@@ -59,44 +59,25 @@ private_draw_node (LIMdlNode* node)
 
 /*****************************************************************************/
 
-void
-liren_draw_all (LIRenContext* context,
-                LIRenObject*  object,
-                void*         data)
+void liren_draw_default (
+	LIRenContext*  context,
+	int            index,
+	int            count,
+	LIMatMatrix*   matrix,
+	LIRenMaterial* material,
+	LIRenBuffer*   indices,
+	LIRenBuffer*   vertices)
 {
-	int i;
-	int flags;
-	LIMatMatrix matrix;
-	LIRenMaterial* material;
-	LIRenModel* model;
-
-	model = object->model;
-
-	/* Rendering mode. */
-	flags = 0;
-	flags |= LIREN_FLAG_LIGHTING;
-	flags |= LIREN_FLAG_TEXTURING;
-
-	/* Render the mesh. */
-	matrix = object->orientation.matrix;
-	for (i = 0 ; i < model->buffers.count ; i++)
-	{
-		material = model->materials.array[i];
-		if ((!context->deferred || material->shader_deferred != NULL))
-		{
-			liren_context_set_flags (context, flags);
-			liren_context_set_material (context, material);
-			liren_context_set_material_shader (context, material);
-			liren_context_set_matrix (context, &matrix);
-			liren_context_set_textures (context, material->textures.array, material->textures.count);
-			liren_context_bind (context);
-			liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
-		}
-	}
-
-#ifdef LIREN_ENABLE_PROFILING
-	context->render->profiling.objects++;
-#endif
+	if (context->deferred && material->shader_deferred == NULL)
+		return;
+	liren_context_set_flags (context, LIREN_FLAG_LIGHTING | LIREN_FLAG_TEXTURING);
+	liren_context_set_material (context, material);
+	liren_context_set_material_shader (context, material);
+	liren_context_set_modelmatrix (context, matrix);
+	liren_context_set_textures (context, material->textures.array, material->textures.count);
+	liren_context_set_buffers (context, vertices, indices);
+	liren_context_bind (context);
+	liren_context_render_indexed (context, index, count);
 }
 
 void
@@ -191,10 +172,11 @@ liren_draw_exclude (LIRenContext* context,
 		liren_context_set_flags (context, flags);
 		liren_context_set_material (context, material);
 		liren_context_set_material_shader (context, material);
-		liren_context_set_matrix (context, &matrix);
+		liren_context_set_modelmatrix (context, &matrix);
 		liren_context_set_textures (context, material->textures.array, material->textures.count);
+		liren_context_set_buffers (context, model->vertices, model->buffers.array + i);
 		liren_context_bind (context);
-		liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
+		liren_context_render_indexed (context, 0, model->buffers.array[i].elements.count);
 	}
 
 #ifdef LIREN_ENABLE_PROFILING
@@ -218,6 +200,7 @@ liren_draw_hair (LIRenContext* context,
 	float len1;
 	float blend;
 	LIMatMatrix matrix;
+	LIMatMatrix view;
 	LIMatVector bbx;
 	LIMatVector bby;
 	LIMatVector bbz;
@@ -241,12 +224,13 @@ liren_draw_hair (LIRenContext* context,
 	flags |= LIREN_FLAG_TEXTURING;
 	matrix = object->orientation.matrix;
 	liren_context_set_flags (context, flags);
-	liren_context_set_matrix (context, &matrix);
+	liren_context_set_modelmatrix (context, &matrix);
 
 	/* Calculate billboard axis. */
-	bbx = limat_vector_init (context->modelview.m[0], context->modelview.m[4], context->modelview.m[8]);
-	bby = limat_vector_init (context->modelview.m[1], context->modelview.m[5], context->modelview.m[9]);
-	bbz = limat_vector_init (context->modelview.m[2], context->modelview.m[6], context->modelview.m[10]);
+	view = context->matrix.view;
+	bbx = limat_vector_init (view.m[0], view.m[4], view.m[8]);
+	bby = limat_vector_init (view.m[1], view.m[5], view.m[9]);
+	bbz = limat_vector_init (view.m[2], view.m[6], view.m[10]);
 
 	/* Render hair groups. */
 	glDisable (GL_CULL_FACE);
@@ -342,10 +326,11 @@ liren_draw_opaque (LIRenContext* context,
 			liren_context_set_flags (context, flags);
 			liren_context_set_material (context, material);
 			liren_context_set_material_shader (context, material);
-			liren_context_set_matrix (context, &matrix);
+			liren_context_set_modelmatrix (context, &matrix);
 			liren_context_set_textures (context, material->textures.array, material->textures.count);
+			liren_context_set_buffers (context, model->vertices, model->buffers.array + i);
 			liren_context_bind (context);
-			liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
+			liren_context_render_indexed (context, 0, model->buffers.array[i].elements.count);
 		}
 	}
 
@@ -377,9 +362,10 @@ liren_draw_picking (LIRenContext* context,
 	{
 		material = model->materials.array[i];
 		liren_context_set_flags (context, flags);
-		liren_context_set_matrix (context, &matrix);
+		liren_context_set_modelmatrix (context, &matrix);
+		liren_context_set_buffers (context, model->vertices, model->buffers.array + i);
 		liren_context_bind (context);
-		liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
+		liren_context_render_indexed (context, 0, model->buffers.array[i].elements.count);
 	}
 }
 
@@ -407,10 +393,11 @@ liren_draw_shadeless (LIRenContext* context,
 		liren_context_set_flags (context, flags);
 		liren_context_set_material (context, material);
 		liren_context_set_material_shader (context, material);
-		liren_context_set_matrix (context, &matrix);
+		liren_context_set_modelmatrix (context, &matrix);
 		liren_context_set_textures (context, material->textures.array, material->textures.count);
+		liren_context_set_buffers (context, model->vertices, model->buffers.array + i);
 		liren_context_bind (context);
-		liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
+		liren_context_render_indexed (context, 0, model->buffers.array[i].elements.count);
 	}
 
 #ifdef LIREN_ENABLE_PROFILING
@@ -433,9 +420,10 @@ liren_draw_shadowmap (LIRenContext* context,
 	matrix = object->orientation.matrix;
 	for (i = 0 ; i < model->buffers.count ; i++)
 	{
-		liren_context_set_matrix (context, &matrix);
+		liren_context_set_modelmatrix (context, &matrix);
+		liren_context_set_buffers (context, model->vertices, model->buffers.array + i);
 		liren_context_bind (context);
-		liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
+		liren_context_render_indexed (context, 0, model->buffers.array[i].elements.count);
 	}
 
 #ifdef LIREN_ENABLE_PROFILING
@@ -471,10 +459,11 @@ liren_draw_transparent (LIRenContext* context,
 			liren_context_set_flags (context, flags);
 			liren_context_set_material (context, material);
 			liren_context_set_material_shader (context, material);
-			liren_context_set_matrix (context, &matrix);
+			liren_context_set_modelmatrix (context, &matrix);
 			liren_context_set_textures (context, material->textures.array, material->textures.count);
+			liren_context_set_buffers (context, model->vertices, model->buffers.array + i);
 			liren_context_bind (context);
-			liren_context_render_indexed (context, model->vertices, model->buffers.array + i);
+			liren_context_render_indexed (context, 0, model->buffers.array[i].elements.count);
 		}
 	}
 

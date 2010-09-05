@@ -58,11 +58,9 @@ static int
 private_sort_objects (const void* first,
                       const void* second);
 
-static int
-private_sort_scene (LIRenScene*   self,
-                    LIRenContext* context,
-                    LIRenObject** result_list,
-                    int*          result_count);
+static int private_sort_scene (
+	LIRenScene*   self,
+	LIRenContext* context);
 
 /*****************************************************************************/
 
@@ -114,6 +112,9 @@ liren_scene_free (LIRenScene* self)
 	/* Free particles. */
 	if (self->particles != NULL)
 		lipar_manager_free (self->particles);
+
+	if (self->sort != NULL)
+		liren_sort_free (self->sort);
 
 	/* Free objects. */
 	if (self->groups != NULL)
@@ -196,7 +197,7 @@ liren_scene_pick (LIRenScene*     self,
 	pick = limat_matrix_multiply (pick, *projection);
 	context = liren_render_get_context (self->render);
 	liren_context_set_scene (context, self);
-	liren_context_set_modelview (context, modelview);
+	liren_context_set_viewmatrix (context, modelview);
 	liren_context_set_projection (context, &pick);
 	liren_context_set_frustum (context, frustum);
 
@@ -266,9 +267,7 @@ liren_scene_render_begin (LIRenScene*    self,
                           LIMatMatrix*   projection,
                           LIMatFrustum*  frustum)
 {
-	int count;
 	LIRenContext* context;
-	LIRenObject* objects = NULL;
 
 	lisys_assert (modelview != NULL);
 	lisys_assert (projection != NULL);
@@ -277,28 +276,17 @@ liren_scene_render_begin (LIRenScene*    self,
 		return 0;
 	liren_check_errors ();
 
-	/* Save matrices. */
-	glMatrixMode (GL_PROJECTION);
-	glPushMatrix ();
-	glMatrixMode (GL_MODELVIEW);
-	glPushMatrix ();
-
 	/* Initialize context. */
 	context = liren_render_get_context (self->render);
+	liren_context_init (context);
 	liren_context_set_scene (context, self);
-	liren_context_set_modelview (context, modelview);
+	liren_context_set_viewmatrix (context, modelview);
 	liren_context_set_projection (context, projection);
 	liren_context_set_frustum (context, frustum);
 
 	/* Depth sort scene. */
-	if (!private_sort_scene (self, context, &objects, &count))
-	{
-		glMatrixMode (GL_PROJECTION);
-		glPopMatrix ();
-		glMatrixMode (GL_MODELVIEW);
-		glPopMatrix ();
+	if (!private_sort_scene (self, context))
 		return 0;
-	}
 
 	/* Change render state. */
 	glEnable (GL_DEPTH_TEST);
@@ -322,8 +310,6 @@ liren_scene_render_begin (LIRenScene*    self,
 	self->state.rendering = 1;
 	self->state.context = context;
 	self->state.framebuffer = framebuffer;
-	self->state.objects = objects;
-	self->state.objectn = count;
 
 	/* Enable backbuffer viewport. */
 	glPushAttrib (GL_VIEWPORT_BIT);
@@ -387,7 +373,6 @@ liren_scene_render_end (LIRenScene* self)
 	liren_check_errors ();
 
 	/* Update state. */
-	lisys_free (self->state.objects);
 	memset (&self->state, 0, sizeof (self->state));
 
 	/* Change render state. */
@@ -411,12 +396,6 @@ liren_scene_render_end (LIRenScene* self)
 	glColor3f (1.0f, 1.0f, 1.0f);
 	liren_check_errors ();
 	self->state.rendering = 0;
-
-	/* Restore matrices. */
-	glMatrixMode (GL_PROJECTION);
-	glPopMatrix ();
-	glMatrixMode (GL_MODELVIEW);
-	glPopMatrix ();
 
 	/* Profiling report. */
 #ifdef LIREN_ENABLE_PROFILING
@@ -494,24 +473,22 @@ void liren_scene_render_deferred_opaque (
 	LIRenScene* self)
 {
 	int i;
+	LIRenSortgroup* group;
 
 	/* Validate state. */
 	if (!self->state.rendering)
 		return;
 
-	/* Render opaque faces to G-buffer. */
-	if (self->state.alphatest)
+	/* Render face groups to G-buffer. */
+	for (i = 0 ; i < self->sort->groups.count ; i++)
 	{
-		for (i = 0 ; i < self->state.objectn ; i++)
-			liren_draw_all (self->state.context, self->state.objects + i, NULL);
-		liren_check_errors ();
+		group = self->sort->groups.array + i;
+		if (!self->state.alphatest && group->transparent)
+			continue;
+		liren_draw_default (self->state.context, 0, group->indices->elements.count,
+			&group->matrix, group->material, group->indices, group->vertices);
 	}
-	else
-	{
-		for (i = 0 ; i < self->state.objectn ; i++)
-			liren_draw_opaque (self->state.context, self->state.objects + i, NULL);
-		liren_check_errors ();
-	}
+	liren_check_errors ();
 }
 
 /**
@@ -529,9 +506,9 @@ liren_scene_render_forward_opaque (LIRenScene* self,
 {
 	int i;
 	LIAlgPtrdicIter iter;
-	LIMatAabb aabb0;
-	LIMatAabb aabb1;
+	LIMatAabb aabb;
 	LIRenLight* light;
+	LIRenSortgroup* group;
 
 	/* Validate state. */
 	if (!self->state.rendering)
@@ -544,28 +521,28 @@ liren_scene_render_forward_opaque (LIRenScene* self,
 	glDisable (GL_BLEND);
 	glAlphaFunc (GL_GEQUAL, threshold);
 
-	/* Render opaque faces to post-processing buffer. */
-	for (i = 0 ; i < self->state.objectn ; i++)
+	/* Render face groups to post-processing buffer. */
+	for (i = 0 ; i < self->sort->groups.count ; i++)
 	{
-		liren_object_get_bounds (self->state.objects + i, &aabb1);
+		group = self->sort->groups.array + i;
+		if (!alpha && group->transparent)
+			continue;
 		/* FIXME: Looping through all lights and objects is slow. */
 		LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
 		{
 			light = iter.value;
 			if (light->enabled)
 			{
-				liren_light_get_bounds (light, &aabb0);
-				if (limat_aabb_intersects_aabb (&aabb0, &aabb1))
+				liren_light_get_bounds (light, &aabb);
+				if (limat_aabb_intersects_aabb (&aabb, &group->bounds))
 				{
-					liren_context_set_lights (self->state.context, &light, 1);
-					if (alpha)
-						liren_draw_all (self->state.context, self->state.objects + i, NULL);
-					else
-						liren_draw_opaque (self->state.context, self->state.objects + i, NULL);
+					liren_draw_default (self->state.context, 0, group->indices->elements.count,
+						&group->matrix, group->material, group->indices, group->vertices);
 				}
 			}
 		}
 	}
+	liren_check_errors ();
 
 	/* Change render state. */
 	glDisable (GL_ALPHA_TEST);
@@ -586,9 +563,9 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 {
 	int i;
 	LIAlgPtrdicIter iter;
-	LIMatAabb aabb0;
-	LIMatAabb aabb1;
+	LIMatAabb aabb;
 	LIRenLight* light;
+	LIRenSortface* face;
 
 	/* Validate state. */
 	if (!self->state.rendering)
@@ -604,22 +581,26 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/* Render transparent faces to post-processing buffer. */
-	for (i = self->state.objectn - 1 ; i >= 0 ; i--)
+	for (i = self->sort->buckets.count - 1 ; i >= 0 ; i--)
 	{
-		liren_object_get_bounds (self->state.objects + i, &aabb1);
-		/* FIXME: Looping through all lights and objects is slow. */
+		/* FIXME: Looping through all lights and faces is slow. */
 		LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
 		{
 			light = iter.value;
 			if (light->enabled)
 			{
-				liren_light_get_bounds (light, &aabb0);
-				if (limat_aabb_intersects_aabb (&aabb0, &aabb1))
+				for (face = self->sort->buckets.array[i] ; face != NULL ; face = face->next)
 				{
-					liren_context_set_lights (self->state.context, &light, 1);
-					liren_draw_transparent (self->state.context, self->state.objects + i, NULL);
+					liren_light_get_bounds (light, &aabb);
+					if (limat_aabb_intersects_aabb (&aabb, &face->bounds))
+					{
+						liren_context_set_lights (self->state.context, &light, 1);
+						liren_draw_default (self->state.context, face->index, 3,
+							&face->matrix, face->material, face->indices, face->vertices);
+					}
 				}
 			}
+			break;
 		}
 	}
 
@@ -775,6 +756,9 @@ private_init (LIRenScene* self)
 	self->particles = lipar_manager_new (LIREN_PARTICLE_MAXIMUM_COUNT);
 	if (self->particles == NULL)
 		return 0;
+	self->sort = liren_sort_new (self->render);
+	if (self->sort == NULL)
+		return 0;
 	return 1;
 }
 
@@ -803,12 +787,12 @@ private_light_bounds (LIRenScene*   self,
 	p[6] = limat_vector_init (bounds.max.x, bounds.max.y, bounds.min.z);
 	p[7] = limat_vector_init (bounds.max.x, bounds.max.y, bounds.max.z);
 	tmp = limat_vector_init (0.0f, 0.0f, 0.0f);
-	limat_matrix_project (context->projection, context->modelview, viewport, p, &tmp);
+	limat_matrix_project (context->matrix.projection, context->matrix.view, viewport, p, &tmp);
 	min = max = tmp;
 	for (i = 1 ; i < 8 ; i++)
 	{
 		tmp = limat_vector_init (0.0f, 0.0f, 0.0f);
-		limat_matrix_project (context->projection, context->modelview, viewport, p + i, &tmp);
+		limat_matrix_project (context->matrix.projection, context->matrix.view, viewport, p + i, &tmp);
 		if (tmp.x < min.x) min.x = tmp.x;
 		if (tmp.y < min.y) min.y = tmp.y;
 		if (tmp.z < min.z) min.z = tmp.z;
@@ -868,10 +852,11 @@ private_lighting_render (LIRenScene*    self,
 	textures[3].params.wraps = GL_CLAMP_TO_EDGE;
 	textures[3].params.wrapt = GL_CLAMP_TO_EDGE;
 	liren_context_set_flags (context, LIREN_FLAG_LIGHTING | LIREN_FLAG_TEXTURING);
-	liren_context_set_matrix (context, &matrix);
+	liren_context_set_modelmatrix (context, &matrix);
 	liren_context_set_shader (context, shader);
 	liren_context_set_lights (context, NULL, 0);
 	liren_context_set_textures (context, textures, 4);
+	liren_context_set_buffers (context, NULL, NULL);
 
 	/* Let each light lit the scene. */
 	LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
@@ -951,7 +936,7 @@ private_particle_render (LIRenScene* self)
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE);
 
 	/* Get billboard axis. */
-	matrix = self->state.context->modelviewinverse;
+	matrix = self->state.context->matrix.modelviewinverse;
 	bbp = limat_matrix_transform (matrix, limat_vector_init (0.0f, 0.0f, 0.0f));
 	bbx = limat_matrix_transform (matrix, limat_vector_init (1.0f, 0.0f, 0.0f));
 	bby = limat_matrix_transform (matrix, limat_vector_init (0.0f, 1.0f, 0.0f));
@@ -1133,31 +1118,23 @@ private_sort_objects (const void* first,
 	return 0;
 }
 
-static int
-private_sort_scene (LIRenScene*   self,
-                    LIRenContext* context,
-                    LIRenObject** result_list,
-                    int*          result_count)
+static int private_sort_scene (
+	LIRenScene*   self,
+	LIRenContext* context)
 {
-	int i;
-	int capacity;
-	int count;
 	LIAlgU32dicIter iter0;
 	LIAlgPtrdicIter iter1;
 	LIMatAabb aabb;
-	LIMatVector center0;
-	LIMatVector center1;
+	LIMatMatrix matrix;
 	LIRenGroup* group;
 	LIRenGroupObject* grpobj;
-	LIRenObject* tmp;
-	LIRenObject* objects;
 	LIRenObject* rndobj;
 
-	count = 0;
-	capacity = 256;
-	objects = lisys_calloc (capacity, sizeof (LIRenObject));
-	if (objects == NULL)
-		return 0;
+	/* Initialize sorting. */
+	liren_sort_clear (self->sort);
+	liren_context_bind (context);
+	self->sort->modelview = context->matrix.view;
+	self->sort->projection = context->matrix.projection;
 
 	/* Collect scene objects. */
 	LIALG_U32DIC_FOREACH (iter0, self->objects)
@@ -1168,20 +1145,7 @@ private_sort_scene (LIRenScene*   self,
 		liren_object_get_bounds (rndobj, &aabb);
 		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
 			continue;
-		if (count == capacity)
-		{
-			capacity <<= 1;
-			tmp = lisys_realloc (objects, capacity * sizeof (LIRenObject));
-			if (tmp == NULL)
-			{
-				lisys_free (objects);
-				return 0;
-			}
-			objects = tmp;
-		}
-		tmp = objects + count;
-		*tmp = *rndobj;
-		count++;
+		liren_sort_add_object (self->sort, rndobj);
 	}
 
 	/* Collect group objects. */
@@ -1195,44 +1159,10 @@ private_sort_scene (LIRenScene*   self,
 			continue;
 		for (grpobj = group->objects ; grpobj != NULL ; grpobj = grpobj->next)
 		{
-			if (count == capacity)
-			{
-				capacity <<= 1;
-				tmp = lisys_realloc (objects, capacity * sizeof (LIRenObject));
-				if (tmp == NULL)
-				{
-					lisys_free (objects);
-					return 0;
-				}
-				objects = tmp;
-			}
-			tmp = objects + count;
-			memset (tmp, 0, sizeof (LIRenObject));
-			tmp->transform = grpobj->transform;
-			tmp->scene = self;
-			tmp->model = grpobj->model;
-			tmp->orientation.center = grpobj->transform.position;
-			tmp->orientation.matrix = limat_convert_transform_to_matrix (grpobj->transform);
-			count++;
+			matrix = limat_convert_transform_to_matrix (grpobj->transform);
+			liren_sort_add_model (self->sort, &aabb, &matrix, grpobj->model);
 		}
 	}
-
-	/* Calculate distances to camera. */
-	liren_context_bind (context);
-	center0 = limat_matrix_transform (context->modelviewinverse, limat_vector_init (0.0f, 0.0f, 0.0f));
-	for (i = 0 ; i < count ; i++)
-	{
-		rndobj = objects + i;
-		liren_object_get_center (rndobj, &center1);
-		rndobj->sort = limat_vector_get_length (limat_vector_subtract (center0, center1));
-	}
-
-	/* Sort the list. */
-	qsort (objects, count, sizeof (LIRenObject), private_sort_objects);
-
-	/* Return the list. */
-	*result_list = objects;
-	*result_count = count;
 
 	return 1;
 }

@@ -32,6 +32,7 @@
 #include "render/render-object.h"
 #include "render/render-scene.h"
 #include "render/render-shader.h"
+#include "render/render-sort.h"
 #include "render/render-texture.h"
 #include "render/render-types.h"
 

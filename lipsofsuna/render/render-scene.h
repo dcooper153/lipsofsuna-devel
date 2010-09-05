@@ -32,6 +32,7 @@
 #include "render-light.h"
 #include "render-lighting.h"
 #include "render-object.h"
+#include "render-sort.h"
 #include "render-types.h"
 
 struct _LIRenScene
@@ -40,15 +41,14 @@ struct _LIRenScene
 	LIAlgU32dic* objects;
 	LIParManager* particles;
 	LIRenRender* render;
+	LIRenSort* sort;
 	LIRenLighting* lighting;
 	struct
 	{
 		int alphatest;
 		int rendering;
-		int objectn;
 		LIRenContext* context;
 		LIRenDeferred* framebuffer;
-		LIRenObject* objects;
 	} state;
 	struct
 	{

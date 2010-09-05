@@ -363,18 +363,31 @@ liren_light_get_modelview (const LIRenLight* self,
 }
 
 /**
- * \brief Gets the world position of the light.
- *
- * The position is derived from the modelview matrix of the light.
- *
+ * \brief Gets the OpenGL position vector for the light.
  * \param self Light source.
- * \param value Return location for the position.
+ * \param value Return location for 4 floats.
  */
-void
-liren_light_get_position (const LIRenLight* self,
-                          LIMatVector*      value)
+void liren_light_get_position (
+	const LIRenLight* self,
+	GLfloat*          value)
 {
-	*value = self->transform.position;
+	LIMatVector tmp;
+
+	if (self->directional)
+	{
+		liren_light_get_direction (self, &tmp);
+		value[0] = -tmp.x;
+		value[1] = -tmp.y;
+		value[2] = -tmp.z;
+		value[3] = 0.0f;
+	}
+	else
+	{
+		value[0] = self->transform.position.x;
+		value[1] = self->transform.position.y;
+		value[2] = self->transform.position.z;
+		value[3] = 1.0f;
+	}
 }
 
 /**
@@ -470,7 +483,7 @@ private_update_shadow (LIRenLight* self)
 	limat_frustum_init (&frustum, &self->modelview, &self->projection);
 	context = liren_render_get_context (self->scene->render);
 	liren_context_set_scene (context, self->scene);
-	liren_context_set_modelview (context, &self->modelview);
+	liren_context_set_viewmatrix (context, &self->modelview);
 	liren_context_set_projection (context, &self->projection);
 	liren_context_set_frustum (context, &frustum);
 	liren_context_set_shader (context, shader);

@@ -316,18 +316,8 @@ private_init_resources (LIRenRender* self,
 	self->context = lisys_calloc (1, sizeof (LIRenContext));
 	if (self->context == NULL)
 		return 0;
-	self->context->compiled = 1;
-	self->context->scene = NULL;
 	self->context->render = self;
-	self->context->material.shininess = 1.0f;
-	self->context->material.diffuse[0] = 1.0f;
-	self->context->material.diffuse[1] = 1.0f;
-	self->context->material.diffuse[2] = 1.0f;
-	self->context->material.diffuse[3] = 1.0f;
-	self->context->matrix = limat_matrix_identity ();
-	self->context->modelview = limat_matrix_identity ();
-	self->context->modelviewinverse = limat_matrix_identity ();
-	self->context->projection = limat_matrix_identity ();
+	liren_context_init (self->context);
 
 	/* Initialize image dictionary. */
 	self->images = lialg_strdic_new ();

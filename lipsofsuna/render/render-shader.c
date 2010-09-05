@@ -445,12 +445,26 @@ static int private_uniform_value (
 			return LIREN_UNIFORM_NONE;
 		return LIREN_UNIFORM_DIFFUSETEXTURE0 + index;
 	}
-	if (!strncmp (value, "LIGHTTYPE", 9))
+	if (!strncmp (value, "LIGHTAMBIENT", 12))
 	{
-		index = atoi (value + 9);
+		index = atoi (value + 12);
 		if (index < 0 || index > 9)
 			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_LIGHTTYPE0 + index;
+		return LIREN_UNIFORM_LIGHTAMBIENT0 + index;
+	}
+	if (!strncmp (value, "LIGHTDIFFUSE", 12))
+	{
+		index = atoi (value + 12);
+		if (index < 0 || index > 9)
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_LIGHTDIFFUSE0 + index;
+	}
+	if (!strncmp (value, "LIGHTEQUATION", 13))
+	{
+		index = atoi (value + 13);
+		if (index < 0 || index > 9)
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_LIGHTEQUATION0 + index;
 	}
 	if (!strncmp (value, "LIGHTMATRIX", 11))
 	{
@@ -459,6 +473,13 @@ static int private_uniform_value (
 			return LIREN_UNIFORM_NONE;
 		return LIREN_UNIFORM_LIGHTMATRIX0 + index;
 	}
+	if (!strncmp (value, "LIGHTPOSITIONPREMULT", 20))
+	{
+		index = atoi (value + 20);
+		if (index < 0 || index > 9)
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_LIGHTPOSITIONPREMULT0 + index;
+	}
 	if (!strncmp (value, "LIGHTPOSITION", 13))
 	{
 		index = atoi (value + 13);
@@ -466,16 +487,38 @@ static int private_uniform_value (
 			return LIREN_UNIFORM_NONE;
 		return LIREN_UNIFORM_LIGHTPOSITION0 + index;
 	}
+	if (!strncmp (value, "LIGHTSPECULAR", 13))
+	{
+		index = atoi (value + 13);
+		if (index < 0 || index > 9)
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_LIGHTSPECULAR0 + index;
+	}
+	if (!strncmp (value, "LIGHTTYPE", 9))
+	{
+		index = atoi (value + 9);
+		if (index < 0 || index > 9)
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_LIGHTTYPE0 + index;
+	}
 	if (!strcmp (value, "MATERIALDIFFUSE"))
 		return LIREN_UNIFORM_MATERIALDIFFUSE;
 	if (!strcmp (value, "MATERIALSHININESS"))
 		return LIREN_UNIFORM_MATERIALSHININESS;
 	if (!strcmp (value, "MATERIALSPECULAR"))
 		return LIREN_UNIFORM_MATERIALSPECULAR;
-	if (!strcmp (value, "MODELMATRIX"))
-		return LIREN_UNIFORM_MODELMATRIX;
-	if (!strcmp (value, "MODELVIEWINVERSE"))
-		return LIREN_UNIFORM_MODELVIEWINVERSE;
+	if (!strcmp (value, "MATRIXMODEL"))
+		return LIREN_UNIFORM_MATRIXMODEL;
+	if (!strcmp (value, "MATRIXMODELVIEW"))
+		return LIREN_UNIFORM_MATRIXMODELVIEW;
+	if (!strcmp (value, "MATRIXMODELVIEWINVERSE"))
+		return LIREN_UNIFORM_MATRIXMODELVIEWINVERSE;
+	if (!strcmp (value, "MATRIXNORMAL"))
+		return LIREN_UNIFORM_MATRIXNORMAL;
+	if (!strcmp (value, "MATRIXPROJECTION"))
+		return LIREN_UNIFORM_MATRIXPROJECTION;
+	if (!strcmp (value, "MATRIXPROJECTIONINVERSE"))
+		return LIREN_UNIFORM_MATRIXPROJECTIONINVERSE;
 	if (!strcmp (value, "NOISETEXTURE"))
 		return LIREN_UNIFORM_NOISETEXTURE;
 	if (!strcmp (value, "PARAM0"))

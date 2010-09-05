@@ -29,10 +29,14 @@
 #include "render-object.h"
 #include "render-types.h"
 
-void
-liren_draw_all (LIRenContext* context,
-                LIRenObject*  object,
-                void*         data);
+void liren_draw_default (
+	LIRenContext*  context,
+	int            index,
+	int            count,
+	LIMatMatrix*   matrix,
+	LIRenMaterial* material,
+	LIRenBuffer*   indices,
+	LIRenBuffer*   vertices);
 
 void
 liren_draw_bounds (LIRenContext* context,

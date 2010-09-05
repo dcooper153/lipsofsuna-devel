@@ -34,28 +34,44 @@
 #include "render-texture.h"
 #include "render-types.h"
 
+typedef struct _LIRenContextTexture LIRenContextTexture;
+struct _LIRenContextTexture
+{
+	GLuint texture;
+	GLenum magfilter;
+	GLenum minfilter;
+	GLenum wraps;
+	GLenum wrapt;
+};
+
 struct _LIRenContext
 {
-	int compiled;
 	int deferred;
 	int incomplete;
 	int shadows;
 	LIRenRender* render;
 	LIRenScene* scene;
 	LIRenShader* shader;
+	LIRenBuffer* vertex;
+	LIRenBuffer* index;
 	LIMatFrustum frustum;
-	LIMatMatrix matrix;
-	LIMatMatrix modelview;
-	LIMatMatrix modelviewinverse;
-	LIMatMatrix projection;
 	struct
 	{
+		unsigned int index : 1;
+		unsigned int lights : 1;
 		unsigned int shader : 1;
+		unsigned int material : 1;
+		unsigned int matrix_model : 1;
+		unsigned int matrix_projection : 1;
+		unsigned int matrix_view : 1;
+		unsigned int textures : 1;
+		unsigned int uniforms : 1;
+		unsigned int vertex : 1;
 	} changed;
 	struct
 	{
 		int count;
-		LIRenLight** array;
+		LIRenLight* array[9];
 	} lights;
 	struct
 	{
@@ -67,78 +83,94 @@ struct _LIRenContext
 	} material;
 	struct
 	{
+		LIMatMatrix model;
+		LIMatMatrix modelview;
+		LIMatMatrix modelviewinverse;
+		LIMatMatrix projection;
+		LIMatMatrix projectioninverse;
+		LIMatMatrix view;
+	} matrix;
+	struct
+	{
 		int count;
-		LIRenTexture* array;
+		LIRenContextTexture array[9];
 	} textures;
 };
 
-void
-liren_context_bind (LIRenContext* self);
+LIAPICALL (void, liren_context_init, (
+	LIRenContext* self));
 
-void
-liren_context_render_array (LIRenContext* self,
-                            LIRenBuffer*  vertex);
+LIAPICALL (void, liren_context_bind, (
+	LIRenContext* self));
 
-void
-liren_context_render_indexed (LIRenContext* self,
-                              LIRenBuffer*  vertex,
-                              LIRenBuffer*  index);
+LIAPICALL (void, liren_context_render_array, (
+	LIRenContext* self));
 
-void
-liren_context_unbind (LIRenContext* self);
+LIAPICALL (void, liren_context_render_indexed, (
+	LIRenContext* self,
+	int           start,
+	int           count));
 
-int
-liren_context_get_deferred (LIRenContext* self);
+LIAPICALL (void, liren_context_unbind, (
+	LIRenContext* self));
 
-void
-liren_context_set_deferred (LIRenContext* self,
-                            int           value);
+LIAPICALL (void, liren_context_set_buffers, (
+	LIRenContext* self,
+	LIRenBuffer*  vertex,
+	LIRenBuffer*  index));
 
-void
-liren_context_set_flags (LIRenContext* self,
-                         int           value);
+LIAPICALL (int, liren_context_get_deferred, (
+	LIRenContext* self));
 
-void
-liren_context_set_frustum (LIRenContext*       self,
-                           const LIMatFrustum* frustum);
+LIAPICALL (void, liren_context_set_deferred, (
+	LIRenContext* self,
+	int           value));
 
-void
-liren_context_set_lights (LIRenContext* self,
-                          LIRenLight**  value,
-                          int           count);
+LIAPICALL (void, liren_context_set_flags, (
+	LIRenContext* self,
+	int           value));
 
-void
-liren_context_set_material (LIRenContext*        self,
-                            const LIRenMaterial* value);
+LIAPICALL (void, liren_context_set_frustum, (
+	LIRenContext*       self,
+	const LIMatFrustum* frustum));
 
-void
-liren_context_set_material_shader (LIRenContext*        self,
-                                   const LIRenMaterial* value);
+LIAPICALL (void, liren_context_set_lights, (
+	LIRenContext* self,
+	LIRenLight**  value,
+	int           count));
 
-void
-liren_context_set_matrix (LIRenContext*      self,
-                          const LIMatMatrix* value);
+LIAPICALL (void, liren_context_set_material, (
+	LIRenContext*        self,
+	const LIRenMaterial* value));
 
-void
-liren_context_set_modelview (LIRenContext*      self,
-                             const LIMatMatrix* value);
+LIAPICALL (void, liren_context_set_material_shader, (
+	LIRenContext*        self,
+	const LIRenMaterial* value));
 
-void
-liren_context_set_projection (LIRenContext*      self,
-                              const LIMatMatrix* value);
+LIAPICALL (void, liren_context_set_modelmatrix, (
+	LIRenContext*      self,
+	const LIMatMatrix* value));
 
-void
-liren_context_set_scene (LIRenContext* self,
-                         LIRenScene*   scene);
+LIAPICALL (void, liren_context_set_viewmatrix, (
+	LIRenContext*      self,
+	const LIMatMatrix* value));
 
-void
-liren_context_set_shader (LIRenContext* self,
-                          LIRenShader*  value);
+LIAPICALL (void, liren_context_set_projection, (
+	LIRenContext*      self,
+	const LIMatMatrix* value));
 
-void
-liren_context_set_textures (LIRenContext* self,
-                            LIRenTexture* value,
-                            int           count);
+LIAPICALL (void, liren_context_set_scene, (
+	LIRenContext* self,
+	LIRenScene*   scene));
+
+LIAPICALL (void, liren_context_set_shader, (
+	LIRenContext* self,
+	LIRenShader*  value));
+
+LIAPICALL (void, liren_context_set_textures, (
+	LIRenContext* self,
+	LIRenTexture* value,
+	int           count));
 
 #endif
 

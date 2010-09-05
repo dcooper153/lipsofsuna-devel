@@ -550,7 +550,7 @@ static void private_envmap_update (
 		limat_frustum_init (&frustum, &modelview, &projection);
 		context = liren_render_get_context (self->scene->render);
 		liren_context_set_scene (context, self->scene);
-		liren_context_set_modelview (context, &modelview);
+		liren_context_set_viewmatrix (context, &modelview);
 		liren_context_set_projection (context, &projection);
 		liren_context_set_frustum (context, &frustum);
 		LIALG_U32DIC_FOREACH (iter, self->scene->objects)

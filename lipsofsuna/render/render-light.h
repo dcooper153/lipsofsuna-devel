@@ -111,6 +111,10 @@ LIAPICALL (void, liren_light_get_modelview, (
 	const LIRenLight* self,
 	LIMatMatrix*      value));
 
+LIAPICALL (void, liren_light_get_position, (
+	const LIRenLight* self,
+	GLfloat*          value));
+
 LIAPICALL (void, liren_light_get_transform, (
 	LIRenLight*     self,
 	LIMatTransform* value));

@@ -53,6 +53,9 @@ typedef struct _LIRenScene LIRenScene;
 typedef enum _LIRenSelect LIRenSelect;
 typedef struct _LIRenSelection LIRenSelection;
 typedef struct _LIRenShader LIRenShader;
+typedef struct _LIRenSortgroup LIRenSortgroup;
+typedef struct _LIRenSortface LIRenSortface;
+typedef struct _LIRenSort LIRenSort;
 typedef struct _LIRenTexture LIRenTexture;
 typedef void (*lirenCallback) (LIRenContext*, LIRenObject*, void*);
 
