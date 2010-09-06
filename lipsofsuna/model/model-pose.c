@@ -235,9 +235,12 @@ void limdl_pose_update (
 {
 	int i;
 	LIAlgU32dicIter iter;
+	LIMatQuaternion quat0;
+	LIMatQuaternion quat1;
 	LIMdlPoseFade* fade;
 	LIMdlPoseFade* fade_next;
 	LIMdlPoseChannel* chan;
+	LIMdlPoseGroup* group;
 	LIMdlNode* node0;
 	LIMdlNode* node1;
 
@@ -286,6 +289,20 @@ void limdl_pose_update (
 		node0 = self->nodes.array[i];
 		private_transform_node (self, node0);
 	}
+
+	/* Update pose group transformations. */
+	for (i = 0 ; i < self->groups.count ; i++)
+	{
+		group = self->groups.array + i;
+		if (group->enabled)
+		{
+			quat0 = group->rest_node->transform.global.rotation;
+			quat1 = group->pose_node->transform.global.rotation;
+			quat0 = limat_quaternion_conjugate (quat0);
+			group->rotation = limat_quaternion_multiply (quat1, quat0);
+			group->head_pose = group->pose_node->transform.global.position;
+		}
+	}
 }
 
 void limdl_pose_transform (
@@ -294,97 +311,61 @@ void limdl_pose_transform (
 {
 	int i;
 	int j;
-	int count;
-	float total;
-	LIMatQuaternion quat0;
-	LIMatQuaternion quat1;
 	LIMatVector tmp;
 	LIMatVector rest_vertex;
 	LIMatVector pose_vertex;
 	LIMatVector rest_normal;
 	LIMatVector pose_normal;
-	LIMdlNode* restbone;
-	LIMdlNode* posebone;
+	LIMatVector rest_tangent;
+	LIMatVector pose_tangent;
+	LIMdlPoseGroup* group;
+	LIMdlPoseVertex* vertex;
 	LIMdlWeight* weight;
 	LIMdlWeights* weights;
-	LIMdlModel* model = self->model;
 
-	if (model == NULL)
+	if (self->model == NULL)
 		return;
 
 	/* Transform each vertex. */
-	for (i = 0 ; i < model->vertices.count ; i++)
+	for (i = 0 ; i < self->model->vertices.count ; i++)
 	{
-		count = 0;
-		total = 0.0f;
-
 		/* Get the rest pose state. */
-		rest_vertex = model->vertices.array[i].coord;
-		rest_normal = model->vertices.array[i].normal;
-		rest_normal = limat_vector_add (rest_normal, rest_vertex);
+		vertex = self->vertices.array + i;
+		rest_vertex = self->model->vertices.array[i].coord;
+		rest_normal = self->model->vertices.array[i].normal;
+		rest_tangent = self->model->vertices.array[i].tangent;
 		pose_vertex = limat_vector_init (0.0f, 0.0f, 0.0f);
 		pose_normal = limat_vector_init (0.0f, 0.0f, 0.0f);
-
-		/* Calculate total weight. The model file might not have weights
-		   so we might have to skip and use the original vertex. */
-		if (i < model->weights.count)
-		{
-			weights = model->weights.array + i;
-			for (j = 0 ; j < weights->count ; j++)
-			{
-				weight = weights->weights + j;
-				if (weight->weight != 0.0f)
-				{
-					restbone = model->weightgroups.array[weight->group].node;
-					posebone = self->groups.array[weight->group].node;
-					if (restbone != NULL && posebone != NULL)
-					{
-						total += weight->weight;
-						count++;
-					}
-				}
-			}
-		}
+		pose_tangent = limat_vector_init (0.0f, 0.0f, 0.0f);
 
 		/* Transform by each weight group. */
-		if (count && total != 0.0f)
+		if (vertex->weight_count && vertex->weight_total != 0.0f)
 		{
-			weights = model->weights.array + i;
+			weights = self->model->weights.array + i;
 			for (j = 0 ; j < weights->count ; j++)
 			{
-				/* Get transformation weight. */
+				/* Transform by a weight group. */
 				weight = weights->weights + j;
-				if (weight->weight == 0.0f)
-					continue;
+				group = self->groups.array + weight->group;
+				if (weight->weight != 0.0f && group->enabled)
+				{
+					/* Transform the vertex. */
+					tmp = limat_vector_subtract (rest_vertex, group->head_rest);
+					tmp = limat_quaternion_transform (group->rotation, tmp);
+					tmp = limat_vector_add (tmp, group->head_pose);
+					pose_vertex = limat_vector_add (pose_vertex,
+						limat_vector_multiply (tmp, weight->weight / vertex->weight_total));
 
-				/* Get transformed bone. */
-				restbone = model->weightgroups.array[weight->group].node;
-				posebone = self->groups.array[weight->group].node;
-				if (restbone == NULL || posebone == NULL)
-					continue;
-				count++;
+					/* Transform the normal. */
+					tmp = limat_quaternion_transform (group->rotation, rest_normal);
+					pose_normal = limat_vector_add (pose_normal,
+						limat_vector_multiply (tmp, weight->weight / vertex->weight_total));
 
-#warning Possible to use transforms here?
-				/* Get the rotations. */
-				quat0 = restbone->transform.global.rotation;
-				quat1 = posebone->transform.global.rotation;
-				quat0 = limat_quaternion_conjugate (quat0);
-
-				/* Transform the vertex. */
-				tmp = limat_vector_subtract (rest_vertex, restbone->transform.global.position);
-				tmp = limat_quaternion_transform (quat0, tmp);
-				tmp = limat_quaternion_transform (quat1, tmp);
-				tmp = limat_vector_add (tmp, posebone->transform.global.position);
-				pose_vertex = limat_vector_add (pose_vertex,
-					limat_vector_multiply (tmp, weight->weight / total));
-
-				/* Transform the normal. */
-				tmp = limat_vector_subtract (rest_normal, restbone->transform.global.position);
-				tmp = limat_quaternion_transform (quat0, tmp);
-				tmp = limat_quaternion_transform (quat1, tmp);
-				tmp = limat_vector_add (tmp, posebone->transform.global.position);
-				pose_normal = limat_vector_add (pose_normal,
-					limat_vector_multiply (tmp, weight->weight / total));
+					/* Transform the tangent. */
+					tmp = limat_quaternion_transform (group->rotation, rest_tangent);
+					pose_tangent = limat_vector_add (pose_tangent,
+						limat_vector_multiply (tmp, weight->weight / vertex->weight_total));
+				}
 			}
 		}
 		else
@@ -392,13 +373,13 @@ void limdl_pose_transform (
 			/* Default to the rest pose. */
 			pose_vertex = rest_vertex;
 			pose_normal = rest_normal;
+			pose_tangent = rest_tangent;
 		}
 
 		/* Set the transformed state. */
-		pose_normal = limat_vector_subtract (pose_normal, pose_vertex);
-		pose_normal = limat_vector_normalize (pose_normal);
 		vertices[i].coord = pose_vertex;
-		vertices[i].normal = pose_normal;
+		vertices[i].normal = limat_vector_normalize (pose_normal);
+		vertices[i].tangent = limat_vector_normalize (pose_tangent);
 	}
 }
 
@@ -657,6 +638,8 @@ int limdl_pose_set_model (
 	self->groups.array = NULL;
 	self->nodes.count = 0;
 	self->nodes.array = NULL;
+	self->vertices.count = 0;
+	self->vertices.array = NULL;
 
 	/* Initialize new pose. */
 	if (model != NULL)
@@ -780,16 +763,8 @@ static void private_clear_pose (
 		lisys_free (self->nodes.array);
 	}
 
-	/* Free weight groups. */
-	if (self->groups.array != NULL)
-	{
-		for (i = 0 ; i < self->groups.count ; i++)
-		{
-			lisys_free (self->groups.array[i].name);
-			lisys_free (self->groups.array[i].bone);
-		}
-		lisys_free (self->groups.array);
-	}
+	lisys_free (self->groups.array);
+	lisys_free (self->vertices.array);
 }
 
 static LIMdlPoseChannel* private_create_channel (
@@ -861,11 +836,19 @@ static int private_init_pose (
 	LIMdlModel* model)
 {
 	int i;
+	int j;
+	LIMdlPoseGroup* pose_group;
+	LIMdlPoseVertex* pose_vertex;
+	LIMdlWeight* weight;
+	LIMdlWeights* weights;
+	LIMdlWeightGroup* weight_group;
 
 	/* Set model. */
 	self->model = model;
 	self->groups.count = model->weightgroups.count;
 	self->nodes.count = model->nodes.count;
+	if (model->weights.count)
+		self->vertices.count = model->vertices.count;
 
 	/* Copy nodes. */
 	if (self->nodes.count)
@@ -881,20 +864,49 @@ static int private_init_pose (
 		}
 	}
 
-	/* Copy weight groups. */
+	/* Precalculate weight group information. */
 	if (self->groups.count)
 	{
-		self->groups.array = lisys_calloc (self->groups.count, sizeof (LIMdlWeightGroup));
+		self->groups.array = lisys_calloc (self->groups.count, sizeof (LIMdlPoseGroup));
 		if (self->groups.array == NULL)
 			return 0;
 		for (i = 0 ; i < self->groups.count ; i++)
 		{
-			self->groups.array[i].name = listr_dup (model->weightgroups.array[i].name);
-			self->groups.array[i].bone = listr_dup (model->weightgroups.array[i].bone);
-			self->groups.array[i].node = limdl_pose_find_node (self, self->groups.array[i].bone);
-			if (self->groups.array[i].name == NULL ||
-				self->groups.array[i].bone == NULL)
-				return 0;
+			weight_group = model->weightgroups.array + i;
+			pose_group = self->groups.array + i;
+			pose_group->weight_group = weight_group;
+			pose_group->rest_node = weight_group->node;
+			pose_group->pose_node = limdl_pose_find_node (self, weight_group->bone);
+			pose_group->rotation = limat_quaternion_identity ();
+			if (pose_group->rest_node != NULL)
+				pose_group->head_rest = pose_group->rest_node->transform.global.position;
+			if (pose_group->rest_node != NULL && pose_group->pose_node != NULL)
+				pose_group->enabled = 1;
+		}
+	}
+
+	/* Precalculate vertex weight information. */
+	if (self->vertices.count)
+	{
+		self->vertices.array = lisys_calloc (self->vertices.count, sizeof (LIMdlPoseVertex));
+		if (self->vertices.array == NULL)
+			return 0;
+		for (i = 0 ; i < self->vertices.count ; i++)
+		{
+			pose_vertex = self->vertices.array + i;
+			pose_vertex->weight_count = 0;
+			pose_vertex->weight_total = 0.0f;
+			weights = model->weights.array + i;
+			for (j = 0 ; j < weights->count ; j++)
+			{
+				weight = weights->weights + j;
+				pose_group = self->groups.array + weight->group;
+				if (weight->weight != 0.0f && pose_group->enabled)
+				{
+					pose_vertex->weight_total += weight->weight;
+					pose_vertex->weight_count++;
+				}
+			}
 		}
 	}
 

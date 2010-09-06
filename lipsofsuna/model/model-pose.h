@@ -61,6 +61,25 @@ struct _LIMdlPoseFade
 	LIMdlAnimation* animation;
 };
 
+typedef struct _LIMdlPoseGroup LIMdlPoseGroup;
+struct _LIMdlPoseGroup
+{
+	int enabled;
+	LIMatVector head_pose;
+	LIMatVector head_rest;
+	LIMatQuaternion rotation;
+	LIMdlNode* rest_node;
+	LIMdlNode* pose_node;
+	LIMdlWeightGroup* weight_group;
+};
+
+typedef struct _LIMdlPoseVertex LIMdlPoseVertex;
+struct _LIMdlPoseVertex
+{
+	int weight_count;
+	float weight_total;
+};
+
 struct _LIMdlPose
 {
 	LIMdlModel* model;
@@ -69,13 +88,18 @@ struct _LIMdlPose
 	struct
 	{
 		int count;
-		LIMdlWeightGroup* array;
+		LIMdlPoseGroup* array;
 	} groups;
 	struct
 	{
 		int count;
 		LIMdlNode** array;
 	} nodes;
+	struct
+	{
+		int count;
+		LIMdlPoseVertex* array;
+	} vertices;
 };
 
 #ifdef __cplusplus
