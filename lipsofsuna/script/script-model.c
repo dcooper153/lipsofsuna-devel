@@ -146,7 +146,10 @@ static void Model_setter_file (LIScrArgs* args)
 	const char* file;
 
 	if (liscr_args_geti_string (args, 0, &file))
-		lieng_model_load (args->self, file);
+	{
+		if (!lieng_model_load (args->self, file))
+			lisys_error_report ();
+	}
 }
 
 /* @luadoc
