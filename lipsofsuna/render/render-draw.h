@@ -35,8 +35,7 @@ void liren_draw_default (
 	int            count,
 	LIMatMatrix*   matrix,
 	LIRenMaterial* material,
-	LIRenBuffer*   indices,
-	LIRenBuffer*   vertices);
+	LIRenBuffer*   buffer);
 
 void
 liren_draw_bounds (LIRenContext* context,

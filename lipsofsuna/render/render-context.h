@@ -52,21 +52,19 @@ struct _LIRenContext
 	LIRenRender* render;
 	LIRenScene* scene;
 	LIRenShader* shader;
-	LIRenBuffer* vertex;
-	LIRenBuffer* index;
+	LIRenBuffer* buffer;
 	LIMatFrustum frustum;
 	struct
 	{
-		unsigned int index : 1;
+		unsigned int buffer : 1;
 		unsigned int lights : 1;
-		unsigned int shader : 1;
 		unsigned int material : 1;
 		unsigned int matrix_model : 1;
 		unsigned int matrix_projection : 1;
 		unsigned int matrix_view : 1;
+		unsigned int shader : 1;
 		unsigned int textures : 1;
 		unsigned int uniforms : 1;
-		unsigned int vertex : 1;
 	} changed;
 	struct
 	{
@@ -103,9 +101,6 @@ LIAPICALL (void, liren_context_init, (
 LIAPICALL (void, liren_context_bind, (
 	LIRenContext* self));
 
-LIAPICALL (void, liren_context_render_array, (
-	LIRenContext* self));
-
 LIAPICALL (void, liren_context_render_indexed, (
 	LIRenContext* self,
 	int           start,
@@ -114,10 +109,9 @@ LIAPICALL (void, liren_context_render_indexed, (
 LIAPICALL (void, liren_context_unbind, (
 	LIRenContext* self));
 
-LIAPICALL (void, liren_context_set_buffers, (
+LIAPICALL (void, liren_context_set_buffer, (
 	LIRenContext* self,
-	LIRenBuffer*  vertex,
-	LIRenBuffer*  index));
+	LIRenBuffer*  vertex));
 
 LIAPICALL (int, liren_context_get_deferred, (
 	LIRenContext* self));

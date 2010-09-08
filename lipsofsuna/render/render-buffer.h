@@ -34,7 +34,6 @@
 enum
 {
 	LIREN_BUFFER_TYPE_DYNAMIC,
-	LIREN_BUFFER_TYPE_MEMORY,
 	LIREN_BUFFER_TYPE_STATIC,
 	LIREN_BUFFER_TYPE_STREAM
 };
@@ -42,33 +41,37 @@ enum
 struct _LIRenBuffer
 {
 	int type;
-	GLuint buffer;
-	GLenum target;
-	LIRenFormat format;
+	GLuint index_buffer;
+	GLuint vertex_array;
+	GLuint vertex_buffer;
+	LIRenFormat vertex_format;
 	struct
 	{
 		int count;
-		void* array;
-	} elements;
+	} indices;
+	struct
+	{
+		int count;
+	} vertices;
 };
 
-LIAPICALL (int, liren_buffer_init_index, (
-	LIRenBuffer* self,
-	const void*  data,
-	int          count,
-	int          type));
-
-LIAPICALL (int, liren_buffer_init_vertex, (
+LIAPICALL (int, liren_buffer_init, (
 	LIRenBuffer*       self,
-	const LIRenFormat* format,
-	const void*        data,
-	int                count,
+	const void*        index_data,
+	int                index_count,
+	const LIRenFormat* vertex_format,
+	const void*        vertex_data,
+	int                vertex_count,
 	int                type));
 
 LIAPICALL (void, liren_buffer_free, (
 	LIRenBuffer* self));
 
-LIAPICALL (void*, liren_buffer_lock, (
+LIAPICALL (void*, liren_buffer_lock_indices, (
+	LIRenBuffer* self,
+	int          write));
+
+LIAPICALL (void*, liren_buffer_lock_vertices, (
 	LIRenBuffer* self,
 	int          write));
 
@@ -76,7 +79,11 @@ LIAPICALL (void, liren_buffer_replace_data, (
 	LIRenBuffer* self,
 	void*        data));
 
-LIAPICALL (void, liren_buffer_unlock, (
+LIAPICALL (void, liren_buffer_unlock_indices, (
+	LIRenBuffer* self,
+	void*        data));
+
+LIAPICALL (void, liren_buffer_unlock_vertices, (
 	LIRenBuffer* self,
 	void*        data));
 

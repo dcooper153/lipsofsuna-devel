@@ -67,6 +67,7 @@ LIRenShader* liren_shader_new (
 	const char*  name,
 	const char*  config,
 	const char*  vertex,
+	const char*  geometry,
 	const char*  fragment)
 {
 	GLint length;
@@ -103,12 +104,20 @@ LIRenShader* liren_shader_new (
 
 	/* Create shader objects. */
 	self->vertex = glCreateShaderObjectARB (GL_VERTEX_SHADER);
+	if (geometry != NULL)
+		self->geometry = glCreateShaderObjectARB (GL_GEOMETRY_SHADER_ARB);
 	self->fragment = glCreateShaderObjectARB (GL_FRAGMENT_SHADER);
 
 	/* Upload shader source. */
 	length = strlen (vertex);
 	ptr = vertex;
 	glShaderSourceARB (self->vertex, 1, &ptr, &length);
+	if (geometry != NULL)
+	{
+		length = strlen (geometry);
+		ptr = geometry;
+		glShaderSourceARB (self->geometry, 1, &ptr, &length);
+	}
 	length = strlen (fragment);
 	ptr = fragment;
 	glShaderSourceARB (self->fragment, 1, &ptr, &length);
@@ -119,6 +128,17 @@ LIRenShader* liren_shader_new (
 	{
 		liren_shader_free (self);
 		return NULL;
+	}
+
+	/* Compile the geometry shader. */
+	if (geometry != NULL)
+	{
+		glCompileShaderARB (self->geometry);
+		if (!private_check_compile (self, name, self->geometry))
+		{
+			liren_shader_free (self);
+			return NULL;
+		}
 	}
 
 	/* Compile the fragment shader. */
@@ -132,6 +152,8 @@ LIRenShader* liren_shader_new (
 	/* Link the shader program. */
 	self->program = glCreateProgramObjectARB ();
 	glAttachObjectARB (self->program, self->vertex);
+	if (geometry)
+		glAttachObjectARB (self->program, self->geometry);
 	glAttachObjectARB (self->program, self->fragment);
 	private_init_attributes (self);
 	glLinkProgramARB (self->program);
@@ -161,6 +183,8 @@ void liren_shader_free (
 
 	if (self->vertex)
 		glDeleteObjectARB (self->vertex);
+	if (self->geometry)
+		glDeleteObjectARB (self->geometry);
 	if (self->fragment)
 		glDeleteObjectARB (self->fragment);
 	if (self->program)
@@ -189,7 +213,12 @@ static int private_check_compile (
 	GLsizei length;
 	LIArcReader* reader;
 
-	type = (shader == self->vertex)? "vertex" : "fragment";
+	if (shader == self->vertex)
+		type = "vertex";
+	else if (shader == self->fragment)
+		type = "fragment";
+	else
+		type = "geometry";
 	glGetObjectParameterivARB (shader, GL_COMPILE_STATUS, &status);
 	if (status == GL_FALSE)
 	{
@@ -201,7 +230,7 @@ static int private_check_compile (
 			{
 				while (liarc_reader_get_text (reader, "\n", &text))
 				{
-					printf ("WARNING: %s:%s%s\n", name, type, text);
+					printf ("WARNING: %s:%s %s\n", name, type, text);
 					lisys_free (text);
 				}
 				liarc_reader_free (reader);
@@ -257,7 +286,10 @@ static void private_init_attributes (
 		for (i = 0 ; i < self->attributes.count ; i++)
 		{
 			attribute = self->attributes.array + i;
-			attribute->binding = i + 1;
+			if (attribute->value != LIREN_ATTRIBUTE_NONE)
+				attribute->binding = attribute->value;
+			else
+				attribute->binding = LIREN_ATTRIBUTE_COORD;
 			glBindAttribLocationARB (self->program, attribute->binding, attribute->name);
 		}
 	}
@@ -415,8 +447,6 @@ static int private_attribute_value (
 		return LIREN_ATTRIBUTE_COORD;
 	if (!strcmp (value, "NORMAL"))
 		return LIREN_ATTRIBUTE_NORMAL;
-	if (!strcmp (value, "TANGENT"))
-		return LIREN_ATTRIBUTE_TANGENT;
 	if (!strcmp (value, "TEXCOORD"))
 		return LIREN_ATTRIBUTE_TEXCOORD;
 

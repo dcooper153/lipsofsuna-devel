@@ -32,7 +32,6 @@ typedef struct _LIMdlVertex LIMdlVertex;
 struct _LIMdlVertex
 {
 	float texcoord[2];
-	LIMatVector tangent;
 	LIMatVector normal;
 	LIMatVector coord;
 };
@@ -41,14 +40,12 @@ static inline void
 limdl_vertex_init (LIMdlVertex*       self,
                    const LIMatVector* coord,
                    const LIMatVector* normal,
-                   const LIMatVector* tangent,
                    float              u,
                    float              v)
 {
 	memset (self, 0, sizeof (LIMdlVertex));
 	self->texcoord[0] = u;
 	self->texcoord[1] = v;
-	self->tangent = *tangent;
 	self->normal = *normal;
 	self->coord = *coord;
 }

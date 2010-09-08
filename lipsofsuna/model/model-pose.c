@@ -316,8 +316,6 @@ void limdl_pose_transform (
 	LIMatVector pose_vertex;
 	LIMatVector rest_normal;
 	LIMatVector pose_normal;
-	LIMatVector rest_tangent;
-	LIMatVector pose_tangent;
 	LIMdlPoseGroup* group;
 	LIMdlPoseVertex* vertex;
 	LIMdlWeight* weight;
@@ -333,10 +331,8 @@ void limdl_pose_transform (
 		vertex = self->vertices.array + i;
 		rest_vertex = self->model->vertices.array[i].coord;
 		rest_normal = self->model->vertices.array[i].normal;
-		rest_tangent = self->model->vertices.array[i].tangent;
 		pose_vertex = limat_vector_init (0.0f, 0.0f, 0.0f);
 		pose_normal = limat_vector_init (0.0f, 0.0f, 0.0f);
-		pose_tangent = limat_vector_init (0.0f, 0.0f, 0.0f);
 
 		/* Transform by each weight group. */
 		if (vertex->weight_count && vertex->weight_total != 0.0f)
@@ -360,11 +356,6 @@ void limdl_pose_transform (
 					tmp = limat_quaternion_transform (group->rotation, rest_normal);
 					pose_normal = limat_vector_add (pose_normal,
 						limat_vector_multiply (tmp, weight->weight / vertex->weight_total));
-
-					/* Transform the tangent. */
-					tmp = limat_quaternion_transform (group->rotation, rest_tangent);
-					pose_tangent = limat_vector_add (pose_tangent,
-						limat_vector_multiply (tmp, weight->weight / vertex->weight_total));
 				}
 			}
 		}
@@ -373,13 +364,11 @@ void limdl_pose_transform (
 			/* Default to the rest pose. */
 			pose_vertex = rest_vertex;
 			pose_normal = rest_normal;
-			pose_tangent = rest_tangent;
 		}
 
 		/* Set the transformed state. */
 		vertices[i].coord = pose_vertex;
 		vertices[i].normal = limat_vector_normalize (pose_normal);
-		vertices[i].tangent = limat_vector_normalize (pose_tangent);
 	}
 }
 

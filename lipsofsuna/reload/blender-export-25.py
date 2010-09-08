@@ -5,7 +5,7 @@ class LIEnum:
 		self.debug = False
 		self.files = []
 		self.MAGIC = 'lips/mdl'
-		self.VERSION = 0xFFFFFFF4
+		self.VERSION = 0xFFFFFFF3
 		self.LIGHTFLAG_NOSHADOW = 1
 		self.MATRFLAG_BILLBOARD = 1
 		self.MATRFLAG_COLLISION = 2
@@ -328,11 +328,11 @@ class LIMesh:
 		self.vertlist = []
 		self.weightgroupdict = {}
 		self.weightgrouplist = []
-		# Emit weight groups.
-		#for group in obj.vertex_groups:
-		#	self.weightgrouplist.append(group.name)
 		# Emit faces.
 		for face in mesh.faces:
+			# Vertices.
+			verts = [mesh.verts[x] for x in face.verts]
+			indices = [x for x in face.verts]
 			# Material attributes.
 			idx = face.material_index
 			bmat = None
@@ -355,14 +355,13 @@ class LIMesh:
 			else:
 				mat = self.matdict[key]
 			# Emit face.
-			vnum = 0
-			for vi in face.verts:
+			for i in range(0, len(verts)):
 				# Vertex attributes.
-				bvert = mesh.verts[vi]
+				bvert = verts[i]
 				no = face.smooth and bvert.normal or face.normal
-				uv = uvs[vnum]
+				uv = uvs[i]
 				# Emit vertex.
-				key = (vi, no.x, no.y, no.z, uv[0], uv[1])
+				key = (indices[i], no.x, no.y, no.z, uv[0], uv[1])
 				if key not in self.vertdict:
 					# Add weights.
 					weights = []
@@ -383,7 +382,6 @@ class LIMesh:
 					vert = self.vertdict[key]
 				# Emit index.
 				mat.indices.append(vert.index)
-				vnum = vnum + 1
 
 	def write_bounds(self, writer):
 		if not len(self.vertlist):
@@ -850,9 +848,6 @@ class LIVertex:
 	def write(self, writer):
 		writer.write_float(self.uv[0])
 		writer.write_float(1.0 - self.uv[1])
-		writer.write_float(0) # TODO: Tangent
-		writer.write_float(0) # TODO: Tangent
-		writer.write_float(0) # TODO: Tangent
 		writer.write_float(self.no.x)
 		writer.write_float(self.no.y)
 		writer.write_float(self.no.z)

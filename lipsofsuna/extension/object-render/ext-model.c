@@ -33,7 +33,7 @@
  */
 
 /* @luadoc
- * --- Vertex usage style. ("dynamic"/"memory"/"static"/"stream")
+ * --- Vertex usage style. ("dynamic"/"static"/"stream")
  * -- @name Model.vertex_policy
  * -- @class table
  */
@@ -55,9 +55,6 @@ static void Model_getter_vertex_policy (LIScrArgs* args)
 	{
 		case LIREN_BUFFER_TYPE_DYNAMIC:
 			liscr_args_seti_string (args, "dynamic");
-			break;
-		case LIREN_BUFFER_TYPE_MEMORY:
-			liscr_args_seti_string (args, "memory");
 			break;
 		case LIREN_BUFFER_TYPE_STATIC:
 			liscr_args_seti_string (args, "static");
@@ -86,8 +83,6 @@ static void Model_setter_vertex_policy (LIScrArgs* args)
 		return;
 	if (!strcmp (value, "dynamic"))
 		liren_model_set_type (model, LIREN_BUFFER_TYPE_DYNAMIC);
-	else if (!strcmp (value, "memory"))
-		liren_model_set_type (model, LIREN_BUFFER_TYPE_MEMORY);
 	else if (!strcmp (value, "static"))
 		liren_model_set_type (model, LIREN_BUFFER_TYPE_STATIC);
 	else if (!strcmp (value, "stream"))

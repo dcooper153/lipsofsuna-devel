@@ -431,7 +431,6 @@ private_merge_height_model (LIVoxBuilder* self,
 	LIMatVector ex[2][3];
 	LIMatVector ez[2][3];
 	LIMatVector n[4];
-	LIMatVector t[4];
 	LIMatVector uv[8];
 	LIMdlVertex bot[3][3];
 	LIMdlVertex top[3][3];
@@ -469,11 +468,8 @@ private_merge_height_model (LIVoxBuilder* self,
 		n[1] = limat_vector_init (0.0f, -1.0f, 0.0f);
 		uv[0] = limat_transform_transform (voxel->transform, topco[x][z]);
 		uv[1] = limat_transform_transform (voxel->transform, botco[x][z]);
-		/* FIXME: Bad tangents. */
-		t[0] = limat_vector_init (1.0f, 0.0f, 0.0f);
-		t[1] = limat_vector_init (1.0f, 0.0f, 0.0f);
-		limdl_vertex_init (&(top[x][z]), &(topco[x][z]), n + 0, t + 0, ssurf * uv[0].x, ssurf * uv[0].z);
-		limdl_vertex_init (&(bot[x][z]), &(botco[x][z]), n + 1, t + 1, sside * uv[1].x, sside * uv[1].z);
+		limdl_vertex_init (&(top[x][z]), &(topco[x][z]), n + 0, ssurf * uv[0].x, ssurf * uv[0].z);
+		limdl_vertex_init (&(bot[x][z]), &(botco[x][z]), n + 1, sside * uv[1].x, sside * uv[1].z);
 	}
 
 	/* Calculate smooth normals. */
@@ -523,19 +519,14 @@ private_merge_height_model (LIVoxBuilder* self,
 		uv[5] = limat_transform_transform (voxel->transform, topco[2 - x][2]);
 		uv[6] = limat_transform_transform (voxel->transform, botco[0][2 - x]);
 		uv[7] = limat_transform_transform (voxel->transform, topco[0][2 - x]);
-		/* FIXME: Bad tangents. */
-		t[0] = limat_vector_init (1.0f, 0.0f, 0.0f);
-		t[1] = limat_vector_init (0.0f, 0.0f, 1.0f);
-		t[2] = limat_vector_init (-1.0f, 0.0f, 0.0f);
-		t[3] = limat_vector_init (0.0f, 0.0f, -1.0f);
-		limdl_vertex_init (&(side[x][0]), &(botco[x][0]), n + 0, t + 0, sside * uv[0].x, sside * uv[0].y);
-		limdl_vertex_init (&(side[x][1]), &(topco[x][0]), n + 0, t + 0, sside * uv[1].x, sside * uv[1].y);
-		limdl_vertex_init (&(side[3 + x][0]), &(botco[2][x]), n + 1, t + 1, sside * uv[2].z, sside * uv[2].y);
-		limdl_vertex_init (&(side[3 + x][1]), &(topco[2][x]), n + 1, t + 1, sside * uv[3].z, sside * uv[3].y);
-		limdl_vertex_init (&(side[8 - x][0]), &(botco[2 - x][2]), n + 2, t + 2, sside * uv[4].x, sside * uv[4].y);
-		limdl_vertex_init (&(side[8 - x][1]), &(topco[2 - x][2]), n + 2, t + 2, sside * uv[5].x, sside * uv[5].y);
-		limdl_vertex_init (&(side[11 - x][0]), &(botco[0][2 - x]), n + 3, t + 3, sside * uv[6].z, sside * uv[6].y);
-		limdl_vertex_init (&(side[11 - x][1]), &(topco[0][2 - x]), n + 3, t + 3, sside * uv[7].z, sside * uv[7].y);
+		limdl_vertex_init (&(side[x][0]), &(botco[x][0]), n + 0, sside * uv[0].x, sside * uv[0].y);
+		limdl_vertex_init (&(side[x][1]), &(topco[x][0]), n + 0, sside * uv[1].x, sside * uv[1].y);
+		limdl_vertex_init (&(side[3 + x][0]), &(botco[2][x]), n + 1, sside * uv[2].z, sside * uv[2].y);
+		limdl_vertex_init (&(side[3 + x][1]), &(topco[2][x]), n + 1, sside * uv[3].z, sside * uv[3].y);
+		limdl_vertex_init (&(side[8 - x][0]), &(botco[2 - x][2]), n + 2, sside * uv[4].x, sside * uv[4].y);
+		limdl_vertex_init (&(side[8 - x][1]), &(topco[2 - x][2]), n + 2, sside * uv[5].x, sside * uv[5].y);
+		limdl_vertex_init (&(side[11 - x][0]), &(botco[0][2 - x]), n + 3, sside * uv[6].z, sside * uv[6].y);
+		limdl_vertex_init (&(side[11 - x][1]), &(topco[0][2 - x]), n + 3, sside * uv[7].z, sside * uv[7].y);
 	}
 
 	/* Find or create materials. */

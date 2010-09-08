@@ -77,8 +77,9 @@ int liren_sort_add_group (
 	LIRenSort*     self,
 	LIMatAabb*     bounds,
 	LIMatMatrix*   matrix,
-	LIRenBuffer*   indices,
-	LIRenBuffer*   vertices,
+	int            index,
+	int            count,
+	LIRenBuffer*   buffer,
 	LIRenMaterial* material,
 	int            transparent)
 {
@@ -98,16 +99,17 @@ int liren_sort_add_group (
 
 	/* Append the group to the buffer. */
 	num = self->groups.count;
+	self->groups.array[num].index = index;
+	self->groups.array[num].count = count;
 	self->groups.array[num].transparent = transparent;
 	self->groups.array[num].bounds = *bounds;
 	self->groups.array[num].matrix = *matrix;
-	self->groups.array[num].indices = indices;
-	self->groups.array[num].vertices = vertices;
+	self->groups.array[num].buffer = buffer;
 	self->groups.array[num].material = material;
 	self->groups.count++;
 
 	if (transparent)
-		return liren_sort_add_faces (self, bounds, matrix, indices, vertices, material);
+		return liren_sort_add_faces (self, bounds, matrix, index, count, buffer, material);
 
 	return 1;
 }
@@ -116,8 +118,9 @@ int liren_sort_add_faces (
 	LIRenSort*     self,
 	LIMatAabb*     bounds,
 	LIMatMatrix*   matrix,
-	LIRenBuffer*   indices,
-	LIRenBuffer*   vertices,
+	int            index,
+	int            count,
+	LIRenBuffer*   buffer,
 	LIRenMaterial* material)
 {
 	int i;
@@ -137,7 +140,7 @@ int liren_sort_add_faces (
 	LIRenSortface* tmp;
 
 	/* Resize the buffer if necessary. */
-	need = self->faces.count + indices->elements.count / 3;
+	need = self->faces.count + count / 3;
 	if (self->faces.capacity <= need)
 	{
 		num = self->faces.capacity << 1;
@@ -173,17 +176,16 @@ int liren_sort_add_faces (
 
 	/* Add each face in the group. */
 	num = self->faces.count;
-	fmt = &vertices->format;
-	vtxdata = liren_buffer_lock (vertices, 0);
-	idxdata = liren_buffer_lock (indices, 0);
-	for (i = 0 ; i < indices->elements.count ; i += 3, num++)
+	fmt = &buffer->vertex_format;
+	vtxdata = liren_buffer_lock_vertices (buffer, 0);
+	idxdata = liren_buffer_lock_indices (buffer, 0);
+	for (i = 0 ; i < count ; i += 3, num++)
 	{
 		/* Append the face to the buffer. */
-		self->faces.array[num].index = i;
+		self->faces.array[num].index = index + i;
 		self->faces.array[num].bounds = *bounds;
 		self->faces.array[num].matrix = *matrix;
-		self->faces.array[num].indices = indices;
-		self->faces.array[num].vertices = vertices;
+		self->faces.array[num].buffer = buffer;
 		self->faces.array[num].material = material;
 
 		/* Calculate the center of the triangle. */
@@ -206,8 +208,8 @@ int liren_sort_add_faces (
 		self->faces.array[num].next = self->buckets.array[bucket];
 		self->buckets.array[bucket] = self->faces.array + num;
 	}
-	liren_buffer_unlock (indices, idxdata);
-	liren_buffer_unlock (vertices, vtxdata);
+	liren_buffer_unlock_indices (buffer, idxdata);
+	liren_buffer_unlock_vertices (buffer, vtxdata);
 	self->faces.count = num;
 
 	return 1;
@@ -221,17 +223,16 @@ int liren_sort_add_model (
 {
 	int i;
 	int ret = 1;
-	LIRenBuffer* buffer;
+	int transp;
 	LIRenMaterial* material;
 
 	for (i = 0 ; i < model->materials.count ; i++)
 	{
 		material = model->materials.array[i];
-		buffer = model->buffers.array + i;
-		if (material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY)
-			ret &= liren_sort_add_group (self, bounds, matrix, buffer, model->vertices, material, 1);
-		else
-			ret &= liren_sort_add_group (self, bounds, matrix, buffer, model->vertices, material, 0);
+		transp = (material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY);
+		ret &= liren_sort_add_group (self, bounds, matrix,
+			model->groups.array[i].start, model->groups.array[i].count,
+			model->buffer, material, transp);
 	}
 
 	return ret;

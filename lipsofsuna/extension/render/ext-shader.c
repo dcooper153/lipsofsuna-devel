@@ -40,6 +40,7 @@
  * -- @param args Arguments.<ul>
  * --   <li>config: Shader configuration code.</li>
  * --   <li>fragment: Fragment program code.</li>
+ * --   <li>geometry: Geometry program code.</li>
  * --   <li>name: Unique shader name.</li>
  * --   <li>vertex: Vertex program code.</li></ul>
  * function Shader.new(clss, args)
@@ -49,6 +50,7 @@ static void Shader_new (LIScrArgs* args)
 	const char* name = "forward-default";
 	const char* config = "";
 	const char* fragment = "void main()\n{\ngl_FragColor = vec4(1.0,1.0,1.0,1.0);\n}";
+	const char* geometry = NULL;
 	const char* vertex = "void main()\n{\ngl_Position=ftransform();\n}";
 	LIExtModule* module;
 	LIRenShader* shader;
@@ -56,6 +58,7 @@ static void Shader_new (LIScrArgs* args)
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SHADER);
 	liscr_args_gets_string (args, "config", &config);
 	liscr_args_gets_string (args, "fragment", &fragment);
+	liscr_args_gets_string (args, "geometry", &geometry);
 	liscr_args_gets_string (args, "name", &name);
 	liscr_args_gets_string (args, "vertex", &vertex);
 
@@ -65,7 +68,7 @@ static void Shader_new (LIScrArgs* args)
 		return;
 
 	/* Allocate self. */
-	shader = liren_shader_new (module->client->render, name, config, vertex, fragment);
+	shader = liren_shader_new (module->client->render, name, config, vertex, geometry, fragment);
 	if (shader == NULL)
 	{
 		lisys_error_report ();

@@ -274,7 +274,6 @@ liren_scene_render_begin (LIRenScene*    self,
 	lisys_assert (frustum != NULL);
 	if (framebuffer == NULL)
 		return 0;
-	liren_check_errors ();
 
 	/* Initialize context. */
 	context = liren_render_get_context (self->render);
@@ -294,8 +293,6 @@ liren_scene_render_begin (LIRenScene*    self,
 	glFrontFace (GL_CCW);
 	glDepthMask (GL_TRUE);
 	glDepthFunc (GL_LEQUAL);
-	glEnable (GL_NORMALIZE);
-	glEnable (GL_COLOR_MATERIAL);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/* Reset profiling. */
@@ -370,7 +367,6 @@ liren_scene_render_end (LIRenScene* self)
 	glPopMatrix ();
 	glMatrixMode (GL_MODELVIEW);
 	glPopMatrix ();
-	liren_check_errors ();
 
 	/* Update state. */
 	memset (&self->state, 0, sizeof (self->state));
@@ -394,7 +390,6 @@ liren_scene_render_end (LIRenScene* self)
 	glDepthMask (GL_FALSE);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor3f (1.0f, 1.0f, 1.0f);
-	liren_check_errors ();
 	self->state.rendering = 0;
 
 	/* Profiling report. */
@@ -447,14 +442,12 @@ void liren_scene_render_deferred_end (
 		return;
 
 	/* Change render state. */
-	liren_check_errors ();
 	glDisable (GL_ALPHA_TEST);
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[0]);
 	glPushAttrib (GL_SCISSOR_BIT);
 
 	/* Render lit fragments to post-processing buffer. */
 	private_lighting_render (self, self->state.context, self->state.framebuffer);
-	liren_check_errors ();
 
 	/* Change render state. */
 	glPopAttrib ();
@@ -485,10 +478,9 @@ void liren_scene_render_deferred_opaque (
 		group = self->sort->groups.array + i;
 		if (!self->state.alphatest && group->transparent)
 			continue;
-		liren_draw_default (self->state.context, 0, group->indices->elements.count,
-			&group->matrix, group->material, group->indices, group->vertices);
+		liren_draw_default (self->state.context, group->index, group->count,
+			&group->matrix, group->material, group->buffer);
 	}
-	liren_check_errors ();
 }
 
 /**
@@ -536,17 +528,15 @@ liren_scene_render_forward_opaque (LIRenScene* self,
 				liren_light_get_bounds (light, &aabb);
 				if (limat_aabb_intersects_aabb (&aabb, &group->bounds))
 				{
-					liren_draw_default (self->state.context, 0, group->indices->elements.count,
-						&group->matrix, group->material, group->indices, group->vertices);
+					liren_draw_default (self->state.context, group->index, group->count,
+						&group->matrix, group->material, group->buffer);
 				}
 			}
 		}
 	}
-	liren_check_errors ();
 
 	/* Change render state. */
 	glDisable (GL_ALPHA_TEST);
-	liren_check_errors ();
 }
 
 /**
@@ -573,7 +563,6 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 
 	/* Change render state. */
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[0]);
-	glEnable (GL_COLOR_MATERIAL);
 	glEnable (GL_BLEND);
 	glEnable (GL_CULL_FACE);
 	glEnable (GL_DEPTH_TEST);
@@ -596,7 +585,7 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 					{
 						liren_context_set_lights (self->state.context, &light, 1);
 						liren_draw_default (self->state.context, face->index, 3,
-							&face->matrix, face->material, face->indices, face->vertices);
+							&face->matrix, face->material, face->buffer);
 					}
 				}
 			}
@@ -606,8 +595,6 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 
 	/* Change render state. */
 	liren_context_set_lights (self->state.context, NULL, 0);
-	liren_check_errors ();
-	glDisable (GL_COLOR_MATERIAL);
 	glDisable (GL_CULL_FACE);
 
 	/* Render particles. */
@@ -615,7 +602,6 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 
 	/* Change render state. */
 	glDepthMask (GL_TRUE);
-	liren_check_errors ();
 }
 
 /**
@@ -669,7 +655,6 @@ void liren_scene_render_postproc (
 	glTexCoord2i (1, 0);
 	glVertex2i (1, -1);
 	glEnd ();
-	liren_check_errors ();
 
 	/* Swap input and output buffers. */
 	tmp = self->state.framebuffer->postproc_fbo[0];
@@ -856,7 +841,7 @@ private_lighting_render (LIRenScene*    self,
 	liren_context_set_shader (context, shader);
 	liren_context_set_lights (context, NULL, 0);
 	liren_context_set_textures (context, textures, 4);
-	liren_context_set_buffers (context, NULL, NULL);
+	liren_context_set_buffer (context, NULL);
 
 	/* Let each light lit the scene. */
 	LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)

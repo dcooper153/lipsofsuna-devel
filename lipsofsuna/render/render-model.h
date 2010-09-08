@@ -33,18 +33,25 @@
 #include "render-material.h"
 #include "render-types.h"
 
+typedef struct _LIRenModelGroup LIRenModelGroup;
+struct _LIRenModelGroup
+{
+	int start;
+	int count;
+};
+
 struct _LIRenModel
 {
 	int id;
 	int type;
 	LIMdlModel* model;
-	LIRenBuffer* vertices;
+	LIRenBuffer* buffer;
 	LIRenRender* render;
 	struct
 	{
 		int count;
-		LIRenBuffer* array;
-	} buffers;
+		LIRenModelGroup* array;
+	} groups;
 	struct
 	{
 		int count;

@@ -24,72 +24,138 @@
 
 #include "render-buffer.h"
 
-static int private_init (
+int liren_buffer_init (
 	LIRenBuffer*       self,
-	GLenum             target,
-	const LIRenFormat* format,
-	const void*        data,
-	int                count,
-	int                type);
-
-/*****************************************************************************/
-
-int liren_buffer_init_index (
-	LIRenBuffer* self,
-	const void*  data,
-	int          count,
-	int          type)
-{
-	static const LIRenFormat format =
-	{
-		sizeof (uint32_t),
-		GL_FLOAT, 0,
-		GL_FLOAT, 0,
-		GL_FLOAT, 0,
-		GL_FLOAT, 0
-	};
-
-	return private_init (self, GL_ELEMENT_ARRAY_BUFFER_ARB, &format, data, count, type);
-}
-
-int liren_buffer_init_vertex (
-	LIRenBuffer*       self,
-	const LIRenFormat* format,
-	const void*        data,
-	int                count,
+	const void*        index_data,
+	int                index_count,
+	const LIRenFormat* vertex_format,
+	const void*        vertex_data,
+	int                vertex_count,
 	int                type)
 {
-	return private_init (self, GL_ARRAY_BUFFER_ARB, format, data, count, type);
+	int size;
+
+	lisys_assert (vertex_format->vtx_format);
+
+	memset (self, 0, sizeof (LIRenBuffer));
+	self->type = type;
+	self->vertex_format = *vertex_format;
+	glBindVertexArray (0);
+
+	/* Create index buffer object. */
+	if (index_count)
+	{
+		size = index_count * sizeof (uint32_t);
+		glGenBuffers (1, &self->index_buffer);
+		glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, self->index_buffer);
+		glBufferData (GL_ELEMENT_ARRAY_BUFFER, size, index_data, GL_STATIC_DRAW);
+		self->indices.count = index_count;
+	}
+
+	/* Create vertex buffer object. */
+	if (vertex_count)
+	{
+		size = vertex_count * vertex_format->size;
+		switch (self->type)
+		{
+			case LIREN_BUFFER_TYPE_DYNAMIC:
+				glGenBuffers (1, &self->vertex_buffer);
+				glBindBuffer (GL_ARRAY_BUFFER, self->vertex_buffer);
+				glBufferData (GL_ARRAY_BUFFER, size, vertex_data, GL_DYNAMIC_DRAW);
+				break;
+			case LIREN_BUFFER_TYPE_STATIC:
+				glGenBuffers (1, &self->vertex_buffer);
+				glBindBuffer (GL_ARRAY_BUFFER, self->vertex_buffer);
+				glBufferData (GL_ARRAY_BUFFER, size, vertex_data, GL_STATIC_DRAW);
+				break;
+			case LIREN_BUFFER_TYPE_STREAM:
+				glGenBuffers (1, &self->vertex_buffer);
+				glBindBuffer (GL_ARRAY_BUFFER, self->vertex_buffer);
+				glBufferData (GL_ARRAY_BUFFER, size, vertex_data, GL_STREAM_DRAW);
+				break;
+			default:
+				lisys_assert (0 && "invalid vbo type");
+				break;
+		}
+		self->vertices.count = vertex_count;
+	}
+
+	/* Create vertex array object. */
+	if (self->vertex_buffer)
+	{
+		glGenVertexArrays (1, &self->vertex_array);
+		glBindVertexArray (self->vertex_array);
+		glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, self->index_buffer);
+		glBindBuffer (GL_ARRAY_BUFFER, self->vertex_buffer);
+		glEnableVertexAttribArray (LIREN_ATTRIBUTE_COORD);
+		glVertexAttribPointer (LIREN_ATTRIBUTE_COORD, 3, vertex_format->vtx_format,
+			GL_FALSE, vertex_format->size, NULL + vertex_format->vtx_offset);
+		if (vertex_format->nml_format)
+		{
+			glEnableVertexAttribArray (LIREN_ATTRIBUTE_NORMAL);
+			glVertexAttribPointer (LIREN_ATTRIBUTE_NORMAL, 3, vertex_format->nml_format,
+				GL_FALSE, vertex_format->size, NULL + vertex_format->nml_offset);
+		}
+		if (vertex_format->tex_format)
+		{
+			glEnableVertexAttribArray (LIREN_ATTRIBUTE_TEXCOORD);
+			glVertexAttribPointer (LIREN_ATTRIBUTE_TEXCOORD, 2, vertex_format->tex_format,
+				GL_FALSE, vertex_format->size, NULL + vertex_format->tex_offset);
+		}
+	}
+
+	return 1;
 }
 
 void liren_buffer_free (
 	LIRenBuffer* self)
 {
-	if (self->buffer)
-		glDeleteBuffersARB (1, &self->buffer);
-	lisys_free (self->elements.array);
+	if (self->vertex_array)
+		glDeleteVertexArrays (1, &self->vertex_array);
+	if (self->index_buffer)
+		glDeleteBuffers (1, &self->index_buffer);
+	if (self->vertex_buffer)
+		glDeleteBuffers (1, &self->vertex_buffer);
 }
 
-void* liren_buffer_lock (
+void* liren_buffer_lock_indices (
 	LIRenBuffer* self,
 	int          write)
 {
-	int size;
 	void* ret;
 
-	size = self->elements.count * self->format.size;
-	if (self->buffer != 0)
+	if (self->index_buffer)
 	{
-		glBindBufferARB (self->target, self->buffer);
+		glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, self->index_buffer);
 		if (write)
-			ret = glMapBufferARB (self->target, GL_READ_WRITE_ARB);
+			ret = glMapBuffer (GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
 		else
-			ret = glMapBufferARB (self->target, GL_READ_ONLY_ARB);
-		glBindBufferARB (self->target, 0);
+			ret = glMapBuffer (GL_ELEMENT_ARRAY_BUFFER, GL_READ_ONLY);
+		glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
 		return ret;
 	}
 	else
-		return self->elements.array;
+		return NULL;
+}
+
+void* liren_buffer_lock_vertices (
+	LIRenBuffer* self,
+	int          write)
+{
+	void* ret;
+
+	if (self->vertex_buffer)
+	{
+		glBindBuffer (GL_ARRAY_BUFFER, self->vertex_buffer);
+		if (write)
+			ret = glMapBuffer (GL_ARRAY_BUFFER, GL_READ_WRITE);
+		else
+			ret = glMapBuffer (GL_ARRAY_BUFFER, GL_READ_ONLY);
+		glBindBuffer (GL_ARRAY_BUFFER, 0);
+		return ret;
+	}
+	else
+		return NULL;
 }
 
 void liren_buffer_replace_data (
@@ -99,103 +165,59 @@ void liren_buffer_replace_data (
 	int size;
 	GLenum mode;
 
-	size = self->elements.count * self->format.size;
-	if (self->buffer)
+	size = self->vertices.count * self->vertex_format.size;
+	if (self->vertex_buffer)
 	{
-		glBindBufferARB (self->target, self->buffer);
+		glBindVertexArray (0);
+		glBindBuffer (GL_ARRAY_BUFFER, self->vertex_buffer);
 		switch (self->type)
 		{
 			case LIREN_BUFFER_TYPE_DYNAMIC:
-				mode = GL_DYNAMIC_DRAW_ARB;
+				mode = GL_DYNAMIC_DRAW;
 				break;
 			case LIREN_BUFFER_TYPE_STATIC:
-				mode = GL_STATIC_DRAW_ARB;
+				mode = GL_STATIC_DRAW;
 				break;
 			case LIREN_BUFFER_TYPE_STREAM:
-				mode = GL_STREAM_DRAW_ARB;
+				mode = GL_STREAM_DRAW;
 				break;
 			default:
 				lisys_assert (0 && "invalid vbo type");
 				break;
 		}
-		glBufferDataARB (self->target, size, data, mode);
-		glBindBufferARB (self->target, 0);
+		glBufferData (GL_ARRAY_BUFFER, size, data, mode);
+		glBindBuffer (GL_ARRAY_BUFFER, 0);
 	}
-	else
-		memcpy (self->elements.array, data, size);
 }
 
-void liren_buffer_unlock (
+void liren_buffer_unlock_indices (
 	LIRenBuffer* self,
 	void*        data)
 {
-	if (self->buffer)
+	if (self->index_buffer)
 	{
-		glBindBufferARB (self->target, self->buffer);
-		glUnmapBufferARB (self->target);
-		glBindBufferARB (self->target, 0);
+		glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, self->index_buffer);
+		glUnmapBuffer (GL_ELEMENT_ARRAY_BUFFER);
+		glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+}
+
+void liren_buffer_unlock_vertices (
+	LIRenBuffer* self,
+	void*        data)
+{
+	if (self->vertex_buffer)
+	{
+		glBindBuffer (GL_ARRAY_BUFFER, self->vertex_buffer);
+		glUnmapBuffer (GL_ARRAY_BUFFER);
+		glBindBuffer (GL_ARRAY_BUFFER, 0);
 	}
 }
 
 int liren_buffer_get_size (
 	LIRenBuffer* self)
 {
-	return self->elements.count * self->format.size;
-}
-
-/*****************************************************************************/
-
-static int private_init (
-	LIRenBuffer*       self,
-	GLenum             target,
-	const LIRenFormat* format,
-	const void*        data,
-	int                count,
-	int                type)
-{
-	int size;
-
-	memset (self, 0, sizeof (LIRenBuffer));
-	if (GLEW_ARB_vertex_buffer_object)
-		self->type = type;
-	else
-		self->type = LIREN_BUFFER_TYPE_MEMORY;
-	self->target = target;
-	self->format = *format;
-	if (count)
-	{
-		size = count * format->size;
-		switch (self->type)
-		{
-			case LIREN_BUFFER_TYPE_DYNAMIC:
-				glGenBuffersARB (1, &self->buffer);
-				glBindBufferARB (target, self->buffer);
-				glBufferDataARB (target, size, data, GL_DYNAMIC_DRAW_ARB);
-				glBindBufferARB (target, 0);
-				break;
-			case LIREN_BUFFER_TYPE_STATIC:
-				glGenBuffersARB (1, &self->buffer);
-				glBindBufferARB (target, self->buffer);
-				glBufferDataARB (target, size, data, GL_STATIC_DRAW_ARB);
-				glBindBufferARB (target, 0);
-				break;
-			case LIREN_BUFFER_TYPE_STREAM:
-				glGenBuffersARB (1, &self->buffer);
-				glBindBufferARB (target, self->buffer);
-				glBufferDataARB (target, size, data, GL_STREAM_DRAW_ARB);
-				glBindBufferARB (target, 0);
-				break;
-			default:
-				self->elements.array = lisys_malloc (count * format->size);
-				if (self->elements.array == NULL)
-					return 0;
-				memcpy (self->elements.array, data, size);
-				break;
-		}
-		self->elements.count = count;
-	}
-
-	return 1;
+	return self->vertices.count * self->vertex_format.size;
 }
 
 /** @} */

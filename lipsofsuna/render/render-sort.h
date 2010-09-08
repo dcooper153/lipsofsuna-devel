@@ -34,11 +34,12 @@
 
 struct _LIRenSortgroup
 {
+	int index;
+	int count;
 	int transparent;
 	LIMatAabb bounds;
 	LIMatMatrix matrix;
-	LIRenBuffer* indices;
-	LIRenBuffer* vertices;
+	LIRenBuffer* buffer;
 	LIRenMaterial* material;
 };
 
@@ -47,8 +48,7 @@ struct _LIRenSortface
 	int index;
 	LIMatAabb bounds;
 	LIMatMatrix matrix;
-	LIRenBuffer* indices;
-	LIRenBuffer* vertices;
+	LIRenBuffer* buffer;
 	LIRenSortface* next;
 	LIRenMaterial* material;
 };
@@ -86,8 +86,9 @@ LIAPICALL (int, liren_sort_add_group, (
 	LIRenSort*     self,
 	LIMatAabb*     bounds,
 	LIMatMatrix*   matrix,
-	LIRenBuffer*   indices,
-	LIRenBuffer*   vertices,
+	int            index,
+	int            count,
+	LIRenBuffer*   buffer,
 	LIRenMaterial* material,
 	int            transparent));
 
@@ -95,8 +96,9 @@ LIAPICALL (int, liren_sort_add_faces, (
 	LIRenSort*     self,
 	LIMatAabb*     bounds,
 	LIMatMatrix*   matrix,
-	LIRenBuffer*   indices,
-	LIRenBuffer*   vertices,
+	int            index,
+	int            count,
+	LIRenBuffer*   buffer,
 	LIRenMaterial* material));
 
 LIAPICALL (int, liren_sort_add_model, (

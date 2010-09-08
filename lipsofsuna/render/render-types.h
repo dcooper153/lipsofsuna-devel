@@ -64,8 +64,6 @@ struct _LIRenFormat
 	int size;
 	int tex_format;
 	int tex_offset;
-	int tan_format;
-	int tan_offset;
 	int nml_format;
 	int nml_offset;
 	int vtx_format;

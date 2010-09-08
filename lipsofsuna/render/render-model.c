@@ -220,19 +220,15 @@ static void private_clear_materials (
 static void private_clear_model (
 	LIRenModel* self)
 {
-	int i;
-
-	for (i = 0 ; i < self->buffers.count ; i++)
-		liren_buffer_free (self->buffers.array + i);
-	if (self->vertices != NULL)
+	if (self->buffer != NULL)
 	{
-		liren_buffer_free (self->vertices);
-		lisys_free (self->vertices);
-		self->vertices = NULL;
+		liren_buffer_free (self->buffer);
+		lisys_free (self->buffer);
+		self->buffer = NULL;
 	}
-	lisys_free (self->buffers.array);
-	self->buffers.array = NULL;
-	self->buffers.count = 0;
+	lisys_free (self->groups.array);
+	self->groups.array = NULL;
+	self->groups.count = 0;
 }
 
 static int private_init_materials (
@@ -268,46 +264,65 @@ static int private_init_model (
 	LIRenModel* self,
 	int         type)
 {
+	int c;
 	int i;
+	uint32_t* indices;
 	LIMdlFaces* group;
 	LIRenFormat format =
 	{
-		11 * sizeof (float),
+		8 * sizeof (float),
 		GL_FLOAT, 0 * sizeof (float),
 		GL_FLOAT, 2 * sizeof (float),
-		GL_FLOAT, 5 * sizeof (float),
-		GL_FLOAT, 8 * sizeof (float)
+		GL_FLOAT, 5 * sizeof (float)
 	};
 
-	/* Allocate vertex buffer. */
-	self->vertices = lisys_calloc (1, sizeof (LIRenBuffer));
-	if (self->vertices == NULL)
+	/* Allocate render buffer. */
+	self->buffer = lisys_calloc (1, sizeof (LIRenBuffer));
+	if (self->buffer == NULL)
 		return 0;
 
-	/* Allocate vertex buffer data. */
-	if (!liren_buffer_init_vertex (self->vertices, &format,
-	     self->model->vertices.array, self->model->vertices.count, type))
-		return 0;
-
-	/* Allocate index buffer list. */
-	if (self->model->facegroups.count)
+	/* Allocate face groups. */
+	self->groups.count = self->model->facegroups.count;
+	if (self->groups.count)
 	{
-		self->buffers.array = lisys_calloc (self->model->facegroups.count, sizeof (LIRenBuffer));
-		if (self->buffers.array == NULL)
+		self->groups.array = lisys_calloc (self->groups.count, sizeof (LIRenModelGroup));
+		if (self->groups.array == NULL)
 			return 0;
-		self->buffers.count = self->model->facegroups.count;
 	}
 
-	/* Allocate index buffer data. */
-	for (i = 0 ; i < self->buffers.count ; i++)
+	/* Calculate face group offsets. */
+	for (c = i = 0 ; i < self->groups.count ; i++)
 	{
 		group = self->model->facegroups.array + i;
-		lisys_assert (group->material >= 0);
-		lisys_assert (group->material < self->materials.count);
-		if (!liren_buffer_init_index (self->buffers.array + i,
-		     group->indices.array, group->indices.count, type))
-			return 0;
+		self->groups.array[i].start = c;
+		self->groups.array[i].count = group->indices.count;
+		c += group->indices.count;
 	}
+
+	/* Combine the index lists. */
+	if (c)
+	{
+		indices = lisys_calloc (c, sizeof (uint32_t));
+		if (indices == NULL)
+			return 0;
+		for (c = i = 0 ; i < self->groups.count ; i++)
+		{
+			group = self->model->facegroups.array + i;
+			memcpy (indices + c, group->indices.array, group->indices.count * sizeof (uint32_t));
+			c += group->indices.count;
+		}
+	}
+	else
+		indices = NULL;
+
+	/* Initialize the render buffer. */
+	if (!liren_buffer_init (self->buffer, indices, c, &format,
+	     self->model->vertices.array, self->model->vertices.count, type))
+	{
+		lisys_free (indices);
+		return 0;
+	}
+	lisys_free (indices);
 
 	return 1;
 }

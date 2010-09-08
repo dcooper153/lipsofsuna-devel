@@ -35,7 +35,7 @@ class LipsEnumTexTypes:
 		self.IMAGE = 2
 Lips = LipsEnum()
 
-lips_format_version = 0xFFFFFFF4
+lips_format_version = 0xFFFFFFF3
 lips_animation_timescale = 0.01
 lips_minimum_box_size = 0.3
 lips_mirror_snap = 0.01
@@ -901,9 +901,6 @@ class LipsVertex:
 	def WriteCoords(self, writer):
 		writer.WriteFloat(self.te[0])
 		writer.WriteFloat(self.te[1])
-		writer.WriteFloat(self.te[2])
-		writer.WriteFloat(self.te[3])
-		writer.WriteFloat(self.te[4])
 		writer.WriteFloat(self.no.x)
 		writer.WriteFloat(self.no.y)
 		writer.WriteFloat(self.no.z)

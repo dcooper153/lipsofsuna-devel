@@ -41,7 +41,7 @@
 #include "model-types.h"
 #include "model-vertex.h"
 
-#define LIMDL_FORMAT_VERSION 0xFFFFFFF4
+#define LIMDL_FORMAT_VERSION 0xFFFFFFF3
 
 typedef int LIMdlModelFlags;
 

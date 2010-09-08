@@ -25,21 +25,12 @@
 #include <string.h>
 #include "render-context.h"
 
-static void
-private_bind_material (LIRenContext* self);
+static void private_bind_material (
+	LIRenContext* self);
 
-static void
-private_bind_uniform (LIRenContext* self,
-                      LIRenUniform* uniform);
-
-static void
-private_bind_vertices (LIRenContext*      self,
-                       const LIRenFormat* format,
-                       const void*        base);
-
-static void
-private_unbind_vertices (LIRenContext*      self,
-                         const LIRenFormat* format);
+static void private_bind_uniform (
+	LIRenContext* self,
+	LIRenUniform* uniform);
 
 /*****************************************************************************/
 
@@ -47,18 +38,16 @@ void liren_context_init (
 	LIRenContext* self)
 {
 	self->scene = NULL;
-	self->vertex = NULL;
-	self->index = NULL;
-	self->changed.index = 1;
-	self->changed.shader = 1;
+	self->buffer = NULL;
+	self->changed.buffer = 1;
 	self->changed.lights = 1;
 	self->changed.material = 1;
 	self->changed.matrix_model = 1;
 	self->changed.matrix_projection = 1;
 	self->changed.matrix_view = 1;
+	self->changed.shader = 1;
 	self->changed.textures = 1;
 	self->changed.uniforms = 1;
-	self->changed.vertex = 1;
 	self->lights.count = 0;
 	self->material.shininess = 1.0f;
 	self->material.diffuse[0] = 1.0f;
@@ -79,6 +68,7 @@ void liren_context_bind (
 {
 	int i;
 
+	/* Update matrices. */
 	if (self->changed.matrix_model || self->changed.matrix_view)
 	{
 		self->matrix.modelview = limat_matrix_multiply (self->matrix.view, self->matrix.model);
@@ -109,27 +99,17 @@ void liren_context_bind (
 		for (i = 0 ; i < self->shader->uniforms.count ; i++)
 			private_bind_uniform (self, self->shader->uniforms.array + i);
 	}
-	liren_check_errors ();
 
-	/* Bind buffers. */
-	if (self->changed.index)
+	/* Bind vertex array. */
+	if (self->changed.buffer)
 	{
-		if (self->index != NULL)
-			glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, self->index->buffer);
+		if (self->buffer != NULL)
+			glBindVertexArray (self->buffer->vertex_array);
 		else
-			glBindBufferARB (GL_ELEMENT_ARRAY_BUFFER_ARB, 0);
-	}
-	if (self->changed.vertex)
-	{
-		if (self->vertex != NULL)
-			glBindBufferARB (GL_ARRAY_BUFFER_ARB, self->vertex->buffer);
-		else
-			glBindBufferARB (GL_ARRAY_BUFFER_ARB, 0);
-		if (self->vertex != NULL)
-			private_bind_vertices (self, &self->vertex->format, self->vertex->elements.array);
+			glBindVertexArray (0);
 	}
 
-	self->changed.index = 0;
+	self->changed.buffer = 0;
 	self->changed.lights = 0;
 	self->changed.material = 0;
 	self->changed.matrix_model = 0;
@@ -138,26 +118,6 @@ void liren_context_bind (
 	self->changed.shader = 0;
 	self->changed.textures = 0;
 	self->changed.uniforms = 0;
-	self->changed.vertex = 0;
-}
-
-/**
- * \brief Renders non-indexed triangles.
- * \param self Rendering context.
- */
-void liren_context_render (
-	LIRenContext* self)
-{
-	if (self->incomplete)
-		return;
-
-	glDrawArraysEXT (GL_TRIANGLES, 0, self->vertex->elements.count);
-
-#ifdef LIREN_ENABLE_PROFILING
-	self->render->profiling.materials++;
-	self->render->profiling.faces += self->vertex->elements.count / 3;
-	self->render->profiling.vertices += self->vertex->elements.count;
-#endif
 }
 
 /**
@@ -174,13 +134,16 @@ void liren_context_render_indexed (
 	if (self->incomplete)
 		return;
 
-	glDrawRangeElements (GL_TRIANGLES, 0, self->vertex->elements.count,
-		count, GL_UNSIGNED_INT, self->index->elements.array + 4 * start);
+	lisys_assert (start >= 0);
+	lisys_assert (start + count <= self->buffer->indices.count);
+
+	glDrawRangeElements (GL_TRIANGLES, 0, self->buffer->vertices.count,
+		count, GL_UNSIGNED_INT, NULL + start * sizeof (uint32_t));
 
 #ifdef LIREN_ENABLE_PROFILING
 	self->render->profiling.materials++;
-	self->render->profiling.faces += self->index->elements.count / 3;
-	self->render->profiling.vertices += self->index->elements.count;
+	self->render->profiling.faces += self->buffer->indices.count / 3;
+	self->render->profiling.vertices += self->buffer->indices.count;
 #endif
 }
 
@@ -193,29 +156,21 @@ void liren_context_unbind (
 	LIRenContext* self)
 {
 	glUseProgramObjectARB (0);
-	glEnable (GL_TEXTURE_2D);
+	glBindVertexArray (0);
 	glEnable (GL_BLEND);
 	glDisable (GL_DEPTH_TEST);
 	glDisable (GL_CULL_FACE);
 	glColor3f (1.0f, 1.0f, 1.0f);
 }
 
-void liren_context_set_buffers (
+void liren_context_set_buffer (
 	LIRenContext* self,
-	LIRenBuffer*  vertex,
-	LIRenBuffer*  index)
+	LIRenBuffer*  buffer)
 {
-	if (self->index != index)
+	if (self->buffer != buffer)
 	{
-		self->index = index;
-		self->changed.index = 1;
-	}
-	if (self->vertex != vertex)
-	{
-		if (self->vertex != NULL)
-			private_unbind_vertices (self, &self->vertex->format);
-		self->vertex = vertex;
-		self->changed.vertex = 1;
+		self->buffer = buffer;
+		self->changed.buffer = 1;
 	}
 }
 
@@ -284,9 +239,9 @@ void liren_context_set_material (
 {
 	if (self->material.flags != value->flags ||
 	    self->material.shininess != value->shininess ||
-	    memcpy (self->material.parameters, value->parameters, 4 * sizeof (float)) ||
-	    memcpy (self->material.diffuse, value->diffuse, 4 * sizeof (float)) ||
-	    memcpy (self->material.specular, value->specular, 4 * sizeof (float)))
+	    memcmp (self->material.parameters, value->parameters, 4 * sizeof (float)) ||
+	    memcmp (self->material.diffuse, value->diffuse, 4 * sizeof (float)) ||
+	    memcmp (self->material.specular, value->specular, 4 * sizeof (float)))
 	{
 		self->material.flags = value->flags;
 		self->material.shininess = value->shininess;
@@ -312,7 +267,7 @@ void liren_context_set_modelmatrix (
 	LIRenContext*      self,
 	const LIMatMatrix* value)
 {
-	if (memcpy (&self->matrix.model, value, sizeof (LIMatMatrix)))
+	if (memcmp (&self->matrix.model, value, sizeof (LIMatMatrix)))
 	{
 		self->matrix.model = *value;
 		self->changed.matrix_model = 1;
@@ -324,7 +279,7 @@ void liren_context_set_viewmatrix (
 	LIRenContext*      self,
 	const LIMatMatrix* value)
 {
-	if (memcpy (&self->matrix.view, value, sizeof (LIMatMatrix)))
+	if (memcmp (&self->matrix.view, value, sizeof (LIMatMatrix)))
 	{
 		self->matrix.view = *value;
 		self->changed.matrix_view = 1;
@@ -336,7 +291,7 @@ void liren_context_set_projection (
 	LIRenContext*      self,
 	const LIMatMatrix* value)
 {
-	if (memcpy (&self->matrix.projection, value, sizeof (LIMatMatrix)))
+	if (memcmp (&self->matrix.projection, value, sizeof (LIMatMatrix)))
 	{
 		self->matrix.projection = *value;
 		self->changed.matrix_projection = 1;
@@ -362,7 +317,6 @@ void liren_context_set_shader (
 	if (value != self->shader)
 	{
 		self->shader = value;
-		self->changed.index = 1;
 		self->changed.lights = 1;
 		self->changed.material = 1;
 		self->changed.matrix_model = 1;
@@ -371,7 +325,6 @@ void liren_context_set_shader (
 		self->changed.shader = 1;
 		self->changed.textures = 1;
 		self->changed.uniforms = 1;
-		self->changed.vertex = 1;
 	}
 }
 
@@ -800,89 +753,6 @@ static void private_bind_uniform (
 			if (self->changed.shader)
 				glUniform1fARB (uniform->binding, self->render->helpers.time);
 			break;
-	}
-}
-
-static void private_bind_vertices (
-	LIRenContext*      self,
-	const LIRenFormat* format,
-	const void*        base)
-{
-	int i;
-	LIRenAttribute* attr;
-
-	if (self->shader != NULL)
-	{
-		for (i = 0 ; i < self->shader->attributes.count ; i++)
-		{
-			attr = self->shader->attributes.array + i;
-			switch (attr->value)
-			{
-				case LIREN_ATTRIBUTE_COORD:
-					glEnableVertexAttribArrayARB (attr->binding);
-					glVertexAttribPointerARB (attr->binding, 3, format->vtx_format,
-						GL_FALSE, format->size, base + format->vtx_offset);
-					break;
-				case LIREN_ATTRIBUTE_NORMAL:
-					glEnableVertexAttribArrayARB (attr->binding);
-					glVertexAttribPointerARB (attr->binding, 3, format->nml_format,
-						GL_FALSE, format->size, base + format->nml_offset);
-					break;
-				case LIREN_ATTRIBUTE_TANGENT:
-					glEnableVertexAttribArrayARB (attr->binding);
-					glVertexAttribPointerARB (attr->binding, 3, format->tan_format,
-						GL_FALSE, format->size, base + format->tan_offset);
-					break;
-				case LIREN_ATTRIBUTE_TEXCOORD:
-					glEnableVertexAttribArrayARB (attr->binding);
-					glVertexAttribPointerARB (attr->binding, 2, format->tex_format,
-						GL_FALSE, format->size, base + format->tex_offset);
-					break;
-			}
-		}
-		glEnableClientState (GL_VERTEX_ARRAY);
-		glVertexPointerEXT (3, format->vtx_format, format->size, 0, base + format->vtx_offset);
-	}
-	else
-	{
-		glEnableClientState (GL_TEXTURE_COORD_ARRAY);
-		glTexCoordPointer (2, format->tex_format, format->size, base + format->tex_offset);
-		glEnableClientState (GL_NORMAL_ARRAY);
-		glNormalPointerEXT (format->nml_format, format->size, 0, base + format->nml_offset);
-		glEnableClientState (GL_VERTEX_ARRAY);
-		glVertexPointerEXT (3, format->vtx_format, format->size, 0, base + format->vtx_offset);
-	}
-}
-
-static void private_unbind_vertices (
-	LIRenContext*      self,
-	const LIRenFormat* format)
-{
-	int i;
-	LIRenAttribute* attr;
-
-	if (self->shader != NULL)
-	{
-		for (i = 0 ; i < self->shader->attributes.count ; i++)
-		{
-			attr = self->shader->attributes.array + i;
-			switch (attr->value)
-			{
-				case LIREN_ATTRIBUTE_COORD:
-				case LIREN_ATTRIBUTE_NORMAL:
-				case LIREN_ATTRIBUTE_TANGENT:
-				case LIREN_ATTRIBUTE_TEXCOORD:
-					glDisableVertexAttribArrayARB (attr->binding);
-					break;
-			}
-		}
-		glDisableClientState (GL_VERTEX_ARRAY);
-	}
-	else
-	{
-		glDisableClientState (GL_TEXTURE_COORD_ARRAY);
-		glDisableClientState (GL_NORMAL_ARRAY);
-		glDisableClientState (GL_VERTEX_ARRAY);
 	}
 }
 

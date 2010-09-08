@@ -122,7 +122,7 @@ liren_object_deform (LIRenObject* self)
 		return;
 
 	/* Modify the vertex buffer. */
-	buffer = self->model->vertices;
+	buffer = self->model->buffer;
 	size = liren_buffer_get_size (buffer);
 	if (size)
 	{
