@@ -241,13 +241,13 @@ private_rebuild (LIRenDeferred* self,
 	/* Choose pixel formats. */
 	if (GLEW_ARB_texture_float)
 	{
-		fmt1 = 4;
+		fmt1 = GL_RGBA;
 		fmt2 = GL_RGBA32F_ARB;
 	}
 	else
 	{
-		fmt1 = 4;
-		fmt2 = 4;
+		fmt1 = GL_RGBA;
+		fmt2 = GL_RGBA;
 	}
 
 	/* Create depth texture. */

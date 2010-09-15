@@ -283,17 +283,17 @@ liimg_dds_read_header (LIImgDDS* self,
 		{
 			case DDS_COMPRESS_DXT1:
 				self->info.compressed = 1;
-				self->info.internal = 3;
+				self->info.internal = GL_RGB;
 				self->info.format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
 				return 1;
 			case DDS_COMPRESS_DXT3:
 				self->info.compressed = 1;
-				self->info.internal = 4;
+				self->info.internal = GL_RGBA;
 				self->info.format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
 				return 1;
 			case DDS_COMPRESS_DXT5:
 				self->info.compressed = 1;
-				self->info.internal = 4;
+				self->info.internal = GL_RGBA;
 				self->info.format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
 				return 1;
 		}
