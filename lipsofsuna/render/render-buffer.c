@@ -126,6 +126,7 @@ void* liren_buffer_lock_indices (
 
 	if (self->index_buffer)
 	{
+		glBindVertexArray (0);
 		glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, self->index_buffer);
 		if (write)
 			ret = glMapBuffer (GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
@@ -168,7 +169,6 @@ void liren_buffer_replace_data (
 	size = self->vertices.count * self->vertex_format.size;
 	if (self->vertex_buffer)
 	{
-		glBindVertexArray (0);
 		glBindBuffer (GL_ARRAY_BUFFER, self->vertex_buffer);
 		switch (self->type)
 		{

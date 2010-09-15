@@ -243,7 +243,7 @@ liren_scene_render_begin (LIRenScene*    self,
 void
 liren_scene_render_end (LIRenScene* self)
 {
-	int i;
+	GLint viewport[4];
 
 	/* Validate state. */
 	if (!self->state.rendering)
@@ -251,55 +251,23 @@ liren_scene_render_end (LIRenScene* self)
 
 	/* Disable backbuffer viewport. */
 	glPopAttrib ();
+	glGetIntegerv (GL_VIEWPORT, viewport);
 
-	/* Setup copy to screen. */
-	glMatrixMode (GL_MODELVIEW);
-	glPushMatrix ();
-	glLoadIdentity ();
-	glMatrixMode (GL_PROJECTION);
-	glPushMatrix ();
-	glLoadIdentity ();
-	glUseProgramObjectARB (0);
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
-	glBindTexture (GL_TEXTURE_2D, self->state.framebuffer->postproc_texture[0]);
-	glColor3f (1.0f, 1.0f, 1.0f);
-
-	/* Copy results to screen. */
-	glBegin (GL_QUADS);
-	glTexCoord2i (0, 0);
-	glVertex2i (-1, -1);
-	glTexCoord2i (0, 1);
-	glVertex2i (-1, 1);
-	glTexCoord2i (1, 1);
-	glVertex2i (1, 1);
-	glTexCoord2i (1, 0);
-	glVertex2i (1, -1);
-	glEnd ();
-
-	/* Disable copy to screen. */
-	glPopMatrix ();
-	glMatrixMode (GL_MODELVIEW);
-	glPopMatrix ();
+	/* Blit from the post-processing FBO to the screen. */
+	glBindFramebuffer (GL_DRAW_FRAMEBUFFER_EXT, 0);
+	glBindFramebuffer (GL_READ_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[0]);
+	glBlitFramebuffer (0, 0, viewport[2], viewport[3], viewport[0], viewport[1],
+		viewport[0] + viewport[2], viewport[1] + viewport[3], GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
 	/* Update state. */
 	memset (&self->state, 0, sizeof (self->state));
 
 	/* Change render state. */
 	glUseProgramObjectARB (0);
-	glMatrixMode (GL_TEXTURE);
-	for (i = 7 ; i >= 0 ; i--)
-	{
-		glActiveTextureARB (GL_TEXTURE0 + i);
-		glBindTexture (GL_TEXTURE_2D, 0);
-		glDisable (GL_TEXTURE_2D);
-	}
+	glBindVertexArray (0);
 	glEnable (GL_BLEND);
-	glEnable (GL_TEXTURE_2D);
-	glDisable (GL_ALPHA_TEST);
 	glDisable (GL_DEPTH_TEST);
 	glDisable (GL_CULL_FACE);
-	glDisable (GL_NORMALIZE);
-	glDisable (GL_COLOR_MATERIAL);
 	glDepthMask (GL_FALSE);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor3f (1.0f, 1.0f, 1.0f);
@@ -333,9 +301,7 @@ void liren_scene_render_deferred_begin (
 	liren_context_set_deferred (self->state.context, 1);
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->deferred_fbo);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glEnable (GL_ALPHA_TEST);
 	glDisable (GL_BLEND);
-	glAlphaFunc (GL_GEQUAL, threshold);
 	self->state.alphatest = alphatest;
 }
 
@@ -355,15 +321,12 @@ void liren_scene_render_deferred_end (
 		return;
 
 	/* Change render state. */
-	glDisable (GL_ALPHA_TEST);
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[0]);
-	glPushAttrib (GL_SCISSOR_BIT);
+	glBindFramebuffer (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[0]);
 
 	/* Render lit fragments to post-processing buffer. */
 	private_lighting_render (self, self->state.context, self->state.framebuffer);
 
 	/* Change render state. */
-	glPopAttrib ();
 	liren_context_set_deferred (self->state.context, 0);
 }
 
@@ -422,9 +385,7 @@ liren_scene_render_forward_opaque (LIRenScene* self,
 	/* Change render state. */
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[0]);
 	glEnable (GL_DEPTH_TEST);
-	glEnable (GL_ALPHA_TEST);
 	glDisable (GL_BLEND);
-	glAlphaFunc (GL_GEQUAL, threshold);
 
 	/* Render face groups to post-processing buffer. */
 	for (i = 0 ; i < self->sort->groups.count ; i++)
@@ -447,9 +408,6 @@ liren_scene_render_forward_opaque (LIRenScene* self,
 			}
 		}
 	}
-
-	/* Change render state. */
-	glDisable (GL_ALPHA_TEST);
 }
 
 /**
@@ -508,7 +466,6 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 
 	/* Change render state. */
 	liren_context_set_lights (self->state.context, NULL, 0);
-	glDisable (GL_CULL_FACE);
 
 	/* Render particles. */
 	private_particle_render (self);
@@ -531,6 +488,7 @@ void liren_scene_render_postproc (
 	LIRenScene* self,
 	const char* name)
 {
+	float param[4];
 	GLuint tmp;
 	LIRenShader* shader;
 
@@ -538,49 +496,48 @@ void liren_scene_render_postproc (
 	if (!self->state.rendering)
 		return;
 
-	/* Find post-processing shader. */
+	/* Find the shader. */
 	shader = liren_render_find_shader (self->render, name);
 	if (shader == NULL)
 		return;
 
+	/* Calculate the pixel size in texture units. */
+	param[0] = 1.0f / self->state.framebuffer->width;
+	param[1] = 1.0f / self->state.framebuffer->height;
+	param[2] = 0.0;
+	param[3] = 0.0;
+
 	/* Change render state. */
+	liren_context_set_buffer (self->state.context, NULL);
+	liren_context_set_shader (self->state.context, shader);
+	liren_context_set_textures_raw (self->state.context, self->state.framebuffer->postproc_texture, 1);
+	liren_context_set_param (self->state.context, param);
+	liren_context_bind (self->state.context);
 	glDisable (GL_BLEND);
 	glDisable (GL_CULL_FACE);
 	glDisable (GL_DEPTH_TEST);
-	glMatrixMode (GL_MODELVIEW);
-	glPushMatrix ();
-	glLoadIdentity ();
-	glMatrixMode (GL_PROJECTION);
-	glPushMatrix ();
-	glLoadIdentity ();
-	glUseProgramObjectARB (shader->program);
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[1]);
-	glBindTexture (GL_TEXTURE_2D, self->state.framebuffer->postproc_texture[0]);
+	glDepthMask (GL_FALSE);
+	glBindFramebuffer (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[1]);
 
-	/* Render from buffer to another. */
-	glBegin (GL_QUADS);
-	glTexCoord2i (0, 0);
-	glVertex2i (-1, -1);
-	glTexCoord2i (0, 1);
-	glVertex2i (-1, 1);
-	glTexCoord2i (1, 1);
-	glVertex2i (1, 1);
-	glTexCoord2i (1, 0);
-	glVertex2i (1, -1);
+	/* Render from the first buffer to the second. */
+	glBegin (GL_TRIANGLE_STRIP);
+	glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, 0, 0);
+	glVertexAttrib2f (LIREN_ATTRIBUTE_COORD, -1, -1);
+	glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, 1, 0);
+	glVertexAttrib2f (LIREN_ATTRIBUTE_COORD, 1, -1);
+	glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, 0, 1);
+	glVertexAttrib2f (LIREN_ATTRIBUTE_COORD, -1, 1);
+	glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, 1, 1);
+	glVertexAttrib2f (LIREN_ATTRIBUTE_COORD, 1, 1);
 	glEnd ();
 
-	/* Swap input and output buffers. */
+	/* Swap the buffers so that we can chain passes. */
 	tmp = self->state.framebuffer->postproc_fbo[0];
 	self->state.framebuffer->postproc_fbo[0] = self->state.framebuffer->postproc_fbo[1];
 	self->state.framebuffer->postproc_fbo[1] = tmp;
 	tmp = self->state.framebuffer->postproc_texture[0];
 	self->state.framebuffer->postproc_texture[0] = self->state.framebuffer->postproc_texture[1];
 	self->state.framebuffer->postproc_texture[1] = tmp;
-
-	/* Change render state. */
-	glPopMatrix ();
-	glMatrixMode (GL_MODELVIEW);
-	glPopMatrix ();
 }
 
 /**
@@ -724,6 +681,7 @@ private_lighting_render (LIRenScene*    self,
 	if (shader == NULL)
 		return;
 
+	glPushAttrib (GL_SCISSOR_BIT);
 	glDisable (GL_DEPTH_TEST);
 	glDisable (GL_CULL_FACE);
 	glDisable (GL_BLEND);
@@ -794,8 +752,8 @@ private_lighting_render (LIRenScene*    self,
 	}
 
 	liren_context_set_lights (context, NULL, 0);
-	liren_context_unbind (context);
 	glDisable (GL_SCISSOR_TEST);
+	glPopAttrib ();
 }
 
 static void
@@ -824,22 +782,21 @@ private_particle_render (LIRenScene* self)
 	LIParLine* line;
 	LIParPoint* particle;
 	LIRenImage* image;
+	LIRenShader* shader;
 	LIRenObject* object;
 
-	/* Set billboard rendering mode. */
-	if (livid_features.shader_model >= 3)
-		glUseProgramObjectARB (0);
-	glColor3f (1.0f, 1.0f, 1.0f);
+	shader = liren_render_find_shader (self->render, "particle");
+	if (shader == NULL)
+		return;
+
+	matrix = limat_matrix_identity ();
+	liren_context_set_modelmatrix (self->state.context, &matrix);
+	liren_context_set_shader (self->state.context, shader);
+	liren_context_bind (self->state.context);
+	glEnable (GL_DEPTH_TEST);
+	glDisable (GL_CULL_FACE);
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE);
-
-	/* Get billboard axis. */
-	matrix = self->state.context->matrix.modelviewinverse;
-	bbp = limat_matrix_transform (matrix, limat_vector_init (0.0f, 0.0f, 0.0f));
-	bbx = limat_matrix_transform (matrix, limat_vector_init (1.0f, 0.0f, 0.0f));
-	bby = limat_matrix_transform (matrix, limat_vector_init (0.0f, 1.0f, 0.0f));
-	bbx = limat_vector_subtract (bbx, bbp);
-	bby = limat_vector_subtract (bby, bbp);
 
 	/* Render particle systems of objects as billboards. */
 	LIALG_U32DIC_FOREACH (iter1, self->objects)
@@ -864,42 +821,29 @@ private_particle_render (LIRenScene* self)
 					continue;
 			}
 
-			/* Calculate billboard size. */
-			bbsx = limat_vector_multiply (bbx, system->particle_size);
-			bbsy = limat_vector_multiply (bby, system->particle_size);
-
 			/* Render each alive particle. */
-			glBindTexture (GL_TEXTURE_2D, image->texture->texture);
-			glBegin (GL_QUADS);
+			liren_context_set_textures_raw (self->state.context, &image->texture->texture, 1);
+			liren_context_bind (self->state.context);
+
+			glBegin (GL_TRIANGLES);
+			glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, system->particle_size, system->particle_size);
 			for (j = 0 ; j < system->particles.count ; j++)
 			{
 				part = system->particles.array + j;
 				if (limdl_particle_get_state (part, object->particle.time, object->particle.loop, &position, &fade))
 				{
 					position = limat_transform_transform (object->transform, position);
-					v[0] = limat_vector_subtract (position, bbsx);
-					v[0] = limat_vector_subtract (v[0], bbsy);
-					v[1] = limat_vector_add (position, bbsx);
-					v[1] = limat_vector_subtract (v[1], bbsy);
-					v[2] = limat_vector_add (position, bbsx);
-					v[2] = limat_vector_add (v[2], bbsy);
-					v[3] = limat_vector_subtract (position, bbsx);
-					v[3] = limat_vector_add (v[3], bbsy);
-					glColor4f (1.0f, 1.0f, 1.0f, fade);
-					glTexCoord2i (0, 0);
-					glVertex3f (v[0].x, v[0].y, v[0].z);
-					glTexCoord2i (1, 0);
-					glVertex3f (v[1].x, v[1].y, v[1].z);
-					glTexCoord2i (1, 1);
-					glVertex3f (v[2].x, v[2].y, v[2].z);
-					glTexCoord2i (0, 1);
-					glVertex3f (v[3].x, v[3].y, v[3].z);
+					glVertexAttrib4f (LIREN_ATTRIBUTE_NORMAL, 1.0f, 1.0f, 1.0f, fade);
+					glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
+					glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
+					glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
 				}
 			}
 			glEnd ();
 		}
 	}
 
+#if 0
 	/* Set point particle rendering mode. */
 	if (livid_features.shader_model >= 3)
 		glUseProgramObjectARB (0);
@@ -954,6 +898,7 @@ private_particle_render (LIRenScene* self)
 		glVertex3f (line->position[1].x, line->position[1].y, line->position[1].z);
 	}
 	glEnd ();
+#endif
 
 	/* Set normal rendering mode. */
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);

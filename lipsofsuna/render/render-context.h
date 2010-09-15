@@ -103,9 +103,6 @@ LIAPICALL (void, liren_context_render_indexed, (
 	int           start,
 	int           count));
 
-LIAPICALL (void, liren_context_unbind, (
-	LIRenContext* self));
-
 LIAPICALL (void, liren_context_set_buffer, (
 	LIRenContext* self,
 	LIRenBuffer*  vertex));
@@ -141,6 +138,10 @@ LIAPICALL (void, liren_context_set_material_shader, (
 LIAPICALL (void, liren_context_set_modelmatrix, (
 	LIRenContext*      self,
 	const LIMatMatrix* value));
+
+LIAPICALL (void, liren_context_set_param, (
+	LIRenContext* self,
+	const float*  value));
 
 LIAPICALL (void, liren_context_set_viewmatrix, (
 	LIRenContext*      self,

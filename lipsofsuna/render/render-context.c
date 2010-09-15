@@ -147,22 +147,6 @@ void liren_context_render_indexed (
 #endif
 }
 
-/**
- * \brief Resets the OpenGL state variables used by contexts.
- *
- * \param self Rendering context.
- */
-void liren_context_unbind (
-	LIRenContext* self)
-{
-	glUseProgramObjectARB (0);
-	glBindVertexArray (0);
-	glEnable (GL_BLEND);
-	glDisable (GL_DEPTH_TEST);
-	glDisable (GL_CULL_FACE);
-	glColor3f (1.0f, 1.0f, 1.0f);
-}
-
 void liren_context_set_buffer (
 	LIRenContext* self,
 	LIRenBuffer*  buffer)
@@ -272,6 +256,17 @@ void liren_context_set_modelmatrix (
 		self->matrix.model = *value;
 		self->changed.matrix_model = 1;
 		self->changed.uniforms = 1;
+	}
+}
+
+void liren_context_set_param (
+	LIRenContext* self,
+	const float*  value)
+{
+	if (memcmp (self->material.parameters, value, 4 * sizeof (float)))
+	{
+		self->changed.material = 1;
+		memcpy (self->material.parameters, value, 4 * sizeof (float));
 	}
 }
 
@@ -738,13 +733,7 @@ static void private_bind_uniform (
 			break;
 		case LIREN_UNIFORM_PARAM0:
 			if (self->changed.material)
-			{
-				glUniform4fARB (uniform->binding,
-					self->material.parameters[0],
-					self->material.parameters[1],
-					self->material.parameters[2],
-					self->material.parameters[3]);
-			}
+				glUniform4fvARB (uniform->binding, 1, self->material.parameters);
 			break;
 		case LIREN_UNIFORM_SHADOWTEXTURE0:
 		case LIREN_UNIFORM_SHADOWTEXTURE1:
