@@ -38,10 +38,7 @@ typedef struct _LIRenContextTexture LIRenContextTexture;
 struct _LIRenContextTexture
 {
 	GLuint texture;
-	GLenum magfilter;
-	GLenum minfilter;
-	GLenum wraps;
-	GLenum wrapt;
+	GLuint sampler;
 };
 
 struct _LIRenContext
@@ -164,6 +161,11 @@ LIAPICALL (void, liren_context_set_shader, (
 LIAPICALL (void, liren_context_set_textures, (
 	LIRenContext* self,
 	LIRenTexture* value,
+	int           count));
+
+LIAPICALL (void, liren_context_set_textures_raw, (
+	LIRenContext* self,
+	GLuint*       value,
 	int           count));
 
 #endif

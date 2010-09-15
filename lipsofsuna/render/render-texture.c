@@ -24,10 +24,9 @@
 
 #include "render-texture.h"
 
-void
-liren_texture_init (LIRenTexture* self,
-                    LIMdlTexture* texture)
-
+void liren_texture_init (
+	LIRenTexture* self,
+	LIMdlTexture* texture)
 {
 	self->flags = texture->flags;
 	self->type = texture->type;
@@ -71,16 +70,25 @@ liren_texture_init (LIRenTexture* self,
 		self->params.wraps = GL_REPEAT;
 		self->params.wrapt = GL_REPEAT;
 	}
+
+	/* Create a sampler object. */
+	glGenSamplers (1, &self->sampler);
+	glSamplerParameteri (self->sampler, GL_TEXTURE_MIN_FILTER, self->params.minfilter);
+	glSamplerParameteri (self->sampler, GL_TEXTURE_MAG_FILTER, self->params.magfilter);
+	glSamplerParameteri (self->sampler, GL_TEXTURE_WRAP_S, self->params.wraps);
+	glSamplerParameteri (self->sampler, GL_TEXTURE_WRAP_T, self->params.wrapt);
 }
 
-void
-liren_texture_free (LIRenTexture* self)
+void liren_texture_free (
+	LIRenTexture* self)
 {
+	if (self->sampler)
+		glDeleteSamplers (1, &self->sampler);
 }
 
-void
-liren_texture_set_image (LIRenTexture* self,
-                         LIRenImage*   value)
+void liren_texture_set_image (
+	LIRenTexture* self,
+	LIRenImage*   value)
 {
 	self->image = value;
 	if (value != NULL && value->texture != NULL)

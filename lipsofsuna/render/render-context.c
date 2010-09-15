@@ -342,10 +342,7 @@ void liren_context_set_textures (
 		for (i = 0 ; i < c ; i++)
 		{
 			if (self->textures.array[i].texture != value[i].texture ||
-			    self->textures.array[i].minfilter != value[i].params.minfilter ||
-			    self->textures.array[i].magfilter != value[i].params.magfilter ||
-			    self->textures.array[i].wraps != value[i].params.wraps ||
-			    self->textures.array[i].wrapt != value[i].params.wrapt)
+			    self->textures.array[i].sampler != value[i].sampler)
 				break;
 		}
 		if (i == c)
@@ -355,10 +352,37 @@ void liren_context_set_textures (
 	for (i = 0 ; i < c ; i++)
 	{
 		self->textures.array[i].texture = value[i].texture;
-		self->textures.array[i].minfilter = value[i].params.minfilter;
-		self->textures.array[i].magfilter = value[i].params.magfilter;
-		self->textures.array[i].wraps = value[i].params.wraps;
-		self->textures.array[i].wrapt = value[i].params.wrapt;
+		self->textures.array[i].sampler = value[i].sampler;
+	}
+	self->textures.count = c;
+	self->changed.textures = 1;
+	self->changed.uniforms = 1;
+}
+
+void liren_context_set_textures_raw (
+	LIRenContext* self,
+	GLuint*       value,
+	int           count)
+{
+	int c;
+	int i;
+
+	c = LIMAT_MIN (count, 9);
+	if (self->textures.count == c)
+	{
+		for (i = 0 ; i < c ; i++)
+		{
+			if (self->textures.array[i].texture != value[i])
+				break;
+		}
+		if (i == c)
+			return;
+	}
+
+	for (i = 0 ; i < c ; i++)
+	{
+		self->textures.array[i].texture = value[i];
+		self->textures.array[i].sampler = 0;
 	}
 	self->textures.count = c;
 	self->changed.textures = 1;
@@ -458,10 +482,7 @@ static void private_bind_uniform (
 					texture = self->textures.array + index;
 					glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 					glBindTexture (GL_TEXTURE_2D, texture->texture);
-					glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture->magfilter);
-					glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture->minfilter);
-					glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture->wraps);
-					glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture->wrapt);
+					glBindSampler (GL_TEXTURE_2D, texture->sampler);
 				}
 				else
 				{

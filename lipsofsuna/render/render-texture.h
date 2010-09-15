@@ -37,6 +37,7 @@ struct _LIRenTexture
 	int height;
 	char* name;
 	GLuint texture;
+	GLuint sampler;
 	LIMdlTextureType type;
 	LIMdlTextureFlags flags;
 	LIRenImage* image;
