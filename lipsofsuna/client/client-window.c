@@ -126,17 +126,6 @@ private_init_video (LICliWindow* self)
 		return 0;
 	}
 
-	/* FIXME: Shouldn't be here? */
-	/* FIXME: Should be user configurable. */
-	if (1/*settings.graphics_quality == high*/)
-	{
-		glHint (GL_FOG_HINT, GL_NICEST);
-		glHint (GL_LINE_SMOOTH_HINT, GL_NICEST);
-		glHint (GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-		glHint (GL_POINT_SMOOTH_HINT, GL_NICEST);
-		glHint (GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-	}
-
 	return 1;
 }
 
