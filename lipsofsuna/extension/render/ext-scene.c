@@ -237,64 +237,6 @@ static void Scene_draw_post_process (LIScrArgs* args)
 	liren_scene_render_postproc (scene, shader);
 }
 
-/* @luadoc
- * --- Pick an object from the scene.
- * -- 
- * -- @param clss Scene class.
- * -- @param args Arguments.<ul>
- * --   <li>modelview: Modelview matrix.</li>
- * --   <li>projection: Projection matrix.</li>
- * --   <li>viewport: Viewport array.</li>
- * --   <li>x: X coordinate.</li>
- * --   <li>y: Y coordinate.</li></ul>
- * -- @return Vector and object, or vector and nil when hit terrain.
- * function Scene.pick(clss, args)
- */
-static void Scene_pick (LIScrArgs* args)
-{
-	int x;
-	int y;
-	int viewport[4];
-	LIExtModule* module;
-	LIEngObject* object;
-	LIMatFrustum frustum;
-	LIMatMatrix modelview;
-	LIMatMatrix projection;
-	LIRenSelection result;
-
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
-
-	/* Get arguments. */
-	modelview = limat_matrix_identity ();
-	projection = limat_matrix_identity ();
-	liscr_args_gets_floatv (args, "modelview", 16, modelview.m);
-	liscr_args_gets_floatv (args, "projection", 16, projection.m);
-	viewport[0] = 0;
-	viewport[1] = 0;
-	viewport[2] = module->client->window->mode.width;
-	viewport[2] = module->client->window->mode.height;
-	liscr_args_gets_intv (args, "viewport", 4, viewport);
-	viewport[0] = LIMAT_MAX (0, viewport[0]);
-	viewport[1] = LIMAT_MAX (0, viewport[1]);
-	viewport[1] = module->client->window->mode.height - viewport[1] - viewport[3];
-	viewport[2] = LIMAT_MAX (2, viewport[2]);
-	viewport[3] = LIMAT_MAX (2, viewport[3]);
-	module->client->video.SDL_GetMouseState (&x, &y);
-	liscr_args_gets_int (args, "x", &x);
-	liscr_args_gets_int (args, "y", &y);
-
-	/* Pick objects from the scene. */
-	limat_frustum_init (&frustum, &modelview, &projection);
-	y = module->client->window->mode.height - y - 1;
-	if (!liren_scene_pick (module->client->scene, &modelview, &projection, &frustum, viewport, x, y, 10, &result))
-		return;
-
-	/* Return the picked point and object. */
-	object = lieng_engine_find_object (module->program->engine, result.object);
-	liscr_args_seti_vector (args, &result.point);
-	liscr_args_seti_data (args, (object != NULL)? object->script : NULL);
-}
-
 /*****************************************************************************/
 
 void liext_script_scene (
@@ -311,7 +253,6 @@ void liext_script_scene (
 	liscr_class_insert_mfunc (self, "draw_end", Scene_draw_end);
 	liscr_class_insert_mfunc (self, "draw_forward_transparent", Scene_draw_forward_transparent);
 	liscr_class_insert_mfunc (self, "draw_post_process", Scene_draw_post_process);
-	liscr_class_insert_cfunc (self, "pick", Scene_pick);
 }
 
 /** @} */

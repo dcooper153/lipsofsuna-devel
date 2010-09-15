@@ -59,6 +59,43 @@ static void Object_deform_mesh (LIScrArgs* args)
  * --- Starts the particle animation of the object.
  * -- @param self Object.
  * -- @param args Arguments.<ul>
+ * --   <li>1,start_point: Ray start point in world space.</li>
+ * --   <li>2,end_point: Ray end point in world space.</li></ul>
+ * function Object.particle_animation(self)
+ */
+static void Object_intersect_ray (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIEngObject* engobj;
+	LIMatVector ray0;
+	LIMatVector ray1;
+	LIMatVector result;
+	LIRenObject* object;
+
+	/* Get render object. */
+	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_RENDER_OBJECT);
+	engobj = args->self;
+	object = liren_scene_find_object (module->scene, engobj->id);
+	if (object == NULL)
+		return;
+
+	/* Get arguments. */
+	if (!liscr_args_geti_vector (args, 0, &ray0) &&
+	    !liscr_args_gets_vector (args, "start_point", &ray0))
+		return;
+	if (!liscr_args_geti_vector (args, 1, &ray1) &&
+	    !liscr_args_gets_vector (args, "end_point", &ray1))
+		return;
+
+	/* Return the intersection point, if any. */
+	if (liren_object_intersect_ray (object, &ray0, &ray1, &result))
+		liscr_args_seti_vector (args, &result);
+}
+
+/* @luadoc
+ * --- Starts the particle animation of the object.
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
  * --   <li>loop: True to loop infinitely.</li>
  * --   <li>time: Animation offset in seconds.</li></ul>
  * function Object.particle_animation(self)
@@ -94,5 +131,6 @@ void liext_script_render_object (
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_RENDER_OBJECT, data);
 	liscr_class_insert_mfunc (self, "deform_mesh", Object_deform_mesh);
+	liscr_class_insert_mfunc (self, "intersect_ray", Object_intersect_ray);
 	liscr_class_insert_mfunc (self, "particle_animation", Object_particle_animation);
 }

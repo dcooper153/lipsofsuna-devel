@@ -65,7 +65,13 @@ LIAPICALL (LIRenModel*, liren_model_new, (
 	int          id));
 
 LIAPICALL (void, liren_model_free, (
-	LIRenModel*  self));
+	LIRenModel* self));
+
+LIAPICALL (int, liren_model_intersect_ray, (
+	const LIRenModel*  self,
+	const LIMatVector* ray0,
+	const LIMatVector* ray1,
+	LIMatVector*       result));
 
 LIAPICALL (void, liren_model_replace_image, (
 	LIRenModel* self,

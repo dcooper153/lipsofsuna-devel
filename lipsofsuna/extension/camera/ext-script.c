@@ -93,6 +93,49 @@ static void Camera_move (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Creates a picking ray for the current camera configuration.
+ * -- @param self Camera.
+ * -- @param args Arguments.<ul>
+ * --   <li>cursor: Cursor position, in pixels.</li>
+ * --   <li>far: Ray end distance, in world coordinate units.</li>
+ * --   <li>near: Ray start distance, in world coordinate units.</li></ul>
+ * function Camera.picking_ray(self, args)
+ */
+static void Camera_picking_ray (LIScrArgs* args)
+{
+	float fardist = 50.0f;
+	float neardist = 0.0f;
+	LIMatVector cursor;
+	LIMatVector dir;
+	LIMatVector ray0;
+	LIMatVector ray1;
+	LIAlgCamera* self = args->self;
+
+	/* Handle arguments. */
+	liscr_args_gets_float (args, "far", &fardist);
+	liscr_args_gets_float (args, "near", &neardist);
+	if (!liscr_args_gets_vector (args, "cursor", &cursor))
+	{
+		cursor.x = self->view.viewport[0] + self->view.viewport[2] / 2.0f;
+		cursor.y = self->view.viewport[1] + self->view.viewport[3] / 2.0f;
+	}
+
+	/* Calculate ray vector. */
+	cursor.z = 0.0f;
+	lialg_camera_unproject (self, &cursor, &ray0);
+	cursor.z = 1.0f;
+	lialg_camera_unproject (self, &cursor, &ray1);
+	dir = limat_vector_subtract (ray1, ray0);
+	dir = limat_vector_normalize (dir);
+
+	/* Apply near and far distances specified by the user. */
+	ray1 = limat_vector_add (ray0, limat_vector_multiply (dir, fardist));
+	ray0 = limat_vector_add (ray0, limat_vector_multiply (dir, neardist));
+	liscr_args_seti_vector (args, &ray0);
+	liscr_args_seti_vector (args, &ray1);
+}
+
+/* @luadoc
  * ---
  * -- Resets the look spring transformation of the camera.
  * --
@@ -448,6 +491,7 @@ void liext_script_camera (
 	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_insert_cfunc (self, "new", Camera_new);
 	liscr_class_insert_mfunc (self, "move", Camera_move);
+	liscr_class_insert_mfunc (self, "picking_ray", Camera_picking_ray);
 	liscr_class_insert_mfunc (self, "reset", Camera_reset);
 	liscr_class_insert_mfunc (self, "tilt", Camera_tilt);
 	liscr_class_insert_mfunc (self, "turn", Camera_turn);

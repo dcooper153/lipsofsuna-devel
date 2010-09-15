@@ -103,6 +103,64 @@ liren_model_free (LIRenModel* self)
 	lisys_free (self);
 }
 
+/**
+ * \brief Calculates the first intersection of the model and a ray.
+ * \param self Model.
+ * \param ray0 Start point of the ray, in model space.
+ * \param ray1 End point of the ray, in model space.
+ * \param result Return location for the intersection point.
+ * \return Nonzero if an intersection was found, zero if not.
+ */
+int liren_model_intersect_ray (
+	const LIRenModel*  self,
+	const LIMatVector* ray0,
+	const LIMatVector* ray1,
+	LIMatVector*       result)
+{
+	int i;
+	int found;
+	float d;
+	float best_dist;
+	void* vtxdata;
+	uint32_t* idxdata;
+	LIMatTriangle triangle;
+	LIMatVector best_point;
+	LIMatVector p;
+	const LIRenFormat* fmt;
+
+	/* Test for intersection for each face in the model. */
+	found = 0;
+	fmt = &self->buffer->vertex_format;
+	vtxdata = liren_buffer_lock_vertices (self->buffer, 0);
+	idxdata = liren_buffer_lock_indices (self->buffer, 0);
+	for (i = 0 ; i < self->buffer->indices.count ; i += 3)
+	{
+		/* Get the next triangle. */
+		limat_triangle_set_from_points (&triangle,
+			(LIMatVector*)(vtxdata + fmt->vtx_offset + fmt->size * idxdata[i + 0]),
+			(LIMatVector*)(vtxdata + fmt->vtx_offset + fmt->size * idxdata[i + 1]),
+			(LIMatVector*)(vtxdata + fmt->vtx_offset + fmt->size * idxdata[i + 2]));
+
+		/* Check for an intersection. */
+		if (limat_triangle_intersects_ray (&triangle, ray0, ray1, &p))
+		{
+			d = limat_vector_get_length (limat_vector_subtract (p, *ray0));
+			if (!found || d < best_dist)
+			{
+				best_dist = d;
+				best_point = p;
+				found = 1;
+			}
+		}
+	}
+	liren_buffer_unlock_indices (self->buffer, idxdata);
+	liren_buffer_unlock_vertices (self->buffer, vtxdata);
+	if (found)
+		*result = best_point;
+
+	return found;
+}
+
 void
 liren_model_replace_image (LIRenModel* self,
                            LIRenImage* image)

@@ -72,17 +72,6 @@ LIAPICALL (LIParPoint*, liren_scene_insert_particle, (
 	const LIMatVector* position,
 	const LIMatVector* velocity));
 
-LIAPICALL (int, liren_scene_pick, (
-	LIRenScene*     self,
-	LIMatMatrix*    modelview,
-	LIMatMatrix*    projection,
-	LIMatFrustum*   frustum,
-	const int*      viewport,
-	int             x,
-	int             y,
-	int             size,
-	LIRenSelection* result));
-
 LIAPICALL (int, liren_scene_render_begin, (
 	LIRenScene*    self,
 	LIRenDeferred* framebuffer,

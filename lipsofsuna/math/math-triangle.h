@@ -100,6 +100,18 @@ limat_triangle_intersects_point (const LIMatVector* vertex0,
 	return 1;
 }
 
+static inline int limat_triangle_intersects_ray (
+	const LIMatTriangle* self,
+	const LIMatVector*   ray0,
+	const LIMatVector*   ray1,
+	LIMatVector*         result)
+{
+	if (!limat_plane_intersects_segment (&self->plane, ray0, ray1, result))
+		return 0;
+	return limat_triangle_intersects_point (self->vertices + 0,
+		self->vertices + 1, self->vertices + 2, result);
+}
+
 /**
  * \brief Checks if the triangle intersects with another.
  *
