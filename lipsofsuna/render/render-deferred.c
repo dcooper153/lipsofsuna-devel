@@ -233,9 +233,9 @@ private_rebuild (LIRenDeferred* self,
 	GLuint postproc_texture[2];
 	static const GLenum fragdata[] =
 	{
-		GL_COLOR_ATTACHMENT0_EXT,
-		GL_COLOR_ATTACHMENT1_EXT,
-		GL_COLOR_ATTACHMENT2_EXT
+		GL_COLOR_ATTACHMENT0,
+		GL_COLOR_ATTACHMENT1,
+		GL_COLOR_ATTACHMENT2
 	};
 
 	/* Choose pixel formats. */
@@ -300,21 +300,21 @@ private_rebuild (LIRenDeferred* self,
 	}
 
 	/* Create deferred framebuffer object. */
-	glGenFramebuffersEXT (1, &deferred_fbo);
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, deferred_fbo);
-	glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
+	glGenFramebuffers (1, &deferred_fbo);
+	glBindFramebuffer (GL_FRAMEBUFFER, deferred_fbo);
+	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 		GL_TEXTURE_2D, depth_texture, 0);
-	glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 		GL_TEXTURE_2D, diffuse_texture, 0);
-	glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT1_EXT,
+	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1,
 		GL_TEXTURE_2D, specular_texture, 0);
-	glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT2_EXT,
+	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2,
 		GL_TEXTURE_2D, normal_texture, 0);
 	if (!private_check (self))
 	{
-		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
-		glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, 0);
-		glDeleteFramebuffersEXT (1, &deferred_fbo);
+		glBindFramebuffer (GL_FRAMEBUFFER, 0);
+		glBindRenderbuffer (GL_RENDERBUFFER, 0);
+		glDeleteFramebuffers (1, &deferred_fbo);
 		glDeleteTextures (1, &depth_texture);
 		glDeleteTextures (1, &normal_texture);
 		glDeleteTextures (1, &diffuse_texture);
@@ -325,20 +325,20 @@ private_rebuild (LIRenDeferred* self,
 	glDrawBuffers (sizeof (fragdata) / sizeof (GLenum), fragdata);
 
 	/* Create post-processing framebuffer objects. */
-	glGenFramebuffersEXT (2, postproc_fbo);
+	glGenFramebuffers (2, postproc_fbo);
 	for (i = 0 ; i < 2 ; i++)
 	{
-		glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, postproc_fbo[i]);
-		glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, GL_DEPTH_ATTACHMENT_EXT,
+		glBindFramebuffer (GL_FRAMEBUFFER, postproc_fbo[i]);
+		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 			GL_TEXTURE_2D, depth_texture, 0);
-		glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT, GL_COLOR_ATTACHMENT0_EXT,
+		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
 			GL_TEXTURE_2D, postproc_texture[i], 0);
 		if (!private_check (self))
 		{
-			glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
-			glBindRenderbufferEXT (GL_RENDERBUFFER_EXT, 0);
-			glDeleteFramebuffersEXT (1, &deferred_fbo);
-			glDeleteFramebuffersEXT (2, postproc_fbo);
+			glBindFramebuffer (GL_FRAMEBUFFER, 0);
+			glBindRenderbuffer (GL_RENDERBUFFER, 0);
+			glDeleteFramebuffers (1, &deferred_fbo);
+			glDeleteFramebuffers (2, postproc_fbo);
 			glDeleteTextures (1, &depth_texture);
 			glDeleteTextures (1, &normal_texture);
 			glDeleteTextures (1, &diffuse_texture);
@@ -350,9 +350,9 @@ private_rebuild (LIRenDeferred* self,
 	}
 
 	/* Accept successful rebuild. */
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
-	glDeleteFramebuffersEXT (1, &self->deferred_fbo);
-	glDeleteFramebuffersEXT (2, self->postproc_fbo);
+	glBindFramebuffer (GL_FRAMEBUFFER, 0);
+	glDeleteFramebuffers (1, &self->deferred_fbo);
+	glDeleteFramebuffers (2, self->postproc_fbo);
 	glDeleteTextures (1, &self->depth_texture);
 	glDeleteTextures (1, &self->normal_texture);
 	glDeleteTextures (1, &self->diffuse_texture);
