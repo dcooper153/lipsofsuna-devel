@@ -508,7 +508,7 @@ void liren_scene_render_postproc (
 	param[3] = 0.0;
 
 	/* Change render state. */
-	liren_context_set_buffer (self->state.context, NULL);
+	liren_context_set_buffer (self->state.context, self->render->helpers.unit_quad);
 	liren_context_set_shader (self->state.context, shader);
 	liren_context_set_textures_raw (self->state.context, self->state.framebuffer->postproc_texture, 1);
 	liren_context_set_param (self->state.context, param);
@@ -520,16 +520,7 @@ void liren_scene_render_postproc (
 	glBindFramebuffer (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[1]);
 
 	/* Render from the first buffer to the second. */
-	glBegin (GL_TRIANGLE_STRIP);
-	glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, 0, 0);
-	glVertexAttrib2f (LIREN_ATTRIBUTE_COORD, -1, -1);
-	glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, 1, 0);
-	glVertexAttrib2f (LIREN_ATTRIBUTE_COORD, 1, -1);
-	glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, 0, 1);
-	glVertexAttrib2f (LIREN_ATTRIBUTE_COORD, -1, 1);
-	glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, 1, 1);
-	glVertexAttrib2f (LIREN_ATTRIBUTE_COORD, 1, 1);
-	glEnd ();
+	liren_context_render_indexed (self->state.context, 0, 6);
 
 	/* Swap the buffers so that we can chain passes. */
 	tmp = self->state.framebuffer->postproc_fbo[0];
@@ -712,7 +703,7 @@ private_lighting_render (LIRenScene*    self,
 	liren_context_set_shader (context, shader);
 	liren_context_set_lights (context, NULL, 0);
 	liren_context_set_textures (context, textures, 4);
-	liren_context_set_buffer (context, NULL);
+	liren_context_set_buffer (context, self->render->helpers.unit_quad);
 
 	/* Let each light lit the scene. */
 	LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
@@ -739,16 +730,7 @@ private_lighting_render (LIRenScene*    self,
 			glDisable (GL_SCISSOR_TEST);
 
 		/* Shade light rectangle. */
-		glBegin (GL_QUADS);
-		glTexCoord2i (0, 0);
-		glVertex2i (-1, -1);
-		glTexCoord2i (0, 1);
-		glVertex2i (-1, 1);
-		glTexCoord2i (1, 1);
-		glVertex2i (1, 1);
-		glTexCoord2i (1, 0);
-		glVertex2i (1, -1);
-		glEnd ();
+		liren_context_render_indexed (context, 0, 6);
 	}
 
 	liren_context_set_lights (context, NULL, 0);

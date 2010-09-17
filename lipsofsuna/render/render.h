@@ -28,6 +28,7 @@
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/image.h>
 #include <lipsofsuna/system.h>
+#include "render-buffer.h"
 #include "render-context.h"
 #include "render-image.h"
 #include "render-light.h"
@@ -52,6 +53,7 @@ struct _LIRenRender
 		float time;
 		GLuint noise;
 		GLuint depth_texture_max;
+		LIRenBuffer* unit_quad;
 		LIRenImage* empty_image;
 	} helpers;
 #ifdef LIREN_ENABLE_PROFILING
