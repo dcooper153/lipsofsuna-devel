@@ -307,6 +307,21 @@ static void Quaternion_normalize (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- The conjugate of the quaternion.
+ * -- @name Quaternion.conjugate
+ * -- @class table
+ */
+static void Quaternion_getter_conjugate (LIScrArgs* args)
+{
+	LIMatQuaternion* data;
+	LIMatQuaternion tmp;
+
+	data = args->self;
+	tmp = limat_quaternion_conjugate (*data);
+	liscr_args_seti_quaternion (args, &tmp);
+}
+
+/* @luadoc
  * ---
  * -- Euler angle presentation of the quaternion.
  * -- @name Quaternion.euler
@@ -411,6 +426,7 @@ liscr_script_quaternion (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "new_euler", Quaternion_new_euler);
 	liscr_class_insert_mfunc (self, "nlerp", Quaternion_nlerp);
 	liscr_class_insert_mfunc (self, "normalize", Quaternion_normalize);
+	liscr_class_insert_mvar (self, "conjugate", Quaternion_getter_conjugate, NULL);
 	liscr_class_insert_mvar (self, "euler", Quaternion_getter_euler, NULL);
 	liscr_class_insert_mvar (self, "length", Quaternion_getter_length, NULL);
 	liscr_class_insert_mvar (self, "x", Quaternion_getter_x, Quaternion_setter_x);
