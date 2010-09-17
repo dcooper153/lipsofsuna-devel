@@ -41,6 +41,8 @@ struct _LIRenLight
 	float rating;
 	float cutoff;
 	float exponent;
+	float shadow_far;
+	float shadow_near;
 	float ambient[4];
 	float diffuse[4];
 	float specular[4];
@@ -82,6 +84,9 @@ LIAPICALL (int, liren_light_compare, (
 	const LIRenLight* light));
 
 LIAPICALL (void, liren_light_update, (
+	LIRenLight* self));
+
+LIAPICALL (void, liren_light_update_projection, (
 	LIRenLight* self));
 
 LIAPICALL (void, liren_light_set_ambient, (
@@ -130,6 +135,13 @@ LIAPICALL (void, liren_light_get_projection, (
 LIAPICALL (void, liren_light_set_projection, (
 	LIRenLight*        self,
 	const LIMatMatrix* value));
+
+LIAPICALL (int, liren_light_get_shadow, (
+	const LIRenLight* self));
+
+LIAPICALL (void, liren_light_set_shadow, (
+	LIRenLight* self,
+	int         value));
 
 #endif
 

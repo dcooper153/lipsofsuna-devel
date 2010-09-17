@@ -489,6 +489,20 @@ static int private_uniform_value (
 			return LIREN_UNIFORM_NONE;
 		return LIREN_UNIFORM_LIGHTDIFFUSE0 + index;
 	}
+	if (!strncmp (value, "LIGHTDIRECTIONPREMULT", 21))
+	{
+		index = atoi (value + 20);
+		if (index < 0 || index > 9)
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_LIGHTDIRECTIONPREMULT0 + index;
+	}
+	if (!strncmp (value, "LIGHTDIRECTION", 14))
+	{
+		index = atoi (value + 13);
+		if (index < 0 || index > 9)
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_LIGHTDIRECTION0 + index;
+	}
 	if (!strncmp (value, "LIGHTEQUATION", 13))
 	{
 		index = atoi (value + 13);
@@ -523,6 +537,13 @@ static int private_uniform_value (
 		if (index < 0 || index > 9)
 			return LIREN_UNIFORM_NONE;
 		return LIREN_UNIFORM_LIGHTSPECULAR0 + index;
+	}
+	if (!strncmp (value, "LIGHTSPOT", 9))
+	{
+		index = atoi (value + 9);
+		if (index < 0 || index > 9)
+			return LIREN_UNIFORM_NONE;
+		return LIREN_UNIFORM_LIGHTSPOT0 + index;
 	}
 	if (!strncmp (value, "LIGHTTYPE", 9))
 	{

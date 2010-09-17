@@ -177,7 +177,6 @@ static void Light_setter_equation (LIScrArgs* args)
 
 /* @luadoc
  * --- Gets or sets the position of the light.
- * --
  * -- @name Light.position
  * -- @class table
  */
@@ -201,6 +200,137 @@ static void Light_setter_position (LIScrArgs* args)
 	}
 }
 
+/* @luadoc
+ * --- Gets or sets the rotation of the light.
+ * -- @name Light.rotation
+ * -- @class table
+ */
+static void Light_getter_rotation (LIScrArgs* args)
+{
+	LIMatTransform transform;
+
+	liren_light_get_transform (args->self, &transform);
+	liscr_args_seti_quaternion (args, &transform.rotation);
+}
+static void Light_setter_rotation (LIScrArgs* args)
+{
+	LIMatTransform transform;
+	LIMatQuaternion value;
+
+	if (liscr_args_geti_quaternion (args, 0, &value))
+	{
+		liren_light_get_transform (args->self, &transform);
+		transform.rotation = value;
+		liren_light_set_transform (args->self, &transform);
+	}
+}
+
+/* @luadoc
+ * --- Enables or disables shadow casting.
+ * -- @name Light.shadow_casting
+ * -- @class table
+ */
+static void Light_getter_shadow_casting (LIScrArgs* args)
+{
+	liscr_args_seti_bool (args, liren_light_get_shadow (args->self));
+}
+static void Light_setter_shadow_casting (LIScrArgs* args)
+{
+	int value;
+
+	if (liscr_args_geti_bool (args, 0, &value))
+		liren_light_set_shadow (args->self, value);
+}
+
+/* @luadoc
+ * --- Far place distance of the shadow projection.
+ * -- @name Light.shadow_far
+ * -- @class table
+ */
+static void Light_getter_shadow_far (LIScrArgs* args)
+{
+	LIRenLight* self = args->self;
+
+	liscr_args_seti_float (args, self->shadow_far);
+}
+static void Light_setter_shadow_far (LIScrArgs* args)
+{
+	float value;
+	LIRenLight* self = args->self;
+
+	if (liscr_args_geti_float (args, 0, &value))
+	{
+		self->shadow_far = LIMAT_MAX (value, LIMAT_EPSILON);
+		liren_light_update_projection (self);
+	}
+}
+
+/* @luadoc
+ * --- Near place distance of the shadow projection.
+ * -- @name Light.shadow_near
+ * -- @class table
+ */
+static void Light_getter_shadow_near (LIScrArgs* args)
+{
+	LIRenLight* self = args->self;
+
+	liscr_args_seti_float (args, self->shadow_near);
+}
+static void Light_setter_shadow_near (LIScrArgs* args)
+{
+	float value;
+	LIRenLight* self = args->self;
+
+	if (liscr_args_geti_float (args, 0, &value))
+	{
+		self->shadow_near = LIMAT_MAX (value, LIMAT_EPSILON);
+		liren_light_update_projection (self);
+	}
+}
+
+/* @luadoc
+ * --- Spot cutoff angle of the light, in radians.
+ * -- @name Light.spot_cutoff
+ * -- @class table
+ */
+static void Light_getter_spot_cutoff (LIScrArgs* args)
+{
+	LIRenLight* self = args->self;
+
+	liscr_args_seti_float (args, self->cutoff);
+}
+static void Light_setter_spot_cutoff (LIScrArgs* args)
+{
+	float value;
+	LIRenLight* self = args->self;
+
+	if (liscr_args_geti_float (args, 0, &value))
+	{
+		self->cutoff = LIMAT_CLAMP (value, 0.0f, M_PI);
+		liren_light_update_projection (self);
+	}
+}
+
+/* @luadoc
+ * --- Spot exponent of the light.
+ * -- @name Light.spot_cutoff
+ * -- @class table
+ */
+static void Light_getter_spot_exponent (LIScrArgs* args)
+{
+	LIRenLight* self = args->self;
+
+	liscr_args_seti_float (args, self->exponent);
+}
+static void Light_setter_spot_exponent (LIScrArgs* args)
+{
+	float value;
+	LIRenLight* self = args->self;
+
+	if (liscr_args_geti_float (args, 0, &value))
+		self->exponent = LIMAT_CLAMP (value, 0.0f, 127.0f);
+}
+
 /*****************************************************************************/
 
 void
@@ -215,6 +345,12 @@ licli_script_light (LIScrClass* self,
 	liscr_class_insert_mvar (self, "enabled", Light_getter_enabled, Light_setter_enabled);
 	liscr_class_insert_mvar (self, "equation", Light_getter_equation, Light_setter_equation);
 	liscr_class_insert_mvar (self, "position", Light_getter_position, Light_setter_position);
+	liscr_class_insert_mvar (self, "rotation", Light_getter_rotation, Light_setter_rotation);
+	liscr_class_insert_mvar (self, "shadow_casting", Light_getter_shadow_casting, Light_setter_shadow_casting);
+	liscr_class_insert_mvar (self, "shadow_far", Light_getter_shadow_far, Light_setter_shadow_far);
+	liscr_class_insert_mvar (self, "shadow_near", Light_getter_shadow_near, Light_setter_shadow_near);
+	liscr_class_insert_mvar (self, "spot_cutoff", Light_getter_spot_cutoff, Light_setter_spot_cutoff);
+	liscr_class_insert_mvar (self, "spot_exponent", Light_getter_spot_exponent, Light_setter_spot_exponent);
 }
 
 /** @} */

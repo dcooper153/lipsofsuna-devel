@@ -23,7 +23,7 @@
  */
 
 #include <lipsofsuna/system.h>
-#include "render-draw.h"
+#include "render-group.h"
 #include "render-light.h"
 
 #define LIGHT_CONTRIBUTION_EPSILON 0.001f
@@ -35,7 +35,6 @@ private_update_shadow (LIRenLight* self);
 
 /**
  * \brief Creates a new light source.
- *
  * \param scene Scene.
  * \param color Array of 4 floats.
  * \param equation Array of 3 floats.
@@ -44,13 +43,13 @@ private_update_shadow (LIRenLight* self);
  * \param shadows Nonzero if the lamp casts shadows.
  * \return New light source or NULL.
  */
-LIRenLight*
-liren_light_new (LIRenScene*  scene,
-                 const float* color,
-                 const float* equation,
-                 float        cutoff,
-                 float        exponent,
-                 int          shadows)
+LIRenLight* liren_light_new (
+	LIRenScene*  scene,
+	const float* color,
+	const float* equation,
+	float        cutoff,
+	float        exponent,
+	int          shadows)
 {
 	LIRenLight* self;
 
@@ -77,43 +76,14 @@ liren_light_new (LIRenScene*  scene,
 	self->equation[2] = equation[2];
 	self->cutoff = cutoff;
 	self->exponent = exponent;
+	self->shadow_far = 50.0f;
+	self->shadow_near = 0.1f;
 	self->projection = limat_matrix_identity ();
 	self->modelview = limat_matrix_identity ();
 	self->modelview_inverse = limat_matrix_identity ();
 	self->transform = limat_transform_identity ();
-	if (!shadows)
-		return self;
-	if (!GLEW_EXT_framebuffer_object || !GLEW_ARB_depth_buffer_float)
-		return self;
-
-	/* Create shadow texture. */
-	glGenTextures (1, &self->shadow.map);
-	glBindTexture (GL_TEXTURE_2D, self->shadow.map);
-	glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, SHADOWMAPSIZE, SHADOWMAPSIZE,
-		0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-
-	/* Create framebuffer object. */
-	glGenFramebuffersEXT (1, &self->shadow.fbo);
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->shadow.fbo);
-	glFramebufferTexture2DEXT (GL_FRAMEBUFFER_EXT,
-		GL_DEPTH_ATTACHMENT_EXT, GL_TEXTURE_2D, self->shadow.map, 0);
-	glDrawBuffer (GL_FALSE);
-	glReadBuffer (GL_FALSE);
-	switch (glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT))
-	{
-		case GL_FRAMEBUFFER_COMPLETE_EXT:
-			break;
-		default:
-			lisys_error_set (ENOTSUP, "cannot create framebuffer object");
-			glDeleteFramebuffersEXT (1, &self->shadow.fbo);
-			self->shadow.fbo = 0;
-			break;
-	}
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+	liren_light_update_projection (self);
+	liren_light_set_shadow (self, shadows);
 
 	return self;
 }
@@ -125,9 +95,9 @@ liren_light_new (LIRenScene*  scene,
  * \param color Array of 4 floats.
  * \return New light source or NULL.
  */
-LIRenLight*
-liren_light_new_directional (LIRenScene*  scene,
-                             const float* color)
+LIRenLight* liren_light_new_directional (
+	LIRenScene*  scene,
+	const float* color)
 {
 	const float equation[3] = { 1.0f, 0.0f, 0.0f };
 	const LIMatVector direction = { 0.0f, 0.0f, -1.0f };
@@ -144,14 +114,13 @@ liren_light_new_directional (LIRenScene*  scene,
 
 /**
  * \brief Creates a new light from a model light.
- *
  * \param scene Scene.
  * \param light Model light.
  * \return New light or NULL.
  */
-LIRenLight*
-liren_light_new_from_model (LIRenScene*      scene,
-                            const LIMdlNode* light)
+LIRenLight* liren_light_new_from_model (
+	LIRenScene*      scene,
+	const LIMdlNode* light)
 {
 	LIMatMatrix projection;
 	LIMatTransform transform;
@@ -177,14 +146,12 @@ liren_light_new_from_model (LIRenScene*      scene,
 
 /**
  * \brief Frees a light source.
- *
  * \param self Light source.
  */
-void liren_light_free (LIRenLight* self)
+void liren_light_free (
+	LIRenLight* self)
 {
-	if (GLEW_EXT_framebuffer_object)
-		glDeleteFramebuffersEXT (1, &self->shadow.fbo);
-	glDeleteTextures (1, &self->shadow.map);
+	liren_light_set_shadow (self, 0);
 	liren_lighting_remove_light (self->scene->lighting, self);
 	lisys_free (self);
 }
@@ -212,30 +179,36 @@ liren_light_compare (const LIRenLight* self,
 	return 0;
 }
 
-void
-liren_light_update (LIRenLight* self)
+void liren_light_update (
+	LIRenLight* self)
 {
 	if (self->shadow.map)
 		private_update_shadow (self);
 }
 
-void
-liren_light_set_ambient (LIRenLight*  self,
-                         const float* value)
+void liren_light_update_projection (
+	LIRenLight* self)
+{
+	self->projection = limat_matrix_perspective (2.0f * self->cutoff * M_PI,
+		1.0f, self->shadow_near, self->shadow_far);
+}
+
+void liren_light_set_ambient (
+	LIRenLight*  self,
+	const float* value)
 {
 	memcpy (self->ambient, value, 4 * sizeof (float));
 }
 
 /**
  * \brief Gets the area of effect of the light source.
- *
  * \param self Light source.
  * \param result Return location for a bounding box.
  * \return Nonzero if has bounds.
  */
-int
-liren_light_get_bounds (const LIRenLight* self,
-                        LIMatAabb*        result)
+int liren_light_get_bounds (
+	const LIRenLight* self,
+	LIMatAabb*        result)
 {
 	double a;
 	double b;
@@ -277,9 +250,9 @@ liren_light_get_bounds (const LIRenLight* self,
  * \param self Light source.
  * \param value Return location for the direction.
  */
-void
-liren_light_get_direction (const LIRenLight* self,
-                           LIMatVector*      value)
+void liren_light_get_direction (
+	const LIRenLight* self,
+	LIMatVector*      value)
 {
 	*value = limat_vector_init (0.0f, 0.0f, -1.0f);
 	*value = limat_quaternion_transform (self->transform.rotation, *value);
@@ -287,13 +260,12 @@ liren_light_get_direction (const LIRenLight* self,
 
 /**
  * \brief Makes the light directional and sets it direction.
- *
  * \param self Light source.
  * \param value Light direction.
  */
-void
-liren_light_set_direction (LIRenLight*        self,
-                           const LIMatVector* value)
+void liren_light_set_direction (
+	LIRenLight*        self,
+	const LIMatVector* value)
 {
 	float a;
 	float b;
@@ -326,38 +298,35 @@ liren_light_set_direction (LIRenLight*        self,
 
 /**
  * \brief Enables or disables directional mode.
- *
  * \param self Light source.
  * \param value Nonzero if the light is directional.
  */
-void
-liren_light_set_directional (LIRenLight* self,
-                             int         value)
+void liren_light_set_directional (
+	LIRenLight* self,
+	int         value)
 {
 	self->directional = (value != 0);
 }
 
 /**
  * \brief Checks if the light is registered.
- *
  * \param self Light source.
  * \return Nonzero if registered.
  */
-int
-liren_light_get_enabled (const LIRenLight* self)
+int liren_light_get_enabled (
+	const LIRenLight* self)
 {
 	return self->enabled;
 }
 
 /**
  * \brief Gets the modelview matrix of the light.
- *
  * \param self Light source.
  * \param value Return location for the matrix.
  */
-void
-liren_light_get_modelview (const LIRenLight* self,
-                           LIMatMatrix*         value)
+void liren_light_get_modelview (
+	const LIRenLight* self,
+	LIMatMatrix*         value)
 {
 	*value = self->modelview;
 }
@@ -392,39 +361,103 @@ void liren_light_get_position (
 
 /**
  * \brief Gets the projection matrix of the light.
- *
  * \param self Light source.
  * \param value Return location for the matrix.
  */
-void
-liren_light_get_projection (const LIRenLight* self,
-                            LIMatMatrix*         value)
+void liren_light_get_projection (
+	const LIRenLight* self,
+	LIMatMatrix*      value)
 {
 	*value = self->projection;
 }
 
 /**
  * \brief Sets the projection matrix of the light.
- *
  * \param self Light source.
  * \param value Matrix to set.
  */
-void
-liren_light_set_projection (LIRenLight*     self,
-                            const LIMatMatrix* value)
+void liren_light_set_projection (
+	LIRenLight*        self,
+	const LIMatMatrix* value)
 {
 	self->projection = *value;
 }
 
 /**
+ * \brief Gets the shadow casting mode of the light.
+ * \param self Light source.
+ * \return Nonzero if shadow casting is allowed, zero if disabled.
+ */
+int liren_light_get_shadow (
+	const LIRenLight* self)
+{
+	return self->shadow.fbo != 0;
+}
+
+/**
+ * \brief Sets the shadow casting mode of the light.
+ * \param self Light source.
+ * \param value Nonzero to allow shadow casting, zero to disable.
+ */
+void liren_light_set_shadow (
+	LIRenLight* self,
+	int         value)
+{
+	float border[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+	if ((value != 0) == (self->shadow.fbo != 0))
+		return;
+	if (value)
+	{
+		/* Create shadow texture. */
+		glGenTextures (1, &self->shadow.map);
+		glBindTexture (GL_TEXTURE_2D, self->shadow.map);
+		glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, SHADOWMAPSIZE, SHADOWMAPSIZE,
+			0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameterfv (GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
+
+		/* Create framebuffer object. */
+		glGenFramebuffers (1, &self->shadow.fbo);
+		glBindFramebuffer (GL_FRAMEBUFFER, self->shadow.fbo);
+		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, self->shadow.map, 0);
+		glDrawBuffer (GL_NONE);
+		glReadBuffer (GL_NONE);
+		switch (glCheckFramebufferStatus (GL_FRAMEBUFFER))
+		{
+			case GL_FRAMEBUFFER_COMPLETE:
+				break;
+			default:
+				lisys_error_set (ENOTSUP, "cannot create framebuffer object");
+				glDeleteFramebuffers (1, &self->shadow.fbo);
+				glDeleteTextures (1, &self->shadow.map);
+				self->shadow.fbo = 0;
+				self->shadow.map = 0;
+				break;
+		}
+		glBindFramebuffer (GL_FRAMEBUFFER, 0);
+	}
+	else
+	{
+		/* Delete the shadow map. */
+		glDeleteFramebuffers (1, &self->shadow.fbo);
+		glDeleteTextures (1, &self->shadow.map);
+		self->shadow.fbo = 0;
+		self->shadow.map = 0;
+	}
+}
+
+/**
  * \brief Gets the transformation of the light.
- *
  * \param self Light source.
  * \param value Return value for the transformation.
  */
-void
-liren_light_get_transform (LIRenLight*     self,
-                           LIMatTransform* value)
+void liren_light_get_transform (
+	LIRenLight*     self,
+	LIMatTransform* value)
 {
 	*value = self->transform;
 }
@@ -437,9 +470,9 @@ liren_light_get_transform (LIRenLight*     self,
  * \param self Light source.
  * \param transform Transformation.
  */
-void
-liren_light_set_transform (LIRenLight*           self,
-                           const LIMatTransform* transform)
+void liren_light_set_transform (
+	LIRenLight*           self,
+	const LIMatTransform* transform)
 {
 	LIMatVector dir;
 	LIMatVector pos;
@@ -455,43 +488,79 @@ liren_light_set_transform (LIRenLight*           self,
 
 /*****************************************************************************/
 
-static void
-private_update_shadow (LIRenLight* self)
+static void private_update_shadow (
+	LIRenLight* self)
 {
-	LIAlgU32dicIter iter;
+	LIAlgPtrdicIter iter0;
+	LIAlgU32dicIter iter1;
+	LIMatAabb aabb;
 	LIMatFrustum frustum;
+	LIMatMatrix matrix;
 	LIRenContext* context;
+	LIRenGroup* group;
+	LIRenGroupObject* grpobj;
+	LIRenObject* object;
 	LIRenShader* shader;
 
-	/* Find shader. */
+	/* Find the shader. */
 	shader = liren_render_find_shader (self->scene->render, "shadowmap");
 	if (shader == NULL)
 		return;
 
 	/* Enable depth rendering mode. */
-	glPushAttrib (GL_VIEWPORT_BIT);
+	glPushAttrib (GL_VIEWPORT_BIT | GL_SCISSOR_BIT);
+	glBindFramebuffer (GL_FRAMEBUFFER, self->shadow.fbo);
 	glViewport (0, 0, SHADOWMAPSIZE, SHADOWMAPSIZE);
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->shadow.fbo);
-	glClear (GL_DEPTH_BUFFER_BIT);
 	glEnable (GL_DEPTH_TEST);
 	glEnable (GL_CULL_FACE);
+	glDisable (GL_SCISSOR_TEST);
 	glFrontFace (GL_CCW);
 	glDepthFunc (GL_LEQUAL);
-	glBindTexture (GL_TEXTURE_2D, 0);
-
-	/* Render to depth texture. */
+	glDepthMask (GL_TRUE);
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	limat_frustum_init (&frustum, &self->modelview, &self->projection);
 	context = liren_render_get_context (self->scene->render);
+	liren_context_init (context);
 	liren_context_set_scene (context, self->scene);
 	liren_context_set_viewmatrix (context, &self->modelview);
 	liren_context_set_projection (context, &self->projection);
 	liren_context_set_frustum (context, &frustum);
 	liren_context_set_shader (context, shader);
-	LIALG_U32DIC_FOREACH (iter, self->scene->objects)
-		liren_draw_shadowmap (context, iter.value, self);
+
+	/* Render groups and objects to the depth texture. */
+	LIALG_PTRDIC_FOREACH (iter0, self->scene->groups)
+	{
+		group = iter0.value;
+		if (!liren_group_get_realized (group))
+			continue;
+		liren_group_get_bounds (group, &aabb);
+		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
+			continue;
+		for (grpobj = group->objects ; grpobj != NULL ; grpobj = grpobj->next)
+		{
+			matrix = limat_convert_transform_to_matrix (grpobj->transform);
+			liren_context_set_modelmatrix (context, &matrix);
+			liren_context_set_buffer (context, grpobj->model->buffer);
+			liren_context_bind (context);
+			liren_context_render_indexed (context, 0, grpobj->model->buffer->indices.count);
+		}
+	}
+	LIALG_U32DIC_FOREACH (iter1, self->scene->objects)
+	{
+		object = iter1.value;
+		if (!liren_object_get_realized (object))
+			continue;
+		liren_object_get_bounds (object, &aabb);
+		if (limat_frustum_cull_aabb (&frustum, &aabb))
+			continue;
+		liren_context_set_modelmatrix (context, &object->orientation.matrix);
+		liren_context_set_buffer (context, object->model->buffer);
+		liren_context_bind (context);
+		liren_context_render_indexed (context, 0, object->model->buffer->indices.count);
+	}
 
 	/* Disable depth rendering mode. */
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebuffer (GL_FRAMEBUFFER, 0);
 	glPopAttrib ();
 }
 
