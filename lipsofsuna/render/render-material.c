@@ -27,11 +27,9 @@
 
 /**
  * \brief Creates a new material.
- *
  * \return Material or NULL.
  */
-LIRenMaterial*
-liren_material_new ()
+LIRenMaterial* liren_material_new ()
 {
 	LIRenMaterial* self;
 
@@ -43,9 +41,15 @@ liren_material_new ()
 	return self;
 }
 
-LIRenMaterial*
-liren_material_new_from_model (LIRenRender*         render,
-                               const LIMdlMaterial* material)
+/**
+ * \brief Creates a new material from a model material.
+ * \param render Renderer.
+ * \param material Model material.
+ * \return Material or NULL.
+ */
+LIRenMaterial* liren_material_new_from_model (
+	LIRenRender*         render,
+	const LIMdlMaterial* material)
 {
 	int j;
 	char* name;
@@ -127,13 +131,16 @@ liren_material_new_from_model (LIRenRender*         render,
 }
 
 /**
- * \brief Frees a material.
- *
+ * \brief Frees the material.
  * \param self Material.
  */
-void
-liren_material_free (LIRenMaterial* self)
+void liren_material_free (
+	LIRenMaterial* self)
 {
+	int i;
+
+	for (i = 0 ; i < self->textures.count ; i++)
+		liren_texture_free (self->textures.array + i);
 	lisys_free (self->textures.array);
 	lisys_free (self);
 }
@@ -144,9 +151,9 @@ liren_material_free (LIRenMaterial* self)
  * \param self Material.
  * \param flags Flags.
  */
-void
-liren_material_set_flags (LIRenMaterial* self,
-                          int            flags)
+void liren_material_set_flags (
+	LIRenMaterial* self,
+	int            flags)
 {
 	self->flags = flags;
 }
@@ -165,10 +172,10 @@ liren_material_set_flags (LIRenMaterial* self,
  * \param deferred Shader for deferred rendering.
  * \param forward Shader for forward rendering.
  */
-int
-liren_material_set_shader (LIRenMaterial* self,
-                           LIRenShader*   deferred,
-                           LIRenShader*   forward)
+int liren_material_set_shader (
+	LIRenMaterial* self,
+	LIRenShader*   deferred,
+	LIRenShader*   forward)
 {
 	self->shader_deferred = deferred;
 	self->shader_forward = forward;
@@ -184,22 +191,26 @@ liren_material_set_shader (LIRenMaterial* self,
  * \param texture Texture data.
  * \param image Image.
  */
-void
-liren_material_set_texture (LIRenMaterial* self,
-                            int            index,
-                            LIMdlTexture*  texture,
-                            LIRenImage*    image)
+void liren_material_set_texture (
+	LIRenMaterial* self,
+	int            index,
+	LIMdlTexture*  texture,
+	LIRenImage*    image)
 {
 	if (index < 0 || index >= self->textures.count)
 		return;
-	liren_texture_init (self->textures.array + index, texture);
+	self->textures.array[index].type = texture->type;
+	self->textures.array[index].width = texture->width;
+	self->textures.array[index].height = texture->height;
+	liren_texture_set_flags (self->textures.array + index, texture->flags);
 	liren_texture_set_image (self->textures.array + index, image);
 }
 
-int
-liren_material_set_texture_count (LIRenMaterial* self,
-                                  int            value)
+int liren_material_set_texture_count (
+	LIRenMaterial* self,
+	int            value)
 {
+	int i;
 	int num;
 	LIRenTexture* tmp;
 
@@ -211,12 +222,15 @@ liren_material_set_texture_count (LIRenMaterial* self,
 			tmp = realloc (self->textures.array, value * sizeof (LIRenTexture));
 			if (tmp == NULL)
 				return 0;
+			for (i = self->textures.count ; i < value ; i++)
+				liren_texture_init (tmp + i);
 			self->textures.array = tmp;
 			self->textures.count = value;
-			memset (tmp + value - num, 0, num * sizeof (LIRenTexture));
 		}
 		else
 		{
+			for (i = value ; i < self->textures.count ; i++)
+				liren_texture_free (self->textures.array + i);
 			tmp = realloc (self->textures.array, value * sizeof (LIRenTexture));
 			if (tmp != NULL)
 				self->textures.array = tmp;
@@ -225,6 +239,8 @@ liren_material_set_texture_count (LIRenMaterial* self,
 	}
 	else
 	{
+		for (i = 0 ; i < self->textures.count ; i++)
+			liren_texture_free (self->textures.array + i);
 		lisys_free (self->textures.array);
 		self->textures.array = NULL;
 		self->textures.count = 0;

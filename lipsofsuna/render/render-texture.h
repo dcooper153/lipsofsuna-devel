@@ -50,16 +50,19 @@ struct _LIRenTexture
 	} params;
 };
 
-void
-liren_texture_init (LIRenTexture* self,
-                    LIMdlTexture* texture);
+LIAPICALL (void, liren_texture_init, (
+	LIRenTexture* self));
 
-void
-liren_texture_free (LIRenTexture* self);
+LIAPICALL (void, liren_texture_free, (
+	LIRenTexture* self));
 
-void
-liren_texture_set_image (LIRenTexture* self,
-                         LIRenImage*   value);
+LIAPICALL (void, liren_texture_set_flags, (
+	LIRenTexture* self,
+	int           value));
+
+LIAPICALL (void, liren_texture_set_image, (
+	LIRenTexture* self,
+	LIRenImage*   value));
 
 #endif
 

@@ -299,7 +299,7 @@ void liren_scene_render_deferred_begin (
 
 	/* Change render state. */
 	liren_context_set_deferred (self->state.context, 1);
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->deferred_fbo);
+	glBindFramebuffer (GL_FRAMEBUFFER, self->state.framebuffer->deferred_fbo);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glDisable (GL_BLEND);
 	self->state.alphatest = alphatest;
@@ -321,7 +321,7 @@ void liren_scene_render_deferred_end (
 		return;
 
 	/* Change render state. */
-	glBindFramebuffer (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[0]);
+	glBindFramebuffer (GL_FRAMEBUFFER, self->state.framebuffer->postproc_fbo[0]);
 
 	/* Render lit fragments to post-processing buffer. */
 	private_lighting_render (self, self->state.context, self->state.framebuffer);
@@ -679,25 +679,13 @@ private_lighting_render (LIRenScene*    self,
 	glGetIntegerv (GL_VIEWPORT, viewport);
 	matrix = limat_matrix_identity ();
 	textures[0].texture = framebuffer->diffuse_texture;
-	textures[0].params.magfilter = GL_NEAREST;
-	textures[0].params.minfilter = GL_NEAREST;
-	textures[0].params.wraps = GL_CLAMP_TO_EDGE;
-	textures[0].params.wrapt = GL_CLAMP_TO_EDGE;
+	textures[0].sampler = 0;
 	textures[1].texture = framebuffer->specular_texture;
-	textures[1].params.magfilter = GL_NEAREST;
-	textures[1].params.minfilter = GL_NEAREST;
-	textures[1].params.wraps = GL_CLAMP_TO_EDGE;
-	textures[1].params.wrapt = GL_CLAMP_TO_EDGE;
+	textures[1].sampler = 0;
 	textures[2].texture = framebuffer->normal_texture;
-	textures[2].params.magfilter = GL_NEAREST;
-	textures[2].params.minfilter = GL_NEAREST;
-	textures[2].params.wraps = GL_CLAMP_TO_EDGE;
-	textures[2].params.wrapt = GL_CLAMP_TO_EDGE;
+	textures[2].sampler = 0;
 	textures[3].texture = framebuffer->depth_texture;
-	textures[3].params.magfilter = GL_NEAREST;
-	textures[3].params.minfilter = GL_NEAREST;
-	textures[3].params.wraps = GL_CLAMP_TO_EDGE;
-	textures[3].params.wrapt = GL_CLAMP_TO_EDGE;
+	textures[3].sampler = 0;
 	liren_context_set_flags (context, LIREN_FLAG_LIGHTING | LIREN_FLAG_TEXTURING);
 	liren_context_set_modelmatrix (context, &matrix);
 	liren_context_set_shader (context, shader);
