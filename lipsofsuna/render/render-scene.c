@@ -33,17 +33,18 @@
 static int
 private_init (LIRenScene* self);
 
-static int
-private_light_bounds (LIRenScene*   self,
-                      LIRenLight*   light,
-                      LIRenContext* context,
-                      int*          viewport,
-                      float*        result);
+static int private_light_bounds (
+	LIRenScene*   self,
+	LIRenLight*   light,
+	LIRenContext* context,
+	const int*    viewport,
+	float*        result);
 
-static void
-private_lighting_render (LIRenScene*    self,
-                         LIRenContext*  context,
-                         LIRenDeferred* framebuffer);
+static void private_lighting_render (
+	LIRenScene*   self,
+	LIRenContext* context,
+	const int*    viewport,
+	int           type);
 
 static void
 private_particle_render (LIRenScene* self);
@@ -316,6 +317,10 @@ void liren_scene_render_deferred_begin (
 void liren_scene_render_deferred_end (
 	LIRenScene* self)
 {
+	int viewport[4];
+	LIMatMatrix matrix;
+	LIRenTexture textures[4];
+
 	/* Validate state. */
 	if (!self->state.rendering)
 		return;
@@ -324,7 +329,30 @@ void liren_scene_render_deferred_end (
 	glBindFramebuffer (GL_FRAMEBUFFER, self->state.framebuffer->postproc_fbo[0]);
 
 	/* Render lit fragments to post-processing buffer. */
-	private_lighting_render (self, self->state.context, self->state.framebuffer);
+	glPushAttrib (GL_SCISSOR_BIT);
+	glDisable (GL_DEPTH_TEST);
+	glDisable (GL_CULL_FACE);
+	glDisable (GL_BLEND);
+	glGetIntegerv (GL_VIEWPORT, viewport);
+	matrix = limat_matrix_identity ();
+	textures[0].texture = self->state.framebuffer->diffuse_texture;
+	textures[0].sampler = 0;
+	textures[1].texture = self->state.framebuffer->specular_texture;
+	textures[1].sampler = 0;
+	textures[2].texture = self->state.framebuffer->normal_texture;
+	textures[2].sampler = 0;
+	textures[3].texture = self->state.framebuffer->depth_texture;
+	textures[3].sampler = 0;
+	liren_context_set_flags (self->state.context, LIREN_FLAG_LIGHTING | LIREN_FLAG_TEXTURING);
+	liren_context_set_modelmatrix (self->state.context, &matrix);
+	liren_context_set_lights (self->state.context, NULL, 0);
+	liren_context_set_textures (self->state.context, textures, 4);
+	liren_context_set_buffer (self->state.context, self->render->helpers.unit_quad);
+	private_lighting_render (self, self->state.context, viewport, 0);
+	private_lighting_render (self, self->state.context, viewport, 1);
+	liren_context_set_lights (self->state.context, NULL, 0);
+	glDisable (GL_SCISSOR_TEST);
+	glPopAttrib ();
 
 	/* Change render state. */
 	liren_context_set_deferred (self->state.context, 0);
@@ -608,12 +636,12 @@ private_init (LIRenScene* self)
 	return 1;
 }
 
-static int
-private_light_bounds (LIRenScene*   self,
-                      LIRenLight*   light,
-                      LIRenContext* context,
-                      int*          viewport,
-                      float*        result)
+static int private_light_bounds (
+	LIRenScene*   self,
+	LIRenLight*   light,
+	LIRenContext* context,
+	const int*    viewport,
+	float*        result)
 {
 	int i;
 	LIMatAabb bounds;
@@ -654,49 +682,42 @@ private_light_bounds (LIRenScene*   self,
 	return 1;
 }
 
-static void
-private_lighting_render (LIRenScene*    self,
-                         LIRenContext*  context,
-                         LIRenDeferred* framebuffer)
+static void private_lighting_render (
+	LIRenScene*   self,
+	LIRenContext* context,
+	const int*    viewport,
+	int           type)
 {
+	int ltype;
 	int index = 0;
-	int viewport[4];
 	float bounds[4];
 	LIAlgPtrdicIter iter;
-	LIMatMatrix matrix;
 	LIRenLight* light;
 	LIRenShader* shader;
-	LIRenTexture textures[4];
 
-	shader = liren_render_find_shader (self->render, "deferred");
+	if (!type)
+		shader = liren_render_find_shader (self->render, "deferred");
+	else
+		shader = liren_render_find_shader (self->render, "deferred-spotlight");
 	if (shader == NULL)
 		return;
-
-	glPushAttrib (GL_SCISSOR_BIT);
-	glDisable (GL_DEPTH_TEST);
-	glDisable (GL_CULL_FACE);
-	glDisable (GL_BLEND);
-	glGetIntegerv (GL_VIEWPORT, viewport);
-	matrix = limat_matrix_identity ();
-	textures[0].texture = framebuffer->diffuse_texture;
-	textures[0].sampler = 0;
-	textures[1].texture = framebuffer->specular_texture;
-	textures[1].sampler = 0;
-	textures[2].texture = framebuffer->normal_texture;
-	textures[2].sampler = 0;
-	textures[3].texture = framebuffer->depth_texture;
-	textures[3].sampler = 0;
-	liren_context_set_flags (context, LIREN_FLAG_LIGHTING | LIREN_FLAG_TEXTURING);
-	liren_context_set_modelmatrix (context, &matrix);
 	liren_context_set_shader (context, shader);
-	liren_context_set_lights (context, NULL, 0);
-	liren_context_set_textures (context, textures, 4);
-	liren_context_set_buffer (context, self->render->helpers.unit_quad);
 
 	/* Let each light lit the scene. */
 	LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
 	{
 		light = iter.value;
+		ltype = liren_light_get_type (light);
+		if (ltype == LIREN_UNIFORM_LIGHTTYPE_POINT)
+		{
+			if (type != 0)
+				continue;
+		}
+		else
+		{
+			if (type != 1)
+				continue;
+		}
 		liren_context_set_lights (context, &light, 1);
 		liren_context_bind (context);
 
@@ -720,10 +741,6 @@ private_lighting_render (LIRenScene*    self,
 		/* Shade light rectangle. */
 		liren_context_render_indexed (context, 0, 6);
 	}
-
-	liren_context_set_lights (context, NULL, 0);
-	glDisable (GL_SCISSOR_TEST);
-	glPopAttrib ();
 }
 
 static void

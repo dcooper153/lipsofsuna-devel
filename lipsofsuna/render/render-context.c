@@ -741,14 +741,7 @@ static void private_bind_uniform (
 				if (index < self->lights.count)
 				{
 					light = self->lights.array[index];
-					if (light->directional)
-						glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_DIRECTIONAL);
-					else if (LIMAT_ABS (light->cutoff - M_PI) < 0.001)
-						glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_POINT);
-					else if (light->shadow.map)
-						glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_SPOTSHADOW);
-					else
-						glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_SPOT);
+					glUniform1iARB (uniform->binding, liren_light_get_type (light));
 				}
 				else
 					glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_DISABLED);

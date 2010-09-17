@@ -143,6 +143,9 @@ LIAPICALL (void, liren_light_set_shadow, (
 	LIRenLight* self,
 	int         value));
 
+LIAPICALL (int, liren_light_get_type, (
+	const LIRenLight* self));
+
 #endif
 
 /** @} */

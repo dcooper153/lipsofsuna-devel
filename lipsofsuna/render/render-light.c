@@ -486,6 +486,19 @@ void liren_light_set_transform (
 	self->modelview_inverse = limat_matrix_invert (self->modelview);
 }
 
+int liren_light_get_type (
+	const LIRenLight* self)
+{
+	if (self->directional)
+		return LIREN_UNIFORM_LIGHTTYPE_DIRECTIONAL;
+	else if (LIMAT_ABS (self->cutoff - M_PI) < 0.001)
+		return LIREN_UNIFORM_LIGHTTYPE_POINT;
+	else if (self->shadow.map)
+		return LIREN_UNIFORM_LIGHTTYPE_SPOTSHADOW;
+	else
+		return LIREN_UNIFORM_LIGHTTYPE_SPOT;
+}
+
 /*****************************************************************************/
 
 static void private_update_shadow (
