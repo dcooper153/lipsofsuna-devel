@@ -32,6 +32,12 @@
 #include "render-material.h"
 #include "render-types.h"
 
+enum
+{
+	LIREN_SORT_TYPE_FACE,
+	LIREN_SORT_TYPE_PARTICLE
+};
+
 struct _LIRenSortgroup
 {
 	int index;
@@ -45,18 +51,35 @@ struct _LIRenSortgroup
 
 struct _LIRenSortface
 {
-	int index;
-	LIMatAabb bounds;
-	LIMatMatrix matrix;
-	LIRenBuffer* buffer;
+	int type;
 	LIRenSortface* next;
-	LIRenMaterial* material;
+	union
+	{
+		struct
+		{
+			int index;
+			LIMatAabb bounds;
+			LIMatMatrix matrix;
+			LIRenBuffer* buffer;
+			LIRenMaterial* material;
+		} face;
+		struct
+		{
+			float size;
+			float diffuse[4];
+			LIMatVector position;
+			LIRenImage* image;
+			LIRenShader* shader;
+		} particle;
+	};
 };
 
 struct _LIRenSort
 {
+	LIMatFrustum frustum;
 	LIMatMatrix modelview;
 	LIMatMatrix projection;
+	LIRenRender* render;
 	struct
 	{
 		int count;
@@ -111,8 +134,18 @@ LIAPICALL (int, liren_sort_add_object, (
 	LIRenSort*   self,
 	LIRenObject* object));
 
+int liren_sort_add_particle (
+	LIRenSort*         self,
+	const LIMatVector* position,
+	float              size,
+	const float*       diffuse,
+	LIRenImage*        image,
+	LIRenShader*       shader);
+
 LIAPICALL (void, liren_sort_clear, (
-	LIRenSort* self));
+	LIRenSort*         self,
+	const LIMatMatrix* modelview,
+	const LIMatMatrix* projection));
 
 #endif
 

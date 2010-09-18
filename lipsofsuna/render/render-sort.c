@@ -24,6 +24,12 @@
 
 #include "render-sort.h"
 
+static int private_resize_faces (
+	LIRenSort* self,
+	int        count);
+
+/*****************************************************************************/
+
 LIRenSort* liren_sort_new (
 	LIRenRender* render)
 {
@@ -33,6 +39,7 @@ LIRenSort* liren_sort_new (
 	self = lisys_calloc (1, sizeof (LIRenSort));
 	if (self == NULL)
 		return NULL;
+	self->render = render;
 
 	/* Allocate buffer for opaque material groups. */
 	self->groups.capacity = 1024;
@@ -124,7 +131,6 @@ int liren_sort_add_faces (
 	LIRenMaterial* material)
 {
 	int i;
-	int need;
 	int num;
 	int bucket;
 	float dist;
@@ -136,39 +142,10 @@ int liren_sort_add_faces (
 	LIMatVector diff;
 	LIMatVector eye;
 	LIRenFormat* fmt;
-	LIRenSortface* ptr;
-	LIRenSortface* tmp;
 
 	/* Resize the buffer if necessary. */
-	need = self->faces.count + count / 3;
-	if (self->faces.capacity <= need)
-	{
-		num = self->faces.capacity << 1;
-		while (num < need)
-			num <<= 1;
-		tmp = lisys_realloc (self->faces.array, num * sizeof (LIRenSortface));
-		if (tmp == NULL)
-			return 0;
-		if (tmp != self->faces.array)
-		{
-			/* If the address of the face buffer changed, we need to adjust
-			   the pointers in the buckets to match the new address. */
-			for (i = 0 ; i < self->buckets.count ; i++)
-			{
-				if (self->buckets.array[i] != NULL)
-				{
-					self->buckets.array[i] = self->buckets.array[i] - self->faces.array + tmp;
-					for (ptr = self->buckets.array[i] ; ptr != NULL ; ptr = ptr->next)
-					{
-						if (ptr->next)
-							ptr->next = ptr->next - self->faces.array + tmp;
-					}
-				}
-			}
-		}
-		self->faces.array = tmp;
-		self->faces.capacity = num;
-	}
+	if (!private_resize_faces (self, self->faces.count + count / 3))
+		return 0;
 
 	/* Calculate camera position. */
 	mat = limat_matrix_invert (self->modelview);
@@ -182,11 +159,12 @@ int liren_sort_add_faces (
 	for (i = 0 ; i < count ; i += 3, num++)
 	{
 		/* Append the face to the buffer. */
-		self->faces.array[num].index = index + i;
-		self->faces.array[num].bounds = *bounds;
-		self->faces.array[num].matrix = *matrix;
-		self->faces.array[num].buffer = buffer;
-		self->faces.array[num].material = material;
+		self->faces.array[num].type = LIREN_SORT_TYPE_FACE;
+		self->faces.array[num].face.index = index + i;
+		self->faces.array[num].face.bounds = *bounds;
+		self->faces.array[num].face.matrix = *matrix;
+		self->faces.array[num].face.buffer = buffer;
+		self->faces.array[num].face.material = material;
 
 		/* Calculate the center of the triangle. */
 		vtx[0] = *((LIMatVector*)(vtxdata + fmt->vtx_offset + fmt->size * idxdata[i + 0]));
@@ -226,6 +204,11 @@ int liren_sort_add_model (
 	int transp;
 	LIRenMaterial* material;
 
+	/* Frustum culling. */
+	if (limat_frustum_cull_aabb (&self->frustum, bounds))
+		return 1;
+
+	/* Add each material group. */
 	for (i = 0 ; i < model->materials.count ; i++)
 	{
 		material = model->materials.array[i];
@@ -242,18 +225,167 @@ int liren_sort_add_object (
 	LIRenSort*   self,
 	LIRenObject* object)
 {
+	int i;
+	int j;
+	float diffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	LIMatAabb bounds;
+	LIMatVector position;
+	LIMdlModel* model;
+	LIMdlParticle* part;
+	LIMdlParticleSystem* system;
+	LIRenImage* image;
+	LIRenShader* shader;
 
+	/* Add each face group of the model. */
 	liren_object_get_bounds (object, &bounds);
-	return liren_sort_add_model (self, &bounds, &object->orientation.matrix, object->model);
+	if (!liren_sort_add_model (self, &bounds, &object->orientation.matrix, object->model))
+		return 0;
+
+	/* TODO: Frustum culling for particles. */
+
+	/* Check for particles. */
+	model = object->model->model;
+	if (!model->particlesystems.count)
+		return 1;
+	shader = liren_render_find_shader (self->render, "particle");
+	if (shader == NULL)
+		return 1;
+
+	/* Add each particle system. */
+	for (i = 0 ; i < model->particlesystems.count ; i++)
+	{
+		/* Find texture image of the system. */
+		system = model->particlesystems.array + i;
+		image = liren_render_find_image (self->render, system->texture);
+		if (image == NULL)
+		{
+			liren_render_load_image (self->render, system->texture);
+			image = liren_render_find_image (self->render, system->texture);
+			if (image == NULL)
+				continue;
+		}
+
+		/* Add each alive particle in the system. */
+		for (j = 0 ; j < system->particles.count ; j++)
+		{
+			part = system->particles.array + j;
+			if (limdl_particle_get_state (part, object->particle.time, object->particle.loop, &position, diffuse + 3))
+			{
+				position = limat_transform_transform (object->transform, position);
+				liren_sort_add_particle (self, &position, system->particle_size, diffuse, image, shader);
+			}
+		}
+	}
+
+	return 1;
+}
+
+int liren_sort_add_particle (
+	LIRenSort*         self,
+	const LIMatVector* position,
+	float              size,
+	const float*       diffuse,
+	LIRenImage*        image,
+	LIRenShader*       shader)
+{
+	int num;
+	int bucket;
+	float dist;
+	LIMatMatrix mat;
+	LIMatVector diff;
+	LIMatVector eye;
+
+	/* Resize the buffer if necessary. */
+	if (!private_resize_faces (self, self->faces.count + 1))
+		return 0;
+
+	/* Calculate camera position. */
+	mat = limat_matrix_invert (self->modelview);
+	eye = limat_matrix_transform (mat, limat_vector_init (0.0f, 0.0f, 0.0f));
+
+	/* Append the particle to the buffer. */
+	num = self->faces.count;
+	self->faces.array[num].type = LIREN_SORT_TYPE_PARTICLE;
+	self->faces.array[num].particle.position = *position;
+	self->faces.array[num].particle.size = size;
+	self->faces.array[num].particle.image = image;
+	self->faces.array[num].particle.shader = shader;
+	memcpy (self->faces.array[num].particle.diffuse, diffuse, 4 * sizeof (float));
+
+	/* Calculate bucket index based on distance to camera. */
+	/* TODO: Would be better to use far plane distance here? */
+	/* TODO: Non-linear mapping might work better for details closer to the camera? */
+	diff = limat_vector_subtract (*position, eye);
+	dist = limat_vector_get_length (diff);
+	bucket = dist / 50.0f * (self->buckets.count - 1);
+	bucket = LIMAT_CLAMP (bucket, 0, self->buckets.count - 1);
+
+	/* Insert to the depth bucket. */
+	self->faces.array[num].next = self->buckets.array[bucket];
+	self->buckets.array[bucket] = self->faces.array + num;
+	self->faces.count = ++num;
+
+	return 1;
 }
 
 void liren_sort_clear (
-	LIRenSort* self)
+	LIRenSort*         self,
+	const LIMatMatrix* modelview,
+	const LIMatMatrix* projection)
 {
 	self->groups.count = 0;
 	self->faces.count = 0;
 	memset (self->buckets.array, 0, self->buckets.count * sizeof (LIRenSortface*));
+	self->modelview = *modelview;
+	self->projection = *projection;
+	limat_frustum_init (&self->frustum, modelview, projection);
+}
+
+/*****************************************************************************/
+
+static int private_resize_faces (
+	LIRenSort* self,
+	int        count)
+{
+	int i;
+	int num;
+	LIRenSortface* ptr;
+	LIRenSortface* tmp;
+
+	if (self->faces.capacity > count)
+		return 1;
+
+	/* Reallocate the face array. */
+	num = self->faces.capacity << 1;
+	while (num < count)
+		num <<= 1;
+	tmp = lisys_realloc (self->faces.array, num * sizeof (LIRenSortface));
+	if (tmp == NULL)
+		return 0;
+
+	/* If the address of the face buffer changed, we need to adjust
+	   the pointers in the buckets to match the new address. */
+	if (tmp != self->faces.array)
+	{
+		for (i = 0 ; i < self->buckets.count ; i++)
+		{
+			if (self->buckets.array[i] != NULL)
+			{
+				self->buckets.array[i] = self->buckets.array[i] - self->faces.array + tmp;
+				for (ptr = self->buckets.array[i] ; ptr != NULL ; ptr = ptr->next)
+				{
+					if (ptr->next)
+						ptr->next = ptr->next - self->faces.array + tmp;
+				}
+			}
+		}
+	}
+
+	/* Use the new face array. */
+	self->faces.array = tmp;
+	self->faces.capacity = num;
+
+	return 1;
 }
 
 /** @} */

@@ -30,8 +30,8 @@
 #define LIREN_LIGHT_MAXIMUM_RATING 100.0f
 #define LIREN_PARTICLE_MAXIMUM_COUNT 1000
 
-static int
-private_init (LIRenScene* self);
+static int private_init (
+	LIRenScene* self);
 
 static int private_light_bounds (
 	LIRenScene*   self,
@@ -45,19 +45,6 @@ static void private_lighting_render (
 	LIRenContext* context,
 	const int*    viewport,
 	int           type);
-
-static void
-private_particle_render (LIRenScene* self);
-
-static void
-private_render (LIRenScene*   self,
-                LIRenContext* context,
-                lirenCallback call,
-                void*         data);
-
-static int
-private_sort_objects (const void* first,
-                      const void* second);
 
 static int private_sort_scene (
 	LIRenScene*   self,
@@ -453,12 +440,16 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 	int i;
 	LIAlgPtrdicIter iter;
 	LIMatAabb aabb;
+	LIMatMatrix identity;
+	LIMatVector position;
 	LIRenLight* light;
 	LIRenSortface* face;
 
 	/* Validate state. */
 	if (!self->state.rendering)
 		return;
+
+	identity = limat_matrix_identity ();
 
 	/* Change render state. */
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[0]);
@@ -471,6 +462,7 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 	/* Render transparent faces to post-processing buffer. */
 	for (i = self->sort->buckets.count - 1 ; i >= 0 ; i--)
 	{
+		/* Render faces with lighting. */
 		/* FIXME: Looping through all lights and faces is slow. */
 		LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
 		{
@@ -479,27 +471,47 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 			{
 				for (face = self->sort->buckets.array[i] ; face != NULL ; face = face->next)
 				{
+					if (face->type != LIREN_SORT_TYPE_FACE)
+						continue;
 					liren_light_get_bounds (light, &aabb);
-					if (limat_aabb_intersects_aabb (&aabb, &face->bounds))
-					{
-						liren_context_set_lights (self->state.context, &light, 1);
-						liren_draw_default (self->state.context, face->index, 3,
-							&face->matrix, face->material, face->buffer);
-					}
+					if (!limat_aabb_intersects_aabb (&aabb, &face->face.bounds))
+						continue;
+					liren_context_set_lights (self->state.context, &light, 1);
+					liren_draw_default (self->state.context, face->face.index, 3,
+						&face->face.matrix, face->face.material, face->face.buffer);
 				}
 			}
-			break;
+		}
+
+		/* Render particles without lighting. */
+		for (face = self->sort->buckets.array[i] ; face != NULL ; face = face->next)
+		{
+			if (face->type != LIREN_SORT_TYPE_PARTICLE)
+				continue;
+			liren_context_set_modelmatrix (self->state.context, &identity);
+			liren_context_set_shader (self->state.context, face->particle.shader);
+			liren_context_set_lights (self->state.context, NULL, 0);
+			liren_context_set_textures_raw (self->state.context, &face->particle.image->texture->texture, 1);
+			liren_context_bind (self->state.context);
+			glEnable (GL_DEPTH_TEST);
+			glDisable (GL_CULL_FACE);
+			glEnable (GL_BLEND);
+			glBlendFunc (GL_SRC_ALPHA, GL_ONE);
+			glBegin (GL_TRIANGLES);
+			glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, face->particle.size, face->particle.size);
+			position = face->particle.position;
+			glVertexAttrib4fv (LIREN_ATTRIBUTE_NORMAL, face->particle.diffuse);
+			glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
+			glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
+			glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
+			glEnd ();
 		}
 	}
 
 	/* Change render state. */
 	liren_context_set_lights (self->state.context, NULL, 0);
-
-	/* Render particles. */
-	private_particle_render (self);
-
-	/* Change render state. */
 	glDepthMask (GL_TRUE);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 /**
@@ -621,8 +633,8 @@ liren_scene_set_sky (LIRenScene* self,
 
 /*****************************************************************************/
 
-static int
-private_init (LIRenScene* self)
+static int private_init (
+	LIRenScene* self)
 {
 	self->lighting = liren_lighting_new (self->render);
 	if (self->lighting == NULL)
@@ -743,211 +755,6 @@ static void private_lighting_render (
 	}
 }
 
-static void
-private_particle_render (LIRenScene* self)
-{
-	int i;
-	int j;
-	float fade;
-	float color0[4];
-	float color1[4];
-	float attenuation[] = { 1.0f, 1.0f, 0.0f };
-	LIAlgStrdicIter iter;
-	LIAlgU32dicIter iter1;
-	LIMatMatrix matrix;
-	LIMatVector v[4];
-	LIMatVector bbp;
-	LIMatVector bbx;
-	LIMatVector bby;
-	LIMatVector bbsx;
-	LIMatVector bbsy;
-	LIMatVector position;
-	LIMdlModel* model;
-	LIMdlParticle* part;
-	LIMdlParticleSystem* system;
-	LIParGroup* group;
-	LIParLine* line;
-	LIParPoint* particle;
-	LIRenImage* image;
-	LIRenShader* shader;
-	LIRenObject* object;
-
-	shader = liren_render_find_shader (self->render, "particle");
-	if (shader == NULL)
-		return;
-
-	matrix = limat_matrix_identity ();
-	liren_context_set_modelmatrix (self->state.context, &matrix);
-	liren_context_set_shader (self->state.context, shader);
-	liren_context_bind (self->state.context);
-	glEnable (GL_DEPTH_TEST);
-	glDisable (GL_CULL_FACE);
-	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE);
-
-	/* Render particle systems of objects as billboards. */
-	LIALG_U32DIC_FOREACH (iter1, self->objects)
-	{
-		/* Get the model of the object. */
-		object = iter1.value;
-		if (!liren_object_get_realized (object))
-			continue;
-		model = object->model->model;
-
-		/* Render all particle systems of the model. */
-		for (i = 0 ; i < model->particlesystems.count ; i++)
-		{
-			/* Find texture image of the system. */
-			system = model->particlesystems.array + i;
-			image = liren_render_find_image (self->render, system->texture);
-			if (image == NULL)
-			{
-				liren_render_load_image (self->render, system->texture);
-				image = liren_render_find_image (self->render, system->texture);
-				if (image == NULL)
-					continue;
-			}
-
-			/* Render each alive particle. */
-			liren_context_set_textures_raw (self->state.context, &image->texture->texture, 1);
-			liren_context_bind (self->state.context);
-
-			glBegin (GL_TRIANGLES);
-			glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, system->particle_size, system->particle_size);
-			for (j = 0 ; j < system->particles.count ; j++)
-			{
-				part = system->particles.array + j;
-				if (limdl_particle_get_state (part, object->particle.time, object->particle.loop, &position, &fade))
-				{
-					position = limat_transform_transform (object->transform, position);
-					glVertexAttrib4f (LIREN_ATTRIBUTE_NORMAL, 1.0f, 1.0f, 1.0f, fade);
-					glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
-					glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
-					glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
-				}
-			}
-			glEnd ();
-		}
-	}
-
-#if 0
-	/* Set point particle rendering mode. */
-	if (livid_features.shader_model >= 3)
-		glUseProgramObjectARB (0);
-	glColor3f (1.0f, 1.0f, 1.0f);
-	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE);
-	if (GLEW_ARB_point_sprite)
-	{
-		glEnable (GL_POINT_SPRITE_ARB);
-		glTexEnvi (GL_POINT_SPRITE_ARB, GL_COORD_REPLACE_ARB, GL_TRUE);
-		glPointParameterfvARB (GL_POINT_DISTANCE_ATTENUATION_ARB, attenuation);
-		glPointSize (64.0f);
-	}
-	else
-		glPointSize (4.0f);
-
-	/* Render point particles. */
-	LIALG_STRDIC_FOREACH (iter, self->particles->groups)
-	{
-		group = iter.value;
-		image = liren_render_find_image (self->render, group->texture);
-		if (image == NULL)
-		{
-			liren_render_load_image (self->render, group->texture);
-			image = liren_render_find_image (self->render, group->texture);
-		}
-		if (image != NULL)
-		{
-			glBindTexture (GL_TEXTURE_2D, image->texture->texture);
-			glBegin (GL_POINTS);
-			for (particle = group->points.used ; particle != NULL ; particle = particle->next)
-			{
-				lipar_point_get_color (particle, color0);
-				glColor4fv (color0);
-				glVertex3f (particle->position.x, particle->position.y, particle->position.z);
-			}
-			glEnd ();
-		}
-	}
-	if (GLEW_ARB_point_sprite)
-		glDisable (GL_POINT_SPRITE_ARB);
-
-	/* Render line particles. */
-	glBindTexture (GL_TEXTURE_2D, 0);
-	glBegin (GL_LINES);
-	for (line = self->particles->lines.used ; line != NULL ; line = line->next)
-	{
-		lipar_line_get_colors (line, color0, color1);
-		glColor4fv (color0);
-		glVertex3f (line->position[0].x, line->position[0].y, line->position[0].z);
-		glColor4fv (color1);
-		glVertex3f (line->position[1].x, line->position[1].y, line->position[1].z);
-	}
-	glEnd ();
-#endif
-
-	/* Set normal rendering mode. */
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-}
-
-static void
-private_render (LIRenScene*   self,
-                LIRenContext* context,
-                lirenCallback call,
-                void*         data)
-{
-	LIAlgU32dicIter iter0;
-	LIAlgPtrdicIter iter1;
-	LIMatAabb aabb;
-	LIRenGroup* group;
-	LIRenObject tmpobj;
-	LIRenObject* rndobj;
-	LIRenGroupObject* grpobj;
-
-	LIALG_U32DIC_FOREACH (iter0, self->objects)
-	{
-		rndobj = iter0.value;
-		if (!liren_object_get_realized (rndobj))
-			continue;
-		liren_object_get_bounds (rndobj, &aabb);
-		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
-			continue;
-		call (context, rndobj, data);
-	}
-	LIALG_PTRDIC_FOREACH (iter1, self->groups)
-	{
-		group = iter1.value;
-		if (!liren_group_get_realized (group))
-			continue;
-		liren_group_get_bounds (group, &aabb);
-		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
-			continue;
-		for (grpobj = group->objects ; grpobj != NULL ; grpobj = grpobj->next)
-		{
-			memset (&tmpobj, 0, sizeof (LIRenObject));
-			tmpobj.transform = grpobj->transform;
-			tmpobj.scene = self;
-			tmpobj.model = grpobj->model;
-			tmpobj.orientation.center = grpobj->transform.position;
-			tmpobj.orientation.matrix = limat_convert_transform_to_matrix (grpobj->transform);
-			call (context, &tmpobj, data);
-		}
-	}
-}
-
-static int
-private_sort_objects (const void* first,
-                      const void* second)
-{
-	const LIRenObject* a = first;
-	const LIRenObject* b = second;
-
-	if (a->sort < b->sort) return -1;
-	if (a->sort > b->sort) return 1;
-	return 0;
-}
-
 static int private_sort_scene (
 	LIRenScene*   self,
 	LIRenContext* context)
@@ -961,10 +768,8 @@ static int private_sort_scene (
 	LIRenObject* rndobj;
 
 	/* Initialize sorting. */
-	liren_sort_clear (self->sort);
+	liren_sort_clear (self->sort, &context->matrix.view, &context->matrix.projection);
 	liren_context_bind (context);
-	self->sort->modelview = context->matrix.view;
-	self->sort->projection = context->matrix.projection;
 
 	/* Collect scene objects. */
 	LIALG_U32DIC_FOREACH (iter0, self->objects)
