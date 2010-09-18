@@ -53,14 +53,7 @@ struct _LIEngEngine
 		int flags;
 		int radius;
 		char* dir;
-		void* unique_data;
-		int (*unique_call)(void*, uint32_t);
 	} config;
-	struct
-	{
-		uint32_t start;
-		uint32_t size;
-	} range;
 };
 
 LIAPICALL (LIEngEngine*, lieng_engine_new, (
@@ -96,16 +89,6 @@ LIAPICALL (int, lieng_engine_get_flags, (
 LIAPICALL (void, lieng_engine_set_flags, (
 	LIEngEngine* self,
 	int          flags));
-
-LIAPICALL (void, lieng_engine_set_local_range, (
-	LIEngEngine* self,
-	uint32_t     start,
-	uint32_t     end));
-
-LIAPICALL (void, lieng_engine_set_unique_object_call, (
-	LIEngEngine* self,
-	void*        call,
-	void*        data));
 
 LIAPICALL (void*, lieng_engine_get_userdata, (
 	LIEngEngine* self));

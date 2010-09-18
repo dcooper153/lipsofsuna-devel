@@ -61,10 +61,8 @@ struct _LIEngObject
 };
 
 LIAPICALL (LIEngObject*, lieng_object_new, (
-	LIEngEngine*     engine,
-	LIEngModel*      model,
-	LIPhyControlMode control,
-	uint32_t         id));
+	LIEngEngine* engine,
+	uint32_t     id));
 
 LIAPICALL (void, lieng_object_free, (
 	LIEngObject* self));
@@ -95,9 +93,6 @@ LIAPICALL (int, lieng_object_moved, (
 LIAPICALL (void, lieng_object_refresh, (
 	LIEngObject* self,
 	float        radius));
-
-LIAPICALL (int, lieng_object_reset, (
-	LIEngObject* self));
 
 LIAPICALL (void, lieng_object_update, (
 	LIEngObject* self,

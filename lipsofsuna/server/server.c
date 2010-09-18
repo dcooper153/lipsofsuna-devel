@@ -66,7 +66,6 @@ LISerServer* liser_server_new (
 	self->engine = self->program->engine;
 	self->paths = self->program->paths;
 	self->script = self->program->script;
-	lieng_engine_set_local_range (self->engine, LINET_RANGE_SERVER_START, LINET_RANGE_SERVER_END);
 
 	/* Initialize server component. */
 	if (!limai_program_insert_component (self->program, "server", self))

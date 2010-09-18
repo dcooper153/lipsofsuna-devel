@@ -64,8 +64,6 @@ lieng_engine_new (LICalCallbacks* calls,
 	self->sectors->sector_free_callback.userdata = self;
 	self->sectors->sector_load_callback.callback = private_sector_load;
 	self->sectors->sector_load_callback.userdata = self;
-	self->range.start = 0;
-	self->range.size = 0xFFFFFFFF;
 	self->config.radius = 1;
 	self->config.dir = listr_dup (path);
 	if (self->config.dir == NULL)
@@ -122,18 +120,6 @@ lieng_engine_free (LIEngEngine* self)
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self->config.dir);
 	lisys_free (self);
-}
-
-int
-lieng_engine_check_unique (LIEngEngine* self,
-                           uint32_t     id)
-{
-	if (lialg_u32dic_find (self->objects, id) != NULL)
-		return 0;
-	if (self->config.unique_call != NULL)
-		return self->config.unique_call (self->config.unique_data, id);
-
-	return 1;
 }
 
 /**
@@ -226,31 +212,6 @@ lieng_engine_set_flags (LIEngEngine* self,
                         int          flags)
 {
 	self->config.flags = flags;
-}
-
-/**
- * \brief Sets the range of local object IDs.
- *
- * \param self Engine.
- * \param start Range start.
- * \param end Range end.
- */
-void
-lieng_engine_set_local_range (LIEngEngine* self,
-                              uint32_t     start,
-                              uint32_t     end)
-{
-	self->range.start = start;
-	self->range.size = end - start;
-}
-
-void
-lieng_engine_set_unique_object_call (LIEngEngine* self,
-                                     void*        call,
-                                     void*        data)
-{
-	self->config.unique_call = call;
-	self->config.unique_data = data;
 }
 
 void*

@@ -37,18 +37,13 @@ private_warp (LIEngObject*       self,
 
 /**
  * \brief Creates a new engine object.
- *
  * \param engine Engine.
- * \param model Model or NULL.
- * \param control Control mode for the physics object.
  * \param id Object ID or 0 for unique.
  * \return Engine object or NULL.
  */
-LIEngObject*
-lieng_object_new (LIEngEngine*     engine,
-                  LIEngModel*      model,
-                  LIPhyControlMode control,
-                  uint32_t         id)
+LIEngObject* lieng_object_new (
+	LIEngEngine* engine,
+	uint32_t         id)
 {
 	double rnd;
 	LIEngObject* self;
@@ -67,11 +62,10 @@ lieng_object_new (LIEngEngine*     engine,
 	while (!self->id)
 	{
 		rnd = lisys_randf ();
-		self->id = engine->range.start + (uint32_t)(engine->range.size * rnd);
-		if (!self->id)
-			continue;
-		if (!lieng_engine_check_unique (engine, self->id))
-			self->id = 0;
+		self->id = (int)((LINET_RANGE_ENGINE_END - LINET_RANGE_ENGINE_START) *
+			rnd + LINET_RANGE_ENGINE_START);
+		if (lieng_engine_find_object (engine, self->id))
+			id = 0;
 	}
 
 	/* Insert to object list. */
@@ -85,13 +79,6 @@ lieng_object_new (LIEngEngine*     engine,
 	self->pose = limdl_pose_new ();
 	if (self->pose == NULL)
 		goto error;
-
-	/* Set model. */
-	if (model != NULL)
-	{
-		lieng_object_set_model (self, model);
-		lieng_object_animate (self, 0, "idle", 1, 0.0f, 0.0f);
-	}
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "object-new", lical_marshal_DATA_PTR, self);
@@ -332,27 +319,6 @@ lieng_object_refresh (LIEngObject* self,
 		lieng_object_get_transform (self, &transform);
 		lialg_sectors_refresh_point (self->engine->sectors, &transform.position, radius);
 	}
-}
-
-/**
- * \brief Attempts to reset the object.
- *
- * \param self Object.
- * \return Nonzero on success.
- */
-int lieng_object_reset (
-	LIEngObject* self)
-{
-	/* Reset fields specific to the engine. */
-	lieng_object_set_realized (self, 0);
-	self->transform = limat_transform_identity ();
-	self->smoothing.target = limat_transform_identity ();
-	lieng_object_set_model (self, NULL);
-
-	/* Invoke callbacks to reset anything else. */
-	lical_callbacks_call (self->engine->callbacks, self->engine, "object-reset", lical_marshal_DATA_PTR, self);
-
-	return 1;
 }
 
 /**

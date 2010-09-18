@@ -141,47 +141,55 @@ static void Object_edit_pose (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Finds an object by ID.
- * --
+ * --- Finds all objects inside a sphere.
  * -- @param clss Object class.
  * -- @param args Arguments.<ul>
- * --   <li>id: Object ID. (required)</li>
- * --   <li>point: Center point for radius check.</li>
- * --   <li>radius: Maximum distance from center point.</li></ul>
- * -- @return Object or nil.
+ * --   <li>point: Center point. (required)</li>
+ * --   <li>radius: Search radius.</li>
+ * --   <li>sector: Return all object in this sector.</li></ul>
+ * -- @return Table of matching objects.
  * function Object.find(clss, args)
  */
 static void Object_find (LIScrArgs* args)
 {
 	int id;
-	float radius;
+	float radius = 32.0f;
+	LIAlgU32dicIter iter1;
+	LIEngObjectIter iter;
 	LIEngObject* object;
-	LIMaiProgram* program;
-	LIMatTransform transform;
+	LIEngSector* sector;
 	LIMatVector center;
+	LIMatVector diff;
+	LIMaiProgram* program;
 
-	if (liscr_args_gets_int (args, "id", &id))
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+
+	/* Radial find mode. */
+	if (liscr_args_gets_vector (args, "point", &center))
 	{
-		/* Find object. */
-		program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
-		object = lieng_engine_find_object (program->engine, id);
-		if (object == NULL)
-			return;
-
-		/* Optional radius check. */
-		if (liscr_args_gets_vector (args, "point", &center) &&
-		    liscr_args_gets_float (args, "radius", &radius))
+		liscr_args_gets_float (args, "radius", &radius);
+		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+		LIENG_FOREACH_OBJECT (iter, program->engine, &center, radius)
 		{
-			if (!lieng_object_get_realized (object))
-				return;
-			lieng_object_get_transform (object, &transform);
-			center = limat_vector_subtract (center, transform.position);
-			if (limat_vector_get_length (center) > radius)
-				return;
+			diff = limat_vector_subtract (center, iter.object->transform.position);
+			if (limat_vector_get_length (diff) < radius)
+				liscr_args_seti_data (args, iter.object->script);
 		}
+	}
 
-		/* Return object. */
-		liscr_args_seti_data (args, object->script);
+	/* Sector find mode. */
+	else if (liscr_args_gets_int (args, "sector", &id))
+	{
+		sector = lialg_sectors_data_index (program->sectors, "engine", id, 0);
+		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+		if (sector != NULL)
+		{
+			LIALG_U32DIC_FOREACH (iter1, sector->objects)
+			{
+				object = iter1.value;
+				liscr_args_seti_data (args, object->script);
+			}
+		}
 	}
 }
 
@@ -230,60 +238,6 @@ static void Object_find_node (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Finds all objects inside a sphere.
- * --
- * -- @param clss Object class.
- * -- @param args Arguments.<ul>
- * --   <li>point: Center point. (required)</li>
- * --   <li>radius: Search radius.</li>
- * --   <li>sector: Return all object in this sector.</li></ul>
- * -- @return Table of matching objects and their IDs.
- * function Object.find_objects(clss, args)
- */
-static void Object_find_objects (LIScrArgs* args)
-{
-	int id;
-	float radius = 32.0f;
-	LIAlgU32dicIter iter1;
-	LIEngObjectIter iter;
-	LIEngObject* object;
-	LIEngSector* sector;
-	LIMatVector center;
-	LIMatVector diff;
-	LIMaiProgram* program;
-
-	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
-
-	/* Radial find mode. */
-	if (liscr_args_gets_vector (args, "point", &center))
-	{
-		liscr_args_gets_float (args, "radius", &radius);
-		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-		LIENG_FOREACH_OBJECT (iter, program->engine, &center, radius)
-		{
-			diff = limat_vector_subtract (center, iter.object->transform.position);
-			if (limat_vector_get_length (diff) < radius)
-				liscr_args_setf_data (args, iter.object->id, iter.object->script);
-		}
-	}
-
-	/* Sector find mode. */
-	else if (liscr_args_gets_int (args, "sector", &id))
-	{
-		sector = lialg_sectors_data_index (program->sectors, "engine", id, 0);
-		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-		if (sector != NULL)
-		{
-			LIALG_U32DIC_FOREACH (iter1, sector->objects)
-			{
-				object = iter1.value;
-				liscr_args_setf_data (args, object->id, object->script);
-			}
-		}
-	}
-}
-
-/* @luadoc
  * --- Gets animation information for the given animation channel.
  * --
  * -- If an animation is looping in the channel, a table containing the fields
@@ -319,39 +273,18 @@ static void Object_get_animation (LIScrArgs* args)
  * --- Creates a new object.
  * --
  * -- @param clss Object class.
- * -- @param args Arguments.<ul>
- * --   <li>id: Unique ID of the object. (required)</li></ul>
+ * -- @param args Arguments.
  * -- @return New object.
  * function Object.new(clss, args)
  */
 static void Object_new (LIScrArgs* args)
 {
-	int id;
 	int realize = 0;
 	LIEngObject* self;
 	LIMaiProgram* program;
 	LIScrClass* clss;
 
 	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
-	if (!liscr_args_gets_int (args, "id", &id) || id <= 0)
-		return;
-
-	/* Check for an existing object. Reusing an existing object with the same
-	   ID is a valid use case because the scripts have no way to know if the
-	   object has been garbage collected by clients in networked scenarios. */
-	self = lieng_engine_find_object (program->engine, id);
-	if (self != NULL)
-	{
-		if (self->script != NULL)
-		{
-			lieng_object_reset (self);
-			liscr_args_call_setters_except (args, self->script, "realized");
-			liscr_args_gets_bool (args, "realized", &realize);
-			liscr_args_seti_data (args, self->script);
-			lieng_object_set_realized (self, realize);
-		}
-		return;
-	}
 
 	/* Get real class. */
 	clss = liscr_isanyclass (args->lua, 1);
@@ -359,7 +292,7 @@ static void Object_new (LIScrArgs* args)
 		return;
 
 	/* Allocate object. */
-	self = lieng_object_new (program->engine, NULL, LIPHY_CONTROL_MODE_RIGID, id);
+	self = lieng_object_new (program->engine, 0);
 	if (self == NULL)
 		return;
 
@@ -441,17 +374,6 @@ static void Object_getter_animations (LIScrArgs* args)
  * -- @name Object.contact_cb
  * -- @class table
  */
-
-/* @luadoc
- * --- Unique identification number.
- * --
- * -- @name Object.id
- * -- @class table
- */
-static void Object_getter_id (LIScrArgs* args)
-{
-	liscr_args_seti_int (args, LIENG_OBJECT (args->self)->id);
-}
 
 /* @luadoc
  * --- Model string.
@@ -707,13 +629,11 @@ void liscr_script_object (
 	liscr_class_insert_mfunc (self, "edit_pose", Object_edit_pose);
 	liscr_class_insert_cfunc (self, "find", Object_find);
 	liscr_class_insert_mfunc (self, "find_node", Object_find_node);
-	liscr_class_insert_cfunc (self, "find_objects", Object_find_objects);
 	liscr_class_insert_mfunc (self, "get_animation", Object_get_animation);
 	liscr_class_insert_cfunc (self, "new", Object_new);
 	liscr_class_insert_mfunc (self, "refresh", Object_refresh);
 	liscr_class_insert_mfunc (self, "update_animations", Object_update_animations);
 	liscr_class_insert_mvar (self, "animations", Object_getter_animations, NULL);
-	liscr_class_insert_mvar (self, "id", Object_getter_id, NULL);
 	liscr_class_insert_mvar (self, "model", Object_getter_model, Object_setter_model);
 	liscr_class_insert_mvar (self, "position", Object_getter_position, Object_setter_position);
 	liscr_class_insert_mvar (self, "position_smoothing", Object_getter_position_smoothing, Object_setter_position_smoothing);

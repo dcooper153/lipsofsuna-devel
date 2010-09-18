@@ -212,7 +212,6 @@ int licli_client_load_module (
 	self->engine = self->program->engine;
 	self->paths = self->program->paths;
 	self->script = self->program->script;
-	lieng_engine_set_local_range (self->engine, LINET_RANGE_CLIENT_START, LINET_RANGE_CLIENT_END);
 	lical_callbacks_insert (self->callbacks, self->engine, "tick", -1000, private_update, self, NULL);
 	lical_callbacks_insert (self->callbacks, self->engine, "select", 32768, private_select, self, NULL);
 

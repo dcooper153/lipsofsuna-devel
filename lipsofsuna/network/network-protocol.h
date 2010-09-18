@@ -26,48 +26,14 @@
 #define __NETWORK_PROTOCOL_H__
 
 #define LINET_PROTOCOL_VERSION "E"
-#define LINET_INVALID_ANIMATION 65535
-#define LINET_INVALID_MODEL 65535
 
 /****************************************************************************/
 /* Object number ranges. */
 
-#define LINET_RANGE_SERVER_START 0x00000000
-#define LINET_RANGE_SERVER_END   0x0FFFFFFF
-#define LINET_RANGE_CLIENT_START 0x10000000
-#define LINET_RANGE_CLIENT_END   0x1FFFFFFF
-#define LINET_RANGE_RENDER_START 0x20000000
-#define LINET_RANGE_RENDER_END   0x2FFFFFFF
-
-/****************************************************************************/
-/* Network commands. */
-
-enum
-{
-	LINET_SERVER_PACKET_CUSTOM = 128,
-	LINET_SERVER_PACKET_MAX
-};
-
-/****************************************************************************/
-/* Object flags. */
-/* FIXME */
-
-enum
-{
-	LINET_OBJECT_FLAG_DYNAMIC = 0x01
-};
-
-/****************************************************************************/
-/* Control flags. */
-/* FIXME */
-
-enum
-{
-	LINET_CONTROL_MOVE_FRONT = 0x01,
-	LINET_CONTROL_MOVE_BACK  = 0x02,
-	LINET_CONTROL_RUN        = 0x40,
-	LINET_CONTROL_MASK       = 0xFF,
-};
+#define LINET_RANGE_ENGINE_START 0x00000000
+#define LINET_RANGE_ENGINE_END   0x3FFFFFFF
+#define LINET_RANGE_RENDER_START 0x40000000
+#define LINET_RANGE_RENDER_END   0x6FFFFFFF
 
 /****************************************************************************/
 /* Effect flags. */
