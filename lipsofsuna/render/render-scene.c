@@ -251,7 +251,7 @@ liren_scene_render_end (LIRenScene* self)
 	memset (&self->state, 0, sizeof (self->state));
 
 	/* Change render state. */
-	glUseProgramObjectARB (0);
+	glUseProgram (0);
 	glBindVertexArray (0);
 	glEnable (GL_BLEND);
 	glDisable (GL_DEPTH_TEST);

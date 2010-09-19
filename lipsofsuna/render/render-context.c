@@ -93,7 +93,7 @@ void liren_context_bind (
 
 	/* Bind shader. */
 	if (self->changed.shader)
-		glUseProgramObjectARB (self->shader->program);
+		glUseProgram (self->shader->program);
 
 	/* Bind material. */
 	if (self->changed.material)

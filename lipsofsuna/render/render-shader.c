@@ -36,6 +36,9 @@ static int private_check_link (
 	const char*  name,
 	GLint        program);
 
+static void private_clear (
+	LIRenShader* self);
+
 static void private_init_attributes (
 	LIRenShader* self);
 
@@ -58,8 +61,12 @@ static int private_uniform_value (
 
 /**
  * \brief Creates a new shader program.
- *
  * \param render Renderer.
+ * \param name Unique name.
+ * \param config Shader configuration code.
+ * \param vertex Vertex shader code.
+ * \param geometry Geometry shader code or NULL.
+ * \param fragment Fragment shader code.
  * \return New shader or NULL.
  */
 LIRenShader* liren_shader_new (
@@ -70,9 +77,6 @@ LIRenShader* liren_shader_new (
 	const char*  geometry,
 	const char*  fragment)
 {
-	GLint length;
-	const GLchar* ptr;
-	LIArcReader* reader;
 	LIRenShader* self;
 
 	/* Allocate self. */
@@ -87,93 +91,25 @@ LIRenShader* liren_shader_new (
 		return NULL;
 	}
 
-	/* Parse configuration. */
-	reader = liarc_reader_new (config, strlen (config));
-	if (reader == NULL)
-	{
-		liren_shader_free (self);
-		return NULL;
-	}
-	if (!private_read_config (self, reader))
-	{
-		liarc_reader_free (reader);
-		liren_shader_free (self);
-		return NULL;
-	}
-	liarc_reader_free (reader);
-
-	/* Create shader objects. */
-	self->vertex = glCreateShaderObjectARB (GL_VERTEX_SHADER);
-	if (geometry != NULL)
-		self->geometry = glCreateShaderObjectARB (GL_GEOMETRY_SHADER_ARB);
-	self->fragment = glCreateShaderObjectARB (GL_FRAGMENT_SHADER);
-
-	/* Upload shader source. */
-	length = strlen (vertex);
-	ptr = vertex;
-	glShaderSourceARB (self->vertex, 1, &ptr, &length);
-	if (geometry != NULL)
-	{
-		length = strlen (geometry);
-		ptr = geometry;
-		glShaderSourceARB (self->geometry, 1, &ptr, &length);
-	}
-	length = strlen (fragment);
-	ptr = fragment;
-	glShaderSourceARB (self->fragment, 1, &ptr, &length);
-
-	/* Compile the vertex shader. */
-	glCompileShaderARB (self->vertex);
-	if (!private_check_compile (self, name, self->vertex))
+	/* Compile the shader. */
+	if (!liren_shader_compile (self, config, vertex, geometry, fragment))
 	{
 		liren_shader_free (self);
 		return NULL;
 	}
 
-	/* Compile the geometry shader. */
-	if (geometry != NULL)
-	{
-		glCompileShaderARB (self->geometry);
-		if (!private_check_compile (self, name, self->geometry))
-		{
-			liren_shader_free (self);
-			return NULL;
-		}
-	}
-
-	/* Compile the fragment shader. */
-	glCompileShaderARB (self->fragment);
-	if (!private_check_compile (self, name, self->fragment))
+	/* Insert to dictionary. */
+	if (!lialg_strdic_insert (render->shaders, name, self))
 	{
 		liren_shader_free (self);
 		return NULL;
 	}
-
-	/* Link the shader program. */
-	self->program = glCreateProgramObjectARB ();
-	glAttachObjectARB (self->program, self->vertex);
-	if (geometry)
-		glAttachObjectARB (self->program, self->geometry);
-	glAttachObjectARB (self->program, self->fragment);
-	private_init_attributes (self);
-	glLinkProgramARB (self->program);
-	if (!private_check_link (self, name, self->program))
-	{
-		liren_shader_free (self);
-		return NULL;
-	}
-	glUseProgramObjectARB (self->program);
-
-	/* Initialize uniforms. */
-	private_init_uniforms (self);
-	glUseProgramObjectARB (0);
 
 	return self;
 }
 
 /**
  * \brief Frees the shader program.
- *
  * \param self Shader.
  */
 void liren_shader_free (
@@ -181,14 +117,12 @@ void liren_shader_free (
 {
 	int i;
 
-	if (self->vertex)
-		glDeleteObjectARB (self->vertex);
-	if (self->geometry)
-		glDeleteObjectARB (self->geometry);
-	if (self->fragment)
-		glDeleteObjectARB (self->fragment);
-	if (self->program)
-		glDeleteObjectARB (self->program);
+	if (self->name != NULL)
+		lialg_strdic_remove (self->render->shaders, self->name);
+	glDeleteProgram (self->program);
+	glDeleteShader (self->vertex);
+	glDeleteShader (self->geometry);
+	glDeleteShader (self->fragment);
 	for (i = 0 ; i < self->attributes.count ; i++)
 		lisys_free (self->attributes.array[i].name);
 	for (i = 0 ; i < self->uniforms.count ; i++)
@@ -197,6 +131,118 @@ void liren_shader_free (
 	lisys_free (self->uniforms.array);
 	lisys_free (self->name);
 	lisys_free (self);
+}
+
+/**
+ * \brief Recompiles the shader out of new code.
+ * \param self Shader.
+ * \param config Shader configuration code.
+ * \param vertex Vertex shader code.
+ * \param geometry Geometry shader code or NULL.
+ * \param fragment Fragment shader code.
+ * \return Nonzero on success.
+ */
+int liren_shader_compile (
+	LIRenShader* self,
+	const char*  config,
+	const char*  vertex,
+	const char*  geometry,
+	const char*  fragment)
+{
+	GLint length;
+	const GLchar* ptr;
+	LIArcReader* reader;
+	LIRenShader tmp;
+
+	/* Initialize a temporary struct so that we don't overwrite
+	   the old shader if something goes wrong. */
+	memset (&tmp, 0, sizeof (LIRenShader));
+	tmp.render = self->render;
+	tmp.name = self->name;
+
+	/* Parse configuration. */
+	reader = liarc_reader_new (config, strlen (config));
+	if (reader == NULL)
+		return 0;
+	if (!private_read_config (&tmp, reader))
+	{
+		private_clear (&tmp);
+		liarc_reader_free (reader);
+		return 0;
+	}
+	liarc_reader_free (reader);
+
+	/* Create shader objects. */
+	tmp.vertex = glCreateShader (GL_VERTEX_SHADER);
+	if (geometry != NULL)
+		tmp.geometry = glCreateShader (GL_GEOMETRY_SHADER);
+	tmp.fragment = glCreateShader (GL_FRAGMENT_SHADER);
+
+	/* Upload shader source. */
+	length = strlen (vertex);
+	ptr = vertex;
+	glShaderSource (tmp.vertex, 1, &ptr, &length);
+	if (geometry != NULL)
+	{
+		length = strlen (geometry);
+		ptr = geometry;
+		glShaderSource (tmp.geometry, 1, &ptr, &length);
+	}
+	length = strlen (fragment);
+	ptr = fragment;
+	glShaderSource (tmp.fragment, 1, &ptr, &length);
+
+	/* Compile the vertex shader. */
+	glCompileShader (tmp.vertex);
+	if (!private_check_compile (&tmp, tmp.name, tmp.vertex))
+	{
+		private_clear (&tmp);
+		return 0;
+	}
+
+	/* Compile the geometry shader. */
+	if (geometry != NULL)
+	{
+		glCompileShader (tmp.geometry);
+		if (!private_check_compile (&tmp, tmp.name, tmp.geometry))
+		{
+			private_clear (&tmp);
+			return 0;
+		}
+	}
+
+	/* Compile the fragment shader. */
+	glCompileShader (tmp.fragment);
+	if (!private_check_compile (&tmp, tmp.name, tmp.fragment))
+	{
+		private_clear (&tmp);
+		return 0;
+	}
+
+	/* Link the shader program. */
+	tmp.program = glCreateProgram ();
+	glAttachShader (tmp.program, tmp.vertex);
+	if (tmp.geometry)
+		glAttachShader (tmp.program, tmp.geometry);
+	glAttachShader (tmp.program, tmp.fragment);
+	private_init_attributes (&tmp);
+	glLinkProgram (tmp.program);
+	if (!private_check_link (&tmp, tmp.name, tmp.program))
+	{
+		private_clear (&tmp);
+		return 0;
+	}
+	glUseProgram (tmp.program);
+
+	/* Initialize uniforms. */
+	private_init_uniforms (&tmp);
+	glUseProgram (0);
+
+	/* Replace the old program with the new one. */
+	private_clear (self);
+	memcpy (self, &tmp, sizeof (LIRenShader));
+
+	return 1;
 }
 
 /****************************************************************************/
@@ -219,10 +265,10 @@ static int private_check_compile (
 		type = "fragment";
 	else
 		type = "geometry";
-	glGetObjectParameterivARB (shader, GL_COMPILE_STATUS, &status);
+	glGetShaderiv (shader, GL_COMPILE_STATUS, &status);
 	if (status == GL_FALSE)
 	{
-		glGetInfoLogARB (shader, sizeof (log), &length, log);
+		glGetShaderInfoLog (shader, sizeof (log), &length, log);
 		if (length)
 		{
 			reader = liarc_reader_new (log, length);
@@ -254,10 +300,10 @@ static int private_check_link (
 	GLsizei length;
 	LIArcReader* reader;
 
-	glGetObjectParameterivARB (program, GL_LINK_STATUS, &status);
-	glGetInfoLogARB (program, sizeof (log), &length, log);
+	glGetProgramiv (program, GL_LINK_STATUS, &status);
 	if (status == GL_FALSE)
 	{
+		glGetProgramInfoLog (program, sizeof (log), &length, log);
 		reader = liarc_reader_new (log, length);
 		if (reader != NULL)
 		{
@@ -275,23 +321,37 @@ static int private_check_link (
 	return 1;
 }
 
+static void private_clear (
+	LIRenShader* self)
+{
+	int i;
+
+	for (i = 0 ; i < self->attributes.count ; i++)
+		lisys_free (self->attributes.array[i].name);
+	for (i = 0 ; i < self->uniforms.count ; i++)
+		lisys_free (self->uniforms.array[i].name);
+	lisys_free (self->attributes.array);
+	lisys_free (self->uniforms.array);
+	glDeleteProgram (self->program);
+	glDeleteShader (self->vertex);
+	glDeleteShader (self->geometry);
+	glDeleteShader (self->fragment);
+}
+
 static void private_init_attributes (
 	LIRenShader* self)
 {
 	int i;
 	LIRenAttribute* attribute;
 
-	if (livid_features.shader_model >= 3)
+	for (i = 0 ; i < self->attributes.count ; i++)
 	{
-		for (i = 0 ; i < self->attributes.count ; i++)
-		{
-			attribute = self->attributes.array + i;
-			if (attribute->value != LIREN_ATTRIBUTE_NONE)
-				attribute->binding = attribute->value;
-			else
-				attribute->binding = LIREN_ATTRIBUTE_COORD;
-			glBindAttribLocationARB (self->program, attribute->binding, attribute->name);
-		}
+		attribute = self->attributes.array + i;
+		if (attribute->value != LIREN_ATTRIBUTE_NONE)
+			attribute->binding = attribute->value;
+		else
+			attribute->binding = LIREN_ATTRIBUTE_COORD;
+		glBindAttribLocationARB (self->program, attribute->binding, attribute->name);
 	}
 }
 
@@ -302,17 +362,14 @@ static void private_init_uniforms (
 	int sampler = 0;
 	LIRenUniform* uniform;
 
-	if (livid_features.shader_model >= 3)
+	for (i = 0 ; i < self->uniforms.count ; i++)
 	{
-		for (i = 0 ; i < self->uniforms.count ; i++)
+		uniform = self->uniforms.array + i;
+		uniform->binding = glGetUniformLocationARB (self->program, uniform->name);
+		if (liren_uniform_get_sampler (uniform))
 		{
-			uniform = self->uniforms.array + i;
-			uniform->binding = glGetUniformLocationARB (self->program, uniform->name);
-			if (liren_uniform_get_sampler (uniform))
-			{
-				uniform->sampler = sampler++;
-				glUniform1iARB (uniform->binding, uniform->sampler);
-			}
+			uniform->sampler = sampler++;
+			glUniform1iARB (uniform->binding, uniform->sampler);
 		}
 	}
 }

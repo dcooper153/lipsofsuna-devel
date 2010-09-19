@@ -36,10 +36,10 @@
 struct _LIRenShader
 {
 	char* name;
-	GLint program;
-	GLint vertex;
-	GLint geometry;
-	GLint fragment;
+	GLuint program;
+	GLuint vertex;
+	GLuint geometry;
+	GLuint fragment;
 	LIRenRender* render;
 	struct
 	{
@@ -67,6 +67,13 @@ LIAPICALL (LIRenShader*, liren_shader_new, (
 
 LIAPICALL (void, liren_shader_free, (
 	LIRenShader* self));
+
+LIAPICALL (int, liren_shader_compile, (
+	LIRenShader* self,
+	const char*  config,
+	const char*  vertex,
+	const char*  geometry,
+	const char*  fragment));
 
 #endif
 

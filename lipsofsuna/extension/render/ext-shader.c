@@ -29,13 +29,12 @@
  * module "Extension.Render"
  * ---
  * -- Specify shaders.
- * -- @name Scene
+ * -- @name Shader
  * -- @class table
  */
 
 /* @luadoc
  * --- Creates a new shader.
- * --
  * -- @param clss Shader class.
  * -- @param args Arguments.<ul>
  * --   <li>config: Shader configuration code.</li>
@@ -48,11 +47,12 @@
 static void Shader_new (LIScrArgs* args)
 {
 	const char* name = "forward-default";
-	const char* config = "";
+	const char* config = "attribute att_coord COORD";
 	const char* fragment = "void main()\n{\ngl_FragColor = vec4(1.0,1.0,1.0,1.0);\n}";
 	const char* geometry = NULL;
-	const char* vertex = "void main()\n{\ngl_Position=ftransform();\n}";
+	const char* vertex = "in vec3 att_coord;\nvoid main()\n{\ngl_Position=vec4(att_coord,1.0);\n}";
 	LIExtModule* module;
+	LIScrData* data;
 	LIRenShader* shader;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SHADER);
@@ -75,12 +75,40 @@ static void Shader_new (LIScrArgs* args)
 		return;
 	}
 
-	/* Insert to dictionary. */
-	if (!lialg_strdic_insert (module->client->render->shaders, name, shader))
+	/* Allocate userdata. */
+	data = liscr_data_new (args->script, shader, LIEXT_SCRIPT_SHADER, liren_shader_free);
+	if (data == NULL)
 	{
 		liren_shader_free (shader);
 		return;
 	}
+	liscr_args_seti_data (args, data);
+	liscr_data_unref (data, NULL);
+}
+
+/* @luadoc
+ * --- Recompiles the shader from new source code.
+ * -- @param self Shader.
+ * -- @param args Arguments.<ul>
+ * --   <li>config: Shader configuration code.</li>
+ * --   <li>fragment: Fragment program code.</li>
+ * --   <li>geometry: Geometry program code.</li>
+ * --   <li>vertex: Vertex program code.</li></ul>
+ * function Shader.compile(self, args)
+ */
+static void Shader_compile (LIScrArgs* args)
+{
+	const char* config = "attribute att_coord COORD";
+	const char* fragment = "void main()\n{\ngl_FragColor = vec4(1.0,1.0,1.0,1.0);\n}";
+	const char* geometry = NULL;
+	const char* vertex = "in vec3 att_coord;\nvoid main()\n{\ngl_Position=vec4(att_coord,1.0);\n}";
+
+	liscr_args_gets_string (args, "config", &config);
+	liscr_args_gets_string (args, "fragment", &fragment);
+	liscr_args_gets_string (args, "geometry", &geometry);
+	liscr_args_gets_string (args, "vertex", &vertex);
+	if (!liren_shader_compile (args->self, config, vertex, geometry, fragment))
+		lisys_error_report ();
 }
 
 /*****************************************************************************/
@@ -92,6 +120,7 @@ void liext_script_shader (
 	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SHADER, data);
 	liscr_class_insert_cfunc (self, "new", Shader_new);
+	liscr_class_insert_mfunc (self, "compile", Shader_compile);
 }
 
 /** @} */
