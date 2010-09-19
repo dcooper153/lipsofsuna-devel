@@ -25,9 +25,6 @@
 #include <string.h>
 #include "render-context.h"
 
-static void private_bind_material (
-	LIRenContext* self);
-
 static void private_bind_uniform (
 	LIRenContext* self,
 	LIRenUniform* uniform);
@@ -45,7 +42,13 @@ void liren_context_init (
 	self->scene = NULL;
 	self->buffer = NULL;
 	self->incomplete = 1;
+	self->blend.enable = 0;
+	self->blend.blend_src = GL_SRC_ALPHA;
+	self->blend.blend_dst = GL_ONE_MINUS_SRC_ALPHA;
+	self->changed.blend = 1;
 	self->changed.buffer = 1;
+	self->changed.cull = 1;
+	self->changed.depth = 1;
 	self->changed.lights = 1;
 	self->changed.material = 1;
 	self->changed.matrix_model = 1;
@@ -54,6 +57,11 @@ void liren_context_init (
 	self->changed.shader = 1;
 	self->changed.textures = 1;
 	self->changed.uniforms = 1;
+	self->cull.enable = 1;
+	self->cull.front_face = GL_CCW;
+	self->depth.enable_test = 1;
+	self->depth.enable_write = 1;
+	self->depth.depth_func = GL_LEQUAL;
 	self->lights.count = 0;
 	self->material.shininess = 1.0f;
 	self->material.diffuse[0] = 1.0f;
@@ -83,27 +91,13 @@ void liren_context_bind (
 	if (self->changed.matrix_projection)
 		self->matrix.projectioninverse = limat_matrix_invert (self->matrix.projection);
 
-	/* Validate state. */
-	if (self->shader == NULL)
-	{
-		self->incomplete = 1;
-		return;
-	}
-	self->incomplete = 0;
-
 	/* Bind shader. */
 	if (self->changed.shader)
-		glUseProgram (self->shader->program);
-
-	/* Bind material. */
-	if (self->changed.material)
-		private_bind_material (self);
-
-	/* Bind uniforms. */
-	if (self->changed.uniforms)
 	{
-		for (i = 0 ; i < self->shader->uniforms.count ; i++)
-			private_bind_uniform (self, self->shader->uniforms.array + i);
+		if (self->shader != NULL)
+			glUseProgram (self->shader->program);
+		else
+			glUseProgram (0);
 	}
 
 	/* Bind vertex array. */
@@ -115,7 +109,60 @@ void liren_context_bind (
 			glBindVertexArray (0);
 	}
 
+	/* Update blend, cull, and depth modes. */
+	if (self->changed.blend)
+	{
+		if (self->blend.enable)
+		{
+			glEnable (GL_BLEND);
+			glBlendFunc (self->blend.blend_src, self->blend.blend_dst);
+		}
+		else
+			glDisable (GL_BLEND);
+	}
+	if (self->changed.cull)
+	{
+		if (self->cull.enable)
+		{
+			glEnable (GL_CULL_FACE);
+			glFrontFace (self->cull.front_face);
+		}
+		else
+			glDisable (GL_CULL_FACE);
+	}
+	if (self->changed.depth)
+	{
+		if (self->depth.enable_test)
+		{
+			glEnable (GL_DEPTH_TEST);
+			glDepthFunc (self->depth.depth_func);
+		}
+		else
+			glDisable (GL_DEPTH_TEST);
+		if (self->depth.enable_write)
+			glDepthMask (GL_TRUE);
+		else
+			glDepthMask (GL_FALSE);
+	}
+
+	/* Bind uniforms. */
+	if (self->shader != NULL)
+	{
+		self->incomplete = 0;
+		if (self->changed.uniforms)
+		{
+			for (i = 0 ; i < self->shader->uniforms.count ; i++)
+				private_bind_uniform (self, self->shader->uniforms.array + i);
+		}
+	}
+	else
+		self->incomplete = 1;
+
+	/* All state changes were applied. */
+	self->changed.blend = 0;
 	self->changed.buffer = 0;
+	self->changed.cull = 0;
+	self->changed.depth = 0;
 	self->changed.lights = 0;
 	self->changed.material = 0;
 	self->changed.matrix_model = 0;
@@ -153,6 +200,23 @@ void liren_context_render_indexed (
 #endif
 }
 
+void liren_context_set_blend (
+	LIRenContext* self,
+	int           enable,
+	GLenum        blend_src,
+	GLenum        blend_dst)
+{
+	if (self->blend.enable != enable ||
+	    self->blend.blend_src != blend_src ||
+	    self->blend.blend_dst != blend_dst)
+	{
+		self->blend.enable = enable;
+		self->blend.blend_src = blend_src;
+		self->blend.blend_dst = blend_dst;
+		self->changed.blend = 1;
+	}
+}
+
 void liren_context_set_buffer (
 	LIRenContext* self,
 	LIRenBuffer*  buffer)
@@ -161,6 +225,20 @@ void liren_context_set_buffer (
 	{
 		self->buffer = buffer;
 		self->changed.buffer = 1;
+	}
+}
+
+void liren_context_set_cull (
+	LIRenContext* self,
+	int           enable,
+	int           front_face)
+{
+	if (self->cull.enable != enable ||
+	    self->cull.front_face != front_face)
+	{
+		self->cull.enable = enable;
+		self->cull.front_face = front_face;
+		self->changed.cull = 1;
 	}
 }
 
@@ -177,7 +255,26 @@ void liren_context_set_deferred (
 	if (self->deferred != value)
 	{
 		self->deferred = value;
+		self->changed.blend = 1;
+		self->changed.depth = 1;
 		self->changed.uniforms = 1;
+	}
+}
+
+void liren_context_set_depth (
+	LIRenContext* self,
+	int           enable_test,
+	int           enable_write,
+	GLenum        depth_func)
+{
+	if (self->depth.enable_test != enable_test ||
+	    self->depth.enable_write != enable_write ||
+	    self->depth.depth_func != depth_func)
+	{
+		self->depth.enable_test = enable_test;
+		self->depth.enable_write = enable_write;
+		self->depth.depth_func = depth_func;
+		self->changed.depth = 1;
 	}
 }
 
@@ -227,19 +324,34 @@ void liren_context_set_material (
 	LIRenContext*        self,
 	const LIRenMaterial* value)
 {
-	if (self->material.flags != value->flags ||
-	    self->material.shininess != value->shininess ||
+	/* Set material parameters. */
+	if (self->material.shininess != value->shininess ||
 	    memcmp (self->material.parameters, value->parameters, 4 * sizeof (float)) ||
 	    memcmp (self->material.diffuse, value->diffuse, 4 * sizeof (float)) ||
 	    memcmp (self->material.specular, value->specular, 4 * sizeof (float)))
 	{
-		self->material.flags = value->flags;
 		self->material.shininess = value->shininess;
 		memcpy (self->material.parameters, value->parameters, 4 * sizeof (float));
 		memcpy (self->material.diffuse, value->diffuse, 4 * sizeof (float));
 		memcpy (self->material.specular, value->specular, 4 * sizeof (float));
 		self->changed.material = 1;
 		self->changed.uniforms = 1;
+	}
+
+	/* Set material flags. */
+	if (value->flags & LIREN_MATERIAL_FLAG_CULLFACE)
+		liren_context_set_cull (self, 1, GL_CCW);
+	else
+		liren_context_set_cull (self, 0, GL_CCW);
+	if (value->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY)
+	{
+		liren_context_set_blend (self, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		liren_context_set_depth (self, 1, 0, GL_LEQUAL);
+	}
+	else
+	{
+		liren_context_set_blend (self, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		liren_context_set_depth (self, 1, 1, GL_LEQUAL);
 	}
 }
 
@@ -391,26 +503,6 @@ void liren_context_set_textures_raw (
 }
 
 /*****************************************************************************/
-
-static void private_bind_material (
-	LIRenContext* self)
-{
-	if (self->material.flags & LIREN_MATERIAL_FLAG_CULLFACE)
-		glEnable (GL_CULL_FACE);
-	else
-		glDisable (GL_CULL_FACE);
-	if (!self->deferred && (self->material.flags & LIREN_MATERIAL_FLAG_TRANSPARENCY))
-	{
-		glEnable (GL_BLEND);
-		glDepthMask (GL_FALSE);
-		glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	}
-	else
-	{
-		glDisable (GL_BLEND);
-		glDepthMask (GL_TRUE);
-	}
-}
 
 static void private_bind_uniform (
 	LIRenContext* self,

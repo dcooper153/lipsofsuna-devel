@@ -53,7 +53,16 @@ struct _LIRenContext
 	LIMatFrustum frustum;
 	struct
 	{
+		int enable;
+		GLenum blend_src;
+		GLenum blend_dst;
+	} blend;
+	struct
+	{
+		unsigned int blend : 1;
 		unsigned int buffer : 1;
+		unsigned int cull : 1;
+		unsigned int depth : 1;
 		unsigned int lights : 1;
 		unsigned int material : 1;
 		unsigned int matrix_model : 1;
@@ -65,12 +74,22 @@ struct _LIRenContext
 	} changed;
 	struct
 	{
+		int enable;
+		GLenum front_face;
+	} cull;
+	struct
+	{
+		int enable_test;
+		int enable_write;
+		int depth_func;
+	} depth;
+	struct
+	{
 		int count;
 		LIRenLight* array[9];
 	} lights;
 	struct
 	{
-		int flags;
 		float parameters[4];
 		float shininess;
 		float diffuse[4];
@@ -103,9 +122,20 @@ LIAPICALL (void, liren_context_render_indexed, (
 	int           start,
 	int           count));
 
+LIAPICALL (void, liren_context_set_blend, (
+	LIRenContext* self,
+	int           enable,
+	GLenum        blend_src,
+	GLenum        blend_dst));
+
 LIAPICALL (void, liren_context_set_buffer, (
 	LIRenContext* self,
 	LIRenBuffer*  vertex));
+
+LIAPICALL (void, liren_context_set_cull, (
+	LIRenContext* self,
+	int           enable,
+	int           front_face));
 
 LIAPICALL (int, liren_context_get_deferred, (
 	LIRenContext* self));
@@ -113,6 +143,12 @@ LIAPICALL (int, liren_context_get_deferred, (
 LIAPICALL (void, liren_context_set_deferred, (
 	LIRenContext* self,
 	int           value));
+
+LIAPICALL (void, liren_context_set_depth, (
+	LIRenContext* self,
+	int           enable_test,
+	int           enable_write,
+	GLenum        depth_func));
 
 LIAPICALL (void, liren_context_set_flags, (
 	LIRenContext* self,

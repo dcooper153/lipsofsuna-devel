@@ -524,21 +524,18 @@ static void private_update_shadow (
 	glPushAttrib (GL_VIEWPORT_BIT | GL_SCISSOR_BIT);
 	glBindFramebuffer (GL_FRAMEBUFFER, self->shadow.fbo);
 	glViewport (0, 0, SHADOWMAPSIZE, SHADOWMAPSIZE);
-	glEnable (GL_DEPTH_TEST);
-	glEnable (GL_CULL_FACE);
 	glDisable (GL_SCISSOR_TEST);
-	glFrontFace (GL_CCW);
-	glDepthFunc (GL_LEQUAL);
-	glDepthMask (GL_TRUE);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	limat_frustum_init (&frustum, &self->modelview, &self->projection);
 	context = liren_render_get_context (self->scene->render);
 	liren_context_init (context);
 	liren_context_set_scene (context, self->scene);
-	liren_context_set_viewmatrix (context, &self->modelview);
-	liren_context_set_projection (context, &self->projection);
+	liren_context_set_cull (context, 1, GL_CCW);
+	liren_context_set_depth (context, 1, 1, GL_LEQUAL);
 	liren_context_set_frustum (context, &frustum);
+	liren_context_set_projection (context, &self->projection);
 	liren_context_set_shader (context, shader);
+	liren_context_set_viewmatrix (context, &self->modelview);
 
 	/* Render groups and objects to the depth texture. */
 	LIALG_PTRDIC_FOREACH (iter0, self->scene->groups)

@@ -180,21 +180,16 @@ liren_scene_render_begin (LIRenScene*    self,
 	context = liren_render_get_context (self->render);
 	liren_context_init (context);
 	liren_context_set_scene (context, self);
-	liren_context_set_viewmatrix (context, modelview);
-	liren_context_set_projection (context, projection);
+	liren_context_set_blend (context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	liren_context_set_cull (context, 1, GL_CCW);
+	liren_context_set_depth (context, 1, 1, GL_LEQUAL);
 	liren_context_set_frustum (context, frustum);
+	liren_context_set_projection (context, projection);
+	liren_context_set_viewmatrix (context, modelview);
 
 	/* Depth sort scene. */
 	if (!private_sort_scene (self, context))
 		return 0;
-
-	/* Change render state. */
-	glEnable (GL_DEPTH_TEST);
-	glEnable (GL_CULL_FACE);
-	glFrontFace (GL_CCW);
-	glDepthMask (GL_TRUE);
-	glDepthFunc (GL_LEQUAL);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/* Reset profiling. */
 #ifdef LIREN_ENABLE_PROFILING
@@ -247,18 +242,14 @@ liren_scene_render_end (LIRenScene* self)
 	glBlitFramebuffer (0, 0, viewport[2], viewport[3], viewport[0], viewport[1],
 		viewport[0] + viewport[2], viewport[1] + viewport[3], GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
-	/* Update state. */
-	memset (&self->state, 0, sizeof (self->state));
-
 	/* Change render state. */
-	glUseProgram (0);
-	glBindVertexArray (0);
-	glEnable (GL_BLEND);
-	glDisable (GL_DEPTH_TEST);
-	glDisable (GL_CULL_FACE);
-	glDepthMask (GL_FALSE);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glColor3f (1.0f, 1.0f, 1.0f);
+	liren_context_set_buffer (self->state.context, NULL);
+	liren_context_set_blend (self->state.context, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	liren_context_set_cull (self->state.context, 0, GL_CCW);
+	liren_context_set_depth (self->state.context, 0, 0, GL_LEQUAL);
+	liren_context_set_shader (self->state.context, NULL);
+	liren_context_bind (self->state.context);
+	memset (&self->state, 0, sizeof (self->state));
 	self->state.rendering = 0;
 
 	/* Profiling report. */
@@ -287,9 +278,9 @@ void liren_scene_render_deferred_begin (
 
 	/* Change render state. */
 	liren_context_set_deferred (self->state.context, 1);
+	liren_context_set_blend (self->state.context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindFramebuffer (GL_FRAMEBUFFER, self->state.framebuffer->deferred_fbo);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glDisable (GL_BLEND);
 	self->state.alphatest = alphatest;
 }
 
@@ -317,9 +308,6 @@ void liren_scene_render_deferred_end (
 
 	/* Render lit fragments to post-processing buffer. */
 	glPushAttrib (GL_SCISSOR_BIT);
-	glDisable (GL_DEPTH_TEST);
-	glDisable (GL_CULL_FACE);
-	glDisable (GL_BLEND);
 	glGetIntegerv (GL_VIEWPORT, viewport);
 	matrix = limat_matrix_identity ();
 	textures[0].texture = self->state.framebuffer->diffuse_texture;
@@ -331,6 +319,9 @@ void liren_scene_render_deferred_end (
 	textures[3].texture = self->state.framebuffer->depth_texture;
 	textures[3].sampler = 0;
 	liren_context_set_flags (self->state.context, LIREN_FLAG_LIGHTING | LIREN_FLAG_TEXTURING);
+	liren_context_set_cull (self->state.context, 0, GL_CCW);
+	liren_context_set_depth (self->state.context, 0, 0, GL_LEQUAL);
+	liren_context_set_blend (self->state.context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	liren_context_set_modelmatrix (self->state.context, &matrix);
 	liren_context_set_lights (self->state.context, NULL, 0);
 	liren_context_set_textures (self->state.context, textures, 4);
@@ -399,8 +390,8 @@ liren_scene_render_forward_opaque (LIRenScene* self,
 
 	/* Change render state. */
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[0]);
-	glEnable (GL_DEPTH_TEST);
-	glDisable (GL_BLEND);
+	liren_context_set_depth (self->state.context, 1, 0, GL_LEQUAL);
+	liren_context_set_blend (self->state.context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/* Render face groups to post-processing buffer. */
 	for (i = 0 ; i < self->sort->groups.count ; i++)
@@ -449,15 +440,11 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 	if (!self->state.rendering)
 		return;
 
-	identity = limat_matrix_identity ();
-
 	/* Change render state. */
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[0]);
-	glEnable (GL_BLEND);
-	glEnable (GL_CULL_FACE);
-	glEnable (GL_DEPTH_TEST);
-	glDepthMask (GL_FALSE);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	liren_context_set_cull (self->state.context, 0, GL_CCW);
+	liren_context_set_depth (self->state.context, 1, 0, GL_LEQUAL);
+	identity = limat_matrix_identity ();
 
 	/* Render transparent faces to post-processing buffer. */
 	for (i = self->sort->buckets.count - 1 ; i >= 0 ; i--)
@@ -488,15 +475,12 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 		{
 			if (face->type != LIREN_SORT_TYPE_PARTICLE)
 				continue;
+			liren_context_set_blend (self->state.context, 1, GL_SRC_ALPHA, GL_ONE);
+			liren_context_set_lights (self->state.context, NULL, 0);
 			liren_context_set_modelmatrix (self->state.context, &identity);
 			liren_context_set_shader (self->state.context, face->particle.shader);
-			liren_context_set_lights (self->state.context, NULL, 0);
 			liren_context_set_textures_raw (self->state.context, &face->particle.image->texture->texture, 1);
 			liren_context_bind (self->state.context);
-			glEnable (GL_DEPTH_TEST);
-			glDisable (GL_CULL_FACE);
-			glEnable (GL_BLEND);
-			glBlendFunc (GL_SRC_ALPHA, GL_ONE);
 			glBegin (GL_TRIANGLES);
 			glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, face->particle.size, face->particle.size);
 			position = face->particle.position;
@@ -510,8 +494,6 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 
 	/* Change render state. */
 	liren_context_set_lights (self->state.context, NULL, 0);
-	glDepthMask (GL_TRUE);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
 /**
@@ -549,14 +531,13 @@ void liren_scene_render_postproc (
 
 	/* Change render state. */
 	liren_context_set_buffer (self->state.context, self->render->helpers.unit_quad);
+	liren_context_set_blend (self->state.context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	liren_context_set_cull (self->state.context, 0, GL_CCW);
+	liren_context_set_depth (self->state.context, 0, 0, GL_LEQUAL);
+	liren_context_set_param (self->state.context, param);
 	liren_context_set_shader (self->state.context, shader);
 	liren_context_set_textures_raw (self->state.context, self->state.framebuffer->postproc_texture, 1);
-	liren_context_set_param (self->state.context, param);
 	liren_context_bind (self->state.context);
-	glDisable (GL_BLEND);
-	glDisable (GL_CULL_FACE);
-	glDisable (GL_DEPTH_TEST);
-	glDepthMask (GL_FALSE);
 	glBindFramebuffer (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[1]);
 
 	/* Render from the first buffer to the second. */
@@ -713,6 +694,7 @@ static void private_lighting_render (
 		shader = liren_render_find_shader (self->render, "deferred-spotlight");
 	if (shader == NULL)
 		return;
+	liren_context_set_cull (context, 0, GL_CCW);
 	liren_context_set_shader (context, shader);
 
 	/* Let each light lit the scene. */
@@ -730,16 +712,10 @@ static void private_lighting_render (
 			if (type != 1)
 				continue;
 		}
+		if (index++ == 1)
+			liren_context_set_blend (context, 1, GL_ONE, GL_ONE);
 		liren_context_set_lights (context, &light, 1);
 		liren_context_bind (context);
-
-		/* FIXME: It should be possible to avoid these state changes. */
-		glDisable (GL_CULL_FACE);
-		if (index++ >= 1)
-		{
-			glBlendFunc (GL_ONE, GL_ONE);
-			glEnable (GL_BLEND);
-		}
 
 		/* Calculate light rectangle. */
 		if (private_light_bounds (self, light, context, viewport, bounds))
