@@ -29,58 +29,23 @@
 #include "render-object.h"
 #include "render-types.h"
 
-void liren_draw_default (
+LIAPICALL (void, liren_draw_default, (
 	LIRenContext*  context,
 	int            index,
 	int            count,
 	LIMatMatrix*   matrix,
 	LIRenMaterial* material,
-	LIRenBuffer*   buffer);
+	LIRenBuffer*   buffer));
 
-void
-liren_draw_bounds (LIRenContext* context,
-                   LIRenObject*  object,
-                   void*         data);
+LIAPICALL (void, liren_draw_debug, (
+	LIRenContext* context,
+	LIRenObject*  object,
+	void*         data));
 
-void
-liren_draw_debug (LIRenContext* context,
-                  LIRenObject*  object,
-                  void*         data);
-
-void
-liren_draw_exclude (LIRenContext* context,
-                    LIRenObject*  object,
-                    void*         data);
-
-void
-liren_draw_hair (LIRenContext* context,
-                 LIRenObject*  object,
-                 void*         data);
-
-void
-liren_draw_opaque (LIRenContext* context,
-                   LIRenObject*  object,
-                   void*         data);
-
-void
-liren_draw_picking (LIRenContext* context,
-                    LIRenObject*  object,
-                    void*         data);
-
-void
-liren_draw_shadeless (LIRenContext* context,
-                      LIRenObject*  object,
-                      void*         data);
-
-void
-liren_draw_shadowmap (LIRenContext* context,
-                      LIRenObject*  object,
-                      void*         data);
-
-void
-liren_draw_transparent (LIRenContext* context,
-                        LIRenObject*  object,
-                        void*         data);
+LIAPICALL (void, liren_draw_hair, (
+	LIRenContext* context,
+	LIRenObject*  object,
+	void*         data));
 
 #endif
 

@@ -536,6 +536,8 @@ error:
 static void private_envmap_update (
 	LIRenObject* self)
 {
+#warning Envmaps are disabled.
+#if 0
 	int i;
 	LIAlgU32dicIter iter;
 	LIMatFrustum frustum;
@@ -599,6 +601,7 @@ static void private_envmap_update (
 	/* Disable cube map rendering mode. */
 	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, 0);
 	glPopAttrib ();
+#endif
 }
 
 static void private_lights_clear (
