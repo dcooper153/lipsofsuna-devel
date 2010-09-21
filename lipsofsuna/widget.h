@@ -20,7 +20,6 @@
 
 #include "widget/widget.h"
 #include "widget/widget-button.h"
-#include "widget/widget-check.h"
 #include "widget/widget-class.h"
 #include "widget/widget-container.h"
 #include "widget/widget-entry.h"
