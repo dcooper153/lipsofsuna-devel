@@ -233,7 +233,7 @@ liext_script_network (LIScrClass* self,
                       void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_NETWORK, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "disconnect", Network_disconnect);
 	liscr_class_insert_cfunc (self, "host", Network_host);
 	liscr_class_insert_cfunc (self, "join", Network_join);

@@ -38,7 +38,6 @@
  * --
  * -- @param self Speech class.
  * -- @param args Arguments.<ul>
- * --   <li>id: Object id.</li>
  * --   <li>object: Object.</li>
  * --   <li>message: Speech string. (required)</li></ul>
  * function Speech.add(self, args)
@@ -54,7 +53,7 @@ static void Speech_add (LIScrArgs* args)
 		return;
 	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &object))
 		id = ((LIEngObject*) object->data)->id;
-	else if (!liscr_args_gets_int (args, "id", &id))
+	else
 		return;
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPEECH);
 	liext_speeches_set_speech (module, id, msg);
@@ -106,7 +105,7 @@ liext_script_speech (LIScrClass* self,
                      void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPEECH, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "add", Speech_add);
 	liscr_class_insert_cfunc (self, "draw", Speech_draw);
 }

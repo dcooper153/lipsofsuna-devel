@@ -211,7 +211,7 @@ void liext_script_sound (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SOUND, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "effect", Sound_effect);
 	liscr_class_insert_cvar (self, "listener_position", Sound_getter_listener_position, Sound_setter_listener_position);
 	liscr_class_insert_cvar (self, "listener_rotation", Sound_getter_listener_rotation, Sound_setter_listener_rotation);

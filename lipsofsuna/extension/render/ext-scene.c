@@ -243,8 +243,8 @@ void liext_script_scene (
 	LIScrClass* self,
 	void*       data)
 {
-	liscr_class_inherit (self, liscr_script_class, NULL);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SCENE, data);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Scene_new);
 	liscr_class_insert_mfunc (self, "draw_begin", Scene_draw_begin);
 	liscr_class_insert_mfunc (self, "draw_deferred_begin", Scene_draw_deferred_begin);

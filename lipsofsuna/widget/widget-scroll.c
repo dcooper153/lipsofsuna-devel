@@ -146,6 +146,7 @@ private_event (LIWdgScroll*  self,
 	float r;
 	LIWdgManager* manager;
 	LIWdgRect alloc;
+	LIWdgRect clip;
 	LIWdgRect rect;
 	LIWdgStyle* style0;
 	LIWdgStyle* style1;
@@ -183,29 +184,17 @@ private_event (LIWdgScroll*  self,
 			/* Draw base. */
 			bar = (int)(v * alloc.width);
 			ref = (int)(r * alloc.width);
-			glPushAttrib (GL_SCISSOR_BIT);
-			glEnable (GL_SCISSOR_TEST);
-			if (style2 != NULL && bar > 0)
-			{
-				glScissor (alloc.x, manager->height - alloc.y - alloc.height, bar, alloc.height);
-				liwdg_style_paint (style2, &alloc);
-			}
-			if (style1 != NULL && ref > bar)
-			{
-				glScissor (alloc.x + bar, manager->height - alloc.y - alloc.height, ref - bar, alloc.height);
-				liwdg_style_paint (style1, &alloc);
-			}
-			if (style0 != NULL && ref < alloc.width)
-			{
-				glScissor (alloc.x + ref, manager->height - alloc.y - alloc.height, alloc.width - ref, alloc.height);
-				liwdg_style_paint (style0, &alloc);
-			}
-			glPopAttrib ();
+			clip = alloc;
+			clip.width = bar;
+			liwdg_style_paint_base (style2, &alloc, &clip);
+			clip.x += clip.width;
+			clip.width = ref - bar;
+			liwdg_style_paint_base (style1, &alloc, &clip);
+			clip.x += clip.width;
+			clip.width = alloc.width - ref;
+			liwdg_style_paint_base (style0, &alloc, &clip);
 			/* Draw label. */
-			glColor4fv (style0->color);
-			lifnt_layout_render (self->text,
-				rect.x + (rect.width - w) / 2,
-				rect.y + (rect.height - h) / 2);
+			liwdg_style_paint_text (style0, self->text, 0.5f, 0.5f, &rect);
 			return 1;
 		case LIWDG_EVENT_TYPE_STYLE:
 			private_rebuild (self);

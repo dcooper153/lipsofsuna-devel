@@ -244,7 +244,7 @@ liext_script_generator (LIScrClass* self,
                         void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_GENERATOR, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "add_brush", Generator_add_brush);
 	liscr_class_insert_cfunc (self, "disable_brush", Generator_disable_brush);
 	liscr_class_insert_cfunc (self, "enable_brush", Generator_enable_brush);

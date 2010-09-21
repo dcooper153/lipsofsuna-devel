@@ -75,18 +75,17 @@ LIAPICALL (LIFntFont*, lifnt_font_new, (
 LIAPICALL (void, lifnt_font_free, (
 	LIFntFont* self));
 
-LIAPICALL (void, lifnt_font_render, (
-	LIFntFont* self,
-	int        x,
-	int        y,
-	wchar_t    glyph));
-
 LIAPICALL (int, lifnt_font_get_advance, (
 	LIFntFont* self,
 	wchar_t    glyph));
 
 LIAPICALL (int, lifnt_font_get_height, (
 	const LIFntFont* self));
+
+LIAPICALL (void, lifnt_font_get_vertices, (
+	LIFntFont* self,
+	wchar_t    glyph,
+	float*     result));
 
 #endif
 

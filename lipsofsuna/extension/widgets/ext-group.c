@@ -198,8 +198,14 @@ Group_insert_row (lua_State* lua)
 static void Group_new (LIScrArgs* args)
 {
 	LIExtModule* module;
+	LIScrClass* clss;
 	LIScrData* data;
 	LIWdgWidget* self;
+
+	/* Get real class. */
+	clss = liscr_isanyclass (args->lua, 1);
+	if (clss == NULL)
+		return;
 
 	/* Allocate userdata. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GROUP);
@@ -208,7 +214,7 @@ static void Group_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_GROUP, liwdg_widget_free);
+	data = liscr_data_new (args->script, self, clss->meta, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -445,9 +451,8 @@ void liext_script_group (
 	LIScrClass* self,
 	void*       data)
 {
-	liscr_class_inherit (self, liext_script_widget, data);
+	liscr_class_inherit (self, LIEXT_SCRIPT_WIDGET);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_GROUP, data);
-	liscr_class_insert_interface (self, LIEXT_SCRIPT_GROUP);
 	liscr_class_insert_mfunc (self, "append_col", Group_append_col);
 	liscr_class_insert_mfunc (self, "append_row", Group_append_row);
 	liscr_class_insert_func (self, "insert_col", Group_insert_col);

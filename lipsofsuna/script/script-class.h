@@ -41,10 +41,9 @@ LIAPICALL (LIScrClass*, liscr_class_new_full, (
 LIAPICALL (void, liscr_class_free, (
 	LIScrClass* self));
 
-LIAPICALL (void, liscr_class_inherit, (
-	LIScrClass*    self,
-	LIScrClassInit init,
-	void*          data));
+LIAPICALL (int, liscr_class_inherit, (
+	LIScrClass* self,
+	const char* meta));
 
 LIAPICALL (int, liscr_class_insert_cfunc, (
 	LIScrClass*   self,

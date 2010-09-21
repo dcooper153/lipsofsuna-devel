@@ -39,32 +39,273 @@ private_paint_tiled (LIWdgStyle* self,
 
 /**
  * \brief Paints widget graphics.
- *
  * \param self Style.
  * \param rect Rectangle.
  */
-void
-liwdg_style_paint (LIWdgStyle* self,
-                   LIWdgRect*  rect)
+void liwdg_style_paint (
+	LIWdgStyle* self,
+	LIWdgRect*  rect)
+{
+	liwdg_style_paint_base (self, rect, NULL);
+}
+
+/**
+ * \brief Paints widget base with optional clipping.
+ * \param self Style.
+ * \param rect Frame rectangle.
+ * \param clip Clip rectangle or NULL.
+ */
+void liwdg_style_paint_base (
+	LIWdgStyle* self,
+	LIWdgRect*  rect,
+	LIWdgRect*  clip)
 {
 	if (self->texture == NULL)
 		return;
+	if (clip != NULL)
+	{
+		glPushAttrib (GL_SCISSOR_BIT);
+		glEnable (GL_SCISSOR_TEST);
+		glScissor (clip->x, self->manager->height - clip->y - clip->height, clip->width, clip->height);
+	}
 	if (self->scale)
 		private_paint_scaled (self, rect);
 	else
 		private_paint_tiled (self, rect);
+	if (clip != NULL)
+		glPopAttrib ();
+}
+
+void liwdg_style_paint_text (
+	LIWdgStyle*      self,
+	LIFntLayout*     text,
+	float            halign,
+	float            valign,
+	const LIWdgRect* rect)
+{
+#if 0
+	int i;
+	int x;
+	int y;
+	int w;
+	int h;
+	int ret;
+	float* vertex_data;
+	uint32_t* index_data;
+	LIFntLayoutGlyph* glyph;
+	LIRenBuffer buffer;
+	LIRenFormat vertex_format =
+	{
+		5 * sizeof (float),
+		GL_FLOAT, 0,
+		0, 0,
+		GL_FLOAT, 2 * sizeof (float)
+	};
+
+	/* Get vertex data. */
+	if (!text->n_glyphs)
+		return;
+	if (!lifnt_layout_get_vertices (text, &index_data, &vertex_data))
+		return;
+
+	/* Apply translation. */
+	w = lifnt_layout_get_width (text);
+	h = lifnt_layout_get_height (text);
+	x = rect->x + (int)(halign * (rect->width - w));
+	y = rect->y + (int)(valign * (rect->height - h));
+	for (i = 2 ; i < text->n_glyphs * 20 ; i += 5)
+	{
+		glyph = text->glyphs + i;
+		vertex_data[i + 0] += x;
+		vertex_data[i + 1] += y;
+	}
+
+	/* Create vertex buffer. */
+	ret = liren_buffer_init (&buffer, index_data, text->n_glyphs * 6,
+		&vertex_format, vertex_data, text->n_glyphs * 4, LIREN_BUFFER_TYPE_STREAM);
+	lisys_free (index_data);
+	lisys_free (vertex_data);
+	if (!ret)
+		return;
+
+	/* Enable clipping. */
+	glPushAttrib (GL_SCISSOR_BIT);
+	glScissor (rect->x, self->manager->height - rect->y - rect->height, rect->width, rect->height);
+	glEnable (GL_SCISSOR_TEST);
+
+	/* Render glyphs. */
+	liren_context_set_diffuse (self->manager->context, self->color);
+	liren_context_set_buffer (self->manager->context, &buffer);
+	liren_context_set_projection (self->manager->context, &self->manager->projection);
+	liren_context_set_shader (self->manager->context, self->manager->shader);
+	for (i = 0 ; i < text->n_glyphs ; i++)
+	{
+		glyph = text->glyphs + i;
+		liren_context_set_textures_raw (self->manager->context, &glyph->font->texture, 1);
+		liren_context_bind (self->manager->context);
+		liren_context_render_indexed (self->manager->context, 6 * i, 6);
+	}
+
+	/* Disable clipping. */
+	glPopAttrib ();
+#else
+	int i;
+	int x;
+	int y;
+	int w;
+	int h;
+	float* vertex_data;
+	uint32_t* index_data;
+	LIFntLayoutGlyph* glyph;
+
+	/* Get vertex data. */
+	if (!text->n_glyphs)
+		return;
+	if (!lifnt_layout_get_vertices (text, &index_data, &vertex_data))
+		return;
+
+	/* Apply translation. */
+	w = lifnt_layout_get_width (text);
+	h = lifnt_layout_get_height (text);
+	x = rect->x + (int)(halign * (rect->width - w));
+	y = rect->y + (int)(valign * (rect->height - h));
+	for (i = 2 ; i < text->n_glyphs * 20 ; i += 5)
+	{
+		glyph = text->glyphs + i;
+		vertex_data[i + 0] += x;
+		vertex_data[i + 1] += y;
+	}
+
+	/* Enable clipping. */
+	glPushAttrib (GL_SCISSOR_BIT);
+	glScissor (rect->x, self->manager->height - rect->y - rect->height, rect->width, rect->height);
+	glEnable (GL_SCISSOR_TEST);
+
+	/* Render glyphs. */
+	liren_context_set_diffuse (self->manager->context, self->color);
+	liren_context_set_buffer (self->manager->context, NULL);
+	liren_context_set_projection (self->manager->context, &self->manager->projection);
+	liren_context_set_shader (self->manager->context, self->manager->shader);
+	for (i = 0 ; i < text->n_glyphs ; i++)
+	{
+		glyph = text->glyphs + i;
+		liren_context_set_textures_raw (self->manager->context, &glyph->font->texture, 1);
+		liren_context_bind (self->manager->context);
+		glBegin (GL_TRIANGLES);
+		int j;
+		for (j = 0 ; j < 6 ; j++)
+		{
+			glVertexAttrib2fv (LIREN_ATTRIBUTE_TEXCOORD, vertex_data + 5 * index_data[6 * i + j] + 0);
+			glVertexAttrib2fv (LIREN_ATTRIBUTE_COORD, vertex_data + 5 * index_data[6 * i + j] + 2);
+		}
+		glEnd ();
+	}
+
+	/* Disable clipping. */
+	glPopAttrib ();
+	lisys_free (index_data);
+	lisys_free (vertex_data);
+#endif
+}
+
+/**
+ * \brief Paints a textured rectangle.
+ * \param self Style.
+ * \param u0 UV coordinate of the top-left corner.
+ * \param v0 UV coordinate of the top-left corner.
+ * \param x0 XY coordinate of the top-left corner.
+ * \param y0 XY coordinate of the top-left corner.
+ * \param u1 UV coordinate of the bottom-right corner.
+ * \param v1 UV coordinate of the bottom-right corner.
+ * \param x1 XY coordinate of the bottom-right corner.
+ * \param y1 XY coordinate of the bottom-right corner.
+ */
+void liwdg_style_paint_textured_quad (
+	LIWdgStyle* self,
+	float       u0,
+	float       v0,
+	float       x0,
+	float       y0,
+	float       u1,
+	float       v1,
+	float       x1,
+	float       y1)
+{
+	uint32_t index_data[6] = { 0, 1, 2, 1, 2, 3 };
+	float white[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	float vertex_data[20] =
+	{
+		u0, v0, x0, y0, 0.0f,
+		u1, v0, x1, y0, 0.0f,
+		u0, v1, x0, y1, 0.0f,
+		u1, v1, x1, y1, 0.0f
+	};
+#if 0
+	LIRenFormat vertex_format =
+	{
+		5 * sizeof (float),
+		GL_FLOAT, 0,
+		0, 0,
+		GL_FLOAT, 2 * sizeof (float)
+	};
+	LIRenBuffer buffer;
+
+	if (!liren_buffer_init (&buffer, index_data, 6, &vertex_format, vertex_data, 4, LIREN_BUFFER_TYPE_STREAM))
+		return;
+	liren_context_set_buffer (self->manager->context, &buffer);
+	liren_context_set_diffuse (self->manager->context, white);
+	liren_context_set_projection (self->manager->context, &self->manager->projection);
+	liren_context_set_shader (self->manager->context, self->manager->shader);
+	liren_context_set_textures_raw (self->manager->context, &self->texture->texture, 1);
+	liren_context_bind (self->manager->context);
+	liren_context_render_indexed (self->manager->context, 0, 6);
+	liren_context_set_buffer (self->manager->context, NULL);
+	liren_buffer_free (&buffer);
+#else
+	liren_context_set_buffer (self->manager->context, NULL);
+	liren_context_set_diffuse (self->manager->context, white);
+	liren_context_set_projection (self->manager->context, &self->manager->projection);
+	liren_context_set_shader (self->manager->context, self->manager->shader);
+	liren_context_set_textures_raw (self->manager->context, &self->texture->texture, 1);
+	liren_context_bind (self->manager->context);
+	glBegin (GL_TRIANGLES);
+	int i;
+	for (i = 0 ; i < 6 ; i++)
+	{
+		glVertexAttrib2fv (LIREN_ATTRIBUTE_TEXCOORD, vertex_data + 5 * index_data[i] + 0);
+		glVertexAttrib2fv (LIREN_ATTRIBUTE_COORD, vertex_data + 5 * index_data[i] + 2);
+	}
+	glEnd ();
+#endif
+}
+
+/**
+ * \brief Paints a textured rectangle.
+ * \param self Style.
+ * \param rect Rectangle.
+ * \param u0 UV coordinate of the top-left corner.
+ * \param v0 UV coordinate of the top-left corner.
+ * \param u1 UV coordinate of the bottom-right corner.
+ * \param v1 UV coordinate of the bottom-right corner.
+ */
+void liwdg_style_paint_textured_rect (
+	LIWdgStyle*      self,
+	const LIWdgRect* rect,
+	float            u0,
+	float            v0,
+	float            u1,
+	float            v1)
+{
+	liwdg_style_paint_textured_quad (self, u0, v0, rect->x, rect->y,
+		u1, v1, rect->x + rect->width, rect->y + rect->height);
 }
 
 /*****************************************************************************/
 
-static void
-private_paint_scaled (LIWdgStyle* self,
-                      LIWdgRect*  rect)
+static void private_paint_scaled (
+	LIWdgStyle* self,
+	LIWdgRect*  rect)
 {
-	int px;
-	int py;
-	int pw;
-	int ph;
 	float center;
 	float size;
 	float xs;
@@ -102,28 +343,13 @@ private_paint_scaled (LIWdgStyle* self,
 		tx[1] = center + 0.5f * rect->width / ys;
 	}
 
-	/* Bind texture. */
-	glBindTexture (GL_TEXTURE_2D, self->texture->texture);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	glColor3f (1.0f, 1.0f, 1.0f);
-
 	/* Paint fill. */
-	px = rect->x;
-	py = rect->y;
-	pw = rect->width;
-	ph = rect->height;
-	glBegin (GL_TRIANGLE_STRIP);
-	glTexCoord2f (tx[0], ty[0]); glVertex2f (px     , py);
-	glTexCoord2f (tx[1], ty[0]); glVertex2f (px + pw, py);
-	glTexCoord2f (tx[0], ty[1]); glVertex2f (px     , py + ph);
-	glTexCoord2f (tx[1], ty[1]); glVertex2f (px + pw, py + ph);
-	glEnd ();
+	liwdg_style_paint_textured_rect (self, rect, tx[0], ty[0], tx[1], ty[1]);
 }
 
-static void
-private_paint_tiled (LIWdgStyle* self,
-                     LIWdgRect*  rect)
+static void private_paint_tiled (
+	LIWdgStyle* self,
+	LIWdgRect*  rect)
 {
 	int px;
 	int py;
@@ -154,83 +380,53 @@ private_paint_tiled (LIWdgStyle* self,
 	ty[2] = (float)(self->y + self->h[0] + self->h[1]) / self->texture->height;
 	ty[3] = (float)(self->y + self->h[0] + self->h[1] + self->h[2]) / self->texture->height;
 
-	/* Bind texture. */
-	glBindTexture (GL_TEXTURE_2D, self->texture->texture);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glColor3f (1.0f, 1.0f, 1.0f);
-
 	/* Paint corners. */
 	px = rect->x;
 	py = rect->y;
-	glBegin (GL_TRIANGLE_STRIP);
-	glTexCoord2f (tx[0], ty[0]); glVertex2f (px       , py);
-	glTexCoord2f (tx[1], ty[0]); glVertex2f (px + w[0], py);
-	glTexCoord2f (tx[0], ty[1]); glVertex2f (px       , py + h[0]);
-	glTexCoord2f (tx[1], ty[1]); glVertex2f (px + w[0], py + h[0]);
-	glEnd ();
+	liwdg_style_paint_textured_quad (self,
+		tx[0], ty[0], px, py,
+		tx[1], ty[1], px + w[0], py + h[0]);
 	px = rect->x + rect->width - w[2] - 1;
-	glBegin (GL_TRIANGLE_STRIP);
-	glTexCoord2f (tx[2], ty[0]); glVertex2f (px       , py);
-	glTexCoord2f (tx[3], ty[0]); glVertex2f (px + w[2], py);
-	glTexCoord2f (tx[2], ty[1]); glVertex2f (px       , py + h[0]);
-	glTexCoord2f (tx[3], ty[1]); glVertex2f (px + w[2], py + h[0]);
-	glEnd ();
+	liwdg_style_paint_textured_quad (self,
+		tx[2], ty[0], px, py,
+		tx[3], ty[1], px + w[2], py + h[0]);
 	py = rect->y + rect->height - h[2] - 1;
-	glBegin (GL_TRIANGLE_STRIP);
-	glTexCoord2f (tx[2], ty[2]); glVertex2f (px       , py);
-	glTexCoord2f (tx[3], ty[2]); glVertex2f (px + w[2], py);
-	glTexCoord2f (tx[2], ty[3]); glVertex2f (px       , py + h[2]);
-	glTexCoord2f (tx[3], ty[3]); glVertex2f (px + w[2], py + h[2]);
-	glEnd ();
+	liwdg_style_paint_textured_quad (self,
+		tx[2], ty[2], px, py,
+		tx[3], ty[3], px + w[2], py + h[2]);
 	px = rect->x;
-	glBegin (GL_TRIANGLE_STRIP);
-	glTexCoord2f (tx[0], ty[2]); glVertex2f (px       , py);
-	glTexCoord2f (tx[1], ty[2]); glVertex2f (px + w[0], py);
-	glTexCoord2f (tx[0], ty[3]); glVertex2f (px       , py + h[2]);
-	glTexCoord2f (tx[1], ty[3]); glVertex2f (px + w[0], py + h[2]);
-	glEnd ();
+	liwdg_style_paint_textured_quad (self,
+		tx[0], ty[2], px, py,
+		tx[1], ty[3], px + w[0], py + h[2]);
 
 	/* Paint horizontal borders. */
 	for (px = rect->x + w[0] ; px < rect->x + rect->width - w[2] ; px += w[1])
 	{
 		fw = LIMAT_MIN (w[1], rect->x + rect->width - px - w[2] - 1);
-		fu = tx[1] + (tx[2] - tx[1]) * fw / w[1];
+		fu = (tx[2] - tx[1]) * fw / w[1];
 		py = rect->y;
-		glBegin (GL_TRIANGLE_STRIP);
-		glTexCoord2f (tx[1], ty[0]); glVertex2f (px     , py);
-		glTexCoord2f (fu   , ty[0]); glVertex2f (px + fw, py);
-		glTexCoord2f (tx[1], ty[1]); glVertex2f (px     , py + h[0]);
-		glTexCoord2f (fu   , ty[1]); glVertex2f (px + fw, py + h[0]);
-		glEnd ();
+		liwdg_style_paint_textured_quad (self,
+			tx[1], ty[0], px, py,
+			tx[1] + fu, ty[1], px + fw, py + h[0]);
 		py = rect->y + rect->height - h[2] - 1;
-		glBegin (GL_TRIANGLE_STRIP);
-		glTexCoord2f (tx[1], ty[2]); glVertex2f (px     , py);
-		glTexCoord2f (fu   , ty[2]); glVertex2f (px + fw, py);
-		glTexCoord2f (tx[1], ty[3]); glVertex2f (px     , py + h[2]);
-		glTexCoord2f (fu   , ty[3]); glVertex2f (px + fw, py + h[2]);
-		glEnd ();
+		liwdg_style_paint_textured_quad (self,
+			tx[1], ty[2], px, py,
+			tx[1] + fu, ty[3], px + fw, py + h[2]);
 	}
 
 	/* Paint vertical borders. */
 	for (py = rect->y + h[0] ; py < rect->y + rect->height - h[2] ; py += h[1])
 	{
 		fh = LIMAT_MIN (h[1], rect->y + rect->height - py - h[2] - 1);
-		fv = ty[1] + (ty[2] - ty[1]) * fh / h[1];
+		fv = (ty[2] - ty[1]) * fh / h[1];
 		px = rect->x;
-		glBegin (GL_TRIANGLE_STRIP);
-		glTexCoord2f (tx[0], ty[1]); glVertex2f (px       , py);
-		glTexCoord2f (tx[1], ty[1]); glVertex2f (px + w[0], py);
-		glTexCoord2f (tx[0], fv   ); glVertex2f (px       , py + fh);
-		glTexCoord2f (tx[1], fv   ); glVertex2f (px + w[0], py + fh);
-		glEnd ();
+		liwdg_style_paint_textured_quad (self,
+			tx[0], ty[1], px, py,
+			tx[1], ty[1] + fv, px + w[0], py + fh);
 		px = rect->x + rect->width - w[2] - 1;
-		glBegin (GL_TRIANGLE_STRIP);
-		glTexCoord2f (tx[2], ty[1]); glVertex2f (px       , py);
-		glTexCoord2f (tx[3], ty[1]); glVertex2f (px + w[2], py);
-		glTexCoord2f (tx[2], fv   ); glVertex2f (px       , py + fh);
-		glTexCoord2f (tx[3], fv   ); glVertex2f (px + w[2], py + fh);
-		glEnd ();
+		liwdg_style_paint_textured_quad (self,
+			tx[2], ty[1], px, py,
+			tx[3], ty[1] + fv, px + w[0], py + fh);
 	}
 
 	/* Paint fill. */
@@ -239,13 +435,10 @@ private_paint_tiled (LIWdgStyle* self,
 	{
 		fw = LIMAT_MIN (w[1], rect->x + rect->width - px - w[2] - 1);
 		fh = LIMAT_MIN (h[1], rect->y + rect->height - py - h[2] - 1);
-		fu = tx[1] + (tx[2] - tx[1]) * fw / w[1];
-		fv = ty[1] + (ty[2] - ty[1]) * fh / h[1];
-		glBegin (GL_TRIANGLE_STRIP);
-		glTexCoord2f (tx[1], ty[1]); glVertex2f (px     , py);
-		glTexCoord2f (fu   , ty[1]); glVertex2f (px + fw, py);
-		glTexCoord2f (tx[1], fv   ); glVertex2f (px     , py + fh);
-		glTexCoord2f (fu   , fv   ); glVertex2f (px + fw, py + fh);
-		glEnd ();
+		fu = (tx[2] - tx[1]) * fw / w[1];
+		fv = (ty[2] - ty[1]) * fh / h[1];
+		liwdg_style_paint_textured_quad (self,
+			tx[1], ty[1], px, py,
+			tx[1] + fu, ty[1] + fv, px + fw, py + fh);
 	}
 }

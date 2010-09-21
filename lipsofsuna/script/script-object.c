@@ -622,7 +622,7 @@ void liscr_script_object (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_OBJECT, data);
-	liscr_class_inherit (self, liscr_script_class, data);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_mfunc (self, "add_model", Object_add_model);
 	liscr_class_insert_mfunc (self, "animate", Object_animate);
 	liscr_class_insert_mfunc (self, "calculate_bounds", Object_calculate_bounds);

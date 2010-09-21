@@ -106,26 +106,37 @@ void liext_speeches_render (
 	const LIMatMatrix* modelview,
 	const int*         viewport)
 {
+	int i;
+	int j;
+	int x;
+	int y;
+	int w;
+	int h;
+	float* vertex_data;
+	uint32_t* index_data;
 	int width;
+	float diffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	LIAlgU32dicIter iter;
 	LIAlgList* ptr;
 	LIExtObject* object;
 	LIExtSpeech* speech;
+	LIFntLayout* text;
+	LIFntLayoutGlyph* glyph;
+	LIMatMatrix matrix;
 	LIMatVector win;
+	LIRenShader* shader;
+	LIRenRender* render = self->client->render;
 
-	/* Set 2D mode. */
-	glMatrixMode (GL_PROJECTION);
-	glPushMatrix ();
-	glLoadIdentity();
-	glOrtho (0, viewport[2], 0, viewport[3], -100.0f, 100.0f);
-	glMatrixMode (GL_MODELVIEW);
-	glPushMatrix ();
-	glLoadIdentity ();
-
-	self->video->glEnable (GL_TEXTURE_2D);
-	self->video->glEnable (GL_BLEND);
-	self->video->glDisable (GL_CULL_FACE);
-	self->video->glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	shader = liren_render_find_shader (render, "widget");
+	if (shader == NULL)
+		return;
+	matrix = limat_matrix_ortho (0, viewport[2], 0, viewport[3], -100.0f, 100.0f);
+	liren_context_set_shader (render->context, shader);
+	liren_context_set_blend (render->context, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	liren_context_set_buffer (render->context, NULL);
+	liren_context_set_cull (render->context, 0, GL_CCW);
+	liren_context_set_depth (render->context, 0, 0, GL_LEQUAL);
+	liren_context_set_projection (render->context, &matrix);
 	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		object = iter.value;
@@ -141,24 +152,50 @@ void liext_speeches_render (
 		for (ptr = object->speech ; ptr != NULL ; ptr = ptr->next)
 		{
 			speech = ptr->data;
-			win.y += lifnt_layout_get_height (speech->text);
-			width = lifnt_layout_get_width (speech->text) / 2;
-			self->video->glPushMatrix ();
-			self->video->glTranslatef (win.x - width, win.y, 0.0f);
-			self->video->glScalef (1.0f, -1.0f, 1.0f);
-			self->video->glColor4f (0.0f, 0.0f, 0.0f, speech->alpha);
-			lifnt_layout_render (speech->text, 1, -1);
-			self->video->glColor4f (1.0f, 1.0f, 1.0f, speech->alpha);
-			lifnt_layout_render (speech->text, 0, 0);
-			self->video->glPopMatrix ();
+			text = speech->text;
+			win.y += lifnt_layout_get_height (text);
+			width = lifnt_layout_get_width (text) / 2;
+			diffuse[3] = speech->alpha;
+			liren_context_set_diffuse (render->context, diffuse);
+
+			/* Get vertex data. */
+			if (!text->n_glyphs)
+				continue;
+			if (!lifnt_layout_get_vertices (text, &index_data, &vertex_data))
+				continue;
+
+			/* Apply translation and scaling. */
+			w = lifnt_layout_get_width (text);
+			h = lifnt_layout_get_height (text);
+			x = win.x - width;
+			y = win.y;
+			for (i = 2 ; i < text->n_glyphs * 20 ; i += 5)
+			{
+				glyph = text->glyphs + i;
+				vertex_data[i + 0] += x;
+				vertex_data[i + 1] *= -1.0f;
+				vertex_data[i + 1] += y;
+			}
+
+			/* Render glyphs. */
+			for (i = 0 ; i < text->n_glyphs ; i++)
+			{
+				glyph = text->glyphs + i;
+				liren_context_set_textures_raw (render->context, &glyph->font->texture, 1);
+				liren_context_bind (render->context);
+				glBegin (GL_TRIANGLES);
+				for (j = 0 ; j < 6 ; j++)
+				{
+					glVertexAttrib2fv (LIREN_ATTRIBUTE_TEXCOORD, vertex_data + 5 * index_data[6 * i + j] + 0);
+					glVertexAttrib2fv (LIREN_ATTRIBUTE_COORD, vertex_data + 5 * index_data[6 * i + j] + 2);
+				}
+				glEnd ();
+			}
+
+			lisys_free (index_data);
+			lisys_free (vertex_data);
 		}
 	}
-
-	 /* Reset mode. */
-	glMatrixMode (GL_PROJECTION);
-	glPopMatrix ();
-	glMatrixMode (GL_MODELVIEW);
-	glPopMatrix ();
 }
 
 /**

@@ -39,6 +39,8 @@ struct _LIWdgButton
 {
 	LIWdgWidget base;
 	LIFntLayout* text;
+	float halign;
+	float valign;
 	char* string;
 };
 

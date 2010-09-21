@@ -278,6 +278,18 @@ void liren_context_set_depth (
 	}
 }
 
+void liren_context_set_diffuse (
+	LIRenContext* self,
+	const float*  value)
+{
+	if (memcpy (self->material.diffuse, value, 4 * sizeof (float)))
+	{
+		memcpy (self->material.diffuse, value, 4 * sizeof (float));
+		self->changed.material = 1;
+		self->changed.uniforms = 1;
+	}
+}
+
 void liren_context_set_flags (
 	LIRenContext* self,
 	int           value)
@@ -485,7 +497,8 @@ void liren_context_set_textures_raw (
 	{
 		for (i = 0 ; i < c ; i++)
 		{
-			if (self->textures.array[i].texture != value[i])
+			if (self->textures.array[i].texture != value[i] ||
+			    self->textures.array[i].sampler != 0)
 				break;
 		}
 		if (i == c)

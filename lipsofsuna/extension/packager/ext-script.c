@@ -99,7 +99,7 @@ void liext_script_packager (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_PACKAGER, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "cancel", Packager_cancel);
 	liscr_class_insert_cfunc (self, "save", Packager_save);
 	liscr_class_insert_cvar (self, "verbose", Packager_getter_verbose, Packager_setter_verbose);

@@ -95,7 +95,7 @@ void
 liscr_script_event (LIScrClass* self,
                   void*       data)
 {
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Event_new);
 	liscr_class_insert_mvar (self, "type", Event_getter_type, Event_setter_type);
 }

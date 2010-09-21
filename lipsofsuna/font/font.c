@@ -110,59 +110,6 @@ lifnt_font_free (LIFntFont* self)
 }
 
 /**
- * \brief Renders a single glyph.
- *
- * \param self A font.
- * \param x X coordinate of the glyph.
- * \param y Y coordinate of the glyph.
- * \param glyph A glyph.
- */
-void
-lifnt_font_render (LIFntFont* self,
-                   int        x,
-                   int        y,
-                   wchar_t    glyph)
-{
-	float tex_x;
-	float tex_y;
-	float tex_w;
-	float tex_h;
-	LIFntFontGlyph* cached;
-
-	/* Get tile. */
-	cached = lialg_u32dic_find (self->index, glyph);
-	if (cached == NULL)
-	{
-		cached = private_cache_glyph (self, glyph);
-		if (cached == NULL)
-			return;
-	}
-
-	/* Get texture rectangle. */
-	tex_x = cached->table_x * self->table_glyph_width / (float) LIFNT_CACHE_WIDTH;
-	tex_y = cached->table_y * self->table_glyph_height / (float) LIFNT_CACHE_HEIGHT;
-	tex_w = cached->width / (float) LIFNT_CACHE_WIDTH;
-	tex_h = cached->height / (float) LIFNT_CACHE_HEIGHT;
-
-	/* Render tile. */
-	glBindTexture (GL_TEXTURE_2D, self->texture);
-	glBegin (GL_TRIANGLE_STRIP);
-	glTexCoord2f (tex_x, tex_y);
-	glVertex2f (x + cached->bearing_x,
-	            y - cached->bearing_y);
-	glTexCoord2f (tex_x + tex_w, tex_y);
-	glVertex2f (x + cached->bearing_x + cached->width,
-	            y - cached->bearing_y);
-	glTexCoord2f (tex_x, tex_y + tex_h);
-	glVertex2f (x + cached->bearing_x,
-	            y - cached->bearing_y + cached->height);
-	glTexCoord2f (tex_x + tex_w, tex_y + tex_h);
-	glVertex2f (x + cached->bearing_x + cached->width,
-	            y - cached->bearing_y + cached->height);
-	glEnd ();
-}
-
-/**
  * \brief Gets the horizontal advance of the glyph.
  *
  * \param self A font.
@@ -190,6 +137,61 @@ int
 lifnt_font_get_height (const LIFntFont* self)
 {
 	return self->font_height;
+}
+
+/**
+ * \brief Gets the vertices of a glyph.
+ * \param self Font.
+ * \param glyph Glyph code.
+ * \param result Return location for 20 floats.
+ */
+void lifnt_font_get_vertices (
+	LIFntFont* self,
+	wchar_t    glyph,
+	float*     result)
+{
+	float tex_x;
+	float tex_y;
+	float tex_w;
+	float tex_h;
+	LIFntFontGlyph* cached;
+
+	/* Get tile. */
+	cached = lialg_u32dic_find (self->index, glyph);
+	if (cached == NULL)
+	{
+		cached = private_cache_glyph (self, glyph);
+		if (cached == NULL)
+			return;
+	}
+
+	/* Get texture rectangle. */
+	tex_x = cached->table_x * self->table_glyph_width / (float) LIFNT_CACHE_WIDTH;
+	tex_y = cached->table_y * self->table_glyph_height / (float) LIFNT_CACHE_HEIGHT;
+	tex_w = cached->width / (float) LIFNT_CACHE_WIDTH;
+	tex_h = cached->height / (float) LIFNT_CACHE_HEIGHT;
+
+	/* Write texture and vertex coordinates. */
+	result[0] = tex_x;
+	result[1] = tex_y;
+	result[2] = cached->bearing_x;
+	result[3] = -cached->bearing_y;
+	result[4] = 0.0f;
+	result[5] = tex_x + tex_w;
+	result[6] = tex_y;
+	result[7] = cached->bearing_x + cached->width;
+	result[8] = -cached->bearing_y;
+	result[9] = 0.0f;
+	result[10] = tex_x;
+	result[11] = tex_y + tex_h;
+	result[12] = cached->bearing_x;
+	result[13] = -cached->bearing_y + cached->height;
+	result[14] = 0.0f;
+	result[15] = tex_x + tex_w;
+	result[16] = tex_y + tex_h;
+	result[17] = cached->bearing_x + cached->width;
+	result[18] = -cached->bearing_y + cached->height;
+	result[19] = 0.0f;
 }
 
 /*****************************************************************************/

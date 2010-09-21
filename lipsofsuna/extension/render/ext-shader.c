@@ -117,7 +117,7 @@ void liext_script_shader (
 	LIScrClass* self,
 	void*       data)
 {
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SHADER, data);
 	liscr_class_insert_cfunc (self, "new", Shader_new);
 	liscr_class_insert_mfunc (self, "compile", Shader_compile);

@@ -18,46 +18,44 @@
 /**
  * \addtogroup liwdg Widget
  * @{
- * \addtogroup LIWdgProgress Progress
+ * \addtogroup LIWdgStyles Styles
  * @{
  */
 
-#ifndef __WIDGET_PROGRESS_H__
-#define __WIDGET_PROGRESS_H__
+#ifndef __WIDGET_STYLES_H__
+#define __WIDGET_STYLES_H__
 
-#include <lipsofsuna/font.h>
+#include <lipsofsuna/image.h>
 #include <lipsofsuna/system.h>
-#include "widget.h"
+#include "widget-style.h"
+#include "widget-types.h"
 
-#define LIWDG_PROGRESS(o) ((LIWdgProgress*)(o))
-
-typedef struct _LIWdgProgress LIWdgProgress;
-struct _LIWdgProgress
+struct _LIWdgStyles
 {
-	LIWdgWidget base;
-	LIFntLayout* text;
-	char* string;
-	float value;
+	char* root;
+	LIWdgManager* manager;
+	LIWdgStyle fallback;
+	LIAlgStrdic* fonts;
+	LIAlgStrdic* images;
+	LIAlgStrdic* subimgs;
 };
 
-LIAPICALL (const LIWdgClass*, liwdg_widget_progress, ());
+LIAPICALL (LIWdgStyles*, liwdg_styles_new, (
+	LIWdgManager* manager,
+	const char*   root));
 
-LIAPICALL (LIWdgWidget*, liwdg_progress_new, (
-	LIWdgManager* manager));
+LIAPICALL (void, liwdg_styles_free, (
+	LIWdgStyles* self));
 
-LIAPICALL (int, liwdg_progress_set_text, (
-	LIWdgProgress* self,
-	const char*    text));
+LIAPICALL (int, liwdg_styles_add_font, (
+	LIWdgStyles* self,
+	const char*  name,
+	LIArcReader* reader));
 
-LIAPICALL (const char*, liwdg_progress_get_text, (
-	LIWdgProgress* self));
-
-LIAPICALL (float, liwdg_progress_get_value, (
-	LIWdgProgress* self));
-
-LIAPICALL (void, liwdg_progress_set_value, (
-	LIWdgProgress* self,
-	float          value));
+LIAPICALL (int, liwdg_styles_add_widget, (
+	LIWdgStyles* self,
+	const char*  name,
+	LIArcReader* reader));
 
 #endif
 

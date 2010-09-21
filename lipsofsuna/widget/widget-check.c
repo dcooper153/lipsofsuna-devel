@@ -146,8 +146,8 @@ static int
 private_event (LIWdgCheck* self,
                LIWdgEvent* event)
 {
-	int h;
 	LIWdgRect rect;
+	LIWdgStyle* style;
 
 	switch (event->type)
 	{
@@ -164,11 +164,10 @@ private_event (LIWdgCheck* self,
 			lical_callbacks_call (LIWDG_WIDGET (self)->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self);
 			return 0;
 		case LIWDG_EVENT_TYPE_RENDER:
+			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
 			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
-			glColor4fv (LIWDG_WIDGET (self)->style->color);
-			h = lifnt_layout_get_height (self->text);
-			lifnt_layout_render (self->text, rect.x, rect.y + (rect.height - h) / 2 - 2);
+			liwdg_style_paint_text (style, self->text, 0.0f, 0.5f, &rect);
 			return 1;
 	}
 

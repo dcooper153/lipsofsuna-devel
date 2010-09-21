@@ -446,7 +446,7 @@ void liext_script_material (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_MATERIAL, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Material_new);
 	liscr_class_insert_mvar (self, "diffuse0", Material_getter_diffuse0, Material_setter_diffuse0);
 	liscr_class_insert_mvar (self, "diffuse1", Material_getter_diffuse1, Material_setter_diffuse1);

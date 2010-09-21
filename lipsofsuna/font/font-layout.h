@@ -72,6 +72,11 @@ LIAPICALL (void, lifnt_layout_clear, (
 LIAPICALL (int, lifnt_layout_get_height, (
 	LIFntLayout* self));
 
+LIAPICALL (int, lifnt_layout_get_vertices, (
+	LIFntLayout* self,
+	uint32_t**   result_index,
+	float**      result_vertex));
+
 LIAPICALL (int, lifnt_layout_get_width, (
 	LIFntLayout* self));
 

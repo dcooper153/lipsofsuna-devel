@@ -81,7 +81,7 @@ void liext_script_generator_region (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_REGION, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_mvar (self, "point", Region_getter_point, NULL);
 	liscr_class_insert_mvar (self, "size", Region_getter_size, NULL);
 	liscr_class_insert_mvar (self, "type", Region_getter_type, NULL);

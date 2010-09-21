@@ -84,7 +84,6 @@ liscr_class_new_full (LIScrScript* script,
 	if (self == NULL)
 		return NULL;
 	self->script = script;
-	self->base = base;
 
 	/* Allocate class name. */
 	self->name = listr_dup (name);
@@ -125,6 +124,10 @@ liscr_class_new_full (LIScrScript* script,
 	lua_pushvalue (self->script->lua, -1);
 	lua_setmetatable (self->script->lua, -2);
 	lua_pop (self->script->lua, -1);
+
+	/* Setup inheritance. */
+	if (base != NULL)
+		liscr_class_inherit (self, base->meta);
 
 	/* Default meta functions. */
 	liscr_class_insert_func (self, "__call", liscr_class_default___call);
@@ -178,18 +181,28 @@ liscr_class_free (LIScrClass* self)
 }
 
 /**
- * \brief Inherits members from another class.
- *
+ * \brief Inherits from another class.
  * \param self Class.
- * \param init Class initializer.
- * \param data Class userdata.
+ * \param meta Class meta string.
+ * \return Nonzero on success.
  */
-void
-liscr_class_inherit (LIScrClass*    self,
-                     LIScrClassInit init,
-                     void*          data)
+int liscr_class_inherit (
+	LIScrClass* self,
+	const char* meta)
 {
-	init (self, data);
+	LIAlgStrdicIter iter;
+
+	/* Set the base class. */
+	self->base = liscr_script_find_class (self->script, meta);
+	if (self->base == NULL)
+		return 0;
+
+	/* Copy userdata from the base class. This will allow the methods
+	   of the base classes to successfully access their data. */
+	LIALG_STRDIC_FOREACH (iter, self->base->userdata)
+		liscr_class_set_userdata (self, iter.key, iter.value);
+
+	return 1;
 }
 
 /**

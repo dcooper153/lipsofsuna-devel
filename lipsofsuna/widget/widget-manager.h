@@ -29,9 +29,10 @@
 #include <lipsofsuna/callback.h>
 #include <lipsofsuna/font.h>
 #include <lipsofsuna/image.h>
+#include <lipsofsuna/render.h>
 #include <lipsofsuna/system.h>
 #include "widget.h"
-#include "widget-style.h"
+#include "widget-styles.h"
 #include "widget-types.h"
 
 struct _LIWdgManager
@@ -41,6 +42,9 @@ struct _LIWdgManager
 	LIWdgStyles* styles;
 	LICalCallbacks* callbacks;
 	LIMatMatrix projection;
+	LIRenContext* context;
+	LIRenRender* render;
+	LIRenShader* shader;
 	LIVidCalls video;
 	struct
 	{
@@ -67,6 +71,7 @@ struct _LIWdgManager
 
 LIAPICALL (LIWdgManager*, liwdg_manager_new, (
 	LIVidCalls*     video,
+	LIRenRender*    render,
 	LICalCallbacks* callbacks,
 	const char*     path));
 

@@ -36,7 +36,7 @@ static int
 private_event (LIWdgButton* self,
                LIWdgEvent*  event);
 
-static void
+static void 
 private_rebuild (LIWdgButton* self);
 
 /****************************************************************************/
@@ -115,8 +115,6 @@ static int
 private_event (LIWdgButton* self,
                LIWdgEvent*  event)
 {
-	int w;
-	int h;
 	LIWdgRect rect;
 	LIWdgStyle* style;
 
@@ -138,15 +136,10 @@ private_event (LIWdgButton* self,
 			private_rebuild (self);
 			break;
 		case LIWDG_EVENT_TYPE_RENDER:
-			w = lifnt_layout_get_width (self->text);
-			h = lifnt_layout_get_height (self->text);
 			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
 			liwdg_widget_get_content (LIWDG_WIDGET (self), &rect);
 			liwdg_widget_paint (LIWDG_WIDGET (self), NULL);
-			glColor4fv (style->color);
-			lifnt_layout_render (self->text,
-				rect.x + (rect.width - w) / 2,
-				rect.y + (rect.height - h) / 2);
+			liwdg_style_paint_text (style, self->text, self->halign, self->valign, &rect);
 			break;
 		case LIWDG_EVENT_TYPE_UPDATE:
 			if (liwdg_widget_get_focused (LIWDG_WIDGET (self)))
@@ -159,19 +152,30 @@ private_event (LIWdgButton* self,
 	return liwdg_widget_widget ()->event (LIWDG_WIDGET (self), event);
 }
 
-static void
-private_rebuild (LIWdgButton* self)
+static void private_rebuild (
+	LIWdgButton* self)
 {
 	int h = 0;
+	int limit;
 	LIFntFont* font;
 
-	lifnt_layout_clear (self->text);
+	/* Set the desired label width. */
 	font = liwdg_widget_get_font (LIWDG_WIDGET (self));
+	limit = LIWDG_WIDGET (self)->userrequest.width;
+	if (limit >= 0)
+		lifnt_layout_set_width_limit (self->text, limit);
+	else
+		lifnt_layout_set_width_limit (self->text, 0);
+
+	/* Rebuild the label layout. */
+	lifnt_layout_clear (self->text);
 	if (font != NULL)
 	{
 		h = lifnt_font_get_height (font);
 		lifnt_layout_append_string (self->text, font, self->string);
 	}
+
+	/* Recalculate the internal size request. */
 	liwdg_widget_set_request_internal (LIWDG_WIDGET (self),
 		lifnt_layout_get_width (self->text), LIMAT_MAX (
 		lifnt_layout_get_height (self->text), h));

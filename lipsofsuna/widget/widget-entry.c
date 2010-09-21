@@ -242,12 +242,7 @@ private_event (LIWdgEntry* self,
 			/* Draw text. */
 			manager = LIWDG_WIDGET (self)->manager;
 			style = liwdg_widget_get_style (LIWDG_WIDGET (self));
-			glPushAttrib (GL_SCISSOR_BIT);
-			glScissor (rect.x, manager->height - rect.y - rect.height, rect.width, rect.height);
-			glEnable (GL_SCISSOR_TEST);
-			glColor4fv (style->color);
-			lifnt_layout_render (self->text, rect.x, rect.y);
-			glPopAttrib ();
+			liwdg_style_paint_text (style, self->text, 0.0f, 0.5f, &rect);
 			return 1;
 		case LIWDG_EVENT_TYPE_UPDATE:
 			focus = liwdg_widget_get_focused (LIWDG_WIDGET (self));

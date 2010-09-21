@@ -79,16 +79,17 @@ private_load_config (LIWdgManager* self,
 
 /**
  * \brief Creates a new widget manager.
- *
  * \param video Video callbacks.
+ * \param render Renderer.
  * \param callbacks Callback manager.
  * \param root Client data directory root.
  * \return New widget manager or NULL.
  */
-LIWdgManager*
-liwdg_manager_new (LIVidCalls*     video,
-                   LICalCallbacks* callbacks,
-                   const char*     root)
+LIWdgManager* liwdg_manager_new (
+	LIVidCalls*     video,
+	LIRenRender*    render,
+	LICalCallbacks* callbacks,
+	const char*     root)
 {
 	LIWdgManager* self;
 
@@ -100,6 +101,8 @@ liwdg_manager_new (LIVidCalls*     video,
 	self->width = 640;
 	self->height = 480;
 	self->video = *video;
+	self->render = render;
+	self->context = liren_render_get_context (render);
 	self->projection = limat_matrix_identity ();
 
 	/* Load config and resources. */
@@ -556,23 +559,25 @@ liwdg_manager_remove_window (LIWdgManager* self,
 void
 liwdg_manager_render (LIWdgManager* self)
 {
+	LIMatMatrix matrix;
 	LIWdgWidget* widget;
+
+	/* Find the widget shader. */
+	self->shader = liren_render_find_shader (self->render, "widget");
+	if (self->shader == NULL)
+		return;
+
+	/* Initialize render mode. */
+	matrix = limat_matrix_ortho (0.0f, self->width, self->height, 0.0f, -100.0f, 100.0f);
+	liren_context_init (self->context);
+	liren_context_set_blend (self->context, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	liren_context_set_cull (self->context, 0, GL_CCW);
+	liren_context_set_depth (self->context, 0, 0, GL_LEQUAL);
+	liren_context_set_shader (self->context, self->shader);
+	liren_context_bind (self->context);
 
 	/* Setup viewport. */
 	glViewport (0, 0, self->width, self->height);
-	glMatrixMode (GL_PROJECTION);
-	glLoadIdentity();
-	glOrtho (0, self->width, self->height, 0, -100.0f, 100.0f);
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
-
-	/* Setup render mode. */
-	glEnable (GL_BLEND);
-	glEnable (GL_TEXTURE_2D);
-	glDisable (GL_DEPTH_TEST);
-	glDisable (GL_CULL_FACE);
-	glDepthMask (GL_FALSE);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/* Render widgets. */
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);

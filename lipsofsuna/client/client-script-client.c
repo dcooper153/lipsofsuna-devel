@@ -154,7 +154,7 @@ licli_script_client (LIScrClass* self,
                      void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_CLIENT, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "host", Client_host);
 	liscr_class_insert_cfunc (self, "swap_buffers", Client_swap_buffers);
 	liscr_class_insert_cvar (self, "cursor_pos", Client_getter_cursor_pos, NULL);

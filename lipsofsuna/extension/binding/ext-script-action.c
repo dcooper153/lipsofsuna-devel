@@ -164,7 +164,7 @@ void liext_script_action (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_ACTION, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Action_new);
 	liscr_class_insert_mfunc (self, "free", Action_free);
 	liscr_class_insert_mvar (self, "enabled", Action_getter_enabled, Action_setter_enabled);

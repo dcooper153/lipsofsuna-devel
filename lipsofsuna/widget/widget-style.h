@@ -32,6 +32,7 @@
 struct _LIWdgStyle
 {
 	LIImgTexture* texture;
+	LIWdgManager* manager;
 	int x;
 	int y;
 	int w[3];
@@ -44,36 +45,40 @@ struct _LIWdgStyle
 	float selection[4];
 };
 
-struct _LIWdgStyles
-{
-	char* root;
-	LIWdgManager* manager;
-	LIWdgStyle fallback;
-	LIAlgStrdic* fonts;
-	LIAlgStrdic* images;
-	LIAlgStrdic* subimgs;
-};
-
 LIAPICALL (void, liwdg_style_paint, (
 	LIWdgStyle* self,
 	LIWdgRect*  rect));
 
-LIAPICALL (LIWdgStyles*, liwdg_styles_new, (
-	LIWdgManager* manager,
-	const char*   root));
+void liwdg_style_paint_base (
+	LIWdgStyle* self,
+	LIWdgRect*  rect,
+	LIWdgRect*  clip);
 
-LIAPICALL (void, liwdg_styles_free, (
-	LIWdgStyles* self));
+LIAPICALL (void, liwdg_style_paint_quad, (
+	LIWdgStyle* self,
+	float       u0,
+	float       v0,
+	float       x0,
+	float       y0,
+	float       u1,
+	float       v1,
+	float       x1,
+	float       y1));
 
-LIAPICALL (int, liwdg_styles_add_font, (
-	LIWdgStyles* self,
-	const char*  name,
-	LIArcReader* reader));
+LIAPICALL (void, liwdg_style_paint_rect, (
+	LIWdgStyle*      self,
+	const LIWdgRect* rect,
+	float            u0,
+	float            v0,
+	float            u1,
+	float            v1));
 
-LIAPICALL (int, liwdg_styles_add_widget, (
-	LIWdgStyles* self,
-	const char*  name,
-	LIArcReader* reader));
+LIAPICALL (void, liwdg_style_paint_text, (
+	LIWdgStyle*      self,
+	LIFntLayout*     text,
+	float            halign,
+	float            valign,
+	const LIWdgRect* rect));
 
 #endif
 

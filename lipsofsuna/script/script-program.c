@@ -281,7 +281,7 @@ liscr_script_program (LIScrClass* self,
                       void*       data)
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_PROGRAM, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "launch_mod", Program_launch_mod);
 	liscr_class_insert_cfunc (self, "load_extension", Program_load_extension);
 	liscr_class_insert_cfunc (self, "pop_event", Program_pop_event);

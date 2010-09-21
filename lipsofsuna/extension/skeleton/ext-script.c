@@ -49,7 +49,7 @@ void liext_script_skeleton (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKELETON, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "test", Skeleton_test);
 }
 

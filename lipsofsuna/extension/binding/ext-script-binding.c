@@ -121,7 +121,7 @@ void liext_script_binding (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_BINDING, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Binding_new);
 	liscr_class_insert_mfunc (self, "free", Binding_free);
 }

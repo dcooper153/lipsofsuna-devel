@@ -417,7 +417,7 @@ void
 liscr_script_quaternion (LIScrClass* self,
                        void*       data)
 {
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_func (self, "__add", Quaternion___add);
 	liscr_class_insert_func (self, "__mul", Quaternion___mul);
 	liscr_class_insert_func (self, "__sub", Quaternion___sub);

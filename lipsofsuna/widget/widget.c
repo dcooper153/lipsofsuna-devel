@@ -123,6 +123,7 @@ liwdg_widget_detach (LIWdgWidget* self)
 	{
 		lisys_assert (liwdg_widget_typeis (self->parent, liwdg_widget_container ()));
 		liwdg_container_detach_child (LIWDG_CONTAINER (self->parent), self);
+		lisys_assert (self->parent == NULL);
 		changed = 1;
 	}
 

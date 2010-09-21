@@ -175,8 +175,8 @@ limat_matrix_lookat (float eyex,
 static inline LIMatMatrix
 limat_matrix_ortho (float left,
                     float right,
-                    float top,
                     float bottom,
+                    float top,
                     float nearz,
                     float farz)
 {

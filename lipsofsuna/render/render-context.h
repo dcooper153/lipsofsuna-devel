@@ -150,6 +150,10 @@ LIAPICALL (void, liren_context_set_depth, (
 	int           enable_write,
 	GLenum        depth_func));
 
+LIAPICALL (void, liren_context_set_diffuse, (
+	LIRenContext* self,
+	const float*  value));
+
 LIAPICALL (void, liren_context_set_flags, (
 	LIRenContext* self,
 	int           value));

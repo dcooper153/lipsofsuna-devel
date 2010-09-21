@@ -23,6 +23,7 @@
  */
 
 #include <wctype.h>
+#include <lipsofsuna/render.h>
 #include <lipsofsuna/string.h>
 #include "font-layout.h"
 
@@ -84,25 +85,6 @@ lifnt_layout_free (LIFntLayout* self)
 	lisys_free (self);
 }
 
-void
-lifnt_layout_render (LIFntLayout* self,
-                     int          x,
-                     int          y)
-{
-	int i;
-	LIFntLayoutGlyph* glyph;
-
-	/* Layout glyphs. */
-	private_layout (self);
-
-	/* Render glyphs. */
-	for (i = 0 ; i < self->n_glyphs ; i++)
-	{
-		glyph = self->glyphs + i;
-		lifnt_font_render (glyph->font, x + glyph->x, y + glyph->y, glyph->glyph);
-	}
-}
-
 int
 lifnt_layout_append_string (LIFntLayout* self,
                             LIFntFont*   font,
@@ -162,6 +144,64 @@ lifnt_layout_get_height (LIFntLayout* self)
 {
 	private_layout (self);
 	return self->height;
+}
+
+int lifnt_layout_get_vertices (
+	LIFntLayout* self,
+	uint32_t**   result_index,
+	float**      result_vertex)
+{
+	int i;
+	int j;
+	float* vertices;
+	uint32_t* indices;
+	LIFntLayoutGlyph* glyph;
+
+	/* Layout glyphs. */
+	private_layout (self);
+
+	/* Allocate buffer data. */
+	if (self->n_glyphs)
+	{
+		indices = lisys_calloc (6 * self->n_glyphs, sizeof (uint32_t));
+		if (indices == NULL)
+			return 0;
+		vertices = lisys_calloc (20 * self->n_glyphs, sizeof (float));
+		if (vertices == NULL)
+		{
+			lisys_free (indices);
+			return 0;
+		}
+	}
+	else
+	{
+		indices = NULL;
+		vertices = NULL;
+	}
+
+	/* Create vertices and indices. */
+	for (i = 0 ; i < self->n_glyphs ; i++)
+	{
+		glyph = self->glyphs + i;
+		indices[6 * i + 0] = 4 * i + 0;
+		indices[6 * i + 1] = 4 * i + 1;
+		indices[6 * i + 2] = 4 * i + 2;
+		indices[6 * i + 3] = 4 * i + 1;
+		indices[6 * i + 4] = 4 * i + 2;
+		indices[6 * i + 5] = 4 * i + 3;
+		lifnt_font_get_vertices (glyph->font, glyph->glyph, vertices + 20 * i);
+		for (j = 2 ; j < 20 ; j += 5)
+		{
+			vertices[20 * i + j + 0] += glyph->x;
+			vertices[20 * i + j + 1] += glyph->y;
+		}
+	}
+
+	/* Return the buffers. */
+	*result_index = indices;
+	*result_vertex = vertices;
+
+	return 1;
 }
 
 int

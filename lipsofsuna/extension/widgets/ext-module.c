@@ -74,7 +74,7 @@ LIExtModule* liext_widgets_new (
 	}
 
 	/* Allocate the widget manager. */
-	self->widgets = liwdg_manager_new (&self->client->video, self->program->callbacks, self->client->path);
+	self->widgets = liwdg_manager_new (&self->client->video, self->client->render, self->program->callbacks, self->client->path);
 	if (self->widgets == NULL)
 	{
 		liext_widgets_free (self);
@@ -108,11 +108,7 @@ LIExtModule* liext_widgets_new (
 	liscr_script_create_class (program->script, "Button", liext_script_button, self);
 	liscr_script_create_class (program->script, "Entry", liext_script_entry, self);
 	liscr_script_create_class (program->script, "Image", liext_script_image, self);
-	liscr_script_create_class (program->script, "Label", liext_script_label, self);
-	liscr_script_create_class (program->script, "Menu", liext_script_menu, self);
 	liscr_script_create_class (program->script, "Scroll", liext_script_scroll, self);
-	liscr_script_create_class (program->script, "Spin", liext_script_spin, self);
-	liscr_script_create_class (program->script, "Tree", liext_script_tree, self);
 	liscr_script_create_class (program->script, "View", liext_script_view, self);
 
 	return self;

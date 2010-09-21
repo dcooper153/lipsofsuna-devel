@@ -86,6 +86,7 @@ LIWdgStyles* liwdg_styles_new (
 
 	/* Initialize defaults. */
 	memset (tmp, 0, sizeof (tmp));
+	self->fallback.manager = manager;
 	self->fallback.color[0] = 0.0f;
 	self->fallback.color[1] = 0.0f;
 	self->fallback.color[2] = 0.0f;

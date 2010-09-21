@@ -849,7 +849,7 @@ void liext_script_tile (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_TILE, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Tile_new);
 	liscr_class_insert_mfunc (self, "rotate", Tile_rotate);
 	liscr_class_insert_mvar (self, "damage", Tile_getter_damage, Tile_setter_damage);
@@ -862,7 +862,7 @@ void liext_script_voxel (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
-	liscr_class_inherit (self, liscr_script_class, NULL);
+	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "copy_region", Voxel_copy_region);
 	liscr_class_insert_cfunc (self, "fill_region", Voxel_fill_region);
 	liscr_class_insert_cfunc (self, "find_blocks", Voxel_find_blocks);
