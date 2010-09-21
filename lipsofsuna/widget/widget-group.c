@@ -660,9 +660,14 @@ liwdg_group_set_size (LIWdgGroup* self,
 	}
 
 	/* Free widgets that don't fit. */
-	for (y = height ; y < self->height ; y++)
+	for (y = 0 ; y < height ; y++)
 	{
 		for (x = width ; x < self->width ; x++)
+			private_call_detach (self, x, y);
+	}
+	for (y = height ; y < self->height ; y++)
+	{
+		for (x = 0 ; x < self->width ; x++)
 			private_call_detach (self, x, y);
 	}
 
