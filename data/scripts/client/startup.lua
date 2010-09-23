@@ -3,6 +3,7 @@ Startup = Class{name = "Startup"}
 -- Modify these to join a server of your choice.
 Startup.addr = "h.lipsofsuna.org"
 Startup.port = 10101
+Startup.mod = "lipsofsuna"
 
 --- Initializes the startup screen.
 -- @param clss Startup class.
@@ -11,7 +12,7 @@ Startup.init = function(clss)
 		clss.group = Group{cols = 3, rows = 3, behind = true, fullscreen = true, style = "mainmenu"}
 		clss.group:set_expand{col = 1, row = 1}
 		clss.group:set_expand{col = 3}
-		clss.text = Label()
+		clss.text = Button{style = "label"}
 		clss.button_host = Button{style = "mainmenu-label", text = "Host", pressed = function() clss:host() end}
 		clss.button_join = Button{style = "mainmenu-label", text = "Join", pressed = function() clss:join() end}
 		clss.button_quit = Button{style = "mainmenu-label", text = "Quit", pressed = function() Program:shutdown() end}
@@ -28,7 +29,6 @@ Startup.init = function(clss)
 	Sound.music_fading = 5.0
 	Sound.music_volume = 0.2
 	Sound.music = "fairytale8"
-	Reload:reload()
 end
 
 --- Hides the startup screen.
@@ -44,14 +44,14 @@ end
 --- Joins a server.
 -- @param clss Startup class.
 Startup.join = function(clss)
-	Program:launch_mod{name = "lipsofsuna", args = "--join " .. clss.addr .. " " .. clss.port}
+	Program:launch_mod{name = clss.mod, args = "--join " .. clss.addr .. " " .. clss.port}
 	Program.quit = true
 end
 
 --- Hosts a server.
 -- @param clss Startup class.
 Startup.host = function(clss)
-	Program:launch_mod{name = "lipsofsuna", args = "--host localhost " .. clss.port}
+	Program:launch_mod{name = clss.mod, args = "--host localhost " .. clss.port}
 	Program.quit = true
 end
 
