@@ -34,7 +34,7 @@
 typedef struct _LIExtBlock LIExtBlock;
 typedef struct _LIExtModule LIExtModule;
 
-#define LIEXT_SCRIPT_VOXEL "Voxel"
+#define LIEXT_SCRIPT_TILES_RENDER "TilesRender"
 
 struct _LIExtModule
 {
@@ -60,6 +60,12 @@ int liext_tiles_render_build_block (
 
 void liext_tiles_render_clear_all (
 	LIExtModule* self);
+
+/*****************************************************************************/
+
+void liext_script_tiles_render (
+	LIScrClass* self,
+	void*       data);
 
 #endif
 

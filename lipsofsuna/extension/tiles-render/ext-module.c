@@ -52,6 +52,7 @@ LIExtModule* liext_tiles_render_new (
 	LIMaiProgram* program)
 {
 	LIExtModule* self;
+	LIScrClass* clss;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
@@ -91,6 +92,11 @@ LIExtModule* liext_tiles_render_new (
 		liext_tiles_render_free (self);
 		return NULL;
 	}
+
+	/* Extend classes. */
+	clss = liscr_script_find_class (program->script, "Voxel");
+	if (clss != NULL)
+		liext_script_tiles_render (clss, self);
 
 	return self;
 }
