@@ -470,8 +470,6 @@ liimg_dds_load_texture (FILE*     file,
 	/* Load image. */
 	glGenTextures (1, &texture);
 	glBindTexture (GL_TEXTURE_2D, texture);
-	if (!dds.header.mipmaps)
-		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	if (!fmt.compressed)
@@ -537,6 +535,8 @@ liimg_dds_load_texture (FILE*     file,
 			lisys_free (lvl.data);
 		}
 	}
+	if (!dds.header.mipmaps)
+		glGenerateMipmap (GL_TEXTURE_2D);
 
 	return texture;
 }

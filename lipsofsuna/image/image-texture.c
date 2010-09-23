@@ -66,10 +66,10 @@ liimg_texture_new_from_rgba (int         width,
 	self->height = height;
 	glGenTextures (1, &self->texture);
 	glBindTexture (GL_TEXTURE_2D, self->texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+	glGenerateMipmap (GL_TEXTURE_2D);
 
 	return self;
 }
