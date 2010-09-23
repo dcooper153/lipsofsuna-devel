@@ -131,7 +131,7 @@ liren_object_deform (LIRenObject* self)
 			return;
 		memcpy (vertices, self->model->model->vertices.array, size);
 		limdl_pose_transform (self->pose, vertices);
-		liren_buffer_replace_data (buffer, vertices);
+		liren_buffer_upload_vertices (buffer, 0, buffer->vertices.count, vertices);
 		lisys_free (vertices);
 	}
 

@@ -128,6 +128,11 @@ liren_render_free (LIRenRender* self)
 		liren_buffer_free (self->helpers.unit_quad);
 		lisys_free (self->helpers.unit_quad);
 	}
+	if (self->immediate.buffer != NULL)
+	{
+		liren_buffer_free (self->immediate.buffer);
+		lisys_free (self->immediate.buffer);
+	}
 	lisys_free (self->datadir);
 	lisys_free (self->context);
 	lisys_free (self);
@@ -294,6 +299,7 @@ private_init_resources (LIRenRender* self,
 	unsigned char* pixels;
 	const float depth_texture[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	uint32_t quad_index_data[] = { 0, 1, 2, 1, 2, 3 };
+	LIRenFormat immediate_vertex_format = { 32, GL_FLOAT, 24, GL_FLOAT, 12, GL_FLOAT, 0 };
 	LIRenFormat quad_vertex_format = { 20, GL_FLOAT, 12, 0, 0, GL_FLOAT, 0 };
 	const float quad_vertex_data[] =
 	{
@@ -394,8 +400,16 @@ private_init_resources (LIRenRender* self,
 	if (self->helpers.unit_quad == NULL)
 		return 0;
 	if (!liren_buffer_init (self->helpers.unit_quad, quad_index_data, 6,
-	     &quad_vertex_format, &quad_vertex_data, 4, LIREN_BUFFER_TYPE_STREAM))
-		return 1;
+	     &quad_vertex_format, &quad_vertex_data, 4, LIREN_BUFFER_TYPE_STATIC))
+		return 0;
+
+	/* Initialize immediate mode style vertex buffer. */
+	self->immediate.buffer = lisys_calloc (1, sizeof (LIRenBuffer));
+	if (self->immediate.buffer == NULL)
+		return 0;
+	if (!liren_buffer_init (self->immediate.buffer, NULL, 0,
+	     &immediate_vertex_format, NULL, 512, LIREN_BUFFER_TYPE_STREAM))
+		return 0;
 
 	return 1;
 }

@@ -24,6 +24,17 @@
 
 #include "render-buffer.h"
 
+/**
+ * \brief Initializes a vertex buffer.
+ * \param self Buffer.
+ * \param index_data Pointer to an array of 32-bit unsigned indices, or NULL.
+ * \param index_count Number of indices to allocate.
+ * \param vertex_format Vertex format.
+ * \param vertex_data Pointer to vertex format specific array of vertices, or NULL.
+ * \param vertex_count Number of vertices to allocate.
+ * \param type Usage type.
+ * \return Nonzero on success.
+ */
 int liren_buffer_init (
 	LIRenBuffer*       self,
 	const void*        index_data,
@@ -107,6 +118,10 @@ int liren_buffer_init (
 	return 1;
 }
 
+/**
+ * \brief Frees the vertex buffer.
+ * \param self Buffer.
+ */
 void liren_buffer_free (
 	LIRenBuffer* self)
 {
@@ -118,6 +133,11 @@ void liren_buffer_free (
 		glDeleteBuffers (1, &self->vertex_buffer);
 }
 
+/**
+ * \brief Locks the index array for reading or writing.
+ * \param self Buffer.
+ * \return Pointer to the locked array, or NULL.
+ */
 void* liren_buffer_lock_indices (
 	LIRenBuffer* self,
 	int          write)
@@ -139,6 +159,11 @@ void* liren_buffer_lock_indices (
 		return NULL;
 }
 
+/**
+ * \brief Locks the vertex array for reading or writing.
+ * \param self Buffer.
+ * \return Pointer to the locked array, or NULL.
+ */
 void* liren_buffer_lock_vertices (
 	LIRenBuffer* self,
 	int          write)
@@ -157,37 +182,6 @@ void* liren_buffer_lock_vertices (
 	}
 	else
 		return NULL;
-}
-
-void liren_buffer_replace_data (
-	LIRenBuffer* self,
-	void*        data)
-{
-	int size;
-	GLenum mode;
-
-	size = self->vertices.count * self->vertex_format.size;
-	if (self->vertex_buffer)
-	{
-		glBindBuffer (GL_ARRAY_BUFFER, self->vertex_buffer);
-		switch (self->type)
-		{
-			case LIREN_BUFFER_TYPE_DYNAMIC:
-				mode = GL_DYNAMIC_DRAW;
-				break;
-			case LIREN_BUFFER_TYPE_STATIC:
-				mode = GL_STATIC_DRAW;
-				break;
-			case LIREN_BUFFER_TYPE_STREAM:
-				mode = GL_STREAM_DRAW;
-				break;
-			default:
-				lisys_assert (0 && "invalid vbo type");
-				break;
-		}
-		glBufferData (GL_ARRAY_BUFFER, size, data, mode);
-		glBindBuffer (GL_ARRAY_BUFFER, 0);
-	}
 }
 
 void liren_buffer_unlock_indices (
@@ -210,6 +204,34 @@ void liren_buffer_unlock_vertices (
 	{
 		glBindBuffer (GL_ARRAY_BUFFER, self->vertex_buffer);
 		glUnmapBuffer (GL_ARRAY_BUFFER);
+		glBindBuffer (GL_ARRAY_BUFFER, 0);
+	}
+}
+
+/**
+ * \brief Replaces vertex data.
+ * \param self Buffer.
+ * \param start Index of the first replaced vertex.
+ * \param count Number of vertices to replace.
+ */
+void liren_buffer_upload_vertices (
+	LIRenBuffer* self,
+	int          start,
+	int          count,
+	void*        data)
+{
+	int offs;
+	int size;
+
+	lisys_assert (start >= 0);
+	lisys_assert (start + count <= self->vertices.count);
+
+	if (self->vertex_buffer)
+	{
+		offs = start * self->vertex_format.size;
+		size = count * self->vertex_format.size;
+		glBindBuffer (GL_ARRAY_BUFFER, self->vertex_buffer);
+		glBufferSubData (GL_ARRAY_BUFFER, offs, size, data);
 		glBindBuffer (GL_ARRAY_BUFFER, 0);
 	}
 }

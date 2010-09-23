@@ -75,16 +75,18 @@ LIAPICALL (void*, liren_buffer_lock_vertices, (
 	LIRenBuffer* self,
 	int          write));
 
-LIAPICALL (void, liren_buffer_replace_data, (
-	LIRenBuffer* self,
-	void*        data));
-
 LIAPICALL (void, liren_buffer_unlock_indices, (
 	LIRenBuffer* self,
 	void*        data));
 
 LIAPICALL (void, liren_buffer_unlock_vertices, (
 	LIRenBuffer* self,
+	void*        data));
+
+LIAPICALL (void, liren_buffer_upload_vertices, (
+	LIRenBuffer* self,
+	int          start,
+	int          count,
 	void*        data));
 
 LIAPICALL (int, liren_buffer_get_size, (

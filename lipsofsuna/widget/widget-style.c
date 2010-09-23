@@ -83,80 +83,18 @@ void liwdg_style_paint_text (
 	float            valign,
 	const LIWdgRect* rect)
 {
-#if 0
 	int i;
+	int j;
 	int x;
 	int y;
 	int w;
 	int h;
-	int ret;
+	float* vertex;
 	float* vertex_data;
 	uint32_t* index_data;
 	LIFntLayoutGlyph* glyph;
-	LIRenBuffer buffer;
-	LIRenFormat vertex_format =
-	{
-		5 * sizeof (float),
-		GL_FLOAT, 0,
-		0, 0,
-		GL_FLOAT, 2 * sizeof (float)
-	};
-
-	/* Get vertex data. */
-	if (!text->n_glyphs)
-		return;
-	if (!lifnt_layout_get_vertices (text, &index_data, &vertex_data))
-		return;
-
-	/* Apply translation. */
-	w = lifnt_layout_get_width (text);
-	h = lifnt_layout_get_height (text);
-	x = rect->x + (int)(halign * (rect->width - w));
-	y = rect->y + (int)(valign * (rect->height - h));
-	for (i = 2 ; i < text->n_glyphs * 20 ; i += 5)
-	{
-		glyph = text->glyphs + i;
-		vertex_data[i + 0] += x;
-		vertex_data[i + 1] += y;
-	}
-
-	/* Create vertex buffer. */
-	ret = liren_buffer_init (&buffer, index_data, text->n_glyphs * 6,
-		&vertex_format, vertex_data, text->n_glyphs * 4, LIREN_BUFFER_TYPE_STREAM);
-	lisys_free (index_data);
-	lisys_free (vertex_data);
-	if (!ret)
-		return;
-
-	/* Enable clipping. */
-	glPushAttrib (GL_SCISSOR_BIT);
-	glScissor (rect->x, self->manager->height - rect->y - rect->height, rect->width, rect->height);
-	glEnable (GL_SCISSOR_TEST);
-
-	/* Render glyphs. */
-	liren_context_set_diffuse (self->manager->context, self->color);
-	liren_context_set_buffer (self->manager->context, &buffer);
-	liren_context_set_projection (self->manager->context, &self->manager->projection);
-	liren_context_set_shader (self->manager->context, self->manager->shader);
-	for (i = 0 ; i < text->n_glyphs ; i++)
-	{
-		glyph = text->glyphs + i;
-		liren_context_set_textures_raw (self->manager->context, &glyph->font->texture, 1);
-		liren_context_bind (self->manager->context);
-		liren_context_render_indexed (self->manager->context, 6 * i, 6);
-	}
-
-	/* Disable clipping. */
-	glPopAttrib ();
-#else
-	int i;
-	int x;
-	int y;
-	int w;
-	int h;
-	float* vertex_data;
-	uint32_t* index_data;
-	LIFntLayoutGlyph* glyph;
+	LIMatVector coords[6];
+	LIMatVector texcoords[6];
 
 	/* Get vertex data. */
 	if (!text->n_glyphs)
@@ -191,21 +129,19 @@ void liwdg_style_paint_text (
 		glyph = text->glyphs + i;
 		liren_context_set_textures_raw (self->manager->context, &glyph->font->texture, 1);
 		liren_context_bind (self->manager->context);
-		glBegin (GL_TRIANGLES);
-		int j;
 		for (j = 0 ; j < 6 ; j++)
 		{
-			glVertexAttrib2fv (LIREN_ATTRIBUTE_TEXCOORD, vertex_data + 5 * index_data[6 * i + j] + 0);
-			glVertexAttrib2fv (LIREN_ATTRIBUTE_COORD, vertex_data + 5 * index_data[6 * i + j] + 2);
+			vertex = vertex_data + 5 * index_data[6 * i + j];
+			coords[j] = limat_vector_init (vertex[2], vertex[3], vertex[4]);
+			texcoords[j] = limat_vector_init (vertex[0], vertex[1], 0.0f);
 		}
-		glEnd ();
+		liren_context_render_immediate (self->manager->context, GL_TRIANGLES, coords, NULL, texcoords, 6);
 	}
 
 	/* Disable clipping. */
 	glPopAttrib ();
 	lisys_free (index_data);
 	lisys_free (vertex_data);
-#endif
 }
 
 /**
@@ -231,52 +167,23 @@ void liwdg_style_paint_textured_quad (
 	float       x1,
 	float       y1)
 {
-	uint32_t index_data[6] = { 0, 1, 2, 1, 2, 3 };
 	float white[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	float vertex_data[20] =
+	LIMatVector coords[6] =
 	{
-		u0, v0, x0, y0, 0.0f,
-		u1, v0, x1, y0, 0.0f,
-		u0, v1, x0, y1, 0.0f,
-		u1, v1, x1, y1, 0.0f
+		{ x0, y0, 0.0f }, { x1, y0, 0.0f }, { x0, y1, 0.0f },
+		{ x1, y0, 0.0f }, { x0, y1, 0.0f }, { x1, y1, 0.0f }
 	};
-#if 0
-	LIRenFormat vertex_format =
+	LIMatVector texcoords[6] =
 	{
-		5 * sizeof (float),
-		GL_FLOAT, 0,
-		0, 0,
-		GL_FLOAT, 2 * sizeof (float)
+		{ u0, v0, 0.0f }, { u1, v0, 0.0f }, { u0, v1, 0.0f },
+		{ u1, v0, 0.0f }, { u0, v1, 0.0f }, { u1, v1, 0.0f }
 	};
-	LIRenBuffer buffer;
-
-	if (!liren_buffer_init (&buffer, index_data, 6, &vertex_format, vertex_data, 4, LIREN_BUFFER_TYPE_STREAM))
-		return;
-	liren_context_set_buffer (self->manager->context, &buffer);
 	liren_context_set_diffuse (self->manager->context, white);
 	liren_context_set_projection (self->manager->context, &self->manager->projection);
 	liren_context_set_shader (self->manager->context, self->manager->shader);
 	liren_context_set_textures_raw (self->manager->context, &self->texture->texture, 1);
 	liren_context_bind (self->manager->context);
-	liren_context_render_indexed (self->manager->context, 0, 6);
-	liren_context_set_buffer (self->manager->context, NULL);
-	liren_buffer_free (&buffer);
-#else
-	liren_context_set_buffer (self->manager->context, NULL);
-	liren_context_set_diffuse (self->manager->context, white);
-	liren_context_set_projection (self->manager->context, &self->manager->projection);
-	liren_context_set_shader (self->manager->context, self->manager->shader);
-	liren_context_set_textures_raw (self->manager->context, &self->texture->texture, 1);
-	liren_context_bind (self->manager->context);
-	glBegin (GL_TRIANGLES);
-	int i;
-	for (i = 0 ; i < 6 ; i++)
-	{
-		glVertexAttrib2fv (LIREN_ATTRIBUTE_TEXCOORD, vertex_data + 5 * index_data[i] + 0);
-		glVertexAttrib2fv (LIREN_ATTRIBUTE_COORD, vertex_data + 5 * index_data[i] + 2);
-	}
-	glEnd ();
-#endif
+	liren_context_render_immediate (self->manager->context, GL_TRIANGLES, coords, NULL, texcoords, 6);
 }
 
 /**

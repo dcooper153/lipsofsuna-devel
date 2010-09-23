@@ -56,6 +56,11 @@ struct _LIRenRender
 		LIRenBuffer* unit_quad;
 		LIRenImage* empty_image;
 	} helpers;
+	struct
+	{
+		int offset;
+		LIRenBuffer* buffer;
+	} immediate;
 #ifdef LIREN_ENABLE_PROFILING
 	struct
 	{
