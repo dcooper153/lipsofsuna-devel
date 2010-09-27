@@ -81,9 +81,9 @@ class LIAnimation:
 		for bone in armat.pose.bones:
 			for cons in bone.constraints:
 				if cons.type == 'IK' and cons.target and cons.subtarget in self.channeldict:
-					if cons.chain_length > 0:
+					if cons.chain_count > 0:
 						next = bone
-						for i in range(0, cons.chain_length):
+						for i in range(0, cons.chain_count):
 							self.add_channel(next.name)
 							next = bone.parent
 							if not next:
@@ -101,6 +101,9 @@ class LIAnimation:
 				self.channellist.append(name)
 
 	def write(self, writer):
+		# TODO: Make sure that there are no solo tracks.
+		# Make sure that there is no active action.
+		self.armature.animation_data.action = None
 		# Mute tracks that don't belong to the animation.
 		for track in self.armature.animation_data.nla_tracks:
 			if track.name != self.name:
@@ -109,11 +112,14 @@ class LIAnimation:
 				track.mute = False
 		# Reset the armature to the rest pose.
 		self.hierarchy.rest_pose()
+		# Stabilize constraints.
+		bpy.context.scene.frame_set(self.frame_start)
+		bpy.context.scene.frame_set(self.frame_start)
 		# Evaluate channels for each frame.
 		framelist = []
-		for frame in range(self.frame_start, self.frame_end + 1):
+		for frame in range(self.frame_start, self.frame_end):
 			# Switch frame.
-			bpy.context.scene.set_frame(frame)
+			bpy.context.scene.frame_set(frame)
 			# Get channel transformations.
 			xforms = []
 			for chan in self.channellist:
@@ -123,14 +129,14 @@ class LIAnimation:
 		# Writer header.
 		writer.write_string(self.name)
 		writer.write_int(len(self.channellist))
-		writer.write_int(self.frame_end - self.frame_start + 1)
+		writer.write_int(self.frame_end - self.frame_start)
 		writer.write_marker()
 		# Write channel names.
 		for chan in self.channellist:
 			writer.write_string(chan)
 		writer.write_marker()
 		# Write channel transformations.
-		for frame in range(self.frame_start, self.frame_end + 1):
+		for frame in range(self.frame_start, self.frame_end):
 			for chan in range(len(self.channellist)):
 				xform = framelist[frame][chan]
 				writer.write_float(xform[0].x)
@@ -259,7 +265,7 @@ class LIMaterial:
 				self.shader = mat["shader"]
 			except:
 				pass
-			if mat.transparency:
+			if mat.use_transparency:
 				self.flags |= LIFormat.MATRFLAG_ALPHA
 			self.diffuse[0] = mat.diffuse_color[0]
 			self.diffuse[1] = mat.diffuse_color[1]
@@ -285,7 +291,7 @@ class LIMaterial:
 					self.textures.append(LITexture(index, tex, tex.image))
 				index = index + 1
 		# Face texture.
-		if img and ((not mat) or (mat and mat.face_texture)):
+		if img and ((not mat) or (mat and mat.use_face_texture)):
 			if not len(self.textures):
 				self.textures.append(0)
 			self.textures[0] = LITexture(0, None, img)
@@ -331,8 +337,8 @@ class LIMesh:
 		# Emit faces.
 		for face in mesh.faces:
 			# Vertices.
-			verts = [mesh.verts[x] for x in face.verts]
-			indices = [x for x in face.verts]
+			verts = [mesh.vertices[x] for x in face.vertices]
+			indices = [x for x in face.vertices]
 			# Material attributes.
 			idx = face.material_index
 			bmat = None
@@ -340,8 +346,8 @@ class LIMesh:
 			if idx < len(obj.material_slots):
 				bmat = obj.material_slots[idx].material
 			# Texture attributes.
-			if mesh.active_uv_texture:
-				buvs = mesh.active_uv_texture.data[face.index]
+			if mesh.uv_textures.active:
+				buvs = mesh.uv_textures.active.data[face.index]
 				bimg = buvs.image
 				uvs = buvs.uv
 			else:
@@ -358,7 +364,7 @@ class LIMesh:
 			for i in range(0, len(verts)):
 				# Vertex attributes.
 				bvert = verts[i]
-				no = face.smooth and bvert.normal or face.normal
+				no = face.use_smooth and bvert.normal or face.normal
 				uv = uvs[i]
 				# Emit vertex.
 				key = (indices[i], no.x, no.y, no.z, uv[0], uv[1])
@@ -584,7 +590,7 @@ class LINodeBone(LINode):
 
 	# \brief Gets the armature space rest matrix of the bone head.
 	def get_head_rest_matrix(self):
-		return self.bone.matrix_local
+		return self.bone.matrix_local.copy()
 
 	# \brief Gets the armature space rest matrix of the bone tail.
 	def get_tail_rest_matrix(self):
@@ -592,7 +598,7 @@ class LINodeBone(LINode):
 
 	# \brief Gets the armature space pose transformation of the bone head.
 	def get_head_pose_matrix(self):
-		return self.pose_bone.matrix
+		return self.pose_bone.matrix.copy()
 
 	# \brief Gets the armature space pose transformation of the bone tail.
 	def get_tail_pose_matrix(self):
@@ -707,7 +713,7 @@ class LIParticles:
 		if len(self.particlesystems):
 			for frame in range(self.frame_start, self.frame_end):
 				# Switch frame.
-				bpy.context.scene.set_frame(frame)
+				bpy.context.scene.frame_set(frame)
 				# Add particle frame.
 				for sys in self.particlesystems:
 					sys.add_frame()
@@ -792,7 +798,7 @@ class LIShapePart:
 	def __init__(self, obj):
 		self.vertices = []
 		matrix = LIFormat.matrix.copy().to_3x3() * obj.matrix_world.rotation_part()
-		for v in obj.data.verts:
+		for v in obj.data.vertices:
 			self.vertices.append(matrix * v.co)
 
 	def write(self, writer):
@@ -815,13 +821,13 @@ class LITexture:
 		# Parameters.
 		if tex:
 			self.flags = 0
-			if tex.filter == 'REPEAT':
+			if tex.extension == 'REPEAT':
 				self.flags |= LIFormat.TEXFLAG_CLAMP
 			else:
 				self.flags |= LIFormat.TEXFLAG_REPEAT
-			if tex.interpolation:
+			if tex.use_interpolation:
 				self.flags |= LIFormat.TEXFLAG_BILINEAR
-			if tex.mipmap:
+			if tex.use_mipmap:
 				self.flags |= LIFormat.TEXFLAG_MIPMAP
 		# Filename.
 		if img:
@@ -1087,7 +1093,7 @@ class LIExporter(bpy.types.Operator):
 			f.write()
 		# Restore state.
 		bpy.context.scene.layers = origlayers
-		bpy.context.scene.set_frame(origframe)
+		bpy.context.scene.frame_set(origframe)
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
