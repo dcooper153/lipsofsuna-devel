@@ -59,6 +59,8 @@ static void Object_add_model (LIScrArgs* args)
  * -- @param args Arguments.<ul>
  * --   <li>animation: Animation name.</li>
  * --   <li>channel: Channel number.</li>
+ * --   <li>fade_in: Fade in duration in seconds.</li>
+ * --   <li>fade_out: Fade out duration in seconds.</li>
  * --   <li>weight: Blending weight.</li>
  * --   <li>time: Starting time.</li>
  * --   <li>permanent: True if should keep repeating.</li></ul>
@@ -70,12 +72,16 @@ static void Object_animate (LIScrArgs* args)
 	int ret;
 	int repeat = 0;
 	int channel = -1;
+	float fade_in = 0.0f;
+	float fade_out = 0.0f;
 	float weight = 1.0f;
 	float time = 0.0f;
 	const char* animation = NULL;
 
 	liscr_args_gets_string (args, "animation", &animation);
 	liscr_args_gets_int (args, "channel", &channel);
+	liscr_args_gets_float (args, "fade_in", &fade_in);
+	liscr_args_gets_float (args, "fade_out", &fade_out);
 	liscr_args_gets_float (args, "weight", &weight);
 	liscr_args_gets_float (args, "time", &time);
 	liscr_args_gets_bool (args, "permanent", &repeat);
@@ -83,8 +89,40 @@ static void Object_animate (LIScrArgs* args)
 		channel = -1;
 	else
 		channel--;
-	ret = lieng_object_animate (args->self, channel, animation, repeat, weight, time);
+	ret = lieng_object_animate (args->self, channel, animation, repeat, weight, time, fade_in, fade_out);
 	liscr_args_seti_bool (args, ret);
+}
+
+/* @luadoc
+ * --- Fades out an animation channel.
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>channel: Channel number.</li>
+ * --   <li>duration: Fade duration in seconds.</li></ul>
+ * function Object.animate_fade(self, args)
+ */
+static void Object_animate_fade (LIScrArgs* args)
+{
+	int channel = 0;
+	float time = 0.0f;
+	float rate;
+	LIEngObject* object;
+
+	if (!liscr_args_gets_int (args, "channel", &channel))
+		return;
+	liscr_args_gets_float (args, "duration", &time);
+
+	if (channel < 1 || channel > 255)
+		return;
+	channel--;
+	if (time <= 0.0f)
+		rate = 1000.0f;
+	else
+		rate = 1.0f / time;
+
+	object = args->self;
+	if (object->pose != NULL)
+		limdl_pose_fade_channel (object->pose, channel, rate);
 }
 
 /* @luadoc
@@ -625,6 +663,7 @@ void liscr_script_object (
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_mfunc (self, "add_model", Object_add_model);
 	liscr_class_insert_mfunc (self, "animate", Object_animate);
+	liscr_class_insert_mfunc (self, "animate_fade", Object_animate_fade);
 	liscr_class_insert_mfunc (self, "calculate_bounds", Object_calculate_bounds);
 	liscr_class_insert_mfunc (self, "edit_pose", Object_edit_pose);
 	liscr_class_insert_cfunc (self, "find", Object_find);

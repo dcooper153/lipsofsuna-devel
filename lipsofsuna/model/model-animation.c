@@ -413,46 +413,6 @@ int limdl_animation_get_transform (
 	return 1;
 }
 
-/**
- * \brief Gets the weight of the animation at certain point.
- *
- * The three weights passed allow different blending patters,
- * mostly needed for looping:
- *
- * - Loop once: [0,1,0]
- * - Loop twice: [0,1,1] [1,1,0]
- * - Loop thrice: [0,1,1] [1,1,1] [1,1,0]
- * - Loop forever: [1,1,1]
- *
- * \param self Animation.
- * \param time Time into the animation in seconds.
- * \param sweight Starting weight.
- * \param mweight Middle weight.
- * \param eweight Ending weight.
- * \return Value within range from 0.0 to 1.0.
- */
-float limdl_animation_get_weight (
-	const LIMdlAnimation* self,
-	float                 time,
-	float                 sweight,
-	float                 mweight,
-	float                 eweight)
-{
-#warning No animation weights
-#if 0
-	if (time < 0.0f)
-		return sweight;
-	if (time < self->blendin)
-		return sweight + (mweight - sweight) * (time / self->blendin);
-	if (time < self->duration - self->blendout)
-		return mweight;
-	if (time < self->duration)
-		return mweight + (eweight - mweight) * (1.0f - (self->duration - time) / self->blendout);
-	return eweight;
-#endif
-	return 1.0f;
-}
-
 /*****************************************************************************/
 
 static LIMatTransform*

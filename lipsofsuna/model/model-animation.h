@@ -40,8 +40,8 @@ struct _LIMdlAnimation
 {
 	int length;
 	char* name;
-	float blendin;
-	float blendout;
+	float blendin; /* TODO: Not used anymore, remove. */
+	float blendout; /* TODO: Not used anymore, remove. */
 	struct
 	{
 		int count;
@@ -93,13 +93,6 @@ LIAPICALL (int, limdl_animation_get_transform, (
 	const char*     name,
 	float           secs,
 	LIMatTransform* value));
-
-LIAPICALL (float, limdl_animation_get_weight, (
-	const LIMdlAnimation* self,
-	float                 time,
-	float                 sweight,
-	float                 mweight,
-	float                 eweight));
 
 #endif
 

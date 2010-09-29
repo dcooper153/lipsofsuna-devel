@@ -48,6 +48,8 @@ struct _LIMdlPoseChannel
 	int repeats;
 	float time;
 	float priority;
+	float fade_in;
+	float fade_out;
 	LIMdlAnimation* animation;
 };
 
@@ -140,6 +142,16 @@ LIAPICALL (void, limdl_pose_set_channel_animation, (
 	LIMdlPose*  self,
 	int         channel,
 	const char* animation));
+
+LIAPICALL (void, limdl_pose_set_channel_fade_in, (
+	LIMdlPose* self,
+	int        channel,
+	float      value));
+
+LIAPICALL (void, limdl_pose_set_channel_fade_out, (
+	LIMdlPose* self,
+	int        channel,
+	float      value));
 
 LIAPICALL (const char*, limdl_pose_get_channel_name, (
 	const LIMdlPose* self,

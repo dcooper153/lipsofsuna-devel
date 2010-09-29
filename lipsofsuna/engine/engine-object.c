@@ -159,16 +159,20 @@ lieng_object_ref (LIEngObject* self,
  * \param animation Animation name or NULL.
  * \param permanent Nonzero if should repeat infinitely.
  * \param priority Blending priority.
- * \param time Starting time.
+ * \param time Starting time in seconds.
+ * \param fade_in Fade in duration in seconds.
+ * \param fade_out Fade out duration in seconds.
  * \return Nonzero if an animation was started or stopped.
  */
-int
-lieng_object_animate (LIEngObject* self,
-                      int          channel,
-                      const char*  animation,
-                      int          permanent,
-                      float        priority,
-                      float        time)
+int lieng_object_animate (
+	LIEngObject* self,
+	int          channel,
+	const char*  animation,
+	int          permanent,
+	float        priority,
+	float        time,
+	float        fade_in,
+	float        fade_out)
 {
 	const char* name;
 
@@ -203,6 +207,8 @@ lieng_object_animate (LIEngObject* self,
 		limdl_pose_set_channel_priority (self->pose, channel, priority);
 		limdl_pose_set_channel_position (self->pose, channel, time);
 		limdl_pose_set_channel_state (self->pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
+		limdl_pose_set_channel_fade_in (self->pose, channel, fade_in);
+		limdl_pose_set_channel_fade_out (self->pose, channel, fade_out);
 	}
 
 	return 1;

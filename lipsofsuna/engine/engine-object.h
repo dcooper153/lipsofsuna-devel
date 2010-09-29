@@ -77,7 +77,9 @@ LIAPICALL (int, lieng_object_animate, (
 	const char*  animation,
 	int          permanent,
 	float        priority,
-	float        time));
+	float        time,
+	float        fade_in,
+	float        fade_out));
 
 LIAPICALL (LIMdlNode*, lieng_object_find_node, (
 	LIEngObject* self,

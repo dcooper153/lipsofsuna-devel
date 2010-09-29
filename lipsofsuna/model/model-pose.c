@@ -164,7 +164,11 @@ void limdl_pose_fade_channel (
 
 	/* Handle auto rate. */
 	if (rate == LIMDL_POSE_FADE_AUTOMATIC)
-		rate = 1.0f / chan->animation->blendout;
+	{
+		if (chan->fade_out < LIMAT_EPSILON)
+			return;
+		rate = 1.0f / chan->fade_out;
+	}
 
 	/* Create a fade sequence. */
 	fade = lisys_calloc (1, sizeof (LIMdlPoseFade));
@@ -173,9 +177,9 @@ void limdl_pose_fade_channel (
 		limdl_pose_destroy_channel (self, channel);
 		return;
 	}
-	fade->rate = rate;
-	fade->time = chan->time;
 	fade->weight = chan->priority * private_get_channel_weight (self, chan);
+	fade->rate = fade->weight * rate;
+	fade->time = chan->time;
 	fade->animation = limdl_animation_new_copy (chan->animation);
 	if (fade->animation == NULL)
 	{
@@ -414,7 +418,33 @@ void limdl_pose_set_channel_animation (
 		return;
 	}
 	chan->time = 0.0f;
+	chan->fade_in = 0.0f;
+	chan->fade_out = 0.0f;
 	chan->animation = anim;
+}
+
+void limdl_pose_set_channel_fade_in (
+	LIMdlPose* self,
+	int        channel,
+	float      value)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_find_channel (self, channel);
+	if (chan != NULL)
+		chan->fade_in = value;
+}
+
+void limdl_pose_set_channel_fade_out (
+	LIMdlPose* self,
+	int        channel,
+	float      value)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_find_channel (self, channel);
+	if (chan != NULL)
+		chan->fade_out = value;
 }
 
 const char* limdl_pose_get_channel_name (
@@ -926,12 +956,9 @@ static int private_play_channel (
 	channel->time = channel->time - duration * cycles;
 
 	/* Handle looping. */
-	if (channel->repeats != -1)
-	{
-		channel->repeat += cycles;
-		if (channel->repeat >= channel->repeats)
-			return 0;
-	}
+	channel->repeat += cycles;
+	if (channel->repeats != -1 && channel->repeat >= channel->repeats)
+		return 0;
 
 	return 1;
 }
@@ -1025,9 +1052,24 @@ static float private_get_channel_weight (
 	const LIMdlPose*        self,
 	const LIMdlPoseChannel* channel)
 {
-	return limdl_animation_get_weight (channel->animation, channel->time,
-		channel->repeat == 0 && channel->repeats != -1? 0.0f : 1.0f, 1.0f,
-		channel->repeat == channel->repeats - 1? 0.0f : 1.0f);
+	float end;
+	float time;
+	float duration;
+
+	duration = limdl_animation_get_duration (channel->animation);
+	time = channel->repeat * duration + channel->time;
+	end = channel->repeats * duration;
+
+	/* Fade in period. */
+	if (time < channel->fade_in)
+		return time / channel->fade_in;
+
+	/* No fade period. */
+	if (channel->repeats == -1 || time < end - channel->fade_out)
+		return 1.0f;
+
+	/* Fade out period. */
+	return 1.0f - (end - time) / channel->fade_out;
 }
 
 /** @} */
