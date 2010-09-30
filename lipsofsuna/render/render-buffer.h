@@ -87,7 +87,7 @@ LIAPICALL (void, liren_buffer_upload_vertices, (
 	LIRenBuffer* self,
 	int          start,
 	int          count,
-	void*        data));
+	const void*  data));
 
 LIAPICALL (int, liren_buffer_get_size, (
 	LIRenBuffer* self));

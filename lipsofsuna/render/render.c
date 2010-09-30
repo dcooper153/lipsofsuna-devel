@@ -408,7 +408,7 @@ private_init_resources (LIRenRender* self,
 	if (self->immediate.buffer == NULL)
 		return 0;
 	if (!liren_buffer_init (self->immediate.buffer, NULL, 0,
-	     &immediate_vertex_format, NULL, 512, LIREN_BUFFER_TYPE_STREAM))
+	     &immediate_vertex_format, NULL, 300000, LIREN_BUFFER_TYPE_STREAM))
 		return 0;
 
 	return 1;

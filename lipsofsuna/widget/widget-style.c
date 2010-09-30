@@ -27,13 +27,25 @@
 #include "widget-manager.h"
 #include "widget-style.h"
 
-static void
-private_paint_scaled (LIWdgStyle* self,
-                      LIWdgRect*  rect);
+static void private_pack_quad (
+	LIRenVertex* array,
+	int*         offset,
+	float        u0,
+	float        v0,
+	float        x0,
+	float        y0,
+	float        u1,
+	float        v1,
+	float        x1,
+	float        y1);
 
-static void
-private_paint_tiled (LIWdgStyle* self,
-                     LIWdgRect*  rect);
+static void private_paint_scaled (
+	LIWdgStyle* self,
+	LIWdgRect*  rect);
+
+static void private_paint_tiled (
+	LIWdgStyle* self,
+	LIWdgRect*  rect);
 
 /*****************************************************************************/
 
@@ -60,6 +72,8 @@ void liwdg_style_paint_base (
 	LIWdgRect*  rect,
 	LIWdgRect*  clip)
 {
+	float white[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
 	if (self->texture == NULL)
 		return;
 	if (clip != NULL)
@@ -68,6 +82,11 @@ void liwdg_style_paint_base (
 		glEnable (GL_SCISSOR_TEST);
 		glScissor (clip->x, self->manager->height - clip->y - clip->height, clip->width, clip->height);
 	}
+	liren_context_set_diffuse (self->manager->context, white);
+	liren_context_set_projection (self->manager->context, &self->manager->projection);
+	liren_context_set_shader (self->manager->context, self->manager->shader);
+	liren_context_set_textures_raw (self->manager->context, &self->texture->texture, 1);
+	liren_context_bind (self->manager->context);
 	if (self->scale)
 		private_paint_scaled (self, rect);
 	else
@@ -93,8 +112,7 @@ void liwdg_style_paint_text (
 	float* vertex_data;
 	uint32_t* index_data;
 	LIFntLayoutGlyph* glyph;
-	LIMatVector coords[6];
-	LIMatVector texcoords[6];
+	LIRenVertex vertices[6];
 
 	/* Get vertex data. */
 	if (!text->n_glyphs)
@@ -132,10 +150,11 @@ void liwdg_style_paint_text (
 		for (j = 0 ; j < 6 ; j++)
 		{
 			vertex = vertex_data + 5 * index_data[6 * i + j];
-			coords[j] = limat_vector_init (vertex[2], vertex[3], vertex[4]);
-			texcoords[j] = limat_vector_init (vertex[0], vertex[1], 0.0f);
+			memcpy (vertices[j].coord, vertex + 2, 3 * sizeof (float));
+			memset (vertices[j].normal, 0, 3 * sizeof (float));
+			memcpy (vertices[j].texcoord, vertex + 0, 2 * sizeof (float));
 		}
-		liren_context_render_immediate (self->manager->context, GL_TRIANGLES, coords, NULL, texcoords, 6);
+		liren_context_render_immediate (self->manager->context, GL_TRIANGLES, vertices, 6);
 	}
 
 	/* Disable clipping. */
@@ -168,22 +187,21 @@ void liwdg_style_paint_textured_quad (
 	float       y1)
 {
 	float white[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	LIMatVector coords[6] =
+	LIRenVertex vertices[6] =
 	{
-		{ x0, y0, 0.0f }, { x1, y0, 0.0f }, { x0, y1, 0.0f },
-		{ x1, y0, 0.0f }, { x0, y1, 0.0f }, { x1, y1, 0.0f }
-	};
-	LIMatVector texcoords[6] =
-	{
-		{ u0, v0, 0.0f }, { u1, v0, 0.0f }, { u0, v1, 0.0f },
-		{ u1, v0, 0.0f }, { u0, v1, 0.0f }, { u1, v1, 0.0f }
+		{ { x0, y0, 0.0f }, { 0.0f, 0.0f, 0.0f }, { u0, v0 } },
+		{ { x1, y0, 0.0f }, { 0.0f, 0.0f, 0.0f }, { u1, v0 } },
+		{ { x0, y1, 0.0f }, { 0.0f, 0.0f, 0.0f }, { u0, v1 } },
+		{ { x1, y0, 0.0f }, { 0.0f, 0.0f, 0.0f }, { u1, v0 } },
+		{ { x0, y1, 0.0f }, { 0.0f, 0.0f, 0.0f }, { u0, v1 } },
+		{ { x1, y1, 0.0f }, { 0.0f, 0.0f, 0.0f }, { u1, v1 } }
 	};
 	liren_context_set_diffuse (self->manager->context, white);
 	liren_context_set_projection (self->manager->context, &self->manager->projection);
 	liren_context_set_shader (self->manager->context, self->manager->shader);
 	liren_context_set_textures_raw (self->manager->context, &self->texture->texture, 1);
 	liren_context_bind (self->manager->context);
-	liren_context_render_immediate (self->manager->context, GL_TRIANGLES, coords, NULL, texcoords, 6);
+	liren_context_render_immediate (self->manager->context, GL_TRIANGLES, vertices, 6);
 }
 
 /**
@@ -209,16 +227,44 @@ void liwdg_style_paint_textured_rect (
 
 /*****************************************************************************/
 
+static void private_pack_quad (
+	LIRenVertex* array,
+	int*         offset,
+	float        u0,
+	float        v0,
+	float        x0,
+	float        y0,
+	float        u1,
+	float        v1,
+	float        x1,
+	float        y1)
+{
+	LIRenVertex vertices[6] =
+	{
+		{ { x0, y0, 0.0f }, { 0.0f, 0.0f, 0.0f }, { u0, v0 } },
+		{ { x1, y0, 0.0f }, { 0.0f, 0.0f, 0.0f }, { u1, v0 } },
+		{ { x0, y1, 0.0f }, { 0.0f, 0.0f, 0.0f }, { u0, v1 } },
+		{ { x1, y0, 0.0f }, { 0.0f, 0.0f, 0.0f }, { u1, v0 } },
+		{ { x0, y1, 0.0f }, { 0.0f, 0.0f, 0.0f }, { u0, v1 } },
+		{ { x1, y1, 0.0f }, { 0.0f, 0.0f, 0.0f }, { u1, v1 } }
+	};
+	memcpy (array + *offset, vertices, 6 * sizeof (LIRenVertex));
+	*offset += 6;
+	lisys_assert (*offset < 65536);
+}
+
 static void private_paint_scaled (
 	LIWdgStyle* self,
 	LIWdgRect*  rect)
 {
+	int offset = 0;
 	float center;
 	float size;
 	float xs;
 	float ys;
 	float tx[2];
 	float ty[2];
+	LIRenVertex vertices[6];
 
 	/* Calculate texture coordinates. */
 	tx[0] = (float)(self->x) / self->texture->width;
@@ -251,7 +297,10 @@ static void private_paint_scaled (
 	}
 
 	/* Paint fill. */
-	liwdg_style_paint_textured_rect (self, rect, tx[0], ty[0], tx[1], ty[1]);
+	private_pack_quad (vertices, &offset,
+		tx[0], ty[0], rect->x, rect->y,
+		tx[1], ty[1], rect->x + rect->width, rect->y + rect->height);
+	liren_context_render_immediate (self->manager->context, GL_TRIANGLES, vertices, offset);
 }
 
 static void private_paint_tiled (
@@ -260,6 +309,7 @@ static void private_paint_tiled (
 {
 	int px;
 	int py;
+	int offset = 0;
 	float fw;
 	float fh;
 	float fu;
@@ -268,6 +318,7 @@ static void private_paint_tiled (
 	float h[3];
 	float tx[4];
 	float ty[4];
+	LIRenVertex vertices[65536];
 
 	/* Calculate repeat counts. */
 	w[0] = self->w[0];
@@ -287,56 +338,56 @@ static void private_paint_tiled (
 	ty[2] = (float)(self->y + self->h[0] + self->h[1]) / self->texture->height;
 	ty[3] = (float)(self->y + self->h[0] + self->h[1] + self->h[2]) / self->texture->height;
 
-	/* Paint corners. */
+	/* Pack corners. */
 	px = rect->x;
 	py = rect->y;
-	liwdg_style_paint_textured_quad (self,
+	private_pack_quad (vertices, &offset,
 		tx[0], ty[0], px, py,
 		tx[1], ty[1], px + w[0], py + h[0]);
 	px = rect->x + rect->width - w[2] - 1;
-	liwdg_style_paint_textured_quad (self,
+	private_pack_quad (vertices, &offset,
 		tx[2], ty[0], px, py,
 		tx[3], ty[1], px + w[2], py + h[0]);
 	py = rect->y + rect->height - h[2] - 1;
-	liwdg_style_paint_textured_quad (self,
+	private_pack_quad (vertices, &offset,
 		tx[2], ty[2], px, py,
 		tx[3], ty[3], px + w[2], py + h[2]);
 	px = rect->x;
-	liwdg_style_paint_textured_quad (self,
+	private_pack_quad (vertices, &offset,
 		tx[0], ty[2], px, py,
 		tx[1], ty[3], px + w[0], py + h[2]);
 
-	/* Paint horizontal borders. */
+	/* Pack horizontal borders. */
 	for (px = rect->x + w[0] ; px < rect->x + rect->width - w[2] ; px += w[1])
 	{
 		fw = LIMAT_MIN (w[1], rect->x + rect->width - px - w[2] - 1);
 		fu = (tx[2] - tx[1]) * fw / w[1];
 		py = rect->y;
-		liwdg_style_paint_textured_quad (self,
+		private_pack_quad (vertices, &offset,
 			tx[1], ty[0], px, py,
 			tx[1] + fu, ty[1], px + fw, py + h[0]);
 		py = rect->y + rect->height - h[2] - 1;
-		liwdg_style_paint_textured_quad (self,
+		private_pack_quad (vertices, &offset,
 			tx[1], ty[2], px, py,
 			tx[1] + fu, ty[3], px + fw, py + h[2]);
 	}
 
-	/* Paint vertical borders. */
+	/* Pack vertical borders. */
 	for (py = rect->y + h[0] ; py < rect->y + rect->height - h[2] ; py += h[1])
 	{
 		fh = LIMAT_MIN (h[1], rect->y + rect->height - py - h[2] - 1);
 		fv = (ty[2] - ty[1]) * fh / h[1];
 		px = rect->x;
-		liwdg_style_paint_textured_quad (self,
+		private_pack_quad (vertices, &offset,
 			tx[0], ty[1], px, py,
 			tx[1], ty[1] + fv, px + w[0], py + fh);
 		px = rect->x + rect->width - w[2] - 1;
-		liwdg_style_paint_textured_quad (self,
+		private_pack_quad (vertices, &offset,
 			tx[2], ty[1], px, py,
 			tx[3], ty[1] + fv, px + w[0], py + fh);
 	}
 
-	/* Paint fill. */
+	/* Pack fill. */
 	for (py = rect->y + h[0] ; py < rect->y + rect->height - h[2] ; py += h[1])
 	for (px = rect->x + w[0] ; px < rect->x + rect->width - w[2] ; px += w[1])
 	{
@@ -344,8 +395,11 @@ static void private_paint_tiled (
 		fh = LIMAT_MIN (h[1], rect->y + rect->height - py - h[2] - 1);
 		fu = (tx[2] - tx[1]) * fw / w[1];
 		fv = (ty[2] - ty[1]) * fh / h[1];
-		liwdg_style_paint_textured_quad (self,
+		private_pack_quad (vertices, &offset,
 			tx[1], ty[1], px, py,
 			tx[1] + fu, ty[1] + fv, px + fw, py + fh);
 	}
+
+	/* Render the packed vertices. */
+	liren_context_render_immediate (self->manager->context, GL_TRIANGLES, vertices, offset);
 }

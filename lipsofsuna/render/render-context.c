@@ -199,61 +199,22 @@ void liren_context_render_array (
  * \brief Renders primitives.
  * \param self Rendering context.
  * \param type Primitive type.
- * \param coords Array of coordinate vectors, or NULL.
- * \param normals Array of normal vectors, or NULL.
- * \param texcoords Array of texture coordinate vectors, or NULL.
- * \param count Number of vertices to draw.
+ * \param vertices Array of vertices.
+ * \param count Number of vertices.
  */
 int liren_context_render_immediate (
 	LIRenContext*      self,
 	GLenum             type,
-	const LIMatVector* coords,
-	const LIMatVector* normals,
-	const LIMatVector* texcoords,
+	const LIRenVertex* vertices,
 	int                count)
 {
-	int i;
 	int* offset;
-	float* vertices;
 	LIRenBuffer* buffer;
 
 	offset = &self->render->immediate.offset;
 	buffer = self->render->immediate.buffer;
 	lisys_assert (count > 0);
 	lisys_assert (count <= buffer->vertices.count);
-
-	/* Allocate uploaded data. */
-	vertices = lisys_calloc (count * 8, sizeof (float));
-	if (vertices == NULL)
-		return 0;
-
-	/* Format uploaded data. */
-	if (coords != NULL)
-	{
-		for (i = 0 ; i < count ; i++)
-		{
-			vertices[8 * i + 0] = coords[i].x;
-			vertices[8 * i + 1] = coords[i].y;
-			vertices[8 * i + 2] = coords[i].z;
-		}
-	}
-	if (normals != NULL)
-	{
-		for (i = 0 ; i < count ; i++)
-		{
-			vertices[8 * i + 3] = normals[i].x;
-			vertices[8 * i + 4] = normals[i].y;
-			vertices[8 * i + 5] = normals[i].z;
-		}
-	}
-	if (texcoords != NULL)
-	{
-		for (i = 0 ; i < count ; i++)
-		{
-			vertices[8 * i + 6] = texcoords[i].x;
-			vertices[8 * i + 7] = texcoords[i].y;
-		}
-	}
 
 	/* Make sure the right buffer is bound. */
 	if (self->buffer != buffer)
@@ -268,7 +229,6 @@ int liren_context_render_immediate (
 		*offset = 0;
 	liren_buffer_upload_vertices (buffer, *offset, count, vertices);
 	glBindBuffer (GL_ARRAY_BUFFER, buffer->vertex_buffer);
-	lisys_free (vertices);
 
 	/* Render the primitive array. */
 	liren_context_render_array (self, type, *offset, count);

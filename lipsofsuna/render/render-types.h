@@ -57,6 +57,7 @@ typedef struct _LIRenSortgroup LIRenSortgroup;
 typedef struct _LIRenSortface LIRenSortface;
 typedef struct _LIRenSort LIRenSort;
 typedef struct _LIRenTexture LIRenTexture;
+typedef struct _LIRenVertex LIRenVertex;
 typedef void (*lirenCallback) (LIRenContext*, LIRenObject*, void*);
 
 struct _LIRenFormat
@@ -76,6 +77,13 @@ struct _LIRenSelection
 	float depth;
 	uint32_t object;
 	LIMatVector point;
+};
+
+struct _LIRenVertex
+{
+	float coord[3];
+	float normal[3];
+	float texcoord[2];
 };
 
 #endif

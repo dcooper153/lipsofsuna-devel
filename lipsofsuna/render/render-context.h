@@ -126,9 +126,7 @@ LIAPICALL (void, liren_context_render_array, (
 LIAPICALL (int, liren_context_render_immediate, (
 	LIRenContext*      self,
 	GLenum             type,
-	const LIMatVector* coords,
-	const LIMatVector* normals,
-	const LIMatVector* texcoords,
+	const LIRenVertex* vertices,
 	int                count));
 
 LIAPICALL (void, liren_context_render_indexed, (

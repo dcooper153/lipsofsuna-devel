@@ -218,10 +218,11 @@ void liren_buffer_upload_vertices (
 	LIRenBuffer* self,
 	int          start,
 	int          count,
-	void*        data)
+	const void*  data)
 {
 	int offs;
 	int size;
+	void* map;
 
 	lisys_assert (start >= 0);
 	lisys_assert (start + count <= self->vertices.count);
@@ -231,7 +232,12 @@ void liren_buffer_upload_vertices (
 		offs = start * self->vertex_format.size;
 		size = count * self->vertex_format.size;
 		glBindBuffer (GL_ARRAY_BUFFER, self->vertex_buffer);
-		glBufferSubData (GL_ARRAY_BUFFER, offs, size, data);
+		map = glMapBufferRange (GL_ARRAY_BUFFER, offs, size,
+			GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_RANGE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+		if (map == NULL)
+			return;
+		memcpy (map, data, size);
+		glUnmapBuffer (GL_ARRAY_BUFFER);
 		glBindBuffer (GL_ARRAY_BUFFER, 0);
 	}
 }
