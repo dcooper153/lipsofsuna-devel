@@ -48,6 +48,7 @@ struct _LIEngObject
 	LIEngModel* model;
 	LIEngSector* sector;
 	LIMatTransform transform;
+	LIMatTransform transform_event;
 	LIMdlPose* pose;
 #ifndef LIENG_DISABLE_SCRIPTS
 	LIScrData* script;
