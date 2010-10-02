@@ -37,7 +37,7 @@
  * -- @param args Arguments.<ul>
  * --   <li>name: Brush name.</li>
  * --   <li>size: Size vector.</li></ul>
- * function Generator.disable_brush(clss, args)
+ * function Generator.add_brush(clss, args)
  */
 static void Generator_add_brush (LIScrArgs* args)
 {
@@ -56,12 +56,102 @@ static void Generator_add_brush (LIScrArgs* args)
 		brush = ligen_brush_new (module->generator, (int) size.x, (int) size.y, (int) size.z);
 		if (brush == NULL)
 			return;
+		while (brush->id <= 0)
+		{
+			brush->id = random ();
+			if (ligen_generator_find_brush (module->generator, brush->id))
+				brush->id = 0;
+		}
 		if (!ligen_brush_set_name (brush, name) ||
 		    !ligen_generator_insert_brush (module->generator, brush))
 		{
 			ligen_brush_free (brush);
 			return;
 		}
+	}
+}
+
+/* @luadoc
+ * --- Adds a new linking rule to a region connectivity rule.
+ * -- @param clss Generator class.
+ * -- @param args Arguments.<ul>
+ * --   <li>name: Brush name.</li>
+ * --   <li>brush: Name of the linked brush.</li>
+ * --   <li>offset: Offset of the linked brush, in tiles.</li>
+ * --   <li>rule: Rule number.</li></ul>
+ * -- @return Link number or nil.
+ * function Generator.add_rule(clss, args)
+ */
+static void Generator_add_link (LIScrArgs* args)
+{
+	int ruleid;
+	const char* name;
+	const char* name1;
+	LIExtModule* module;
+	LIGenBrush* brush;
+	LIGenBrush* brush1;
+	LIGenRule* rule;
+	LIMatVector pos;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	if (liscr_args_gets_string (args, "name", &name) &&
+	    liscr_args_gets_string (args, "brush", &name1) &&
+	    liscr_args_gets_vector (args, "offset", &pos) &&
+	    liscr_args_gets_int (args, "rule", &ruleid))
+	{
+		/* Find the modified brush. */
+		brush = ligen_generator_find_brush_by_name (module->generator, name);
+		if (brush == NULL)
+			return;
+
+		/* Find the linked brush. */
+		brush1 = ligen_generator_find_brush_by_name (module->generator, name1);
+		if (brush1 == NULL)
+			return;
+
+		/* Find the modified rule. */
+		if (ruleid < 1 || ruleid > brush->rules.count)
+			return;
+		rule = brush->rules.array[ruleid - 1];
+		if (rule == NULL)
+			return;
+
+		/* Insert the new stroke. */
+		ligen_rule_insert_stroke (rule, (int) pos.x, (int) pos.y, (int) pos.z, 0, brush1->id);
+		liscr_args_seti_int (args, rule->strokes.count);
+	}
+}
+
+/* @luadoc
+ * --- Adds a new region connectivity rule.
+ * -- @param clss Generator class.
+ * -- @param args Arguments.<ul>
+ * --   <li>name: Brush name.</li></ul>
+ * -- @return Rule number or nil.
+ * function Generator.add_rule(clss, args)
+ */
+static void Generator_add_rule (LIScrArgs* args)
+{
+	const char* name;
+	LIExtModule* module;
+	LIGenBrush* brush;
+	LIGenRule* rule;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	if (liscr_args_gets_string (args, "name", &name))
+	{
+		brush = ligen_generator_find_brush_by_name (module->generator, name);
+		if (brush == NULL)
+			return;
+		rule = ligen_rule_new ();
+		if (rule == NULL)
+			return;
+		if (!ligen_brush_insert_rule (brush, rule))
+		{
+			ligen_rule_free (rule);
+			return;
+		}
+		liscr_args_seti_int (args, brush->rules.count);
 	}
 }
 
@@ -246,6 +336,8 @@ liext_script_generator (LIScrClass* self,
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_GENERATOR, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "add_brush", Generator_add_brush);
+	liscr_class_insert_cfunc (self, "add_link", Generator_add_link);
+	liscr_class_insert_cfunc (self, "add_rule", Generator_add_rule);
 	liscr_class_insert_cfunc (self, "disable_brush", Generator_disable_brush);
 	liscr_class_insert_cfunc (self, "enable_brush", Generator_enable_brush);
 	liscr_class_insert_cfunc (self, "expand", Generator_expand);

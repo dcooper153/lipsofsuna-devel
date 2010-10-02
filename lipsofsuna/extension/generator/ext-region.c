@@ -32,6 +32,26 @@
  */
 
 /* @luadoc
+ * --- Name of the region.
+ * -- @name Region.name
+ * -- @class table
+ */
+static void Region_getter_name (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIGenBrush* brush;
+	LIGenStroke* stroke;
+
+	stroke = args->self;
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_REGION);
+	brush = ligen_generator_find_brush (module->generator, stroke->brush);
+	if (brush != NULL)
+		liscr_args_seti_string (args, brush->name);
+	else
+		liscr_args_seti_string (args, "");
+}
+
+/* @luadoc
  * --- Position of the region.
  * -- @name Region.point
  * -- @class table
@@ -82,6 +102,7 @@ void liext_script_generator_region (
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_REGION, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
+	liscr_class_insert_mvar (self, "name", Region_getter_name, NULL);
 	liscr_class_insert_mvar (self, "point", Region_getter_point, NULL);
 	liscr_class_insert_mvar (self, "size", Region_getter_size, NULL);
 	liscr_class_insert_mvar (self, "type", Region_getter_type, NULL);
