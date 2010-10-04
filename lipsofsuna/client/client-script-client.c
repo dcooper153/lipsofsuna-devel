@@ -60,6 +60,106 @@ static void Client_host (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Takes a screenshot.
+ * -- @param clss Client class.
+ * -- @return Screenshot filename.
+ * function Client.screenshot(clss)
+ */
+static void Client_screenshot (LIScrArgs* args)
+{
+	int i;
+	int width;
+	int height;
+	int pitch;
+	char* home;
+	char* file;
+	char* path;
+	uint32_t rmask;
+	uint32_t gmask;
+	uint32_t bmask;
+	uint32_t amask;
+	uint8_t* pixels;
+	SDL_Surface* surface;
+	LICliClient* client;
+
+	/* Get window size. */
+	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	width = client->window->mode.width;
+	height = client->window->mode.height;
+	pitch = 4 * width;
+
+	/* Capture pixel data. */
+	/* The one extra row we allocate is used for flipping. */
+	pixels = calloc ((height + 1) * pitch, sizeof (uint8_t));
+	if (pixels == NULL)
+		return;
+	glReadPixels (0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+	/* Flip the image vertically. */
+	/* We use the extra row as temporary storage. */
+	for (i = 0 ; i < height / 2 ; i++)
+	{
+		memcpy (pixels + pitch * height, pixels + pitch * i, pitch);
+		memcpy (pixels + pitch * i, pixels + pitch * (height - i - 1), pitch);
+		memcpy (pixels + pitch * (height - i - 1), pixels + pitch * height, pitch);
+	}
+
+	/* Create a temporary SDL surface. */
+	if (lisys_endian_big ())
+	{
+		rmask = 0xFF000000;
+		gmask = 0x00FF0000;
+		bmask = 0x0000FF00;
+		amask = 0x000000FF;
+	}
+	else
+	{
+		rmask = 0x000000FF;
+		gmask = 0x0000FF00;
+		bmask = 0x00FF0000;
+		amask = 0xFF000000;
+	}
+	surface = SDL_CreateRGBSurfaceFrom(pixels, width, height,
+		32, pitch, rmask, gmask, bmask, amask);
+	if (surface == NULL)
+	{
+		lisys_free (pixels);
+		return;
+	}
+
+	/* Construct file path. */
+	home = lisys_system_get_path_home ();
+	file = listr_format ("screenshot-%d.bmp", (int) time (NULL));
+	if (home == NULL || file == NULL)
+	{
+		SDL_FreeSurface (surface);
+		lisys_free (pixels);
+		lisys_free (home);
+		lisys_free (file);
+		return;
+	}
+	path = lisys_path_concat (home, file, NULL);
+	lisys_free (home);
+	if (path == NULL)
+	{
+		SDL_FreeSurface (surface);
+		lisys_free (pixels);
+		lisys_free (file);
+		return;
+	}
+
+	/* Save the surface to a file. */
+	SDL_SaveBMP (surface, path);
+	SDL_FreeSurface (surface);
+	lisys_free (pixels);
+
+	/* Return the file name. */
+	liscr_args_seti_string (args, file);
+	lisys_free (path);
+	lisys_free (file);
+}
+
+/* @luadoc
  * --- Copies the rendered scene to the screen.
  * -- @param clss Client class.
  * function Client.swap_buffers(clss)
@@ -156,6 +256,7 @@ licli_script_client (LIScrClass* self,
 	liscr_class_set_userdata (self, LICLI_SCRIPT_CLIENT, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "host", Client_host);
+	liscr_class_insert_cfunc (self, "screenshot", Client_screenshot);
 	liscr_class_insert_cfunc (self, "swap_buffers", Client_swap_buffers);
 	liscr_class_insert_cvar (self, "cursor_pos", Client_getter_cursor_pos, NULL);
 	liscr_class_insert_cvar (self, "fps", Client_getter_fps, NULL);
