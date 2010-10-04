@@ -95,14 +95,13 @@ static void Class_check (LIScrArgs* args)
  * -- with any other class as clss, creates an instance of that class.
  * -- @param clss Class class.
  * -- @param args Arguments.<ul>
- * --   <li>1,name: Class name. (required)</li>
- * --   <li>2,base: Base class.</li></ul>
+ * --   <li>1,base: Base class or nil for Class.</li></ul>
  * -- @return New class.
  * function Class.new(clss, args)
  */
 static void Class_new (LIScrArgs* args)
 {
-	const char* name;
+	char name[16];
 	LIScrClass* base;
 	LIScrClass* clss;
 	LIScrData* data;
@@ -112,8 +111,8 @@ static void Class_new (LIScrArgs* args)
 	if (clss == NULL)
 		return;
 
-	/* If not calling the new function of any of the inherited classes,
-	   create a new instance of the class and return it. */
+	/* If called with an already inherited class as clss,
+	 * create an instance of that class. */
 	if (strcmp (clss->meta, LISCR_SCRIPT_CLASS))
 	{
 		data = liscr_data_new_alloc (args->script, 1, clss->meta);
@@ -124,35 +123,35 @@ static void Class_new (LIScrArgs* args)
 		return;
 	}
 
-	/* Otherwise inherit a new class and return it. */
-	if (!liscr_args_gets_class (args, "base", NULL, &base) &&
-	    !liscr_args_geti_class (args, 1, NULL, &base))
+	/* Find the base class for the new class we are inheriting. */
+	if (!liscr_args_geti_class (args, 0, NULL, &base) &&
+	    !liscr_args_gets_class (args, "base", NULL, &base))
 	{
 		base = liscr_script_find_class (args->script, LISCR_SCRIPT_CLASS);
 		if (base == NULL)
 			return;
 	}
-	if (liscr_args_gets_string (args, "name", &name) ||
-	    liscr_args_geti_string (args, 0, &name))
+
+	/* Find a free class name. */
+	do
 	{
-		/* Check for duplicates. */
+		snprintf (name, 16, "__%4X", lisys_randi (0xFFFF));
 		clss = liscr_script_find_class (args->script, name);
-		if (clss != NULL)
-			return;
-
-		/* Create a new class. */
-		clss = liscr_class_new_full (args->script, base, name, 0);
-		if (clss == NULL)
-			return;
-		if (!liscr_script_insert_class (args->script, clss))
-		{
-			liscr_class_free (clss);
-			return;
-		}
-
-		/* Return class. */
-		liscr_args_seti_class (args, clss);
 	}
+	while (clss != NULL);
+
+	/* Create a new class. */
+	clss = liscr_class_new_full (args->script, base, name, 0);
+	if (clss == NULL)
+		return;
+	if (!liscr_script_insert_class (args->script, clss))
+	{
+		liscr_class_free (clss);
+		return;
+	}
+
+	/* Return the class. */
+	liscr_args_seti_class (args, clss);
 }
 
 /* @luadoc
@@ -339,17 +338,6 @@ static void Class_getter_class (LIScrArgs* args)
 	liscr_args_seti_class (args, args->clss);
 }
 
-/* @luadoc
- * --- Class name of the type.
- * --
- * -- @name Class.class_name
- * -- @class table
- */
-static void Class_getter_class_name (LIScrArgs* args)
-{
-	liscr_args_seti_string (args, liscr_class_get_name (args->clss));
-}
-
 /*****************************************************************************/
 
 void liscr_script_class (
@@ -362,7 +350,6 @@ void liscr_script_class (
 	liscr_class_insert_func (self, "getter", Class_getter);
 	liscr_class_insert_func (self, "setter", Class_setter);
 	liscr_class_insert_mvar (self, "class", Class_getter_class, NULL);
-	liscr_class_insert_cvar (self, "class_name", Class_getter_class_name, NULL);
 }
 
 /** @} */
