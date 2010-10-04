@@ -18,9 +18,7 @@
 /**
  * \addtogroup liext Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliSpeech Speech
+ * \addtogroup LIExtSpeech Speech
  * @{
  */
 
@@ -29,11 +27,11 @@
 
 #include "ext-module.h"
 
-#define LIEXT_SPEECH_TIMEOUT 10.0f
-
-typedef struct _LIExtSpeech LIExtSpeech;
 struct _LIExtSpeech
 {
+	float fade_exponent;
+	float fade_time;
+	float life_time;
 	float timer;
 	float diffuse[4];
 	LIFntLayout* text;
@@ -49,6 +47,5 @@ void liext_speech_free (
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

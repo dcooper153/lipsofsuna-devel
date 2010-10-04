@@ -18,9 +18,7 @@
 /**
  * \addtogroup liext Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliSpeech Speech
+ * \addtogroup LIExtSpeech Speech
  * @{
  */
 
@@ -43,6 +41,9 @@ LIExtSpeech* liext_speech_new (
 	self->diffuse[2] = 1.0f;
 	self->diffuse[3] = 1.0f;
 	self->timer = 0.0f;
+	self->fade_exponent = 4;
+	self->fade_time = 5;
+	self->life_time = 10;
 	self->text = lifnt_layout_new ();
 	if (self->text == NULL)
 	{
@@ -64,6 +65,5 @@ liext_speech_free (LIExtSpeech* self)
 	lisys_free (self);
 }
 
-/** @} */
 /** @} */
 /** @} */

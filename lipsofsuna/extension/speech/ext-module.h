@@ -18,9 +18,7 @@
 /**
  * \addtogroup liext Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliSpeech Speech
+ * \addtogroup LIExtSpeech Speech
  * @{
  */
 
@@ -32,6 +30,8 @@
 #include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_SPEECH "Speech"
+
+typedef struct _LIExtSpeech LIExtSpeech;
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
@@ -55,7 +55,7 @@ void liext_speeches_render (
 	const LIMatMatrix* modelview,
 	const int*         viewport);
 
-int liext_speeches_set_speech (
+LIExtSpeech* liext_speeches_set_speech (
 	LIExtModule* self,
 	uint32_t     object,
 	const float* diffuse,
@@ -84,6 +84,5 @@ void liext_script_speech (
 
 #endif
 
-/** @} */
 /** @} */
 /** @} */

@@ -18,16 +18,15 @@
 /**
  * \addtogroup liext Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliSpeech Speech
+ * \addtogroup LIExtSpeech Speech
  * @{
  */
 
 #include "ext-module.h"
+#include "ext-speech.h"
 
 /* @luadoc
- * module "Extension.Client.Speech"
+ * module "Extension.Speech"
  * --- Display speech above objects.
  * -- @name Sound
  * -- @class table
@@ -35,10 +34,12 @@
 
 /* @luadoc
  * --- Displays a message above the object.
- * --
  * -- @param self Speech class.
  * -- @param args Arguments.<ul>
  * --   <li>diffuse: Diffuse color.</li>
+ * --   <li>fade_exponent: Fade exponent.</li>
+ * --   <li>fade_time: Fade time in seconds, or nil.</li>
+ * --   <li>life_time: Life time in seconds, or nil.</li>
  * --   <li>font: Font name or nil.</li>
  * --   <li>object: Object.</li>
  * --   <li>message: Speech string. (required)</li></ul>
@@ -52,6 +53,7 @@ static void Speech_add (LIScrArgs* args)
 	const char* font = "default";
 	LIScrData* object;
 	LIExtModule* module;
+	LIExtSpeech* speech;
 
 	if (!liscr_args_gets_string (args, "message", &msg))
 		return;
@@ -62,12 +64,20 @@ static void Speech_add (LIScrArgs* args)
 	else
 		return;
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPEECH);
-	liext_speeches_set_speech (module, id, diffuse, font, msg);
+	speech = liext_speeches_set_speech (module, id, diffuse, font, msg);
+	if (speech != NULL)
+	{
+		if (liscr_args_gets_float (args, "fade_exponent", &speech->fade_exponent))
+			speech->fade_exponent = LIMAT_MAX (1.0f, speech->fade_exponent);
+		if (liscr_args_gets_float (args, "fade_time", &speech->fade_time))
+			speech->fade_time = LIMAT_MAX (0.0f, speech->fade_time);
+		if (liscr_args_gets_float (args, "life_time", &speech->life_time))
+			speech->life_time = LIMAT_MAX (0.0f, speech->life_time);
+	}
 }
 
 /* @luadoc
  * --- Draws the speech texts to the framebuffer.
- * --
  * -- @param self Speech class.
  * -- @param args Arguments.<ul>
  * --   <li>modelview: Modelview matrix.</li>
@@ -116,6 +126,5 @@ liext_script_speech (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "draw", Speech_draw);
 }
 
-/** @} */
 /** @} */
 /** @} */

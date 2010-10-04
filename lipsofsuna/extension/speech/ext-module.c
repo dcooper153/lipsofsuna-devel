@@ -18,9 +18,7 @@
 /**
  * \addtogroup liext Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliSpeech Speech
+ * \addtogroup LIExtSpeech Speech
  * @{
  */
 
@@ -205,7 +203,7 @@ void liext_speeches_render (
  * \param font Font name.
  * \param message String.
  */
-int liext_speeches_set_speech (
+LIExtSpeech* liext_speeches_set_speech (
 	LIExtModule* self,
 	uint32_t     object,
 	const float* diffuse,
@@ -221,7 +219,7 @@ int liext_speeches_set_speech (
 	create = 0;
 	engobj = lieng_engine_find_object (self->client->engine, object);
 	if (engobj == NULL)
-		return 0;
+		return NULL;
 
 	/* Find or create sound object. */
 	extobj = lialg_u32dic_find (self->objects, object);
@@ -230,11 +228,11 @@ int liext_speeches_set_speech (
 		create = 1;
 		extobj = liext_speech_object_new ();
 		if (extobj == NULL)
-			return 0;
+			return NULL;
 		if (!lialg_u32dic_insert (self->objects, object, extobj))
 		{
 			liext_speech_object_free (extobj);
-			return 0;
+			return NULL;
 		}
 	}
 
@@ -247,7 +245,7 @@ int liext_speeches_set_speech (
 			lialg_u32dic_remove (self->objects, object);
 			liext_speech_object_free (extobj);
 		}
-		return 0;
+		return NULL;
 	}
 	memcpy (speech->diffuse, diffuse, 4 * sizeof (float));
 	if (!lialg_list_prepend (&extobj->speech, speech))
@@ -258,10 +256,10 @@ int liext_speeches_set_speech (
 			liext_speech_object_free (extobj);
 		}
 		liext_speech_free (speech);
-		return 0;
+		return NULL;
 	}
 
-	return 1;
+	return speech;
 }
 
 /*****************************************************************************/
@@ -317,18 +315,18 @@ static int private_tick (
 				next = ptr->next;
 				speech = ptr->data;
 				speech->timer += secs;
-				if (speech->timer > LIEXT_SPEECH_TIMEOUT)
+				if (speech->timer > speech->life_time)
 				{
 					liext_speech_free (speech);
 					lialg_list_remove (&extobj->speech, ptr);
 				}
 				else
 				{
-					t = speech->timer / LIEXT_SPEECH_TIMEOUT;
-					if (t < 0.5)
+					t = (speech->timer - speech->life_time + speech->fade_time) / speech->fade_time;
+					if (t < 0)
 						speech->diffuse[3] = 1.0f;
 					else
-						speech->diffuse[3] = 1.0f - powf (2.0f * t - 0.5, 4);
+						speech->diffuse[3] = 1.0f - powf (t, speech->fade_exponent);
 				}
 			}
 		}
@@ -342,6 +340,5 @@ static int private_tick (
 	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */
