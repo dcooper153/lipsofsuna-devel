@@ -38,6 +38,8 @@
  * --
  * -- @param self Speech class.
  * -- @param args Arguments.<ul>
+ * --   <li>diffuse: Diffuse color.</li>
+ * --   <li>font: Font name or nil.</li>
  * --   <li>object: Object.</li>
  * --   <li>message: Speech string. (required)</li></ul>
  * function Speech.add(self, args)
@@ -45,18 +47,22 @@
 static void Speech_add (LIScrArgs* args)
 {
 	int id;
+	float diffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	const char* msg;
+	const char* font = "default";
 	LIScrData* object;
 	LIExtModule* module;
 
 	if (!liscr_args_gets_string (args, "message", &msg))
 		return;
+	liscr_args_gets_floatv (args, "diffuse", 4, diffuse);
+	liscr_args_gets_string (args, "font", &font);
 	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &object))
 		id = ((LIEngObject*) object->data)->id;
 	else
 		return;
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPEECH);
-	liext_speeches_set_speech (module, id, msg);
+	liext_speeches_set_speech (module, id, diffuse, font, msg);
 }
 
 /* @luadoc

@@ -29,15 +29,19 @@
 
 LIExtSpeech* liext_speech_new (
 	LIExtModule* module,
+	const char*  font,
 	const char*  text)
 {
 	LIExtSpeech* self;
-	LIFntFont* font;
+	LIFntFont* font1;
 
 	self = lisys_malloc (sizeof (LIExtSpeech));
 	if (self == NULL)
 		return NULL;
-	self->alpha = 1.0f;
+	self->diffuse[0] = 1.0f;
+	self->diffuse[1] = 1.0f;
+	self->diffuse[2] = 1.0f;
+	self->diffuse[3] = 1.0f;
 	self->timer = 0.0f;
 	self->text = lifnt_layout_new ();
 	if (self->text == NULL)
@@ -46,9 +50,9 @@ LIExtSpeech* liext_speech_new (
 		return NULL;
 	}
 	lifnt_layout_set_width_limit (self->text, 150);
-	font = liwdg_manager_find_font (module->widgets, "default");
-	if (font != NULL)
-		lifnt_layout_append_string (self->text, font, text);
+	font1 = liwdg_manager_find_font (module->widgets, font);
+	if (font1 != NULL)
+		lifnt_layout_append_string (self->text, font1, text);
 
 	return self;
 }

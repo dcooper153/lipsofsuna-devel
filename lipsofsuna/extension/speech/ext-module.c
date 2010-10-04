@@ -112,10 +112,9 @@ void liext_speeches_render (
 	int y;
 	int w;
 	int h;
+	int width;
 	float* vertex_data;
 	uint32_t* index_data;
-	int width;
-	float diffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	LIAlgU32dicIter iter;
 	LIAlgList* ptr;
 	LIExtObject* object;
@@ -155,8 +154,7 @@ void liext_speeches_render (
 			text = speech->text;
 			win.y += lifnt_layout_get_height (text);
 			width = lifnt_layout_get_width (text) / 2;
-			diffuse[3] = speech->alpha;
-			liren_context_set_diffuse (render->context, diffuse);
+			liren_context_set_diffuse (render->context, speech->diffuse);
 
 			/* Get vertex data. */
 			if (!text->n_glyphs)
@@ -203,11 +201,15 @@ void liext_speeches_render (
  *
  * \param self Module.
  * \param object Object.
+ * \param diffuse Diffuse color.
+ * \param font Font name.
  * \param message String.
  */
 int liext_speeches_set_speech (
 	LIExtModule* self,
 	uint32_t     object,
+	const float* diffuse,
+	const char*  font,
 	const char*  message)
 {
 	int create;
@@ -237,7 +239,7 @@ int liext_speeches_set_speech (
 	}
 
 	/* Allocate new speech. */
-	speech = liext_speech_new (self, message);
+	speech = liext_speech_new (self, font, message);
 	if (speech == NULL)
 	{
 		if (create)
@@ -247,6 +249,7 @@ int liext_speeches_set_speech (
 		}
 		return 0;
 	}
+	memcpy (speech->diffuse, diffuse, 4 * sizeof (float));
 	if (!lialg_list_prepend (&extobj->speech, speech))
 	{
 		if (create)
@@ -323,9 +326,9 @@ static int private_tick (
 				{
 					t = speech->timer / LIEXT_SPEECH_TIMEOUT;
 					if (t < 0.5)
-						speech->alpha = 1.0f;
+						speech->diffuse[3] = 1.0f;
 					else
-						speech->alpha = 1.0f - powf (2.0f * t - 0.5, 4);
+						speech->diffuse[3] = 1.0f - powf (2.0f * t - 0.5, 4);
 				}
 			}
 		}

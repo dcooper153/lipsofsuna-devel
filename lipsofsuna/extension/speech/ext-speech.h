@@ -35,12 +35,13 @@ typedef struct _LIExtSpeech LIExtSpeech;
 struct _LIExtSpeech
 {
 	float timer;
-	float alpha;
+	float diffuse[4];
 	LIFntLayout* text;
 };
 
 LIExtSpeech* liext_speech_new (
 	LIExtModule* module,
+	const char*  font,
 	const char*  text);
 
 void liext_speech_free (

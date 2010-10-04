@@ -58,6 +58,8 @@ void liext_speeches_render (
 int liext_speeches_set_speech (
 	LIExtModule* self,
 	uint32_t     object,
+	const float* diffuse,
+	const char*  font,
 	const char*  message);
 
 /*****************************************************************************/
