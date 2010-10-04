@@ -435,9 +435,9 @@ int livox_manager_paste_voxels (
 	min[0] = xstart / self->tiles_per_line;
 	min[1] = ystart / self->tiles_per_line;
 	min[2] = zstart / self->tiles_per_line;
-	max[0] = (xstart + xsize) / self->tiles_per_line;
-	max[1] = (ystart + ysize) / self->tiles_per_line;
-	max[2] = (zstart + zsize) / self->tiles_per_line;
+	max[0] = (xstart + xsize - 1) / self->tiles_per_line;
+	max[1] = (ystart + ysize - 1) / self->tiles_per_line;
+	max[2] = (zstart + zsize - 1) / self->tiles_per_line;
 
 	/* Loop through affected sectors. */
 	for (sec[2] = min[2] ; sec[2] <= max[2] ; sec[2]++)
