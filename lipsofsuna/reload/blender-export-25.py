@@ -474,7 +474,7 @@ class LINode:
 				self.add_node(LINodeArmature(self, object))
 			if object.type == 'EMPTY':
 				self.add_node(LINode(self, object))
-			if object.type == 'LAMP':
+			if object.type == 'LAMP' and (object.data.type == 'SPOT' or object.data.type == 'POINT'):
 				self.add_node(LINodeLight(self, object))
 
 	def add_node(self, node):
