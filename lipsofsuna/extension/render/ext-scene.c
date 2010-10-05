@@ -53,7 +53,7 @@ static void Scene_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SCENE, liren_deferred_free);
+	data = liscr_data_new (args->script, self, args->clss, liren_deferred_free);
 	if (data == NULL)
 	{
 		liren_deferred_free (self);

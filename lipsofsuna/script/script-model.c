@@ -64,7 +64,7 @@ static void Model_copy (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, self, args->clss->meta, lieng_model_free);
+	self->script = liscr_data_new (args->script, self, args->clss, lieng_model_free);
 	if (self->script == NULL)
 	{
 		lieng_model_free (self);
@@ -108,14 +108,8 @@ static void Model_new (LIScrArgs* args)
 {
 	LIEngModel* self;
 	LIMaiProgram* program;
-	LIScrClass* clss;
 
 	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
-
-	/* Get real class. */
-	clss = liscr_isanyclass (args->lua, 1);
-	if (clss == NULL)
-		return;
 
 	/* Allocate model. */
 	self = lieng_model_new (program->engine);
@@ -123,7 +117,7 @@ static void Model_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, self, clss->meta, lieng_model_free);
+	self->script = liscr_data_new (args->script, self, args->clss, lieng_model_free);
 	if (self->script == NULL)
 	{
 		lieng_model_free (self);

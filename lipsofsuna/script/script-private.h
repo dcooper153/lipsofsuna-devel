@@ -26,7 +26,8 @@
 #include "script-types.h"
 
 #define LISCR_SCRIPT_SELF (NULL + 1)
-#define LISCR_SCRIPT_LOOKUP (NULL + 2)
+#define LISCR_SCRIPT_LOOKUP_CLASS (NULL + 2)
+#define LISCR_SCRIPT_LOOKUP_DATA (NULL + 3)
 
 typedef struct _LIScrClassMemb LIScrClassMemb;
 
@@ -39,15 +40,9 @@ struct _LIScrClass
 {
 	int flags;
 	char* name;
-	char* meta;
 	LIAlgStrdic* userdata;
 	LIScrClass* base;
 	LIScrScript* script;
-	struct
-	{
-		int count;
-		char** array;
-	} interfaces;
 	struct
 	{
 		int count;

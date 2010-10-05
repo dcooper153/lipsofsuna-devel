@@ -309,9 +309,11 @@ LIScrData*
 liscr_vector_new (LIScrScript*       script,
                   const LIMatVector* vector)
 {
+	LIScrClass* clss;
 	LIScrData* self;
 
-	self = liscr_data_new_alloc (script, sizeof (LIMatVector), LISCR_SCRIPT_VECTOR);
+	clss = liscr_script_find_class (script, LISCR_SCRIPT_VECTOR);
+	self = liscr_data_new_alloc (script, sizeof (LIMatVector), clss);
 	if (self == NULL)
 		return NULL;
 	*((LIMatVector*) self->data) = *vector;

@@ -111,10 +111,12 @@ liscr_script_event (LIScrClass* self,
 LIScrData*
 liscr_event_new (LIScrScript* script)
 {
+	LIScrClass* clss;
 	LIScrData* data;
 	LIScrEvent* self;
 
-	data = liscr_data_new_alloc (script, sizeof (LIScrEvent), LISCR_SCRIPT_EVENT);
+	clss = liscr_script_find_class (script, LISCR_SCRIPT_EVENT);
+	data = liscr_data_new_alloc (script, sizeof (LIScrEvent), clss);
 	if (data == NULL)
 		return NULL;
 	self = data->data;

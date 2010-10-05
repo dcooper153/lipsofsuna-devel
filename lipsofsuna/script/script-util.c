@@ -28,87 +28,89 @@
 #include "script-private.h"
 #include "script-util.h"
 
-LIScrClass*
-liscr_isanyclass (lua_State*  lua,
-                  int         arg)
+LIScrClass* liscr_isanyclass (
+	lua_State*  lua,
+	int         arg)
 {
 	int ret;
-	LIAlgStrdicIter iter;
-	LIScrClass* clss;
-	LIScrScript* script = liscr_script (lua);
+	void* ptr;
 
-	LIALG_STRDIC_FOREACH (iter, script->classes)
-	{
-		clss = iter.value;
-		lua_pushvalue (lua, arg);
-		lua_getfield (lua, LUA_REGISTRYINDEX, clss->meta);
-		ret = lua_rawequal (lua, -1, -2);
-		lua_pop (lua, 2);
-		if (ret)
-			return clss;
-	}
+	/* Check if a userdata. */
+	ptr = lua_touserdata (lua, arg);
+	if (ptr == NULL)
+		return NULL;
 
-	return NULL;
+	/* Get the class lookup table. */
+	lua_pushlightuserdata (lua, LISCR_SCRIPT_LOOKUP_CLASS);
+	lua_gettable (lua, LUA_REGISTRYINDEX);
+	lisys_assert (lua_type (lua, -1) == LUA_TTABLE);
+
+	/* Check if in the lookup table. */
+	lua_pushlightuserdata (lua, ptr);
+	lua_gettable (lua, -2);
+	ret = lua_isuserdata (lua, -1);
+	lua_pop (lua, 2);
+	if (!ret)
+		return NULL;
+
+	return ptr;
 }
 
-LIScrData*
-liscr_isanydata (lua_State* lua,
-                 int        arg)
+LIScrData* liscr_isanydata (
+	lua_State* lua,
+	int        arg)
 {
 	int ret;
-	LIAlgStrdicIter iter;
-	LIScrClass* clss;
-	LIScrData* object;
-	LIScrScript* script = liscr_script (lua);
+	void* ptr;
 
-	object = lua_touserdata (lua, arg);
-	if (object == NULL)
+	/* Check if userdata. */
+	ptr = lua_touserdata (lua, arg);
+	if (ptr == NULL)
 		return NULL;
-	if (!lua_getmetatable (lua, arg))
-		return NULL;
-	LIALG_STRDIC_FOREACH (iter, script->classes)
-	{
-		clss = iter.value;
-		lua_getfield (lua, LUA_REGISTRYINDEX, clss->meta);
-		ret = lua_rawequal (lua, -1, -2);
-		lua_pop (lua, 1);
-		if (!ret)
-		{
-			lua_pop (lua, 1);
-			return object;
-		}
-	}
-	lua_pop (lua, 1);
 
-	return NULL;
+	/* Get the data lookup table. */
+	lua_pushlightuserdata (lua, LISCR_SCRIPT_LOOKUP_DATA);
+	lua_gettable (lua, LUA_REGISTRYINDEX);
+	lisys_assert (lua_type (lua, -1) == LUA_TTABLE);
+
+	/* Check if in the lookup table. */
+	lua_pushlightuserdata (lua, ptr);
+	lua_gettable (lua, -2);
+	ret = lua_isuserdata (lua, -1);
+	lua_pop (lua, 2);
+	if (!ret)
+		return NULL;
+
+	return ptr;
 }
 
-LIScrClass*
-liscr_isclass (lua_State*  lua,
-               int         arg,
-               const char* meta)
+/**
+ * \brief Gets a class from stack.
+ *
+ * If the type check fails, NULL is returned.
+ *
+ * Consumes: 0.
+ * Returns: 0.
+ *
+ * \param lua Lua state.
+ * \param arg Stack index.
+ * \param meta Class type.
+ * \return Class owned by Lua or NULL.
+ */
+LIScrClass* liscr_isclass (
+	lua_State*  lua,
+	int         arg,
+	const char* meta)
 {
-	int ret;
-	LIAlgStrdicIter iter;
 	LIScrClass* clss;
-	LIScrScript* script = liscr_script (lua);
 
-	LIALG_STRDIC_FOREACH (iter, script->classes)
-	{
-		clss = iter.value;
-		lua_pushvalue (lua, arg);
-		lua_getfield (lua, LUA_REGISTRYINDEX, clss->meta);
-		ret = lua_rawequal (lua, -1, -2);
-		lua_pop (lua, 2);
-		if (ret)
-		{
-			if (liscr_class_get_interface (clss, meta))
-				return clss;
-			break;
-		}
-	}
+	clss = liscr_isanyclass (lua, arg);
+	if (clss == NULL)
+		return NULL;
+	if (!liscr_class_get_interface (clss, meta))
+		return NULL;
 
-	return NULL;
+	return clss;
 }
 
 /**
@@ -124,10 +126,10 @@ liscr_isclass (lua_State*  lua,
  * \param meta Class type.
  * \return Userdata owned by Lua or NULL.
  */
-LIScrData*
-liscr_isdata (lua_State*  lua,
-              int         arg,
-              const char* meta)
+LIScrData* liscr_isdata (
+	lua_State*  lua,
+	int         arg,
+	const char* meta)
 {
 	LIScrData* data;
 
@@ -140,9 +142,9 @@ liscr_isdata (lua_State*  lua,
 	return data;
 }
 
-LIScrClass*
-liscr_checkanyclass (lua_State* lua,
-                     int        arg)
+LIScrClass* liscr_checkanyclass (
+	lua_State* lua,
+	int        arg)
 {
 	char msg[256];
 	LIScrClass* clss;
@@ -157,9 +159,9 @@ liscr_checkanyclass (lua_State* lua,
 	return clss;
 }
 
-LIScrData*
-liscr_checkanydata (lua_State* lua,
-                    int        arg)
+LIScrData* liscr_checkanydata (
+	lua_State* lua,
+	int        arg)
 {
 	char msg[256];
 	LIScrData* object;
@@ -174,10 +176,10 @@ liscr_checkanydata (lua_State* lua,
 	return object;
 }
 
-LIScrClass*
-liscr_checkclass (lua_State*  lua,
-                  int         arg,
-                  const char* meta)
+LIScrClass* liscr_checkclass (
+	lua_State*  lua,
+	int         arg,
+	const char* meta)
 {
 	char msg[256];
 	LIScrClass* clss;
@@ -190,21 +192,6 @@ liscr_checkclass (lua_State*  lua,
 	}
 
 	return clss;
-}
-
-void*
-liscr_checkclassdata (lua_State*  lua,
-                      int         arg,
-                      const char* meta)
-{
-	void* data;
-	LIScrClass* clss;
-
-	clss = liscr_checkclass (lua, arg, meta);
-	data = liscr_class_get_userdata (clss, meta);
-	lisys_assert (data != NULL);
-
-	return data;
 }
 
 /**
@@ -220,10 +207,10 @@ liscr_checkclassdata (lua_State*  lua,
  * \param meta Class type.
  * \return Userdata owned by Lua.
  */
-LIScrData*
-liscr_checkdata (lua_State*  lua,
-                 int         arg,
-                 const char* meta)
+LIScrData* liscr_checkdata (
+	lua_State*  lua,
+	int         arg,
+	const char* meta)
 {
 	char msg[256];
 	LIScrData* object;
@@ -246,10 +233,10 @@ liscr_checkdata (lua_State*  lua,
  * \param arg Index of the source table.
  * \return Nonzero on success.
  */
-int
-liscr_copyargs (lua_State* lua,
-                LIScrData* data,
-                int        arg)
+int liscr_copyargs (
+	lua_State* lua,
+	LIScrData* data,
+	int        arg)
 {
 	if (lua_type (lua, arg) != LUA_TTABLE)
 		return 0;
@@ -294,12 +281,39 @@ liscr_copyargs (lua_State* lua,
  * \param lua Lua state.
  * \param clss Pointer to script class.
  */
-void
-liscr_pushclass (lua_State*  lua,
-                 LIScrClass* clss)
+void liscr_pushclass (
+	lua_State*  lua,
+	LIScrClass* clss)
 {
-	lua_getfield (lua, LUA_REGISTRYINDEX, clss->meta);
+	/* Get the class lookup table. */
+	lua_pushlightuserdata (lua, LISCR_SCRIPT_LOOKUP_CLASS);
+	lua_gettable (lua, LUA_REGISTRYINDEX);
 	lisys_assert (lua_type (lua, -1) == LUA_TTABLE);
+
+	/* Fetch by pointer. */
+	lua_pushlightuserdata (lua, clss);
+	lua_gettable (lua, -2);
+	lua_remove (lua, -2);
+	lisys_assert (lua_type (lua, -1) == LUA_TUSERDATA);
+}
+
+/**
+ * \brief Pushes the environment table of the clss to stack.
+ *
+ * Consumes: 0.
+ * Returns: 1.
+ *
+ * \param lua Lua state.
+ * \param clss Class.
+ */
+void liscr_pushclasspriv (
+	lua_State*  lua,
+	LIScrClass* clss)
+{
+	liscr_pushclass (lua, clss);
+	lua_getfenv (lua, -1);
+	lua_remove (lua, -2);
+	lisys_assert (lua_istable (lua, -1));
 }
 
 /**
@@ -311,11 +325,11 @@ liscr_pushclass (lua_State*  lua,
  * \param lua Lua state.
  * \param object Pointer to script userdata.
  */
-void
-liscr_pushdata (lua_State* lua,
-                LIScrData* object)
+void liscr_pushdata (
+	lua_State* lua,
+	LIScrData* object)
 {
-	lua_pushlightuserdata (lua, LISCR_SCRIPT_LOOKUP);
+	lua_pushlightuserdata (lua, LISCR_SCRIPT_LOOKUP_DATA);
 	lua_gettable (lua, LUA_REGISTRYINDEX);
 	lisys_assert (lua_type (lua, -1) == LUA_TTABLE);
 	lua_pushlightuserdata (lua, object);
@@ -333,9 +347,9 @@ liscr_pushdata (lua_State* lua,
  * \param lua Lua state.
  * \param object Pointer to script userdata.
  */
-void
-liscr_pushpriv (lua_State* lua,
-                LIScrData* object)
+void liscr_pushpriv (
+	lua_State* lua,
+	LIScrData* object)
 {
 	liscr_pushdata (lua, object);
 	lua_getfenv (lua, -1);
@@ -349,8 +363,8 @@ liscr_pushpriv (lua_State* lua,
  * \param lua Lua state.
  * \return Script.
  */
-LIScrScript*
-liscr_script (lua_State* lua)
+LIScrScript* liscr_script (
+	lua_State* lua)
 {
 	LIScrScript* script;
 

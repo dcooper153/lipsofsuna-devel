@@ -38,27 +38,17 @@
  *
  * \param script Script.
  * \param data Wrapped data.
- * \param meta Name of the metatable.
+ * \param clss Class.
  * \param free Free function called by garbage collector.
  * \return New script userdata or NULL.
  */
-LIScrData*
-liscr_data_new (LIScrScript* script,
-                void*        data,
-                const char*  meta,
-                liscrGCFunc  free)
+LIScrData* liscr_data_new (
+	LIScrScript* script,
+	void*        data,
+	LIScrClass*  clss,
+	liscrGCFunc  free)
 {
-	LIScrClass* clss;
 	LIScrData* object;
-
-	/* Find class. */
-	clss = liscr_script_find_class (script, meta);
-	if (clss == NULL)
-	{
-		lisys_error_set (EINVAL, "invalid class `%s'", meta);
-		lisys_assert (0);
-		return NULL;
-	}
 
 	/* Allocate object. */
 	object = lua_newuserdata (script->lua, sizeof (LIScrData));
@@ -72,11 +62,11 @@ liscr_data_new (LIScrScript* script,
 	object->script = script;
 	object->data = data;
 	object->free = free;
-	luaL_getmetatable (script->lua, meta);
+	liscr_pushclasspriv (script->lua, clss);
 	lua_setmetatable (script->lua, -2);
 
 	/* Add to lookup table. */
-	lua_pushlightuserdata (script->lua, LISCR_SCRIPT_LOOKUP);
+	lua_pushlightuserdata (script->lua, LISCR_SCRIPT_LOOKUP_DATA);
 	lua_gettable (script->lua, LUA_REGISTRYINDEX);
 	lisys_assert (lua_type (script->lua, -1) == LUA_TTABLE);
 	lua_pushlightuserdata (script->lua, object);
@@ -102,13 +92,13 @@ liscr_data_new (LIScrScript* script,
  *
  * \param script Script.
  * \param size Wrapped data size.
- * \param meta Name of the metatable.
+ * \param clss Class.
  * \return New script userdata or NULL.
  */
-LIScrData*
-liscr_data_new_alloc (LIScrScript* script,
-                      size_t       size,
-                      const char*  meta)
+LIScrData* liscr_data_new_alloc (
+	LIScrScript* script,
+	size_t       size,
+	LIScrClass*  clss)
 {
 	void* data;
 	LIScrData* self;
@@ -116,7 +106,7 @@ liscr_data_new_alloc (LIScrScript* script,
 	data = lisys_calloc (1, size);
 	if (data == NULL)
 		return NULL;
-	self = liscr_data_new (script, data, meta, lisys_free);
+	self = liscr_data_new (script, data, clss, lisys_free);
 	if (self == NULL)
 	{
 		lisys_free (data);
@@ -147,7 +137,7 @@ liscr_data_free (LIScrData* object)
 		object->free (object->data, object);
 
 	/* Remove from lookup table. */
-	lua_pushlightuserdata (script->lua, LISCR_SCRIPT_LOOKUP);
+	lua_pushlightuserdata (script->lua, LISCR_SCRIPT_LOOKUP_DATA);
 	lua_gettable (script->lua, LUA_REGISTRYINDEX);
 	lisys_assert (lua_type (script->lua, -1) == LUA_TTABLE);
 	lua_pushlightuserdata (script->lua, object);
@@ -340,7 +330,7 @@ liscr_data_get_valid (LIScrData* self)
 {
 	int ret;
 
-	lua_pushlightuserdata (self->script->lua, LISCR_SCRIPT_LOOKUP);
+	lua_pushlightuserdata (self->script->lua, LISCR_SCRIPT_LOOKUP_DATA);
 	lua_gettable (self->script->lua, LUA_REGISTRYINDEX);
 	lisys_assert (lua_type (self->script->lua, -1) == LUA_TTABLE);
 	lua_pushlightuserdata (self->script->lua, self);

@@ -310,14 +310,16 @@ static void Generator_getter_regions (LIScrArgs* args)
 	int i;
 	LIExtModule* module;
 	LIGenStroke* stroke;
+	LIScrClass* clss;
 	LIScrData* data;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_GENERATOR);
+	clss = liscr_script_find_class (args->script, LIEXT_SCRIPT_REGION);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 	for (i = 0 ; i < module->generator->strokes.count ; i++)
 	{
 		stroke = module->generator->strokes.array + i;
-		data = liscr_data_new_alloc (args->script, sizeof (LIGenStroke), LIEXT_SCRIPT_REGION);
+		data = liscr_data_new_alloc (args->script, sizeof (LIGenStroke), clss);
 		if (data != NULL)
 		{
 			memcpy (data->data, stroke, sizeof (LIGenStroke));

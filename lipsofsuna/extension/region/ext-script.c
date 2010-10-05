@@ -69,7 +69,7 @@ static void Region_find (LIScrArgs* args)
 				    point.y < region->position.y || region->position.y + region->size.y < point.y ||
 				    point.z < region->position.z || region->position.z + region->size.z < point.z)
 					continue;
-				data = liscr_data_new_alloc (args->script, sizeof (void*), LIEXT_SCRIPT_REGION);
+				data = liscr_data_new_alloc (args->script, sizeof (void*), args->clss);
 				if (data == NULL)
 					continue;
 				liscr_pushdata (args->lua, data);

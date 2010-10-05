@@ -27,6 +27,7 @@
 #include "script-class.h"
 #include "script-data.h"
 #include "script-private.h"
+#include "script-util.h"
 
 /**
  * \brief Creates a new script.
@@ -43,20 +44,11 @@ liscr_script_new ()
 	if (self == NULL)
 		return NULL;
 
-	/* Allocate class tree. */
-	self->classes = lialg_strdic_new ();
-	if (self->classes == NULL)
-	{
-		lisys_free (self);
-		return NULL;
-	}
-
 	/* Allocate script. */
 	self->lua = lua_open ();
 	if (self->lua == NULL)
 	{
 		lisys_error_set (ENOMEM, "cannot allocate script");
-		lialg_strdic_free (self->classes);
 		lisys_free (self);
 		return NULL;
 	}
@@ -86,8 +78,17 @@ liscr_script_new ()
 	lua_pushlightuserdata (self->lua, self);
 	lua_settable (self->lua, LUA_REGISTRYINDEX);
 
-	/* Create pointer->userdata lookup table. */
-	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_LOOKUP);
+	/* Create pointer->class lookup table. */
+	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_LOOKUP_CLASS);
+	lua_newtable (self->lua);
+	lua_newtable (self->lua);
+	lua_pushstring (self->lua, "v");
+	lua_setfield (self->lua, -2, "__mode");
+	lua_setmetatable (self->lua, -2);
+	lua_settable (self->lua, LUA_REGISTRYINDEX);
+
+	/* Create pointer->data lookup table. */
+	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_LOOKUP_DATA);
 	lua_newtable (self->lua);
 	lua_newtable (self->lua);
 	lua_pushstring (self->lua, "v");
@@ -106,16 +107,9 @@ liscr_script_new ()
 void
 liscr_script_free (LIScrScript* self)
 {
-	LIAlgStrdicIter iter;
-
-	/* Free all objects. */
+	/* Grabage collect everything. */
 	lua_close (self->lua);
 	self->lua = NULL;
-
-	/* Free classes. */
-	LIALG_STRDIC_FOREACH (iter, self->classes)
-		liscr_class_free (iter.value);
-	lialg_strdic_free (self->classes);
 
 	lisys_free (self);
 }
@@ -142,13 +136,6 @@ liscr_script_create_class (LIScrScript*   self,
 	if (clss == NULL)
 		return NULL;
 
-	/* Store to list. */
-	if (!lialg_strdic_insert (self->classes, clss->meta, clss))
-	{
-		liscr_class_free (clss);
-		return NULL;
-	}
-
 	/* Call initializer. */
 	init (clss, data);
 
@@ -156,7 +143,7 @@ liscr_script_create_class (LIScrScript*   self,
 }
 
 /**
- * \brief Finds a class by name.
+ * \brief Finds a built-in class by name.
  *
  * \param self Script.
  * \param name Class identifier.
@@ -166,7 +153,14 @@ LIScrClass*
 liscr_script_find_class (LIScrScript* self,
                          const char*  name)
 {
-	return lialg_strdic_find (self->classes, name);
+	LIScrClass* clss;
+
+	/* Search from the registry by name. */
+	lua_getfield (self->lua, LUA_REGISTRYINDEX, name);
+	clss = liscr_isclass (self->lua, -1, name);
+	lua_pop (self->lua, 1);
+
+	return clss;
 }
 
 /**
@@ -211,23 +205,6 @@ liscr_script_load (LIScrScript* self,
 		lua_pop (self->lua, 1);
 		return 0;
 	}
-
-	return 1;
-}
-
-/**
- * \brief Inserts a new class to the script.
- *
- * \param self Script.
- * \param clss Class.
- * \return Nonzero on success.
- */
-int
-liscr_script_insert_class (LIScrScript* self,
-                           LIScrClass*  clss)
-{
-	if (!lialg_strdic_insert (self->classes, clss->meta, clss))
-		return 0;
 
 	return 1;
 }

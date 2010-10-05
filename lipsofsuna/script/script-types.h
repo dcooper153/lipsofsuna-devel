@@ -51,7 +51,6 @@ struct _LIScrScript
 {
 	void* userpointer;
 	lua_State* lua;
-	LIAlgStrdic* classes;
 };
 
 /* FIXME */

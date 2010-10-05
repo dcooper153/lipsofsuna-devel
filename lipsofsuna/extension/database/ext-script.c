@@ -96,7 +96,7 @@ static void Database_new (LIScrArgs* args)
 	lisys_free (path);
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, sql, LIEXT_SCRIPT_DATABASE, private_free_database);
+	data = liscr_data_new (args->script, sql, args->clss, private_free_database);
 	if (data == NULL)
 	{
 		lisys_free (sql);

@@ -92,7 +92,7 @@ static void Binding_new (LIScrArgs* args)
 	self = libnd_binding_new (module->bindings, type, action, params, code, mods, mult);
 	if (self == NULL)
 		return;
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_BINDING, libnd_binding_free);
+	data = liscr_data_new (args->script, self, args->clss, libnd_binding_free);
 	if (data == NULL)
 	{
 		libnd_binding_free (self);

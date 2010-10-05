@@ -76,7 +76,7 @@ static void Shader_new (LIScrArgs* args)
 	}
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, shader, LIEXT_SCRIPT_SHADER, liren_shader_free);
+	data = liscr_data_new (args->script, shader, args->clss, liren_shader_free);
 	if (data == NULL)
 	{
 		liren_shader_free (shader);

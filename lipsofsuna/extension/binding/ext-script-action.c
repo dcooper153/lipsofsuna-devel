@@ -128,7 +128,7 @@ static void Action_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_ACTION, libnd_action_free);
+	data = liscr_data_new (args->script, self, args->clss, libnd_action_free);
 	if (data == NULL)
 	{
 		libnd_action_free (self);

@@ -113,9 +113,9 @@ static void Class_new (LIScrArgs* args)
 
 	/* If called with an already inherited class as clss,
 	 * create an instance of that class. */
-	if (strcmp (clss->meta, LISCR_SCRIPT_CLASS))
+	if (strcmp (clss->name, LISCR_SCRIPT_CLASS))
 	{
-		data = liscr_data_new_alloc (args->script, 1, clss->meta);
+		data = liscr_data_new_alloc (args->script, 1, clss);
 		if (data == NULL)
 			return;
 		liscr_args_call_setters (args, data);
@@ -141,17 +141,17 @@ static void Class_new (LIScrArgs* args)
 	while (clss != NULL);
 
 	/* Create a new class. */
+	liscr_script_set_gc (args->script, 0);
 	clss = liscr_class_new_full (args->script, base, name, 0);
 	if (clss == NULL)
-		return;
-	if (!liscr_script_insert_class (args->script, clss))
 	{
-		liscr_class_free (clss);
+		liscr_script_set_gc (args->script, 1);
 		return;
 	}
 
 	/* Return the class. */
 	liscr_args_seti_class (args, clss);
+	liscr_script_set_gc (args->script, 1);
 }
 
 /* @luadoc
@@ -187,7 +187,7 @@ static int Class_getter (lua_State* lua)
 
 	/* Check for class. */
 	clss1 = lua_touserdata (lua, lua_upvalueindex (1));
-	if (!liscr_class_get_interface (clss, clss1->meta))
+	if (!liscr_class_get_interface (clss, clss1->name))
 		return 0;
 
 	/* Getters. */
@@ -232,8 +232,7 @@ static int Class_getter (lua_State* lua)
 	/* Custom class variables. */
 	for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
 	{
-		luaL_getmetatable (lua, ptr->meta);
-		lisys_assert (!lua_isnil (lua, -1));
+		liscr_pushclasspriv (lua, ptr);
 		lua_pushvalue (lua, 2);
 		lua_rawget (lua, -2);
 		lua_remove (lua, -2);
@@ -280,7 +279,7 @@ static int Class_setter (lua_State* lua)
 
 	/* Check for class. */
 	clss1 = lua_touserdata (lua, lua_upvalueindex (1));
-	if (!liscr_class_get_interface (clss, clss1->meta))
+	if (!liscr_class_get_interface (clss, clss1->name))
 		return 0;
 
 	/* Setters. */
@@ -317,8 +316,7 @@ static int Class_setter (lua_State* lua)
 	}
 
 	/* Custom class variables. */
-	luaL_getmetatable (lua, clss->meta);
-	lisys_assert (!lua_isnil (lua, -1));
+	liscr_pushclasspriv (lua, clss);
 	lua_pushvalue (lua, 2);
 	lua_pushvalue (lua, 3);
 	lua_rawset (lua, -3);

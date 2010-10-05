@@ -77,7 +77,7 @@ static void Npc_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_NPC, liext_npc_free);
+	data = liscr_data_new (args->script, self, args->clss, liext_npc_free);
 	if (data == NULL)
 	{
 		liext_npc_free (self);
@@ -103,6 +103,7 @@ static void Npc_solve_path (LIScrArgs* args)
 	LIAiPath* tmp;
 	LIExtNpc* self;
 	LIMatVector vector;
+	LIScrClass* clss;
 	LIScrData* path;
 
 	if (!liscr_args_gets_vector (args, "point", &vector))
@@ -117,7 +118,8 @@ static void Npc_solve_path (LIScrArgs* args)
 		return;
 
 	/* Create path object. */
-	path = liscr_data_new (args->script, tmp, LISCR_SCRIPT_PATH, liai_path_free);
+	clss = liscr_script_find_class (args->script, LISCR_SCRIPT_PATH);
+	path = liscr_data_new (args->script, tmp, clss, liai_path_free);
 	if (path != NULL)
 	{
 		liscr_args_seti_data (args, path);

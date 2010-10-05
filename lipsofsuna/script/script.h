@@ -50,10 +50,6 @@ LIAPICALL (LIScrClass*, liscr_script_find_class, (
 	LIScrScript* self,
 	const char*  name));
 
-LIAPICALL (int, liscr_script_insert_class, (
-	LIScrScript* self,
-	LIScrClass*  clss));
-
 LIAPICALL (void, liscr_script_update, (
 	LIScrScript* self,
 	float        secs));

@@ -61,7 +61,7 @@ static void Material_new (LIScrArgs* args)
 	}
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, material, LIEXT_SCRIPT_MATERIAL, NULL);
+	data = liscr_data_new (args->script, material, args->clss, NULL);
 	if (data == NULL)
 	{
 		livox_manager_remove_material (module->voxels, material->id);

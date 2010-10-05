@@ -448,9 +448,11 @@ LIScrData*
 liscr_quaternion_new (LIScrScript*           script,
                       const LIMatQuaternion* quaternion)
 {
+	LIScrClass* clss;
 	LIScrData* self;
 
-	self = liscr_data_new_alloc (script, sizeof (LIMatQuaternion), LISCR_SCRIPT_QUATERNION);
+	clss = liscr_script_find_class (script, LISCR_SCRIPT_QUATERNION);
+	self = liscr_data_new_alloc (script, sizeof (LIMatQuaternion), clss);
 	if (self == NULL)
 		return NULL;
 	*((LIMatQuaternion*) self->data) = *quaternion;

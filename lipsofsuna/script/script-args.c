@@ -1254,7 +1254,8 @@ liscr_marshal_CLASS (lua_State* lua)
 	LIScrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
 	void (*func)(LIScrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
 
-	if (!liscr_isclass (lua, 1, clss->meta))
+	clss = liscr_isclass (lua, 1, clss->name);
+	if (clss == NULL)
 		return 0;
 	liscr_args_init_func (&args, lua, clss, NULL);
 	func (&args);
@@ -1273,10 +1274,10 @@ liscr_marshal_DATA (lua_State* lua)
 	void (*func)(LIScrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
 	LIScrData* data;
 
-	data = liscr_isdata (lua, 1, clss->meta);
+	data = liscr_isdata (lua, 1, clss->name);
 	if (data == NULL)
 		return 0;
-	liscr_args_init_func (&args, lua, clss, data);
+	liscr_args_init_func (&args, lua, data->clss, data);
 	func (&args);
 
 	if (args.output_table)

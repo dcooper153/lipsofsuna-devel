@@ -92,14 +92,8 @@ private_callback_pressed (LIScrData* data)
 static void Button_new (LIScrArgs* args)
 {
 	LIExtModule* module;
-	LIScrClass* clss;
 	LIScrData* data;
 	LIWdgWidget* self;
-
-	/* Get real class. */
-	clss = liscr_isanyclass (args->lua, 1);
-	if (clss == NULL)
-		return;
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_BUTTON);
@@ -108,7 +102,7 @@ static void Button_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, clss->meta, liwdg_widget_free);
+	data = liscr_data_new (args->script, self, args->clss, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -166,7 +160,7 @@ static void Entry_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_ENTRY, liwdg_widget_free);
+	data = liscr_data_new (args->script, self, args->clss, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -235,7 +229,7 @@ static void Image_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_IMAGE, liwdg_widget_free);
+	data = liscr_data_new (args->script, self, args->clss, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -293,7 +287,7 @@ static void Scroll_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SCROLL, liwdg_widget_free);
+	data = liscr_data_new (args->script, self, args->clss, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -390,7 +384,7 @@ View_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_VIEW, liwdg_widget_free);
+	data = liscr_data_new (args->script, self, args->clss, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);

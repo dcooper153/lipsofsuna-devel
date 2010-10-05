@@ -31,13 +31,13 @@
 LIAPICALL (LIScrData*, liscr_data_new, (
 	LIScrScript* script,
 	void*        data,
-	const char*  meta,
+	LIScrClass*  clss,
 	liscrGCFunc  free));
 
 LIAPICALL (LIScrData*, liscr_data_new_alloc, (
 	LIScrScript* script,
 	size_t       size,
-	const char*  meta));
+	LIScrClass*  clss));
 
 LIAPICALL (void, liscr_data_free, (
 	LIScrData* object));

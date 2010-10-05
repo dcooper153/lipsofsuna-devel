@@ -29,6 +29,10 @@
 #include "script-private.h"
 #include "script-util.h"
 
+void private_inherit (
+	LIScrClass* self,
+	LIScrClass* base);
+
 static int
 private_insert_func (LIScrClass*   self,
                      int           member,
@@ -41,10 +45,6 @@ private_insert_var (LIScrClass*   self,
                     const char*   name,
                     LIScrArgsFunc args,
                     LIScrArgsFunc setter);
-
-static int
-private_string_compare (const void* a,
-                        const void* b);
 
 /*****************************************************************************/
 
@@ -64,72 +64,80 @@ liscr_class_new (LIScrScript* script,
 
 /**
  * \brief Creates a new class.
- *
  * \param script Script.
  * \param base Base class or NULL for none.
  * \param name Class name.
  * \param global Nonzero if a global variables should be allocated as well.
  * \return New class or NULL.
  */
-LIScrClass*
-liscr_class_new_full (LIScrScript* script,
-                      LIScrClass*  base,
-                      const char*  name,
-                      int          global)
+LIScrClass* liscr_class_new_full (
+	LIScrScript* script,
+	LIScrClass*  base,
+	const char*  name,
+	int          global)
 {
+	char* name1;
+	LIAlgStrdic* dict;
 	LIScrClass* self;
 
+	/* Allocate data. */
+	name1 = listr_dup (name);
+	if (name1 == NULL)
+		return NULL;
+	dict = lialg_strdic_new ();
+	if (dict == NULL)
+	{
+		lisys_free (name1);
+		return NULL;
+	}
+
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIScrClass));
+	self = lua_newuserdata (script->lua, sizeof (LIScrClass));
 	if (self == NULL)
 		return NULL;
+	memset (self, 0, sizeof (LIScrClass));
 	self->script = script;
-
-	/* Allocate class name. */
-	self->name = listr_dup (name);
-	if (self->name == NULL)
-	{
-		lisys_free (self);
-		return NULL;
-	}
-
-	/* Allocate metatable name. */
-	self->meta = listr_dup (name);
-	if (self->meta == NULL)
-	{
-		lisys_free (self->name);
-		lisys_free (self);
-		return NULL;
-	}
-
-	/* Allocate userdata. */
-	self->userdata = lialg_strdic_new ();
-	if (self->userdata == NULL)
-	{
-		lisys_free (self->name);
-		lisys_free (self->meta);
-		lisys_free (self);
-		return NULL;
-	}
+	self->name = name1;
+	self->userdata = dict;
 
 	/* Create metatable. */
-	luaL_newmetatable (self->script->lua, self->meta);
-	if (global)
-	{
-		lua_pushvalue (self->script->lua, -1);
-		lua_setglobal (self->script->lua, self->name);
-	}
-
-	/* Set own metatable. */
-	lua_pushvalue (self->script->lua, -1);
-	lua_setmetatable (self->script->lua, -2);
-	lua_pop (self->script->lua, -1);
+	/* The metatable is also used as the environment table. Custom
+	   class variables can be stored to it by the user. */
+	lua_newtable (script->lua);
+	lua_pushvalue (script->lua, -1);
+	lua_setfenv (script->lua, -3);
+	lua_pushvalue (script->lua, -1);
+	lua_setmetatable (script->lua, -3);
+	lua_pop (script->lua, 1);
 
 	/* Setup inheritance. */
 	if (base != NULL)
-		liscr_class_inherit (self, base->meta);
+		private_inherit (self, base);
 
-	/* Default meta functions. */
+	/* Add to registry if a built-in class. */
+	/* This stops built-in classes from being garbage collected as well as
+	   allows built-in classes to be searched with liscr_script_find_class(). */
+	if (name[0] != '_')
+	{
+		lua_pushvalue (script->lua, -1);
+		lua_setfield (script->lua, LUA_REGISTRYINDEX, name);
+	}
+	if (global)
+	{
+		lua_pushvalue (script->lua, -1);
+		lua_setglobal (script->lua, name);
+	}
+
+	/* Add to class lookup. */
+	lua_pushlightuserdata (self->script->lua, LISCR_SCRIPT_LOOKUP_CLASS);
+	lua_gettable (self->script->lua, LUA_REGISTRYINDEX);
+	lisys_assert (lua_type (self->script->lua, -1) == LUA_TTABLE);
+	lua_pushlightuserdata (self->script->lua, self);
+	lua_pushvalue (self->script->lua, -3);
+	lua_settable (self->script->lua, -3);
+	lua_pop (self->script->lua, 2);
+
+	/* Setup default meta functions. */
 	liscr_class_insert_func (self, "__call", liscr_class_default___call);
 	liscr_class_insert_func (self, "__gc", liscr_class_default___gc);
 	liscr_class_insert_func (self, "__index", liscr_class_default___index);
@@ -140,13 +148,21 @@ liscr_class_new_full (LIScrScript* script,
 
 /**
  * \brief Unregisters and frees the class.
- *
  * \param self Class.
  */
-void
-liscr_class_free (LIScrClass* self)
+void liscr_class_free (
+	LIScrClass* self)
 {
 	int i;
+
+	/* Remove from class lookup. */
+	lua_pushlightuserdata (self->script->lua, LISCR_SCRIPT_LOOKUP_CLASS);
+	lua_gettable (self->script->lua, LUA_REGISTRYINDEX);
+	lisys_assert (lua_type (self->script->lua, -1) == LUA_TTABLE);
+	lua_pushlightuserdata (self->script->lua, self);
+	lua_pushnil (self->script->lua);
+	lua_settable (self->script->lua, -3);
+	lua_pop (self->script->lua, 1);
 
 	/* Free accessors. */
 	if (self->vars.array != NULL)
@@ -154,14 +170,6 @@ liscr_class_free (LIScrClass* self)
 		for (i = 0 ; i < self->vars.count ; i++)
 			lisys_free (self->vars.array[i].name);
 		lisys_free (self->vars.array);
-	}
-
-	/* Free interfaces. */
-	if (self->interfaces.array != NULL)
-	{
-		for (i = 0 ; i < self->interfaces.count ; i++)
-			lisys_free (self->interfaces.array[i]);
-		lisys_free (self->interfaces.array);
 	}
 
 	/* Free class variable. */
@@ -175,9 +183,7 @@ liscr_class_free (LIScrClass* self)
 	if (self->userdata != NULL)
 		lialg_strdic_free (self->userdata);
 
-	lisys_free (self->meta);
 	lisys_free (self->name);
-	lisys_free (self);
 }
 
 /**
@@ -190,17 +196,12 @@ int liscr_class_inherit (
 	LIScrClass* self,
 	const char* meta)
 {
-	LIAlgStrdicIter iter;
+	LIScrClass* base;
 
-	/* Set the base class. */
-	self->base = liscr_script_find_class (self->script, meta);
-	if (self->base == NULL)
+	base = liscr_script_find_class (self->script, meta);
+	if (base == NULL)
 		return 0;
-
-	/* Copy userdata from the base class. This will allow the methods
-	   of the base classes to successfully access their data. */
-	LIALG_STRDIC_FOREACH (iter, self->base->userdata)
-		liscr_class_set_userdata (self, iter.key, iter.value);
+	private_inherit (self, base);
 
 	return 1;
 }
@@ -239,70 +240,22 @@ liscr_class_insert_cvar (LIScrClass*   self,
 }
 
 /**
- * \brief Inserts an enumeration value to the class.
- *
- * \param self Class.
- * \param name Name for the value.
- * \param value Integer value.
- */
-void
-liscr_class_insert_enum (LIScrClass* self,
-                         const char* name,
-                         int         value)
-{
-	luaL_getmetatable (self->script->lua, self->meta);
-	lua_pushstring (self->script->lua, name);
-	lua_pushnumber (self->script->lua, value);
-	lua_rawset (self->script->lua, -3);
-	lua_pop (self->script->lua, 1);
-}
-
-/**
  * \brief Inserts a member function to the class.
- *
  * \param self Class.
  * \param name Name for the function.
  * \param value Function pointer.
  */
-void
-liscr_class_insert_func (LIScrClass*  self,
-                         const char*  name,
-                         liscrMarshal value)
+void liscr_class_insert_func (
+	LIScrClass*  self,
+	const char*  name,
+	liscrMarshal value)
 {
-	luaL_getmetatable (self->script->lua, self->meta);
+	liscr_pushclasspriv (self->script->lua, self);
 	lua_pushstring (self->script->lua, name);
 	lua_pushlightuserdata (self->script->lua, self);
 	lua_pushcclosure (self->script->lua, value, 1);
 	lua_rawset (self->script->lua, -3);
 	lua_pop (self->script->lua, 1);
-}
-
-/**
- * \brief Register the class as an implementer of an interface.
- *
- * \param self Class.
- * \param name Type name.
- * \return Nonzero on success.
- */
-int
-liscr_class_insert_interface (LIScrClass* self,
-                              const char* name)
-{
-	char** tmp;
-
-	tmp = lisys_realloc (self->interfaces.array, (self->interfaces.count + 1) * sizeof (char*));
-	if (tmp == NULL)
-		return 0;
-	self->interfaces.array = tmp;
-	tmp += self->interfaces.count;
-	*tmp = listr_dup (name);
-	if (*tmp == NULL)
-		return 0;
-	self->interfaces.count++;
-	qsort (self->interfaces.array, self->interfaces.count,
-		sizeof (char*), private_string_compare);
-
-	return 1;
 }
 
 /**
@@ -340,30 +293,21 @@ liscr_class_insert_mvar (LIScrClass*  self,
 
 /**
  * \brief Checks if the class implements an interface.
- *
  * \param self Class.
  * \param name Type name.
  * \return Nonzero if implements.
  */
-int
-liscr_class_get_interface (const LIScrClass* self,
-                           const char*       name)
+int liscr_class_get_interface (
+	const LIScrClass* self,
+	const char*       name)
 {
-	char* ret;
+	const LIScrClass* ptr;
 
-	/* Check self. */
-	if (!strcmp (self->meta, name))
-		return 1;
-
-	/* Check interfaces. */
-	ret = bsearch (&name, self->interfaces.array, self->interfaces.count,
-		sizeof (char*), private_string_compare);
-	if (ret != NULL)
-		return 1;
-
-	/* Check base. */
-	if (self->base != NULL && liscr_class_get_interface (self->base, name))
-		return 1;
+	for (ptr = self ; ptr != NULL ; ptr = ptr->base)
+	{
+		if (!strcmp (ptr->name, name))
+			return 1;
+	}
 
 	return 0;
 }
@@ -438,7 +382,7 @@ liscr_class_default___call (lua_State* lua)
 
 	/* Check for class. */
 	clss1 = lua_touserdata (lua, lua_upvalueindex (1));
-	if (!liscr_class_get_interface (clss, clss1->meta))
+	if (!liscr_class_get_interface (clss, clss1->name))
 		return 0;
 
 	/* Call new. */
@@ -460,10 +404,15 @@ liscr_class_default___call (lua_State* lua)
 int
 liscr_class_default___gc (lua_State* lua)
 {
+	LIScrClass* clss;
 	LIScrData* self;
 
-	self = liscr_checkanydata (lua, 1);
-	liscr_data_free (self);
+	clss = liscr_isanyclass (lua, 1);
+	if (clss != NULL)
+		liscr_class_free (clss);
+	self = liscr_isanydata (lua, 1);
+	if (self != NULL)
+		liscr_data_free (self);
 
 	return 0;
 }
@@ -499,8 +448,10 @@ int liscr_class_default___index (
 	/* Custom getter. */
 	for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
 	{
-		luaL_getmetatable (lua, ptr->meta);
-		lisys_assert (!lua_isnil (lua, -1));
+		/* Get private table. */
+		liscr_pushclasspriv (lua, ptr);
+
+		/* Get getter. */
 		lua_pushstring (lua, "getter");
 		lua_rawget (lua, -2);
 		if (lua_type (lua, -1) != LUA_TFUNCTION)
@@ -509,6 +460,8 @@ int liscr_class_default___index (
 			continue;
 		}
 		lua_remove (lua, -2);
+
+		/* Call getter. */
 		lua_pushvalue (lua, 1);
 		lua_pushvalue (lua, 2);
 		if (lua_pcall (lua, 2, 1, 0) != 0)
@@ -556,8 +509,10 @@ int liscr_class_default___newindex (
 	/* Custom setter. */
 	for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
 	{
-		luaL_getmetatable (lua, ptr->meta);
-		lisys_assert (!lua_isnil (lua, -1));
+		/* Get private table. */
+		liscr_pushclasspriv (lua, ptr);
+
+		/* Get setter. */
 		lua_pushstring (lua, "setter");
 		lua_rawget (lua, -2);
 		if (lua_type (lua, -1) != LUA_TFUNCTION)
@@ -566,6 +521,8 @@ int liscr_class_default___newindex (
 			continue;
 		}
 		lua_remove (lua, -2);
+
+		/* Call setter. */
 		lua_pushvalue (lua, 1);
 		lua_pushvalue (lua, 2);
 		lua_pushvalue (lua, 3);
@@ -583,13 +540,28 @@ int liscr_class_default___newindex (
 
 /*****************************************************************************/
 
+void private_inherit (
+	LIScrClass* self,
+	LIScrClass* base)
+{
+	LIAlgStrdicIter iter;
+
+	/* Set the base class. */
+	self->base = base;
+
+	/* Copy userdata from the base class. This allows the methods
+	   of the base classes to successfully access their data. */
+	LIALG_STRDIC_FOREACH (iter, self->base->userdata)
+		liscr_class_set_userdata (self, iter.key, iter.value);
+}
+
 static int
 private_insert_func (LIScrClass*   self,
                      int           member,
                      const char*   name,
                      LIScrArgsFunc func)
 {
-	luaL_getmetatable (self->script->lua, self->meta);
+	liscr_pushclasspriv (self->script->lua, self);
 	lua_pushstring (self->script->lua, name);
 	lua_pushlightuserdata (self->script->lua, self);
 	lua_pushlightuserdata (self->script->lua, func);
@@ -642,16 +614,6 @@ private_insert_var (LIScrClass*   self,
 	self->flags |= LISCR_CLASS_FLAG_SORT_VARS;
 
 	return 1;
-}
-
-static int
-private_string_compare (const void* a,
-                        const void* b)
-{
-	const char* const* aa = a;
-	const char* const* bb = b;
-
-	return strcmp (*aa, *bb);
 }
 
 /** @} */

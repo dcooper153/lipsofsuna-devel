@@ -320,14 +320,8 @@ static void Object_new (LIScrArgs* args)
 	int realize = 0;
 	LIEngObject* self;
 	LIMaiProgram* program;
-	LIScrClass* clss;
 
 	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
-
-	/* Get real class. */
-	clss = liscr_isanyclass (args->lua, 1);
-	if (clss == NULL)
-		return;
 
 	/* Allocate object. */
 	self = lieng_object_new (program->engine, 0);
@@ -335,7 +329,7 @@ static void Object_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, self, clss->meta, lieng_object_free);
+	self->script = liscr_data_new (args->script, self, args->clss, lieng_object_free);
 	if (self->script == NULL)
 	{
 		lieng_object_free (self);

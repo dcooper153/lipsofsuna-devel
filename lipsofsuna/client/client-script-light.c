@@ -56,7 +56,7 @@ static void Light_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LICLI_SCRIPT_LIGHT, liren_light_free);
+	data = liscr_data_new (args->script, self, args->clss, liren_light_free);
 	if (data == NULL)
 	{
 		liren_light_free (self);

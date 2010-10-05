@@ -298,6 +298,7 @@ LIScrData*
 liscr_packet_new_readable (LIScrScript*       script,
                            const LIArcReader* reader)
 {
+	LIScrClass* clss;
 	LIScrData* data;
 	LIScrPacket* self;
 
@@ -323,7 +324,8 @@ liscr_packet_new_readable (LIScrScript*       script,
 	memcpy (self->buffer, reader->buffer, reader->length);
 
 	/* Allocate script data. */
-	data = liscr_data_new (script, self, LISCR_SCRIPT_PACKET, liscr_packet_free);
+	clss = liscr_script_find_class (script, LISCR_SCRIPT_PACKET);
+	data = liscr_data_new (script, self, clss, liscr_packet_free);
 	if (data == NULL)
 	{
 		liarc_reader_free (self->reader);
@@ -338,6 +340,7 @@ LIScrData*
 liscr_packet_new_writable (LIScrScript* script,
                            int          type)
 {
+	LIScrClass* clss;
 	LIScrData* data;
 	LIScrPacket* self;
 
@@ -355,7 +358,8 @@ liscr_packet_new_writable (LIScrScript* script,
 	}
 
 	/* Allocate script data. */
-	data = liscr_data_new (script, self, LISCR_SCRIPT_PACKET, liscr_packet_free);
+	clss = liscr_script_find_class (script, LISCR_SCRIPT_PACKET);
+	data = liscr_data_new (script, self, clss, liscr_packet_free);
 	if (data == NULL)
 	{
 		liarc_writer_free (self->writer);

@@ -44,7 +44,7 @@ static void Tile_new (LIScrArgs* args)
 	LIScrData* data;
 
 	/* Allocate userdata. */
-	data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), LIEXT_SCRIPT_TILE);
+	data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), args->clss);
 	if (data == NULL)
 		return;
 	liscr_args_call_setters (args, data);
@@ -376,6 +376,7 @@ static void Voxel_find_material (LIScrArgs* args)
 {
 	int id;
 	LIExtModule* module;
+	LIScrClass* clss;
 	LIScrData* data;
 	LIVoxMaterial* material;
 
@@ -388,7 +389,8 @@ static void Voxel_find_material (LIScrArgs* args)
 		material = livox_material_new_copy (material);
 		if (material == NULL)
 			return;
-		data = liscr_data_new (args->script, material, LIEXT_SCRIPT_MATERIAL, livox_material_free);
+		clss = liscr_script_find_class (args->script, LIEXT_SCRIPT_MATERIAL);
+		data = liscr_data_new (args->script, material, clss, livox_material_free);
 		if (data == NULL)
 		{
 			livox_material_free (material);
@@ -416,6 +418,7 @@ static void Voxel_find_tile (LIScrArgs* args)
 	LIExtModule* module;
 	LIMatVector point;
 	LIMatVector result;
+	LIScrClass* clss;
 	LIScrData* data;
 	LIVoxVoxel* voxel;
 
@@ -436,7 +439,8 @@ static void Voxel_find_tile (LIScrArgs* args)
 			return;
 
 		/* Return values. */
-		data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), LIEXT_SCRIPT_TILE);
+		clss = liscr_script_find_class (args->script, LIEXT_SCRIPT_TILE);
+		data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), clss);
 		if (data == NULL)
 			return;
 		*((LIVoxVoxel*) data->data) = *voxel;
@@ -529,6 +533,7 @@ static void Voxel_get_tile (LIScrArgs* args)
 	int lim;
 	LIExtModule* module;
 	LIMatVector point;
+	LIScrClass* clss;
 	LIScrData* data;
 
 	if (liscr_args_gets_vector (args, "point", &point))
@@ -539,7 +544,8 @@ static void Voxel_get_tile (LIScrArgs* args)
 		    point.y < 0.0f || point.y >= lim ||
 		    point.z < 0.0f || point.z >= lim)
 			return;
-		data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), LIEXT_SCRIPT_TILE);
+		clss = liscr_script_find_class (args->script, LIEXT_SCRIPT_TILE);
+		data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), clss);
 		if (data == NULL)
 			return;
 		livox_manager_get_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, data->data);
@@ -771,12 +777,14 @@ static void Voxel_setter_blocks_per_line (LIScrArgs* args)
 static void Voxel_getter_fill (LIScrArgs* args)
 {
 	LIExtModule* self;
+	LIScrClass* clss;
 	LIScrData* voxel;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
 	if (self->voxels->fill)
 	{
-		voxel = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), LIEXT_SCRIPT_TILE);
+		clss = liscr_script_find_class (args->script, LIEXT_SCRIPT_TILE);
+		voxel = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), clss);
 		if (voxel != NULL)
 		{
 			livox_voxel_init (voxel->data, self->voxels->fill);
