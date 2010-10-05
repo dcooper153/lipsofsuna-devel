@@ -1,4 +1,4 @@
-Startup = Class{name = "Startup"}
+Startup = Class()
 
 -- Modify these to join a server of your choice.
 Startup.addr = "h.lipsofsuna.org"

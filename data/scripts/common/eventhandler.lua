@@ -1,5 +1,4 @@
-Eventhandler = Class{name = "Eventhandler"}
-local instfunc = Eventhandler.new
+Eventhandler = Class()
 Eventhandler.handlers = {}
 setmetatable(Eventhandler.handlers, {__mode = "v"})
 
@@ -12,7 +11,7 @@ setmetatable(Eventhandler.handlers, {__mode = "v"})
 --   <li>type: Event type. (required)</li></ul>
 -- @return New event handler.
 Eventhandler.new = function(clss, args)
-	local self = instfunc(clss, args)
+	local self = Class.new(clss, args)
 	self:enable()
 	return self
 end
