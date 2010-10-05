@@ -34,6 +34,17 @@
  */
 
 /* @luadoc
+ * --- Clears the screen.
+ * -- @param clss Client class.
+ * function Client.clear_buffer(clss)
+ */
+static void Client_clear_buffer (LIScrArgs* args)
+{
+	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
+	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
+/* @luadoc
  * --- Launches a server.
  * --
  * -- @param clss Client class.
@@ -93,6 +104,7 @@ static void Client_screenshot (LIScrArgs* args)
 	pixels = calloc ((height + 1) * pitch, sizeof (uint8_t));
 	if (pixels == NULL)
 		return;
+	glBindFramebuffer (GL_FRAMEBUFFER_EXT, 0);
 	glReadPixels (0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 	/* Flip the image vertically. */
@@ -166,12 +178,7 @@ static void Client_screenshot (LIScrArgs* args)
  */
 static void Client_swap_buffers (LIScrArgs* args)
 {
-	LICliClient* client;
-
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-	client->video.SDL_GL_SwapBuffers ();
-	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	SDL_GL_SwapBuffers ();
 }
 
 /* @luadoc
@@ -255,6 +262,7 @@ licli_script_client (LIScrClass* self,
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_CLIENT, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
+	liscr_class_insert_cfunc (self, "clear_buffer", Client_clear_buffer);
 	liscr_class_insert_cfunc (self, "host", Client_host);
 	liscr_class_insert_cfunc (self, "screenshot", Client_screenshot);
 	liscr_class_insert_cfunc (self, "swap_buffers", Client_swap_buffers);
