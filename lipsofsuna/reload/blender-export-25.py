@@ -31,6 +31,14 @@ LIFormat = LIEnum()
 ##############################################################################
 
 def object_files(object):
+	if object.library:
+		return []
+	try:
+		prop = object['export']
+		if prop == "false":
+			return []
+	except:
+		pass
 	try:
 		path = os.path.split(bpy.data.filepath)[0]
 		path = os.path.join(os.path.split(path)[0], "graphics")
@@ -219,7 +227,7 @@ class LIHierarchy:
 	def rest_pose(self):
 		active = bpy.context.scene.objects.active
 		for obj in bpy.data.objects:
-			if obj.type == 'ARMATURE':
+			if obj.type == 'ARMATURE' and not obj.library:
 				bpy.context.scene.objects.active = obj
 				bpy.ops.object.mode_set(mode='POSE', toggle=False)
 				bpy.ops.pose.select_all(action='SELECT')
