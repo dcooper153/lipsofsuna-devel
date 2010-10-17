@@ -1,0 +1,1778 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assets>
+
+  <author-info>
+    <name>Andrew Kator &amp; Jennifer Legaz</name>
+    <url>http://www.katorlegaz.com/3d_models/</url>
+  </author-info>
+  <author-info>
+    <name>Ari Mustonen</name>
+    <email>amuzen@users.sourceforge.net</email>
+    <url>http://lipsofsuna.org/</url>
+  </author-info>
+  <author-info>
+    <name>Bart Kelsey</name>
+    <url>http://opengameart.org/</url>
+  </author-info>
+  <author-info>
+    <name>Blender Open Model Repository</name>
+    <url>http://blendermodels.org/license.html</url>
+  </author-info>
+  <author-info>
+    <name>Brian Rocz</name>
+    <url>http://3dblenderstuff.wordpress.com/</url>
+  </author-info>
+  <author-info>
+    <name>Clint Bellanger</name>
+    <url>http://pfunked.deviantart.com/</url>
+  </author-info>
+  <author-info>
+    <name>Georges Grondin</name>
+  </author-info>
+  <author-info>
+    <name>Independent.nu</name>
+    <url>http://www.johannespinter.com/inu/ljudbank.htm</url>
+  </author-info>
+  <author-info>
+    <name>Julius</name>
+    <url>http://opengameart.org/user/99</url>
+  </author-info>
+  <author-info>
+    <name>Martin Frydenlund</name>
+  </author-info>
+  <author-info>
+    <name>Michel Baradari</name>
+    <url>http://apollo-music.de</url>
+  </author-info>
+  <author-info>
+    <name>Peragro Tempus Project</name>
+    <url>http://peragro.org/</url>
+  </author-info>
+  <author-info>
+    <name>Scopia Visual Interfaces Systems, s.l.</name>
+    <url>http://www.scopia.es/</url>
+  </author-info>
+  <author-info>
+    <name>Tranberry</name>
+    <url>http://tranberry.se/</url>
+  </author-info>
+  <author-info>
+    <name>Unknown</name>
+  </author-info>
+  <author-info>
+    <name>WeaponGuy</name>
+    <url>http://opengameart.org/user/301</url>
+  </author-info>
+  <author-info>
+    <name>tidbit (Joseph)</name>
+  </author-info>
+  <author-info>
+    <name>titus tscharntk</name>
+  </author-info>
+  <author-info>
+    <name>zero-project</name>
+    <url>http://www.zero-project.gr/</url>
+  </author-info>
+
+  <license-info>
+    <name>CC0</name>
+    <url>http://creativecommons.org/publicdomain/zero/1.0/</url>
+  </license-info>
+  <license-info>
+    <name>Creative Commons BY 3.0</name>
+    <url>http://creativecommons.org/licenses/by/3.0/</url>
+  </license-info>
+  <license-info>
+    <name>Creative Commons BY-SA 3.0</name>
+    <url>http://creativecommons.org/licenses/by-sa/3.0/</url>
+  </license-info>
+
+  <asset>
+    <file>concept/aer1.xcf</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>ok</status>
+    <tag>character</tag>
+    <tag>player</tag>
+    <tag>sketch</tag>
+    <type>concept art</type>
+  </asset>
+
+  <asset>
+    <file>concept/logo.svg</file>
+    <author>Tranberry</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>complete</status>
+    <tag>logo</tag>
+    <tag>svg</tag>
+    <type>logo</type>
+  </asset>
+
+  <asset>
+    <file>import/aer1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/aer1.png</dep>
+    <dep>import/aer1n.png</dep>
+    <status>incomplete</status>
+    <tag>character</tag>
+    <tag>player</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/aer1.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>incomplete</status>
+    <tag>character</tag>
+    <tag>player</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/aer1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>incomplete</status>
+    <tag>character</tag>
+    <tag>player</tag>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/airtank1.blend</file>
+    <author>Brian Rocz</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/airtank1.png</dep>
+    <dep>import/airtank1n.png</dep>
+    <dep>import/airtank2.png</dep>
+    <status>complete</status>
+    <type>model</type>
+    <comment>Reduced the polygon count of the original.</comment>
+  </asset>
+
+  <asset>
+    <file>import/airtank1.png</file>
+    <author>Brian Rocz</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/airtank1n.png</file>
+    <author>Brian Rocz</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>complete</status>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/airtank2.png</file>
+    <author>Brian Rocz</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/alchemy-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <comment>Needs texturing</comment>
+    <status>incomplete</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/arrow-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <comment>Too plain; the head and fletchings don't look quite good. See http://en.wikipedia.org/wiki/Arrow for possible ideas.</comment>
+    <dep>import/arrow-000.png</dep>
+    <status>placeholder</status>
+    <tag>item</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/arrow-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <comment>Quick and dirty placeholder texture.</comment>
+    <status>placeholder</status>
+    <tag>item</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/axe-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/axe-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/bench-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/bench-000.png</dep>
+    <status>textured</status>
+    <tag>prop</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/bench-000.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>prop</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/book-000.blend</file>
+    <author>Peragro Tempus Project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/book-000.png</dep>
+    <status>complete</status>
+    <tag>item</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/book-000.png</file>
+    <author>Peragro Tempus Project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/bottle-000.blend</file>
+    <author>Andrew Kator &amp; Jennifer Legaz</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.katorlegaz.com/3d_models/household_dining/0113/index.php</source>
+    <status>FIXME</status>
+    <tag>item</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/bow-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/bow-001.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/bow-001.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/bow-002.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/bow-002.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/bricks1.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/bricks1n.png</file>
+    <author>WeaponGuy</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+    <status>usable</status>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/bricks2.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/bricks2n.png</file>
+    <author>WeaponGuy</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+    <status>usable</status>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/bricks3.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/bricks3n.png</file>
+    <author>WeaponGuy</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+    <status>usable</status>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/bricks-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <comment>Needs better textures</comment>
+    <status>incomplete</status>
+    <tag>tile</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/bricks-002-nml.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>wall</tag>
+    <tag>brick</tag>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/bricks-002.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>wall</tag>
+    <tag>brick</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/candle-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/candle-000.png</dep>
+    <status>textured</status>
+    <tag>item</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/candle-000.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>item</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/candle-001.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/candle-001.png</dep>
+    <status>textured</status>
+    <tag>item</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/candle-001.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>item</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/candle-002.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/candle-001.png</dep>
+    <status>textured</status>
+    <tag>item</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/candle-002.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>item</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/candle-003.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/candle-002.png</dep>
+    <status>textured</status>
+    <tag>item</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/chair-001.blend</file>
+    <author>Martin Frydenlund</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>FIXME</status>
+    <tag>prop</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/chair-002.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/chair-000.png</dep>
+    <status>textured</status>
+    <tag>prop</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/chair-002.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>prop</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/chest-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <comment>Could use a higher resolution texture.</comment>
+    <dep>import/chest-000.png</dep>
+    <status>textured</status>
+    <tag>container</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/chest-000.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>container</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/cobbles-000-nml.png</file>
+    <author>titus tscharntk</author>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <source>http://www.burningwell.org/gallery2/v/textures/buildings/pavingBrickCobbles/cobbles_grey_texture_TT7010071.JPG.html</source>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/cobbles-000.png</file>
+    <author>titus tscharntk</author>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <source>http://www.burningwell.org/gallery2/v/textures/buildings/pavingBrickCobbles/cobbles_grey_texture_TT7010071.JPG.html</source>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/crate-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <comment>Could inset the face squares.</comment>
+    <comment>Could use a higher resolution texture.</comment>
+    <dep>import/crate-000.png</dep>
+    <status>textured</status>
+    <tag>crate</tag>
+    <tag>tile</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/crate-000.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>crate</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/crystal-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <comment>Too simple</comment>
+    <status>incomplete</status>
+    <tag>tile</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/door-000-nml.png</file>
+    <author>Georges Grondin</author>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <source>http://www.burningwell.org/gallery2/v/textures/buildings/windowsHouses/door968.jpg.html</source>
+    <status>complete</status>
+    <tag>door</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/door-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <comment>Only has frame. Add the door itself.</comment>
+    <status>incomplete</status>
+    <tag>tile</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/door-000.png</file>
+    <author>Georges Grondin</author>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <source>http://www.burningwell.org/gallery2/v/textures/buildings/windowsHouses/door968.jpg.html</source>
+    <status>complete</status>
+    <tag>door</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/drawbridge-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/wood-002.png</dep>
+    <dep>import/wood-002-nml.png</dep>
+    <status>complete</status>
+    <tag>castle</tag>
+    <tag>drawbridge</tag>
+    <tag>gate</tag>
+    <tag>prop</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/ears-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>FIXME</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/equipment1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>placeholder</status>
+    <type>ui</type>
+  </asset>
+
+  <asset>
+    <file>import/eyes-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>placeholder</status>
+    <tag>eyes</tag>
+    <tag>character</tag>
+    <tag>player</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/fence-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/wood-004.png</dep>
+    <status>complete</status>
+    <tag>fence</tag>
+    <tag>tile</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/fence-001.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/wood-004.png</dep>
+    <status>complete</status>
+    <tag>fence</tag>
+    <tag>tile</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/fence-002.blend</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/fence_color.png</dep>
+    <dep>import/fence_normal.png</dep>
+    <source>http://opengameart.org/content/stone-and-wood-barricade</source>
+    <status>usable</status>
+    <tag>fence</tag>
+    <tag>tile</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/fence-003.blend</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/fence_color.png</dep>
+    <dep>import/fence_normal.png</dep>
+    <source>http://opengameart.org/content/stone-and-wood-barricade</source>
+    <status>usable</status>
+    <tag>fence</tag>
+    <tag>tile</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/fence-004.blend</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/fence_color.png</dep>
+    <dep>import/fence_normal.png</dep>
+    <source>http://opengameart.org/content/stone-and-wood-barricade</source>
+    <status>usable</status>
+    <tag>fence</tag>
+    <tag>tile</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/fence_color.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/stone-and-wood-barricade</source>
+    <status>usable</status>
+    <tag>fence</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/fence_normal.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/stone-and-wood-barricade</source>
+    <status>usable</status>
+    <tag>fence</tag>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/fireball1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>placeholder</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/flowerpot-000.blend</file>
+    <author>Scopia Visual Interfaces Systems, s.l.</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://resources.blogscopia.com/models/arboles/maceta/maceta_en.html</source>
+    <status>FIXME</status>
+    <tag>flowerpot</tag>
+    <tag>prop</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/gem-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/gem-000.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/grass-000-nml.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>placeholder</status>
+    <tag>grass</tag>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/grass-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>grass</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/grass-001.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>grass</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/grass-002.png</file>
+    <author>Unknown</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/golgotha-textures-francegrassfulljpg</source>
+    <status>usable</status>
+    <tag>grass</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/grenade1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/grenade1.png</dep>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/grenade1.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/grinosaur-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/grinosaur-000.png</dep>
+    <status>usable</status>
+    <tag>monster</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/grinosaur-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>usable</status>
+    <tag>monster</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/ground-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>incomplete</status>
+    <tag>tile</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/heal1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>placeholder</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/house1.blend</file>
+    <author>WeaponGuy</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+    <status>usable</status>
+    <tag>tile</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/katana-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/katana-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/kraken-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <comment>Needs texturing and animations</comment>
+    <status>rigged</status>
+    <tag>character</tag>
+    <tag>kraken</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/lantern-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/lantern-000.png</dep>
+    <status>textured</status>
+    <tag>item</tag>
+    <tag>lantern</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/lantern-000.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>item</tag>
+    <tag>lantern</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/macrochi-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>usable</status>
+    <tag>crab</tag>
+    <tag>monster</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/macrochi-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>crab</tag>
+    <tag>monster</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/mainmenu1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>gui</type>
+  </asset>
+
+  <asset>
+    <file>import/mattock-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>usable</status>
+    <tag>object</tag>
+    <tag>mattock</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/mattock-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/meat-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>placeholder</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/meat-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>placeholder</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/metal-000.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <comment>It might be possible to add a specular map for this.</comment>
+    <status>ok</status>
+    <tag>metal</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/morningstar-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/morningstar-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/mushroom-000.blend</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/mushroom-000.png</dep>
+    <source>http://opengameart.org/content/low-poly-mushrooms</source>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/mushroom-000.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/low-poly-mushrooms</source>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/particle-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>FIXME</status>
+    <tag>particle</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/particle-001.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>FIXME</status>
+    <tag>particle</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/particle-002.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>FIXME</status>
+    <tag>particle</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/particle-003.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>FIXME</status>
+    <tag>particle</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/poleaxe-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/poleaxe-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/poleaxe-001.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/poleaxe-001.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/porticullis-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/metal-000.png</dep>
+    <dep>import/metal-000-nml.png</dep>
+    <status>complete</status>
+    <tag>castle</tag>
+    <tag>gate</tag>
+    <tag>porticullis</tag>
+    <tag>prop</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/potion-000.blend</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/potions</source>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/roof1.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/roof1n.png</file>
+    <author>WeaponGuy</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+    <status>usable</status>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/rune-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>FIXME</status>
+    <tag>internal</tag>
+    <tag>rune</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/saw1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>incomplete</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/saw1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>placeholder</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/shield-000.blend</file>
+    <author>Peragro Tempus Project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/shield-000.png</dep>
+    <status>complete</status>
+    <tag>shield</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/shield-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>incomplete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/skills1.svg</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>incomplete</status>
+    <tag>icon</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/spear-000.blend</file>
+    <author>Blender Open Model Repository</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://www.blendermodels.org/models/weapon/</source>
+    <status>FIXME</status>
+    <tag>spear</tag>
+    <tag>weapon</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/spotlight-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>FIXME</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/stalagmite-000-nml.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>placeholder</status>
+    <tag>cave</tag>
+    <tag>stalagmite</tag>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/stalagmite-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>placeholder</status>
+    <tag>cave</tag>
+    <tag>stalagmite</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/stalagmite-001.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/stone-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/stone-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/stone-001-nml.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/stone-001.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/stone-001.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/stone-002-nml.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/stone-002.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/stone-002.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/stone-003.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/stone-004.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/stone_color.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/stone-and-wood-barricade</source>
+    <status>usable</status>
+    <tag>stone</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/stone_normal.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/stone-and-wood-barricade</source>
+    <status>usable</status>
+    <tag>stone</tag>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/sword-000.blend</file>
+    <author>Blender Open Model Repository</author>
+    <license>Creative Commons BY 3.0</license>
+    <comment>The crossguard and the pommel look too plain.</comment>
+    <comment>Needs a better texture.</comment>
+    <dep>import/sword-000.png</dep>
+    <source>http://www.blendermodels.org/models/weapon/</source>
+    <status>placeholder</status>
+    <tag>sword</tag>
+    <tag>weapon</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/sword-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <comment>Quick and dirty placeholder texture.</comment>
+    <status>placeholder</status>
+    <tag>sword</tag>
+    <tag>weapon</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/table-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/wood-003.png</dep>
+    <status>textured</status>
+    <tag>prop</tag>
+    <tag>table</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/torch1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <dep>import/wood-002.png</dep>
+    <status>placeholder</status>
+    <tag>torch</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/tree1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>prop</tag>
+    <tag>tree</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/tree1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>prop</tag>
+    <tag>tree</tag>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/tree1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <dep>import/tree1.png</dep>
+    <dep>import/tree1n.png</dep>
+    <dep>import/tree2.png</dep>
+    <status>usable</status>
+    <tag>prop</tag>
+    <tag>tree</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/tree2.png</file>
+    <author>Julius</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/jkms-tree-set</source>
+    <status>usable</status>
+    <tag>prop</tag>
+    <tag>tree</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/wand-000.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/wand-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/wand-001.blend</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/wand-001.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/widgets-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>placeholder</status>
+    <tag>gui</tag>
+    <tag>widgets</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/wood1.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/wood1n.png</file>
+    <author>WeaponGuy</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+    <status>usable</status>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/wood-002-nml.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>prop</tag>
+    <tag>wall</tag>
+    <tag>wood</tag>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/wood-002.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>prop</tag>
+    <tag>wall</tag>
+    <tag>wood</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/wood-003.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>prop</tag>
+    <tag>wood</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/wood-004.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>ok</status>
+    <tag>prop</tag>
+    <tag>wood</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>sounds/beam-000.flac</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>FIXME</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/crack-000.flac</file>
+    <author>Independent.nu</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/35-wooden-crackshitsdestructions</source>
+    <status>complete</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/crack-001.flac</file>
+    <author>Independent.nu</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/35-wooden-crackshitsdestructions</source>
+    <status>complete</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/explosion1.flac</file>
+    <author>Michel Baradari</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/2-explosions</source>
+    <status>complete</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fairytale1.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+    <status>complete</status>
+    <type>music</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fairytale10.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+    <status>complete</status>
+    <type>music</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fairytale11.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+    <status>complete</status>
+    <type>music</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fairytale12.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+    <status>complete</status>
+    <type>music</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fairytale13.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+    <status>complete</status>
+    <type>music</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fairytale2.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+    <status>complete</status>
+    <type>music</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fairytale3.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+    <status>complete</status>
+    <type>music</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fairytale4.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+    <status>complete</status>
+    <type>music</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fairytale5.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+    <status>complete</status>
+    <type>music</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fairytale6.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+    <status>complete</status>
+    <type>music</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fairytale7.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+    <status>complete</status>
+    <type>music</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fairytale8.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+    <status>complete</status>
+    <type>music</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fairytale9.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+    <status>complete</status>
+    <type>music</type>
+  </asset>
+
+  <asset>
+    <file>sounds/fire-000.flac</file>
+    <author>Bart Kelsey</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/spell-4-fire</source>
+    <status>complete</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/growl-000.flac</file>
+    <author>Bart Kelsey</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/6-monstrous-growls</source>
+    <status>complete</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/hop-000.flac</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>FIXME</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/impact-000.flac</file>
+    <author>Independent.nu</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/2-wooden-squish-splatter-sequences</source>
+    <status>complete</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/snap-000.flac</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>FIXME</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/spell-000.flac</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>FIXME</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/spell-001.flac</file>
+    <author>Bart Kelsey</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/spell-3</source>
+    <status>complete</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/spring-000.flac</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>FIXME</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/squish-000.flac</file>
+    <author>Independent.nu</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/2-wooden-squish-splatter-sequences</source>
+    <status>complete</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/swing-000.flac</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>FIXME</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/swing-001.flac</file>
+    <author>Independent.nu</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/35-wooden-crackshitsdestructions</source>
+    <status>complete</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/thud-000.flac</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>FIXME</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/wield-000.flac</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>FIXME</status>
+    <type>sound effect</type>
+  </asset>
+</assets>

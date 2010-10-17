@@ -1,0 +1,204 @@
+Chargen = Class()
+Chargen.visible = false
+Chargen.list_races = {
+	{"Aer", "aer"},
+	{"Android", "android"},
+	{"Devora", "devora"},
+	{"Kraken", "kraken"},
+	{"Wyrm", "wyrm"}}
+Chargen.list_genders = {
+	{"Female", "female"},
+	{"Male", "male"}}
+Chargen.list_hair_styles = {
+	{"Bald", ""},
+	{"Pigtails", "hair1"}}
+Chargen.list_hair_colors = { -- Not implemented yet.
+	{"Default", "default", 1, 1, 1}}
+
+--- Initializes the character generator.
+-- @param clss Chargen class.
+Chargen.init = function(clss)
+	-- Race and hair selectors.
+	local races = {}
+	local genders = {}
+	local hair_styles = {}
+	local hair_colors = {}
+	for k,v in ipairs(clss.list_races) do
+		table.insert(races, {v[1], function() Chargen:set_race(k) end})
+	end
+	for k,v in ipairs(clss.list_genders) do
+		table.insert(genders, {v[1], function() Chargen:set_gender(k) end})
+	end
+	for k,v in ipairs(clss.list_hair_styles) do
+		table.insert(hair_styles, {v[1], function() Chargen:set_hair_style(k) end})
+	end
+	for k,v in ipairs(clss.list_hair_colors) do
+		table.insert(hair_colors, {v[1], function() Chargen:set_hair_color(k) end})
+	end
+	clss.label_race = Button{style = "label", text = "Race:"}
+	clss.combo_race = Widgets.ComboBox(races)
+	clss.label_gender = Button{style = "label", text = "Gender:"}
+	clss.combo_gender = Widgets.ComboBox(genders)
+	clss.label_hair_style = Button{style = "label", text = "Hair:"}
+	clss.combo_hair_style = Widgets.ComboBox(hair_styles)
+	clss.combo_hair_color = Widgets.ComboBox(hair_colors)
+	-- TODO: Apperance sliders.
+	-- Preview widget.
+	clss.scene = Scene()
+	clss.object = Object{position = Vector(-100, -100, -100), type = "character"}
+	clss.light = Light{ambient = {1.0,1.0,1.0,0.3}, diffuse={1.0,1.0,1.0,1.0}, equation={3,0.3,0.03}}
+	clss.camera = Camera{far = 60.0, near = 0.3, mode = "first-person"}
+	clss.timer = Timer{enabled = false, func = function(self, secs) clss:update(secs) end}
+	clss.preview = Group{cols = 1, behind = true, fullscreen = true}
+	clss.preview.margins = {5,5,5,5}
+	clss.preview.render = function(self)
+		clss.camera.viewport = {self.x, self.y, self.width, self.height}
+		clss.scene:draw_begin{
+			modelview = clss.camera.modelview,
+			projection = clss.camera.projection,
+			viewport = clss.camera.viewport}
+		clss.scene:draw_deferred_begin()
+		clss.scene:draw_deferred_opaque()
+		clss.scene:draw_deferred_end()
+		clss.scene:draw_forward_transparent()
+		clss.scene:draw_post_process{shader = "postprocess-vert-hdr"}
+		clss.scene:draw_post_process{shader = "postprocess-horz-hdr"}
+		clss.scene:draw_end()
+	end
+	-- Apply and quit buttons.
+	clss.button_create = Button{text = "Create", pressed = function() clss:apply() end}
+	clss.button_quit = Button{text = "Quit", pressed = function() clss:quit() end}
+	-- Packing.
+	clss.group_hair = Group{rows = 1, cols = 2, homogeneous = true}
+	clss.group_hair:set_child{row = 1, col = 1, widget = clss.combo_hair_style}
+	clss.group_hair:set_child{row = 1, col = 2, widget = clss.combo_hair_color}
+	clss.group_hair:set_expand{col = 1}
+	clss.group_hair:set_expand{col = 2}
+	clss.group_race = Group{rows = 3, cols = 2, homogeneous = true}
+	clss.group_race:set_child{row = 1, col = 1, widget = clss.label_race}
+	clss.group_race:set_child{row = 1, col = 2, widget = clss.combo_race}
+	clss.group_race:set_child{row = 2, col = 1, widget = clss.label_gender}
+	clss.group_race:set_child{row = 2, col = 2, widget = clss.combo_gender}
+	clss.group_race:set_child{row = 3, col = 1, widget = clss.label_hair_style}
+	clss.group_race:set_child{row = 3, col = 2, widget = clss.group_hair}
+	clss.group_race:set_expand{col = 2}
+	clss.group_race:set_request{width = 300}
+	clss.group_left = Group{cols = 1}
+	clss.group_left:append_row(Button{style = "inventory-label", text = "Create character"})
+	clss.group_left:append_row(clss.group_race)
+	clss.group_left:append_row(clss.button_create)
+	clss.group_left:append_row(clss.button_quit)
+	clss.group_left:set_expand{col = 1}
+	clss.group_left:set_request{width = 300}
+	clss.group = clss.preview
+	clss.group:append_row(clss.group_left)
+	clss.group:set_expand{row = 1}
+end
+
+Chargen.apply = function(clss)
+	local packet = Packet(packets.CHARACTER_CREATE,
+		"string", clss.list_races[clss.combo_race.value][2],
+		"string", clss.list_genders[clss.combo_gender.value][2],
+		"string", clss.list_hair_styles[clss.combo_hair_style.value][2],
+		"string", clss.list_hair_colors[clss.combo_hair_color.value][2])
+	Network:send{packet = packet}
+end
+
+--- Executes the character generator.
+-- @param clss Chargen class.
+Chargen.execute = function(clss)
+	Gui:free()
+	Sound.music_fading = 5.0
+	Sound.music_volume = 0.2
+	Sound.music = "fairytale10"
+	clss.group.floating = true
+	clss.object.realized = true
+	clss.timer.enabled = true
+	clss.light.enabled = true
+	clss:random()
+end
+
+Chargen.quit = function(clss)
+	Program.quit = true
+end
+
+--- Randomizes the character
+-- @param clss Chargen class.
+Chargen.random = function(clss)
+	clss:set_race(1)
+	clss:set_gender(1)
+	clss:set_hair_style(2)
+	clss:set_hair_color(1)
+	clss:update_model()
+end
+
+Chargen.set_gender = function(clss, index)
+	clss.combo_gender.value = index
+	clss.combo_gender.text = clss.list_genders[index][1]
+	clss.gender = clss.list_genders[index][2]
+	clss:update_model()
+end
+
+Chargen.set_hair_style = function(clss, index)
+	clss.combo_hair_style.value = index
+	clss.combo_hair_style.text = clss.list_hair_styles[index][1]
+	clss.hair_style = clss.list_hair_styles[index][2]
+	clss:update_model()
+end
+
+Chargen.set_hair_color = function(clss, index)
+	clss.combo_hair_color.value = index
+	clss.combo_hair_color.text = clss.list_hair_colors[index][1]
+	clss.hair_color = clss.list_hair_colors[index][2]
+	clss:update_model()
+end
+
+Chargen.set_race = function(clss, index)
+	clss.combo_race.value = index
+	clss.combo_race.text = clss.list_races[index][1]
+	clss.race = clss.list_races[index][2]
+	clss:update_model()
+end
+
+Chargen.update = function(clss, secs)
+	-- Update model.
+	local rot = Quaternion{axis = Vector(0, 1, 0), angle = math.pi * 0.1 * secs}
+	clss.object.rotation = clss.object.rotation * rot
+	clss.object:update_animations{secs = secs}
+	clss.object:deform_mesh()
+	-- Update light.
+	clss.light.position = clss.object.position + clss.object.rotation * Vector(0, 2, -5)
+	-- Update camera.
+	clss.camera.target_position = clss.object.position + Vector(0, 1.8, -2)
+	clss.camera.target_rotation = Quaternion{axis = Vector(0, 1, 0), angle = math.pi}
+	clss.camera.viewport = {clss.preview.x, clss.preview.y, clss.preview.width, clss.preview.height}
+	clss.camera:update(secs)
+end
+
+Chargen.update_model = function(clss)
+	clss.object:create_character_model{
+		equipment = {"chainmail tunic", "chainmail pants"}, -- TODO
+		gender = clss.gender,
+		hair_color = clss.hair_color,
+		hair_style = clss.hair_style,
+		race = clss.race}
+	clss.object:animate{animation = "walk", channel = 1, permanent = true}
+	clss.object:update_animations{secs = 1}
+	clss.object:deform_mesh()
+end
+
+------------------------------------------------------------------------------
+
+Chargen:init()
+Protocol:add_handler{type = "CHARACTER_ACCEPT", func = function(event)
+	Chargen.group.floating = false
+	Chargen.object.realized = false
+	Chargen.timer.enabled = false
+	Chargen.light.enabled = false
+	Gui:init()
+	Sound.music = "fairytale2"
+	Sound.music_volume = 0.1
+end}
+Protocol:add_handler{type = "CHARACTER_CREATE", func = function(event)
+	Chargen:execute()
+end}
