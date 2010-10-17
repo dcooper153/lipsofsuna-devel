@@ -29,8 +29,9 @@
 #define __IMAGE_DDS_H__
 
 #include <stdio.h>
+#include <string.h>
 #include <lipsofsuna/system.h>
-#include <lipsofsuna/video.h>
+
 #define DDS_HEADER_MAGIC 0x20534444
 #define DDS_FLAG_CAPS 0x00000001
 #define DDS_FLAG_HEIGHT 0x00000002
@@ -50,14 +51,28 @@
 #define DDS_CAPS_TEXTURE 0x00001000
 #define DDS_CAPS_MIPMAP 0x00400000
 
+enum
+{
+	DDS_TYPE_RGBA8888,
+	DDS_TYPE_RGB888,
+	DDS_TYPE_BGRA8888,
+	DDS_TYPE_BGR888,
+	DDS_TYPE_ARGB8888,
+	DDS_TYPE_RGBA4444,
+	DDS_TYPE_ARGB4444,
+	DDS_TYPE_RGB565,
+	DDS_TYPE_BGR565,
+	DDS_TYPE_DXT1,
+	DDS_TYPE_DXT3,
+	DDS_TYPE_DXT5
+};
+
 typedef struct _LIImgDDSFormat LIImgDDSFormat;
 struct _LIImgDDSFormat
 {
-	int compressed;
-	int bpp;
-	GLenum internal;
-	GLenum format;
-	GLenum type;
+	int alpha;
+	int bytes;
+	int type;
 };
 
 typedef struct _LIImgDDSLevel LIImgDDSLevel;
@@ -110,17 +125,16 @@ struct _LIImgDDS
 
 /**
  * \brief Initializes the DDS header for an RGBA image.
- *
  * \param self DDS.
  * \param width Image width.
  * \param height Image height.
  * \param mipmaps Mipmap count.
  */
-static inline void
-liimg_dds_init_rgba (LIImgDDS* self,
-                     int       width,
-                     int       height,
-                     int       mipmaps)
+static inline void liimg_dds_init_rgba (
+	LIImgDDS* self,
+	int       width,
+	int       height,
+	int       mipmaps)
 {
 	memset (self, 0, sizeof (LIImgDDS));
 	self->header.magic = DDS_HEADER_MAGIC;
@@ -147,19 +161,18 @@ liimg_dds_init_rgba (LIImgDDS* self,
 
 /**
  * \brief Initializes the DDS header for an S3TC image.
- *
  * \param self DDS.
  * \param width Image width.
  * \param height Image height.
  * \param size Size of first mipmap level in bytes.
  * \param mipmaps Mipmap count.
  */
-static inline void
-liimg_dds_init_s3tc (LIImgDDS* self,
-                     int       width,
-                     int       height,
-                     int       size,
-                     int       mipmaps)
+static inline void liimg_dds_init_s3tc (
+	LIImgDDS* self,
+	int       width,
+	int       height,
+	int       size,
+	int       mipmaps)
 {
 	memset (self, 0, sizeof (LIImgDDS));
 	self->header.magic = DDS_HEADER_MAGIC;
@@ -182,11 +195,10 @@ liimg_dds_init_s3tc (LIImgDDS* self,
 
 /**
  * \brief Used internally for swapping header byte order when necessary.
- *
  * \param self DDS.
  */
-static inline void
-liimg_dds_byteswap (LIImgDDS* self)
+static inline void liimg_dds_byteswap (
+	LIImgDDS* self)
 {
 	if (lisys_endian_big ())
 	{
@@ -215,14 +227,13 @@ liimg_dds_byteswap (LIImgDDS* self)
 
 /**
  * \brief Reads the DDS file header.
- *
  * \param self DDS.
  * \param file File.
  * \return Nonzero on success.
  */
-static inline int
-liimg_dds_read_header (LIImgDDS* self,
-                       FILE*     file)
+static inline int liimg_dds_read_header (
+	LIImgDDS* self,
+	FILE*     file)
 {
 	int i;
 	int alpha = 0;
@@ -238,15 +249,15 @@ liimg_dds_read_header (LIImgDDS* self,
 	}
 	formats[] =
 	{
-		{ 1, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF, { 0, 4, 4, GL_RGBA, GL_UNSIGNED_BYTE } },
-		{ 0, 24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000, { 0, 3, 3, GL_RGB, GL_UNSIGNED_BYTE } },
-		{ 1, 32, 0x0000FF00, 0x00FF0000, 0xFF000000, 0x000000FF, { 0, 4, 4, GL_BGRA, GL_UNSIGNED_BYTE } },
-		{ 0, 24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000, { 0, 3, 3, GL_BGR, GL_UNSIGNED_BYTE } },
-		{ 1, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000, { 0, 4, 4, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV } },
-		{ 1, 16, 0xF000, 0x0F00, 0x00F0, 0x000F, { 0, 2, 2, GL_RGBA16, GL_UNSIGNED_SHORT_4_4_4_4 } },
-		{ 1, 16, 0x00F0, 0x0F00, 0xF000, 0x000F, { 0, 2, 2, GL_RGBA16, GL_UNSIGNED_SHORT_4_4_4_4_REV } },
-		{ 0, 16, 0xF800, 0x07E0, 0x001F, 0x0000, { 0, 2, 2, GL_RGB16, GL_UNSIGNED_SHORT_5_6_5 } },
-		{ 0, 16, 0x001F, 0x07E0, 0xF800, 0x0000, { 0, 2, 2, GL_RGB16, GL_UNSIGNED_SHORT_5_6_5_REV } }
+		{ 1, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF, { 1, 4, DDS_TYPE_RGBA8888 } },
+		{ 0, 24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000, { 0, 3, DDS_TYPE_RGB888 } },
+		{ 1, 32, 0x0000FF00, 0x00FF0000, 0xFF000000, 0x000000FF, { 1, 4, DDS_TYPE_BGRA8888 } },
+		{ 0, 24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000, { 0, 3, DDS_TYPE_BGR888 } },
+		{ 1, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000, { 1, 4, DDS_TYPE_ARGB8888 } },
+		{ 1, 16, 0xF000, 0x0F00, 0x00F0, 0x000F, { 1, 2, DDS_TYPE_RGBA4444 } },
+		{ 1, 16, 0x00F0, 0x0F00, 0xF000, 0x000F, { 1, 2, DDS_TYPE_ARGB4444 } },
+		{ 0, 16, 0xF800, 0x07E0, 0x001F, 0x0000, { 0, 2, DDS_TYPE_RGB565 } },
+		{ 0, 16, 0x001F, 0x07E0, 0xF800, 0x0000, { 0, 2, DDS_TYPE_BGR565 } }
 	};
 
 	/* Read header. */
@@ -282,19 +293,16 @@ liimg_dds_read_header (LIImgDDS* self,
 		switch (self->format.compress)
 		{
 			case DDS_COMPRESS_DXT1:
-				self->info.compressed = 1;
-				self->info.internal = GL_RGB;
-				self->info.format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+				self->info.alpha = 0;
+				self->info.type = DDS_TYPE_DXT1;
 				return 1;
 			case DDS_COMPRESS_DXT3:
-				self->info.compressed = 1;
-				self->info.internal = GL_RGBA;
-				self->info.format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+				self->info.alpha = 1;
+				self->info.type = DDS_TYPE_DXT3;
 				return 1;
 			case DDS_COMPRESS_DXT5:
-				self->info.compressed = 1;
-				self->info.internal = GL_RGBA;
-				self->info.format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+				self->info.alpha = 1;
+				self->info.type = DDS_TYPE_DXT5;
 				return 1;
 		}
 	}
@@ -318,19 +326,11 @@ liimg_dds_read_header (LIImgDDS* self,
 		}
 	}
 
-	printf ("UNSUPPORTED FORMAT %d %X %X %X %X %X\n",
-		alpha,
-		self->format.rgbbits,
-		self->format.rmask,
-		self->format.gmask,
-		self->format.bmask,
-		self->format.amask);
 	return 0;
 }
 
 /**
  * \brief Reads a mipmap level from the DDS file.
- *
  * \param self DDS.
  * \param file File.
  * \param level Mipmap level.
@@ -338,11 +338,11 @@ liimg_dds_read_header (LIImgDDS* self,
  * \param size Return location for pixel data buffer size.
  * \return Nonzero on success.
  */
-static inline int
-liimg_dds_read_level (LIImgDDS*      self,
-                      FILE*          file,
-                      int            level,
-                      LIImgDDSLevel* result)
+static inline int liimg_dds_read_level (
+	LIImgDDS*      self,
+	FILE*          file,
+	int            level,
+	LIImgDDSLevel* result)
 {
 	int mult;
 
@@ -363,7 +363,7 @@ liimg_dds_read_level (LIImgDDS*      self,
 		result->size = ((result->width + 3) / 4) * ((result->height + 3) / 4) * mult;
 	}
 	else
-		result->size = self->info.bpp * result->width * result->height;
+		result->size = self->info.bytes * result->width * result->height;
 
 	/* Load pixel data. */
 	result->data = lisys_malloc (result->size);
@@ -380,14 +380,13 @@ liimg_dds_read_level (LIImgDDS*      self,
 
 /**
  * \brief Writes the DDS file header.
- *
  * \param self DDS.
  * \param file File.
  * \return Nonzero on success.
  */
-static inline int
-liimg_dds_write_header (LIImgDDS* self,
-                        FILE*     file)
+static inline int liimg_dds_write_header (
+	LIImgDDS* self,
+	FILE*     file)
 {
 	liimg_dds_byteswap (self);
 	if (!fwrite (&self->header.magic, 4, 1, file) ||
@@ -418,7 +417,6 @@ liimg_dds_write_header (LIImgDDS* self,
 
 /**
  * \brief Writes a mipmap level to the DDS file.
- *
  * \param self DDS.
  * \param file File.
  * \param level Mipmap level.
@@ -426,119 +424,17 @@ liimg_dds_write_header (LIImgDDS* self,
  * \param size Pixel data size in bytes.
  * \return Nonzero on success.
  */
-static inline int
-liimg_dds_write_level (LIImgDDS* self,
-                       FILE*     file,
-                       int       level,
-                       void*     data,
-                       int       size)
+static inline int liimg_dds_write_level (
+	LIImgDDS* self,
+	FILE*     file,
+	int       level,
+	void*     data,
+	int       size)
 {
 	if (!fwrite (data, size, 1, file))
 		return 0;
 
 	return 1;
-}
-
-/*****************************************************************************/
-
-/**
- * \brief Loads a DDS texture file.
- *
- * \param file File pointer.
- * \param info Return location for DDS info or NULL.
- * \return New texture number or zero.
- */
-static inline GLuint
-liimg_dds_load_texture (FILE*     file,
-                        LIImgDDS* info)
-{
-	int i;
-	int type;
-	void* tmp;
-	GLuint texture;
-	LIImgDDS dds;
-	LIImgDDSFormat fmt;
-	LIImgDDSLevel lvl;
-
-	/* Read header. */
-	if (!liimg_dds_read_header (&dds, file))
-		return 0;
-	fmt = dds.info;
-	if (info != NULL)
-		*info = dds;
-
-	/* Load image. */
-	glGenTextures (1, &texture);
-	glBindTexture (GL_TEXTURE_2D, texture);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	if (!fmt.compressed)
-	{
-		/* Uncompressed format. */
-		for (i = 0 ; !i || i < (int) dds.header.mipmaps ; i++)
-		{
-			if (!liimg_dds_read_level (&dds, file, i, &lvl))
-			{
-				glDeleteTextures (1, &texture);
-				return 0;
-			}
-			glTexImage2D (GL_TEXTURE_2D, i, fmt.internal, lvl.width,
-				lvl.height, 0, fmt.format, fmt.type, lvl.data);
-			lisys_free (lvl.data);
-		}
-	}
-	else if (GLEW_EXT_texture_compression_s3tc)
-	{
-		/* Hardware uncompression. */
-		for (i = 0 ; !i || i < (int) dds.header.mipmaps ; i++)
-		{
-			if (!liimg_dds_read_level (&dds, file, i, &lvl))
-			{
-				glDeleteTextures (1, &texture);
-				return 0;
-			}
-			glCompressedTexImage2DARB (GL_TEXTURE_2D, i, fmt.format,
-				lvl.width, lvl.height, 0, lvl.size, lvl.data);
-			lisys_free (lvl.data);
-		}
-	}
-	else
-	{
-		/* Software uncompression. */
-		for (i = 0 ; !i || i < (int) dds.header.mipmaps ; i++)
-		{
-			if (!liimg_dds_read_level (&dds, file, i, &lvl))
-			{
-				glDeleteTextures (1, &texture);
-				return 0;
-			}
-			switch (fmt.format)
-			{
-				case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT: type = 1; break;
-				case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT: type = 3; break;
-				case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT: type = 5; break;
-				default:
-					type = 0;
-					break;
-			}
-			if (type)
-			{
-				tmp = lisys_malloc (4 * lvl.width * lvl.height);
-				if (tmp != NULL)
-				{
-					liimg_compress_uncompress (lvl.data, lvl.width, lvl.height, type, tmp);
-					glTexImage2D (GL_TEXTURE_2D, i, 4, lvl.width, lvl.height,
-						0, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
-					lisys_free (tmp);
-				}
-			}
-			lisys_free (lvl.data);
-		}
-	}
-	if (!dds.header.mipmaps)
-		glGenerateMipmap (GL_TEXTURE_2D);
-
-	return texture;
 }
 
 #endif

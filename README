@@ -8,36 +8,43 @@ Forums: http://forum.freegamedev.net/viewforum.php?f=25
 Wiki: http://sourceforge.net/apps/trac/lipsofsuna/wiki/
 
 
+System requirements
+===================
 
-Installing the engine
-=====================
-
-To build the game, you need to have Python and the Waf build system installed,
-as well as a number of dependencies listed on the project wiki. Once you have
-all the requirements installed, build the game with the command:
-
-waf configure build install
+To be able to play the game at all, you need a PC with a graphics card that
+supports OpenGL 3.3 or later.
 
 
+Dependencies
+============
 
-Installing the data files
-=========================
+ * Python            http://www.python.org/
+ * Bullet  >= 2.71   http://www.bulletphysics.com/
+ * Grapple >= 0.9.5  http://opensource.linuxgamepublishing.com/grapple.php
+ * Lua     >= 5.1    http://www.lua.org/
+ * SQLite  >= 3.6    http://www.sqlite.org/
+ * SDL     >= 1.2    http://libsdl.org/
+ * SDL_ttf >= 2.0    http://www.libsdl.org/projects/SDL_ttf
+ * OpenGL  >= 3.3    http://www.opengl.org/
+ * OpenAL            http://www.openal.org/
+ * libogg            http://xiph.org/downloads/
+ * libvorbis         http://xiph.org/downloads/
+ * libflac           http://flac.sourceforge.net/
 
-If you downloaded a file release, you can skip this section. The data files are
-already in their right place and you can run the game right away.
 
-Otherwise, you need to download the data file originals from the data repository
-and import the files to the engine. Do this by running the following two commands
-in the directory where you compiled the game:
+Compiling
+=========
 
-git clone git://lipsofsuna.git.sourceforge.net/gitroot/lipsofsuna/data install/data
-install/lipsofsuna -i
+After installing the dependencies, run the following command in the directory
+where this README file is located:
 
+./waf configure build install
 
 
-Running the game
-================
+Running
+=======
 
-To run the game, type:
+After compiling the game, run the following command in the directory where
+this README file is located:
 
 install/lipsofsuna

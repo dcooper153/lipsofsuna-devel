@@ -66,20 +66,14 @@ def configure(ctx):
 	ctx.check_tool('compiler_cxx')
 
 	# Dependencies
-	ctx.check(header_name='arpa/inet.h', define_name='HAVE_ARPA_INET_H')
 	ctx.check(header_name='dlfcn.h', define_name='HAVE_DLFCN_H')
-	ctx.check(header_name='endian.h', define_name='HAVE_ENDIAN_H')
 	ctx.check(header_name='fcntl.h', define_name='HAVE_FCNTL_H')
 	ctx.check(header_name='inotifytools/inotify.h', define_name='HAVE_INOTIFYTOOLS_INOTIFY_H')
 	ctx.check(header_name='inttypes.h', define_name='HAVE_INTTYPES_H')
-	ctx.check(header_name='netdb.h', define_name='HAVE_NETDB_H')
-	ctx.check(header_name='netinet/in.h', define_name='HAVE_NETINET_IN_H')
 	ctx.check(header_name='poll.h', define_name='HAVE_POLL_H')
 	ctx.check(header_name='stdint.h', define_name='HAVE_STDINT_H')
-	ctx.check(header_name='sys/byteorder.h', define_name='HAVE_SYS_BYTEORDER_H')
 	ctx.check(header_name='sys/inotify.h', define_name='HAVE_SYS_INOTIFY_H')
 	ctx.check(header_name='sys/mman.h', define_name='HAVE_SYS_MMAN_H')
-	ctx.check(header_name='sys/socket.h', define_name='HAVE_SYS_SOCKET_H')
 	ctx.check(header_name='sys/stat.h', define_name='HAVE_SYS_STAT_H')
 	ctx.check(header_name='sys/time.h', define_name='HAVE_SYS_TIME_H')
 	ctx.check(header_name='sys/wait.h', define_name='HAVE_SYS_WAIT_H')
@@ -147,19 +141,6 @@ def configure(ctx):
 	# GLEW
 	ctx.check_cc(header_name='GL/glew.h', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
 	ctx.check_cc(lib='GLEW', mandatory=True, uselib='CORE TEST GL', uselib_store='GLEW')
-
-	# PNG
-	if not ctx.check_cfg(package='libpng12', atleast_version='1.2.0', args='--cflags --libs', uselib_store="PNG") and \
-	   not ctx.check_cfg(package='libpng14', atleast_version='1.2.0', args='--cflags --libs', uselib_store="PNG") and \
-	   not ctx.check_cfg(package='libpng', atleast_version='1.2.0', args='--cflags --libs', uselib_store="PNG"):
-		ctx.check_cxx(header_name='png.h', mandatory=True, uselib='CORE TEST', uselib_store='PNG')
-		if not ctx.check_cxx(lib='png12', mandatory=True, uselib='CORE TEST', uselib_store='PNG') and \
-		   not ctx.check_cxx(lib='png15', mandatory=True, uselib='CORE TEST', uselib_store='PNG'):
-			ctx.check_cxx(lib='png', mandatory=True, uselib='CORE TEST', uselib_store='PNG')
-
-	# squish
-	ctx.check_cxx(header_name='squish.h', mandatory=True, uselib='CORE TEST', uselib_store='SQUISH')
-	ctx.check_cxx(lib='squish', mandatory=True, uselib='CORE TEST', uselib_store='SQUISH')
 
 	if ctx.env.SOUND:
 		# AL
@@ -245,7 +226,7 @@ def build(ctx):
 		ctx.env.TOOLDIR = os.path.join(ctx.env.PREFIX, 'tool')
 		ctx.env.SAVEDIR = os.path.join(ctx.env.PREFIX, 'save')
 	objs = ''
-	libs = 'CORE LUA SQLITE BULLET GRAPPLE SDL SDL_TTF ZLIB GLEW GL PNG SQUISH THREAD AL VORBIS OGG FLAC'
+	libs = 'CORE LUA SQLITE BULLET GRAPPLE SDL SDL_TTF ZLIB GLEW GL THREAD AL VORBIS OGG FLAC'
 
 	# Core objects.
 	for dir in CORE_DIRS.split(' '):
@@ -276,7 +257,7 @@ def build(ctx):
 			features = 'cc',
 			source = ctx.path.ant_glob(path),
 			target = dir + '_ext_objs',
-			uselib = 'EXTENSION LUA SQLITE GRAPPLE SDL SDL_TTF ZLIB GLEW GL PNG THREAD AL VORBIS OGG FLAC')
+			uselib = 'EXTENSION LUA SQLITE GRAPPLE SDL SDL_TTF ZLIB GLEW GL THREAD AL VORBIS OGG FLAC')
 
 	# Target executable.
 	ctx.new_task_gen(

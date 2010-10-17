@@ -22,9 +22,10 @@
  * @{
  */
 
+#include <string.h>
 #include <lipsofsuna/system.h>
-#include "image-compress.h"
 #include "image-dds.h"
+#include "image-ddsgl.h"
 #include "image-texture.h"
 
 /**
@@ -132,7 +133,7 @@ liimg_texture_load (LIImgTexture* self,
 		lisys_error_set (EIO, "cannot open file `%s'", path);
 		return 0;
 	}
-	tex = liimg_dds_load_texture (file, &dds);
+	tex = liimg_ddsgl_load_texture (file, &dds);
 	fclose (file);
 	if (!tex)
 	{

@@ -81,36 +81,9 @@ void liext_reload_free (
 	LIExtReload* self)
 {
 	if (self->reload != NULL)
-	{
-		liext_reload_cancel (self);
 		lirel_reload_free (self->reload);
-	}
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
-}
-
-/**
- * \brief Cancels any active reloading process.
- *
- * \param self Reload.
- */
-void liext_reload_cancel (
-	LIExtReload* self)
-{
-	lirel_reload_cancel (self->reload);
-	private_callback_tick (self, 1.0f);
-}
-
-/**
- * \brief Reloads all client data files.
- *
- * \param self Reload.
- * \return Nonzero on success.
- */
-int liext_reload_run (
-	LIExtReload* self)
-{
-	return lirel_reload_run (self->reload);
 }
 
 /**
@@ -123,14 +96,6 @@ void liext_reload_update (
 {
 	/* Update reloader state. */
 	lirel_reload_update (self->reload);
-}
-
-int liext_reload_get_done (
-	const LIExtReload* self)
-{
-	if (self->reload == NULL)
-		return 1;
-	return lirel_reload_get_done (self->reload);
 }
 
 int liext_reload_get_enabled (

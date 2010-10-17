@@ -35,7 +35,6 @@ struct _LIRelReload
 	int queued;
 	LIPthPaths* paths;
 	LISysNotify* notify;
-	LIThrAsyncCall* worker;
 	void (*reload_image_call)(void*, const char*);
 	void* reload_image_data;
 	void (*reload_model_call)(void*, const char*);
@@ -48,20 +47,8 @@ LIAPICALL (LIRelReload*, lirel_reload_new, (
 LIAPICALL (void, lirel_reload_free, (
 	LIRelReload* self));
 
-LIAPICALL (void, lirel_reload_cancel, (
-	LIRelReload* self));
-
-LIAPICALL (int, lirel_reload_main, (
-	LIRelReload* self));
-
-LIAPICALL (int, lirel_reload_run, (
-	LIRelReload* self));
-
 LIAPICALL (int, lirel_reload_update, (
 	LIRelReload* self));
-
-LIAPICALL (int, lirel_reload_get_done, (
-	const LIRelReload* self));
 
 LIAPICALL (int, lirel_reload_get_enabled, (
 	const LIRelReload* self));
@@ -79,42 +66,6 @@ LIAPICALL (void, lirel_reload_set_model_callback, (
 	LIRelReload* self,
 	void       (*call)(),
 	void*        data));
-
-LIAPICALL (float, lirel_reload_get_progress, (
-	const LIRelReload* self));
-
-/**
- * @}
- * \addtogroup lirelBlender Blender
- * @{
- */
-
-LIAPICALL (int, lirel_reload_blender, (
-	LIRelReload* self,
-	const char*  src,
-	const char*  dst));
-
-/**
- * @}
- * \addtogroup lirelImage Image
- * @{
- */
-
-LIAPICALL (int, lirel_reload_image, (
-	LIRelReload* self,
-	const char*  src,
-	const char*  dst));
-
-/**
- * @}
- * \addtogroup lirelGimp Gimp
- * @{
- */
-
-LIAPICALL (int, lirel_reload_gimp, (
-	LIRelReload* self,
-	const char*  src,
-	const char*  dst));
 
 #endif
 

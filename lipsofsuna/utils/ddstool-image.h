@@ -30,29 +30,32 @@ struct _LIImgImage
 	void* pixels;
 };
 
-LIImgImage*
-liimg_image_new ();
+LIImgImage* liimg_image_new ();
 
-LIImgImage*
-liimg_image_new_from_file (const char* path);
+LIImgImage* liimg_image_new_from_file (
+	const char* path);
 
-void
-liimg_image_free (LIImgImage* self);
+void liimg_image_free (
+	LIImgImage* self);
 
-int
-liimg_image_load (LIImgImage* self,
-                  const char* path);
+int liimg_image_load_dds (
+	LIImgImage* self,
+	const char* path);
 
-int
-liimg_image_save_rgba (LIImgImage* self,
-                       const char* path);
+int liimg_image_load_png (
+	LIImgImage* self,
+	const char* path);
 
-int
-liimg_image_save_s3tc (LIImgImage* self,
-                       const char* path);
+int liimg_image_save_rgba (
+	LIImgImage* self,
+	const char* path);
 
-void
-liimg_image_shrink_half (LIImgImage* self);
+int liimg_image_save_s3tc (
+	LIImgImage* self,
+	const char* path);
+
+void liimg_image_shrink_half (
+	LIImgImage* self);
 
 /** @} */
 /** @} */

@@ -22,19 +22,20 @@
  * @{
  */
 
+#include <stdlib.h>
+#include <string.h>
 #include <png.h>
-#include <lipsofsuna/system.h>
-#include "image-compress.h"
-#include "image-dds.h"
-#include "image.h"
+#include "lipsofsuna/system.h"
+#include "lipsofsuna/image/image-dds.h"
+#include "ddstool-image.h"
+#include "ddstool-compress.h"
 
 /**
  * \brief Creates a new empty image.
  *
  * \return New image or NULL.
  */
-LIImgImage*
-liimg_image_new ()
+LIImgImage* liimg_image_new ()
 {
 	LIImgImage* self;
 
@@ -51,15 +52,16 @@ liimg_image_new ()
  * \param path Path to the image file.
  * \return New image or NULL.
  */
-LIImgImage*
-liimg_image_new_from_file (const char* path)
+LIImgImage* liimg_image_new_from_file (
+	const char* path)
 {
 	LIImgImage* self;
 
 	self = liimg_image_new ();
 	if (self == NULL)
 		return NULL;
-	if (!liimg_image_load (self, path))
+	if (!liimg_image_load_png (self, path) &&
+	    !liimg_image_load_dds (self, path))
 	{
 		liimg_image_free (self);
 		return NULL;
@@ -73,23 +75,88 @@ liimg_image_new_from_file (const char* path)
  *
  * \param self Image.
  */
-void
-liimg_image_free (LIImgImage* self)
+void liimg_image_free (
+	LIImgImage* self)
 {
 	lisys_free (self->pixels);
 	lisys_free (self);
 }
 
 /**
- * \brief Loads the image from a file.
+ * \brief Loads the image from a DDS file.
  *
  * \param self Image.
  * \param path Path to the file.
  * \return Nonzero on success.
  */
-int
-liimg_image_load (LIImgImage* self,
-                  const char* path)
+int liimg_image_load_dds (
+	LIImgImage* self,
+	const char* path)
+{
+	int type;
+	void* pixels;
+	FILE* file;
+	LIImgDDS dds;
+	LIImgDDSFormat fmt;
+	LIImgDDSLevel lvl;
+
+	/* Read header. */
+	file = fopen (path, "rb");
+	if (file == NULL)
+		return 0;
+	if (!liimg_dds_read_header (&dds, file))
+	{
+		fclose (file);
+		return 0;
+	}
+	fmt = dds.info;
+
+	/* Read pixels. */
+	if (!liimg_dds_read_level (&dds, file, 0, &lvl))
+	{
+		fclose (file);
+		return 0;
+	}
+	fclose (file);
+
+	/* Uncompress pixels. */
+	pixels = lisys_calloc (1, 4 * lvl.width * lvl.height);
+	if (pixels == NULL)
+		return 0;
+	switch (fmt.type)
+	{
+		case DDS_TYPE_DXT1: type = 1; break;
+		case DDS_TYPE_DXT3: type = 3; break;
+		case DDS_TYPE_DXT5: type = 5; break;
+		default:
+			type = 0;
+			break;
+	}
+	if (type)
+		liimg_compress_uncompress (lvl.data, lvl.width, lvl.height, type, pixels);
+	else
+		memcpy (pixels, lvl.data, 4 * lvl.width * lvl.height);
+	lisys_free (lvl.data);
+
+	/* Use the new pixels. */
+	lisys_free (self->pixels);
+	self->pixels = pixels;
+	self->width = lvl.width;
+	self->height = lvl.height;
+
+	return 1;
+}
+
+/**
+ * \brief Loads the image from a PNG file.
+ *
+ * \param self Image.
+ * \param path Path to the file.
+ * \return Nonzero on success.
+ */
+int liimg_image_load_png (
+	LIImgImage* self,
+	const char* path)
 {
 	int x;
 	int y;
@@ -141,7 +208,6 @@ liimg_image_load (LIImgImage* self,
 	height = png_get_image_height (png, info);
 	rows = png_get_rows (png, info);
 	depth = png_get_rowbytes (png, info);
-	lisys_assert (depth == 3 * width || depth == 4 * width);
 	depth /= width;
 	fclose (file);
 
@@ -192,9 +258,9 @@ liimg_image_load (LIImgImage* self,
  * \param path Path to the file.
  * \return Nonzero on success.
  */
-int
-liimg_image_save_rgba (LIImgImage* self,
-                       const char* path)
+int liimg_image_save_rgba (
+	LIImgImage* self,
+	const char* path)
 {
 	int w;
 	int h;
@@ -218,7 +284,7 @@ liimg_image_save_rgba (LIImgImage* self,
 	{
 		w = w? w : 1;
 		h = h? h : 1;
-		liimg_dds_write_level (&dds, file, 0, /*pixels*/self->pixels, 4 * w * h);
+		liimg_dds_write_level (&dds, file, 0, self->pixels, 4 * w * h);
 		w >>= 1;
 		h >>= 1;
 		break; /* FIXME: No mipmaps. */
@@ -238,9 +304,9 @@ liimg_image_save_rgba (LIImgImage* self,
  * \param path Path to the file.
  * \return Nonzero on success.
  */
-int
-liimg_image_save_s3tc (LIImgImage* self,
-                       const char* path)
+int liimg_image_save_s3tc (
+	LIImgImage* self,
+	const char* path)
 {
 	int w;
 	int h;
@@ -300,8 +366,8 @@ liimg_image_save_s3tc (LIImgImage* self,
  *
  * \param self Image.
  */
-void
-liimg_image_shrink_half (LIImgImage* self)
+void liimg_image_shrink_half (
+	LIImgImage* self)
 {
 	int x;
 	int y;

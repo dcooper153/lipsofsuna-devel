@@ -44,17 +44,8 @@ LIExtReload* liext_reload_new (
 void liext_reload_free (
 	LIExtReload* self);
 
-void liext_reload_cancel (
-	LIExtReload* self);
-
-int liext_reload_run (
-	LIExtReload* self);
-
 void liext_reload_update (
 	LIExtReload* self);
-
-int liext_reload_get_done (
-	const LIExtReload* self);
 
 int liext_reload_get_enabled (
 	const LIExtReload* self);

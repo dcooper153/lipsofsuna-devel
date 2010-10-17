@@ -18,7 +18,6 @@
 #ifndef __LIPS_IMAGE_H__
 #define __LIPS_IMAGE_H__
 
-#include "image/image.h"
 #include "image/image-texture.h"
 
 #endif

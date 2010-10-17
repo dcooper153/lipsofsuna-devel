@@ -26,7 +26,7 @@
  */
 
 #include <squish.h>
-#include "image-compress.h"
+#include "ddstool-compress.h"
 
 /**
  * \brief Compresses RGBA pixel data to DXT5 bytes.

@@ -45,18 +45,6 @@ Startup.execute = function(clss)
 				self:disable()
 			end
 		end}
-	elseif Startup.mode == "--import" then
-		-- Import data files.
-		if not clss.reload_started then
-			clss.text.text = "Importing data files..."
-			Reload:reload()
-			clss.reload_wait_timer = Timer{delay = 1, func = function(self)
-				if Reload.done then
-					clss.text.text = "Data files imported."
-					self:disable()
-				end
-			end}
-		end
 	elseif Startup.mode == "--join" then
 		-- Join a game.
 		Program:unload_world()

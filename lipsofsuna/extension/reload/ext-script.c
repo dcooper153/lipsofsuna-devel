@@ -35,58 +35,6 @@
  */
 
 /* @luadoc
- * --- Cancels any ongoing reload.
- * --
- * -- @param clss Reload class.
- * function Reload.cancel(clss)
- */
-static void Reload_cancel (LIScrArgs* args)
-{
-	LIExtReload* self;
-
-	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
-	liext_reload_cancel (self);
-}
-
-/* @luadoc
- * --- Reloads all modified data files.
- * --
- * -- @param clss Reload class.
- * -- @param args Arguments.<ul>
- * --   <li>block: If true, lock up the game until done.</li></ul>
- * function Reload.reload(clss, args)
- */
-static void Reload_reload (LIScrArgs* args)
-{
-	int block = 0;
-	LIExtReload* self;
-
-	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
-	liscr_args_gets_bool (args, "block", &block);
-	liext_reload_run (self);
-
-	if (block)
-	{
-		while (!liext_reload_get_done (self))
-			liext_reload_update (self);
-	}
-}
-
-/* @luadoc
- * --- True if the reloader is currently idle.
- * --
- * -- @name Reload.done
- * -- @class table
- */
-static void Reload_getter_done (LIScrArgs* args)
-{
-	LIExtReload* self;
-
-	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
-	liscr_args_seti_bool (args, liext_reload_get_done (self));
-}
-
-/* @luadoc
  * --- Automatic reload flag.
  * --
  * -- False by default.
@@ -121,9 +69,6 @@ liext_script_reload (LIScrClass* self,
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_RELOAD, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "cancel", Reload_cancel);
-	liscr_class_insert_cfunc (self, "reload", Reload_reload);
-	liscr_class_insert_cvar (self, "done", Reload_getter_done, NULL);
 	liscr_class_insert_cvar (self, "enabled", Reload_getter_enabled, Reload_setter_enabled);
 }
 
