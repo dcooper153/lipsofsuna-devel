@@ -292,9 +292,14 @@ def build(ctx):
 	ctx.install_as(instpath, 'lipsofsuna-bin' + ctx.env.EXEEXT, chmod = 0777)
 	ctx.install_files(ctx.env.TOOLDIR, ['lipsofsuna/reload/blender-export.py'])
 	ctx.install_files(ctx.env.TOOLDIR, ['lipsofsuna/reload/blender-export-25.py'])
-	for src in ctx.path.ant_glob('data/**/*.*').split(' '):
-		dst = os.path.join(ctx.env.DATADIR, os.path.dirname(src).replace('data/', ''))
+	for src in ctx.path.ant_glob('data/launcher/**/*.*').split(' '):
+		dst = os.path.join(ctx.env.DATADIR, os.path.dirname(src).replace('data/launcher/', ''))
 		ctx.install_files(dst, [src])
+	for src in ctx.path.ant_glob('data/lipsofsuna/**/*.*').split(' '):
+		dst = os.path.join(ctx.env.MODSDIR, os.path.dirname(src).replace('data/lipsofsuna/', 'lipsofsuna/'))
+		ctx.install_files(dst, [src])
+	dst = os.path.join(ctx.env.MODSDIR, 'lipsofsuna', 'save')
+	ctx.install_files(dst, [])
 
 def html(ctx):
 	Utils.exec_command('docs/makedoc.sh ' + VERSION)
