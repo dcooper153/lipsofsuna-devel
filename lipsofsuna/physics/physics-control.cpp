@@ -145,7 +145,7 @@ liphyCharacterControl::get_ground ()
 
 liphyRigidControl::liphyRigidControl (LIPhyObject* object, btCollisionShape* shape) :
 	liphyControl (object, shape),
-	body (0.0, object->motion, shape, btVector3 (0.0, 0.0, 0.0))
+	body (object->config.mass, object->motion, shape, btVector3 (0.0, 0.0, 0.0))
 {
 	LIMatVector v;
 	btVector3 angular (object->config.angular.x, object->config.angular.y, object->config.angular.z);
@@ -179,6 +179,7 @@ void
 liphyRigidControl::transform (const btTransform& value)
 {
 	this->body.setCenterOfMassTransform (value);
+	this->object->motion->setWorldTransform (value);
 }
 
 void
@@ -294,6 +295,7 @@ liphyStaticControl::transform (const btTransform& value)
 {
 	this->object->physics->dynamics->removeRigidBody (&this->body);
 	this->body.setCenterOfMassTransform (value);
+	this->object->motion->setWorldTransform (value);
 	this->object->physics->dynamics->addRigidBody (&this->body,
 		this->object->config.collision_group,
 		this->object->config.collision_mask);
@@ -355,6 +357,7 @@ liphyVehicleControl::transform (const btTransform& value)
 	int i;
 
 	this->body.setCenterOfMassTransform (value);
+	this->object->motion->setWorldTransform (value);
 	this->vehicle->resetSuspension ();
 	for (i = 0 ; i < this->vehicle->getNumWheels () ; i++)
 		this->vehicle->updateWheelTransform (i, true);
