@@ -277,7 +277,7 @@ def build(ctx):
 		dst = os.path.join(ctx.env.DATADIR, os.path.dirname(src).replace('data/launcher/', ''))
 		ctx.install_files(dst, [src])
 	for src in ctx.path.ant_glob('data/lipsofsuna/**/*.*').split(' '):
-		dst = os.path.join(ctx.env.MODSDIR, os.path.dirname(src).replace('data/lipsofsuna/', 'lipsofsuna/'))
+		dst = os.path.join(ctx.env.MODSDIR, os.path.dirname(src.replace('data/lipsofsuna/', 'lipsofsuna/')))
 		ctx.install_files(dst, [src])
 	dst = os.path.join(ctx.env.MODSDIR, 'lipsofsuna', 'save')
 	ctx.install_files(dst, [])
