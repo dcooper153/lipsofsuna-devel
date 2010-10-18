@@ -136,10 +136,6 @@ Widgets:add_widget_style("scroll-horz:ref", [[
 ]])
 
 Widgets:add_widget_style("inventory", [[
-	file: widgets1.dds;
-	source: 192 0;
-	width: 6 52 6;
-	height: 6 52 6;
 	padding: 8 8 8 8;
 	text-color: 1 1 1 1;
 	hover-color: 1 0 0 1;

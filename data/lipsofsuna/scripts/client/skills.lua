@@ -81,12 +81,12 @@ Skills.update = function(clss, id, value, cap)
 		skill.cap = cap
 		skill.max = spec and spec.max or 100
 		if id == "health" then
-			Gui.skill_health.reference = skill.maximum
-			Gui.skill_health.value = skill.value
+			Gui.skill_health.reference = cap
+			Gui.skill_health.value = value
 		end
 		if id == "willpower" then
-			Gui.skill_mana.reference = skill.maximum
-			Gui.skill_mana.value = skill.value
+			Gui.skill_mana.reference = cap
+			Gui.skill_mana.value = value
 		end
 	end
 end

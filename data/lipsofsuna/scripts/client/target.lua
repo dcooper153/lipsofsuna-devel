@@ -11,7 +11,7 @@ end
 --- Cancels targeting.
 -- @param self Target class.
 function Target.cancel(self)
-	Gui.action_label.text = ""
+	Gui:set_action_text()
 	self.func = nil
 	self.action.enabled = false
 	controls.EDIT_SELECT.enabled = not Client.moving
@@ -51,7 +51,7 @@ end
 -- @param self Target class.
 -- @param func Targeting callback.
 function Target.start(self, msg, func)
-	Gui.action_label.text = msg
+	Gui:set_action_text(msg)
 	self.func = func
 	self.action.enabled = true
 	Client.moving = false

@@ -3,6 +3,13 @@ Gui = Class()
 --- Initializes the in-game user interface.
 -- @param clss Gui class.
 Gui.init = function(clss)
+	-- Inventory menu.
+	Gui.inventory_group = Group{cols = 1, style = "inventory"}
+	Gui.inventory_group:set_request{width = 100}
+	Gui.inventory_group:append_row(Button{style = "inventory-label", text = "Inventory"})
+	Gui.inventory_group:append_row(Equipment.group)
+	Gui.inventory_group:append_row(Inventory.group)
+	Gui.inventory_group:set_expand{col = 1, row = 3}
 	-- Action menu.
 	Gui.menu_widget_actions = Widgets.Menu{
 		{"Examine", function() Commands:examine() end},
@@ -11,15 +18,11 @@ Gui.init = function(clss)
 		{"Use", function() Commands:use() end}}
 	-- View menu.
 	Gui.menu_widget_view = Widgets.Menu{
-		{"Inventory", function() Inventory:toggle() Equipment:toggle() end},
+		{"Inventory", Gui.inventory_group},
 		{"Skills", Skills.window}}
 	-- Admin menu.
 	Gui.menu_widget_admin = Widgets.Menu{
 		{"Editor", function() Editing:toggle() end},
-		{"Reload", function() Reload:reload() end},
-		{"Package", function()
-			Packager:save{file = "lipsofsuna-data-0.0.3.tar.gz", dir = "lipsofsuna-0.0.3"}
-		end},
 		{"Save", function() Network:send{packet = Packet(packets.ADMIN_SAVE)} end},
 		{"Shutdown", function() Network:send{packet = Packet(packets.ADMIN_SHUTDOWN)} end}}
 	Gui.menu_widget_main = Widgets.Menu{
@@ -68,12 +71,18 @@ are especially welcome.
 	Gui.menus = Widgets.Menus()
 	Gui.menus:open{level = 1, widget = Gui.menu_widget_main}
 	-- Bottom HUD.
+	Gui.action_label = Button{style = "label", visible = false}
 	Gui.chat_history = Widgets.Log()
 	Gui.chat_entry = Entry{style = "chat"}
 	Gui.chat_entry.activated = function(self)
 		Network:send{packet = Packet(packets.CHAT, "string", self.text)}
 		self:clear()
 	end
+	Gui.chat_group = Group{cols = 1}
+	Gui.chat_group:append_row(Gui.chat_history)
+	Gui.chat_group:append_row(Gui.chat_entry)
+	Gui.chat_group:append_row(Gui.action_label)
+	Gui.chat_group:set_expand{row = 1}
 	-- Skill group.
 	Gui.skill_health = Scroll{style = "health"}
 	Gui.skill_health:set_range{min = 0, max = 100}
@@ -89,29 +98,20 @@ are especially welcome.
 	Gui.skills_group:append_col(skillgrp)
 	Gui.skills_group:append_col(Quickslots.group)
 	Gui.skills_group:set_expand{col = 2}
-	Gui.action_label = Button{style = "label"}
 	-- Packing.
 	Gui.fps_label = Button{style = "label"}
-	Gui.editor_group = Group{cols = 1, style = "inventory", visible = false}
+	Gui.editor_group = Group{cols = 1, style = "window", visible = false}
 	Gui.editor_group:append_row(Button{style = "inventory-label", text = "Editor"})
 	Gui.editor_group:append_row(Editing.dialog)
 	Gui.menu_group = Group{rows = 1}
 	Gui.menu_group:append_col(Gui.menus)
-	Gui.menu_group:append_col(Gui.chat_history)
+	Gui.menu_group:append_col(Gui.chat_group)
 	Gui.menu_group:set_expand{col = 2}
 	Gui.center_group = Group{cols = 1}
 	Gui.center_group:append_row(Gui.fps_label)
 	Gui.center_group:append_row(Gui.menu_group)
-	Gui.center_group:append_row(Gui.action_label)
-	Gui.center_group:append_row(Gui.chat_entry)
 	Gui.center_group:append_row(Gui.skills_group)
 	Gui.center_group:set_expand{row = 1}
-	Gui.inventory_group = Group{cols = 1, style = "inventory", visible = false}
-	Gui.inventory_group:set_request{width = 100}
-	Gui.inventory_group:append_row(Button{style = "inventory-label", text = "Inventory"})
-	Gui.inventory_group:append_row(Equipment.group)
-	Gui.inventory_group:append_row(Inventory.group)
-	Gui.inventory_group:set_expand{col = 1, row = 3}
 	Gui.scene = Group{rows = 1, style = "scene", margins = {5,5,5,5}}
 	Gui.scene.scene = Scene()
 	Gui.scene.pick = function(self) return Target:pick_scene() end
@@ -135,7 +135,6 @@ are especially welcome.
 	end
 	Gui.scene:append_col(Gui.editor_group)
 	Gui.scene:append_col(Gui.center_group)
-	Gui.scene:append_col(Gui.inventory_group)
 	Gui.scene:set_expand{col = 2, row = 1}
 	Gui.bottom = Group{rows = 1}
 	Gui.bottom:append_col(Gui.scene)
@@ -151,6 +150,18 @@ end
 -- @param clss Gui class.
 Gui.free = function()
 	Gui.main.floating = false
+end
+
+--- Sets or unsets the text of the action label.
+-- @param clss Gui class.
+-- @param text String or nil.
+Gui.set_action_text = function(clss, text)
+	if text then
+		clss.action_label.text = text
+		clss.action_label.visible = true
+	else
+		clss.action_label.visible = false
+	end
 end
 
 Eventhandler{type = "tick", func = function(self, args)

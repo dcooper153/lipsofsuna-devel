@@ -1,33 +1,34 @@
-Equipment = {}
+Equipment = Class()
 
-do
-	Equipment.group = Group{cols = 1, style = "equipment", visible = false}
-	Equipment.group:set_request{height = 155, width = 60}
-	Equipment.button_head = Button{style = "label"}
-	Equipment.button_upperbody = Button{style = "label"}
-	Equipment.button_handl = Button{style = "label"}
-	Equipment.button_handr = Button{style = "label"}
-	Equipment.button_lowerbody = Button{style = "label"}
-	Equipment.button_feet = Button{style = "label"}
-	Equipment.group:append_row(Equipment.button_head)
-	Equipment.group:append_row(Equipment.button_upperbody)
-	Equipment.group:append_row(Equipment.button_handr)
-	Equipment.group:append_row(Equipment.button_handl)
-	Equipment.group:append_row(Equipment.button_lowerbody)
-	Equipment.group:append_row(Equipment.button_feet)
-	Equipment.button_head.pressed = function() Equipment:clicked("head") end
-	Equipment.button_upperbody.pressed = function() Equipment:clicked("upperbody") end
-	Equipment.button_handl.pressed = function() Equipment:clicked("hand.L") end
-	Equipment.button_handr.pressed = function() Equipment:clicked("hand.R") end
-	Equipment.button_lowerbody.pressed = function() Equipment:clicked("lowerbody") end
-	Equipment.button_feet.pressed = function() Equipment:clicked("feet") end
+Equipment.init = function(clss)
+	clss.group = Group{cols = 1, style = "equipment"}
+	clss.group:set_request{height = 155, width = 60}
+	clss.button_head = Button{style = "label"}
+	clss.button_upperbody = Button{style = "label"}
+	clss.button_handl = Button{style = "label"}
+	clss.button_handr = Button{style = "label"}
+	clss.button_lowerbody = Button{style = "label"}
+	clss.button_feet = Button{style = "label"}
+	clss.group:append_row(clss.button_head)
+	clss.group:append_row(clss.button_upperbody)
+	clss.group:append_row(clss.button_handr)
+	clss.group:append_row(clss.button_handl)
+	clss.group:append_row(clss.button_lowerbody)
+	clss.group:append_row(clss.button_feet)
+	clss.group:set_expand{col = 1}
+	clss.button_head.pressed = function() clss:clicked("head") end
+	clss.button_upperbody.pressed = function() clss:clicked("upperbody") end
+	clss.button_handl.pressed = function() clss:clicked("hand.L") end
+	clss.button_handr.pressed = function() clss:clicked("hand.R") end
+	clss.button_lowerbody.pressed = function() clss:clicked("lowerbody") end
+	clss.button_feet.pressed = function() clss:clicked("feet") end
 end
 
 --- Sets the contents of an equipment slot.
 -- @param clss Equipment class.
 -- @param node Node name.
 -- @param name Item name.
-function Equipment.set_item(clss, slot, name)
+Equipment.set_item = function(clss, slot, name)
 	local funs =
 	{
 		["head"] = function() clss.button_head.text = name end,
@@ -41,13 +42,7 @@ function Equipment.set_item(clss, slot, name)
 	if fun then fun() end
 end
 
---- Toggles the visibility of the equipment group.
--- @param self Equipment class.
-function Equipment.toggle(self)
-	self.group.visible = not self.group.visible
-end
-
-function Equipment.clicked(self, slot)
+Equipment.clicked = function(clss, slot)
 	if Target:active() then
 		Target:select_equipment(slot)
 	else
@@ -56,7 +51,7 @@ function Equipment.clicked(self, slot)
 	end
 end
 
-function Equipment.move(self, src_type, src_id, src_slot, dst_type, dst_id, dst_slot)
+Equipment.move = function(self, src_type, src_id, src_slot, dst_type, dst_id, dst_slot)
 
 	if not Player.object then return end
 	local pos = Player.object.position
@@ -126,6 +121,10 @@ function Equipment.move(self, src_type, src_id, src_slot, dst_type, dst_id, dst_
 	end
 
 end
+
+------------------------------------------------------------------------------
+
+Equipment:init()
 
 -- Updates items of the equipment display.
 Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)

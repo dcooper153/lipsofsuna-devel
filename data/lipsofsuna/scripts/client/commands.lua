@@ -38,7 +38,7 @@ end
 --- Initiates targeting for the use command.
 -- @param self Commands class.
 Commands.use = function(self)
-	Target:start("With what would you like to use?", function(where, id, slot)
+	Target:start("What would you like to use?", function(where, id, slot)
 		if where == "inv" then
 			Network:send{packet = Packet(packets.USE, "uint32", id, "uint32", slot)}
 		elseif where == "obj" then
