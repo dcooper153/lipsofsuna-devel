@@ -209,8 +209,8 @@ def configure(ctx):
 		print("\tlibdir: " + libdir)
 		print("\tdatadir: " + datadir)
 		print("\tsavedir: " + savedir + "\n")
-	print("Build command: waf")
-	print("Install command: waf install\n")
+	print("Build command: ./waf")
+	print("Install command: ./waf install\n")
 
 def build(ctx):
 	ctx.add_group("build")
@@ -281,6 +281,16 @@ def build(ctx):
 		ctx.install_files(dst, [src])
 	dst = os.path.join(ctx.env.MODSDIR, 'lipsofsuna', 'save')
 	ctx.install_files(dst, [])
+
+def dist_hook():
+	whitelist = ['AUTHORS', 'COPYING', 'data', 'docs', 'lipsofsuna', 'README', 'waf', 'wscript']
+	import shutil
+	for name in os.listdir('.'):
+		if name not in whitelist:
+			if os.path.isdir(name):
+				shutil.rmtree(name)
+			else:
+				os.remove(name)
 
 def html(ctx):
 	Utils.exec_command('docs/makedoc.sh ' + VERSION)

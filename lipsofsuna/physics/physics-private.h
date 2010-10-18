@@ -18,6 +18,9 @@
 #ifndef __PHYSICS_PRIVATE_H__
 #define __PHYSICS_PRIVATE_H__
 
+#ifndef assert
+#define assert(a)
+#endif
 #include <btBulletDynamicsCommon.h>
 #include <BulletCollision/CollisionDispatch/btGhostObject.h>
 #include <BulletDynamics/Character/btKinematicCharacterController.h>
