@@ -186,15 +186,19 @@ private_event (LIWdgScroll*  self,
 			ref = (int)(r * alloc.width);
 			clip = alloc;
 			clip.width = bar;
-			liwdg_style_paint_base (style2, &alloc, &clip);
+			if (style2 != NULL)
+				liwdg_style_paint_base (style2, &alloc, &clip);
 			clip.x += clip.width;
 			clip.width = ref - bar;
-			liwdg_style_paint_base (style1, &alloc, &clip);
+			if (style1 != NULL)
+				liwdg_style_paint_base (style1, &alloc, &clip);
 			clip.x += clip.width;
 			clip.width = alloc.width - ref;
-			liwdg_style_paint_base (style0, &alloc, &clip);
+			if (style0 != NULL)
+				liwdg_style_paint_base (style0, &alloc, &clip);
 			/* Draw label. */
-			liwdg_style_paint_text (style0, self->text, 0.5f, 0.5f, &rect);
+			if (style0 != NULL)
+				liwdg_style_paint_text (style0, self->text, 0.5f, 0.5f, &rect);
 			return 1;
 		case LIWDG_EVENT_TYPE_STYLE:
 			private_rebuild (self);
