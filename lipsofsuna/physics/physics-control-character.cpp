@@ -29,51 +29,14 @@
 #define LIPHY_CHARACTER_RISING_LIMIT 5.0f 
 #define LIPHY_CHARACTER_GROUND_DAMPING 1.0f
 
-liphyMotionState::liphyMotionState (
-	LIPhyObject*       object,
-	const btTransform& transform)
-{
-	this->object = object;
-	this->current = transform;
-	this->previous = transform;
-}
-
-void liphyMotionState::getWorldTransform (
-	btTransform& transform) const
-{
-	transform = this->current;
-}
-
-void liphyMotionState::setWorldTransform (
-	const btTransform& transform)
-{
-	lisys_assert (!isnan (transform.getOrigin ()[0]));
-	lisys_assert (!isnan (transform.getOrigin ()[1]));
-	lisys_assert (!isnan (transform.getOrigin ()[2]));
-	lisys_assert (!isnan (transform.getRotation ()[0]));
-	lisys_assert (!isnan (transform.getRotation ()[1]));
-	lisys_assert (!isnan (transform.getRotation ()[2]));
-	lisys_assert (!isnan (transform.getRotation ()[3]));
-
-	this->current = transform;
-	if (this->object->control != NULL)
-	{
-		this->previous = this->current;
-		this->object->control->update ();
-		lical_callbacks_call (this->object->physics->callbacks, this->object->physics, "object-transform", lical_marshal_DATA_PTR, this->object);
-	}
-}
-
-/*****************************************************************************/
-
-liphyCharacterController::liphyCharacterController (
+LIPhyCharacterAction::LIPhyCharacterAction (
 	LIPhyObject* object)
 {
 	this->object = object;
 	this->ground = 0;
 }
 
-void liphyCharacterController::updateAction (
+void LIPhyCharacterAction::updateAction (
 	btCollisionWorld* world, btScalar delta)
 {
 	int ground;
@@ -129,10 +92,26 @@ void liphyCharacterController::updateAction (
 	((btRigidBody*) object)->setLinearVelocity (velx + vely + velz);
 }
 
-void liphyCharacterController::debugDraw (
+void LIPhyCharacterAction::debugDraw (
 	btIDebugDraw* debug)
 {
 }
 
-/** @} */
-/** @} */
+LIPhyCharacterControl::LIPhyCharacterControl (LIPhyObject* object, btCollisionShape* shape) :
+	LIPhyControlRigid (object, shape), action (object)
+{
+	object->physics->dynamics->addAction (&this->action);
+	this->body.setActivationState (DISABLE_DEACTIVATION);
+	this->body.setAngularFactor (0.0f);
+}
+
+LIPhyCharacterControl::~LIPhyCharacterControl ()
+{
+	object->physics->dynamics->removeAction (&this->action);
+	this->body.setAngularFactor (1.0f);
+}
+
+bool LIPhyCharacterControl::get_ground ()
+{
+	return this->action.ground;
+}

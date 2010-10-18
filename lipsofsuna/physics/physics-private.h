@@ -30,12 +30,13 @@
 #include "physics-types.h"
 
 #define LIPHY_BROADPHASE_DBVT
+#define PRIVATE_CCD_MOTION_THRESHOLD 1.0f
 
-class liphyControl;
+class LIPhyControl;
 class LIPhyContactController;
-class liphyCharacterController;
+class LIPhyCharacterAction;
 class LIPhyObjectShape;
-class liphyMotionState;
+class LIPhyMotionState;
 
 struct _LIPhyPhysics
 {
@@ -69,8 +70,8 @@ struct _LIPhyObject
 	int flags;
 	uint32_t id;
 	LIPhyControlMode control_mode;
-	liphyControl* control;
-	liphyMotionState* motion;
+	LIPhyControl* control;
+	LIPhyMotionState* motion;
 	LIPhyPhysics* physics;
 	LIPhyShape* shape;
 	struct
@@ -108,10 +109,10 @@ struct LIPhyContactRecord
 	LIPhyObject* object1;
 };
 
-class liphyMotionState : public btMotionState
+class LIPhyMotionState : public btMotionState
 {
 public:
-	liphyMotionState (LIPhyObject* object, const btTransform& transform);
+	LIPhyMotionState (LIPhyObject* object, const btTransform& transform);
 	virtual void getWorldTransform (btTransform& transform) const;
 	virtual void setWorldTransform (const btTransform& transform);
 public:
@@ -120,10 +121,10 @@ public:
 	btTransform previous;
 };
 
-class liphyCharacterController : public btActionInterface
+class LIPhyCharacterAction : public btActionInterface
 {
 public:
-	liphyCharacterController (LIPhyObject* object);
+	LIPhyCharacterAction (LIPhyObject* object);
 	virtual void updateAction (btCollisionWorld* world, btScalar delta);
 	virtual void debugDraw (btIDebugDraw* debug);
 public:
@@ -131,11 +132,11 @@ public:
 	LIPhyObject* object;
 };
 
-class liphyControl
+class LIPhyControl
 {
 public:
-	liphyControl (LIPhyObject* object, btCollisionShape* shape);
-	virtual ~liphyControl ();
+	LIPhyControl (LIPhyObject* object, btCollisionShape* shape);
+	virtual ~LIPhyControl ();
 public:
 	virtual void apply_impulse (const btVector3& pos, const btVector3& imp);
 	virtual void transform (const btTransform& value);
@@ -157,11 +158,11 @@ public:
 	LIPhyContactController* contact_controller;
 };
 
-class liphyRigidControl : public liphyControl
+class LIPhyControlRigid : public LIPhyControl
 {
 public:
-	liphyRigidControl (LIPhyObject* object, btCollisionShape* shape);
-	virtual ~liphyRigidControl ();
+	LIPhyControlRigid (LIPhyObject* object, btCollisionShape* shape);
+	virtual ~LIPhyControlRigid ();
 public:
 	virtual void apply_impulse (const btVector3& pos, const btVector3& imp);
 	virtual void transform (const btTransform& value);
@@ -181,22 +182,22 @@ public:
 	btRigidBody body;
 };
 
-class liphyCharacterControl : public liphyRigidControl
+class LIPhyCharacterControl : public LIPhyControlRigid
 {
 public:
-	liphyCharacterControl (LIPhyObject* object, btCollisionShape* shape);
-	virtual ~liphyCharacterControl ();
+	LIPhyCharacterControl (LIPhyObject* object, btCollisionShape* shape);
+	virtual ~LIPhyCharacterControl ();
 public:
 	virtual bool get_ground ();
 public:
-	liphyCharacterController controller;
+	LIPhyCharacterAction action;
 };
 
-class liphyStaticControl : public liphyControl
+class LIPhyControlStatic : public LIPhyControl
 {
 public:
-	liphyStaticControl (LIPhyObject* object, btCollisionShape* shape);
-	virtual ~liphyStaticControl ();
+	LIPhyControlStatic (LIPhyObject* object, btCollisionShape* shape);
+	virtual ~LIPhyControlStatic ();
 public:
 	virtual void transform (const btTransform& value);
 	virtual void set_contacts (bool value);
@@ -205,11 +206,11 @@ public:
 	btRigidBody body;
 };
 
-class liphyVehicleControl : public liphyControl
+class LIPhyControlVehicle : public LIPhyControl
 {
 public:
-	liphyVehicleControl (LIPhyObject* object, btCollisionShape* shape);
-	virtual ~liphyVehicleControl ();
+	LIPhyControlVehicle (LIPhyObject* object, btCollisionShape* shape);
+	virtual ~LIPhyControlVehicle ();
 public:
 	virtual void transform (const btTransform& value);
 	virtual void update ();

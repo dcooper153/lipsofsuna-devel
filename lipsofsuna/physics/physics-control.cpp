@@ -25,415 +25,81 @@
 #include "physics-object.h"
 #include "physics-private.h"
 
-#define PRIVATE_CCD_MOTION_THRESHOLD 1.0f
-
 /*****************************************************************************/
 
-liphyControl::liphyControl (LIPhyObject* object, btCollisionShape* shape) :
+LIPhyControl::LIPhyControl (LIPhyObject* object, btCollisionShape* shape) :
 	object (object),
 	contact_controller (NULL)
 {
 }
 
-liphyControl::~liphyControl ()
+LIPhyControl::~LIPhyControl ()
 {
 }
 
-void
-liphyControl::apply_impulse (const btVector3& pos, const btVector3& imp)
+void LIPhyControl::apply_impulse (const btVector3& pos, const btVector3& imp)
 {
 }
 
-void
-liphyControl::transform (const btTransform& value)
+void LIPhyControl::transform (const btTransform& value)
 {
 }
 
-void
-liphyControl::update ()
+void LIPhyControl::update ()
 {
 }
 
-void
-liphyControl::get_angular (btVector3* value)
+void LIPhyControl::get_angular (btVector3* value)
 {
 	*value = btVector3 (0.0, 0.0, 0.0);
 }
 
-void
-liphyControl::set_angular (const btVector3& value)
+void LIPhyControl::set_angular (const btVector3& value)
 {
 }
 
-void
-liphyControl::set_collision_group (int mask)
+void LIPhyControl::set_collision_group (int mask)
 {
 }
 
-void
-liphyControl::set_collision_mask (int mask)
+void LIPhyControl::set_collision_mask (int mask)
 {
 }
 
-void
-liphyControl::set_contacts (bool value)
+void LIPhyControl::set_contacts (bool value)
 {
 }
 
-void
-liphyControl::get_gravity (btVector3* value)
+void LIPhyControl::get_gravity (btVector3* value)
 {
 	*value = btVector3 (0.0, 0.0, 0.0);
 }
 
-void
-liphyControl::set_gravity (const btVector3& value)
+void LIPhyControl::set_gravity (const btVector3& value)
 {
 }
 
-bool
-liphyControl::get_ground ()
+bool LIPhyControl::get_ground ()
 {
 	return false;
 }
 
-void
-liphyControl::set_mass (float value, const btVector3& inertia)
+void LIPhyControl::set_mass (float value, const btVector3& inertia)
 {
 }
 
-btCollisionObject*
-liphyControl::get_object ()
+btCollisionObject* LIPhyControl::get_object ()
 {
 	return NULL;
 }
 
-void
-liphyControl::get_velocity (btVector3* value)
+void LIPhyControl::get_velocity (btVector3* value)
 {
 	*value = btVector3 (0.0, 0.0, 0.0);
 }
 
-void
-liphyControl::set_velocity (const btVector3& value)
+void LIPhyControl::set_velocity (const btVector3& value)
 {
-}
-
-/*****************************************************************************/
-
-liphyCharacterControl::liphyCharacterControl (LIPhyObject* object, btCollisionShape* shape) :
-	liphyRigidControl (object, shape), controller (object)
-{
-	object->physics->dynamics->addAction (&this->controller);
-	this->body.setActivationState (DISABLE_DEACTIVATION);
-	this->body.setAngularFactor (0.0f);
-}
-
-liphyCharacterControl::~liphyCharacterControl ()
-{
-	object->physics->dynamics->removeAction (&this->controller);
-	this->body.setAngularFactor (1.0f);
-}
-
-bool
-liphyCharacterControl::get_ground ()
-{
-	return this->controller.ground;
-}
-
-/*****************************************************************************/
-
-liphyRigidControl::liphyRigidControl (LIPhyObject* object, btCollisionShape* shape) :
-	liphyControl (object, shape),
-	body (object->config.mass, object->motion, shape, btVector3 (0.0, 0.0, 0.0))
-{
-	LIMatVector v;
-	btVector3 angular (object->config.angular.x, object->config.angular.y, object->config.angular.z);
-	btVector3 gravity (object->config.gravity.x, object->config.gravity.y, object->config.gravity.z);
-	btVector3 velocity (object->config.velocity.x, object->config.velocity.y, object->config.velocity.z);
-
-	this->body.setUserPointer (object);
-	this->body.setLinearVelocity (velocity);
-	this->body.setAngularVelocity (angular);
-	this->body.setCcdMotionThreshold (PRIVATE_CCD_MOTION_THRESHOLD);
-	this->object->physics->dynamics->addRigidBody (&this->body,
-		this->object->config.collision_group,
-		this->object->config.collision_mask);
-	liphy_object_get_inertia (object, &v);
-	this->body.setMassProps (object->config.mass, btVector3 (v.x, v.y, v.z));
-	this->body.setGravity (gravity);
-}
-
-liphyRigidControl::~liphyRigidControl ()
-{
-	this->object->physics->dynamics->removeRigidBody (&this->body);
-}
-
-void
-liphyRigidControl::apply_impulse (const btVector3& pos, const btVector3& imp)
-{
-	this->body.applyImpulse (imp, pos);
-}
-
-void
-liphyRigidControl::transform (const btTransform& value)
-{
-	this->body.setCenterOfMassTransform (value);
-	this->object->motion->setWorldTransform (value);
-}
-
-void
-liphyRigidControl::update ()
-{
-	const btVector3& velocity = this->body.getLinearVelocity ();
-
-	this->object->config.velocity = limat_vector_init (velocity[0], velocity[1], velocity[2]);
-}
-
-void
-liphyRigidControl::get_angular (btVector3* value)
-{
-	*value = this->body.getAngularVelocity ();
-}
-
-void
-liphyRigidControl::set_angular (const btVector3& value)
-{
-	this->body.setAngularVelocity (value);
-}
-
-void
-liphyRigidControl::set_collision_group (int mask)
-{
-	btBroadphaseProxy* proxy;
-
-	proxy = this->body.getBroadphaseHandle ();
-	if (proxy != NULL)
-		proxy->m_collisionFilterGroup = mask;
-}
-
-void
-liphyRigidControl::set_collision_mask (int mask)
-{
-	btBroadphaseProxy* proxy;
-
-	proxy = this->body.getBroadphaseHandle ();
-	if (proxy != NULL)
-		proxy->m_collisionFilterMask = mask;
-}
-
-void
-liphyRigidControl::set_contacts (bool value)
-{
-	if (value)
-	{
-		this->body.setCollisionFlags (this->body.getCollisionFlags() |
-			btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-	}
-	else
-	{
-		this->body.setCollisionFlags (this->body.getCollisionFlags() &
-			~btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-	}
-}
-
-void
-liphyRigidControl::get_gravity (btVector3* value)
-{
-	*value = this->body.getGravity ();
-}
-
-void
-liphyRigidControl::set_gravity (const btVector3& value)
-{
-	this->body.setGravity (value);
-}
-
-void
-liphyRigidControl::set_mass (float value, const btVector3& inertia)
-{
-	this->body.setMassProps (value, inertia);
-}
-
-btCollisionObject*
-liphyRigidControl::get_object ()
-{
-	return &this->body;
-}
-
-void
-liphyRigidControl::get_velocity (btVector3* value)
-{
-	*value = this->body.getLinearVelocity ();
-}
-
-void
-liphyRigidControl::set_velocity (const btVector3& value)
-{
-	this->body.setLinearVelocity (value);
-}
-
-/*****************************************************************************/
-
-liphyStaticControl::liphyStaticControl (LIPhyObject* object, btCollisionShape* shape) :
-	liphyControl (object, shape),
-	body (0.0, object->motion, shape, btVector3 (0.0, 0.0, 0.0))
-{
-	this->body.setUserPointer (object);
-	this->object->physics->dynamics->addCollisionObject (&this->body,
-		this->object->config.collision_group,
-		this->object->config.collision_mask);
-}
-
-liphyStaticControl::~liphyStaticControl ()
-{
-	this->object->physics->dynamics->removeCollisionObject (&this->body);
-}
-
-void
-liphyStaticControl::transform (const btTransform& value)
-{
-	this->object->physics->dynamics->removeRigidBody (&this->body);
-	this->body.setCenterOfMassTransform (value);
-	this->object->motion->setWorldTransform (value);
-	this->object->physics->dynamics->addRigidBody (&this->body,
-		this->object->config.collision_group,
-		this->object->config.collision_mask);
-}
-
-void
-liphyStaticControl::set_contacts (bool value)
-{
-	if (value)
-	{
-		this->body.setCollisionFlags (this->body.getCollisionFlags() |
-			btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-	}
-	else
-	{
-		this->body.setCollisionFlags (this->body.getCollisionFlags() &
-			~btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-	}
-}
-
-btCollisionObject*
-liphyStaticControl::get_object ()
-{
-	return &this->body;
-}
-
-/*****************************************************************************/
-
-liphyVehicleControl::liphyVehicleControl (LIPhyObject* object, btCollisionShape* shape) :
-	liphyControl (object, shape),
-	body (0.0, object->motion, shape, btVector3 (0.0, 0.0, 0.0)),
-	caster (object->physics->dynamics)
-{
-	LIMatVector v;
-	btVector3 angular (object->config.angular.x, object->config.angular.y, object->config.angular.z);
-	btVector3 velocity (object->config.velocity.x, object->config.velocity.y, object->config.velocity.z);
-
-	liphy_object_get_inertia (object, &v);
-	this->body.setMassProps (object->config.mass, btVector3 (v.x, v.y, v.z));
-	this->body.setUserPointer (object);
-	this->body.setLinearVelocity (velocity);
-	this->body.setAngularVelocity (angular);
-	this->body.setActivationState (DISABLE_DEACTIVATION);
-	this->body.setCcdMotionThreshold (PRIVATE_CCD_MOTION_THRESHOLD);
-	this->vehicle = new btRaycastVehicle (this->tuning, &this->body, &this->caster);
-	this->vehicle->setCoordinateSystem (0, 1, 2);
-	this->object->physics->dynamics->addVehicle (this->vehicle);
-}
-
-liphyVehicleControl::~liphyVehicleControl ()
-{
-	this->object->physics->dynamics->removeVehicle (this->vehicle);
-	delete this->vehicle;
-}
-
-void
-liphyVehicleControl::transform (const btTransform& value)
-{
-	int i;
-
-	this->body.setCenterOfMassTransform (value);
-	this->object->motion->setWorldTransform (value);
-	this->vehicle->resetSuspension ();
-	for (i = 0 ; i < this->vehicle->getNumWheels () ; i++)
-		this->vehicle->updateWheelTransform (i, true);
-}
-
-void
-liphyVehicleControl::update ()
-{
-	const btVector3& velocity = this->body.getLinearVelocity ();
-
-	this->object->config.velocity = limat_vector_init (velocity[0], velocity[1], velocity[2]);
-}
-
-void
-liphyVehicleControl::set_collision_group (int mask)
-{
-	btBroadphaseProxy* proxy;
-
-	proxy = this->body.getBroadphaseHandle ();
-	if (proxy != NULL)
-		proxy->m_collisionFilterGroup = mask;
-}
-
-void
-liphyVehicleControl::set_collision_mask (int mask)
-{
-	btBroadphaseProxy* proxy;
-
-	proxy = this->body.getBroadphaseHandle ();
-	if (proxy != NULL)
-		proxy->m_collisionFilterMask = mask;
-}
-
-void
-liphyVehicleControl::set_contacts (bool value)
-{
-	if (value)
-	{
-		this->body.setCollisionFlags (this->body.getCollisionFlags() |
-			btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-	}
-	else
-	{
-		this->body.setCollisionFlags (this->body.getCollisionFlags() &
-			~btCollisionObject::CF_CUSTOM_MATERIAL_CALLBACK);
-	}
-}
-
-void
-liphyVehicleControl::get_gravity (btVector3* value)
-{
-	*value = this->body.getGravity ();
-}
-
-void
-liphyVehicleControl::set_gravity (const btVector3& value)
-{
-	this->body.setGravity (value);
-}
-
-void
-liphyVehicleControl::set_mass (float value, const btVector3& inertia)
-{
-	this->body.setMassProps (value, inertia);
-}
-
-btCollisionObject*
-liphyVehicleControl::get_object ()
-{
-	return &this->body;
-}
-
-void
-liphyVehicleControl::set_velocity (const btVector3& value)
-{
-	this->body.setLinearVelocity (value);
 }
 
 /** @} */
