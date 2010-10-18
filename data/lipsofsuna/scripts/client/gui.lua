@@ -64,8 +64,7 @@ are especially welcome.
 ]]})
 			dialog:append_row(Button{text = "Close", pressed = function() dialog.floating = false end})
 			dialog.floating = true
-		end},
-		{"Back", function() Gui.menus:close() end}}
+		end}}
 	Gui.menus = Widgets.Menus()
 	Gui.menus:open{level = 1, widget = Gui.menu_widget_main}
 	-- Bottom HUD.
