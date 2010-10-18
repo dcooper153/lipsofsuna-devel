@@ -31,13 +31,11 @@ typedef struct _LIVidFeatures LIVidFeatures;
 struct _LIVidFeatures
 {
 	int anisotropic_level;
-	int shader_model;
-	int max_texture_units;
 };
 
 extern LIVidFeatures livid_features;
 
-LIAPICALL (void, livid_features_init, ());
+LIAPICALL (int, livid_features_init, ());
 
 LIAPICALL (int, livid_features_get_max_samples, ());
 

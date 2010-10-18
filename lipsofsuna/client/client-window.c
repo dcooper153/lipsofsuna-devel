@@ -119,10 +119,11 @@ private_init_video (LICliWindow* self)
 	if (private_resize (self, 1024, 768, livid_features_get_max_samples ()) +
 	    private_resize (self, 1024, 768, 0) == 0)
 		return 0;
-	livid_features_init ();
+	if (!livid_features_init ())
+		return 0;
 	if (self->client->video.TTF_Init () == -1)
 	{
-		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot initialize SDL TTF");
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot initialize SDL_ttf");
 		return 0;
 	}
 

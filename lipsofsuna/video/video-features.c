@@ -37,9 +37,9 @@ LIVidFeatures livid_features;
 
 /**
  * \brief Initializes the global video card feature cache.
+ * \return Nonzero on success.
  */
-void
-livid_features_init ()
+int livid_features_init ()
 {
 	GLint tmp;
 
@@ -47,27 +47,18 @@ livid_features_init ()
 	memset (&livid_features, 0, sizeof (LIVidFeatures));
 
 	/* Get capabilities. */
+	if (!GLEW_VERSION_3_3)
+	{
+		lisys_error_set (EINVAL, "OpenGL 3.3 isn't supported by your graphics card");
+		return 0;
+	}
 	if (GLEW_EXT_texture_filter_anisotropic)
 	{
 		glGetIntegerv (GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT, &tmp);
 		livid_features.anisotropic_level = tmp;
 	}
-	if (GLEW_ARB_shading_language_100)
-	{
-		if (glewIsSupported ("GL_AMD_vertex_shader_tessellator"))
-			livid_features.shader_model = 5;
-		else if (glewIsSupported ("GL_ARB_geometry_shader4"))
-			livid_features.shader_model = 4;
-		else if (GLEW_NV_vertex_program3 || GLEW_ATI_shader_texture_lod ||
-		         glewIsSupported ("GL_ARB_shader_texture_lod"))
-			livid_features.shader_model = 3;
-		else if (GLEW_ARB_fragment_shader)
-			livid_features.shader_model = 2;
-		else
-			livid_features.shader_model = 1;
-	}
-	glGetIntegerv (GL_MAX_TEXTURE_UNITS, &tmp);
-	livid_features.max_texture_units = tmp;
+
+	return 1;
 }
 
 /**
@@ -80,8 +71,7 @@ livid_features_init ()
  *
  * \return Number of samples.
  */
-int
-livid_features_get_max_samples ()
+int livid_features_get_max_samples ()
 {
 #ifdef HAVE_GL_GLX_H
 

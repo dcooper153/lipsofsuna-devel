@@ -33,16 +33,10 @@ private_init_resources (LIRenRender* self,
 
 /*****************************************************************************/
 
-LIRenRender*
-liren_render_new (const char* dir)
+LIRenRender* liren_render_new (
+	const char* dir)
 {
 	LIRenRender* self;
-
-	if (livid_features.shader_model < 3)
-	{
-		lisys_error_set (ENOTSUP, "OpenGL 2.0 compatible video hardware is required");
-		return NULL;
-	}
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIRenRender));
@@ -360,17 +354,13 @@ private_init_resources (LIRenRender* self,
 		return 0;
 
 	/* Initialize default depth texture. */
-	if (livid_features.shader_model >= 3)
-	{
-		glGenTextures (1, &self->helpers.depth_texture_max);
-		glBindTexture (GL_TEXTURE_2D, self->helpers.depth_texture_max);
-		glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 2, 2,
-			0, GL_DEPTH_COMPONENT, GL_FLOAT, depth_texture);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	}
+	glGenTextures (1, &self->helpers.depth_texture_max);
+	glBindTexture (GL_TEXTURE_2D, self->helpers.depth_texture_max);
+	glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 2, 2, 0, GL_DEPTH_COMPONENT, GL_FLOAT, depth_texture);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
 	/* Initialize noise texture. */
 	pixels = lisys_malloc (4 * 256 * 256);
