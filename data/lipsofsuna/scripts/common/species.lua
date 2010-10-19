@@ -57,6 +57,8 @@ Species.copy = function(orig, args)
 	self.ai_wander_time = orig.ai_wander_time
 	self.dialog = orig.dialog
 	self.gravity = orig.gravity
+	self.hair_color = orig.hair_color
+	self.hair_style = orig.hair_style
 	self.inventory_size = orig.inventory_size
 	self.mass = orig.mass
 	self.model = orig.model
@@ -141,6 +143,8 @@ Species.new = function(clss, args)
 	copy("dialog")
 	copy("equipment_slots", {})
 	copy("gravity", Vector(0, -20, 0))
+	copy("hair_color")
+	copy("hair_style")
 	copy("inventory_items", {})
 	copy("inventory_size", 0)
 	copy("mass", 50)

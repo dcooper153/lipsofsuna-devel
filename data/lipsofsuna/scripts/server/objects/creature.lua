@@ -7,6 +7,12 @@ Creature.setter = function(self, key, value)
 		self.model = spec.model
 		self.mass = spec.mass
 		self.gravity = spec.gravity
+		if spec.hair_color then
+			self.hair_color = spec.hair_color
+		end
+		if spec.hair_style then
+			self.hair_style = spec.hair_style
+		end
 		-- Create skills.
 		self.skills = self.skills or Skills{owner = self}
 		self.skills:clear()

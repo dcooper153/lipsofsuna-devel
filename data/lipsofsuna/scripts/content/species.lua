@@ -176,7 +176,8 @@ Species{
 	name = "companion",
 	base = "aer",
 	dialog = "companion",
-	inventory_items = {"torch", "axe", "chainmail pants", "chainmail leggings"}}
+	hair_style = "hair1",
+	inventory_items = {"torch", "axe", "chainmail tunic", "chainmail pants", "chainmail leggings"}}
 
 Species{
 	name = "brigand",
@@ -190,6 +191,8 @@ Species{
 	dialog = "peculiarpetnpc",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
+	hair_style = "hair1",
+	inventory_items = {"torch", "axe", "chainmail tunic", "chainmail pants", "chainmail leggings"},
 	factions = {"peculiarpet"}}
 
 Species{
