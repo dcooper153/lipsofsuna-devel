@@ -50,7 +50,7 @@ main (int argc, char** argv)
 		lisys_free (path);
 		return 1;
 	}
-	self = licli_client_new (&video, path, argc > 1? argv[1] : "data");
+	self = licli_client_new (&video, path, argc > 1? argv[1] : "default");
 	if (self == NULL)
 	{
 		lisys_error_report ();
@@ -67,7 +67,7 @@ main (int argc, char** argv)
 	}
 	else
 	{
-		if (!licli_client_load_module (self, "data", NULL))
+		if (!licli_client_load_module (self, "default", NULL))
 			lisys_error_report ();
 	}
 

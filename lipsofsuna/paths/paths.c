@@ -65,46 +65,31 @@ LIPthPaths* lipth_paths_new (
 
 	/* Get data directory. */
 #ifdef LI_RELATIVE_PATHS
-	self->global_data = listr_dup (self->root);
+	self->global_data = lisys_path_concat (self->root, "data", NULL);
 	if (self->global_data == NULL)
-		goto error;
-	if (!strcmp (name, "data"))
-		self->module_data = lisys_path_concat (self->global_data, "data", NULL);
-	else
-		self->module_data = lisys_path_concat (self->global_data, "mods", name, NULL);
-	if (self->module_data == NULL)
 		goto error;
 #else
 	self->global_data = LIDATADIR;
-	if (!strcmp (name, "data"))
-		self->module_data = lisys_path_concat (self->global_data, "data", NULL);
-	else
-		self->module_data = lisys_path_concat (self->global_data, "mods", name, NULL);
+#endif
+	self->module_data = lisys_path_concat (self->global_data, name, NULL);
 	if (self->module_data == NULL)
 		goto error;
-#endif
 
 	/* Get save directory. */
 #ifdef LI_RELATIVE_PATHS
-	self->global_state = listr_dup (self->global_data);
+	self->global_state = lisys_path_concat (self->root, "save", NULL);
 	if (self->global_state == NULL)
-		goto error;
-	self->module_state = lisys_path_concat (self->module_data, "save", NULL);
-	if (self->module_state == NULL)
 		goto error;
 #else
 	self->global_state = LISAVEDIR;
-	if (!strcmp (name, "data"))
-		self->module_state = lisys_path_concat (self->global_state, "data", NULL);
-	else
-		self->module_state = lisys_path_concat (self->global_state, "mods", name, NULL);
-	if (self->module_state == NULL)
-		goto error;
 #endif
+	self->module_state = lisys_path_concat (self->global_state, name, NULL);
+	if (self->module_data == NULL)
+		goto error;
 
 	/* Get extension directory. */
 #ifdef LI_RELATIVE_PATHS
-	self->global_exts = lisys_path_concat (self->global_data, "lib", "extensions", NULL);;
+	self->global_exts = lisys_path_concat (self->global_data, "lib", "extensions", NULL);
 	if (self->global_exts == NULL)
 		goto error;
 #else

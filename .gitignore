@@ -1,5 +1,6 @@
-build
+.build
 install
 lipsofsuna.geany
 .lock-wscript
+.lock-wafbuild
 .waf*
