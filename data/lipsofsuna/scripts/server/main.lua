@@ -89,10 +89,68 @@ require "server/modifiers/bleeding"
 require "server/editing"
 require "server/particles"
 
+--- Places a random heightmap to the map.
+-- @param clss Voxel class.
+-- @param args Arguments.<ul>
+--   <li>material: Material name.</li>
+--   <li>mushroom_density: Per tile mushroom probability or nil.</li></ul>
+--   <li>point: Position vector, in tiles.</li>
+--   <li>size: Size vector, in tiles.</li>
+--   <li>tree_density: Per tile tree probability or nil.</li></ul>
+Voxel.make_heightmap = function(clss, args)
+	local p = Vector(0, args.point.y, 0)
+	local m = Material:find{name = args.material}
+	if not m then return end
+	local t = Tile{terrain = m.id}
+	for z = args.point.z,args.point.z+args.size.z-1 do
+		p.z = z
+		for x = args.point.x,args.point.x+args.size.x-1 do
+			local h = math.random()
+			p.x = x
+			t.damage = math.floor(255 * h)
+			Voxel:set_tile{point = p, tile = t}
+			if math.random() < (args.tree_density or 0) then
+				Voxel:place_obstacle{name = "tree", point = p + Vector(0.5, 0.9 - h, 0.5)}
+			elseif math.random() < (args.mushroom_density or 0) then
+				Voxel:place_obstacle{name = "mushroom", point = p + Vector(0.5, 1 - h, 0.5)}
+			end
+		end
+	end
+end
+
+--- Places a monster to the map.
+-- @param clss Voxel class.
+-- @param args Arguments.<ul>
+--   <li>name: Monster name.</li>
+--   <li>point: Position vector, in tiles.</li></ul>
+Voxel.place_creature = function(clss, args)
+	local spec = Species:find(args)
+	if not spec then return end
+	Creature{
+		species = spec,
+		position = args.point * Config.tilewidth,
+		realized = true}
+end
+
+--- Places an obstacle to the map.
+-- @param clss Voxel class.
+-- @param args Arguments.<ul>
+--   <li>name: Obstacle name.</li>
+--   <li>point: Position vector, in tiles.</li></ul>
+Voxel.place_obstacle = function(clss, args)
+	local spec = Obstaclespec:find(args)
+	if not spec then return end
+	Obstacle{
+		spec = spec,
+		position = args.point * Config.tilewidth,
+		realized = true}
+end
+
 --- Places a predefined map pattern to the map.
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
---   <li>name: Pattern name.</li></ul>
+--   <li>name: Pattern name.</li>
+--   <li>point: Position vector, in tiles.</li></ul>
 Voxel.place_pattern = function(clss, args)
 	local pat = Pattern:find(args)
 	if not pat then return end
@@ -109,14 +167,9 @@ Voxel.place_pattern = function(clss, args)
 	end
 	-- Create obstacles.
 	for k,v in pairs(pat.obstacles) do
-		local point = args.point + Vector(v[1], v[2], v[3])
-		local spec = Obstaclespec:find{name = v[4]}
-		if spec then
-			Obstacle{
-				spec = spec,
-				position = point * Config.tilewidth,
-				realized = true}
-		end
+		clss:place_obstacle{
+			name = v[4],
+			point = args.point + Vector(v[1], v[2], v[3])}
 	end
 	-- Create items.
 	for k,v in pairs(pat.items) do
@@ -179,6 +232,19 @@ restart = function()
 				Voxel:place_pattern{point = r.point + Vector(1,0,6), name = "house1"}
 				Voxel:place_pattern{point = r.point + Vector(5,0,6), name = "house1"}
 				Voxel:place_pattern{point = r.point + Vector(1.7,1,1.7), name = "peculiarpet"}
+				local p = Vector(10,0,0)
+				local s = r.size - p
+				Voxel:make_heightmap{point = r.point + p, size = s, material = "ground1"}
+				p = p + Vector(3,1,3)
+				s = s - Vector(2,1,2)
+				Voxel:make_heightmap{point = r.point + p, size = s,
+					material = "ground1", tree_density = 0.2}
+			else
+				Voxel:place_creature{point = r.point + Vector(1,1,3), name = "bloodworm"}
+				Voxel:place_creature{point = r.point + Vector(2,1,8), name = "bloodworm"}
+				Voxel:make_heightmap{point = r.point + Vector(0,0,0), size = r.size,
+					material = "ground1", tree_density = 0.1,
+					mushroom_density = 0.3}
 			end
 		end
 	end
