@@ -246,8 +246,7 @@ def build(ctx):
 	# Installation.
 	ctx.set_group("install")
 	ctx.install_as('${BINDIR}/lipsofsuna%s' % ctx.env.EXEEXT, 'lipsofsuna-bin' + ctx.env.EXEEXT, chmod = 0777)
-	ctx.install_files(ctx.env.TOOLDIR, ['lipsofsuna/reload/blender-export.py'])
-	ctx.install_files(ctx.env.TOOLDIR, ['lipsofsuna/reload/blender-export-25.py'])
+	ctx.install_files(ctx.env.TOOLDIR, ['tool/lipsofsuna_export.py'])
 	start_dir = ctx.path.find_dir('data')
 	ctx.install_files('${DATADIR}', start_dir.ant_glob('**/*.*'), cwd=start_dir, relative_trick=True)
 	ctx.new_task_gen(
@@ -259,7 +258,7 @@ def build(ctx):
 def dist(ctx):
 	import Logs
 	import tarfile
-	dirs = ['lipsofsuna/**/*.*', 'data/**/*.*', 'AUTHORS', 'COPYING', 'README', 'waf', 'wscript']
+	dirs = ['lipsofsuna/**/*.*', 'data/**/*.*', 'tool/*', 'AUTHORS', 'COPYING', 'README', 'waf', 'wscript']
 	excl = ['**/.*', '**/import']
 	base = APPNAME + '-' + VERSION
 	name = base + '.tar.gz'
