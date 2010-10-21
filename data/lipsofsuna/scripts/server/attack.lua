@@ -66,7 +66,7 @@ end
 --   <li>stop: Time into animation when to stop testing.</li></ul>
 Attack.sweep = function(clss, args)
 	local r = args.radius or 0.3
-	local t0 = args.start or 0.25
+	local t0 = args.start or 0.1
 	local t1 = args.stop or 0.5
 	Thread(function()
 		local t = 0.0
