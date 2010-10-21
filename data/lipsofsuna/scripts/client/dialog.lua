@@ -20,7 +20,8 @@ Dialog.new = function(clss, id, msg, opt)
 			end})
 		end
 	end
-	-- Make it active.
+	-- Make it active. If there was an existing dialog page,
+	-- it's closed automatically by the menu.
 	clss.active = self
 	Gui.menus:open{level = 1, widget = self}
 end
@@ -38,10 +39,6 @@ Dialog.close = function(self, silent)
 	end
 end
 
-Dialog.find = function(clss, id)
-	return clss.dict_id[id]
-end
-
 ------------------------------------------------------------------------------
 
 -- Creates a conversation dialog.
@@ -54,17 +51,11 @@ Protocol:add_handler{type = "DIALOG_CHOICE", func = function(event)
 		if not ok then break end
 		table.insert(opts, opt)
 	end
-	if Dialog.active then
-		Dialog.active:close(true)
-	end
 	Dialog(id, nil, opts)
 end}
 Protocol:add_handler{type = "DIALOG_LINE", func = function(event)
 	local ok,id,msg = event.packet:read("uint32", "string")
 	if not ok then return end
-	if Dialog.active then
-		Dialog.active:close(true)
-	end
 	Dialog(id, msg, nil)
 end}
 
@@ -72,7 +63,6 @@ end}
 Protocol:add_handler{type = "DIALOG_CLOSE", func = function(event)
 	local ok,id = event.packet:read("uint32")
 	if not ok then return end
-	local dialog = Dialog:find(id)
-	if not dialog then return end
-	dialog:close(true)
+	if not Dialog.active or Dialog.active.id ~= id then return end
+	Dialog.active:close(true)
 end}

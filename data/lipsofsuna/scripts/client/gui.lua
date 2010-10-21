@@ -30,44 +30,7 @@ Gui.init = function(clss)
 		{"View", Gui.menu_widget_view},
 		{"Admin", Gui.menu_widget_admin},
 		{"Options", Options.group},
-		{"Help", function()
-			local dialog = Group{cols = 1, style = "window"}
-			dialog:append_row(Button{style = "label", text = 
-[[This version if the game is unstable and incomplete. There are
-several know bugs and rough edges. Close to nothing is representative
-of the gaming experience for which the projects is aiming.
-
-Controls:
-* Escape: Toggle movement/user interface mode
-* W: Walk forward
-* A: Sidestep left
-* S: Walk backward
-* D: Sidestep right
-* C: Jump
-* X: Crouch
-* Y: Toggle camera mode
-* Comma: Pick up
-* Space: Use (read/loot/chat)
-* Shift: Run
-* Left mouse button: Attack
-* Mouse wheel: Zoom camera
-* Left control: Camera rotation mode
-
-Hints: Hit the monsters until they die. You can move inventory items by
-clicking the item and slot names or the map. Use the space bar to talk
-with the test companion, loot chests or read books. Check out the skill
-dialog in the view menu for information on how to cast spells and use
-other feats.
-
-More: If the game, in its current modest state, somehow managed to impress
-you, you are encouraged to bring some life to the project forums. Go to the
-project home page at http://lipsofsuna.org and click the forums link. It
-would be nice to have some company around there. Gentlemen who take it easy
-are especially welcome.
-]]})
-			dialog:append_row(Button{text = "Close", pressed = function() dialog.floating = false end})
-			dialog.floating = true
-		end}}
+		{"Help", Help.menu}}
 	Gui.menus = Widgets.Menus()
 	Gui.menus:open{level = 1, widget = Gui.menu_widget_main}
 	-- Bottom HUD.

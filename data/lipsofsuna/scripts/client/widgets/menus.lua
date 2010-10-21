@@ -17,17 +17,29 @@ end
 Widgets.Menus.open = function(self, args)
 	-- Close levels if opening from an upper level.
 	if #self.stack >= args.level then
-		self:close{level = args.level}
+		self:close{hide = false, level = args.level}
 	end
 	-- Append the new widget.
 	table.insert(self.stack, args.widget)
 	args.widget.level = #self.stack
 	self:set_child{row = 1, col = 1, widget = args.widget}
+	-- Disable player controls when the menu is open.
+	if not self.visible then
+		Client.moving = false
+		controls.EDIT_SELECT.enabled = true
+		controls.SHOOT.enabled = false
+	end
 	-- Make sure we are visible.
 	self.visible = true
 end
 
+--- Closes menu levels.
+-- @param self Menus.
+-- @oaram args Arguments.<ul>
+--   <li>hide: False to not hide the menu even if it becomes empty.</li>
+--   <li>level: Closed menu level or nil to close the topmost.</li></ul>
 Widgets.Menus.close = function(self, args)
+	local h = not args or args.hide ~= false
 	-- Pop levels from the stack.
 	local l = math.max(1, args and args.level or #self.stack)
 	while #self.stack >= l do
@@ -38,7 +50,14 @@ Widgets.Menus.close = function(self, args)
 	-- Show the topmost level or hide if all levels closed.
 	if #self.stack > 0 then
 		self:set_child{row = 1, col = 1, widget = self.stack[#self.stack]}
-	else
+	elseif h then
 		self.visible = false
 	end
+	-- Enable player controls when the menu is closed.
+	if h and not self.visible then
+		Client.moving = true
+		controls.EDIT_SELECT.enabled = false
+		controls.SHOOT.enabled = true
+	end
 end
+

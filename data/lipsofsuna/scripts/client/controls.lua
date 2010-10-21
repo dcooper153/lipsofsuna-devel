@@ -77,20 +77,17 @@ controls.MACRO.callback = function(event)
 	end
 end
 
--- Mode.
-controls.MODE = Action{id = "mode", name = "Mode", desc = "Switch between movement and user interface modes"}
-controls.MODE.callback = function(event)
+-- Menu.
+controls.MENU = Action{id = "menu", name = "Menu", desc = "Show or hide the menu"}
+controls.MENU.callback = function(event)
 	if event.active then
 		if Target:active() then
 			Target:cancel()
 		else
-			Client.moving = not Client.moving
-			controls.EDIT_SELECT.enabled = not Client.moving
-			controls.SHOOT.enabled = Client.moving
 			if Client.moving then
-				Gui.menus:close{level = 1}
-			else
 				Gui.menus:open{level = 1, widget = Gui.menu_widget_main}
+			else
+				Gui.menus:close()
 			end
 		end
 	end
@@ -107,7 +104,7 @@ controls.PICKUP = Action{id = "pick-up", name = "Pick up", desc = "Pick up items
 controls.PICKUP.callback = function(event)
 	if event.active then
 		if Client.moving then
-			controls.MODE.callback(event)
+			controls.MENU.callback(event)
 		end
 		Commands:pickup()
 	end
@@ -181,7 +178,7 @@ controls.USE = Action{id = "use", name = "Use", desc = "Chat, loot, read, ..."}
 controls.USE.callback = function(event)
 	if event.active then
 		if Client.moving then
-			controls.MODE.callback(event)
+			controls.MENU.callback(event)
 		end
 		Commands:use()
 	end
@@ -191,7 +188,7 @@ Binding{action = "cycle-focus", key = 9} --TAB
 Binding{action = "cycle-focus", key = 9, mods = 0x1, mult = -1.0} --LSHIFT+TAB
 Binding{action = "cycle-window-focus", key = 9, mods = 0x40} --LCTRL+TAB
 Binding{action = "cycle-window-focus", key = 9, mods = 0x41, mult = -1.0} --LCTRL+LSHIFT+TAB
-Binding{action = "mode", key = 27} --ESCAPE
+Binding{action = "menu", key = 27} --ESCAPE
 
 Binding{action = "move", key = 119, mult = -1.0} --w
 Binding{action = "strafe", key = 97, mult = -1.0} --a
