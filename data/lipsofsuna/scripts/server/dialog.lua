@@ -1,6 +1,7 @@
 Dialog = Class()
 Dialog.dict_id = {}
 Dialog.dict_name = {}
+Dialog.dict_user = {}
 
 --- Creates a new dialog.
 -- @param clss Quest class.
@@ -41,9 +42,18 @@ Dialog.copy = function(self)
 end
 
 Dialog.close = function(self)
+	-- Notify the user. The user might have forcefully closed the dialog
+	-- or logged out, in which case we don't need to send anything.
+	if self.user then
+		local packet = Packet(packets.DIALOG_CLOSE, "uint32", self.id)
+		self.user:send{packet = packet}
+	end
 	-- Detach from the object.
 	self.object.dialog = nil
 	-- Clear the state.
+	if self.user then
+		Dialog.dict_user[self.user] = nil
+	end
 	self.answer = nil
 	self.object = nil
 	self.user = nil
@@ -73,8 +83,10 @@ end
 --   <li>type: Dialog type. ("use"/"die")</ul>
 -- @return True if started.
 Dialog.start = function(clss, args)
-	-- Only allow one dialog at a time.
+	-- Allow the target object and the player object both to engage
+	-- into only one dialog at a time.
 	if args.object.dialog then return end
+	if clss.dict_user[args.user] then return end
 	-- Find the dialog.
 	local dialog = Dialog:find{name = args.object.species.dialog}
 	if not dialog then return end
@@ -86,6 +98,9 @@ Dialog.start = function(clss, args)
 	dialog.answer = nil
 	dialog.object = args.object
 	dialog.user = args.user
+	if args.user then
+		clss.dict_user[args.user] = true
+	end
 	if args.type == "die" then
 		dialog.routine = coroutine.create(dialog.die or function() end)
 	else
@@ -111,47 +126,74 @@ end
 -- Sends a conversation packet to the user and puts the dialog thread to
 -- sleep until a reply is received.
 -- @param self Dialog.
--- @param msg Message string.
--- @param opt List of accepted answers.
+-- @param args List of accepted answers.
 -- @return Answer.
-Dialog.dialog = function(self, msg, opt)
+Dialog.choice = function(self, args)
+	-- Send the choices to the client.
 	local dict = {}
-	local packet = Packet(packets.DIALOG_DATA, "uint32", self.id, "string", msg)
-	for k,v in ipairs(opt) do
-		dict[v] = k
-		packet:write("string", v)
+	if self.user then
+		local packet = Packet(packets.DIALOG_CHOICE, "uint32", self.id)
+		for k,v in ipairs(args) do
+			dict[v] = k
+			packet:write("string", v)
+		end
+		self.user:send{packet = packet}
 	end
-	self.user:send{packet = packet}
-	while not self.answer or not dict[self.answer] do
+	-- Wait for a reply.
+	while self.user and not self.answer do
 		coroutine.yield()
 	end
+	-- Pick the default answer if the client lost control, for example due to
+	-- being disconnected. If no default is explicitly specified, the last
+	-- choice in the list is used.
+	if not self.answer or not dict[self.answer] then
+		self.answer = args[args.default or #args]
+	end
+	-- Return the answer.
 	local answer = self.answer
 	self.answer = nil
 	return answer
+end
+
+--- Shows a conversation dialog and waits for a page flip.<br/>
+-- Sends a conversation packet to the user and puts the dialog thread to
+-- sleep until a reply is received.
+-- @param self Dialog.
+-- @param msg Message string.
+Dialog.line = function(self, msg)
+	if self.user then
+		local packet = Packet(packets.DIALOG_LINE, "uint32", self.id, "string", msg)
+		self.user:send{packet = packet}
+	end
+	while self.user and not self.answer do
+		coroutine.yield()
+	end
+	self.answer = nil
 end
 
 ------------------------------------------------------------------------------
 
 Protocol:add_handler{type = "DIALOG_ANSWER", func = function(event)
 	local ok,id,msg = event.packet:read("uint32", "string")
-	if ok then
-		local dialog = Dialog.dict_id[id]
-		local object = Player:find{client = event.client}
-		if dialog and dialog.user == object and not dialog.answer then
-			dialog.answer = msg
-		end
+	if not ok then return end
+	local dialog = Dialog.dict_id[id]
+	local object = Player:find{client = event.client}
+	if dialog and dialog.user == object and not dialog.answer then
+		dialog.answer = msg
 	end
 end}
 
 Protocol:add_handler{type = "DIALOG_CLOSE", func = function(event)
 	local ok,id = event.packet:read("uint32")
-	if ok then
-		local dialog = Dialog.dict_id[id]
-		local object = Player:find{client = event.client}
-		if dialog and dialog.user == object then
-			dialog:close()
-		end
-	end
+	if not ok then return end
+	-- Find the dialog and make sure the user owns it.
+	local dialog = Dialog.dict_id[id]
+	local object = Player:find{client = event.client}
+	if not dialog or dialog.user ~= object then return end
+	-- Forcefully close the dialog. This causes it to automatically
+	-- execute with default choices until it reaches the end.
+	Dialog.dict_user[dialog.user] = nil
+	dialog.user = nil
 end}
 
 Eventhandler{type = "tick", func = function(self, args)

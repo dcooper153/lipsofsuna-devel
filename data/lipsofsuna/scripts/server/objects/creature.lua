@@ -444,7 +444,9 @@ Creature.state_updaters =
 		-- Turn towards the target.
 		if self.dialog then
 			self:set_movement(0)
-			self:face_point{point = self.dialog.user.position, secs = secs}
+			if self.dialog.user then
+				self:face_point{point = self.dialog.user.position, secs = secs}
+			end
 		end
 	end,
 	combat = function(self, secs)

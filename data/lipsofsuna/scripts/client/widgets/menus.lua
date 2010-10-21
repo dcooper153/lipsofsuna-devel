@@ -31,6 +31,8 @@ Widgets.Menus.close = function(self, args)
 	-- Pop levels from the stack.
 	local l = math.max(1, args and args.level or #self.stack)
 	while #self.stack >= l do
+		local w = self.stack[#self.stack]
+		if w.close then w:close() end
 		self.stack[#self.stack] = nil
 	end
 	-- Show the topmost level or hide if all levels closed.
