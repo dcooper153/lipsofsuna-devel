@@ -101,6 +101,7 @@ Species.new = function(clss, args)
 	end
 	-- Factions.
 	if args.factions then
+		self.factions = {}
 		for k,v in pairs(args.factions) do
 			self.factions[v] = Faction:find{name = v}
 		end

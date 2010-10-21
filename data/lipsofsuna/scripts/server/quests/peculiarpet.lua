@@ -14,6 +14,7 @@ Completion conditions:
 --]]
 
 local name = Names:random{race = "Aer", gender = "female"}
+Quest.peculiar_pet_npc_name = name
 
 Dialog{name = "peculiarpetnpc", unique = true,
 die = function(self)

@@ -186,6 +186,13 @@ Species{
 	factions = {"evil"}}
 
 Species{
+	name = "lipscitizen",
+	base = "aer",
+	dialog = "lipscitizen",
+	hair_style = "hair1",
+	inventory_items = {"chainmail tunic", "chainmail pants", "chainmail leggings"}}
+
+Species{
 	name = "peculiarpetnpc",
 	base = "aer",
 	dialog = "peculiarpetnpc",

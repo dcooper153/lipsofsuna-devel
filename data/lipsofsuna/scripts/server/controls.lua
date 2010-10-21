@@ -36,12 +36,6 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 			o:send{packet = Packet(packets.QUEST_COMPLETE, "uint32", q.id)}
 		end
 	end
-	-- FIXME
-	Creature{
-		species = "companion",
-		master = o,
-		position = o.position + Vector(5,0,5),
-		realized = true}
 end}
 
 Protocol:add_handler{type = "CROUCH", func = function(args)
