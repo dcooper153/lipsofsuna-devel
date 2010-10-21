@@ -11,7 +11,7 @@ out = '.build'
 
 CORE_DIRS = 'ai algorithm archive binding callback client engine extension font generator image main math model network particle paths physics reload render script server sound string system thread video voxel widget'
 EXTS_DIRS = 'binding camera database effect generator network npc object-physics object-render physics packager region reload render skeleton sound speech tiles tiles-physics tiles-render widgets'
-CORE_EXCL = 'lipsofsuna/math/unittest.c lipsofsuna/server/server-main.c lipsofsuna/main/main.c'
+CORE_EXCL = 'src/lipsofsuna/math/unittest.c src/lipsofsuna/server/server-main.c src/lipsofsuna/main/main.c'
 
 def options(ctx):
 	ctx.tool_options('compiler_cc')
@@ -34,8 +34,8 @@ def configure(ctx):
 	ctx.env.SOUND = Options.options.sound != "false"
 
 	# Flags
-	ctx.env.INCLUDES_CORE = ['.']
-	ctx.env.INCLUDES_EXTENSION = ['.']
+	ctx.env.INCLUDES_CORE = ['.', 'src']
+	ctx.env.INCLUDES_EXTENSION = ['.', 'src']
 	ctx.env.INCLUDES_TEST = []
 	ctx.env.CFLAGS_CORE = ['-g', '-Wall', '-O0', '-DHAVE_CONFIG_H']
 	ctx.env.CFLAGS_EXTENSION = ['-g', '-Wall', '-O0', '-DHAVE_CONFIG_H']
@@ -153,7 +153,7 @@ def configure(ctx):
 	if ctx.env.RELPATH:
 		ctx.define('LI_RELATIVE_PATHS', 1)
 		ctx.env.RPATH_CORE = ['$ORIGIN/lib']
-		ctx.env.PREFIX = os.path.join(ctx.path.abspath(), 'install')
+		ctx.env.PREFIX = ctx.path.abspath()
 		ctx.env.BINDIR = ctx.env.PREFIX
 		ctx.env.EXTSDIR = os.path.join(ctx.env.PREFIX, 'lib', 'extensions')
 		ctx.env.DATADIR = os.path.join(ctx.env.PREFIX, 'data')
@@ -209,7 +209,7 @@ def build(ctx):
 
 	# Core objects.
 	for dir in CORE_DIRS.split(' '):
-		srcs = ctx.path.ant_glob('lipsofsuna/%s/*.c' % dir, excl=CORE_EXCL.split(' '))
+		srcs = ctx.path.ant_glob('src/lipsofsuna/%s/*.c' % dir, excl=CORE_EXCL.split(' '))
 		if srcs:
 			objs += dir + '_objs '
 			ctx.new_task_gen(
@@ -217,7 +217,7 @@ def build(ctx):
 				source = srcs,
 				target = dir + '_objs',
 				use = libs)
-		srcs = ctx.path.ant_glob('lipsofsuna/%s/*.cpp' % dir, excl=CORE_EXCL.split(' '))
+		srcs = ctx.path.ant_glob('src/lipsofsuna/%s/*.cpp' % dir, excl=CORE_EXCL.split(' '))
 		if srcs:
 			objs += dir + '_cxx_objs '
 			ctx.new_task_gen(
@@ -231,24 +231,25 @@ def build(ctx):
 		objs += dir + '_ext_objs '
 		ctx.new_task_gen(
 			features = 'c',
-			source = ctx.path.ant_glob('lipsofsuna/extension/%s/*.c' % dir),
+			source = ctx.path.ant_glob('src/lipsofsuna/extension/%s/*.c' % dir),
 			target = dir + '_ext_objs',
 			use = 'EXTENSION LUA SQLITE GRAPPLE SDL SDL_TTF ZLIB GLEW GL THREAD AL VORBIS OGG FLAC')
 
 	# Target executable.
 	ctx.new_task_gen(
 		features = 'c cxx cprogram',
-		target = 'lipsofsuna-bin',
-		install_path = None,
+		target = 'lipsofsuna',
+		install_path = '${BINDIR}',
 		add_objects = objs,
 		use = libs)
 
-	# Installation.
+	# Installation. Since relpath uses the same directory layout as the source tree, the executable
+	# will find the data files from their current locations and we can avoid installing them.
 	ctx.set_group("install")
-	ctx.install_as('${BINDIR}/lipsofsuna%s' % ctx.env.EXEEXT, 'lipsofsuna-bin' + ctx.env.EXEEXT, chmod = 0777)
-	ctx.install_files(ctx.env.TOOLDIR, ['tool/lipsofsuna_export.py'])
-	start_dir = ctx.path.find_dir('data')
-	ctx.install_files('${DATADIR}', start_dir.ant_glob('**/*.*'), cwd=start_dir, relative_trick=True)
+	if not ctx.env.RELPATH:
+		ctx.install_files(ctx.env.TOOLDIR, ['tool/lipsofsuna_export.py'])
+		start_dir = ctx.path.find_dir('data')
+		ctx.install_files('${DATADIR}', start_dir.ant_glob('**/*.*'), cwd=start_dir, relative_trick=True)
 	ctx.new_task_gen(
 		target = 'dummy',
 		rule   = 'touch ${TGT}',
@@ -258,7 +259,7 @@ def build(ctx):
 def dist(ctx):
 	import Logs
 	import tarfile
-	dirs = ['lipsofsuna/**/*.*', 'data/**/*.*', 'tool/*', 'AUTHORS', 'COPYING', 'README', 'waf', 'wscript']
+	dirs = ['src/**/*.*', 'data/**/*.*', 'tool/*', 'AUTHORS', 'COPYING', 'README', 'waf', 'wscript']
 	excl = ['**/.*', '**/import']
 	base = APPNAME + '-' + VERSION
 	name = base + '.tar.gz'

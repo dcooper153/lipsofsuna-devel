@@ -1,6 +1,10 @@
-.build
-install
+lipsofsuna
 lipsofsuna.geany
+data/lipsofsuna/import
+save
+.build
 .lock-wscript
 .lock-wafbuild
 .waf*
+!data/lipsofsuna/
+!src/lipsofsuna/
