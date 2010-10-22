@@ -198,6 +198,7 @@ Protocol:add_handler{type = "CHARACTER_ACCEPT", func = function(event)
 	Gui:init()
 	Sound.music = "fairytale2"
 	Sound.music_volume = 0.1
+	Program:unload_world()
 end}
 Protocol:add_handler{type = "CHARACTER_CREATE", func = function(event)
 	Chargen:execute()
