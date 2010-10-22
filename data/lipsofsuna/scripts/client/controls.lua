@@ -208,10 +208,10 @@ Binding{action = "run", mousebutton = 3} --BUTTON3
 Binding{action = "camera-zoom", mousebutton = 4, mult = -2.0} --BUTTON4
 Binding{action = "camera-zoom", mousebutton = 5, mult = 2.0} --BUTTON5
 Binding{action = "edit-select", mousebutton = 1, mods = 0x40} --LCTRL+BUTTON1
-Binding{action = "turn", mousedelta = 0, mult = 1.0} --AXIS0
-Binding{action = "tilt", mousedelta = 1, mult = 0.5} --AXIS1
-Binding{action = "camera-turn", mousedelta = 0, mods = 0x40, mult = 1.0} --AXIS0+LCTRL
-Binding{action = "camera-tilt", mousedelta = 1, mods = 0x40, mult = 0.5} --AXIS1+LCTRL
+Binding{action = "turn", mousedelta = 0, mult = 0.5} --AXIS0
+Binding{action = "tilt", mousedelta = 1, mult = 0.3} --AXIS1
+Binding{action = "camera-turn", mousedelta = 0, mods = 0x40, mult = 0.5} --AXIS0+LCTRL
+Binding{action = "camera-tilt", mousedelta = 1, mods = 0x40, mult = 0.3} --AXIS1+LCTRL
 --Binding{action = "camera-tilt", key = 100, mult = 10.0} --d
 --Binding{action = "camera-tilt", key = 99, mult = -10.0} --c
 
