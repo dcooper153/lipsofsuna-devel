@@ -30,11 +30,6 @@
 #include "server-callbacks.h"
 #include "server-script.h"
 
-static int
-private_init_sql (LISerServer* self);
-
-/****************************************************************************/
-
 /**
  * \brief Creates a new server instance.
  *
@@ -73,8 +68,7 @@ LISerServer* liser_server_new (
 		limai_program_free (self->program);
 		return NULL;
 	}
-	if (!private_init_sql (self) ||
-	    !liser_server_init_callbacks_client (self) ||
+	if (!liser_server_init_callbacks_client (self) ||
 	    !liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
 	    !liscr_script_create_class (self->script, "Event", liscr_script_event, self->script) ||
 	    !liscr_script_create_class (self->script, "Model", liscr_script_model, self->program) ||
@@ -111,10 +105,6 @@ liser_server_free (LISerServer* self)
 		limai_program_free (self->program);
 	}
 
-	/* Free database. */
-	if (self->sql != NULL)
-		sqlite3_close (self->sql);
-
 	lisys_free (self);
 }
 
@@ -128,67 +118,6 @@ int
 liser_server_main (LISerServer* self)
 {
 	return limai_program_execute_script (self->program, "server/main.lua");
-}
-
-/****************************************************************************/
-
-static int
-private_init_sql (LISerServer* self)
-{
-	int flags = SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE;
-	char* path;
-	const char* query;
-	sqlite3_stmt* statement;
-
-	/* Format path. */
-	path = lipth_paths_get_sql (self->paths, "server.db");
-	if (path == NULL)
-		return 0;
-
-	/* Open database. */
-	if (sqlite3_open_v2 (path, &self->sql, flags, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
-		sqlite3_close (self->sql);
-		lisys_free (path);
-		return 0;
-	}
-	lisys_free (path);
-
-	/* Create info table. */
-	query = "CREATE TABLE IF NOT EXISTS info (version TEXT);";
-	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
-
-	/* Create object table. */
-	query = "CREATE TABLE IF NOT EXISTS objects "
-		"(id INTEGER PRIMARY KEY,sector UNSIGNED INTEGER,model TEXT,"
-		"flags UNSIGNED INTEGER,angx REAL,angy REAL,angz REAL,posx REAL,"
-		"posy REAL,posz REAL,rotx REAL,roty REAL,rotz REAL,rotw REAL,"
-		"mass REAL,move REAL,speed REAL,step REAL,colgrp UNSIGNED INTEGER,"
-		"colmsk UNSIGNED INTEGER,control UNSIGNED INTEGER,type TEXT,extra TEXT);";
-	if (sqlite3_prepare_v2 (self->sql, query, -1, &statement, NULL) != SQLITE_OK)
-	{
-		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (self->sql));
-		return 0;
-	}
-	if (sqlite3_step (statement) != SQLITE_DONE)
-	{
-		sqlite3_finalize (statement);
-		return 0;
-	}
-	sqlite3_finalize (statement);
-
-	return 1;
 }
 
 /** @} */

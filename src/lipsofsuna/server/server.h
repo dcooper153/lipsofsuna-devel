@@ -32,7 +32,6 @@
 struct _LISerServer
 {
 	/* Server. */
-	LIArcSql* sql;
 	LIMaiProgram* program;
 
 	/* Program. */
