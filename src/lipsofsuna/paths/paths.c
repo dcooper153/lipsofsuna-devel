@@ -85,7 +85,7 @@ LIPthPaths* lipth_paths_new (
 	if (self->global_state == NULL)
 		goto error;
 	self->module_state = lisys_path_concat (self->global_state, name, NULL);
-	if (self->module_data == NULL)
+	if (self->module_state == NULL)
 		goto error;
 
 	/* Get extension directory. */
@@ -126,9 +126,9 @@ void lipth_paths_free (
 {
 #ifdef LI_RELATIVE_PATHS
 	lisys_free (self->global_exts);
-	lisys_free (self->global_state);
-#endif
 	lisys_free (self->global_data);
+#endif
+	lisys_free (self->global_state);
 	lisys_free (self->module_data);
 	lisys_free (self->module_name);
 	lisys_free (self->module_state);
