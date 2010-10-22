@@ -29,18 +29,10 @@ Player.new = function(clss, args)
 	self:add_item{object = Item:create{name = "saw"}}
 
 	-- Terrain listener.
-	Thread(function()
-		local t0 = Program.time
-		local t1 = t0
-		while self.realized do
-			while t1 - t0 < 0.2 do
-				t1 = Program.time
-				coroutine.yield()
-			end
-			t0 = t1
-			self:vision_cb{type = "player-tick"}
-		end
-	end)
+	self.player_timer = Timer{delay = 0.2, func = function()
+		self:update_vision_radius()
+		self:vision_cb{type = "player-tick"}
+	end}
 
 	return self
 end
@@ -65,6 +57,7 @@ Player.die = function(self)
 end
 
 Player.respawn = function(self)
+	self.player_timer:disable()
 	self.vision:disable()
 	self:send{packet = Packet(packets.CHARACTER_CREATE)}
 	Player.clients[self.client] = nil
@@ -96,6 +89,21 @@ Player.inventory_cb = function(self, args)
 	if fun then fun(args) end
 end
 
+--- Updates the vision radius of the player.<br/>
+-- The view distance depends on the perception skill so it's necessary to
+-- recalculate it occasionally. That can be done by calling this function.
+-- @param self Object.
+Player.update_vision_radius = function(self)
+	local skills = self.skills
+	local perception = skills:get_value{skill = "perception"}
+	if not perception then return end
+	local r = 15 + perception / 6
+	if math.floor(r) ~= self.vision.radius then
+		self.vision.radius = r
+		self.vision:rescan_objects()
+	end
+end
+
 Player.vision_cb = function(self, args)
 	local funs
 	local sendinfo = function(o)
@@ -117,7 +125,7 @@ Player.vision_cb = function(self, args)
 		end
 	end
 	local sendmap = function()
-		local b = Voxel:find_blocks{point = self.position, radius = 10}
+		local b = Voxel:find_blocks{point = self.position, radius = self.vision.radius}
 		for k,v in pairs(b) do
 			funs["voxel-block-changed"]({index = k, stamp = v})
 		end
@@ -240,5 +248,6 @@ Eventhandler{type = "logout", func = function(self, event)
 	if not object then return end
 	Player.clients[event.client] = nil
 	object.realized = false
+	object.player_timer:disable()
 	object.vision:disable()
 end}
