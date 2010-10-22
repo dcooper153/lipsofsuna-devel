@@ -272,7 +272,7 @@
   </asset>
 
   <asset>
-    <file>import/bow-000.blend</file>
+    <file>import/bow1.blend</file>
     <author>tidbit (Joseph)</author>
     <license>Creative Commons BY 3.0</license>
     <status>usable</status>
@@ -280,31 +280,7 @@
   </asset>
 
   <asset>
-    <file>import/bow-001.blend</file>
-    <author>tidbit (Joseph)</author>
-    <license>Creative Commons BY 3.0</license>
-    <status>usable</status>
-    <type>model</type>
-  </asset>
-
-  <asset>
-    <file>import/bow-001.png</file>
-    <author>Ari Mustonen</author>
-    <license>CC0</license>
-    <status>usable</status>
-    <type>texture</type>
-  </asset>
-
-  <asset>
-    <file>import/bow-002.blend</file>
-    <author>tidbit (Joseph)</author>
-    <license>Creative Commons BY 3.0</license>
-    <status>usable</status>
-    <type>model</type>
-  </asset>
-
-  <asset>
-    <file>import/bow-002.png</file>
+    <file>import/bow1.png</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>
     <status>usable</status>

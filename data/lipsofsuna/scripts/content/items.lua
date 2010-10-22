@@ -26,6 +26,14 @@ Itemspec{
 	equipment_slot = "hand.R"}
 
 Itemspec{
+	name = "bow",
+	model = "bow1",
+	categories = {"ranged", "weapon"},
+	crafting_tools = {saw = 1},
+	crafting_materials = {log = 1},
+	equipment_slot = "hand.R"}
+
+Itemspec{
 	name = "chainmail leggings",
 	model = "book-000",
 	categories = {"armor"},
@@ -51,12 +59,6 @@ Itemspec{
 	crafting_materials = {log = 1},
 	equipment_models = {upper1 = "bra1"},
 	equipment_slot = "upperbody"}
-
-Itemspec{
-	name = "composite bow",
-	model = "bow-001",
-	categories = {"ranged", "weapon"},
-	equipment_slot = "hand.R"}
 
 Itemspec{
 	name = "gem",
@@ -140,12 +142,6 @@ Itemspec{
 	stacking = true}
 
 Itemspec{
-	name = "long bow",
-	model = "bow-002",
-	categories = {"ranged", "weapon"},
-	equipment_slot = "hand.R"}
-
-Itemspec{
 	name = "mana potion",
 	model = "potion-004",
 	mass = 2,
@@ -197,14 +193,6 @@ Itemspec{
 	model = "shield-000",
 	categories = {"shield"},
 	equipment_slot = "hand.L"}
-
-Itemspec{
-	name = "short bow",
-	model = "bow-000",
-	categories = {"ranged", "weapon"},
-	crafting_tools = {saw = 1},
-	crafting_materials = {log = 1},
-	equipment_slot = "hand.R"}
 
 Itemspec{
 	name = "spear",
