@@ -187,7 +187,7 @@ liarc_tar_write_file (LIArcTar*   self,
 	}
 
 	/* Open file. */
-	if (!lisys_lstat (src, &st))
+	if (!lisys_filesystem_lstat (src, &st))
 	{
 		lisys_error_set (EIO, "cannot stat `%s'", src);
 		return 0;
@@ -208,7 +208,7 @@ liarc_tar_write_file (LIArcTar*   self,
 	}
 	if (st.type == LISYS_STAT_LINK)
 	{
-		link = lisys_readlink (src);
+		link = lisys_filesystem_readlink (src);
 		if (link == NULL)
 			return 0;
 	}

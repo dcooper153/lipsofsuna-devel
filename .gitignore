@@ -1,7 +1,6 @@
 lipsofsuna
 lipsofsuna.geany
 data/lipsofsuna/import
-save
 .build
 .lock-wscript
 .lock-wafbuild

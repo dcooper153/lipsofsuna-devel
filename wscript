@@ -20,13 +20,12 @@ def options(ctx):
 	ctx.add_option('--bindir', action='store', default=None, help='override executable directory [default: PREFIX/bin]')
 	ctx.add_option('--libdir', action='store', default=None, help='override library directory [default: PREFIX/lib]')
 	ctx.add_option('--datadir', action='store', default=None, help='override data directory [default: PREFIX/share]')
-	ctx.add_option('--savedir', action='store', default=None, help='override save directory [default: PREFIX/var]')
 	ctx.add_option('--sound', action='store', default=True, help='compile with sound support [default: true]')
 
 def configure(ctx):
 
 	# Options
-	if Options.options.relpath != "false" and (Options.options.bindir or Options.options.libdir or Options.options.datadir or Options.options.savedir):
+	if Options.options.relpath != "false" and (Options.options.bindir or Options.options.libdir or Options.options.datadir):
 		print("\nThe directory overrides are not used by a relative path build")
 		print("To enable a traditional build, configure with --relpath=false\n")
 		exit(1)
@@ -159,7 +158,6 @@ def configure(ctx):
 		ctx.env.DATADIR = os.path.join(ctx.env.PREFIX, 'data')
 		ctx.env.PROGDIR = os.path.join(ctx.env.PREFIX, 'bin')
 		ctx.env.TOOLDIR = os.path.join(ctx.env.PREFIX, 'tool')
-		ctx.env.SAVEDIR = os.path.join(ctx.env.PREFIX, 'save')
 	else:
 		bindir = Options.options.bindir
 		if not bindir:
@@ -170,20 +168,15 @@ def configure(ctx):
 		datadir = Options.options.datadir
 		if not datadir:
 			datadir = os.path.join(ctx.env.PREFIX, 'share')
-		savedir = Options.options.savedir
-		if not savedir:
-			savedir = os.path.join(ctx.env.PREFIX, 'var')
 		ctx.env.BINDIR = bindir
 		ctx.env.EXTSDIR = os.path.join(libdir, APPNAME, 'extensions', '0.1')
 		ctx.env.DATADIR = os.path.join(datadir, APPNAME)
 		ctx.env.PROGDIR = bindir
 		ctx.env.TOOLDIR = os.path.join(datadir, APPNAME, 'tool')
-		ctx.env.SAVEDIR = os.path.join(savedir, APPNAME)
 		ctx.define('LIEXTSDIR', ctx.env.EXTSDIR)
 		ctx.define('LIDATADIR', os.path.join(datadir, APPNAME))
 		ctx.define('LIPROGDIR', ctx.env.PROGDIR)
 		ctx.define('LITOOLDIR', ctx.env.TOOLDIR)
-		ctx.define('LISAVEDIR', ctx.env.SAVEDIR)
 	ctx.write_config_header('config.h')
 
 	# Messages
@@ -196,7 +189,6 @@ def configure(ctx):
 		print("\tbindir: " + bindir)
 		print("\tlibdir: " + libdir)
 		print("\tdatadir: " + datadir)
-		print("\tsavedir: " + savedir + "\n")
 	print("Build command: ./waf")
 	print("Install command: ./waf install\n")
 
@@ -250,11 +242,6 @@ def build(ctx):
 		ctx.install_files(ctx.env.TOOLDIR, ['tool/lipsofsuna_export.py'])
 		start_dir = ctx.path.find_dir('data')
 		ctx.install_files('${DATADIR}', start_dir.ant_glob('**/*.*'), cwd=start_dir, relative_trick=True)
-	ctx.new_task_gen(
-		target = 'dummy',
-		rule   = 'touch ${TGT}',
-		install_path = '${SAVEDIR}/lipsofsuna',
-		source = 'wscript')
 
 def dist(ctx):
 	import Logs

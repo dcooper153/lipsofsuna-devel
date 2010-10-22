@@ -135,7 +135,7 @@ liext_resources_insert_directory (LIExtResources* self,
 			goto error;
 		if (!lialg_strdic_find (self->ignore, dst1))
 		{
-			if (!lisys_stat (src1, &result))
+			if (!lisys_filesystem_stat (src1, &result))
 				goto error;
 			if (result.type == LISYS_STAT_DIRECTORY)
 			{

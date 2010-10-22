@@ -44,7 +44,7 @@
 #endif
 #include "system.h"
 #include "system-error.h"
-#include "system-file.h"
+#include "system-mmap.h"
 
 struct _LISysMmap
 {
@@ -63,15 +63,13 @@ struct _LISysMmap
 
 /**
  * \brief Creates a read-only memory map of the file.
- *
  * \param path Path.
  * \return New memory map handle or NULL.
  */
-LISysMmap*
-lisys_mmap_open (const char* path)
+LISysMmap* lisys_mmap_open (
+	const char* path)
 {
 #ifdef HAVE_SYS_MMAN_H
-
 	int fd;
 	struct stat st;
 	LISysMmap* self;
@@ -117,9 +115,7 @@ lisys_mmap_open (const char* path)
 	}
 
 	return self;
-
 #elif defined HAVE_WINDOWS_H
-
 	LISysMmap* self;
 
 	/* Allocate self. */
@@ -176,7 +172,6 @@ lisys_mmap_open (const char* path)
 		self->buffer = NULL;
 
 	return self;
-
 #else
 #error "Mmap not supported"
 	return NULL;
@@ -185,11 +180,10 @@ lisys_mmap_open (const char* path)
 
 /**
  * \brief Frees a memory map handle.
- *
  * \param self Memory map handle.
  */
-void
-lisys_mmap_free (LISysMmap* self)
+void lisys_mmap_free (
+	LISysMmap* self)
 {
 #ifdef HAVE_SYS_MMAN_H
 	if (self->buffer != NULL)
@@ -208,179 +202,24 @@ lisys_mmap_free (LISysMmap* self)
 
 /**
  * \brief Gets the mapped memory area.
- *
  * \param self Memory map.
  * \return Memory pointer, may be NULL if the file size was zero.
  */
-void*
-lisys_mmap_get_buffer (LISysMmap* self)
+void* lisys_mmap_get_buffer (
+	LISysMmap* self)
 {
 	return self->buffer;
 }
 
 /**
  * \brief Gets the size of the mapped file.
- *
  * \param self Memory map.
  * \return Size in bytes.
  */
-int
-lisys_mmap_get_size (LISysMmap* self)
+int lisys_mmap_get_size (
+	LISysMmap* self)
 {
 	return self->size;
-}
-
-/**
- * \brief Checks if the file is accessible.
- *
- * \param path Path to the file.
- * \param mode Access mode.
- * \return Nonzero on success.
- */
-int
-lisys_access (const char* path,
-              int         mode)
-{
-	int m = 0;
-
-	if (mode & LISYS_ACCESS_EXISTS) m |= F_OK;
-	if (mode & LISYS_ACCESS_READ) m |= R_OK;
-	if (mode & LISYS_ACCESS_WRITE) m |= W_OK;
-	if (mode & LISYS_ACCESS_EXEC) m |= X_OK;
-
-	return !access (path, m);
-}
-
-/**
- * \brief Reads the target of a symbolic link.
- *
- * \param path Path to the link.
- * \return Link target or NULL.
- */
-char*
-lisys_readlink (const char* path)
-{
-#ifdef HAVE_READLINK
-
-	int len;
-	char* tmp;
-	char* name;
-
-	len = 128;
-	name = NULL;
-	while (1)
-	{
-		tmp = realloc (name, len);
-		if (tmp == NULL)
-		{
-			lisys_error_set (ENOMEM, NULL);
-			free (name);
-			return NULL;
-		}
-		name = tmp;
-		name[len - 1] = '\0';
-		if (readlink (path, name, len) <= 0)
-		{
-			lisys_error_set (errno, "cannot read link `%s'", path);
-			free (name);
-			return NULL;
-		}
-		if (strlen (tmp) < len)
-			break;
-		len <<= 1;
-	}
-
-	return name;
-
-#else
-	lisys_error_set (ENOTSUP, NULL);
-	return NULL;
-#endif
-}
-
-/**
- * \brief Stats an open file.
- *
- * \param path Path to stat.
- * \param result Return value for the stat data.
- * \return Nonzero on success.
- */
-int
-lisys_stat (const char* path,
-            LISysStat*  result)
-{
-	struct stat st;
-
-	/* Stat the file. */
-	if (stat (path, &st) != 0)
-	{
-		lisys_error_set (EIO, "cannot stat `%s'", path);
-		return 0;
-	}
-
-	/* Convert results. */
-	if (S_ISREG (st.st_mode)) result->type = LISYS_STAT_FILE;
-	else if (S_ISDIR (st.st_mode)) result->type = LISYS_STAT_DIRECTORY;
-	else if (S_ISCHR (st.st_mode)) result->type = LISYS_STAT_CHAR;
-	else if (S_ISBLK (st.st_mode)) result->type = LISYS_STAT_BLOCK;
-#ifdef HAVE_LSTAT
-	else if (S_ISLNK (st.st_mode)) result->type = LISYS_STAT_LINK;
-#endif
-	else { lisys_assert (0); }
-	result->uid = st.st_uid;
-	result->gid = st.st_gid;
-	result->mode = st.st_mode & 0777;
-	result->size = st.st_size;
-	result->mtime = st.st_mtime;
-
-	return 1;
-}
-
-/**
- * \brief Stats the specified path.
- *
- * \param path Path to stat.
- * \param result Return value for the stat data.
- * \return Nonzero on success.
- */
-int
-lisys_lstat (const char* path,
-             LISysStat*  result)
-{
-#ifdef HAVE_LSTAT
-
-	struct stat st;
-
-	/* Stat the file. */
-	if (lstat (path, &st) != 0)
-	{
-		lisys_error_set (EIO, "cannot stat `%s'", path);
-		return 0;
-	}
-
-	/* Convert results. */
-	if (S_ISREG (st.st_mode)) result->type = LISYS_STAT_FILE;
-	else if (S_ISDIR (st.st_mode)) result->type = LISYS_STAT_DIRECTORY;
-	else if (S_ISCHR (st.st_mode)) result->type = LISYS_STAT_CHAR;
-	else if (S_ISBLK (st.st_mode)) result->type = LISYS_STAT_BLOCK;
-#ifdef HAVE_LSTAT
-	else if (S_ISLNK (st.st_mode)) result->type = LISYS_STAT_LINK;
-#endif
-	else { lisys_assert (0); }
-	result->uid = st.st_uid;
-	result->gid = st.st_gid;
-	result->mode = st.st_mode & 0777;
-	result->size = st.st_size;
-	result->mtime = st.st_mtime;
-	result->rdev = st.st_rdev;
-
-	return 1;
-
-#else
-
-	return lisys_stat (path, result);
-
-#endif
 }
 
 /** @} */

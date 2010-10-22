@@ -37,6 +37,7 @@ LIPthPaths* lipth_paths_new (
 	const char* path,
 	const char* name)
 {
+	char* tmp;
 	LIPthPaths* self;
 	LISysStat stat;
 
@@ -76,13 +77,13 @@ LIPthPaths* lipth_paths_new (
 		goto error;
 
 	/* Get save directory. */
-#ifdef LI_RELATIVE_PATHS
-	self->global_state = lisys_path_concat (self->root, "save", NULL);
+	tmp = lisys_system_get_path_data_home ();
+	if (tmp == NULL)
+		goto error;
+	self->global_state = lisys_path_concat (tmp, "lipsofsuna", "save", NULL);
+	lisys_free (tmp);
 	if (self->global_state == NULL)
 		goto error;
-#else
-	self->global_state = LISAVEDIR;
-#endif
 	self->module_state = lisys_path_concat (self->global_state, name, NULL);
 	if (self->module_data == NULL)
 		goto error;
@@ -97,7 +98,7 @@ LIPthPaths* lipth_paths_new (
 #endif
 
 	/* Check for valid data directory. */
-	if (!lisys_stat (self->module_data, &stat))
+	if (!lisys_filesystem_stat (self->module_data, &stat))
 	{
 		lisys_error_set (EIO, "missing data directory `%s'", self->module_data);
 		goto error;
@@ -125,9 +126,9 @@ void lipth_paths_free (
 {
 #ifdef LI_RELATIVE_PATHS
 	lisys_free (self->global_exts);
-	lisys_free (self->global_data);
 	lisys_free (self->global_state);
 #endif
+	lisys_free (self->global_data);
 	lisys_free (self->module_data);
 	lisys_free (self->module_name);
 	lisys_free (self->module_state);
@@ -222,15 +223,45 @@ char* lipth_paths_get_sound (
 /**
  * \brief Gets the path to an SQL database.
  *
+ * Calling this function will create the save directory if it doesn't exist
+ * yet. If the creation fails or the function runs out of memory, NULL is
+ * returned and the error message is set.
+ *
  * \param self Paths object.
  * \param name File name.
- * \return Full path or NULL.
+ * \return Newly allocated absolute path or NULL.
  */
 char* lipth_paths_get_sql (
 	const LIPthPaths* self,
 	const char*       name)
 {
-	return lisys_path_concat (self->module_state, name, NULL);
+	char* path;
+
+	/* Format the path. */
+	path = lisys_path_concat (self->module_state, name, NULL);
+	if (path == NULL)
+		return NULL;
+
+	/* Check if the save directory exists. */
+	if (lisys_filesystem_access (self->module_state, LISYS_ACCESS_EXISTS))
+	{
+		if (!lisys_filesystem_access (self->module_state, LISYS_ACCESS_WRITE))
+		{
+			lisys_error_set (EINVAL, "save path `%s' is not writable", path);
+			lisys_free (path);
+			return NULL;
+		}
+		return path;
+	}
+
+	/* Create the save directory. */
+	if (!lisys_filesystem_makepath (self->module_state))
+	{
+		lisys_free (path);
+		return NULL;
+	}
+
+	return path;
 }
 
 /**

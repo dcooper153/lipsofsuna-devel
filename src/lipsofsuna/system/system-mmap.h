@@ -18,53 +18,20 @@
 /**
  * \addtogroup lisys System
  * @{
- * \addtogroup lisysFile File
+ * \addtogroup LISysMmap Mmap
  * @{
  */
 
-#ifndef __SYSTEM_FILE_H__
-#define __SYSTEM_FILE_H__
+#ifndef __SYSTEM_MMAP_H__
+#define __SYSTEM_MMAP_H__
 
-#include <stdio.h>
 #include "system-compiler.h"
 
-enum
-{
-	LISYS_ACCESS_EXISTS = 0x08,
-	LISYS_ACCESS_READ = 0x01,
-	LISYS_ACCESS_WRITE = 0x02,
-	LISYS_ACCESS_EXEC = 0x04,
-};
-
-enum
-{
-	LISYS_STAT_BLOCK,
-	LISYS_STAT_CHAR,
-	LISYS_STAT_DIRECTORY,
-	LISYS_STAT_FILE,
-	LISYS_STAT_LINK
-};
-
 typedef struct _LISysMmap LISysMmap;
-typedef struct _LISysStat LISysStat;
-struct _LISysStat
-{
-	int uid;
-	int gid;
-	int mode;
-	int size;
-	int type;
-	long mtime;
-	long rdev;
-};
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-LIAPICALL (int, lisys_access, (
-	const char* path,
-	int         mode));
 
 LIAPICALL (LISysMmap*, lisys_mmap_open, (
 	const char* path));
@@ -77,17 +44,6 @@ LIAPICALL (void*, lisys_mmap_get_buffer, (
 
 LIAPICALL (int, lisys_mmap_get_size, (
 	LISysMmap* self));
-
-LIAPICALL (char*, lisys_readlink, (
-	const char* path));
-
-LIAPICALL (int, lisys_stat, (
-	const char* path,
-	LISysStat*  result));
-
-LIAPICALL (int, lisys_lstat, (
-	const char* path,
-	LISysStat*  result));
 
 #ifdef __cplusplus
 }

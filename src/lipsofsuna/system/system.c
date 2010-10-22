@@ -32,11 +32,11 @@
 #include "system-error.h"
 #include "system-path.h"
 
-void
-lisys_assert_fail (const char* asrt,
-                   const char* file,
-                   int         line,
-                   const char* func)
+void lisys_assert_fail (
+	const char* asrt,
+	const char* file,
+	int         line,
+	const char* func)
 {
 	fprintf (stderr, "%s:%d: %s: Assertion `%s' failed.\n", file, line, func, asrt);
 	abort ();
@@ -48,8 +48,8 @@ lisys_assert_fail (const char* asrt,
  * \param t Return location for the time or NULL.
  * \return Time.
  */
-time_t
-lisys_time (time_t* t)
+time_t lisys_time (
+	time_t* t)
 {
 	return time (t);
 }
@@ -60,10 +60,9 @@ lisys_time (time_t* t)
  * If no home directory is specified, the current
  * working directory is returned instead.
  *
- * \return A string guaranteed to not be NULL.
+ * \return New string or NULL if out of memory.
  */
-char*
-lisys_system_get_path_home ()
+char* lisys_system_get_path_home ()
 {
 	char* home;
 
@@ -79,18 +78,24 @@ lisys_system_get_path_home ()
  * Follows the XDG Base Directory Specification:
  * http://www.freedesktop.org/Standards/basedir-spec
  *
- * \return A new string or NULL.
+ * \return New string or NULL.
  */
-char*
-lisys_system_get_path_data_home ()
+char* lisys_system_get_path_data_home ()
 {
+	char* ret;
+	char* tmp;
 	const char* dir;
 
 	dir = getenv ("XDG_DATA_HOME");
 	if (dir != NULL && dir[0] != '\0')
 		return strdup (dir);
-	dir = lisys_system_get_path_home ();
-	return lisys_path_concat (dir, ".local/share", NULL);
+	tmp = lisys_system_get_path_home ();
+	if (tmp == NULL)
+		return NULL;
+	ret = lisys_path_concat (tmp, ".local/share", NULL);
+	free (tmp);
+
+	return ret;
 }
 
 /**
@@ -99,18 +104,24 @@ lisys_system_get_path_data_home ()
  * Follows the XDG Base Directory Specification:
  * http://www.freedesktop.org/Standards/basedir-spec
  *
- * \return A new string or NULL.
+ * \return New string or NULL.
  */
-char*
-lisys_system_get_path_config_home ()
+char* lisys_system_get_path_config_home ()
 {
+	char* ret;
+	char* tmp;
 	const char* dir;
 
 	dir = getenv ("XDG_CONFIG_HOME");
 	if (dir != NULL && dir[0] != '\0')
 		return strdup (dir);
-	dir = lisys_system_get_path_home ();
-	return lisys_path_concat (dir, ".config", NULL);
+	tmp = lisys_system_get_path_home ();
+	if (tmp == NULL)
+		return NULL;
+	ret = lisys_path_concat (tmp, ".config", NULL);
+	free (tmp);
+
+	return ret;
 }
 
 /**
@@ -119,18 +130,24 @@ lisys_system_get_path_config_home ()
  * Follows the XDG Base Directory Specification:
  * http://www.freedesktop.org/Standards/basedir-spec
  *
- * \return A new string or NULL.
+ * \return New string or NULL.
  */
-char*
-lisys_system_get_path_cache_home ()
+char* lisys_system_get_path_cache_home ()
 {
+	char* ret;
+	char* tmp;
 	const char* dir;
 
 	dir = getenv ("XDG_CACHE_HOME");
 	if (dir != NULL && dir[0] != '\0')
 		return strdup (dir);
-	dir = lisys_system_get_path_home ();
-	return lisys_path_concat (dir, ".cache", NULL);
+	tmp = lisys_system_get_path_home ();
+	if (tmp == NULL)
+		return NULL;
+	ret = lisys_path_concat (tmp, ".cache", NULL);
+	free (tmp);
+
+	return ret;
 }
 
 /** @} */
