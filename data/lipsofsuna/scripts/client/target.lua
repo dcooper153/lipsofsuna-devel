@@ -1,5 +1,6 @@
-Target = {}
+Target = Class()
 Target.func = nil
+Target.target_object = nil
 
 --- Checks if waiting for target.
 -- @param self Target class.
@@ -18,15 +19,34 @@ function Target.cancel(self)
 	controls.SHOOT.enabled = Client.moving
 end
 
-function Target.pick_scene(self)
+--- Picks an object or a tile from the scene based on the look vector of the player.
+-- @param clss Target class.
+-- @param args Arguments or nil.<ul>
+--   <li>ignore: Dictionary of objects to ignore or nil.</li></ul>
+-- @return Vector and object
+Target.pick_look = function(clss, args)
+	if not Player.object then return end
+	local r1,r2 = Player:get_picking_ray_1st()
+	return clss:pick_ray{ray1 = r1, ray2 = r2, ignore = args and args.ignore}
+end
+
+--- Picks an object or a tile from the scene based on a ray.
+-- @param clss Target class.
+-- @param args Arguments.<ul>
+--   <li>ignore: Dictionary of objects to ignore or nil.</li>
+--   <li>ray1: Start point of the ray.</li>
+--   <li>ray2: End point of the ray.</li></ul>
+-- @return Vector and object
+Target.pick_ray = function(clss, args)
 	local best_object = nil
 	local best_point = nil
 	local best_dist = nil
-	-- Get picking ray.
-	local r1,r2 = Player.camera:picking_ray{cursor = Client.cursor_pos}
+	local r1 = args.ray1
+	local r2 = args.ray2
+	local ignore = args.ignore or {}
 	-- Intersect with objects.
 	for id,o in pairs(Object.objects) do
-		if o.realized then
+		if o.realized and not ignore[o] then
 			local p = o:intersect_ray(r1, r2)
 			if p then
 				local d = (r1 - p).length
@@ -47,16 +67,29 @@ function Target.pick_scene(self)
 	return best_point,best_object
 end
 
+--- Picks an object or a tile from the scene based on camera orientation.
+-- @param clss Target class.
+-- @return Vector and object
+Target.pick_scene = function(clss)
+	local r1,r2 = Player.camera:picking_ray{cursor = Client.cursor_pos}
+	return clss:pick_ray{ray1 = r1, ray2 = r2}
+end
+
 --- Initiates targeting.
--- @param self Target class.
+-- @param clss Target class.
 -- @param func Targeting callback.
-function Target.start(self, msg, func)
-	Gui:set_action_text(msg)
-	self.func = func
-	self.action.enabled = true
-	Client.moving = false
-	controls.EDIT_SELECT.enabled = false
-	controls.SHOOT.enabled = false
+Target.start = function(clss, msg, func)
+	if Client.moving then
+		if clss.target_object then
+			func("obj", clss.target_object.id)
+		end
+	else
+		Gui:set_action_text(msg)
+		clss.func = func
+		clss.action.enabled = true
+		controls.EDIT_SELECT.enabled = true
+		controls.SHOOT.enabled = false
+	end
 end
 
 --- Finishes targeting by selecting an item from a container.
@@ -103,3 +136,27 @@ Target.action.callback = function(event)
 	if event.active then Target:select_scene() end
 end
 Binding{action = "target", mousebutton = 1} --BUTTON1
+
+-- Periodically check if the're an object in front of the player.
+Timer{delay = 0.2, func = function()
+	if Player.object and Client.moving then
+		-- Ignore the player and the equipment.
+		local ignore = {[Player.object] = true}
+		local slots = Slots:find{owner = Player.object}
+		if slots then
+			for k,v in pairs(slots.slots) do
+				ignore[v] = true
+			end
+		end
+		-- Ray pick an object in front of the player.
+		local p,o = Target:pick_look{ignore = ignore}
+		if o then
+			Gui.label_target.text = "Use " .. (o.name or "")
+		else
+			Gui.label_target.text = ""
+		end
+		Target.target_object = o
+	else
+		Target.target_object = nil
+	end
+end}

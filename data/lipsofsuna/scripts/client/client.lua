@@ -19,6 +19,37 @@ local radian_wrap = function(x)
 	end
 end
 
+Player.get_camera_transform = function(clss)
+	if clss.camera.mode == "first-person" then
+		return clss:get_camera_transform_1st()
+	else
+		return clss:get_camera_transform_3rd()
+	end
+end
+
+Player.get_camera_transform_1st = function(clss)
+	local pos,rot = clss:get_camera_transform_3rd()
+	local node = clss.object:find_node{name = "#camera"}
+	if node then pos = clss.object.position + clss.object.rotation * node end
+	return pos,rot
+end
+
+Player.get_camera_transform_3rd = function(clss)
+	local turn = clss.camera_turn_state + clss.turn_state
+	local tilt = clss.camera_tilt_state - clss.tilt_state
+	return clss.object.position + Vector(0, 2, 0), Quaternion:new_euler(turn, 0, tilt)
+end
+
+Player.get_picking_ray_1st = function(clss)
+	local pos,rot = clss:get_camera_transform_1st()
+	return pos,pos + rot * Vector(0,0,-5)
+end
+
+Player.get_picking_ray_3rd = function(clss)
+	local pos,rot = clss:get_camera_transform_3rd()
+	return pos,pos + rot * Vector(0,0,-50)
+end
+
 Player.camera = Camera{far = 60.0, mode = "third-person", near = 0.3}
 Player.camera_tilt = 0
 Player.camera_tilt_state = 0
@@ -34,18 +65,9 @@ Player.update_camera = function(clss, secs)
 	clss.camera_tilt_state = radian_wrap(clss.camera_tilt_state)
 	clss.camera_tilt = 0
 	-- Set the target transformation.
-	local turn = clss.camera_turn_state + clss.turn_state
-	local tilt = clss.camera_tilt_state - clss.tilt_state
-	Player.camera.target_position = Player.object.position + Vector(0, 2, 0)
-	Player.camera.target_rotation = Quaternion:new_euler(turn, 0, tilt)
-	-- Update the first person view.
-	if Camera.mode == "first-person" then
-		local node,rot = Player.object:find_node{name = "#camera"}
-		if node then
-			Player.camera.target_position = Player.object.position + Player.object.rotation * node
-			-- TODO: Need a separate player model for first person view to allow intersections
-		end
-	end
+	local pos,rot = clss:get_camera_transform()
+	Player.camera.target_position = pos
+	Player.camera.target_rotation = rot
 	-- Interpolate.
 	Player.camera.viewport = {Gui.scene.x, Gui.scene.y, Gui.scene.width, Gui.scene.height}
 	Player.camera:update(secs)

@@ -103,9 +103,6 @@ end
 controls.PICKUP = Action{id = "pick-up", name = "Pick up", desc = "Pick up items"}
 controls.PICKUP.callback = function(event)
 	if event.active then
-		if Client.moving then
-			controls.MENU.callback(event)
-		end
 		Commands:pickup()
 	end
 end
@@ -177,9 +174,6 @@ end
 controls.USE = Action{id = "use", name = "Use", desc = "Chat, loot, read, ..."}
 controls.USE.callback = function(event)
 	if event.active then
-		if Client.moving then
-			controls.MENU.callback(event)
-		end
 		Commands:use()
 	end
 end

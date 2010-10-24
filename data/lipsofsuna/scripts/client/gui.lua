@@ -70,11 +70,13 @@ Gui.init = function(clss)
 	Gui.menu_group:append_col(Gui.menus)
 	Gui.menu_group:append_col(Gui.chat_group)
 	Gui.menu_group:set_expand{col = 2}
+	Gui.label_target = Button{style = "label"}
 	Gui.center_group = Group{cols = 1}
+	Gui.center_group:append_row(Gui.label_target)
 	Gui.center_group:append_row(Gui.fps_label)
 	Gui.center_group:append_row(Gui.menu_group)
 	Gui.center_group:append_row(Gui.skills_group)
-	Gui.center_group:set_expand{row = 1}
+	Gui.center_group:set_expand{row = 2}
 	Gui.scene = Group{rows = 1, style = "scene", margins = {5,5,5,5}}
 	Gui.scene.scene = Scene()
 	Gui.scene.pick = function(self) return Target:pick_scene() end
