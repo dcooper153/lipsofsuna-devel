@@ -19,6 +19,7 @@ Gui.init = function(clss)
 	-- View menu.
 	Gui.menu_widget_view = Widgets.Menu{
 		{"Inventory", Gui.inventory_group},
+		{"Quests", Quests.window},
 		{"Skills", Skills.window}}
 	-- Admin menu.
 	Gui.menu_widget_admin = Widgets.Menu{
