@@ -46,6 +46,7 @@ end
 Skills.new = function(clss, args)
 	local s = Class.new(clss, args)
 	s.skills = {}
+	s.enabled = args and args.enabled ~= false or false
 	if s.owner then
 		if clss.dict[s.owner] then error("object already has skills") end
 		clss.dict[s.owner] = s
@@ -221,19 +222,14 @@ end
 -- @name Skills.owner
 -- @class table
 
-require "common/thread"
+require "common/timer"
 
-Thread(function()
-	local secs = 0
-	while true do
-		secs = secs + coroutine.yield()
-		if secs >= 1 then
-			for k,v in pairs(Skills.dict) do
-				for l,w in pairs(v.skills) do
-					v:set_value{skill = l, value = w.value + w.regen * secs}
-				end
+Timer{delay = 1, func = function(self, secs)
+	for k,v in pairs(Skills.dict) do
+		if v.enabled then
+			for l,w in pairs(v.skills) do
+				v:set_value{skill = l, value = w.value + w.regen * secs}
 			end
-			secs = 0
 		end
 	end
-end)
+end}

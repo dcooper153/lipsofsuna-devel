@@ -160,6 +160,8 @@ Creature.die = function(self)
 	self.dead = true
 	self:set_movement(0)
 	self:set_strafing(0)
+	-- Disable skills.
+	self.skills.enabled = false
 	-- Playback animation.
 	self:animate{animation = "death", weight = 10}
 	self:animate{animation = "dead", channel = Animation.CHANNEL_WALK, weight = 0.1, permanent = true}
