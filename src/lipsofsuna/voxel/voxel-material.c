@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup livox Voxel
+ * \addtogroup LIVox Voxel
  * @{
  * \addtogroup LIVoxMaterial Material
  * @{

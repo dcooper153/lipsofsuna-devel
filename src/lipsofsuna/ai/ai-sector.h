@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liai Ai
- * @{
- * \addtogroup LIAiSector Sector
- * @{
- */
-
 #ifndef __AI_SECTOR_H__
 #define __AI_SECTOR_H__
 
@@ -66,6 +59,3 @@ LIAPICALL (LIAiWaypoint*, liai_sector_get_waypoint, (
 	int         z));
 
 #endif
-
-/** @} */
-/** @} */

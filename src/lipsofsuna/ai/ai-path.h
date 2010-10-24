@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liai Ai
- * @{
- * \addtogroup LIAiPath Path
- * @{
- */
-
 #ifndef __AI_PATH_H__
 #define __AI_PATH_H__
 
@@ -64,6 +57,3 @@ LIAPICALL (void, liai_path_set_position, (
 	int       index));
 
 #endif
-
-/** @} */
-/** @} */

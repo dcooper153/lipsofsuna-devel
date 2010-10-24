@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisys System
- * @{
- * \addtogroup lisysExec Execute
- * @{
- */
-
 #ifndef __SYSTEM_EXECUTE_H__
 #define __SYSTEM_EXECUTE_H__
 
@@ -79,6 +72,3 @@ LIAPICALL (int, lisys_execvp_redir_path, (
 	const char* const* args));
 
 #endif
-
-/** @} */
-/** @} */

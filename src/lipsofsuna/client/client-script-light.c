@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup LICli Client
  * @{
- * \addtogroup licliscr Script
+ * \addtogroup LICliScript Script
  * @{
  */
 
@@ -27,7 +27,7 @@
 /*****************************************************************************/
 
 /* @luadoc
- * module "Core.Client.Light"
+ * module "builtin/light"
  * --- Create and manipulate light sources.
  * -- @name Light
  * -- @class table

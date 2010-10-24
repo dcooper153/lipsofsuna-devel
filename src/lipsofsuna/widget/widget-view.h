@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liwdg Widget
- * @{
- * \addtogroup LIWdgView View
- * @{
- */
-
 #ifndef __WIDGET_VIEW_H__
 #define __WIDGET_VIEW_H__
 
@@ -70,6 +63,3 @@ LIAPICALL (void, liwdg_view_set_vscroll, (
 	int        value));
 
 #endif
-
-/** @} */
-/** @} */

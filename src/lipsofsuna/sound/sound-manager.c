@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup lisnd Sound 
+ * \addtogroup LISnd Sound 
  * @{
  * \addtogroup LISndManager Manager 
  * @{

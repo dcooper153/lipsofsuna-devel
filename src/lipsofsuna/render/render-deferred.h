@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenDeferred Deferred
- * @{
- */
-
 #ifndef __RENDER_DEFERRED_H__
 #define __RENDER_DEFERRED_H__
 
@@ -63,6 +56,3 @@ liren_deferred_read_pixel (LIRenDeferred* self,
                            float*         result);
 
 #endif
-
-/** @} */
-/** @} */

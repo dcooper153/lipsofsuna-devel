@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lieng Engine
- * @{
- * \addtogroup liengIterator Iterator
- * @{
- */
-
 #ifndef __ENGINE_ITERATOR_H__
 #define __ENGINE_ITERATOR_H__
 
@@ -37,16 +30,6 @@ struct _LIEngObjectIter
 	LIEngObject* object;
 };
 
-/**
- * \brief Iterates through objects in a range of sectors.
- *
- * This is a macro that works in the same way with a for loop.
- *
- * \param iter Object iterator.
- * \param engine Engine.
- * \param point Search center in world coordinates.
- * \param radius Search radius hint in world units.
- */
 #define LIENG_FOREACH_OBJECT(iter, engine, point, radius) \
 	for (lieng_object_iter_first (&iter, engine, point, radius) ; iter.object != NULL ; \
 	     lieng_object_iter_next (&iter))
@@ -128,14 +111,6 @@ struct _LIEngSelectionIter
 	LIEngObject* object;
 };
 
-/**
- * \brief Iterates through all currently selected objects.
- *
- * This is a macro that works in the same way with a for loop.
- *
- * \param iter Selection iterator.
- * \param engine Engine.
- */
 #define LIENG_FOREACH_SELECTION(iter, engine) \
 	for (lieng_selection_iter_first (&iter, engine) ; iter.object != NULL ; \
 	     lieng_selection_iter_next (&iter))
@@ -180,6 +155,3 @@ lieng_selection_iter_next (LIEngSelectionIter* self)
 }
 
 #endif
-
-/** @} */
-/** @} */

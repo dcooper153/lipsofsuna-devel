@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup lithr Thread
+ * \addtogroup LIThr Thread
  * @{
- * \addtogroup LIThrAsyncCall Async Call
+ * \addtogroup LIThrAsyncCall AsyncCall
  * @{
  */
 

@@ -26,7 +26,7 @@
 #include "ext-npc.h"
 
 /* @luadoc
- * module "Extension.Common.Npc"
+ * module "core/npc"
  * --- Create intelligent non-player characters.
  * -- @name Npc
  * -- @class table

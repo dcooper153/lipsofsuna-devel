@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lipth Paths
- * @{
- * \addtogroup LIPthPaths Paths
- * @{
- */
-
 #ifndef __PATHS_H__
 #define __PATHS_H__
 
@@ -76,6 +69,3 @@ char*
 lipth_paths_get_root ();
 
 #endif
-
-/** @} */
-/** @} */

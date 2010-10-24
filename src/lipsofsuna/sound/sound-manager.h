@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisnd Sound 
- * @{
- * \addtogroup LISndManager Manager 
- * @{
- */
-
 #ifndef __SOUND_MANAGER_H__
 #define __SOUND_MANAGER_H__
 
@@ -63,7 +56,3 @@ LIAPICALL (int, lisnd_manager_set_sample, (
 	const char*   path));
 
 #endif
-
-/** @} */
-/** @} */
-

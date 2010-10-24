@@ -85,5 +85,3 @@ LIAPICALL (LIScrData*, liscr_vector_new, (
 
 #endif
 
-/** @} */
-

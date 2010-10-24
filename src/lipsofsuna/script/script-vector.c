@@ -16,16 +16,16 @@
  */
 
 /**
- * \addtogroup liscr Script
+ * \addtogroup LIScr Script
  * @{
- * \addtogroup liscrVector Vector
+ * \addtogroup LIScrVector Vector
  * @{
  */
 
 #include <lipsofsuna/script.h>
 
 /* @luadoc
- * module "Core.Common.Vector"
+ * module "builtin/vector"
  * --- Do maths in three dimensions.
  * -- @name Vector
  * -- @class table

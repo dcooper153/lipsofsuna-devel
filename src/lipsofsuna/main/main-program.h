@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limai Main
- * @{
- * \addtogroup LIMaiProgram Program
- * @{
- */
-
 #ifndef __MAIN_PROGRAM_H__
 #define __MAIN_PROGRAM_H__
 
@@ -121,6 +114,3 @@ LIAPICALL (double, limai_program_get_time, (
 	const LIMaiProgram* self));
 
 #endif
-
-/** @} */
-/** @} */

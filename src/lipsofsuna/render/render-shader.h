@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenShader Shader
- * @{
- */
-
 #ifndef __RENDER_SHADER_H__
 #define __RENDER_SHADER_H__
 
@@ -76,6 +69,3 @@ LIAPICALL (int, liren_shader_compile, (
 	const char*  fragment));
 
 #endif
-
-/** @} */
-/** @} */

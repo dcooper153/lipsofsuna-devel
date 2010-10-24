@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgBst Bst
- * @{
- */
-
 #ifndef __ALGORITHM_BST_H__
 #define __ALGORITHM_BST_H__
 
@@ -33,9 +26,6 @@ typedef void (*LIAlgBstFree)(void*);
 typedef void* (*LIAlgBstMalloc)(size_t);
 typedef int (*LIAlgBstMatch)(const void*, const void*);
 
-/**
- * \brief A binary search tree node.
- */
 typedef struct _LIAlgBstNode LIAlgBstNode;
 struct _LIAlgBstNode
 {
@@ -45,9 +35,6 @@ struct _LIAlgBstNode
 	LIAlgBstNode* parent;
 };
 
-/**
- * \brief A self-balancing binary search tree.
- */
 typedef struct _LIAlgBst LIAlgBst;
 struct _LIAlgBst
 {
@@ -112,6 +99,3 @@ lialg_bst_unlink (LIAlgBst*     self,
 #endif
 
 #endif
-
-/** @} */
-/** @} */

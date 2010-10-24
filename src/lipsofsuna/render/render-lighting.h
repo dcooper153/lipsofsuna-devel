@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenLighting Lighting
- * @{
- */
-
 #ifndef __RENDER_LIGHTING_H__
 #define __RENDER_LIGHTING_H__
 
@@ -56,6 +49,3 @@ LIAPICALL (void, liren_lighting_update, (
 	LIRenLighting* self));
 
 #endif
-
-/** @} */
-/** @} */

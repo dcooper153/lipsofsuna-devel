@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisnd Sound 
- * @{
- * \addtogroup LISndSource Source
- * @{
- */
-
 #ifndef __SOUND_SOURCE_H__
 #define __SOUND_SOURCE_H__
 
@@ -91,7 +84,3 @@ LIAPICALL (void, lisnd_source_set_volume, (
 	float        value));
 
 #endif
-
-/** @} */
-/** @} */
-

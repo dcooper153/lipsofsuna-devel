@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liimg Image
- * @{
- * \addtogroup LIImgTexture Texture
- * @{
- */
-
 #ifndef __IMAGE_TEXTURE_H__
 #define __IMAGE_TEXTURE_H__
 
@@ -54,6 +47,3 @@ liimg_texture_load (LIImgTexture* self,
                     const char*   path);
 
 #endif
-
-/** @} */
-/** @} */

@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisys System
- * @{
- * \addtogroup lisysTypes Types
- * @{
- */
-
 #ifndef __SYSTEM_TYPES_H__
 #define __SYSTEM_TYPES_H__
 
@@ -46,6 +39,3 @@ LIAPICALL (uint32_t, lisys_htonl, (
 	uint32_t value));
 
 #endif
-
-/** @} */
-/** @} */

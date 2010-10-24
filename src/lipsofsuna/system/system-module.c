@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup lisys System
+ * \addtogroup LISys System
  * @{
  * \addtogroup LISysModule Module
  * @{

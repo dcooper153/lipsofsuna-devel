@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup liscr Script
+ * \addtogroup LIScr Script
  * @{
- * \addtogroup liscrObject Object
+ * \addtogroup LIScrObject Object
  * @{
  */
 
@@ -27,7 +27,7 @@
 #include <lipsofsuna/script.h>
 
 /* @luadoc
- * module "Core.Model"
+ * module "builtin/model"
  * ---
  * -- Load and manipulate models.
  * -- @name Model

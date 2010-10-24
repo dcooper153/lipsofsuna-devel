@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limdl Model
- * @{
- * \addtogroup LIMdlLight Light
- * @{
- */
-
 #ifndef __MODEL_LIGHT_H__
 #define __MODEL_LIGHT_H__
 
@@ -74,6 +67,3 @@ LIAPICALL (void, limdl_light_get_projection, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

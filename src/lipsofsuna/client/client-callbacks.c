@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup LICli Client
  * @{
- * \addtogroup licliCallbacks Callbacks
+ * \addtogroup LICliCallbacks Callbacks
  * @{
  */
 

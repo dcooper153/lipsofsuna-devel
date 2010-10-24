@@ -26,10 +26,8 @@
 #include "ext-client.h"
 
 /**
- * \brief Allocates a new client block.
- *
+ * \brief Allocates a new client.
  * \param module Module.
- * \param object Object associated to the client.
  * \param user Network user.
  * \return New client or NULL.
  */

@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liai Ai
- * @{
- * \addtogroup LIAiManager Manager
- * @{
- */
-
 #ifndef __AI_MANAGER_H__
 #define __AI_MANAGER_H__
 
@@ -65,6 +58,3 @@ LIAPICALL (LIAiPath*, liai_manager_solve_path, (
 	const LIMatVector* end));
 
 #endif
-
-/** @} */
-/** @} */

@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliReload Reload
+ * \addtogroup LIExtReload Reload
  * @{
  */
 
@@ -34,6 +32,5 @@ LIMaiExtensionInfo liext_reload_info =
 	liext_reload_free
 };
 
-/** @} */
 /** @} */
 /** @} */

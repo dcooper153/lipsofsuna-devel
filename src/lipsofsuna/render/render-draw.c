@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup liren Render
+ * \addtogroup LIRen Render
  * @{
- * \addtogroup lirenDraw Draw
+ * \addtogroup LIRenDraw Draw
  * @{
  */
 

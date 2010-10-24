@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup ligen Generator
+ * \addtogroup LIGen Generator
  * @{
  * \addtogroup LIGenRule Rule
  * @{

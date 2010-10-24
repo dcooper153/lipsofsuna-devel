@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenBuffer Buffer
- * @{
- */
-
 #ifndef __RENDER_BUFFER_H__
 #define __RENDER_BUFFER_H__
 
@@ -93,6 +86,3 @@ LIAPICALL (int, liren_buffer_get_size, (
 	LIRenBuffer* self));
 
 #endif
-
-/** @} */
-/** @} */

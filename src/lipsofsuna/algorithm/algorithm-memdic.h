@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgMemdic Memdic
- * @{
- */
-
 #ifndef __ALGORITHM_MEMDIC_H__
 #define __ALGORITHM_MEMDIC_H__
 
@@ -155,6 +148,3 @@ lialg_memdic_iter_next (LIAlgMemdicIter* self)
 }
 
 #endif
-
-/** @} */
-/** @} */

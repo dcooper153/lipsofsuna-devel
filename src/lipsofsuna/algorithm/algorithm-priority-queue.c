@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup lialg Algorithm
+ * \addtogroup LIAlg Algorithm
  * @{
- * \addtogroup LIAlgPriorityQueue Priority Queue
+ * \addtogroup LIAlgPriorityQueue PriorityQueue
  * @{
  */
 

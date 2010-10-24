@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup licli Client
- * @{
- * \addtogroup licliScript Script
- * @{
- */
-
 #ifndef __CLIENT_SCRIPT_H__
 #define __CLIENT_SCRIPT_H__
 
@@ -41,6 +34,3 @@ LIAPICALL (void, licli_script_light, (
 	void*       data));
 
 #endif
-
-/** @} */
-/** @} */

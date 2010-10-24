@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgAstar Astar
- * @{
- */
-
 #ifndef __ALGORITHM_ASTAR_H__
 #define __ALGORITHM_ASTAR_H__
 
@@ -78,6 +71,3 @@ void
 lialg_astar_result_free (LIAlgAstarResult* self);
 
 #endif
-
-/** @} */
-/** @} */

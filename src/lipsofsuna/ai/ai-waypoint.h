@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liai Ai
- * @{
- * \addtogroup LIAiWaypoint Waypoint
- * @{
- */
-
 #ifndef __AI_WAYPOINT_H__
 #define __AI_WAYPOINT_H__
 
@@ -39,6 +32,3 @@ struct _LIAiWaypoint
 };
 
 #endif
-
-/** @} */
-/** @} */

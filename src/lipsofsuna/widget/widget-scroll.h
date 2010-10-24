@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liwdg Widget
- * @{
- * \addtogroup LIWdgScroll Scroll
- * @{
- */
-
 #ifndef __WIDGET_SCROLL_H__
 #define __WIDGET_SCROLL_H__
 
@@ -68,6 +61,3 @@ LIAPICALL (void, liwdg_scroll_set_reference, (
 	float        value));
 
 #endif
-
-/** @} */
-/** @} */

@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgPriorityQueue Priority Queue
- * @{
- */
-
 #ifndef __ALGORITHM_PRIORITY_QUEUE_H__
 #define __ALGORITHM_PRIORITY_QUEUE_H__
 
@@ -87,6 +80,3 @@ lialg_priority_queue_remove_node (LIAlgPriorityQueue*     self,
 #endif
 
 #endif
-
-/** @} */
-/** @} */

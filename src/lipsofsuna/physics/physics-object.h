@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liphy Physics
- * @{
- * \addtogroup LIPhyObject Object
- * @{
- */
-
 #ifndef __PHYSICS_OBJECT_H__
 #define __PHYSICS_OBJECT_H__
 
@@ -207,6 +200,3 @@ LIAPICALL (void, liphy_object_set_velocity, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lical Callback
- * @{
- * \addtogroup LICalCallbacks Callbacks
- * @{
- */
-
 #ifndef __CAL_CALLBACKS_H__
 #define __CAL_CALLBACKS_H__
 
@@ -86,6 +79,3 @@ LIAPICALL (void, lical_callbacks_update, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

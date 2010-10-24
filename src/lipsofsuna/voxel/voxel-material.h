@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup livox Voxel
- * @{
- * \addtogroup LIVoxMaterial Material
- * @{
- */
-
 #ifndef __VOXEL_MATERIAL_H__
 #define __VOXEL_MATERIAL_H__
 
@@ -75,6 +68,3 @@ LIAPICALL (int, livox_material_set_model, (
 	LIEngModel*    model));
 
 #endif
-
-/** @} */
-/** @} */

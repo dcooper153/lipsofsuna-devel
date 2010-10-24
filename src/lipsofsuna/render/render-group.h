@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenObject Object
- * @{
- */
-
 #ifndef __RENDER_GROUP_H__
 #define __RENDER_GROUP_H__
 
@@ -89,7 +82,3 @@ LIAPICALL (int, liren_group_set_realized, (
 	int         value));
 
 #endif
-
-/** @} */
-/** @} */
-

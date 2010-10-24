@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liser Server
- * @{
- * \addtogroup LISerServer Server
- * @{
- */
-
 #ifndef __SERVER_H__
 #define __SERVER_H__
 
@@ -53,6 +46,3 @@ LIAPICALL (int, liser_server_main, (
 	LISerServer* self));
 
 #endif
-
-/** @} */
-/** @} */

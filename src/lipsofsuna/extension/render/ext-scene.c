@@ -26,7 +26,7 @@
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.Render"
+ * module "core/render"
  * ---
  * -- Display the game scene.
  * -- @name Scene
@@ -118,23 +118,16 @@ static void Scene_draw_begin (LIScrArgs* args)
  * -- Begins the deferred rendering pass.
  * --
  * -- @param self Scene.
- * -- @param args Arguments.<ul>
- * --   <li>alphatest: True to draw transparent faces using alpha test.</li>
- * --   <li>threshold: Alpha test threshold.</li></ul>
- * function Scene.draw_deferred_begin(self, args)
+ * function Scene.draw_deferred_begin(self)
  */
 static void Scene_draw_deferred_begin (LIScrArgs* args)
 {
-	int alphatest = 0;
-	float threshold = 0.5f;
 	LIExtModule* module;
 	LIRenScene* scene;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
 	scene = module->client->scene;
-	liscr_args_gets_int (args, "alphatest", &alphatest);
-	liscr_args_gets_float (args, "threshold", &threshold);
-	liren_scene_render_deferred_begin (scene, alphatest, threshold);
+	liren_scene_render_deferred_begin (scene);
 }
 
 /* @luadoc
@@ -143,10 +136,7 @@ static void Scene_draw_deferred_begin (LIScrArgs* args)
  * -- Draws lit fragments to the post-processing buffer using the lights of the
  * -- scene and the data in the deferred rendering G-buffer.
  * -- @param self Scene.
- * -- @param args Arguments.<ul>
- * --   <li>alphatest: True to draw transparent faces using alpha test.</li>
- * --   <li>threshold: Alpha test threshold.</li></ul>
- * function Scene.draw_deferred_begin(self, args)
+ * function Scene.draw_deferred_end(self)
  */
 static void Scene_draw_deferred_end (LIScrArgs* args)
 {
@@ -162,16 +152,20 @@ static void Scene_draw_deferred_end (LIScrArgs* args)
  * ---
  * -- Draws opaque faces to the deferred rendering G-buffer.
  * -- @param self Scene.
- * function Scene.draw_deferred_opaque(self)
+ * -- @param args Arguments.<ul>
+ * --   <li>alpha: True to draw transparent as if they were opaque.</li></ul>
+ * function Scene.draw_deferred_opaque(self, args)
  */
 static void Scene_draw_deferred_opaque (LIScrArgs* args)
 {
+	int alpha = 0;
 	LIExtModule* module;
 	LIRenScene* scene;
 
+	liscr_args_gets_int (args, "alpha", &alpha);
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
 	scene = module->client->scene;
-	liren_scene_render_deferred_opaque (scene);
+	liren_scene_render_deferred_opaque (scene, alpha);
 }
 
 /* @luadoc

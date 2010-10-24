@@ -18,8 +18,6 @@
 #ifndef __LIPS_VIDEO_H__
 #define __LIPS_VIDEO_H__
 
-#include "video/video-calls.h"
-#include "video/video-features.h"
-#include "video/video-opengl.h"
+#include "video/video.h"
 
 #endif

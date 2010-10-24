@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisys System
- * @{
- * \addtogroup LISysMmap Mmap
- * @{
- */
-
 #ifndef __SYSTEM_MMAP_H__
 #define __SYSTEM_MMAP_H__
 
@@ -50,6 +43,3 @@ LIAPICALL (int, lisys_mmap_get_size, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

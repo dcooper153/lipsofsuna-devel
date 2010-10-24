@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisys System
- * @{
- * \addtogroup LISysNotify Notify
- * @{
- */
-
 #ifndef __SYSTEM_NOTIFY_H__
 #define __SYSTEM_NOTIFY_H__
 
@@ -71,6 +64,3 @@ LIAPICALL (LISysNotifyEvent*, lisys_notify_wait, (
 	LISysNotify* self));
 
 #endif
-
-/** @} */
-/** @} */

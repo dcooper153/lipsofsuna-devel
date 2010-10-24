@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup listr String
+ * \addtogroup LIStr String
  * @{
- * \addtogroup listrGeneric Generic
+ * \addtogroup LIStrGeneric Generic
  * @{
  */
 

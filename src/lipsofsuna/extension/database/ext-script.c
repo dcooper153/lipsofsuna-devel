@@ -34,7 +34,7 @@ static void private_free_database (
 /*****************************************************************************/
 
 /* @luadoc
- * module "Extension.Database"
+ * module "core/database"
  * --- Database extension.
  * -- @name Database
  * -- @class table

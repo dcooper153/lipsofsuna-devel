@@ -20,13 +20,9 @@
 
 #include <lipsofsuna/math.h>
 
-/**
- * \addtogroup liphy Physics
- * @{
- * \addtogroup LIPhyObject Object
- * @{
- */
-
+#define LIPHY_DEFAULT_SPEED 3.0f
+#define LIPHY_DEFAULT_COLLISION_GROUP 0x0001
+#define LIPHY_DEFAULT_COLLISION_MASK 0xFFFF
 #define LIPHY_GROUP_STATICS 0x4000
 #define LIPHY_GROUP_TILES 0x8000
 
@@ -40,52 +36,17 @@ enum _LIPhyControlMode
 	LIPHY_CONTROL_MODE_MAX
 };
 
-typedef struct _LIPhyContact LIPhyContact;
 typedef enum _LIPhyControlMode LIPhyControlMode;
+typedef struct _LIPhyCollision LIPhyCollision;
+typedef struct _LIPhyConstraint LIPhyConstraint;
+typedef struct _LIPhyContact LIPhyContact;
 typedef struct _LIPhyObject LIPhyObject;
+typedef struct _LIPhyPhysics LIPhyPhysics;
+typedef struct _LIPhySector LIPhySector;
+typedef struct _LIPhyShape LIPhyShape;
 typedef void (*LIPhyCallback)(LIPhyObject* self, float secs);
 typedef void (*LIPhyContactCall)(LIPhyObject* self, LIPhyContact* contact);
-
-/** @} */
-/** @} */
-
-/**
- * \addtogroup liphy Physics
- * @{
- * \addtogroup LIPhyCollision Collision
- * @{
- */
-
-typedef struct _LIPhyCollision LIPhyCollision;
-struct _LIPhyCollision
-{
-	float fraction;
-	LIMatVector normal;
-	LIMatVector point;
-	LIPhyObject* object;
-};
-
-/** @} */
-/** @} */
-
-/**
- * \addtogroup liphy Physics
- * @{
- * \addtogroup LIPhyConstraint Constraint
- * @{
- */
-
-typedef struct _LIPhyConstraint LIPhyConstraint;
-
-/** @} */
-/** @} */
-
-/**
- * \addtogroup liphy Physics
- * @{
- * \addtogroup LIPhyContact Contact
- * @{
- */
+typedef void (*LIPhyTransformCall)(LIPhyObject* object);
 
 struct _LIPhyContact
 {
@@ -95,59 +56,12 @@ struct _LIPhyContact
 	LIPhyObject* object;
 };
 
-/** @} */
-/** @} */
-
-/**
- * \addtogroup liphy Physics
- * @{
- * \addtogroup LIPhyPhysics Physics
- * @{
- */
-
-/**
- * \brief Default movement speed for objects.
- */
-#define LIPHY_DEFAULT_SPEED 3.0f
-
-/**
- * \brief Default collision group.
- */
-#define LIPHY_DEFAULT_COLLISION_GROUP 0x0001
-
-/**
- * \brief Default collision mask.
- */
-#define LIPHY_DEFAULT_COLLISION_MASK 0xFFFF
-
-typedef void (*liphyTransformCall)(LIPhyObject* object);
-typedef struct _LIPhyPhysics LIPhyPhysics;
-
-/** @} */
-/** @} */
-
-/**
- * \addtogroup liphy Physics
- * @{
- * \addtogroup LIPhySector Sector
- * @{
- */
-
-typedef struct _LIPhySector LIPhySector;
-
-/** @} */
-/** @} */
-
-/**
- * \addtogroup liphy Physics
- * @{
- * \addtogroup LIPhyShape Shape
- * @{
- */
-
-typedef struct _LIPhyShape LIPhyShape;
-
-/** @} */
-/** @} */
+struct _LIPhyCollision
+{
+	float fraction;
+	LIMatVector normal;
+	LIMatVector point;
+	LIPhyObject* object;
+};
 
 #endif

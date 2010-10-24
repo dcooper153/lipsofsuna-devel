@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lifnt Font
- * @{
- * \addtogroup LIFntLayout Layout
- * @{
- */
-
 #ifndef __FONT_LAYOUT_H__
 #define __FONT_LAYOUT_H__
 
@@ -88,6 +81,3 @@ LIAPICALL (void, lifnt_layout_set_width_limit, (
 	int          width));
 
 #endif
-
-/** @} */
-/** @} */

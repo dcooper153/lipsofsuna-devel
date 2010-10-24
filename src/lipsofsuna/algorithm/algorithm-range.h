@@ -20,13 +20,6 @@
 
 #include <lipsofsuna/math.h>
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgRange Range
- * @{
- */
-
 #define LIALG_RANGE_DEFAULT_SIZE 1024
 
 typedef struct _LIAlgRange LIAlgRange;
@@ -42,17 +35,6 @@ struct _LIAlgRange
 	int maxz;
 };
 
-/**
- * \brief Creates a three-dimensional bin range that enclose a sphere.
- *
- * \param xmin Minimum bin coordinate.
- * \param ymin Minimum bin coordinate.
- * \param zmin Minimum bin coordinate.
- * \param xmax Maximum bin coordinate.
- * \param ymax Maximum bin coordinate.
- * \param zmax Maximum bin coordinate.
- * \return Range.
- */
 static inline LIAlgRange
 lialg_range_new (int xmin,
                  int ymin,
@@ -75,14 +57,6 @@ lialg_range_new (int xmin,
 	return self;
 }
 
-/**
- * \brief Creates a three-dimensional bin range that enclose an AABB.
- *
- * \param min Minimum point of the AABB.
- * \param max Maximum point of the AABB.
- * \param unit Bin side length.
- * \return Range.
- */
 static inline LIAlgRange
 lialg_range_new_from_aabb (const LIMatVector* min,
                            const LIMatVector* max,
@@ -102,15 +76,6 @@ lialg_range_new_from_aabb (const LIMatVector* min,
 	return self;
 }
 
-/**
- * \brief Creates a three-dimensional bin range that enclose a sphere.
- *
- * \param x Center bin offset.
- * \param y Center bin offset.
- * \param z Center bin offset.
- * \param radius Radius of the sphere in bins.
- * \return Range.
- */
 static inline LIAlgRange
 lialg_range_new_from_center (int x,
                              int y,
@@ -131,15 +96,6 @@ lialg_range_new_from_center (int x,
 	return self;
 }
 
-/**
- * \brief Creates a three-dimensional bin range that enclose a sphere.
- *
- * \param index Index of the center bin.
- * \param radius Radius of the sphere in bins.
- * \param mini Minimum range coordinate.
- * \param maxi Maximum range coordinate.
- * \return Range.
- */
 static inline LIAlgRange
 lialg_range_new_from_index (int index,
                             int radius,
@@ -165,14 +121,6 @@ lialg_range_new_from_index (int index,
 	return self;
 }
 
-/**
- * \brief Creates a three-dimensional bin range that enclose a sphere.
- *
- * \param center Center point of the sphere.
- * \param radius Radius of the sphere.
- * \param unit Bin side length.
- * \return Range.
- */
 static inline LIAlgRange
 lialg_range_new_from_sphere (const LIMatVector* center,
                              float              radius,
@@ -189,14 +137,6 @@ lialg_range_new_from_sphere (const LIMatVector* center,
 	return self;
 }
 
-/**
- * \brief Clamps the range.
- *
- * \param self Range.
- * \param min Minimum range coordinate.
- * \param min Maximum range coordinate.
- * \return New range.
- */
 static inline LIAlgRange
 lialg_range_clamp (const LIAlgRange self,
                    int              min,
@@ -216,14 +156,6 @@ lialg_range_clamp (const LIAlgRange self,
 	return ret;
 }
 
-/**
- * \brief Checks if the range contains the given bin.
- *
- * \param self Range.
- * \param x Bin coordinate.
- * \param y Bin coordinate.
- * \param z Bin coordinate.
- */
 static inline int
 lialg_range_contains (const LIAlgRange* self,
                       int               x,
@@ -238,12 +170,6 @@ lialg_range_contains (const LIAlgRange* self,
 	return 0;
 }
 
-/**
- * \brief Checks if the range contains the given index.
- *
- * \param self Range.
- * \param index Bin index.
- */
 static inline int
 lialg_range_contains_index (const LIAlgRange* self,
                             int               index)
@@ -262,6 +188,3 @@ lialg_range_contains_index (const LIAlgRange* self,
 }
 
 #endif
-
-/** @} */
-/** @} */

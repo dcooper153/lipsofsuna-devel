@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limdl Model
- * @{
- * \addtogroup LIMdlVertex Vertex
- * @{
- */
-
 #ifndef __MODEL_VERTEX_H__
 #define __MODEL_VERTEX_H__
 
@@ -59,5 +52,3 @@ limdl_vertex_compare (const LIMdlVertex* self,
 
 #endif
 
-/** @} */
-/** @} */

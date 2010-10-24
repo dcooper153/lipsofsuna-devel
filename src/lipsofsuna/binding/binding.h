@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup libnd Binding
- * @{
- * \addtogroup LIBndBinding Binding
- * @{
- */
-
 #ifndef __BINDING_H__
 #define __BINDING_H__
 
@@ -64,6 +57,3 @@ libnd_binding_set_userdata (LIBndBinding* self,
                             void*         value);
 
 #endif
-
-/** @} */
-/** @} */

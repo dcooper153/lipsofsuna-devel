@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup LICli Client
  * @{
- * \addtogroup licliscr Script
+ * \addtogroup LICliScript Script
  * @{
  */
 
@@ -27,7 +27,7 @@
 #include <lipsofsuna/client.h>
 
 /* @luadoc
- * module "Core.Client.Client"
+ * module "builtin/client"
  * --- Access and manipulate the state of the client.
  * -- @name Client
  * -- @class table
@@ -194,7 +194,7 @@ static void Client_getter_cursor_pos (LIScrArgs* args)
 	LIMatVector tmp;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-	client->video.SDL_GetMouseState (&x, &y);
+	SDL_GetMouseState (&x, &y);
 	tmp = limat_vector_init (x, client->window->mode.height - y - 1, 0.0f);
 	liscr_args_seti_vector (args, &tmp);
 }
@@ -250,7 +250,7 @@ static void Client_setter_title (LIScrArgs* args)
 	if (liscr_args_geti_string (args, 0, &value))
 	{
 		client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-		client->video.SDL_WM_SetCaption (value, value);
+		SDL_WM_SetCaption (value, value);
 	}
 }
 

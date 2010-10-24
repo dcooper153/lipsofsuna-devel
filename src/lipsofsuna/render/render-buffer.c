@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liren Render
+ * \addtogroup LIRen Render
  * @{
  * \addtogroup LIRenBuffer Buffer
  * @{
@@ -136,6 +136,7 @@ void liren_buffer_free (
 /**
  * \brief Locks the index array for reading or writing.
  * \param self Buffer.
+ * \param write Nonzero to lock as writable, zero to lock as read-only.
  * \return Pointer to the locked array, or NULL.
  */
 void* liren_buffer_lock_indices (
@@ -162,6 +163,7 @@ void* liren_buffer_lock_indices (
 /**
  * \brief Locks the vertex array for reading or writing.
  * \param self Buffer.
+ * \param write Nonzero to lock as writable, zero to lock as read-only.
  * \return Pointer to the locked array, or NULL.
  */
 void* liren_buffer_lock_vertices (
@@ -213,6 +215,7 @@ void liren_buffer_unlock_vertices (
  * \param self Buffer.
  * \param start Index of the first replaced vertex.
  * \param count Number of vertices to replace.
+ * \param data Raw vertex data to upload.
  */
 void liren_buffer_upload_vertices (
 	LIRenBuffer* self,

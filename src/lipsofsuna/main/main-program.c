@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup limai Main
+ * \addtogroup LIMai Main
  * @{
  * \addtogroup LIMaiProgram Program
  * @{
@@ -67,6 +67,7 @@ static int private_tick (
  * \brief Creates a new program instance.
  *
  * \param paths Path information.
+ * \param args Program arguments.
  * \return New program or NULL.
  */
 LIMaiProgram* limai_program_new (
@@ -425,9 +426,11 @@ LIScrData* limai_program_pop_event (
 /**
  * \brief Pushes an event to the event queue.
  *
- * The event will be referenced once upon success.
+ * The event will be referenced once upon success. If the caller holds no references to it,
+ * it will be subject to garbage collection after passed to scripts and handled by them.
  *
  * \param self Program.
+ * \param event Event.
  * \return Nonzero on success.
  */
 int limai_program_push_event (

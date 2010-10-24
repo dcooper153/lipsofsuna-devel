@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisnd Sound 
- * @{
- * \addtogroup LISndSample Sample 
- * @{
- */
-
 #ifndef __SOUND_SAMPLE_H__
 #define __SOUND_SAMPLE_H__
 
@@ -42,7 +35,3 @@ LIAPICALL (void, lisnd_sample_free, (
 	LISndSample* self));
 
 #endif
-
-/** @} */
-/** @} */
-

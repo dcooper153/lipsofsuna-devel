@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liwdg Widget
- * @{
- * \addtogroup LIWdgEvent Event
- * @{
- */
-
 #ifndef __WIDGET_EVENT_H__
 #define __WIDGET_EVENT_H__
 
@@ -108,7 +101,3 @@ union _LIWdgEvent
 };
 
 #endif
-
-/** @} */
-/** @} */
-

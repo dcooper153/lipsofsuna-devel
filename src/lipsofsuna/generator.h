@@ -15,11 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup ligen Generator
- * @{
- */
-
 #ifndef __LIPS_GENERATOR_H__
 #define __LIPS_GENERATOR_H__
 
@@ -29,6 +24,3 @@
 #include "generator/generator-types.h"
 
 #endif
-
-/** @} */
-/** @} */

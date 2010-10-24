@@ -15,47 +15,15 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limdl Model
- * @{
- * \addtogroup LIMdlBone Bone
- * @{
- */
-
 #ifndef __MODEL_TYPES_H__
 #define __MODEL_TYPES_H__
 
 #include <lipsofsuna/math.h>
 
-typedef struct _LIMdlBone LIMdlBone;
-
-/**
- * @}
- * \addtogroup LIMdlLight Light
- * @{
- */
-
 enum
 {
 	LIMDL_LIGHT_FLAG_SHADOW = 0x01
 };
-
-typedef struct _LIMdlLight LIMdlLight;
-
-/**
- * @}
- * \addtogroup LIMdlModel Model
- * @{
- */
-
-typedef struct _LIMdlModel LIMdlModel;
-typedef struct _LIMdlWeightGroup LIMdlWeightGroup;
-
-/**
- * @}
- * \addtogroup LIMdlNode Node
- * @{
- */
 
 enum _LIMdlNodeType
 {
@@ -65,41 +33,21 @@ enum _LIMdlNodeType
 };
 
 typedef enum _LIMdlNodeType LIMdlNodeType;
-typedef struct _LIMdlNode LIMdlNode;
-typedef void (*LIMdlNodeTransformFunc)(void*, LIMdlNode*, LIMatTransform*);
-
-/**
- * @}
- * \addtogroup LIMdlParticle Particle
- * @{
- */
-
-typedef struct _LIMdlParticle LIMdlParticle;
-typedef struct _LIMdlParticleFrame LIMdlParticleFrame;
-typedef struct _LIMdlParticleSystem LIMdlParticleSystem;
-
-/**
- * @}
- * \addtogroup LIMdlPose Pose
- * @{
- */
-
-typedef int LIMdlPoseChannelState;
-typedef struct _LIMdlPoseChannel LIMdlPoseChannel;
-typedef struct _LIMdlPoseFade LIMdlPoseFade;
-typedef struct _LIMdlPose LIMdlPose;
-
-/**
- * @}
- * \addtogroup LIMdlHair Hair
- * @{
- */
-
+typedef struct _LIMdlBone LIMdlBone;
 typedef struct _LIMdlHair LIMdlHair;
 typedef struct _LIMdlHairNode LIMdlHairNode;
 typedef struct _LIMdlHairs LIMdlHairs;
+typedef struct _LIMdlLight LIMdlLight;
+typedef struct _LIMdlModel LIMdlModel;
+typedef struct _LIMdlNode LIMdlNode;
+typedef void (*LIMdlNodeTransformFunc)(void*, LIMdlNode*, LIMatTransform*);
+typedef struct _LIMdlParticle LIMdlParticle;
+typedef struct _LIMdlParticleFrame LIMdlParticleFrame;
+typedef struct _LIMdlParticleSystem LIMdlParticleSystem;
+typedef struct _LIMdlPose LIMdlPose;
+typedef struct _LIMdlPoseChannel LIMdlPoseChannel;
+typedef int LIMdlPoseChannelState;
+typedef struct _LIMdlPoseFade LIMdlPoseFade;
+typedef struct _LIMdlWeightGroup LIMdlWeightGroup;
 
 #endif
-
-/** @} */
-/** @} */

@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisys System
- * @{
- * \addtogroup lisysSystem System
- * @{
- */
-
 #ifndef __SYSTEM_H__
 #define __SYSTEM_H__
 
@@ -68,6 +61,3 @@ LIAPICALL (char*, lisys_system_get_path_cache_home, ());
 #endif
 
 #endif
-
-/** @} */
-/** @} */

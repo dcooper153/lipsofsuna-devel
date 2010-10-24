@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lifnt Font
- * @{
- * \addtogroup LIFntFont Font
- * @{
- */
-
 #ifndef __FONT_H__
 #define __FONT_H__
 
@@ -63,12 +56,10 @@ struct _LIFntFont
 	GLuint texture;
 	LIAlgU32dic* index;
 	LIFntFontGlyph** table;
-	LIVidCalls video;
 	TTF_Font* font;
 };
 
 LIAPICALL (LIFntFont*, lifnt_font_new, (
-	LIVidCalls* video,
 	const char* path,
 	int         size));
 
@@ -88,6 +79,3 @@ LIAPICALL (void, lifnt_font_get_vertices, (
 	float*     result));
 
 #endif
-
-/** @} */
-/** @} */

@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup livox Voxel
+ * \addtogroup LIVox Voxel
  * @{
  * \addtogroup LIVoxVoxel Voxel
  * @{
@@ -40,15 +40,14 @@ livox_voxel_init (LIVoxVoxel* self,
 }
 
 /**
- * \brief Writes the voxel to a stream.
- *
+ * \brief Reads the voxel from a stream.
  * \param self Voxel.
- * \param writer Stream writer.
+ * \param reader Stream reader.
  * \return Nonzero on success.
  */
-int
-livox_voxel_read (LIVoxVoxel*  self,
-                  LIArcReader* reader)
+int livox_voxel_read (
+	LIVoxVoxel*  self,
+	LIArcReader* reader)
 {
 	uint16_t terrain;
 	uint8_t damage;

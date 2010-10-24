@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liphy Physics
- * @{
- * \addtogroup LIPhyConstraint Constraint
- * @{
- */
-
 #ifndef __PHYSICS_CONSTRAINT_H__
 #define __PHYSICS_CONSTRAINT_H__
 
@@ -51,6 +44,3 @@ LIAPICALL (void, liphy_constraint_free, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

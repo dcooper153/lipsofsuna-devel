@@ -63,7 +63,6 @@ def configure(ctx):
 	ctx.check(header_name='time.h', define_name='HAVE_TIME_H')
 	ctx.check(header_name='unistd.h', define_name='HAVE_UNISTD_H')
 	ctx.check(header_name='windows.h', define_name='HAVE_WINDOWS_H', mandatory=False)
-	ctx.check(header_name='GL/glx.h', define_name='HAVE_GL_GLX_H', mandatory=False)
 	ctx.check_cc(msg='Checking for function fork', header_name='unistd.h', function_name='fork', define_name='HAVE_FORK')
 	ctx.check_cc(msg='Checking for function usleep', header_name='unistd.h', function_name='usleep', define_name='HAVE_USLEEP')
 	ctx.check_cc(lib='dl', uselib_store='CORE')
@@ -246,8 +245,8 @@ def build(ctx):
 def dist(ctx):
 	import Logs
 	import tarfile
-	dirs = ['src/**/*.*', 'data/**/*.*', 'tool/*', 'AUTHORS', 'COPYING', 'README', 'waf', 'wscript']
-	excl = ['**/.*', '**/import']
+	dirs = ['src/**/*.*', 'data/**/*.*', 'tool/*', 'docs/*', 'AUTHORS', 'COPYING', 'README', 'waf', 'wscript']
+	excl = ['**/.*', '**/import', 'docs/html']
 	base = APPNAME + '-' + VERSION
 	name = base + '.tar.gz'
 	Logs.pprint('GREEN', "Creating `%s'" % name)
@@ -269,4 +268,53 @@ def dist(ctx):
 	exit()
 
 def html(ctx):
-	Utils.exec_command('docs/makedoc.sh ' + VERSION)
+	import Logs
+	import re
+	import shutil
+	# Initialize directories.
+	tmpdir = os.path.join(out, 'docs')
+	luadir = os.path.join(ctx.path.abspath(), 'docs', 'html', 'lua')
+	shutil.rmtree(tmpdir, True)
+	shutil.rmtree(luadir, True)
+	os.makedirs(tmpdir)
+	os.makedirs(luadir)
+	# Compile the Doxygen documentation.
+	ctx.exec_command('doxygen docs/Doxyfile')
+	Logs.pprint('GREEN', "Built Doxygen documentation")
+	# Extract script documentation from the source files.
+	def parse(dict, path):
+		def flush(name, text):
+			if text != '':
+				if name not in dict:
+					dict[name] = ''
+				dict[name] += text
+		name = 'FIXME'
+		text = ''
+		file = open(path, "r")
+		block = False
+		for l in file:
+			if re.match('/\* @luadoc', l):
+				block = True
+			elif re.match(' \*/', l):
+				if block:
+					text += "\n"
+				block = False
+			elif block and re.match(' \* module \".*\"\n', l):
+				flush(name, text)
+				name = l.split('"')[1]
+				text = l.replace(' * ', '')
+			elif block and re.match(' * ', l):
+				text += l.replace(' * ', '')
+		file.close()
+		flush(name, text)
+	dict = {}
+	for f in ctx.path.ant_glob('src/**/*.c'):
+		parse(dict, f.abspath())
+	# Compile the script documentation.
+	for k in dict:
+		file = open(os.path.join(tmpdir, k.replace('/', '-') + '.lua'), "w")
+		file.write(dict[k])
+		file.close()
+	ctx.exec_command('luadoc --nofiles -d "%s" "%s"' % (luadir, tmpdir))
+	shutil.rmtree(tmpdir)
+	Logs.pprint('GREEN', "Built Lua documentation")

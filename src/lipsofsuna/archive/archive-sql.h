@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liarc Archive
- * @{
- * \addtogroup LIArcSql Sql
- * @{
- */
-
 #ifndef __ARCHIVE_SQL_H__
 #define __ARCHIVE_SQL_H__
 
@@ -60,6 +53,3 @@ LIAPICALL (int, liarc_sql_replace, (
 	            ...));
 
 #endif
-
-/** @} */
-/** @} */

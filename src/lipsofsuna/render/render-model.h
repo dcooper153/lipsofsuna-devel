@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenModel Model
- * @{
- */
-
 #ifndef __RENDER_MODEL_H__
 #define __RENDER_MODEL_H__
 
@@ -96,6 +89,3 @@ LIAPICALL (int, liren_model_set_type, (
 	int         value));
 
 #endif
-
-/** @} */
-/** @} */

@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliSound Sound
+ * \addtogroup LIExtSound Sound
  * @{
  */
 
@@ -398,6 +396,5 @@ static int private_tick (
 }
 #endif
 
-/** @} */
 /** @} */
 /** @} */

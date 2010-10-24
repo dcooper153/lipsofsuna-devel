@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liwdg Widget
- * @{
- * \addtogroup LIWdgContainer Container
- * @{
- */
-
 #ifndef __WIDGET_CONTAINER_H__
 #define __WIDGET_CONTAINER_H__
 
@@ -91,6 +84,3 @@ LIAPICALL (void, liwdg_container_translate_coords, (
 	int*            childy));
 
 #endif
-
-/** @} */
-/** @} */

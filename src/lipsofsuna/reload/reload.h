@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lirel Reload
- * @{
- * \addtogroup LIRelReload Reload
- * @{
- */
-
 #ifndef __RELOAD_H__
 #define __RELOAD_H__
 
@@ -68,6 +61,3 @@ LIAPICALL (void, lirel_reload_set_model_callback, (
 	void*        data));
 
 #endif
-
-/** @} */
-/** @} */

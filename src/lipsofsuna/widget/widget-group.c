@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liwdg Widget
+ * \addtogroup LIWdg Widget
  * @{
  * \addtogroup LIWdgGroup Group
  * @{

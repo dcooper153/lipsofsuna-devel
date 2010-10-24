@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenUniform Uniform
- * @{
- */
-
 #ifndef __RENDER_UNIFORM_H__
 #define __RENDER_UNIFORM_H__
 
@@ -222,6 +215,3 @@ liren_uniform_get_sampler (LIRenUniform* self)
 }
 
 #endif
-
-/** @} */
-/** @} */

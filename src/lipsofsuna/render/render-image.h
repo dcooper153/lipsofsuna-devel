@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenImage Image
- * @{
- */
-
 #ifndef __RENDER_IMAGE_H__
 #define __RENDER_IMAGE_H__
 
@@ -53,6 +46,3 @@ int
 liren_image_load (LIRenImage* self);
 
 #endif
-
-/** @} */
-/** @} */

@@ -19,7 +19,7 @@
  */
 
 /**
- * \addtogroup liimg Image
+ * \addtogroup LIImg Image
  * @{
  * \addtogroup LIImgDDSGL DDSGL
  * @{

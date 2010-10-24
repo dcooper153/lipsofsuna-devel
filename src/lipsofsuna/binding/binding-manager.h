@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup libnd Binding
- * @{
- * \addtogroup LIBndManager Manager
- * @{
- */
-
 #ifndef __BINDING_MANAGER_H__
 #define __BINDING_MANAGER_H__
 
@@ -54,6 +47,3 @@ libnd_manager_find_action (LIBndManager* self,
                            const char*   id);
 
 #endif
-
-/** @} */
-/** @} */

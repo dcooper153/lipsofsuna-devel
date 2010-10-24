@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup libnd Binding
+ * \addtogroup LIBnd Binding
  * @{
  * \addtogroup LIBndManager Manager
  * @{

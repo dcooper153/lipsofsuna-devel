@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liscr Script
- * @{
- * \addtogroup LIScrScript Script
- * @{
- */
-
 #ifndef __SCRIPT_H__
 #define __SCRIPT_H__
 
@@ -66,7 +59,3 @@ LIAPICALL (void, liscr_script_set_userdata, (
 	void*        data));
 
 #endif
-
-/** @} */
-/** @} */
-

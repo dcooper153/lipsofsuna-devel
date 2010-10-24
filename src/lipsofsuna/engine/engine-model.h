@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lieng Engine
- * @{
- * \addtogroup LIEngModel Model
- * @{
- */
-
 #ifndef __ENGINE_MODEL_H__
 #define __ENGINE_MODEL_H__
 
@@ -70,6 +63,3 @@ LIAPICALL (void, lieng_model_get_bounds_transform, (
 	LIMatAabb*            result));
 
 #endif
-
-/** @} */
-/** @} */

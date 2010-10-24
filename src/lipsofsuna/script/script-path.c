@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup liscr Script
+ * \addtogroup LIScr Script
  * @{
- * \addtogroup liscrPath Path
+ * \addtogroup LIScrPath Path
  * @{
  */
 
@@ -26,7 +26,7 @@
 #include <lipsofsuna/script.h>
 
 /* @luadoc
- * module "Core.Common.Path"
+ * module "builtin/path"
  * ---
  * -- Specify paths for your objects to follow.
  * -- @name Path

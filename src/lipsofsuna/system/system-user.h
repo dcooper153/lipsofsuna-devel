@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisys System
- * @{
- * \addtogroup lisysUser User
- * @{
- */
-
 #ifndef __SYSTEM_USER_H__
 #define __SYSTEM_USER_H__
 
@@ -42,6 +35,3 @@ LIAPICALL (char*, lisys_group_get_name, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

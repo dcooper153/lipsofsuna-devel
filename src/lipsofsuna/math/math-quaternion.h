@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup limat Math
+ * \addtogroup LIMat Math
  * @{
  * \addtogroup LIMatQuaternion Quaternion
  * @{

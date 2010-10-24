@@ -27,7 +27,7 @@
 /*****************************************************************************/
 
 /* @luadoc
- * module "Extension.Binding"
+ * module "core/binding"
  * --- Bind controls to actions.
  * -- @name Binding
  * -- @class table

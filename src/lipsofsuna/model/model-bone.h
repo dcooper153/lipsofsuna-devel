@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limdl Model
- * @{
- * \addtogroup LIMdlBone Bone
- * @{
- */
-
 #ifndef __MODEL_BONE_H__
 #define __MODEL_BONE_H__
 
@@ -54,6 +47,3 @@ LIAPICALL (void, limdl_bone_get_pose_tail, (
 	LIMatVector*     tail));
 
 #endif
-
-/** @} */
-/** @} */

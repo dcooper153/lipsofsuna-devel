@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisnd Sound 
- * @{
- * \addtogroup LISndSystem System
- * @{
- */
-
 #ifndef __SOUND_SYSTEM_H__
 #define __SOUND_SYSTEM_H__
 
@@ -49,7 +42,3 @@ LIAPICALL (void, lisnd_system_set_listener, (
 	const LIMatVector* up));
 
 #endif
-
-/** @} */
-/** @} */
-

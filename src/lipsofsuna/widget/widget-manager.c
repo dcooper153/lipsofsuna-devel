@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liwdg Widget
+ * \addtogroup LIWdg Widget
  * @{
  * \addtogroup LIWdgManager Manager
  * @{
@@ -79,14 +79,12 @@ private_load_config (LIWdgManager* self,
 
 /**
  * \brief Creates a new widget manager.
- * \param video Video callbacks.
  * \param render Renderer.
  * \param callbacks Callback manager.
  * \param root Client data directory root.
  * \return New widget manager or NULL.
  */
 LIWdgManager* liwdg_manager_new (
-	LIVidCalls*     video,
 	LIRenRender*    render,
 	LICalCallbacks* callbacks,
 	const char*     root)
@@ -100,7 +98,6 @@ LIWdgManager* liwdg_manager_new (
 	self->callbacks = callbacks;
 	self->width = 640;
 	self->height = 480;
-	self->video = *video;
 	self->render = render;
 	self->context = liren_render_get_context (render);
 	self->projection = limat_matrix_identity ();
@@ -605,12 +602,12 @@ liwdg_manager_update (LIWdgManager* self,
 	{
 		cx = self->width / 2;
 		cy = self->height / 2;
-		buttons = self->video.SDL_GetMouseState (&x, &y);
+		buttons = SDL_GetMouseState (&x, &y);
 		if (x != cx || y != cy)
 		{
-			self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
-			self->video.SDL_WarpMouse (cx, cy);
-			self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
+			SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
+			SDL_WarpMouse (cx, cy);
+			SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
 		}
 
 		/* Cursor delta events. */
@@ -651,7 +648,7 @@ liwdg_manager_set_focus (LIWdgManager* self,
 {
 	if (liwdg_manager_get_focus (self) != widget)
 	{
-		self->video.SDL_WarpMouse (
+		SDL_WarpMouse (
 			widget->allocation.x + widget->allocation.width / 2,
 			widget->allocation.y + widget->allocation.height / 2);
 	}

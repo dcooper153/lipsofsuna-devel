@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenContext Context
- * @{
- */
-
 #ifndef __RENDER_CONTEXT_H__
 #define __RENDER_CONTEXT_H__
 
@@ -222,6 +215,3 @@ LIAPICALL (void, liren_context_set_textures_raw, (
 	int           count));
 
 #endif
-
-/** @} */
-/** @} */

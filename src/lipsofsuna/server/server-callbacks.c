@@ -16,20 +16,18 @@
  */
 
 /**
- * \addtogroup liser Server
+ * \addtogroup LISer Server
  * @{
- * \addtogroup liserCallbacks Callbacks
+ * \addtogroup LISerCallbacks Callbacks
  * @{
  */
 
 #include <lipsofsuna/network.h>
 #include "server-callbacks.h"
-#include "server-observer.h"
-#include "server-script.h"
 
-static int
-private_object_free (LISerServer* server,
-                     LIEngObject* object)
+static int private_object_free (
+	LISerServer* server,
+	LIEngObject* object)
 {
 	/* Unrealize before server data is freed. */
 	lieng_object_set_realized (object, 0);
@@ -37,8 +35,8 @@ private_object_free (LISerServer* server,
 	return 1;
 }
 
-int
-liser_server_init_callbacks_client (LISerServer* server)
+int liser_server_init_callbacks_client (
+	LISerServer* server)
 {
 	lical_callbacks_insert (server->callbacks, server->engine, "object-free", 65535, private_object_free, server, NULL);
 	return 1;

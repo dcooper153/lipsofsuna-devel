@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisys System
- * @{
- * \addtogroup lisysRelative Relative
- * @{
- */
-
 #ifndef __SYSTEM_RELATIVE_H__
 #define __SYSTEM_RELATIVE_H__
 
@@ -40,6 +33,3 @@ LIAPICALL (char*, lisys_relative_exedir, ());
 #endif
 
 #endif
-
-/** @} */
-/** @} */

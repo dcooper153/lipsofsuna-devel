@@ -16,16 +16,16 @@
  */
 
 /**
- * \addtogroup liscr Script
+ * \addtogroup LIScr Script
  * @{
- * \addtogroup liscrQuaternion Quaternion
+ * \addtogroup LIScrQuaternion Quaternion
  * @{
  */
 
 #include <lipsofsuna/script.h>
 
 /* @luadoc
- * module "Core.Common.Quaternion"
+ * module "builtin/quaternion"
  * ---
  * -- Present rotations in three dimensions.
  * -- @name Quaternion

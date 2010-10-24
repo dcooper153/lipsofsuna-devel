@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup limat Math
+ * \addtogroup LIMat Math
  * @{
- * \addtogroup limatIntersect Intersect
+ * \addtogroup LIMatIntersect Intersect
  * @{
  */
 

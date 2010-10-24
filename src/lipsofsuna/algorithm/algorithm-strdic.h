@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgStrdic Strdic
- * @{
- */
-
 #ifndef __ALGORITHM_STRDIC_H__
 #define __ALGORITHM_STRDIC_H__
 
@@ -145,6 +138,3 @@ lialg_strdic_iter_next (LIAlgStrdicIter* self)
 }
 
 #endif
-
-/** @} */
-/** @} */

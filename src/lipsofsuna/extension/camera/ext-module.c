@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliCamera Camera
+ * \addtogroup LIExtCamera Camera
  * @{
  */
 
@@ -118,6 +116,5 @@ static void private_camera_clip (
 	}
 }
 
-/** @} */
 /** @} */
 /** @} */

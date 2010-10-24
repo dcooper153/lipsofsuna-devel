@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup livox Voxel
- * @{
- * \addtogroup livoxIterator Iterator
- * @{
- */
-
 #ifndef __VOXEL_ITERATOR_H__
 #define __VOXEL_ITERATOR_H__
 
@@ -42,14 +35,6 @@ struct _LIVoxBlockIter
 	int (*filter)(LIVoxBlock*);
 };
 
-/**
- * \brief Iterates through all terrain blocks in all loaded sectors.
- *
- * This is a macro that works in the same way with a for loop.
- *
- * \param iter Block iterator.
- * \param manager Voxel manager.
- */
 #define LIVOX_FOREACH_BLOCK(iter, manager) \
 	for (livox_block_iter_first (&iter, manager, NULL) ; \
 	     iter.block != NULL ; \
@@ -131,16 +116,6 @@ struct _LIVoxVoxelIter
 	LIAlgRangeIter rangei1;
 };
 
-/**
- * \brief Iterates through voxels in the given range.
- *
- * This is a macro that works in the same way with a for loop.
- *
- * \param iter Voxel iterator.
- * \param manager Voxel manager.
- * \param range Range in voxels.
- * \param load Nonzero if should load sectors on demand.
- */
 #define LIVOX_VOXEL_FOREACH(iter, manager, range, load) \
 	for (livox_voxel_iter_first (&(iter), manager, &(range), load) ; \
 	     iter.sector != NULL ; \
@@ -263,6 +238,3 @@ livox_voxel_iter_next (LIVoxVoxelIter* self)
 }
 
 #endif
-
-/** @} */
-/** @} */

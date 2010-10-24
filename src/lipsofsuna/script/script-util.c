@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup liscr Script
+ * \addtogroup LIScr Script
  * @{
- * \addtogroup liscrUtil Util
+ * \addtogroup LIScrUtil Util
  * @{
  */
 

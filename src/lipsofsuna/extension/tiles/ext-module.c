@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIExt Extension
  * @{
- * \addtogroup LIExtVoxel Voxel
+ * \addtogroup LIExtTiles Tiles
  * @{
  */
 

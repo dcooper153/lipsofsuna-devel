@@ -15,15 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liext Extension
- * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliVoxel Voxel
- * @{
- */
-
 #ifndef __EXT_BLOCK_H__
 #define __EXT_BLOCK_H__
 
@@ -51,7 +42,3 @@ void liext_tiles_render_block_clear (
 	LIExtBlock* self);
 
 #endif
-
-/** @} */
-/** @} */
-/** @} */

@@ -15,14 +15,42 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_PARTICLE_H__
-#define __LIPS_PARTICLE_H__
+/**
+ * \addtogroup LIVid Video
+ * @{
+ * \addtogroup LIVidVideo Video
+ * @{
+ */
 
-#include "particle/particle-line.h"
-#include "particle/particle-manager.h"
-#include "particle/particle-point.h"
+#include <string.h>
+#include "video.h"
 
-#endif
+/**
+ * \brief Initializes the global video card information.
+ * \return Nonzero on success.
+ */
+int livid_video_init ()
+{
+	GLint tmp;
+	GLenum error;
+
+        /* Initialize GLEW. */
+        error = glewInit ();
+        if (error != GLEW_OK)
+        {
+                lisys_error_set (LISYS_ERROR_UNKNOWN, "%s", glewGetErrorString (error));
+                return 0;
+        }
+
+	/* Get capabilities. */
+	if (!GLEW_VERSION_3_3)
+	{
+		lisys_error_set (EINVAL, "OpenGL 3.3 isn't supported by your graphics card");
+		return 0;
+	}
+
+	return 1;
+}
 
 /** @} */
 /** @} */

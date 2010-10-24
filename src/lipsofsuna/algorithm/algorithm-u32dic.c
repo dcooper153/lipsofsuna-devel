@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup lialg Algorithm
+ * \addtogroup LIAlg Algorithm
  * @{
  * \addtogroup LIAlgU32dic U32dic
  * @{

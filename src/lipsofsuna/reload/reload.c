@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup lirel Reload
+ * \addtogroup LIRel Reload
  * @{
  * \addtogroup LIRelReload Reload
  * @{

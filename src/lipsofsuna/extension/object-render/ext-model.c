@@ -25,7 +25,7 @@
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.ObjectRender"
+ * module "core/object-render"
  * ---
  * -- Control rendering of objects.
  * -- @name Object
@@ -98,3 +98,6 @@ void liext_script_render_model (
 	liscr_class_set_userdata (self, LISCR_SCRIPT_RENDER_MODEL, data);
 	liscr_class_insert_mvar (self, "vertex_policy", Model_getter_vertex_policy, Model_setter_vertex_policy);
 }
+
+/** @} */
+/** @} */

@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenMaterial Material
- * @{
- */
-
 #ifndef __RENDER_MATERIAL_H__
 #define __RENDER_MATERIAL_H__
 
@@ -86,6 +79,3 @@ liren_material_set_texture_count (LIRenMaterial* self,
                                   int            value);
 
 #endif
-
-/** @} */
-/** @} */

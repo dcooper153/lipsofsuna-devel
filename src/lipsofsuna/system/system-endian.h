@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisys System
- * @{
- * \addtogroup lisysEndian Endian
- * @{
- */
-
 #ifndef __SYSTEM_ENDIAN_H__
 #define __SYSTEM_ENDIAN_H__
 
@@ -35,7 +28,3 @@ LIAPICALL (int, lisys_endian_big, ());
 LIAPICALL (int, lisys_endian_get, ());
 
 #endif
-
-/** @} */
-/** @} */
-

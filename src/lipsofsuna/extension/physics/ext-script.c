@@ -25,22 +25,11 @@
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.Physics"
- * --- Example extension.
+ * module "core/physics"
+ * --- Physics simulation support.
  * -- @name Physics
  * -- @class table
  */
-
-/* @luadoc
- * --- Example function.
- * --
- * -- @param self Physics class.
- * Physics.test(self)
- */
-static void Physics_test (LIScrArgs* args)
-{
-	printf ("Physics.test\n");
-}
 
 /*****************************************************************************/
 
@@ -50,7 +39,6 @@ void liext_script_physics (
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_PHYSICS, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "test", Physics_test);
 }
 
 /** @} */

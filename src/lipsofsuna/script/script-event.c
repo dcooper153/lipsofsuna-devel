@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liscr Script
+ * \addtogroup LIScr Script
  * @{
  * \addtogroup LIScrEvent Event
  * @{
@@ -35,7 +35,7 @@ struct _LIScrEvent
 /*****************************************************************************/
 
 /* @luadoc
- * module "Core.Common.Event"
+ * module "builtin/event"
  * ---
  * -- Receive information on events and actions.
  * -- @name Event

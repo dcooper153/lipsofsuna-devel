@@ -25,7 +25,7 @@
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.Skeleton"
+ * module "core/skeleton"
  * --- Example extension.
  * -- @name Skeleton
  * -- @class table

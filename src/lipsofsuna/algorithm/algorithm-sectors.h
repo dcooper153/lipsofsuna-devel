@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgSectors Sectors
- * @{
- */
-
 #ifndef __ALGORITHM_SECTORS_H__
 #define __ALGORITHM_SECTORS_H__
 

@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup livox Voxel
- * @{
- * \addtogroup LIVoxBlock Block
- * @{
- */
-
 #ifndef __VOXEL_PRIVATE_H__
 #define __VOXEL_PRIVATE_H__
 
@@ -41,7 +34,3 @@ struct _LIVoxSector
 };
 
 #endif
-
-/** @} */
-/** @} */
-

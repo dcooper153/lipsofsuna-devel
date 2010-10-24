@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
  * \addtogroup LIExtSpeech Speech
  * @{
@@ -56,7 +56,6 @@ LIExtModule* liext_speeches_new (
 	}
 	self->client = limai_program_find_component (program, "client");
 	self->widgets = limai_program_find_component (program, "widgets");
-	self->video = &self->client->video;
 
 	/* Allocate objects. */
 	self->objects = lialg_u32dic_new ();

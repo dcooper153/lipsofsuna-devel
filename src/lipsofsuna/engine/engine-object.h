@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lieng Engine
- * @{
- * \addtogroup LIEngObject Object
- * @{
- */
-
 #ifndef __ENGINE_OBJECT_H__
 #define __ENGINE_OBJECT_H__
 
@@ -178,6 +171,3 @@ LIAPICALL (void, lieng_object_set_userdata, (
 	void*        data));
 
 #endif
-
-/** @} */
-/** @} */

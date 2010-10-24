@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliReload Reload
+ * \addtogroup LIExtReload Reload
  * @{
  */
 
@@ -144,6 +142,5 @@ static void private_reload_model (
 		"file", LISCR_TYPE_STRING, name, NULL);
 }
 
-/** @} */
 /** @} */
 /** @} */

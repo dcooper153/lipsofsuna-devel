@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limdl Model
- * @{
- * \addtogroup LIMdlMaterial Material
- * @{
- */
-
 #ifndef __MODEL_MATERIAL_H__
 #define __MODEL_MATERIAL_H__
 
@@ -104,6 +97,3 @@ LIAPICALL (int, limdl_material_set_texture, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

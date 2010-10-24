@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgU32dic U32dic
- * @{
- */
-
 #ifndef __ALGORITHM_U32DIC_H__
 #define __ALGORITHM_U32DIC_H__
 
@@ -147,6 +140,3 @@ lialg_u32dic_iter_next (LIAlgU32dicIter* self)
 }
 
 #endif
-
-/** @} */
-/** @} */

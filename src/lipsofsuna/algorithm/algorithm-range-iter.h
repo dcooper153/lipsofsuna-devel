@@ -15,26 +15,11 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgRangeIter RangeIter
- * @{
- */
-
 #ifndef __ALGORITHM_RANGE_ITER_H__
 #define __ALGORITHM_RANGE_ITER_H__
 
 #include "algorithm-range.h"
 
-/**
- * \brief Iterates through a range of bins in 3D.
- *
- * This is a macro that works in the same way with a for loop.
- *
- * \param iter Range iterator.
- * \param range Iterated range.
- */
 #define LIALG_RANGE_FOREACH(iter, range) \
 	for (lialg_range_iter_first (&iter, &range) ; iter.more ; \
 	     lialg_range_iter_next (&iter))
@@ -110,6 +95,3 @@ lialg_range_iter_next (LIAlgRangeIter* self)
 }
 
 #endif
-
-/** @} */
-/** @} */

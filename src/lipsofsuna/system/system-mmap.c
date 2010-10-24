@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup lisys System
+ * \addtogroup LISys System
  * @{
- * \addtogroup lisysFile File
+ * \addtogroup LISysMmap Mmap
  * @{
  */
 

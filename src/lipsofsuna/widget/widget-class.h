@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liwdg Widget
- * @{
- * \addtogroup LIWdgClass Class
- * @{
- */
-
 #ifndef __WIDGET_CLASS_H__
 #define __WIDGET_CLASS_H__
 
@@ -46,12 +39,6 @@ struct _LIWdgClass
 	LIWdgWidgetExtendFunc extend;
 };
 
-/**
- * \brief Gets the base class of the class.
- *
- * \param self Class.
- * \return Class or NULL.
- */
 static inline const LIWdgClass*
 liwdg_class_get_base (const LIWdgClass* self)
 {
@@ -65,7 +52,3 @@ liwdg_class_get_base (const LIWdgClass* self)
 }
 
 #endif
-
-/** @} */
-/** @} */
-/** @} */

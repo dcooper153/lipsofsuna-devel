@@ -25,7 +25,7 @@
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.Generator"
+ * module "core/generator"
  * --- Map region created by the generator.
  * -- @name Region
  * -- @class table

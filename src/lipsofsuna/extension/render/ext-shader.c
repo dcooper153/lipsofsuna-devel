@@ -26,7 +26,7 @@
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.Render"
+ * module "core/render"
  * ---
  * -- Specify shaders.
  * -- @name Shader

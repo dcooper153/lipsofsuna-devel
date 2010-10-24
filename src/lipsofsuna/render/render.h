@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenRender Render
- * @{
- */
-
 #ifndef __RENDER_H__
 #define __RENDER_H__
 
@@ -109,6 +102,3 @@ liren_check_errors ();
 #endif
 
 #endif
-
-/** @} */
-/** @} */

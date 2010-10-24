@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liwdg Widget
- * @{
- * \addtogroup LIWdgStyles Styles
- * @{
- */
-
 #ifndef __WIDGET_STYLES_H__
 #define __WIDGET_STYLES_H__
 
@@ -58,6 +51,3 @@ LIAPICALL (int, liwdg_styles_add_widget, (
 	LIArcReader* reader));
 
 #endif
-
-/** @} */
-/** @} */

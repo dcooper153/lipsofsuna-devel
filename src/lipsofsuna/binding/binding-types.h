@@ -15,18 +15,8 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup libnd Binding
- * @{
- */
-
 #ifndef __BINDING_TYPES_H__
 #define __BINDING_TYPES_H__
-
-/**
- * \addtogroup LIBndBinding Binding
- * @{
- */
 
 typedef struct _LIBndBinding LIBndBinding;
 typedef enum _LIBndType LIBndType;
@@ -41,26 +31,13 @@ enum _LIBndType
 	LIBND_TYPE_MAX
 };
 
-/** @} */
-/**
- * \addtogroup LIBndAction Action
- * @{
- */
-
 typedef struct _LIBndAction LIBndAction;
 typedef int (*libndCallback)(LIBndAction*  action,
                              LIBndBinding* binding,
                              float         value,
                              void*         data);
 
-/** @} */
-/**
- * \addtogroup LIBndManager Manager
- * @{
- */
 
 typedef struct _LIBndManager LIBndManager;
 
 #endif
-
-/** @} */

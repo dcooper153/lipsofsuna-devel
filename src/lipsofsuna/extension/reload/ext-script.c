@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliReload Reload
+ * \addtogroup LIExtReload Reload
  * @{
  */
 
@@ -28,7 +26,7 @@
 #include "ext-reload.h"
 
 /* @luadoc
- * module "Extension.Client.Reload"
+ * module "core/reload"
  * --- Reload modified data files without restarting.
  * -- @name Reload
  * -- @class table
@@ -72,6 +70,5 @@ liext_script_reload (LIScrClass* self,
 	liscr_class_insert_cvar (self, "enabled", Reload_getter_enabled, Reload_setter_enabled);
 }
 
-/** @} */
 /** @} */
 /** @} */

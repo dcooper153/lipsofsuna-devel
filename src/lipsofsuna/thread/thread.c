@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup lithr Thread
+ * \addtogroup LIThr Thread
  * @{
  * \addtogroup LIThrThread Thread
  * @{

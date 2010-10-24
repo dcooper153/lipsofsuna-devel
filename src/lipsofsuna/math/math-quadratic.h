@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup limat Math
+ * \addtogroup LIMat Math
  * @{
- * \addtogroup limatQuadratic Quadratic
+ * \addtogroup LIMatQuadratic Quadratic
  * @{
  */
 

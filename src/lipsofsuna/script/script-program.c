@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup liscr Script
+ * \addtogroup LIScr Script
  * @{
- * \addtogroup liscrPath Path
+ * \addtogroup LIScrPath Path
  * @{
  */
 
@@ -26,7 +26,7 @@
 #include <lipsofsuna/script.h>
 
 /* @luadoc
- * module "Core.Common.Program"
+ * module "builtin/program"
  * --- Manipulate program state.
  * -- @name Program
  * -- @class table

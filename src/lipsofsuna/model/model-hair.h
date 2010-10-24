@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limdl Model
- * @{
- * \addtogroup LIMdlHair Hair
- * @{
- */
-
 #ifndef __MODEL_HAIR_H__
 #define __MODEL_HAIR_H__
 
@@ -86,6 +79,3 @@ LIAPICALL (int, limdl_hairs_write, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

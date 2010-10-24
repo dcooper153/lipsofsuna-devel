@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup LICli Client
  * @{
  * \addtogroup LICliWindow Window
  * @{
@@ -66,11 +66,11 @@ void
 licli_window_free (LICliWindow* self)
 {
 	if (self->joystick != NULL)
-		self->client->video.SDL_JoystickClose (self->joystick);
+		SDL_JoystickClose (self->joystick);
 	if (self->screen != NULL)
-		self->client->video.SDL_FreeSurface (self->screen);
-	if (self->client->video.TTF_WasInit ())
-		self->client->video.TTF_Quit ();
+		SDL_FreeSurface (self->screen);
+	if (TTF_WasInit ())
+		TTF_Quit ();
 	lisys_free (self);
 }
 
@@ -107,8 +107,8 @@ licli_window_set_size (LICliWindow* self,
 static int
 private_init_input (LICliWindow* self)
 {
-	self->joystick = self->client->video.SDL_JoystickOpen (0);
-	self->client->video.SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
+	self->joystick = SDL_JoystickOpen (0);
+	SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	return 1;
 }
 
@@ -116,12 +116,9 @@ static int
 private_init_video (LICliWindow* self)
 {
 	/* Create the window. */
-	if (private_resize (self, 1024, 768, livid_features_get_max_samples ()) +
-	    private_resize (self, 1024, 768, 0) == 0)
+	if (!private_resize (self, 1024, 768, 0))
 		return 0;
-	if (!livid_features_init ())
-		return 0;
-	if (self->client->video.TTF_Init () == -1)
+	if (TTF_Init () == -1)
 	{
 		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot initialize SDL_ttf");
 		return 0;
@@ -137,19 +134,18 @@ private_resize (LICliWindow* self,
                 int          fsaa)
 {
 	int depth;
-	GLenum error;
 
 	/* Recreate surface. */
 	for ( ; fsaa >= 0 ; fsaa--)
 	{
 		for (depth = 32 ; depth ; depth -= 8)
 		{
-			self->client->video.SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, depth);
-			self->client->video.SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
-			self->client->video.SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
-			self->client->video.SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS, fsaa? 1 : 0);
-			self->client->video.SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, fsaa);
-			self->screen = self->client->video.SDL_SetVideoMode (width, height, 0, SDL_OPENGL | SDL_RESIZABLE);
+			SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, depth);
+			SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
+			SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
+			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS, fsaa? 1 : 0);
+			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, fsaa);
+			self->screen = SDL_SetVideoMode (width, height, 0, SDL_OPENGL | SDL_RESIZABLE);
 			if (self->screen != NULL)
 				break;
 		}
@@ -162,13 +158,9 @@ private_resize (LICliWindow* self,
 		return 0;
 	}
 
-	/* Initialize GLEW. */
-	error = glewInit ();
-	if (error != GLEW_OK)
-	{
-		lisys_error_set (LISYS_ERROR_UNKNOWN, "%s", glewGetErrorString (error));
+	/* Initialize libraries. */
+	if (!livid_video_init ())
 		return 0;
-	}
 
 	/* Store mode. */
 	self->mode.width = width;

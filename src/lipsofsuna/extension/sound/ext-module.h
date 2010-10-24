@@ -15,15 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liext Extension
- * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliSound Sound
- * @{
- */
-
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
@@ -106,7 +97,3 @@ void liext_script_sound (
 	void*       data);
 
 #endif
-
-/** @} */
-/** @} */
-/** @} */

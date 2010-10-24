@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliVoxel Voxel
+ * \addtogroup LIExtTilesRender TilesRender
  * @{
  */
 
@@ -108,6 +106,5 @@ int liext_tiles_render_block_build (
 	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */

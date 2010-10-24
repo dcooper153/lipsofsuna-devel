@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup LIExt Extension
- * @{
- * \addtogroup LIExtNetwork Network
- * @{
- */
-
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
@@ -99,6 +92,3 @@ void liext_script_network (
 	void*       data);
 
 #endif
-
-/** @} */
-/** @} */

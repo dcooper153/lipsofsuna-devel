@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liscr Script
+ * \addtogroup LIScr Script
  * @{
  * \addtogroup LIScrData Data
  * @{

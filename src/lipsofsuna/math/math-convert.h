@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup limat Math
+ * \addtogroup LIMat Math
  * @{
- * \addtogroup limatConvert Convert
+ * \addtogroup LIMatConvert Convert
  * @{
  */
 

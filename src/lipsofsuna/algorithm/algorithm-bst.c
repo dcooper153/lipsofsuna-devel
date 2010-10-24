@@ -19,7 +19,7 @@
    and "Tree Rebalancing in Optimal Time and Space" by Stout and Warren. */
 
 /**
- * \addtogroup lialg Algorithm
+ * \addtogroup LIAlg Algorithm
  * @{
  * \addtogroup LIAlgBst Bst
  * @{

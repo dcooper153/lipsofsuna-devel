@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liscr Script
- * @{
- * \addtogroup LIScrArgs Args
- * @{
- */
-
 #ifndef __SCRIPT_ARGS_H__
 #define __SCRIPT_ARGS_H__
 
@@ -304,6 +297,3 @@ int
 liscr_marshal_DATA (lua_State* lua);
 
 #endif
-
-/** @} */
-/** @} */

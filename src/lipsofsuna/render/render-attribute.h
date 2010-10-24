@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenUniform Uniform
- * @{
- */
-
 #ifndef __RENDER_ATTRIBUTE_H__
 #define __RENDER_ATTRIBUTE_H__
 
@@ -46,6 +39,3 @@ struct _LIRenAttribute
 };
 
 #endif
-
-/** @} */
-/** @} */

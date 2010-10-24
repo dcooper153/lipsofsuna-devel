@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup linet Network
- * @{
- * \addtogroup linetProtocol Protocol
- * @{
- */
-
 #ifndef __NETWORK_PROTOCOL_H__
 #define __NETWORK_PROTOCOL_H__
 
@@ -47,6 +40,3 @@ enum
 };
 
 #endif
-
-/** @} */
-/** @} */

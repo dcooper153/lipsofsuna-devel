@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liscr Script
+ * \addtogroup LIScr Script
  * @{
  * \addtogroup LIScrClass Class
  * @{
@@ -63,7 +63,7 @@ static LIScrClassMemb* private_find_var (
 /*****************************************************************************/
 
 /* @luadoc
- * module "Core.Class"
+ * module "builtin/class"
  * --- Inherit classes.
  * -- @name Class
  * -- @class table

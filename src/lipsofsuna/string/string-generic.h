@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup listr String
- * @{
- * \addtogroup listrGeneric Generic
- * @{
- */
-
 #ifndef __STRING_GENERIC_H__
 #define __STRING_GENERIC_H__
 
@@ -70,6 +63,3 @@ LIAPICALL (char*, listr_wchar_to_utf8, (
 	wchar_t self));
 
 #endif
-
-/** @} */
-/** @} */

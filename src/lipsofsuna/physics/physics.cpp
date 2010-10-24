@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liphy Physics
+ * \addtogroup LIPhy Physics
  * @{
  * \addtogroup LIPhyPhysics Physics
  * @{

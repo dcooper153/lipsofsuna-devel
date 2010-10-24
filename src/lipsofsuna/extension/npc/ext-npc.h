@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup LIExt Extension
- * @{
- * \addtogroup LIExtNpc Npc      
- * @{
- */
-
 #ifndef __EXT_NPC_H__
 #define __EXT_NPC_H__
 
@@ -68,6 +61,3 @@ liext_npc_set_target (LIExtNpc*    self,
                       LIEngObject* object);
 
 #endif
-
-/** @} */
-/** @} */

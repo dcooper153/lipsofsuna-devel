@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgCamera Camera
- * @{
- */
-
 #ifndef __ALGORITHM_CAMERA_H__
 #define __ALGORITHM_CAMERA_H__
 
@@ -179,6 +172,3 @@ LIAPICALL (void, lialg_camera_set_viewport, (
 	int          height));
 
 #endif
-
-/** @} */
-/** @} */

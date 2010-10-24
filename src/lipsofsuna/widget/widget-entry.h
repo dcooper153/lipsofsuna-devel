@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liwdg Widget
- * @{
- * \addtogroup LIWdgEntry Entry
- * @{
- */
-
 #ifndef __WIDGET_ENTRY_H__
 #define __WIDGET_ENTRY_H__
 
@@ -32,12 +25,6 @@
 
 #define LIWDG_ENTRY(o) ((LIWdgEntry*)(o))
 
-/**
- * \brief Text edit widget.
- *
- * This widget implements a frame in which text can be displayed and edited.
- * Both single and multiple line display are supported.
- */
 typedef struct _LIWdgEntry LIWdgEntry;
 struct _LIWdgEntry
 {
@@ -87,6 +74,3 @@ LIAPICALL (int, liwdg_entry_set_text, (
 	const char* text));
 
 #endif
-
-/** @} */
-/** @} */

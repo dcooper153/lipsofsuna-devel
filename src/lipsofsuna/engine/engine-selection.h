@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lieng Engine
- * @{
- * \addtogroup LIEngSelection Selection
- * @{
- */
-
 #ifndef __ENGINE_SELECTION_H__
 #define __ENGINE_SELECTION_H__
 
@@ -41,6 +34,3 @@ void
 lieng_selection_free (LIEngSelection* self);
 
 #endif
-
-/** @} */
-/** @} */

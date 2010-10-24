@@ -16,18 +16,16 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliSound Sound
+ * \addtogroup LIExtSound Sound
  * @{
  */
 
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.Client.Sound"
+ * module "core/sound"
  * ---
  * -- Sound playback.
  * -- @name Sound
@@ -221,6 +219,5 @@ void liext_script_sound (
 	liscr_class_insert_cvar (self, "music_volume", NULL, Sound_setter_music_volume);
 }
 
-/** @} */
 /** @} */
 /** @} */

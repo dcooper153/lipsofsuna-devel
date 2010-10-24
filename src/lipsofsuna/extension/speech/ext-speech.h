@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liext Extension
- * @{
- * \addtogroup LIExtSpeech Speech
- * @{
- */
-
 #ifndef __EXT_SPEECH_H__
 #define __EXT_SPEECH_H__
 
@@ -46,6 +39,3 @@ void liext_speech_free (
 	LIExtSpeech* self);
 
 #endif
-
-/** @} */
-/** @} */

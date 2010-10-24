@@ -24,10 +24,8 @@
 
 #include "ext-module.h"
 
-/*****************************************************************************/
-
 /* @luadoc
- * module "Extension.Widgets"
+ * module "core/widgets"
  * --- Pack widgets in a grid.
  * -- @name Group
  * -- @class table

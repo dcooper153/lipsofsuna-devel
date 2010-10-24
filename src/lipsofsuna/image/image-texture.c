@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liimg Image
+ * \addtogroup LIImg Image
  * @{
  * \addtogroup LIImgTexture Texture
  * @{

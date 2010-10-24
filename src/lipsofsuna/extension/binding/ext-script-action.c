@@ -75,7 +75,7 @@ private_action_callback (LIBndAction*  action,
 /*****************************************************************************/
 
 /* @luadoc
- * module "Extension.Binding"
+ * module "core/binding"
  * ---
  * -- Specify the actions and controls of players.
  * -- @name Action

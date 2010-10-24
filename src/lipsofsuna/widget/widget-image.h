@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liwdg Widget
- * @{
- * \addtogroup LIWdgImage Image
- * @{
- */
-
 #ifndef __WIDGET_IMAGE_H__
 #define __WIDGET_IMAGE_H__
 
@@ -30,9 +23,6 @@
 
 #define LIWDG_IMAGE(o) ((LIWdgImage*)(o))
 
-/**
- * \brief Image widget.
- */
 typedef struct _LIWdgImage LIWdgImage;
 struct _LIWdgImage
 {
@@ -53,6 +43,3 @@ LIAPICALL (const char*, liwdg_image_get_image, (
 	LIWdgImage* self));
 
 #endif
-
-/** @} */
-/** @} */

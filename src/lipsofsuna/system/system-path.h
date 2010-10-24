@@ -15,46 +15,21 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisys System
- * @{
- * \addtogroup lisysPath Path
- * @{
- */
-
 #ifndef __SYSTEM_PATH_H__
 #define __SYSTEM_PATH_H__
 
 #include "system-compiler.h"
 
-/**
- * \brief Indicates that the base name of the next string should be appended.
- */
 #define LISYS_PATH_BASENAME ((char*) -1)
 
-/**
- * \brief Indicates that the path name of the next string should be appended.
- */
 #define LISYS_PATH_PATHNAME ((char*) -2)
 
-/**
- * \brief Indicates that a path separator should be appended.
- */
 #define LISYS_PATH_SEPARATOR ((char*) -3)
 
-/**
- * \brief Indicates that an extension should be removed from the path.
- */
 #define LISYS_PATH_STRIPEXT ((char*) -4)
 
-/**
- * \brief Indicates that all extensions should be removed from the path.
- */
 #define LISYS_PATH_STRIPEXTS ((char*) -5)
 
-/**
- * \brief Indicates that the last path component should be removed from the path.
- */
 #define LISYS_PATH_STRIPLAST ((char*) -6)
 
 typedef const char* lisysPathFormat;
@@ -84,6 +59,3 @@ LIAPICALL (char*, lisys_path_pathname, (
 	const char* path));
 
 #endif
-
-/** @} */
-/** @} */

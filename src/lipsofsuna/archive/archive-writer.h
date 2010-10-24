@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liarc Archive
- * @{
- * \addtogroup LIArcWriter Writer
- * @{
- */
-
 #ifndef __ARCHIVE_WRITER_H__
 #define __ARCHIVE_WRITER_H__
 
@@ -141,6 +134,3 @@ LIAPICALL (int, liarc_writer_get_length, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

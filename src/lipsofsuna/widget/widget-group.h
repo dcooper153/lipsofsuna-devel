@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liwdg Widget
- * @{
- * \addtogroup LIWdgGroup Group
- * @{
- */
-
 #ifndef __WIDGET_GROUP_H__
 #define __WIDGET_GROUP_H__
 
@@ -196,6 +189,3 @@ LIAPICALL (void, liwdg_group_set_spacings, (
 	int         row));
 
 #endif
-
-/** @} */
-/** @} */

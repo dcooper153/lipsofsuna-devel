@@ -15,21 +15,11 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgList List
- * @{
- */
-
 #ifndef __ALGORITHM_LIST_H__
 #define __ALGORITHM_LIST_H__
 
 #include <lipsofsuna/system.h>
 
-/**
- * \brief A doubly linked list class.
- */
 typedef struct _LIAlgList LIAlgList;
 struct _LIAlgList
 {
@@ -42,14 +32,8 @@ struct _LIAlgList
 extern "C" {
 #endif
 
-/**
- * \brief Used for list enumeration.
- */
 typedef void (*LIAlgListForeach)(void*);
 
-/**
- * \brief Used for list sorting.
- */
 typedef int (*LIAlgListCompare)(const void*, const void*);
 
 LIAPICALL (void, lialg_list_free, (
@@ -94,8 +78,5 @@ LIAPICALL (void, lialg_list_remove, (
 #ifdef __cplusplus
 }
 #endif
-
-/** @} */
-/** @} */
 
 #endif

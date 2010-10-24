@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup lifnt Font
+ * \addtogroup LIFnt Font
  * @{
  * \addtogroup LIFntLayout Layout
  * @{

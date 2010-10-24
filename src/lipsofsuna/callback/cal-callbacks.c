@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup lical Callback
+ * \addtogroup LICal Callback
  * @{
  * \addtogroup LICalCallbacks Callbacks
  * @{

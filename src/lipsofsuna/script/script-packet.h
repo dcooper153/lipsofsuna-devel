@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liscr Script
- * @{
- * \addtogroup LIScrPacket Packet
- * @{
- */
-
 #ifndef __SCRIPT_PACKET_H__
 #define __SCRIPT_PACKET_H__
 
@@ -63,7 +56,3 @@ LIAPICALL (void, liscr_packet_free, (
 	LIScrPacket* self));
 
 #endif
-
-/** @} */
-/** @} */
-

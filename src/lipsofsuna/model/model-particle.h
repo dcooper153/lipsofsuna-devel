@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limdl Model
- * @{
- * \addtogroup LIMdlParticle Particle
- * @{
- */
-
 #ifndef __MODEL_PARTICLE_H__
 #define __MODEL_PARTICLE_H__
 
@@ -98,6 +91,3 @@ LIAPICALL (int, limdl_particle_system_write, (
 	LIArcWriter*               writer));
 
 #endif
-
-/** @} */
-/** @} */

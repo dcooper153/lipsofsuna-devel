@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limdl Model
- * @{
- * \addtogroup LIMdlNode Node
- * @{
- */
-
 #ifndef __MODEL_NODE_H__
 #define __MODEL_NODE_H__
 
@@ -241,6 +234,3 @@ limdl_node_iter_next (LIMdlNodeIter* self)
 #endif
 
 #endif
-
-/** @} */
-/** @} */

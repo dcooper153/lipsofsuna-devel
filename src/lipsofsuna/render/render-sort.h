@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenSort Sort
- * @{
- */
-
 #ifndef __RENDER_SORT_H__
 #define __RENDER_SORT_H__
 
@@ -148,6 +141,3 @@ LIAPICALL (void, liren_sort_clear, (
 	const LIMatMatrix* projection));
 
 #endif
-
-/** @} */
-/** @} */

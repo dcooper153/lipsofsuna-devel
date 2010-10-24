@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup LICli Client
  * @{
- * \addtogroup licliMain Main
+ * \addtogroup LICliMain Main
  * @{
  */
 
@@ -33,7 +33,6 @@ main (int argc, char** argv)
 	char* launch_name;
 	char* launch_args;
 	LICliClient* self;
-	LIVidCalls video;
 
 	/* Resolve game directory. */
 	path = lipth_paths_get_root ();
@@ -44,13 +43,7 @@ main (int argc, char** argv)
 	}
 
 	/* Start the program. */
-	if (!livid_calls_init (&video))
-	{
-		lisys_error_report ();
-		lisys_free (path);
-		return 1;
-	}
-	self = licli_client_new (&video, path, argc > 1? argv[1] : "default");
+	self = licli_client_new (path, argc > 1? argv[1] : "default");
 	if (self == NULL)
 	{
 		lisys_error_report ();

@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgPtrdic Ptrdic
- * @{
- */
-
 #ifndef __ALGORITHM_PTRDIC_H__
 #define __ALGORITHM_PTRDIC_H__
 
@@ -144,6 +137,3 @@ lialg_ptrdic_iter_next (LIAlgPtrdicIter* self)
 }
 
 #endif
-
-/** @} */
-/** @} */

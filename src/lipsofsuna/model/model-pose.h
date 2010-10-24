@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limdl Model
- * @{
- * \addtogroup LIMdlPose Pose
- * @{
- */
-
 #ifndef __MODEL_POSE_H__
 #define __MODEL_POSE_H__
 
@@ -209,6 +202,3 @@ LIAPICALL (int, limdl_pose_set_model, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

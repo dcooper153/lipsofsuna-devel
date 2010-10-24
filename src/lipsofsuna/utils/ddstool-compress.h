@@ -18,13 +18,6 @@
  * 3. This notice may not be removed or altered from any source distribution.
  */
 
-/**
- * \addtogroup liimg Image
- * @{
- * \addtogroup liimgCompress Compress
- * @{
- */
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -52,5 +45,3 @@ liimg_compress_storage (int width,
 }
 #endif
 
-/** @} */
-/** @} */

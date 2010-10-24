@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup livox Voxel
- * @{
- * \addtogroup LIVoxBuild Build
- * @{
- */
-
 #ifndef __VOXEL_BUILD_H__
 #define __VOXEL_BUILD_H__
 
@@ -61,6 +54,3 @@ LIAPICALL (int, livox_build_occlusion, (
 	char*         result));
 
 #endif
-
-/** @} */
-/** @} */

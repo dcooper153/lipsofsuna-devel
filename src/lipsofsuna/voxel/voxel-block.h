@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup livox Voxel
- * @{
- * \addtogroup LIVoxBlock Block
- * @{
- */
-
 #ifndef __VOXEL_BLOCK_H__
 #define __VOXEL_BLOCK_H__
 
@@ -50,6 +43,3 @@ LIAPICALL (int, livox_block_get_stamp, (
 	const LIVoxBlock* self));
 
 #endif
-
-/** @} */
-/** @} */

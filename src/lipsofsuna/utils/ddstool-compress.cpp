@@ -19,9 +19,9 @@
  */
 
 /**
- * \addtogroup liimg Image
+ * \addtogroup LIImg Image
  * @{
- * \addtogroup liimgCompress Compress
+ * \addtogroup LIImgCompress Compress
  * @{
  */
 

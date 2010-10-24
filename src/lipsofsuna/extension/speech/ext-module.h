@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liext Extension
- * @{
- * \addtogroup LIExtSpeech Speech
- * @{
- */
-
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
@@ -39,7 +32,6 @@ struct _LIExtModule
 	LIAlgU32dic* objects;
 	LICalHandle calls[1];
 	LICliClient* client;
-	LIVidCalls* video;
 	LIWdgManager* widgets;
 };
 
@@ -83,6 +75,3 @@ void liext_script_speech (
 	void*       data);
 
 #endif
-
-/** @} */
-/** @} */

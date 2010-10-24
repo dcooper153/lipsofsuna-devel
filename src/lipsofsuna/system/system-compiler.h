@@ -15,34 +15,30 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisys System
- * @{
- * \addtogroup lisysCompiler Compiler
- * @{
- */
-
 #ifndef __SYSTEM_COMPILER_H__
 #define __SYSTEM_COMPILER_H__
 
 #ifdef WIN32
-#define LIAPIEXPORT(ret, name, args) typedef ret (*name##_pfn) args; __declspec(dllexport) ret name args
-#define LIAPIIMPORT(ret, name, args) typedef ret (*name##_pfn) args; __declspec(dllimport) ret name args
+ #ifdef __cplusplus
+  #define LIAPIEXPORT(ret, name, args) extern "C" __declspec(dllexport) ret name args
+  #define LIAPIIMPORT(ret, name, args) extern "C" __declspec(dllimport) ret name args
+ #else
+  #define LIAPIEXPORT(ret, name, args) __declspec(dllexport) ret name args
+  #define LIAPIIMPORT(ret, name, args) __declspec(dllimport) ret name args
+ #endif
 #else
-#define LIAPIEXPORT(ret, name, args) ret name args
-#define LIAPIIMPORT(ret, name, args) ret name args
+ #ifdef __cplusplus
+  #define LIAPIEXPORT(ret, name, args) extern "C" ret name args
+  #define LIAPIIMPORT(ret, name, args) extern "C" ret name args
+ #else
+  #define LIAPIEXPORT(ret, name, args) ret name args
+  #define LIAPIIMPORT(ret, name, args) ret name args
+ #endif
 #endif
 #ifdef DLL_EXPORT
-#define LIAPICALL(ret, name, args) LIAPIIMPORT(ret, name, args)
+ #define LIAPICALL(ret, name, args) LIAPIIMPORT(ret, name, args)
 #else
-#define LIAPICALL(ret, name, args) LIAPIEXPORT(ret, name, args)
-#endif
-
-#ifdef WIN32
-#include <windows.h>
-#define LISYS_MODULE_EXESYM(name) ((name##_pfn) GetProcAddress (GetModuleHandle (NULL), #name))
-#else
-#define LISYS_MODULE_EXESYM(name) name
+ #define LIAPICALL(ret, name, args) LIAPIEXPORT(ret, name, args)
 #endif
 
 #if __GNUC__ >= 4
@@ -58,7 +54,4 @@
 #endif
 
 #endif
-
-/** @} */
-/** @} */
 

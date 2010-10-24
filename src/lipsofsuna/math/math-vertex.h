@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup limat Math
+ * \addtogroup LIMat Math
  * @{
  */
 
@@ -94,7 +94,7 @@ static const LIMatVtxops limat_vtxops_v3 =
 /*****************************************************************************/
 
 /*
- * \addtogroup limatVertexT2V3N3 VertexT2V3N3
+ * \addtogroup LIMatVertexT2V3N3 VertexT2V3N3
  * @{
  */
 
@@ -152,7 +152,7 @@ static const LIMatVtxops limat_vtxops_t2n3v3 =
 /*****************************************************************************/
 
 /*
- * \addtogroup limatVertexT6V3N3 VertexT6V3N3
+ * \addtogroup LIMatVertexT6V3N3 VertexT6V3N3
  * @{
  */
 

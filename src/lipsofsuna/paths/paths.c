@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup lipth Paths
+ * \addtogroup LIPth Paths
  * @{
  * \addtogroup LIPthPaths Paths
  * @{

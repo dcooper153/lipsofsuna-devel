@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liwdg Widget
+ * \addtogroup LIWdg Widget
  * @{
  * \addtogroup LIWdgStyle Style
  * @{
@@ -281,7 +281,7 @@ static LIFntFont* private_load_font (
 	path = lisys_path_concat (root, "fonts", file, NULL);
 	if (path == NULL)
 		return NULL;
-	font = lifnt_font_new (&self->manager->video, path, size);
+	font = lifnt_font_new (path, size);
 	lisys_free (path);
 
 	/* Add to list. */

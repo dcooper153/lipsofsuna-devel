@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lieng Engine
- * @{
- * \addtogroup LIEngSector Sector
- * @{
- */
-
 #ifndef __ENGINE_SECTOR_H__
 #define __ENGINE_SECTOR_H__
 
@@ -62,6 +55,3 @@ lieng_sector_get_bounds (const LIEngSector* self,
                          LIMatAabb*         result);
 
 #endif
-
-/** @} */
-/** @} */

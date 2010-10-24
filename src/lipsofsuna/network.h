@@ -18,7 +18,6 @@
 #ifndef __LIPS_NETWORK_H__
 #define __LIPS_NETWORK_H__
 
-#include "network/network-extension.h"
 #include "network/network-protocol.h"
 
 #endif

@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup ligen Generator
+ * \addtogroup LIGen Generator
  * @{
  * \addtogroup LIGenGenerator Generator
  * @{
@@ -60,15 +60,13 @@ private_rule_test (LIGenGenerator* self,
 
 /**
  * \brief Creates a new generator module.
- *
  * \param paths Path information.
  * \param callbacks Callbacks.
- * \param sectors Sector manager.
  * \return New generator or NULL.
  */
-LIGenGenerator*
-ligen_generator_new (LIPthPaths*     paths,
-                     LICalCallbacks* callbacks)
+LIGenGenerator* ligen_generator_new (
+	LIPthPaths*     paths,
+	LICalCallbacks* callbacks)
 {
 	LIGenGenerator* self;
 

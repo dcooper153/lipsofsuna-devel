@@ -25,7 +25,7 @@
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.ObjectRender"
+ * module "core/object-render"
  * ---
  * -- Control rendering of objects.
  * -- @name Object
@@ -134,3 +134,6 @@ void liext_script_render_object (
 	liscr_class_insert_mfunc (self, "intersect_ray", Object_intersect_ray);
 	liscr_class_insert_mfunc (self, "particle_animation", Object_particle_animation);
 }
+
+/** @} */
+/** @} */

@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liarc Archive
- * @{
- * \addtogroup LIArcTar Tar
- * @{
- */
-
 #ifndef __ARCHIVE_TAR_H__
 #define __ARCHIVE_TAR_H__
 
@@ -89,6 +82,3 @@ LIAPICALL (int, liarc_tar_write_file, (
 	const char* dst));
 
 #endif
-
-/** @} */
-/** @} */

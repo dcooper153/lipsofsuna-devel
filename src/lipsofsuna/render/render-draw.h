@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup lirenDraw Draw
- * @{
- */
-
 #ifndef __RENDER_DRAW_H__
 #define __RENDER_DRAW_H__
 
@@ -48,6 +41,3 @@ LIAPICALL (void, liren_draw_hair, (
 	void*         data));
 
 #endif
-
-/** @} */
-/** @} */

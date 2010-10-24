@@ -25,7 +25,7 @@
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.Generator"
+ * module "core/generator"
  * --- Generate random dungeons.
  * -- @name Generator
  * -- @class table

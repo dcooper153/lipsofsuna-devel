@@ -26,7 +26,7 @@
 #include "ext-block.h"
 
 /* @luadoc
- * module "Extension.TilesRender"
+ * module "core/tiles-render"
  * ---
  * -- Control rendering of tiles.
  * -- @name Voxel
@@ -112,3 +112,6 @@ void liext_script_tiles_render (
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_TILES_RENDER, data);
 	liscr_class_insert_cfunc (self, "intersect_ray", Voxel_intersect_ray);
 }
+
+/** @} */
+/** @} */

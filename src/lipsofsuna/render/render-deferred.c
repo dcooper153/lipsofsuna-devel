@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liren Render
+ * \addtogroup LIRen Render
  * @{
  * \addtogroup LIRenDeferred Deferred
  * @{

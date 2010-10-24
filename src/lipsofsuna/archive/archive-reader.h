@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liarc Archive
- * @{
- * \addtogroup LIArcReader Reader
- * @{
- */
-
 #ifndef __ARCHIVE_READER_H__
 #define __ARCHIVE_READER_H__
 
@@ -73,6 +66,3 @@ LIAPICALL (int, liarc_reader_skip_chars, (LIArcReader* self, const char* list));
 #endif
 
 #endif
-
-/** @} */
-/** @} */

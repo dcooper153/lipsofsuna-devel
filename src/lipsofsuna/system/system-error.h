@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisys System
- * @{
- * \addtogroup LISysError Error
- * @{
- */
-
 #ifndef __SYSTEM_ERROR_H__
 #define __SYSTEM_ERROR_H__
 
@@ -66,5 +59,3 @@ LIAPICALL (void, lisys_error_set, (
 
 #endif
 
-/** @} */
-/** @} */

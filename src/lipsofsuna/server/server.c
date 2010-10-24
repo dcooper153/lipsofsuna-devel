@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liser Server
+ * \addtogroup LISer Server
  * @{
  * \addtogroup LISerServer Server
  * @{
@@ -28,7 +28,6 @@
 #include <lipsofsuna/system.h>
 #include "server.h"
 #include "server-callbacks.h"
-#include "server-script.h"
 
 /**
  * \brief Creates a new server instance.

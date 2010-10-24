@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup lieng Engine
+ * \addtogroup LIEng Engine
  * @{
  * \addtogroup LIEngObject Object
  * @{
@@ -237,9 +237,8 @@ lieng_object_find_node (LIEngObject* self,
 
 /**
  * \brief Merges a model to the object.
- *
  * \param self Object.
- * \param name Model.
+ * \param model Model.
  * \return Nonzero on success.
  */
 int lieng_object_merge_model (
@@ -474,18 +473,13 @@ lieng_object_set_flags (LIEngObject* self,
 
 /**
  * \brief Replaces the current model of the object.
- *
- * \warning This function is also called by #lieng_engine_load_model when a
- * model has been reloaded so we must not early exit even if the model is the
- * same.
- *
  * \param self Object.
  * \param model Model or NULL.
  * \return Nonzero on success.
  */
-int
-lieng_object_set_model (LIEngObject* self,
-                        LIEngModel*  model)
+int lieng_object_set_model (
+	LIEngObject* self,
+	LIEngModel*  model)
 {
 	/* Switch model. */
 	if (model != NULL)

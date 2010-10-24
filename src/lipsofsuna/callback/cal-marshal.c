@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup lical Callback
+ * \addtogroup LICal Callback
  * @{
- * \addtogroup licalMarshal Marshal
+ * \addtogroup LICalMarshal Marshal
  * @{
  */
 

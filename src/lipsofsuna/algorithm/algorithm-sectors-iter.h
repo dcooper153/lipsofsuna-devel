@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgSectorsIter SectorsIter
- * @{
- */
-
 #ifndef __ALGORITHM_SECTORS_ITER_H__
 #define __ALGORITHM_SECTORS_ITER_H__
 
@@ -40,44 +33,14 @@ struct _LIAlgSectorsIter
 	int next;
 };
 
-/**
- * \brief Iterates through all created sectors.
- *
- * This is a macro that works in the same way with a for loop.
- *
- * \param iter Sector iterator.
- * \param sectors Sectors.
- */
 #define LIALG_SECTORS_FOREACH(iter, sectors) \
 	for (lialg_sectors_iter_first_all (&iter, sectors) ; iter.sector != NULL ; \
 	     lialg_sectors_iter_next (&iter))
 
-/**
- * \brief Iterates through a range of created sectors.
- *
- * This is a macro that works in the same way with a for loop.
- *
- * \param iter Sector iterator.
- * \param sectors Sectors.
- * \param x Center sector.
- * \param y Center sector.
- * \param z Center sector.
- * \param radius Search radius in sectors.
- */
 #define LIALG_SECTORS_FOREACH_OFFSET(iter, sectors, x, y, z, radius) \
 	for (lialg_sectors_iter_first_offset (&iter, sectors, x, y, z, radius) ; iter.sector != NULL ; \
 	     lialg_sectors_iter_next (&iter))
 
-/**
- * \brief Iterates through a range of created sectors near a point.
- *
- * This is a macro that works in the same way with a for loop.
- *
- * \param iter Sector iterator.
- * \param sectors Sectors.
- * \param point Point in world coordinates.
- * \param radius Radius in world units.
- */
 #define LIALG_SECTORS_FOREACH_POINT(iter, sectors, point, radius) \
 	for (lialg_sectors_iter_first_point (&iter, sectors, point, radius) ; iter.sector != NULL ; \
 	     lialg_sectors_iter_next (&iter))
@@ -195,6 +158,3 @@ lialg_sectors_iter_first_point (LIAlgSectorsIter*  self,
 }
 
 #endif
-
-/** @} */
-/** @} */

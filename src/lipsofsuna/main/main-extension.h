@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liser Server
- * @{
- * \addtogroup LISerExtension Extension
- * @{
- */
-
 #ifndef __MAIN_EXTENSION_H__
 #define __MAIN_EXTENSION_H__
 
@@ -47,6 +40,3 @@ struct _LIMaiExtension
 };
 
 #endif
-
-/** @} */
-/** @} */

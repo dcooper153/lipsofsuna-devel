@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limdl Model
- * @{
- * \addtogroup LIMdlModel Model
- * @{
- */
-
 #ifndef __MODEL_H__
 #define __MODEL_H__
 
@@ -208,6 +201,3 @@ LIAPICALL (int, limdl_model_get_index_count, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

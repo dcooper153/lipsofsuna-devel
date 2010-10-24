@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
  * \addtogroup LIExtSpeech Speech
  * @{

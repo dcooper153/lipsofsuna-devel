@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lical Callback
- * @{
- * \addtogroup LICalHandle Handle
- * @{
- */
-
 #ifndef __CAL_HANDLE_H__
 #define __CAL_HANDLE_H__
 
@@ -55,6 +48,3 @@ LIAPICALL (void, lical_handle_releasev, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

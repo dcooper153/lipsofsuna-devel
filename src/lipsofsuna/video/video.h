@@ -15,46 +15,16 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lipar Particle
- * @{
- * \addtogroup LIParLine Line
- * @{
- */
+#ifndef __VIDEO_H__
+#define __VIDEO_H__
 
-#ifndef __PARTICLE_LINE_H__
-#define __PARTICLE_LINE_H__
-
-#include <lipsofsuna/math.h>
+#include <SDL.h>
+#include <SDL_main.h>
+#include <SDL_ttf.h>
+#include <GL/glew.h>
 #include <lipsofsuna/system.h>
 
-typedef struct _LIParLine LIParLine;
-struct _LIParLine
-{
-	float time[2];
-	float time_fade[2];
-	float time_life[2];
-	float color[2][3];
-	LIMatVector position[2];
-	LIMatVector velocity[2];
-	LIMatVector acceleration[2];
-	LIParLine* prev;
-	LIParLine* next;
-};
-
-LIAPICALL (void, lipar_line_init, (
-	LIParLine*         self,
-	const LIMatVector* position0,
-	const LIMatVector* position1,
-	const LIMatVector* velocity0,
-	const LIMatVector* velocity1));
-
-LIAPICALL (void, lipar_line_get_colors, (
-	const LIParLine* self,
-	float*           color0,
-	float*           color1));
+LIAPICALL (int, livid_video_init, ());
+LIAPICALL (int, livid_video_get_max_samples, ());
 
 #endif
-
-/** @} */
-/** @} */

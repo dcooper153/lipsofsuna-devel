@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limdl Model
- * @{
- * \addtogroup LIMdlShape Shape
- * @{
- */
-
 #ifndef __MODEL_SHAPE_H__
 #define __MODEL_SHAPE_H__
 
@@ -62,6 +55,3 @@ LIAPICALL (int, limdl_shape_write, (
 	LIArcWriter*      writer));
 
 #endif
-
-/** @} */
-/** @} */

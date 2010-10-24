@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup lifnt Font
+ * \addtogroup LIFnt Font
  * @{
  * \addtogroup LIFntFont Font
  * @{
@@ -31,10 +31,9 @@ private_cache_glyph (LIFntFont* self,
 
 /*****************************************************************************/
 
-LIFntFont*
-lifnt_font_new (LIVidCalls* video,
-                const char* path,
-                int         size)
+LIFntFont* lifnt_font_new (
+	const char* path,
+	int         size)
 {
 	LIFntFont* self;
 
@@ -42,10 +41,9 @@ lifnt_font_new (LIVidCalls* video,
 	self = lisys_calloc (1, sizeof (LIFntFont));
 	if (self == NULL)
 		return NULL;
-	self->video = *video;
 
 	/* Open the font. */
-	self->font = self->video.TTF_OpenFont (path, size);
+	self->font = TTF_OpenFont (path, size);
 	if (self->font == NULL)
 	{
 		lisys_error_set (EIO, "cannot load font `%s'", path);
@@ -53,9 +51,9 @@ lifnt_font_new (LIVidCalls* video,
 		return NULL;
 	}
 	self->font_size = size;
-	self->font_height = self->video.TTF_FontLineSkip (self->font);
-	self->font_ascent = self->video.TTF_FontAscent (self->font);
-	self->font_descent = self->video.TTF_FontDescent (self->font);
+	self->font_height = TTF_FontLineSkip (self->font);
+	self->font_ascent = TTF_FontAscent (self->font);
+	self->font_descent = TTF_FontDescent (self->font);
 
 	/* Allocate glyph index. */
 	self->index = lialg_u32dic_new ();
@@ -66,8 +64,8 @@ lifnt_font_new (LIVidCalls* video,
 	}
 
 	/* Allocate glyph table. */
-	self->table_glyph_width = self->video.TTF_FontHeight (self->font); /* FIXME! */
-	self->table_glyph_height = self->video.TTF_FontHeight (self->font);
+	self->table_glyph_width = TTF_FontHeight (self->font); /* FIXME! */
+	self->table_glyph_height = TTF_FontHeight (self->font);
 	self->table_width = LIFNT_CACHE_WIDTH / self->table_glyph_width;
 	self->table_height = LIFNT_CACHE_HEIGHT / self->table_glyph_height;
 	self->table_length = self->table_width * self->table_height;
@@ -105,7 +103,7 @@ lifnt_font_free (LIFntFont* self)
 	if (self->table != NULL)
 		lisys_free (self->table);
 	if (self->font != NULL)
-		self->video.TTF_CloseFont (self->font);
+		TTF_CloseFont (self->font);
 	lisys_free (self);
 }
 
@@ -209,7 +207,7 @@ private_cache_glyph (LIFntFont* self,
 	SDL_Surface* image;
 
 	/* Render the glyph. */
-	image = self->video.TTF_RenderGlyph_Blended (self->font, glyph, color);
+	image = TTF_RenderGlyph_Blended (self->font, glyph, color);
 	if (image == NULL)
 		return NULL;
 
@@ -223,7 +221,7 @@ private_cache_glyph (LIFntFont* self,
 		if (!lialg_u32dic_insert (self->index, glyph, cached))
 		{
 			self->table_filled--;
-			self->video.SDL_FreeSurface (image);
+			SDL_FreeSurface (image);
 			lisys_free (cached);
 			return NULL;
 		}
@@ -247,14 +245,14 @@ private_cache_glyph (LIFntFont* self,
 		{
 			self->table[index] = NULL;
 			self->table_filled--;
-			self->video.SDL_FreeSurface (image);
+			SDL_FreeSurface (image);
 			lisys_free (cached);
 			return NULL;
 		}
 	}
 
 	/* Store metrics. */
-	self->video.TTF_GlyphMetrics (self->font, glyph, &bearing_x, NULL, NULL, &bearing_y, &advance);
+	TTF_GlyphMetrics (self->font, glyph, &bearing_x, NULL, NULL, &bearing_y, &advance);
 	cached->glyph = glyph;
 	cached->table_index = index;
 	cached->table_x = index % self->table_width;
@@ -275,7 +273,7 @@ private_cache_glyph (LIFntFont* self,
 			image->w, image->h,
 			GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
 	}
-	self->video.SDL_FreeSurface (image);
+	SDL_FreeSurface (image);
 
 	return cached;
 }

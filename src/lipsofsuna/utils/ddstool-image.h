@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liimg Image
- * @{
- * \addtogroup LIImgImage Image
- * @{
- */
-
 typedef struct _LIImgImage LIImgImage;
 struct _LIImgImage
 {
@@ -56,6 +49,3 @@ int liimg_image_save_s3tc (
 
 void liimg_image_shrink_half (
 	LIImgImage* self);
-
-/** @} */
-/** @} */

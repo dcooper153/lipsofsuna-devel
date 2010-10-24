@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisys System
- * @{
- * \addtogroup LISysModule Module
- * @{
- */
-
 #include "system-compiler.h"
 
 enum
@@ -46,6 +39,3 @@ LIAPICALL (void*, lisys_module_symbol, (
 LIAPICALL (void*, lisys_module_global_symbol, (
 	const char* module,
 	const char* name));
-
-/** @} */
-/** @} */

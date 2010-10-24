@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup limdl Model
+ * \addtogroup LIMdl Model
  * @{
  * \addtogroup LIMdlPose Pose
  * @{

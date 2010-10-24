@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup licli Client
- * @{
- * \addtogroup LICliWindow Window
- * @{
- */
-
 #ifndef __CLIENT_WINDOW_H__
 #define __CLIENT_WINDOW_H__
 
@@ -63,7 +56,4 @@ LIAPICALL (int, licli_window_set_size, (
 	int          height));
 
 #endif
-
-/** @} */
-/** @} */
 

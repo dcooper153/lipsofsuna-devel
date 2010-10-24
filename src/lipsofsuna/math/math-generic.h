@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup limat Math
+ * \addtogroup LIMat Math
  * @{
- * \addtogroup limatGeneric Generic
+ * \addtogroup LIMatGeneric Generic
  * @{
  */
 

@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup lieng Engine
+ * \addtogroup LIEng Engine
  * @{
  * \addtogroup LIEngSelection Selection
  * @{

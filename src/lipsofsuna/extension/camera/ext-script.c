@@ -25,7 +25,7 @@
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.Camera"
+ * module "core/camera"
  * --- Camera control.
  * -- @name Camera
  * -- @class table

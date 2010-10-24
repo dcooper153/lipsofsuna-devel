@@ -26,7 +26,7 @@
 #include "ext-client.h"
 
 /* @luadoc
- * module "Extension.Common.Network"
+ * module "core/network"
  * --- Networking support.
  * -- @name Network
  * -- @class table

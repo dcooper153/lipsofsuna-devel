@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup listr String
+ * \addtogroup LIArc Archive
  * @{
- * \addtogroup listrReader Reader
+ * \addtogroup LIArcReader Reader
  * @{
  */
 

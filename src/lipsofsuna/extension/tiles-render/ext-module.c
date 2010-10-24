@@ -16,11 +16,9 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliVoxel Voxel
+ * \addtogroup LIExtTilesRender TilesRender
  * @{
  */
 
@@ -234,6 +232,5 @@ static int private_tick (
 	return 1;
 }
 
-/** @} */
 /** @} */
 /** @} */

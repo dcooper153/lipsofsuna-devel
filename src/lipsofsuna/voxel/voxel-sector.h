@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup livox Voxel
- * @{
- * \addtogroup LIVoxSector Sector
- * @{
- */
-
 #ifndef __VOXEL_SECTOR_H__
 #define __VOXEL_SECTOR_H__
 
@@ -118,6 +111,3 @@ LIAPICALL (int, livox_sector_set_voxel, (
 	LIVoxVoxel   terrain));
 
 #endif
-
-/** @} */
-/** @} */

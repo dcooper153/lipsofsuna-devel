@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liser Server
- * @{
- * \addtogroup liserCallbacks Callbacks
- * @{
- */
-
 #ifndef __SERVER_CALLBACKS_H__
 #define __SERVER_CALLBACKS_H__
 
@@ -32,7 +25,4 @@
 int liser_server_init_callbacks_client (LISerServer* server);
 
 #endif
-
-/** @} */
-/** @} */
 

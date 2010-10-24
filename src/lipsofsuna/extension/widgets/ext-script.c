@@ -75,7 +75,7 @@ private_callback_pressed (LIScrData* data)
 /*****************************************************************************/
 
 /* @luadoc
- * module "Extension.Widgets"
+ * module "core/widgets"
  * --- Create buttons.
  * -- @name Button
  * -- @class table

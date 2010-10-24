@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liscr Script
- * @{
- * \addtogroup liscrEvent Event
- * @{
- */
-
 #ifndef __SCRIPT_EVENT_H__
 #define __SCRIPT_EVENT_H__
 
@@ -56,6 +49,3 @@ LIAPICALL (void, liscr_event_set_type, (
 	const char* type));
 
 #endif
-
-/** @} */
-/** @} */

@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liarc Archive
+ * \addtogroup LIArc Archive
  * @{
  * \addtogroup LIArcTar Tar
  * @{

@@ -15,15 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liext Extension
- * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliReload Reload
- * @{
- */
-
 #ifndef __EXT_RELOAD_H__
 #define __EXT_RELOAD_H__
 
@@ -55,7 +46,3 @@ int liext_reload_set_enabled (
 	int          value);
 
 #endif
-
-/** @} */
-/** @} */
-/** @} */

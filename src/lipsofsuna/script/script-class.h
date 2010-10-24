@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liscr Script
- * @{
- * \addtogroup LIScrClass Class
- * @{
- */
-
 #ifndef __SCRIPT_CLASS_H__
 #define __SCRIPT_CLASS_H__
 
@@ -104,6 +97,3 @@ int
 liscr_class_default___newindex (lua_State* lua);
 
 #endif
-
-/** @} */
-/** @} */

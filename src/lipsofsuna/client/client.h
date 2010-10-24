@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup licli Client
- * @{
- * \addtogroup LICliClient Client
- * @{
- */
-
 #ifndef __CLIENT_H__
 #define __CLIENT_H__
 
@@ -50,7 +43,6 @@ struct _LICliClient
 	/* Persistent. */
 	char* root;
 	LICliWindow* window;
-	LIVidCalls video;
 
 	/* Program. */
 	LIAlgSectors* sectors;
@@ -71,7 +63,6 @@ struct _LICliClient
 };
 
 LIAPICALL (LICliClient*, licli_client_new, (
-	LIVidCalls* video,
 	const char* path,
 	const char* name));
 
@@ -104,6 +95,3 @@ LIAPICALL (void, licli_client_set_moving, (
 	int          value));
 
 #endif
-
-/** @} */
-/** @} */

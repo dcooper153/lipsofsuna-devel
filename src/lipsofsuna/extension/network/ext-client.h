@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup LIExt Extension
- * @{
- * \addtogroup LIExtNetwork Network
- * @{
- */
-
 #ifndef __EXT_CLIENT_H__
 #define __EXT_CLIENT_H__
 
@@ -48,6 +41,3 @@ void liext_client_send (
 	int          flags);
 
 #endif
-
-/** @} */
-/** @} */

@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liwdg Widget
- * @{
- * \addtogroup LIWdgManager Manager
- * @{
- */
-
 #ifndef __WIDGET_MANAGER_H__
 #define __WIDGET_MANAGER_H__
 
@@ -45,7 +38,6 @@ struct _LIWdgManager
 	LIRenContext* context;
 	LIRenRender* render;
 	LIRenShader* shader;
-	LIVidCalls video;
 	struct
 	{
 		LIWdgWidget* top;
@@ -70,7 +62,6 @@ struct _LIWdgManager
 };
 
 LIAPICALL (LIWdgManager*, liwdg_manager_new, (
-	LIVidCalls*     video,
 	LIRenRender*    render,
 	LICalCallbacks* callbacks,
 	const char*     path));
@@ -161,6 +152,3 @@ LIAPICALL (void, liwdg_manager_set_size, (
 	int           height));
 
 #endif
-
-/** @} */
-/** @} */

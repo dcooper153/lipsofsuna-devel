@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liren Render
+ * \addtogroup LIRen Render
  * @{
  * \addtogroup LIRenRender Render
  * @{
@@ -97,10 +97,6 @@ liren_scene_free (LIRenScene* self)
 	if (self->lighting != NULL)
 		liren_lighting_free (self->lighting);
 
-	/* Free particles. */
-	if (self->particles != NULL)
-		lipar_manager_free (self->particles);
-
 	if (self->sort != NULL)
 		liren_sort_free (self->sort);
 
@@ -127,24 +123,6 @@ liren_scene_find_object (LIRenScene* self,
                          int         id)
 {
 	return lialg_u32dic_find (self->objects, id);
-}
-
-/**
- * \brief Creates a new particle.
- *
- * \param self Scene.
- * \param texture Texture of the particle.
- * \param position Position of the particle.
- * \param velocity Velocity of the particle.
- * \return Particle owned by the scene or NULL.
- */
-LIParPoint*
-liren_scene_insert_particle (LIRenScene*        self,
-                             const char*        texture,
-                             const LIMatVector* position,
-                             const LIMatVector* velocity)
-{
-	return lipar_manager_insert_point (self->particles, texture, position, velocity);
 }
 
 /**
@@ -262,15 +240,10 @@ liren_scene_render_end (LIRenScene* self)
 
 /**
  * \brief Begins deferred rendering.
- *
  * \param self Scene.
- * \param alphatest Nonzero for drawing transparent faces using alpha test.
- * \param threshold Alpha test threshold.
  */
 void liren_scene_render_deferred_begin (
-	LIRenScene* self,
-	int         alphatest,
-	float       threshold)
+	LIRenScene* self)
 {
 	/* Validate state. */
 	if (!self->state.rendering)
@@ -281,7 +254,6 @@ void liren_scene_render_deferred_begin (
 	liren_context_set_blend (self->state.context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glBindFramebuffer (GL_FRAMEBUFFER, self->state.framebuffer->deferred_fbo);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	self->state.alphatest = alphatest;
 }
 
 /**
@@ -343,9 +315,11 @@ void liren_scene_render_deferred_end (
  * using alpha test, to the G-buffer.
  *
  * \param self Scene.
+ * \param alpha Nonzero to draw transparent faces as if they were opaque.
  */
 void liren_scene_render_deferred_opaque (
-	LIRenScene* self)
+	LIRenScene* self,
+	int         alpha)
 {
 	int i;
 	LIRenSortgroup* group;
@@ -358,7 +332,7 @@ void liren_scene_render_deferred_opaque (
 	for (i = 0 ; i < self->sort->groups.count ; i++)
 	{
 		group = self->sort->groups.array + i;
-		if (!self->state.alphatest && group->transparent)
+		if (!alpha && group->transparent)
 			continue;
 		liren_draw_default (self->state.context, group->index, group->count,
 			&group->matrix, group->material, group->buffer);
@@ -372,11 +346,11 @@ void liren_scene_render_deferred_opaque (
  * using alpha test, to the post-processing input buffer.
  *
  * \param self Scene.
+ * \param alpha Nonzero to draw transparent faces as if they were opaque.
  */
-void
-liren_scene_render_forward_opaque (LIRenScene* self,
-                                   int         alpha,
-                                   float       threshold)
+void liren_scene_render_forward_opaque (
+	LIRenScene* self,
+	int         alpha)
 {
 	int i;
 	LIAlgPtrdicIter iter;
@@ -574,42 +548,6 @@ liren_scene_update (LIRenScene* self,
 
 	/* Update lights. */
 	liren_lighting_update (self->lighting);
-
-	/* Update particles. */
-	lipar_manager_update (self->particles, secs);
-}
-
-/**
- * \brief Sets the skybox model.
- *
- * \param self Scene.
- * \param model Model or NULL to unset.
- */
-int
-liren_scene_set_sky (LIRenScene* self,
-                     LIRenModel* model)
-{
-#warning Skybox is disabled.
-#if 0
-	LIRenObject* inst;
-
-	if (model != NULL)
-	{
-		inst = liren_object_new (model, 0);
-		if (inst == NULL)
-			return 0;
-		if (self->sky.model != NULL)
-			liren_object_free (self->sky.model);
-		self->sky.model = inst;
-	}
-	else
-	{
-		if (self->sky.model != NULL)
-			liren_object_free (self->sky.model);
-		self->sky.model = NULL;
-	}
-#endif
-	return 1;
 }
 
 /*****************************************************************************/
@@ -619,9 +557,6 @@ static int private_init (
 {
 	self->lighting = liren_lighting_new (self->render);
 	if (self->lighting == NULL)
-		return 0;
-	self->particles = lipar_manager_new (LIREN_PARTICLE_MAXIMUM_COUNT);
-	if (self->particles == NULL)
 		return 0;
 	self->sort = liren_sort_new (self->render);
 	if (self->sort == NULL)

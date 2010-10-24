@@ -15,18 +15,10 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liren Render
- * @{
- * \addtogroup LIRenScene Scene
- * @{
- */
-
 #ifndef __RENDER_SCENE_H__
 #define __RENDER_SCENE_H__
 
 #include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/particle.h>
 #include <lipsofsuna/system.h>
 #include "render-deferred.h"
 #include "render-light.h"
@@ -39,13 +31,11 @@ struct _LIRenScene
 {
 	LIAlgPtrdic* groups;
 	LIAlgU32dic* objects;
-	LIParManager* particles;
 	LIRenRender* render;
 	LIRenSort* sort;
 	LIRenLighting* lighting;
 	struct
 	{
-		int alphatest;
 		int rendering;
 		LIRenContext* context;
 		LIRenDeferred* framebuffer;
@@ -66,12 +56,6 @@ LIAPICALL (LIRenObject*, liren_scene_find_object, (
 	LIRenScene* self,
 	int         id));
 
-LIAPICALL (LIParPoint*, liren_scene_insert_particle, (
-	LIRenScene*        self,
-	const char*        texture,
-	const LIMatVector* position,
-	const LIMatVector* velocity));
-
 LIAPICALL (int, liren_scene_render_begin, (
 	LIRenScene*    self,
 	LIRenDeferred* framebuffer,
@@ -83,20 +67,18 @@ LIAPICALL (void, liren_scene_render_end, (
 	LIRenScene* self));
 
 LIAPICALL (void, liren_scene_render_deferred_begin, (
-	LIRenScene* self,
-	int         alpha,
-	float       threshold));
+	LIRenScene* self));
 
 LIAPICALL (void, liren_scene_render_deferred_end, (
 	LIRenScene* self));
 
 LIAPICALL (void, liren_scene_render_deferred_opaque, (
-	LIRenScene* self));
+	LIRenScene* self,
+	int         alpha));
 
 LIAPICALL (void, liren_scene_render_forward_opaque, (
 	LIRenScene* self,
-	int         alphatest,
-	float       threshold));
+	int         alpha));
 
 LIAPICALL (void, liren_scene_render_forward_transparent, (
 	LIRenScene* self));
@@ -109,11 +91,4 @@ LIAPICALL (void, liren_scene_update, (
 	LIRenScene* self,
 	float       secs));
 
-LIAPICALL (int, liren_scene_set_sky, (
-	LIRenScene* self,
-	LIRenModel* model));
-
 #endif
-
-/** @} */
-/** @} */

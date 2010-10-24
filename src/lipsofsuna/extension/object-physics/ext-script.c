@@ -25,7 +25,7 @@
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.ObjectPhysics.Object"
+ * module "core/object-physics"
  * ---
  * -- Control the physics simulation of objects.
  * -- @name Object
@@ -645,3 +645,6 @@ void liext_script_object (
 	liscr_class_insert_mvar (self, "movement", Object_getter_movement, Object_setter_movement);
 	liscr_class_insert_mvar (self, "velocity", Object_getter_velocity, Object_setter_velocity);
 }
+
+/** @} */
+/** @} */

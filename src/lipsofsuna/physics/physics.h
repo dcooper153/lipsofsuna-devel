@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liphy Physics
- * @{
- * \addtogroup LIPhyPhysics Physics
- * @{
- */
-
 #ifndef __PHYSICS_H__
 #define __PHYSICS_H__
 
@@ -95,6 +88,3 @@ LIAPICALL (void, liphy_physics_set_userdata, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

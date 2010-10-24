@@ -15,15 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liext Extension
- * @{
- * \addtogroup liextcli Client
- * @{
- * \addtogroup liextcliReload Reload
- * @{
- */
-
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
@@ -38,14 +29,8 @@
 
 typedef struct _LIExtReload LIExtReload;
 
-/*****************************************************************************/
-
-void
-liext_script_reload (LIScrClass* self,
-                     void*       data);
+void liext_script_reload (
+	LIScrClass* self,
+	void*       data);
 
 #endif
-
-/** @} */
-/** @} */
-/** @} */

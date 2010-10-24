@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup liphy Physics
+ * \addtogroup LIPhy Physics
  * @{
- * \addtogroup liphyPrivate Private
+ * \addtogroup LIPhyPrivate Private
  * @{
  */
 

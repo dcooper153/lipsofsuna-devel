@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lical Callback
- * @{
- * \addtogroup licalMarshal Marshal
- * @{
- */
-
 #ifndef __CAL_MARSHAL_H__
 #define __CAL_MARSHAL_H__
 
@@ -50,6 +43,3 @@ LIAPICALL (int, lical_marshal_DATA_PTR_PTR_PTR, (void* call, void* data, va_list
 #endif
 
 #endif
-
-/** @} */
-/** @} */

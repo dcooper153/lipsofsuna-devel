@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgOctree Octree
- * @{
- */
-
 #ifndef __ALGORITHM_OCTREE_H__
 #define __ALGORITHM_OCTREE_H__
 
@@ -83,6 +76,3 @@ int
 lialg_octree_get_size (const LIAlgOctree* self);
 
 #endif
-
-/** @} */
-/** @} */

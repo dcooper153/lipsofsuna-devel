@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup ligen Generator
- * @{
- * \addtogroup LIGenRule Rule
- * @{
- */
-
 #ifndef __GENERATOR_RULE_H__
 #define __GENERATOR_RULE_H__
 
@@ -79,6 +72,3 @@ LIAPICALL (int, ligen_rule_set_name, (
 	const char* value));
 
 #endif
-
-/** @} */
-/** @} */

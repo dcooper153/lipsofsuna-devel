@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liwdg Widget
- * @{
- * \addtogroup LIWdgButton Button
- * @{
- */
-
 #ifndef __WIDGET_BUTTON_H__
 #define __WIDGET_BUTTON_H__
 
@@ -31,9 +24,6 @@
 
 #define LIWDG_BUTTON(o) ((LIWdgButton*)(o))
 
-/**
- * \brief Button widget.
- */
 typedef struct _LIWdgButton LIWdgButton;
 struct _LIWdgButton
 {
@@ -57,6 +47,3 @@ LIAPICALL (const char*, liwdg_button_get_text, (
 	LIWdgButton* self));
 
 #endif
-
-/** @} */
-/** @} */

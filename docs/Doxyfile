@@ -1,7 +1,7 @@
 PROJECT_NAME           = "Lips of Suna"
 PROJECT_NUMBER         = "0.1"
-OUTPUT_DIRECTORY       = build/docs/html/
-INPUT                  = lipsofsuna
+OUTPUT_DIRECTORY       = docs/html/
+INPUT                  = src
 RECURSIVE              = YES
 EXTRACT_ALL            = YES
 EXTRACT_STATIC         = NO
@@ -21,4 +21,3 @@ HTML_OUTPUT            = api/
 HTML_ALIGN_MEMBERS     = YES
 SHOW_USED_FILES        = NO
 VERBATIM_HEADERS       = NO
-PREDEFINED             = HAVE_ENDIAN_H

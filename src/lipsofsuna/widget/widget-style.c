@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liwdg Widget
+ * \addtogroup LIWdg Widget
  * @{
  * \addtogroup LIWdgStyle Style
  * @{
@@ -403,3 +403,6 @@ static void private_paint_tiled (
 	/* Render the packed vertices. */
 	liren_context_render_immediate (self->manager->context, GL_TRIANGLES, vertices, offset);
 }
+
+/** @} */
+/** @} */

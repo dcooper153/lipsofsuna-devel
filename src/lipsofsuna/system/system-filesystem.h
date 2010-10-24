@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lisys System
- * @{
- * \addtogroup LISysFilesystem Filesystem
- * @{
- */
-
 #ifndef __SYSTEM_FILESYSTEM_H__
 #define __SYSTEM_FILESYSTEM_H__
 
@@ -87,6 +80,3 @@ LIAPICALL (int, lisys_filesystem_lstat, (
 #endif
 
 #endif
-
-/** @} */
-/** @} */

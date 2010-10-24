@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limdl Model
- * @{
- * \addtogroup LIMdlFaces Faces
- * @{
- */
-
 #ifndef __MODEL_FACES_H__
 #define __MODEL_FACES_H__
 
@@ -54,6 +47,3 @@ LIAPICALL (int, limdl_faces_write, (
 	LIArcWriter* writer));
 
 #endif
-
-/** @} */
-/** @} */

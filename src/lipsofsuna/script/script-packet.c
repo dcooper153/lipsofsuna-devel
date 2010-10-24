@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liscr Script
+ * \addtogroup LIScr Script
  * @{
  * \addtogroup LIScrPacket Packet
  * @{
@@ -33,7 +33,7 @@ private_read (LIScrPacket* data,
 /*****************************************************************************/
 
 /* @luadoc
- * module "Core.Common.Packet"
+ * module "builtin/packet"
  * ---
  * -- Send and receive network data.
  * -- @name Packet

@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lialg Algorithm
- * @{
- * \addtogroup LIAlgArray Array
- * @{
- */
-
 #ifndef __ALGORITHM_ARRAY_H__
 #define __ALGORITHM_ARRAY_H__
 
@@ -101,6 +94,3 @@ LIAPICALL (void, lialg_array_zero_full, (
 	int    count));
 
 #endif
-
-/** @} */
-/** @} */

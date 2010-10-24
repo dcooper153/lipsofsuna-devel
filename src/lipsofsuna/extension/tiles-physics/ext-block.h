@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup LIExt Extension
- * @{
- * \addtogroup LIExtTilesPhysics TilesPhysics
- * @{
- */
-
 #ifndef __EXT_BLOCK_H__
 #define __EXT_BLOCK_H__
 
@@ -45,6 +38,3 @@ int liext_tiles_physics_block_build (
 	LIVoxBlockAddr* addr);
 
 #endif
-
-/** @} */
-/** @} */

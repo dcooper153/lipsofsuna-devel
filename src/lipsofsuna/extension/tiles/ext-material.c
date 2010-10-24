@@ -18,14 +18,14 @@
 /**
  * \addtogroup LIExt Extension
  * @{
- * \addtogroup LIExtVoxel Voxel
+ * \addtogroup LIExtTiles Tiles
  * @{
  */
 
 #include "ext-module.h"
 
 /* @luadoc
- * module "Extension.Tiles"
+ * module "core/tiles"
  * --- Terrain material.
  * -- @name Material
  * -- @class table

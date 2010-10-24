@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup limdl Model
- * @{
- * \addtogroup LIMdlAnimation Animation
- * @{
- */
-
 #ifndef __MODEL_ANIMATION_H__
 #define __MODEL_ANIMATION_H__
 
@@ -95,6 +88,3 @@ LIAPICALL (int, limdl_animation_get_transform, (
 	LIMatTransform* value));
 
 #endif
-
-/** @} */
-/** @} */

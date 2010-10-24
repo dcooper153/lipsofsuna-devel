@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup liwdg Widget
- * @{
- * \addtogroup LIWdgWidget Widget
- * @{
- */
-
 #ifndef __WIDGET_H__
 #define __WIDGET_H__
 
@@ -232,6 +225,3 @@ LIAPICALL (void, liwdg_widget_set_visible, (
 	int          visible));
 
 #endif
-
-/** @} */
-/** @} */

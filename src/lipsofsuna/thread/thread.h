@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lithr Thread
- * @{
- * \addtogroup LIThrThread Thread
- * @{
- */
-
 #ifndef __THREAD_H__
 #define __THREAD_H__
 
@@ -44,6 +37,3 @@ LIAPICALL (int, lithr_thread_get_done, (
 	LIThrThread* self));
 
 #endif
-
-/** @} */
-/** @} */

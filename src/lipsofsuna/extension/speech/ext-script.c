@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liext Extension
+ * \addtogroup LIExt Extension
  * @{
  * \addtogroup LIExtSpeech Speech
  * @{
@@ -26,7 +26,7 @@
 #include "ext-speech.h"
 
 /* @luadoc
- * module "Extension.Speech"
+ * module "core/speech"
  * --- Display speech above objects.
  * -- @name Sound
  * -- @class table

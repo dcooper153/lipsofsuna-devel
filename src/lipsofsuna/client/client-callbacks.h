@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup licli Client
- * @{
- * \addtogroup licliCallbacks Callbacks
- * @{
- */
-
 #ifndef __CLIENT_CALLBACKS_H__
 #define __CLIENT_CALLBACKS_H__
 
@@ -31,7 +24,4 @@
 int licli_client_init_callbacks_misc (LICliClient* self);
 
 #endif
-
-/** @} */
-/** @} */
 

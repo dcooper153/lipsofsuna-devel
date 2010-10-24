@@ -16,9 +16,9 @@
  */
 
 /**
- * \addtogroup limat Math
+ * \addtogroup LIMat Math
  * @{
- * \addtogroup limatEllipsoid Ellipsoid
+ * \addtogroup LIMatEllipsoid Ellipsoid
  * @{
  */
 
@@ -89,9 +89,9 @@ limat_ellipsoid_unmap_vector (LIMatVector center,
 /** @} */
 
 /**
- * \addtogroup limat Math
+ * \addtogroup LIMat Math
  * @{
- * \addtogroup limatGeometry Geometry
+ * \addtogroup LIMatGeometry Geometry
  * @{
  */
 

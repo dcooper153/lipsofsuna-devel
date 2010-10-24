@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup licli Client
+ * \addtogroup LICli Client
  * @{
  * \addtogroup LICliClient Client
  * @{
@@ -63,7 +63,6 @@ static int private_update (
 /*****************************************************************************/
 
 LICliClient* licli_client_new (
-	LIVidCalls* video,
 	const char* path,
 	const char* name)
 {
@@ -73,7 +72,6 @@ LICliClient* licli_client_new (
 	self = lisys_calloc (1, sizeof (LICliClient));
 	if (self == NULL)
 		return NULL;
-	self->video = *video;
 
 	/* Allocate root directory. */
 	self->root = listr_dup (path);
@@ -84,7 +82,7 @@ LICliClient* licli_client_new (
 	}
 
 	/* Initialize SDL. */
-	if (self->video.SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
+	if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
 	{
 		lisys_error_set (ENOTSUP, "initializing SDL failed");
 		lisys_free (self->root);
@@ -93,7 +91,7 @@ LICliClient* licli_client_new (
 	}
 
 	/* Create window. */
-	self->video.SDL_EnableUNICODE (1);
+	SDL_EnableUNICODE (1);
 	self->window = licli_window_new (self);
 	if (self->window == NULL)
 	{
@@ -110,7 +108,7 @@ void licli_client_free (
 	licli_client_free_module (self);
 	if (self->window != NULL)
 		licli_window_free (self->window);
-	self->video.SDL_Quit ();
+	SDL_Quit ();
 	lisys_free (self->root);
 	lisys_free (self);
 }
@@ -186,9 +184,9 @@ int licli_client_host (
 /**
  * \brief Loads a module.
  *
- * \param client Client.
- * \param path Package root directory.
+ * \param self Client.
  * \param name Module name.
+ * \param args Module arguments.
  */
 int licli_client_load_module (
 	LICliClient* self,
@@ -279,19 +277,19 @@ void licli_client_set_moving (
 	{
 		cx = self->window->mode.width / 2;
 		cy = self->window->mode.height / 2;
-		self->video.SDL_ShowCursor (SDL_DISABLE);
-		self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
-		self->video.SDL_WarpMouse (cx, cy);
-		self->video.SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
+		SDL_ShowCursor (SDL_DISABLE);
+		SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
+		SDL_WarpMouse (cx, cy);
+		SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
 #ifdef ENABLE_GRABS
-		self->video.SDL_WM_GrabInput (SDL_GRAB_ON);
+		SDL_WM_GrabInput (SDL_GRAB_ON);
 #endif
 	}
 	else
 	{
-		self->video.SDL_ShowCursor (SDL_ENABLE);
+		SDL_ShowCursor (SDL_ENABLE);
 #ifdef ENABLE_GRABS
-		self->video.SDL_WM_GrabInput (SDL_GRAB_OFF);
+		SDL_WM_GrabInput (SDL_GRAB_OFF);
 #endif
 	}
 }
@@ -404,7 +402,7 @@ static int private_update (
 	SDL_Event event;
 
 	/* Invoke input callbacks. */
-	while (self->video.SDL_PollEvent (&event))
+	while (SDL_PollEvent (&event))
 		lical_callbacks_call (self->callbacks, self->engine, "event", lical_marshal_DATA_PTR, &event);
 
 	return 1;

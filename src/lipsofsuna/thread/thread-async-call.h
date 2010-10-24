@@ -15,13 +15,6 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup lithr Thread
- * @{
- * \addtogroup LIThrAsyncCall Async Call
- * @{
- */
-
 #ifndef __THREAD_ASYNC_CALL_H__
 #define __THREAD_ASYNC_CALL_H__
 
@@ -68,6 +61,3 @@ LIAPICALL (void*, lithr_async_call_get_userdata, (
 	LIThrAsyncCall* self));
 
 #endif
-
-/** @} */
-/** @} */
