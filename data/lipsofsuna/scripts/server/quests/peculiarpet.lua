@@ -23,7 +23,7 @@ die = function(self)
 	if not quest then return end
 	-- Update the quest.
 	quest:update{status = "completed", progress = 5, text = name ..
-		"has been killed."}
+		" has been killed."}
 end,
 main = function(self)
 	local lines = {
@@ -46,9 +46,9 @@ main = function(self)
 		if a == lines[3] then return end
 		self:line("You're crazy! Seeing things, I tell you. Get away from me!")
 		if quest.progress == 0 then
-			quest:update{status = "active", progress = 1, text = "We have been told by " ..
-				name .. " that we are crazy because we see a bloodworm in place " ..
-				"of her pet, Puppy."}
+			quest:update{status = "active", progress = 1, text = name ..
+				" has called us crazy because we told her that her pet, " ..
+				"Puppy, is a bloodworm."}
 		end
 		return true
 	end
@@ -150,7 +150,7 @@ die = function(self)
 	-- Update the quest. It's possible that the quest was already completed
 	-- by the NPC being killed so we need to check for the progress here.
 	if quest.progress < 3 then
-		quest:update{status = "active", progress = 3, text = "The bloodworm posing as .. " ..
+		quest:update{status = "active", progress = 3, text = "The bloodworm posing as " ..
 			name .. "'s pet has been killed."}
 	end
 end,
