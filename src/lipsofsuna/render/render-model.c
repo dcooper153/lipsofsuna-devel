@@ -128,6 +128,10 @@ int liren_model_intersect_ray (
 	LIMatVector p;
 	const LIRenFormat* fmt;
 
+	/* Fast exit if no intersection with the bounding box. */
+	if (!limat_intersect_aabb_line_near (&self->model->bounds, ray0, ray1, &p))
+		return 0;
+
 	/* Test for intersection for each face in the model. */
 	found = 0;
 	fmt = &self->buffer->vertex_format;
