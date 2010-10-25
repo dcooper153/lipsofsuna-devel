@@ -330,7 +330,6 @@ private_init_script (LICliClient* self)
 	if (!liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
 	    !liscr_script_create_class (self->script, "Event", liscr_script_event, self->script) ||
 	    !liscr_script_create_class (self->script, "Client", licli_script_client, self) ||
-	    !liscr_script_create_class (self->script, "Light", licli_script_light, self) ||
 	    !liscr_script_create_class (self->script, "Model", liscr_script_model, self->program) ||
 	    !liscr_script_create_class (self->script, "Object", liscr_script_object, self->program) ||
 	    !liscr_script_create_class (self->script, "Packet", liscr_script_packet, self->script) ||

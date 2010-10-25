@@ -23,13 +23,8 @@
 #include <lipsofsuna/widget.h>
 
 #define LICLI_SCRIPT_CLIENT "Client"
-#define LICLI_SCRIPT_LIGHT "Light"
 
 LIAPICALL (void, licli_script_client, (
-	LIScrClass* self,
-	void*       data));
-
-LIAPICALL (void, licli_script_light, (
 	LIScrClass* self,
 	void*       data));
 

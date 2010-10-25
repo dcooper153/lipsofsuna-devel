@@ -16,18 +16,16 @@
  */
 
 /**
- * \addtogroup LICli Client
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup LICliScript Script
+ * \addtogroup LIExtRender Render
  * @{
  */
 
-#include <lipsofsuna/client.h>
-
-/*****************************************************************************/
+#include "ext-module.h"
 
 /* @luadoc
- * module "builtin/light"
+ * module "core/render"
  * --- Create and manipulate light sources.
  * -- @name Light
  * -- @class table
@@ -35,7 +33,6 @@
 
 /* @luadoc
  * --- Creates a new light source.
- * --
  * -- @param clss Light class.
  * -- @param args Arguments.
  * -- @return New light source.
@@ -43,15 +40,15 @@
  */
 static void Light_new (LIScrArgs* args)
 {
-	LICliClient* client;
+	LIExtModule* module;
 	LIRenLight* self;
 	LIScrData* data;
 	const float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	const float equation[3] = { 1.0f, 1.0f, 1.0f };
 
 	/* Allocate self. */
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_LIGHT);
-	self = liren_light_new (client->scene, color, equation, M_PI, 0.0f, 0);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_LIGHT);
+	self = liren_light_new (module->client->scene, color, equation, M_PI, 0.0f, 0);
 	if (self == NULL)
 		return;
 
@@ -333,11 +330,11 @@ static void Light_setter_spot_exponent (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void
-licli_script_light (LIScrClass* self,
-                    void*       data)
+void liext_script_light (
+	LIScrClass* self,
+	void*       data)
 {
-	liscr_class_set_userdata (self, LICLI_SCRIPT_LIGHT, data);
+	liscr_class_set_userdata (self, LIEXT_SCRIPT_LIGHT, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Light_new);
 	liscr_class_insert_mvar (self, "ambient", Light_getter_ambient, Light_setter_ambient);

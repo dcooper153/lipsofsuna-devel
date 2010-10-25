@@ -50,6 +50,7 @@ LIExtModule* liext_render_new (
 	}
 
 	/* Register classes. */
+	liscr_script_create_class (program->script, "Light", liext_script_light, self);
 	liscr_script_create_class (program->script, "Scene", liext_script_scene, self);
 	liscr_script_create_class (program->script, "Shader", liext_script_shader, self);
 
