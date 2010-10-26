@@ -46,7 +46,7 @@ end
 Skills.new = function(clss, args)
 	local s = Class.new(clss, args)
 	s.skills = {}
-	s.enabled = args and args.enabled ~= false or false
+	s.enabled = not args or args.enabled ~= false
 	if s.owner then
 		if clss.dict[s.owner] then error("object already has skills") end
 		clss.dict[s.owner] = s

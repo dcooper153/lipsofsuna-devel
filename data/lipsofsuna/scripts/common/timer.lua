@@ -61,7 +61,7 @@ Eventhandler{type = "tick", func = function(self, args)
 					target = target + delay
 				end
 			else
-				k:func(t - target)
+				k:func(delay + t - target)
 				k.updated = t
 			end
 		end

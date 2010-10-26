@@ -202,7 +202,7 @@ Player.vision_cb = function(self, args)
 			if not v then return end
 			if v.prot == "public" or self == o then
 				self:send{packet = Packet(packets.OBJECT_SKILL, "uint32", o.id,
-					"string", args.skill, "int32", v.value, "int32", v.maximum)}
+					"string", args.skill, "int32", math.ceil(v.value), "int32", math.ceil(v.maximum))}
 			end
 		end,
 		["slot-changed"] = function(args)
