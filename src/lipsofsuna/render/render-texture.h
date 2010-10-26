@@ -30,17 +30,8 @@ struct _LIRenTexture
 	int height;
 	char* name;
 	GLuint texture;
-	GLuint sampler;
 	LIMdlTextureType type;
-	LIMdlTextureFlags flags;
 	LIRenImage* image;
-	struct
-	{
-		GLenum magfilter;
-		GLenum minfilter;
-		GLenum wraps;
-		GLenum wrapt;
-	} params;
 };
 
 LIAPICALL (void, liren_texture_init, (
@@ -48,10 +39,6 @@ LIAPICALL (void, liren_texture_init, (
 
 LIAPICALL (void, liren_texture_free, (
 	LIRenTexture* self));
-
-LIAPICALL (void, liren_texture_set_flags, (
-	LIRenTexture* self,
-	int           value));
 
 LIAPICALL (void, liren_texture_set_image, (
 	LIRenTexture* self,

@@ -530,8 +530,7 @@ void liren_context_set_textures (
 	{
 		for (i = 0 ; i < c ; i++)
 		{
-			if (self->textures.array[i].texture != value[i].texture ||
-			    self->textures.array[i].sampler != value[i].sampler)
+			if (self->textures.array[i].texture != value[i].texture)
 				break;
 		}
 		if (i == c)
@@ -539,10 +538,7 @@ void liren_context_set_textures (
 	}
 
 	for (i = 0 ; i < c ; i++)
-	{
 		self->textures.array[i].texture = value[i].texture;
-		self->textures.array[i].sampler = value[i].sampler;
-	}
 	self->textures.count = c;
 	self->changed.textures = 1;
 	self->changed.uniforms = 1;
@@ -561,8 +557,7 @@ void liren_context_set_textures_raw (
 	{
 		for (i = 0 ; i < c ; i++)
 		{
-			if (self->textures.array[i].texture != value[i] ||
-			    self->textures.array[i].sampler != 0)
+			if (self->textures.array[i].texture != value[i])
 				break;
 		}
 		if (i == c)
@@ -570,10 +565,7 @@ void liren_context_set_textures_raw (
 	}
 
 	for (i = 0 ; i < c ; i++)
-	{
 		self->textures.array[i].texture = value[i];
-		self->textures.array[i].sampler = 0;
-	}
 	self->textures.count = c;
 	self->changed.textures = 1;
 	self->changed.uniforms = 1;
@@ -622,10 +614,6 @@ static void private_bind_uniform (
 					texture = self->textures.array + index;
 					glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 					glBindTexture (GL_TEXTURE_CUBE_MAP_ARB, texture->texture);
-/*					glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, texture->magfilter);
-					glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, texture->minfilter);
-					glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, texture->wraps);
-					glTexParameteri (GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, texture->wrapt);*/
 				}
 				else
 				{
@@ -652,13 +640,11 @@ static void private_bind_uniform (
 					texture = self->textures.array + index;
 					glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 					glBindTexture (GL_TEXTURE_2D, texture->texture);
-					glBindSampler (uniform->sampler, texture->sampler);
 				}
 				else
 				{
 					glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 					glBindTexture (GL_TEXTURE_2D, self->render->helpers.empty_image->texture->texture);
-					glBindSampler (uniform->sampler, 0);
 				}
 				glActiveTextureARB (GL_TEXTURE0);
 			}
@@ -996,7 +982,6 @@ static void private_bind_uniform (
 				}
 				glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 				glBindTexture (GL_TEXTURE_2D, map);
-				glBindSampler (uniform->sampler, 0);
 			}
 			break;
 		case LIREN_UNIFORM_TIME:

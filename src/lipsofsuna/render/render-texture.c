@@ -27,81 +27,14 @@
 void liren_texture_init (
 	LIRenTexture* self)
 {
-	self->flags = 0;
 	self->type = 0;
 	self->width = 0;
 	self->height = 0;
-	glGenSamplers (1, &self->sampler);
-	liren_texture_set_flags (self, 0);
 }
 
 void liren_texture_free (
 	LIRenTexture* self)
 {
-	if (self->sampler)
-		glDeleteSamplers (1, &self->sampler);
-}
-
-void liren_texture_set_flags (
-	LIRenTexture* self,
-	int           value)
-{
-	GLenum magfilter;
-	GLenum minfilter;
-	GLenum wraps;
-	GLenum wrapt;
-
-	/* Get filters. */
-	if (value & LIMDL_TEXTURE_FLAG_MIPMAP)
-	{
-		if (value & LIMDL_TEXTURE_FLAG_BILINEAR)
-		{
-			magfilter = GL_LINEAR;
-			minfilter = GL_LINEAR_MIPMAP_LINEAR;
-		}
-		else
-		{
-			magfilter = GL_NEAREST;
-			minfilter = GL_NEAREST_MIPMAP_NEAREST;
-		}
-	}
-	else
-	{
-		if (self->flags & LIMDL_TEXTURE_FLAG_BILINEAR)
-		{
-			magfilter = GL_LINEAR;
-			minfilter = GL_NEAREST;
-		}
-		else
-		{
-			magfilter = GL_NEAREST;
-			minfilter = GL_NEAREST;
-		}
-	}
-
-	/* Get wrap flags. */
-	if (value & LIMDL_TEXTURE_FLAG_CLAMP)
-	{
-		wraps = GL_CLAMP_TO_EDGE;
-		wrapt = GL_CLAMP_TO_EDGE;
-	}
-	else
-	{
-		wraps = GL_REPEAT;
-		wrapt = GL_REPEAT;
-	}
-
-	/* Update the sampler parameters. */
-	glSamplerParameteri (self->sampler, GL_TEXTURE_MIN_FILTER, minfilter);
-	glSamplerParameteri (self->sampler, GL_TEXTURE_MAG_FILTER, magfilter);
-	glSamplerParameteri (self->sampler, GL_TEXTURE_WRAP_S, wraps);
-	glSamplerParameteri (self->sampler, GL_TEXTURE_WRAP_T, wrapt);
-
-	/* Store the parameters. */
-	self->params.minfilter = minfilter;
-	self->params.magfilter = magfilter;
-	self->params.wraps = wraps;
-	self->params.wrapt = wrapt;
 }
 
 void liren_texture_set_image (

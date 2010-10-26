@@ -283,13 +283,9 @@ void liren_scene_render_deferred_end (
 	glGetIntegerv (GL_VIEWPORT, viewport);
 	matrix = limat_matrix_identity ();
 	textures[0].texture = self->state.framebuffer->diffuse_texture;
-	textures[0].sampler = 0;
 	textures[1].texture = self->state.framebuffer->specular_texture;
-	textures[1].sampler = 0;
 	textures[2].texture = self->state.framebuffer->normal_texture;
-	textures[2].sampler = 0;
 	textures[3].texture = self->state.framebuffer->depth_texture;
-	textures[3].sampler = 0;
 	liren_context_set_flags (self->state.context, LIREN_FLAG_LIGHTING | LIREN_FLAG_TEXTURING);
 	liren_context_set_cull (self->state.context, 0, GL_CCW);
 	liren_context_set_depth (self->state.context, 0, 0, GL_LEQUAL);

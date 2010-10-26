@@ -31,7 +31,6 @@ typedef struct _LIRenContextTexture LIRenContextTexture;
 struct _LIRenContextTexture
 {
 	GLuint texture;
-	GLuint sampler;
 };
 
 struct _LIRenContext

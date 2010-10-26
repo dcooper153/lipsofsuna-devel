@@ -31,19 +31,18 @@
  */
 int livid_video_init ()
 {
-	GLint tmp;
 	GLenum error;
 
-        /* Initialize GLEW. */
-        error = glewInit ();
-        if (error != GLEW_OK)
-        {
-                lisys_error_set (LISYS_ERROR_UNKNOWN, "%s", glewGetErrorString (error));
-                return 0;
-        }
+	/* Initialize GLEW. */
+	error = glewInit ();
+	if (error != GLEW_OK)
+	{
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "%s", glewGetErrorString (error));
+		return 0;
+	}
 
 	/* Get capabilities. */
-	if (!GLEW_VERSION_3_3)
+	if (!GLEW_VERSION_3_2)
 	{
 		lisys_error_set (EINVAL, "OpenGL 3.3 isn't supported by your graphics card");
 		return 0;

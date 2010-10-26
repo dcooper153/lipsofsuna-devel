@@ -202,7 +202,6 @@ void liren_material_set_texture (
 	self->textures.array[index].type = texture->type;
 	self->textures.array[index].width = texture->width;
 	self->textures.array[index].height = texture->height;
-	liren_texture_set_flags (self->textures.array + index, texture->flags);
 	liren_texture_set_image (self->textures.array + index, image);
 }
 
