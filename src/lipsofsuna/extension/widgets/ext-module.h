@@ -22,20 +22,13 @@
 #include <lipsofsuna/widget.h>
 #include <lipsofsuna/extension.h>
 
-#define LIEXT_SCRIPT_BUTTON "Button"
-#define LIEXT_SCRIPT_ENTRY "Entry"
-#define LIEXT_SCRIPT_GROUP "Group"
-#define LIEXT_SCRIPT_IMAGE "Image"
-#define LIEXT_SCRIPT_SCENE "Scene"
-#define LIEXT_SCRIPT_SCROLL "Scroll"
-#define LIEXT_SCRIPT_VIEW "View"
 #define LIEXT_SCRIPT_WIDGET "Widget"
 #define LIEXT_SCRIPT_WIDGETS "Widgets"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
-	LICalHandle calls[5];
+	LICalHandle calls[3];
 	LICliClient* client;
 	LIMaiProgram* program;
 	LIWdgManager* widgets;
@@ -51,34 +44,6 @@ void liext_widgets_callback_paint (
 	LIScrData* data);
 
 /*****************************************************************************/
-
-void
-liext_script_button (LIScrClass* self,
-                   void*       data);
-
-void
-liext_script_entry (LIScrClass* self,
-                  void*       data);
-
-void liext_script_group (
-	LIScrClass* self,
-	void*       data);
-
-void
-liext_script_image (LIScrClass* self,
-                  void*       data);
-
-void liext_script_scene (
-	LIScrClass* self,
-	void*       data);
-
-void
-liext_script_scroll (LIScrClass* self,
-                   void*       data);
-
-void
-liext_script_view (LIScrClass* self,
-                 void*       data);
 
 void liext_script_widget (
 	LIScrClass* self,

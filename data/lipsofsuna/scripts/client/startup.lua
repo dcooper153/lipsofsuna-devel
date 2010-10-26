@@ -14,13 +14,13 @@ Startup.init = function(clss)
 	Startup.mode = args[1] or "--host"
 	Startup.host = args[2] or "localhost"
 	Startup.port = tonumber(args[3] or "10101")
-	clss.group = Group{cols = 3, rows = 3, behind = true, fullscreen = true, style = "mainmenu"}
+	clss.group = Widgets.Background{cols = 3, rows = 3, behind = true, fullscreen = true, image = "mainmenu1"}
 	clss.group:set_expand{col = 1, row = 1}
 	clss.group:set_expand{col = 3}
-	clss.text = Button{style = "label"}
-	clss.button_retry = Button{style = "mainmenu-label", text = "Retry", pressed = function() clss:execute() end, visible = false}
-	clss.button_quit = Button{style = "mainmenu-label", text = "Quit", pressed = function() Program:shutdown() end}
-	clss.group2 = Group{rows = 1, margins = {bottom=30}, spacings = {horz=40}}
+	clss.text = Widgets.Label()
+	clss.button_retry = Widgets.Label{font = "mainmenu", text = "Retry", pressed = function() clss:execute() end, visible = false}
+	clss.button_quit = Widgets.Label{font = "mainmenu", text = "Quit", pressed = function() Program:shutdown() end}
+	clss.group2 = Widget{rows = 1, margins = {bottom=30}, spacings = {horz=40}}
 	clss.group2:append_col(clss.button_retry)
 	clss.group2:append_col(clss.button_quit)
 	clss.group:set_child{col = 2, row = 2, widget = clss.text}

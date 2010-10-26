@@ -35,11 +35,11 @@ Chargen.init = function(clss)
 	for k,v in ipairs(clss.list_hair_colors) do
 		table.insert(hair_colors, {v[1], function() Chargen:set_hair_color(k) end})
 	end
-	clss.label_race = Button{style = "label", text = "Race:"}
+	clss.label_race = Widgets.Label{text = "Race:"}
 	clss.combo_race = Widgets.ComboBox(races)
-	clss.label_gender = Button{style = "label", text = "Gender:"}
+	clss.label_gender = Widgets.Label{text = "Gender:"}
 	clss.combo_gender = Widgets.ComboBox(genders)
-	clss.label_hair_style = Button{style = "label", text = "Hair:"}
+	clss.label_hair_style = Widgets.Label{text = "Hair:"}
 	clss.combo_hair_style = Widgets.ComboBox(hair_styles)
 	clss.combo_hair_color = Widgets.ComboBox(hair_colors)
 	-- TODO: Apperance sliders.
@@ -49,7 +49,7 @@ Chargen.init = function(clss)
 	clss.light = Light{ambient = {1.0,1.0,1.0,0.3}, diffuse={1.0,1.0,1.0,1.0}, equation={3,0.3,0.03}}
 	clss.camera = Camera{far = 60.0, near = 0.3, mode = "first-person"}
 	clss.timer = Timer{enabled = false, func = function(self, secs) clss:update(secs) end}
-	clss.preview = Group{cols = 1, behind = true, fullscreen = true}
+	clss.preview = Widget{cols = 1, behind = true, fullscreen = true}
 	clss.preview.margins = {5,5,5,5}
 	clss.preview.render = function(self)
 		clss.camera.viewport = {self.x, self.y, self.width, self.height}
@@ -66,15 +66,15 @@ Chargen.init = function(clss)
 		clss.scene:draw_end()
 	end
 	-- Apply and quit buttons.
-	clss.button_create = Button{text = "Create", pressed = function() clss:apply() end}
-	clss.button_quit = Button{text = "Quit", pressed = function() clss:quit() end}
+	clss.button_create = Widgets.Button{text = "Create", pressed = function() clss:apply() end}
+	clss.button_quit = Widgets.Button{text = "Quit", pressed = function() clss:quit() end}
 	-- Packing.
-	clss.group_hair = Group{rows = 1, cols = 2, homogeneous = true}
+	clss.group_hair = Widget{rows = 1, cols = 2, homogeneous = true}
 	clss.group_hair:set_child{row = 1, col = 1, widget = clss.combo_hair_style}
 	clss.group_hair:set_child{row = 1, col = 2, widget = clss.combo_hair_color}
 	clss.group_hair:set_expand{col = 1}
 	clss.group_hair:set_expand{col = 2}
-	clss.group_race = Group{rows = 3, cols = 2, homogeneous = true}
+	clss.group_race = Widget{rows = 3, cols = 2, homogeneous = true}
 	clss.group_race:set_child{row = 1, col = 1, widget = clss.label_race}
 	clss.group_race:set_child{row = 1, col = 2, widget = clss.combo_race}
 	clss.group_race:set_child{row = 2, col = 1, widget = clss.label_gender}
@@ -83,8 +83,8 @@ Chargen.init = function(clss)
 	clss.group_race:set_child{row = 3, col = 2, widget = clss.group_hair}
 	clss.group_race:set_expand{col = 2}
 	clss.group_race:set_request{width = 300}
-	clss.group_left = Group{cols = 1}
-	clss.group_left:append_row(Button{style = "inventory-label", text = "Create character"})
+	clss.group_left = Widget{cols = 1}
+	clss.group_left:append_row(Widgets.Label{text = "Create character", font = "medium"})
 	clss.group_left:append_row(clss.group_race)
 	clss.group_left:append_row(clss.button_create)
 	clss.group_left:append_row(clss.button_quit)

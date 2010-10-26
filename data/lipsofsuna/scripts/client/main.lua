@@ -49,15 +49,25 @@ require "content/obstacles"
 require "content/patterns"
 require "content/quests"
 require "content/species"
+require "client/widgets/background"
+require "client/widgets/button"
 require "client/widgets/combobox"
+require "client/widgets/dialogchoice"
+require "client/widgets/dialoglabel"
+require "client/widgets/entry"
+require "client/widgets/equipment"
+require "client/widgets/icon"
+require "client/widgets/iconbutton"
+require "client/widgets/itembutton"
+require "client/widgets/itemlist"
+require "client/widgets/label"
 require "client/widgets/listwidget"
 require "client/widgets/log"
 require "client/widgets/menu"
 require "client/widgets/menuitem"
 require "client/widgets/menus"
-require "client/widgets/iconbutton"
-require "client/widgets/itembutton"
-require "client/widgets/itemlist"
+require "client/widgets/popup"
+require "client/widgets/progress"
 require "client/widgets/questinfo"
 require "client/widgets/skillcontrol"
 require "client/theme"
@@ -99,6 +109,13 @@ require "client/shaders/tilenfn"
 require "client/shaders/tilenxz"
 require "client/shaders/widget"
 
+Eventhandler{type = "keypress", func = function(self, args)
+	local w = Widgets.focused_widget_prev
+	if w and w.event then
+		w:event(args)
+	end
+end}
+
 Eventhandler{type = "quit", func = function(self, args)
 	Program.quit = true
 end}
@@ -131,4 +148,15 @@ while not Program.quit do
 	Client:clear_buffer()
 	Widgets:draw()
 	Client:swap_buffers()
+	-- Focus widgets.
+	local w = Widgets.focused_widget
+	if Widgets.focused_widget_prev ~= w then
+		if Widgets.focused_widget_prev then
+			Widgets.focused_widget_prev.focused = false
+		end
+		if w then
+			w.focused = true
+		end
+		Widgets.focused_widget_prev = w
+	end
 end

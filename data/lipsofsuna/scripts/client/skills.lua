@@ -3,13 +3,13 @@ Skills.dict_row = {}
 Skills.dict_id = {}
 
 Skills.init = function(clss)
-	local dialog = Group{cols = 2, rows = 2}
+	local dialog = Widget{cols = 2, rows = 2}
 	dialog.list = Widgets.List()
 	dialog.list.pressed = function(view, row) Skills:show(row) end
-	dialog.skill_name = Button{style = "inventory-label"}
-	dialog.skill_desc = Button{style = "label"}
+	dialog.skill_name = Widgets.Label{font = "medium"}
+	dialog.skill_desc = Widgets.Label()
 	dialog.skill_desc:set_request{width = 300}
-	dialog.group2 = Group{cols = 1, rows = 3}
+	dialog.group2 = Widget{cols = 1, rows = 3}
 	dialog.group2:set_expand{row = 3}
 	dialog.group2:set_child{col = 1, row = 1, widget = dialog.skill_name}
 	dialog.group2:set_child{col = 1, row = 2, widget = dialog.skill_desc}
@@ -31,6 +31,8 @@ Skills.add = function(clss, id, name, desc)
 		cap = 0, desc = desc, id = id, index = index,
 		max = 100, name = name, text = name, value = 0,
 		pressed = function(self)
+			local v = self:get_value_at(Client.cursor_pos)
+			if v then self.cap = v end
 			Skills:show(self.index)
 			Skills:changed(self.index)
 		end}
@@ -46,7 +48,7 @@ Skills.changed = function(clss, index)
 	local skill = clss.dict_row[index]
 	if not skill then return end
 	Network:send{packet = Packet(packets.SKILLS,
-		"string", skill.id, "float", skill.value)}
+		"string", skill.id, "float", skill.cap)}
 end
 
 --- Shows s skill.
@@ -81,11 +83,11 @@ Skills.update = function(clss, id, value, cap)
 		skill.cap = cap
 		skill.max = spec and spec.max or 100
 		if id == "health" then
-			Gui.skill_health.reference = cap
+			Gui.skill_health.cap = cap
 			Gui.skill_health.value = value
 		end
 		if id == "willpower" then
-			Gui.skill_mana.reference = cap
+			Gui.skill_mana.cap = cap
 			Gui.skill_mana.value = value
 		end
 	end

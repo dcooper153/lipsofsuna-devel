@@ -151,9 +151,10 @@ Timer{delay = 0.2, func = function()
 		-- Ray pick an object in front of the player.
 		local p,o = Target:pick_look{ignore = ignore}
 		if o then
-			Gui.label_target.text = "Use " .. (o.name or "")
+			local s = o.name and o.name ~= "" and (" " .. o.name)
+			Gui:set_target_text("Use" .. (s or ""))
 		else
-			Gui.label_target.text = ""
+			Gui:set_target_text()
 		end
 		Target.target_object = o
 	else

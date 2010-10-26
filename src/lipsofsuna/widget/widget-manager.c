@@ -24,12 +24,8 @@
 
 #include <lipsofsuna/string.h>
 #include <lipsofsuna/system.h>
-#include "widget-group.h"
+#include "widget.h"
 #include "widget-manager.h"
-
-#define BORDERW 3 // FIXME
-#define BORDERH 3 // FIXME
-#define TITLEBARH 16 // FIXME
 
 enum
 {
@@ -210,7 +206,7 @@ liwdg_manager_cycle_focus (LIWdgManager* self,
 	/* Focus next or previous widget. */
 	for (widget = focus ; widget->parent != NULL ; widget = widget->parent)
 	{
-		tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget->parent), widget, next);
+		tmp = liwdg_widget_cycle_focus (widget->parent, widget, next);
 		if (tmp != NULL)
 		{
 			liwdg_manager_set_focus (self, tmp);
@@ -219,7 +215,7 @@ liwdg_manager_cycle_focus (LIWdgManager* self,
 	}
 
 	/* Focus first or last widget. */
-	tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, next);
+	tmp = liwdg_widget_cycle_focus (widget, NULL, next);
 	if (tmp != NULL)
 		liwdg_manager_set_focus (self, tmp);
 }
@@ -231,60 +227,31 @@ liwdg_manager_cycle_window_focus (LIWdgManager* self,
 	private_cycle_window (self, next);
 }
 
-LIFntFont*
-liwdg_manager_find_font (LIWdgManager* self,
-                         const char*   name)
+LIFntFont* liwdg_manager_find_font (
+	LIWdgManager* self,
+	const char*   name)
 {
 	return lialg_strdic_find (self->styles->fonts, name);
 }
 
-LIWdgStyle*
-liwdg_manager_find_style (LIWdgManager* self,
-                          const char*   style,
-                          const char*   state)
+LIImgTexture* liwdg_manager_find_image (
+	LIWdgManager* self,
+	const char*   name)
 {
-	int len0;
-	int len1;
-	char* full;
-	LIWdgStyle* style_ = NULL;
-
-	if (style != NULL)
-	{
-		if (state != NULL)
-		{
-			len0 = strlen (style);
-			len1 = strlen (state);
-			full = lisys_calloc (len0 + len1 + 2, sizeof (char));
-			if (full != NULL)
-			{
-				strcpy (full, style);
-				strcpy (full + len0 + 1, state);
-				full[len0] = ':';
-				style_ = lialg_strdic_find (self->styles->subimgs, full);
-				lisys_free (full);
-			}
-			if (style_ == NULL)
-				style_ = lialg_strdic_find (self->styles->subimgs, style);
-		}
-		else
-			style_ = lialg_strdic_find (self->styles->subimgs, style);
-	}
-
-	return style_;
+	return liwdg_styles_load_image (self->styles, name);
 }
 
 /**
  * \brief Finds a widget by screen position.
- *
  * \param self Widget manager.
  * \param x Screen X coordinate.
  * \param y Screen Y coordinate.
  * \return Widget or NULL.
  */
-LIWdgWidget*
-liwdg_manager_find_widget_by_point (LIWdgManager* self,
-                                    int           x,
-                                    int           y)
+LIWdgWidget* liwdg_manager_find_widget_by_point (
+	LIWdgManager* self,
+	int           x,
+	int           y)
 {
 	int match;
 	LIWdgWidget* widget;
@@ -296,9 +263,9 @@ liwdg_manager_find_widget_by_point (LIWdgManager* self,
 		return NULL;
 
 	/* Find widget. */
-	while (liwdg_widget_typeis (widget, liwdg_widget_container ()))
+	while (1)
 	{
-		child = liwdg_container_child_at (LIWDG_CONTAINER (widget), x, y);
+		child = liwdg_widget_child_at (widget, x, y);
 		if (child == NULL)
 			break;
 		widget = child;
@@ -626,7 +593,6 @@ liwdg_manager_update (LIWdgManager* self,
 	{
 		self->widgets.iter = widget->next;
 		private_resize_window (self, widget);
-		liwdg_widget_update (widget, secs);
 	}
 }
 
@@ -812,21 +778,21 @@ private_cycle_window (LIWdgManager* self,
 		/* Check if this one is it. */
 		if (liwdg_widget_get_visible (widget))
 		{
-			if (liwdg_widget_typeis (widget, liwdg_widget_container ()))
+			if (liwdg_widget_get_focusable (widget))
 			{
-				tmp = liwdg_container_cycle_focus (LIWDG_CONTAINER (widget), NULL, next);
+				private_focus_window (self, widget);
+				liwdg_manager_set_focus (self, widget);
+				return 1;
+			}
+			else
+			{
+				tmp = liwdg_widget_cycle_focus (widget, NULL, next);
 				if (tmp != NULL)
 				{
 					private_focus_window (self, widget);
 					liwdg_manager_set_focus (self, tmp);
 					return 1;
 				}
-			}
-			else if (liwdg_widget_get_focusable (widget))
-			{
-				private_focus_window (self, widget);
-				liwdg_manager_set_focus (self, widget);
-				return 1;
 			}
 		}
 

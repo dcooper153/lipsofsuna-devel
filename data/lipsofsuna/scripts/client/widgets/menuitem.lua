@@ -1,44 +1,47 @@
-Widgets.MenuItem = Class(Group)
+require "client/widgets/label"
 
-Widgets.MenuItem.getter = function(self, key)
-	if key == "arrow" then
-		return self.child_arrow.text == ">"
-	elseif key == "icon" then
-		return self.child_image.style
-	elseif key == "text" then
-		return self.child_text.text
-	else
-		return Group.getter(self, key)
-	end
-end
+Widgets.MenuItem = Class(Widgets.Label)
 
 Widgets.MenuItem.setter = function(self, key, value)
 	if key == "arrow" then
-		self.child_arrow.text = value and ">" or "   "
-	elseif key == "icon" then
-		self.child_image.style = value
-	elseif key == "text" then
-		self.child_text.text = value
+		if self.arrow ~= value then
+			Widgets.Label.setter(self, key, value)
+			self:reshaped()
+		end
 	else
-		Group.setter(self, key, value)
+		Widgets.Label.setter(self, key, value)
 	end
 end
 
 Widgets.MenuItem.new = function(clss, args)
-	local self = Group.new(clss)
-	self.style = "menuitem"
-	self.rows = 1
-	self.child_image = Image{style = "menuitem-icon", pressed = function() self:pressed() end}
-	self.child_text = Button{style = "menuitem-label", pressed = function() self:pressed() end}
-	self.child_arrow = Button{style = "menuitem-arrow", pressed = function() self:pressed() end}
-	self.child_arrow.text = "   "
-	self:append_col(self.child_image)
-	self:append_col(self.child_text)
-	self:append_col(self.child_arrow)
-	self:set_expand{col = 2}
-	for k,v in pairs(args) do self[k] = v end
+	local self = Widgets.Label.new(clss, args)
 	return self
 end
 
-Widgets.MenuItem.pressed = function(self, args)
+Widgets.MenuItem.reshaped = function(self)
+	self:set_request{
+		font = self.font,
+		internal = true,
+		paddings = {2,2,2,2},
+		text = (self.text or "") .. "  >"}
+	local w = self.width
+	local h = self.height
+	self:canvas_clear()
+	self:canvas_text{
+		dest_position = {0,0},
+		dest_size = {w,h},
+		text = self.text,
+		text_alignment = {self.halign,self.valign},
+		text_color = self.focused and {1,1,0,1} or {1,1,1,1},
+		text_font = self.font}
+	if self.arrow then
+		self:canvas_text{
+			dest_position = {0,0},
+			dest_size = {w,h},
+			text = ">",
+			text_alignment = {1,self.valign},
+			text_color = self.focused and {1,1,0,1} or {1,1,1,1},
+			text_font = self.font}
+	end
+	self:canvas_compile()
 end

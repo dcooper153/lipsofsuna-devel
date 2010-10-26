@@ -18,19 +18,17 @@
 #ifndef __WIDGET_STYLES_H__
 #define __WIDGET_STYLES_H__
 
+#include <lipsofsuna/font.h>
 #include <lipsofsuna/image.h>
 #include <lipsofsuna/system.h>
-#include "widget-style.h"
 #include "widget-types.h"
 
 struct _LIWdgStyles
 {
 	char* root;
 	LIWdgManager* manager;
-	LIWdgStyle fallback;
 	LIAlgStrdic* fonts;
 	LIAlgStrdic* images;
-	LIAlgStrdic* subimgs;
 };
 
 LIAPICALL (LIWdgStyles*, liwdg_styles_new, (
@@ -40,14 +38,14 @@ LIAPICALL (LIWdgStyles*, liwdg_styles_new, (
 LIAPICALL (void, liwdg_styles_free, (
 	LIWdgStyles* self));
 
-LIAPICALL (int, liwdg_styles_add_font, (
+LIAPICALL (LIFntFont*, liwdg_styles_load_font, (
 	LIWdgStyles* self,
 	const char*  name,
-	LIArcReader* reader));
+	const char*  file,
+	int          size));
 
-LIAPICALL (int, liwdg_styles_add_widget, (
+LIAPICALL (LIImgTexture*, liwdg_styles_load_image, (
 	LIWdgStyles* self,
-	const char*  name,
-	LIArcReader* reader));
+	const char*  name));
 
 #endif

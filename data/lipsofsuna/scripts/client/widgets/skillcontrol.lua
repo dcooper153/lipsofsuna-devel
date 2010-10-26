@@ -1,53 +1,121 @@
-Widgets.SkillControl = Class(Group)
-
-Widgets.SkillControl.getter = function(self, key)
-	if key == "cap" then
-		return self.child_scroll.reference
-	elseif key == "icon" then
-		return self.child_image.style
-	elseif key == "text" then
-		return self.child_text.text
-	elseif key == "value" then
-		return self.child_scroll.value
-	else
-		return Group.getter(self, key)
-	end
-end
+Widgets.SkillControl = Class(Widget)
 
 Widgets.SkillControl.setter = function(self, key, value)
 	if key == "cap" then
-		self.child_scroll.reference = value
+		if self.cap ~= value then
+			Widget.setter(self, key, value)
+			self:reshaped()
+		end
+	elseif key == "compact" then
+		if self.compact ~= value then
+			Widget.setter(self, key, value)
+			self:reshaped()
+		end
 	elseif key == "icon" then
-		self.child_image.style = value
+		if self.icon ~= value then
+			Widget.setter(self, key, value)
+			self:reshaped()
+		end
 	elseif key == "max" then
-		Group.setter(self, key, value)
-		self.child_scroll:set_range{min = 0, max = self.max}
-		self.child_scroll:set_request{width = self.max}
+		if self.max ~= value then
+			Widget.setter(self, key, value)
+			self:reshaped()
+		end
 	elseif key == "text" then
-		self.child_text.text = value
+		if self.text ~= value then
+			Widget.setter(self, key, value)
+			self:reshaped()
+		end
 	elseif key == "value" then
-		self.child_scroll.value = value
+		if self.value ~= value then
+			Widget.setter(self, key, value)
+			self:reshaped()
+		end
 	else
-		Group.setter(self, key, value)
+		Widget.setter(self, key, value)
 	end
 end
 
 Widgets.SkillControl.new = function(clss, args)
-	local self = Group.new(clss, {rows = 1})
-	self.child_image = Image{style = "image", pressed = function() self:pressed() end}
-	self.child_image:set_request{width = 32}
-	self.child_text = Button{style = "label", pressed = function() self:pressed() end}
-	self.child_text:set_request{width = 80}
-	self.child_scroll = Scroll{reference = 100, pressed = function() self:pressed() end}
-	self.child_scroll:set_range{min = 0, max = 100}
-	self:append_col(self.child_image)
-	self:append_col(self.child_text)
-	self:append_col(self.child_scroll)
-	self.spacings = {5, 5}
-	self.max = 100
-	for k,v in pairs(args) do self[k] = v end
+	local self = Widget.new(clss, args)
+	self.cap = self.cap or 0
+	self.max = self.max or 100
+	self.text = self.text or ""
+	self.value = self.value or 0
+	self.init = true
 	return self
 end
 
+Widgets.SkillControl.get_value_at = function(self, point)
+	local p = point - Vector(self.x, self.y)
+	if not self.compact then
+		p = p - Vector(100, 0)
+	end
+	if p.x >= 0 and p.x <= self.max then
+		return math.ceil(p.x)
+	end
+end
+
 Widgets.SkillControl.pressed = function(self)
+end
+
+Widgets.SkillControl.reshaped = function(self)
+	if not self.init then return end
+	local xlbl = 2
+	local xbar = self.compact and 0 or 100
+	self:set_request{
+		font = "tiny",
+		internal = true,
+		width = xbar + 100,
+		height = 16}
+	local w = self.max
+	local h = self.height
+	local c = self.cap / self.max
+	local v = self.value / self.max
+	self:canvas_clear()
+	-- TODO: Icon
+	if v > 0 then
+		self:canvas_image{
+			dest_clip = {xbar,0,v*w,h},
+			dest_position = {xbar,0},
+			dest_size = {w,h},
+			source_image = "widgets1",
+			source_position = {0,115},
+			source_tiling = {7,87,7,4,15,4}}
+	end
+	if c > v then
+		self:canvas_image{
+			dest_clip = {xbar+v*w,0,c*w-v*w,h},
+			dest_position = {xbar,0},
+			dest_size = {w,h},
+			source_image = "widgets1",
+			source_position = {0,140},
+			source_tiling = {7,87,7,4,15,4}}
+	end
+	if c < 1 then
+		self:canvas_image{
+			dest_clip = {xbar+c*w,0,w-c*w,h},
+			dest_position = {xbar,0},
+			dest_size = {w,h},
+			source_image = "widgets1",
+			source_position = {0,65},
+			source_tiling = {7,87,7,4,15,4}}
+	end
+	if not self.compact and self.text ~= "" then
+		self:canvas_text{
+			dest_position = {xlbl,0},
+			dest_size = {xbar,h},
+			text = self.text,
+			text_alignment = {0,0.5},
+			text_color = {1,1,1,1},
+			text_font = "default"}
+	end
+	self:canvas_text{
+		dest_position = {xbar,0},
+		dest_size = {w,h},
+		text = tostring(self.value),
+		text_alignment = {0.5,0.5},
+		text_color = {1,1,1,1},
+		text_font = "tiny"}
+	self:canvas_compile()
 end

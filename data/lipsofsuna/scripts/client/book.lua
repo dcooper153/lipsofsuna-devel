@@ -3,11 +3,11 @@ Book = Class()
 --- Initializes the book UI.
 -- @param clss Book class.
 Book.init = function(clss)
-	clss.dialog = Group{cols = 1, style = "window"}
-	clss.title = Button{style = "label"}
-	clss.text = Button{style = "label", width = 100}
+	clss.dialog = Widgets.Popup{cols = 1}
+	clss.title = Widgets.Label()
+	clss.text = Widgets.Label()
 	clss.text:set_request{width = 300}
-	clss.button = Button{text = "Close", pressed = function() Book.dialog.floating = false end}
+	clss.button = Widgets.Button{text = "Close", pressed = function() Book.dialog.floating = false end}
 	clss.dialog:append_row(clss.title)
 	clss.dialog:append_row(clss.text)
 	clss.dialog:append_row(clss.button)

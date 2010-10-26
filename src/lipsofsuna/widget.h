@@ -19,18 +19,10 @@
 #define __LIPS_WIDGET_H__
 
 #include "widget/widget.h"
-#include "widget/widget-button.h"
-#include "widget/widget-class.h"
-#include "widget/widget-container.h"
-#include "widget/widget-entry.h"
+#include "widget/widget-element.h"
 #include "widget/widget-event.h"
-#include "widget/widget-group.h"
-#include "widget/widget-image.h"
 #include "widget/widget-manager.h"
-#include "widget/widget-scroll.h"
-#include "widget/widget-style.h"
 #include "widget/widget-styles.h"
 #include "widget/widget-types.h"
-#include "widget/widget-view.h"
 
 #endif

@@ -1,5 +1,5 @@
 Inventory = Class()
-Inventory.group = Group{cols = 1, rows = 1, style = "inventory-list"}
+Inventory.group = Widget{cols = 1, rows = 1}
 Inventory.group:set_expand{col = 1, row = 1}
 
 Inventory.setup = function(clss, id, widget)

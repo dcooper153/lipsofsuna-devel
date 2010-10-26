@@ -1,30 +1,14 @@
 require "client/widgets/label"
 
-Widgets.Log = Class(Widgets.Label)
+Widgets.DialogLabel = Class(Widgets.Label)
 
-Widgets.Log.new = function(clss, args)
+Widgets.DialogLabel.new = function(clss, args)
 	local self = Widgets.Label.new(clss, args)
-	self.lines = {"", "", "", "", ""}
+	self.font = "medium"
 	return self
 end
 
-Widgets.Log.append = function(self, args)
-	local l = self.lines
-	-- Scroll up lines.
-	for i = 2,#l do
-		l[i - 1] = l[i]
-	end
-	-- Append the new line.
-	l[#l] = args.text
-	-- Rebuild the text.
-	local t = l[1]
-	for i = 2,#l do
-		t = t .. "\n" .. l[i]
-	end
-	self.text = t
-end
-
-Widgets.Log.reshaped = function(self)
+Widgets.DialogLabel.reshaped = function(self)
 	self:set_request{
 		font = self.font,
 		internal = true,
@@ -38,7 +22,7 @@ Widgets.Log.reshaped = function(self)
 		dest_position = {0,0},
 		dest_size = {w,h},
 		text = self.text,
-		text_alignment = {0,1},
+		text_alignment = {self.halign,self.valign},
 		text_color = {1,1,1,1},
 		text_font = self.font}
 	self:canvas_compile()

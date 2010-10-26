@@ -24,78 +24,331 @@
 
 #include <lipsofsuna/system.h>
 #include "widget.h"
-#include "widget-group.h"
+#include "widget-element.h"
 
-static int
-private_new (LIWdgWidget*      self,
-             const LIWdgClass* clss,
-             LIWdgManager*     manager);
+#define LIWDG_DEFAULT_SPACING 5
 
-static int
-private_init (LIWdgWidget*  self,
-              LIWdgManager* manager);
+enum
+{
+	PRIVATE_REBUILD_CHILDREN = 0x01,
+	PRIVATE_REBUILD_HORZ = 0x02,
+	PRIVATE_REBUILD_REQUEST = 0x04,
+	PRIVATE_REBUILD_VERT = 0x08
+};
 
-static void
-private_free (LIWdgWidget* self);
+static void private_call_attach (
+	LIWdgWidget* self,
+	int          x,
+	int          y);
 
-static int
-private_event (LIWdgWidget* self,
-               LIWdgEvent*  event);
+static void private_call_detach (
+	LIWdgWidget* self,
+	int          x,
+	int          y);
 
-static void
-private_rebuild_style (LIWdgWidget* self);
+static void private_cell_changed (
+	LIWdgWidget* self,
+	int          x,
+	int          y);
+
+static int private_get_col_size (
+	LIWdgWidget* self,
+	int          x);
+
+static void private_rebuild (
+	LIWdgWidget* self,
+	int          flags);
+
+static int private_get_row_size (
+	LIWdgWidget* self,
+	int          y);
 
 /*****************************************************************************/
 
-const LIWdgClass*
-liwdg_widget_widget ()
-{
-	static const LIWdgClass clss =
-	{
-		NULL, "Widget", sizeof (LIWdgWidget),
-		(LIWdgWidgetInitFunc) private_init,
-		(LIWdgWidgetFreeFunc) private_free,
-		(LIWdgWidgetEventFunc) private_event
-	};
-	return &clss;
-}
-
-LIWdgWidget*
-liwdg_widget_new (LIWdgManager*     manager,
-                  const LIWdgClass* clss)
+LIWdgWidget* liwdg_widget_new (
+	LIWdgManager* manager)
 {
 	LIWdgWidget* self;
 
-	self = lisys_calloc (1, clss->size);
+	self = lisys_calloc (1, sizeof (LIWdgWidget));
 	if (self == NULL)
 		return 0;
 	self->manager = manager;
-	self->type = clss;
-	if (!private_new (self, clss, manager))
-		return 0;
+	self->request[1].width = -1;
+	self->request[1].height = -1;
+	self->request[2].width = -1;
+	self->request[2].height = -1;
+	self->visible = 1;
+	self->cols = NULL;
+	self->rows = NULL;
+	self->cells = NULL;
+	self->width = 0;
+	self->height = 0;
+	self->col_expand = 0;
+	self->row_expand = 0;
+	self->col_spacing = LIWDG_DEFAULT_SPACING;
+	self->row_spacing = LIWDG_DEFAULT_SPACING;
+	self->margin_left = 0;
+	self->margin_right = 0;
+	self->margin_top = 0;
+	self->margin_bottom = 0;
+	private_rebuild (self, PRIVATE_REBUILD_REQUEST);
 
 	return self;
 }
 
 /**
  * \brief Frees the widget.
- *
- * This function can be called for all inherited classes.
- *
  * \param self Widget.
  */
-void
-liwdg_widget_free (LIWdgWidget* self)
+void liwdg_widget_free (LIWdgWidget* self)
 {
-	const LIWdgClass* ptr;
+	int x;
+	int y;
 
-	lical_callbacks_call (self->manager->callbacks, self->manager, "widget-free", lical_marshal_DATA_PTR, self);
-	for (ptr = self->type ; ptr != NULL ; ptr = liwdg_class_get_base (ptr))
-	{
-		if (ptr->free != NULL)
-			ptr->free (self);
-	}
+	for (y = 0 ; y < self->height ; y++)
+	for (x = 0 ; x < self->width ; x++)
+		private_call_detach (self, x, y);
+	liwdg_widget_canvas_clear (self);
+	liwdg_widget_detach (self);
+	lisys_free (self->cols);
+	lisys_free (self->rows);
+	lisys_free (self->cells);
 	lisys_free (self);
+}
+
+/**
+ * \brief Appends an empty column to the widget.
+ * \param self Widget.
+ * \return Nonzero on success.
+ */
+int liwdg_widget_append_col (
+	LIWdgWidget* self)
+{
+	return liwdg_widget_set_size (self, self->width + 1, self->height);
+}
+
+/**
+ * \brief Appends an empty row to the widget.
+ * \param self Widget.
+ * \return Nonzero on success.
+ */
+int liwdg_widget_append_row (
+	LIWdgWidget* self)
+{
+	return liwdg_widget_set_size (self, self->width, self->height + 1);
+}
+
+void liwdg_widget_canvas_clear (
+	LIWdgWidget* self)
+{
+	LIWdgElement* elem;
+	LIWdgElement* elem_next;
+
+	for (elem = self->elements ; elem != NULL ; elem = elem_next)
+	{
+		elem_next = elem->next;
+		liwdg_element_free (elem);
+	}
+	self->elements = NULL;
+}
+
+void liwdg_widget_canvas_compile (
+	LIWdgWidget* self)
+{
+	LIWdgElement* elem;
+
+	for (elem = self->elements ; elem != NULL ; elem = elem->next)
+		liwdg_element_update (elem, &self->allocation);
+}
+
+int liwdg_widget_canvas_insert (
+	LIWdgWidget*  self,
+	LIWdgElement* element)
+{
+	LIWdgElement* elem;
+
+	if (self->elements != NULL)
+	{
+		for (elem = self->elements ; elem->next != NULL ; elem = elem->next) {}
+		elem->next = element;
+	}
+	else
+		self->elements = element;
+
+	return 1;
+}
+
+/**
+ * \brief Gets a child widget under the cursor position.
+ *
+ * \param self Container.
+ * \param pixx Cursor position in pixels.
+ * \param pixy Cursor position in pixels.
+ * \return Widget owned by the widget or NULL.
+ */
+LIWdgWidget* liwdg_widget_child_at (
+	LIWdgWidget* self,
+	int          pixx,
+	int          pixy)
+{
+	int x;
+	int y;
+	LIWdgRect rect;
+
+	liwdg_widget_get_allocation (self, &rect);
+	pixx -= rect.x;
+	pixy -= rect.y;
+
+	/* Get column. */
+	for (x = 0 ; x < self->width ; x++)
+	{
+		if (pixx >= self->cols[x].start + self->cols[x].allocation)
+			continue;
+		if (pixx >= self->cols[x].start)
+			break;
+		return NULL;
+	}
+	if (x == self->width)
+		return NULL;
+
+	/* Get row. */
+	for (y = 0 ; y < self->height ; y++)
+	{
+		if (pixy >= self->rows[y].start + self->rows[y].allocation)
+			continue;
+		if (pixy >= self->rows[y].start)
+			break;
+		return NULL;
+	}
+	if (y == self->height)
+		return NULL;
+
+	/* Return the child. */
+	return self->cells[x + y * self->width].child;
+}
+
+/**
+ * \brief Updates the layout after the size of a child has changed.
+ *
+ * \param self Container.
+ * \param child Child widget.
+ */
+void liwdg_widget_child_request (
+	LIWdgWidget* self,
+	LIWdgWidget* child)
+{
+	int x;
+	int y;
+	LIWdgSize size;
+	LIWdgGroupCell* cell;
+
+	for (y = 0 ; y < self->height ; y++)
+	{
+		for (x = 0 ; x < self->width ; x++)
+		{
+			cell = self->cells + x + y * self->width;
+			if (cell->child == child)
+			{
+				size.width = private_get_col_size (self, x);
+				size.height = private_get_row_size (self, y);
+				if (self->cols[x].request != size.width ||
+				    self->rows[y].request != size.height)
+					private_cell_changed (self, x, y);
+				return;
+			}
+		}
+	}
+	lisys_assert (0 && "Invalid child request");
+}
+
+LIWdgWidget* liwdg_widget_cycle_focus (
+	LIWdgWidget* self,
+	LIWdgWidget* curr,
+	int          next)
+{
+	int x = 0;
+	int y = 0;
+	int found;
+	LIWdgWidget* tmp;
+	LIWdgWidget* child;
+
+	/* Find old focused widget. */
+	found = 0;
+	if (curr != NULL)
+	{
+		for (y = self->height - 1 ; y >= 0 ; y--)
+		{
+			for (x = self->width - 1 ; x >= 0 ; x--)
+			{
+				child = self->cells[x + y * self->width].child;
+				if (child == curr)
+				{
+					found = 1;
+					break;
+				}
+			}
+			if (found)
+				break;
+		}
+		lisys_assert (found);
+	}
+
+	/* Find new focused widget. */
+	if (next)
+	{
+		/* Set start position. */
+		if (!found)
+		{
+			x = 0;
+			y = 0;
+		}
+
+		/* Iterate forward. */
+		for ( ; y < self->height ; y++, x = 0)
+		for ( ; x < self->width ; x++)
+		{
+			if (!found)
+			{
+				child = self->cells[x + y * self->width].child;
+				if (child == NULL)
+					continue;
+				tmp = liwdg_widget_cycle_focus (child, NULL, 1);
+				if (tmp != NULL)
+					return tmp;
+			}
+			else
+				found = 0;
+		}
+	}
+	else
+	{
+		/* Set start position. */
+		if (!found)
+		{
+			x = self->width - 1;
+			y = self->height - 1;
+		}
+
+		/* Iterate backward. */
+		for ( ; y >= 0 ; y--, x = self->width - 1)
+		for ( ; x >= 0 ; x--)
+		{
+			if (!found)
+			{
+				child = self->cells[x + y * self->width].child;
+				if (child == NULL)
+					continue;
+				tmp = liwdg_widget_cycle_focus (child, NULL, 0);
+				if (tmp != NULL)
+					return tmp;
+			}
+			else
+				found = 0;
+		}
+	}
+
+	return NULL;
 }
 
 /**
@@ -108,8 +361,8 @@ liwdg_widget_free (LIWdgWidget* self)
  * \param self Widget.
  * \return Nonzero if was detached from something.
  */
-int
-liwdg_widget_detach (LIWdgWidget* self)
+int liwdg_widget_detach (
+	LIWdgWidget* self)
 {
 	int changed = 0;
 
@@ -121,8 +374,7 @@ liwdg_widget_detach (LIWdgWidget* self)
 	}
 	else if (self->parent != NULL)
 	{
-		lisys_assert (liwdg_widget_typeis (self->parent, liwdg_widget_container ()));
-		liwdg_container_detach_child (LIWDG_CONTAINER (self->parent), self);
+		liwdg_widget_detach_child (self->parent, self);
 		lisys_assert (self->parent == NULL);
 		changed = 1;
 	}
@@ -130,15 +382,58 @@ liwdg_widget_detach (LIWdgWidget* self)
 	return changed;
 }
 
-void
-liwdg_widget_draw (LIWdgWidget* self)
+/**
+ * \brief Finds and unparents a child widget.
+ *
+ * \param self Container.
+ * \param child Child widget.
+ */
+void liwdg_widget_detach_child (
+	LIWdgWidget* self,
+	LIWdgWidget* child)
 {
-	LIWdgEvent event;
+	int x;
+	int y;
+	LIWdgGroupCell* cell;
 
-	if (self->visible)
+	for (y = 0 ; y < self->height ; y++)
 	{
-		event.type = LIWDG_EVENT_TYPE_RENDER;
-		self->type->event (self, &event);
+		for (x = 0 ; x < self->width ; x++)
+		{
+			cell = self->cells + x + y * self->width;
+			if (cell->child == child)
+			{
+				liwdg_widget_set_child (self, x, y, NULL);
+				return;
+			}
+		}
+	}
+}
+
+void liwdg_widget_draw (
+	LIWdgWidget* self)
+{
+	int x;
+	int y;
+	LIWdgGroupCell* cell;
+	LIWdgElement* elem;
+
+	/* Paint custom. */
+	lical_callbacks_call (self->manager->callbacks, self, "paint", lical_marshal_DATA_PTR, self);
+
+	/* Paint canvas. */
+	for (elem = self->elements ; elem != NULL ; elem = elem->next)
+		liwdg_element_paint (elem, self->manager);
+
+	/* Paint children. */
+	for (y = 0 ; y < self->height ; y++)
+	{
+		for (x = 0 ; x < self->width ; x++)
+		{
+			cell = self->cells + x + y * self->width;
+			if (cell->child != NULL && cell->child->visible)
+				liwdg_widget_draw (cell->child);
+		}
 	}
 }
 
@@ -149,11 +444,73 @@ liwdg_widget_draw (LIWdgWidget* self)
  * \param event Event.
  * \return Nonzero if passed through unhandled, zero if absorbed by the widget.
  */
-int
-liwdg_widget_event (LIWdgWidget* self,
-                    LIWdgEvent*  event)
+int liwdg_widget_event (
+	LIWdgWidget* self,
+	LIWdgEvent*  event)
 {
-	return self->type->event (self, event);
+	int x = -1;
+	int y = -1;
+	LIWdgWidget* child;
+
+	/* Get cursor position for mouse events. */
+	switch (event->type)
+	{
+		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
+		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
+			x = event->button.x;
+			y = event->button.y;
+			break;
+		case LIWDG_EVENT_TYPE_MOTION:
+			x = event->motion.x;
+			y = event->motion.y;
+			break;
+	}
+
+	/* Propagate the event to a child. */
+	if (x != -1 && liwdg_widget_get_visible (self))
+	{
+		child = liwdg_widget_child_at (self, x, y);
+		if (child != NULL)
+		{
+			if (!liwdg_widget_event (child, event))
+				return 0;
+		}
+	}
+
+	/* Handle the event on our own. */
+	switch (event->type)
+	{
+		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
+			return lical_callbacks_call (self->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self);
+	}
+
+	return 1;
+}
+
+/**
+ * \brief Calls the passed function for each child.
+ * \param self Container.
+ * \param call Function to call.
+ * \param data Data to pass to the function.
+ */
+void liwdg_widget_foreach_child (
+	LIWdgWidget* self,
+	void       (*call)(),
+	void*        data)
+{
+	int x;
+	int y;
+	LIWdgGroupCell* cell;
+
+	for (y = 0 ; y < self->height ; y++)
+	{
+		for (x = 0 ; x < self->width ; x++)
+		{
+			cell = self->cells + x + y * self->width;
+			if (cell->child != NULL)
+				call (data, cell->child);
+		}
+	}
 }
 
 int
@@ -176,6 +533,84 @@ liwdg_widget_insert_callback_full (LIWdgWidget* self,
 	return lical_callbacks_insert (self->manager->callbacks, self, type, priority, func, data, handle);
 }
 
+/**
+ * \brief Inserts an empty column to the widget.
+ * \param self Widget.
+ * \param index Column index.
+ * \return Nonzero on success.
+ */
+int liwdg_widget_insert_col (
+	LIWdgWidget* self,
+	int          index)
+{
+	int x;
+	int y;
+
+	lisys_assert (index >= 0);
+	lisys_assert (index <= self->width);
+
+	/* Resize. */
+	if (!liwdg_widget_set_size (self, self->width + 1, self->height))
+		return 0;
+
+	/* Shift columns. */
+	for (x = self->width - 1 ; x > index ; x--)
+	{
+		self->cols[x] = self->cols[x - 1];
+		for (y = 0 ; y < self->height ; y++)
+			self->cells[x + y * self->width] = self->cells[(x - 1) + y * self->width];
+	}
+
+	/* Clear new column. */
+	memset (self->cols + index, 0, sizeof (LIWdgGroupCol));
+	for (y = 0 ; y < self->height ; y++)
+		self->cells[index + x * self->width].child = NULL;
+
+	/* Rebuild columns. */
+	private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_CHILDREN);
+
+	return 1;
+}
+
+/**
+ * \brief Inserts an empty row to the widget.
+ * \param self Widget.
+ * \param index Row index.
+ * \return Nonzero on success.
+ */
+int liwdg_widget_insert_row (
+	LIWdgWidget* self,
+	int          index)
+{
+	int x;
+	int y;
+
+	lisys_assert (index >= 0);
+	lisys_assert (index <= self->height);
+
+	/* Resize. */
+	if (!liwdg_widget_set_size (self, self->width, self->height + 1))
+		return 0;
+
+	/* Shift rows. */
+	for (y = self->height - 1 ; y > index ; y--)
+	{
+		self->rows[y] = self->rows[y - 1];
+		for (x = 0 ; x < self->width ; x++)
+			self->cells[x + y * self->width] = self->cells[x + (y - 1) * self->width];
+	}
+
+	/* Clear new row. */
+	memset (self->rows + index, 0, sizeof (LIWdgGroupRow));
+	for (x = 0 ; x < self->width ; x++)
+		self->cells[x + index * self->width].child = NULL;
+
+	/* Rebuild rows. */
+	private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
+
+	return 1;
+}
+
 void
 liwdg_widget_move (LIWdgWidget* self,
                    int          x,
@@ -187,116 +622,95 @@ liwdg_widget_move (LIWdgWidget* self,
 }
 
 /**
- * \brief Paints widget graphics.
- *
+ * \brief Removes a column from the widget.
  * \param self Widget.
- * \param rect Rectangle or NULL for the allocation of the widget.
+ * \param index Column index.
  */
-void
-liwdg_widget_paint (LIWdgWidget* self,
-                    LIWdgRect*   rect)
+void liwdg_widget_remove_col (
+	LIWdgWidget* self,
+	int          index)
 {
-	if (self->style == NULL)
-		return;
-	if (rect == NULL)
-		rect = &self->allocation;
-	liwdg_style_paint (self->style, rect);
-}
+	int x;
+	int y;
 
-/**
- * \brief Calls the custom paint method of the widget.
- * \param self Widget.
- */
-void liwdg_widget_paint_custom (
-	LIWdgWidget* self)
-{
-	lical_callbacks_call (self->manager->callbacks, self, "paint", lical_marshal_DATA_PTR, self);
-}
+	lisys_assert (index >= 0);
+	lisys_assert (index < self->width);
 
-/**
- * \brief Translates coordinates from screen space to widget space.
- *
- * Coordinate translation is needed when widgets are inside a scrollable viewport.
- * For example, if a widget wishes to check if screen space pointer coordinates
- * are inside a specific area of the widget, it needs to translate the coordinates
- * first with this function.
- *
- * \param self Widget.
- * \param screenx Coordinates in screen space.
- * \param screeny Coordinates in screen space.
- * \param widgetx Coordinates in widget space.
- * \param widgety Coordinates in widget space.
- */
-void
-liwdg_widget_translate_coords (LIWdgWidget* self,
-                               int          screenx,
-                               int          screeny,
-                               int*         widgetx,
-                               int*         widgety)
-{
-	*widgetx = screenx;
-	*widgety = screeny;
-	if (self->parent != NULL)
-		liwdg_widget_translate_coords (self->parent, screenx, screeny, widgetx, widgety);
-	if (liwdg_widget_typeis (self, liwdg_widget_container ()))
-		liwdg_container_translate_coords (LIWDG_CONTAINER (self), screenx, screeny, widgetx, widgety);
-}
+	/* Delete widgets. */
+	for (y = 0 ; y < self->height ; y++)
+		private_call_detach (self, index, y);
 
-/**
- * \brief Checks if the widget implements the given class.
- *
- * \param self Widget.
- * \param clss Class.
- * \return Nonzero if implements.
- */
-int
-liwdg_widget_typeis (const LIWdgWidget* self,
-                     const LIWdgClass*  clss)
-{
-	const LIWdgClass* ptr;
-
-	for (ptr = self->type ; ptr != NULL ; ptr = liwdg_class_get_base (ptr))
+	/* Shift columns. */
+	for (x = index ; x < self->width - 1 ; x++)
 	{
-		if (clss == ptr)
-			return 1;
+		self->cols[x] = self->cols[x + 1];
+		for (y = 0 ; y < self->height ; y++)
+			self->cells[x + y * self->width] = self->cells[(x + 1) + y * self->width];
 	}
 
-	return 0;
+	/* Clear last column. */
+	for (y = 0 ; y < self->height ; y++)
+		self->cells[(self->width - 1) + y * self->width].child = NULL;
+
+	/* Resize. */
+	liwdg_widget_set_size (self, self->width - 1, self->height);
+
+	/* Rebuild all. */
+	private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
 }
 
 /**
- * \brief Calls the type specific update handler of the widget.
- *
+ * \brief Removes a row from the widget.
  * \param self Widget.
- * \param secs Seconds since last update.
+ * \param index Row index.
  */
-void
-liwdg_widget_update (LIWdgWidget* self,
-                     float        secs)
+void liwdg_widget_remove_row (
+	LIWdgWidget* self,
+	int          index)
 {
-	LIWdgEvent event;
+	int x;
+	int y;
 
-	event.type = LIWDG_EVENT_TYPE_UPDATE;
-	event.update.secs = secs;
-	self->type->event (self, &event);
+	lisys_assert (index >= 0);
+	lisys_assert (index < self->height);
+
+	/* Delete widgets. */
+	for (x = 0 ; x < self->width ; x++)
+		private_call_detach (self, x, index);
+
+	/* Shift rows. */
+	for (y = index ; y < self->height - 1 ; y++)
+	{
+		self->rows[y] = self->rows[y + 1];
+		for (x = 0 ; x < self->width ; x++)
+			self->cells[x + y * self->width] = self->cells[x + (y + 1) * self->width];
+	}
+
+	/* Clear last row. */
+	for (x = 0 ; x < self->width ; x++)
+		self->cells[x + (self->height - 1) * self->width].child = NULL;
+
+	/* Resize. */
+	liwdg_widget_set_size (self, self->width, self->height - 1);
+
+	/* Rebuild all. */
+	private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
 }
 
-void
-liwdg_widget_get_allocation (LIWdgWidget* self,
-                             LIWdgRect*   allocation)
+void liwdg_widget_get_allocation (
+	LIWdgWidget* self,
+	LIWdgRect*   allocation)
 {
 	*allocation = self->allocation;
 }
 
-void
-liwdg_widget_set_allocation (LIWdgWidget* self,
-                             int          x,
-                             int          y,
-                             int          w,
-                             int          h)
+void liwdg_widget_set_allocation (
+	LIWdgWidget* self,
+	int          x,
+	int          y,
+	int          w,
+	int          h)
 {
-	LIWdgEvent event;
-
 	if (self->allocation.x != x ||
 	    self->allocation.y != y ||
 	    self->allocation.width != w ||
@@ -306,20 +720,20 @@ liwdg_widget_set_allocation (LIWdgWidget* self,
 		self->allocation.y = y;
 		self->allocation.width = w;
 		self->allocation.height = h;
-		event.type = LIWDG_EVENT_TYPE_ALLOCATION;
-		liwdg_widget_event (self, &event);
+		private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
+		lical_callbacks_call (self->manager->callbacks, self->manager, "widget-allocation", lical_marshal_DATA_PTR, self);
 	}
 }
 
-int
-liwdg_widget_get_behind (LIWdgWidget* self)
+int liwdg_widget_get_behind (
+	LIWdgWidget* self)
 {
 	return self->behind;
 }
 
-void
-liwdg_widget_set_behind (LIWdgWidget* self,
-                         int          value)
+void liwdg_widget_set_behind (
+	LIWdgWidget* self,
+	int          value)
 {
 	self->behind = value;
 	if (self->floating)
@@ -355,32 +769,144 @@ liwdg_widget_set_behind (LIWdgWidget* self,
 }
 
 /**
- * \brief Gets the rectangle of the contents of the widget.
- *
- * The content rectangle is the allocation of the widget minus style paddings.
- *
+ * \brief Gets the size of a cell.
  * \param self Widget.
- * \param allocation Return location for a rectangle.
+ * \param x Column number.
+ * \param y Row number.
+ * \param rect Return location for the size.
  */
-void
-liwdg_widget_get_content (LIWdgWidget* self,
-                          LIWdgRect*   allocation)
+void liwdg_widget_get_cell_rect (
+	LIWdgWidget* self,
+	int          x,
+	int          y,
+	LIWdgRect*   rect)
 {
-	allocation->x = self->allocation.x + self->style->pad[1];
-	allocation->y = self->allocation.y + self->style->pad[0];
-	allocation->width = self->allocation.width - self->style->pad[1] - self->style->pad[2];
-	allocation->height = self->allocation.height - self->style->pad[0] - self->style->pad[3];
+	liwdg_widget_get_allocation (self, rect);
+	rect->x += self->cols[x].start;
+	rect->y += self->rows[y].start;
+	rect->width = self->cols[x].allocation;
+	rect->height = self->rows[y].allocation;
 }
 
-int
-liwdg_widget_get_floating (LIWdgWidget* self)
+/**
+ * \brief Gets a child widget.
+ * \param self Widget.
+ * \param x Column number.
+ * \param y Row number.
+ * \return Widget owned by the widget or NULL.
+ */
+LIWdgWidget* liwdg_widget_get_child (
+	LIWdgWidget* self,
+	int          x,
+	int          y)
+{
+	lisys_assert (x < self->width);
+	lisys_assert (y < self->height);
+	return self->cells[x + y * self->width].child;
+}
+
+/**
+ * \brief Sets a child widget in the given cell position.
+ * \param self Widget.
+ * \param x Column number.
+ * \param y Row number.
+ * \param child Widget or NULL.
+ */
+void liwdg_widget_set_child (
+	LIWdgWidget* self,
+	int          x,
+	int          y,
+	LIWdgWidget* child)
+{
+	LIWdgGroupCell* cell;
+
+	lisys_assert (x < self->width);
+	lisys_assert (y < self->height);
+
+	/* Check for same widget. */
+	cell = self->cells + x + y * self->width;
+	if (cell->child == child)
+		return;
+
+	/* Detach the old child. */
+	if (cell->child != NULL)
+	{
+		lisys_assert (!cell->child->floating);
+		lisys_assert (cell->child->parent == self);
+		private_call_detach (self, x, y);
+	}
+
+	/* Attach the new child. */
+	cell->child = child;
+	if (child != NULL)
+	{
+		lisys_assert (!child->floating);
+		lisys_assert (child->parent == NULL);
+		child->parent = self;
+		private_call_attach (self, x, y);
+	}
+
+	/* Update the size of the cell. */
+	private_cell_changed (self, x, y);
+}
+
+/**
+ * \brief Gets the column expand status of a column.
+ * \param self Widget.
+ * \param x Column number.
+ * \return Nonzero if the column is set to expand.
+ */
+int liwdg_widget_get_col_expand (
+	LIWdgWidget* self,
+	int          x)
+{
+	return self->cols[x].expand;
+}
+
+/**
+ * \brief Sets the expand attribute of a column.
+ * \param self Widget.
+ * \param x Column number.
+ * \param expand Nonzero if should expand.
+ */
+void liwdg_widget_set_col_expand (
+	LIWdgWidget* self,
+	int          x,
+	int          expand) 
+{
+	if (self->cols[x].expand != expand)
+	{
+		if (expand)
+			self->col_expand++;
+		else
+			self->col_expand--;
+		self->cols[x].expand = expand;
+		private_rebuild (self, PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_CHILDREN);
+	}
+}
+
+/**
+ * \brief Gets the allocation of a column in pixels.
+ * \param self Widget.
+ * \param x Column number.
+ * \return Horizontal allocation of the column in pixels.
+ */
+int liwdg_widget_get_col_size (
+	LIWdgWidget* self,
+	int          x)
+{
+	return self->cols[x].allocation;
+}
+
+int liwdg_widget_get_floating (
+	LIWdgWidget* self)
 {
 	return self->floating;
 }
 
-void
-liwdg_widget_set_floating (LIWdgWidget* self,
-                           int          value)
+void liwdg_widget_set_floating (
+	LIWdgWidget* self,
+	int          value)
 {
 	liwdg_widget_detach (self);
 	if (value)
@@ -398,80 +924,64 @@ liwdg_widget_set_floating (LIWdgWidget* self,
 	}
 }
 
-int
-liwdg_widget_get_focusable (LIWdgWidget* self)
+int liwdg_widget_get_focusable (
+	LIWdgWidget* self)
 {
 	return self->focusable;
 }
 
-void
-liwdg_widget_set_focusable (LIWdgWidget* self,
-                            int          focusable)
+void liwdg_widget_set_focusable (
+	LIWdgWidget* self,
+	int          value)
 {
-	self->focusable = focusable;
+	self->focusable = value;
 }
 
 /**
  * \brief Gets the focus state of the widget.
- *
  * \param self Widget.
  * \return Nonzero if the widget has focus.
  */
-int
-liwdg_widget_get_focused (LIWdgWidget* self)
+int liwdg_widget_get_focused (
+	LIWdgWidget* self)
 {
 	return (liwdg_manager_get_focus (self->manager) == self);
 }
 
 /**
  * \brief Gives focus to the widget.
- *
  * \param self Widget.
  */
-void
-liwdg_widget_set_focused (LIWdgWidget* self)
+void liwdg_widget_set_focused (
+	LIWdgWidget* self)
 {
 	if (liwdg_manager_get_focus (self->manager) != self &&
 	    liwdg_widget_get_visible (self))
 		liwdg_manager_set_focus (self->manager, self);
 }
 
-/**
- * \brief Gets the font provided by the style of the widget.
- *
- * \param self Widget.
- * \return Font or NULL.
- */
-LIFntFont*
-liwdg_widget_get_font (const LIWdgWidget* self)
-{
-	if (self->style == NULL)
-		return NULL;
-	return liwdg_manager_find_font (self->manager, self->style->font);
-}
-
-int
-liwdg_widget_get_fullscreen (LIWdgWidget* self)
+int liwdg_widget_get_fullscreen (
+	LIWdgWidget* self)
 {
 	return self->fullscreen;
 }
 
-void
-liwdg_widget_set_fullscreen (LIWdgWidget* self,
-                            int           value)
+void liwdg_widget_set_fullscreen (
+	LIWdgWidget* self,
+	int           value)
 {
 	self->fullscreen = value;
 }
 
-int
-liwdg_widget_get_grab (const LIWdgWidget* self)
+int liwdg_widget_get_grab (
+	const LIWdgWidget* self)
 {
 	return self->manager->widgets.grab == self;
 }
 
-void
-liwdg_widget_set_grab (LIWdgWidget* self,
-                       int          value)
+void liwdg_widget_set_grab (
+	LIWdgWidget* self,
+	int          value)
 {
 	int cx;
 	int cy;
@@ -494,77 +1004,127 @@ liwdg_widget_set_grab (LIWdgWidget* self,
 }
 
 /**
+ * \brief Get the homogeneousness flag.
+ * \param self Widget.
+ * \return value Nonzero if homogeneous.
+ */
+int liwdg_widget_get_homogeneous (
+	const LIWdgWidget* self)
+{
+	return self->homogeneous;
+}
+
+/**
+ * \brief Set the homogeneousness flag.
+ * \param self Widget.
+ * \param value Nonzero if homogeneous.
+ */
+void liwdg_widget_set_homogeneous (
+	LIWdgWidget* self,
+	int          value)
+{
+	self->homogeneous = value;
+	private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
+}
+
+/**
+ * \brief Gets the margins of widget in pixels.
+ * \param self Widget.
+ * \param left Return location for the left margin.
+ * \param right Return location for the right margin.
+ * \param top Return location for the top margin.
+ * \param bottom Return location for the bottom margin.
+ */
+void liwdg_widget_get_margins (
+	LIWdgWidget* self,
+	int*         left,
+	int*         right,
+	int*         top,
+	int*         bottom)
+{
+	if (left != NULL) *left = self->margin_left;
+	if (right != NULL) *right = self->margin_right;
+	if (top != NULL) *top = self->margin_top;
+	if (bottom != NULL) *bottom = self->margin_bottom;
+}
+
+/**
+ * \brief Sets the margins of the widget.
+ * \param self Widget.
+ * \param left Left margin in pixels.
+ * \param right Right margin in pixels.
+ * \param top Top margin in pixels.
+ * \param bottom Bottom margin in pixels.
+ */
+void liwdg_widget_set_margins (
+	LIWdgWidget* self,
+	int          left,
+	int          right,
+	int          top,
+	int          bottom)
+{
+	/* Set margins. */
+	self->margin_left = left;
+	self->margin_right = right;
+	self->margin_top = top;
+	self->margin_bottom = bottom;
+
+	/* Rebuild the layout. */
+	private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
+}
+
+/**
  * \brief Gets the full size request of the widget.
  *
  * Returns the larger of the user and hard size requests, combined with the
  * style paddings of the widget.
  *
  * \param self Widget.
+ * \param level Request level.
  * \param request Return location for the size.
  */
-void
-liwdg_widget_get_request (LIWdgWidget* self,
-                          LIWdgSize*   request)
+void liwdg_widget_get_request (
+	LIWdgWidget* self,
+	LIWdgSize*   request)
 {
-	/* Get ordinary request. */
-	request->width = self->hardrequest.width;
-	request->height = self->hardrequest.height;
-	if (self->userrequest.width != -1)
-		request->width = LIMAT_MAX (request->width, self->userrequest.width);
-	if (self->userrequest.height != -1)
-		request->height = LIMAT_MAX (request->height, self->userrequest.height);
-
-	/* Add style paddings. */
-	request->width += self->style->pad[1] + self->style->pad[2];
-	request->height += self->style->pad[0] + self->style->pad[3];
+	request->width = self->request[0].width;
+	request->height = self->request[0].height;
+	if (self->request[1].width != -1)
+		request->width = LIMAT_MAX (request->width, self->request[1].width);
+	if (self->request[1].height != -1)
+		request->height = LIMAT_MAX (request->height, self->request[1].height);
+	if (self->request[2].width != -1)
+		request->width = LIMAT_MAX (request->width, self->request[2].width);
+	if (self->request[2].height != -1)
+		request->height = LIMAT_MAX (request->height, self->request[2].height);
 }
 
 /**
  * \brief Sets or unsets the user overridden size request of the widget.
  *
  * \param self Widget.
+ * \param level Request level.
  * \param w Width or -1 to unset.
  * \param h Height or -1 to unset.
  */
-void
-liwdg_widget_set_request (LIWdgWidget* self,
-                          int          w,
-                          int          h)
+void liwdg_widget_set_request (
+	LIWdgWidget* self,
+	int          level,
+	int          w,
+	int          h)
 {
-	if (self->userrequest.width != w ||
-	    self->userrequest.height != h)
+	if (self->request[level].width != w ||
+	    self->request[level].height != h)
 	{
-		self->userrequest.width = w;
-		self->userrequest.height = h;
+		self->request[level].width = w;
+		self->request[level].height = h;
 		if (self->parent != NULL)
-			liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
+			liwdg_widget_child_request (self->parent, self);
 	}
 }
 
-/**
- * \brief Sets the internal size request of the widget.
- *
- * \param self Widget.
- * \param w Width.
- * \param h Height.
- */
-void
-liwdg_widget_set_request_internal (LIWdgWidget* self,
-                                   int          w,
-                                   int          h)
-{
-	if (self->hardrequest.width != w ||
-	    self->hardrequest.height != h)
-	{
-		self->hardrequest.width = w;
-		self->hardrequest.height = h;
-		if (self->parent != NULL)
-			liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
-	}
-}
-
-LIWdgWidget*
-liwdg_widget_get_root (LIWdgWidget* self)
+LIWdgWidget* liwdg_widget_get_root (
+	LIWdgWidget* self)
 {
 	LIWdgWidget* widget;
 
@@ -572,198 +1132,641 @@ liwdg_widget_get_root (LIWdgWidget* self)
 	return widget;
 }
 
-void
-liwdg_widget_set_state (LIWdgWidget* self,
-                        const char*  state)
+/**
+ * \brief Gets the row expand status of a row.
+ * \param self Widget.
+ * \param y Row number.
+ * \return Nonzero if the row is set to expand.
+ */
+int liwdg_widget_get_row_expand (
+	LIWdgWidget* self,
+	int          y)
 {
-	char* tmp;
+	return self->rows[y].expand;
+}
 
-	/* Early exit. */
-	if ((self->state_name == NULL && state == NULL) ||
-	    (self->state_name != NULL && state != NULL && !strcmp (state, self->state_name)))
-		return;
-
-	/* Store state name. */
-	if (state != NULL)
+/**
+ * \brief Sets the expand attribute of a row.
+ * \param self Widget.
+ * \param y Row number.
+ * \param expand Nonzero if should expand.
+ */
+void liwdg_widget_set_row_expand (
+	LIWdgWidget* self,
+	int          y,
+	int          expand)
+{
+	if (self->rows[y].expand != expand)
 	{
-		tmp = listr_dup (state);
-		if (tmp != NULL)
+		if (expand)
+			self->row_expand++;
+		else
+			self->row_expand--;
+		self->rows[y].expand = expand;
+		private_rebuild (self, PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
+	}
+}
+
+/**
+ * \brief Gets the allocation of a row in pixels.
+ * \param self Widget.
+ * \param y Row number.
+ * \return Vertical allocation of the row in pixels.
+ */
+int liwdg_widget_get_row_size (
+	LIWdgWidget* self,
+	int          y)
+{
+	return self->rows[y].allocation;
+}
+
+LIScrData* liwdg_widget_get_script (
+	LIWdgWidget* self)
+{
+	return self->script;
+}
+
+void liwdg_widget_set_script (
+	LIWdgWidget* self,
+	LIScrData*   value)
+{
+	self->script = value;
+}
+
+/**
+ * \brief Gets the number of columns and rows.
+ * \param self Widget.
+ * \param cols Return location for the number of columns.
+ * \param rows Return location for the number of rows.
+ */
+void liwdg_widget_get_size (
+	LIWdgWidget* self,
+	int*         cols,
+	int*         rows)
+{
+	if (cols != NULL) *cols = self->width;
+	if (rows != NULL) *rows = self->height;
+}
+
+/**
+ * \brief Sets the number of columns and rows.
+ * \param self Widget.
+ * \param width Number of columns.
+ * \param height Number of rows.
+ * \return Nonzero on success.
+ */
+int liwdg_widget_set_size (
+	LIWdgWidget* self,
+	int          width,
+	int          height)
+{
+	int x;
+	int y;
+	LIWdgGroupCol* mem0 = NULL;
+	LIWdgGroupRow* mem1 = NULL;
+	LIWdgGroupCell* mem2 = NULL;
+
+	/* Allocate memory. */
+	if (width > 0)
+	{
+		mem0 = (LIWdgGroupCol*) lisys_calloc (width, sizeof (LIWdgGroupCol));
+		if (mem0 == NULL)
+			return 0;
+	}
+	if (height > 0)
+	{
+		mem1 = (LIWdgGroupRow*) lisys_calloc (height, sizeof (LIWdgGroupRow));
+		if (mem1 == NULL)
 		{
-			lisys_free (self->state_name);
-			self->state_name = tmp;
+			lisys_free (mem0);
+			return 0;
 		}
 	}
-	else
+	if (width > 0 && height > 0)
 	{
-		lisys_free (self->state_name);
-		self->state_name = NULL;
-	}
-
-	/* Rebuild style. */
-	private_rebuild_style (self);
-}
-
-LIWdgStyle*
-liwdg_widget_get_style (LIWdgWidget* self)
-{
-	return self->style;
-}
-
-void
-liwdg_widget_set_style (LIWdgWidget* self,
-                        const char*  style)
-{
-	char* tmp;
-
-	/* Early exit. */
-	if ((self->style_name == NULL && style == NULL) ||
-	    (self->style_name != NULL && style != NULL && !strcmp (style, self->style_name)))
-		return;
-
-	/* Store style name. */
-	if (style != NULL)
-	{
-		tmp = listr_dup (style);
-		if (tmp != NULL)
+		mem2 = (LIWdgGroupCell*) lisys_calloc (width * height, sizeof (LIWdgGroupCell));
+		if (mem2 == NULL)
 		{
-			lisys_free (self->style_name);
-			self->style_name = tmp;
+			lisys_free (mem0);
+			lisys_free (mem1);
+			return 0;
 		}
 	}
-	else
+
+	/* Free widgets that don't fit. */
+	for (y = 0 ; y < height ; y++)
 	{
-		lisys_free (self->style_name);
-		self->style_name = NULL;
+		for (x = width ; x < self->width ; x++)
+			private_call_detach (self, x, y);
+	}
+	for (y = height ; y < self->height ; y++)
+	{
+		for (x = 0 ; x < self->width ; x++)
+			private_call_detach (self, x, y);
 	}
 
-	/* Rebuild style. */
-	private_rebuild_style (self);
+	/* Copy over the column data. */
+	if (self->width < width)
+		memcpy (mem0, self->cols, self->width * sizeof (LIWdgGroupCol));
+	else
+		memcpy (mem0, self->cols, width * sizeof (LIWdgGroupCol));
+	lisys_free (self->cols);
+	self->cols = mem0;
+
+	/* Copy over the row data. */
+	if (self->height < height)
+		memcpy (mem1, self->rows, self->height * sizeof (LIWdgGroupRow));
+	else
+		memcpy (mem1, self->rows, height * sizeof (LIWdgGroupRow));
+	lisys_free (self->rows);
+	self->rows = mem1;
+
+	/* Copy over the cell data. */
+	for (y = 0 ; y < height && y < self->height ; y++)
+	{
+		for (x = 0 ; x < width && x < self->width ; x++)
+		{
+			mem2[x + y * width].child = self->cells[x + y * self->width].child;
+		}
+	}
+	lisys_free (self->cells);
+	self->cells = mem2;
+	self->width = width;
+	self->height = height;
+
+	/* Update the expansion information. */
+	self->col_expand = 0;
+	self->row_expand = 0;
+	for (x = 0 ; x < width ; x++)
+	{
+		if (self->cols[x].expand)
+			self->col_expand++;
+	}
+	for (y = 0 ; y < height ; y++)
+	{
+		if (self->rows[y].expand)
+			self->row_expand++;
+	}
+
+	/* Update the size request. */
+	private_rebuild (self, PRIVATE_REBUILD_REQUEST);
+	return 1;
 }
 
-int
-liwdg_widget_get_temporary (LIWdgWidget* self)
+/**
+ * \brief Gets the row and column spacings in pixels.
+ * \param self Widget.
+ * \param column Return location for the column spacing.
+ * \param row Return location for the row spacing.
+ */
+void liwdg_widget_get_spacings (
+	LIWdgWidget* self,
+	int*         column,
+	int*         row)
+{
+	if (column != NULL) *column = self->col_spacing;
+	if (row != NULL) *row = self->row_spacing;
+}
+
+/**
+ * \brief Sets row and column spacings.
+ * \param self Widget.
+ * \param column Spacing between columns.
+ * \param row Spacing between rows.
+ */
+void liwdg_widget_set_spacings (
+	LIWdgWidget* self,
+	int          column,
+	int          row)
+{
+	if (self->col_spacing != column &&
+	    self->row_spacing != row)
+	{
+		self->col_spacing = column;
+		self->row_spacing = row;
+		private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
+	}
+	else if (self->col_spacing != column)
+	{
+		self->col_spacing = column;
+		private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_CHILDREN);
+	}
+	else if (self->row_spacing != row)
+	{
+		self->row_spacing = row;
+		private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
+	}
+}
+
+int liwdg_widget_get_temporary (
+	LIWdgWidget* self)
 {
 	return self->temporary;
 }
 
-void
-liwdg_widget_set_temporary (LIWdgWidget* self,
-                            int          value)
+void liwdg_widget_set_temporary (
+	LIWdgWidget* self,
+	int          value)
 {
 	self->temporary = value;
 }
 
-void*
-liwdg_widget_get_userdata (LIWdgWidget* self)
-{
-	return self->userdata;
-}
-
-void
-liwdg_widget_set_userdata (LIWdgWidget* self,
-                           void*        value)
-{
-	self->userdata = value;
-}
-
-int
-liwdg_widget_get_visible (LIWdgWidget* self)
+int liwdg_widget_get_visible (
+	LIWdgWidget* self)
 {
 	return self->visible;
 }
 
-void
-liwdg_widget_set_visible (LIWdgWidget* self,
-                          int          visible)
+void liwdg_widget_set_visible (
+	LIWdgWidget* self,
+	int          visible)
 {
 	self->visible = (visible != 0);
 	if (self->parent != NULL)
-		liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
+		liwdg_widget_child_request (self->parent, self);
 	if (self->floating)
 		liwdg_manager_remove_window (self->manager, self);
 }
 
 /*****************************************************************************/
 
-static int
-private_new (LIWdgWidget*      self,
-             const LIWdgClass* clss,
-             LIWdgManager*     manager)
+static void private_call_attach (
+	LIWdgWidget* self,
+	int          x,
+	int          y)
 {
-	const LIWdgClass* base;
+	LIWdgWidget* child;
 
-	/* Initialization. */
-	base = liwdg_class_get_base (clss);
-	if (base != NULL)
+	child = self->cells[x + y * self->width].child;
+	if (child != NULL)
 	{
-		if (!private_new (self, base, manager))
-			return 0;
+		lisys_assert (self->script != NULL);
+		lisys_assert (child->script != NULL);
+		liscr_data_ref (child->script, self->script);
+	}
+}
+
+static void private_call_detach (
+	LIWdgWidget* self,
+	int          x,
+	int          y)
+{
+	LIWdgWidget* child;
+
+	child = self->cells[x + y * self->width].child;
+	if (child != NULL)
+	{
+		liscr_data_unref (child->script, self->script);
+		child->parent = NULL;
+		self->cells[x + y * self->width].child = NULL;
+	}
+}
+
+static void private_cell_changed (
+	LIWdgWidget* self,
+	int          x,
+	int          y)
+{
+	LIWdgSize size;
+	LIWdgWidget* child;
+
+	/* Get the row and column size requests. */
+	size.width = private_get_col_size (self, x);
+	size.height = private_get_row_size (self, y);
+	child = self->cells[x + y * self->width].child;
+
+	/* Rebuild if the requests have changed. */
+	if (size.width  != self->cols[x].request &&
+	    size.height != self->rows[y].request)
+	{
+		/* Both horizontal and vertical layout changed. */
+		self->cols[x].request = size.width;
+		self->rows[y].request = size.height;
+		private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
+	}
+	else if (size.width != self->cols[x].request)
+	{
+		/* Only vertical layout changed. */
+		self->cols[x].request = size.width;
+		private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_CHILDREN);
+	}
+	else if (size.height != self->rows[y].request)
+	{
+		/* Only horizontal layout changed. */
+		self->rows[y].request = size.height;
+		private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
+	}
+	else if (child != NULL && child->visible)
+	{
+		/* Only set allocation of the widget. */
+		lisys_assert (self->cols[x].allocation >= size.width);
+		lisys_assert (self->rows[y].allocation >= size.height);
+		liwdg_widget_set_allocation (child,
+			self->allocation.x + self->cols[x].start,
+			self->allocation.y + self->rows[y].start,
+			self->cols[x].allocation,
+			self->rows[y].allocation);
+	}
+
+	private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
+}
+
+static int private_get_col_size (
+	LIWdgWidget* self,
+	int          x)
+{
+	int y;
+	int width;
+	LIWdgSize size;
+	LIWdgWidget* child;
+
+	width = 0;
+	for (y = 0 ; y < self->height ; y++)
+	{
+		child = self->cells[x + y * self->width].child;
+		if (child != NULL && child->visible)
+		{
+			liwdg_widget_get_request (child, &size);
+			if (width < size.width)
+				width = size.width;
+		}
+	}
+	return width;
+}
+
+static void private_rebuild (
+	LIWdgWidget* self,
+	int          flags)
+{
+	int x;
+	int y;
+	int wmax;
+	int hmax;
+	int wpad;
+	int hpad;
+	int wreq;
+	int hreq;
+	int start;
+	int expand;
+	LIWdgWidget* child;
+	LIWdgRect rect;
+	LIWdgSize size;
+
+	if (self->rebuilding)
+		return;
+	self->rebuilding = 1;
+
+	if (self->homogeneous)
+	{
+		if (1)
+		{
+			/* Calculate the width request. */
+			wmax = 0;
+			wpad = self->margin_right + self->margin_left;
+			for (x = 0 ; x < self->width ; x++)
+			{
+				if (self->cols[x].request > 0)
+				{
+					if (x != self->width - 1)
+						wpad += self->col_spacing;
+					if (wmax < self->cols[x].request)
+						wmax = self->cols[x].request;
+				}
+			}
+			wreq = wpad + wmax * self->width;
+
+			/* Calculate the height request. */
+			hmax = 0;
+			hpad = self->margin_top + self->margin_bottom;
+			for (y = 0 ; y < self->height ; y++)
+			{
+				if (self->rows[y].request > 0)
+				{
+					if (y != self->height - 1)
+						hpad += self->row_spacing;
+					if (hmax < self->rows[y].request)
+						hmax = self->rows[y].request;
+				}
+			}
+			hreq = hpad + hmax * self->height;
+
+			/* Set the size request. */
+			liwdg_widget_set_request (self, 0, wreq, hreq);
+			liwdg_widget_get_allocation (self, &rect);
+			liwdg_widget_get_request (self, &size);
+			rect.width = LIMAT_MAX (size.width, rect.width);
+			rect.height = LIMAT_MAX (size.height, rect.height);
+			liwdg_widget_set_allocation (self, rect.x, rect.y, rect.width, rect.height);
+		}
+
+		liwdg_widget_get_allocation (self, &rect);
+
+		if (flags & PRIVATE_REBUILD_HORZ)
+		{
+			/* Get horizontal expansion. */
+			if (self->col_expand > 0)
+			{
+				expand = rect.width - wreq;
+				lisys_assert (expand >= 0);
+				expand /= self->width;
+			}
+			else
+				expand = 0;
+
+			/* Set horizontal allocations. */
+			start = self->margin_left;
+			for (x = 0 ; x < self->width ; x++)
+			{
+				self->cols[x].start = start;
+				self->cols[x].allocation = wmax;
+				self->cols[x].allocation += expand;
+				start += self->cols[x].allocation;
+				start += self->col_spacing;
+			}
+		}
+
+		if (flags & PRIVATE_REBUILD_VERT)
+		{
+			/* Get vertical expansion. */
+			if (self->row_expand > 0)
+			{
+				expand = rect.height - hreq;
+				lisys_assert (expand >= 0);
+				expand /= self->height;
+			}
+			else
+				expand = 0;
+
+			/* Set vertical allocations. */
+			start = self->margin_top;
+			for (y = 0 ; y < self->height ; y++)
+			{
+				self->rows[y].start = start;
+				self->rows[y].allocation = hmax;
+				self->rows[y].allocation += expand;
+				start += self->rows[y].allocation;
+				start += self->row_spacing;
+			}
+		}
 	}
 	else
 	{
-		lisys_assert (clss == liwdg_widget_widget ());
+		if (flags & PRIVATE_REBUILD_REQUEST)
+		{
+			/* Calculate the width request. */
+			wreq = self->margin_right + self->margin_left;
+			for (x = 0 ; x < self->width ; x++)
+			{
+				if (self->cols[x].request > 0)
+				{
+					if (x != self->width - 1)
+						wreq += self->col_spacing;
+					wreq += self->cols[x].request;
+				}
+			}
+
+			/* Calculate the height request. */
+			hreq = self->margin_top + self->margin_bottom;
+			for (y = 0 ; y < self->height ; y++)
+			{
+				if (self->rows[y].request > 0)
+				{
+					if (y != self->height - 1)
+						hreq += self->row_spacing;
+					hreq += self->rows[y].request;
+				}
+			}
+
+			/* Set the size request. */
+			liwdg_widget_set_request (self, 0, wreq, hreq);
+			liwdg_widget_get_allocation (self, &rect);
+			liwdg_widget_get_request (self, &size);
+			rect.width = LIMAT_MAX (size.width, rect.width);
+			rect.height = LIMAT_MAX (size.height, rect.height);
+			liwdg_widget_set_allocation (self, rect.x, rect.y, rect.width, rect.height);
+		}
+
+		liwdg_widget_get_allocation (self, &rect);
+
+		if (flags & PRIVATE_REBUILD_HORZ)
+		{
+			/* Get horizontal expansion. */
+			if (self->col_expand > 0)
+			{
+				expand = rect.width - self->margin_left - self->margin_right;
+				lisys_assert (expand >= 0);
+				for (x = 0 ; x < self->width ; x++)
+				{
+					if (self->cols[x].request)
+					{
+						expand -= self->cols[x].request;
+						if (x < self->width - 1)
+							expand -= self->col_spacing;
+					}
+				}
+				lisys_assert (expand >= 0);
+				expand /= self->col_expand;
+			}
+			else
+				expand = 0;
+
+			/* Set horizontal allocations. */
+			start = self->margin_left;
+			for (x = 0 ; x < self->width ; x++)
+			{
+				self->cols[x].start = start;
+				self->cols[x].allocation = self->cols[x].request;
+				if (self->cols[x].expand)
+					self->cols[x].allocation += expand;
+				start += self->cols[x].allocation;
+				if (self->cols[x].request)
+					start += self->col_spacing;
+			}
+		}
+
+		if (flags & PRIVATE_REBUILD_VERT)
+		{
+			/* Get vertical expansion. */
+			if (self->row_expand > 0)
+			{
+				expand = rect.height - self->margin_top - self->margin_bottom;
+				lisys_assert (expand >= 0);
+				for (y = 0 ; y < self->height ; y++)
+				{
+					if (self->rows[y].request)
+					{
+						expand -= self->rows[y].request;
+						if (y < self->height - 1)
+							expand -= self->row_spacing;
+					}
+				}
+				lisys_assert (expand >= 0);
+				expand /= self->row_expand;
+			}
+			else
+				expand = 0;
+
+			/* Set vertical allocations. */
+			start = self->margin_top;
+			for (y = 0 ; y < self->height ; y++)
+			{
+				self->rows[y].start = start;
+				self->rows[y].allocation = self->rows[y].request;
+				if (self->rows[y].expand)
+					self->rows[y].allocation += expand;
+				start += self->rows[y].allocation;
+				if (self->rows[y].request)
+					start += self->row_spacing;
+			}
+		}
 	}
-	if (clss->init == NULL)
-		return 1;
-	if (clss->init (self, manager))
-		return 1;
 
-	/* Error recovery. */
-	if (base != NULL)
-		self->type = base;
-	else
-		self->type = liwdg_widget_widget ();
-	liwdg_widget_free (self);
-
-	return 0;
-}
-
-static int
-private_init (LIWdgWidget*  self,
-              LIWdgManager* manager)
-{
-	self->style = &self->manager->styles->fallback;
-	self->userrequest.width = -1;
-	self->userrequest.height = -1;
-	self->manager = manager;
-	self->visible = 1;
-	return 1;
-}
-
-static void
-private_free (LIWdgWidget* self)
-{
-	lisys_free (self->style_name);
-	lisys_free (self->state_name);
-}
-
-static int
-private_event (LIWdgWidget* self,
-               LIWdgEvent*  event)
-{
-	return 1;
-}
-
-static void
-private_rebuild_style (LIWdgWidget* self)
-{
-	LIWdgEvent event;
-	LIWdgStyle* style;
-
-	/* Find style. */
-	style = liwdg_manager_find_style (self->manager, self->style_name, self->state_name);
-	if (style == NULL)
-		style = &self->manager->styles->fallback;
-
-	/* Set new style and request. */
-	if (self->style != style)
+	if (flags & PRIVATE_REBUILD_CHILDREN)
 	{
-		self->style = style;
-		event.type = LIWDG_EVENT_TYPE_STYLE;
-		self->type->event (self, &event);
-		if (self->parent != NULL)
-			liwdg_container_child_request (LIWDG_CONTAINER (self->parent), self);
+		liwdg_widget_get_allocation (self, &rect);
+
+		/* Set positions of widgets. */
+		for (x = 0 ; x < self->width ; x++)
+		{
+			for (y = 0 ; y < self->height ; y++)
+			{
+				child = self->cells[x + y * self->width].child;
+				if (child != NULL)
+				{
+					liwdg_widget_set_allocation (child,
+						rect.x + self->cols[x].start,
+						rect.y + self->rows[y].start,
+						self->cols[x].allocation,
+						self->rows[y].allocation);
+				}
+			}
+		}
 	}
+
+	self->rebuilding = 0;
+}
+
+static int private_get_row_size (
+	LIWdgWidget* self,
+	int          y)
+{
+	int x;
+	int height;
+	LIWdgSize size;
+	LIWdgWidget* child;
+
+	height = 0;
+	for (x = 0 ; x < self->width ; x++)
+	{
+		child = self->cells[x + y * self->width].child;
+		if (child != NULL && child->visible)
+		{
+			liwdg_widget_get_request (child, &size);
+			if (height < size.height)
+				height = size.height;
+		}
+	}
+	return height;
 }
 
 /** @} */

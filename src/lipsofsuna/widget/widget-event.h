@@ -23,27 +23,18 @@
 
 enum
 {
-	LIWDG_EVENT_TYPE_ALLOCATION,
 	LIWDG_EVENT_TYPE_BUTTON_PRESS,
 	LIWDG_EVENT_TYPE_BUTTON_RELEASE,
-	LIWDG_EVENT_TYPE_CLOSE,
 	LIWDG_EVENT_TYPE_KEY_PRESS,
 	LIWDG_EVENT_TYPE_KEY_RELEASE,
 	LIWDG_EVENT_TYPE_MOTION,
-	LIWDG_EVENT_TYPE_PROBE,
-	LIWDG_EVENT_TYPE_RENDER,
-	LIWDG_EVENT_TYPE_STYLE,
-	LIWDG_EVENT_TYPE_UPDATE,
 	LIWDG_EVENT_TYPE_MAX,
 };
 
 typedef union _LIWdgEvent LIWdgEvent;
-typedef struct _LIWdgEventAllocation LIWdgEventAllocation;
 typedef struct _LIWdgEventButton LIWdgEventButton;
 typedef struct _LIWdgEventKey LIWdgEventKey;
 typedef struct _LIWdgEventMotion LIWdgEventMotion;
-typedef struct _LIWdgEventProbe LIWdgEventProbe;
-typedef struct _LIWdgEventUpdate LIWdgEventUpdate;
 
 struct _LIWdgEventAllocation
 {
@@ -76,28 +67,12 @@ struct _LIWdgEventMotion
 	int buttons;
 };
 
-struct _LIWdgEventProbe
-{
-	int type;
-	const LIWdgClass* clss;
-	void* result;
-};
-
-struct _LIWdgEventUpdate
-{
-	int type;
-	float secs;
-};
-
 union _LIWdgEvent
 {
 	int type;
-	LIWdgEventAllocation allocation;
 	LIWdgEventButton button;
 	LIWdgEventKey key;
 	LIWdgEventMotion motion;
-	LIWdgEventProbe probe;
-	LIWdgEventUpdate update;
 };
 
 #endif

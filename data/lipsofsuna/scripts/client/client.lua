@@ -111,6 +111,7 @@ Player.update_pose = function(clss, secs)
 end
 
 Eventhandler{type = "tick", func = function(self, args)
+	-- Player controls.
 	if Player.object then
 		Player:update_pose(args.secs)
 		Player:update_rotation(args.secs)

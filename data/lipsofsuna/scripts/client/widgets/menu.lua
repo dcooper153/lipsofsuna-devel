@@ -1,7 +1,8 @@
-Widgets.Menu = Class(Group)
+Widgets.Menu = Class(Widget)
 
 Widgets.Menu.new = function(clss, args)
-	local self = Group.new(clss, {cols = 1, style = "menu"})
+	local self = Widget.new(clss)
+	self.cols = 1
 	-- Copy arguments.
 	for k,v in pairs(args or {}) do
 		if type(k) ~= "number" then
@@ -21,7 +22,8 @@ end
 
 Widgets.Menu.append = function(self, args)
 	local row = self.rows + 1
-	local button = Widgets.MenuItem{text = args.text, arrow = args.arrow, pressed = function()
+	local button = Widgets.MenuItem{font = "medium", text = args.text, arrow = args.arrow,
+	pressed = function()
 		if args.widget then Gui.menus:open{level = self.level + 1, widget = args.widget} end
 		if args.pressed then args.pressed(self, row) end
 	end}

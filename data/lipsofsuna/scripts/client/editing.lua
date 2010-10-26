@@ -19,23 +19,23 @@ Editing.init = function(clss)
 		"object",
 		"spawner"}
 	clss.popup_class_button:activate{index = 2}
-	clss.entry_model = Entry()
-	clss.group_object_create = Group{cols = 1}
+	clss.entry_model = Widgets.Entry()
+	clss.group_object_create = Widget{cols = 1}
 	clss.group_object_create:set_expand{col = 1}
-	clss.group_object_create:append_row(Button{style = "label", text = "Type:"})
+	clss.group_object_create:append_row(Widgets.Label{text = "Type:"})
 	clss.group_object_create:append_row(clss.popup_class_button)
-	clss.group_object_create:append_row(Button{style = "label", text = "Model:"})
+	clss.group_object_create:append_row(Widgets.Label{text = "Model:"})
 	clss.group_object_create:append_row(clss.entry_model)
-	clss.group_object_create:append_row(Button{text = "Create", pressed = function()
+	clss.group_object_create:append_row(Widgets.Button{text = "Create", pressed = function()
 		Network:send{packet = Packet(packets.ADMIN_SPAWN,
 			"string", Editing.popup_class_button.text,
 			"string", Editing.entry_model.text)}
 	end})
 
 	-- Deleting objects.
-	clss.group_object_delete = Group{cols = 1}
+	clss.group_object_delete = Widget{cols = 1}
 	clss.group_object_delete:set_expand{col = 1}
-	clss.group_object_delete:append_row(Button{text = "Delete", pressed = function()
+	clss.group_object_delete:append_row(Widgets.Button{text = "Delete", pressed = function()
 		local packet = Packet(packets.ADMIN_DELETE)
 		for k,v in pairs(Object.selected_objects) do
 			packet:write("uint32", v.id)
@@ -44,7 +44,7 @@ Editing.init = function(clss)
 	end})
 
 	-- Creating terrain.
-	clss.preview_terrain = Group{style = "button"}
+	clss.preview_terrain = Widget()
 	clss.preview_terrain:set_request{width = 200, height=200}
 	clss.preview_terrain.scene = Scene()
 	clss.preview_terrain.render = function(self)
@@ -69,30 +69,30 @@ Editing.init = function(clss)
 		clss.spin_terrain:append{text = v}
 	end
 	clss.spin_terrain:activate{index = 1}
-	clss.group_terrain_create = Group{cols = 1}
+	clss.group_terrain_create = Widget{cols = 1}
 	clss.group_terrain_create:set_expand{col = 1}
-	clss.group_terrain_create:append_row(Button{style = "label", text = "Material:"})
+	clss.group_terrain_create:append_row(Widgets.Label{text = "Material:"})
 	clss.group_terrain_create:append_row(clss.spin_terrain)
 	clss.group_terrain_create:append_row(clss.preview_terrain)
-	clss.group_terrain_create:append_row(Button{text = "Create", pressed = function()
+	clss.group_terrain_create:append_row(Widgets.Button{text = "Create", pressed = function()
 		Editing:insert()
 	end})
 
 	-- Deleting terrain.
-	clss.group_terrain_delete = Group{cols = 1}
+	clss.group_terrain_delete = Widget{cols = 1}
 	clss.group_terrain_delete:set_expand{col = 1}
-	clss.group_terrain_delete:append_row(Button{text = "Delete", pressed = function()
+	clss.group_terrain_delete:append_row(Widgets.Button{text = "Delete", pressed = function()
 		Editing:erase()
 	end})
 
 	-- Rotating terrain.
 	clss.spin_rot = Widgets.ComboBox{"x", "y", "z"}
 	clss.spin_rot:activate{index = 2}
-	clss.group_terrain_rotate = Group{cols = 1}
-	clss.group_terrain_rotate:append_row(Button{style = "label", text = "Axis:"})
+	clss.group_terrain_rotate = Widget{cols = 1}
+	clss.group_terrain_rotate:append_row(Widgets.Label{text = "Axis:"})
 	clss.group_terrain_rotate:set_expand{col = 1}
 	clss.group_terrain_rotate:append_row(clss.spin_rot)
-	clss.group_terrain_rotate:append_row(Button{text = "Rotate", pressed = function()
+	clss.group_terrain_rotate:append_row(Widgets.Button{text = "Rotate", pressed = function()
 		Editing:rotate()
 	end})
 
@@ -105,7 +105,7 @@ Editing.init = function(clss)
 		{"Terrain: rotate", function() Editing:set_mode(5) end}}
 
 	-- Packing.
-	clss.dialog = Group{cols = 1, rows = 2}
+	clss.dialog = Widget{cols = 1, rows = 2}
 	clss.dialog.spacings = {0, 20}
 	clss.dialog:set_expand{col = 1}
 	clss.dialog:set_request{width = 200, height = 300}

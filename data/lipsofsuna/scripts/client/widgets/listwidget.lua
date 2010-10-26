@@ -1,8 +1,7 @@
-Widgets.List = Class(Group)
+Widgets.List = Class(Widget)
 
 Widgets.List.new = function(clss, args)
-	local self = Group.new(clss, args)
-	self.style = "view"
+	local self = Widget.new(clss, args)
 	self.cols = 1
 	self.rows = 0
 	self:set_expand{col = 1}

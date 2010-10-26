@@ -9,14 +9,14 @@ Startup.mod = "lipsofsuna"
 -- @param clss Startup class.
 Startup.init = function(clss)
 	if not Startup.group then
-		clss.group = Group{cols = 3, rows = 3, behind = true, fullscreen = true, style = "mainmenu"}
+		clss.group = Widgets.Background{cols = 3, rows = 3, behind = true, fullscreen = true, image = "mainmenu1"}
 		clss.group:set_expand{col = 1, row = 1}
 		clss.group:set_expand{col = 3}
-		clss.text = Button{style = "label"}
-		clss.button_host = Button{style = "mainmenu-label", text = "Host", pressed = function() clss:host() end}
-		clss.button_join = Button{style = "mainmenu-label", text = "Join", pressed = function() clss:join() end}
-		clss.button_quit = Button{style = "mainmenu-label", text = "Quit", pressed = function() Program:shutdown() end}
-		clss.group2 = Group{rows = 1, margins = {bottom = 30}, spacings = {horz = 40}}
+		clss.text = Widgets.Label()
+		clss.button_host = Widgets.Label{font = "mainmenu", text = "Host", pressed = function() clss:host() end}
+		clss.button_join = Widgets.Label{font = "mainmenu", text = "Join", pressed = function() clss:join() end}
+		clss.button_quit = Widgets.Label{font = "mainmenu", text = "Quit", pressed = function() Program:shutdown() end}
+		clss.group2 = Widget{rows = 1, margins = {bottom = 30}, spacings = {horz = 40}}
 		clss.group2:append_col(clss.button_host)
 		clss.group2:append_col(clss.button_join)
 		clss.group2:append_col(clss.button_quit)

@@ -1,9 +1,9 @@
-Widgets.Menus = Class(Group)
+Widgets.Menus = Class(Widget)
 
 Widgets.Menus.new = function(clss, args)
-	local self = Group.new(clss, {rows = 3, cols = 1, style = "menus", stack = {}})
-	self.button_back = Button{style = "menuitem-label", text = "  Back", pressed = function() self:close() end}
-	self:set_child{col = 1, row = 2, widget = Button{style = "label", text = "_________________"}}
+	local self = Widget.new(clss, {rows = 3, cols = 1, stack = {}})
+	self.button_back = Widgets.MenuItem{font = "medium", text = "Back", pressed = function() self:close() end}
+	self:set_child{col = 1, row = 2, widget = Widgets.Label{text = "_________________"}}
 	self:set_child{col = 1, row = 3, widget = self.button_back}
 	for k,v in pairs(args or {}) do self[k] = v end
 	return self

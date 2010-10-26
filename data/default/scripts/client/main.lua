@@ -12,6 +12,7 @@ require "core/render"
 require "core/sound"
 require "core/widgets"
 require "common/eventhandler"
+require "client/label"
 require "client/theme"
 require "client/widget"
 require "client/startup"
@@ -34,4 +35,15 @@ while not Program.quit do
 	Client:clear_buffer()
 	Widgets:draw()
 	Client:swap_buffers()
+	-- Focus widgets.
+	local w = Widgets.focused_widget
+	if Widgets.focused_widget_prev ~= w then
+		if Widgets.focused_widget_prev then
+			Widgets.focused_widget_prev.focused = false
+		end
+		if w then
+			w.focused = true
+		end
+		Widgets.focused_widget_prev = w
+	end
 end

@@ -1,10 +1,10 @@
-Widgets.ItemList = Class(Group)
+Widgets.ItemList = Class(Widget)
 
 Widgets.ItemList.getter = function(self, key)
 	if key == "size" then
 		return self.size
 	else
-		return Group.getter(self, key)
+		return Widget.getter(self, key)
 	end
 end
 
@@ -17,13 +17,12 @@ Widgets.ItemList.setter = function(self, key, value)
 			self:set_child{col = 1, row = i, widget = self.buttons[i]}
 		end
 	else
-		Group.setter(self, key, value)
+		Widget.setter(self, key, value)
 	end
 end
 
 Widgets.ItemList.new = function(clss, args)
-	local self = Group.new(clss)
-	self.style = "inventory-list"
+	local self = Widget.new(clss)
 	self.cols = 1
 	self.rows = 0
 	self.spacings = {0, 0}

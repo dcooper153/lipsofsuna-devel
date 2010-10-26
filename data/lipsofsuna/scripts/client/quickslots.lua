@@ -1,11 +1,12 @@
 Quickslots = Class()
+Quickslots.icons = {}
 
 Quickslots.init = function(clss)
-	clss.group = Group{rows = 1}
+	clss.group = Widget{rows = 1}
 	clss.buttons = {}
 	for i = 1,12 do
-		clss.buttons[i] = Image{
-			style = "skill-icon-none",
+		clss.buttons[i] = Widgets.Icon{
+			icon = clss.icons["none"],
 			pressed = function() clss:activate(i) end}
 		clss.group:append_col(clss.buttons[i])
 	end
@@ -13,14 +14,13 @@ end
 
 Quickslots.assign_none = function(clss, index)
 	clss.buttons[index].feat = nil
-	clss.buttons[index].style = "skill-icon-none"
+	clss.buttons[index].icon = clss.icons["none"]
 end
 
-local icons = {}
 Quickslots.assign_feat = function(clss, index, feat)
-	local icon = icons[feat] and feat or "todo"
+	local icon = feat and (clss.icons[feat] or clss.icons["todo"]) or clss.icons["none"]
 	clss.buttons[index].feat = feat
-	clss.buttons[index].style = "skill-icon-" .. icon
+	clss.buttons[index].icon = icon
 end
 
 Quickslots.activate = function(clss, index)
@@ -32,17 +32,11 @@ Quickslots.activate = function(clss, index)
 end
 
 local mkicon = function(name)
-	local x = math.mod(#icons * 32, 256)
-	local y = math.floor(#icons / 32)
-	Widgets:add_widget_style("skill-icon-" .. name, [[
-		file: skills1.dds;
-		source: ]] .. x .. " " .. y .. [[;
-		width: 0 32 0;
-		height: 0 32 0;
-		padding: 16 16 16 16;
-	]])
-	table.insert(icons, name)
-	icons[name] = true
+	local x = math.mod(#Quickslots.icons * 32, 256)
+	local y = math.floor(#Quickslots.icons / 32)
+	local icon = { image = "skills1", name = name, offset = {x,y}, size = {32,32} }
+	Quickslots.icons[name] = icon
+	table.insert(Quickslots.icons, icon)
 end
 mkicon("none")
 mkicon("heal")

@@ -1,14 +1,14 @@
 Equipment = Class()
 
 Equipment.init = function(clss)
-	clss.group = Group{cols = 1, style = "equipment"}
-	clss.group:set_request{height = 155, width = 60}
-	clss.button_head = Button{style = "label"}
-	clss.button_upperbody = Button{style = "label"}
-	clss.button_handl = Button{style = "label"}
-	clss.button_handr = Button{style = "label"}
-	clss.button_lowerbody = Button{style = "label"}
-	clss.button_feet = Button{style = "label"}
+	clss.group = Widgets.Equipment{cols = 1}
+	clss.group.spacings = {0,2}
+	clss.button_head = Widgets.ItemButton{pressed = function() clss:clicked("head") end}
+	clss.button_upperbody = Widgets.ItemButton{pressed = function() clss:clicked("upperbody") end}
+	clss.button_handl = Widgets.ItemButton{pressed = function() clss:clicked("hand.L") end}
+	clss.button_handr = Widgets.ItemButton{pressed = function() clss:clicked("hand.R") end}
+	clss.button_lowerbody = Widgets.ItemButton{pressed = function() clss:clicked("lowerbody") end}
+	clss.button_feet = Widgets.ItemButton{pressed = function() clss:clicked("feet") end}
 	clss.group:append_row(clss.button_head)
 	clss.group:append_row(clss.button_upperbody)
 	clss.group:append_row(clss.button_handr)
@@ -16,12 +16,6 @@ Equipment.init = function(clss)
 	clss.group:append_row(clss.button_lowerbody)
 	clss.group:append_row(clss.button_feet)
 	clss.group:set_expand{col = 1}
-	clss.button_head.pressed = function() clss:clicked("head") end
-	clss.button_upperbody.pressed = function() clss:clicked("upperbody") end
-	clss.button_handl.pressed = function() clss:clicked("hand.L") end
-	clss.button_handr.pressed = function() clss:clicked("hand.R") end
-	clss.button_lowerbody.pressed = function() clss:clicked("lowerbody") end
-	clss.button_feet.pressed = function() clss:clicked("feet") end
 end
 
 --- Sets the contents of an equipment slot.

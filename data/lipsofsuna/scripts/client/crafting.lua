@@ -16,12 +16,12 @@ end
 --- Initializes the crafting UI.
 -- @param clss Crafting class.
 Crafting.init = function(clss)
-	clss.dialog = Group{cols = 1, style = "window"}
+	clss.dialog = Widgets.Popup{cols = 1}
 	clss.dialog:set_expand{col = 1, row = 2}
-	clss.title = Button{text = "Crafting", style = "inventory-label"}
-	clss.tree = Widgets.List{pressed = function(tree, row) Crafting:craft{index = row} end}
+	clss.title = Widgets.Label{font = "medium", text = "Crafting"}
+	clss.tree = Widgets.List()
 	clss.tree:set_request{width = 200, height = 200}
-	clss.button = Button{text = "Close", pressed = function() Crafting.dialog.floating = false end}
+	clss.button = Widgets.Button{text = "Close", pressed = function() Crafting.dialog.floating = false end}
 	clss.dialog:append_row(clss.title)
 	clss.dialog:append_row(clss.tree)
 	clss.dialog:append_row(clss.button)
@@ -33,8 +33,11 @@ end
 --   <li>items: List of craftable items.</li></ul>
 Crafting.show = function(clss, args)
 	clss.tree:clear()
+	local index = 1
 	for k,v in pairs(args.items) do
-		clss.tree:append{text = v}
+		clss.tree:append{widget = Widgets.ItemButton{index = index, text = v,
+			pressed = function(self) Crafting:craft{index = self.index} end}}
+		index = index + 1
 	end
 	clss.dialog.floating = true
 end

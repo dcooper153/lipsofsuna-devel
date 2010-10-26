@@ -2,13 +2,13 @@ Quests = Class()
 Quests.dict_name = {}
 
 Quests.init = function(clss)
-	local dialog = Group{cols = 2, rows = 1}
+	local dialog = Widget{cols = 2, rows = 1}
 	dialog.list = Widgets.List()
 	dialog.list.pressed = function(view, row) Quests:show(row) end
 	dialog.list:set_request{width = 100, height = 100}
 	dialog.quest_info = Widgets.QuestInfo()
-	dialog.title_label = Button{style = "inventory-label", text = "Quests"}
-	dialog.group1 = Group{cols = 1, rows = 2}
+	dialog.title_label = Widgets.Label{font = "medium", text = "Quests"}
+	dialog.group1 = Widget{cols = 1, rows = 2}
 	dialog.group1:set_expand{col = 1, row = 2}
 	dialog.group1:set_child{col = 1, row = 1, widget = dialog.title_label}
 	dialog.group1:set_child{col = 1, row = 2, widget = dialog.list}
@@ -34,7 +34,7 @@ end
 Quests.update = function(clss, quest)
 	local button = clss.dict_name[quest.name]
 	if not button then
-		button = Button{
+		button = Widgets.Button{
 			pressed = function(self) Quests:show(self.text) end,
 			text = quest.name}
 		clss.window.list:append{widget = button}

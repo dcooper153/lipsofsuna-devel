@@ -24,17 +24,7 @@
 
 #include "ext-module.h"
 
-static void private_widget_attach (
-	LIExtModule* module,
-	LIWdgWidget* widget,
-	LIWdgWidget* parent);
-
-static void private_widget_detach (
-	LIExtModule* module,
-	LIWdgWidget* widget,
-	int*         free);
-
-static void private_widget_free (
+static void private_widget_allocation (
 	LIExtModule* module,
 	LIWdgWidget* widget);
 
@@ -93,9 +83,7 @@ LIExtModule* liext_widgets_new (
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (self->program->callbacks, self->program->engine, "event", -10, private_widget_event, self, self->calls + 0) ||
 	    !lical_callbacks_insert (self->program->callbacks, self->program->engine, "tick", 1, private_widget_tick, self, self->calls + 1) ||
-	    !lical_callbacks_insert (self->program->callbacks, self->widgets, "widget-attach", 5, private_widget_attach, self, self->calls + 2) ||
-	    !lical_callbacks_insert (self->program->callbacks, self->widgets, "widget-detach", 5, private_widget_detach, self, self->calls + 3) ||
-	    !lical_callbacks_insert (self->program->callbacks, self->widgets, "widget-free", 5, private_widget_free, self, self->calls + 4))
+	    !lical_callbacks_insert (self->program->callbacks, self->widgets, "widget-allocation", 5, private_widget_allocation, self, self->calls + 2))
 	{
 		liext_widgets_free (self);
 		return 0;
@@ -104,12 +92,6 @@ LIExtModule* liext_widgets_new (
 	/* Register classes. */
 	liscr_script_create_class (program->script, "Widgets", liext_script_widgets, self);
 	liscr_script_create_class (program->script, "Widget", liext_script_widget, self);
-	liscr_script_create_class (program->script, "Group", liext_script_group, self);
-	liscr_script_create_class (program->script, "Button", liext_script_button, self);
-	liscr_script_create_class (program->script, "Entry", liext_script_entry, self);
-	liscr_script_create_class (program->script, "Image", liext_script_image, self);
-	liscr_script_create_class (program->script, "Scroll", liext_script_scroll, self);
-	liscr_script_create_class (program->script, "View", liext_script_view, self);
 
 	return self;
 }
@@ -157,52 +139,64 @@ void liext_widgets_callback_paint (
 
 /*****************************************************************************/
 
-static void private_widget_attach (
-	LIExtModule* module,
-	LIWdgWidget* widget,
-	LIWdgWidget* parent)
-{
-	if (widget->userdata != NULL)
-	{
-		if (parent != NULL)
-			liscr_data_ref (widget->userdata, parent->userdata);
-		else
-			liscr_data_ref (widget->userdata, NULL);
-	}
-}
-
-static void private_widget_detach (
-	LIExtModule* module,
-	LIWdgWidget* widget,
-	int*         free)
-{
-	if (widget->userdata != NULL)
-	{
-		if (liscr_data_get_valid (widget->userdata))
-		{
-			if (widget->parent != NULL)
-				liscr_data_unref (widget->userdata, widget->parent->userdata);
-			else
-				liscr_data_unref (widget->userdata, NULL);
-		}
-		*free = 0;
-	}
-}
-
-static void private_widget_free (
+static void private_widget_allocation (
 	LIExtModule* module,
 	LIWdgWidget* widget)
 {
-	if (widget->userdata != NULL)
-		liwdg_widget_detach (widget);
+	LIScrScript* script;
+	LIScrData* data;
+
+	if (widget->script == NULL)
+		return;
+	data = widget->script;
+	script = data->script;
+
+	liscr_pushdata (script->lua, data);
+	lua_getfield (script->lua, -1, "reshaped");
+	if (lua_type (script->lua, -1) == LUA_TFUNCTION)
+	{
+		lua_pushvalue (script->lua, -2);
+		lua_remove (script->lua, -3);
+		if (lua_pcall (script->lua, 1, 0, 0) != 0)
+		{
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.reshaped: %s", lua_tostring (script->lua, -1));
+			lisys_error_report ();
+			lua_pop (script->lua, 1);
+		}
+	}
+	else
+		lua_pop (script->lua, 2);
 }
 
 static int private_widget_event (
 	LIExtModule* module,
 	SDL_Event*   event)
 {
+	char* str = NULL;
+
 	if (module->client->moving)
 		return 1;
+	if (event->type == SDL_KEYDOWN)
+	{
+		/* FIXME: Shouldn't be here. */
+		if (event->key.keysym.unicode != 0)
+			str = listr_wchar_to_utf8 (event->key.keysym.unicode);
+		if (str != NULL)
+		{
+			limai_program_event (module->program, "keypress",
+				"code", LISCR_TYPE_INT, event->key.keysym.sym,
+				"mods", LISCR_TYPE_INT, event->key.keysym.mod,
+				"text", LISCR_TYPE_STRING, str, NULL);
+			lisys_free (str);
+		}
+		else
+		{
+			limai_program_event (module->program, "keypress",
+				"code", LISCR_TYPE_INT, event->key.keysym.sym,
+				"mods", LISCR_TYPE_INT, event->key.keysym.mod, NULL);
+		}
+		return 1;
+	}
 	if (!liwdg_manager_event_sdl (module->widgets, event))
 		return 1;
 	return 0;

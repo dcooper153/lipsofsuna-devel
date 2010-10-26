@@ -1,4 +1,4 @@
-Dialog = Class(Group)
+Dialog = Class(Widget)
 Dialog.active = nil
 
 --- Creates a new conversation dialog.
@@ -8,14 +8,14 @@ Dialog.active = nil
 -- @param opt List of choices.
 Dialog.new = function(clss, id, msg, opt)
 	-- Create the widget.
-	local self = Group.new(clss, {cols = 1, id = id, margins = {5,5,5,5}})
+	local self = Widget.new(clss, {cols = 1, id = id, margins = {5,5,5,5}})
 	if msg then
-		self:append_row(Button{style = "quest-label", text = msg, pressed = function()
+		self:append_row(Widgets.DialogLabel{text = msg, pressed = function()
 			Network:send{packet = Packet(packets.DIALOG_ANSWER, "uint32", id, "string", "")}
 		end})
 	else
 		for k,v in pairs(opt) do
-			self:append_row(Button{style = "quest-button", text = v, pressed = function()
+			self:append_row(Widgets.DialogChoice{text = v, pressed = function()
 				Network:send{packet = Packet(packets.DIALOG_ANSWER, "uint32", id, "string", v)}
 			end})
 		end

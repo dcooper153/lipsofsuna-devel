@@ -384,7 +384,7 @@ private_get_line_width (LIFntLayout* self,
 		/* FIXME: No kerning. */
 		if (x + glyph->advance >= self->limit_width)
 		{
-			if (i > 0)
+			if (i > start)
 				i--;
 			break;
 		}
