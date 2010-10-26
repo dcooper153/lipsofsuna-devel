@@ -25,7 +25,8 @@ Dependencies
  * SQLite  >= 3.6    http://www.sqlite.org/
  * SDL     >= 1.2    http://libsdl.org/
  * SDL_ttf >= 2.0    http://www.libsdl.org/projects/SDL_ttf
- * OpenGL  >= 3.3    http://www.opengl.org/
+ * GLEW    >= 1.5.5  http://glew.sourceforge.net/
+ * OpenGL  >= 3.2    http://www.opengl.org/
  * OpenAL            http://www.openal.org/
  * libogg            http://xiph.org/downloads/
  * libvorbis         http://xiph.org/downloads/

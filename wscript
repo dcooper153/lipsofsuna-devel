@@ -63,22 +63,18 @@ def configure(ctx):
 	ctx.check(header_name='time.h', define_name='HAVE_TIME_H')
 	ctx.check(header_name='unistd.h', define_name='HAVE_UNISTD_H')
 	ctx.check(header_name='windows.h', define_name='HAVE_WINDOWS_H', mandatory=False)
-	ctx.check_cc(msg='Checking for function fork', header_name='unistd.h', function_name='fork', define_name='HAVE_FORK')
-	ctx.check_cc(msg='Checking for function usleep', header_name='unistd.h', function_name='usleep', define_name='HAVE_USLEEP')
-	ctx.check_cc(lib='dl', uselib_store='CORE')
-	ctx.check_cc(lib='m', uselib_store='CORE')
-	ctx.check_cc(lib='pthread', uselib_store='THREAD')
-	if ctx.is_defined('HAVE_WINDOWS_H'):
-		ctx.env.EXEEXT = '.exe'
-	else:
-		ctx.env.EXEEXT = ''
+	ctx.check_cc(msg='Checking for function fork', header_name='unistd.h', function_name='fork', define_name='HAVE_FORK', mandatory=False)
+	ctx.check_cc(msg='Checking for function usleep', header_name='unistd.h', function_name='usleep', define_name='HAVE_USLEEP', mandatory=False)
+	ctx.check_cc(lib='dl', uselib_store='CORE', mandatory=False)
+	ctx.check_cc(lib='m', uselib_store='CORE', mandatory=False)
+	ctx.check_cc(lib='pthread', uselib_store='THREAD', mandatory=False)
 
 	# zlib
 	ctx.check_cc(lib='z', mandatory=True, uselib_store='ZLIB')
 	ctx.check_cc(header_name='zlib.h', mandatory=True, uselib_store='ZLIB')
 
 	# SQLite
-	if not ctx.check_cfg(package='sqlite', atleast_version='3.6.0', args='--cflags --libs', mandatory=False):
+	if not ctx.check_cfg(package='sqlite3', atleast_version='3.6.0', args='--cflags --libs', uselib_store='SQLITE', mandatory=False):
 		ctx.check_cc(header_name='sqlite3.h', mandatory=True, uselib='CORE TEST', uselib_store='SQLITE')
 		ctx.check_cc(lib='sqlite3', mandatory=True, uselib='CORE TEST', uselib_store='SQLITE')
 
@@ -114,14 +110,10 @@ def configure(ctx):
 	ctx.check_cc(lib='SDL_ttf', mandatory=True, uselib='CORE TEST SDL', uselib_store='SDL_TTF')
 	ctx.check_cc(msg = "Checking for header SDL_ttf.h", mandatory=True, uselib='CORE TEST SDL', fragment="#include <SDL_ttf.h>\nint main(int argc, char** argv) { return 0; }\n")
 
-	# GL
-	ctx.check_cc(header_name='GL/gl.h', mandatory=True, uselib='CORE TEST', uselib_store='GL')
-	if not ctx.check_cc(lib='GL', uselib='CORE TEST', uselib_store='GL', mandatory=False):
-		ctx.check_cc(lib='opengl32', mandatory=True, uselib='CORE TEST', uselib_store='GL')
-
 	# GLEW
-	ctx.check_cc(header_name='GL/glew.h', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
-	ctx.check_cc(lib='GLEW', mandatory=True, uselib='CORE TEST GL', uselib_store='GLEW')
+	if not ctx.check_cfg(package='glew', atleast_version='1.5.5', args='--cflags --libs', mandatory=False):
+		ctx.check_cc(header_name='GL/glew.h', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
+		ctx.check_cc(lib='GLEW', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
 
 	if ctx.env.SOUND:
 		# AL
@@ -196,7 +188,7 @@ def build(ctx):
 	ctx.add_group("install")
 	ctx.set_group("build")
 	objs = ''
-	libs = 'CORE LUA SQLITE BULLET GRAPPLE SDL SDL_TTF ZLIB GLEW GL THREAD AL VORBIS OGG FLAC'
+	libs = 'CORE LUA SQLITE BULLET GRAPPLE SDL SDL_TTF ZLIB GLEW THREAD AL VORBIS OGG FLAC'
 
 	# Core objects.
 	for dir in CORE_DIRS.split(' '):
@@ -224,7 +216,7 @@ def build(ctx):
 			features = 'c',
 			source = ctx.path.ant_glob('src/lipsofsuna/extension/%s/*.c' % dir),
 			target = dir + '_ext_objs',
-			use = 'EXTENSION LUA SQLITE GRAPPLE SDL SDL_TTF ZLIB GLEW GL THREAD AL VORBIS OGG FLAC')
+			use = 'EXTENSION LUA SQLITE GRAPPLE SDL SDL_TTF ZLIB GLEW THREAD AL VORBIS OGG FLAC')
 
 	# Target executable.
 	ctx.new_task_gen(
