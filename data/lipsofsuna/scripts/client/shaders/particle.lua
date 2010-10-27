@@ -28,6 +28,7 @@ void main()
 
 geometry = [[
 #version 150
+#extension GL_EXT_geometry_shader4 : enable
 layout(triangles) in;
 layout(triangle_strip, max_vertices=4) out;
 in geomvar

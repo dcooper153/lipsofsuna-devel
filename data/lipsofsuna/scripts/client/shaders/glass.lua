@@ -21,6 +21,7 @@ uniform uni_shadowmap SHADOWTEXTURE0
 uniform uni_texturemap DIFFUSETEXTURE0]],
 
 	vertex = [[
+#version 150
 in vec3 att_coord;
 in vec3 att_normal;
 in vec2 att_texcoord;
@@ -44,6 +45,7 @@ void main()
 }]],
 
 	fragment = [[
+#version 150
 in vec3 var_coord;
 in vec3 var_normal;
 in vec2 var_texcoord;

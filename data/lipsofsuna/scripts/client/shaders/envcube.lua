@@ -18,6 +18,7 @@ uniform uni_lightmatrix[2] LIGHTMATRIX2
 uniform uni_lightmatrix[3] LIGHTMATRIX3]],
 
 	vertex = [[
+#version 150
 const int cubemapcount = 1;
 const int lightcount = 4;
 const int texturecount = 1;
@@ -54,6 +55,7 @@ void main()
 }]],
 
 	fragment = [[
+#version 150
 const int cubemapcount = 1;
 const int lightcount = 4;
 const int texturecount = 1;

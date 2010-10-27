@@ -8,6 +8,7 @@ uniform uni_materialdiffuse MATERIALDIFFUSE
 uniform uni_matrixprojection MATRIXPROJECTION]],
 
 vertex = [[
+#version 150
 in vec2 att_coord;
 in vec2 att_texcoord;
 out vec2 var_texcoord;
@@ -19,6 +20,7 @@ void main()
 }]],
 
 fragment = [[
+#version 150
 in vec2 var_texcoord;
 uniform vec4 uni_materialdiffuse;
 uniform sampler2D uni_texture;

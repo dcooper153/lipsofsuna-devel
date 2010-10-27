@@ -8,6 +8,7 @@ uniform uni_matrixprojection MATRIXPROJECTION
 uniform uni_texskin DIFFUSETEXTURE0]],
 
 vertex = [[
+#version 150
 in vec3 att_coord;
 in vec2 att_texcoord;
 out vec2 var_texcoord;
@@ -21,6 +22,7 @@ void main()
 }]],
 
 fragment = [[
+#version 150
 in vec2 var_texcoord;
 uniform sampler2D uni_texskin;
 void main()

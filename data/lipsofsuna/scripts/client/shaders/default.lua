@@ -13,6 +13,7 @@ uniform uni_matrixprojection MATRIXPROJECTION
 uniform uni_texturemap[0] DIFFUSETEXTURE0]],
 
 	vertex = [[
+#version 150
 in vec3 att_coord;
 in vec3 att_normal;
 in vec2 att_texcoord;
@@ -30,6 +31,7 @@ void main()
 }]],
 
 	fragment = [[
+#version 150
 in vec3 var_normal;
 in vec2 var_texcoord;
 uniform vec4 uni_materialdiffuse;

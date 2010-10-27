@@ -16,6 +16,7 @@ uniform uni_texturemap[0] DIFFUSETEXTURE0
 uniform uni_texturemap[1] DIFFUSETEXTURE1]],
 
 	vertex = [[
+#version 150
 in vec3 att_coord;
 in vec3 att_normal;
 in vec3 att_tangent;
@@ -52,6 +53,7 @@ void main()
 }]],
 
 	fragment = [[
+#version 150
 in vec3 var_normal;
 in vec3 var_tangent;
 in vec2 var_texcoord;

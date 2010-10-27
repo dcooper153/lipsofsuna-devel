@@ -6,6 +6,7 @@ uniform uni_matrixmodelview MATRIXMODELVIEW
 uniform uni_matrixprojection MATRIXPROJECTION]],
 
 vertex = [[
+#version 150
 in vec3 att_coord;
 uniform mat4 uni_matrixmodelview;
 uniform mat4 uni_matrixprojection;
@@ -16,6 +17,7 @@ void main()
 }]],
 
 fragment = [[
+#version 150
 void main()
 {
 }]]}
