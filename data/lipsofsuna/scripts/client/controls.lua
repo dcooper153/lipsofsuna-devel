@@ -1,7 +1,10 @@
 Keys = {ESCAPE = 27, SPACE = 32, COMMA = 44, a = 97, c = 99, d = 100, y = 121,
 	x = 120, w = 119, s = 115, F1 = 282, F2 = 283, F3 = 284, F4 = 285, F5 = 286,
 	F6 = 287, F7 = 288, F8 = 289, F9 = 290, F10 = 291, F11 = 292, F12 = 293,
-	LSHIFT = 304, RCTRL = 305, PRINT = 316}
+	LSHIFT = 304, RCTRL = 305, LCTRL = 306, PRINT = 316}
+Mods = {LSHIFT = 0x0001, RSHIFT= 0x0002, LCTRL = 0x0040, RCTRL = 0x0080,
+	LALT = 0x0100, RALT = 0x0200, LMETA = 0x0400, RMETA = 0x0800,
+	NUM = 0x1000, CAPS = 0x2000, MODE = 0x4000} 
 
 Action{name = "Attack", mode = "press", key1 = "mouse1", func = function()
 	Network:send{packet = Packet(packets.SHOOT)}
@@ -108,18 +111,18 @@ Action{name = "Strafe", mode = "analog", key1 = Keys.a, key2 = Keys.d, func = fu
 end}
 
 Action{name = "Turn", mode = "analog", key1 = "mousex", func = function(v)
-	if true then
-		Player.turn = -v
-	else
+	if Action.dict_press[Keys.LCTRL] then
 		Player.camera_turn = v
+	else
+		Player.turn = -v
 	end
 end}
 
 Action{name = "Tilt", mode = "analog", key1 = "mousey", func = function(v)
-	if true then
-		Player.tilt = v
-	else
+	if Action.dict_press[Keys.LCTRL] then
 		Player.camera_tilt = v
+	else
+		Player.tilt = v
 	end
 end}
 

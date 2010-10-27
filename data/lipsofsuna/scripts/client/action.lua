@@ -3,6 +3,7 @@ Action.dict_index = {}
 Action.dict_key = {}
 Action.dict_name = {}
 Action.dict_press = {}
+Action.mods = 0
 Action.mouse_sensitivity_x = 0.5
 Action.mouse_sensitivity_y = 0.3
 
@@ -47,8 +48,10 @@ end
 Action.event = function(clss, args, list)
 	-- Maintain key states.
 	if args.type == "keypress" then
+		clss.mods = args.mods
 		clss.dict_press[args.code] = true
 	elseif args.type == "keyrelease" then
+		clss.mods = args.mods
 		clss.dict_press[args.code] = nil
 	end
 	-- Activate actions.

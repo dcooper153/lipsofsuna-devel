@@ -24,6 +24,7 @@ require "core/widgets"
 Voxel.blocks_per_line = 4
 Voxel.tiles_per_line = 8
 
+require "common/bitwise"
 require "common/effect"
 require "common/eventhandler"
 require "common/faction"
