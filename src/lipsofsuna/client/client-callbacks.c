@@ -26,15 +26,61 @@
 #include "client-callbacks.h"
 #include "client-window.h"
 
-/*****************************************************************************/
-/* Miscellaneous. */
-
-static int
-private_miscellaneous_event (LICliClient* client,
-                             SDL_Event*   event)
+static int private_event (
+	LICliClient* client,
+	SDL_Event*   event)
 {
+	char* str = NULL;
+
 	switch (event->type)
 	{
+		case SDL_JOYAXISMOTION:
+			limai_program_event (client->program, "joystickmotion",
+				"axis", LISCR_TYPE_INT, event->jaxis.axis + 1,
+				"value", LISCR_TYPE_INT, event->jaxis.value / 32768.0f, NULL);
+			return 0;
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP:
+			limai_program_event (client->program,
+				(event->type == SDL_JOYBUTTONDOWN)? "joystickpress" : "joystickrelease",
+				"button", LISCR_TYPE_INT, event->jbutton.button, NULL);
+			return 0;
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONUP:
+			limai_program_event (client->program,
+				(event->type == SDL_MOUSEBUTTONDOWN)? "mousepress" : "mouserelease",
+				"button", LISCR_TYPE_INT, event->button.button,
+				"x", LISCR_TYPE_INT, event->button.x,
+				"y", LISCR_TYPE_INT, event->button.y, NULL);
+			return 0;
+		case SDL_KEYDOWN:
+		case SDL_KEYUP:
+			if (event->key.keysym.unicode != 0)
+				str = listr_wchar_to_utf8 (event->key.keysym.unicode);
+			if (str != NULL)
+			{
+				limai_program_event (client->program,
+					(event->type == SDL_KEYDOWN)? "keypress" : "keyrelease",
+					"code", LISCR_TYPE_INT, event->key.keysym.sym,
+					"mods", LISCR_TYPE_INT, event->key.keysym.mod,
+					"text", LISCR_TYPE_STRING, str, NULL);
+				lisys_free (str);
+			}
+			else
+			{
+				limai_program_event (client->program,
+					(event->type == SDL_KEYDOWN)? "keypress" : "keyrelease",
+					"code", LISCR_TYPE_INT, event->key.keysym.sym,
+					"mods", LISCR_TYPE_INT, event->key.keysym.mod, NULL);
+			}
+			return 0;
+		case SDL_MOUSEMOTION:
+			limai_program_event (client->program, "mousemotion",
+				"x", LISCR_TYPE_INT, event->motion.x,
+				"y", LISCR_TYPE_INT, event->motion.y,
+				"dx", LISCR_TYPE_INT, event->motion.xrel,
+				"dy", LISCR_TYPE_INT, event->motion.yrel, NULL);
+			return 0;
 		case SDL_QUIT:
 			limai_program_event (client->program, "quit", NULL);
 			break;
@@ -53,10 +99,37 @@ private_miscellaneous_event (LICliClient* client,
 	return 1;
 }
 
-int
-licli_client_init_callbacks_misc (LICliClient* self)
+static int private_tick (
+	LICliClient* client,
+	float        secs)
 {
-	lical_callbacks_insert (self->callbacks, self->engine, "event", -5, private_miscellaneous_event, self, NULL);
+	int x;
+	int y;
+	int cx;
+	int cy;
+
+	if (!client->moving)
+		return 1;
+
+	/* Pointer warping in movement mode. */
+	cx = client->window->mode.width / 2;
+	cy = client->window->mode.height / 2;
+	SDL_GetMouseState (&x, &y);
+	if (x != cx || y != cy)
+	{
+		SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
+		SDL_WarpMouse (cx, cy);
+		SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
+	}
+
+	return 1;
+}
+
+int licli_client_init_callbacks_misc (
+	LICliClient* self)
+{
+	lical_callbacks_insert (self->callbacks, self->engine, "event", -5, private_event, self, NULL);
+	lical_callbacks_insert (self->callbacks, self->engine, "tick", -5, private_tick, self, NULL);
 	return 1;
 }
 

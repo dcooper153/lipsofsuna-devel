@@ -2,21 +2,12 @@ Target = Class()
 Target.func = nil
 Target.target_object = nil
 
---- Checks if waiting for target.
--- @param self Target class.
--- @return Boolean.
-function Target.active(self)
-	return self.action.enabled
-end
-
 --- Cancels targeting.
 -- @param self Target class.
 function Target.cancel(self)
 	Gui:set_action_text()
 	self.func = nil
-	self.action.enabled = false
-	controls.EDIT_SELECT.enabled = not Client.moving
-	controls.SHOOT.enabled = Client.moving
+	self.active = false
 end
 
 --- Picks an object or a tile from the scene based on the look vector of the player.
@@ -86,9 +77,7 @@ Target.start = function(clss, msg, func)
 	else
 		Gui:set_action_text(msg)
 		clss.func = func
-		clss.action.enabled = true
-		controls.EDIT_SELECT.enabled = true
-		controls.SHOOT.enabled = false
+		clss.active = true
 	end
 end
 
@@ -97,7 +86,7 @@ end
 -- @param inv Container number.
 -- @param slot Slot number.
 function Target.select_container(self, inv, slot)
-	if self.action.enabled then
+	if self.active then
 		local func = self.func
 		self:cancel()
 		func("inv", inv, slot)
@@ -108,7 +97,7 @@ end
 -- @param self Target class.
 -- @param slot Slot name.
 function Target.select_equipment(self, slot)
-	if self.action.enabled then
+	if self.active then
 		local func = self.func
 		self:cancel()
 		func("equ", 0, slot)
@@ -118,7 +107,7 @@ end
 --- Finishes targeting by selecting an object from under the cursor.
 -- @param self Target class.
 function Target.select_scene(self)
-	if self.action.enabled then
+	if self.active then
 		local func = self.func
 		self:cancel()
 		local pos,obj = Target:pick_scene()
@@ -129,13 +118,6 @@ function Target.select_scene(self)
 		end
 	end
 end
-
-Target.action = Action{id = "target", name = "Target", desc = "Target an object or creature under the cursor"}
-Target.action.enabled = false
-Target.action.callback = function(event)
-	if event.active then Target:select_scene() end
-end
-Binding{action = "target", mousebutton = 1} --BUTTON1
 
 -- Periodically check if the're an object in front of the player.
 Timer{delay = 0.2, func = function()

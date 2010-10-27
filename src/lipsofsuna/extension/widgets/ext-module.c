@@ -172,31 +172,8 @@ static int private_widget_event (
 	LIExtModule* module,
 	SDL_Event*   event)
 {
-	char* str = NULL;
-
 	if (module->client->moving)
 		return 1;
-	if (event->type == SDL_KEYDOWN)
-	{
-		/* FIXME: Shouldn't be here. */
-		if (event->key.keysym.unicode != 0)
-			str = listr_wchar_to_utf8 (event->key.keysym.unicode);
-		if (str != NULL)
-		{
-			limai_program_event (module->program, "keypress",
-				"code", LISCR_TYPE_INT, event->key.keysym.sym,
-				"mods", LISCR_TYPE_INT, event->key.keysym.mod,
-				"text", LISCR_TYPE_STRING, str, NULL);
-			lisys_free (str);
-		}
-		else
-		{
-			limai_program_event (module->program, "keypress",
-				"code", LISCR_TYPE_INT, event->key.keysym.sym,
-				"mods", LISCR_TYPE_INT, event->key.keysym.mod, NULL);
-		}
-		return 1;
-	}
 	if (!liwdg_manager_event_sdl (module->widgets, event))
 		return 1;
 	return 0;

@@ -10,7 +10,6 @@ require = function(arg)
 	end
 end
 
-require "core/binding"
 require "core/camera"
 require "core/network"
 require "core/object-render"
@@ -70,6 +69,7 @@ require "client/widgets/popup"
 require "client/widgets/progress"
 require "client/widgets/questinfo"
 require "client/widgets/skillcontrol"
+require "client/action"
 require "client/theme"
 require "client/client"
 require "client/crafting"
@@ -108,13 +108,6 @@ require "client/shaders/texrefl"
 require "client/shaders/tilenfn"
 require "client/shaders/tilenxz"
 require "client/shaders/widget"
-
-Eventhandler{type = "keypress", func = function(self, args)
-	local w = Widgets.focused_widget_prev
-	if w and w.event then
-		w:event(args)
-	end
-end}
 
 Eventhandler{type = "quit", func = function(self, args)
 	Program.quit = true

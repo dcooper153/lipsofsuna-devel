@@ -1,221 +1,172 @@
-controls = {}
+Keys = {ESCAPE = 27, SPACE = 32, COMMA = 44, a = 97, c = 99, d = 100, y = 121,
+	x = 120, w = 119, s = 115, F1 = 282, F2 = 283, F3 = 284, F4 = 285, F5 = 286,
+	F6 = 287, F7 = 288, F8 = 289, F9 = 290, F10 = 291, F11 = 292, F12 = 293,
+	LSHIFT = 304, RCTRL = 305, PRINT = 316}
 
--- Camera.
-controls.CAMERA_SWITCH = Action{id = "camera-switch", name = "Switch view mode", desc = "Switch view mode"}
-controls.CAMERA_SWITCH.callback = function(event)
-	if event.active then
-		if Player.camera.mode == "first-person" then
-			Player.camera.mode = "third-person"
-			if Player.object then
-				local e = Player.object.rotation.euler
-				e[3] = 0
-				Player.object.rotation = Quaternion:new_euler(e)
-			end
-		else
-			Player.camera.mode = "first-person"
+Action{name = "Attack", mode = "press", key1 = "mouse1", func = function()
+	Network:send{packet = Packet(packets.SHOOT)}
+end}
+
+Action{name = "Camera", mode = "press", key1 = Keys.y, func = function()
+	if Player.camera.mode == "first-person" then
+		Player.camera.mode = "third-person"
+		if Player.object then
+			local e = Player.object.rotation.euler
+			e[3] = 0
+			Player.object.rotation = Quaternion:new_euler(e)
 		end
-		Player.camera:reset()
-	end
-end
-controls.CAMERA_TILT = Action{id = "camera-tilt", name = "Tilt camera", desc = "Tilt the camera"}
-controls.CAMERA_TILT.callback = function(event)
-	Player.camera_tilt = event.value
-end
-controls.CAMERA_TURN = Action{id = "camera-turn", name = "Turn camera", desc = "Turn the camera"}
-controls.CAMERA_TURN.callback = function(event)
-	Player.camera_turn = event.value
-end
-controls.CAMERA_ZOOM = Action{id = "camera-zoom", name = "Zoom camera", desc = "Zoom the camera"}
-controls.CAMERA_ZOOM.callback = function(event)
-	Player.camera:zoom{rate = event.value}
-end
-
--- Crouch.
-controls.CROUCH = Action{id = "crouch", name = "Crouch", desc = "Crouch or fly downwards"}
-controls.CROUCH.callback = function(event)
-	Network:send{packet = Packet(packets.CROUCH, "bool", event.active)}
-end
-
--- Cycle focus.
-controls.CYCLE_FOCUS = Action{id = "cycle-focus", name = "Cycle focus", desc = "Cycle focus"}
-controls.CYCLE_FOCUS.callback = function(event)
-	if event.active then
-		Widgets:cycle_focus{backward = event.value < 0}
-	end
-end
-
--- Cycle window focus.
-controls.CYCLE_WINDOW_FOCUS = Action{id = "cycle-window-focus", name = "Cycle window focus", desc = "Cycle window focus"}
-controls.CYCLE_WINDOW_FOCUS.callback = function(event)
-	if event.active then
-		Widgets:cycle_window_focus{backward = event.value < 0}
-	end
-end
-
--- Editing.
-controls.EDIT_SELECT = Action{id = "edit-select", name = "Select", desc = "Select an object for editing"}
-controls.EDIT_SELECT.callback = function(event)
-	if event.active then
-		local pos,object = Gui.scene:pick()
-		if object then
-			object.selected = not object.selected
-		end
-	end
-end
-
--- Jump.
-controls.JUMP = Action{id = "jump", name = "Jump", desc = "Jump or fly upwards"}
-controls.JUMP.callback = function(event)
-	Network:send{packet = Packet(packets.JUMP)}
-end
-
--- Macro.
-controls.MACRO = Action{id = "macro", name = "Chat macro", desc = "Send a predefined chat message"}
-controls.MACRO.callback = function(event)
-	if event.active then
-		Network:send{packet = Packet(packets.CHAT, "string", event.params)}
-	end
-end
-
--- Menu.
-controls.MENU = Action{id = "menu", name = "Menu", desc = "Show or hide the menu"}
-controls.MENU.callback = function(event)
-	if event.active then
-		if Target:active() then
-			Target:cancel()
-		else
-			if Client.moving then
-				Gui.menus:open{level = 1, widget = Gui.menu_widget_main}
-			else
-				Gui.menus:close()
-			end
-		end
-	end
-end
-
--- Move.
-controls.MOVE = Action{id = "move", name = "Move", desc = "Move forward or backward"}
-controls.MOVE.callback = function(event)
-	Network:send{packet = Packet(packets.PLAYER_MOVE, "int8", event.value * -127)}
-end
-
--- Pick up.
-controls.PICKUP = Action{id = "pick-up", name = "Pick up", desc = "Pick up items"}
-controls.PICKUP.callback = function(event)
-	if event.active then
-		Commands:pickup()
-	end
-end
-
--- Quickslots.
-controls.QUICKSLOT = Action{id = "quickslot", name = "Quickslot", desc = "Activate a quickslot"}
-controls.QUICKSLOT.callback = function(event)
-	if event.params then
-		Quickslots:activate(tonumber(event.params))
-	end
-end
-
--- Run.
-controls.RUN = Action{id = "run", name = "Run", desc = "Move faster"}
-controls.RUN.callback = function(event)
-	Network:send{packet = Packet(packets.RUN, "bool", event.active)}
-end
-
--- Screenshot.
-controls.SCREENSHOT = Action{id = "screenshot", name = "Screenshot", desc = "Save a screenshot"}
-controls.SCREENSHOT.callback = function(event)
-	if event.active then
-		local n = Client:screenshot()
-		Gui.chat_history:append{text = "Screenshot: " .. n}
-	end
-end
-
--- Shoot.
-controls.SHOOT = Action{id = "shoot", name = "Shoot", desc = "Shoot or attack"}
-controls.SHOOT.enabled = false
-controls.SHOOT.callback = function(event)
-	if event.active then
-		Network:send{packet = Packet(packets.SHOOT)}
-	end
-end
-
--- Strafe.
-controls.STRAFE = Action{id = "strafe", name = "Strafe", desc = "Strafe left or right"}
-controls.STRAFE.enabled = true
-controls.STRAFE.callback = function(event)
-	if event.active then
-		Network:send{packet = Packet(packets.STRAFE, "int8", event.value * 127)}
 	else
-		Network:send{packet = Packet(packets.STRAFE, "int8", 0)}
+		Player.camera.mode = "first-person"
 	end
-end
+	Player.camera:reset()
+end}
 
--- Skill.
-controls.SKILL = Action{id = "skill", name = "Skill", desc = "Uses a skill"}
-controls.SKILL.callback = function(event)
-	if event.params then
-		Network:send{packet = Packet(packets.SKILL, "string", event.params, "bool", event.active)}
+Action{name = "Jump", mode = "press", key1 = Keys.c, func = function()
+	Network:send{packet = Packet(packets.JUMP)}
+end}
+
+Action{name = "Menu", mode = "press", key1 = Keys.ESCAPE, func = function()
+	if Target.active then
+		Target:cancel()
+	else
+		if Client.moving then
+			Gui.menus:open{level = 1, widget = Gui.menu_widget_main}
+		else
+			Gui.menus:close()
+		end
 	end
-end
+end}
 
--- Turn.
-controls.TURN = Action{id = "turn", name = "Turn", desc = "Turn left or right"}
-controls.TURN.callback = function(event)
-	Player.turn = -event.value
-end
+Action{name = "Move", mode = "analog", key1 = Keys.w, key2 = Keys.s, func = function(v)
+	v = math.max(-1, math.min(1, v))
+	Network:send{packet = Packet(packets.PLAYER_MOVE, "int8", v * -127)}
+end}
 
--- Tilt.
-controls.TILT = Action{id = "tilt", name = "Tilt", desc = "Tilt up or down"}
-controls.TILT.callback = function(event)
-	Player.tilt = event.value
-end
+Action{name = "Pick up", mode = "press", key1 = Keys.COMMA, func = function()
+	Commands:pickup()
+end}
 
--- Use.
-controls.USE = Action{id = "use", name = "Use", desc = "Chat, loot, read, ..."}
-controls.USE.callback = function(event)
-	if event.active then
-		Commands:use()
+Action{name = "Quickslot 1", mode = "press", key1 = Keys.F1, func = function()
+	Quickslots:activate(1)
+end}
+
+Action{name = "Quickslot 2", mode = "press", key1 = Keys.F2, func = function()
+	Quickslots:activate(2)
+end}
+
+Action{name = "Quickslot 3", mode = "press", key1 = Keys.F3, func = function()
+	Quickslots:activate(3)
+end}
+
+Action{name = "Quickslot 4", mode = "press", key1 = Keys.F4, func = function()
+	Quickslots:activate(4)
+end}
+
+Action{name = "Quickslot 5", mode = "press", key1 = Keys.F5, func = function()
+	Quickslots:activate(5)
+end}
+
+Action{name = "Quickslot 6", mode = "press", key1 = Keys.F6, func = function()
+	Quickslots:activate(6)
+end}
+
+Action{name = "Quickslot 7", mode = "press", key1 = Keys.F7, func = function()
+	Quickslots:activate(7)
+end}
+
+Action{name = "Quickslot 8", mode = "press", key1 = Keys.F8, func = function()
+	Quickslots:activate(8)
+end}
+
+Action{name = "Quickslot 9", mode = "press", key1 = Keys.F9, func = function()
+	Quickslots:activate(9)
+end}
+
+Action{name = "Quickslot 10", mode = "press", key1 = Keys.F10, func = function()
+	Quickslots:activate(10)
+end}
+
+Action{name = "Quickslot 11", mode = "press", key1 = Keys.F11, func = function()
+	Quickslots:activate(11)
+end}
+
+Action{name = "Quickslot 12", mode = "press", key1 = Keys.F12, func = function()
+	Quickslots:activate(12)
+end}
+
+Action{name = "Run", mode = "toggle", key1 = Keys.LSHIFT, func = function(v)
+	Network:send{packet = Packet(packets.RUN, "bool", v)}
+end}
+
+Action{name = "Screenshot", mode = "press", key1 = Keys.PRINT, func = function()
+	local n = Client:screenshot()
+	Gui.chat_history:append{text = "Screenshot: " .. n}
+end}
+
+Action{name = "Strafe", mode = "analog", key1 = Keys.a, key2 = Keys.d, func = function(v)
+	Network:send{packet = Packet(packets.STRAFE, "int8", v * 127)}
+end}
+
+Action{name = "Turn", mode = "analog", key1 = "mousex", func = function(v)
+	if true then
+		Player.turn = -v
+	else
+		Player.camera_turn = v
 	end
-end
+end}
 
-Binding{action = "cycle-focus", key = 9} --TAB
-Binding{action = "cycle-focus", key = 9, mods = 0x1, mult = -1.0} --LSHIFT+TAB
-Binding{action = "cycle-window-focus", key = 9, mods = 0x40} --LCTRL+TAB
-Binding{action = "cycle-window-focus", key = 9, mods = 0x41, mult = -1.0} --LCTRL+LSHIFT+TAB
-Binding{action = "menu", key = 27} --ESCAPE
+Action{name = "Tilt", mode = "analog", key1 = "mousey", func = function(v)
+	if true then
+		Player.tilt = v
+	else
+		Player.camera_tilt = v
+	end
+end}
 
-Binding{action = "move", key = 119, mult = -1.0} --w
-Binding{action = "strafe", key = 97, mult = -1.0} --a
-Binding{action = "move", key = 115} --s
-Binding{action = "strafe", key = 100} --d
-Binding{action = "jump", key = 99} --c
-Binding{action = "crouch", key = 120} --x
-Binding{action = "pick-up", key = 44} --COMMA
-Binding{action = "use", key = 32} --SPACE
-Binding{action = "run", key = 304} --LSHIFT
-Binding{action = "shoot", key = 305} --RCTRL
-Binding{action = "camera-switch", key = 121} --y
-Binding{action = "screenshot", key = 316} --PRINT
+Action{name = "Use", mode = "press", key1 = Keys.SPACE, func = function()
+	Commands:use()
+end}
 
-Binding{action = "shoot", mousebutton = 1} --BUTTON1
-Binding{action = "run", mousebutton = 3} --BUTTON3
-Binding{action = "camera-zoom", mousebutton = 4, mult = -2.0} --BUTTON4
-Binding{action = "camera-zoom", mousebutton = 5, mult = 2.0} --BUTTON5
-Binding{action = "edit-select", mousebutton = 1, mods = 0x40} --LCTRL+BUTTON1
-Binding{action = "turn", mousedelta = 0, mult = 0.5} --AXIS0
-Binding{action = "tilt", mousedelta = 1, mult = 0.3} --AXIS1
-Binding{action = "camera-turn", mousedelta = 0, mods = 0x40, mult = 0.5} --AXIS0+LCTRL
-Binding{action = "camera-tilt", mousedelta = 1, mods = 0x40, mult = 0.3} --AXIS1+LCTRL
---Binding{action = "camera-tilt", key = 100, mult = 10.0} --d
---Binding{action = "camera-tilt", key = 99, mult = -10.0} --c
+Action{name = "Zoom", mode = "analog", key1 = "mouse4", key2 = "mouse5", func = function(v)
+	Player.camera:zoom{rate = 2 * v}
+end}
 
-Binding{action = "jump", joystickbutton = 1} --BUTTON1
-Binding{action = "run", joystickbutton = 2} --BUTTON2
-Binding{action = "shoot", joystickbutton = 3} --BUTTON3
-Binding{action = "use", joystickbutton = 4} --BUTTON4
-Binding{action = "move", joystickaxis = 1} --AXIS1
-Binding{action = "turn", joystickaxis = 0} --AXIS0
+------------------------------------------------------------------------------
 
-for i = 1,12 do
-	Binding{action = "quickslot", params = "" .. i, key = 282 + i - 1} --F1..F12
-end
+Eventhandler{type = "keypress", func = function(self, args)
+	if Client.moving then
+		Action:event(args)
+	else
+		local w = Widgets.focused_widget_prev
+		if w and w.event then
+			w:event(args)
+			Action:event(args, {})
+		else
+			Action:event(args, {
+				["Menu"] = true,
+				["Pick up"] = true,
+				["Screenshot"] = true,
+				["Use"] = true})
+		end
+	end
+end}
+
+Eventhandler{type = "keyrelease", func = function(self, args)
+	if Client.moving then
+		Action:event(args)
+	else
+		Action:event(args, {})
+	end
+end}
+
+Eventhandler{type = "mousepress", func = function(self, args)
+	Action:event(args, not Client.moving and {})
+end}
+
+Eventhandler{type = "mouserelease", func = function(self, args)
+	Action:event(args, not Client.moving and {})
+end}
+
+Eventhandler{type = "mousemotion", func = function(self, args)
+	Action:event(args, not Client.moving and {})
+end}

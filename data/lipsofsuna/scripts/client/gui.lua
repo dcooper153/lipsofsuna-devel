@@ -23,6 +23,10 @@ Widgets.Scene.pick = function(self)
 	return Target:pick_scene()
 end
 
+Widgets.Scene.pressed = function(self)
+	Target:select_scene()
+end
+
 Widgets.Scene.render = function(self)
 	Player.camera.viewport = {self.x, self.y, self.width, self.height}
 	self.scene:draw_begin{

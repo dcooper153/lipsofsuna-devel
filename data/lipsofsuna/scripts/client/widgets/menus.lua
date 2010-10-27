@@ -26,8 +26,6 @@ Widgets.Menus.open = function(self, args)
 	-- Disable player controls when the menu is open.
 	if not self.visible then
 		Client.moving = false
-		controls.EDIT_SELECT.enabled = true
-		controls.SHOOT.enabled = false
 	end
 	-- Make sure we are visible.
 	self.visible = true
@@ -56,8 +54,6 @@ Widgets.Menus.close = function(self, args)
 	-- Enable player controls when the menu is closed.
 	if h and not self.visible then
 		Client.moving = true
-		controls.EDIT_SELECT.enabled = false
-		controls.SHOOT.enabled = true
 	end
 end
 

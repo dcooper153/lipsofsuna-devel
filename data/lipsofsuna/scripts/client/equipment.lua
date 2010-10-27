@@ -37,7 +37,7 @@ Equipment.set_item = function(clss, slot, name)
 end
 
 Equipment.clicked = function(clss, slot)
-	if Target:active() then
+	if Target.active then
 		Target:select_equipment(slot)
 	else
 		Target:start("Where would you like to move that?", function(where, id, slott)

@@ -20,7 +20,6 @@
 
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/callback.h>
-#include <lipsofsuna/binding.h>
 #include <lipsofsuna/engine.h>
 #include <lipsofsuna/main.h>
 #include <lipsofsuna/paths.h>

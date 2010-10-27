@@ -3,7 +3,7 @@ Container.dialogs = {}
 Container.lists = {}
 
 function Container.clicked(self, id, slot)
-	if Target:active() then
+	if Target.active then
 		Target:select_container(id, slot)
 	else
 		Target:start("Where would you like to move that?", function(where, idd, slott)
