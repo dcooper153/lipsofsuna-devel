@@ -1,0 +1,9 @@
+0.1.1
+
+ * Included the NEWS file.
+ * Lowered OpenGL requirements to 3.2 from 3.3.
+ * Nvidia compatiblity fixes for shaders.
+ * Fixed errors in the configuration script.
+ * Objects can be used by looking at them and pressing space.
+ * Major user interface improvements, including massive speedups.
+ * Quest menu that shows statuses and descriptions of quests.

@@ -4,7 +4,7 @@ import Options
 import Utils
 
 APPNAME='lipsofsuna'
-VERSION='0.1.0'
+VERSION='0.1.1'
 
 top = '.'
 out = '.build'
@@ -237,7 +237,7 @@ def build(ctx):
 def dist(ctx):
 	import Logs
 	import tarfile
-	dirs = ['src/**/*.*', 'data/**/*.*', 'tool/*', 'docs/*', 'AUTHORS', 'COPYING', 'README', 'waf', 'wscript']
+	dirs = ['src/**/*.*', 'data/**/*.*', 'tool/*', 'docs/*', 'AUTHORS', 'COPYING', 'NEWS', 'README', 'waf', 'wscript']
 	excl = ['**/.*', '**/import', 'docs/html']
 	base = APPNAME + '-' + VERSION
 	name = base + '.tar.gz'
