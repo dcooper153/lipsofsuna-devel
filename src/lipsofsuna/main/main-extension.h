@@ -35,7 +35,9 @@ typedef struct _LIMaiExtension LIMaiExtension;
 struct _LIMaiExtension
 {
 	LIMaiExtensionInfo* info;
+	LIMaiExtension* next;
 	LISysModule* module;
+	char name[64];
 	void* object;
 };
 

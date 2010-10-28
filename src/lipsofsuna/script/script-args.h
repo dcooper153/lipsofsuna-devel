@@ -82,6 +82,11 @@ LIAPICALL (int, liscr_args_geti_bool, (
 	int         index,
 	int*        result));
 
+LIAPICALL (int, liscr_args_geti_bool_convert, (
+	LIScrArgs*  self,
+	int         index,
+	int*        result));
+
 LIAPICALL (int, liscr_args_geti_class, (
 	LIScrArgs*   self,
 	int          index,

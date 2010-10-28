@@ -22,9 +22,10 @@
  * @{
  */
 
-#include <lipsofsuna/engine.h>
-#include <lipsofsuna/main.h>
-#include <lipsofsuna/script.h>
+#include "lipsofsuna/engine.h"
+#include "lipsofsuna/main.h"
+#include "lipsofsuna/script.h"
+#include "script-private.h"
 
 /* @luadoc
  * module "builtin/object"
@@ -340,7 +341,7 @@ static void Object_new (LIScrArgs* args)
 	liscr_args_call_setters_except (args, self->script, "realized");
 	liscr_args_gets_bool (args, "realized", &realize);
 	liscr_args_seti_data (args, self->script);
-	liscr_data_unref (self->script, NULL);
+	liscr_data_unref (self->script);
 	lieng_object_set_realized (self, realize);
 }
 
@@ -546,35 +547,6 @@ static void Object_setter_rotation_smoothing (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Save enabled flag.
- * --
- * -- @name Object.save
- * -- @class table
- */
-static void Object_getter_save (LIScrArgs* args)
-{
-	int flags;
-
-	flags = lieng_object_get_flags (args->self);
-	liscr_args_seti_bool (args, (flags & (LIENG_OBJECT_FLAG_SAVE)) != 0);
-}
-static void Object_setter_save (LIScrArgs* args)
-{
-	int flags;
-	int value;
-
-	if (liscr_args_geti_bool (args, 0, &value))
-	{
-		flags = lieng_object_get_flags (args->self);
-		if (value)
-			flags |= LIENG_OBJECT_FLAG_SAVE;
-		else
-			flags &= ~LIENG_OBJECT_FLAG_SAVE;
-		lieng_object_set_flags (args->self, flags);
-	}
-}
-
-/* @luadoc
  * --- The sector index of the object, or nil if the object isn't on the map.
  * --
  * -- @name Object.sector
@@ -586,65 +558,6 @@ static void Object_getter_sector (LIScrArgs* args)
 
 	if (self->sector != NULL)
 		liscr_args_seti_int (args, self->sector->sector->index);
-}
-
-/* @luadoc
- * --- Selection status flag.
- * --
- * -- @name Object.selected
- * -- @class table
- */
-static void Object_getter_selected (LIScrArgs* args)
-{
-	liscr_args_seti_bool (args, lieng_object_get_selected (args->self));
-}
-static void Object_setter_selected (LIScrArgs* args)
-{
-	int value;
-
-	if (liscr_args_geti_bool (args, 0, &value))
-		lieng_object_set_selected (args->self, value);
-}
-
-/* @luadoc
- * --- List of selected objects.
- * -- <br/>
- * -- Class variable.
- * -- @name Object.selected_objects
- * -- @class table
- */
-static void Object_getter_selected_objects (LIScrArgs* args)
-{
-	LIEngSelectionIter iter;
-	LIMaiProgram* program;
-
-	/* Create empty table. */
-	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
-	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-
-	/* Pack selected objects. */
-	LIENG_FOREACH_SELECTION (iter, program->engine)
-	{
-		if (lieng_object_get_realized (iter.object))
-			liscr_args_seti_data (args, iter.object->script);
-	}
-}
-static void Object_setter_selected_objects (LIScrArgs* args)
-{
-	int i;
-	LIEngSelectionIter iter;
-	LIMaiProgram* program;
-	LIScrData* data;
-
-	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
-
-	/* Unselect all. */
-	LIENG_FOREACH_SELECTION (iter, program->engine)
-		lieng_object_set_selected (iter.object, 0);
-
-	/* Select listed. */
-	for (i = 0 ; liscr_args_geti_data (args, i, LISCR_SCRIPT_OBJECT, &data) ; i++)
-		lieng_object_set_selected (data->data, 1);
 }
 
 /*****************************************************************************/
@@ -673,10 +586,7 @@ void liscr_script_object (
 	liscr_class_insert_mvar (self, "realized", Object_getter_realized, Object_setter_realized);
 	liscr_class_insert_mvar (self, "rotation", Object_getter_rotation, Object_setter_rotation);
 	liscr_class_insert_mvar (self, "rotation_smoothing", Object_getter_rotation_smoothing, Object_setter_rotation_smoothing);
-	liscr_class_insert_mvar (self, "save", Object_getter_save, Object_setter_save);
 	liscr_class_insert_mvar (self, "sector", Object_getter_sector, NULL);
-	liscr_class_insert_mvar (self, "selected", Object_getter_selected, Object_setter_selected);
-	liscr_class_insert_cvar (self, "selected_objects", Object_getter_selected_objects, Object_setter_selected_objects);
 }
 
 /** @} */

@@ -1395,14 +1395,22 @@ static void private_call_attach (
 	int          x,
 	int          y)
 {
+	lua_State* lua;
+	LIScrScript* script;
 	LIWdgWidget* child;
 
 	child = self->cells[x + y * self->width].child;
 	if (child != NULL)
 	{
+		script = liscr_data_get_script (self->script);
+		lua = liscr_script_get_lua (script);
 		lisys_assert (self->script != NULL);
 		lisys_assert (child->script != NULL);
-		liscr_data_ref (child->script, self->script);
+		liscr_pushpriv (lua, self->script);
+		lua_pushlightuserdata (lua, child->script);
+		liscr_pushdata (lua, child->script);
+		lua_settable (lua, -3);
+		lua_pop (lua, 1);
 	}
 }
 
@@ -1411,12 +1419,20 @@ static void private_call_detach (
 	int          x,
 	int          y)
 {
+	lua_State* lua;
+	LIScrScript* script;
 	LIWdgWidget* child;
 
 	child = self->cells[x + y * self->width].child;
 	if (child != NULL)
 	{
-		liscr_data_unref (child->script, self->script);
+		script = liscr_data_get_script (self->script);
+		lua = liscr_script_get_lua (script);
+		liscr_pushpriv (lua, self->script);
+		lua_pushlightuserdata (lua, child->script);
+		lua_pushnil (lua);
+		lua_settable (lua, -3);
+		lua_pop (lua, 1);
 		child->parent = NULL;
 		self->cells[x + y * self->width].child = NULL;
 	}

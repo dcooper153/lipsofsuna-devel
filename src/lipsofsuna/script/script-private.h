@@ -26,8 +26,9 @@
 #include "script-types.h"
 
 #define LISCR_SCRIPT_SELF (NULL + 1)
-#define LISCR_SCRIPT_LOOKUP_CLASS (NULL + 2)
-#define LISCR_SCRIPT_LOOKUP_DATA (NULL + 3)
+#define LISCR_SCRIPT_REFS (NULL + 2)
+#define LISCR_SCRIPT_LOOKUP_CLASS (NULL + 3)
+#define LISCR_SCRIPT_LOOKUP_DATA (NULL + 4)
 
 typedef struct _LIScrClassMemb LIScrClassMemb;
 
@@ -38,6 +39,7 @@ enum
 
 struct _LIScrClass
 {
+	char signature;
 	int flags;
 	char* name;
 	LIAlgStrdic* userdata;
@@ -56,6 +58,22 @@ struct _LIScrClassMemb
 	int member;
 	LIScrArgsFunc getter;
 	LIScrArgsFunc setter;
+};
+
+struct _LIScrData
+{
+	char signature;
+	LIScrClass* clss;
+	LIScrScript* script;
+	LIScrGCFunc free;
+	void* data;
+	int refcount;
+};
+
+struct _LIScrScript
+{
+	void* userpointer;
+	lua_State* lua;
 };
 
 #endif

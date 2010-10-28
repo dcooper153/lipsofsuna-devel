@@ -96,14 +96,15 @@ liren_image_new_from_file (LIRenRender* render,
 	return self;
 }
 
-void
-liren_image_free (LIRenImage* self)
+void liren_image_free (
+	LIRenImage* self)
 {
 	/* Remove from dictionary. */
 	if (self->added)
 		lialg_strdic_remove (self->render->images, self->name);
 
-	/* Free self. */
+	if (self->texture != NULL)
+		liimg_texture_free (self->texture);
 	lisys_free (self->name);
 	lisys_free (self->path);
 	lisys_free (self);

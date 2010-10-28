@@ -28,23 +28,24 @@ static int private_callback_pressed (
 	LIScrData* data)
 {
 	LIScrScript* script = liscr_data_get_script (data);
+	lua_State* lua = liscr_script_get_lua (script);
 
-	liscr_pushdata (script->lua, data);
-	lua_getfield (script->lua, -1, "pressed");
-	if (lua_type (script->lua, -1) == LUA_TFUNCTION)
+	liscr_pushdata (lua, data);
+	lua_getfield (lua, -1, "pressed");
+	if (lua_type (lua, -1) == LUA_TFUNCTION)
 	{
-		lua_pushvalue (script->lua, -2);
-		lua_remove (script->lua, -3);
-		if (lua_pcall (script->lua, 1, 0, 0) != 0)
+		lua_pushvalue (lua, -2);
+		lua_remove (lua, -3);
+		if (lua_pcall (lua, 1, 0, 0) != 0)
 		{
-			lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.pressed: %s", lua_tostring (script->lua, -1));
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.pressed: %s", lua_tostring (lua, -1));
 			lisys_error_report ();
-			lua_pop (script->lua, 1);
+			lua_pop (lua, 1);
 		}
 		return 0;
 	}
 	else
-		lua_pop (script->lua, 2);
+		lua_pop (lua, 2);
 	return 1;
 }
 
@@ -111,8 +112,8 @@ static void Widget_append_col (LIScrArgs* args)
 	/* Append rows. */
 	for (i = 0 ; i < h && liscr_args_geti_data (args, i, LIEXT_SCRIPT_WIDGET, &data) ; i++)
 	{
-		liwdg_widget_detach (data->data);
-		liwdg_widget_set_child (args->self, w, i, data->data);
+		liwdg_widget_detach (liscr_data_get_data (data));
+		liwdg_widget_set_child (args->self, w, i, liscr_data_get_data (data));
 	}
 }
 
@@ -138,8 +139,8 @@ static void Widget_append_row (LIScrArgs* args)
 	/* Append columns. */
 	for (i = 0 ; i < w && liscr_args_geti_data (args, i, LIEXT_SCRIPT_WIDGET, &data) ; i++)
 	{
-		liwdg_widget_detach (data->data);
-		liwdg_widget_set_child (args->self, i, h, data->data);
+		liwdg_widget_detach (liscr_data_get_data (data));
+		liwdg_widget_set_child (args->self, i, h, liscr_data_get_data (data));
 	}
 }
 
@@ -345,97 +346,73 @@ static void Widget_get_request (LIScrArgs* args)
 /* @luadoc
  * --- Inserts a column to the widget.
  * -- @param self Widget.
- * -- @param col Column index.
- * -- @param widget Optional widget.
- * function Widget.insert_col(self, col, widget)
+ * -- @param args Arguments.<ul>
+ * --   <li>1,col: Column index or nil.</li>
+ * --   <li>2,widget: Widget or nil.</li></ul>
+ * function Widget.insert_col(self, args)
  */
-static int Widget_insert_col (lua_State* lua)
+static void Widget_insert_col (LIScrArgs* args)
 {
 	int w;
 	int h;
-	int col;
-	LIScrData* self;
-	LIScrData* widget;
+	int col = 0;
+	LIScrData* widget = NULL;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_WIDGET);
-	col = luaL_checkint (lua, 2) - 1;
-	if (!lua_isnoneornil (lua, 3))
-		widget = liscr_checkdata (lua, 3, LIEXT_SCRIPT_WIDGET);
-	else
-		widget = NULL;
-	liwdg_widget_get_size (self->data, &w, &h);
-	luaL_argcheck (lua, col >= 0 && col <= w, 2, "invalid column");
+	if (!liscr_args_geti_int (args, 0, &col))
+		liscr_args_gets_int (args, "col", &col);
+	if (!liscr_args_geti_data (args, 1, LIEXT_SCRIPT_WIDGET, &widget))
+		liscr_args_gets_data (args, "widget", LIEXT_SCRIPT_WIDGET, &widget);
+	col--;
+	liwdg_widget_get_size (args->self, &w, &h);
+	if (col < 0) col = 0;
+	if (col > w) col = w;
 
 	/* Insert row. */
-	if (!liwdg_widget_insert_col (self->data, col))
-		return 0;
+	if (!liwdg_widget_insert_col (args->self, col))
+		return;
 
 	/* Set widget. */
-	if (widget != NULL)
+	if (h && widget != NULL)
 	{
-		lua_getfield (lua, 1, "set_child");
-		lua_pushvalue (lua, 1);
-		lua_pushnumber (lua, col + 1);
-		lua_pushnumber (lua, 1);
-		lua_pushvalue (lua, 3);
-		if (lua_pcall (lua, 4, 0, 0) != 0)
-		{
-			lisys_error_set (LISYS_ERROR_UNKNOWN, "%s", lua_tostring (lua, -1));
-			lisys_error_report ();
-			lua_pop (lua, 1);
-			return 0;
-		}
+		liwdg_widget_detach (liscr_data_get_data (widget));
+		liwdg_widget_set_child (args->self, col, 0, liscr_data_get_data (widget));
 	}
-
-	return 0;
 }
 
 /* @luadoc
  * --- Inserts a row to the widget.
  * -- @param self Widget.
- * -- @param row Row index.
- * -- @param widget Optional widget.
- * function Widget.insert_row(self, row, widget)
+ * -- @param args Arguments.<ul>
+ * --   <li>1,row: Row index or nil.</li>
+ * --   <li>2,widget: Widget or nil.</li></ul>
+ * function Widget.insert_row(self, args)
  */
-static int Widget_insert_row (lua_State* lua)
+static void Widget_insert_row (LIScrArgs* args)
 {
 	int w;
 	int h;
-	int row;
-	LIScrData* self;
-	LIScrData* widget;
+	int row = 0;
+	LIScrData* widget = NULL;
 
-	self = liscr_checkdata (lua, 1, LIEXT_SCRIPT_WIDGET);
-	row = luaL_checkint (lua, 2) - 1;
-	if (!lua_isnoneornil (lua, 3))
-		widget = liscr_checkdata (lua, 3, LIEXT_SCRIPT_WIDGET);
-	else
-		widget = NULL;
-	liwdg_widget_get_size (self->data, &w, &h);
-	luaL_argcheck (lua, row >= 0 && row <= h, 2, "invalid row");
+	if (!liscr_args_geti_int (args, 0, &row))
+		liscr_args_gets_int (args, "row", &row);
+	if (!liscr_args_geti_data (args, 1, LIEXT_SCRIPT_WIDGET, &widget))
+		liscr_args_gets_data (args, "widget", LIEXT_SCRIPT_WIDGET, &widget);
+	row--;
+	liwdg_widget_get_size (args->self, &w, &h);
+	if (row < 0) row = 0;
+	if (row > w) row = w;
 
 	/* Insert row. */
-	if (!liwdg_widget_insert_row (self->data, row))
-		return 0;
+	if (!liwdg_widget_insert_row (args->self, row))
+		return;
 
 	/* Set widget. */
-	if (widget != NULL)
+	if (w && widget != NULL)
 	{
-		lua_getfield (lua, 1, "set_child");
-		lua_pushvalue (lua, 1);
-		lua_pushnumber (lua, 1);
-		lua_pushnumber (lua, row + 1);
-		lua_pushvalue (lua, 3);
-		if (lua_pcall (lua, 4, 0, 0) != 0)
-		{
-			lisys_error_set (LISYS_ERROR_UNKNOWN, "%s", lua_tostring (lua, -1));
-			lisys_error_report ();
-			lua_pop (lua, 1);
-			return 0;
-		}
+		liwdg_widget_detach (liscr_data_get_data (widget));
+		liwdg_widget_set_child (args->self, 0, row, liscr_data_get_data (widget));
 	}
-
-	return 0;
 }
 
 /* @luadoc
@@ -483,7 +460,7 @@ static void Widget_popup (LIScrArgs* args)
 	liwdg_widget_set_visible (widget, 1);
 	liwdg_manager_insert_window (widget->manager, widget);
 	liwdg_widget_set_allocation (widget, rect.x, rect.y, rect.width, rect.height);
-	liscr_data_ref (args->data, NULL);
+	liscr_data_ref (args->data);
 }
 
 /* @luadoc
@@ -537,8 +514,8 @@ static void Widget_set_child (LIScrArgs* args)
 	/* Attach new widget. */
 	if (data != NULL)
 	{
-		liwdg_widget_detach (data->data);
-		liwdg_widget_set_child (args->self, x - 1, y - 1, data->data);
+		liwdg_widget_detach (liscr_data_get_data (data));
+		liwdg_widget_set_child (args->self, x - 1, y - 1, liscr_data_get_data (data));
 	}
 	else
 		liwdg_widget_set_child (args->self, x - 1, y - 1, NULL);
@@ -892,8 +869,8 @@ void liext_script_widget (
 	liscr_class_insert_mfunc (self, "canvas_text", Widget_canvas_text);
 	liscr_class_insert_mfunc (self, "get_child", Widget_get_child);
 	liscr_class_insert_mfunc (self, "get_request", Widget_get_request);
-	liscr_class_insert_func (self, "insert_col", Widget_insert_col);
-	liscr_class_insert_func (self, "insert_row", Widget_insert_row);
+	liscr_class_insert_mfunc (self, "insert_col", Widget_insert_col);
+	liscr_class_insert_mfunc (self, "insert_row", Widget_insert_row);
 	liscr_class_insert_mfunc (self, "popup", Widget_popup);
 	liscr_class_insert_mfunc (self, "remove", Widget_remove);
 	liscr_class_insert_mfunc (self, "set_child", Widget_set_child);

@@ -22,7 +22,8 @@
  * @{
  */
 
-#include <lipsofsuna/script.h>
+#include "lipsofsuna/script.h"
+#include "script-private.h"
 
 static int private_member_compare (
 	const void* a,

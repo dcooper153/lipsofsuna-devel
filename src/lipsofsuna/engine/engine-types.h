@@ -20,21 +20,6 @@
 
 #include <lipsofsuna/system.h>
 
-enum _LIEngMatrix
-{
-	LIENG_MATRIX_LOCAL,
-	LIENG_MATRIX_WORLD,
-};
-
-enum
-{
-	LIENG_OBJECT_FLAG_DIRTY = 0x0001,
-	LIENG_OBJECT_FLAG_DYNAMIC = 0x0002,
-	LIENG_OBJECT_FLAG_INVISIBLE = 0x0008,
-	LIENG_OBJECT_FLAG_SAVE = 0x0010,
-	LIENG_OBJECT_FLAG_RELOAD = 0x8000
-};
-
 typedef struct _LIEngEngine LIEngEngine;
 typedef enum _LIEngMatrix LIEngMatrix;
 typedef struct _LIEngModel LIEngModel;

@@ -22,13 +22,19 @@
  * @{
  */
 
-#include <string.h>
+#include <lipsofsuna/string.h>
 #include <lipsofsuna/network.h>
 #include <lipsofsuna/script.h>
+#include "script-private.h"
 
-static int
-private_read (LIScrPacket* data,
-              lua_State*   lua);
+static void private_read (
+	LIScrPacket* self,
+	LIScrArgs*   args);
+
+static void private_write (
+	LIScrPacket* self,
+	LIScrArgs*   args,
+	int          start);
 
 /*****************************************************************************/
 
@@ -42,191 +48,84 @@ private_read (LIScrPacket* data,
 
 /* @luadoc
  * ---
- * -- First packet number for custom packets.
- * -- @name Packet.CUSTOM
- * -- @class table
- */
-
-/* @luadoc
- * ---
  * -- Creates a new packet.
- * --
  * -- @param self Packet class.
  * -- @param type Packet type.
  * -- @param ... Packet contents.
  * -- @return New packet.
  * function Packet.new(self, type, ...)
  */
-static int
-Packet_new (lua_State* lua)
+static void Packet_new (LIScrArgs* args)
 {
-	int err;
-	int type;
+	int type = 0;
 	LIScrData* self;
-	LIScrScript* script = liscr_script (lua);
 
-	liscr_checkclass (lua, 1, LISCR_SCRIPT_PACKET);
-	type = luaL_checkinteger (lua, 2);
+	liscr_args_geti_int (args, 0, &type);
 
 	/* Allocate packet. */
-	self = liscr_packet_new_writable (script, type);
+	self = liscr_packet_new_writable (args->script, type);
 	if (self == NULL)
-	{
-		lua_pushnil (lua);
-		return 1;
-	}
+		return;
 
 	/* Write content. */
-	lua_getfield (lua, LUA_GLOBALSINDEX, "Packet");
-	lua_getfield (lua, -1, "write");
-	lua_remove (lua, -2);
-	lua_replace (lua, 1);
-	liscr_pushdata (lua, self);
-	lua_replace (lua, 2);
-	err = lua_pcall (lua, lua_gettop (lua) - 1, 0, 0);
-	if (err != 0)
-	{
-		liscr_data_unref (self, NULL);
-		lua_error (lua);
-	}
+	private_write (self->data, args, 1);
 
 	/* Return packet. */
-	liscr_pushdata (lua, self);
-	liscr_data_unref (self, NULL);
-	return 1;
+	liscr_args_seti_data (args, self);
+	liscr_data_unref (self);
 }
 
 /* @luadoc
  * ---
  * -- Reads data starting from the beginning of the packet.
- * --
  * -- @param self Packet.
  * -- @param ... Types to read.
  * -- @return Boolean and a list of read values.
  * function Packet.read(self, ...)
  */
-static int
-Packet_read (lua_State* lua)
+static void Packet_read (LIScrArgs* args)
 {
-	LIScrData* self;
-	LIScrPacket* data;
+	LIScrPacket* self;
 
-	self = liscr_checkdata (lua, 1, LISCR_SCRIPT_PACKET);
-	data = self->data;
-	luaL_argcheck (lua, data->reader != NULL, 1, "packet is not readable");
-	data->reader->pos = 1;
-
-	return private_read (data, lua);
+	self = args->self;
+	if (self->reader != NULL)
+	{
+		self->reader->pos = 1;
+		private_read (self, args);
+	}
 }
 
 /* @luadoc
  * ---
  * -- Reads data starting from the last read positiong of the packet.
- * --
  * -- @param self Packet.
  * -- @param ... Types to read.
  * -- @return Boolean and a list of read values.
  * function Packet.resume(self, ...)
  */
-static int
-Packet_resume (lua_State* lua)
+static void Packet_resume (LIScrArgs* args)
 {
-	LIScrData* self;
-	LIScrPacket* data;
+	LIScrPacket* self;
 
-	self = liscr_checkdata (lua, 1, LISCR_SCRIPT_PACKET);
-	data = self->data;
-	luaL_argcheck (lua, data->reader != NULL, 1, "packet is not readable");
-
-	return private_read (data, lua);
+	self = args->self;
+	if (self->reader != NULL)
+		private_read (self, args);
 }
 
 /* @luadoc
  * ---
  * -- Appends data to the packet.
- * --
  * -- @param self Packet.
  * -- @param ... Types to write.
  * function Packet.write(self, ...)
  */
-static int
-Packet_write (lua_State* lua)
+static void Packet_write (LIScrArgs* args)
 {
-	int i;
-	const char* type;
-	LIScrData* self;
-	LIScrPacket* data;
-	union
-	{
-		int8_t i8;
-		int16_t i16;
-		int32_t i32;
-		uint8_t u8;
-		uint16_t u16;
-		uint32_t u32;
-		float flt;
-		const char* str;
-	} tmp;
+	LIScrPacket* self;
 
-	self = liscr_checkdata (lua, 1, LISCR_SCRIPT_PACKET);
-	data = self->data;
-	luaL_argcheck (lua, data->writer != NULL, 1, "packet is not writable");
-
-	/* Write content. */
-	for (i = 2 ; i <= lua_gettop (lua) ; i++)
-	{
-		type = luaL_checkstring (lua, i++);
-		if (!strcmp (type, "bool"))
-		{
-			tmp.u8 = lua_toboolean (lua, i);
-			liarc_writer_append_uint8 (data->writer, tmp.u8);
-		}
-		else if (!strcmp (type, "float"))
-		{
-			tmp.flt = luaL_checknumber (lua, i);
-			liarc_writer_append_float (data->writer, tmp.flt);
-		}
-		else if (!strcmp (type, "int8"))
-		{
-			tmp.i8 = luaL_checknumber (lua, i);
-			liarc_writer_append_int8 (data->writer, tmp.i8);
-		}
-		else if (!strcmp (type, "int16"))
-		{
-			tmp.i16 = luaL_checknumber (lua, i);
-			liarc_writer_append_int16 (data->writer, tmp.i16);
-		}
-		else if (!strcmp (type, "int32"))
-		{
-			tmp.i32 = luaL_checknumber (lua, i);
-			liarc_writer_append_int32 (data->writer, tmp.i32);
-		}
-		else if (!strcmp (type, "string"))
-		{
-			tmp.str = luaL_checkstring (lua, i);
-			liarc_writer_append_string (data->writer, tmp.str);
-			liarc_writer_append_nul (data->writer);
-		}
-		else if (!strcmp (type, "uint8"))
-		{
-			tmp.u8 = luaL_checknumber (lua, i);
-			liarc_writer_append_uint8 (data->writer, tmp.u8);
-		}
-		else if (!strcmp (type, "uint16"))
-		{
-			tmp.u16 = luaL_checknumber (lua, i);
-			liarc_writer_append_uint16 (data->writer, tmp.u16);
-		}
-		else if (!strcmp (type, "uint32"))
-		{
-			tmp.u32 = luaL_checknumber (lua, i);
-			liarc_writer_append_uint32 (data->writer, tmp.u32);
-		}
-		else
-			luaL_argerror (lua, i - 1, "invalid format");
-	}
-
-	return 0;
+	self = args->self;
+	if (self->writer != NULL)
+		private_write (self, args, 0);
 }
 
 /* @luadoc
@@ -281,22 +180,22 @@ static void Packet_setter_type (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void
-liscr_script_packet (LIScrClass* self,
-                   void*       data)
+void liscr_script_packet (
+	LIScrClass* self,
+	void*       data)
 {
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_func (self, "new", Packet_new);
-	liscr_class_insert_func (self, "read", Packet_read);
-	liscr_class_insert_func (self, "resume", Packet_resume);
-	liscr_class_insert_func (self, "write", Packet_write);
+	liscr_class_insert_cfunc (self, "new", Packet_new);
+	liscr_class_insert_mfunc (self, "read", Packet_read);
+	liscr_class_insert_mfunc (self, "resume", Packet_resume);
+	liscr_class_insert_mfunc (self, "write", Packet_write);
 	liscr_class_insert_mvar (self, "size", Packet_getter_size, NULL);
 	liscr_class_insert_mvar (self, "type", Packet_getter_type, Packet_setter_type);
 }
 
-LIScrData*
-liscr_packet_new_readable (LIScrScript*       script,
-                           const LIArcReader* reader)
+LIScrData* liscr_packet_new_readable (
+	LIScrScript*       script,
+	const LIArcReader* reader)
 {
 	LIScrClass* clss;
 	LIScrData* data;
@@ -336,9 +235,9 @@ liscr_packet_new_readable (LIScrScript*       script,
 	return data;
 }
 
-LIScrData*
-liscr_packet_new_writable (LIScrScript* script,
-                           int          type)
+LIScrData* liscr_packet_new_writable (
+	LIScrScript* script,
+	int          type)
 {
 	LIScrClass* clss;
 	LIScrData* data;
@@ -370,8 +269,8 @@ liscr_packet_new_writable (LIScrScript* script,
 	return data;
 }
 
-void
-liscr_packet_free (LIScrPacket* self)
+void liscr_packet_free (
+	LIScrPacket* self)
 {
 	if (self->writer != NULL)
 		liarc_writer_free (self->writer);
@@ -383,11 +282,12 @@ liscr_packet_free (LIScrPacket* self)
 
 /*****************************************************************************/
 
-static int
-private_read (LIScrPacket* data,
-              lua_State*   lua)
+static void private_read (
+	LIScrPacket* self,
+	LIScrArgs*   args)
 {
 	int i;
+	int p;
 	int ok = 1;
 	const char* type;
 	union
@@ -402,68 +302,169 @@ private_read (LIScrPacket* data,
 		char* str;
 	} tmp;
 
-	/* Read content. */
-	for (i = 2 ; i <= lua_gettop (lua) ; i++)
+	/* Check for valid format. */
+	p = self->reader->pos;
+	for (i = 0 ; liscr_args_geti_string (args, i, &type) ; i++)
 	{
-		type = luaL_checkstring (lua, i);
+		if (!strcmp (type, "bool"))
+			ok = liarc_reader_get_int8 (self->reader, &tmp.i8);
+		else if (!strcmp (type, "float"))
+			ok = liarc_reader_get_float (self->reader, &tmp.flt);
+		else if (!strcmp (type, "int8"))
+			ok = liarc_reader_get_int8 (self->reader, &tmp.i8);
+		else if (!strcmp (type, "int16"))
+			ok = liarc_reader_get_int16 (self->reader, &tmp.i16);
+		else if (!strcmp (type, "int32"))
+			ok = liarc_reader_get_int32 (self->reader, &tmp.i32);
+		else if (!strcmp (type, "string"))
+		{
+			if (liarc_reader_get_text (self->reader, "", &tmp.str))
+			{
+				ok = listr_utf8_get_valid (tmp.str);
+				lisys_free (tmp.str);
+			}
+			else
+				ok = 0;
+		}
+		else if (!strcmp (type, "uint8"))
+			ok = liarc_reader_get_uint8 (self->reader, &tmp.u8);
+		else if (!strcmp (type, "uint16"))
+			ok = liarc_reader_get_uint16 (self->reader, &tmp.u16);
+		else if (!strcmp (type, "uint32"))
+			ok = liarc_reader_get_uint32 (self->reader, &tmp.u32);
+		else
+			ok = 0;
+		if (!ok)
+			return;
+	}
+	liscr_args_seti_bool (args, 1);
+	self->reader->pos = p;
+
+	/* Read and return contents. */
+	for (i = 0 ; liscr_args_geti_string (args, i, &type) ; i++)
+	{
+		liscr_args_geti_string (args, i, &type);
 		if (!strcmp (type, "bool"))
 		{
-			if (ok) ok &= liarc_reader_get_int8 (data->reader, &tmp.i8);
-			if (ok) lua_pushboolean (lua, tmp.i8);
+			liarc_reader_get_uint8 (self->reader, &tmp.u8);
+			liscr_args_seti_bool (args, tmp.u8);
 		}
 		else if (!strcmp (type, "float"))
 		{
-			if (ok) ok &= liarc_reader_get_float (data->reader, &tmp.flt);
-			if (ok) lua_pushnumber (lua, tmp.flt);
+			liarc_reader_get_float (self->reader, &tmp.flt);
+			liscr_args_seti_float (args, tmp.flt);
 		}
 		else if (!strcmp (type, "int8"))
 		{
-			if (ok) ok &= liarc_reader_get_int8 (data->reader, &tmp.i8);
-			if (ok) lua_pushnumber (lua, tmp.i8);
+			liarc_reader_get_int8 (self->reader, &tmp.i8);
+			liscr_args_seti_int (args, tmp.i8);
 		}
 		else if (!strcmp (type, "int16"))
 		{
-			if (ok) ok &= liarc_reader_get_int16 (data->reader, &tmp.i16);
-			if (ok) lua_pushnumber (lua, tmp.i16);
+			liarc_reader_get_int16 (self->reader, &tmp.i16);
+			liscr_args_seti_int (args, tmp.i16);
 		}
 		else if (!strcmp (type, "int32"))
 		{
-			if (ok) ok &= liarc_reader_get_int32 (data->reader, &tmp.i32);
-			if (ok) lua_pushnumber (lua, tmp.i32);
+			liarc_reader_get_int32 (self->reader, &tmp.i32);
+			liscr_args_seti_float (args, tmp.i32);
 		}
 		else if (!strcmp (type, "string"))
 		{
-			tmp.str = NULL;
-			if (ok) ok &= liarc_reader_get_text (data->reader, "", &tmp.str);
-			if (ok) ok &= listr_utf8_get_valid (tmp.str);
-			if (ok) lua_pushstring (lua, tmp.str);
-			lisys_free (tmp.str);
+			if (liarc_reader_get_text (self->reader, "", &tmp.str))
+			{
+				liscr_args_seti_string (args, tmp.str);
+				lisys_free (tmp.str);
+			}
 		}
 		else if (!strcmp (type, "uint8"))
 		{
-			if (ok) ok &= liarc_reader_get_uint8 (data->reader, &tmp.u8);
-			if (ok) lua_pushnumber (lua, tmp.u8);
+			liarc_reader_get_uint8 (self->reader, &tmp.u8);
+			liscr_args_seti_int (args, tmp.u8);
 		}
 		else if (!strcmp (type, "uint16"))
 		{
-			if (ok) ok &= liarc_reader_get_uint16 (data->reader, &tmp.u16);
-			if (ok) lua_pushnumber (lua, tmp.u16);
+			liarc_reader_get_uint16 (self->reader, &tmp.u16);
+			liscr_args_seti_int (args, tmp.u16);
 		}
 		else if (!strcmp (type, "uint32"))
 		{
-			if (ok) ok &= liarc_reader_get_uint32 (data->reader, &tmp.u32);
-			if (ok) lua_pushnumber (lua, tmp.u32);
+			liarc_reader_get_uint32 (self->reader, &tmp.u32);
+			liscr_args_seti_float (args, tmp.u32);
 		}
-		else
-			luaL_argerror (lua, i, "invalid format");
-		if (!ok)
-			lua_pushnil (lua);
-		lua_replace (lua, i);
 	}
+}
 
-	lua_pushboolean (lua, ok);
-	lua_replace (lua, 1);
-	return lua_gettop (lua);
+static void private_write (
+	LIScrPacket* self,
+	LIScrArgs*   args,
+	int          start)
+{
+	int i;
+	int bol;
+	float flt;
+	const char* str;
+	const char* type;
+
+	for (i = start ; liscr_args_geti_string (args, i, &type) ; i++)
+	{
+		i++;
+		if (!strcmp (type, "bool"))
+		{
+			bol = 0;
+			liscr_args_geti_bool_convert (args, i, &bol);
+			liarc_writer_append_uint8 (self->writer, bol);
+		}
+		else if (!strcmp (type, "float"))
+		{
+			flt = 0.0f;
+			liscr_args_geti_float (args, i, &flt);
+			liarc_writer_append_float (self->writer, flt);
+		}
+		else if (!strcmp (type, "int8"))
+		{
+			flt = 0.0f;
+			liscr_args_geti_float (args, i, &flt);
+			liarc_writer_append_int8 (self->writer, (int8_t) flt);
+		}
+		else if (!strcmp (type, "int16"))
+		{
+			flt = 0.0f;
+			liscr_args_geti_float (args, i, &flt);
+			liarc_writer_append_int16 (self->writer, (int16_t) flt);
+		}
+		else if (!strcmp (type, "int32"))
+		{
+			flt = 0.0f;
+			liscr_args_geti_float (args, i, &flt);
+			liarc_writer_append_int32 (self->writer, (int32_t) flt);
+		}
+		else if (!strcmp (type, "string"))
+		{
+			str = "";
+			liscr_args_geti_string (args, i, &str);
+			liarc_writer_append_string (self->writer, str);
+			liarc_writer_append_nul (self->writer);
+		}
+		else if (!strcmp (type, "uint8"))
+		{
+			flt = 0.0f;
+			liscr_args_geti_float (args, i, &flt);
+			liarc_writer_append_int8 (self->writer, (uint8_t) flt);
+		}
+		else if (!strcmp (type, "uint16"))
+		{
+			flt = 0.0f;
+			liscr_args_geti_float (args, i, &flt);
+			liarc_writer_append_int16 (self->writer, (uint16_t) flt);
+		}
+		else if (!strcmp (type, "uint32"))
+		{
+			flt = 0.0f;
+			liscr_args_geti_float (args, i, &flt);
+			liarc_writer_append_int32 (self->writer, (uint32_t) flt);
+		}
+	}
 }
 
 /** @} */

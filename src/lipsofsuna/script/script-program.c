@@ -106,7 +106,7 @@ static void Program_pop_event (LIScrArgs* args)
 	if (data != NULL)
 	{
 		liscr_args_seti_data (args, data);
-		liscr_data_unref (data, NULL);
+		liscr_data_unref (data);
 	}
 }
 

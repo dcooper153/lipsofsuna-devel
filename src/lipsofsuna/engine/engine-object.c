@@ -28,6 +28,7 @@
 
 #warning Engine object refresh radius is hardcoded.
 #define REFRESH_RADIUS 10.0f
+#define SCRIPT_POINTER_MODEL ((void*) -1)
 
 static int
 private_warp (LIEngObject*       self,
@@ -54,7 +55,6 @@ LIEngObject* lieng_object_new (
 		return NULL;
 	self->id = id;
 	self->engine = engine;
-	self->flags = LIENG_OBJECT_FLAG_SAVE;
 	self->transform = limat_transform_identity ();
 	self->smoothing.target = limat_transform_identity ();
 
@@ -103,7 +103,6 @@ lieng_object_free (LIEngObject* self)
 {
 	/* Unrealize. */
 	lieng_object_set_realized (self, 0);
-	lieng_object_set_selected (self, 0);
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "object-free", lical_marshal_DATA_PTR, self);
@@ -139,9 +138,9 @@ lieng_object_ref (LIEngObject* self,
 	if (self->script != NULL)
 	{
 		for (i = count ; i > 0 ; i--)
-			liscr_data_ref (self->script, NULL);
+			liscr_data_ref (self->script);
 		for (i = count ; i < 0 ; i++)
-			liscr_data_unref (self->script, NULL);
+			liscr_data_unref (self->script);
 		return;
 	}
 #endif
@@ -404,36 +403,6 @@ lieng_object_get_bounds_transform (const LIEngObject* self,
 }
 
 /**
- * \brief Checks if the simulation state of the object needs to be synchronized.
- *
- * \param self Object.
- * \return Nonzero if synchronization is needed.
- */
-int
-lieng_object_get_dirty (const LIEngObject* self)
-{
-	if (self->flags & LIENG_OBJECT_FLAG_DIRTY)
-		return 1;
-	return 0;
-}
-
-/**
- * \brief Sets the value of the dirty flag.
- *
- * \param self Object.
- * \param value Boolean.
- */
-void
-lieng_object_set_dirty (LIEngObject* self,
-                        int          value)
-{
-	if (value)
-		self->flags |= LIENG_OBJECT_FLAG_DIRTY;
-	else
-		self->flags &= ~LIENG_OBJECT_FLAG_DIRTY;
-}
-
-/**
  * \brief Gets the distance between the objects.
  *
  * If either of the objects is in not realized, LIMAT_INFINITE is returned.
@@ -458,19 +427,6 @@ lieng_object_get_distance (const LIEngObject* self,
 	return limat_vector_get_length (limat_vector_subtract (t0.position, t1.position));
 }
 
-int
-lieng_object_get_flags (const LIEngObject* self)
-{
-	return self->flags;
-}
-
-void
-lieng_object_set_flags (LIEngObject* self,
-                        int          flags)
-{
-	self->flags = flags;
-}
-
 /**
  * \brief Replaces the current model of the object.
  * \param self Object.
@@ -481,17 +437,28 @@ int lieng_object_set_model (
 	LIEngObject* self,
 	LIEngModel*  model)
 {
+	lua_State* lua;
+	LIScrScript* script;
+
+	script = liscr_data_get_script (self->script);
+	lua = liscr_script_get_lua (script);
+
 	/* Switch model. */
 	if (model != NULL)
-	{
 		limdl_pose_set_model (self->pose, model->model);
-		liscr_data_ref (model->script, self->script);
-	}
 	else
 		limdl_pose_set_model (self->pose, NULL);
-	if (self->model != NULL)
-		liscr_data_unref (self->model->script, self->script);
 	self->model = model;
+
+	/* Reference the model. */
+	liscr_pushpriv (lua, self->script);
+	lua_pushlightuserdata (lua, SCRIPT_POINTER_MODEL);
+	if (model != NULL)
+		liscr_pushdata (lua, model->script);
+	else
+		lua_pushnil (lua);
+	lua_settable (lua, -3);
+	lua_pop (lua, 1);
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "object-model", lical_marshal_DATA_PTR_PTR, self, model);
@@ -571,63 +538,6 @@ LIEngSector*
 lieng_object_get_sector (LIEngObject* self)
 {
 	return self->sector;
-}
-
-/**
- * \brief Returns whether the object is selected.
- * 
- * \param self Object.
- * \return Nonzero if selected.
- */
-int
-lieng_object_get_selected (const LIEngObject* self)
-{
-	LIEngSelection* selection;
-
-	selection = lialg_ptrdic_find (self->engine->selection, (void*) self);
-	if (selection != NULL)
-		return 1;
-
-	return 0;
-}
-
-/**
- * \brief Selects or deselects the object.
- *
- * \param self Object.
- * \param select Nonzero if should select.
- */
-int
-lieng_object_set_selected (LIEngObject* self,
-                           int          select)
-{
-	LIEngSelection* selection;
-
-	if (select)
-	{
-		selection = lialg_ptrdic_find (self->engine->selection, self);
-		if (selection != NULL)
-			return 1;
-		selection = lieng_selection_new (self);
-		if (selection == NULL)
-			return 0;
-		if (lialg_ptrdic_insert (self->engine->selection, self, selection) == NULL)
-		{
-			lieng_selection_free (selection);
-			return 0;
-		}
-	}
-	else
-	{
-		selection = lialg_ptrdic_find (self->engine->selection, self);
-		if (selection != NULL)
-		{
-			lieng_selection_free (selection);
-			lialg_ptrdic_remove (self->engine->selection, self);
-		}
-	}
-
-	return 1;
 }
 
 /**

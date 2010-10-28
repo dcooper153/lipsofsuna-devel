@@ -24,6 +24,8 @@
 
 #include "ext-module.h"
 
+#define SCRIPT_POINTER_MODEL ((void*) -1)
+
 /* @luadoc
  * module "core/tiles"
  * --- Terrain material.
@@ -69,7 +71,7 @@ static void Material_new (LIScrArgs* args)
 	}
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
-	liscr_data_unref (data, NULL);
+	liscr_data_unref (data);
 }
 
 /* @luadoc
@@ -192,14 +194,22 @@ static void Material_setter_model (LIScrArgs* args)
 	LIVoxMaterial* self = args->self;
 
 	liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &data);
-	if (self->model != NULL)
-		liscr_data_unref (self->model->script, args->data);
+
+	/* Set the model. */
 	if (data != NULL)
-		livox_material_set_model (self, data->data);
+		livox_material_set_model (self, liscr_data_get_data (data));
 	else
 		livox_material_set_model (self, NULL);
-	if (self->model != NULL)
-		liscr_data_ref (self->model->script, args->data);
+
+	/* Reference the model. */
+	liscr_pushpriv (args->lua, args->data);
+	lua_pushlightuserdata (args->lua, SCRIPT_POINTER_MODEL);
+	if (data != NULL)
+		liscr_pushdata (args->lua, data);
+	else
+		lua_pushnil (args->lua);
+	lua_settable (args->lua, -3);
+	lua_pop (args->lua, 1);
 }
 
 /* @luadoc

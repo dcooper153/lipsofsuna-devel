@@ -98,6 +98,13 @@ LIExtModule* liext_object_render_new (
 	self->render = self->client->render;
 	self->scene = self->client->scene;
 
+	/* Make sure that the required extensions are loaded. */
+	if (!limai_program_insert_extension (program, "render"))
+	{
+		liext_object_render_free (self);
+		return NULL;
+	}
+
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (program->callbacks, program->engine, "engine-free", 1, private_engine_free, self, self->calls + 0) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "model-changed", 1, private_model_changed, self, self->calls + 1) ||

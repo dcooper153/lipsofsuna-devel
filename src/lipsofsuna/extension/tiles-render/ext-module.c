@@ -67,8 +67,9 @@ LIExtModule* liext_tiles_render_new (
 		return NULL;
 	}
 
-	/* Make sure the tiles extension is loaded. */
-	if (!limai_program_insert_extension (program, "tiles"))
+	/* Make sure that the required extensions are loaded. */
+	if (!limai_program_insert_extension (program, "render") ||
+	    !limai_program_insert_extension (program, "tiles"))
 	{
 		liext_tiles_render_free (self);
 		return NULL;

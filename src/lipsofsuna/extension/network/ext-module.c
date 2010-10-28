@@ -543,7 +543,7 @@ static int private_message_client (
 		limai_program_event (self->program, "packet",
 			"message", LISCR_TYPE_INT, data[0],
 			"packet", LISCR_SCRIPT_PACKET, packet, NULL);
-		liscr_data_unref (packet, NULL);
+		liscr_data_unref (packet);
 	}
 	liarc_reader_free (reader);
 
@@ -579,7 +579,7 @@ static int private_message_server (
 			"message", LISCR_TYPE_INT, ((uint8_t*) message->USER_MSG.data)[0],
 			"client", LISCR_TYPE_INT, (int) client->net,
 			"packet", LISCR_SCRIPT_PACKET, packet, NULL);
-		liscr_data_unref (packet, NULL);
+		liscr_data_unref (packet);
 	}
 	liarc_reader_free (reader);
 

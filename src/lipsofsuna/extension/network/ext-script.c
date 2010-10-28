@@ -135,7 +135,7 @@ static void Network_send (LIScrArgs* args)
 	/* Get packet. */
 	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
 		return;
-	packet = data->data;
+	packet = liscr_data_get_data (data);
 
 	/* Get object if hosting. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);

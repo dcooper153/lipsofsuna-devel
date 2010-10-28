@@ -52,7 +52,7 @@ LIAPICALL (int, liscr_class_insert_cvar, (
 LIAPICALL (void, liscr_class_insert_func, (
 	LIScrClass*  self,
 	const char*  name,
-	liscrMarshal value));
+	LIScrMarshal value));
 
 LIAPICALL (int, liscr_class_insert_mfunc, (
 	LIScrClass*   self,

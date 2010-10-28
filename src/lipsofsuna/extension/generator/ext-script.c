@@ -322,9 +322,9 @@ static void Generator_getter_regions (LIScrArgs* args)
 		data = liscr_data_new_alloc (args->script, sizeof (LIGenStroke), clss);
 		if (data != NULL)
 		{
-			memcpy (data->data, stroke, sizeof (LIGenStroke));
+			memcpy (liscr_data_get_data (data), stroke, sizeof (LIGenStroke));
 			liscr_args_seti_data (args, data);
-			liscr_data_unref (data, NULL);
+			liscr_data_unref (data);
 		}
 	}
 }

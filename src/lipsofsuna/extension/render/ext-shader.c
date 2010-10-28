@@ -83,7 +83,7 @@ static void Shader_new (LIScrArgs* args)
 		return;
 	}
 	liscr_args_seti_data (args, data);
-	liscr_data_unref (data, NULL);
+	liscr_data_unref (data);
 }
 
 /* @luadoc

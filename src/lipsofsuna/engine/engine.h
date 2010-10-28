@@ -35,7 +35,6 @@
 struct _LIEngEngine
 {
 	void* userdata;
-	LIAlgPtrdic* selection;
 	LIAlgSectors* sectors;
 	LIAlgU32dic* models;
 	LIAlgU32dic* objects;
@@ -60,9 +59,6 @@ LIAPICALL (void, lieng_engine_free, (
 LIAPICALL (int, lieng_engine_check_unique, (
 	LIEngEngine* self,
 	uint32_t     id));
-
-LIAPICALL (void, lieng_engine_clear_selection, (
-	LIEngEngine* self));
 
 LIAPICALL (LIEngObject*, lieng_engine_find_object, (
 	LIEngEngine* self,

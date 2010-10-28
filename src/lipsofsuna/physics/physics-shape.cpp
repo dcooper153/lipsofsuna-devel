@@ -90,14 +90,17 @@ LIPhyShape* liphy_shape_new (
 }
 
 /**
- * \brief Frees or unreferences the collision shape.
- *
+ * \brief Frees the collision shape.
  * \param self Collision shape.
  */
 void liphy_shape_free (
 	LIPhyShape* self)
 {
-	delete self->shape;
+	if (self->shape != NULL)
+	{
+		liphy_shape_clear (self);
+		delete self->shape;
+	}
 	lisys_free (self);
 }
 
@@ -110,11 +113,12 @@ int liphy_shape_add_aabb (
 
 	shape = private_create_from_box (self, aabb);
 	if (shape == NULL)
+		return 0;
+	if (!private_add_shape (self, shape, transform))
 	{
-		liphy_shape_free (self);
+		delete shape;
 		return 0;
 	}
-	private_add_shape (self, shape, transform);
 
 	return 1;
 }
@@ -129,11 +133,12 @@ int liphy_shape_add_convex (
 
 	shape = private_create_from_vertices (self, vertices, count, 1.0f);
 	if (shape == NULL)
+		return 0;
+	if (!private_add_shape (self, shape, transform))
 	{
-		liphy_shape_free (self);
+		delete shape;
 		return 0;
 	}
-	private_add_shape (self, shape, transform);
 
 	return 1;
 }
@@ -166,7 +171,8 @@ int liphy_shape_add_shape (
 		child = (btConvexHullShape*) shape->shape->getChildShape (i);
 		child = new btConvexHullShape (*child);
 		// FIXME: Take child transformation into account.
-		private_add_shape (self, child, transform);
+		if (!private_add_shape (self, child, transform))
+			delete child;
 	}
 
 	return 1;
@@ -179,6 +185,14 @@ int liphy_shape_add_shape (
 void liphy_shape_clear (
 	LIPhyShape* self)
 {
+	int i;
+	btCollisionShape* child;
+
+	for (i = 0 ; i < self->shape->getNumChildShapes () ; i++)
+	{
+		child = self->shape->getChildShape (i);
+		delete child;
+	}
 	while (self->shape->getNumChildShapes ())
 		self->shape->removeChildShapeByIndex (0);
 }
@@ -227,7 +241,6 @@ static int private_add_model (
 	LIMdlShape* shape;
 
 	/* Use precalculated convex shapes when possible. */
-	/* FIXME: One model can have multiple shapes. */
 	if (model->shapes.count)
 	{
 		empty = 1;
@@ -241,7 +254,11 @@ static int private_add_model (
 				shape->parts.array[i].vertices.count, scale);
 			if (ret == NULL)
 				return 0;
-			private_add_shape (self, ret, transform);
+			if (!private_add_shape (self, ret, transform))
+			{
+				delete ret;
+				return 0;
+			}
 			empty = 0;
 		}
 		if (empty)
@@ -249,7 +266,11 @@ static int private_add_model (
 			ret = private_create_from_empty (self);
 			if (ret == NULL)
 				return 0;
-			private_add_shape (self, ret, transform);
+			if (!private_add_shape (self, ret, transform))
+			{
+				delete ret;
+				return 0;
+			}
 		}
 		return 1;
 	}
@@ -269,8 +290,16 @@ static int private_add_model (
 	/* Create the shape from the vertex coordinates. */
 	ret = private_create_from_vertices (self, tmp, model->vertices.count, scale);
 	if (ret == NULL)
+	{
+		lisys_free (tmp);
 		return 0;
-	private_add_shape (self, ret, transform);
+	}
+	if (!private_add_shape (self, ret, transform))
+	{
+		lisys_free (tmp);
+		delete ret;
+		return 0;
+	}
 	lisys_free (tmp);
 
 	return 1;
@@ -291,7 +320,14 @@ static int private_add_shape (
 		r = btQuaternion(transform->rotation.x, transform->rotation.y,
 		                 transform->rotation.z, transform->rotation.w);
 	}
-	self->shape->addChildShape (btTransform (r, p), shape);
+	try
+	{
+		self->shape->addChildShape (btTransform (r, p), shape);
+	}
+	catch (...)
+	{
+		return 0;
+	}
 
 	return 1;
 }

@@ -47,10 +47,10 @@ struct _LIMaiProgram
 	LIAlgList* event_last;
 	LIAlgSectors* sectors;
 	LIAlgStrdic* components;
-	LIAlgStrdic* extensions;
 	LICalCallbacks* callbacks;
 	LICalHandle calls[8];
 	LIEngEngine* engine;
+	LIMaiExtension* extensions;
 	LIPthPaths* paths;
 	LIScrScript* script;
 };

@@ -24,6 +24,7 @@
 
 #include "script-args.h"
 #include "script-library.h"
+#include "script-private.h"
 #include "script-util.h"
 
 void
@@ -142,10 +143,10 @@ liscr_args_call_setters_except (LIScrArgs*  self,
 	}
 }
 
-int
-liscr_args_geti_bool (LIScrArgs*  self,
-                      int         index,
-                      int*        result)
+int liscr_args_geti_bool (
+	LIScrArgs*  self,
+	int         index,
+	int*        result)
 {
 	int ret = 0;
 
@@ -170,6 +171,33 @@ liscr_args_geti_bool (LIScrArgs*  self,
 			*result = (int) lua_toboolean (self->lua, index);
 			ret = 1;
 		}
+	}
+
+	return ret;
+}
+
+int liscr_args_geti_bool_convert (
+	LIScrArgs*  self,
+	int         index,
+	int*        result)
+{
+	int ret = 0;
+
+	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
+	{
+		lua_pushnumber (self->lua, index + 1);
+		lua_gettable (self->lua, self->input_table);
+		*result = (int) lua_toboolean (self->lua, -1);
+		ret = 1;
+		lua_pop (self->lua, 1);
+	}
+	else
+	{
+		if (index < 0 || index >= self->args_count)
+			return 0;
+		index += self->args_start;
+		*result = (int) lua_toboolean (self->lua, index);
+		ret = 1;
 	}
 
 	return ret;
@@ -960,7 +988,7 @@ liscr_args_seti_quaternion (LIScrArgs*             self,
 		if (quat != NULL)
 		{
 			liscr_pushdata (self->lua, quat);
-			liscr_data_unref (quat, NULL);
+			liscr_data_unref (quat);
 			self->ret++;
 		}
 	}
@@ -977,7 +1005,7 @@ liscr_args_seti_quaternion (LIScrArgs*             self,
 			lua_pushnumber (self->lua, ++self->ret);
 			liscr_pushdata (self->lua, quat);
 			lua_settable (self->lua, self->output_table);
-			liscr_data_unref (quat, NULL);
+			liscr_data_unref (quat);
 		}
 	}
 }
@@ -1050,7 +1078,7 @@ liscr_args_seti_vector (LIScrArgs*         self,
 		if (vector != NULL)
 		{
 			liscr_pushdata (self->lua, vector);
-			liscr_data_unref (vector, NULL);
+			liscr_data_unref (vector);
 			self->ret++;
 		}
 	}
@@ -1067,7 +1095,7 @@ liscr_args_seti_vector (LIScrArgs*         self,
 			lua_pushnumber (self->lua, ++self->ret);
 			liscr_pushdata (self->lua, vector);
 			lua_settable (self->lua, self->output_table);
-			liscr_data_unref (vector, NULL);
+			liscr_data_unref (vector);
 		}
 	}
 }
@@ -1182,7 +1210,7 @@ liscr_args_sets_quaternion (LIScrArgs*             self,
 		{
 			liscr_pushdata (self->lua, quat);
 			lua_setfield (self->lua, self->output_table, name);
-			liscr_data_unref (quat, NULL);
+			liscr_data_unref (quat);
 		}
 	}
 }
@@ -1240,7 +1268,7 @@ liscr_args_sets_vector (LIScrArgs*         self,
 		{
 			liscr_pushdata (self->lua, vector);
 			lua_setfield (self->lua, self->output_table, name);
-			liscr_data_unref (vector, NULL);
+			liscr_data_unref (vector);
 		}
 	}
 }

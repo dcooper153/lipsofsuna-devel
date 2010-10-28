@@ -108,7 +108,7 @@ liren_scene_free (LIRenScene* self)
 	}
 	if (self->objects != NULL)
 	{
-		lisys_assert (self->objects->size == 0);
+		//lisys_assert (self->objects->size == 0);
 		lialg_u32dic_free (self->objects);
 	}
 

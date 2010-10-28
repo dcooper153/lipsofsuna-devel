@@ -178,6 +178,9 @@ int livox_build_area (
 	{
 		if (result_model != NULL) *result_model = NULL;
 		if (result_physics != NULL) *result_physics = NULL;
+		lisys_free (self.occlud);
+		lisys_free (self.voxels);
+		lisys_free (self.voxelsb);
 		return 1;
 	}
 

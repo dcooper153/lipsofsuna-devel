@@ -51,6 +51,9 @@ LIAPICALL (void, liscr_script_set_gc, (
 	LIScrScript* self,
 	int          value));
 
+LIAPICALL (lua_State*, liscr_script_get_lua, (
+	LIScrScript* self));
+
 LIAPICALL (void*, liscr_script_get_userdata, (
 	LIScrScript* self));
 

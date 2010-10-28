@@ -103,6 +103,7 @@ void
 ligen_rule_free (LIGenRule* self)
 {
 	lisys_free (self->strokes.array);
+	lisys_free (self->name);
 	lisys_free (self);
 }
 

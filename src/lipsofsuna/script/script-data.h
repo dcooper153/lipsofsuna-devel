@@ -25,7 +25,7 @@ LIAPICALL (LIScrData*, liscr_data_new, (
 	LIScrScript* script,
 	void*        data,
 	LIScrClass*  clss,
-	liscrGCFunc  free));
+	LIScrGCFunc  free));
 
 LIAPICALL (LIScrData*, liscr_data_new_alloc, (
 	LIScrScript* script,
@@ -36,12 +36,10 @@ LIAPICALL (void, liscr_data_free, (
 	LIScrData* object));
 
 LIAPICALL (void, liscr_data_ref, (
-	LIScrData* object,
-	LIScrData* referencer));
+	LIScrData* object));
 
 LIAPICALL (void, liscr_data_unref, (
-	LIScrData* object,
-	LIScrData* referencer));
+	LIScrData* object));
 
 LIAPICALL (LIScrClass*, liscr_data_get_class, (
 	LIScrData* self));
@@ -50,10 +48,10 @@ LIAPICALL (int, liscr_data_set_class, (
 	LIScrData*  self,
 	LIScrClass* clss));
 
-LIAPICALL (LIScrScript*, liscr_data_get_script, (
+LIAPICALL (void*, liscr_data_get_data, (
 	LIScrData* self));
 
-LIAPICALL (int, liscr_data_get_valid, (
+LIAPICALL (LIScrScript*, liscr_data_get_script, (
 	LIScrData* self));
 
 #endif

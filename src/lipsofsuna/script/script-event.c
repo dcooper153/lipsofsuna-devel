@@ -22,17 +22,9 @@
  * @{
  */
 
-#include <lipsofsuna/script.h>
-#include <lipsofsuna/system.h>
-
-typedef struct _LIScrEvent LIScrEvent;
-struct _LIScrEvent
-{
-	LIScrData* data;
-	char* type;
-};
-
-/*****************************************************************************/
+#include "lipsofsuna/script.h"
+#include "lipsofsuna/system.h"
+#include "script-private.h"
 
 /* @luadoc
  * module "builtin/event"
@@ -59,45 +51,29 @@ static void Event_new (LIScrArgs* args)
 		return;
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
-	liscr_data_unref (data, NULL);
+	liscr_data_unref (data);
 }
 
 /* @luadoc
  * ---
- * -- Type number of the event.
+ * -- Type of the event.
  * -- @name Event.type
  * -- @class table
  */
-static void Event_getter_type (LIScrArgs* args)
-{
-	LIScrEvent* self = args->self;
-
-	lisys_assert (self->type != NULL);
-	liscr_args_seti_string (args, self->type);
-}
-static void Event_setter_type (LIScrArgs* args)
-{
-	const char* value;
-
-	if (liscr_args_geti_string (args, 0, &value))
-		liscr_event_set_type (args->data, value);
-}
 
 /*****************************************************************************/
 
 /**
  * \brief Adds the event type members to the class.
- *
  * \param self Class.
  * \param data Pointer to script.
  */
-void
-liscr_script_event (LIScrClass* self,
-                  void*       data)
+void liscr_script_event (
+	LIScrClass* self,
+	void*       data)
 {
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Event_new);
-	liscr_class_insert_mvar (self, "type", Event_getter_type, Event_setter_type);
 }
 
 /**
@@ -108,25 +84,16 @@ liscr_script_event (LIScrClass* self,
  * \param script Script.
  * \return New event or NULL.
  */
-LIScrData*
-liscr_event_new (LIScrScript* script)
+LIScrData* liscr_event_new (
+	LIScrScript* script)
 {
 	LIScrClass* clss;
 	LIScrData* data;
-	LIScrEvent* self;
 
 	clss = liscr_script_find_class (script, LISCR_SCRIPT_EVENT);
-	data = liscr_data_new_alloc (script, sizeof (LIScrEvent), clss);
+	data = liscr_data_new_alloc (script, 1, clss);
 	if (data == NULL)
 		return NULL;
-	self = data->data;
-	self->data = data;
-	self->type = listr_dup ("event");
-	if (self->type == NULL)
-	{
-		liscr_data_unref (data, NULL);
-		return NULL;
-	}
 
 	return data;
 }
@@ -140,9 +107,9 @@ liscr_event_new (LIScrScript* script)
  * \param args List of fields to set.
  * \return New event or NULL.
  */
-LIScrData*
-liscr_event_newv (LIScrScript* script,
-                  va_list      args)
+LIScrData* liscr_event_newv (
+	LIScrScript* script,
+	va_list      args)
 {
 	LIScrData* self;
 
@@ -163,9 +130,9 @@ liscr_event_newv (LIScrScript* script,
  * \param ... List of fields to set.
  * \return New script event or NULL.
  */
-LIScrData*
-liscr_event_newva (LIScrScript* script,
-                                ...)
+LIScrData* liscr_event_newva (
+	LIScrScript* script,
+	             ...)
 {
 	va_list args;
 	LIScrData* self;
@@ -179,13 +146,12 @@ liscr_event_newva (LIScrScript* script,
 
 /**
  * \brief Sets member values of the event.
- *
  * \param self Event.
  * \param ... List of arguments.
  */
-void
-liscr_event_set (LIScrData* self,
-                            ...)
+void liscr_event_set (
+	LIScrData* self,
+	           ...)
 {
 	va_list args;
 
@@ -196,13 +162,12 @@ liscr_event_set (LIScrData* self,
 
 /**
  * \brief Sets member values of the event.
- *
  * \param self Event.
  * \param args List of arguments.
  */
-void
-liscr_event_setv (LIScrData* self,
-                  va_list    args)
+void liscr_event_setv (
+	LIScrData* self,
+	va_list    args)
 {
 	int pint;
 	void* pptr;
@@ -258,41 +223,18 @@ liscr_event_setv (LIScrData* self,
 }
 
 /**
- * \brief Gets the type of the event.
- *
- * No validity check beyound the value actually being a number is performed.
- * You need to check that the type isn't out of bounds yourself.
- *
- * \param self Event.
- * \return Event type.
- */
-const char*
-liscr_event_get_type (const LIScrData* self)
-{
-	LIScrEvent* event = self->data;
-
-	return event->type;
-}
-
-/**
  * \brief Sets the type of the event.
- *
  * \param self Event.
  * \param type Event type.
  */
-void
-liscr_event_set_type (LIScrData*  self,
-                      const char* type)
+void liscr_event_set_type (
+	LIScrData*  self,
+	const char* type)
 {
-	char* tmp;
-	LIScrEvent* event = self->data;
-
-	tmp = listr_dup (type);
-	if (tmp != NULL)
-	{
-		lisys_free (event->type);
-		event->type = tmp;
-	}
+	liscr_pushpriv (self->script->lua, self);
+	lua_pushstring (self->script->lua, type);
+	lua_setfield (self->script->lua, -2, "type");
+	lua_pop (self->script->lua, 1);
 }
 
 /** @} */

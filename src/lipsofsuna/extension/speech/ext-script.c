@@ -60,7 +60,7 @@ static void Speech_add (LIScrArgs* args)
 	liscr_args_gets_floatv (args, "diffuse", 4, diffuse);
 	liscr_args_gets_string (args, "font", &font);
 	if (liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &object))
-		id = ((LIEngObject*) object->data)->id;
+		id = ((LIEngObject*) liscr_data_get_data (object))->id;
 	else
 		return;
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPEECH);

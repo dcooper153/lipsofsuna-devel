@@ -117,24 +117,25 @@ void liext_widgets_callback_paint (
 	LIScrData* data)
 {
 	LIScrScript* script = liscr_data_get_script (data);
+	lua_State* lua = liscr_script_get_lua (script);
 
 	/* Invoke callback. */
-	liscr_pushdata (script->lua, data);
-	lua_getfield (script->lua, -1, "render");
-	if (lua_type (script->lua, -1) == LUA_TFUNCTION)
+	liscr_pushdata (lua, data);
+	lua_getfield (lua, -1, "render");
+	if (lua_type (lua, -1) == LUA_TFUNCTION)
 	{
 		/* Call the Lua function. */
-		lua_pushvalue (script->lua, -2);
-		lua_remove (script->lua, -3);
-		if (lua_pcall (script->lua, 1, 0, 0) != 0)
+		lua_pushvalue (lua, -2);
+		lua_remove (lua, -3);
+		if (lua_pcall (lua, 1, 0, 0) != 0)
 		{
-			lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.render: %s", lua_tostring (script->lua, -1));
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.render: %s", lua_tostring (lua, -1));
 			lisys_error_report ();
-			lua_pop (script->lua, 1);
+			lua_pop (lua, 1);
 		}
 	}
 	else
-		lua_pop (script->lua, 2);
+		lua_pop (lua, 2);
 }
 
 /*****************************************************************************/
@@ -145,27 +146,29 @@ static void private_widget_allocation (
 {
 	LIScrScript* script;
 	LIScrData* data;
+	lua_State* lua;
 
 	if (widget->script == NULL)
 		return;
 	data = widget->script;
-	script = data->script;
+	script = liscr_data_get_script (data);
+	lua = liscr_script_get_lua (script);
 
-	liscr_pushdata (script->lua, data);
-	lua_getfield (script->lua, -1, "reshaped");
-	if (lua_type (script->lua, -1) == LUA_TFUNCTION)
+	liscr_pushdata (lua, data);
+	lua_getfield (lua, -1, "reshaped");
+	if (lua_type (lua, -1) == LUA_TFUNCTION)
 	{
-		lua_pushvalue (script->lua, -2);
-		lua_remove (script->lua, -3);
-		if (lua_pcall (script->lua, 1, 0, 0) != 0)
+		lua_pushvalue (lua, -2);
+		lua_remove (lua, -3);
+		if (lua_pcall (lua, 1, 0, 0) != 0)
 		{
-			lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.reshaped: %s", lua_tostring (script->lua, -1));
+			lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.reshaped: %s", lua_tostring (lua, -1));
 			lisys_error_report ();
-			lua_pop (script->lua, 1);
+			lua_pop (lua, 1);
 		}
 	}
 	else
-		lua_pop (script->lua, 2);
+		lua_pop (lua, 2);
 }
 
 static int private_widget_event (

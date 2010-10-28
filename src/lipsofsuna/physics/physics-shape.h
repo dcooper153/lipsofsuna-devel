@@ -59,6 +59,9 @@ LIAPICALL (int, liphy_shape_add_shape, (
 	LIPhyShape*           shape,
 	const LIMatTransform* transform));
 
+LIAPICALL (void, liphy_shape_clear, (
+	LIPhyShape* self));
+
 LIAPICALL (void, liphy_shape_get_inertia, (
 	const LIPhyShape* self,
 	float             mass,

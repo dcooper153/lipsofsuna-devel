@@ -61,7 +61,7 @@ static void Light_new (LIScrArgs* args)
 	}
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
-	liscr_data_unref (data, NULL);
+	liscr_data_unref (data);
 }
 
 /* @luadoc

@@ -78,6 +78,11 @@ liscr_script_new ()
 	lua_pushlightuserdata (self->lua, self);
 	lua_settable (self->lua, LUA_REGISTRYINDEX);
 
+	/* Create internal reference table. */
+	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_REFS);
+	lua_newtable (self->lua);
+	lua_settable (self->lua, LUA_REGISTRYINDEX);
+
 	/* Create pointer->class lookup table. */
 	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_LOOKUP_CLASS);
 	lua_newtable (self->lua);
@@ -235,6 +240,12 @@ liscr_script_set_gc (LIScrScript* self,
 		lua_gc (self->lua, LUA_GCRESTART, 0);
 	else
 		lua_gc (self->lua, LUA_GCSTOP, 0);
+}
+
+lua_State* liscr_script_get_lua (
+	LIScrScript* self)
+{
+	return self->lua;
 }
 
 void*

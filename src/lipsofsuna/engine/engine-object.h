@@ -29,14 +29,11 @@
 #include <lipsofsuna/script.h>
 #endif
 
-#define LIENG_OBJECT(o) ((LIEngObject*)(o))
-
 struct _LIEngObject
 {
 	int refs;
 	void* userdata;
 	uint32_t id;
-	uint16_t flags;
 	LIEngEngine* engine;
 	LIEngModel* model;
 	LIEngSector* sector;
@@ -113,13 +110,6 @@ LIAPICALL (float, lieng_object_get_distance, (
 	const LIEngObject* self,
 	const LIEngObject* object));
 
-LIAPICALL (int, lieng_object_get_flags, (
-	const LIEngObject* self));
-
-LIAPICALL (void, lieng_object_set_flags, (
-	LIEngObject* self,
-	int          flags));
-
 LIAPICALL (int, lieng_object_set_model, (
 	LIEngObject* self,
 	LIEngModel*  model));
@@ -133,13 +123,6 @@ LIAPICALL (int, lieng_object_set_realized, (
 
 LIAPICALL (LIEngSector*, lieng_object_get_sector, (
 	LIEngObject* self));
-
-LIAPICALL (int, lieng_object_get_selected, (
-	const LIEngObject* self));
-
-LIAPICALL (int, lieng_object_set_selected, (
-	LIEngObject* self,
-	int          select));
 
 LIAPICALL (void, lieng_object_get_smoothing, (
 	LIEngObject* self,

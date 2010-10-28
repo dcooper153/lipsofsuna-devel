@@ -32,28 +32,8 @@ typedef struct _LIScrClass LIScrClass;
 typedef struct _LIScrData LIScrData;
 typedef struct _LIScrScript LIScrScript;
 typedef void (*LIScrClassInit)(LIScrClass*, void*);
-typedef void (*liscrGCFunc)();
-typedef int (*liscrMarshal)(lua_State*);
+typedef void (*LIScrGCFunc)();
+typedef int (*LIScrMarshal)(lua_State*);
 typedef void (*LIScrArgsFunc)(LIScrArgs*);
-
-/* FIXME */
-struct _LIScrData
-{
-	LIScrClass* clss;
-	LIScrScript* script;
-	liscrGCFunc free;
-	void* data;
-	int refcount;
-};
-
-/* FIXME */
-struct _LIScrScript
-{
-	void* userpointer;
-	lua_State* lua;
-};
-
-/* FIXME */
-#include "script-private.h"
 
 #endif

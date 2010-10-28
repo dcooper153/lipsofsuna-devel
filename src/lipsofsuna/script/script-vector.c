@@ -22,7 +22,8 @@
  * @{
  */
 
-#include <lipsofsuna/script.h>
+#include "lipsofsuna/script.h"
+#include "script-private.h"
 
 /* @luadoc
  * module "builtin/vector"
@@ -32,121 +33,7 @@
  */
 
 /* @luadoc
- * --- Calculates the sum of two vectors.
- * --
- * -- @param self Vector.
- * -- @param vector Vector.
- * -- @return New vector.
- * function Vector.__add(self, vector)
- */
-static int
-Vector___add (lua_State* lua)
-{
-	LIMatVector tmp;
-	LIScrData* a;
-	LIScrData* b;
-	LIScrData* c;
-	LIScrScript* script = liscr_script (lua);
-
-	a = liscr_checkdata (lua, 1, LISCR_SCRIPT_VECTOR);
-	b = liscr_checkdata (lua, 2, LISCR_SCRIPT_VECTOR);
-
-	tmp = limat_vector_add (*((LIMatVector*) a->data), *((LIMatVector*) b->data));
-	c = liscr_vector_new (script, &tmp);
-	if (c != NULL)
-	{
-		liscr_pushdata (lua, c);
-		liscr_data_unref (c, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	return 1;
-}
-
-/* @luadoc
- * --- Multiplies the vector with a scalar.
- * --
- * -- @param self Vector.
- * -- @param scalar Scalar.
- * -- @return New vector.
- * function Vector.__mul(self, scalar)
- */
-static int
-Vector___mul (lua_State* lua)
-{
-	float s;
-	LIMatVector tmp;
-	LIScrData* a;
-	LIScrData* c;
-	LIScrScript* script = liscr_script (lua);
-
-	a = liscr_checkdata (lua, 1, LISCR_SCRIPT_VECTOR);
-	s = luaL_checknumber (lua, 2);
-
-	tmp = limat_vector_multiply (*((LIMatVector*) a->data), s);
-	c = liscr_vector_new (script, &tmp);
-	if (c != NULL)
-	{
-		liscr_pushdata (lua, c);
-		liscr_data_unref (c, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	return 1;
-}
-
-/* @luadoc
- * --- Subtracts a vector from another.
- * --
- * -- @param self Vector.
- * -- @param vector Vector.
- * -- @return New vector.
- * function Vector.__sub(self, vector)
- */
-static int
-Vector___sub (lua_State* lua)
-{
-	LIMatVector tmp;
-	LIScrData* a;
-	LIScrData* b;
-	LIScrData* c;
-	LIScrScript* script = liscr_script (lua);
-
-	a = liscr_checkdata (lua, 1, LISCR_SCRIPT_VECTOR);
-	b = liscr_checkdata (lua, 2, LISCR_SCRIPT_VECTOR);
-
-	tmp = limat_vector_subtract (*((LIMatVector*) a->data), *((LIMatVector*) b->data));
-	c = liscr_vector_new (script, &tmp);
-	if (c != NULL)
-	{
-		liscr_pushdata (lua, c);
-		liscr_data_unref (c, NULL);
-	}
-	else
-		lua_pushnil (lua);
-	return 1;
-}
-
-/* @luadoc
- * --- Converts the vector to a string.
- * --
- * -- @param self Vector.
- * -- @return String.
- * function Vector.__tostring(self)
- */
-static void Vector___tostring (LIScrArgs* args)
-{
-	char buffer[256];
-	LIMatVector* self;
-
-	self = args->self;
-	snprintf (buffer, 256, "Vector(%g,%g,%g)", self->x, self->y, self->z);
-	liscr_args_seti_string (args, buffer);
-}
-
-/* @luadoc
  * --- Creates a new vector.
- * --
  * -- @param clss Vector class.
  * -- @param args Arguments.<ul>
  * --   <li>1,x: X coordinate.</li>
@@ -169,8 +56,80 @@ static void Vector_new (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Calculates the sum of two vectors.
+ * -- @param self Vector.
+ * -- @param vector Vector.
+ * -- @return New vector.
+ * function Vector.__add(self, vector)
+ */
+static void Vector___add (LIScrArgs* args)
+{
+	LIMatVector tmp;
+	LIScrData* b;
+
+	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &b))
+		return;
+
+	tmp = limat_vector_add (*((LIMatVector*) args->self), *((LIMatVector*) b->data));
+	liscr_args_seti_vector (args, &tmp);
+}
+
+/* @luadoc
+ * --- Multiplies the vector by a scalar.
+ * -- @param self Vector.
+ * -- @param scalar Scalar.
+ * -- @return New vector.
+ * function Vector.__mul(self, scalar)
+ */
+static void Vector___mul (LIScrArgs* args)
+{
+	float s;
+	LIMatVector tmp;
+
+	if (!liscr_args_geti_float (args, 0, &s))
+		return;
+
+	tmp = limat_vector_multiply (*((LIMatVector*) args->self), s);
+	liscr_args_seti_vector (args, &tmp);
+}
+
+/* @luadoc
+ * --- Subtracts a vector from another.
+ * -- @param self Vector.
+ * -- @param vector Vector.
+ * -- @return New vector.
+ * function Vector.__sub(self, vector)
+ */
+static void Vector___sub (LIScrArgs* args)
+{
+	LIMatVector tmp;
+	LIScrData* b;
+
+	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &b))
+		return;
+
+	tmp = limat_vector_subtract (*((LIMatVector*) args->self), *((LIMatVector*) b->data));
+	liscr_args_seti_vector (args, &tmp);
+}
+
+/* @luadoc
+ * --- Converts the vector to a string.
+ * -- @param self Vector.
+ * -- @return String.
+ * function Vector.__tostring(self)
+ */
+static void Vector___tostring (LIScrArgs* args)
+{
+	char buffer[256];
+	LIMatVector* self;
+
+	self = args->self;
+	snprintf (buffer, 256, "Vector(%g,%g,%g)", self->x, self->y, self->z);
+	liscr_args_seti_string (args, buffer);
+}
+
+/* @luadoc
  * --- Calculates the cross product of two vectors.
- * --
  * -- @param self Vector.
  * -- @param vector Vector.
  * -- @return New vector.
@@ -190,7 +149,6 @@ static void Vector_cross (LIScrArgs* args)
 
 /* @luadoc
  * --- Calculates the dot product of two vectors.
- * --
  * -- @param self Vector.
  * -- @param vector Vector.
  * -- @return Scalar.
@@ -210,7 +168,6 @@ static void Vector_dot (LIScrArgs* args)
 
 /* @luadoc
  * --- Normalizes the vector and returns it.
- * --
  * -- @param self Vector.
  * -- @return Vector.
  * function Vector.normalize(self)
@@ -282,13 +239,13 @@ liscr_script_vector (LIScrClass* self,
                      void*       data)
 {
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_func (self, "__add", Vector___add);
-	liscr_class_insert_func (self, "__mul", Vector___mul);
-	liscr_class_insert_func (self, "__sub", Vector___sub);
+	liscr_class_insert_cfunc (self, "new", Vector_new);
+	liscr_class_insert_mfunc (self, "__add", Vector___add);
+	liscr_class_insert_mfunc (self, "__mul", Vector___mul);
+	liscr_class_insert_mfunc (self, "__sub", Vector___sub);
 	liscr_class_insert_mfunc (self, "__tostring", Vector___tostring);
 	liscr_class_insert_mfunc (self, "cross", Vector_cross);
 	liscr_class_insert_mfunc (self, "dot", Vector_dot);
-	liscr_class_insert_cfunc (self, "new", Vector_new);
 	liscr_class_insert_mfunc (self, "normalize", Vector_normalize);
 	liscr_class_insert_mvar (self, "length", Vector_getter_length, NULL);
 	liscr_class_insert_mvar (self, "x", Vector_getter_x, Vector_setter_x);

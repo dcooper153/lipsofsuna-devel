@@ -100,45 +100,26 @@ lieng_engine_free (LIEngEngine* self)
 		}
 	}
 
-	/* Clear selection. */
-	if (self->selection != NULL)
-		lieng_engine_clear_selection (self);
-
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->callbacks, self, "free", lical_marshal_DATA_PTR, self);
 
-	/* Clear sectors. */
+	/* Clear sector data. */
 	if (self->sectors != NULL)
+	{
 		lialg_sectors_remove_content (self->sectors, "engine");
+		self->sectors->sector_free_callback.callback = NULL;
+		self->sectors->sector_free_callback.userdata = NULL;
+		self->sectors->sector_load_callback.callback = NULL;
+		self->sectors->sector_load_callback.userdata = NULL;
+	}
 
 	if (self->objects != NULL)
 		lialg_u32dic_free (self->objects);
 	if (self->models != NULL)
 		lialg_u32dic_free (self->models);
-	if (self->selection != NULL)
-		lialg_ptrdic_free (self->selection);
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self->config.dir);
 	lisys_free (self);
-}
-
-/**
- * \brief Clears the current selection.
- *
- * \param self Engine.
- */
-void
-lieng_engine_clear_selection (LIEngEngine* self)
-{
-	LIAlgPtrdicIter iter;
-	LIEngSelection* selection;
-
-	LIALG_PTRDIC_FOREACH (iter, self->selection)
-	{
-		selection = iter.value;
-		lieng_selection_free (selection);
-	}
-	lialg_ptrdic_clear (self->selection);
 }
 
 /**
@@ -240,11 +221,6 @@ private_init (LIEngEngine* self)
 	/* Models. */
 	self->models = lialg_u32dic_new ();
 	if (self->models == NULL)
-		return 0;
-
-	/* Selection. */
-	self->selection = lialg_ptrdic_new ();
-	if (self->selection == NULL)
 		return 0;
 
 	/* Sectors. */

@@ -53,6 +53,7 @@ LIRelReload* lirel_reload_new (
 
 void lirel_reload_free (LIRelReload* self)
 {
+	lirel_reload_set_enabled (self, 0);
 	lisys_free (self);
 }
 

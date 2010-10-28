@@ -38,24 +38,6 @@ LIAPICALL (LIScrData*, liscr_isdata, (
 	int         arg,
 	const char* meta));
 
-LIAPICALL (LIScrClass*, liscr_checkanyclass, (
-	lua_State* lua,
-	int        arg));
-
-LIAPICALL (LIScrData*, liscr_checkanydata, (
-	lua_State* lua,
-	int        arg));
-
-LIAPICALL (LIScrClass*, liscr_checkclass, (
-	lua_State*  lua,
-	int         arg,
-	const char* meta));
-
-LIAPICALL (LIScrData*, liscr_checkdata, (
-	lua_State*  lua,
-	int         arg,
-	const char* meta));
-
 LIAPICALL (int, liscr_copyargs, (
 	lua_State* lua,
 	LIScrData* data,

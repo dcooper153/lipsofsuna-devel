@@ -25,6 +25,7 @@
 #include <lipsofsuna/engine.h>
 #include <lipsofsuna/main.h>
 #include <lipsofsuna/script.h>
+#include "script-private.h"
 
 /* @luadoc
  * module "builtin/model"
@@ -74,7 +75,7 @@ static void Model_copy (LIScrArgs* args)
 	/* Initialize userdata. */
 	liscr_args_call_setters (args, self->script);
 	liscr_args_seti_data (args, self->script);
-	liscr_data_unref (self->script, NULL);
+	liscr_data_unref (self->script);
 }
 
 /* @luadoc
@@ -127,7 +128,7 @@ static void Model_new (LIScrArgs* args)
 	/* Initialize userdata. */
 	liscr_args_call_setters (args, self->script);
 	liscr_args_seti_data (args, self->script);
-	liscr_data_unref (self->script, NULL);
+	liscr_data_unref (self->script);
 }
 
 /* @luadoc

@@ -144,26 +144,27 @@ static void private_contact_callback (
 	LIEngObject* engobj = liphy_object_get_userdata (object);
 	LIMaiProgram* program = lieng_engine_get_userdata (engobj->engine);
 	LIScrScript* script = program->script;
+	lua_State* lua = liscr_script_get_lua (script);
 
 	/* Push callback. */
-	liscr_pushdata (script->lua, engobj->script);
-	lua_getfield (script->lua, -1, "contact_cb");
-	if (lua_type (script->lua, -1) != LUA_TFUNCTION)
+	liscr_pushdata (lua, engobj->script);
+	lua_getfield (lua, -1, "contact_cb");
+	if (lua_type (lua, -1) != LUA_TFUNCTION)
 	{
-		lua_pop (script->lua, 2);
+		lua_pop (lua, 2);
 		return;
 	}
 
 	/* Push object. */
-	lua_pushvalue (script->lua, -2);
-	lua_remove (script->lua, -3);
+	lua_pushvalue (lua, -2);
+	lua_remove (lua, -3);
 
 	/* Push contact. */
-	lua_newtable (script->lua);
+	lua_newtable (lua);
 
 	/* Convert impulse. */
-	lua_pushnumber (script->lua, contact->impulse);
-	lua_setfield (script->lua, -2, "impulse");
+	lua_pushnumber (lua, contact->impulse);
+	lua_setfield (lua, -2, "impulse");
 
 	/* Convert object. */
 	if (contact->object != NULL)
@@ -171,8 +172,8 @@ static void private_contact_callback (
 		engobj = liphy_object_get_userdata (contact->object);
 		if (engobj != NULL && engobj->script != NULL)
 		{
-			liscr_pushdata (script->lua, engobj->script);
-			lua_setfield (script->lua, -2, "object");
+			liscr_pushdata (lua, engobj->script);
+			lua_setfield (lua, -2, "object");
 		}
 	}
 
@@ -180,30 +181,30 @@ static void private_contact_callback (
 	data = liscr_vector_new (script, &contact->point);
 	if (data != NULL)
 	{
-		liscr_pushdata (script->lua, data);
-		liscr_data_unref (data, NULL);
+		liscr_pushdata (lua, data);
+		liscr_data_unref (data);
 	}
 	else
-		lua_pushnil (script->lua);
-	lua_setfield (script->lua, -2, "point");
+		lua_pushnil (lua);
+	lua_setfield (lua, -2, "point");
 
 	/* Convert normal. */
 	data = liscr_vector_new (script, &contact->normal);
 	if (data != NULL)
 	{
-		liscr_pushdata (script->lua, data);
-		liscr_data_unref (data, NULL);
+		liscr_pushdata (lua, data);
+		liscr_data_unref (data);
 	}
 	else
-		lua_pushnil (script->lua);
-	lua_setfield (script->lua, -2, "normal");
+		lua_pushnil (lua);
+	lua_setfield (lua, -2, "normal");
 
 	/* Call function. */
-	if (lua_pcall (script->lua, 2, 0, 0) != 0)
+	if (lua_pcall (lua, 2, 0, 0) != 0)
 	{
-		lisys_error_set (LISYS_ERROR_UNKNOWN, "Object.contact_cb: %s", lua_tostring (script->lua, -1));
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "Object.contact_cb: %s", lua_tostring (lua, -1));
 		lisys_error_report ();
-		lua_pop (script->lua, 1);
+		lua_pop (lua, 1);
 	}
 }
 

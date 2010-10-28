@@ -261,7 +261,10 @@ void limdl_pose_update (
 				break;
 			case LIMDL_POSE_CHANNEL_STATE_PLAYING:
 				if (!private_play_channel (self, chan, secs))
+				{
 					lialg_u32dic_remove (self->channels, iter.key);
+					private_channel_free (chan);
+				}
 				break;
 		}
 	}
@@ -420,6 +423,7 @@ void limdl_pose_set_channel_animation (
 	chan->time = 0.0f;
 	chan->fade_in = 0.0f;
 	chan->fade_out = 0.0f;
+	limdl_animation_free (chan->animation);
 	chan->animation = anim;
 }
 

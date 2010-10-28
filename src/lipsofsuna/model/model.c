@@ -1660,7 +1660,10 @@ static int private_write_block (
 	}
 	len = liarc_writer_get_length (data);
 	if (!len)
+	{
+		liarc_writer_free (data);
 		return 1;
+	}
 
 	/* Write the temporary to the main writer as a block. */
 	if (!liarc_writer_append_string (writer, name) ||

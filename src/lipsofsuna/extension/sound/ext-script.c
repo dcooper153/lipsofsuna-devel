@@ -58,7 +58,7 @@ static void Sound_effect (LIScrArgs* args)
 	if (liscr_args_gets_string (args, "effect", &effect) &&
 	    liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 	{
-		object = data->data;
+		object = liscr_data_get_data (data);
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
 		source = liext_sound_set_effect (module, object->id, effect, flags);
 		if (source != NULL)

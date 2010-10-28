@@ -96,6 +96,7 @@ LIScrClass* liscr_class_new_full (
 	if (self == NULL)
 		return NULL;
 	memset (self, 0, sizeof (LIScrClass));
+	self->signature = 'C';
 	self->script = script;
 	self->name = name1;
 	self->userdata = dict;
@@ -248,7 +249,7 @@ liscr_class_insert_cvar (LIScrClass*   self,
 void liscr_class_insert_func (
 	LIScrClass*  self,
 	const char*  name,
-	liscrMarshal value)
+	LIScrMarshal value)
 {
 	liscr_pushclasspriv (self->script->lua, self);
 	lua_pushstring (self->script->lua, name);
@@ -369,8 +370,8 @@ liscr_class_set_userdata (LIScrClass* self,
  * \param lua Lua state.
  * \return Zero.
  */
-int
-liscr_class_default___call (lua_State* lua)
+int liscr_class_default___call (
+	lua_State* lua)
 {
 	LIScrClass* clss;
 	LIScrClass* clss1;
@@ -401,18 +402,20 @@ liscr_class_default___call (lua_State* lua)
  * \param lua Lua state.
  * \return Zero.
  */
-int
-liscr_class_default___gc (lua_State* lua)
+int liscr_class_default___gc (
+	lua_State* lua)
 {
-	LIScrClass* clss;
-	LIScrData* self;
+	char* data;
 
-	clss = liscr_isanyclass (lua, 1);
-	if (clss != NULL)
-		liscr_class_free (clss);
-	self = liscr_isanydata (lua, 1);
-	if (self != NULL)
-		liscr_data_free (self);
+	/* The lookup tables don't exist here anymore so we need to rely
+	   on the signature byte to distinguish classes from userdata. */
+	data = lua_touserdata (lua, 1);
+	lisys_assert (data != NULL);
+	lisys_assert (*data == 'C' || *data == 'D');
+	if (*data == 'C')
+		liscr_class_free ((void*) data);
+	else
+		liscr_data_free ((void*) data);
 
 	return 0;
 }

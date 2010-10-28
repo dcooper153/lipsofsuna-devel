@@ -106,12 +106,16 @@ LIMaiProgram* limai_program_new (
 void limai_program_free (
 	LIMaiProgram* self)
 {
-	LIAlgStrdicIter iter;
 	LIMaiExtension* extension;
+	LIMaiExtension* extension_next;
 
 	/* Invoke callbacks. */
 	if (self->callbacks != NULL)
 		lical_callbacks_call (self->callbacks, self, "program-shutdown", lical_marshal_DATA);
+
+	/* Clear all sector data. */
+	if (self->sectors != NULL)
+		lialg_sectors_clear (self->sectors);
 
 	/* Free script. */
 	if (self->script != NULL)
@@ -125,15 +129,14 @@ void limai_program_free (
 	/* Free extensions. */
 	if (self->extensions != NULL)
 	{
-		LIALG_STRDIC_FOREACH (iter, self->extensions)
+		for (extension = self->extensions ; extension != NULL ; extension = extension_next)
 		{
-			extension = iter.value;
+			extension_next = extension->next;
 			((void (*)(void*)) extension->info->free) (extension->object);
 			if (extension->module != NULL)
 				lisys_module_free (extension->module);
 			lisys_free (extension);
 		}
-		lialg_strdic_free (self->extensions);
 	}
 
 	/* Free components. */
@@ -156,6 +159,12 @@ void limai_program_free (
 	{
 		lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 		lical_callbacks_free (self->callbacks);
+	}
+
+	if (self->sectors != NULL)
+	{
+		lisys_assert (self->sectors->content->size == 0);
+		lialg_sectors_free (self->sectors);
 	}
 
 	lisys_free (self->launch_args);
@@ -205,7 +214,7 @@ void limai_program_eventva (
 
 	/* Push to event list. */
 	limai_program_push_event (self, event);
-	liscr_data_unref (event, NULL);
+	liscr_data_unref (event);
 }
 
 /**
@@ -259,12 +268,19 @@ LIMaiExtension* limai_program_find_extension (
 	LIMaiProgram* self,
 	const char*   name)
 {
-	return lialg_strdic_find (self->extensions, name);
+	LIMaiExtension* extension;
+
+	for (extension = self->extensions ; extension != NULL ; extension = extension->next)
+	{
+		if (!strcmp (extension->name, name))
+			return extension;
+	}
+
+	return NULL;
 }
 
 /**
  * \brief Loads an extension.
- *
  * \param self Program.
  * \param name Extensions name.
  * \return Nonzero on success.
@@ -276,13 +292,13 @@ int limai_program_insert_extension (
 	char* ptr;
 	char* path;
 	char* ident;
-	LISysModule* module;
+	LISysModule* module = NULL;
 	LIMaiExtension* extension;
 	LIMaiExtensionInfo* info;
 
 	/* Check if already loaded. */
-	module = lialg_strdic_find (self->extensions, name);
-	if (module != NULL)
+	extension = limai_program_find_extension (self, name);
+	if (extension != NULL)
 		return 1;
 
 	/* Determine extension info struct name. We restrict the
@@ -347,28 +363,28 @@ int limai_program_insert_extension (
 		goto error;
 	}
 
-	/* Insert to extension list. */
+	/* Allocate extension. */
 	extension = lisys_calloc (1, sizeof (LIMaiExtension));
 	if (extension == NULL)
 		goto error;
+	strncpy (extension->name, name, sizeof (extension->name) - 1);
 	extension->info = info;
 	extension->module = module;
-	if (extension == NULL)
-		goto error;
-	if (!lialg_strdic_insert (self->extensions, name, extension))
-	{
-		lisys_free (extension);
-		goto error;
-	}
 
 	/* Call module initializer. */
 	extension->object = ((void* (*)(LIMaiProgram*)) info->init)(self);
 	if (extension->object == NULL)
 	{
-		lialg_strdic_remove (self->extensions, name);
 		lisys_free (extension);
 		goto error;
 	}
+
+	/* Insert to extension list. */
+	/* We prepend to the beginning of the list so that the extensions will be
+	   freed in the reverse order. This allows extensions to be cleaned up
+	   correctly when they have non-circular dependencies. */
+	extension->next = self->extensions;
+	self->extensions = extension;
 
 	return 1;
 
@@ -441,7 +457,7 @@ int limai_program_push_event (
 		return 0;
 	if (self->event_last == NULL)
 		self->event_last = self->event_first;
-	liscr_data_ref (event, NULL);
+	liscr_data_ref (event);
 
 	return 1;
 }
@@ -543,9 +559,6 @@ static int private_init (
 	/* Initialize dictionaries. */
 	self->components = lialg_strdic_new ();
 	if (self->components == NULL)
-		return 0;
-	self->extensions = lialg_strdic_new ();
-	if (self->extensions == NULL)
 		return 0;
 
 	/* Initialize callbacks. */
@@ -653,6 +666,8 @@ static int private_object_reset (
 	LIMaiProgram* self,
 	LIEngObject*  object)
 {
+	lua_State* lua;
+
 	if (object->script != NULL)
 	{
 		/* Emit an event. */
@@ -660,20 +675,21 @@ static int private_object_reset (
 			"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
 
 		/* Call the reset function provided by scripts. */
-		liscr_pushdata (self->script->lua, object->script);
-		lua_getfield (self->script->lua, -1, "reset");
-		if (lua_type (self->script->lua, -1) == LUA_TFUNCTION)
+		lua = liscr_script_get_lua (self->script);
+		liscr_pushdata (lua, object->script);
+		lua_getfield (lua, -1, "reset");
+		if (lua_type (lua, -1) == LUA_TFUNCTION)
 		{
-			liscr_pushdata (self->script->lua, object->script);
-			if (lua_pcall (self->script->lua, 1, 0, 0) != 0)
+			liscr_pushdata (lua, object->script);
+			if (lua_pcall (lua, 1, 0, 0) != 0)
 			{
-				lisys_error_set (EINVAL, lua_tostring (self->script->lua, -1));
-				lua_pop (self->script->lua, 1);
+				lisys_error_set (EINVAL, lua_tostring (lua, -1));
+				lua_pop (lua, 1);
 			}
-			lua_pop (self->script->lua, 1);
+			lua_pop (lua, 1);
 		}
 		else
-			lua_pop (self->script->lua, 2);
+			lua_pop (lua, 2);
 	}
 
 	return 1;

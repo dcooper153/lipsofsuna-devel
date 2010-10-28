@@ -49,7 +49,7 @@ static void Tile_new (LIScrArgs* args)
 		return;
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
-	liscr_data_unref (data, NULL);
+	liscr_data_unref (data);
 }
 
 /* @luadoc
@@ -209,7 +209,7 @@ static void Voxel_copy_region (LIScrArgs* args)
 		lisys_free (result);
 		return;
 	}
-	writer = ((LIScrPacket*) packet->data)->writer;
+	writer = ((LIScrPacket*) liscr_data_get_data (packet))->writer;
 
 	/* Write dimensions. */
 	if (!liarc_writer_append_uint32 (writer, (int) size.x) ||
@@ -262,7 +262,7 @@ static void Voxel_fill_region (LIScrArgs* args)
 	if (size.x < 1.0f || size.y < 1.0f || size.z < 1.0f)
 		return;
 	if (liscr_args_gets_data (args, "tile", LIEXT_SCRIPT_TILE, &data))
-		tile = *((LIVoxVoxel*) data->data);
+		tile = *((LIVoxVoxel*) liscr_data_get_data (data));
 	else
 		livox_voxel_init (&tile, 0);
 
@@ -397,7 +397,7 @@ static void Voxel_find_material (LIScrArgs* args)
 			return;
 		}
 		liscr_args_seti_data (args, data);
-		liscr_data_unref (data, NULL);
+		liscr_data_unref (data);
 	}
 }
 
@@ -443,11 +443,11 @@ static void Voxel_find_tile (LIScrArgs* args)
 		data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), clss);
 		if (data == NULL)
 			return;
-		*((LIVoxVoxel*) data->data) = *voxel;
+		*((LIVoxVoxel*) liscr_data_get_data (data)) = *voxel;
 		liscr_args_seti_data (args, data);
 		result = limat_vector_init (index[0], index[1], index[2]);
 		liscr_args_seti_vector (args, &result);
-		liscr_data_unref (data, NULL);
+		liscr_data_unref (data);
 	}
 }
 
@@ -499,25 +499,25 @@ static void Voxel_get_block (LIScrArgs* args)
 		data = liscr_packet_new_writable (args->script, type);
 		if (data == NULL)
 			return;
-		packet = data->data;
+		packet = liscr_data_get_data (data);
 	}
 	else
 	{
-		packet = data->data;
+		packet = liscr_data_get_data (data);
 		if (packet->writer == NULL)
 			return;
-		liscr_data_ref (data, NULL);
+		liscr_data_ref (data);
 	}
 
 	/* Build packet. */
 	if (!liarc_writer_append_uint32 (packet->writer, index) ||
 		!livox_sector_write_block (sector, addr.block[0], addr.block[1], addr.block[2], packet->writer))
 	{
-		liscr_data_unref (data, NULL);
+		liscr_data_unref (data);
 		return;
 	}
 	liscr_args_seti_data (args, data);
-	liscr_data_unref (data, NULL);
+	liscr_data_unref (data);
 }
 
 /* @luadoc
@@ -548,7 +548,7 @@ static void Voxel_get_tile (LIScrArgs* args)
 		data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), clss);
 		if (data == NULL)
 			return;
-		livox_manager_get_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, data->data);
+		livox_manager_get_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, liscr_data_get_data (data));
 		liscr_args_seti_data (args, data);
 	}
 }
@@ -597,7 +597,7 @@ static void Voxel_paste_region (LIScrArgs* args)
 	/* Get terrain data. */
 	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
 		return;
-	packet = data->data;
+	packet = liscr_data_get_data (data);
 	if (packet->reader == NULL)
 	{
 		reader = liarc_reader_new (
@@ -680,7 +680,7 @@ static void Voxel_set_block (LIScrArgs* args)
 	/* Get packet. */
 	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
 		return;
-	packet = data->data;
+	packet = liscr_data_get_data (data);
 	if (!packet->reader)
 		return;
 
@@ -740,7 +740,7 @@ static void Voxel_set_tile (LIScrArgs* args)
 		    point.y < 0.0f || point.y >= lim ||
 		    point.z < 0.0f || point.z >= lim)
 			return;
-		livox_manager_set_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, voxel->data);
+		livox_manager_set_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, liscr_data_get_data (voxel));
 	}
 }
 
@@ -787,9 +787,9 @@ static void Voxel_getter_fill (LIScrArgs* args)
 		voxel = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), clss);
 		if (voxel != NULL)
 		{
-			livox_voxel_init (voxel->data, self->voxels->fill);
+			livox_voxel_init (liscr_data_get_data (voxel), self->voxels->fill);
 			liscr_args_seti_data (args, voxel);
-			liscr_data_unref (voxel, NULL);
+			liscr_data_unref (voxel);
 		}
 	}
 }
@@ -800,7 +800,7 @@ static void Voxel_setter_fill (LIScrArgs* args)
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
 	if (liscr_args_geti_data (args, 0, LIEXT_SCRIPT_TILE, &voxel))
-		livox_manager_set_fill (self->voxels, ((LIVoxVoxel*) voxel->data)->type);
+		livox_manager_set_fill (self->voxels, ((LIVoxVoxel*) liscr_data_get_data (voxel))->type);
 	else
 		livox_manager_set_fill (self->voxels, 0);
 }

@@ -27,8 +27,7 @@
 static void private_free_database (
 	LIArcSql* self)
 {
-	if (self != NULL)
-		sqlite3_close (self);
+	sqlite3_close (self);
 }
 
 /*****************************************************************************/
@@ -80,12 +79,6 @@ static void Database_new (LIScrArgs* args)
 		return;
 
 	/* Open database. */
-	sql = lisys_calloc (1, sizeof (LIArcSql*));
-	if (sql == NULL)
-	{
-		lisys_free (path);
-		return;
-	}
 	if (sqlite3_open_v2 (path, &sql, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL) != SQLITE_OK)
 	{
 		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (sql));
@@ -99,12 +92,12 @@ static void Database_new (LIScrArgs* args)
 	data = liscr_data_new (args->script, sql, args->clss, private_free_database);
 	if (data == NULL)
 	{
-		lisys_free (sql);
+		sqlite3_close (sql);
 		return;
 	}
 	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
-	liscr_data_unref (data, NULL);
+	liscr_data_unref (data);
 }
 
 /* @luadoc
@@ -192,7 +185,7 @@ static void Database_query (LIScrArgs* args)
 					data = liscr_isdata (args->lua, -1, LISCR_SCRIPT_PACKET);
 					if (data == NULL)
 						break;
-					packet = data->data;
+					packet = liscr_data_get_data (data);
 					if (packet->writer != NULL)
 					{
 						if (sqlite3_bind_blob (statement, i, packet->writer->memory.buffer,
@@ -251,7 +244,7 @@ static void Database_query (LIScrArgs* args)
 		lua_newtable (args->lua);
 
 		/* Push the columns to the table. */
-		for (col = 0 ; col < sqlite3_column_count(statement) ; col++)
+		for (col = 0 ; col < sqlite3_column_count (statement) ; col++)
 		{
 			switch (sqlite3_column_type (statement, col))
 			{

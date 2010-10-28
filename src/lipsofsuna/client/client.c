@@ -145,6 +145,17 @@ void licli_client_free_module (
 		lipth_paths_free (self->paths);
 		self->paths = NULL;
 	}
+	if (self->scene != NULL)
+	{
+		liren_scene_free (self->scene);
+		self->scene = NULL;
+	}
+	if (self->render != NULL)
+	{
+		liren_render_free (self->render);
+		self->render = NULL;
+	}
+
 	lisys_free (self->path);
 	lisys_free (self->name);
 	self->path = NULL;
