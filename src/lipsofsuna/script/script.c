@@ -202,14 +202,22 @@ liscr_script_load (LIScrScript* self,
 		return 0;
 	}
 
+	/* Set the error handler. */
+	lua_pushvalue (self->lua, 1);
+	lua_getglobal (self->lua, "debug");
+	lua_getfield (self->lua, 3, "traceback");
+	lua_replace (self->lua, 1);
+	lua_pop (self->lua, 1);
+
 	/* Parse the file. */
-	ret = lua_pcall (self->lua, 0, 0, 0);
+	ret = lua_pcall (self->lua, 0, 0, 1);
 	if (ret)
 	{
 		lisys_error_set (EINVAL, "%s", lua_tostring (self->lua, -1));
-		lua_pop (self->lua, 1);
+		lua_pop (self->lua, 2);
 		return 0;
 	}
+	lua_pop (self->lua, 1);
 
 	return 1;
 }

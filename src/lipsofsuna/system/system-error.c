@@ -29,7 +29,7 @@
 #include <pthread.h>
 #include "system-error.h"
 
-#define LISYS_ERROR_LENGTH 256
+#define LISYS_ERROR_LENGTH 2048
 
 typedef struct _LISysError LISysError;
 struct _LISysError
