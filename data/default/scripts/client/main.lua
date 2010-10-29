@@ -12,10 +12,18 @@ require "core/render"
 require "core/sound"
 require "core/widgets"
 require "common/eventhandler"
+require "client/entry"
 require "client/label"
 require "client/theme"
 require "client/widget"
 require "client/startup"
+
+Eventhandler{type = "keypress", func = function(self, args)
+	local w = Widgets.focused_widget
+	if w and w.event then
+		w:event(args)
+	end
+end}
 
 Eventhandler{type = "quit", func = function(self, args)
 	Program.quit = true
