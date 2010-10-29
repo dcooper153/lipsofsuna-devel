@@ -386,10 +386,10 @@ static int private_read_config (
 	LIRenUniform* uniform;
 
 	/* Parse options. */
-	while (1)
+	while (!liarc_reader_check_end (reader))
 	{
 		if (!liarc_reader_get_text (reader, "\n", &line))
-			break;
+			return 0;
 		if (!strlen (line))
 		{
 			lisys_free (line);
