@@ -65,6 +65,8 @@ Species.copy = function(orig, args)
 	self.skill_quota = orig.skill_quota
 	self.speed_walk = orig.speed_walk
 	self.speed_run = orig.speed_run
+	self.tilt_bone = orig.tilt_bone
+	self.tilt_limit = orig.tilt_limit
 	return self
 end
 
@@ -154,6 +156,8 @@ Species.new = function(clss, args)
 	copy("skill_quota", 200)
 	copy("speed_walk", 3)
 	copy("speed_run", 6)
+	copy("tilt_bone")
+	copy("tilt_limit", math.pi)
 	return self
 end
 

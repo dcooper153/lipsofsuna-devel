@@ -142,8 +142,8 @@ Protocol:add_handler{type = "PLAYER_TURN", func = function(args)
 		local ok,x,y,z,w = args.packet:read("float", "float", "float", "float")
 		if ok then
 			local e = Quaternion(x, y, z, w).euler
-			if e[3] < -0.5 then e[3] = -0.5 end
-			if e[3] > 0.5 then e[3] = 0.5 end
+			e[3] = math.min(player.species.tilt_limit, e[3])
+			e[3] = math.max(-player.species.tilt_limit, e[3])
 			player.rotation = Quaternion:new_euler(e)
 		end
 	end

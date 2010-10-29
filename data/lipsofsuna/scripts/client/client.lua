@@ -80,22 +80,23 @@ Player.turn_state = 0
 Player.rotation_curr = Quaternion()
 Player.rotation_prev = Quaternion()
 Player.update_rotation = function(clss, secs)
+	local spec = Species:find{name = Player.object.race}
 	-- Update turning.
 	clss.turn_state = clss.turn_state + clss.turn * secs
 	clss.turn_state = radian_wrap(clss.turn_state)
-	clss.object.rotation = Quaternion:new_euler(clss.turn_state, 0, 0)
 	clss.turn = 0
 	-- Update tilting.
 	clss.tilt_state = clss.tilt_state + clss.tilt * secs
-	clss.tilt_state = math.min(0.4 * math.pi, clss.tilt_state)
-	clss.tilt_state = math.max(-0.4 * math.pi, clss.tilt_state)
+	if spec then
+		clss.tilt_state = math.min(spec.tilt_limit, clss.tilt_state)
+		clss.tilt_state = math.max(-spec.tilt_limit, clss.tilt_state)
+	end
 	clss.tilt = 0
-	-- Tilt the back of the character.
-	local quat = Quaternion{axis = Vector(1,0,0), angle = clss.tilt_state}
-	clss.object:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "back", rotation = quat}
-	-- Sync rotation with the server.
+	-- Update rotation.
 	local r = Quaternion:new_euler(clss.turn_state, 0, -clss.tilt_state)
+	clss.object:update_rotation(r)
 	clss.rotation_curr = r
+	-- Sync rotation with the server.
 	if (clss.rotation_prev - r).length > 0.1 then
 		clss.rotation_prev = r
 		Network:send{packet = Packet(packets.PLAYER_TURN, "float", r.x, "float", r.y, "float", r.z, "float", r.w)}
@@ -103,11 +104,6 @@ Player.update_rotation = function(clss, secs)
 end
 
 Player.update_pose = function(clss, secs)
-	if clss.object then
-		-- Create the customization animation.
-		Player.object:animate{animation = "empty", channel = Animation.CHANNEL_CUSTOMIZE,
-			weight = 10.0, permanent = true}
-	end
 end
 
 Eventhandler{type = "tick", func = function(self, args)
@@ -223,7 +219,9 @@ Protocol:add_handler{type = "OBJECT_MOVED", func = function(event)
 		local o = Object:find{id = i}
 		if o then
 			o.position = Vector(x, y, z)
-			o.rotation = Quaternion(rx, ry, rz, rw)
+			if o ~= Player.object then
+				o:update_rotation(Quaternion(rx, ry, rz, rw))
+			end
 		end
 	end
 end}
@@ -245,7 +243,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	if not ok then return end
 	-- Create the object.
 	local type = (t == 0 and "creature") or (t == 1 and "item") or (t == 2 and "obstacle") or "object"
-	local o = Object{id = i, model = m, name = n, position = Vector(x, y, z), position_smoothing = 0.5, rotation = Quaternion(rx, ry, rz, rw), rotation_smoothing = 0.5, realized = true, type = type}
+	local o = Object{id = i, model = m, name = n, position = Vector(x, y, z), position_smoothing = 0.5, rotation_smoothing = 0.5, type = type}
 	-- Apply optional customizations.
 	local ok,ra,ge,hs,hc = event.packet:resume("string", "string", "string", "string")
 	if ok then
@@ -261,6 +259,8 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	end
 	-- Rebuild the model.
 	o:update_model()
+	o:update_rotation(Quaternion(rx, ry, rz, rw))
+	o.realized = true
 end}
 
 Protocol:add_handler{type = "OBJECT_SKILL", func = function(event)

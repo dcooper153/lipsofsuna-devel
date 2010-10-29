@@ -66,6 +66,11 @@ Object.update_model = function(self)
 			hair_style = self.hair_style,
 			race = self.race}
 	end
+	-- Create the customization animation.
+	if spec and (spec.models or spec.tilt_bone) then
+		self:animate{animation = "empty", channel = Animation.CHANNEL_CUSTOMIZE,
+			weight = 10.0, permanent = true}
+	end
 	-- Particle hacks.
 	if self.model_name == "torch1" then
 		Thread(function()
@@ -80,5 +85,26 @@ Object.update_model = function(self)
 			end
 			fx.realized = false
 		end)
+	end
+end
+
+--- Updates the rotation of the object.<br/>
+-- This function differs from setting the rotation directly in that if the
+-- object is a creature with bone tilting specified in the spec, the tilting
+-- component of the rotation is applied to the bone instead of to the whole
+-- object.
+-- @param self Object.
+-- @param quat Quaternion.
+Object.update_rotation = function(self, quat)
+	local spec = Species:find{name = self.race}
+	if spec and spec.tilt_bone then
+		local euler = quat.euler
+		local bodyq = Quaternion:new_euler(euler[1], euler[2], 0)
+		local boneq = Quaternion{axis = Vector(1,0,0), angle = -euler[3]}
+		if o ~= Player.object then print("HO!", euler[3]) end
+		self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = spec.tilt_bone, rotation = boneq}
+		self.rotation = bodyq
+	else
+		self.rotation = quat
 	end
 end

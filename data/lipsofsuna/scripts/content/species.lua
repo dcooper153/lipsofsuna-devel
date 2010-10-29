@@ -29,7 +29,9 @@ Species{
 		{name = "strength", max = 40, val = 20},
 		{name = "willpower", max = 80, val = 30}},
 	speed_walk = 3,
-	speed_run = 6}
+	speed_run = 6,
+	tilt_bone = "back",
+	tilt_limit = 1.25}
 
 Species{
 	name = "aer-player",
@@ -59,7 +61,9 @@ Species{
 		{name = "strength", max = 80, val = 30},
 		{name = "willpower", max = 40, val = 20}},
 	speed_walk = 3,
-	speed_run = 6}
+	speed_run = 6,
+	tilt_bone = "back",
+	tilt_limit = 1.25}
 
 Species{
 	name = "devora",
@@ -90,7 +94,9 @@ Species{
 		{name = "strength", max = 60, val = 20},
 		{name = "willpower", max = 80, val = 30}},
 	speed_walk = 3,
-	speed_run = 6}
+	speed_run = 6,
+	tilt_bone = "back",
+	tilt_limit = 1.25}
 
 Species{
 	name = "devora-player",
@@ -127,7 +133,9 @@ Species{
 		{name = "strength", max = 80, val = 30},
 		{name = "willpower", max = 100, val = 50}},
 	speed_walk = 3,
-	speed_run = 6}
+	speed_run = 6,
+	tilt_bone = "back",
+	tilt_limit = 1.25}
 
 Species{
 	name = "kraken-player",
@@ -164,7 +172,9 @@ Species{
 		{name = "strength", max = 100, val = 50},
 		{name = "willpower", max = 60, val = 20}},
 	speed_walk = 3,
-	speed_run = 6}
+	speed_run = 6,
+	tilt_bone = "back",
+	tilt_limit = 1.25}
 
 Species{
 	name = "wyrm-player",
