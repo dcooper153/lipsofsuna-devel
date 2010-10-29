@@ -101,7 +101,6 @@ Object.update_rotation = function(self, quat)
 		local euler = quat.euler
 		local bodyq = Quaternion:new_euler(euler[1], euler[2], 0)
 		local boneq = Quaternion{axis = Vector(1,0,0), angle = -euler[3]}
-		if o ~= Player.object then print("HO!", euler[3]) end
 		self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = spec.tilt_bone, rotation = boneq}
 		self.rotation = bodyq
 	else
