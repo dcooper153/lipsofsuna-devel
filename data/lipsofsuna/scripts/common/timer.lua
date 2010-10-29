@@ -1,6 +1,7 @@
 Timer = Class()
-Timer.timers = {}
-setmetatable(Timer.timers, {__mode = "v"})
+Timer.dict_timer = {}
+Timer.dict_delete = {}
+setmetatable(Timer.dict_timer, {__mode = "v"})
 
 Timer.setter = function(self, key, value)
 	if key == "enabled" then
@@ -36,21 +37,29 @@ end
 -- The timer will be subject to normal garbage collection when disabled.
 -- @param self Timer.
 Timer.disable = function(self)
-	Timer.timers[self] = nil
+	-- Since this is often called from inside callback, we add removed
+	-- timers to a separate table to not screw up the update loop.
+	Timer.dict_delete[self] = true
 end
 
 --- Enables the timer.<br/>
 -- The timer will not be subject to garbage collection when enabled.
 -- @param self Timer.
 Timer.enable = function(self)
-	Timer.timers[self] = self.owner or true
+	Timer.dict_timer[self] = self.owner or true
 	self.updated = Program.time
 end
 
 -- Register event handler.
 Eventhandler{type = "tick", func = function(self, args)
 	local t = Program.time
-	for k,v in pairs(Timer.timers) do
+	-- Remove timers.
+	for k in pairs(Timer.dict_delete) do
+		Timer.dict_timer[k] = nil
+	end
+	Timer.dict_delete = {}
+	-- Update timers.
+	for k,v in pairs(Timer.dict_timer) do
 		local delay = (k.delay or 0)
 		local target = k.updated + delay
 		if target <= t then
@@ -67,4 +76,3 @@ Eventhandler{type = "tick", func = function(self, args)
 		end
 	end
 end}
-
