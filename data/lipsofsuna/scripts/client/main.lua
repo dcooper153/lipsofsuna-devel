@@ -129,6 +129,8 @@ Eventhandler{type = "tick", func = function(self, args)
 	end
 end}
 
+Startup:execute()
+
 -- Main loop.
 while not Program.quit do
 	-- Update program state.

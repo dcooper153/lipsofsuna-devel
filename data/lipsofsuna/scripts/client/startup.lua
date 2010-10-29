@@ -38,11 +38,8 @@ Startup.execute = function(clss)
 		clss.text.text = "Starting the server..."
 		clss.host_wait_timer = Timer{delay = 1, func = function(self)
 			if Network:join{host = "localhost", clss.port} then
-				clss.joined = true
-				clss.group.floating = false
-				Gui:init()
-				Chargen:execute()
 				self:disable()
+				clss:finish()
 			end
 		end}
 	elseif Startup.mode == "--join" then
@@ -51,22 +48,32 @@ Startup.execute = function(clss)
 		if not Network:join{host = clss.host, port = clss.port} then
 			clss.text.text = "Connecting to " .. clss.host .. ":" .. clss.port .. " failed!"
 			clss.button_retry.visible = true
+		else
+			clss:finish()
 		end
 	else
 		-- Display help.
 		clss.text.text = "Usage:\n" ..
 			"  lipsofsuna --join <server> <port>\n" ..
-			"  lipsofsuna --host localhost <port>\n" ..
-			"  lipsofsuna --import\n"
+			"  lipsofsuna --host localhost <port>\n"
 	end
 end
 
+--- Finishes the startup when connection has been established.
+-- @param clss Startup class.
+Startup.finish = function(clss)
+	clss.joined = true
+	clss.group.floating = false
+	Gui:init()
+	Chargen:execute()
+end
+
 Startup:init()
-Startup:execute()
 
 Eventhandler{type = "tick", func = function(self, args)
 	if Startup.joined and not Network.connected then
 		Gui:free()
+		Chargen:free()
 		Startup.group.floating = true
 		Startup.button_retry.text = "Reconnect"
 		Startup.button_retry.visible = true

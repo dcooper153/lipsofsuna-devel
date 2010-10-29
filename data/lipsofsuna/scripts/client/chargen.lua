@@ -104,6 +104,13 @@ Chargen.execute = function(clss)
 	clss:random()
 end
 
+Chargen.free = function(clss)
+	clss.group.floating = false
+	clss.object.realized = false
+	clss.timer.enabled = false
+	clss.light.enabled = false
+end
+
 Chargen.quit = function(clss)
 	Program.quit = true
 end
@@ -177,10 +184,7 @@ end
 
 Chargen:init()
 Protocol:add_handler{type = "CHARACTER_ACCEPT", func = function(event)
-	Chargen.group.floating = false
-	Chargen.object.realized = false
-	Chargen.timer.enabled = false
-	Chargen.light.enabled = false
+	Chargen:free()
 	Gui:init()
 	Sound.music = "fairytale2"
 	Sound.music_volume = 0.1
