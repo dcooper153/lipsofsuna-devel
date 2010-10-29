@@ -70,7 +70,7 @@ Gui.init = function(clss)
 	Gui.center_group:append_row(Gui.menu_group)
 	Gui.center_group:append_row(Gui.skills_group)
 	Gui.center_group:set_expand{row = 1}
-	Gui.scene = Widgets.Scene{rows = 1, margins = {5,5,5,5}}
+	Gui.scene = Widgets.Scene{rows = 1, camera = Player.camera, margins = {5,5,5,5}}
 	Gui.scene:append_col(Gui.editor_group)
 	Gui.scene:append_col(Gui.center_group)
 	Gui.scene:set_expand{col = 2, row = 1}

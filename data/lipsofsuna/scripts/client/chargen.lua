@@ -49,22 +49,8 @@ Chargen.init = function(clss)
 	clss.light = Light{ambient = {1.0,1.0,1.0,0.3}, diffuse={1.0,1.0,1.0,1.0}, equation={3,0.3,0.03}}
 	clss.camera = Camera{far = 60.0, near = 0.3, mode = "first-person"}
 	clss.timer = Timer{enabled = false, func = function(self, secs) clss:update(secs) end}
-	clss.preview = Widget{cols = 1, behind = true, fullscreen = true}
+	clss.preview = Widgets.Scene{cols = 1, behind = true, fullscreen = true, camera = clss.camera}
 	clss.preview.margins = {5,5,5,5}
-	clss.preview.render = function(self)
-		clss.camera.viewport = {self.x, self.y, self.width, self.height}
-		clss.scene:draw_begin{
-			modelview = clss.camera.modelview,
-			projection = clss.camera.projection,
-			viewport = clss.camera.viewport}
-		clss.scene:draw_deferred_begin()
-		clss.scene:draw_deferred_opaque()
-		clss.scene:draw_deferred_end()
-		clss.scene:draw_forward_transparent()
-		clss.scene:draw_post_process{shader = "postprocess-vert-hdr"}
-		clss.scene:draw_post_process{shader = "postprocess-horz-hdr"}
-		clss.scene:draw_end()
-	end
 	-- Apply and quit buttons.
 	clss.button_create = Widgets.Button{text = "Create", pressed = function() clss:apply() end}
 	clss.button_quit = Widgets.Button{text = "Quit", pressed = function() clss:quit() end}

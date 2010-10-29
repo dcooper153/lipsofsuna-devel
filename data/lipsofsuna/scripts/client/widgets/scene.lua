@@ -1,4 +1,3 @@
-
 Widgets.Scene = Class(Widget)
 
 Widgets.Scene.setter = function(self, key, value)
@@ -29,9 +28,9 @@ end
 Widgets.Scene.render = function(self)
 	Player.camera.viewport = {self.x, self.y, self.width, self.height}
 	self.scene:draw_begin{
-		modelview = Player.camera.modelview,
-		projection = Player.camera.projection,
-		viewport = Player.camera.viewport}
+		modelview = self.camera.modelview,
+		projection = self.camera.projection,
+		viewport = self.camera.viewport}
 	self.scene:draw_deferred_begin()
 	self.scene:draw_deferred_opaque()
 	self.scene:draw_deferred_end()
@@ -40,9 +39,9 @@ Widgets.Scene.render = function(self)
 	self.scene:draw_post_process{shader = "postprocess-horz-hdr"}
 	self.scene:draw_end()
 	Speech:draw{
-		modelview = Player.camera.modelview,
-		projection = Player.camera.projection,
-		viewport = Player.camera.viewport}
+		modelview = self.camera.modelview,
+		projection = self.camera.projection,
+		viewport = self.camera.viewport}
 end
 
 Widgets.Scene.reshaped = function(self)
