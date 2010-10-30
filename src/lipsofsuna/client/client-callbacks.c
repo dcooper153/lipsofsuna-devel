@@ -37,7 +37,7 @@ static int private_event (
 		case SDL_JOYAXISMOTION:
 			limai_program_event (client->program, "joystickmotion",
 				"axis", LISCR_TYPE_INT, event->jaxis.axis + 1,
-				"value", LISCR_TYPE_INT, event->jaxis.value / 32768.0f, NULL);
+				"value", LISCR_TYPE_FLOAT, event->jaxis.value / 32768.0f, NULL);
 			return 0;
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
