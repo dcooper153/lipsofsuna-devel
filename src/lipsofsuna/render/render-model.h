@@ -22,8 +22,10 @@
 #include <lipsofsuna/model.h>
 #include <lipsofsuna/system.h>
 #include "render.h"
-#include "render-buffer.h"
+#include "render-buffer-texture.h"
 #include "render-material.h"
+#include "render-mesh.h"
+#include "render-particles.h"
 #include "render-types.h"
 
 typedef struct _LIRenModelGroup LIRenModelGroup;
@@ -37,8 +39,9 @@ struct _LIRenModel
 {
 	int id;
 	int type;
-	LIMdlModel* model;
-	LIRenBuffer* buffer;
+	LIMatAabb bounds;
+	LIRenMesh mesh;
+	LIRenParticles particles;
 	LIRenRender* render;
 	struct
 	{
@@ -60,6 +63,11 @@ LIAPICALL (LIRenModel*, liren_model_new, (
 LIAPICALL (void, liren_model_free, (
 	LIRenModel* self));
 
+LIAPICALL (int, liren_model_deform, (
+	LIRenModel*      self,
+	const char*      shader,
+	const LIMdlPose* pose));
+
 LIAPICALL (int, liren_model_intersect_ray, (
 	const LIRenModel*  self,
 	const LIMatVector* ray0,
@@ -77,9 +85,6 @@ LIAPICALL (void, liren_model_get_bounds, (
 LIAPICALL (int, liren_model_set_model, (
 	LIRenModel* self,
 	LIMdlModel* model));
-
-LIAPICALL (int, liren_model_get_static, (
-	LIRenModel* self));
 
 LIAPICALL (int, liren_model_get_type, (
 	const LIRenModel* self));

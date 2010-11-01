@@ -1,9 +1,6 @@
 Shader{
 	name = "forward-hair",
 	config = [[
-attribute att_coord COORD
-attribute att_normal NORMAL
-attribute att_texcoord TEXCOORD
 uniform uni_lightambient LIGHTAMBIENT0
 uniform uni_lightdiffuse LIGHTDIFFUSE0
 uniform uni_lightequation LIGHTEQUATION0
@@ -19,43 +16,6 @@ uniform uni_normalmap DIFFUSETEXTURE1
 uniform uni_texturemap DIFFUSETEXTURE0]],
 
 	vertex = [[
-#version 150
-in vec3 att_coord;
-in vec3 att_normal;
-in vec2 att_texcoord;
-out geomvar
-{
-	vec3 coord;
-	vec3 lightvector;
-	vec3 normal;
-	vec2 texcoord;
-} OUT;
-uniform vec3 uni_lightposition;
-uniform mat4 uni_matrixmodelview;
-uniform mat3 uni_matrixnormal;
-uniform mat4 uni_matrixprojection;
-void main()
-{
-	vec4 tmp = uni_matrixmodelview * vec4(att_coord,1.0);
-	OUT.coord = tmp.xyz;
-	OUT.lightvector = uni_lightposition - tmp.xyz;
-	OUT.normal = uni_matrixnormal * att_normal;
-	OUT.texcoord = att_texcoord;
-	gl_Position = uni_matrixprojection * tmp;
-}]],
-
-	geometry = [[
-#version 150
-#extension GL_EXT_geometry_shader4 : enable
-layout(triangles) in;
-layout(triangle_strip, max_vertices=3) out;
-in geomvar
-{
-	vec3 coord;
-	vec3 lightvector;
-	vec3 normal;
-	vec2 texcoord;
-} IN[3];
 out fragvar
 {
 	vec3 coord;
@@ -64,28 +24,22 @@ out fragvar
 	vec3 tangent;
 	vec2 texcoord;
 } OUT;
-uniform mat3 uni_matrixnormal;]]
-.. Shader.los_triangle_tangent .. [[
+uniform vec3 uni_lightposition;
+uniform mat4 uni_matrixmodelview;
+uniform mat3 uni_matrixnormal;
+uniform mat4 uni_matrixprojection;
 void main()
 {
-	int i;
-	OUT.tangent = uni_matrixnormal * los_triangle_tangent(
-		IN[0].coord, IN[1].coord, IN[2].coord,
-		IN[0].texcoord, IN[1].texcoord, IN[2].texcoord);
-	for(i = 0 ; i < gl_VerticesIn ; i++)
-	{
-		OUT.coord = IN[i].coord;
-		OUT.lightvector = IN[i].lightvector;
-		OUT.normal = IN[i].normal;
-		OUT.texcoord = IN[i].texcoord;
-		gl_Position = gl_PositionIn[i];
-		EmitVertex();
-	}
-	EndPrimitive();
+	vec4 tmp = uni_matrixmodelview * vec4(LOS_coord,1.0);
+	OUT.coord = tmp.xyz;
+	OUT.lightvector = uni_lightposition - tmp.xyz;
+	OUT.normal = uni_matrixnormal * LOS_normal;
+	OUT.tangent = uni_matrixnormal * LOS_tangent;
+	OUT.texcoord = LOS_texcoord;
+	gl_Position = uni_matrixprojection * tmp;
 }]],
 
 	fragment = [[
-#version 150
 in fragvar
 {
 	vec3 coord;

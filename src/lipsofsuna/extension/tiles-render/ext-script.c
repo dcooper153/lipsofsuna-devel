@@ -72,11 +72,11 @@ static void Voxel_intersect_ray (LIScrArgs* args)
 	LIALG_MEMDIC_FOREACH (iter, module->blocks)
 	{
 		block = iter.value;
-		if (block->rmodel == NULL)
+		if (block->model == NULL)
 			continue;
 
 		/* Get the intersection point in the model space. */
-		if (!liren_model_intersect_ray (block->rmodel, &ray0, &ray1, &result))
+		if (!liren_model_intersect_ray (block->model, &ray0, &ray1, &result))
 			continue;
 
 		/* Update the result if closer than the old one. */

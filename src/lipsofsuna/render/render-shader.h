@@ -37,11 +37,6 @@ struct _LIRenShader
 	struct
 	{
 		int count;
-		LIRenAttribute* array;
-	} attributes;
-	struct
-	{
-		int count;
 	} lights;
 	struct
 	{
@@ -56,7 +51,8 @@ LIAPICALL (LIRenShader*, liren_shader_new, (
 	const char*  config,
 	const char*  vertex,
 	const char*  geometry,
-	const char*  fragment));
+	const char*  fragment,
+	int          feedback));
 
 LIAPICALL (void, liren_shader_free, (
 	LIRenShader* self));
@@ -66,6 +62,7 @@ LIAPICALL (int, liren_shader_compile, (
 	const char*  config,
 	const char*  vertex,
 	const char*  geometry,
-	const char*  fragment));
+	const char*  fragment,
+	int          feedback));
 
 #endif

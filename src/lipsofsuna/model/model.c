@@ -31,6 +31,11 @@ typedef int (*LIMdlWriteFunc)(const LIMdlModel*, LIArcWriter*);
 static void private_build (
 	LIMdlModel* self);
 
+static void private_build_vertex_weights (
+	LIMdlModel*   self,
+	LIMdlVertex*  vertex,
+	LIMdlWeights* weights);
+
 static int private_read (
 	LIMdlModel*  self,
 	LIArcReader* reader);
@@ -883,6 +888,10 @@ int limdl_model_insert_vertex_weights (
 		}
 	}
 
+	/* Choose vertex weights for hardware deformation. */
+	i = self->vertices.count - 1;
+	private_build_vertex_weights (self, self->vertices.array + i, dstwei);
+
 	return 1;
 }
 
@@ -1139,6 +1148,69 @@ private_build (LIMdlModel* self)
 		node = self->nodes.array[i];
 		limdl_node_rebuild (node, 1);
 	}
+
+	/* Choose vertex weights for hardware deformation. */
+	for (i = 0 ; i < self->weights.count ; i++)
+		private_build_vertex_weights (self, self->vertices.array + i, self->weights.array + i);
+}
+
+static void private_build_vertex_weights (
+	LIMdlModel*   self,
+	LIMdlVertex*  vertex,
+	LIMdlWeights* weights)
+{
+	int i;
+	int j;
+	int bone;
+	float weight;
+	float weights_tmp[LIMDL_VERTEX_WEIGHTS_MAX + 1];
+	unsigned char bones_tmp[LIMDL_VERTEX_WEIGHTS_MAX + 1];
+
+	/* Initialize empty weights. */
+	for (i = 0 ; i < LIMDL_VERTEX_WEIGHTS_MAX + 1 ; i++)
+	{
+		weights_tmp[i] = 0.0f;
+		bones_tmp[i] = 0;
+	}
+
+	/* Insertion sort the weights. */
+	for (i = 0 ; i < weights->count ; i++)
+	{
+		bone = weights->weights[i].group;
+		if (self->weightgroups.array[bone].node != NULL)
+		{
+			lisys_assert (bone < self->weightgroups.count);
+			weight = weights->weights[i].weight;
+			if (weight == 0.0f)
+				continue;
+			for (j = LIMDL_VERTEX_WEIGHTS_MAX ; j > 0 && weight > weights_tmp[j - 1] ; j--)
+			{
+				weights_tmp[j] = weights_tmp[j - 1];
+				bones_tmp[j] = bones_tmp[j - 1];
+			}
+			bones_tmp[j] = bone + 1;
+			weights_tmp[j] = weight;
+		}
+	}
+
+	/* Normalize the weights. */
+	weight = 0.0f;
+	for (i = 0 ; i < LIMDL_VERTEX_WEIGHTS_MAX ; i++)
+		weight += weights_tmp[i];
+	if (weight > LIMAT_EPSILON)
+	{
+		for (i = 0 ; i < LIMDL_VERTEX_WEIGHTS_MAX ; i++)
+			weights_tmp[i] /= weight;
+	}
+	else
+	{
+		weights_tmp[0] = 1.0f;
+		bones_tmp[0] = 0;
+	}
+
+	/* Store the most significant weights to the vertex. */
+	memcpy (vertex->weights, weights_tmp, LIMDL_VERTEX_WEIGHTS_MAX * sizeof (float));
+	memcpy (vertex->bones, bones_tmp, LIMDL_VERTEX_WEIGHTS_MAX * sizeof (char));
 }
 
 static int
@@ -1513,6 +1585,7 @@ private_read_vertices (LIMdlModel*  self,
 		for (i = 0 ; i < self->vertices.count ; i++)
 		{
 			vertex = self->vertices.array + i;
+			vertex->weights[0] = 1.0f;
 			if (!liarc_reader_get_float (reader, vertex->texcoord + 0) ||
 				!liarc_reader_get_float (reader, vertex->texcoord + 1) ||
 				!liarc_reader_get_float (reader, &vertex->normal.x) ||

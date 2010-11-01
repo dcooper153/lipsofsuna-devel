@@ -41,16 +41,18 @@
  * --   <li>fragment: Fragment program code.</li>
  * --   <li>geometry: Geometry program code.</li>
  * --   <li>name: Unique shader name.</li>
+ * --   <li>transform_feedback: True to enable transform feedback.</li>
  * --   <li>vertex: Vertex program code.</li></ul>
  * function Shader.new(clss, args)
  */
 static void Shader_new (LIScrArgs* args)
 {
+	int feedback = 0;
 	const char* name = "forward-default";
-	const char* config = "attribute att_coord COORD";
+	const char* config = "";
 	const char* fragment = "void main()\n{\ngl_FragColor = vec4(1.0,1.0,1.0,1.0);\n}";
 	const char* geometry = NULL;
-	const char* vertex = "in vec3 att_coord;\nvoid main()\n{\ngl_Position=vec4(att_coord,1.0);\n}";
+	const char* vertex = "void main()\n{\ngl_Position=vec4(LOS_coord,1.0);\n}";
 	LIExtModule* module;
 	LIScrData* data;
 	LIRenShader* shader;
@@ -61,6 +63,7 @@ static void Shader_new (LIScrArgs* args)
 	liscr_args_gets_string (args, "geometry", &geometry);
 	liscr_args_gets_string (args, "name", &name);
 	liscr_args_gets_string (args, "vertex", &vertex);
+	liscr_args_gets_bool (args, "transform_feedback", &feedback);
 
 	/* Avoid duplicate names. */
 	shader = lialg_strdic_find (module->client->render->shaders, name);
@@ -68,7 +71,7 @@ static void Shader_new (LIScrArgs* args)
 		return;
 
 	/* Allocate self. */
-	shader = liren_shader_new (module->client->render, name, config, vertex, geometry, fragment);
+	shader = liren_shader_new (module->client->render, name, config, vertex, geometry, fragment, feedback);
 	if (shader == NULL)
 	{
 		lisys_error_report ();
@@ -93,21 +96,24 @@ static void Shader_new (LIScrArgs* args)
  * --   <li>config: Shader configuration code.</li>
  * --   <li>fragment: Fragment program code.</li>
  * --   <li>geometry: Geometry program code.</li>
+ * --   <li>transform_feedback: True to enable transform feedback.</li>
  * --   <li>vertex: Vertex program code.</li></ul>
  * function Shader.compile(self, args)
  */
 static void Shader_compile (LIScrArgs* args)
 {
-	const char* config = "attribute att_coord COORD";
+	int feedback = 0;
+	const char* config = "";
 	const char* fragment = "void main()\n{\ngl_FragColor = vec4(1.0,1.0,1.0,1.0);\n}";
 	const char* geometry = NULL;
-	const char* vertex = "in vec3 att_coord;\nvoid main()\n{\ngl_Position=vec4(att_coord,1.0);\n}";
+	const char* vertex = "void main()\n{\ngl_Position=vec4(LOS_coord,1.0);\n}";
 
 	liscr_args_gets_string (args, "config", &config);
 	liscr_args_gets_string (args, "fragment", &fragment);
 	liscr_args_gets_string (args, "geometry", &geometry);
 	liscr_args_gets_string (args, "vertex", &vertex);
-	if (!liren_shader_compile (args->self, config, vertex, geometry, fragment))
+	liscr_args_gets_bool (args, "transform_feedback", &feedback);
+	if (!liren_shader_compile (args->self, config, vertex, geometry, fragment, feedback))
 		lisys_error_report ();
 }
 

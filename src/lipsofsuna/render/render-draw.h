@@ -28,7 +28,7 @@ LIAPICALL (void, liren_draw_default, (
 	int            count,
 	LIMatMatrix*   matrix,
 	LIRenMaterial* material,
-	LIRenBuffer*   buffer));
+	LIRenMesh*     mesh));
 
 LIAPICALL (void, liren_draw_debug, (
 	LIRenContext* context,

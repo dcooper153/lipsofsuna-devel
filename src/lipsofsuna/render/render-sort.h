@@ -23,6 +23,7 @@
 #include "render.h"
 #include "render-buffer.h"
 #include "render-material.h"
+#include "render-mesh.h"
 #include "render-types.h"
 
 enum
@@ -38,7 +39,7 @@ struct _LIRenSortgroup
 	int transparent;
 	LIMatAabb bounds;
 	LIMatMatrix matrix;
-	LIRenBuffer* buffer;
+	LIRenMesh* mesh;
 	LIRenMaterial* material;
 };
 
@@ -53,7 +54,7 @@ struct _LIRenSortface
 			int index;
 			LIMatAabb bounds;
 			LIMatMatrix matrix;
-			LIRenBuffer* buffer;
+			LIRenMesh* mesh;
 			LIRenMaterial* material;
 		} face;
 		struct
@@ -104,7 +105,7 @@ LIAPICALL (int, liren_sort_add_group, (
 	LIMatMatrix*   matrix,
 	int            index,
 	int            count,
-	LIRenBuffer*   buffer,
+	LIRenMesh*     mesh,
 	LIRenMaterial* material,
 	int            transparent));
 
@@ -114,7 +115,7 @@ LIAPICALL (int, liren_sort_add_faces, (
 	LIMatMatrix*   matrix,
 	int            index,
 	int            count,
-	LIRenBuffer*   buffer,
+	LIRenMesh*     mesh,
 	LIRenMaterial* material));
 
 LIAPICALL (int, liren_sort_add_model, (

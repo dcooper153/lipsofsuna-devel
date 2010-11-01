@@ -39,19 +39,12 @@ static int private_check_link (
 static void private_clear (
 	LIRenShader* self);
 
-static void private_init_attributes (
-	LIRenShader* self);
-
 static void private_init_uniforms (
 	LIRenShader* self);
 
 static int private_read_config (
 	LIRenShader* self,
 	LIArcReader* reader);
-
-static int private_attribute_value (
-	LIRenShader* self,
-	const char*  value);
 
 static int private_uniform_value (
 	LIRenShader* self,
@@ -67,6 +60,7 @@ static int private_uniform_value (
  * \param vertex Vertex shader code.
  * \param geometry Geometry shader code or NULL.
  * \param fragment Fragment shader code.
+ * \param feedback Nonzero to enable transform feedback.
  * \return New shader or NULL.
  */
 LIRenShader* liren_shader_new (
@@ -75,7 +69,8 @@ LIRenShader* liren_shader_new (
 	const char*  config,
 	const char*  vertex,
 	const char*  geometry,
-	const char*  fragment)
+	const char*  fragment,
+	int          feedback)
 {
 	LIRenShader* self;
 
@@ -92,7 +87,7 @@ LIRenShader* liren_shader_new (
 	}
 
 	/* Compile the shader. */
-	if (!liren_shader_compile (self, config, vertex, geometry, fragment))
+	if (!liren_shader_compile (self, config, vertex, geometry, fragment, feedback))
 	{
 		liren_shader_free (self);
 		return NULL;
@@ -123,11 +118,8 @@ void liren_shader_free (
 	glDeleteShader (self->vertex);
 	glDeleteShader (self->geometry);
 	glDeleteShader (self->fragment);
-	for (i = 0 ; i < self->attributes.count ; i++)
-		lisys_free (self->attributes.array[i].name);
 	for (i = 0 ; i < self->uniforms.count ; i++)
 		lisys_free (self->uniforms.array[i].name);
-	lisys_free (self->attributes.array);
 	lisys_free (self->uniforms.array);
 	lisys_free (self->name);
 	lisys_free (self);
@@ -140,6 +132,7 @@ void liren_shader_free (
  * \param vertex Vertex shader code.
  * \param geometry Geometry shader code or NULL.
  * \param fragment Fragment shader code.
+ * \param feedback Nonzero to enable transform feedback.
  * \return Nonzero on success.
  */
 int liren_shader_compile (
@@ -147,10 +140,45 @@ int liren_shader_compile (
 	const char*  config,
 	const char*  vertex,
 	const char*  geometry,
-	const char*  fragment)
+	const char*  fragment,
+	int          feedback)
 {
-	GLint length;
-	const GLchar* ptr;
+	GLint restore;
+	GLint lengths[3];
+	const GLchar* strings[3];
+	const GLchar* feedbacks[4] =
+	{
+		"LOS_out_texcoord",
+		"LOS_out_normal",
+		"LOS_out_coord",
+		"LOS_out_tangent"
+	};
+	const GLchar* headers[4] =
+	{
+		/* Common */
+		"layout(shared) uniform LOSDATA\n{\n"
+		"	vec3 light_direction;\n"
+		"	vec4 material_diffuse;\n"
+		"	mat4 model_matrix;\n"
+		"	mat3 normal_matrix;\n"
+		"	mat4 projection_matrix;\n"
+		"} LOS;\n",
+		/* Vertex */
+		"#version 150\n"
+		"in vec3 LOS_coord;\n"
+		"in vec2 LOS_texcoord;\n"
+		"in vec3 LOS_normal;\n"
+		"in vec3 LOS_tangent;\n"
+		"in vec4 LOS_weights1;\n"
+		"in vec4 LOS_weights2;\n"
+		"in vec4 LOS_bones1;\n"
+		"in vec4 LOS_bones2;\n",
+		/* Geometry */
+		"#version 150\n"
+		"#extension GL_EXT_geometry_shader4 : enable\n",
+		/* Fragment */
+		"#version 150\n"
+	};
 	LIArcReader* reader;
 	LIRenShader tmp;
 
@@ -179,18 +207,30 @@ int liren_shader_compile (
 	tmp.fragment = glCreateShader (GL_FRAGMENT_SHADER);
 
 	/* Upload shader source. */
-	length = strlen (vertex);
-	ptr = vertex;
-	glShaderSource (tmp.vertex, 1, &ptr, &length);
+	strings[0] = headers[1];
+	strings[1] = headers[0];
+	strings[2] = vertex;
+	lengths[0] = strlen (strings[0]);
+	lengths[1] = strlen (strings[1]);
+	lengths[2] = strlen (strings[2]);
+	glShaderSource (tmp.vertex, 3, strings, lengths);
 	if (geometry != NULL)
 	{
-		length = strlen (geometry);
-		ptr = geometry;
-		glShaderSource (tmp.geometry, 1, &ptr, &length);
+		strings[0] = headers[2];
+		strings[1] = headers[0];
+		strings[2] = geometry;
+		lengths[0] = strlen (strings[0]);
+		lengths[1] = strlen (strings[1]);
+		lengths[2] = strlen (strings[2]);
+		glShaderSource (tmp.geometry, 3, strings, lengths);
 	}
-	length = strlen (fragment);
-	ptr = fragment;
-	glShaderSource (tmp.fragment, 1, &ptr, &length);
+	strings[0] = headers[3];
+	strings[1] = headers[0];
+	strings[2] = fragment;
+	lengths[0] = strlen (strings[0]);
+	lengths[1] = strlen (strings[1]);
+	lengths[2] = strlen (strings[2]);
+	glShaderSource (tmp.fragment, 3, strings, lengths);
 
 	/* Compile the vertex shader. */
 	glCompileShader (tmp.vertex);
@@ -225,18 +265,31 @@ int liren_shader_compile (
 	if (tmp.geometry)
 		glAttachShader (tmp.program, tmp.geometry);
 	glAttachShader (tmp.program, tmp.fragment);
-	private_init_attributes (&tmp);
+	glBindAttribLocation (tmp.program, LIREN_ATTRIBUTE_COORD, "LOS_coord");
+	glBindAttribLocation (tmp.program, LIREN_ATTRIBUTE_TEXCOORD, "LOS_texcoord");
+	glBindAttribLocation (tmp.program, LIREN_ATTRIBUTE_NORMAL, "LOS_normal");
+	glBindAttribLocation (tmp.program, LIREN_ATTRIBUTE_TANGENT, "LOS_tangent");
+	glBindAttribLocation (tmp.program, LIREN_ATTRIBUTE_WEIGHTS1, "LOS_weights1");
+	glBindAttribLocation (tmp.program, LIREN_ATTRIBUTE_WEIGHTS2, "LOS_weights2");
+	glBindAttribLocation (tmp.program, LIREN_ATTRIBUTE_BONES1, "LOS_bones1");
+	glBindAttribLocation (tmp.program, LIREN_ATTRIBUTE_BONES2, "LOS_bones2");
+	if (feedback)
+	{
+		glTransformFeedbackVaryings (tmp.program, sizeof (feedbacks) /
+			sizeof (*feedbacks), feedbacks, GL_INTERLEAVED_ATTRIBS);
+	}
 	glLinkProgram (tmp.program);
 	if (!private_check_link (&tmp, tmp.name, tmp.program))
 	{
 		private_clear (&tmp);
 		return 0;
 	}
-	glUseProgram (tmp.program);
 
 	/* Initialize uniforms. */
+	glGetIntegerv (GL_CURRENT_PROGRAM, &restore);
+	glUseProgram (tmp.program);
 	private_init_uniforms (&tmp);
-	glUseProgram (0);
+	glUseProgram (restore);
 
 	/* Replace the old program with the new one. */
 	private_clear (self);
@@ -326,33 +379,13 @@ static void private_clear (
 {
 	int i;
 
-	for (i = 0 ; i < self->attributes.count ; i++)
-		lisys_free (self->attributes.array[i].name);
 	for (i = 0 ; i < self->uniforms.count ; i++)
 		lisys_free (self->uniforms.array[i].name);
-	lisys_free (self->attributes.array);
 	lisys_free (self->uniforms.array);
 	glDeleteProgram (self->program);
 	glDeleteShader (self->vertex);
 	glDeleteShader (self->geometry);
 	glDeleteShader (self->fragment);
-}
-
-static void private_init_attributes (
-	LIRenShader* self)
-{
-	int i;
-	LIRenAttribute* attribute;
-
-	for (i = 0 ; i < self->attributes.count ; i++)
-	{
-		attribute = self->attributes.array + i;
-		if (attribute->value != LIREN_ATTRIBUTE_NONE)
-			attribute->binding = attribute->value;
-		else
-			attribute->binding = LIREN_ATTRIBUTE_COORD;
-		glBindAttribLocationARB (self->program, attribute->binding, attribute->name);
-	}
 }
 
 static void private_init_uniforms (
@@ -382,7 +415,6 @@ static int private_read_config (
 	char* name;
 	char* ptr;
 	char* value;
-	LIRenAttribute* attribute;
 	LIRenUniform* uniform;
 
 	/* Parse options. */
@@ -402,46 +434,6 @@ static int private_read_config (
 			if (self->lights.count < 0 ||
 			    self->lights.count >= 8)
 				return 0;
-		}
-		else if (!strncmp (line, "attribute ", 10))
-		{
-			/* Separate fields. */
-			for (name = line + 10 ; *name != '\0' && isspace (*name) ; name++) {}
-			for (ptr = name ; *ptr != '\0' && !isspace (*ptr) ; ptr++) {}
-			if (*ptr != '\0')
-			{
-				*ptr = '\0';
-				ptr++;
-			}
-			for (value = ptr ; *value != '\0' && isspace (*value) ; value++) {}
-			for (ptr = value ; *ptr != '\0' && !isspace (*ptr) ; ptr++) {}
-			if (*ptr != '\0')
-			{
-				*ptr = '\0';
-				ptr++;
-			}
-
-			/* Resize array. */
-			attribute = lisys_realloc (self->attributes.array, (self->attributes.count + 1) * sizeof (LIRenAttribute));
-			if (attribute == NULL)
-			{
-				lisys_free (line);
-				return 0;
-			}
-			self->attributes.array = attribute;
-			attribute += self->attributes.count;
-
-			/* Initialize attribute. */
-			attribute->binding = 0;
-			attribute->value = private_attribute_value (self, value);
-			attribute->name = listr_dup (name);
-			if (attribute->name == NULL)
-			{
-				lisys_free (line);
-				return 0;
-			}
-			self->attributes.count++;
-			lisys_free (line);
 		}
 		else if (!strncmp (line, "uniform ", 8))
 		{
@@ -492,22 +484,6 @@ static int private_read_config (
 	}
 
 	return 1;
-}
-
-static int private_attribute_value (
-	LIRenShader* self,
-	const char*  value)
-{
-	if (!strcmp (value, "NONE"))
-		return LIREN_ATTRIBUTE_NONE;
-	if (!strcmp (value, "COORD"))
-		return LIREN_ATTRIBUTE_COORD;
-	if (!strcmp (value, "NORMAL"))
-		return LIREN_ATTRIBUTE_NORMAL;
-	if (!strcmp (value, "TEXCOORD"))
-		return LIREN_ATTRIBUTE_TEXCOORD;
-
-	return LIREN_ATTRIBUTE_NONE;
 }
 
 static int private_uniform_value (

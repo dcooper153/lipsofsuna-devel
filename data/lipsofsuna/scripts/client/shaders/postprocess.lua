@@ -67,25 +67,19 @@ end
 ------------------------------------------------------------------------------
 
 Bloom.code_config = [[
-attribute att_coord COORD
-attribute att_texcoord TEXCOORD
 uniform uni_param PARAM0
 uniform uni_texturemap DIFFUSETEXTURE0]]
 
 Bloom.code_vertex = [[
-#version 150
-in vec2 att_coord;
-in vec2 att_texcoord;
 out vec2 var_texcoord;
 void main()
 {
-	var_texcoord = att_texcoord;
-	gl_Position = vec4(att_coord, 0.0, 1.0);
+	var_texcoord = LOS_texcoord;
+	gl_Position = vec4(LOS_coord, 1.0);
 }]]
 
 Bloom.code_fragment = function(clss, horz)
 return [[
-#version 150
 in vec2 var_texcoord;
 uniform vec4 uni_param;
 uniform sampler2D uni_texturemap;

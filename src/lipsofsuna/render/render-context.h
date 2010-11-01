@@ -38,10 +38,10 @@ struct _LIRenContext
 	int deferred;
 	int incomplete;
 	int shadows;
+	GLuint array;
 	LIRenRender* render;
 	LIRenScene* scene;
 	LIRenShader* shader;
-	LIRenBuffer* buffer;
 	LIMatFrustum frustum;
 	struct
 	{
@@ -178,6 +178,10 @@ LIAPICALL (void, liren_context_set_material, (
 LIAPICALL (void, liren_context_set_material_shader, (
 	LIRenContext*        self,
 	const LIRenMaterial* value));
+
+LIAPICALL (void, liren_context_set_mesh, (
+	LIRenContext* self,
+	LIRenMesh*    mesh));
 
 LIAPICALL (void, liren_context_set_modelmatrix, (
 	LIRenContext*      self,

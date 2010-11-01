@@ -23,7 +23,6 @@
  */
 
 #include <lipsofsuna/system.h>
-#include "render-group.h"
 #include "render-light.h"
 
 #define LIGHT_CONTRIBUTION_EPSILON 0.001f
@@ -504,14 +503,10 @@ int liren_light_get_type (
 static void private_update_shadow (
 	LIRenLight* self)
 {
-	LIAlgPtrdicIter iter0;
 	LIAlgU32dicIter iter1;
 	LIMatAabb aabb;
 	LIMatFrustum frustum;
-	LIMatMatrix matrix;
 	LIRenContext* context;
-	LIRenGroup* group;
-	LIRenGroupObject* grpobj;
 	LIRenObject* object;
 	LIRenShader* shader;
 
@@ -537,24 +532,7 @@ static void private_update_shadow (
 	liren_context_set_shader (context, shader);
 	liren_context_set_viewmatrix (context, &self->modelview);
 
-	/* Render groups and objects to the depth texture. */
-	LIALG_PTRDIC_FOREACH (iter0, self->scene->groups)
-	{
-		group = iter0.value;
-		if (!liren_group_get_realized (group))
-			continue;
-		liren_group_get_bounds (group, &aabb);
-		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
-			continue;
-		for (grpobj = group->objects ; grpobj != NULL ; grpobj = grpobj->next)
-		{
-			matrix = limat_convert_transform_to_matrix (grpobj->transform);
-			liren_context_set_modelmatrix (context, &matrix);
-			liren_context_set_buffer (context, grpobj->model->buffer);
-			liren_context_bind (context);
-			liren_context_render_indexed (context, 0, grpobj->model->buffer->indices.count);
-		}
-	}
+	/* Render objects to the depth texture. */
 	LIALG_U32DIC_FOREACH (iter1, self->scene->objects)
 	{
 		object = iter1.value;
@@ -564,9 +542,9 @@ static void private_update_shadow (
 		if (limat_frustum_cull_aabb (&frustum, &aabb))
 			continue;
 		liren_context_set_modelmatrix (context, &object->orientation.matrix);
-		liren_context_set_buffer (context, object->model->buffer);
+		liren_context_set_mesh (context, &object->model->mesh);
 		liren_context_bind (context);
-		liren_context_render_indexed (context, 0, object->model->buffer->indices.count);
+		liren_context_render_array (context, GL_TRIANGLES, 0, object->model->mesh.counts[2]);
 	}
 
 	/* Disable depth rendering mode. */

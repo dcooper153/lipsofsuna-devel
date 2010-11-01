@@ -55,9 +55,9 @@ static void private_lights_update (
  * \param id Unique identifier.
  * \return New object or NULL.
  */
-LIRenObject*
-liren_object_new (LIRenScene* scene,
-                  int         id)
+LIRenObject* liren_object_new (
+	LIRenScene* scene,
+	int         id)
 {
 	LIRenObject* self;
 
@@ -114,27 +114,13 @@ void liren_object_free (
 void
 liren_object_deform (LIRenObject* self)
 {
-	int size;
-	void* vertices;
-	LIRenBuffer* buffer;
-
 	if (!liren_object_get_realized (self))
 		return;
 
-	/* Modify the vertex buffer. */
-	buffer = self->model->buffer;
-	size = liren_buffer_get_size (buffer);
-	if (size)
-	{
-		vertices = lisys_malloc (size);
-		if (vertices == NULL)
-			return;
-		memcpy (vertices, self->model->model->vertices.array, size);
-		limdl_pose_transform (self->pose, vertices);
-		liren_buffer_upload_vertices (buffer, 0, buffer->vertices.count, vertices);
-		lisys_free (vertices);
-	}
+	/* Deform the mesh. */
+	liren_model_deform (self->model, "skeletal", self->pose);
 
+	/* Update light positions. */
 	private_lights_update (self);
 }
 
@@ -356,12 +342,11 @@ liren_object_get_transform (LIRenObject*    self,
  * \param self Object.
  * \param value Transformation.
  */
-void
-liren_object_set_transform (LIRenObject*          self,
-                            const LIMatTransform* value)
+void liren_object_set_transform (
+	LIRenObject*          self,
+	const LIMatTransform* value)
 {
 	LIMatVector center;
-	LIMdlModel* model;
 
 	/* Set transformation. */
 	self->transform = *value;
@@ -371,8 +356,7 @@ liren_object_set_transform (LIRenObject*          self,
 	if (self->model != NULL)
 	{
 		/* FIXME: Incorrect for rotated objects. */
-		model = self->model->model;
-		center = limat_vector_add (model->bounds.min, model->bounds.max);
+		center = limat_vector_add (self->model->bounds.min, self->model->bounds.max);
 		center = limat_vector_multiply (center, 0.5f);
 		center = limat_vector_add (center, value->position);
 		self->orientation.center = center;
@@ -384,15 +368,15 @@ liren_object_set_transform (LIRenObject*          self,
 	private_lights_update (self);
 }
 
-void*
-liren_object_get_userdata (const LIRenObject* self)
+void* liren_object_get_userdata (
+	const LIRenObject* self)
 {
 	return self->userdata;
 }
 
-void
-liren_object_set_userdata (LIRenObject* self,
-                           void*        value)
+void liren_object_set_userdata (
+	LIRenObject* self,
+	void*        value)
 {
 	self->userdata = value;
 }

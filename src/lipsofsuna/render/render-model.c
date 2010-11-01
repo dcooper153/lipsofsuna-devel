@@ -32,10 +32,12 @@ static void private_clear_model (
 	LIRenModel* self);
 
 static int private_init_materials (
-	LIRenModel* self);
+	LIRenModel* self,
+	LIMdlModel* model);
 
 static int private_init_model (
 	LIRenModel* self,
+	LIMdlModel* model,
 	int         type);
 
 /*****************************************************************************/
@@ -63,7 +65,6 @@ LIRenModel* liren_model_new (
 	if (self == NULL)
 		return NULL;
 	self->render = render;
-	self->model = model;
 	self->id = id;
 	self->type = LIREN_BUFFER_TYPE_STATIC;
 
@@ -103,6 +104,76 @@ liren_model_free (LIRenModel* self)
 	lisys_free (self);
 }
 
+int liren_model_deform (
+	LIRenModel*      self,
+	const char*      shader,
+	const LIMdlPose* pose)
+{
+	int i;
+	int j;
+	int count;
+	GLfloat* data;
+	LIMdlPoseGroup* group;
+	LIRenBufferTexture tmp;
+	LIRenContext* context;
+	LIRenShader* shader_;
+
+	/* Find the transform feedback shader. */
+	shader_ = liren_render_find_shader (self->render, shader);
+	if (shader_ == NULL)
+		return 0;
+
+	/* Collect pose data. */
+	/* The first transformation in the list is the fallback indentity transform
+	   referred to by the vertices that don't have all four weights. */
+	count = 12 * (pose->groups.count + 1);
+	data = lisys_calloc (count, sizeof (GLfloat));
+	if (data == NULL)
+		return 0;
+	j = 0;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 1.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 1.0f;
+	for (i = 0 ; i < pose->groups.count ; i++)
+	{
+		group = pose->groups.array + i;
+		data[j++] = group->head_rest.x;
+		data[j++] = group->head_rest.y;
+		data[j++] = group->head_rest.z;
+		data[j++] = 0.0;
+		data[j++] = group->head_pose.x;
+		data[j++] = group->head_pose.y;
+		data[j++] = group->head_pose.z;
+		data[j++] = 1.0f; /* TODO: Pack scale factor here. */
+		data[j++] = group->rotation.x;
+		data[j++] = group->rotation.y;
+		data[j++] = group->rotation.z;
+		data[j++] = group->rotation.w;
+	}
+
+	/* Deform the mesh. */
+	context = liren_render_get_context (self->render);
+	liren_context_init (context);
+	liren_context_set_shader (context, shader_);
+	liren_context_bind (context);
+	liren_buffer_texture_init (&tmp, data, count * sizeof (GLfloat));
+	glActiveTexture (GL_TEXTURE0);
+	glBindTexture (GL_TEXTURE_BUFFER, tmp.texture);
+	liren_mesh_deform (&self->mesh);
+	liren_buffer_texture_clear (&tmp);
+
+	return 1;
+}
+
 /**
  * \brief Calculates the first intersection of the model and a ray.
  * \param self Model.
@@ -122,28 +193,28 @@ int liren_model_intersect_ray (
 	float d;
 	float best_dist;
 	void* vtxdata;
-	uint32_t* idxdata;
 	LIMatTriangle triangle;
 	LIMatVector best_point;
 	LIMatVector p;
-	const LIRenFormat* fmt;
+	LIRenFormat format;
 
 	/* Fast exit if no intersection with the bounding box. */
-	if (!limat_intersect_aabb_line_near (&self->model->bounds, ray0, ray1, &p))
+	if (!limat_intersect_aabb_line_near (&self->bounds, ray0, ray1, &p))
 		return 0;
 
 	/* Test for intersection for each face in the model. */
 	found = 0;
-	fmt = &self->buffer->vertex_format;
-	vtxdata = liren_buffer_lock_vertices (self->buffer, 0);
-	idxdata = liren_buffer_lock_indices (self->buffer, 0);
-	for (i = 0 ; i < self->buffer->indices.count ; i += 3)
+	liren_mesh_get_format (&self->mesh, &format);
+	vtxdata = liren_mesh_lock_vertices (&self->mesh);
+	if (vtxdata == NULL)
+		return 0;
+	for (i = 0 ; i < self->mesh.counts[2] ; i += 3)
 	{
 		/* Get the next triangle. */
 		limat_triangle_set_from_points (&triangle,
-			(LIMatVector*)(vtxdata + fmt->vtx_offset + fmt->size * idxdata[i + 0]),
-			(LIMatVector*)(vtxdata + fmt->vtx_offset + fmt->size * idxdata[i + 1]),
-			(LIMatVector*)(vtxdata + fmt->vtx_offset + fmt->size * idxdata[i + 2]));
+			(LIMatVector*)(vtxdata + format.vtx_offset + format.size * (i + 0)),
+			(LIMatVector*)(vtxdata + format.vtx_offset + format.size * (i + 1)),
+			(LIMatVector*)(vtxdata + format.vtx_offset + format.size * (i + 2)));
 
 		/* Check for an intersection. */
 		if (limat_triangle_intersects_ray (&triangle, ray0, ray1, &p))
@@ -157,8 +228,7 @@ int liren_model_intersect_ray (
 			}
 		}
 	}
-	liren_buffer_unlock_indices (self->buffer, idxdata);
-	liren_buffer_unlock_vertices (self->buffer, vtxdata);
+	liren_mesh_unlock_vertices (&self->mesh);
 	if (found)
 		*result = best_point;
 
@@ -186,14 +256,11 @@ liren_model_replace_image (LIRenModel* self,
 	}
 }
 
-void
-liren_model_get_bounds (LIRenModel* self,
-                        LIMatAabb*  aabb)
+void liren_model_get_bounds (
+	LIRenModel* self,
+	LIMatAabb*  aabb)
 {
-	if (self->model != NULL)
-		*aabb = self->model->bounds;
-	else
-		limat_aabb_init (aabb);
+	*aabb = self->bounds;
 }
 
 int liren_model_set_model (
@@ -208,9 +275,9 @@ int liren_model_set_model (
 
 	/* Create new model data and erase the old data. */
 	backup = *self;
-	self->model = model;
-	if (!private_init_materials (self) ||
-	    !private_init_model (self, self->type))
+	self->bounds = model->bounds;
+	if (!private_init_materials (self, model) ||
+	    !private_init_model (self, model, self->type))
 	{
 		private_clear_materials (self);
 		private_clear_model (self);
@@ -236,18 +303,6 @@ int liren_model_set_model (
 	return 1;
 }
 
-/**
- * \brief Checks if the model is static.
- *
- * \param self Model.
- * \return Nonzero if the model is static.
- */
-int
-liren_model_get_static (LIRenModel* self)
-{
-	return !self->model->animations.count;
-}
-
 int liren_model_get_type (
 	const LIRenModel* self)
 {
@@ -258,8 +313,10 @@ int liren_model_set_type (
 	LIRenModel* self,
 	int         value)
 {
+#warning Changing buffer mode of a model is disabled.
 	self->type = value;
-	return liren_model_set_model (self, self->model);
+//	return liren_model_set_model (self, self->model);
+	return 1;
 }
 
 /*****************************************************************************/
@@ -282,26 +339,23 @@ static void private_clear_materials (
 static void private_clear_model (
 	LIRenModel* self)
 {
-	if (self->buffer != NULL)
-	{
-		liren_buffer_free (self->buffer);
-		lisys_free (self->buffer);
-		self->buffer = NULL;
-	}
+	liren_particles_clear (&self->particles);
+	liren_mesh_clear (&self->mesh);
 	lisys_free (self->groups.array);
 	self->groups.array = NULL;
 	self->groups.count = 0;
 }
 
 static int private_init_materials (
-	LIRenModel* self)
+	LIRenModel* self,
+	LIMdlModel* model)
 {
 	uint32_t i;
 	LIMdlMaterial* src;
 	LIRenMaterial* dst;
 
 	/* Allocate materials. */
-	self->materials.count = self->model->materials.count;
+	self->materials.count = model->materials.count;
 	if (self->materials.count)
 	{
 		self->materials.array = lisys_calloc (self->materials.count, sizeof (LIRenMaterial*));
@@ -312,7 +366,7 @@ static int private_init_materials (
 	/* Resolve materials. */
 	for (i = 0 ; i < self->materials.count ; i++)
 	{
-		src = self->model->materials.array + i;
+		src = model->materials.array + i;
 		dst = liren_material_new_from_model (self->render, src);
 		if (dst == NULL)
 			return 0;
@@ -324,27 +378,20 @@ static int private_init_materials (
 
 static int private_init_model (
 	LIRenModel* self,
+	LIMdlModel* model,
 	int         type)
 {
 	int c;
 	int i;
+	int ok;
+	void* vertices;
 	uint32_t* indices;
+	GLint restore;
 	LIMdlFaces* group;
-	LIRenFormat format =
-	{
-		8 * sizeof (float),
-		GL_FLOAT, 0 * sizeof (float),
-		GL_FLOAT, 2 * sizeof (float),
-		GL_FLOAT, 5 * sizeof (float)
-	};
-
-	/* Allocate render buffer. */
-	self->buffer = lisys_calloc (1, sizeof (LIRenBuffer));
-	if (self->buffer == NULL)
-		return 0;
+	LIMdlPose* pose;
 
 	/* Allocate face groups. */
-	self->groups.count = self->model->facegroups.count;
+	self->groups.count = model->facegroups.count;
 	if (self->groups.count)
 	{
 		self->groups.array = lisys_calloc (self->groups.count, sizeof (LIRenModelGroup));
@@ -355,7 +402,7 @@ static int private_init_model (
 	/* Calculate face group offsets. */
 	for (c = i = 0 ; i < self->groups.count ; i++)
 	{
-		group = self->model->facegroups.array + i;
+		group = model->facegroups.array + i;
 		self->groups.array[i].start = c;
 		self->groups.array[i].count = group->indices.count;
 		c += group->indices.count;
@@ -369,7 +416,7 @@ static int private_init_model (
 			return 0;
 		for (c = i = 0 ; i < self->groups.count ; i++)
 		{
-			group = self->model->facegroups.array + i;
+			group = model->facegroups.array + i;
 			memcpy (indices + c, group->indices.array, group->indices.count * sizeof (uint32_t));
 			c += group->indices.count;
 		}
@@ -377,14 +424,47 @@ static int private_init_model (
 	else
 		indices = NULL;
 
+	/* Initialize particles. */
+	liren_particles_init (&self->particles, self->render, model);
+	if (self->particles.frames.count)
+		self->bounds = limat_aabb_union (self->bounds, self->particles.bounds);
+
 	/* Initialize the render buffer. */
-	if (!liren_buffer_init (self->buffer, indices, c, &format,
-	     self->model->vertices.array, self->model->vertices.count, type))
+	if (!liren_mesh_init (&self->mesh, indices, c,
+	     model->vertices.array, model->vertices.count))
 	{
 		lisys_free (indices);
 		return 0;
 	}
 	lisys_free (indices);
+
+	/* Transform the default pose. */
+	pose = limdl_pose_new ();
+	if (pose != NULL)
+	{
+		ok = limdl_pose_set_model (pose, model) &&
+		     liren_model_deform (self, "skeletal", pose);
+		limdl_pose_free (pose);
+	}
+	else
+		ok = 0;
+
+	/* If transforming the default pose failed, our transform feedback buffer
+	   is full of random data since we never initialized it. To avoid an ugly
+	   polygon mess when the shader is missing, we zero the buffer as a fallback. */
+	if (!ok && self->mesh.sizes[3])
+	{
+		glGetIntegerv (GL_VERTEX_ARRAY_BINDING, &restore);
+		glBindVertexArray (0);
+		glBindBuffer (GL_ARRAY_BUFFER, self->mesh.buffers[2]);
+		vertices = glMapBuffer (GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+		if (vertices != NULL)
+		{
+			memset (vertices, 0, self->mesh.sizes[3]);
+			glUnmapBuffer (GL_ARRAY_BUFFER);
+		}
+		glBindVertexArray (restore);
+	}
 
 	return 1;
 }

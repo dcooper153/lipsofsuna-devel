@@ -41,7 +41,6 @@ typedef struct _LIRenContext LIRenContext;
 typedef struct _LIRenDeferred LIRenDeferred;
 typedef enum _LIRenFlags LIRenFlags;
 typedef struct _LIRenFormat LIRenFormat;
-typedef struct _LIRenGroup LIRenGroup;
 typedef struct _LIRenLight LIRenLight;
 typedef struct _LIRenLighting LIRenLighting;
 typedef struct _LIRenMaterial LIRenMaterial;

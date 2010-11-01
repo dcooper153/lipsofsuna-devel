@@ -65,7 +65,7 @@ void liren_draw_default (
 	int            count,
 	LIMatMatrix*   matrix,
 	LIRenMaterial* material,
-	LIRenBuffer*   buffer)
+	LIRenMesh*     mesh)
 {
 	if (context->deferred && material->shader_deferred == NULL)
 		return;
@@ -74,9 +74,9 @@ void liren_draw_default (
 	liren_context_set_material_shader (context, material);
 	liren_context_set_modelmatrix (context, matrix);
 	liren_context_set_textures (context, material->textures.array, material->textures.count);
-	liren_context_set_buffer (context, buffer);
+	liren_context_set_mesh (context, mesh);
 	liren_context_bind (context);
-	liren_context_render_indexed (context, index, count);
+	liren_context_render_array (context, GL_TRIANGLES, index, count);
 }
 
 void
@@ -109,6 +109,8 @@ liren_draw_hair (LIRenContext* context,
                  LIRenObject*  object,
                  void*         data)
 {
+#warning Hair rendering is disabled.
+#if 0
 	int i;
 	int j;
 	int k;
@@ -215,6 +217,7 @@ liren_draw_hair (LIRenContext* context,
 
 #ifdef LIREN_ENABLE_PROFILING
 	context->render->profiling.objects++;
+#endif
 #endif
 }
 

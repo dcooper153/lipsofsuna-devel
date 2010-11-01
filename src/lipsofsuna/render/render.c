@@ -25,7 +25,6 @@
 #include <lipsofsuna/system.h>
 #include "render.h"
 #include "render-draw.h"
-#include "render-group.h"
 
 static int
 private_init_resources (LIRenRender* self,

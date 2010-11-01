@@ -1,9 +1,6 @@
 Shader{
 	name = "deferred-tilenxz",
 	config = [[
-attribute att_coord COORD
-attribute att_normal NORMAL
-attribute att_tangent TANGENT
 uniform uni_param PARAM0
 uniform uni_materialdiffuse MATERIALDIFFUSE
 uniform uni_materialspecular MATERIALSPECULAR
@@ -16,10 +13,6 @@ uniform uni_texturemap[0] DIFFUSETEXTURE0
 uniform uni_texturemap[1] DIFFUSETEXTURE1]],
 
 	vertex = [[
-#version 150
-in vec3 att_coord;
-in vec3 att_normal;
-in vec3 att_tangent;
 out vec3 var_coord;
 out vec3 var_normal;
 out vec3 var_tangent;
@@ -32,13 +25,13 @@ uniform mat3 uni_matrixnormal;
 uniform mat4 uni_matrixprojection;
 void main()
 {
-	vec4 tmp = uni_matrixmodelview * vec4(att_coord,1.0);
+	vec4 tmp = uni_matrixmodelview * vec4(LOS_coord,1.0);
 	var_coord = tmp.xyz;
-	var_normal = uni_matrixnormal * att_normal;
-	var_tangent = uni_matrixnormal * att_tangent;
+	var_normal = uni_matrixnormal * LOS_normal;
+	var_tangent = uni_matrixnormal * LOS_tangent;
 	gl_Position = uni_matrixprojection * tmp;
 	/* Texture translation. */
-	vec3 tex = (uni_matrixmodel * vec4(att_coord,1.0)).xyz;
+	vec3 tex = (uni_matrixmodel * vec4(LOS_coord,1.0)).xyz;
 	vec3 u = mat3(uni_matrixmodel) * vec3(1.0,0.0,0.0);
 	vec3 v = mat3(uni_matrixmodel) * vec3(0.0,0.0,1.0);
 	var_texcoord.xy = vec2(abs(dot(tex, u)), abs(dot(tex,v)));
@@ -46,7 +39,6 @@ void main()
 }]],
 
 	fragment = [[
-#version 150
 in vec3 var_coord;
 in vec3 var_normal;
 in vec3 var_tangent;

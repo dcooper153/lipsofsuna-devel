@@ -15,22 +15,44 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_ATTRIBUTE_H__
-#define __RENDER_ATTRIBUTE_H__
+#ifndef __RENDER_MESH_H__
+#define __RENDER_MESH_H__
 
-#include <lipsofsuna/video.h>
+#include "lipsofsuna/system.h"
+#include "lipsofsuna/video.h"
 #include "render-types.h"
 
-enum
+typedef struct _LIRenMesh LIRenMesh;
+struct _LIRenMesh
 {
-	LIREN_ATTRIBUTE_COORD,
-	LIREN_ATTRIBUTE_NORMAL,
-	LIREN_ATTRIBUTE_TEXCOORD,
-	LIREN_ATTRIBUTE_TANGENT,
-	LIREN_ATTRIBUTE_WEIGHTS1,
-	LIREN_ATTRIBUTE_WEIGHTS2,
-	LIREN_ATTRIBUTE_BONES1,
-	LIREN_ATTRIBUTE_BONES2
+	int sizes[3];
+	int counts[3];
+	GLuint buffers[3];
+	GLuint arrays[2];
 };
 
+LIAPICALL (int, liren_mesh_init, (
+	LIRenMesh* self,
+	void*      index_data,
+	int        index_count,
+	void*      vertex_data,
+	int        vertex_count));
+
+LIAPICALL (void, liren_mesh_clear, (
+	LIRenMesh* self));
+
+LIAPICALL (void, liren_mesh_deform, (
+	LIRenMesh* self));
+
+LIAPICALL (void*, liren_mesh_lock_vertices, (
+	const LIRenMesh* self));
+
+LIAPICALL (void, liren_mesh_unlock_vertices, (
+	const LIRenMesh* self));
+
+LIAPICALL (void, liren_mesh_get_format, (
+	const LIRenMesh* self,
+	LIRenFormat*     value));
+
 #endif
+

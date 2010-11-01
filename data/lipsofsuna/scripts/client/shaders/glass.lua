@@ -1,9 +1,6 @@
 Shader{
 	name = "forward-glass",
 	config = [[
-attribute att_coord COORD
-attribute att_normal NORMAL
-attribute att_texcoord TEXCOORD
 uniform uni_lightambient LIGHTAMBIENT0
 uniform uni_lightdiffuse LIGHTDIFFUSE0
 uniform uni_lightequation LIGHTEQUATION0
@@ -21,10 +18,6 @@ uniform uni_shadowmap SHADOWTEXTURE0
 uniform uni_texturemap DIFFUSETEXTURE0]],
 
 	vertex = [[
-#version 150
-in vec3 att_coord;
-in vec3 att_normal;
-in vec2 att_texcoord;
 out vec3 var_coord;
 out vec3 var_normal;
 out vec2 var_texcoord;
@@ -36,16 +29,15 @@ uniform mat3 uni_matrixnormal;
 uniform mat4 uni_matrixprojection;
 void main()
 {
-	vec4 tmp = uni_matrixmodelview * vec4(att_coord,1.0);
+	vec4 tmp = uni_matrixmodelview * vec4(LOS_coord,1.0);
 	var_coord = tmp.xyz;
-	var_normal = uni_matrixnormal * att_normal;
-	var_texcoord = att_texcoord;
+	var_normal = uni_matrixnormal * LOS_normal;
+	var_texcoord = LOS_texcoord;
 	var_lightdir = uni_lightposition - var_coord;
 	gl_Position = uni_matrixprojection * tmp;
 }]],
 
 	fragment = [[
-#version 150
 in vec3 var_coord;
 in vec3 var_normal;
 in vec2 var_texcoord;

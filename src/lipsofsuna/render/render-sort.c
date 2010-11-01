@@ -86,7 +86,7 @@ int liren_sort_add_group (
 	LIMatMatrix*   matrix,
 	int            index,
 	int            count,
-	LIRenBuffer*   buffer,
+	LIRenMesh*     mesh,
 	LIRenMaterial* material,
 	int            transparent)
 {
@@ -111,12 +111,12 @@ int liren_sort_add_group (
 	self->groups.array[num].transparent = transparent;
 	self->groups.array[num].bounds = *bounds;
 	self->groups.array[num].matrix = *matrix;
-	self->groups.array[num].buffer = buffer;
+	self->groups.array[num].mesh = mesh;
 	self->groups.array[num].material = material;
 	self->groups.count++;
 
 	if (transparent)
-		return liren_sort_add_faces (self, bounds, matrix, index, count, buffer, material);
+		return liren_sort_add_faces (self, bounds, matrix, index, count, mesh, material);
 
 	return 1;
 }
@@ -127,7 +127,7 @@ int liren_sort_add_faces (
 	LIMatMatrix*   matrix,
 	int            index,
 	int            count,
-	LIRenBuffer*   buffer,
+	LIRenMesh*     mesh,
 	LIRenMaterial* material)
 {
 	int i;
@@ -135,13 +135,12 @@ int liren_sort_add_faces (
 	int bucket;
 	float dist;
 	void* vtxdata;
-	uint32_t* idxdata;
 	LIMatMatrix mat;
 	LIMatVector vtx[3];
 	LIMatVector center;
 	LIMatVector diff;
 	LIMatVector eye;
-	LIRenFormat* fmt;
+	LIRenFormat format;
 
 	/* Resize the buffer if necessary. */
 	if (!private_resize_faces (self, self->faces.count + count / 3))
@@ -153,9 +152,10 @@ int liren_sort_add_faces (
 
 	/* Add each face in the group. */
 	num = self->faces.count;
-	fmt = &buffer->vertex_format;
-	vtxdata = liren_buffer_lock_vertices (buffer, 0);
-	idxdata = liren_buffer_lock_indices (buffer, 0);
+	liren_mesh_get_format (mesh, &format);
+	vtxdata = liren_mesh_lock_vertices (mesh);
+	if (vtxdata == NULL)
+		return 0;
 	for (i = 0 ; i < count ; i += 3, num++)
 	{
 		/* Append the face to the buffer. */
@@ -163,13 +163,13 @@ int liren_sort_add_faces (
 		self->faces.array[num].face.index = index + i;
 		self->faces.array[num].face.bounds = *bounds;
 		self->faces.array[num].face.matrix = *matrix;
-		self->faces.array[num].face.buffer = buffer;
+		self->faces.array[num].face.mesh = mesh;
 		self->faces.array[num].face.material = material;
 
 		/* Calculate the center of the triangle. */
-		vtx[0] = *((LIMatVector*)(vtxdata + fmt->vtx_offset + fmt->size * idxdata[i + 0]));
-		vtx[1] = *((LIMatVector*)(vtxdata + fmt->vtx_offset + fmt->size * idxdata[i + 1]));
-		vtx[2] = *((LIMatVector*)(vtxdata + fmt->vtx_offset + fmt->size * idxdata[i + 2]));
+		vtx[0] = *((LIMatVector*)(vtxdata + format.vtx_offset + format.size * (i + 0)));
+		vtx[1] = *((LIMatVector*)(vtxdata + format.vtx_offset + format.size * (i + 1)));
+		vtx[2] = *((LIMatVector*)(vtxdata + format.vtx_offset + format.size * (i + 2)));
 		center = limat_vector_add (limat_vector_add (vtx[0], vtx[1]), vtx[2]);
 		center = limat_vector_multiply (center, 1.0f / 3.0f);
 		center = limat_matrix_transform (*matrix, center);
@@ -186,8 +186,7 @@ int liren_sort_add_faces (
 		self->faces.array[num].next = self->buckets.array[bucket];
 		self->buckets.array[bucket] = self->faces.array + num;
 	}
-	liren_buffer_unlock_indices (buffer, idxdata);
-	liren_buffer_unlock_vertices (buffer, vtxdata);
+	liren_mesh_unlock_vertices (mesh);
 	self->faces.count = num;
 
 	return 1;
@@ -213,9 +212,10 @@ int liren_sort_add_model (
 	{
 		material = model->materials.array[i];
 		transp = (material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY);
+#warning Depth sorting of transparent faces is very slow.
 		ret &= liren_sort_add_group (self, bounds, matrix,
 			model->groups.array[i].start, model->groups.array[i].count,
-			model->buffer, material, transp);
+			&model->mesh, material, transp);
 	}
 
 	return ret;
@@ -225,15 +225,7 @@ int liren_sort_add_object (
 	LIRenSort*   self,
 	LIRenObject* object)
 {
-	int i;
-	int j;
-	float diffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	LIMatAabb bounds;
-	LIMatVector position;
-	LIMdlModel* model;
-	LIMdlParticle* part;
-	LIMdlParticleSystem* system;
-	LIRenImage* image;
 	LIRenShader* shader;
 
 	/* Add each face group of the model. */
@@ -241,40 +233,16 @@ int liren_sort_add_object (
 	if (!liren_sort_add_model (self, &bounds, &object->orientation.matrix, object->model))
 		return 0;
 
-	/* TODO: Frustum culling for particles. */
-
-	/* Check for particles. */
-	model = object->model->model;
-	if (!model->particlesystems.count)
-		return 1;
+	/* Add particle systems of the object. */
 	shader = liren_render_find_shader (self->render, "particle");
-	if (shader == NULL)
-		return 1;
-
-	/* Add each particle system. */
-	for (i = 0 ; i < model->particlesystems.count ; i++)
+	if (shader != NULL)
 	{
-		/* Find texture image of the system. */
-		system = model->particlesystems.array + i;
-		image = liren_render_find_image (self->render, system->texture);
-		if (image == NULL)
-		{
-			liren_render_load_image (self->render, system->texture);
-			image = liren_render_find_image (self->render, system->texture);
-			if (image == NULL)
-				continue;
-		}
-
-		/* Add each alive particle in the system. */
-		for (j = 0 ; j < system->particles.count ; j++)
-		{
-			part = system->particles.array + j;
-			if (limdl_particle_get_state (part, object->particle.time, object->particle.loop, &position, diffuse + 3))
-			{
-				position = limat_transform_transform (object->transform, position);
-				liren_sort_add_particle (self, &position, system->particle_size, diffuse, image, shader);
-			}
-		}
+		liren_particles_sort (
+			&object->model->particles,
+			object->particle.time,
+			object->particle.loop,
+			&object->transform,
+			shader, self);
 	}
 
 	return 1;

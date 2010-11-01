@@ -1,18 +1,11 @@
 Shader{
 name = "particle",
 config = [[
-attribute att_coord COORD
-attribute att_color NORMAL
-attribute att_size TEXCOORD
 uniform uni_matrixmodelview MATRIXMODELVIEW
 uniform uni_matrixprojection MATRIXPROJECTION
 uniform uni_diffusetexture DIFFUSETEXTURE0]],
 
 vertex = [[
-#version 150
-in vec3 att_coord;
-in vec4 att_color;
-in vec2 att_size;
 out geomvar
 {
 	vec4 color;
@@ -21,14 +14,12 @@ out geomvar
 uniform mat4 uni_matrixmodelview;
 void main()
 {
-	OUT.color = att_color;
-	OUT.size = att_size;
-	gl_Position = uni_matrixmodelview * vec4(att_coord,1.0);
+	OUT.color = vec4(LOS_normal,LOS_texcoord.x);
+	OUT.size = LOS_texcoord.yy;
+	gl_Position = uni_matrixmodelview * vec4(LOS_coord,1.0);
 }]],
 
 geometry = [[
-#version 150
-#extension GL_EXT_geometry_shader4 : enable
 layout(triangles) in;
 layout(triangle_strip, max_vertices=4) out;
 in geomvar
@@ -65,7 +56,6 @@ void main()
 }]],
 
 fragment = [[
-#version 150
 in fragvar
 {
 	vec4 color;

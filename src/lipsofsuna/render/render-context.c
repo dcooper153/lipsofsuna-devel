@@ -40,7 +40,7 @@ void liren_context_init (
 	memset (self, 0, sizeof (LIRenContext));
 	self->render = render;
 	self->scene = NULL;
-	self->buffer = NULL;
+	self->array = 0;
 	self->incomplete = 1;
 	self->blend.enable = 0;
 	self->blend.blend_src = GL_SRC_ALPHA;
@@ -102,12 +102,7 @@ void liren_context_bind (
 
 	/* Bind vertex array. */
 	if (self->changed.buffer)
-	{
-		if (self->buffer != NULL)
-			glBindVertexArray (self->buffer->vertex_array);
-		else
-			glBindVertexArray (0);
-	}
+		glBindVertexArray (self->array);
 
 	/* Update blend, cull, and depth modes. */
 	if (self->changed.blend)
@@ -190,7 +185,6 @@ void liren_context_render_array (
 		return;
 
 	lisys_assert (start >= 0);
-	lisys_assert (start + count <= self->buffer->vertices.count);
 
 	glDrawArrays (type, start, count);
 }
@@ -217,7 +211,7 @@ int liren_context_render_immediate (
 	lisys_assert (count <= buffer->vertices.count);
 
 	/* Make sure the right buffer is bound. */
-	if (self->buffer != buffer)
+	if (self->array != buffer->vertex_array)
 	{
 		liren_context_set_buffer (self, buffer);
 		liren_context_bind (self);
@@ -252,10 +246,8 @@ void liren_context_render_indexed (
 		return;
 
 	lisys_assert (start >= 0);
-	lisys_assert (start + count <= self->buffer->indices.count);
 
-	glDrawRangeElements (GL_TRIANGLES, 0, self->buffer->vertices.count,
-		count, GL_UNSIGNED_INT, NULL + start * sizeof (uint32_t));
+	glDrawElements (GL_TRIANGLES, count, GL_UNSIGNED_INT, NULL + start * sizeof (uint32_t));
 
 #ifdef LIREN_ENABLE_PROFILING
 	self->render->profiling.materials++;
@@ -285,9 +277,12 @@ void liren_context_set_buffer (
 	LIRenContext* self,
 	LIRenBuffer*  buffer)
 {
-	if (self->buffer != buffer)
+	GLuint array;
+
+	array = (buffer != NULL)? buffer->vertex_array : 0;
+	if (self->array != array)
 	{
-		self->buffer = buffer;
+		self->array = array;
 		self->changed.buffer = 1;
 	}
 }
@@ -439,6 +434,17 @@ void liren_context_set_material_shader (
 		liren_context_set_shader (self, value->shader_deferred);
 	else
 		liren_context_set_shader (self, value->shader_forward);
+}
+
+void liren_context_set_mesh (
+	LIRenContext* self,
+	LIRenMesh*    mesh)
+{
+	if (self->array != mesh->arrays[1])
+	{
+		self->array = mesh->arrays[1];
+		self->changed.buffer = 1;
+	}
 }
 
 void liren_context_set_modelmatrix (

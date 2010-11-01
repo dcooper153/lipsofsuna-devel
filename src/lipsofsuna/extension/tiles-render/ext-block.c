@@ -42,32 +42,25 @@ LIExtBlock* liext_tiles_render_block_new (
 void liext_tiles_render_block_free (
 	LIExtBlock* self)
 {
-	if (self->group != NULL)
-		liren_group_free (self->group);
-	if (self->rmodel != NULL)
-		liren_model_free (self->rmodel);
-	if (self->mmodel != NULL)
-		limdl_model_free (self->mmodel);
+	if (self->object != NULL)
+		liren_object_free (self->object);
+	if (self->model != NULL)
+		liren_model_free (self->model);
 	lisys_free (self);
 }
 
 void liext_tiles_render_block_clear (
 	LIExtBlock* self)
 {
-	if (self->group != NULL)
+	if (self->object != NULL)
 	{
-		liren_group_free (self->group);
-		self->group = NULL;
+		liren_object_free (self->object);
+		self->object = NULL;
 	}
-	if (self->rmodel != NULL)
+	if (self->model != NULL)
 	{
-		liren_model_free (self->rmodel);
-		self->rmodel = NULL;
-	}
-	if (self->mmodel != NULL)
-	{
-		limdl_model_free (self->mmodel);
-		self->mmodel = NULL;
+		liren_model_free (self->model);
+		self->model = NULL;
 	}
 }
 
@@ -75,33 +68,31 @@ int liext_tiles_render_block_build (
 	LIExtBlock*     self,
 	LIVoxBlockAddr* addr)
 {
-	LIMatTransform transform;
+	LIMdlModel* model = NULL;
 
 	/* Free old objects. */
 	liext_tiles_render_block_clear (self);
 
 	/* Build new objects. */
-	if (!livox_build_block (self->module->voxels, self->module->client->engine, NULL, addr, &self->mmodel, NULL))
+	if (!livox_build_block (self->module->voxels, self->module->client->engine, NULL, addr, &model, NULL))
 		return 0;
 
 	/* Create render model if not empty. */
-	if (self->mmodel != NULL)
+	if (model != NULL)
 	{
-		self->rmodel = liren_model_new (self->module->client->render, self->mmodel, 0);
-		if (self->rmodel != NULL)
+		self->model = liren_model_new (self->module->client->render, model, 0);
+		limdl_model_free (model);
+		if (self->model != NULL)
 		{
-			self->group = liren_group_new (self->module->client->scene);
-			if (self->group != NULL)
-			{
-				transform = limat_transform_identity ();
-				liren_group_insert_model (self->group, self->rmodel, &transform);
-			}
+			self->object = liren_object_new (self->module->client->scene, 0);
+			if (self->object != NULL)
+				liren_object_set_model (self->object, self->model);
 		}
 	}
 
 	/* Realize if not empty. */
-	if (self->group != NULL)
-		liren_group_set_realized (self->group, 1);
+	if (self->object != NULL)
+		liren_object_set_realized (self->object, 1);
 
 	return 1;
 }

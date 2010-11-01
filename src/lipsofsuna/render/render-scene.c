@@ -25,7 +25,6 @@
 #include <lipsofsuna/system.h>
 #include "render.h"
 #include "render-draw.h"
-#include "render-group.h"
 
 #define LIREN_LIGHT_MAXIMUM_RATING 100.0f
 #define LIREN_PARTICLE_MAXIMUM_COUNT 1000
@@ -331,7 +330,7 @@ void liren_scene_render_deferred_opaque (
 		if (!alpha && group->transparent)
 			continue;
 		liren_draw_default (self->state.context, group->index, group->count,
-			&group->matrix, group->material, group->buffer);
+			&group->matrix, group->material, group->mesh);
 	}
 }
 
@@ -379,7 +378,7 @@ void liren_scene_render_forward_opaque (
 				if (limat_aabb_intersects_aabb (&aabb, &group->bounds))
 				{
 					liren_draw_default (self->state.context, group->index, group->count,
-						&group->matrix, group->material, group->buffer);
+						&group->matrix, group->material, group->mesh);
 				}
 			}
 		}
@@ -435,7 +434,7 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 						continue;
 					liren_context_set_lights (self->state.context, &light, 1);
 					liren_draw_default (self->state.context, face->face.index, 3,
-						&face->face.matrix, face->face.material, face->face.buffer);
+						&face->face.matrix, face->face.material, face->face.mesh);
 				}
 			}
 		}
@@ -452,9 +451,9 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 			liren_context_set_textures_raw (self->state.context, &face->particle.image->texture->texture, 1);
 			liren_context_bind (self->state.context);
 			glBegin (GL_TRIANGLES);
-			glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, face->particle.size, face->particle.size);
+			glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, face->particle.diffuse[3], face->particle.size);
 			position = face->particle.position;
-			glVertexAttrib4fv (LIREN_ATTRIBUTE_NORMAL, face->particle.diffuse);
+			glVertexAttrib3fv (LIREN_ATTRIBUTE_NORMAL, face->particle.diffuse);
 			glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
 			glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
 			glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
@@ -667,11 +666,7 @@ static int private_sort_scene (
 	LIRenContext* context)
 {
 	LIAlgU32dicIter iter0;
-	LIAlgPtrdicIter iter1;
 	LIMatAabb aabb;
-	LIMatMatrix matrix;
-	LIRenGroup* group;
-	LIRenGroupObject* grpobj;
 	LIRenObject* rndobj;
 
 	/* Initialize sorting. */
@@ -688,22 +683,6 @@ static int private_sort_scene (
 		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
 			continue;
 		liren_sort_add_object (self->sort, rndobj);
-	}
-
-	/* Collect group objects. */
-	LIALG_PTRDIC_FOREACH (iter1, self->groups)
-	{
-		group = iter1.value;
-		if (!liren_group_get_realized (group))
-			continue;
-		liren_group_get_bounds (group, &aabb);
-		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
-			continue;
-		for (grpobj = group->objects ; grpobj != NULL ; grpobj = grpobj->next)
-		{
-			matrix = limat_convert_transform_to_matrix (grpobj->transform);
-			liren_sort_add_model (self->sort, &aabb, &matrix, grpobj->model);
-		}
 	}
 
 	return 1;

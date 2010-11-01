@@ -21,12 +21,16 @@
 #include <string.h>
 #include <lipsofsuna/math.h>
 
+#define LIMDL_VERTEX_WEIGHTS_MAX 8
+
 typedef struct _LIMdlVertex LIMdlVertex;
 struct _LIMdlVertex
 {
 	float texcoord[2];
 	LIMatVector normal;
 	LIMatVector coord;
+	float weights[LIMDL_VERTEX_WEIGHTS_MAX];
+	unsigned char bones[LIMDL_VERTEX_WEIGHTS_MAX];
 };
 
 static inline void
@@ -41,6 +45,7 @@ limdl_vertex_init (LIMdlVertex*       self,
 	self->texcoord[1] = v;
 	self->normal = *normal;
 	self->coord = *coord;
+	self->weights[0] = 1.0f;
 }
 
 static inline int

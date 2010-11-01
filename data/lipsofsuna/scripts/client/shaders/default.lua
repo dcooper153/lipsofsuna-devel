@@ -1,9 +1,6 @@
 Shader{
 	name = "deferred-default",
 	config = [[
-attribute att_coord COORD
-attribute att_normal NORMAL
-attribute att_texcoord TEXCOORD
 uniform uni_materialdiffuse MATERIALDIFFUSE
 uniform uni_materialspecular MATERIALSPECULAR
 uniform uni_materialshininess MATERIALSHININESS
@@ -13,10 +10,6 @@ uniform uni_matrixprojection MATRIXPROJECTION
 uniform uni_texturemap[0] DIFFUSETEXTURE0]],
 
 	vertex = [[
-#version 150
-in vec3 att_coord;
-in vec3 att_normal;
-in vec2 att_texcoord;
 out vec3 var_normal;
 out vec2 var_texcoord;
 uniform mat4 uni_matrixmodelview;
@@ -24,14 +17,13 @@ uniform mat3 uni_matrixnormal;
 uniform mat4 uni_matrixprojection;
 void main()
 {
-	vec4 tmp = uni_matrixmodelview * vec4(att_coord,1.0);
-	var_normal = uni_matrixnormal * att_normal;
-	var_texcoord = att_texcoord;
+	vec4 tmp = uni_matrixmodelview * vec4(LOS_coord,1.0);
+	var_normal = uni_matrixnormal * LOS_normal;
+	var_texcoord = LOS_texcoord;
 	gl_Position = uni_matrixprojection * tmp;
 }]],
 
 	fragment = [[
-#version 150
 in vec3 var_normal;
 in vec2 var_texcoord;
 uniform vec4 uni_materialdiffuse;

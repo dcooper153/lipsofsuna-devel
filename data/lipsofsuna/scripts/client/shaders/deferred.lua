@@ -2,8 +2,6 @@ Shader{
 name = "deferred",
 config = [[
 light-count 1
-attribute att_coord COORD
-attribute att_texcoord TEXCOORD
 uniform uni_lightambient LIGHTAMBIENT0
 uniform uni_lightdiffuse LIGHTDIFFUSE0
 uniform uni_lightequation LIGHTEQUATION0
@@ -16,18 +14,14 @@ uniform uni_texturemap[2] DIFFUSETEXTURE2
 uniform uni_depthmap DIFFUSETEXTURE3]],
 
 vertex = [[
-#version 150
-in vec3 att_coord;
-in vec2 att_texcoord;
 out vec2 var_texcoord;
 void main()
 {
-	var_texcoord = att_texcoord;
-	gl_Position = vec4(att_coord, 1.0);
+	var_texcoord = LOS_texcoord;
+	gl_Position = vec4(LOS_coord, 1.0);
 }]],
 
 fragment = [[
-#version 150
 in vec2 var_texcoord;
 uniform mat4 uni_matrixprojectioninverse;
 uniform vec4 uni_lightambient;
@@ -79,8 +73,6 @@ Shader{
 name = "deferred-spotlight",
 config = [[
 light-count 1
-attribute att_coord COORD
-attribute att_texcoord TEXCOORD
 uniform uni_lightambient LIGHTAMBIENT0
 uniform uni_lightdiffuse LIGHTDIFFUSE0
 uniform uni_lightdirection LIGHTDIRECTIONPREMULT0
@@ -97,18 +89,14 @@ uniform uni_depthmap DIFFUSETEXTURE3
 uniform uni_shadowmap SHADOWTEXTURE0]],
 
 vertex = [[
-#version 150
-in vec3 att_coord;
-in vec2 att_texcoord;
 out vec2 var_texcoord;
 void main()
 {
-	var_texcoord = att_texcoord;
-	gl_Position = vec4(att_coord, 1.0);
+	var_texcoord = LOS_texcoord;
+	gl_Position = vec4(LOS_coord, 1.0);
 }]],
 
 fragment = [[
-#version 150
 in vec2 var_texcoord;
 uniform mat4 uni_matrixprojectioninverse;
 uniform vec4 uni_lightambient;

@@ -15,29 +15,30 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_BLOCK_H__
-#define __EXT_BLOCK_H__
+#ifndef __RENDER_BUFFER_TEXTURE_H__
+#define __RENDER_BUFFER_TEXTURE_H__
 
-#include "ext-module.h"
+#include "lipsofsuna/video.h"
 
-struct _LIExtBlock
+typedef struct _LIRenBufferTexture LIRenBufferTexture;
+struct _LIRenBufferTexture
 {
-	LIExtModule* module;
-	LIRenModel* model;
-	LIRenObject* object;
+	int size;
+	GLuint buffer;
+	GLuint texture;
 };
 
-LIExtBlock* liext_tiles_render_block_new (
-	LIExtModule* module);
+LIAPICALL (void, liren_buffer_texture_init, (
+	LIRenBufferTexture* self,
+	void*               data,
+	int                 size));
 
-void liext_tiles_render_block_free (
-	LIExtBlock* self);
+LIAPICALL (void, liren_buffer_texture_clear, (
+	LIRenBufferTexture* self));
 
-int liext_tiles_render_block_build (
-	LIExtBlock*     self,
-	LIVoxBlockAddr* addr);
-
-void liext_tiles_render_block_clear (
-	LIExtBlock* self);
+LIAPICALL (void, liren_buffer_texture_upload, (
+	LIRenBufferTexture* self,
+	int                 size,
+	void*               data));
 
 #endif
