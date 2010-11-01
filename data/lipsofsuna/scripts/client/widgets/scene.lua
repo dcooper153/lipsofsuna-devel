@@ -35,8 +35,10 @@ Widgets.Scene.render = function(self)
 	self.scene:draw_deferred_opaque()
 	self.scene:draw_deferred_end()
 	self.scene:draw_forward_transparent()
-	self.scene:draw_post_process{shader = "postprocess-vert-hdr"}
-	self.scene:draw_post_process{shader = "postprocess-horz-hdr"}
+	if Options.check_postproc.active then
+		self.scene:draw_post_process{shader = "postprocess-vert-hdr"}
+		self.scene:draw_post_process{shader = "postprocess-horz-hdr"}
+	end
 	self.scene:draw_end()
 	Speech:draw{
 		modelview = self.camera.modelview,
