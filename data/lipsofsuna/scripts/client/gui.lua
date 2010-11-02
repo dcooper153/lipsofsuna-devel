@@ -61,15 +61,15 @@ Gui.init = function(clss)
 	Gui.editor_group = Widgets.Popup{cols = 1, visible = false}
 	Gui.editor_group:append_row(Widgets.Label{font = "medium", text = "Editor"})
 	Gui.editor_group:append_row(Editing.dialog)
-	Gui.menu_group = Widget{rows = 1}
-	Gui.menu_group:append_col(Gui.menus)
-	Gui.menu_group:append_col(Gui.chat_group)
-	Gui.menu_group:set_expand{col = 2}
+	Gui.top_group = Widget{rows = 1}
+	Gui.top_group:append_col(Gui.chat_group)
+	Gui.top_group:append_col(Gui.fps_label)
+	Gui.top_group:set_expand{col = 1}
 	Gui.center_group = Widget{cols = 1}
-	Gui.center_group:append_row(Gui.fps_label)
-	Gui.center_group:append_row(Gui.menu_group)
+	Gui.center_group:append_row(Gui.top_group)
+	Gui.center_group:append_row(Gui.menus)
 	Gui.center_group:append_row(Gui.skills_group)
-	Gui.center_group:set_expand{row = 1}
+	Gui.center_group:set_expand{col = 1, row = 1}
 	Gui.scene = Widgets.Scene{rows = 1, camera = Player.camera, margins = {5,5,5,5}}
 	Gui.scene:append_col(Gui.editor_group)
 	Gui.scene:append_col(Gui.center_group)

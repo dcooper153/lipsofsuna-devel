@@ -4,18 +4,15 @@ Widgets.Log = Class(Widgets.Label)
 
 Widgets.Log.new = function(clss, args)
 	local self = Widgets.Label.new(clss, args)
-	self.lines = {"", "", "", "", ""}
+	self.lines = {}
 	return self
 end
 
 Widgets.Log.append = function(self, args)
+	-- Append and scroll.
 	local l = self.lines
-	-- Scroll up lines.
-	for i = 2,#l do
-		l[i - 1] = l[i]
-	end
-	-- Append the new line.
-	l[#l] = args.text
+	table.insert(l, args.text)
+	if #l > 5 then table.remove(l, 1) end
 	-- Rebuild the text.
 	local t = l[1]
 	for i = 2,#l do
