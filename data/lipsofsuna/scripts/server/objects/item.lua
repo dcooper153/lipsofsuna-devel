@@ -174,13 +174,13 @@ Item.use_cb = function(self, user)
 			["lesser health potion"] = { skill = "health", value = 10 },
 			["health potion"] = { skill = "health", value = 30 },
 			["greater health potion"] = { skill = "health", value = 60 },
-			["lesser mana potion"] = { skill = "mana", value = 10 },
-			["mana potion"] = { skill = "mana", value = 30 },
-			["greater mana potion"] = { skill = "mana", value = 60 }
+			["lesser mana potion"] = { skill = "willpower", value = 10 },
+			["mana potion"] = { skill = "willpower", value = 30 },
+			["greater mana potion"] = { skill = "willpower", value = 60 }
 		}
 		local type = types[self.name]
 		if not type then return end
-		local skills = Skills:find{owner = user}
+		local skills = user.skills
 		if not skills then return end
 		local value = skills:get_value{skill = type.skill}
 		if not value then return end
