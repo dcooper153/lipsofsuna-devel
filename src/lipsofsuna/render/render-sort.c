@@ -153,7 +153,7 @@ int liren_sort_add_faces (
 	/* Add each face in the group. */
 	num = self->faces.count;
 	liren_mesh_get_format (mesh, &format);
-	vtxdata = liren_mesh_lock_vertices (mesh);
+	vtxdata = liren_mesh_lock_vertices (mesh, index, count);
 	if (vtxdata == NULL)
 		return 0;
 	for (i = 0 ; i < count ; i += 3, num++)
@@ -212,7 +212,6 @@ int liren_sort_add_model (
 	{
 		material = model->materials.array[i];
 		transp = (material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY);
-#warning Depth sorting of transparent faces is very slow.
 		ret &= liren_sort_add_group (self, bounds, matrix,
 			model->groups.array[i].start, model->groups.array[i].count,
 			&model->mesh, material, transp);

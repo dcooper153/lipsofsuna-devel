@@ -145,17 +145,21 @@ void liren_mesh_deform (
  * \return Pointer to the locked array, or NULL.
  */
 void* liren_mesh_lock_vertices (
-	const LIRenMesh* self)
+	const LIRenMesh* self,
+	int              start,
+	int              count)
 {
 	void* ret;
 	GLint restore;
+	LIRenFormat format;
 
 	if (self->buffers[2])
 	{
+		liren_mesh_get_format (self, &format);
 		glGetIntegerv (GL_VERTEX_ARRAY_BINDING, &restore);
 		glBindVertexArray (0);
 		glBindBuffer (GL_ARRAY_BUFFER, self->buffers[2]);
-		ret = glMapBuffer (GL_ARRAY_BUFFER, GL_READ_ONLY);
+		ret = glMapBufferRange (GL_ARRAY_BUFFER, format.size * start, format.size * count, GL_MAP_READ_BIT);
 		glBindVertexArray (restore);
 		return ret;
 	}

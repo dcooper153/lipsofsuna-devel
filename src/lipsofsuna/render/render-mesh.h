@@ -45,7 +45,9 @@ LIAPICALL (void, liren_mesh_deform, (
 	LIRenMesh* self));
 
 LIAPICALL (void*, liren_mesh_lock_vertices, (
-	const LIRenMesh* self));
+	const LIRenMesh* self,
+	int              start,
+	int              count));
 
 LIAPICALL (void, liren_mesh_unlock_vertices, (
 	const LIRenMesh* self));

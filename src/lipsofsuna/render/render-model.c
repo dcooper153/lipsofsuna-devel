@@ -205,7 +205,7 @@ int liren_model_intersect_ray (
 	/* Test for intersection for each face in the model. */
 	found = 0;
 	liren_mesh_get_format (&self->mesh, &format);
-	vtxdata = liren_mesh_lock_vertices (&self->mesh);
+	vtxdata = liren_mesh_lock_vertices (&self->mesh, 0, self->mesh.counts[2]);
 	if (vtxdata == NULL)
 		return 0;
 	for (i = 0 ; i < self->mesh.counts[2] ; i += 3)
