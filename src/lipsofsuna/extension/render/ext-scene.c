@@ -193,6 +193,21 @@ static void Scene_draw_end (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Draws the opaque faces of the scene to the post-processing buffer.
+ * -- @param self Scene.
+ * function Scene.draw_forward_opaque(self)
+ */
+static void Scene_draw_forward_opaque (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIRenScene* scene;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
+	scene = module->client->scene;
+	liren_scene_render_forward_opaque (scene, 0);
+}
+
+/* @luadoc
  * ---
  * -- Draws the transparent faces of the scene to the post-processing buffer.
  * --
@@ -245,6 +260,7 @@ void liext_script_scene (
 	liscr_class_insert_mfunc (self, "draw_deferred_end", Scene_draw_deferred_end);
 	liscr_class_insert_mfunc (self, "draw_deferred_opaque", Scene_draw_deferred_opaque);
 	liscr_class_insert_mfunc (self, "draw_end", Scene_draw_end);
+	liscr_class_insert_mfunc (self, "draw_forward_opaque", Scene_draw_forward_opaque);
 	liscr_class_insert_mfunc (self, "draw_forward_transparent", Scene_draw_forward_transparent);
 	liscr_class_insert_mfunc (self, "draw_post_process", Scene_draw_post_process);
 }

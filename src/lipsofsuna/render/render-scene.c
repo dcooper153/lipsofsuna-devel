@@ -323,6 +323,10 @@ void liren_scene_render_deferred_opaque (
 	if (!self->state.rendering)
 		return;
 
+	/* Change render state. */
+	liren_context_set_depth (self->state.context, 1, 1, GL_LEQUAL);
+	liren_context_set_blend (self->state.context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 	/* Render face groups to G-buffer. */
 	for (i = 0 ; i < self->sort->groups.count ; i++)
 	{
@@ -348,6 +352,7 @@ void liren_scene_render_forward_opaque (
 	int         alpha)
 {
 	int i;
+	int first = 1;
 	LIAlgPtrdicIter iter;
 	LIMatAabb aabb;
 	LIRenLight* light;
@@ -358,29 +363,33 @@ void liren_scene_render_forward_opaque (
 		return;
 
 	/* Change render state. */
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[0]);
-	liren_context_set_depth (self->state.context, 1, 0, GL_LEQUAL);
+	glBindFramebuffer (GL_FRAMEBUFFER, self->state.framebuffer->postproc_fbo[0]);
+	liren_context_set_cull (self->state.context, 1, GL_CCW);
+	liren_context_set_depth (self->state.context, 1, 1, GL_LEQUAL);
 	liren_context_set_blend (self->state.context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	/* Render face groups to post-processing buffer. */
-	for (i = 0 ; i < self->sort->groups.count ; i++)
+	/* The first pass is done for all groups so that the base color and the depth buffer
+	   are right. After that, the contributions of the rest of the lights are summed. */
+	LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
 	{
-		group = self->sort->groups.array + i;
-		if (!alpha && group->transparent)
-			continue;
-		/* FIXME: Looping through all lights and objects is slow. */
-		LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
+		light = iter.value;
+		if (light->enabled)
 		{
-			light = iter.value;
-			if (light->enabled)
+			liren_context_set_lights (self->state.context, &light, 1);
+			liren_light_get_bounds (light, &aabb);
+			for (i = 0 ; i < self->sort->groups.count ; i++)
 			{
-				liren_light_get_bounds (light, &aabb);
-				if (limat_aabb_intersects_aabb (&aabb, &group->bounds))
-				{
-					liren_draw_default (self->state.context, group->index, group->count,
-						&group->matrix, group->material, group->mesh);
-				}
+				group = self->sort->groups.array + i;
+				if (!alpha && group->transparent)
+					continue;
+				if (!first && !limat_aabb_intersects_aabb (&aabb, &group->bounds))
+					continue;
+				liren_draw_default (self->state.context, group->index, group->count,
+					&group->matrix, group->material, group->mesh);
 			}
+			liren_context_set_blend (self->state.context, 1, GL_ONE, GL_ONE);
+			first = 0;
 		}
 	}
 }
@@ -394,8 +403,8 @@ void liren_scene_render_forward_opaque (
  *
  * \param self Scene.
  */
-void
-liren_scene_render_forward_transparent (LIRenScene* self)
+void liren_scene_render_forward_transparent (
+	LIRenScene* self)
 {
 	int i;
 	LIAlgPtrdicIter iter;
@@ -432,6 +441,7 @@ liren_scene_render_forward_transparent (LIRenScene* self)
 					liren_light_get_bounds (light, &aabb);
 					if (!limat_aabb_intersects_aabb (&aabb, &face->face.bounds))
 						continue;
+					liren_context_set_blend (self->state.context, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 					liren_context_set_lights (self->state.context, &light, 1);
 					liren_draw_default (self->state.context, face->face.index, 3,
 						&face->face.matrix, face->face.material, face->face.mesh);

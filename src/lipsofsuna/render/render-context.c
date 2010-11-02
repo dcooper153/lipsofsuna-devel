@@ -414,16 +414,6 @@ void liren_context_set_material (
 		liren_context_set_cull (self, 1, GL_CCW);
 	else
 		liren_context_set_cull (self, 0, GL_CCW);
-	if (value->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY)
-	{
-		liren_context_set_blend (self, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		liren_context_set_depth (self, 1, 0, GL_LEQUAL);
-	}
-	else
-	{
-		liren_context_set_blend (self, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		liren_context_set_depth (self, 1, 1, GL_LEQUAL);
-	}
 }
 
 void liren_context_set_material_shader (
