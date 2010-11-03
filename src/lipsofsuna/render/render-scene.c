@@ -290,12 +290,12 @@ void liren_scene_render_deferred_end (
 	liren_context_set_depth (self->state.context, 0, 0, GL_LEQUAL);
 	liren_context_set_blend (self->state.context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	liren_context_set_modelmatrix (self->state.context, &matrix);
-	liren_context_set_lights (self->state.context, NULL, 0);
+	liren_context_set_light (self->state.context, NULL);
 	liren_context_set_textures (self->state.context, textures, 4);
 	liren_context_set_buffer (self->state.context, self->render->helpers.unit_quad);
 	private_lighting_render (self, self->state.context, viewport, 0);
 	private_lighting_render (self, self->state.context, viewport, 1);
-	liren_context_set_lights (self->state.context, NULL, 0);
+	liren_context_set_light (self->state.context, NULL);
 	glDisable (GL_SCISSOR_TEST);
 	glPopAttrib ();
 
@@ -376,7 +376,7 @@ void liren_scene_render_forward_opaque (
 		light = iter.value;
 		if (light->enabled)
 		{
-			liren_context_set_lights (self->state.context, &light, 1);
+			liren_context_set_light (self->state.context, light);
 			liren_light_get_bounds (light, &aabb);
 			for (i = 0 ; i < self->sort->groups.count ; i++)
 			{
@@ -442,7 +442,7 @@ void liren_scene_render_forward_transparent (
 					if (!limat_aabb_intersects_aabb (&aabb, &face->face.bounds))
 						continue;
 					liren_context_set_blend (self->state.context, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-					liren_context_set_lights (self->state.context, &light, 1);
+					liren_context_set_light (self->state.context, light);
 					liren_draw_default (self->state.context, face->face.index, 3,
 						&face->face.matrix, face->face.material, face->face.mesh);
 				}
@@ -455,7 +455,7 @@ void liren_scene_render_forward_transparent (
 			if (face->type != LIREN_SORT_TYPE_PARTICLE)
 				continue;
 			liren_context_set_blend (self->state.context, 1, GL_SRC_ALPHA, GL_ONE);
-			liren_context_set_lights (self->state.context, NULL, 0);
+			liren_context_set_light (self->state.context, NULL);
 			liren_context_set_modelmatrix (self->state.context, &identity);
 			liren_context_set_shader (self->state.context, face->particle.shader);
 			liren_context_set_textures_raw (self->state.context, &face->particle.image->texture->texture, 1);
@@ -472,7 +472,7 @@ void liren_scene_render_forward_transparent (
 	}
 
 	/* Change render state. */
-	liren_context_set_lights (self->state.context, NULL, 0);
+	liren_context_set_light (self->state.context, NULL);
 }
 
 /**
@@ -654,7 +654,7 @@ static void private_lighting_render (
 		}
 		if (index++ == 1)
 			liren_context_set_blend (context, 1, GL_ONE, GL_ONE);
-		liren_context_set_lights (context, &light, 1);
+		liren_context_set_light (context, light);
 		liren_context_bind (context);
 
 		/* Calculate light rectangle. */

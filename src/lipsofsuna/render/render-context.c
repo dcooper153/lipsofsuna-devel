@@ -40,6 +40,7 @@ void liren_context_init (
 	memset (self, 0, sizeof (LIRenContext));
 	self->render = render;
 	self->scene = NULL;
+	self->light = NULL;
 	self->array = 0;
 	self->incomplete = 1;
 	self->blend.enable = 0;
@@ -62,7 +63,6 @@ void liren_context_init (
 	self->depth.enable_test = 1;
 	self->depth.enable_write = 1;
 	self->depth.depth_func = GL_LEQUAL;
-	self->lights.count = 0;
 	self->material.shininess = 1.0f;
 	self->material.diffuse[0] = 1.0f;
 	self->material.diffuse[1] = 1.0f;
@@ -365,30 +365,16 @@ void liren_context_set_frustum (
 	self->frustum = *frustum;
 }
 
-void liren_context_set_lights (
+void liren_context_set_light (
 	LIRenContext* self,
-	LIRenLight**  value,
-	int           count)
+	LIRenLight*   value)
 {
-	int i;
-	int c;
-
-	c = LIMAT_MIN (count, 9);
-	if (self->lights.count == c)
+	if (self->light != value)
 	{
-		for (i = 0 ; i < c ; i++)
-		{
-			if (memcmp (self->lights.array[i], value[i], sizeof (LIRenLight)))
-				break;
-		}
-		if (i == c)
-			return;
+		self->light = value;
+		self->changed.lights = 1;
+		self->changed.uniforms = 1;
 	}
-
-	memcpy (self->lights.array, value, c * sizeof (LIRenLight*));
-	self->lights.count = c;
-	self->changed.lights = 1;
-	self->changed.uniforms = 1;
 }
 
 void liren_context_set_material (
@@ -491,7 +477,7 @@ void liren_context_set_scene (
 	self->scene = scene;
 	/* FIXME */
 	self->textures.count = 0;
-	self->lights.count = 0;
+	self->light = NULL;
 	self->changed.uniforms = 1;
 }
 
@@ -576,7 +562,6 @@ static void private_bind_uniform (
 	int index;
 	GLint map;
 	GLfloat mat3[9];
-	LIRenLight* light;
 	LIRenContextTexture* texture;
 	LIMatVector vector;
 	LIMatMatrix matrix;
@@ -646,256 +631,125 @@ static void private_bind_uniform (
 			}
 			break;
 		case LIREN_UNIFORM_LIGHTAMBIENT0:
-		case LIREN_UNIFORM_LIGHTAMBIENT1:
-		case LIREN_UNIFORM_LIGHTAMBIENT2:
-		case LIREN_UNIFORM_LIGHTAMBIENT3:
-		case LIREN_UNIFORM_LIGHTAMBIENT4:
-		case LIREN_UNIFORM_LIGHTAMBIENT5:
-		case LIREN_UNIFORM_LIGHTAMBIENT6:
-		case LIREN_UNIFORM_LIGHTAMBIENT7:
-		case LIREN_UNIFORM_LIGHTAMBIENT8:
-		case LIREN_UNIFORM_LIGHTAMBIENT9:
 			if (self->changed.lights)
 			{
-				index = uniform->value - LIREN_UNIFORM_LIGHTAMBIENT0;
-				if (index < self->lights.count)
-				{
-					light = self->lights.array[index];
-					glUniform4fvARB (uniform->binding, 1, light->ambient);
-				}
+				if (self->light != NULL)
+					glUniform4fv (uniform->binding, 1, self->light->ambient);
 				else
-					glUniform4fARB (uniform->binding, 0.0f, 0.0f, 0.0f, 1.0f);
+					glUniform4f (uniform->binding, 0.0f, 0.0f, 0.0f, 1.0f);
 			}
 			break;
 		case LIREN_UNIFORM_LIGHTDIFFUSE0:
-		case LIREN_UNIFORM_LIGHTDIFFUSE1:
-		case LIREN_UNIFORM_LIGHTDIFFUSE2:
-		case LIREN_UNIFORM_LIGHTDIFFUSE3:
-		case LIREN_UNIFORM_LIGHTDIFFUSE4:
-		case LIREN_UNIFORM_LIGHTDIFFUSE5:
-		case LIREN_UNIFORM_LIGHTDIFFUSE6:
-		case LIREN_UNIFORM_LIGHTDIFFUSE7:
-		case LIREN_UNIFORM_LIGHTDIFFUSE8:
-		case LIREN_UNIFORM_LIGHTDIFFUSE9:
 			if (self->changed.lights)
 			{
-				index = uniform->value - LIREN_UNIFORM_LIGHTDIFFUSE0;
-				if (index < self->lights.count)
-				{
-					light = self->lights.array[index];
-					glUniform4fvARB (uniform->binding, 1, light->diffuse);
-				}
+				if (self->light != NULL)
+					glUniform4fv (uniform->binding, 1, self->light->diffuse);
 				else
-					glUniform4fARB (uniform->binding, 1.0f, 1.0f, 1.0f, 1.0f);
+					glUniform4f (uniform->binding, 1.0f, 1.0f, 1.0f, 1.0f);
 			}
 			break;
 		case LIREN_UNIFORM_LIGHTDIRECTION0:
-		case LIREN_UNIFORM_LIGHTDIRECTION1:
-		case LIREN_UNIFORM_LIGHTDIRECTION2:
-		case LIREN_UNIFORM_LIGHTDIRECTION3:
-		case LIREN_UNIFORM_LIGHTDIRECTION4:
-		case LIREN_UNIFORM_LIGHTDIRECTION5:
-		case LIREN_UNIFORM_LIGHTDIRECTION6:
-		case LIREN_UNIFORM_LIGHTDIRECTION7:
-		case LIREN_UNIFORM_LIGHTDIRECTION8:
-		case LIREN_UNIFORM_LIGHTDIRECTION9:
 			if (self->changed.lights)
 			{
-				index = uniform->value - LIREN_UNIFORM_LIGHTDIRECTION0;
-				if (index < self->lights.count)
+				if (self->light != NULL)
 				{
-					light = self->lights.array[index];
-					liren_light_get_direction (light, &vector);
-					glUniform3fARB (uniform->binding, vector.x, vector.y, vector.z);
+					liren_light_get_direction (self->light, &vector);
+					glUniform3f (uniform->binding, vector.x, vector.y, vector.z);
 				}
 				else
-					glUniform3fARB (uniform->binding, 0.0f, 0.0f, 0.0f);
+					glUniform3f (uniform->binding, 0.0f, 0.0f, 0.0f);
 			}
 			break;
 		case LIREN_UNIFORM_LIGHTDIRECTIONPREMULT0:
-		case LIREN_UNIFORM_LIGHTDIRECTIONPREMULT1:
-		case LIREN_UNIFORM_LIGHTDIRECTIONPREMULT2:
-		case LIREN_UNIFORM_LIGHTDIRECTIONPREMULT3:
-		case LIREN_UNIFORM_LIGHTDIRECTIONPREMULT4:
-		case LIREN_UNIFORM_LIGHTDIRECTIONPREMULT5:
-		case LIREN_UNIFORM_LIGHTDIRECTIONPREMULT6:
-		case LIREN_UNIFORM_LIGHTDIRECTIONPREMULT7:
-		case LIREN_UNIFORM_LIGHTDIRECTIONPREMULT8:
-		case LIREN_UNIFORM_LIGHTDIRECTIONPREMULT9:
 			if (self->changed.lights)
 			{
-				index = uniform->value - LIREN_UNIFORM_LIGHTDIRECTIONPREMULT0;
-				if (index < self->lights.count)
+				if (self->light != NULL)
 				{
-					light = self->lights.array[index];
 					matrix = limat_matrix_get_rotation (self->matrix.modelview);
-					liren_light_get_direction (light, &vector);
+					liren_light_get_direction (self->light, &vector);
 					vector = limat_matrix_transform (matrix, vector);
-					glUniform3fARB (uniform->binding, vector.x, vector.y, vector.z);
+					glUniform3f (uniform->binding, vector.x, vector.y, vector.z);
 				}
 				else
-					glUniform3fARB (uniform->binding, 0.0f, 0.0f, -1.0f);
+					glUniform3f (uniform->binding, 0.0f, 0.0f, -1.0f);
 			}
 			break;
 		case LIREN_UNIFORM_LIGHTEQUATION0:
-		case LIREN_UNIFORM_LIGHTEQUATION1:
-		case LIREN_UNIFORM_LIGHTEQUATION2:
-		case LIREN_UNIFORM_LIGHTEQUATION3:
-		case LIREN_UNIFORM_LIGHTEQUATION4:
-		case LIREN_UNIFORM_LIGHTEQUATION5:
-		case LIREN_UNIFORM_LIGHTEQUATION6:
-		case LIREN_UNIFORM_LIGHTEQUATION7:
-		case LIREN_UNIFORM_LIGHTEQUATION8:
-		case LIREN_UNIFORM_LIGHTEQUATION9:
 			if (self->changed.lights)
 			{
 				index = uniform->value - LIREN_UNIFORM_LIGHTEQUATION0;
-				if (index < self->lights.count)
-				{
-					light = self->lights.array[index];
-					glUniform3fvARB (uniform->binding, 1, light->equation);
-				}
+				if (self->light != NULL)
+					glUniform3fv (uniform->binding, 1, self->light->equation);
 				else
-					glUniform3fARB (uniform->binding, 1.0f, 0.0f, 0.0f);
+					glUniform3f (uniform->binding, 1.0f, 0.0f, 0.0f);
 			}
 			break;
 		case LIREN_UNIFORM_LIGHTMATRIX0:
-		case LIREN_UNIFORM_LIGHTMATRIX1:
-		case LIREN_UNIFORM_LIGHTMATRIX2:
-		case LIREN_UNIFORM_LIGHTMATRIX3:
-		case LIREN_UNIFORM_LIGHTMATRIX4:
-		case LIREN_UNIFORM_LIGHTMATRIX5:
-		case LIREN_UNIFORM_LIGHTMATRIX6:
-		case LIREN_UNIFORM_LIGHTMATRIX7:
-		case LIREN_UNIFORM_LIGHTMATRIX8:
-		case LIREN_UNIFORM_LIGHTMATRIX9:
 			if (self->changed.lights || self->changed.matrix_model || self->changed.matrix_view)
 			{
-				index = uniform->value - LIREN_UNIFORM_LIGHTMATRIX0;
-				if (index < self->lights.count)
+				if (self->light != NULL)
 				{
-					light = self->lights.array[index];
-					matrix = limat_matrix_multiply (bias, light->projection);
-					matrix = limat_matrix_multiply (matrix, light->modelview);
+					matrix = limat_matrix_multiply (bias, self->light->projection);
+					matrix = limat_matrix_multiply (matrix, self->light->modelview);
 					matrix = limat_matrix_multiply (matrix, self->matrix.modelviewinverse);
-					glUniformMatrix4fvARB (uniform->binding, 1, GL_FALSE, matrix.m);
+					glUniformMatrix4fv (uniform->binding, 1, GL_FALSE, matrix.m);
 				}
 				else
-					glUniformMatrix4fvARB (uniform->binding, 1, GL_FALSE, bias.m);
+					glUniformMatrix4fv (uniform->binding, 1, GL_FALSE, bias.m);
 			}
 			break;
 		case LIREN_UNIFORM_LIGHTPOSITION0:
-		case LIREN_UNIFORM_LIGHTPOSITION1:
-		case LIREN_UNIFORM_LIGHTPOSITION2:
-		case LIREN_UNIFORM_LIGHTPOSITION3:
-		case LIREN_UNIFORM_LIGHTPOSITION4:
-		case LIREN_UNIFORM_LIGHTPOSITION5:
-		case LIREN_UNIFORM_LIGHTPOSITION6:
-		case LIREN_UNIFORM_LIGHTPOSITION7:
-		case LIREN_UNIFORM_LIGHTPOSITION8:
-		case LIREN_UNIFORM_LIGHTPOSITION9:
 			if (self->changed.lights)
 			{
-				index = uniform->value - LIREN_UNIFORM_LIGHTPOSITION0;
-				if (index < self->lights.count)
+				if (self->light != NULL)
 				{
-					light = self->lights.array[index];
-					glUniform3fARB (uniform->binding,
-						light->transform.position.x,
-						light->transform.position.y,
-						light->transform.position.z);
+					glUniform3f (uniform->binding,
+						self->light->transform.position.x,
+						self->light->transform.position.y,
+						self->light->transform.position.z);
 				}
 				else
-					glUniform3fARB (uniform->binding, 0.0f, 0.0f, 0.0f);
+					glUniform3f (uniform->binding, 0.0f, 0.0f, 0.0f);
 			}
 			break;
 		case LIREN_UNIFORM_LIGHTPOSITIONPREMULT0:
-		case LIREN_UNIFORM_LIGHTPOSITIONPREMULT1:
-		case LIREN_UNIFORM_LIGHTPOSITIONPREMULT2:
-		case LIREN_UNIFORM_LIGHTPOSITIONPREMULT3:
-		case LIREN_UNIFORM_LIGHTPOSITIONPREMULT4:
-		case LIREN_UNIFORM_LIGHTPOSITIONPREMULT5:
-		case LIREN_UNIFORM_LIGHTPOSITIONPREMULT6:
-		case LIREN_UNIFORM_LIGHTPOSITIONPREMULT7:
-		case LIREN_UNIFORM_LIGHTPOSITIONPREMULT8:
-		case LIREN_UNIFORM_LIGHTPOSITIONPREMULT9:
 			if (self->changed.lights)
 			{
-				index = uniform->value - LIREN_UNIFORM_LIGHTPOSITIONPREMULT0;
-				if (index < self->lights.count)
+				if (self->light != NULL)
 				{
-					light = self->lights.array[index];
-					vector = limat_matrix_transform (self->matrix.view, light->transform.position);
-					glUniform3fARB (uniform->binding, vector.x, vector.y, vector.z);
+					vector = limat_matrix_transform (self->matrix.view, self->light->transform.position);
+					glUniform3f (uniform->binding, vector.x, vector.y, vector.z);
 				}
 				else
-					glUniform3fARB (uniform->binding, 0.0f, 0.0f, 0.0f);
+					glUniform3f (uniform->binding, 0.0f, 0.0f, 0.0f);
 			}
 			break;
 		case LIREN_UNIFORM_LIGHTSPECULAR0:
-		case LIREN_UNIFORM_LIGHTSPECULAR1:
-		case LIREN_UNIFORM_LIGHTSPECULAR2:
-		case LIREN_UNIFORM_LIGHTSPECULAR3:
-		case LIREN_UNIFORM_LIGHTSPECULAR4:
-		case LIREN_UNIFORM_LIGHTSPECULAR5:
-		case LIREN_UNIFORM_LIGHTSPECULAR6:
-		case LIREN_UNIFORM_LIGHTSPECULAR7:
-		case LIREN_UNIFORM_LIGHTSPECULAR8:
-		case LIREN_UNIFORM_LIGHTSPECULAR9:
 			if (self->changed.lights)
 			{
 				index = uniform->value - LIREN_UNIFORM_LIGHTSPECULAR0;
-				if (index < self->lights.count)
-				{
-					light = self->lights.array[index];
-					glUniform4fvARB (uniform->binding, 1, light->specular);
-				}
+				if (self->light != NULL)
+					glUniform4fv (uniform->binding, 1, self->light->specular);
 				else
-					glUniform4fARB (uniform->binding, 1.0f, 1.0f, 1.0f, 1.0f);
+					glUniform4f (uniform->binding, 1.0f, 1.0f, 1.0f, 1.0f);
 			}
 			break;
 		case LIREN_UNIFORM_LIGHTSPOT0:
-		case LIREN_UNIFORM_LIGHTSPOT1:
-		case LIREN_UNIFORM_LIGHTSPOT2:
-		case LIREN_UNIFORM_LIGHTSPOT3:
-		case LIREN_UNIFORM_LIGHTSPOT4:
-		case LIREN_UNIFORM_LIGHTSPOT5:
-		case LIREN_UNIFORM_LIGHTSPOT6:
-		case LIREN_UNIFORM_LIGHTSPOT7:
-		case LIREN_UNIFORM_LIGHTSPOT8:
-		case LIREN_UNIFORM_LIGHTSPOT9:
 			if (self->changed.lights)
 			{
-				index = uniform->value - LIREN_UNIFORM_LIGHTSPOT0;
-				if (index < self->lights.count)
-				{
-					light = self->lights.array[index];
-					glUniform3fARB (uniform->binding, light->cutoff, cos (light->cutoff), light->exponent);
-				}
+				if (self->light != NULL)
+					glUniform3f (uniform->binding, self->light->cutoff, cos (self->light->cutoff), self->light->exponent);
 				else
-					glUniform3fARB (uniform->binding, M_PI, -1.0f, 0.0f);
+					glUniform3f (uniform->binding, M_PI, -1.0f, 0.0f);
 			}
 			break;
 		case LIREN_UNIFORM_LIGHTTYPE0:
-		case LIREN_UNIFORM_LIGHTTYPE1:
-		case LIREN_UNIFORM_LIGHTTYPE2:
-		case LIREN_UNIFORM_LIGHTTYPE3:
-		case LIREN_UNIFORM_LIGHTTYPE4:
-		case LIREN_UNIFORM_LIGHTTYPE5:
-		case LIREN_UNIFORM_LIGHTTYPE6:
-		case LIREN_UNIFORM_LIGHTTYPE7:
-		case LIREN_UNIFORM_LIGHTTYPE8:
-		case LIREN_UNIFORM_LIGHTTYPE9:
 			if (self->changed.lights)
 			{
-				index = uniform->value - LIREN_UNIFORM_LIGHTTYPE0;
-				if (index < self->lights.count)
-				{
-					light = self->lights.array[index];
-					glUniform1iARB (uniform->binding, liren_light_get_type (light));
-				}
+				if (self->light != NULL)
+					glUniform1i (uniform->binding, liren_light_get_type (self->light));
 				else
-					glUniform1iARB (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_DISABLED);
+					glUniform1i (uniform->binding, LIREN_UNIFORM_LIGHTTYPE_DISABLED);
 			}
 			break;
 		case LIREN_UNIFORM_MATERIALDIFFUSE:
@@ -957,24 +811,13 @@ static void private_bind_uniform (
 				glUniform4fvARB (uniform->binding, 1, self->material.parameters);
 			break;
 		case LIREN_UNIFORM_SHADOWTEXTURE0:
-		case LIREN_UNIFORM_SHADOWTEXTURE1:
-		case LIREN_UNIFORM_SHADOWTEXTURE2:
-		case LIREN_UNIFORM_SHADOWTEXTURE3:
-		case LIREN_UNIFORM_SHADOWTEXTURE4:
-		case LIREN_UNIFORM_SHADOWTEXTURE5:
-		case LIREN_UNIFORM_SHADOWTEXTURE6:
-		case LIREN_UNIFORM_SHADOWTEXTURE7:
-		case LIREN_UNIFORM_SHADOWTEXTURE8:
-		case LIREN_UNIFORM_SHADOWTEXTURE9:
 			if (self->changed.lights)
 			{
-				index = uniform->value - LIREN_UNIFORM_SHADOWTEXTURE0;
 				map = self->render->helpers.depth_texture_max;
-				if (index < self->lights.count)
+				if (self->light != NULL)
 				{
-					light = self->lights.array[index];
-					if (light->shadow.map)
-						map = light->shadow.map;
+					if (self->light->shadow.map)
+						map = self->light->shadow.map;
 				}
 				glActiveTextureARB (GL_TEXTURE0 + uniform->sampler);
 				glBindTexture (GL_TEXTURE_2D, map);

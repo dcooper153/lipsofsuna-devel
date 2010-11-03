@@ -39,6 +39,7 @@ struct _LIRenContext
 	int incomplete;
 	int shadows;
 	GLuint array;
+	LIRenLight* light;
 	LIRenRender* render;
 	LIRenScene* scene;
 	LIRenShader* shader;
@@ -75,11 +76,6 @@ struct _LIRenContext
 		int enable_write;
 		int depth_func;
 	} depth;
-	struct
-	{
-		int count;
-		LIRenLight* array[9];
-	} lights;
 	struct
 	{
 		float parameters[4];
@@ -166,10 +162,9 @@ LIAPICALL (void, liren_context_set_frustum, (
 	LIRenContext*       self,
 	const LIMatFrustum* frustum));
 
-LIAPICALL (void, liren_context_set_lights, (
+LIAPICALL (void, liren_context_set_light, (
 	LIRenContext* self,
-	LIRenLight**  value,
-	int           count));
+	LIRenLight*   value));
 
 LIAPICALL (void, liren_context_set_material, (
 	LIRenContext*        self,
