@@ -21,6 +21,7 @@ def options(ctx):
 	ctx.add_option('--libdir', action='store', default=None, help='override library directory [default: PREFIX/lib]')
 	ctx.add_option('--datadir', action='store', default=None, help='override data directory [default: PREFIX/share]')
 	ctx.add_option('--sound', action='store', default=True, help='compile with sound support [default: true]')
+	ctx.add_option('--optimize', action='store', default=False, help='compile with heavy optimizations [default: false]')
 
 def configure(ctx):
 
@@ -31,15 +32,19 @@ def configure(ctx):
 		exit(1)
 	ctx.env.RELPATH = Options.options.relpath != "false"
 	ctx.env.SOUND = Options.options.sound != "false"
+	if Options.options.optimize != "false":
+		optimize = '-O3'
+	else:
+		optimize = '-O0'
 
 	# Flags
 	ctx.env.INCLUDES_CORE = ['.', 'src']
 	ctx.env.INCLUDES_EXTENSION = ['.', 'src']
 	ctx.env.INCLUDES_TEST = []
-	ctx.env.CFLAGS_CORE = ['-g', '-Wall', '-O0', '-DHAVE_CONFIG_H']
-	ctx.env.CFLAGS_EXTENSION = ['-g', '-Wall', '-O0', '-DHAVE_CONFIG_H']
-	ctx.env.CXXFLAGS_CORE = ['-g', '-Wall', '-O0', '-DHAVE_CONFIG_H']
-	ctx.env.CXXFLAGS_EXTENSION = ['-g', '-Wall', '-O0', '-DHAVE_CONFIG_H', '-DDLL_EXPORT']
+	ctx.env.CFLAGS_CORE = ['-g', '-Wall', optimize, '-DHAVE_CONFIG_H']
+	ctx.env.CFLAGS_EXTENSION = ['-g', '-Wall', optimize, '-DHAVE_CONFIG_H']
+	ctx.env.CXXFLAGS_CORE = ['-g', '-Wall', optimize, '-DHAVE_CONFIG_H']
+	ctx.env.CXXFLAGS_EXTENSION = ['-g', '-Wall', optimize, '-DHAVE_CONFIG_H', '-DDLL_EXPORT']
 	ctx.env.LIBPATH_CORE = []
 	ctx.env.LIBPATH_EXTENSION = []
 	ctx.env.LIBPATH_TEST = []
