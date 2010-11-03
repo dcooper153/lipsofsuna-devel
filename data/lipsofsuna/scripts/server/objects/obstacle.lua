@@ -22,6 +22,8 @@ end
 Obstacle.new = function(clss, args)
 	local self = Object.new(clss, args)
 	self.physics = "static"
+	self.collision_group = 0x8000
+	self.collision_mask = 0xFF
 	return self
 end
 
