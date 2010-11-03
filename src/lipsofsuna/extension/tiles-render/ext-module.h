@@ -23,9 +23,18 @@
 #include <lipsofsuna/extension.h>
 
 typedef struct _LIExtBlock LIExtBlock;
+typedef struct _LIExtBuildTask LIExtBuildTask;
 typedef struct _LIExtModule LIExtModule;
 
 #define LIEXT_SCRIPT_TILES_RENDER "TilesRender"
+
+struct _LIExtBuildTask
+{
+	LIVoxBlockAddr addr;
+	LIVoxBuilder* builder;
+	LIMdlModel* model;
+	LIExtBuildTask* next;
+};
 
 struct _LIExtModule
 {
@@ -34,6 +43,13 @@ struct _LIExtModule
 	LICliClient* client;
 	LIMaiProgram* program;
 	LIVoxManager* voxels;
+	struct
+	{
+		LIThrAsyncCall* worker;
+		LIThrMutex* mutex;
+		LIExtBuildTask* pending;
+		LIExtBuildTask* completed;
+	} tasks;
 };
 
 LIExtModule* liext_tiles_render_new (

@@ -148,6 +148,7 @@ static void private_contact_callback (
 	LIScrData* data;
 	LIEngObject* engobj = liphy_object_get_userdata (object);
 	LIMaiProgram* program = lieng_engine_get_userdata (engobj->engine);
+	LIMatVector vector;
 	LIScrScript* script = program->script;
 	lua_State* lua = liscr_script_get_lua (script);
 
@@ -180,6 +181,21 @@ static void private_contact_callback (
 			liscr_pushdata (lua, engobj->script);
 			lua_setfield (lua, -2, "object");
 		}
+	}
+
+	/* Convert terrain. */
+	if (contact->terrain != NULL)
+	{
+		liphy_terrain_get_tile (contact->terrain, contact->terrain_index, &vector);
+		data = liscr_vector_new (script, &vector);
+		if (data != NULL)
+		{
+			liscr_pushdata (lua, data);
+			liscr_data_unref (data);
+		}
+		else
+			lua_pushnil (lua);
+		lua_setfield (lua, -2, "tile");
 	}
 
 	/* Convert point. */

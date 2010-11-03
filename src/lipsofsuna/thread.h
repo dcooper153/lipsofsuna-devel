@@ -20,5 +20,6 @@
 
 #include "thread/thread.h"
 #include "thread/thread-async-call.h"
+#include "thread/thread-mutex.h"
 
 #endif

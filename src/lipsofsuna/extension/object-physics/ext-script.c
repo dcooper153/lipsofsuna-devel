@@ -161,8 +161,9 @@ static void Object_sweep_sphere (LIScrArgs* args)
 	LIMatVector start;
 	LIMatVector end;
 	LIEngObject* hitobj;
-	LIPhyCollision result;
 	LIExtModule* module;
+	LIMatVector vector;
+	LIPhyCollision result;
 	LIPhyObject* object;
 
 	/* Get physics object. */
@@ -187,6 +188,11 @@ static void Object_sweep_sphere (LIScrArgs* args)
 			hitobj = liphy_object_get_userdata (result.object);
 			if (hitobj != NULL && hitobj->script != NULL)
 				liscr_args_sets_data (args, "object", hitobj->script);
+		}
+		if (result.terrain != NULL)
+		{
+			liphy_terrain_get_tile (result.terrain, result.terrain_index, &vector);
+			liscr_args_sets_vector (args, "tile", &vector);
 		}
 	}
 }

@@ -68,14 +68,31 @@ int liext_tiles_render_block_build (
 	LIExtBlock*     self,
 	LIVoxBlockAddr* addr)
 {
+	int blockw;
 	LIMdlModel* model = NULL;
+	LIVoxBuilder* builder;
+	LIVoxManager* manager;
 
 	/* Free old objects. */
 	liext_tiles_render_block_clear (self);
 
 	/* Build new objects. */
-	if (!livox_build_block (self->module->voxels, self->module->program->engine, NULL, addr, &model, NULL))
+	manager = self->module->voxels;
+	blockw = manager->tiles_per_line / manager->blocks_per_line;
+	builder = livox_builder_new (self->module->voxels,
+		self->module->program->engine, NULL,
+		manager->tiles_per_line * addr->sector[0] + blockw * addr->block[0],
+		manager->tiles_per_line * addr->sector[1] + blockw * addr->block[1],
+		manager->tiles_per_line * addr->sector[2] + blockw * addr->block[2],
+		blockw, blockw, blockw);
+	if (builder == NULL)
 		return 0;
+	if (!livox_builder_build (builder, &model, NULL))
+	{
+		livox_builder_free (builder);
+		return 0;
+	}
+	livox_builder_free (builder);
 
 	/* Create render model if not empty. */
 	if (model != NULL)

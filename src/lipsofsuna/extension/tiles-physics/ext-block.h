@@ -23,8 +23,7 @@
 struct _LIExtBlock
 {
 	LIExtModule* module;
-	LIPhyShape* shape;
-	LIPhyObject* object;
+	LIPhyTerrain* terrain;
 };
 
 LIExtBlock* liext_tiles_physics_block_new (
@@ -32,9 +31,5 @@ LIExtBlock* liext_tiles_physics_block_new (
 
 void liext_tiles_physics_block_free (
 	LIExtBlock* self);
-
-int liext_tiles_physics_block_build (
-	LIExtBlock*     self,
-	LIVoxBlockAddr* addr);
 
 #endif

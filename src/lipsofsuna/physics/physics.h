@@ -23,10 +23,6 @@
 #include <lipsofsuna/system.h>
 #include "physics-types.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 LIAPICALL (LIPhyPhysics*, liphy_physics_new, (
 	LICalCallbacks* callbacks));
 
@@ -60,6 +56,8 @@ LIAPICALL (int, liphy_physics_cast_sphere, (
 	const LIMatVector*  start,
 	const LIMatVector*  end,
 	float               radius,
+	int                 group,
+	int                 mask,
 	LIPhyObject**       ignore_array,
 	int                 ignore_count,
 	LIPhyCollision*     result));
@@ -71,6 +69,10 @@ LIAPICALL (void, liphy_physics_clear_constraints, (
 LIAPICALL (void, liphy_physics_clear_contacts, (
 	LIPhyPhysics* self,
 	LIPhyObject*  object));
+
+LIAPICALL (LIPhyModel*, liphy_physics_find_model, (
+	LIPhyPhysics* self,
+	uint32_t      id));
 
 LIAPICALL (LIPhyObject*, liphy_physics_find_object, (
 	LIPhyPhysics* self,
@@ -86,9 +88,5 @@ LIAPICALL (void*, liphy_physics_get_userdata, (
 LIAPICALL (void, liphy_physics_set_userdata, (
 	LIPhyPhysics* self,
 	void*         data));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -36,7 +36,7 @@ LIPhyControlVehicle::LIPhyControlVehicle (LIPhyObject* object, btCollisionShape*
 
 	liphy_object_get_inertia (object, &v);
 	this->body.setMassProps (object->config.mass, btVector3 (v.x, v.y, v.z));
-	this->body.setUserPointer (object);
+	this->body.setUserPointer (&object->pointer);
 	this->body.setLinearVelocity (velocity);
 	this->body.setAngularVelocity (angular);
 	this->body.setActivationState (DISABLE_DEACTIVATION);

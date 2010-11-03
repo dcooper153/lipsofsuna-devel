@@ -12,7 +12,7 @@ require "core/network"
 require "core/tiles"
 require "core/tiles-physics"
 Voxel.blocks_per_line = 4
-Voxel.tiles_per_line = 8
+Voxel.tiles_per_line = 16
 require "common/bitwise"
 require "common/effect"
 require "common/eventhandler"

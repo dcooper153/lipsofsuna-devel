@@ -22,9 +22,13 @@
 #define assert(a)
 #endif
 #include <btBulletDynamicsCommon.h>
+#include <LinearMath/btConvexHull.h>
 #include <BulletCollision/CollisionDispatch/btGhostObject.h>
+#include <BulletCollision/CollisionShapes/btShapeHull.h>
+#include <BulletCollision/NarrowPhaseCollision/btRaycastCallback.h>
 #include <BulletDynamics/Character/btKinematicCharacterController.h>
 #include <lipsofsuna/algorithm.h>
+#include <lipsofsuna/callback.h>
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/model.h>
 #include "physics-types.h"
@@ -55,6 +59,7 @@ struct _LIPhyPhysics
 	LIAlgList* contacts;
 	LIAlgList* contacts_iter;
 	LIAlgList* controllers;
+	LIAlgU32dic* models;
 	LIAlgU32dic* objects;
 	LICalCallbacks* callbacks;
 };
@@ -65,6 +70,73 @@ struct _LIPhyShape
 	btCompoundShape* shape;
 };
 
+typedef struct _LIPhyModelMesh LIPhyModelMesh;
+struct _LIPhyModelMesh
+{
+	struct
+	{
+		int count;
+		int* array;
+	} indices;
+	struct
+	{
+		int count;
+		btScalar* array;
+	} vertices;
+};
+
+struct _LIPhyModel
+{
+	int id;
+	int flags;
+	LIMdlModel* model;
+	LIPhyPhysics* physics;
+	LIPhyShape* shape;
+	struct
+	{
+		int count;
+		LIPhyModelMesh* array;
+	} meshes;
+};
+
+typedef struct _LIPhyPointer LIPhyPointer;
+struct _LIPhyPointer
+{
+	int object;
+	void* pointer;
+};
+
+struct _LIPhyTerrain
+{
+	int collision_group;
+	int collision_mask;
+	int offset[3];
+	int realized;
+	int size[3];
+	btBvhTriangleMeshShape* shape;
+	btCollisionObject* object;
+	btTriangleIndexVertexArray* vertex_array;
+	LIPhyPhysics* physics;
+	struct
+	{
+		int count;
+		int capacity;
+		int* array;
+	} indices;
+	struct
+	{
+		int count;
+		int capacity;
+		int* array;
+	} materials;
+	struct
+	{
+		int count;
+		int capacity;
+		btScalar* array;
+	} vertices;
+};
+
 struct _LIPhyObject
 {
 	int flags;
@@ -73,6 +145,7 @@ struct _LIPhyObject
 	LIPhyControl* control;
 	LIPhyMotionState* motion;
 	LIPhyPhysics* physics;
+	LIPhyPointer pointer;
 	LIPhyShape* shape;
 	struct
 	{
@@ -102,11 +175,13 @@ struct _LIPhyConstraint
 
 struct LIPhyContactRecord
 {
+	int terrain_index;
 	float impulse;
 	LIMatVector point;
 	LIMatVector normal;
 	LIPhyObject* object0;
 	LIPhyObject* object1;
+	LIPhyTerrain* terrain;
 };
 
 class LIPhyMotionState : public btMotionState
@@ -228,6 +303,100 @@ public:
 	btRaycastVehicle* vehicle;
 	btDefaultVehicleRaycaster caster;
 	btRaycastVehicle::btVehicleTuning tuning;
+};
+
+/*****************************************************************************/
+
+class LIPhyPrivateRaycastWorld : public btCollisionWorld::ClosestRayResultCallback
+{
+public:
+	LIPhyPrivateRaycastWorld (LIPhyObject** ignore_array, int ignore_count, const btVector3& src, const btVector3& dst) :
+		btCollisionWorld::ClosestRayResultCallback (src, dst)
+	{
+		this->ignore_count = ignore_count;
+		this->ignore_array = ignore_array;
+	}
+	virtual btScalar addSingleResult (btCollisionWorld::LocalRayResult& result, bool world)
+	{
+		int i;
+		LIPhyObject* hit = (LIPhyObject*) result.m_collisionObject->getUserPointer ();
+		for (i = 0 ; i < this->ignore_count ; i++)
+		{
+			if (hit == this->ignore_array[i])
+				return 1.0;
+		}
+		return btCollisionWorld::ClosestRayResultCallback::addSingleResult (result, world);
+	}
+protected:
+	int ignore_count;
+	LIPhyObject** ignore_array;
+};
+
+class LIPhyPrivateConvexcastWorld : public btCollisionWorld::ClosestConvexResultCallback
+{
+public:
+	LIPhyPrivateConvexcastWorld (LIPhyObject** ignore_array, int ignore_count) :
+		btCollisionWorld::ClosestConvexResultCallback (btVector3 (0.0, 0.0, 0.0), btVector3 (0.0, 0.0, 0.0))
+	{
+		this->ignore_count = ignore_count;
+		this->ignore_array = ignore_array;
+	}
+	virtual btScalar addSingleResult (btCollisionWorld::LocalConvexResult& result, bool world)
+	{
+		int i;
+		LIPhyObject* object;
+		LIPhyPointer* pointer = (LIPhyPointer*) result.m_hitCollisionObject->getUserPointer ();
+		if (pointer->object)
+		{
+			object = (LIPhyObject*) pointer->pointer;
+			for (i = 0 ; i < this->ignore_count ; i++)
+			{
+				if (object == this->ignore_array[i])
+					return 1.0;
+			}
+		}
+		return ClosestConvexResultCallback::addSingleResult (result, world);
+	}
+protected:
+	int ignore_count;
+	LIPhyObject** ignore_array;
+};
+
+class LIPhyPrivateRaycastTerrain : public btTriangleRaycastCallback
+{
+public:
+	LIPhyPrivateRaycastTerrain (const btVector3& a, const btVector3& b) : btTriangleRaycastCallback (a, b)
+	{
+		this->triangle_index = 0;
+	}
+	virtual btScalar reportHit (const btVector3& hitNormalLocal, btScalar hitFraction, int partId, int triangleIndex)
+	{
+		this->triangle_index = triangleIndex;
+		this->normal = hitNormalLocal;
+		return hitFraction;
+	}
+	int triangle_index;
+	btVector3 normal;
+};
+
+class LIPhyPrivateConvexcastTerrain : public btTriangleConvexcastCallback
+{
+public:
+	LIPhyPrivateConvexcastTerrain (const btConvexShape* convexShape, const btTransform& convexShapeFrom, const btTransform& convexShapeTo, const btTransform& triangleToWorld, const btScalar triangleCollisionMargin) :
+		btTriangleConvexcastCallback (convexShape, convexShapeFrom, convexShapeTo, triangleToWorld, triangleCollisionMargin)
+	{
+		this->triangle_index = 0;
+	}
+	virtual btScalar reportHit (const btVector3& hitNormalLocal, const btVector3& hitPointLocal, btScalar hitFraction, int partId, int triangleIndex)
+	{
+		this->triangle_index = triangleIndex;
+		this->normal = hitNormalLocal;
+		this->point = hitPointLocal;
+		return hitFraction;
+	}
+	int triangle_index;
+	btVector3 normal;
+	btVector3 point;
 };
 
 #endif

@@ -15,15 +15,52 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_PHYSICS_H__
-#define __LIPS_PHYSICS_H__
+/**
+ * \addtogroup LIThr Thread
+ * @{
+ * \addtogroup LIThrMutex Mutex
+ * @{
+ */
 
-#include "physics/physics.h"
-#include "physics/physics-constraint.h"
-#include "physics/physics-model.h"
-#include "physics/physics-object.h"
-#include "physics/physics-shape.h"
-#include "physics/physics-terrain.h"
-#include "physics/physics-types.h"
+#include <pthread.h>
+#include <lipsofsuna/system.h>
+#include "thread-mutex.h"
 
-#endif
+struct _LIThrMutex
+{
+	pthread_mutex_t mutex;
+};
+
+LIThrMutex* lithr_mutex_new ()
+{
+	LIThrMutex* self;
+
+	self = lisys_calloc (1, sizeof (LIThrMutex));
+	if (self == NULL)
+		return NULL;
+	pthread_mutex_init (&self->mutex, NULL);
+
+	return self;
+}
+
+void lithr_mutex_free (
+	LIThrMutex* self)
+{
+	pthread_mutex_destroy (&self->mutex);
+	lisys_free (self);
+}
+
+void lithr_mutex_lock (
+	LIThrMutex* self)
+{
+	pthread_mutex_lock (&self->mutex);
+}
+
+void lithr_mutex_unlock (
+	LIThrMutex* self)
+{
+	pthread_mutex_unlock (&self->mutex);
+}
+
+/** @} */
+/** @} */

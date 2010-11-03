@@ -29,7 +29,7 @@ LIPhyControlStatic::LIPhyControlStatic (LIPhyObject* object, btCollisionShape* s
 	LIPhyControl (object, shape),
 	body (0.0, object->motion, shape, btVector3 (0.0, 0.0, 0.0))
 {
-	this->body.setUserPointer (object);
+	this->body.setUserPointer (&object->pointer);
 	this->object->physics->dynamics->addCollisionObject (&this->body,
 		this->object->config.collision_group,
 		this->object->config.collision_mask);

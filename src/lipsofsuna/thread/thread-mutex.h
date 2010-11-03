@@ -15,15 +15,22 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_PHYSICS_H__
-#define __LIPS_PHYSICS_H__
+#ifndef __THREAD_MUTEX_H__
+#define __THREAD_MUTEX_H__
 
-#include "physics/physics.h"
-#include "physics/physics-constraint.h"
-#include "physics/physics-model.h"
-#include "physics/physics-object.h"
-#include "physics/physics-shape.h"
-#include "physics/physics-terrain.h"
-#include "physics/physics-types.h"
+#include <lipsofsuna/system.h>
+
+typedef struct _LIThrMutex LIThrMutex;
+
+LIAPICALL (LIThrMutex*, lithr_mutex_new, ());
+
+LIAPICALL (void, lithr_mutex_free, (
+	LIThrMutex* self));
+
+LIAPICALL (void, lithr_mutex_lock, (
+	LIThrMutex* self));
+
+LIAPICALL (void, lithr_mutex_unlock, (
+	LIThrMutex* self));
 
 #endif

@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIPhy Physics
  * @{
- * \addtogroup LIPhySector Sector
+ * \addtogroup LIPhyShape Shape
  * @{
  */
 
@@ -76,7 +76,7 @@ LIPhyShape* liphy_shape_new (
 	try
 	{
 		self->physics = physics;
-		self->shape = new btCompoundShape ();
+		self->shape = new btCompoundShape (false);
 		self->shape->setUserPointer (self);
 	}
 	catch (...)
@@ -204,10 +204,10 @@ void liphy_shape_clear (
  * \param mass Mass.
  * \param result Return location for the inertia vector.
  */
-void
-liphy_shape_get_inertia (const LIPhyShape* self,
-                         float             mass,
-                         LIMatVector*      result)
+void liphy_shape_get_inertia (
+	const LIPhyShape* self,
+	float             mass,
+	LIMatVector*      result)
 {
 	btVector3 inertia;
 

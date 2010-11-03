@@ -57,10 +57,6 @@ LIAPICALL (LIPhyObject*, liphy_object_scan_sphere, (
 	const LIMatVector* relctr,
 	float              radius));
 
-LIAPICALL (float, liphy_object_sweep, (
-	const LIPhyObject* self,
-	const LIMatVector* sweep));
-
 LIAPICALL (int, liphy_object_sweep_sphere, (
 	LIPhyObject*       self,
 	const LIMatVector* relsrc,

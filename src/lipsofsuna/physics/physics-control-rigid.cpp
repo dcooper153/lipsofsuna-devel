@@ -34,7 +34,7 @@ LIPhyControlRigid::LIPhyControlRigid (LIPhyObject* object, btCollisionShape* sha
 	btVector3 gravity (object->config.gravity.x, object->config.gravity.y, object->config.gravity.z);
 	btVector3 velocity (object->config.velocity.x, object->config.velocity.y, object->config.velocity.z);
 
-	this->body.setUserPointer (object);
+	this->body.setUserPointer (&object->pointer);
 	this->body.setLinearVelocity (velocity);
 	this->body.setAngularVelocity (angular);
 	this->body.setCcdMotionThreshold (PRIVATE_CCD_MOTION_THRESHOLD);

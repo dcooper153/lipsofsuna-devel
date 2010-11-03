@@ -25,80 +25,31 @@
 #include <lipsofsuna/system.h>
 #include "physics.h"
 #include "physics-constraint.h"
+#include "physics-model.h"
 #include "physics-object.h"
 #include "physics-private.h"
+#include "physics-terrain.h"
 
 #define MAXPROXIES 1000000
 
-class RayTestIgnore : public btCollisionWorld::ClosestRayResultCallback
-{
-public:
-	RayTestIgnore (LIPhyObject** ignore_array, int ignore_count, const btVector3& src, const btVector3& dst) :
-		btCollisionWorld::ClosestRayResultCallback (src, dst)
-	{
-		this->ignore_count = ignore_count;
-		this->ignore_array = ignore_array;
-	}
-	virtual btScalar addSingleResult (btCollisionWorld::LocalRayResult& result, bool world)
-	{
-		int i;
-		LIPhyObject* hit = (LIPhyObject*) result.m_collisionObject->getUserPointer ();
-		for (i = 0 ; i < this->ignore_count ; i++)
-		{
-			if (hit == this->ignore_array[i])
-				return 1.0;
-		}
-		return btCollisionWorld::ClosestRayResultCallback::addSingleResult (result, world);
-	}
-protected:
-	int ignore_count;
-	LIPhyObject** ignore_array;
-};
+static bool private_contact_processed (
+	btManifoldPoint& point,
+	void*            body0,
+	void*            body1);
 
-class ConvexTestIgnore : public btCollisionWorld::ClosestConvexResultCallback
-{
-public:
-	ConvexTestIgnore (LIPhyObject** ignore_array, int ignore_count) :
-		btCollisionWorld::ClosestConvexResultCallback (btVector3 (0.0, 0.0, 0.0), btVector3 (0.0, 0.0, 0.0))
-	{
-		this->ignore_count = ignore_count;
-		this->ignore_array = ignore_array;
-	}
-	virtual btScalar addSingleResult (btCollisionWorld::LocalConvexResult& result, bool world)
-	{
-		int i;
-		LIPhyObject* hit = (LIPhyObject*) result.m_hitCollisionObject->getUserPointer ();
-		for (i = 0 ; i < this->ignore_count ; i++)
-		{
-			if (hit == this->ignore_array[i])
-				return 1.0;
-		}
-		return ClosestConvexResultCallback::addSingleResult (result, world);
-	}
-protected:
-	int ignore_count;
-	LIPhyObject** ignore_array;
-};
-
-static bool
-private_contact_processed (btManifoldPoint& cp,
-                           void*            body0,
-                           void*            body1);
-
-static void
-private_internal_tick (btDynamicsWorld* dynamics,
-                       btScalar         step);
+static void private_internal_tick (
+	btDynamicsWorld* dynamics,
+	btScalar         step);
 
 /*****************************************************************************/
 
 /**
  * \brief Creates a new physics simulation.
- *
  * \param callbacks Callback manager.
  * \return New physics simulation or NULL.
  */
-LIPhyPhysics*
-liphy_physics_new (LICalCallbacks* callbacks)
+LIPhyPhysics* liphy_physics_new (
+	LICalCallbacks* callbacks)
 {
 	LIPhyPhysics* self;
 	btVector3 vmin (-65535, -65535, -65535);
@@ -110,11 +61,17 @@ liphy_physics_new (LICalCallbacks* callbacks)
 		return NULL;
 	self->callbacks = callbacks;
 
-	/* Allocation dictionary. */
+	/* Allocation dictionaries. */
+	self->models = lialg_u32dic_new ();
+	if (self->models == NULL)
+	{
+		liphy_physics_free (self);
+		return NULL;
+	}
 	self->objects = lialg_u32dic_new ();
 	if (self->objects == NULL)
 	{
-		lisys_free (self);
+		liphy_physics_free (self);
 		return NULL;
 	}
 
@@ -149,19 +106,26 @@ liphy_physics_new (LICalCallbacks* callbacks)
 
 /**
  * \brief Frees the physics simulation.
- *
  * \param self Physics simulation.
  */
-void
-liphy_physics_free (LIPhyPhysics* self)
+void liphy_physics_free (
+	LIPhyPhysics* self)
 {
 	LIAlgU32dicIter iter;
 
 	lisys_assert (self->contacts == NULL);
 	lisys_assert (self->constraints == NULL);
 
-	LIALG_U32DIC_FOREACH (iter, self->objects)
-		liphy_object_free ((LIPhyObject*) iter.value);
+	if (self->objects != NULL)
+	{
+		LIALG_U32DIC_FOREACH (iter, self->objects)
+			liphy_object_free ((LIPhyObject*) iter.value);
+	}
+	if (self->models != NULL)
+	{
+		LIALG_U32DIC_FOREACH (iter, self->models)
+			liphy_model_free ((LIPhyModel*) iter.value);
+	}
 
 	delete self->dynamics;
 	delete self->solver;
@@ -169,6 +133,7 @@ liphy_physics_free (LIPhyPhysics* self)
 	delete self->dispatcher;
 	delete self->broadphase;
 	delete self->ghostcallback;
+	lialg_u32dic_free (self->models);
 	lialg_u32dic_free (self->objects);
 	lialg_list_free (self->controllers);
 	lisys_free (self);
@@ -202,7 +167,7 @@ int liphy_physics_cast_ray (
 	btVector3 src (start->x, start->y, start->z);
 	btVector3 dst (end->x, end->y, end->z);
 	btCollisionWorld* collision;
-	RayTestIgnore test (ignore_array, ignore_count, src, dst);
+	LIPhyPrivateRaycastWorld test (ignore_array, ignore_count, src, dst);
 
 	/* Cast the ray. */
 	collision = self->dynamics->getCollisionWorld ();
@@ -263,7 +228,8 @@ int liphy_physics_cast_shape (
 	float best;
 	btCollisionWorld* collision;
 	btConvexShape* btshape;
-	ConvexTestIgnore test (ignore_array, ignore_count);
+	LIPhyPrivateConvexcastWorld test (ignore_array, ignore_count);
+	LIPhyPointer* pointer;
 	btTransform btstart (
 		btQuaternion (start->rotation.x, start->rotation.y, start->rotation.z, start->rotation.w),
 		btVector3 (start->position.x, start->position.y, start->position.z));
@@ -284,7 +250,7 @@ int liphy_physics_cast_shape (
 	{
 		btshape = (btConvexShape*) shape->shape->getChildShape (i);
 		collision->convexSweepTest (btshape, btstart, btend, test);
-		if (test.m_closestHitFraction <= best)
+		if (test.m_closestHitFraction <= best && test.m_hitCollisionObject != NULL)
 		{
 			best = test.m_closestHitFraction;
 			result->fraction = test.m_closestHitFraction;
@@ -294,10 +260,19 @@ int liphy_physics_cast_shape (
 			result->point.x = test.m_hitPointWorld[0];
 			result->point.y = test.m_hitPointWorld[1];
 			result->point.z = test.m_hitPointWorld[2];
-			if (test.m_hitCollisionObject != NULL)
-				result->object = (LIPhyObject*) test.m_hitCollisionObject->getUserPointer ();
+			pointer = (LIPhyPointer*) test.m_hitCollisionObject->getUserPointer ();
+			if (pointer->object)
+			{
+				result->object = (LIPhyObject*) pointer->pointer;
+				result->terrain = NULL;
+				result->terrain_index = 0;
+			}
 			else
+			{
 				result->object = NULL;
+				result->terrain = (LIPhyTerrain*) pointer->pointer;
+				result->terrain_index = 0;
+			}
 		}
 	}
 
@@ -315,60 +290,79 @@ int liphy_physics_cast_shape (
  * \param start Cast start point.
  * \param end Cast end point.
  * \param radius Sphere radius.
+ * \param group Collision group.
+ * \param mask Collision mask.
  * \param ignore_array Array of ignored objects.
  * \param ignore_count Number of ignore objects.
  * \param result Return location for collision data.
  * \return Nonzero if a collision occurred.
  */
-int
-liphy_physics_cast_sphere (const LIPhyPhysics* self,
-                           const LIMatVector*  start,
-                           const LIMatVector*  end,
-                           float               radius,
-                           LIPhyObject**       ignore_array,
-                           int                 ignore_count,
-                           LIPhyCollision*     result)
+int liphy_physics_cast_sphere (
+	const LIPhyPhysics* self,
+	const LIMatVector*  start,
+	const LIMatVector*  end,
+	float               radius,
+	int                 group,
+	int                 mask,
+	LIPhyObject**       ignore_array,
+	int                 ignore_count,
+	LIPhyCollision*     result)
 {
 	btCollisionWorld* collision;
 	btTransform btstart (btQuaternion (0.0, 0.0, 0.0, 1.0), btVector3 (start->x, start->y, start->z));
 	btTransform btend (btQuaternion (0.0, 0.0, 0.0, 1.0), btVector3 (end->x, end->y, end->z));
 	btSphereShape shape (radius);
+	LIPhyPointer* pointer;
 
 	/* Initialize sweep. */
-	ConvexTestIgnore test (ignore_array, ignore_count);
+	LIPhyPrivateConvexcastWorld test (ignore_array, ignore_count);
 	test.m_closestHitFraction = 1.0f;
-	test.m_collisionFilterGroup = btBroadphaseProxy::DefaultFilter;
-	test.m_collisionFilterMask = btBroadphaseProxy::AllFilter;
+	test.m_collisionFilterGroup = group;
+	test.m_collisionFilterMask = mask;
 
 	/* Sweep the shape. */
 	collision = self->dynamics->getCollisionWorld ();
 	collision->convexSweepTest (&shape, btstart, btend, test);
-	result->fraction = test.m_closestHitFraction;
-	result->normal.x = test.m_hitNormalWorld[0];
-	result->normal.y = test.m_hitNormalWorld[1];
-	result->normal.z = test.m_hitNormalWorld[2];
-	result->point.x = test.m_hitPointWorld[0];
-	result->point.y = test.m_hitPointWorld[1];
-	result->point.z = test.m_hitPointWorld[2];
-	if (test.m_hitCollisionObject != NULL)
-		result->object = (LIPhyObject*) test.m_hitCollisionObject->getUserPointer ();
-	else
-		result->object = NULL;
+	if (test.m_hitCollisionObject != NULL && test.m_closestHitFraction < 1.0f)
+	{
+		result->fraction = test.m_closestHitFraction;
+		result->normal.x = test.m_hitNormalWorld[0];
+		result->normal.y = test.m_hitNormalWorld[1];
+		result->normal.z = test.m_hitNormalWorld[2];
+		result->point.x = test.m_hitPointWorld[0];
+		result->point.y = test.m_hitPointWorld[1];
+		result->point.z = test.m_hitPointWorld[2];
+		pointer = (LIPhyPointer*) test.m_hitCollisionObject->getUserPointer ();
+		if (pointer->object)
+		{
+			result->object = (LIPhyObject*) pointer->pointer;
+			result->terrain = NULL;
+			result->terrain_index = 0;
+		}
+		else
+		{
+			result->object = NULL;
+			result->terrain = (LIPhyTerrain*) pointer->pointer;
+			result->terrain_index = 0;
+			liphy_terrain_cast_sphere (result->terrain, start, end, radius, result);
+		}
+		return 1;
+	}
 
-	return result->fraction < 1.0f;
+	return 0;
 }
 
 /**
  * \brief Clears all constraints affecting the object.
  *
- * Use by the object class to remove invalid constraints.
+ * Used by the object class to remove invalid constraints.
  *
  * \param self Physics.
  * \param object Object.
  */
-void
-liphy_physics_clear_constraints (LIPhyPhysics* self,
-                                 LIPhyObject*  object)
+void liphy_physics_clear_constraints (
+		LIPhyPhysics* self,
+		LIPhyObject*  object)
 {
 	LIAlgList* ptr;
 	LIAlgList* next;
@@ -395,9 +389,9 @@ liphy_physics_clear_constraints (LIPhyPhysics* self,
  * \param self Physics.
  * \param object Object.
  */
-void
-liphy_physics_clear_contacts (LIPhyPhysics* self,
-                              LIPhyObject*  object)
+void liphy_physics_clear_contacts (
+	LIPhyPhysics* self,
+	LIPhyObject*  object)
 {
 	LIAlgList* ptr;
 	LIAlgList* next;
@@ -418,6 +412,19 @@ liphy_physics_clear_contacts (LIPhyPhysics* self,
 }
 
 /**
+ * \brief Finds a physics model by ID.
+ * \param self Physics simulation.
+ * \param id Model ID.
+ * \return Model or NULL.
+ */
+LIPhyModel* liphy_physics_find_model (
+	LIPhyPhysics* self,
+	uint32_t      id)
+{
+	return (LIPhyModel*) lialg_u32dic_find (self->models, id);
+}
+
+/**
  * \brief Finds a physics object by ID.
  * \param self Physics simulation.
  * \param id Object ID.
@@ -432,13 +439,12 @@ LIPhyObject* liphy_physics_find_object (
 
 /**
  * \brief Updates the physics simulation.
- *
  * \param self Physics simulation.
  * \param secs Tick length in seconds.
  */
-void
-liphy_physics_update (LIPhyPhysics* self,
-                      float         secs)
+void liphy_physics_update (
+	LIPhyPhysics* self,
+	float         secs)
 {
 	LIAlgList* ptr;
 	LIPhyContact contact;
@@ -456,12 +462,14 @@ liphy_physics_update (LIPhyPhysics* self,
 		contact.impulse = record->impulse;
 		contact.point = record->point;
 		contact.normal = record->normal;
-		if (record->object0->config.contact_call != NULL)
+		contact.terrain = record->terrain;
+		contact.terrain_index = record->terrain_index;
+		if (record->object0 != NULL && record->object0->config.contact_call != NULL)
 		{
 			contact.object = record->object1;
 			record->object0->config.contact_call (record->object0, &contact);
 		}
-		if (record->object1->config.contact_call != NULL)
+		if (record->object1 != NULL && record->object1->config.contact_call != NULL)
 		{
 			contact.object = record->object0;
 			record->object1->config.contact_call (record->object1, &contact);
@@ -473,50 +481,71 @@ liphy_physics_update (LIPhyPhysics* self,
 
 /**
  * \brief Gets the userdata of the physics engine.
- *
  * \param self Physics simulation.
  * \return Userdata.
  */
-void*
-liphy_physics_get_userdata (LIPhyPhysics* self)
+void* liphy_physics_get_userdata (
+	LIPhyPhysics* self)
 {
 	return self->userdata;
 }
 
 /**
  * \brief Sets the userdata of the physics engine.
- *
  * \param self Physics simulation.
  * \param data Userdata.
  */
-void
-liphy_physics_set_userdata (LIPhyPhysics* self,
-                            void*         data)
+void liphy_physics_set_userdata (
+	LIPhyPhysics* self,
+	void*         data)
 {
 	self->userdata = data;
 }
 
 /*****************************************************************************/
 
-static bool
-private_contact_processed (btManifoldPoint& point,
-                           void*            body0,
-                           void*            body1)
+static bool private_contact_processed (
+	btManifoldPoint& point,
+	void*            body0,
+	void*            body1)
 {
 	LIMatVector momentum0;
 	LIMatVector momentum1;
-	LIPhyObject* object;
+	LIPhyPhysics* physics = NULL;
+	LIPhyPointer* pointer0;
+	LIPhyPointer* pointer1;
 	LIPhyContactRecord contact;
 	LIPhyContactRecord* tmp;
 
-	/* Get objects. */
-	contact.object0 = (LIPhyObject*)((btCollisionObject*) body0)->getUserPointer ();
-	contact.object1 = (LIPhyObject*)((btCollisionObject*) body1)->getUserPointer ();
-	if (contact.object0 != NULL) object = contact.object0;
-	else if (contact.object1 == NULL) object = contact.object1;
-	else return false;
-	if (contact.object0->config.contact_call == NULL &&
-	    contact.object1->config.contact_call == NULL)
+	/* Get contact information. */
+	memset (&contact, 0, sizeof (LIPhyContactRecord));
+	pointer0 = (LIPhyPointer*)((btCollisionObject*) body0)->getUserPointer ();
+	pointer1 = (LIPhyPointer*)((btCollisionObject*) body1)->getUserPointer ();
+	if (pointer0->object)
+	{
+		contact.object0 = (LIPhyObject*) pointer0->pointer;
+		physics = contact.object0->physics;
+	}
+	else
+	{
+		contact.terrain = (LIPhyTerrain*) pointer0->pointer;
+		contact.terrain_index = contact.terrain->materials.array[point.m_index0];
+	}
+	if (pointer1->object)
+	{
+		contact.object1 = (LIPhyObject*) pointer1->pointer;
+		physics = contact.object0->physics;
+	}
+	else
+	{
+		contact.terrain = (LIPhyTerrain*) pointer1->pointer;
+		contact.terrain_index = contact.terrain->materials.array[point.m_index1];
+	}
+
+	/* Make sure that the contact involved at least one object with a contact
+	   callback before inserting the contact to the queue. */
+	if ((contact.object0 == NULL || contact.object0->config.contact_call == NULL) &&
+	    (contact.object1 == NULL || contact.object1->config.contact_call == NULL))
 		return false;
 
 	/* Get collision point. */
@@ -527,10 +556,20 @@ private_contact_processed (btManifoldPoint& point,
 
 	/* Calculate impulse. */
 	/* FIXME: This is sloppy. */
-	liphy_object_get_velocity (contact.object0, &momentum0);
-	liphy_object_get_velocity (contact.object1, &momentum1);
-	momentum0 = limat_vector_multiply (momentum0, liphy_object_get_mass (contact.object0));
-	momentum1 = limat_vector_multiply (momentum1, liphy_object_get_mass (contact.object1));
+	if (contact.object0 != NULL)
+	{
+		liphy_object_get_velocity (contact.object0, &momentum0);
+		momentum0 = limat_vector_multiply (momentum0, liphy_object_get_mass (contact.object0));
+	}
+	else
+		momentum1 = limat_vector_init (0.0f, 0.0f, 0.0f);
+	if (contact.object1 != NULL)
+	{
+		liphy_object_get_velocity (contact.object1, &momentum1);
+		momentum1 = limat_vector_multiply (momentum1, liphy_object_get_mass (contact.object1));
+	}
+	else
+		momentum1 = limat_vector_init (0.0f, 0.0f, 0.0f);
 	contact.impulse = limat_vector_get_length (limat_vector_subtract (momentum0, momentum1));
 
 	/* Manipulating the physics state in the contact callback is dangerous
@@ -539,15 +578,15 @@ private_contact_processed (btManifoldPoint& point,
 	if (tmp == NULL)
 		return false;
 	*tmp = contact;
-	if (!lialg_list_prepend (&object->physics->contacts, tmp))
+	if (!lialg_list_prepend (&physics->contacts, tmp))
 		lisys_free (tmp);
 
 	return false;
 }
 
-static void
-private_internal_tick (btDynamicsWorld* dynamics,
-                       btScalar         step)
+static void private_internal_tick (
+	btDynamicsWorld* dynamics,
+	btScalar         step)
 {
 }
 

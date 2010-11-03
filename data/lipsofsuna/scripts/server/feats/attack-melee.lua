@@ -8,6 +8,7 @@ feat.func = function(self, args)
 			feat = self,
 			point = r.point,
 			target = r.object,
+			tile = r.tile,
 			weapon = weapon}
 	end}
 end

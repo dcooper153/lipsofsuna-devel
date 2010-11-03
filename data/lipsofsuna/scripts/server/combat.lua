@@ -7,24 +7,27 @@ Combat = Class()
 --   <li>feat: Used feat.</li>
 --   <li>point: Hit point in world space.</li>
 --   <li>target: Attacked creature.</li>
+--   <li>tile: Attacked tile or nil.</li>
 --   <li>weapon: Used weapon.</li></ul>
 Combat.apply_melee_hit = function(clss, args)
-	-- Terrain hits.
-	if not args.target then
-		if args.weapon and args.weapon.itemspec.name == "mattock" then
-			Voxel:damage(args.point, args.damage, "mattock")
-		end
-		return
-	end
 	-- Effects.
-	args.target:effect{effect = "thud-000"}
-	if args.point then Particles:create(args.point, "default") end
+	if args.target then
+		args.target:effect{effect = "thud-000"}
+		if args.point then Particles:create(args.point, "default") end
+	end
 	-- Impulse.
-	if args.attacker then
+	if args.target and args.attacker then
 		args.target:impulse{impulse = args.attacker.rotation * Vector(0, 0, -100)}
 	end
 	-- Damage target.
-	args.target:damaged(clss:calculate_melee_damage(args))
+	if args.target then
+		args.target:damaged(clss:calculate_melee_damage(args))
+	end
+	if args.tile then
+		if args.weapon and args.weapon.itemspec.name == "mattock" then
+			Voxel:damage(args.tile, args.damage, "mattock")
+		end
+	end
 end
 
 --- Applies ranged damage.
@@ -34,7 +37,8 @@ end
 --   <li>feat: Used feat.</li>
 --   <li>point: Hit point in world space.</li>
 --   <li>projectile: Fired object. (required)</li>
---   <li>target: Attacked creature.</li></ul>
+--   <li>target: Attacked object or nil.</li>
+--   <li>tile: Attacked tile or nil.</li></ul>
 Combat.apply_ranged_hit = function(clss, args)
 	-- Effects.
 	if args.target then
@@ -48,6 +52,9 @@ Combat.apply_ranged_hit = function(clss, args)
 	-- Damage target.
 	if args.target then
 		args.target:damaged(clss:calculate_ranged_damage(args))
+	end
+	if args.tile then
+		-- TODO: Terrain hits
 	end
 	-- Destroy projectile.
 	if args.projectile then

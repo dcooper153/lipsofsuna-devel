@@ -24,6 +24,20 @@
 
 #include "ext-module.h"
 
+static int private_model_changed (
+	LIExtModule* self,
+	LIEngModel*  model);
+
+static int private_model_free (
+	LIExtModule* self,
+	LIEngModel*  model);
+
+static int private_model_new (
+	LIExtModule* self,
+	LIEngModel*  model);
+
+/*****************************************************************************/
+
 LIMaiExtensionInfo liext_physics_info =
 {
 	LIMAI_EXTENSION_VERSION, "Physics",
@@ -60,6 +74,15 @@ LIExtModule* liext_physics_new (
 	/* Register classes. */
 	liscr_script_create_class (program->script, "Physics", liext_script_physics, self);
 
+	/* Register callbacks. */
+	if (!lical_callbacks_insert (program->callbacks, program->engine, "model-changed", 1, private_model_changed, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "model-free", 1, private_model_free, self, self->calls + 1) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "model-new", 1, private_model_new, self, self->calls + 2))
+	{
+		liext_physics_free (self);
+		return NULL;
+	}
+
 	return self;
 }
 
@@ -74,7 +97,55 @@ void liext_physics_free (
 	if (self->physics != NULL)
 		liphy_physics_free (self->physics);
 
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
+}
+
+/*****************************************************************************/
+
+static int private_model_changed (
+	LIExtModule* self,
+	LIEngModel*  model)
+{
+	LIPhyModel* model_;
+
+	lisys_assert (model != NULL);
+
+	model_ = liphy_physics_find_model (self->physics, model->id);
+	if (model_ != NULL)
+		liphy_model_set_model (model_, model->model);
+
+	return 1;
+}
+
+static int private_model_free (
+	LIExtModule* self,
+	LIEngModel*  model)
+{
+	LIPhyModel* model_;
+
+	lisys_assert (model != NULL);
+
+	model_ = liphy_physics_find_model (self->physics, model->id);
+	if (model_ != NULL)
+		liphy_model_free (model_);
+
+	return 1;
+}
+
+static int private_model_new (
+	LIExtModule* self,
+	LIEngModel*  model)
+{
+	LIPhyModel* model_;
+
+	lisys_assert (model != NULL);
+
+	model_ = liphy_physics_find_model (self->physics, model->id);
+	if (model_ == NULL)
+		liphy_model_new (self->physics, model->model, model->id);
+
+	return 1;
 }
 
 /** @} */

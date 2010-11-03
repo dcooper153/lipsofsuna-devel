@@ -126,7 +126,8 @@ Item.fire = function(self, args)
 					feat = Feat:find{name = "attack"},
 					point = result.point,
 					projectile = proj,
-					target = result.object}
+					target = result.object,
+					tile = result.tile}
 			end
 		end
 		if args.timer then

@@ -40,28 +40,34 @@ typedef enum _LIPhyControlMode LIPhyControlMode;
 typedef struct _LIPhyCollision LIPhyCollision;
 typedef struct _LIPhyConstraint LIPhyConstraint;
 typedef struct _LIPhyContact LIPhyContact;
+typedef struct _LIPhyModel LIPhyModel;
 typedef struct _LIPhyObject LIPhyObject;
 typedef struct _LIPhyPhysics LIPhyPhysics;
 typedef struct _LIPhySector LIPhySector;
 typedef struct _LIPhyShape LIPhyShape;
+typedef struct _LIPhyTerrain LIPhyTerrain;
 typedef void (*LIPhyCallback)(LIPhyObject* self, float secs);
 typedef void (*LIPhyContactCall)(LIPhyObject* self, LIPhyContact* contact);
 typedef void (*LIPhyTransformCall)(LIPhyObject* object);
 
 struct _LIPhyContact
 {
+	int terrain_index;
 	float impulse;
 	LIMatVector point;
 	LIMatVector normal;
 	LIPhyObject* object;
+	LIPhyTerrain* terrain;
 };
 
 struct _LIPhyCollision
 {
+	int terrain_index;
 	float fraction;
 	LIMatVector normal;
 	LIMatVector point;
 	LIPhyObject* object;
+	LIPhyTerrain* terrain;
 };
 
 #endif

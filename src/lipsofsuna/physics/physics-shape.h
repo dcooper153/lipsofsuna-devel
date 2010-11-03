@@ -24,10 +24,6 @@
 #include "physics.h"
 #include "physics-types.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 LIAPICALL (LIPhyShape*, liphy_shape_new, (
 	LIPhyPhysics* physics));
 
@@ -70,9 +66,5 @@ LIAPICALL (void, liphy_shape_get_inertia, (
 LIAPICALL (int, liphy_shape_set_model, (
 	LIPhyShape*       self,
 	const LIMdlModel* model));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

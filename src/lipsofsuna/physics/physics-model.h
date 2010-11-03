@@ -15,15 +15,27 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_PHYSICS_H__
-#define __LIPS_PHYSICS_H__
+#ifndef __PHYSICS_MODEL_H__
+#define __PHYSICS_MODEL_H__
 
-#include "physics/physics.h"
-#include "physics/physics-constraint.h"
-#include "physics/physics-model.h"
-#include "physics/physics-object.h"
-#include "physics/physics-shape.h"
-#include "physics/physics-terrain.h"
-#include "physics/physics-types.h"
+#include <lipsofsuna/model.h>
+#include <lipsofsuna/system.h>
+#include "physics-types.h"
+
+LIAPICALL (LIPhyModel*, liphy_model_new, (
+	LIPhyPhysics* physics,
+	LIMdlModel*   model,
+	int           id));
+
+LIAPICALL (void, liphy_model_free, (
+	LIPhyModel* self));
+
+LIAPICALL (int, liphy_model_build, (
+	LIPhyModel* self,
+	int         terrain));
+
+LIAPICALL (int, liphy_model_set_model, (
+	LIPhyModel* self,
+	LIMdlModel* model));
 
 #endif

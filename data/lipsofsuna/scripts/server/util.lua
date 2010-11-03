@@ -6,8 +6,8 @@ Actions.register = function(self, args)
 end
 
 Config = {}
-Config.center = Vector(2048, 2048, 2048)
-Config.spawn = Vector(2048, 2035, 2048)
+Config.center = Vector(1024, 1024, 1024)
+Config.spawn = Vector(1024, 1026, 1024)
 
 Config.tilewidth = 32 / Voxel.tiles_per_line
 Config.tilescale = 1 / Config.tilewidth
@@ -60,7 +60,7 @@ Voxel.player_contact = function(self, player, point)
 	while true do
 		local t,c = Voxel:find_voxel{point = point, match = "full"}
 		if not c or (c - point).length > 3 then break end
-		local m = Voxel:find_material{id = t.terrain}
+		local m = Material:find{id = t.terrain}
 		if not m then break end
 		if m.name == "trapdoor-000" then
 			Voxel:erase{point = c}
@@ -75,37 +75,36 @@ Voxel.player_contact = function(self, player, point)
 end
 
 Voxel.damage = function(self, point, damage)
-	local t,p = Voxel:find_tile{point = point, match = "full"}
-	if p then
-		damage = 86
-		if t.damage + damage > 255 then
+	local t = Voxel:get_tile{point = point}
+	damage = 86
+	if t.damage + damage > 255 then
 
-			local m = Voxel:find_material{id = t.terrain}
-			if m then
-				if m.name == "crystal-000" then
-					t.damage = 0
-					t.terrain = t.terrain + 1
-					Voxel:set_tile{point = p, tile = t}
-					--Effect("shatter-000", c)
-					return
-				end
-				if m.name == "crystal-001" then
-					t.terrain = 0
-					Voxel:set_tile{point = p, tile = t}
-					return
-				end
+		local m = Material:find{id = t.terrain}
+		if m then
+			if m.name == "crystal-000" then
+				t.damage = 0
+				t.terrain = t.terrain + 1
+				Voxel:set_tile{point = point, tile = t}
+				--Effect("shatter-000", c)
+				return
 			end
-
-			t.terrain = 0
-			Voxel:set_tile{point = p, tile = t}
-			--Effect("crack-000", result.point)
-			if math.random(10) == 1 then
-				Item:create{name = "gem", position = c, realized = true}
+			if m.name == "crystal-001" then
+				t.terrain = 0
+				Voxel:set_tile{point = point, tile = t}
+				return
 			end
-
-		else
-			t.damage = t.damage + damage
-			Voxel:set_tile{point = p, tile = t}
 		end
+
+		t.terrain = 0
+		Voxel:set_tile{point = point, tile = t}
+		--Effect("crack-000", result.point)
+		if math.random(10) == 1 then
+			local offset = Vector(math.random(), math.random(), math.random())
+			Item:create{name = "gem", position = (point + offset) * Config.tilewidth, realized = true}
+		end
+
+	else
+		t.damage = t.damage + damage
+		Voxel:set_tile{point = point, tile = t}
 	end
 end

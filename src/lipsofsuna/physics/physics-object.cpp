@@ -27,19 +27,6 @@
 
 #define PRIVATE_REALIZED 0x0200
 
-static float private_sweep_shape (
-	const LIPhyObject* self,
-	const btTransform& start,
-	const btVector3&   sweep,
-	btVector3*         normal);
-
-static int private_sweep_sphere (
-	const LIPhyObject* self,
-	btConvexShape*     shape,
-	const btTransform& start,
-	const btTransform& end,
-	LIPhyCollision*    result);
-
 static void private_update_state (
 	LIPhyObject* self);
 
@@ -70,6 +57,8 @@ LIPhyObject* liphy_object_new (
 	self->physics = physics;
 	self->id = id;
 	self->shape = shape;
+	self->pointer.object = 1;
+	self->pointer.pointer = self;
 	self->control_mode = control_mode;
 	self->config.gravity = limat_vector_init (0.0f, -10.0f, 0.0f);
 	self->config.mass = 10.0f;
@@ -249,28 +238,6 @@ void liphy_object_jump (
 }
 
 /**
- * \brief Performs a sweep test.
- *
- * Tests how far the object could move along the given sweep vector before
- * hitting an obstacle. Multiplying the sweep vector by the return value
- * yields a displacement vector that causes the object to move until it hits
- * an obstacle or the end of the sweep vector.
- *
- * \param self Object.
- * \param sweep Sweep vector.
- * \return Fraction swept before hitting an obstacle.
- */
-float liphy_object_sweep (
-	const LIPhyObject* self,
-	const LIMatVector* sweep)
-{
-	btTransform transform;
-
-	self->motion->getWorldTransform (transform);
-	return private_sweep_shape (self, transform, btVector3 (sweep->x, sweep->y, sweep->z), NULL);
-}
-
-/**
  * \brief Performs a sweep test with a sphere.
  *
  * This function is a handy for things like melee attack checks since
@@ -291,30 +258,18 @@ int liphy_object_sweep_sphere (
 	float              radius,
 	LIPhyCollision*    result)
 {
-	int ret;
-	btTransform transform;
-	btTransform start (btQuaternion (0.0, 0.0, 0.0, 1.0), btVector3 (relsrc->x, relsrc->y, relsrc->z));
-	btTransform end (btQuaternion (0.0, 0.0, 0.0, 1.0), btVector3 (reldst->x, reldst->y, reldst->z));
-	btSphereShape shape (radius);
+	LIMatTransform transform;
+	LIMatVector start;
+	LIMatVector end;
 
-	self->motion->getWorldTransform (transform);
-	start = transform * start;
-	end = transform * end;
+	if (self->control == NULL)
+		return 0;
+	liphy_object_get_transform (self, &transform);
+	start = limat_transform_transform (transform, *relsrc);
+	end = limat_transform_transform (transform, *reldst);
 
-	btVector3 center = transform.getOrigin ();
-	btVector3 origin0 = start.getOrigin ();
-	btVector3 origin1 = end.getOrigin ();
-	start.setOrigin (btVector3 (
-		center[0] + (origin0[0] - center[0]),
-		center[1] + (origin0[1] - center[1]),
-		center[2] + (origin0[2] - center[2])));
-	end.setOrigin (btVector3 (
-		center[0] + (origin1[0] - center[0]),
-		center[1] + (origin1[1] - center[1]),
-		center[2] + (origin1[2] - center[2])));
-
-	ret = private_sweep_sphere (self, &shape, start, end, result);
-	return ret;
+	return liphy_physics_cast_sphere (self->physics, &start, &end, radius,
+		btBroadphaseProxy::DefaultFilter, btBroadphaseProxy::AllFilter, &self, 1, result);
 }
 
 /**
@@ -844,116 +799,6 @@ void liphy_object_set_velocity (
 }
 
 /*****************************************************************************/
-
-class PrivateConvexTest : public btCollisionWorld::ClosestConvexResultCallback
-{
-public:
-	PrivateConvexTest (btCollisionObject* self) :
-		btCollisionWorld::ClosestConvexResultCallback (btVector3 (0.0, 0.0, 0.0), btVector3 (0.0, 0.0, 0.0))
-	{
-		this->self = self;
-	}
-	virtual btScalar addSingleResult (btCollisionWorld::LocalConvexResult& result, bool world)
-	{
-		if (result.m_hitCollisionObject == self)
-			return 1.0;
-		return ClosestConvexResultCallback::addSingleResult (result, world);
-	}
-protected:
-	btCollisionObject* self;
-};
-
-static int private_sweep_sphere (
-	const LIPhyObject* self,
-	btConvexShape*     shape,
-	const btTransform& start,
-	const btTransform& end,
-	LIPhyCollision*    result)
-{
-	btTransform src;
-	btTransform dst;
-	btCollisionObject* object;
-	btCollisionWorld* collision;
-
-	/* Get own object. */
-	if (self->control == NULL)
-		return 0;
-	object = self->control->get_object ();
-	if (object == NULL)
-		return 0;
-
-	/* Initialize sweep. */
-	PrivateConvexTest test (object);
-	test.m_closestHitFraction = 1.0f;
-	test.m_collisionFilterGroup = btBroadphaseProxy::DefaultFilter;
-	test.m_collisionFilterMask = btBroadphaseProxy::AllFilter;
-
-	/* Sweep the shape. */
-	collision = self->physics->dynamics->getCollisionWorld ();
-	collision->convexSweepTest (shape, start, end, test);
-	result->fraction = test.m_closestHitFraction;
-	result->normal.x = test.m_hitNormalWorld[0];
-	result->normal.y = test.m_hitNormalWorld[1];
-	result->normal.z = test.m_hitNormalWorld[2];
-	result->point.x = test.m_hitPointWorld[0];
-	result->point.y = test.m_hitPointWorld[1];
-	result->point.z = test.m_hitPointWorld[2];
-	if (test.m_hitCollisionObject != NULL)
-		result->object = (LIPhyObject*) test.m_hitCollisionObject->getUserPointer ();
-	else
-		result->object = NULL;
-
-	return result->fraction < 1.0f;
-}
-
-static float private_sweep_shape (
-	const LIPhyObject* self,
-	const btTransform& start,
-	const btVector3&   sweep,
-	btVector3*         normal)
-{
-	int i;
-	btTransform src;
-	btTransform dst;
-	btCollisionObject* object;
-	btCollisionWorld* collision;
-	btConvexShape* shape;
-
-	/* Get own object. */
-	if (self->control == NULL)
-		return 1.0f;
-	object = self->control->get_object ();
-	if (object == NULL)
-		return 1.0f;
-	if (self->shape->shape->getNumChildShapes () == 0)
-		return 1.0f;
-
-	/* Initialize sweep. */
-	float best = 1.0f;
-	PrivateConvexTest test (object);
-	test.m_closestHitFraction = 1.0f;
-	test.m_collisionFilterGroup = self->config.collision_group;
-	test.m_collisionFilterMask = self->config.collision_mask;
-
-	/* Sweep the shape. */
-	for (i = 0 ; i < self->shape->shape->getNumChildShapes () ; i++)
-	{
-		collision = self->physics->dynamics->getCollisionWorld ();
-		shape = (btConvexShape*) self->shape->shape->getChildShape (i);
-		src = start;
-		dst = src;
-		dst.setOrigin (dst.getOrigin () + sweep);
-		collision->convexSweepTest (shape, src, dst, test);
-		if (test.m_closestHitFraction <= best)
-		{
-			best = test.m_closestHitFraction;
-			if (normal != NULL)
-				*normal = test.m_hitNormalWorld;
-		}
-	}
-
-	return best;
-}
 
 static void private_update_state (
 	LIPhyObject* self)

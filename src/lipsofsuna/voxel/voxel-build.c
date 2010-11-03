@@ -29,31 +29,35 @@
 #define CULL_EPSILON 0.01f
 #define MISSING_HEIGHT -10.0f
 
+/* The builder isn't completely thread-safe at the moment. The biggest issue is
+   that material data is queried from the voxel manager without locking. Our
+   current scripts don't edit the materials after initialization so it works,
+   but it needs to be fixed in the future. */
+#warning Thread-safety issues in terrain builder
+
 typedef struct _LIVoxVoxelB LIVoxVoxelB;
 struct _LIVoxVoxelB
 {
 	int mask;
+	int index;
 	float height;
 	LIEngModel* model;
 	LIMatTransform transform;
 	LIVoxMaterial* material;
 };
 
-typedef struct _LIVoxBuilder LIVoxBuilder;
 struct _LIVoxBuilder
 {
-	int xsize;
-	int ysize;
-	int zsize;
-	int xstep;
-	int ystep;
-	int zstep;
+	int offset[3];
+	int size[3];
+	int step[3];
 	char* occlud;
+	float tile_width;
 	float vertex_scale;
 	LIAlgMemdic* accel;
 	LIEngEngine* engine;
 	LIMdlModel* model;
-	LIPhyShape* physics;
+	LIPhyTerrain* physics;
 	LIPhyPhysics* physics_manager;
 	LIVoxManager* manager;
 	LIVoxVoxel* voxels;
@@ -65,17 +69,11 @@ private_build (LIVoxBuilder* self,
                int           model,
                int           physics);
 
-static void
-private_merge_height_model (LIVoxBuilder* self,
-                            LIVoxVoxelB*  voxel,
-                            LIMatVector   botco[3][3],
-                            LIMatVector   topco[3][3]);
-
-static void
-private_merge_height_physics (LIVoxBuilder* self,
-                              LIVoxVoxelB*  voxel,
-                              LIMatVector   botco[3][3],
-                              LIMatVector   topco[3][3]);
+static void private_merge_height (
+	LIVoxBuilder* self,
+	LIVoxVoxelB*  voxel,
+	LIMatVector   botco[3][3],
+	LIMatVector   topco[3][3]);
 
 static int
 private_merge_tile_model (LIVoxBuilder* self,
@@ -93,6 +91,12 @@ static int
 private_merge_vertex (LIVoxBuilder* self,
                       LIVoxVoxelB*  voxel,
                       LIMdlVertex*  vertex);
+
+static void private_merge_triangle (
+	LIVoxBuilder* self,
+	LIVoxVoxelB*  voxel,
+	int           group,
+	LIMdlVertex*  verts);
 
 static int
 private_occlude_face (LIVoxBuilder* self,
@@ -119,7 +123,7 @@ private_solve_height_4 (LIVoxBuilder* self,
 
 /*****************************************************************************/
 
-int livox_build_area (
+LIVoxBuilder* livox_builder_new (
 	LIVoxManager* manager,
 	LIEngEngine*  engine,
 	LIPhyPhysics* physics,
@@ -128,9 +132,62 @@ int livox_build_area (
 	int           zstart,
 	int           xsize,
 	int           ysize,
-	int           zsize,
-	LIMdlModel**  result_model,
-	LIPhyShape**  result_physics)
+	int           zsize)
+{
+	LIVoxBuilder* self;
+
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (LIVoxBuilder));
+	if (self == NULL)
+		return NULL;
+	self->manager = manager;
+	self->engine = engine;
+	self->physics_manager = physics;
+	self->tile_width = manager->tile_width;
+	self->vertex_scale = manager->tile_width * 0.5f;
+	self->offset[0] = xstart;
+	self->offset[1] = ystart;
+	self->offset[2] = zstart;
+	self->size[0] = xsize + 2;
+	self->size[1] = ysize + 2;
+	self->size[2] = zsize + 2;
+	self->step[0] = 1;
+	self->step[1] = self->size[0];
+	self->step[2] = self->size[0] * self->size[1];
+	self->occlud = lisys_calloc (self->size[0] * self->size[1] * self->size[2], sizeof (char));
+	self->voxels = lisys_calloc (self->size[0] * self->size[1] * self->size[2], sizeof (LIVoxVoxel));
+	self->voxelsb = lisys_calloc (self->size[0] * self->size[1] * self->size[2], sizeof (LIVoxVoxelB));
+	if (self->occlud == NULL || self->voxels == NULL || self->voxelsb == NULL)
+	{
+		lisys_free (self->occlud);
+		lisys_free (self->voxels);
+		lisys_free (self->voxelsb);
+		lisys_free (self);
+		return NULL;
+	}
+
+	/* Fetch terrain data. */
+	/* This is done in the initializer so that the builder doesn't need to
+	   reference to external data. This helps with thread-safety. */
+	livox_manager_copy_voxels (manager, xstart - 1, ystart - 1, zstart - 1,
+		self->size[0], self->size[1], self->size[2], self->voxels);
+
+	return self;
+}
+
+void livox_builder_free (
+	LIVoxBuilder* self)
+{
+	lisys_free (self->occlud);
+	lisys_free (self->voxels);
+	lisys_free (self->voxelsb);
+	lisys_free (self);
+}
+
+int livox_builder_build (
+	LIVoxBuilder*  self,
+	LIMdlModel**   result_model,
+	LIPhyTerrain** result_physics)
 {
 	int i;
 	int x;
@@ -142,149 +199,108 @@ int livox_build_area (
 	LIMatVector vector;
 	LIVoxMaterial* material;
 	LIVoxVoxel* voxel;
-	LIVoxBuilder self;
 
 	/* Allocate temporary data. */
 	count = 0;
-	memset (&self, 0, sizeof (LIVoxBuilder));
-	self.manager = manager;
-	self.engine = engine;
-	self.physics_manager = physics;
-	self.vertex_scale = manager->tile_width * 0.5f;
-	self.xsize = xsize + 2;
-	self.ysize = ysize + 2;
-	self.zsize = zsize + 2;
-	self.xstep = 1;
-	self.ystep = self.xsize;
-	self.zstep = self.xsize * self.ysize;
-	self.occlud = lisys_calloc (self.xsize * self.ysize * self.zsize, sizeof (char));
-	self.voxels = lisys_calloc (self.xsize * self.ysize * self.zsize, sizeof (LIVoxVoxel));
-	self.voxelsb = lisys_calloc (self.xsize * self.ysize * self.zsize, sizeof (LIVoxVoxelB));
-	if (self.occlud == NULL || self.voxels == NULL || self.voxelsb == NULL)
-	{
-		lisys_free (self.occlud);
-		lisys_free (self.voxels);
-		lisys_free (self.voxelsb);
-		return 0;
-	}
-
-	/* Fetch surrounding voxel data. */
-	livox_manager_copy_voxels (manager, xstart - 1, ystart - 1, zstart - 1,
-		self.xsize, self.ysize, self.zsize, self.voxels);
 
 	/* Calculate occlusion information. */
-	i = livox_build_occlusion (manager, self.xsize, self.ysize, self.zsize, self.voxels, self.occlud);
-	if (i == xsize * ysize * zsize)
+	i = livox_build_occlusion (self->manager, self->size[0], self->size[1], self->size[2], self->voxels, self->occlud);
+	if (i == (self->size[0] - 2) * (self->size[1] - 2) * (self->size[2] - 2))
 	{
 		if (result_model != NULL) *result_model = NULL;
 		if (result_physics != NULL) *result_physics = NULL;
-		lisys_free (self.occlud);
-		lisys_free (self.voxels);
-		lisys_free (self.voxelsb);
 		return 1;
 	}
 
 	/* Calculate area offset. */
-	offset = limat_vector_init (xstart - 1, ystart - 1, zstart - 1);
-	offset = limat_vector_multiply (offset, manager->tile_width);
+	offset = limat_vector_init (self->offset[0] - 1, self->offset[1] - 1, self->offset[2] - 1);
+	offset = limat_vector_multiply (offset, self->tile_width);
 
 	/* Precalculate useful information on voxels. */
-	for (z = 0 ; z < self.zsize ; z++)
-	for (y = 0 ; y < self.ysize ; y++)
-	for (x = 0 ; x < self.xsize ; x++)
+	for (z = 0 ; z < self->size[2] ; z++)
+	for (y = 0 ; y < self->size[1] ; y++)
+	for (x = 0 ; x < self->size[0] ; x++)
 	{
-		i = x + y * self.ystep + z * self.zstep;
-		self.voxelsb[i].height = MISSING_HEIGHT;
+		i = x + y * self->step[1] + z * self->step[2];
+		self->voxelsb[i].height = MISSING_HEIGHT;
 
 		/* Type check. */
-		voxel = self.voxels + i;
+		voxel = self->voxels + i;
 		if (!voxel->type)
 			continue;
 
 		/* Material check. */
-		material = livox_manager_find_material (manager, voxel->type);
+		material = livox_manager_find_material (self->manager, voxel->type);
 		if (material == NULL)
 			continue;
-		self.voxelsb[i].material = material;
+		self->voxelsb[i].material = material;
 
 		/* Cache model. */
 		if (material->type == LIVOX_MATERIAL_TYPE_TILE)
 		{
-			self.voxelsb[i].model = material->model;
-			self.voxelsb[i].height = 1.0f;
+			self->voxelsb[i].model = material->model;
+			self->voxelsb[i].height = 1.0f;
 		}
 
 		/* Cache height. */
 		if (material->type == LIVOX_MATERIAL_TYPE_HEIGHT)
-			self.voxelsb[i].height = livox_voxel_get_height (voxel);
+			self->voxelsb[i].height = livox_voxel_get_height (voxel);
 
 		/* Cache transformation. */
 		vector = limat_vector_init (x + 0.5f, y + 0.5f, z + 0.5f);
-		vector = limat_vector_multiply (vector, manager->tile_width);
-		self.voxelsb[i].transform.position = limat_vector_add (vector, offset);
-		livox_voxel_get_quaternion (voxel, &self.voxelsb[i].transform.rotation);
+		vector = limat_vector_multiply (vector, self->tile_width);
+		self->voxelsb[i].transform.position = limat_vector_add (vector, offset);
+		livox_voxel_get_quaternion (voxel, &self->voxelsb[i].transform.rotation);
 
 		/* Occlusion check. */
-		if (!(self.occlud[i] & LIVOX_OCCLUDE_OCCLUDED))
+		if (!(self->occlud[i] & LIVOX_OCCLUDE_OCCLUDED))
 			count++;
-		self.voxelsb[i].mask = self.occlud[i];
+		self->voxelsb[i].mask = self->occlud[i];
+	}
+
+	/* Store voxel coordinates so that we can save them to collision
+	   objects and then later use them to determine the exact tile hit. */
+	for (z = 0 ; z < self->size[2] - 2 ; z++)
+	for (y = 0 ; y < self->size[1] - 2 ; y++)
+	for (x = 0 ; x < self->size[0] - 2 ; x++)
+	{
+		i = (x + 1) + (y + 1) * self->step[1] + (z + 1) * self->step[2];
+		self->voxelsb[i].index = x + y * (self->size[0] - 2) + z * (self->size[0] - 2) * (self->size[1] - 2);
 	}
 
 	/* Build mesh and/or physics. */
 	ret = 1;
 	if (count)
 	{
-		ret = private_build (&self, result_model != NULL, result_physics != NULL);
+		ret = private_build (self, result_model != NULL, result_physics != NULL);
 		if (ret)
 		{
 			if (result_physics != NULL)
-				*result_physics = self.physics;
+				*result_physics = self->physics;
 			if (result_model != NULL)
-				*result_model = self.model;
+				*result_model = self->model;
 		}
 		else
 		{
-			if (self.physics != NULL)
-				liphy_shape_free (self.physics);
-			if (self.model != NULL)
-				limdl_model_free (self.model);
+			if (self->physics != NULL)
+				liphy_terrain_free (self->physics);
+			if (self->model != NULL)
+				limdl_model_free (self->model);
 		}
 	}
 
-	/* Free temporary data. */
-	lisys_free (self.occlud);
-	lisys_free (self.voxels);
-	lisys_free (self.voxelsb);
-
 	return ret;
-}
-
-int livox_build_block (
-	LIVoxManager*         manager,
-	LIEngEngine*          engine,
-	LIPhyPhysics*         physics,
-	const LIVoxBlockAddr* addr,
-	LIMdlModel**          result_model,
-	LIPhyShape**          result_physics)
-{
-	int blockw = manager->tiles_per_line / manager->blocks_per_line;
-
-	return livox_build_area (manager, engine, physics,
-		manager->tiles_per_line * addr->sector[0] + blockw * addr->block[0],
-		manager->tiles_per_line * addr->sector[1] + blockw * addr->block[1],
-		manager->tiles_per_line * addr->sector[2] + blockw * addr->block[2],
-		blockw, blockw, blockw, result_model, result_physics);
 }
 
 /**
  * \brief Solves occlusion masks for a volume of voxels.
  *
  * \param manager Voxel manager.
- * \param xsize Number of voxels.
- * \param ysize Number of voxels.
- * \param zsize Number of voxels.
+ * \param size[0] Number of voxels.
+ * \param size[1] Number of voxels.
+ * \param size[2] Number of voxels.
  * \param voxels Array of voxels in the volume.
- * \param result Buffer with room for xsize*ysize*zsize integers.
+ * \param result Buffer with room for size[0]*size[1]*size[2] integers.
  * \return Number of completely occluded voxels.
  */
 int livox_build_occlusion (
@@ -350,6 +366,7 @@ private_build (LIVoxBuilder* self,
 	int y;
 	int z;
 	int ret = 1;
+	int size[3];
 	LIMatVector botco[3][3];
 	LIMatVector topco[3][3];
 	LIVoxVoxelB* voxel;
@@ -363,11 +380,11 @@ private_build (LIVoxBuilder* self,
 	}
 
 	/* Build all voxels inside the area. */
-	for (z = 1 ; z < self->zsize - 1 ; z++)
-	for (y = 1 ; y < self->ysize - 1 ; y++)
-	for (x = 1 ; x < self->xsize - 1 ; x++)
+	for (z = 1 ; z < self->size[2] - 1 ; z++)
+	for (y = 1 ; y < self->size[1] - 1 ; y++)
+	for (x = 1 ; x < self->size[0] - 1 ; x++)
 	{
-		voxel = self->voxelsb + x + y * self->ystep + z * self->zstep;
+		voxel = self->voxelsb + x + y * self->step[1] + z * self->step[2];
 		if (voxel->material == NULL)
 			continue;
 
@@ -380,7 +397,11 @@ private_build (LIVoxBuilder* self,
 		}
 		if (physics && self->physics == NULL && self->physics_manager != NULL)
 		{
-			self->physics = liphy_shape_new (self->physics_manager);
+			size[0] = self->size[0] - 2;
+			size[1] = self->size[1] - 2;
+			size[2] = self->size[2] - 2;
+			self->physics = liphy_terrain_new (self->physics_manager, self->offset, size,
+				LIPHY_GROUP_TILES, LIPHY_DEFAULT_COLLISION_MASK & ~LIPHY_GROUP_TILES);
 			if (self->physics == NULL)
 				ret = 0;
 		}
@@ -398,10 +419,7 @@ private_build (LIVoxBuilder* self,
 		if (voxel->material->type == LIVOX_MATERIAL_TYPE_HEIGHT)
 		{
 			private_solve_coords (self, voxel, botco, topco);
-			if (self->model != NULL)
-				private_merge_height_model (self, voxel, botco, topco);
-			if (self->physics != NULL)
-				private_merge_height_physics (self, voxel, botco, topco);
+			private_merge_height (self, voxel, botco, topco);
 		}
 	}
 
@@ -416,21 +434,20 @@ private_build (LIVoxBuilder* self,
 	return ret;
 }
 
-static void
-private_merge_height_model (LIVoxBuilder* self,
-                            LIVoxVoxelB*  voxel,
-                            LIMatVector   botco[3][3],
-                            LIMatVector   topco[3][3])
+static void private_merge_height (
+	LIVoxBuilder* self,
+	LIVoxVoxelB*  voxel,
+	LIMatVector   botco[3][3],
+	LIMatVector   topco[3][3])
 {
-	int g0;
-	int g1;
+	int g0 = 0;
+	int g1 = 0;
 	int i;
 	int k;
 	int x;
 	int z;
 	float ssurf;
 	float sside;
-	uint32_t indices[3];
 	LIMatVector ex[2][3];
 	LIMatVector ez[2][3];
 	LIMatVector n[4];
@@ -476,36 +493,39 @@ private_merge_height_model (LIVoxBuilder* self,
 	}
 
 	/* Calculate smooth normals. */
-	top[0][0].normal = limat_vector_normalize (
-		limat_vector_cross (ex[0][0], ez[0][0]));
-	top[1][0].normal = limat_vector_normalize (
-		limat_vector_add (
-		limat_vector_cross (ex[0][0], ez[0][1]),
-		limat_vector_cross (ex[1][0], ez[0][1])));
-	top[2][0].normal = limat_vector_normalize (
-		limat_vector_cross (ex[1][0], ez[0][2]));
-	top[0][1].normal = limat_vector_normalize (
-		limat_vector_add (
-		limat_vector_cross (ex[0][1], ez[0][0]),
-		limat_vector_cross (ex[0][1], ez[1][0])));
-	top[1][1].normal = limat_vector_normalize (
-		limat_vector_add (limat_vector_add (limat_vector_add (
-		limat_vector_cross (ex[0][1], ez[0][1]),
-		limat_vector_cross (ex[0][1], ez[1][1])),
-		limat_vector_cross (ex[1][1], ez[0][1])),
-		limat_vector_cross (ex[1][1], ez[1][1])));
-	top[2][1].normal = limat_vector_normalize (
-		limat_vector_add (
-		limat_vector_cross (ex[1][1], ez[0][2]),
-		limat_vector_cross (ex[1][1], ez[1][2])));
-	top[0][2].normal = limat_vector_normalize (
-		limat_vector_cross (ex[0][2], ez[1][0]));
-	top[1][2].normal = limat_vector_normalize (
-		limat_vector_add (
-		limat_vector_cross (ex[0][2], ez[1][1]),
-		limat_vector_cross (ex[1][2], ez[1][1])));
-	top[2][2].normal = limat_vector_normalize (
-		limat_vector_cross (ex[1][2], ez[1][2]));
+	if (self->model != NULL)
+	{
+		top[0][0].normal = limat_vector_normalize (
+			limat_vector_cross (ex[0][0], ez[0][0]));
+		top[1][0].normal = limat_vector_normalize (
+			limat_vector_add (
+			limat_vector_cross (ex[0][0], ez[0][1]),
+			limat_vector_cross (ex[1][0], ez[0][1])));
+		top[2][0].normal = limat_vector_normalize (
+			limat_vector_cross (ex[1][0], ez[0][2]));
+		top[0][1].normal = limat_vector_normalize (
+			limat_vector_add (
+			limat_vector_cross (ex[0][1], ez[0][0]),
+			limat_vector_cross (ex[0][1], ez[1][0])));
+		top[1][1].normal = limat_vector_normalize (
+			limat_vector_add (limat_vector_add (limat_vector_add (
+			limat_vector_cross (ex[0][1], ez[0][1]),
+			limat_vector_cross (ex[0][1], ez[1][1])),
+			limat_vector_cross (ex[1][1], ez[0][1])),
+			limat_vector_cross (ex[1][1], ez[1][1])));
+		top[2][1].normal = limat_vector_normalize (
+			limat_vector_add (
+			limat_vector_cross (ex[1][1], ez[0][2]),
+			limat_vector_cross (ex[1][1], ez[1][2])));
+		top[0][2].normal = limat_vector_normalize (
+			limat_vector_cross (ex[0][2], ez[1][0]));
+		top[1][2].normal = limat_vector_normalize (
+			limat_vector_add (
+			limat_vector_cross (ex[0][2], ez[1][1]),
+			limat_vector_cross (ex[1][2], ez[1][1])));
+		top[2][2].normal = limat_vector_normalize (
+			limat_vector_cross (ex[1][2], ez[1][2]));
+	}
 
 	/* Build side vertices. */
 	for (x = 0 ; x < 3 ; x++)
@@ -533,12 +553,15 @@ private_merge_height_model (LIVoxBuilder* self,
 	}
 
 	/* Find or create materials. */
-	g0 = private_merge_material (self, &voxel->material->mat_top);
-	if (g0 == -1)
-		return;
-	g1 = private_merge_material (self, &voxel->material->mat_side);
-	if (g1 == -1)
-		return;
+	if (self->model != NULL)
+	{
+		g0 = private_merge_material (self, &voxel->material->mat_top);
+		if (g0 == -1)
+			return;
+		g1 = private_merge_material (self, &voxel->material->mat_side);
+		if (g1 == -1)
+			return;
+	}
 
 	/* Create top and bottom triangles. */
 	for (z = 0 ; z < 2 ; z++)
@@ -549,31 +572,13 @@ private_merge_height_model (LIVoxBuilder* self,
 		for (k = 0 ; k < 3 ; k++)
 			verts[k] = top[x + quadidx[z == x][2*k + 6*i]][z + quadidx[z == x][2*k + 6*i + 1]];
 		if (!private_occlude_face (self, voxel, verts))
-		{
-			for (k = 0 ; k < 3 ; k++)
-			{
-				indices[k] = private_merge_vertex (self, voxel, verts + k);
-				if (indices[k] == -1)
-					break;
-			}
-			if (k == 3)
-				limdl_model_insert_indices (self->model, g0, indices, 3);
-		}
+			private_merge_triangle (self, voxel, g0, verts);
 
 		/* Bottom surface. */
 		for (k = 0 ; k < 3 ; k++)
 			verts[k] = bot[x + quadidxrev[z == x][2*k + 6*i]][z + quadidxrev[z == x][2*k + 6*i + 1]];
 		if (!private_occlude_face (self, voxel, verts))
-		{
-			for (k = 0 ; k < 3 ; k++)
-			{
-				indices[k] = private_merge_vertex (self, voxel, verts + k);
-				if (indices[k] == -1)
-					break;
-			}
-			if (k == 3)
-				limdl_model_insert_indices (self->model, g1, indices, 3);
-		}
+			private_merge_triangle (self, voxel, g1, verts);
 	}
 
 	/* Create side triangles. */
@@ -589,40 +594,8 @@ private_merge_height_model (LIVoxBuilder* self,
 				verts[k] = side[3 * z + x + quadidx[0][2*k + 6*i]][quadidx[0][2*k + 6*i + 1]];
 		}
 		if (!private_occlude_face (self, voxel, verts))
-		{
-			for (k = 0 ; k < 3 ; k++)
-			{
-				indices[k] = private_merge_vertex (self, voxel, verts + k);
-				if (indices[k] == -1)
-					break;
-			}
-			if (k == 3)
-				limdl_model_insert_indices (self->model, g1, indices, 3);
-		}
+			private_merge_triangle (self, voxel, g1, verts);
 	}
-}
-
-static void
-private_merge_height_physics (LIVoxBuilder* self,
-                              LIVoxVoxelB*  voxel,
-                              LIMatVector   botco[3][3],
-                              LIMatVector   topco[3][3])
-{
-	int i;
-	int x;
-	int z;
-	LIMatVector verts[18];
-
-	/* Collect vertices. */
-	for (i = z = 0 ; z < 3 ; z++)
-	for (x = 0 ; x < 3 ; x++)
-	{
-		verts[i++] = botco[x][z];
-		verts[i++] = topco[x][z];
-	}
-
-	/* Insert convex shape. */
-	liphy_shape_add_convex (self->physics, verts, 18, &voxel->transform);
 }
 
 static int
@@ -704,12 +677,17 @@ private_merge_tile_model (LIVoxBuilder* self,
 	return 1;
 }
 
-static int
-private_merge_tile_physics (LIVoxBuilder* self,
-                            LIVoxVoxelB*  voxel)
+static int private_merge_tile_physics (
+	LIVoxBuilder* self,
+	LIVoxVoxelB*  voxel)
 {
-	return liphy_shape_add_model (self->physics, voxel->model->model,
-		&voxel->transform, self->vertex_scale);
+	LIPhyModel* model;
+
+	model = liphy_physics_find_model (self->physics_manager, voxel->model->id);
+	if (model == NULL)
+		return 0;
+	return liphy_terrain_add_model (self->physics, voxel->index,
+		model, &voxel->transform, self->vertex_scale);
 }
 
 static int
@@ -786,56 +764,89 @@ private_occlude_face (LIVoxBuilder* self,
 
 	/* Occlusion check. */
 	if ((voxel->mask & LIVOX_OCCLUDE_XNEG) &&
-		LIMAT_ABS (coords[0].x + self->manager->tile_width / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[1].x + self->manager->tile_width / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[2].x + self->manager->tile_width / 2) < CULL_EPSILON)
+		LIMAT_ABS (coords[0].x + self->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[1].x + self->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[2].x + self->tile_width / 2) < CULL_EPSILON)
 		return 1;
 	if ((voxel->mask & LIVOX_OCCLUDE_XPOS) &&
-		LIMAT_ABS (coords[0].x - self->manager->tile_width / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[1].x - self->manager->tile_width / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[2].x - self->manager->tile_width / 2) < CULL_EPSILON)
+		LIMAT_ABS (coords[0].x - self->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[1].x - self->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[2].x - self->tile_width / 2) < CULL_EPSILON)
 		return 1;
 	if ((voxel->mask & LIVOX_OCCLUDE_YNEG) &&
-		LIMAT_ABS (coords[0].y + self->manager->tile_width / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[1].y + self->manager->tile_width / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[2].y + self->manager->tile_width / 2) < CULL_EPSILON)
+		LIMAT_ABS (coords[0].y + self->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[1].y + self->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[2].y + self->tile_width / 2) < CULL_EPSILON)
 		return 1;
 	if ((voxel->mask & LIVOX_OCCLUDE_YPOS) &&
-		LIMAT_ABS (coords[0].y - self->manager->tile_width / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[1].y - self->manager->tile_width / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[2].y - self->manager->tile_width / 2) < CULL_EPSILON)
+		LIMAT_ABS (coords[0].y - self->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[1].y - self->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[2].y - self->tile_width / 2) < CULL_EPSILON)
 		return 1;
 	if ((voxel->mask & LIVOX_OCCLUDE_ZNEG) &&
-		LIMAT_ABS (coords[0].z + self->manager->tile_width / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[1].z + self->manager->tile_width / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[2].z + self->manager->tile_width / 2) < CULL_EPSILON)
+		LIMAT_ABS (coords[0].z + self->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[1].z + self->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[2].z + self->tile_width / 2) < CULL_EPSILON)
 		return 1;
 	if ((voxel->mask & LIVOX_OCCLUDE_ZPOS) &&
-		LIMAT_ABS (coords[0].z - self->manager->tile_width / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[1].z - self->manager->tile_width / 2) < CULL_EPSILON &&
-		LIMAT_ABS (coords[2].z - self->manager->tile_width / 2) < CULL_EPSILON)
+		LIMAT_ABS (coords[0].z - self->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[1].z - self->tile_width / 2) < CULL_EPSILON &&
+		LIMAT_ABS (coords[2].z - self->tile_width / 2) < CULL_EPSILON)
 		return 1;
 
 	return 0;
 }
 
-static inline void
-private_solve_coords (LIVoxBuilder* self,
-                      LIVoxVoxelB*  voxel,
-                      LIMatVector   bot[3][3],
-                      LIMatVector   top[3][3])
+static void private_merge_triangle (
+	LIVoxBuilder* self,
+	LIVoxVoxelB*  voxel,
+	int           group,
+	LIMdlVertex*  verts)
+{
+	int k;
+	uint32_t indices[3];
+	LIMatVector coords[3];
+
+	/* Merge to display model. */
+	if (self->model != NULL)
+	{
+		for (k = 0 ; k < 3 ; k++)
+		{
+			indices[k] = private_merge_vertex (self, voxel, verts + k);
+			if (indices[k] == -1)
+				break;
+		}
+		if (k == 3)
+			limdl_model_insert_indices (self->model, group, indices, 3);
+	}
+
+	/* Merge to physics model. */
+	if (self->physics != NULL)
+	{
+		coords[0] = verts[0].coord;
+		coords[1] = verts[1].coord;
+		coords[2] = verts[2].coord;
+		liphy_terrain_add_vertices (self->physics, voxel->index, coords, 3, &voxel->transform);
+	}
+}
+
+static inline void private_solve_coords (
+	LIVoxBuilder* self,
+	LIVoxVoxelB*  voxel,
+	LIMatVector   bot[3][3],
+	LIMatVector   top[3][3])
 {
 	int x;
 	int y;
 	int z;
 	float h[3][3][3];
-	float size = 0.5f * self->manager->tile_width;
+	float size = 0.5f * self->tile_width;
 
 	/* Cache tile heights. */
 	for (z = -1 ; z <= 1 ; z++)
 	for (y = -1 ; y <= 1 ; y++)
 	for (x = -1 ; x <= 1 ; x++)
-		h[x + 1][z + 1][y + 1] = voxel[x + y * self->ystep + z * self->zstep].height;
+		h[x + 1][z + 1][y + 1] = voxel[x + y * self->step[1] + z * self->step[2]].height;
 
 	/* Construct X and Z coordinates. */
 	for (z = 0 ; z < 3 ; z++)
@@ -843,18 +854,18 @@ private_solve_coords (LIVoxBuilder* self,
 	{
 		/* Top. */
 		top[x][z] = limat_vector_init (
-			(-0.5f + x / 2.0f) * self->manager->tile_width, 0.5f * self->manager->tile_width,
-			(-0.5f + z / 2.0f) * self->manager->tile_width);
+			(-1.0f + x) * size, size,
+			(-1.0f + z) * size);
 
 		/* Bottom. */
 		bot[x][z] = limat_vector_init (
-			(-0.5f + x / 2.0f) * self->manager->tile_width, -0.5f * self->manager->tile_width,
-			(-0.5f + z / 2.0f) * self->manager->tile_width);
+			(-1.0f + x) * size, -size,
+			(-1.0f + z) * size);
 	}
 
 	/* Construct Y coordinate. */
-	if (voxel[self->ystep].material == NULL ||
-	    voxel[self->ystep].material->type != LIVOX_MATERIAL_TYPE_HEIGHT)
+	if (voxel[self->step[1]].material == NULL ||
+	    voxel[self->step[1]].material->type != LIVOX_MATERIAL_TYPE_HEIGHT)
 	{
 		top[0][0].y = size * private_solve_height_4 (self, h[1][1][1], h[0][0], h[0][1], h[1][0]);
 		top[1][0].y = size * private_solve_height_2 (self, h[1][1][1], h[1][0]);

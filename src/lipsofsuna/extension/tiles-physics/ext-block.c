@@ -42,50 +42,9 @@ LIExtBlock* liext_tiles_physics_block_new (
 void liext_tiles_physics_block_free (
 	LIExtBlock* self)
 {
-	if (self->object != NULL)
-		liphy_object_free (self->object);
-	if (self->shape != NULL)
-		liphy_shape_free (self->shape);
+	if (self->terrain != NULL)
+		liphy_terrain_free (self->terrain);
 	lisys_free (self);
-}
-
-int liext_tiles_physics_block_build (
-	LIExtBlock*     self,
-	LIVoxBlockAddr* addr)
-{
-	/* Free old object and shape. */
-	if (self->object != NULL)
-	{
-		liphy_object_free (self->object);
-		self->object = NULL;
-	}
-	if (self->shape != NULL)
-	{
-		liphy_shape_free (self->shape);
-		self->shape = NULL;
-	}
-
-	/* Build new shape. */
-	if (!livox_build_block (self->module->voxels, self->module->program->engine,
-	     self->module->physics, addr, NULL, &self->shape))
-		return 0;
-
-	/* Create an object and realize if not empty. */
-	if (self->shape != NULL)
-	{
-		self->object = liphy_object_new (self->module->physics, 0, self->shape,
-			LIPHY_CONTROL_MODE_STATIC);
-		if (self->object == NULL)
-		{
-			liphy_shape_free (self->shape);
-			self->shape = NULL;
-		}
-		liphy_object_set_collision_group (self->object, LIPHY_GROUP_TILES);
-		liphy_object_set_collision_mask (self->object, LIPHY_DEFAULT_COLLISION_MASK & ~LIPHY_GROUP_TILES);
-		liphy_object_set_realized (self->object, 1);
-	}
-
-	return 1;
 }
 
 /** @} */

@@ -24,7 +24,9 @@
 #include <lipsofsuna/system.h>
 #include "voxel-manager.h"
 
-LIAPICALL (int, livox_build_area, (
+typedef struct _LIVoxBuilder LIVoxBuilder;
+
+LIAPICALL (LIVoxBuilder*, livox_builder_new, (
 	LIVoxManager* manager,
 	LIEngEngine*  engine,
 	LIPhyPhysics* physics,
@@ -33,17 +35,15 @@ LIAPICALL (int, livox_build_area, (
 	int           zstart,
 	int           xsize,
 	int           ysize,
-	int           zsize,
-	LIMdlModel**  result_model,
-	LIPhyShape**  result_physics));
+	int           zsize));
 
-LIAPICALL (int, livox_build_block, (
-	LIVoxManager*         manager,
-	LIEngEngine*          engine,
-	LIPhyPhysics*         physics,
-	const LIVoxBlockAddr* addr,
-	LIMdlModel**          result_model,
-	LIPhyShape**          result_physics));
+LIAPICALL (void, livox_builder_free, (
+	LIVoxBuilder* self));
+
+LIAPICALL (int, livox_builder_build, (
+	LIVoxBuilder*  self,
+	LIMdlModel**   result_model,
+	LIPhyTerrain** result_physics));
 
 LIAPICALL (int, livox_build_occlusion, (
 	LIVoxManager* manager,

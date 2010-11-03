@@ -18,12 +18,21 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/server.h>
-#include <lipsofsuna/voxel.h>
-#include <lipsofsuna/extension.h>
+#include "lipsofsuna/extension.h"
+#include "lipsofsuna/thread.h"
+#include "lipsofsuna/voxel.h"
 
 typedef struct _LIExtBlock LIExtBlock;
+typedef struct _LIExtBuildTask LIExtBuildTask;
 typedef struct _LIExtModule LIExtModule;
+
+struct _LIExtBuildTask
+{
+	LIVoxBlockAddr addr;
+	LIVoxBuilder* builder;
+	LIPhyTerrain* terrain;
+	LIExtBuildTask* next;
+};
 
 struct _LIExtModule
 {
@@ -32,6 +41,13 @@ struct _LIExtModule
 	LIMaiProgram* program;
 	LIPhyPhysics* physics;
 	LIVoxManager* voxels;
+	struct
+	{
+		LIThrAsyncCall* worker;
+		LIThrMutex* mutex;
+		LIExtBuildTask* pending;
+		LIExtBuildTask* completed;
+	} tasks;
 };
 
 LIExtModule* liext_tiles_physics_new (
