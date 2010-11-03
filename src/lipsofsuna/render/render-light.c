@@ -27,8 +27,11 @@
 
 #define LIGHT_CONTRIBUTION_EPSILON 0.001f
 
-static void
-private_update_shadow (LIRenLight* self);
+static void private_update_bounds (
+	LIRenLight* self);
+
+static void private_update_shadow (
+	LIRenLight* self);
 
 /*****************************************************************************/
 
@@ -209,34 +212,7 @@ int liren_light_get_bounds (
 	const LIRenLight* self,
 	LIMatAabb*        result)
 {
-	double a;
-	double b;
-	double c;
-	double r;
-	double det;
-	double eps;
-
-	/* Choose epsilon. */
-	eps = LIMAT_MAX (LIMAT_MAX (self->diffuse[0], self->diffuse[1]), self->diffuse[2]);
-	eps /= 256.0;
-	if (eps < LIGHT_CONTRIBUTION_EPSILON)
-		eps = LIGHT_CONTRIBUTION_EPSILON;
-
-	/* Solve radius. */
-	/* 1 / (A * r^2 + B * r + C) = E */
-	/* (EA) * r^2 + (EB) * r + (Ec-1) = 0 */
-	a = eps * self->equation[0];
-	b = eps * self->equation[1];
-	c = eps * self->equation[2] - 1.0;
-	det = b * b - 4 * a * c;
-	if (det < 0.0)
-		return 0;
-	r = (-b + sqrt (det)) / (2.0 * a);
-	r = r + 0.5;
-
-	/* Create bounding box. */
-	result->min = limat_vector_subtract (self->transform.position, limat_vector_init (r, r, r));
-	result->max = limat_vector_add (self->transform.position, limat_vector_init (r, r, r));
+	*result = self->bounds;
 
 	return 1;
 }
@@ -293,6 +269,7 @@ void liren_light_set_direction (
 	projection = limat_matrix_ortho (200, -200, 200, -200, -1000, 1000);
 	liren_light_set_projection (self, &projection);
 	self->directional = 1;
+	private_update_bounds (self);
 }
 
 /**
@@ -380,6 +357,7 @@ void liren_light_set_projection (
 	const LIMatMatrix* value)
 {
 	self->projection = *value;
+	private_update_bounds (self);
 }
 
 /**
@@ -483,6 +461,7 @@ void liren_light_set_transform (
 	self->transform = *transform;
 	self->modelview = limat_matrix_look (pos.x, pos.y, pos.z, dir.x, dir.y, dir.z, up.x, up.y, up.z);
 	self->modelview_inverse = limat_matrix_invert (self->modelview);
+	private_update_bounds (self);
 }
 
 int liren_light_get_type (
@@ -499,6 +478,43 @@ int liren_light_get_type (
 }
 
 /*****************************************************************************/
+
+static void private_update_bounds (
+	LIRenLight* self)
+{
+	double a;
+	double b;
+	double c;
+	double r;
+	double det;
+	double eps;
+
+	/* Choose epsilon. */
+	eps = LIMAT_MAX (LIMAT_MAX (self->diffuse[0], self->diffuse[1]), self->diffuse[2]);
+	eps /= 256.0;
+	if (eps < LIGHT_CONTRIBUTION_EPSILON)
+		eps = LIGHT_CONTRIBUTION_EPSILON;
+
+	/* Solve radius. */
+	/* 1 / (A * r^2 + B * r + C) = E */
+	/* (EA) * r^2 + (EB) * r + (Ec-1) = 0 */
+	a = eps * self->equation[0];
+	b = eps * self->equation[1];
+	c = eps * self->equation[2] - 1.0;
+	det = b * b - 4 * a * c;
+	if (det < 0.0)
+	{
+		self->bounds.min = self->transform.position;
+		self->bounds.max = self->transform.position;
+		return;
+	}
+	r = (-b + sqrt (det)) / (2.0 * a);
+	r = r + 0.5;
+
+	/* Create bounding box. */
+	self->bounds.min = limat_vector_subtract (self->transform.position, limat_vector_init (r, r, r));
+	self->bounds.max = limat_vector_add (self->transform.position, limat_vector_init (r, r, r));
+}
 
 static void private_update_shadow (
 	LIRenLight* self)

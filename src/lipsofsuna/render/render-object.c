@@ -27,6 +27,9 @@
 #include "render-draw.h"
 #include "render-object.h"
 
+static void private_bounds_update (
+	LIRenObject* self);
+
 static void private_envmap_clear (
 	LIRenObject* self);
 
@@ -194,21 +197,14 @@ liren_object_update (LIRenObject* self,
 
 /**
  * \brief Gets the bounding box of the object.
- *
  * \param self Object.
  * \param result Return location for the bounding box.
  */
-void
-liren_object_get_bounds (const LIRenObject* self,
-                         LIMatAabb*         result)
+void liren_object_get_bounds (
+	const LIRenObject* self,
+	LIMatAabb*         result)
 {
-	LIMatAabb tmp;
-
-	if (self->model != NULL)
-		liren_model_get_bounds (self->model, &tmp);
-	else
-		limat_aabb_init (&tmp);
-	*result = limat_aabb_transform (tmp, &self->orientation.matrix);
+	*result = self->bounds;
 }
 
 /**
@@ -251,6 +247,7 @@ int liren_object_set_model (
 		private_lights_create (self, self->pose);
 		private_envmap_create (self);
 	}
+	private_bounds_update (self);
 
 	return 1;
 }
@@ -346,23 +343,12 @@ void liren_object_set_transform (
 	LIRenObject*          self,
 	const LIMatTransform* value)
 {
-	LIMatVector center;
-
 	/* Set transformation. */
 	self->transform = *value;
 	self->orientation.matrix = limat_convert_transform_to_matrix (*value);
 
-	/* Set box center. */
-	if (self->model != NULL)
-	{
-		/* FIXME: Incorrect for rotated objects. */
-		center = limat_vector_add (self->model->bounds.min, self->model->bounds.max);
-		center = limat_vector_multiply (center, 0.5f);
-		center = limat_vector_add (center, value->position);
-		self->orientation.center = center;
-	}
-	else
-		self->orientation.center = value->position;
+	/* Recalculate bounding box. */
+	private_bounds_update (self);
 
 	/* Transform our light sources. */
 	private_lights_update (self);
@@ -382,6 +368,26 @@ void liren_object_set_userdata (
 }
 
 /*****************************************************************************/
+
+static void private_bounds_update (
+	LIRenObject* self)
+{
+	LIMatVector center;
+
+	/* Update bounding box. */
+	if (self->model != NULL)
+	{
+		liren_model_get_bounds (self->model, &self->bounds);
+		self->bounds = limat_aabb_transform (self->bounds, &self->orientation.matrix);
+	}
+	else
+		limat_aabb_init (&self->bounds);
+
+	/* Update center point. */
+	center = limat_vector_add (self->bounds.min, self->bounds.max);
+	center = limat_vector_multiply (center, 0.5f);
+	self->orientation.center = center;
+}
 
 static void private_envmap_clear (
 	LIRenObject* self)

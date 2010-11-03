@@ -40,6 +40,7 @@ struct _LIRenLight
 	float diffuse[4];
 	float specular[4];
 	float equation[3];
+	LIMatAabb bounds;
 	LIMatMatrix projection;
 	LIMatMatrix modelview;
 	LIMatMatrix modelview_inverse;

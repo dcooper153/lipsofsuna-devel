@@ -34,6 +34,7 @@ struct _LIRenObject
 	int realized;
 	float sort;
 	void* userdata;
+	LIMatAabb bounds;
 	LIMatTransform transform;
 	LIMdlPose* pose;
 	LIRenScene* scene;
