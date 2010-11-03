@@ -52,8 +52,13 @@ end
 
 --- Saves all active sectors to the database.
 -- @param class Serialize class.
-Serialize.save_world = function(clss)
+-- @param erase True to completely erase the old map.
+Serialize.save_world = function(clss, erase)
 	clss.db:query("BEGIN TRANSACTION;")
+	if erase then
+		clss.db:query("DELETE FROM object;")
+		clss.db:query("DELETE FROM terrain;")
+	end
 	for k,v in pairs(Program.sectors) do
 		clss:save_sector(k)
 	end

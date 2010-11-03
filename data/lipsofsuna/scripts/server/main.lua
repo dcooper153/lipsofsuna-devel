@@ -321,7 +321,7 @@ restart = function()
 	end
 	-- Save map.
 	print("Saving map...")
-	Serialize:save_world()
+	Serialize:save_world(true)
 	Program:unload_world()
 	-- Discard events emitted during map generation so that they
 	-- don't trigger when the game starts.
