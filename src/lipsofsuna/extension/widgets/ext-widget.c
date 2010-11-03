@@ -258,7 +258,6 @@ static void Widget_canvas_text (LIScrArgs* args)
 	if (!liscr_args_gets_string (args, "text", &text))
 		return;
 	liscr_args_gets_string (args, "text_font", &text_font);
-#warning Fix this when done with deprecating widget styles.
 	font = lialg_strdic_find (widget->manager->styles->fonts, text_font);
 	if (font == NULL)
 		return;
