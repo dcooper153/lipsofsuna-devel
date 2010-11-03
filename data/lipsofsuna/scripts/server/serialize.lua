@@ -4,6 +4,8 @@ Serialize = Class()
 -- @param clss Serialize class.
 Serialize.init = function(clss)
 	clss.db = Database{name = "save.db"}
+	clss.db:query("PRAGMA synchronous=OFF;")
+	clss.db:query("PRAGMA count_changes=OFF;")
 	clss.db:query("CREATE TABLE IF NOT EXISTS objects (id INTEGER PRIMARY KEY,sector UNSIGNED INTEGER,data TEXT);");
 	clss.db:query("CREATE TABLE IF NOT EXISTS terrain (sector INTEGER PRIMARY KEY,data BLOB);");
 end
