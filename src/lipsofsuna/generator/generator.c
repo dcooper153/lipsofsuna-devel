@@ -430,15 +430,12 @@ private_rule_apply (LIGenGenerator* self,
 	LIGenStroke stroke1;
 	LIGenRulestroke* rstroke;
 
-	printf ("BRUSH %s RULE %s\n", brush->name, rule->name);
-
 	orig = self->strokes.count;
 	for (i = 0 ; i < rule->strokes.count ; i++)
 	{
 		rstroke = rule->strokes.array + i;
 		brush1 = lialg_u32dic_find (self->brushes, rstroke->brush);
 		lisys_assert (brush1 != NULL);
-		printf (" * CREATE %s\n", brush1->name);
 		stroke1.pos[0] = stroke->pos[0] + rstroke->pos[0];
 		stroke1.pos[1] = stroke->pos[1] + rstroke->pos[1];
 		stroke1.pos[2] = stroke->pos[2] + rstroke->pos[2];
