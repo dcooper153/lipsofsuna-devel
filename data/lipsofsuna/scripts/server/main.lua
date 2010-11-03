@@ -118,6 +118,51 @@ Voxel.make_heightmap = function(clss, args)
 	end
 end
 
+--- Places a slope to the map.
+-- @param clss Voxel class.
+-- @param args Arguments.<ul>
+--   <li>heights: Desired heights of the four corners of the region.</li>
+--   <li>material: Material name.</li>
+--   <li>mushroom_density: Per tile mushroom probability or nil.</li></ul>
+--   <li>point: Position vector, in tiles.</li>
+--   <li>randomness: Randomness of height.</li>
+--   <li>size: Size vector, in tiles.</li>
+--   <li>tree_density: Per tile tree probability or nil.</li></ul>
+Voxel.make_slope = function(clss, args)
+	local c = args.heights
+	local r = args.randomness or 0
+	local p = Vector(0, args.point.y, 0)
+	local m = Material:find{name = args.material}
+	if not m then return end
+	local t = Tile{terrain = m.id}
+	for z = args.point.z,args.point.z+args.size.z-1 do
+		p.z = z
+		for x = args.point.x,args.point.x+args.size.x-1 do
+			p.x = x
+			-- Calculate the height with bilinear filtering.
+			local u = (x - args.point.x) / (args.size.x - 1)
+			local v = (z - args.point.z) / (args.size.z - 1)
+			local h = (c[1] * (1 - u) + c[2] * u) * (1 - v) + 
+			          (c[3] * (1 - u) + c[4] * u) * v;
+			-- Add some randomness to the height.
+			h = math.max(0, h + r * (0.5 - 0.5 * math.random()))
+			-- Create the tile stack matching the height.
+			for y = 0,math.floor(h) do
+				p.y = args.point.y + y
+				t.damage = 255 * (1 - math.min(1, h - y))
+				Voxel:set_tile{point = p, tile = t}
+			end
+			-- Position extra objects.
+			p.y = args.point.y
+			if math.random() < (args.tree_density or 0) then
+				Voxel:place_obstacle{name = "tree", point = p + Vector(0.5, h, 0.5)}
+			elseif math.random() < (args.mushroom_density or 0) then
+				Voxel:place_obstacle{name = "mushroom", point = p + Vector(0.5, h, 0.5)}
+			end
+		end
+	end
+end
+
 --- Places a monster to the map.
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
@@ -220,7 +265,7 @@ restart = function()
 	Program:unload_world()
 	print("Generating map...")
 	Generator:format{center = Config.center * Config.tilescale}
-	Generator:expand{count = 2}
+	Generator:expand{count = 100}
 	for i,r in pairs(Generator.regions) do
 		Voxel:fill_region{point = r.point, size = r.size}
 		local spec = Regionspec:find{name = r.name}
@@ -241,9 +286,33 @@ restart = function()
 				s = s - Vector(2,1,2)
 				Voxel:make_heightmap{point = r.point + p, size = s,
 					material = "ground1", tree_density = 0.2}
-			else
+			elseif spec.name == "dungeon-room" then
+				Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "house1"}
+			elseif spec.name == "dungeon-slope-n" then
+				Voxel:make_slope{point = r.point, size = r.size,
+					heights = {2,2,3,3}, randomness = 1,
+					material = "ground1", tree_density = 0.2}
+			elseif spec.name == "dungeon-slope-s" then
+				Voxel:make_slope{point = r.point, size = r.size,
+					heights = {3,3,2,2}, randomness = 1,
+					material = "ground1", tree_density = 0.2}
+			elseif spec.name == "dungeon-slope-e" then
+				Voxel:make_slope{point = r.point, size = r.size,
+					heights = {2,3,2,3}, randomness = 1,
+					material = "ground1", tree_density = 0.2}
+			elseif spec.name == "dungeon-slope-w" then
+				Voxel:make_slope{point = r.point, size = r.size,
+					heights = {3,2,3,2}, randomness = 1,
+					material = "ground1", tree_density = 0.2}
+			elseif spec.name == "dungeon-corridor-ns" then
 				Voxel:place_creature{point = r.point + Vector(1,1,3), name = "bloodworm"}
 				Voxel:place_creature{point = r.point + Vector(2,1,8), name = "bloodworm"}
+				Voxel:make_heightmap{point = r.point + Vector(0,0,0), size = r.size,
+					material = "ground1", tree_density = 0.1,
+					mushroom_density = 0.3}
+			elseif spec.name == "dungeon-corridor-ew" then
+				Voxel:place_creature{point = r.point + Vector(3,1,1), name = "bloodworm"}
+				Voxel:place_creature{point = r.point + Vector(8,1,2), name = "bloodworm"}
 				Voxel:make_heightmap{point = r.point + Vector(0,0,0), size = r.size,
 					material = "ground1", tree_density = 0.1,
 					mushroom_density = 0.3}
