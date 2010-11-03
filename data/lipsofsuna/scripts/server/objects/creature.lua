@@ -409,7 +409,6 @@ Creature.update_ai_state = function(self)
 	-- Enter combat mode if an enemy was found.
 	if best_enemy then
 		self:set_state{state = "combat", target = best_enemy}
-		self:refresh()
 		return
 	end
 	-- Switch to chat mode if a dialog is active.
@@ -521,24 +520,20 @@ Creature.state_switchers =
 		if not self.dialog then
 			self:set_state{state = "wander"}
 		end
-		self:refresh()
 	end,
 	combat = function(self)
 		-- If we were in the combat state, enter the searching mode in hopes
 		-- of finding any enemies that are hiding or trying to escape.
 		-- TODO: Companion should follow master.
-		self:refresh()
 		self:set_state{state = "search"}
 		return
 	end,
 	follow = function(self)
 		-- TODO
-		self:refresh()
 	end,
 	flee = function(self)
 		-- If we were fleeing, keep fleeing a bit more and then try to hide
 		-- so that the enemies have harder time to find us.
-		self:refresh()
 		if self.state_timer > 5 then
 			self:set_state{state = "hide"}
 		end
@@ -555,7 +550,6 @@ Creature.state_switchers =
 	search = function(self)
 		-- If we have been searching for a while without finding anything,
 		-- conclude that there are no enemies and enter the wandering mode.
-		self:refresh()
 		if self.state_timer > self.species.ai_search_time then
 			self:set_state{state = "wander"}
 		end

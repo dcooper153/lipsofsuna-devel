@@ -275,11 +275,8 @@ lieng_object_moved (LIEngObject* self)
 	LIEngSector* src;
 	LIMatTransform transform;
 
-	/* Refresh sector list. */
-	lieng_object_get_transform (self, &transform);
-	lialg_sectors_refresh_point (self->engine->sectors, &transform.position, REFRESH_RADIUS);
-
 	/* Move between sectors. */
+	lieng_object_get_transform (self, &transform);
 	src = self->sector;
 	dst = lialg_sectors_data_point (self->engine->sectors, "engine", &transform.position, 1);
 	if (dst == NULL)
@@ -666,9 +663,6 @@ private_warp (LIEngObject*       self,
 {
 	LIEngSector* dst;
 	LIEngSector* src;
-
-	/* Refresh sector list. */
-	lialg_sectors_refresh_point (self->engine->sectors, position, REFRESH_RADIUS);
 
 	/* Move between sectors. */
 	src = self->sector;

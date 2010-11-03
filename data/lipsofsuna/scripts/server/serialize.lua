@@ -40,7 +40,7 @@ Serialize.save_sector = function(clss, sector)
 	for k,v in pairs(objs) do
 		local data = v:write()
 		if data and not Class:check{data = v, name = "Player"} then
-			clss.db:query("INSERT INTO objects (id,sector,data) VALUES (?,?,?);", {v.id, sector, data})
+			clss.db:query("REPLACE INTO objects (id,sector,data) VALUES (?,?,?);", {v.id, sector, data})
 		end
 	end
 	-- Write terrain.
@@ -65,7 +65,7 @@ end}
 Timer{delay = 2, func = function(self, args)
 	local written = 0
 	for k,d in pairs(Program.sectors) do
-		if d > 120 and written < 5 then
+		if d > 10 and written < 5 then
 			-- Group into a single transaction.
 			if written == 0 then
 				Serialize.db:query("BEGIN TRANSACTION;")
