@@ -189,12 +189,12 @@ int liren_model_intersect_ray (
 	LIMatVector*       result)
 {
 	int i;
-	int found;
+	int found = 0;
 	float d;
-	float best_dist;
+	float best_dist = 0.0f;
 	void* vtxdata;
 	LIMatTriangle triangle;
-	LIMatVector best_point;
+	LIMatVector best_point = { 0.0f, 0.0f, 0.0f };
 	LIMatVector p;
 	LIRenFormat format;
 
@@ -203,7 +203,6 @@ int liren_model_intersect_ray (
 		return 0;
 
 	/* Test for intersection for each face in the model. */
-	found = 0;
 	liren_mesh_get_format (&self->mesh, &format);
 	vtxdata = liren_mesh_lock_vertices (&self->mesh, 0, self->mesh.counts[2]);
 	if (vtxdata == NULL)
@@ -452,7 +451,7 @@ static int private_init_model (
 	/* If transforming the default pose failed, our transform feedback buffer
 	   is full of random data since we never initialized it. To avoid an ugly
 	   polygon mess when the shader is missing, we zero the buffer as a fallback. */
-	if (!ok && self->mesh.sizes[3])
+	if (!ok && self->mesh.sizes[2])
 	{
 		glGetIntegerv (GL_VERTEX_ARRAY_BINDING, &restore);
 		glBindVertexArray (0);
@@ -460,7 +459,7 @@ static int private_init_model (
 		vertices = glMapBuffer (GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 		if (vertices != NULL)
 		{
-			memset (vertices, 0, self->mesh.sizes[3]);
+			memset (vertices, 0, self->mesh.sizes[2]);
 			glUnmapBuffer (GL_ARRAY_BUFFER);
 		}
 		glBindVertexArray (restore);
