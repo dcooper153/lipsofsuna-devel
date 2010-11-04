@@ -58,7 +58,7 @@ static void Generator_add_brush (LIScrArgs* args)
 			return;
 		while (brush->id <= 0)
 		{
-			brush->id = random ();
+			brush->id = rand ();
 			if (ligen_generator_find_brush (module->generator, brush->id))
 				brush->id = 0;
 		}
