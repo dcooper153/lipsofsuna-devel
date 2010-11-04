@@ -1,3 +1,16 @@
+0.1.2
+
+ * Fixed several memory leaks.
+ * Fixed multiplayer and added server selection to the startup screen.
+ * Fixed a crash when joystick axis input was received.
+ * Hardware accelerated animations.
+ * Disabled bloom by default to lower hardware requirements.
+ * Improved the performance of rendering transparent objects.
+ * Fixed the usage of mana potions.
+ * Added more map generation rules and increased the size of the map.
+ * Miscellaneous small performance optimizations.
+ * Added sound effects for quest updates and inventory item management.
+
 0.1.1
 
  * Included the NEWS file.
