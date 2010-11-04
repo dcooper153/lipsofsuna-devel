@@ -191,7 +191,7 @@ int liren_particles_evaluate_particle (
 	frame -= p->frame_start;
 	if (frame < 0.0)
 		return 0;
-	last = p->frame_end - 1;
+	last = p->frame_end - 2;
 	if (frame >= last)
 	{
 		if (!loop)
