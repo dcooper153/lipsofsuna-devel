@@ -22,6 +22,7 @@
  * @{
  */
 
+#include "main-extension.h"
 #include "main-program.h"
 
 static int private_init (
@@ -313,7 +314,7 @@ int limai_program_insert_extension (
 	}
 
 	/* Open an external library if the extension isn't built-in. */
-	info = lisys_module_global_symbol (NULL, ident);
+	info = limai_extension_get_builtin (name);
 	if (info == NULL)
 	{
 		path = lisys_path_format (self->paths->global_exts, LISYS_PATH_SEPARATOR,

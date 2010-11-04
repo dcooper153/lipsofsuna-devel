@@ -41,4 +41,7 @@ struct _LIMaiExtension
 	void* object;
 };
 
+LIAPICALL (LIMaiExtensionInfo*, limai_extension_get_builtin, (
+	const char* name));
+
 #endif

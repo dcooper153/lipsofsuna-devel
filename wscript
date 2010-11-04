@@ -48,7 +48,7 @@ def configure(ctx):
 	ctx.env.LIBPATH_CORE = []
 	ctx.env.LIBPATH_EXTENSION = []
 	ctx.env.LIBPATH_TEST = []
-	ctx.env.LINKFLAGS_CORE = ['-g', '-export-dynamic']
+	ctx.env.LINKFLAGS_CORE = ['-g']
 	ctx.env.LINKFLAGS_EXTENSION = ['-g']
 
 	# Base dependencies
