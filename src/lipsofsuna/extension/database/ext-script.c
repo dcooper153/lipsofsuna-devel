@@ -22,10 +22,11 @@
  * @{
  */
 
+#include <sqlite3.h>
 #include "ext-module.h"
 
 static void private_free_database (
-	LIArcSql* self)
+	sqlite3* self)
 {
 	sqlite3_close (self);
 }
@@ -53,7 +54,7 @@ static void Database_new (LIScrArgs* args)
 	char* path;
 	const char* ptr;
 	const char* name;
-	LIArcSql* sql;
+	sqlite3* sql;
 	LIExtModule* module;
 	LIScrData* data;
 
@@ -127,8 +128,8 @@ static void Database_query (LIScrArgs* args)
 	int size;
 	const char* query;
 	const char* str;
+	sqlite3* self;
 	LIArcReader* reader;
-	LIArcSql* self;
 	LIScrData* data;
 	LIScrPacket* packet;
 	sqlite3_stmt* statement;

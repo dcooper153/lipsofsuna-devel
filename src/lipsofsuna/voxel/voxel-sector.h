@@ -41,10 +41,6 @@ LIAPICALL (void, livox_sector_fill, (
 	LIVoxSector* self,
 	LIVoxVoxel*  terrain));
 
-LIAPICALL (int, livox_sector_read, (
-	LIVoxSector* self,
-	LIArcSql*    sql));
-
 LIAPICALL (int, livox_sector_read_block, (
 	LIVoxSector* self,
 	int          x,
@@ -55,10 +51,6 @@ LIAPICALL (int, livox_sector_read_block, (
 LIAPICALL (void, livox_sector_update, (
 	LIVoxSector* self,
 	float        secs));
-
-LIAPICALL (int, livox_sector_write, (
-	LIVoxSector* self,
-	LIArcSql*    sql));
 
 LIAPICALL (int, livox_sector_write_block, (
 	LIVoxSector* self,

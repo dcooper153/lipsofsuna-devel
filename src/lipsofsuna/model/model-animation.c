@@ -121,7 +121,7 @@ int limdl_animation_insert_channel (
 	int frame;
 	char* str;
 	char** tmp;
-	LIMdlFrame* buffer;
+	LIMdlFrame* buffer = NULL;
 
 	/* Check for existence. */
 	if (limdl_animation_get_channel (self, name) != -1)

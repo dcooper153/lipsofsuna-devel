@@ -19,7 +19,6 @@
 #define __LIPS_ARCHIVE_H__
 
 #include "archive/archive-reader.h"
-#include "archive/archive-sql.h"
 #include "archive/archive-tar.h"
 #include "archive/archive-writer.h"
 
