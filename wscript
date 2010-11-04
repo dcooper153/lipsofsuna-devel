@@ -11,7 +11,7 @@ out = '.build'
 
 CORE_DIRS = 'ai algorithm archive binding callback client engine extension font generator image main math model network particle paths physics reload render script server sound string system thread video voxel widget'
 EXTS_DIRS = 'binding camera database effect generator network npc object-physics object-render physics packager region reload render skeleton sound speech tiles tiles-physics tiles-render widgets'
-CORE_EXCL = 'src/lipsofsuna/math/unittest.c src/lipsofsuna/server/server-main.c src/lipsofsuna/main/main.c'
+CORE_EXCL = 'src/lipsofsuna/math/unittest.c'
 
 def options(ctx):
 	ctx.tool_options('compiler_cc')

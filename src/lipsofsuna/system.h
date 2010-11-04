@@ -23,7 +23,6 @@
 #include "system/system-directory.h"
 #include "system/system-endian.h"
 #include "system/system-error.h"
-#include "system/system-execute.h"
 #include "system/system-filesystem.h"
 #include "system/system-mmap.h"
 #include "system/system-memory.h"
