@@ -1,3 +1,11 @@
+Effect.play = function(clss, name)
+	EffectObject{
+		object = Player.object,
+		sound = name,
+		sound_pitch = 1,
+		realized = true}
+end
+
 EffectObject = Class(Object)
 
 --- Creates a new effect.
@@ -9,6 +17,7 @@ EffectObject = Class(Object)
 --   <li>model: Particle effect name or nil.</li>
 --   <li>object: Parent object or nil.</li>
 --   <li>sound: Sound effect name or nil.</li>
+--   <li>sound_pitch: Sound effect pitch factor or nil.</li>
 --   <li>text: Text effect string or nil.</li>
 --   <li>velocity: Velocity vector or nil.</li></ul>
 -- @return Object.
@@ -21,7 +30,8 @@ EffectObject.new = function(clss, args)
 	self:particle_animation{loop = false}
 	-- Attach a sound effect.
 	if args.sound then
-		Sound:effect{object = self, effect = args.sound, pitch = 0.8+0.4*math.random()}
+		local pitch = args.sound_pitch or (0.8+0.4*math.random())
+		Sound:effect{object = self, effect = args.sound, pitch = pitch}
 	end
 	-- Attach a text effect.
 	if args.text then

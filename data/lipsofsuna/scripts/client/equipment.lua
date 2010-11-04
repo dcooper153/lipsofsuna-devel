@@ -49,6 +49,7 @@ Equipment.move = function(self, src_type, src_id, src_slot, dst_type, dst_id, ds
 
 	if not Player.object then return end
 	local pos = Player.object.position
+	Effect:play("item1")
 
 	-- Equipment -> equipment.
 	if src_type == "equ" and dst_type == "equ" then

@@ -68,5 +68,6 @@ Protocol:add_handler{type = "QUEST_STATUS", func = function(event)
 			quest.text = t
 			Quests:update(quest)
 		end
+		Effect:play("quest1")
 	end
 end}

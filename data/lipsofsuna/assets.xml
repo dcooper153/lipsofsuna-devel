@@ -1678,6 +1678,22 @@
   </asset>
 
   <asset>
+    <file>sounds/item1.flac</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/quest1.flac</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
     <file>sounds/snap-000.flac</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>
