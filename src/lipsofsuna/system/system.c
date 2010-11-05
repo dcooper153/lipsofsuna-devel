@@ -28,6 +28,11 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#ifdef HAVE_WINDOWS_H
+#define _WIN32_IE 0x0400
+#include <windows.h>
+#include <shlobj.h>
+#endif
 #include "system.h"
 #include "system-error.h"
 #include "system-path.h"
@@ -64,12 +69,20 @@ time_t lisys_time (
  */
 char* lisys_system_get_path_home ()
 {
+#ifdef __WIN32__
+	char tmp[MAX_PATH];
+
+	if (!SHGetSpecialFolderPath (NULL, tmp, CSIDL_PROFILE, TRUE))
+		return NULL;
+	return strdup (tmp);
+#else
 	char* home;
 
 	home = getenv ("HOME");
-	if (home == NULL)
-		return strdup (".");
-	return strdup (home);
+	if (home != NULL)
+		return strdup (home);
+	return strdup (".");
+#endif
 }
 
 /**
@@ -82,6 +95,13 @@ char* lisys_system_get_path_home ()
  */
 char* lisys_system_get_path_data_home ()
 {
+#ifdef __WIN32__
+	char tmp[MAX_PATH];
+
+	if (!SHGetSpecialFolderPath (NULL, tmp, CSIDL_APPDATA, TRUE))
+		return NULL;
+	return strdup (tmp);
+#else
 	char* ret;
 	char* tmp;
 	const char* dir;
@@ -96,6 +116,7 @@ char* lisys_system_get_path_data_home ()
 	free (tmp);
 
 	return ret;
+#endif
 }
 
 /**
@@ -108,6 +129,9 @@ char* lisys_system_get_path_data_home ()
  */
 char* lisys_system_get_path_config_home ()
 {
+#ifdef __WIN32__
+	return lisys_system_get_path_data_home ();
+#else
 	char* ret;
 	char* tmp;
 	const char* dir;
@@ -122,6 +146,7 @@ char* lisys_system_get_path_config_home ()
 	free (tmp);
 
 	return ret;
+#endif
 }
 
 /**
@@ -134,6 +159,9 @@ char* lisys_system_get_path_config_home ()
  */
 char* lisys_system_get_path_cache_home ()
 {
+#ifdef __WIN32__
+	return lisys_system_get_path_data_home ();
+#else
 	char* ret;
 	char* tmp;
 	const char* dir;
@@ -148,6 +176,7 @@ char* lisys_system_get_path_cache_home ()
 	free (tmp);
 
 	return ret;
+#endif
 }
 
 /** @} */
