@@ -145,7 +145,7 @@ LISysMmap* lisys_mmap_open (
 		free (self);
 		return NULL;
 	}
-	self->size = GetFileSize (self->handle, NULL);
+	self->size = GetFileSize (self->file, NULL);
 	if (self->size == INVALID_FILE_SIZE)
 	{
 		lisys_error_set (EIO, "cannot get size of `%s'", path);
