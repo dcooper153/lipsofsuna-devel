@@ -145,7 +145,7 @@ static inline GLuint liimg_ddsgl_load_texture (
 			lisys_free (lvl.data);
 		}
 	}
-	if (!dds.header.mipmaps)
+	if (dds.header.mipmaps <= 1)
 		glGenerateMipmap (GL_TEXTURE_2D);
 
 	return texture;
