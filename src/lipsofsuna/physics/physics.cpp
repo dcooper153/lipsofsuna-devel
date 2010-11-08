@@ -30,6 +30,31 @@
 
 #define MAXPROXIES 1000000
 
+class RayTestIgnore : public btCollisionWorld::ClosestRayResultCallback
+{
+public:
+	RayTestIgnore (LIPhyObject** ignore_array, int ignore_count, const btVector3& src, const btVector3& dst) :
+		btCollisionWorld::ClosestRayResultCallback (src, dst)
+	{
+		this->ignore_count = ignore_count;
+		this->ignore_array = ignore_array;
+	}
+	virtual btScalar addSingleResult (btCollisionWorld::LocalRayResult& result, bool world)
+	{
+		int i;
+		LIPhyObject* hit = (LIPhyObject*) result.m_collisionObject->getUserPointer ();
+		for (i = 0 ; i < this->ignore_count ; i++)
+		{
+			if (hit == this->ignore_array[i])
+				return 1.0;
+		}
+		return btCollisionWorld::ClosestRayResultCallback::addSingleResult (result, world);
+	}
+protected:
+	int ignore_count;
+	LIPhyObject** ignore_array;
+};
+
 class ConvexTestIgnore : public btCollisionWorld::ClosestConvexResultCallback
 {
 public:
@@ -159,42 +184,48 @@ liphy_physics_free (LIPhyPhysics* self)
  * \param self Physics simulation.
  * \param start Ray start point.
  * \param end Ray end point.
- * \param result Return location for collision point.
- * \param normal Return location for collision surface normal.
+ * \param result Return location for collision point or NULL.
+ * \param normal Return location for collision surface normal or NULL.
  * \return Nonzero if no collision occurred.
  */
-int
-liphy_physics_cast_ray (const LIPhyPhysics* self,
-                        const LIMatVector*  start,
-                        const LIMatVector*  end,
-                        LIMatVector*        result,
-                        LIMatVector*        normal)
+int liphy_physics_cast_ray (
+	const LIPhyPhysics* self,
+	const LIMatVector*  start,
+	const LIMatVector*  end,
+	int                 group,
+	int                 mask,
+	LIPhyObject**       ignore_array,
+	int                 ignore_count,
+	LIMatVector*        result,
+	LIMatVector*        normal)
 {
 	btVector3 src (start->x, start->y, start->z);
 	btVector3 dst (end->x, end->y, end->z);
-//	btBroadphaseProxy* proxy;
 	btCollisionWorld* collision;
-	btCollisionWorld::ClosestRayResultCallback test (src, dst);
+	RayTestIgnore test (ignore_array, ignore_count, src, dst);
 
 	/* Cast the ray. */
-//	proxy = self->body->getBroadphaseHandle ();
 	collision = self->dynamics->getCollisionWorld ();
 	test.m_closestHitFraction = 1.0f;
-//	test.m_collisionFilterGroup = proxy->m_collisionFilterGroup;
-//	test.m_collisionFilterMask = proxy->m_collisionFilterMask;
+	test.m_collisionFilterGroup = group;
+	test.m_collisionFilterMask = mask;
 	collision->rayTest (src, dst, test);
 
 	/* Inspect results. */
 	if (test.m_closestHitFraction < 1.0f)
 	{
-		*result = limat_vector_init (test.m_hitPointWorld[0], test.m_hitPointWorld[1], test.m_hitPointWorld[2]);
-		*normal = limat_vector_init (test.m_hitNormalWorld[0], test.m_hitNormalWorld[1], test.m_hitNormalWorld[2]);
+		if (result != NULL)
+			*result = limat_vector_init (test.m_hitPointWorld[0], test.m_hitPointWorld[1], test.m_hitPointWorld[2]);
+		if (normal != NULL)
+			*normal = limat_vector_init (test.m_hitNormalWorld[0], test.m_hitNormalWorld[1], test.m_hitNormalWorld[2]);
 		return 0;
 	}
 	else
 	{
-		*result = *end;
-		*normal = limat_vector_normalize (limat_vector_subtract (*end, *start));
+		if (result != NULL)
+			*result = *end;
+		if (normal != NULL)
+			*normal = limat_vector_normalize (limat_vector_subtract (*end, *start));
 		return 1;
 	}
 }
@@ -217,16 +248,16 @@ liphy_physics_cast_ray (const LIPhyPhysics* self,
  * \param result Return location for collision data.
  * \return Nonzero if a collision occurred.
  */
-int
-liphy_physics_cast_shape (const LIPhyPhysics*   self,
-                          const LIMatTransform* start,
-                          const LIMatTransform* end,
-                          const LIPhyShape*     shape,
-                          int                   group,
-                          int                   mask,
-                          LIPhyObject**         ignore_array,
-                          int                   ignore_count,
-                          LIPhyCollision*       result)
+int liphy_physics_cast_shape (
+	const LIPhyPhysics*   self,
+	const LIMatTransform* start,
+	const LIMatTransform* end,
+	const LIPhyShape*     shape,
+	int                   group,
+	int                   mask,
+	LIPhyObject**         ignore_array,
+	int                   ignore_count,
+	LIPhyCollision*       result)
 {
 	int i;
 	float best;

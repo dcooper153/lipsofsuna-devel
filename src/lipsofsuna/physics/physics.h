@@ -37,6 +37,10 @@ LIAPICALL (int, liphy_physics_cast_ray, (
 	const LIPhyPhysics* self,
 	const LIMatVector*  start,
 	const LIMatVector*  end,
+	int                 group,
+	int                 mask,
+	LIPhyObject**       ignore_array,
+	int                 ignore_count,
 	LIMatVector*        result,
 	LIMatVector*        normal));
 

@@ -33,6 +33,7 @@ LIPhyCharacterAction::LIPhyCharacterAction (
 	LIPhyObject* object)
 {
 	this->object = object;
+	this->timer = 0.0f;
 	this->ground = 0;
 }
 
@@ -51,9 +52,19 @@ void LIPhyCharacterAction::updateAction (
 	btVector3 forward = transform * btVector3 (0.0f, 0.0f, -1.0f) - pos;
 
 	/* Check for ground. */
-	LIMatVector check = { 0.0f, -0.2f, 0.0f };
-	ground = liphy_object_sweep (this->object, &check) < 1.0f;
-	this->ground = ground;
+	this->timer += delta;
+	if (this->timer >= 0.2f)
+	{
+		LIMatVector check0 = { pos[0], pos[1], pos[2] };
+		LIMatVector check1 = { pos[0], pos[1] - 0.3f, pos[2] };
+		ground = liphy_physics_cast_ray (this->object->physics, &check0, &check1,
+			this->object->config.collision_group, this->object->config.collision_mask,
+			&this->object, 1, NULL, NULL) < 1.0f;
+		this->ground = ground;
+		this->timer = 0.0f;
+	}
+	else
+		ground = this->ground;
 
 	/* Get velocity components. */
 	btVector3 vel = ((btRigidBody*) object)->getLinearVelocity ();

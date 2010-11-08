@@ -129,6 +129,7 @@ public:
 	virtual void debugDraw (btIDebugDraw* debug);
 public:
 	int ground;
+	float timer;
 	LIPhyObject* object;
 };
 
