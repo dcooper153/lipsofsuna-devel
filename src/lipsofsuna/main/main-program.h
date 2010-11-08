@@ -56,7 +56,8 @@ struct _LIMaiProgram
 };
 
 LIAPICALL (LIMaiProgram*, limai_program_new, (
-	LIPthPaths* paths,
+	const char* path,
+	const char* name,
 	const char* args));
 
 LIAPICALL (void, limai_program_free, (

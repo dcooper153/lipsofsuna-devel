@@ -22,17 +22,16 @@
  * @{
  */
 
-#include <SDL.h>
-#include <SDL_main.h>
-#include "client.h"
+#include "SDL.h"
+#include "SDL_main.h"
+#include "main-program.h"
 
-int
-main (int argc, char** argv)
+int main (int argc, char** argv)
 {
 	char* path;
 	char* launch_name;
 	char* launch_args;
-	LICliClient* self;
+	LIMaiProgram* program;
 
 	/* Resolve game directory. */
 	path = lipth_paths_get_root ();
@@ -43,56 +42,49 @@ main (int argc, char** argv)
 	}
 
 	/* Start the program. */
-	self = licli_client_new (path, argc > 1? argv[1] : "default");
-	if (self == NULL)
+	/* FIXME: Should concatenate the arguments. */
+	program = limai_program_new (path, argc > 1? argv[1] : "default", (argc > 2)? argv[2] : NULL);
+	if (program == NULL)
 	{
 		lisys_error_report ();
 		lisys_free (path);
 		return 1;
 	}
 
-	/* Load the first mod. */
-	if (argc > 1)
-	{
-		/* FIXME: Should concatenate the arguments. */
-		if (!licli_client_load_module (self, argv[1], (argc > 2)? argv[2] : NULL))
-			lisys_error_report ();
-	}
-	else
-	{
-		if (!licli_client_load_module (self, "default", NULL))
-			lisys_error_report ();
-	}
-
 	/* Execute mods until one exits without starting a new one. */
-	while (self->program != NULL)
+	while (program != NULL)
 	{
 		/* Execute the module until the script exits. */
-		if (!licli_client_main (self))
+		if (!limai_program_execute_script (program, "main.lua"))
 		{
 			lisys_error_report ();
 			break;
 		}
 
 		/* Check if the module started another one. */
-		launch_name = self->program->launch_name;
-		launch_args = self->program->launch_args;
+		launch_name = program->launch_name;
+		launch_args = program->launch_args;
 		if (launch_name == NULL)
 			break;
-		self->program->launch_name = NULL;
-		self->program->launch_args = NULL;
+		program->launch_name = NULL;
+		program->launch_args = NULL;
+		limai_program_free (program);
 
 		/* Unload the old module and load a new one. */
-		licli_client_free_module (self);
-		if (!licli_client_load_module (self, launch_name, launch_args))
-			lisys_error_report ();
+		program = limai_program_new (path, launch_name, launch_args);
 		lisys_free (launch_name);
 		lisys_free (launch_args);
+		if (program == NULL)
+		{
+			lisys_error_report ();
+			break;
+		}
 	}
 
 	/* Free all resources. */
-	licli_client_free (self);
+	limai_program_free (program);
 	lisys_free (path);
+	SDL_Quit ();
 
 	return 0;
 }

@@ -49,7 +49,7 @@ LIExtModule* liext_sound_new (
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
-	self->client = limai_program_find_component (program, "client");
+	self->program = program;
 	self->music_volume = 1.0f;
 	self->music_fading = 1.0f;
 	self->listener_rotation = limat_quaternion_identity ();
@@ -142,7 +142,7 @@ LISndSample* liext_sound_find_sample (
 		return sample;
 
 	/* Try to load OGG. */
-	path = lisys_path_format (self->client->paths->module_data,
+	path = lisys_path_format (self->program->paths->module_data,
 		LISYS_PATH_SEPARATOR, "sounds",
 		LISYS_PATH_SEPARATOR, name, ".ogg", NULL);
 	if (path == NULL)
@@ -153,7 +153,7 @@ LISndSample* liext_sound_find_sample (
 		return lisnd_manager_get_sample (self->sound, name);
 
 	/* Try to load FLAC. */
-	path = lisys_path_format (self->client->paths->module_data,
+	path = lisys_path_format (self->program->paths->module_data,
 		LISYS_PATH_SEPARATOR, "sounds",
 		LISYS_PATH_SEPARATOR, name, ".flac", NULL);
 	if (path == NULL)
@@ -192,7 +192,7 @@ LISndSource* liext_sound_set_effect (
 
 	/* Find engine object. */
 	create = 0;
-	engobj = lieng_engine_find_object (self->client->engine, object);
+	engobj = lieng_engine_find_object (self->program->engine, object);
 	if (engobj == NULL)
 		return NULL;
 
@@ -366,7 +366,7 @@ static int private_tick (
 	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		extobj = iter.value;
-		engobj = lieng_engine_find_object (self->client->engine, iter.key);
+		engobj = lieng_engine_find_object (self->program->engine, iter.key);
 		if (engobj != NULL)
 		{
 			for (ptr = extobj->sounds ; ptr != NULL ; ptr = next)

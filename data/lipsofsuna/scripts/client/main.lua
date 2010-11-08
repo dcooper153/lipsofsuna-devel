@@ -1,5 +1,6 @@
 print "INFO: Loading client scripts."
 
+require "core/graphics"
 require "core/camera"
 require "core/network"
 require "core/object-render"

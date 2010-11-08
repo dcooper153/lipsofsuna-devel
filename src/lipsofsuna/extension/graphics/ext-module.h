@@ -15,13 +15,25 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __CLIENT_CALLBACKS_H__
-#define __CLIENT_CALLBACKS_H__
+#ifndef __EXT_MODULE_H__
+#define __EXT_MODULE_H__
 
-#include <lipsofsuna/render.h>
-#include "client-types.h"
+#include "lipsofsuna/extension.h"
+#include "lipsofsuna/client.h"
 
-int licli_client_init_callbacks_misc (LICliClient* self);
+#define LIEXT_SCRIPT_GRAPHICS "Graphics"
+
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
+{
+	LIMaiProgram* program;
+	LICliClient* client;
+};
+
+LIExtModule* liext_graphics_new (
+	LIMaiProgram* program);
+
+void liext_graphics_free (
+	LIExtModule* self);
 
 #endif
-

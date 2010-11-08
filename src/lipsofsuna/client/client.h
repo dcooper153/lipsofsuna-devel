@@ -29,32 +29,14 @@
 #include <lipsofsuna/thread.h>
 #include <lipsofsuna/video.h>
 #include <lipsofsuna/widget.h>
-#include "client-callbacks.h"
 #include "client-types.h"
 #include "client-window.h"
 
-// FIXME
-#define LICLI_SELECT_MAXIMUM_COUNT 128
-#define LICLI_SELECT_RECTANGLE_SIZE 1
-
 struct _LICliClient
 {
-	/* Persistent. */
-	char* root;
-	LICliWindow* window;
-
-	/* Program. */
-	LIAlgSectors* sectors;
-	LICalCallbacks* callbacks;
-	LIEngEngine* engine;
-	LIMaiProgram* program;
-	LIScrScript* script;
-
-	/* Module. */
 	int moving;
-	char* name;
-	char* path;
-	LIPthPaths* paths;
+	LICliWindow* window;
+	LIMaiProgram* program;
 	LIRenRender* render;
 	LIRenScene* scene;
 	LISerServer* server;
@@ -62,29 +44,14 @@ struct _LICliClient
 };
 
 LIAPICALL (LICliClient*, licli_client_new, (
-	const char* path,
-	const char* name));
+	LIMaiProgram* program));
 
 LIAPICALL (void, licli_client_free, (
-	LICliClient* self));
-
-LIAPICALL (void, licli_client_free_module, (
 	LICliClient* self));
 
 LIAPICALL (int, licli_client_host, (
 	LICliClient* self,
 	const char*  args));
-
-LIAPICALL (int, licli_client_load_module, (
-	LICliClient* self,
-	const char*  name,
-	const char*  args));
-
-LIAPICALL (int, licli_client_main, (
-	LICliClient* self));
-
-LIAPICALL (void, licli_client_render, (
-	LICliClient* self));
 
 LIAPICALL (int, licli_client_get_moving, (
 	LICliClient* self));

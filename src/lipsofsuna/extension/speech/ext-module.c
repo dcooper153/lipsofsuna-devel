@@ -47,6 +47,7 @@ LIExtModule* liext_speeches_new (
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
+	self->program = program;
 
 	/* Make sure the widgets extension is loaded. */
 	if (!limai_program_insert_extension (program, "widgets"))
@@ -216,7 +217,7 @@ LIExtSpeech* liext_speeches_set_speech (
 
 	/* Find engine object. */
 	create = 0;
-	engobj = lieng_engine_find_object (self->client->engine, object);
+	engobj = lieng_engine_find_object (self->program->engine, object);
 	if (engobj == NULL)
 		return NULL;
 
@@ -299,7 +300,7 @@ static int private_tick (
 	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		extobj = iter.value;
-		engobj = lieng_engine_find_object (self->client->engine, iter.key);
+		engobj = lieng_engine_find_object (self->program->engine, iter.key);
 		if (engobj != NULL)
 		{
 			/* Update speech offset. */

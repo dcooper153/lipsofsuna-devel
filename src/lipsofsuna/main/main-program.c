@@ -26,7 +26,10 @@
 #include "main-program.h"
 
 static int private_init (
-	LIMaiProgram* self);
+	LIMaiProgram* self,
+	const char*   path,
+	const char*   name,
+	const char*   args);
 
 static int private_object_model (
 	LIMaiProgram* self,
@@ -67,12 +70,14 @@ static int private_tick (
 /**
  * \brief Creates a new program instance.
  *
- * \param paths Path information.
- * \param args Program arguments.
+ * \param path Root data directory.
+ * \param name Module name.
+ * \param args Module arguments or NULL.
  * \return New program or NULL.
  */
 LIMaiProgram* limai_program_new (
-	LIPthPaths* paths,
+	const char* path,
+	const char* name,
 	const char* args)
 {
 	LIMaiProgram* self;
@@ -81,7 +86,6 @@ LIMaiProgram* limai_program_new (
 	self = lisys_calloc (1, sizeof (LIMaiProgram));
 	if (self == NULL)
 		return NULL;
-	self->paths = paths;
 	self->args = listr_dup ((args != NULL)? args : "");
 	if (self->args == NULL)
 	{
@@ -90,7 +94,7 @@ LIMaiProgram* limai_program_new (
 	}
 
 	/* Initialize subsystems. */
-	if (!private_init (self))
+	if (!private_init (self, path, name, args))
 	{
 		limai_program_free (self);
 		return NULL;
@@ -167,6 +171,8 @@ void limai_program_free (
 		lisys_assert (self->sectors->content->size == 0);
 		lialg_sectors_free (self->sectors);
 	}
+	if (self->paths != NULL)
+		lipth_paths_free (self->paths);
 
 	lisys_free (self->launch_args);
 	lisys_free (self->launch_name);
@@ -555,8 +561,16 @@ double limai_program_get_time (
 /****************************************************************************/
 
 static int private_init (
-	LIMaiProgram* self)
+	LIMaiProgram* self,
+	const char*   path,
+	const char*   name,
+	const char*   args)
 {
+	/* Initialize paths. */
+	self->paths = lipth_paths_new (path, name);
+	if (self->paths == NULL)
+		return 0;
+
 	/* Initialize dictionaries. */
 	self->components = lialg_strdic_new ();
 	if (self->components == NULL)
@@ -589,6 +603,18 @@ static int private_init (
 	gettimeofday (&self->start, NULL);
 	self->prev_tick = self->start;
 	self->curr_tick = self->start;
+
+	/* Register classes. */
+	if (!liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
+	    !liscr_script_create_class (self->script, "Event", liscr_script_event, self->script) ||
+	    !liscr_script_create_class (self->script, "Model", liscr_script_model, self) ||
+	    !liscr_script_create_class (self->script, "Object", liscr_script_object, self) ||
+	    !liscr_script_create_class (self->script, "Packet", liscr_script_packet, self->script) ||
+	    !liscr_script_create_class (self->script, "Path", liscr_script_path, self->script) ||
+	    !liscr_script_create_class (self->script, "Program", liscr_script_program, self) ||
+	    !liscr_script_create_class (self->script, "Quaternion", liscr_script_quaternion, self->script) ||
+	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script))
+		return 0;
 
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (self->callbacks, self->engine, "object-model", 65535, private_object_model, self, self->calls + 0) ||

@@ -74,7 +74,7 @@ int liext_tiles_render_block_build (
 	liext_tiles_render_block_clear (self);
 
 	/* Build new objects. */
-	if (!livox_build_block (self->module->voxels, self->module->client->engine, NULL, addr, &model, NULL))
+	if (!livox_build_block (self->module->voxels, self->module->program->engine, NULL, addr, &model, NULL))
 		return 0;
 
 	/* Create render model if not empty. */

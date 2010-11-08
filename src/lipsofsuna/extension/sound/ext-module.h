@@ -31,7 +31,7 @@ struct _LIExtModule
 {
 	float music_fading;
 	float music_volume;
-	LICliClient* client;
+	LIMaiProgram* program;
 	LIMatVector listener_position;
 	LIMatVector listener_velocity;
 	LIMatQuaternion listener_rotation;

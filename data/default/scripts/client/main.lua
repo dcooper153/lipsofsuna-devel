@@ -1,3 +1,4 @@
+require "core/graphics"
 require "core/render"
 require "core/sound"
 require "core/widgets"

@@ -19,7 +19,6 @@
 #define __LIPS_CLIENT_H__
 
 #include "client/client.h"
-#include "client/client-callbacks.h"
 #include "client/client-script.h"
 #include "client/client-types.h"
 #include "client/client-window.h"

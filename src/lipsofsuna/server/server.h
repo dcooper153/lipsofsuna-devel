@@ -36,7 +36,8 @@ struct _LISerServer
 };
 
 LIAPICALL (LISerServer*, liser_server_new, (
-	LIPthPaths* paths,
+	const char* path,
+	const char* name,
 	const char* args));
 
 LIAPICALL (void, liser_server_free, (

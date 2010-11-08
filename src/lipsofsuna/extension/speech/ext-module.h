@@ -32,6 +32,7 @@ struct _LIExtModule
 	LIAlgU32dic* objects;
 	LICalHandle calls[1];
 	LICliClient* client;
+	LIMaiProgram* program;
 	LIWdgManager* widgets;
 };
 

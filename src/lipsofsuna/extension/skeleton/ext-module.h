@@ -18,7 +18,7 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/extension.h>
+#include "lipsofsuna/extension.h"
 
 #define LIEXT_SCRIPT_SKELETON "Skeleton"
 

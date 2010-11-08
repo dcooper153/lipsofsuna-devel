@@ -30,41 +30,32 @@
 #include <lipsofsuna/string.h>
 #include <lipsofsuna/system.h>
 #include "client.h"
-#include "client-callbacks.h"
 #include "client-script.h"
 #include "client-window.h"
 
-static int
-private_init_paths (LICliClient* self,
-                    const char*  path,
-                    const char*  name);
+static int private_init (
+	LICliClient*  self,
+	LIMaiProgram* program);
 
-static int
-private_init_render (LICliClient* self);
+static int private_event (
+	LICliClient* client,
+	SDL_Event*   event);
 
-static int
-private_init_script (LICliClient* self);
-
-static void
-private_server_main (LIThrThread* thread,
-                     void*        data);
+static void private_server_main (
+	LIThrThread* thread,
+	void*        data);
 
 static void private_server_shutdown (
 	LICliClient* self);
 
-static int private_select (
-	LICliClient*    self,
-	LIRenSelection* selection);
-
-static int private_update (
+static int private_tick (
 	LICliClient* self,
 	float        secs);
 
 /*****************************************************************************/
 
 LICliClient* licli_client_new (
-	const char* path,
-	const char* name)
+	LIMaiProgram* program)
 {
 	LICliClient* self;
 
@@ -72,20 +63,12 @@ LICliClient* licli_client_new (
 	self = lisys_calloc (1, sizeof (LICliClient));
 	if (self == NULL)
 		return NULL;
-
-	/* Allocate root directory. */
-	self->root = listr_dup (path);
-	if (self->root == NULL)
-	{
-		lisys_free (self);
-		return NULL;
-	}
+	self->program = program;
 
 	/* Initialize SDL. */
 	if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
 	{
 		lisys_error_set (ENOTSUP, "initializing SDL failed");
-		lisys_free (self->root);
 		lisys_free (self);
 		return NULL;
 	}
@@ -99,67 +82,37 @@ LICliClient* licli_client_new (
 		return NULL;
 	}
 
+	/* Load module. */
+	if (!private_init (self, program))
+	{
+		licli_client_free (self);
+		return NULL;
+	}
+
 	return self;
 }
 
 void licli_client_free (
 	LICliClient* self)
 {
-	licli_client_free_module (self);
-	if (self->window != NULL)
-		licli_window_free (self->window);
-	SDL_Quit ();
-	lisys_free (self->root);
-	lisys_free (self);
-}
-
-/**
- * \brief Frees the currently loaded module.
- *
- * \param self Client.
- */
-void licli_client_free_module (
-	LICliClient* self)
-{
 	/* Invoke callbacks. */
-	if (self->callbacks != NULL)
-		lical_callbacks_call (self->callbacks, self, "client-free", lical_marshal_DATA);
+	lical_callbacks_call (self->program->callbacks, self, "client-free", lical_marshal_DATA);
 
-	/* Free program. */
+	/* Remove component. */
 	if (self->program != NULL)
-	{
 		limai_program_remove_component (self->program, "client");
-		limai_program_free (self->program);
-		self->sectors = NULL;
-		self->callbacks = NULL;
-		self->engine = NULL;
-		self->program = NULL;
-		self->script = NULL;
-	}
 
 	/* Free the server. */
 	private_server_shutdown (self);
 
-	if (self->paths != NULL)
-	{
-		lipth_paths_free (self->paths);
-		self->paths = NULL;
-	}
 	if (self->scene != NULL)
-	{
 		liren_scene_free (self->scene);
-		self->scene = NULL;
-	}
 	if (self->render != NULL)
-	{
 		liren_render_free (self->render);
-		self->render = NULL;
-	}
+	if (self->window != NULL)
+		licli_window_free (self->window);
 
-	lisys_free (self->path);
-	lisys_free (self->name);
-	self->path = NULL;
-	self->name = NULL;
+	lisys_free (self);
 }
 
 /**
@@ -177,7 +130,7 @@ int licli_client_host (
 	private_server_shutdown (self);
 
 	/* Create new server. */
-	self->server = liser_server_new (self->paths, args);
+	self->server = liser_server_new (self->program->paths->root, self->program->paths->module_name, args);
 	if (self->server == NULL)
 		return 0;
 
@@ -190,69 +143,6 @@ int licli_client_host (
 	}
 
 	return 1;
-}
-
-/**
- * \brief Loads a module.
- *
- * \param self Client.
- * \param name Module name.
- * \param args Module arguments.
- */
-int licli_client_load_module (
-	LICliClient* self,
-	const char*  name,
-	const char*  args)
-{
-	/* Initialize paths. */
-	if (!private_init_paths (self, self->root, name))
-		return 0;
-
-	/* Create program. */
-	self->program = limai_program_new (self->paths, args);
-	if (self->program == NULL)
-	{
-		lipth_paths_free (self->paths);
-		self->paths = NULL;
-		return 0;
-	}
-	self->sectors = self->program->sectors;
-	self->callbacks = self->program->callbacks;
-	self->engine = self->program->engine;
-	self->paths = self->program->paths;
-	self->script = self->program->script;
-	lical_callbacks_insert (self->callbacks, self->engine, "tick", -1000, private_update, self, NULL);
-	lical_callbacks_insert (self->callbacks, self->engine, "select", 32768, private_select, self, NULL);
-
-	/* Store credentials. */
-	self->name = listr_dup (name);
-	if (self->name == NULL)
-	{
-		licli_client_free_module (self);
-		return 0;
-	}
-
-	/* Initialize client component. */
-	if (!limai_program_insert_component (self->program, "client", self))
-	{
-		licli_client_free_module (self);
-		return 0;
-	}
-	if (!private_init_render (self) ||
-	    !private_init_script (self) ||
-	    !licli_client_init_callbacks_misc (self))
-	{
-		licli_client_free_module (self);
-		return 0;
-	}
-
-	return 1;
-}
-
-int licli_client_main (
-	LICliClient* self)
-{
-	return limai_program_execute_script (self->program, "main.lua");
 }
 
 /**
@@ -307,55 +197,109 @@ void licli_client_set_moving (
 
 /*****************************************************************************/
 
-static int
-private_init_paths (LICliClient* self,
-                    const char*  path,
-                    const char*  name)
+static int private_init (
+	LICliClient*  self,
+	LIMaiProgram* program)
 {
-	self->paths = lipth_paths_new (path, name);
-	if (self->paths == NULL)
-		return 0;
-	self->path = listr_dup (self->paths->module_data);
-	if (self->path == NULL)
-		return 0;
-
-	return 1;
-}
-
-static int
-private_init_render (LICliClient* self)
-{
-	self->render = liren_render_new (self->paths->module_data);
+	/* Initialize renderer. */
+	self->render = liren_render_new (self->program->paths->module_data);
 	if (self->render == NULL)
 		return 0;
 	self->scene = liren_scene_new (self->render);
 	if (self->scene == NULL)
 		return 0;
 
-	return 1;
-}
-
-static int
-private_init_script (LICliClient* self)
-{
-	if (!liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
-	    !liscr_script_create_class (self->script, "Event", liscr_script_event, self->script) ||
-	    !liscr_script_create_class (self->script, "Client", licli_script_client, self) ||
-	    !liscr_script_create_class (self->script, "Model", liscr_script_model, self->program) ||
-	    !liscr_script_create_class (self->script, "Object", liscr_script_object, self->program) ||
-	    !liscr_script_create_class (self->script, "Packet", liscr_script_packet, self->script) ||
-	    !liscr_script_create_class (self->script, "Path", liscr_script_path, self->script) ||
-	    !liscr_script_create_class (self->script, "Program", liscr_script_program, self->program) ||
-	    !liscr_script_create_class (self->script, "Quaternion", liscr_script_quaternion, self->script) ||
-	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script))
+	/* Register component. */
+	if (!limai_program_insert_component (self->program, "client", self))
 		return 0;
 
+	/* Register classes. */
+	if (!liscr_script_create_class (program->script, "Client", licli_script_client, self))
+		return 0;
+
+	/* Register callbacks. */
+	lical_callbacks_insert (program->callbacks, program->engine, "event", -5, private_event, self, NULL);
+	lical_callbacks_insert (program->callbacks, program->engine, "tick", -1000, private_tick, self, NULL);
+
 	return 1;
 }
 
-static void
-private_server_main (LIThrThread* thread,
-                     void*        data)
+static int private_event (
+	LICliClient* self,
+	SDL_Event*   event)
+{
+	char* str = NULL;
+
+	switch (event->type)
+	{
+		case SDL_JOYAXISMOTION:
+			limai_program_event (self->program, "joystickmotion",
+				"axis", LISCR_TYPE_INT, event->jaxis.axis + 1,
+				"value", LISCR_TYPE_FLOAT, event->jaxis.value / 32768.0f, NULL);
+			return 0;
+		case SDL_JOYBUTTONDOWN:
+		case SDL_JOYBUTTONUP:
+			limai_program_event (self->program,
+				(event->type == SDL_JOYBUTTONDOWN)? "joystickpress" : "joystickrelease",
+				"button", LISCR_TYPE_INT, event->jbutton.button, NULL);
+			return 0;
+		case SDL_MOUSEBUTTONDOWN:
+		case SDL_MOUSEBUTTONUP:
+			limai_program_event (self->program,
+				(event->type == SDL_MOUSEBUTTONDOWN)? "mousepress" : "mouserelease",
+				"button", LISCR_TYPE_INT, event->button.button,
+				"x", LISCR_TYPE_INT, event->button.x,
+				"y", LISCR_TYPE_INT, event->button.y, NULL);
+			return 0;
+		case SDL_KEYDOWN:
+		case SDL_KEYUP:
+			if (event->key.keysym.unicode != 0)
+				str = listr_wchar_to_utf8 (event->key.keysym.unicode);
+			if (str != NULL)
+			{
+				limai_program_event (self->program,
+					(event->type == SDL_KEYDOWN)? "keypress" : "keyrelease",
+					"code", LISCR_TYPE_INT, event->key.keysym.sym,
+					"mods", LISCR_TYPE_INT, event->key.keysym.mod,
+					"text", LISCR_TYPE_STRING, str, NULL);
+				lisys_free (str);
+			}
+			else
+			{
+				limai_program_event (self->program,
+					(event->type == SDL_KEYDOWN)? "keypress" : "keyrelease",
+					"code", LISCR_TYPE_INT, event->key.keysym.sym,
+					"mods", LISCR_TYPE_INT, event->key.keysym.mod, NULL);
+			}
+			return 0;
+		case SDL_MOUSEMOTION:
+			limai_program_event (self->program, "mousemotion",
+				"x", LISCR_TYPE_INT, event->motion.x,
+				"y", LISCR_TYPE_INT, event->motion.y,
+				"dx", LISCR_TYPE_INT, event->motion.xrel,
+				"dy", LISCR_TYPE_INT, event->motion.yrel, NULL);
+			return 0;
+		case SDL_QUIT:
+			limai_program_event (self->program, "quit", NULL);
+			break;
+		case SDL_ACTIVEEVENT:
+			if (event->active.state & SDL_APPINPUTFOCUS)
+				self->program->sleep = 5000;
+			else
+				self->program->sleep = 0;
+			break;
+		case SDL_VIDEORESIZE:
+			if (!licli_window_set_size (self->window, event->resize.w, event->resize.h))
+				return 1;
+			break;
+	}
+
+	return 1;
+}
+
+static void private_server_main (
+	LIThrThread* thread,
+	void*        data)
 {
 	LICliClient* self = data;
 
@@ -385,35 +329,33 @@ static void private_server_shutdown (
 	}
 }
 
-static int private_select (
-	LICliClient*    self,
-	LIRenSelection* selection)
-{
-	LIEngObject* object;
-
-	if (selection != NULL)
-	{
-		object = lieng_engine_find_object (self->engine, selection->object);
-		if (object != NULL && object->script != NULL)
-		{
-			limai_program_event (self->program, "select",
-				"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
-			return 1;
-		}
-	}
-
-	return 1;
-}
-
-static int private_update (
+static int private_tick (
 	LICliClient* self,
 	float        secs)
 {
+	int x;
+	int y;
+	int cx;
+	int cy;
 	SDL_Event event;
 
 	/* Invoke input callbacks. */
 	while (SDL_PollEvent (&event))
-		lical_callbacks_call (self->callbacks, self->engine, "event", lical_marshal_DATA_PTR, &event);
+		lical_callbacks_call (self->program->callbacks, self->program->engine, "event", lical_marshal_DATA_PTR, &event);
+
+	/* Pointer warping in movement mode. */
+	if (self->moving)
+	{
+		cx = self->window->mode.width / 2;
+		cy = self->window->mode.height / 2;
+		SDL_GetMouseState (&x, &y);
+		if (x != cx || y != cy)
+		{
+			SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
+			SDL_WarpMouse (cx, cy);
+			SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
+		}
+	}
 
 	return 1;
 }
