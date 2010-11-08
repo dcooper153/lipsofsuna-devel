@@ -50,17 +50,18 @@ static inline int liimg_ddsgl_get_format (
 	LIImgDDS*         self,
 	LIImgDDSGLFormat* info)
 {
-	static const LIImgDDSGLFormat formats[12] =
+	static const LIImgDDSGLFormat formats[13] =
 	{
 		{ 0, GL_RGBA, GL_RGBA, GL_UNSIGNED_BYTE },
-		{ 0, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE },
-		{ 0, GL_RGBA, GL_BGRA, GL_UNSIGNED_BYTE },
 		{ 0, GL_RGB, GL_BGR, GL_UNSIGNED_BYTE },
+		{ 0, GL_RGBA, GL_BGRA, GL_UNSIGNED_BYTE },
+		{ 0, GL_RGB, GL_RGB, GL_UNSIGNED_BYTE },
 		{ 0, GL_RGBA, GL_BGRA, GL_UNSIGNED_INT_8_8_8_8_REV },
-		{ 0, GL_RGBA16, GL_RGBA16, GL_UNSIGNED_SHORT_4_4_4_4 },
-		{ 0, GL_RGBA16, GL_RGBA16, GL_UNSIGNED_SHORT_4_4_4_4_REV },
-		{ 0, GL_RGB16, GL_RGB16, GL_UNSIGNED_SHORT_5_6_5 },
-		{ 0, GL_RGB16, GL_RGB16, GL_UNSIGNED_SHORT_5_6_5_REV },
+		{ 0, GL_RGBA, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV },
+		{ 0, GL_RGBA16, GL_RGBA, GL_UNSIGNED_SHORT_4_4_4_4 },
+		{ 0, GL_RGBA16, GL_BGRA, GL_UNSIGNED_SHORT_4_4_4_4_REV },
+		{ 0, GL_RGB16, GL_RGB, GL_UNSIGNED_SHORT_5_6_5 },
+		{ 0, GL_RGB16, GL_RGB, GL_UNSIGNED_SHORT_5_6_5_REV },
 		{ 1, 0, GL_COMPRESSED_RGBA_S3TC_DXT1_EXT, 0 },
 		{ 1, 0, GL_COMPRESSED_RGBA_S3TC_DXT3_EXT, 0 },
 		{ 1, 0, GL_COMPRESSED_RGBA_S3TC_DXT5_EXT, 0 }
@@ -72,13 +73,14 @@ static inline int liimg_ddsgl_get_format (
 		case DDS_TYPE_BGRA8888: *info = formats[2]; break;
 		case DDS_TYPE_BGR888: *info = formats[3]; break;
 		case DDS_TYPE_ARGB8888: *info = formats[4]; break;
-		case DDS_TYPE_RGBA4444: *info = formats[5]; break;
-		case DDS_TYPE_ARGB4444: *info = formats[6]; break;
-		case DDS_TYPE_RGB565: *info = formats[7]; break;
-		case DDS_TYPE_BGR565: *info = formats[8]; break;
-		case DDS_TYPE_DXT1: *info = formats[9]; break;
-		case DDS_TYPE_DXT3: *info = formats[10]; break;
-		case DDS_TYPE_DXT5: *info = formats[11]; break;
+		case DDS_TYPE_ABGR8888: *info = formats[5]; break;
+		case DDS_TYPE_RGBA4444: *info = formats[6]; break;
+		case DDS_TYPE_ARGB4444: *info = formats[7]; break;
+		case DDS_TYPE_RGB565: *info = formats[8]; break;
+		case DDS_TYPE_BGR565: *info = formats[9]; break;
+		case DDS_TYPE_DXT1: *info = formats[10]; break;
+		case DDS_TYPE_DXT3: *info = formats[11]; break;
+		case DDS_TYPE_DXT5: *info = formats[12]; break;
 		default:
 			return 0;
 	};
