@@ -252,7 +252,7 @@ int licli_client_load_module (
 int licli_client_main (
 	LICliClient* self)
 {
-	return limai_program_execute_script (self->program, "client/main.lua");
+	return limai_program_execute_script (self->program, "main.lua");
 }
 
 /**

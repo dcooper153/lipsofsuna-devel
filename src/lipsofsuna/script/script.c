@@ -183,8 +183,7 @@ liscr_script_load (LIScrScript* self,
 	char* inc;
 
 	/* Set include path. */
-	inc = lisys_path_format (LISYS_PATH_PATHNAME, path,
-		LISYS_PATH_STRIPLAST, LISYS_PATH_SEPARATOR, "?.lua", NULL);
+	inc = lisys_path_format (LISYS_PATH_PATHNAME, path, LISYS_PATH_SEPARATOR, "?.lua", NULL);
 	if (inc == NULL)
 		return 0;
 	lua_getfield (self->lua, LUA_GLOBALSINDEX, "package");

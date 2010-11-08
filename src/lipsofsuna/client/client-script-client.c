@@ -55,7 +55,7 @@ static void Client_clear_buffer (LIScrArgs* args)
  */
 static void Client_host (LIScrArgs* args)
 {
-	const char* str = NULL;
+	const char* str = "--server";
 	LICliClient* client;
 
 	if (!liscr_args_gets_string (args, "args", &str))

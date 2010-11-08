@@ -109,14 +109,13 @@ liser_server_free (LISerServer* self)
 
 /**
  * \brief Runs the server script.
- *
  * \param self Server.
  * \return Nonzero on success.
  */
-int
-liser_server_main (LISerServer* self)
+int liser_server_main (
+	LISerServer* self)
 {
-	return limai_program_execute_script (self->program, "server/main.lua");
+	return limai_program_execute_script (self->program, "main.lua");
 }
 
 /** @} */
