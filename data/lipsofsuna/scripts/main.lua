@@ -8,6 +8,30 @@ require = function(arg)
 	end
 end
 
+require "core/network"
+require "core/tiles"
+require "core/tiles-physics"
+Voxel.blocks_per_line = 4
+Voxel.tiles_per_line = 8
+require "common/bitwise"
+require "common/effect"
+require "common/eventhandler"
+require "common/faction"
+require "common/feat"
+require "common/itemspec"
+require "common/material"
+require "common/model"
+require "common/names"
+require "common/object"
+require "common/obstaclespec"
+require "common/pattern"
+require "common/protocol"
+require "common/quest"
+require "common/regionspec"
+require "common/species"
+require "common/thread"
+require "common/timer"
+
 if Program.args == "--server" then
 	require "server/main"
 else

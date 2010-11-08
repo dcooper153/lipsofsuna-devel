@@ -8,7 +8,8 @@ end
 Config = {}
 Config.center = Vector(2048, 2048, 2048)
 Config.spawn = Vector(2048, 2035, 2048)
-Config.tilewidth = 4
+
+Config.tilewidth = 32 / Voxel.tiles_per_line
 Config.tilescale = 1 / Config.tilewidth
 Config.gravity = Vector(0, -20, 0)
 Config.skillregen = 0.5
