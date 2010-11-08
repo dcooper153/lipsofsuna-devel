@@ -40,6 +40,10 @@ static int private_model_new (
 	LIExtModule* self,
 	LIEngModel*  model);
 
+static int private_object_free (
+	LIExtModule* self,
+	LIEngObject* object);
+
 static int private_object_model (
 	LIExtModule* self,
 	LIEngObject* object,
@@ -106,12 +110,13 @@ LIExtModule* liext_object_physics_new (
 	if (!lical_callbacks_insert (program->callbacks, program->engine, "model-changed", -65535, private_model_changed, self, self->calls + 0) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "model-free", -65535, private_model_free, self, self->calls + 1) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "model-new", -65535, private_model_new, self, self->calls + 2) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-model", -65535, private_object_model, self, self->calls + 3) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-new", -65535, private_object_new, self, self->calls + 4) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-transform", -65535, private_object_transform, self, self->calls + 5) ||
-	    !lical_callbacks_insert (program->callbacks, self->physics, "object-transform", -65535, private_physics_transform, self, self->calls + 6) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", -65535, private_object_visibility, self, self->calls + 7) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", -65535, private_tick, self, self->calls + 8))
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-free", -65535, private_object_free, self, self->calls + 3) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-model", -65535, private_object_model, self, self->calls + 4) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-new", -65535, private_object_new, self, self->calls + 5) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-transform", -65535, private_object_transform, self, self->calls + 6) ||
+	    !lical_callbacks_insert (program->callbacks, self->physics, "object-transform", -65535, private_physics_transform, self, self->calls + 7) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", -65535, private_object_visibility, self, self->calls + 8) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", -65535, private_tick, self, self->calls + 9))
 	{
 		liext_object_physics_free (self);
 		return NULL;
@@ -243,6 +248,23 @@ static int private_model_new (
 		return 1;
 	liphy_shape_add_model (shape, model->model, NULL, 1.0f);
 	model->physics = shape;
+
+	return 1;
+}
+
+static int private_object_free (
+	LIExtModule* self,
+	LIEngObject* object)
+{
+	LIPhyObject* phyobj;
+
+	/* Find physics object. */
+	phyobj = liphy_physics_find_object (self->physics, object->id);
+	if (phyobj == NULL)
+		return 1;
+
+	/* Free it. */
+	liphy_object_free (phyobj);
 
 	return 1;
 }
