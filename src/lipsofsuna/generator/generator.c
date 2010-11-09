@@ -77,15 +77,13 @@ LIGenGenerator* ligen_generator_new (
 	self->paths = paths;
 	self->callbacks = callbacks;
 
-	/* Load databases. */
 	if (!private_init (self))
-		goto error;
+	{
+		ligen_generator_free (self);
+		return NULL;
+	}
 
 	return self;
-
-error:
-	ligen_generator_free (self);
-	return NULL;
 }
 
 /**
@@ -267,7 +265,7 @@ ligen_generator_step (LIGenGenerator* self)
 	/* Randomize stroke order. */
 	for (i = 0 ; i < self->strokes.count ; i++)
 	{
-		k = rand () % self->strokes.count;
+		k = lialg_random_max (&self->random, self->strokes.count);
 		stroke = self->strokes.array[i];
 		self->strokes.array[i] = self->strokes.array[k];
 		self->strokes.array[k] = stroke;
@@ -297,7 +295,7 @@ ligen_generator_step (LIGenGenerator* self)
 			rnd[j] = j;
 		for (j = 0 ; j < brush->rules.count ; j++)
 		{
-			k = rand () % brush->rules.count;
+			k = lialg_random_max (&self->random, brush->rules.count);
 			tmp = rnd[j];
 			rnd[j] = rnd[k];
 			rnd[k] = tmp;
@@ -329,6 +327,7 @@ static int private_init (
 	self->brushes = lialg_u32dic_new ();
 	if (self->brushes == NULL)
 		return 0;
+	lialg_random_init (&self->random, lisys_time (NULL));
 	return 1;
 }
 

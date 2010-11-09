@@ -58,6 +58,7 @@ lieng_engine_new (LICalCallbacks* calls,
 	self = lisys_calloc (1, sizeof (LIEngEngine));
 	if (self == NULL)
 		return NULL;
+	lialg_random_init (&self->random, lisys_time (NULL));
 	self->callbacks = calls;
 	self->sectors = sectors;
 	self->sectors->sector_free_callback.callback = private_sector_free;

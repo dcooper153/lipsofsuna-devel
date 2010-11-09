@@ -225,27 +225,6 @@ lialg_u32dic_remove_node (LIAlgU32dic*     self,
 	self->size--;
 }
 
-/**
- * \brief Returns a random unused key.
- *
- * \param self Associative array.
- * \return Unique key.
- */
-uint32_t
-lialg_u32dic_unique_key (const LIAlgU32dic* self)
-{
-	uint32_t key;
-
-	for (key = 0 ; !key ; )
-	{
-		key = lisys_randi (0x7FFFFFFF);
-		if (lialg_u32dic_find ((LIAlgU32dic*) self, key) != NULL)
-			key = 0;
-	}
-
-	return key;
-}
-
 /*****************************************************************************/
 
 static int

@@ -27,20 +27,7 @@
 #endif
 #include "system-compiler.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-LIAPICALL (float, lisys_randf, ());
-
-LIAPICALL (int, lisys_randi, (
-	int max));
-
 LIAPICALL (void, lisys_usleep, (
 	int usecs));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

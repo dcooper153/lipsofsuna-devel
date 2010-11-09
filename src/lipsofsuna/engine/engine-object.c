@@ -44,9 +44,8 @@ private_warp (LIEngObject*       self,
  */
 LIEngObject* lieng_object_new (
 	LIEngEngine* engine,
-	uint32_t         id)
+	uint32_t     id)
 {
-	double rnd;
 	LIEngObject* self;
 
 	/* Allocate self. */
@@ -61,9 +60,7 @@ LIEngObject* lieng_object_new (
 	/* Choose object number. */
 	while (!self->id)
 	{
-		rnd = lisys_randf ();
-		self->id = (int)((LINET_RANGE_ENGINE_END - LINET_RANGE_ENGINE_START) *
-			rnd + LINET_RANGE_ENGINE_START);
+		self->id = lialg_random_range (&engine->random, LINET_RANGE_ENGINE_START, LINET_RANGE_ENGINE_END);
 		if (lieng_engine_find_object (engine, self->id))
 			id = 0;
 	}

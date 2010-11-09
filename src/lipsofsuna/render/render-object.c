@@ -75,8 +75,7 @@ LIRenObject* liren_object_new (
 	/* Choose unique ID. */
 	while (!id)
 	{
-		id = (int)((LINET_RANGE_RENDER_END - LINET_RANGE_RENDER_START) *
-			((float) rand () / RAND_MAX)) + LINET_RANGE_RENDER_START;
+		id = lialg_random_range (&scene->render->random, LINET_RANGE_RENDER_START, LINET_RANGE_RENDER_END);
 		if (liren_scene_find_object (scene, id))
 			id = 0;
 	}

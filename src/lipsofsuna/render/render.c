@@ -41,6 +41,7 @@ LIRenRender* liren_render_new (
 	self = lisys_calloc (1, sizeof (LIRenRender));
 	if (self == NULL)
 		return NULL;
+	lialg_random_init (&self->random, lisys_time (NULL));
 
 	/* Allocate scene list. */
 	self->scenes = lialg_ptrdic_new ();

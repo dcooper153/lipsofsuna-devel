@@ -103,6 +103,7 @@ static void Class_check (LIScrArgs* args)
 static void Class_new (LIScrArgs* args)
 {
 	char name[16];
+	LIAlgRandom rng;
 	LIScrClass* base;
 	LIScrClass* clss;
 	LIScrData* data;
@@ -134,9 +135,10 @@ static void Class_new (LIScrArgs* args)
 	}
 
 	/* Find a free class name. */
+	lialg_random_init (&rng, lisys_time (NULL));
 	do
 	{
-		snprintf (name, 16, "__%4X", lisys_randi (0xFFFF));
+		snprintf (name, 16, "__%4X", lialg_random_max (&rng, 0xFFFF));
 		clss = liscr_script_find_class (args->script, name);
 	}
 	while (clss != NULL);

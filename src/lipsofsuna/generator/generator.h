@@ -36,6 +36,7 @@ struct _LIGenStroke
 
 struct _LIGenGenerator
 {
+	LIAlgRandom random;
 	LIAlgU32dic* brushes;
 	LICalCallbacks* callbacks;
 	LIPthPaths* paths;

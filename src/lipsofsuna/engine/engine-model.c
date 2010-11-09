@@ -32,7 +32,6 @@ static void private_changed (
 LIEngModel* lieng_model_new (
 	LIEngEngine* engine)
 {
-	float rnd;
 	LIEngModel* self;
 
 	/* Allocate self. */
@@ -52,8 +51,7 @@ LIEngModel* lieng_model_new (
 	/* Choose model number. */
 	while (!self->id)
 	{
-		rnd = lisys_randf ();
-		self->id = (int)(0x7FFFFFFF * rnd);
+		self->id = lialg_random_rand (&engine->random);
 		if (!self->id)
 			continue;
 		if (lialg_u32dic_find (engine->models, self->id) != NULL)
@@ -69,7 +67,6 @@ LIEngModel* lieng_model_new (
 LIEngModel* lieng_model_new_copy (
 	LIEngModel* model)
 {
-	float rnd;
 	LIEngModel* self;
 
 	/* Allocate self. */
@@ -89,8 +86,7 @@ LIEngModel* lieng_model_new_copy (
 	/* Choose model number. */
 	while (!self->id)
 	{
-		rnd = lisys_randf ();
-		self->id = (int)(0x7FFFFFFF * rnd);
+		self->id = lialg_random_rand (&model->engine->random);
 		if (!self->id)
 			continue;
 		if (lialg_u32dic_find (model->engine->models, self->id) != NULL)

@@ -237,18 +237,9 @@ private_cache_glyph (LIFntFont* self,
 	}
 	else
 	{
-		/* Replace random tile. */
-		index = rand () % self->table_length;
-		cached = self->table[index];
-		lialg_u32dic_remove (self->index, cached->glyph);
-		if (!lialg_u32dic_insert (self->index, glyph, cached))
-		{
-			self->table[index] = NULL;
-			self->table_filled--;
-			SDL_FreeSurface (image);
-			lisys_free (cached);
-			return NULL;
-		}
+		/* FIXME: Add support for allocating more textures. */
+		SDL_FreeSurface (image);
+		return NULL;
 	}
 
 	/* Store metrics. */

@@ -37,6 +37,7 @@ struct _LIRenRender
 {
 	char* datadir;
 	LIAlgPtrdic* scenes;
+	LIAlgRandom random;
 	LIAlgStrdic* shaders;
 	LIAlgStrdic* images;
 	LIAlgU32dic* models;

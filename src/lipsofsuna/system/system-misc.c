@@ -27,20 +27,8 @@
 #endif
 #include "system-misc.h"
 
-float
-lisys_randf ()
-{
-	return (float) rand () / RAND_MAX;
-}
-
-int
-lisys_randi (int max)
-{
-	return max * ((float) rand () / RAND_MAX);
-}
-
-void
-lisys_usleep (int usecs)
+void lisys_usleep (
+	int usecs)
 {
 #ifdef HAVE_USLEEP
 	usleep (usecs);

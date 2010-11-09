@@ -627,6 +627,8 @@ static int private_init (
 	    !lical_callbacks_insert (self->callbacks, self->engine, "tick", 2, private_tick, self, self->calls + 7))
 		return 0;
 
+	lialg_random_init (&self->random, lisys_time (NULL));
+
 	return 1;
 }
 

@@ -45,6 +45,7 @@ struct _LIMaiProgram
 	struct timeval prev_tick;
 	LIAlgList* event_first;
 	LIAlgList* event_last;
+	LIAlgRandom random;
 	LIAlgSectors* sectors;
 	LIAlgStrdic* components;
 	LICalCallbacks* callbacks;

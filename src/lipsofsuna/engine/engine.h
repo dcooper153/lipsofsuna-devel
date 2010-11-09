@@ -35,6 +35,7 @@
 struct _LIEngEngine
 {
 	void* userdata;
+	LIAlgRandom random;
 	LIAlgSectors* sectors;
 	LIAlgU32dic* models;
 	LIAlgU32dic* objects;

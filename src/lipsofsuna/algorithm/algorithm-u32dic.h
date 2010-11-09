@@ -83,9 +83,6 @@ LIAPICALL (void, lialg_u32dic_remove_node, (
 	LIAlgU32dic*     self,
 	LIAlgU32dicNode* node));
 
-LIAPICALL (uint32_t, lialg_u32dic_unique_key, (
-	const LIAlgU32dic* self));
-
 #ifdef __cplusplus
 }
 #endif

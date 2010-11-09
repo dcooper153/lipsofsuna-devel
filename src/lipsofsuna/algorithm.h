@@ -29,6 +29,7 @@
 #include "algorithm/algorithm-list.h"
 #include "algorithm/algorithm-octree.h"
 #include "algorithm/algorithm-priority-queue.h"
+#include "algorithm/algorithm-random.h"
 #include "algorithm/algorithm-range.h"
 #include "algorithm/algorithm-range-iter.h"
 #include "algorithm/algorithm-sectors.h"
