@@ -323,6 +323,7 @@ static void private_worker_thread (
 		if (!livox_builder_build (task->builder, NULL, &task->terrain) || task->terrain == NULL)
 		{
 			livox_builder_free (task->builder);
+			lisys_free (task);
 			lithr_mutex_lock (self->tasks.mutex);
 			continue;
 		}

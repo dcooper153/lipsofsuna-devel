@@ -205,6 +205,7 @@ int liphy_terrain_add_vertices (
 		}
 		ret = private_add_vertices (self, index, 1.0f, idx, count, tmp, count);
 		delete[] tmp;
+		delete[] idx;
 	}
 
 	return ret;
