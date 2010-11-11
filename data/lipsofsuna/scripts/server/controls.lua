@@ -18,16 +18,23 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	if not species then return end
 	-- TODO: Input validation.
 	Network:send{client = args.client, packet = Packet(packets.CHARACTER_ACCEPT)}
-	-- Create character.
+	-- Create character. To prevent the player from falling inside the ground
+	-- when spawned in a yet to be loaded region, we disable the physics of
+	-- the object for a short while.
 	local o = Player{
 		client = args.client,
 		gender = ge,
 		hair_color = hc,
 		hair_style = hs,
+		physics = "static",
 		position = Config.spawn,
 		species = species,
 		realized = true}
 	Player.clients[args.client] = o
+	Timer{delay = 1, func = function(self)
+		o.physics = "kinematic"
+		self:disable()
+	end}
 	-- Transmit active and completed quests.
 	for k,q in pairs(Quest.dict_name) do
 		if q.status == "active" then

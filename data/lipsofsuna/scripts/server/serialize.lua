@@ -19,15 +19,20 @@ Serialize.load_sector = function(clss, sector)
 	for k,v in ipairs(rows) do
 		Voxel:paste_region{sector = sector, packet = v[2]}
 	end
-	-- Load objects.
+	-- Load objects. Since tiles are loaded in background, we need to wait for them to be
+	-- loaded before creation the object or else the object will fall inside the ground.
+	-- TODO: Should use a tiles-loaded event to determine when the tiles have been loaded.
 	local rows = clss.db:query("SELECT * FROM objects WHERE sector=?;", {sector})
-	for k,v in ipairs(rows) do
-		local func = assert(loadstring("return function()\n" .. v[3] .. "\nend"))()
-		if func then
-			local object = func()
-			if object then object.realized = true end
+	Timer{delay = 1, func = function(self)
+		for k,v in ipairs(rows) do
+			local func = assert(loadstring("return function()\n" .. v[3] .. "\nend"))()
+			if func then
+				local object = func()
+				if object then object.realized = true end
+			end
 		end
-	end
+		self:disable()
+	end}
 end
 
 --- Saves a sector to the database.
