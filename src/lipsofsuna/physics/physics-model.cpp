@@ -248,7 +248,7 @@ static int private_build_terrain (
 			return 0;
 
 		/* Create a convex hull and triangulate it. */
-		tmp = new btScalar[model->vertices.count];
+		tmp = new btScalar[4 * model->vertices.count];
 		for (j = 0 ; j < model->vertices.count ; j++)
 		{
 			vector = model->vertices.array[j].coord;
