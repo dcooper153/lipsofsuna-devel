@@ -18,8 +18,7 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <pthread.h>
-#include <grapple/grapple.h>
+#include <enet/enet.h>
 #include <lipsofsuna/network.h>
 #include <lipsofsuna/extension.h>
 
@@ -30,11 +29,12 @@ typedef struct _LIExtClient LIExtClient;
 
 struct _LIExtModule
 {
-	pthread_mutex_t mutex;
-	grapple_client client_socket;
-	grapple_server server_socket;
+	int closed;
+	int connected;
+	ENetHost* client_socket;
+	ENetHost* server_socket;
+	ENetPeer* client_peer;
 	LIAlgU32dic* clients;
-	LIAlgStrdic* passwords;
 	LICalHandle calls[2];
 	LIMaiProgram* program;
 };
@@ -47,16 +47,12 @@ void liext_network_free (
 
 int liext_network_host (
 	LIExtModule* self,
-	int          udp,
 	int          port);
 
 int liext_network_join (
 	LIExtModule* self,
-	int          udp,
 	int          port,
-	const char*  addr,
-	const char*  name,
-	const char*  pass);
+	const char*  addr);
 
 void liext_network_update (
 	LIExtModule* self,
@@ -64,13 +60,13 @@ void liext_network_update (
 
 LIExtClient* liext_network_find_client (
 	LIExtModule* self,
-	grapple_user user);
+	int          id);
 
 int liext_network_send (
 	LIExtModule* self,
-	grapple_user user,
+	int          id,
 	LIArcWriter* writer,
-	int          flags);
+	int          reliable);
 
 void liext_network_shutdown (
 	LIExtModule* self);

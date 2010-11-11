@@ -18,7 +18,7 @@ Startup.init = function(clss)
 	clss.group:set_expand{col = 1, row = 1}
 	clss.group:set_expand{col = 3}
 	clss.text = Widgets.Label()
-	clss.button_retry = Widgets.Label{font = "mainmenu", text = "Retry", pressed = function() clss:execute() end, visible = false}
+	clss.button_retry = Widgets.Label{font = "mainmenu", text = "Retry", pressed = function() clss:execute() end}
 	clss.button_quit = Widgets.Label{font = "mainmenu", text = "Quit", pressed = function() Program:shutdown() end}
 	clss.group2 = Widget{rows = 1, margins = {bottom=30}, spacings = {horz=40}}
 	clss.group2:append_col(clss.button_retry)
@@ -36,20 +36,25 @@ Startup.execute = function(clss)
 		Program:unload_world()
 		Client:host()
 		clss.text.text = "Starting the server..."
-		clss.host_wait_timer = Timer{delay = 1, func = function(self)
+		clss.host_wait_timer = Timer{delay = 2, func = function(timer)
 			if Network:join{host = "localhost", clss.port} then
-				self:disable()
-				clss:finish()
+				clss.text.text = "Connecting to the server..."
+				clss.connecting = true
+			else
+				clss.text.text = "Failed to start the server!"
+				clss.connecting = nil
 			end
+			timer:disable()
 		end}
 	elseif Startup.mode == "--join" then
 		-- Join a game.
 		Program:unload_world()
-		if not Network:join{host = clss.host, port = clss.port} then
-			clss.text.text = "Connecting to " .. clss.host .. ":" .. clss.port .. " failed!"
-			clss.button_retry.visible = true
+		if Network:join{host = clss.host, port = clss.port} then
+			clss.text.text = "Connecting to " .. clss.host .. ":" .. clss.port .. "..."
+			clss.connecting = true
 		else
-			clss:finish()
+			clss.text.text = "Failed to connect to " .. clss.host .. ":" .. clss.port .. "!"
+			clss.connecting = nil
 		end
 	else
 		-- Display help.
@@ -62,6 +67,7 @@ end
 --- Finishes the startup when connection has been established.
 -- @param clss Startup class.
 Startup.finish = function(clss)
+	clss.connecting = nil
 	clss.joined = true
 	clss.group.floating = false
 	Gui:init()
@@ -71,7 +77,9 @@ end
 Startup:init()
 
 Eventhandler{type = "tick", func = function(self, args)
-	if Startup.joined and not Network.connected then
+	if Startup.connecting and Network.connected then
+		Startup:finish()
+	elseif Startup.joined and not Network.connected then
 		Gui:free()
 		Chargen:free()
 		Startup.group.floating = true

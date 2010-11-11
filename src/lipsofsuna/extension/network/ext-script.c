@@ -76,7 +76,7 @@ static void Network_host (LIScrArgs* args)
 	liscr_args_gets_int (args, "port", &port);
 	port = LIMAT_CLAMP (port, 1025, 32767);
 
-	if (liext_network_host (module, udp, port))
+	if (liext_network_host (module, port))
 		liscr_args_seti_bool (args, 1);
 }
 
@@ -86,31 +86,22 @@ static void Network_host (LIScrArgs* args)
  * -- @param clss Network class.
  * -- @param args Arguments.<ul>
  * --   <li>host: Server address.</li>
- * --   <li>login: Login name.</li>
- * --   <li>password: password.</li>
  * --   <li>port: Port to listen to.</li>
- * --   <li>udp: True for UDP.</li></ul>
  * -- @return True on success.
  * function Network.join(clss, args)
  */
 static void Network_join (LIScrArgs* args)
 {
 	int port = 10101;
-	int udp = 0;
 	const char* addr = "localhost";
-	const char* name = "Player";
-	const char* pass = "password";
 	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
-	liscr_args_gets_bool (args, "udp", &udp);
 	liscr_args_gets_int (args, "port", &port);
 	liscr_args_gets_string (args, "host", &addr);
-	liscr_args_gets_string (args, "login", &addr);
-	liscr_args_gets_string (args, "password", &addr);
 	port = LIMAT_CLAMP (port, 1025, 32767);
 
-	if (liext_network_join (module, udp, port, addr, name, pass))
+	if (liext_network_join (module, port, addr))
 		liscr_args_seti_bool (args, 1);
 }
 
@@ -148,12 +139,7 @@ static void Network_send (LIScrArgs* args)
 	/* Send packet. */
 	liscr_args_gets_bool (args, "reliable", &reliable);
 	if (packet->writer != NULL)
-	{
-		if (reliable)
-			liext_network_send (module, id, packet->writer, GRAPPLE_RELIABLE);
-		else
-			liext_network_send (module, id, packet->writer, 0);
-	}
+		liext_network_send (module, id, packet->writer, reliable);
 }
 
 /* @luadoc
@@ -187,7 +173,8 @@ static void Network_getter_clients (LIScrArgs* args)
 	LIALG_U32DIC_FOREACH (iter, module->clients)
 	{
 		client = iter.value;
-		liscr_args_seti_int (args, client->net);
+		if (client->connected)
+			liscr_args_seti_int (args, client->id);
 	}
 }
 

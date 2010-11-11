@@ -93,10 +93,10 @@ def configure(ctx):
 		if not ctx.check_cxx(lib='bulletdynamics', uselib='CORE TEST', uselib_store='BULLET', mandatory=False):
 			ctx.check_cxx(lib='BulletDynamics', mandatory=True, uselib='CORE TEST', uselib_store='BULLET')
 
-	# Grapple
-	if not ctx.check_cfg(package='grapple', atleast_version='0.9', args='--cflags --libs', mandatory=False):
-		ctx.check_cc(header_name='grapple/grapple_client.h', mandatory=True, uselib='CORE TEST', uselib_store='GRAPPLE')
-		ctx.check_cc(lib='grapple', mandatory=True, uselib='CORE TEST', uselib_store='GRAPPLE')
+	# ENet
+	if not ctx.check_cfg(package='enet', atleast_version='1.2.0', args='--cflags --libs', mandatory=False):
+		ctx.check_cc(header_name='enet/enet.h', mandatory=True, uselib='CORE TEST', uselib_store='ENET')
+		ctx.check_cc(lib='enet', mandatory=True, uselib='CORE TEST', uselib_store='ENET')
 
 	# Lua
 	if not ctx.check_cfg(package='lua5.1', atleast_version='5.1', args='--cflags --libs', uselib_store='LUA', mandatory=False):
@@ -193,7 +193,7 @@ def build(ctx):
 	ctx.add_group("install")
 	ctx.set_group("build")
 	objs = ''
-	libs = 'CORE LUA SQLITE BULLET GRAPPLE SDL SDL_TTF ZLIB GLEW THREAD AL VORBIS OGG FLAC'
+	libs = 'CORE LUA SQLITE BULLET ENET SDL SDL_TTF ZLIB GLEW THREAD AL VORBIS OGG FLAC'
 
 	# Core objects.
 	for dir in CORE_DIRS.split(' '):
@@ -221,7 +221,7 @@ def build(ctx):
 			features = 'c',
 			source = ctx.path.ant_glob('src/lipsofsuna/extension/%s/*.c' % dir),
 			target = dir + '_ext_objs',
-			use = 'EXTENSION LUA SQLITE GRAPPLE SDL SDL_TTF ZLIB GLEW THREAD AL VORBIS OGG FLAC')
+			use = 'EXTENSION LUA SQLITE ENET SDL SDL_TTF ZLIB GLEW THREAD AL VORBIS OGG FLAC')
 
 	# Target executable.
 	ctx.new_task_gen(

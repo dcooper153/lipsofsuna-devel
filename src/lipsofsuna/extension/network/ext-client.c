@@ -28,12 +28,12 @@
 /**
  * \brief Allocates a new client.
  * \param module Module.
- * \param user Network user.
+ * \param peer Network peer.
  * \return New client or NULL.
  */
 LIExtClient* liext_client_new (
 	LIExtModule* module,
-	grapple_user user)
+	ENetPeer*    peer)
 {
 	LIExtClient* self;
 
@@ -42,14 +42,31 @@ LIExtClient* liext_client_new (
 	if (self == NULL)
 		return NULL;
 	self->module = module;
-	self->net = user;
+	self->connected = 1;
+	self->peer = peer;
+	self->peer->data = self;
+
+	/* Find free ID. */
+	while (!self->id)
+	{
+		self->id = lialg_random_rand (&module->program->random);
+		if (lialg_u32dic_find (module->clients, self->id) != NULL)
+			self->id = 0;
+	}
+
+	/* Add to the client list. */
+	if (!lialg_u32dic_insert (module->clients, self->id, self))
+	{
+		self->peer->data = NULL;
+		lisys_free (self);
+		return NULL;
+	}
 
 	return self;
 }
 
 /**
- * \brief Disconnects and frees the client.
- *
+ * \brief Frees the client.
  * \param self Client.
  */
 void liext_client_free (
@@ -57,33 +74,36 @@ void liext_client_free (
 {
 	/* Signal logout. */
 	limai_program_event (self->module->program, "logout",
-		"client", LISCR_TYPE_INT, (int) self->net, NULL);
+		"client", LISCR_TYPE_INT, self->id, NULL);
 
 	/* Remove from the client list. */
-	if (self->net != 0)
-	{
-		lialg_u32dic_remove (self->module->clients, self->net);
-		grapple_server_disconnect_client (self->module->server_socket, self->net);
-	}
+	lialg_u32dic_remove (self->module->clients, self->id);
 
 	lisys_free (self);
 }
 
 /**
  * \brief Sends a network packet to the client.
- *
  * \param self Client.
  * \param writer Packet.
- * \param flags Grapple send flags.
+ * \param reliable Nonzero for reliable.
  */
 void liext_client_send (
 	LIExtClient* self,
 	LIArcWriter* writer,
-	int          flags)
+	int          reliable)
 {
-	grapple_server_send (self->module->server_socket, self->net, flags,
-		liarc_writer_get_buffer (writer),
-		liarc_writer_get_length (writer));
+	ENetPacket* packet;
+
+	if (self->connected)
+	{
+		packet = enet_packet_create (
+			liarc_writer_get_buffer (writer),
+			liarc_writer_get_length (writer),
+			(reliable)? ENET_PACKET_FLAG_RELIABLE : 0);
+		if (packet != NULL)
+			enet_peer_send (self->peer, 0, packet);
+	}
 }
 
 /** @} */

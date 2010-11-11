@@ -22,15 +22,16 @@
 
 struct _LIExtClient
 {
-	grapple_user net;
-	LIExtClient* next;
-	LIExtClient* prev;
+	int id;
+	int connected;
+	time_t disconnect_time;
+	ENetPeer* peer;
 	LIExtModule* module;
 };
 
 LIExtClient* liext_client_new (
 	LIExtModule* module,
-	grapple_user user);
+	ENetPeer*    peer);
 
 void liext_client_free (
 	LIExtClient* self);
@@ -38,6 +39,6 @@ void liext_client_free (
 void liext_client_send (
 	LIExtClient* self,
 	LIArcWriter* writer,
-	int          flags);
+	int          reliable);
 
 #endif
