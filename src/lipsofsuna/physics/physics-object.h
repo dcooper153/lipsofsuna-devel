@@ -31,7 +31,7 @@ extern "C" {
 LIAPICALL (LIPhyObject*, liphy_object_new, (
 	LIPhyPhysics*    physics,
 	uint32_t         id,
-	LIPhyShape*      shape,
+	LIPhyModel*      model,
 	LIPhyControlMode control_mode));
 
 LIAPICALL (void, liphy_object_free, (
@@ -122,6 +122,13 @@ LIAPICALL (void, liphy_object_set_mass, (
 	LIPhyObject* self,
 	float        value));
 
+LIAPICALL (LIPhyModel*, liphy_object_get_model, (
+	const LIPhyObject* self));
+
+LIAPICALL (void, liphy_object_set_model, (
+	LIPhyObject* self,
+	LIPhyModel*  model));
+
 LIAPICALL (float, liphy_object_get_movement, (
 	const LIPhyObject* self));
 
@@ -140,12 +147,12 @@ LIAPICALL (void, liphy_object_set_rotating, (
 	LIPhyObject* self,
 	float        value));
 
-LIAPICALL (float, liphy_object_get_shape, (
+LIAPICALL (const char*, liphy_object_get_shape, (
 	const LIPhyObject* self));
 
 LIAPICALL (void, liphy_object_set_shape, (
 	LIPhyObject* self,
-	LIPhyShape*  shape));
+	const char*  value));
 
 LIAPICALL (float, liphy_object_get_strafing, (
 	const LIPhyObject* self));

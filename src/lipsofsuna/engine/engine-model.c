@@ -105,13 +105,6 @@ void lieng_model_free (
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "model-free", lical_marshal_DATA_PTR, self);
 
-	/* Unreference and free shape. */
-	if (self->physics != NULL)
-	{
-		liphy_shape_free (self->physics);
-		liphy_shape_free (self->physics);
-	}
-
 	/* Free data. */
 	if (self->model != NULL)
 		limdl_model_free (self->model);

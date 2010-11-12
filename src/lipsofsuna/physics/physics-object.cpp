@@ -23,9 +23,13 @@
  */
 
 #include "physics-object.h"
+#include "physics-model.h"
 #include "physics-private.h"
 
 #define PRIVATE_REALIZED 0x0200
+
+static LIPhyShape* private_get_shape (
+	LIPhyObject* self);
 
 static void private_update_state (
 	LIPhyObject* self);
@@ -37,14 +41,14 @@ static void private_update_state (
  *
  * \param physics Physics system.
  * \param id Object ID.
- * \param shape Collision shape or NULL.
+ * \param model Physics model or NULL.
  * \param control_mode Simulation mode.
  * \return New object or NULL.
  */
 LIPhyObject* liphy_object_new (
 	LIPhyPhysics*    physics,
 	uint32_t         id,
-	LIPhyShape*      shape,
+	LIPhyModel*      model,
 	LIPhyControlMode control_mode)
 {
 	LIPhyObject* self;
@@ -56,7 +60,7 @@ LIPhyObject* liphy_object_new (
 		return NULL;
 	self->physics = physics;
 	self->id = id;
-	self->shape = shape;
+	self->model = model;
 	self->pointer.object = 1;
 	self->pointer.pointer = self;
 	self->control_mode = control_mode;
@@ -66,6 +70,12 @@ LIPhyObject* liphy_object_new (
 	self->config.character_step = 0.35;
 	self->config.collision_group = LIPHY_DEFAULT_COLLISION_GROUP;
 	self->config.collision_mask = LIPHY_DEFAULT_COLLISION_MASK;
+	self->shape_name = listr_dup ("default");
+	if (self->shape_name == NULL)
+	{
+		liphy_object_free (self);
+		return NULL;
+	}
 	try
 	{
 		self->motion = new LIPhyMotionState (self, btTransform (orientation, position));
@@ -111,6 +121,7 @@ void liphy_object_free (
 
 	/* Free self. */
 	delete self->motion;
+	lisys_free (self->shape_name);
 	lisys_free (self);
 }
 
@@ -491,8 +502,11 @@ void liphy_object_get_inertia (
 	LIPhyObject* self,
 	LIMatVector* result)
 {
-	if (self->shape != NULL)
-		liphy_shape_get_inertia (self->shape, self->config.mass, result);
+	LIPhyShape* shape;
+
+	shape = private_get_shape (self);
+	if (shape != NULL)
+		liphy_shape_get_inertia (shape, self->config.mass, result);
 	else
 		*result = limat_vector_init (0.0f, 0.0f, 0.0f);
 }
@@ -530,6 +544,25 @@ void liphy_object_set_mass (
 		inertia[1] = v.y;
 		inertia[2] = v.z;
 		self->control->set_mass (value, inertia);
+	}
+}
+
+LIPhyModel* liphy_object_get_model (
+	LIPhyObject* self)
+{
+	return self->model;
+}
+
+void liphy_object_set_model (
+	LIPhyObject* self,
+	LIPhyModel*  model)
+{
+	if (model != NULL)
+		liphy_model_build (model, 0);
+	if (model != self->model)
+	{
+		self->model = model;
+		private_update_state (self);
 	}
 }
 
@@ -621,21 +654,27 @@ void liphy_object_set_rotating (
 #endif
 }
 
-LIPhyShape* liphy_object_get_shape (
+const char* liphy_object_get_shape (
 	LIPhyObject* self)
 {
-	return self->shape;
+	return self->shape_name;
 }
 
 void liphy_object_set_shape (
 	LIPhyObject* self,
-	LIPhyShape*  shape)
+	const char*  value)
 {
-	if (shape != self->shape)
+	char* tmp;
+
+	if (!strcmp (self->shape_name, value))
+		return;
+	tmp = listr_dup (value);
+	if (tmp != NULL)
 	{
-		self->shape = shape;
-		private_update_state (self);
+		lisys_free (self->shape_name);
+		self->shape_name = tmp;
 	}
+	private_update_state (self);
 }
 
 /**
@@ -800,10 +839,19 @@ void liphy_object_set_velocity (
 
 /*****************************************************************************/
 
+static LIPhyShape* private_get_shape (
+	LIPhyObject* self)
+{
+	if (self->model == NULL)
+		return NULL;
+	return self->model->shape;
+}
+
 static void private_update_state (
 	LIPhyObject* self)
 {
 	btCollisionShape* shape;
+	LIPhyShape* shape_;
 
 	/* Remove all constraints involving us. */
 	liphy_physics_clear_constraints (self->physics, self);
@@ -818,9 +866,10 @@ static void private_update_state (
 	/* Create new controller. */
 	if (self->flags & PRIVATE_REALIZED)
 	{
-		if (self->shape == NULL)
+		shape_ = private_get_shape (self);
+		if (shape_ == NULL)
 			return;
-		shape = self->shape->shape;
+		shape = shape_->shape;
 		switch (self->control_mode)
 		{
 			case LIPHY_CONTROL_MODE_NONE:

@@ -19,7 +19,6 @@
 #define __ENGINE_MODEL_H__
 
 #include <lipsofsuna/model.h>
-#include <lipsofsuna/physics.h>
 #include <lipsofsuna/script.h>
 #include "engine.h"
 #include "engine-types.h"
@@ -29,7 +28,6 @@ struct _LIEngModel
 	int id;
 	LIEngEngine* engine;
 	LIMdlModel* model;
-	LIPhyShape* physics;
 	LIScrData* script;
 };
 

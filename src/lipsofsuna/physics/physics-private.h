@@ -141,12 +141,13 @@ struct _LIPhyObject
 {
 	int flags;
 	uint32_t id;
+	char* shape_name;
 	LIPhyControlMode control_mode;
 	LIPhyControl* control;
 	LIPhyMotionState* motion;
 	LIPhyPhysics* physics;
 	LIPhyPointer pointer;
-	LIPhyShape* shape;
+	LIPhyModel* model;
 	struct
 	{
 		int collision_group;

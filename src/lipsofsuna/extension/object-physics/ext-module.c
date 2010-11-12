@@ -233,8 +233,11 @@ static int private_model_changed (
 	LIExtModule* self,
 	LIEngModel*  model)
 {
-	if (model->physics != NULL)
-		liphy_shape_set_model (model->physics, model->model);
+	LIPhyModel* model_;
+
+	model_ = liphy_physics_find_model (self->physics, model->id);
+	if (model_ != NULL)
+		liphy_model_set_model (model_, model->model);
 
 	return 1;
 }
@@ -243,11 +246,11 @@ static int private_model_free (
 	LIExtModule* self,
 	LIEngModel*  model)
 {
-	if (model->physics != NULL)
-	{
-		liphy_shape_free (model->physics);
-		model->physics = NULL;
-	}
+	LIPhyModel* model_;
+
+	model_ = liphy_physics_find_model (self->physics, model->id);
+	if (model_ != NULL)
+		liphy_model_free (model_);
 
 	return 1;
 }
@@ -256,14 +259,11 @@ static int private_model_new (
 	LIExtModule* self,
 	LIEngModel*  model)
 {
-	LIPhyShape* shape;
+	LIPhyModel* model_;
 
-	/* Create collision shape. */
-	shape = liphy_shape_new (self->physics);
-	if (shape == NULL)
+	model_ = liphy_model_new (self->physics, model->model, model->id);
+	if (model_ == NULL)
 		return 1;
-	liphy_shape_add_model (shape, model->model, NULL, 1.0f);
-	model->physics = shape;
 
 	return 1;
 }
@@ -290,6 +290,7 @@ static int private_object_model (
 	LIEngObject* object,
 	LIEngModel*  model)
 {
+	LIPhyModel* model_;
 	LIPhyObject* phyobj;
 
 	/* Find physics object. */
@@ -297,11 +298,12 @@ static int private_object_model (
 	if (phyobj == NULL)
 		return 1;
 
-	/* Set its collision shape. */
-	if (model != NULL)
-		liphy_object_set_shape (phyobj, model->physics);
+	/* Set shape from a physics model. */
+	model_ = liphy_physics_find_model (self->physics, model->id);
+	if (model_ != NULL)
+		liphy_object_set_model (phyobj, model_);
 	else
-		liphy_object_set_shape (phyobj, NULL);
+		liphy_object_set_model (phyobj, NULL);
 
 	return 1;
 }
