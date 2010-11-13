@@ -158,6 +158,8 @@ Creature.die = function(self)
 	Dialog:start{object = self, type = "die"}
 	-- Disable controls.
 	self.dead = true
+	self.physics = "rigid"
+	self.shape = "dead"
 	self:set_movement(0)
 	self:set_strafing(0)
 	-- Disable skills.
