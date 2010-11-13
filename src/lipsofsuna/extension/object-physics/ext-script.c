@@ -515,6 +515,44 @@ static void Object_setter_physics (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Physics shape.<br/>
+ * -- A model can contain multiple physics shapes. By setting the field,
+ * -- you can switch to one of the alternative shapes. This can be used
+ * -- to, for example, set a smaller collision shape when the creature
+ * -- is crouching.
+ * -- @name Object.shape
+ * -- @class table
+ */
+static void Object_getter_shape (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIPhyObject* object;
+
+	/* Get physics object. */
+	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	if (object == NULL)
+		return;
+
+	liscr_args_seti_string (args, liphy_object_get_shape (object));
+}
+static void Object_setter_shape (LIScrArgs* args)
+{
+	const char* value;
+	LIExtModule* module;
+	LIPhyObject* object;
+
+	/* Get physics object. */
+	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	if (object == NULL)
+		return;
+
+	if (liscr_args_geti_string (args, 0, &value))
+		liphy_object_set_shape (object, value);
+}
+
+/* @luadoc
  * --- Movement speed.
  * --
  * -- Only used by creature objects.
@@ -646,6 +684,7 @@ void liext_script_object (
 	liscr_class_insert_mvar (self, "ground", Object_getter_ground, NULL);
 	liscr_class_insert_mvar (self, "mass", Object_getter_mass, Object_setter_mass);
 	liscr_class_insert_mvar (self, "physics", Object_getter_physics, Object_setter_physics);
+	liscr_class_insert_mvar (self, "shape", Object_getter_shape, Object_setter_shape);
 	liscr_class_insert_mvar (self, "speed", Object_getter_speed, Object_setter_speed);
 	liscr_class_insert_mvar (self, "strafing", Object_getter_strafing, Object_setter_strafing);
 	liscr_class_insert_mvar (self, "movement", Object_getter_movement, Object_setter_movement);

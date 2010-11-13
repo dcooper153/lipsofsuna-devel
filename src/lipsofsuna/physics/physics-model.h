@@ -34,6 +34,10 @@ LIAPICALL (int, liphy_model_build, (
 	LIPhyModel* self,
 	int         terrain));
 
+LIAPICALL (LIPhyShape*, liphy_model_find_shape, (
+	LIPhyModel* self,
+	const char* name));
+
 LIAPICALL (int, liphy_model_set_model, (
 	LIPhyModel* self,
 	LIMdlModel* model));

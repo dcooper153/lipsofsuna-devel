@@ -655,7 +655,7 @@ void liphy_object_set_rotating (
 }
 
 const char* liphy_object_get_shape (
-	LIPhyObject* self)
+	const LIPhyObject* self)
 {
 	return self->shape_name;
 }
@@ -842,9 +842,16 @@ void liphy_object_set_velocity (
 static LIPhyShape* private_get_shape (
 	LIPhyObject* self)
 {
+	LIPhyShape* shape;
+
 	if (self->model == NULL)
 		return NULL;
-	return self->model->shape;
+	shape = liphy_model_find_shape (self->model, self->shape_name);
+	if (shape != NULL)
+		return shape;
+	shape = liphy_model_find_shape (self->model, "default");
+
+	return shape;
 }
 
 static void private_update_state (

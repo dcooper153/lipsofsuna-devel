@@ -89,9 +89,9 @@ struct _LIPhyModel
 {
 	int id;
 	int flags;
+	LIAlgStrdic* shapes;
 	LIMdlModel* model;
 	LIPhyPhysics* physics;
-	LIPhyShape* shape;
 	struct
 	{
 		int count;

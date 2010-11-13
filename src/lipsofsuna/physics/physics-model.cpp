@@ -57,9 +57,6 @@ static int private_build_terrain_triangulate (
 	btScalar*   vertex_array,
 	int         vertex_count);
 
-static void private_clear_object (
-	LIPhyModel* self);
-
 static void private_clear_terrain (
 	LIPhyModel* self);
 
@@ -91,6 +88,14 @@ LIPhyModel* liphy_model_new (
 	self->model = model;
 	self->id = id;
 
+	/* Allocate shape dictionary. */
+	self->shapes = lialg_strdic_new ();
+	if (self->shapes == NULL)
+	{
+		liphy_model_free (self);
+		return NULL;
+	}
+
 	/* Add to dictionary. */
 	if (!lialg_u32dic_insert (physics->models, id, self))
 	{
@@ -107,12 +112,26 @@ LIPhyModel* liphy_model_new (
  */
 void liphy_model_free (LIPhyModel* self)
 {
+	LIAlgStrdicIter iter;
+	LIPhyShape* shape;
+
 	/* Remove from dictionary. */
 	lialg_u32dic_remove (self->physics->models, self->id);
 
-	/* Free self. */
-	private_clear_object (self);
+	/* Free terrain shape. */
 	private_clear_terrain (self);
+
+	/* Free object shapes. */
+	if (self->shapes != NULL)
+	{
+		LIALG_STRDIC_FOREACH (iter, self->shapes)
+		{
+			shape = (LIPhyShape*) iter.value;
+			liphy_shape_free (shape);
+		}
+		lialg_strdic_free (self->shapes);
+	}
+
 	lisys_free (self);
 }
 
@@ -146,17 +165,20 @@ int liphy_model_build (
 	return 1;
 }
 
+LIPhyShape* liphy_model_find_shape (
+	LIPhyModel* self,
+	const char* name)
+{
+	return (LIPhyShape*) lialg_strdic_find (self->shapes, name);
+}
+
 int liphy_model_set_model (
 	LIPhyModel* self,
 	LIMdlModel* model)
 {
 	/* Terrain data can't be rebuilt, though we don't need that right now anyway. */
-	if (self->shape != NULL)
-	{
-		liphy_shape_clear (self->shape);
-		liphy_shape_add_model (self->shape, self->model, NULL, 1.0f);
-	}
 	self->model = model;
+	private_build_object (self);
 
 	return 1;
 }
@@ -166,17 +188,88 @@ int liphy_model_set_model (
 static int private_build_object (
 	LIPhyModel* self)
 {
-	LIPhyShape* shape;
+	int i;
+	int create;
+	LIAlgStrdicIter iter;
+	LIPhyShape* physhape;
+	LIMdlShape* mdlshape;
 
-	shape = liphy_shape_new (self->physics);
-	if (shape == NULL)
-		return 0;
-	if (!liphy_shape_add_model (shape, self->model, NULL, 1.0f))
+	/* Clear old shapes. */
+	/* We can't free the shapes because they may still used by objects.
+	   Clearing works fine since the shapes retain their pointers. */
+	LIALG_STRDIC_FOREACH (iter, self->shapes)
 	{
-		liphy_shape_free (shape);
-		return 0;
+		physhape = (LIPhyShape*) iter.value;
+		liphy_shape_clear (physhape);
 	}
-	self->shape = shape;
+
+	/* Create explicit model shapes. */
+	for (i = 0 ; i < self->model->shapes.count ; i++)
+	{
+		/* Find or create the physics shape. */
+		mdlshape = self->model->shapes.array + i;
+		physhape = (LIPhyShape*) lialg_strdic_find (self->shapes, mdlshape->name);
+		if (physhape == NULL)
+		{
+			create = 1;
+			physhape = liphy_shape_new (self->physics);
+			if (physhape == NULL)
+				return 0;
+		}
+		else
+			create = 0;
+
+		/* Add the model shape to the physics shape. */
+		if (!liphy_shape_add_model_shape (physhape, mdlshape, NULL, 1.0f))
+		{
+			liphy_shape_free (physhape);
+			return 0;
+		}
+
+		/* Add the shape to the dictionary. */
+		if (create)
+		{
+			if (!lialg_strdic_insert (self->shapes, mdlshape->name, physhape))
+			{
+				liphy_shape_free (physhape);
+				return 0;
+			}
+		}
+	}
+
+	/* Create fallback shape from full model data. */
+	if (!self->model->shapes.count)
+	{
+		/* Find or create the physics shape. */
+		mdlshape = self->model->shapes.array + i;
+		physhape = (LIPhyShape*) lialg_strdic_find (self->shapes, "default");
+		if (physhape == NULL)
+		{
+			create = 1;
+			physhape = liphy_shape_new (self->physics);
+			if (physhape == NULL)
+				return 0;
+		}
+		else
+			create = 0;
+
+		/* Add the model mesh to the physics shape. */
+		if (!liphy_shape_add_model_full (physhape, self->model, NULL, 1.0f))
+		{
+			liphy_shape_free (physhape);
+			return 0;
+		}
+
+		/* Add the shape to the dictionary. */
+		if (create)
+		{
+			if (!lialg_strdic_insert (self->shapes, "default", physhape))
+			{
+				liphy_shape_free (physhape);
+				return 0;
+			}
+		}
+	}
 
 	return 1;
 }
@@ -391,16 +484,6 @@ static int private_build_terrain_triangulate (
 	delete[] idx;
 
 	return 1;
-}
-
-static void private_clear_object (
-	LIPhyModel* self)
-{
-	if (self->shape != NULL)
-	{
-		liphy_shape_free (self->shape);
-		self->shape = NULL;
-	}
 }
 
 static void private_clear_terrain (

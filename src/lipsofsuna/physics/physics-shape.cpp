@@ -29,12 +29,6 @@
 
 #define VERTEX_WELD_EPSILON 0.05
 
-static int private_add_model (
-	LIPhyShape*           self,
-	const LIMdlModel*     model,
-	const LIMatTransform* transform,
-	float                 scale);
-
 static int private_add_shape (
 	LIPhyShape*           self,
 	btConvexShape*        shape,
@@ -143,13 +137,88 @@ int liphy_shape_add_convex (
 	return 1;
 }
 
-int liphy_shape_add_model (
+int liphy_shape_add_model_full (
 	LIPhyShape*           self,
 	const LIMdlModel*     model,
 	const LIMatTransform* transform,
 	float                 scale)
 {
-	return private_add_model (self, model, transform, scale);
+	int i;
+	LIMatVector* tmp;
+	btConvexHullShape* ret;
+
+	/* Extract coordinates from vertices. */
+	if (model->vertices.count)
+	{
+		tmp = (LIMatVector*) lisys_calloc (model->vertices.count, sizeof (LIMatVector));
+		if (tmp == NULL)
+			return 0;
+		for (i = 0 ; i < model->vertices.count ; i++)
+			tmp[i] = model->vertices.array[i].coord;
+	}
+	else
+		tmp = NULL;
+
+	/* Create the shape from the vertex coordinates. */
+	ret = private_create_from_vertices (self, tmp, model->vertices.count, scale);
+	if (ret == NULL)
+	{
+		lisys_free (tmp);
+		return 0;
+	}
+	if (!private_add_shape (self, ret, transform))
+	{
+		lisys_free (tmp);
+		delete ret;
+		return 0;
+	}
+	lisys_free (tmp);
+
+	return 1;
+}
+
+int liphy_shape_add_model_shape (
+	LIPhyShape*           self,
+	const LIMdlShape*     shape,
+	const LIMatTransform* transform,
+	float                 scale)
+{
+	int i;
+	int empty = 1;
+	btConvexHullShape* ret;
+
+	/* Add the shape parts to the physics shape. */
+	for (i = 0 ; i < shape->parts.count ; i++)
+	{
+		if (!shape->parts.array[i].vertices.count)
+			continue;
+		ret = private_create_from_vertices (self,
+			shape->parts.array[i].vertices.array,
+			shape->parts.array[i].vertices.count, scale);
+		if (ret == NULL)
+			return 0;
+		if (!private_add_shape (self, ret, transform))
+		{
+			delete ret;
+			return 0;
+		}
+		empty = 0;
+	}
+
+	/* Ensure that something is always created. */
+	if (empty)
+	{
+		ret = private_create_from_empty (self);
+		if (ret == NULL)
+			return 0;
+		if (!private_add_shape (self, ret, transform))
+		{
+			delete ret;
+			return 0;
+		}
+	}
+
+	return 1;
 }
 
 /**
@@ -218,92 +287,7 @@ void liphy_shape_get_inertia (
 	result->z = inertia[2];
 }
 
-int liphy_shape_set_model (
-	LIPhyShape*       self,
-	const LIMdlModel* model)
-{
-	liphy_shape_clear (self);
-	return private_add_model (self, model, NULL, 1.0f);
-}
-
 /*****************************************************************************/
-
-static int private_add_model (
-	LIPhyShape*           self,
-	const LIMdlModel*     model,
-	const LIMatTransform* transform,
-	float                 scale)
-{
-	int i;
-	int empty;
-	btConvexHullShape* ret;
-	LIMatVector* tmp;
-	LIMdlShape* shape;
-
-	/* Use precalculated convex shapes when possible. */
-	if (model->shapes.count)
-	{
-		empty = 1;
-		shape = model->shapes.array + 0;
-		for (i = 0 ; i < shape->parts.count ; i++)
-		{
-			if (!shape->parts.array[i].vertices.count)
-				continue;
-			ret = private_create_from_vertices (self,
-				shape->parts.array[i].vertices.array,
-				shape->parts.array[i].vertices.count, scale);
-			if (ret == NULL)
-				return 0;
-			if (!private_add_shape (self, ret, transform))
-			{
-				delete ret;
-				return 0;
-			}
-			empty = 0;
-		}
-		if (empty)
-		{
-			ret = private_create_from_empty (self);
-			if (ret == NULL)
-				return 0;
-			if (!private_add_shape (self, ret, transform))
-			{
-				delete ret;
-				return 0;
-			}
-		}
-		return 1;
-	}
-
-	/* Extract coordinates from vertices. */
-	if (model->vertices.count)
-	{
-		tmp = (LIMatVector*) lisys_calloc (model->vertices.count, sizeof (LIMatVector));
-		if (tmp == NULL)
-			return 0;
-		for (i = 0 ; i < model->vertices.count ; i++)
-			tmp[i] = model->vertices.array[i].coord;
-	}
-	else
-		tmp = NULL;
-
-	/* Create the shape from the vertex coordinates. */
-	ret = private_create_from_vertices (self, tmp, model->vertices.count, scale);
-	if (ret == NULL)
-	{
-		lisys_free (tmp);
-		return 0;
-	}
-	if (!private_add_shape (self, ret, transform))
-	{
-		lisys_free (tmp);
-		delete ret;
-		return 0;
-	}
-	lisys_free (tmp);
-
-	return 1;
-}
 
 static int private_add_shape (
 	LIPhyShape*           self,

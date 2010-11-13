@@ -44,9 +44,15 @@ LIAPICALL (int, liphy_shape_add_convex, (
 	int                   count,
 	const LIMatTransform* transform));
 
-LIAPICALL (int, liphy_shape_add_model, (
+LIAPICALL (int, liphy_shape_add_model_full, (
 	LIPhyShape*           self,
 	const LIMdlModel*     model,
+	const LIMatTransform* transform,
+	float                 scale));
+
+LIAPICALL (int, liphy_shape_add_model_shape, (
+	LIPhyShape*           self,
+	const LIMdlShape*     shape,
 	const LIMatTransform* transform,
 	float                 scale));
 
@@ -62,9 +68,5 @@ LIAPICALL (void, liphy_shape_get_inertia, (
 	const LIPhyShape* self,
 	float             mass,
 	LIMatVector*      result));
-
-LIAPICALL (int, liphy_shape_set_model, (
-	LIPhyShape*       self,
-	const LIMdlModel* model));
 
 #endif
