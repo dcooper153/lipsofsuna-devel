@@ -48,7 +48,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
-	equipment_models = {skirt = "aerlowerarmor1", panties = "panties1"},
+	equipment_models = {skirt = "aerlowerarmor1", panties = "panties2"},
 	equipment_slot = "lowerbody"}
 
 Itemspec{
@@ -58,6 +58,15 @@ Itemspec{
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
 	equipment_models = {upper1 = "bra1"},
+	equipment_slot = "upperbody"}
+
+Itemspec{
+	name = "dress",
+	model = "book-000",
+	categories = {"armor"},
+	crafting_tools = {saw = 1},
+	crafting_materials = {log = 1},
+	equipment_models = {upper1 = "chinadress1", panties = "panties2"},
 	equipment_slot = "upperbody"}
 
 Itemspec{

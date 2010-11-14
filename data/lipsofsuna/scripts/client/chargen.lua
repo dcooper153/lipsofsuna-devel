@@ -42,7 +42,16 @@ Chargen.init = function(clss)
 	clss.label_hair_style = Widgets.Label{text = "Hair:"}
 	clss.combo_hair_style = Widgets.ComboBox(hair_styles)
 	clss.combo_hair_color = Widgets.ComboBox(hair_colors)
-	-- TODO: Apperance sliders.
+	-- Apperance sliders.
+	clss.label_height = Widgets.Label{text = "Height:"}
+	clss.scroll_height = Widgets.Progress{min = 0.9, max = 1.05, value = 1,
+		pressed = function(self) clss:set_height(self:get_value_at(Client.cursor_pos)) end}
+	clss.label_nose_scale = Widgets.Label{text = "Nose:"}
+	clss.scroll_nose_scale = Widgets.Progress{min = 0.5, max = 2.0, value = 1,
+		pressed = function(self) clss:set_nose_scale(self:get_value_at(Client.cursor_pos)) end}
+	clss.label_bust_scale = Widgets.Label{text = "Bust:"}
+	clss.scroll_bust_scale = Widgets.Progress{min = 0.3, max = 1.3, value = 1,
+		pressed = function(self) clss:set_bust_scale(self:get_value_at(Client.cursor_pos)) end}
 	-- Preview widget.
 	clss.scene = Scene()
 	clss.object = Object{position = Vector(-100, -100, -100), type = "character"}
@@ -60,13 +69,19 @@ Chargen.init = function(clss)
 	clss.group_hair:set_child{row = 1, col = 2, widget = clss.combo_hair_color}
 	clss.group_hair:set_expand{col = 1}
 	clss.group_hair:set_expand{col = 2}
-	clss.group_race = Widget{rows = 3, cols = 2, homogeneous = true}
+	clss.group_race = Widget{rows = 6, cols = 2, homogeneous = true}
 	clss.group_race:set_child{row = 1, col = 1, widget = clss.label_race}
 	clss.group_race:set_child{row = 1, col = 2, widget = clss.combo_race}
 	clss.group_race:set_child{row = 2, col = 1, widget = clss.label_gender}
 	clss.group_race:set_child{row = 2, col = 2, widget = clss.combo_gender}
 	clss.group_race:set_child{row = 3, col = 1, widget = clss.label_hair_style}
 	clss.group_race:set_child{row = 3, col = 2, widget = clss.group_hair}
+	clss.group_race:set_child{row = 4, col = 1, widget = clss.label_height}
+	clss.group_race:set_child{row = 4, col = 2, widget = clss.scroll_height}
+	clss.group_race:set_child{row = 5, col = 1, widget = clss.label_nose_scale}
+	clss.group_race:set_child{row = 5, col = 2, widget = clss.scroll_nose_scale}
+	clss.group_race:set_child{row = 6, col = 1, widget = clss.label_bust_scale}
+	clss.group_race:set_child{row = 6, col = 2, widget = clss.scroll_bust_scale}
 	clss.group_race:set_expand{col = 2}
 	clss.group_race:set_request{width = 300}
 	clss.group_left = Widget{cols = 1}
@@ -86,7 +101,10 @@ Chargen.apply = function(clss)
 		"string", clss.list_races[clss.combo_race.value][2],
 		"string", clss.list_genders[clss.combo_gender.value][2],
 		"string", clss.list_hair_styles[clss.combo_hair_style.value][2],
-		"string", clss.list_hair_colors[clss.combo_hair_color.value][2])
+		"string", clss.list_hair_colors[clss.combo_hair_color.value][2],
+		"float", clss.scroll_height.value,
+		"float", clss.scroll_nose_scale.value,
+		"float", clss.scroll_bust_scale.value)
 	Network:send{packet = packet}
 end
 
@@ -132,6 +150,11 @@ Chargen.set_gender = function(clss, index)
 	clss:update_model()
 end
 
+Chargen.set_bust_scale = function(clss, value)
+	clss.scroll_bust_scale.value = value
+	clss:update_model()
+end
+
 Chargen.set_hair_style = function(clss, index)
 	clss.combo_hair_style.value = index
 	clss.combo_hair_style.text = clss.list_hair_styles[index][1]
@@ -143,6 +166,16 @@ Chargen.set_hair_color = function(clss, index)
 	clss.combo_hair_color.value = index
 	clss.combo_hair_color.text = clss.list_hair_colors[index][1]
 	clss.hair_color = clss.list_hair_colors[index][2]
+	clss:update_model()
+end
+
+Chargen.set_height = function(clss, value)
+	clss.scroll_height.value = value
+	clss:update_model()
+end
+
+Chargen.set_nose_scale = function(clss, value)
+	clss.scroll_nose_scale.value = value
 	clss:update_model()
 end
 
@@ -170,10 +203,13 @@ end
 
 Chargen.update_model = function(clss)
 	clss.object:create_character_model{
-		equipment = {"chainmail tunic", "chainmail pants"}, -- TODO
+		body_scale = clss.scroll_height.value,
+		bust_scale = clss.scroll_bust_scale.value,
+		equipment = {"dress"}, -- TODO
 		gender = clss.gender,
 		hair_color = clss.hair_color,
 		hair_style = clss.hair_style,
+		nose_scale = clss.scroll_nose_scale.value,
 		race = clss.race}
 	clss.object:animate{animation = "walk", channel = 1, permanent = true}
 	clss.object:update_animations{secs = 1}

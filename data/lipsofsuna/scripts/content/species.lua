@@ -37,7 +37,7 @@ Species{
 	name = "aer-player",
 	base = "aer",
 	ai_enabled = false,
-	inventory_items = {"torch", "mattock", "chainmail tunic", "chainmail pants", "chainmail leggings"}}
+	inventory_items = {"torch", "mattock", "dress", "chainmail leggings"}}
 
 Species{
 	name = "android",
@@ -209,7 +209,7 @@ Species{
 	ai_enable_combat = false,
 	ai_enable_wander = false,
 	hair_style = "hair1",
-	inventory_items = {"torch", "axe", "chainmail tunic", "chainmail pants", "chainmail leggings"},
+	inventory_items = {"axe", "dress"},
 	factions = {"peculiarpet"}}
 
 Species{

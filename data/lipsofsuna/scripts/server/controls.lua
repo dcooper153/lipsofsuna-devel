@@ -12,7 +12,7 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	local player = Player:find{client = args.client}
 	if player then return end
 	-- Get character flags.
-	local ok,ra,ge,hs,hc = args.packet:read("string", "string", "string", "string")
+	local ok,ra,ge,hs,hc,bo,no,bu = args.packet:read("string", "string", "string", "string", "float", "float", "float")
 	if not ok then return end
 	local species = Species:find{name = ra .. "-player"}
 	if not species then return end
@@ -22,10 +22,13 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	-- when spawned in a yet to be loaded region, we disable the physics of
 	-- the object for a short while.
 	local o = Player{
+		body_scale = bo,
+		bust_scale = bu,
 		client = args.client,
 		gender = ge,
 		hair_color = hc,
 		hair_style = hs,
+		nose_scale = no,
 		physics = "static",
 		position = Config.spawn,
 		species = species,

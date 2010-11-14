@@ -245,17 +245,23 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	local type = (t == 0 and "creature") or (t == 1 and "item") or (t == 2 and "obstacle") or "object"
 	local o = Object{id = i, model = m, name = n, position = Vector(x, y, z), position_smoothing = 0.5, rotation_smoothing = 0.5, type = type}
 	-- Apply optional customizations.
-	local ok,ra,ge,hs,hc = event.packet:resume("string", "string", "string", "string")
+	local ok,ra,ge,hs,hc,bo,no,bu = event.packet:resume("string", "string", "string", "string", "float", "float", "float")
 	if ok then
 		o.race = ra
 		o.gender = ge
 		o.hair_style = hs
 		o.hair_color = hc
+		o.body_scale = bo
+		o.bust_scale = bu
+		o.nose_scale = no
 	else
 		o.race = nil
 		o.gender = nil
 		o.hair_style = nil
 		o.hair_color = nil
+		o.body_scale = nil
+		o.bust_scale = nil
+		o.nose_scale = nil
 	end
 	-- Rebuild the model.
 	o:update_model()

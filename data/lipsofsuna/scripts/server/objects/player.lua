@@ -173,7 +173,10 @@ Player.vision_cb = function(self, args)
 				p:write("string", o.species.name,
 					"string", o.gender or "female",
 					"string", o.hair_style or "",
-					"string", o.hair_color or "white")
+					"string", o.hair_color or "white",
+					"float", o.body_scale or 1,
+					"float", o.nose_scale or 1,
+					"float", o.bust_scale or 1)
 			end
 			-- Send to the player.
 			self:send{packet = p}

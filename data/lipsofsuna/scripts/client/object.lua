@@ -3,10 +3,13 @@
 -- screen to create customized character objects.
 -- @param self Object.
 -- @param args Arguments.<ul>
+--   <li>body_scale: Scale factor.</li>
+--   <li>bust_scale: Bust scale factor.</li>
 --   <li>equipment: List of equipment.</li>
 --   <li>gender: Gender string.</li>
 --   <li>hair_color: Hair color string.</li>
 --   <li>hair_style: Hair style string.</li>
+--   <li>nose_scale: Nose scale factor.</li>
 --   <li>race: Race string.</li></ul>
 Object.create_character_model = function(self, args)
 	-- Get the species.
@@ -49,6 +52,15 @@ Object.create_character_model = function(self, args)
 	-- Recalculate bounding box.
 	m:calculate_bounds()
 	self.model = m
+	-- Apply custom deformations.
+	self:animate{animation = "empty", channel = Animation.CHANNEL_CUSTOMIZE,
+		weight = 0, weight_scale = 1, permanent = true}
+	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "mover", scale = args.body_scale or 1}
+	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "nose", scale = args.nose_scale or 1}
+	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "breast.L", scale = args.bust_scale or 1}
+	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "breast.R", scale = args.bust_scale or 1}
+	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "breastspikiness.L", scale = args.bust_scale or 1}
+	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "breastspikiness.R", scale = args.bust_scale or 1}
 end
 
 Object.update_model = function(self)
@@ -60,16 +72,19 @@ Object.update_model = function(self)
 	local spec = self.race and Species:find{name = self.race}
 	if spec and spec.models then
 		self:create_character_model{
+			body_scale = self.body_scale,
+			bust_scale = self.bust_scale,
 			equipment = self.equipment,
 			gender = self.gender,
 			hair_color = self.hair_color,
 			hair_style = self.hair_style,
+			nose_scale = self.nose_scale,
 			race = self.race}
 	end
 	-- Create the customization animation.
 	if spec and (spec.models or spec.tilt_bone) then
-		self:animate{animation = "empty", channel = Animation.CHANNEL_CUSTOMIZE,
-			weight = 10.0, permanent = true}
+		self:animate{animation = "empty", channel = Animation.CHANNEL_TILT,
+			weight = 10, permanent = true}
 	end
 	-- Particle hacks.
 	if self.model_name == "torch1" then
@@ -101,7 +116,7 @@ Object.update_rotation = function(self, quat)
 		local euler = quat.euler
 		local bodyq = Quaternion:new_euler(euler[1], euler[2], 0)
 		local boneq = Quaternion{axis = Vector(1,0,0), angle = -euler[3]}
-		self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = spec.tilt_bone, rotation = boneq}
+		self:edit_pose{channel = Animation.CHANNEL_TILT, node = spec.tilt_bone, rotation = boneq}
 		self.rotation = bodyq
 	else
 		self.rotation = quat
