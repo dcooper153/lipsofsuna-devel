@@ -76,6 +76,7 @@ static void Object_animate (LIScrArgs* args)
 	float fade_in = 0.0f;
 	float fade_out = 0.0f;
 	float weight = 1.0f;
+	float weight_scale = 0.0f;
 	float time = 0.0f;
 	const char* animation = NULL;
 
@@ -84,13 +85,14 @@ static void Object_animate (LIScrArgs* args)
 	liscr_args_gets_float (args, "fade_in", &fade_in);
 	liscr_args_gets_float (args, "fade_out", &fade_out);
 	liscr_args_gets_float (args, "weight", &weight);
+	liscr_args_gets_float (args, "weight_scale", &weight_scale);
 	liscr_args_gets_float (args, "time", &time);
 	liscr_args_gets_bool (args, "permanent", &repeat);
 	if (channel < 1 || channel > 255)
 		channel = -1;
 	else
 		channel--;
-	ret = lieng_object_animate (args->self, channel, animation, repeat, weight, time, fade_in, fade_out);
+	ret = lieng_object_animate (args->self, channel, animation, repeat, weight_scale, weight, time, fade_in, fade_out);
 	liscr_args_seti_bool (args, ret);
 }
 
@@ -147,13 +149,15 @@ static void Object_calculate_bounds (LIScrArgs* args)
  * --   <li>frame: Frame number.</li>
  * --   <li>node: Node name. (required)</li>
  * --   <li>position: Position change relative to rest pose.</li>
- * --   <li>rotation: Rotation change relative to rest pose.</li></ul>
+ * --   <li>rotation: Rotation change relative to rest pose.</li>
+ * --   <li>scale: Scale factor.</li></ul>
  * function Object.edit_pose(self, args)
  */
 static void Object_edit_pose (LIScrArgs* args)
 {
 	int frame = 0;
 	int channel = 0;
+	float scale = 1.0f;
 	const char* node = NULL;
 	LIMatTransform transform = limat_transform_identity ();
 	LIEngObject* self = args->self;
@@ -174,9 +178,10 @@ static void Object_edit_pose (LIScrArgs* args)
 	}
 	liscr_args_gets_quaternion (args, "rotation", &transform.rotation);
 	liscr_args_gets_vector (args, "position", &transform.position);
+	liscr_args_gets_float (args, "scale", &scale);
 	transform.rotation = limat_quaternion_normalize (transform.rotation);
 
-	limdl_pose_set_channel_transform (self->pose, channel, frame, node, &transform);
+	limdl_pose_set_channel_transform (self->pose, channel, frame, node, scale, &transform);
 }
 
 /* @luadoc
@@ -244,6 +249,7 @@ static void Object_find (LIScrArgs* args)
  */
 static void Object_find_node (LIScrArgs* args)
 {
+	float scale;
 	const char* name;
 	const char* space = "local";
 	LIMatTransform transform;
@@ -264,12 +270,12 @@ static void Object_find_node (LIScrArgs* args)
 	/* Get the transformation. */
 	if (!strcmp (space, "world"))
 	{
-		limdl_node_get_world_transform (node, &transform);
+		limdl_node_get_world_transform (node, &scale, &transform);
 		lieng_object_get_transform (self, &transform1);
 		transform = limat_transform_multiply (transform1, transform);
 	}
 	else
-		limdl_node_get_world_transform (node, &transform);
+		limdl_node_get_world_transform (node, &scale, &transform);
 
 	/* Return the transformation. */
 	liscr_args_seti_vector (args, &transform.position);
@@ -305,7 +311,8 @@ static void Object_get_animation (LIScrArgs* args)
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
 	liscr_args_sets_string (args, "animation", anim->name);
 	liscr_args_sets_float (args, "time", limdl_pose_get_channel_position (object->pose, chan));
-	liscr_args_sets_float (args, "weight", limdl_pose_get_channel_priority (object->pose, chan));
+	liscr_args_sets_float (args, "weight", limdl_pose_get_channel_priority_transform (object->pose, chan));
+	liscr_args_sets_float (args, "weight_scale", limdl_pose_get_channel_priority_scale (object->pose, chan));
 }
 
 /* @luadoc

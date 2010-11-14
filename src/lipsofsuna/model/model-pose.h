@@ -40,7 +40,8 @@ struct _LIMdlPoseChannel
 	int repeat;
 	int repeats;
 	float time;
-	float priority;
+	float priority_scale;
+	float priority_transform;
 	float fade_in;
 	float fade_out;
 	LIMdlAnimation* animation;
@@ -50,7 +51,8 @@ struct _LIMdlPoseFade
 {
 	float rate;
 	float time;
-	float weight;
+	float priority_scale;
+	float priority_transform;
 	LIMdlPoseFade* prev;
 	LIMdlPoseFade* next;
 	LIMdlAnimation* animation;
@@ -60,6 +62,7 @@ typedef struct _LIMdlPoseGroup LIMdlPoseGroup;
 struct _LIMdlPoseGroup
 {
 	int enabled;
+	float scale_pose;
 	LIMatVector head_pose;
 	LIMatVector head_rest;
 	LIMatQuaternion rotation;
@@ -96,10 +99,6 @@ struct _LIMdlPose
 		LIMdlPoseVertex* array;
 	} vertices;
 };
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 LIAPICALL (LIMdlPose*, limdl_pose_new, ());
 
@@ -159,11 +158,20 @@ LIAPICALL (void, limdl_pose_set_channel_position, (
 	int        channel,
 	float      value));
 
-LIAPICALL (float, limdl_pose_get_channel_priority, (
+LIAPICALL (float, limdl_pose_get_channel_priority_scale, (
 	const LIMdlPose* self,
 	int              channel));
 
-LIAPICALL (void, limdl_pose_set_channel_priority, (
+LIAPICALL (void, limdl_pose_set_channel_priority_scale, (
+	LIMdlPose* self,
+	int        channel,
+	float      value));
+
+LIAPICALL (float, limdl_pose_get_channel_priority_transform, (
+	const LIMdlPose* self,
+	int              channel));
+
+LIAPICALL (void, limdl_pose_set_channel_priority_transform, (
 	LIMdlPose* self,
 	int        channel,
 	float      value));
@@ -191,14 +199,11 @@ LIAPICALL (int, limdl_pose_set_channel_transform, (
 	int                   channel,
 	int                   frame,
 	const char*           node,
+	float                 scale,
 	const LIMatTransform* transform));
 
 LIAPICALL (int, limdl_pose_set_model, (
 	LIMdlPose*  self,
 	LIMdlModel* model));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

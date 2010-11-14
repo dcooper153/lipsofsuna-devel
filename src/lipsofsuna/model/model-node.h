@@ -39,6 +39,8 @@ struct _LIMdlNode
 	} nodes;
 	struct
 	{
+		float local_scale;
+		float global_scale;
 		LIMatTransform rest;
 		LIMatTransform local;
 		LIMatTransform global;
@@ -100,6 +102,7 @@ LIAPICALL (void, limdl_node_get_pose_axes, (
 
 LIAPICALL (void, limdl_node_set_local_transform, (
 	LIMdlNode*            self,
+	float                 scale,
 	const LIMatTransform* value));
 
 LIAPICALL (void, limdl_node_get_rest_transform, (
@@ -108,6 +111,7 @@ LIAPICALL (void, limdl_node_get_rest_transform, (
 
 LIAPICALL (void, limdl_node_get_world_transform, (
 	const LIMdlNode* self,
+	float*           scale,
 	LIMatTransform*  value));
 
 LIAPICALL (LIMdlNodeType, limdl_node_get_type, (

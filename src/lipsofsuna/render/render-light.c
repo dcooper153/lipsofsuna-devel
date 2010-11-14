@@ -124,6 +124,7 @@ LIRenLight* liren_light_new_from_model (
 	LIRenScene*      scene,
 	const LIMdlNode* light)
 {
+	float scale;
 	LIMatMatrix projection;
 	LIMatTransform transform;
 	LIRenLight* self;
@@ -138,7 +139,7 @@ LIRenLight* liren_light_new_from_model (
 
 	/* Set transform. */
 	self->node = light;
-	limdl_node_get_world_transform (light, &transform);
+	limdl_node_get_world_transform (light, &scale, &transform);
 	liren_light_set_transform (self, &transform);
 	limdl_light_get_projection (light, &projection);
 	liren_light_set_projection (self, &projection);

@@ -25,6 +25,7 @@
 typedef struct _LIMdlFrame LIMdlFrame;
 struct _LIMdlFrame
 {
+	float scale;
 	LIMatTransform transform;
 };
 
@@ -79,12 +80,14 @@ LIAPICALL (int, limdl_animation_set_transform, (
 	LIMdlAnimation*       self,
 	const char*           name,
 	int                   frame,
+	float                 scale,
 	const LIMatTransform* value));
 
 LIAPICALL (int, limdl_animation_get_transform, (
 	LIMdlAnimation* self,
 	const char*     name,
 	float           secs,
+	float*          scale,
 	LIMatTransform* value));
 
 #endif

@@ -155,6 +155,7 @@ void limdl_pose_fade_channel (
 	int        channel,
 	float      rate)
 {
+	float weight;
 	LIMdlPoseFade* fade;
 	LIMdlPoseChannel* chan;
 
@@ -177,8 +178,10 @@ void limdl_pose_fade_channel (
 		limdl_pose_destroy_channel (self, channel);
 		return;
 	}
-	fade->weight = chan->priority * private_get_channel_weight (self, chan);
-	fade->rate = fade->weight * rate;
+	weight = private_get_channel_weight (self, chan);
+	fade->priority_transform = chan->priority_transform * weight;
+	fade->priority_scale = chan->priority_scale * weight;
+	fade->rate = fade->priority_transform * rate;
 	fade->time = chan->time;
 	fade->animation = limdl_animation_new_copy (chan->animation);
 	if (fade->animation == NULL)
@@ -274,8 +277,8 @@ void limdl_pose_update (
 	{
 		fade_next = fade->next;
 		fade->time += secs;
-		fade->weight -= secs * fade->rate;
-		if (fade->weight <= 0.0f)
+		fade->priority_transform -= secs * fade->rate;
+		if (fade->priority_transform <= 0.0f)
 		{
 			private_fade_remove (self, fade);
 			private_fade_free (fade);
@@ -308,6 +311,7 @@ void limdl_pose_update (
 			quat0 = limat_quaternion_conjugate (quat0);
 			group->rotation = limat_quaternion_multiply (quat1, quat0);
 			group->head_pose = group->pose_node->transform.global.position;
+			group->scale_pose = group->pose_node->transform.global_scale;
 		}
 	}
 }
@@ -490,7 +494,7 @@ void limdl_pose_set_channel_position (
 		chan->time = limdl_animation_get_duration (chan->animation);
 }
 
-float limdl_pose_get_channel_priority (
+float limdl_pose_get_channel_priority_scale (
 	const LIMdlPose* self,
 	int              channel)
 {
@@ -499,10 +503,10 @@ float limdl_pose_get_channel_priority (
 	chan = private_find_channel (self, channel);
 	if (chan == NULL)
 		return 0.0f;
-	return chan->priority;
+	return chan->priority_scale;
 }
 
-void limdl_pose_set_channel_priority (
+void limdl_pose_set_channel_priority_scale (
 	LIMdlPose* self,
 	int        channel,
 	float      value)
@@ -512,7 +516,32 @@ void limdl_pose_set_channel_priority (
 	chan = private_create_channel (self, channel);
 	if (chan == NULL)
 		return;
-	chan->priority = value;
+	chan->priority_scale = value;
+}
+
+float limdl_pose_get_channel_priority_transform (
+	const LIMdlPose* self,
+	int              channel)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_find_channel (self, channel);
+	if (chan == NULL)
+		return 0.0f;
+	return chan->priority_transform;
+}
+
+void limdl_pose_set_channel_priority_transform (
+	LIMdlPose* self,
+	int        channel,
+	float      value)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_create_channel (self, channel);
+	if (chan == NULL)
+		return;
+	chan->priority_transform = value;
 }
 
 int limdl_pose_get_channel_repeats (
@@ -596,6 +625,7 @@ void limdl_pose_set_channel_state (
  * \param channel Channel number.
  * \param frame Frame number.
  * \param node Node name.
+ * \param scale Scale factor.
  * \param transform Node transformation.
  * \return Nonzero on success.
  */
@@ -604,6 +634,7 @@ int limdl_pose_set_channel_transform (
 	int                   channel,
 	int                   frame,
 	const char*           node,
+	float                 scale,
 	const LIMatTransform* transform)
 {
 	LIMdlNode* node_;
@@ -629,7 +660,7 @@ int limdl_pose_set_channel_transform (
 	}
 
 	/* Set the node transformation of the frame. */
-	limdl_animation_set_transform (chan->animation, node, frame, transform);
+	limdl_animation_set_transform (chan->animation, node, frame, scale, transform);
 
 	return 1;
 }
@@ -816,6 +847,8 @@ static LIMdlPoseChannel* private_create_channel (
 	}
 	chan->state = LIMDL_POSE_CHANNEL_STATE_PLAYING;
 	chan->animation = anim;
+	chan->priority_scale = 0.0f;
+	chan->priority_transform = 1.0f;
 
 	/* Register the channel. */
 	if (!lialg_u32dic_insert (self->channels, channel, chan))
@@ -973,7 +1006,10 @@ static void private_transform_node (
 {
 	int i;
 	int channels;
-	float total;
+	float scale;
+	float scale1;
+	float total_scale;
+	float total_transform;
 	float weight;
 	LIAlgU32dicIter iter;
 	LIMatQuaternion bonerot;
@@ -985,7 +1021,9 @@ static void private_transform_node (
 	LIMdlPoseChannel* chan;
 
 	channels = 0;
-	total = 0.0f;
+	scale = 0.0f;
+	total_scale = 0.0f;
+	total_transform = 0.0f;
 	position = limat_vector_init (0.0f, 0.0f, 0.0f);
 	rotation = limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -996,7 +1034,8 @@ static void private_transform_node (
 		if (limdl_animation_get_channel (chan->animation, node->name) != -1)
 		{
 			weight = private_get_channel_weight (self, chan);
-			total += chan->priority * weight;
+			total_transform += chan->priority_transform * weight;
+			total_scale += chan->priority_scale * weight;
 			channels++;
 		}
 	}
@@ -1006,45 +1045,73 @@ static void private_transform_node (
 	{
 		if (limdl_animation_get_channel (fade->animation, node->name) != -1)
 		{
-			total += fade->weight;
+			total_transform += fade->priority_transform;
+			total_scale += fade->priority_scale;
 			channels++;
 		}
 	}
 
-	/* Apply valid influences. */
-	if (channels && total >= LIMAT_EPSILON)
+	/* Apply valid transformation influences. */
+	if (channels && total_transform >= LIMAT_EPSILON)
 	{
 		/* Apply channel influences. */
 		LIALG_U32DIC_FOREACH (iter, self->channels)
 		{
 			chan = iter.value;
-			if (limdl_animation_get_transform (chan->animation, node->name, chan->time, &transform))
+			if (limdl_animation_get_transform (chan->animation, node->name, chan->time, &scale1, &transform))
 			{
 				bonepos = transform.position;
 				bonerot = transform.rotation;
-				weight = chan->priority * private_get_channel_weight (self, chan);
-				rotation = limat_quaternion_nlerp (bonerot, rotation, weight / total);
-				position = limat_vector_lerp (bonepos, position, weight / total);
+				weight = private_get_channel_weight (self, chan);
+				rotation = limat_quaternion_nlerp (bonerot, rotation, chan->priority_transform * weight / total_transform);
+				position = limat_vector_lerp (bonepos, position, chan->priority_transform * weight / total_transform);
 			}
 		}
 
 		/* Apply fade influences. */
 		for (fade = self->fades ; fade != NULL ; fade = fade->next)
 		{
-			if (limdl_animation_get_transform (fade->animation, node->name, fade->time, &transform))
+			if (limdl_animation_get_transform (fade->animation, node->name, fade->time, &scale1, &transform))
 			{
 				bonepos = transform.position;
 				bonerot = transform.rotation;
-				weight = fade->weight;
-				rotation = limat_quaternion_nlerp (bonerot, rotation, weight / total);
-				position = limat_vector_lerp (bonepos, position, weight / total);
+				weight = fade->priority_transform;
+				rotation = limat_quaternion_nlerp (bonerot, rotation, weight / total_transform);
+				position = limat_vector_lerp (bonepos, position, weight / total_transform);
 			}
 		}
 	}
 
+	/* Apply valid scale influences. */
+	if (channels && total_scale >= LIMAT_EPSILON)
+	{
+		/* Apply channel influences. */
+		LIALG_U32DIC_FOREACH (iter, self->channels)
+		{
+			chan = iter.value;
+			if (limdl_animation_get_transform (chan->animation, node->name, chan->time, &scale1, &transform))
+			{
+				weight = private_get_channel_weight (self, chan);
+				scale += scale1 * chan->priority_scale / total_scale;
+			}
+		}
+
+		/* Apply fade influences. */
+		for (fade = self->fades ; fade != NULL ; fade = fade->next)
+		{
+			if (limdl_animation_get_transform (fade->animation, node->name, fade->time, &scale1, &transform))
+			{
+				weight = fade->priority_transform;
+				scale += scale1 * fade->priority_scale / total_scale;
+			}
+		}
+	}
+	else
+		scale = 1.0f;
+
 	/* Update node transformation. */
 	transform = limat_transform_init (position, rotation);
-	limdl_node_set_local_transform (node, &transform);
+	limdl_node_set_local_transform (node, scale, &transform);
 	limdl_node_rebuild (node, 0);
 
 	/* Update child transformations recursively. */

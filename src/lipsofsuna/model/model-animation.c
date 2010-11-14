@@ -27,10 +27,12 @@
 
 #define TIMESCALE 0.02f
 
-static LIMatTransform*
-private_frame_transform (LIMdlAnimation* self,
-                         int             chan,
-                         int             frame);
+static void private_frame_transform (
+	LIMdlAnimation* self,
+	int             chan,
+	int             frame,
+	float*          scale,
+	LIMatTransform* value);
 
 /*****************************************************************************/
 
@@ -121,6 +123,8 @@ int limdl_animation_insert_channel (
 	int frame;
 	char* str;
 	char** tmp;
+	LIMdlFrame* dstframe;
+	LIMdlFrame* srcframe;
 	LIMdlFrame* buffer = NULL;
 
 	/* Check for existence. */
@@ -145,10 +149,14 @@ int limdl_animation_insert_channel (
 		{
 			for (chan = 0 ; chan < self->channels.count ; chan++)
 			{
-				buffer[(self->channels.count + 1) * frame + chan].transform =
-					self->buffer.array[self->channels.count * frame + chan].transform;
+				srcframe = self->buffer.array + self->channels.count * frame + chan;
+				dstframe = buffer + (self->channels.count + 1) * frame + chan;
+				dstframe->scale = srcframe->scale;
+				dstframe->transform = srcframe->transform;
 			}
-			buffer[(self->channels.count + 1) * frame + chan].transform = limat_transform_identity ();
+			dstframe = buffer + (self->channels.count + 1) * frame + chan;
+			dstframe->scale = 1.0f;
+			dstframe->transform = limat_transform_identity ();
 		}
 	}
 
@@ -244,6 +252,7 @@ int limdl_animation_read (
 	/* Read frames. */
 	for (i = 0 ; i < self->buffer.count ; i++)
 	{
+		self->buffer.array[i].scale = 1.0f;
 		transform = &self->buffer.array[i].transform;
 		if (!liarc_reader_get_float (reader, &transform->position.x) ||
 			!liarc_reader_get_float (reader, &transform->position.y) ||
@@ -333,7 +342,10 @@ int limdl_animation_set_length (
 			return 0;
 		self->buffer.array = tmp;
 		for (i = self->channels.count * self->length ; i < self->channels.count * value ; i++)
+		{
+			self->buffer.array[i].scale = 1.0f;
 			self->buffer.array[i].transform = limat_transform_identity ();
+		}
 	}
 	self->length = value;
 	self->buffer.count = self->channels.count * self->length;
@@ -343,10 +355,10 @@ int limdl_animation_set_length (
 
 /**
  * \brief Sets the node transformation.
- *
  * \param self Animation.
  * \param name Channel name.
  * \param frame Frame number.
+ * \param scale Scale factor.
  * \param value Node transformation.
  * \return Nonzero on success.
  */
@@ -354,6 +366,7 @@ int limdl_animation_set_transform (
 	LIMdlAnimation*       self,
 	const char*           name,
 	int                   frame,
+	float                 scale,
 	const LIMatTransform* value)
 {
 	int chan;
@@ -364,6 +377,7 @@ int limdl_animation_set_transform (
 	chan = limdl_animation_get_channel (self, name);
 	if (chan == -1)
 		return 0;
+	self->buffer.array[self->channels.count * frame + chan].scale = scale;
 	self->buffer.array[self->channels.count * frame + chan].transform = *value;
 
 	return 1;
@@ -371,10 +385,10 @@ int limdl_animation_set_transform (
 
 /**
  * \brief Gets the node transformation.
- *
  * \param self Animation.
  * \param name Channel name.
  * \param secs Animation position.
+ * \param scale Return location for the scale factor.
  * \param value Return location for the transformation.
  * \return Nonzero on success.
  */
@@ -382,14 +396,17 @@ int limdl_animation_get_transform (
 	LIMdlAnimation* self,
 	const char*     name,
 	float           secs,
+	float*          scale,
 	LIMatTransform* value)
 {
 	int chan;
 	int frame;
+	float s0;
+	float s1;
 	float blend;
 	float frames;
-	LIMatTransform* t0;
-	LIMatTransform* t1;
+	LIMatTransform t0;
+	LIMatTransform t1;
 
 	chan = limdl_animation_get_channel (self, name);
 	if (chan == -1)
@@ -398,16 +415,17 @@ int limdl_animation_get_transform (
 	frames = secs / TIMESCALE;
 	frame = (int) frames;
 	if (frame <= 0)
-		*value = *private_frame_transform (self, chan, 0);
+		private_frame_transform (self, chan, 0, scale, value);
 	else if (frame >= self->length - 1)
-		*value = *private_frame_transform (self, chan, self->length - 1);
+		private_frame_transform (self, chan, self->length - 1, scale, value);
 	else
 	{
 		blend = frames - frame;
-		t0 = private_frame_transform (self, chan, frame);
-		t1 = private_frame_transform (self, chan, frame + 1);
-		value->position = limat_vector_lerp (t1->position, t0->position, blend);
-		value->rotation = limat_quaternion_nlerp (t1->rotation, t0->rotation, blend);
+		private_frame_transform (self, chan, frame, &s0, &t0);
+		private_frame_transform (self, chan, frame + 1, &s1, &t1);
+		*scale = (1.0f - blend) * s0 + blend * s1;
+		value->position = limat_vector_lerp (t1.position, t0.position, blend);
+		value->rotation = limat_quaternion_nlerp (t1.rotation, t0.rotation, blend);
 	}
 
 	return 1;
@@ -415,12 +433,15 @@ int limdl_animation_get_transform (
 
 /*****************************************************************************/
 
-static LIMatTransform*
-private_frame_transform (LIMdlAnimation* self,
-                         int             chan,
-                         int             frame)
+static void private_frame_transform (
+	LIMdlAnimation* self,
+	int             chan,
+	int             frame,
+	float*          scale,
+	LIMatTransform* value)
 {
-	return &self->buffer.array[self->channels.count * frame + chan].transform;
+	*scale = self->buffer.array[self->channels.count * frame + chan].scale;
+	*value = self->buffer.array[self->channels.count * frame + chan].transform;
 }
 
 /** @} */

@@ -25,13 +25,13 @@
 #include <lipsofsuna/system.h>
 #include "model-node.h"
 
-static void
-private_calculate_world_transform (LIMdlNode* self);
+static void private_calculate_world_transform (
+	LIMdlNode* self);
 
 /*****************************************************************************/
 
-LIMdlNode*
-limdl_node_new (LIMdlModel* model)
+LIMdlNode* limdl_node_new (
+	LIMdlModel* model)
 {
 	LIMdlNode* self;
 
@@ -41,13 +41,15 @@ limdl_node_new (LIMdlModel* model)
 	self->model = model;
 	self->transform.rest = limat_transform_identity ();
 	self->transform.local = limat_transform_identity ();
+	self->transform.local_scale = 1.0f;
 	self->transform.global = limat_transform_identity ();
+	self->transform.global_scale = 1.0f;
 
 	return self;
 }
 
-LIMdlNode*
-limdl_node_copy (const LIMdlNode* node)
+LIMdlNode* limdl_node_copy (
+	const LIMdlNode* node)
 {
 	int i;
 	LIMdlNode* self;
@@ -59,7 +61,9 @@ limdl_node_copy (const LIMdlNode* node)
 	self->model = node->model;
 	self->transform.rest = node->transform.rest;
 	self->transform.local = node->transform.local;
+	self->transform.local_scale = node->transform.local_scale;
 	self->transform.global = node->transform.global;
+	self->transform.global_scale = node->transform.global_scale;
 
 	/* Copy name. */
 	if (node->name != NULL)
@@ -108,8 +112,8 @@ error:
 	return NULL;
 }
 
-void
-limdl_node_free (LIMdlNode* self)
+void limdl_node_free (
+	LIMdlNode* self)
 {
 	int i;
 
@@ -128,9 +132,9 @@ limdl_node_free (LIMdlNode* self)
 	lisys_free (self);
 }
 
-LIMdlNode*
-limdl_node_find_node (const LIMdlNode* self,
-                      const char*      name)
+LIMdlNode* limdl_node_find_node (
+	const LIMdlNode* self,
+	const char*      name)
 {
 	int i;
 	LIMdlNode* tmp;
@@ -153,9 +157,9 @@ limdl_node_find_node (const LIMdlNode* self,
 	return NULL;
 }
 
-int
-limdl_node_read (LIMdlNode*   self,
-                 LIArcReader* reader)
+int limdl_node_read (
+	LIMdlNode*   self,
+	LIArcReader* reader)
 {
 	int i;
 	uint32_t count;
@@ -179,7 +183,9 @@ limdl_node_read (LIMdlNode*   self,
 	self->nodes.count = count;
 	self->transform.rest = limat_transform_init (position, rotation);
 	self->transform.local = limat_transform_identity ();
+	self->transform.local_scale = 1.0f;
 	self->transform.global = limat_transform_init (position, rotation);
+	self->transform.global_scale = 1.0f;
 
 	/* Read type sepecific data. */
 	switch (type)
@@ -239,9 +245,9 @@ limdl_node_rebuild (LIMdlNode* self,
 	}
 }
 
-int
-limdl_node_write (const LIMdlNode* self,
-                  LIArcWriter*     writer)
+int limdl_node_write (
+	const LIMdlNode* self,
+	LIArcWriter*     writer)
 {
 	int i;
 	int count = 0;
@@ -295,33 +301,31 @@ limdl_node_write (const LIMdlNode* self,
 	return !writer->error;
 }
 
-LIMdlNode*
-limdl_node_get_child (const LIMdlNode* self,
-                      int              index)
+LIMdlNode* limdl_node_get_child (
+	const LIMdlNode* self,
+	int              index)
 {
 	return self->nodes.array[index];
 }
 
 /**
  * \brief Gets the number of direct children.
- *
  * \param self Node.
  * \return Child count.
  */
-int
-limdl_node_get_child_count (const LIMdlNode* self)
+int limdl_node_get_child_count (
+	const LIMdlNode* self)
 {
 	return self->nodes.count;
 }
 
 /**
  * \brief Gets the recursive child count of the node.
- *
  * \param self Node.
  * \return Recursive child count.
  */
-int
-limdl_node_get_child_total (const LIMdlNode* self)
+int limdl_node_get_child_total (
+	const LIMdlNode* self)
 {
 	int i;
 	const LIMdlNode* node;
@@ -338,12 +342,11 @@ limdl_node_get_child_total (const LIMdlNode* self)
 
 /**
  * \brief Gets the name of the node.
- *
  * \param self Node.
  * \return Name.
  */
-const char*
-limdl_node_get_name (const LIMdlNode* self)
+const char* limdl_node_get_name (
+	const LIMdlNode* self)
 {
 	if (self->name != NULL)
 		return self->name;
@@ -358,28 +361,30 @@ limdl_node_get_name (const LIMdlNode* self)
  * \param y Return location for the Y axis.
  * \param z Return location for the Z axis.
  */
-void
-limdl_node_get_pose_axes (const LIMdlNode* self,
-                          LIMatVector*     x,
-                          LIMatVector*     y,
-                          LIMatVector*     z)
+void limdl_node_get_pose_axes (
+	const LIMdlNode* self,
+	LIMatVector*     x,
+	LIMatVector*     y,
+	LIMatVector*     z)
 {
 	*x = limat_quaternion_transform (self->transform.global.rotation, limat_vector_init (1.0f, 0.0f, 0.0f));
 	*y = limat_quaternion_transform (self->transform.global.rotation, limat_vector_init (0.0f, 1.0f, 0.0f));
 	*z = limat_quaternion_transform (self->transform.global.rotation, limat_vector_init (0.0f, 0.0f, 1.0f));
 }
 
-void
-limdl_node_get_rest_transform (const LIMdlNode* self,
-                               LIMatTransform*  value)
+void limdl_node_get_rest_transform (
+	const LIMdlNode* self,
+	LIMatTransform*  value)
 {
 	*value = self->transform.rest;
 }
 
-void
-limdl_node_get_world_transform (const LIMdlNode* self,
-                                LIMatTransform*  value)
+void limdl_node_get_world_transform (
+	const LIMdlNode* self,
+	float*           scale,
+	LIMatTransform*  value)
 {
+	*scale = self->transform.global_scale;
 	*value = self->transform.global;
 }
 
@@ -389,12 +394,15 @@ limdl_node_get_world_transform (const LIMdlNode* self,
  * Call #limdl_node_rebuild to apply the transformation.
  *
  * \param self Node.
+ * \param scale Scale factor.
  * \param value Local transformation of the node.
  */
-void
-limdl_node_set_local_transform (LIMdlNode*            self,
-                                const LIMatTransform* value)
+void limdl_node_set_local_transform (
+	LIMdlNode*            self,
+	float                 scale,
+	const LIMatTransform* value)
 {
+	self->transform.local_scale = scale;
 	self->transform.local = *value;
 }
 
@@ -406,29 +414,56 @@ limdl_node_get_type (const LIMdlNode* self)
 
 /*****************************************************************************/
 
-static void
-private_calculate_world_transform (LIMdlNode* self)
+static void private_calculate_world_transform (
+	LIMdlNode* self)
 {
 	LIMatTransform p;
 	LIMatTransform t;
+	LIMatVector tmp;
 
 	if (self->parent != NULL)
 	{
+		/* Get the tail transformation of the parent. */
 		p = self->parent->transform.global;
 		if (self->parent->type == LIMDL_NODE_BONE)
-			p.position = limat_transform_transform (p, self->parent->bone.length);
-		t = limat_transform_multiply (p, self->transform.rest);
+			p.position = self->parent->bone.tail;
+
+		/* Calculate the global scale factor. */
+		/* This is the product of the local scale factors of all the ancestors. */
+		self->transform.global_scale = self->parent->transform.global_scale * self->transform.local_scale;
+
+		/* Calculate the global transformation. */
+		/* This is the local transformation concatenated with the parent tail transformation. */
+		t = self->transform.rest;
+		t.position = limat_vector_multiply (t.position, self->parent->transform.global_scale);
+		t = limat_transform_multiply (p, t);
 		t = limat_transform_multiply (t, self->transform.local);
 		self->transform.global = t;
+
+		/* Calculate the tail position. */
 		if (self->type == LIMDL_NODE_BONE)
-			self->bone.tail = limat_transform_transform (t, self->bone.length);
+		{
+			tmp = limat_vector_multiply (self->bone.length, self->transform.global_scale);
+			self->bone.tail = limat_transform_transform (t, tmp);
+		}
 	}
 	else
 	{
+		/* Calculate global scale factor. */
+		/* There are no parents so this is simply the local scale factor. */
+		self->transform.global_scale = self->transform.local_scale;
+
+		/* Calulate the global transformation. */
+		/* There are no parents so this is simply the local transformation. */
 		t = limat_transform_multiply (self->transform.rest, self->transform.local);
 		self->transform.global = t;
+
+		/* Calculate the tail position. */
 		if (self->type == LIMDL_NODE_BONE)
-			self->bone.tail = limat_transform_transform (t, self->bone.length);
+		{
+			tmp = limat_vector_multiply (self->bone.length, self->transform.global_scale);
+			self->bone.tail = limat_transform_transform (t, tmp);
+		}
 	}
 }
 

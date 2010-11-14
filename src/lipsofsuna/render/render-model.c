@@ -153,7 +153,7 @@ int liren_model_deform (
 		data[j++] = group->head_pose.x;
 		data[j++] = group->head_pose.y;
 		data[j++] = group->head_pose.z;
-		data[j++] = 1.0f; /* TODO: Pack scale factor here. */
+		data[j++] = group->scale_pose;
 		data[j++] = group->rotation.x;
 		data[j++] = group->rotation.y;
 		data[j++] = group->rotation.z;

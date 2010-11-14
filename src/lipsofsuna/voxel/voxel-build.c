@@ -598,14 +598,15 @@ static void private_merge_height (
 	}
 }
 
-static int
-private_merge_tile_model (LIVoxBuilder* self,
-                          LIVoxVoxelB*  voxel)
+static int private_merge_tile_model (
+	LIVoxBuilder* self,
+	LIVoxVoxelB*  voxel)
 {
 	int g;
 	int i;
 	int j;
 	int k;
+	float scale;
 	uint32_t indices[3];
 	LIMatTransform transform;
 	LIMdlFaces* faces;
@@ -627,7 +628,7 @@ private_merge_tile_model (LIVoxBuilder* self,
 				if (limdl_model_insert_node (self->model, node))
 				{
 					node = self->model->nodes.array[self->model->nodes.count - 1];
-					limdl_node_get_world_transform (node, &transform);
+					limdl_node_get_world_transform (node, &scale, &transform);
 					transform = limat_transform_multiply (transform, voxel->transform);
 					node->transform.rest = limat_transform_identity ();
 					node->transform.local = transform;

@@ -661,6 +661,7 @@ static void private_lights_update (
 	LIRenObject* self)
 {
 	int i;
+	float scale;
 	LIMatTransform transform;
 	LIRenLight* light;
 
@@ -669,7 +670,7 @@ static void private_lights_update (
 		light = self->lights.array[i];
 		if (light->node != NULL)
 		{
-			limdl_node_get_world_transform (light->node, &transform);
+			limdl_node_get_world_transform (light->node, &scale, &transform);
 			transform = limat_transform_multiply (self->transform, transform);
 			liren_light_set_transform (light, &transform);
 		}
