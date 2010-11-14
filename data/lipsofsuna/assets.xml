@@ -115,9 +115,19 @@
     <license>Creative Commons BY-SA 3.0</license>
     <dep>import/aer1.png</dep>
     <dep>import/aer1n.png</dep>
-    <status>incomplete</status>
+    <status>usable</status>
     <tag>character</tag>
     <tag>player</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/aeritem1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/aer1.png</dep>
+    <dep>import/aer1n.png</dep>
+    <status>incomplete</status>
     <type>model</type>
   </asset>
 
