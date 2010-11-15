@@ -1,4 +1,4 @@
-Keys = {ESCAPE = 27, SPACE = 32, COMMA = 44, a = 97, c = 99, d = 100, y = 121,
+Keys = {ESCAPE = 27, SPACE = 32, COMMA = 44, a = 97, c = 99, d = 100, i = 105, y = 121,
 	x = 120, w = 119, s = 115, F1 = 282, F2 = 283, F3 = 284, F4 = 285, F5 = 286,
 	F6 = 287, F7 = 288, F8 = 289, F9 = 290, F10 = 291, F11 = 292, F12 = 293,
 	LSHIFT = 304, RCTRL = 305, LCTRL = 306, PRINT = 316}
@@ -22,6 +22,18 @@ Action{name = "Camera", mode = "press", key1 = Keys.y, func = function()
 		Player.camera.mode = "first-person"
 	end
 	Player.camera:reset()
+end}
+
+Action{name = "Inventory", mode = "press", key1 = Keys.i, func = function()
+	if Target.active then
+		Target:cancel()
+	else
+		if Client.moving then
+			Gui.menus:open{level = 1, widget = Gui.inventory_group}
+		else
+			Gui.menus:close()
+		end
+	end
 end}
 
 Action{name = "Jump", mode = "press", key1 = Keys.c, func = function()
