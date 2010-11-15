@@ -331,6 +331,7 @@ void liphy_terrain_set_realized (
 			self->indices.count / 3, self->indices.array, 3 * sizeof (int),
 			self->vertices.count, self->vertices.array, 4 * sizeof (btScalar));
 		self->shape = new btBvhTriangleMeshShape (self->vertex_array, false);
+		self->shape->setMargin (0.2f);
 
 		/* Create the collision object. */
 		self->object = new btCollisionObject ();
