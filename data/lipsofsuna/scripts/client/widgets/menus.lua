@@ -2,9 +2,9 @@ Widgets.Menus = Class(Widget)
 
 Widgets.Menus.new = function(clss, args)
 	local self = Widget.new(clss, {rows = 3, cols = 1, stack = {}})
-	self.button_back = Widgets.MenuItem{font = "medium", text = "Back", pressed = function() self:close() end}
+	self.button_close = Widgets.MenuItem{font = "medium", text = "Close", pressed = function() self:close() end}
 	self:set_child{col = 1, row = 2, widget = Widgets.Label{text = "_________________"}}
-	self:set_child{col = 1, row = 3, widget = self.button_back}
+	self:set_child{col = 1, row = 3, widget = self.button_close}
 	for k,v in pairs(args or {}) do self[k] = v end
 	return self
 end
@@ -35,11 +35,11 @@ end
 -- @param self Menus.
 -- @oaram args Arguments.<ul>
 --   <li>hide: False to not hide the menu even if it becomes empty.</li>
---   <li>level: Closed menu level or nil to close the topmost.</li></ul>
+--   <li>level: Closed menu level or nil to close all.</li></ul>
 Widgets.Menus.close = function(self, args)
 	local h = not args or args.hide ~= false
 	-- Pop levels from the stack.
-	local l = math.max(1, args and args.level or #self.stack)
+	local l = math.max(1, args and args.level or 1)
 	while #self.stack >= l do
 		local w = self.stack[#self.stack]
 		if w.close then w:close() end
