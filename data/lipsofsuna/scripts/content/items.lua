@@ -26,6 +26,16 @@ Itemspec{
 	equipment_slot = "hand.R"}
 
 Itemspec{
+	name = "boomerang",
+	model = "boomerang1",
+	mass = 3,
+	categories = {"boomerang", "throwable", "weapon"},
+	crafting_materials = {log = 1},
+	crafting_tools = {saw = 1},
+	equipment_slot = "hand.R",
+	stacking = true}
+
+Itemspec{
 	name = "bow",
 	model = "bow1",
 	categories = {"ranged", "weapon"},
@@ -103,6 +113,7 @@ Itemspec{
 	crafting_materials = {log = 1},
 	crafting_tools = {saw = 1},
 	destroy_actions = {"explode"},
+	destroy_timer = 3,
 	equipment_slot = "hand.R",
 	health = 1,
 	stacking = true}

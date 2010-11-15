@@ -14,6 +14,7 @@ Itemspec.dict_name = {}
 --   <li>crafting_materials: Dictionary of crafting materials.</li>
 --   <li>crafting_skills: Dictionary of required crafting skills.</li>
 --   <li>destroy_actions: List of actions to perform when the item is destroyed.</li>
+--   <li>destroy_timer: Time in seconds after which to destruct when thrown.</li>
 --   <li>equipment_models: Dictionary of equipment models or nil.</li>
 --   <li>equipment_slot: Equipment slot into which the item can be placed.</li>
 --   <li>health: Number of hit points the item has.</li>
