@@ -14,6 +14,7 @@ Itemspec{
 	model = "arrow-000",
 	mass = 2,
 	categories = {"arrow"},
+	damage = 5,
 	crafting_count = 10,
 	crafting_materials = {log = 1},
 	crafting_tools = {saw = 1},
@@ -23,6 +24,8 @@ Itemspec{
 	name = "axe",
 	model = "axe-000",
 	categories = {"melee", "weapon"},
+	damage = 10,
+	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R"}
 
 Itemspec{
@@ -32,6 +35,8 @@ Itemspec{
 	categories = {"boomerang", "throwable", "weapon"},
 	crafting_materials = {log = 1},
 	crafting_tools = {saw = 1},
+	damage = 20,
+	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R",
 	stacking = true}
 
@@ -41,6 +46,8 @@ Itemspec{
 	categories = {"ranged", "weapon"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
+	damage = 10,
+	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R"}
 
 Itemspec{
@@ -112,6 +119,8 @@ Itemspec{
 	categories = {"explosive", "throwable", "weapon"},
 	crafting_materials = {log = 1},
 	crafting_tools = {saw = 1},
+	damage = 30,
+	damage_bonus_intelligence = 0.2,
 	destroy_actions = {"explode"},
 	destroy_timer = 3,
 	equipment_slot = "hand.R",
@@ -132,6 +141,9 @@ Itemspec{
 	name = "katana",
 	model = "katana-000",
 	categories = {"melee", "weapon"},
+	damage = 10,
+	damage_bonus_dexterity = 0.2,
+	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R"}
 
 Itemspec{
@@ -177,12 +189,16 @@ Itemspec{
 	categories = {"melee", "weapon"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
+	damage = 6,
+	damage_bonus_strength = 0.1,
 	equipment_slot = "hand.R"}
 
 Itemspec{
 	name = "morning star",
 	model = "morningstar-000",
 	categories = {"melee", "weapon"},
+	damage = 10,
+	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R"}
 
 Itemspec{
@@ -201,6 +217,7 @@ Itemspec{
 	name = "poleaxe",
 	model = "poleaxe-000", --"poleaxe-001"
 	categories = {"melee", "weapon"},
+	damage = 10,
 	equipment_slot = "hand.R"}
 
 Itemspec{
@@ -212,18 +229,23 @@ Itemspec{
 	name = "shield",
 	model = "shield-000",
 	categories = {"shield"},
+	damage = 10,
 	equipment_slot = "hand.L"}
 
 Itemspec{
 	name = "spear",
 	model = "spear-000",
 	categories = {"melee", "weapon"},
+	damage = 10,
+	damage_bonus_dexterity = 0.2,
+	damage_bonus_strength = 0.1,
 	equipment_slot = "hand.R"}
 
 Itemspec{
 	name = "sword",
 	model = "sword-000",
 	categories = {"melee", "weapon"},
+	damage = 10,
 	equipment_slot = "hand.R"}
 
 Itemspec{
@@ -236,6 +258,8 @@ Itemspec{
 	name = "wand",
 	model = "wand-000", --"wand-001"
 	categories = {"melee", "weapon"},
+	damage = 5,
+	damage_bonus_willpower = 0.2,
 	equipment_slot = "hand.R"}
 
 Itemspec{

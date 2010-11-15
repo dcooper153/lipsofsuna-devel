@@ -13,6 +13,13 @@ Itemspec.dict_name = {}
 --   <li>crafting_count: Number of items crafted per use.</li>
 --   <li>crafting_materials: Dictionary of crafting materials.</li>
 --   <li>crafting_skills: Dictionary of required crafting skills.</li>
+--   <li>damage: Base damage.</li>
+--   <li>damage_bonus_dexterity: How much one point of dexterity adds to damage.</li>
+--   <li>damage_bonus_health: How much one point of health adds to damage.</li>
+--   <li>damage_bonus_intelligence: How much one point of intelligence adds to damage.</li>
+--   <li>damage_bonus_percention: How much one point of perception adds to damage.</li>
+--   <li>damage_bonus_strength: How much one point of strength adds to damage.</li>
+--   <li>damage_bonus_willpower: How much one point of willpower adds to damage.</li>
 --   <li>destroy_actions: List of actions to perform when the item is destroyed.</li>
 --   <li>destroy_timer: Time in seconds after which to destruct when thrown.</li>
 --   <li>equipment_models: Dictionary of equipment models or nil.</li>

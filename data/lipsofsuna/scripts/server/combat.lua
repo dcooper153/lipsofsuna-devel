@@ -21,7 +21,7 @@ Combat.apply_melee_hit = function(clss, args)
 	end
 	-- Damage target.
 	if args.target then
-		args.target:damaged(clss:calculate_melee_damage(args))
+		args.target:damaged(clss:calculate_physical_damage(args))
 	end
 	if args.tile then
 		if args.weapon and args.weapon.itemspec.name == "mattock" then
@@ -51,7 +51,7 @@ Combat.apply_ranged_hit = function(clss, args)
 	end
 	-- Damage target.
 	if args.target then
-		args.target:damaged(clss:calculate_ranged_damage(args))
+		args.target:damaged(clss:calculate_physical_damage(args))
 	end
 	if args.tile then
 		-- TODO: Terrain hits
@@ -88,47 +88,50 @@ end
 -- @param clss Combat class.
 -- @param args Arguments.<ul>
 --   <li>attacker: Attacking creature.</li>
---   <li>feat: Used feat.</li>
+--   <li>feat: Used feat or nil for attack.</li>
 --   <li>point: Hit point in world space.</li>
---   <li>target: Attacked creature. (required)</li>
---   <li>weapon: Used weapon.</li></ul>
+--   <li>projectile: Fired object or nil.</li>
+--   <li>target: Attacked creature or nil.</li>
+--   <li>weapon: Used weapon or nil.</li></ul>
 -- @return Damage.
-Combat.calculate_melee_damage = function(clss, args)
-	-- Feat bonus.
+Combat.calculate_physical_damage = function(clss, args)
+	-- Base damage.
+	-- The base damage depends on the feat and the type of weapon and ammunition used.
 	local feat = args.feat or Feat:find{name = "attack"}
+	local spec1 = args.weapon and args.weapon.itemspec or {}
+	local spec2 = args.projectile and args.projectile.itemspec or {}
 	local damage = feat.inflict_damage
-	-- Skill bonus.
+	if spec1 or spec2 then
+		damage = damage + (spec1.damage or 0) + (spec2.damage or 0)
+	else
+		damage = damage + 3
+	end
+	-- Damage bonus from skills.
+	-- The bonus damage depends on the type of weapon and ammunition used.
+	local bonuses
 	local skills = Skills:find{owner = args.attacker}
-	if skills and skills:has_skill{skill = "strength"} then
-		damage = damage + 0.2 * skills:get_value{skill = "strength"}
+	if not skills then return damage end
+	if spec1 or spec2 then
+		bonuses = {
+			dexterity = (spec1.damage_bonus_dexterity or 0) + (spec2.damage_bonus_dexterity or 0),
+			health = (spec1.damage_bonus_health or 0) + (spec2.damage_bonus_health or 0),
+			intelligence = (spec1.damage_bonus_intelligence or 0) + (spec2.damage_bonus_intelligence or 0),
+			perception = (spec1.damage_bonus_percention or 0) + (spec2.damage_bonus_percention or 0),
+			strength = (spec1.damage_bonus_strength or 0) + (spec2.damage_bonus_strength or 0),
+			willpower = (spec1.damage_bonus_willpower or 0) + (spec2.damage_bonus_willpower or 0)}
+	else
+		bonuses = {
+			dexterity = 0.2,
+			strength = 0.2,
+			willpower = 0.1}
 	end
-	-- Weapon bonus.
-	if args.weapon then
-		damage = damage + 10
+	for k,v in pairs(bonuses) do
+		if skills:has_skill{skill = k} then
+			damage = damage + v * skills:get_value{skill = k}
+		end
 	end
-	return damage
-end
-
---- Calculates the damage of a ranged attack.
--- @param clss Combat class.
--- @param args Arguments.<ul>
---   <li>attacker: Attacking creature.</li>
---   <li>feat: Used feat.</li>
---   <li>point: Hit point in world space.</li>
---   <li>projectile: Fired object. (required)</li>
---   <li>target: Attacked creature. (required)</li></ul>
--- @return Damage.
-Combat.calculate_ranged_damage = function(clss, args)
-	-- Feat bonus.
-	local feat = args.feat or Feat:find{name = "attack"}
-	local damage = feat.inflict_damage
-	-- Skill bonus.
-	local skills = Skills:find{owner = args.attacker}
-	if skills and skills:has_skill{skill = "dexterity"} then
-		damage = damage + 0.2 * skills:get_value{skill = "dexterity"}
-	end
-	-- Weapon bonus.
-	damage = damage + 10
+	-- If there were penalties, make sure we do at least 1 point of damage.
+	damage = math.max(1, damage)
 	return damage
 end
 
