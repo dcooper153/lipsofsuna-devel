@@ -190,8 +190,6 @@ Chargen.update = function(clss, secs)
 	-- Update model.
 	local rot = Quaternion{axis = Vector(0, 1, 0), angle = math.pi * 0.1 * secs}
 	clss.object.rotation = clss.object.rotation * rot
-	clss.object:update_animations{secs = secs}
-	clss.object:deform_mesh()
 	-- Update light.
 	clss.light.position = clss.object.position + clss.object.rotation * Vector(0, 2, -5)
 	-- Update camera.

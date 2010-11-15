@@ -1,3 +1,12 @@
+local oldanimate = Object.animate
+Object.animate = function(self, args)
+	if not self.animated then
+		self.animated = true
+		self.model = self.model and self.model:copy()
+	end
+	oldanimate(self, args)
+end
+
 --- Creates a customized character model for the object.<br/>
 -- This function is used by both the network events and the character creation
 -- screen to create customized character objects.
@@ -53,6 +62,7 @@ Object.create_character_model = function(self, args)
 	m:calculate_bounds()
 	self.model = m
 	-- Apply custom deformations.
+	self.animated = true
 	self:animate{animation = "empty", channel = Animation.CHANNEL_CUSTOMIZE,
 		weight = 0, weight_scale = 1, permanent = true}
 	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "mover", scale = args.body_scale or 1}

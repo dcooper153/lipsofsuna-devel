@@ -77,11 +77,9 @@ static LIMdlAnimation private_empty_anim =
 
 /**
  * \brief Creates a new model pose.
- * \param model The model this pose is for.
  * \return New model pose or NULL.
  */
-LIMdlPose* limdl_pose_new (
-	LIMdlModel* model)
+LIMdlPose* limdl_pose_new ()
 {
 	LIMdlPose* self;
 
@@ -751,6 +749,9 @@ int limdl_pose_set_model (
 
 	/* Clear old data. */
 	private_clear_pose (&backup);
+
+	/* Rebuild pose channels. */
+	limdl_pose_update (self, 0.0f);
 
 	return 1;
 }

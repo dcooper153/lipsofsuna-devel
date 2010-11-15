@@ -93,7 +93,7 @@ Eventhandler{type = "tick", func = function(self, args)
 	animt = animt + args.secs
 	if animt > 0.03 then
 		for k,v in pairs(Object.objects) do
-			if v.type == "creature" then
+			if v.animated then
 				v:update_animations{secs = animt}
 				v:deform_mesh()
 			end
