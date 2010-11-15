@@ -176,6 +176,7 @@ Inventory.set_object = function(self, args)
 	if v then Inventory.objectdict[v] = nil end
 	if args.object then Inventory.objectdict[args.object] = self end
 	-- Add to slot.
+	if args.object then args.object:detach() end
 	self.slots[args.slot] = args.object
 	self:update_slot(args)
 end

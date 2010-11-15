@@ -35,6 +35,37 @@ Slots.find = function(clss, args)
 	end
 end
 
+--- Tries to merge an item to the slots.<br/>
+-- @param self Slots.
+-- @param args Arguments.<ul>
+--   <li>exclude: Slot name to exclude.</li>
+--   <li>object: Object.</li>
+--   <li>slot: Slot name if requiring a specific slot.</li></ul>
+-- @return True if merged or added.
+Slots.merge_object = function(self, args)
+	if args.slot then
+		-- Merge or insert to specific slot.
+		local object = self:get_object{slot = args.slot}
+		if object and object:merge{object = args.object} then
+			args.object:detach()
+			self:update_slot{slot = args.slot}
+			return true
+		end
+	else
+		-- Merge to any slot.
+		for slot in pairs(self.slots) do
+			if slot ~= args.exclude then
+				local object = self:get_object{slot = slot}
+				if object and object:merge{object = args.object} then
+					args.object:detach()
+					self:update_slot{slot = slot}
+					return true
+				end
+			end
+		end
+	end
+end
+
 --- Creates a new slots object.
 -- @param clss Slots class.
 -- @param args Arguments.
@@ -106,6 +137,7 @@ Slots.set_object = function(self, args)
 	if v.object then Slots.objectdict[v.object] = nil end
 	if args.object then Slots.objectdict[args.object] = self end
 	-- Add to slot.
+	if args.object then args.object:detach() end
 	v.object = args.object
 	Vision:event{type = "slot-changed", object = self.owner, slot = args.slot}
 end

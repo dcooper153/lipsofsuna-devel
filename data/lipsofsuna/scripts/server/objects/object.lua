@@ -109,17 +109,19 @@ Object.subtract = function(self, args)
 	end
 end
 
---- Merges or adds an item to the inventory of the object.
+--- Merges or adds an item to the slots or inventory of the object.
 -- @param self Object.
 -- @param args Arguments.<ul>
 --   <li>object: Object to add.</li></ul>
 -- @return True if succeeded.
 Object.add_item = function(self, args)
 	if not args.object then return end
-	local inv = Inventory:find{owner = self}
-	if not inv then return end
-	if not inv:merge_object{object = args.object} then return end
-	return true
+	if self.slots then
+		if self.slots:merge_object{object = args.object} then return true end
+	end
+	if self.inventory then
+		if self.inventory:merge_object{object = args.object} then return true end
+	end
 end
 
 --- Finds an item from the inventory of the object.

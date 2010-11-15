@@ -112,6 +112,7 @@ end
 --   <li>point: Firing point relative to the owner.</li>
 --   <li>speed: Initial speed.</li>
 --   <li>timer: Trigger at timeout.</li></ul>
+-- @return The split and fired item.
 Item.fire = function(self, args)
 	if args.owner then
 		local pt = args.point or Vector()
@@ -149,6 +150,7 @@ Item.fire = function(self, args)
 		proj.velocity = args.owner.rotation * Vector(0, 0, -sp)
 		proj.save = false
 		proj.realized = true
+		return proj
 	end
 end
 

@@ -193,7 +193,6 @@ Creature.equip_item = function(self, args)
 	local slot = args.object.itemspec.equipment_slot
 	if not slot then return end
 	if not self:unequip_item{slot = slot} then return end
-	args.object:detach()
 	self.slots:set_object{object = args.object, slot = slot}
 	return true
 end
