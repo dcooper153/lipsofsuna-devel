@@ -449,7 +449,9 @@ Creature.state_updaters =
 			local actions = {}
 			local spec = self.species
 			local dist = (self.target.position - self.position).length
-			if spec.ai_enable_attack then table.insert(actions, "attack") end
+			for i=1,5 do
+				if spec.ai_enable_attack then table.insert(actions, "attack") end
+			end
 			if spec.ai_enable_attack and dist < 3 then table.insert(actions, "attack") end
 			if spec.ai_enable_defend and dist < 4 then table.insert(actions, "defend") end
 			if spec.ai_enable_strafe and dist < 4 then table.insert(actions, "strafe") end
@@ -519,6 +521,8 @@ Creature.state_switchers =
 		-- of finding any enemies that are hiding or trying to escape.
 		-- TODO: Companion should follow master.
 		self:set_state{state = "search"}
+		self:set_movement(0)
+		self:set_strafing(0)
 		return
 	end,
 	follow = function(self)
@@ -543,9 +547,9 @@ Creature.state_switchers =
 	search = function(self)
 		-- If we have been searching for a while without finding anything,
 		-- conclude that there are no enemies and enter the wandering mode.
-		if self.state_timer > self.species.ai_search_time then
+		--if self.state_timer > self.species.ai_search_time then
 			self:set_state{state = "wander"}
-		end
+		--end
 	end,
 	wait = function(self)
 		-- Keep waiting if already waiting.

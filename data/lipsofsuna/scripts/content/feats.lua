@@ -3,14 +3,6 @@ Feat{
 	inflict_damage = 5}
 
 Feat{
-	name = "bite",
-	categories = {"melee"},
-	cooldown = 1,
-	effect_animation = "bite",
-	effect_sound = "growl1",
-	inflict_damage = 10}
-
-Feat{
 	name = "attack-melee",
 	categories = {"melee"},
 	cooldown = 1,
@@ -38,6 +30,14 @@ Feat{
 	inflict_damage = 30,
 	required_weapon = "throwable",
 	targeting_mode = "weapon"}
+
+Feat{
+	name = "bite",
+	categories = {"melee"},
+	cooldown = 2,
+	effect_animation = "bite",
+	effect_sound = "growl1",
+	inflict_damage = 10}
 
 Feat{
 	name = "criticalhit",

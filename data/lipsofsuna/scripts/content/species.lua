@@ -10,7 +10,7 @@ Species{
 		{name = "lowerbody"},
 		{name = "upperbody"}},
 	factions = {"good"},
-	feats = {"attack"},
+	feats = {"attack", "attack-melee", "attack-ranged"},
 	inventory_size = 20,
 	model = "aer1",
 	models = {
