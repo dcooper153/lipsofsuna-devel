@@ -64,13 +64,14 @@ serialize_npc = function(npc)
 end
 
 serialize_skills = function(skills)
-	local str = "local skills=Skills{owner=self}\n"
+	if not skills then return "" end
+	local str = "self.skills.enabled=" .. serialize_value(skills.enabled) .. "\n"
 	for k,v in pairs(skills:get_names()) do
 		local max = skills:get_maximum{skill = v}
 		local val = skills:get_value{skill = v}
 		local regn = skills:get_regen{skill = v}
 		local prot = skills:get_protect{skill = v}
-		str = str .. "skills:register{prot=" .. serialize_value(prot) ..
+		str = str .. "self.skills:register{prot=" .. serialize_value(prot) ..
 			",skill=" .. serialize_value(v) ..
 			",value=" .. serialize_value(val) ..
 			",maximum=" .. serialize_value(max) ..

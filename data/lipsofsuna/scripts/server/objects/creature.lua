@@ -420,10 +420,13 @@ end
 Creature.write = function(self)
 	return "local self=Creature{" ..
 		"angular=" .. serialize_value(self.angular) .. "," ..
+		"dead=" .. serialize_value(self.dead) .. "," ..
 		"id=" .. serialize_value(self.id) .. "," ..
+		"physics=" .. serialize_value(self.physics) .. "," ..
 		"position=" .. serialize_value(self.position) .. "," ..
 		"rotation=" .. serialize_value(self.rotation) .. "," ..
 		"species=" .. serialize_value(self.species.name) .. "}\n" ..
+		serialize_skills(self.skills) .. "\n" ..
 		"return self"
 end
 
