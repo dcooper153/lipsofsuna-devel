@@ -55,6 +55,7 @@ Player.camera_tilt = 0
 Player.camera_tilt_state = 0
 Player.camera_turn = 0
 Player.camera_turn_state = 0
+Player.camera:zoom{rate = -5}
 Player.update_camera = function(clss, secs)
 	-- Update turning.
 	clss.camera_turn_state = clss.camera_turn_state + clss.camera_turn * secs
