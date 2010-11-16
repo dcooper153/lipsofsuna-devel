@@ -4,95 +4,11 @@ Serialize = Class()
 -- @param clss Serialize class.
 Serialize.init = function(clss)
 	clss.db = Database{name = "save.db"}
-	clss.db:query("PRAGMA synchronous=OFF;")
-	clss.db:query("PRAGMA count_changes=OFF;")
-	clss.db:query("CREATE TABLE IF NOT EXISTS objects (id INTEGER PRIMARY KEY,sector UNSIGNED INTEGER,data TEXT);");
-	clss.db:query("CREATE TABLE IF NOT EXISTS terrain (sector INTEGER PRIMARY KEY,data BLOB);");
-end
-
---- Reads a sector from the database.
--- @param class Serialize class.
--- @param sector Sector index.
-Serialize.load_sector = function(clss, sector)
-	-- Load terrain.
-	local rows = clss.db:query("SELECT * FROM terrain WHERE sector=?;", {sector})
-	for k,v in ipairs(rows) do
-		Voxel:paste_region{sector = sector, packet = v[2]}
-	end
-	-- Load objects. Since tiles are loaded in background, we need to wait for them to be
-	-- loaded before creation the object or else the object will fall inside the ground.
-	-- TODO: Should use a tiles-loaded event to determine when the tiles have been loaded.
-	local rows = clss.db:query("SELECT * FROM objects WHERE sector=?;", {sector})
-	Timer{delay = 1, func = function(self)
-		for k,v in ipairs(rows) do
-			local func = assert(loadstring("return function()\n" .. v[3] .. "\nend"))()
-			if func then
-				local object = func()
-				if object then object.realized = true end
-			end
-		end
-		self:disable()
-	end}
-end
-
---- Saves a sector to the database.
--- @param class Serialize class.
--- @param sector Sector index.
-Serialize.save_sector = function(clss, sector)
-	-- Erase old data.
-	clss.db:query("DELETE FROM objects WHERE sector=?;", {sector})
-	clss.db:query("DELETE FROM terrain WHERE sector=?;", {sector})
-	-- Write objects.
-	local objs = Object:find{sector = sector}
-	for k,v in pairs(objs) do
-		local data = v:write()
-		if data and not Class:check{data = v, name = "Player"} then
-			clss.db:query("REPLACE INTO objects (id,sector,data) VALUES (?,?,?);", {v.id, sector, data})
-		end
-	end
-	-- Write terrain.
-	local data = Voxel:copy_region{sector = sector}
-	clss.db:query("INSERT INTO terrain (sector,data) VALUES (?,?);", {sector, data})
-end
-
---- Saves all active sectors to the database.
--- @param class Serialize class.
--- @param erase True to completely erase the old map.
-Serialize.save_world = function(clss, erase)
-	clss.db:query("BEGIN TRANSACTION;")
-	if erase then
-		clss.db:query("DELETE FROM objects;")
-		clss.db:query("DELETE FROM terrain;")
-	end
-	for k,v in pairs(Program.sectors) do
-		clss:save_sector(k)
-	end
-	clss.db:query("END TRANSACTION;")
+	clss.sectors = Sectors{database = clss.db}
+	Sectors.instance = clss.sectors
 end
 
 Serialize:init()
-Eventhandler{type = "sector-load", func = function(self, args)
-	Serialize:load_sector(args.sector)
-end}
-Timer{delay = 2, func = function(self, args)
-	local written = 0
-	for k,d in pairs(Program.sectors) do
-		if d > 10 and written < 5 then
-			-- Group into a single transaction.
-			if written == 0 then
-				Serialize.db:query("BEGIN TRANSACTION;")
-			end
-			written = written + 1
-			-- Serialize and unload the sector.
-			Serialize:save_sector(k)
-			Program:unload_sector{sector = k}
-		end
-	end
-	-- Finish the transaction.
-	if written > 0 then
-		Serialize.db:query("END TRANSACTION;")
-	end
-end}
 
 -----------
 

@@ -11,6 +11,10 @@ require "core/tiles-render"
 require "core/reload"
 require "core/widgets"
 
+local db = Database{name = "client.sql"}
+Sectors.instance = Sectors{database = db, save_objects = false}
+Sectors.instance:erase_world()
+
 require "client/shader"
 require "client/shaders/skeletal"
 require "content/effects"

@@ -8,11 +8,12 @@ require = function(arg)
 	end
 end
 
+require "core/database"
 require "core/network"
 require "core/tiles"
 require "core/tiles-physics"
-Voxel.blocks_per_line = 4
-Voxel.tiles_per_line = 16
+Voxel.blocks_per_line = 2
+Voxel.tiles_per_line = 14
 require "common/bitwise"
 require "common/effect"
 require "common/eventhandler"
@@ -28,6 +29,7 @@ require "common/pattern"
 require "common/protocol"
 require "common/quest"
 require "common/regionspec"
+require "common/sectors"
 require "common/species"
 require "common/thread"
 require "common/timer"

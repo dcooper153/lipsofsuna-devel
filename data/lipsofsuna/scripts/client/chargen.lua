@@ -54,7 +54,7 @@ Chargen.init = function(clss)
 		pressed = function(self) clss:set_bust_scale(self:get_value_at(Client.cursor_pos)) end}
 	-- Preview widget.
 	clss.scene = Scene()
-	clss.object = Object{position = Vector(-100, -100, -100), type = "character"}
+	clss.object = Object{position = Vector(1, 1, 1), type = "character"}
 	clss.light = Light{ambient = {1.0,1.0,1.0,0.3}, diffuse={1.0,1.0,1.0,1.0}, equation={3,0.3,0.03}}
 	clss.camera = Camera{far = 60.0, near = 0.3, mode = "first-person"}
 	clss.timer = Timer{enabled = false, func = function(self, secs) clss:update(secs) end}
@@ -190,6 +190,7 @@ Chargen.update = function(clss, secs)
 	-- Update model.
 	local rot = Quaternion{axis = Vector(0, 1, 0), angle = math.pi * 0.1 * secs}
 	clss.object.rotation = clss.object.rotation * rot
+	clss.object:refresh()
 	-- Update light.
 	clss.light.position = clss.object.position + clss.object.rotation * Vector(0, 2, -5)
 	-- Update camera.

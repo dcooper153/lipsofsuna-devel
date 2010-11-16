@@ -98,6 +98,28 @@ livox_sector_new (LIAlgSector* sector)
 void
 livox_sector_free (LIVoxSector* self)
 {
+	int x;
+	int y;
+	int z;
+	LIVoxUpdateEvent event;
+
+	/* Invoke callbacks. */
+	if (self->blocks != NULL)
+	{
+		event.sector[0] = self->sector->x;
+		event.sector[1] = self->sector->y;
+		event.sector[2] = self->sector->z;
+		for (z = 0 ; z < self->manager->blocks_per_line ; z++)
+		for (y = 0 ; y < self->manager->blocks_per_line ; y++)
+		for (x = 0 ; x < self->manager->blocks_per_line ; x++)
+		{
+			event.block[0] = x;
+			event.block[1] = y;
+			event.block[2] = z;
+			lical_callbacks_call (self->manager->callbacks, self->manager, "block-free", lical_marshal_DATA_PTR, &event);
+		}
+	}
+
 	lisys_free (self->blocks);
 	lisys_free (self->tiles);
 	lisys_free (self);

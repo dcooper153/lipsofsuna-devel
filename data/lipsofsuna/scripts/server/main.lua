@@ -1,6 +1,5 @@
 print "INFO: Loading server scripts."
 
-require "core/database"
 require "core/generator"
 require "core/object-physics"
 
@@ -229,7 +228,7 @@ restart = function()
 	for k,v in pairs(Network.clients) do
 		Network:disconnect{object = v}
 	end
-	Program:unload_world()
+	Sectors.instance:unload_world()
 	print("Generating map...")
 	Generator:format{center = Config.center * Config.tilescale}
 	Generator:expand{count = 100}
@@ -288,8 +287,8 @@ restart = function()
 	end
 	-- Save map.
 	print("Saving map...")
-	Serialize:save_world(true)
-	Program:unload_world()
+	Sectors.instance:save_world(true)
+	Sectors.instance:unload_world()
 	-- Discard events emitted during map generation so that they
 	-- don't trigger when the game starts.
 	Program:update()
