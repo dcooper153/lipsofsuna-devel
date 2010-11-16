@@ -104,7 +104,6 @@ end
 -- @param args Arguments.<ul>
 --   <li>skills: Skills of the user.</li>
 --   <li>inventory: Inventory of the user.</li>
---   <li>slots: Slots of the user.</li>
 --   <li>user: Object whose skills and inventory to use.</li></ul>
 -- @return True if usable.
 Feat.usable = function(self, args)
@@ -129,10 +128,9 @@ Feat.usable = function(self, args)
 		if not item or item:get_count() < v then return end
 	end
 	-- Check for weapon.
-	local slots = args.slots or Slots:find{owner = args.user}
 	if self.required_weapon then
-		if not slots then return self.required_weapon == "melee" end
-		local weapon = slots:get_object{slot = "hand.R"}
+		if not inventory then return self.required_weapon == "melee" end
+		local weapon = inventory:get_object{slot = "hand.R"}
 		if not weapon then return self.required_weapon == "melee" end
 		if not weapon.itemspec.categories[self.required_weapon] then return end
 	end

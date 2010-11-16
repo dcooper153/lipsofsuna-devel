@@ -107,19 +107,19 @@ end
 Player.vision_cb = function(self, args)
 	local funs
 	local sendinfo = function(o)
-		local slots = Slots:find{owner = o}
-		local skills = Skills:find{owner = o}
 		for k,v in pairs(o.animations) do
 			local a = o:get_animation{channel = k}
 			funs["object-animated"]({animation = v, channel = k, object = o, permanent = true, time = a.time, weight = a.weight})
 		end
-		if slots then
-			for k,v in pairs(slots.slots) do
-				funs["slot-changed"]({object = o, slot = k})
+		if o.inventory then
+			for k,v in pairs(o.inventory.slots) do
+				if type(k) == "string" then
+					funs["slot-changed"]({object = o, slot = k})
+				end
 			end
 		end
-		if skills then
-			for k,v in pairs(skills.skills) do
+		if o.skills then
+			for k,v in pairs(o.skills.skills) do
 				funs["skill-changed"]({object = o, skill = k})
 			end
 		end
@@ -210,20 +210,13 @@ Player.vision_cb = function(self, args)
 		end,
 		["slot-changed"] = function(args)
 			local o = args.object
-			local s = Slots:find{owner = o}
-			if not s then return end
-			local v = s:get_slot{slot = args.slot}
-			if not v then return end
-			if v.prot == "public" or self == o then
-				local model = v.object and v.object.model_name or ""
-				local node = v.node or ""
-				local name = v.object and v.object:get_name_with_count() or ""
-				self:send{packet = Packet(packets.OBJECT_SLOT, "uint32", o.id,
-					"string", v.name or "", 
-					"string", node,
-					"string", model,
-					"string", name)}
-			end
+			local item = o:get_item{slot = args.slot}
+			local spec = item and item.itemspec and item.itemspec.name or ""
+			local model = item and item.model_name or ""
+			local count = item and item.count or 1
+			self:send{packet = Packet(packets.OBJECT_SLOT,
+				"uint32", o.id, "uint32", count,
+				"string", spec, "string", args.slot)}
 		end,
 		["voxel-block-changed"] = function(args)
 			if self.vision.terrain[args.index] ~= args.stamp then

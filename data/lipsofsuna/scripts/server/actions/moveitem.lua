@@ -27,9 +27,9 @@ Actions:register{name = "moveitem", func = function(clss, args)
 		srcobj = inv:get_object{slot = args.srcslot}
 		if not srcobj then return end
 	elseif args.srcslot then
-		local slots = Slots:find{owner = object}
-		if not slots then return end
-		srcobj = slots:get_object{slot = args.srcslot}
+		local inventory = Inventory:find{owner = object}
+		if not inventory then return end
+		srcobj = inventory:get_object{slot = args.srcslot}
 		if not srcobj then return end
 	end
 
@@ -63,15 +63,14 @@ Actions:register{name = "moveitem", func = function(clss, args)
 	elseif args.dstslot then
 		if not srcobj.itemspec then return end
 		if srcobj.itemspec.equipment_slot ~= args.dstslot then return end
-		local slots = Slots:find{owner = object}
-		if not slots then return end
-		local oldequ = slots:get_object{slot = args.dstslot}
+		local inventory = Inventory:find{owner = object}
+		if not inventory then return end
+		local oldequ = inventory:get_object{slot = args.dstslot}
 		if oldequ then
-			local inv = Inventory:find{owner = object}
-			if not inv or not inv:merge_object{object = oldequ} then return end
+			if not inventory:merge_object{object = oldequ} then return end
 		end
 		srcobj:detach()
-		slots:set_object{slot = args.dstslot, object = srcobj}
+		inventory:set_object{slot = args.dstslot, object = srcobj}
 
 	-- Move to world.
 	elseif args.dstpoint then

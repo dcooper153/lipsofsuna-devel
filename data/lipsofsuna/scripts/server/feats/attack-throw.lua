@@ -1,8 +1,7 @@
 local feat = Feat:find{name = "attack-throw"}
 feat.func = function(self, args)
 	-- Get weapon.
-	local slots = Slots:find{owner = args.user}
-	local weapon = slots:get_object{slot = "hand.R"}
+	local weapon = args.user:get_item{slot = "hand.R"}
 	-- Perform ranged attack.
 	Attack:ranged{user = args.user, delay = 2, start = 0.5, func = function(user, point)
 		local proj = weapon:fire{
@@ -33,8 +32,8 @@ feat.func = function(self, args)
 			proj.contact_cb = function(self, result)
 				if result.object == proj.owner then
 					-- Owner catch.
-					if not proj.owner.slots:get_object{slot = "hand.R"} then
-						proj.owner.slots:set_object{slot = "hand.R", object = proj}
+					if not proj.owner:get_item{slot = "hand.R"} then
+						proj.owner:get_item{slot = "hand.R", object = proj}
 					else
 						proj.owner:add_item{object = proj}
 					end

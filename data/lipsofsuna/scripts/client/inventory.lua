@@ -1,4 +1,5 @@
-Inventory = Class()
+require "common/inventory"
+
 Inventory.group = Widget{cols = 1, rows = 1}
 Inventory.group:set_expand{col = 1, row = 1}
 

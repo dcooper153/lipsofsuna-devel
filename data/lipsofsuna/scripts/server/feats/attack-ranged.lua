@@ -1,8 +1,7 @@
 local feat = Feat:find{name = "attack-ranged"}
 feat.func = function(self, args)
 	-- Get weapon and ammo.
-	local slots = Slots:find{owner = args.user}
-	local weapon = slots:get_object{slot = "hand.R"}
+	local weapon = args.user:get_item{slot = "hand.R"}
 	local ammo = args.user:split_items{name = "arrow"}
 	-- Perform ranged attack.
 	Attack:ranged{user = args.user, func = function(user, point)

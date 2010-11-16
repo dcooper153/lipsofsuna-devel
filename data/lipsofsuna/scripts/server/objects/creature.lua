@@ -30,12 +30,6 @@ Creature.setter = function(self, key, value)
 		for k,v in pairs(spec.inventory_items) do
 			self:add_item{object = Item:create{name = v}}
 		end
-		-- Create slots.
-		self.slots = self.slots or Slots{owner = self}
-		self.slots:clear()
-		for k,v in pairs(spec.equipment_slots) do
-			self.slots:register{prot = "public", name = v.name, node = v.node or ""}
-		end
 		self:equip_best_items()
 	else
 		Object.setter(self, key, value)
@@ -168,16 +162,15 @@ Creature.die = function(self)
 	self:animate{animation = "death", weight = 10}
 	self:animate{animation = "dead", channel = Animation.CHANNEL_WALK, weight = 0.1, permanent = true}
 	-- Drop held items.
-	local s = Slots:find{owner = self}
-	local o = s and s:get_object{slot = "handl"}
+	local o = self:get_item{slot = "hand.L"}
 	if o then
-		s:set_object{slot = "handl"}
+		o:detach()
 		o.position = self.position
 		o.realized = true
 	end
-	o = s and s:get_object{slot = "handr"}
+	o = self:get_item{slot = "hand.R"}
 	if o then
-		s:set_object{slot = "handr"}
+		o:detach()
 		o.position = self.position
 		o.realized = true
 	end
@@ -193,7 +186,7 @@ Creature.equip_item = function(self, args)
 	local slot = args.object.itemspec.equipment_slot
 	if not slot then return end
 	if not self:unequip_item{slot = slot} then return end
-	self.slots:set_object{object = args.object, slot = slot}
+	self.inventory:set_object{object = args.object, slot = slot}
 	return true
 end
 
@@ -201,15 +194,14 @@ end
 -- @param self Object.
 -- @param args Arguments.
 Creature.equip_best_items = function(self, args)
-	for name,slot in pairs(self.slots.slots) do
+	-- Loop through all our equipment slots.
+	for name in pairs(self.species.equipment_slots) do
 		-- Find the best item to place to the slot.
-		local best = slot.object
+		local best = self:get_item{slot = name}
 		for index,item in pairs(self.inventory.slots) do
 			if item.itemspec.equipment_slot == name then
 				-- TODO: Actually check for armor class etc.
-				if not best then
-					best = item
-				end
+				if not best then best = item end
 			end
 		end
 		-- Place the best item to the slot.
@@ -337,7 +329,7 @@ end
 --   <li>slot: Slot name.</li></ul>
 -- @return True if the slot is now empty.
 Creature.unequip_item = function(self, args)
-	local item = self.slots:get_object{slot = args.slot}
+	local item = self.inventory:get_object{slot = args.slot}
 	if not item then return true end
 	if not self:add_item{object = item} then return end
 	return true

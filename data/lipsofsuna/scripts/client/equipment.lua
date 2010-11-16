@@ -22,18 +22,21 @@ end
 -- @param clss Equipment class.
 -- @param node Node name.
 -- @param name Item name.
-Equipment.set_item = function(clss, slot, name)
-	local funs =
+Equipment.set_item = function(clss, slot, name, count)
+	local widgets =
 	{
-		["head"] = function() clss.button_head.text = name end,
-		["upperbody"] = function() clss.button_upperbody.text = name end,
-		["hand.L"] = function() clss.button_handl.text = name end,
-		["hand.R"] = function() clss.button_handr.text = name end,
-		["lowerbody"] = function() clss.button_lowerbody.text = name end,
-		["feet"] = function() clss.button_feet.text = name end
+		["head"] = clss.button_head,
+		["upperbody"] = clss.button_upperbody,
+		["hand.L"] = clss.button_handl,
+		["hand.R"] = clss.button_handr,
+		["lowerbody"] = clss.button_lowerbody,
+		["feet"] = clss.button_feet
 	}
-	local fun = funs[slot]
-	if fun then fun() end
+	local widget = widgets[slot]
+	if widget then
+		widget.text = name or ""
+		widget.count = count or 1
+	end
 end
 
 Equipment.clicked = function(clss, slot)
@@ -123,8 +126,9 @@ Equipment:init()
 
 -- Updates items of the equipment display.
 Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
-	local ok,i,slot,node,model,name = event.packet:read("uint32", "string", "string", "string", "string")
+	local ok,i,count,spec,slot = event.packet:read("uint32", "uint32", "string", "string")
 	if ok and Player.object and Player.object.id == i then
-		Equipment:set_item(slot, name)
+		spec = Itemspec:find{name = spec}
+		Equipment:set_item(slot, spec and spec.name, count)
 	end
 end}

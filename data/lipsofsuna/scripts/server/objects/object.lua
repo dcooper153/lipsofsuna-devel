@@ -116,23 +116,31 @@ end
 -- @return True if succeeded.
 Object.add_item = function(self, args)
 	if not args.object then return end
-	if self.slots then
-		if self.slots:merge_object{object = args.object} then return true end
-	end
-	if self.inventory then
-		if self.inventory:merge_object{object = args.object} then return true end
-	end
+	if not self.inventory then return end
+	if self.inventory:merge_object{object = args.object} then return true end
 end
 
---- Finds an item from the inventory of the object.
+--- Finds an item from the inventory.
 -- @param self Object.
 -- @param args Arguments.<ul>
---   <li>name: Item name.</li></ul>
+--   <li>name: Item name.</li>
+--   <li>slot: Slot name or number.</li></ul>
 -- @return Object or nil.
-Object.find_item = function(self, args)
-	local inv = Inventory:find{owner = args.user}
-	if not inv then return end
-	return inv:find_object{name = args.name}
+Object.get_item = function(self, args)
+	if not self.inventory then return end
+	if args.slot then return self.inventory:get_object(args) end
+	if args.name then return self.inventory:find_object(args) end
+end
+
+--- Sets the item in a specific inventory slot.
+-- @param self Object.
+-- @param args Arguments.<ul>
+--   <li>object: Object to add.</li>
+--   <li>slot: Slot name or number.</li></ul>
+Object.set_item = function(self, args)
+	if not args.object then return end
+	if not self.inventory then return end
+	self.inventory:set_object(args)
 end
 
 --- Splits items from the inventory of the object.
@@ -193,21 +201,11 @@ end
 Object.set_count = function(self, args)
 	self.count = args.count;
 	-- Update inventory.
-	local inv = Inventory:find{object = self}
-	if inv then
-		for k,v in pairs(inv.slots) do
+	local inventory = Inventory:find{object = self}
+	if inventory then
+		for k,v in pairs(inventory.slots) do
 			if v == self then
-				inv:update_slot{slot = k}
-				break
-			end
-		end
-	end
-	-- Update slots.
-	local slots = Slots:find{object = self}
-	if slots then
-		for k,v in pairs(slots.slots) do
-			if v.object == self then
-				slots:update_slot{slot = k}
+				inventory:update_slot{slot = k}
 				break
 			end
 		end
@@ -225,16 +223,6 @@ Object.detach = function(self)
 		for k,v in pairs(inv.slots) do
 			if v == self then
 				inv:set_object{slot = k}
-				break
-			end
-		end
-	end
-	-- Detach from slots.
-	local slots = Slots:find{object = self}
-	if slots then
-		for k,v in pairs(slots.slots) do
-			if v.object == self then
-				slots:set_object{slot = k}
 				break
 			end
 		end

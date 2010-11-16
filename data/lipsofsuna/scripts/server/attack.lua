@@ -4,30 +4,20 @@ Attack = {}
 -- @param clss Object.
 -- @param args Arguments.<ul>
 --   <li>object: Object whose blade to find. (required)</li>
---   <li>slot: Slot name, or node name without the leading '#'.</li></ul>
+--   <li>slot: Equipment slot name.</li></ul>
 -- @return Blade position relative to the object.
 Attack.find_blade_point = function(clss, args)
-
+	-- Find weapon node in the owner.
 	local name = args.slot or "hand.R"
-
-	-- Find weapon slot.
-	local slots = Slots:find{owner = args.object}
-	local slot = slots and slots:get_slot{slot = name}
-	if not slot then
-		local node,rot = args.object:find_node{name = "#" .. name}
-		if node then return node end
-		return Vector()
-	end
-
-	-- Find slot position.
-	local node,rot = args.object:find_node{name = slot.node}
-	if not slot.object then return node end
-
-	-- Find blade position.
+	local node,rot = args.object:find_node{name = "#" .. name}
+	if not node then return end
+	-- Find weapon object in the slot.
+	local weapon = args.object:get_item{slot = slot}
+	if not weapon then return node end
+	-- Find blade node in the weapon.
 	local blade = slot.object:find_node{name = "#blade"}
 	if not blade then return node end
 	return node + rot * blade
-
 end
 
 --- Performs a ranged attack.

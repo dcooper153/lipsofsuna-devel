@@ -304,28 +304,24 @@ Protocol:add_handler{type = "OBJECT_SKILL", func = function(event)
 end}
 
 Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
-	local ok,i,slot,node,model,name = event.packet:read("uint32", "string", "string", "string", "string")
+	local ok,i,count,spec,slot = event.packet:read("uint32", "uint32", "string", "string")
 	if ok then
 		local o = Object:find{id = i}
 		if not o then return end
-		model = (model ~= "" and model or nil)
-		if node ~= "" then
-			-- Add-on equipment.
-			local slots = Slots:find{owner = o} or Slots:new{owner = o}
-			slots:set_object{node = node, model = model}
-		else
+		local slots = Slots:find{owner = o} or Slots:new{owner = o}
+		spec = Itemspec:find{name = spec}
+		if not spec then
+			-- Missing spec.
+			slots:set_object{slot = slot}
+		elseif spec.equipment_models then
 			-- Replacer equipment.
-			local special =
-			{
-				["upperbody"] = true,
-				["lowerbody"] = true,
-				["feet"] = true
-			}
-			if special[slot] then
-				o.equipment = o.equipment or {}
-				o.equipment[slot] = name
-				o:update_model()
-			end
+			slots:set_object{slot = slot}
+			o.equipment = o.equipment or {}
+			o.equipment[slot] = spec.name
+			o:update_model()
+		else
+			-- Add-on equipment.
+			slots:set_object{slot = slot, model = spec.model}
 		end
 	end
 end}

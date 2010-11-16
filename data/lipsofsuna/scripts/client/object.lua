@@ -7,6 +7,9 @@ Object.animate = function(self, args)
 	oldanimate(self, args)
 end
 
+Object.detach = function(self)
+end
+
 --- Creates a customized character model for the object.<br/>
 -- This function is used by both the network events and the character creation
 -- screen to create customized character objects.
@@ -23,12 +26,12 @@ end
 Object.create_character_model = function(self, args)
 	-- Get the species.
 	local name = args.race .. (args.gender == "male" and "m" or "")
-	local spec = Species:find{name = name}
-	if not spec then return end
+	local species = Species:find{name = name}
+	if not species then return end
 	-- Get the base meshes.
-	local meshes = {skeleton = spec.model}
-	if spec.models then
-		for k,v in pairs(spec.models) do
+	local meshes = {skeleton = species.model}
+	if species.models then
+		for k,v in pairs(species.models) do
 			meshes[k] = v
 		end
 	end
@@ -38,8 +41,8 @@ Object.create_character_model = function(self, args)
 	end
 	-- Add equipment models.
 	if args.equipment then
-		for _,name in pairs(args.equipment) do
-			spec = Itemspec:find{name = name}
+		for slot,name in pairs(args.equipment) do
+			local spec = Itemspec:find{name = name}
 			if spec and spec.equipment_models then
 				for k,v in pairs(spec.equipment_models) do
 					meshes[k] = v

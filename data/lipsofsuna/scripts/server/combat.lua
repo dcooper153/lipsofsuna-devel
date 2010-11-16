@@ -153,10 +153,9 @@ Combat.calculate_spell_damage = function(clss, args)
 		damage = damage + 0.2 * skills:get_value{skill = "willpower"}
 	end
 	-- Weapon penalty.
-	local slots = Slots:find{owner = args.attacker}
-	if slots then
-		local weaponl = slots:get_object{slot = "hand.L"}
-		local weaponr = slots:get_object{slot = "hand.R"}
+	if args.attacker then
+		local weaponl = args.attacker:get_item{slot = "hand.L"}
+		local weaponr = args.attacker:get_item{slot = "hand.R"}
 		if weaponl or weaponr then
 			-- TODO: Should only get penalty from metal weapons.
 			damage = damage * 0.5

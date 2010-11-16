@@ -97,9 +97,16 @@ Species.new = function(clss, args)
 		self = base:copy{name = args.name}
 	else
 		self = Spec.new(clss, args)
+		self.equipment_slots = {}
 		self.factions = {}
 		self.feats = {}
 		self.skills = {}
+	end
+	-- Equipment slots.
+	if args.equipment_slots then
+		for k,v in pairs(args.equipment_slots) do
+			self.equipment_slots[v.name] = v
+		end
 	end
 	-- Factions.
 	if args.factions then
@@ -144,7 +151,6 @@ Species.new = function(clss, args)
 	copy("ai_wait_allowed", true)
 	copy("ai_wander_time", 60)
 	copy("dialog")
-	copy("equipment_slots", {})
 	copy("gravity", Vector(0, -20, 0))
 	copy("hair_color")
 	copy("hair_style")
