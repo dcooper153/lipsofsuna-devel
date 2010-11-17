@@ -188,7 +188,7 @@ Item.use_cb = function(self, user)
 		local value = skills:get_value{skill = type.skill}
 		if not value then return end
 		skills:set_value{skill = type.skill, value = value + type.value}
-		user:effect{effect = "spell-000"}
+		Effect:play{effect = "impact1", object = user}
 		self:subtract{count = 1}
 	end
 end

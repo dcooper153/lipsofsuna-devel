@@ -28,29 +28,6 @@ Damage.impulse = function(self, value)
 	return 0.03 * value
 end
 
-makeloot = function(position)
-	local loot = Item:create{category = "weapon"}
-	loot.position = position + Vector(0.0, 1.0 + 0.3, 0.0)
-	loot.realized = true
-	return loot
-end
-
-makemeat = function(position)
-	for i=1,10 do
-		local p = Vector(math.random(100) - 50, math.random(100) - 50, math.random(100) - 50)
-		local v = Vector(math.random(100) - 50, math.random(50), math.random(100) - 50)
-		p = v * 0.01
-		v = v * 0.1
-		local a = {"meat-000", "meat-001"}
-		local m = a[math.random(2)]
-		local o = Decayer{model = m, position = position + p, velocity = v, realized = true}
-		if i == 1 then
-			o:effect{effect = "squish-000"}
-			Particles:create(position, "squish")
-		end
-	end
-end
-
 --- Handles interaction between players and terrain.
 -- @param self Voxels class.
 -- @param player Player object.

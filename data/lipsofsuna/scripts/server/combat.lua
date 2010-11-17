@@ -12,8 +12,7 @@ Combat = Class()
 Combat.apply_melee_hit = function(clss, args)
 	-- Effects.
 	if args.target then
-		args.target:effect{effect = "thud-000"}
-		if args.point then Particles:create(args.point, "default") end
+		Effect:play{effect = "impact1", point = args.point}
 	end
 	-- Impulse.
 	if args.target and args.attacker then
@@ -42,8 +41,7 @@ end
 Combat.apply_ranged_hit = function(clss, args)
 	-- Effects.
 	if args.target then
-		args.target:effect{effect = "thud-000"}
-		if args.point then Particles:create(args.point, "default") end
+		Effect:play{effect = "impact1", point = args.point}
 	end
 	-- Impulse.
 	if args.target and args.projectile then

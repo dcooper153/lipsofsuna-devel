@@ -17,5 +17,17 @@ Effect{
 	sound = "spell-000"}
 
 Effect{
+	name = "impact1",
+	sound = "thud-000"}
+
+Effect{
+	name = "jump1",
+	sound = "hop-000"}
+
+Effect{
 	name = "swing1",
 	sound = "swing-000"}
+
+Effect{
+	name = "wield1",
+	sound = "wield-000"}

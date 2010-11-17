@@ -56,7 +56,7 @@ Feat.perform = function(self, args)
 	-- Playback effects.
 	if not args.stop then
 		if feat.effect_sound then
-			args.user:effect{effect = feat.effect_sound}
+			Effect:play{effect = feat.effect_sound, object = args.user}
 		end
 		if feat.effect_animation then
 			args.user:animate{animation = feat.effect_animation, weight = 10.0}

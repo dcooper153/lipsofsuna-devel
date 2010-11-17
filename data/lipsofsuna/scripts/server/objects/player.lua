@@ -42,9 +42,8 @@ end
 	local resist = Voxel:player_contact(self, result.point)
 	if damage > resist then
 		damage = damage - resist
-		self:effect{effect = "thud-000"}
+		Effect:play{effect = "impact1", point = result.point}
 		self:damaged(damage)
-		Particles:debug(result.point, "test")
 	end
 end--]]
 

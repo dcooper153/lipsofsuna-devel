@@ -16,7 +16,6 @@ feat.func = function(self, args)
 		local o = Object{model = "fireball1", rotation = args.user.rotation,
 			position = p, velocity = v, physics = "rigid", realized = true}
 		o.gravity = Vector(0, 0, 0)
-		o:effect{effect = "fireball1"}
 		-- Wait for collision.
 		o.contact_cb = function(o, result)
 			Particles:create(result.point, "explosion1")

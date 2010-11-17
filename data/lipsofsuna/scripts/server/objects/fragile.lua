@@ -13,9 +13,8 @@ end
 Fragile.contact_cb = function(self, result)
 	local damage = Damage:impulse(result.impulse)
 	if damage > self.resistance then
-		self:effect{effect = "thud-000"}
+		Effect:play{effect = "impact1", object = self}
 		self:damaged(damage)
-		Particles:debug(result.point, "test")
 	end
 end
 

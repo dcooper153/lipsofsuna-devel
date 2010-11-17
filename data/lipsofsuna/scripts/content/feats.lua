@@ -66,6 +66,7 @@ Feat{
 	categories = {"ranged"},
 	cooldown = 2,
 	effect_animation = "cast-spell",
+	effect_sound = "fireball1",
 	inflict_damage = 20,
 	required_reagents = {mushroom = 1},
 	required_skills = {willpower = 10},

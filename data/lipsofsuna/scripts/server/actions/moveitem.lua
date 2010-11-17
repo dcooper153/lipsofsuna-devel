@@ -12,9 +12,7 @@
 --   <li>velocity: Velocity when moved to the world.</li></ul>
 -- @return True on success.
 Actions:register{name = "moveitem", func = function(clss, args)
-
 	local object = args.object
-
 	-- Get moved object.
 	local srcobj = nil
 	if args.srcobj then
@@ -58,7 +56,6 @@ Actions:register{name = "moveitem", func = function(clss, args)
 		elseif not inv:merge_object{object = srcobj} then
 			return
 		end
-
 	-- Move to equipment.
 	elseif args.dstslot then
 		if not srcobj.itemspec then return end
@@ -71,7 +68,6 @@ Actions:register{name = "moveitem", func = function(clss, args)
 		end
 		srcobj:detach()
 		inventory:set_object{slot = args.dstslot, object = srcobj}
-
 	-- Move to world.
 	elseif args.dstpoint then
 		if (args.dstpoint - object.position).length > 5.0 then return end
@@ -81,16 +77,11 @@ Actions:register{name = "moveitem", func = function(clss, args)
 		srcobj.velocity = args.velocity or Vector()
 		srcobj.rotation = args.rotation or Quaternion()
 		srcobj.realized = true
-
 	else return end
-
 	-- Animate when moving to or from the world.
 	if args.srcobj or args.dstpoint then
 		object:animate{animation = "pickup", channel = Animation.CHANNEL_ACTION, weight = 10}
 		object.cooldown = 2
 	end
-
-	object:effect{effect = "wield-000"}
 	return true
-
 end}

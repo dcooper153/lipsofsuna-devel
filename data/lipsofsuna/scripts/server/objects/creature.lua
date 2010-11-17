@@ -259,7 +259,7 @@ Creature.jump = function(self)
 			local v = self.velocity
 			self.jumped = t
 			Thread(function()
-				self:effect{effect = "hop-000"}
+				Effect:play{effect = "jump1", object = self}
 				self:animate{animation = "jump"}
 				local t = 0.0
 				while t < 0.2 do t = t + coroutine.yield() end
