@@ -30,6 +30,10 @@
     <name>Georges Grondin</name>
   </author-info>
   <author-info>
+    <name>Henrique Lazarini</name>
+    <url>http://ails.deviantart.com/</url>
+  </author-info>
+  <author-info>
     <name>Independent.nu</name>
     <url>http://www.johannespinter.com/inu/ljudbank.htm</url>
   </author-info>
@@ -839,6 +843,17 @@
     <status>usable</status>
     <tag>tile</tag>
     <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/icons1.png</file>
+    <author>Henrique Lazarini</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/420-pixel-art-icons-medievalfantasy-rpg</source>
+    <status>usable</status>
+    <tag>icon</tag>
+    <type>texture</type>
+    <comment>The icons are scaled down from 34x34.</comment>
   </asset>
 
   <asset>
