@@ -20,7 +20,7 @@ Dependencies
 
  * Python            http://www.python.org/
  * Bullet  >= 2.71   http://www.bulletphysics.com/
- * Grapple >= 0.9.5  http://opensource.linuxgamepublishing.com/grapple.php
+ * ENet    >= 1.2.2  http://enet.bespin.org/
  * Lua     >= 5.1    http://www.lua.org/
  * SQLite  >= 3.6    http://www.sqlite.org/
  * SDL     >= 1.2    http://libsdl.org/
