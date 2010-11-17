@@ -28,8 +28,8 @@ Species{
 		{name = "perception", max = 60, val = 20},
 		{name = "strength", max = 40, val = 20},
 		{name = "willpower", max = 80, val = 30}},
-	speed_walk = 3,
-	speed_run = 6,
+	speed_walk = 2,
+	speed_run = 4,
 	tilt_bone = "back",
 	tilt_limit = 1.25}
 

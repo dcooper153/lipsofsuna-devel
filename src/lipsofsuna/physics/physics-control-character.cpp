@@ -46,17 +46,27 @@ void LIPhyCharacterAction::updateAction (
 	float speed;
 	btCollisionObject* object = this->object->control->get_object ();
 	btTransform transform = object->getWorldTransform ();
+
+	/* Calculate the movement axes of the character. */
+	/* We use the gravity vector as the down axis because the facing direction,
+	   includes the tilting component, which would case the character to lift
+	   off distrubingly when walking while tilted. */
 	btVector3 pos = transform * btVector3 (0.0f, 0.0f, 0.0f);
-	btVector3 down = transform * btVector3 (0.0f, -1.0f, 0.0f) - pos;
 	btVector3 right = transform * btVector3 (1.0f, 0.0f, 0.0f) - pos;
 	btVector3 forward = transform * btVector3 (0.0f, 0.0f, -1.0f) - pos;
+	LIMatVector down1 = limat_vector_normalize (this->object->config.gravity);
+	btVector3 down = btVector3 (down1.x, down1.y, down1.z);
+	if (limat_vector_get_length (down1) < LIMAT_EPSILON)
+		down = transform * btVector3 (0.0f, -1.0f, 0.0f) - pos;
+	forward = right.cross(down);
+	right = down.cross(forward);
 
 	/* Check for ground. */
 	this->timer += delta;
 	if (this->timer >= 0.2f)
 	{
 		LIMatVector check0 = { pos[0], pos[1], pos[2] };
-		LIMatVector check1 = { pos[0], pos[1] - 0.3f, pos[2] };
+		LIMatVector check1 = { pos[0], pos[1] - 0.6f, pos[2] };
 		ground = liphy_physics_cast_ray (this->object->physics, &check0, &check1,
 			this->object->config.collision_group, this->object->config.collision_mask,
 			&this->object, 1, NULL, NULL) < 1.0f;
