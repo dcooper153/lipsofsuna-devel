@@ -316,6 +316,10 @@ Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
 		if not spec then
 			-- Missing spec.
 			slots:set_object{slot = slot}
+			if o.equipment and o.equipment[slot] then
+				o.equipment[slot] = nil
+				o:update_model()
+			end
 		elseif spec.equipment_models then
 			-- Replacer equipment.
 			slots:set_object{slot = slot}
@@ -325,6 +329,10 @@ Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
 		else
 			-- Add-on equipment.
 			slots:set_object{slot = slot, model = spec.model}
+			if o.equipment and o.equipment[slot] then
+				o.equipment[slot] = nil
+				o:update_model()
+			end
 		end
 	end
 end}

@@ -74,6 +74,9 @@ Object.create_character_model = function(self, args)
 	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "breast.R", scale = args.bust_scale or 1}
 	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "breastspikiness.L", scale = args.bust_scale or 1}
 	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "breastspikiness.R", scale = args.bust_scale or 1}
+	-- Apply initial deformation.
+	self:update_animations{secs = 0}
+	self:deform_mesh()
 end
 
 Object.update_model = function(self)
