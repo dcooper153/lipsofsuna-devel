@@ -49,11 +49,15 @@ Widgets.IconButton.reshaped = function(self)
 		source_image = "widgets1",
 		source_position = self.focused and {64,0} or {0,0},
 		source_tiling = {6,52,6,6,52,6}}
-	self:canvas_image{
-		dest_position = {0,0},
-		dest_size = {16,16},
-		source_image = "widgets1",--TODO: Overridable icon
-		source_position = {0,0}}
+	local icon = Iconspec:find{name = self.icon}
+	if icon then
+		self:canvas_image{
+			dest_position = {0,0},
+			dest_size = {20,20},
+			source_image = icon.image,
+			source_position = icon.offset,
+			source_tiling = {0,icon.size[1],0,0,icon.size[1],0}}
+	end
 	self:canvas_text{
 		dest_position = {18,0},
 		dest_size = {w,h},

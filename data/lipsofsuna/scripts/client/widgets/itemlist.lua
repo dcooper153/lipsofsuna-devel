@@ -34,8 +34,8 @@ Widgets.ItemList.set_item = function(self, args)
 	local widget = self.buttons[args.slot]
 	if not widget then return end
 	widget.text = args.name
-	widget.count = 0 -- FIXME
-	widget.icon = "item-icon-none" -- FIXME
+	widget.count = args.count
+	widget.icon = args.icon
 end
 
 Widgets.ItemList.pressed = function(self, row)

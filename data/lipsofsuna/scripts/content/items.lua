@@ -18,6 +18,7 @@ Itemspec{
 	crafting_count = 10,
 	crafting_materials = {log = 1},
 	crafting_tools = {saw = 1},
+	icon = "arrow1",
 	stacking = true}
 
 Itemspec{
@@ -26,7 +27,8 @@ Itemspec{
 	categories = {"melee", "weapon"},
 	damage = 10,
 	damage_bonus_strength = 0.2,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	icon = "axe1"}
 
 Itemspec{
 	name = "boomerang",
@@ -48,7 +50,8 @@ Itemspec{
 	crafting_materials = {log = 1},
 	damage = 10,
 	damage_bonus_dexterity = 0.2,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	icon = "bow1"}
 
 Itemspec{
 	name = "chainmail leggings",
@@ -75,7 +78,8 @@ Itemspec{
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
 	equipment_models = {upper1 = "bra1"},
-	equipment_slot = "upperbody"}
+	equipment_slot = "upperbody",
+	icon = "cloth1"}
 
 Itemspec{
 	name = "dress",
@@ -84,7 +88,8 @@ Itemspec{
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
 	equipment_models = {upper1 = "chinadress1", panties = "panties2"},
-	equipment_slot = "upperbody"}
+	equipment_slot = "upperbody",
+	icon = "cloth1"}
 
 Itemspec{
 	name = "gem",
@@ -99,9 +104,10 @@ Itemspec{
 	mass = 2,
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
-	crafting_skills = {alchemy = 75},
+	crafting_skills = {intelligence = 75},
 	crafting_tools = {["mortar and pestle"] = 1},
-	stacking = true}
+	stacking = true,
+	icon = "potion1"}
 
 Itemspec{
 	name = "greater mana potion",
@@ -109,8 +115,9 @@ Itemspec{
 	mass = 2,
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
-	crafting_skills = {alchemy = 75},
-	crafting_tools = {["mortar and pestle"] = 1}}
+	crafting_skills = {intelligence = 75},
+	crafting_tools = {["mortar and pestle"] = 1},
+	icon = "potion2"}
 
 Itemspec{
 	name = "grenade",
@@ -133,9 +140,10 @@ Itemspec{
 	mass = 2,
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
-	crafting_skills = {alchemy = 50},
+	crafting_skills = {intelligence = 50},
 	crafting_tools = {["mortar and pestle"] = 1},
-	stacking = true}
+	stacking = true,
+	icon = "potion1"}
 
 Itemspec{
 	name = "katana",
@@ -152,9 +160,10 @@ Itemspec{
 	mass = 2,
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
-	crafting_skills = {alchemy = 25},
+	crafting_skills = {intelligence = 25},
 	crafting_tools = {["mortar and pestle"] = 1},
-	stacking = true}
+	stacking = true,
+	icon = "potion1"}
 
 Itemspec{
 	name = "lesser mana potion",
@@ -162,9 +171,10 @@ Itemspec{
 	mass = 2,
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
-	crafting_skills = {alchemy = 25},
+	crafting_skills = {intelligence = 25},
 	crafting_tools = {["mortar and pestle"] = 1},
-	stacking = true}
+	stacking = true,
+	icon = "potion2"}
 
 Itemspec{
 	name = "log",
@@ -179,9 +189,10 @@ Itemspec{
 	mass = 2,
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
-	crafting_skills = {alchemy = 50},
+	crafting_skills = {intelligence = 50},
 	crafting_tools = {["mortar and pestle"] = 1},
-	stacking = true}
+	stacking = true,
+	icon = "potion2"}
 
 Itemspec{
 	name = "mattock",
@@ -211,7 +222,8 @@ Itemspec{
 	model = "mushroom-000",--"mushroom-001"..."mushroom-008"
 	mass = 2,
 	categories = {"reagent"},
-	stacking = true}
+	stacking = true,
+	icon = "mushroom1"}
 
 Itemspec{
 	name = "poleaxe",
@@ -252,7 +264,8 @@ Itemspec{
 	name = "torch",
 	model = "torch1",
 	categories = {"misc"},
-	equipment_slot = "hand.L"}
+	equipment_slot = "hand.L",
+	icon = "torch1"}
 
 Itemspec{
 	name = "wand",

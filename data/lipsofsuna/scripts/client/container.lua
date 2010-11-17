@@ -57,10 +57,13 @@ end
 -- @param slot Slot number.
 -- @param model Model code.
 -- @param name Object name.
-function Container.insert_item(self, id, slot, model, name)
+-- @param count Object count.
+function Container.insert_item(self, id, slot, name, count)
 	local list = self.lists[id]
 	if list then
-		list:set_item{slot = slot, name = "# " .. name}
+		local spec = Itemspec:find{name = name}
+		local icon = spec and spec.icon
+		list:set_item{slot = slot, icon = icon, name = name, count = count}
 	end
 end
 

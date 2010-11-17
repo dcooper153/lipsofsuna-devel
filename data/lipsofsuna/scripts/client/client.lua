@@ -150,8 +150,8 @@ Protocol:add_handler{type = "INVENTORY_CLOSED", func = function(event)
 end}
 
 Protocol:add_handler{type = "INVENTORY_ITEM_ADDED", func = function(event)
-	local ok,id,slot,model,name = event.packet:read("uint32", "uint8", "uint32", "string")
-	if ok then Container:insert_item(id, slot, model, name) end
+	local ok,id,slot,count,name = event.packet:read("uint32", "uint8", "uint32", "string")
+	if ok then Container:insert_item(id, slot, name, count) end
 end}
 
 Protocol:add_handler{type = "INVENTORY_ITEM_REMOVED", func = function(event)

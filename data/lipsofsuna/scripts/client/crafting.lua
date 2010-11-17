@@ -35,8 +35,9 @@ Crafting.show = function(clss, args)
 	clss.tree:clear()
 	local index = 1
 	for k,v in pairs(args.items) do
-		clss.tree:append{widget = Widgets.ItemButton{index = index, text = v,
-			pressed = function(self) Crafting:craft{index = self.index} end}}
+		local spec = Itemspec:find{name = v}
+		clss.tree:append{widget = Widgets.ItemButton{index = index, icon = spec and spec.icon,
+			text = v, pressed = function(self) Crafting:craft{index = self.index} end}}
 		index = index + 1
 	end
 	clss.dialog.floating = true

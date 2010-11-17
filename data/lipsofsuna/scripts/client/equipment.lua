@@ -34,7 +34,9 @@ Equipment.set_item = function(clss, slot, name, count)
 	}
 	local widget = widgets[slot]
 	if widget then
+		local spec = Itemspec:find{name = name}
 		widget.text = name or ""
+		widget.icon = spec and spec.icon
 		widget.count = count or 1
 	end
 end
@@ -126,9 +128,8 @@ Equipment:init()
 
 -- Updates items of the equipment display.
 Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
-	local ok,i,count,spec,slot = event.packet:read("uint32", "uint32", "string", "string")
+	local ok,i,count,name,slot = event.packet:read("uint32", "uint32", "string", "string")
 	if ok and Player.object and Player.object.id == i then
-		spec = Itemspec:find{name = spec}
-		Equipment:set_item(slot, spec and spec.name, count)
+		Equipment:set_item(slot, name, count)
 	end
 end}

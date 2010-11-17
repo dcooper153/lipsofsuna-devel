@@ -25,6 +25,7 @@ Itemspec.dict_name = {}
 --   <li>equipment_models: Dictionary of equipment models or nil.</li>
 --   <li>equipment_slot: Equipment slot into which the item can be placed.</li>
 --   <li>health: Number of hit points the item has.</li>
+--   <li>icon: Icon name.</li>
 --   <li>mass: Mass in kilograms.</li>
 --   <li>model: Model to use for the item. (required)</li>
 --   <li>name: Name of the item type. (required)</li>
