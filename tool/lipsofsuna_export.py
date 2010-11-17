@@ -273,6 +273,16 @@ class LIMaterial:
 				self.shader = mat["shader"]
 			except:
 				pass
+			try:
+				if mat["cull"] == "false":
+					self.flags &= ~LIFormat.MATRFLAG_CULLFACE
+			except:
+				pass
+			try:
+				if mat["collision"] == "false":
+					self.flags &= ~LIFormat.MATRFLAG_COLLISION
+			except:
+				pass
 			if mat.use_transparency:
 				self.flags |= LIFormat.MATRFLAG_ALPHA
 			self.diffuse[0] = mat.diffuse_color[0]
