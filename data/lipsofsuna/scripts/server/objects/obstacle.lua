@@ -54,6 +54,10 @@ Obstacle.use_cb = function(self, user)
 		local mats = {}
 		for k,v in pairs(self.spec.harvest_materials) do table.insert(mats, k) end
 		if #mats == 0 then return end
+		-- Effect playback.
+		if self.spec.harvest_effect then
+			Effect:play{effect = self.spec.harvest_effect, point = self.position}
+		end
 		-- Choose a random item from the list.
 		local item = Item:create{name = mats[math.random(1, #mats)]}
 		user:add_item{object = item}

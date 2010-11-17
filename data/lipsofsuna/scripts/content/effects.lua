@@ -27,6 +27,10 @@ Effect{
 	sound = "hop-000"}
 
 Effect{
+	name = "harvest1",
+	sound = "scissor1"}
+
+Effect{
 	name = "swing1",
 	sound = "swing-000"}
 

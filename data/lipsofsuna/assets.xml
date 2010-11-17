@@ -1704,6 +1704,14 @@
   </asset>
 
   <asset>
+    <file>sounds/scissor1.flac</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
     <file>sounds/snap-000.flac</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>

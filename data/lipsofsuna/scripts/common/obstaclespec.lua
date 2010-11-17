@@ -9,6 +9,7 @@ Obstaclespec.dict_name = {}
 -- @param args Arguments.<ul>
 --   <li>categories: List of categories to which the obstacle belongs.</li>
 --   <li>harvest_behavior: Harvest behavior. ("keep"/"destroy")</li>
+--   <li>harvest_effect: Effect to play when harvested.</li>
 --   <li>harvest_materials: Dictionary of harvestable materials.</li>
 --   <li>destroy_actions: List of actions to perform when the obstacle is destroyed.</li>
 --   <li>health: Number of hit points the obstacle has.</li>
