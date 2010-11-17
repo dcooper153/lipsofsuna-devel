@@ -3,6 +3,7 @@ Creature = Class(Object)
 Creature.setter = function(self, key, value)
 	if key == "species" then
 		local spec = type(value) == "string" and Species:find{name = value} or value
+		if self.species == spec then return end
 		Object.setter(self, key, spec)
 		self.model = spec.model
 		self.mass = spec.mass
