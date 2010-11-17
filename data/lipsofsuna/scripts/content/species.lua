@@ -37,7 +37,7 @@ Species{
 	name = "aer-player",
 	base = "aer",
 	ai_enabled = false,
-	inventory_items = {"torch", "mattock", "dress", "chainmail leggings"}}
+	inventory_items = {"saw", "mortar and pestle", "torch", "boomerang", "mattock", "dress", "chainmail leggings"}}
 
 Species{
 	name = "android",

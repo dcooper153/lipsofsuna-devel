@@ -19,14 +19,7 @@ Player.new = function(clss, args)
 	self.name = args and args.name or Names:random()
 	self.vision = Vision{object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
 	self.vision.terrain = {}
-
-	local inventory = self.inventory
-	inventory:subscribe{object = self, callback = function(args) self:inventory_cb(args) end}
-	self:add_item{object = Item:create{name = "axe"}}
-	for i = 1,10 do self:add_item{object = Item:create{category = "potion"}} end
-	for i = 1,50 do self:add_item{object = Item:create{category = "reagent"}} end
-	self:add_item{object = Item:create{name = "mortar and pestle"}}
-	self:add_item{object = Item:create{name = "saw"}}
+	self.inventory:subscribe{object = self, callback = function(args) self:inventory_cb(args) end}
 
 	-- Terrain listener.
 	self.player_timer = Timer{delay = 0.2, func = function()
