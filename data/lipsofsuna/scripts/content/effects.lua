@@ -9,7 +9,8 @@ Effect{
 
 Effect{
 	name = "growl1",
-	sound = "growl-000"}
+	sound = "growl-000",
+	sound_pitch = 0.1}
 
 Effect{
 	name = "heal1",
@@ -18,7 +19,8 @@ Effect{
 
 Effect{
 	name = "impact1",
-	sound = "thud-000"}
+	sound = "thud-000",
+	sound_pitch = 0.1}
 
 Effect{
 	name = "jump1",

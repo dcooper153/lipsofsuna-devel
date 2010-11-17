@@ -204,6 +204,7 @@ Protocol:add_handler{type = "OBJECT_EFFECT", func = function(event)
 			model = effect.model,
 			object = obj,
 			sound = effect.sound,
+			sound_pitch = effect.sound_pitch,
 			realized = true}
 	end
 end}
@@ -361,16 +362,11 @@ Protocol:add_handler{type = "WORLD_EFFECT", func = function(event)
 		local effect = Effect:find{name = t}
 		if not effect then return end
 		-- Create the effect object.
-		local o = Object{position=Vector(x, y, z), model = effect.model, realized = true}
-		o:particle_animation{loop = false}
-		-- Attach an optional sound effect.
-		if effect.sound then
-			Sound:effect{object = o, effect = effect.sound, pitch = 0.8+0.4*math.random()}
-		end
-		-- Remove the object when the playback has ended.
-		Timer{delay = 10, func = function(self)
-			o.realized = false
-			self:disable()
-		end}
+		EffectObject{
+			model = effect.model,
+			position = Vector(x,y,z),
+			sound = effect.sound,
+			sound_pitch = effect.sound_pitch,
+			realized = true}
 	end
 end}
