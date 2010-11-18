@@ -33,6 +33,7 @@ struct _LIRenModelGroup
 {
 	int start;
 	int count;
+	LIMatVector* face_sort_coords;
 };
 
 struct _LIRenModel
@@ -77,6 +78,9 @@ LIAPICALL (int, liren_model_intersect_ray, (
 LIAPICALL (void, liren_model_replace_image, (
 	LIRenModel* self,
 	LIRenImage* image));
+
+LIAPICALL (void, liren_model_update_transparency, (
+	LIRenModel* self));
 
 LIAPICALL (void, liren_model_get_bounds, (
 	LIRenModel* self,

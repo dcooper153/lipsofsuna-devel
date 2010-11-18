@@ -1,12 +1,29 @@
 Options = Class()
+Options.animation_quality = 1.0
+Options.transparency_quality = 0.3
 
 Options.init = function(clss)
+	-- Animation quality adjustment.
+	local scroll_animation = Widgets.Progress{min = 0, max = 1, value = clss.animation_quality}
+	scroll_animation:set_request{width = 100}
+	scroll_animation.pressed = function(self)
+		local v = self:get_value_at(Client.cursor_pos)
+		clss.animation_quality = v
+		self.value = v
+	end
+	-- Transparency quality adjustment.
+	local scroll_transparency = Widgets.Progress{min = 0, max = 1, value = clss.transparency_quality}
+	scroll_transparency:set_request{width = 100}
+	scroll_transparency.pressed = function(self)
+		local v = self:get_value_at(Client.cursor_pos)
+		clss.transparency_quality = v
+		self.value = v
+	end
 	-- Bloom toggle.
 	clss.check_postproc = Widgets.Check{text = "Enable bloom"}
 	-- Luminance adjustment.
 	local scroll_luminance = Widgets.Progress{min = 0, max = 1, value = 0}
 	scroll_luminance:set_request{width = 100}
-	scroll_luminance.value = 0
 	scroll_luminance.pressed = function(self)
 		local v = self:get_value_at(Client.cursor_pos)
 		self.value = v
@@ -32,13 +49,18 @@ Options.init = function(clss)
 		Bloom:compile()
 	end
 	-- Packing.
+	local quality_group = Widget{cols = 2}
+	quality_group:append_row(Widgets.Label{text = "Animation"}, scroll_animation)
+	quality_group:append_row(Widgets.Label{text = "Transparency"}, scroll_transparency)
 	local bloom_group = Widget{cols = 2}
 	bloom_group:append_row(clss.check_postproc)
 	bloom_group:append_row(Widgets.Label{text = "Radius"}, scroll_radius)
 	bloom_group:append_row(Widgets.Label{text = "Exposure"}, scroll_exposure)
 	bloom_group:append_row(Widgets.Label{text = "Influence"}, scroll_luminance)
 	clss.group = Widget{cols = 2}
-	clss.group:append_row(Widgets.Label{text = "Bloom"})
+	clss.group:append_row(Widgets.Label{text = "Quality", font = "medium"})
+	clss.group:append_row(quality_group)
+	clss.group:append_row(Widgets.Label{text = "Bloom", font = "medium"})
 	clss.group:append_row(bloom_group)
 end
 

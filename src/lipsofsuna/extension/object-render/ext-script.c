@@ -123,6 +123,29 @@ static void Object_particle_animation (LIScrArgs* args)
 	liren_object_particle_animation (object, start, loop);
 }
 
+/* @luadoc
+ * --- Recalculates the positions of transparent faces for correct depth sorting.
+ * -- @param self Object.
+ * function Object.update_transparency(self)
+ */
+static void Object_update_transparency (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIEngObject* engobj;
+	LIRenObject* object;
+
+	/* Get render object. */
+	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_RENDER_OBJECT);
+	engobj = args->self;
+	object = liren_scene_find_object (module->scene, engobj->id);
+	if (object == NULL)
+		return;
+
+	/* Deform the mesh. */
+	if (object->model != NULL)
+		liren_model_update_transparency (object->model);
+}
+
 /*****************************************************************************/
 
 void liext_script_render_object (
@@ -133,6 +156,7 @@ void liext_script_render_object (
 	liscr_class_insert_mfunc (self, "deform_mesh", Object_deform_mesh);
 	liscr_class_insert_mfunc (self, "intersect_ray", Object_intersect_ray);
 	liscr_class_insert_mfunc (self, "particle_animation", Object_particle_animation);
+	liscr_class_insert_mfunc (self, "update_transparency", Object_update_transparency);
 }
 
 /** @} */

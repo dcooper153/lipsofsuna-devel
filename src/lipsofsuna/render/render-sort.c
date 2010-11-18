@@ -88,7 +88,7 @@ int liren_sort_add_group (
 	int            count,
 	LIRenMesh*     mesh,
 	LIRenMaterial* material,
-	int            transparent)
+	LIMatVector*   face_sort_coords)
 {
 	int num;
 	LIRenSortgroup* tmp;
@@ -108,15 +108,15 @@ int liren_sort_add_group (
 	num = self->groups.count;
 	self->groups.array[num].index = index;
 	self->groups.array[num].count = count;
-	self->groups.array[num].transparent = transparent;
+	self->groups.array[num].transparent = (face_sort_coords != NULL);
 	self->groups.array[num].bounds = *bounds;
 	self->groups.array[num].matrix = *matrix;
 	self->groups.array[num].mesh = mesh;
 	self->groups.array[num].material = material;
 	self->groups.count++;
 
-	if (transparent)
-		return liren_sort_add_faces (self, bounds, matrix, index, count, mesh, material);
+	if (face_sort_coords != NULL)
+		return liren_sort_add_faces (self, bounds, matrix, index, count, mesh, material, face_sort_coords);
 
 	return 1;
 }
@@ -128,19 +128,17 @@ int liren_sort_add_faces (
 	int            index,
 	int            count,
 	LIRenMesh*     mesh,
-	LIRenMaterial* material)
+	LIRenMaterial* material,
+	LIMatVector*   face_sort_coords)
 {
 	int i;
-	int num;
+	int n;
 	int bucket;
 	float dist;
-	void* vtxdata;
 	LIMatMatrix mat;
-	LIMatVector vtx[3];
 	LIMatVector center;
 	LIMatVector diff;
 	LIMatVector eye;
-	LIRenFormat format;
 
 	/* Resize the buffer if necessary. */
 	if (!private_resize_faces (self, self->faces.count + count / 3))
@@ -150,29 +148,19 @@ int liren_sort_add_faces (
 	mat = limat_matrix_invert (self->modelview);
 	eye = limat_matrix_transform (mat, limat_vector_init (0.0f, 0.0f, 0.0f));
 
-	/* Add each face in the group. */
-	num = self->faces.count;
-	liren_mesh_get_format (mesh, &format);
-	vtxdata = liren_mesh_lock_vertices (mesh, index, count);
-	if (vtxdata == NULL)
-		return 0;
-	for (i = 0 ; i < count ; i += 3, num++)
+	/* Add each face of the group. */
+	for (i = 0, n = self->faces.count ; i < count / 3 ; i++, n++)
 	{
 		/* Append the face to the buffer. */
-		self->faces.array[num].type = LIREN_SORT_TYPE_FACE;
-		self->faces.array[num].face.index = index + i;
-		self->faces.array[num].face.bounds = *bounds;
-		self->faces.array[num].face.matrix = *matrix;
-		self->faces.array[num].face.mesh = mesh;
-		self->faces.array[num].face.material = material;
+		self->faces.array[n].type = LIREN_SORT_TYPE_FACE;
+		self->faces.array[n].face.index = index + 3 * i;
+		self->faces.array[n].face.bounds = *bounds;
+		self->faces.array[n].face.matrix = *matrix;
+		self->faces.array[n].face.mesh = mesh;
+		self->faces.array[n].face.material = material;
 
 		/* Calculate the center of the triangle. */
-		vtx[0] = *((LIMatVector*)(vtxdata + format.vtx_offset + format.size * (i + 0)));
-		vtx[1] = *((LIMatVector*)(vtxdata + format.vtx_offset + format.size * (i + 1)));
-		vtx[2] = *((LIMatVector*)(vtxdata + format.vtx_offset + format.size * (i + 2)));
-		center = limat_vector_add (limat_vector_add (vtx[0], vtx[1]), vtx[2]);
-		center = limat_vector_multiply (center, 1.0f / 3.0f);
-		center = limat_matrix_transform (*matrix, center);
+		center = limat_matrix_transform (*matrix, face_sort_coords[i]);
 
 		/* Calculate bucket index based on distance to camera. */
 		/* TODO: Would be better to use far plane distance here? */
@@ -183,11 +171,10 @@ int liren_sort_add_faces (
 		bucket = LIMAT_CLAMP (bucket, 0, self->buckets.count - 1);
 
 		/* Insert to the depth bucket. */
-		self->faces.array[num].next = self->buckets.array[bucket];
-		self->buckets.array[bucket] = self->faces.array + num;
+		self->faces.array[n].next = self->buckets.array[bucket];
+		self->buckets.array[bucket] = self->faces.array + n;
+		self->faces.count++;
 	}
-	liren_mesh_unlock_vertices (mesh);
-	self->faces.count = num;
 
 	return 1;
 }
@@ -200,7 +187,6 @@ int liren_sort_add_model (
 {
 	int i;
 	int ret = 1;
-	int transp;
 	LIRenMaterial* material;
 
 	/* Frustum culling. */
@@ -211,10 +197,9 @@ int liren_sort_add_model (
 	for (i = 0 ; i < model->materials.count ; i++)
 	{
 		material = model->materials.array[i];
-		transp = (material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY);
 		ret &= liren_sort_add_group (self, bounds, matrix,
 			model->groups.array[i].start, model->groups.array[i].count,
-			&model->mesh, material, transp);
+			&model->mesh, material, model->groups.array[i].face_sort_coords);
 	}
 
 	return ret;

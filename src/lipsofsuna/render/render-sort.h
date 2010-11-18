@@ -107,7 +107,7 @@ LIAPICALL (int, liren_sort_add_group, (
 	int            count,
 	LIRenMesh*     mesh,
 	LIRenMaterial* material,
-	int            transparent));
+	LIMatVector*   face_sort_coords));
 
 LIAPICALL (int, liren_sort_add_faces, (
 	LIRenSort*     self,
@@ -116,7 +116,8 @@ LIAPICALL (int, liren_sort_add_faces, (
 	int            index,
 	int            count,
 	LIRenMesh*     mesh,
-	LIRenMaterial* material));
+	LIRenMaterial* material,
+	LIMatVector*   face_sort_coords));
 
 LIAPICALL (int, liren_sort_add_model, (
 	LIRenSort*   self,
