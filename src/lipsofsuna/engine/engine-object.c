@@ -26,13 +26,12 @@
 #include "engine-object.h"
 #include "engine-selection.h"
 
-#warning Engine object refresh radius is hardcoded.
-#define REFRESH_RADIUS 10.0f
 #define SCRIPT_POINTER_MODEL ((void*) -1)
+#define SMOOTHING_TIMESTEP (1.0f / 60.0f)
 
-static int
-private_warp (LIEngObject*       self,
-              const LIMatVector* position);
+static int private_warp (
+	LIEngObject*       self,
+	const LIMatVector* position);
 
 /*****************************************************************************/
 
@@ -339,9 +338,20 @@ void lieng_object_update (
 	/* Smoothing. */
 	if (self->smoothing.rot != 0.0f || self->smoothing.pos != 0.0f)
 	{
-		if (lieng_object_get_realized (self))
+		/* Update smoothing timer. */
+		if (!lieng_object_get_realized (self))
+			return;
+		self->smoothing.timer += secs;
+		if (self->smoothing.timer < SMOOTHING_TIMESTEP)
+			return;
+		if (self->smoothing.timer > 1.0f)
+			self->smoothing.timer -= floor (self->smoothing.timer);
+
+		/* Calculate the new position. */
+		/* This is done in a loop with a constant timestep to make
+		   smoothing more resilient to rapid framerate changes. */
+		while (self->smoothing.timer >= SMOOTHING_TIMESTEP)
 		{
-			/* Calculate new position. */
 			transform0 = self->transform;
 			transform1 = self->smoothing.target;
 			transform0.rotation = limat_quaternion_get_nearest (transform0.rotation, transform1.rotation);
@@ -351,14 +361,16 @@ void lieng_object_update (
 			transform.rotation = limat_quaternion_nlerp (
 				transform1.rotation, transform0.rotation,
 				0.5f * self->smoothing.rot);
-
-			/* Set new position. */
 			self->transform = transform;
-			private_warp (self, &transform.position);
-
-			/* Invoke callbacks. */
-			lical_callbacks_call (self->engine->callbacks, self->engine, "object-transform", lical_marshal_DATA_PTR_PTR, self, &transform);
+			self->smoothing.timer -= SMOOTHING_TIMESTEP;
 		}
+
+		/* Set new position. */
+		self->transform = transform;
+		private_warp (self, &transform.position);
+
+		/* Invoke callbacks. */
+		lical_callbacks_call (self->engine->callbacks, self->engine, "object-transform", lical_marshal_DATA_PTR_PTR, self, &transform);
 	}
 }
 

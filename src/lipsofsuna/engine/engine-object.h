@@ -47,6 +47,7 @@ struct _LIEngObject
 	{
 		float pos;
 		float rot;
+		float timer;
 		LIMatTransform target;
 	} smoothing;
 };
