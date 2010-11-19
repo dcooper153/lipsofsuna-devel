@@ -1401,6 +1401,20 @@
   </asset>
 
   <asset>
+    <file>import/tree3.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/tree3.png</dep>
+    <dep>import/tree3n.png</dep>
+    <dep>import/tree4.png</dep>
+    <dep>import/tree4n.png</dep>
+    <status>usable</status>
+    <tag>prop</tag>
+    <tag>tree</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
     <file>import/tree2.png</file>
     <author>Julius</author>
     <author>Ari Mustonen</author>
@@ -1410,6 +1424,46 @@
     <tag>prop</tag>
     <tag>tree</tag>
     <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/tree3.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>prop</tag>
+    <tag>tree</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/tree3n.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>prop</tag>
+    <tag>tree</tag>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/tree4.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>prop</tag>
+    <tag>tree</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/tree4n.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>prop</tag>
+    <tag>tree</tag>
+    <type>normalmap</type>
   </asset>
 
   <asset>
