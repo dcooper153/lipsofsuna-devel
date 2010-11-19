@@ -1,5 +1,5 @@
 Shader{
-	name = "deferred-normalmap",
+	name = "deferred-eye",
 	config = [[
 uniform uni_materialdiffuse MATERIALDIFFUSE
 uniform uni_materialspecular MATERIALSPECULAR
@@ -7,53 +7,35 @@ uniform uni_materialshininess MATERIALSHININESS
 uniform uni_matrixmodelview MATRIXMODELVIEW
 uniform uni_matrixnormal MATRIXNORMAL
 uniform uni_matrixprojection MATRIXPROJECTION
-uniform uni_diffusetexture DIFFUSETEXTURE0
-uniform uni_normaltexture DIFFUSETEXTURE1]],
+uniform uni_texturemap[0] DIFFUSETEXTURE0]],
 
 	vertex = [[
-out fragvar
-{
-	vec3 coord;
-	vec3 normal;
-	vec3 tangent;
-	vec2 texcoord;
-} OUT;
+out vec3 var_normal;
+out vec2 var_texcoord;
 uniform mat4 uni_matrixmodelview;
 uniform mat3 uni_matrixnormal;
 uniform mat4 uni_matrixprojection;
 void main()
 {
 	vec4 tmp = uni_matrixmodelview * vec4(LOS_coord,1.0);
-	OUT.coord = tmp.xyz;
-	OUT.normal = uni_matrixnormal * LOS_normal;
-	OUT.tangent = uni_matrixnormal * LOS_tangent;
-	OUT.texcoord = LOS_texcoord;
+	var_normal = uni_matrixnormal * LOS_normal;
+	var_texcoord = LOS_texcoord;
 	gl_Position = uni_matrixprojection * tmp;
 }]],
 
 	fragment = [[
-in fragvar
-{
-	vec3 coord;
-	vec3 normal;
-	vec3 tangent;
-	vec2 texcoord;
-} IN;
+in vec3 var_normal;
+in vec2 var_texcoord;
 uniform vec4 uni_materialdiffuse;
 uniform vec4 uni_materialspecular;
 uniform float uni_materialshininess;
-uniform sampler2D uni_diffusetexture;
-uniform sampler2D uni_normaltexture;
-]] .. Shader.los_normal_mapping .. [[
+uniform sampler2D uni_texturemap[1];
 void main()
 {
-	vec3 tangent = normalize(IN.tangent);
-	vec3 normal = los_normal_mapping(IN.normal, tangent, IN.texcoord, uni_normaltexture);
-	vec4 diffuse = texture(uni_diffusetexture, IN.texcoord);
-	if(diffuse.a < 0.5)
-		discard;
+	vec3 normal = normalize(var_normal);
+	vec4 diffuse = texture(uni_texturemap[0], var_texcoord);
 	/* Diffuse. */
-	gl_FragData[0] = uni_materialdiffuse * diffuse;
+	gl_FragData[0] = mix(uni_materialdiffuse, vec4(diffuse.rgb,1.0), diffuse.a);
 	/* Specular. */
 	gl_FragData[1].rgb = uni_materialspecular.xyz * uni_materialspecular.a;
 	gl_FragData[1].a = uni_materialshininess / 128.0;

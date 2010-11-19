@@ -186,7 +186,7 @@ Species{
 	name = "companion",
 	base = "aer",
 	dialog = "companion",
-	hair_style = "hair1",
+	hair_style = {"hair1",255,255,255},
 	inventory_items = {"torch", "axe", "chainmail tunic", "chainmail pants", "chainmail leggings"}}
 
 Species{
@@ -199,7 +199,7 @@ Species{
 	name = "lipscitizen",
 	base = "aer",
 	dialog = "lipscitizen",
-	hair_style = "hair1",
+	hair_style = {"hair1",255,192,192},
 	inventory_items = {"chainmail tunic", "chainmail pants", "chainmail leggings"}}
 
 Species{
@@ -208,7 +208,7 @@ Species{
 	dialog = "peculiarpetnpc",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
-	hair_style = "hair1",
+	hair_style = {"hair1",0,255,0},
 	inventory_items = {"axe", "dress"},
 	factions = {"peculiarpet"}}
 

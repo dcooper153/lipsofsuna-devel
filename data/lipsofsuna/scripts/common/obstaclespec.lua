@@ -40,5 +40,8 @@ Obstaclespec.random = function(clss, args)
 		if not cat then return end
 		return cat[math.random(#cat)]
 	end
+	if args and args.name then
+		return clss.dict_name[args.name]
+	end
 	return clss.dict_id[math.random(#clss.dict_id)]
 end

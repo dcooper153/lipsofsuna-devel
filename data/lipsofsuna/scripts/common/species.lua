@@ -56,13 +56,14 @@ Species.copy = function(orig, args)
 	self.ai_wait_allowed = orig.ai_wait_allowed
 	self.ai_wander_time = orig.ai_wander_time
 	self.dialog = orig.dialog
+	self.eye_style = orig.eye_style
 	self.gravity = orig.gravity
-	self.hair_color = orig.hair_color
 	self.hair_style = orig.hair_style
 	self.inventory_size = orig.inventory_size
 	self.mass = orig.mass
 	self.model = orig.model
 	self.skill_quota = orig.skill_quota
+	self.skin_style = orig.skin_style
 	self.speed_walk = orig.speed_walk
 	self.speed_run = orig.speed_run
 	self.tilt_bone = orig.tilt_bone
@@ -151,8 +152,8 @@ Species.new = function(clss, args)
 	copy("ai_wait_allowed", true)
 	copy("ai_wander_time", 60)
 	copy("dialog")
+	copy("eye_style")
 	copy("gravity", Vector(0, -15, 0))
-	copy("hair_color")
 	copy("hair_style")
 	copy("inventory_items", {})
 	copy("inventory_size", 0)
@@ -160,6 +161,7 @@ Species.new = function(clss, args)
 	copy("model", "aer1")
 	self.name = args.name
 	copy("skill_quota", 200)
+	copy("skin_style")
 	copy("speed_walk", 3)
 	copy("speed_run", 6)
 	copy("tilt_bone")

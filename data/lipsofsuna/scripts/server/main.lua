@@ -76,7 +76,7 @@ Voxel.make_heightmap = function(clss, args)
 			t.damage = math.floor(255 * h)
 			Voxel:set_tile{point = p, tile = t}
 			if math.random() < (args.tree_density or 0) then
-				Voxel:place_obstacle{name = "tree", point = p + Vector(0.5, 0.9 - h, 0.5)}
+				Voxel:place_obstacle{category = "tree", point = p + Vector(0.5, 0.9 - h, 0.5)}
 			elseif math.random() < (args.mushroom_density or 0) then
 				Voxel:place_obstacle{name = "mushroom", point = p + Vector(0.5, 1 - h, 0.5)}
 			end
@@ -121,7 +121,7 @@ Voxel.make_slope = function(clss, args)
 			-- Position extra objects.
 			p.y = args.point.y
 			if math.random() < (args.tree_density or 0) then
-				Voxel:place_obstacle{name = "tree", point = p + Vector(0.5, h, 0.5)}
+				Voxel:place_obstacle{category = "tree", point = p + Vector(0.5, h, 0.5)}
 			elseif math.random() < (args.mushroom_density or 0) then
 				Voxel:place_obstacle{name = "mushroom", point = p + Vector(0.5, h, 0.5)}
 			end
@@ -149,7 +149,7 @@ end
 --   <li>name: Obstacle name.</li>
 --   <li>point: Position vector, in tiles.</li></ul>
 Voxel.place_obstacle = function(clss, args)
-	local spec = Obstaclespec:find(args)
+	local spec = Obstaclespec:random(args)
 	if not spec then return end
 	Obstacle{
 		spec = spec,

@@ -249,23 +249,35 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	local type = (t == 0 and "creature") or (t == 1 and "item") or (t == 2 and "obstacle") or "object"
 	local o = Object{id = i, model = m, name = n, position = Vector(x, y, z), position_smoothing = 0.5, rotation_smoothing = 0.5, type = type}
 	-- Apply optional customizations.
-	local ok,ra,ge,hs,hc,bo,no,bu = event.packet:resume("string", "string", "string", "string", "float", "float", "float")
+	local ok,ra,ge,bo,no,bu,eye,eyer,eyeg,eyeb,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = event.packet:resume(
+		"string", "string", "float", "float", "float",
+		"string", "uint8", "uint8", "uint8",
+		"string", "uint8", "uint8", "uint8",
+		"string", "uint8", "uint8", "uint8")
 	if ok then
 		o.race = ra
 		o.gender = ge
-		o.hair_style = hs
-		o.hair_color = hc
 		o.body_scale = bo
 		o.bust_scale = bu
 		o.nose_scale = no
+		o.eye_style = eye
+		o.eye_color = {eyer / 255, eyeg / 255, eyeb / 255}
+		o.hair_style = hair
+		o.hair_color = {hairr / 255, hairg / 255, hairb / 255}
+		o.skin_style = skin
+		o.skin_color = {skinr / 255, sking / 255, skinb / 255}
 	else
 		o.race = nil
 		o.gender = nil
-		o.hair_style = nil
-		o.hair_color = nil
 		o.body_scale = nil
 		o.bust_scale = nil
 		o.nose_scale = nil
+		o.eye_style = nil
+		o.eye_color = nil
+		o.hair_style = nil
+		o.hair_color = nil
+		o.skin_style = nil
+		o.skin_color = nil
 	end
 	-- Rebuild the model.
 	o:update_model()

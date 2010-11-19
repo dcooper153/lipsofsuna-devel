@@ -7,6 +7,14 @@ Obstaclespec{
 	harvest_materials = { log = 1 }}
 
 Obstaclespec{
+	name = "rust sprig tree",
+	model = "tree2",
+	categories = {"tree"},
+	health = 100,
+	harvest_effect = "harvest1",
+	harvest_materials = { log = 1 }}
+
+Obstaclespec{
 	name = "mushroom",
 	model = "mushroom-000",
 	categories = {"reagent"},

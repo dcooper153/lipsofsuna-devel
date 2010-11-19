@@ -60,10 +60,13 @@ Object.create_character_model = function(self, args)
 			m:merge(Model:load{file = v})
 		end
 	end
-	-- TODO: Colorize hair.
 	-- Recalculate bounding box.
 	m:calculate_bounds()
 	self.model = m
+	-- Colorize materials.
+	m:edit_material{match_shader = "forward-hair", diffuse = args.hair_color}
+	m:edit_material{match_shader = "deferred-skin", diffuse = args.skin_color}
+	m:edit_material{match_texture = "eye1", diffuse = args.eye_color}
 	-- Apply custom deformations.
 	self.animated = true
 	self:animate{animation = "empty", channel = Animation.CHANNEL_CUSTOMIZE,
@@ -91,11 +94,15 @@ Object.update_model = function(self)
 			body_scale = self.body_scale,
 			bust_scale = self.bust_scale,
 			equipment = self.equipment,
+			eye_color = self.eye_color,
+			eye_style = self.eye_style,
 			gender = self.gender,
 			hair_color = self.hair_color,
 			hair_style = self.hair_style,
 			nose_scale = self.nose_scale,
-			race = self.race}
+			race = self.race,
+			skin_color = self.skin_color,
+			skin_style = self.skin_style}
 	end
 	-- Create the customization animation.
 	if spec and (spec.models or spec.tilt_bone) then
