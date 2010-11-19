@@ -817,7 +817,7 @@ class LIShapePart:
 		self.vertices = []
 		matrix = LIFormat.matrix.copy().to_3x3() * obj.matrix_world.rotation_part()
 		for v in obj.data.vertices:
-			self.vertices.append(matrix * v.co)
+			self.vertices.append(v.co * matrix)
 
 	def write(self, writer):
 		writer.write_int(len(self.vertices))
