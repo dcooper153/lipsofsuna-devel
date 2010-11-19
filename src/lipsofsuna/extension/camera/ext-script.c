@@ -119,6 +119,8 @@ static void Camera_picking_ray (LIScrArgs* args)
 		cursor.x = self->view.viewport[0] + self->view.viewport[2] / 2.0f;
 		cursor.y = self->view.viewport[1] + self->view.viewport[3] / 2.0f;
 	}
+	else
+		cursor.y = self->view.viewport[3] - cursor.y - 1;
 
 	/* Calculate ray vector. */
 	cursor.z = 0.0f;

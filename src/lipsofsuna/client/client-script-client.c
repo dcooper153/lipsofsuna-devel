@@ -195,7 +195,7 @@ static void Client_getter_cursor_pos (LIScrArgs* args)
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
 	SDL_GetMouseState (&x, &y);
-	tmp = limat_vector_init (x, client->window->mode.height - y - 1, 0.0f);
+	tmp = limat_vector_init (x, y, 0.0f);
 	liscr_args_seti_vector (args, &tmp);
 }
 
