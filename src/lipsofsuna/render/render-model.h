@@ -69,6 +69,11 @@ LIAPICALL (int, liren_model_deform, (
 	const char*      shader,
 	const LIMdlPose* pose));
 
+LIAPICALL (LIRenMaterial*, liren_model_find_material, (
+	LIRenModel* self,
+	const char* shader,
+	const char* texture));
+
 LIAPICALL (int, liren_model_intersect_ray, (
 	const LIRenModel*  self,
 	const LIMatVector* ray0,

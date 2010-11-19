@@ -49,33 +49,40 @@ struct _LIRenMaterial
 	} textures;
 };
 
-LIRenMaterial*
-liren_material_new ();
+LIAPICALL (LIRenMaterial*, liren_material_new, ());
 
-LIRenMaterial*
-liren_material_new_from_model (LIRenRender*         render,
-                               const LIMdlMaterial* material);
+LIAPICALL (LIRenMaterial*, liren_material_new_from_model, (
+	LIRenRender*         render,
+	const LIMdlMaterial* material));
 
-void
-liren_material_free (LIRenMaterial* self);
+LIAPICALL (void, liren_material_free, (
+	LIRenMaterial* self));
 
-void
-liren_material_set_flags (LIRenMaterial* self,
-                          int            flags);
+LIAPICALL (void, liren_material_set_diffuse, (
+	LIRenMaterial* self,
+	const float*   value));
 
-int
-liren_material_set_shader (LIRenMaterial* self,
-                           LIRenShader*   deferred,
-                           LIRenShader*   forward);
+LIAPICALL (void, liren_material_set_flags, (
+	LIRenMaterial* self,
+	int            flags));
 
-void
-liren_material_set_texture (LIRenMaterial* self,
-                            int            index,
-                            LIMdlTexture*  texture,
-                            LIRenImage*    image);
+LIAPICALL (int, liren_material_set_shader, (
+	LIRenMaterial* self,
+	LIRenShader*   deferred,
+	LIRenShader*   forward));
 
-int
-liren_material_set_texture_count (LIRenMaterial* self,
-                                  int            value);
+LIAPICALL (void, liren_material_set_specular, (
+	LIRenMaterial* self,
+	const float*   value));
+
+LIAPICALL (void, liren_material_set_texture, (
+	LIRenMaterial* self,
+	int            index,
+	LIMdlTexture*  texture,
+	LIRenImage*    image));
+
+LIAPICALL (int, liren_material_set_texture_count, (
+	LIRenMaterial* self,
+	int            value));
 
 #endif

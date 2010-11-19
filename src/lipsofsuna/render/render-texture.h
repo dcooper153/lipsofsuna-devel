@@ -28,7 +28,6 @@ struct _LIRenTexture
 	int id;
 	int width;
 	int height;
-	char* name;
 	GLuint texture;
 	LIMdlTextureType type;
 	LIRenImage* image;

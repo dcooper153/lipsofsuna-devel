@@ -21,8 +21,8 @@
 #include <lipsofsuna/extension.h>
 #include <lipsofsuna/client.h>
 
-#define LISCR_SCRIPT_RENDER_MODEL "RenderModel"
-#define LISCR_SCRIPT_RENDER_OBJECT "RenderObject"
+#define LIEXT_SCRIPT_RENDER_MODEL "RenderModel"
+#define LIEXT_SCRIPT_RENDER_OBJECT "RenderObject"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule

@@ -45,7 +45,7 @@ static void Object_deform_mesh (LIScrArgs* args)
 	LIRenObject* object;
 
 	/* Get render object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_RENDER_OBJECT);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER_OBJECT);
 	engobj = args->self;
 	object = liren_scene_find_object (module->scene, engobj->id);
 	if (object == NULL)
@@ -73,7 +73,7 @@ static void Object_intersect_ray (LIScrArgs* args)
 	LIRenObject* object;
 
 	/* Get render object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_RENDER_OBJECT);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER_OBJECT);
 	engobj = args->self;
 	object = liren_scene_find_object (module->scene, engobj->id);
 	if (object == NULL)
@@ -109,7 +109,7 @@ static void Object_particle_animation (LIScrArgs* args)
 	LIRenObject* object;
 
 	/* Get render object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_RENDER_OBJECT);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER_OBJECT);
 	engobj = args->self;
 	object = liren_scene_find_object (module->scene, engobj->id);
 	if (object == NULL)
@@ -135,7 +135,7 @@ static void Object_update_transparency (LIScrArgs* args)
 	LIRenObject* object;
 
 	/* Get render object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_RENDER_OBJECT);
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER_OBJECT);
 	engobj = args->self;
 	object = liren_scene_find_object (module->scene, engobj->id);
 	if (object == NULL)
@@ -152,7 +152,7 @@ void liext_script_render_object (
 	LIScrClass* self,
 	void*       data)
 {
-	liscr_class_set_userdata (self, LISCR_SCRIPT_RENDER_OBJECT, data);
+	liscr_class_set_userdata (self, LIEXT_SCRIPT_RENDER_OBJECT, data);
 	liscr_class_insert_mfunc (self, "deform_mesh", Object_deform_mesh);
 	liscr_class_insert_mfunc (self, "intersect_ray", Object_intersect_ray);
 	liscr_class_insert_mfunc (self, "particle_animation", Object_particle_animation);

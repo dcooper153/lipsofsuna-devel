@@ -146,6 +146,18 @@ void liren_material_free (
 }
 
 /**
+ * \brief Sets the diffuse color of the material.
+ * \param self Material.
+ * \param value Color in RGBA.
+ */
+void liren_material_set_diffuse (
+	LIRenMaterial* self,
+	const float*   value)
+{
+	memcpy (self->diffuse, value, 4 * sizeof (float));
+}
+
+/**
  * \brief Sets the rendering flags of the material.
  *
  * \param self Material.
@@ -181,6 +193,18 @@ int liren_material_set_shader (
 	self->shader_forward = forward;
 
 	return 1;
+}
+
+/**
+ * \brief Sets the specular color of the material.
+ * \param self Material.
+ * \param value Color in RGBA.
+ */
+void liren_material_set_specular (
+	LIRenMaterial* self,
+	const float*   value)
+{
+	memcpy (self->specular, value, 4 * sizeof (float));
 }
 
 /**

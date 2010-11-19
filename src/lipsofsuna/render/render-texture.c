@@ -27,9 +27,7 @@
 void liren_texture_init (
 	LIRenTexture* self)
 {
-	self->type = 0;
-	self->width = 0;
-	self->height = 0;
+	memset (self, 0, sizeof (LIRenTexture));
 }
 
 void liren_texture_free (
