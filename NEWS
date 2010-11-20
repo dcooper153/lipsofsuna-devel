@@ -1,3 +1,19 @@
+0.1.3
+
+ * Models: China dress, boomerang, another tree.
+ * Animations: Spell casting, ranged attack, throwing.
+ * The eye, hair, and skin colors of the character can be customized.
+ * Breast size slider and a few other body proportion adjustment widgets.
+ * Support for inventory item icons and added a couple of icons.
+ * Corpses have better physics.
+ * Animation and transparency quality are configurable via the options screen.
+ * Fixed issues that prevented the game from compiling with MingGW.
+ * Fixed networking issues in Windows by migrating to ENet.
+ * Support for running the game in a dedicated server mode.
+ * Decreased memory usage by properly swapping out inactive map sectors.
+ * Various terrain system improvements and optimizations.
+ * Buildings are broken due to ongoing terrain system changes.
+
 0.1.2
 
  * Fixed several memory leaks.
