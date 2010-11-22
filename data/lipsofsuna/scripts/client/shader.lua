@@ -57,7 +57,7 @@ float los_light_diffuse(in vec3 coord, in vec3 normal)
 Shader.los_light_specular = [[
 float los_light_specular(in vec3 coord, in vec3 normal, in float shininess)
 {
-	vec3 refl = reflect(normalize(coord), normal);
+	vec3 refl = reflect(-normalize(coord), normal);
 	float coeff = max(0.0, dot(normal, refl));
 	return pow(coeff, shininess);
 }]]

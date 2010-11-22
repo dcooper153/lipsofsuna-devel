@@ -128,7 +128,13 @@ liren_render_free (LIRenRender* self)
 		lisys_free (self->immediate.buffer);
 	}
 	lisys_free (self->datadir);
-	lisys_free (self->context);
+
+	if (self->context != NULL)
+	{
+		liren_uniforms_clear (&self->context->uniforms);
+		lisys_free (self->context);
+	}
+
 	lisys_free (self);
 }
 
@@ -331,6 +337,7 @@ private_init_resources (LIRenRender* self,
 	if (self->context == NULL)
 		return 0;
 	self->context->render = self;
+	liren_uniforms_init (&self->context->uniforms);
 	liren_context_init (self->context);
 
 	/* Initialize image dictionary. */
@@ -379,10 +386,12 @@ private_init_resources (LIRenRender* self,
 		}
 	}
 	glGenTextures (1, &self->helpers.noise);
+	glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_NOISE_TEXTURE);
 	glBindTexture (GL_TEXTURE_2D, self->helpers.noise);
 	glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glActiveTexture (GL_TEXTURE0);
 	lisys_free (pixels);
 
 	/* Initialize unit quad buffer. */

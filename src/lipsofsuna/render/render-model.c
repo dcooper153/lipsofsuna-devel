@@ -167,7 +167,7 @@ int liren_model_deform (
 	liren_context_bind (context);
 	liren_buffer_texture_init (&tmp, data, count * sizeof (GLfloat));
 	lisys_free (data);
-	glActiveTexture (GL_TEXTURE0);
+	glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_BUFFER_TEXTURE);
 	glBindTexture (GL_TEXTURE_BUFFER, tmp.texture);
 	liren_mesh_deform (&self->mesh);
 	liren_buffer_texture_clear (&tmp);

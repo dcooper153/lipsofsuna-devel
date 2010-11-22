@@ -10,12 +10,10 @@ Bloom.init = function(clss)
 	clss:compile_filter_kernel()
 	clss.shader_horz = Shader{
 		name = "postprocess-horz-hdr",
-		config = clss.code_config,
 		vertex = clss.code_vertex,
 		fragment = clss:code_fragment(true)}
 	clss.shader_vert = Shader{
 		name = "postprocess-vert-hdr",
-		config = clss.code_config,
 		vertex = clss.code_vertex,
 		fragment = clss:code_fragment(false)}
 end
@@ -25,11 +23,9 @@ end
 Bloom.compile = function(clss)
 	clss:compile_filter_kernel()
 	clss.shader_horz:compile{
-		config = clss.code_config,
 		vertex = clss.code_vertex,
 		fragment = clss:code_fragment(true)}
 	clss.shader_vert:compile{
-		config = clss.code_config,
 		vertex = clss.code_vertex,
 		fragment = clss:code_fragment(false)}
 end
@@ -66,10 +62,6 @@ end
 
 ------------------------------------------------------------------------------
 
-Bloom.code_config = [[
-uniform uni_param PARAM0
-uniform uni_texturemap DIFFUSETEXTURE0]]
-
 Bloom.code_vertex = [[
 out vec2 var_texcoord;
 void main()
@@ -81,8 +73,6 @@ void main()
 Bloom.code_fragment = function(clss, horz)
 return [[
 in vec2 var_texcoord;
-uniform vec4 uni_param;
-uniform sampler2D uni_texturemap;
 const float bloom_exposure = ]] .. clss.exposure .. [[;
 const float bloom_luminance = ]] .. clss.luminance .. [[;
 float los_postproc_exposure(vec3 color)
@@ -101,15 +91,15 @@ vec4 los_postproc_bloom(vec2 dt)
 	vec3 bloom = vec3(0.0);
 	for(i = 0 ; i < w ; i++)
 	{
-		vec3 sample = texture2D(uni_texturemap, var_texcoord + float(i - r) * dt).rgb;
+		vec3 sample = texture2D(LOS_diffuse_texture_0, var_texcoord + float(i - r) * dt).rgb;
 		bloom += sample * kernel[i] * los_postproc_exposure(sample);
 	}
 	return vec4(bloom, 1.0);
 }
 void main()
 {
-	vec4 bloom = los_postproc_bloom(uni_param.]] .. (horz and "xw" or "wy") .. [[);
-	vec4 color = texture(uni_texturemap, var_texcoord);
+	vec4 bloom = los_postproc_bloom(LOS.material_param_0.]] .. (horz and "xw" or "wy") .. [[);
+	vec4 color = texture(LOS_diffuse_texture_0, var_texcoord);
 	gl_FragColor = color + bloom;
 }]]
 end

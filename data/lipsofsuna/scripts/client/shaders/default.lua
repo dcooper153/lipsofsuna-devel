@@ -1,46 +1,31 @@
 Shader{
 	name = "deferred-default",
-	config = [[
-uniform uni_materialdiffuse MATERIALDIFFUSE
-uniform uni_materialspecular MATERIALSPECULAR
-uniform uni_materialshininess MATERIALSHININESS
-uniform uni_matrixmodelview MATRIXMODELVIEW
-uniform uni_matrixnormal MATRIXNORMAL
-uniform uni_matrixprojection MATRIXPROJECTION
-uniform uni_texturemap[0] DIFFUSETEXTURE0]],
 
 	vertex = [[
 out vec3 var_normal;
 out vec2 var_texcoord;
-uniform mat4 uni_matrixmodelview;
-uniform mat3 uni_matrixnormal;
-uniform mat4 uni_matrixprojection;
 void main()
 {
-	vec4 tmp = uni_matrixmodelview * vec4(LOS_coord,1.0);
-	var_normal = uni_matrixnormal * LOS_normal;
+	vec4 tmp = LOS.matrix_modelview * vec4(LOS_coord,1.0);
+	var_normal = LOS.matrix_normal * LOS_normal;
 	var_texcoord = LOS_texcoord;
-	gl_Position = uni_matrixprojection * tmp;
+	gl_Position = LOS.matrix_projection * tmp;
 }]],
 
 	fragment = [[
 in vec3 var_normal;
 in vec2 var_texcoord;
-uniform vec4 uni_materialdiffuse;
-uniform vec4 uni_materialspecular;
-uniform float uni_materialshininess;
-uniform sampler2D uni_texturemap[1];
 void main()
 {
 	vec3 normal = normalize(var_normal);
-	vec4 diffuse = texture(uni_texturemap[0], var_texcoord);
+	vec4 diffuse = texture(LOS_diffuse_texture_0, var_texcoord);
 	if(diffuse.a < 0.5)
 		discard;
 	/* Diffuse. */
-	gl_FragData[0] = uni_materialdiffuse * diffuse;
+	gl_FragData[0] = LOS.material_diffuse * diffuse;
 	/* Specular. */
-	gl_FragData[1].rgb = uni_materialspecular.xyz * uni_materialspecular.a;
-	gl_FragData[1].a = uni_materialshininess / 128.0;
+	gl_FragData[1].rgb = LOS.material_specular.xyz * LOS.material_specular.a;
+	gl_FragData[1].a = LOS.material_shininess / 128.0;
 	/* Normal. */
 	gl_FragData[2].xyz = 0.5 * normal + vec3(0.5);
 }]]}

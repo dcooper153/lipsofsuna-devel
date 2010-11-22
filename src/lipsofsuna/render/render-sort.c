@@ -140,27 +140,58 @@ int liren_sort_add_faces (
 	LIMatVector diff;
 	LIMatVector eye;
 
-	/* Resize the buffer if necessary. */
-	if (!private_resize_faces (self, self->faces.count + count / 3))
-		return 0;
-
 	/* Calculate camera position. */
 	mat = limat_matrix_invert (self->modelview);
 	eye = limat_matrix_transform (mat, limat_vector_init (0.0f, 0.0f, 0.0f));
 
-	/* Add each face of the group. */
-	for (i = 0, n = self->faces.count ; i < count / 3 ; i++, n++)
+	/* Add the whole group or individual faces depending on material settings. */
+	if (material->flags & LIREN_MATERIAL_FLAG_SORTFACES)
 	{
-		/* Append the face to the buffer. */
-		self->faces.array[n].type = LIREN_SORT_TYPE_FACE;
-		self->faces.array[n].face.index = index + 3 * i;
-		self->faces.array[n].face.bounds = *bounds;
-		self->faces.array[n].face.matrix = *matrix;
-		self->faces.array[n].face.mesh = mesh;
-		self->faces.array[n].face.material = material;
+		/* Resize the buffer if necessary. */
+		if (!private_resize_faces (self, self->faces.count + count / 3))
+			return 0;
 
-		/* Calculate the center of the triangle. */
-		center = limat_matrix_transform (*matrix, face_sort_coords[i]);
+		/* Add each face of the group. */
+		for (i = 0, n = self->faces.count ; i < count / 3 ; i++, n++)
+		{
+			/* Append the face to the buffer. */
+			self->faces.array[n].type = LIREN_SORT_TYPE_FACE;
+			self->faces.array[n].face.index = index + 3 * i;
+			self->faces.array[n].face.bounds = *bounds;
+			self->faces.array[n].face.matrix = *matrix;
+			self->faces.array[n].face.mesh = mesh;
+			self->faces.array[n].face.material = material;
+
+			/* Calculate the center of the triangle. */
+			center = limat_matrix_transform (*matrix, face_sort_coords[i]);
+
+			/* Calculate bucket index based on distance to camera. */
+			/* TODO: Would be better to use far plane distance here? */
+			/* TODO: Non-linear mapping might work better for details closer to the camera? */
+			diff = limat_vector_subtract (center, eye);
+			dist = limat_vector_get_length (diff);
+			bucket = dist / 50.0f * (self->buckets.count - 1);
+			bucket = LIMAT_CLAMP (bucket, 0, self->buckets.count - 1);
+
+			/* Insert to the depth bucket. */
+			self->faces.array[n].next = self->buckets.array[bucket];
+			self->buckets.array[bucket] = self->faces.array + n;
+			self->faces.count++;
+		}
+	}
+	else
+	{
+		/* Resize the buffer if necessary. */
+		if (!private_resize_faces (self, self->faces.count + 1))
+			return 0;
+
+		/* Calculate the center of the group. */
+		center = limat_vector_init (0.0f, 0.0f, 0.0f);
+		for (i = 0 ; i < count / 3 ; i++)
+		{
+			center = limat_vector_multiply (limat_vector_add (center,
+				limat_matrix_transform (*matrix, face_sort_coords[i])), 1.0f / count);
+		}
 
 		/* Calculate bucket index based on distance to camera. */
 		/* TODO: Would be better to use far plane distance here? */
@@ -170,8 +201,16 @@ int liren_sort_add_faces (
 		bucket = dist / 50.0f * (self->buckets.count - 1);
 		bucket = LIMAT_CLAMP (bucket, 0, self->buckets.count - 1);
 
-		/* Insert to the depth bucket. */
+		/* Add the whole group to the depth bucket. */
+		n = self->faces.count;
 		self->faces.array[n].next = self->buckets.array[bucket];
+		self->faces.array[n].type = LIREN_SORT_TYPE_GROUP;
+		self->faces.array[n].group.bounds = *bounds;
+		self->faces.array[n].group.matrix = *matrix;
+		self->faces.array[n].group.index = index;
+		self->faces.array[n].group.count = count;
+		self->faces.array[n].group.mesh = mesh;
+		self->faces.array[n].group.material = material;
 		self->buckets.array[bucket] = self->faces.array + n;
 		self->faces.count++;
 	}

@@ -26,6 +26,7 @@
 #include "render-scene.h"
 #include "render-texture.h"
 #include "render-types.h"
+#include "render-uniforms.h"
 
 typedef struct _LIRenContextTexture LIRenContextTexture;
 struct _LIRenContextTexture
@@ -44,6 +45,8 @@ struct _LIRenContext
 	LIRenScene* scene;
 	LIRenShader* shader;
 	LIMatFrustum frustum;
+	LIRenUniforms uniforms;
+	GLuint shadow_texture;
 	struct
 	{
 		int enable;
@@ -56,14 +59,7 @@ struct _LIRenContext
 		unsigned int buffer : 1;
 		unsigned int cull : 1;
 		unsigned int depth : 1;
-		unsigned int lights : 1;
-		unsigned int material : 1;
-		unsigned int matrix_model : 1;
-		unsigned int matrix_projection : 1;
-		unsigned int matrix_view : 1;
 		unsigned int shader : 1;
-		unsigned int textures : 1;
-		unsigned int uniforms : 1;
 	} changed;
 	struct
 	{
@@ -76,13 +72,6 @@ struct _LIRenContext
 		int enable_write;
 		int depth_func;
 	} depth;
-	struct
-	{
-		float parameters[4];
-		float shininess;
-		float diffuse[4];
-		float specular[4];
-	} material;
 	struct
 	{
 		LIMatMatrix model;

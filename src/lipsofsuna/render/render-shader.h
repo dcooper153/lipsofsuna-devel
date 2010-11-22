@@ -34,21 +34,11 @@ struct _LIRenShader
 	GLuint geometry;
 	GLuint fragment;
 	LIRenRender* render;
-	struct
-	{
-		int count;
-	} lights;
-	struct
-	{
-		int count;
-		LIRenUniform* array;
-	} uniforms;
 };
 
 LIAPICALL (LIRenShader*, liren_shader_new, (
 	LIRenRender* render,
 	const char*  name,
-	const char*  config,
 	const char*  vertex,
 	const char*  geometry,
 	const char*  fragment,
@@ -59,7 +49,6 @@ LIAPICALL (void, liren_shader_free, (
 
 LIAPICALL (int, liren_shader_compile, (
 	LIRenShader* self,
-	const char*  config,
 	const char*  vertex,
 	const char*  geometry,
 	const char*  fragment,

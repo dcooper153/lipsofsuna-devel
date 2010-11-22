@@ -49,6 +49,15 @@ struct _LIRenLight
 	LIRenScene* scene;
 	struct
 	{
+		float pos_world[3];
+		float pos_view[3];
+		float dir_world[3];
+		float dir_view[3];
+		float spot[3];
+		LIMatMatrix matrix;
+	} cache;
+	struct
+	{
 		GLuint fbo;
 		GLuint map;
 	} shadow;
@@ -79,6 +88,10 @@ LIAPICALL (int, liren_light_compare, (
 
 LIAPICALL (void, liren_light_update, (
 	LIRenLight* self));
+
+LIAPICALL (void, liren_light_update_cache, (
+	LIRenLight*   self,
+	LIRenContext* context));
 
 LIAPICALL (void, liren_light_update_projection, (
 	LIRenLight* self));

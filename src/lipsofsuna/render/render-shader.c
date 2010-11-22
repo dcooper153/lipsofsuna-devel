@@ -39,24 +39,12 @@ static int private_check_link (
 static void private_clear (
 	LIRenShader* self);
 
-static void private_init_uniforms (
-	LIRenShader* self);
-
-static int private_read_config (
-	LIRenShader* self,
-	LIArcReader* reader);
-
-static int private_uniform_value (
-	LIRenShader* self,
-	const char*  value);
-
 /****************************************************************************/
 
 /**
  * \brief Creates a new shader program.
  * \param render Renderer.
  * \param name Unique name.
- * \param config Shader configuration code.
  * \param vertex Vertex shader code.
  * \param geometry Geometry shader code or NULL.
  * \param fragment Fragment shader code.
@@ -66,7 +54,6 @@ static int private_uniform_value (
 LIRenShader* liren_shader_new (
 	LIRenRender* render,
 	const char*  name,
-	const char*  config,
 	const char*  vertex,
 	const char*  geometry,
 	const char*  fragment,
@@ -87,7 +74,7 @@ LIRenShader* liren_shader_new (
 	}
 
 	/* Compile the shader. */
-	if (!liren_shader_compile (self, config, vertex, geometry, fragment, feedback))
+	if (!liren_shader_compile (self, vertex, geometry, fragment, feedback))
 	{
 		liren_shader_free (self);
 		return NULL;
@@ -110,17 +97,12 @@ LIRenShader* liren_shader_new (
 void liren_shader_free (
 	LIRenShader* self)
 {
-	int i;
-
 	if (self->name != NULL)
 		lialg_strdic_remove (self->render->shaders, self->name);
 	glDeleteProgram (self->program);
 	glDeleteShader (self->vertex);
 	glDeleteShader (self->geometry);
 	glDeleteShader (self->fragment);
-	for (i = 0 ; i < self->uniforms.count ; i++)
-		lisys_free (self->uniforms.array[i].name);
-	lisys_free (self->uniforms.array);
 	lisys_free (self->name);
 	lisys_free (self);
 }
@@ -128,7 +110,6 @@ void liren_shader_free (
 /**
  * \brief Recompiles the shader out of new code.
  * \param self Shader.
- * \param config Shader configuration code.
  * \param vertex Vertex shader code.
  * \param geometry Geometry shader code or NULL.
  * \param fragment Fragment shader code.
@@ -137,15 +118,28 @@ void liren_shader_free (
  */
 int liren_shader_compile (
 	LIRenShader* self,
-	const char*  config,
 	const char*  vertex,
 	const char*  geometry,
 	const char*  fragment,
 	int          feedback)
 {
+	int i;
 	GLint restore;
+	GLint binding;
 	GLint lengths[3];
+	GLint uniforms;
 	const GLchar* strings[3];
+	const GLchar* samplers[8] =
+	{
+		"LOS_diffuse_texture_0",
+		"LOS_diffuse_texture_1",
+		"LOS_diffuse_texture_2",
+		"LOS_diffuse_texture_3",
+		"LOS_buffer_texture",
+		"LOS_cube_texture",
+		"LOS_noise_texture",
+		"LOS_shadow_texture"
+	};
 	const GLchar* feedbacks[4] =
 	{
 		"LOS_out_texcoord",
@@ -157,12 +151,38 @@ int liren_shader_compile (
 	{
 		/* Common */
 		"layout(shared) uniform LOSDATA\n{\n"
+		"	vec4 light_ambient;\n"
+		"	vec4 light_diffuse;\n"
 		"	vec3 light_direction;\n"
+		"	vec3 light_direction_premult;\n"
+		"	vec3 light_equation;\n"
+		"	mat4 light_matrix;\n"
+		"	vec3 light_position;\n"
+		"	vec3 light_position_premult;\n"
+		"	vec4 light_specular;\n"
+		"	vec3 light_spot;\n"
+		"	float light_type;\n"
 		"	vec4 material_diffuse;\n"
-		"	mat4 model_matrix;\n"
-		"	mat3 normal_matrix;\n"
-		"	mat4 projection_matrix;\n"
-		"} LOS;\n",
+		"	vec4 material_param_0;\n"
+		"	float material_shininess;\n"
+		"	vec4 material_specular;\n"
+		"	mat4 matrix_model;\n"
+		"	mat4 matrix_modelview;\n"
+		"	mat4 matrix_modelview_inverse;\n"
+		"	mat4 matrix_modelview_projection;\n"
+		"	mat3 matrix_normal;\n"
+		"	mat4 matrix_projection;\n"
+		"	mat4 matrix_projection_inverse;\n"
+		"	float time;\n"
+		"} LOS;\n"
+		"uniform sampler2D LOS_diffuse_texture_0;\n"
+		"uniform sampler2D LOS_diffuse_texture_1;\n"
+		"uniform sampler2D LOS_diffuse_texture_2;\n"
+		"uniform sampler2D LOS_diffuse_texture_3;\n"
+		"uniform samplerBuffer LOS_buffer_texture;\n"
+		"uniform samplerCube LOS_cube_texture;\n"
+		"uniform sampler2D LOS_noise_texture;\n"
+		"uniform sampler2DShadow LOS_shadow_texture;\n",
 		/* Vertex */
 		"#version 150\n"
 		"in vec3 LOS_coord;\n"
@@ -179,7 +199,6 @@ int liren_shader_compile (
 		/* Fragment */
 		"#version 150\n"
 	};
-	LIArcReader* reader;
 	LIRenShader tmp;
 
 	/* Initialize a temporary struct so that we don't overwrite
@@ -187,18 +206,6 @@ int liren_shader_compile (
 	memset (&tmp, 0, sizeof (LIRenShader));
 	tmp.render = self->render;
 	tmp.name = self->name;
-
-	/* Parse configuration. */
-	reader = liarc_reader_new (config, strlen (config));
-	if (reader == NULL)
-		return 0;
-	if (!private_read_config (&tmp, reader))
-	{
-		private_clear (&tmp);
-		liarc_reader_free (reader);
-		return 0;
-	}
-	liarc_reader_free (reader);
 
 	/* Create shader objects. */
 	tmp.vertex = glCreateShader (GL_VERTEX_SHADER);
@@ -285,10 +292,27 @@ int liren_shader_compile (
 		return 0;
 	}
 
-	/* Initialize uniforms. */
+	/* Bind the uniform buffer. */
+	/* All shaders share the same uniform block so that we don't need to
+	   reset our uniform data every time the shader is changed. */
+	uniforms = glGetUniformBlockIndex (tmp.program, "LOSDATA");
+	if (uniforms != GL_INVALID_INDEX)
+	{
+		glUniformBlockBinding (tmp.program, uniforms, 0);
+		liren_uniforms_setup (&self->render->context->uniforms, tmp.program);
+	}
+
+	/* Bind samplers to standard indices. */
+	/* All shaders use the same texture unit layout so that we don't need
+	   to rebind textures every time the shader is changed. */
 	glGetIntegerv (GL_CURRENT_PROGRAM, &restore);
 	glUseProgram (tmp.program);
-	private_init_uniforms (&tmp);
+	for (i = 0 ; i < sizeof (samplers) / sizeof (*samplers) ; i++)
+	{
+		binding = glGetUniformLocation (tmp.program, samplers[i]);
+		if (binding != GL_INVALID_INDEX)
+			glUniform1i (binding, i);
+	}
 	glUseProgram (restore);
 
 	/* Replace the old program with the new one. */
@@ -377,247 +401,10 @@ static int private_check_link (
 static void private_clear (
 	LIRenShader* self)
 {
-	int i;
-
-	for (i = 0 ; i < self->uniforms.count ; i++)
-		lisys_free (self->uniforms.array[i].name);
-	lisys_free (self->uniforms.array);
 	glDeleteProgram (self->program);
 	glDeleteShader (self->vertex);
 	glDeleteShader (self->geometry);
 	glDeleteShader (self->fragment);
-}
-
-static void private_init_uniforms (
-	LIRenShader* self)
-{
-	int i;
-	int sampler = 0;
-	LIRenUniform* uniform;
-
-	for (i = 0 ; i < self->uniforms.count ; i++)
-	{
-		uniform = self->uniforms.array + i;
-		uniform->binding = glGetUniformLocationARB (self->program, uniform->name);
-		if (liren_uniform_get_sampler (uniform))
-		{
-			uniform->sampler = sampler++;
-			glUniform1iARB (uniform->binding, uniform->sampler);
-		}
-	}
-}
-
-static int private_read_config (
-	LIRenShader* self,
-	LIArcReader* reader)
-{
-	char* line;
-	char* name;
-	char* ptr;
-	char* value;
-	LIRenUniform* uniform;
-
-	/* Parse options. */
-	while (!liarc_reader_check_end (reader))
-	{
-		if (!liarc_reader_get_text (reader, "\n", &line))
-			return 0;
-		if (!strlen (line))
-		{
-			lisys_free (line);
-			continue;
-		}
-		if (!strncmp (line, "light-count ", 12))
-		{
-			self->lights.count = atoi (line + 12);
-			lisys_free (line);
-			if (self->lights.count < 0 ||
-			    self->lights.count >= 8)
-				return 0;
-		}
-		else if (!strncmp (line, "uniform ", 8))
-		{
-			/* Separate fields. */
-			for (name = line + 8 ; *name != '\0' && isspace (*name) ; name++) {}
-			for (ptr = name ; *ptr != '\0' && !isspace (*ptr) ; ptr++) {}
-			if (*ptr != '\0')
-			{
-				*ptr = '\0';
-				ptr++;
-			}
-			for (value = ptr ; *value != '\0' && isspace (*value) ; value++) {}
-			for (ptr = value ; *ptr != '\0' && !isspace (*ptr) ; ptr++) {}
-			if (*ptr != '\0')
-			{
-				*ptr = '\0';
-				ptr++;
-			}
-
-			/* Resize array. */
-			uniform = lisys_realloc (self->uniforms.array, (self->uniforms.count + 1) * sizeof (LIRenUniform));
-			if (uniform == NULL)
-			{
-				lisys_free (line);
-				return 0;
-			}
-			self->uniforms.array = uniform;
-			uniform += self->uniforms.count;
-
-			/* Initialize uniform. */
-			uniform->binding = 0;
-			uniform->value = private_uniform_value (self, value);
-			uniform->name = listr_dup (name);
-			if (uniform->name == NULL)
-			{
-				lisys_free (line);
-				return 0;
-			}
-			self->uniforms.count++;
-			lisys_free (line);
-		}
-		else
-		{
-			lisys_error_set (EINVAL, NULL);
-			lisys_free (line);
-			return 0;
-		}
-	}
-
-	return 1;
-}
-
-static int private_uniform_value (
-	LIRenShader* self,
-	const char*  value)
-{
-	int index;
-
-	if (!strcmp (value, "NONE"))
-		return LIREN_UNIFORM_NONE;
-	if (!strncmp (value, "CUBETEXTURE", 11))
-	{
-		index = atoi (value + 11);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_CUBETEXTURE0 + index;
-	}
-	if (!strncmp (value, "DIFFUSETEXTURE", 14))
-	{
-		index = atoi (value + 14);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_DIFFUSETEXTURE0 + index;
-	}
-	if (!strncmp (value, "LIGHTAMBIENT", 12))
-	{
-		index = atoi (value + 12);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_LIGHTAMBIENT0 + index;
-	}
-	if (!strncmp (value, "LIGHTDIFFUSE", 12))
-	{
-		index = atoi (value + 12);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_LIGHTDIFFUSE0 + index;
-	}
-	if (!strncmp (value, "LIGHTDIRECTIONPREMULT", 21))
-	{
-		index = atoi (value + 20);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_LIGHTDIRECTIONPREMULT0 + index;
-	}
-	if (!strncmp (value, "LIGHTDIRECTION", 14))
-	{
-		index = atoi (value + 13);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_LIGHTDIRECTION0 + index;
-	}
-	if (!strncmp (value, "LIGHTEQUATION", 13))
-	{
-		index = atoi (value + 13);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_LIGHTEQUATION0 + index;
-	}
-	if (!strncmp (value, "LIGHTMATRIX", 11))
-	{
-		index = atoi (value + 11);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_LIGHTMATRIX0 + index;
-	}
-	if (!strncmp (value, "LIGHTPOSITIONPREMULT", 20))
-	{
-		index = atoi (value + 20);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_LIGHTPOSITIONPREMULT0 + index;
-	}
-	if (!strncmp (value, "LIGHTPOSITION", 13))
-	{
-		index = atoi (value + 13);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_LIGHTPOSITION0 + index;
-	}
-	if (!strncmp (value, "LIGHTSPECULAR", 13))
-	{
-		index = atoi (value + 13);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_LIGHTSPECULAR0 + index;
-	}
-	if (!strncmp (value, "LIGHTSPOT", 9))
-	{
-		index = atoi (value + 9);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_LIGHTSPOT0 + index;
-	}
-	if (!strncmp (value, "LIGHTTYPE", 9))
-	{
-		index = atoi (value + 9);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_LIGHTTYPE0 + index;
-	}
-	if (!strcmp (value, "MATERIALDIFFUSE"))
-		return LIREN_UNIFORM_MATERIALDIFFUSE;
-	if (!strcmp (value, "MATERIALSHININESS"))
-		return LIREN_UNIFORM_MATERIALSHININESS;
-	if (!strcmp (value, "MATERIALSPECULAR"))
-		return LIREN_UNIFORM_MATERIALSPECULAR;
-	if (!strcmp (value, "MATRIXMODEL"))
-		return LIREN_UNIFORM_MATRIXMODEL;
-	if (!strcmp (value, "MATRIXMODELVIEW"))
-		return LIREN_UNIFORM_MATRIXMODELVIEW;
-	if (!strcmp (value, "MATRIXMODELVIEWINVERSE"))
-		return LIREN_UNIFORM_MATRIXMODELVIEWINVERSE;
-	if (!strcmp (value, "MATRIXNORMAL"))
-		return LIREN_UNIFORM_MATRIXNORMAL;
-	if (!strcmp (value, "MATRIXPROJECTION"))
-		return LIREN_UNIFORM_MATRIXPROJECTION;
-	if (!strcmp (value, "MATRIXPROJECTIONINVERSE"))
-		return LIREN_UNIFORM_MATRIXPROJECTIONINVERSE;
-	if (!strcmp (value, "NOISETEXTURE"))
-		return LIREN_UNIFORM_NOISETEXTURE;
-	if (!strcmp (value, "PARAM0"))
-		return LIREN_UNIFORM_PARAM0;
-	if (!strncmp (value, "SHADOWTEXTURE", 13))
-	{
-		index = atoi (value + 13);
-		if (index < 0 || index > 9)
-			return LIREN_UNIFORM_NONE;
-		return LIREN_UNIFORM_SHADOWTEXTURE0 + index;
-	}
-	if (!strcmp (value, "TIME"))
-		return LIREN_UNIFORM_TIME;
-
-	return LIREN_UNIFORM_NONE;
 }
 
 /** @} */

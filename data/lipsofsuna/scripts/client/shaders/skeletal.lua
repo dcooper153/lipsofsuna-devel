@@ -1,14 +1,11 @@
 Shader{
 	name = "skeletal",
 	transform_feedback = true,
-	config = [[
-uniform uni_bones DIFFUSETEXTURE0]],
 
 	vertex = [[
 out vec3 geo_coord;
 out vec3 geo_normal;
 out vec2 geo_texcoord;
-uniform samplerBuffer uni_bones;
 vec4 los_quat_mul(in vec4 a, in vec4 b)
 {
 	return vec4(
@@ -37,9 +34,9 @@ void main()
 	for (i = 0 ; i < 8 ; i++)
 	{
 		int offset = 3 * bone[i];
-		vec3 restpos = texelFetch(uni_bones, offset).xyz;
-		vec4 posepos = texelFetch(uni_bones, offset + 1);
-		vec4 poserot = texelFetch(uni_bones, offset + 2);
+		vec3 restpos = texelFetch(LOS_buffer_texture, offset).xyz;
+		vec4 posepos = texelFetch(LOS_buffer_texture, offset + 1);
+		vec4 poserot = texelFetch(LOS_buffer_texture, offset + 2);
 		vtx += weight[i] * (los_quat_xform(poserot, (LOS_coord - restpos) * posepos.w) + posepos.xyz);
 		nml += weight[i] * (los_quat_xform(poserot, LOS_normal));
 	}

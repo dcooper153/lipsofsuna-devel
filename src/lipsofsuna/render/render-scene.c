@@ -145,6 +145,7 @@ liren_scene_render_begin (LIRenScene*    self,
                           LIMatMatrix*   projection,
                           LIMatFrustum*  frustum)
 {
+	LIAlgPtrdicIter iter;
 	LIRenContext* context;
 
 	lisys_assert (modelview != NULL);
@@ -167,6 +168,10 @@ liren_scene_render_begin (LIRenScene*    self,
 	/* Depth sort scene. */
 	if (!private_sort_scene (self, context))
 		return 0;
+
+	/* Precalculate light settings. */
+	LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
+		liren_light_update_cache (iter.value, context);
 
 	/* Reset profiling. */
 #ifdef LIREN_ENABLE_PROFILING
@@ -407,10 +412,12 @@ void liren_scene_render_forward_transparent (
 	LIRenScene* self)
 {
 	int i;
+	int pass;
 	LIAlgPtrdicIter iter;
 	LIMatAabb aabb;
 	LIMatMatrix identity;
 	LIMatVector position;
+	LIRenContext* context;
 	LIRenLight* light;
 	LIRenSortface* face;
 
@@ -419,55 +426,96 @@ void liren_scene_render_forward_transparent (
 		return;
 
 	/* Change render state. */
-	glBindFramebufferEXT (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[0]);
+	glBindFramebuffer (GL_FRAMEBUFFER, self->state.framebuffer->postproc_fbo[0]);
 	liren_context_set_cull (self->state.context, 0, GL_CCW);
 	liren_context_set_depth (self->state.context, 1, 0, GL_LEQUAL);
 	identity = limat_matrix_identity ();
+	context = self->state.context;
 
 	/* Render transparent faces to post-processing buffer. */
 	for (i = self->sort->buckets.count - 1 ; i >= 0 ; i--)
 	{
 		/* Render faces with lighting. */
 		/* FIXME: Looping through all lights and faces is slow. */
-		LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
-		{
-			light = iter.value;
-			if (light->enabled)
-			{
-				for (face = self->sort->buckets.array[i] ; face != NULL ; face = face->next)
-				{
-					if (face->type != LIREN_SORT_TYPE_FACE)
-						continue;
-					liren_light_get_bounds (light, &aabb);
-					if (!limat_aabb_intersects_aabb (&aabb, &face->face.bounds))
-						continue;
-					liren_context_set_blend (self->state.context, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-					liren_context_set_light (self->state.context, light);
-					liren_draw_default (self->state.context, face->face.index, 3,
-						&face->face.matrix, face->face.material, face->face.mesh);
-				}
-			}
-		}
-
-		/* Render particles without lighting. */
 		for (face = self->sort->buckets.array[i] ; face != NULL ; face = face->next)
 		{
-			if (face->type != LIREN_SORT_TYPE_PARTICLE)
-				continue;
-			liren_context_set_blend (self->state.context, 1, GL_SRC_ALPHA, GL_ONE);
-			liren_context_set_light (self->state.context, NULL);
-			liren_context_set_modelmatrix (self->state.context, &identity);
-			liren_context_set_shader (self->state.context, face->particle.shader);
-			liren_context_set_textures_raw (self->state.context, &face->particle.image->texture->texture, 1);
-			liren_context_bind (self->state.context);
-			glBegin (GL_TRIANGLES);
-			glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, face->particle.diffuse[3], face->particle.size);
-			position = face->particle.position;
-			glVertexAttrib3fv (LIREN_ATTRIBUTE_NORMAL, face->particle.diffuse);
-			glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
-			glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
-			glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
-			glEnd ();
+			if (face->type == LIREN_SORT_TYPE_FACE)
+			{
+				/* Render a single transparent triangle. */
+				pass = 0;
+				LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
+				{
+					light = iter.value;
+					if (light->enabled)
+					{
+						liren_light_get_bounds (light, &aabb);
+						if (!limat_aabb_intersects_aabb (&aabb, &face->face.bounds))
+							continue;
+						if (!pass)
+						{
+							liren_context_set_blend (context, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+							liren_context_set_material (context, face->face.material);
+							liren_context_set_material_shader (context, face->face.material);
+							liren_context_set_modelmatrix (context, &face->face.matrix);
+							liren_context_set_textures (context, face->face.material->textures.array, face->face.material->textures.count);
+							liren_context_set_mesh (context, face->face.mesh);
+						}
+						else if (pass == 1)
+							liren_context_set_blend (self->state.context, 1, GL_SRC_ALPHA, GL_ONE);
+						liren_context_set_light (self->state.context, light);
+						liren_context_bind (context);
+						liren_context_render_array (context, GL_TRIANGLES, face->face.index, 3);
+						pass++;
+					}
+				}
+			}
+			else if (face->type == LIREN_SORT_TYPE_GROUP)
+			{
+				/* Render a group of transparent triangles. */
+				pass = 0;
+				LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
+				{
+					light = iter.value;
+					if (light->enabled)
+					{
+						liren_light_get_bounds (light, &aabb);
+						if (!limat_aabb_intersects_aabb (&aabb, &face->group.bounds))
+							continue;
+						if (!pass)
+						{
+							liren_context_set_blend (context, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+							liren_context_set_material (context, face->group.material);
+							liren_context_set_material_shader (context, face->group.material);
+							liren_context_set_modelmatrix (context, &face->group.matrix);
+							liren_context_set_textures (context, face->group.material->textures.array, face->group.material->textures.count);
+							liren_context_set_mesh (context, face->group.mesh);
+						}
+						else if (pass == 1)
+							liren_context_set_blend (self->state.context, 1, GL_SRC_ALPHA, GL_ONE);
+						liren_context_set_light (self->state.context, light);
+						liren_context_bind (context);
+						liren_context_render_array (context, GL_TRIANGLES, face->group.index, face->group.count);
+						pass++;
+					}
+				}
+			}
+			else if (face->type == LIREN_SORT_TYPE_PARTICLE)
+			{
+				/* Render a particle. */
+				liren_context_set_blend (self->state.context, 1, GL_SRC_ALPHA, GL_ONE);
+				liren_context_set_modelmatrix (self->state.context, &identity);
+				liren_context_set_shader (self->state.context, face->particle.shader);
+				liren_context_set_textures_raw (self->state.context, &face->particle.image->texture->texture, 1);
+				liren_context_bind (self->state.context);
+				glBegin (GL_TRIANGLES);
+				glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, face->particle.diffuse[3], face->particle.size);
+				position = face->particle.position;
+				glVertexAttrib3fv (LIREN_ATTRIBUTE_NORMAL, face->particle.diffuse);
+				glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
+				glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
+				glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
+				glEnd ();
+			}
 		}
 	}
 
@@ -642,7 +690,7 @@ static void private_lighting_render (
 	{
 		light = iter.value;
 		ltype = liren_light_get_type (light);
-		if (ltype == LIREN_UNIFORM_LIGHTTYPE_POINT)
+		if (ltype == LIREN_LIGHTTYPE_POINT)
 		{
 			if (type != 0)
 				continue;

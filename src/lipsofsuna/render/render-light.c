@@ -189,6 +189,58 @@ void liren_light_update (
 		private_update_shadow (self);
 }
 
+/**
+ * \brief Caches the lighting values needed by shaders for fast access.
+ * \param self Light.
+ * \param context Context.
+ */
+void liren_light_update_cache (
+	LIRenLight*   self,
+	LIRenContext* context)
+{
+	LIMatMatrix matrix;
+	LIMatVector vector;
+	LIMatMatrix bias =
+	{{
+		0.5f, 0.0f, 0.0f, 0.0f,
+		0.0f, 0.5f, 0.0f, 0.0f,
+		0.0f, 0.0f, 0.5f, 0.0f,
+		0.5f, 0.5f, 0.5f, 1.0f
+	}};
+
+	/* Calculate position vectors. */
+	vector = self->transform.position;
+	self->cache.pos_world[0] = vector.x;
+	self->cache.pos_world[1] = vector.y;
+	self->cache.pos_world[2] = vector.z;
+	vector = limat_matrix_transform (context->matrix.modelview, vector);
+	self->cache.pos_view[0] = vector.x;
+	self->cache.pos_view[1] = vector.y;
+	self->cache.pos_view[2] = vector.z;
+
+	/* Calculate direction vectors. */
+	liren_light_get_direction (self, &vector);
+	self->cache.dir_world[0] = vector.x;
+	self->cache.dir_world[1] = vector.y;
+	self->cache.dir_world[2] = vector.z;
+	matrix = limat_matrix_get_rotation (context->matrix.modelview);
+	vector = limat_matrix_transform (matrix, vector);
+	self->cache.dir_view[0] = vector.x;
+	self->cache.dir_view[1] = vector.y;
+	self->cache.dir_view[2] = vector.z;
+
+	/* Calculate shadow buffer matrix. */
+	matrix = limat_matrix_multiply (bias, context->matrix.projection);
+	matrix = limat_matrix_multiply (matrix, context->matrix.view);
+	matrix = limat_matrix_multiply (matrix, context->matrix.modelviewinverse);
+	self->cache.matrix = matrix;
+
+	/* Calculate spot light settings. */
+	self->cache.spot[0] = self->cutoff;
+	self->cache.spot[1] = cos (self->cutoff);
+	self->cache.spot[2] = self->exponent;
+}
+
 void liren_light_update_projection (
 	LIRenLight* self)
 {
@@ -469,13 +521,13 @@ int liren_light_get_type (
 	const LIRenLight* self)
 {
 	if (self->directional)
-		return LIREN_UNIFORM_LIGHTTYPE_DIRECTIONAL;
+		return LIREN_LIGHTTYPE_DIRECTIONAL;
 	else if (LIMAT_ABS (self->cutoff - M_PI) < 0.001)
-		return LIREN_UNIFORM_LIGHTTYPE_POINT;
+		return LIREN_LIGHTTYPE_POINT;
 	else if (self->shadow.map)
-		return LIREN_UNIFORM_LIGHTTYPE_SPOTSHADOW;
+		return LIREN_LIGHTTYPE_SPOTSHADOW;
 	else
-		return LIREN_UNIFORM_LIGHTTYPE_SPOT;
+		return LIREN_LIGHTTYPE_SPOT;
 }
 
 /*****************************************************************************/

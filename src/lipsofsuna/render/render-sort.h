@@ -29,6 +29,7 @@
 enum
 {
 	LIREN_SORT_TYPE_FACE,
+	LIREN_SORT_TYPE_GROUP,
 	LIREN_SORT_TYPE_PARTICLE
 };
 
@@ -57,6 +58,15 @@ struct _LIRenSortface
 			LIRenMesh* mesh;
 			LIRenMaterial* material;
 		} face;
+		struct
+		{
+			int index;
+			int count;
+			LIMatAabb bounds;
+			LIMatMatrix matrix;
+			LIRenMesh* mesh;
+			LIRenMaterial* material;
+		} group;
 		struct
 		{
 			float size;

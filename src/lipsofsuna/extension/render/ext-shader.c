@@ -49,7 +49,6 @@ static void Shader_new (LIScrArgs* args)
 {
 	int feedback = 0;
 	const char* name = "forward-default";
-	const char* config = "";
 	const char* fragment = "void main()\n{\ngl_FragColor = vec4(1.0,1.0,1.0,1.0);\n}";
 	const char* geometry = NULL;
 	const char* vertex = "void main()\n{\ngl_Position=vec4(LOS_coord,1.0);\n}";
@@ -58,7 +57,6 @@ static void Shader_new (LIScrArgs* args)
 	LIRenShader* shader;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SHADER);
-	liscr_args_gets_string (args, "config", &config);
 	liscr_args_gets_string (args, "fragment", &fragment);
 	liscr_args_gets_string (args, "geometry", &geometry);
 	liscr_args_gets_string (args, "name", &name);
@@ -71,7 +69,7 @@ static void Shader_new (LIScrArgs* args)
 		return;
 
 	/* Allocate self. */
-	shader = liren_shader_new (module->client->render, name, config, vertex, geometry, fragment, feedback);
+	shader = liren_shader_new (module->client->render, name, vertex, geometry, fragment, feedback);
 	if (shader == NULL)
 	{
 		lisys_error_report ();
@@ -103,17 +101,15 @@ static void Shader_new (LIScrArgs* args)
 static void Shader_compile (LIScrArgs* args)
 {
 	int feedback = 0;
-	const char* config = "";
 	const char* fragment = "void main()\n{\ngl_FragColor = vec4(1.0,1.0,1.0,1.0);\n}";
 	const char* geometry = NULL;
 	const char* vertex = "void main()\n{\ngl_Position=vec4(LOS_coord,1.0);\n}";
 
-	liscr_args_gets_string (args, "config", &config);
 	liscr_args_gets_string (args, "fragment", &fragment);
 	liscr_args_gets_string (args, "geometry", &geometry);
 	liscr_args_gets_string (args, "vertex", &vertex);
 	liscr_args_gets_bool (args, "transform_feedback", &feedback);
-	if (!liren_shader_compile (args->self, config, vertex, geometry, fragment, feedback))
+	if (!liren_shader_compile (args->self, vertex, geometry, fragment, feedback))
 		lisys_error_report ();
 }
 
