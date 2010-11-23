@@ -23,7 +23,7 @@ Gui.init = function(clss)
 		{"Skills", Skills.window}}
 	-- Admin menu.
 	Gui.menu_widget_admin = Widgets.Menu{
-		{"Editor", function() Editing:toggle() end},
+		{"Editor", Editing.dialog},
 		{"Save", function() Network:send{packet = Packet(packets.ADMIN_SAVE)} end},
 		{"Shutdown", function() Network:send{packet = Packet(packets.ADMIN_SHUTDOWN)} end}}
 	Gui.menu_widget_main = Widgets.Menu{
@@ -31,7 +31,8 @@ Gui.init = function(clss)
 		{"View", Gui.menu_widget_view},
 		{"Admin", Gui.menu_widget_admin},
 		{"Options", Options.group},
-		{"Help", Help.menu}}
+		{"Help", Help.menu},
+		{"Quit", function() Program.quit = true end}}
 	Gui.menus = Widgets.Menus()
 	Gui.menus:open{level = 1, widget = Gui.menu_widget_main}
 	-- Bottom HUD.
@@ -58,9 +59,6 @@ Gui.init = function(clss)
 	Gui.skills_group:set_expand{col = 2}
 	-- Packing.
 	Gui.fps_label = Widgets.Label{valign = 0}
-	Gui.editor_group = Widgets.Popup{cols = 1, visible = false}
-	Gui.editor_group:append_row(Widgets.Label{font = "medium", text = "Editor"})
-	Gui.editor_group:append_row(Editing.dialog)
 	Gui.top_group = Widget{rows = 1}
 	Gui.top_group:append_col(Gui.chat_group)
 	Gui.top_group:append_col(Gui.fps_label)
@@ -71,9 +69,8 @@ Gui.init = function(clss)
 	Gui.center_group:append_row(Gui.skills_group)
 	Gui.center_group:set_expand{col = 1, row = 1}
 	Gui.scene = Widgets.Scene{rows = 1, camera = Player.camera, margins = {5,5,5,5}}
-	Gui.scene:append_col(Gui.editor_group)
 	Gui.scene:append_col(Gui.center_group)
-	Gui.scene:set_expand{col = 2, row = 1}
+	Gui.scene:set_expand{col = 1, row = 1}
 	Gui.bottom = Widget{rows = 1}
 	Gui.bottom:append_col(Gui.scene)
 	Gui.bottom:append_col(nil)

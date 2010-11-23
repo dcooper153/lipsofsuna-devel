@@ -105,11 +105,12 @@ Editing.init = function(clss)
 		{"Terrain: rotate", function() Editing:set_mode(5) end}}
 
 	-- Packing.
-	clss.dialog = Widget{cols = 1, rows = 2}
+	clss.dialog = Widgets.Popup{cols = 1, rows = 3}
 	clss.dialog.spacings = {0, 20}
 	clss.dialog:set_expand{col = 1}
 	clss.dialog:set_request{width = 200, height = 300}
-	clss.dialog:set_child{col = 1, row = 1, widget = clss.popup_button}
+	clss.dialog:set_child{col = 1, row = 1, widget = Widgets.Label{font = "medium", text = "Editor"}}
+	clss.dialog:set_child{col = 1, row = 2, widget = clss.popup_button}
 	clss:set_mode(1)
 end
 
@@ -120,23 +121,23 @@ Editing.set_mode = function(clss, mode)
 	local funs =
 	{
 		function()
-			clss.dialog:set_child{col = 1, row = 2, widget = clss.group_object_create}
+			clss.dialog:set_child{col = 1, row = 3, widget = clss.group_object_create}
 			clss.popup_button.text = "Object: create"
 		end,
 		function()
-			clss.dialog:set_child{col = 1, row = 2, widget = clss.group_object_delete}
+			clss.dialog:set_child{col = 1, row = 3, widget = clss.group_object_delete}
 			clss.popup_button.text = "Object: delete"
 		end,
 		function()
-			clss.dialog:set_child{col = 1, row = 2, widget = clss.group_terrain_create}
+			clss.dialog:set_child{col = 1, row = 3, widget = clss.group_terrain_create}
 			clss.popup_button.text = "Terrain: create"
 		end,
 		function()
-			clss.dialog:set_child{col = 1, row = 2, widget = clss.group_terrain_delete}
+			clss.dialog:set_child{col = 1, row = 3, widget = clss.group_terrain_delete}
 			clss.popup_button.text = "Terrain: delete"
 		end,
 		function()
-			clss.dialog:set_child{col = 1, row = 2, widget = clss.group_terrain_rotate}
+			clss.dialog:set_child{col = 1, row = 3, widget = clss.group_terrain_rotate}
 			clss.popup_button.text = "Terrain: rotate"
 		end
 	}

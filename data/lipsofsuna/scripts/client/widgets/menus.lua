@@ -2,9 +2,13 @@ Widgets.Menus = Class(Widget)
 
 Widgets.Menus.new = function(clss, args)
 	local self = Widget.new(clss, {rows = 3, cols = 1, stack = {}})
+	self.button_back = Widgets.MenuItem{font = "medium", text = "Back", pressed = function() self:close{level = #self.stack} end}
 	self.button_close = Widgets.MenuItem{font = "medium", text = "Close", pressed = function() self:close() end}
+	local group = Widget{rows = 1, cols = 2}
+	group:set_child{col = 1, row = 1, widget = self.button_back}
+	group:set_child{col = 2, row = 1, widget = self.button_close}
 	self:set_child{col = 1, row = 2, widget = Widgets.Label{text = "_________________"}}
-	self:set_child{col = 1, row = 3, widget = self.button_close}
+	self:set_child{col = 1, row = 3, widget = group}
 	for k,v in pairs(args or {}) do self[k] = v end
 	return self
 end
