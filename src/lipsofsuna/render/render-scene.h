@@ -73,12 +73,10 @@ LIAPICALL (void, liren_scene_render_deferred_end, (
 	LIRenScene* self));
 
 LIAPICALL (void, liren_scene_render_deferred_opaque, (
-	LIRenScene* self,
-	int         alpha));
+	LIRenScene* self));
 
 LIAPICALL (void, liren_scene_render_forward_opaque, (
-	LIRenScene* self,
-	int         alpha));
+	LIRenScene* self));
 
 LIAPICALL (void, liren_scene_render_forward_transparent, (
 	LIRenScene* self));

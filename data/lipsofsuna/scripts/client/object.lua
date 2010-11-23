@@ -64,8 +64,8 @@ Object.create_character_model = function(self, args)
 	m:calculate_bounds()
 	self.model = m
 	-- Colorize materials.
-	m:edit_material{match_shader = "forward-hair", diffuse = args.hair_color}
-	m:edit_material{match_shader = "deferred-skin", diffuse = args.skin_color}
+	m:edit_material{match_shader = "hair", diffuse = args.hair_color}
+	m:edit_material{match_shader = "skin", diffuse = args.skin_color}
 	m:edit_material{match_texture = "eye1", diffuse = args.eye_color}
 	-- Apply custom deformations.
 	self.animated = true

@@ -1,15 +1,13 @@
 Shader{
 name = "deferred",
-
-vertex = [[
+forward_pass1_vertex = [[
 out vec2 var_texcoord;
 void main()
 {
 	var_texcoord = LOS_texcoord;
 	gl_Position = vec4(LOS_coord, 1.0);
 }]],
-
-fragment = [[
+forward_pass1_fragment = [[
 in vec2 var_texcoord;]]
 .. Shader.los_light_attenuation
 .. Shader.los_light_combine
@@ -51,16 +49,14 @@ void main()
 
 Shader{
 name = "deferred-spotlight",
-
-vertex = [[
+forward_pass1_vertex = [[
 out vec2 var_texcoord;
 void main()
 {
 	var_texcoord = LOS_texcoord;
 	gl_Position = vec4(LOS_coord, 1.0);
 }]],
-
-fragment = [[
+forward_pass1_fragment = [[
 in vec2 var_texcoord;]]
 .. Shader.los_light_attenuation
 .. Shader.los_light_combine

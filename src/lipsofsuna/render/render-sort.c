@@ -93,6 +93,10 @@ int liren_sort_add_group (
 	int num;
 	LIRenSortgroup* tmp;
 
+	/* Don't add groups with no valid shader. */
+	if (material->shader == NULL)
+		return 1;
+
 	/* Resize the buffer if necessary. */
 	if (self->groups.capacity == self->groups.count)
 	{
@@ -115,6 +119,7 @@ int liren_sort_add_group (
 	self->groups.array[num].material = material;
 	self->groups.count++;
 
+	/* Depth sort transparent groups. */
 	if (face_sort_coords != NULL)
 		return liren_sort_add_faces (self, bounds, matrix, index, count, mesh, material, face_sort_coords);
 
@@ -285,6 +290,10 @@ int liren_sort_add_particle (
 	LIMatMatrix mat;
 	LIMatVector diff;
 	LIMatVector eye;
+
+	/* Don't add particles with no transparency shader pass. */
+	if (shader == NULL || !shader->passes[LIREN_SHADER_PASS_TRANSPARENT0].program)
+		return 1;
 
 	/* Resize the buffer if necessary. */
 	if (!private_resize_faces (self, self->faces.count + 1))

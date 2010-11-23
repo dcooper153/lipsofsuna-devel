@@ -163,7 +163,7 @@ int liren_model_deform (
 	/* Deform the mesh. */
 	context = liren_render_get_context (self->render);
 	liren_context_init (context);
-	liren_context_set_shader (context, shader_);
+	liren_context_set_shader (context, LIREN_SHADER_PASS_FORWARD0, shader_);
 	liren_context_bind (context);
 	liren_buffer_texture_init (&tmp, data, count * sizeof (GLfloat));
 	lisys_free (data);
@@ -195,12 +195,8 @@ LIRenMaterial* liren_model_find_material (
 		material = self->materials.array[i];
 		if (shader != NULL)
 		{
-			/* The name of either the deferred or the forward shader must match. */
-			if (material->shader_deferred == NULL && material->shader_forward == NULL)
-				continue;
-			if (material->shader_deferred != NULL && strcmp (shader, material->shader_deferred->name))
-				continue;
-			if (material->shader_forward != NULL && strcmp (shader, material->shader_forward->name))
+			/* The name of either the shader must match. */
+			if (material->shader != NULL && strcmp (shader, material->shader->name))
 				continue;
 		}
 		if (texture != NULL)
@@ -331,7 +327,9 @@ void liren_model_update_transparency (
 
 		/* Check if new sort coordinates are needed. */
 		material = self->materials.array[i];
-		if (!(material->flags & LIREN_MATERIAL_FLAG_TRANSPARENCY))
+		if (material->shader == NULL)
+			continue;
+		if (!material->shader->passes[LIREN_SHADER_PASS_TRANSPARENT0].program)
 			continue;
 
 		/* Allocate space for the sort coordinates. */

@@ -598,7 +598,7 @@ static void private_update_shadow (
 	liren_context_set_depth (context, 1, 1, GL_LEQUAL);
 	liren_context_set_frustum (context, &frustum);
 	liren_context_set_projection (context, &self->projection);
-	liren_context_set_shader (context, shader);
+	liren_context_set_shader (context, LIREN_SHADER_PASS_FORWARD0, shader);
 	liren_context_set_viewmatrix (context, &self->modelview);
 
 	/* Render objects to the depth texture. */

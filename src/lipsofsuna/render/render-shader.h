@@ -24,31 +24,44 @@
 #include "render-attribute.h"
 #include "render-light.h"
 #include "render-types.h"
+#include "render-program.h"
 #include "render-uniform.h"
+
+enum
+{
+	LIREN_SHADER_PASS_DEFERRED0,
+	LIREN_SHADER_PASS_DEFERRED1,
+	LIREN_SHADER_PASS_DEFERRED_MAX = LIREN_SHADER_PASS_DEFERRED1,
+	LIREN_SHADER_PASS_FORWARD0,
+	LIREN_SHADER_PASS_FORWARD1,
+	LIREN_SHADER_PASS_FORWARD_MAX = LIREN_SHADER_PASS_FORWARD1,
+	LIREN_SHADER_PASS_TRANSPARENT0,
+	LIREN_SHADER_PASS_TRANSPARENT1,
+	LIREN_SHADER_PASS_TRANSPARENT_MAX = LIREN_SHADER_PASS_TRANSPARENT1,
+	LIREN_SHADER_PASS_COUNT,
+};
 
 struct _LIRenShader
 {
 	char* name;
-	GLuint program;
-	GLuint vertex;
-	GLuint geometry;
-	GLuint fragment;
 	LIRenRender* render;
+	LIRenProgram passes[LIREN_SHADER_PASS_COUNT];
 };
 
 LIAPICALL (LIRenShader*, liren_shader_new, (
 	LIRenRender* render,
-	const char*  name,
-	const char*  vertex,
-	const char*  geometry,
-	const char*  fragment,
-	int          feedback));
+	const char*  name));
 
 LIAPICALL (void, liren_shader_free, (
 	LIRenShader* self));
 
+LIAPICALL (void, liren_shader_clear_pass, (
+	LIRenShader* self,
+	int          pass));
+
 LIAPICALL (int, liren_shader_compile, (
 	LIRenShader* self,
+	int          pass,
 	const char*  vertex,
 	const char*  geometry,
 	const char*  fragment,

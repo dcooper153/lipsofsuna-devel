@@ -1,7 +1,29 @@
 Shader{
-	name = "forward-hair",
-
-	vertex = [[
+name = "hair",
+forward_pass1_vertex = [[
+out fragvar
+{
+	vec2 texcoord;
+} OUT;
+void main()
+{
+	vec4 tmp = LOS.matrix_modelview * vec4(LOS_coord,1.0);
+	OUT.texcoord = LOS_texcoord;
+	gl_Position = LOS.matrix_projection * tmp;
+}]],
+forward_pass1_fragment = [[
+in fragvar
+{
+	vec2 texcoord;
+} IN;
+void main()
+{
+	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
+	if (diffuse.a < 0.90)
+		discard;
+	gl_FragColor = vec4(0.0,0.0,0.0,0.0);
+}]],
+transparent_pass1_vertex = [[
 out fragvar
 {
 	vec3 coord;
@@ -20,8 +42,7 @@ void main()
 	OUT.texcoord = LOS_texcoord;
 	gl_Position = LOS.matrix_projection * tmp;
 }]],
-
-	fragment = [[
+transparent_pass1_fragment = [[
 in fragvar
 {
 	vec3 coord;

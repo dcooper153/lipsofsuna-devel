@@ -34,6 +34,7 @@ Widgets.Scene.render = function(self)
 	self.scene:draw_deferred_begin()
 	self.scene:draw_deferred_opaque()
 	self.scene:draw_deferred_end()
+	self.scene:draw_forward_opaque()
 	self.scene:draw_forward_transparent()
 	if Options.check_postproc.active then
 		self.scene:draw_post_process{shader = "postprocess-vert-hdr"}

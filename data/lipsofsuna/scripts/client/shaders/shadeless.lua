@@ -1,7 +1,6 @@
 Shader{
-name = "forward-shadeless",
-
-vertex = [[
+name = "shadeless",
+forward_pass1_vertex = [[
 out vec2 var_texcoord;
 void main()
 {
@@ -9,8 +8,7 @@ void main()
 	gl_Position = LOS.matrix_projection * tmp;
 	var_texcoord = LOS_texcoord;
 }]],
-
-fragment = [[
+forward_pass1_fragment = [[
 in vec2 var_texcoord;
 void main()
 {

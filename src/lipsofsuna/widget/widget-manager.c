@@ -537,7 +537,7 @@ liwdg_manager_render (LIWdgManager* self)
 	liren_context_set_blend (self->context, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	liren_context_set_cull (self->context, 0, GL_CCW);
 	liren_context_set_depth (self->context, 0, 0, GL_LEQUAL);
-	liren_context_set_shader (self->context, self->shader);
+	liren_context_set_shader (self->context, LIREN_SHADER_PASS_FORWARD0, self->shader);
 	liren_context_bind (self->context);
 
 	/* Setup viewport. */

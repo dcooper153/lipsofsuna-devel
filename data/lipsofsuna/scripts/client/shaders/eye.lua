@@ -1,7 +1,6 @@
 Shader{
-	name = "deferred-eye",
-
-	vertex = [[
+name = "eye",
+deferred_pass1_vertex = [[
 out vec3 var_normal;
 out vec2 var_texcoord;
 void main()
@@ -11,8 +10,7 @@ void main()
 	var_texcoord = LOS_texcoord;
 	gl_Position = LOS.matrix_projection * tmp;
 }]],
-
-	fragment = [[
+deferred_pass1_fragment = [[
 in vec3 var_normal;
 in vec2 var_texcoord;
 void main()

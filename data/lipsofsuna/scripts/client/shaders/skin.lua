@@ -1,7 +1,6 @@
 Shader{
-	name = "deferred-skin",
-
-	vertex = [[
+name = "skin",
+deferred_pass1_vertex = [[
 out fragvar
 {
 	vec3 coord;
@@ -18,8 +17,7 @@ void main()
 	OUT.texcoord = LOS_texcoord;
 	gl_Position = LOS.matrix_projection * tmp;
 }]],
-
-	fragment = [[
+deferred_pass1_fragment = [[
 in fragvar
 {
 	vec3 coord;

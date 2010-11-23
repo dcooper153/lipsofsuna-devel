@@ -41,8 +41,7 @@ struct _LIRenMaterial
 	float strand_start;
 	float strand_end;
 	float strand_shape;
-	LIRenShader* shader_deferred;
-	LIRenShader* shader_forward;
+	LIRenShader* shader;
 	struct
 	{
 		int count;
@@ -69,8 +68,7 @@ LIAPICALL (void, liren_material_set_flags, (
 
 LIAPICALL (int, liren_material_set_shader, (
 	LIRenMaterial* self,
-	LIRenShader*   deferred,
-	LIRenShader*   forward));
+	LIRenShader*   value));
 
 LIAPICALL (void, liren_material_set_specular, (
 	LIRenMaterial* self,

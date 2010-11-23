@@ -25,6 +25,30 @@
 #include <lipsofsuna/render.h>
 #include "ext-module.h"
 
+static const char* default_fragment_shader = "void main()\n{\ngl_FragColor = vec4(1.0,1.0,1.0,1.0);\n}";
+static const char* default_vertex_shader = "void main()\n{\ngl_Position=vec4(LOS_coord,1.0);\n}";
+static const char* shader_pass_fields[3 * LIREN_SHADER_PASS_COUNT] =
+{
+	"deferred_pass1_fragment",
+	"deferred_pass1_geometry",
+	"deferred_pass1_vertex",
+	"deferred_pass2_fragment",
+	"deferred_pass2_geometry",
+	"deferred_pass2_vertex",
+	"forward_pass1_fragment",
+	"forward_pass1_geometry",
+	"forward_pass1_vertex",
+	"forward_pass2_fragment",
+	"forward_pass2_geometry",
+	"forward_pass2_vertex",
+	"transparent_pass1_fragment",
+	"transparent_pass1_geometry",
+	"transparent_pass1_vertex",
+	"transparent_pass2_fragment",
+	"transparent_pass2_geometry",
+	"transparent_pass2_vertex"
+};
+
 /* @luadoc
  * module "core/render"
  * ---
@@ -47,20 +71,18 @@
  */
 static void Shader_new (LIScrArgs* args)
 {
+	int i;
 	int feedback = 0;
-	const char* name = "forward-default";
-	const char* fragment = "void main()\n{\ngl_FragColor = vec4(1.0,1.0,1.0,1.0);\n}";
-	const char* geometry = NULL;
-	const char* vertex = "void main()\n{\ngl_Position=vec4(LOS_coord,1.0);\n}";
+	const char* name = "default";
+	const char* fragment;
+	const char* geometry;
+	const char* vertex;
 	LIExtModule* module;
 	LIScrData* data;
 	LIRenShader* shader;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SHADER);
-	liscr_args_gets_string (args, "fragment", &fragment);
-	liscr_args_gets_string (args, "geometry", &geometry);
-	liscr_args_gets_string (args, "name", &name);
-	liscr_args_gets_string (args, "vertex", &vertex);
+    liscr_args_gets_string (args, "name", &name);
 	liscr_args_gets_bool (args, "transform_feedback", &feedback);
 
 	/* Avoid duplicate names. */
@@ -69,11 +91,26 @@ static void Shader_new (LIScrArgs* args)
 		return;
 
 	/* Allocate self. */
-	shader = liren_shader_new (module->client->render, name, vertex, geometry, fragment, feedback);
+	shader = liren_shader_new (module->client->render, name);
 	if (shader == NULL)
 	{
 		lisys_error_report ();
 		return;
+	}
+
+	/* Compile passes. */
+	for (i = 0 ; i < LIREN_SHADER_PASS_COUNT ; i++)
+	{
+		fragment = default_fragment_shader;
+		geometry = NULL;
+		vertex = default_vertex_shader;
+		if (liscr_args_gets_string (args, shader_pass_fields[3 * i + 0], &fragment))
+		{
+			liscr_args_gets_string (args, shader_pass_fields[3 * i + 1], &geometry);
+			liscr_args_gets_string (args, shader_pass_fields[3 * i + 2], &vertex);
+			if (!liren_shader_compile (shader, i, vertex, geometry, fragment, feedback))
+				lisys_error_report ();
+		}
 	}
 
 	/* Allocate userdata. */
@@ -100,17 +137,29 @@ static void Shader_new (LIScrArgs* args)
  */
 static void Shader_compile (LIScrArgs* args)
 {
+	int i;
 	int feedback = 0;
-	const char* fragment = "void main()\n{\ngl_FragColor = vec4(1.0,1.0,1.0,1.0);\n}";
-	const char* geometry = NULL;
-	const char* vertex = "void main()\n{\ngl_Position=vec4(LOS_coord,1.0);\n}";
+	const char* fragment;
+	const char* geometry;
+	const char* vertex;
+	LIRenShader* shader = args->self;
 
-	liscr_args_gets_string (args, "fragment", &fragment);
-	liscr_args_gets_string (args, "geometry", &geometry);
-	liscr_args_gets_string (args, "vertex", &vertex);
+	/* Compile passes. */
 	liscr_args_gets_bool (args, "transform_feedback", &feedback);
-	if (!liren_shader_compile (args->self, vertex, geometry, fragment, feedback))
-		lisys_error_report ();
+	for (i = 0 ; i < LIREN_SHADER_PASS_COUNT ; i++)
+	{
+		liren_shader_clear_pass (shader, i);
+		fragment = default_fragment_shader;
+		geometry = NULL;
+		vertex = default_vertex_shader;
+		if (liscr_args_gets_string (args, shader_pass_fields[3 * i + 0], &fragment))
+		{
+			liscr_args_gets_string (args, shader_pass_fields[3 * i + 1], &geometry);
+			liscr_args_gets_string (args, shader_pass_fields[3 * i + 2], &vertex);
+			if (!liren_shader_compile (shader, i, vertex, geometry, fragment, feedback))
+				lisys_error_report ();
+		}
+	}
 }
 
 /*****************************************************************************/

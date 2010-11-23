@@ -149,29 +149,22 @@ static void Scene_draw_deferred_end (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Draws opaque faces to the deferred rendering G-buffer.
+ * --- Draws opaque faces to the deferred rendering G-buffer.
  * -- @param self Scene.
- * -- @param args Arguments.<ul>
- * --   <li>alpha: True to draw transparent as if they were opaque.</li></ul>
- * function Scene.draw_deferred_opaque(self, args)
+ * function Scene.draw_deferred_opaque(self)
  */
 static void Scene_draw_deferred_opaque (LIScrArgs* args)
 {
-	int alpha = 0;
 	LIExtModule* module;
 	LIRenScene* scene;
 
-	liscr_args_gets_int (args, "alpha", &alpha);
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
 	scene = module->client->scene;
-	liren_scene_render_deferred_opaque (scene, alpha);
+	liren_scene_render_deferred_opaque (scene);
 }
 
 /* @luadoc
- * ---
- * -- Ends scene rendering and draws the output to the framebuffer.
- * --
+ * --- Ends scene rendering and draws the output to the framebuffer.
  * -- @param self Scene.
  * function Scene.draw_begin(self)
  */
@@ -204,7 +197,7 @@ static void Scene_draw_forward_opaque (LIScrArgs* args)
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
 	scene = module->client->scene;
-	liren_scene_render_forward_opaque (scene, 0);
+	liren_scene_render_forward_opaque (scene);
 }
 
 /* @luadoc

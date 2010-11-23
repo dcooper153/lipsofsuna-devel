@@ -47,6 +47,7 @@ struct _LIRenContext
 	LIMatFrustum frustum;
 	LIRenUniforms uniforms;
 	GLuint shadow_texture;
+	int shader_pass;
 	struct
 	{
 		int enable;
@@ -159,10 +160,6 @@ LIAPICALL (void, liren_context_set_material, (
 	LIRenContext*        self,
 	const LIRenMaterial* value));
 
-LIAPICALL (void, liren_context_set_material_shader, (
-	LIRenContext*        self,
-	const LIRenMaterial* value));
-
 LIAPICALL (void, liren_context_set_mesh, (
 	LIRenContext* self,
 	LIRenMesh*    mesh));
@@ -189,6 +186,7 @@ LIAPICALL (void, liren_context_set_scene, (
 
 LIAPICALL (void, liren_context_set_shader, (
 	LIRenContext* self,
+	int           pass,
 	LIRenShader*  value));
 
 LIAPICALL (void, liren_context_set_textures, (

@@ -68,9 +68,9 @@ void liren_context_bind (
 	/* Bind shader. */
 	if (self->changed.shader)
 	{
-		if (self->shader != NULL)
+		if (self->shader != NULL && self->shader->passes[self->shader_pass].program)
 		{
-			glUseProgram (self->shader->program);
+			glUseProgram (self->shader->passes[self->shader_pass].program);
 			self->incomplete = 0;
 		}
 		else
@@ -380,16 +380,6 @@ void liren_context_set_material (
 		liren_context_set_cull (self, 0, GL_CCW);
 }
 
-void liren_context_set_material_shader (
-	LIRenContext*        self,
-	const LIRenMaterial* value)
-{
-	if (self->deferred)
-		liren_context_set_shader (self, value->shader_deferred);
-	else
-		liren_context_set_shader (self, value->shader_forward);
-}
-
 void liren_context_set_mesh (
 	LIRenContext* self,
 	LIRenMesh*    mesh)
@@ -463,10 +453,12 @@ void liren_context_set_scene (
 
 void liren_context_set_shader (
 	LIRenContext* self,
+	int           pass,
 	LIRenShader*  value)
 {
-	if (value != self->shader)
+	if (pass != self->shader_pass || value != self->shader)
 	{
+		self->shader_pass = pass;
 		self->shader = value;
 		self->changed.shader = 1;
 	}

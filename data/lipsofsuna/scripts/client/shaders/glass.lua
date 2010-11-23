@@ -1,7 +1,6 @@
 Shader{
-	name = "forward-glass",
-
-	vertex = [[
+name = "glass",
+transparent_pass1_vertex = [[
 out vec3 var_coord;
 out vec3 var_normal;
 out vec2 var_texcoord;
@@ -15,8 +14,7 @@ void main()
 	var_lightdir = LOS.light_position_premult - var_coord;
 	gl_Position = LOS.matrix_projection * tmp;
 }]],
-
-	fragment = [[
+transparent_pass1_fragment = [[
 in vec3 var_coord;
 in vec3 var_normal;
 in vec2 var_texcoord;

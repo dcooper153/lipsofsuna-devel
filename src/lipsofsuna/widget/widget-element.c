@@ -166,7 +166,7 @@ void liwdg_element_paint (
 		/* Render the vertex buffer. */
 		liren_context_set_buffer (manager->context, self->buffer);
 		liren_context_set_projection (manager->context, &manager->projection);
-		liren_context_set_shader (manager->context, manager->shader);
+		liren_context_set_shader (manager->context, LIREN_SHADER_PASS_FORWARD0, manager->shader);
 		if (self->texture != NULL)
 		{
 			liren_context_set_textures_raw (manager->context, &self->texture->texture, 1);

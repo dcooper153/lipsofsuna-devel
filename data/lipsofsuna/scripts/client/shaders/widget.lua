@@ -1,15 +1,13 @@
 Shader{
 name = "widget",
-
-vertex = [[
+forward_pass1_vertex = [[
 out vec2 var_texcoord;
 void main()
 {
 	gl_Position = LOS.matrix_projection * vec4(LOS_coord, 1.0);
 	var_texcoord = LOS_texcoord;
 }]],
-
-fragment = [[
+forward_pass1_fragment = [[
 in vec2 var_texcoord;
 void main()
 {

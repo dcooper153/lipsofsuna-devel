@@ -128,7 +128,7 @@ void liext_speeches_render (
 	if (shader == NULL)
 		return;
 	matrix = limat_matrix_ortho (0, viewport[2], 0, viewport[3], -100.0f, 100.0f);
-	liren_context_set_shader (render->context, shader);
+	liren_context_set_shader (render->context, LIREN_SHADER_PASS_FORWARD0, shader);
 	liren_context_set_blend (render->context, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	liren_context_set_buffer (render->context, NULL);
 	liren_context_set_cull (render->context, 0, GL_CCW);

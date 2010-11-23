@@ -10,12 +10,12 @@ Bloom.init = function(clss)
 	clss:compile_filter_kernel()
 	clss.shader_horz = Shader{
 		name = "postprocess-horz-hdr",
-		vertex = clss.code_vertex,
-		fragment = clss:code_fragment(true)}
+		forward_pass1_vertex = clss.code_vertex,
+		forward_pass1_fragment = clss:code_fragment(true)}
 	clss.shader_vert = Shader{
 		name = "postprocess-vert-hdr",
-		vertex = clss.code_vertex,
-		fragment = clss:code_fragment(false)}
+		forward_pass1_vertex = clss.code_vertex,
+		forward_pass1_fragment = clss:code_fragment(false)}
 end
 
 --- Recompiles the bloom filters.
@@ -23,11 +23,11 @@ end
 Bloom.compile = function(clss)
 	clss:compile_filter_kernel()
 	clss.shader_horz:compile{
-		vertex = clss.code_vertex,
-		fragment = clss:code_fragment(true)}
+		forward_pass1_vertex = clss.code_vertex,
+		forward_pass1_fragment = clss:code_fragment(true)}
 	clss.shader_vert:compile{
-		vertex = clss.code_vertex,
-		fragment = clss:code_fragment(false)}
+		forward_pass1_vertex = clss.code_vertex,
+		forward_pass1_fragment = clss:code_fragment(false)}
 end
 
 --- Recompiles the kernel of the bloom filters.

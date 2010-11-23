@@ -1,8 +1,7 @@
 Shader{
-	name = "skeletal",
-	transform_feedback = true,
-
-	vertex = [[
+name = "skeletal",
+transform_feedback = true,
+forward_pass1_vertex = [[
 out vec3 geo_coord;
 out vec3 geo_normal;
 out vec2 geo_texcoord;
@@ -45,8 +44,7 @@ void main()
 	geo_texcoord = LOS_texcoord;
 	gl_Position = vec4(LOS_coord,1.0);
 }]],
-
-	geometry = [[
+forward_pass1_geometry = [[
 layout(triangles) in;
 layout(triangle_strip, max_vertices=3) out;
 in vec3 geo_coord[3];
@@ -78,8 +76,7 @@ void main()
 	}
 	EndPrimitive();
 }]],
-
-	fragment = [[
+forward_pass1_fragment = [[
 void main()
 {
 }]]}
