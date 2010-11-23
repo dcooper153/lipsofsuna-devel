@@ -152,6 +152,7 @@ end
 -- @param clss Chargen class.
 Chargen.execute = function(clss)
 	Gui:free()
+	Client.moving = false
 	Sound.music_fading = 5.0
 	Sound.music_volume = 0.2
 	Sound.music = "fairytale10"
