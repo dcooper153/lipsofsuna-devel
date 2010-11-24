@@ -133,10 +133,12 @@ end
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
 --   <li>name: Monster name.</li>
---   <li>point: Position vector, in tiles.</li></ul>
+--   <li>point: Position vector, in tiles.</li>
+--   <li>prob: Creation probability.</li></ul>
 Voxel.place_creature = function(clss, args)
 	local spec = Species:find(args)
 	if not spec then return end
+	if args.prob and math.random() > args.prob then return end
 	Creature{
 		species = spec,
 		position = args.point * Config.tilewidth,
@@ -251,34 +253,34 @@ restart = function()
 				p = p + Vector(3,1,3)
 				s = s - Vector(2,1,2)
 				Voxel:make_heightmap{point = r.point + p, size = s,
-					material = "ground1", tree_density = 0.2}
+					material = "ground1", tree_density = 0.1}
 			elseif spec.name == "dungeon-room" then
 				Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "house1"}
 			elseif spec.name == "dungeon-slope-n" then
 				Voxel:make_slope{point = r.point, size = r.size,
 					heights = {2,2,3,3}, randomness = 1,
-					material = "ground1", tree_density = 0.2}
+					material = "ground1", tree_density = 0.1}
 			elseif spec.name == "dungeon-slope-s" then
 				Voxel:make_slope{point = r.point, size = r.size,
 					heights = {3,3,2,2}, randomness = 1,
-					material = "ground1", tree_density = 0.2}
+					material = "ground1", tree_density = 0.1}
 			elseif spec.name == "dungeon-slope-e" then
 				Voxel:make_slope{point = r.point, size = r.size,
 					heights = {2,3,2,3}, randomness = 1,
-					material = "ground1", tree_density = 0.2}
+					material = "ground1", tree_density = 0.1}
 			elseif spec.name == "dungeon-slope-w" then
 				Voxel:make_slope{point = r.point, size = r.size,
 					heights = {3,2,3,2}, randomness = 1,
-					material = "ground1", tree_density = 0.2}
+					material = "ground1", tree_density = 0.1}
 			elseif spec.name == "dungeon-corridor-ns" then
-				Voxel:place_creature{point = r.point + Vector(1,1,3), name = "bloodworm"}
-				Voxel:place_creature{point = r.point + Vector(2,1,8), name = "bloodworm"}
+				Voxel:place_creature{point = r.point + Vector(1,1,3), name = "bloodworm", prob = 0.25}
+				Voxel:place_creature{point = r.point + Vector(2,1,8), name = "bloodworm", prob = 0.25}
 				Voxel:make_heightmap{point = r.point + Vector(0,0,0), size = r.size,
 					material = "ground1", tree_density = 0.1,
 					mushroom_density = 0.3}
 			elseif spec.name == "dungeon-corridor-ew" then
-				Voxel:place_creature{point = r.point + Vector(3,1,1), name = "bloodworm"}
-				Voxel:place_creature{point = r.point + Vector(8,1,2), name = "bloodworm"}
+				Voxel:place_creature{point = r.point + Vector(3,1,1), name = "bloodworm", prob = 0.25}
+				Voxel:place_creature{point = r.point + Vector(8,1,2), name = "bloodworm", prob = 0.25}
 				Voxel:make_heightmap{point = r.point + Vector(0,0,0), size = r.size,
 					material = "ground1", tree_density = 0.1,
 					mushroom_density = 0.3}
