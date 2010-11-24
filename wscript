@@ -75,7 +75,8 @@ def configure(ctx):
 	ctx.check_cc(lib='pthread', uselib_store='THREAD', mandatory=False)
 
 	# zlib
-	ctx.check_cc(lib='z', mandatory=True, uselib_store='ZLIB')
+	if not ctx.check_cc(lib='z', mandatory=False, uselib_store='ZLIB'):
+		ctx.check_cc(lib='zdll', mandatory=True, uselib_store='ZLIB')
 	ctx.check_cc(header_name='zlib.h', mandatory=True, uselib_store='ZLIB')
 
 	# SQLite

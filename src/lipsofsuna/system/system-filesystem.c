@@ -71,7 +71,11 @@ int lisys_filesystem_access (
 int lisys_filesystem_makedir (
 	const char* path)
 {
+#ifdef HAVE_WINDOWS_H
+	if (mkdir (path) == -1)
+#else
 	if (mkdir (path, 0770) == -1)
+#endif
 	{
 		lisys_error_set (errno, "cannot create directory `%s'", path);
 		return 0;
