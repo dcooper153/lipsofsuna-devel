@@ -126,16 +126,9 @@ def configure(ctx):
 		if not ctx.check_cfg(package='openal', atleast_version='0.0.8', args='--cflags --libs', uselib_store="AL", mandatory=False):
 			ctx.check_cc(header_name='AL/al.h', mandatory=True, uselib='CORE TEST', uselib_store='AL')
 			ctx.check_cc(lib='openal', mandatory=True, uselib='CORE TEST', uselib_store='AL')
-		# OGG
-		if not ctx.check_cfg(package='ogg', atleast_version='1.1.0', args='--cflags --libs', mandatory=False):
-			ctx.check_cc(header_name='ogg.h', mandatory=True, uselib='CORE TEST', uselib_store='OGG')
-			ctx.check_cc(lib='ogg', mandatory=True, uselib='CORE TEST', uselib_store='OGG')
 		# VORBIS
-		if not ctx.check_cfg(package='vorbis', atleast_version='1.2.0', args='--cflags --libs', mandatory=False) or \
-		   not ctx.check_cfg(package='vorbisfile', atleast_version='1.2.0', args='--cflags --libs', uselib_store='VORBIS', mandatory=False):
-			ctx.check_cc(header_name='vorbis.h', mandatory=True, uselib='CORE TEST', uselib_store='VORBIS')
+		if not ctx.check_cfg(package='vorbisfile', atleast_version='1.2.0', args='--cflags --libs', uselib_store='VORBIS', mandatory=False):
 			ctx.check_cc(header_name='vorbisfile.h', mandatory=True, uselib='CORE TEST', uselib_store='VORBIS')
-			ctx.check_cc(lib='vorbis', mandatory=True, uselib='CORE TEST', uselib_store='VORBIS')
 			ctx.check_cc(lib='vorbisfile', mandatory=True, uselib='CORE TEST', uselib_store='VORBIS')
 		# FLAC
 		if not ctx.check_cfg(package='flac', atleast_version='1.2.0', args='--cflags --libs', mandatory=False):
