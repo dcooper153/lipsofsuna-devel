@@ -8,6 +8,16 @@ require = function(arg)
 	end
 end
 
+if Program.args == "--help" or Program.args == "-h" then
+	print("Usage: lipsofsuna lipsofsuna [options]\n")
+	print("Options:")
+	print("  --help                   Show this help message and exit.")
+	print("  --host localhost <port>  Start a server and join it.")
+	print("  --join <server> <port>   Join a remove server.")
+	print("  --server                 Run as a dedicated server.")
+	return
+end
+
 require "core/database"
 require "core/network"
 require "core/tiles"

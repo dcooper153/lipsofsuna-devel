@@ -1,3 +1,13 @@
+if Program.args == "--help" or Program.args == "-h" then
+	print("Usage: lipsofsuna [modname] [options]\n")
+	print("Options:")
+	print("  --help                          Show this help message and exit.\n")
+	print("Examples:")
+	print("  lipsofsuna lipsofsuna --help    Show help for mod lipsofsuna")
+	print("  lipsofsuna lipsofsuna --server  Run mod lipsofsuna as a dedicated server")
+	return
+end
+
 require "core/graphics"
 require "core/render"
 require "core/sound"

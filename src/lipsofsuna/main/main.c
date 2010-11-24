@@ -26,6 +26,46 @@
 #include "SDL_main.h"
 #include "main-program.h"
 
+static int private_parse_arguments (
+	int    argc,
+	char** argv,
+	char** name,
+	char** args)
+{
+	int i;
+	char* tmp;
+
+	for (i = 1 ; i < argc ; i++)
+	{
+		if (i == 1 && argv[i][0] != '-')
+		{
+			/* The first argument is the module name unless it begins with '-'. */
+			*name = argv[i];
+		}
+		else if (*args == NULL)
+		{
+			/* Copy the first switch to the argument list. */
+			*args = listr_dup (argv[i]);
+			if (*args == NULL)
+				return 0;
+		}
+		else
+		{
+			/* Append the remaining switches to the argument list. */
+			tmp = listr_format ("%s %s", *args, argv[i]);
+			if (tmp == NULL)
+			{
+				lisys_free (*args);
+				return 0;
+			}
+			lisys_free (*args);
+			*args = tmp;
+		}
+	}
+
+	return 1;
+}
+
 int main (int argc, char** argv)
 {
 	char* path;
@@ -41,9 +81,19 @@ int main (int argc, char** argv)
 		return 1;
 	}
 
+	/* Parse command line arguments. */
+	launch_name = "default";
+	launch_args = NULL;
+	if (!private_parse_arguments (argc, argv, &launch_name, &launch_args))
+	{
+		lisys_error_report ();
+		lisys_free (path);
+		return 1;
+	}
+
 	/* Start the program. */
-	/* FIXME: Should concatenate the arguments. */
-	program = limai_program_new (path, argc > 1? argv[1] : "default", (argc > 2)? argv[2] : NULL);
+	program = limai_program_new (path, launch_name, launch_args);
+	lisys_free (launch_args);
 	if (program == NULL)
 	{
 		lisys_error_report ();
