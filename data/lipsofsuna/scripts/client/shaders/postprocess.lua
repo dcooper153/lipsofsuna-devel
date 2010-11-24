@@ -75,13 +75,6 @@ return [[
 in vec2 var_texcoord;
 const float bloom_exposure = ]] .. clss.exposure .. [[;
 const float bloom_luminance = ]] .. clss.luminance .. [[;
-float los_postproc_exposure(vec3 color)
-{
-	float luminance = dot(color, vec3(0.3, 0.59, 0.11));
-	float bloomed = max(0.0, luminance - bloom_luminance);
-	float exposure = 1.0 - exp(-bloom_exposure * bloomed);
-	return exposure;
-}
 vec4 los_postproc_bloom(vec2 dt)
 {
 	int i;
@@ -92,7 +85,10 @@ vec4 los_postproc_bloom(vec2 dt)
 	for(i = 0 ; i < w ; i++)
 	{
 		vec3 sample = texture2D(LOS_diffuse_texture_0, var_texcoord + float(i - r) * dt).rgb;
-		bloom += sample * kernel[i] * los_postproc_exposure(sample);
+		float luminance = dot(sample, vec3(0.3, 0.59, 0.11));
+		float bloomed = max(0.0, luminance - bloom_luminance);
+		float exposure = 1.0 - exp(-bloom_exposure * bloomed);
+		bloom += sample * (kernel[i] * exposure);
 	}
 	return vec4(bloom, 1.0);
 }
