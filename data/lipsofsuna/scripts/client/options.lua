@@ -1,5 +1,6 @@
 Options = Class()
 Options.animation_quality = 1.0
+Options.mouse_sensitivity = 1.0
 Options.transparency_quality = 0.3
 
 Options.init = function(clss)
@@ -48,6 +49,14 @@ Options.init = function(clss)
 		Bloom.exposure = v
 		Bloom:compile()
 	end
+	-- Mouse sensitivity.
+	local scroll_mouse = Widgets.Progress{min = 0, max = 2, value = clss.mouse_sensitivity}
+	scroll_mouse:set_request{width = 100}
+	scroll_mouse.pressed = function(self)
+		local v = self:get_value_at(Client.cursor_pos)
+		self.value = v
+		clss.mouse_sensitivity = v
+	end
 	-- Packing.
 	local quality_group = Widget{cols = 2}
 	quality_group:append_row(Widgets.Label{text = "Animation"}, scroll_animation)
@@ -57,11 +66,15 @@ Options.init = function(clss)
 	bloom_group:append_row(Widgets.Label{text = "Radius"}, scroll_radius)
 	bloom_group:append_row(Widgets.Label{text = "Exposure"}, scroll_exposure)
 	bloom_group:append_row(Widgets.Label{text = "Influence"}, scroll_luminance)
+	local mouse_group = Widget{cols = 2}
+	mouse_group:append_row(Widgets.Label{text = "Sensitivity"}, scroll_mouse)
 	clss.group = Widget{cols = 2}
 	clss.group:append_row(Widgets.Label{text = "Quality", font = "medium"})
 	clss.group:append_row(quality_group)
 	clss.group:append_row(Widgets.Label{text = "Bloom", font = "medium"})
 	clss.group:append_row(bloom_group)
+	clss.group:append_row(Widgets.Label{text = "Mouse", font = "medium"})
+	clss.group:append_row(mouse_group)
 end
 
 Options.toggle = function(clss)

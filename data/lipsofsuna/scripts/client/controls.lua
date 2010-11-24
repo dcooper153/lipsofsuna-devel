@@ -124,17 +124,17 @@ end}
 
 Action{name = "Turn", mode = "analog", key1 = "mousex", func = function(v)
 	if Action.dict_press[Keys.LCTRL] then
-		Player.camera_turn = v
+		Player.camera_turn = v * Options.mouse_sensitivity
 	else
-		Player.turn = -v
+		Player.turn = -v * Options.mouse_sensitivity
 	end
 end}
 
 Action{name = "Tilt", mode = "analog", key1 = "mousey", func = function(v)
 	if Action.dict_press[Keys.LCTRL] then
-		Player.camera_tilt = v
+		Player.camera_tilt = v * Options.mouse_sensitivity
 	else
-		Player.tilt = v
+		Player.tilt = v * Options.mouse_sensitivity
 	end
 end}
 
