@@ -303,23 +303,61 @@ int liext_network_send (
 void liext_network_shutdown (
 	LIExtModule* self)
 {
+	ENetEvent event;
 	LIAlgU32dicIter iter0;
+	LIExtClient* client;
 
-	/* Disconnect and free clients. */
-	LIALG_U32DIC_FOREACH (iter0, self->clients)
-		liext_client_free (iter0.value);
-	lialg_u32dic_clear (self->clients);
+	if (self->server_socket != NULL)
+	{
+		/* Queue a disconnection event for each client. */
+		LIALG_U32DIC_FOREACH (iter0, self->clients)
+		{
+			client = iter0.value;
+			enet_peer_disconnect (client->peer, 0);
+		}
 
-	/* Destroy sockets. */
+		/* Wait for the disconnection events to be sent. */
+		/* This blocks but it isn't a huge problem at this point since
+		   there's no current use case for highly responsive shutdowns. */
+		while (enet_host_service (self->server_socket, &event, 500))
+		{
+			switch (event.type)
+			{
+				case ENET_EVENT_TYPE_CONNECT:
+					enet_peer_reset (event.peer);
+					break;
+				case ENET_EVENT_TYPE_RECEIVE:
+					enet_packet_destroy (event.packet);
+					break;
+				case ENET_EVENT_TYPE_DISCONNECT:
+					break;
+				default:
+					break;
+			}
+		}
+
+		/* Force disconnect and free clients. */
+		LIALG_U32DIC_FOREACH (iter0, self->clients)
+		{
+			client = iter0.value;
+			enet_peer_reset (client->peer);
+			liext_client_free (client);
+		}
+		lialg_u32dic_clear (self->clients);
+
+		/* Destroy the server socket. */
+		if (self->server_socket)
+		{
+			enet_host_destroy (self->server_socket);
+			self->server_socket = NULL;
+		}
+	}
+
+	/* Destroy the client socket. */
 	if (self->client_socket)
 	{
 		enet_host_destroy (self->client_socket);
 		self->client_socket = NULL;
-	}
-	if (self->server_socket)
-	{
-		enet_host_destroy (self->server_socket);
-		self->server_socket = NULL;
 	}
 	self->connected = 0;
 }
