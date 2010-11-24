@@ -53,17 +53,18 @@ in fragvar
 } IN;]]
 .. Shader.los_light_attenuation
 .. Shader.los_light_combine
+.. Shader.los_light_specular
 .. Shader.los_normal_mapping .. [[
 float los_light_diffuse_hair(in vec3 coord, in vec3 normal)
 {
 	vec3 dir = normalize(coord);
 	float coeff = dot(normal, dir);
-	return max(0.0, 0.75 * coeff + 0.25);
+	return max(0.0, 0.25 + 0.75 * coeff);
 }
 float los_light_specular_hair(in vec3 coord, in vec3 normal, in vec3 tangent, in float shininess)
 {
-	vec3 refl = reflect(normalize(coord), normal);
-	float a = dot(tangent, refl);
+	vec3 refl = reflect(-normalize(coord), normal);
+	float a = max(0.0, dot(tangent, refl));
 	float coeff1 = max(0.0, dot(normal, refl));
 	float coeff2 = sqrt(1.0 - a * a);
 	float coeff = mix(coeff1, coeff2, 0.6);
@@ -74,11 +75,12 @@ void main()
 	vec3 tangent = normalize(IN.tangent);
 	vec3 normal = los_normal_mapping(IN.normal, tangent, IN.texcoord, LOS_diffuse_texture_1);
 	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
+	if(normal.z < 0)
+		normal = -normal;
 	float fattn = los_light_attenuation(IN.lightvector, LOS.light_equation);
 	float fdiff = los_light_diffuse_hair(IN.lightvector, normal);
 	float fspec = los_light_specular_hair(IN.coord, normal, tangent, LOS.material_shininess);
 	vec4 light = los_light_combine(fattn, fdiff, fspec, LOS.light_ambient,
 		LOS.light_diffuse, LOS.light_specular * LOS.material_specular);
 	gl_FragColor = LOS.material_diffuse * diffuse * light;
-	gl_FragColor.a = diffuse.a;
 }]]}

@@ -11,7 +11,8 @@ Chargen.list_genders = {
 	{"Male", "male"}}
 Chargen.list_hair_styles = {
 	{"Bald", ""},
-	{"Pigtails", "hair1"}}
+	{"Pigtails", "hair1"},
+	{"Long", "hair2"}}
 Chargen.list_eye_styles = {
 	{"Default", ""}} -- TODO
 Chargen.list_skin_styles = {
@@ -75,7 +76,7 @@ Chargen.init = function(clss)
 	-- Preview widget.
 	clss.scene = Scene()
 	clss.object = Object{position = Vector(1, 1, 1), type = "character"}
-	clss.light = Light{ambient = {1.0,1.0,1.0,0.3}, diffuse={1.0,1.0,1.0,1.0}, equation={3,0.3,0.03}}
+	clss.light = Light{ambient = {1.0,1.0,1.0,1.0}, diffuse={1.0,1.0,1.0,1.0}, equation={2,0.3,0.03}}
 	clss.camera = Camera{far = 60.0, near = 0.3, mode = "first-person"}
 	clss.timer = Timer{enabled = false, func = function(self, secs) clss:update(secs) end}
 	clss.preview = Widgets.Scene{cols = 1, behind = true, fullscreen = true, camera = clss.camera}

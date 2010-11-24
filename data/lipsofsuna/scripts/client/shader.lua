@@ -43,7 +43,7 @@ float los_light_attenuation(in vec3 coord, in vec3 equation)
 Shader.los_light_combine = [[
 vec4 los_light_combine(in float fattn, in float fdiff, in float fspec, in vec4 cambi, in vec4 cdiff, in vec4 cspec)
 {
-	return fattn * (cambi + fdiff * cdiff + fspec * cspec);
+	return vec4(fattn * (cambi.rgb + fdiff * cdiff.rgb + fspec * cspec.rgb), 1.0);
 }]]
 
 Shader.los_light_diffuse = [[
