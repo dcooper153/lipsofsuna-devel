@@ -32,7 +32,7 @@ def configure(ctx):
 		exit(1)
 	ctx.env.RELPATH = Options.options.relpath != "false"
 	ctx.env.SOUND = Options.options.sound != "false"
-	if Options.options.optimize != "false":
+	if Options.options.optimize == "true":
 		optimize = '-O3'
 	else:
 		optimize = '-O0'
