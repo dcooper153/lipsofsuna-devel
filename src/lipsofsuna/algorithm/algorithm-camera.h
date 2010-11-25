@@ -46,6 +46,12 @@ struct _LIAlgCamera
 	} controls;
 	struct
 	{
+		float pos;
+		float rot;
+		float timer;
+	} smoothing;
+	struct
+	{
 		LIMatTransform center;
 		LIMatTransform current;
 		LIMatTransform local;
@@ -151,6 +157,16 @@ LIAPICALL (void, lialg_camera_set_projection, (
 	float        aspect,
 	float        nearplane,
 	float        farplane));
+
+LIAPICALL (void, lialg_camera_get_smoothing, (
+	const LIAlgCamera* self,
+	float*             pos,
+	float*             rot));
+
+LIAPICALL (void, lialg_camera_set_smoothing, (
+	LIAlgCamera* self,
+	float        pos,
+	float        rot));
 
 LIAPICALL (void, lialg_camera_get_transform, (
 	const LIAlgCamera* self,

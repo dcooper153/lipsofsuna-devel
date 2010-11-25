@@ -210,6 +210,16 @@ static void Camera_turn (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Warps the camera to the target point.
+ * -- @param self Camera.
+ * function Camera.warp(self)
+ */
+static void Camera_warp (LIScrArgs* args)
+{
+	lialg_camera_warp (args->self);
+}
+
+/* @luadoc
  * --- Animates the camera.
  * --
  * -- @param self Camera.
@@ -369,6 +379,29 @@ static void Camera_getter_position (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- The position smoothing factor of the camera.
+ * -- @name Camera.position_smoothing
+ * -- @class table
+ */
+static void Camera_getter_position_smoothing (LIScrArgs* args)
+{
+	float pos;
+	float rot;
+
+	lialg_camera_get_smoothing (args->self, &pos, &rot);
+	liscr_args_seti_float (args, pos);
+}
+static void Camera_setter_position_smoothing (LIScrArgs* args)
+{
+	float pos;
+	float rot;
+
+	lialg_camera_get_smoothing (args->self, &pos, &rot);
+	liscr_args_geti_float (args, 0, &pos);
+	lialg_camera_set_smoothing (args->self, pos, rot);
+}
+
+/* @luadoc
  * --- Projection matrix.
  * -- @name Camera.projection
  * -- @class table
@@ -399,6 +432,29 @@ static void Camera_getter_rotation (LIScrArgs* args)
 	camera = args->self;
 	lialg_camera_get_transform (camera, &transform);
 	liscr_args_seti_quaternion (args, &transform.rotation);
+}
+
+/* @luadoc
+ * --- The rotation smoothing factor of the camera.
+ * -- @name Camera.rotation_smoothing
+ * -- @class table
+ */
+static void Camera_getter_rotation_smoothing (LIScrArgs* args)
+{
+	float pos;
+	float rot;
+
+	lialg_camera_get_smoothing (args->self, &pos, &rot);
+	liscr_args_seti_float (args, rot);
+}
+static void Camera_setter_rotation_smoothing (LIScrArgs* args)
+{
+	float pos;
+	float rot;
+
+	lialg_camera_get_smoothing (args->self, &pos, &rot);
+	liscr_args_geti_float (args, 0, &rot);
+	lialg_camera_set_smoothing (args->self, pos, rot);
 }
 
 /* @luadoc
@@ -498,14 +554,17 @@ void liext_script_camera (
 	liscr_class_insert_mfunc (self, "tilt", Camera_tilt);
 	liscr_class_insert_mfunc (self, "turn", Camera_turn);
 	liscr_class_insert_mfunc (self, "update", Camera_update);
+	liscr_class_insert_mfunc (self, "warp", Camera_warp);
 	liscr_class_insert_mfunc (self, "zoom", Camera_zoom);
 	liscr_class_insert_mvar (self, "far", NULL, Camera_setter_far);
 	liscr_class_insert_mvar (self, "mode", Camera_getter_mode, Camera_setter_mode);
 	liscr_class_insert_mvar (self, "near", NULL, Camera_setter_near);
 	liscr_class_insert_mvar (self, "modelview", Camera_getter_modelview, NULL);
 	liscr_class_insert_mvar (self, "position", Camera_getter_position, NULL);
+	liscr_class_insert_mvar (self, "position_smoothing", Camera_getter_position_smoothing, Camera_setter_position_smoothing);
 	liscr_class_insert_mvar (self, "projection", Camera_getter_projection, NULL);
 	liscr_class_insert_mvar (self, "rotation", Camera_getter_rotation, NULL);
+	liscr_class_insert_mvar (self, "rotation_smoothing", Camera_getter_rotation_smoothing, Camera_setter_rotation_smoothing);
 	liscr_class_insert_mvar (self, "target_position", Camera_getter_target_position, Camera_setter_target_position);
 	liscr_class_insert_mvar (self, "target_rotation", Camera_getter_target_rotation, Camera_setter_target_rotation);
 	liscr_class_insert_mvar (self, "viewport", Camera_getter_viewport, Camera_setter_viewport);
