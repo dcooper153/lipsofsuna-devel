@@ -162,6 +162,8 @@ Chargen.execute = function(clss)
 	clss.timer.enabled = true
 	clss.light.enabled = true
 	clss:random()
+	clss:update(0.0)
+	clss.camera:warp()
 end
 
 Chargen.free = function(clss)
