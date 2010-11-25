@@ -388,9 +388,10 @@ private_init_resources (LIRenRender* self,
 	glGenTextures (1, &self->helpers.noise);
 	glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_NOISE_TEXTURE);
 	glBindTexture (GL_TEXTURE_2D, self->helpers.noise);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, 256, 256, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glGenerateMipmap (GL_TEXTURE_2D);
 	glActiveTexture (GL_TEXTURE0);
 	lisys_free (pixels);
 
