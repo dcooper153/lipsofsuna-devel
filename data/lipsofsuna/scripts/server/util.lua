@@ -7,7 +7,7 @@ end
 
 Config = {}
 Config.center = Vector(1024, 1024, 1024)
-Config.spawn = Vector(1024, 1026, 1024)
+Config.spawn = Vector(1026, 1010, 1024)
 
 Config.tilewidth = 32 / Voxel.tiles_per_line
 Config.tilescale = 1 / Config.tilewidth
