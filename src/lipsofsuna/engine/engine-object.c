@@ -54,7 +54,6 @@ LIEngObject* lieng_object_new (
 	self->id = id;
 	self->engine = engine;
 	self->transform = limat_transform_identity ();
-	self->smoothing.target = limat_transform_identity ();
 
 	/* Choose object number. */
 	while (!self->id)
@@ -289,9 +288,6 @@ lieng_object_moved (LIEngObject* self)
 		self->sector = dst;
 	}
 
-	/* Physics defeat smoothing. */
-	self->smoothing.target = transform;
-
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "object-motion", lical_marshal_DATA_PTR, self);
 
@@ -331,47 +327,6 @@ void lieng_object_update (
 	LIEngObject* self,
 	float        secs)
 {
-	LIMatTransform transform;
-	LIMatTransform transform0;
-	LIMatTransform transform1;
-
-	/* Smoothing. */
-	if (self->smoothing.rot != 0.0f || self->smoothing.pos != 0.0f)
-	{
-		/* Update smoothing timer. */
-		if (!lieng_object_get_realized (self))
-			return;
-		self->smoothing.timer += secs;
-		if (self->smoothing.timer < SMOOTHING_TIMESTEP)
-			return;
-		if (self->smoothing.timer > 1.0f)
-			self->smoothing.timer -= floor (self->smoothing.timer);
-
-		/* Calculate the new position. */
-		/* This is done in a loop with a constant timestep to make
-		   smoothing more resilient to rapid framerate changes. */
-		while (self->smoothing.timer >= SMOOTHING_TIMESTEP)
-		{
-			transform0 = self->transform;
-			transform1 = self->smoothing.target;
-			transform0.rotation = limat_quaternion_get_nearest (transform0.rotation, transform1.rotation);
-			transform.position = limat_vector_lerp (
-				transform1.position, transform0.position,
-				0.5f * self->smoothing.pos);
-			transform.rotation = limat_quaternion_nlerp (
-				transform1.rotation, transform0.rotation,
-				0.5f * self->smoothing.rot);
-			self->transform = transform;
-			self->smoothing.timer -= SMOOTHING_TIMESTEP;
-		}
-
-		/* Set new position. */
-		self->transform = transform;
-		private_warp (self, &transform.position);
-
-		/* Invoke callbacks. */
-		lical_callbacks_call (self->engine->callbacks, self->engine, "object-transform", lical_marshal_DATA_PTR_PTR, self, &transform);
-	}
 }
 
 /**
@@ -550,68 +505,7 @@ lieng_object_get_sector (LIEngObject* self)
 }
 
 /**
- * \brief Gets positional and rotation smoothing.
- *
- * \param self Object.
- * \param pos Return location for positional smoothing.
- * \param rot Return location for rotational smoothing.
- */
-void lieng_object_get_smoothing (
-	LIEngObject* self,
-	float*       pos,
-	float*       rot)
-{
-	*pos = self->smoothing.pos;
-	*rot = self->smoothing.rot;
-}
-
-/**
- * \brief Sets positional and rotation smoothing.
- *
- * By setting either of the smoothing values to non-zero, the engine object is
- * set to interpolation mode. In interpolation mode, all transformations are
- * delayed and happen gradually each time the engine state is updated. Both
- * values default to zero.
- *
- * \param self Object.
- * \param pos Positional smoothing.
- * \param rot Rotational smoothing.
- */
-void lieng_object_set_smoothing (
-	LIEngObject* self,
-	float        pos,
-	float        rot)
-{
-	self->smoothing.pos = pos;
-	self->smoothing.rot = rot;
-}
-
-/**
- * \brief Gets the smoothing target transformation of the object.
- *
- * Works exactly like #lieng_object_get_transform when smoothing is disabled.
- * However, if smoothing is enabled, this returns the target transformation
- * instead of the current interpolation state. 
- *
- * \param self Object.
- * \param value Return location for the transformation.
- */
-void
-lieng_object_get_target (const LIEngObject* self,
-                         LIMatTransform*    value)
-{
-	int realized;
-
-	realized = lieng_object_get_realized (self);
-	if (!realized || (self->smoothing.rot == 0.0f && self->smoothing.pos == 0.0f))
-		*value = self->transform;
-	else
-		*value = self->smoothing.target;
-}
-
-/**
  * \brief Gets the world space transformation of the object.
- *
  * \param self Object.
  * \param value Return location for the transformation.
  */
@@ -635,21 +529,17 @@ lieng_object_set_transform (LIEngObject*          self,
 {
 	int realized;
 
+	/* Warp to new position. */
 	realized = lieng_object_get_realized (self);
-	if (!realized || (self->smoothing.rot == 0.0f && self->smoothing.pos == 0.0f))
+	if (realized)
 	{
-		/* Transform immediately. */
-		if (realized)
-		{
-			if (!private_warp (self, &value->position))
-				return 0;
-		}
-		self->transform = *value;
-
-		/* Invoke callbacks. */
-		lical_callbacks_call (self->engine->callbacks, self->engine, "object-transform", lical_marshal_DATA_PTR_PTR, self, value);
+		if (!private_warp (self, &value->position))
+			return 0;
 	}
-	self->smoothing.target = *value;
+	self->transform = *value;
+
+	/* Invoke callbacks. */
+	lical_callbacks_call (self->engine->callbacks, self->engine, "object-transform", lical_marshal_DATA_PTR_PTR, self, value);
 
 	return 1;
 }

@@ -43,13 +43,6 @@ struct _LIEngObject
 #ifndef LIENG_DISABLE_SCRIPTS
 	LIScrData* script;
 #endif
-	struct
-	{
-		float pos;
-		float rot;
-		float timer;
-		LIMatTransform target;
-	} smoothing;
 };
 
 LIAPICALL (LIEngObject*, lieng_object_new, (
@@ -125,20 +118,6 @@ LIAPICALL (int, lieng_object_set_realized, (
 
 LIAPICALL (LIEngSector*, lieng_object_get_sector, (
 	LIEngObject* self));
-
-LIAPICALL (void, lieng_object_get_smoothing, (
-	LIEngObject* self,
-	float*       pos,
-	float*       rot));
-
-LIAPICALL (void, lieng_object_set_smoothing, (
-	LIEngObject* self,
-	float        pos,
-	float        rot));
-
-LIAPICALL (void, lieng_object_get_target, (
-	const LIEngObject* self,
-	LIMatTransform*    value));
 
 LIAPICALL (void, lieng_object_get_transform, (
 	const LIEngObject* self,

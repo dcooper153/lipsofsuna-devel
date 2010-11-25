@@ -145,3 +145,34 @@ Object.update_rotation = function(self, quat)
 		self.rotation = quat
 	end
 end
+
+Object.update_motion_state = function(self, tick)
+	if not self.interpolation then return end
+	-- Damp velocity to reduce overshoots.
+	self.interpolation = self.interpolation + tick
+	if self.interpolation > 0.3 then
+		self.velocity = self.velocity * 0.93
+	end
+	-- Apply position change predicted by the velocity.
+	self.position = self.position + self.velocity * tick
+	-- Correction prediction errors over time.
+	self.position = self.position + self.correction * 0.07
+	self.correction = self.correction * 0.93
+end
+
+Object.set_motion_state = function(self, pos, rot, vel)
+	-- Store the prediction error so that it can be corrected over time.
+	if (pos - self.position).length < 5 then
+		self.correction = pos - self.position
+	else
+		self.position = pos
+		self.correction = Vector()
+	end
+	-- Store the current velocity so that we can predict future movements.
+	self.velocity = Vector(vx, vy, vz)
+	self.interpolation = 0
+	-- Set rotation unless controlled by the local player.
+	if self ~= Player.object then
+		self:update_rotation(rot)
+	end
+end

@@ -455,34 +455,10 @@ static void Object_setter_position (LIScrArgs* args)
 
 	if (liscr_args_geti_vector (args, 0, &vector))
 	{
-		lieng_object_get_target (args->self, &transform);
+		lieng_object_get_transform (args->self, &transform);
 		transform.position = vector;
 		lieng_object_set_transform (args->self, &transform);
 	}
-}
-
-/* @luadoc
- * --- The position smoothing factor of the object.
- * --
- * -- @name Object.position_smoothing
- * -- @class table
- */
-static void Object_getter_position_smoothing (LIScrArgs* args)
-{
-	float pos;
-	float rot;
-
-	lieng_object_get_smoothing (args->self, &pos, &rot);
-	liscr_args_seti_float (args, pos);
-}
-static void Object_setter_position_smoothing (LIScrArgs* args)
-{
-	float pos;
-	float rot;
-
-	lieng_object_get_smoothing (args->self, &pos, &rot);
-	liscr_args_geti_float (args, 0, &pos);
-	lieng_object_set_smoothing (args->self, pos, rot);
 }
 
 /* @luadoc
@@ -523,34 +499,10 @@ static void Object_setter_rotation (LIScrArgs* args)
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &quat))
 	{
-		lieng_object_get_target (args->self, &transform);
+		lieng_object_get_transform (args->self, &transform);
 		transform.rotation = *((LIMatQuaternion*) quat->data);
 		lieng_object_set_transform (args->self, &transform);
 	}
-}
-
-/* @luadoc
- * --- The rotation smoothing factor of the object.
- * --
- * -- @name Object.rotation_smoothing
- * -- @class table
- */
-static void Object_getter_rotation_smoothing (LIScrArgs* args)
-{
-	float pos;
-	float rot;
-
-	lieng_object_get_smoothing (args->self, &pos, &rot);
-	liscr_args_seti_float (args, rot);
-}
-static void Object_setter_rotation_smoothing (LIScrArgs* args)
-{
-	float pos;
-	float rot;
-
-	lieng_object_get_smoothing (args->self, &pos, &rot);
-	liscr_args_geti_float (args, 0, &rot);
-	lieng_object_set_smoothing (args->self, pos, rot);
 }
 
 /* @luadoc
@@ -589,10 +541,8 @@ void liscr_script_object (
 	liscr_class_insert_mvar (self, "animations", Object_getter_animations, NULL);
 	liscr_class_insert_mvar (self, "model", Object_getter_model, Object_setter_model);
 	liscr_class_insert_mvar (self, "position", Object_getter_position, Object_setter_position);
-	liscr_class_insert_mvar (self, "position_smoothing", Object_getter_position_smoothing, Object_setter_position_smoothing);
 	liscr_class_insert_mvar (self, "realized", Object_getter_realized, Object_setter_realized);
 	liscr_class_insert_mvar (self, "rotation", Object_getter_rotation, Object_setter_rotation);
-	liscr_class_insert_mvar (self, "rotation_smoothing", Object_getter_rotation_smoothing, Object_setter_rotation_smoothing);
 	liscr_class_insert_mvar (self, "sector", Object_getter_sector, NULL);
 }
 

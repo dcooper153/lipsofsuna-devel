@@ -129,7 +129,7 @@ Eventhandler{type = "tick", func = function(self, args)
 		-- Sound playback.
 		Sound.listener_position = Player.camera.position
 		Sound.listener_rotation = Player.camera.rotation
-		-- TODO: Sound.listener_velocity = ...
+		Sound.listener_velocity = Player.object.velocity
 		-- Refresh the active portion of the map.
 		Player.object:refresh()
 	end
@@ -228,15 +228,11 @@ Protocol:add_handler{type = "OBJECT_HIDDEN", func = function(event)
 end}
 
 Protocol:add_handler{type = "OBJECT_MOVED", func = function(event)
-	local ok,i,x,y,z,rx,ry,rz,rw = event.packet:read("uint32", "float", "float", "float", "float", "float", "float", "float")
+	local ok,i,x,y,z,rx,ry,rz,rw,vx,vy,vz = event.packet:read("uint32", "float", "float", "float", "float", "float", "float", "float", "float", "float", "float")
 	if ok then
 		local o = Object:find{id = i}
-		if o then
-			o.position = Vector(x, y, z)
-			if o ~= Player.object then
-				o:update_rotation(Quaternion(rx, ry, rz, rw))
-			end
-		end
+		if not o then return end
+		o:set_motion_state(Vector(x, y, z), Quaternion(rx, ry, rz, rw), Vector(vx, vy, vz))
 	end
 end}
 
@@ -257,7 +253,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	if not ok then return end
 	-- Create the object.
 	local type = (t == 0 and "creature") or (t == 1 and "item") or (t == 2 and "obstacle") or "object"
-	local o = Object{id = i, model = m, name = n, position = Vector(x, y, z), position_smoothing = 0.5, rotation_smoothing = 0.5, type = type}
+	local o = Object{id = i, model = m, name = n, position = Vector(x, y, z), type = type}
 	-- Apply optional customizations.
 	local ok,ra,ge,bo,no,bu,eye,eyer,eyeg,eyeb,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = event.packet:resume(
 		"string", "string", "float", "float", "float",

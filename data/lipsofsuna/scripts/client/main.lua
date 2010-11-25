@@ -97,6 +97,7 @@ end}
 
 local animt = 0
 local transpt = 0
+local ipolt = 0
 Eventhandler{type = "tick", func = function(self, args)
 	-- Update animations.
 	animt = animt + args.secs
@@ -118,6 +119,18 @@ Eventhandler{type = "tick", func = function(self, args)
 			end
 		end
 		transpt = 0
+	end
+	-- Interpolate objects.
+	ipolt = math.min(ipolt + args.secs, 1)
+	while ipolt > 1/60 do
+		for k,v in pairs(Object.objects) do
+			v:update_motion_state(1/60)
+		end
+		ipolt = ipolt - 1/60
+	end
+	-- Update equipment positions.
+	for k,v in pairs(Slots.dict_owner) do
+		v:update()
 	end
 end}
 

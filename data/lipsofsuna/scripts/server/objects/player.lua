@@ -144,9 +144,11 @@ Player.vision_cb = function(self, args)
 		end,
 		["object-moved"] = function(args)
 			local o = args.object
-			self:send{packet = Packet(packets.OBJECT_MOVED, "uint32", o.id,
+			local p = Packet(packets.OBJECT_MOVED, "uint32", o.id,
 				"float", o.position.x, "float", o.position.y, "float", o.position.z,
-				"float", o.rotation.x, "float", o.rotation.y, "float", o.rotation.z, "float", o.rotation.w)}
+				"float", o.rotation.x, "float", o.rotation.y, "float", o.rotation.z, "float", o.rotation.w,
+				"float", o.velocity.x, "float", o.velocity.y, "float", o.velocity.z)
+			self:send{packet = p, reliable = false}
 			if o == self then
 				self.vision:rescan_objects()
 				sendmap()

@@ -41,9 +41,3 @@ Slots.update = function(self)
 		end
 	end
 end
-
-Eventhandler{type = "tick", func = function(self, args)
-	for k,v in pairs(Slots.dict_owner) do
-		v:update()
-	end
-end}
