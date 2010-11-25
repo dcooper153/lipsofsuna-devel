@@ -80,6 +80,7 @@ Player.tilt_state = 0
 Player.turn_state = 0
 Player.rotation_curr = Quaternion()
 Player.rotation_prev = Quaternion()
+Player.rotation_sync_timer = 0
 Player.update_rotation = function(clss, secs)
 	local spec = Species:find{name = Player.object.race}
 	-- Update turning.
@@ -98,10 +99,19 @@ Player.update_rotation = function(clss, secs)
 	clss.object:update_rotation(r)
 	clss.rotation_curr = r
 	-- Sync rotation with the server.
-	if (clss.rotation_prev - r).length > 0.1 then
-		clss.rotation_prev = r
-		Network:send{packet = Packet(packets.PLAYER_TURN, "float", r.x, "float", r.y, "float", r.z, "float", r.w)}
+	-- Rotation takes at most 0.25 seconds to fully synchronize. Large changes
+	-- are sent immediately whereas smaller changes are grouped together to
+	-- reduce useless network traffic.
+	clss.rotation_sync_timer = clss.rotation_sync_timer + secs
+	if (clss.rotation_prev - r).length > math.max(0, 0.1 - 0.4 * clss.rotation_sync_timer) then
+		clss:send_rotation()
 	end
+end
+
+Player.send_rotation = function(clss)
+	local r = clss.rotation_curr
+	clss.rotation_prev = r
+	Network:send{packet = Packet(packets.PLAYER_TURN, "float", r.x, "float", r.y, "float", r.z, "float", r.w)}
 end
 
 Player.update_pose = function(clss, secs)
