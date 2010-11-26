@@ -117,6 +117,7 @@ Itemspec{
 	crafting_materials = {mushroom = 1},
 	crafting_skills = {intelligence = 75},
 	crafting_tools = {["mortar and pestle"] = 1},
+	stacking = true,
 	icon = "potion2"}
 
 Itemspec{
