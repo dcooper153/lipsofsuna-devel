@@ -1,6 +1,6 @@
 Shader{
 name = "tilenxz",
-deferred_pass1_vertex = [[
+pass2_vertex = [[
 out vec3 var_coord;
 out vec3 var_normal;
 out vec3 var_tangent;
@@ -19,7 +19,7 @@ void main()
 	var_texcoord.xy = vec2(abs(dot(tex, u)), abs(dot(tex,v)));
 	var_texcoord *= (1.0 - LOS.material_param_0.x);
 }]],
-deferred_pass1_fragment = [[
+pass2_fragment = [[
 in vec3 var_normal;
 in vec3 var_tangent;
 in vec2 var_texcoord;

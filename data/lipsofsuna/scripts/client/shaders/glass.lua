@@ -1,6 +1,8 @@
 Shader{
 name = "glass",
-transparent_pass1_vertex = [[
+pass6_depth_func = "lequal",
+pass6_depth_write = false,
+pass6_vertex = [[
 out vec3 var_coord;
 out vec3 var_normal;
 out vec2 var_texcoord;
@@ -14,7 +16,7 @@ void main()
 	var_lightdir = LOS.light_position_premult - var_coord;
 	gl_Position = LOS.matrix_projection * tmp;
 }]],
-transparent_pass1_fragment = [[
+pass6_fragment = [[
 in vec3 var_coord;
 in vec3 var_normal;
 in vec2 var_texcoord;

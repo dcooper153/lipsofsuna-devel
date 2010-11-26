@@ -103,6 +103,13 @@ void liren_shader_clear_pass (
  * \param geometry Geometry shader code or NULL.
  * \param fragment Fragment shader code.
  * \param feedback Nonzero to enable transform feedback.
+ * \param blend_enable Nonzero to enable blending.
+ * \param blend_src Source blend function.
+ * \param blend_dst Destination blend function.
+ * \param color_write Nonzero to enable color writes.
+ * \param depth_test Nonzero to enable depth test.
+ * \param depth_write Nonzero to enable depth writes.
+ * \param depth_func Depth test function.
  * \return Nonzero on success.
  */
 int liren_shader_compile (
@@ -111,10 +118,33 @@ int liren_shader_compile (
 	const char*  vertex,
 	const char*  geometry,
 	const char*  fragment,
-	int          feedback)
+	int          feedback,
+	int          blend_enable,
+	GLenum       blend_src,
+	GLenum       blend_dst,
+	int          color_write,
+	int          depth_test,
+	int          depth_write,
+	GLenum       depth_func)
 {
+	liren_program_set_blend (self->passes + pass, blend_enable, blend_src, blend_dst);
+	liren_program_set_color (self->passes + pass, color_write);
+	liren_program_set_depth (self->passes + pass, depth_test, depth_write, depth_func);
 	return liren_program_compile (self->passes + pass, self->name,
 		vertex, geometry, fragment, feedback);
+}
+
+int liren_shader_get_sort (
+	LIRenShader* self)
+{
+	return self->sort;
+}
+
+void liren_shader_set_sort (
+	LIRenShader* self,
+	int          value)
+{
+	self->sort = value;
 }
 
 /** @} */

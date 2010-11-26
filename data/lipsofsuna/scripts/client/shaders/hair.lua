@@ -1,6 +1,9 @@
 Shader{
 name = "hair",
-forward_pass1_vertex = [[
+sort = true,
+pass1_color_write = false,
+pass1_depth_func = "lequal",
+pass1_vertex = [[
 out fragvar
 {
 	vec2 texcoord;
@@ -11,7 +14,7 @@ void main()
 	OUT.texcoord = LOS_texcoord;
 	gl_Position = LOS.matrix_projection * tmp;
 }]],
-forward_pass1_fragment = [[
+pass1_fragment = [[
 in fragvar
 {
 	vec2 texcoord;
@@ -21,9 +24,13 @@ void main()
 	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
 	if (diffuse.a < 0.90)
 		discard;
-	gl_FragColor = vec4(0.0,0.0,0.0,0.0);
 }]],
-transparent_pass1_vertex = [[
+pass6_blend = true,
+pass6_blend_src = "src_alpha",
+pass6_blend_dst = "one",
+pass6_depth_func = "lequal",
+pass6_depth_write = false,
+pass6_vertex = [[
 out fragvar
 {
 	vec3 coord;
@@ -42,7 +49,7 @@ void main()
 	OUT.texcoord = LOS_texcoord;
 	gl_Position = LOS.matrix_projection * tmp;
 }]],
-transparent_pass1_fragment = [[
+pass6_fragment = [[
 in fragvar
 {
 	vec3 coord;

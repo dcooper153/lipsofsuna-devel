@@ -47,6 +47,7 @@ struct _LIRenContext
 	LIMatFrustum frustum;
 	LIRenUniforms uniforms;
 	GLuint shadow_texture;
+	int color_write;
 	int shader_pass;
 	struct
 	{
@@ -121,6 +122,10 @@ LIAPICALL (void, liren_context_set_blend, (
 LIAPICALL (void, liren_context_set_buffer, (
 	LIRenContext* self,
 	LIRenBuffer*  vertex));
+
+LIAPICALL (void, liren_context_set_color_write, (
+	LIRenContext* self,
+	int           value));
 
 LIAPICALL (void, liren_context_set_cull, (
 	LIRenContext* self,

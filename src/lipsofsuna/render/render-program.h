@@ -27,6 +27,13 @@ typedef struct _LIRenProgram LIRenProgram;
 struct _LIRenProgram
 {
 	LIRenRender* render;
+	int depth_test;
+	int depth_write;
+	GLenum depth_func;
+	int blend_enable;
+	GLenum blend_src;
+	GLenum blend_dst;
+	int color_write;
 	GLuint program;
 	GLuint vertex;
 	GLuint geometry;
@@ -47,6 +54,22 @@ LIAPICALL (int, liren_program_compile, (
 	const char*   geometry,
 	const char*   fragment,
 	int           feedback));
+
+LIAPICALL (void, liren_program_set_blend, (
+	LIRenProgram* self,
+	int           blend_enabled,
+	GLenum        blend_src,
+	GLenum        blend_dst));
+
+LIAPICALL (void, liren_program_set_color, (
+	LIRenProgram* self,
+	int           color_write));
+
+LIAPICALL (void, liren_program_set_depth, (
+	LIRenProgram* self,
+	int           depth_test,
+	int           depth_write,
+	GLenum        depth_func));
 
 #endif
 

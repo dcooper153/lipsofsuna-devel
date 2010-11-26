@@ -8,14 +8,9 @@ Bloom.shape = 4       -- The shape of the intensity curve of the bloom filter.
 -- @param clss Bloom class.
 Bloom.init = function(clss)
 	clss:compile_filter_kernel()
-	clss.shader_horz = Shader{
-		name = "postprocess-horz-hdr",
-		forward_pass1_vertex = clss.code_vertex,
-		forward_pass1_fragment = clss:code_fragment(true)}
-	clss.shader_vert = Shader{
-		name = "postprocess-vert-hdr",
-		forward_pass1_vertex = clss.code_vertex,
-		forward_pass1_fragment = clss:code_fragment(false)}
+	clss.shader_horz = Shader{name = "postprocess-horz-hdr"}
+	clss.shader_vert = Shader{name = "postprocess-vert-hdr"}
+	clss:compile()
 end
 
 --- Recompiles the bloom filters.
@@ -23,11 +18,15 @@ end
 Bloom.compile = function(clss)
 	clss:compile_filter_kernel()
 	clss.shader_horz:compile{
-		forward_pass1_vertex = clss.code_vertex,
-		forward_pass1_fragment = clss:code_fragment(true)}
+		pass1_depth_test = false,
+		pass1_depth_write = false,
+		pass1_vertex = clss.code_vertex,
+		pass1_fragment = clss:code_fragment(true)}
 	clss.shader_vert:compile{
-		forward_pass1_vertex = clss.code_vertex,
-		forward_pass1_fragment = clss:code_fragment(false)}
+		pass1_depth_test = false,
+		pass1_depth_write = false,
+		pass1_vertex = clss.code_vertex,
+		pass1_fragment = clss:code_fragment(false)}
 end
 
 --- Recompiles the kernel of the bloom filters.

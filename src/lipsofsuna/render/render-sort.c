@@ -291,8 +291,8 @@ int liren_sort_add_particle (
 	LIMatVector diff;
 	LIMatVector eye;
 
-	/* Don't add particles with no transparency shader pass. */
-	if (shader == NULL || !shader->passes[LIREN_SHADER_PASS_TRANSPARENT0].program)
+	/* Don't add particles with no valid shader. */
+	if (shader == NULL)
 		return 1;
 
 	/* Resize the buffer if necessary. */

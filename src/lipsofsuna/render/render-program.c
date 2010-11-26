@@ -59,6 +59,13 @@ int liren_program_init (
 {
 	memset (self, 0, sizeof (LIRenProgram));
 	self->render = render;
+	self->depth_write = 1;
+	self->depth_test = 1;
+	self->depth_func = GL_LEQUAL;
+	self->blend_enable = 0;
+	self->blend_src = GL_SRC_ALPHA;
+	self->blend_dst = GL_ONE_MINUS_SRC_ALPHA;
+	self->color_write = 1;
 
 	return 1;
 }
@@ -103,10 +110,45 @@ int liren_program_compile (
 		liren_program_clear (&tmp);
 		return 0;
 	}
-	liren_program_clear (self);
-	*self = tmp;
+	glDeleteProgram (self->program);
+	glDeleteShader (self->vertex);
+	glDeleteShader (self->geometry);
+	glDeleteShader (self->fragment);
+	self->program = tmp.program;
+	self->vertex = tmp.vertex;
+	self->geometry = tmp.geometry;
+	self->fragment = tmp.fragment;
 
 	return 1;
+}
+
+void liren_program_set_blend (
+	LIRenProgram* self,
+	int           blend_enable,
+	GLenum        blend_src,
+	GLenum        blend_dst)
+{
+	self->blend_enable = blend_enable;
+	self->blend_src = blend_src;
+	self->blend_dst = blend_dst;
+}
+
+void liren_program_set_color (
+	LIRenProgram* self,
+	int           color_write)
+{
+	self->color_write = color_write;
+}
+
+void liren_program_set_depth (
+	LIRenProgram* self,
+	int           depth_test,
+	int           depth_write,
+	GLenum        depth_func)
+{
+	self->depth_test = depth_test;
+	self->depth_write = depth_write;
+	self->depth_func = depth_func;
 }
 
 /****************************************************************************/

@@ -1,6 +1,6 @@
 Shader{
 name = "texrefl",
-deferred_pass1_vertex = [[
+pass2_vertex = [[
 out vec3 var_coord;
 out vec3 var_normal;
 out vec2 var_texcoord;
@@ -13,7 +13,7 @@ void main()
 	vec3 refr = normalize(reflect(normalize(var_coord), normalize(var_normal)));
 	var_texcoord = LOS_texcoord + refr.xy + refr.zz;
 }]],
-deferred_pass1_fragment = [[
+pass2_fragment = [[
 in vec3 var_coord;
 in vec3 var_normal;
 in vec2 var_texcoord;

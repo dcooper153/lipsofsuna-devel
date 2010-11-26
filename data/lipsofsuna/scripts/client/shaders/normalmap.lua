@@ -1,6 +1,7 @@
 Shader{
 name = "normalmap",
-deferred_pass1_vertex = [[
+pass2_depth_func = "lequal",
+pass2_vertex = [[
 out fragvar
 {
 	vec3 coord;
@@ -17,7 +18,7 @@ void main()
 	OUT.texcoord = LOS_texcoord;
 	gl_Position = LOS.matrix_projection * tmp;
 }]],
-deferred_pass1_fragment = [[
+pass2_fragment = [[
 in fragvar
 {
 	vec3 coord;

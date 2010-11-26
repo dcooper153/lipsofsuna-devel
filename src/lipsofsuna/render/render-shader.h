@@ -27,22 +27,11 @@
 #include "render-program.h"
 #include "render-uniform.h"
 
-enum
-{
-	LIREN_SHADER_PASS_DEFERRED0,
-	LIREN_SHADER_PASS_DEFERRED1,
-	LIREN_SHADER_PASS_DEFERRED_MAX = LIREN_SHADER_PASS_DEFERRED1,
-	LIREN_SHADER_PASS_FORWARD0,
-	LIREN_SHADER_PASS_FORWARD1,
-	LIREN_SHADER_PASS_FORWARD_MAX = LIREN_SHADER_PASS_FORWARD1,
-	LIREN_SHADER_PASS_TRANSPARENT0,
-	LIREN_SHADER_PASS_TRANSPARENT1,
-	LIREN_SHADER_PASS_TRANSPARENT_MAX = LIREN_SHADER_PASS_TRANSPARENT1,
-	LIREN_SHADER_PASS_COUNT,
-};
+#define LIREN_SHADER_PASS_COUNT 10
 
 struct _LIRenShader
 {
+	int sort;
 	char* name;
 	LIRenRender* render;
 	LIRenProgram passes[LIREN_SHADER_PASS_COUNT];
@@ -65,6 +54,20 @@ LIAPICALL (int, liren_shader_compile, (
 	const char*  vertex,
 	const char*  geometry,
 	const char*  fragment,
-	int          feedback));
+	int          feedback,
+	int          blend_enable,
+	GLenum       blend_src,
+	GLenum       blend_dst,
+	int          color_write,
+	int          depth_test,
+	int          depth_write,
+	GLenum       depth_func));
+
+LIAPICALL (int, liren_shader_get_sort, (
+	LIRenShader* self));
+
+LIAPICALL (void, liren_shader_set_sort, (
+	LIRenShader* self,
+	int          value));
 
 #endif

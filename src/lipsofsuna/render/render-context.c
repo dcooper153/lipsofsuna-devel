@@ -282,6 +282,19 @@ void liren_context_set_deferred (
 	}
 }
 
+void liren_context_set_color_write (
+	LIRenContext* self,
+	int           value)
+{
+	if (self->color_write != value)
+	{
+		if (value)
+			glColorMask (GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+		else
+			glColorMask (GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+	}
+}
+
 void liren_context_set_depth (
 	LIRenContext* self,
 	int           enable_test,
@@ -461,6 +474,14 @@ void liren_context_set_shader (
 		self->shader_pass = pass;
 		self->shader = value;
 		self->changed.shader = 1;
+	}
+	if (value != NULL)
+	{
+		liren_context_set_blend (self, value->passes[pass].blend_enable,
+			value->passes[pass].blend_src, value->passes[pass].blend_dst);
+		liren_context_set_color_write (self, value->passes[pass].color_write);
+		liren_context_set_depth (self, value->passes[pass].depth_test,
+			value->passes[pass].depth_write, value->passes[pass].depth_func);
 	}
 }
 

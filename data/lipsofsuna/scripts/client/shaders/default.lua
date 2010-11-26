@@ -1,6 +1,7 @@
 Shader{
 name = "default",
-deferred_pass1_vertex = [[
+pass2_depth_func = "lequal",
+pass2_vertex = [[
 out vec3 var_normal;
 out vec2 var_texcoord;
 void main()
@@ -10,7 +11,7 @@ void main()
 	var_texcoord = LOS_texcoord;
 	gl_Position = LOS.matrix_projection * tmp;
 }]],
-deferred_pass1_fragment = [[
+pass2_fragment = [[
 in vec3 var_normal;
 in vec2 var_texcoord;
 void main()

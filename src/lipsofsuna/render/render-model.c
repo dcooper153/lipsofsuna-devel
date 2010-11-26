@@ -163,7 +163,7 @@ int liren_model_deform (
 	/* Deform the mesh. */
 	context = liren_render_get_context (self->render);
 	liren_context_init (context);
-	liren_context_set_shader (context, LIREN_SHADER_PASS_FORWARD0, shader_);
+	liren_context_set_shader (context, 0, shader_);
 	liren_context_bind (context);
 	liren_buffer_texture_init (&tmp, data, count * sizeof (GLfloat));
 	lisys_free (data);
@@ -329,7 +329,7 @@ void liren_model_update_transparency (
 		material = self->materials.array[i];
 		if (material->shader == NULL)
 			continue;
-		if (!material->shader->passes[LIREN_SHADER_PASS_TRANSPARENT0].program)
+		if (!material->shader->sort)
 			continue;
 
 		/* Allocate space for the sort coordinates. */

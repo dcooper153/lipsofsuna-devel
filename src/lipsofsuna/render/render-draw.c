@@ -67,14 +67,6 @@ void liren_draw_default (
 	LIRenMaterial* material,
 	LIRenMesh*     mesh)
 {
-	liren_context_set_flags (context, LIREN_FLAG_LIGHTING | LIREN_FLAG_TEXTURING);
-	liren_context_set_material (context, material);
-	liren_context_set_shader (context, LIREN_SHADER_PASS_DEFERRED0, material->shader);
-	liren_context_set_modelmatrix (context, matrix);
-	liren_context_set_textures (context, material->textures.array, material->textures.count);
-	liren_context_set_mesh (context, mesh);
-	liren_context_bind (context);
-	liren_context_render_array (context, GL_TRIANGLES, index, count);
 }
 
 void

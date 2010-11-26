@@ -31,11 +31,12 @@ Widgets.Scene.render = function(self)
 		modelview = self.camera.modelview,
 		projection = self.camera.projection,
 		viewport = self.camera.viewport}
-	self.scene:draw_deferred_begin()
-	self.scene:draw_deferred_opaque()
-	self.scene:draw_deferred_end()
-	self.scene:draw_forward_opaque()
-	self.scene:draw_forward_transparent()
+	self.scene:draw_pass{pass = 1} -- Depth
+	self.scene:draw_pass{pass = 2, deferred = true} -- Deferred lighting
+	self.scene:draw_pass{pass = 3} -- Forward ambient
+	self.scene:draw_pass{pass = 4, lighting = true} -- Forward lighting
+	self.scene:draw_pass{pass = 5, sorting = true} -- Transparent ambient
+	self.scene:draw_pass{pass = 6, lighting = true, sorting = true} -- Transparent lighting
 	if Options.check_postproc.active then
 		self.scene:draw_post_process{shader = "postprocess-vert-hdr"}
 		self.scene:draw_post_process{shader = "postprocess-horz-hdr"}

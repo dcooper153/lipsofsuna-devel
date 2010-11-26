@@ -106,61 +106,9 @@ static void Scene_draw_begin (LIScrArgs* args)
 	/* Initialize rendering mode. */
 	glPushAttrib (GL_VIEWPORT_BIT);
 	glViewport (viewport[0], viewport[1], viewport[2], viewport[3]);
-	glDepthMask (GL_TRUE);
-	glClear (GL_DEPTH_BUFFER_BIT);
 	limat_frustum_init (&frustum, &modelview, &projection);
 	liren_deferred_resize (args->self, viewport[2], viewport[3]);
 	liren_scene_render_begin (scene, args->self, &modelview, &projection, &frustum);
-}
-
-/* @luadoc
- * ---
- * -- Begins the deferred rendering pass.
- * --
- * -- @param self Scene.
- * function Scene.draw_deferred_begin(self)
- */
-static void Scene_draw_deferred_begin (LIScrArgs* args)
-{
-	LIExtModule* module;
-	LIRenScene* scene;
-
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
-	scene = module->client->scene;
-	liren_scene_render_deferred_begin (scene);
-}
-
-/* @luadoc
- * ---
- * -- Ends the deferred rendering pass.<br/>
- * -- Draws lit fragments to the post-processing buffer using the lights of the
- * -- scene and the data in the deferred rendering G-buffer.
- * -- @param self Scene.
- * function Scene.draw_deferred_end(self)
- */
-static void Scene_draw_deferred_end (LIScrArgs* args)
-{
-	LIExtModule* module;
-	LIRenScene* scene;
-
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
-	scene = module->client->scene;
-	liren_scene_render_deferred_end (scene);
-}
-
-/* @luadoc
- * --- Draws opaque faces to the deferred rendering G-buffer.
- * -- @param self Scene.
- * function Scene.draw_deferred_opaque(self)
- */
-static void Scene_draw_deferred_opaque (LIScrArgs* args)
-{
-	LIExtModule* module;
-	LIRenScene* scene;
-
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
-	scene = module->client->scene;
-	liren_scene_render_deferred_opaque (scene);
 }
 
 /* @luadoc
@@ -177,44 +125,37 @@ static void Scene_draw_end (LIScrArgs* args)
 	scene = module->client->scene;
 	liren_scene_render_end (scene);
 	glPopAttrib ();
-	glEnable (GL_BLEND);
-	glEnable (GL_TEXTURE_2D);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable (GL_CULL_FACE);
-	glDisable (GL_DEPTH_TEST);
-	glDepthMask (GL_FALSE);
 }
 
 /* @luadoc
- * --- Draws the opaque faces of the scene to the post-processing buffer.
+ * --- Renders a scene pass.
  * -- @param self Scene.
- * function Scene.draw_forward_opaque(self)
+ * -- @param args Arguments.<ul>
+ * --   <li>deferred: True to enable deferred rendering.</li>
+ * --   <li>lighting: True to enable lighting.</li>
+ * --   <li>pass: Pass number.</li>
+ * --   <li>sorting: True to enable sorting.</li></ul>
+ * function Scene.draw_pass(self, args)
  */
-static void Scene_draw_forward_opaque (LIScrArgs* args)
+static void Scene_draw_pass (LIScrArgs* args)
 {
+	int deferred = 0;
+	int lighting = 0;
+	int pass = 1;
+	int sorting = 0;
 	LIExtModule* module;
 	LIRenScene* scene;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
 	scene = module->client->scene;
-	liren_scene_render_forward_opaque (scene);
-}
+	liscr_args_gets_bool (args, "deferred", &deferred);
+	liscr_args_gets_bool (args, "lighting", &lighting);
+	liscr_args_gets_int (args, "pass", &pass);
+	liscr_args_gets_bool (args, "sorting", &sorting);
+	if (pass < 1 || pass > LIREN_SHADER_PASS_COUNT)
+		return;
 
-/* @luadoc
- * ---
- * -- Draws the transparent faces of the scene to the post-processing buffer.
- * --
- * -- @param self Scene.
- * function Scene.draw_forward_transparent(self)
- */
-static void Scene_draw_forward_transparent (LIScrArgs* args)
-{
-	LIExtModule* module;
-	LIRenScene* scene;
-
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
-	scene = module->client->scene;
-	liren_scene_render_forward_transparent (scene);
+	liren_scene_render_pass (scene, pass - 1, lighting, sorting, deferred);
 }
 
 /* @luadoc
@@ -249,12 +190,8 @@ void liext_script_scene (
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Scene_new);
 	liscr_class_insert_mfunc (self, "draw_begin", Scene_draw_begin);
-	liscr_class_insert_mfunc (self, "draw_deferred_begin", Scene_draw_deferred_begin);
-	liscr_class_insert_mfunc (self, "draw_deferred_end", Scene_draw_deferred_end);
-	liscr_class_insert_mfunc (self, "draw_deferred_opaque", Scene_draw_deferred_opaque);
 	liscr_class_insert_mfunc (self, "draw_end", Scene_draw_end);
-	liscr_class_insert_mfunc (self, "draw_forward_opaque", Scene_draw_forward_opaque);
-	liscr_class_insert_mfunc (self, "draw_forward_transparent", Scene_draw_forward_transparent);
+	liscr_class_insert_mfunc (self, "draw_pass", Scene_draw_pass);
 	liscr_class_insert_mfunc (self, "draw_post_process", Scene_draw_post_process);
 }
 

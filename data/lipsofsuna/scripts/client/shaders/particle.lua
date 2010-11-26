@@ -1,6 +1,11 @@
 Shader{
 name = "particle",
-transparent_pass1_vertex = [[
+sort = true,
+pass5_blend = true,
+pass5_blend_src = "src_alpha",
+pass5_blend_dst = "one",
+pass5_depth_write = false,
+pass5_vertex = [[
 out geomvar
 {
 	vec4 color;
@@ -12,7 +17,7 @@ void main()
 	OUT.size = LOS_texcoord.yy;
 	gl_Position = LOS.matrix_modelview * vec4(LOS_coord,1.0);
 }]],
-transparent_pass1_geometry = [[
+pass5_geometry = [[
 layout(triangles) in;
 layout(triangle_strip, max_vertices=4) out;
 in geomvar
@@ -46,7 +51,7 @@ void main()
 	EmitVertex();
 	EndPrimitive();
 }]],
-transparent_pass1_fragment = [[
+pass5_fragment = [[
 in fragvar
 {
 	vec4 color;

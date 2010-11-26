@@ -1,6 +1,21 @@
 Shader{
 name = "eye",
-deferred_pass1_vertex = [[
+pass1_color_write = false,
+pass1_depth_func = "lequal",
+pass1_vertex = [[
+void main()
+{
+	vec4 tmp = LOS.matrix_modelview * vec4(LOS_coord,1.0);
+	gl_Position = LOS.matrix_projection * tmp;
+}]],
+pass1_fragment = [[
+in vec2 var_texcoord;
+void main()
+{
+}]],
+pass2_depth_func = "lequal",
+pass2_depth_write = true,
+pass2_vertex = [[
 out vec3 var_normal;
 out vec2 var_texcoord;
 void main()
@@ -10,7 +25,7 @@ void main()
 	var_texcoord = LOS_texcoord;
 	gl_Position = LOS.matrix_projection * tmp;
 }]],
-deferred_pass1_fragment = [[
+pass2_fragment = [[
 in vec3 var_normal;
 in vec2 var_texcoord;
 void main()
