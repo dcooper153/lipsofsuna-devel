@@ -107,7 +107,13 @@ void liren_uniforms_setup (
 
 	/* Check for validity. */
 	for (i = 0 ; i < LIREN_UNIFORM_COUNT ; i++)
-		lisys_assert (self->uniform_indices[i] != GL_INVALID_INDEX);
+	{
+		if (self->uniform_indices[i] == GL_INVALID_INDEX)
+		{
+			lisys_error_set (EINVAL, "could not find uniform `%s'", uniform_names[i]);
+			lisys_error_report ();
+		}
+	}
 }
 
 void liren_uniforms_commit (
