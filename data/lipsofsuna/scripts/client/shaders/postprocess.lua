@@ -93,7 +93,7 @@ vec4 los_postproc_bloom(vec2 dt)
 }
 void main()
 {
-	vec4 bloom = los_postproc_bloom(LOS.material_param_0.]] .. (horz and "xw" or "wy") .. [[);
+	vec4 bloom = los_postproc_bloom(LOS_material_param_0.]] .. (horz and "xw" or "wy") .. [[);
 	vec4 color = texture(LOS_diffuse_texture_0, var_texcoord);
 	gl_FragColor = color + bloom;
 }]]

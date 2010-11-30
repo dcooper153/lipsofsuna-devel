@@ -63,29 +63,29 @@ void liren_uniforms_setup (
 {
 	int i;
 	const char* uniform_names[LIREN_UNIFORM_COUNT] = {
-		"LOS.light_ambient",
-		"LOS.light_diffuse",
-		"LOS.light_direction",
-		"LOS.light_direction_premult",
-		"LOS.light_equation",
-		"LOS.light_matrix",
-		"LOS.light_position",
-		"LOS.light_position_premult",
-		"LOS.light_specular",
-		"LOS.light_spot",
-		"LOS.light_type",
-		"LOS.material_diffuse",
-		"LOS.material_param_0",
-		"LOS.material_shininess",
-		"LOS.material_specular",
-		"LOS.matrix_model",
-		"LOS.matrix_modelview",
-		"LOS.matrix_modelview_inverse",
-		"LOS.matrix_modelview_projection",
-		"LOS.matrix_normal",
-		"LOS.matrix_projection",
-		"LOS.matrix_projection_inverse",
-		"LOS.time"
+		"LOS_light_ambient",
+		"LOS_light_diffuse",
+		"LOS_light_direction",
+		"LOS_light_direction_premult",
+		"LOS_light_equation",
+		"LOS_light_matrix",
+		"LOS_light_position",
+		"LOS_light_position_premult",
+		"LOS_light_specular",
+		"LOS_light_spot",
+		"LOS_light_type",
+		"LOS_material_diffuse",
+		"LOS_material_param_0",
+		"LOS_material_shininess",
+		"LOS_material_specular",
+		"LOS_matrix_model",
+		"LOS_matrix_modelview",
+		"LOS_matrix_modelview_inverse",
+		"LOS_matrix_modelview_projection",
+		"LOS_matrix_normal",
+		"LOS_matrix_projection",
+		"LOS_matrix_projection_inverse",
+		"LOS_time"
 	};
 
 	/* Setup when called by the first shader. */
@@ -189,7 +189,7 @@ static void private_queue_mat (
 	{
 		/* Copy to back buffer. */
 		offset = self->uniform_offsets[uniform];
-		stride = self->uniform_matrix_strides[uniform] + 4 * sizeof (float);
+		stride = self->uniform_matrix_strides[uniform];
 		memcpy (self->uniform_values[uniform], value, 16 * sizeof (float));
 		for (i = 0 ; i < size ; i++)
 			memcpy (self->data + offset + i * stride, value + i * 4, size * sizeof (float));

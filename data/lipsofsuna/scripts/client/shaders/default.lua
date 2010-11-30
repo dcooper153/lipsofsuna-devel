@@ -6,10 +6,10 @@ out vec3 var_normal;
 out vec2 var_texcoord;
 void main()
 {
-	vec4 tmp = LOS.matrix_modelview * vec4(LOS_coord,1.0);
-	var_normal = LOS.matrix_normal * LOS_normal;
+	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	var_normal = LOS_matrix_normal * LOS_normal;
 	var_texcoord = LOS_texcoord;
-	gl_Position = LOS.matrix_projection * tmp;
+	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass2_fragment = [[
 in vec3 var_normal;
@@ -21,10 +21,10 @@ void main()
 	if(diffuse.a < 0.5)
 		discard;
 	/* Diffuse. */
-	gl_FragData[0] = LOS.material_diffuse * diffuse;
+	gl_FragData[0] = LOS_material_diffuse * diffuse;
 	/* Specular. */
-	gl_FragData[1].rgb = LOS.material_specular.xyz * LOS.material_specular.a;
-	gl_FragData[1].a = LOS.material_shininess / 128.0;
+	gl_FragData[1].rgb = LOS_material_specular.xyz * LOS_material_specular.a;
+	gl_FragData[1].a = LOS_material_shininess / 128.0;
 	/* Normal. */
 	gl_FragData[2].xyz = 0.5 * normal + vec3(0.5);
 }]]}

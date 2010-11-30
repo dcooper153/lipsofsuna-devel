@@ -10,9 +10,9 @@ out fragvar
 } OUT;
 void main()
 {
-	vec4 tmp = LOS.matrix_modelview * vec4(LOS_coord,1.0);
+	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
 	OUT.texcoord = LOS_texcoord;
-	gl_Position = LOS.matrix_projection * tmp;
+	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass1_fragment = [[
 in fragvar
@@ -41,13 +41,13 @@ out fragvar
 } OUT;
 void main()
 {
-	vec4 tmp = LOS.matrix_modelview * vec4(LOS_coord,1.0);
+	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
 	OUT.coord = tmp.xyz;
-	OUT.lightvector = LOS.light_position_premult - tmp.xyz;
-	OUT.normal = LOS.matrix_normal * LOS_normal;
-	OUT.tangent = LOS.matrix_normal * LOS_tangent;
+	OUT.lightvector = LOS_light_position_premult - tmp.xyz;
+	OUT.normal = LOS_matrix_normal * LOS_normal;
+	OUT.tangent = LOS_matrix_normal * LOS_tangent;
 	OUT.texcoord = LOS_texcoord;
-	gl_Position = LOS.matrix_projection * tmp;
+	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass6_fragment = [[
 in fragvar
@@ -84,10 +84,10 @@ void main()
 	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
 	if(normal.z < 0)
 		normal = -normal;
-	float fattn = los_light_attenuation(IN.lightvector, LOS.light_equation);
+	float fattn = los_light_attenuation(IN.lightvector, LOS_light_equation);
 	float fdiff = los_light_diffuse_hair(IN.lightvector, normal);
-	float fspec = los_light_specular_hair(IN.coord, normal, tangent, LOS.material_shininess);
-	vec4 light = los_light_combine(fattn, fdiff, fspec, LOS.light_ambient,
-		LOS.light_diffuse, LOS.light_specular * LOS.material_specular);
-	gl_FragColor = LOS.material_diffuse * diffuse * light;
+	float fspec = los_light_specular_hair(IN.coord, normal, tangent, LOS_material_shininess);
+	vec4 light = los_light_combine(fattn, fdiff, fspec, LOS_light_ambient,
+		LOS_light_diffuse, LOS_light_specular * LOS_material_specular);
+	gl_FragColor = LOS_material_diffuse * diffuse * light;
 }]]}

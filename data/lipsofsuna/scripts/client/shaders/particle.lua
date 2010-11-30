@@ -15,7 +15,7 @@ void main()
 {
 	OUT.color = vec4(LOS_normal,LOS_texcoord.x);
 	OUT.size = LOS_texcoord.yy;
-	gl_Position = LOS.matrix_modelview * vec4(LOS_coord,1.0);
+	gl_Position = LOS_matrix_modelview * vec4(LOS_coord,1.0);
 }]],
 pass5_geometry = [[
 layout(triangles) in;
@@ -38,16 +38,16 @@ void main()
 	vec4 vy = vec4(0.0, IN[0].size.y, 0.0, 1.0);
 	OUT.color = IN[0].color;
 	OUT.texcoord = vec2(0.0, 0.0);
-	gl_Position = LOS.matrix_projection * vec4(ctr - size, 1.0);
+	gl_Position = LOS_matrix_projection * vec4(ctr - size, 1.0);
 	EmitVertex();
 	OUT.texcoord = vec2(1.0, 0.0);
-	gl_Position = LOS.matrix_projection * vec4(ctr + size.xzz - size.zyz, 1.0);
+	gl_Position = LOS_matrix_projection * vec4(ctr + size.xzz - size.zyz, 1.0);
 	EmitVertex();
 	OUT.texcoord = vec2(0.0, 1.0);
-	gl_Position = LOS.matrix_projection * vec4(ctr - size.xzz + size.zyz, 1.0);
+	gl_Position = LOS_matrix_projection * vec4(ctr - size.xzz + size.zyz, 1.0);
 	EmitVertex();
 	OUT.texcoord = vec2(1.0, 1.0);
-	gl_Position = LOS.matrix_projection * vec4(ctr + size, 1.0);
+	gl_Position = LOS_matrix_projection * vec4(ctr + size, 1.0);
 	EmitVertex();
 	EndPrimitive();
 }]],
