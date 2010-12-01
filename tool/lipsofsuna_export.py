@@ -696,6 +696,9 @@ class LIParticle:
 		self.frames.append(frame)
 		self.frame_end += 1
 
+	def is_empty(self):
+		return len(self.frames) <= 1
+
 	# \brief Saves the particle.
 	# \param self Particle.
 	# \param writer Writer.
@@ -789,6 +792,9 @@ class LIParticleSystem:
 	# \param self Particle system.
 	# \param writer Writer.
 	def write(self, writer):
+		for i in range(len(self.particles) - 1, -1, -1):
+			if self.particles[i].is_empty():
+				del self.particles[i]
 		writer.write_int(self.frame_start)
 		writer.write_int(self.frame_end)
 		writer.write_int(self.frame_end + self.lifetime)
