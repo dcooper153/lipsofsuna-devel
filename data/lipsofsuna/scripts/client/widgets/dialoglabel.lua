@@ -5,6 +5,7 @@ Widgets.DialogLabel = Class(Widgets.Label)
 Widgets.DialogLabel.new = function(clss, args)
 	local self = Widgets.Label.new(clss, args)
 	self.font = "medium"
+	self:set_request{width = 800}
 	return self
 end
 
