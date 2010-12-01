@@ -1,3 +1,3 @@
 Quest{
-	name = "Peculiar Pet",
+	name = "Chara's Portal",
 	status = "inactive"}

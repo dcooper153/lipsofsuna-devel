@@ -16,7 +16,7 @@ Completion conditions:
 local name = Names:random{race = "Aer", gender = "female"}
 Quest.peculiar_pet_npc_name = name
 
-Dialog{name = "peculiarpetnpc", unique = true,
+Dialog{name = "peculiarpet_npc", unique = true,
 die = function(self)
 	-- Find the quest.
 	local quest = Quest:find{name = "Peculiar Pet"}
@@ -142,7 +142,7 @@ main = function(self)
 	end
 end}
 
-Dialog{name = "peculiarpetworm", unique = true,
+Dialog{name = "peculiarpet_worm", unique = true,
 die = function(self)
 	-- Find the quest.
 	local quest = Quest:find{name = "Peculiar Pet"}

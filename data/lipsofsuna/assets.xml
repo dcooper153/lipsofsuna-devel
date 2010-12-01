@@ -1012,6 +1012,15 @@
   </asset>
 
   <asset>
+    <file>import/particle1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>particle</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
     <file>import/particle-000.png</file>
     <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>
@@ -1145,6 +1154,15 @@
     <license>CC0</license>
     <status>placeholder</status>
     <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/seirei1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/particle1.png</dep>
+    <status>placeholder</status>
+    <type>model</type>
   </asset>
 
   <asset>

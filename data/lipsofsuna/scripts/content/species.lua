@@ -203,16 +203,6 @@ Species{
 	inventory_items = {"chainmail tunic", "chainmail pants", "chainmail leggings"}}
 
 Species{
-	name = "peculiarpetnpc",
-	base = "aer",
-	dialog = "peculiarpetnpc",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
-	hair_style = {"hair1",0,255,0},
-	inventory_items = {"axe", "dress"},
-	factions = {"peculiarpet"}}
-
-Species{
 	name = "bloodworm",
 	model = "bloodworm1",
 	ai_enable_strafe = false,
@@ -226,9 +216,8 @@ Species{
 		{name = "health", max = 30, val = 30}}}
 
 Species{
-	name = "peculiarpetworm",
-	base = "bloodworm",
-	dialog = "peculiarpetworm",
+	name = "seirei",
+	model = "seirei1",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
-	factions = {"peculiarpet"}}
+	factions = {"neutral", "seirei"}}

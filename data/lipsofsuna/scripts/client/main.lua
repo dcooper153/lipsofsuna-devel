@@ -1,32 +1,9 @@
 print "INFO: Loading client scripts."
 
-require "core/graphics"
-require "core/camera"
-require "core/object-render"
-require "core/render"
-require "core/sound"
-require "core/speech"
-require "core/tiles-physics"
-require "core/tiles-render"
-require "core/reload"
-require "core/widgets"
-
 local db = Database{name = "client.sql"}
 Sectors.instance = Sectors{database = db, save_objects = false}
 Sectors.instance:erase_world()
 
-require "client/shader"
-require "client/shaders/skeletal"
-require "content/effects"
-require "content/factions"
-require "content/feats"
-require "content/icons"
-require "content/items"
-require "content/materials"
-require "content/obstacles"
-require "content/patterns"
-require "content/quests"
-require "content/species"
 require "client/widgets/background"
 require "client/widgets/button"
 require "client/widgets/check"

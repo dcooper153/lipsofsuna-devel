@@ -1,21 +1,5 @@
 print "INFO: Loading server scripts."
 
-require "core/generator"
-require "core/object-physics"
-
-require "common/vision"
-require "common/inventory"
-require "common/skills"
-require "content/effects"
-require "content/factions"
-require "content/feats"
-require "content/items"
-require "content/materials"
-require "content/obstacles"
-require "content/patterns"
-require "content/regions"
-require "content/quests"
-require "content/species"
 require "server/util"
 require "server/serialize"
 require "server/attack"
@@ -48,8 +32,10 @@ require "server/objects/player"
 require "server/npcs/lastboss"
 require "server/admin"
 require "server/quest"
+require "server/quests/mourningadventurer"
 require "server/quests/lipscitizen"
 require "server/quests/peculiarpet"
+require "server/quests/rootsofworld"
 require "server/modifier"
 require "server/modifiers/bleeding"
 require "server/editing"
@@ -244,6 +230,9 @@ restart = function()
 				Voxel:place_pattern{point = r.point + Vector(5,0,1), name = "house1"}
 				Voxel:place_pattern{point = r.point + Vector(1,0,6), name = "house1"}
 				Voxel:place_pattern{point = r.point + Vector(5,0,6), name = "house1"}
+				Voxel:place_pattern{point = r.point + Vector(8,2,8), name = "rootsofworld"}
+				Voxel:place_pattern{point = r.point + Vector(9,2,9), name = "mourningadventurer_town"}
+				Voxel:place_pattern{point = r.point + Vector(7,2,7), name = "mourningadventurer_lost"}
 				Voxel:place_pattern{point = r.point + Vector(1.7,1,1.7), name = "peculiarpet"}
 				Voxel:place_creature{point = r.point + Vector(3,0,14), name = "lipscitizen"}
 				Voxel:place_creature{point = r.point + Vector(8,0,9), name = "lipscitizen"}

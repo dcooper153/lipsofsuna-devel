@@ -27,9 +27,3 @@ Pattern{
 		{1,0,2,"housebasedoorway1",2},
 		{1,1,2,"houseroofdoorway1",2},
 		{1,0,3,"housedoorstep1",2}}}
-
-Pattern{
-	name = "peculiarpet",
-	creatures = {
-		{0,0,0,"peculiarpetworm"},
-		{1.3,0,0,"peculiarpetnpc"}}}

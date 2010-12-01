@@ -46,6 +46,42 @@ require "common/thread"
 require "common/timer"
 
 if Program.args == "--server" then
+require "core/generator"
+require "core/object-physics"
+require "common/vision"
+require "common/inventory"
+require "common/skills"
+else
+require "core/graphics"
+require "core/camera"
+require "core/object-render"
+require "core/render"
+require "core/sound"
+require "core/speech"
+require "core/tiles-physics"
+require "core/tiles-render"
+require "core/reload"
+require "core/widgets"
+require "client/shader"
+require "client/shaders/skeletal"
+end
+
+require "content/effects"
+require "content/factions"
+require "content/feats"
+require "content/icons"
+require "content/items"
+require "content/materials"
+require "content/obstacles"
+require "content/patterns"
+require "content/regions"
+require "content/species"
+require "content/quests/mourningadventurer"
+require "content/quests/peculiarpet"
+require "content/quests/rootsofworld"
+require "content/quests/misc"
+
+if Program.args == "--server" then
 	require "server/main"
 else
 	require "client/main"
