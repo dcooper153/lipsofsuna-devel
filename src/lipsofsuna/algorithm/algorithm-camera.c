@@ -408,6 +408,30 @@ void lialg_camera_set_far (
 }
 
 /**
+ * \brief Gets the field of view of the camera.
+ * \param self Camera.
+ * \return Field of view in radians.
+ */
+float lialg_camera_get_fov (
+	const LIAlgCamera* self)
+{
+	return self->view.fov;
+}
+
+/**
+ * \brief Sets the field of view of the camera.
+ * \param self Camera.
+ * \param value Field of view in radians.
+ */
+void lialg_camera_set_fov (
+	LIAlgCamera* self,
+	float        value)
+{
+	self->view.fov = value;
+	private_update_projection (self);
+}
+
+/**
  * \brief Gets the frustum of the camera.
  * \param self Camera.
  * \param result Return location for frustum.

@@ -286,6 +286,24 @@ static void Camera_setter_far (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- The field of view of the camera.
+ * -- @name Camera.fov
+ * -- @class table
+ */
+static void Camera_getter_fov (LIScrArgs* args)
+{
+	liscr_args_seti_float (args, lialg_camera_get_fov (args->self));
+}
+static void Camera_setter_fov (LIScrArgs* args)
+{
+	float pos;
+	float fov = M_PI / 5.0f;
+
+	liscr_args_geti_float (args, 0, &fov);
+	lialg_camera_set_fov (args->self, fov);
+}
+
+/* @luadoc
  * --- Camera mode.
  * --
  * -- Recognized values: "first-person"/"manual"/"third-person".
@@ -557,6 +575,7 @@ void liext_script_camera (
 	liscr_class_insert_mfunc (self, "warp", Camera_warp);
 	liscr_class_insert_mfunc (self, "zoom", Camera_zoom);
 	liscr_class_insert_mvar (self, "far", NULL, Camera_setter_far);
+	liscr_class_insert_mvar (self, "fov", Camera_getter_fov, Camera_setter_fov);
 	liscr_class_insert_mvar (self, "mode", Camera_getter_mode, Camera_setter_mode);
 	liscr_class_insert_mvar (self, "near", NULL, Camera_setter_near);
 	liscr_class_insert_mvar (self, "modelview", Camera_getter_modelview, NULL);

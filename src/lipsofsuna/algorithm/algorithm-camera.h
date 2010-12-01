@@ -135,6 +135,13 @@ LIAPICALL (void, lialg_camera_set_far, (
 	LIAlgCamera* self,
 	float        value));
 
+LIAPICALL (float, lialg_camera_get_fov, (
+	const LIAlgCamera* self));
+
+LIAPICALL (void, lialg_camera_set_fov, (
+	LIAlgCamera* self,
+	float        value));
+
 LIAPICALL (void, lialg_camera_get_frustum, (
 	const LIAlgCamera* self,
 	LIMatFrustum*      result));
