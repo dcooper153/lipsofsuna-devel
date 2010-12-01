@@ -46,11 +46,11 @@ Species.copy = function(orig, args)
 	end
 	-- Others.
 	self.ai_enabled = orig.ai_enabled
-	self.ai_enable_attack = self.ai_enable_attack
-	self.ai_enable_combat = self.ai_enable_combat
-	self.ai_enable_defend = self.ai_enable_defend
-	self.ai_enable_strafe = self.ai_enable_strafe
-	self.ai_enable_wander = self.ai_enable_wander
+	self.ai_enable_attack = orig.ai_enable_attack
+	self.ai_enable_combat = orig.ai_enable_combat
+	self.ai_enable_defend = orig.ai_enable_defend
+	self.ai_enable_strafe = orig.ai_enable_strafe
+	self.ai_enable_wander = orig.ai_enable_wander
 	self.ai_search_time = orig.ai_search_time
 	self.ai_update_delay = orig.ai_update_delay
 	self.ai_wait_allowed = orig.ai_wait_allowed
