@@ -85,10 +85,11 @@ class LIAnimation:
 					if chan.find("pose.bones[\"") == 0:
 						chan = chan.split("\"")[1]
 						self.add_channel(chan)
-		# Get the list of bones moved by IK.
+		# Get the list of bones moved by constraints.
 		for bone in armat.pose.bones:
 			for cons in bone.constraints:
 				if cons.type == 'IK' and cons.target and cons.subtarget in self.channeldict:
+					# Part of the IK chain of an animated bone.
 					if cons.chain_count > 0:
 						next = bone
 						for i in range(0, cons.chain_count):
@@ -101,6 +102,9 @@ class LIAnimation:
 						while next:
 							self.add_channel(next.name)
 							next = bone.parent
+				elif cons.type == 'COPY_ROTATION' and cons.target and cons.subtarget in self.channeldict:
+					# Copy rotation from an animated bone.
+					self.add_channel(bone.name)
 
 	def add_channel(self, name):
 		if name in self.armature.data.bones:
