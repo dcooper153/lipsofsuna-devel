@@ -19,6 +19,13 @@ Widgets.DialogChoice.reshaped = function(self)
 	local h = self.height
 	self:canvas_clear()
 	self:canvas_text{
+		dest_position = {2,2},
+		dest_size = {w,h},
+		text = self.text,
+		text_alignment = {self.halign,self.valign},
+		text_color = {0,0,0,1},
+		text_font = self.font}
+	self:canvas_text{
 		dest_position = {0,0},
 		dest_size = {w,h},
 		text = self.text,
