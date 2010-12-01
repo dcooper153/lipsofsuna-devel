@@ -778,7 +778,7 @@ class LIParticleSystem:
 			if bpar.alive_state == 'UNBORN':
 				lpar.frame_start += 1
 			elif bpar.alive_state == 'ALIVE':
-				lpar.add_frame(LIFormat.matrix * (bpar.location - self.object.location))
+				lpar.add_frame((bpar.location - self.object.location) * LIFormat.matrix)
 			i += 1
 
 	# \brief Saves the particle system.
