@@ -211,6 +211,28 @@ for k,reg in pairs(Regionspec.dict_name) do
 	end
 end
 
+--- Disables all region types.
+-- @param clss Generator class.
+-- @param args Arguments.<ul>
+--   <li>except: Name of a rule not to enable.</li></ul>
+Generator.disable_regions = function(clss, args)
+	for k,reg in pairs(Regionspec.dict_name) do
+		Generator:disable_brush{name = reg.name}
+	end
+	Generator:enable_brush{name = args and args.except}
+end
+
+--- Enables all region types.
+-- @param clss Generator class.
+-- @param args Arguments.<ul>
+--   <li>except: Name of a rule not to disable.</li></ul>
+Generator.enable_regions = function(clss, args)
+	for k,reg in pairs(Regionspec.dict_name) do
+		Generator:enable_brush{name = reg.name}
+	end
+	Generator:disable_brush{name = args and args.except}
+end
+
 restart = function()
 	Network.closed = true
 	for k,v in pairs(Network.clients) do
@@ -218,8 +240,17 @@ restart = function()
 	end
 	Sectors.instance:unload_world()
 	print("Generating map...")
+	-- Generate the town and its surroundings.
 	Generator:format{center = Config.center * Config.tilescale}
-	Generator:expand{count = 100}
+	Generator:disable_brush{name = "rootsofworld-grove"}
+	Generator:expand{count = 10}
+	-- Generate Chara's root grove.
+	Generator:disable_regions{except = "rootsofworld-grove"}
+	Generator:expand{count = 1}
+	Generator:enable_regions{except = "rootsofworld-grove"}
+	-- Generate lots pointless random regions.
+	Generator:expand{count = 89}
+	-- Populate the generated regions.
 	for i,r in pairs(Generator.regions) do
 		Voxel:fill_region{point = r.point, size = r.size}
 		local spec = Regionspec:find{name = r.name}
@@ -230,10 +261,8 @@ restart = function()
 				Voxel:place_pattern{point = r.point + Vector(5,0,1), name = "house1"}
 				Voxel:place_pattern{point = r.point + Vector(1,0,6), name = "house1"}
 				Voxel:place_pattern{point = r.point + Vector(5,0,6), name = "house1"}
-				Voxel:place_pattern{point = r.point + Vector(8,2,8), name = "rootsofworld"}
 				Voxel:place_pattern{point = r.point + Vector(9,2,9), name = "mourningadventurer_town"}
-				Voxel:place_pattern{point = r.point + Vector(7,2,7), name = "mourningadventurer_lost"}
-				Voxel:place_pattern{point = r.point + Vector(1.7,1,1.7), name = "peculiarpet"}
+				Voxel:place_pattern{point = r.point + Vector(4,1,4), name = "peculiarpet"}
 				Voxel:place_creature{point = r.point + Vector(3,0,14), name = "lipscitizen"}
 				Voxel:place_creature{point = r.point + Vector(8,0,9), name = "lipscitizen"}
 				local p = Vector(10,0,0)
@@ -273,6 +302,9 @@ restart = function()
 				Voxel:make_heightmap{point = r.point + Vector(0,0,0), size = r.size,
 					material = "ground1", tree_density = 0.1,
 					mushroom_density = 0.3}
+			elseif spec.name == "rootsofworld-grove" then
+				Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "rootsofworld"}
+				Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "mourningadventurer_lost"}
 			end
 		end
 	end
