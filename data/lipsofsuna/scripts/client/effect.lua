@@ -1,8 +1,10 @@
 Effect.play = function(clss, name)
+	local e = Effect:find{name = name}
+	if not e then return end
 	EffectObject{
 		object = Player.object,
-		sound = name,
-		sound_pitch = 1,
+		sound = e.sound,
+		sound_pitch = e.sound_pitch,
 		realized = true}
 end
 

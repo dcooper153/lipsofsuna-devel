@@ -13,6 +13,10 @@ Effect{
 	sound_pitch = 0.1}
 
 Effect{
+	name = "harvest1",
+	sound = "scissor1"}
+
+Effect{
 	name = "heal1",
 	model = "heal1",
 	sound = "spell-000"}
@@ -27,8 +31,8 @@ Effect{
 	sound = "hop-000"}
 
 Effect{
-	name = "harvest1",
-	sound = "scissor1"}
+	name = "quest1",
+	sound = "quest1"}
 
 Effect{
 	name = "swing1",
