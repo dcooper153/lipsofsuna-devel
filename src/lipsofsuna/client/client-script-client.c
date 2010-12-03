@@ -180,6 +180,9 @@ static void Client_screenshot (LIScrArgs* args)
  */
 static void Client_swap_buffers (LIScrArgs* args)
 {
+	glBindFramebuffer (GL_FRAMEBUFFER, 0);
+	glBindFramebuffer (GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer (GL_READ_FRAMEBUFFER, 0);
 	SDL_GL_SwapBuffers ();
 }
 
