@@ -12,6 +12,7 @@ Species{
 	name = "peculiarpet_npc",
 	base = "aer",
 	dialog = "peculiarpet_npc",
+	marker = "peculiarpet_npc",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
 	hair_style = {"hair1",0,255,0},
@@ -22,6 +23,7 @@ Species{
 	name = "peculiarpet_worm",
 	base = "bloodworm",
 	dialog = "peculiarpet_worm",
+	marker = "peculiarpet_worm",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
 	factions = {"peculiarpet"}}

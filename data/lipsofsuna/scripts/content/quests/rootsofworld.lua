@@ -10,4 +10,5 @@ Pattern{
 Species{
 	name = "Chara",
 	base = "seirei",
-	dialog = "rootsofworld_chara"}
+	dialog = "rootsofworld_chara",
+	marker = "rootsofworld_chara"}

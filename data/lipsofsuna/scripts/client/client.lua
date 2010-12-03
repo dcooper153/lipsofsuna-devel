@@ -106,6 +106,9 @@ Player.update_rotation = function(clss, secs)
 	if (clss.rotation_prev - r).length > math.max(0, 0.1 - 0.4 * clss.rotation_sync_timer) then
 		clss:send_rotation()
 	end
+	-- Update compass rotation.
+	Gui.scene.compass = clss.rotation_curr.euler[1] / (2 * math.pi)
+	Gui.scene.compass_quest = Quests:get_compass_direction()
 end
 
 Player.send_rotation = function(clss)

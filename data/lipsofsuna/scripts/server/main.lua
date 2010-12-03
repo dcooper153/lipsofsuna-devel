@@ -238,6 +238,8 @@ restart = function()
 	for k,v in pairs(Network.clients) do
 		Network:disconnect{object = v}
 	end
+	-- Remove previous map.
+	Marker:reset()
 	Sectors.instance:unload_world()
 	print("Generating map...")
 	-- Generate the town and its surroundings.
@@ -248,7 +250,7 @@ restart = function()
 	Generator:disable_regions{except = "rootsofworld-grove"}
 	Generator:expand{count = 1}
 	Generator:enable_regions{except = "rootsofworld-grove"}
-	-- Generate lots pointless random regions.
+	-- Generate lots of pointless random regions.
 	Generator:expand{count = 89}
 	-- Populate the generated regions.
 	for i,r in pairs(Generator.regions) do

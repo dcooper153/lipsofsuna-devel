@@ -157,6 +157,7 @@ Species.new = function(clss, args)
 	copy("hair_style")
 	copy("inventory_items", {})
 	copy("inventory_size", 0)
+	copy("marker")
 	copy("mass", 50)
 	copy("model", "aer1")
 	self.name = args.name

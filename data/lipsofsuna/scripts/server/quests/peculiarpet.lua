@@ -22,6 +22,7 @@ die = function(self)
 	local quest = Quest:find{name = "Peculiar Pet"}
 	if not quest then return end
 	-- Update the quest.
+	quest:marker("peculiarpet_npc")
 	quest:update{status = "completed", progress = 5, text = name ..
 		" has been killed."}
 end,
@@ -46,6 +47,7 @@ main = function(self)
 		if a == lines[3] then return end
 		self:line("You're crazy! Seeing things, I tell you. Get away from me!")
 		if quest.progress == 0 then
+			quest:marker("peculiarpet_npc")
 			quest:update{status = "active", progress = 1, text = name ..
 				" has called us crazy because we told her that her pet, " ..
 				"Puppy, is a bloodworm."}

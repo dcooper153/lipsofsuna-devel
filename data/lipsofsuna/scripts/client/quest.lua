@@ -19,6 +19,19 @@ Quests.init = function(clss)
 	clss.window = dialog
 end
 
+--- Gets the compass direction for the currently shown quest.
+-- @param clss Quest class.
+-- @return Compass direction or nil.
+Quests.get_compass_direction = function(clss)
+	if clss.shown_quest then
+		local quest = Quest:find{name = clss.shown_quest}
+		if not quest or not quest.marker then return end
+		if not Player.object then return end
+		local diff = quest.marker - Player.object.position
+		return 1 - (math.atan2(diff.z, diff.x) / (2 * math.pi) - 0.25)
+	end
+end
+
 --- Shows a quest.
 -- @param clss Quests class.
 -- @param name Quest name.
@@ -26,6 +39,7 @@ Quests.show = function(clss, name)
 	local quest = Quest:find{name = name}
 	if not quest then return end
 	clss.window.quest_info.quest = quest
+	clss.shown_quest = name
 end
 
 --- Updates a quest.
@@ -46,6 +60,21 @@ end
 ------------------------------------------------------------------------------
 
 Quests:init()
+
+-- Sets to position of the quest marker.
+Protocol:add_handler{type = "QUEST_MARKER", func = function(event)
+	local ok,id,x,y,z = event.packet:read("uint32", "float", "float", "float")
+	if ok then
+		print("QUESTMARKER",id,x,y,z)
+		local quest = Quest:find{id = id}
+		if not quest then return end
+		if x > 0.1 and y > 0.1 and z > 0.1 then
+			quest.marker = Vector(x,y,z)
+		else
+			quest.marker = nil
+		end
+	end
+end}
 
 -- Updates the quest status.
 Protocol:add_handler{type = "QUEST_STATUS", func = function(event)

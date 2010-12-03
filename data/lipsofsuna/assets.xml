@@ -524,6 +524,15 @@
   </asset>
 
   <asset>
+    <file>import/compass1.svg</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>placeholder</status>
+    <tag>ui</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
     <file>import/crate-000.blend</file>
     <author>tidbit (Joseph)</author>
     <license>Creative Commons BY 3.0</license>

@@ -83,6 +83,7 @@ do
 	add("PARTICLE_RAY")
 	add("PLAYER_MOVE")
 	add("PLAYER_TURN")
+	add("QUEST_MARKER")
 	add("QUEST_STATUS")
 	add("RUN")
 	add("SHOOT")

@@ -32,6 +32,10 @@ Creature.setter = function(self, key, value)
 			self:add_item{object = Item:create{name = v}}
 		end
 		self:equip_best_items()
+		-- Create map marker.
+		if spec.marker then
+			self.marker = Marker{name = spec.marker, target = self.id}
+		end
 	else
 		Object.setter(self, key, value)
 	end

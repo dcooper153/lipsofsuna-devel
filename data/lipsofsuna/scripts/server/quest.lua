@@ -1,3 +1,5 @@
+require "common/eventhandler"
+
 --- Marks the quest as active.
 -- @param clss Quest class.
 -- @param args Arguments.<ul>
@@ -32,6 +34,17 @@ Quest.complete = function(clss, args)
 	end
 end
 
+--- Sets the active map marker of the quest.
+-- @param self Quest.
+-- @param name Marker name or nil.
+Quest.marker = function(self, name)
+	local m = Marker:find{name = name}
+	if self.marker_data ~= m then
+		self.marker_data = m
+		self:send_marker{all = true}
+	end
+end
+
 --- Sends the quest status to a client or clients.
 -- @param self Quest.
 -- @param args Arguments.<ul>
@@ -43,6 +56,30 @@ Quest.send = function(self, args)
 	-- Create update packet.
 	local c = self.status == "completed" and 1 or 0
 	local p = Packet(packets.QUEST_STATUS, "uint32", self.id, "uint8", c, "string", self.text)
+	-- Send the packet to clients.
+	if args.all then
+		for k,v in pairs(Player.clients) do
+			v:send{packet = p}
+		end
+	elseif args.client then
+		args.client:send{packet = p}
+	end
+	-- Send the mark if one is set.
+	self:send_marker(args)
+end
+
+--- Sends the map marker of the quest to a client or clients.
+-- @param self Quest.
+-- @param args Arguments.<ul>
+--   <li>all: True to send to all clients.</li>
+--   <li>client: Client.</li></ul>
+Quest.send_marker = function(self, args)
+	-- Skip inactive quests.
+	if self.status ~= "active" and self.status ~= "completed" then return end
+	-- Create marker packet.
+	local pos = self.marker_data and self.marker_data.position or Vector()
+	local p = Packet(packets.QUEST_MARKER, "uint32", self.id,
+		"float", pos.x, "float", pos.y, "float", pos.z)
 	-- Send the packet to clients.
 	if args.all then
 		for k,v in pairs(Player.clients) do
