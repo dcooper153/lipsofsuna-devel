@@ -104,7 +104,9 @@ static void Client_screenshot (LIScrArgs* args)
 	pixels = calloc ((height + 1) * pitch, sizeof (uint8_t));
 	if (pixels == NULL)
 		return;
-	glBindFramebuffer (GL_FRAMEBUFFER_EXT, 0);
+	glBindFramebuffer (GL_FRAMEBUFFER, 0);
+	glBindFramebuffer (GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer (GL_READ_FRAMEBUFFER, 0);
 	glReadPixels (0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
 
 	/* Flip the image vertically. */
