@@ -32,7 +32,6 @@ end
 
 Widgets.ColorSelector.get_value_at = function(self, point)
 	local p = point - Vector(self.x, self.y)
-	print("AAAAAAAAAAAAAA", point, self.x, self.y, self.width, self.height)
 	local v = p.x / self.width
 	if p.y < self.height / 3 then return "red", v end
 	if p.y < self.height * 2 / 3 then return "green", v end
@@ -42,7 +41,6 @@ end
 Widgets.ColorSelector.pressed = function(self)
 	local c,v = self:get_value_at(Client.cursor_pos)
 	self[c] = v
-	print("set", c, v)
 	return c,v
 end
 
