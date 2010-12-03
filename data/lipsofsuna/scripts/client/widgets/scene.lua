@@ -89,16 +89,16 @@ Widgets.Scene.reshaped = function(self)
 		end
 	end
 	if self.action then
-		local o = 140
+		local o = 20
 		self:canvas_text{
-			dest_position = {2,h-o+2},
+			dest_position = {2,o+2},
 			dest_size = {w,o},
 			text = self.action,
 			text_alignment = {0.5,0},
 			text_color = {0,0,0,1},
 			text_font = "medium"}
 		self:canvas_text{
-			dest_position = {0,h-o},
+			dest_position = {0,o},
 			dest_size = {w,o},
 			text = self.action,
 			text_alignment = {0.5,0},
