@@ -9,6 +9,7 @@ Feat.dict_name = {}
 --- Registers a new feat.
 -- @param clss Feat class.
 -- @param args Arguments.<ul>
+--   <li>action_frames: Blender frame range of the action portion.</li>
 --   <li>affects_allies: Applicable to allied creatures.</li>
 --   <li>affects_enemies: Applicable to enemy creatures.</li>
 --   <li>affects_items: Applicable to items.</li>
@@ -31,6 +32,7 @@ Feat.dict_name = {}
 -- @return New feat.
 Feat.new = function(clss, args)
 	local self = Spec.new(clss, args)
+	self.action_frames = self.action_frames or {2, 10}
 	self.skills = self.skills or {}
 	self.affects_allies = self.affects_allies or false
 	self.affects_enemies = self.affects_enemies or false
