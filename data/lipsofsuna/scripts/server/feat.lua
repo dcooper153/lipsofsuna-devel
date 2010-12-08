@@ -59,11 +59,27 @@ Feat.perform = function(self, args)
 			Effect:play{effect = feat.effect_sound, object = args.user}
 		end
 		if feat.effect_animation then
-			args.user:animate{animation = feat.effect_animation, weight = 10.0}
+			args.user:animate{animation = feat.effect_animation, weight = 100.0}
 		end
 	end
 	-- Call the feat function.
 	if feat.toggle or not args.stop then
+		local slot = feat.slot or "hand.R"
+		local weapon = args.user:get_item{slot = slot}
+		if feat.categories["melee"] then
+			Attack:sweep{user = args.user, slot = slot,
+				start = feat.action_frames[1] * 0.05,
+				stop = feat.action_frames[2] * 0.05,
+				func = function(f, r)
+				Combat:apply_melee_hit{
+					attacker = args.user,
+					feat = feat,
+					point = r.point,
+					target = r.object,
+					tile = r.tile,
+					weapon = weapon}
+			end}
+		end
 		if feat.func then feat:func(args) end
 	end
 end
