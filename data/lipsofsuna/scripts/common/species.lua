@@ -44,6 +44,12 @@ Species.copy = function(orig, args)
 			self.models[k] = v
 		end
 	end
+	if orig.models_lod then
+		self.models_lod = {}
+		for k,v in pairs(orig.models_lod) do
+			self.models_lod[k] = v
+		end
+	end
 	-- Others.
 	self.ai_distance_hint = orig.ai_distance_hint
 	self.ai_enabled = orig.ai_enabled
@@ -134,6 +140,12 @@ Species.new = function(clss, args)
 		self.models = {}
 		for k,v in pairs(args.models) do
 			self.models[k] = v
+		end
+	end
+	if args.models_lod then
+		self.models_lod = {}
+		for k,v in pairs(args.models_lod) do
+			self.models_lod[k] = v
 		end
 	end
 	-- Others.

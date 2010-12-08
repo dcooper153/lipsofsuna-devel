@@ -24,6 +24,7 @@ end
 --   <li>nose_scale: Nose scale factor.</li>
 --   <li>race: Race string.</li></ul>
 Object.create_character_model = function(self, args)
+	local lod = Options.low_quality_models
 	-- Get the species.
 	local name = args.race .. (args.gender == "male" and "m" or "")
 	local species = Species:find{name = name}
@@ -31,7 +32,7 @@ Object.create_character_model = function(self, args)
 	-- Get the base meshes.
 	local meshes = {skeleton = species.model}
 	if species.models then
-		for k,v in pairs(species.models) do
+		for k,v in pairs(lod and species.models_lod or species.models) do
 			meshes[k] = v
 		end
 	end
@@ -44,7 +45,7 @@ Object.create_character_model = function(self, args)
 		for slot,name in pairs(args.equipment) do
 			local spec = Itemspec:find{name = name}
 			if spec and spec.equipment_models then
-				for k,v in pairs(spec.equipment_models) do
+				for k,v in pairs(lod and spec.equipment_models_lod or spec.equipment_models) do
 					meshes[k] = v
 				end
 			end
@@ -110,11 +111,12 @@ Object.update_model = function(self)
 			weight = 10, permanent = true}
 	end
 	-- Particle hacks.
-	if self.model_name == "torch1" then
+	if self.model_name == "torch1" and not self.particle_hack then
 		Thread(function()
 			coroutine.yield()
 			local fx = Object{model = "torchfx1", position = self.position, realized = true}
-			while self.realized do
+			self.particle_hack = fx
+			while self.realized and self.particle_hack == fx do
 				local p = self.position
 				local n = self:find_node{name = "#flame"}
 				if n then p = p + self.rotation * n end

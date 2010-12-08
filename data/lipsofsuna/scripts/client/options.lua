@@ -1,9 +1,24 @@
 Options = Class()
+Options.low_quality_models = false
 Options.animation_quality = 1.0
 Options.mouse_sensitivity = 1.0
 Options.transparency_quality = 0.3
 
 Options.init = function(clss)
+	-- Model quality adjustment.
+	local button_model_quality = Widgets.Button{text = "High quality"}
+	button_model_quality.pressed = function(self)
+		if self.text == "Low quality" then
+			clss.low_quality_models = false
+			self.text = "High quality"
+		else
+			clss.low_quality_models = true
+			self.text = "Low quality"
+		end
+		for i,o in pairs(Object.objects) do
+			o:update_model()
+		end
+	end
 	-- Animation quality adjustment.
 	local scroll_animation = Widgets.Progress{min = 0, max = 1, value = clss.animation_quality}
 	scroll_animation:set_request{width = 100}
@@ -59,6 +74,7 @@ Options.init = function(clss)
 	end
 	-- Packing.
 	local quality_group = Widget{cols = 2}
+	quality_group:append_row(Widgets.Label{text = "Models"}, button_model_quality)
 	quality_group:append_row(Widgets.Label{text = "Animation"}, scroll_animation)
 	quality_group:append_row(Widgets.Label{text = "Transparency"}, scroll_transparency)
 	local bloom_group = Widget{cols = 2}

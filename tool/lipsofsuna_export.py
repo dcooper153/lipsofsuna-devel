@@ -40,13 +40,20 @@ def object_files(object):
 	except:
 		pass
 	try:
+		lod = object['lod']
+	except:
+		lod = 'false'
+	try:
 		path = os.path.split(bpy.data.filepath)[0]
 		path = os.path.join(os.path.split(path)[0], "graphics")
 		prop = object['file'].split(',')
 		result = []
 		for item in prop:
 			if item != '':
-				result.append(os.path.join(path, item + '.lmdl'))
+				if lod == 'true':
+					result.append(os.path.join(path, item + 'l.lmdl'))
+				else:
+					result.append(os.path.join(path, item + '.lmdl'))
 		return result
 	except:
 		return LIFormat.files
