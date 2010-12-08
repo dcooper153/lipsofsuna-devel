@@ -45,6 +45,7 @@ Species.copy = function(orig, args)
 		end
 	end
 	-- Others.
+	self.ai_distance_hint = orig.ai_distance_hint
 	self.ai_enabled = orig.ai_enabled
 	self.ai_enable_attack = orig.ai_enable_attack
 	self.ai_enable_combat = orig.ai_enable_combat
@@ -140,6 +141,7 @@ Species.new = function(clss, args)
 		if args[f] ~= nil then self[f] = args[f] end
 		if self[f] == nil then self[f] = d end
 	end
+	copy("ai_distance_hint", 1)
 	copy("ai_enable_attack", true)
 	copy("ai_enable_combat", true)
 	copy("ai_enable_defend", true)

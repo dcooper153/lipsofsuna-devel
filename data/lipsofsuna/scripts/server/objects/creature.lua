@@ -245,7 +245,7 @@ Creature.find_best_feat = function(self, args)
 			if feat.categories[args.category] and feat:usable{user = self} then
 				-- Calculate feat score.
 				-- TODO: Take more factors into account?
-				local score = feat.inflict_damage
+				local score = feat.inflict_damage + 5 * math.random()
 				-- Maintain the best feat.
 				if score > best_score then
 					best_feat = feat
@@ -583,13 +583,14 @@ Creature.combat_updaters =
 	attack = function(self)
 		-- Maintain distance to the target.
 		local dist = (self.target.position - self.position).length
-		if dist < 1 then
+		local hint = self.species.ai_distance_hint + self.target.species.ai_distance_hint
+		if dist < hint then
 			self.movement = -0.25
-		elseif dist > 3 then
+		elseif dist > hint + 2 then
 			self.movement = 1
 		end
 		-- Attack when close enough.
-		if dist < 2 then
+		if dist < hint + 1 then
 			local f = self:find_best_feat{category = "melee"}
 			if f then
 				Feat:perform{name = f.name, user = self}
@@ -599,22 +600,24 @@ Creature.combat_updaters =
 	defend = function(self)
 		-- Maintain distance to the target.
 		local dist = (self.target.position - self.position).length
-		if dist < 2 then
+		local hint = self.species.ai_distance_hint + self.target.species.ai_distance_hint
+		if dist < hint + 1 then
 			self.movement = -0.25
-		elseif dist > 3 then
+		elseif dist > hint + 2 then
 			self.movement = 0.25
 		end
 	end,
 	normal = function(self)
 		-- Maintain distance to the target.
 		local dist = (self.target.position - self.position).length
-		if dist >= 5 then
+		local hint = self.species.ai_distance_hint + self.target.species.ai_distance_hint
+		if dist >= hint + 4 then
 			self:set_movement(1)
-		elseif dist >= 4 then
+		elseif dist >= hint + 3 then
 			self:set_movement(0.5)
-		elseif dist <= 1 then
+		elseif dist <= hint then
 			self:set_movement(-0.5)
-		elseif dist <= 2 then
+		elseif dist <= hint + 1 then
 			self:set_movement(-0.25)
 		else
 			self:set_movement(0)
@@ -626,7 +629,8 @@ Creature.combat_updaters =
 	walk = function(self)
 		-- Move toward the target until close.
 		local dist = (self.target.position - self.position).length
-		if dist < 1 and self.movement > 0 then
+		local hint = self.species.ai_distance_hint + self.target.species.ai_distance_hint
+		if dist < hint and self.movement > 0 then
 			self.action_timer = 0
 		end
 	end
