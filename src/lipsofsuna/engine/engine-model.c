@@ -57,6 +57,11 @@ LIEngModel* lieng_model_new (
 		if (lialg_u32dic_find (engine->models, self->id) != NULL)
 			self->id = 0;
 	}
+	if (!lialg_u32dic_insert (engine->models, self->id, self))
+	{
+		lieng_model_free (self);
+		return NULL;
+	}
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "model-new", lical_marshal_DATA_PTR, self);
@@ -92,6 +97,11 @@ LIEngModel* lieng_model_new_copy (
 		if (lialg_u32dic_find (model->engine->models, self->id) != NULL)
 			self->id = 0;
 	}
+	if (!lialg_u32dic_insert (model->engine->models, self->id, self))
+	{
+		lieng_model_free (self);
+		return NULL;
+	}
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "model-new", lical_marshal_DATA_PTR_PTR, self, model);
@@ -102,6 +112,8 @@ LIEngModel* lieng_model_new_copy (
 void lieng_model_free (
 	LIEngModel* self)
 {
+	lialg_u32dic_remove (self->engine->models, self->id);
+
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "model-free", lical_marshal_DATA_PTR, self);
 
