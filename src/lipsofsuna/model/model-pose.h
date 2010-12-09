@@ -93,11 +93,6 @@ struct _LIMdlPose
 		int count;
 		LIMdlNode** array;
 	} nodes;
-	struct
-	{
-		int count;
-		LIMdlPoseVertex* array;
-	} vertices;
 };
 
 LIAPICALL (LIMdlPose*, limdl_pose_new, ());
@@ -121,10 +116,6 @@ LIAPICALL (LIMdlNode*, limdl_pose_find_node, (
 LIAPICALL (void, limdl_pose_update, (
 	LIMdlPose* self,
 	float      secs));
-
-LIAPICALL (void, limdl_pose_transform, (
-	LIMdlPose*   self,
-	LIMdlVertex* vertices));
 
 LIAPICALL (LIMdlAnimation*, limdl_pose_get_channel_animation, (
 	const LIMdlPose* self,
