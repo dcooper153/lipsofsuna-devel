@@ -296,7 +296,6 @@ static void Camera_getter_fov (LIScrArgs* args)
 }
 static void Camera_setter_fov (LIScrArgs* args)
 {
-	float pos;
 	float fov = M_PI / 5.0f;
 
 	liscr_args_geti_float (args, 0, &fov);
