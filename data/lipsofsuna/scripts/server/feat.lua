@@ -123,6 +123,9 @@ end
 --   <li>user: Object whose skills and inventory to use.</li></ul>
 -- @return True if usable.
 Feat.usable = function(self, args)
+	-- Check for support by the species.
+	local spec = args.species or args.user and args.user.species
+	if spec and not spec.feats[self.name] then return end
 	-- Check for skills.
 	local skills = args.skills or Skills:find{owner = args.user}
 	for k,v in pairs(self.required_skills) do
