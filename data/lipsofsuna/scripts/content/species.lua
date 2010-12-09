@@ -204,7 +204,6 @@ Species{
 
 Species{
 	name = "bloodworm",
-	model = "bloodworm1",
 	ai_enable_strafe = false,
 	ai_enable_defend = false,
 	factions = {"evil"},

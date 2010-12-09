@@ -37,7 +37,8 @@ Feat{
 	cooldown = 2,
 	effect_animation = "bite",
 	effect_sound = "growl1",
-	inflict_damage = 10}
+	inflict_damage = 10,
+	slot = "mouth"}
 
 Feat{
 	name = "criticalhit",
