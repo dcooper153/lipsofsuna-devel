@@ -57,17 +57,9 @@ LIAPICALL (LIEngEngine*, lieng_engine_new, (
 LIAPICALL (void, lieng_engine_free, (
 	LIEngEngine* self));
 
-LIAPICALL (int, lieng_engine_check_unique, (
-	LIEngEngine* self,
-	uint32_t     id));
-
 LIAPICALL (LIEngObject*, lieng_engine_find_object, (
 	LIEngEngine* self,
 	uint32_t     id));
-
-LIAPICALL (int, lieng_engine_load_model, (
-	LIEngEngine* self,
-	const char*  name));
 
 LIAPICALL (void, lieng_engine_update, (
 	LIEngEngine* self,
