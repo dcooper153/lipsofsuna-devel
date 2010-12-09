@@ -28,7 +28,7 @@ Quests.get_compass_direction = function(clss)
 		if not quest or not quest.marker then return end
 		if not Player.object then return end
 		local diff = quest.marker - Player.object.position
-		return 1 - (math.atan2(diff.z, diff.x) / (2 * math.pi) - 0.25)
+		return 1 - (math.atan2(diff.z, -diff.x) / (2 * math.pi) - 0.25)
 	end
 end
 
