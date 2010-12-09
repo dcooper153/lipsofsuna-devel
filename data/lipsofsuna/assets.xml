@@ -15,6 +15,10 @@
     <url>http://opengameart.org/</url>
   </author-info>
   <author-info>
+    <name>Bitiquinho</name>
+    <url>http://opengameart.org/user/773</url>
+  </author-info>
+  <author-info>
     <name>Blender Open Model Repository</name>
     <url>http://blendermodels.org/license.html</url>
   </author-info>
@@ -594,6 +598,33 @@
     <status>complete</status>
     <tag>door</tag>
     <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/dragon1.blend</file>
+    <author>Bitiquinho</author>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <dep>import/dragon1.png</dep>
+    <dep>import/dragon1n.png</dep>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/dragon1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/dragon1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>normalmap</type>
   </asset>
 
   <asset>

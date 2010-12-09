@@ -216,6 +216,20 @@ Species{
 		{name = "health", max = 30, val = 30}}}
 
 Species{
+	name = "dragon",
+	model = "dragon1",
+	ai_distance_hint = 2.5,
+	ai_enable_strafe = false,
+	ai_enable_defend = false,
+	factions = {"evil"},
+	feats = {"dragon-bite", "dragon-claw-left", "dragon-claw-right"},
+	inventory_size = 0,
+	mass = 1000,
+	speed_walk = 1,
+	skills = {
+		{name = "health", max = 100, val = 100}}}
+
+Species{
 	name = "seirei",
 	model = "seirei1",
 	ai_enable_combat = false,

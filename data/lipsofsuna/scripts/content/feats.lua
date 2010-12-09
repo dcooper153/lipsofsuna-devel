@@ -52,6 +52,35 @@ Feat{
 	targeting_mode = "weapon"}
 
 Feat{
+	name = "dragon-bite",
+	action_frames = {0, 30},
+	categories = {"melee"},
+	cooldown = 4,
+	effect_animation = "bite",
+	inflict_damage = 50,
+	slot = "mouth"}
+
+Feat{
+	name = "dragon-claw-left",
+	action_frames = {0, 15},
+	categories = {"melee"},
+	cooldown = 2,
+	effect_animation = "claw-left",
+	effect_sound = "swing1",
+	inflict_damage = 30,
+	slot = "hand.L"}
+
+Feat{
+	name = "dragon-claw-right",
+	action_frames = {0, 15},
+	categories = {"melee"},
+	cooldown = 2,
+	effect_animation = "claw-right",
+	effect_sound = "swing1",
+	inflict_damage = 30,
+	slot = "hand.R"}
+
+Feat{
 	name = "heal",
 	cooldown = 2,
 	effect_animation = "cast-spell",

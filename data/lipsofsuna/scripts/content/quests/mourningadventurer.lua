@@ -10,7 +10,8 @@ Pattern{
 Pattern{
 	name = "mourningadventurer_lost",
 	creatures = {
-		{0,0,0,"lost adventurer"}}}
+		{0,0,0,"lost adventurer"},
+		{2,0,0,"dragon"}}}
 
 Species{
 	name = "mourning adventurer",
