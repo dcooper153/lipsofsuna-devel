@@ -10,7 +10,7 @@ Species{
 		{name = "lowerbody"},
 		{name = "upperbody"}},
 	factions = {"good"},
-	feats = {"attack", "attack-melee", "attack-ranged", "attack-throw", "fireball", "heal"},
+	feats = {"right hand", "ranged", "ranged spell", "spell on self", "spell on touch", "throw"},
 	inventory_size = 20,
 	model = "aer1",
 	models = {
@@ -221,7 +221,7 @@ Species{
 	ai_enable_strafe = false,
 	ai_enable_defend = false,
 	factions = {"evil"},
-	feats = {"dragon-bite", "dragon-claw-left", "dragon-claw-right"},
+	feats = {"dragon bite", "left claw", "right claw"},
 	inventory_size = 0,
 	mass = 1000,
 	speed_walk = 1,

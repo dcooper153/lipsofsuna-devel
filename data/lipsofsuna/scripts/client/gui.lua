@@ -18,6 +18,7 @@ Gui.init = function(clss)
 		{"Use", function() Commands:use() end}}
 	-- View menu.
 	Gui.menu_widget_view = Widgets.Menu{
+		{"Feats", Feats.inst.window},
 		{"Inventory", Gui.inventory_group},
 		{"Quests", Quests.window},
 		{"Skills", Skills.window}}

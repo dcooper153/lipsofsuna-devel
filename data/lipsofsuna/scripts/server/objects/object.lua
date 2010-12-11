@@ -29,6 +29,57 @@ Object.effect = function(self, args)
 	end
 end
 
+--- Fires or throws the object.
+-- @param self Object.
+-- @param args Arguments.<ul>
+--   <li>collision: Trigger at collision.</li>
+--   <li>feat: Feat.</li>
+--   <li>owner: Object firing the projectile. (required)</li>
+--   <li>point: Firing point relative to the owner.</li>
+--   <li>speed: Initial speed.</li>
+--   <li>timer: Trigger at timeout.</li></ul>
+-- @return True on success.
+Object.fire = function(self, args)
+	if not args.owner or not args.feat then return end
+	print("FFFFFF1")
+	-- Enable collision callback.
+	if args.collision then
+		self.contact_cb = function(_, result)
+			if result.object == self.owner then return end
+			args.feat:apply{
+				attacker = args.owner,
+				point = result.point,
+				selfectile = self,
+				target = result.object,
+				tile = result.tile}
+			self.realized = false
+			self.contact_cb = nil
+		end
+	end
+	print("FFFFFF2")
+	-- Enable destruction timer.
+	if args.timer then
+		Timer{delay = args.timer, func = function(timer)
+			self:die()
+			timer:disable()
+		end}
+	end
+	print("FFFFFF3")
+	-- Add the selfectile to the world.
+	self:detach()
+	print("FFFFFF4")
+	self.owner = args.owner
+	print("FFFFFF5")
+	self.position = args.owner.position + args.owner.rotation * (args.point or Vector())
+	print("FFFFFF6")
+	self.rotation = args.owner.rotation
+	print("FFFFFF7")
+	self.velocity = args.owner.rotation * Vector(0, 0, -(args.speed or 20))
+	print("FFFFFF8", self.velocity)
+	self.save = false
+	self.realized = true
+end
+
 --- Gets a free object ID.
 -- @param clss Object class.
 -- @return Free object ID.

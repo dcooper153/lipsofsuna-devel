@@ -87,6 +87,29 @@ Protocol:add_handler{type = "EXAMINE", func = function(args)
 	end
 end}
 
+Protocol:add_handler{type = "FEAT", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if not player.dead then
+		-- Players are able to create custom feats on client side. When
+		-- the feat is performed, the client sends us all the information
+		-- on the feat. We then reconstruct and perform the feat.
+		local ok,anim,e1,v1,e2,v2,e3,v3,on = args.packet:read("string",
+			"string", "float", "string", "float", "string", "float", "bool")
+		if ok then
+			if anim == "" or not Featanimspec:find{name = anim} then anim = nil end
+			if e1 == "" or not Feateffectspec:find{name = e1} then e1 = nil end
+			if e2 == "" or not Feateffectspec:find{name = e2} then e2 = nil end
+			if e3 == "" or not Feateffectspec:find{name = e3} then e3 = nil end
+			local feat = Feat{animation = anim, effects = {
+				e1 and {e1, math.max(1, math.min(100, v1))},
+				e2 and {e2, math.max(1, math.min(100, v2))},
+				e3 and {e3, math.max(1, math.min(100, v3))}}}
+			feat:perform{stop = not on, user = player}
+		end
+	end
+end}
+
 Protocol:add_handler{type = "JUMP", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
@@ -203,20 +226,21 @@ Protocol:add_handler{type = "SHOOT", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
 	if not player.dead then
-		Feat:perform{name = "attack", user = player}
+		local anim = nil
+		local weapon = player:get_item{slot = "hand.R"}
+		if not weapon or weapon.itemspec.categories["melee"] then
+			anim = "right hand"
+		elseif weapon.itemspec.categories["ranged"] then
+			anim = "ranged"
+		elseif weapon.itemspec.categories["throwable"] then
+			anim = "throw"
+		end
+		if anim then
+			local feat = Feat{animation = anim}
+			feat:perform{stop = args.stop, user = player}
+		end
 	else
 		player:respawn()
-	end
-end}
-
-Protocol:add_handler{type = "SKILL", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if not player.dead then
-		local ok,id,on = args.packet:read("string", "bool")
-		if ok then
-			Feat:perform{name = id, stop = not on, user = player}
-		end
 	end
 end}
 

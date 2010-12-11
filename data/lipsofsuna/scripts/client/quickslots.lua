@@ -20,7 +20,8 @@ end
 Quickslots.assign_feat = function(clss, index, feat)
 	local icon
 	if feat then
-		icon = Iconspec:find{name = "skill-" .. feat}
+		local anim = feat and Featanimspec:find{name = feat.animation}
+		icon = anim and Iconspec:find{name = anim.icon}
 		icon = icon or Iconspec:find{name = "skill-todo"}
 	else
 		icon = Iconspec:find{name = "skill-none"}
@@ -32,16 +33,28 @@ end
 Quickslots.activate = function(clss, index)
 	local feat = clss.buttons[index].feat
 	if feat then
-		Network:send{packet = Packet(packets.SKILL, "string", feat, "bool", true)}
-		Network:send{packet = Packet(packets.SKILL, "string", feat, "bool", false)}
+		local names = {}
+		local values = {}
+		for i = 1,3 do
+			names[i] = feat.effects[i] and feat.effects[i][1] or ""
+			values[i] = feat.effects[i] and feat.effects[i][2] or 0
+		end
+		Network:send{packet = Packet(packets.FEAT,
+			"string", feat.animation or "",
+			"string", names[1], "float", values[1],
+			"string", names[2], "float", values[2],
+			"string", names[3], "float", values[3],
+			"bool", true)}
+		Network:send{packet = Packet(packets.FEAT,
+			"string", feat.animation or "",
+			"string", names[1], "float", values[1],
+			"string", names[2], "float", values[2],
+			"string", names[3], "float", values[3],
+			"bool", false)}
 	end
 end
 
 Quickslots:init()
-local i = 1
-for k,v in pairs(Feat.dict_name) do
-	if i < 12 then
-		Quickslots:assign_feat(i, k)
-		i = i + 1
-	end
-end
+Quickslots:assign_feat(1, Feat{animation = "spell on self", effects = {{"restore health", 10}}})
+Quickslots:assign_feat(2, Feat{animation = "ranged spell", effects = {{"fire damage", 10}}})
+Quickslots:assign_feat(3, Feat{animation = "ranged", effects = {{"physical damage", 1}}})

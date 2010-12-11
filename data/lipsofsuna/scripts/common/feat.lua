@@ -1,53 +1,140 @@
 require "common/spec"
 
-Feat = Class(Spec)
-Feat.type = "feat"
-Feat.dict_id = {}
-Feat.dict_cat = {}
-Feat.dict_name = {}
+Featanimspec = Class(Spec)
+Featanimspec.type = "featanim"
+Featanimspec.dict_id = {}
+Featanimspec.dict_cat = {}
+Featanimspec.dict_name = {}
 
---- Registers a new feat.
--- @param clss Feat class.
+--- Registers a feat animation.
+-- @param clss Featanimspec class.
 -- @param args Arguments.<ul>
 --   <li>action_frames: Blender frame range of the action portion.</li>
+--   <li>categories: List of categories.</li>
+--   <li>cooldown: Cooldown time in seconds.</li>
+--   <li>effect_animation: Animation name.</li>
+--   <li>effect_sound: Sound effect name.</li>
+--   <li>icon: Icon name.</li>
+--   <li>required_ammo: Table of required ammo.</li>
+--   <li>toggle: True to trigger the handler on the key release event as well.</li></ul>
+-- @return New feat animation.
+Featanimspec.new = function(clss, args)
+	local self = Spec.new(clss, args)
+	self.cooldown = self.cooldown or 0
+	self.action_frames = self.action_frames or {2, 10}
+	self.icon = self.icon or "skill-todo"
+	self.required_ammo = self.required_ammo or {}
+	self.toggle = self.toggle or false
+	return self
+end
+
+Feateffectspec = Class(Spec)
+Feateffectspec.type = "feateffect"
+Feateffectspec.dict_id = {}
+Feateffectspec.dict_cat = {}
+Feateffectspec.dict_name = {}
+
+--- Registers a feat effect.
+-- @param clss Feateffectspec class.
+-- @param args Arguments.<ul>
 --   <li>affects_allies: Applicable to allied creatures.</li>
 --   <li>affects_enemies: Applicable to enemy creatures.</li>
 --   <li>affects_items: Applicable to items.</li>
 --   <li>affects_terrain: Applicable to terrain.</li>
 --   <li>categories: List of categories.</li>
---   <li>cooldown: Cooldown time in seconds.</li>
---   <li>effect_animation: Animation name.</li>
---   <li>effect_sound: Sound effect name.</li>
---   <li>inflict_damage: Damage inflicted to affected objects.</li>
---   <li>inflict_modifier: Modifier inflicted to affected objects.</li>
---   <li>locked: Not unlocked yet.</li>
---   <li>name: Name of the feat. (required)</li>
---   <li>range: Maximum firing range for bullet and ray targeting modes.</li>
+--   <li>cooldown_base: Base cooldown time.</li>
+--   <li>cooldown_mult: Cooldown time multiplier.</li>
+--   <li>effect: Effect name.</li>
+--   <li>damage_base: Base effect strength.</li>
+--   <li>damage_mult: Effect strength multiplier.</li>
+--   <li>locked: True for not unlocked yet.</li>
+--   <li>name: Skill effect name.</li>
 --   <li>radius: Area of effect radius.</li>
---   <li>required_ammo: Table of required ammo.</li>
---   <li>required_reagents: Table of required reagents.</li>
---   <li>required_skills: Table of required skills.</li>
---   <li>targeting_mode: The way how the target of the feat is selected.</li>
---   <li>toggle: True to trigger the handler on the key release event as well.</li></ul>
+--   <li>range: Maximum firing range for bullet and ray targeting modes.</li>
+--   <li>skill_base: List of base skill requirements.</li>
+--   <li>skill_mult: List of skill requirements multipliers.</li>
+--   <li>reagent_base: List of base reagent requirements.</li>
+--   <li>reagent_mult: List of reagent requirements multipliers.</li></ul>
+-- @return New feat effect.
+Feateffectspec.new = function(clss, args)
+	local self = Spec.new(clss, args)
+	self.cooldown_base = self.cooldown_base or 1
+	self.cooldown_mult = self.cooldown_mult or 0
+	self.radius = self.radius or 0
+	self.range = self.range or 0
+	self.reagent_base = self.reagent_base or {}
+	self.reagent_mult = self.reagent_mult or {}
+	self.skill_base = self.skill_base or {}
+	self.skill_mult = self.skill_mult or {}
+	return self
+end
+
+Feat = Class()
+
+--- Creates a new feat.
+-- @param clss Feat class.
+-- @param args Arguments.<ul>
+--   <li>animation: Feat animation name.</li>
+--   <li>effects: List of effects and their magnitudes.</li></ul>
 -- @return New feat.
 Feat.new = function(clss, args)
-	local self = Spec.new(clss, args)
-	self.action_frames = self.action_frames or {2, 10}
-	self.skills = self.skills or {}
-	self.affects_allies = self.affects_allies or false
-	self.affects_enemies = self.affects_enemies or false
-	self.affects_items = self.affects_items or false
-	self.affects_terrain = self.affects_terrain or false
-	self.cooldown = self.cooldown or 0
-	self.inflict_damage = self.inflict_damage or 0
-	self.inflict_modifier = self.inflict_modifier
-	self.locked = self.locked or false
-	self.range = self.range or 0
-	self.radius = self.radius or 0
-	self.required_ammo = self.required_ammo or {}
-	self.required_reagents = self.required_reagents or {}
-	self.required_skills = self.required_skills or {}
-	self.targeting_mode = self.targeting_mode or "none"
-	self.toggle = self.toggle or false
+	local self = Class.new(clss, args)
+	self.effects = self.effects or {}
 	return self
+end
+
+--- Gets the skill and reagent requirements of the feat.
+-- @param self Feat.
+-- @return Feat info table.
+Feat.get_info = function(self)
+	local damage = 0
+	local reagents = {}
+	local skills = {}
+	local anim = Featanimspec:find{name = self.animation}
+	local cooldown = anim and anim.cooldown
+	if anim then
+		damage = anim.inflict_damage or 0
+		for index,data in pairs(self.effects) do
+			local effect = Feateffectspec:find{name = data[1]}
+			if effect then
+				-- Base skill requirements.
+				for skill,value in pairs(effect.skill_base) do
+					local val = skills[skill] or 0
+					skills[skill] = val + value
+				end
+				-- Magnitude based skill requirements.
+				for skill,mult in pairs(effect.skill_mult) do
+					local val = skills[skill] or 0
+					skills[skill] = val + mult * data[2]
+				end
+				-- Base reagent requirements.
+				for reagent,value in pairs(effect.reagent_base) do
+					local val = reagents[reagent] or 0
+					reagents[reagent] = val + value
+				end
+				-- Magnitude based reagent requirements.
+				for reagent,mult in pairs(effect.reagent_mult) do
+					local val = reagents[reagent] or 0
+					reagents[reagent] = val + mult * data[2]
+				end
+				-- Cooldown contribution.
+				cooldown = cooldown + effect.cooldown_base + effect.cooldown_mult * data[2]
+				-- Damage contribution.
+				damage = damage + effect.damage_base + effect.damage_mult * data[2]
+			end
+		end
+		for k,v in pairs(skills) do
+			skills[k] = math.max(1, math.ceil(v))
+		end
+		for k,v in pairs(reagents) do
+			reagents[k] = math.max(1, math.ceil(v))
+		end
+	end
+	return {
+		cooldown = cooldown,
+		inflict_damage = damage,
+		required_ammo = anim and anim.required_ammo,
+		required_reagents = reagents,
+		required_skills = skills,
+		required_weapon = anim and anim.required_weapon}
 end

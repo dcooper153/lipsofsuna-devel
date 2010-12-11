@@ -36,10 +36,30 @@ Widgets.ComboBox.append = function(self, args)
 	self.menu:append_row(widget)
 end
 
+--- Activates a row of the combo box menu.
+-- @param self Combo box.
+-- @param args Arguments.<ul>
+--   <li>index: Row index.</li>
+--   <li>text: Row text.</li></ul>
+-- @return True on success.
 Widgets.ComboBox.activate = function(self, args)
-	local widget = self.menu:get_child{col = 1, row = args.index}
-	if not widget then return end
-	widget:pressed()
+	if args.index then
+		-- Activate by index.
+		local widget = self.menu:get_child{col = 1, row = args.index}
+		if not widget then return end
+		widget:pressed()
+	elseif args.text then
+		-- Activate by text.
+		local row = 1
+		local widget
+		for row = 1,self.menu.rows do
+			widget = self.menu:get_child{col = 1, row = row}
+			if not widget then return end
+			if widget.text == args.text then break end
+		end
+		widget:pressed()
+	end
+	return true
 end
 
 Widgets.ComboBox.pressed = function(self)

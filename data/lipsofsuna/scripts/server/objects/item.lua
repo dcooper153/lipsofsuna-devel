@@ -108,50 +108,70 @@ end
 -- @param self Object.
 -- @param args Arguments.<ul>
 --   <li>collision: Trigger at collision.</li>
+--   <li>feat: Feat.</li>
 --   <li>owner: Object firing the projectile. (required)</li>
 --   <li>point: Firing point relative to the owner.</li>
 --   <li>speed: Initial speed.</li>
 --   <li>timer: Trigger at timeout.</li></ul>
 -- @return The split and fired item.
 Item.fire = function(self, args)
-	if args.owner then
-		local pt = args.point or Vector()
-		local sp = args.speed or 20
-		local user = args.owner
-		local proj = self:split()
+	-- Split a projectile from the stack and fire it.
+	if not args.owner or not args.feat then return end
+	local proj = self:split()
+	Object.fire(proj, args)
+	-- Special handling for boomerangs.
+	if proj.itemspec.categories["boomerang"] then
+		-- Enable boomerange collisions.
+		-- The boomerang mode is disabled when a collision occurs and either the
+		-- collision object is damaged or the user catches the boomerang.
 		if args.collision then
-			proj.contact_cb = function(self, result)
-				if result.object == proj.owner then return end
-				Combat:apply_ranged_hit{
-					attacker = user,
-					feat = Feat:find{name = "attack"},
-					point = result.point,
-					projectile = proj,
-					target = result.object,
-					tile = result.tile}
+			proj.contact_cb = function(_, result)
+				if result.object == proj.owner then
+					-- Owner catch.
+					local o = proj.owner:get_item{slot = "hand.R"}
+					if not o then
+						proj.owner:set_item{slot = "hand.R", object = proj}
+					elseif not o:merge{object = proj} then
+						proj.owner:add_item{object = proj}
+					end
+				else
+					-- Damage target.
+					args.feat:apply{
+						attacker = args.user,
+						point = result.point,
+						projectile = proj,
+						target = result.object,
+						tile = result.tile}
+				end
+				-- Disable boomerang mode.
+				proj.timer:disable()
+				proj.gravity = Config.gravity
+				proj:animate{channel = 2}
+				proj.contact_cb = nil
 			end
 		end
-		if args.timer then
-			Timer{delay = args.timer, func = function(timer)
-				if proj.realized then
-					Combat:apply_ranged_hit{
-						attacker = user,
-						feat = Feat:find{name = "attack"},
-						point = proj.position,
-						projectile = proj}
+		-- Enable boomerang rotation.
+		if proj.itemspec.categories["boomerang"] then
+			proj.rotated = 0
+			proj.rotation = Quaternion{axis = Vector(0,0,1), angle = -0.5 * math.pi}
+			proj:animate{animation = "fly", channel = 2, permanent = true}
+			proj.gravity = Vector(0,2,0)
+			proj.timer = Timer{delay = 0, func = function(self, secs)
+				-- Adjust velocity vector.
+				local m = 1.55 * math.pi
+				local r = math.min(secs * 1.3 * math.pi, m - proj.rotated)
+				proj.velocity = Quaternion{axis = Vector(0,1,0), angle = r} * proj.velocity
+				-- Stop after a while.
+				proj.rotated = proj.rotated + r
+				if proj.rotated >= m then
+					self:disable()
+					proj.gravity = Config.gravity
 				end
-				timer:disable()
 			end}
 		end
-		proj:detach()
-		proj.owner = args.owner
-		proj.position = args.owner.position + args.owner.rotation * pt
-		proj.rotation = args.owner.rotation
-		proj.velocity = args.owner.rotation * Vector(0, 0, -sp)
-		proj.save = false
-		proj.realized = true
-		return proj
 	end
+	-- Return the fired projectile.
+	return proj
 end
 
 --- Called when the object is examined.

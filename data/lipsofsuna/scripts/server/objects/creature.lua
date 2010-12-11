@@ -138,13 +138,15 @@ end
 -- @param amount Amount of damage.
 Creature.damaged = function(self, amount)
 	if not self.realized then return end
-	local skills = self.skills
-	local health = skills:get_value{skill = "health"}
+	local health = self.skills:get_value{skill = "health"}
 	if not health then return end
-	if health - amount > 0 then
-		skills:set_value{skill = "health", value = health - amount}
+	if amount < 0 then
+		local max = self.skills:get_maximum{skill = "health"}
+		self.skills:set_value{skill = "health", value = math.min(health - amount, max)}
+	elseif health - amount > 0 then
+		self.skills:set_value{skill = "health", value = health - amount}
 	else
-		skills:set_value{skill = "health", value = 0}
+		self.skills:set_value{skill = "health", value = 0}
 		self:die()
 	end
 end
@@ -235,17 +237,20 @@ end
 -- @param self Object.
 -- @param args Arguments.<ul>
 --   <li>category: Feat category.</li></ul>
+-- @return New feat.
 Creature.find_best_feat = function(self, args)
 	local best_feat = nil
 	local best_score = -1
-	-- Loop through all known feats.
-	for feat_name in pairs(self.species.feats) do
-		local feat = Feat:find{name = feat_name}
-		if feat then
-			if feat.categories[args.category] and feat:usable{user = self} then
+	-- Loop through all known feat animations.
+	for anim_name in pairs(self.species.feats) do
+		local anim = Featanimspec:find{name = anim_name}
+		if anim and anim.categories[args.category] then
+			local feat = Feat{animation = anim_name}
+			if feat:usable{user = self} then
 				-- Calculate feat score.
 				-- TODO: Take more factors into account?
-				local score = feat.inflict_damage + 5 * math.random()
+				local info = feat:get_info()
+				local score = info.inflict_damage + 5 * math.random()
 				-- Maintain the best feat.
 				if score > best_score then
 					best_feat = feat
@@ -590,11 +595,9 @@ Creature.combat_updaters =
 			self.movement = 1
 		end
 		-- Attack when close enough.
-		if dist < hint + 1 then
+		if not self.cooldown and dist < hint + 1 then
 			local f = self:find_best_feat{category = "melee"}
-			if f then
-				Feat:perform{name = f.name, user = self}
-			end
+			if f then f:perform{user = self} end
 		end
 	end,
 	defend = function(self)
