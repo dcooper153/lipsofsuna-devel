@@ -3,13 +3,8 @@ local r
 -- The town of Lips.
 Regionspec{
 	name = "root",
-	size = {16,16,16},
-	style = "lips",
-	links = {
-		{{"dungeon-corridor-ns",7,0,-10}},
-		{{"dungeon-corridor-ns",7,0,16}},
-		{{"dungeon-corridor-ew",-10,0,7}},
-		{{"dungeon-corridor-ew",16,0,7}}}}
+	size = {32,32,32},
+	style = "lips"}
 
 -- Dungeon room.
 Regionspec{
@@ -20,13 +15,13 @@ Regionspec{
 -- Dungeon corridor along North-South axis.
 Regionspec{
 	name = "dungeon-corridor-ns",
-	size = {3,4,10},
+	size = {6,7,10},
 	style = "cave"}
 
 -- Dungeon corridor along East-West axis.
 Regionspec{
 	name = "dungeon-corridor-ew",
-	size = {10,4,3},
+	size = {10,7,6},
 	style = "cave"}
 
 -- Dungeon slope rising toward East.
@@ -58,6 +53,10 @@ Regionspec{
 	size = {8,8,8},
 	style = "rootgrove"}
 
+-- Connectivity rules for the town of Lips.
+r = Regionspec:find{name = "root"}
+r:link{name = "dungeon-corridor-ns", dirs = {"n", "s"}}
+r:link{name = "dungeon-corridor-ew", dirs = {"e", "w"}}
 -- Connectivity rules for the dungeon theme.
 r = Regionspec:find{name = "dungeon-room"}
 r:link{name = "dungeon-corridor-ns", back = true, dirs = {"n", "s"}}

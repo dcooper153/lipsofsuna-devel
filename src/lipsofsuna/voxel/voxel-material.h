@@ -31,24 +31,13 @@ enum
 	LIVOX_MATERIAL_FLAG_OCCLUDER = 0x01
 };
 
-enum
-{
-	LIVOX_MATERIAL_TYPE_CORNER,
-	LIVOX_MATERIAL_TYPE_HEIGHT,
-	LIVOX_MATERIAL_TYPE_TILE,
-	LIVOX_MATERIAL_TYPE_MAX
-};
-
 struct _LIVoxMaterial
 {
 	int id;
 	int flags;
-	int type;
 	char* name;
 	float friction;
-	LIEngModel* model;
-	LIMdlMaterial mat_side;
-	LIMdlMaterial mat_top;
+	LIMdlMaterial material;
 };
 
 LIAPICALL (LIVoxMaterial*, livox_material_new, ());
@@ -62,9 +51,5 @@ LIAPICALL (void, livox_material_free, (
 LIAPICALL (int, livox_material_set_name, (
 	LIVoxMaterial* self,
 	const char*    value));
-
-LIAPICALL (int, livox_material_set_model, (
-	LIVoxMaterial* self,
-	LIEngModel*    model));
 
 #endif

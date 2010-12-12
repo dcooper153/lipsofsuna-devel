@@ -31,23 +31,11 @@ LIAPICALL (int, livox_voxel_read, (
 	LIVoxVoxel*  self,
 	LIArcReader* reader));
 
-LIAPICALL (void, livox_voxel_rotate, (
-	LIVoxVoxel* self,
-	int         axis,
-	int         step));
-
 LIAPICALL (int, livox_voxel_write, (
 	LIVoxVoxel*  self,
 	LIArcWriter* writer));
 
-LIAPICALL (float, livox_voxel_get_height, (
-	const LIVoxVoxel* self));
-
 LIAPICALL (int, livox_voxel_get_type, (
 	const LIVoxVoxel* self));
-
-LIAPICALL (void, livox_voxel_get_quaternion, (
-	const LIVoxVoxel* self,
-	LIMatQuaternion*  value));
 
 #endif

@@ -36,9 +36,7 @@ enum
 typedef struct _LIVoxVoxel LIVoxVoxel;
 struct _LIVoxVoxel
 {
-	uint16_t type;
-	uint8_t damage;
-	uint8_t rotation;
+	uint8_t type;
 };
 
 typedef struct _LIVoxManager LIVoxManager;

@@ -158,7 +158,6 @@ livox_sector_fill (LIVoxSector* self,
 
 /**
  * \brief Reads block data from a stream.
- *
  * \param self Sector.
  * \param x Block offset.
  * \param y Block offset.
@@ -177,9 +176,6 @@ int livox_sector_read_block (
 	int tx;
 	int ty;
 	int tz;
-	uint8_t damage;
-	uint8_t rotation;
-	uint16_t terrain;
 	LIVoxVoxel tmp;
 
 	c = self->manager->tiles_per_line / self->manager->blocks_per_line;
@@ -187,13 +183,8 @@ int livox_sector_read_block (
 	for (ty = 0 ; ty < c ; ty++)
 	for (tx = 0 ; tx < c ; tx++)
 	{
-		if (!liarc_reader_get_uint16 (reader, &terrain) ||
-		    !liarc_reader_get_uint8 (reader, &damage) ||
-		    !liarc_reader_get_uint8 (reader, &rotation))
+		if (!livox_voxel_read (&tmp, reader))
 			return 0;
-		livox_voxel_init (&tmp, terrain);
-		tmp.damage = damage;
-		tmp.rotation = rotation;
 		if (private_set_voxel (self, tx + x * c, ty + y * c, tz + z * c, &tmp))
 			self->dirty = 1;
 	}
@@ -242,9 +233,7 @@ int livox_sector_write_block (
 	for (tx = 0 ; tx < c ; tx++)
 	{
 		tile = livox_sector_get_voxel (self, tx + x * c, ty + y * c, tz + z * c);
-		if (!liarc_writer_append_uint16 (writer, tile->type) ||
-		    !liarc_writer_append_uint8 (writer, tile->damage) ||
-		    !liarc_writer_append_uint8 (writer, tile->rotation))
+		if (!livox_voxel_write (tile, writer))
 			return 0;
 	}
 
@@ -461,9 +450,7 @@ static int private_set_voxel (
 	/* Modify terrain. */
 	tile = self->tiles + x + y * self->manager->tiles_per_line +
 		z * self->manager->tiles_per_line * self->manager->tiles_per_line;
-	if (tile->type == voxel->type &&
-	    tile->damage == voxel->damage &&
-	    tile->rotation == voxel->rotation)
+	if (tile->type == voxel->type)
 		return 0;
 	*tile = *voxel;
 

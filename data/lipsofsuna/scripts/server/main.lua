@@ -39,21 +39,19 @@ require "server/particles"
 --   <li>size: Size vector, in tiles.</li>
 --   <li>tree_density: Per tile tree probability or nil.</li></ul>
 Voxel.make_heightmap = function(clss, args)
-	local p = Vector(0, args.point.y, 0)
+	local e = (args.height or 2) + 1
 	local m = Material:find{name = args.material}
 	if not m then return end
-	local t = Tile{terrain = m.id}
 	for z = args.point.z,args.point.z+args.size.z-1 do
-		p.z = z
 		for x = args.point.x,args.point.x+args.size.x-1 do
-			local h = math.random()
-			p.x = x
-			t.damage = math.floor(255 * h)
-			Voxel:set_tile{point = p, tile = t}
+			local h = math.floor(e * math.random())
+			for y = args.point.y,args.point.y+h-1 do
+				Voxel:set_tile{point = Vector(x,y,z), tile = m.id}
+			end
 			if math.random() < (args.tree_density or 0) then
-				Voxel:place_obstacle{category = "tree", point = p + Vector(0.5, 0.9 - h, 0.5)}
+				Voxel:place_obstacle{category = "tree", point = Vector(x + 0.5, args.point.y + h, z + 0.5)}
 			elseif math.random() < (args.mushroom_density or 0) then
-				Voxel:place_obstacle{name = "mushroom", point = p + Vector(0.5, 1 - h, 0.5)}
+				Voxel:place_obstacle{name = "mushroom", point = Vector(x + 0.5, args.point.y + h, z + 0.5)}
 			end
 		end
 	end
@@ -75,7 +73,6 @@ Voxel.make_slope = function(clss, args)
 	local p = Vector(0, args.point.y, 0)
 	local m = Material:find{name = args.material}
 	if not m then return end
-	local t = Tile{terrain = m.id}
 	for z = args.point.z,args.point.z+args.size.z-1 do
 		p.z = z
 		for x = args.point.x,args.point.x+args.size.x-1 do
@@ -90,8 +87,7 @@ Voxel.make_slope = function(clss, args)
 			-- Create the tile stack matching the height.
 			for y = 0,math.floor(h) do
 				p.y = args.point.y + y
-				t.damage = 255 * (1 - math.min(1, h - y))
-				Voxel:set_tile{point = p, tile = t}
+				Voxel:set_tile{point = p, tile = m.id}
 			end
 			-- Position extra objects.
 			p.y = args.point.y
@@ -146,11 +142,9 @@ Voxel.place_pattern = function(clss, args)
 	for k,v in pairs(pat.tiles) do
 		local mat = Material:find{name = v[4]}
 		if mat then
-			local tile = Tile{terrain = mat.id}
-			if v[5] then tile:rotate{axis = "y", step = v[5]} end
 			Voxel:set_tile{
 				point = args.point + Vector(v[1], v[2], v[3]),
-				tile = tile}
+				tile = mat.id}
 		end
 	end
 	-- Create obstacles.
@@ -262,40 +256,40 @@ restart = function()
 				Voxel:place_creature{point = r.point + Vector(8,0,9), name = "lipscitizen"}
 				local p = Vector(10,0,0)
 				local s = r.size - p
-				Voxel:make_heightmap{point = r.point + p, size = s, material = "ground1"}
+				Voxel:make_heightmap{point = r.point + p, size = s, material = "grass1"}
 				p = p + Vector(3,1,3)
 				s = s - Vector(2,1,2)
 				Voxel:make_heightmap{point = r.point + p, size = s,
-					material = "ground1", tree_density = 0.1}
+					material = "grass1", tree_density = 0.05}
 			elseif spec.name == "dungeon-room" then
 				Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "house1"}
 			elseif spec.name == "dungeon-slope-n" then
 				Voxel:make_slope{point = r.point, size = r.size,
 					heights = {2,2,3,3}, randomness = 1,
-					material = "ground1", tree_density = 0.1}
+					material = "ground1", tree_density = 0.05}
 			elseif spec.name == "dungeon-slope-s" then
 				Voxel:make_slope{point = r.point, size = r.size,
 					heights = {3,3,2,2}, randomness = 1,
-					material = "ground1", tree_density = 0.1}
+					material = "ground1", tree_density = 0.05}
 			elseif spec.name == "dungeon-slope-e" then
 				Voxel:make_slope{point = r.point, size = r.size,
 					heights = {2,3,2,3}, randomness = 1,
-					material = "ground1", tree_density = 0.1}
+					material = "ground1", tree_density = 0.05}
 			elseif spec.name == "dungeon-slope-w" then
 				Voxel:make_slope{point = r.point, size = r.size,
 					heights = {3,2,3,2}, randomness = 1,
-					material = "ground1", tree_density = 0.1}
+					material = "ground1", tree_density = 0.05}
 			elseif spec.name == "dungeon-corridor-ns" then
 				Voxel:place_creature{point = r.point + Vector(1,1,3), name = "bloodworm", prob = 0.25}
 				Voxel:place_creature{point = r.point + Vector(2,1,8), name = "bloodworm", prob = 0.25}
 				Voxel:make_heightmap{point = r.point + Vector(0,0,0), size = r.size,
-					material = "ground1", tree_density = 0.1,
+					material = "grass1", tree_density = 0.05,
 					mushroom_density = 0.3}
 			elseif spec.name == "dungeon-corridor-ew" then
 				Voxel:place_creature{point = r.point + Vector(3,1,1), name = "bloodworm", prob = 0.25}
 				Voxel:place_creature{point = r.point + Vector(8,1,2), name = "bloodworm", prob = 0.25}
 				Voxel:make_heightmap{point = r.point + Vector(0,0,0), size = r.size,
-					material = "ground1", tree_density = 0.1,
+					material = "grass1", tree_density = 0.01,
 					mushroom_density = 0.3}
 			elseif spec.name == "rootsofworld-grove" then
 				Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "rootsofworld"}

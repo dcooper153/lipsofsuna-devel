@@ -1,7 +1,10 @@
 Pattern{
 	name = "house1",
 	items = {
-		{0,0,0,"air tank"}},
+		{1,0,0,"air tank"}},
+	obstacles = {
+		{0,0,0,"tree"}}}
+--[[
 	obstacles = {
 		{0.3,0,2.8,"tree"},
 		{2.8,0,2.8,"tree"}},
@@ -26,4 +29,4 @@ Pattern{
 		{2,2,1,"houserooftop3",2},
 		{1,0,2,"housebasedoorway1",2},
 		{1,1,2,"houseroofdoorway1",2},
-		{1,0,3,"housedoorstep1",2}}}
+		{1,0,3,"housedoorstep1",2}}}--]]

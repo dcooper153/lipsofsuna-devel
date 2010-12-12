@@ -53,79 +53,6 @@ static void Tile_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Rotates the tile.
- * -- @param self Tile.
- * -- @param args Arguments.<ul>
- * --   <li>axis: Axis of rotation ("x"/"y"/"z" or 1/2/3)</li>
- * --   <li>step: Number of steps to rotate.</li></ul>
- * function Tile.rotate(self, args)
- */
-static void Tile_rotate (LIScrArgs* args)
-{
-	int step = 1;
-	int axis = 0;
-	const char* tmp;
-
-	if (liscr_args_gets_int (args, "step", &step))
-		step %= 4;
-	if (liscr_args_gets_string (args, "axis", &tmp))
-	{
-		if (!strcmp (tmp, "x")) axis = 0;
-		else if (!strcmp (tmp, "y")) axis = 1;
-		else if (!strcmp (tmp, "z")) axis = 2;
-	}
-	else if (liscr_args_gets_int (args, "axis", &axis))
-	{
-		axis = LIMAT_CLAMP (axis - 1, 0, 2);
-	}
-	livox_voxel_rotate (args->self, axis, step);
-}
-
-/* @luadoc
- * --- Damage counter of the tile.
- * --
- * -- @name Tile.damage
- * -- @class table
- */
-static void Tile_getter_damage (LIScrArgs* args)
-{
-	liscr_args_seti_int (args, ((LIVoxVoxel*) args->self)->damage);
-}
-static void Tile_setter_damage (LIScrArgs* args)
-{
-	int value;
-
-	if (liscr_args_geti_int (args, 0, &value))
-	{
-		if (value < 0x00) value = 0;
-		if (value > 0xFF) value = 0xFF;
-		((LIVoxVoxel*) args->self)->damage = value;
-	}
-}
-
-/* @luadoc
- * --- Rotation of the tile.
- * --
- * -- @name Tile.rotation
- * -- @class table
- */
-static void Tile_getter_rotation (LIScrArgs* args)
-{
-	liscr_args_seti_int (args, ((LIVoxVoxel*) args->self)->rotation);
-}
-static void Tile_setter_rotation (LIScrArgs* args)
-{
-	int value;
-
-	if (liscr_args_geti_int (args, 0, &value))
-	{
-		if (value <  0) value = 0;
-		if (value > 24) value = 24;
-		((LIVoxVoxel*) args->self)->rotation = value;
-	}
-}
-
-/* @luadoc
  * --- Terrain type of the tile.
  * --
  * -- @name Tile.terrain
@@ -720,19 +647,20 @@ static void Voxel_set_block (LIScrArgs* args)
  * --- Sets the contents of a tile.
  * -- @param clss Voxel class.
  * -- @param args Arguments.<ul>
- * --   <li>point: Tile index vector. (required)</li>
- * --   <li>tile: Tile. (required)</li></ul>
+ * --   <li>point: Tile index vector.</li>
+ * --   <li>tile: Tile number.</li></ul>
  * function Voxel.set_tile(clss, args)
  */
 static void Voxel_set_tile (LIScrArgs* args)
 {
 	int lim;
+	int type;
 	LIExtModule* module;
 	LIMatVector point;
-	LIScrData* voxel;
+	LIVoxVoxel voxel;
 
 	if (liscr_args_gets_vector (args, "point", &point) &&
-	    liscr_args_gets_data (args, "tile", LIEXT_SCRIPT_TILE, &voxel))
+	    liscr_args_gets_int (args, "tile", &type))
 	{
 		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
 		lim = module->voxels->tiles_per_line * module->program->sectors->count;
@@ -740,7 +668,8 @@ static void Voxel_set_tile (LIScrArgs* args)
 		    point.y < 0.0f || point.y >= lim ||
 		    point.z < 0.0f || point.z >= lim)
 			return;
-		livox_manager_set_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, liscr_data_get_data (voxel));
+		livox_voxel_init (&voxel, type);
+		livox_manager_set_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, &voxel);
 	}
 }
 
@@ -859,9 +788,6 @@ void liext_script_tile (
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_TILE, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Tile_new);
-	liscr_class_insert_mfunc (self, "rotate", Tile_rotate);
-	liscr_class_insert_mvar (self, "damage", Tile_getter_damage, Tile_setter_damage);
-	liscr_class_insert_mvar (self, "rotation", Tile_getter_rotation, Tile_setter_rotation);
 	liscr_class_insert_mvar (self, "terrain", Tile_getter_terrain, Tile_setter_terrain);
 }
 

@@ -42,7 +42,7 @@ void main()
 		nml += weight[i] * (los_quat_xform(poserot, LOS_normal));
 	}
 	geo_coord = vtx;
-	geo_normal = normalize(nml);
+	geo_normal = normalize(nml) * length(LOS_normal);
 	geo_texcoord = LOS_texcoord;
 	gl_Position = vec4(LOS_coord,1.0);
 }]],

@@ -85,24 +85,12 @@ Editing.init = function(clss)
 		Editing:erase()
 	end})
 
-	-- Rotating terrain.
-	clss.spin_rot = Widgets.ComboBox{"x", "y", "z"}
-	clss.spin_rot:activate{index = 2}
-	clss.group_terrain_rotate = Widget{cols = 1}
-	clss.group_terrain_rotate:append_row(Widgets.Label{text = "Axis:"})
-	clss.group_terrain_rotate:set_expand{col = 1}
-	clss.group_terrain_rotate:append_row(clss.spin_rot)
-	clss.group_terrain_rotate:append_row(Widgets.Button{text = "Rotate", pressed = function()
-		Editing:rotate()
-	end})
-
 	-- Popup button.
 	clss.popup_button = Widgets.ComboBox{
 		{"Objects: create", function() Editing:set_mode(1) end},
 		{"Objects: delete", function() Editing:set_mode(2) end},
 		{"Terrain: create", function() Editing:set_mode(3) end},
-		{"Terrain: delete", function() Editing:set_mode(4) end},
-		{"Terrain: rotate", function() Editing:set_mode(5) end}}
+		{"Terrain: delete", function() Editing:set_mode(4) end}}
 
 	-- Packing.
 	clss.dialog = Widgets.Popup{cols = 1, rows = 3}
@@ -135,10 +123,6 @@ Editing.set_mode = function(clss, mode)
 		function()
 			clss.dialog:set_child{col = 1, row = 3, widget = clss.group_terrain_delete}
 			clss.popup_button.text = "Terrain: delete"
-		end,
-		function()
-			clss.dialog:set_child{col = 1, row = 3, widget = clss.group_terrain_rotate}
-			clss.popup_button.text = "Terrain: rotate"
 		end
 	}
 	local fun = funs[mode]
@@ -186,22 +170,6 @@ function Editing.insert(self)
 		end
 	end
 	Target:start("Creating terrain...", func)
-end
-
-function Editing.rotate(self)
-	local function func(where, id, slot)
-		if where == "map" and slot ~= nil then
-			local t,p = Voxel:find_tile{match = "full", point = slot}
-			if p then
-				t:rotate{axis = self.spin_rot.value}
-				Network:send{packet = Packet(packets.EDIT_TILE,
-					"int32", p.x, "int32", p.y, "int32", p.z,
-					"uint8", t.terrain, "uint8", t.damage, "uint8", t.rotation)}
-			end
-			Editing:rotate()
-		end
-	end
-	Target:start("Rotating terrain...", func)
 end
 
 Editing:init()
