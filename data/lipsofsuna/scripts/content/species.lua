@@ -20,6 +20,13 @@ Species{
 		legs = "aerlegnude1",
 		lower = "aerlowernude1",
 		upper = "aeruppernude1"},
+	models_lod = {
+		skeleton = "aer1",
+		arms = "aerarmnude1l",
+		head = "aerhead1l",
+		legs = "aerlegnude1l",
+		lower = "aerlowernude1l",
+		upper = "aeruppernude1l"},
 	skill_quota = 200,
 	skills = {
 		{name = "dexterity", max = 80, val = 30},
