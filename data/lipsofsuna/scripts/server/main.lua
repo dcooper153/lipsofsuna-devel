@@ -236,9 +236,13 @@ restart = function()
 	Generator:disable_brush{name = "rootsofworld-grove"}
 	Generator:expand{count = 10}
 	-- Generate Chara's root grove.
-	Generator:disable_regions{except = "rootsofworld-grove"}
-	Generator:expand{count = 1}
-	Generator:enable_regions{except = "rootsofworld-grove"}
+	local success
+	repeat
+		Generator:disable_regions{except = "rootsofworld-grove"}
+		success = Generator:expand{count = 1}
+		Generator:enable_regions{except = "rootsofworld-grove"}
+		Generator:expand{count = 1}
+	until success
 	-- Generate lots of pointless random regions.
 	Generator:expand{count = 89}
 	-- Populate the generated regions.
