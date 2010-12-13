@@ -338,6 +338,7 @@ Voxel.block_changed_cb = function(index, stamp)
 end
 
 math.randomseed(1000000 * Program.time)
+Program.sleep = 1/60
 
 -- Main loop.
 while not Program.quit do

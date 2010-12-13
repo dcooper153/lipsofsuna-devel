@@ -55,7 +55,6 @@ LISerServer* liser_server_new (
 		lisys_free (self);
 		return NULL;
 	}
-	self->program->sleep = 5000;
 	self->sectors = self->program->sectors;
 	self->callbacks = self->program->callbacks;
 	self->engine = self->program->engine;
