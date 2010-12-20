@@ -50,7 +50,7 @@ Player.get_picking_ray_3rd = function(clss)
 	return pos,pos + rot * Vector(0,0,-50)
 end
 
-Player.camera = Camera{far = 60.0, fov = 0.96, mode = "third-person", near = 0.3, position_smoothing = 0.15, rotation_smoothing = 0.15}
+Player.camera = Camera{far = 60.0, fov = 0.96, mode = "third-person", near = 0.01, position_smoothing = 0.15, rotation_smoothing = 0.15}
 Player.camera_tilt = 0
 Player.camera_tilt_state = 0
 Player.camera_turn = 0
@@ -71,6 +71,7 @@ Player.update_camera = function(clss, secs)
 	Player.camera.target_rotation = rot
 	-- Interpolate.
 	Player.camera.viewport = {Gui.scene.x, Gui.scene.y, Gui.scene.width, Gui.scene.height}
+	Player.camera:update(secs)
 	Player.camera:update(secs)
 end
 
@@ -119,24 +120,6 @@ end
 
 Player.update_pose = function(clss, secs)
 end
-
-Eventhandler{type = "tick", func = function(self, args)
-	-- Player controls.
-	if Player.object then
-		Player:update_pose(args.secs)
-		Player:update_rotation(args.secs)
-		Player:update_camera(args.secs)
-		-- Update the light ball.
-		Player.light.position = Player.object.position + Player.object.rotation * Vector(0, 2, -5)
-		Player.light.enabled = true
-		-- Sound playback.
-		Sound.listener_position = Player.camera.position
-		Sound.listener_rotation = Player.camera.rotation
-		Sound.listener_velocity = Player.object.velocity
-		-- Refresh the active portion of the map.
-		Player.object:refresh()
-	end
-end}
 
 Eventhandler{type = "object-model", func = function(self, args)
 	--args.object:update_model{model = args.model}

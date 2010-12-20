@@ -111,6 +111,21 @@ Eventhandler{type = "tick", func = function(self, args)
 	for k,v in pairs(Slots.dict_owner) do
 		v:update()
 	end
+	-- Update player state.
+	if Player.object then
+		Player:update_pose(args.secs)
+		Player:update_rotation(args.secs)
+		Player:update_camera(args.secs)
+		-- Update the light ball.
+		Player.light.position = Player.object.position + Player.object.rotation * Vector(0, 2, -5)
+		Player.light.enabled = true
+		-- Sound playback.
+		Sound.listener_position = Player.camera.position
+		Sound.listener_rotation = Player.camera.rotation
+		Sound.listener_velocity = Player.object.velocity
+		-- Refresh the active portion of the map.
+		Player.object:refresh()
+	end
 end}
 
 Startup:execute()
