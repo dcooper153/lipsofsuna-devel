@@ -41,7 +41,6 @@ end
 -- @return True on success.
 Object.fire = function(self, args)
 	if not args.owner or not args.feat then return end
-	print("FFFFFF1")
 	-- Enable collision callback.
 	if args.collision then
 		self.contact_cb = function(_, result)
@@ -49,14 +48,13 @@ Object.fire = function(self, args)
 			args.feat:apply{
 				attacker = args.owner,
 				point = result.point,
-				selfectile = self,
+				projectile = self,
 				target = result.object,
 				tile = result.tile}
 			self.realized = false
 			self.contact_cb = nil
 		end
 	end
-	print("FFFFFF2")
 	-- Enable destruction timer.
 	if args.timer then
 		Timer{delay = args.timer, func = function(timer)
@@ -64,18 +62,12 @@ Object.fire = function(self, args)
 			timer:disable()
 		end}
 	end
-	print("FFFFFF3")
-	-- Add the selfectile to the world.
+	-- Add the projectile to the world.
 	self:detach()
-	print("FFFFFF4")
 	self.owner = args.owner
-	print("FFFFFF5")
 	self.position = args.owner.position + args.owner.rotation * (args.point or Vector())
-	print("FFFFFF6")
 	self.rotation = args.owner.rotation
-	print("FFFFFF7")
 	self.velocity = args.owner.rotation * Vector(0, 0, -(args.speed or 20))
-	print("FFFFFF8", self.velocity)
 	self.save = false
 	self.realized = true
 end
