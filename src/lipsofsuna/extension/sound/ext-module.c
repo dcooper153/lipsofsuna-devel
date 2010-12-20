@@ -176,7 +176,6 @@ LISndSource* liext_sound_set_effect (
 	LIEngObject* engobj;
 	LIExtObject* extobj;
 	LIMatTransform transform;
-	LIMatVector vector;
 	LISndSample* sample;
 	LISndSource* source;
 
@@ -236,9 +235,6 @@ LISndSource* liext_sound_set_effect (
 	/* Set properties. */
 	lieng_object_get_transform (engobj, &transform);
 	lisnd_source_set_position (source, &transform.position);
-	// TODO: Use the physics component to get the velocity.
-	//lieng_object_get_velocity (engobj, &vector);
-	//lisnd_source_set_velocity (source, &vector);
 	if (flags & LINET_EFFECT_REPEAT)
 		lisnd_source_set_looping (source, 1);
 	lisnd_source_set_playing (source, 1);

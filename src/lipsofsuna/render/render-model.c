@@ -37,8 +37,7 @@ static int private_init_materials (
 
 static int private_init_model (
 	LIRenModel* self,
-	LIMdlModel* model,
-	int         type);
+	LIMdlModel* model);
 
 /*****************************************************************************/
 
@@ -66,7 +65,6 @@ LIRenModel* liren_model_new (
 		return NULL;
 	self->render = render;
 	self->id = id;
-	self->type = LIREN_BUFFER_TYPE_STATIC;
 
 	/* Create model data. */
 	if (!liren_model_set_model (self, model))
@@ -384,7 +382,7 @@ int liren_model_set_model (
 	backup = *self;
 	self->bounds = model->bounds;
 	if (!private_init_materials (self, model) ||
-	    !private_init_model (self, model, self->type))
+	    !private_init_model (self, model))
 	{
 		private_clear_materials (self);
 		private_clear_model (self);
@@ -407,22 +405,6 @@ int liren_model_set_model (
 		}
 	}
 
-	return 1;
-}
-
-int liren_model_get_type (
-	const LIRenModel* self)
-{
-	return self->type;
-}
-
-int liren_model_set_type (
-	LIRenModel* self,
-	int         value)
-{
-#warning Changing buffer mode of a model is disabled.
-	self->type = value;
-//	return liren_model_set_model (self, self->model);
 	return 1;
 }
 
@@ -490,8 +472,7 @@ static int private_init_materials (
 
 static int private_init_model (
 	LIRenModel* self,
-	LIMdlModel* model,
-	int         type)
+	LIMdlModel* model)
 {
 	int c;
 	int i;

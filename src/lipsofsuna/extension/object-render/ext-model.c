@@ -73,63 +73,6 @@ static void Model_edit_material (LIScrArgs* args)
 		liren_material_set_specular (material, color);
 }
 
-/* @luadoc
- * --- Vertex usage style. ("dynamic"/"static"/"stream")
- * -- @name Model.vertex_policy
- * -- @class table
- */
-static void Model_getter_vertex_policy (LIScrArgs* args)
-{
-	LIExtModule* module;
-	LIEngModel* engmdl;
-	LIRenModel* model;
-
-	/* Get render model. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER_MODEL);
-	engmdl = args->self;
-	model = liren_render_find_model (module->render, engmdl->id);
-	if (model == NULL)
-		return;
-
-	/* Set buffer type. */
-	switch (liren_model_get_type (model))
-	{
-		case LIREN_BUFFER_TYPE_DYNAMIC:
-			liscr_args_seti_string (args, "dynamic");
-			break;
-		case LIREN_BUFFER_TYPE_STATIC:
-			liscr_args_seti_string (args, "static");
-			break;
-		case LIREN_BUFFER_TYPE_STREAM:
-			liscr_args_seti_string (args, "stream");
-			break;
-	}
-}
-static void Model_setter_vertex_policy (LIScrArgs* args)
-{
-	const char* value;
-	LIExtModule* module;
-	LIEngModel* engmdl;
-	LIRenModel* model;
-
-	/* Get render model. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER_MODEL);
-	engmdl = args->self;
-	model = liren_render_find_model (module->render, engmdl->id);
-	if (model == NULL)
-		return;
-
-	/* Set buffer type. */
-	if (!liscr_args_geti_string (args, 0, &value))
-		return;
-	if (!strcmp (value, "dynamic"))
-		liren_model_set_type (model, LIREN_BUFFER_TYPE_DYNAMIC);
-	else if (!strcmp (value, "static"))
-		liren_model_set_type (model, LIREN_BUFFER_TYPE_STATIC);
-	else if (!strcmp (value, "stream"))
-		liren_model_set_type (model, LIREN_BUFFER_TYPE_STREAM);
-}
-
 /*****************************************************************************/
 
 void liext_script_render_model (
@@ -138,7 +81,6 @@ void liext_script_render_model (
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_RENDER_MODEL, data);
 	liscr_class_insert_mfunc (self, "edit_material", Model_edit_material);
-	liscr_class_insert_mvar (self, "vertex_policy", Model_getter_vertex_policy, Model_setter_vertex_policy);
 }
 
 /** @} */

@@ -39,7 +39,6 @@ struct _LIRenModelGroup
 struct _LIRenModel
 {
 	int id;
-	int type;
 	LIMatAabb bounds;
 	LIRenMesh mesh;
 	LIRenParticles particles;
@@ -94,12 +93,5 @@ LIAPICALL (void, liren_model_get_bounds, (
 LIAPICALL (int, liren_model_set_model, (
 	LIRenModel* self,
 	LIMdlModel* model));
-
-LIAPICALL (int, liren_model_get_type, (
-	const LIRenModel* self));
-
-LIAPICALL (int, liren_model_set_type, (
-	LIRenModel* self,
-	int         value));
 
 #endif
