@@ -121,8 +121,8 @@ Eventhandler{type = "tick", func = function(self, args)
 		Player.light.position = Player.object.position + Player.object.rotation * Vector(0, 2, -5)
 		Player.light.enabled = true
 		-- Sound playback.
-		Sound.listener_position = Player.camera.position
-		Sound.listener_rotation = Player.camera.rotation
+		Sound.listener_position = Player.object.position
+		Sound.listener_rotation = Player.object.rotation
 		Sound.listener_velocity = Player.object.velocity
 		-- Refresh the active portion of the map.
 		Player.object:refresh()

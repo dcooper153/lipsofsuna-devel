@@ -283,14 +283,14 @@ lisnd_source_set_volume (LISndSource* self,
 
 /*****************************************************************************/
 
-static int
-private_init_source (LISndSource* self,
-                     ALuint*      result)
+static int private_init_source (
+	LISndSource* self,
+	ALuint*      result)
 {
 	alGenSources (1, result);
 	if (alGetError() != AL_NO_ERROR)
 		return 0;
-	alSourcef (self->source, AL_REFERENCE_DISTANCE, 5.0f);
+	alSourcef (self->source, AL_REFERENCE_DISTANCE, 1.0f);
 	alSourcef (self->source, AL_MAX_DISTANCE, 100.0f);
 
 	return 1;
