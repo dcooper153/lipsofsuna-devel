@@ -52,7 +52,7 @@ Voxel.player_contact = function(self, player, point)
 end
 
 Voxel.damage = function(self, point, damage)
-	local t = Voxel:get_tile{point = point}
+	--local t = Voxel:get_tile{point = point}
 	--local m = Material:find{id = t.terrain}
 	Voxel:set_tile{point = point, tile = 0}
 	--Effect("crack-000", result.point)

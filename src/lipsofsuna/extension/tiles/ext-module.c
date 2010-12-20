@@ -72,7 +72,6 @@ LIExtModule* liext_tiles_new (
 
 	/* Register classes. */
 	liscr_script_create_class (program->script, "Material", liext_script_material, self);
-	liscr_script_create_class (program->script, "Tile", liext_script_tile, self);
 	liscr_script_create_class (program->script, "Voxel", liext_script_voxel, self);
 
 	return self;

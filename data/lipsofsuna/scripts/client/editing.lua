@@ -141,12 +141,8 @@ function Editing.erase(self)
 		if where == "map" and slot ~= nil then
 			local t,p = Voxel:find_tile{match = "full", point = slot}
 			if p then
-				t.terrain = 0
-				t.damage = 0
-				t.rotation = 0
 				Network:send{packet = Packet(packets.EDIT_TILE,
-					"int32", p.x, "int32", p.y, "int32", p.z,
-					"uint8", t.terrain, "uint8", t.damage, "uint8", t.rotation)}
+					"int32", p.x, "int32", p.y, "int32", p.z, "uint8", t)}
 			end
 			Editing:erase()
 		end
@@ -159,12 +155,11 @@ function Editing.insert(self)
 		if where == "map" and slot ~= nil then
 			local t,p = Voxel:find_tile{match = "empty", point = slot}
 			if p then
-				t.terrain = Material:find{name = self.spin_terrain.text}.id
-				t.damage = 0
-				t.rotation = 0
-				Network:send{packet = Packet(packets.EDIT_TILE,
-					"uint32", p.x, "uint32", p.y, "uint32", p.z,
-					"uint8", t.terrain, "uint8", t.damage, "uint8", t.rotation)}
+				local m = Material:find{name = self.spin_terrain.text}
+				if m then
+					Network:send{packet = Packet(packets.EDIT_TILE,
+						"uint32", p.x, "uint32", p.y, "uint32", p.z, "uint8", m.id)}
+				end
 			end
 			Editing:insert(how)
 		end

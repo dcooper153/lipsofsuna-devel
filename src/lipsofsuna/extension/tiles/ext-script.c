@@ -32,51 +32,6 @@
  */
 
 /* @luadoc
- * --- Creates a new tile.
- * --
- * -- @param clss Tile class.
- * -- @param args Arguments.
- * -- @return New tile.
- * function Tile.new(clss, args)
- */
-static void Tile_new (LIScrArgs* args)
-{
-	LIScrData* data;
-
-	/* Allocate userdata. */
-	data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), args->clss);
-	if (data == NULL)
-		return;
-	liscr_args_call_setters (args, data);
-	liscr_args_seti_data (args, data);
-	liscr_data_unref (data);
-}
-
-/* @luadoc
- * --- Terrain type of the tile.
- * --
- * -- @name Tile.terrain
- * -- @class table
- */
-static void Tile_getter_terrain (LIScrArgs* args)
-{
-	liscr_args_seti_int (args, ((LIVoxVoxel*) args->self)->type);
-}
-static void Tile_setter_terrain (LIScrArgs* args)
-{
-	int value;
-
-	if (liscr_args_geti_int (args, 0, &value))
-	{
-		if (value < 0x0000) value = 0;
-		if (value > 0xFFFF) value = 0xFFFF;
-		((LIVoxVoxel*) args->self)->type = value;
-	}
-}
-
-/*****************************************************************************/
-
-/* @luadoc
  * --- Copies a terrain region into a packet.
  * -- @param clss Voxel class.
  * -- @param args Arguments.<ul>
@@ -175,10 +130,10 @@ static void Voxel_fill_region (LIScrArgs* args)
 {
 	int i;
 	int count;
+	int type = 0;
 	LIExtModule* module;
 	LIMatVector pos;
 	LIMatVector size;
-	LIScrData* data;
 	LIVoxVoxel tile;
 	LIVoxVoxel* tiles;
 
@@ -188,10 +143,8 @@ static void Voxel_fill_region (LIScrArgs* args)
 		return;
 	if (size.x < 1.0f || size.y < 1.0f || size.z < 1.0f)
 		return;
-	if (liscr_args_gets_data (args, "tile", LIEXT_SCRIPT_TILE, &data))
-		tile = *((LIVoxVoxel*) liscr_data_get_data (data));
-	else
-		livox_voxel_init (&tile, 0);
+	liscr_args_gets_int (args, "tile", &type);
+	livox_voxel_init (&tile, type);
 
 	/* Allocate tiles. */
 	count = (int) size.x * (int) size.y * (int) size.z;
@@ -345,8 +298,6 @@ static void Voxel_find_tile (LIScrArgs* args)
 	LIExtModule* module;
 	LIMatVector point;
 	LIMatVector result;
-	LIScrClass* clss;
-	LIScrData* data;
 	LIVoxVoxel* voxel;
 
 	if (liscr_args_gets_vector (args, "point", &point))
@@ -366,15 +317,9 @@ static void Voxel_find_tile (LIScrArgs* args)
 			return;
 
 		/* Return values. */
-		clss = liscr_script_find_class (args->script, LIEXT_SCRIPT_TILE);
-		data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), clss);
-		if (data == NULL)
-			return;
-		*((LIVoxVoxel*) liscr_data_get_data (data)) = *voxel;
-		liscr_args_seti_data (args, data);
+		liscr_args_seti_int (args, voxel->type);
 		result = limat_vector_init (index[0], index[1], index[2]);
 		liscr_args_seti_vector (args, &result);
-		liscr_data_unref (data);
 	}
 }
 
@@ -460,8 +405,7 @@ static void Voxel_get_tile (LIScrArgs* args)
 	int lim;
 	LIExtModule* module;
 	LIMatVector point;
-	LIScrClass* clss;
-	LIScrData* data;
+	LIVoxVoxel voxel;
 
 	if (liscr_args_gets_vector (args, "point", &point))
 	{
@@ -471,12 +415,8 @@ static void Voxel_get_tile (LIScrArgs* args)
 		    point.y < 0.0f || point.y >= lim ||
 		    point.z < 0.0f || point.z >= lim)
 			return;
-		clss = liscr_script_find_class (args->script, LIEXT_SCRIPT_TILE);
-		data = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), clss);
-		if (data == NULL)
-			return;
-		livox_manager_get_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, liscr_data_get_data (data));
-		liscr_args_seti_data (args, data);
+		livox_manager_get_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, &voxel);
+		liscr_args_seti_int (args, voxel.type);
 	}
 }
 
@@ -706,32 +646,19 @@ static void Voxel_setter_blocks_per_line (LIScrArgs* args)
 static void Voxel_getter_fill (LIScrArgs* args)
 {
 	LIExtModule* self;
-	LIScrClass* clss;
-	LIScrData* voxel;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
 	if (self->voxels->fill)
-	{
-		clss = liscr_script_find_class (args->script, LIEXT_SCRIPT_TILE);
-		voxel = liscr_data_new_alloc (args->script, sizeof (LIVoxVoxel), clss);
-		if (voxel != NULL)
-		{
-			livox_voxel_init (liscr_data_get_data (voxel), self->voxels->fill);
-			liscr_args_seti_data (args, voxel);
-			liscr_data_unref (voxel);
-		}
-	}
+		liscr_args_seti_int (args, self->voxels->fill);
 }
 static void Voxel_setter_fill (LIScrArgs* args)
 {
+	int type = 0;
 	LIExtModule* self;
-	LIScrData* voxel;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-	if (liscr_args_geti_data (args, 0, LIEXT_SCRIPT_TILE, &voxel))
-		livox_manager_set_fill (self->voxels, ((LIVoxVoxel*) liscr_data_get_data (voxel))->type);
-	else
-		livox_manager_set_fill (self->voxels, 0);
+	liscr_args_geti_int (args, 0, &type);
+	livox_manager_set_fill (self->voxels, type);
 }
 
 /* @luadoc
@@ -780,16 +707,6 @@ static void Voxel_setter_tiles_per_line (LIScrArgs* args)
 }
 
 /*****************************************************************************/
-
-void liext_script_tile (
-	LIScrClass* self,
-	void*       data)
-{
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_TILE, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "new", Tile_new);
-	liscr_class_insert_mvar (self, "terrain", Tile_getter_terrain, Tile_setter_terrain);
-}
 
 void liext_script_voxel (
 	LIScrClass* self,

@@ -26,7 +26,6 @@ typedef struct _LIExtBlock LIExtBlock;
 typedef struct _LIExtModule LIExtModule;
 
 #define LIEXT_SCRIPT_MATERIAL "Material"
-#define LIEXT_SCRIPT_TILE "Tile"
 #define LIEXT_SCRIPT_VOXEL "Voxel"
 
 struct _LIExtModule

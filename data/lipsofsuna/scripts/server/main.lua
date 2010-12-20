@@ -309,7 +309,7 @@ restart = function()
 	Network.closed = false
 end
 
-Voxel.fill = Tile:new{terrain = 1}
+Voxel.fill = 1
 restart()
 Network:host{port = 10101}
 
