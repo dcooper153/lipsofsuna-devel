@@ -154,9 +154,7 @@ end
 Chargen.execute = function(clss)
 	Gui:free()
 	Client.moving = false
-	Sound.music_fading = 5.0
-	Sound.music_volume = 0.2
-	Sound.music = "fairytale10"
+	Sound:switch_music_track("char")
 	clss.group.floating = true
 	clss.object.realized = true
 	clss.timer.enabled = true
@@ -295,8 +293,7 @@ Chargen:init()
 Protocol:add_handler{type = "CHARACTER_ACCEPT", func = function(event)
 	Chargen:free()
 	Gui:init()
-	Sound.music = "fairytale2"
-	Sound.music_volume = 0.1
+	Sound:switch_music_track("game")
 	Program:unload_world()
 end}
 Protocol:add_handler{type = "CHARACTER_CREATE", func = function(event)

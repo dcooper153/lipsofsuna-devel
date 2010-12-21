@@ -29,6 +29,7 @@
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
+	int music_looping;
 	float music_fading;
 	float music_volume;
 	LIMaiProgram* program;
@@ -69,6 +70,10 @@ int liext_sound_set_music (
 void liext_sound_set_music_fading (
 	LIExtModule* self,
 	float        value);
+
+void liext_sound_set_music_looping (
+	LIExtModule* self,
+	int          value);
 
 void liext_sound_set_music_volume (
 	LIExtModule* self,

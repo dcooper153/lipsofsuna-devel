@@ -50,6 +50,7 @@ LIExtModule* liext_sound_new (
 	if (self == NULL)
 		return NULL;
 	self->program = program;
+	self->music_looping = 0;
 	self->music_volume = 1.0f;
 	self->music_fading = 1.0f;
 	self->listener_rotation = limat_quaternion_identity ();
@@ -66,10 +67,7 @@ LIExtModule* liext_sound_new (
 	/* Initialize sound. */
 	self->system = lisnd_system_new ();
 	if (self->system != NULL)
-	{
 		self->sound = lisnd_manager_new (self->system);
-		self->music = lisnd_source_new (self->system);
-	}
 	else
 		printf ("WARNING: cannot initialize sound\n");
 
@@ -263,13 +261,14 @@ int liext_sound_set_music (
 	lisnd_source_queue_sample (music, sample);
 	lisnd_source_set_fading (music, 0.0f, 1.0f / self->music_fading);
 	lisnd_source_set_volume (music, self->music_volume);
-	lisnd_source_set_looping (music, 1);
+	lisnd_source_set_looping (music, self->music_looping);
 	lisnd_source_set_playing (music, 1);
 
 	/* Fade out the old music track. */
 	if (self->music_fade != NULL)
 		lisnd_source_free (self->music_fade);
-	lisnd_source_set_fading (self->music, 1.0f, -1.0f / self->music_fading);
+	if (self->music != NULL)
+		lisnd_source_set_fading (self->music, 1.0f, -1.0f / self->music_fading);
 	self->music_fade = self->music;
 	self->music = music;
 
@@ -281,6 +280,18 @@ void liext_sound_set_music_fading (
 	float        value)
 {
 	self->music_fading = value;
+}
+
+void liext_sound_set_music_looping (
+	LIExtModule* self,
+	int          value)
+{
+	if (self->music_looping != value)
+	{
+		self->music_looping = value;
+		if (self->music != NULL)
+			lisnd_source_set_looping (self->music, self->music_looping);
+	}
 }
 
 void liext_sound_set_music_volume (
@@ -351,12 +362,20 @@ static int private_tick (
 	{
 		if (!lisnd_source_update (self->music_fade, secs))
 		{
+			limai_program_event (self->program, "music-fade-ended", NULL);
 			lisnd_source_free (self->music_fade);
 			self->music_fade = NULL;
 		}
 	}
 	if (self->music != NULL)
-		lisnd_source_update (self->music, secs);
+	{
+		if (!lisnd_source_update (self->music, secs))
+		{
+			limai_program_event (self->program, "music-ended", NULL);
+			lisnd_source_free (self->music);
+			self->music = NULL;
+		}
+	}
 
 	/* Update sound effects. */
 	LIALG_U32DIC_FOREACH (iter, self->objects)

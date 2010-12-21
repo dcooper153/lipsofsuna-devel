@@ -3,6 +3,8 @@ Options.low_quality_models = false
 Options.animation_quality = 1.0
 Options.mouse_sensitivity = 1.0
 Options.transparency_quality = 0.3
+Options.sound_volume = 1.0
+Options.music_volume = 0.3
 
 Options.init = function(clss)
 	-- Model quality adjustment.
@@ -72,6 +74,22 @@ Options.init = function(clss)
 		self.value = v
 		clss.mouse_sensitivity = v
 	end
+	-- Sound settings.
+	local scroll_music = Widgets.Progress{min = 0, max = 1, value = clss.music_volume}
+	scroll_music:set_request{width = 100}
+	scroll_music.pressed = function(self)
+		local v = self:get_value_at(Client.cursor_pos)
+		self.value = v
+		clss.music_volume = v
+		Sound.music_volume = v
+	end
+	local scroll_sound = Widgets.Progress{min = 0, max = 1, value = clss.sound_volume}
+	scroll_sound:set_request{width = 100}
+	scroll_sound.pressed = function(self)
+		local v = self:get_value_at(Client.cursor_pos)
+		self.value = v
+		clss.sound_volume = v
+	end
 	-- Packing.
 	local quality_group = Widget{cols = 2}
 	quality_group:append_row(Widgets.Label{text = "Models"}, button_model_quality)
@@ -84,6 +102,9 @@ Options.init = function(clss)
 	bloom_group:append_row(Widgets.Label{text = "Influence"}, scroll_luminance)
 	local mouse_group = Widget{cols = 2}
 	mouse_group:append_row(Widgets.Label{text = "Sensitivity"}, scroll_mouse)
+	local sound_group = Widget{cols = 2}
+	sound_group:append_row(Widgets.Label{text = "Music"}, scroll_music)
+	sound_group:append_row(Widgets.Label{text = "Effects"}, scroll_sound)
 	clss.group = Widget{cols = 2}
 	clss.group:append_row(Widgets.Label{text = "Quality", font = "medium"})
 	clss.group:append_row(quality_group)
@@ -91,6 +112,8 @@ Options.init = function(clss)
 	clss.group:append_row(bloom_group)
 	clss.group:append_row(Widgets.Label{text = "Mouse", font = "medium"})
 	clss.group:append_row(mouse_group)
+	clss.group:append_row(Widgets.Label{text = "Volume", font = "medium"})
+	clss.group:append_row(sound_group)
 end
 
 Options.toggle = function(clss)
