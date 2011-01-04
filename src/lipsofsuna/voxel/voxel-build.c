@@ -472,7 +472,7 @@ static void private_merge_voxel (
 
 	/* Generate vertices. */
 	/* TODO: Smooth normals. */
-	scale = 1.0f - voxel->material->material.emission;
+	scale = voxel->material->texture_scale;
 	for (i = 0 ; i < count ; i += 3)
 	{
 		coord[0] = limat_vector_multiply (coords[i + 0], self->tile_width);

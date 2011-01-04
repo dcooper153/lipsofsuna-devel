@@ -37,6 +37,7 @@ struct _LIVoxMaterial
 	int flags;
 	char* name;
 	float friction;
+	float texture_scale;
 	LIMdlMaterial material;
 };
 

@@ -31,6 +31,9 @@
     <url>http://pfunked.deviantart.com/</url>
   </author-info>
   <author-info>
+    <name>Dim</name>
+  </author-info>
+  <author-info>
     <name>Georges Grondin</name>
   </author-info>
   <author-info>
@@ -51,6 +54,10 @@
   <author-info>
     <name>Michel Baradari</name>
     <url>http://apollo-music.de</url>
+  </author-info>
+  <author-info>
+    <name>Mysteryem</name>
+    <url>http://www.mysterymayhem.co.uk/</url>
   </author-info>
   <author-info>
     <name>Peragro Tempus Project</name>
@@ -115,6 +122,14 @@
     <tag>logo</tag>
     <tag>svg</tag>
     <type>logo</type>
+  </asset>
+
+  <asset>
+    <file>import/adamantium1.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>complete</status>
+    <type>texture</type>
   </asset>
 
   <asset>
@@ -206,6 +221,15 @@
   </asset>
 
   <asset>
+    <file>import/aquanite1.png</file>
+    <author>Mysteryem</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/29-grounds-and-walls-and-water-1024x1024</source>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
     <file>import/arrow-000.blend</file>
     <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>
@@ -240,6 +264,24 @@
     <license>CC0</license>
     <status>usable</status>
     <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/basalt1.png</file>
+    <author>Dim</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/dims-enviromental-and-architectural-textures</source>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/basalt1n.png</file>
+    <author>Dim</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/dims-enviromental-and-architectural-textures</source>
+    <status>complete</status>
+    <type>normalmap</type>
   </asset>
 
   <asset>
@@ -559,6 +601,24 @@
   </asset>
 
   <asset>
+    <file>import/crimson1.png</file>
+    <author>Mysteryem</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/29-grounds-and-walls-and-water-1024x1024</source>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/crimson1n.png</file>
+    <author>Mysteryem</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/29-grounds-and-walls-and-water-1024x1024</source>
+    <status>complete</status>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
     <file>import/crystal-000.blend</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>
@@ -750,6 +810,24 @@
   </asset>
 
   <asset>
+    <file>import/ferrostone1.png</file>
+    <author>Dim</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/dims-enviromental-and-architectural-textures</source>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/ferrostone1n.png</file>
+    <author>Dim</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/dims-enviromental-and-architectural-textures</source>
+    <status>complete</status>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
     <file>import/fireball1.blend</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>
@@ -781,6 +859,24 @@
     <author>tidbit (Joseph)</author>
     <license>Creative Commons BY 3.0</license>
     <status>ok</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/granite1.png</file>
+    <author>Mysteryem</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/29-grounds-and-walls-and-water-1024x1024</source>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/granite1n.png</file>
+    <author>Mysteryem</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/29-grounds-and-walls-and-water-1024x1024</source>
+    <status>complete</status>
     <type>texture</type>
   </asset>
 
@@ -883,6 +979,24 @@
     <status>usable</status>
     <tag>tile</tag>
     <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/ice1.png</file>
+    <author>Mysteryem</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/29-grounds-and-walls-and-water-1024x1024</source>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/ice1n.png</file>
+    <author>Mysteryem</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/29-grounds-and-walls-and-water-1024x1024</source>
+    <status>complete</status>
+    <type>texture</type>
   </asset>
 
   <asset>
@@ -1181,6 +1295,24 @@
   </asset>
 
   <asset>
+    <file>import/sand1.png</file>
+    <author>Mysteryem</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/29-grounds-and-walls-and-water-1024x1024</source>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/sand1n.png</file>
+    <author>Mysteryem</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/29-grounds-and-walls-and-water-1024x1024</source>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
     <file>import/saw1.blend</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>
@@ -1230,6 +1362,24 @@
     <status>incomplete</status>
     <tag>icon</tag>
     <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/soil1.png</file>
+    <author>Dim</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/dims-enviromental-and-architectural-textures</source>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/soil1n.png</file>
+    <author>Dim</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/dims-enviromental-and-architectural-textures</source>
+    <status>complete</status>
+    <type>normalmap</type>
   </asset>
 
   <asset>

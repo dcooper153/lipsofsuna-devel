@@ -38,6 +38,7 @@ LIVoxMaterial* livox_material_new ()
 	self = lisys_calloc (1, sizeof (LIVoxMaterial));
 	if (self == NULL)
 		return NULL;
+	self->texture_scale = 1.0f;
 
 	/* Allocate name. */
 	self->name = listr_dup ("");
@@ -55,9 +56,6 @@ LIVoxMaterial* livox_material_new ()
 		livox_material_free (self);
 		return NULL;
 	}
-
-	/* FIXME: Abusing for texture scaling... */
-	self->material.emission = 0.9f;
 
 	return self;
 }
@@ -81,6 +79,7 @@ LIVoxMaterial* livox_material_new_copy (
 	self->id = src->id;
 	self->flags = src->flags;
 	self->friction = src->friction;
+	self->texture_scale = src->texture_scale;
 
 	/* Copy name. */
 	self->name = listr_dup (src->name);

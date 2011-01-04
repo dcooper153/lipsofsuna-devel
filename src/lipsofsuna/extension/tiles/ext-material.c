@@ -75,8 +75,8 @@ static void Material_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Top surface diffuse color.
- * -- @name Material.diffuse0
+ * --- Diffuse color.
+ * -- @name Material.diffuse
  * -- @class table
  */
 static void Material_getter_diffuse (LIScrArgs* args)
@@ -169,8 +169,8 @@ static void Material_setter_name (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Top surface shader.
- * -- @name Material.shader0
+ * --- Surface shader.
+ * -- @name Material.shader
  * -- @class table
  */
 static void Material_getter_shader (LIScrArgs* args)
@@ -189,8 +189,8 @@ static void Material_setter_shader (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Top surface shininess.
- * -- @name Material.shininess0
+ * --- Shininess.
+ * -- @name Material.shininess
  * -- @class table
  */
 static void Material_getter_shininess (LIScrArgs* args)
@@ -209,8 +209,8 @@ static void Material_setter_shininess (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Top surface specular color.
- * -- @name Material.specular0
+ * --- Specular color.
+ * -- @name Material.specular
  * -- @class table
  */
 static void Material_getter_specular (LIScrArgs* args)
@@ -234,8 +234,8 @@ static void Material_setter_specular (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Top surface textures.
- * -- @name Material.texture0
+ * --- Texture list.
+ * -- @name Material.texture
  * -- @class table
  */
 static void Material_getter_texture (LIScrArgs* args)
@@ -264,6 +264,26 @@ static void Material_setter_texture (LIScrArgs* args)
 	}
 }
 
+/* @luadoc
+ * --- Texture scale factor.
+ * -- @name Material.texture_scale
+ * -- @class table
+ */
+static void Material_getter_texture_scale (LIScrArgs* args)
+{
+	LIVoxMaterial* self = args->self;
+
+	liscr_args_seti_float (args, self->texture_scale);
+}
+static void Material_setter_texture_scale (LIScrArgs* args)
+{
+	float value;
+	LIVoxMaterial* self = args->self;
+
+	if (liscr_args_geti_float (args, 0, &value))
+		self->texture_scale = value;
+}
+
 /*****************************************************************************/
 
 void liext_script_material (
@@ -282,6 +302,7 @@ void liext_script_material (
 	liscr_class_insert_mvar (self, "shininess", Material_getter_shininess, Material_setter_shininess);
 	liscr_class_insert_mvar (self, "specular", Material_getter_specular, Material_setter_specular);
 	liscr_class_insert_mvar (self, "texture", Material_getter_texture, Material_setter_texture);
+	liscr_class_insert_mvar (self, "texture_scale", Material_getter_texture_scale, Material_setter_texture_scale);
 }
 
 /** @} */
