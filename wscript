@@ -38,24 +38,31 @@ def configure(ctx):
 		optimize = '-O0'
 
 	# Flags
+	ctx.check_tool('compiler_cc')
+	ctx.check_tool('compiler_cxx')
 	ctx.env.INCLUDES_CORE = ['.', 'src']
 	ctx.env.INCLUDES_EXTENSION = ['.', 'src']
 	ctx.env.INCLUDES_TEST = []
-	ctx.env.CFLAGS_CORE = ['-g', '-Wall', optimize, '-DHAVE_CONFIG_H']
-	ctx.env.CFLAGS_EXTENSION = ['-g', '-Wall', optimize, '-DHAVE_CONFIG_H']
-	ctx.env.CXXFLAGS_CORE = ['-g', '-Wall', optimize, '-DHAVE_CONFIG_H']
-	ctx.env.CXXFLAGS_EXTENSION = ['-g', '-Wall', optimize, '-DHAVE_CONFIG_H', '-DDLL_EXPORT']
+	cflags = ctx.env.CFLAGS
+	cflags.extend(['-g', '-Wall', optimize, '-DHAVE_CONFIG_H'])
+	ldflags = ctx.env.LINKFLAGS
+	ldflags.extend(['-g'])
+	ctx.env.CFLAGS_CORE = cflags
+	ctx.env.CFLAGS_EXTENSION = cflags
+	ctx.env.CFLAGS_TEST = cflags
+	ctx.env.CXXFLAGS_CORE = cflags
+	ctx.env.CXXFLAGS_EXTENSION = cflags
+	ctx.env.CXXFLAGS_TEST = cflags
 	ctx.env.LIBPATH_CORE = []
 	ctx.env.LIBPATH_EXTENSION = []
 	ctx.env.LIBPATH_TEST = []
-	ctx.env.LINKFLAGS_CORE = ['-g']
-	ctx.env.LINKFLAGS_EXTENSION = ['-g']
+	ctx.env.LINKFLAGS_CORE = ldflags
+	ctx.env.LINKFLAGS_EXTENSION = ldflags
+	ctx.env.LINKFLAGS_TEST = ldflags
 
 	# Base dependencies
-	ctx.check_tool('compiler_cc')
-	ctx.check_tool('compiler_cxx')
-	ctx.check(header_name='dlfcn.h', define_name='HAVE_DLFCN_H')
-	ctx.check(header_name='fcntl.h', define_name='HAVE_FCNTL_H')
+	ctx.check(header_name='dlfcn.h', define_name='HAVE_DLFCN_H', mandatory=False)
+	ctx.check(header_name='fcntl.h', define_name='HAVE_FCNTL_H', mandatory=False)
 	ctx.check(header_name='inotifytools/inotify.h', define_name='HAVE_INOTIFYTOOLS_INOTIFY_H', mandatory=False)
 	ctx.check(header_name='inttypes.h', define_name='HAVE_INTTYPES_H', mandatory=False)
 	ctx.check(header_name='poll.h', define_name='HAVE_POLL_H', mandatory=False)
@@ -86,16 +93,15 @@ def configure(ctx):
 
 	# Bullet
 	if not ctx.check_cfg(package='bullet', atleast_version='2.74', args='--cflags --libs', mandatory=False):
-		ctx.check_cxx(header_name='btBulletCollisionCommon.h', mandatory=True, uselib='CORE TEST', uselib_store='BULLET')
-		if not ctx.check_cxx(lib='linearmath', uselib='CORE TEST', uselib_store='BULLET', mandatory=False):
-			ctx.check_cxx(lib='LinearMath', mandatory=True, uselib='CORE TEST', uselib_store='BULLET')
-		if not ctx.check_cxx(lib='bulletcollision', uselib='CORE TEST', uselib_store='BULLET', mandatory=False):
-			ctx.check_cxx(lib='BulletCollision', mandatory=True, uselib='CORE TEST', uselib_store='BULLET')
-		if not ctx.check_cxx(lib='bulletdynamics', uselib='CORE TEST', uselib_store='BULLET', mandatory=False):
-			ctx.check_cxx(lib='BulletDynamics', mandatory=True, uselib='CORE TEST', uselib_store='BULLET')
+		if ctx.check_cxx(lib='linearmath', uselib='CORE TEST', mandatory=False):
+			ctx.env.LINKFLAGS_BULLET = ['-llinearmath', '-lbulletcollision', '-lbulletdynamics']
+		elif ctx.check_cxx(lib='LinearMath', uselib='CORE TEST', mandatory=True):
+			ctx.env.LINKFLAGS_BULLET = ['-lLinearMath', '-lBulletCollision', '-lBulletDynamics']
+		ctx.check_cxx(header_name='btBulletCollisionCommon.h', mandatory=True, uselib='CORE TEST BULLET', uselib_store='BULLET')
 
 	# ENet
-	if not ctx.check_cfg(package='enet', atleast_version='1.2.0', args='--cflags --libs', mandatory=False):
+	if not ctx.check_cfg(package='enet', atleast_version='1.2.0', args='--cflags --libs', mandatory=False) and \
+	   not ctx.check_cfg(package='libenet', atleast_version='1.2.0', args='--cflags --libs', uselib_store='ENET', mandatory=False):
 		ctx.check_cc(header_name='enet/enet.h', mandatory=True, uselib='CORE TEST', uselib_store='ENET')
 		ctx.check_cc(lib='enet', mandatory=True, uselib='CORE TEST', uselib_store='ENET')
 
@@ -119,13 +125,19 @@ def configure(ctx):
 	# GLEW
 	if not ctx.check_cfg(package='glew', atleast_version='1.5.5', args='--cflags --libs', mandatory=False):
 		ctx.check_cc(header_name='GL/glew.h', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
-		ctx.check_cc(lib='GLEW', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
+		if not ctx.check_cc(lib='GLEW', mandatory=False, uselib='CORE TEST', uselib_store='GLEW'):
+			ctx.check_cc(lib='GLEW32', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
 
 	if ctx.env.SOUND:
 		# AL
 		if not ctx.check_cfg(package='openal', atleast_version='0.0.8', args='--cflags --libs', uselib_store="AL", mandatory=False):
 			ctx.check_cc(header_name='AL/al.h', mandatory=True, uselib='CORE TEST', uselib_store='AL')
-			ctx.check_cc(lib='openal', mandatory=True, uselib='CORE TEST', uselib_store='AL')
+			if not ctx.check_cc(lib='openal', mandatory=False, uselib='CORE TEST', uselib_store='AL'):
+				ctx.check_cc(lib='OpenAL32', mandatory=True, uselib='CORE TEST', uselib_store='AL')
+		# OGG
+		if not ctx.check_cfg(package='ogg', atleast_version='1.1.0', args='--cflags --libs', mandatory=False):
+			ctx.check_cc(header_name='ogg.h', mandatory=True, uselib='CORE TEST', uselib_store='OGG')
+			ctx.check_cc(lib='ogg', mandatory=True, uselib='CORE TEST', uselib_store='OGG')
 		# VORBIS
 		if not ctx.check_cfg(package='vorbisfile', atleast_version='1.2.0', args='--cflags --libs', uselib_store='VORBIS', mandatory=False):
 			ctx.check_cc(header_name='vorbisfile.h', mandatory=True, uselib='CORE TEST', uselib_store='VORBIS')
