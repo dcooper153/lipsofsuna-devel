@@ -39,6 +39,12 @@ Sectors.erase_world = function(self, erase)
 	self.database:query("END TRANSACTION;")
 end
 
+--- Called when an empty sector is created.
+-- @param self Sectors.
+-- @param sector Sector index.
+Sectors.format_sector = function(self, sector)
+end
+
 --- Reads a sector from the database.
 -- @param self Sectors.
 -- @param sector Sector index.
@@ -49,9 +55,15 @@ Sectors.load_sector = function(self, sector)
 	-- Load terrain.
 	if self.save_terrain then
 		local rows = self.database:query("SELECT * FROM terrain WHERE sector=?;", {sector})
-		for k,v in ipairs(rows) do
-			Voxel:paste_region{sector = sector, packet = v[2]}
+		if #rows == 0 then
+			self:format_sector(sector)
+		else
+			for k,v in ipairs(rows) do
+				Voxel:paste_region{sector = sector, packet = v[2]}
+			end
 		end
+	else
+		self:format_sector(sector)
 	end
 	-- Load objects. Since tiles are loaded in background, we need to wait for them to be
 	-- loaded before creation the object or else the object will fall inside the ground.

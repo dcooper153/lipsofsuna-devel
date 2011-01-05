@@ -1,4 +1,63 @@
 
+--- Called when an empty sector is created.
+-- @param self Sectors.
+-- @param sector Sector index.
+Sectors.format_generated_sector = function(self, sector)
+	local w = 128
+	local sx = sector % w
+	local sy = math.floor(sector / w) % w
+	local sz = math.floor(sector / w / w) % w
+	local org = Vector(sx, sy, sz) * Voxel.tiles_per_line
+	local mats = {
+		Material:find{name = "adamantium1"},
+		Material:find{name = "aquanite1"},
+		Material:find{name = "basalt1"},
+		Material:find{name = "brittlerock1"},
+		Material:find{name = "crimson1"},
+		Material:find{name = "ferrostone1"},
+		Material:find{name = "sand1"},
+		Material:find{name = "soil1"}}
+	--[[Material:find{name = "grass1"},
+		Material:find{name = "ice1"},
+		Material:find{name = "iron1"},
+		Material:find{name = "magma1"},
+		Material:find{name = "pipe1"},
+		Material:find{name = "water1"},
+		Material:find{name = "wood1"}]]
+	local growdirs = {
+		Vector(-1, 0, 0),
+		Vector(1, 0, 0),
+		Vector(0, -1, 0),
+		Vector(0, 1, 0),
+		Vector(0, 0, -1),
+		Vector(0, 0, 1)}
+	local growrand
+	growrand = function(ctr, mat, dep)
+		local p = org + ctr
+		local t = Voxel:get_tile{point = p}
+		if t == 0 then return end
+		Voxel:set_tile{point = p, tile = mat}
+		if dep > 4 then return end
+		for k,v in pairs(growdirs) do
+			if math.random() < (4 - dep) * 0.15 then
+				local p = ctr + v
+				p.x = math.max(math.min(p.x, Voxel.tiles_per_line - 1), 1)
+				p.y = math.max(math.min(p.y, Voxel.tiles_per_line - 1), 1)
+				p.z = math.max(math.min(p.z, Voxel.tiles_per_line - 1), 1)
+				growrand(p, mat, dep + 1)
+			end
+		end
+	end
+	local p = Vector()
+	for i=1,100 do
+		p.x = math.random(1, Voxel.tiles_per_line - 1)
+		p.y = math.random(1, Voxel.tiles_per_line - 1)
+		p.z = math.random(1, Voxel.tiles_per_line - 1)
+		local m = mats[math.random(1,#mats)]
+		if m then growrand(p, m.id, 1) end
+	end
+end
+
 --- Places a random heightmap to the map.
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
@@ -188,14 +247,6 @@ Generator.enable_regions = function(clss, args)
 end
 
 Generator.generate = function(clss, args)
-	-- Override the sector loading function.
-	-- Instead of loading terrain and objects from the database, we want to
-	-- generate our own random terrain tiles.
---[[	local orig_load_sector = Sectors.instance.load_sector
-	Sectors.instance.load_sector = function(sectors, sector)
-		
-	end--]]
-
 	-- Generate the town and its surroundings.
 	Generator:format{center = Config.center * Config.tilescale}
 	Generator:disable_brush{name = "rootsofworld-grove"}
@@ -266,6 +317,15 @@ Generator.generate = function(clss, args)
 				Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "rootsofworld"}
 				Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "mourningadventurer_lost"}
 			end
+		end
+	end
+	-- Randomize tiles.
+	Program:update()
+	while true do
+		local e = Program:pop_event()
+		if not e then break end
+		if e.type == "sector-load" then
+			Sectors:format_generated_sector(e.sector)
 		end
 	end
 end
