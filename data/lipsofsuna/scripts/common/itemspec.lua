@@ -9,10 +9,14 @@ Itemspec.dict_name = {}
 --- Creates a new item specification.
 -- @param clss Itemspec class.
 -- @param args Arguments.<ul>
+--   <li>ammo_type: Name of the ammunition item type.</li>
 --   <li>categories: List of categories to which the item belongs.</li>
+--   <li>construct_tile: Tile type to construct when used.</li>
+--   <li>construct_tile_count: Material count required by tile construction.</li>
 --   <li>crafting_count: Number of items crafted per use.</li>
 --   <li>crafting_materials: Dictionary of crafting materials.</li>
 --   <li>crafting_skills: Dictionary of required crafting skills.</li>
+--   <li>crafting_tools: Dictionary of required crafting tools.</li>
 --   <li>damage: Base damage.</li>
 --   <li>damage_bonus_dexterity: How much one point of dexterity adds to damage.</li>
 --   <li>damage_bonus_health: How much one point of health adds to damage.</li>
@@ -37,6 +41,7 @@ Itemspec.new = function(clss, args)
 	self.crafting_count = self.crafting_count or 1
 	self.crafting_materials = self.crafting_materials or {}
 	self.crafting_skills = self.crafting_skills or {}
+	self.crafting_tools = self.crafting_tools or {}
 	self.destroy_actions = self.destroy_actions or {}
 	self.mass = self.mass or 10
 	-- Models.

@@ -45,6 +45,21 @@ Attack.ranged = function(clss, args)
 	end)
 end
 
+--- Performs a ray cast.
+-- @param clss Attack class.
+-- @param args Arguments.<ul>
+--   <li>func: Callback function called when hit something. (required)</li>
+--   <li>length: Length of the cast lay.</li>
+--   <li>radius: Radius of the collision test sphere.</li>
+--   <li>start: Start position relative to the user.</li>
+--   <li>user: Attacking object. (required)</li>
+-- @return Sweep result or nil.
+Attack.ray = function(clss, args)
+	local src = args.start or Vector()
+	local dst = src - Vector(0, 0, args.length or 1)
+	return args.user:sweep_sphere{src = src, dst = dst, radius = args.radius or 0.3}
+end
+
 --- Performs an attack sweep.
 -- @param clss Attack class.
 -- @param args Arguments.<ul>

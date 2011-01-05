@@ -22,18 +22,40 @@ Feat.apply = function(self, args)
 	for effect in pairs(effects) do
 		Effect:play{effect = effect, point = args.point}
 	end
-	-- Impulse.
-	if args.target and args.attacker then
-		args.target:impulse{impulse = args.attacker.rotation * Vector(0, 0, -100)}
+	-- Damage and impulse.
+	if anim.categories["melee"] or anim.categories["ranged"] then
+		if args.target and args.attacker then
+			args.target:impulse{impulse = args.attacker.rotation * Vector(0, 0, -100)}
+		end
+		if args.target then
+			local damage = self:calculate_damage(args)
+			args.target:damaged(damage)
+		end
 	end
-	-- Damage target.
-	if args.target then
-		local damage = self:calculate_damage(args)
-		args.target:damaged(damage)
-	end
-	if args.tile then
-		if args.weapon and args.weapon.itemspec.name == "mattock" then
+	-- Digging.
+	if anim.categories["melee"] and args.tile and args.weapon then
+		if args.weapon.itemspec.categories["mattock"] then
 			Voxel:damage(args.tile, args.damage, "mattock")
+		end
+	end
+	-- Building.
+	if anim.categories["build"] and args.tile and args.weapon then
+		if args.weapon.itemspec.construct_tile then
+			local m = Material:find{name = args.weapon.itemspec.construct_tile}
+			local need = args.weapon.itemspec.construct_tile_count or 1
+			local have = args.weapon:get_count()
+			if m and need <= have then
+				local t,p = Voxel:find_tile{match = "empty", point = args.point}
+				if t then
+					local tile = Aabb{point = p * Config.tilewidth, size = Vector(1, 1, 1) * Config.tilewidth}
+					local char = Aabb{point = args.attacker.position - Vector(0.5, 0, 0.5), size = Vector(1.5, 2, 1.5)}
+					if not tile:intersects(char) then
+						local o = args.weapon:split{count = need}
+						o:detach()
+						Voxel:set_tile{point = p, tile = m.id}
+					end
+				end
+			end
 		end
 	end
 end
@@ -124,6 +146,23 @@ Feat.perform = function(self, args)
 		if anim then
 			local slot = anim.slot
 			local weapon = args.user:get_item{slot = slot}
+			if anim.categories["build"] then
+				-- Build terrain or machines.
+				-- While the attack animation is played, a sphere is swept along
+				-- the path of the attack point. If a tile collides with the
+				-- sphere, a new tile attached to it.
+				local off = Vector(0, 1, -0.1)
+				local dst = args.user.position + args.user.rotation * off
+				local r = Attack:ray{user = args.user, length = 5, start = off}
+				if r and r.tile then
+					feat:apply{
+						attacker = args.user,
+						point = r.point,
+						target = r.object,
+						tile = r.tile,
+						weapon = weapon}
+				end
+			end
 			if anim.categories["melee"] then
 				-- Melee attack.
 				-- While the attack animation is played, a sphere is swept along

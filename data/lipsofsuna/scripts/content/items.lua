@@ -1,3 +1,567 @@
+------------------------------------------------------------------------------
+-- Materials.
+
+Itemspec{
+	name = "adamantium",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"material"},
+	stacking = true}
+
+Itemspec{
+	name = "aquanite stone",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"material"},
+	stacking = true}
+
+Itemspec{
+	name = "basalt stone",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"build", "material"},
+	construct_tile = "basalt1",
+	construct_tile_count = 3,
+	equipment_slot = "hand.R",
+	stacking = true}
+
+Itemspec{
+	name = "berry",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"material"},
+	stacking = true}
+
+Itemspec{
+	name = "crimson stone",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"material"},
+	stacking = true}
+
+Itemspec{
+	name = "dragon scale",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"material"},
+	stacking = true}
+
+Itemspec{
+	name = "glass ingot",
+	model = "book-000", -- FIXME
+	mass = 3,
+	categories = {"material"},
+	crafting_materials = {["sand chunk"] = 3},
+	stacking = true}
+
+Itemspec{
+	name = "ferrostone",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"build", "material"},
+	construct_tile = "ferrostone1",
+	construct_tile_count = 3,
+	crafting_materials = {["granite stone"] = 3},
+	equipment_slot = "hand.R",
+	stacking = true}
+
+Itemspec{
+	name = "flax",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"material"},
+	stacking = true}
+
+Itemspec{
+	name = "fruit",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"material"},
+	stacking = true}
+
+Itemspec{
+	name = "granite stone",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"build", "material"},
+	construct_tile = "granite1",
+	construct_tile_count = 3,
+	equipment_slot = "hand.R",
+	stacking = true}
+
+Itemspec{
+	name = "iron ingot",
+	model = "book-000", -- FIXME
+	mass = 3,
+	categories = {"build", "material"},
+	construct_tile = "iron1",
+	construct_tile_count = 4,
+	crafting_materials = {["ferrostone"] = 3},
+	equipment_slot = "hand.R",
+	stacking = true}
+
+Itemspec{
+	name = "hide",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"material"},
+	stacking = true}
+
+Itemspec{
+	name = "log",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"build", "material"},
+	construct_tile = "wood1",
+	construct_tile_count = 4,
+	equipment_slot = "hand.R",
+	stacking = true}
+
+Itemspec{
+	name = "mushroom",
+	model = "mushroom-000",--"mushroom-001"..."mushroom-008"
+	mass = 1,
+	categories = {"material"},
+	stacking = true,
+	icon = "mushroom1"}
+
+Itemspec{
+	name = "sand chunk",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"build", "material"},
+	construct_tile = "sand1",
+	construct_tile_count = 3,
+	equipment_slot = "hand.R",
+	stacking = true}
+
+Itemspec{
+	name = "soil chunk",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"build", "material"},
+	construct_tile = "soil1",
+	construct_tile_count = 3,
+	equipment_slot = "hand.R",
+	stacking = true}
+
+Itemspec{
+	name = "wheat",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"material"},
+	stacking = true}
+
+------------------------------------------------------------------------------
+-- Weapons.
+
+Itemspec{
+	name = "adamantium crossbow",
+	model = "bow1", -- FIXME
+	ammo_type = "arrow",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["adamantium"] = 9},
+	damage = 30,
+	damage_bonus_dexterity = 0.2,
+	equipment_slot = "hand.R",
+	icon = "bow1"}
+
+Itemspec{
+	name = "adamantium dagger",
+	model = "katana-000", -- FIXME
+	categories = {"melee", "weapon"},
+	crafting_materials = {["adamantium"] = 3},
+	damage = 20,
+	damage_bonus_dexterity = 0.4,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "adamantium hatchet",
+	model = "axe-000",
+	categories = {"hatchet", "melee", "weapon"},
+	crafting_materials = {["adamantium"] = 3},
+	damage = 20,
+	damage_bonus_strength = 0.2,
+	equipment_slot = "hand.R",
+	icon = "axe1"}
+
+Itemspec{
+	name = "adamantium mattock",
+	model = "mattock-000",
+	categories = {"mattock", "melee", "weapon"},
+	crafting_materials = {["adamantium"] = 9},
+	damage = 20,
+	damage_bonus_strength = 0.1,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "adamantium musket",
+	model = "bow1", -- FIXME
+	ammo_type = "bullet",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["adamantium"] = 15, ["log"] = 2},
+	damage = 50,
+	damage_bonus_intelligence = 0.2,
+	damage_bonus_perception = 0.2,
+	equipment_slot = "hand.R",
+	icon = "bow1"}
+
+Itemspec{
+	name = "adamantium sword",
+	model = "katana-000",
+	categories = {"melee", "weapon"},
+	crafting_materials = {["adamantium"] = 3},
+	damage = 40,
+	damage_bonus_dexterity = 0.2,
+	damage_bonus_strength = 0.2,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "aquanite crossbow",
+	model = "bow1", -- FIXME
+	ammo_type = "arrow",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["aquanite stone"] = 9},
+	damage = 22,
+	damage_bonus_dexterity = 0.2,
+	equipment_slot = "hand.R",
+	icon = "bow1"}
+
+Itemspec{
+	name = "aquanite dagger",
+	model = "katana-000", -- FIXME
+	categories = {"melee", "weapon"},
+	crafting_materials = {["aquanite stone"] = 3},
+	damage = 15,
+	damage_bonus_dexterity = 0.4,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "aquanite grenade",
+	model = "grenade1",
+	mass = 3,
+	categories = {"explosive", "throwable", "weapon"},
+	crafting_materials = {["aquanite stone"] = 1, ["iron ingot"] = 1},
+	damage = 40,
+	damage_bonus_intelligence = 0.2,
+	destroy_actions = {"explode"},
+	destroy_timer = 3,
+	equipment_slot = "hand.R",
+	health = 1,
+	stacking = true}
+
+Itemspec{
+	name = "aquanite hatchet",
+	model = "axe-000",
+	categories = {"hatchet", "melee", "weapon"},
+	crafting_materials = {["aquanite stone"] = 3},
+	damage = 15,
+	damage_bonus_strength = 0.2,
+	equipment_slot = "hand.R",
+	icon = "axe1"}
+
+Itemspec{
+	name = "aquanite mattock",
+	model = "mattock-000",
+	categories = {"mattock", "melee", "weapon"},
+	crafting_materials = {["aquanite stone"] = 9},
+	damage = 15,
+	damage_bonus_strength = 0.1,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "aquanite musket",
+	model = "bow1", -- FIXME
+	ammo_type = "bullet",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["aquanite stone"] = 15, ["log"] = 2},
+	damage = 37,
+	damage_bonus_intelligence = 0.2,
+	damage_bonus_perception = 0.2,
+	equipment_slot = "hand.R",
+	icon = "bow1"}
+
+Itemspec{
+	name = "aquanite sword",
+	model = "katana-000",
+	categories = {"melee", "weapon"},
+	crafting_materials = {["aquanite stone"] = 3},
+	damage = 30,
+	damage_bonus_dexterity = 0.2,
+	damage_bonus_strength = 0.2,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "crimson crossbow",
+	model = "bow1", -- FIXME
+	ammo_type = "arrow",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["crimson stone"] = 9},
+	damage = 22,
+	damage_bonus_dexterity = 0.2,
+	equipment_slot = "hand.R",
+	icon = "bow1"}
+
+Itemspec{
+	name = "crimson dagger",
+	model = "katana-000", -- FIXME
+	categories = {"melee", "weapon"},
+	crafting_materials = {["crimson stone"] = 3},
+	damage = 15,
+	damage_bonus_dexterity = 0.4,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "crimson grenade",
+	model = "grenade1",
+	mass = 3,
+	categories = {"explosive", "throwable", "weapon"},
+	crafting_materials = {["crimson stone"] = 1, ["iron ingot"] = 1},
+	damage = 40,
+	damage_bonus_intelligence = 0.2,
+	destroy_actions = {"explode"},
+	destroy_timer = 3,
+	equipment_slot = "hand.R",
+	health = 1,
+	stacking = true}
+
+Itemspec{
+	name = "crimson hatchet",
+	model = "axe-000",
+	categories = {"hatchet", "melee", "weapon"},
+	crafting_materials = {["crimson stone"] = 3},
+	damage = 15,
+	damage_bonus_strength = 0.2,
+	equipment_slot = "hand.R",
+	icon = "axe1"}
+
+Itemspec{
+	name = "crimson mattock",
+	model = "mattock-000",
+	categories = {"mattock", "melee", "weapon"},
+	crafting_materials = {["crimson stone"] = 9},
+	damage = 15,
+	damage_bonus_strength = 0.1,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "crimson musket",
+	model = "bow1", -- FIXME
+	ammo_type = "bullet",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["crimson stone"] = 15, ["log"] = 2},
+	damage = 37,
+	damage_bonus_intelligence = 0.2,
+	damage_bonus_perception = 0.2,
+	equipment_slot = "hand.R",
+	icon = "bow1"}
+
+Itemspec{
+	name = "crimson sword",
+	model = "katana-000",
+	categories = {"melee", "weapon"},
+	crafting_materials = {["crimson stone"] = 3},
+	damage = 30,
+	damage_bonus_dexterity = 0.2,
+	damage_bonus_strength = 0.2,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "iron crossbow",
+	model = "bow1", -- FIXME
+	ammo_type = "arrow",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["iron ingot"] = 3},
+	damage = 15,
+	damage_bonus_dexterity = 0.2,
+	equipment_slot = "hand.R",
+	icon = "bow1"}
+
+Itemspec{
+	name = "iron dagger",
+	model = "katana-000", -- FIXME
+	categories = {"melee", "weapon"},
+	crafting_materials = {["iron ingot"] = 1},
+	damage = 10,
+	damage_bonus_dexterity = 0.4,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "iron hatchet",
+	model = "axe-000",
+	categories = {"hatchet", "melee", "weapon"},
+	crafting_materials = {["iron ingot"] = 1},
+	damage = 10,
+	damage_bonus_strength = 0.2,
+	equipment_slot = "hand.R",
+	icon = "axe1"}
+
+Itemspec{
+	name = "iron mattock",
+	model = "mattock-000",
+	categories = {"mattock", "melee", "weapon"},
+	crafting_materials = {["iron ingot"] = 3},
+	damage = 10,
+	damage_bonus_strength = 0.1,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "iron musket",
+	model = "bow1", -- FIXME
+	ammo_type = "bullet",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["iron ingot"] = 5, ["log"] = 2},
+	damage = 25,
+	damage_bonus_intelligence = 0.2,
+	damage_bonus_perception = 0.2,
+	equipment_slot = "hand.R",
+	icon = "bow1"}
+
+Itemspec{
+	name = "iron sword",
+	model = "katana-000",
+	categories = {"melee", "weapon"},
+	crafting_materials = {["iron ingot"] = 1},
+	damage = 10,
+	damage_bonus_dexterity = 0.2,
+	damage_bonus_strength = 0.2,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "wooden crossbow",
+	model = "bow1", -- FIXME
+	ammo_type = "arrow",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["log"] = 3},
+	damage = 7,
+	damage_bonus_dexterity = 0.2,
+	equipment_slot = "hand.R",
+	icon = "bow1"}
+
+Itemspec{
+	name = "wooden dagger",
+	model = "katana-000", -- FIXME
+	categories = {"melee", "weapon"},
+	crafting_materials = {["log"] = 1},
+	damage = 5,
+	damage_bonus_dexterity = 0.4,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "wooden hatchet",
+	model = "axe-000",
+	categories = {"hatchet", "melee", "weapon"},
+	crafting_materials = {["log"] = 1},
+	damage = 5,
+	damage_bonus_strength = 0.2,
+	equipment_slot = "hand.R",
+	icon = "axe1"}
+
+Itemspec{
+	name = "wooden mattock",
+	model = "mattock-000",
+	categories = {"mattock", "melee", "weapon"},
+	crafting_materials = {["log"] = 3},
+	damage = 5,
+	damage_bonus_strength = 0.1,
+	equipment_slot = "hand.R"}
+
+Itemspec{
+	name = "wooden sword",
+	model = "katana-000",
+	categories = {"melee", "weapon"},
+	crafting_materials = {["log"] = 1},
+	damage = 10,
+	damage_bonus_dexterity = 0.2,
+	damage_bonus_strength = 0.2,
+	equipment_slot = "hand.R"}
+
+------------------------------------------------------------------------------
+-- Armor.
+
+-- TODO
+
+Itemspec{
+	name = "dress",
+	model = "book-000",
+	categories = {"armor"},
+	crafting_tools = {saw = 1},
+	crafting_materials = {log = 1},
+	equipment_models = {upper1 = "chinadress1", panties = "panties2"},
+	equipment_slot = "upperbody",
+	icon = "cloth1"}
+
+Itemspec{
+	name = "leather leggings",
+	model = "book-000",
+	categories = {"armor"},
+	crafting_tools = {saw = 1},
+	crafting_materials = {log = 1},
+	equipment_models = {legs = "aerlegarmor1"},
+	equipment_slot = "feet"}
+
+Itemspec{
+	name = "leather pants",
+	model = "book-000",
+	categories = {"armor"},
+	crafting_tools = {saw = 1},
+	crafting_materials = {log = 1},
+	equipment_models = {skirt = "aerlowerarmor1", panties = "panties2"},
+	equipment_slot = "lowerbody"}
+
+Itemspec{
+	name = "leather top",
+	model = "book-000",
+	categories = {"armor"},
+	crafting_tools = {saw = 1},
+	crafting_materials = {log = 1},
+	equipment_models = {upper1 = "bra1"},
+	equipment_slot = "upperbody",
+	icon = "cloth1"}
+
+Itemspec{
+	name = "wooden shield",
+	model = "shield-000",
+	categories = {"shield"},
+	crafting_materials = {["log"] = 1},
+	equipment_slot = "hand.L"}
+
+------------------------------------------------------------------------------
+-- Miscellaneous.
+
+Itemspec{
+	name = "arrow",
+	model = "arrow-000",
+	mass = 1,
+	categories = {"arrow"},
+	damage = 5,
+	crafting_count = 10,
+	crafting_materials = {["log"] = 1},
+	icon = "arrow1",
+	stacking = true}
+
+Itemspec{
+	name = "bullet",
+	model = "arrow-000", -- FIXME
+	mass = 1,
+	categories = {"bullet"},
+	damage = 5,
+	crafting_count = 10,
+	crafting_materials = {["iron ingot"] = 1, ["crimson stone"] = 3},
+	icon = "arrow1",
+	stacking = true}
+
+Itemspec{
+	name = "torch",
+	model = "torch1",
+	categories = {"misc"},
+	crafting_materials = {["log"] = 1},
+	equipment_slot = "hand.L",
+	icon = "torch1"}
+
+------------------------------------------------------------------------------
+-- FIXME
+
 Itemspec{
 	name = "air tank",
 	model = "airtank1",
@@ -10,27 +574,6 @@ Itemspec{
 	stacking = false}
 
 Itemspec{
-	name = "arrow",
-	model = "arrow-000",
-	mass = 2,
-	categories = {"arrow"},
-	damage = 5,
-	crafting_count = 10,
-	crafting_materials = {log = 1},
-	crafting_tools = {saw = 1},
-	icon = "arrow1",
-	stacking = true}
-
-Itemspec{
-	name = "axe",
-	model = "axe-000",
-	categories = {"melee", "weapon"},
-	damage = 10,
-	damage_bonus_strength = 0.2,
-	equipment_slot = "hand.R",
-	icon = "axe1"}
-
-Itemspec{
 	name = "boomerang",
 	model = "boomerang1",
 	mass = 3,
@@ -41,55 +584,6 @@ Itemspec{
 	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R",
 	stacking = true}
-
-Itemspec{
-	name = "bow",
-	model = "bow1",
-	categories = {"ranged", "weapon"},
-	crafting_tools = {saw = 1},
-	crafting_materials = {log = 1},
-	damage = 10,
-	damage_bonus_dexterity = 0.2,
-	equipment_slot = "hand.R",
-	icon = "bow1"}
-
-Itemspec{
-	name = "chainmail leggings",
-	model = "book-000",
-	categories = {"armor"},
-	crafting_tools = {saw = 1},
-	crafting_materials = {log = 1},
-	equipment_models = {legs = "aerlegarmor1"},
-	equipment_slot = "feet"}
-
-Itemspec{
-	name = "chainmail pants",
-	model = "book-000",
-	categories = {"armor"},
-	crafting_tools = {saw = 1},
-	crafting_materials = {log = 1},
-	equipment_models = {skirt = "aerlowerarmor1", panties = "panties2"},
-	equipment_slot = "lowerbody"}
-
-Itemspec{
-	name = "chainmail tunic",
-	model = "book-000",
-	categories = {"armor"},
-	crafting_tools = {saw = 1},
-	crafting_materials = {log = 1},
-	equipment_models = {upper1 = "bra1"},
-	equipment_slot = "upperbody",
-	icon = "cloth1"}
-
-Itemspec{
-	name = "dress",
-	model = "book-000",
-	categories = {"armor"},
-	crafting_tools = {saw = 1},
-	crafting_materials = {log = 1},
-	equipment_models = {upper1 = "chinadress1", panties = "panties2"},
-	equipment_slot = "upperbody",
-	icon = "cloth1"}
 
 Itemspec{
 	name = "gem",
@@ -121,21 +615,6 @@ Itemspec{
 	icon = "potion2"}
 
 Itemspec{
-	name = "grenade",
-	model = "grenade1",
-	mass = 3,
-	categories = {"explosive", "throwable", "weapon"},
-	crafting_materials = {log = 1},
-	crafting_tools = {saw = 1},
-	damage = 30,
-	damage_bonus_intelligence = 0.2,
-	destroy_actions = {"explode"},
-	destroy_timer = 3,
-	equipment_slot = "hand.R",
-	health = 1,
-	stacking = true}
-
-Itemspec{
 	name = "health potion",
 	model = "potion-001",
 	mass = 2,
@@ -145,15 +624,6 @@ Itemspec{
 	crafting_tools = {["mortar and pestle"] = 1},
 	stacking = true,
 	icon = "potion1"}
-
-Itemspec{
-	name = "katana",
-	model = "katana-000",
-	categories = {"melee", "weapon"},
-	damage = 10,
-	damage_bonus_dexterity = 0.2,
-	damage_bonus_strength = 0.2,
-	equipment_slot = "hand.R"}
 
 Itemspec{
 	name = "lesser health potion",
@@ -178,13 +648,6 @@ Itemspec{
 	icon = "potion2"}
 
 Itemspec{
-	name = "log",
-	model = "mushroom-000",
-	mass = 2,
-	categories = {"reagent"},
-	stacking = true}
-
-Itemspec{
 	name = "mana potion",
 	model = "potion-004",
 	mass = 2,
@@ -196,85 +659,14 @@ Itemspec{
 	icon = "potion2"}
 
 Itemspec{
-	name = "mattock",
-	model = "mattock-000",
-	categories = {"melee", "weapon"},
-	crafting_tools = {saw = 1},
-	crafting_materials = {log = 1},
-	damage = 6,
-	damage_bonus_strength = 0.1,
-	equipment_slot = "hand.R"}
-
-Itemspec{
-	name = "morning star",
-	model = "morningstar-000",
-	categories = {"melee", "weapon"},
-	damage = 10,
-	damage_bonus_strength = 0.2,
-	equipment_slot = "hand.R"}
-
-Itemspec{
 	name = "mortar and pestle",
 	model = "alchemy-000",
 	categories = {"tool"}}
 
 Itemspec{
-	name = "mushroom",
-	model = "mushroom-000",--"mushroom-001"..."mushroom-008"
-	mass = 2,
-	categories = {"reagent"},
-	stacking = true,
-	icon = "mushroom1"}
-
-Itemspec{
-	name = "poleaxe",
-	model = "poleaxe-000", --"poleaxe-001"
-	categories = {"melee", "weapon"},
-	damage = 10,
-	equipment_slot = "hand.R"}
-
-Itemspec{
 	name = "saw",
 	model = "saw1",
 	categories = {"tool"}}
-
-Itemspec{
-	name = "shield",
-	model = "shield-000",
-	categories = {"shield"},
-	damage = 10,
-	equipment_slot = "hand.L"}
-
-Itemspec{
-	name = "spear",
-	model = "spear-000",
-	categories = {"melee", "weapon"},
-	damage = 10,
-	damage_bonus_dexterity = 0.2,
-	damage_bonus_strength = 0.1,
-	equipment_slot = "hand.R"}
-
-Itemspec{
-	name = "sword",
-	model = "sword-000",
-	categories = {"melee", "weapon"},
-	damage = 10,
-	equipment_slot = "hand.R"}
-
-Itemspec{
-	name = "torch",
-	model = "torch1",
-	categories = {"misc"},
-	equipment_slot = "hand.L",
-	icon = "torch1"}
-
-Itemspec{
-	name = "wand",
-	model = "wand-000", --"wand-001"
-	categories = {"melee", "weapon"},
-	damage = 5,
-	damage_bonus_willpower = 0.2,
-	equipment_slot = "hand.R"}
 
 Itemspec{
 	name = "Steamworks",

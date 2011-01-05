@@ -10,7 +10,7 @@ Species{
 		{name = "lowerbody"},
 		{name = "upperbody"}},
 	factions = {"good"},
-	feats = {"right hand", "ranged", "ranged spell", "spell on self", "spell on touch", "throw"},
+	feats = {"build", "right hand", "ranged", "ranged spell", "spell on self", "spell on touch", "throw"},
 	inventory_size = 20,
 	model = "aer1",
 	models = {
@@ -44,7 +44,7 @@ Species{
 	name = "aer-player",
 	base = "aer",
 	ai_enabled = false,
-	inventory_items = {"saw", "mortar and pestle", "torch", "boomerang", "mattock", "dress", "chainmail leggings"}}
+	inventory_items = {"saw", "torch", "boomerang", "wooden mattock", "dress", "leather leggings"}}
 
 Species{
 	name = "android",
@@ -199,7 +199,7 @@ Species{
 Species{
 	name = "brigand",
 	base = "aer",
-	inventory_items = {"axe", "chainmail tunic", "chainmail pants", "chainmail leggings"},
+	inventory_items = {"axe", "leather top", "leather pants", "leather leggings"},
 	factions = {"evil"}}
 
 Species{
@@ -207,7 +207,7 @@ Species{
 	base = "aer",
 	dialog = "lipscitizen",
 	hair_style = {"hair1",255,192,192},
-	inventory_items = {"chainmail tunic", "chainmail pants", "chainmail leggings"}}
+	inventory_items = {"leather top", "leather pants", "leather leggings"}}
 
 Species{
 	name = "bloodworm",

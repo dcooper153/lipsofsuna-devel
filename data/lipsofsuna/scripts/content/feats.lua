@@ -9,6 +9,15 @@ Featanimspec{
 	slot = "mouth"}
 
 Featanimspec{
+	name = "build",
+	animation = "punch",
+	categories = {"build"},
+	cooldown = 0.5,
+	effect = "swing1",
+	required_weapon = "build",
+	slot = "hand.R"}
+
+Featanimspec{
 	name = "dragon bite",
 	action_frames = {0, 30},
 	animation = "bite",

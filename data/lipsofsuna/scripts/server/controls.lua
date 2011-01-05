@@ -234,6 +234,8 @@ Protocol:add_handler{type = "SHOOT", func = function(args)
 			anim = "ranged"
 		elseif weapon.itemspec.categories["throwable"] then
 			anim = "throw"
+		elseif weapon.itemspec.categories["build"] then
+			anim = "build"
 		end
 		if anim then
 			local feat = Feat{animation = anim}
