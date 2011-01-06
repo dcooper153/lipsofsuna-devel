@@ -34,7 +34,12 @@ end
 Crafting.show = function(clss, args)
 	clss.tree:clear()
 	local index = 1
+	local sorted = {}
 	for k,v in pairs(args.items) do
+		table.insert(sorted, v)
+	end
+	table.sort(sorted)
+	for k,v in pairs(sorted) do
 		local spec = Itemspec:find{name = v}
 		clss.tree:append{widget = Widgets.ItemButton{index = index, icon = spec and spec.icon,
 			text = v, pressed = function(self) Crafting:craft{index = self.index} end}}
