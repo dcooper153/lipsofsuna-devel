@@ -263,22 +263,14 @@ Creature.find_best_feat = function(self, args)
 end
 
 Creature.jump = function(self)
-	if self.ground then
-		local t = Program.time
-		if t - self.jumped > 1.0 then
-			local v = self.velocity
-			self.jumped = t
-			Thread(function()
-				Effect:play{effect = "jump1", object = self}
-				self:animate{animation = "jump"}
-				local t = 0.0
-				while t < 0.2 do t = t + coroutine.yield() end
-				if self.ground then
-					Object.jump(self, {impulse = Vector(v.x, 400, v.z)})
-				end
-			end)
-		end
-	end
+	if not self.ground then return end
+	local t = Program.time
+	if t - self.jumped < 0.5 then return end
+	local v = self.velocity
+	self.jumped = t
+	Effect:play{effect = "jump1", object = self}
+	self:animate{animation = "jump"}
+	Object.jump(self, {impulse = Vector(v.x, 400, v.z)})
 end
 
 --- Updates the enemy list of the creature.
