@@ -551,9 +551,9 @@ static void private_update_bounds (
 	/* Solve radius. */
 	/* 1 / (A * r^2 + B * r + C) = E */
 	/* (EA) * r^2 + (EB) * r + (Ec-1) = 0 */
-	a = eps * self->equation[0];
+	a = eps * self->equation[2];
 	b = eps * self->equation[1];
-	c = eps * self->equation[2] - 1.0;
+	c = eps * self->equation[0] - 1.0;
 	det = b * b - 4 * a * c;
 	if (det < 0.0)
 	{
@@ -562,7 +562,6 @@ static void private_update_bounds (
 		return;
 	}
 	r = (-b + sqrt (det)) / (2.0 * a);
-	r = r + 0.5;
 
 	/* Create bounding box. */
 	self->bounds.min = limat_vector_subtract (self->transform.position, limat_vector_init (r, r, r));

@@ -632,13 +632,27 @@ static int private_light_bounds (
 {
 	int i;
 	LIMatAabb bounds;
+	LIMatMatrix inv;
 	LIMatVector min;
 	LIMatVector max;
 	LIMatVector tmp;
 	LIMatVector p[8];
 
+	/* If the camera is inside the light volume, return zero to force a
+	 * a fullscreen quad. This is needed because trying to project the
+	 * box to the screen can give incorrect results in some cases. */
 	if (!liren_light_get_bounds (light, &bounds))
 		return 0;
+	if (limat_matrix_get_singular (context->matrix.view))
+		return 0;
+	inv = limat_matrix_invert (context->matrix.view);
+	tmp = limat_matrix_transform (inv, limat_vector_init (0.0f, 0.0f, 0.0f));
+	if (bounds.min.x <= tmp.x && tmp.x <= bounds.max.x &&
+	    bounds.min.y <= tmp.y && tmp.y <= bounds.max.y &&
+	    bounds.min.z <= tmp.z && tmp.z <= bounds.max.z)
+		return 0;
+
+	/* Get the vertices of the bounding box. */
 	p[0] = limat_vector_init (bounds.min.x, bounds.min.y, bounds.min.z);
 	p[1] = limat_vector_init (bounds.min.x, bounds.min.y, bounds.max.z);
 	p[2] = limat_vector_init (bounds.min.x, bounds.max.y, bounds.min.z);
@@ -647,13 +661,17 @@ static int private_light_bounds (
 	p[5] = limat_vector_init (bounds.max.x, bounds.min.y, bounds.max.z);
 	p[6] = limat_vector_init (bounds.max.x, bounds.max.y, bounds.min.z);
 	p[7] = limat_vector_init (bounds.max.x, bounds.max.y, bounds.max.z);
+
+	/* Project the vertices to the screen plane. */
 	tmp = limat_vector_init (0.0f, 0.0f, 0.0f);
-	limat_matrix_project (context->matrix.projection, context->matrix.view, viewport, p, &tmp);
+	if (!limat_matrix_project (context->matrix.projection, context->matrix.view, viewport, p, &tmp))
+		return 0;
 	min = max = tmp;
 	for (i = 1 ; i < 8 ; i++)
 	{
 		tmp = limat_vector_init (0.0f, 0.0f, 0.0f);
-		limat_matrix_project (context->matrix.projection, context->matrix.view, viewport, p + i, &tmp);
+		if (!limat_matrix_project (context->matrix.projection, context->matrix.view, viewport, p + i, &tmp))
+			return 0;
 		if (tmp.x < min.x) min.x = tmp.x;
 		if (tmp.y < min.y) min.y = tmp.y;
 		if (tmp.z < min.z) min.z = tmp.z;
@@ -661,6 +679,25 @@ static int private_light_bounds (
 		if (tmp.y > max.y) max.y = tmp.y;
 		if (tmp.z > max.z) max.z = tmp.z;
 	}
+
+	/* Skip the light if it's out of view range. */
+	if (max.z < 0.0f || min.z > 1.0f)
+		return 0;
+
+	/* Lit the whole screen area if intersecting with the near plane. */
+	/* If some of the vertices are behind the near plane, the projection
+	   doesn't give the rectangle we want. We'd have to clip the box with
+	   the view plane but it's more trouble than it's worth. */
+	if (min.z < 0.0f)
+	{
+		result[0] = viewport[0];
+		result[1] = viewport[1];
+		result[2] = viewport[2];
+		result[3] = viewport[3];
+		return 1;
+	}
+
+	/* Calculate the lit screen area. */
 	result[0] = min.x;
 	result[1] = min.y;
 	result[2] = max.x - min.x;
