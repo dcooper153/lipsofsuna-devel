@@ -86,9 +86,12 @@ LIAPICALL (void, liphy_object_set_collision_mask, (
 	LIPhyObject* self,
 	int          mask));
 
-LIAPICALL (void, liphy_object_set_contact_call, (
-	LIPhyObject*     self,
-	LIPhyContactCall value));
+LIAPICALL (int, liphy_object_get_contact_events, (
+	LIPhyObject* self));
+
+LIAPICALL (void, liphy_object_set_contact_events, (
+	LIPhyObject* self,
+	int          value));
 
 LIAPICALL (LIPhyControlMode, liphy_object_get_control_mode, (
 	const LIPhyObject* self));
@@ -175,13 +178,6 @@ LIAPICALL (void, liphy_object_get_transform, (
 LIAPICALL (void, liphy_object_set_transform, (
 	LIPhyObject*          self,
 	const LIMatTransform* value));
-
-LIAPICALL (LIPhyCallback, liphy_object_get_usercall, (
-	LIPhyObject* self));
-
-LIAPICALL (void, liphy_object_set_usercall, (
-	LIPhyObject*  self,
-	LIPhyCallback value));
 
 LIAPICALL (void*, liphy_object_get_userdata, (
 	LIPhyObject* self));

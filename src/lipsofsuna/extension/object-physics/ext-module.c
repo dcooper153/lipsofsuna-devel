@@ -24,10 +24,6 @@
 
 #include "ext-module.h"
 
-static void private_contact_callback (
-	LIPhyObject*  object,
-	LIPhyContact* contact);
-
 static int private_model_changed (
 	LIExtModule* self,
 	LIEngModel*  model);
@@ -39,6 +35,10 @@ static int private_model_free (
 static int private_model_new (
 	LIExtModule* self,
 	LIEngModel*  model);
+
+static void private_object_contact (
+	LIExtModule*  self,
+	LIPhyContact* contact);
 
 static int private_object_free (
 	LIExtModule* self,
@@ -110,13 +110,14 @@ LIExtModule* liext_object_physics_new (
 	if (!lical_callbacks_insert (program->callbacks, program->engine, "model-changed", -65535, private_model_changed, self, self->calls + 0) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "model-free", -65535, private_model_free, self, self->calls + 1) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "model-new", -65535, private_model_new, self, self->calls + 2) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-free", -65535, private_object_free, self, self->calls + 3) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-model", -65535, private_object_model, self, self->calls + 4) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-new", -65535, private_object_new, self, self->calls + 5) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-transform", -65535, private_object_transform, self, self->calls + 6) ||
-	    !lical_callbacks_insert (program->callbacks, self->physics, "object-transform", -65535, private_physics_transform, self, self->calls + 7) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", -65535, private_object_visibility, self, self->calls + 8) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", -65535, private_tick, self, self->calls + 9))
+	    !lical_callbacks_insert (program->callbacks, self->physics, "object-contact", -65535, private_object_contact, self, self->calls + 3) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-free", -65535, private_object_free, self, self->calls + 4) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-model", -65535, private_object_model, self, self->calls + 5) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-new", -65535, private_object_new, self, self->calls + 6) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-transform", -65535, private_object_transform, self, self->calls + 7) ||
+	    !lical_callbacks_insert (program->callbacks, self->physics, "object-transform", -65535, private_physics_transform, self, self->calls + 8) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", -65535, private_object_visibility, self, self->calls + 9) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", -65535, private_tick, self, self->calls + 10))
 	{
 		liext_object_physics_free (self);
 		return NULL;
@@ -140,94 +141,6 @@ void liext_object_physics_free (
 }
 
 /*****************************************************************************/
-
-static void private_contact_callback (
-	LIPhyObject*  object,
-	LIPhyContact* contact)
-{
-	LIScrData* data;
-	LIEngObject* engobj = liphy_object_get_userdata (object);
-	LIMaiProgram* program = lieng_engine_get_userdata (engobj->engine);
-	LIMatVector vector;
-	LIScrScript* script = program->script;
-	lua_State* lua = liscr_script_get_lua (script);
-
-	/* Push callback. */
-	liscr_pushdata (lua, engobj->script);
-	lua_getfield (lua, -1, "contact_cb");
-	if (lua_type (lua, -1) != LUA_TFUNCTION)
-	{
-		lua_pop (lua, 2);
-		return;
-	}
-
-	/* Push object. */
-	lua_pushvalue (lua, -2);
-	lua_remove (lua, -3);
-
-	/* Push contact. */
-	lua_newtable (lua);
-
-	/* Convert impulse. */
-	lua_pushnumber (lua, contact->impulse);
-	lua_setfield (lua, -2, "impulse");
-
-	/* Convert object. */
-	if (contact->object != NULL)
-	{
-		engobj = liphy_object_get_userdata (contact->object);
-		if (engobj != NULL && engobj->script != NULL)
-		{
-			liscr_pushdata (lua, engobj->script);
-			lua_setfield (lua, -2, "object");
-		}
-	}
-
-	/* Convert terrain. */
-	if (contact->terrain != NULL)
-	{
-		liphy_terrain_get_tile (contact->terrain, contact->terrain_index, &vector);
-		data = liscr_vector_new (script, &vector);
-		if (data != NULL)
-		{
-			liscr_pushdata (lua, data);
-			liscr_data_unref (data);
-		}
-		else
-			lua_pushnil (lua);
-		lua_setfield (lua, -2, "tile");
-	}
-
-	/* Convert point. */
-	data = liscr_vector_new (script, &contact->point);
-	if (data != NULL)
-	{
-		liscr_pushdata (lua, data);
-		liscr_data_unref (data);
-	}
-	else
-		lua_pushnil (lua);
-	lua_setfield (lua, -2, "point");
-
-	/* Convert normal. */
-	data = liscr_vector_new (script, &contact->normal);
-	if (data != NULL)
-	{
-		liscr_pushdata (lua, data);
-		liscr_data_unref (data);
-	}
-	else
-		lua_pushnil (lua);
-	lua_setfield (lua, -2, "normal");
-
-	/* Call function. */
-	if (lua_pcall (lua, 2, 0, 0) != 0)
-	{
-		lisys_error_set (LISYS_ERROR_UNKNOWN, "Object.contact_cb: %s", lua_tostring (lua, -1));
-		lisys_error_report ();
-		lua_pop (lua, 1);
-	}
-}
 
 static int private_model_changed (
 	LIExtModule* self,
@@ -266,6 +179,52 @@ static int private_model_new (
 		return 1;
 
 	return 1;
+}
+
+static void private_object_contact (
+	LIExtModule*  self,
+	LIPhyContact* contact)
+{
+	LIScrData* point;
+	LIScrData* normal;
+	LIScrData* tile;
+	LIEngObject* object0;
+	LIEngObject* object1;
+	LIMatVector vector;
+	LIScrScript* script = self->program->script;
+
+	if (contact->object1 != NULL)
+	{
+		object0 = liphy_object_get_userdata (contact->object0);
+		object1 = liphy_object_get_userdata (contact->object1);
+		point = liscr_vector_new (script, &contact->point);
+		normal = liscr_vector_new (script, &contact->normal);
+		limai_program_event (self->program, "object-contact",
+			"impulse", LISCR_TYPE_FLOAT, contact->impulse,
+			"normal", LISCR_SCRIPT_VECTOR, normal, 
+			"object", LISCR_SCRIPT_OBJECT, object1->script,
+			"point", LISCR_SCRIPT_VECTOR, point,
+			"self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
+		liscr_data_unref (point);
+		liscr_data_unref (normal);
+	}
+	else
+	{
+		object0 = liphy_object_get_userdata (contact->object0);
+		liphy_terrain_get_tile (contact->terrain, contact->terrain_index, &vector);
+		point = liscr_vector_new (script, &contact->point);
+		normal = liscr_vector_new (script, &contact->normal);
+		tile = liscr_vector_new (script, &vector);
+		limai_program_event (self->program, "object-contact",
+			"impulse", LISCR_TYPE_FLOAT, contact->impulse,
+			"normal", LISCR_SCRIPT_VECTOR, normal, 
+			"point", LISCR_SCRIPT_VECTOR, point,
+			"tile", LISCR_SCRIPT_VECTOR, tile,
+			"self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
+		liscr_data_unref (point);
+		liscr_data_unref (normal);
+		liscr_data_unref (tile);
+	}
 }
 
 static int private_object_free (
@@ -317,10 +276,7 @@ static int private_object_new (
 	/* Initialize physics. */
 	phyobj = liphy_object_new (self->physics, object->id, NULL, LIPHY_CONTROL_MODE_STATIC);
 	if (phyobj != NULL)
-	{
 		liphy_object_set_userdata (phyobj, object);
-		liphy_object_set_contact_call (phyobj, private_contact_callback);
-	}
 
 	return 1;
 }

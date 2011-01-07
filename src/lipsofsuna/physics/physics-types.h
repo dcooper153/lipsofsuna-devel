@@ -56,7 +56,8 @@ struct _LIPhyContact
 	float impulse;
 	LIMatVector point;
 	LIMatVector normal;
-	LIPhyObject* object;
+	LIPhyObject* object0;
+	LIPhyObject* object1;
 	LIPhyTerrain* terrain;
 };
 

@@ -113,7 +113,6 @@ void liphy_physics_free (
 {
 	LIAlgU32dicIter iter;
 
-	lisys_assert (self->contacts == NULL);
 	lisys_assert (self->constraints == NULL);
 
 	if (self->objects != NULL)
@@ -381,37 +380,6 @@ void liphy_physics_clear_constraints (
 }
 
 /**
- * \brief Clears all pending contact callbacks for the object.
- *
- * This function can be safely called from inside the contact processing loop.
- * It's used by object cleanup code to clear references that are going invalid.
- *
- * \param self Physics.
- * \param object Object.
- */
-void liphy_physics_clear_contacts (
-	LIPhyPhysics* self,
-	LIPhyObject*  object)
-{
-	LIAlgList* ptr;
-	LIAlgList* next;
-	LIPhyContactRecord* record;
-
-	for (ptr = self->contacts ; ptr != NULL ; ptr = next)
-	{
-		next = ptr->next;
-		record = (LIPhyContactRecord*) ptr->data;
-		if (record->object0 == object || record->object1 == object)
-		{
-			if (self->contacts_iter == ptr)
-				self->contacts_iter = ptr->next;
-			lialg_list_remove (&self->contacts, ptr);
-			lisys_free (record);
-		}
-	}
-}
-
-/**
  * \brief Finds a physics model by ID.
  * \param self Physics simulation.
  * \param id Model ID.
@@ -446,37 +414,8 @@ void liphy_physics_update (
 	LIPhyPhysics* self,
 	float         secs)
 {
-	LIAlgList* ptr;
-	LIPhyContact contact;
-	LIPhyContactRecord* record;
-
 	/* Step simulation. */
 	self->dynamics->stepSimulation (secs, 20);
-
-	/* Process contacts. */
-	for (ptr = self->contacts ; ptr != NULL ; ptr = self->contacts_iter)
-	{
-		self->contacts_iter = ptr->next;
-		record = (LIPhyContactRecord*) ptr->data;
-		lialg_list_remove (&self->contacts, ptr);
-		contact.impulse = record->impulse;
-		contact.point = record->point;
-		contact.normal = record->normal;
-		contact.terrain = record->terrain;
-		contact.terrain_index = record->terrain_index;
-		if (record->object0 != NULL && record->object0->config.contact_call != NULL)
-		{
-			contact.object = record->object1;
-			record->object0->config.contact_call (record->object0, &contact);
-		}
-		if (record->object1 != NULL && record->object1->config.contact_call != NULL)
-		{
-			contact.object = record->object0;
-			record->object1->config.contact_call (record->object1, &contact);
-		}
-		lisys_free (record);
-	}
-	self->contacts_iter = NULL;
 }
 
 /**
@@ -511,14 +450,14 @@ static bool private_contact_processed (
 {
 	LIMatVector momentum0;
 	LIMatVector momentum1;
+	LIPhyObject* object;
 	LIPhyPhysics* physics = NULL;
 	LIPhyPointer* pointer0;
 	LIPhyPointer* pointer1;
-	LIPhyContactRecord contact;
-	LIPhyContactRecord* tmp;
+	LIPhyContact contact;
 
 	/* Get contact information. */
-	memset (&contact, 0, sizeof (LIPhyContactRecord));
+	memset (&contact, 0, sizeof (LIPhyContact));
 	pointer0 = (LIPhyPointer*)((btCollisionObject*) body0)->getUserPointer ();
 	pointer1 = (LIPhyPointer*)((btCollisionObject*) body1)->getUserPointer ();
 	if (pointer0->object)
@@ -529,6 +468,8 @@ static bool private_contact_processed (
 	else
 	{
 		contact.terrain = (LIPhyTerrain*) pointer0->pointer;
+		if (point.m_index0 >= contact.terrain->materials.count)
+			return false;
 		contact.terrain_index = contact.terrain->materials.array[point.m_index0];
 	}
 	if (pointer1->object)
@@ -539,13 +480,15 @@ static bool private_contact_processed (
 	else
 	{
 		contact.terrain = (LIPhyTerrain*) pointer1->pointer;
+		if (point.m_index1 >= contact.terrain->materials.count)
+			return false;
 		contact.terrain_index = contact.terrain->materials.array[point.m_index1];
 	}
 
 	/* Make sure that the contact involved at least one object with a contact
 	   callback before inserting the contact to the queue. */
-	if ((contact.object0 == NULL || contact.object0->config.contact_call == NULL) &&
-	    (contact.object1 == NULL || contact.object1->config.contact_call == NULL))
+	if ((contact.object0 == NULL || !contact.object0->config.contact_events) &&
+	    (contact.object1 == NULL || !contact.object1->config.contact_events))
 		return false;
 
 	/* Get collision point. */
@@ -572,14 +515,16 @@ static bool private_contact_processed (
 		momentum1 = limat_vector_init (0.0f, 0.0f, 0.0f);
 	contact.impulse = limat_vector_get_length (limat_vector_subtract (momentum0, momentum1));
 
-	/* Manipulating the physics state in the contact callback is dangerous
-	   so let's store the contact to a list and process it later. */
-	tmp = (LIPhyContactRecord*) lisys_calloc (1, sizeof (LIPhyContactRecord));
-	if (tmp == NULL)
-		return false;
-	*tmp = contact;
-	if (!lialg_list_prepend (&physics->contacts, tmp))
-		lisys_free (tmp);
+	/* Invoke callbacks. */
+	if (contact.object0 != NULL && contact.object0->config.contact_events)
+		lical_callbacks_call (physics->callbacks, physics, "object-contact", lical_marshal_DATA_PTR, &contact);
+	if (contact.object1 != NULL && contact.object1->config.contact_events)
+	{
+		object = contact.object0;
+		contact.object0 = contact.object1;
+		contact.object1 = object;
+		lical_callbacks_call (physics->callbacks, physics, "object-contact", lical_marshal_DATA_PTR, &contact);
+	}
 
 	return false;
 }

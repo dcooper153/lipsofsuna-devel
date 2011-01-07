@@ -66,10 +66,6 @@ LIAPICALL (void, liphy_physics_clear_constraints, (
 	LIPhyPhysics* self,
 	LIPhyObject*  object));
 
-LIAPICALL (void, liphy_physics_clear_contacts, (
-	LIPhyPhysics* self,
-	LIPhyObject*  object));
-
 LIAPICALL (LIPhyModel*, liphy_physics_find_model, (
 	LIPhyPhysics* self,
 	uint32_t      id));

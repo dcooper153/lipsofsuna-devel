@@ -62,6 +62,11 @@ Network:host{port = 10101}
 Eventhandler{type = "object-motion", func = function(self, event)
 	Vision:event{type = "object-moved", object = event.object}
 end}
+Eventhandler{type = "object-contact", func = function(self, event)
+	if event.self.contact_cb then
+		event.self:contact_cb(event)
+	end
+end}
 
 -- Visibility.
 Eventhandler{type = "object-visibility", func = function(self, event)

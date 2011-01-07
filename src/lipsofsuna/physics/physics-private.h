@@ -56,8 +56,6 @@ struct _LIPhyPhysics
 	btDiscreteDynamicsWorld* dynamics;
 	btGhostPairCallback* ghostcallback;
 	LIAlgList* constraints;
-	LIAlgList* contacts;
-	LIAlgList* contacts_iter;
 	LIAlgList* controllers;
 	LIAlgU32dic* models;
 	LIAlgU32dic* objects;
@@ -152,6 +150,7 @@ struct _LIPhyObject
 	{
 		int collision_group;
 		int collision_mask;
+		int contact_events;
 		float mass;
 		float movement;
 		float speed;
@@ -161,8 +160,6 @@ struct _LIPhyObject
 		LIMatVector angular;
 		LIMatVector gravity;
 		LIMatVector velocity;
-		LIPhyCallback custom_call;
-		LIPhyContactCall contact_call;
 	} config;
 };
 
@@ -172,17 +169,6 @@ struct _LIPhyConstraint
 	LIPhyObject* object0;
 	LIPhyObject* object1;
 	btTypedConstraint* constraint;
-};
-
-struct LIPhyContactRecord
-{
-	int terrain_index;
-	float impulse;
-	LIMatVector point;
-	LIMatVector normal;
-	LIPhyObject* object0;
-	LIPhyObject* object1;
-	LIPhyTerrain* terrain;
 };
 
 class LIPhyMotionState : public btMotionState

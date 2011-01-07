@@ -108,9 +108,6 @@ LIPhyObject* liphy_object_new (
 void liphy_object_free (
 	LIPhyObject* self)
 {
-	/* Cancel all contact callbacks involving us. */
-	liphy_physics_clear_contacts (self->physics, self);
-
 	/* Remove from dictionary. */
 	if (self->id)
 		lialg_u32dic_remove (self->physics->objects, self->id);
@@ -390,21 +387,28 @@ void liphy_object_set_collision_mask (
 }
 
 /**
- * \brief Sets the contact handler callback of the object.
- *
- * The contact callback, when not NULL, is called every time the object
- * collides with something.
- *
+ * \brief Gets the contact event generation status of the object.
  * \param self Object.
  * \param value Contact callback.
  */
-void liphy_object_set_contact_call (
-	LIPhyObject*     self,
-	LIPhyContactCall value)
+int liphy_object_get_contact_events (
+	LIPhyObject* self)
 {
-	self->config.contact_call = value;
+	return self->config.contact_events;
+}
+
+/**
+ * \brief Enables or disables contect events for the object.
+ * \param self Object.
+ * \param value Contact callback.
+ */
+void liphy_object_set_contact_events (
+	LIPhyObject* self,
+	int          value)
+{
+	self->config.contact_events = value;
 	if (self->control != NULL)
-		self->control->set_contacts (value != NULL);
+		self->control->set_contacts (value);
 }
 
 /**
@@ -898,7 +902,7 @@ static void private_update_state (
 				break;
 		}
 		if (self->control != NULL)
-			self->control->set_contacts (self->config.contact_call != NULL);
+			self->control->set_contacts (self->config.contact_events);
 	}
 }
 

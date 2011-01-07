@@ -312,6 +312,40 @@ static void Object_setter_collision_mask (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Contact event generation toggle.
+ * -- @name Object.contact_events
+ * -- @class table
+ */
+static void Object_getter_contact_events (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIPhyObject* object;
+
+	/* Get physics object. */
+	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	if (object == NULL)
+		return;
+
+	liscr_args_seti_bool (args, liphy_object_get_contact_events (object));
+}
+static void Object_setter_contact_events (LIScrArgs* args)
+{
+	int value;
+	LIExtModule* module;
+	LIPhyObject* object;
+
+	/* Get physics object. */
+	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	if (object == NULL)
+		return;
+
+	if (liscr_args_geti_bool (args, 0, &value))
+		liphy_object_set_contact_events (object, value);
+}
+
+/* @luadoc
  * --- Gravity vector.
  * --
  * -- @name Object.gravity
@@ -680,6 +714,7 @@ void liext_script_object (
 	liscr_class_insert_mvar (self, "angular", Object_getter_angular, Object_setter_angular);
 	liscr_class_insert_mvar (self, "collision_group", Object_getter_collision_group, Object_setter_collision_group);
 	liscr_class_insert_mvar (self, "collision_mask", Object_getter_collision_mask, Object_setter_collision_mask);
+	liscr_class_insert_mvar (self, "contact_events", Object_getter_contact_events, Object_setter_contact_events);
 	liscr_class_insert_mvar (self, "gravity", Object_getter_gravity, Object_setter_gravity);
 	liscr_class_insert_mvar (self, "ground", Object_getter_ground, NULL);
 	liscr_class_insert_mvar (self, "mass", Object_getter_mass, Object_setter_mass);

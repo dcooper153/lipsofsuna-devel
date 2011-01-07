@@ -1,6 +1,16 @@
 local oldanimate = Object.animate
+local oldsetter = Object.setter
 
 Object.contact_damage = 0.03
+
+Object.setter = function(self, key, value)
+	if key == "contact_cb" then
+		oldsetter(self, key, value)
+		self.contact_events = (type(value) == "function")
+	else
+		oldsetter(self, key, value)
+	end
+end
 
 Object.animate = function(self, args)
 	if oldanimate(self, args) then
