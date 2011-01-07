@@ -10,11 +10,28 @@ end
 
 Widgets.ItemList.setter = function(self, key, value)
 	if key == "size" then
-		self.rows = value
-		self.buttons = {}
-		for i = 1,value do
-			self.buttons[i] = Widgets.ItemButton{pressed = function() self:pressed(i) end}
-			self:set_child{col = 1, row = i, widget = self.buttons[i]}
+		if value <= 10 then
+			-- Small inventories are single column.
+			self.cols = 1
+			self.rows = value
+			self.buttons = {}
+			for i = 1,value do
+				self.buttons[i] = Widgets.ItemButton{pressed = function() self:pressed(i) end}
+				self:set_child{col = 1, row = i, widget = self.buttons[i]}
+			end
+		else
+			-- Large inventories are dual column.
+			local rows = math.ceil(value / 2)
+			self.cols = 2
+			self.rows = rows
+			self.buttons = {}
+			for i = 1,value do
+				self.buttons[i] = Widgets.ItemButton{pressed = function() self:pressed(i) end}
+				self:set_child{
+					col = 1 + math.floor((i - 1) / rows),
+					row = 1 + (i - 1) % rows,
+					widget = self.buttons[i]}
+			end
 		end
 	else
 		Widget.setter(self, key, value)

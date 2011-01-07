@@ -4,12 +4,12 @@ Gui = Class()
 -- @param clss Gui class.
 Gui.init = function(clss)
 	-- Inventory menu.
-	Gui.inventory_group = Widget{cols = 1}
+	Gui.inventory_group = Widget{cols = 2, rows = 2}
 	Gui.inventory_group:set_request{width = 100}
-	Gui.inventory_group:append_row(Widgets.Label{font = "medium", text = "Inventory"})
-	Gui.inventory_group:append_row(Equipment.group)
-	Gui.inventory_group:append_row(Inventory.group)
-	Gui.inventory_group:set_expand{col = 1, row = 3}
+	Gui.inventory_group:set_child{col = 1, row = 1, widget = Widgets.Label{font = "medium", text = "Inventory"}}
+	Gui.inventory_group:set_child{col = 1, row = 2, widget = Equipment.group}
+	Gui.inventory_group:set_child{col = 2, row = 2, widget = Inventory.group}
+	Gui.inventory_group:set_expand{col = 2, row = 2}
 	-- Action menu.
 	Gui.menu_widget_actions = Widgets.Menu{
 		{"Examine", function() Commands:examine() end},
