@@ -82,6 +82,7 @@ Voxel.damage = function(self, point)
 		for k,v in pairs(m.mining_materials) do
 			for i = 1,v do
 				local offset = Vector(math.random(), math.random(), math.random())
+				offset = offset * 0.7 + Vector(0.3, 0.3, 0.3)
 				Item:create{name = k, position = (point + offset) * Config.tilewidth, realized = true}
 			end
 		end

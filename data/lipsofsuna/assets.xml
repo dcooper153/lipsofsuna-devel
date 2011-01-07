@@ -1430,6 +1430,22 @@
   </asset>
 
   <asset>
+    <file>import/stone1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/adamantium1.png</dep>
+    <dep>import/aquanite1.png</dep>
+    <dep>import/basalt1.png</dep>
+    <dep>import/crimson1.png</dep>
+    <dep>import/ferrostone1.png</dep>
+    <dep>import/granite1.png</dep>
+    <dep>import/sand1.png</dep>
+    <dep>import/soil1.png</dep>
+    <status>incomplete</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
     <file>import/stone-000.blend</file>
     <author>tidbit (Joseph)</author>
     <license>Creative Commons BY 3.0</license>

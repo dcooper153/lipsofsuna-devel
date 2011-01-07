@@ -3,21 +3,21 @@
 
 Itemspec{
 	name = "adamantium",
-	model = "book-000", -- FIXME
+	model = "adamantium1",
 	mass = 1,
 	categories = {"material"},
 	stacking = true}
 
 Itemspec{
 	name = "aquanite stone",
-	model = "book-000", -- FIXME
+	model = "aquanitestone1",
 	mass = 1,
 	categories = {"material"},
 	stacking = true}
 
 Itemspec{
 	name = "basalt stone",
-	model = "book-000", -- FIXME
+	model = "basaltstone1",
 	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "basalt1",
@@ -34,7 +34,7 @@ Itemspec{
 
 Itemspec{
 	name = "crimson stone",
-	model = "book-000", -- FIXME
+	model = "crimsonstone1",
 	mass = 1,
 	categories = {"material"},
 	stacking = true}
@@ -47,16 +47,8 @@ Itemspec{
 	stacking = true}
 
 Itemspec{
-	name = "glass ingot",
-	model = "book-000", -- FIXME
-	mass = 3,
-	categories = {"material"},
-	crafting_materials = {["sand chunk"] = 3},
-	stacking = true}
-
-Itemspec{
 	name = "ferrostone",
-	model = "book-000", -- FIXME
+	model = "ferrostone1",
 	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "ferrostone1",
@@ -80,8 +72,16 @@ Itemspec{
 	stacking = true}
 
 Itemspec{
-	name = "granite stone",
+	name = "glass ingot",
 	model = "book-000", -- FIXME
+	mass = 3,
+	categories = {"material"},
+	crafting_materials = {["sand chunk"] = 3},
+	stacking = true}
+
+Itemspec{
+	name = "granite stone",
+	model = "granitestone1",
 	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "granite1",
@@ -127,7 +127,7 @@ Itemspec{
 
 Itemspec{
 	name = "sand chunk",
-	model = "book-000", -- FIXME
+	model = "sandchunk1",
 	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "sand1",
@@ -137,7 +137,7 @@ Itemspec{
 
 Itemspec{
 	name = "soil chunk",
-	model = "book-000", -- FIXME
+	model = "soilchunk1",
 	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "soil1",
