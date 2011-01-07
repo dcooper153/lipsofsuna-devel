@@ -10,6 +10,7 @@ Itemspec.dict_name = {}
 -- @param clss Itemspec class.
 -- @param args Arguments.<ul>
 --   <li>ammo_type: Name of the ammunition item type.</li>
+--   <li>armor_class: How much protection the item offers when equipped.</li>
 --   <li>categories: List of categories to which the item belongs.</li>
 --   <li>construct_tile: Tile type to construct when used.</li>
 --   <li>construct_tile_count: Material count required by tile construction.</li>
@@ -37,6 +38,7 @@ Itemspec.dict_name = {}
 -- @return New item specification.
 Itemspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
+	self.armor_class = self.armor_class or 0
 	self.crafting_enabled = (self.crafting_count or self.crafting_materials or self.crafting_skills) and true
 	self.crafting_count = self.crafting_count or 1
 	self.crafting_materials = self.crafting_materials or {}

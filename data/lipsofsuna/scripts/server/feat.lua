@@ -29,6 +29,11 @@ Feat.apply = function(self, args)
 		end
 		if args.target then
 			local damage = self:calculate_damage(args)
+			if damage > 0 then
+				local armor = args.target.armor_class or 0
+				local mult = math.max(0.2, 1 - armor)
+				damage = damage * mult
+			end
 			args.target:damaged(damage)
 		end
 	end

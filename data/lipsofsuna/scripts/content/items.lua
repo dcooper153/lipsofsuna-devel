@@ -484,6 +484,7 @@ Itemspec{
 Itemspec{
 	name = "dress",
 	model = "book-000",
+	armor_class = 0.02,
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
@@ -494,6 +495,7 @@ Itemspec{
 Itemspec{
 	name = "iron greaves",
 	model = "book-000",
+	armor_class = 0.08,
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 3},
 	equipment_models = {legs = "aerlegplate1"},
@@ -502,6 +504,7 @@ Itemspec{
 Itemspec{
 	name = "iron gauntlets",
 	model = "book-000",
+	armor_class = 0.08,
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 2},
 	equipment_models = {arms = "aerarmplate1"},
@@ -510,6 +513,7 @@ Itemspec{
 Itemspec{
 	name = "iron breastplate",
 	model = "book-000",
+	armor_class = 0.18,
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 5},
 	equipment_models = {upper = "aerupperplate1", lower = "aerlowerplate1"},
@@ -518,6 +522,7 @@ Itemspec{
 Itemspec{
 	name = "leather leggings",
 	model = "book-000",
+	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
@@ -527,6 +532,7 @@ Itemspec{
 Itemspec{
 	name = "leather pants",
 	model = "book-000",
+	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
@@ -536,6 +542,7 @@ Itemspec{
 Itemspec{
 	name = "leather top",
 	model = "book-000",
+	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
@@ -546,6 +553,7 @@ Itemspec{
 Itemspec{
 	name = "wooden shield",
 	model = "shield-000",
+	armor_class = 0.08,
 	categories = {"shield"},
 	crafting_materials = {["log"] = 1},
 	equipment_slot = "hand.L"}

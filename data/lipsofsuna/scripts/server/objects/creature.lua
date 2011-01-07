@@ -1,5 +1,18 @@
 Creature = Class(Object)
 
+Creature.getter = function(self, key)
+	if key == "armor_class" then
+		local value = 0
+		for k,v in pairs(self.species.equipment_slots) do
+			local i = self:get_item{slot = v.name}
+			value = value + (i and i.itemspec.armor_class or 0)
+		end
+		return value
+	else
+		return Object.getter(self, key)
+	end
+end
+
 Creature.setter = function(self, key, value)
 	if key == "species" then
 		local spec = type(value) == "string" and Species:find{name = value} or value
