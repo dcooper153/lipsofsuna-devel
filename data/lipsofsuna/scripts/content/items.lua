@@ -168,7 +168,7 @@ Itemspec{
 
 Itemspec{
 	name = "adamantium dagger",
-	model = "katana-000", -- FIXME
+	model = "sword1", -- FIXME
 	categories = {"melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
 	damage = 20,
@@ -208,7 +208,7 @@ Itemspec{
 
 Itemspec{
 	name = "adamantium sword",
-	model = "katana-000",
+	model = "sword1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
 	damage = 40,
@@ -229,7 +229,7 @@ Itemspec{
 
 Itemspec{
 	name = "aquanite dagger",
-	model = "katana-000", -- FIXME
+	model = "sword1", -- FIXME
 	categories = {"melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
 	damage = 15,
@@ -283,7 +283,7 @@ Itemspec{
 
 Itemspec{
 	name = "aquanite sword",
-	model = "katana-000",
+	model = "sword1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
 	damage = 30,
@@ -304,7 +304,7 @@ Itemspec{
 
 Itemspec{
 	name = "crimson dagger",
-	model = "katana-000", -- FIXME
+	model = "sword1", -- FIXME
 	categories = {"melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 3},
 	damage = 15,
@@ -358,7 +358,7 @@ Itemspec{
 
 Itemspec{
 	name = "crimson sword",
-	model = "katana-000",
+	model = "sword1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 3},
 	damage = 30,
@@ -379,7 +379,7 @@ Itemspec{
 
 Itemspec{
 	name = "iron dagger",
-	model = "katana-000", -- FIXME
+	model = "sword1", -- FIXME
 	categories = {"melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 1},
 	damage = 10,
@@ -419,7 +419,7 @@ Itemspec{
 
 Itemspec{
 	name = "iron sword",
-	model = "katana-000",
+	model = "sword1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 1},
 	damage = 10,
@@ -440,7 +440,7 @@ Itemspec{
 
 Itemspec{
 	name = "wooden dagger",
-	model = "katana-000", -- FIXME
+	model = "sword1", -- FIXME
 	categories = {"melee", "weapon"},
 	crafting_materials = {["log"] = 1},
 	damage = 5,
@@ -468,7 +468,7 @@ Itemspec{
 
 Itemspec{
 	name = "wooden sword",
-	model = "katana-000",
+	model = "sword1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["log"] = 1},
 	damage = 10,

@@ -79,6 +79,10 @@
     <url>http://opengameart.org/user/301</url>
   </author-info>
   <author-info>
+    <name>johndh</name>
+    <url>http://opengameart.org/user/681</url>
+  </author-info>
+  <author-info>
     <name>tidbit (Joseph)</name>
   </author-info>
   <author-info>
@@ -1554,28 +1558,34 @@
   </asset>
 
   <asset>
-    <file>import/sword-000.blend</file>
-    <author>Blender Open Model Repository</author>
-    <license>Creative Commons BY 3.0</license>
-    <comment>The crossguard and the pommel look too plain.</comment>
-    <comment>Needs a better texture.</comment>
-    <dep>import/sword-000.png</dep>
-    <source>http://www.blendermodels.org/models/weapon/</source>
-    <status>placeholder</status>
-    <tag>sword</tag>
-    <tag>weapon</tag>
+    <file>import/sword1.blend</file>
+    <author>johndh</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/sword1.png</dep>
+    <dep>import/sword1n.png</dep>
+    <source>http://opengameart.org/content/naval-cutlass-with-basket-hilt</source>
+    <status>usable</status>
     <type>model</type>
   </asset>
 
   <asset>
-    <file>import/sword-000.png</file>
-    <author>Ari Mustonen</author>
+    <file>import/sword1.png</file>
+    <author>johndh</author>
     <license>Creative Commons BY-SA 3.0</license>
-    <comment>Quick and dirty placeholder texture.</comment>
-    <status>placeholder</status>
-    <tag>sword</tag>
-    <tag>weapon</tag>
+    <source>http://opengameart.org/content/naval-cutlass-with-basket-hilt</source>
+    <status>usable</status>
     <type>texture</type>
+    <comment>Baked from the procedural textures.</comment>
+  </asset>
+
+  <asset>
+    <file>import/sword1n.png</file>
+    <author>johndh</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/naval-cutlass-with-basket-hilt</source>
+    <status>usable</status>
+    <type>normalmap</type>
+    <comment>Baked from the procedural textures.</comment>
   </asset>
 
   <asset>
