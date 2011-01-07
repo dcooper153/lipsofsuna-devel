@@ -1211,6 +1211,14 @@
   </asset>
 
   <asset>
+    <file>import/plate1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>incomplete</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
     <file>import/poleaxe-000.blend</file>
     <author>tidbit (Joseph)</author>
     <license>Creative Commons BY 3.0</license>

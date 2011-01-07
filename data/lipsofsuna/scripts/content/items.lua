@@ -492,6 +492,30 @@ Itemspec{
 	icon = "cloth1"}
 
 Itemspec{
+	name = "iron greaves",
+	model = "book-000",
+	categories = {"armor"},
+	crafting_materials = {["iron ingot"] = 3},
+	equipment_models = {legs = "aerlegplate1"},
+	equipment_slot = "feet"}
+
+Itemspec{
+	name = "iron gauntlets",
+	model = "book-000",
+	categories = {"armor"},
+	crafting_materials = {["iron ingot"] = 2},
+	equipment_models = {arms = "aerarmplate1"},
+	equipment_slot = "arms"}
+
+Itemspec{
+	name = "iron breastplate",
+	model = "book-000",
+	categories = {"armor"},
+	crafting_materials = {["iron ingot"] = 5},
+	equipment_models = {upper = "aerupperplate1", lower = "aerlowerplate1"},
+	equipment_slot = "upperbody"}
+
+Itemspec{
 	name = "leather leggings",
 	model = "book-000",
 	categories = {"armor"},
