@@ -9,12 +9,14 @@ Equipment.init = function(clss)
 	clss.button_handr = Widgets.ItemButton{pressed = function() clss:clicked("hand.R") end}
 	clss.button_lowerbody = Widgets.ItemButton{pressed = function() clss:clicked("lowerbody") end}
 	clss.button_feet = Widgets.ItemButton{pressed = function() clss:clicked("feet") end}
+	clss.button_arms = Widgets.ItemButton{pressed = function() clss:clicked("arms") end}
 	clss.group:append_row(clss.button_head)
 	clss.group:append_row(clss.button_upperbody)
 	clss.group:append_row(clss.button_handr)
 	clss.group:append_row(clss.button_handl)
 	clss.group:append_row(clss.button_lowerbody)
 	clss.group:append_row(clss.button_feet)
+	clss.group:append_row(clss.button_arms)
 	clss.group:set_expand{col = 1}
 end
 
@@ -30,7 +32,8 @@ Equipment.set_item = function(clss, slot, name, count)
 		["hand.L"] = clss.button_handl,
 		["hand.R"] = clss.button_handr,
 		["lowerbody"] = clss.button_lowerbody,
-		["feet"] = clss.button_feet
+		["feet"] = clss.button_feet,
+		["arms"] = clss.button_arms
 	}
 	local widget = widgets[slot]
 	if widget then

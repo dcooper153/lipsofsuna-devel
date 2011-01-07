@@ -3,6 +3,7 @@ local regen = 0.5
 Species{
 	name = "aer",
 	equipment_slots = {
+		{name = "arms"},
 		{name = "feet"},
 		{name = "hand.L", node = "#hand.L"},
 		{name = "hand.R", node = "#hand.R"},
@@ -49,6 +50,7 @@ Species{
 Species{
 	name = "android",
 	equipment_slots = {
+		{name = "arms"},
 		{name = "feet"},
 		{name = "hand.L", node = "#hand.L"},
 		{name = "hand.R", node = "#hand.R"},
@@ -75,6 +77,7 @@ Species{
 Species{
 	name = "devora",
 	equipment_slots = {
+		{name = "arms"},
 		{name = "feet"},
 		{name = "hand.L", node = "#hand.L"},
 		{name = "hand.R", node = "#hand.R"},
@@ -114,6 +117,7 @@ Species{
 Species{
 	name = "kraken",
 	equipment_slots = {
+		{name = "arms"},
 		{name = "feet"},
 		{name = "hand.L", node = "#hand.L"},
 		{name = "hand.R", node = "#hand.R"},
@@ -153,6 +157,7 @@ Species{
 Species{
 	name = "wyrm",
 	equipment_slots = {
+		{name = "arms"},
 		{name = "feet"},
 		{name = "hand.L", node = "#hand.L"},
 		{name = "hand.R", node = "#hand.R"},
