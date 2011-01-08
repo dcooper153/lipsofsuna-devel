@@ -53,7 +53,6 @@ struct _LIVoxBuilder
 	int step[3];
 	float tile_width;
 	float vertex_scale;
-	LIAlgMemdic* accel;
 	LIEngEngine* engine;
 	LIMdlModel* model;
 	LIPhyTerrain* physics;
@@ -70,16 +69,18 @@ static int private_merge_material (
 	LIVoxBuilder*  self,
 	LIMdlMaterial* material);
 
-static void private_merge_triangle (
+static int private_merge_triangles_model (
 	LIVoxBuilder* self,
 	LIVoxVoxelB*  voxel,
-	int           group,
-	LIMdlVertex*  verts);
+	int           types[3][3][3],
+	LIMatVector*  coords,
+	int           count);
 
-static int private_merge_vertex (
+static int private_merge_triangles_physics (
 	LIVoxBuilder* self,
 	LIVoxVoxelB*  voxel,
-	LIMdlVertex*  vertex);
+	LIMatVector*  coords,
+	int           count);
 
 static void private_merge_voxel (
 	LIVoxBuilder* self,
@@ -171,6 +172,7 @@ int livox_builder_build (
 	count = 0;
 	self->model_wanted = (result_model != NULL);
 	self->physics_wanted = (result_physics != NULL);
+	lisys_assert (result_physics == NULL || self->physics_manager != NULL);
 
 	/* Calculate area offset. */
 	offset = limat_vector_init (self->offset[0] - 1.5f, self->offset[1] - 1.5f, self->offset[2] - 1.5f);
@@ -310,14 +312,6 @@ static int private_build (
 	int z;
 	int ret = 1;
 
-	/* Allocate vertex cache. */
-	if (self->model_wanted)
-	{
-		self->accel = lialg_memdic_new ();
-		if (self->accel == NULL)
-			return 0;
-	}
-
 	/* Build all voxels inside the area. */
 	for (z = 1 ; z < self->size[2] - 1 ; z++)
 	for (y = 1 ; y < self->size[1] - 1 ; y++)
@@ -327,10 +321,6 @@ static int private_build (
 	/* Calculate bounds needed by frustum culling. */
 	if (self->model != NULL)
 		limdl_model_calculate_bounds (self->model);
-
-	/* Free vertex cache. */
-	if (self->model_wanted)
-		lialg_memdic_free (self->accel);
 
 	return ret;
 }
@@ -363,73 +353,12 @@ static int private_merge_material (
 	return g;
 }
 
-static void private_merge_triangle (
+static int private_merge_triangles_model (
 	LIVoxBuilder* self,
 	LIVoxVoxelB*  voxel,
-	int           group,
-	LIMdlVertex*  verts)
-{
-	int k;
-	uint32_t indices[3];
-	LIMatTransform transform;
-	LIMatVector coords[3];
-
-	/* Merge to display model. */
-	if (self->model != NULL)
-	{
-		for (k = 0 ; k < 3 ; k++)
-		{
-			indices[k] = private_merge_vertex (self, voxel, verts + k);
-			if (indices[k] == -1)
-				break;
-		}
-		if (k == 3)
-			limdl_model_insert_indices (self->model, group, indices, 3);
-	}
-
-	/* Merge to physics model. */
-	if (self->physics != NULL)
-	{
-		coords[0] = verts[0].coord;
-		coords[1] = verts[1].coord;
-		coords[2] = verts[2].coord;
-		transform = limat_transform_identity ();
-		liphy_terrain_add_vertices (self->physics, voxel->index, coords, 3, &transform);
-	}
-}
-
-static int private_merge_vertex (
-	LIVoxBuilder* self,
-	LIVoxVoxelB*  voxel,
-	LIMdlVertex*  vertex)
-{
-	void* ptr;
-	uint32_t index;
-
-	ptr = lialg_memdic_find (self->accel, &vertex, sizeof (LIMdlVertex));
-	if (ptr == NULL)
-	{
-		/* Add to model. */
-		index = self->model->vertices.count;
-		if (!limdl_model_insert_vertex (self->model, vertex))
-			return -1;
-
-		/* Add to lookup. */
-		ptr = (void*)(intptr_t)(index + 1);
-		if (!lialg_memdic_insert (self->accel, &vertex, sizeof (LIMdlVertex), ptr))
-			return -1;
-	}
-	else
-		index = ((int)(intptr_t) ptr) - 1;
-
-	return index;
-}
-
-static void private_merge_voxel (
-	LIVoxBuilder* self,
-	int           vx,
-	int           vy,
-	int           vz)
+	int           types[3][3][3],
+	LIMatVector*  coords,
+	int           count)
 {
 	int i;
 	int j;
@@ -439,42 +368,27 @@ static void private_merge_voxel (
 	int xr;
 	int yr;
 	int zr;
-	int count;
 	int group;
-	int size[3];
-	int types[3][3][3];
 	float scale;
 	float splat;
 	float uv[2] = { 0.0f, 0.0f };
+	uint32_t indices[3];
 	LIMatVector coord[3];
-	LIMatVector coords[64];
 	LIMatVector normal[3];
-	LIMdlVertex vertices[64];
-	LIVoxVoxelB* voxel;
+	LIMdlVertex vertex;
 	const int regions[4] = { 0, 1, 1, 2 };
 
-	/* Skip empty voxels. */
-	voxel = self->voxelsb + vx + vy * self->step[1] + vz * self->step[2];
-	if (!voxel->type)
-		return;
+	/* Find or create material. */
+	group = private_merge_material (self, &voxel->material->material);
+	if (group == -1)
+		return 0;
 
-	/* Get neighborhood. */
-	for (z = -1 ; z <= 1 ; z++)
-	for (y = -1 ; y <= 1 ; y++)
-	for (x = -1 ; x <= 1 ; x++)
-		types[x + 1][y + 1][z + 1] = self->voxelsb[(x + vx) + (y + vy) * self->step[1] + (z + vz) * self->step[2]].type;
-
-	/* Generate triangles. */
-	/* TODO: Support different kinds of triangulation schemes. */
-	count = private_triangulate_cube (self, types, coords);
-	if (!count)
-		return;
-
-	/* Generate vertices. */
+	/* Generate normals and texture coordinates. */
 	/* TODO: Smooth normals. */
 	scale = voxel->material->texture_scale;
 	for (i = 0 ; i < count ; i += 3)
 	{
+		/* Calculate world coordinates and the triangle normal. */
 		coord[0] = limat_vector_multiply (coords[i + 0], self->tile_width);
 		coord[1] = limat_vector_multiply (coords[i + 1], self->tile_width);
 		coord[2] = limat_vector_multiply (coords[i + 2], self->tile_width);
@@ -485,6 +399,8 @@ static void private_merge_voxel (
 			limat_vector_normalize (limat_vector_cross (
 			limat_vector_subtract (coord[0], coord[1]),
 			limat_vector_subtract (coord[1], coord[2])));
+
+		/* Merge vertices. */
 		for (j = 0 ; j < 3 ; j++)
 		{
 			/* Calculate texture splatting factor. */
@@ -532,36 +448,102 @@ static void private_merge_voxel (
 				}
 			}
 
-			/* Initialize a new vertex. */
-			limdl_vertex_init (vertices + i + j, coord + j, normal + j, uv[0], uv[1]);
+			/* Merge the vertex. */
+			limdl_vertex_init (&vertex, coord + j, normal + j, uv[0], uv[1]);
+			if (!limdl_model_insert_vertex (self->model, &vertex))
+				return 0;
 		}
+
+		/* Merge indices. */
+		indices[0] = self->model->vertices.count - 3;
+		indices[1] = self->model->vertices.count - 2;
+		indices[2] = self->model->vertices.count - 1;
+		if (!limdl_model_insert_indices (self->model, group, indices, 3))
+			return 0;
 	}
 
-	/* Allocate outputs now that we know we're going to output something. */
-	if (self->model_wanted && self->model == NULL)
-		self->model = limdl_model_new ();
-	if (self->physics_wanted && self->physics == NULL && self->physics_manager != NULL)
+	return 1;
+}
+
+static int private_merge_triangles_physics (
+	LIVoxBuilder* self,
+	LIVoxVoxelB*  voxel,
+	LIMatVector*  coords,
+	int           count)
+{
+	int i;
+	LIMatTransform transform;
+
+	/* Calculate world coordinates and the triangle normal. */
+	/* Modifies the passed coordinate array in-place. */
+	for (i = 0 ; i < count ; i++)
 	{
-		size[0] = self->size[0] - 2;
-		size[1] = self->size[1] - 2;
-		size[2] = self->size[2] - 2;
-		self->physics = liphy_terrain_new (self->physics_manager, self->offset, size,
-			LIPHY_GROUP_TILES, LIPHY_DEFAULT_COLLISION_MASK & ~LIPHY_GROUP_TILES);
+		coords[i] = limat_vector_multiply (coords[i], self->tile_width);
+		coords[i] = limat_vector_add (coords[i], voxel->position);
 	}
 
-	/* Find or create materials. */
-	if (self->model != NULL)
-	{
-		group = private_merge_material (self, &voxel->material->material);
-		if (group == -1)
-			return;
-	}
-	else
-		group = 0;
+	/* Merge vertices to the terrain shape. */
+	transform = limat_transform_identity ();
+	return liphy_terrain_add_vertices (self->physics, voxel->index, coords, count, &transform);
+}
+
+static void private_merge_voxel (
+	LIVoxBuilder* self,
+	int           vx,
+	int           vy,
+	int           vz)
+{
+	int x;
+	int y;
+	int z;
+	int count;
+	int size[3];
+	int types[3][3][3];
+	LIMatVector coords[64];
+	LIVoxVoxelB* voxel;
+
+	/* Skip empty voxels. */
+	voxel = self->voxelsb + vx + vy * self->step[1] + vz * self->step[2];
+	if (!voxel->type)
+		return;
+
+	/* Get neighborhood. */
+	for (z = -1 ; z <= 1 ; z++)
+	for (y = -1 ; y <= 1 ; y++)
+	for (x = -1 ; x <= 1 ; x++)
+		types[x + 1][y + 1][z + 1] = self->voxelsb[(x + vx) + (y + vy) * self->step[1] + (z + vz) * self->step[2]].type;
+
+	/* Generate triangles. */
+	/* TODO: Support different kinds of triangulation schemes. */
+	count = private_triangulate_cube (self, types, coords);
+	if (!count)
+		return;
 
 	/* Add triangles to the model. */
-	for (i = 0 ; i < count ; i += 3)
-		private_merge_triangle (self, voxel, group, vertices + i);
+	if (self->model_wanted)
+	{
+		if (self->model == NULL)
+			self->model = limdl_model_new ();
+		if (self->model != NULL)
+			private_merge_triangles_model (self, voxel, types, coords, count);
+	}
+
+	/* Add triangles to the physics shape. */
+	/* This modifies the coordinates in-place so the order in which we
+	   update the model and the physics shape is significant. */
+	if (self->physics_wanted)
+	{
+		if (self->physics == NULL)
+		{
+			size[0] = self->size[0] - 2;
+			size[1] = self->size[1] - 2;
+			size[2] = self->size[2] - 2;
+			self->physics = liphy_terrain_new (self->physics_manager, self->offset, size,
+				LIPHY_GROUP_TILES, LIPHY_DEFAULT_COLLISION_MASK & ~LIPHY_GROUP_TILES);
+		}
+		if (self->physics != NULL)
+			private_merge_triangles_physics (self, voxel, coords, count);
+	}
 }
 
 static int private_triangulate_cube (
