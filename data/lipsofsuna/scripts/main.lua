@@ -2,7 +2,10 @@ local oldrequire = require
 require = function(arg)
 	local s,e = string.find(arg, "core/")
 	if s then
-		Program:load_extension(string.sub(arg, e + 1))
+		local name = string.sub(arg, e + 1)
+		if not Program:load_extension(name) then
+			error("loading extension `" .. name .. "' failed")
+		end
 	else
 		oldrequire(arg)
 	end

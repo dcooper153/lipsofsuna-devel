@@ -44,7 +44,7 @@ int livid_video_init ()
 	/* Get capabilities. */
 	if (!GLEW_VERSION_3_2)
 	{
-		lisys_error_set (EINVAL, "OpenGL 3.3 isn't supported by your graphics card");
+		lisys_error_set (EINVAL, "OpenGL 3.2 isn't supported by your graphics card");
 		return 0;
 	}
 
