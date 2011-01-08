@@ -25,16 +25,12 @@
 #include <lipsofsuna/string.h>
 #include <lipsofsuna/system.h>
 #include "model.h"
+#include "model-builder.h"
 
 typedef int (*LIMdlWriteFunc)(const LIMdlModel*, LIArcWriter*);
 
 static void private_build (
 	LIMdlModel* self);
-
-static void private_build_vertex_weights (
-	LIMdlModel*   self,
-	LIMdlVertex*  vertex,
-	LIMdlWeights* weights);
 
 static int private_read (
 	LIMdlModel*  self,
@@ -81,9 +77,9 @@ static int private_read_weights (
 	LIArcReader* reader);
 
 static int private_read_vertex_weights (
-	LIMdlModel*   self,
-	LIMdlWeights* weights,
-	LIArcReader*  reader);
+	LIMdlModel*  self,
+	LIMdlVertex* vertex,
+	LIArcReader* reader);
 
 static int private_write (
 	const LIMdlModel* self,
@@ -141,8 +137,7 @@ static int private_write_weights (
 
 /*****************************************************************************/
 
-LIMdlModel*
-limdl_model_new ()
+LIMdlModel* limdl_model_new ()
 {
 	LIMdlModel* self;
 
@@ -154,8 +149,8 @@ limdl_model_new ()
 	return self;
 }
 
-LIMdlModel*
-limdl_model_new_copy (LIMdlModel* model)
+LIMdlModel* limdl_model_new_copy (
+	LIMdlModel* model)
 {
 	LIMdlModel* self;
 	LIArcReader* reader;
@@ -187,12 +182,11 @@ limdl_model_new_copy (LIMdlModel* model)
 
 /**
  * \brief Loads a model from uncompressed data.
- *
  * \param reader A reader.
  * \return A new model or NULL.
  */
-LIMdlModel*
-limdl_model_new_from_data (LIArcReader* reader)
+LIMdlModel* limdl_model_new_from_data (
+	LIArcReader* reader)
 {
 	LIMdlModel* self;
 
@@ -219,12 +213,11 @@ limdl_model_new_from_data (LIArcReader* reader)
 
 /**
  * \brief Loads a model from a file.
- *
  * \param path The path to the file.
  * \return A new model or NULL.
  */
-LIMdlModel*
-limdl_model_new_from_file (const char* path)
+LIMdlModel* limdl_model_new_from_file (
+	const char* path)
 {
 	LIArcReader* reader;
 	LIMdlModel* self;
@@ -261,11 +254,10 @@ error:
 
 /**
  * \brief Frees the model.
- *
- * \param self A model.
+ * \param self Model.
  */
-void
-limdl_model_free (LIMdlModel* self)
+void limdl_model_free (
+	LIMdlModel* self)
 {
 	int i;
 	LIMdlMaterial* material;
@@ -300,11 +292,6 @@ limdl_model_free (LIMdlModel* self)
 		lisys_free (self->weightgroups.array);
 	}
 	lisys_free (self->vertices.array);
-
-	/* Free vertex weights. */
-	for (i = 0 ; i < self->weights.count ; i++)
-		lisys_free (self->weights.array[i].weights);
-	lisys_free (self->weights.array);
 
 	/* Free nodes. */
 	if (self->nodes.array != NULL)
@@ -358,8 +345,8 @@ limdl_model_free (LIMdlModel* self)
  *
  * \param self Model.
  */
-void
-limdl_model_calculate_bounds (LIMdlModel* self)
+void limdl_model_calculate_bounds (
+	LIMdlModel* self)
 {
 	int j;
 	LIMatVector v;
@@ -391,14 +378,13 @@ limdl_model_calculate_bounds (LIMdlModel* self)
 
 /**
  * \brief Finds an animation by name.
- *
  * \param self Model.
  * \param name Animation name.
  * \return Animation or NULL.
  */
-LIMdlAnimation*
-limdl_model_find_animation (LIMdlModel* self,
-                            const char* name)
+LIMdlAnimation* limdl_model_find_animation (
+	LIMdlModel* self,
+	const char* name)
 {
 	int i;
 
@@ -413,14 +399,13 @@ limdl_model_find_animation (LIMdlModel* self,
 
 /**
  * \brief Finds a face group.
- *
  * \param self Model.
  * \param material Material index.
  * \return Face group index or -1.
  */
-int
-limdl_model_find_facegroup (LIMdlModel* self,
-                            int         material)
+int limdl_model_find_facegroup (
+	LIMdlModel* self,
+	int         material)
 {
 	int i;
 
@@ -444,9 +429,9 @@ limdl_model_find_facegroup (LIMdlModel* self,
  * \param material Material.
  * \return Material index or -1.
  */
-int
-limdl_model_find_material (const LIMdlModel*    self,
-                           const LIMdlMaterial* material)
+int limdl_model_find_material (
+	const LIMdlModel*    self,
+	const LIMdlMaterial* material)
 {
 	int i;
 
@@ -461,14 +446,13 @@ limdl_model_find_material (const LIMdlModel*    self,
 
 /**
  * \brief Finds a node by name.
- *
  * \param self Model.
  * \param name Name of the node to find.
  * \return Node or NULL.
  */
-LIMdlNode*
-limdl_model_find_node (const LIMdlModel* self,
-                       const char*       name)
+LIMdlNode* limdl_model_find_node (
+	const LIMdlModel* self,
+	const char*       name)
 {
 	int i;
 	LIMdlNode* node;
@@ -486,7 +470,6 @@ limdl_model_find_node (const LIMdlModel* self,
 
 /**
  * \brief Finds the index of a matching vertex.
- *
  * \param self Model.
  * \param vertex Vertex.
  * \return Index in vertex array or -1 if not found.
@@ -507,60 +490,7 @@ int limdl_model_find_vertex (
 }
 
 /**
- * \brief Finds the index of a matching vertex.
- *
- * \param self Model.
- * \param vertex Vertex.
- * \param weights Weight group influences.
- * \param mapping Maps group indices of the weights array.
- * \return Index in vertex array or -1 if not found.
- */
-int limdl_model_find_vertex_weighted (
-	LIMdlModel*         self,
-	const LIMdlVertex*  vertex,
-	const LIMdlWeights* weights,
-	const int*          mapping)
-{
-	int i;
-	int j;
-	int k;
-	LIMdlWeights* weights1;
-
-	for (i = 0 ; i < self->vertices.count ; i++)
-	{
-		/* Match vertex. */
-		if (limdl_vertex_compare (self->vertices.array + i, vertex) != 0)
-			continue;
-
-		/* Match weight counts. */
-		weights1 = self->weights.array + i;
-		if (weights1 == NULL && weights == NULL)
-			return 1;
-		if (weights1->count != weights->count)
-			continue;
-
-		/* Match weight influences. */
-		for (j = 0 ; j < weights1->count ; j++)
-		{
-			for (k = 0 ; k < weights->count ; k++)
-			{
-				if (weights1->weights[j].group == weights->weights[mapping[k]].group &&
-				    weights1->weights[j].weight == weights->weights[mapping[k]].weight)
-					break;
-			}
-			if (k == weights->count)
-				break;
-		}
-		if (j == weights->count)
-			return i;
-	}
-
-	return -1;
-}
-
-/**
  * \brief Finds a matching weight group.
- *
  * \param self Model.
  * \param name Group name.
  * \param bone Bone name.
@@ -585,400 +515,27 @@ int limdl_model_find_weightgroup (
 	return -1;
 }
 
-/**
- * \brief Inserts a triangle to the model.
- *
- * Inserts vertices, vertex weights, and indices to the model, merging the
- * new vertex with existing vertices, if possible.
- *
- * \param self Model.
- * \param group Face group index.
- * \param vertices Array of three vertices.
- * \param weights Array of three weights or NULL.
- * \return Nonzero on success.
- */
-int
-limdl_model_insert_face (LIMdlModel*         self,
-                         int                 group,
-                         const LIMdlVertex*  vertices,
-                         const LIMdlWeights* weights)
-{
-	int i;
-	uint32_t index;
-	uint32_t* indices;
-	LIMdlFaces* group_;
-
-	group_ = self->facegroups.array + group;
-
-	/* Allocate space. */
-	if (group_->indices.capacity < group_->indices.count + 3)
-	{
-		if (group_->indices.capacity)
-			i = group_->indices.capacity << 1;
-		else
-			i = 64;
-		indices = lisys_realloc (group_->indices.array, i * sizeof (uint32_t));
-		if (indices == NULL)
-			return 0;
-		group_->indices.array = indices;
-		group_->indices.capacity = i;
-	}
-
-	/* Insert vertices and indices. */
-	for (i = 0 ; i < 3 ; i++)
-	{
-		/* Insert vertex. */
-		index = limdl_model_find_vertex (self, vertices + i);
-		if (index == -1)
-		{
-			index = self->vertices.count;
-			if (!limdl_model_insert_vertex (self, vertices + i))
-				return 0;
-			if (!limdl_model_insert_vertex_weights (self, weights, NULL))
-			{
-				self->vertices.count--;
-				return 0;
-			}
-		}
-
-		/* Insert index. */
-		group_->indices.array[group_->indices.count] = index;
-		group_->indices.count++;
-	}
-
-	return 1;
-}
-
-/**
- * \brief Inserts a face group to the model.
- *
- * \param self Model.
- * \param material Material index.
- * \return Nonzero on success.
- */
-int
-limdl_model_insert_facegroup (LIMdlModel* self,
-                              int         material)
-{
-	int count;
-	LIMdlFaces* tmp;
-
-	lisys_assert (material >= 0);
-	lisys_assert (material < self->materials.count);
-
-	/* Resize buffer. */
-	count = self->facegroups.count + 1;
-	tmp = lisys_realloc (self->facegroups.array, count * sizeof (LIMdlFaces));
-	if (tmp == NULL)
-		return 0;
-	self->facegroups.array = tmp;
-	tmp += self->facegroups.count;
-	self->facegroups.count++;
-
-	/* Initialize group. */
-	memset (tmp, 0, sizeof (LIMdlFaces));
-	tmp->material = material;
-
-	return 1;
-}
-
-/**
- * \brief Inserts indices to the model.
- *
- * \param self Model.
- * \param group Face group index.
- * \param indices Array of indices.
- * \param count Number of indices.
- * \return Nonzero on success.
- */
-int
-limdl_model_insert_indices (LIMdlModel* self,
-                            int         group,
-                            uint32_t*   indices,
-                            int         count)
-{
-	int i;
-	uint32_t* tmp;
-	LIMdlFaces* group_;
-
-	group_ = self->facegroups.array + group;
-
-	/* Allocate space. */
-	if (group_->indices.capacity < group_->indices.count + count)
-	{
-		if (group_->indices.capacity)
-			i = group_->indices.capacity;
-		else
-			i = 64;
-		while (i < group_->indices.count + count)
-			i <<= 1;
-		tmp = lisys_realloc (group_->indices.array, i * sizeof (uint32_t));
-		if (tmp == NULL)
-			return 0;
-		group_->indices.array = tmp;
-		group_->indices.capacity = i;
-	}
-
-	/* Insert indices. */
-	memcpy (group_->indices.array + group_->indices.count, indices, count * sizeof (uint32_t));
-	group_->indices.count += count;
-
-	return 1;
-}
-
-/**
- * \brief Inserts a material to the model.
- *
- * \param self Model.
- * \param material Material.
- * \return Nonzero on success.
- */
-int
-limdl_model_insert_material (LIMdlModel*          self,
-                             const LIMdlMaterial* material)
-{
-	int count;
-	LIMdlMaterial* tmp;
-
-	/* Resize buffer. */
-	count = self->materials.count + 1;
-	tmp = lisys_realloc (self->materials.array, count * sizeof (LIMdlMaterial));
-	if (tmp == NULL)
-		return 0;
-	self->materials.array = tmp;
-	tmp += self->materials.count;
-
-	/* Copy material. */
-	if (!limdl_material_init_copy (tmp, material))
-		return 0;
-	self->materials.count++;
-
-	return 1;
-}
-
-/**
- * \brief Inserts a node to the model.
- *
- * \param self Model.
- * \param node Node.
- * \return Nonzero on success.
- */
-int
-limdl_model_insert_node (LIMdlModel*      self,
-                         const LIMdlNode* node)
-{
-	LIMdlNode** tmp;
-
-	tmp = realloc (self->nodes.array, (self->nodes.count + 1) * sizeof (LIMdlNode*));
-	if (tmp == NULL)
-		return 0;
-	self->nodes.array = tmp;
-	tmp += self->nodes.count;
-
-	*tmp = limdl_node_copy (node);
-	if (*tmp == NULL)
-		return 0;
-	self->nodes.count++;
-
-	return 1;
-}
-
-/**
- * \brief Inserts a vertex to the model.
- *
- * \param self Model.
- * \param vertex Vertex.
- * \return Nonzero on success.
- */
-int limdl_model_insert_vertex (
-	LIMdlModel*         self,
-	const LIMdlVertex*  vertex)
-{
-	int count;
-	int capacity;
-	void* tmp;
-
-	/* Allocate space for the vertex. */
-	if (self->vertices.capacity < self->vertices.count + 1)
-	{
-		if (self->vertices.capacity)
-			capacity = self->vertices.capacity << 1;
-		else
-			capacity = 32;
-		tmp = lisys_realloc (self->vertices.array, capacity * sizeof (LIMdlVertex));
-		if (tmp == NULL)
-			return 0;
-		self->vertices.array = tmp;
-		self->vertices.capacity = capacity;
-	}
-	count = self->vertices.count;
-
-	/* Append vertex. */
-	self->vertices.array[count] = *vertex;
-	self->vertices.count++;
-
-	return 1;
-}
-
-/**
- * \brief Inserts vertex weights to the model.
- *
- * \param self Model.
- * \param weights Vertex weights or NULL.
- * \param mapping Maps group indices of the weights array. NULL if no mapping is needed.
- * \return Nonzero on success.
- */
-int limdl_model_insert_vertex_weights (
-	LIMdlModel*         self,
-	const LIMdlWeights* weights,
-	const int*          mapping)
-{
-	int i;
-	int group;
-	int count;
-	int capacity;
-	LIMdlWeights* tmp;
-	LIMdlWeights* dstwei;
-
-	/* Don't create weights when none are needed. */
-	if (!self->weights.count && (weights == NULL || !weights->count))
-		return 1;
-	lisys_assert (self->weights.count < self->vertices.count);
-	count = self->weights.count;
-
-	/* Allocate space for weights. */
-	if (self->weights.capacity < self->vertices.count)
-	{
-		if (self->weights.capacity)
-			capacity = self->weights.capacity;
-		else
-			capacity = 32;
-		while (capacity < self->vertices.count) 
-			capacity = capacity << 1;
-		tmp = lisys_realloc (self->weights.array, capacity * sizeof (LIMdlWeights));
-		if (tmp == NULL)
-			return 0;
-		self->weights.array = tmp;
-		self->weights.capacity = capacity;
-	}
-
-	/* Initialize the new weights and any missing weights. */
-	memset (self->weights.array + count, 0, (self->vertices.count - count) * sizeof (LIMdlWeights));
-	dstwei = self->weights.array + self->vertices.count - 1;
-
-	/* Copy weights. */
-	if (weights != NULL && weights->count)
-	{
-		dstwei->weights = lisys_malloc (weights->count * sizeof (LIMdlWeight));
-		if (dstwei->weights == NULL)
-			return 0;
-		memcpy (dstwei->weights, weights->weights, weights->count * sizeof (LIMdlWeight));
-		dstwei->count = weights->count;
-	}
-	self->weights.count = self->vertices.count;
-
-	/* Remap weight group indices. */
-	if (mapping != NULL)
-	{
-		for (i = 0 ; i < dstwei->count ; i++)
-		{
-			group = mapping[dstwei->weights[i].group];
-			lisys_assert (group < self->weightgroups.count);
-			dstwei->weights[i].group = group;
-		}
-	}
-
-	/* Choose vertex weights for hardware deformation. */
-	i = self->vertices.count - 1;
-	private_build_vertex_weights (self, self->vertices.array + i, dstwei);
-
-	return 1;
-}
-
-/**
- * \brief Inserts a vertex to the model.
- *
- * \param self Model.
- * \param vertex Vertex.
- * \param weights Vertex weights or NULL.
- * \param mapping Maps group indices of the weights array. NULL if no mapping is needed.
- * \return Nonzero on success.
- */
-int limdl_model_insert_vertex_weighted (
-	LIMdlModel*         self,
-	const LIMdlVertex*  vertex,
-	const LIMdlWeights* weights,
-	const int*          mapping)
-{
-	if (!limdl_model_insert_vertex (self, vertex))
-		return 0;
-	if (!limdl_model_insert_vertex_weights (self, weights, mapping))
-	{
-		self->vertices.count--;
-		return 0;
-	}
-
-	return 1;
-}
-
-/**
- * \brief Inserts a weight group to the model.
- *
- * \param self Model.
- * \param name Group name.
- * \param bone Bone name.
- * \return Nonzero on success.
- */
-int limdl_model_insert_weightgroup (
+int limdl_model_merge (
 	LIMdlModel* self,
-	const char* name,
-	const char* bone)
-{
-	int count;
-	LIMdlWeightGroup* tmp;
-
-	/* Resize buffer. */
-	count = self->weightgroups.count + 1;
-	tmp = lisys_realloc (self->weightgroups.array, count * sizeof (LIMdlWeightGroup));
-	if (tmp == NULL)
-		return 0;
-	self->weightgroups.array = tmp;
-	tmp += self->weightgroups.count;
-
-	/* Copy weight group. */
-	tmp->name = listr_dup (name);
-	tmp->bone = listr_dup (bone);
-	if (tmp->name == NULL || tmp->bone == NULL)
-	{
-		lisys_free (tmp->name);
-		lisys_free (tmp->bone);
-		return 0;
-	}
-	self->weightgroups.count++;
-
-	/* Map node. */
-	tmp->node = limdl_model_find_node (self, tmp->bone);
-
-	return 1;
-}
-
-int
-limdl_model_merge (LIMdlModel* self,
-                   LIMdlModel* model)
+	LIMdlModel* model)
 {
 	int i;
 	int j;
 	int count;
 	int group;
 	int material;
-	int vertex;
 	int* vertices = NULL;
 	int* wgroups = NULL;
 	uint32_t index;
 	uint32_t* indices;
+	LIMdlBuilder* builder = NULL;
 	LIMdlFaces* dstfaces;
 	LIMdlFaces* srcfaces;
-	LIMdlWeights* weights;
+
+	/* Create a model builder. */
+	builder = limdl_builder_new (self);
+	if (builder == NULL)
+		goto error;
 
 	/* Map weight groups. */
 	if (model->weightgroups.count)
@@ -994,7 +551,7 @@ limdl_model_merge (LIMdlModel* self,
 			if (group == -1)
 			{
 				group = self->weightgroups.count;
-				if (!limdl_model_insert_weightgroup (self, 
+				if (!limdl_builder_insert_weightgroup (builder, 
 				    model->weightgroups.array[i].name,
 				    model->weightgroups.array[i].bone))
 					goto error;
@@ -1009,22 +566,9 @@ limdl_model_merge (LIMdlModel* self,
 	{
 		vertices = lisys_calloc (model->vertices.count, sizeof (int));
 		for (i = 0 ; i < model->vertices.count ; i++)
-		{
-			/* FIXME: Too slow with the lousy search algorithm. */
-/*			vertex = limdl_model_find_vertex_weighted (self, model->vertices.array + i,
-				model->weights.array + i, wgroups);
-			if (vertex == -1)*/
-			{
-				vertex = self->vertices.count;
-				if (model->weights.count)
-					weights = model->weights.array + i;
-				else
-					weights = NULL;
-				if (!limdl_model_insert_vertex_weighted (self, model->vertices.array + i, weights, wgroups))
-					goto error;
-			}
-			vertices[i] = vertex;
-		}
+			vertices[i] = self->vertices.count + i;
+		if (!limdl_builder_insert_vertices (builder, model->vertices.array, model->vertices.count, wgroups))
+			goto error;
 	}
 
 	/* Merge each face group. */
@@ -1037,7 +581,7 @@ limdl_model_merge (LIMdlModel* self,
 		if (material == -1)
 		{
 			material = self->materials.count;
-			if (!limdl_model_insert_material (self, model->materials.array + srcfaces->material))
+			if (!limdl_builder_insert_material (builder, model->materials.array + srcfaces->material))
 				goto error;
 		}
 
@@ -1046,7 +590,7 @@ limdl_model_merge (LIMdlModel* self,
 		if (group == -1)
 		{
 			group = self->facegroups.count;
-			if (!limdl_model_insert_facegroup (self, material))
+			if (!limdl_builder_insert_facegroup (builder, material))
 				goto error;
 		}
 
@@ -1073,27 +617,31 @@ limdl_model_merge (LIMdlModel* self,
 		}
 	}
 
+	limdl_builder_finish (builder);
+	limdl_builder_free (builder);
 	lisys_free (wgroups);
 	lisys_free (vertices);
 
 	return 1;
 
 error:
+	if (builder != NULL)
+		limdl_builder_free (builder);
 	lisys_free (wgroups);
 	lisys_free (vertices);
 	return 0;
 }
 
-int
-limdl_model_write (const LIMdlModel* self,
-                   LIArcWriter*      writer)
+int limdl_model_write (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
 {
 	return private_write (self, writer);
 }
 
-int
-limdl_model_write_file (const LIMdlModel* self,
-                        const char*       path)
+int limdl_model_write_file (
+	const LIMdlModel* self,
+	const char*       path)
 {
 	LIArcWriter* writer;
 
@@ -1114,8 +662,8 @@ limdl_model_write_file (const LIMdlModel* self,
 	return 1;
 }
 
-int
-limdl_model_get_index_count (const LIMdlModel* self)
+int limdl_model_get_index_count (
+	const LIMdlModel* self)
 {
 	int i;
 	int c;
@@ -1128,8 +676,8 @@ limdl_model_get_index_count (const LIMdlModel* self)
 
 /*****************************************************************************/
 
-static void
-private_build (LIMdlModel* self)
+static void private_build (
+	LIMdlModel* self)
 {
 	int i;
 	LIMdlNode* node;
@@ -1148,74 +696,11 @@ private_build (LIMdlModel* self)
 		node = self->nodes.array[i];
 		limdl_node_rebuild (node, 1);
 	}
-
-	/* Choose vertex weights for hardware deformation. */
-	for (i = 0 ; i < self->weights.count ; i++)
-		private_build_vertex_weights (self, self->vertices.array + i, self->weights.array + i);
 }
 
-static void private_build_vertex_weights (
-	LIMdlModel*   self,
-	LIMdlVertex*  vertex,
-	LIMdlWeights* weights)
-{
-	int i;
-	int j;
-	int bone;
-	float weight;
-	float weights_tmp[LIMDL_VERTEX_WEIGHTS_MAX + 1];
-	unsigned char bones_tmp[LIMDL_VERTEX_WEIGHTS_MAX + 1];
-
-	/* Initialize empty weights. */
-	for (i = 0 ; i < LIMDL_VERTEX_WEIGHTS_MAX + 1 ; i++)
-	{
-		weights_tmp[i] = 0.0f;
-		bones_tmp[i] = 0;
-	}
-
-	/* Insertion sort the weights. */
-	for (i = 0 ; i < weights->count ; i++)
-	{
-		bone = weights->weights[i].group;
-		if (self->weightgroups.array[bone].node != NULL)
-		{
-			lisys_assert (bone < self->weightgroups.count);
-			weight = weights->weights[i].weight;
-			if (weight == 0.0f)
-				continue;
-			for (j = LIMDL_VERTEX_WEIGHTS_MAX ; j > 0 && weight > weights_tmp[j - 1] ; j--)
-			{
-				weights_tmp[j] = weights_tmp[j - 1];
-				bones_tmp[j] = bones_tmp[j - 1];
-			}
-			bones_tmp[j] = bone + 1;
-			weights_tmp[j] = weight;
-		}
-	}
-
-	/* Normalize the weights. */
-	weight = 0.0f;
-	for (i = 0 ; i < LIMDL_VERTEX_WEIGHTS_MAX ; i++)
-		weight += weights_tmp[i];
-	if (weight > LIMAT_EPSILON)
-	{
-		for (i = 0 ; i < LIMDL_VERTEX_WEIGHTS_MAX ; i++)
-			weights_tmp[i] /= weight;
-	}
-	else
-	{
-		weights_tmp[0] = 1.0f;
-		bones_tmp[0] = 0;
-	}
-
-	/* Store the most significant weights to the vertex. */
-	memcpy (vertex->weights, weights_tmp, LIMDL_VERTEX_WEIGHTS_MAX * sizeof (float));
-	memcpy (vertex->bones, bones_tmp, LIMDL_VERTEX_WEIGHTS_MAX * sizeof (char));
-}
-
-static int
-private_read (LIMdlModel*  self,
-              LIArcReader* reader)
+static int private_read (
+	LIMdlModel*  self,
+	LIArcReader* reader)
 {
 	int i;
 	int j;
@@ -1322,11 +807,11 @@ private_read (LIMdlModel*  self,
 			return 0;
 		}
 	}
-	for (i = 0 ; i < self->weights.count ; i++)
+	for (i = 0 ; i < self->vertices.count ; i++)
 	{
-		for (j = 0 ; j < self->weights.array[i].count ; j++)
+		for (j = 0 ; j < LIMDL_VERTEX_WEIGHTS_MAX ; j++)
 		{
-			if (self->weights.array[i].weights[j].group >= self->weightgroups.count)
+			if (self->vertices.array[i].bones[j] > self->weightgroups.count)
 			{
 				lisys_error_set (EINVAL, "weight group index out of bounds");
 				return 0;
@@ -1337,9 +822,9 @@ private_read (LIMdlModel*  self,
 	return 1;
 }
 
-static int
-private_read_animations (LIMdlModel*  self,
-                         LIArcReader* reader)
+static int private_read_animations (
+	LIMdlModel*  self,
+	LIArcReader* reader)
 {
 	int i;
 	uint32_t tmp;
@@ -1386,9 +871,9 @@ static int private_read_bounds (
 	return 1;
 }
 
-static int
-private_read_faces (LIMdlModel*  self,
-                    LIArcReader* reader)
+static int private_read_faces (
+	LIMdlModel*  self,
+	LIArcReader* reader)
 {
 	int i;
 	uint32_t tmp;
@@ -1416,9 +901,9 @@ private_read_faces (LIMdlModel*  self,
 	return 1;
 }
 
-static int
-private_read_hairs (LIMdlModel*  self,
-                    LIArcReader* reader)
+static int private_read_hairs (
+	LIMdlModel*  self,
+	LIArcReader* reader)
 {
 	int i;
 	uint32_t count;
@@ -1444,9 +929,9 @@ private_read_hairs (LIMdlModel*  self,
 	return 1;
 }
 
-static int
-private_read_materials (LIMdlModel*  self,
-                        LIArcReader* reader)
+static int private_read_materials (
+	LIMdlModel*  self,
+	LIArcReader* reader)
 {
 	int i;
 	uint32_t tmp;
@@ -1472,9 +957,9 @@ private_read_materials (LIMdlModel*  self,
 	return 1;
 }
 
-static int
-private_read_nodes (LIMdlModel*  self,
-                    LIArcReader* reader)
+static int private_read_nodes (
+	LIMdlModel*  self,
+	LIArcReader* reader)
 {
 	int i;
 	uint32_t tmp;
@@ -1533,9 +1018,9 @@ static int private_read_particles (
 	return 1;
 }
 
-static int
-private_read_shapes (LIMdlModel*  self,
-                     LIArcReader* reader)
+static int private_read_shapes (
+	LIMdlModel*  self,
+	LIArcReader* reader)
 {
 	int i;
 	uint32_t tmp;
@@ -1561,9 +1046,9 @@ private_read_shapes (LIMdlModel*  self,
 	return 1;
 }
 
-static int
-private_read_vertices (LIMdlModel*  self,
-                       LIArcReader* reader)
+static int private_read_vertices (
+	LIMdlModel*  self,
+	LIArcReader* reader)
 {
 	int i;
 	uint32_t tmp;
@@ -1573,7 +1058,6 @@ private_read_vertices (LIMdlModel*  self,
 	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
 	self->vertices.count = tmp;
-	self->vertices.capacity = tmp;
 
 	/* Read vertices. */
 	if (tmp)
@@ -1601,9 +1085,9 @@ private_read_vertices (LIMdlModel*  self,
 	return 1;
 }
 
-static int
-private_read_weights (LIMdlModel*  self,
-                      LIArcReader* reader)
+static int private_read_weights (
+	LIMdlModel*  self,
+	LIArcReader* reader)
 {
 	int i;
 	uint32_t tmp[2];
@@ -1641,14 +1125,9 @@ private_read_weights (LIMdlModel*  self,
 	/* Read vertex weights. */
 	if (tmp[1])
 	{
-		self->weights.array = lisys_calloc (tmp[1], sizeof (LIMdlWeights));
-		if (self->weights.array == NULL)
-			return 0;
-		self->weights.count = tmp[1];
-		self->weights.capacity = tmp[1];
-		for (i = 0 ; i < self->weights.count ; i++)
+		for (i = 0 ; i < self->vertices.count ; i++)
 		{
-			if (!private_read_vertex_weights (self, self->weights.array + i, reader))
+			if (!private_read_vertex_weights (self, self->vertices.array + i, reader))
 				return 0;
 		}
 	}
@@ -1656,27 +1135,34 @@ private_read_weights (LIMdlModel*  self,
 	return 1;
 }
 
-static int
-private_read_vertex_weights (LIMdlModel*   self,
-                             LIMdlWeights* weights,
-                             LIArcReader*  reader)
+static int private_read_vertex_weights (
+	LIMdlModel*  self,
+	LIMdlVertex* vertex,
+	LIArcReader* reader)
 {
-	float weight;
 	uint32_t i;
+	uint32_t j;
 	uint32_t count;
 	uint32_t group;
+	float weight;
+	float weights_tmp[LIMDL_VERTEX_WEIGHTS_MAX + 1];
+	unsigned char bones_tmp[LIMDL_VERTEX_WEIGHTS_MAX + 1];
 
 	/* Read header. */
 	if (!liarc_reader_get_uint32 (reader, &count))
 		return 0;
 
-	/* Allocate weights. */
-	weights->count = count;
-	weights->weights = lisys_calloc (count, sizeof (LIMdlWeight));
-	if (weights->weights == NULL)
-		return 0;
+	/* Initialize empty weights. */
+	for (i = 0 ; i < LIMDL_VERTEX_WEIGHTS_MAX + 1 ; i++)
+	{
+		weights_tmp[i] = 0.0f;
+		bones_tmp[i] = 0;
+	}
 
 	/* Read weights. */
+	/* We only save the most significant weights by doing in place insertion
+	   sorting. Weights cannot be eliminated here because the bones using them
+	   might become available only after a model merge. */
 	for (i = 0 ; i < count ; i++)
 	{
 		if (!liarc_reader_get_uint32 (reader, &group) ||
@@ -1687,9 +1173,35 @@ private_read_vertex_weights (LIMdlModel*   self,
 			lisys_error_set (EINVAL, "weight group index out of bounds");
 			return 0;
 		}
-		weights->weights[i].group = group;
-		weights->weights[i].weight = weight;
+		if (weight == 0.0f)
+			continue;
+		for (j = LIMDL_VERTEX_WEIGHTS_MAX ; j > 0 && weight > weights_tmp[j - 1] ; j--)
+		{
+			weights_tmp[j] = weights_tmp[j - 1];
+			bones_tmp[j] = bones_tmp[j - 1];
+		}
+		bones_tmp[j] = group + 1;
+		weights_tmp[j] = weight;
 	}
+
+	/* Normalize the weights. */
+	weight = 0.0f;
+	for (i = 0 ; i < LIMDL_VERTEX_WEIGHTS_MAX ; i++)
+		weight += weights_tmp[i];
+	if (weight > LIMAT_EPSILON)
+	{
+		for (i = 0 ; i < LIMDL_VERTEX_WEIGHTS_MAX ; i++)
+			weights_tmp[i] /= weight;
+	}
+	else
+	{
+		weights_tmp[0] = 1.0f;
+		bones_tmp[0] = 0;
+	}
+
+	/* Store the most significant weights to the vertex. */
+	memcpy (vertex->weights, weights_tmp, LIMDL_VERTEX_WEIGHTS_MAX * sizeof (float));
+	memcpy (vertex->bones, bones_tmp, LIMDL_VERTEX_WEIGHTS_MAX * sizeof (char));
 
 	return 1;
 }
@@ -2002,8 +1514,9 @@ static int private_write_weights (
 {
 	int i;
 	int j;
+	int count;
+	LIMdlVertex* vertex;
 	LIMdlWeightGroup* group;
-	LIMdlWeights* weights;
 
 	/* Check if writing is needed. */
 	if (!self->weightgroups.count)
@@ -2024,19 +1537,24 @@ static int private_write_weights (
 	}
 
 	/* Write header. */
-	if (!liarc_writer_append_uint32 (writer, self->weights.count))
+	if (!liarc_writer_append_uint32 (writer, self->vertices.count))
 		return 0;
 
 	/* Write vertex weights. */
-	for (i = 0 ; i < self->weights.count ; i++)
+	for (i = 0 ; i < self->vertices.count ; i++)
 	{
-		weights = self->weights.array + i;
-		if (!liarc_writer_append_uint32 (writer, weights->count))
-			return 0;
-		for (j = 0 ; j < weights->count ; j++)
+		vertex = self->vertices.array + i;
+		for (count = 0 ; count < LIMDL_VERTEX_WEIGHTS_MAX ; count++)
 		{
-			if (!liarc_writer_append_uint32 (writer, weights->weights[j].group) ||
-			    !liarc_writer_append_float (writer, weights->weights[j].weight))
+			if (!vertex->bones[count])
+				break;
+		}
+		if (!liarc_writer_append_uint32 (writer, count))
+			return 0;
+		for (j = 0 ; j < count ; j++)
+		{
+			if (!liarc_writer_append_uint32 (writer, vertex->bones[j] - 1) ||
+			    !liarc_writer_append_float (writer, vertex->weights[j]))
 				return 0;
 		}
 	}

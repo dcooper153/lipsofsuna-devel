@@ -21,6 +21,7 @@
 #include "model/model.h"
 #include "model/model-animation.h"
 #include "model/model-bone.h"
+#include "model/model-builder.h"
 #include "model/model-hair.h"
 #include "model/model-material.h"
 #include "model/model-node.h"

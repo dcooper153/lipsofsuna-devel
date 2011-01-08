@@ -18,9 +18,7 @@
 #ifndef __MODEL_H__
 #define __MODEL_H__
 
-#include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/math.h>
-#include <lipsofsuna/string.h>
 #include <lipsofsuna/system.h>
 #include "model-animation.h"
 #include "model-bone.h"
@@ -46,20 +44,6 @@ enum
 	LIMDL_MATERIAL_FLAG_TRANSPARENCY = 0x08,
 };
 
-typedef struct _LIMdlWeight LIMdlWeight;
-struct _LIMdlWeight
-{
-	int group;
-	float weight;
-};
-
-typedef struct _LIMdlWeights LIMdlWeights;
-struct _LIMdlWeights
-{
-	int count;
-	LIMdlWeight* weights;
-};
-
 struct _LIMdlWeightGroup
 {
 	char* name;
@@ -80,14 +64,9 @@ struct _LIMdlModel
 	struct { int count; LIMdlNode** array; } nodes;
 	struct { int count; LIMdlParticleSystem* array; } particlesystems;
 	struct { int count; LIMdlShape* array; } shapes;
-	struct { int count; LIMdlVertex* array; int capacity; } vertices;
+	struct { int count; LIMdlVertex* array; } vertices;
 	struct { int count; LIMdlWeightGroup* array; } weightgroups;
-	struct { int count; LIMdlWeights* array; int capacity; } weights;
 };
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 LIAPICALL (LIMdlModel*, limdl_model_new, ());
 
@@ -100,10 +79,10 @@ LIAPICALL (LIMdlModel*, limdl_model_new_from_data, (
 LIAPICALL (LIMdlModel*, limdl_model_new_from_file, (
 	const char* path));
 
-LIAPICALL (void, limdl_model_calculate_bounds, (
+LIAPICALL (void, limdl_model_free, (
 	LIMdlModel* self));
 
-LIAPICALL (void, limdl_model_free, (
+LIAPICALL (void, limdl_model_calculate_bounds, (
 	LIMdlModel* self));
 
 LIAPICALL (LIMdlAnimation*, limdl_model_find_animation, (
@@ -126,57 +105,7 @@ LIAPICALL (int, limdl_model_find_vertex, (
 	LIMdlModel*        self,
 	const LIMdlVertex* vertex));
 
-LIAPICALL (int, limdl_model_find_vertex_weighted, (
-	LIMdlModel*         self,
-	const LIMdlVertex*  vertex,
-	const LIMdlWeights* weights,
-	const int*          mapping));
-
 LIAPICALL (int, limdl_model_find_weightgroup, (
-	LIMdlModel* self,
-	const char* name,
-	const char* bone));
-
-LIAPICALL (int, limdl_model_insert_face, (
-	LIMdlModel*         self,
-	int                 group,
-	const LIMdlVertex*  vertices,
-	const LIMdlWeights* weights));
-
-LIAPICALL (int, limdl_model_insert_facegroup, (
-	LIMdlModel* self,
-	int         material));
-
-LIAPICALL (int, limdl_model_insert_indices, (
-	LIMdlModel* self,
-	int         group,
-	uint32_t*   indices,
-	int         count));
-
-LIAPICALL (int, limdl_model_insert_material, (
-	LIMdlModel*          self,
-	const LIMdlMaterial* material));
-
-LIAPICALL (int, limdl_model_insert_node, (
-	LIMdlModel*      self,
-	const LIMdlNode* node));
-
-LIAPICALL (int, limdl_model_insert_vertex, (
-	LIMdlModel*         self,
-	const LIMdlVertex*  vertex));
-
-LIAPICALL (int, limdl_model_insert_vertex_weighted, (
-	LIMdlModel*         self,
-	const LIMdlVertex*  vertex,
-	const LIMdlWeights* weights,
-	const int*          mapping));
-
-LIAPICALL (int, limdl_model_insert_vertex_weights, (
-	LIMdlModel*         self,
-	const LIMdlWeights* weights,
-	const int*          mapping));
-
-LIAPICALL (int, limdl_model_insert_weightgroup, (
 	LIMdlModel* self,
 	const char* name,
 	const char* bone));
@@ -195,9 +124,5 @@ LIAPICALL (int, limdl_model_write_file, (
 
 LIAPICALL (int, limdl_model_get_index_count, (
 	const LIMdlModel* self));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -54,7 +54,7 @@ struct _LIVoxBuilder
 	float tile_width;
 	float vertex_scale;
 	LIEngEngine* engine;
-	LIMdlModel* model;
+	LIMdlBuilder* model_builder;
 	LIPhyTerrain* physics;
 	LIPhyPhysics* physics_manager;
 	LIVoxManager* manager;
@@ -225,15 +225,20 @@ int livox_builder_build (
 			if (result_physics != NULL)
 				*result_physics = self->physics;
 			if (result_model != NULL)
-				*result_model = self->model;
+			{
+				if (self->model_builder != NULL)
+					*result_model = self->model_builder->model;
+				else
+					*result_model = NULL;
+			}
 		}
 		else
 		{
 			if (self->physics != NULL)
 				liphy_terrain_free (self->physics);
-			if (self->model != NULL)
-				limdl_model_free (self->model);
 		}
+		if (self->model_builder != NULL)
+			limdl_builder_free (self->model_builder);
 	}
 
 	return ret;
@@ -319,8 +324,8 @@ static int private_build (
 		private_merge_voxel (self, x, y, z);
 
 	/* Calculate bounds needed by frustum culling. */
-	if (self->model != NULL)
-		limdl_model_calculate_bounds (self->model);
+	if (self->model_builder != NULL)
+		limdl_builder_finish (self->model_builder);
 
 	return ret;
 }
@@ -333,20 +338,20 @@ static int private_merge_material (
 	int m;
 
 	/* Find or create material. */
-	m = limdl_model_find_material (self->model, material);
+	m = limdl_model_find_material (self->model_builder->model, material);
 	if (m == -1)
 	{
-		m = self->model->materials.count;
-		if (!limdl_model_insert_material (self->model, material))
+		m = self->model_builder->model->materials.count;
+		if (!limdl_builder_insert_material (self->model_builder, material))
 			return -1;
 	}
 
 	/* Find or create face group. */
-	g = limdl_model_find_facegroup (self->model, m);
+	g = limdl_model_find_facegroup (self->model_builder->model, m);
 	if (g == -1)
 	{
-		g = self->model->facegroups.count;
-		if (!limdl_model_insert_facegroup (self->model, m))
+		g = self->model_builder->model->facegroups.count;
+		if (!limdl_builder_insert_facegroup (self->model_builder, m))
 			return -1;
 	}
 
@@ -372,10 +377,9 @@ static int private_merge_triangles_model (
 	float scale;
 	float splat;
 	float uv[2] = { 0.0f, 0.0f };
-	uint32_t indices[3];
 	LIMatVector coord[3];
 	LIMatVector normal[3];
-	LIMdlVertex vertex;
+	LIMdlVertex vertices[3];
 	const int regions[4] = { 0, 1, 1, 2 };
 
 	/* Find or create material. */
@@ -400,7 +404,7 @@ static int private_merge_triangles_model (
 			limat_vector_subtract (coord[0], coord[1]),
 			limat_vector_subtract (coord[1], coord[2])));
 
-		/* Merge vertices. */
+		/* Calculate texture coordinates and splatting. */
 		for (j = 0 ; j < 3 ; j++)
 		{
 			/* Calculate texture splatting factor. */
@@ -448,17 +452,12 @@ static int private_merge_triangles_model (
 				}
 			}
 
-			/* Merge the vertex. */
-			limdl_vertex_init (&vertex, coord + j, normal + j, uv[0], uv[1]);
-			if (!limdl_model_insert_vertex (self->model, &vertex))
-				return 0;
+			/* Initialize the vertex. */
+			limdl_vertex_init (vertices + j, coord + j, normal + j, uv[0], uv[1]);
 		}
 
-		/* Merge indices. */
-		indices[0] = self->model->vertices.count - 3;
-		indices[1] = self->model->vertices.count - 2;
-		indices[2] = self->model->vertices.count - 1;
-		if (!limdl_model_insert_indices (self->model, group, indices, 3))
+		/* Merge vertices. */
+		if (!limdl_builder_insert_face (self->model_builder, group, vertices, NULL))
 			return 0;
 	}
 
@@ -522,9 +521,9 @@ static void private_merge_voxel (
 	/* Add triangles to the model. */
 	if (self->model_wanted)
 	{
-		if (self->model == NULL)
-			self->model = limdl_model_new ();
-		if (self->model != NULL)
+		if (self->model_builder == NULL)
+			self->model_builder = limdl_builder_new (NULL);
+		if (self->model_builder != NULL)
 			private_merge_triangles_model (self, voxel, types, coords, count);
 	}
 
