@@ -26,11 +26,13 @@
 typedef struct _LISndSource LISndSource;
 struct _LISndSource
 {
+	int blocked_playing;
 	float volume;
 	float fade_factor;
 	float fade_value;
 	ALuint source;
 	ALint queued;
+	LISndSample* blocked_sample;
 };
 
 LIAPICALL (LISndSource*, lisnd_source_new, (

@@ -28,27 +28,32 @@
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 #include <lipsofsuna/archive.h>
+#include <lipsofsuna/string.h>
 #include <lipsofsuna/system.h>
 #include "sound-sample.h"
 
-static void
-private_flac_error_callback (const FLAC__StreamDecoder*     decoder,
-                             FLAC__StreamDecoderErrorStatus status,
-                             void*                          data);
+static void private_flac_error_callback (
+	const FLAC__StreamDecoder*     decoder,
+	FLAC__StreamDecoderErrorStatus status,
+	void*                          data);
 
-static FLAC__StreamDecoderWriteStatus
-private_flac_stream_callback (const FLAC__StreamDecoder* decoder,
-                              const FLAC__Frame*         frame,
-                              const FLAC__int32* const   buffer[],
-                              void*                      data);
+static FLAC__StreamDecoderWriteStatus private_flac_stream_callback (
+	const FLAC__StreamDecoder* decoder,
+	const FLAC__Frame*         frame,
+	const FLAC__int32* const   buffer[],
+	void*                      data);
 
-static int
-private_load_flac (LISndSample* self,
-                   const char*  file);
+static int private_load_flac (
+	LISndSample* self,
+	const char*  file);
 
-static int
-private_load_vorbis (LISndSample* self,
-                     const char*  file);
+static int private_load_vorbis (
+	LISndSample* self,
+	const char*  file);
+
+static void private_worker_thread (
+	LIThrAsyncCall* call,
+	void*           data);
 
 /*****************************************************************************/
 
@@ -61,9 +66,9 @@ private_load_vorbis (LISndSample* self,
  * \param file File name.
  * \return New sample or NULL.
  */
-LISndSample*
-lisnd_sample_new (LISndSystem* system,
-                  const char*  file)
+LISndSample* lisnd_sample_new (
+	LISndSystem* system,
+	const char*  file)
 {
 	LISndSample* self;
 
@@ -72,39 +77,28 @@ lisnd_sample_new (LISndSystem* system,
 	if (self == NULL)
 		return NULL;
 
+	/* Store the filename. */
+	self->file = listr_dup (file);
+	if (self->file == NULL)
+	{
+		lisnd_sample_free (self);
+		return NULL;
+	}
+
 	/* Allocate a buffer. */
 	alGenBuffers (1, &self->buffer);
 	if (alGetError() != AL_NO_ERROR)
 	{
-		lisys_free (self);
+		lisnd_sample_free (self);
 		return NULL;
 	}
 
-	/* Load the sample. */
-	if (lisys_path_check_ext (file, "flac"))
+	/* Start loading the sample. */
+	self->worker = lithr_async_call_new (private_worker_thread, NULL, self);
+	if (self->worker == NULL)
 	{
-		if (!private_load_flac (self, file))
-		{
-			lisnd_sample_free (self);
-			return NULL;
-		}
-	}
-	else if (lisys_path_check_ext (file, "ogg"))
-	{
-		if (!private_load_vorbis (self, file))
-		{
-			lisnd_sample_free (self);
-			return NULL;
-		}
-	}
-	else
-	{
-		if (!private_load_flac (self, file) &&
-		    !private_load_vorbis (self, file))
-		{
-			lisnd_sample_free (self);
-			return NULL;
-		}
+		lisnd_sample_free (self);
+		return NULL;
 	}
 
 	return self;
@@ -112,30 +106,37 @@ lisnd_sample_new (LISndSystem* system,
 
 /**
  * \brief Frees the sample.
- *
  * \param self Sample.
  */
-void
-lisnd_sample_free (LISndSample* self)
+void lisnd_sample_free (
+	LISndSample* self)
 {
+	/* Stop the worker thread. */
+	if (self->worker != NULL)
+	{
+		lithr_async_call_stop (self->worker);
+		lithr_async_call_free (self->worker);
+	}
+
 	alDeleteBuffers (1, &self->buffer);
+	lisys_free (self->file);
 	lisys_free (self);
 }
 
 /*****************************************************************************/
 
-static void
-private_flac_error_callback (const FLAC__StreamDecoder*     decoder,
-                             FLAC__StreamDecoderErrorStatus status,
-                             void*                          data)
+static void private_flac_error_callback (
+	const FLAC__StreamDecoder*     decoder,
+	FLAC__StreamDecoderErrorStatus status,
+	void*                          data)
 {
 }
 
-static FLAC__StreamDecoderWriteStatus
-private_flac_stream_callback (const FLAC__StreamDecoder* decoder,
-                              const FLAC__Frame*         frame,
-                              const FLAC__int32* const   buffer[],
-                              void*                      data)
+static FLAC__StreamDecoderWriteStatus private_flac_stream_callback (
+	const FLAC__StreamDecoder* decoder,
+	const FLAC__Frame*         frame,
+	const FLAC__int32* const   buffer[],
+	void*                      data)
 {
 	FLAC__uint32 i;
 	FLAC__uint32 j;
@@ -167,9 +168,9 @@ private_flac_stream_callback (const FLAC__StreamDecoder* decoder,
 	return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }
 
-static int
-private_load_flac (LISndSample* self,
-                   const char*  file)
+static int private_load_flac (
+	LISndSample* self,
+	const char*  file)
 {
 	ALenum format;
 	FLAC__uint32 bps;
@@ -250,9 +251,9 @@ private_load_flac (LISndSample* self,
 	return 1;
 }
 
-static int
-private_load_vorbis (LISndSample* self,
-                     const char*  file)
+static int private_load_vorbis (
+	LISndSample* self,
+	const char*  file)
 {
 	int bs = -1;
 	int freq;
@@ -306,6 +307,25 @@ private_load_vorbis (LISndSample* self,
 	lisys_free (buffer);
 
 	return 1;
+}
+
+static void private_worker_thread (
+	LIThrAsyncCall* call,
+	void*           data)
+{
+	LISndSample* self = data;
+
+	if (lisys_path_check_ext (self->file, "flac"))
+	{
+		if (!private_load_flac (self, self->file))
+			lisys_error_report ();
+	}
+	else if (lisys_path_check_ext (self->file, "ogg"))
+	{
+		if (!private_load_vorbis (self, self->file))
+			lisys_error_report ();
+	}
+	self->loaded = 1;
 }
 
 #endif

@@ -35,12 +35,11 @@ private_init_source (LISndSource* self,
 
 /**
  * \brief Creates an empty sound source.
- *
  * \param system Sound system.
  * \return New sound source or NULL.
  */
-LISndSource*
-lisnd_source_new (LISndSystem* system)
+LISndSource* lisnd_source_new (
+	LISndSystem* system)
 {
 	LISndSource* self;
 
@@ -63,14 +62,13 @@ lisnd_source_new (LISndSystem* system)
 
 /**
  * \brief Creates an sound source and queues a sample.
- *
  * \param system Sound system.
  * \param sample Sample to be queued.
  * \return New sound source or NULL.
  */
-LISndSource*
-lisnd_source_new_with_sample (LISndSystem* system,
-                              LISndSample* sample)
+LISndSource* lisnd_source_new_with_sample (
+	LISndSystem* system,
+	LISndSample* sample)
 {
 	LISndSource* self;
 
@@ -96,11 +94,10 @@ lisnd_source_new_with_sample (LISndSystem* system,
 
 /**
  * \brief Frees the sound source.
- *
  * \param self Sound source.
  */
-void
-lisnd_source_free (LISndSource* self)
+void lisnd_source_free (
+	LISndSource* self)
 {
 	alSourceStop (self->source);
 	alDeleteSources (1, &self->source);
@@ -119,12 +116,24 @@ lisnd_source_free (LISndSource* self)
  * \param secs Seconds since last update.
  * \return The number of samples in the queue.
  */
-int
-lisnd_source_update (LISndSource* self,
-                     float        secs)
+int lisnd_source_update (
+	LISndSource* self,
+	float        secs)
 {
 	ALint num;
 	ALuint buffer;
+
+	/* Handle blocking samples. */
+	/* Samples are loaded in separate threads so the sample may have not been
+	   loaded yet. We need to pass until the sample has been loaded. */
+	if (self->blocked_sample != NULL)
+	{
+		if (!self->blocked_sample->loaded)
+			return 1;
+		lisnd_source_queue_sample (self, self->blocked_sample);
+		if (self->blocked_playing)
+			alSourcePlay (self->source);
+	}
 
 	/* Update fading. */
 	if (self->fade_factor != 0.0f)
@@ -156,29 +165,33 @@ lisnd_source_update (LISndSource* self,
 
 /**
  * \brief Queues a sample.
- *
  * \param self Sound source.
  * \param sample Sample.
  */
-void
-lisnd_source_queue_sample (LISndSource* self,
-                           LISndSample* sample)
+void lisnd_source_queue_sample (
+	LISndSource* self,
+	LISndSample* sample)
 {
-	alSourceQueueBuffers (self->source, 1, &sample->buffer);
-	self->queued++;
+	if (sample->loaded)
+	{
+		alSourceQueueBuffers (self->source, 1, &sample->buffer);
+		self->blocked_sample = NULL;
+		self->queued++;
+	}
+	else
+		self->blocked_sample = sample;
 }
 
 /**
  * \brief Sets the fading speed of the source.
- *
  * \param self Sound source.
  * \param start Initial volume multiplier.
  * \param speed Fading amound per second.
  */
-void
-lisnd_source_set_fading (LISndSource* self,
-                         float        start,
-                         float        speed)
+void lisnd_source_set_fading (
+	LISndSource* self,
+	float        start,
+	float        speed)
 {
 	self->fade_value = start;
 	self->fade_factor = speed;
@@ -187,95 +200,95 @@ lisnd_source_set_fading (LISndSource* self,
 
 /**
  * \brief Sets the looping setting of the source.
- *
  * \param self Sound source.
  * \param looping Nonzero if should loop.
  */
-void
-lisnd_source_set_looping (LISndSource* self,
-                          int          looping)
+void lisnd_source_set_looping (
+	LISndSource* self,
+	int          looping)
 {
 	alSourcei (self->source, AL_LOOPING, looping);
 }
 
 /**
  * \brief Sets the pitch multiplier of the source.
- *
  * \param self Sound source.
  * \param value Pitch multiplier.
  */
-void
-lisnd_source_set_pitch (LISndSource* self,
-                        float        value)
+void lisnd_source_set_pitch (
+	LISndSource* self,
+	float        value)
 {
 	alSourcef (self->source, AL_PITCH, value);
 }
 
 /**
  * \brief Checks if the source is in playing state.
- *
  * \param self Sound source.
  */
-int
-lisnd_source_get_playing (LISndSource* self)
+int lisnd_source_get_playing (
+	LISndSource* self)
 {
 	ALint state;
 
+	if (self->blocked_playing)
+		return 1;
 	alGetSourcei (self->source, AL_SOURCE_STATE, &state);
 	return state == AL_PLAYING;
 }
 
 /**
  * \brief Plays or stops the source.
- *
  * \param self Sound source.
  * \param playing Nonzero for playing, zero for stopped.
  */
-void
-lisnd_source_set_playing (LISndSource* self,
-                          int          playing)
+void lisnd_source_set_playing (
+	LISndSource* self,
+	int          playing)
 {
 	if (playing)
-		alSourcePlay (self->source);
+	{
+		if (self->blocked_sample != NULL)
+			self->blocked_playing = 1;
+		else
+			alSourcePlay (self->source);
+	}
 	else
 		alSourcePause (self->source);
 }
 
 /**
  * \brief Sets the position of the source.
- *
  * \param self Sound source.
  * \param value Vector.
  */
-void
-lisnd_source_set_position (LISndSource*       self,
-                           const LIMatVector* value)
+void lisnd_source_set_position (
+	LISndSource*       self,
+	const LIMatVector* value)
 {
 	alSource3f (self->source, AL_POSITION, -value->x, value->y, -value->z);
 }
 
 /**
  * \brief Sets the velocity of the source.
- *
  * \param self Sound source.
  * \param value Vector.
  */
-void
-lisnd_source_set_velocity (LISndSource*       self,
-                           const LIMatVector* value)
+void lisnd_source_set_velocity (
+	LISndSource*       self,
+	const LIMatVector* value)
 {
 	alSource3f (self->source, AL_VELOCITY, value->x, value->y, value->z);
 }
 
 /**
  * \brief Sets the volume of the source.
- *
  * \param self Sound source.
  * \param value Volume.
  */
-void
-lisnd_source_set_volume (LISndSource* self,
-                         float        value)
+void lisnd_source_set_volume (
+	LISndSource* self,
+	float        value)
 {
 	self->volume = value;
 	alSourcef (self->source, AL_GAIN, self->fade_value * self->volume);
