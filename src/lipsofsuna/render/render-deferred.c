@@ -253,7 +253,7 @@ private_rebuild (LIRenDeferred* self,
 	/* Create depth texture. */
 	glGenTextures (1, &depth_texture);
 	glBindTexture (GL_TEXTURE_2D, depth_texture);
-	glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, width, height,
+	glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height,
 		0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
