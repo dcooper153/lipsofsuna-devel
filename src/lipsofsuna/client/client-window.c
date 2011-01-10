@@ -26,22 +26,21 @@
 #include "client.h"
 #include "client-window.h"
 
-static int
-private_init_input (LICliWindow* self);
+static int private_init_input (
+	LICliWindow* self);
 
-static int
-private_init_video (LICliWindow* self);
+static int private_init_video (
+	LICliWindow* self);
 
-static int
-private_resize (LICliWindow* self,
-                int          width,
-                int          height,
-                int          fsaa);
+static int private_resize (
+	LICliWindow* self,
+	int          width,
+	int          height);
 
 /****************************************************************************/
 
-LICliWindow*
-licli_window_new (LICliClient* client)
+LICliWindow* licli_window_new (
+	LICliClient* client)
 {
 	LICliWindow* self;
 
@@ -62,8 +61,8 @@ licli_window_new (LICliClient* client)
 	return self;
 }
 
-void
-licli_window_free (LICliWindow* self)
+void licli_window_free (
+	LICliWindow* self)
 {
 	if (self->joystick != NULL)
 		SDL_JoystickClose (self->joystick);
@@ -74,17 +73,10 @@ licli_window_free (LICliWindow* self)
 	lisys_free (self);
 }
 
-void
-licli_window_set_fsaa (LICliWindow* self,
-                       int          samples)
-{
-	private_resize (self, self->mode.width, self->mode.height, samples);
-}
-
-void
-licli_window_get_size (const LICliWindow* self,
-                       int*               width,
-                       int*               height)
+void licli_window_get_size (
+	const LICliWindow* self,
+	int*               width,
+	int*               height)
 {
 	if (width != NULL)
 		*width = self->mode.width;
@@ -92,31 +84,31 @@ licli_window_get_size (const LICliWindow* self,
 		*height = self->mode.height;
 }
 
-int
-licli_window_set_size (LICliWindow* self,
-                       int          width,
-                       int          height)
+int licli_window_set_size (
+	LICliWindow* self,
+	int          width,
+	int          height)
 {
-	if (!private_resize (self, width, height, self->mode.fsaa))
+	if (!private_resize (self, width, height))
 		return 0;
 	return 1;
 }
 
 /****************************************************************************/
 
-static int
-private_init_input (LICliWindow* self)
+static int private_init_input (
+	LICliWindow* self)
 {
 	self->joystick = SDL_JoystickOpen (0);
 	SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 	return 1;
 }
 
-static int
-private_init_video (LICliWindow* self)
+static int private_init_video (
+	LICliWindow* self)
 {
 	/* Create the window. */
-	if (!private_resize (self, 1024, 768, 0))
+	if (!private_resize (self, 1024, 768))
 		return 0;
 	if (TTF_Init () == -1)
 	{
@@ -127,31 +119,17 @@ private_init_video (LICliWindow* self)
 	return 1;
 }
 
-static int
-private_resize (LICliWindow* self,
-                int          width,
-                int          height,
-                int          fsaa)
+static int private_resize (
+	LICliWindow* self,
+	int          width,
+	int          height)
 {
-	int depth;
-
 	/* Recreate surface. */
-	for ( ; fsaa >= 0 ; fsaa--)
-	{
-		for (depth = 32 ; depth ; depth -= 8)
-		{
-			SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, depth);
-			SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
-			SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
-			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLEBUFFERS, fsaa? 1 : 0);
-			SDL_GL_SetAttribute (SDL_GL_MULTISAMPLESAMPLES, fsaa);
-			self->screen = SDL_SetVideoMode (width, height, 0, SDL_OPENGL | SDL_RESIZABLE);
-			if (self->screen != NULL)
-				break;
-		}
-		if (self->screen != NULL)
-			break;
-	}
+	SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 0);
+	SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 0);
+	SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
+	SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
+	self->screen = SDL_SetVideoMode (width, height, 0, SDL_OPENGL | SDL_RESIZABLE);
 	if (self->screen == NULL)
 	{
 		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot set video mode");
@@ -165,11 +143,6 @@ private_resize (LICliWindow* self,
 	/* Store mode. */
 	self->mode.width = width;
 	self->mode.height = height;
-	self->mode.fsaa = fsaa;
-	if (fsaa)
-		glEnable (GL_MULTISAMPLE_ARB);
-	else
-		glDisable (GL_MULTISAMPLE_ARB);
 
 	return 1;
 }

@@ -31,7 +31,6 @@ struct _LICliWindow
 	{
 		int width;
 		int height;
-		int fsaa;
 	} mode;
 };
 
@@ -40,10 +39,6 @@ LIAPICALL (LICliWindow*, licli_window_new, (
 
 LIAPICALL (void, licli_window_free, (
 	LICliWindow* self));
-
-LIAPICALL (void, licli_window_set_fsaa, (
-	LICliWindow* self,
-	int          samples));
 
 LIAPICALL (void, licli_window_get_size, (
 	const LICliWindow* self,
