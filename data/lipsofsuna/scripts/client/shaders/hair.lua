@@ -89,5 +89,5 @@ void main()
 	float fspec = los_light_specular_hair(IN.coord, normal, tangent, LOS_material_shininess);
 	vec4 light = los_light_combine(fattn, fdiff, fspec, LOS_light_ambient,
 		LOS_light_diffuse, LOS_light_specular * LOS_material_specular);
-	gl_FragColor = LOS_material_diffuse * diffuse * light;
+	LOS_output_0 = LOS_material_diffuse * diffuse * light;
 }]]}

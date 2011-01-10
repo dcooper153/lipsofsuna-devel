@@ -25,7 +25,7 @@
 #include <lipsofsuna/render.h>
 #include "ext-module.h"
 
-static const char* default_fragment_shader = "void main()\n{\ngl_FragColor = vec4(1.0,1.0,1.0,1.0);\n}";
+static const char* default_fragment_shader = "void main()\n{\nLOS_output_0 = vec4(1.0,1.0,1.0,1.0);\n}";
 static const char* default_vertex_shader = "void main()\n{\ngl_Position=vec4(LOS_coord,1.0);\n}";
 
 static void private_compile (

@@ -33,10 +33,10 @@ void main()
 	vec3 normal = normalize(var_normal);
 	vec4 diffuse = texture(LOS_diffuse_texture_0, var_texcoord);
 	/* Diffuse. */
-	gl_FragData[0] = mix(LOS_material_diffuse, vec4(diffuse.rgb,1.0), diffuse.a);
+	LOS_output_0 = mix(LOS_material_diffuse, vec4(diffuse.rgb,1.0), diffuse.a);
 	/* Specular. */
-	gl_FragData[1].rgb = LOS_material_specular.xyz * LOS_material_specular.a;
-	gl_FragData[1].a = LOS_material_shininess / 128.0;
+	LOS_output_1.rgb = LOS_material_specular.xyz * LOS_material_specular.a;
+	LOS_output_1.a = LOS_material_shininess / 128.0;
 	/* Normal. */
-	gl_FragData[2].xyz = 0.5 * normal + vec3(0.5);
+	LOS_output_2.xyz = 0.5 * normal + vec3(0.5);
 }]]}

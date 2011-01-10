@@ -35,10 +35,10 @@ void main()
 	if(diffuse.a < 0.5)
 		discard;
 	/* Diffuse. */
-	gl_FragData[0] = LOS_material_diffuse * diffuse;
+	LOS_output_0 = LOS_material_diffuse * diffuse;
 	/* Specular. */
-	gl_FragData[1].rgb = LOS_material_specular.xyz * LOS_material_specular.a;
-	gl_FragData[1].a = LOS_material_shininess / 128.0;
+	LOS_output_1.rgb = LOS_material_specular.xyz * LOS_material_specular.a;
+	LOS_output_1.a = LOS_material_shininess / 128.0;
 	/* Normal. */
-	gl_FragData[2].xyz = 0.5 * normal + vec3(0.5);
+	LOS_output_2.xyz = 0.5 * normal + vec3(0.5);
 }]]}

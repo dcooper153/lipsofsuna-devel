@@ -10,6 +10,6 @@ void main()
 pass3_fragment = [[
 void main()
 {
-	gl_FragColor = vec4(2.0, 2.0, 2.0, 1.0);
+	LOS_output_0 = vec4(2.0, 2.0, 2.0, 1.0);
 }]]}
 

@@ -286,7 +286,7 @@ void main()
 
 	vec3 normal = normalize (var_normal);
 
-	gl_FragColor = var_color * texture * lighting (normal);
-	gl_FragColor.a = var_color.a * texture.a;
+	LOS_output_0 = var_color * texture * lighting (normal);
+	LOS_output_0.a = var_color.a * texture.a;
 }]]}
 

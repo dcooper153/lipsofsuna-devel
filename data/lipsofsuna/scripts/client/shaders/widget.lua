@@ -16,5 +16,5 @@ pass1_fragment = [[
 in vec2 var_texcoord;
 void main()
 {
-	gl_FragColor = LOS_material_diffuse * texture(LOS_diffuse_texture_0, var_texcoord);
+	LOS_output_0 = LOS_material_diffuse * texture(LOS_diffuse_texture_0, var_texcoord);
 }]]}

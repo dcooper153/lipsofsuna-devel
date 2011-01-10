@@ -44,7 +44,7 @@ void main()
 	float fspec = los_light_specular(lightvector, normal, spec.a);
 	vec4 light = los_light_combine(fattn, fdiff, fspec, LOS_light_ambient,
 		LOS_light_diffuse, LOS_light_specular * vec4(spec.rgb, 1.0));
-	gl_FragColor = diffuse * light;
+	LOS_output_0 = diffuse * light;
 }]]}
 
 ------------------------------------------------------------------------------
@@ -98,5 +98,5 @@ void main()
 	float fspec = los_light_specular(lightvector, normal, spec.a);
 	vec4 light = los_light_combine(fattn, fspot * fdiff * fshad, fspec, LOS_light_ambient,
 		LOS_light_diffuse, LOS_light_specular * vec4(spec.rgb, 1.0));
-	gl_FragColor = diffuse * light;
+	LOS_output_0 = diffuse * light;
 }]]}

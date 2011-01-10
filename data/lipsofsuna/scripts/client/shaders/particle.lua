@@ -59,5 +59,5 @@ in fragvar
 } IN;
 void main()
 {
-	gl_FragColor = IN.color * texture(LOS_diffuse_texture_0, IN.texcoord);
+	LOS_output_0 = IN.color * texture(LOS_diffuse_texture_0, IN.texcoord);
 }]]}

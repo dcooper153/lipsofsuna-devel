@@ -52,10 +52,10 @@ layout(triangle_strip, max_vertices=3) out;
 in vec3 geo_coord[3];
 in vec3 geo_normal[3];
 in vec2 geo_texcoord[3];
-out vec3 LOS_out_coord;
-out vec3 LOS_out_normal;
-out vec3 LOS_out_tangent;
-out vec2 LOS_out_texcoord;
+out vec3 LOS_output_coord;
+out vec3 LOS_output_normal;
+out vec3 LOS_output_tangent;
+out vec2 LOS_output_texcoord;
 vec3 los_triangle_tangent(in vec3 co0, in vec3 co1, in vec3 co2, in vec2 uv0, in vec2 uv1, in vec2 uv2)
 {
 	vec3 ed0 = co1 - co0;
@@ -65,14 +65,14 @@ vec3 los_triangle_tangent(in vec3 co0, in vec3 co1, in vec3 co2, in vec2 uv0, in
 void main()
 {
 	int i;
-	LOS_out_tangent = los_triangle_tangent(
+	LOS_output_tangent = los_triangle_tangent(
 		geo_coord[0], geo_coord[1], geo_coord[2],
 		geo_texcoord[0], geo_texcoord[1], geo_texcoord[2]);
 	for(i = 0 ; i < gl_VerticesIn ; i++)
 	{
-		LOS_out_coord = geo_coord[i];
-		LOS_out_texcoord = geo_texcoord[i];
-		LOS_out_normal = geo_normal[i];
+		LOS_output_coord = geo_coord[i];
+		LOS_output_texcoord = geo_texcoord[i];
+		LOS_output_normal = geo_normal[i];
 		gl_Position = gl_PositionIn[i];
 		EmitVertex();
 	}

@@ -137,6 +137,6 @@ void main()
 			}
 		}
 	}
-	gl_FragColor = var_color * mix (texture * (ambient + diffuse + specular), envmap, envmapblend);
-	gl_FragColor.a = var_color.a * texture.a;
+	LOS_output_0 = var_color * mix (texture * (ambient + diffuse + specular), envmap, envmapblend);
+	LOS_output_0.a = var_color.a * texture.a;
 }]]}

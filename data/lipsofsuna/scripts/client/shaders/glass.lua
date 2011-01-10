@@ -34,6 +34,6 @@ void main()
 	float fspec = los_light_specular(var_coord, normal, LOS_material_shininess);
 	vec4 light = los_light_combine(fattn, fdiff, fspec, LOS_light_ambient,
 		LOS_light_diffuse, LOS_light_specular * LOS_material_specular);
-	gl_FragColor = LOS_material_diffuse * diffuse * light;
-	gl_FragColor.a = max(LOS_material_diffuse.a * diffuse.a, fattn * fspec);
+	LOS_output_0 = LOS_material_diffuse * diffuse * light;
+	LOS_output_0.a = max(LOS_material_diffuse.a * diffuse.a, fattn * fspec);
 }]]}

@@ -180,10 +180,17 @@ static int private_compile (
 	};
 	const GLchar* feedbacks[4] =
 	{
-		"LOS_out_texcoord",
-		"LOS_out_normal",
-		"LOS_out_coord",
-		"LOS_out_tangent"
+		"LOS_output_texcoord",
+		"LOS_output_normal",
+		"LOS_output_coord",
+		"LOS_output_tangent"
+	};
+	const GLchar* outputs[4] =
+	{
+		"LOS_output_0",
+		"LOS_output_1",
+		"LOS_output_2",
+		"LOS_output_3"
 	};
 	const GLchar* headers[4] =
 	{
@@ -236,6 +243,10 @@ static int private_compile (
 		"#extension GL_EXT_geometry_shader4 : enable\n",
 		/* Fragment */
 		"#version 150\n"
+		"out vec4 LOS_output_0;\n"
+		"out vec4 LOS_output_1;\n"
+		"out vec4 LOS_output_2;\n"
+		"out vec4 LOS_output_3;\n"
 	};
 
 	/* Create shader objects. */
@@ -288,12 +299,14 @@ static int private_compile (
 	if (!private_check_compile (self, name, self->fragment))
 		return 0;
 
-	/* Link the shader program. */
+	/* Attach shaders. */
 	self->program = glCreateProgram ();
 	glAttachShader (self->program, self->vertex);
 	if (self->geometry)
 		glAttachShader (self->program, self->geometry);
 	glAttachShader (self->program, self->fragment);
+
+	/* Bind attributes and outputs. */
 	glBindAttribLocation (self->program, LIREN_ATTRIBUTE_COORD, "LOS_coord");
 	glBindAttribLocation (self->program, LIREN_ATTRIBUTE_TEXCOORD, "LOS_texcoord");
 	glBindAttribLocation (self->program, LIREN_ATTRIBUTE_NORMAL, "LOS_normal");
@@ -302,11 +315,15 @@ static int private_compile (
 	glBindAttribLocation (self->program, LIREN_ATTRIBUTE_WEIGHTS2, "LOS_weights2");
 	glBindAttribLocation (self->program, LIREN_ATTRIBUTE_BONES1, "LOS_bones1");
 	glBindAttribLocation (self->program, LIREN_ATTRIBUTE_BONES2, "LOS_bones2");
+	for (i = 0 ; i < sizeof (outputs) / sizeof (*outputs) ; i++)
+		glBindFragDataLocation (self->program, i, outputs[i]);
 	if (feedback)
 	{
 		glTransformFeedbackVaryings (self->program, sizeof (feedbacks) /
 			sizeof (*feedbacks), feedbacks, GL_INTERLEAVED_ATTRIBS);
 	}
+
+	/* Link the shader program. */
 	glLinkProgram (self->program);
 	if (!private_check_link (self, name, self->program))
 		return 0;
