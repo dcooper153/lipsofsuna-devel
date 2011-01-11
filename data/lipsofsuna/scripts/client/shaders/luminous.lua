@@ -1,6 +1,20 @@
 Shader{
 name = "luminous",
-pass3_depth_func = "lequal",
+pass1_color_write = false,
+pass1_depth_func = "lequal",
+pass1_vertex = [[
+void main()
+{
+	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	gl_Position = LOS_matrix_projection * tmp;
+}]],
+pass1_fragment = [[
+in vec2 var_texcoord;
+void main()
+{
+}]],
+pass3_depth_func = "equal",
+pass3_depth_write = false,
 pass3_vertex = [[
 void main()
 {

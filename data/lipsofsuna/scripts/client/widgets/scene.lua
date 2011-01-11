@@ -42,7 +42,6 @@ Widgets.Scene.render = function(self)
 		projection = self.camera.projection,
 		viewport = self.camera.viewport}
 	self.scene:draw_pass{pass = 1} -- Depth
-	self.scene:draw_pass{pass = 2, deferred = true} -- Deferred lighting
 	self.scene:draw_pass{pass = 3} -- Forward ambient
 	self.scene:draw_pass{pass = 4, lighting = true} -- Forward lighting
 	self.scene:draw_pass{pass = 5, sorting = true} -- Transparent ambient

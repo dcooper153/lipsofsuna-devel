@@ -1,36 +1,30 @@
 Shader{
 name = "hair",
-sort = true,
+pass1_alpha_to_coverage = true,
 pass1_color_write = false,
 pass1_depth_func = "lequal",
 pass1_vertex = [[
-out fragvar
-{
-	vec2 texcoord;
-} OUT;
+out vec2 var_texcoord;
 void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
-	OUT.texcoord = LOS_texcoord;
+	var_texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass1_fragment = [[
-in fragvar
-{
-	vec2 texcoord;
-} IN;
+in vec2 var_texcoord;
 void main()
 {
-	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
-	if (diffuse.a < 0.90)
-		discard;
+	LOS_output_0.rgb = vec3(0.0);
+	LOS_output_0.a = texture(LOS_diffuse_texture_0, var_texcoord).a;
 }]],
-pass6_blend = true,
-pass6_blend_src = "src_alpha",
-pass6_blend_dst = "one",
-pass6_depth_func = "lequal",
-pass6_depth_write = false,
-pass6_vertex = [[
+pass4_alpha_to_coverage = true,
+pass4_blend = true,
+pass4_blend_src = "one",
+pass4_blend_dst = "one",
+pass4_depth_func = "equal",
+pass4_depth_write = false,
+pass4_vertex = [[
 out fragvar
 {
 	vec3 coord;
@@ -49,7 +43,7 @@ void main()
 	OUT.texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
-pass6_fragment = [[
+pass4_fragment = [[
 in fragvar
 {
 	vec3 coord;
@@ -60,7 +54,6 @@ in fragvar
 } IN;]]
 .. Shader.los_light_attenuation
 .. Shader.los_light_combine
-.. Shader.los_light_specular
 .. Shader.los_normal_mapping .. [[
 float los_light_diffuse_hair(in vec3 coord, in vec3 normal)
 {
