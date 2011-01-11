@@ -24,6 +24,7 @@
 #include "render/render-context.h"
 #include "render/render-deferred.h"
 #include "render/render-draw.h"
+#include "render/render-error.h"
 #include "render/render-image.h"
 #include "render/render-light.h"
 #include "render/render-lighting.h"

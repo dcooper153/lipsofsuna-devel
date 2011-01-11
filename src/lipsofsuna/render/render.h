@@ -95,11 +95,4 @@ LIAPICALL (void, liren_render_update, (
 LIAPICALL (LIRenContext*, liren_render_get_context, (
 	LIRenRender* self));
 
-#ifndef NDEBUG
-void
-liren_check_errors ();
-#else
-#define liren_check_errors()
-#endif
-
 #endif
