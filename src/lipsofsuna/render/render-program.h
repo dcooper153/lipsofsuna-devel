@@ -27,6 +27,7 @@ typedef struct _LIRenProgram LIRenProgram;
 struct _LIRenProgram
 {
 	LIRenRender* render;
+	int alpha_to_coverage;
 	int depth_test;
 	int depth_write;
 	GLenum depth_func;
@@ -54,6 +55,10 @@ LIAPICALL (int, liren_program_compile, (
 	const char*   geometry,
 	const char*   fragment,
 	int           feedback));
+
+LIAPICALL (void, liren_program_set_alpha_to_coverage, (
+	LIRenProgram* self,
+	int           value));
 
 LIAPICALL (void, liren_program_set_blend, (
 	LIRenProgram* self,

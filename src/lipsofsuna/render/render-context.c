@@ -219,6 +219,20 @@ void liren_context_render_indexed (
 #endif
 }
 
+void liren_context_set_alpha_to_coverage (
+	LIRenContext* self,
+	int           value)
+{
+	if (self->alpha_to_coverage != value)
+	{
+		self->alpha_to_coverage = value;
+		if (value)
+			glEnable (GL_SAMPLE_ALPHA_TO_COVERAGE);
+		else
+			glDisable (GL_SAMPLE_ALPHA_TO_COVERAGE);
+	}
+}
+
 void liren_context_set_blend (
 	LIRenContext* self,
 	int           enable,
@@ -477,6 +491,7 @@ void liren_context_set_shader (
 	}
 	if (value != NULL)
 	{
+		liren_context_set_alpha_to_coverage (self, value->passes[pass].alpha_to_coverage);
 		liren_context_set_blend (self, value->passes[pass].blend_enable,
 			value->passes[pass].blend_src, value->passes[pass].blend_dst);
 		liren_context_set_color_write (self, value->passes[pass].color_write);

@@ -119,6 +119,7 @@ int liren_shader_compile (
 	const char*  geometry,
 	const char*  fragment,
 	int          feedback,
+	int          alpha_to_coverage,
 	int          blend_enable,
 	GLenum       blend_src,
 	GLenum       blend_dst,
@@ -127,6 +128,7 @@ int liren_shader_compile (
 	int          depth_write,
 	GLenum       depth_func)
 {
+	liren_program_set_alpha_to_coverage (self->passes + pass, alpha_to_coverage);
 	liren_program_set_blend (self->passes + pass, blend_enable, blend_src, blend_dst);
 	liren_program_set_color (self->passes + pass, color_write);
 	liren_program_set_depth (self->passes + pass, depth_test, depth_write, depth_func);

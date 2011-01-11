@@ -122,6 +122,13 @@ int liren_program_compile (
 	return 1;
 }
 
+void liren_program_set_alpha_to_coverage (
+	LIRenProgram* self,
+	int           value)
+{
+	self->alpha_to_coverage = value;
+}
+
 void liren_program_set_blend (
 	LIRenProgram* self,
 	int           blend_enable,

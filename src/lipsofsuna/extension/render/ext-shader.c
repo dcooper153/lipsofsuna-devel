@@ -35,6 +35,7 @@ static void private_compile (
 	int i;
 	int tmpbool;
 	int feedback = 0;
+	int alpha_coverage;
 	int blend_enable;
 	GLenum blend_src;
 	GLenum blend_dst;
@@ -42,6 +43,7 @@ static void private_compile (
 	int depth_test;
 	int depth_write;
 	GLenum depth_func;
+	char field_alpha_coverage[64];
 	char field_blend_enable[64];
 	char field_blend_src[64];
 	char field_blend_dst[64];
@@ -64,6 +66,7 @@ static void private_compile (
 		fragment = default_fragment_shader;
 		geometry = NULL;
 		vertex = default_vertex_shader;
+		alpha_coverage = 0;
 		blend_enable = 0;
 		blend_src = GL_SRC_ALPHA;
 		blend_dst = GL_ONE_MINUS_SRC_ALPHA;
@@ -74,6 +77,7 @@ static void private_compile (
 		snprintf (field_fragment, sizeof (field_fragment), "pass%d_fragment", i + 1);
 		snprintf (field_geometry, sizeof (field_geometry), "pass%d_geometry", i + 1);
 		snprintf (field_vertex, sizeof (field_vertex), "pass%d_vertex", i + 1);
+		snprintf (field_alpha_coverage, sizeof (field_alpha_coverage), "pass%d_alpha_to_coverage", i + 1);
 		snprintf (field_blend_enable, sizeof (field_blend_enable), "pass%d_blend", i + 1);
 		snprintf (field_blend_src, sizeof (field_blend_src), "pass%d_blend_src", i + 1);
 		snprintf (field_blend_dst, sizeof (field_blend_dst), "pass%d_blend_dst", i + 1);
@@ -85,6 +89,8 @@ static void private_compile (
 		{
 			liscr_args_gets_string (args, field_geometry, &geometry);
 			liscr_args_gets_string (args, field_vertex, &vertex);
+			if (liscr_args_gets_bool (args, field_alpha_coverage, &tmpbool))
+				alpha_coverage = tmpbool;
 			if (liscr_args_gets_bool (args, field_blend_enable, &tmpbool))
 				blend_enable = tmpbool;
 			if (liscr_args_gets_string (args, field_blend_src, &tmpstr))
@@ -120,7 +126,7 @@ static void private_compile (
 				else if (!strcmp (tmpstr, "less"))
 					depth_func = GL_LESS;
 			}
-			if (!liren_shader_compile (shader, i, vertex, geometry, fragment, feedback,
+			if (!liren_shader_compile (shader, i, vertex, geometry, fragment, feedback, alpha_coverage,
 			     blend_enable, blend_src, blend_dst, color_write, depth_test, depth_write, depth_func))
 				lisys_error_report ();
 		}
