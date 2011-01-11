@@ -70,8 +70,7 @@ LIAPICALL (void, liren_scene_render_pass, (
 	LIRenScene* self,
 	int         pass,
 	int         lighting,
-	int         sorting,
-	int         deferred));
+	int         sorting));
 
 LIAPICALL (void, liren_scene_render_postproc, (
 	LIRenScene* self,

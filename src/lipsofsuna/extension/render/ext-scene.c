@@ -135,7 +135,6 @@ static void Scene_draw_end (LIScrArgs* args)
  * --- Renders a scene pass.
  * -- @param self Scene.
  * -- @param args Arguments.<ul>
- * --   <li>deferred: True to enable deferred rendering.</li>
  * --   <li>lighting: True to enable lighting.</li>
  * --   <li>pass: Pass number.</li>
  * --   <li>sorting: True to enable sorting.</li></ul>
@@ -143,7 +142,6 @@ static void Scene_draw_end (LIScrArgs* args)
  */
 static void Scene_draw_pass (LIScrArgs* args)
 {
-	int deferred = 0;
 	int lighting = 0;
 	int pass = 1;
 	int sorting = 0;
@@ -152,14 +150,13 @@ static void Scene_draw_pass (LIScrArgs* args)
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
 	scene = module->client->scene;
-	liscr_args_gets_bool (args, "deferred", &deferred);
 	liscr_args_gets_bool (args, "lighting", &lighting);
 	liscr_args_gets_int (args, "pass", &pass);
 	liscr_args_gets_bool (args, "sorting", &sorting);
 	if (pass < 1 || pass > LIREN_SHADER_PASS_COUNT)
 		return;
 
-	liren_scene_render_pass (scene, pass - 1, lighting, sorting, deferred);
+	liren_scene_render_pass (scene, pass - 1, lighting, sorting);
 }
 
 /* @luadoc

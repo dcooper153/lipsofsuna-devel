@@ -32,19 +32,6 @@
 static int private_init (
 	LIRenScene* self);
 
-static int private_light_bounds (
-	LIRenScene*   self,
-	LIRenLight*   light,
-	LIRenContext* context,
-	const int*    viewport,
-	float*        result);
-
-static void private_lighting_render (
-	LIRenScene*   self,
-	LIRenContext* context,
-	const int*    viewport,
-	int           type);
-
 static int private_sort_scene (
 	LIRenScene*   self,
 	LIRenContext* context);
@@ -187,10 +174,6 @@ int liren_scene_render_begin (
 	glPushAttrib (GL_VIEWPORT_BIT);
 	glViewport (0, 0, framebuffer->width, framebuffer->height);
 
-	/* Clear the deferred buffer. */
-	glBindFramebuffer (GL_FRAMEBUFFER, self->state.framebuffer->deferred_fbo);
-	glClear (GL_COLOR_BUFFER_BIT);
-
 	/* Clear the post-processing buffer. */
 	glBindFramebuffer (GL_FRAMEBUFFER, framebuffer->postproc_fbo[0]);
 	glClear (GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
@@ -244,30 +227,25 @@ liren_scene_render_end (LIRenScene* self)
  * \param pass Pass number.
  * \param lighting Nonzero to enable lighting.
  * \param sorting Nonzero to enable sorting.
- * \param deferred Nonzero to render to the deferred buffer.
  */
 void liren_scene_render_pass (
 	LIRenScene* self,
 	int         pass,
 	int         lighting,
-	int         sorting,
-	int         deferred)
+	int         sorting)
 {
 	int i;
-	int viewport[4];
 	const float black[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 	const float equation[3] = { 1.0f, 0.0f, 0.0f };
 	LIAlgPtrdicIter iter;
 	LIMatAabb aabb;
 	LIMatMatrix identity;
-	LIMatMatrix matrix;
 	LIMatVector position;
 	LIRenContext* context;
 	LIRenLight* ambient_light;
 	LIRenLight* light;
 	LIRenSortface* face;
 	LIRenSortgroup* group;
-	LIRenTexture textures[4];
 
 	/* Validate state. */
 	if (!self->state.rendering)
@@ -281,18 +259,8 @@ void liren_scene_render_pass (
 	liren_light_update_cache (ambient_light, self->state.context);
 
 	/* Bind the desired framebuffer. */
-	if (deferred)
-	{
-		liren_context_set_deferred (self->state.context, 1);
-		glBindFramebuffer (GL_FRAMEBUFFER, self->state.framebuffer->deferred_fbo);
-		lighting = 0;
-		sorting = 0;
-	}
-	else
-	{
-		liren_context_set_deferred (self->state.context, 0);
-		glBindFramebuffer (GL_FRAMEBUFFER, self->state.framebuffer->postproc_fbo[0]);
-	}
+	liren_context_set_deferred (self->state.context, 0);
+	glBindFramebuffer (GL_FRAMEBUFFER, self->state.framebuffer->postproc_fbo[0]);
 
 	/* Render each group. */
 	if (!lighting && !sorting)
@@ -503,28 +471,6 @@ void liren_scene_render_pass (
 		}
 	}
 
-	/* Deferred lighting for the deferred rendering pass. */
-	if (deferred)
-	{
-		glBindFramebuffer (GL_FRAMEBUFFER, self->state.framebuffer->postproc_fbo[0]);
-		glPushAttrib (GL_SCISSOR_BIT);
-		glGetIntegerv (GL_VIEWPORT, viewport);
-		matrix = limat_matrix_identity ();
-		textures[0].texture = self->state.framebuffer->diffuse_texture;
-		textures[1].texture = self->state.framebuffer->specular_texture;
-		textures[2].texture = self->state.framebuffer->normal_texture;
-		textures[3].texture = self->state.framebuffer->depth_texture;
-		liren_context_set_cull (self->state.context, 0, GL_CCW);
-		liren_context_set_modelmatrix (self->state.context, &matrix);
-		liren_context_set_textures (self->state.context, textures, 4);
-		liren_context_set_buffer (self->state.context, self->render->helpers.unit_quad);
-		private_lighting_render (self, self->state.context, viewport, 0);
-		private_lighting_render (self, self->state.context, viewport, 1);
-		glDisable (GL_SCISSOR_TEST);
-		glPopAttrib ();
-		liren_context_set_deferred (self->state.context, 0);
-	}
-
 	/* Free pass. */
 	liren_context_set_light (self->state.context, NULL);
 	liren_light_free (ambient_light);
@@ -621,145 +567,6 @@ static int private_init (
 	if (self->sort == NULL)
 		return 0;
 	return 1;
-}
-
-static int private_light_bounds (
-	LIRenScene*   self,
-	LIRenLight*   light,
-	LIRenContext* context,
-	const int*    viewport,
-	float*        result)
-{
-	int i;
-	LIMatAabb bounds;
-	LIMatMatrix inv;
-	LIMatVector min;
-	LIMatVector max;
-	LIMatVector tmp;
-	LIMatVector p[8];
-
-	/* If the camera is inside the light volume, return zero to force a
-	 * a fullscreen quad. This is needed because trying to project the
-	 * box to the screen can give incorrect results in some cases. */
-	if (!liren_light_get_bounds (light, &bounds))
-		return 0;
-	if (limat_matrix_get_singular (context->matrix.view))
-		return 0;
-	inv = limat_matrix_invert (context->matrix.view);
-	tmp = limat_matrix_transform (inv, limat_vector_init (0.0f, 0.0f, 0.0f));
-	if (bounds.min.x <= tmp.x && tmp.x <= bounds.max.x &&
-	    bounds.min.y <= tmp.y && tmp.y <= bounds.max.y &&
-	    bounds.min.z <= tmp.z && tmp.z <= bounds.max.z)
-		return 0;
-
-	/* Get the vertices of the bounding box. */
-	p[0] = limat_vector_init (bounds.min.x, bounds.min.y, bounds.min.z);
-	p[1] = limat_vector_init (bounds.min.x, bounds.min.y, bounds.max.z);
-	p[2] = limat_vector_init (bounds.min.x, bounds.max.y, bounds.min.z);
-	p[3] = limat_vector_init (bounds.min.x, bounds.max.y, bounds.max.z);
-	p[4] = limat_vector_init (bounds.max.x, bounds.min.y, bounds.min.z);
-	p[5] = limat_vector_init (bounds.max.x, bounds.min.y, bounds.max.z);
-	p[6] = limat_vector_init (bounds.max.x, bounds.max.y, bounds.min.z);
-	p[7] = limat_vector_init (bounds.max.x, bounds.max.y, bounds.max.z);
-
-	/* Project the vertices to the screen plane. */
-	tmp = limat_vector_init (0.0f, 0.0f, 0.0f);
-	if (!limat_matrix_project (context->matrix.projection, context->matrix.view, viewport, p, &tmp))
-		return 0;
-	min = max = tmp;
-	for (i = 1 ; i < 8 ; i++)
-	{
-		tmp = limat_vector_init (0.0f, 0.0f, 0.0f);
-		if (!limat_matrix_project (context->matrix.projection, context->matrix.view, viewport, p + i, &tmp))
-			return 0;
-		if (tmp.x < min.x) min.x = tmp.x;
-		if (tmp.y < min.y) min.y = tmp.y;
-		if (tmp.z < min.z) min.z = tmp.z;
-		if (tmp.x > max.x) max.x = tmp.x;
-		if (tmp.y > max.y) max.y = tmp.y;
-		if (tmp.z > max.z) max.z = tmp.z;
-	}
-
-	/* Skip the light if it's out of view range. */
-	if (max.z < 0.0f || min.z > 1.0f)
-		return 0;
-
-	/* Lit the whole screen area if intersecting with the near plane. */
-	/* If some of the vertices are behind the near plane, the projection
-	   doesn't give the rectangle we want. We'd have to clip the box with
-	   the view plane but it's more trouble than it's worth. */
-	if (min.z < 0.0f)
-	{
-		result[0] = viewport[0];
-		result[1] = viewport[1];
-		result[2] = viewport[2];
-		result[3] = viewport[3];
-		return 1;
-	}
-
-	/* Calculate the lit screen area. */
-	result[0] = min.x;
-	result[1] = min.y;
-	result[2] = max.x - min.x;
-	result[3] = max.y - min.y;
-
-	return 1;
-}
-
-static void private_lighting_render (
-	LIRenScene*   self,
-	LIRenContext* context,
-	const int*    viewport,
-	int           type)
-{
-	int ltype;
-	int index = 0;
-	float bounds[4];
-	LIAlgPtrdicIter iter;
-	LIRenLight* light;
-	LIRenShader* shader;
-
-	if (!type)
-		shader = liren_render_find_shader (self->render, "deferred");
-	else
-		shader = liren_render_find_shader (self->render, "deferred-spotlight");
-	if (shader == NULL)
-		return;
-	liren_context_set_cull (context, 0, GL_CCW);
-	liren_context_set_shader (context, 0, shader);
-
-	/* Let each light lit the scene. */
-	LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
-	{
-		light = iter.value;
-		ltype = liren_light_get_type (light);
-		if (ltype == LIREN_LIGHTTYPE_POINT)
-		{
-			if (type != 0)
-				continue;
-		}
-		else
-		{
-			if (type != 1)
-				continue;
-		}
-		if (index++ == 1)
-			liren_context_set_blend (context, 1, GL_ONE, GL_ONE);
-		liren_context_set_light (context, light);
-		liren_context_bind (context);
-
-		/* Calculate light rectangle. */
-		if (private_light_bounds (self, light, context, viewport, bounds))
-		{
-			glScissor (bounds[0], bounds[1], bounds[2], bounds[3]);
-			glEnable (GL_SCISSOR_TEST);
-		}
-		else
-			glDisable (GL_SCISSOR_TEST);
-
-		/* Shade light rectangle. */
-		liren_context_render_indexed (context, 0, 6);
-	}
 }
 
 static int private_sort_scene (

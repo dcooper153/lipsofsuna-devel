@@ -85,12 +85,8 @@ LIRenDeferred* liren_deferred_new (
 void liren_deferred_free (
 	LIRenDeferred* self)
 {
-	glDeleteFramebuffers (1, &self->deferred_fbo);
 	glDeleteFramebuffers (2, self->postproc_fbo);
 	glDeleteTextures (1, &self->depth_texture);
-	glDeleteTextures (1, &self->normal_texture);
-	glDeleteTextures (1, &self->diffuse_texture);
-	glDeleteTextures (1, &self->specular_texture);
 	glDeleteTextures (2, self->postproc_texture);
 	lisys_free (self);
 }
@@ -166,9 +162,6 @@ void liren_deferred_read_pixel (
 	switch (texture)
 	{
 		case 0: glBindTexture (GL_TEXTURE_2D, self->depth_texture); break;
-		case 1: glBindTexture (GL_TEXTURE_2D, self->diffuse_texture); break;
-		case 2: glBindTexture (GL_TEXTURE_2D, self->specular_texture); break;
-		case 3: glBindTexture (GL_TEXTURE_2D, self->normal_texture); break;
 	}
 	mem = calloc (4 * self->width * self->height, sizeof (GLfloat));
 	if (mem != NULL)
@@ -239,12 +232,8 @@ static int private_rebuild (
 	GLenum fmt1;
 	GLenum fmt2;
 	GLenum error;
-	GLuint deferred_fbo;
 	GLuint postproc_fbo[2];
 	GLuint depth_texture;
-	GLuint normal_texture;
-	GLuint diffuse_texture;
-	GLuint specular_texture;
 	GLuint postproc_texture[2];
 	static const GLenum fragdata[] =
 	{
@@ -272,46 +261,6 @@ static int private_rebuild (
 	glTexImage2DMultisample (GL_TEXTURE_2D_MULTISAMPLE, samples,
 		GL_DEPTH_COMPONENT24, width, height, GL_FALSE);
 
-	/* Create multisample normal texture. */
-	glGenTextures (1, &normal_texture);
-	glBindTexture (GL_TEXTURE_2D_MULTISAMPLE, normal_texture);
-	glTexImage2DMultisample (GL_TEXTURE_2D_MULTISAMPLE, samples, fmt1, width, height, GL_FALSE);
-
-	/* Create multisample diffuse texture. */
-	glGenTextures (1, &diffuse_texture);
-	glBindTexture (GL_TEXTURE_2D_MULTISAMPLE, diffuse_texture);
-	glTexImage2DMultisample (GL_TEXTURE_2D_MULTISAMPLE, samples, fmt1, width, height, GL_FALSE);
-
-	/* Create multisample specular texture. */
-	glGenTextures (1, &specular_texture);
-	glBindTexture (GL_TEXTURE_2D_MULTISAMPLE, specular_texture);
-	glTexImage2DMultisample (GL_TEXTURE_2D_MULTISAMPLE, samples, fmt1, width, height, GL_FALSE);
-
-	/* Create multisample deferred framebuffer object. */
-	glGenFramebuffers (1, &deferred_fbo);
-	glBindFramebuffer (GL_FRAMEBUFFER, deferred_fbo);
-	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-		GL_TEXTURE_2D_MULTISAMPLE, depth_texture, 0);
-	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-		GL_TEXTURE_2D_MULTISAMPLE, diffuse_texture, 0);
-	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1,
-		GL_TEXTURE_2D_MULTISAMPLE, specular_texture, 0);
-	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2,
-		GL_TEXTURE_2D_MULTISAMPLE, normal_texture, 0);
-	if (!private_check (self))
-	{
-		glBindFramebuffer (GL_FRAMEBUFFER, 0);
-		glBindRenderbuffer (GL_RENDERBUFFER, 0);
-		glDeleteFramebuffers (1, &deferred_fbo);
-		glDeleteTextures (1, &depth_texture);
-		glDeleteTextures (1, &normal_texture);
-		glDeleteTextures (1, &diffuse_texture);
-		glDeleteTextures (1, &specular_texture);
-		glDeleteTextures (2, postproc_texture);
-		return 0;
-	}
-	glDrawBuffers (sizeof (fragdata) / sizeof (GLenum), fragdata);
-
 	/* Create multisample postprocessing textures. */
 	glGenTextures (2, postproc_texture);
 	for (i = 0 ; i < 2 ; i++)
@@ -333,12 +282,8 @@ static int private_rebuild (
 		{
 			glBindFramebuffer (GL_FRAMEBUFFER, 0);
 			glBindRenderbuffer (GL_RENDERBUFFER, 0);
-			glDeleteFramebuffers (1, &deferred_fbo);
 			glDeleteFramebuffers (2, postproc_fbo);
 			glDeleteTextures (1, &depth_texture);
-			glDeleteTextures (1, &normal_texture);
-			glDeleteTextures (1, &diffuse_texture);
-			glDeleteTextures (1, &specular_texture);
 			glDeleteTextures (2, postproc_texture);
 			return 0;
 		}
@@ -354,20 +299,12 @@ static int private_rebuild (
 
 	/* Accept successful rebuild. */
 	glBindFramebuffer (GL_FRAMEBUFFER, 0);
-	glDeleteFramebuffers (1, &self->deferred_fbo);
 	glDeleteFramebuffers (2, self->postproc_fbo);
 	glDeleteTextures (1, &self->depth_texture);
-	glDeleteTextures (1, &self->normal_texture);
-	glDeleteTextures (1, &self->diffuse_texture);
-	glDeleteTextures (1, &self->specular_texture);
 	glDeleteTextures (2, self->postproc_texture);
-	self->deferred_fbo = deferred_fbo;
 	self->postproc_fbo[0] = postproc_fbo[0];
 	self->postproc_fbo[1] = postproc_fbo[1];
 	self->depth_texture = depth_texture;
-	self->normal_texture = normal_texture;
-	self->diffuse_texture = diffuse_texture;
-	self->specular_texture = specular_texture;
 	self->postproc_texture[0] = postproc_texture[0];
 	self->postproc_texture[1] = postproc_texture[1];
 
