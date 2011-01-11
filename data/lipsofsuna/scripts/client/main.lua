@@ -75,7 +75,6 @@ Eventhandler{type = "quit", func = function(self, args)
 end}
 
 local animt = 0
-local transpt = 0
 local ipolt = 0
 Eventhandler{type = "tick", func = function(self, args)
 	-- Update animations.
@@ -88,16 +87,6 @@ Eventhandler{type = "tick", func = function(self, args)
 			end
 		end
 		animt = 0
-	end
-	-- Update transparency.
-	transpt = transpt + args.secs
-	if transpt > 0.2 * (1 - Options.transparency_quality) then
-		for k,v in pairs(Object.objects) do
-			if v.animated then
-				v:update_transparency()
-			end
-		end
-		transpt = 0
 	end
 	-- Interpolate objects.
 	ipolt = math.min(ipolt + args.secs, 1)
