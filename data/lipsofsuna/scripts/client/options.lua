@@ -2,11 +2,23 @@ Options = Class()
 Options.low_quality_models = false
 Options.animation_quality = 1.0
 Options.mouse_sensitivity = 1.0
+Options.multisamples = 1
 Options.transparency_quality = 0.3
 Options.sound_volume = 1.0
 Options.music_volume = 0.3
 
 Options.init = function(clss)
+	-- Antialiasing quality.
+	local samples = math.log(clss.multisamples) / math.log(2)
+	local scroll_multisamples = Widgets.Progress{min = 0, max = 4, text = tostring(clss.multisamples) .. "x", value = samples}
+	scroll_multisamples:set_request{width = 100}
+	scroll_multisamples.pressed = function(self)
+		local v = self:get_value_at(Client.cursor_pos)
+		local p = 2 ^ math.floor(v + 0.5)
+		self.value = v
+		self.text = p .. "x"
+		clss.multisamples = p
+	end
 	-- Model quality adjustment.
 	local button_model_quality = Widgets.Button{text = "High quality"}
 	button_model_quality.pressed = function(self)
@@ -93,6 +105,7 @@ Options.init = function(clss)
 	-- Packing.
 	local quality_group = Widget{cols = 2}
 	quality_group:append_row(Widgets.Label{text = "Models"}, button_model_quality)
+	quality_group:append_row(Widgets.Label{text = "Antialiasing"}, scroll_multisamples)
 	quality_group:append_row(Widgets.Label{text = "Animation"}, scroll_animation)
 	quality_group:append_row(Widgets.Label{text = "Transparency"}, scroll_transparency)
 	local bloom_group = Widget{cols = 2}

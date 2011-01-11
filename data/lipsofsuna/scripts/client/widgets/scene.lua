@@ -39,6 +39,7 @@ Widgets.Scene.render = function(self)
 	Player.camera.viewport = {self.x, self.y, self.width, self.height}
 	self.scene:draw_begin{
 		modelview = self.camera.modelview,
+		multisamples = Options.multisamples,
 		projection = self.camera.projection,
 		viewport = self.camera.viewport}
 	self.scene:draw_pass{pass = 1} -- Depth

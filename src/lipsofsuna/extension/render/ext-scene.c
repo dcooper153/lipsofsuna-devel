@@ -48,7 +48,7 @@ static void Scene_new (LIScrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
-	self = liren_deferred_new (module->client->render, 32, 32);
+	self = liren_deferred_new (module->client->render, 32, 32, 1);
 	if (self == NULL)
 		return;
 
@@ -71,12 +71,14 @@ static void Scene_new (LIScrArgs* args)
  * -- @param self Scene.
  * -- @param args Arguments.<ul>
  * --   <li>modelview: Modelview matrix.</li>
+ * --   <li>multisamples: Number of multisamples.</li>
  * --   <li>projection: Projection matrix.</li>
  * --   <li>viewport: Viewport array.</li></ul>
  * function Scene.draw_begin(self, args)
  */
 static void Scene_draw_begin (LIScrArgs* args)
 {
+	int multisamples = 1;
 	GLint viewport[4];
 	LIExtModule* module;
 	LIMatFrustum frustum;
@@ -91,6 +93,8 @@ static void Scene_draw_begin (LIScrArgs* args)
 	modelview = limat_matrix_identity ();
 	projection = limat_matrix_identity ();
 	liscr_args_gets_floatv (args, "modelview", 16, modelview.m);
+	if (liscr_args_gets_int (args, "multisamples", &multisamples))
+		multisamples = LIMAT_MAX (1, multisamples);
 	liscr_args_gets_floatv (args, "projection", 16, projection.m);
 	viewport[0] = 0;
 	viewport[1] = 0;
@@ -107,7 +111,7 @@ static void Scene_draw_begin (LIScrArgs* args)
 	glPushAttrib (GL_VIEWPORT_BIT);
 	glViewport (viewport[0], viewport[1], viewport[2], viewport[3]);
 	limat_frustum_init (&frustum, &modelview, &projection);
-	liren_deferred_resize (args->self, viewport[2], viewport[3]);
+	liren_deferred_resize (args->self, viewport[2], viewport[3], multisamples);
 	liren_scene_render_begin (scene, args->self, &modelview, &projection, &frustum);
 }
 

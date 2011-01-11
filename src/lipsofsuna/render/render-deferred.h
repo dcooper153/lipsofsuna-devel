@@ -25,6 +25,7 @@ struct _LIRenDeferred
 {
 	int width;
 	int height;
+	int samples;
 	GLuint deferred_fbo;
 	GLuint postproc_fbo[2];
 	GLuint depth_texture;
@@ -35,24 +36,26 @@ struct _LIRenDeferred
 	LIRenRender* render;
 };
 
-LIRenDeferred*
-liren_deferred_new (LIRenRender* render,
-                    int          width,
-                    int          height);
+LIAPICALL (LIRenDeferred*, liren_deferred_new, (
+	LIRenRender* render,
+	int          width,
+	int          height,
+	int          samples));
 
-void
-liren_deferred_free (LIRenDeferred* self);
+LIAPICALL (void, liren_deferred_free, (
+	LIRenDeferred* self));
 
-int
-liren_deferred_resize (LIRenDeferred* self,
-                       int            width,
-                       int            height);
+LIAPICALL (int, liren_deferred_resize, (
+	LIRenDeferred* self,
+	int            width,
+	int            height,
+	int            samples));
 
-void
-liren_deferred_read_pixel (LIRenDeferred* self,
-                           int            x,
-                           int            y,
-                           int            texture,
-                           float*         result);
+LIAPICALL (void, liren_deferred_read_pixel, (
+	LIRenDeferred* self,
+	int            x,
+	int            y,
+	int            texture,
+	float*         result));
 
 #endif

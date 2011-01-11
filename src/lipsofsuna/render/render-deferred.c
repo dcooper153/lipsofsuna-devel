@@ -24,48 +24,34 @@
 
 #include <lipsofsuna/system.h>
 #include "render-deferred.h"
+#include "render-error.h"
 
-static int
-private_check (LIRenDeferred* self);
+static int private_check (
+	LIRenDeferred* self);
 
-static int
-private_rebuild (LIRenDeferred* self,
-                 int            width,
-                 int            height);
+static int private_rebuild (
+	LIRenDeferred* self,
+	int            width,
+	int            height,
+	int            samples);
 
 /*****************************************************************************/
 
 /**
  * \brief Creates a deferred rendering framebuffer.
- *
  * \param render Renderer.
  * \param width Framebuffer width.
  * \param height Framebuffer height.
+ * \param samples Number of multisamples.
  * \return New deferred framebuffer or NULL.
  */
-LIRenDeferred*
-liren_deferred_new (LIRenRender* render,
-                    int          width,
-                    int          height)
+LIRenDeferred* liren_deferred_new (
+	LIRenRender* render,
+	int          width,
+	int          height,
+	int          samples)
 {
 	LIRenDeferred* self;
-
-	/* Check for capabilities. */
-	if (!GLEW_EXT_framebuffer_object)
-	{
-		lisys_error_set (ENOTSUP, "EXT_framebuffer_object not supported");
-		return NULL;
-	}
-	if (!GLEW_ARB_depth_buffer_float)
-	{
-		lisys_error_set (ENOTSUP, "ARB_depth_buffer_float not supported");
-		return NULL;
-	}
-	if (!GLEW_ARB_texture_non_power_of_two)
-	{
-		lisys_error_set (ENOTSUP, "ARB_texture_non_power_of_two not supported");
-		return NULL;
-	}
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIRenDeferred));
@@ -76,7 +62,14 @@ liren_deferred_new (LIRenRender* render,
 	self->height = height;
 
 	/* Create frame buffer object. */
-	if (!private_rebuild (self, width, height))
+	for ( ; samples > 0 ; samples--)
+	{
+		if (!liren_deferred_resize (self, width, height, samples))
+			lisys_error_report ();
+		else
+			break;
+	}
+	if (samples == 0)
 	{
 		liren_deferred_free (self);
 		return NULL;
@@ -87,14 +80,13 @@ liren_deferred_new (LIRenRender* render,
 
 /**
  * \brief Frees the deferred framebuffer.
- *
  * \param self Deferred framebuffer.
  */
-void
-liren_deferred_free (LIRenDeferred* self)
+void liren_deferred_free (
+	LIRenDeferred* self)
 {
-	glDeleteFramebuffersEXT (1, &self->deferred_fbo);
-	glDeleteFramebuffersEXT (2, self->postproc_fbo);
+	glDeleteFramebuffers (1, &self->deferred_fbo);
+	glDeleteFramebuffers (2, self->postproc_fbo);
 	glDeleteTextures (1, &self->depth_texture);
 	glDeleteTextures (1, &self->normal_texture);
 	glDeleteTextures (1, &self->diffuse_texture);
@@ -105,23 +97,43 @@ liren_deferred_free (LIRenDeferred* self)
 
 /**
  * \brief Resizes the deferred framebuffer.
- *
  * \param self Deferred framebuffer.
  * \param width New width.
  * \param height New height.
+ * \param samples Number of multisamples.
  * \return Nonzero on success.
  */
-int
-liren_deferred_resize (LIRenDeferred* self,
-                       int            width,
-                       int            height)
+int liren_deferred_resize (
+	LIRenDeferred* self,
+	int            width,
+	int            height,
+	int            samples)
 {
-	if (self->width == width && self->height == height)
+	int max;
+	int request;
+	GLint max_color;
+	GLint max_depth;
+
+	/* Make sure that the sample count is valid. */
+	/* The sample count must not be greater than the maximum sample count.
+	   It must also be a power of two and greater than zero. */
+	glGetIntegerv (GL_MAX_COLOR_TEXTURE_SAMPLES, &max_color);
+	glGetIntegerv (GL_MAX_DEPTH_TEXTURE_SAMPLES, &max_depth);
+	request = samples;
+	max = LIMAT_MIN (max_color, max_depth);
+	for (samples = 1 ; samples < max && samples < request ; samples <<= 1) {}
+	samples = LIMAT_MIN (samples, max);
+
+	/* Check if a resize is actually needed. */
+	if (self->width == width && self->height == height && self->samples == samples)
 		return 1;
-	if (private_rebuild (self, width, height))
+
+	/* Recreate the framebuffer objects. */
+	if (private_rebuild (self, width, height, samples))
 	{
 		self->width = width;
 		self->height = height;
+		self->samples = samples;
 		return 1;
 	}
 
@@ -132,6 +144,7 @@ liren_deferred_resize (LIRenDeferred* self,
  * \brief Reads a pixel value from one of the textures.
  *
  * This function is horribly slow and should only be used for debugging purposes.
+ * Doesn't work with multisample buffers currently.
  *
  * \param self Deferred framebuffer.
  * \param x Framebuffer position.
@@ -140,12 +153,12 @@ liren_deferred_resize (LIRenDeferred* self,
  * \param result Return location for 4 floats.
  * \return Nonzero on success.
  */
-void
-liren_deferred_read_pixel (LIRenDeferred* self,
-                           int            x,
-                           int            y,
-                           int            texture,
-                           float*         result)
+void liren_deferred_read_pixel (
+	LIRenDeferred* self,
+	int            x,
+	int            y,
+	int            texture,
+	float*         result)
 {
 	int off;
 	GLfloat* mem;
@@ -172,42 +185,42 @@ liren_deferred_read_pixel (LIRenDeferred* self,
 
 /*****************************************************************************/
 
-static int
-private_check (LIRenDeferred* self)
+static int private_check (
+	LIRenDeferred* self)
 {
 	int ret;
 
-	ret = glCheckFramebufferStatusEXT (GL_FRAMEBUFFER_EXT);
-	if (ret != GL_FRAMEBUFFER_COMPLETE_EXT)
+	ret = glCheckFramebufferStatus (GL_FRAMEBUFFER);
+	if (ret != GL_FRAMEBUFFER_COMPLETE)
 	{
 		switch (ret)
 		{
-			case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
-				lisys_error_set (ENOTSUP, "framebuffer object unsupported");
+			case GL_FRAMEBUFFER_UNSUPPORTED:
+				lisys_error_set (ENOTSUP, "OpenGL: framebuffer object unsupported");
 				break;
-			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
-				lisys_error_set (ENOTSUP, "incomplete framebuffer attachment");
+			case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
+				lisys_error_set (ENOTSUP, "OpenGL: incomplete framebuffer attachment");
 				break;
-			case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
-				lisys_error_set (ENOTSUP, "incomplete framebuffer draw buffer");
+			case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
+				lisys_error_set (ENOTSUP, "OpenGL: incomplete framebuffer draw buffer");
 				break;
 			case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
-				lisys_error_set (ENOTSUP, "incomplete framebuffer dimensions");
+				lisys_error_set (ENOTSUP, "OpenGL: incomplete framebuffer dimensions");
 				break;
 			case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
-				lisys_error_set (ENOTSUP, "incomplete framebuffer formats");
+				lisys_error_set (ENOTSUP, "OpenGL: incomplete framebuffer formats");
 				break;
-			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
-				lisys_error_set (ENOTSUP, "missing framebuffer attachment");
+			case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
+				lisys_error_set (ENOTSUP, "OpenGL: missing framebuffer attachment");
 				break;
-			case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE_EXT:
-				lisys_error_set (ENOTSUP, "incomplete framebuffer multisample");
+			case GL_FRAMEBUFFER_INCOMPLETE_MULTISAMPLE:
+				lisys_error_set (ENOTSUP, "OpenGL: incomplete framebuffer multisample");
 				break;
-			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
-				lisys_error_set (ENOTSUP, "incomplete framebuffer read buffer");
+			case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
+				lisys_error_set (ENOTSUP, "OpenGL: incomplete framebuffer read buffer");
 				break;
 			default:
-				lisys_error_set (ENOTSUP, "unknown framebuffer creation error");
+				lisys_error_set (ENOTSUP, "OpenGL: unknown framebuffer creation error");
 				break;
 		}
 		return 0;
@@ -216,14 +229,16 @@ private_check (LIRenDeferred* self)
 	return 1;
 }
 
-static int
-private_rebuild (LIRenDeferred* self,
-                 int            width,
-                 int            height)
+static int private_rebuild (
+	LIRenDeferred* self,
+	int            width,
+	int            height,
+	int            samples)
 {
 	int i;
 	GLenum fmt1;
 	GLenum fmt2;
+	GLenum error;
 	GLuint deferred_fbo;
 	GLuint postproc_fbo[2];
 	GLuint depth_texture;
@@ -242,74 +257,47 @@ private_rebuild (LIRenDeferred* self,
 	if (GLEW_ARB_texture_float)
 	{
 		fmt1 = GL_RGBA;
-		fmt2 = GL_RGBA32F_ARB;
+		fmt2 = GL_RGBA32F;
 	}
 	else
 	{
 		fmt1 = GL_RGBA;
 		fmt2 = GL_RGBA;
 	}
+	error = glGetError ();
 
-	/* Create depth texture. */
+	/* Create multisample depth texture. */
 	glGenTextures (1, &depth_texture);
-	glBindTexture (GL_TEXTURE_2D, depth_texture);
-	glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height,
-		0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture (GL_TEXTURE_2D_MULTISAMPLE, depth_texture);
+	glTexImage2DMultisample (GL_TEXTURE_2D_MULTISAMPLE, samples,
+		GL_DEPTH_COMPONENT24, width, height, GL_FALSE);
 
-	/* Create normal texture. */
+	/* Create multisample normal texture. */
 	glGenTextures (1, &normal_texture);
-	glBindTexture (GL_TEXTURE_2D, normal_texture);
-	glTexImage2D (GL_TEXTURE_2D, 0, fmt1, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture (GL_TEXTURE_2D_MULTISAMPLE, normal_texture);
+	glTexImage2DMultisample (GL_TEXTURE_2D_MULTISAMPLE, samples, fmt1, width, height, GL_FALSE);
 
-	/* Create diffuse texture. */
+	/* Create multisample diffuse texture. */
 	glGenTextures (1, &diffuse_texture);
-	glBindTexture (GL_TEXTURE_2D, diffuse_texture);
-	glTexImage2D (GL_TEXTURE_2D, 0, fmt1, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture (GL_TEXTURE_2D_MULTISAMPLE, diffuse_texture);
+	glTexImage2DMultisample (GL_TEXTURE_2D_MULTISAMPLE, samples, fmt1, width, height, GL_FALSE);
 
-	/* Create specular texture. */
+	/* Create multisample specular texture. */
 	glGenTextures (1, &specular_texture);
-	glBindTexture (GL_TEXTURE_2D, specular_texture);
-	glTexImage2D (GL_TEXTURE_2D, 0, fmt1, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glBindTexture (GL_TEXTURE_2D_MULTISAMPLE, specular_texture);
+	glTexImage2DMultisample (GL_TEXTURE_2D_MULTISAMPLE, samples, fmt1, width, height, GL_FALSE);
 
-	/* Create postprocessing textures. */
-	glGenTextures (2, postproc_texture);
-	for (i = 0 ; i < 2 ; i++)
-	{
-		glBindTexture (GL_TEXTURE_2D, postproc_texture[i]);
-		glTexImage2D (GL_TEXTURE_2D, 0, fmt2, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-	}
-
-	/* Create deferred framebuffer object. */
+	/* Create multisample deferred framebuffer object. */
 	glGenFramebuffers (1, &deferred_fbo);
 	glBindFramebuffer (GL_FRAMEBUFFER, deferred_fbo);
 	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-		GL_TEXTURE_2D, depth_texture, 0);
+		GL_TEXTURE_2D_MULTISAMPLE, depth_texture, 0);
 	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-		GL_TEXTURE_2D, diffuse_texture, 0);
+		GL_TEXTURE_2D_MULTISAMPLE, diffuse_texture, 0);
 	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1,
-		GL_TEXTURE_2D, specular_texture, 0);
+		GL_TEXTURE_2D_MULTISAMPLE, specular_texture, 0);
 	glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2,
-		GL_TEXTURE_2D, normal_texture, 0);
+		GL_TEXTURE_2D_MULTISAMPLE, normal_texture, 0);
 	if (!private_check (self))
 	{
 		glBindFramebuffer (GL_FRAMEBUFFER, 0);
@@ -324,15 +312,23 @@ private_rebuild (LIRenDeferred* self,
 	}
 	glDrawBuffers (sizeof (fragdata) / sizeof (GLenum), fragdata);
 
-	/* Create post-processing framebuffer objects. */
+	/* Create multisample postprocessing textures. */
+	glGenTextures (2, postproc_texture);
+	for (i = 0 ; i < 2 ; i++)
+	{
+		glBindTexture (GL_TEXTURE_2D_MULTISAMPLE, postproc_texture[i]);
+		glTexImage2DMultisample (GL_TEXTURE_2D_MULTISAMPLE, samples, fmt2, width, height, GL_FALSE);
+	}
+
+	/* Create multisample post-processing framebuffer objects. */
 	glGenFramebuffers (2, postproc_fbo);
 	for (i = 0 ; i < 2 ; i++)
 	{
 		glBindFramebuffer (GL_FRAMEBUFFER, postproc_fbo[i]);
-		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-			GL_TEXTURE_2D, depth_texture, 0);
 		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-			GL_TEXTURE_2D, postproc_texture[i], 0);
+			GL_TEXTURE_2D_MULTISAMPLE, postproc_texture[i], 0);
+		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+			GL_TEXTURE_2D_MULTISAMPLE, depth_texture, 0);
 		if (!private_check (self))
 		{
 			glBindFramebuffer (GL_FRAMEBUFFER, 0);
@@ -348,6 +344,13 @@ private_rebuild (LIRenDeferred* self,
 		}
 		glDrawBuffers (1, fragdata);
 	}
+
+	/* There's a danger of running out of memory here since the G-buffer
+	   can consume a lot of video memory with high multisample settings.
+	   If something goes wrong, it's better to revert to the old buffer
+	   than to try to use the broken one just created. */
+	if (liren_error_get ())
+		return 0;
 
 	/* Accept successful rebuild. */
 	glBindFramebuffer (GL_FRAMEBUFFER, 0);
