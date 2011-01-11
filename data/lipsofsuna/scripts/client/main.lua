@@ -64,13 +64,9 @@ require "client/shaders/luminous"
 require "client/shaders/normalmap"
 require "client/shaders/particle"
 require "client/shaders/postprocess"
-require "client/shaders/shadeless"
 require "client/shaders/shadowmap"
 require "client/shaders/skin"
 require "client/shaders/terrain"
-require "client/shaders/texrefl"
-require "client/shaders/tilenfn"
-require "client/shaders/tilenxz"
 require "client/shaders/widget"
 
 Eventhandler{type = "quit", func = function(self, args)
