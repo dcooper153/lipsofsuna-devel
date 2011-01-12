@@ -50,7 +50,16 @@ Options.init = function(clss)
 		self.value = v
 	end
 	-- Bloom toggle.
-	clss.check_postproc = Widgets.Check{text = "Enable bloom"}
+	local button_bloom = Widgets.Button{text = "Bloom disabled"}
+	button_bloom.pressed = function(self)
+		if self.text == "Bloom disabled" then
+			clss.bloom_enabled = true
+			self.text = "Bloom enabled"
+		else
+			clss.bloom_enabled = nil
+			self.text = "Bloom disabled"
+		end
+	end
 	-- Luminance adjustment.
 	local scroll_luminance = Widgets.Progress{min = 0, max = 1, value = 0}
 	scroll_luminance:set_request{width = 100}
@@ -109,7 +118,7 @@ Options.init = function(clss)
 	quality_group:append_row(Widgets.Label{text = "Animation"}, scroll_animation)
 	quality_group:append_row(Widgets.Label{text = "Transparency"}, scroll_transparency)
 	local bloom_group = Widget{cols = 2}
-	bloom_group:append_row(clss.check_postproc)
+	bloom_group:append_row(Widgets.Label{text = "Bloom"}, button_bloom)
 	bloom_group:append_row(Widgets.Label{text = "Radius"}, scroll_radius)
 	bloom_group:append_row(Widgets.Label{text = "Exposure"}, scroll_exposure)
 	bloom_group:append_row(Widgets.Label{text = "Influence"}, scroll_luminance)

@@ -83,7 +83,7 @@ vec4 los_postproc_bloom(vec2 dt)
 	vec3 bloom = vec3(0.0);
 	for(i = 0 ; i < w ; i++)
 	{
-		vec3 sample = texture2D(LOS_diffuse_texture_0, var_texcoord + float(i - r) * dt).rgb;
+		vec3 sample = texture(LOS_diffuse_texture_0, var_texcoord + float(i - r) * dt).rgb;
 		float luminance = dot(sample, vec3(0.3, 0.59, 0.11));
 		float bloomed = max(0.0, luminance - bloom_luminance);
 		float exposure = 1.0 - exp(-bloom_exposure * bloomed);

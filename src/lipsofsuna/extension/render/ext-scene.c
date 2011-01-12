@@ -48,7 +48,7 @@ static void Scene_new (LIScrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
-	self = liren_deferred_new (module->client->render, 32, 32, 1);
+	self = liren_deferred_new (module->client->render, 32, 32, 1, 0);
 	if (self == NULL)
 		return;
 
@@ -65,11 +65,10 @@ static void Scene_new (LIScrArgs* args)
 }
 
 /* @luadoc
- * ---
- * -- Begins scene rendering.
- * --
+ * --- Begins scene rendering.
  * -- @param self Scene.
  * -- @param args Arguments.<ul>
+ * --   <li>hdr: True to enable HDR.</li>
  * --   <li>modelview: Modelview matrix.</li>
  * --   <li>multisamples: Number of multisamples.</li>
  * --   <li>projection: Projection matrix.</li>
@@ -78,6 +77,7 @@ static void Scene_new (LIScrArgs* args)
  */
 static void Scene_draw_begin (LIScrArgs* args)
 {
+	int hdr = 0;
 	int multisamples = 1;
 	GLint viewport[4];
 	LIExtModule* module;
@@ -92,6 +92,7 @@ static void Scene_draw_begin (LIScrArgs* args)
 	/* Get arguments. */
 	modelview = limat_matrix_identity ();
 	projection = limat_matrix_identity ();
+	liscr_args_gets_bool (args, "hdr", &hdr);
 	liscr_args_gets_floatv (args, "modelview", 16, modelview.m);
 	if (liscr_args_gets_int (args, "multisamples", &multisamples))
 		multisamples = LIMAT_MAX (1, multisamples);
@@ -111,7 +112,7 @@ static void Scene_draw_begin (LIScrArgs* args)
 	glPushAttrib (GL_VIEWPORT_BIT);
 	glViewport (viewport[0], viewport[1], viewport[2], viewport[3]);
 	limat_frustum_init (&frustum, &modelview, &projection);
-	liren_deferred_resize (args->self, viewport[2], viewport[3], multisamples);
+	liren_deferred_resize (args->self, viewport[2], viewport[3], multisamples, hdr);
 	liren_scene_render_begin (scene, args->self, &modelview, &projection, &frustum);
 }
 

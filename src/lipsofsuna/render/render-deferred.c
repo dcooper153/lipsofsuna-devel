@@ -33,7 +33,8 @@ static int private_rebuild (
 	LIRenDeferred* self,
 	int            width,
 	int            height,
-	int            samples);
+	int            samples,
+	int            hdr);
 
 /*****************************************************************************/
 
@@ -43,13 +44,15 @@ static int private_rebuild (
  * \param width Framebuffer width.
  * \param height Framebuffer height.
  * \param samples Number of multisamples.
+ * \param hdr Nonzero to use floating point framebuffer to enable HDR.
  * \return New deferred framebuffer or NULL.
  */
 LIRenDeferred* liren_deferred_new (
 	LIRenRender* render,
 	int          width,
 	int          height,
-	int          samples)
+	int          samples,
+	int          hdr)
 {
 	LIRenDeferred* self;
 
@@ -64,7 +67,7 @@ LIRenDeferred* liren_deferred_new (
 	/* Create frame buffer object. */
 	for ( ; samples > 0 ; samples--)
 	{
-		if (!liren_deferred_resize (self, width, height, samples))
+		if (!liren_deferred_resize (self, width, height, samples, hdr))
 			lisys_error_report ();
 		else
 			break;
@@ -85,9 +88,10 @@ LIRenDeferred* liren_deferred_new (
 void liren_deferred_free (
 	LIRenDeferred* self)
 {
-	glDeleteFramebuffers (2, self->postproc_fbo);
-	glDeleteTextures (1, &self->depth_texture);
-	glDeleteTextures (2, self->postproc_texture);
+	glDeleteFramebuffers (1, &self->render_framebuffer);
+	glDeleteFramebuffers (2, self->postproc_framebuffers);
+	glDeleteTextures (2, self->render_textures);
+	glDeleteTextures (3, self->postproc_textures);
 	lisys_free (self);
 }
 
@@ -97,13 +101,15 @@ void liren_deferred_free (
  * \param width New width.
  * \param height New height.
  * \param samples Number of multisamples.
+ * \param hdr Nonzero to use floating point framebuffer to enable HDR.
  * \return Nonzero on success.
  */
 int liren_deferred_resize (
 	LIRenDeferred* self,
 	int            width,
 	int            height,
-	int            samples)
+	int            samples,
+	int            hdr)
 {
 	int max;
 	int request;
@@ -121,11 +127,11 @@ int liren_deferred_resize (
 	samples = LIMAT_MIN (samples, max);
 
 	/* Check if a resize is actually needed. */
-	if (self->width == width && self->height == height && self->samples == samples)
+	if (self->hdr == hdr && self->width == width && self->height == height && self->samples == samples)
 		return 1;
 
 	/* Recreate the framebuffer objects. */
-	if (private_rebuild (self, width, height, samples))
+	if (private_rebuild (self, width, height, samples, hdr))
 	{
 		self->width = width;
 		self->height = height;
@@ -134,46 +140,6 @@ int liren_deferred_resize (
 	}
 
 	return 0;
-}
-
-/**
- * \brief Reads a pixel value from one of the textures.
- *
- * This function is horribly slow and should only be used for debugging purposes.
- * Doesn't work with multisample buffers currently.
- *
- * \param self Deferred framebuffer.
- * \param x Framebuffer position.
- * \param y Framebuffer position.
- * \param texture Texture index from 0 to 3.
- * \param result Return location for 4 floats.
- * \return Nonzero on success.
- */
-void liren_deferred_read_pixel (
-	LIRenDeferred* self,
-	int            x,
-	int            y,
-	int            texture,
-	float*         result)
-{
-	int off;
-	GLfloat* mem;
-
-	switch (texture)
-	{
-		case 0: glBindTexture (GL_TEXTURE_2D, self->depth_texture); break;
-	}
-	mem = calloc (4 * self->width * self->height, sizeof (GLfloat));
-	if (mem != NULL)
-	{
-		glGetTexImage (GL_TEXTURE_2D, 0, GL_RGBA, GL_FLOAT, mem);
-		off = 4 * x + 4 * y * self->width;
-		result[0] = mem[off + 0];
-		result[1] = mem[off + 1];
-		result[2] = mem[off + 2];
-		result[3] = mem[off + 3];
-		free (mem);
-	}
 }
 
 /*****************************************************************************/
@@ -226,65 +192,119 @@ static int private_rebuild (
 	LIRenDeferred* self,
 	int            width,
 	int            height,
-	int            samples)
+	int            samples,
+	int            hdr)
 {
 	int i;
-	GLenum fmt1;
-	GLenum fmt2;
+	GLenum fmt;
 	GLenum error;
-	GLuint postproc_fbo[2];
-	GLuint depth_texture;
-	GLuint postproc_texture[2];
-	static const GLenum fragdata[] =
-	{
-		GL_COLOR_ATTACHMENT0,
-		GL_COLOR_ATTACHMENT1,
-		GL_COLOR_ATTACHMENT2
-	};
+	GLuint render_framebuffer;
+	GLuint render_textures[2];
+	GLuint postproc_framebuffers[2];
+	GLuint postproc_textures[2];
+	static const GLenum fragdata[] = { GL_COLOR_ATTACHMENT0 };
 
 	/* Choose pixel formats. */
-	if (GLEW_ARB_texture_float)
-	{
-		fmt1 = GL_RGBA;
-		fmt2 = GL_RGBA32F;
-	}
+	if (hdr && GLEW_ARB_texture_float)
+		fmt = GL_RGBA32F;
 	else
-	{
-		fmt1 = GL_RGBA;
-		fmt2 = GL_RGBA;
-	}
+		fmt = GL_RGBA;
 	error = glGetError ();
 
-	/* Create multisample depth texture. */
-	glGenTextures (1, &depth_texture);
-	glBindTexture (GL_TEXTURE_2D_MULTISAMPLE, depth_texture);
-	glTexImage2DMultisample (GL_TEXTURE_2D_MULTISAMPLE, samples,
-		GL_DEPTH_COMPONENT24, width, height, GL_FALSE);
-
-	/* Create multisample postprocessing textures. */
-	glGenTextures (2, postproc_texture);
-	for (i = 0 ; i < 2 ; i++)
+	if (samples)
 	{
-		glBindTexture (GL_TEXTURE_2D_MULTISAMPLE, postproc_texture[i]);
-		glTexImage2DMultisample (GL_TEXTURE_2D_MULTISAMPLE, samples, fmt2, width, height, GL_FALSE);
-	}
+		/* Create multisample render textures. */
+		glGenTextures (2, render_textures);
+		glBindTexture (GL_TEXTURE_2D_MULTISAMPLE, render_textures[0]);
+		glTexImage2DMultisample (GL_TEXTURE_2D_MULTISAMPLE, samples, fmt, width, height, GL_FALSE);
+		glBindTexture (GL_TEXTURE_2D_MULTISAMPLE, render_textures[1]);
+		glTexImage2DMultisample (GL_TEXTURE_2D_MULTISAMPLE, samples,
+			GL_DEPTH_COMPONENT24, width, height, GL_FALSE);
 
-	/* Create multisample post-processing framebuffer objects. */
-	glGenFramebuffers (2, postproc_fbo);
-	for (i = 0 ; i < 2 ; i++)
-	{
-		glBindFramebuffer (GL_FRAMEBUFFER, postproc_fbo[i]);
+		/* Create multisample render framebuffer object. */
+		glGenFramebuffers (1, &render_framebuffer);
+		glBindFramebuffer (GL_FRAMEBUFFER, render_framebuffer);
 		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-			GL_TEXTURE_2D_MULTISAMPLE, postproc_texture[i], 0);
+			GL_TEXTURE_2D_MULTISAMPLE, render_textures[0], 0);
 		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-			GL_TEXTURE_2D_MULTISAMPLE, depth_texture, 0);
+			GL_TEXTURE_2D_MULTISAMPLE, render_textures[1], 0);
 		if (!private_check (self))
 		{
 			glBindFramebuffer (GL_FRAMEBUFFER, 0);
-			glBindRenderbuffer (GL_RENDERBUFFER, 0);
-			glDeleteFramebuffers (2, postproc_fbo);
-			glDeleteTextures (1, &depth_texture);
-			glDeleteTextures (2, postproc_texture);
+			glDeleteFramebuffers (1, &render_framebuffer);
+			glDeleteTextures (2, render_textures);
+			return 0;
+		}
+		glDrawBuffers (1, fragdata);
+	}
+	else
+	{
+		/* Create render textures. */
+		glGenTextures (2, render_textures);
+		glBindTexture (GL_TEXTURE_2D, render_textures[0]);
+		glTexImage2D (GL_TEXTURE_2D, 0, fmt, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+		glBindTexture (GL_TEXTURE_2D, render_textures[1]);
+		glTexImage2D (GL_TEXTURE_2D, 0, fmt, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+		/* Create render framebuffer object. */
+		glGenFramebuffers (1, &render_framebuffer);
+		glBindFramebuffer (GL_FRAMEBUFFER, render_framebuffer);
+		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+			GL_TEXTURE_2D, render_textures[0], 0);
+		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+			GL_TEXTURE_2D, render_textures[1], 0);
+		if (!private_check (self))
+		{
+			glBindFramebuffer (GL_FRAMEBUFFER, 0);
+			glDeleteFramebuffers (1, &render_framebuffer);
+			glDeleteTextures (2, render_textures);
+			return 0;
+		}
+		glDrawBuffers (1, fragdata);
+	}
+
+	/* Create postprocessing textures. */
+	glGenTextures (3, postproc_textures);
+	for (i = 0 ; i < 2 ; i++)
+	{
+		glBindTexture (GL_TEXTURE_2D, postproc_textures[i]);
+		glTexImage2D (GL_TEXTURE_2D, 0, fmt, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	}
+	glBindTexture (GL_TEXTURE_2D, postproc_textures[2]);
+	glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	/* Create post-processing framebuffer objects. */
+	glGenFramebuffers (2, postproc_framebuffers);
+	for (i = 0 ; i < 2 ; i++)
+	{
+		glBindFramebuffer (GL_FRAMEBUFFER, postproc_framebuffers[i]);
+		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+			GL_TEXTURE_2D, postproc_textures[i], 0);
+		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+			GL_TEXTURE_2D, postproc_textures[2], 0);
+		if (!private_check (self))
+		{
+			glBindFramebuffer (GL_FRAMEBUFFER, 0);
+			glDeleteFramebuffers (2, postproc_framebuffers);
+			glDeleteFramebuffers (1, &render_framebuffer);
+			glDeleteTextures (3, postproc_textures);
+			glDeleteTextures (2, render_textures);
 			return 0;
 		}
 		glDrawBuffers (1, fragdata);
@@ -299,14 +319,18 @@ static int private_rebuild (
 
 	/* Accept successful rebuild. */
 	glBindFramebuffer (GL_FRAMEBUFFER, 0);
-	glDeleteFramebuffers (2, self->postproc_fbo);
-	glDeleteTextures (1, &self->depth_texture);
-	glDeleteTextures (2, self->postproc_texture);
-	self->postproc_fbo[0] = postproc_fbo[0];
-	self->postproc_fbo[1] = postproc_fbo[1];
-	self->depth_texture = depth_texture;
-	self->postproc_texture[0] = postproc_texture[0];
-	self->postproc_texture[1] = postproc_texture[1];
+	glDeleteFramebuffers (1, &self->render_framebuffer);
+	glDeleteFramebuffers (2, self->postproc_framebuffers);
+	glDeleteTextures (2, self->render_textures);
+	glDeleteTextures (3, self->postproc_textures);
+	self->render_framebuffer = render_framebuffer;
+	self->render_textures[0] = render_textures[0];
+	self->render_textures[1] = render_textures[1];
+	self->postproc_framebuffers[0] = postproc_framebuffers[0];
+	self->postproc_framebuffers[1] = postproc_framebuffers[1];
+	self->postproc_textures[0] = postproc_textures[0];
+	self->postproc_textures[1] = postproc_textures[1];
+	self->postproc_textures[2] = postproc_textures[2];
 
 	return 1;
 }

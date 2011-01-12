@@ -36,7 +36,9 @@ struct _LIRenScene
 	LIRenLighting* lighting;
 	struct
 	{
+		int postproc_passes;
 		int rendering;
+		GLint original_viewport[4];
 		LIRenContext* context;
 		LIRenDeferred* framebuffer;
 	} state;

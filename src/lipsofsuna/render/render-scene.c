@@ -167,15 +167,14 @@ int liren_scene_render_begin (
 
 	/* Update state. */
 	self->state.rendering = 1;
+	self->state.postproc_passes = 0;
 	self->state.context = context;
 	self->state.framebuffer = framebuffer;
+	glGetIntegerv (GL_VIEWPORT, self->state.original_viewport);
 
 	/* Enable backbuffer viewport. */
-	glPushAttrib (GL_VIEWPORT_BIT);
+	glBindFramebuffer (GL_FRAMEBUFFER, framebuffer->render_framebuffer);
 	glViewport (0, 0, framebuffer->width, framebuffer->height);
-
-	/* Clear the post-processing buffer. */
-	glBindFramebuffer (GL_FRAMEBUFFER, framebuffer->postproc_fbo[0]);
 	glClear (GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
 	return 1;
@@ -189,22 +188,28 @@ int liren_scene_render_begin (
  *
  * \param self Scene.
  */
-void
-liren_scene_render_end (LIRenScene* self)
+void liren_scene_render_end (
+	LIRenScene* self)
 {
-	GLint viewport[4];
+	GLint* viewport;
 
 	/* Validate state. */
 	if (!self->state.rendering)
 		return;
 
 	/* Disable backbuffer viewport. */
-	glPopAttrib ();
-	glGetIntegerv (GL_VIEWPORT, viewport);
+	viewport = self->state.original_viewport;
+	glViewport (viewport[0], viewport[1], viewport[1], viewport[2]);
 
-	/* Blit from the post-processing FBO to the screen. */
+	/* Blit to the screen. */
+	/* If no post-processing steps were done, we blit directly from the render
+	   buffer. Otherwise, the final image is in the first post-processing
+	   buffer and we need to blit from there. */
+	if (self->state.postproc_passes)
+		glBindFramebuffer (GL_READ_FRAMEBUFFER, self->state.framebuffer->postproc_framebuffers[0]);
+	else
+		glBindFramebuffer (GL_READ_FRAMEBUFFER, self->state.framebuffer->render_framebuffer);
 	glBindFramebuffer (GL_DRAW_FRAMEBUFFER, 0);
-	glBindFramebuffer (GL_READ_FRAMEBUFFER, self->state.framebuffer->postproc_fbo[0]);
 	glBlitFramebuffer (0, 0, viewport[2], viewport[3], viewport[0], viewport[1],
 		viewport[0] + viewport[2], viewport[1] + viewport[3], GL_COLOR_BUFFER_BIT, GL_NEAREST);
 
@@ -257,10 +262,6 @@ void liren_scene_render_pass (
 	ambient_light = liren_light_new (self, black, equation, M_PI, 0.0f, 0);
 	liren_light_set_ambient (ambient_light, black);
 	liren_light_update_cache (ambient_light, self->state.context);
-
-	/* Bind the desired framebuffer. */
-	liren_context_set_deferred (self->state.context, 0);
-	glBindFramebuffer (GL_FRAMEBUFFER, self->state.framebuffer->postproc_fbo[0]);
 
 	/* Render each group. */
 	if (!lighting && !sorting)
@@ -492,6 +493,7 @@ void liren_scene_render_postproc (
 {
 	float param[4];
 	GLuint tmp;
+	LIRenDeferred* framebuffer;
 	LIRenShader* shader;
 
 	/* Validate state. */
@@ -502,33 +504,45 @@ void liren_scene_render_postproc (
 	shader = liren_render_find_shader (self->render, name);
 	if (shader == NULL)
 		return;
+	framebuffer = self->state.framebuffer;
+
+	/* Blit to the post-processing buffer. */
+	/* This is needed because the render buffer is multisampled but the
+	   post-processing buffer isn't due to fragment shader performance.
+	   Multisamples needs to be resolved before post-processing. */
+	if (!self->state.postproc_passes)
+	{
+		glBindFramebuffer (GL_READ_FRAMEBUFFER, framebuffer->render_framebuffer);
+		glBindFramebuffer (GL_DRAW_FRAMEBUFFER, framebuffer->postproc_framebuffers[0]);
+		glBlitFramebuffer (0, 0, framebuffer->width, framebuffer->height, 0, 0,
+			framebuffer->width, framebuffer->height, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+	}
 
 	/* Calculate the pixel size in texture units. */
-	param[0] = 1.0f / self->state.framebuffer->width;
-	param[1] = 1.0f / self->state.framebuffer->height;
+	param[0] = 1.0f / framebuffer->width;
+	param[1] = 1.0f / framebuffer->height;
 	param[2] = 0.0;
 	param[3] = 0.0;
 
-	/* Change render state. */
+	/* Render from the first buffer to the second. */
+	glBindFramebuffer (GL_FRAMEBUFFER, framebuffer->postproc_framebuffers[1]);
 	liren_context_set_buffer (self->state.context, self->render->helpers.unit_quad);
 	liren_context_set_blend (self->state.context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	liren_context_set_cull (self->state.context, 0, GL_CCW);
 	liren_context_set_param (self->state.context, param);
 	liren_context_set_shader (self->state.context, 0, shader);
-	liren_context_set_textures_raw (self->state.context, self->state.framebuffer->postproc_texture, 1);
+	liren_context_set_textures_raw (self->state.context, framebuffer->postproc_textures, 1);
 	liren_context_bind (self->state.context);
-	glBindFramebuffer (GL_FRAMEBUFFER_EXT, self->state.framebuffer->postproc_fbo[1]);
-
-	/* Render from the first buffer to the second. */
 	liren_context_render_indexed (self->state.context, 0, 6);
+	self->state.postproc_passes++;
 
 	/* Swap the buffers so that we can chain passes. */
-	tmp = self->state.framebuffer->postproc_fbo[0];
-	self->state.framebuffer->postproc_fbo[0] = self->state.framebuffer->postproc_fbo[1];
-	self->state.framebuffer->postproc_fbo[1] = tmp;
-	tmp = self->state.framebuffer->postproc_texture[0];
-	self->state.framebuffer->postproc_texture[0] = self->state.framebuffer->postproc_texture[1];
-	self->state.framebuffer->postproc_texture[1] = tmp;
+	tmp = framebuffer->postproc_framebuffers[0];
+	framebuffer->postproc_framebuffers[0] = framebuffer->postproc_framebuffers[1];
+	framebuffer->postproc_framebuffers[1] = tmp;
+	tmp = framebuffer->postproc_textures[0];
+	framebuffer->postproc_textures[0] = framebuffer->postproc_textures[1];
+	framebuffer->postproc_textures[1] = tmp;
 }
 
 /**
