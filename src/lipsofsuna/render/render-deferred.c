@@ -201,7 +201,7 @@ static int private_rebuild (
 	GLuint render_framebuffer;
 	GLuint render_textures[2];
 	GLuint postproc_framebuffers[2];
-	GLuint postproc_textures[2];
+	GLuint postproc_textures[3];
 	static const GLenum fragdata[] = { GL_COLOR_ATTACHMENT0 };
 
 	/* Choose pixel formats. */
@@ -211,7 +211,7 @@ static int private_rebuild (
 		fmt = GL_RGBA;
 	error = glGetError ();
 
-	if (samples)
+	if (samples > 1)
 	{
 		/* Create multisample render textures. */
 		glGenTextures (2, render_textures);
@@ -248,7 +248,7 @@ static int private_rebuild (
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 		glBindTexture (GL_TEXTURE_2D, render_textures[1]);
-		glTexImage2D (GL_TEXTURE_2D, 0, fmt, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT24, width, height, 0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
