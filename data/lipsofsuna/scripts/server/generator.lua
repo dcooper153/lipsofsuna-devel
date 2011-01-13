@@ -168,11 +168,17 @@ Voxel.place_pattern = function(clss, args)
 	if not pat then return end
 	-- Create tiles.
 	for k,v in pairs(pat.tiles) do
-		local mat = Material:find{name = v[4]}
-		if mat then
+		if v[4] then
+			local mat = Material:find{name = v[4]}
+			if mat then
+				Voxel:set_tile{
+					point = args.point + Vector(v[1], v[2], v[3]),
+					tile = mat.id}
+			end
+		else
 			Voxel:set_tile{
 				point = args.point + Vector(v[1], v[2], v[3]),
-				tile = mat.id}
+				tile = 0}
 		end
 	end
 	-- Create obstacles.
@@ -205,127 +211,190 @@ Voxel.place_pattern = function(clss, args)
 	end
 end
 
--- Initialize map generation rules.
-for k,reg in pairs(Regionspec.dict_name) do
-	Generator:add_brush{name = reg.name, size = Vector(reg.size[1], reg.size[2], reg.size[3])}
-end
-for k,reg in pairs(Regionspec.dict_name) do
-	for l,rule in pairs(reg.links) do
-		local id = Generator:add_rule{name = reg.name}
-		for m,link in pairs(rule) do
-			Generator:add_link{
-				name = reg.name,
-				brush = link[1],
-				offset = Vector(link[2], link[3], link[4]),
-				rule = id}
-		end
-	end
-end
-
 ------------------------------------------------------------------------------
 
---- Disables all region types.
+Generator = Class()
+
+--- Draws a corridor in the map.
 -- @param clss Generator class.
--- @param args Arguments.<ul>
---   <li>except: Name of a rule not to enable.</li></ul>
-Generator.disable_regions = function(clss, args)
-	for k,reg in pairs(Regionspec.dict_name) do
-		Generator:disable_brush{name = reg.name}
+-- @param src Source point in tiles.
+-- @param dst Destination point in tiles.
+Generator.paint_corridor = function(clss, src, dst)
+	local dir = (dst - src):normalize()
+	local len = math.floor((dst - src).length)
+	local pos = Vector(src.x, src.y, src.z)
+	local ipos = Vector()
+	for l = 0,len do
+		ipos.x = math.floor(pos.x + 0.5)
+		ipos.y = math.floor(pos.y + 0.5)
+		ipos.z = math.floor(pos.z + 0.5)
+		Voxel:place_pattern{name = "corridor1", point = ipos}
+		pos = pos + dir
 	end
-	Generator:enable_brush{name = args and args.except}
 end
 
---- Enables all region types.
+--- Places a region to the map.
 -- @param clss Generator class.
--- @param args Arguments.<ul>
---   <li>except: Name of a rule not to disable.</li></ul>
-Generator.enable_regions = function(clss, args)
-	for k,reg in pairs(Regionspec.dict_name) do
-		Generator:enable_brush{name = reg.name}
+-- @param reg Region spec.
+Generator.place_region = function(clss, reg)
+	-- Determine the approximate position.
+	-- Regions can be placed randomly or relative to each other. Here we
+	-- decide the range of positions that are valid for the region.
+	local rel = nil
+	local dist = nil
+	if reg.position then
+		rel = Vector(reg.position[1], 0, reg.position[2])
+	elseif not reg.distance then
+		rel = Vector(math.random(500, 2500), 0, math.random(500, 2500))
+		dist = {nil, 300, 300}
+	elseif clss.regions_dict_name[reg.distance[1]] then
+		rel = clss.regions_dict_name[reg.distance[1]].point
+		rel = Vector(rel.x, 0, rel.z)
+		dist = reg.distance
+	else return end
+	-- Determine the final position.
+	-- Regions with a random position range are placed at different
+	-- positions until one is found where they fit. Regions with fixed
+	-- positions are simply placed there without any checks.
+	local pos = Vector()
+	local size = Vector(reg.size[1], reg.size[2], reg.size[3])
+	local aabb = Aabb{point = pos, size = size + Vector(10,10,10)}
+	if dist then
+		repeat
+			pos.x = math.random(dist[2], dist[3])
+			pos.y = math.random(reg.depth[1], reg.depth[2])
+			pos.z = math.random(dist[2], dist[3])
+			if math.random(0, 1) == 1 then pos.x = -pos.x end
+			if math.random(0, 1) == 1 then pos.z = -pos.z end
+			pos = pos + rel
+			aabb.point = pos - Vector(5,5,5)
+		until clss:validate_region_position(aabb)
+	else
+		pos.x = rel.x
+		pos.y = math.random(reg.depth[1], reg.depth[2])
+		pos.z = rel.z
+		aabb.point = pos - Vector(5,5,5)
 	end
-	Generator:disable_brush{name = args and args.except}
+	-- Store the region.
+	local region = {aabb = aabb, links = {}, point = pos, size = size, spec = reg}
+	table.insert(clss.regions_dict_id, region)
+	clss.regions_dict_name[reg.name] = region
+	return region
 end
 
+--- Checks if a region can be placed in the given position.
+-- @param clss Generator class.
+-- @param aabb Position of the region.
+-- @return True if the position is valid.
+Generator.validate_region_position = function(clss, aabb)
+	for k,v in pairs(clss.regions_dict_id) do
+		if aabb:intersects(v.aabb) then return end
+	end
+	return true
+end
+
+--- Generates the world map.
+-- @param clss Generator class.
+-- @param args Arguments.
 Generator.generate = function(clss, args)
-	-- Generate the town and its surroundings.
-	Generator:format{center = Config.center * Config.tilescale}
-	Generator:disable_brush{name = "rootsofworld-grove"}
-	Generator:expand{count = 10}
-	-- Generate Chara's root grove.
-	local success
-	repeat
-		Generator:disable_regions{except = "rootsofworld-grove"}
-		success = Generator:expand{count = 1}
-		Generator:enable_regions{except = "rootsofworld-grove"}
-		Generator:expand{count = 1}
-	until success
-	-- Generate lots of pointless random regions.
-	Generator:expand{count = 89}
-	-- Populate the generated regions.
-	for i,r in pairs(Generator.regions) do
-		Voxel:fill_region{point = r.point, size = r.size}
-		local spec = Regionspec:find{name = r.name}
-		if spec then
-			-- TODO: Actually fill the regions here.
-			if spec.style == "lips" then
-				Voxel:place_pattern{point = r.point + Vector(1,0,1), name = "house1"}
-				Voxel:place_pattern{point = r.point + Vector(5,0,1), name = "house1"}
-				Voxel:place_pattern{point = r.point + Vector(1,0,6), name = "house1"}
-				Voxel:place_pattern{point = r.point + Vector(5,0,6), name = "house1"}
-				Voxel:place_pattern{point = r.point + Vector(9,2,9), name = "mourningadventurer_town"}
-				Voxel:place_pattern{point = r.point + Vector(4,1,4), name = "peculiarpet"}
-				Voxel:place_creature{point = r.point + Vector(3,0,14), name = "lipscitizen"}
-				Voxel:place_creature{point = r.point + Vector(8,0,9), name = "lipscitizen"}
-				local p = Vector(10,0,0)
-				local s = r.size - p
-				Voxel:make_heightmap{point = r.point + p, size = s, material = "grass1"}
-				p = p + Vector(3,1,3)
-				s = s - Vector(2,1,2)
-				Voxel:make_heightmap{point = r.point + p, size = s,
-					material = "grass1", tree_density = 0.05}
-			elseif spec.name == "dungeon-room" then
-				Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "house1"}
-			elseif spec.name == "dungeon-slope-n" then
-				Voxel:make_slope{point = r.point, size = r.size,
-					heights = {2,2,3,3}, randomness = 1,
-					material = "soil1", tree_density = 0.05}
-			elseif spec.name == "dungeon-slope-s" then
-				Voxel:make_slope{point = r.point, size = r.size,
-					heights = {3,3,2,2}, randomness = 1,
-					material = "soil1", tree_density = 0.05}
-			elseif spec.name == "dungeon-slope-e" then
-				Voxel:make_slope{point = r.point, size = r.size,
-					heights = {2,3,2,3}, randomness = 1,
-					material = "soil1", tree_density = 0.05}
-			elseif spec.name == "dungeon-slope-w" then
-				Voxel:make_slope{point = r.point, size = r.size,
-					heights = {3,2,3,2}, randomness = 1,
-					material = "soil1", tree_density = 0.05}
-			elseif spec.name == "dungeon-corridor-ns" then
-				Voxel:place_creature{point = r.point + Vector(1,1,3), name = "bloodworm", prob = 0.25}
-				Voxel:place_creature{point = r.point + Vector(2,1,8), name = "bloodworm", prob = 0.25}
-				Voxel:make_heightmap{point = r.point + Vector(0,0,0), size = r.size,
-					material = "grass1", tree_density = 0.05,
-					mushroom_density = 0.3}
-			elseif spec.name == "dungeon-corridor-ew" then
-				Voxel:place_creature{point = r.point + Vector(3,1,1), name = "bloodworm", prob = 0.25}
-				Voxel:place_creature{point = r.point + Vector(8,1,2), name = "bloodworm", prob = 0.25}
-				Voxel:make_heightmap{point = r.point + Vector(0,0,0), size = r.size,
-					material = "grass1", tree_density = 0.01,
-					mushroom_density = 0.3}
-			elseif spec.name == "rootsofworld-grove" then
-				Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "rootsofworld"}
-				Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "mourningadventurer_lost"}
+	-- Initialize state.
+	clss.links = {}
+	clss.regions_dict_id = {}
+	clss.regions_dict_name = {}
+	-- Place special areas.
+	-- Regions have dependencies so we need to place them in several passes.
+	-- The region tables are filled but the map is all empty after this.
+	clss:update_status(0, "Placing regions")
+	while true do
+		local skipped = 0
+		for name,reg in pairs(Regionspec.dict_name) do
+			if not clss.regions_dict_name[name] then
+				if not clss:place_region(reg) then
+					skipped = skipped + 1
+				end
 			end
 		end
+		if skipped == 0 then break end
+	end
+	-- Initialize connectivity.
+	-- A cyclic graph is created out of the special areas by creating links
+	-- between them according to the rules in the region specs.
+	clss:update_status(0, "Connecting regions")
+	local linkn = 0
+	for _,reg1 in pairs(clss.regions_dict_name) do
+		for _,name in ipairs(reg1.spec.links) do
+			local reg2 = clss.regions_dict_name[name]
+			local link = {reg1, reg2}
+			reg1.links[reg2.spec.name] = link
+			reg2.links[reg1.spec.name] = link
+			table.insert(clss.links, link)
+			linkn = linkn + 1
+		end
+	end
+	-- TODO: Randomize connectivity.
+	-- Paint corridors.
+	clss:update_status(0, "Creating corridors")
+	for i,link in ipairs(clss.links) do
+		local src = (link[1].point + link[1].size * 0.5):floor()
+		local dst = (link[2].point + link[2].size * 0.5):floor()
+		clss:paint_corridor(src, dst)
+		clss:update_status(i / linkn)
+	end
+	-- Paint regions.
+	clss:update_status(0, "Creating regions")
+	local region_funcs = {
+		-- TODO
+		["Lips"] = function(r)
+			Voxel:place_pattern{point = r.point + Vector(1,0,1), name = "house1"}
+			Voxel:place_pattern{point = r.point + Vector(5,0,1), name = "house1"}
+			Voxel:place_pattern{point = r.point + Vector(1,0,6), name = "house1"}
+			Voxel:place_pattern{point = r.point + Vector(5,0,6), name = "house1"}
+			Voxel:place_pattern{point = r.point + Vector(9,2,9), name = "mourningadventurer_town"}
+			Voxel:place_pattern{point = r.point + Vector(4,1,4), name = "peculiarpet"}
+			Voxel:place_creature{point = r.point + Vector(3,0,14), name = "lipscitizen"}
+			Voxel:place_creature{point = r.point + Vector(8,0,9), name = "lipscitizen"}
+--[[
+			local p = Vector(10,0,0)
+			local s = r.size - p
+			Voxel:make_heightmap{point = r.point + p, size = s, material = "grass1"}
+			p = p + Vector(3,1,3)
+			s = s - Vector(2,1,2)
+			Voxel:make_heightmap{point = r.point + p, size = s,
+				material = "grass1", tree_density = 0.05}]]
+		end,
+		["Chara's Root Grove"] = function(r)
+			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "rootsofworld"}
+			Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "mourningadventurer_lost"}
+		end}
+	for name,reg in pairs(clss.regions_dict_name) do
+		Voxel:fill_region{point = reg.point, size = reg.size}
+		local func = region_funcs[name]
+		if func then func(reg) end
+	end
+	-- Find used sectors.
+	clss:update_status(0, "Counting sectors")
+	local sectorn = 0
+	local sectors = Program.sectors
+	for k in pairs(sectors) do
+		sectorn = sectorn + 1
 	end
 	-- Randomize tiles.
-	Program:update()
-	while true do
-		local e = Program:pop_event()
-		if not e then break end
-		if e.type == "sector-load" then
-			Sectors:format_generated_sector(e.sector)
-		end
+	clss:update_status(0, "Creating ore veins")
+	local index = 0
+	for k in pairs(sectors) do
+		Sectors:format_generated_sector(k)
+		clss:update_status(index / sectorn)
+		index = index + 1
+	end
+end
+
+Generator.update_status = function(clss, frac, msg)
+	if msg then
+		print(math.ceil(frac * 100) .. "% " .. msg)
+		clss.prev_message = msg
+		clss.prev_fraction = frac
+	elseif frac == 1 or frac > clss.prev_fraction + 0.1 then
+		print(math.ceil(frac * 100) .. "% " .. clss.prev_message)
+		clss.prev_fraction = frac
 	end
 end

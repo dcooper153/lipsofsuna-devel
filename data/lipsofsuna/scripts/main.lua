@@ -50,7 +50,6 @@ require "common/thread"
 require "common/timer"
 
 if Program.args == "--server" then
-require "core/generator"
 require "core/object-physics"
 require "common/vision"
 require "common/inventory"

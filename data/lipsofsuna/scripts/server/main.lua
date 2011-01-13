@@ -49,6 +49,8 @@ restart = function()
 	-- don't trigger when the game starts.
 	Program:update()
 	repeat until not Program:pop_event()
+	Program:update()
+	repeat until not Program:pop_event()
 	print("Done")
 	Network.closed = false
 end

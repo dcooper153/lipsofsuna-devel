@@ -5,6 +5,10 @@ Actions.register = function(self, args)
 	self[args.name] = args.func
 end
 
+Vector.floor = function(self)
+	return Vector(math.floor(self.x), math.floor(self.y), math.floor(self.z))
+end
+
 Aabb = Class()
 
 Aabb.new = function(clss, args)
@@ -25,13 +29,14 @@ Aabb.intersects = function(self, aabb)
 end
 
 Config = {}
-Config.center = Vector(1024, 1024, 1024)
-Config.spawn = Vector(1026, 1018, 1024)
-
 Config.tilewidth = 32 / Voxel.tiles_per_line
 Config.tilescale = 1 / Config.tilewidth
 Config.gravity = Vector(0, -20, 0)
 Config.skillregen = 0.5
+
+local reg = Regionspec:find{name = "Lips"}
+Config.center = Vector(reg.position[1] + reg.size[1] * 0.5, reg.depth[1], reg.position[2] + reg.size[3] * 0.5) * Config.tilewidth
+Config.spawn = Config.center + Vector(0, 3, 0)
 
 Skills.get_total = function(self)
 	local n = self:get_names()
