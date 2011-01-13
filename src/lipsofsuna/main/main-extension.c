@@ -27,7 +27,6 @@
 
 extern LIMaiExtensionInfo liext_camera_info;
 extern LIMaiExtensionInfo liext_database_info;
-extern LIMaiExtensionInfo liext_generator_info;
 extern LIMaiExtensionInfo liext_graphics_info;
 extern LIMaiExtensionInfo liext_network_info;
 extern LIMaiExtensionInfo liext_object_physics_info;
@@ -60,7 +59,6 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 	{
 		{ "camera", &liext_camera_info },
 		{ "database", &liext_database_info },
-		{ "generator", &liext_generator_info },
 		{ "graphics", &liext_graphics_info },
 		{ "network", &liext_network_info },
 		{ "object-physics", &liext_object_physics_info },
