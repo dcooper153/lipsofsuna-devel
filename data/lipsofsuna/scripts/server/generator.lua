@@ -213,6 +213,23 @@ end
 
 ------------------------------------------------------------------------------
 
+Region = Class()
+
+Region.new = function(clss, args)
+	local self = Class.new(clss, args)
+	self.links = {}
+	return self
+end
+
+Region.create_link = function(self, region)
+	local link = {self, region}
+	table.insert(self.links, link)
+	table.insert(region.links, link)
+	return link
+end
+
+------------------------------------------------------------------------------
+
 Generator = Class()
 
 --- Draws a corridor in the map.
@@ -276,7 +293,7 @@ Generator.place_region = function(clss, reg)
 		aabb.point = pos - Vector(5,5,5)
 	end
 	-- Store the region.
-	local region = {aabb = aabb, links = {}, point = pos, size = size, spec = reg}
+	local region = Region{aabb = aabb, point = pos, size = size, spec = reg}
 	table.insert(clss.regions_dict_id, region)
 	clss.regions_dict_name[reg.name] = region
 	return region
@@ -287,6 +304,12 @@ end
 -- @param aabb Position of the region.
 -- @return True if the position is valid.
 Generator.validate_region_position = function(clss, aabb)
+	if aabb.point.x < 100 then return end
+	if aabb.point.y < 100 then return end
+	if aabb.point.z < 100 then return end
+	if aabb.point.x + aabb.size.x > 3000 then return end
+	if aabb.point.y + aabb.size.y > 3000 then return end
+	if aabb.point.z + aabb.size.z > 3000 then return end
 	for k,v in pairs(clss.regions_dict_id) do
 		if aabb:intersects(v.aabb) then return end
 	end
@@ -324,14 +347,22 @@ Generator.generate = function(clss, args)
 	for _,reg1 in pairs(clss.regions_dict_name) do
 		for _,name in ipairs(reg1.spec.links) do
 			local reg2 = clss.regions_dict_name[name]
-			local link = {reg1, reg2}
-			reg1.links[reg2.spec.name] = link
-			reg2.links[reg1.spec.name] = link
-			table.insert(clss.links, link)
+			local link = reg1:create_link(reg2)
 			linkn = linkn + 1
+			clss.links[linkn] = link
 		end
 	end
-	-- TODO: Randomize connectivity.
+	-- Randomize connectivity.
+	-- Links between regions are subdivided and random regions are created.
+	clss:update_status(0, "Randomizing connectivity")
+	for i,link in ipairs(clss.links) do
+		local l = clss:subdivide_link(link)
+		if l then
+			linkn = linkn + 1
+			clss.links[linkn] = l
+		end
+		clss:update_status(i / linkn)
+	end
 	-- Paint corridors.
 	clss:update_status(0, "Creating corridors")
 	for i,link in ipairs(clss.links) do
@@ -366,9 +397,9 @@ Generator.generate = function(clss, args)
 			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "rootsofworld"}
 			Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "mourningadventurer_lost"}
 		end}
-	for name,reg in pairs(clss.regions_dict_name) do
+	for _,reg in pairs(clss.regions_dict_id) do
 		Voxel:fill_region{point = reg.point, size = reg.size}
-		local func = region_funcs[name]
+		local func = region_funcs[reg.spec.name]
 		if func then func(reg) end
 	end
 	-- Find used sectors.
@@ -386,6 +417,50 @@ Generator.generate = function(clss, args)
 		clss:update_status(index / sectorn)
 		index = index + 1
 	end
+end
+
+--- Subdivides the link between the region and another region.
+-- @param self Generator class.
+-- @param link Link to subdivide.
+-- @return Link or nil.
+Generator.subdivide_link = function(clss, link)
+	-- Select the type for the new region.
+	local spec = Regionspec:random{category = "random"}
+	if not spec then return end
+	-- Calculate the subdivision.
+	local src = link[1].point
+	local dst = link[2].point
+	local len = (dst - src).length
+	if len - link[1].size.length - link[2].size.length < 16 then return end
+	local rel = src + (dst - src) * (0.3 + 0.4 * math.random())
+	-- Find the position for the new region.
+	local ok = nil
+	local pos = Vector()
+	local size = Vector(spec.size[1], spec.size[2], spec.size[3])
+	local aabb = Aabb{point = pos, size = size + Vector(10,10,10)}
+	local dist = {0,math.ceil(0.3 * len)}
+	for i = 1,20 do
+		pos.x = math.random(dist[1], dist[2])
+		pos.y = math.random(dist[1], dist[2])
+		pos.z = math.random(dist[1], dist[2])
+		if math.random(0, 1) == 1 then pos.x = -pos.x end
+		if math.random(0, 1) == 1 then pos.y = -pos.y end
+		if math.random(0, 1) == 1 then pos.z = -pos.z end
+		pos = (pos + rel):floor()
+		aabb.point = pos - Vector(5,5,5)
+		if clss:validate_region_position(aabb) then
+			ok = true
+			break
+		end
+	end
+	if not ok then return end
+	-- Create the new region.
+	local region = Region{aabb = aabb, point = pos, size = size, spec = spec}
+	table.insert(clss.regions_dict_id, region)
+	-- Link the new region to the path.
+	local l = region:create_link(link[2])
+	link[2] = region
+	return l
 end
 
 Generator.update_status = function(clss, frac, msg)

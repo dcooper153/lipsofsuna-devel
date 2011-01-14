@@ -55,17 +55,3 @@ Itemspec.new = function(clss, args)
 	end
 	return self
 end
-
---- Returns a random item spec.
--- @param clss Itemspec class.
--- @param args Arguments.<ul>
---   <li>category: Category name.</li></ul>
--- @return Itemspec or nil.
-Itemspec.random = function(clss, args)
-	if args and args.category then
-		local cat = clss.dict_cat[args.category]
-		if not cat then return end
-		return cat[math.random(#cat)]
-	end
-	return clss.dict_id[math.random(#clss.dict_id)]
-end
