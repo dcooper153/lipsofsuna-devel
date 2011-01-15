@@ -88,7 +88,6 @@ Voxel.block_changed_cb = function(index, stamp)
 	Vision:event{type = "voxel-block-changed", index = index, point = ARGH, stamp = stamp}
 end
 
-math.randomseed(1000000 * Program.time)
 Program.sleep = 1/60
 
 -- Main loop.

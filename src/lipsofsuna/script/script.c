@@ -31,11 +31,9 @@
 
 /**
  * \brief Creates a new script.
- *
  * \return New script or NULL.
  */
-LIScrScript*
-liscr_script_new ()
+LIScrScript* liscr_script_new ()
 {
 	LIScrScript* self;
 
@@ -54,24 +52,24 @@ liscr_script_new ()
 	}
 
 	/* Load libraries. */
-    lua_pushcfunction (self->lua, luaopen_base);
-    lua_pushstring (self->lua, "");
-    lua_call (self->lua, 1, 0);
-    lua_pushcfunction (self->lua, luaopen_package);
-    lua_pushstring (self->lua, LUA_LOADLIBNAME);
-    lua_call (self->lua, 1, 0);
-    lua_pushcfunction (self->lua, luaopen_table);
-    lua_pushstring (self->lua, LUA_TABLIBNAME);
-    lua_call (self->lua, 1, 0);
-    lua_pushcfunction (self->lua, luaopen_string);
-    lua_pushstring (self->lua, LUA_STRLIBNAME);
-    lua_call (self->lua, 1, 0);
-    lua_pushcfunction (self->lua, luaopen_math);
-    lua_pushstring (self->lua, LUA_MATHLIBNAME);
-    lua_call (self->lua, 1, 0);
-    lua_pushcfunction (self->lua, luaopen_debug);
-    lua_pushstring (self->lua, LUA_DBLIBNAME);
-    lua_call (self->lua, 1, 0);
+	lua_pushcfunction (self->lua, luaopen_base);
+	lua_pushstring (self->lua, "");
+	lua_call (self->lua, 1, 0);
+	lua_pushcfunction (self->lua, luaopen_package);
+	lua_pushstring (self->lua, LUA_LOADLIBNAME);
+	lua_call (self->lua, 1, 0);
+	lua_pushcfunction (self->lua, luaopen_table);
+	lua_pushstring (self->lua, LUA_TABLIBNAME);
+	lua_call (self->lua, 1, 0);
+	lua_pushcfunction (self->lua, luaopen_string);
+	lua_pushstring (self->lua, LUA_STRLIBNAME);
+	lua_call (self->lua, 1, 0);
+	lua_pushcfunction (self->lua, luaopen_math);
+	lua_pushstring (self->lua, LUA_MATHLIBNAME);
+	lua_call (self->lua, 1, 0);
+	lua_pushcfunction (self->lua, luaopen_debug);
+	lua_pushstring (self->lua, LUA_DBLIBNAME);
+	lua_call (self->lua, 1, 0);
 
 	/* Create shortcut to self. */
 	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_SELF);
@@ -100,6 +98,18 @@ liscr_script_new ()
 	lua_setfield (self->lua, -2, "__mode");
 	lua_setmetatable (self->lua, -2);
 	lua_settable (self->lua, LUA_REGISTRYINDEX);
+
+	/* Initialize random numbers. */
+	lua_getglobal (self->lua, "math");
+	lua_getfield (self->lua, -1, "randomseed");
+	lua_remove (self->lua, -2);
+	lua_pushnumber (self->lua, lisys_time (NULL));
+	if (lua_pcall (self->lua, 1, 0, 0) != 0)
+	{
+		lisys_error_set (EINVAL, lua_tostring (self->lua, -1));
+		lisys_error_report ();
+		lua_pop (self->lua, 1);
+	}
 
 	return self;
 }
