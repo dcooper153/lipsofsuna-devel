@@ -207,8 +207,9 @@ Species{
 Species{
 	name = "brigand",
 	base = "aer",
-	inventory_items = {"axe", "leather top", "leather pants", "leather leggings"},
-	factions = {"evil"}}
+	categories = {"enemy"},
+	factions = {"evil"},
+	inventory_items = {"iron sword", "leather top", "leather pants", "leather leggings"}}
 
 Species{
 	name = "lipscitizen",
@@ -221,6 +222,7 @@ Species{
 	name = "bloodworm",
 	ai_enable_strafe = false,
 	ai_enable_defend = false,
+	categories = {"enemy"},
 	factions = {"evil"},
 	feats = {"bite"},
 	inventory_size = 0,

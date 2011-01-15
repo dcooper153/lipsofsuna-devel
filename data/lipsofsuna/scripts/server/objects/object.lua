@@ -115,6 +115,28 @@ Object.get_name_with_count = function(self)
 	return name
 end
 
+--- Returns the range of tiles occupied by the object.
+-- @param self Object.
+-- @return Start vector, size vector.
+Object.get_tile_range = function(self)
+	-- TODO: Should depend on species.
+	local size = Vector(1,2,1)
+	local src = self.position * Config.tilescale
+	src.x = math.floor(src.x)
+	src.y = math.floor(src.y + 0.1)
+	src.z = math.floor(src.z)
+	return src, src + size
+end
+
+--- Returns true if the object is stuck inside a wall.
+-- @param self Object.
+-- @return True if stuck. 
+Object.get_stuck = function(self, value)
+	if not self.realized then return end
+	local src,dst = self:get_tile_range()
+	return not Voxel:check_empty(src, dst)
+end
+
 --- Finds a targeted object.
 -- @param self Object.
 -- @param where Inventory number or zero for world.

@@ -95,7 +95,7 @@ static void Voxel_intersect_ray (LIScrArgs* args)
 		/* TODO: Blocks should maintain a list of triangles that tells to which tile
 		 * each triangle belongs to. Then we could determine the actual tiles instead
 		 * of guesstimating. */
-		if (livox_manager_find_voxel (module->voxels, LIVOX_FIND_FULL, &best.point, index) == NULL)
+		if (livox_manager_find_voxel (module->voxels, LIVOX_FIND_FULL, &best.point, 0.0f, index) == NULL)
 			return;
 		result = limat_vector_init (index[0], index[1], index[2]);
 		liscr_args_seti_vector (args, &best.point);

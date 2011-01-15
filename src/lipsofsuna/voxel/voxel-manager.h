@@ -90,6 +90,7 @@ LIAPICALL (LIVoxVoxel*, livox_manager_find_voxel, (
 	LIVoxManager*      self,
 	int                flags,
 	const LIMatVector* point,
+	float              radius,
 	int*               index));
 
 LIAPICALL (int, livox_manager_insert_material, (

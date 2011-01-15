@@ -30,6 +30,14 @@ Sectors.new = function(clss, args)
 	return self
 end
 
+--- Called when a sector is created by the game.
+-- @param self Sectors.
+-- @param sector Sector index.
+-- @param terrain True if terrain was loaded.
+-- @param objects Array of objects.
+Sectors.created_sector = function(self, sector, terrain, objects)
+end
+
 --- Removes all sectors from the database.
 -- @param self Sectors.
 Sectors.erase_world = function(self, erase)
@@ -39,46 +47,46 @@ Sectors.erase_world = function(self, erase)
 	self.database:query("END TRANSACTION;")
 end
 
---- Called when an empty sector is created.
--- @param self Sectors.
--- @param sector Sector index.
-Sectors.format_sector = function(self, sector)
-end
-
 --- Reads a sector from the database.
 -- @param self Sectors.
 -- @param sector Sector index.
 Sectors.load_sector = function(self, sector)
+	local objects = {}
+	local terrain = nil
 	-- Only load once.
 	if self.sectors[sector] then return end
 	self.sectors[sector] = true
 	-- Load terrain.
 	if self.save_terrain then
 		local rows = self.database:query("SELECT * FROM terrain WHERE sector=?;", {sector})
-		if #rows == 0 then
-			self:format_sector(sector)
-		else
+		if #rows ~= 0 then
 			for k,v in ipairs(rows) do
 				Voxel:paste_region{sector = sector, packet = v[2]}
 			end
+			terrain = true
 		end
-	else
-		self:format_sector(sector)
 	end
 	-- Load objects. Since tiles are loaded in background, we need to wait for them to be
 	-- loaded before creation the object or else the object will fall inside the ground.
 	-- TODO: Should use a tiles-loaded event to determine when the tiles have been loaded.
 	if self.save_objects then
 		local rows = self.database:query("SELECT * FROM objects WHERE sector=?;", {sector})
-		Timer{delay = 1, func = function(self)
+		Timer{delay = 1, func = function(timer)
 			for k,v in ipairs(rows) do
 				local func = assert(loadstring("return function()\n" .. v[3] .. "\nend"))()
 				if func then
 					local object = func()
 					if object then object.realized = true end
+					table.insert(objects, object)
 				end
 			end
-			self:disable()
+			timer:disable()
+			self:created_sector(sector, terrain, objects)
+		end}
+	else
+		Timer{delay = 1, func = function(timer)
+			timer:disable()
+			self:created_sector(sector, terrain, objects)
 		end}
 	end
 end

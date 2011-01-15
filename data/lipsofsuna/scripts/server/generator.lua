@@ -1,61 +1,22 @@
-
---- Called when an empty sector is created.
--- @param self Sectors.
--- @param sector Sector index.
-Sectors.format_generated_sector = function(self, sector)
-	local w = 128
-	local sx = sector % w
-	local sy = math.floor(sector / w) % w
-	local sz = math.floor(sector / w / w) % w
-	local org = Vector(sx, sy, sz) * Voxel.tiles_per_line
-	local mats = {
-		Material:find{name = "adamantium1"},
-		Material:find{name = "aquanite1"},
-		Material:find{name = "basalt1"},
-		Material:find{name = "brittlerock1"},
-		Material:find{name = "crimson1"},
-		Material:find{name = "ferrostone1"},
-		Material:find{name = "sand1"},
-		Material:find{name = "soil1"}}
-	--[[Material:find{name = "grass1"},
-		Material:find{name = "ice1"},
-		Material:find{name = "iron1"},
-		Material:find{name = "magma1"},
-		Material:find{name = "pipe1"},
-		Material:find{name = "water1"},
-		Material:find{name = "wood1"}]]
-	local growdirs = {
-		Vector(-1, 0, 0),
-		Vector(1, 0, 0),
-		Vector(0, -1, 0),
-		Vector(0, 1, 0),
-		Vector(0, 0, -1),
-		Vector(0, 0, 1)}
-	local growrand
-	growrand = function(ctr, mat, dep)
-		local p = org + ctr
-		local t = Voxel:get_tile{point = p}
-		if t == 0 then return end
-		Voxel:set_tile{point = p, tile = mat}
-		if dep > 4 then return end
-		for k,v in pairs(growdirs) do
-			if math.random() < (4 - dep) * 0.15 then
-				local p = ctr + v
-				p.x = math.max(math.min(p.x, Voxel.tiles_per_line - 1), 1)
-				p.y = math.max(math.min(p.y, Voxel.tiles_per_line - 1), 1)
-				p.z = math.max(math.min(p.z, Voxel.tiles_per_line - 1), 1)
-				growrand(p, mat, dep + 1)
+--- Returns true if the requested range of tiles is empty.
+-- @param src Tile range start.
+-- @param dst Tile range end.
+-- @return True if the range is empty.
+Voxel.check_empty = function(clss, src, dst)
+	local v = Vector()
+	for x = src.x,dst.x-1 do
+		v.x = x
+		for y = src.y,dst.y-1 do
+			v.y = y
+			for z = src.z,dst.z-1 do
+				v.z = z
+				if clss:get_tile{point = v} ~= 0 then
+					return
+				end
 			end
 		end
 	end
-	local p = Vector()
-	for i=1,100 do
-		p.x = math.random(1, Voxel.tiles_per_line - 1)
-		p.y = math.random(1, Voxel.tiles_per_line - 1)
-		p.z = math.random(1, Voxel.tiles_per_line - 1)
-		local m = mats[math.random(1,#mats)]
-		if m then growrand(p, m.id, 1) end
-	end
+	return true
 end
 
 --- Places a random heightmap to the map.
@@ -135,9 +96,8 @@ end
 --   <li>point: Position vector, in tiles.</li>
 --   <li>prob: Creation probability.</li></ul>
 Voxel.place_creature = function(clss, args)
-	local spec = Species:find(args)
+	local spec = Species:random(args)
 	if not spec then return end
-	if args.prob and math.random() > args.prob then return end
 	Creature{
 		species = spec,
 		position = args.point * Config.tilewidth,

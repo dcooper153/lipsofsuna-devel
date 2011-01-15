@@ -228,6 +228,7 @@ livox_manager_find_material (LIVoxManager* self,
  * \param self Voxel manager.
  * \param flags Search flags.
  * \param point Point in world space.
+ * \param radius Search radius in world units.
  * \param index Return location for voxel position or NULL.
  * \return Voxel or NULL.
  */
@@ -235,6 +236,7 @@ LIVoxVoxel* livox_manager_find_voxel (
 	LIVoxManager*      self,
 	int                flags,
 	const LIMatVector* point,
+	float              radius,
 	int*               index)
 {
 	float d;
@@ -254,32 +256,39 @@ LIVoxVoxel* livox_manager_find_voxel (
 	}
 	best = { 0, 0, 0, 10.0E10f, NULL };
 
+	/* Enforce minimum search radius. */
+	radius = LIMAT_MAX (self->tile_width, radius);
+
 	/* Loop through affected sectors. */
-	range = lialg_range_new_from_sphere (point, self->tile_width, self->tile_width);
+	range = lialg_range_new_from_sphere (point, radius, self->tile_width);
 	LIVOX_VOXEL_FOREACH (iter, self, range, 1)
 	{
+		/* Check that the tile matches the criteria. */
 		livox_sector_get_origin (iter.sector, &origin);
 		voxel = *livox_sector_get_voxel (iter.sector, iter.voxel[0], iter.voxel[1], iter.voxel[2]);
-		if ((!voxel.type && (flags & LIVOX_FIND_EMPTY)) ||
-			( voxel.type && (flags & LIVOX_FIND_FULL)))
-		{
-			tmp = limat_vector_init (
-				origin.x + self->tile_width * (iter.voxel[0] + 0.5f),
-				origin.y + self->tile_width * (iter.voxel[1] + 0.5f),
-				origin.z + self->tile_width * (iter.voxel[2] + 0.5f));
-			diff = limat_vector_subtract (*point, tmp);
-			d = limat_vector_dot (diff, diff);
-			if (best.sector == NULL || d < best.dist)
-			{
-				best.x = iter.voxel[0];
-				best.y = iter.voxel[1];
-				best.z = iter.voxel[2];
-				best.dist = d;
-				best.sector = iter.sector;
-			}
-		}
+		if (!(!voxel.type && (flags & LIVOX_FIND_EMPTY)) &&
+		    !( voxel.type && (flags & LIVOX_FIND_FULL)))
+			continue;
+
+		/* Check that the tile is closer than the best match so far. */
+		tmp = limat_vector_init (
+			origin.x + self->tile_width * (iter.voxel[0] + 0.5f),
+			origin.y + self->tile_width * (iter.voxel[1] + 0.5f),
+			origin.z + self->tile_width * (iter.voxel[2] + 0.5f));
+		diff = limat_vector_subtract (*point, tmp);
+		d = limat_vector_dot (diff, diff);
+		if (best.sector != NULL && d >= best.dist)
+			continue;
+
+		/* Set the new best match. */
+		best.x = iter.voxel[0];
+		best.y = iter.voxel[1];
+		best.z = iter.voxel[2];
+		best.dist = d;
+		best.sector = iter.sector;
 	}
 
+	/* Return the tile coordinates. */
 	if (best.sector == NULL)
 		return NULL;
 	if (index != NULL)
@@ -289,6 +298,7 @@ LIVoxVoxel* livox_manager_find_voxel (
 		index[2] = best.z + best.sector->sector->z * self->tiles_per_line;
 	}
 
+	/* Return the tile contents. */
 	return livox_sector_get_voxel (best.sector, best.x, best.y, best.z);
 }
 

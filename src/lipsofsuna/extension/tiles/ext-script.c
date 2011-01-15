@@ -294,6 +294,7 @@ static void Voxel_find_tile (LIScrArgs* args)
 {
 	int index[3];
 	int flags = LIVOX_FIND_ALL;
+	float radius = 0.0f;
 	const char* tmp;
 	LIExtModule* module;
 	LIMatVector point;
@@ -311,8 +312,12 @@ static void Voxel_find_tile (LIScrArgs* args)
 			else if (!strcmp (tmp, "full")) flags = LIVOX_FIND_FULL;
 		}
 
+		/* Search radius. */
+		liscr_args_gets_float (args, "radius", &radius);
+		radius = LIMAT_MAX (0.0f, radius);
+
 		/* Find voxel. */
-		voxel = livox_manager_find_voxel (module->voxels, flags, &point, index);
+		voxel = livox_manager_find_voxel (module->voxels, flags, &point, radius, index);
 		if (voxel == NULL)
 			return;
 
