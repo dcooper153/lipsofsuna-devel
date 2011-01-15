@@ -108,7 +108,7 @@ Object.update_model = function(self)
 	-- Create the customization animation.
 	if spec and (spec.models or spec.tilt_bone) then
 		self:animate{animation = "empty", channel = Animation.CHANNEL_TILT,
-			weight = 10, permanent = true}
+			weight = 1000, permanent = true}
 	end
 	-- Particle hacks.
 	if self.model_name == "torch1" and not self.particle_hack then
