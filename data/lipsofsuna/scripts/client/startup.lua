@@ -1,19 +1,8 @@
 Startup = Class()
 
-string.split = function(self, sep)
-	local sep,fields = sep or " ", {}
-	local pattern = string.format("([^%s]+)", sep)
-	self:gsub(pattern, function(c) fields[#fields+1] = c end)
-	return fields
-end
-
 --- Initializes the startup screen.
 -- @param clss Startup class.
 Startup.init = function(clss)
-	local args = string.split(Program.args)
-	Startup.mode = args[1] or "--host"
-	Startup.host = args[2] or "localhost"
-	Startup.port = tonumber(args[3] or "10101")
 	clss.group = Widgets.Background{cols = 3, rows = 3, behind = true, fullscreen = true, image = "mainmenu1"}
 	clss.group:set_expand{col = 1, row = 1}
 	clss.group:set_expand{col = 3}
@@ -31,13 +20,13 @@ end
 --- Executes the startup command.
 -- @param clss Startup class.
 Startup.execute = function(clss)
-	if Startup.mode == "--host" then
+	if Settings.host then
 		-- Host a game.
 		Program:unload_world()
-		Client:host()
-		clss.text.text = "Starting the server..."
+		Client:host("--server " .. Settings.addr .. " " .. Settings.port)
+		clss.text.text = "Starting the server on port " .. Settings.port .. "..."
 		clss.host_wait_timer = Timer{delay = 2, func = function(timer)
-			if Network:join{host = "localhost", clss.port} then
+			if Network:join{host = "localhost", Settings.port} then
 				clss.text.text = "Connecting to the server..."
 				clss.connecting = true
 			else
@@ -46,21 +35,16 @@ Startup.execute = function(clss)
 			end
 			timer:disable()
 		end}
-	elseif Startup.mode == "--join" then
+	else
 		-- Join a game.
 		Program:unload_world()
-		if Network:join{host = clss.host, port = clss.port} then
-			clss.text.text = "Connecting to " .. clss.host .. ":" .. clss.port .. "..."
+		if Network:join{host = Settings.addr, port = Settings.port} then
+			clss.text.text = "Connecting to " .. Settings.addr .. ":" .. Settings.port .. "..."
 			clss.connecting = true
 		else
-			clss.text.text = "Failed to connect to " .. clss.host .. ":" .. clss.port .. "!"
+			clss.text.text = "Failed to connect to " .. Settings.addr .. ":" .. Settings.port .. "!"
 			clss.connecting = nil
 		end
-	else
-		-- Display help.
-		clss.text.text = "Usage:\n" ..
-			"  lipsofsuna --join <server> <port>\n" ..
-			"  lipsofsuna --host localhost <port>\n"
 	end
 end
 

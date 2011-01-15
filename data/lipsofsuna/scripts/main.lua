@@ -10,14 +10,17 @@ require = function(arg)
 		oldrequire(arg)
 	end
 end
+string.split = function(self, sep)
+	local sep,fields = sep or " ", {}
+	local pattern = string.format("([^%s]+)", sep)
+	self:gsub(pattern, function(c) fields[#fields+1] = c end)
+	return fields
+end
 
-if Program.args == "--help" or Program.args == "-h" then
-	print("Usage: lipsofsuna lipsofsuna [options]\n")
-	print("Options:")
-	print("  --help                   Show this help message and exit.")
-	print("  --host localhost <port>  Start a server and join it.")
-	print("  --join <server> <port>   Join a remove server.")
-	print("  --server                 Run as a dedicated server.")
+-- Handle command line arguments.
+require "common/settings"
+if not Settings:parse_command_line() then
+	print(Settings:usage())
 	return
 end
 
@@ -49,7 +52,7 @@ require "common/species"
 require "common/thread"
 require "common/timer"
 
-if Program.args == "--server" then
+if Settings.server then
 require "core/object-physics"
 require "common/vision"
 require "common/inventory"
@@ -84,7 +87,8 @@ require "content/quests/peculiarpet"
 require "content/quests/rootsofworld"
 require "content/quests/misc"
 
-if Program.args == "--server" then
+if Settings.quit then Program.quit = true end
+if Settings.server then
 	require "server/main"
 else
 	require "client/main"

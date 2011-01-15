@@ -31,6 +31,8 @@ require "server/editing"
 require "server/particles"
 require "server/generator"
 
+local map_version = "1"
+
 restart = function()
 	Network.closed = true
 	for k,v in pairs(Network.clients) do
@@ -45,6 +47,7 @@ restart = function()
 	print("Saving map...")
 	Sectors.instance:save_world(true)
 	Sectors.instance:unload_world()
+	Serialize:set_value("map_version", map_version)
 	-- Discard events emitted during map generation so that they
 	-- don't trigger when the game starts.
 	Program:update()
@@ -57,7 +60,9 @@ end
 
 local m = Material:find{name = "granite1"}
 Voxel.fill = m.id
-restart()
+if Settings.generate or Serialize:get_value("map_version") ~= map_version then
+	restart()
+end
 Network:host{port = 10101}
 
 -- Simulate.

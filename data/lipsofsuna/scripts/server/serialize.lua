@@ -5,7 +5,27 @@ Serialize = Class()
 Serialize.init = function(clss)
 	clss.db = Database{name = "save.db"}
 	clss.sectors = Sectors{database = clss.db}
+	clss.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT,value TEXT);")
 	Sectors.instance = clss.sectors
+end
+
+--- Gets a value from the key-value database.
+-- @param clss Serialize class.
+-- @param key Key string.
+-- @return Value string or nil.
+Serialize.get_value = function(clss, key)
+	local rows = clss.db:query("SELECT value FROM keyval WHERE key=?;", {key})
+	for k,v in ipairs(rows) do
+		return v[1]
+	end
+end
+
+--- Stores a value to the key-value database.
+-- @param clss Serialize class.
+-- @param key Key string.
+-- @param value Value string.
+Serialize.set_value = function(clss, key, value)
+	clss.db:query("REPLACE INTO keyval (key,value) VALUES (?,?);", {key, value})
 end
 
 Serialize:init()
