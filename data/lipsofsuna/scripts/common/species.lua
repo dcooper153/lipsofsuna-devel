@@ -62,6 +62,9 @@ Species.copy = function(orig, args)
 	self.ai_update_delay = orig.ai_update_delay
 	self.ai_wait_allowed = orig.ai_wait_allowed
 	self.ai_wander_time = orig.ai_wander_time
+	self.aim_ray_center = orig.aim_ray_center
+	self.aim_ray_end = orig.aim_ray_end
+	self.aim_ray_start = orig.aim_ray_start
 	self.dialog = orig.dialog
 	self.eye_style = orig.eye_style
 	self.gravity = orig.gravity
@@ -165,6 +168,9 @@ Species.new = function(clss, args)
 	copy("ai_update_delay", 2)
 	copy("ai_wait_allowed", true)
 	copy("ai_wander_time", 60)
+	copy("aim_ray_center", Vector(0, 1, 0))
+	copy("aim_ray_end", 5)
+	copy("aim_ray_start", 0.1)
 	copy("dialog")
 	copy("eye_style")
 	copy("gravity", Vector(0, -15, 0))

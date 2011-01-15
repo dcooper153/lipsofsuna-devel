@@ -73,11 +73,17 @@ Object.fire = function(self, args)
 		end}
 	end
 	-- Add the projectile to the world.
+	local src,dst = args.owner:get_attack_ray()
+	local vec = args.owner.rotation * (dst - src)
 	self:detach()
 	self.owner = args.owner
-	self.position = args.owner.position + args.owner.rotation * (args.point or Vector())
-	self.rotation = args.owner.rotation
-	self.velocity = args.owner.rotation * Vector(0, 0, -(args.speed or 20))
+	self.position = args.owner.position + args.owner.rotation * src
+	if args.owner.tilt then
+		self.rotation = args.owner.rotation * args.owner.tilt
+	else
+		self.rotation = args.owner.rotation
+	end
+	self.velocity = vec:normalize() * (args.speed or 20)
 	self.save = false
 	self.realized = true
 end

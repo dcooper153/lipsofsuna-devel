@@ -275,6 +275,23 @@ Creature.find_best_feat = function(self, args)
 	return best_feat
 end
 
+--- Gets the attack ray of the creature.
+-- @param self Object.
+-- @return Ray start point and ray end point relative to the object.
+Creature.get_attack_ray = function(self)
+	local ctr = self.species.aim_ray_center
+	if self.tilt then
+		local rot = Quaternion:new_euler(self.tilt.euler)
+		local src = ctr + rot * Vector(0, 0, -self.species.aim_ray_start)
+		local dst = ctr + rot * Vector(0, 0, -self.species.aim_ray_end)
+		return src, dst
+	else
+		local src = ctr + Vector(0, 0, -self.species.aim_ray_start)
+		local dst = ctr + Vector(0, 0, -self.species.aim_ray_end)
+		return src, dst
+	end
+end
+
 Creature.jump = function(self)
 	if not self.ground then return end
 	local t = Program.time

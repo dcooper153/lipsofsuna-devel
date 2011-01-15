@@ -156,34 +156,36 @@ Feat.perform = function(self, args)
 				-- While the attack animation is played, a sphere is swept along
 				-- the path of the attack point. If a tile collides with the
 				-- sphere, a new tile attached to it.
-				local off = Vector(0, 1, -0.1)
-				local dst = args.user.position + args.user.rotation * off
-				local r = Attack:ray{user = args.user, length = 5, start = off}
-				if r and r.tile then
+				Thread(function(self)
+					Thread:sleep(anim.action_frames[1] * 0.05)
+					local src,dst = args.user:get_attack_ray(args)
+					local r = args.user:sweep_sphere{src = src, dst = dst, radius = 0.1}
+					if not r or not r.tile then return end
 					feat:apply{
 						attacker = args.user,
 						point = r.point,
 						target = r.object,
 						tile = r.tile,
 						weapon = weapon}
-				end
+				end)
 			end
 			if anim.categories["melee"] then
 				-- Melee attack.
 				-- While the attack animation is played, a sphere is swept along
 				-- the path of the attack point. The first object or tile that
 				-- collides with the sphere is damaged.
-				Attack:sweep{user = args.user, slot = slot,
-					start = anim.action_frames[1] * 0.05,
-					stop = anim.action_frames[2] * 0.05,
-					func = function(f, r)
+				Thread(function(self)
+					Thread:sleep(anim.action_frames[1] * 0.05)
+					local src,dst = args.user:get_attack_ray(args)
+					local r = args.user:sweep_sphere{src = src, dst = dst, radius = 0.1}
+					if not r then return end
 					feat:apply{
 						attacker = args.user,
 						point = r.point,
 						target = r.object,
 						tile = r.tile,
 						weapon = weapon}
-				end}
+				end)
 			end
 			if anim.categories["ranged"] then
 				-- Ranged attack.
@@ -192,12 +194,10 @@ Feat.perform = function(self, args)
 				-- care of damaging the hit object or tile.
 				Thread(function(self)
 					Thread:sleep(anim.action_frames[1] * 0.05)
-					local point = Attack:find_blade_point{object = args.user, slot = slot} + Vector(0, 0.3, -1.5)
 					for name,count in pairs(info.required_ammo) do
 						local ammo = args.user:split_items{name = name, count = count}
 						if ammo then
-							ammo:fire{collision = true, feat = feat, point = point,
-								owner = args.user, weapon = weapon}
+							ammo:fire{collision = true, feat = feat, owner = args.user, weapon = weapon}
 						end
 					end
 					for index,data in ipairs(feat.effects) do
@@ -205,8 +205,7 @@ Feat.perform = function(self, args)
 						if effect and effect.projectile then
 							local ammo = Object{model = effect.projectile, physics = "rigid"}
 							ammo.gravity = Vector()
-							ammo:fire{collision = true, feat = feat, point = point,
-								owner = args.user, weapon = weapon}
+							ammo:fire{collision = true, feat = feat, owner = args.user, weapon = weapon}
 						end
 					end
 				end)
@@ -231,11 +230,12 @@ Feat.perform = function(self, args)
 				-- care of damaging the hit object or tile.
 				Thread(function(self)
 					Thread:sleep(anim.action_frames[1] * 0.05)
-					local point = Attack:find_blade_point{object = args.user, slot = slot} + Vector(0, 0.3, -1.5)
+					local src = args.user:get_attack_ray(args)
+					local point = args.user.position + args.user.rotation * src
 					local proj = weapon:fire{
 						collision = not weapon.itemspec.destroy_timer,
 						feat = feat,
-						point = point + Vector(0.2, 0.3, -1.5),
+						point = point,
 						owner = args.user,
 						speed = 10,
 						timer = weapon.itemspec.destroy_timer}

@@ -182,7 +182,8 @@ Protocol:add_handler{type = "PLAYER_TURN", func = function(args)
 			local e = Quaternion(x, y, z, w).euler
 			e[3] = math.min(player.species.tilt_limit, e[3])
 			e[3] = math.max(-player.species.tilt_limit, e[3])
-			player.rotation = Quaternion:new_euler(e)
+			player.tilt = Quaternion:new_euler{0, 0, e[3]}
+			player.rotation = Quaternion:new_euler{e[1], e[2], 0}
 		end
 	end
 end}

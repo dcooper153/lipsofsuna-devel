@@ -2,7 +2,6 @@ print "INFO: Loading server scripts."
 
 require "server/util"
 require "server/serialize"
-require "server/attack"
 require "server/controls"
 require "server/crafting"
 require "server/dialog"

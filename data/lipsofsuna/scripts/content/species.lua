@@ -2,6 +2,9 @@ local regen = 0.5
 
 Species{
 	name = "aer",
+	aim_ray_center = Vector(0, 1.5, 0),
+	aim_ray_end = 5,
+	aim_ray_start = 0.5,
 	equipment_slots = {
 		{name = "arms"},
 		{name = "feet"},
