@@ -157,6 +157,19 @@ static void Network_shutdown (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Updates the network status and generates network events.
+ * -- @param clss Network class.
+ * function Network.update(clss)
+ */
+static void Network_update (LIScrArgs* args)
+{
+	LIExtModule* module;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
+	liext_network_update (module, 1.0f);
+}
+
+/* @luadoc
  * --- Gets the list of connected clients.
  * --
  * -- @name Network.clients
@@ -226,6 +239,7 @@ liext_script_network (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "join", Network_join);
 	liscr_class_insert_cfunc (self, "send", Network_send);
 	liscr_class_insert_cfunc (self, "shutdown", Network_shutdown);
+	liscr_class_insert_cfunc (self, "update", Network_update);
 	liscr_class_insert_cvar (self, "clients", Network_getter_clients, NULL);
 	liscr_class_insert_cvar (self, "closed", Network_getter_closed, Network_setter_closed);
 	liscr_class_insert_cvar (self, "connected", Network_getter_connected, NULL);

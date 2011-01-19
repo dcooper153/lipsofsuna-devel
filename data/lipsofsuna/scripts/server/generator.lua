@@ -192,6 +192,23 @@ end
 
 Generator = Class()
 
+--- Informs clients of the generator status.
+-- @param clss Generator class.
+-- @param client Specific client to inform or nil to inform all.
+-- @return Network packet.
+Generator.inform_clients = function(clss, client)
+	local p = Packet(packets.GENERATOR_STATUS,
+		"string", clss.prev_message or "",
+		"float", clss.prev_fraction or 0)
+	if client then
+		Network:send{client = client, packet = p}
+	else
+		for k,v in pairs(Network.clients) do
+			Network:send{client = v, packet = p}
+		end
+	end
+end
+
 --- Draws a corridor in the map.
 -- @param clss Generator class.
 -- @param src Source point in tiles.
@@ -280,10 +297,19 @@ end
 -- @param clss Generator class.
 -- @param args Arguments.
 Generator.generate = function(clss, args)
+	-- Remove all player characters.
+	for k,v in pairs(Player.clients) do
+		v:detach(true)
+	end
+	Player.clients = {}
 	-- Initialize state.
 	clss.links = {}
 	clss.regions_dict_id = {}
 	clss.regions_dict_name = {}
+	-- Reset the world.
+	clss:update_status(0, "Resetting world")
+	Marker:reset()
+	Sectors.instance:unload_world()
 	-- Place special areas.
 	-- Regions have dependencies so we need to place them in several passes.
 	-- The region tables are filled but the map is all empty after this.
@@ -377,6 +403,23 @@ Generator.generate = function(clss, args)
 		clss:update_status(index / sectorn)
 		index = index + 1
 	end
+	-- Save the map.
+	clss:update_status(0, "Saving the map")
+	Sectors.instance:save_world(true)
+	Sectors.instance:unload_world()
+	Serialize:set_value("map_version", map_version)
+	-- Discard events emitted during map generation so that they
+	-- don't trigger when the game starts.
+	clss:update_status(0, "Finishing")
+	Program:update()
+	repeat until not Program:pop_event()
+	Program:update()
+	repeat until not Program:pop_event()
+	-- Inform players of the generation being complete.
+	local status = Packet(packets.CHARACTER_CREATE)
+	for k,v in pairs(Network.clients) do
+		Network:send{client = v, packet = status}
+	end
 end
 
 --- Subdivides the link between the region and another region.
@@ -423,13 +466,34 @@ Generator.subdivide_link = function(clss, link)
 	return l
 end
 
+--- Updates the network status while the generator is active.
+-- @param clss Generator class.
+Generator.update_network = function(clss)
+	Network:update()
+	while true do
+		local event = Program:pop_event()
+		if not event then break end
+		if event.type == "login" then
+			Generator:inform_clients(event.client)
+		end
+	end
+end
+
+--- Updates the status message of the generator.
+-- @param clss Generator class.
+-- @param frac Fraction of the task completed.
+-- @param msg Message string.
 Generator.update_status = function(clss, frac, msg)
 	if msg then
 		print(math.ceil(frac * 100) .. "% " .. msg)
 		clss.prev_message = msg
 		clss.prev_fraction = frac
+		clss:inform_clients()
+		clss:update_network()
 	elseif frac == 1 or frac > clss.prev_fraction + 0.1 then
 		print(math.ceil(frac * 100) .. "% " .. clss.prev_message)
 		clss.prev_fraction = frac
+		clss:inform_clients()
+		clss:update_network()
 	end
 end

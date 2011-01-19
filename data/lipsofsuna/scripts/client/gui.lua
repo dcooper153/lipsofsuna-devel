@@ -85,7 +85,9 @@ end
 --- Frees the in-game user interface.
 -- @param clss Gui class.
 Gui.free = function()
-	Gui.main.floating = false
+	if Gui.main then
+		Gui.main.floating = false
+	end
 end
 
 --- Sets or unsets the text of the action label.

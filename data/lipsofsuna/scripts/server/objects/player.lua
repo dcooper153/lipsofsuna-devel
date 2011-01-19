@@ -48,11 +48,18 @@ Player.die = function(self)
 	self.contact_cb = false
 end
 
-Player.respawn = function(self)
+Player.detach = function(self, keep)
 	self.player_timer:disable()
 	self.vision:disable()
-	self:send{packet = Packet(packets.CHARACTER_CREATE)}
-	Player.clients[self.client] = nil
+	self.realized = false
+	if not keep then
+		self:send{packet = Packet(packets.CHARACTER_CREATE)}
+		Player.clients[self.client] = nil
+	end
+end
+
+Player.respawn = function(self)
+	self:detach()
 end
 
 Player.inventory_cb = function(self, args)
@@ -241,13 +248,11 @@ end
 
 Eventhandler{type = "login", func = function(self, event)
 	print("Client login")
+	Network:send{client = event.client, packet = Packet(packets.CHARACTER_CREATE)}
 end}
 Eventhandler{type = "logout", func = function(self, event)
 	print("Client logout")
 	local object = Player.clients[event.client]
 	if not object then return end
-	Player.clients[event.client] = nil
-	object.realized = false
-	object.player_timer:disable()
-	object.vision:disable()
+	object:detach()
 end}

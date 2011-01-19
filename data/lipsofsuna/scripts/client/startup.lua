@@ -9,9 +9,11 @@ Startup.init = function(clss)
 	clss.text = Widgets.Label()
 	clss.button_retry = Widgets.Label{font = "mainmenu", text = "Retry", pressed = function() clss:execute() end}
 	clss.button_quit = Widgets.Label{font = "mainmenu", text = "Quit", pressed = function() Program:shutdown() end}
-	clss.group2 = Widget{rows = 1, margins = {bottom=30}, spacings = {horz=40}}
-	clss.group2:append_col(clss.button_retry)
-	clss.group2:append_col(clss.button_quit)
+	clss.group2 = Widget{cols = 4, rows = 1, margins = {bottom=30}, spacings = {horz=40}}
+	clss.group2:set_child{col = 2, row = 1, widget = clss.button_retry}
+	clss.group2:set_child{col = 3, row = 1, widget = clss.button_quit}
+	clss.group2:set_expand{col = 1}
+	clss.group2:set_expand{col = 4}
 	clss.group:set_child{col = 2, row = 2, widget = clss.text}
 	clss.group:set_child{col = 2, row = 3, widget = clss.group2}
 	clss.group.floating = true
@@ -53,9 +55,6 @@ end
 Startup.finish = function(clss)
 	clss.connecting = nil
 	clss.joined = true
-	clss.group.floating = false
-	Gui:init()
-	Chargen:execute()
 end
 
 Startup:init()
@@ -70,5 +69,17 @@ Eventhandler{type = "tick", func = function(self, args)
 		Startup.button_retry.text = "Reconnect"
 		Startup.button_retry.visible = true
 		Startup.text.text = "Lost connection to the server!"
+	end
+end}
+
+Protocol:add_handler{type = "GENERATOR_STATUS", func = function(event)
+	local ok,s,f = event.packet:read("string", "float")
+	if ok then
+		Gui:free()
+		Chargen:free()
+		Startup.group.floating = true
+		Startup.button_retry.text = "Reconnect"
+		Startup.button_retry.visible = false
+		Startup.text.text = "Map generator: " .. s .. " (" .. math.ceil(f * 100) .. "%)"
 	end
 end}

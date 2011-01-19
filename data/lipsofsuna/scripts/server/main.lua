@@ -34,36 +34,19 @@ require "server/generator"
 local map_version = "1"
 
 restart = function()
-	Network.closed = true
-	for k,v in pairs(Network.clients) do
-		Network:disconnect{object = v}
-	end
+	-- TODO: Kill player characters.
 	-- Remove previous map.
-	Marker:reset()
-	Sectors.instance:unload_world()
 	print("Generating map...")
 	Generator:generate()
-	-- Save map.
-	print("Saving map...")
-	Sectors.instance:save_world(true)
-	Sectors.instance:unload_world()
-	Serialize:set_value("map_version", map_version)
-	-- Discard events emitted during map generation so that they
-	-- don't trigger when the game starts.
-	Program:update()
-	repeat until not Program:pop_event()
-	Program:update()
-	repeat until not Program:pop_event()
 	print("Done")
-	Network.closed = false
 end
 
 local m = Material:find{name = "granite1"}
 Voxel.fill = m.id
+Network:host{port = 10101}
 if Settings.generate or Serialize:get_value("map_version") ~= map_version then
 	restart()
 end
-Network:host{port = 10101}
 
 -- Simulate.
 Eventhandler{type = "object-motion", func = function(self, event)

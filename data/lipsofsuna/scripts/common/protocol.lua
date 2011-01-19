@@ -65,6 +65,7 @@ do
 	add("EXAMINE")
 	add("FEAT")
 	add("FEAT_UNLOCK")
+	add("GENERATOR_STATUS")
 	add("INVENTORY_CREATED")
 	add("INVENTORY_CLOSED")
 	add("INVENTORY_ITEM_ADDED")
