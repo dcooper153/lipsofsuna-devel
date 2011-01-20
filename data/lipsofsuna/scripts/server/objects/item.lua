@@ -9,6 +9,24 @@ Item.setter = function(self, key, value)
 		self.mass = spec.mass
 		self.model = spec.model
 		self.name = spec.name
+	elseif key == "realized" then
+		-- Avoid objects getting stuck inside walls.
+		-- When object is created, we start a timer that periodically checks
+		-- if the object is stuck until it isn't or there's no way to fix it.
+		if value == self.realized then return end
+		if value then
+			self.stuck_timer = Timer{delay = 0.5, func = function(timer)
+				timer.counter = (timer.counter or 0) + 1
+				if not self:stuck_check() or (not self.stuck and timer.counter > 10) then
+					timer:disable()
+					self.stuck_timer = nil
+				end
+			end}
+		elseif self.stuck_timer then
+			self.stuck_timer:disable()
+			self.stuck_timer = nil
+		end
+		Object.setter(self, key, value)
 	else
 		Object.setter(self, key, value)
 	end

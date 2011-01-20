@@ -275,21 +275,6 @@ Creature.find_best_feat = function(self, args)
 	return best_feat
 end
 
---- Fixes the position of a stuck object.
--- @param self Object.
--- @return True if fixing succeeded.
-Creature.fix_stuck = function(self)
-	-- Get the tile position of the object.
-	local src = self:get_tile_range()
-	-- Find the closest empty tile.
-	-- FIXME: The object doesn't necessarily fit inside one tile.
-	local t,p = Voxel:find_tile{match = "empty", point = src * Config.tilewidth, radius = 5 * Config.tilewidth}
-	if not t then return end
-	-- Move the object to the empty tile.
-	self.position = (p + Vector(0.5, 0.1, 0.5)) * Config.tilewidth
-	return true
-end
-
 --- Gets the attack ray of the creature.
 -- @param self Object.
 -- @return Ray start point and ray end point relative to the object.
@@ -393,21 +378,7 @@ Creature.update = function(self, secs)
 		self.anim_timer = 0
 	end
 	-- Fix stuck creatures.
-	if self:get_stuck() then
-		self.stuck = (self.stuck or 0) + 2
-		if self.stuck < 10 then
-			self:fix_stuck()
-		else
-			print("Warning: Creature " .. self.species.name .. " was deleted because it was permanently stuck!")
-			self.realized = false
-		end
-	elseif self.stuck then
-		if self.stuck > 1 then
-			self.stuck = self.stuck -1
-		else
-			self.stuck = nil
-		end
-	end
+	if not self:stuck_check() then return end
 	-- Skip all controls if we are dead.
 	if self.dead then
 		return
