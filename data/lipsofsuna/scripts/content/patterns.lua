@@ -27,6 +27,28 @@ Pattern{
 		{0,2,2}, {1,2,2}}}
 
 Pattern{
+	name = "dungeon1",
+	obstacles = {
+		{2,1,2,"mushroom"},
+		{6,1,3,"mushroom"},
+		{3,1,5,"mushroom"}},
+	tiles = {
+		{0,0,0,"granite1",7,0,7},
+		{0,1,0,"granite1"},
+		{0,2,0,"granite1"},
+		{5,1,2,"granite1"},
+		{2,1,6,"granite1"}}}
+
+Pattern{
+	name = "nature1",
+	obstacles = {
+		{2,1,2,"tree"},
+		{6,1,5,"tree"},
+		{3,1,4,"mushroom"}},
+	tiles = {
+		{0,0,0,"grass1",7,0,7}}}
+
+Pattern{
 	name = "house1",
 	items = {
 		{1,0,0,"air tank"}},

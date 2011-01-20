@@ -128,17 +128,28 @@ Voxel.place_pattern = function(clss, args)
 	if not pat then return end
 	-- Create tiles.
 	for k,v in pairs(pat.tiles) do
+		-- Get tile type.
+		local tile = 0
 		if v[4] then
 			local mat = Material:find{name = v[4]}
-			if mat then
-				Voxel:set_tile{
-					point = args.point + Vector(v[1], v[2], v[3]),
-					tile = mat.id}
+			tile = mat and mat.id or 0
+		end
+		if v[5] then
+			-- Fill volume of tiles.
+			for x = v[1],v[1]+v[5] do
+				for y = v[2],v[2]+v[6] do
+					for z = v[3],v[3]+v[7] do
+						Voxel:set_tile{
+							point = args.point + Vector(x, y, z),
+							tile = tile}
+					end
+				end
 			end
 		else
+			-- Fill individual tile.
 			Voxel:set_tile{
 				point = args.point + Vector(v[1], v[2], v[3]),
-				tile = 0}
+				tile = tile}
 		end
 	end
 	-- Create obstacles.
@@ -178,6 +189,7 @@ Region = Class()
 Region.new = function(clss, args)
 	local self = Class.new(clss, args)
 	self.links = {}
+	self.linked_regions = {}
 	return self
 end
 
@@ -185,6 +197,7 @@ Region.create_link = function(self, region)
 	local link = {self, region}
 	table.insert(self.links, link)
 	table.insert(region.links, link)
+	self.linked_regions[region] = true
 	return link
 end
 
@@ -218,12 +231,15 @@ Generator.paint_corridor = function(clss, src, dst)
 	local len = math.floor((dst - src).length)
 	local pos = Vector(src.x, src.y, src.z)
 	local ipos = Vector()
-	for l = 0,len do
-		ipos.x = math.floor(pos.x + 0.5)
-		ipos.y = math.floor(pos.y + 0.5)
-		ipos.z = math.floor(pos.z + 0.5)
+	local l = 0
+	while l < len do
+		ipos.x = math.floor(pos.x + 0.5) + math.random(0, 3)
+		ipos.y = math.floor(pos.y + 0.5) + math.random(0, 3)
+		ipos.z = math.floor(pos.z + 0.5) + math.random(0, 3)
 		Voxel:place_pattern{name = "corridor1", point = ipos}
-		pos = pos + dir
+		local step = math.random(1, 3)
+		pos = pos + dir * step
+		l = l + step
 	end
 end
 
@@ -328,7 +344,7 @@ Generator.generate = function(clss, args)
 	-- Initialize connectivity.
 	-- A cyclic graph is created out of the special areas by creating links
 	-- between them according to the rules in the region specs.
-	clss:update_status(0, "Connecting regions")
+	clss:update_status(0, "Placing primary paths")
 	local linkn = 0
 	for _,reg1 in pairs(clss.regions_dict_name) do
 		for _,name in ipairs(reg1.spec.links) do
@@ -340,15 +356,46 @@ Generator.generate = function(clss, args)
 	end
 	-- Randomize connectivity.
 	-- Links between regions are subdivided and random regions are created.
-	clss:update_status(0, "Randomizing connectivity")
-	for i,link in ipairs(clss.links) do
-		local l = clss:subdivide_link(link)
-		if l then
-			linkn = linkn + 1
-			clss.links[linkn] = l
-		end
+	clss:update_status(0, "Randomizing primary paths")
+	for i = 1,linkn do
+		local link = clss.links[i]
+		clss:subdivide_link(link)
 		clss:update_status(i / linkn)
 	end
+	linkn = #clss.links
+	-- Connect random rooms together.
+	-- We try to make the maze less linear by taking some rooms with roughly
+	-- the same Y offset and connecting them with a new random path.
+	clss:update_status(0, "Placing secondary paths")
+	local regionn = #clss.regions_dict_id
+	local reglink = function(reg1, reg2)
+		if reg1 == reg2 then return end
+		if reg1.linked_regions[reg2] then return end
+		if math.abs(reg1.point.y - reg2.point.y) > 300 then return end
+		if #reg1.links > 5 then return end
+		if #reg2.links > 5 then return end
+		local link = reg1:create_link(reg2)
+		linkn = linkn + 1
+		clss.links[linkn] = link
+		clss:subdivide_link(link)
+		return true
+	end
+	for layer = 0,20 do
+		local y = 3000 * (1 - layer / 20)
+		local retry = 0
+		local created = 0
+		while retry < 30 and created < 10 do
+			local reg1 = clss.regions_dict_id[math.random(1, regionn)]
+			local reg2 = clss.regions_dict_id[math.random(1, regionn)]
+			if math.abs(reg1.point.y - y) < 300 and reglink(reg1, reg2) then
+				created = created + 1
+			else
+				retry = retry + 1
+			end
+		end
+		clss:update_status(layer / 20)
+	end
+	linkn = #clss.links
 	-- Paint corridors.
 	clss:update_status(0, "Creating corridors")
 	for i,link in ipairs(clss.links) do
@@ -382,6 +429,12 @@ Generator.generate = function(clss, args)
 		["Chara's Root Grove"] = function(r)
 			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "rootsofworld"}
 			Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "mourningadventurer_lost"}
+		end,
+		["Random: Dungeon"] = function(r)
+			Voxel:place_pattern{point = r.point, name = "dungeon1"}
+		end,
+		["Random: Nature"] = function(r)
+			Voxel:place_pattern{point = r.point, name = "nature1"}
 		end}
 	for _,reg in pairs(clss.regions_dict_id) do
 		Voxel:fill_region{point = reg.point, size = reg.size}
@@ -427,6 +480,10 @@ end
 -- @param link Link to subdivide.
 -- @return Link or nil.
 Generator.subdivide_link = function(clss, link)
+	clss:subdivide_link_recursive(link)
+end
+
+Generator.subdivide_link_recursive = function(clss, link)
 	-- Select the type for the new region.
 	local spec = Regionspec:random{category = "random"}
 	if not spec then return end
@@ -434,7 +491,7 @@ Generator.subdivide_link = function(clss, link)
 	local src = link[1].point
 	local dst = link[2].point
 	local len = (dst - src).length
-	if len - link[1].size.length - link[2].size.length < 16 then return end
+	if len - 2 * (link[1].size.length + link[2].size.length) < 1 then return end
 	local rel = src + (dst - src) * (0.3 + 0.4 * math.random())
 	-- Find the position for the new region.
 	local ok = nil
@@ -461,9 +518,13 @@ Generator.subdivide_link = function(clss, link)
 	local region = Region{aabb = aabb, point = pos, size = size, spec = spec}
 	table.insert(clss.regions_dict_id, region)
 	-- Link the new region to the path.
-	local l = region:create_link(link[2])
+	local link1 = region:create_link(link[2])
 	link[2] = region
-	return l
+	table.insert(clss.links, link1)
+	-- Recursively subdivide the new paths.
+	clss:subdivide_link_recursive(link)
+	clss:subdivide_link_recursive(link1)
+	return link1
 end
 
 --- Updates the network status while the generator is active.
@@ -490,7 +551,7 @@ Generator.update_status = function(clss, frac, msg)
 		clss.prev_fraction = frac
 		clss:inform_clients()
 		clss:update_network()
-	elseif frac == 1 or frac > clss.prev_fraction + 0.1 then
+	elseif frac == 1 or frac > clss.prev_fraction + 0.05 then
 		print(math.ceil(frac * 100) .. "% " .. clss.prev_message)
 		clss.prev_fraction = frac
 		clss:inform_clients()
