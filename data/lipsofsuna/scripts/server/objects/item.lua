@@ -2,14 +2,7 @@ Item = Class(Object)
 Item.pickable = true
 
 Item.setter = function(self, key, value)
-	if key == "itemspec" then
-		local spec = type(value) == "string" and Itemspec:find{name = value} or value
-		if not spec then return end
-		Object.setter(self, key, spec)
-		self.mass = spec.mass
-		self.model = spec.model
-		self.name = spec.name
-	elseif key == "realized" then
+	if key == "realized" then
 		-- Avoid objects getting stuck inside walls.
 		-- When object is created, we start a timer that periodically checks
 		-- if the object is stuck until it isn't or there's no way to fix it.
@@ -27,6 +20,13 @@ Item.setter = function(self, key, value)
 			self.stuck_timer = nil
 		end
 		Object.setter(self, key, value)
+	elseif key == "spec" then
+		local spec = type(value) == "string" and Itemspec:find{name = value} or value
+		if not spec then return end
+		Object.setter(self, key, spec)
+		self.mass = spec.mass
+		self.model = spec.model
+		self.name = spec.name
 	else
 		Object.setter(self, key, value)
 	end
@@ -37,7 +37,7 @@ end
 -- @return Object.
 Item.clone = function(self)
 	return Item{
-		itemspec = self.itemspec,
+		spec = self.spec,
 		angular = self.angular,
 		position = self.position,
 		rotation = self.rotation}
@@ -48,9 +48,9 @@ end
 -- @param amount Amount of damage.
 Item.damaged = function(self, amount)
 	-- Items whose spec has no health are indestructible.
-	if not self.itemspec.health then return end
+	if not self.spec.health then return end
 	-- Subtract health.
-	local h = self.health or self.itemspec.health
+	local h = self.health or self.spec.health
 	self.health = math.max(0, h - amount)
 	-- Destroy when out of health.
 	if self.health == 0 then
@@ -65,7 +65,7 @@ Item.die = function(self)
 	if self.dead then return end
 	self.dead = true
 	-- Execute destruction actions.
-	for k,v in ipairs(self.itemspec.destroy_actions) do
+	for k,v in ipairs(self.spec.destroy_actions) do
 		if v == "explode" then
 			for k,v in pairs(Object:find{point = self.position, radius = 5}) do
 				Particles:create(self.position, "explosion1")
@@ -108,7 +108,7 @@ Item.create = function(clss, args)
 	self = Item:new(args)
 	-- TODO
 	self.category = nil
-	self.itemspec = spec
+	self.spec = spec
 	return self
 end
 
@@ -138,7 +138,7 @@ Item.fire = function(self, args)
 	local proj = self:split()
 	Object.fire(proj, args)
 	-- Special handling for boomerangs.
-	if proj.itemspec.categories["boomerang"] then
+	if proj.spec.categories["boomerang"] then
 		-- Enable boomerange collisions.
 		-- The boomerang mode is disabled when a collision occurs and either the
 		-- collision object is damaged or the user catches the boomerang.
@@ -169,7 +169,7 @@ Item.fire = function(self, args)
 			end
 		end
 		-- Enable boomerang rotation.
-		if proj.itemspec.categories["boomerang"] then
+		if proj.spec.categories["boomerang"] then
 			proj.rotated = 0
 			proj.rotation = Quaternion{axis = Vector(0,0,1), angle = -0.5 * math.pi}
 			proj:animate{animation = "fly", channel = 2, permanent = true}
@@ -196,20 +196,20 @@ end
 -- @param self Object.
 -- @param user User.
 Item.examine_cb = function(self, user)
-	user:send{packet = Packet(packets.MESSAGE, "string", self.itemspec.name)}
+	user:send{packet = Packet(packets.MESSAGE, "string", self.spec.name)}
 end
 
 --- Called when the object is used.
 -- @param self Object.
 -- @param user User.
 Item.use_cb = function(self, user)
-	if self.itemspec.categories["tool"] then
+	if self.spec.categories["tool"] then
 		Crafting:send{user = user}
-	elseif self.itemspec.categories["book"] then
+	elseif self.spec.categories["book"] then
 		user:send{packet = Packet(packets.BOOK,
-			"string", self.itemspec.name,
-			"string", self.itemspec.book_text)}
-	elseif self.itemspec.categories["potion"] then
+			"string", self.spec.name,
+			"string", self.spec.book_text)}
+	elseif self.spec.categories["potion"] then
 		local types =
 		{
 			["lesser health potion"] = { skill = "health", value = 10 },
@@ -236,7 +236,7 @@ end
 -- @param user User object.
 -- @param slot Slot name.
 Item.equipped = function(self, user, slot)
-	if self.itemspec.categories["shield"] then
+	if self.spec.categories["shield"] then
 		user:animate{animation = "hold-left", channel = Animation.CHANNEL_EQUIP_LEFT, weight = 10.0, permanent = true}
 	end
 end
@@ -246,7 +246,7 @@ end
 -- @param user User object.
 -- @param slot Slot name.
 Item.unequipped = function(self, user, slot)
-	if self.itemspec.categories["shield"] then
+	if self.spec.categories["shield"] then
 		user:animate{channel = Animation.CHANNEL_EQUIP_LEFT}
 	end
 end
@@ -258,7 +258,7 @@ Item.write = function(self)
 	return "local self=Item{" ..
 		"angular=" .. serialize_value(self.angular) .. "," ..
 		"id=" .. serialize_value(self.id) .. "," ..
-		"itemspec=" .. serialize_value(self.itemspec.name) .. "," ..
+		"spec=" .. serialize_value(self.spec.name) .. "," ..
 		"position=" .. serialize_value(self.position) .. "," ..
 		"rotation=" .. serialize_value(self.rotation) .. "}\n" ..
 		"return self"

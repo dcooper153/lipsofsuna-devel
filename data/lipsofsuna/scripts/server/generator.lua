@@ -164,7 +164,7 @@ Voxel.place_pattern = function(clss, args)
 		local spec = Itemspec:find{name = v[4]}
 		if spec then
 			Item{
-				itemspec = spec,
+				spec = spec,
 				position = point * Config.tilewidth,
 				realized = true}
 		end

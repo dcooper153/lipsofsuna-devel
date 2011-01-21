@@ -39,15 +39,15 @@ Feat.apply = function(self, args)
 	end
 	-- Digging.
 	if anim.categories["melee"] and args.tile and args.weapon then
-		if args.weapon.itemspec.categories["mattock"] then
+		if args.weapon.spec.categories["mattock"] then
 			Voxel:damage(args.tile, args.damage, "mattock")
 		end
 	end
 	-- Building.
 	if anim.categories["build"] and args.tile and args.weapon then
-		if args.weapon.itemspec.construct_tile then
-			local m = Material:find{name = args.weapon.itemspec.construct_tile}
-			local need = args.weapon.itemspec.construct_tile_count or 1
+		if args.weapon.spec.construct_tile then
+			local m = Material:find{name = args.weapon.spec.construct_tile}
+			local need = args.weapon.spec.construct_tile_count or 1
 			local have = args.weapon:get_count()
 			if m and need <= have then
 				local t,p = Voxel:find_tile{match = "empty", point = args.point}
@@ -77,8 +77,8 @@ end
 Feat.calculate_damage = function(self, args)
 	-- Base damage.
 	-- The base damage depends on the feat and the type of weapon and ammunition used.
-	local spec1 = args.weapon and args.weapon.itemspec
-	local spec2 = args.projectile and args.projectile.itemspec
+	local spec1 = args.weapon and args.weapon.spec
+	local spec2 = args.projectile and args.projectile.spec
 	local info = self:get_info()
 	local damage = info.inflict_damage
 	if spec1 or spec2 then
@@ -233,12 +233,12 @@ Feat.perform = function(self, args)
 					local src = args.user:get_attack_ray(args)
 					local point = args.user.position + args.user.rotation * src
 					local proj = weapon:fire{
-						collision = not weapon.itemspec.destroy_timer,
+						collision = not weapon.spec.destroy_timer,
 						feat = feat,
 						point = point,
 						owner = args.user,
 						speed = 10,
-						timer = weapon.itemspec.destroy_timer}
+						timer = weapon.spec.destroy_timer}
 				end)
 			end
 		end
@@ -315,7 +315,7 @@ Feat.usable = function(self, args)
 		if not inventory then return info.required_weapon == "melee" end
 		local weapon = inventory:get_object{slot = "hand.R"}
 		if not weapon then return info.required_weapon == "melee" end
-		if not weapon.itemspec.categories[info.required_weapon] then return end
+		if not weapon.spec.categories[info.required_weapon] then return end
 	end
 	return true
 end

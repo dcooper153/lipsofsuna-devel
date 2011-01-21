@@ -68,7 +68,7 @@ Player.inventory_cb = function(self, args)
 	{
 		["inventory-changed"] = function()
 			if args.object then
-				local name = args.object.itemspec and args.object.itemspec.name
+				local name = args.object.spec.name
 				self:send{packet = Packet(packets.INVENTORY_ITEM_ADDED, "uint32", id,
 					"uint8", args.slot, "uint32", args.object:get_count(), "string", name)}
 			else
@@ -163,7 +163,7 @@ Player.vision_cb = function(self, args)
 		end,
 		["object-shown"] = function(args)
 			local o = args.object
-			local t = (o.species and 0) or (o.itemspec and 1) or (o.spec and 2) or 3
+			local t = (o.species and 0) or (o.spec.type == "item" and 1) or (o.spec.type == "obstacle" and 2) or 3
 			-- Append basic data.
 			local p = Packet(packets.OBJECT_SHOWN, "uint32", o.id,
 				"uint8", t, "string", o.model_name, "string", o.name or "",
@@ -222,7 +222,7 @@ Player.vision_cb = function(self, args)
 		["slot-changed"] = function(args)
 			local o = args.object
 			local item = o:get_item{slot = args.slot}
-			local spec = item and item.itemspec and item.itemspec.name or ""
+			local spec = item and item.spec.name
 			local model = item and item.model_name or ""
 			local count = item and item.count or 1
 			self:send{packet = Packet(packets.OBJECT_SLOT,

@@ -54,7 +54,7 @@ end
 Inventory.find_object = function(self, args)
 	for k,v in pairs(self.slots) do
 		if (not args.name or (v.name and v.name == args.name)) and
-		   (not args.type or (v.itemspec and v.itemspec.categories[args.type])) then
+		   (not args.type or (v.spec.categories[args.type])) then
 			return v, k
 		end
 	end

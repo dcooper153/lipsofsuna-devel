@@ -5,7 +5,7 @@ Creature.getter = function(self, key)
 		local value = 0
 		for k,v in pairs(self.species.equipment_slots) do
 			local i = self:get_item{slot = v.name}
-			value = value + (i and i.itemspec.armor_class or 0)
+			value = value + (i and i.spec.armor_class or 0)
 		end
 		return value
 	else
@@ -203,7 +203,7 @@ end
 --   <li>object: Item to equip.</li></ul>
 -- @return True if equipped successfully.
 Creature.equip_item = function(self, args)
-	local slot = args.object.itemspec.equipment_slot
+	local slot = args.object.spec.equipment_slot
 	if not slot then return end
 	if not self:unequip_item{slot = slot} then return end
 	self.inventory:set_object{object = args.object, slot = slot}
@@ -219,7 +219,7 @@ Creature.equip_best_items = function(self, args)
 		-- Find the best item to place to the slot.
 		local best = self:get_item{slot = name}
 		for index,item in pairs(self.inventory.slots) do
-			if item.itemspec.equipment_slot == name then
+			if item.spec.equipment_slot == name then
 				-- TODO: Actually check for armor class etc.
 				if not best then best = item end
 			end

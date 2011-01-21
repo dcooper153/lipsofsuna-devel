@@ -229,13 +229,13 @@ Protocol:add_handler{type = "SHOOT", func = function(args)
 	if not player.dead then
 		local anim = nil
 		local weapon = player:get_item{slot = "hand.R"}
-		if not weapon or weapon.itemspec.categories["melee"] then
+		if not weapon or weapon.spec.categories["melee"] then
 			anim = "right hand"
-		elseif weapon.itemspec.categories["ranged"] then
+		elseif weapon.spec.categories["ranged"] then
 			anim = "ranged"
-		elseif weapon.itemspec.categories["throwable"] then
+		elseif weapon.spec.categories["throwable"] then
 			anim = "throw"
-		elseif weapon.itemspec.categories["build"] then
+		elseif weapon.spec.categories["build"] then
 			anim = "build"
 		end
 		if anim then

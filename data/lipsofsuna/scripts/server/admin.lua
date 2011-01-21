@@ -46,7 +46,7 @@ Protocol:add_handler{type = "ADMIN_SPAWN", func = function(args)
 			local spec = Itemspec:find{name = msg}
 			if not spec then return end
 			Item{
-				itemspec = spec,
+				spec = spec,
 				position = player.position,
 				realized = true}
 		elseif typ == "item-cat" then
@@ -54,7 +54,7 @@ Protocol:add_handler{type = "ADMIN_SPAWN", func = function(args)
 			local spec = Itemspec:random{category = msg}
 			if not spec then return end
 			Item{
-				itemspec = spec,
+				spec = spec,
 				position = player.position,
 				realized = true}
 		elseif typ == "obstacle" then

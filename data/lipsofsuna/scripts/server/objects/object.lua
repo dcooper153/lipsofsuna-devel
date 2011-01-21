@@ -380,7 +380,7 @@ end
 -- @return True if merged successfully.
 Object.merge = function(self, args)
 	local obj = args.object
-	if self.itemspec and self.itemspec == args.object.itemspec and self.itemspec.stacking then
+	if self.spec == args.object.spec and self.spec.stacking then
 		self.count = self:get_count() + obj:get_count()
 		obj.realized = false
 		return true

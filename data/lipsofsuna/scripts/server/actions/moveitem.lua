@@ -58,8 +58,8 @@ Actions:register{name = "moveitem", func = function(clss, args)
 		end
 	-- Move to equipment.
 	elseif args.dstslot then
-		if not srcobj.itemspec then return end
-		if srcobj.itemspec.equipment_slot ~= args.dstslot then return end
+		if srcobj.spec.type ~= "item" then return end
+		if srcobj.spec.equipment_slot ~= args.dstslot then return end
 		local inventory = Inventory:find{owner = object}
 		if not inventory then return end
 		local oldequ = inventory:get_object{slot = args.dstslot}
