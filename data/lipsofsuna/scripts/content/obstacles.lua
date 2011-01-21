@@ -17,7 +17,7 @@ Obstaclespec{
 Obstaclespec{
 	name = "mushroom",
 	model = "mushroom-000",
-	categories = {"reagent"},
+	categories = {"small-plant", "reagent"},
 	health = 10,
 	harvest_behavior = "destroy",
 	harvest_effect = "harvest1",

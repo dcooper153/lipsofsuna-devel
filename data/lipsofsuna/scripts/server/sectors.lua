@@ -63,36 +63,54 @@ Sectors.format_generated_sector = function(self, sector)
 		Material:find{name = "pipe1"},
 		Material:find{name = "water1"},
 		Material:find{name = "wood1"}]]
-	local growdirs = {
-		Vector(-1, 0, 0),
-		Vector(1, 0, 0),
-		Vector(0, -1, 0),
-		Vector(0, 1, 0),
-		Vector(0, 0, -1),
-		Vector(0, 0, 1)}
-	local growrand
-	growrand = function(ctr, mat, dep)
-		local p = org + ctr
-		local t = Voxel:get_tile{point = p}
-		if t == 0 then return end
-		Voxel:set_tile{point = p, tile = mat}
-		if dep > 4 then return end
-		for k,v in pairs(growdirs) do
-			if math.random() < (4 - dep) * 0.15 then
-				local p = ctr + v
-				p.x = math.max(math.min(p.x, Voxel.tiles_per_line - 1), 1)
-				p.y = math.max(math.min(p.y, Voxel.tiles_per_line - 1), 1)
-				p.z = math.max(math.min(p.z, Voxel.tiles_per_line - 1), 1)
-				growrand(p, mat, dep + 1)
+	local points = {
+		Vector(-1,-1,-1), Vector(0,-1,-1), Vector(1,-1,-1),
+		Vector(-1,0,-1), Vector(0,0,-1), Vector(1,0,-1),
+		Vector(-1,1,-1), Vector(0,1,-1), Vector(1,1,-1),
+		Vector(-1,-1,0), Vector(0,-1,0), Vector(1,-1,0),
+		Vector(-1,0,0), Vector(0,0,0), Vector(1,0,0),
+		Vector(-1,1,0), Vector(0,1,0), Vector(1,1,0),
+		Vector(-1,-1,1), Vector(0,-1,1), Vector(1,-1,1),
+		Vector(-1,0,1), Vector(0,0,1), Vector(1,0,1),
+		Vector(-1,1,1), Vector(0,1,1), Vector(1,1,1)}
+	local createplant = function(ctr)
+		local i = 0
+		repeat
+			i = i + 1
+			ctr.y = ctr.y - 1
+			if i > 10 then return end
+		until Voxel:get_tile{point = ctr} ~= 0
+		ctr.y = ctr.y + 1
+		local src = ctr + Vector(-1,1,-1)
+		local dst = ctr + Vector(1,3,1)
+		ctr = ctr + Vector (0.5, 0, 0.5)
+		if Voxel:check_empty(src, dst) and math.random() < 0.3 then
+			Voxel:place_obstacle{point = ctr, category = "tree"}
+		else
+			Voxel:place_obstacle{point = ctr, category = "small-plant"}
+		end
+	end
+	local createvein = function(ctr, mat)
+		for k,v in pairs(points) do
+			if math.random() < 0.3 then
+				local t = Voxel:get_tile{point = ctr + v}
+				if t ~= 0 then
+					Voxel:set_tile{point = ctr + v, tile = mat}
+				end
 			end
 		end
 	end
 	local p = Vector()
 	for i=1,100 do
-		p.x = math.random(1, Voxel.tiles_per_line - 1)
-		p.y = math.random(1, Voxel.tiles_per_line - 1)
-		p.z = math.random(1, Voxel.tiles_per_line - 1)
-		local m = mats[math.random(1,#mats)]
-		if m then growrand(p, m.id, 1) end
+		p.x = org.x + math.random(1, Voxel.tiles_per_line - 1)
+		p.y = org.y + math.random(1, Voxel.tiles_per_line - 1)
+		p.z = org.z + math.random(1, Voxel.tiles_per_line - 1)
+		local t = Voxel:get_tile{point = p}
+		if t ~= 0 then
+			local m = mats[math.random(1,#mats)]
+			if m then createvein(p, m.id, 1) end
+		else
+			createplant(p)
+		end
 	end
 end

@@ -163,7 +163,7 @@ Object.get_tile_range = function(self)
 	src.x = math.floor(src.x)
 	src.y = math.floor(src.y + 0.1)
 	src.z = math.floor(src.z)
-	return src, src + size
+	return src, src + size - Vector(1,1,1)
 end
 
 --- Returns true if the object is stuck inside a wall.

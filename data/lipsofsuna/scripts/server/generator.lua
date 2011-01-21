@@ -4,11 +4,11 @@
 -- @return True if the range is empty.
 Voxel.check_empty = function(clss, src, dst)
 	local v = Vector()
-	for x = src.x,dst.x-1 do
+	for x = src.x,dst.x do
 		v.x = x
-		for y = src.y,dst.y-1 do
+		for y = src.y,dst.y do
 			v.y = y
-			for z = src.z,dst.z-1 do
+			for z = src.z,dst.z do
 				v.z = z
 				if clss:get_tile{point = v} ~= 0 then
 					return
@@ -204,6 +204,9 @@ end
 ------------------------------------------------------------------------------
 
 Generator = Class()
+Generator.map_size = Vector(1000, 1000, 1000)
+Generator.map_start = Vector(1500, 2500, 1500) - Generator.map_size * 0.5
+Generator.map_end = Vector(1500, 2500, 1500) + Generator.map_size * 0.5
 
 --- Informs clients of the generator status.
 -- @param clss Generator class.
@@ -255,8 +258,8 @@ Generator.place_region = function(clss, reg)
 	if reg.position then
 		rel = Vector(reg.position[1], 0, reg.position[2])
 	elseif not reg.distance then
-		rel = Vector(math.random(500, 2500), 0, math.random(500, 2500))
-		dist = {nil, 300, 300}
+		rel = Vector(math.random(clss.map_start.x, clss.map_end.x), 0, math.random(clss.map_start.z, clss.map_end.z))
+		dist = {nil, 0.1 * clss.map_size.x, 0.1 * clss.map_size.x}
 	elseif clss.regions_dict_name[reg.distance[1]] then
 		rel = clss.regions_dict_name[reg.distance[1]].point
 		rel = Vector(rel.x, 0, rel.z)
@@ -297,12 +300,12 @@ end
 -- @param aabb Position of the region.
 -- @return True if the position is valid.
 Generator.validate_region_position = function(clss, aabb)
-	if aabb.point.x < 100 then return end
-	if aabb.point.y < 100 then return end
-	if aabb.point.z < 100 then return end
-	if aabb.point.x + aabb.size.x > 3000 then return end
-	if aabb.point.y + aabb.size.y > 3000 then return end
-	if aabb.point.z + aabb.size.z > 3000 then return end
+	if aabb.point.x < clss.map_start.x then return end
+	if aabb.point.y < clss.map_start.y then return end
+	if aabb.point.z < clss.map_start.z then return end
+	if aabb.point.x + aabb.size.x > clss.map_end.x then return end
+	if aabb.point.y + aabb.size.y > clss.map_end.y then return end
+	if aabb.point.z + aabb.size.z > clss.map_end.z then return end
 	for k,v in pairs(clss.regions_dict_id) do
 		if aabb:intersects(v.aabb) then return end
 	end
@@ -381,13 +384,14 @@ Generator.generate = function(clss, args)
 		return true
 	end
 	for layer = 0,20 do
-		local y = 3000 * (1 - layer / 20)
+		local y = clss.map_start.y + clss.map_size.y * (layer / 20)
+		local limit = 0.1 * clss.map_size.y
 		local retry = 0
 		local created = 0
 		while retry < 30 and created < 10 do
 			local reg1 = clss.regions_dict_id[math.random(1, regionn)]
 			local reg2 = clss.regions_dict_id[math.random(1, regionn)]
-			if math.abs(reg1.point.y - y) < 300 and reglink(reg1, reg2) then
+			if math.abs(reg1.point.y - y) < limit and reglink(reg1, reg2) then
 				created = created + 1
 			else
 				retry = retry + 1
@@ -449,7 +453,7 @@ Generator.generate = function(clss, args)
 		sectorn = sectorn + 1
 	end
 	-- Randomize tiles.
-	clss:update_status(0, "Creating ore veins")
+	clss:update_status(0, "Creating resource deposits")
 	local index = 0
 	for k in pairs(sectors) do
 		Sectors:format_generated_sector(k)
