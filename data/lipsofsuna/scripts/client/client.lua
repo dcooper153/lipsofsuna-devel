@@ -50,7 +50,7 @@ Player.get_picking_ray_3rd = function(clss)
 	return pos,pos + rot * Vector(0,0,-50)
 end
 
-Player.camera = Camera{far = 60.0, fov = 0.96, mode = "third-person", near = 0.01, position_smoothing = 0.15, rotation_smoothing = 0.15}
+Player.camera = Camera{far = 60.0, fov = 1.1, mode = "third-person", near = 0.01, position_smoothing = 0.15, rotation_smoothing = 0.15}
 Player.camera_tilt = 0
 Player.camera_tilt_state = 0
 Player.camera_turn = 0
@@ -71,7 +71,6 @@ Player.update_camera = function(clss, secs)
 	Player.camera.target_rotation = rot
 	-- Interpolate.
 	Player.camera.viewport = {Gui.scene.x, Gui.scene.y, Gui.scene.width, Gui.scene.height}
-	Player.camera:update(secs)
 	Player.camera:update(secs)
 end
 
@@ -337,6 +336,15 @@ Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
 			if o.equipment and o.equipment[slot] then
 				o.equipment[slot] = nil
 				o:update_model()
+			end
+		end
+		-- Torch holding hack.
+		if slot == "hand.L" then
+			if spec then
+				o:animate{animation = "hold-left", channel = Animation.CHANNEL_LEFT_HAND, weight = 3,
+					fade_in = 0.5, fade_out = 0.5, permanent = true}
+			else
+				o:animate{animation = "empty", channel = Animation.CHANNEL_LEFT_HAND}
 			end
 		end
 	end

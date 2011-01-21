@@ -1603,10 +1603,26 @@
     <file>import/torch1.blend</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>
-    <dep>import/wood-002.png</dep>
-    <status>placeholder</status>
-    <tag>torch</tag>
+    <dep>import/torch1.png</dep>
+    <dep>import/torch1n.png</dep>
+    <status>usable</status>
     <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/torch1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/torch1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <type>normalmap</type>
   </asset>
 
   <asset>
