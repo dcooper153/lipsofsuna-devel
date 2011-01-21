@@ -292,13 +292,18 @@ int limdl_animation_get_channel (
 /**
  * \brief Gets the duration of the animation in seconds.
  *
+ * The return value is guaranteed to be greater than zero. If the animation
+ * has one or less frames, the return value is one second.
+ *
  * \param self Animation.
  * \return Duration in seconds.
  */
 float limdl_animation_get_duration (
 	const LIMdlAnimation* self)
 {
-	return (self->length - 1) * TIMESCALE;
+	if (self->length > 1)
+		return (self->length - 1) * TIMESCALE;
+	return 1.0f;
 }
 
 /**
