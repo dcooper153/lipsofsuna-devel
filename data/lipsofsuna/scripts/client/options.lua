@@ -1,4 +1,7 @@
 Options = Class()
+Options.fullscreen = false
+Options.screen_width = 1024
+Options.screen_height = 768
 Options.low_quality_models = false
 Options.animation_quality = 1.0
 Options.mouse_sensitivity = 1.0
@@ -8,6 +11,25 @@ Options.sound_volume = 1.0
 Options.music_volume = 0.3
 
 Options.init = function(clss)
+	-- Video mode.
+	local modes = {}
+	for k,v in ipairs(Client.video_modes) do
+		table.insert(modes, {"" .. v[1] .. "x" .. v[2], function()
+			Client:set_video_mode(v[1], v[2], true)
+		end, width = v[1], height = v[2]})
+	end
+	table.sort(modes, function(a, b)
+		if a.height < b.height then return true end
+		if a.height > b.height then return false end
+		if a.width < b.width then return true end
+		return false
+	end)
+	table.insert(modes, 1, {"Windowed", function()
+		local s = Client.video_mode
+		Client:set_video_mode(s[1], s[2], false)
+	end})
+	local combo_video_mode = Widgets.ComboBox(modes)
+	combo_video_mode:activate{index = 1, pressed = false}
 	-- Antialiasing quality.
 	local samples = math.log(clss.multisamples) / math.log(2)
 	local scroll_multisamples = Widgets.Progress{min = 0, max = 4, text = tostring(clss.multisamples) .. "x", value = samples}
@@ -113,6 +135,7 @@ Options.init = function(clss)
 	end
 	-- Packing.
 	local quality_group = Widget{cols = 2}
+	quality_group:append_row(Widgets.Label{text = "Resolution"}, combo_video_mode)
 	quality_group:append_row(Widgets.Label{text = "Models"}, button_model_quality)
 	quality_group:append_row(Widgets.Label{text = "Antialiasing"}, scroll_multisamples)
 	quality_group:append_row(Widgets.Label{text = "Animation"}, scroll_animation)

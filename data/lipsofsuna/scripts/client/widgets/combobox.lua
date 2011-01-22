@@ -40,6 +40,7 @@ end
 -- @param self Combo box.
 -- @param args Arguments.<ul>
 --   <li>index: Row index.</li>
+--   <li>press: False to not call the menu activation function.</li>
 --   <li>text: Row text.</li></ul>
 -- @return True on success.
 Widgets.ComboBox.activate = function(self, args)
@@ -47,7 +48,7 @@ Widgets.ComboBox.activate = function(self, args)
 		-- Activate by index.
 		local widget = self.menu:get_child{col = 1, row = args.index}
 		if not widget then return end
-		widget:pressed()
+		if args.press ~= false then widget:pressed() end
 	elseif args.text then
 		-- Activate by text.
 		local row = 1
@@ -57,7 +58,7 @@ Widgets.ComboBox.activate = function(self, args)
 			if not widget then return end
 			if widget.text == args.text then break end
 		end
-		widget:pressed()
+		if args.press ~= false then widget:pressed() end
 	end
 	return true
 end
