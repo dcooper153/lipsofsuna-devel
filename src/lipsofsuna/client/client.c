@@ -33,6 +33,8 @@
 #include "client-script.h"
 #include "client-window.h"
 
+#define ENABLE_GRABS
+
 static int private_init (
 	LICliClient*  self,
 	LIMaiProgram* program);
@@ -179,11 +181,12 @@ void licli_client_set_moving (
 		cx = self->window->mode.width / 2;
 		cy = self->window->mode.height / 2;
 		SDL_ShowCursor (SDL_DISABLE);
+#ifdef ENABLE_GRABS
+		SDL_WM_GrabInput (SDL_GRAB_ON);
+#else
 		SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
 		SDL_WarpMouse (cx, cy);
 		SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
-#ifdef ENABLE_GRABS
-		SDL_WM_GrabInput (SDL_GRAB_ON);
 #endif
 	}
 	else
@@ -333,10 +336,12 @@ static int private_tick (
 	LICliClient* self,
 	float        secs)
 {
+#ifndef ENABLE_GRABS
 	int x;
 	int y;
 	int cx;
 	int cy;
+#endif
 	SDL_Event event;
 
 	/* Invoke input callbacks. */
@@ -344,6 +349,7 @@ static int private_tick (
 		lical_callbacks_call (self->program->callbacks, self->program->engine, "event", lical_marshal_DATA_PTR, &event);
 
 	/* Pointer warping in movement mode. */
+#ifndef ENABLE_GRABS
 	if (self->moving)
 	{
 		cx = self->window->mode.width / 2;
@@ -356,6 +362,7 @@ static int private_tick (
 			SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
 		}
 	}
+#endif
 
 	return 1;
 }
