@@ -35,7 +35,8 @@ static int private_init_video (
 static int private_resize (
 	LICliWindow* self,
 	int          width,
-	int          height);
+	int          height,
+	int          fullscreen);
 
 /****************************************************************************/
 
@@ -73,6 +74,12 @@ void licli_window_free (
 	lisys_free (self);
 }
 
+int licli_window_get_fullscreen (
+	LICliWindow* self)
+{
+	return self->mode.fullscreen;
+}
+
 void licli_window_get_size (
 	const LICliWindow* self,
 	int*               width,
@@ -87,9 +94,10 @@ void licli_window_get_size (
 int licli_window_set_size (
 	LICliWindow* self,
 	int          width,
-	int          height)
+	int          height,
+	int          full)
 {
-	if (!private_resize (self, width, height))
+	if (!private_resize (self, width, height, full))
 		return 0;
 	return 1;
 }
@@ -108,7 +116,7 @@ static int private_init_video (
 	LICliWindow* self)
 {
 	/* Create the window. */
-	if (!private_resize (self, 1024, 768))
+	if (!private_resize (self, 1024, 768, 0))
 		return 0;
 	if (TTF_Init () == -1)
 	{
@@ -122,14 +130,53 @@ static int private_init_video (
 static int private_resize (
 	LICliWindow* self,
 	int          width,
-	int          height)
+	int          height,
+	int          fullscreen)
 {
+	int i;
+	Uint32 flags;
+	SDL_Rect* best = NULL;
+	SDL_Rect** modes;
+
+	/* Determine screen surface flags. */
+	if (fullscreen)
+	{
+		flags = SDL_OPENGL | SDL_FULLSCREEN;
+		modes = SDL_ListModes (NULL, flags);
+		if (modes != NULL && modes != (SDL_Rect**) -1)
+		{
+			/* Determine the best possible fullscreen mode. */
+			for (i = 0 ; modes[i] ; i++)
+			{
+				if (best == NULL ||
+				   (LIMAT_ABS (modes[i]->w - width) < LIMAT_ABS (best->w - width) &&
+				    LIMAT_ABS (modes[i]->h - height) < LIMAT_ABS (best->h - height)))
+					best = modes[i];
+			}
+		}
+		printf ("SETFS %d %d!!!\n", best? best->w : -1, best? best->h : -1);
+		if (best != NULL)
+		{
+			/* Set the resolution to the best mode found. */
+			width = best->w;
+			height = best->h;
+		}
+		else
+		{
+			/* Revert to windowed mode if no fullscreen modes. */
+			flags = SDL_OPENGL | SDL_RESIZABLE;
+			fullscreen = 0;
+		}
+	}
+	else
+		flags = SDL_OPENGL | SDL_RESIZABLE;
+
 	/* Recreate surface. */
 	SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 0);
 	SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 0);
 	SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
 	SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
-	self->screen = SDL_SetVideoMode (width, height, 0, SDL_OPENGL | SDL_RESIZABLE);
+	self->screen = SDL_SetVideoMode (width, height, 0, flags);
 	if (self->screen == NULL)
 	{
 		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot set video mode");
@@ -143,6 +190,7 @@ static int private_resize (
 	/* Store mode. */
 	self->mode.width = width;
 	self->mode.height = height;
+	self->mode.fullscreen = fullscreen;
 
 	return 1;
 }

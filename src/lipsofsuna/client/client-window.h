@@ -31,6 +31,7 @@ struct _LICliWindow
 	{
 		int width;
 		int height;
+		int fullscreen;
 	} mode;
 };
 
@@ -48,7 +49,8 @@ LIAPICALL (void, licli_window_get_size, (
 LIAPICALL (int, licli_window_set_size, (
 	LICliWindow* self,
 	int          width,
-	int          height));
+	int          height,
+	int          full));
 
 #endif
 

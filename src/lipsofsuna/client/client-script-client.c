@@ -174,6 +174,41 @@ static void Client_screenshot (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Sets the current video mode.
+ * -- @param clss Client class.
+ * -- @param args Arguments.<ul>
+ * --   <li>1,width: Window width in pixels.</li>
+ * --   <li>2,height: Window height in pixels.</li>
+ * --   <li>3,fullscreen: True for fullscreen.</li></ul>
+ * -- @return True on success.
+ * function Client.set_video_mode(clss, args)
+ */
+static void Client_set_video_mode (LIScrArgs* args)
+{
+	int width = 1024;
+	int height = 768;
+	int fullscreen = 0;
+	LICliClient* client;
+
+	if (!liscr_args_gets_int (args, "width", &width))
+		liscr_args_geti_int (args, 0, &width);
+	if (!liscr_args_gets_int (args, "height", &height))
+		liscr_args_geti_int (args, 1, &height);
+	if (!liscr_args_gets_bool (args, "fullscreen", &fullscreen))
+		liscr_args_geti_bool (args, 2, &fullscreen);
+	width = LIMAT_MAX (320, width);
+	height = LIMAT_MAX (240, height);
+
+	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	if (!licli_window_set_size (client->window, width, height, fullscreen))
+	{
+		lisys_error_report ();
+		return;
+	}
+	liscr_args_seti_bool (args, 1);
+}
+
+/* @luadoc
  * --- Copies the rendered scene to the screen.
  * -- @param clss Client class.
  * function Client.swap_buffers(clss)
@@ -259,22 +294,71 @@ static void Client_setter_title (LIScrArgs* args)
 	}
 }
 
+/* @luadoc
+ * --- Current video mode.
+ * -- @name Client.video_mode
+ * -- @class table
+ */
+static void Client_getter_video_mode (LIScrArgs* args)
+{
+	LICliClient* client;
+
+	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+	liscr_args_seti_int (args, client->window->mode.width);
+	liscr_args_seti_int (args, client->window->mode.height);
+	liscr_args_seti_bool (args, client->window->mode.fullscreen);
+}
+
+/* @luadoc
+ * --- List of supported fullscreen modes.
+ * -- @name Client.video_modes
+ * -- @class table
+ */
+static void Client_getter_video_modes (LIScrArgs* args)
+{
+	int i;
+	SDL_Rect** modes;
+	LICliClient* client;
+
+	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+	modes = SDL_ListModes (NULL, SDL_OPENGL | SDL_FULLSCREEN);
+	if (modes != NULL && modes != (SDL_Rect**) -1)
+	{
+		for (i = 0 ; modes[i] ; i++)
+		{
+			lua_newtable (args->lua);
+			lua_pushnumber (args->lua, 1);
+			lua_pushnumber (args->lua, modes[i]->w);
+			lua_settable (args->lua, -3);
+			lua_pushnumber (args->lua, 2);
+			lua_pushnumber (args->lua, modes[i]->h);
+			lua_settable (args->lua, -3);
+			liscr_args_seti_stack (args);
+		}
+	}
+}
+
 /*****************************************************************************/
 
-void
-licli_script_client (LIScrClass* self,
-                     void*       data)
+void licli_script_client (
+	LIScrClass* self,
+	void*       data)
 {
 	liscr_class_set_userdata (self, LICLI_SCRIPT_CLIENT, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "clear_buffer", Client_clear_buffer);
 	liscr_class_insert_cfunc (self, "host", Client_host);
 	liscr_class_insert_cfunc (self, "screenshot", Client_screenshot);
+	liscr_class_insert_cfunc (self, "set_video_mode", Client_set_video_mode);
 	liscr_class_insert_cfunc (self, "swap_buffers", Client_swap_buffers);
 	liscr_class_insert_cvar (self, "cursor_pos", Client_getter_cursor_pos, NULL);
 	liscr_class_insert_cvar (self, "fps", Client_getter_fps, NULL);
 	liscr_class_insert_cvar (self, "moving", Client_getter_moving, Client_setter_moving);
 	liscr_class_insert_cvar (self, "title", NULL, Client_setter_title);
+	liscr_class_insert_cvar (self, "video_mode", Client_getter_video_mode, NULL);
+	liscr_class_insert_cvar (self, "video_modes", Client_getter_video_modes, NULL);
 }
 
 /** @} */
