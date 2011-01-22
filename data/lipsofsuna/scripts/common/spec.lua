@@ -60,7 +60,9 @@ end
 --   <li>category: Category name or nil.</li></ul>
 -- @return Obstaclespec or nil.
 Spec.random = function(clss, args)
-	if args and args.category then
+	if args and args.name then
+		return clss.dict_name[args.name]
+	elseif args and args.category then
 		local cat = clss.dict_cat[args.category]
 		if not cat then return end
 		return cat[math.random(#cat)]
