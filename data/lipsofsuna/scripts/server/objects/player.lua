@@ -11,12 +11,28 @@ end
 
 --- Creates a new player object.
 -- @param clss Player class.
--- @param args Arguments.
+-- @param args Arguments.<ul>
+--   <li>angular: Angular velocity.</li>
+--   <li>body_scale: Scale factor of the body.</li>
+--   <li>bust_scale: Scale factor of the bust.</li>
+--   <li>client: Client controlling the character.</li>
+--   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
+--   <li>gender: Gender.</li>
+--   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
+--   <li>id: Unique object ID or nil for a random free one.</li>
+--   <li>jumped: Jump timer.</li>
+--   <li>name: Name of the creature.</li>
+--   <li>nose_scale: Scale factor of the nose.</li>
+--   <li>physics: Physics mode.</li>
+--   <li>position: Position vector of the creature.</li>
+--   <li>rotation: Rotation quaternion of the creature.</li>
+--   <li>skin_style: Skin style defined by an array of {style, red, green, blue}.</li>
+--   <li>species: Species of the creature.</li>
+--   <li>realized: True to add the object to the simulation.</li></ul>
 -- @return Player.
 Player.new = function(clss, args)
 	local self = Creature.new(clss, args)
-	self.species = args.species or "aer-player"
-	self.name = args and args.name or Names:random()
+	self.client = args.client
 	self.vision = Vision{object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
 	self.vision.terrain = {}
 	self.inventory:subscribe{object = self, callback = function(args) self:inventory_cb(args) end}

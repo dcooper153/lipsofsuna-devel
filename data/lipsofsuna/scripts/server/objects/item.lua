@@ -114,11 +114,27 @@ end
 
 --- Creates an item.
 -- @param clss Item class.
--- @param args Arguments.
+-- @param args Arguments.<ul>
+--   <li>angular: Angular velocity.</li>
+--   <li>id: Unique object ID or nil for a random free one.</li>
+--   <li>physics: Physics mode.</li>
+--   <li>position: Position vector of the item.</li>
+--   <li>rotation: Rotation quaternion of the item.</li>
+--   <li>realized: True to add the object to the simulation.</li></ul>
 -- @return New item.
 Item.new = function(clss, args)
-	local self = Object.new(clss, args)
-	self.physics = args and args.physics or "rigid"
+	local self = Object.new(clss, {id = args.id})
+	local copy = function(n, d)
+		if args[n] ~= nil or d then
+			self[n] = (args[n] ~= nil) and args[n] or d
+		end
+	end
+	copy("angular")
+	copy("physics", "rigid")
+	copy("position")
+	copy("rotation")
+	copy("spec")
+	copy("realized")
 	return self
 end
 

@@ -56,12 +56,44 @@ end
 
 --- Creates a new creature.
 -- @param clss Creature class.
--- @param args Arguments.
+-- @param args Arguments.<ul>
+--   <li>angular: Angular velocity.</li>
+--   <li>body_scale: Scale factor of the body.</li>
+--   <li>bust_scale: Scale factor of the bust.</li>
+--   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
+--   <li>gender: Gender.</li>
+--   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
+--   <li>id: Unique object ID or nil for a random free one.</li>
+--   <li>jumped: Jump timer.</li>
+--   <li>name: Name of the creature.</li>
+--   <li>nose_scale: Scale factor of the nose.</li>
+--   <li>physics: Physics mode.</li>
+--   <li>position: Position vector of the creature.</li>
+--   <li>rotation: Rotation quaternion of the creature.</li>
+--   <li>skin_style: Skin style defined by an array of {style, red, green, blue}.</li>
+--   <li>species: Species of the creature.</li>
+--   <li>realized: True to add the object to the simulation.</li></ul>
 Creature.new = function(clss, args)
-	local self = Object.new(clss, args)
-	self.physics = args and args.physics or "kinematic"
-	self.species = args and args.species or "aer"
-	self.jumped = args and args.jumped or 0
+	local self = Object.new(clss, {id = args.id})
+	local copy = function(n, d)
+		if args[n] ~= nil or d then
+			self[n] = (args[n] ~= nil) and args[n] or d
+		end
+	end
+	copy("angular")
+	copy("body_scale")
+	copy("bust_scale")
+	copy("gender")
+	copy("eye_style")
+	copy("hair_style")
+	copy("jumped", 0)
+	copy("name")
+	copy("nose_style")
+	copy("physics", "kinematic")
+	copy("rotation")
+	copy("position")
+	copy("skin_style")
+	copy("species")
 	self.anim_timer = 0
 	self.enemies = {}
 	setmetatable(self.enemies, {__mode = "kv"})
@@ -69,6 +101,7 @@ Creature.new = function(clss, args)
 	self:calculate_combat_ratings()
 	self:set_state{state = "wander"}
 	self:set_movement(0)
+	copy("realized")
 
 	Thread(function()
 		while true do
