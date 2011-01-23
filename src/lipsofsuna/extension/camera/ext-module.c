@@ -24,12 +24,6 @@
 
 #include "ext-module.h"
 
-static void private_camera_clip (
-	LIExtModule* self,
-	LIAlgCamera* camera);
-
-/*****************************************************************************/
-
 LIMaiExtensionInfo liext_camera_info =
 {
 	LIMAI_EXTENSION_VERSION, "Camera",
@@ -61,28 +55,14 @@ void liext_cameras_free (
 	lisys_free (self);
 }
 
-void liext_cameras_update (
-	LIExtModule* self,
-	LIAlgCamera* camera,
-	float        secs)
-{
-	lialg_camera_update (camera, secs);
-	if (lialg_camera_get_driver (camera) != LIALG_CAMERA_FIRSTPERSON)
-		private_camera_clip (self, camera);
-}
-
-/*****************************************************************************/
-
-static void private_camera_clip (
-	LIExtModule* self,
-	LIAlgCamera* camera)
+float liext_cameras_clip_camera (
+	LIExtModule*    self,
+	LIAlgCamera*    camera,
+	LIMatTransform* start,
+	LIMatTransform* end)
 {
 	int hit;
-	float frac;
 	LIMatAabb aabb;
-	LIMatTransform start;
-	LIMatTransform end;
-	LIMatVector diff;
 	LIPhyCollision tmp;
 	LIPhyPhysics* physics;
 	LIPhyShape* shape;
@@ -90,30 +70,34 @@ static void private_camera_clip (
 	/* Find the physics manager. */
 	physics = limai_program_find_component (self->program, "physics");
 	if (physics == NULL)
-		return;
+		return 1.0f;
 
 	/* Create sweep shape. */
 	/* FIXME: Could use a more accurate shape. */
 	lialg_camera_get_bounds (camera, &aabb);
 	shape = liphy_shape_new (physics);
 	if (shape == NULL)
-		return;
+		return 1.0f;
 	liphy_shape_add_aabb (shape, &aabb, NULL);
 
 	/* Sweep the shape. */
-	lialg_camera_get_center (camera, &start);
-	lialg_camera_get_transform (camera, &end);
-	diff = limat_vector_subtract (end.position, start.position);
-	hit = liphy_physics_cast_shape (physics, &start, &end, shape,
+	hit = liphy_physics_cast_shape (physics, start, end, shape,
 		LICLI_PHYSICS_GROUP_CAMERA, LIPHY_GROUP_STATICS | LIPHY_GROUP_TILES, NULL, 0, &tmp);
 	liphy_shape_free (shape);
 
 	/* Clip the camera. */
 	if (hit)
-	{
-		frac = tmp.fraction * limat_vector_get_length (diff);
-		lialg_camera_clip (camera, frac);
-	}
+		return tmp.fraction;
+	else
+		return 1.0f;
+}
+
+void liext_cameras_update (
+	LIExtModule* self,
+	LIAlgCamera* camera,
+	float        secs)
+{
+	lialg_camera_update (camera, secs);
 }
 
 /** @} */

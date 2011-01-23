@@ -50,6 +50,7 @@ static void Camera_new (LIScrArgs* args)
 	if (self == NULL)
 		return;
 	lialg_camera_set_driver (self, LIALG_CAMERA_THIRDPERSON);
+	lialg_camera_set_clipping (self, liext_cameras_clip_camera, module);
 	lialg_camera_set_viewport (self, 0, 0,
 		module->client->window->mode.width,
 		module->client->window->mode.height);

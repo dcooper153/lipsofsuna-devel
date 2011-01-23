@@ -97,33 +97,6 @@ void lialg_camera_free (
 }
 
 /**
- * \brief Clips the camera.
- *
- * When in third person mode, ensures that the distance from the camera to the
- * target is at most the value given. The camera transformation will reset to
- * the unclipped value the next time update is called.
- *
- * \param self Camera.
- * \param dist Maximum distance to the target.
- */
-void lialg_camera_clip (
-	LIAlgCamera* self,
-	float        dist)
-{
-	LIMatVector dir;
-	LIMatVector pos;
-
-	if (self->config.driver != LIALG_CAMERA_THIRDPERSON || dist >= self->config.distance)
-		return;
-	dir = limat_vector_subtract (self->transform.current.position, self->transform.center.position);
-	dir = limat_vector_normalize (dir);
-	dir = limat_vector_multiply (dir, dist);
-	pos = limat_vector_add (self->transform.center.position, dir);
-	self->transform.current.position = pos;
-	private_update_modelview (self);
-}
-
-/**
  * \brief Moves the camera by the specified amount.
  * \param self Camera.
  * \param value Movement amount.
@@ -372,6 +345,26 @@ void lialg_camera_set_center (
 }
 
 /**
+ * \brief Sets the external clipping function of the camera.
+ *
+ * When the clipping function is set, the camera ensures that its distance to the
+ * target in the third person mode isn't more than that returned by the clip
+ * function.
+ *
+ * \param self Camera.
+ * \param func Clipping function or NULL to disable.
+ * \param data Userdata to be passed to the clipping function.
+ */
+void lialg_camera_set_clipping (
+	LIAlgCamera*    self,
+	LIAlgCameraClip func,
+	void*           data)
+{
+	self->config.clip_func = func;
+	self->config.clip_data = data;
+}
+
+/**
  * \brief Gets the driver type of the camera.
  * \param self Camera.
  * \return Camera driver type.
@@ -617,21 +610,38 @@ static void private_update_3rd_person (
 	LIAlgCamera* self,
 	float        dist)
 {
+	float frac;
 	LIMatTransform transform;
+	LIMatTransform target;
+	LIMatTransform center;
 
 	/* Copy center position and rotation. */
-	self->transform.target = self->transform.center;
+	center = self->transform.center;
 
 	/* Apply local rotation. */
-	self->transform.target = limat_transform_multiply (self->transform.target, self->transform.local);
-	self->transform.target.rotation = limat_quaternion_normalize (self->transform.target.rotation);
+	center = limat_transform_multiply (center, self->transform.local);
+	center.rotation = limat_quaternion_normalize (center.rotation);
 
 	/* Project backwards. */
 	transform = limat_transform_init (
 		limat_vector_init (0.0f, 0.0f, dist),
 		limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f));
-	self->transform.target = limat_transform_multiply (self->transform.target, transform);
-	self->transform.target.rotation = limat_quaternion_normalize (self->transform.target.rotation);
+	target = limat_transform_multiply (center, transform);
+	target.rotation = limat_quaternion_normalize (target.rotation);
+
+	/* Apply clipping. */
+	if (self->config.clip_func != NULL)
+	{
+		frac = self->config.clip_func (self->config.clip_data, self, &center, &target);
+		transform = limat_transform_init (
+			limat_vector_init (0.0f, 0.0f, dist * frac),
+			limat_quaternion_init (0.0f, 0.0f, 0.0f, 1.0f));
+		target = limat_transform_multiply (center, transform);
+		target.rotation = limat_quaternion_normalize (target.rotation);
+	}
+
+	/* Set the target position. */
+	self->transform.target = target;
 }
 
 static void private_update_modelview (

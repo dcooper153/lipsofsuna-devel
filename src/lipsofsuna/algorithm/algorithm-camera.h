@@ -20,7 +20,10 @@
 
 #include <lipsofsuna/math.h>
 
+typedef struct _LIAlgCamera LIAlgCamera;
 typedef int LIAlgCameraDriver;
+typedef float (*LIAlgCameraClip)(void*, LIAlgCamera*, LIMatTransform*, LIMatTransform*);
+
 enum 
 {
 	LIALG_CAMERA_FIRSTPERSON,
@@ -29,13 +32,14 @@ enum
 	LIALG_CAMERA_MAX
 };
 
-typedef struct _LIAlgCamera LIAlgCamera;
 struct _LIAlgCamera
 {
 	struct
 	{
 		float distance;
 		LIAlgCameraDriver driver;
+		LIAlgCameraClip clip_func;
+		void* clip_data;
 	} config;
 	struct
 	{
@@ -74,10 +78,6 @@ LIAPICALL (LIAlgCamera*, lialg_camera_new, ());
 
 LIAPICALL (void, lialg_camera_free, (
 	LIAlgCamera* self));
-
-LIAPICALL (void, lialg_camera_clip, (
-	LIAlgCamera* self,
-	float        dist));
 
 LIAPICALL (void, lialg_camera_move, (
 	LIAlgCamera* self,
@@ -123,6 +123,11 @@ LIAPICALL (void, lialg_camera_get_center, (
 LIAPICALL (void, lialg_camera_set_center, (
 	LIAlgCamera*          self,
 	const LIMatTransform* value));
+
+LIAPICALL (void, lialg_camera_set_clip, (
+	LIAlgCamera*    self,
+	LIAlgCameraClip func,
+	void*           data));
 
 LIAPICALL (LIAlgCameraDriver, lialg_camera_get_driver, (
 	LIAlgCamera* self));

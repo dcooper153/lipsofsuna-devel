@@ -36,6 +36,12 @@ LIExtModule* liext_cameras_new (
 void liext_cameras_free (
 	LIExtModule* self);
 
+float liext_cameras_clip_camera (
+	LIExtModule*    self,
+	LIAlgCamera*    camera,
+	LIMatTransform* start,
+	LIMatTransform* end);
+
 void liext_cameras_update (
 	LIExtModule* self,
 	LIAlgCamera* camera,
