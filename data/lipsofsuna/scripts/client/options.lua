@@ -8,7 +8,7 @@ Options.mouse_sensitivity = 1.0
 Options.multisamples = 2
 Options.transparency_quality = 0.3
 Options.sound_volume = 1.0
-Options.music_volume = 0.3
+Options.music_volume = 0.1
 
 Options.init = function(clss)
 	-- Video mode.
@@ -118,7 +118,7 @@ Options.init = function(clss)
 		clss.mouse_sensitivity = v
 	end
 	-- Sound settings.
-	local scroll_music = Widgets.Progress{min = 0, max = 1, value = clss.music_volume}
+	local scroll_music = Widgets.Progress{min = 0, max = 0.5, value = clss.music_volume}
 	scroll_music:set_request{width = 100}
 	scroll_music.pressed = function(self)
 		local v = self:get_value_at(Client.cursor_pos)
