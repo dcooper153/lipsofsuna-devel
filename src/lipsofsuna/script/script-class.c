@@ -531,9 +531,9 @@ int liscr_class_default___newindex (
 		lua_pushvalue (lua, 3);
 		if (lua_pcall (lua, 3, 0, 0) != 0)
 		{
-			lisys_error_set (EINVAL, lua_tostring (self->script->lua, -1));
+			lisys_error_set (EINVAL, lua_tostring (lua, -1));
 			lisys_error_report ();
-			lua_pop (self->script->lua, 1);
+			lua_pop (lua, 1);
 		}
 		break;
 	}
