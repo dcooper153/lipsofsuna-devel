@@ -117,14 +117,31 @@ end
 --- Saves all active sectors to the database.
 -- @param self Sectors.
 -- @param erase True to completely erase the old map.
-Sectors.save_world = function(self, erase)
+-- @param progress Progress callback.
+Sectors.save_world = function(self, erase, progress)
 	self.database:query("BEGIN TRANSACTION;")
+	-- Erase old world from the database.
 	if erase then
 		if self.save_objects then self.database:query("DELETE FROM objects;") end
 		if self.save_terrain then self.database:query("DELETE FROM terrain;") end
 	end
-	for k,v in pairs(Program.sectors) do
-		self:save_sector(k)
+	-- Write the new world data.
+	local sectors = Program.sectors
+	if progress then
+		-- Write with progress updates.
+		local total = 0
+		for k in pairs(sectors) do total = total + 1 end
+		local i = 1
+		for k,v in pairs(sectors) do
+			self:save_sector(k)
+			progress(i / total)
+			i = i + 1
+		end
+	else
+		-- Write without progress updates.
+		for k,v in pairs(sectors) do
+			self:save_sector(k)
+		end
 	end
 	self.database:query("END TRANSACTION;")
 end

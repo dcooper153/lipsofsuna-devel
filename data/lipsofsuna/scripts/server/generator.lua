@@ -465,7 +465,7 @@ Generator.generate = function(clss, args)
 	end
 	-- Save the map.
 	clss:update_status(0, "Saving the map")
-	Sectors.instance:save_world(true)
+	Sectors.instance:save_world(true, function(p) clss:update_status(p) end)
 	Sectors.instance:unload_world()
 	Serialize:set_value("map_version", Generator.map_version)
 	-- Save map markers.
