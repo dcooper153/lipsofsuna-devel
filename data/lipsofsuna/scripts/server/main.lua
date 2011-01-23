@@ -31,8 +31,6 @@ require "server/editing"
 require "server/particles"
 require "server/generator"
 
-local map_version = "1"
-
 restart = function()
 	-- TODO: Kill player characters.
 	-- Remove previous map.
@@ -44,8 +42,10 @@ end
 local m = Material:find{name = "granite1"}
 Voxel.fill = m.id
 Network:host{port = 10101}
-if Settings.generate or Serialize:get_value("map_version") ~= map_version then
+if Settings.generate or Serialize:get_value("map_version") ~= Generator.map_version then
 	restart()
+else
+	Serialize:load_markers()
 end
 
 -- Simulate.

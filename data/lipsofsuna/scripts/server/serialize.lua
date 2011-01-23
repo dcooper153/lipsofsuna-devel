@@ -5,7 +5,8 @@ Serialize = Class()
 Serialize.init = function(clss)
 	clss.db = Database{name = "save.db"}
 	clss.sectors = Sectors{database = clss.db}
-	clss.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT,value TEXT);")
+	clss.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
+	clss.db:query("CREATE TABLE IF NOT EXISTS markers (name TEXT PRIMARY KEY,id INTEGER,x FLOAT,y FLOAT,z FLOAT);")
 	Sectors.instance = clss.sectors
 end
 
@@ -18,6 +19,29 @@ Serialize.get_value = function(clss, key)
 	for k,v in ipairs(rows) do
 		return v[1]
 	end
+end
+
+--- Loads map markers from the database.
+Serialize.load_markers = function(clss)
+	local r = clss.db:query("SELECT name,id,x,y,z FROM markers;")
+	for k,v in ipairs(r) do
+		Marker{name = v[1], target = v[2], position = Vector(v[3], v[4], v[5])}
+	end
+end
+
+--- Saves all map markers.
+-- @param clss Serialize class.
+-- @param erase True to erase existing database entries first.
+Serialize.save_markers = function(clss, erase)
+	clss.db:query("BEGIN TRANSACTION;")
+	if erase then
+		clss.db:query("DELETE FROM markers;")
+	end
+	for k,v in pairs(Marker.dict_name) do
+		clss.db:query("REPLACE INTO markers (name,id,x,y,z) VALUES (?,?,?,?,?);",
+			{k, v.target, v.position.x, v.position.y, v.position.z})
+	end
+	clss.db:query("END TRANSACTION;")
 end
 
 --- Stores a value to the key-value database.

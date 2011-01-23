@@ -207,6 +207,7 @@ Generator = Class()
 Generator.map_size = Vector(1000, 1000, 1000)
 Generator.map_start = Vector(1500, 2500, 1500) - Generator.map_size * 0.5
 Generator.map_end = Vector(1500, 2500, 1500) + Generator.map_size * 0.5
+Generator.map_version = "1"
 
 --- Informs clients of the generator status.
 -- @param clss Generator class.
@@ -464,7 +465,10 @@ Generator.generate = function(clss, args)
 	clss:update_status(0, "Saving the map")
 	Sectors.instance:save_world(true)
 	Sectors.instance:unload_world()
-	Serialize:set_value("map_version", map_version)
+	Serialize:set_value("map_version", Generator.map_version)
+	-- Save map markers.
+	clss:update_status(0, "Saving map markers")
+	Serialize:save_markers(true)
 	-- Discard events emitted during map generation so that they
 	-- don't trigger when the game starts.
 	clss:update_status(0, "Finishing")
