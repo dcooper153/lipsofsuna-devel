@@ -45,7 +45,7 @@ Network:host{port = 10101}
 if Settings.generate or Serialize:get_value("map_version") ~= Generator.map_version then
 	restart()
 else
-	Serialize:load_markers()
+	Serialize:load()
 end
 
 -- Simulate.

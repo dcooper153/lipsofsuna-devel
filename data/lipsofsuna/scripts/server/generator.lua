@@ -464,8 +464,9 @@ Generator.generate = function(clss, args)
 	Sectors.instance:unload_world()
 	Serialize:set_value("map_version", Generator.map_version)
 	-- Save map markers.
-	clss:update_status(0, "Saving map markers")
+	clss:update_status(0, "Saving quests")
 	Serialize:save_markers(true)
+	Serialize:save_quests(true)
 	-- Discard events emitted during map generation so that they
 	-- don't trigger when the game starts.
 	clss:update_status(0, "Finishing")

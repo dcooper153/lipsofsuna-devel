@@ -7,6 +7,7 @@ Serialize.init = function(clss)
 	clss.sectors = Sectors{database = clss.db}
 	clss.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
 	clss.db:query("CREATE TABLE IF NOT EXISTS markers (name TEXT PRIMARY KEY,id INTEGER,x FLOAT,y FLOAT,z FLOAT);")
+	clss.db:query("CREATE TABLE IF NOT EXISTS quests (name TEXT PRIMARY KEY,progress FLOAT,status TEXT,desc TEXT);")
 	Sectors.instance = clss.sectors
 end
 
@@ -21,12 +22,41 @@ Serialize.get_value = function(clss, key)
 	end
 end
 
+--- Loads everything except map data.
+-- @param clss Serialize class.
+Serialize.load = function(clss)
+	clss:load_markers()
+	clss:load_quests()
+end
+
 --- Loads map markers from the database.
+-- @param clss Serialize class.
 Serialize.load_markers = function(clss)
 	local r = clss.db:query("SELECT name,id,x,y,z FROM markers;")
 	for k,v in ipairs(r) do
 		Marker{name = v[1], target = v[2], position = Vector(v[3], v[4], v[5])}
 	end
+end
+
+--- Loads quests from the database.
+-- @param clss Serialize class.
+Serialize.load_quests = function(clss)
+	local r = clss.db:query("SELECT name,progress,status,desc FROM quests;")
+	for k,v in ipairs(r) do
+		local quest = Quest:find{name = v[1]}
+		if quest then
+			quest:update{progress = v[2], status = v[3], text = v[4]}
+		end
+	end
+end
+
+--- Saves everything.
+-- @param clss Serialize class.
+-- @param erase True to erase existing database entries first.
+Serialize.save = function(clss, erase)
+	clss.sectors:save_world(erase)
+	clss:save_markers(erase)
+	clss:save_quests(erase)
 end
 
 --- Saves all map markers.
@@ -40,6 +70,21 @@ Serialize.save_markers = function(clss, erase)
 	for k,v in pairs(Marker.dict_name) do
 		clss.db:query("REPLACE INTO markers (name,id,x,y,z) VALUES (?,?,?,?,?);",
 			{k, v.target, v.position.x, v.position.y, v.position.z})
+	end
+	clss.db:query("END TRANSACTION;")
+end
+
+--- Saves all quests.
+-- @param clss Serialize class.
+-- @param erase True to erase existing database entries first.
+Serialize.save_quests = function(clss, erase)
+	clss.db:query("BEGIN TRANSACTION;")
+	if erase then
+		clss.db:query("DELETE FROM quests;")
+	end
+	for k,v in pairs(Quest.dict_name) do
+		clss.db:query("REPLACE INTO quests (name,progress,status,desc) VALUES (?,?,?,?);",
+			{k, v.progress, v.status, v.text})
 	end
 	clss.db:query("END TRANSACTION;")
 end

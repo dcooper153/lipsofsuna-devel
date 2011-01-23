@@ -27,12 +27,12 @@ end}
 
 Protocol:add_handler{type = "ADMIN_SAVE", func = function(args)
 	print("Saving world state...")
-	Sectors.instance:save_world()
+	Serialize:save()
 	print("Done")
 end}
 
 Protocol:add_handler{type = "ADMIN_SHUTDOWN", func = function(args)
-	Sectors.instance:save_world()
+	Serialize:save()
 	Program:shutdown()
 end}
 

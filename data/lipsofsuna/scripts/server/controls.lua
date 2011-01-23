@@ -45,11 +45,7 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	end}
 	-- Transmit active and completed quests.
 	for k,q in pairs(Quest.dict_name) do
-		if q.status == "active" then
-			o:send{packet = Packet(packets.QUEST_ACTIVATE, "uint32", q.id)}
-		elseif q.status == "completed" then
-			o:send{packet = Packet(packets.QUEST_COMPLETE, "uint32", q.id)}
-		end
+		q:send{client = o}
 	end
 end}
 
