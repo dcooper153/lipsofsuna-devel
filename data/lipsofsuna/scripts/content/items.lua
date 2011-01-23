@@ -21,7 +21,7 @@ Itemspec{
 	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "basalt1",
-	construct_tile_count = 3,
+	construct_tile_count = 1,
 	equipment_slot = "hand.R",
 	stacking = true}
 
@@ -52,8 +52,8 @@ Itemspec{
 	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "ferrostone1",
-	construct_tile_count = 3,
-	crafting_materials = {["granite stone"] = 3},
+	construct_tile_count = 1,
+	crafting_materials = {["granite stone"] = 2},
 	equipment_slot = "hand.R",
 	stacking = true}
 
@@ -76,7 +76,7 @@ Itemspec{
 	model = "book-000", -- FIXME
 	mass = 3,
 	categories = {"material"},
-	crafting_materials = {["sand chunk"] = 3},
+	crafting_materials = {["sand chunk"] = 1},
 	stacking = true}
 
 Itemspec{
@@ -85,7 +85,7 @@ Itemspec{
 	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "granite1",
-	construct_tile_count = 3,
+	construct_tile_count = 1,
 	equipment_slot = "hand.R",
 	stacking = true}
 
@@ -95,8 +95,8 @@ Itemspec{
 	mass = 3,
 	categories = {"build", "material"},
 	construct_tile = "iron1",
-	construct_tile_count = 4,
-	crafting_materials = {["ferrostone"] = 3},
+	construct_tile_count = 1,
+	crafting_materials = {["ferrostone"] = 1},
 	equipment_slot = "hand.R",
 	stacking = true}
 
@@ -113,7 +113,7 @@ Itemspec{
 	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "wood1",
-	construct_tile_count = 4,
+	construct_tile_count = 1,
 	equipment_slot = "hand.R",
 	stacking = true}
 
@@ -131,7 +131,7 @@ Itemspec{
 	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "sand1",
-	construct_tile_count = 3,
+	construct_tile_count = 1,
 	equipment_slot = "hand.R",
 	stacking = true}
 
@@ -141,7 +141,7 @@ Itemspec{
 	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "soil1",
-	construct_tile_count = 3,
+	construct_tile_count = 1,
 	equipment_slot = "hand.R",
 	stacking = true}
 
