@@ -204,9 +204,9 @@ end
 ------------------------------------------------------------------------------
 
 Generator = Class()
-Generator.map_size = Vector(1000, 1000, 1000)
-Generator.map_start = Vector(1500, 2500, 1500) - Generator.map_size * 0.5
-Generator.map_end = Vector(1500, 2500, 1500) + Generator.map_size * 0.5
+Generator.map_size = Vector(500, 500, 500)
+Generator.map_start = Vector(1500, 2750, 1500) - Generator.map_size * 0.5
+Generator.map_end = Vector(1500, 2750, 1500) + Generator.map_size * 0.5
 Generator.map_version = "1"
 
 --- Informs clients of the generator status.
@@ -272,7 +272,7 @@ Generator.place_region = function(clss, reg)
 	-- positions are simply placed there without any checks.
 	local pos = Vector()
 	local size = Vector(reg.size[1], reg.size[2], reg.size[3])
-	local aabb = Aabb{point = pos, size = size + Vector(10,10,10)}
+	local aabb = Aabb{point = pos, size = size + Vector(6,6,6)}
 	if dist then
 		repeat
 			pos.x = math.random(dist[2], dist[3])
@@ -281,7 +281,7 @@ Generator.place_region = function(clss, reg)
 			if math.random(0, 1) == 1 then pos.x = -pos.x end
 			if math.random(0, 1) == 1 then pos.z = -pos.z end
 			pos = pos + rel
-			aabb.point = pos - Vector(5,5,5)
+			aabb.point = pos - Vector(3,3,3)
 		until clss:validate_region_position(aabb)
 	else
 		pos.x = rel.x
@@ -334,9 +334,10 @@ Generator.generate = function(clss, args)
 	-- Regions have dependencies so we need to place them in several passes.
 	-- The region tables are filled but the map is all empty after this.
 	clss:update_status(0, "Placing regions")
+	local special = Regionspec:find{category = "special"}
 	while true do
 		local skipped = 0
-		for name,reg in pairs(Regionspec.dict_name) do
+		for name,reg in pairs(special) do
 			if not clss.regions_dict_name[name] then
 				if not clss:place_region(reg) then
 					skipped = skipped + 1
@@ -371,13 +372,14 @@ Generator.generate = function(clss, args)
 	-- We try to make the maze less linear by taking some rooms with roughly
 	-- the same Y offset and connecting them with a new random path.
 	clss:update_status(0, "Placing secondary paths")
+	local mapsize = clss.map_size.y
 	local regionn = #clss.regions_dict_id
 	local reglink = function(reg1, reg2)
 		if reg1 == reg2 then return end
 		if reg1.linked_regions[reg2] then return end
-		if math.abs(reg1.point.y - reg2.point.y) > 300 then return end
-		if #reg1.links > 5 then return end
-		if #reg2.links > 5 then return end
+		if (reg1.point - reg2.point).length > 0.5 * mapsize then return end
+		if #reg1.links > 7 then return end
+		if #reg2.links > 7 then return end
 		local link = reg1:create_link(reg2)
 		linkn = linkn + 1
 		clss.links[linkn] = link
@@ -389,7 +391,7 @@ Generator.generate = function(clss, args)
 		local limit = 0.1 * clss.map_size.y
 		local retry = 0
 		local created = 0
-		while retry < 30 and created < 10 do
+		while retry < 100 and created < 20 do
 			local reg1 = clss.regions_dict_id[math.random(1, regionn)]
 			local reg2 = clss.regions_dict_id[math.random(1, regionn)]
 			if math.abs(reg1.point.y - y) < limit and reglink(reg1, reg2) then

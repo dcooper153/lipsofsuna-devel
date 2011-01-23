@@ -10,7 +10,7 @@ Regionspec{
 	name = "Portal of Lips",
 	categories = {"special"},
 	depth = {2950,3000},
-	distance = {"Lips",50,100},
+	distance = {"Lips",30,50},
 	links = {"Sanctuary", "Chara's Root Grove"},
 	size = {16,8,16}}
 
@@ -18,35 +18,35 @@ Regionspec{
 	name = "Sanctuary",
 	categories = {"special"},
 	depth = {2950,3000},
-	distance = {"Lips",50,100},
+	distance = {"Lips",30,70},
 	size = {20,10,20}}
 
 Regionspec{
 	name = "Chara's Root Grove",
 	categories = {"special"},
-	depth = {2800,2950},
-	distance = {"Lips",100,300},
+	depth = {2900,2975},
+	distance = {"Lips",50,100},
 	links = {"Midguard"},
 	size = {16,8,16}}
 
 Regionspec{
 	name = "Midguard",
 	categories = {"special"},
-	depth = {2400,2600},
+	depth = {2700,2800},
 	links = {"Portal of Midguard", "Erinyes' Lair"},
 	size = {48,16,48}}
 
 Regionspec{
 	name = "Portal of Midguard",
 	categories = {"special"},
-	depth = {2400,2600},
+	depth = {2700,2800},
 	distance = {"Midguard",100,300},
 	size = {16,8,16}}
 
 Regionspec{
 	name = "Erinyes' Portal",
 	categories = {"special"},
-	depth = {2100,2200},
+	depth = {2500,2600},
 	size = {16,8,16}}
 
 Regionspec{
@@ -66,11 +66,11 @@ Regionspec{
 Regionspec{
 	name = "Random: Dungeon",
 	categories = {"random"},
-	depth = {2000, 3000},
+	depth = {2500, 3000},
 	size = {8,8,8}}
 
 Regionspec{
 	name = "Random: Nature",
 	categories = {"random"},
-	depth = {2000, 3000},
+	depth = {2500, 3000},
 	size = {8,8,8}}
