@@ -60,6 +60,7 @@ end
 --   <li>angular: Angular velocity.</li>
 --   <li>body_scale: Scale factor of the body.</li>
 --   <li>bust_scale: Scale factor of the bust.</li>
+--   <li>dead: True for a dead creature.</li>
 --   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
 --   <li>gender: Gender.</li>
 --   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
@@ -83,6 +84,7 @@ Creature.new = function(clss, args)
 	copy("angular")
 	copy("body_scale")
 	copy("bust_scale")
+	copy("dead")
 	copy("gender")
 	copy("eye_style")
 	copy("hair_style")
@@ -101,6 +103,9 @@ Creature.new = function(clss, args)
 	self:calculate_combat_ratings()
 	self:set_state{state = "wander"}
 	self:set_movement(0)
+	if self.dead then
+		self:animate{animation = "dead", channel = Animation.CHANNEL_WALK, weight = 0.1, permanent = true}
+	end
 	copy("realized")
 
 	Thread(function()
