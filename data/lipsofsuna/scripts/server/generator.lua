@@ -416,22 +416,14 @@ Generator.generate = function(clss, args)
 	local region_funcs = {
 		-- TODO
 		["Lips"] = function(r)
-			Voxel:place_pattern{point = r.point + Vector(1,0,1), name = "house1"}
-			Voxel:place_pattern{point = r.point + Vector(5,0,1), name = "house1"}
-			Voxel:place_pattern{point = r.point + Vector(1,0,6), name = "house1"}
-			Voxel:place_pattern{point = r.point + Vector(5,0,6), name = "house1"}
+			Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "house1"}
+			Voxel:place_pattern{point = r.point + Vector(13,0,1), name = "house1"}
+			Voxel:place_pattern{point = r.point + Vector(14,0,1), name = "house1"}
+			Voxel:place_pattern{point = r.point + Vector(12,0,12), name = "spawnpoint1"}
 			Voxel:place_pattern{point = r.point + Vector(9,2,9), name = "mourningadventurer_town"}
 			Voxel:place_pattern{point = r.point + Vector(4,1,4), name = "peculiarpet"}
 			Voxel:place_creature{point = r.point + Vector(3,0,14), name = "lipscitizen"}
 			Voxel:place_creature{point = r.point + Vector(8,0,9), name = "lipscitizen"}
---[[
-			local p = Vector(10,0,0)
-			local s = r.size - p
-			Voxel:make_heightmap{point = r.point + p, size = s, material = "grass1"}
-			p = p + Vector(3,1,3)
-			s = s - Vector(2,1,2)
-			Voxel:make_heightmap{point = r.point + p, size = s,
-				material = "grass1", tree_density = 0.05}]]
 		end,
 		["Chara's Root Grove"] = function(r)
 			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "rootsofworld"}
@@ -442,6 +434,9 @@ Generator.generate = function(clss, args)
 		end,
 		["Random: Nature"] = function(r)
 			Voxel:place_pattern{point = r.point, name = "nature1"}
+		end,
+		["Sanctuary"] = function(r)
+			Voxel:place_pattern{point = r.point + Vector(3,0,3), name = "sanctuary1"}
 		end}
 	for _,reg in pairs(clss.regions_dict_id) do
 		Voxel:fill_region{point = reg.point, size = reg.size}

@@ -19,7 +19,7 @@ Regionspec{
 	categories = {"special"},
 	depth = {2950,3000},
 	distance = {"Lips",30,70},
-	size = {20,10,20}}
+	size = {20,15,26}}
 
 Regionspec{
 	name = "Chara's Root Grove",

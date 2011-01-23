@@ -51,32 +51,39 @@ Pattern{
 Pattern{
 	name = "house1",
 	items = {
-		{1,0,0,"air tank"}},
-	obstacles = {
-		{0,0,0,"tree"}}}
---[[
-	obstacles = {
-		{0.3,0,2.8,"tree"},
-		{2.8,0,2.8,"tree"}},
+		{3,1,1,"air tank"}},
 	tiles = {
-		{0,0,0,"housebasecorner2"},
-		{1,0,0,"housebasewall1"},
-		{2,0,0,"housebasecorner1"},
-		{0,1,0,"houseroofcorner2"},
-		{1,1,0,"houseroofwall1"},
-		{2,1,0,"houseroofcorner1"},
-		{0,2,0,"houserooftop3"},
-		{1,2,0,"houserooftop2"},
-		{2,2,0,"houserooftop1"},
-		{0,0,1,"housebasecorner1",2},
-		{1,0,1,"housebasepillar1",2},
-		{2,0,1,"housebasecorner2",2},
-		{0,1,1,"houseroofcorner1",2},
-		{1,1,1,"houseroofextend1",2},
-		{2,1,1,"houseroofcorner2",2},
-		{0,2,1,"houserooftop1",2},
-		{1,2,1,"houserooftop2",2},
-		{2,2,1,"houserooftop3",2},
-		{1,0,2,"housebasedoorway1",2},
-		{1,1,2,"houseroofdoorway1",2},
-		{1,0,3,"housedoorstep1",2}}}--]]
+		{0,0,0,"granite1",6,0,6},-- Base
+		{3,0,7,"granite1"}, -- Doorstep
+		{0,1,0,"wood1",6,3,6}, -- Walls
+		{0,5,1,"wood1",6,0,4}, -- Ceiling
+		{1,1,1,nil,4,2,4}, -- Inside
+		{3,1,6,nil,0,1,0}, -- Door
+		{2,2,0,nil}, -- Window
+		{4,2,0,nil}}} -- Window
+
+Pattern{
+	name = "sanctuary1",
+	tiles = {
+		{0,0,0,"granite1",14,0,14},-- Base
+		{5,0,15,"granite1",3,0,0}, -- Doorstep
+		{0,1,0,"granite1",14,5,14}, -- Walls
+		{0,7,1,"granite1",14,0,12}, -- Ceiling
+		{1,1,1,nil,12,4,12}, -- Inside
+		{6,1,14,nil,1,2,1}, -- Door
+		{3,2,0,nil,0,1,0}, -- Window
+		{11,2,0,nil,0,1,0}, -- Window
+		{3,2,14,nil,0,1,0}, -- Window
+		{11,2,14,nil,0,1,0}, -- Window
+		{0,2,3,nil,0,1,0}, -- Window
+		{0,2,7,nil,0,1,0}, -- Window
+		{0,2,11,nil,0,1,0}, -- Window
+		{14,2,3,nil,0,1,0}, -- Window
+		{14,2,7,nil,0,1,0}, -- Window
+		{14,2,11,nil,0,1,0}}} -- Window
+
+Pattern{
+	name = "spawnpoint1",
+	tiles = {
+		{0,0,0,"granite1",7,0,7},
+		{1,1,1,"granite1",5,0,5}}}
