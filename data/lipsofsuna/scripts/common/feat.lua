@@ -124,13 +124,14 @@ Feat.get_info = function(self)
 			end
 		end
 		for k,v in pairs(skills) do
-			skills[k] = math.max(1, math.ceil(v))
+			skills[k] = math.max(1, math.floor(v))
 		end
 		for k,v in pairs(reagents) do
-			reagents[k] = math.max(1, math.ceil(v))
+			reagents[k] = math.max(1, math.floor(v))
 		end
 	end
 	return {
+		animation = anim,
 		cooldown = cooldown,
 		inflict_damage = damage,
 		required_ammo = anim and anim.required_ammo,

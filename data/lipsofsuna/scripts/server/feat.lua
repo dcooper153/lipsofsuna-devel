@@ -23,7 +23,8 @@ Feat.apply = function(self, args)
 		Effect:play{effect = effect, point = args.point}
 	end
 	-- Damage and impulse.
-	if anim.categories["melee"] or anim.categories["ranged"] then
+	if anim.categories["melee"] or anim.categories["ranged"] or
+	   anim.categories["self"] or anim.categories["touch"] then
 		if args.target and args.attacker then
 			args.target:impulse{impulse = args.attacker.rotation * Vector(0, 0, -100)}
 		end
@@ -88,6 +89,7 @@ Feat.calculate_damage = function(self, args)
 	end
 	-- Damage bonus from skills.
 	-- The bonus damage depends on the type of weapon and ammunition used.
+	-- The hardcoded bare-handed bonuses only apply to melee attacks.
 	local bonuses
 	local skills = args.attacker and args.attacker.skills
 	if not skills then return damage end
@@ -101,11 +103,13 @@ Feat.calculate_damage = function(self, args)
 			perception = (spec1.damage_bonus_percention or 0) + (spec2.damage_bonus_percention or 0),
 			strength = (spec1.damage_bonus_strength or 0) + (spec2.damage_bonus_strength or 0),
 			willpower = (spec1.damage_bonus_willpower or 0) + (spec2.damage_bonus_willpower or 0)}
-	else
+	elseif info.animation.categories["melee"] then
 		bonuses = {
 			dexterity = 0.2,
 			strength = 0.2,
 			willpower = 0.1}
+	else
+		bonuses = {}
 	end
 	for k,v in pairs(bonuses) do
 		if skills:has_skill{skill = k} then
