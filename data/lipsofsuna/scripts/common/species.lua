@@ -1,7 +1,7 @@
 require "common/spec"
 
 Species = Class(Spec)
-Species.type = "creature"
+Species.type = "species"
 Species.dict_id = {}
 Species.dict_cat = {}
 Species.dict_name = {}
@@ -86,9 +86,9 @@ end
 -- @param object Object.
 -- @return True if an enemy.
 Species.check_enemy = function(self, object)
-	if object.species then
+	if object.spec.type == "species" then
 		for name1,spec1 in pairs(self.factions) do
-			for name2,spec2 in pairs(object.species.factions) do
+			for name2,spec2 in pairs(object.spec.factions) do
 				if spec1.enemies[name2] then
 					return true
 				end

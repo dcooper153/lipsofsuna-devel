@@ -99,7 +99,7 @@ Voxel.place_creature = function(clss, args)
 	local spec = Species:random(args)
 	if not spec then return end
 	Creature{
-		species = spec,
+		spec = spec,
 		position = args.point * Config.tilewidth,
 		realized = true}
 end
@@ -175,7 +175,7 @@ Voxel.place_pattern = function(clss, args)
 		local spec = Species:find{name = v[4]}
 		if spec then
 			Creature{
-				species = spec,
+				spec = spec,
 				position = point * Config.tilewidth,
 				realized = true}
 		end

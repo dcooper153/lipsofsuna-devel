@@ -19,7 +19,7 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 	-- Count monsters.
 	local monsters = 1
 	for k,obj in pairs(objects) do
-		if obj.species then
+		if obj.spec.type == "species" then
 			monsters = monsters - 1
 			if monsters == 0 then return end
 		end

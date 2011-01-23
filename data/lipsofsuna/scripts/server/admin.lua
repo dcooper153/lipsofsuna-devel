@@ -78,7 +78,7 @@ Protocol:add_handler{type = "ADMIN_SPAWN", func = function(args)
 			local spec = Species:find{name = msg}
 			if not spec then return end
 			Creature{
-				species = spec,
+				spec = spec,
 				position = player.position,
 				realized = true}
 		-- FIXME:

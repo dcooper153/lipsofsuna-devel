@@ -69,8 +69,8 @@ main = function(self)
 			" We have angered " .. name .. " by suggesting that we killed the" ..
 			" pet and turned the corpse into a dead bloodworm to offend her."}
 		-- Anger the NPC.
-		self.object.species.ai_enable_combat = true
-		self.object.species:set_factions{"evil"}
+		self.object.spec.ai_enable_combat = true
+		self.object.spec:set_factions{"evil"}
 		return false
 	end
 	-- Good and neutral resolutions.

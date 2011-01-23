@@ -88,7 +88,7 @@ Dialog.start = function(clss, args)
 	if args.object.dialog then return end
 	if clss.dict_user[args.user] then return end
 	-- Find the dialog.
-	local dialog = Dialog:find{name = args.object.species.dialog}
+	local dialog = Dialog:find{name = args.object.spec.dialog}
 	if not dialog then return end
 	-- Create a new instance if not unique.
 	if not dialog.unique then

@@ -3,7 +3,7 @@ Creature = Class(Object)
 Creature.getter = function(self, key)
 	if key == "armor_class" then
 		local value = 0
-		for k,v in pairs(self.species.equipment_slots) do
+		for k,v in pairs(self.spec.equipment_slots) do
 			local i = self:get_item{slot = v.name}
 			value = value + (i and i.spec.armor_class or 0)
 		end
@@ -14,9 +14,9 @@ Creature.getter = function(self, key)
 end
 
 Creature.setter = function(self, key, value)
-	if key == "species" then
+	if key == "spec" then
 		local spec = type(value) == "string" and Species:find{name = value} or value
-		if self.species == spec then return end
+		if self.spec == spec then return end
 		Object.setter(self, key, spec)
 		self.model = spec.model
 		self.mass = spec.mass
@@ -71,7 +71,7 @@ end
 --   <li>position: Position vector of the creature.</li>
 --   <li>rotation: Rotation quaternion of the creature.</li>
 --   <li>skin_style: Skin style defined by an array of {style, red, green, blue}.</li>
---   <li>species: Species of the creature.</li>
+--   <li>spec: Species of the creature.</li>
 --   <li>realized: True to add the object to the simulation.</li></ul>
 Creature.new = function(clss, args)
 	local self = Object.new(clss, {id = args.id})
@@ -93,7 +93,7 @@ Creature.new = function(clss, args)
 	copy("rotation")
 	copy("position")
 	copy("skin_style")
-	copy("species")
+	copy("spec")
 	self.anim_timer = 0
 	self.enemies = {}
 	setmetatable(self.enemies, {__mode = "kv"})
@@ -157,7 +157,7 @@ end
 -- @param self Object.
 Creature.calculate_speed = function(self)
 	-- Base speed.
-	local s = self.running and self.species.speed_run or self.species.speed_walk
+	local s = self.running and self.spec.speed_run or self.spec.speed_walk
 	-- Skill bonuses.
 	local str = self.skills:get_value{skill = "strength"} or 0
 	local agi = self.skills:get_value{skill = "agility"} or 0
@@ -176,7 +176,7 @@ end
 Creature.check_enemy = function(self, object)
 	if object == self then return end
 	if object.dead then return end
-	return self.species:check_enemy(object)
+	return self.spec:check_enemy(object)
 end
 
 --- Causes the object to take damage.
@@ -248,7 +248,7 @@ end
 -- @param args Arguments.
 Creature.equip_best_items = function(self, args)
 	-- Loop through all our equipment slots.
-	for name in pairs(self.species.equipment_slots) do
+	for name in pairs(self.spec.equipment_slots) do
 		-- Find the best item to place to the slot.
 		local best = self:get_item{slot = name}
 		for index,item in pairs(self.inventory.slots) do
@@ -288,7 +288,7 @@ Creature.find_best_feat = function(self, args)
 	local best_feat = nil
 	local best_score = -1
 	-- Loop through all known feat animations.
-	for anim_name in pairs(self.species.feats) do
+	for anim_name in pairs(self.spec.feats) do
 		local anim = Featanimspec:find{name = anim_name}
 		if anim and anim.categories[args.category] then
 			local feat = Feat{animation = anim_name}
@@ -312,15 +312,15 @@ end
 -- @param self Object.
 -- @return Ray start point and ray end point relative to the object.
 Creature.get_attack_ray = function(self)
-	local ctr = self.species.aim_ray_center
+	local ctr = self.spec.aim_ray_center
 	if self.tilt then
 		local rot = Quaternion:new_euler(self.tilt.euler)
-		local src = ctr + rot * Vector(0, 0, -self.species.aim_ray_start)
-		local dst = ctr + rot * Vector(0, 0, -self.species.aim_ray_end)
+		local src = ctr + rot * Vector(0, 0, -self.spec.aim_ray_start)
+		local dst = ctr + rot * Vector(0, 0, -self.spec.aim_ray_end)
 		return src, dst
 	else
-		local src = ctr + Vector(0, 0, -self.species.aim_ray_start)
-		local dst = ctr + Vector(0, 0, -self.species.aim_ray_end)
+		local src = ctr + Vector(0, 0, -self.spec.aim_ray_start)
+		local dst = ctr + Vector(0, 0, -self.spec.aim_ray_end)
 		return src, dst
 	end
 end
@@ -368,8 +368,8 @@ end
 --   <li>target: Targeted object.</li></ul>
 Creature.set_state = function(self, args)
 	local s = args.state
-	if (s == "wander" and not self.species.ai_enable_wander) or
-	   (s == "combat" and not self.species.ai_enable_combat) then
+	if (s == "wander" and not self.spec.ai_enable_wander) or
+	   (s == "combat" and not self.spec.ai_enable_combat) then
 		s = "wait"
 	end
 	self.state = s
@@ -424,7 +424,7 @@ Creature.update = function(self, secs)
 		end
 	end
 	-- Skip the rest if AI is disabled.
-	if not self.species.ai_enabled then
+	if not self.spec.ai_enabled then
 		self:refresh()
 		return
 	end
@@ -437,7 +437,7 @@ Creature.update = function(self, secs)
 	local func = self.state_updaters[self.state]
 	func(self, secs)
 	-- Only consider state changes every couple of seconds.
-	if self.update_timer < self.species.ai_update_delay then return end
+	if self.update_timer < self.spec.ai_update_delay then return end
 	self:update_ai_state()
 end
 
@@ -457,7 +457,7 @@ Creature.update_ai_state = function(self)
 	self:scan_enemies()
 	local best_enemy = nil
 	local best_rating = -1
-	if self.species.ai_enable_combat then
+	if self.spec.ai_enable_combat then
 		for k,v in pairs(self.enemies) do
 			local r = self:calculate_enemy_rating(v)
 			if r > best_rating then
@@ -492,7 +492,7 @@ Creature.write = function(self)
 		"physics=" .. serialize_value(self.physics) .. "," ..
 		"position=" .. serialize_value(self.position) .. "," ..
 		"rotation=" .. serialize_value(self.rotation) .. "," ..
-		"species=" .. serialize_value(self.species.name) .. "}\n" ..
+		"spec=" .. serialize_value(self.spec.name) .. "}\n" ..
 		serialize_skills(self.skills) .. "\n" ..
 		"return self"
 end
@@ -517,7 +517,7 @@ Creature.state_updaters =
 		-- Decide what combat action to perform next.
 		if self.action_timer <= 0 then
 			local actions = {}
-			local spec = self.species
+			local spec = self.spec
 			local dist = (self.target.position - self.position).length
 			for i=1,5 do
 				if spec.ai_enable_attack then table.insert(actions, "attack") end
@@ -617,7 +617,7 @@ Creature.state_switchers =
 	search = function(self)
 		-- If we have been searching for a while without finding anything,
 		-- conclude that there are no enemies and enter the wandering mode.
-		--if self.state_timer > self.species.ai_search_time then
+		--if self.state_timer > self.spec.ai_search_time then
 			self:set_state{state = "wander"}
 		--end
 	end,
@@ -630,8 +630,8 @@ Creature.state_switchers =
 		local rot = Quaternion{axis = Vector(0,1,0), angle = math.random() * 6.28}
 		self.target = self.position + rot * Vector(0, 0, 5)
 		-- Switch to waiting mode after wandering enough.
-		if self.species.ai_wait_allowed then
-			if self.state_timer > self.species.ai_wander_time then
+		if self.spec.ai_wait_allowed then
+			if self.state_timer > self.spec.ai_wander_time then
 				self:set_state{state = "wait"}
 			end
 		end
@@ -645,7 +645,7 @@ Creature.combat_updaters =
 	attack = function(self)
 		-- Maintain distance to the target.
 		local dist = (self.target.position - self.position).length
-		local hint = self.species.ai_distance_hint + self.target.species.ai_distance_hint
+		local hint = self.spec.ai_distance_hint + self.target.spec.ai_distance_hint
 		if dist < hint then
 			self.movement = -0.25
 		elseif dist > hint + 2 then
@@ -660,7 +660,7 @@ Creature.combat_updaters =
 	defend = function(self)
 		-- Maintain distance to the target.
 		local dist = (self.target.position - self.position).length
-		local hint = self.species.ai_distance_hint + self.target.species.ai_distance_hint
+		local hint = self.spec.ai_distance_hint + self.target.spec.ai_distance_hint
 		if dist < hint + 1 then
 			self.movement = -0.25
 		elseif dist > hint + 2 then
@@ -670,7 +670,7 @@ Creature.combat_updaters =
 	normal = function(self)
 		-- Maintain distance to the target.
 		local dist = (self.target.position - self.position).length
-		local hint = self.species.ai_distance_hint + self.target.species.ai_distance_hint
+		local hint = self.spec.ai_distance_hint + self.target.spec.ai_distance_hint
 		if dist >= hint + 4 then
 			self:set_movement(1)
 		elseif dist >= hint + 3 then
@@ -689,7 +689,7 @@ Creature.combat_updaters =
 	walk = function(self)
 		-- Move toward the target until close.
 		local dist = (self.target.position - self.position).length
-		local hint = self.species.ai_distance_hint + self.target.species.ai_distance_hint
+		local hint = self.spec.ai_distance_hint + self.target.spec.ai_distance_hint
 		if dist < hint and self.movement > 0 then
 			self.action_timer = 0
 		end

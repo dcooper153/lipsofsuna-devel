@@ -27,7 +27,7 @@ end
 --   <li>position: Position vector of the creature.</li>
 --   <li>rotation: Rotation quaternion of the creature.</li>
 --   <li>skin_style: Skin style defined by an array of {style, red, green, blue}.</li>
---   <li>species: Species of the creature.</li>
+--   <li>spec: Species of the creature.</li>
 --   <li>realized: True to add the object to the simulation.</li></ul>
 -- @return Player.
 Player.new = function(clss, args)
@@ -179,15 +179,15 @@ Player.vision_cb = function(self, args)
 		end,
 		["object-shown"] = function(args)
 			local o = args.object
-			local t = (o.species and 0) or (o.spec.type == "item" and 1) or (o.spec.type == "obstacle" and 2) or 3
+			local t = (o.spec.type == "species" and 0) or (o.spec.type == "item" and 1) or (o.spec.type == "obstacle" and 2) or 3
 			-- Append basic data.
 			local p = Packet(packets.OBJECT_SHOWN, "uint32", o.id,
 				"uint8", t, "string", o.model_name, "string", o.name or "",
 				"float", o.position.x, "float", o.position.y, "float", o.position.z,
 				"float", o.rotation.x, "float", o.rotation.y, "float", o.rotation.z, "float", o.rotation.w)
 			-- Append optional customizations.
-			if o.species and o.species.models then
-				p:write("string", o.species.name,
+			if o.spec.type == "species" and o.spec.models then
+				p:write("string", o.spec.name,
 					"string", o.gender or "female",
 					"float", o.body_scale or 1,
 					"float", o.nose_scale or 1,

@@ -290,8 +290,10 @@ end
 -- @return True if usable.
 Feat.usable = function(self, args)
 	-- Check for support by the species.
-	local spec = args.species or args.user and args.user.species
-	if spec and not spec.feats[self.animation] then return end
+	if not args.user then return end
+	local spec = args.user.spec
+	if spec.type ~= "species" then return end
+	if not spec.feats[self.animation] then return end
 	-- Get feat information.
 	local info = self:get_info()
 	-- Check for skills.

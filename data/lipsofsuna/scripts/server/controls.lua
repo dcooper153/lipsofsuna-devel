@@ -18,8 +18,8 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		"string", "uint8", "uint8", "uint8",
 		"string", "uint8", "uint8", "uint8")
 	if not ok then return end
-	local species = Species:find{name = ra .. "-player"}
-	if not species then return end
+	local spec = Species:find{name = ra .. "-player"}
+	if not spec then return end
 	-- TODO: Input validation.
 	Network:send{client = args.client, packet = Packet(packets.CHARACTER_ACCEPT)}
 	-- Create character. To prevent the player from falling inside the ground
@@ -29,15 +29,15 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		body_scale = bo,
 		bust_scale = bu,
 		client = args.client,
-		gender = ge,
 		eye_style = {eye, eyer, eyeg, eyeb},
+		gender = ge,
 		hair_style = {hair, hairr, hairg, hairb},
 		nose_scale = no,
 		physics = "static",
 		position = Config.spawn,
+		realized = true,
 		skin_style = {skin, skinr, sking, skinb},
-		species = species,
-		realized = true}
+		spec = spec}
 	Player.clients[args.client] = o
 	Timer{delay = 1, func = function(self)
 		o.physics = "kinematic"
@@ -180,8 +180,8 @@ Protocol:add_handler{type = "PLAYER_TURN", func = function(args)
 		local ok,x,y,z,w = args.packet:read("float", "float", "float", "float")
 		if ok then
 			local e = Quaternion(x, y, z, w).euler
-			e[3] = math.min(player.species.tilt_limit, e[3])
-			e[3] = math.max(-player.species.tilt_limit, e[3])
+			e[3] = math.min(player.spec.tilt_limit, e[3])
+			e[3] = math.max(-player.spec.tilt_limit, e[3])
 			player.tilt = Quaternion:new_euler{0, 0, e[3]}
 			player.rotation = Quaternion:new_euler{e[1], e[2], 0}
 		end
@@ -209,14 +209,14 @@ Protocol:add_handler{type = "SKILLS", func = function(args)
 		if not ok then return end
 		if v < 0 then return end
 		-- Enforce species limit.
-		local spec = player.species.skills[s]
+		local spec = player.spec.skills[s]
 		if not spec then return end
 		v = math.min(v, spec.max)
 		-- Enforce skill quota.
 		local skills = player.skills
 		if not skills then return end
 		local t = skills:get_total() - skills:get_maximum{skill = s}
-		v = math.min(v, player.species.skill_quota - t)
+		v = math.min(v, player.spec.skill_quota - t)
 		if v <= 0 then return end
 		-- Set the new maximum value.
 		skills:set_maximum{skill = s, value = v}

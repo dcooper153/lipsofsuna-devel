@@ -1,7 +1,17 @@
 local oldanimate = Object.animate
+local oldgetter = Object.getter
 local oldsetter = Object.setter
+local objspec = Spec{name = "object", type = "object"}
 
 Object.contact_damage = 0.03
+
+Object.getter = function(self, key)
+	if key == "spec" then
+		return oldgetter(self, key, value) or objspec
+	else
+		return oldgetter(self, key)
+	end
+end
 
 Object.setter = function(self, key, value)
 	if key == "contact_cb" then
