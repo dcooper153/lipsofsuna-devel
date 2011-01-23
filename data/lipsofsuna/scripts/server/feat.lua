@@ -256,29 +256,8 @@ end
 --   <li>category: Category name or nil.</li></ul>
 -- @return Feat or nil.
 Feat.unlock = function(clss, args)
-	local choices = {}
-	-- Find the unlocked feats.
-	if args and args.category then
-		local cat = clss.dict_cat[args.category]
-		if not cat then return end
-		for k,v in pairs(cat) do
-			if v.locked then table.insert(choices, v) end
-		end
-	else
-		for k,v in pairs(clss.dict_id) do
-			if v.locked then table.insert(choices, v) end
-		end
-	end
-	-- Choose a random feat and unlock it.
-	if #choices == 0 then return end
-	local feat = choices[math.random(1,#choices)]
-	feat.locked = false
-	-- Inform clients.
-	local packet = Packet(packets.FEAT_UNLOCK, "string", feat.name)
-	for k,v in pairs(Player.clients) do
-		v:send{packet = packet}
-	end
-	return feat
+	print("Warning: unlocking feats isn't implemented, nor are there any locked feats.")
+	return nil
 end
 
 --- Checks if the feat can be used with the given skills.
