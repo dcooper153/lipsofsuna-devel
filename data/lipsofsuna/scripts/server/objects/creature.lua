@@ -534,7 +534,6 @@ Creature.state_updaters =
 			if spec.ai_enable_walk and dist < 6 then table.insert(actions, "walk") end
 			local action = self.combat_switchers[actions[math.random(#actions)]]
 			action(self)
-			print("SETACTION", self.action_state, self.action_timer, self.movement, self.strafing)
 		end
 		-- Turn towards the target.
 		local face = self:face_point{point = self.target.position, secs = secs}
