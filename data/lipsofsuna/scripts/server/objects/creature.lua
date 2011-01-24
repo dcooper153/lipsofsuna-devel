@@ -61,7 +61,7 @@ Creature.setter = function(self, key, value)
 		-- Create inventory.
 		self.inventory = self.inventory or Inventory{owner = self, size = spec.inventory_size} -- FIXME: Resizing not supported.
 		for k,v in pairs(spec.inventory_items) do
-			self:add_item{object = Item:create{name = v}}
+			self:add_item{object = Item{spec = Itemspec:find{name = v}}}
 		end
 		self:equip_best_items()
 		-- Create map marker.

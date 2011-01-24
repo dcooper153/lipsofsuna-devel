@@ -93,25 +93,6 @@ Item.split = function(self, args)
 	return self
 end
 
---- Creates a random or a named item.
--- @param clss Item class.
--- @param args Arguments.<ul>
---   <li>category: Category name.</li>
---   <li>name: Item name.</li></ul>
--- @return Object or nil.
-Item.create = function(clss, args)
-	local self
-	-- Select item type.
-	local spec = args and args.name and Itemspec:find(args) or Itemspec:random(args)
- 	if not spec then return end
-	-- Create new object.
-	self = Item:new(args)
-	-- TODO
-	self.category = nil
-	self.spec = spec
-	return self
-end
-
 --- Creates an item.
 -- @param clss Item class.
 -- @param args Arguments.<ul>

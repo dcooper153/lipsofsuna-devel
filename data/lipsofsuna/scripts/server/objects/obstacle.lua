@@ -59,7 +59,7 @@ Obstacle.use_cb = function(self, user)
 			Effect:play{effect = self.spec.harvest_effect, point = self.position}
 		end
 		-- Choose a random item from the list.
-		local item = Item:create{name = mats[math.random(1, #mats)]}
+		local item = Item{spec = Itemspec:find{name = mats[math.random(1, #mats)]}}
 		user:add_item{object = item}
 		user:send{packet = Packet(packets.MESSAGE, "string", "Harvested " .. item.name .. ".")}
 		-- Harvesting behavior.

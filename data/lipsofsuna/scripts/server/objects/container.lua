@@ -16,7 +16,7 @@ end
 -- @param self Object.
 Container.create_random_loot = function(self)
 	for i = 1,self.inventory.size do
-		self.inventory:set_object{slot = i, object = Item:create()}
+		self.inventory:set_object{slot = i, object = Item{spec = Itemspec:random()}}
 	end
 end
 

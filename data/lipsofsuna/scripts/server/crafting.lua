@@ -16,7 +16,7 @@ Crafting.craft = function(clss, args)
 		args.user:subtract_items{name = name, count = req}
 	end
 	-- Create item.
-	return Item:create{name = args.name, count = spec.crafting_count or nil}
+	return Item{count = spec.crafting_count, spec = spec}
 end
 
 --- Checks if a specific item can be crafted by the user.
