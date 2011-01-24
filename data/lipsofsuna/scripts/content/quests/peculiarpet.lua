@@ -22,6 +22,7 @@ Species{
 Species{
 	name = "peculiarpet_worm",
 	base = "bloodworm",
+	categories = {},
 	dialog = "peculiarpet_worm",
 	marker = "peculiarpet_worm",
 	ai_enable_combat = false,
