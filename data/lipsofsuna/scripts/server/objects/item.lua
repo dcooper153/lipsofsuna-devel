@@ -274,6 +274,7 @@ end
 Item.write = function(self)
 	return "local self=Item{" ..
 		"angular=" .. serialize_value(self.angular) .. "," ..
+		"count=" .. serialize_value(self.count) .. "," ..
 		"id=" .. serialize_value(self.id) .. "," ..
 		"spec=" .. serialize_value(self.spec.name) .. "," ..
 		"position=" .. serialize_value(self.position) .. "," ..
