@@ -168,7 +168,7 @@ end
 -- @return Start vector, size vector.
 Object.get_tile_range = function(self)
 	-- TODO: Should depend on species.
-	local size = Vector(1,2,1)
+	local size = Vector(1,self.spec.type == "creature" and 2 or 1,1)
 	local src = self.position * Config.tilescale
 	src.x = math.floor(src.x)
 	src.y = math.floor(src.y + 0.1)
