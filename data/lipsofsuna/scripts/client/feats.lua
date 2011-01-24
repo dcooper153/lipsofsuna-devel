@@ -163,6 +163,7 @@ Feats.show = function(self, index)
 	end
 	self.protect = nil
 	self.active_slot = index
+	self:changed()
 end
 
 --- Toggles the visibility of the feat editor.
