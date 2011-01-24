@@ -130,6 +130,7 @@ Item.new = function(clss, args)
 		end
 	end
 	copy("angular")
+	copy("count")
 	copy("physics", "rigid")
 	copy("position")
 	copy("rotation")
