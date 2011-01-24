@@ -16,8 +16,14 @@ Species{
 		{name = "head"},
 		{name = "lowerbody"},
 		{name = "upperbody"}},
+	eye_styles = {
+		{"Default", ""}},
 	factions = {"good"},
 	feats = {"build", "right hand", "ranged", "ranged spell", "spell on self", "spell on touch", "throw"},
+	hair_styles = {
+		{"Bald", ""},
+		{"Long", "hair2"},
+		{"Pigtails", "hair1"}},
 	inventory_size = 20,
 	skill_quota = 200,
 	speed_walk = 2,
@@ -196,7 +202,8 @@ Species{
 	name = "lipscitizen",
 	base = "aer",
 	dialog = "lipscitizen",
-	hair_style = {"hair1",255,192,192},
+	eye_style = "random",
+	hair_style = "random",
 	inventory_items = {"leather top", "leather pants", "leather leggings"}}
 
 Species{
@@ -214,6 +221,8 @@ Species{
 	base = "aer",
 	categories = {"enemy"},
 	factions = {"evil"},
+	eye_style = "random",
+	hair_style = "random",
 	inventory_items = {"iron sword", "leather top", "leather pants", "leather leggings"}}
 
 Species{

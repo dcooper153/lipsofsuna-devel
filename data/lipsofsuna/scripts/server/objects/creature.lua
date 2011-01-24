@@ -21,11 +21,30 @@ Creature.setter = function(self, key, value)
 		self.model = spec.model
 		self.mass = spec.mass
 		self.gravity = spec.gravity
-		if spec.hair_color then
-			self.hair_color = spec.hair_color
+		-- Set appearance.
+		if spec.eye_style then
+			if spec.eye_style == "random" then
+				local s = spec.hair_styles[math.random(1, #spec.eye_styles)]
+				local rgb = Color:hsv_to_rgb{math.random(), 0.2 + 0.8 * math.random(), math.random()}
+				rgb[1] = math.floor(255 * rgb[1] + 0.5)
+				rgb[2] = math.floor(255 * rgb[1] + 0.5)
+				rgb[3] = math.floor(255 * rgb[1] + 0.5)
+				table.insert(rgb, 1, s[2])
+				self.eye_style = rgb
+			else
+				self.eye_style = spec.eye_style
+			end
 		end
 		if spec.hair_style then
-			self.hair_style = spec.hair_style
+			if spec.hair_style == "random" then
+				local s = spec.hair_styles[math.random(1, #spec.hair_styles)]
+				local r = math.random(0, 255)
+				local g = math.random(0, 255)
+				local b = math.random(0, 255)
+				self.hair_style = {s[2], r, g, b}
+			else
+				self.hair_style = spec.hair_style
+			end
 		end
 		-- Create skills.
 		self.skills = self.skills or Skills{owner = self}

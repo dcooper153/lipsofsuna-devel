@@ -9,12 +9,8 @@ Chargen.list_races = {
 Chargen.list_genders = {
 	{"Female", "female"},
 	{"Male", "male"}}
-Chargen.list_hair_styles = {
-	{"Bald", ""},
-	{"Pigtails", "hair1"},
-	{"Long", "hair2"}}
-Chargen.list_eye_styles = {
-	{"Default", ""}} -- TODO
+Chargen.list_hair_styles = {}
+Chargen.list_eye_styles = {}
 Chargen.list_skin_styles = {
 	{"Default", ""}} -- TODO
 
@@ -24,15 +20,21 @@ Chargen.init = function(clss)
 	-- Race and hair selectors.
 	local races = {}
 	local genders = {}
+	local eye_styles = {}
 	local hair_styles = {}
-	local hair_colors = {}
 	for k,v in ipairs(clss.list_races) do
 		table.insert(races, {v[1], function() Chargen:set_race(k) end})
 	end
 	for k,v in ipairs(clss.list_genders) do
 		table.insert(genders, {v[1], function() Chargen:set_gender(k) end})
 	end
-	for k,v in ipairs(clss.list_hair_styles) do
+	local race = Species:find{name = "race"}
+	for k,v in ipairs(race.eye_styles) do
+		clss.list_eye_styles[k] = v
+		table.insert(eye_styles, {v[1], function() Chargen:set_hair_style(k) end})
+	end
+	for k,v in ipairs(race.hair_styles) do
+		clss.list_hair_styles[k] = v
 		table.insert(hair_styles, {v[1], function() Chargen:set_hair_style(k) end})
 	end
 	clss.label_race = Widgets.Label{text = "Race:"}
