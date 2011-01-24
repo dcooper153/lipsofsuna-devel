@@ -10,26 +10,17 @@ Gui.init = function(clss)
 	Gui.inventory_group:set_child{col = 1, row = 2, widget = Equipment.group}
 	Gui.inventory_group:set_child{col = 2, row = 2, widget = Inventory.group}
 	Gui.inventory_group:set_expand{col = 2, row = 2}
-	-- Action menu.
-	Gui.menu_widget_actions = Widgets.Menu{
-		{"Examine", function() Commands:examine() end},
-		{"Pick up", function() Commands:pickup() end},
-		{"Throw", function() Commands:throw() end},
-		{"Use", function() Commands:use() end}}
-	-- View menu.
-	Gui.menu_widget_view = Widgets.Menu{
-		{"Feats", Feats.inst.window},
-		{"Inventory", Gui.inventory_group},
-		{"Quests", Quests.window},
-		{"Skills", Skills.window}}
 	-- Admin menu.
 	Gui.menu_widget_admin = Widgets.Menu{
 		{"Editor", Editing.dialog},
 		{"Save", function() Network:send{packet = Packet(packets.ADMIN_SAVE)} end},
 		{"Shutdown", function() Network:send{packet = Packet(packets.ADMIN_SHUTDOWN)} end}}
 	Gui.menu_widget_main = Widgets.Menu{
-		{"Action", Gui.menu_widget_actions},
-		{"View", Gui.menu_widget_view},
+		{"Feats", Feats.inst.window},
+		{"Inventory", Gui.inventory_group},
+		{"Quests", Quests.window},
+		{"Skills", Skills.window},
+		{"-----", function() end},
 		{"Admin", Gui.menu_widget_admin},
 		{"Options", Options.group},
 		{"Help", Help.menu},
