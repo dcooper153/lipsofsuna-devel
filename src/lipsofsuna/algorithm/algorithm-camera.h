@@ -124,7 +124,7 @@ LIAPICALL (void, lialg_camera_set_center, (
 	LIAlgCamera*          self,
 	const LIMatTransform* value));
 
-LIAPICALL (void, lialg_camera_set_clip, (
+LIAPICALL (void, lialg_camera_set_clipping, (
 	LIAlgCamera*    self,
 	LIAlgCameraClip func,
 	void*           data));
