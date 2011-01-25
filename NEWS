@@ -1,3 +1,14 @@
+0.2.0
+
+ * Vastly improved map generation algorithm.
+ * Added the first part of the main quest and one side quest.
+ * Added a quest compass to make it easier to find quest objectives.
+ * Mining ores and other material from map tiles.
+ * New monsters: dragon, aer brigands.
+ * New items: ore stones, plate armor, weapon variants craftable of different ores.
+ * Armor class is taken into account when calculating damage.
+ * Improved feat system with support for custom feats.
+
 0.1.3
 
  * Models: China dress, boomerang, another tree.
