@@ -29,6 +29,15 @@
 
 #define TIMESCALE 0.02f
 
+static int private_evaluate_frame (
+	LIRenParticles* self,
+	int             system,
+	int             particle,
+	int             frame,
+	int             loop);
+
+/*****************************************************************************/
+
 int liren_particles_init (
 	LIRenParticles* self,
 	LIRenRender*    render,
@@ -64,6 +73,9 @@ int liren_particles_init (
 		{
 			dstsystem = self->systems.array + i;
 			srcsystem = model->particlesystems.array + i;
+			dstsystem->frame_start = srcsystem->frame_start;
+			dstsystem->frame_end = srcsystem->frame_end;
+			dstsystem->frame_end_emit = srcsystem->frame_end_emit;
 			dstsystem->particle_start = self->particles.count;
 			dstsystem->particle_size = srcsystem->particle_size;
 			dstsystem->image = liren_render_find_image (render, srcsystem->texture);
@@ -174,40 +186,55 @@ void liren_particles_clear (
 
 int liren_particles_evaluate_particle (
 	LIRenParticles* self,
+	int             system,
 	int             particle,
 	float           time,
 	int             loop,
 	LIMatVector*    position,
 	float*          color)
 {
-	int last;
+	int index0;
+	int index1;
 	float frame;
 	LIRenParticle* p;
 	LIRenParticleFrame* frame0;
 	LIRenParticleFrame* frame1;
+	LIRenParticleSystem* s;
 
+	/* Calculate the offset into the whole particle animation. */
+	s = self->systems.array + system;
 	p = self->particles.array + particle;
+	lisys_assert (p->frame_start >= 0.0f);
+	lisys_assert (p->frame_start < self->frames.count);
+	lisys_assert (p->frame_end <= self->frames.count);
 	frame = time / TIMESCALE;
-	frame -= p->frame_start;
-	if (frame < 0.0)
-		return 0;
-	last = p->frame_end - 2;
-	if (frame >= last)
-	{
-		if (!loop)
-			return 0;
-		frame -= (int)(frame / last) * last;
-		lisys_assert (frame >= 0.0f);
-		lisys_assert (frame < last);
-	}
+	if (loop && frame > s->frame_end_emit)
+		frame = fmodf (frame, s->frame_end_emit);
 
-	frame0 = self->frames.array + p->buffer_start + (int) frame;
-	frame1 = self->frames.array + p->buffer_start + (int) frame + 1;
+	/* Get the nearest frames. */
+	index0 = private_evaluate_frame (self, system, particle, (int) frame, loop);
+	if (index0 == -1)
+		return 0;
+	index1 = private_evaluate_frame (self, system, particle, (int) frame + 1, loop);
+	if (index1 == -1)
+		return 0;
+	frame0 = self->frames.array + p->buffer_start + (index0 - p->frame_start);
+	frame1 = self->frames.array + p->buffer_start + (index1 - p->frame_start);
+
+	/* Interpolate between the frames. */
 	*position = limat_vector_lerp (frame1->coord, frame0->coord, frame - (int) frame);
+
+	/* Calculate the diffuse color. */
+	if (frame < p->frame_start)
+	{
+		frame += s->frame_end_emit;
+		lisys_assert (frame >= 0.0f);
+	}
 	color[0] = 1.0f;
 	color[1] = 1.0f;
 	color[2] = 1.0f;
-	color[3] = 1.0f - frame / last;
+	color[3] = 1.0f - (frame - p->frame_start) / (p->frame_end - p->frame_start);
+
 	return 1;
 }
 
@@ -232,11 +259,45 @@ void liren_particles_sort (
 			continue;
 		for (j = system->particle_start ; j < system->particle_end ; j++)
 		{
-			if (liren_particles_evaluate_particle (self, j, time, loop, &coord, color))
+			if (liren_particles_evaluate_particle (self, i, j, time, loop, &coord, color))
 			{
 				coord = limat_transform_transform (*transform, coord);
 				liren_sort_add_particle (sort, &coord, system->particle_size, color, system->image, shader);
 			}
 		}
 	}
+}
+
+/*****************************************************************************/
+
+static int private_evaluate_frame (
+	LIRenParticles* self,
+	int             system,
+	int             particle,
+	int             frame,
+	int             loop)
+{
+	LIRenParticle* p;
+	LIRenParticleSystem* s;
+
+	/* Get the particle. */
+	s = self->systems.array + system;
+	p = self->particles.array + particle;
+
+	/* Handle looping. */
+	/* If looping is enabled and the frame range of the particle extends
+	   beyond the wrap position of the animation, the frames outside of
+	   the animation wrap and continue from the beginning. */
+	if (loop && frame < p->frame_start)
+	{
+		if (p->frame_end <= s->frame_end_emit)
+			return -1;
+		frame += s->frame_end_emit;
+	}
+
+	/* Check that the frame exists. */
+	if (frame < p->frame_start || frame >= p->frame_end)
+		return -1;
+
+	return frame;
 }

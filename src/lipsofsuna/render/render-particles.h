@@ -41,6 +41,9 @@ struct _LIRenParticleFrame
 typedef struct _LIRenParticleSystem LIRenParticleSystem;
 struct _LIRenParticleSystem
 {
+	int frame_start;
+	int frame_end;
+	int frame_end_emit;
 	int buffer_start;
 	int buffer_end;
 	int particle_start;
@@ -52,9 +55,6 @@ struct _LIRenParticleSystem
 typedef struct _LIRenParticles LIRenParticles;
 struct _LIRenParticles
 {
-	int frame_start;
-	int frame_end_emit;
-	int frame_end;
 	LIMatAabb bounds;
 	struct
 	{
@@ -83,6 +83,7 @@ LIAPICALL (void, liren_particles_clear, (
 
 LIAPICALL (int, liren_particles_evaluate_particle, (
 	LIRenParticles* self,
+	int             system,
 	int             particle,
 	float           time,
 	int             loop,
