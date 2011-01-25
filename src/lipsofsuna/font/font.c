@@ -35,6 +35,8 @@ LIFntFont* lifnt_font_new (
 	const char* path,
 	int         size)
 {
+	FILE* file;
+	SDL_RWops* rw;
 	LIFntFont* self;
 
 	/* Allocate self. */
@@ -43,10 +45,27 @@ LIFntFont* lifnt_font_new (
 		return NULL;
 
 	/* Open the font. */
-	self->font = TTF_OpenFont (path, size);
+	/* SDL RWops don't seem to work well together with MinGW when the filename
+	   contains unicode characters. Since TTF_OpenFont uses RWops internally,
+	   we need to work around by creating our own RWops from a file pointer. */
+	file = fopen (path, "rb");
+	if (file == NULL)
+	{
+		lisys_error_set (EIO, "cannot open font file `%s'", path);
+		return NULL;
+	}
+	rw = SDL_RWFromFP (file, 1);
+	if (rw == NULL)
+	{
+		lisys_error_set (EIO, "cannot create rwops for font file `%s'", path);
+		return NULL;
+	}
+
+	/* Read the font. */
+	self->font = TTF_OpenFontRW (rw, 1, size);
 	if (self->font == NULL)
 	{
-		lisys_error_set (EIO, "cannot load font `%s'", path);
+		lisys_error_set (EIO, "cannot read font `%s': %s", path, TTF_GetError ());
 		lifnt_font_free (self);
 		return NULL;
 	}
