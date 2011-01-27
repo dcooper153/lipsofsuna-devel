@@ -28,11 +28,7 @@ Action{name = "Inventory", mode = "press", key1 = Keys.i, func = function()
 	if Target.active then
 		Target:cancel()
 	else
-		if Client.moving then
-			Gui.menus:open{level = 1, widget = Gui.inventory_group}
-		else
-			Gui.menus:close()
-		end
+		Gui.menus:open{level = 1, widget = Gui.inventory_group}
 	end
 end}
 
@@ -149,29 +145,17 @@ end}
 ------------------------------------------------------------------------------
 
 Eventhandler{type = "keypress", func = function(self, args)
-	if Client.moving then
-		Action:event(args)
+	local w = not Client.moving and Widgets.focused_widget_prev
+	if w and w.event then
+		w:event(args)
+		Action:event(args, {})
 	else
-		local w = Widgets.focused_widget_prev
-		if w and w.event then
-			w:event(args)
-			Action:event(args, {})
-		else
-			Action:event(args, {
-				["Menu"] = true,
-				["Pick up"] = true,
-				["Screenshot"] = true,
-				["Use"] = true})
-		end
+		Action:event(args)
 	end
 end}
 
 Eventhandler{type = "keyrelease", func = function(self, args)
-	if Client.moving then
-		Action:event(args)
-	else
-		Action:event(args, {})
-	end
+	Action:event(args)
 end}
 
 Eventhandler{type = "mousepress", func = function(self, args)
