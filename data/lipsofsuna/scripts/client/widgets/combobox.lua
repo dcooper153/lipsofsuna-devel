@@ -64,16 +64,34 @@ Widgets.ComboBox.activate = function(self, args)
 end
 
 Widgets.ComboBox.pressed = function(self)
-	local w = self
-	self.menu:set_request{width = w.width - 4}
-	self.menu:popup{x = w.x, y = w.y, width = w.width, height = w.height, dir = "down"}
+	if self.menu.rows == 0 then return end
+	local p = Client.cursor_pos
+	if p.x - self.x < 10 then
+		-- Previous item.
+		if self.value > 1 then
+			self:activate{index = self.value - 1}
+		else
+			self:activate{index = self.menu.rows} 
+		end
+	elseif p.x - self.x > self.width - 11 then
+		-- Next item.
+		if self.value < self.menu.rows then
+			self:activate{index = self.value + 1}
+		else
+			self:activate{index = 1} 
+		end
+	else
+		-- Popup menu.
+		self.menu:set_request{width = self.width - 4}
+		self.menu:popup{x = self.x, y = self.y, width = self.width, height = self.height, dir = "down"}
+	end
 end
 
 Widgets.ComboBox.reshaped = function(self)
 	self:set_request{
 		font = self.font,
 		internal = true,
-		paddings = {2,2,2,2},
+		paddings = {2,12,12,2},
 		text = self.text}
 	local w = self.width
 	local h = self.height
@@ -85,7 +103,7 @@ Widgets.ComboBox.reshaped = function(self)
 		source_position = self.focused and {64,0} or {0,0},
 		source_tiling = {6,52,6,6,52,6}}
 	self:canvas_text{
-		dest_position = {3,0},
+		dest_position = {13,0},
 		dest_size = {w,h},
 		text = self.text,
 		text_alignment = {0,0.5},
