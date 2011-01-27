@@ -16,20 +16,29 @@ Species{
 		{name = "head"},
 		{name = "lowerbody"},
 		{name = "upperbody"}},
-	eye_styles = {
-		{"Default", ""}},
 	factions = {"good"},
 	feats = {"build", "right hand", "ranged", "ranged spell", "spell on self", "spell on touch", "throw"},
-	hair_styles = {
-		{"Bald", ""},
-		{"Long", "hair2"},
-		{"Pigtails", "hair1"}},
 	inventory_size = 20,
 	skill_quota = 200,
 	speed_walk = 2,
 	speed_run = 4,
 	tilt_bone = "back",
-	tilt_limit = 1.25}
+	tilt_limit = 1.25,
+	-- Customization.
+	body_scale = {0.9, 1.05},
+	bust_scale = {0.3, 1.3},
+	nose_scale = {0.5, 2.0},
+	eye_styles = {
+		{"Default", ""}},
+	genders = {
+		{"Female", "female"},
+		{"Male", "male"}},
+	hair_styles = {
+		{"Bald", ""},
+		{"Long", "hair2"},
+		{"Pigtails", "hair1"}},
+	skin_styles = {
+		{"Default", ""}}}
 
 Species{
 	name = "aer",
@@ -86,6 +95,7 @@ Species{
 Species{
 	name = "devora",
 	base = "race",
+	genders = {{"Genderless", "female"}},
 	model = "aer1",
 	models = {
 		skeleton = "aer1",
@@ -112,6 +122,7 @@ Species{
 Species{
 	name = "kraken",
 	base = "race",
+	genders = {{"Female", "female"}},
 	model = "aer1",
 	models = {
 		skeleton = "aer1",

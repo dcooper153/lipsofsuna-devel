@@ -6,13 +6,10 @@ Chargen.list_races = {
 	{"Devora", "devora"},
 	{"Kraken", "kraken"},
 	{"Wyrm", "wyrm"}}
-Chargen.list_genders = {
-	{"Female", "female"},
-	{"Male", "male"}}
+Chargen.list_genders = {}
 Chargen.list_hair_styles = {}
 Chargen.list_eye_styles = {}
-Chargen.list_skin_styles = {
-	{"Default", ""}} -- TODO
+Chargen.list_skin_styles = {}
 
 --- Initializes the character generator.
 -- @param clss Chargen class.
@@ -20,33 +17,18 @@ Chargen.init = function(clss)
 	-- Character name.
 	clss.label_name = Widgets.Label{text = "Name:"}
 	clss.entry_name = Widgets.Entry()
-	-- Race and hair selectors.
+	-- Race and gender selectors.
 	local races = {}
-	local genders = {}
-	local eye_styles = {}
-	local hair_styles = {}
 	for k,v in ipairs(clss.list_races) do
 		table.insert(races, {v[1], function() Chargen:set_race(k) end})
-	end
-	for k,v in ipairs(clss.list_genders) do
-		table.insert(genders, {v[1], function() Chargen:set_gender(k) end})
-	end
-	local race = Species:find{name = "race"}
-	for k,v in ipairs(race.eye_styles) do
-		clss.list_eye_styles[k] = v
-		table.insert(eye_styles, {v[1], function() Chargen:set_hair_style(k) end})
-	end
-	for k,v in ipairs(race.hair_styles) do
-		clss.list_hair_styles[k] = v
-		table.insert(hair_styles, {v[1], function() Chargen:set_hair_style(k) end})
 	end
 	clss.label_race = Widgets.Label{text = "Race:"}
 	clss.combo_race = Widgets.ComboBox(races)
 	clss.label_gender = Widgets.Label{text = "Gender:"}
-	clss.combo_gender = Widgets.ComboBox(genders)
+	clss.combo_gender = Widgets.ComboBox()
 	-- Eye style and color selectors.
 	clss.label_eye_style = Widgets.Label{text = "Eyes:"}
-	clss.combo_eye_style = Widgets.ComboBox(eye_styles)
+	clss.combo_eye_style = Widgets.ComboBox()
 	clss.label_eye_color = Widgets.Label{text = "  Color:"}
 	clss.color_eye = Widgets.ColorSelector{pressed = function(self, point)
 		Widgets.ColorSelector.pressed(self, point)
@@ -54,7 +36,7 @@ Chargen.init = function(clss)
 	end}
 	-- Hair style and color selectors.
 	clss.label_hair_style = Widgets.Label{text = "Hair:"}
-	clss.combo_hair_style = Widgets.ComboBox(hair_styles)
+	clss.combo_hair_style = Widgets.ComboBox()
 	clss.label_hair_color = Widgets.Label{text = "  Color:"}
 	clss.color_hair = Widgets.ColorSelector{pressed = function(self, point)
 		Widgets.ColorSelector.pressed(self, point)
@@ -62,7 +44,7 @@ Chargen.init = function(clss)
 	end}
 	-- Skin style and color selectors.
 	clss.label_skin_style = Widgets.Label{text = "Skin:"}
-	clss.combo_skin_style = Widgets.ComboBox(skin_styles)
+	clss.combo_skin_style = Widgets.ComboBox()
 	clss.label_skin_color = Widgets.Label{text = "  Color:"}
 	clss.color_skin = Widgets.ColorSelector{pressed = function(self, point)
 		Widgets.ColorSelector.pressed(self, point)
@@ -70,13 +52,13 @@ Chargen.init = function(clss)
 	end}
 	-- Body proportion sliders.
 	clss.label_height = Widgets.Label{text = "Height:"}
-	clss.scroll_height = Widgets.Progress{min = 0.9, max = 1.05, value = 1,
+	clss.scroll_height = Widgets.Progress{min = 0, max = 1, value = 1,
 		pressed = function(self) clss:set_height(self:get_value_at(Client.cursor_pos)) end}
 	clss.label_nose_scale = Widgets.Label{text = "Nose:"}
-	clss.scroll_nose_scale = Widgets.Progress{min = 0.5, max = 2.0, value = 1,
+	clss.scroll_nose_scale = Widgets.Progress{min = 0, max = 1, value = 1,
 		pressed = function(self) clss:set_nose_scale(self:get_value_at(Client.cursor_pos)) end}
 	clss.label_bust_scale = Widgets.Label{text = "Bust:"}
-	clss.scroll_bust_scale = Widgets.Progress{min = 0.3, max = 1.3, value = 1,
+	clss.scroll_bust_scale = Widgets.Progress{min = 0, max = 1, value = 1,
 		pressed = function(self) clss:set_bust_scale(self:get_value_at(Client.cursor_pos)) end}
 	-- Preview widget.
 	clss.scene = Scene()
@@ -186,10 +168,7 @@ end
 --- Randomizes the character
 -- @param clss Chargen class.
 Chargen.random = function(clss)
-	clss:set_race(1)
-	clss:set_gender(1)
-	clss:set_hair_style(2)
-	clss:set_hair_color(1, 1, 1)
+	clss:set_race(math.random(1, #clss.list_races))
 	clss:update_model()
 end
 
@@ -244,10 +223,62 @@ Chargen.set_nose_scale = function(clss, value)
 end
 
 Chargen.set_race = function(clss, index)
+	-- Set the race selection.
 	clss.combo_race.value = index
 	clss.combo_race.text = clss.list_races[index][1]
 	clss.race = clss.list_races[index][2]
+	local spec = Species:find{name = clss.list_races[clss.combo_race.value][2]}
+	-- Rebuild the gender list.
+	clss.list_genders = {}
+	clss.combo_gender:clear()
+	for k,v in ipairs(spec.genders) do
+		clss.list_genders[k] = v
+		clss.combo_gender:append{text = v[1], pressed = function() Chargen:set_gender(k) end}
+	end
+	-- Rebuild the eye style list.
+	clss.list_eye_styles = {}
+	clss.combo_eye_style:clear()
+	for k,v in ipairs(spec.eye_styles) do
+		clss.list_eye_styles[k] = v
+		clss.combo_eye_style:append{text = v[1], pressed = function() Chargen:set_eye_style(k) end}
+	end
+	-- Rebuild the hair style list.
+	clss.list_hair_styles = {}
+	clss.combo_hair_style:clear()
+	for k,v in ipairs(spec.hair_styles) do
+		clss.list_hair_styles[k] = v
+		clss.combo_hair_style:append{text = v[1], pressed = function() Chargen:set_hair_style(k) end}
+	end
+	-- Rebuild the skin style list.
+	clss.list_skin_styles = {}
+	clss.combo_skin_style:clear()
+	for k,v in ipairs(spec.skin_styles) do
+		clss.list_skin_styles[k] = v
+		clss.combo_skin_style:append{text = v[1], pressed = function() Chargen:set_skin_style(k) end}
+	end
+	-- Reconfigure the body proportion sliders.
+	clss.scroll_height.value = 1
+	clss.scroll_height.min = spec.body_scale[1]
+	clss.scroll_height.max = spec.body_scale[2]
+	clss.scroll_nose_scale.value = 1
+	clss.scroll_nose_scale.min = spec.nose_scale[1]
+	clss.scroll_nose_scale.max = spec.nose_scale[2]
+	clss.scroll_bust_scale.value = 1
+	clss.scroll_bust_scale.min = spec.bust_scale[1]
+	clss.scroll_bust_scale.max = spec.bust_scale[2]
+	-- Randomize the affected fields.
+	clss:set_gender(1)--math.random(1, #clss.list_genders))
+	clss:set_eye_style(math.random(1, #clss.list_eye_styles))
+	clss:set_eye_color(math.random(), math.random(), math.random())
+	clss:set_hair_style(math.random(1, #clss.list_hair_styles))
+	clss:set_hair_color(math.random(), math.random(), math.random())
+	clss:set_skin_style(math.random(1, #clss.list_skin_styles))
+	clss:set_height(spec.body_scale[1] + math.random() * (spec.body_scale[2] - spec.body_scale[1]))
+	clss:set_bust_scale(spec.bust_scale[1] + math.random() * (spec.bust_scale[2] - spec.bust_scale[1]))
+	clss:set_nose_scale(spec.nose_scale[1] + math.random() * (spec.nose_scale[2] - spec.nose_scale[1]))
 	clss:update_model()
+	-- Randomize the name.
+	clss.entry_name.text = Names:random{race = clss.list_races[clss.combo_race.value][2], gender = "female"}
 end
 
 Chargen.set_skin_style = function(clss, index)

@@ -13,7 +13,7 @@ Completion conditions:
  * The worm has been killed and the NPC was told that the pet is dead.
 --]]
 
-local name = Names:random{race = "Aer", gender = "female"}
+local name = Names:random{race = "aer", gender = "female"}
 Quest.peculiar_pet_npc_name = name
 
 Dialog{name = "peculiarpet_npc", unique = true,

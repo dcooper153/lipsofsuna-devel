@@ -15,25 +15,8 @@ Widgets.ComboBox.new = function(clss, args)
 		end
 	end
 	-- Create menu items.
-	for k,v in ipairs(args or {}) do
-		if type(v) == "table" then
-			self:append{text = v[1], pressed = v[2]}
-		elseif type(v) == "string" then
-			self:append{text = v}
-		end
-	end
+	self:set_items(args or {})
 	return self
-end
-
-Widgets.ComboBox.append = function(self, args)
-	local row = self.menu.rows + 1
-	local widget = Widgets.MenuItem{text = args.text, pressed = function()
-		self.text = args.text
-		self.value = row
-		self.menu.visible = false
-		if args.pressed then args.pressed(self, row) end
-	end}
-	self.menu:append_row(widget)
 end
 
 --- Activates a row of the combo box menu.
@@ -63,6 +46,28 @@ Widgets.ComboBox.activate = function(self, args)
 	return true
 end
 
+--- Appends a new item to the combo box.
+-- @param self Combo box.
+-- @param args Arguments.<ul>
+--   <li>pressed: Selection handling function.</li>
+--   <li>text: Text of the item.</li></ul>
+Widgets.ComboBox.append = function(self, args)
+	local row = self.menu.rows + 1
+	local widget = Widgets.MenuItem{text = args.text, pressed = function()
+		self.text = args.text
+		self.value = row
+		self.menu.visible = false
+		if args.pressed then args.pressed(self, row) end
+	end}
+	self.menu:append_row(widget)
+end
+
+Widgets.ComboBox.clear = function(self)
+	self.value = 1
+	self.menu.rows = 0
+	self.text = nil
+end
+
 Widgets.ComboBox.pressed = function(self)
 	if self.menu.rows == 0 then return end
 	local p = Client.cursor_pos
@@ -84,6 +89,17 @@ Widgets.ComboBox.pressed = function(self)
 		-- Popup menu.
 		self.menu:set_request{width = self.width - 4}
 		self.menu:popup{x = self.x, y = self.y, width = self.width, height = self.height, dir = "down"}
+	end
+end
+
+Widgets.ComboBox.set_items = function(self, items)
+	self:clear()
+	for k,v in ipairs(items) do
+		if type(v) == "table" then
+			self:append{text = v[1], pressed = v[2]}
+		elseif type(v) == "string" then
+			self:append{text = v}
+		end
 	end
 end
 
