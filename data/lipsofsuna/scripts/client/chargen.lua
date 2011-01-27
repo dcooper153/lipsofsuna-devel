@@ -17,6 +17,9 @@ Chargen.list_skin_styles = {
 --- Initializes the character generator.
 -- @param clss Chargen class.
 Chargen.init = function(clss)
+	-- Character name.
+	clss.label_name = Widgets.Label{text = "Name:"}
+	clss.entry_name = Widgets.Entry()
 	-- Race and hair selectors.
 	local races = {}
 	local genders = {}
@@ -92,29 +95,31 @@ Chargen.init = function(clss)
 	clss.group_hair:set_child{row = 1, col = 2, widget = clss.combo_hair_color}
 	clss.group_hair:set_expand{col = 1}
 	clss.group_hair:set_expand{col = 2}
-	clss.group_race = Widget{rows = 11, cols = 2, homogeneous = true}
-	clss.group_race:set_child{row = 1, col = 1, widget = clss.label_race}
-	clss.group_race:set_child{row = 1, col = 2, widget = clss.combo_race}
-	clss.group_race:set_child{row = 2, col = 1, widget = clss.label_gender}
-	clss.group_race:set_child{row = 2, col = 2, widget = clss.combo_gender}
-	clss.group_race:set_child{row = 3, col = 1, widget = clss.label_eye_style}
-	clss.group_race:set_child{row = 3, col = 2, widget = clss.combo_eye_style}
-	clss.group_race:set_child{row = 4, col = 1, widget = clss.label_eye_color}
-	clss.group_race:set_child{row = 4, col = 2, widget = clss.color_eye}
-	clss.group_race:set_child{row = 5, col = 1, widget = clss.label_hair_style}
-	clss.group_race:set_child{row = 5, col = 2, widget = clss.combo_hair_style}
-	clss.group_race:set_child{row = 6, col = 1, widget = clss.label_hair_color}
-	clss.group_race:set_child{row = 6, col = 2, widget = clss.color_hair}
-	clss.group_race:set_child{row = 7, col = 1, widget = clss.label_skin_style}
-	clss.group_race:set_child{row = 7, col = 2, widget = clss.combo_skin_style}
-	clss.group_race:set_child{row = 8, col = 1, widget = clss.label_skin_color}
-	clss.group_race:set_child{row = 8, col = 2, widget = clss.color_skin}
-	clss.group_race:set_child{row = 9, col = 1, widget = clss.label_height}
-	clss.group_race:set_child{row = 9, col = 2, widget = clss.scroll_height}
-	clss.group_race:set_child{row = 10, col = 1, widget = clss.label_nose_scale}
-	clss.group_race:set_child{row = 10, col = 2, widget = clss.scroll_nose_scale}
-	clss.group_race:set_child{row = 11, col = 1, widget = clss.label_bust_scale}
-	clss.group_race:set_child{row = 11, col = 2, widget = clss.scroll_bust_scale}
+	clss.group_race = Widget{rows = 12, cols = 2, homogeneous = true}
+	clss.group_race:set_child{row = 1, col = 1, widget = clss.label_name}
+	clss.group_race:set_child{row = 1, col = 2, widget = clss.entry_name}
+	clss.group_race:set_child{row = 2, col = 1, widget = clss.label_race}
+	clss.group_race:set_child{row = 2, col = 2, widget = clss.combo_race}
+	clss.group_race:set_child{row = 3, col = 1, widget = clss.label_gender}
+	clss.group_race:set_child{row = 3, col = 2, widget = clss.combo_gender}
+	clss.group_race:set_child{row = 4, col = 1, widget = clss.label_eye_style}
+	clss.group_race:set_child{row = 4, col = 2, widget = clss.combo_eye_style}
+	clss.group_race:set_child{row = 5, col = 1, widget = clss.label_eye_color}
+	clss.group_race:set_child{row = 5, col = 2, widget = clss.color_eye}
+	clss.group_race:set_child{row = 6, col = 1, widget = clss.label_hair_style}
+	clss.group_race:set_child{row = 6, col = 2, widget = clss.combo_hair_style}
+	clss.group_race:set_child{row = 7, col = 1, widget = clss.label_hair_color}
+	clss.group_race:set_child{row = 7, col = 2, widget = clss.color_hair}
+	clss.group_race:set_child{row = 8, col = 1, widget = clss.label_skin_style}
+	clss.group_race:set_child{row = 8, col = 2, widget = clss.combo_skin_style}
+	clss.group_race:set_child{row = 9, col = 1, widget = clss.label_skin_color}
+	clss.group_race:set_child{row = 9, col = 2, widget = clss.color_skin}
+	clss.group_race:set_child{row = 10, col = 1, widget = clss.label_height}
+	clss.group_race:set_child{row = 10, col = 2, widget = clss.scroll_height}
+	clss.group_race:set_child{row = 11, col = 1, widget = clss.label_nose_scale}
+	clss.group_race:set_child{row = 11, col = 2, widget = clss.scroll_nose_scale}
+	clss.group_race:set_child{row = 12, col = 1, widget = clss.label_bust_scale}
+	clss.group_race:set_child{row = 12, col = 2, widget = clss.scroll_bust_scale}
 	clss.group_race:set_expand{col = 2}
 	clss.group_race:set_request{width = 300}
 	clss.group_left = Widget{cols = 1}
@@ -131,6 +136,7 @@ end
 
 Chargen.apply = function(clss)
 	local packet = Packet(packets.CHARACTER_CREATE,
+		"string", clss.entry_name.text,
 		"string", clss.list_races[clss.combo_race.value][2],
 		"string", clss.list_genders[clss.combo_gender.value][2],
 		"float", clss.scroll_height.value,

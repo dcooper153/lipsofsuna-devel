@@ -12,8 +12,8 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	local player = Player:find{client = args.client}
 	if player then return end
 	-- Get character flags.
-	local ok,ra,ge,bo,no,bu,eye,eyer,eyeg,eyeb,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = args.packet:read(
-		"string", "string", "float", "float", "float",
+	local ok,na,ra,ge,bo,no,bu,eye,eyer,eyeg,eyeb,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = args.packet:read(
+		"string", "string", "string", "float", "float", "float",
 		"string", "uint8", "uint8", "uint8",
 		"string", "uint8", "uint8", "uint8",
 		"string", "uint8", "uint8", "uint8")
@@ -32,6 +32,7 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		eye_style = {eye, eyer, eyeg, eyeb},
 		gender = ge,
 		hair_style = {hair, hairr, hairg, hairb},
+		name = (na ~= "" and na or "Player"),
 		nose_scale = no,
 		physics = "static",
 		position = Config.spawn,
