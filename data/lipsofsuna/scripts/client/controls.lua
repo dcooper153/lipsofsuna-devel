@@ -1,4 +1,5 @@
-Keys = {ESCAPE = 27, SPACE = 32, COMMA = 44, a = 97, c = 99, d = 100, i = 105, y = 121,
+Keys = {ESCAPE = 27, SPACE = 32, COMMA = 44,
+	a = 97, c = 99, d = 100, f = 102, i = 105, k = 107, o = 111, q = 113, y = 121,
 	x = 120, w = 119, s = 115, F1 = 282, F2 = 283, F3 = 284, F4 = 285, F5 = 286,
 	F6 = 287, F7 = 288, F8 = 289, F9 = 290, F10 = 291, F11 = 292, F12 = 293,
 	LSHIFT = 304, RCTRL = 305, LCTRL = 306, PRINT = 316}
@@ -22,6 +23,14 @@ Action{name = "Camera", mode = "press", key1 = Keys.y, func = function()
 		Player.camera.mode = "first-person"
 	end
 	Player.camera:reset()
+end}
+
+Action{name = "Feats", mode = "press", key1 = Keys.f, func = function()
+	if Target.active then
+		Target:cancel()
+	else
+		Gui.menus:open{level = 1, widget = Feats.inst.window}
+	end
 end}
 
 Action{name = "Inventory", mode = "press", key1 = Keys.i, func = function()
@@ -53,8 +62,32 @@ Action{name = "Move", mode = "analog", key1 = Keys.w, key2 = Keys.s, func = func
 	Network:send{packet = Packet(packets.PLAYER_MOVE, "int8", v * -127)}
 end}
 
+Action{name = "Options", mode = "press", key1 = Keys.o, func = function()
+	if Target.active then
+		Target:cancel()
+	else
+		Gui.menus:open{level = 1, widget = Options.group}
+	end
+end}
+
 Action{name = "Pick up", mode = "press", key1 = Keys.COMMA, func = function()
 	Commands:pickup()
+end}
+
+Action{name = "Quests", mode = "press", key1 = Keys.q, func = function()
+	if Target.active then
+		Target:cancel()
+	else
+		Gui.menus:open{level = 1, widget = Quests.window}
+	end
+end}
+
+Action{name = "Skills", mode = "press", key1 = Keys.k, func = function()
+	if Target.active then
+		Target:cancel()
+	else
+		Gui.menus:open{level = 1, widget = Skills.window}
+	end
 end}
 
 Action{name = "Quickslot 1", mode = "press", key1 = Keys.F1, func = function()
