@@ -24,7 +24,7 @@ end
 --   <li>nose_scale: Nose scale factor.</li>
 --   <li>race: Race string.</li></ul>
 Object.create_character_model = function(self, args)
-	local lod = Options.low_quality_models
+	local lod = (Options.model_quality == 0)
 	-- Get the species.
 	local name = args.race .. (args.gender == "male" and "m" or "")
 	local species = Species:find{name = name}
