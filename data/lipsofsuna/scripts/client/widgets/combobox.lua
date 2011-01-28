@@ -27,21 +27,30 @@ end
 --   <li>text: Row text.</li></ul>
 -- @return True on success.
 Widgets.ComboBox.activate = function(self, args)
+	-- Find the item.
+	local widget = nil
+	local index = nil
 	if args.index then
-		-- Activate by index.
-		local widget = self.menu:get_child{col = 1, row = args.index}
-		if not widget then return end
-		if args.press ~= false then widget:pressed() end
+		widget = self.menu:get_child{col = 1, row = args.index}
+		index = args.index
 	elseif args.text then
-		-- Activate by text.
-		local row = 1
-		local widget
-		for row = 1,self.menu.rows do
-			widget = self.menu:get_child{col = 1, row = row}
-			if not widget then return end
-			if widget.text == args.text then break end
+		index = 1
+		for index = 1,self.menu.rows do
+			local tmp = self.menu:get_child{col = 1, row = index}
+			if not tmp then return end
+			if tmp.text == args.text then
+				widget = tmp
+				break
+			end
 		end
-		if args.press ~= false then widget:pressed() end
+	end
+	-- Set the selection.
+	if not widget then return end
+	if args.press ~= false then
+		widget:pressed()
+	else
+		self.active = index
+		self.text = widget.text
 	end
 	return true
 end
