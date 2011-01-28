@@ -50,8 +50,12 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	-- Set skills.
 	local names = {"dexterity", "health", "intelligence", "perception", "strength", "willpower"}
 	local values = {s1, s2, s3, s4, s5, s6}
-	for i = 1,6 do o:set_skill(names[i], 0) end
-	for i = 1,6 do o:set_skill(names[i], values[i]) end
+	for i = 1,#names do o:set_skill(names[i], 0) end
+	for i = 1,#names do
+		o:set_skill(names[i], values[i])
+		local real = o.skills:get_maximum{skill = names[i]}
+		o.skills:set_value{skill = names[i], value = 0.666 * real}
+	end
 	-- Transmit active and completed quests.
 	for k,q in pairs(Quest.dict_name) do
 		q:send{client = o}
