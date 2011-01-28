@@ -284,13 +284,13 @@ Protocol:add_handler{type = "OBJECT_SKILL", func = function(event)
 		if not o then return end
 		-- Update player skills.
 		if o == Player.object then
-			Skills:update(s, v, m)
+			Gui.skills:update(s, v, m)
 		end
 		-- Display health changes.
 		if s == "health" then
 			if o.health then
 				local diff = v - o.health
-				if math.abs(diff) >= 2 then
+				if math.abs(diff) > 2 then
 					local red = {1,0,0,1}
 					local green = {0,1,0,1}
 					EffectObject{

@@ -86,7 +86,7 @@ Action{name = "Skills", mode = "press", key1 = Keys.k, func = function()
 	if Target.active then
 		Target:cancel()
 	else
-		Gui.menus:open{level = 1, widget = Skills.window}
+		Gui.menus:open{level = 1, widget = Gui.skills.window}
 	end
 end}
 

@@ -1,3 +1,5 @@
+require "client/skills"
+
 Chargen = Class()
 Chargen.visible = false
 Chargen.list_races = {
@@ -60,6 +62,8 @@ Chargen.init = function(clss)
 	clss.label_bust_scale = Widgets.Label{text = "Bust:"}
 	clss.scroll_bust_scale = Widgets.Progress{min = 0, max = 1, value = 1,
 		pressed = function(self) clss:set_bust_scale(self:get_value_at(Client.cursor_pos)) end}
+	-- Skills.
+	clss.skills = Skills()
 	-- Preview widget.
 	clss.scene = Scene()
 	clss.object = Object{position = Vector(1, 1, 1), type = "character"}
@@ -113,7 +117,8 @@ Chargen.init = function(clss)
 	clss.group_left:set_request{width = 300}
 	clss.group = clss.preview
 	clss.group:append_row(clss.group_left)
-	clss.group:set_expand{row = 1}
+	clss.group:append_row(clss.skills.window)
+	clss.group:set_expand{row = 2}
 end
 
 Chargen.apply = function(clss)
@@ -279,6 +284,8 @@ Chargen.set_race = function(clss, index)
 	clss:update_model()
 	-- Randomize the name.
 	clss.entry_name.text = Names:random{race = clss.list_races[clss.combo_race.value][2], gender = "female"}
+	-- Reset skills.
+	clss.skills:set_species(spec)
 end
 
 Chargen.set_skin_style = function(clss, index)

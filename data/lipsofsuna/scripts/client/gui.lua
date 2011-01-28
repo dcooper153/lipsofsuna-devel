@@ -3,6 +3,7 @@ Gui = Class()
 --- Initializes the in-game user interface.
 -- @param clss Gui class.
 Gui.init = function(clss)
+	Gui.skills = Skills{main = true, sync = true}
 	-- Inventory menu.
 	Gui.inventory_group = Widget{cols = 2, rows = 2}
 	Gui.inventory_group:set_request{width = 100}
@@ -19,7 +20,7 @@ Gui.init = function(clss)
 		{"Feats", Feats.inst.window},
 		{"Inventory", Gui.inventory_group},
 		{"Quests", Quests.window},
-		{"Skills", Skills.window},
+		{"Skills", Gui.skills.window},
 		{"-----", function() end},
 		{"Admin", Gui.menu_widget_admin},
 		{"Options", Options.group},
