@@ -188,6 +188,7 @@ static void Client_set_video_mode (LIScrArgs* args)
 	int width = 1024;
 	int height = 768;
 	int fullscreen = 0;
+	int vsync = 0;
 	LICliClient* client;
 
 	if (!liscr_args_gets_int (args, "width", &width))
@@ -196,11 +197,13 @@ static void Client_set_video_mode (LIScrArgs* args)
 		liscr_args_geti_int (args, 1, &height);
 	if (!liscr_args_gets_bool (args, "fullscreen", &fullscreen))
 		liscr_args_geti_bool (args, 2, &fullscreen);
+	if (!liscr_args_gets_bool (args, "vsync", &vsync))
+		liscr_args_geti_bool (args, 3, &vsync);
 	width = LIMAT_MAX (320, width);
 	height = LIMAT_MAX (240, height);
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
-	if (!licli_window_set_size (client->window, width, height, fullscreen))
+	if (!licli_window_set_size (client->window, width, height, fullscreen, vsync))
 	{
 		lisys_error_report ();
 		return;
@@ -308,6 +311,7 @@ static void Client_getter_video_mode (LIScrArgs* args)
 	liscr_args_seti_int (args, client->window->mode.width);
 	liscr_args_seti_int (args, client->window->mode.height);
 	liscr_args_seti_bool (args, client->window->mode.fullscreen);
+	liscr_args_seti_bool (args, client->window->mode.vsync);
 }
 
 /* @luadoc

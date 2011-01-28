@@ -36,7 +36,8 @@ static int private_resize (
 	LICliWindow* self,
 	int          width,
 	int          height,
-	int          fullscreen);
+	int          fullscreen,
+	int          vsync);
 
 /****************************************************************************/
 
@@ -95,9 +96,10 @@ int licli_window_set_size (
 	LICliWindow* self,
 	int          width,
 	int          height,
-	int          full)
+	int          full,
+	int          sync)
 {
-	if (!private_resize (self, width, height, full))
+	if (!private_resize (self, width, height, full, sync))
 		return 0;
 	return 1;
 }
@@ -116,7 +118,7 @@ static int private_init_video (
 	LICliWindow* self)
 {
 	/* Create the window. */
-	if (!private_resize (self, 1024, 768, 0))
+	if (!private_resize (self, 1024, 768, 0, 0))
 		return 0;
 	if (TTF_Init () == -1)
 	{
@@ -131,7 +133,8 @@ static int private_resize (
 	LICliWindow* self,
 	int          width,
 	int          height,
-	int          fullscreen)
+	int          fullscreen,
+	int          sync)
 {
 	int i;
 	Uint32 flags;
@@ -154,7 +157,6 @@ static int private_resize (
 					best = modes[i];
 			}
 		}
-		printf ("SETFS %d %d!!!\n", best? best->w : -1, best? best->h : -1);
 		if (best != NULL)
 		{
 			/* Set the resolution to the best mode found. */
@@ -174,7 +176,8 @@ static int private_resize (
 	/* Recreate surface. */
 	SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 0);
 	SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 0);
-	SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
+	if (sync)
+		SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
 	SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
 	self->screen = SDL_SetVideoMode (width, height, 0, flags);
 	if (self->screen == NULL)
@@ -191,6 +194,7 @@ static int private_resize (
 	self->mode.width = width;
 	self->mode.height = height;
 	self->mode.fullscreen = fullscreen;
+	self->mode.vsync = sync;
 
 	return 1;
 }

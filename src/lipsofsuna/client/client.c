@@ -292,7 +292,7 @@ static int private_event (
 				self->program->sleep = 0;
 			break;
 		case SDL_VIDEORESIZE:
-			if (!licli_window_set_size (self->window, event->resize.w, event->resize.h, 0))
+			if (!licli_window_set_size (self->window, event->resize.w, event->resize.h, 0, self->window->mode.vsync))
 				return 1;
 			break;
 	}
