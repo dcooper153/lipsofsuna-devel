@@ -12,8 +12,11 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	local player = Player:find{client = args.client}
 	if player then return end
 	-- Get character flags.
-	local ok,na,ra,ge,bo,no,bu,eye,eyer,eyeg,eyeb,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = args.packet:read(
-		"string", "string", "string", "float", "float", "float",
+	local ok,na,ra,ge,s1,s2,s3,s4,s5,s6,bo,no,bu,eye,eyer,eyeg,eyeb,
+	hair,hairr,hairg,hairb,skin,skinr,sking,skinb = args.packet:read(
+		"string", "string", "string",
+		"uint8", "uint8", "uint8", "uint8", "uint8", "uint8",
+		"float", "float", "float",
 		"string", "uint8", "uint8", "uint8",
 		"string", "uint8", "uint8", "uint8",
 		"string", "uint8", "uint8", "uint8")
@@ -44,6 +47,11 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		o.physics = "kinematic"
 		self:disable()
 	end}
+	-- Set skills.
+	local names = {"dexterity", "health", "intelligence", "perception", "strength", "willpower"}
+	local values = {s1, s2, s3, s4, s5, s6}
+	for i = 1,6 do o:set_skill(names[i], 0) end
+	for i = 1,6 do o:set_skill(names[i], values[i]) end
 	-- Transmit active and completed quests.
 	for k,q in pairs(Quest.dict_name) do
 		q:send{client = o}
@@ -204,19 +212,7 @@ Protocol:add_handler{type = "SKILLS", func = function(args)
 		-- Read packet data.
 		local ok,s,v = args.packet:read("string", "float")
 		if not ok then return end
-		if v < 0 then return end
-		-- Enforce species limit.
-		local spec = player.spec.skills[s]
-		if not spec then return end
-		v = math.min(v, spec.max)
-		-- Enforce skill quota.
-		local skills = player.skills
-		if not skills then return end
-		local t = skills:get_total() - skills:get_maximum{skill = s}
-		v = math.min(v, player.spec.skill_quota - t)
-		if v <= 0 then return end
-		-- Set the new maximum value.
-		skills:set_maximum{skill = s, value = v}
+		player:set_skill(s, v)
 	end
 end}
 

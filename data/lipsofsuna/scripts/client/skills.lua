@@ -77,6 +77,10 @@ Skills.changed = function(self, index)
 	Network:send{packet = Packet(packets.SKILLS, "string", skill.id, "float", skill.cap)}
 end
 
+Skills.get_value = function(self, id)
+	return self.dict_id[id].value
+end
+
 --- Sets the species for which the skills are.
 -- @param self Skills.
 -- @param value Species.
