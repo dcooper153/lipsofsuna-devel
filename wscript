@@ -175,6 +175,8 @@ def configure(ctx):
 		ctx.env.DATADIR = os.path.join(datadir, APPNAME)
 		ctx.env.PROGDIR = bindir
 		ctx.env.TOOLDIR = os.path.join(datadir, APPNAME, 'tool')
+		ctx.env.APPDIR = os.path.join(datadir, 'applications')
+		ctx.env.ICONDIR = os.path.join(datadir, 'pixmaps')
 		ctx.define('LIEXTSDIR', ctx.env.EXTSDIR)
 		ctx.define('LIDATADIR', os.path.join(datadir, APPNAME))
 		ctx.define('LIPROGDIR', ctx.env.PROGDIR)
@@ -244,11 +246,13 @@ def build(ctx):
 		ctx.install_files(ctx.env.TOOLDIR, ['tool/lipsofsuna_export.py'])
 		start_dir = ctx.path.find_dir('data')
 		ctx.install_files('${DATADIR}', start_dir.ant_glob('**/*.*'), cwd=start_dir, relative_trick=True)
+		ctx.install_files('${APPDIR}', ['misc/lipsofsuna.desktop'])
+		ctx.install_files('${ICONDIR}', ['misc/lipsofsuna.png', 'misc/lipsofsuna.svg'])
 
 def dist(ctx):
 	import Logs
 	import tarfile
-	dirs = ['src/**/*.*', 'data/**/*.*', 'tool/*', 'docs/*', 'AUTHORS', 'COPYING', 'NEWS', 'README', 'waf', 'wscript']
+	dirs = ['src/**/*.*', 'data/**/*.*', 'tool/*', 'misc/*', 'docs/*', 'AUTHORS', 'COPYING', 'NEWS', 'README', 'waf', 'wscript']
 	excl = ['**/.*', '**/import', 'docs/html']
 	base = APPNAME + '-' + VERSION
 	name = base + '.tar.gz'
