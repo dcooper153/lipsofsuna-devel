@@ -1,29 +1,25 @@
 Obstacle = Class(Object)
 
---- Causes the obstacle to take damage.
--- @param self Object.
--- @param amount Amount of damage.
-Obstacle.damaged = function(self, amount)
-	-- Obstacles whose spec has no health are indestructible.
-	if not self.spec.health then return end
-	-- Subtract health.
-	local h = self.health or self.spec.health
-	self.health = math.max(0, h - amount)
-	-- Destroy when out of health.
-	if self.health == 0 then
-		self:die()
-	end
-end
-
 --- Creates an obstacle.
 -- @param clss Mover class.
 -- @param args Arguments.
 -- @return New obstacle.
 Obstacle.new = function(clss, args)
-	local self = Object.new(clss, args)
-	self.physics = "static"
-	self.collision_group = 0x8000
-	self.collision_mask = 0xFF
+	local self = Object.new(clss, {id = args.id})
+	local copy = function(n, d)
+		if args[n] ~= nil or d then
+			self[n] = (args[n] ~= nil) and args[n] or d
+		end
+	end
+	copy("angular")
+	copy("collision_group", 0x8000)
+	copy("collision_mask", 0xFF)
+	copy("health")
+	copy("name")
+	copy("rotation")
+	copy("position")
+	copy("spec")
+	copy("realized")
 	return self
 end
 
@@ -40,8 +36,26 @@ Obstacle.setter = function(self, key, value)
 		self.mass = spec.mass
 		self.gravity = spec.gravity
 		self.physics = spec.physics
+		if spec.marker then
+			self.marker = Marker{name = spec.marker, position = self.position, target = self.id}
+		end
 	else
 		Object.setter(self, key, value)
+	end
+end
+
+--- Causes the obstacle to take damage.
+-- @param self Object.
+-- @param amount Amount of damage.
+Obstacle.damaged = function(self, amount)
+	-- Obstacles whose spec has no health are indestructible.
+	if not self.spec.health then return end
+	-- Subtract health.
+	local h = self.health or self.spec.health
+	self.health = math.max(0, h - amount)
+	-- Destroy when out of health.
+	if self.health == 0 then
+		self:die()
 	end
 end
 
