@@ -81,6 +81,7 @@ Obstacle.use_cb = function(self, user)
 			self:die()
 		end
 	end
+	Object.use_cb(self, user)
 end
 
 --- Serializes the object to a string.

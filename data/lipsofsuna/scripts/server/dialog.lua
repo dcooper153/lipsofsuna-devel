@@ -108,7 +108,9 @@ Dialog.start = function(clss, args)
 	end
 	-- Attach to the object.
 	dialog.object.dialog = dialog
-	dialog.object:update_ai_state()
+	if dialog.object.spec.type == "creature" then
+		dialog.object:update_ai_state()
+	end
 	-- Start the coroutine.
 	local r,e = coroutine.resume(dialog.routine, dialog)
 	if r == false then
