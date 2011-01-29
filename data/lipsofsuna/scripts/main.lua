@@ -86,6 +86,7 @@ require "content/species"
 require "content/quests/mourningadventurer"
 require "content/quests/peculiarpet"
 require "content/quests/rootsofworld"
+require "content/quests/sanctuary"
 require "content/quests/misc"
 
 if Settings.quit then Program.quit = true end

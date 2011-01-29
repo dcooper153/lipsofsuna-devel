@@ -59,9 +59,12 @@ end--]]
 --- Causes the player to die and respawn.
 -- @param self Player.
 Player.die = function(self)
-	self:send{packet = Packet(packets.MESSAGE, "string", "You have died...")}
-	Creature.die(self)
-	self.contact_cb = false
+	if Creature.die(self) then
+		self:send{packet = Packet(packets.MESSAGE, "string", "You have died...")}
+		self.contact_cb = false
+	else
+		self:send{packet = Packet(packets.MESSAGE, "string", "Saved by Sanctuary.")}
+	end
 end
 
 Player.detach = function(self, keep)

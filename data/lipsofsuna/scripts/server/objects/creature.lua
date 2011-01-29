@@ -223,8 +223,17 @@ end
 
 --- Causes the creature to die.
 -- @param self Object.
+-- @return True if killed, false if saved by Sanctuary.
 Creature.die = function(self)
 	if self.dead then return end
+	-- Sanctuary save.
+	if self.modifiers and self.modifiers.sanctuary then
+		self.modifiers.sanctuary = nil
+		local marker = Marker:find{name = "sanctuary"}
+		if not marker or not marker.position then return end
+		self.position = marker.position + Vector(0, 2, 0)
+		return
+	end
 	-- Death dialog.
 	Dialog:start{object = self, type = "die"}
 	-- Disable controls.
@@ -252,6 +261,7 @@ Creature.die = function(self)
 		o.realized = true
 	end
 	--Object.die(self)
+	return true
 end
 
 --- Equips the item passed as a parameter.
