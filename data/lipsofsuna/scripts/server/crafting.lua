@@ -47,7 +47,7 @@ Crafting.can_craft = function(clss, args)
 	for name,req in pairs(spec.crafting_materials) do
 		if not inv then return end
 		local obj = inv:find_object{name = name}
-		local cnt = obj and obj:get_count() or 0
+		local cnt = obj and obj.count or 0
 		if cnt < req then return end
 	end
 	return true

@@ -60,7 +60,7 @@ Feat.apply = function(self, args)
 		if args.weapon.spec.construct_tile then
 			local m = Material:find{name = args.weapon.spec.construct_tile}
 			local need = args.weapon.spec.construct_tile_count or 1
-			local have = args.weapon:get_count()
+			local have = args.weapon.count
 			if m and need <= have then
 				local t,p = Voxel:find_tile{match = "empty", point = args.point}
 				if t then
@@ -298,13 +298,13 @@ Feat.usable = function(self, args)
 	for k,v in pairs(info.required_reagents) do
 		if not inventory then return end
 		local item = inventory:find_object{name = k}
-		if not item or item:get_count() < v then return end
+		if not item or item.count < v then return end
 	end
 	-- Check for ammo.
 	for k,v in pairs(info.required_ammo) do
 		if not inventory then return end
 		local item = inventory:find_object{name = k}
-		if not item or item:get_count() < v then return end
+		if not item or item.count < v then return end
 	end
 	-- Check for weapon.
 	if info.required_weapon then

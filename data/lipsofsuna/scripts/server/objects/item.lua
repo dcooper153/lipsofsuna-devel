@@ -84,7 +84,7 @@ end
 -- @return Object.
 Item.split = function(self, args)
 	local c = args and args.count or 1
-	if c < self:get_count() then
+	if c < self.count then
 		local o = self:clone()
 		self:subtract{count = c}
 		o.count = c

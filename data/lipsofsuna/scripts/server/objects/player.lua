@@ -89,7 +89,7 @@ Player.inventory_cb = function(self, args)
 			if args.object then
 				local name = args.object.spec.name
 				self:send{packet = Packet(packets.INVENTORY_ITEM_ADDED, "uint32", id,
-					"uint8", args.slot, "uint32", args.object:get_count(), "string", name)}
+					"uint8", args.slot, "uint32", args.object.count, "string", name)}
 			else
 				self:send{packet = Packet(packets.INVENTORY_ITEM_REMOVED, "uint32", id,
 					"uint8", args.slot)}
