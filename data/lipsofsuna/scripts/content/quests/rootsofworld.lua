@@ -2,13 +2,22 @@ Quest{
 	name = "Roots of World",
 	status = "inactive"}
 
+Obstaclespec{
+	name = "chara's portal",
+	model = "portal1",
+	categories = {"portal", "special"},
+	dialog = "chara's portal",
+	marker = "chara's portal"}
+
 Pattern{
-	name = "rootsofworld",
+	name = "roots of world",
 	creatures = {
-		{0,0,0,"Chara"}}}
+		{0,0,0,"Chara"}},
+	obstacles = {
+		{4,0,4,"chara's portal"}}}
 
 Species{
 	name = "Chara",
 	base = "seirei",
-	dialog = "rootsofworld_chara",
-	marker = "rootsofworld_chara"}
+	dialog = "chara",
+	marker = "chara"}

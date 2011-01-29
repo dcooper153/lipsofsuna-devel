@@ -20,7 +20,7 @@ ChatCommand{pattern = "^/suicide$", func = function(player, matches)
 end}
 
 -- Teleportation.
-ChatCommand{pattern = "^/teleport ([a-zA-Z0-9_]+)$", func = function(player, matches)
+ChatCommand{pattern = "^/teleport (.*)$", func = function(player, matches)
 	if player:teleport{marker = matches[1]} then
 		player:send{packet = Packet(packets.MESSAGE, "string", "/teleport: Teleported to " .. matches[1] .. ".")}
 	else

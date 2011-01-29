@@ -16,13 +16,13 @@ Completion conditions:
 local name = Names:random{race = "aer", gender = "female"}
 Quest.peculiar_pet_npc_name = name
 
-Dialog{name = "peculiarpet_npc", unique = true,
+Dialog{name = "peculiar pet npc", unique = true,
 die = function(self)
 	-- Find the quest.
 	local quest = Quest:find{name = "Peculiar Pet"}
 	if not quest then return end
 	-- Update the quest.
-	quest:marker("peculiarpet_npc")
+	quest:marker("peculiar pet npc")
 	quest:update{status = "completed", progress = 5, text = name ..
 		" has been killed."}
 end,
@@ -144,7 +144,7 @@ main = function(self)
 	end
 end}
 
-Dialog{name = "peculiarpet_worm", unique = true,
+Dialog{name = "peculiar pet worm", unique = true,
 die = function(self)
 	-- Find the quest.
 	local quest = Quest:find{name = "Peculiar Pet"}

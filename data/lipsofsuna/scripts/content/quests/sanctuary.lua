@@ -10,7 +10,7 @@ Obstaclespec{
 	marker = "sanctuary"}
 
 Pattern{
-	name = "sanctuary1",
+	name = "sanctuary",
 	obstacles = {
 		{8,2,8,"sanctuary device"}},
 	tiles = {

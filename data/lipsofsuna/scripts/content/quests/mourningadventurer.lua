@@ -3,12 +3,12 @@ Quest{
 	status = "inactive"}
 
 Pattern{
-	name = "mourningadventurer_town",
+	name = "mourning adventurer town",
 	creatures = {
 		{0,0,0,"mourning adventurer"}}}
 
 Pattern{
-	name = "mourningadventurer_lost",
+	name = "mourning adventurer lost",
 	creatures = {
 		{0,0,0,"lost adventurer"},
 		{2,0,0,"dragon"}}}
@@ -16,21 +16,21 @@ Pattern{
 Species{
 	name = "mourning adventurer",
 	base = "aer",
-	dialog = "mourningadventurer_townchar",
-	marker = "mourningadventurer_townchar",
+	dialog = "mourning adventurer town",
+	marker = "mourning adventurer town",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
 	hair_style = {"hair2",200,180,20},
-	inventory_items = {"axe", "dress"},
+	inventory_items = {"iron hatchet", "dress"},
 	factions = {"neutral"}}
 
 Species{
 	name = "lost adventurer",
 	base = "aer",
-	dialog = "mourningadventurer_lostchar",
-	marker = "mourningadventurer_lostchar",
+	dialog = "mourning adventurer lost",
+	marker = "mourning adventurer lost",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
 	hair_style = {"hair2",200,180,20},
-	inventory_items = {"axe", "dress"},
+	inventory_items = {"iron hatchet", "dress"},
 	factions = {"good"}}

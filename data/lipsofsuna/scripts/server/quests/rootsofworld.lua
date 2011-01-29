@@ -12,7 +12,7 @@ Related quests:
  * Chara's Illusion: Started when this quest is completed.
 --]]
 
-Dialog{name = "rootsofworld_chara", unique = true,
+Dialog{name = "chara", unique = true,
 main = function(self)
 	local quest = Quest:find{name = "Roots of World"}
 	if not quest then return end
@@ -114,8 +114,9 @@ main = function(self)
 					"very reason why the world is withering. Chara has opened a portal in " ..
 					"her root grove to show what awaits us."}
 				--TODO: Open the portal.
-				local q1 = Quest:find{name = "Chara's Portal"}
+				local q1 = Quest:find{name = "Chara's Illusion"}
 				if q1 and q1.status == "inactive" then
+					q1:marker("chara's portal")
 					q1:update{status = "active", progress = 0, text =
 						"Chara has opened a portal in her root grove for us. She has told us " ..
 						"to step in to learn about defeating Erinyes."}

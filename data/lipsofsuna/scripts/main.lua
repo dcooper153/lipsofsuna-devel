@@ -83,11 +83,13 @@ require "content/obstacles"
 require "content/patterns"
 require "content/regions"
 require "content/species"
+require "content/quests/charasillusion"
 require "content/quests/mourningadventurer"
 require "content/quests/peculiarpet"
+require "content/quests/portaloflips"
+require "content/quests/portalofmidguard"
 require "content/quests/rootsofworld"
 require "content/quests/sanctuary"
-require "content/quests/misc"
 
 if Settings.quit then Program.quit = true end
 if Settings.server then

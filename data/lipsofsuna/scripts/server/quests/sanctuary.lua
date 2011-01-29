@@ -12,6 +12,7 @@ main = function(self)
 	if not quest then return end
 	if quest.progress == 0 then
 		self:line("You have activated the Sanctuary.")
+		quest:marker("sanctuary")
 		quest:update{status = "completed", progress = 1, text = "The Sanctuary has been activated."}
 	else
 		self:line("The Sanctuary is already active.")

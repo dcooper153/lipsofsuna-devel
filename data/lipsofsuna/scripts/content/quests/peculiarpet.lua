@@ -3,28 +3,28 @@ Quest{
 	status = "inactive"}
 
 Pattern{
-	name = "peculiarpet",
+	name = "peculiar pet",
 	creatures = {
-		{0,0,0,"peculiarpet_worm"},
-		{1.3,0,0,"peculiarpet_npc"}}}
+		{0,0,0,"peculiar pet worm"},
+		{1.3,0,0,"peculiar pet npc"}}}
 
 Species{
-	name = "peculiarpet_npc",
+	name = "peculiar pet npc",
 	base = "aer",
-	dialog = "peculiarpet_npc",
-	marker = "peculiarpet_npc",
+	dialog = "peculiar pet npc",
+	marker = "peculiar pet npc",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
 	hair_style = {"hair1",0,255,0},
 	inventory_items = {"axe", "dress"},
-	factions = {"peculiarpet"}}
+	factions = {"peculiar pet"}}
 
 Species{
-	name = "peculiarpet_worm",
+	name = "peculiar pet worm",
 	base = "bloodworm",
 	categories = {},
-	dialog = "peculiarpet_worm",
-	marker = "peculiarpet_worm",
+	dialog = "peculiar pet worm",
+	marker = "peculiar pet worm",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
-	factions = {"peculiarpet"}}
+	factions = {"peculiar pet"}}

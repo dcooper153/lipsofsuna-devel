@@ -420,14 +420,23 @@ Generator.generate = function(clss, args)
 			Voxel:place_pattern{point = r.point + Vector(13,0,1), name = "house1"}
 			Voxel:place_pattern{point = r.point + Vector(14,0,1), name = "house1"}
 			Voxel:place_pattern{point = r.point + Vector(12,0,12), name = "spawnpoint1"}
-			Voxel:place_pattern{point = r.point + Vector(9,2,9), name = "mourningadventurer_town"}
-			Voxel:place_pattern{point = r.point + Vector(4,1,4), name = "peculiarpet"}
+			Voxel:place_pattern{point = r.point + Vector(9,2,9), name = "mourning adventurer town"}
+			Voxel:place_pattern{point = r.point + Vector(4,1,4), name = "peculiar pet"}
 			Voxel:place_creature{point = r.point + Vector(3,0,14), name = "lipscitizen"}
 			Voxel:place_creature{point = r.point + Vector(8,0,9), name = "lipscitizen"}
 		end,
 		["Chara's Root Grove"] = function(r)
-			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "rootsofworld"}
-			Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "mourningadventurer_lost"}
+			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "roots of world"}
+			Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "mourning adventurer lost"}
+		end,
+		["Chara's Illusion"] = function(r)
+			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "chara's illusion"}
+		end,
+		["Portal of Lips"] = function(r)
+			Voxel:place_pattern{point = r.point + Vector(0,0,0), name = "portal of lips"}
+		end,
+		["Portal of Midguard"] = function(r)
+			Voxel:place_pattern{point = r.point + Vector(0,0,0), name = "portal of midguard"}
 		end,
 		["Random: Dungeon"] = function(r)
 			Voxel:place_pattern{point = r.point, name = "dungeon1"}
@@ -436,7 +445,7 @@ Generator.generate = function(clss, args)
 			Voxel:place_pattern{point = r.point, name = "nature1"}
 		end,
 		["Sanctuary"] = function(r)
-			Voxel:place_pattern{point = r.point + Vector(3,0,3), name = "sanctuary1"}
+			Voxel:place_pattern{point = r.point + Vector(3,0,3), name = "sanctuary"}
 		end}
 	for _,reg in pairs(clss.regions_dict_id) do
 		Voxel:fill_region{point = reg.point, size = reg.size}
