@@ -66,7 +66,7 @@ Creature.setter = function(self, key, value)
 		self:equip_best_items()
 		-- Create map marker.
 		if spec.marker then
-			self.marker = Marker{name = spec.marker, target = self.id}
+			self.marker = Marker{name = spec.marker, position = self.position, target = self.id}
 		end
 	else
 		Object.setter(self, key, value)
@@ -306,7 +306,9 @@ end
 --- Finds the best feat to use in combat.
 -- @param self Object.
 -- @param args Arguments.<ul>
---   <li>category: Feat category.</li></ul>
+--   <li>category: Feat category.</li>
+--   <li>target: Object to be attacked.</li>
+--   <li>weapon: Weapon to be used.</li></ul>
 -- @return New feat.
 Creature.find_best_feat = function(self, args)
 	local best_feat = nil
@@ -319,12 +321,14 @@ Creature.find_best_feat = function(self, args)
 			if feat:usable{user = self} then
 				-- Calculate feat score.
 				-- TODO: Take more factors into account?
-				local info = feat:get_info()
-				local score = info.inflict_damage + 5 * math.random()
-				-- Maintain the best feat.
-				if score > best_score then
-					best_feat = feat
-					best_score = score
+				local score = feat:calculate_damage{attacker = self, target = args.target, weapon = args.weapon}
+				if score and score > 0 then
+					score = score + 5 * math.random()
+					-- Maintain the best feat.
+					if score > best_score then
+						best_feat = feat
+						best_score = score
+					end
 				end
 			end
 		end
@@ -346,6 +350,17 @@ Creature.get_attack_ray = function(self)
 		local src = ctr + Vector(0, 0, -self.spec.aim_ray_start)
 		local dst = ctr + Vector(0, 0, -self.spec.aim_ray_end)
 		return src, dst
+	end
+end
+
+--- Inflicts a modifier on the object.
+-- @param self Object.
+-- @param name Modifier name.
+-- @param strength Modifier strength.
+Creature.inflict_modifier = function(self, name, strength)
+	if not self.modifiers then self.modifiers = {} end
+	if not self.modifiers[name] or self.modifiers[name] < strength then
+		self.modifiers[name] = strength
 	end
 end
 
@@ -453,6 +468,19 @@ Creature.update = function(self, secs)
 	if self.anim_timer > 0.05 then
 		self:update_animations{secs = self.anim_timer}
 		self.anim_timer = 0
+	end
+	-- Update modifiers.
+	if self.modifiers then
+		local num = 0
+		local keep = {}
+		for k,v in pairs(self.modifiers) do
+			-- TODO: Do modifier specific things here.
+			if v > secs then
+				keep[k] = v - secs
+				num = num + 1
+			end
+		end
+		self.modifiers = num > 0 and keep or nil
 	end
 	-- Fix stuck creatures.
 	if not self:stuck_check() then return end
@@ -696,7 +724,8 @@ Creature.combat_updaters =
 		end
 		-- Attack when close enough.
 		if not self.cooldown and dist < hint + 1 then
-			local f = self:find_best_feat{category = "melee"}
+			local f = self:find_best_feat{category = "melee", target = self.target,
+				weapon = self:get_item{slot = "hand.R"}}
 			if f then f:perform{user = self} end
 		end
 	end,

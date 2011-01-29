@@ -22,20 +22,31 @@ Feat.apply = function(self, args)
 	for effect in pairs(effects) do
 		Effect:play{effect = effect, point = args.point}
 	end
-	-- Damage and impulse.
+	-- Impulse.
 	if anim.categories["melee"] or anim.categories["ranged"] or
 	   anim.categories["self"] or anim.categories["touch"] then
 		if args.target and args.attacker then
 			args.target:impulse{impulse = args.attacker.rotation * Vector(0, 0, -100)}
 		end
-		if args.target then
-			local damage = self:calculate_damage(args)
-			if damage > 0 then
-				local armor = args.target.armor_class or 0
-				local mult = math.max(0.2, 1 - armor)
-				damage = damage * mult
+	end
+	-- Influences.
+	if args.target then
+		local info = self:get_info()
+		info.influences.health = -self:calculate_damage(args)
+		for k,v in pairs(info.influences) do
+			if k == "health" then
+				-- Increase or decrease health.
+				local damage = self:calculate_damage(args)
+				if damage > 0 then
+					local armor = args.target.armor_class or 0
+					local mult = math.max(0.2, 1 - armor)
+					damage = damage * mult
+				end
+				args.target:damaged(damage)
+			elseif k == "sanctuary" then
+				-- Increase sanctuary duration.
+				args.target:inflict_modifier("sanctuary", v)
 			end
-			args.target:damaged(damage)
 		end
 	end
 	-- Digging.
@@ -81,7 +92,7 @@ Feat.calculate_damage = function(self, args)
 	local spec1 = args.weapon and args.weapon.spec
 	local spec2 = args.projectile and args.projectile.spec
 	local info = self:get_info()
-	local damage = info.inflict_damage
+	local damage = -(info.influences.health or 0)
 	if spec1 or spec2 then
 		damage = damage + (spec1 and spec1.damage or 0) + (spec2 and spec2.damage or 0)
 	else

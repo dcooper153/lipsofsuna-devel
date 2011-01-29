@@ -215,6 +215,13 @@ Object.get_count = function(self)
 	return self.count or 1
 end
 
+--- Inflicts a modifier on the object.
+-- @param self Object.
+-- @param name Modifier name.
+-- @param strength Modifier strength.
+Object.inflict_modifier = function(self, name, strength)
+end
+
 --- Creates a new object from a data string.
 -- @param clss Object class.
 -- @param data Data string.

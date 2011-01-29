@@ -5,7 +5,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "growl1",
 	effect_impact = "impact1",
-	inflict_damage = 10,
+	influences = {{"health", -10}},
 	slot = "mouth"}
 
 Featanimspec{
@@ -24,7 +24,7 @@ Featanimspec{
 	categories = {"melee"},
 	cooldown = 4,
 	effect_impact = "impact1",
-	inflict_damage = 50,
+	influences = {{"health", -50}},
 	slot = "mouth"}
 
 Featanimspec{
@@ -35,7 +35,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
-	inflict_damage = 30,
+	influences = {{"health", -30}},
 	slot = "hand.L"}
 
 Featanimspec{
@@ -46,7 +46,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
-	inflict_damage = 30,
+	influences = {{"health", -30}},
 	slot = "hand.R"}
 
 Featanimspec{
@@ -107,9 +107,8 @@ Featanimspec{
 Feateffectspec{
 	name = "fire damage",
 	categories = {"fire", "melee", "spell"},
-	damage_base = 5,
-	damage_mult = 0.95,
 	effect = "explosion1",
+	influences = {{"health", -5, -0.95}},
 	projectile = "fireball1",
 	skill_mult = {intelligence = 1, willpower = 1},
 	reagent_base = {mushroom = 1},
@@ -118,18 +117,25 @@ Feateffectspec{
 Feateffectspec{
 	name = "physical damage",
 	categories = {"melee", "physical"},
-	damage_base = 5,
-	damage_mult = 0.95,
 	effect = "impact1",
+	influences = {{"health", -5, -0.95}},
 	skill_mult = {strength = 1, dexterity = 0.5}}
 
 Feateffectspec{
 	name = "restore health",
 	categories = {"heal", "spell"},
-	damage_base = -5,
-	damage_mult = -1.06,
 	effect = "heal1",
+	influences = {{"health", 5, 1.06}},
 	skill_base = {intelligence = 10, willpower = 5},
 	skill_mult = {intelligence = 1, willpower = 0.1},
 	reagent_base = {mushroom = 1},
 	reagent_mult = {mushroom = 0.09}}
+
+Feateffectspec{
+	name = "sanctuary",
+	categories = {"spell"},
+	effect = "heal1",
+	influences = {{"sanctuary", 30, 2}},
+--	skill_base = {intelligence = 25, willpower = 25},
+--	reagent_base = {mushroom = 3}}
+	skill_base = {intelligence = 1, willpower = 1}}

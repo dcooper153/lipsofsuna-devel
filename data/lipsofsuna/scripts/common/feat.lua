@@ -15,6 +15,7 @@ Featanimspec.dict_name = {}
 --   <li>effect_animation: Animation name.</li>
 --   <li>effect_sound: Sound effect name.</li>
 --   <li>icon: Icon name.</li>
+--   <li>influences: List of {type, base} influences.</li>
 --   <li>required_ammo: Table of required ammo.</li>
 --   <li>toggle: True to trigger the handler on the key release event as well.</li></ul>
 -- @return New feat animation.
@@ -23,6 +24,7 @@ Featanimspec.new = function(clss, args)
 	self.cooldown = self.cooldown or 0
 	self.action_frames = self.action_frames or {2, 10}
 	self.icon = self.icon or "skill-todo"
+	self.influences = self.influences or {}
 	self.required_ammo = self.required_ammo or {}
 	self.toggle = self.toggle or false
 	return self
@@ -45,8 +47,7 @@ Feateffectspec.dict_name = {}
 --   <li>cooldown_base: Base cooldown time.</li>
 --   <li>cooldown_mult: Cooldown time multiplier.</li>
 --   <li>effect: Effect name.</li>
---   <li>damage_base: Base effect strength.</li>
---   <li>damage_mult: Effect strength multiplier.</li>
+--   <li>influences: List of {type, base, mult} influences.</li>
 --   <li>locked: True for not unlocked yet.</li>
 --   <li>name: Skill effect name.</li>
 --   <li>radius: Area of effect radius.</li>
@@ -60,6 +61,7 @@ Feateffectspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.cooldown_base = self.cooldown_base or 1
 	self.cooldown_mult = self.cooldown_mult or 0
+	self.influences = self.influences or {}
 	self.radius = self.radius or 0
 	self.range = self.range or 0
 	self.reagent_base = self.reagent_base or {}
@@ -90,10 +92,20 @@ Feat.get_info = function(self)
 	local damage = 0
 	local reagents = {}
 	local skills = {}
+	local influences = {}
 	local anim = Featanimspec:find{name = self.animation}
 	local cooldown = anim and anim.cooldown
 	if anim then
-		damage = anim.inflict_damage or 0
+		-- Influence contribution.
+		for _,influ in pairs(anim.influences) do
+			local n = influ[1]
+			local v = influ[2]
+			influences[n] = (influences[n] or 0) + v
+			if influences[n] == 0 then
+				influences[n] = nil
+			end
+		end
+		-- Effect contributions.
 		for index,data in pairs(self.effects) do
 			local effect = Feateffectspec:find{name = data[1]}
 			if effect then
@@ -119,8 +131,15 @@ Feat.get_info = function(self)
 				end
 				-- Cooldown contribution.
 				cooldown = cooldown + effect.cooldown_base + effect.cooldown_mult * data[2]
-				-- Damage contribution.
-				damage = damage + effect.damage_base + effect.damage_mult * data[2]
+				-- Influence contribution.
+				for _,influ in pairs(effect.influences) do
+					local n = influ[1]
+					local v = influ[2] + influ[3] * data[2]
+					influences[n] = (influences[n] or 0) + v
+					if influences[n] == 0 then
+						influences[n] = nil
+					end
+				end
 			end
 		end
 		for k,v in pairs(skills) do
@@ -133,7 +152,7 @@ Feat.get_info = function(self)
 	return {
 		animation = anim,
 		cooldown = cooldown,
-		inflict_damage = damage,
+		influences = influences,
 		required_ammo = anim and anim.required_ammo,
 		required_reagents = reagents,
 		required_skills = skills,
