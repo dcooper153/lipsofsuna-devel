@@ -229,9 +229,7 @@ Creature.die = function(self)
 	-- Sanctuary save.
 	if self.modifiers and self.modifiers.sanctuary then
 		self.modifiers.sanctuary = nil
-		local marker = Marker:find{name = "sanctuary"}
-		if not marker or not marker.position then return end
-		self.position = marker.position + Vector(0, 2, 0)
+		self:teleport{marker = "sanctuary"}
 		return
 	end
 	-- Death dialog.

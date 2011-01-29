@@ -380,6 +380,28 @@ Object.subtract_items = function(self, args)
 	return true
 end
 
+--- Teleports the object.
+-- @param self Object.
+-- @param args Arguments.<ul>
+--   <li>marker: Map marker name.</li>
+--   <li>position: World position.</li></ul>
+-- @return True on success.
+Object.teleport = function(self, args)
+	if args.marker then
+		-- Teleport to a map marker.
+		local marker = Marker:find{name = args.marker}
+		if marker and marker.position then
+			self.position = marker.position + Vector(0, 2, 0)
+			return true
+		end
+	end
+	if args.position then
+		-- Teleport to a world position.
+		self.position = args.position
+		return true
+	end
+end
+
 --- Called when the object is used.
 -- @param self Object.
 -- @param user User.

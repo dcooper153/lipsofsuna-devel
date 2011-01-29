@@ -1,12 +1,3 @@
-Protocol:add_handler{type = "CHAT", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	local ok,msg = args.packet:read("string")
-	if ok then
-		player:say(msg)
-	end
-end}
-
 Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	-- Make sure not created already.
 	local player = Player:find{client = args.client}

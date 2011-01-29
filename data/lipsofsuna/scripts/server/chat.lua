@@ -1,0 +1,51 @@
+ChatCommand = Class()
+ChatCommand.dict_id = {}
+
+--- Registers a new chat command.
+-- @param clss Chat command class.
+-- @param args Arguments.<ul>
+--   <li>func: Handler function.</li>
+--   <li>pattern: Pattern to match.</li></ul>
+-- @return New chat command.
+ChatCommand.new = function(clss, args)
+	local self = Class.new(clss, args)
+	self.id = #clss.dict_id + 1
+	clss.dict_id[self.id] = self
+	return self
+end
+
+-- Suicide.
+ChatCommand{pattern = "^/suicide$", func = function(player, matches)
+	player:die()
+end}
+
+-- Teleportation.
+ChatCommand{pattern = "^/teleport ([a-zA-Z0-9_]+)$", func = function(player, matches)
+	if player:teleport{marker = matches[1]} then
+		player:send{packet = Packet(packets.MESSAGE, "string", "/teleport: Teleported to " .. matches[1] .. ".")}
+	else
+		player:send{packet = Packet(packets.MESSAGE, "string", "/teleport: Map marker " .. matches[1] .. " doesn't exist.")}
+	end
+end}
+
+-- Any other command.
+ChatCommand{pattern = "^(/[^ ]*).*", func = function(player, matches)
+	player:send{packet = Packet(packets.MESSAGE, "string", "Unrecognized command.")}
+end}
+
+-- Normal chat.
+ChatCommand{pattern = ".*", func = function(player, matches)
+	player:say(matches[1])
+end}
+
+Protocol:add_handler{type = "CHAT", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	local ok,msg = args.packet:read("string")
+	if ok then
+		for k,v in ipairs(ChatCommand.dict_id) do
+			local matches = string.match(msg, v.pattern)
+			if matches then return v.func(player, {matches}) end
+		end
+	end
+end}
