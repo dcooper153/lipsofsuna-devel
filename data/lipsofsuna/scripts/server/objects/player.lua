@@ -77,6 +77,23 @@ Player.detach = function(self, keep)
 	end
 end
 
+--- Inflicts a modifier on the object.
+-- @param self Object.
+-- @param name Modifier name.
+-- @param strength Modifier strength.
+Player.inflict_modifier = function(self, name, strength)
+	self:send{packet = Packet(packets.MODIFIER_ADD, "string", name, "float", strength)}
+	return Creature.inflict_modifier(self, name, strength)
+end
+
+--- Called when a modifier is removed.
+-- @param self Object.
+-- @param name Modifier name.
+Player.removed_modifier = function(self, name)
+	self:send{packet = Packet(packets.MODIFIER_REMOVE, "string", name)}
+	return Creature.removed_modifier(self, name)
+end
+
 Player.respawn = function(self)
 	self:detach()
 end

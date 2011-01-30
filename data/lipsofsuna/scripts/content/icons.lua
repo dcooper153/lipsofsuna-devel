@@ -77,3 +77,23 @@ Iconspec{
 	image = "skills1",
 	offset = {96,0},
 	size = {32,32}}
+
+------------------------------------------------------------------------------
+
+Iconspec{
+	name = "modifier-heal",
+	image = "icons1",
+	offset = {34,222},
+	size = {34,34}}
+
+Iconspec{
+	name = "modifier-sanctuary",
+	image = "icons1",
+	offset = {0,222},
+	size = {34,34}}
+
+Iconspec{
+	name = "modifier-plague",
+	image = "icons1",
+	offset = {68,222},
+	size = {34,34}}

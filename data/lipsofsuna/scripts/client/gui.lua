@@ -45,16 +45,19 @@ Gui.init = function(clss)
 	local skillgrp = Widget{cols = 1, spacings = {0,1}}
 	skillgrp:append_row(Gui.skill_health)
 	skillgrp:append_row(Gui.skill_mana)
-	-- Chat group.
+	-- Skills group.
+	Gui.fps_label = Widgets.Label{valign = 1}
 	Gui.skills_group = Widget{rows = 1}
 	Gui.skills_group:append_col(skillgrp)
 	Gui.skills_group:append_col(Quickslots.group)
+	Gui.skills_group:append_col(Gui.fps_label)
 	Gui.skills_group:set_expand{col = 2}
+	-- Modifiers.
+	Gui.modifiers = Widgets.Modifiers()
 	-- Packing.
-	Gui.fps_label = Widgets.Label{valign = 0}
 	Gui.top_group = Widget{rows = 1}
 	Gui.top_group:append_col(Gui.chat_group)
-	Gui.top_group:append_col(Gui.fps_label)
+	Gui.top_group:append_col(Gui.modifiers)
 	Gui.top_group:set_expand{col = 1}
 	Gui.center_group = Widget{cols = 1}
 	Gui.center_group:append_row(Gui.top_group)

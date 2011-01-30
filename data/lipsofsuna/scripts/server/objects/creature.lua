@@ -228,7 +228,7 @@ Creature.die = function(self)
 	if self.dead then return end
 	-- Sanctuary save.
 	if self.modifiers and self.modifiers.sanctuary then
-		self.modifiers.sanctuary = nil
+		self:remove_modifier("sanctuary")
 		self:teleport{marker = "sanctuary"}
 		return
 	end
@@ -383,6 +383,22 @@ Creature.jump = function(self)
 	Object.jump(self, {impulse = Vector(v.x, 400, v.z)})
 end
 
+--- Removes a modifier.
+-- @param self Object.
+-- @param name Modifier name.
+Creature.remove_modifier = function(self, name)
+	if self.modifiers[name] then
+		self.modifiers[name] = nil
+		self:removed_modifier(name)
+	end
+end
+
+--- Called when a modifier is removed.
+-- @param self Object.
+-- @param name Modifier name.
+Creature.removed_modifier = function(self, name)
+end
+
 --- Updates the enemy list of the creature.
 -- @param self Object.
 Creature.scan_enemies = function(self)
@@ -486,6 +502,8 @@ Creature.update = function(self, secs)
 			if v > secs then
 				keep[k] = v - secs
 				num = num + 1
+			else
+				self:removed_modifier(k)
 			end
 		end
 		self.modifiers = num > 0 and keep or nil

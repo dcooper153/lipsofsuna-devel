@@ -72,6 +72,8 @@ do
 	add("INVENTORY_ITEM_REMOVED")
 	add("JUMP")
 	add("MESSAGE")
+	add("MODIFIER_ADD")
+	add("MODIFIER_REMOVE")
 	add("MOVE_ITEM")
 	add("OBJECT_ANIMATED")
 	add("OBJECT_EFFECT")
