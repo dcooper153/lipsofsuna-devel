@@ -1255,6 +1255,22 @@
   </asset>
 
   <asset>
+    <file>import/portal1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>wip</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/portal1.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>wip</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
     <file>import/porticullis-000.blend</file>
     <author>tidbit (Joseph)</author>
     <license>Creative Commons BY 3.0</license>
