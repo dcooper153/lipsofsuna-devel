@@ -262,3 +262,29 @@ Species{
 	speed_walk = 1,
 	skills = {
 		{name = "health", max = 100, val = 100}}}
+
+Species{
+	name = "plague rat",
+	ai_enable_strafe = false,
+	ai_enable_defend = false,
+	categories = {"enemy", "plague"},
+	factions = {"evil"},
+	feats = {"bite"},
+	inventory_size = 0,
+	model = "bloodworm1", -- FIXME
+	speed_walk = 1,
+	skills = {
+		{name = "health", max = 30, val = 30}}}
+
+Species{
+	name = "plague slime",
+	ai_enable_strafe = false,
+	ai_enable_defend = false,
+	categories = {"enemy", "plague"},
+	factions = {"evil"},
+	feats = {"bite"},
+	inventory_size = 0,
+	model = "bloodworm1", -- FIXME
+	speed_walk = 1,
+	skills = {
+		{name = "health", max = 30, val = 30}}}

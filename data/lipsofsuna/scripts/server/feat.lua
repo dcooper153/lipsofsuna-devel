@@ -30,12 +30,12 @@ Feat.apply = function(self, args)
 		end
 	end
 	-- Influences.
-	if args.target then
-		local info = self:get_info()
-		info.influences.health = -self:calculate_damage(args)
-		for k,v in pairs(info.influences) do
-			if k == "health" then
-				-- Increase or decrease health.
+	local info = self:get_info()
+	info.influences.health = -self:calculate_damage(args)
+	for k,v in pairs(info.influences) do
+		if k == "health" then
+			-- Increase or decrease health.
+			if args.target then
 				local damage = self:calculate_damage(args)
 				if damage > 0 then
 					local armor = args.target.armor_class or 0
@@ -43,8 +43,23 @@ Feat.apply = function(self, args)
 					damage = damage * mult
 				end
 				args.target:damaged(damage)
-			elseif k == "sanctuary" then
-				-- Increase sanctuary duration.
+			end
+		elseif k == "plague" then
+			-- Summon plagued beasts.
+			for i = 1,math.random(1, math.ceil(v + 0.01)) do
+				local s = Species:random{category = "plague"}
+				if s then
+					local p = args.point + Vector(
+						-1 + 2 * math.random(),
+						-1 + 2 * math.random(),
+						-1 + 2 * math.random())
+					local o = Creature{spec = s, position = p, realized = true}
+					o:inflict_modifier("plague", 10000)
+				end
+			end
+		elseif k == "sanctuary" then
+			-- Increase sanctuary duration.
+			if args.target then
 				args.target:inflict_modifier("sanctuary", v)
 			end
 		end

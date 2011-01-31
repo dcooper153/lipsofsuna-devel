@@ -1,20 +1,13 @@
 --- Bleeding modifier.
--- @param self Modifier.
-Modifier:register{name = "bleeding", func = function(self)
-
-	-- Only affect mobiles.
-	if not self.object.skills then
-		return
+Modifier{name = "bleeding", func = function(self, object, timer, secs)
+	-- Initialize the bleeding timer.
+	if not object.bleeding_timer or object.bleeding_timer > timer then
+		object.bleeding_timer = 0
 	end
-
-	-- Bleed for 10 seconds.
-	self.object:say("[Bleeding started]")
-	while self.timer < 10.0 do
-		local t = coroutine.yield()
-		self.timer = self.timer + t
-		self.object:damaged(3 * t)
-		--TODO: Effect
+	-- Damage every five second.
+	if object.plague_timer and timer - object.plague_timer > 1 then
+		object:damaged(5)
+		object.plague_timer = timer
 	end
-	self.object:say("[Bleeding stopped]")
-
+	return timer - secs
 end}

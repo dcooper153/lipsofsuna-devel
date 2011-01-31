@@ -41,7 +41,7 @@ Widgets.Modifier.reshaped = function(self)
 		source_image = icon.image,
 		source_position = icon.offset,
 		source_tiling = {0,icon.size[1],0,0,icon.size[1],0}}
-	if self.time_coarse then
+	if self.time_coarse < 10000 then
 		self:canvas_text{
 			dest_position = {2,2},
 			dest_size = {w,h},

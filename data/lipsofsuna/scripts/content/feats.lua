@@ -105,6 +105,17 @@ Featanimspec{
 ---------------------------------------------------------------------
 
 Feateffectspec{
+	name = "black haze",
+	categories = {"plague", "spell"},
+	effect = "spell1",
+	influences = {{"plague", 1, 0.04}},
+	projectile = "fireball1",
+	skill_base = {willpower = 25},
+	skill_mult = {willpower = 0.2},
+	reagent_base = {mushroom = 0.5},
+	reagent_mult = {mushroom = 0.02}}
+
+Feateffectspec{
 	name = "fire damage",
 	categories = {"fire", "melee", "spell"},
 	effect = "explosion1",

@@ -367,6 +367,7 @@ end
 -- @param strength Modifier strength.
 Creature.inflict_modifier = function(self, name, strength)
 	if not self.modifiers then self.modifiers = {} end
+	if not strength then print(debug.traceback()) end
 	if not self.modifiers[name] or self.modifiers[name] < strength then
 		self.modifiers[name] = strength
 	end
@@ -495,18 +496,7 @@ Creature.update = function(self, secs)
 	end
 	-- Update modifiers.
 	if self.modifiers then
-		local num = 0
-		local keep = {}
-		for k,v in pairs(self.modifiers) do
-			-- TODO: Do modifier specific things here.
-			if v > secs then
-				keep[k] = v - secs
-				num = num + 1
-			else
-				self:removed_modifier(k)
-			end
-		end
-		self.modifiers = num > 0 and keep or nil
+		Modifier:update(self, secs)
 	end
 	-- Fix stuck creatures.
 	if not self:stuck_check() then return end

@@ -49,7 +49,9 @@ end
 -- @param secs Seconds since the last update.
 Widgets.Modifiers.update = function(self, secs)
 	for k,v in pairs(self.dict_id) do
-		v.time = math.max(0, v.time - secs)
+		if v.time < 10000 then
+			v.time = math.max(0, v.time - secs)
+		end
 	end
 end
 

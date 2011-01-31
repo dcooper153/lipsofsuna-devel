@@ -1,36 +1,50 @@
-Modifier = Class()
-Modifier.types = {}
-
---- Creates a new modifier.
--- @param clss Modifier class.
--- @param args Arguments.<ul>
---   <li>args: Modifier specific arguments.</li>
---   <li>name: Modifier name. (required)</li>
---   <li>object: Object to modify. (required)</li></ul>
--- @return Modifier or nil.
-Modifier.new = function(clss, object, name, args)
-	if not args.object.modifiers then
-		args.object.modifiers = {}
-	end
-	if args.object.modifiers[args.name] then
-		return object.modifiers[args.name]
-	elseif clss.types[args.name] then
-		local self = Class.new(clss, {timer = 0, object = args.object})
-		args.object.modifiers[args.name] = self
-		self.routine = Thread(function()
-			clss.types[args.name](self, args.args)
-			object.modifiers[args.name] = nil
-		end)
-		return self
-	end
-	return nil
-end
+Modifier = Class(Spec)
+Modifier.type = "modifier"
+Modifier.dict_id = {}
+Modifier.dict_name = {}
 
 --- Registers a new modifier type.
 -- @param clss Modifier class.
 -- @param args Arguments.<ul>
---   <li>func: Handler function. (required)</li>
---   <li>name: Modifier name. (required)</li></ul>
-Modifier.register = function(clss, args)
-	clss.types[args.name] = args.func
+--   <li>name: Modifier name.</li>
+--   <li>func: Update function.</li></ul>
+-- @return Modifier.
+Modifier.new = function(clss, args)
+	local self = Spec.new(clss, args)
+	return self
+end
+
+--- Updates the modifiers of the object.
+-- @param clss Modifier class.
+-- @param object Object whose modifiers to update.
+-- @param secs Seconds since the last update.
+Modifier.update = function(clss, object, secs)
+	local num = 0
+	local keep = {}
+	-- Update each modifier.
+	for k,v in pairs(object.modifiers) do
+		-- Update the modifier.
+		local m = Modifier:find{name = k}
+		if m and m.func then
+			v = m:func(object, v, secs)
+		else
+			v = 0
+		end
+		-- Handle removal.
+		if v > 0 then
+			keep[k] = v
+			num = num + 1
+		else
+			object:removed_modifier(k)
+		end
+	end
+	-- Update the modifier list.
+	if object.dead then
+		for k,v in pairs(keep) do
+			object:remove_modifier(k)
+		end
+		object.modifiers = nil
+	else
+		object.modifiers = num > 0 and keep or nil
+	end
 end
