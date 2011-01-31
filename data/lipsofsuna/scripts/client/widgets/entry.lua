@@ -16,7 +16,9 @@ Widgets.Entry.event = function(self, args)
 	if args.type == "keypress" then
 		if args.code == 8 then
 			-- Backspace.
-			self.text = string.sub(self.text, 1, math.max(0, #self.text - 1))
+			if self.text and #self.text then
+				self.text = string.sub(self.text, 1, math.max(0, #self.text - 1))
+			end
 		elseif args.code == 13 then
 			-- Enter.
 			if self.pressed then
@@ -24,7 +26,7 @@ Widgets.Entry.event = function(self, args)
 			end
 		elseif args.text then
 			-- Typing.
-			self.text = self.text .. args.text
+			self.text = (self.text or "") .. args.text
 		end
 	end
 end
