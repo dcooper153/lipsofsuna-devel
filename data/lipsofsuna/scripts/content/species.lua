@@ -182,6 +182,12 @@ Species{
 	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
 
 Species{
+	name = "android-player",
+	base = "android",
+	ai_enabled = false,
+	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+
+Species{
 	name = "devora-player",
 	base = "devora",
 	ai_enabled = false,
