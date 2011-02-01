@@ -588,7 +588,7 @@ static int private_init (
 		return 0;
 
 	/* Create engine. */
-	self->engine = lieng_engine_new (self->callbacks, self->sectors, self->paths->module_data);
+	self->engine = lieng_engine_new (self->callbacks, self->sectors, self->paths);
 	if (self->engine == NULL)
 		return 0;
 	lieng_engine_set_userdata (self->engine, self);

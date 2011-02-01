@@ -127,10 +127,11 @@ liren_image_load (LIRenImage* self)
 
 /*****************************************************************************/
 
-static int
-private_init (LIRenImage* self,
-              const char* name)
+static int private_init (
+	LIRenImage* self,
+	const char* name)
 {
+	char* file;
 	LIAlgStrdicNode* node;
 
 	/* Allocate name. */
@@ -139,9 +140,11 @@ private_init (LIRenImage* self,
 		return 0;
 
 	/* Allocate path. */
-	self->path = lisys_path_format (self->render->datadir,
-		LISYS_PATH_SEPARATOR, "graphics",
-		LISYS_PATH_SEPARATOR, name, ".dds", NULL);
+	file = listr_concat (name, ".dds");
+	if (file == NULL)
+		return 0;
+	self->path = lipth_paths_get_graphics (self->render->paths, file);
+	free (file);
 	if (self->path == NULL)
 		return 0;
 

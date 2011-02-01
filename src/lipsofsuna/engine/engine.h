@@ -23,6 +23,7 @@
 #include <lipsofsuna/callback.h>
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/model.h>
+#include <lipsofsuna/paths.h>
 #include <lipsofsuna/physics.h>
 #include <lipsofsuna/system.h>
 #include "engine-model.h"
@@ -41,18 +42,18 @@ struct _LIEngEngine
 	LIAlgU32dic* objects;
 	LICalCallbacks* callbacks;
 	LICalHandle calls[1];
+	LIPthPaths* paths;
 	struct
 	{
 		int flags;
 		int radius;
-		char* dir;
 	} config;
 };
 
 LIAPICALL (LIEngEngine*, lieng_engine_new, (
 	LICalCallbacks* calls,
 	LIAlgSectors*   sectors,
-	const char*     path));
+	LIPthPaths*     paths));
 
 LIAPICALL (void, lieng_engine_free, (
 	LIEngEngine* self));

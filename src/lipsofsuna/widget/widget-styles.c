@@ -29,7 +29,7 @@
 
 LIWdgStyles* liwdg_styles_new (
 	LIWdgManager* manager,
-	const char*   root)
+	LIPthPaths*   paths)
 {
 	LIWdgStyles* self;
 
@@ -38,12 +38,7 @@ LIWdgStyles* liwdg_styles_new (
 	if (self == NULL)
 		return NULL;
 	self->manager = manager;
-	self->root = listr_dup (root);
-	if (root == NULL)
-	{
-		liwdg_styles_free (self);
-		return NULL;
-	}
+	self->paths = paths;
 
 	/* Allocate resource lists. */
 	self->fonts = lialg_strdic_new ();
@@ -74,7 +69,6 @@ void liwdg_styles_free (
 			liimg_texture_free (iter.value);
 		lialg_strdic_free (self->images);
 	}
-	lisys_free (self->root);
 	lisys_free (self);
 }
 
@@ -85,6 +79,7 @@ LIFntFont* liwdg_styles_load_font (
 	int          size)
 {
 	char* path;
+	char* file_;
 	LIFntFont* font;
 
 	/* Check for existing. */
@@ -93,8 +88,11 @@ LIFntFont* liwdg_styles_load_font (
 		return font;
 
 	/* Load font. */
-	path = lisys_path_format (self->root, LISYS_PATH_SEPARATOR,
-		"fonts", LISYS_PATH_SEPARATOR, file, ".ttf", NULL);
+	file_ = listr_concat (file, ".ttf");
+	if (file == NULL)
+		return NULL;
+	path = lipth_paths_get_font (self->paths, file_);
+	free (file_);
 	if (path == NULL)
 		return NULL;
 	font = lifnt_font_new (path, size);
@@ -116,6 +114,7 @@ LIImgTexture* liwdg_styles_load_image (
 	LIWdgStyles* self,
 	const char*  name)
 {
+	char* file;
 	char* path;
 	LIImgTexture* texture;
 
@@ -125,8 +124,11 @@ LIImgTexture* liwdg_styles_load_image (
 		return texture;
 
 	/* Format path. */
-	path = lisys_path_format (self->root, LISYS_PATH_SEPARATOR,
-		"graphics", LISYS_PATH_SEPARATOR, name, ".dds", NULL);
+	file = listr_concat (name, ".dds");
+	if (file == NULL)
+		return NULL;
+	path = lipth_paths_get_graphics (self->paths, file);
+	free (file);
 	if (path == NULL)
 		return NULL;
 

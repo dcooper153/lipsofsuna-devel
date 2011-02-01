@@ -20,6 +20,7 @@
 
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/image.h>
+#include <lipsofsuna/paths.h>
 #include <lipsofsuna/system.h>
 #include "render-buffer.h"
 #include "render-context.h"
@@ -35,12 +36,12 @@
 
 struct _LIRenRender
 {
-	char* datadir;
 	LIAlgPtrdic* scenes;
 	LIAlgRandom random;
 	LIAlgStrdic* shaders;
 	LIAlgStrdic* images;
 	LIAlgU32dic* models;
+	LIPthPaths* paths;
 	LIRenContext* context;
 	struct
 	{
@@ -67,7 +68,7 @@ struct _LIRenRender
 };
 
 LIAPICALL (LIRenRender*, liren_render_new, (
-	const char* dir));
+	LIPthPaths* paths));
 
 LIAPICALL (void, liren_render_free, (
 	LIRenRender* self));

@@ -28,44 +28,40 @@ struct _LIPthPaths
 	char* module_data;
 	char* module_name;
 	char* module_state;
+	char* override_data;
 };
 
-LIPthPaths*
-lipth_paths_new (const char* path,
-                 const char* name);
+LIAPICALL (LIPthPaths*, lipth_paths_new, (
+	const char* path,
+	const char* name));
 
-void
-lipth_paths_free (LIPthPaths* self);
+LIAPICALL (void, lipth_paths_free, (
+	LIPthPaths* self));
 
-char*
-lipth_paths_get_data (const LIPthPaths* self,
-                      const char*       name);
+LIAPICALL (char*, lipth_paths_get_data, (
+	const LIPthPaths* self,
+	const char*       name));
 
-char*
-lipth_paths_get_font (const LIPthPaths* self,
-                      const char*       name);
+LIAPICALL (char*, lipth_paths_get_font, (
+	const LIPthPaths* self,
+	const char*       name));
 
-char*
-lipth_paths_get_graphics (const LIPthPaths* self,
-                          const char*       name);
+LIAPICALL (char*, lipth_paths_get_graphics, (
+	const LIPthPaths* self,
+	const char*       name));
 
-char*
-lipth_paths_get_script (const LIPthPaths* self,
-                        const char*       name);
+LIAPICALL (char*, lipth_paths_get_script, (
+	const LIPthPaths* self,
+	const char*       name));
 
-char*
-lipth_paths_get_shader (const LIPthPaths* self,
-                        const char*       name);
+LIAPICALL (char*, lipth_paths_get_sound, (
+	const LIPthPaths* self,
+	const char*       name));
 
-char*
-lipth_paths_get_sound (const LIPthPaths* self,
-                       const char*       name);
+LIAPICALL (char*, lipth_paths_get_sql, (
+	const LIPthPaths* self,
+	const char*       name));
 
-char*
-lipth_paths_get_sql (const LIPthPaths* self,
-                     const char*       name);
-
-char*
-lipth_paths_get_root ();
+LIAPICALL (char*, lipth_paths_get_root, ());
 
 #endif

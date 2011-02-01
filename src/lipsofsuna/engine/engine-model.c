@@ -137,13 +137,16 @@ int lieng_model_load (
 	LIEngModel* self,
 	const char* name)
 {
+	char* file;
 	char* path;
 	LIMdlModel* tmpmdl;
 
 	/* Allocate path. */
-	path = lisys_path_format (self->engine->config.dir,
-		LISYS_PATH_SEPARATOR, "graphics",
-		LISYS_PATH_SEPARATOR, name, ".lmdl", NULL);
+	file = listr_concat (name, ".lmdl");
+	if (name == NULL)
+		return 0;
+	path = lipth_paths_get_graphics (self->engine->paths, file);
+	free (file);
 	if (path == NULL)
 		return 0;
 

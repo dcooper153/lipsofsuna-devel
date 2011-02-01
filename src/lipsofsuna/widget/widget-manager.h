@@ -22,6 +22,7 @@
 #include <lipsofsuna/callback.h>
 #include <lipsofsuna/font.h>
 #include <lipsofsuna/image.h>
+#include <lipsofsuna/paths.h>
 #include <lipsofsuna/render.h>
 #include <lipsofsuna/system.h>
 #include "widget.h"
@@ -35,6 +36,7 @@ struct _LIWdgManager
 	LIWdgStyles* styles;
 	LICalCallbacks* callbacks;
 	LIMatMatrix projection;
+	LIPthPaths* paths;
 	LIRenContext* context;
 	LIRenRender* render;
 	LIRenShader* shader;
@@ -64,7 +66,7 @@ struct _LIWdgManager
 LIAPICALL (LIWdgManager*, liwdg_manager_new, (
 	LIRenRender*    render,
 	LICalCallbacks* callbacks,
-	const char*     path));
+	LIPthPaths*     paths));
 
 LIAPICALL (void, liwdg_manager_free, (
 	LIWdgManager* self));

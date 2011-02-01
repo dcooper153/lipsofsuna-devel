@@ -42,16 +42,15 @@ private_sector_load (void*        self,
 
 /**
  * \brief Creates a new game engine.
- *
  * \param calls Callback manager.
  * \param sectors Sector manager.
- * \param path Module directory.
+ * \param paths Paths used for loading data files.
  * \return New engine or NULL.
  */
-LIEngEngine*
-lieng_engine_new (LICalCallbacks* calls,
-                  LIAlgSectors*   sectors,
-                  const char*     path)
+LIEngEngine* lieng_engine_new (
+	LICalCallbacks* calls,
+	LIAlgSectors*   sectors,
+	LIPthPaths*     paths)
 {
 	LIEngEngine* self;
 
@@ -65,10 +64,8 @@ lieng_engine_new (LICalCallbacks* calls,
 	self->sectors->sector_free_callback.userdata = self;
 	self->sectors->sector_load_callback.callback = private_sector_load;
 	self->sectors->sector_load_callback.userdata = self;
+	self->paths = paths;
 	self->config.radius = 1;
-	self->config.dir = listr_dup (path);
-	if (self->config.dir == NULL)
-		goto error;
 	if (!private_init (self))
 		goto error;
 
@@ -119,7 +116,6 @@ lieng_engine_free (LIEngEngine* self)
 	if (self->models != NULL)
 		lialg_u32dic_free (self->models);
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
-	lisys_free (self->config.dir);
 	lisys_free (self);
 }
 

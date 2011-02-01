@@ -67,9 +67,9 @@ static void
 private_resize_window (LIWdgManager* self,
                        LIWdgWidget*  window);
 
-static int
-private_load_config (LIWdgManager* self,
-                     const char*   root);
+static int private_load_config (
+	LIWdgManager* self,
+	LIPthPaths*   paths);
 
 /*****************************************************************************/
 
@@ -77,13 +77,13 @@ private_load_config (LIWdgManager* self,
  * \brief Creates a new widget manager.
  * \param render Renderer.
  * \param callbacks Callback manager.
- * \param root Client data directory root.
+ * \param paths Paths used for loading data files.
  * \return New widget manager or NULL.
  */
 LIWdgManager* liwdg_manager_new (
 	LIRenRender*    render,
 	LICalCallbacks* callbacks,
-	const char*     root)
+	LIPthPaths*     paths)
 {
 	LIWdgManager* self;
 
@@ -99,7 +99,7 @@ LIWdgManager* liwdg_manager_new (
 	self->projection = limat_matrix_identity ();
 
 	/* Load config and resources. */
-	if (!private_load_config (self, root))
+	if (!private_load_config (self, paths))
 	{
 		liwdg_manager_free (self);
 		return NULL;
@@ -837,11 +837,11 @@ private_resize_window (LIWdgManager* self,
 	}
 }
 
-static int
-private_load_config (LIWdgManager* self,
-                     const char*   root)
+static int private_load_config (
+	LIWdgManager* self,
+	LIPthPaths*   paths)
 {
-	self->styles = liwdg_styles_new (self, root);
+	self->styles = liwdg_styles_new (self, paths);
 	if (self->styles == NULL)
 		return 0;
 

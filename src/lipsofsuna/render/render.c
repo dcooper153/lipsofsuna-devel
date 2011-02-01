@@ -26,14 +26,13 @@
 #include "render.h"
 #include "render-draw.h"
 
-static int
-private_init_resources (LIRenRender* self,
-                        const char*  dir);
+static int private_init_resources (
+	LIRenRender* self);
 
 /*****************************************************************************/
 
 LIRenRender* liren_render_new (
-	const char* dir)
+	LIPthPaths* paths)
 {
 	LIRenRender* self;
 
@@ -41,6 +40,7 @@ LIRenRender* liren_render_new (
 	self = lisys_calloc (1, sizeof (LIRenRender));
 	if (self == NULL)
 		return NULL;
+	self->paths = paths;
 	lialg_random_init (&self->random, lisys_time (NULL));
 
 	/* Allocate scene list. */
@@ -49,10 +49,7 @@ LIRenRender* liren_render_new (
 		goto error;
 
 	/* Load data. */
-	self->datadir = listr_dup (dir);
-	if (self->datadir == NULL)
-		goto error;
-	if (!private_init_resources (self, dir))
+	if (!private_init_resources (self))
 		goto error;
 
 	return self;
@@ -62,8 +59,8 @@ error:
 	return NULL;
 }
 
-void
-liren_render_free (LIRenRender* self)
+void liren_render_free (
+	LIRenRender* self)
 {
 	LIAlgStrdicIter iter1;
 	LIAlgU32dicIter iter2;
@@ -127,7 +124,6 @@ liren_render_free (LIRenRender* self)
 		liren_buffer_free (self->immediate.buffer);
 		lisys_free (self->immediate.buffer);
 	}
-	lisys_free (self->datadir);
 
 	if (self->context != NULL)
 	{
@@ -193,9 +189,9 @@ LIRenModel* liren_render_find_model (
  * \param name Texture name.
  * \return Nonzero on success.
  */
-int
-liren_render_load_image (LIRenRender* self,
-                         const char*  name)
+int liren_render_load_image (
+	LIRenRender* self,
+	const char*  name)
 {
 	LIAlgU32dicIter iter;
 	LIRenImage* image;
@@ -232,65 +228,27 @@ liren_render_load_image (LIRenRender* self,
 
 /**
  * \brief Updates the renderer state.
- *
  * \param self Renderer.
  * \param secs Number of seconds since the last update.
  */
-void
-liren_render_update (LIRenRender* self,
-                     float        secs)
+void liren_render_update (
+	LIRenRender* self,
+	float        secs)
 {
 	/* Update time. */
 	self->helpers.time += secs;
 }
 
-LIRenContext*
-liren_render_get_context (LIRenRender* self)
+LIRenContext* liren_render_get_context (
+	LIRenRender* self)
 {
 	return self->context;
 }
 
 /*****************************************************************************/
 
-#ifndef NDEBUG
-void
-liren_check_errors ()
-{
-	switch (glGetError ())
-	{
-		case GL_NO_ERROR:
-			return;
-		case GL_INVALID_ENUM:
-			fprintf (stderr, "ERROR: GL_INVALID_ENUM\n");
-			break;
-		case GL_INVALID_VALUE:
-			fprintf (stderr, "ERROR: GL_INVALID_VALUE\n");
-			break;
-		case GL_INVALID_OPERATION:
-			fprintf (stderr, "ERROR: GL_INVALID_OPERATION\n");
-			break;
-		case GL_STACK_OVERFLOW:
-			fprintf (stderr, "ERROR: GL_STACK_OVERFLOW\n");
-			break;
-		case GL_STACK_UNDERFLOW:
-			fprintf (stderr, "ERROR: GL_STACK_UNDERFLOW\n");
-			break;
-		case GL_OUT_OF_MEMORY:
-			fprintf (stderr, "ERROR: GL_OUT_OF_MEMORY\n");
-			break;
-		default:
-			fprintf (stderr, "ERROR: Unknown GL error\n");
-			break;
-	}
-	lisys_assert (0);
-}
-#endif
-
-/*****************************************************************************/
-
-static int
-private_init_resources (LIRenRender* self,
-                        const char*  dir)
+static int private_init_resources (
+	LIRenRender* self)
 {
 	int x;
 	int y;

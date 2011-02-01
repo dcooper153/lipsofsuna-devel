@@ -20,20 +20,21 @@
 
 #include <lipsofsuna/font.h>
 #include <lipsofsuna/image.h>
+#include <lipsofsuna/paths.h>
 #include <lipsofsuna/system.h>
 #include "widget-types.h"
 
 struct _LIWdgStyles
 {
-	char* root;
-	LIWdgManager* manager;
 	LIAlgStrdic* fonts;
 	LIAlgStrdic* images;
+	LIPthPaths* paths;
+	LIWdgManager* manager;
 };
 
 LIAPICALL (LIWdgStyles*, liwdg_styles_new, (
 	LIWdgManager* manager,
-	const char*   root));
+	LIPthPaths*   paths));
 
 LIAPICALL (void, liwdg_styles_free, (
 	LIWdgStyles* self));

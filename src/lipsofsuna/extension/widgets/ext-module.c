@@ -64,7 +64,7 @@ LIExtModule* liext_widgets_new (
 	}
 
 	/* Allocate the widget manager. */
-	self->widgets = liwdg_manager_new (self->client->render, self->program->callbacks, self->program->paths->module_data);
+	self->widgets = liwdg_manager_new (self->client->render, self->program->callbacks, self->program->paths);
 	if (self->widgets == NULL)
 	{
 		liext_widgets_free (self);

@@ -76,10 +76,18 @@ LIPthPaths* lipth_paths_new (
 	if (self->module_data == NULL)
 		goto error;
 
-	/* Get save directory. */
+	/* Get data override directory. */
 	tmp = lisys_system_get_path_data_home ();
 	if (tmp == NULL)
 		goto error;
+	self->override_data = lisys_path_concat (tmp, "lipsofsuna", "data", name, NULL);
+	if (self->override_data == NULL)
+	{
+		lisys_free (tmp);
+		goto error;
+	}
+
+	/* Get save directory. */
 	self->global_state = lisys_path_concat (tmp, "lipsofsuna", "save", NULL);
 	lisys_free (tmp);
 	if (self->global_state == NULL)
@@ -132,6 +140,7 @@ void lipth_paths_free (
 	lisys_free (self->module_data);
 	lisys_free (self->module_name);
 	lisys_free (self->module_state);
+	lisys_free (self->override_data);
 	lisys_free (self->root);
 	lisys_free (self);
 }
@@ -147,6 +156,17 @@ char* lipth_paths_get_data (
 	const LIPthPaths* self,
 	const char*       name)
 {
+	char* path;
+
+	/* Try the override path. */
+	path = lisys_path_concat (self->override_data, name, NULL);
+	if (path == NULL)
+		return NULL;
+	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
+		return path;
+	free (path);
+
+	/* Try the real path. */
 	return lisys_path_concat (self->module_data, name, NULL);
 }
 
@@ -161,6 +181,17 @@ char* lipth_paths_get_font (
 	const LIPthPaths* self,
 	const char*       name)
 {
+	char* path;
+
+	/* Try the override path. */
+	path = lisys_path_concat (self->override_data, "fonts", name, NULL);
+	if (path == NULL)
+		return NULL;
+	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
+		return path;
+	free (path);
+
+	/* Try the real path. */
 	return lisys_path_concat (self->module_data, "fonts", name, NULL);
 }
 
@@ -175,6 +206,17 @@ char* lipth_paths_get_graphics (
 	const LIPthPaths* self,
 	const char*       name)
 {
+	char* path;
+
+	/* Try the override path. */
+	path = lisys_path_concat (self->override_data, "graphics", name, NULL);
+	if (path == NULL)
+		return NULL;
+	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
+		return path;
+	free (path);
+
+	/* Try the real path. */
 	return lisys_path_concat (self->module_data, "graphics", name, NULL);
 }
 
@@ -189,21 +231,18 @@ char* lipth_paths_get_script (
 	const LIPthPaths* self,
 	const char*       name)
 {
-	return lisys_path_concat (self->module_data, "scripts", name, NULL);
-}
+	char* path;
 
-/**
- * \brief Gets the path to a shader file.
- *
- * \param self Paths object.
- * \param name File name.
- * \return Full path or NULL.
- */
-char* lipth_paths_get_shader (
-	const LIPthPaths* self,
-	const char*       name)
-{
-	return lisys_path_concat (self->module_data, "shaders", name, NULL);
+	/* Try the override path. */
+	path = lisys_path_concat (self->override_data, "scripts", name, NULL);
+	if (path == NULL)
+		return NULL;
+	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
+		return path;
+	free (path);
+
+	/* Try the real path. */
+	return lisys_path_concat (self->module_data, "scripts", name, NULL);
 }
 
 /**
@@ -217,6 +256,17 @@ char* lipth_paths_get_sound (
 	const LIPthPaths* self,
 	const char*       name)
 {
+	char* path;
+
+	/* Try the override path. */
+	path = lisys_path_concat (self->override_data, "sounds", name, NULL);
+	if (path == NULL)
+		return NULL;
+	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
+		return path;
+	free (path);
+
+	/* Try the real path. */
 	return lisys_path_concat (self->module_data, "sounds", name, NULL);
 }
 

@@ -205,7 +205,7 @@ static int private_init (
 	LIMaiProgram* program)
 {
 	/* Initialize renderer. */
-	self->render = liren_render_new (self->program->paths->module_data);
+	self->render = liren_render_new (self->program->paths);
 	if (self->render == NULL)
 		return 0;
 	self->scene = liren_scene_new (self->render);
