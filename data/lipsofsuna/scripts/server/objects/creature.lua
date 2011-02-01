@@ -322,7 +322,7 @@ Creature.find_best_feat = function(self, args)
 	local best_feat = nil
 	local best_score = -1
 	-- Loop through all known feat animations.
-	for anim_name in pairs(self.spec.feats) do
+	for anim_name in pairs(self.spec.feat_anims) do
 		local anim = Featanimspec:find{name = anim_name}
 		if anim and anim.categories[args.category] then
 			local feat = Feat{animation = anim_name}

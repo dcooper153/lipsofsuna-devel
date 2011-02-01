@@ -228,6 +228,9 @@ Protocol:add_handler{type = "OBJECT_SELF", func = function(event)
 		if o then
 			Player.species = o.race or "aer"
 			Camera.mode = "third-person"
+			Quickslots:reset()
+			Feats.inst:set_race(Player.species)
+			Feats.inst:show(1)
 		end
 		Player.object = o
 	end

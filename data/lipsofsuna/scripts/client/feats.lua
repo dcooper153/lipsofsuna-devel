@@ -8,24 +8,18 @@ Feats = Class()
 Feats.new = function(clss)
 	local self = Class.new(clss)
 	-- Animation selector.
-	local anims = {{"", nil}}
-	for k in pairs(Featanimspec.dict_name) do table.insert(anims, {k, function() self:changed() end}) end
-	table.sort(anims, function(a, b) return a[1]<b[1] end)
 	local label = Widgets.Label{text = "Type"}
 	label:set_request{width = 46}
-	self.combo_anim = Widgets.ComboBox(anims)
+	self.combo_anim = Widgets.ComboBox()
 	self.group_anim = Widget{cols = 2, rows = 1}
 	self.group_anim:set_expand{col = 2}
 	self.group_anim:set_child{col = 1, row = 1, widget = label}
 	self.group_anim:set_child{col = 2, row = 1, widget = self.combo_anim}
-	-- Effect selector.
-	local effects = {{"", nil}}
-	for k in pairs(Feateffectspec.dict_name) do table.insert(effects, {k, function() self:changed() end}) end
-	table.sort(effects, function(a, b) return a[1]<b[1] end)
+	-- Effect selectors.
 	self.combo_effect = {}
 	self.scroll_effect = {}
 	for i = 1,3 do
-		self.combo_effect[i] = Widgets.ComboBox(effects)
+		self.combo_effect[i] = Widgets.ComboBox()
 		self.combo_effect[i]:set_request{width = 100}
 		self.scroll_effect[i] = Widgets.Progress{min = 0, max = 100, value = 0, pressed = function(w)
 			w.value = w:get_value_at(Client.cursor_pos)
@@ -147,6 +141,36 @@ Feats.changed = function(self)
 		feat.effects[i] = {effects[i], values[i]}
 	end
 	Quickslots:assign_feat(self.active_slot, feat)
+end
+
+--- Sets the race of the character using the feat editor.
+-- @param self Feats.
+-- @param name Race name.
+Feats.set_race = function(self, name)
+	local spec = Species:find{name = name}
+	if not spec then return end
+	-- Rebuild the feat animation list.
+	self.dict_anims_id = {{"", nil}}
+	for k in pairs(spec.feat_anims) do
+		table.insert(self.dict_anims_id, {k, function() self:changed() end})
+	end
+	table.sort(self.dict_anims_id, function(a, b) return a[1]<b[1] end)
+	self.combo_anim:clear()
+	for k,v in ipairs(self.dict_anims_id) do
+		self.combo_anim:append{text = v[1], pressed = v[2]}
+	end
+	-- Rebuild the feat effect list.
+	self.dict_effects_id = {{"", nil}}
+	for k in pairs(spec.feat_effects) do
+		table.insert(self.dict_effects_id, {k, function() self:changed() end})
+	end
+	table.sort(self.dict_effects_id, function(a, b) return a[1]<b[1] end)
+	for i = 1,3 do
+		self.combo_effect[i]:clear()
+		for k,v in ipairs(self.dict_effects_id) do
+			self.combo_effect[i]:append{text = v[1], pressed = v[2]}
+		end
+	end
 end
 
 --- Shows the feat for the given quickslot.

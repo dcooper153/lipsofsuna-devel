@@ -298,7 +298,7 @@ Feat.usable = function(self, args)
 	if not args.user then return end
 	local spec = args.user.spec
 	if spec.type ~= "species" then return end
-	if not spec.feats[self.animation] then return end
+	if not spec.feat_anims[self.animation] then return end
 	-- Get feat information.
 	local info = self:get_info()
 	-- Check for skills.

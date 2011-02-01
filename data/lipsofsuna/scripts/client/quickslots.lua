@@ -54,7 +54,10 @@ Quickslots.activate = function(clss, index)
 	end
 end
 
+Quickslots.reset = function(clss)
+	clss:assign_feat(1, Feat{animation = "spell on self", effects = {{"restore health", 10}}})
+	clss:assign_feat(2, Feat{animation = "ranged spell", effects = {{"fire damage", 10}}})
+	clss:assign_feat(3, Feat{animation = "ranged", effects = {{"physical damage", 1}}})
+end
+
 Quickslots:init()
-Quickslots:assign_feat(1, Feat{animation = "spell on self", effects = {{"restore health", 10}}})
-Quickslots:assign_feat(2, Feat{animation = "ranged spell", effects = {{"fire damage", 10}}})
-Quickslots:assign_feat(3, Feat{animation = "ranged", effects = {{"physical damage", 1}}})

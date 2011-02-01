@@ -30,7 +30,8 @@ Species.new = function(clss, args)
 	self.args = args
 	self.equipment_slots = {}
 	self.factions = {}
-	self.feats = {}
+	self.feat_anims = {}
+	self.feat_effects = {}
 	self.skills = {}
 	-- Equipment slots.
 	-- Converted from a list to a dictionary to make searching easier.
@@ -51,9 +52,14 @@ Species.new = function(clss, args)
 	-- Feats.
 	-- Converted from a list to a dictionary to make searching easier.
 	-- The key is the name of the feat and the value is unused.
-	if args.feats then
-		for k,v in pairs(args.feats) do
-			self.feats[v] = true
+	if args.feat_anims then
+		for k,v in pairs(args.feat_anims) do
+			self.feat_anims[v] = true
+		end
+	end
+	if args.feat_effects then
+		for k,v in pairs(args.feat_effects) do
+			self.feat_effects[v] = true
 		end
 	end
 	-- Skills.
