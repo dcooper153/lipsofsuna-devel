@@ -48,6 +48,7 @@ struct _LIWdgElement
 
 LIAPICALL (LIWdgElement*, liwdg_element_new_image, (
 	LIImgTexture* texture,
+	const float*  color,
 	const int*    dst_clip,
 	const int*    dst_pos,
 	const int*    dst_size,

@@ -168,6 +168,7 @@ static void Widget_canvas_compile (LIScrArgs* args)
  * --- Packs an image to the canvas of the widget.
  * -- @param self Widget.
  * -- @param args Arguments.<ul>
+ * --   <li>color: RGBA color or nil.</li>
  * --   <li>dest_clip: {x,y,w,h} or nil.</li>
  * --   <li>dest_position: {x,y} or nil.</li>
  * --   <li>dest_size: {w,h} or nil.</li>
@@ -177,11 +178,13 @@ static void Widget_canvas_compile (LIScrArgs* args)
  */
 static void Widget_canvas_image (LIScrArgs* args)
 {
+	float color[4];
 	int dest_clip[4];
 	int dest_position[2];
 	int dest_size[2];
 	int source_position[2];
 	int source_tiling[6];
+	float* color_ptr = NULL;
 	int* dest_position_ptr = NULL;
 	int* dest_size_ptr = NULL;
 	int* dest_clip_ptr = NULL;
@@ -199,6 +202,8 @@ static void Widget_canvas_image (LIScrArgs* args)
 	texture = liwdg_manager_find_image (widget->manager, source_image);
 	if (texture == NULL)
 		return;
+	if (liscr_args_gets_floatv (args, "color", 4, color) == 4)
+		color_ptr = color;
 	if (liscr_args_gets_intv (args, "dest_clip", 4, dest_clip) == 4)
 		dest_clip_ptr = dest_clip;
 	if (liscr_args_gets_intv (args, "dest_position", 2, dest_position) == 2)
@@ -211,7 +216,7 @@ static void Widget_canvas_image (LIScrArgs* args)
 		source_tiling_ptr = source_tiling;
 
 	/* Create the canvas element. */
-	elem = liwdg_element_new_image (texture, dest_clip_ptr, dest_position_ptr,
+	elem = liwdg_element_new_image (texture, color_ptr, dest_clip_ptr, dest_position_ptr,
 		dest_size_ptr, source_position_ptr, source_tiling_ptr);
 	if (elem == NULL)
 		return;

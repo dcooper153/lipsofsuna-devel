@@ -58,18 +58,24 @@ static void private_pack_verts (
 
 LIWdgElement* liwdg_element_new_image (
 	LIImgTexture* texture,
+	const float*  color,
 	const int*    dst_clip,
 	const int*    dst_pos,
 	const int*    dst_size,
 	const int*    src_pos,
 	const int*    src_tiling)
 {
+	const float white[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	LIWdgElement* self;
 
 	self = lisys_calloc (1, sizeof (LIWdgElement));
 	if (self == NULL)
 		return 0;
 	self->texture = texture;
+	if (color != NULL)
+		memcpy (self->text_color, color, 4 * sizeof (float));
+	else
+		memcpy (self->text_color, white, 4 * sizeof (float));
 	if (dst_clip != NULL)
 	{
 		self->dst_clip_enabled = 1;
@@ -150,8 +156,6 @@ void liwdg_element_paint (
 	LIWdgElement* self,
 	LIWdgManager* manager)
 {
-	const float white[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-
 	if (self->buffer != NULL)
 	{
 		/* Enable clipping. */
@@ -167,16 +171,11 @@ void liwdg_element_paint (
 		liren_context_set_buffer (manager->context, self->buffer);
 		liren_context_set_projection (manager->context, &manager->projection);
 		liren_context_set_shader (manager->context, 0, manager->shader);
+		liren_context_set_diffuse (manager->context, self->text_color);
 		if (self->texture != NULL)
-		{
 			liren_context_set_textures_raw (manager->context, &self->texture->texture, 1);
-			liren_context_set_diffuse (manager->context, white);
-		}
 		else
-		{
 			liren_context_set_textures_raw (manager->context, &self->font->texture, 1);
-			liren_context_set_diffuse (manager->context, self->text_color);
-		}
 		liren_context_bind (manager->context);
 		liren_context_render_array (manager->context, GL_TRIANGLES, 0, self->vertices.count);
 
