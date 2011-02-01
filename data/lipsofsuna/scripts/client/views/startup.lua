@@ -18,9 +18,17 @@ Startup.init = function(clss)
 	clss.group:set_child{col = 2, row = 3, widget = clss.group2}
 end
 
+--- Finishes the startup when connection has been established.
+-- @param clss Startup class.
+Startup.close = function(clss)
+	clss.connecting = nil
+	clss.joined = true
+end
+
 --- Executes the startup command.
 -- @param clss Startup class.
-Startup.execute = function(clss)
+Startup.enter = function(clss)
+	clss.group.floating = true
 	if Settings.host then
 		-- Host a game.
 		Program:unload_world()
@@ -49,25 +57,11 @@ Startup.execute = function(clss)
 	end
 end
 
---- Finishes the startup when connection has been established.
--- @param clss Startup class.
-Startup.finish = function(clss)
-	clss.connecting = nil
-	clss.joined = true
-end
-
 --- Shows or updates the waiting screen.
 -- @param clss Startup class.
 -- @param text Waiting text.
 -- @param button Retry button text or nil for no button.
 Startup.set_state = function(clss, text, button)
-	if not Startup.group.floating then
-		Gui:free()
-		Chargen:free()
-		clss.group.floating = true
-		Client.moving = false
-		Sound:switch_music_track("menu")
-	end
 	if button then
 		clss.button_retry.text = button
 		clss.button_retry.visible = true
@@ -80,9 +74,8 @@ end
 Startup:init()
 
 Eventhandler{type = "tick", func = function(self, args)
-	if Startup.connecting and Network.connected then
-		Startup:finish()
-	elseif Startup.joined and not Network.connected then
+	if Startup.joined and not Network.connected then
+		Gui:set_mode("startup")
 		Startup:set_state("Lost connection to the server!", "Reconnect")
 	end
 end}
@@ -90,6 +83,7 @@ end}
 Protocol:add_handler{type = "GENERATOR_STATUS", func = function(event)
 	local ok,s,f = event.packet:read("string", "float")
 	if ok then
+		Gui:set_mode("startup")
 		Startup:set_state("Map generator: " .. s .. " (" .. math.ceil(f * 100) .. "%)")
 	end
 end}

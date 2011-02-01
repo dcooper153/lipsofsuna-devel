@@ -2,7 +2,14 @@ Widgets.Menus = Class(Widget)
 
 Widgets.Menus.new = function(clss, args)
 	local self = Widget.new(clss, {rows = 3, cols = 1, stack = {}})
-	self.button_back = Widgets.MenuItem{font = "medium", text = "Back", pressed = function() self:close{level = #self.stack} end}
+	self.button_back = Widgets.MenuItem{font = "medium", text = "Back", pressed = function()
+		local w = self.stack[#self.stack]
+		if w.back then
+			w:back()
+		else
+			self:close{level = #self.stack}
+		end
+	end}
 	self.button_close = Widgets.MenuItem{font = "medium", text = "Close", pressed = function() self:close() end}
 	local group = Widget{rows = 1, cols = 2}
 	group:set_child{col = 1, row = 1, widget = self.button_back}
@@ -27,10 +34,6 @@ Widgets.Menus.open = function(self, args)
 	table.insert(self.stack, args.widget)
 	args.widget.level = #self.stack
 	self:set_child{row = 1, col = 1, widget = args.widget}
-	-- Disable player controls when the menu is open.
-	if not self.visible then
-		Client.moving = false
-	end
 	-- Make sure we are visible.
 	self.visible = true
 end
@@ -55,9 +58,9 @@ Widgets.Menus.close = function(self, args)
 	elseif h then
 		self.visible = false
 	end
-	-- Enable player controls when the menu is closed.
+	-- Return to the game mode when the menu is closed.
 	if h and not self.visible then
-		Client.moving = true
+		Gui:set_mode("game")
 	end
 end
 

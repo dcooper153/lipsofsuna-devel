@@ -108,7 +108,7 @@ Player.update_rotation = function(clss, secs)
 	end
 	-- Update compass rotation.
 	Gui.scene.compass = -clss.rotation_curr.euler[1] / (2 * math.pi)
-	Gui.scene.compass_quest = Quests:get_compass_direction()
+	Gui.scene.compass_quest = Views.Quests.inst:get_compass_direction()
 end
 
 Player.send_rotation = function(clss)
@@ -229,8 +229,8 @@ Protocol:add_handler{type = "OBJECT_SELF", func = function(event)
 			Player.species = o.race or "aer"
 			Camera.mode = "third-person"
 			Quickslots:reset()
-			Feats.inst:set_race(Player.species)
-			Feats.inst:show(1)
+			Views.Feats.inst:set_race(Player.species)
+			Views.Feats.inst:show(1)
 		end
 		Player.object = o
 	end

@@ -38,9 +38,9 @@ end
 Widgets.Scene.render = function(self)
 	Player.camera.viewport = {self.x, self.y, self.width, self.height}
 	self.scene:draw_begin{
-		hdr = Options.bloom_enabled,
+		hdr = Views.Options.inst.bloom_enabled,
 		modelview = self.camera.modelview,
-		multisamples = Options.multisamples,
+		multisamples = Views.Options.inst.multisamples,
 		projection = self.camera.projection,
 		viewport = self.camera.viewport}
 	self.scene:draw_pass{pass = 1} -- Depth
@@ -48,7 +48,7 @@ Widgets.Scene.render = function(self)
 	self.scene:draw_pass{pass = 4, lighting = true} -- Forward lighting
 	self.scene:draw_pass{pass = 5, sorting = true} -- Transparent ambient
 	self.scene:draw_pass{pass = 6, lighting = true, sorting = true} -- Transparent lighting
-	if Options.bloom_enabled then
+	if Views.Options.inst.bloom_enabled then
 		self.scene:draw_post_process{shader = "postprocess-vert-hdr"}
 		self.scene:draw_post_process{shader = "postprocess-horz-hdr"}
 	end

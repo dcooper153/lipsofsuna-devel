@@ -1,30 +1,33 @@
-Quests = Class()
-Quests.dict_name = {}
+Views.Quests = Class(Widget)
 
-Quests.init = function(clss)
-	local dialog = Widget{cols = 2, rows = 1}
-	dialog.list = Widgets.List()
-	dialog.list.pressed = function(view, row) Quests:show(row) end
-	dialog.list:set_request{width = 100, height = 100}
-	dialog.quest_info = Widgets.QuestInfo()
-	dialog.title_label = Widgets.Label{font = "medium", text = "Quests"}
-	dialog.group1 = Widget{cols = 1, rows = 2}
-	dialog.group1:set_expand{col = 1, row = 2}
-	dialog.group1:set_child{col = 1, row = 1, widget = dialog.title_label}
-	dialog.group1:set_child{col = 1, row = 2, widget = dialog.list}
-	dialog.spacings = {5, 5}
-	dialog:set_expand{col = 2, row = 1}
-	dialog:set_child{col = 1, row = 1, widget = dialog.group1}
-	dialog:set_child{col = 2, row = 1, widget = dialog.quest_info}
-	clss.window = dialog
+Views.Quests.new = function(clss)
+	local self = Widget.new(clss, {cols = 2, rows = 1, spacings = {5, 5}})
+	self.dict_name = {}
+	self.list = Widgets.List()
+	self.list.pressed = function(view, row) self:show(row) end
+	self.list:set_request{width = 100, height = 100}
+	self.quest_info = Widgets.QuestInfo()
+	self.title_label = Widgets.Label{font = "medium", text = "Quests"}
+	self.group1 = Widget{cols = 1, rows = 2}
+	self.group1:set_expand{col = 1, row = 2}
+	self.group1:set_child{col = 1, row = 1, widget = self.title_label}
+	self.group1:set_child{col = 1, row = 2, widget = self.list}
+	self:set_expand{col = 2, row = 1}
+	self:set_child{col = 1, row = 1, widget = self.group1}
+	self:set_child{col = 2, row = 1, widget = self.quest_info}
+	return self
+end
+
+Views.Quests.back = function(self)
+	Gui:set_mode("menu")
 end
 
 --- Gets the compass direction for the currently shown quest.
--- @param clss Quest class.
+-- @param self Quest class.
 -- @return Compass direction or nil.
-Quests.get_compass_direction = function(clss)
-	if clss.shown_quest then
-		local quest = Quest:find{name = clss.shown_quest}
+Views.Quests.get_compass_direction = function(self)
+	if self.shown_quest then
+		local quest = Quest:find{name = self.shown_quest}
 		if not quest or not quest.marker then return end
 		if not Player.object then return end
 		local diff = quest.marker - Player.object.position
@@ -33,33 +36,33 @@ Quests.get_compass_direction = function(clss)
 end
 
 --- Shows a quest.
--- @param clss Quests class.
+-- @param self Quests class.
 -- @param name Quest name.
-Quests.show = function(clss, name)
+Views.Quests.show = function(self, name)
 	local quest = Quest:find{name = name}
 	if not quest then return end
-	clss.window.quest_info.quest = quest
-	clss.shown_quest = name
+	self.quest_info.quest = quest
+	self.shown_quest = name
 end
 
 --- Updates a quest.
--- @param clss Quests class.
+-- @param self Quests class.
 -- @param quest Quest.
-Quests.update = function(clss, quest)
-	local button = clss.dict_name[quest.name]
+Views.Quests.update = function(self, quest)
+	local button = self.dict_name[quest.name]
 	if not button then
 		button = Widgets.Button{
-			pressed = function(self) Quests:show(self.text) end,
+			pressed = function(widget) self:show(widget.text) end,
 			text = quest.name}
-		clss.window.list:append{widget = button}
-		clss.dict_name[quest.name] = button
+		self.list:append{widget = button}
+		self.dict_name[quest.name] = button
 	end
-	clss:show(quest.name)
+	self:show(quest.name)
 end
 
 ------------------------------------------------------------------------------
 
-Quests:init()
+Views.Quests.inst = Views.Quests()
 
 -- Sets to position of the quest marker.
 Protocol:add_handler{type = "QUEST_MARKER", func = function(event)
@@ -85,16 +88,16 @@ Protocol:add_handler{type = "QUEST_STATUS", func = function(event)
 			Gui.chat_history:append{text = "Started quest: " .. quest.name}
 			quest.status = "active"
 			quest.text = t
-			Quests:update(quest)
+			Views.Quests.inst:update(quest)
 		elseif quest.status ~= "completed" and c == 1 then
 			Gui.chat_history:append{text = "Completed quest: " .. quest.name}
 			quest.status = "completed"
 			quest.text = t
-			Quests:update(quest)
+			Views.Quests.inst:update(quest)
 		elseif quest.text ~= t then
 			Gui.chat_history:append{text = "Updated quest: " .. quest.name}
 			quest.text = t
-			Quests:update(quest)
+			Views.Quests.inst:update(quest)
 		end
 		Effect:play("quest1")
 	end

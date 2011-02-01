@@ -5,6 +5,7 @@ Target.target_object = nil
 --- Cancels targeting.
 -- @param self Target class.
 function Target.cancel(self)
+	if not self.active then return end
 	Gui:set_action_text()
 	self.func = nil
 	self.active = false

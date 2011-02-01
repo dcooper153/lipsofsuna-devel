@@ -3,28 +3,21 @@ Gui = Class()
 --- Initializes the in-game user interface.
 -- @param clss Gui class.
 Gui.init = function(clss)
-	Gui.skills = Skills{main = true, sync = true}
-	-- Inventory menu.
-	Gui.inventory_group = Widget{cols = 2, rows = 2}
-	Gui.inventory_group:set_request{width = 100}
-	Gui.inventory_group:set_child{col = 1, row = 1, widget = Widgets.Label{font = "medium", text = "Inventory"}}
-	Gui.inventory_group:set_child{col = 1, row = 2, widget = Equipment.group}
-	Gui.inventory_group:set_child{col = 2, row = 2, widget = Inventory.group}
-	Gui.inventory_group:set_expand{col = 2, row = 2}
+	Gui.skills = Views.Skills{main = true, sync = true}
 	-- Admin menu.
 	Gui.menu_widget_admin = Widgets.Menu{
 		{"Editor", Editing.dialog},
 		{"Save", function() Network:send{packet = Packet(packets.ADMIN_SAVE)} end},
 		{"Shutdown", function() Network:send{packet = Packet(packets.ADMIN_SHUTDOWN)} end}}
 	Gui.menu_widget_main = Widgets.Menu{
-		{"Feats", Feats.inst.window},
-		{"Inventory", Gui.inventory_group},
-		{"Quests", Quests.window},
-		{"Skills", Gui.skills.window},
+		{"Feats", function() clss:set_mode("feats", 2) end},
+		{"Inventory", function() clss:set_mode("inventory", 2) end},
+		{"Quests", function() clss:set_mode("quests", 2) end},
+		{"Skills", function() clss:set_mode("skills", 2) end},
 		{"-----", function() end},
 		{"Admin", Gui.menu_widget_admin},
-		{"Options", Options.group},
-		{"Help", Help.menu},
+		{"Options", function() clss:set_mode("options", 2) end},
+		{"Help", function() clss:set_mode("help", 2) end},
 		{"Quit", function() Program.quit = true end}}
 	Gui.menus = Widgets.Menus()
 	Gui.menus:open{level = 1, widget = Gui.menu_widget_main}
@@ -74,15 +67,72 @@ Gui.init = function(clss)
 	Gui.main = Widget{cols = 1, behind = true, fullscreen = true}
 	Gui.main:append_row(Gui.bottom)
 	Gui.main:set_expand{col = 1, row = 1}
-	Gui.main.floating = true
 end
 
---- Frees the in-game user interface.
--- @param clss Gui class.
-Gui.free = function()
-	if Gui.main then
-		Gui.main.floating = false
+Gui.set_mode = function(self, mode, level)
+	-- Check for state changes.
+	if self.mode == mode then return end
+	-- Close the old view.
+	Target:cancel()
+	Drag:cancel()
+	if self.view and self.view.close then self.view:close() end
+	-- Set the base view mode.
+	local base = (mode == "startup" or mode == "wait") and 1 or (mode == "chargen") and 2 or 3
+	if base ~= self.mode_base then
+		if base == 1 then
+			-- Connection mode.
+			self.mode_base = 1
+			self.main.floating = false
+			Sound:switch_music_track("menu")
+		elseif mode == "chargen" then
+			-- Character creation.
+			self.mode_base = 2
+			self.main.floating = false
+			Sound:switch_music_track("char")
+		else
+			-- Game modes.
+			self.mode_base = 3
+			self.main.floating = true
+			Program:unload_world()
+			Sound:switch_music_track("game")
+		end
 	end
+	-- Set the detailed view mode.
+	print("SETMODE", self.mode, "=>", mode)
+	self.mode = mode
+	if mode == "chargen" then
+		self.view = Views.Chargen.inst
+	elseif mode == "dialog" then
+		Gui.menus:open{level = level or 1, widget = Views.Dialog.inst}
+		self.view = Views.Dialog.inst
+	elseif mode == "feats" then
+		Gui.menus:open{level = level or 1, widget = Views.Feats.inst}
+		self.view = Views.Feats.inst
+	elseif mode == "game" then
+		Gui.menus:close()
+		self.view = Views.Game.inst
+	elseif mode == "help" then
+		Gui.menus:open{level = level or 1, widget = Views.Help.inst}
+		self.view = Views.Help.inst
+	elseif mode == "inventory" then
+		Gui.menus:open{level = level or 1, widget = Views.Inventory.inst}
+		self.view = Views.Inventory.inst
+	elseif mode == "menu" then
+		Gui.menus:open{level = level or 1, widget = Gui.menu_widget_main}
+		self.view = Gui.menu_widget_main
+	elseif mode == "options" then
+		Gui.menus:open{level = level or 1, widget = Views.Options.inst}
+		self.view = Views.Options.inst
+	elseif mode == "quests" then
+		Gui.menus:open{level = level or 1, widget = Views.Quests.inst}
+		self.view = Views.Quests.inst
+	elseif mode == "skills" then
+		Gui.menus:open{level = level or 1, widget = self.skills}
+		self.view = self.skills
+	elseif mode == "startup" then
+		self.view = Startup
+	end
+	if self.view and self.view.enter then self.view:enter() end
 end
 
 --- Sets or unsets the text of the action label.

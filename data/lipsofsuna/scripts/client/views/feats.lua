@@ -1,12 +1,13 @@
 require "client/quickslots"
 
-Feats = Class()
+Views.Feats = Class(Widget)
+Views.Feats.mode = "chargen"
 
 --- Creates a new feat editor.
 -- @param clss Feats class.
 -- @return Feats.
-Feats.new = function(clss)
-	local self = Class.new(clss)
+Views.Feats.new = function(clss)
+	local self = Widget.new(clss, {cols = 1})
 	-- Animation selector.
 	local label = Widgets.Label{text = "Type"}
 	label:set_request{width = 46}
@@ -57,20 +58,23 @@ Feats.new = function(clss)
 		self.group_quick:set_expand{col = i}
 	end
 	-- Packing for the dialog.
-	self.window = Widget{cols = 1}
-	self.window:append_row(Widgets.Label{font = "medium", text = "Feat"})
-	self.window:append_row(self.group_quick)
-	self.window:append_row(self.group_anim)
-	self.window:append_row(self.group_effect)
-	self.window:append_row(self.group_req)
+	self:append_row(Widgets.Label{font = "medium", text = "Feat"})
+	self:append_row(self.group_quick)
+	self:append_row(self.group_anim)
+	self:append_row(self.group_effect)
+	self:append_row(self.group_req)
 	-- Show the first feat.
 	self:show(1)
 	return self
 end
 
+Views.Feats.back = function(self)
+	Gui:set_mode("menu")
+end
+
 --- Recalculates the skill and reagent requirements of the currently shown feat.
 -- @param self Feats.
-Feats.changed = function(self)
+Views.Feats.changed = function(self)
 	if self.protect then return end
 	-- Get effects and their magnitudes.
 	local effects = {}
@@ -146,7 +150,7 @@ end
 --- Sets the race of the character using the feat editor.
 -- @param self Feats.
 -- @param name Race name.
-Feats.set_race = function(self, name)
+Views.Feats.set_race = function(self, name)
 	local spec = Species:find{name = name}
 	if not spec then return end
 	-- Rebuild the feat animation list.
@@ -176,7 +180,7 @@ end
 --- Shows the feat for the given quickslot.
 -- @param self Feats.
 -- @param index Quickslot index.
-Feats.show = function(self, index)
+Views.Feats.show = function(self, index)
 	local feat = Quickslots.buttons[index].feat or Feat()
 	self.protect = true
 	self.combo_anim:activate{text = feat.animation or ""}
@@ -190,12 +194,4 @@ Feats.show = function(self, index)
 	self:changed()
 end
 
---- Toggles the visibility of the feat editor.
--- @param self Feats.
-Feats.toggle = function(self)
-	Gui.menus:open{widget = self.window}
-end
-
-------------------------------------------------------------------------------
-
-Feats.inst = Feats()
+Views.Feats.inst = Views.Feats()

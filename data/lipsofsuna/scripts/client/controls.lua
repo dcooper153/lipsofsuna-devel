@@ -26,19 +26,11 @@ Action{name = "Camera", mode = "press", key1 = Keys.y, func = function()
 end}
 
 Action{name = "Feats", mode = "press", key1 = Keys.f, func = function()
-	if Target.active then
-		Target:cancel()
-	else
-		Gui.menus:open{level = 1, widget = Feats.inst.window}
-	end
+	Gui:set_mode("feats")
 end}
 
 Action{name = "Inventory", mode = "press", key1 = Keys.i, func = function()
-	if Target.active then
-		Target:cancel()
-	else
-		Gui.menus:open{level = 1, widget = Gui.inventory_group}
-	end
+	Gui:set_mode("inventory")
 end}
 
 Action{name = "Jump", mode = "press", key1 = Keys.c, func = function()
@@ -46,14 +38,10 @@ Action{name = "Jump", mode = "press", key1 = Keys.c, func = function()
 end}
 
 Action{name = "Menu", mode = "press", key1 = Keys.ESCAPE, func = function()
-	if Target.active then
-		Target:cancel()
+	if Gui.mode ~= "game" then
+		Gui:set_mode("game")
 	else
-		if Client.moving then
-			Gui.menus:open{level = 1, widget = Gui.menu_widget_main}
-		else
-			Gui.menus:close()
-		end
+		Gui:set_mode("menu")
 	end
 end}
 
@@ -63,11 +51,7 @@ Action{name = "Move", mode = "analog", key1 = Keys.w, key2 = Keys.s, func = func
 end}
 
 Action{name = "Options", mode = "press", key1 = Keys.o, func = function()
-	if Target.active then
-		Target:cancel()
-	else
-		Gui.menus:open{level = 1, widget = Options.group}
-	end
+	Gui:set_mode("options")
 end}
 
 Action{name = "Pick up", mode = "press", key1 = Keys.COMMA, func = function()
@@ -75,19 +59,11 @@ Action{name = "Pick up", mode = "press", key1 = Keys.COMMA, func = function()
 end}
 
 Action{name = "Quests", mode = "press", key1 = Keys.q, func = function()
-	if Target.active then
-		Target:cancel()
-	else
-		Gui.menus:open{level = 1, widget = Quests.window}
-	end
+	Gui:set_mode("quests")
 end}
 
 Action{name = "Skills", mode = "press", key1 = Keys.k, func = function()
-	if Target.active then
-		Target:cancel()
-	else
-		Gui.menus:open{level = 1, widget = Gui.skills.window}
-	end
+	Gui:set_mode("skills")
 end}
 
 Action{name = "Quickslot 1", mode = "press", key1 = Keys.F1, func = function()
@@ -153,17 +129,17 @@ end}
 
 Action{name = "Turn", mode = "analog", key1 = "mousex", func = function(v)
 	if Action.dict_press[Keys.LCTRL] then
-		Player.camera_turn = v * Options.mouse_sensitivity
+		Player.camera_turn = v * Views.Options.inst.mouse_sensitivity
 	else
-		Player.turn = -v * Options.mouse_sensitivity
+		Player.turn = -v * Views.Options.inst.mouse_sensitivity
 	end
 end}
 
 Action{name = "Tilt", mode = "analog", key1 = "mousey", func = function(v)
 	if Action.dict_press[Keys.LCTRL] then
-		Player.camera_tilt = v * Options.mouse_sensitivity
+		Player.camera_tilt = v * Views.Options.inst.mouse_sensitivity
 	else
-		Player.tilt = v * Options.mouse_sensitivity
+		Player.tilt = v * Views.Options.inst.mouse_sensitivity
 	end
 end}
 
@@ -178,7 +154,7 @@ end}
 ------------------------------------------------------------------------------
 
 Eventhandler{type = "keypress", func = function(self, args)
-	local w = not Client.moving and Widgets.focused_widget_prev
+	local w = Gui.mode ~= "game" and Widgets.focused_widget_prev
 	if w and w.event then
 		w:event(args)
 		Action:event(args, {})
@@ -192,13 +168,13 @@ Eventhandler{type = "keyrelease", func = function(self, args)
 end}
 
 Eventhandler{type = "mousepress", func = function(self, args)
-	Action:event(args, not Client.moving and {})
+	Action:event(args, Gui.mode ~= "game" and {})
 end}
 
 Eventhandler{type = "mouserelease", func = function(self, args)
-	Action:event(args, not Client.moving and {})
+	Action:event(args, Gui.mode ~= "game" and {})
 end}
 
 Eventhandler{type = "mousemotion", func = function(self, args)
-	Action:event(args, not Client.moving and {})
+	Action:event(args, Gui.mode ~= "game" and {})
 end}

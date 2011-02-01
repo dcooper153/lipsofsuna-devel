@@ -1,12 +1,12 @@
-Skills = Class()
+Views.Skills = Class(Widget)
 
-Skills.getter = function(self, key, value)
+Views.Skills.getter = function(self, key, value)
 	if key == "total" then
 		local t = 0
 		for k,v in pairs(self.dict_id) do t = t + v.value end
 		return t
 	else
-		return Class.getter(self, key, value)
+		return Widget.getter(self, key, value)
 	end
 end
 
@@ -16,8 +16,9 @@ end
 --   <li>main: Synchronize skills with the main window.</li>
 --   <li>sync: Synchronize skills with the server.</li></ul>
 -- @return Skills widget.
-Skills.new = function(clss, args)
-	local self = Class.new(clss, args)
+Views.Skills.new = function(clss, args)
+	local self = Widget.new(clss, {cols = 2, rows = 2, spacings = {40, 5},
+		main = args and args.main, sync = args and args.sync})
 	self.dict_id = {}
 	self.dict_row = {}
 	-- Create widgets.
@@ -29,10 +30,9 @@ Skills.new = function(clss, args)
 	self.group:set_expand{row = 3}
 	self.group:set_child{col = 1, row = 1, widget = self.skill_name}
 	self.group:set_child{col = 1, row = 2, widget = self.skill_desc}
-	self.window = Widget{cols = 2, rows = 2, spacings = {40, 5}}
-	self.window:set_expand{col = 2, row = 1}
-	self.window:set_child{col = 1, row = 2, widget = self.list}
-	self.window:set_child{col = 2, row = 2, widget = self.group}
+	self:set_expand{col = 2, row = 1}
+	self:set_child{col = 1, row = 2, widget = self.list}
+	self:set_child{col = 2, row = 2, widget = self.group}
 	-- Create skills.
 	self:add("dexterity", "Dexterity", "Determines the effectiveness of your ranged attacks, as well as how fast you can move and react.")
 	self:add("health", "Health", "Determines how much damage your can withstand.")
@@ -49,7 +49,7 @@ end
 -- @param id Skill id.
 -- @param name Skill name.
 -- @param desc Skill description.
-Skills.add = function(self, id, name, desc)
+Views.Skills.add = function(self, id, name, desc)
 	local index = #self.dict_row + 1
 	local skill = Widgets.SkillControl{
 		cap = 0, desc = desc, id = id, index = index,
@@ -67,24 +67,28 @@ Skills.add = function(self, id, name, desc)
 	self.list:append_row(skill)
 end
 
+Views.Skills.back = function(self)
+	Gui:set_mode("menu")
+end
+
 --- Sends the value of the currently selected skill to the server.
 -- @param self Skills.
 -- @param index Skill index.
-Skills.changed = function(self, index)
+Views.Skills.changed = function(self, index)
 	if not self.sync then return end
 	local skill = self.dict_row[index]
 	if not skill then return end
 	Network:send{packet = Packet(packets.SKILLS, "string", skill.id, "float", skill.cap)}
 end
 
-Skills.get_value = function(self, id)
+Views.Skills.get_value = function(self, id)
 	return self.dict_id[id].value
 end
 
 --- Sets the species for which the skills are.
 -- @param self Skills.
 -- @param value Species.
-Skills.set_species = function(self, value)
+Views.Skills.set_species = function(self, value)
 	self.species = value
 	for k,v in pairs(value.skills) do
 		local w = self.dict_id[k]
@@ -99,7 +103,7 @@ end
 --- Shows a skill.
 -- @param self Skills.
 -- @param index Skill number.
-Skills.show = function(self, index)
+Views.Skills.show = function(self, index)
 	local skill = self.dict_row[index]
 	local species = Species:find{name = Player.species}
 	local spec = species and species.skills[skill.id]
@@ -112,7 +116,7 @@ end
 -- @param id Skill id.
 -- @param value Current value.
 -- @param cap Custom cap.
-Skills.update = function(self, id, value, cap)
+Views.Skills.update = function(self, id, value, cap)
 	local skill = self.dict_id[id]
 	if skill then
 		local species = Species:find{name = Player.species}

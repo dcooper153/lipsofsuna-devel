@@ -33,7 +33,7 @@ EffectObject.new = function(clss, args)
 	self:particle_animation{loop = false}
 	-- Attach a sound effect.
 	if args.sound then
-		local volume = (args.sound_volume or 1) * Options.sound_volume
+		local volume = (args.sound_volume or 1) * Views.Options.inst.sound_volume
 		if args.sound_pitch then
 			Sound:effect{object = self, effect = args.sound, volume = volume,
 				pitch = 1 + args.sound_pitch * (math.random() - 0.5)}

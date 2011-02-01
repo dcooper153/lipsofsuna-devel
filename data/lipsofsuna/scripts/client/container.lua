@@ -20,6 +20,7 @@ function Container.create(self, id, size, own)
 	self.lists[id] = list
 	if own then
 		Inventory:setup(id, list)
+		Views.Inventory.inst:setup(list)
 	else
 		-- TODO: Closing the dialog should notify the server.
 		local dialog = Widgets.Popup{cols = 1, rows = 2}
@@ -42,6 +43,7 @@ function Container.close(self, id)
 	if Inventory.id == id then
 		Inventory:setup(nil, nil)
 		Inventory:hide()
+		Views.Inventory.inst:setup()
 	end
 	if dialog then
 		dialog.floating = false

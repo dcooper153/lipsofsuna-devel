@@ -4,6 +4,8 @@ local db = Database{name = "client.sql"}
 Sectors.instance = Sectors{database = db, save_objects = false}
 Sectors.instance:erase_world()
 
+Views = {}
+
 require "client/widgets/background"
 require "client/widgets/button"
 require "client/widgets/check"
@@ -39,7 +41,6 @@ require "client/drag"
 require "client/commands"
 require "client/controls"
 require "client/container"
-require "client/dialog"
 require "client/effect"
 require "client/inventory"
 require "client/equipment"
@@ -66,15 +67,16 @@ require "client/shaders/widget"
 require "client/views/book"
 require "client/views/chargen"
 require "client/views/crafting"
+require "client/views/dialog"
 require "client/views/editing"
 require "client/views/feats"
+require "client/views/game"
 require "client/views/help"
+require "client/views/inventory"
 require "client/views/options"
 require "client/views/quests"
 require "client/views/skills"
 require "client/views/startup"
-
-Widgets.Cursor.inst = Widgets.Cursor(Iconspec:find{name = "cursor1"})
 
 Eventhandler{type = "quit", func = function(self, args)
 	Program.quit = true
@@ -87,7 +89,7 @@ Eventhandler{type = "tick", func = function(self, args)
 	Widgets.Cursor.inst:update()
 	-- Update animations.
 	animt = animt + args.secs
-	if animt > 0.2 * (1 - Options.animation_quality) then
+	if animt > 0.2 * (1 - Views.Options.inst.animation_quality) then
 		for k,v in pairs(Object.objects) do
 			if v.animated then
 				v:update_animations{secs = animt}
@@ -125,7 +127,10 @@ Eventhandler{type = "tick", func = function(self, args)
 	end
 end}
 
-Startup:execute()
+-- Initialize the UI state.
+Widgets.Cursor.inst = Widgets.Cursor(Iconspec:find{name = "cursor1"})
+Gui:init()
+Gui:set_mode("startup")
 
 -- Main loop.
 while not Program.quit do
