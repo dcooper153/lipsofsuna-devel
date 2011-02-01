@@ -1,4 +1,4 @@
-require "client/skills"
+require "client/views/skills"
 
 Chargen = Class()
 Chargen.visible = false
