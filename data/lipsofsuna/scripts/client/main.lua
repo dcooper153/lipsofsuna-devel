@@ -9,6 +9,7 @@ require "client/widgets/button"
 require "client/widgets/check"
 require "client/widgets/colorselector"
 require "client/widgets/combobox"
+require "client/widgets/cursor"
 require "client/widgets/dialogchoice"
 require "client/widgets/dialoglabel"
 require "client/widgets/entry"
@@ -72,6 +73,8 @@ require "client/shaders/skin"
 require "client/shaders/terrain"
 require "client/shaders/widget"
 
+Widgets.Cursor.inst = Widgets.Cursor(Iconspec:find{name = "cursor1"})
+
 Eventhandler{type = "quit", func = function(self, args)
 	Program.quit = true
 end}
@@ -79,6 +82,8 @@ end}
 local animt = 0
 local ipolt = 0
 Eventhandler{type = "tick", func = function(self, args)
+	-- Update the cursor.
+	Widgets.Cursor.inst:update()
 	-- Update animations.
 	animt = animt + args.secs
 	if animt > 0.2 * (1 - Options.animation_quality) then

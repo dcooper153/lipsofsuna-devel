@@ -13,11 +13,18 @@ require "core/render"
 require "core/sound"
 require "core/widgets"
 require "common/eventhandler"
+require "client/cursor"
 require "client/entry"
 require "client/label"
 require "client/theme"
 require "client/widget"
 require "client/startup"
+
+Widgets.Cursor.inst = Widgets.Cursor({
+	name = "cursor1",
+	image = "cursor1",
+	offset = {0, 0},
+	size = {32, 32}})
 
 Eventhandler{type = "keypress", func = function(self, args)
 	local w = Widgets.focused_widget
@@ -40,6 +47,8 @@ while not Program.quit do
 		Eventhandler:event(event)
 		event = Program:pop_event()
 	end
+	-- Update the cursor.
+	Widgets.Cursor.inst:update()
 	-- Render the scene.
 	Client:clear_buffer()
 	Widgets:draw()

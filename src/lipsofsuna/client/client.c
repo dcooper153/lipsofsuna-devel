@@ -83,6 +83,7 @@ LICliClient* licli_client_new (
 		licli_client_free (self);
 		return NULL;
 	}
+	SDL_ShowCursor (SDL_DISABLE);
 
 	/* Load module. */
 	if (!private_init (self, program))
@@ -180,7 +181,6 @@ void licli_client_set_moving (
 	{
 		cx = self->window->mode.width / 2;
 		cy = self->window->mode.height / 2;
-		SDL_ShowCursor (SDL_DISABLE);
 #ifdef ENABLE_GRABS
 		SDL_WM_GrabInput (SDL_GRAB_ON);
 #else
@@ -191,7 +191,6 @@ void licli_client_set_moving (
 	}
 	else
 	{
-		SDL_ShowCursor (SDL_ENABLE);
 #ifdef ENABLE_GRABS
 		SDL_WM_GrabInput (SDL_GRAB_OFF);
 #endif

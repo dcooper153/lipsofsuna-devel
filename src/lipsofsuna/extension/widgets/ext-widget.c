@@ -842,6 +842,14 @@ static void Widget_getter_x (LIScrArgs* args)
 	liwdg_widget_get_allocation (args->self, &rect);
 	liscr_args_seti_float (args, rect.x);
 }
+static void Widget_setter_x (LIScrArgs* args)
+{
+	LIWdgRect rect;
+
+	liwdg_widget_get_allocation (args->self, &rect);
+	liscr_args_geti_int (args, 0, &rect.x);
+	liwdg_widget_set_allocation (args->self, rect.x, rect.y, rect.width, rect.height);
+}
 
 /* @luadoc
  * --- Top edge position.
@@ -854,6 +862,14 @@ static void Widget_getter_y (LIScrArgs* args)
 
 	liwdg_widget_get_allocation (args->self, &rect);
 	liscr_args_seti_float (args, rect.y);
+}
+static void Widget_setter_y (LIScrArgs* args)
+{
+	LIWdgRect rect;
+
+	liwdg_widget_get_allocation (args->self, &rect);
+	liscr_args_geti_int (args, 0, &rect.y);
+	liwdg_widget_set_allocation (args->self, rect.x, rect.y, rect.width, rect.height);
 }
 
 /*****************************************************************************/
@@ -891,8 +907,8 @@ void liext_script_widget (
 	liscr_class_insert_mvar (self, "temporary", Widget_getter_temporary, Widget_setter_temporary);
 	liscr_class_insert_mvar (self, "visible", Widget_getter_visible, Widget_setter_visible);
 	liscr_class_insert_mvar (self, "width", Widget_getter_width, NULL);
-	liscr_class_insert_mvar (self, "x", Widget_getter_x, NULL);
-	liscr_class_insert_mvar (self, "y", Widget_getter_y, NULL);
+	liscr_class_insert_mvar (self, "x", Widget_getter_x, Widget_setter_x);
+	liscr_class_insert_mvar (self, "y", Widget_getter_y, Widget_setter_y);
 }
 
 /** @} */
