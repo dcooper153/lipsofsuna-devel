@@ -6,8 +6,7 @@ function Container.clicked(self, id, slot)
 	if Target.active then
 		Target:select_container(id, slot)
 	else
-		Target:start("Where would you like to move that?", function(where, idd, slott)
-			Equipment:move("inv", id, slot, where, idd, slott) end)
+		Drag:clicked_container(id, slot)
 	end
 end
 

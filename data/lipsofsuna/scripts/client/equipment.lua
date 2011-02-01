@@ -53,8 +53,7 @@ Equipment.clicked = function(clss, slot)
 	if Target.active then
 		Target:select_equipment(slot)
 	else
-		Target:start("Where would you like to move that?", function(where, id, slott)
-			Equipment:move("equ", nil, slot, where, id, slott) end)
+		Drag:clicked_equipment(nil, slot)
 	end
 end
 

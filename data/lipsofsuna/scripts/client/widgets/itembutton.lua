@@ -8,6 +8,11 @@ Widgets.ItemButton.setter = function(self, key, value)
 			Widgets.IconButton.setter(self, key, value)
 			self:reshaped()
 		end
+	elseif key == "drag" then
+		if self.drag ~= value then
+			Widgets.IconButton.setter(self, key, value)
+			self:reshaped()
+		end
 	else
 		Widgets.IconButton.setter(self, key, value)
 	end
@@ -26,11 +31,13 @@ Widgets.ItemButton.reshaped = function(self)
 	local w = self.width
 	local h = self.height
 	self:canvas_clear()
+	local a = self.drag and 0.2 or 1
 	local icon = Iconspec:find{name = self.icon}
 	if icon then
 		self:canvas_image{
 			dest_position = {0,0},
 			dest_size = {20,20},
+			color = {1,1,1,a},
 			source_image = icon.image,
 			source_position = icon.offset,
 			source_tiling = {0,icon.size[1],0,0,icon.size[1],0}}
@@ -41,7 +48,7 @@ Widgets.ItemButton.reshaped = function(self)
 			dest_size = {w,h},
 			text = self.text,
 			text_alignment = {0,0.5},
-			text_color = self.focused and {1,1,0,1} or {1,1,1,1},
+			text_color = self.focused and {1,1,0,a} or {1,1,1,a},
 			text_font = self.font}
 	end
 	if self.count and self.count > 1 then
@@ -50,7 +57,7 @@ Widgets.ItemButton.reshaped = function(self)
 			dest_size = {w,h},
 			text = tostring(self.count),
 			text_alignment = {1,0.5},
-			text_color = self.focused and {1,1,0,1} or {1,1,1,1},
+			text_color = self.drag and {1,1,1,a} or self.focused and {1,1,0,a} or {1,1,1,a},
 			text_font = self.font}
 	end
 	self:canvas_compile()
