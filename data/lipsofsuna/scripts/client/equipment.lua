@@ -18,6 +18,21 @@ Equipment.init = function(clss)
 	clss.group:append_row(clss.button_feet)
 	clss.group:append_row(clss.button_arms)
 	clss.group:set_expand{col = 1}
+	clss.dict_name = {
+		["head"] = clss.button_head,
+		["upperbody"] = clss.button_upperbody,
+		["hand.L"] = clss.button_handl,
+		["hand.R"] = clss.button_handr,
+		["lowerbody"] = clss.button_lowerbody,
+		["feet"] = clss.button_feet,
+		["arms"] = clss.button_arms}
+end
+
+Equipment.get_item = function(clss, args)
+	local obj = clss.dict_name[args.slot]
+	if not obj then return end
+	if not obj.text or #obj.text == 0 then return end
+	return obj
 end
 
 --- Sets the contents of an equipment slot.
@@ -25,17 +40,7 @@ end
 -- @param node Node name.
 -- @param name Item name.
 Equipment.set_item = function(clss, slot, name, count)
-	local widgets =
-	{
-		["head"] = clss.button_head,
-		["upperbody"] = clss.button_upperbody,
-		["hand.L"] = clss.button_handl,
-		["hand.R"] = clss.button_handr,
-		["lowerbody"] = clss.button_lowerbody,
-		["feet"] = clss.button_feet,
-		["arms"] = clss.button_arms
-	}
-	local widget = widgets[slot]
+	local widget = clss.dict_name[slot]
 	if widget then
 		local spec = Itemspec:find{name = name}
 		widget.text = name or ""

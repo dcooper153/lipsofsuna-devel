@@ -51,6 +51,15 @@ function Container.close(self, id)
 	self.lists[id] = nil
 end
 
+Container.get_item = function(clss, args)
+	local list = clss.lists[args.inv]
+	if not list then return end
+	local obj = list:get_item{slot = args.slot}
+	if not obj then return end
+	if not obj.text or #obj.text == 0 then return end
+	return obj
+end
+
 --- Inserts an item.
 -- @param self Container class.
 -- @param id Unique container number.

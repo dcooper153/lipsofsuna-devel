@@ -47,6 +47,13 @@ Widgets.ItemList.new = function(clss, args)
 	return self
 end
 
+Widgets.ItemList.get_item = function(self, args)
+	local widget = self.buttons[args.slot]
+	if not widget then return end
+	if not widget.text then return end
+	return widget
+end
+
 Widgets.ItemList.set_item = function(self, args)
 	local widget = self.buttons[args.slot]
 	if not widget then return end
