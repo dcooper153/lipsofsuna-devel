@@ -16,7 +16,7 @@ Iconspec.dict_name = {}
 -- @return New icon specification.
 Iconspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
-	self.source_image = self.source_image or "widgets1"
+	self.source_image = self.source_image or "icons1"
 	self.source_position = self.source_position or {0,0}
 	return self
 end

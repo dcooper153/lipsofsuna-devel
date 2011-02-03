@@ -53,6 +53,7 @@ Featanimspec{
 	name = "right hand",
 	animation = "punch",
 	categories = {"melee"},
+	description = "Hit with your right hand",
 	cooldown = 0.5,
 	effect = "swing1",
 	effect_impact = "impact1",
@@ -65,6 +66,7 @@ Featanimspec{
 	animation = "fire-bow",
 	categories = {"ranged"},
 	cooldown = 1,
+	description = "Fire a ranged weapon",
 	effect_impact = "impact1",
 	required_ammo = {arrow = 1},
 	required_weapon = "ranged",
@@ -75,6 +77,7 @@ Featanimspec{
 	animation = "cast-spell",
 	categories = {"ranged", "spell"},
 	cooldown = 2,
+	description = "Cast a magical projectile",
 	effect = "spell1"}
 
 Featanimspec{
@@ -82,6 +85,7 @@ Featanimspec{
 	animation = "cast-spell",
 	categories = {"self", "spell"},
 	cooldown = 2,
+	description = "Cast a spell on yourself",
 	effect = "spell1"}
 
 Featanimspec{
@@ -89,6 +93,7 @@ Featanimspec{
 	animation = "cast-spell",
 	categories = {"spell", "touch"},
 	cooldown = 2,
+	description = "Cast a short range touch spell",
 	effect = "spell1"}
 
 Featanimspec{
@@ -97,6 +102,7 @@ Featanimspec{
 	animation = "throw",
 	categories = {"throw"},
 	cooldown = 1,
+	description = "Throw grenades or other throwing weapons",
 	effect = "swing1",
 	effect_impact = "impact1",
 	required_weapon = "throwable",
@@ -107,7 +113,9 @@ Featanimspec{
 Feateffectspec{
 	name = "black haze",
 	categories = {"plague", "spell"},
+	description = "Conjure infectious plagued monsters",
 	effect = "spell1",
+	icon = "modifier-plague",
 	influences = {{"plague", 1, 0.04}},
 	projectile = "fireball1",
 	skill_base = {willpower = 25},
@@ -118,6 +126,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "fire damage",
 	categories = {"fire", "melee", "spell"},
+	description = "Inflict fire damage",
 	effect = "explosion1",
 	influences = {{"health", -5, -0.95}},
 	projectile = "fireball1",
@@ -128,6 +137,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "physical damage",
 	categories = {"melee", "physical"},
+	description = "Inflict physical or telekinetic damage",
 	effect = "impact1",
 	influences = {{"health", -5, -0.95}},
 	skill_mult = {strength = 1, dexterity = 0.5}}
@@ -135,7 +145,9 @@ Feateffectspec{
 Feateffectspec{
 	name = "restore health",
 	categories = {"heal", "spell"},
+	description = "Restore health",
 	effect = "heal1",
+	icon = "modifier-heal",
 	influences = {{"health", 5, 1.06}},
 	skill_base = {intelligence = 10, willpower = 5},
 	skill_mult = {intelligence = 1, willpower = 0.1},
@@ -145,7 +157,9 @@ Feateffectspec{
 Feateffectspec{
 	name = "sanctuary",
 	categories = {"spell"},
+	description = "Protect from death",
 	effect = "heal1",
+	icon = "modifier-sanctuary",
 	influences = {{"sanctuary", 30, 2}},
 --	skill_base = {intelligence = 25, willpower = 25},
 --	reagent_base = {mushroom = 3}}

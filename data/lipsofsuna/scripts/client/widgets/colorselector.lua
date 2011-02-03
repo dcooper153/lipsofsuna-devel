@@ -46,38 +46,28 @@ end
 
 Widgets.ColorSelector.reshaped = function(self)
 	if not self.init then return end
-	self:set_request{width = 128, height = 24}
+	self:set_request{width = 128, height = 40}
 	local w = self.width
 	local h = self.height
 	local values = {self.red, self.green, self.blue}
 	self:canvas_clear()
 	for i=1,3 do
 		local v = values[i]
+		self:canvas_image{
+			dest_position = {0,(i-1)*h/3},
+			dest_size = {w,h/3},
+			source_image = "widgets1",
+			source_position = {450,376},
+			source_tiling = {34,120,34,5,15,5}}
 		if v > 0 then
 			self:canvas_image{
 				dest_clip = {0,0,v*w,h},
 				dest_position = {0,(i-1)*h/3},
 				dest_size = {w,h/3},
 				source_image = "widgets1",
-				source_position = {0,115},
-				source_tiling = {7,87,7,4,15,4}}
-		end
-		if v < 1 then
-			self:canvas_image{
-				dest_clip = {v*w,0,w-v*w,h},
-				dest_position = {0,(i-1)*h/3},
-				dest_size = {w,h/3},
-				source_image = "widgets1",
-				source_position = {0,65},
-				source_tiling = {7,87,7,4,15,4}}
+				source_position = {450,436},
+				source_tiling = {34,120,34,5,15,5}}
 		end
 	end
---[[	self:canvas_image{
-		dest_clip = {0,0,w,h},
-		dest_position = {0,8},
-		dest_size = {w,h/3},
-		source_image = "widgets1",
-		source_position = {0,115},
-		source_tiling = {7,87,7,4,15,4}}--]]
 	self:canvas_compile()
 end

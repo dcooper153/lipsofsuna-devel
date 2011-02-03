@@ -79,6 +79,10 @@
     <url>http://opengameart.org/user/301</url>
   </author-info>
   <author-info>
+    <name>hiponboy</name>
+    <url>http://opengameart.org/user/783</url>
+  </author-info>
+  <author-info>
     <name>johndh</name>
     <url>http://opengameart.org/user/681</url>
   </author-info>
@@ -1773,12 +1777,12 @@
   </asset>
 
   <asset>
-    <file>import/widgets-000.png</file>
+    <file>import/widgets1.png</file>
+    <author>hiponboy</author>
     <author>Ari Mustonen</author>
-    <license>CC0</license>
-    <status>placeholder</status>
-    <tag>gui</tag>
-    <tag>widgets</tag>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/moderna-graphical-interface</source>
+    <status>usable</status>
     <type>texture</type>
   </asset>
 

@@ -1,20 +1,17 @@
 Views.Quests = Class(Widget)
 
 Views.Quests.new = function(clss)
-	local self = Widget.new(clss, {cols = 2, rows = 1, spacings = {5, 5}})
+	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0, 0}})
 	self.dict_name = {}
 	self.list = Widgets.List()
 	self.list.pressed = function(view, row) self:show(row) end
 	self.list:set_request{width = 100, height = 100}
 	self.quest_info = Widgets.QuestInfo()
-	self.title_label = Widgets.Label{font = "medium", text = "Quests"}
-	self.group1 = Widget{cols = 1, rows = 2}
-	self.group1:set_expand{col = 1, row = 2}
-	self.group1:set_child{col = 1, row = 1, widget = self.title_label}
-	self.group1:set_child{col = 1, row = 2, widget = self.list}
-	self:set_expand{col = 2, row = 1}
-	self:set_child{col = 1, row = 1, widget = self.group1}
-	self:set_child{col = 2, row = 1, widget = self.quest_info}
+	self.title = Widgets.Frame{style = "title", text = "Quest"}
+	self:set_expand{col = 1, row = 2}
+	self:set_child{col = 1, row = 1, widget = self.title}
+	self:set_child{col = 1, row = 2, widget = self.list}
+	self:set_child{col = 1, row = 3, widget = self.quest_info}
 	return self
 end
 

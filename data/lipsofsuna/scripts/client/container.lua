@@ -23,7 +23,7 @@ function Container.create(self, id, size, own)
 		Views.Inventory.inst:setup(list)
 	else
 		-- TODO: Closing the dialog should notify the server.
-		local dialog = Widgets.Popup{cols = 1, rows = 2}
+		local dialog = Widgets.Frame{cols = 1, rows = 2, style = "popup"}
 		local button = Widgets.Button{text = "Close", pressed = function() dialog.visible = false end}
 		dialog.items = list
 		dialog:set_request{width = 200}

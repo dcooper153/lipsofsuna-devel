@@ -93,7 +93,7 @@ Editing.init = function(clss)
 		{"Terrain: delete", function() Editing:set_mode(4) end}}
 
 	-- Packing.
-	clss.dialog = Widgets.Popup{cols = 1, rows = 3}
+	clss.dialog = Widgets.Frame{cols = 1, rows = 3, style = "popup"}
 	clss.dialog.spacings = {0, 20}
 	clss.dialog:set_expand{col = 1}
 	clss.dialog:set_request{width = 200, height = 300}

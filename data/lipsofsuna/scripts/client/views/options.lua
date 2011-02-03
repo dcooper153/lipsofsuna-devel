@@ -19,7 +19,7 @@ end
 
 Views.Options.new = function(clss)
 	-- Allocate self.
-	local self = Widget.new(clss, {cols = 2})
+	local self = Widget.new(clss, {cols = 2, rows = 4, spacings = {5,0}})
 	self.fullscreen = false
 	self.vsync = false
 	self.window_width = 1024
@@ -150,31 +150,31 @@ Views.Options.new = function(clss)
 		self:set_sound_volume(v)
 	end
 	-- Packing.
-	local quality_group = Widget{cols = 2}
+	local quality_group = Widgets.Frame{cols = 2}
 	quality_group:append_row(Widgets.Label{text = "Resolution"}, self.combo_video_mode)
 	quality_group:append_row(Widgets.Label{text = "Models"}, self.button_model_quality)
 	quality_group:append_row(Widgets.Label{text = "Antialiasing"}, self.scroll_multisamples)
 	quality_group:append_row(Widgets.Label{text = "Animation"}, self.scroll_animation)
 	quality_group:append_row(Widgets.Label{text = "Transparency"}, self.scroll_transparency)
 	quality_group:append_row(Widgets.Label{text = "VSync"}, self.button_vsync)
-	local bloom_group = Widget{cols = 2}
+	local bloom_group = Widgets.Frame{cols = 2}
 	bloom_group:append_row(Widgets.Label{text = "Bloom"}, button_bloom)
 	bloom_group:append_row(Widgets.Label{text = "Radius"}, scroll_radius)
 	bloom_group:append_row(Widgets.Label{text = "Exposure"}, scroll_exposure)
 	bloom_group:append_row(Widgets.Label{text = "Influence"}, scroll_luminance)
-	local mouse_group = Widget{cols = 2}
+	local mouse_group = Widgets.Frame{cols = 2}
 	mouse_group:append_row(Widgets.Label{text = "Sensitivity"}, self.scroll_mouse)
-	local sound_group = Widget{cols = 2}
+	local sound_group = Widgets.Frame{cols = 2}
 	sound_group:append_row(Widgets.Label{text = "Music"}, self.scroll_music)
 	sound_group:append_row(Widgets.Label{text = "Effects"}, self.scroll_sound)
-	self:append_row(Widgets.Label{text = "Quality", font = "medium"})
-	self:append_row(quality_group)
-	self:append_row(Widgets.Label{text = "Bloom", font = "medium"})
-	self:append_row(bloom_group)
-	self:append_row(Widgets.Label{text = "Mouse", font = "medium"})
-	self:append_row(mouse_group)
-	self:append_row(Widgets.Label{text = "Volume", font = "medium"})
-	self:append_row(sound_group)
+	self:set_child{col = 1, row = 1, widget = Widgets.Frame{style = "title", text = "Graphics"}}
+	self:set_child{col = 1, row = 2, widget = quality_group}
+	self:set_child{col = 1, row = 3, widget = Widgets.Frame{style = "title", text = "Bloom"}}
+	self:set_child{col = 1, row = 4, widget = bloom_group}
+	self:set_child{col = 2, row = 1, widget = Widgets.Frame{style = "title", text = "Mouse"}}
+	self:set_child{col = 2, row = 2, widget = mouse_group}
+	self:set_child{col = 2, row = 3, widget = Widgets.Frame{style = "title", text = "Volume"}}
+	self:set_child{col = 2, row = 4, widget = sound_group}
 	-- Load the options.
 	self.db = Database{name = "options.sqlite"}
 	self.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")

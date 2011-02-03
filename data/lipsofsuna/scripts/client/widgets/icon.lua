@@ -1,5 +1,5 @@
 Widgets.Icon = Class(Widget)
-Widgets.Icon.DEFAULT = { image="widgets1", offset={0,0}, size={16,16} }
+Widgets.Icon.DEFAULT = {image="icons1", offset={0,0}, size={34,34}}
 
 Widgets.Icon.setter = function(self, key, value)
 	if key == "icon" then

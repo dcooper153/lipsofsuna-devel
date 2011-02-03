@@ -50,6 +50,7 @@ Widgets.SkillControl.get_value_at = function(self, point)
 	local p = point - Vector(self.x, self.y)
 	if not self.compact then
 		p = p - Vector(100, 0)
+		p.x = p.x / 2
 	end
 	if p.x >= 0 and p.x <= self.max then
 		return math.ceil(p.x)
@@ -66,22 +67,28 @@ Widgets.SkillControl.reshaped = function(self)
 	self:set_request{
 		font = "tiny",
 		internal = true,
-		width = xbar + 100,
+		width = xbar + (self.compact and 100 or 200),
 		height = 16}
-	local w = self.max
+	local w = self.compact and self.max or 2 * self.max
 	local h = self.height
 	local c = self.cap / self.max
 	local v = self.value / self.max
 	self:canvas_clear()
 	-- TODO: Icon
+	self:canvas_image{
+		dest_position = {xbar,0},
+		dest_size = {w,h},
+		source_image = "widgets1",
+		source_position = {450,375},
+		source_tiling = {34,120,34,6,15,7}}
 	if v > 0 then
 		self:canvas_image{
 			dest_clip = {xbar,0,v*w,h},
 			dest_position = {xbar,0},
 			dest_size = {w,h},
 			source_image = "widgets1",
-			source_position = {0,115},
-			source_tiling = {7,87,7,4,15,4}}
+			source_position = {450,405},
+			source_tiling = {34,120,34,6,15,7}}
 	end
 	if c > v then
 		self:canvas_image{
@@ -89,17 +96,8 @@ Widgets.SkillControl.reshaped = function(self)
 			dest_position = {xbar,0},
 			dest_size = {w,h},
 			source_image = "widgets1",
-			source_position = {0,140},
-			source_tiling = {7,87,7,4,15,4}}
-	end
-	if c < 1 then
-		self:canvas_image{
-			dest_clip = {xbar+c*w,0,w-c*w,h},
-			dest_position = {xbar,0},
-			dest_size = {w,h},
-			source_image = "widgets1",
-			source_position = {0,65},
-			source_tiling = {7,87,7,4,15,4}}
+			source_position = {450,465},
+			source_tiling = {34,120,34,6,15,7}}
 	end
 	if not self.compact and self.text ~= "" then
 		self:canvas_text{

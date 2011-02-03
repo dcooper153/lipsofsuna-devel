@@ -7,7 +7,9 @@ Views.Feats.mode = "chargen"
 -- @param clss Feats class.
 -- @return Feats.
 Views.Feats.new = function(clss)
-	local self = Widget.new(clss, {cols = 1})
+	local self = Widget.new(clss, {cols = 1, spacings = {0,0,0,0}})
+	-- Title.
+	self.title = Widgets.Frame{style = "title", text = "Feats"}
 	-- Animation selector.
 	local label = Widgets.Label{text = "Type"}
 	label:set_request{width = 46}
@@ -21,7 +23,7 @@ Views.Feats.new = function(clss)
 	self.scroll_effect = {}
 	for i = 1,3 do
 		self.combo_effect[i] = Widgets.ComboBox()
-		self.combo_effect[i]:set_request{width = 100}
+		self.combo_effect[i]:set_request{width = 150}
 		self.scroll_effect[i] = Widgets.Progress{min = 0, max = 100, value = 0, pressed = function(w)
 			w.value = w:get_value_at(Client.cursor_pos)
 			self:changed()
@@ -39,33 +41,66 @@ Views.Feats.new = function(clss)
 	self.group_effect:set_child{col = 3, row = 1, widget = self.scroll_effect[1]}
 	self.group_effect:set_child{col = 3, row = 2, widget = self.scroll_effect[2]}
 	self.group_effect:set_child{col = 3, row = 3, widget = self.scroll_effect[3]}
-	-- Requirement display.
-	self.label_skills = Widgets.Label{valign = 0}
-	self.label_reagents = Widgets.Label{valign = 0}
+	-- Information display.
+	self.label_skills = Widgets.Label{valign = 0, color = {0,0,0,1}}
+	self.label_reagents = Widgets.Label{valign = 0, color = {0,0,0,1}}
+	self.label_description = Widgets.Label{valign = 0, color = {0,0,0,1}}
+	self.label_description:set_request{height = 80, width = 270}
 	self.group_req = Widget{rows = 2, cols = 2}
-	self.group_req:set_request{height = 100}
 	self.group_req:set_expand{col = 1, row = 2}
 	self.group_req:set_expand{col = 2}
-	self.group_req:set_child{row = 1, col = 1, widget = Widgets.Label{font = "medium", text = "Skills"}}
-	self.group_req:set_child{row = 1, col = 2, widget = Widgets.Label{font = "medium", text = "Reagents"}}
+	self.group_req:set_child{row = 1, col = 1, widget = Widgets.Label{font = "medium", text = "Skills", color = {0,0,0,1}}}
+	self.group_req:set_child{row = 1, col = 2, widget = Widgets.Label{font = "medium", text = "Reagents", color = {0,0,0,1}}}
 	self.group_req:set_child{row = 2, col = 1, widget = self.label_skills}
 	self.group_req:set_child{row = 2, col = 2, widget = self.label_reagents}
+	self.group_info = Widgets.Frame{rows = 3, cols = 1, style = "paper"}
+	self.group_info:set_request{height = 310}
+	self.group_info:set_expand{col = 1, row = 3}
+	self.group_info:set_child{row = 1, col = 1, widget = Widgets.Label{font = "medium", text = "Description", color = {0,0,0,1}}}
+	self.group_info:set_child{row = 2, col = 1, widget = self.label_description}
+	self.group_info:set_child{row = 3, col = 1, widget = self.group_req}
 	-- Quickslot selector.
-	self.group_quick = Widget{cols = 12, rows = 1}
+	self.combo_slot = Widgets.ComboBox()
 	for i = 1,12 do
-		local button = Widgets.Button{text = tostring(i), pressed = function() self:show(i) end}
-		self.group_quick:set_child{col = i, row = 1, widget = button}
-		self.group_quick:set_expand{col = i}
+		self.combo_slot:append{text = "Quickslot " .. i, pressed = function() self:show(i) end}
 	end
+	local label1 = Widgets.Label{text = "Slot"}
+	label1:set_request{width = 46}
+	self.group_slot = Widget{cols = 2, rows = 1}
+	self.group_slot:set_expand{col = 2}
+	self.group_slot:set_child{col = 1, row = 1, widget = label1}
+	self.group_slot:set_child{col = 2, row = 1, widget = self.combo_slot}
+	-- Assign button.
+	self.button_assign = Widgets.Button{text = "Assign to the quickslot"}
+	self.button_assign.pressed = function() self:assign() end
 	-- Packing for the dialog.
-	self:append_row(Widgets.Label{font = "medium", text = "Feat"})
-	self:append_row(self.group_quick)
-	self:append_row(self.group_anim)
-	self:append_row(self.group_effect)
-	self:append_row(self.group_req)
+	self.group = Widgets.Frame{cols = 1}
+	self.group:append_row(self.group_slot)
+	self.group:append_row(self.group_anim)
+	self.group:append_row(self.group_effect)
+	self.group:append_row(self.button_assign)
+	self:append_row(self.title)
+	self:append_row(self.group)
+	self:append_row(self.group_info)
 	-- Show the first feat.
 	self:show(1)
 	return self
+end
+
+Views.Feats.assign = function(self)
+	-- Get effects and their magnitudes.
+	local effects = {}
+	local values = {}
+	for i = 1,3 do
+		table.insert(effects, self.combo_effect[i].text)
+		table.insert(values, self.scroll_effect[i].value)
+	end
+	-- Create a feat from the animation and the effects.
+	local feat = {animation = self.combo_anim.text ~= "" and self.combo_anim.text, effects = {}}
+	for i = 1,3 do
+		feat.effects[i] = {effects[i], values[i]}
+	end
+	Quickslots:assign_feat(self.active_slot, feat)
 end
 
 Views.Feats.back = function(self)
@@ -139,12 +174,20 @@ Views.Feats.changed = function(self)
 		reagent_str = reagent_str .. (reagent_str ~= "" and "\n" or "") .. v
 	end
 	self.label_reagents.text = reagent_str
-	-- Update the active quickslot.
-	local feat = {animation = self.combo_anim.text ~= "" and self.combo_anim.text, effects = {}}
-	for i = 1,3 do
-		feat.effects[i] = {effects[i], values[i]}
+	-- Display Description.
+	local desc = ""
+	local anim = Featanimspec:find{name = self.combo_anim.text}
+	if anim then
+		desc = " - " .. anim.description
+		for i = 1,3 do
+			local name = self.combo_effect[i].text or ""
+			local effect = Feateffectspec:find{name = name}
+			if effect and effect.description then
+				desc = desc .. "\n - " .. effect.description
+			end
+		end
 	end
-	Quickslots:assign_feat(self.active_slot, feat)
+	self.label_description.text = desc
 end
 
 --- Sets the race of the character using the feat editor.
@@ -156,7 +199,10 @@ Views.Feats.set_race = function(self, name)
 	-- Rebuild the feat animation list.
 	self.dict_anims_id = {{"", nil}}
 	for k in pairs(spec.feat_anims) do
-		table.insert(self.dict_anims_id, {k, function() self:changed() end})
+		local anim = Featanimspec:find{name = k}
+		if anim and anim.description then
+			table.insert(self.dict_anims_id, {k, function() self:changed() end})
+		end
 	end
 	table.sort(self.dict_anims_id, function(a, b) return a[1]<b[1] end)
 	self.combo_anim:clear()
@@ -183,6 +229,7 @@ end
 Views.Feats.show = function(self, index)
 	local feat = Quickslots.buttons[index].feat or Feat()
 	self.protect = true
+	self.combo_slot:activate{index = index, press = false}
 	self.combo_anim:activate{text = feat.animation or ""}
 	for j = 1,3 do
 		local e = feat.effects[j]

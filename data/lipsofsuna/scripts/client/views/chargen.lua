@@ -15,9 +15,10 @@ Views.Chargen.list_races = {
 Views.Chargen.new = function(clss)
 	-- Preview scene.
 	local camera = Camera{far = 60.0, near = 0.3, mode = "first-person"}
-	local self = Widgets.Scene.new(clss, {cols = 1, behind = true, fullscreen = true, camera = camera})
+	local self = Widgets.Scene.new(clss, {cols = 1, behind = true, fullscreen = true, camera = camera, spacings = {0,0}})
 	self.margins = {5,5,5,5}
 	self.skills = Views.Skills()
+	self.skills:set_child{row = 1, col = 1}
 	self.object = Object{position = Vector(1, 1, 1), type = "character"}
 	self.light = Light{ambient = {1.0,1.0,1.0,1.0}, diffuse={1.0,1.0,1.0,1.0}, equation={2,0.3,0.03}}
 	self.timer = Timer{enabled = false, func = function(timer, secs) self:update(secs) end}
@@ -80,7 +81,7 @@ Views.Chargen.new = function(clss)
 	self.group_hair:set_child{row = 1, col = 2, widget = self.combo_hair_color}
 	self.group_hair:set_expand{col = 1}
 	self.group_hair:set_expand{col = 2}
-	self.group_race = Widget{rows = 12, cols = 2, homogeneous = true}
+	self.group_race = Widgets.Frame{rows = 12, cols = 2, spacings = {0,2}}
 	self.group_race:set_child{row = 1, col = 1, widget = self.label_name}
 	self.group_race:set_child{row = 1, col = 2, widget = self.entry_name}
 	self.group_race:set_child{row = 2, col = 1, widget = self.label_race}
@@ -106,17 +107,16 @@ Views.Chargen.new = function(clss)
 	self.group_race:set_child{row = 12, col = 1, widget = self.label_bust_scale}
 	self.group_race:set_child{row = 12, col = 2, widget = self.scroll_bust_scale}
 	self.group_race:set_expand{col = 2}
-	self.group_race:set_request{width = 300}
 	self.group_left = Widget{cols = 1}
-	self.group_left:append_row(Widgets.Label{text = "Create character", font = "medium"})
-	self.group_left:append_row(self.group_race)
 	self.group_left:append_row(self.button_create)
 	self.group_left:append_row(self.button_quit)
 	self.group_left:set_expand{col = 1}
-	self.group_left:set_request{width = 300}
-	self:append_row(self.group_left)
+	self:append_row(Widgets.Frame{style = "title", text = "Character"})
+	self:append_row(self.group_race)
 	self:append_row(self.skills)
-	self:set_expand{row = 2}
+	self:append_row()
+	self:append_row(self.group_left)
+	self:set_expand{row = 4}
 	return self
 end
 

@@ -1,7 +1,9 @@
-Widgets.List = Class(Widget)
+require "client/widgets/frame"
+
+Widgets.List = Class(Widgets.Frame)
 
 Widgets.List.new = function(clss, args)
-	local self = Widget.new(clss, args)
+	local self = Widgets.Frame.new(clss, args)
 	self.cols = 1
 	self.rows = 0
 	self:set_expand{col = 1}

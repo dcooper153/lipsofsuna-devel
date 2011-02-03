@@ -5,7 +5,10 @@ Views.Inventory.mode = "inventory"
 -- @param clss Inventory view class.
 -- @return Inventory view.
 Views.Inventory.new = function(clss)
-	local self = Widget.new(clss, {cols = 2, rows = 2})
+	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0, 0}})
+	self.title = Widgets.Frame{style = "title", text = "Inventory"}
+	self.inventory = Widgets.Frame{cols = 1, rows = 1}
+	self.inventory:set_expand{col = 1, row = 1}
 	self.equipment = Widgets.Equipment{pressed = function(widget, slot)
 		if Target.active then
 			Target:select_equipment(slot)
@@ -14,8 +17,9 @@ Views.Inventory.new = function(clss)
 		end
 	end}
 	self:set_request{width = 100}
-	self:set_child{col = 1, row = 1, widget = Widgets.Label{font = "medium", text = "Inventory"}}
+	self:set_child{col = 1, row = 1, widget = self.title}
 	self:set_child{col = 1, row = 2, widget = self.equipment}
+	self:set_child{col = 1, row = 3, widget = self.inventory}
 	self:set_expand{col = 2, row = 2}
 	return self
 end
@@ -65,8 +69,8 @@ end
 -- @param self Inventory view.
 -- @param widget Player inventory widget.
 Views.Inventory.setup = function(self, widget)
-	self.inventory = widget
-	self:set_child{col = 2, row = 2, widget = widget}
+	self.itemlist = widget
+	self.inventory:set_child{col = 1, row = 1, widget = widget}
 end
 
 ------------------------------------------------------------------------------

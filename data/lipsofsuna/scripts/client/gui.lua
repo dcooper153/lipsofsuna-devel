@@ -10,14 +10,14 @@ Gui.init = function(clss)
 		{"Save", function() Network:send{packet = Packet(packets.ADMIN_SAVE)} end},
 		{"Shutdown", function() Network:send{packet = Packet(packets.ADMIN_SHUTDOWN)} end}}
 	Gui.menu_widget_main = Widgets.Menu{
-		{"Feats", function() clss:set_mode("feats", 2) end},
-		{"Inventory", function() clss:set_mode("inventory", 2) end},
-		{"Quests", function() clss:set_mode("quests", 2) end},
-		{"Skills", function() clss:set_mode("skills", 2) end},
+		{"Feats", function() clss:set_mode("feats", 2) end, arrow = true},
+		{"Inventory", function() clss:set_mode("inventory", 2) end, arrow = true},
+		{"Quests", function() clss:set_mode("quests", 2) end, arrow = true},
+		{"Skills", function() clss:set_mode("skills", 2) end, arrow = true},
 		{"-----", function() end},
 		{"Admin", Gui.menu_widget_admin},
-		{"Options", function() clss:set_mode("options", 2) end},
-		{"Help", function() clss:set_mode("help", 2) end},
+		{"Options", function() clss:set_mode("options", 2) end, arrow = true},
+		{"Help", function() clss:set_mode("help", 2) end, arrow = true},
 		{"Quit", function() Program.quit = true end}}
 	Gui.menus = Widgets.Menus()
 	Gui.menus:open{level = 1, widget = Gui.menu_widget_main}
@@ -35,16 +35,19 @@ Gui.init = function(clss)
 	-- Skill group.
 	Gui.skill_health = Widgets.SkillControl{compact = true}
 	Gui.skill_mana = Widgets.SkillControl{compact = true}
-	local skillgrp = Widget{cols = 1, spacings = {0,1}}
+	local skillgrp = Widget{cols = 1, spacings = {0,0}}
 	skillgrp:append_row(Gui.skill_health)
 	skillgrp:append_row(Gui.skill_mana)
 	-- Skills group.
+	local pad = Widget()
+	pad:set_request{width = 64}
 	Gui.fps_label = Widgets.Label{valign = 1}
-	Gui.skills_group = Widget{rows = 1}
+	Gui.skills_group = Widgets.Frame{rows = 1, style = "quickbar"}
 	Gui.skills_group:append_col(skillgrp)
+	Gui.skills_group:append_col(pad)
 	Gui.skills_group:append_col(Quickslots.group)
 	Gui.skills_group:append_col(Gui.fps_label)
-	Gui.skills_group:set_expand{col = 2}
+	Gui.skills_group:set_expand{col = 3}
 	-- Modifiers.
 	Gui.modifiers = Widgets.Modifiers()
 	-- Packing.
@@ -57,7 +60,7 @@ Gui.init = function(clss)
 	Gui.center_group:append_row(Gui.menus)
 	Gui.center_group:append_row(Gui.skills_group)
 	Gui.center_group:set_expand{col = 1, row = 1}
-	Gui.scene = Widgets.Scene{rows = 1, camera = Player.camera, margins = {5,5,5,5}}
+	Gui.scene = Widgets.Scene{rows = 1, camera = Player.camera, margins = {5,5,5,0}}
 	Gui.scene:append_col(Gui.center_group)
 	Gui.scene:set_expand{col = 1, row = 1}
 	Gui.bottom = Widget{rows = 1}

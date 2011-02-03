@@ -12,7 +12,7 @@ Widgets.Menu.new = function(clss, args)
 	-- Create menu items.
 	for k,v in ipairs(args or {}) do
 		if type(v[2]) == "function" then
-			self:append{text = v[1], pressed = v[2]}
+			self:append{text = v[1], pressed = v[2], arrow = v.arrow}
 		else
 			self:append{text = v[1], widget = v[2], arrow = true}
 		end

@@ -53,23 +53,20 @@ Widgets.Progress.reshaped = function(self)
 	local h = self.height
 	local v = (self.value - self.min) / (self.max - self.min)
 	self:canvas_clear()
+	self:canvas_image{
+		dest_position = {0,0},
+		dest_size = {w,h},
+		source_image = "widgets1",
+		source_position = {450,375},
+		source_tiling = {34,120,34,6,15,7}}
 	if v > 0 then
 		self:canvas_image{
 			dest_clip = {0,0,v*w,h},
 			dest_position = {0,0},
 			dest_size = {w,h},
 			source_image = "widgets1",
-			source_position = {0,115},
-			source_tiling = {7,87,7,4,15,4}}
-	end
-	if v < 1 then
-		self:canvas_image{
-			dest_clip = {v*w,0,w-v*w,h},
-			dest_position = {0,0},
-			dest_size = {w,h},
-			source_image = "widgets1",
-			source_position = {0,65},
-			source_tiling = {7,87,7,4,15,4}}
+			source_position = {450,405},
+			source_tiling = {34,120,34,6,15,7}}
 	end
 	self:canvas_text{
 		dest_position = {0,0},

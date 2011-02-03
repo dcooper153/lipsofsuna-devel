@@ -17,22 +17,17 @@ end
 --   <li>sync: Synchronize skills with the server.</li></ul>
 -- @return Skills widget.
 Views.Skills.new = function(clss, args)
-	local self = Widget.new(clss, {cols = 2, rows = 2, spacings = {40, 5},
+	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0,0},
 		main = args and args.main, sync = args and args.sync})
 	self.dict_id = {}
 	self.dict_row = {}
 	-- Create widgets.
+	self.title = Widgets.Frame{style = "title", text = "Skills"}
 	self.list = Widgets.List{pressed = function(view, row) self:show(row) end}
-	self.skill_name = Widgets.Label{font = "medium"}
-	self.skill_desc = Widgets.Label()
-	self.skill_desc:set_request{width = 300}
-	self.group = Widget{cols = 1, rows = 3}
-	self.group:set_expand{row = 3}
-	self.group:set_child{col = 1, row = 1, widget = self.skill_name}
-	self.group:set_child{col = 1, row = 2, widget = self.skill_desc}
-	self:set_expand{col = 2, row = 1}
+	self.desc_text = Widgets.Text()
+	self:set_child{col = 1, row = 1, widget = self.title}
 	self:set_child{col = 1, row = 2, widget = self.list}
-	self:set_child{col = 2, row = 2, widget = self.group}
+	self:set_child{col = 1, row = 3, widget = self.desc_text}
 	-- Create skills.
 	self:add("dexterity", "Dexterity", "Determines the effectiveness of your ranged attacks, as well as how fast you can move and react.")
 	self:add("health", "Health", "Determines how much damage your can withstand.")
@@ -107,8 +102,7 @@ Views.Skills.show = function(self, index)
 	local skill = self.dict_row[index]
 	local species = Species:find{name = Player.species}
 	local spec = species and species.skills[skill.id]
-	self.skill_name.text = skill.name
-	self.skill_desc.text = skill.desc
+	self.desc_text.text = {{skill.name, "medium"}, {skill.desc}}
 end
 
 --- Updates a skill.

@@ -1,6 +1,4 @@
-require "client/widgets/iconbutton"
-
-Widgets.ItemButton = Class(Widgets.IconButton)
+Widgets.ItemButton = Class(Widget)
 
 Widgets.ItemButton.setter = function(self, key, value)
 	if key == "count" then
@@ -13,13 +11,36 @@ Widgets.ItemButton.setter = function(self, key, value)
 			Widgets.IconButton.setter(self, key, value)
 			self:reshaped()
 		end
+	elseif key == "focused" then
+		if self.focused ~= value then
+			Widget.setter(self, key, value)
+			self:reshaped()
+		end
+	elseif key == "font" then
+		if self.font ~= value then
+			Widget.setter(self, key, value)
+			self:reshaped()
+		end
+	elseif key == "icon" then
+		if self.icon ~= value then
+			Widget.setter(self, key, value)
+			self:reshaped()
+		end
+	elseif key == "text" then
+		if self.text ~= value then
+			Widget.setter(self, key, value)
+			self:reshaped()
+		end
 	else
-		Widgets.IconButton.setter(self, key, value)
+		Widget.setter(self, key, value)
 	end
 end
 
 Widgets.ItemButton.new = function(clss, args)
-	local self = Widgets.IconButton.new(clss, args)
+	local self = Widget.new(clss, args)
+	self.font = self.font or "default"
+	self.icon = self.icon or ""
+	self.text = self.text or ""
 	return self
 end
 
@@ -37,8 +58,8 @@ Widgets.ItemButton.reshaped = function(self)
 		dest_position = {0,0},
 		dest_size = {w,h},
 		source_image = "widgets1",
-		source_position = self.focused and {64,0} or {0,0},
-		source_tiling = {6,52,6,6,52,6}}
+		source_position = self.focused and {650,395} or {650,375},
+		source_tiling = {20,109,20,6,7,6}}
 	-- Icon.
 	local icon = Iconspec:find{name = self.icon}
 	if icon then

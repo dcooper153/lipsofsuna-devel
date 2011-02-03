@@ -1,7 +1,12 @@
 Widgets.Label = Class(Widget)
 
 Widgets.Label.setter = function(self, key, value)
-	if key == "focused" then
+	if key == "color" then
+		if self.color ~= value then
+			Widget.setter(self, key, value)
+			self:reshaped()
+		end
+	elseif key == "focused" then
 		if self.focused ~= value then
 			Widget.setter(self, key, value)
 			self:reshaped()
@@ -47,7 +52,7 @@ Widgets.Label.reshaped = function(self)
 		dest_size = {w,h},
 		text = self.text,
 		text_alignment = {self.halign,self.valign},
-		text_color = f and p and {0.6,0.6,0,1} or p and {0.6,0.6,0.6,0.6} or {1,1,1,1},
+		text_color = self.color or (f and p and {0.6,0.6,0,1} or p and {0.6,0.6,0.6,0.6} or {1,1,1,1}),
 		text_font = self.font}
 	self:canvas_compile()
 end

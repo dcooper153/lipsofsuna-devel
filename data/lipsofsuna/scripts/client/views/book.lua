@@ -3,7 +3,7 @@ Book = Class()
 --- Initializes the book UI.
 -- @param clss Book class.
 Book.init = function(clss)
-	clss.dialog = Widgets.Popup{cols = 1}
+	clss.dialog = Widgets.Frame{cols = 1, style = "popup"}
 	clss.title = Widgets.Label()
 	clss.text = Widgets.Label()
 	clss.text:set_request{width = 300}

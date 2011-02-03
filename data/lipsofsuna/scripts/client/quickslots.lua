@@ -2,13 +2,16 @@ Quickslots = Class()
 Quickslots.icons = {}
 
 Quickslots.init = function(clss)
-	clss.group = Widget{rows = 1}
+	clss.group = Widget{rows = 1, spacings = {0,0}}
 	clss.buttons = {}
 	for i = 1,12 do
-		clss.buttons[i] = Widgets.Icon{
-			icon = Iconspec:find{name = "skill-none"},
-			pressed = function() clss:activate(i) end}
+		clss.buttons[i] = Widgets.Quickslot{pressed = function() clss:activate(i) end}
 		clss.group:append_col(clss.buttons[i])
+		if i == 4 or i == 8 then
+			local pad = Widget()
+			pad:set_request{width = 15}
+			clss.group:append_col(pad)
+		end
 	end
 end
 
@@ -18,13 +21,16 @@ Quickslots.assign_none = function(clss, index)
 end
 
 Quickslots.assign_feat = function(clss, index, feat)
-	local icon
+	local icon = nil
 	if feat then
-		local anim = feat and Featanimspec:find{name = feat.animation}
-		icon = anim and Iconspec:find{name = anim.icon}
-		icon = icon or Iconspec:find{name = "skill-todo"}
-	else
-		icon = Iconspec:find{name = "skill-none"}
+		for i = 1,3 do
+			local effect = feat.effects[i]
+			if effect then
+				spec = Feateffectspec:find{name = effect[1]}
+				icon = spec and Iconspec:find{name = spec.icon}
+				if icon then break end
+			end
+		end
 	end
 	clss.buttons[index].feat = feat
 	clss.buttons[index].icon = icon

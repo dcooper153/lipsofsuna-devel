@@ -1,12 +1,12 @@
 require "client/widgets/button"
-require "client/widgets/popup"
+require "client/widgets/frame"
 
 Widgets.ComboBox = Class(Widgets.Button)
 
 Widgets.ComboBox.new = function(clss, args)
 	local self = Widgets.Button.new(clss)
 	self.value = 1
-	self.menu = Widgets.Popup{cols = 1, temporary = true}
+	self.menu = Widgets.Frame{cols = 1, style = "popup", temporary = true}
 	self.menu:set_expand{col = 1}
 	-- Copy arguments.
 	for k,v in pairs(args or {}) do
@@ -96,7 +96,7 @@ Widgets.ComboBox.pressed = function(self)
 		end
 	else
 		-- Popup menu.
-		self.menu:set_request{width = self.width - 4}
+		self.menu:set_request{width = self.width + 9}
 		self.menu:popup{x = self.x, y = self.y, width = self.width, height = self.height, dir = "down"}
 	end
 end
@@ -120,15 +120,30 @@ Widgets.ComboBox.reshaped = function(self)
 		text = self.text}
 	local w = self.width
 	local h = self.height
+	-- Background.
 	self:canvas_clear()
 	self:canvas_image{
 		dest_position = {0,0},
 		dest_size = {w,h},
 		source_image = "widgets1",
-		source_position = self.focused and {64,0} or {0,0},
-		source_tiling = {6,52,6,6,52,6}}
+		source_position = self.focused and {350,415} or {350,375},
+		source_tiling = {12,64,12,11,14,13}}
+	-- Arrows.
+	self:canvas_image{
+		dest_position = {5,(h-14)/2},
+		dest_size = {7,14},
+		source_image = "widgets1",
+		source_position = {651,417},
+		source_tiling = {0,7,0,0,14,0}}
+	self:canvas_image{
+		dest_position = {w-11,(h-14)/2},
+		dest_size = {7,14},
+		source_image = "widgets1",
+		source_position = {667,417},
+		source_tiling = {0,7,0,0,14,0}}
+	-- Text.
 	self:canvas_text{
-		dest_position = {13,0},
+		dest_position = {15,0},
 		dest_size = {w,h},
 		text = self.text,
 		text_alignment = {0,0.5},

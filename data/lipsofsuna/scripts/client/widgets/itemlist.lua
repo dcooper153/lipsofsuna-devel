@@ -15,6 +15,7 @@ Widgets.ItemList.setter = function(self, key, value)
 			self.cols = 1
 			self.rows = value
 			self.buttons = {}
+			self:set_expand{col = 1}
 			for i = 1,value do
 				self.buttons[i] = Widgets.ItemButton{pressed = function() self:pressed(i) end}
 				self:set_child{col = 1, row = i, widget = self.buttons[i]}
@@ -25,6 +26,8 @@ Widgets.ItemList.setter = function(self, key, value)
 			self.cols = 2
 			self.rows = rows
 			self.buttons = {}
+			self:set_expand{col = 1}
+			self:set_expand{col = 2}
 			for i = 1,value do
 				self.buttons[i] = Widgets.ItemButton{pressed = function() self:pressed(i) end}
 				self:set_child{

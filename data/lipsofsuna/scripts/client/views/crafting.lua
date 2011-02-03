@@ -16,7 +16,7 @@ end
 --- Initializes the crafting UI.
 -- @param clss Crafting class.
 Crafting.init = function(clss)
-	clss.dialog = Widgets.Popup{cols = 1}
+	clss.dialog = Widgets.Frame{cols = 1, style = "popup"}
 	clss.dialog:set_expand{col = 1, row = 2}
 	clss.title = Widgets.Label{font = "medium", text = "Crafting"}
 	clss.tree = Widgets.List()

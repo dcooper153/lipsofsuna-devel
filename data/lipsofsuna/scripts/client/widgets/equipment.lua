@@ -1,10 +1,10 @@
-Widgets.Equipment = Class(Widget)
+require "client/widgets/frame"
+
+Widgets.Equipment = Class(Widgets.Frame)
 
 Widgets.Equipment.new = function(clss, args)
-	local self = Widget.new(clss, {cols = 2, pressed = args.pressed})
+	local self = Widgets.Frame.new(clss, {cols = 2, pressed = args.pressed, style = "equipment"})
 	self:set_expand{col = 2}
-	self:set_request{internal = true, width = 256, height = 165}
-	self.spacings = {0,2}
 	self.dict_name = {}
 	self.dict_name["head"] = Widgets.ItemButton{pressed = function() self:pressed("head") end}
 	self.dict_name["upperbody"] = Widgets.ItemButton{pressed = function() self:pressed("upperbody") end}
@@ -21,17 +21,4 @@ Widgets.Equipment.new = function(clss, args)
 	self:append_row(self.dict_name["feet"])
 	self:append_row(self.dict_name["arms"])
 	return self
-end
-
-Widgets.Equipment.reshaped = function(self)
-	local w = self.width
-	local h = self.height
-	self:canvas_clear()
-	self:canvas_image{
-		dest_position = {0,0},
-		dest_size = {w,h},
-		source_image = "equipment1",
-		source_position = {0,0},
-		source_tiling = {0,256,0,0,256,0}}
-	self:canvas_compile()
 end

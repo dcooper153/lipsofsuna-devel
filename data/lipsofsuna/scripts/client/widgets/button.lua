@@ -35,7 +35,7 @@ Widgets.Button.reshaped = function(self)
 	self:set_request{
 		font = self.font,
 		internal = true,
-		paddings = {2,2,2,2},
+		paddings = {3,6,6,3},
 		text = self.text}
 	local w = self.width
 	local h = self.height
@@ -44,8 +44,8 @@ Widgets.Button.reshaped = function(self)
 		dest_position = {0,0},
 		dest_size = {w,h},
 		source_image = "widgets1",
-		source_position = self.focused and {64,0} or {0,0},
-		source_tiling = {6,52,6,6,52,6}}
+		source_position = self.focused and {350,415} or {350,375},
+		source_tiling = {12,64,12,11,14,13}}
 	self:canvas_text{
 		dest_position = {0,0},
 		dest_size = {w,h},
