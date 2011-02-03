@@ -56,6 +56,25 @@ Drag.clicked_equipment = function(self, inv, slot)
 	item.drag = true
 end
 
+--- Called when the scene is clicked with the purpose of stopping a drag.
+-- @param self Drag.
+-- @return True if the click was handled by the drag and drop system.
+Drag.clicked_scene = function(self)
+	-- Handle existing drags.
+	-- If there's an item drag in progress, the item is dropped to the
+	-- world. Otherwise, the incompatible drag is cancelled.
+	if self.drag then
+		if self.drag[1] == "equ" or self.drag[1] == "inv" then
+			Equipment:move(self.drag[1], self.drag[2], self.drag[3], "obj")
+			self:clear()
+		else
+			self:cancel()
+		end
+		return true
+	end
+	-- TODO: Dragging from the world to the inventory.
+end
+
 Drag.cancel = function(self)
 	self:clear()
 end

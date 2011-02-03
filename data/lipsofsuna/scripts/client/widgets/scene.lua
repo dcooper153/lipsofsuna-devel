@@ -32,7 +32,9 @@ Widgets.Scene.pick = function(self)
 end
 
 Widgets.Scene.pressed = function(self)
-	Target:select_scene()
+	if not Drag:clicked_scene() then
+		Target:select_scene()
+	end
 end
 
 Widgets.Scene.render = function(self)
