@@ -1,62 +1,5 @@
 Equipment = Class()
 
-Equipment.init = function(clss)
-	clss.group = Widgets.Equipment{cols = 1}
-	clss.group.spacings = {0,2}
-	clss.button_head = Widgets.ItemButton{pressed = function() clss:clicked("head") end}
-	clss.button_upperbody = Widgets.ItemButton{pressed = function() clss:clicked("upperbody") end}
-	clss.button_handl = Widgets.ItemButton{pressed = function() clss:clicked("hand.L") end}
-	clss.button_handr = Widgets.ItemButton{pressed = function() clss:clicked("hand.R") end}
-	clss.button_lowerbody = Widgets.ItemButton{pressed = function() clss:clicked("lowerbody") end}
-	clss.button_feet = Widgets.ItemButton{pressed = function() clss:clicked("feet") end}
-	clss.button_arms = Widgets.ItemButton{pressed = function() clss:clicked("arms") end}
-	clss.group:append_row(clss.button_head)
-	clss.group:append_row(clss.button_upperbody)
-	clss.group:append_row(clss.button_handr)
-	clss.group:append_row(clss.button_handl)
-	clss.group:append_row(clss.button_lowerbody)
-	clss.group:append_row(clss.button_feet)
-	clss.group:append_row(clss.button_arms)
-	clss.group:set_expand{col = 1}
-	clss.dict_name = {
-		["head"] = clss.button_head,
-		["upperbody"] = clss.button_upperbody,
-		["hand.L"] = clss.button_handl,
-		["hand.R"] = clss.button_handr,
-		["lowerbody"] = clss.button_lowerbody,
-		["feet"] = clss.button_feet,
-		["arms"] = clss.button_arms}
-end
-
-Equipment.get_item = function(clss, args)
-	local obj = clss.dict_name[args.slot]
-	if not obj then return end
-	if not obj.text or #obj.text == 0 then return end
-	return obj
-end
-
---- Sets the contents of an equipment slot.
--- @param clss Equipment class.
--- @param node Node name.
--- @param name Item name.
-Equipment.set_item = function(clss, slot, name, count)
-	local widget = clss.dict_name[slot]
-	if widget then
-		local spec = Itemspec:find{name = name}
-		widget.text = name or ""
-		widget.icon = spec and spec.icon
-		widget.count = count or 1
-	end
-end
-
-Equipment.clicked = function(clss, slot)
-	if Target.active then
-		Target:select_equipment(slot)
-	else
-		Drag:clicked_equipment(nil, slot)
-	end
-end
-
 Equipment.move = function(self, src_type, src_id, src_slot, dst_type, dst_id, dst_slot)
 
 	if not Player.object then return end
@@ -128,15 +71,3 @@ Equipment.move = function(self, src_type, src_id, src_slot, dst_type, dst_id, ds
 	end
 
 end
-
-------------------------------------------------------------------------------
-
-Equipment:init()
-
--- Updates items of the equipment display.
-Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
-	local ok,i,count,name,slot = event.packet:read("uint32", "uint32", "string", "string")
-	if ok and Player.object and Player.object.id == i then
-		Equipment:set_item(slot, name, count)
-	end
-end}

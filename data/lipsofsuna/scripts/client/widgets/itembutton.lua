@@ -30,8 +30,16 @@ Widgets.ItemButton.reshaped = function(self)
 		width = 150}
 	local w = self.width
 	local h = self.height
-	self:canvas_clear()
 	local a = self.drag and 0.2 or 1
+	-- Background.
+	self:canvas_clear()
+	self:canvas_image{
+		dest_position = {0,0},
+		dest_size = {w,h},
+		source_image = "widgets1",
+		source_position = self.focused and {64,0} or {0,0},
+		source_tiling = {6,52,6,6,52,6}}
+	-- Icon.
 	local icon = Iconspec:find{name = self.icon}
 	if icon then
 		self:canvas_image{
@@ -42,6 +50,7 @@ Widgets.ItemButton.reshaped = function(self)
 			source_position = icon.offset,
 			source_tiling = {0,icon.size[1],0,0,icon.size[1],0}}
 	end
+	-- Text.
 	if self.text then
 		self:canvas_text{
 			dest_position = {22,0},
@@ -51,6 +60,7 @@ Widgets.ItemButton.reshaped = function(self)
 			text_color = self.focused and {1,1,0,a} or {1,1,1,a},
 			text_font = self.font}
 	end
+	-- Count.
 	if self.count and self.count > 1 then
 		self:canvas_text{
 			dest_position = {0,0},
