@@ -38,8 +38,10 @@ static void private_update_shadow (
 /**
  * \brief Creates a new light source.
  * \param scene Scene.
- * \param color Array of 4 floats.
- * \param equation Array of 3 floats.
+ * \param ambient Ambient color, array of 4 floats.
+ * \param diffuse Diffuse color, array of 4 floats.
+ * \param specular Specular color, array of 4 floats.
+ * \param equation Attenuation equation, array of 3 floats.
  * \param cutoff Spot cutoff in radians.
  * \param exponent Spot expoent.
  * \param shadows Nonzero if the lamp casts shadows.
@@ -47,7 +49,9 @@ static void private_update_shadow (
  */
 LIRenLight* liren_light_new (
 	LIRenScene*  scene,
-	const float* color,
+	const float* ambient,
+	const float* diffuse,
+	const float* specular,
 	const float* equation,
 	float        cutoff,
 	float        exponent,
@@ -60,18 +64,17 @@ LIRenLight* liren_light_new (
 	if (self == NULL)
 		return NULL;
 	self->scene = scene;
-#warning Hardcoded light ambient because model format does not support it
-	self->ambient[0] = 0.2f * color[0];
-	self->ambient[1] = 0.2f * color[1];
-	self->ambient[2] = 0.2f * color[2];
+	self->ambient[0] = ambient[0];
+	self->ambient[1] = ambient[1];
+	self->ambient[2] = ambient[2];
 	self->ambient[3] = 1.0f;
-	self->diffuse[0] = color[0];
-	self->diffuse[1] = color[1];
-	self->diffuse[2] = color[2];
+	self->diffuse[0] = diffuse[0];
+	self->diffuse[1] = diffuse[1];
+	self->diffuse[2] = diffuse[2];
 	self->diffuse[3] = 1.0f;
-	self->specular[0] = color[0];
-	self->specular[1] = color[1];
-	self->specular[2] = color[2];
+	self->specular[0] = specular[0];
+	self->specular[1] = specular[1];
+	self->specular[2] = specular[2];
 	self->specular[3] = 1.0f;
 	self->equation[0] = equation[0];
 	self->equation[1] = equation[1];
@@ -92,21 +95,24 @@ LIRenLight* liren_light_new (
 
 /**
  * \brief Creates a new directional light source.
- *
  * \param scene Scene.
- * \param color Array of 4 floats.
+ * \param ambient Ambient color, array of 4 floats.
+ * \param diffuse Diffuse color, array of 4 floats.
+ * \param specular Specular color, array of 4 floats.
  * \return New light source or NULL.
  */
 LIRenLight* liren_light_new_directional (
 	LIRenScene*  scene,
-	const float* color)
+	const float* ambient,
+	const float* diffuse,
+	const float* specular)
 {
 	const float equation[3] = { 1.0f, 0.0f, 0.0f };
 	const LIMatVector direction = { 0.0f, 0.0f, -1.0f };
 	LIRenLight* self;
 
 	/* Create the sun.  */
-	self = liren_light_new (scene, color, equation, M_PI, 0.0f, 0);
+	self = liren_light_new (scene, ambient, diffuse, specular, equation, M_PI, 0.0f, 0);
 	if (self == NULL)
 		return NULL;
 	liren_light_set_direction (self, &direction);
@@ -130,8 +136,8 @@ LIRenLight* liren_light_new_from_model (
 	LIRenLight* self;
 
 	/* Allocate self. */
-	self = liren_light_new (scene,
-		light->light.color, light->light.equation,
+	self = liren_light_new (scene, light->light.ambient,
+		light->light.diffuse, light->light.specular, light->light.equation,
 		light->light.spot.cutoff, light->light.spot.exponent,
 		light->light.flags & LIMDL_LIGHT_FLAG_SHADOW);
 	if (self == NULL)

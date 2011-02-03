@@ -65,7 +65,9 @@ struct _LIRenLight
 
 LIAPICALL (LIRenLight*, liren_light_new, (
 	LIRenScene*  scene,
-	const float* color,
+	const float* ambient,
+	const float* diffuse,
+	const float* specular,
 	const float* equation,
 	float        cutoff,
 	float        exponent,
@@ -73,7 +75,9 @@ LIAPICALL (LIRenLight*, liren_light_new, (
 
 LIAPICALL (LIRenLight*, liren_light_new_directional, (
 	LIRenScene*  scene,
-	const float* color));
+	const float* ambient,
+	const float* diffuse,
+	const float* specular));
 
 LIAPICALL (LIRenLight*, liren_light_new_from_model, (
 	LIRenScene*      scene,

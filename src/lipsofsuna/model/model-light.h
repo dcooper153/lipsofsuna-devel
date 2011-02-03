@@ -27,7 +27,9 @@
 struct _LIMdlLight
 {
 	int flags;
-	float color[3];
+	float ambient[4];
+	float diffuse[4];
+	float specular[4];
 	float equation[3];
 	struct
 	{

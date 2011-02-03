@@ -43,12 +43,13 @@ static void Light_new (LIScrArgs* args)
 	LIExtModule* module;
 	LIRenLight* self;
 	LIScrData* data;
-	const float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	const float black[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	const float white[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	const float equation[3] = { 1.0f, 1.0f, 1.0f };
 
 	/* Allocate self. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_LIGHT);
-	self = liren_light_new (module->client->scene, color, equation, M_PI, 0.0f, 0);
+	self = liren_light_new (module->client->scene, black, white, white, equation, M_PI, 0.0f, 0);
 	if (self == NULL)
 		return;
 
@@ -94,10 +95,10 @@ static void Light_setter_ambient (LIScrArgs* args)
 
 /* @luadoc
  * --- The diffuse color of the light source.
- * -- @name Light.color
+ * -- @name Light.diffuse
  * -- @class table
  */
-static void Light_getter_color (LIScrArgs* args)
+static void Light_getter_diffuse (LIScrArgs* args)
 {
 	LIRenLight* light;
 
@@ -108,7 +109,7 @@ static void Light_getter_color (LIScrArgs* args)
 	liscr_args_seti_float (args, light->diffuse[2]);
 	liscr_args_seti_float (args, light->diffuse[3]);
 }
-static void Light_setter_color (LIScrArgs* args)
+static void Light_setter_diffuse (LIScrArgs* args)
 {
 	int i;
 	float value[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -286,6 +287,34 @@ static void Light_setter_shadow_near (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- The specular color of the light source.
+ * -- @name Light.specular
+ * -- @class table
+ */
+static void Light_getter_specular (LIScrArgs* args)
+{
+	LIRenLight* light;
+
+	light = args->self;
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_seti_float (args, light->specular[0]);
+	liscr_args_seti_float (args, light->specular[1]);
+	liscr_args_seti_float (args, light->specular[2]);
+	liscr_args_seti_float (args, light->specular[3]);
+}
+static void Light_setter_specular (LIScrArgs* args)
+{
+	int i;
+	float value[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	LIRenLight* light;
+
+	light = args->self;
+	for (i = 0 ; i < 4 ; i++)
+		liscr_args_geti_float (args, i, value + i);
+	memcpy (light->specular, value, 4 * sizeof (float));
+}
+
+/* @luadoc
  * --- Spot cutoff angle of the light, in radians.
  * -- @name Light.spot_cutoff
  * -- @class table
@@ -338,7 +367,7 @@ void liext_script_light (
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Light_new);
 	liscr_class_insert_mvar (self, "ambient", Light_getter_ambient, Light_setter_ambient);
-	liscr_class_insert_mvar (self, "color", Light_getter_color, Light_setter_color);
+	liscr_class_insert_mvar (self, "diffuse", Light_getter_diffuse, Light_setter_diffuse);
 	liscr_class_insert_mvar (self, "enabled", Light_getter_enabled, Light_setter_enabled);
 	liscr_class_insert_mvar (self, "equation", Light_getter_equation, Light_setter_equation);
 	liscr_class_insert_mvar (self, "position", Light_getter_position, Light_setter_position);
@@ -346,6 +375,7 @@ void liext_script_light (
 	liscr_class_insert_mvar (self, "shadow_casting", Light_getter_shadow_casting, Light_setter_shadow_casting);
 	liscr_class_insert_mvar (self, "shadow_far", Light_getter_shadow_far, Light_setter_shadow_far);
 	liscr_class_insert_mvar (self, "shadow_near", Light_getter_shadow_near, Light_setter_shadow_near);
+	liscr_class_insert_mvar (self, "specular", Light_getter_specular, Light_setter_specular);
 	liscr_class_insert_mvar (self, "spot_cutoff", Light_getter_spot_cutoff, Light_setter_spot_cutoff);
 	liscr_class_insert_mvar (self, "spot_exponent", Light_getter_spot_exponent, Light_setter_spot_exponent);
 }

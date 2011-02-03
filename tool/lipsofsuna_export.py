@@ -6,7 +6,8 @@ class LIEnum:
 		self.files = []
 		self.MAGIC = 'lips/mdl'
 		self.VERSION = 0xFFFFFFF3
-		self.LIGHTFLAG_NOSHADOW = 1
+		self.LIGHTFLAG_NOSHADOW = 0x01
+		self.LIGHTFLAG_NEWFORMAT = 0x80
 		self.MATRFLAG_BILLBOARD = 1
 		self.MATRFLAG_COLLISION = 2
 		self.MATRFLAG_CULLFACE = 4
@@ -643,7 +644,7 @@ class LINodeLight(LINode):
 	def __init__(self, parent, object):
 		LINode.__init__(self, parent, object)
 		self.type = LIFormat.NODETYPE_LIGHT
-		self.flags = 0
+		self.flags = LIFormat.LIGHTFLAG_NEWFORMAT
 		if object.data.shadow_method != 'NOSHADOW':
 			self.flags |= LIFormat.LIGHTFLAG_NOSHADOW
 		if object.data.type == 'SPOT':
@@ -658,10 +659,18 @@ class LINodeLight(LINode):
 			self.spot_cutoff = math.pi
 			self.spot_size = math.pi
 			self.spot_blend = 0
-		self.diffuse = [0, 0, 0]
+		self.ambient = [0, 0, 0, 1]
+		self.ambient[0] = bpy.context.scene.world.ambient_color[0]
+		self.ambient[1] = bpy.context.scene.world.ambient_color[1]
+		self.ambient[2] = bpy.context.scene.world.ambient_color[2]
+		self.diffuse = [0, 0, 0, 1]
 		self.diffuse[0] = object.data.energy * object.data.color[0]
 		self.diffuse[1] = object.data.energy * object.data.color[1]
 		self.diffuse[2] = object.data.energy * object.data.color[2]
+		self.specular = [0, 0, 0, 1]
+		self.specular[0] = self.diffuse[0]
+		self.specular[1] = self.diffuse[1]
+		self.specular[2] = self.diffuse[2]
 		self.equation = [1, 1, 1]
 		self.equation[1] = object.data.linear_attenuation / object.data.distance
 		self.equation[2] = object.data.quadratic_attenuation / (object.data.distance * object.data.distance)
@@ -671,9 +680,18 @@ class LINodeLight(LINode):
 		writer.write_float(self.spot_cutoff)
 		writer.write_float(self.clip_start)
 		writer.write_float(self.clip_end)
+		writer.write_float(self.ambient[0])
+		writer.write_float(self.ambient[1])
+		writer.write_float(self.ambient[2])
+		writer.write_float(self.ambient[3])
 		writer.write_float(self.diffuse[0])
 		writer.write_float(self.diffuse[1])
 		writer.write_float(self.diffuse[2])
+		writer.write_float(self.diffuse[3])
+		writer.write_float(self.specular[0])
+		writer.write_float(self.specular[1])
+		writer.write_float(self.specular[2])
+		writer.write_float(self.specular[3])
 		writer.write_float(self.equation[0])
 		writer.write_float(self.equation[1])
 		writer.write_float(self.equation[2])

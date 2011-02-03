@@ -259,7 +259,7 @@ void liren_scene_render_pass (
 	/* Initialize pass. */
 	identity = limat_matrix_identity ();
 	context = self->state.context;
-	ambient_light = liren_light_new (self, black, equation, M_PI, 0.0f, 0);
+	ambient_light = liren_light_new (self, black, black, black, equation, M_PI, 0.0f, 0);
 	liren_light_set_ambient (ambient_light, black);
 	liren_light_update_cache (ambient_light, self->state.context);
 
