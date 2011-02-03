@@ -597,20 +597,20 @@ static int private_triangulate_cube (
 	if (!types[1][1][0])
 	{
 		result[count++] = cubevert[0][0][0];
+		result[count++] = cubevert[1][1][0];
 		result[count++] = cubevert[1][0][0];
-		result[count++] = cubevert[1][1][0];
 		result[count++] = cubevert[0][0][0];
-		result[count++] = cubevert[1][1][0];
 		result[count++] = cubevert[0][1][0];
+		result[count++] = cubevert[1][1][0];
 	}
 	if (!types[1][1][2])
 	{
 		result[count++] = cubevert[0][0][1];
-		result[count++] = cubevert[1][1][1];
 		result[count++] = cubevert[1][0][1];
-		result[count++] = cubevert[0][0][1];
-		result[count++] = cubevert[0][1][1];
 		result[count++] = cubevert[1][1][1];
+		result[count++] = cubevert[0][0][1];
+		result[count++] = cubevert[1][1][1];
+		result[count++] = cubevert[0][1][1];
 	}
 
 	return count;
