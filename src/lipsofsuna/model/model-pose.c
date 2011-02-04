@@ -311,6 +311,12 @@ void limdl_pose_update (
 			group->head_pose = group->pose_node->transform.global.position;
 			group->scale_pose = group->pose_node->transform.global_scale;
 		}
+		else
+		{
+			group->rotation = limat_quaternion_identity ();
+			group->head_pose = limat_vector_init (0.0f, 0.0f, 0.0f);
+			group->scale_pose = 1.0f;
+		}
 	}
 }
 
