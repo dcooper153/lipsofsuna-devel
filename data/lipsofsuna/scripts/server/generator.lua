@@ -207,7 +207,7 @@ Generator = Class()
 Generator.map_size = Vector(500, 500, 500)
 Generator.map_start = Vector(1500, 2750, 1500) - Generator.map_size * 0.5
 Generator.map_end = Vector(1500, 2750, 1500) + Generator.map_size * 0.5
-Generator.map_version = "1"
+Generator.map_version = "2"
 
 --- Informs clients of the generator status.
 -- @param clss Generator class.

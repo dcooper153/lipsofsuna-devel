@@ -101,7 +101,6 @@ Gui.set_mode = function(self, mode, level)
 		end
 	end
 	-- Set the detailed view mode.
-	print("SETMODE", self.mode, "=>", mode)
 	self.mode = mode
 	if mode == "chargen" then
 		self.view = Views.Chargen.inst

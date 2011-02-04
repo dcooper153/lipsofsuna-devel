@@ -3,12 +3,12 @@ Widgets.ItemButton = Class(Widget)
 Widgets.ItemButton.setter = function(self, key, value)
 	if key == "count" then
 		if self.count ~= value then
-			Widgets.IconButton.setter(self, key, value)
+			Widget.setter(self, key, value)
 			self:reshaped()
 		end
 	elseif key == "drag" then
 		if self.drag ~= value then
-			Widgets.IconButton.setter(self, key, value)
+			Widget.setter(self, key, value)
 			self:reshaped()
 		end
 	elseif key == "focused" then
