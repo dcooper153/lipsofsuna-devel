@@ -458,7 +458,7 @@ static void private_pack_tiled (
 		px = r.x + r.width - w[2] - 1;
 		private_pack_quad (self,
 			tx[2], ty[1], px, py,
-			tx[3], ty[1] + fv, px + w[0], py + fh);
+			tx[3], ty[1] + fv, px + w[2], py + fh);
 	}
 
 	/* Pack fill. */
