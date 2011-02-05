@@ -1,5 +1,3 @@
-require "client/views/skills"
-
 Views.Chargen = Class(Widgets.Scene)
 Views.Chargen.mode = "chargen"
 Views.Chargen.list_races = {
@@ -15,10 +13,18 @@ Views.Chargen.list_races = {
 Views.Chargen.new = function(clss)
 	-- Preview scene.
 	local camera = Camera{far = 60.0, near = 0.3, mode = "first-person"}
-	local self = Widgets.Scene.new(clss, {cols = 1, behind = true, fullscreen = true, camera = camera, spacings = {0,0}})
+	local self = Widgets.Scene.new(clss, {rows = 1, behind = true, fullscreen = true, camera = camera, spacings = {0,0}})
 	self.margins = {5,5,5,5}
-	self.skills = Views.Skills()
-	self.skills:set_child{row = 1, col = 1}
+	self.skills_text = Widgets.Text()
+	self.skills = Widgets.Skills()
+	self.skills.changed = function(widget, skill)
+		skill.value = skill.cap
+	end
+	self.skills.shown = function(widget, skill)
+		local species = self:get_race()
+		local spec = species and species.skills[skill.id]
+		self.skills_text.text = {{skill.name, "medium"}, {skill.desc}}
+	end
 	self.object = Object{position = Vector(1, 1, 1), type = "character"}
 	self.light = Light{ambient = {1.0,1.0,1.0,1.0}, diffuse={1.0,1.0,1.0,1.0}, equation={2,0.3,0.03}}
 	self.timer = Timer{enabled = false, func = function(timer, secs) self:update(secs) end}
@@ -35,6 +41,7 @@ Views.Chargen.new = function(clss)
 		table.insert(races, {v[1], function() self:set_race(k) end})
 	end
 	self.label_race = Widgets.Label{text = "Race:"}
+	self.label_race:set_request{width = 100}
 	self.combo_race = Widgets.ComboBox(races)
 	self.label_gender = Widgets.Label{text = "Gender:"}
 	self.combo_gender = Widgets.ComboBox()
@@ -74,6 +81,7 @@ Views.Chargen.new = function(clss)
 		pressed = function(widget) self:set_bust_scale(widget:get_value_at(Client.cursor_pos)) end}
 	-- Apply and quit buttons.
 	self.button_create = Widgets.Button{text = "Create", pressed = function() self:apply() end}
+	self.button_create:set_request{height = 40}
 	self.button_quit = Widgets.Button{text = "Quit", pressed = function() self:quit() end}
 	-- Packing.
 	self.group_hair = Widget{rows = 1, cols = 2, homogeneous = true}
@@ -81,42 +89,55 @@ Views.Chargen.new = function(clss)
 	self.group_hair:set_child{row = 1, col = 2, widget = self.combo_hair_color}
 	self.group_hair:set_expand{col = 1}
 	self.group_hair:set_expand{col = 2}
-	self.group_race = Widgets.Frame{rows = 12, cols = 2, spacings = {0,2}}
+	self.group_race = Widget{rows = 3, cols = 2, spacings = {0,2}}
 	self.group_race:set_child{row = 1, col = 1, widget = self.label_name}
 	self.group_race:set_child{row = 1, col = 2, widget = self.entry_name}
 	self.group_race:set_child{row = 2, col = 1, widget = self.label_race}
 	self.group_race:set_child{row = 2, col = 2, widget = self.combo_race}
 	self.group_race:set_child{row = 3, col = 1, widget = self.label_gender}
 	self.group_race:set_child{row = 3, col = 2, widget = self.combo_gender}
-	self.group_race:set_child{row = 4, col = 1, widget = self.label_eye_style}
-	self.group_race:set_child{row = 4, col = 2, widget = self.combo_eye_style}
-	self.group_race:set_child{row = 5, col = 1, widget = self.label_eye_color}
-	self.group_race:set_child{row = 5, col = 2, widget = self.color_eye}
-	self.group_race:set_child{row = 6, col = 1, widget = self.label_hair_style}
-	self.group_race:set_child{row = 6, col = 2, widget = self.combo_hair_style}
-	self.group_race:set_child{row = 7, col = 1, widget = self.label_hair_color}
-	self.group_race:set_child{row = 7, col = 2, widget = self.color_hair}
-	self.group_race:set_child{row = 8, col = 1, widget = self.label_skin_style}
-	self.group_race:set_child{row = 8, col = 2, widget = self.combo_skin_style}
-	self.group_race:set_child{row = 9, col = 1, widget = self.label_skin_color}
-	self.group_race:set_child{row = 9, col = 2, widget = self.color_skin}
-	self.group_race:set_child{row = 10, col = 1, widget = self.label_height}
-	self.group_race:set_child{row = 10, col = 2, widget = self.scroll_height}
-	self.group_race:set_child{row = 11, col = 1, widget = self.label_nose_scale}
-	self.group_race:set_child{row = 11, col = 2, widget = self.scroll_nose_scale}
-	self.group_race:set_child{row = 12, col = 1, widget = self.label_bust_scale}
-	self.group_race:set_child{row = 12, col = 2, widget = self.scroll_bust_scale}
 	self.group_race:set_expand{col = 2}
-	self.group_left = Widget{cols = 1}
-	self.group_left:append_row(self.button_create)
-	self.group_left:append_row(self.button_quit)
+	self.group_race1 = Widgets.Frame{rows = 2, cols = 1}
+	self.group_race1:set_child{row = 1, col = 1, widget = self.group_race}
+	self.group_race1:set_child{row = 2, col = 1, widget = self.skills}
+	self.group_appearance = Widgets.Frame{rows = 9, cols = 2, spacings = {0,2}}
+	self.group_appearance:set_child{row = 1, col = 1, widget = self.label_eye_style}
+	self.group_appearance:set_child{row = 1, col = 2, widget = self.combo_eye_style}
+	self.group_appearance:set_child{row = 2, col = 1, widget = self.label_eye_color}
+	self.group_appearance:set_child{row = 2, col = 2, widget = self.color_eye}
+	self.group_appearance:set_child{row = 3, col = 1, widget = self.label_hair_style}
+	self.group_appearance:set_child{row = 3, col = 2, widget = self.combo_hair_style}
+	self.group_appearance:set_child{row = 4, col = 1, widget = self.label_hair_color}
+	self.group_appearance:set_child{row = 4, col = 2, widget = self.color_hair}
+	self.group_appearance:set_child{row = 5, col = 1, widget = self.label_skin_style}
+	self.group_appearance:set_child{row = 5, col = 2, widget = self.combo_skin_style}
+	self.group_appearance:set_child{row = 6, col = 1, widget = self.label_skin_color}
+	self.group_appearance:set_child{row = 6, col = 2, widget = self.color_skin}
+	self.group_appearance:set_child{row = 7, col = 1, widget = self.label_height}
+	self.group_appearance:set_child{row = 7, col = 2, widget = self.scroll_height}
+	self.group_appearance:set_child{row = 8, col = 1, widget = self.label_nose_scale}
+	self.group_appearance:set_child{row = 8, col = 2, widget = self.scroll_nose_scale}
+	self.group_appearance:set_child{row = 9, col = 1, widget = self.label_bust_scale}
+	self.group_appearance:set_child{row = 9, col = 2, widget = self.scroll_bust_scale}
+	self.group_appearance:set_expand{col = 2}
+	self.group_buttons = Widget{rows = 2, cols = 1, margins = {0,0,5,5}}
+	self.group_buttons:set_child{row = 1, col = 1, widget = self.button_create}
+	self.group_buttons:set_child{row = 2, col = 1, widget = self.button_quit}
+	self.group_buttons:set_expand{col = 1}
+	self.group_left = Widget{cols = 1, spacings = {0,0}}
+	self.group_left:append_row(Widgets.Frame{style = "title", text = "Character"})
+	self.group_left:append_row(self.group_race1)
+	self.group_left:append_row(self.skills_text)
+	self.group_left:append_row(self.group_buttons)
 	self.group_left:set_expand{col = 1}
-	self:append_row(Widgets.Frame{style = "title", text = "Character"})
-	self:append_row(self.group_race)
-	self:append_row(self.skills)
-	self:append_row()
-	self:append_row(self.group_left)
-	self:set_expand{row = 4}
+	self.group_right = Widget{cols = 1, spacings = {0,0}}
+	self.group_right:append_row(Widgets.Frame{style = "title", text = "Apperance"})
+	self.group_right:append_row(self.group_appearance)
+	self.group_right:set_expand{col = 1}
+	self:append_col(self.group_left)
+	self:append_col(nil)
+	self:append_col(self.group_right)
+	self:set_expand{row = 1, col = 2}
 	return self
 end
 
@@ -177,6 +198,7 @@ end
 Views.Chargen.random = function(self)
 	self:set_race(math.random(1, #self.list_races))
 	self:update_model()
+	self.skills:show(1)
 end
 
 Views.Chargen.set_gender = function(self, index)
@@ -229,12 +251,16 @@ Views.Chargen.set_nose_scale = function(self, value)
 	self:update_model()
 end
 
+Views.Chargen.get_race = function(self)
+	return Species:find{name = self.list_races[self.combo_race.value][2]}
+end
+
 Views.Chargen.set_race = function(self, index)
 	-- Set the race selection.
 	self.combo_race.value = index
 	self.combo_race.text = self.list_races[index][1]
 	self.race = self.list_races[index][2]
-	local spec = Species:find{name = self.list_races[self.combo_race.value][2]}
+	local spec = self:get_race()
 	-- Rebuild the gender list.
 	self.list_genders = {}
 	self.combo_gender:clear()

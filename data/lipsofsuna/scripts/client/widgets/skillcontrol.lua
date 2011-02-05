@@ -103,7 +103,7 @@ Widgets.SkillControl.reshaped = function(self)
 		self:canvas_text{
 			dest_position = {xlbl,0},
 			dest_size = {xbar,h},
-			text = self.text,
+			text = self.text .. ":",
 			text_alignment = {0,0.5},
 			text_color = {1,1,1,1},
 			text_font = "default"}
