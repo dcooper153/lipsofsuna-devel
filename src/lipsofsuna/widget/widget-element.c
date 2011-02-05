@@ -57,13 +57,15 @@ static void private_pack_verts (
 /*****************************************************************************/
 
 LIWdgElement* liwdg_element_new_image (
-	LIImgTexture* texture,
-	const float*  color,
-	const int*    dst_clip,
-	const int*    dst_pos,
-	const int*    dst_size,
-	const int*    src_pos,
-	const int*    src_tiling)
+	LIImgTexture*      texture,
+	const float*       color,
+	const int*         dst_clip,
+	const int*         dst_pos,
+	const int*         dst_size,
+	const int*         src_pos,
+	const int*         src_tiling,
+	float              rotation_angle,
+	const LIMatVector* rotation_center)
 {
 	const float white[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	LIWdgElement* self;
@@ -97,18 +99,23 @@ LIWdgElement* liwdg_element_new_image (
 		self->src_tiling[1] = texture->width;
 		self->src_tiling[4] = texture->height;
 	}
+	self->rotation = rotation_angle;
+	if (rotation_center != NULL)
+		self->center = *rotation_center;
 
 	return self;
 }
 
 LIWdgElement* liwdg_element_new_text (
-	LIFntFont*    font,
-	const char*   text,
-	const int*    dst_clip,
-	const int*    dst_pos,
-	const int*    dst_size,
-	const float*  text_align,
-	const float*  text_color)
+	LIFntFont*         font,
+	const char*        text,
+	const int*         dst_clip,
+	const int*         dst_pos,
+	const int*         dst_size,
+	const float*       text_align,
+	const float*       text_color,
+	float              rotation_angle,
+	const LIMatVector* rotation_center)
 {
 	LIWdgElement* self;
 
@@ -135,6 +142,9 @@ LIWdgElement* liwdg_element_new_text (
 		memcpy (self->text_align, text_align, 2 * sizeof (float));
 	if (text_color != NULL)
 		memcpy (self->text_color, text_color, 4 * sizeof (float));
+	self->rotation = rotation_angle;
+	if (rotation_center != NULL)
+		self->center = *rotation_center;
 
 	return self;
 }
@@ -480,7 +490,10 @@ static void private_pack_verts (
 	const LIRenVertex* verts,
 	int                count)
 {
+	int i;
 	int cap;
+	LIMatQuaternion q;
+	LIMatVector v;
 	LIRenVertex* tmp;
 
 	/* Allocate space for vertices. */
@@ -501,6 +514,24 @@ static void private_pack_verts (
 	/* Append vertices. */
 	memcpy (self->vertices.array + self->vertices.count, verts, count * sizeof (LIRenVertex));
 	self->vertices.count += count;
+
+	/* Apply rotation. */
+	if (self->rotation != 0.0f)
+	{
+		v = limat_vector_init (0.0f, 0.0f, -1.0f);
+		q = limat_quaternion_rotation (self->rotation, v);
+		for (i = self->vertices.count - count ; i < self->vertices.count ; i++)
+		{
+			tmp = self->vertices.array + i;
+			v = limat_vector_init (tmp->coord[0], tmp->coord[1], tmp->coord[2]);
+			v = limat_vector_subtract (v, self->center);
+			v = limat_quaternion_transform (q, v);
+			v = limat_vector_add (v, self->center);
+			tmp->coord[0] = v.x;
+			tmp->coord[1] = v.y;
+			tmp->coord[2] = v.z;
+		}
+	}
 }
 
 /** @} */

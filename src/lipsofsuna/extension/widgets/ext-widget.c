@@ -172,6 +172,8 @@ static void Widget_canvas_compile (LIScrArgs* args)
  * --   <li>dest_clip: {x,y,w,h} or nil.</li>
  * --   <li>dest_position: {x,y} or nil.</li>
  * --   <li>dest_size: {w,h} or nil.</li>
+ * --   <li>rotation: Rotation angle in radians or nil.</li>
+ * --   <li>rotation_center: Rotation center vector or nil.</li>
  * --   <li>source_position: {x,y} or nil.</li>
  * --   <li>source_tiling: {x1,x2,x3,y1,y2,y3} or nil.</li></ul>
  * function Widget.canvas_image(self, args)
@@ -191,6 +193,9 @@ static void Widget_canvas_image (LIScrArgs* args)
 	int* source_position_ptr = NULL;
 	int* source_tiling_ptr = NULL;
 	const char* source_image;
+	float rotation = 0.0f;
+	LIScrData* vector = NULL;
+	LIMatVector* rotation_center_ptr = NULL;
 	LIImgTexture* texture;
 	LIWdgWidget* widget;
 	LIWdgElement* elem;
@@ -214,10 +219,13 @@ static void Widget_canvas_image (LIScrArgs* args)
 		source_position_ptr = source_position;
 	if (liscr_args_gets_intv (args, "source_tiling", 6, source_tiling) == 6)
 		source_tiling_ptr = source_tiling;
+	liscr_args_gets_float (args, "rotation", &rotation);
+	if (liscr_args_gets_data (args, "rotation_center", LISCR_SCRIPT_VECTOR, &vector))
+		rotation_center_ptr = liscr_data_get_data (vector);
 
 	/* Create the canvas element. */
 	elem = liwdg_element_new_image (texture, color_ptr, dest_clip_ptr, dest_position_ptr,
-		dest_size_ptr, source_position_ptr, source_tiling_ptr);
+		dest_size_ptr, source_position_ptr, source_tiling_ptr, rotation, rotation_center_ptr);
 	if (elem == NULL)
 		return;
 	if (!liwdg_widget_canvas_insert (widget, elem))
@@ -234,6 +242,8 @@ static void Widget_canvas_image (LIScrArgs* args)
  * --   <li>dest_clip: {x,y,w,h} or nil.</li>
  * --   <li>dest_position: {x,y} or nil.</li>
  * --   <li>dest_size: {w,h} or nil.</li>
+ * --   <li>rotation: Rotation angle in radians or nil.</li>
+ * --   <li>rotation_center: Rotation center vector or nil.</li>
  * --   <li>text: String.</li></ul>
  * --   <li>text_alignment: {x,y} or nil.</li>
  * --   <li>text_color: {r,g,b,a} or nil.</li></ul>
@@ -254,6 +264,9 @@ static void Widget_canvas_text (LIScrArgs* args)
 	float* text_color_ptr = NULL;
 	const char* text;
 	const char* text_font = "default";
+	float rotation = 0.0f;
+	LIScrData* vector = NULL;
+	LIMatVector* rotation_center_ptr = NULL;
 	LIFntFont* font;
 	LIWdgWidget* widget;
 	LIWdgElement* elem;
@@ -276,10 +289,13 @@ static void Widget_canvas_text (LIScrArgs* args)
 		text_align_ptr = text_align;
 	if (liscr_args_gets_floatv (args, "text_color", 4, text_color) == 4)
 		text_color_ptr = text_color;
+	liscr_args_gets_float (args, "rotation", &rotation);
+	if (liscr_args_gets_data (args, "rotation_center", LISCR_SCRIPT_VECTOR, &vector))
+		rotation_center_ptr = liscr_data_get_data (vector);
 
 	/* Create the canvas element. */
 	elem = liwdg_element_new_text (font, text, dest_clip_ptr, dest_position_ptr,
-		dest_size_ptr, text_align_ptr, text_color_ptr);
+		dest_size_ptr, text_align_ptr, text_color_ptr, rotation, rotation_center_ptr);
 	if (elem == NULL)
 		return;
 	if (!liwdg_widget_canvas_insert (widget, elem))

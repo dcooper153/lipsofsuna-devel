@@ -31,11 +31,13 @@ struct _LIWdgElement
 	int src_pos[2];
 	int src_tiling_enabled;
 	int src_tiling[6];
+	float rotation;
 	char* text;
 	float text_align[2];
 	float text_color[4];
 	LIFntFont* font;
 	LIImgTexture* texture;
+	LIMatVector center;
 	LIRenBuffer* buffer;
 	LIWdgElement* next;
 	struct
@@ -47,22 +49,26 @@ struct _LIWdgElement
 };
 
 LIAPICALL (LIWdgElement*, liwdg_element_new_image, (
-	LIImgTexture* texture,
-	const float*  color,
-	const int*    dst_clip,
-	const int*    dst_pos,
-	const int*    dst_size,
-	const int*    src_pos,
-	const int*    src_tiling));
+	LIImgTexture*      texture,
+	const float*       color,
+	const int*         dst_clip,
+	const int*         dst_pos,
+	const int*         dst_size,
+	const int*         src_pos,
+	const int*         src_tiling,
+	float              rotation_angle,
+	const LIMatVector* rotation_center));
 
 LIAPICALL (LIWdgElement*, liwdg_element_new_text, (
-	LIFntFont*    font,
-	const char*   text,
-	const int*    dst_clip,
-	const int*    dst_pos,
-	const int*    dst_size,
-	const float*  text_align,
-	const float*  text_color));
+	LIFntFont*         font,
+	const char*        text,
+	const int*         dst_clip,
+	const int*         dst_pos,
+	const int*         dst_size,
+	const float*       text_align,
+	const float*       text_color,
+	float              rotation_angle,
+	const LIMatVector* rotation_center));
 
 LIAPICALL (void, liwdg_element_free, (
 	LIWdgElement* self));
