@@ -1,4 +1,5 @@
 Serialize = Class()
+Serialize.data_version = "2"
 
 --- Initializes the serializer.
 -- @param clss Serialize class.
@@ -6,8 +7,12 @@ Serialize.init = function(clss)
 	clss.db = Database{name = "save.db"}
 	clss.sectors = Sectors{database = clss.db}
 	clss.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
+	if clss:get_value("data_version") ~= clss.data_version then
+		clss.db:query("DROP TABLE markers;")
+		clss.db:query("DROP TABLE quests;")
+	end
 	clss.db:query("CREATE TABLE IF NOT EXISTS markers (name TEXT PRIMARY KEY,id INTEGER,x FLOAT,y FLOAT,z FLOAT);")
-	clss.db:query("CREATE TABLE IF NOT EXISTS quests (name TEXT PRIMARY KEY,progress FLOAT,status TEXT,desc TEXT);")
+	clss.db:query("CREATE TABLE IF NOT EXISTS quests (name TEXT PRIMARY KEY,progress FLOAT,status TEXT,desc TEXT,marker TEXT);")
 	Sectors.instance = clss.sectors
 end
 
@@ -41,11 +46,11 @@ end
 --- Loads quests from the database.
 -- @param clss Serialize class.
 Serialize.load_quests = function(clss)
-	local r = clss.db:query("SELECT name,progress,status,desc FROM quests;")
+	local r = clss.db:query("SELECT name,progress,status,desc,marker FROM quests;")
 	for k,v in ipairs(r) do
 		local quest = Quest:find{name = v[1]}
 		if quest then
-			quest:update{progress = v[2], status = v[3], text = v[4]}
+			quest:update{progress = v[2], status = v[3], text = v[4], marker = v[5]}
 		end
 	end
 end
@@ -57,6 +62,16 @@ Serialize.save = function(clss, erase)
 	clss.sectors:save_world(erase)
 	clss:save_markers(erase)
 	clss:save_quests(erase)
+end
+
+--- Saves a map marker.
+-- @param clss Serialize class.
+-- @param marker Map marker.
+Serialize.save_marker = function(clss, marker)
+	clss.db:query("BEGIN TRANSACTION;")
+	clss.db:query("REPLACE INTO markers (name,id,x,y,z) VALUES (?,?,?,?,?);",
+		{marker.name, marker.target, marker.position.x, marker.position.y, marker.position.z})
+	clss.db:query("END TRANSACTION;")
 end
 
 --- Saves all map markers.
@@ -74,6 +89,16 @@ Serialize.save_markers = function(clss, erase)
 	clss.db:query("END TRANSACTION;")
 end
 
+--- Saves a quest.
+-- @param clss Serialize class.
+-- @param quest Quest.
+Serialize.save_quest = function(clss, quest)
+	clss.db:query("BEGIN TRANSACTION;")
+	clss.db:query("REPLACE INTO quests (name,progress,status,desc,marker) VALUES (?,?,?,?,?);",
+		{quest.name, quest.progress, quest.status, quest.text, quest.marker})
+	clss.db:query("END TRANSACTION;")
+end
+
 --- Saves all quests.
 -- @param clss Serialize class.
 -- @param erase True to erase existing database entries first.
@@ -84,7 +109,7 @@ Serialize.save_quests = function(clss, erase)
 	end
 	for k,v in pairs(Quest.dict_name) do
 		clss.db:query("REPLACE INTO quests (name,progress,status,desc) VALUES (?,?,?,?);",
-			{k, v.progress, v.status, v.text})
+			{k, v.progress, v.status, v.text, v.marker})
 	end
 	clss.db:query("END TRANSACTION;")
 end

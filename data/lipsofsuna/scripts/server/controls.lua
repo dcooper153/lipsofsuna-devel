@@ -50,6 +50,7 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	-- Transmit active and completed quests.
 	for k,q in pairs(Quest.dict_name) do
 		q:send{client = o}
+		q:send_marker{client = o}
 	end
 end}
 

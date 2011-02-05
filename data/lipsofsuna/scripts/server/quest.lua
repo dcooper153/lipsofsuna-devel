@@ -14,6 +14,7 @@ Quest.activate = function(clss, args)
 	if q.status == "unused" or q.status == "inactive" then
 		q.status = "active"
 		q:send{all = true}
+		Serialize:save_quest(q)
 	end
 end
 
@@ -31,6 +32,7 @@ Quest.complete = function(clss, args)
 	if q.status ~= "completed" then
 		q.status = "completed"
 		q:send{all = true}
+		Serialize:save_quest(q)
 	end
 end
 
@@ -39,9 +41,10 @@ end
 -- @param name Marker name or nil.
 Quest.marker = function(self, name)
 	local m = Marker:find{name = name}
-	if self.marker_data ~= m then
-		self.marker_data = m
+	if m and self.marker ~= m then
+		self.marker = name
 		self:send_marker{all = true}
+		Serialize:save_quest(self)
 	end
 end
 
@@ -77,9 +80,9 @@ Quest.send_marker = function(self, args)
 	-- Skip inactive quests.
 	if self.status ~= "active" and self.status ~= "completed" then return end
 	-- Create marker packet.
-	local pos = self.marker_data and self.marker_data.position or Vector()
-	local p = Packet(packets.QUEST_MARKER, "uint32", self.id,
-		"float", pos.x, "float", pos.y, "float", pos.z)
+	local m = self.marker and Marker:find{name = self.marker}
+	local pos = m and m.position or Vector()
+	local p = Packet(packets.QUEST_MARKER, "uint32", self.id, "float", pos.x, "float", pos.y, "float", pos.z)
 	-- Send the packet to clients.
 	if args.all then
 		for k,v in pairs(Player.clients) do
@@ -94,13 +97,21 @@ end
 -- @param self Quest.
 -- @param args Arguments.<ul>
 --   <li>progress: Progress number or nil.</li>
+--   <li>marker: Map marker name or nil.</li>
 --   <li>status: Quest status or nil.</li>
 --   <li>text: Quest text or nil.</li></ul>
 Quest.update = function(self, args)
 	-- Update the status.
+	local ch_m = false
 	local ch_p = false
 	local ch_s = false
 	local ch_t = false
+	if args.marker and self.marker ~= args.marker then
+		if Marker:find{name = args.marker} then
+			self.marker = args.marker
+			ch_m = true
+		end
+	end
 	if args.progress and self.progres ~= args.progress then
 		self.progress = args.progress
 		ch_p = true
@@ -116,5 +127,12 @@ Quest.update = function(self, args)
 	-- Inform clients.
 	if ch_s or ch_t then
 		self:send{all = true}
+	end
+	if ch_m then
+		self:send_marker{all = true}
+	end
+	-- Save changes.
+	if ch_m or ch_p or ch_s or ch_t then
+		Serialize:save_quest(self)
 	end
 end
