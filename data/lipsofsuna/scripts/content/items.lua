@@ -530,6 +530,16 @@ Itemspec{
 	equipment_slot = "feet"}
 
 Itemspec{
+	name = "leather boots",
+	model = "boots1",
+	armor_class = 0.04,
+	categories = {"armor"},
+	crafting_tools = {saw = 1},
+	crafting_materials = {log = 1},
+	equipment_models = {legs = "aerlegarmor2", legs1 = "boots1"},
+	equipment_slot = "feet"}
+
+Itemspec{
 	name = "leather pants",
 	model = "book-000",
 	armor_class = 0.04,
