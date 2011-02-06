@@ -96,6 +96,10 @@
     <name>zero-project</name>
     <url>http://www.zero-project.gr/</url>
   </author-info>
+ <author-info>
+    <name>Francisco "FreeLikeGNU" Athens</name>
+    <url>http://freelikegnu.org</url>
+  </author-info>
 
   <license-info>
     <name>CC0</name>
@@ -2131,5 +2135,41 @@
     <license>CC0</license>
     <status>FIXME</status>
     <type>sound effect</type>
+  </asset>
+ <asset>
+    <file>graphics/plaguerat1.lmdl</file>
+    <author>Francisco Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>character</tag>
+    <tag>enemy</tag>
+    <type>model</type>
+  </asset>
+ <asset>
+    <file>import/plaguerat1.blend</file>
+    <author>Francisco Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>character</tag>
+    <tag>enemy</tag>
+    <type>model</type>
+  </asset>
+ <asset>
+    <file>graphics/slime2.lmdl</file>
+    <author>Francisco Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>character</tag>
+    <tag>enemy</tag>
+    <type>model</type>
+  </asset>
+ <asset>
+    <file>import/slime2.blend</file>
+    <author>Francisco Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>character</tag>
+    <tag>enemy</tag>
+    <type>model</type>
   </asset>
 </assets>
