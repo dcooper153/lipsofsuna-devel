@@ -166,20 +166,23 @@ static void Scene_draw_pass (LIScrArgs* args)
  * --
  * -- @param self Scene.
  * -- @param args Arguments.<ul>
+ * --   <li>mipmaps: True to generate mipmaps.</li>
  * --   <li>shader: Post-processing shader name.</li></ul>
  * function Scene.draw_post_process(self, args)
  */
 static void Scene_draw_post_process (LIScrArgs* args)
 {
+	int mipmaps = 0;
 	const char* shader = "postprocess0";
 	LIExtModule* module;
 	LIRenScene* scene;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
 	scene = module->client->scene;
+	liscr_args_gets_bool (args, "mipmaps", &mipmaps);
 	liscr_args_gets_string (args, "shader", &shader);
 
-	liren_scene_render_postproc (scene, shader);
+	liren_scene_render_postproc (scene, shader, mipmaps);
 }
 
 /*****************************************************************************/

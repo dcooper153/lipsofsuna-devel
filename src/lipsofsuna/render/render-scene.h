@@ -76,7 +76,8 @@ LIAPICALL (void, liren_scene_render_pass, (
 
 LIAPICALL (void, liren_scene_render_postproc, (
 	LIRenScene* self,
-	const char* name));
+	const char* name,
+	int         mipmaps));
 
 LIAPICALL (void, liren_scene_update, (
 	LIRenScene* self,
