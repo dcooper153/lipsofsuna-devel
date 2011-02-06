@@ -88,46 +88,23 @@ Views.Options.new = function(clss)
 		self:set_transparency_quality(v)
 	end
 	-- Bloom toggle.
-	local button_bloom = Widgets.Button{text = "Bloom disabled"}
-	button_bloom.pressed = function(widget)
-		if widget.text == "Bloom disabled" then
-			self.bloom_enabled = true
-			widget.text = "Bloom enabled"
-		else
-			self.bloom_enabled = nil
-			widget.text = "Bloom disabled"
-		end
-		self:changed()
+	self.button_bloom = Widgets.Button{text = "Disabled"}
+	self.button_bloom.pressed = function(widget)
+		self:set_bloom(not self.bloom_enabled)
 	end
 	-- Luminance adjustment.
-	local scroll_luminance = Widgets.Progress{min = 0, max = 1, value = 0}
-	scroll_luminance:set_request{width = 100}
-	scroll_luminance.pressed = function(widget)
+	self.scroll_luminance = Widgets.Progress{min = 0, max = 1, value = 0}
+	self.scroll_luminance:set_request{width = 100}
+	self.scroll_luminance.pressed = function(widget)
 		local v = widget:get_value_at(Client.cursor_pos)
-		widget.value = v
-		Bloom.luminance = 1 - v
-		Bloom:compile()
-		self:changed()
-	end
-	-- Radius adjustment.
-	local scroll_radius = Widgets.Progress{value = 40}
-	scroll_radius:set_request{width = 100}
-	scroll_radius.pressed = function(widget)
-		local v = widget:get_value_at(Client.cursor_pos)
-		widget.value = v
-		Bloom.radius = math.floor(v)
-		Bloom:compile()
-		self:changed()
+		self:set_bloom_luminance(1 - v)
 	end
 	-- Exposure adjustment.
-	local scroll_exposure = Widgets.Progress{min = 1, max = 10, value = 1.5}
-	scroll_exposure:set_request{width = 100}
-	scroll_exposure.pressed = function(widget)
+	self.scroll_exposure = Widgets.Progress{min = 1, max = 10, value = 1.5}
+	self.scroll_exposure:set_request{width = 100}
+	self.scroll_exposure.pressed = function(widget)
 		local v = widget:get_value_at(Client.cursor_pos)
-		widget.value = v
-		Bloom.exposure = v
-		Bloom:compile()
-		self:changed()
+		self:set_bloom_exposure(v)
 	end
 	-- Mouse sensitivity.
 	self.scroll_mouse = Widgets.Progress{min = 0, max = 2, value = self.mouse_sensitivity}
@@ -158,10 +135,9 @@ Views.Options.new = function(clss)
 	quality_group:append_row(Widgets.Label{text = "Transparency"}, self.scroll_transparency)
 	quality_group:append_row(Widgets.Label{text = "VSync"}, self.button_vsync)
 	local bloom_group = Widgets.Frame{cols = 2}
-	bloom_group:append_row(Widgets.Label{text = "Bloom"}, button_bloom)
-	bloom_group:append_row(Widgets.Label{text = "Radius"}, scroll_radius)
-	bloom_group:append_row(Widgets.Label{text = "Exposure"}, scroll_exposure)
-	bloom_group:append_row(Widgets.Label{text = "Influence"}, scroll_luminance)
+	bloom_group:append_row(Widgets.Label{text = "Bloom"}, self.button_bloom)
+	bloom_group:append_row(Widgets.Label{text = "Influence"}, self.scroll_luminance)
+	bloom_group:append_row(Widgets.Label{text = "Exposure"}, self.scroll_exposure)
 	local mouse_group = Widgets.Frame{cols = 2}
 	mouse_group:append_row(Widgets.Label{text = "Sensitivity"}, self.scroll_mouse)
 	local sound_group = Widgets.Frame{cols = 2}
@@ -205,6 +181,9 @@ end
 Views.Options.load = function(self)
 	local opts = {
 		animation_quality = function(v) self:set_animation_quality(tonumber(v)) end,
+		bloom = function(v) self:set_bloom(v == "true") end,
+		bloom_exposure = function(v) self:set_bloom_exposure(tonumber(v)) end,
+		bloom_luminance = function(v) self:set_bloom_luminance(tonumber(v)) end,
 		fullscreen = function(v) self.fullscreen = (v == "true") end,
 		model_quality = function(v) self:set_model_quality(tonumber(v)) end,
 		mouse_sensitivity = function(v) self:set_mouse_sensitivity(tonumber(v)) end,
@@ -241,6 +220,9 @@ Views.Options.save = function(self)
 		self.db:query("REPLACE INTO keyval (key,value) VALUES (?,?);", {k, tostring(v)})
 	end
 	write("animation_quality", self.animation_quality)
+	write("bloom", self.bloom_enabled or false)
+	write("bloom_exposure", Bloom.exposure)
+	write("bloom_luminance", Bloom.luminance)
 	write("fullscreen", self.fullscreen)
 	write("model_quality", self.model_quality)
 	write("mouse_sensitivity", self.mouse_sensitivity)
@@ -256,6 +238,31 @@ end
 Views.Options.set_animation_quality = function(self, v)
 	self.animation_quality = v
 	self.scroll_animation.value = v
+	self:changed()
+end
+
+Views.Options.set_bloom = function(self, v)
+	if v then
+		self.bloom_enabled = true
+		self.button_bloom.text = "Enabled"
+	else
+		self.bloom_enabled = nil
+		self.button_bloom.text = "Disabled"
+	end
+	self:changed()
+end
+
+Views.Options.set_bloom_exposure = function(self, v)
+	self.scroll_exposure.value = v
+	Bloom.exposure = v
+	Bloom:compile()
+	self:changed()
+end
+
+Views.Options.set_bloom_luminance = function(self, v)
+	self.scroll_luminance.value = 1 - v
+	Bloom.luminance = v
+	Bloom:compile()
 	self:changed()
 end
 

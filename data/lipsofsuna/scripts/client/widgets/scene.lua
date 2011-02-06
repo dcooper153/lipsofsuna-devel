@@ -51,8 +51,7 @@ Widgets.Scene.render = function(self)
 	self.scene:draw_pass{pass = 5, sorting = true} -- Transparent ambient
 	self.scene:draw_pass{pass = 6, lighting = true, sorting = true} -- Transparent lighting
 	if Views.Options.inst.bloom_enabled then
-		self.scene:draw_post_process{shader = "postprocess-vert-hdr"}
-		self.scene:draw_post_process{shader = "postprocess-horz-hdr"}
+		self.scene:draw_post_process{mipmaps = true, shader = "postprocess-hdr"}
 	end
 	self.scene:draw_end()
 	Speech:draw{
