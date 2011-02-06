@@ -366,7 +366,7 @@ end
 Views.Chargen.inst = Views.Chargen()
 
 Protocol:add_handler{type = "CHARACTER_ACCEPT", func = function(event)
-	Gui:set_mode("menu")
+	Gui:set_mode("game")
 end}
 Protocol:add_handler{type = "CHARACTER_CREATE", func = function(event)
 	Gui:set_mode("chargen")
