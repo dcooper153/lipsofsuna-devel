@@ -538,15 +538,15 @@ void liren_scene_render_postproc (
 	{
 		glGenerateMipmap (GL_TEXTURE_2D);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		liren_context_bind (self->state.context);
+		liren_context_render_indexed (self->state.context, 0, 6);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	}
 	else
 	{
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		liren_context_bind (self->state.context);
+		liren_context_render_indexed (self->state.context, 0, 6);
 	}
-	liren_context_bind (self->state.context);
-	liren_context_render_indexed (self->state.context, 0, 6);
 	self->state.postproc_passes++;
 
 	/* Swap the buffers so that we can chain passes. */
