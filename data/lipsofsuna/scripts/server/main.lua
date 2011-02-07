@@ -23,6 +23,7 @@ require "server/npcs/lastboss"
 require "server/admin"
 require "server/quest"
 require "server/quests/charasillusion"
+require "server/quests/erinyes"
 require "server/quests/lipscitizen"
 require "server/quests/mourningadventurer"
 require "server/quests/peculiarpet"
@@ -38,21 +39,13 @@ require "server/editing"
 require "server/particles"
 require "server/generator"
 
-restart = function()
-	-- TODO: Kill player characters.
-	-- Remove previous map.
-	print("Generating map...")
-	Generator:generate()
-	print("Done")
-end
-
 local m = Material:find{name = "granite1"}
 Voxel.fill = m.id
 Network:host{port = 10101}
 if Settings.generate or
    Serialize:get_value("map_version") ~= Generator.map_version or
    Serialize:get_value("data_version") ~= Serialize.data_version then
-	restart()
+	Generator:generate()
 	Serialize:set_value("data_version", Serialize.data_version)
 else
 	Serialize:load()

@@ -82,15 +82,23 @@ Gui.set_mode = function(self, mode, level)
 	-- Set the base view mode.
 	local base = (mode == "startup" or mode == "wait") and 1 or (mode == "chargen") and 2 or 3
 	if base ~= self.mode_base then
+		if self.mode_base == 3 then
+			-- Disconnecting.
+			for k,v in pairs(Object.objects) do
+				v.realized = false
+				Player.object = nil
+			end
+			self.main.floating = false
+		end
 		if base == 1 then
 			-- Connection mode.
 			self.mode_base = 1
-			self.main.floating = false
+			Startup.group.floating = true
 			Sound:switch_music_track("menu")
 		elseif mode == "chargen" then
 			-- Character creation.
 			self.mode_base = 2
-			self.main.floating = false
+			Views.Chargen.floating = true
 			Sound:switch_music_track("char")
 		else
 			-- Game modes.

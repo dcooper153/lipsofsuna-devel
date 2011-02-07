@@ -432,6 +432,9 @@ Generator.generate = function(clss, args)
 		["Chara's Illusion"] = function(r)
 			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "chara's illusion"}
 		end,
+		["Erinyes' Lair"] = function(r)
+			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "erinyes' lair"}
+		end,
 		["Portal of Lips"] = function(r)
 			Voxel:place_pattern{point = r.point + Vector(0,0,0), name = "portal of lips"}
 		end,
