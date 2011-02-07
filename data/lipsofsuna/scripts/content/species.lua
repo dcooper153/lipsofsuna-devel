@@ -278,7 +278,7 @@ Species{
 	factions = {"evil"},
 	feat_anims = {"bite"},
 	inventory_size = 0,
-	model = "bloodworm1", -- FIXME
+	model = "plaguerat1", -- FIXME
 	speed_walk = 1,
 	skills = {
 		{name = "health", max = 30, val = 30}}}
@@ -291,7 +291,7 @@ Species{
 	factions = {"evil"},
 	feat_anims = {"bite"},
 	inventory_size = 0,
-	model = "bloodworm1", -- FIXME
+	model = "slime2", -- FIXME
 	speed_walk = 1,
 	skills = {
 		{name = "health", max = 30, val = 30}}}
