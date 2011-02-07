@@ -536,9 +536,9 @@ void liren_scene_render_postproc (
 	liren_context_set_textures_raw (self->state.context, framebuffer->postproc_textures, 1);
 	if (mipmaps)
 	{
+		liren_context_bind (self->state.context);
 		glGenerateMipmap (GL_TEXTURE_2D);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		liren_context_bind (self->state.context);
 		liren_context_render_indexed (self->state.context, 0, 6);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	}
