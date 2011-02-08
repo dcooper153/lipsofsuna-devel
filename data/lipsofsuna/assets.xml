@@ -553,6 +553,19 @@
   </asset>
 
   <asset>
+    <file>import/chest1.blend</file>
+    <author>WeaponGuy</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/metal2.png</dep>
+    <dep>import/metal3.png</dep>
+    <dep>import/planks1.png</dep>
+    <source>http://opengameart.org/content/treasure-chest</source>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
     <file>import/chest-000.png</file>
     <author>tidbit (Joseph)</author>
     <license>Creative Commons BY 3.0</license>
@@ -1143,6 +1156,24 @@
   </asset>
 
   <asset>
+    <file>import/metal2.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/treasure-chest</source>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/metal3.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/treasure-chest</source>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
     <file>import/morningstar-000.blend</file>
     <author>tidbit (Joseph)</author>
     <license>Creative Commons BY 3.0</license>
@@ -1219,6 +1250,15 @@
     <license>Creative Commons BY-SA 3.0</license>
     <status>FIXME</status>
     <tag>particle</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/planks1.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/treasure-chest</source>
+    <status>usable</status>
     <type>texture</type>
   </asset>
 

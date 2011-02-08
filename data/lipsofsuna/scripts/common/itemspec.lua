@@ -10,6 +10,8 @@ Itemspec.dict_name = {}
 -- @param clss Itemspec class.
 -- @param args Arguments.<ul>
 --   <li>ammo_type: Name of the ammunition item type.</li>
+--   <li>animation_looted: Looted animation name.</li>
+--   <li>animation_looting: Looting animation name.</li>
 --   <li>armor_class: How much protection the item offers when equipped.</li>
 --   <li>categories: List of categories to which the item belongs.</li>
 --   <li>construct_tile: Tile type to construct when used.</li>
@@ -31,6 +33,8 @@ Itemspec.dict_name = {}
 --   <li>equipment_slot: Equipment slot into which the item can be placed.</li>
 --   <li>health: Number of hit points the item has.</li>
 --   <li>icon: Icon name.</li>
+--   <li>inventory_items: List of inventory items for containers.</li>
+--   <li>inventory_size: Size of the inventory, makes the item a container.</li>
 --   <li>mass: Mass in kilograms.</li>
 --   <li>model: Model to use for the item. (required)</li>
 --   <li>name: Name of the item type. (required)</li>
@@ -45,6 +49,7 @@ Itemspec.new = function(clss, args)
 	self.crafting_skills = self.crafting_skills or {}
 	self.crafting_tools = self.crafting_tools or {}
 	self.destroy_actions = self.destroy_actions or {}
+	self.inventory_items = self.inventory_items or {}
 	self.mass = self.mass or 10
 	-- Models.
 	if args.equipment_models then

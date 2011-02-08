@@ -100,9 +100,8 @@ Sectors.save_sector = function(self, sector)
 		self.database:query("DELETE FROM objects WHERE sector=?;", {sector})
 		local objs = Object:find{sector = sector}
 		for k,v in pairs(objs) do
-			local data = v:write()
-			if data and not Class:check{data = v, name = "Player"} then
-				self.database:query("REPLACE INTO objects (id,sector,data) VALUES (?,?,?);", {v.id, sector, data})
+			if not Class:check{data = v, name = "Player"} then
+				v:save()
 			end
 		end
 	end

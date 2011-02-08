@@ -40,13 +40,23 @@ Object.setter = function(self, key, value)
 	end
 end
 
---- Creates a new object from a data string.
+--- Creates a new object from a data string or database entry.
 -- @param clss Object class.
--- @param data Data string.
--- @return Object.
-Object.load = function(clss, data)
-	local func = assert(loadstring("return function()\n" .. data .. "\nend"))()
-	if func then return func() end
+-- @param args Arguments.<ul>
+--  <li>data: Data string.</li>
+--  <li>id: Object ID to search from the database.</li></ul>
+-- @return Object or nil.
+Object.load = function(clss, args)
+	if args.data then
+		local func = assert(loadstring("return function()\n" .. args.data .. "\nend"))()
+		if func then return func() end
+	elseif args.id then
+		local rows = Serialize.db:query("SELECT * FROM objects WHERE id=?;", {args.id})
+		for k,v in ipairs(rows) do
+			local func = assert(loadstring("return function()\n" .. v[3] .. "\nend"))()
+			return func and func()
+		end
+	end
 end
 
 --- Merges or adds an item to the slots or inventory of the object.
@@ -74,7 +84,7 @@ end
 -- @return New object.
 Object.clone = function(self)
 	local data = string.gsub(self:save(), "id=[0-9]*,", "")
-	return Object:load(data)
+	return Object:load{data = data}
 end
 
 --- Causes the object to take damage.
@@ -263,6 +273,13 @@ end
 
 Object.purge = function(self)
 	Serialize.db:query("DELETE FROM objects WHERE id=?;", {self.id})
+end
+
+--- Saves the object to the database.
+-- @param self Object.
+Object.save = function(self)
+	local data = self:write()
+	Serialize.db:query("REPLACE INTO objects (id,sector,data) VALUES (?,?,?);", {self.id, self.sector, data})
 end
 
 --- Sends a chat message to all players near the object.

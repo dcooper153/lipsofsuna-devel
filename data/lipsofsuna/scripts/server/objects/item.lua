@@ -2,7 +2,12 @@ Item = Class(Object)
 Item.pickable = true
 
 Item.setter = function(self, key, value)
-	if key == "realized" then
+	if key == "looted" then
+		if self.looted ~= value then
+			self:animate{animation = value and self.spec.animation_looted, channel = 1, permanent = value and true}
+			Object.setter(self, key, value)
+		end
+	elseif key == "realized" then
 		-- Avoid objects getting stuck inside walls.
 		-- When object is created, we start a timer that periodically checks
 		-- if the object is stuck until it isn't or there's no way to fix it.
@@ -27,9 +32,43 @@ Item.setter = function(self, key, value)
 		self.mass = spec.mass
 		self.model = spec.model
 		self.name = spec.name
+		if spec.inventory_size and not self.inventory then
+			self.inventory = Inventory{owner = self, size = spec.inventory_size}
+			for k,v in pairs(spec.inventory_items) do
+				self:add_item{object = Item{spec = Itemspec:find{name = v}}}
+			end
+		end
 	else
 		Object.setter(self, key, value)
 	end
+end
+
+--- Creates an item.
+-- @param clss Item class.
+-- @param args Arguments.<ul>
+--   <li>angular: Angular velocity.</li>
+--   <li>id: Unique object ID or nil for a random free one.</li>
+--   <li>physics: Physics mode.</li>
+--   <li>position: Position vector of the item.</li>
+--   <li>rotation: Rotation quaternion of the item.</li>
+--   <li>realized: True to add the object to the simulation.</li></ul>
+-- @return New item.
+Item.new = function(clss, args)
+	local self = Object.new(clss, {id = args.id})
+	local copy = function(n, d)
+		if args[n] ~= nil or d then
+			self[n] = (args[n] ~= nil) and args[n] or d
+		end
+	end
+	copy("angular")
+	copy("count")
+	copy("physics", "rigid")
+	copy("position")
+	copy("rotation")
+	copy("spec")
+	copy("looted")
+	copy("realized")
+	return self
 end
 
 --- Creates a copy of the item.
@@ -90,33 +129,6 @@ Item.split = function(self, args)
 		o.count = c
 		return o
 	end
-	return self
-end
-
---- Creates an item.
--- @param clss Item class.
--- @param args Arguments.<ul>
---   <li>angular: Angular velocity.</li>
---   <li>id: Unique object ID or nil for a random free one.</li>
---   <li>physics: Physics mode.</li>
---   <li>position: Position vector of the item.</li>
---   <li>rotation: Rotation quaternion of the item.</li>
---   <li>realized: True to add the object to the simulation.</li></ul>
--- @return New item.
-Item.new = function(clss, args)
-	local self = Object.new(clss, {id = args.id})
-	local copy = function(n, d)
-		if args[n] ~= nil or d then
-			self[n] = (args[n] ~= nil) and args[n] or d
-		end
-	end
-	copy("angular")
-	copy("count")
-	copy("physics", "rigid")
-	copy("position")
-	copy("rotation")
-	copy("spec")
-	copy("realized")
 	return self
 end
 
@@ -201,7 +213,13 @@ end
 -- @param self Object.
 -- @param user User.
 Item.use_cb = function(self, user)
-	if self.spec.categories["tool"] then
+	if self.spec.categories["container"] then
+		if self.inventory then
+			self.inventory:subscribe{object = user, callback = function(args) user:inventory_cb(args) end}
+			self:animate{animation = self.spec.animation_looting, weight = 10}
+			self.looted = true
+		end
+	elseif self.spec.categories["tool"] then
 		Crafting:send{user = user}
 	elseif self.spec.categories["book"] then
 		user:send{packet = Packet(packets.BOOK,
@@ -257,8 +275,10 @@ Item.write = function(self)
 		"angular=" .. serialize_value(self.angular) .. "," ..
 		"count=" .. serialize_value(self.count) .. "," ..
 		"id=" .. serialize_value(self.id) .. "," ..
+		"looted=" .. serialize_value(self.looted) .. "," ..
 		"spec=" .. serialize_value(self.spec.name) .. "," ..
 		"position=" .. serialize_value(self.position) .. "," ..
 		"rotation=" .. serialize_value(self.rotation) .. "}\n" ..
+		Serialize:encode_inventory(self.inventory) ..
 		"return self"
 end

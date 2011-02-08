@@ -602,6 +602,33 @@ Itemspec{
 	icon = "torch1"}
 
 ------------------------------------------------------------------------------
+-- Containers.
+
+Itemspec{
+	name = "chest",
+	model = "chest1",
+	mass = 15,
+	animation_looted = "open",
+	animation_looting = "opening",
+	categories = {"container"},
+	crafting_materials = {log = 1},
+	crafting_tools = {saw = 1},
+	inventory_size = 4,
+	stacking = false}
+
+Itemspec{
+	name = "workbench",
+	model = "chest1",
+	mass = 15,
+	animation_looted = "open",
+	animation_looting = "opening",
+	categories = {"container", "workbench"},
+	crafting_materials = {log = 1},
+	crafting_tools = {saw = 1},
+	inventory_size = 4,
+	stacking = false}
+
+------------------------------------------------------------------------------
 -- FIXME
 
 Itemspec{

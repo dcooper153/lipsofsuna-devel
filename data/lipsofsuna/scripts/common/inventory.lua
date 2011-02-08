@@ -158,7 +158,7 @@ end
 --   <li>callback: Callback.</li>
 --   <li>object: Object to subscribe.</li></ul>
 Inventory.subscribe = function(self, args)
-	if args.object and args.callback then
+	if args.object and args.callback and not self.listeners[args.object] then
 		self.listeners[args.object] = args.callback
 		args.callback{type = "inventory-subscribed", inventory = self}
 		for k,v in pairs(self.slots) do

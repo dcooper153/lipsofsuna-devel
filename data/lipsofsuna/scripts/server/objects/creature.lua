@@ -581,7 +581,8 @@ Creature.write = function(self)
 		"position=" .. serialize_value(self.position) .. "," ..
 		"rotation=" .. serialize_value(self.rotation) .. "," ..
 		"spec=" .. serialize_value(self.spec.name) .. "}\n" ..
-		serialize_skills(self.skills) .. "\n" ..
+		Serialize:encode_skills(self.skills) ..
+		Serialize:encode_inventory(self.inventory) ..
 		"return self"
 end
 

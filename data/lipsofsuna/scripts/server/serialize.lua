@@ -16,6 +16,45 @@ Serialize.init = function(clss)
 	Sectors.instance = clss.sectors
 end
 
+--- Makes a string out of an inventory and saves the items to the database.
+-- @param clss Serialize class.
+-- @param inv Inventory.
+-- @return String.
+Serialize.encode_inventory = function(clss, inv)
+	if not inv then return "" end
+	local str = ""
+	for i=1,inv.size do
+		local obj = inv:get_object{slot = i}
+		if obj then
+			obj:save()
+			str = str .. "self.inventory:set_object{slot=" .. serialize_value(i) ..
+				",object=Object:load{id=" .. serialize_value(obj.id) ..  "}}\n"
+		end
+	end
+	return str
+end
+
+--- Makes a string out of skills.
+-- @param clss Serialize class.
+-- @param skills Skills.
+-- @return String.
+Serialize.encode_skills = function(clss, skills)
+	if not skills then return "" end
+	local str = "self.skills.enabled=" .. serialize_value(skills.enabled) .. "\n"
+	for k,v in pairs(skills:get_names()) do
+		local max = skills:get_maximum{skill = v}
+		local val = skills:get_value{skill = v}
+		local regn = skills:get_regen{skill = v}
+		local prot = skills:get_protect{skill = v}
+		str = str .. "self.skills:register{prot=" .. serialize_value(prot) ..
+			",skill=" .. serialize_value(v) ..
+			",value=" .. serialize_value(val) ..
+			",maximum=" .. serialize_value(max) ..
+			",regen=" .. serialize_value(regn) .. "}\n"
+	end
+	return str
+end
+
 --- Gets a value from the key-value database.
 -- @param clss Serialize class.
 -- @param key Key string.
@@ -156,41 +195,11 @@ serialize_table = function(tbl)
 	return str .. "}"
 end
 
-serialize_inventory = function(inv)
-	local str = "local inv = Inventory{owner=self, size=" .. serialize_value(inv.size) .. "}\n"
-	for i=1,inv.size do
-		local obj = inv:get_object{slot = i}
-		if obj then
-			obj:write()
-			str = str .. "inv:set_object{slot=" .. serialize_value(i) ..
-				",object=Object:new{id=" .. serialize_value(obj.id) ..  "}}\n"
-		end
-	end
-	return str
-end
-
 serialize_npc = function(npc)
 	local str = "local npc=Npc{owner=self" ..
 		",alert=" .. serialize_value(npc.alert) ..
 		",radius=" .. serialize_value(npc.radius) ..
 		",refresh=" .. serialize_value(npc.refresh) .. "}\n"
-	return str
-end
-
-serialize_skills = function(skills)
-	if not skills then return "" end
-	local str = "self.skills.enabled=" .. serialize_value(skills.enabled) .. "\n"
-	for k,v in pairs(skills:get_names()) do
-		local max = skills:get_maximum{skill = v}
-		local val = skills:get_value{skill = v}
-		local regn = skills:get_regen{skill = v}
-		local prot = skills:get_protect{skill = v}
-		str = str .. "self.skills:register{prot=" .. serialize_value(prot) ..
-			",skill=" .. serialize_value(v) ..
-			",value=" .. serialize_value(val) ..
-			",maximum=" .. serialize_value(max) ..
-			",regen=" .. serialize_value(regn) .. "}\n"
-	end
 	return str
 end
 
