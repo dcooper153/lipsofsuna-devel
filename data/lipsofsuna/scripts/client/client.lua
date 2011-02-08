@@ -136,22 +136,35 @@ end}
 
 Protocol:add_handler{type = "INVENTORY_CREATED", func = function(event)
 	local ok,id,size,own = event.packet:read("uint32", "uint8", "bool")
-	if ok then Container:create(id, size, own) end
+	if not ok then return end
+	local cont = Widgets.Container{id = id, size = size}
+	Views.Inventory.inst:add_container(cont, own)
 end}
 
 Protocol:add_handler{type = "INVENTORY_CLOSED", func = function(event)
 	local ok,id = event.packet:read("uint32")
-	if ok then Container:close(id) end
+	if not ok then return end
+	local cont = Widgets.Container:find(id)
+	if not cont then return end
+	cont:close(true)
 end}
 
 Protocol:add_handler{type = "INVENTORY_ITEM_ADDED", func = function(event)
 	local ok,id,slot,count,name = event.packet:read("uint32", "uint8", "uint32", "string")
-	if ok then Container:insert_item(id, slot, name, count) end
+	if not ok then return end
+	local cont = Widgets.Container:find(id)
+	if not cont then return end
+	local spec = Itemspec:find{name = name}
+	local icon = spec and spec.icon
+	cont.item_list:set_item{slot = slot, icon = icon, name = name, count = count}
 end}
 
 Protocol:add_handler{type = "INVENTORY_ITEM_REMOVED", func = function(event)
 	local ok,id,slot = event.packet:read("uint32", "uint8")
-	if ok then Container:remove_item(id, slot) end
+	if not ok then return end
+	local cont = Widgets.Container:find(id)
+	if not cont then return end
+	cont.item_list:set_item{slot = slot}
 end}
 
 Protocol:add_handler{type = "MESSAGE", func = function(event)

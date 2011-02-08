@@ -16,11 +16,11 @@ end
 -- @param self Commands class.
 Commands.pickup = function(self)
 	Target:start("What would you like to pick up?", function(where, id, slot)
-		if where == "obj" then
+		local cont = Widgets.Inventory.inst.container
+		if where == "obj" and cont then
 			Network:send{packet = Packet(packets.MOVE_ITEM,
 				"uint8", moveitem.WORLD, "uint8", moveitem.INVENTORY,
-				"uint32", id,
-				"uint32", Inventory.id, "uint32", 0)}
+				"uint32", id, "uint32", cont.id, "uint32", 0)}
 		end
 	end)
 end

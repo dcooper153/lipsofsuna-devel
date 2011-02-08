@@ -5,10 +5,10 @@ Views.Inventory.mode = "inventory"
 -- @param clss Inventory view class.
 -- @return Inventory view.
 Views.Inventory.new = function(clss)
-	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0, 0}})
+	local self = Widget.new(clss, {cols = 3, rows = 3, spacings = {0, 0}})
 	self.title = Widgets.Frame{style = "title", text = "Inventory"}
-	self.inventory = Widgets.Frame{cols = 1, rows = 1}
-	self.inventory:set_expand{col = 1, row = 1}
+	self.containers = Widget{rows = 1}
+	self.containers:set_expand{row = 1}
 	self.equipment = Widgets.Equipment{pressed = function(widget, slot)
 		if Target.active then
 			Target:select_equipment(slot)
@@ -19,9 +19,45 @@ Views.Inventory.new = function(clss)
 	self:set_request{width = 100}
 	self:set_child{col = 1, row = 1, widget = self.title}
 	self:set_child{col = 1, row = 2, widget = self.equipment}
-	self:set_child{col = 1, row = 3, widget = self.inventory}
-	self:set_expand{col = 2, row = 2}
+	self:set_child{col = 2, row = 3, widget = self.containers}
+	self:set_expand{col = 3, row = 2}
 	return self
+end
+
+--- Adds a container to the inventory.
+-- @param self Inventory view.
+-- @param widget Container widget.
+-- @param own True if this is the main inventory.
+Views.Inventory.add_container = function(self, widget, own)
+	if own then
+		widget.button_close.visible = false
+		self.container = widget
+		self:set_child{col = 1, row = 3, widget = widget}
+	else
+		widget.button_close.visible = true
+		self.containers:append_col(widget)
+		widget.closed = function(w) self:remove_container(w) end
+		Gui:set_mode("inventory")
+	end
+end
+
+--- Removes a container from the inventory view.
+-- @param self Inventory view.
+-- @param widget Container widget.
+Views.Inventory.remove_container = function(self, widget)
+	-- Remove main inventory.
+	if self.container == widget then
+		self.container = nil
+		self:set_child{col = 1, row = 3}
+	end
+	-- Remove looted containers.
+	for i = 1,self.containers.cols do
+		local w = self.containers:get_child{col = i, row = 1}
+		if w == widget then
+			self.containers:remove{col = i}
+			break
+		end
+	end
 end
 
 Views.Inventory.back = function(self)
@@ -31,6 +67,11 @@ end
 --- Closes the inventory view.
 -- @param self Inventory view.
 Views.Inventory.close = function(self)
+	-- Close containers.
+	for i = 1,self.containers.cols do
+		local w = self.containers:get_child{col = i, row = 1}
+		w:close()
+	end
 end
 
 --- Enters the inventory view.
@@ -38,16 +79,28 @@ end
 Views.Inventory.enter = function(self)
 end
 
---- Gets the contents of an equipment slot.
+--- Gets the contents of an inventory or an equipment slot.
 -- @param self Inventory view.
 -- @param args Arguments.<ul>
---   <li>slot Slot name.</li></ul>
+--   <li>id: Container ID.</li></ul>
+--   <li>slot: Slot name.</li></ul>
 -- @return Item widget or nil.
 Views.Inventory.get_item = function(self, args)
-	local obj = self.equipment.dict_name[args.slot]
-	if not obj then return end
-	if not obj.text or #obj.text == 0 then return end
-	return obj
+	if type(args.slot) == "string" then
+		-- Equipment slot.
+		local obj = self.equipment.dict_name[args.slot]
+		if not obj then return end
+		if not obj.text or #obj.text == 0 then return end
+		return obj
+	else
+		-- Inventory slot.
+		local cont = Widgets.Container:find(args.id or self.id)
+		if not cont then return end
+		local obj = cont.item_list:get_item{slot = args.slot}
+		if not obj then return end
+		if not obj.text or #obj.text == 0 then return end
+		return obj
+	end
 end
 
 --- Sets the contents of an equipment slot.
@@ -63,14 +116,6 @@ Views.Inventory.set_item = function(self, slot, name, count)
 		widget.icon = spec and spec.icon
 		widget.count = count or 1
 	end
-end
-
---- Assigns the player inventory widget to the view.
--- @param self Inventory view.
--- @param widget Player inventory widget.
-Views.Inventory.setup = function(self, widget)
-	self.itemlist = widget
-	self.inventory:set_child{col = 1, row = 1, widget = widget}
 end
 
 ------------------------------------------------------------------------------

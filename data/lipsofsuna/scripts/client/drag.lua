@@ -18,7 +18,7 @@ Drag.clicked_container = function(self, inv, slot)
 		return
 	end
 	-- Make sure that the dragged item exists.
-	local item = Container:get_item{inv = inv, slot = slot}
+	local item = Views.Inventory.inst:get_item{id = inv, slot = slot}
 	if not item then return end
 	-- Update the cursor.
 	self.drag = {"inv", inv, slot}
@@ -46,7 +46,7 @@ Drag.clicked_equipment = function(self, inv, slot)
 		return
 	end
 	-- Make sure that the dragged item exists.
-	local item = Views.Inventory.inst:get_item{slot = slot}
+	local item = Views.Inventory.inst:get_item{id = inv, slot = slot}
 	if not item then return end
 	-- Update the cursor.
 	self.drag = {"equ", inv, slot}
@@ -82,11 +82,8 @@ end
 Drag.clear = function(self)
 	-- Restore items slots back to normal.
 	if not self.drag then return end
-	if self.drag[1] == "equ" then
-		local item = Views.Inventory.inst:get_item{inv = self.drag[2], slot = self.drag[3]}
-		if item then item.drag = nil end
-	elseif self.drag[1] == "inv" then
-		local item = Container:get_item{inv = self.drag[2], slot = self.drag[3]}
+	if self.drag[1] == "equ" or self.drag[1] == "inv" then
+		local item = Views.Inventory.inst:get_item{id = self.drag[2], slot = self.drag[3]}
 		if item then item.drag = nil end
 	end
 	-- Reset the cursor.

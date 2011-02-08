@@ -111,6 +111,18 @@ Protocol:add_handler{type = "FEAT", func = function(args)
 	end
 end}
 
+Protocol:add_handler{type = "INVENTORY_CLOSED", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if not player.dead then
+		local ok,id = args.packet:read("uint32")
+		if not ok then return end
+		local inv = Inventory:find{id = id}
+		if not inv or inv == player.inventory then return end
+		inv:unsubscribe{object = player}
+	end
+end}
+
 Protocol:add_handler{type = "JUMP", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end

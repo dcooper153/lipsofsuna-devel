@@ -183,7 +183,7 @@ end
 Inventory.unsubscribe = function(self, args)
 	local listener = self.listeners[args.object]
 	if listener then
-		listener.callback{type = "inventory-unsubscribed", inventory = self}
+		listener{type = "inventory-unsubscribed", inventory = self}
 		self.listeners[args.object] = nil
 	end
 end

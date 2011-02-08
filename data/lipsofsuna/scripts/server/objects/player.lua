@@ -117,7 +117,7 @@ Player.inventory_cb = function(self, args)
 				"uint8", args.inventory.size, "bool", args.inventory.owner == self)}
 		end,
 		["inventory-unsubscribed"] = function()
-			user:send{packet = Packet(packets.INVENTORY_CLOSED, "uint32", id)}
+			self:send{packet = Packet(packets.INVENTORY_CLOSED, "uint32", id)}
 		end
 	}
 	local fun = funs[args.type]
