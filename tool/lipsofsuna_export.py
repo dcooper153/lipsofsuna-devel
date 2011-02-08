@@ -156,7 +156,7 @@ class LIAnimation:
 			writer.write_string(chan)
 		writer.write_marker()
 		# Write channel transformations.
-		for frame in range(self.frame_start, self.frame_end):
+		for frame in range(0, self.frame_end - self.frame_start):
 			for chan in range(len(self.channellist)):
 				xform = framelist[frame][chan]
 				writer.write_float(xform[0].x)
