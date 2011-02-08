@@ -23,7 +23,7 @@ Species{
 	skill_quota = 200,
 	speed_walk = 2,
 	speed_run = 4,
-	tilt_bone = "back",
+	tilt_bone = "",
 	tilt_limit = 1.25,
 	-- Customization.
 	body_scale = {0.9, 1.05},
@@ -180,7 +180,7 @@ Species{
 	name = "aer-player",
 	base = "aer",
 	ai_enabled = false,
-	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings", "iron gauntlets", "leather boots"}}
 
 Species{
 	name = "android-player",

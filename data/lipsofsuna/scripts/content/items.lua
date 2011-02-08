@@ -507,7 +507,7 @@ Itemspec{
 	armor_class = 0.08,
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 2},
-	equipment_models = {arms = "aerarmplate1"},
+	equipment_models = {arms = "aerarmplate2"},
 	equipment_slot = "arms"}
 
 Itemspec{
