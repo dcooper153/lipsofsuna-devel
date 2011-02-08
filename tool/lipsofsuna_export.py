@@ -26,7 +26,7 @@ class LIEnum:
 		self.TEXTYPE_IMAGE = 2
 		self.euler = mathutils.Euler((-0.5 * math.pi, 0, 0))
 		self.matrix = self.euler.to_matrix().to_4x4()
-		self.quat = self.euler.to_quat()
+		self.quat = self.euler.to_quaternion()
 LIFormat = LIEnum()
 
 ##############################################################################
@@ -527,9 +527,9 @@ class LINode:
 		if self.object.parent_bone:
 			parentbone = self.object.parent.pose.bones[self.object.parent_bone]
 			parentmatr = parentbone.matrix * mathutils.Matrix.Translation(self.parent.len)
-			matrix = parentmatr.invert() * matrix
-		loc = matrix.translation_part()
-		rot = matrix.rotation_part().to_quat().normalize()
+			matrix = parentmatr.inverted() * matrix
+		loc = matrix.to_translation()
+		rot = matrix.to_3x3().to_quaternion().normalized()
 		return (loc, rot)
 
 	# \brief Writes the node to a stream.
@@ -601,9 +601,9 @@ class LINodeBone(LINode):
 	def get_rest_transform(self):
 		matrix = self.get_head_rest_matrix()
 		if self.bone.parent:
-			matrix = self.parent.get_tail_rest_matrix().invert() * matrix
-		loc = matrix.translation_part()
-		rot = matrix.rotation_part().to_quat().normalize()
+			matrix = self.parent.get_tail_rest_matrix().inverted() * matrix
+		loc = matrix.to_translation()
+		rot = matrix.to_3x3().to_quaternion().normalized()
 		return (loc, rot)
 
 	# \brief Gets the parent relative pose transformation of the node.
@@ -611,11 +611,11 @@ class LINodeBone(LINode):
 		rest = self.get_head_rest_matrix()
 		pose = self.get_head_pose_matrix()
 		if self.bone.parent:
-			rest = self.parent.get_tail_rest_matrix().invert() * rest
-			pose = self.parent.get_tail_pose_matrix().invert() * pose
-		matrix = rest.invert() * pose
-		loc = matrix.translation_part()
-		rot = matrix.rotation_part().to_quat().normalize()
+			rest = self.parent.get_tail_rest_matrix().inverted() * rest
+			pose = self.parent.get_tail_pose_matrix().inverted() * pose
+		matrix = rest.inverted() * pose
+		loc = matrix.to_translation()
+		rot = matrix.to_3x3().to_quaternion().normalized()
 		return (loc, rot)
 
 	# \brief Gets the armature space rest matrix of the bone head.
@@ -850,7 +850,7 @@ class LIShapePart:
 
 	def __init__(self, obj):
 		self.vertices = []
-		matrix = LIFormat.matrix.copy().to_3x3() * obj.matrix_world.rotation_part()
+		matrix = LIFormat.matrix.copy().to_3x3() * obj.matrix_world.to_3x3()
 		for v in obj.data.vertices:
 			self.vertices.append(v.co * matrix)
 
