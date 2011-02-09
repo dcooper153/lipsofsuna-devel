@@ -42,12 +42,12 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 		return true
 	end
 	-- Try to displace the other item.
-	local tmp = inv:get_empty_slot()
-	if not tmp then return end
+	local tmpslot = dstinv:get_empty_slot()
+	if not tmpslot then return end
 	dstobj:detach()
-	dstinv:set_object{slot = tmp, object = dstobj}
+	dstinv:set_object{slot = tmpslot, object = dstobj}
 	srcobj:detach()
-	dstinv:set_object{slot = slot, object = srcobj}
+	dstinv:set_object{slot = dstslot, object = srcobj}
 	return true
 end
 
