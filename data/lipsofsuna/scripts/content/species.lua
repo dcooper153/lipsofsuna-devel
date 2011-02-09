@@ -23,7 +23,7 @@ Species{
 	skill_quota = 200,
 	speed_walk = 2,
 	speed_run = 4,
-	tilt_bone = "",
+	tilt_bone = "backtilt",
 	tilt_limit = 1.25,
 	-- Customization.
 	body_scale = {0.9, 1.05},
