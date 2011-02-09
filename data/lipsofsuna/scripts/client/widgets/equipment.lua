@@ -5,6 +5,7 @@ Widgets.Equipment = Class(Widgets.Frame)
 Widgets.Equipment.new = function(clss, args)
 	local self = Widgets.Frame.new(clss, {cols = 2, pressed = args.pressed, style = "equipment"})
 	self:set_expand{col = 2}
+	-- TODO: Different formats for different species using args.spec.
 	self.dict_name = {}
 	self.dict_name["head"] = Widgets.ItemButton{pressed = function() self:pressed("head") end}
 	self.dict_name["upperbody"] = Widgets.ItemButton{pressed = function() self:pressed("upperbody") end}

@@ -83,10 +83,10 @@ Widgets.Frame.reshaped = function(self)
 			source_tiling = {75,183,75,50,158,100}}
 		self:canvas_image{
 			dest_position = {20,0},
-			dest_size = {w-20,h},
+			dest_size = {300,185},
 			source_image = "widgets1",
 			source_position = {0,327},
-			source_tiling = {0,512,0,0,512,0}}
+			source_tiling = {0,300,0,0,185,0}}
 	elseif self.style == "paper" then
 		self:set_request{internal = true, width = 333, height = 220}
 		self:canvas_image{

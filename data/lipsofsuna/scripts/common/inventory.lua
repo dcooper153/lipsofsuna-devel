@@ -210,22 +210,23 @@ Inventory.set_object = function(self, args)
 end
 
 --- Emits a slot update event.</br>
--- If the slot is a number, a private inventory-changed event is send to
--- the subscibers. If it's a string, a public vision event is send to
+-- A private inventory-changed event is always sent to the subscibers.
+-- If the slot was a string, a public vision event is also send to
 -- nearby objects as if they saw an item being equipped or unequipped.</br>
 -- If there are no subscribers and the Vision class hasn't been loaded,
--- the function does nothing, hence making the class usable for use for
--- both the client and the server.
+-- the function does nothing, hence making the class usable to both the
+-- client and the server.
 -- @param self Inventory.
 -- @param args Arguments.<ul>
 --   <li>slot: Slot number or name.</li></ul>
 Inventory.update_slot = function(self, args)
 	local o = self:get_object(args)
-	if type(args.slot) == "number" then
-		for k,v in pairs(self.listeners) do
-			v{type = "inventory-changed", inventory = self, object = o, slot = args.slot}
-		end
-	elseif Vision then
+	-- Always send inventory change events to subscribers.
+	for k,v in pairs(self.listeners) do
+		v{type = "inventory-changed", inventory = self, object = o, slot = args.slot}
+	end
+	-- Only send public slot change events when an equipment slot changed.
+	if type(args.slot) == "string" and Vision then
 		Vision:event{type = "slot-changed", object = self.owner, slot = args.slot}
 	end
 end

@@ -257,6 +257,17 @@ end
 Object.inflict_modifier = function(self, name, strength)
 end
 
+--- Loots the object.
+-- @param self Object.
+-- @param user Object doing the looting.
+Object.loot = function(self, user)
+	if self.inventory then
+		self.inventory:subscribe{object = user, callback = function(args) user:inventory_cb(args) end}
+		self:animate{animation = self.spec.animation_looting, weight = 10}
+		self.looted = true
+	end
+end
+
 --- Merges the objects if they're similar.
 -- @param self Object.
 -- @param args Arguments.<ul>
@@ -423,7 +434,9 @@ end
 -- @param self Object.
 -- @param user User.
 Object.use_cb = function(self, user)
-	Dialog:start{object = self, user = user}
+	if not Dialog:start{object = self, user = user} then
+		self:loot(user)
+	end
 end
 
 --- Serializes the object to a string.

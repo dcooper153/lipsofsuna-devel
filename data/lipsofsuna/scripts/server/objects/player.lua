@@ -103,17 +103,21 @@ Player.inventory_cb = function(self, args)
 	local funs =
 	{
 		["inventory-changed"] = function()
+			local islot = (type(args.slot) == "number") and args.slot or 0
+			local sslot = (type(args.slot) == "string") and args.slot or ""
 			if args.object then
 				local name = args.object.spec.name
 				self:send{packet = Packet(packets.INVENTORY_ITEM_ADDED, "uint32", id,
-					"uint8", args.slot, "uint32", args.object.count, "string", name)}
+					"uint8", islot, "string", sslot, "uint32", args.object.count, "string", name)}
 			else
 				self:send{packet = Packet(packets.INVENTORY_ITEM_REMOVED, "uint32", id,
-					"uint8", args.slot)}
+					"uint8", islot, "string", sslot)}
 			end
 		end,
 		["inventory-subscribed"] = function()
+			local spec = args.inventory.owner.spec
 			self:send{packet = Packet(packets.INVENTORY_CREATED, "uint32", id,
+				"string", spec.type, "string", spec.name,
 				"uint8", args.inventory.size, "bool", args.inventory.owner == self)}
 		end,
 		["inventory-unsubscribed"] = function()

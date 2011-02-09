@@ -132,40 +132,44 @@ Protocol:add_handler{type = "JUMP", func = function(args)
 end}
 
 Protocol:add_handler{type = "MOVE_ITEM", func = function(args)
+	-- Find the player.
 	local player = Player:find{client = args.client}
 	if not player then return end
-	if not player.dead then
-		local cmd = {}
-		local ok,src,dst = args.packet:read("uint8", "uint8")
+	if player.dead then return end
+	-- Read the source and destination types.
+	local ok,src,dst = args.packet:read("uint8", "uint8")
+	if not ok then return end
+	if src == moveitem.WORLD and dst == moveitem.WORLD then return end
+	-- Read the detailed source information.
+	local srcid = nil
+	local srcslot = nil
+	if src == moveitem.EQUIPMENT then
+		ok,srcid,srcslot = args.packet:resume("uint32", "string")
 		if not ok then return end
-		if src == moveitem.EQUIPMENT then
-			ok,cmd.srcslot = args.packet:resume("string")
-			if not ok then return end
-		elseif src == moveitem.INVENTORY then
-			ok,cmd.srcinv,cmd.srcslot = args.packet:resume("uint32", "uint32")
-			if not ok then return end
-		elseif src == moveitem.WORLD then
-			ok,cmd.srcobj = args.packet:resume("uint32")
-			if not ok then return end
-		else return end
-		if dst == moveitem.EQUIPMENT then
-			ok,cmd.dstslot = args.packet:resume("string")
-			if not ok then return end
-		elseif dst == moveitem.INVENTORY then
-			ok,cmd.dstinv,cmd.dstslot = args.packet:resume("uint32", "uint32")
-			if not ok then return end
-			if cmd.dstslot == 0 then cmd.dstslot = nil end
-		elseif dst == moveitem.WORLD then
-			local ok1,x,y,z,v = args.packet:resume("float", "float", "float", "float")
-			if not ok1 then return end
-			if v < -10 then v = -10 end
-			if v > 10 then v = 10 end
-			cmd.dstpoint = Vector(x, y, z)
-			cmd.rotation = player.rotation
-			cmd.velocity = player.rotation * Vector(0, 0, v)
-		else return end
-		cmd.object = player
-		Actions:moveitem(cmd)
+	elseif src == moveitem.INVENTORY then
+		ok,srcid,srcslot = args.packet:resume("uint32", "uint8")
+		if not ok then return end
+	elseif src == moveitem.WORLD then
+		ok,srcid = args.packet:resume("uint32")
+		if not ok then return end
+	else return end
+	-- Read the detailed destination information.
+	local dstid = nil
+	local dstslot = nil
+	if dst == moveitem.EQUIPMENT then
+		ok,dstid,dstslot = args.packet:resume("uint32", "string")
+		if not ok then return end
+	elseif dst == moveitem.INVENTORY then
+		ok,dstid,dstslot = args.packet:resume("uint32", "uint8")
+		if not ok then return end
+	elseif dst ~= moveitem.WORLD then return end
+	-- Perform the item move.
+	if src == moveitem.WORLD then
+		return Actions:move_from_world_to_inv(player, srcid, dstid, dstslot)
+	elseif dst == moveitem.WORLD then
+		return Actions:move_from_inv_to_world(player, srcid, srcslot)
+	else
+		return Actions:move_from_inv_to_inv(player, srcid, srcslot, dstid, dstslot)
 	end
 end}
 

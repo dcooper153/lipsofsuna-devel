@@ -12,7 +12,7 @@ Slots.set_object = function(self, args)
 	if not args.model then
 		-- Clear item.
 		if object then object.realized = false end
-		Inventory.set_object(self, args)
+		self.slots[args.slot] = nil
 	elseif object then
 		-- Replace item.
 		object.model = args.model
@@ -21,7 +21,7 @@ Slots.set_object = function(self, args)
 		-- Create item.
 		object = Object{model = args.model}
 		object:update_model(args)
-		Inventory.set_object(self, {slot = args.slot, object = object})
+		self.slots[args.slot] = object
 	end
 end
 

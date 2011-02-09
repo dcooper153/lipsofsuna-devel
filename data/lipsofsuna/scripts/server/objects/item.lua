@@ -214,11 +214,7 @@ end
 -- @param user User.
 Item.use_cb = function(self, user)
 	if self.spec.categories["container"] then
-		if self.inventory then
-			self.inventory:subscribe{object = user, callback = function(args) user:inventory_cb(args) end}
-			self:animate{animation = self.spec.animation_looting, weight = 10}
-			self.looted = true
-		end
+		self:loot(user)
 	elseif self.spec.categories["tool"] then
 		Crafting:send{user = user}
 	elseif self.spec.categories["book"] then

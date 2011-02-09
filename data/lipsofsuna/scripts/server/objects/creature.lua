@@ -384,6 +384,14 @@ Creature.jump = function(self)
 	Object.jump(self, {impulse = Vector(v.x, 400, v.z)})
 end
 
+--- Loots the object.
+-- @param self Object.
+-- @param user Object doing the looting.
+Creature.loot = function(self, user)
+	if not self.dead and not user.sneak then return end
+	return Object.loot(self, user)
+end
+
 --- Removes a modifier.
 -- @param self Object.
 -- @param name Modifier name.

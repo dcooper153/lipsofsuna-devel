@@ -1,87 +1,114 @@
---- Moves an item.
+--- Moves an inventory item to another inventory.
 -- @param clss Actions class.
--- @param args Arguments.<ul>
---   <li>dstinv: Destination inventory ID.</li>
---   <li>dstpoint: Destination position in world coordinates.</li>
---   <li>dstslot: Destination equipment slot name or inventory slot number.</li>
---   <li>object: Object performing the action.</li>
---   <li>rotation: Rotation when moved to the world.</li>
---   <li>srcobj: Source map object ID.</li>
---   <li>srcinv: Source inventory ID.</li>
---   <li>srcslot: Source equipment slot name.</li>
---   <li>velocity: Velocity when moved to the world.</li></ul>
+-- @param user Object performing the action.
+-- @param srcid Source inventory ID.
+-- @param srcslot Source inventory or equipment slot.
+-- @param dstid Destination inventory ID.
+-- @param dstslot Destination inventory or equipment slot.
 -- @return True on success.
-Actions:register{name = "moveitem", func = function(clss, args)
-	local object = args.object
-	-- Get moved object.
-	local srcobj = nil
-	if args.srcobj then
-		-- TODO: Check for walls.
-		srcobj = Object:find{id = args.srcobj, point = object.position, radius = 5.0}
-		if not srcobj or not srcobj.pickable then return end
-	elseif args.srcinv then
-		local inv = Inventory:find{id = args.srcinv}
-		if not inv or not inv:subscribed{object = object} then return end
-		srcobj = inv:get_object{slot = args.srcslot}
-		if not srcobj then return end
-	elseif args.srcslot then
-		local inventory = Inventory:find{owner = object}
-		if not inventory then return end
-		srcobj = inventory:get_object{slot = args.srcslot}
-		if not srcobj then return end
+Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstslot)
+	-- Find inventories.
+	local srcinv = Inventory:find{id = srcid}
+	if not srcinv or not srcinv:subscribed{object = user} then return end
+	local dstinv = Inventory:find{id = dstid}
+	if not dstinv or not dstinv:subscribed{object = user} then return end
+	-- Validate slots.
+	if type(srcslot) == "string" then
+		if not srcinv.owner.spec.equipment_slots then return end
+		if not srcinv.owner.spec.equipment_slots[srcslot] then return end
+	elseif srcslot < 1 or srcinv.size < srcslot then
+		return
 	end
-
-	-- Move to inventory.
-	if args.dstinv then
-		local inv = Inventory:find{id = args.dstinv}
-		if not inv or not inv:subscribed{object = object} then return end
-		local slot = args.dstslot
-		if slot then
-			if slot < 1 or slot > inv.size then return end
-			local object = inv:get_object{slot = slot}
-			if object then
-				if object == srcobj then return end
-				if not inv:merge_object{object = srcobj, slot = slot} then
-					local tmp = inv:get_empty_slot()
-					if not tmp then return end
-					object:detach()
-					inv:set_object{slot = tmp, object = object}
-					srcobj:detach()
-					inv:set_object{slot = slot, object = srcobj}
-				end
-			else
-				srcobj:detach()
-				inv:set_object{slot = slot, object = srcobj}
-			end
-		elseif not inv:merge_object{object = srcobj} then
-			return
-		end
-	-- Move to equipment.
-	elseif args.dstslot then
-		if srcobj.spec.type ~= "item" then return end
-		if srcobj.spec.equipment_slot ~= args.dstslot then return end
-		local inventory = Inventory:find{owner = object}
-		if not inventory then return end
-		local oldequ = inventory:get_object{slot = args.dstslot}
-		if oldequ then
-			if not inventory:merge_object{object = oldequ} then return end
-		end
-		srcobj:detach()
-		inventory:set_object{slot = args.dstslot, object = srcobj}
-	-- Move to world.
-	elseif args.dstpoint then
-		if (args.dstpoint - object.position).length > 5.0 then return end
-		-- TODO: Check for walls.
-		srcobj:detach()
-		srcobj.position = args.dstpoint
-		srcobj.velocity = args.velocity or Vector()
-		srcobj.rotation = args.rotation or Quaternion()
-		srcobj.realized = true
-	else return end
-	-- Animate when moving to or from the world.
-	if args.srcobj or args.dstpoint then
-		object:animate{animation = "pickup", channel = Animation.CHANNEL_ACTION, weight = 10}
-		object.cooldown = 2
+	if type(dstslot) == "string" then
+		if not dstinv.owner.spec.equipment_slots then return end
+		if not dstinv.owner.spec.equipment_slots[dstslot] then return end
+	elseif dstslot < 1 then
+		dstslot = dstinv:get_empty_slot()
+		if not dstslot then return end
+	elseif dstslot > dstinv.size then
+		return
 	end
+	-- Try to move the item.
+	local srcobj = srcinv:get_object{slot = srcslot}
+	if not srcobj then return end
+	local dstobj = dstinv:get_object{slot = dstslot}
+	if not dstobj then
+		srcobj:detach()
+		dstinv:set_object{slot = dstslot, object = srcobj}
+		return true
+	end
+	-- Try to merge with other items.
+	if dstinv:merge_object{object = srcobj, slot = dstslot} then
+		return true
+	end
+	-- Try to displace the other item.
+	local tmp = inv:get_empty_slot()
+	if not tmp then return end
+	dstobj:detach()
+	dstinv:set_object{slot = tmp, object = dstobj}
+	srcobj:detach()
+	dstinv:set_object{slot = slot, object = srcobj}
 	return true
-end}
+end
+
+--- Drops an inventory item.
+-- @param clss Actions class.
+-- @param user Object performing the action.
+-- @param srcid Source inventory ID.
+-- @param srcslot Source inventory or equipment slot.
+-- @return True on success.
+Actions.move_from_inv_to_world = function(clss, user, srcid, srcslot)
+	-- Find the inventory.
+	local srcinv = Inventory:find{id = srcid}
+	if not srcinv or not srcinv:subscribed{object = user} then return end
+	-- Move the item.
+	local srcobj = srcinv:get_object{slot = srcslot}
+	if not srcobj then return end
+	srcobj:detach()
+	srcobj.position = user.position
+	srcobj.velocity = Vector()
+	srcobj.rotation = Quaternion()
+	srcobj.realized = true
+	-- Animate the user.
+	user:animate{animation = "pickup", channel = Animation.CHANNEL_ACTION, weight = 10}
+	user.cooldown = 1
+	return true
+end
+
+--- Picks up an item and places it into the inventory.
+-- @param clss Actions class.
+-- @param user Object performing the action.
+-- @param srcid Source object ID.
+-- @param dstid Destination inventory ID.
+-- @param dstslot Destination inventory or equipment slot.
+-- @return True on success.
+Actions.move_from_world_to_inv = function(clss, user, srcid, dstid, dstslot)
+	-- Find the inventory.
+	local dstinv = Inventory:find{id = dstid}
+	if not dstinv or not dstinv:subscribed{object = user} then return end
+	-- Validate slots.
+	if type(dstslot) == "string" then
+		if not dstinv.owner.spec.equipment_slots then return end
+		if not dstinv.owner.spec.equipment_slots[dstslot] then return end
+	elseif dstslot < 1 then
+		dstslot = nil
+	elseif dstslot > dstinv.size then
+		return
+	end
+	-- Find the world item.
+	local srcobj = Object:find{id = srcid, point = user.position, radius = 5.0}
+	if not srcobj or not srcobj.pickable then return end
+	-- Try to move the item.
+	local dstobj = dstinv:get_object{slot = dstslot}
+	if not dstobj and dstslot then
+		srcobj:detach()
+		dstinv:set_object{slot = dstslot, object = srcobj}
+	-- Try to merge with other items.
+	elseif not dstinv:merge_object{object = srcobj, slot = dstslot} then
+		return
+	end
+	-- Animate the user.
+	user:animate{animation = "pickup", channel = Animation.CHANNEL_ACTION, weight = 10}
+	user.cooldown = 1
+	return true
+end
