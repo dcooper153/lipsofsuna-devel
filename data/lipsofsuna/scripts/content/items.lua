@@ -525,7 +525,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
-	crafting_materials = {log = 1},
+	crafting_materials = {hide = 4},
 	equipment_models = {legs = "aerlegarmor1"},
 	equipment_slot = "feet"}
 
@@ -535,7 +535,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
-	crafting_materials = {log = 1},
+	crafting_materials = {hide = 4},
 	equipment_models = {legs = "aerlegarmor2", legs1 = "boots1"},
 	equipment_slot = "feet"}
 
@@ -545,7 +545,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
-	crafting_materials = {log = 1},
+	crafting_materials = {hide = 4},
 	equipment_models = {skirt = "aerlowerarmor1", panties = "panties2"},
 	equipment_slot = "lowerbody"}
 
@@ -555,7 +555,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
-	crafting_materials = {log = 1},
+	crafting_materials = {hide = 4},
 	equipment_models = {upper1 = "bra1"},
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
