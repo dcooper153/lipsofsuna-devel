@@ -250,7 +250,8 @@ Species{
 	categories = {"enemy"},
 	factions = {"evil"},
 	feat_anims = {"bite"},
-	inventory_size = 0,
+	inventory_size = 3,
+	inventory_items = {"hide", "hide"},
 	model = "bloodworm1",
 	speed_walk = 1,
 	skills = {
@@ -264,7 +265,9 @@ Species{
 	ai_enable_defend = false,
 	factions = {"evil"},
 	feat_anims = {"dragon bite", "left claw", "right claw"},
-	inventory_size = 0,
+	inventory_size = 10,
+	inventory_items = {"dragon scale", "dragon scale", "dragon scale", "dragon scale", "dragon scale",
+		"adamantium", "adamantium", "adamantium", "adamantium", "crimson stone", "crimson stone"},
 	mass = 1000,
 	speed_walk = 1,
 	skills = {
@@ -277,7 +280,8 @@ Species{
 	categories = {"enemy", "plague"},
 	factions = {"evil"},
 	feat_anims = {"bite"},
-	inventory_size = 0,
+	inventory_size = 3,
+	inventory_items = {"hide", "hide"},
 	model = "plaguerat1", -- FIXME
 	speed_walk = 1,
 	skills = {
