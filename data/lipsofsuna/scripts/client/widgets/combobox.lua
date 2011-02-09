@@ -75,6 +75,27 @@ Widgets.ComboBox.clear = function(self)
 	self.value = 1
 	self.menu.rows = 0
 	self.text = nil
+	self:close()
+end
+
+--- Makes sure that the popup of the combo box is hidden.
+-- @param self Combo box.
+Widgets.ComboBox.close = function(self)
+	if Widgets.ComboBox.active == self then
+		Widgets.ComboBox.active = nil
+		self.menu.visible = false
+	end
+end
+
+--- Shows the popup of the combo box.
+-- @param self Combo box.
+Widgets.ComboBox.popup = function(self)
+	if Widgets.ComboBox.active then
+		Widgets.ComboBox.active:close()
+	end
+	self.menu:set_request{width = self.width + 9}
+	self.menu:popup{x = self.x, y = self.y, width = self.width, height = self.height, dir = "down"}
+	Widgets.ComboBox.active = self
 end
 
 Widgets.ComboBox.pressed = function(self)
@@ -96,8 +117,7 @@ Widgets.ComboBox.pressed = function(self)
 		end
 	else
 		-- Popup menu.
-		self.menu:set_request{width = self.width + 9}
-		self.menu:popup{x = self.x, y = self.y, width = self.width, height = self.height, dir = "down"}
+		self:popup()
 	end
 end
 

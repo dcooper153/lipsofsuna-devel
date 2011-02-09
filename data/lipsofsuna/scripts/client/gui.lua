@@ -79,6 +79,7 @@ Gui.set_mode = function(self, mode, level)
 	Target:cancel()
 	Drag:cancel()
 	if self.view and self.view.close then self.view:close() end
+	if Widgets.ComboBox.active then Widgets.ComboBox.active:close() end
 	-- Set the base view mode.
 	local base = (mode == "startup" or mode == "wait") and 1 or (mode == "chargen") and 2 or 3
 	if base ~= self.mode_base then
