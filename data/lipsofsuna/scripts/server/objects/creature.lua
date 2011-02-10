@@ -379,8 +379,9 @@ Creature.jump = function(self)
 	if t - self.jumped < 0.5 then return end
 	local v = self.velocity
 	self.jumped = t
+	self.jumping = true
 	Effect:play{effect = "jump1", object = self}
-	self:animate{animation = "jump"}
+	self:animate{animation = "jump", channel = Animation.CHANNEL_JUMP, permanent = true}
 	Object.jump(self, {impulse = Vector(v.x, 400, v.z)})
 end
 
@@ -499,6 +500,11 @@ Creature.update = function(self, secs)
 	-- Update animations.
 	self.anim_timer = self.anim_timer + secs
 	if self.anim_timer > 0.05 then
+		if self.jumping and self.ground and Program.time - self.jumped > 0.5 then
+			Effect:play{effect = "thud1", object = self}
+			self:animate{animation = "land", channel = Animation.CHANNEL_JUMP, weight = 10.0}
+			self.jumping = nil
+		end
 		self:update_animations{secs = self.anim_timer}
 		self.anim_timer = 0
 	end
