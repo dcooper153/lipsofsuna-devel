@@ -150,7 +150,7 @@ void liphy_physics_free (
  * \param end Ray end point.
  * \param result Return location for collision point or NULL.
  * \param normal Return location for collision surface normal or NULL.
- * \return Nonzero if no collision occurred.
+ * \return Nonzero if a collision occurred.
  */
 int liphy_physics_cast_ray (
 	const LIPhyPhysics* self,
@@ -160,38 +160,43 @@ int liphy_physics_cast_ray (
 	int                 mask,
 	LIPhyObject**       ignore_array,
 	int                 ignore_count,
-	LIMatVector*        result,
-	LIMatVector*        normal)
+	LIPhyCollision*     result)
 {
 	btVector3 src (start->x, start->y, start->z);
 	btVector3 dst (end->x, end->y, end->z);
-	btCollisionWorld* collision;
-	LIPhyPrivateRaycastWorld test (ignore_array, ignore_count, src, dst);
+	btCollisionWorld* collision = self->dynamics->getCollisionWorld ();
+	LIPhyPointer* pointer;
 
 	/* Cast the ray. */
-	collision = self->dynamics->getCollisionWorld ();
+	LIPhyPrivateRaycastWorld test (ignore_array, ignore_count, src, dst);
 	test.m_closestHitFraction = 1.0f;
 	test.m_collisionFilterGroup = group;
 	test.m_collisionFilterMask = mask;
 	collision->rayTest (src, dst, test);
+	if (test.m_closestHitFraction >= 1.0f)
+		return 0;
 
 	/* Inspect results. */
-	if (test.m_closestHitFraction < 1.0f)
+	if (result != NULL)
 	{
-		if (result != NULL)
-			*result = limat_vector_init (test.m_hitPointWorld[0], test.m_hitPointWorld[1], test.m_hitPointWorld[2]);
-		if (normal != NULL)
-			*normal = limat_vector_init (test.m_hitNormalWorld[0], test.m_hitNormalWorld[1], test.m_hitNormalWorld[2]);
-		return 0;
+		result->point = limat_vector_init (test.m_hitPointWorld[0], test.m_hitPointWorld[1], test.m_hitPointWorld[2]);
+		result->normal = limat_vector_init (test.m_hitNormalWorld[0], test.m_hitNormalWorld[1], test.m_hitNormalWorld[2]);
+		pointer = (LIPhyPointer*) test.m_collisionObject->getUserPointer ();
+		if (pointer->object)
+		{
+			result->object = (LIPhyObject*) pointer->pointer;
+			result->terrain = NULL;
+			result->terrain_index = 0;
+		}
+		else
+		{
+			result->object = NULL;
+			result->terrain = (LIPhyTerrain*) pointer->pointer;
+			result->terrain_index = 0;
+		}
 	}
-	else
-	{
-		if (result != NULL)
-			*result = *end;
-		if (normal != NULL)
-			*normal = limat_vector_normalize (limat_vector_subtract (*end, *start));
-		return 1;
-	}
+
+	return 1;
 }
 
 /**

@@ -43,6 +43,19 @@ LIAPICALL (int, liphy_object_approach, (
 	float              speed,
 	float              dist));
 
+LIAPICALL (int, liphy_object_cast_ray, (
+	LIPhyObject*       self,
+	const LIMatVector* relsrc,
+	const LIMatVector* reldst,
+	LIPhyCollision*    result));
+
+LIAPICALL (int, liphy_object_cast_sphere, (
+	LIPhyObject*       self,
+	const LIMatVector* relsrc,
+	const LIMatVector* reldst,
+	float              radius,
+	LIPhyCollision*    result));
+
 LIAPICALL (void, liphy_object_impulse, (
 	LIPhyObject*       self,
 	const LIMatVector* point,
@@ -56,13 +69,6 @@ LIAPICALL (LIPhyObject*, liphy_object_scan_sphere, (
 	LIPhyObject*       self,
 	const LIMatVector* relctr,
 	float              radius));
-
-LIAPICALL (int, liphy_object_sweep_sphere, (
-	LIPhyObject*       self,
-	const LIMatVector* relsrc,
-	const LIMatVector* reldst,
-	float              radius,
-	LIPhyCollision*    result));
 
 LIAPICALL (void, liphy_object_get_angular, (
 	const LIPhyObject* self,

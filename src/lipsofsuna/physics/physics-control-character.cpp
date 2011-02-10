@@ -69,7 +69,7 @@ void LIPhyCharacterAction::updateAction (
 		LIMatVector check1 = { pos[0], pos[1] - 0.6f, pos[2] };
 		ground = liphy_physics_cast_ray (this->object->physics, &check0, &check1,
 			this->object->config.collision_group, this->object->config.collision_mask,
-			&this->object, 1, NULL, NULL) < 1.0f;
+			&this->object, 1, NULL);
 		this->ground = ground;
 		this->timer = 0.0f;
 	}

@@ -177,7 +177,7 @@ static void Object_sweep_sphere (LIScrArgs* args)
 		return;
 	liscr_args_gets_float (args, "radius", &radius);
 
-	if (liphy_object_sweep_sphere (object, &start, &end, radius, &result))
+	if (liphy_object_cast_sphere (object, &start, &end, radius, &result))
 	{
 		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
 		liscr_args_sets_float (args, "fraction", result.fraction);

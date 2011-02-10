@@ -174,6 +174,70 @@ int liphy_object_approach (
 }
 
 /**
+ * \brief Performs a relative ray cast test.
+ * \param self Object.
+ * \param relsrc Sweep start point, in object space.
+ * \param reldst Sweep end point, in object space.
+ * \param result Return location for collision information.
+ * \return Nonzero if hit something.
+ */
+int liphy_object_cast_ray (
+	LIPhyObject*       self,
+	const LIMatVector* relsrc,
+	const LIMatVector* reldst,
+	float              radius,
+	LIPhyCollision*    result)
+{
+	LIMatTransform transform;
+	LIMatVector start;
+	LIMatVector end;
+
+	if (self->control == NULL)
+		return 0;
+	liphy_object_get_transform (self, &transform);
+	start = limat_transform_transform (transform, *relsrc);
+	end = limat_transform_transform (transform, *reldst);
+
+	return liphy_physics_cast_ray (self->physics, &start, &end,
+		btBroadphaseProxy::DefaultFilter, btBroadphaseProxy::AllFilter, &self, 1, result);
+}
+
+/**
+ * \brief Performs a relative sphere sweep test.
+ *
+ * This function is a handy for things like melee attack checks since
+ * you can place the sphere at the damaging point of the weapon and
+ * project it to the direction of the attack.
+ *
+ * \param self Object.
+ * \param relsrc Sweep start point, in object space.
+ * \param reldst Sweep end point, in object space.
+ * \param radius Radius of the swept sphere.
+ * \param result Return location for collision information.
+ * \return Nonzero if hit something.
+ */
+int liphy_object_cast_sphere (
+	LIPhyObject*       self,
+	const LIMatVector* relsrc,
+	const LIMatVector* reldst,
+	float              radius,
+	LIPhyCollision*    result)
+{
+	LIMatTransform transform;
+	LIMatVector start;
+	LIMatVector end;
+
+	if (self->control == NULL)
+		return 0;
+	liphy_object_get_transform (self, &transform);
+	start = limat_transform_transform (transform, *relsrc);
+	end = limat_transform_transform (transform, *reldst);
+
+	return liphy_physics_cast_sphere (self->physics, &start, &end, radius,
+		btBroadphaseProxy::DefaultFilter, btBroadphaseProxy::AllFilter, &self, 1, result);
+}
+
+/**
  * \brief Modifies the velocity of the object with an impulse.
  *
  * \param self Object.
@@ -243,41 +307,6 @@ void liphy_object_jump (
 	LIMatVector o = { 0.0f, 0.0f, 0.0f };
 
 	liphy_object_impulse (self, impulse, &o);
-}
-
-/**
- * \brief Performs a sweep test with a sphere.
- *
- * This function is a handy for things like melee attack checks since
- * you can place the sphere at the damaging point of the weapon and
- * project it to the direction of the attack.
- *
- * \param self Object.
- * \param relsrc Sweep start point, in object space.
- * \param reldst Sweep end point, in object space.
- * \param radius Radius of the swept sphere.
- * \param result Return location for collision information.
- * \return Nonzero if hit something.
- */
-int liphy_object_sweep_sphere (
-	LIPhyObject*       self,
-	const LIMatVector* relsrc,
-	const LIMatVector* reldst,
-	float              radius,
-	LIPhyCollision*    result)
-{
-	LIMatTransform transform;
-	LIMatVector start;
-	LIMatVector end;
-
-	if (self->control == NULL)
-		return 0;
-	liphy_object_get_transform (self, &transform);
-	start = limat_transform_transform (transform, *relsrc);
-	end = limat_transform_transform (transform, *reldst);
-
-	return liphy_physics_cast_sphere (self->physics, &start, &end, radius,
-		btBroadphaseProxy::DefaultFilter, btBroadphaseProxy::AllFilter, &self, 1, result);
 }
 
 /**
