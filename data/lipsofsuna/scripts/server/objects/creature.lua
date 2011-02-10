@@ -193,6 +193,30 @@ Creature.calculate_speed = function(self)
 	end
 end
 
+--- Checks line of sight to the target point or object.
+-- @param self Object.
+-- @param args Arguments.<ul>
+--   <li>object: Object being looked for.</li>
+--   <li>point: Point being looked for.</li></ul>
+-- @return True if seen.
+Creature.check_line_of_sight = function(self, args)
+	if args.point then
+		-- TODO: Take bounding box into account.
+		local src = self.position + Vector(0,1,0)
+		local dst = args.point
+		local ret = Physics:cast_ray{src = src, dst = dst, ignore = self}
+		return not ret or (ret.point - dst).length < 0.5
+	elseif args.object then
+		-- TODO: Take stealth into account.
+		-- TODO: Take bounding box into account.
+		-- TODO: Shoot multiple rays?
+		local src = self.position + Vector(0,1,0)
+		local dst = args.object.position + Vector(0,1,0)
+		local ret = Physics:cast_ray{src = src, dst = dst, ignore = self}
+		if not ret or ret.object == args.object then return true end
+	end
+end
+
 --- Checks if the given object is an enemy of the creature.
 -- @param self Object.
 -- @param object Object.
@@ -420,8 +444,9 @@ Creature.scan_enemies = function(self)
 	local objs = Object:find{point = self.position, radius = 10}
 	for k,v in pairs(objs) do
 		if self:check_enemy(v) then
-			self.enemies[v] = v
-			break
+			if self:check_line_of_sight{object = v} then
+				self.enemies[v] = v
+			end
 		end
 	end
 end
