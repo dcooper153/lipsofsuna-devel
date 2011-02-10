@@ -200,18 +200,30 @@ end
 --   <li>point: Point being looked for.</li></ul>
 -- @return True if seen.
 Creature.check_line_of_sight = function(self, args)
+	-- TODO: Take stealth into account.
+	local src
+	local dst
+	-- Get the vision ray.
+	-- TODO: Take bounding box into account.
 	if args.point then
-		-- TODO: Take bounding box into account.
-		local src = self.position + Vector(0,1,0)
-		local dst = args.point
+		src = self.position + Vector(0,1,0)
+		dst = args.point
+	elseif args.object then
+		src = self.position + Vector(0,1,0)
+		dst = args.object.position + Vector(0,1,0)
+	end
+	-- Check for view cone.
+	local ray = (src - dst):normalize()
+	local look = self.rotation * Vector(0,0,-1)
+	if math.acos(ray:dot(look)) > self.spec.view_cone then
+		return
+	end
+	-- Check for ray cast success.
+	-- TODO: Shoot multiple rays?
+	if args.point then
 		local ret = Physics:cast_ray{src = src, dst = dst, ignore = self}
 		return not ret or (ret.point - dst).length < 0.5
 	elseif args.object then
-		-- TODO: Take stealth into account.
-		-- TODO: Take bounding box into account.
-		-- TODO: Shoot multiple rays?
-		local src = self.position + Vector(0,1,0)
-		local dst = args.object.position + Vector(0,1,0)
 		local ret = Physics:cast_ray{src = src, dst = dst, ignore = self}
 		if not ret or ret.object == args.object then return true end
 	end
