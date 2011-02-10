@@ -1,5 +1,6 @@
 Shader{
 name = "glass",
+sort = true,
 pass6_depth_func = "lequal",
 pass6_depth_write = false,
 pass6_vertex = [[
@@ -16,6 +17,11 @@ void main()
 	var_lightdir = LOS_light_position_premult - var_coord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
+pass6_blend = true,
+pass6_blend_src = "one",
+pass6_blend_dst = "one",
+pass6_depth_func = "lequal",
+pass6_depth_write = false,
 pass6_fragment = [[
 in vec3 var_coord;
 in vec3 var_normal;

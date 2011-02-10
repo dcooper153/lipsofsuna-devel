@@ -663,7 +663,7 @@ Itemspec{
 
 Itemspec{
 	name = "greater health potion",
-	model = "potion-002",
+	model = "potion3",
 	mass = 2,
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
@@ -674,7 +674,7 @@ Itemspec{
 
 Itemspec{
 	name = "greater mana potion",
-	model = "potion-005",--"potion-006"
+	model = "potion7",
 	mass = 2,
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
@@ -685,7 +685,7 @@ Itemspec{
 
 Itemspec{
 	name = "health potion",
-	model = "potion-001",
+	model = "potion3",
 	mass = 2,
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
@@ -696,7 +696,7 @@ Itemspec{
 
 Itemspec{
 	name = "lesser health potion",
-	model = "potion-000",
+	model = "potion3",
 	mass = 2,
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
@@ -707,7 +707,7 @@ Itemspec{
 
 Itemspec{
 	name = "lesser mana potion",
-	model = "potion-003",
+	model = "potion7",
 	mass = 2,
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
@@ -718,7 +718,7 @@ Itemspec{
 
 Itemspec{
 	name = "mana potion",
-	model = "potion-004",
+	model = "potion7",
 	mass = 2,
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
