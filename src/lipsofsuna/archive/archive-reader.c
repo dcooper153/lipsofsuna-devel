@@ -920,12 +920,12 @@ liarc_reader_get_key_value_pair (LIArcReader* self,
  * \param num Number of bytes to skip.
  * \return Nonzero on success.
  */
-int
-liarc_reader_skip_bytes (LIArcReader* self,
-                         int          num)
+int liarc_reader_skip_bytes (
+	LIArcReader* self,
+	int          num)
 {
 	/* Check for read errors. */
-	if (self->pos >= self->length - num - 1)
+	if (self->pos > self->length - num)
 	{
 		lisys_error_set (EINVAL, "unexpected end of stream");
 		return 0;
