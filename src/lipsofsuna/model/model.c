@@ -34,7 +34,8 @@ static void private_build (
 
 static int private_read (
 	LIMdlModel*  self,
-	LIArcReader* reader);
+	LIArcReader* reader,
+	int          mesh);
 
 static int private_read_animations (
 	LIMdlModel*  self,
@@ -173,7 +174,7 @@ LIMdlModel* limdl_model_new_copy (
 		liarc_writer_free (writer);
 		return NULL;
 	}
-	self = limdl_model_new_from_data (reader);
+	self = limdl_model_new_from_data (reader, 1);
 	liarc_reader_free (reader);
 	liarc_writer_free (writer);
 
@@ -183,10 +184,12 @@ LIMdlModel* limdl_model_new_copy (
 /**
  * \brief Loads a model from uncompressed data.
  * \param reader A reader.
+ * \param mesh Zero to only load collision shapes.
  * \return A new model or NULL.
  */
 LIMdlModel* limdl_model_new_from_data (
-	LIArcReader* reader)
+	LIArcReader* reader,
+	int          mesh)
 {
 	LIMdlModel* self;
 
@@ -199,7 +202,7 @@ LIMdlModel* limdl_model_new_from_data (
 	}
 
 	/* Read from stream. */
-	if (!private_read (self, reader))
+	if (!private_read (self, reader, mesh))
 	{
 		lisys_error_append ("cannot load model");
 		limdl_model_free (self);
@@ -214,10 +217,12 @@ LIMdlModel* limdl_model_new_from_data (
 /**
  * \brief Loads a model from a file.
  * \param path The path to the file.
+ * \param mesh Zero to only load collision shapes.
  * \return A new model or NULL.
  */
 LIMdlModel* limdl_model_new_from_file (
-	const char* path)
+	const char* path,
+	int         mesh)
 {
 	LIArcReader* reader;
 	LIMdlModel* self;
@@ -236,7 +241,7 @@ LIMdlModel* limdl_model_new_from_file (
 		goto error;
 
 	/* Read from stream. */
-	if (!private_read (self, reader))
+	if (!private_read (self, reader, mesh))
 		goto error;
 	liarc_reader_free (reader);
 
@@ -700,7 +705,8 @@ static void private_build (
 
 static int private_read (
 	LIMdlModel*  self,
-	LIArcReader* reader)
+	LIArcReader* reader,
+	int          mesh)
 {
 	int i;
 	int j;
@@ -760,21 +766,21 @@ static int private_read (
 		}
 		if (!strcmp (id, "bou"))
 			ret = private_read_bounds (self, reader);
-		else if (!strcmp (id, "mat"))
+		else if (mesh && !strcmp (id, "mat"))
 			ret = private_read_materials (self, reader);
-		else if (!strcmp (id, "ver"))
+		else if (mesh && !strcmp (id, "ver"))
 			ret = private_read_vertices (self, reader);
-		else if (!strcmp (id, "fac"))
+		else if (mesh && !strcmp (id, "fac"))
 			ret = private_read_faces (self, reader);
-		else if (!strcmp (id, "wei"))
+		else if (mesh && !strcmp (id, "wei"))
 			ret = private_read_weights (self, reader);
-		else if (!strcmp (id, "nod"))
+		else if (mesh && !strcmp (id, "nod"))
 			ret = private_read_nodes (self, reader);
-		else if (!strcmp (id, "ani"))
+		else if (mesh && !strcmp (id, "ani"))
 			ret = private_read_animations (self, reader);
-		else if (!strcmp (id, "hai"))
+		else if (mesh && !strcmp (id, "hai"))
 			ret = private_read_hairs (self, reader);
-		else if (!strcmp (id, "par"))
+		else if (mesh && !strcmp (id, "par"))
 			ret = private_read_particles (self, reader);
 		else if (!strcmp (id, "sha"))
 			ret = private_read_shapes (self, reader);

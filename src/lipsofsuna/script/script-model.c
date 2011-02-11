@@ -36,6 +36,39 @@
  */
 
 /* @luadoc
+ * --- Creates a new model.
+ * -- @param clss Model class.
+ * -- @param args Arguments.
+ * -- @return New model.
+ * function Model.new(clss, args)
+ */
+static void Model_new (LIScrArgs* args)
+{
+	LIEngModel* self;
+	LIMaiProgram* program;
+
+	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+
+	/* Allocate model. */
+	self = lieng_model_new (program->engine);
+	if (self == NULL)
+		return;
+
+	/* Allocate userdata. */
+	self->script = liscr_data_new (args->script, self, args->clss, lieng_model_free);
+	if (self->script == NULL)
+	{
+		lieng_model_free (self);
+		return;
+	}
+
+	/* Initialize userdata. */
+	liscr_args_call_setters (args, self->script);
+	liscr_args_seti_data (args, self->script);
+	liscr_data_unref (self->script);
+}
+
+/* @luadoc
  * --- Recalculates the bounding box of the model.
  * -- @param self Model.
  * function Model.calculate_bounds(self)
@@ -79,6 +112,34 @@ static void Model_copy (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Loads the model from a file.
+ * -- @param self Model.
+ * -- @param args Arguments.<ul>
+ * --   <li>1,file: Filename.</li>
+ * --   <li>2,mesh: False to not load the mesh.</li></ul>
+ * -- @return True if loaded successfully.
+ * function Model.load(self, args)
+ */
+static void Model_load (LIScrArgs* args)
+{
+	int mesh = 1;
+	const char* file;
+
+	if (!liscr_args_geti_string (args, 0, &file) &&
+	    !liscr_args_gets_string (args, "file", &file))
+		return;
+	if (!liscr_args_geti_bool (args, 1, &mesh))
+		liscr_args_gets_bool (args, "mesh", &mesh);
+
+	if (!lieng_model_load (args->self, file, mesh))
+	{
+		lisys_error_report ();
+		return;
+	}
+	liscr_args_seti_bool (args, 1);
+}
+
+/* @luadoc
  * --- Adds an additional model mesh to the model.
  * -- @param self Model.
  * -- @param args Arguments.<ul>
@@ -93,56 +154,6 @@ static void Model_merge (LIScrArgs* args)
 	    liscr_args_gets_data (args, "model", LISCR_SCRIPT_MODEL, &model))
 	{
 		if (!lieng_model_merge (args->self, model->data))
-			lisys_error_report ();
-	}
-}
-
-/* @luadoc
- * --- Creates a new model.
- * --
- * -- @param clss Model class.
- * -- @param args Arguments.
- * -- @return New model.
- * function Model.new(clss, args)
- */
-static void Model_new (LIScrArgs* args)
-{
-	LIEngModel* self;
-	LIMaiProgram* program;
-
-	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
-
-	/* Allocate model. */
-	self = lieng_model_new (program->engine);
-	if (self == NULL)
-		return;
-
-	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, self, args->clss, lieng_model_free);
-	if (self->script == NULL)
-	{
-		lieng_model_free (self);
-		return;
-	}
-
-	/* Initialize userdata. */
-	liscr_args_call_setters (args, self->script);
-	liscr_args_seti_data (args, self->script);
-	liscr_data_unref (self->script);
-}
-
-/* @luadoc
- * --- Loads the model from a file.
- * -- @name Model.file
- * -- @class table
- */
-static void Model_setter_file (LIScrArgs* args)
-{
-	const char* file;
-
-	if (liscr_args_geti_string (args, 0, &file))
-	{
-		if (!lieng_model_load (args->self, file))
 			lisys_error_report ();
 	}
 }
@@ -170,9 +181,9 @@ void liscr_script_model (
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_mfunc (self, "calculate_bounds", Model_calculate_bounds);
 	liscr_class_insert_mfunc (self, "copy", Model_copy);
+	liscr_class_insert_mfunc (self, "load", Model_load);
 	liscr_class_insert_mfunc (self, "merge", Model_merge);
 	liscr_class_insert_cfunc (self, "new", Model_new);
-	liscr_class_insert_mvar (self, "file", NULL, Model_setter_file);
 	liscr_class_insert_mvar (self, "id", Model_getter_id, NULL);
 }
 

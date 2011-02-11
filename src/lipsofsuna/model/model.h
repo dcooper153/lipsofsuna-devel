@@ -74,10 +74,12 @@ LIAPICALL (LIMdlModel*, limdl_model_new_copy, (
 	LIMdlModel* model));
 
 LIAPICALL (LIMdlModel*, limdl_model_new_from_data, (
-	LIArcReader* reader));
+	LIArcReader* reader,
+	int          mesh));
 
 LIAPICALL (LIMdlModel*, limdl_model_new_from_file, (
-	const char* path));
+	const char* path,
+	int         mesh));
 
 LIAPICALL (void, limdl_model_free, (
 	LIMdlModel* self));

@@ -135,7 +135,8 @@ void lieng_model_calculate_bounds (
 
 int lieng_model_load (
 	LIEngModel* self,
-	const char* name)
+	const char* name,
+	int         mesh)
 {
 	char* file;
 	char* path;
@@ -151,7 +152,7 @@ int lieng_model_load (
 		return 0;
 
 	/* Load model geometry. */
-	tmpmdl = limdl_model_new_from_file (path);
+	tmpmdl = limdl_model_new_from_file (path, mesh);
 	lisys_free (path);
 	if (tmpmdl == NULL)
 		return 0;

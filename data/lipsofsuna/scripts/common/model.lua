@@ -1,4 +1,5 @@
-local instfunc = Model.new
+local oldinst = Model.new
+local oldload = Model.load
 Model.models = {}
 setmetatable(Model.models, {__mode = "v"})
 
@@ -16,10 +17,15 @@ end
 --- Finds or loads a model by name.
 -- @param clss Model class.
 -- @param args Arguments.<ul>
---   <li>file: Model filename.</li></ul>
+--   <li>file: Model filename.</li>
+--   <li>mesh: False to not load the mesh.</li></ul>
 -- @return Model.
 Model.load = function(clss, args)
-	return clss:find(args) or clss:new(args)
+	local self = clss:find(args)
+	if self then return self end
+	self = clss:new{name = args.file}
+	oldload(self, args)
+	return self
 end
 
 --- Creates a new model.
@@ -27,10 +33,9 @@ end
 -- @param args Arguments.
 -- @return New models.
 Model.new = function(clss, args)
-	local self = instfunc(clss, args)
-	if args and args.file then
-		clss.models[args.file] = self
-		self.name = args.file
+	local self = oldinst(clss, args)
+	if self.name then
+		clss.models[self.name] = self
 	end
 	return self
 end

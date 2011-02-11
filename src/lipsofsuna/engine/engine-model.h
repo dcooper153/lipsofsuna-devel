@@ -45,7 +45,8 @@ LIAPICALL (void, lieng_model_calculate_bounds, (
 
 LIAPICALL (int, lieng_model_load, (
 	LIEngModel* self,
-	const char* name));
+	const char* name,
+	int         mesh));
 
 LIAPICALL (int, lieng_model_merge, (
 	LIEngModel* self,

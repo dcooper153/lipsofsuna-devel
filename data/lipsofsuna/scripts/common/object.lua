@@ -3,6 +3,7 @@ local oldgetter = Object.getter
 local oldsetter = Object.setter
 local oldfind = Object.find
 Object.objects = {}
+Object.load_meshes = true
 setmetatable(Object.objects, {__mode = "v"})
 
 Object.getter = function(self, key)
@@ -15,7 +16,7 @@ end
 
 Object.setter = function(self, key, value)
 	if key == "model" and type(value) == "string" then
-		local m = Model:find{file = value} or Model{file = value}
+		local m = Model:load{file = value, mesh = self.load_meshes}
 		oldsetter(self, key, m)
 	else
 		oldsetter(self, key, value)

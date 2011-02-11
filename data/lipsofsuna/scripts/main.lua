@@ -58,6 +58,7 @@ require "core/object-physics"
 require "common/vision"
 require "common/inventory"
 require "common/skills"
+Object.load_meshes = false
 else
 require "core/animation"
 require "core/graphics"
