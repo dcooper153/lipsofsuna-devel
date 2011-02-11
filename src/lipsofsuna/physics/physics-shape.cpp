@@ -287,6 +287,23 @@ void liphy_shape_get_inertia (
 	result->z = inertia[2];
 }
 
+/**
+ * \brief Sets the center of mass of the shape.
+ *
+ * The center of mass will only be applied to the shape parts added
+ * since calling this. Be sure that the shape has been cleared before
+ * calling this or else the results won't make sense.
+ *
+ * \param self Collision shape.
+ * \param center Center of mass position vector.
+ */
+void liphy_shape_set_center_of_mass (
+	LIPhyShape*        self,
+	const LIMatVector* center)
+{
+	self->center_of_mass = *center;
+}
+
 /*****************************************************************************/
 
 static int private_add_shape (
@@ -296,6 +313,8 @@ static int private_add_shape (
 {
 	btVector3 p(0.0f, 0.0f, 0.0f);
 	btQuaternion r(0.0f, 0.0f, 0.0f, 1.0f);
+	btTransform center_of_mass(r, btVector3 (
+		self->center_of_mass.x, self->center_of_mass.y, self->center_of_mass.z));
 
 	if (transform != NULL)
 	{
@@ -306,12 +325,19 @@ static int private_add_shape (
 	}
 	try
 	{
-		self->shape->addChildShape (btTransform (r, p), shape);
+		self->shape->addChildShape (center_of_mass.inverse() * btTransform (r, p), shape);
 	}
 	catch (...)
 	{
 		return 0;
 	}
+
+	/* Update the bounding box. */
+	btVector3 min;
+	btVector3 max;
+	self->shape->getAabb(btTransform::getIdentity (), min, max);
+	self->bounds.min = limat_vector_init (min[0], min[1], min[2]);
+	self->bounds.max = limat_vector_init (max[0], max[1], max[2]);
 
 	return 1;
 }

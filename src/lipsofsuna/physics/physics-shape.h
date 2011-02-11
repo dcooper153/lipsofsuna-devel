@@ -69,4 +69,8 @@ LIAPICALL (void, liphy_shape_get_inertia, (
 	float             mass,
 	LIMatVector*      result));
 
+LIAPICALL (void, liphy_shape_set_center_of_mass, (
+	LIPhyShape*        self,
+	const LIMatVector* center));
+
 #endif

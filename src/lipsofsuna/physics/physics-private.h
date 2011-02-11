@@ -65,6 +65,8 @@ struct _LIPhyPhysics
 struct _LIPhyShape
 {
 	LIPhyPhysics* physics;
+	LIMatAabb bounds;
+	LIMatVector center_of_mass;
 	btCompoundShape* shape;
 };
 
@@ -140,12 +142,14 @@ struct _LIPhyObject
 	int flags;
 	uint32_t id;
 	char* shape_name;
+	LIMatVector center_of_mass;
 	LIPhyControlMode control_mode;
 	LIPhyControl* control;
 	LIPhyMotionState* motion;
 	LIPhyPhysics* physics;
 	LIPhyPointer pointer;
 	LIPhyModel* model;
+	LIPhyShape* shape;
 	struct
 	{
 		int collision_group;

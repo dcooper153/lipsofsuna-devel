@@ -354,6 +354,21 @@ void liphy_object_set_angular (
 }
 
 /**
+ * \brief Gets the local bounding box of the object.
+ * \param self Object.
+ * \param result Return location for the bounding box.
+ */
+void liphy_object_get_bounds (
+	const LIPhyObject* self,
+	LIMatAabb*         result)
+{
+	if (self->shape != NULL)
+		*result = self->shape->bounds;
+	else
+		limat_aabb_init (result);
+}
+
+/**
  * \brief Gets the collision group of the object.
  *
  * \param self Object.
@@ -774,7 +789,19 @@ void liphy_object_get_transform (
 	btQuaternion rotation;
 	btVector3 position;
 
+	/* Get the raw transformation. */
 	self->motion->getWorldTransform (trans);
+
+	/* Calculate displacement. */
+	/* Due to the center of mass transform of the collision shape, the
+	   object may need to displaced for it to appear in the right place. */
+	if (self->shape != NULL)
+	{
+		LIMatVector ctr = self->center_of_mass;
+		btVector3 disp = btVector3 (ctr.x, ctr.y, ctr.z);
+		trans = trans * btTransform (btQuaternion::getIdentity (), disp).inverse();
+	}
+
 	rotation = trans.getRotation ();
 	position = trans.getOrigin ();
 	value->position.x = position[0];
@@ -799,6 +826,16 @@ void liphy_object_set_transform (
 	btVector3 origin (value->position.x, value->position.y, value->position.z);
 	btQuaternion rotation (value->rotation.x, value->rotation.y, value->rotation.z, value->rotation.w);
 	btTransform transform (rotation, origin);
+
+	/* Calculate displacement. */
+	/* Due to the center of mass transform of the collision shape, the
+	   object may need to displaced for it to appear in the right place. */
+	if (self->shape != NULL)
+	{
+		LIMatVector ctr = self->center_of_mass;
+		btVector3 disp = btVector3 (ctr.x, ctr.y, ctr.z);
+		transform = transform * btTransform (btQuaternion::getIdentity (), disp);
+	}
 
 	/* Update the transformation of the body. */
 	if (self->control != NULL)
@@ -891,6 +928,7 @@ static void private_update_state (
 	LIPhyObject* self)
 {
 	btCollisionShape* shape;
+	LIMatTransform transform;
 	LIPhyShape* shape_;
 
 	/* Remove all constraints involving us. */
@@ -902,6 +940,8 @@ static void private_update_state (
 		delete self->control;
 		self->control = NULL;
 	}
+	self->shape = NULL;
+	liphy_object_get_transform (self, &transform);
 
 	/* Create new controller. */
 	if (self->flags & PRIVATE_REALIZED)
@@ -910,6 +950,7 @@ static void private_update_state (
 		if (shape_ == NULL)
 			return;
 		shape = shape_->shape;
+		self->shape = shape_;
 		switch (self->control_mode)
 		{
 			case LIPHY_CONTROL_MODE_NONE:
@@ -931,7 +972,11 @@ static void private_update_state (
 				break;
 		}
 		if (self->control != NULL)
+		{
+			self->center_of_mass = self->shape->center_of_mass;
 			self->control->set_contacts (self->config.contact_events);
+			liphy_object_set_transform (self, &transform);
+		}
 	}
 }
 

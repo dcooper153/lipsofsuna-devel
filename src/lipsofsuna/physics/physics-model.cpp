@@ -192,10 +192,11 @@ static int private_build_object (
 	int create;
 	LIAlgStrdicIter iter;
 	LIPhyShape* physhape;
+	LIMatVector center;
 	LIMdlShape* mdlshape;
 
 	/* Clear old shapes. */
-	/* We can't free the shapes because they may still used by objects.
+	/* We can't free the shapes because they may still be used by objects.
 	   Clearing works fine since the shapes retain their pointers. */
 	LIALG_STRDIC_FOREACH (iter, self->shapes)
 	{
@@ -218,6 +219,11 @@ static int private_build_object (
 		}
 		else
 			create = 0;
+
+		/* Set the center of mass. */
+		/* This must be done before adding any model shapes. */
+		limdl_shape_get_center (mdlshape, &center);
+		liphy_shape_set_center_of_mass (physhape, &center);
 
 		/* Add the model shape to the physics shape. */
 		if (!liphy_shape_add_model_shape (physhape, mdlshape, NULL, 1.0f))
@@ -252,6 +258,11 @@ static int private_build_object (
 		}
 		else
 			create = 0;
+
+		/* Set the center of mass. */
+		/* This must be done before adding any model shapes. */
+		limat_aabb_get_center (&self->model->bounds, &center);
+		liphy_shape_set_center_of_mass (physhape, &center);
 
 		/* Add the model mesh to the physics shape. */
 		if (!liphy_shape_add_model_full (physhape, self->model, NULL, 1.0f))

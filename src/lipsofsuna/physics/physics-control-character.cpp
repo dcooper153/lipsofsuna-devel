@@ -53,8 +53,16 @@ void LIPhyCharacterAction::updateAction (
 	float damp0;
 	float damp1;
 	float speed;
+	LIMatAabb bounds;
+	btTransform transform;
 	btCollisionObject* object = this->object->control->get_object ();
-	btTransform transform = object->getWorldTransform ();
+
+	/* Get the transformation of the bottom of the character. */
+	liphy_object_get_bounds (this->object, &bounds);
+	transform = object->getWorldTransform ();
+	transform = btTransform (btQuaternion::getIdentity (), btVector3 (
+		0.5f * (bounds.min.x + bounds.max.x), bounds.min.y,
+		0.5f * (bounds.min.z + bounds.max.z))) * transform;
 
 	/* Calculate the movement axes of the character. */
 	/* We use the gravity vector as the down axis because the facing direction,
