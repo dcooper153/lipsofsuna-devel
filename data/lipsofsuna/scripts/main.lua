@@ -59,6 +59,7 @@ require "common/vision"
 require "common/inventory"
 require "common/skills"
 else
+require "core/animation"
 require "core/graphics"
 require "core/camera"
 require "core/object-render"

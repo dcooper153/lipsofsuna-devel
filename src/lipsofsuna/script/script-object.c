@@ -54,81 +54,6 @@ static void Object_add_model (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Sets or clears an animation.
- * --
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>animation: Animation name.</li>
- * --   <li>channel: Channel number.</li>
- * --   <li>fade_in: Fade in duration in seconds.</li>
- * --   <li>fade_out: Fade out duration in seconds.</li>
- * --   <li>weight: Blending weight.</li>
- * --   <li>time: Starting time.</li>
- * --   <li>permanent: True if should keep repeating.</li></ul>
- * -- @return True if started a new animation.
- * function Object.animate(self, args)
- */
-static void Object_animate (LIScrArgs* args)
-{
-	int ret;
-	int repeat = 0;
-	int channel = -1;
-	float fade_in = 0.0f;
-	float fade_out = 0.0f;
-	float weight = 1.0f;
-	float weight_scale = 0.0f;
-	float time = 0.0f;
-	const char* animation = NULL;
-
-	liscr_args_gets_string (args, "animation", &animation);
-	liscr_args_gets_int (args, "channel", &channel);
-	liscr_args_gets_float (args, "fade_in", &fade_in);
-	liscr_args_gets_float (args, "fade_out", &fade_out);
-	liscr_args_gets_float (args, "weight", &weight);
-	liscr_args_gets_float (args, "weight_scale", &weight_scale);
-	liscr_args_gets_float (args, "time", &time);
-	liscr_args_gets_bool (args, "permanent", &repeat);
-	if (channel < 1 || channel > 255)
-		channel = -1;
-	else
-		channel--;
-	ret = lieng_object_animate (args->self, channel, animation, repeat, weight_scale, weight, time, fade_in, fade_out);
-	liscr_args_seti_bool (args, ret);
-}
-
-/* @luadoc
- * --- Fades out an animation channel.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>channel: Channel number.</li>
- * --   <li>duration: Fade duration in seconds.</li></ul>
- * function Object.animate_fade(self, args)
- */
-static void Object_animate_fade (LIScrArgs* args)
-{
-	int channel = 0;
-	float time = 0.0f;
-	float rate;
-	LIEngObject* object;
-
-	if (!liscr_args_gets_int (args, "channel", &channel))
-		return;
-	liscr_args_gets_float (args, "duration", &time);
-
-	if (channel < 1 || channel > 255)
-		return;
-	channel--;
-	if (time <= 0.0f)
-		rate = 1000.0f;
-	else
-		rate = 1.0f / time;
-
-	object = args->self;
-	if (object->pose != NULL)
-		limdl_pose_fade_channel (object->pose, channel, rate);
-}
-
-/* @luadoc
  * --- Recalculates the bounding box of the model of the object.
  * -- @param self Object.
  * function Object.calculate_bounds(self)
@@ -139,49 +64,6 @@ static void Object_calculate_bounds (LIScrArgs* args)
 
 	if (self->model != NULL)
 		lieng_model_calculate_bounds (self->model);
-}
-
-/* @luadoc
- * --- Edits the pose of a node.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>channel: Channel number.</li>
- * --   <li>frame: Frame number.</li>
- * --   <li>node: Node name. (required)</li>
- * --   <li>position: Position change relative to rest pose.</li>
- * --   <li>rotation: Rotation change relative to rest pose.</li>
- * --   <li>scale: Scale factor.</li></ul>
- * function Object.edit_pose(self, args)
- */
-static void Object_edit_pose (LIScrArgs* args)
-{
-	int frame = 0;
-	int channel = 0;
-	float scale = 1.0f;
-	const char* node = NULL;
-	LIMatTransform transform = limat_transform_identity ();
-	LIEngObject* self = args->self;
-
-	if (!liscr_args_gets_string (args, "node", &node))
-		return;
-	if (liscr_args_gets_int (args, "channel", &channel))
-	{
-		channel--;
-		if (channel < 0) channel = 0;
-		if (channel > 254) channel = 254;
-	}
-	if (liscr_args_gets_int (args, "frame", &frame))
-	{
-		frame--;
-		if (frame < 0)
-			return;
-	}
-	liscr_args_gets_quaternion (args, "rotation", &transform.rotation);
-	liscr_args_gets_vector (args, "position", &transform.position);
-	liscr_args_gets_float (args, "scale", &scale);
-	transform.rotation = limat_quaternion_normalize (transform.rotation);
-
-	limdl_pose_set_channel_transform (self->pose, channel, frame, node, scale, &transform);
 }
 
 /* @luadoc
@@ -238,84 +120,6 @@ static void Object_find (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Finds a bone or an anchor by name.
- * --
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>name: Node name. (required)</li>
- * --   <li>space: Coordinate space. ("local"/"world")</li></ul>
- * -- @return Position and rotation, or nil if not found.
- * function Object.find_node(self, args)
- */
-static void Object_find_node (LIScrArgs* args)
-{
-	float scale;
-	const char* name;
-	const char* space = "local";
-	LIMatTransform transform;
-	LIMatTransform transform1;
-	LIMdlNode* node;
-	LIEngObject* self;
-
-	if (!liscr_args_gets_string (args, "name", &name))
-		return;
-	liscr_args_gets_string (args, "space", &space);
-
-	/* Find the node. */
-	self = args->self;
-	node = limdl_pose_find_node (self->pose, name);
-	if (node == NULL)
-		return;
-
-	/* Get the transformation. */
-	if (!strcmp (space, "world"))
-	{
-		limdl_node_get_world_transform (node, &scale, &transform);
-		lieng_object_get_transform (self, &transform1);
-		transform = limat_transform_multiply (transform1, transform);
-	}
-	else
-		limdl_node_get_world_transform (node, &scale, &transform);
-
-	/* Return the transformation. */
-	liscr_args_seti_vector (args, &transform.position);
-	liscr_args_seti_quaternion (args, &transform.rotation);
-}
-
-/* @luadoc
- * --- Gets animation information for the given animation channel.
- * --
- * -- If an animation is looping in the channel, a table containing the fields
- * -- animation, time, and weight is returned.
- * --
- * -- @param self Server class.
- * -- @param args Arguments.<ul>
- * --   <li>channel: Channel number. (required)</li></ul>
- * -- @return Animation info table or nil.
- * function Object.get_animation(self, args)
- */
-static void Object_get_animation (LIScrArgs* args)
-{
-	int chan;
-	LIEngObject* object;
-	LIMdlAnimation* anim;
-
-	/* Check arguments. */
-	if (!liscr_args_gets_int (args, "channel", &chan))
-		return;
-	chan--;
-	object = args->self;
-	anim = limdl_pose_get_channel_animation (object->pose, chan);
-	if (anim == NULL)
-		return;
-	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
-	liscr_args_sets_string (args, "animation", anim->name);
-	liscr_args_sets_float (args, "time", limdl_pose_get_channel_position (object->pose, chan));
-	liscr_args_sets_float (args, "weight", limdl_pose_get_channel_priority_transform (object->pose, chan));
-	liscr_args_sets_float (args, "weight_scale", limdl_pose_get_channel_priority_scale (object->pose, chan));
-}
-
-/* @luadoc
  * --- Creates a new object.
  * --
  * -- @param clss Object class.
@@ -365,45 +169,6 @@ static void Object_refresh (LIScrArgs* args)
 
 	liscr_args_gets_float (args, "radius", &radius);
 	lieng_object_refresh (args->self, radius);
-}
-
-/* @luadoc
- * --- Updates the animations of the object.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>secs: Tick length.</li></ul>
- * function Object.update_animations(self, args)
- */
-static void Object_update_animations (LIScrArgs* args)
-{
-	float secs = 1.0f;
-	LIEngObject* self;
-
-	self = args->self;
-	liscr_args_gets_float (args, "secs", &secs);
-	if (self->pose != NULL)
-		limdl_pose_update (self->pose, secs);
-}
-
-/* @luadoc
- * --- Table of channel numbers and animation names.<br/>
- * -- A list of permanent animations the object is playing back.
- * -- @name Object.animations
- */
-static void Object_getter_animations (LIScrArgs* args)
-{
-	LIAlgU32dicIter iter;
-	LIEngObject* object;
-	LIMdlPoseChannel* channel;
-
-	object = args->self;
-	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-	LIALG_U32DIC_FOREACH (iter, object->pose->channels)
-	{
-		channel = iter.value;
-		if (channel->repeats == -1)
-			liscr_args_setf_string (args, iter.key + 1, channel->animation->name);
-	}
 }
 
 /* @luadoc
@@ -528,17 +293,10 @@ void liscr_script_object (
 	liscr_class_set_userdata (self, LISCR_SCRIPT_OBJECT, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_mfunc (self, "add_model", Object_add_model);
-	liscr_class_insert_mfunc (self, "animate", Object_animate);
-	liscr_class_insert_mfunc (self, "animate_fade", Object_animate_fade);
 	liscr_class_insert_mfunc (self, "calculate_bounds", Object_calculate_bounds);
-	liscr_class_insert_mfunc (self, "edit_pose", Object_edit_pose);
 	liscr_class_insert_cfunc (self, "find", Object_find);
-	liscr_class_insert_mfunc (self, "find_node", Object_find_node);
-	liscr_class_insert_mfunc (self, "get_animation", Object_get_animation);
 	liscr_class_insert_cfunc (self, "new", Object_new);
 	liscr_class_insert_mfunc (self, "refresh", Object_refresh);
-	liscr_class_insert_mfunc (self, "update_animations", Object_update_animations);
-	liscr_class_insert_mvar (self, "animations", Object_getter_animations, NULL);
 	liscr_class_insert_mvar (self, "model", Object_getter_model, Object_setter_model);
 	liscr_class_insert_mvar (self, "position", Object_getter_position, Object_setter_position);
 	liscr_class_insert_mvar (self, "realized", Object_getter_realized, Object_setter_realized);
