@@ -872,6 +872,15 @@
   </asset>
 
   <asset>
+    <file>import/fur1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <comment>This is a special texture used by the fur shader.</comment>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
     <file>import/gem-000.blend</file>
     <author>tidbit (Joseph)</author>
     <license>Creative Commons BY 3.0</license>
@@ -985,6 +994,24 @@
     <status>incomplete</status>
     <tag>tile</tag>
     <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/headband1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/fur1.png</dep>
+    <dep>import/headband1.png</dep>
+    <status>incomplete</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/headband1.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>incomplete</status>
+    <type>texture</type>
   </asset>
 
   <asset>

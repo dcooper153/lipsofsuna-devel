@@ -13,7 +13,6 @@ pass1_fragment = [[
 void main()
 {
 }]],
---pass4_alpha_to_coverage = true,
 pass6_blend = true,
 pass6_blend_src = "one",
 pass6_blend_dst = "one",

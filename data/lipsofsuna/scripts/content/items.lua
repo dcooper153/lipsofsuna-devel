@@ -520,6 +520,16 @@ Itemspec{
 	equipment_slot = "upperbody"}
 
 Itemspec{
+	name = "kitty headband",
+	model = "headband1",
+	armor_class = 0.02,
+	categories = {"armor"},
+	crafting_tools = {saw = 1},
+	crafting_materials = {hide = 2},
+	equipment_models = {headband = "headband1"},
+	equipment_slot = "head"}
+
+Itemspec{
 	name = "leather leggings",
 	model = "book-000",
 	armor_class = 0.04,
