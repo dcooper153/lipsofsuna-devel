@@ -534,16 +534,14 @@ end
 -- @param self Object.
 -- @param secs Seconds since the last update.
 Creature.update = function(self, secs)
-	-- Update animations.
-	self.anim_timer = self.anim_timer + secs
-	if self.anim_timer > 0.05 then
-		if self.jumping and self.ground and Program.time - self.jumped > 0.5 then
+	-- Play the landing animation after jumping.
+	if self.jumping then
+		self.jump_timer = (self.jump_timer or 0) + secs
+		if self.jump_timer > 0.2 and Program.time - self.jumped > 0.5 and self.ground then
 			Effect:play{effect = "thud1", object = self}
 			self:animate{animation = "land", channel = Animation.CHANNEL_JUMP, weight = 10.0}
 			self.jumping = nil
 		end
-		self:update_animations{secs = self.anim_timer}
-		self.anim_timer = 0
 	end
 	-- Update modifiers.
 	if self.modifiers then

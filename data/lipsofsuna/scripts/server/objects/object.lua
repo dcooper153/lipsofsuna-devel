@@ -70,13 +70,28 @@ Object.add_item = function(self, args)
 	if self.inventory:merge_object{object = args.object} then return true end
 end
 
+--- Plays an animation.
+-- @param self Object.
+-- @param args Arguments.<ul>
+--   <li>animation: Animation name.</li>
+--   <li>permanent: True to keep playing.</li>
+--   <li>weight: Blending weight.</li></ul>
+-- @return True if started a new animation.
 Object.animate = function(self, args)
-	if oldanimate(self, args) then
-		args.type = "object-animated"
-		args.object = self
-		Vision:event(args)
-		return true
+	-- Maintain channels.
+	if args.permanent then
+		if not self.animations_ then self.animations_ = {} end
+		local prev = self.animations_[args.channel]
+		if prev and prev[1] == args.animation and prev[2] == args.weight then return end
+		self.animations_[args.channel] = {args.animation, args.weight, Program.time}
+	elseif self.animations_ and args.channel then
+		self.animations_[args.channel] = nil
 	end
+	-- Emit a vision event.
+	args.type = "object-animated"
+	args.object = self
+	Vision:event(args)
+	return true
 end
 
 --- Clones the object.

@@ -146,9 +146,10 @@ end
 Player.vision_cb = function(self, args)
 	local funs
 	local sendinfo = function(o)
-		for k,v in pairs(o.animations) do
-			local a = o:get_animation{channel = k}
-			funs["object-animated"]({animation = v, channel = k, object = o, permanent = true, time = a.time, weight = a.weight})
+		if o.animations_ then
+			for k,v in pairs(o.animations_) do
+				funs["object-animated"]({animation = v[1], channel = k, object = o, permanent = true, time = Program.time - v[3], weight = v[2]})
+			end
 		end
 		if o.inventory then
 			for k,v in pairs(o.inventory.slots) do
