@@ -80,12 +80,12 @@ end
 Object.animate = function(self, args)
 	-- Maintain channels.
 	if args.permanent then
-		if not self.animations_ then self.animations_ = {} end
-		local prev = self.animations_[args.channel]
+		if not self.animations then self.animations = {} end
+		local prev = self.animations[args.channel]
 		if prev and prev[1] == args.animation and prev[2] == args.weight then return end
-		self.animations_[args.channel] = {args.animation, args.weight, Program.time}
-	elseif self.animations_ and args.channel then
-		self.animations_[args.channel] = nil
+		self.animations[args.channel] = {args.animation, args.weight, Program.time}
+	elseif self.animations and args.channel then
+		self.animations[args.channel] = nil
 	end
 	-- Emit a vision event.
 	args.type = "object-animated"

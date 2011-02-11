@@ -146,8 +146,8 @@ end
 Player.vision_cb = function(self, args)
 	local funs
 	local sendinfo = function(o)
-		if o.animations_ then
-			for k,v in pairs(o.animations_) do
+		if o.animations then
+			for k,v in pairs(o.animations) do
 				funs["object-animated"]({animation = v[1], channel = k, object = o, permanent = true, time = Program.time - v[3], weight = v[2]})
 			end
 		end
