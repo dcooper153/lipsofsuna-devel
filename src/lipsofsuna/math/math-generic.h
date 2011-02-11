@@ -34,9 +34,27 @@
 #define LIMAT_EPSILON 1E-20f
 #define LIMAT_INFINITE (1.0f/0.0f)
 
-static inline float
-limat_quantize (float value,
-                float resolution)
+static inline float limat_mix (
+	float value0,
+	float value1,
+	float mix)
+{
+	return (1.0f - mix) * value0 + mix * value1;
+}
+
+static inline float limat_smoothstep (
+	float value,
+	float edge0,
+	float edge1)
+{
+	float x = (value - edge0) / (edge1 - edge0);
+	x = LIMAT_CLAMP (x, 0.0f, 1.0f);
+	return x * x * (3.0f - 2.0f * x);
+}
+
+static inline float limat_quantize (
+	float value,
+	float resolution)
 {
 	float tmp;
 

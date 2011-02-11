@@ -617,7 +617,7 @@ Itemspec{
 Itemspec{
 	name = "chest",
 	model = "chest1",
-	mass = 15,
+	mass = 100,
 	animation_looted = "open",
 	animation_looting = "opening",
 	categories = {"container"},

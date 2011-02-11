@@ -29,6 +29,15 @@
 #define LIPHY_CHARACTER_RISING_LIMIT 5.0f 
 #define LIPHY_CHARACTER_GROUND_DAMPING 1.0f
 
+static void private_calculate_control (
+	float            current_speed,
+	float            target_speed,
+	const btVector3* direction,
+	btVector3*       velocity_result,
+	btVector3*       acceleration_result);
+
+/*****************************************************************************/
+
 LIPhyCharacterAction::LIPhyCharacterAction (
 	LIPhyObject* object)
 {
@@ -78,6 +87,7 @@ void LIPhyCharacterAction::updateAction (
 
 	/* Get velocity components. */
 	btVector3 vel = ((btRigidBody*) object)->getLinearVelocity ();
+	btVector3 accel = btVector3 (0.0f, 0.0f, 0.0f);
 	float dotx = vel.dot (right);
 	float doty = vel.dot (-down);
 	float dotz = vel.dot (-forward);
@@ -98,19 +108,27 @@ void LIPhyCharacterAction::updateAction (
 	/* Walking. */
 	speed = this->object->config.movement * this->object->config.speed;
 	if (speed != 0.0f)
-		velz = forward * speed * damp0;
+	{
+		private_calculate_control (-dotz, speed, &forward, &velx, &accel);
+		velz *= damp0;
+	}
 	else if (ground)
 		velz *= damp1;
 
 	/* Strafing. */
 	speed = this->object->config.strafing * this->object->config.speed;
 	if (speed != 0.0f)
-		velx = right * speed * damp0;
+	{
+		private_calculate_control (dotx, speed, &right, &velx, &accel);
+		velx *= damp0;
+	}
 	else if (ground)
 		velx *= damp1;
 
 	/* Sum modified component velocities. */
+	float mass = this->object->config.mass;
 	((btRigidBody*) object)->setLinearVelocity (velx + vely + velz);
+	((btRigidBody*) object)->applyImpulse (accel * mass * delta, btVector3 (0.0f, 0.0f, 0.0f));
 }
 
 void LIPhyCharacterAction::debugDraw (
@@ -135,6 +153,44 @@ LIPhyCharacterControl::~LIPhyCharacterControl ()
 bool LIPhyCharacterControl::get_ground ()
 {
 	return this->action.ground;
+}
+
+/*****************************************************************************/
+
+static void private_calculate_control (
+	float            current_speed,
+	float            target_speed,
+	const btVector3* direction,
+	btVector3*       velocity_result,
+	btVector3*       acceleration_result)
+{
+	float accel_factor;
+	float speed_factor;
+
+	/* Set velocity. */
+	/* Fully acceleration-based movement may lead to the character not starting
+	   to walk properly due to contact friction. We work around this by forcing
+	   some of the target velocity on the character. We need to be careful not
+	   to hack the velocity too much or else the character will be able to push
+	   heavy objects effortlessly. */
+	speed_factor = limat_smoothstep (current_speed, 0.0f, 7.0f);
+	speed_factor = limat_mix (0.5f, 0.1f, speed_factor);
+	if ((target_speed > 0.0f && current_speed < speed_factor * target_speed) ||
+	    (target_speed < 0.0f && current_speed > speed_factor * target_speed))
+		*velocity_result = *direction * target_speed * speed_factor;
+
+	/* Set acceleration. */
+	/* Acceleration is only set when the character isn't already moving faster
+	   than the target speed. The acceleration speed is chosen so that the
+	   character reaches the full speed quickly but isn't able to push heavy
+	   objects too easily. */
+	if ((target_speed < 0.0f || current_speed < target_speed) &&
+	    (target_speed > 0.0f || current_speed > target_speed))
+	{
+		accel_factor = limat_smoothstep (target_speed, 1.0f, 7.0f);
+		accel_factor = limat_mix (6.0f, 2.0f, accel_factor);
+		*acceleration_result += *direction * target_speed * accel_factor;
+	}
 }
 
 /** @} */
