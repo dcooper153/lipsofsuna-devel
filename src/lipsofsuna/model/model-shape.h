@@ -36,6 +36,8 @@ typedef struct _LIMdlShape LIMdlShape;
 struct _LIMdlShape
 {
 	char* name;
+	LIMatAabb bounds;
+	LIMatVector center;
 	struct
 	{
 		int count;
@@ -53,5 +55,9 @@ LIAPICALL (int, limdl_shape_read, (
 LIAPICALL (int, limdl_shape_write, (
 	const LIMdlShape* self,
 	LIArcWriter*      writer));
+
+LIAPICALL (void, limdl_shape_get_center, (
+	const LIMdlShape* self,
+	LIMatVector*      result));
 
 #endif

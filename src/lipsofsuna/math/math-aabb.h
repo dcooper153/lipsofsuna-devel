@@ -79,6 +79,23 @@ limat_aabb_init_from_points (LIMatAabb*         self,
 }
 
 /**
+ * \brief Updates the bounding box to also enclose a point.
+ * \param self Axis-aligned bounding box.
+ * \param point Position vector.
+ */
+static inline void limat_aabb_add_point (
+	LIMatAabb*         self,
+	const LIMatVector* point)
+{
+	if (self->min.x > point->x) self->min.x = point->x;
+	if (self->min.y > point->y) self->min.y = point->y;
+	if (self->min.z > point->z) self->min.z = point->z;
+	if (self->max.x < point->x) self->max.x = point->x;
+	if (self->max.y < point->y) self->max.y = point->y;
+	if (self->max.z < point->z) self->max.z = point->z;
+}
+
+/**
  * \brief Creates the maximum bounding box for a transformed box.
  *
  * \param self Axis-aligned bounding box.
@@ -244,6 +261,20 @@ limat_aabb_union (const LIMatAabb self,
 	ret.max.z = self.max.z > aabb.max.z? self.max.z : aabb.max.z;
 
 	return ret;
+}
+
+/**
+ * \brief Gets the center of the AABB.
+ * \param self Axis-aligned bounding box.
+ * \param result Return location for the center.
+ */
+static inline void limat_aabb_get_center (
+	const LIMatAabb* self,
+	LIMatVector*     result)
+{
+	result->x = 0.5f * (self->min.x + self->max.x);
+	result->y = 0.5f * (self->min.y + self->max.y);
+	result->z = 0.5f * (self->min.z + self->max.z);
 }
 
 #endif

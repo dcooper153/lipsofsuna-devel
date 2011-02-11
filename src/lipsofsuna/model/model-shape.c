@@ -45,6 +45,7 @@ int limdl_shape_read (
 	int i;
 	int j;
 	uint32_t tmp;
+	LIMatVector* vertex;
 	LIMdlShapePart* part;
 
 	/* Read header. */
@@ -81,12 +82,26 @@ int limdl_shape_read (
 		/* Read vertices. */
 		for (j = 0 ; j < tmp ; j++)
 		{
-			if (!liarc_reader_get_float (reader, &part->vertices.array[j].x) ||
-				!liarc_reader_get_float (reader, &part->vertices.array[j].y) ||
-				!liarc_reader_get_float (reader, &part->vertices.array[j].z))
+			/* Read the vertex position. */
+			vertex = part->vertices.array + j;
+			if (!liarc_reader_get_float (reader, &vertex->x) ||
+				!liarc_reader_get_float (reader, &vertex->y) ||
+				!liarc_reader_get_float (reader, &vertex->z))
 				return 0;
+
+			/* Update the bounding box. */
+			if (!i && !j)
+			{
+				self->bounds.min = *vertex;
+				self->bounds.max = *vertex;
+			}
+			else
+				limat_aabb_add_point (&self->bounds, vertex);
 		}
 	}
+
+	/* Calculate the center of mass. */
+	limat_aabb_get_center (&self->bounds, &self->center);
 
 	return 1;
 }
@@ -121,6 +136,18 @@ int limdl_shape_write (
 	}
 
 	return 1;
+}
+
+/**
+ * \brief Gets the center of mass of the shape.
+ * \param self Shape.
+ * \param result Return location for the center of mass vector.
+ */
+void limdl_shape_get_center (
+	const LIMdlShape* self,
+	LIMatVector*      result)
+{
+	*result = self->center;
 }
 
 /** @} */
