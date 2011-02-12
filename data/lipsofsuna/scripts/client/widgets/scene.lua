@@ -72,7 +72,7 @@ Widgets.Scene.reshaped = function(self)
 			rotation = math.pi * (1 - 2 * x),
 			rotation_center = Vector{44,h-40},
 			source_image = "compass1",
-			source_position = {43,2},
+			source_position = {42,2},
 			source_tiling = {0,74,0,0,74,0}}
 		if self.compass_quest then
 			x = (self.compass_quest - x + 2) % 1
