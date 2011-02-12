@@ -192,6 +192,7 @@ static int private_build_object (
 	int create;
 	LIAlgStrdicIter iter;
 	LIPhyShape* physhape;
+	LIMatAabb bounds;
 	LIMatVector center;
 	LIMdlShape* mdlshape;
 
@@ -243,7 +244,8 @@ static int private_build_object (
 		}
 	}
 
-	/* Create fallback shape from full model data. */
+	/* Create a fallback shape if necessary. */
+	/* Ideally all model files would have a shape in them but that isn't the case yet. */
 	if (!self->model->shapes.count)
 	{
 		/* Find or create the physics shape. */
@@ -259,13 +261,16 @@ static int private_build_object (
 		else
 			create = 0;
 
+		/* Use the bounding box of the model. */
+		bounds = self->model->bounds;
+
 		/* Set the center of mass. */
 		/* This must be done before adding any model shapes. */
-		limat_aabb_get_center (&self->model->bounds, &center);
+		limat_aabb_get_center (&bounds, &center);
 		liphy_shape_set_center_of_mass (physhape, &center);
 
 		/* Add the model mesh to the physics shape. */
-		if (!liphy_shape_add_model_full (physhape, self->model, NULL, 1.0f))
+		if (!liphy_shape_add_aabb (physhape, &bounds, NULL))
 		{
 			liphy_shape_free (physhape);
 			return 0;

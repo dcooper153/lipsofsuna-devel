@@ -137,46 +137,6 @@ int liphy_shape_add_convex (
 	return 1;
 }
 
-int liphy_shape_add_model_full (
-	LIPhyShape*           self,
-	const LIMdlModel*     model,
-	const LIMatTransform* transform,
-	float                 scale)
-{
-	int i;
-	LIMatVector* tmp;
-	btConvexHullShape* ret;
-
-	/* Extract coordinates from vertices. */
-	if (model->vertices.count)
-	{
-		tmp = (LIMatVector*) lisys_calloc (model->vertices.count, sizeof (LIMatVector));
-		if (tmp == NULL)
-			return 0;
-		for (i = 0 ; i < model->vertices.count ; i++)
-			tmp[i] = model->vertices.array[i].coord;
-	}
-	else
-		tmp = NULL;
-
-	/* Create the shape from the vertex coordinates. */
-	ret = private_create_from_vertices (self, tmp, model->vertices.count, scale);
-	if (ret == NULL)
-	{
-		lisys_free (tmp);
-		return 0;
-	}
-	if (!private_add_shape (self, ret, transform))
-	{
-		lisys_free (tmp);
-		delete ret;
-		return 0;
-	}
-	lisys_free (tmp);
-
-	return 1;
-}
-
 int liphy_shape_add_model_shape (
 	LIPhyShape*           self,
 	const LIMdlShape*     shape,
@@ -347,28 +307,7 @@ static btConvexHullShape* private_create_convex (
 	btScalar*   vertices,
 	int         count)
 {
-	btShapeHull* hull;
-	btConvexHullShape* shape;
-	btConvexHullShape* shape1;
-
-	shape1 = new btConvexHullShape (vertices, count, 4 * sizeof (btScalar));
-	try
-	{
-		if (count > 42)
-		{
-			hull = new btShapeHull (shape1);
-			hull->buildHull (shape1->getMargin ());
-			shape = new btConvexHullShape ((btScalar*) hull->getVertexPointer (), hull->numVertices ());
-			delete shape1;
-			delete hull;
-			return shape;
-		}
-	}
-	catch (...)
-	{
-	}
-
-	return shape1;
+	return new btConvexHullShape (vertices, count, 4 * sizeof (btScalar));
 }
 
 static btConvexHullShape* private_create_from_box (
@@ -416,8 +355,6 @@ static btConvexHullShape* private_create_from_vertices (
 	float              scale)
 {
 	int i;
-	int j;
-	int num;
 	btConvexHullShape* ret;
 	btScalar* tmp;
 	LIMatVector vertex;
@@ -426,40 +363,28 @@ static btConvexHullShape* private_create_from_vertices (
 	if (!count)
 		return private_create_from_empty (self);
 
-	/* Remove duplicate vertices from the model. */
-	num = 0;
+	/* Create a temporary copy of the vertices. */
 	tmp = (btScalar*) lisys_calloc (4 * count, sizeof (btScalar));
 	if (tmp == NULL)
 		return NULL;
 	for (i = 0 ; i < count ; i++)
 	{
 		vertex = vertices[i];
-		for (j = 0 ; j < num ; j++)
-		{
-			if (LIMAT_ABS (vertex.x - tmp[4 * j + 0]) < VERTEX_WELD_EPSILON &&
-			    LIMAT_ABS (vertex.y - tmp[4 * j + 1]) < VERTEX_WELD_EPSILON &&
-			    LIMAT_ABS (vertex.z - tmp[4 * j + 2]) < VERTEX_WELD_EPSILON)
-				break;
-		}
-		if (j == num)
-		{
-			tmp[4 * num + 0] = vertex.x;
-			tmp[4 * num + 1] = vertex.y;
-			tmp[4 * num + 2] = vertex.z;
-			tmp[4 * num + 3] = 0.0;
-			num++;
-		}
+		tmp[4 * i + 0] = vertex.x;
+		tmp[4 * i + 1] = vertex.y;
+		tmp[4 * i + 2] = vertex.z;
+		tmp[4 * i + 3] = 0.0;
 	}
 
 	/* Scale the vertices. */
 	if (scale != 1.0f)
 	{
-		for (i = 0 ; i < 4 * num ; i++)
+		for (i = 0 ; i < 4 * count ; i++)
 			tmp[i] *= scale;
 	}
 
 	/* Create a convex shape. */
-	ret = private_create_convex (self, tmp, num);
+	ret = private_create_convex (self, tmp, count);
 	lisys_free (tmp);
 
 	return ret;

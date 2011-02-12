@@ -44,12 +44,6 @@ LIAPICALL (int, liphy_shape_add_convex, (
 	int                   count,
 	const LIMatTransform* transform));
 
-LIAPICALL (int, liphy_shape_add_model_full, (
-	LIPhyShape*           self,
-	const LIMdlModel*     model,
-	const LIMatTransform* transform,
-	float                 scale));
-
 LIAPICALL (int, liphy_shape_add_model_shape, (
 	LIPhyShape*           self,
 	const LIMdlShape*     shape,
