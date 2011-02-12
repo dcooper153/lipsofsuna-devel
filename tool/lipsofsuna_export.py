@@ -176,12 +176,68 @@ class LICollision:
 	def __init__(self):
 		self.shapes = {}
 
+	# \brief Builds the default collision mesh from the graphical mesh.
+	# \param object Mesh object.
+	def add_default(self, object):
+		if 'default' not in self.shapes:
+			# Calculate the bounding box of the object.
+			bmin = mathutils.Vector(object.bound_box[0])
+			bmax = mathutils.Vector(object.bound_box[0])
+			for b in object.bound_box:
+				if bmin[0] > b[0]:
+					bmin[0] = b[0]
+				if bmin[1] > b[1]:
+					bmin[1] = b[1]
+				if bmin[2] > b[2]:
+					bmin[2] = b[2]
+				if bmax[0] < b[0]:
+					bmax[0] = b[0]
+				if bmax[1] < b[1]:
+					bmax[1] = b[1]
+				if bmax[2] < b[2]:
+					bmax[2] = b[2]
+			# Save the old selection.
+			selection = []
+			for obj in bpy.data.objects:
+				if obj.select:
+					selection.append(obj)
+			# Create an icosphere enclosing the object.
+			bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2, size=0.7*(bmax - bmin).length)
+			icohull = None
+			for obj in bpy.data.objects:
+				if obj.select:
+					icohull = obj
+					break
+			# Add a shrinkwrap modifier.
+			modifier = icohull.modifiers.new('shrinkwrap', 'SHRINKWRAP')
+			modifier.target = object
+			# Apply the shrinkwrap modifier.
+			oldmesh = icohull.data
+			icohull.data = icohull.create_mesh(bpy.context.scene, True, 'PREVIEW')
+			bpy.data.meshes.remove(oldmesh)
+			# Fix the coordinate system.
+			center = 0.5 * (bmax + bmin)
+			translation = mathutils.Matrix.Translation((center.x, center.y, center.z))
+			icohull.matrix_local = LIFormat.matrix * translation * icohull.matrix_local
+			bpy.ops.object.rotation_apply()
+			# Collect the resulting vertices.
+			shape = LIShape('default')
+			shape.add_mesh(icohull, center)
+			self.shapes['default'] = shape
+			# Delete the icosphere.
+			bpy.ops.object.delete()
+			# Restore the old selection.
+			for obj in selection:
+				obj.select = True
+
+	# \brief Adds an explicit collision mesh to the list of collision shapes.
+	# \param object Mesh object.
 	def add_mesh(self, object):
 		try:
 			prop = object['shape']
 			if prop not in self.shapes:
 				self.shapes[prop] = LIShape(prop)
-			self.shapes[prop].add_mesh(object)
+			self.shapes[prop].add_mesh(object, mathutils.Vector((0.0, 0.0, 0.0)))
 		except:
 			pass
 
@@ -836,8 +892,8 @@ class LIShape:
 		self.name = name
 		self.parts = []
 
-	def add_mesh(self, obj):
-		self.parts.append(LIShapePart(obj))
+	def add_mesh(self, obj, offset):
+		self.parts.append(LIShapePart(obj, offset))
 
 	def write(self, writer):
 		writer.write_string(self.name)
@@ -848,11 +904,11 @@ class LIShape:
 
 class LIShapePart:
 
-	def __init__(self, obj):
+	def __init__(self, obj, offset):
 		self.vertices = []
 		matrix = LIFormat.matrix.copy().to_3x3() * obj.matrix_world.to_3x3()
 		for v in obj.data.vertices:
-			self.vertices.append(v.co * matrix)
+			self.vertices.append(v.co * matrix + offset)
 
 	def write(self, writer):
 		writer.write_int(len(self.vertices))
@@ -964,9 +1020,7 @@ class LIFile:
 		for obj in tempobjs:
 			# Remove unwanted modifiers.
 			for mod in obj.modifiers:
-				if mod.type == 'SUBSURF':
-					obj.modifiers.remove(mod)
-				if mod.type == mod.type == 'ARMATURE':
+				if mod.type == 'ARMATURE':
 					obj.modifiers.remove(mod)
 			# Apply modifiers.
 			oldmesh = obj.data
@@ -998,6 +1052,12 @@ class LIFile:
 			except Exception as e:
 				bpy.ops.object.delete()
 				raise e
+			# Build the default collision shape.
+			# We remove the armature and build a convex hull using shrinkwrap.
+			if self.mesh:
+				for mod in object.modifiers:
+					object.modifiers.remove(mod)
+				self.coll.add_default(object)
 			# Delete the temporary mesh.
 			bpy.ops.object.delete()
 		# Build the node hierarchy.
