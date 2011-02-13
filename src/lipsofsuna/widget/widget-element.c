@@ -166,15 +166,18 @@ void liwdg_element_paint (
 	LIWdgElement* self,
 	LIWdgManager* manager)
 {
+	int scissor[5];
+
 	if (self->buffer != NULL)
 	{
 		/* Enable clipping. */
 		if (self->dst_clip_enabled)
 		{
-			glPushAttrib (GL_SCISSOR_BIT);
-			glScissor (self->dst_clip_screen[0], manager->height - self->dst_clip_screen[1] -
+			scissor[4] = liren_context_get_scissor (manager->context,
+				scissor + 0, scissor + 1, scissor + 2, scissor + 3);
+			liren_context_set_scissor (manager->context, 1,
+				self->dst_clip_screen[0], manager->height - self->dst_clip_screen[1] -
 				self->dst_clip_screen[3], self->dst_clip_screen[2], self->dst_clip_screen[3]);
-			glEnable (GL_SCISSOR_TEST);
 		}
 
 		/* Render the vertex buffer. */
@@ -191,7 +194,10 @@ void liwdg_element_paint (
 
 		/* Disable clipping. */
 		if (self->dst_clip_enabled)
-			glPopAttrib ();
+		{
+			liren_context_set_scissor (manager->context, scissor[4],
+				scissor[0], scissor[1], scissor[2], scissor[3]);
+		}
 	}
 }
 

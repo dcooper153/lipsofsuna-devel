@@ -86,6 +86,11 @@ struct _LIRenContext
 	} matrix;
 	struct
 	{
+		int enabled;
+		int rect[4];
+	} scissor;
+	struct
+	{
 		int count;
 		LIRenContextTexture array[9];
 	} textures;
@@ -193,6 +198,21 @@ LIAPICALL (void, liren_context_set_projection, (
 LIAPICALL (void, liren_context_set_scene, (
 	LIRenContext* self,
 	LIRenScene*   scene));
+
+LIAPICALL (int, liren_context_get_scissor, (
+	LIRenContext* self,
+	int*          x,
+	int*          y,
+	int*          w,
+	int*          h));
+
+LIAPICALL (void, liren_context_set_scissor, (
+	LIRenContext* self,
+	int           enabled,
+	int           x,
+	int           y,
+	int           w,
+	int           h));
 
 LIAPICALL (void, liren_context_set_shader, (
 	LIRenContext* self,
