@@ -600,8 +600,7 @@ static int private_sort_scene (
 	LIRenScene*   self,
 	LIRenContext* context)
 {
-	LIAlgU32dicIter iter0;
-	LIMatAabb aabb;
+	LIAlgU32dicIter iter;
 	LIRenObject* rndobj;
 
 	/* Initialize sorting. */
@@ -609,13 +608,10 @@ static int private_sort_scene (
 	liren_context_bind (context);
 
 	/* Collect scene objects. */
-	LIALG_U32DIC_FOREACH (iter0, self->objects)
+	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
-		rndobj = iter0.value;
+		rndobj = iter.value;
 		if (!liren_object_get_realized (rndobj))
-			continue;
-		liren_object_get_bounds (rndobj, &aabb);
-		if (limat_frustum_cull_aabb (&context->frustum, &aabb))
 			continue;
 		liren_sort_add_object (self->sort, rndobj);
 	}

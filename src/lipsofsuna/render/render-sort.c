@@ -146,7 +146,7 @@ int liren_sort_add_faces (
 	LIMatVector eye;
 
 	/* Calculate camera position. */
-	mat = limat_matrix_invert (self->modelview);
+	mat = self->render->context->matrix.modelviewinverse;
 	eye = limat_matrix_transform (mat, limat_vector_init (0.0f, 0.0f, 0.0f));
 
 	/* Add the whole group or individual faces depending on material settings. */
@@ -300,7 +300,7 @@ int liren_sort_add_particle (
 		return 0;
 
 	/* Calculate camera position. */
-	mat = limat_matrix_invert (self->modelview);
+	mat = self->render->context->matrix.modelviewinverse;
 	eye = limat_matrix_transform (mat, limat_vector_init (0.0f, 0.0f, 0.0f));
 
 	/* Append the particle to the buffer. */
