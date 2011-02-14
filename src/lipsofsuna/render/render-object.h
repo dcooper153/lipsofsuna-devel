@@ -78,6 +78,7 @@ LIAPICALL (int, liren_object_intersect_ray, (
 	const LIRenObject* self,
 	const LIMatVector* ray0,
 	const LIMatVector* ray1,
+	int                detail,
 	LIMatVector*       result));
 
 LIAPICALL (void, liren_object_particle_animation, (
