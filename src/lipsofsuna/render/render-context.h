@@ -28,7 +28,7 @@
 #include "render-types.h"
 #include "render-uniforms.h"
 
-#define LIREN_CONTEXT_MAX_LIGHTS 5
+#define LIREN_CONTEXT_MAX_LIGHTS 3
 
 typedef struct _LIRenContextTexture LIRenContextTexture;
 struct _LIRenContextTexture
