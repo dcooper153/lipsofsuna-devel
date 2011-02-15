@@ -45,11 +45,9 @@ Widgets.Scene.render = function(self)
 		multisamples = Views.Options.inst.multisamples,
 		projection = self.camera.projection,
 		viewport = self.camera.viewport}
-	self.scene:draw_pass{pass = 1} -- Depth
-	self.scene:draw_pass{pass = 3} -- Forward ambient
-	self.scene:draw_pass{pass = 4, lighting = true} -- Forward lighting
-	self.scene:draw_pass{pass = 5, sorting = true} -- Transparent ambient
-	self.scene:draw_pass{pass = 6, lighting = true, sorting = true} -- Transparent lighting
+	self.scene:draw_pass{pass = 1} -- Depth pass
+	self.scene:draw_pass{pass = 4} -- Opaque pass
+	self.scene:draw_pass{pass = 6, sorting = true} -- Transparent pass
 	if Views.Options.inst.bloom_enabled then
 		self.scene:draw_post_process{mipmaps = true, shader = "postprocess-hdr"}
 	end

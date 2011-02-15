@@ -351,43 +351,30 @@ void liren_context_set_frustum (
 
 void liren_context_set_light (
 	LIRenContext* self,
+	int           index,
 	LIRenLight*   value)
 {
-	if (value != NULL && value != self->light)
+	const float black[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	const float infinite[3] = { 999999.0f, 999999.0f, 999999.0f };
+
+	if (value != NULL)
 	{
 		self->light = value;
-
-		/* Update uniforms. */
-		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT_AMBIENT, value->ambient);
-		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT_DIFFUSE, value->diffuse);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT_DIRECTION, value->cache.dir_world);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT_DIRECTION_PREMULT, value->cache.dir_view);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT_EQUATION, value->equation);
-		liren_uniforms_set_mat3 (&self->uniforms, LIREN_UNIFORM_LIGHT_MATRIX, value->cache.matrix.m);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT_POSITION, value->cache.pos_world);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT_POSITION_PREMULT, value->cache.pos_view);
-		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT_SPECULAR, value->specular);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT_SPOT, value->cache.spot);
-
-		/* Bind shadow texture. */
-		if (value->shadow.map)
-		{
-			if (self->shadow_texture != value->shadow.map)
-			{
-				self->shadow_texture = value->shadow.map;
-				glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_SHADOW_TEXTURE);
-				glBindTexture (GL_TEXTURE_2D, self->shadow_texture);
-			}
-		}
-		else
-		{
-			if (self->shadow_texture != self->render->helpers.depth_texture_max)
-			{
-				self->shadow_texture = self->render->helpers.depth_texture_max;
-				glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_SHADOW_TEXTURE);
-				glBindTexture (GL_TEXTURE_2D, self->shadow_texture);
-			}
-		}
+		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_AMBIENT + index, value->ambient);
+		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_DIFFUSE + index, value->diffuse);
+		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_EQUATION + index, value->equation);
+		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION + index, value->cache.pos_world);
+		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION_PREMULT + index, value->cache.pos_view);
+		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_SPECULAR + index, value->specular);
+	}
+	else
+	{
+		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_AMBIENT + index, black);
+		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_DIFFUSE + index, black);
+		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_EQUATION + index, infinite);
+		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION + index, black);
+		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION_PREMULT + index, black);
+		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_SPECULAR + index, black);
 	}
 }
 

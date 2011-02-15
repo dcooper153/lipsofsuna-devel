@@ -13,15 +13,15 @@ in vec2 var_texcoord;
 void main()
 {
 }]],
-pass3_depth_func = "equal",
-pass3_depth_write = false,
-pass3_vertex = [[
+pass4_depth_func = "equal",
+pass4_depth_write = false,
+pass4_vertex = [[
 void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
-pass3_fragment = [[
+pass4_fragment = [[
 void main()
 {
 	LOS_output_0 = vec4(2.0, 2.0, 2.0, 1.0);

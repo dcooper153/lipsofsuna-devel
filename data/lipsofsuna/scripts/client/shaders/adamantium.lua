@@ -21,7 +21,7 @@ pass4_vertex = [[
 out fragvar
 {
 	vec3 coord;
-	vec3 lightvector;
+	vec3 lightvector[LOS_LIGHT_MAX];
 	vec3 normal;
 	vec2 texcoord;
 	vec2 texcoord1;
@@ -30,8 +30,8 @@ out fragvar
 void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	]] .. Shader.los_lighting_vectors("OUT.lightvector", "tmp.xyz") .. [[
 	OUT.coord = tmp.xyz;
-	OUT.lightvector = LOS_light_position_premult - tmp.xyz;
 	OUT.normal = LOS_matrix_normal * LOS_normal;
 	vec3 refr = normalize(reflect(normalize(OUT.coord), normalize(OUT.normal)));
 	OUT.texcoord = LOS_texcoord;
@@ -43,26 +43,18 @@ pass4_fragment = [[
 in fragvar
 {
 	vec3 coord;
-	vec3 lightvector;
+	vec3 lightvector[LOS_LIGHT_MAX];
 	vec3 normal;
 	vec2 texcoord;
 	vec2 texcoord1;
 	float splatting;
-} IN;]]
-.. Shader.los_light_attenuation
-.. Shader.los_light_combine
-.. Shader.los_light_diffuse
-.. Shader.los_light_specular .. [[
+} IN;
 void main()
 {
 	vec3 normal = normalize(IN.normal);
 	vec4 diffuse0 = mix(texture(LOS_diffuse_texture_0, IN.texcoord), texture(LOS_diffuse_texture_0, IN.texcoord1), 0.5);
 	vec4 diffuse1 = texture(LOS_diffuse_texture_1, IN.texcoord);
 	vec4 diffuse = LOS_material_diffuse * mix(diffuse0, diffuse1, IN.splatting);
-	float fattn = los_light_attenuation(IN.lightvector, LOS_light_equation);
-	float fdiff = los_light_diffuse(IN.lightvector, normal);
-	float fspec = los_light_specular(IN.coord, normal, LOS_material_shininess);
-	vec4 light = los_light_combine(fattn, fdiff, fspec, LOS_light_ambient,
-		LOS_light_diffuse, LOS_light_specular * LOS_material_specular);
-	LOS_output_0 = LOS_material_diffuse * diffuse * light;
+	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector") .. [[
+	LOS_output_0 = LOS_material_diffuse * diffuse * lighting;
 }]]}

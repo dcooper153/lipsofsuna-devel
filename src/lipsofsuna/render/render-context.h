@@ -28,6 +28,8 @@
 #include "render-types.h"
 #include "render-uniforms.h"
 
+#define LIREN_CONTEXT_MAX_LIGHTS 5
+
 typedef struct _LIRenContextTexture LIRenContextTexture;
 struct _LIRenContextTexture
 {
@@ -169,6 +171,7 @@ LIAPICALL (void, liren_context_set_frustum, (
 
 LIAPICALL (void, liren_context_set_light, (
 	LIRenContext* self,
+	int           index,
 	LIRenLight*   value));
 
 LIAPICALL (void, liren_context_set_material, (

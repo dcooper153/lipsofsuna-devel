@@ -38,7 +38,8 @@ static int private_compile (
 static int private_check_compile (
 	LIRenProgram* self,
 	const char*   name,
-	GLint         shader);
+	GLint         shader,
+	const char*   code);
 
 static int private_check_link (
 	LIRenProgram* self,
@@ -202,18 +203,8 @@ static int private_compile (
 	const GLchar* headers[4] =
 	{
 		/* Common */
+		"#define LOS_LIGHT_MAX 5\n"
 		"layout(shared) uniform LOSDATA\n{\n"
-		"	vec4 LOS_light_ambient;\n"
-		"	vec4 LOS_light_diffuse;\n"
-		"	vec3 LOS_light_direction;\n"
-		"	vec3 LOS_light_direction_premult;\n"
-		"	vec3 LOS_light_equation;\n"
-		"	mat4 LOS_light_matrix;\n"
-		"	vec3 LOS_light_position;\n"
-		"	vec3 LOS_light_position_premult;\n"
-		"	vec4 LOS_light_specular;\n"
-		"	vec3 LOS_light_spot;\n"
-		"	float LOS_light_type;\n"
 		"	vec4 LOS_material_diffuse;\n"
 		"	vec4 LOS_material_param_0;\n"
 		"	float LOS_material_shininess;\n"
@@ -226,6 +217,14 @@ static int private_compile (
 		"	mat4 LOS_matrix_projection;\n"
 		"	mat4 LOS_matrix_projection_inverse;\n"
 		"	float LOS_time;\n"
+		"	struct\n{\n"
+		"		vec4 ambient;\n"
+		"		vec4 diffuse;\n"
+		"		vec3 equation;\n"
+		"		vec3 position;\n"
+		"		vec3 position_premult;\n"
+		"		vec4 specular;\n"
+		"	} LOS_light[LOS_LIGHT_MAX];\n"
 		"};\n"
 		"uniform sampler2D LOS_diffuse_texture_0;\n"
 		"uniform sampler2D LOS_diffuse_texture_1;\n"
@@ -290,20 +289,20 @@ static int private_compile (
 
 	/* Compile the vertex shader. */
 	glCompileShader (self->vertex);
-	if (!private_check_compile (self, name, self->vertex))
+	if (!private_check_compile (self, name, self->vertex, strings[2]))
 		return 0;
 
 	/* Compile the geometry shader. */
 	if (geometry != NULL)
 	{
 		glCompileShader (self->geometry);
-		if (!private_check_compile (self, name, self->geometry))
+		if (!private_check_compile (self, name, self->geometry, strings[2]))
 			return 0;
 	}
 
 	/* Compile the fragment shader. */
 	glCompileShader (self->fragment);
-	if (!private_check_compile (self, name, self->fragment))
+	if (!private_check_compile (self, name, self->fragment, strings[2]))
 		return 0;
 
 	/* Attach shaders. */
@@ -364,7 +363,8 @@ static int private_compile (
 static int private_check_compile (
 	LIRenProgram* self,
 	const char*   name,
-	GLint         shader)
+	GLint         shader,
+	const char*   code)
 {
 	char* text;
 	const char* type;
@@ -396,7 +396,7 @@ static int private_check_compile (
 				liarc_reader_free (reader);
 			}
 		}
-		lisys_error_set (EINVAL, "cannot compile %s shader `%s'", type, name);
+		lisys_error_set (EINVAL, "cannot compile %s shader `%s':\n\n%s", type, name, code);
 		return 0;
 	}
 

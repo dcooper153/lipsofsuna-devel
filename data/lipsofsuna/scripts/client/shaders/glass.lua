@@ -4,42 +4,39 @@ sort = true,
 pass6_depth_func = "lequal",
 pass6_depth_write = false,
 pass6_vertex = [[
-out vec3 var_coord;
-out vec3 var_normal;
-out vec2 var_texcoord;
-out vec3 var_lightdir;
+out fragvar
+{
+	vec3 coord;
+	vec3 lightvector[LOS_LIGHT_MAX];
+	vec3 normal;
+	vec2 texcoord;
+} OUT;
 void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
-	var_coord = tmp.xyz;
-	var_normal = LOS_matrix_normal * LOS_normal;
-	var_texcoord = LOS_texcoord;
-	var_lightdir = LOS_light_position_premult - var_coord;
+	]] .. Shader.los_lighting_vectors("OUT.lightvector", "tmp.xyz") .. [[
+	OUT.coord = tmp.xyz;
+	OUT.normal = LOS_matrix_normal * LOS_normal;
+	OUT.texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass6_blend = true,
-pass6_blend_src = "one",
-pass6_blend_dst = "one",
+pass6_blend_src = "src_alpha",
+pass6_blend_dst = "one_minus_src_alpha",
 pass6_depth_func = "lequal",
 pass6_depth_write = false,
 pass6_fragment = [[
-in vec3 var_coord;
-in vec3 var_normal;
-in vec2 var_texcoord;
-in vec3 var_lightdir;]]
-.. Shader.los_light_attenuation
-.. Shader.los_light_combine
-.. Shader.los_light_diffuse
-.. Shader.los_light_specular .. [[
+in fragvar
+{
+	vec3 coord;
+	vec3 lightvector[LOS_LIGHT_MAX];
+	vec3 normal;
+	vec2 texcoord;
+} IN;
 void main()
 {
-	vec3 normal = normalize(var_normal);
-	vec4 diffuse = texture2D(LOS_diffuse_texture_0, var_texcoord);
-	float fattn = los_light_attenuation(var_lightdir, LOS_light_equation);
-	float fdiff = los_light_diffuse(var_lightdir, normal);
-	float fspec = los_light_specular(var_coord, normal, LOS_material_shininess);
-	vec4 light = los_light_combine(fattn, fdiff, fspec, LOS_light_ambient,
-		LOS_light_diffuse, LOS_light_specular * LOS_material_specular);
-	LOS_output_0 = LOS_material_diffuse * diffuse * light;
-	LOS_output_0.a = max(LOS_material_diffuse.a * diffuse.a, fattn * fspec);
+	vec3 normal = normalize(IN.normal);
+	vec4 diffuse = texture2D(LOS_diffuse_texture_0, IN.texcoord);
+	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector") .. [[
+	LOS_output_0 = LOS_material_diffuse * diffuse * lighting;
 }]]}
