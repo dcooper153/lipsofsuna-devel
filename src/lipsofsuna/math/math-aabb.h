@@ -37,8 +37,8 @@ struct _LIMatAabb
 	LIMatVector max;
 };
 
-static inline void
-limat_aabb_init (LIMatAabb* self)
+static inline void limat_aabb_init (
+	LIMatAabb* self)
 {
 	memset (self, 0, sizeof (LIMatAabb));
 }
@@ -50,10 +50,10 @@ limat_aabb_init (LIMatAabb* self)
  * \param center Center of the bounding box.
  * \param size Size of the bounding box.
  */
-static inline void
-limat_aabb_init_from_center (LIMatAabb*         self,
-                             const LIMatVector* center,
-                             const LIMatVector* size)
+static inline void limat_aabb_init_from_center (
+	LIMatAabb*         self,
+	const LIMatVector* center,
+	const LIMatVector* size)
 {
 	LIMatVector tmp;
 
@@ -64,15 +64,14 @@ limat_aabb_init_from_center (LIMatAabb*         self,
 
 /**
  * \brief Initializes an axis-aligned bounding box from minimum and maximum points.
- *
  * \param self Axis-aligned bounding box.
  * \param min Minimum point of the bounding box.
  * \param max Maximum point of the bounding box.
  */
-static inline void
-limat_aabb_init_from_points (LIMatAabb*         self,
-                             const LIMatVector* min,
-                             const LIMatVector* max)
+static inline void limat_aabb_init_from_points (
+	LIMatAabb*         self,
+	const LIMatVector* min,
+	const LIMatVector* max)
 {
 	self->min = *min;
 	self->max = *max;
@@ -97,14 +96,13 @@ static inline void limat_aabb_add_point (
 
 /**
  * \brief Creates the maximum bounding box for a transformed box.
- *
  * \param self Axis-aligned bounding box.
  * \param matrix Matrix.
  * \return Axis-aligned bounding box.
  */
-static inline LIMatAabb
-limat_aabb_transform (const LIMatAabb    self,
-                      const LIMatMatrix* matrix)
+static inline LIMatAabb limat_aabb_transform (
+	const LIMatAabb    self,
+	const LIMatMatrix* matrix)
 {
 	int i;
 	LIMatAabb result;
@@ -151,10 +149,10 @@ limat_aabb_transform (const LIMatAabb    self,
  * \param result Return location with room for at least 9 points.
  * \return Number vertices in the clipped triangle.
  */
-static inline int
-limat_aabb_clip_triangle (const LIMatAabb*     self,
-                          const LIMatTriangle* triangle,
-                          LIMatVector*         result)
+static inline int limat_aabb_clip_triangle (
+	const LIMatAabb*     self,
+	const LIMatTriangle* triangle,
+	LIMatVector*         result)
 {
 	int curr;
 	int prev;
@@ -220,14 +218,13 @@ limat_aabb_clip_triangle (const LIMatAabb*     self,
 
 /**
  * \brief Checks if two axis-aligned bounding boxes intersect.
- *
  * \param self Axis-aligned bounding box.
  * \param aabb Axis-aligned bounding box.
  * \return Nonzero if the boxes intersect.
  */
-static inline int
-limat_aabb_intersects_aabb (const LIMatAabb* self,
-                            const LIMatAabb* aabb)
+static inline int limat_aabb_intersects_aabb (
+	const LIMatAabb* self,
+	const LIMatAabb* aabb)
 {
 	if (self->min.x >= aabb->max.x ||
 	    self->min.y >= aabb->max.y ||
@@ -242,14 +239,13 @@ limat_aabb_intersects_aabb (const LIMatAabb* self,
 
 /**
  * \brief Calculates a bounding box that encloses both of the passed AABBs.
- *
  * \param self Axis-aligned bounding box.
  * \param aabb Axis-aligned bounding box.
  * \return Axis-aligned bounding box.
  */
-static inline LIMatAabb
-limat_aabb_union (const LIMatAabb self,
-                  const LIMatAabb aabb)
+static inline LIMatAabb limat_aabb_union (
+	const LIMatAabb self,
+	const LIMatAabb aabb)
 {
 	LIMatAabb ret;
 

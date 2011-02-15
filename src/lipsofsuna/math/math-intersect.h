@@ -30,18 +30,17 @@
 
 /**
  * \brief Gets the intersection points of an AABB and a line.
- *
  * \param self Axis-aligned bounding box.
  * \param p0 Point on the line.
  * \param p1 Point on the line.
  * \param ret Return location for 6 points.
  * \return Number of intersections.
  */
-static inline int
-limat_intersect_aabb_line (const LIMatAabb*   self,
-                           const LIMatVector* p0,
-                           const LIMatVector* p1,
-                           LIMatVector*       ret)
+static inline int limat_intersect_aabb_line (
+	const LIMatAabb*   self,
+	const LIMatVector* p0,
+	const LIMatVector* p1,
+	LIMatVector*       ret)
 {
 	int hits;
 	float d;
@@ -124,11 +123,11 @@ limat_intersect_aabb_line (const LIMatAabb*   self,
  * \param ret Return location for one point.
  * \return Nonzero if found an intersection.
  */
-static inline int
-limat_intersect_aabb_line_far (const LIMatAabb*   self,
-                               const LIMatVector* eye,
-                               const LIMatVector* end,
-                               LIMatVector*       ret)
+static inline int limat_intersect_aabb_line_far (
+	const LIMatAabb*   self,
+	const LIMatVector* eye,
+	const LIMatVector* end,
+	LIMatVector*       ret)
 {
 	int i;
 	int hit;
@@ -168,14 +167,14 @@ limat_intersect_aabb_line_far (const LIMatAabb*   self,
  * \param self Axis-aligned bounding box.
  * \param eye Eye position vector.
  * \param end End position vector.
- * \param ret Return location for one point.
+ * \param ret Return location for one point or NULL.
  * \return Nonzero if found an intersection.
  */
-static inline int
-limat_intersect_aabb_line_near (const LIMatAabb*   self,
-                                const LIMatVector* eye,
-                                const LIMatVector* end,
-                                LIMatVector*       ret)
+static inline int limat_intersect_aabb_line_near (
+	const LIMatAabb*   self,
+	const LIMatVector* eye,
+	const LIMatVector* end,
+	LIMatVector*       ret)
 {
 	int i;
 	int hit;

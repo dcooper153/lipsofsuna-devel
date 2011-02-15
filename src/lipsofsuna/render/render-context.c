@@ -478,6 +478,49 @@ void liren_context_set_scene (
 	self->light = NULL;
 }
 
+int liren_context_get_scissor (
+	LIRenContext* self,
+	int*          x,
+	int*          y,
+	int*          w,
+	int*          h)
+{
+	*x = self->scissor.rect[0];
+	*y = self->scissor.rect[1];
+	*w = self->scissor.rect[2];
+	*h = self->scissor.rect[3];
+	return self->scissor.enabled;
+}
+
+void liren_context_set_scissor (
+	LIRenContext* self,
+	int           enabled,
+	int           x,
+	int           y,
+	int           w,
+	int           h)
+{
+	if (self->scissor.enabled != enabled)
+	{
+		self->scissor.enabled = enabled;
+		if (enabled)
+			glEnable (GL_SCISSOR_TEST);
+		else
+			glDisable (GL_SCISSOR_TEST);
+	}
+	if (self->scissor.rect[0] != x ||
+	    self->scissor.rect[1] != y ||
+	    self->scissor.rect[2] != w ||
+	    self->scissor.rect[3] != h)
+	{
+		self->scissor.rect[0] = x;
+		self->scissor.rect[1] = y;
+		self->scissor.rect[2] = w;
+		self->scissor.rect[3] = h;
+		glScissor (x, y, w, h);
+	}
+}
+
 void liren_context_set_shader (
 	LIRenContext* self,
 	int           pass,

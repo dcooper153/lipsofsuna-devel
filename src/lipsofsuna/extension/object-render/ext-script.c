@@ -60,11 +60,13 @@ static void Object_deform_mesh (LIScrArgs* args)
  * -- @param self Object.
  * -- @param args Arguments.<ul>
  * --   <li>1,start_point: Ray start point in world space.</li>
- * --   <li>2,end_point: Ray end point in world space.</li></ul>
+ * --   <li>2,end_point: Ray end point in world space.</li>
+ * --   <li>3,detail: False to not do detailed, per triangle collision testing.</li></ul>
  * function Object.particle_animation(self)
  */
 static void Object_intersect_ray (LIScrArgs* args)
 {
+	int detail = 1;
 	LIExtModule* module;
 	LIEngObject* engobj;
 	LIMatVector ray0;
@@ -86,9 +88,11 @@ static void Object_intersect_ray (LIScrArgs* args)
 	if (!liscr_args_geti_vector (args, 1, &ray1) &&
 	    !liscr_args_gets_vector (args, "end_point", &ray1))
 		return;
+	if (!liscr_args_geti_bool (args, 2, &detail))
+		liscr_args_gets_bool (args, "detail", &detail);
 
 	/* Return the intersection point, if any. */
-	if (liren_object_intersect_ray (object, &ray0, &ray1, &result))
+	if (liren_object_intersect_ray (object, &ray0, &ray1, detail, &result))
 		liscr_args_seti_vector (args, &result);
 }
 
