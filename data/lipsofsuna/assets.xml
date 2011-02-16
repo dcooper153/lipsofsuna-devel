@@ -87,6 +87,9 @@
     <url>http://opengameart.org/user/681</url>
   </author-info>
   <author-info>
+    <name>thecubber</name>
+  </author-info>
+  <author-info>
     <name>tidbit (Joseph)</name>
   </author-info>
   <author-info>
@@ -1137,6 +1140,45 @@
     <tag>item</tag>
     <tag>lantern</tag>
     <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/lizardman1.blend</file>
+    <author>thecubber</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/rigged-textured-reptile</source>
+    <dep>import/lizardman1.png</dep>
+    <dep>import/lizardman1n.png</dep>
+    <dep>import/lizardman1s.png</dep>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/lizardman1.png</file>
+    <author>thecubber</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/rigged-textured-reptile</source>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/lizardman1n.png</file>
+    <author>thecubber</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/rigged-textured-reptile</source>
+    <status>usable</status>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/lizardman1s.png</file>
+    <author>thecubber</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/rigged-textured-reptile</source>
+    <status>usable</status>
+    <type>specularman</type>
   </asset>
 
   <asset>

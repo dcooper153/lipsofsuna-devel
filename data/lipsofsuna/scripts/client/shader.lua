@@ -83,7 +83,8 @@ float los_light_diffuse(in vec3 coord, in vec3 normal)
 	return max(0.0, coeff);
 }]]
 
-Shader.los_lighting_default = function(co, no, lv)
+Shader.los_lighting_default = function(co, no, lv, sp)
+	local specmap = sp and (sp .. ".rgb * ") or ""
 	return [[int lighting_index;
 	vec4 lighting = vec4(0.0, 0.0, 0.0, 1.0);
 	for(lighting_index = 0 ; lighting_index < LOS_LIGHT_MAX ; lighting_index++)
@@ -94,7 +95,7 @@ Shader.los_lighting_default = function(co, no, lv)
 		float fspec = pow(max(0.0, dot(]] .. no .. [[, reflect(-normalize(]] .. co .. [[), ]] .. no .. [[))), LOS_material_shininess);
 		lighting.rgb += fattn * (LOS_light[lighting_index].ambient.rgb +
 			fdiff * LOS_light[lighting_index].diffuse.rgb +
-			fspec * LOS_light[lighting_index].specular.rgb * LOS_material_specular.rgb);
+			fspec * LOS_light[lighting_index].specular.rgb * ]] .. specmap .. [[LOS_material_specular.rgb);
 	}]]
 end
 
