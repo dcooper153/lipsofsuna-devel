@@ -85,6 +85,7 @@ static void private_compile (
 		snprintf (field_depth_test, sizeof (field_depth_test), "pass%d_depth_test", i + 1);
 		snprintf (field_depth_write, sizeof (field_depth_write), "pass%d_depth_write", i + 1);
 		snprintf (field_depth_func, sizeof (field_depth_func), "pass%d_depth_func", i + 1);
+		liren_shader_clear_pass (shader, i);
 		if (liscr_args_gets_string (args, field_fragment, &fragment))
 		{
 			liscr_args_gets_string (args, field_geometry, &geometry);
