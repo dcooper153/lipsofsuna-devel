@@ -186,12 +186,16 @@ Species{
 		lower = "trogfemlowernude1",
 		upper = "trogfemuppernude1"},
 	skills = {
-		{name = "dexterity", max = 80, val = 30},
+		{name = "dexterity", max = 8, val = 3},
 		{name = "health", max = 100, val = 50},
-		{name = "intelligence", max = 100, val = 50},
+		{name = "intelligence", max = 10, val = 5},
 		{name = "perception", max = 60, val = 20},
-		{name = "strength", max = 40, val = 20},
-		{name = "willpower", max = 80, val = 30}}}
+		{name = "strength", max = 4, val = 2},
+		{name = "willpower", max = 8, val = 3}},
+	hair_styles = {		
+		{"trogshort", "trogfemshorthair1"}},
+	skin_styles = {
+		{""}}}
 	
 
 ------------------------------------------------------------------------------
@@ -227,11 +231,6 @@ Species{
 	ai_enabled = false,
 	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
 
-Species{
-	name = "trogfem-player",
-	base = "trogfemale",
-	ai_enabled = false,
-	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "trog rags"}}
 
 Species{
 	name = "companion",
@@ -269,6 +268,15 @@ Species{
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {"iron sword", "leather top", "leather pants", "leather leggings"}}
+
+Species{
+	name = "troglodyte female",
+	base = "trogfemale",
+	categories = {"enemy"},
+	factions = {"evil"},
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"trog rags"}}
 
 Species{
 	name = "bloodworm",

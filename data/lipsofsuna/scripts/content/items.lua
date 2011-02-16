@@ -499,7 +499,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
-	equipment_models = {upper1 = "trogfemrags1", panties = "panties2"},
+	equipment_models = {upper1 = "trogfemrags1"},
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
 
