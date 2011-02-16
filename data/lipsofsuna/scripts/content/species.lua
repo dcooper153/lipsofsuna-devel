@@ -274,6 +274,21 @@ Species{
 		{name = "health", max = 100, val = 100}}}
 
 Species{
+	name = "lizardman",
+	model = "lizardman1",
+	ai_distance_hint = 1.0,
+	factions = {"evil"},
+	feat_anims = {"right hand", "left hand"},
+	inventory_size = 5,
+	inventory_items = {},
+	mass = 100,
+	speed_walk = 3,
+	skills = {
+		{name = "dexterity", max = 50, val = 50},
+		{name = "health", max = 50, val = 50},
+		{name = "strength", max = 50, val = 50}}}
+
+Species{
 	name = "plague rat",
 	ai_enable_strafe = false,
 	ai_enable_defend = false,
