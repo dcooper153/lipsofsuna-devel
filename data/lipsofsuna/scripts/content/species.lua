@@ -37,7 +37,8 @@ Species{
 	hair_styles = {
 		{"Bald", ""},
 		{"Long", "hair2"},
-		{"Pigtails", "hair1"}},
+		{"Pigtails", "hair1"},
+		{"Short", "aershorthair1"}},
 	skin_styles = {
 		{"Default", ""}}}
 
@@ -173,6 +174,26 @@ Species{
 		{name = "strength", max = 100, val = 50},
 		{name = "willpower", max = 60, val = 20}}}
 
+Species{
+	name = "trogfemale",
+	base = "race",
+	model = "trogfem1",
+	models = {
+		skeleton = "trogfem1",
+		arms = "trogfemarmnude1",
+		head = "trogfemhead1",
+		legs = "trogfemlegnude1",
+		lower = "trogfemlowernude1",
+		upper = "trogfemuppernude1"},
+	skills = {
+		{name = "dexterity", max = 80, val = 30},
+		{name = "health", max = 100, val = 50},
+		{name = "intelligence", max = 100, val = 50},
+		{name = "perception", max = 60, val = 20},
+		{name = "strength", max = 40, val = 20},
+		{name = "willpower", max = 80, val = 30}}}
+	
+
 ------------------------------------------------------------------------------
 -- Playable races.
 
@@ -180,7 +201,7 @@ Species{
 	name = "aer-player",
 	base = "aer",
 	ai_enabled = false,
-	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings", "iron gauntlets", "leather boots"}}
+	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
 
 Species{
 	name = "android-player",
@@ -205,6 +226,12 @@ Species{
 	base = "wyrm",
 	ai_enabled = false,
 	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+
+Species{
+	name = "trogfem-player",
+	base = "trogfemale",
+	ai_enabled = false,
+	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "trog rags"}}
 
 Species{
 	name = "companion",

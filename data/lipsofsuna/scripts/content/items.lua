@@ -493,6 +493,17 @@ Itemspec{
 	icon = "cloth1"}
 
 Itemspec{
+	name = "trog rags",
+	model = "book-000",
+	armor_class = 0.02,
+	categories = {"armor"},
+	crafting_tools = {saw = 1},
+	crafting_materials = {log = 1},
+	equipment_models = {upper1 = "trogfemrags1", panties = "panties2"},
+	equipment_slot = "upperbody",
+	icon = "cloth1"}
+
+Itemspec{
 	name = "iron greaves",
 	model = "book-000",
 	armor_class = 0.08,
@@ -567,6 +578,26 @@ Itemspec{
 	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 4},
 	equipment_models = {upper1 = "bra1"},
+	equipment_slot = "upperbody",
+	icon = "cloth1"}
+
+Itemspec{
+	name = "leather skirt",
+	model = "book-000",
+	armor_class = 0.04,
+	categories = {"armor"},
+	crafting_tools = {saw = 1},
+	crafting_materials = {hide = 4},
+	equipment_models = {skirt = "aerleatherskirt1", panties = "panties2"},
+	equipment_slot = "lowerbody"}
+Itemspec{
+	name = "leather chest",
+	model = "book-000",
+	armor_class = 0.04,
+	categories = {"armor"},
+	crafting_tools = {saw = 1},
+	crafting_materials = {hide = 4},
+	equipment_models = {upper1 = "aerleatherchest1"},
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
 
