@@ -46,10 +46,10 @@ Widgets.ComboBox.activate = function(self, args)
 	end
 	-- Set the selection.
 	if not widget then return end
+	self.value = index
 	if args.press ~= false then
 		widget:pressed()
 	else
-		self.active = index
 		self.text = widget.text
 	end
 	return true
