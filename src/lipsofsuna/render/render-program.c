@@ -289,20 +289,20 @@ static int private_compile (
 
 	/* Compile the vertex shader. */
 	glCompileShader (self->vertex);
-	if (!private_check_compile (self, name, self->vertex, strings[2]))
+	if (!private_check_compile (self, name, self->vertex, vertex))
 		return 0;
 
 	/* Compile the geometry shader. */
 	if (geometry != NULL)
 	{
 		glCompileShader (self->geometry);
-		if (!private_check_compile (self, name, self->geometry, strings[2]))
+		if (!private_check_compile (self, name, self->geometry, geometry))
 			return 0;
 	}
 
 	/* Compile the fragment shader. */
 	glCompileShader (self->fragment);
-	if (!private_check_compile (self, name, self->fragment, strings[2]))
+	if (!private_check_compile (self, name, self->fragment, fragment))
 		return 0;
 
 	/* Attach shaders. */
