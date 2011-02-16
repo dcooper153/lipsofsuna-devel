@@ -1,5 +1,59 @@
 Shader{name = "skeletal",
 
+-- Low quality program.
+-- No tangent calculation.
+low = {
+transform_feedback = true,
+pass1_depth_test = false,
+pass1_depth_write = false,
+pass1_vertex = [[
+out vec3 LOS_output_coord;
+out vec3 LOS_output_normal;
+out vec3 LOS_output_tangent;
+out vec2 LOS_output_texcoord;
+vec3 los_quat_xform(in vec4 q, in vec3 v)
+{
+	vec4 a = vec4(
+		 (q.w * v.x) + (q.y * v.z) - (q.z * v.y),
+		 (q.w * v.y) - (q.x * v.z) + (q.z * v.x),
+		 (q.w * v.z) + (q.x * v.y) - (q.y * v.x),
+		-(q.x * v.x) - (q.y * v.y) - (q.z * v.z));
+	return vec3(
+		(a.w * -q.x) + (a.x *  q.w) + (a.y * -q.z) - (a.z * -q.y),
+		(a.w * -q.y) - (a.x * -q.z) + (a.y *  q.w) + (a.z * -q.x),
+		(a.w * -q.z) + (a.x * -q.y) - (a.y * -q.x) + (a.z *  q.w));
+}
+void main()
+{
+	int i;
+	int bone[8] = int[](
+		int(LOS_bones1.x), int(LOS_bones1.y), int(LOS_bones1.z), int(LOS_bones1.w),
+		int(LOS_bones2.x), int(LOS_bones2.y), int(LOS_bones2.z), int(LOS_bones2.w));
+	float weight[8] = float[](
+		LOS_weights1.x, LOS_weights1.y, LOS_weights1.z, LOS_weights1.w,
+		LOS_weights2.x, LOS_weights2.y, LOS_weights2.z, LOS_weights2.w);
+	vec3 vtx = vec3(0.0);
+	vec3 nml = vec3(0.0);
+	for (i = 0 ; i < 8 ; i++)
+	{
+		int offset = 3 * bone[i];
+		vec3 restpos = texelFetch(LOS_buffer_texture, offset).xyz;
+		vec4 posepos = texelFetch(LOS_buffer_texture, offset + 1);
+		vec4 poserot = texelFetch(LOS_buffer_texture, offset + 2);
+		vtx += weight[i] * (los_quat_xform(poserot, (LOS_coord - restpos) * posepos.w) + posepos.xyz);
+		nml += weight[i] * (los_quat_xform(poserot, LOS_normal));
+	}
+	LOS_output_coord = vtx;
+	LOS_output_normal = normalize(nml) * length(LOS_normal);
+	LOS_output_texcoord = LOS_texcoord;
+	LOS_output_tangent = vec3(0.0);
+	gl_Position = vec4(LOS_coord,1.0);
+}]],
+pass1_fragment = [[
+void main()
+{
+}]]},
+
 -- Medium quality program.
 medium = {
 transform_feedback = true,
@@ -9,19 +63,17 @@ pass1_vertex = [[
 out vec3 geo_coord;
 out vec3 geo_normal;
 out vec2 geo_texcoord;
-vec4 los_quat_mul(in vec4 a, in vec4 b)
-{
-	return vec4(
-		(a.w * b.x) + (a.x * b.w) + (a.y * b.z) - (a.z * b.y),
-		(a.w * b.y) - (a.x * b.z) + (a.y * b.w) + (a.z * b.x),
-		(a.w * b.z) + (a.x * b.y) - (a.y * b.x) + (a.z * b.w),
-		(a.w * b.w) - (a.x * b.x) - (a.y * b.y) - (a.z * b.z));
-}
 vec3 los_quat_xform(in vec4 q, in vec3 v)
 {
-	vec4 a = los_quat_mul(q, vec4(v, 0.0));
-	vec4 b = q * vec4(-1.0, -1.0, -1.0, 1.0);
-	return los_quat_mul(a, b).xyz;
+	vec4 a = vec4(
+		 (q.w * v.x) + (q.y * v.z) - (q.z * v.y),
+		 (q.w * v.y) - (q.x * v.z) + (q.z * v.x),
+		 (q.w * v.z) + (q.x * v.y) - (q.y * v.x),
+		-(q.x * v.x) - (q.y * v.y) - (q.z * v.z));
+	return vec3(
+		(a.w * -q.x) + (a.x *  q.w) + (a.y * -q.z) - (a.z * -q.y),
+		(a.w * -q.y) - (a.x * -q.z) + (a.y *  q.w) + (a.z * -q.x),
+		(a.w * -q.z) + (a.x * -q.y) - (a.y * -q.x) + (a.z *  q.w));
 }
 void main()
 {
@@ -58,18 +110,14 @@ out vec3 LOS_output_coord;
 out vec3 LOS_output_normal;
 out vec3 LOS_output_tangent;
 out vec2 LOS_output_texcoord;
-vec3 los_triangle_tangent(in vec3 co0, in vec3 co1, in vec3 co2, in vec2 uv0, in vec2 uv1, in vec2 uv2)
-{
-	vec3 ed0 = co1 - co0;
-	vec3 ed1 = co2 - co0;
-	return normalize(ed1 * (uv1.y - uv0.y) - ed0 * (uv2.y - uv0.y));
-}
 void main()
 {
 	int i;
-	LOS_output_tangent = los_triangle_tangent(
-		geo_coord[0], geo_coord[1], geo_coord[2],
-		geo_texcoord[0], geo_texcoord[1], geo_texcoord[2]);
+	vec3 ed0 = geo_coord[1] - geo_coord[0];
+	vec3 ed1 = geo_coord[2] - geo_coord[0];
+	LOS_output_tangent = normalize(
+		ed1 * (geo_texcoord[1].y - geo_texcoord[0].y) -
+		ed0 * (geo_texcoord[2].y - geo_texcoord[0].y));
 	for(i = 0 ; i < gl_VerticesIn ; i++)
 	{
 		LOS_output_coord = geo_coord[i];
