@@ -1063,6 +1063,35 @@
   </asset>
 
   <asset>
+    <file>import/jar1.blend</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/jar1.png</dep>
+    <dep>import/jar1n.png</dep>
+    <source>http://opengameart.org/content/netted-jar</source>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/jar1.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/netted-jar</source>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/jar1n.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/netted-jar</source>
+    <status>usable</status>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
     <file>import/katana-000.blend</file>
     <author>tidbit (Joseph)</author>
     <license>Creative Commons BY 3.0</license>

@@ -627,6 +627,16 @@ Itemspec{
 	stacking = false}
 
 Itemspec{
+	name = "jar",
+	model = "jar1",
+	mass = 10,
+	categories = {"container"},
+	crafting_materials = {["granite stone"] = 3},
+	crafting_tools = {saw = 1},
+	inventory_size = 4,
+	stacking = false}
+
+Itemspec{
 	name = "workbench",
 	model = "chest1",
 	mass = 15,
