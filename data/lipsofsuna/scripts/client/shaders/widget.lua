@@ -1,5 +1,7 @@
-Shader{
-name = "widget",
+Shader{name = "widget",
+
+-- Medium quality program.
+medium = {
 pass1_blend = true,
 pass1_blend_src = "src_alpha",
 pass1_blend_dst = "one_minus_src_alpha",
@@ -17,4 +19,4 @@ in vec2 var_texcoord;
 void main()
 {
 	LOS_output_0 = LOS_material_diffuse * texture(LOS_diffuse_texture_0, var_texcoord);
-}]]}
+}]]}}

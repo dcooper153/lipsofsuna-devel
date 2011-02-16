@@ -1,19 +1,21 @@
 local instfunc = Shader.new
-Shader.shaders = {}
+Shader.dict_name = {}
 
 --- Creates a new shader and enables it.<br/>
--- The shader will not be subject to garbage collection when enabled.
+-- The shader isn't compiled at all when it's created. It's done later in the
+-- options screen when the used shader quality is known. Until then we only
+-- store the settings for the different quality levels.
 -- @param clss Shader class.
 -- @param args Arguments.<ul>
---   <li>config: Shader configuration string.</li>
---   <li>fragment: Fragment program code.</li>
---   <li>name: Unique shader name.</li>
---   <li>vertex: Vertex program code.</li></ul>
+--   <li>high: High quality shader.</li>
+--   <li>low: Low quality shader.</li>
+--   <li>medium: Medium quality shader.</li>
+--   <li>name: Shader name.</li></ul>
 -- @return New shader.
 Shader.new = function(clss, args)
 	local self = instfunc(clss, args)
 	if self then
-		self.name = args.name
+		for k,v in pairs(args) do self[k] = v end
 		self:enable()
 		return self
 	end
@@ -23,14 +25,41 @@ end
 -- The shader will be subject to normal garbage collection when disabled.
 -- @param self Shader.
 Shader.disable = function(self)
-	Shader.shaders[self.name] = nil
+	Shader.dict_name[self.name] = nil
 end
 
 --- Enables the shader.<br/>
 -- The shader will not be subject to garbage collection when enabled.
 -- @param self Shader.
 Shader.enable = function(self)
-	Shader.shaders[self.name] = self
+	Shader.dict_name[self.name] = self
+end
+
+--- Sets the quality level of the shader.<br/>
+-- Older graphics cards can't deal with certain effects, such as geometry
+-- amplification in the geometry shader, so multiple shader sets are used.
+-- This function allows switching the shader quality be recompiling the
+-- shader with different settings.
+-- \param self Shader.
+-- \param value Integer in the range of [1,3].
+Shader.set_quality = function(self, value)
+	local qualities = {self.low, self.medium, self.high}
+	if self.quality ~= value then
+		self.quality = value
+		-- Try the requested level.
+		local q = qualities[value]
+		if q then return self:compile(q) end
+		-- Fallback to lower setting.
+		for i = value,1,-1 do
+			local q = qualities[i]
+			if q then return self:compile(q) end
+		end
+		-- Fallback to higher setting.
+		for i = value,3 do
+			local q = qualities[i]
+			if q then return self:compile(q) end
+		end
+	end
 end
 
 Shader.los_light_attenuation = [[

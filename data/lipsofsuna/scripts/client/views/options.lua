@@ -28,6 +28,7 @@ Views.Options.new = function(clss)
 	self.animation_quality = 1.0
 	self.mouse_sensitivity = 1.0
 	self.multisamples = 2
+	self.shader_quality = 2
 	self.transparency_quality = 0.3
 	self.sound_volume = 1.0
 	self.music_volume = 0.1
@@ -68,6 +69,11 @@ Views.Options.new = function(clss)
 			self:set_model_quality(0)
 		end
 	end
+	-- Shader quality.
+	self.combo_shader_quality = Widgets.ComboBox{
+		{"Low", function() self:set_shader_quality(1) end},
+		{"Medium", function() self:set_shader_quality(2) end},
+		{"High", function() self:set_shader_quality(3) end}}
 	-- VSync enable.
 	self.button_vsync = Widgets.Button{text = "Disabled"}
 	self.button_vsync.pressed = function(widget)
@@ -130,6 +136,7 @@ Views.Options.new = function(clss)
 	local quality_group = Widgets.Frame{cols = 2}
 	quality_group:append_row(Widgets.Label{text = "Resolution"}, self.combo_video_mode)
 	quality_group:append_row(Widgets.Label{text = "Models"}, self.button_model_quality)
+	quality_group:append_row(Widgets.Label{text = "Shaders"}, self.combo_shader_quality)
 	quality_group:append_row(Widgets.Label{text = "Antialiasing"}, self.scroll_multisamples)
 	quality_group:append_row(Widgets.Label{text = "Animation"}, self.scroll_animation)
 	quality_group:append_row(Widgets.Label{text = "Transparency"}, self.scroll_transparency)
@@ -155,6 +162,8 @@ Views.Options.new = function(clss)
 	self.db = Database{name = "options.sqlite"}
 	self.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
 	self:load()
+	-- Make sure that shaders are compiled.
+	self:set_shader_quality(self.shader_quality)
 	return self
 end
 
@@ -189,6 +198,7 @@ Views.Options.load = function(self)
 		mouse_sensitivity = function(v) self:set_mouse_sensitivity(tonumber(v)) end,
 		multisamples = function(v) self:set_multisamples(tonumber(v)) end,
 		music_volume = function(v) self:set_music_volume(tonumber(v)) end,
+		shader_quality = function(v) self:set_shader_quality(tonumber(v)) end,
 		sound_volume = function(v) self:set_sound_volume(tonumber(v)) end,
 		transparency_quality = function(v) self:set_transparency_quality(tonumber(v)) end,
 		vsync = function(v) self.vsync = (v == "true") end,
@@ -228,6 +238,7 @@ Views.Options.save = function(self)
 	write("mouse_sensitivity", self.mouse_sensitivity)
 	write("multisamples", self.multisamples)
 	write("music_volume", self.music_volume)
+	write("shader_quality", self.shader_quality)
 	write("sound_volume", self.sound_volume)
 	write("transparency_quality", self.transparency_quality)
 	write("vsync", self.vsync)
@@ -298,6 +309,16 @@ Views.Options.set_music_volume = function(self, v)
 	self.music_volume = v
 	Sound.music_volume = v
 	self:changed()
+end
+
+Views.Options.set_shader_quality = function(self, v)
+	v = math.min(math.max(v, 1), 3)
+	self.combo_shader_quality:activate{index = v, press = false}
+	self.shader_quality = v
+	self:changed()
+	for k,s in pairs(Shader.dict_name) do
+		s:set_quality(v)
+	end
 end
 
 Views.Options.set_sound_volume = function(self, v)

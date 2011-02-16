@@ -1,5 +1,8 @@
-Shader{
-name = "foliage",
+Shader{name = "foliage",
+
+-- Medium quality program.
+-- Normal mapping.
+medium = {
 pass1_alpha_to_coverage = true,
 pass1_color_write = false,
 pass1_depth_func = "lequal",
@@ -57,4 +60,4 @@ void main()
 	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
 	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector") .. [[
 	LOS_output_0 = LOS_material_diffuse * diffuse * lighting;
-}]]}
+}]]}}

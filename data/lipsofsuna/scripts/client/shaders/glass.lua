@@ -1,5 +1,7 @@
-Shader{
-name = "glass",
+Shader{name = "glass",
+
+-- Medium quality program.
+medium = {
 sort = true,
 pass6_depth_func = "lequal",
 pass6_depth_write = false,
@@ -39,4 +41,4 @@ void main()
 	vec4 diffuse = texture2D(LOS_diffuse_texture_0, IN.texcoord);
 	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector") .. [[
 	LOS_output_0 = LOS_material_diffuse * diffuse * lighting;
-}]]}
+}]]}}

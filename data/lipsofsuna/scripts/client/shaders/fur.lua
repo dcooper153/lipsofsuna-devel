@@ -1,5 +1,93 @@
-Shader{
-name = "fur",
+Shader{name = "fur",
+
+-- Low quality program.
+-- No lighting.
+low = {
+pass1_color_write = false,
+pass1_depth_func = "lequal",
+pass1_vertex = [[
+void main()
+{
+	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	gl_Position = LOS_matrix_projection * tmp;
+}]],
+pass1_fragment = [[
+void main()
+{
+}]],
+pass4_depth_func = "equal",
+pass4_depth_write = false,
+pass4_vertex = [[
+out fragvar
+{
+	vec2 texcoord;
+} OUT;
+void main()
+{
+	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	OUT.texcoord = LOS_texcoord;
+	gl_Position = LOS_matrix_projection * tmp;
+}]],
+pass4_fragment = [[
+in fragvar
+{
+	vec2 texcoord;
+} IN;
+void main()
+{
+	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
+	LOS_output_0 = LOS_material_diffuse * diffuse;
+}]]},
+
+-- Medium quality program.
+-- Vertex lighting.
+medium = {
+pass1_color_write = false,
+pass1_depth_func = "lequal",
+pass1_vertex = [[
+void main()
+{
+	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	gl_Position = LOS_matrix_projection * tmp;
+}]],
+pass1_fragment = [[
+void main()
+{
+}]],
+pass4_depth_func = "equal",
+pass4_depth_write = false,
+pass4_vertex = [[
+out fragvar
+{
+	vec4 light;
+	vec2 texcoord;
+} OUT;
+void main()
+{
+	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	vec3 normal = LOS_matrix_normal * LOS_normal;
+	OUT.texcoord = LOS_texcoord;
+	vec3 lightvector[LOS_LIGHT_MAX];
+	]] .. Shader.los_lighting_vectors("lightvector", "tmp.xyz") .. [[
+	]] .. Shader.los_lighting_default("tmp.xyz", "normal", "lightvector") .. [[
+	OUT.light = lighting;
+	gl_Position = LOS_matrix_projection * tmp;
+}]],
+pass4_fragment = [[
+in fragvar
+{
+	vec4 light;
+	vec2 texcoord;
+} IN;
+void main()
+{
+	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
+	LOS_output_0 = LOS_material_diffuse * diffuse * IN.light;
+}]]},
+
+-- High quality program.
+-- Vertex lighting, geometry layers.
+high = {
 sort = true,
 pass1_color_write = false,
 pass1_depth_func = "lequal",
@@ -53,7 +141,6 @@ out fragvar
 	float layer;
 	vec4 color;
 	vec4 light;
-	vec3 normal;
 	vec2 texcoord;
 	vec2 texcoord2;
 } OUT;
@@ -69,7 +156,6 @@ void main()
 		{
 			OUT.color = color;
 			OUT.light = IN[i].light;
-			OUT.normal = IN[i].normal;
 			OUT.texcoord = IN[i].texcoord;
 			OUT.texcoord2 = IN[i].texcoord + 0.1 * vec2(sin(OUT.layer), cos(OUT.layer));
 			vec3 coord = IN[i].coord + IN[i].normal * OUT.layer * 0.03;
@@ -85,17 +171,15 @@ in fragvar
 	float layer;
 	vec4 color;
 	vec4 light;
-	vec3 normal;
 	vec2 texcoord;
 	vec2 texcoord2;
 } IN;
 void main()
 {
-	vec3 normal = normalize(IN.normal);
 	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
 	vec4 mask = texture(LOS_diffuse_texture_1, IN.texcoord2);
 	if(IN.layer <= 0.0001)
 		LOS_output_0 = LOS_material_diffuse * diffuse * IN.light;
 	else
 		LOS_output_0 = LOS_material_diffuse * diffuse * IN.color * mask * IN.light;
-}]]}
+}]]}}

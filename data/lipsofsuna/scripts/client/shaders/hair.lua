@@ -1,5 +1,7 @@
-Shader{
-name = "hair",
+Shader{name = "hair",
+
+-- Medium quality program.
+medium = {
 pass1_alpha_to_coverage = true,
 pass1_color_write = false,
 pass1_depth_func = "lequal",
@@ -57,4 +59,4 @@ void main()
 		normal = -normal;
 	]] .. Shader.los_lighting_hair("IN.coord", "normal", "tangent", "IN.lightvector") .. [[
 	LOS_output_0 = LOS_material_diffuse * diffuse * lighting;
-}]]}
+}]]}}

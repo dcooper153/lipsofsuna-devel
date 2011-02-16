@@ -1,5 +1,7 @@
-Shader{
-name = "skeletal",
+Shader{name = "skeletal",
+
+-- Medium quality program.
+medium = {
 transform_feedback = true,
 pass1_depth_test = false,
 pass1_depth_write = false,
@@ -81,4 +83,4 @@ void main()
 pass1_fragment = [[
 void main()
 {
-}]]}
+}]]}}

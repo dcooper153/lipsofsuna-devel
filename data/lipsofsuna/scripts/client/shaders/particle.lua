@@ -1,5 +1,22 @@
-Shader{
-name = "particle",
+Shader{name = "particle",
+
+-- Low quality program.
+-- No particles at all.
+low = {
+pass4_vertex = [[
+void main()
+{
+	gl_Position = vec4(0.0);
+}]],
+pass4_fragment = [[
+void main()
+{
+	discard;
+}]]},
+
+-- Medium quality program.
+-- Hardware particles using geometry shaders.
+medium = {
 sort = true,
 pass6_blend = true,
 pass6_blend_src = "src_alpha",
@@ -61,4 +78,4 @@ in fragvar
 void main()
 {
 	LOS_output_0 = IN.color * texture(LOS_diffuse_texture_0, IN.texcoord);
-}]]}
+}]]}}

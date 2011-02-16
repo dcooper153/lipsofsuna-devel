@@ -1,5 +1,7 @@
-Shader{
-name = "adamantium",
+Shader{name = "adamantium",
+
+-- Medium quality program.
+medium = {
 pass1_color_write = false,
 pass1_depth_func = "lequal",
 pass1_vertex = [[
@@ -57,4 +59,4 @@ void main()
 	vec4 diffuse = LOS_material_diffuse * mix(diffuse0, diffuse1, IN.splatting);
 	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector") .. [[
 	LOS_output_0 = LOS_material_diffuse * diffuse * lighting;
-}]]}
+}]]}}
