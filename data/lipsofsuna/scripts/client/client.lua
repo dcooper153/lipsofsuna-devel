@@ -50,7 +50,7 @@ Player.get_picking_ray_3rd = function(clss)
 	return pos,pos + rot * Vector(0,0,-50)
 end
 
-Player.camera = Camera{far = 60.0, fov = 1.1, mode = "third-person", near = 0.01, position_smoothing = 0.15, rotation_smoothing = 0.15}
+Player.camera = Camera{far = 40.0, fov = 1.1, mode = "third-person", near = 0.01, position_smoothing = 0.15, rotation_smoothing = 0.15}
 Player.camera_tilt = 0
 Player.camera_tilt_state = 0
 Player.camera_turn = 0
