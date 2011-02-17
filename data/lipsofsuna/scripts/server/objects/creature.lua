@@ -449,15 +449,24 @@ end
 -- @param self Object.
 Creature.scan_enemies = function(self)
 	-- Clear old enemies.
-	for k,v in pairs(self.enemies) do
-		self.enemies[k] = nil
-	end
+	local old = self.enemies
+	local time = Program.time
+	self.enemies = {}
 	-- Find new enemies.
 	local objs = Object:find{point = self.position, radius = 10}
 	for k,v in pairs(objs) do
-		if self:check_enemy(v) then
+		local enemy = old[v]
+		if enemy and time - enemy[2] < 10 then
+			-- If the enemy is still nearby and was last seen a very short time
+			-- ago, we add it back to the list. Without this, the creature would
+			-- give up the moment the target hides behind anything.
+			self.enemies[v] = enemy
+		elseif self:check_enemy(v) then
+			-- If a new enemy was within the scan radius, a line of sight check
+			-- is performed to cull enemies behind walls. If the LOS check
+			-- succeeds, the enemy is considered found.
 			if self:check_line_of_sight{object = v} then
-				self.enemies[v] = v
+				self.enemies[v] = {v, time}
 			end
 		end
 	end
@@ -596,9 +605,9 @@ Creature.update_ai_state = function(self)
 	local best_rating = -1
 	if self.spec.ai_enable_combat then
 		for k,v in pairs(self.enemies) do
-			local r = self:calculate_enemy_rating(v)
+			local r = self:calculate_enemy_rating(v[1])
 			if r > best_rating then
-				best_enemy = v
+				best_enemy = v[1]
 				best_rating = r
 			end
 		end
@@ -784,9 +793,9 @@ Creature.combat_updaters =
 		local dist = (self.target.position - self.position).length
 		local hint = self.spec.ai_distance_hint + self.target.spec.ai_distance_hint
 		if dist < hint then
-			self.movement = -0.25
+			self:set_movement(-0.25)
 		elseif dist > hint + 2 then
-			self.movement = 1
+			self:set_movement(1)
 		end
 		-- Attack when close enough.
 		if not self.cooldown and dist < hint + 1 then
@@ -800,9 +809,9 @@ Creature.combat_updaters =
 		local dist = (self.target.position - self.position).length
 		local hint = self.spec.ai_distance_hint + self.target.spec.ai_distance_hint
 		if dist < hint + 1 then
-			self.movement = -0.25
+			self:set_movement(-0.25)
 		elseif dist > hint + 2 then
-			self.movement = 0.25
+			self:set_movement(0.25)
 		end
 	end,
 	normal = function(self)

@@ -129,7 +129,7 @@ Species.new = function(clss, args)
 	copy("speed_walk", 3)
 	copy("speed_run", 6)
 	copy("tilt_limit", math.pi)
-	copy("view_cone", 0.5 * math.pi)
+	copy("view_cone", 0.8 * math.pi)
 	return self
 end
 
