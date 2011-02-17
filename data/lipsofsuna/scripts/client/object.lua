@@ -45,8 +45,11 @@ Object.create_character_model = function(self, args)
 		for slot,name in pairs(args.equipment) do
 			local spec = Itemspec:find{name = name}
 			if spec and spec.equipment_models then
-				for k,v in pairs(lod and spec.equipment_models_lod or spec.equipment_models) do
-					meshes[k] = v
+				local models = spec:get_equipment_models(species.equipment_class or species.name, lod)
+				if models then
+					for k,v in pairs(models) do
+						meshes[k] = v
+					end
 				end
 			end
 		end

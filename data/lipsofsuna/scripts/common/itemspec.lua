@@ -52,11 +52,31 @@ Itemspec.new = function(clss, args)
 	self.inventory_items = self.inventory_items or {}
 	self.mass = self.mass or 10
 	-- Models.
+	-- The table, if present, maps a list of models for one or more species.
+	-- The race name can contain multiple races separated by a slash.
 	if args.equipment_models then
 		self.equipment_models = {}
-		for k,v in pairs(args.equipment_models) do
-			self.equipment_models[k] = v
+		for races,models in pairs(args.equipment_models) do
+			for _,race in pairs(string.split(races, "/")) do
+				self.equipment_models[race] = models
+			end
 		end
 	end
 	return self
+end
+
+--- Finds the equipment models for the race.
+-- @param self Itemspec.
+-- @param name Name of the equipment class matching the race.
+-- @param lod True for low level of detail.
+-- @return Table of equipment models or nil.
+Itemspec.get_equipment_models = function(self, name, lod)
+	-- Choose the level of detail.
+	-- If the requested level doesn't exist, fall back to the other one.
+	local models = nil
+	if lod then models = self.equipment_models_lod end
+	if not models then models = self.equipment_models end
+	if not models then models = self.equipment_models_lod end
+	-- Find the equipment models for the race.
+	return models and models[name]
 end

@@ -37,7 +37,9 @@ end
 Player.get_camera_transform_3rd = function(clss)
 	local turn = clss.camera_turn_state + clss.turn_state
 	local tilt = clss.camera_tilt_state - clss.tilt_state
-	return clss.object.position + Vector(0, 2, 0), Quaternion:new_euler(turn, 0, tilt)
+	local spec = Species:find{name = clss.species}
+	local ctr = spec and spec.camera_center or Vector(0, 2, 0)
+	return clss.object.position + ctr, Quaternion:new_euler(turn, 0, tilt)
 end
 
 Player.get_picking_ray_1st = function(clss)
