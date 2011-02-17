@@ -287,7 +287,7 @@ Species{
 	feat_anims = {"bite"},
 	inventory_size = 3,
 	inventory_items = {"hide", "hide"},
-	model = "bloodworm1",
+	model = "bloodworm2",
 	speed_walk = 1,
 	skills = {
 		{name = "health", max = 30, val = 30}}}
