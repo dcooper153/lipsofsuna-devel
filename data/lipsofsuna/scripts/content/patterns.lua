@@ -64,6 +64,8 @@ Pattern{
 
 Pattern{
 	name = "spawnpoint1",
+	items = {
+		{2,2,2,"workbench"}},
 	tiles = {
 		{0,0,0,"granite1",7,0,7},
 		{1,1,1,"granite1",5,0,5}}}
