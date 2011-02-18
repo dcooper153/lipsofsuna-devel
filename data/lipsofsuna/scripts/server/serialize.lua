@@ -1,5 +1,5 @@
 Serialize = Class()
-Serialize.data_version = "2"
+Serialize.data_version = "3"
 
 --- Initializes the serializer.
 -- @param clss Serialize class.
