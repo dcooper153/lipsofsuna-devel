@@ -17,10 +17,9 @@ end
 --   <li>size: Number of slots in the container.</li>
 --   <li>spec: Object spec of the owner.</li></ul>
 Widgets.Container.new = function(clss, args)
-	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0, 0}})
+	local self = Widget.new(clss, {cols = 1, spacings = {0, 0}})
 	self.id = args.id
 	self:set_request{width = 200}
-	self:set_expand{col = 1, row = 1}
 	clss.dict_id[args.id] = self
 	-- Equipment list.
 	local slots = nil
@@ -38,18 +37,25 @@ Widgets.Container.new = function(clss, args)
 				Drag:clicked_equipment(self.id, slot)
 			end
 		end}
-		self:set_child{col = 1, row = 1, widget = self.equipment}
+		self:append_row(self.equipment)
+	end
+	-- Crafting list.
+	if args.spec and args.spec.inventory_type == "workbench" then
+		self.crafting = Widgets.List()
+		self.crafting.spacings = {0,0}
+		self:append_row(self.crafting)
 	end
 	-- Item list.
 	self.item_list = Widgets.ItemList{size = args.size, pressed = function(w, r) self:pressed(r) end}
-	self.group = Widgets.Frame{cols = 1, rows = 2}
+	self.group = Widgets.Frame{cols = 1, rows = 3}
 	self.group:set_expand{col = 1, row = 1}
 	self.group:set_child{col = 1, row = 1, widget = self.item_list}
-	self:set_child{col = 1, row = 2, widget = self.group}
+	self:append_row(self.group)
+	self:set_expand{col = 1, row = 1}
 	-- Close button.
 	self.closed = args.closed
 	self.button_close = Widgets.Button{text = "Close", pressed = function() self:close() end}
-	self.group:set_child{col = 1, row = 2, widget = self.button_close}
+	self.group:set_child{col = 1, row = 3, widget = self.button_close}
 	return self
 end
 
@@ -120,5 +126,38 @@ Widgets.Container.set_item = function(self, args)
 		widget.text = args.name
 		widget.count = args.count
 		widget.icon = args.icon
+	end
+	self:update()
+end
+
+--- Updates the crafting list.
+-- @param self Container widget.
+Widgets.Container.update = function(self)
+	if not self.crafting then return end
+	-- Get stored items.
+	local items = {}
+	for i = 1,self.item_list.size do
+		local item = self.item_list:get_item{slot = i}
+		if item then items[item.text] = item.count end
+	end
+	-- Calculate craftable items.
+	local get_item = function(name)
+		return items[name]
+	end
+	local get_skill = function(name)
+		return Gui.skills.skills:get_value(name)
+	end
+	craftable = Crafting:get_craftable{get_item = get_item, get_skill = get_skill}
+	table.sort(craftable)
+	-- Rebuild the crafting list.
+	local index = 1
+	self.crafting:clear()
+	for k,v in pairs(craftable) do
+		local spec = Itemspec:find{name = v}
+		local widget = Widgets.ItemButton{index = index, icon = spec and spec.icon, text = v, pressed = function(w)
+			Network:send{packet = Packet(packets.CRAFTING, "uint32", self.id, "string", w.text)}
+		end}
+		self.crafting:append{widget = widget}
+		index = index + 1
 	end
 end

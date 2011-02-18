@@ -1,5 +1,3 @@
-Crafting = Class()
-
 --- Asks the server to craft an item.
 -- @param clss Crafting class.
 -- @param args Arguments.<ul>

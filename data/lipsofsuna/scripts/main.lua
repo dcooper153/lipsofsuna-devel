@@ -32,6 +32,7 @@ Voxel.blocks_per_line = 4
 Voxel.tiles_per_line = 24
 require "common/bitwise"
 require "common/color"
+require "common/crafting"
 require "common/effect"
 require "common/eventhandler"
 require "common/faction"

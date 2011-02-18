@@ -2,7 +2,7 @@ Widgets.ItemList = Class(Widget)
 
 Widgets.ItemList.getter = function(self, key)
 	if key == "size" then
-		return self.size
+		return self.rows
 	else
 		return Widget.getter(self, key)
 	end
