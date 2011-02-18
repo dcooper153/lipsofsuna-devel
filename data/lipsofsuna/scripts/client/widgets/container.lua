@@ -42,7 +42,7 @@ Widgets.Container.new = function(clss, args)
 	-- Crafting list.
 	if args.spec and args.spec.inventory_type == "workbench" then
 		self.crafting = Widgets.List()
-		self.crafting.spacings = {0,0}
+		self.crafting:set_request{height = 190}
 		self:append_row(self.crafting)
 	end
 	-- Item list.
@@ -151,6 +151,7 @@ Widgets.Container.update = function(self)
 	table.sort(craftable)
 	-- Rebuild the crafting list.
 	local index = 1
+	local offset = self.crafting:get_offset()
 	self.crafting:clear()
 	for k,v in pairs(craftable) do
 		local spec = Itemspec:find{name = v}
@@ -160,4 +161,5 @@ Widgets.Container.update = function(self)
 		self.crafting:append{widget = widget}
 		index = index + 1
 	end
+	self.crafting:set_offset(offset)
 end
