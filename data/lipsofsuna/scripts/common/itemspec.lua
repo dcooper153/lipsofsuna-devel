@@ -35,6 +35,8 @@ Itemspec.dict_name = {}
 --   <li>icon: Icon name.</li>
 --   <li>inventory_items: List of inventory items for containers.</li>
 --   <li>inventory_size: Size of the inventory, makes the item a container.</li>
+--   <li>loot_categories: List of item categories this container can have as random loot.</li>
+--   <li>loot_count: Minimum and maximum number of random loot items this container can have.</li>
 --   <li>mass: Mass in kilograms.</li>
 --   <li>model: Model to use for the item. (required)</li>
 --   <li>name: Name of the item type. (required)</li>

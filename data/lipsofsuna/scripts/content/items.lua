@@ -668,6 +668,8 @@ Itemspec{
 	crafting_materials = {log = 1},
 	crafting_tools = {saw = 1},
 	inventory_size = 4,
+	loot_categories = {"armor", "book", "material", "misc", "potion", "shield", "weapon"},
+	loot_count = {2, 4},
 	stacking = false}
 
 Itemspec{
@@ -678,6 +680,8 @@ Itemspec{
 	crafting_materials = {["granite stone"] = 3},
 	crafting_tools = {saw = 1},
 	inventory_size = 4,
+	loot_categories = {"material", "misc", "potion"},
+	loot_count = {0, 4},
 	stacking = false}
 
 Itemspec{

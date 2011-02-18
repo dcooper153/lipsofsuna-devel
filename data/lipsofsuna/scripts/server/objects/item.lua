@@ -32,10 +32,28 @@ Item.setter = function(self, key, value)
 		self.mass = spec.mass
 		self.model = spec.model
 		self.name = spec.name
+		-- Create the inventory.
 		if spec.inventory_size and not self.inventory then
 			self.inventory = Inventory{owner = self, size = spec.inventory_size}
 			for k,v in pairs(spec.inventory_items) do
 				self:add_item{object = Item{spec = Itemspec:find{name = v}}}
+			end
+		end
+		-- Create random loot.
+		-- When the map generator or an admin command creates an object, the
+		-- random field is set to indicate that random loot should be generated.
+		-- The field isn't saved so loot is only created once as expected.
+		if self.random and self.inventory and spec.loot_categories then
+			local num_cat = #spec.loot_categories
+			local num_item
+			if spec.loot_count then
+				num_item = math.random(spec.loot_count[1], spec.loot_count[2])
+			else
+				num_item = math.random(0, self.inventory.size)
+			end
+			for i = 1,num_item do
+				local cat = spec.loot_categories[math.random(1, num_cat)]
+				self:add_item{object = Item{spec = Itemspec:random{category = cat}}}
 			end
 		end
 	else
@@ -64,6 +82,7 @@ Item.new = function(clss, args)
 	copy("count")
 	copy("physics", "rigid")
 	copy("position")
+	copy("random")
 	copy("rotation")
 	copy("spec")
 	copy("looted")

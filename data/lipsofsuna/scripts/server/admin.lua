@@ -48,6 +48,7 @@ Protocol:add_handler{type = "ADMIN_SPAWN", func = function(args)
 			Item{
 				spec = spec,
 				position = player.position,
+				random = true,
 				realized = true}
 		elseif typ == "item-cat" then
 			if not msg then return end
@@ -56,6 +57,7 @@ Protocol:add_handler{type = "ADMIN_SPAWN", func = function(args)
 			Item{
 				spec = spec,
 				position = player.position,
+				random = true,
 				realized = true}
 		elseif typ == "obstacle" then
 			if not msg then return end
@@ -81,24 +83,6 @@ Protocol:add_handler{type = "ADMIN_SPAWN", func = function(args)
 				spec = spec,
 				position = player.position,
 				realized = true}
-		-- FIXME:
-		elseif typ == "mover" then
-			local object = Mover{
-				model = msg or "porticullis-000",
-				position = player.position,
-				realized = true}
-		elseif typ == "chest" then
-			local object = Container{
-				model = msg or "chest-000",
-				position = player.position,
-				realized = true}
-			object:create_random_loot()
-		elseif typ == "door" then
-			local object = Door{
-				mass = 10.0,
-				model = msg or "door-004",
-				position = player.position + Vector(0.0,0.5,0.0),
-				rotation = player.rotation}
 		elseif msg then
 			local object = Object{
 				model = msg,
