@@ -578,6 +578,15 @@
   </asset>
 
   <asset>
+    <file>import/chinadress1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/chinadress1.png</dep>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
     <file>import/cobbles-000-nml.png</file>
     <author>titus tscharntk</author>
     <author>Ari Mustonen</author>
@@ -653,6 +662,16 @@
     <comment>Too simple</comment>
     <status>incomplete</status>
     <tag>tile</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/devora1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/devora1.png</dep>
+    <dep>import/devora1n.png</dep>
+    <status>incomplete</status>
     <type>model</type>
   </asset>
 

@@ -8,6 +8,7 @@ Species{
 	aim_ray_center = Vector(0, 1.5, 0),
 	aim_ray_end = 5,
 	aim_ray_start = 0.5,
+	camera_center = Vector(0, 1.5, 0),
 	equipment_slots = {
 		{name = "arms"},
 		{name = "feet"},
@@ -45,6 +46,7 @@ Species{
 Species{
 	name = "aer",
 	base = "race",
+	equipment_class = "aer",
 	model = "aer1",
 	models = {
 		skeleton = "aer1",
@@ -71,6 +73,7 @@ Species{
 Species{
 	name = "android",
 	base = "race",
+	equipment_class = "android",
 	model = "aer1",
 	models = {
 		skeleton = "aer1",
@@ -97,15 +100,22 @@ Species{
 Species{
 	name = "devora",
 	base = "race",
+	aim_ray_center = Vector(0, 1, 0),
+	camera_center = Vector(0, 1, 0),
+	equipment_class = "devora",
 	genders = {{"Genderless", "female"}},
-	model = "aer1",
+	hair_styles = {
+		{"Bald", ""},
+		{"Plant 1", "devorahair1"},
+		{"Plant 2", "devorahair2"}},
+	model = "devora1",
 	models = {
-		skeleton = "aer1",
-		arms = "aerarmnude1",
-		head = "aerhead1",
-		legs = "aerlegnude1",
-		lower = "aerlowernude1",
-		upper = "aeruppernude1"},
+		skeleton = "devora1",
+		arms = "devoraarmnude1",
+		head = "devorahead1",
+		legs = "devoralegnude1",
+		lower = "devoralowernude1",
+		upper = "devorauppernude1"},
 	models_lod = {
 		skeleton = "aer1",
 		arms = "aerarmnude1l",
@@ -124,6 +134,7 @@ Species{
 Species{
 	name = "kraken",
 	base = "race",
+	equipment_class = "kraken",
 	genders = {{"Female", "female"}},
 	model = "aer1",
 	models = {
@@ -151,6 +162,7 @@ Species{
 Species{
 	name = "wyrm",
 	base = "race",
+	equipment_class = "wyrm",
 	model = "aer1",
 	models = {
 		skeleton = "aer1",

@@ -92,7 +92,7 @@ def configure(ctx):
 		ctx.check_cc(lib='sqlite3', mandatory=True, uselib='CORE TEST', uselib_store='SQLITE')
 
 	# Bullet
-	if not ctx.check_cfg(package='bullet', atleast_version='2.74', args='--cflags --libs', mandatory=False):
+	if not ctx.check_cfg(package='bullet', atleast_version='2.77', args='--cflags --libs', mandatory=False):
 		if ctx.check_cxx(lib='linearmath', uselib='CORE TEST', mandatory=False):
 			ctx.env.LINKFLAGS_BULLET = ['-llinearmath', '-lbulletcollision', '-lbulletdynamics']
 		elif ctx.check_cxx(lib='LinearMath', uselib='CORE TEST', mandatory=True):

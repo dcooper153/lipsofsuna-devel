@@ -483,12 +483,14 @@ Itemspec{
 
 Itemspec{
 	name = "dress",
-	model = "book-000",
+	model = "chinadress1",
 	armor_class = 0.02,
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
-	equipment_models = {upper1 = "chinadress1", panties = "panties2"},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {upper1 = "aerchinadress1", panties = "panties2"},
+		["devora"] = {upper1 = "devorachinadress1"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
 
@@ -499,7 +501,8 @@ Itemspec{
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
-	equipment_models = {upper1 = "trogfemrags1"},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {upper1 = "trogfemrags1"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
 
@@ -509,7 +512,8 @@ Itemspec{
 	armor_class = 0.08,
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 3},
-	equipment_models = {legs = "aerlegplate1"},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {legs = "aerlegplate1"}},
 	equipment_slot = "feet"}
 
 Itemspec{
@@ -518,7 +522,8 @@ Itemspec{
 	armor_class = 0.08,
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 2},
-	equipment_models = {arms = "aerarmplate2"},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {arms = "aerarmplate2"}},
 	equipment_slot = "arms"}
 
 Itemspec{
@@ -527,7 +532,8 @@ Itemspec{
 	armor_class = 0.18,
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 5},
-	equipment_models = {upper = "aerupperplate1", lower = "aerlowerplate1"},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {upper = "aerupperplate1", lower = "aerlowerplate1"}},
 	equipment_slot = "upperbody"}
 
 Itemspec{
@@ -537,7 +543,8 @@ Itemspec{
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 2},
-	equipment_models = {headband = "headband1"},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {headband = "headband1"}},
 	equipment_slot = "head"}
 
 Itemspec{
@@ -547,7 +554,8 @@ Itemspec{
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 4},
-	equipment_models = {legs = "aerlegarmor1"},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor1"}},
 	equipment_slot = "feet"}
 
 Itemspec{
@@ -557,7 +565,8 @@ Itemspec{
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 4},
-	equipment_models = {legs = "aerlegarmor2", legs1 = "boots1"},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor2", legs1 = "boots1"}},
 	equipment_slot = "feet"}
 
 Itemspec{
@@ -567,7 +576,8 @@ Itemspec{
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 4},
-	equipment_models = {skirt = "aerlowerarmor1", panties = "panties2"},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"}},
 	equipment_slot = "lowerbody"}
 
 Itemspec{
@@ -577,7 +587,8 @@ Itemspec{
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 4},
-	equipment_models = {upper1 = "bra1"},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {upper1 = "bra1"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
 
@@ -588,7 +599,8 @@ Itemspec{
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 4},
-	equipment_models = {skirt = "aerleatherskirt1", panties = "panties2"},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {skirt = "aerleatherskirt1", panties = "panties2"}},
 	equipment_slot = "lowerbody"}
 Itemspec{
 	name = "leather chest",
@@ -597,7 +609,8 @@ Itemspec{
 	categories = {"armor"},
 	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 4},
-	equipment_models = {upper1 = "aerleatherchest1"},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {upper1 = "aerleatherchest1"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
 
