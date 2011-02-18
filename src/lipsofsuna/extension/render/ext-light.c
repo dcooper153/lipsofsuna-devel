@@ -199,6 +199,24 @@ static void Light_setter_position (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- The priority of the light, higher means more important.
+ * -- @name Light.priority
+ * -- @class table
+ */
+static void Light_getter_priority (LIScrArgs* args)
+{
+	liscr_args_seti_float (args, liren_light_get_priority (args->self));
+}
+static void Light_setter_priority (LIScrArgs* args)
+{
+	float value;
+
+	if (liscr_args_geti_float (args, 0, &value))
+		liren_light_set_priority (args->self, value);
+}
+
+
+/* @luadoc
  * --- Gets or sets the rotation of the light.
  * -- @name Light.rotation
  * -- @class table
@@ -371,6 +389,7 @@ void liext_script_light (
 	liscr_class_insert_mvar (self, "enabled", Light_getter_enabled, Light_setter_enabled);
 	liscr_class_insert_mvar (self, "equation", Light_getter_equation, Light_setter_equation);
 	liscr_class_insert_mvar (self, "position", Light_getter_position, Light_setter_position);
+	liscr_class_insert_mvar (self, "priority", Light_getter_priority, Light_setter_priority);
 	liscr_class_insert_mvar (self, "rotation", Light_getter_rotation, Light_setter_rotation);
 	liscr_class_insert_mvar (self, "shadow_casting", Light_getter_shadow_casting, Light_setter_shadow_casting);
 	liscr_class_insert_mvar (self, "shadow_far", Light_getter_shadow_far, Light_setter_shadow_far);

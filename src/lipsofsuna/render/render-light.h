@@ -31,7 +31,7 @@ struct _LIRenLight
 {
 	int directional;
 	int enabled;
-	float rating;
+	float priority;
 	float cutoff;
 	float exponent;
 	float shadow_far;
@@ -131,13 +131,12 @@ LIAPICALL (void, liren_light_get_position, (
 	const LIRenLight* self,
 	GLfloat*          value));
 
-LIAPICALL (void, liren_light_get_transform, (
-	LIRenLight*     self,
-	LIMatTransform* value));
+LIAPICALL (float, liren_light_get_priority, (
+	LIRenLight* self));
 
-LIAPICALL (void, liren_light_set_transform, (
-	LIRenLight*           self,
-	const LIMatTransform* transform));
+LIAPICALL (void, liren_light_set_priority, (
+	LIRenLight* self,
+	float       value));
 
 LIAPICALL (void, liren_light_get_projection, (
 	const LIRenLight* self,
@@ -153,6 +152,14 @@ LIAPICALL (int, liren_light_get_shadow, (
 LIAPICALL (void, liren_light_set_shadow, (
 	LIRenLight* self,
 	int         value));
+
+LIAPICALL (void, liren_light_get_transform, (
+	LIRenLight*     self,
+	LIMatTransform* value));
+
+LIAPICALL (void, liren_light_set_transform, (
+	LIRenLight*           self,
+	const LIMatTransform* transform));
 
 LIAPICALL (int, liren_light_get_type, (
 	const LIRenLight* self));

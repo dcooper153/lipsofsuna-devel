@@ -6,7 +6,7 @@ Eventhandler{type = "select", func = function(self, args)
 end}
 
 Player = Class()
-Player.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equation={1.5,0.3,0.04}}
+Player.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equation={1.5,0.3,0.04}, priority = 2}
 Player.species = "aer" -- FIXME
 
 local radian_wrap = function(x)

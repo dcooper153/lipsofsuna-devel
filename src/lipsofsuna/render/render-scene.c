@@ -132,8 +132,6 @@ int liren_scene_render_begin (
 	LIMatMatrix*   projection,
 	LIMatFrustum*  frustum)
 {
-	int i;
-	LIAlgPtrdicIter iter;
 	LIRenContext* context;
 
 	lisys_assert (modelview != NULL);
@@ -154,17 +152,8 @@ int liren_scene_render_begin (
 	if (!private_sort_scene (self, context))
 		return 0;
 
-	/* Calculate and upload light settings. */
-	i = 0;
-	LIALG_PTRDIC_FOREACH (iter, self->lighting->lights)
-	{
-		liren_light_update_cache (iter.value, context);
-		if (i < LIREN_CONTEXT_MAX_LIGHTS)
-			liren_context_set_light (context, i, iter.value);
-		i++;
-	}
-	for ( ; i < LIREN_CONTEXT_MAX_LIGHTS ; i++)
-		liren_context_set_light (context, i, NULL);
+	/* Upload light settings. */
+	liren_lighting_upload (self->lighting, context);
 
 	/* Reset profiling. */
 #ifdef LIREN_ENABLE_PROFILING

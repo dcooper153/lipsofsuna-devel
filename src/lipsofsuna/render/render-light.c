@@ -166,26 +166,30 @@ void liren_light_free (
 }
 
 /**
- * \brief Compares the contributions of two lights.
- *
- * The function inspects the contribution values previously set by the engine and
- * returns and integer that is -1 if the first light contributes more than the
- * second one, 0 if they contribute as much, and 1 if the second light contributes
- * more.
- *
+ * \brief Compares the priorities of two lights.
  * \param self Light source.
  * \param light Light source.
  * \return Integer indicating which light contributes more.
  */
-int
-liren_light_compare (const LIRenLight* self,
-                     const LIRenLight* light)
+int liren_light_compare (
+	const LIRenLight* self,
+	const LIRenLight* light)
 {
-	if (self->rating < light->rating)
+	/* Sorting is done primarily by priority. */
+	/* This allows the user to decide what lights are the most important
+	   ones. If there's an ambient light in the scene, for example, the
+	   user may want to give that higher priority than other lights. */
+	if (self->priority < light->priority)
 		return -1;
-	if (self->rating > light->rating)
+	if (self->priority > light->priority)
 		return 1;
-	return 0;
+
+	/* Secondary sorting by pointer. */
+	/* This ensures that the choice is consistent across frames
+	   when there are multiple lights with the same priority. */
+	if (self < light)
+		return -1;
+	return 1;
 }
 
 void liren_light_update (
@@ -392,6 +396,29 @@ void liren_light_get_position (
 		value[2] = self->transform.position.z;
 		value[3] = 1.0f;
 	}
+}
+
+/**
+ * \brief Gets the priority of the light.
+ * \param self Light source.
+ * \return Priority value, higher means more important.
+ */
+float liren_light_get_priority (
+	LIRenLight* self)
+{
+	return self->priority;
+}
+
+/**
+ * \brief Sets the priority of the light.
+ * \param self Light source.
+ * \param value Priority value, higher means more important.
+ */
+void liren_light_set_priority (
+	LIRenLight* self,
+	float       value)
+{
+	self->priority = value;
 }
 
 /**

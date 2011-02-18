@@ -48,4 +48,8 @@ LIAPICALL (void, liren_lighting_remove_light, (
 LIAPICALL (void, liren_lighting_update, (
 	LIRenLighting* self));
 
+LIAPICALL (void, liren_lighting_upload, (
+	LIRenLighting* self,
+	LIRenContext*  context));
+
 #endif
