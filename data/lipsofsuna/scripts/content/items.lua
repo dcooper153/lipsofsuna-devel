@@ -476,6 +476,17 @@ Itemspec{
 	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R"}
 
+Itemspec{
+	name = "wooden club",
+	model = "woodenclub1",
+	categories = {"melee", "weapon"},
+	crafting_materials = {["log"] = 1},
+	damage = 10,
+	damage_bonus_dexterity = 0.2,
+	damage_bonus_strength = 0.2,
+	equipment_slot = "hand.R"}
+
+
 ------------------------------------------------------------------------------
 -- Armor.
 

@@ -324,16 +324,20 @@ Species{
 	name = "lizardman",
 	model = "lizardman2",
 	ai_distance_hint = 1.0,
+	ai_enable_defend = false,
 	factions = {"evil"},
-	feat_anims = {"bite"},
+	feat_anims = {"right hand","bite"},
 	inventory_size = 5,
-	inventory_items = {},
+	inventory_items = {"wooden club"},
 	mass = 100,
 	speed_walk = 1,
+	equipment_slots = {
+		{name = "hand.L", node = "#hand.L"},
+		{name = "hand.R", node = "#hand.R"}},
 	skills = {
-		{name = "dexterity", max = 50, val = 50},
-		{name = "health", max = 50, val = 50},
-		{name = "strength", max = 50, val = 50}}}
+		{name = "dexterity", max = 5, val = 5},
+		{name = "health", max = 500, val = 500},
+		{name = "strength", max = 5, val = 5}}}
 
 Species{
 	name = "plague rat",
