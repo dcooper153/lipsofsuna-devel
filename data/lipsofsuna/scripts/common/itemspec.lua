@@ -19,7 +19,6 @@ Itemspec.dict_name = {}
 --   <li>crafting_count: Number of items crafted per use.</li>
 --   <li>crafting_materials: Dictionary of crafting materials.</li>
 --   <li>crafting_skills: Dictionary of required crafting skills.</li>
---   <li>crafting_tools: Dictionary of required crafting tools.</li>
 --   <li>damage: Base damage.</li>
 --   <li>damage_bonus_dexterity: How much one point of dexterity adds to damage.</li>
 --   <li>damage_bonus_health: How much one point of health adds to damage.</li>
@@ -35,6 +34,7 @@ Itemspec.dict_name = {}
 --   <li>icon: Icon name.</li>
 --   <li>inventory_items: List of inventory items for containers.</li>
 --   <li>inventory_size: Size of the inventory, makes the item a container.</li>
+--   <li>inventory_type: Inventory type string.</li>
 --   <li>loot_categories: List of item categories this container can have as random loot.</li>
 --   <li>loot_count: Minimum and maximum number of random loot items this container can have.</li>
 --   <li>mass: Mass in kilograms.</li>
@@ -49,7 +49,6 @@ Itemspec.new = function(clss, args)
 	self.crafting_count = self.crafting_count or 1
 	self.crafting_materials = self.crafting_materials or {}
 	self.crafting_skills = self.crafting_skills or {}
-	self.crafting_tools = self.crafting_tools or {}
 	self.destroy_actions = self.destroy_actions or {}
 	self.inventory_items = self.inventory_items or {}
 	self.mass = self.mass or 10

@@ -29,9 +29,10 @@ Views.Inventory.add_container = function(self, widget, own)
 		self.container = widget
 		self.group:set_child{col = 1, row = 3, widget = widget}
 	else
+		local text = widget.crafting and "Workbench" or "Loot"
 		widget.button_close.visible = true
-		self.containers:append_col(Widget(), Widgets.Frame{style = "title", text = "Loot"}, widget)
 		widget.closed = function(w) self:remove_container(w) end
+		self.containers:append_col(Widget(), Widgets.Frame{style = "title", text = text}, widget)
 		Gui:set_mode("inventory")
 	end
 end

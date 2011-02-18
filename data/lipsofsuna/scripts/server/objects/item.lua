@@ -234,8 +234,6 @@ end
 Item.use_cb = function(self, user)
 	if self.spec.categories["container"] then
 		self:loot(user)
-	elseif self.spec.categories["tool"] then
-		Crafting:send{user = user}
 	elseif self.spec.categories["book"] then
 		user:send{packet = Packet(packets.BOOK,
 			"string", self.spec.name,
