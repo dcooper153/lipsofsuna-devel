@@ -494,6 +494,7 @@ Itemspec{
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
 
+
 Itemspec{
 	name = "trog rags",
 	model = "book-000",
@@ -502,7 +503,7 @@ Itemspec{
 	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {upper1 = "trogfemrags1"}},
+		["troglodyte female"] = {upper1 = "trogfemrags1"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
 
