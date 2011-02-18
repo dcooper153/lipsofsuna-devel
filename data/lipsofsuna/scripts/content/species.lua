@@ -288,7 +288,7 @@ Species{
 	factions = {"evil"},
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"trog rags"}}
+	inventory_items = {"wooden club", "trog rags"}}
 
 Species{
 	name = "bloodworm",
