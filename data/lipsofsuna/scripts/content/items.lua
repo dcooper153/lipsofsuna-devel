@@ -486,7 +486,6 @@ Itemspec{
 	model = "chinadress1",
 	armor_class = 0.02,
 	categories = {"armor"},
-	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {upper1 = "aerchinadress1", panties = "panties2"},
@@ -500,7 +499,6 @@ Itemspec{
 	model = "book-000",
 	armor_class = 0.02,
 	categories = {"armor"},
-	crafting_tools = {saw = 1},
 	crafting_materials = {log = 1},
 	equipment_models = {
 		["troglodyte female"] = {upper1 = "trogfemrags1"}},
@@ -542,7 +540,6 @@ Itemspec{
 	model = "headband1",
 	armor_class = 0.02,
 	categories = {"armor"},
-	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 2},
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {headband = "headband1"}},
@@ -553,7 +550,6 @@ Itemspec{
 	model = "book-000",
 	armor_class = 0.04,
 	categories = {"armor"},
-	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 4},
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor1"}},
@@ -564,7 +560,6 @@ Itemspec{
 	model = "boots1",
 	armor_class = 0.04,
 	categories = {"armor"},
-	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 4},
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor2", legs1 = "boots1"}},
@@ -575,7 +570,6 @@ Itemspec{
 	model = "book-000",
 	armor_class = 0.04,
 	categories = {"armor"},
-	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 4},
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"}},
@@ -586,7 +580,6 @@ Itemspec{
 	model = "book-000",
 	armor_class = 0.04,
 	categories = {"armor"},
-	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 4},
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {upper1 = "bra1"}},
@@ -598,7 +591,6 @@ Itemspec{
 	model = "book-000",
 	armor_class = 0.04,
 	categories = {"armor"},
-	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 4},
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {skirt = "aerleatherskirt1", panties = "panties2"}},
@@ -608,7 +600,6 @@ Itemspec{
 	model = "book-000",
 	armor_class = 0.04,
 	categories = {"armor"},
-	crafting_tools = {saw = 1},
 	crafting_materials = {hide = 4},
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {upper1 = "aerleatherchest1"}},
@@ -667,7 +658,6 @@ Itemspec{
 	animation_looting = "opening",
 	categories = {"container", "generate"},
 	crafting_materials = {log = 1},
-	crafting_tools = {saw = 1},
 	inventory_size = 4,
 	inventory_type = "chest",
 	loot_categories = {"armor", "book", "material", "misc", "potion", "shield", "weapon"},
@@ -680,7 +670,6 @@ Itemspec{
 	mass = 10,
 	categories = {"container", "generate"},
 	crafting_materials = {["granite stone"] = 3},
-	crafting_tools = {saw = 1},
 	inventory_size = 4,
 	inventory_type = "chest",
 	loot_categories = {"material", "misc", "potion"},
@@ -695,7 +684,6 @@ Itemspec{
 	animation_looting = "opening",
 	categories = {"container", "workbench"},
 	crafting_materials = {log = 1},
-	crafting_tools = {saw = 1},
 	inventory_size = 4,
 	inventory_type = "workbench",
 	stacking = false}
@@ -709,7 +697,6 @@ Itemspec{
 	mass = 15,
 	categories = {"explosive"},
 	crafting_materials = {log = 1},
-	crafting_tools = {saw = 1},
 	destroy_actions = {"explode"},
 	health = 1,
 	stacking = false}
@@ -720,7 +707,6 @@ Itemspec{
 	mass = 3,
 	categories = {"boomerang", "throwable", "weapon"},
 	crafting_materials = {log = 1},
-	crafting_tools = {saw = 1},
 	damage = 20,
 	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R",
@@ -740,7 +726,6 @@ Itemspec{
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
 	crafting_skills = {intelligence = 75},
-	crafting_tools = {["mortar and pestle"] = 1},
 	stacking = true,
 	icon = "potion1"}
 
@@ -751,7 +736,6 @@ Itemspec{
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
 	crafting_skills = {intelligence = 75},
-	crafting_tools = {["mortar and pestle"] = 1},
 	stacking = true,
 	icon = "potion2"}
 
@@ -762,7 +746,6 @@ Itemspec{
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
 	crafting_skills = {intelligence = 50},
-	crafting_tools = {["mortar and pestle"] = 1},
 	stacking = true,
 	icon = "potion1"}
 
@@ -773,7 +756,6 @@ Itemspec{
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
 	crafting_skills = {intelligence = 25},
-	crafting_tools = {["mortar and pestle"] = 1},
 	stacking = true,
 	icon = "potion1"}
 
@@ -784,7 +766,6 @@ Itemspec{
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
 	crafting_skills = {intelligence = 25},
-	crafting_tools = {["mortar and pestle"] = 1},
 	stacking = true,
 	icon = "potion2"}
 
@@ -795,19 +776,8 @@ Itemspec{
 	categories = {"potion"},
 	crafting_materials = {mushroom = 1},
 	crafting_skills = {intelligence = 50},
-	crafting_tools = {["mortar and pestle"] = 1},
 	stacking = true,
 	icon = "potion2"}
-
-Itemspec{
-	name = "mortar and pestle",
-	model = "alchemy-000",
-	categories = {"tool"}}
-
-Itemspec{
-	name = "saw",
-	model = "saw1",
-	categories = {"tool"}}
 
 Itemspec{
 	name = "Steamworks",
