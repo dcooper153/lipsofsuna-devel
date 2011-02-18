@@ -92,15 +92,31 @@ end
 --- Places a monster to the map.
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
---   <li>name: Monster name.</li>
---   <li>point: Position vector, in tiles.</li>
---   <li>prob: Creation probability.</li></ul>
+--   <li>category: Species category.</li>
+--   <li>name: Species name.</li>
+--   <li>point: Position vector, in tiles.</li></ul>
 Voxel.place_creature = function(clss, args)
 	local spec = Species:random(args)
 	if not spec then return end
 	Creature{
 		spec = spec,
 		position = args.point * Config.tilewidth,
+		realized = true}
+end
+
+--- Places an item to the map.
+-- @param clss Voxel class.
+-- @param args Arguments.<ul>
+--   <li>category: Item category.</li>
+--   <li>name: Item name.</li>
+--   <li>point: Position vector, in tiles.</li></ul>
+Voxel.place_item = function(clss, args)
+	local spec = Itemspec:random(args)
+	if not spec then return end
+	Item{
+		spec = spec,
+		position = args.point * Config.tilewidth,
+		random = true,
 		realized = true}
 end
 

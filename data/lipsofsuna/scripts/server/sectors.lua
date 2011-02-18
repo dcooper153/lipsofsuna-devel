@@ -73,7 +73,7 @@ Sectors.format_generated_sector = function(self, sector)
 		Vector(-1,-1,1), Vector(0,-1,1), Vector(1,-1,1),
 		Vector(-1,0,1), Vector(0,0,1), Vector(1,0,1),
 		Vector(-1,1,1), Vector(0,1,1), Vector(1,1,1)}
-	local createplant = function(ctr)
+	local create_plant_or_item = function(ctr)
 		local i = 0
 		repeat
 			i = i + 1
@@ -84,13 +84,15 @@ Sectors.format_generated_sector = function(self, sector)
 		local src = ctr + Vector(-1,1,-1)
 		local dst = ctr + Vector(1,3,1)
 		ctr = ctr + Vector (0.5, 0, 0.5)
-		if Voxel:check_empty(src, dst) and math.random() < 0.3 then
+		if math.random() < 0.1 then
+			Voxel:place_item{point = ctr, category = "generate"}
+		elseif math.random() < 0.4 and Voxel:check_empty(src, dst) then
 			Voxel:place_obstacle{point = ctr, category = "tree"}
 		else
 			Voxel:place_obstacle{point = ctr, category = "small-plant"}
 		end
 	end
-	local createvein = function(ctr, mat)
+	local create_vein = function(ctr, mat)
 		for k,v in pairs(points) do
 			if math.random() < 0.3 then
 				local t = Voxel:get_tile{point = ctr + v}
@@ -108,9 +110,9 @@ Sectors.format_generated_sector = function(self, sector)
 		local t = Voxel:get_tile{point = p}
 		if t ~= 0 then
 			local m = mats[math.random(1,#mats)]
-			if m then createvein(p, m.id, 1) end
+			if m then create_vein(p, m.id, 1) end
 		else
-			createplant(p)
+			create_plant_or_item(p)
 		end
 	end
 end
