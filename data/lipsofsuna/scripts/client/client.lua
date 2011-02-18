@@ -219,19 +219,18 @@ Protocol:add_handler{type = "OBJECT_SELF", func = function(event)
 end}
 
 Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
-	local ok,i,t,m,n,x,y,z,rx,ry,rz,rw = event.packet:read("uint32", "uint8", "string", "string", "float", "float", "float", "float", "float", "float", "float")
+	local ok,i,t,s,m,n,x,y,z,rx,ry,rz,rw = event.packet:read("uint32", "string", "string", "string", "string", "float", "float", "float", "float", "float", "float", "float")
 	if not ok then return end
 	-- Create the object.
-	local type = (t == 0 and "creature") or (t == 1 and "item") or (t == 2 and "obstacle") or "object"
-	local o = Object{id = i, model = m, name = n, position = Vector(x, y, z), type = type}
+	local o = Object{id = i, model = m, name = n, position = Vector(x, y, z), spec = s, type = t}
+	if t == "species" then o.race = s end
 	-- Apply optional customizations.
-	local ok,ra,ge,bo,no,bu,eye,eyer,eyeg,eyeb,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = event.packet:resume(
-		"string", "string", "float", "float", "float",
+	local ok,ge,bo,no,bu,eye,eyer,eyeg,eyeb,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = event.packet:resume(
+		"string", "float", "float", "float",
 		"string", "uint8", "uint8", "uint8",
 		"string", "uint8", "uint8", "uint8",
 		"string", "uint8", "uint8", "uint8")
 	if ok then
-		o.race = ra
 		o.gender = ge
 		o.body_scale = bo
 		o.bust_scale = bu
@@ -243,7 +242,6 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		o.skin_style = skin
 		o.skin_color = {skinr / 255, sking / 255, skinb / 255}
 	else
-		o.race = nil
 		o.gender = nil
 		o.body_scale = nil
 		o.bust_scale = nil
