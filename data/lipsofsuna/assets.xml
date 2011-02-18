@@ -2276,7 +2276,7 @@
   </asset>
  <asset>
     <file>graphics/plaguerat1.lmdl</file>
-    <author>Francisco Athens</author>
+    <author>Francisco "FreeLikeGNU" Athens</author>
     <license>Creative Commons BY-SA 3.0</license>
     <status>development</status>
     <tag>character</tag>
@@ -2285,7 +2285,7 @@
   </asset>
  <asset>
     <file>import/plaguerat1.blend</file>
-    <author>Francisco Athens</author>
+    <author>Francisco "FreeLikeGNU" Athens</author>
     <license>Creative Commons BY-SA 3.0</license>
     <status>development</status>
     <tag>character</tag>
@@ -2294,7 +2294,7 @@
   </asset>
  <asset>
     <file>graphics/slime2.lmdl</file>
-    <author>Francisco Athens</author>
+    <author>Francisco "FreeLikeGNU" Athens</author>
     <license>Creative Commons BY-SA 3.0</license>
     <status>development</status>
     <tag>character</tag>
@@ -2303,7 +2303,43 @@
   </asset>
  <asset>
     <file>import/slime2.blend</file>
-    <author>Francisco Athens</author>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>character</tag>
+    <tag>enemy</tag>
+    <type>model</type>
+  </asset>
+ <asset>
+    <file>graphics/bloodworm2.lmdl</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>character</tag>
+    <tag>enemy</tag>
+    <type>model</type>
+  </asset>
+ <asset>
+    <file>import/bloodworm2.blend</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>character</tag>
+    <tag>enemy</tag>
+    <type>model</type>
+  </asset>
+ <asset>
+    <file>graphics/lizardman2.lmdl</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>character</tag>
+    <tag>enemy</tag>
+    <type>model</type>
+  </asset>
+ <asset>
+    <file>import/lizardman2.blend</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
     <license>Creative Commons BY-SA 3.0</license>
     <status>development</status>
     <tag>character</tag>

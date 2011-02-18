@@ -310,14 +310,14 @@ Species{
 
 Species{
 	name = "lizardman",
-	model = "lizardman1",
+	model = "lizardman2",
 	ai_distance_hint = 1.0,
 	factions = {"evil"},
-	feat_anims = {"right hand", "left hand"},
+	feat_anims = {"bite"},
 	inventory_size = 5,
 	inventory_items = {},
 	mass = 100,
-	speed_walk = 3,
+	speed_walk = 1,
 	skills = {
 		{name = "dexterity", max = 50, val = 50},
 		{name = "health", max = 50, val = 50},
