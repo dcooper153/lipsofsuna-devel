@@ -301,7 +301,7 @@ Species{
 	inventory_items = {"hide", "hide"},
 	jump_force = 3,
 	model = "bloodworm2",
-	speed_walk = 1,
+	speed_walk = 2,
 	skills = {
 		{name = "health", max = 30, val = 30}}}
 
@@ -331,13 +331,13 @@ Species{
 	inventory_size = 5,
 	inventory_items = {"wooden club"},
 	mass = 100,
-	speed_walk = 1,
+	speed_walk = 3,
 	equipment_slots = {
 		{name = "hand.L", node = "#hand.L"},
 		{name = "hand.R", node = "#hand.R"}},
 	skills = {
 		{name = "dexterity", max = 5, val = 5},
-		{name = "health", max = 500, val = 500},
+		{name = "health", max = 50, val = 50},
 		{name = "strength", max = 5, val = 5}}}
 
 Species{
@@ -351,7 +351,7 @@ Species{
 	inventory_items = {"hide", "hide"},
 	jump_force = 6,
 	model = "plaguerat1", -- FIXME
-	speed_walk = 1,
+	speed_walk = 4,
 	skills = {
 		{name = "health", max = 30, val = 30}}}
 
@@ -365,6 +365,6 @@ Species{
 	inventory_size = 0,
 	jump_force = 4,
 	model = "slime2", -- FIXME
-	speed_walk = 1,
+	speed_walk = 2,
 	skills = {
 		{name = "health", max = 30, val = 30}}}

@@ -795,7 +795,7 @@ Creature.combat_updaters =
 		local hint = self.spec.ai_distance_hint + self.target.spec.ai_distance_hint
 		if diff.y > 0.5 then self:jump() end
 		if dist < hint then
-			self:set_movement(-0.25)
+			self:set_movement(-0.5)
 		elseif dist > hint + 2 then
 			self:set_movement(1)
 		end
@@ -811,9 +811,9 @@ Creature.combat_updaters =
 		local dist = (self.target.position - self.position).length
 		local hint = self.spec.ai_distance_hint + self.target.spec.ai_distance_hint
 		if dist < hint + 1 then
-			self:set_movement(-0.25)
+			self:set_movement(-0.5)
 		elseif dist > hint + 2 then
-			self:set_movement(0.25)
+			self:set_movement(0.5)
 		end
 	end,
 	normal = function(self)
@@ -826,10 +826,8 @@ Creature.combat_updaters =
 			self:set_movement(1)
 		elseif dist >= hint + 3 then
 			self:set_movement(0.5)
-		elseif dist <= hint then
-			self:set_movement(-0.5)
 		elseif dist <= hint + 1 then
-			self:set_movement(-0.25)
+			self:set_movement(-0.5)
 		else
 			self:set_movement(0)
 			self.action_timer = math.max(self.action_timer, 1)
@@ -852,11 +850,10 @@ Creature.combat_updaters =
 Creature.combat_switchers =
 {
 	attack = function(self)
-		local moves = { 1, 0.5, 0.25 }
 		self.action_state = "attack"
 		self.action_timer = math.random(2, 4)
 		self:set_strafing(0)
-		self:set_movement(moves[math.random(3)])
+		self:set_movement(1)
 	end,
 	defend = function(self)
 		self.action_state = "defend"
@@ -877,10 +874,10 @@ Creature.combat_switchers =
 		self:set_movement(0)
 	end,
 	walk = function(self)
-		local moves = { 1, 0.5, 0.25, -0.25, -0.5 }
+		local moves = { 1, -0.5 }
 		self.action_state = "walk"
 		self.action_timer = math.random(2, 4)
 		self:set_strafing(0)
-		self:set_movement(moves[math.random(5)])
+		self:set_movement(moves[math.random(2)])
 	end
 }
