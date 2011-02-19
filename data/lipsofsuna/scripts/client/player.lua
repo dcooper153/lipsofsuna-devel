@@ -28,11 +28,25 @@ Player.get_camera_transform_1st = function(clss)
 end
 
 Player.get_camera_transform_3rd = function(clss)
+	-- Calculate the rotation.
 	local turn = clss.camera_turn_state + clss.turn_state
 	local tilt = clss.camera_tilt_state - clss.tilt_state
+	local rot = Quaternion:new_euler(turn, 0, tilt)
+	-- Calculate the center position.
+	-- If there's room, the camera is placed slightly to the right so that
+	-- the character doesn't obstruct the crosshair so badly.
 	local spec = Species:find{name = clss.species}
-	local ctr = spec and spec.camera_center or Vector(0, 2, 0)
-	return clss.object.position + ctr, Quaternion:new_euler(turn, 0, tilt)
+	local rel = spec and spec.camera_center or Vector(0, 2, 0)
+	local r1 = clss.object.position + rel
+	local r2 = r1 + Quaternion:new_euler(turn) * Vector(1.3)
+	local ctr = Voxel:intersect_ray(r1, r2)
+	if ctr then
+		ctr = r1 + (ctr - r1) * 0.9
+	else
+		ctr = r2
+	end
+	-- Return the final transformation.
+	return ctr, rot
 end
 
 Player.get_picking_ray_1st = function(clss)
