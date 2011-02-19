@@ -124,6 +124,12 @@ class LIAnimation:
 		# TODO: Make sure that there are no solo tracks.
 		# Make sure that there is no active action.
 		self.armature.animation_data.action = None
+		# Disable blend in/out to avoid broken frames at start or end.
+		for track in self.armature.animation_data.nla_tracks:
+			for strip in track.strips:
+				strip.use_auto_blend = False
+				strip.blend_in = 0.0
+				strip.blend_out = 0.0
 		# Mute tracks that don't belong to the animation.
 		for track in self.armature.animation_data.nla_tracks:
 			if track.name != self.name:
