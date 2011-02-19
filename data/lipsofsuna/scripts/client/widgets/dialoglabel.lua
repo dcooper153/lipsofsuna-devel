@@ -31,7 +31,7 @@ Widgets.DialogLabel.reshaped = function(self)
 		dest_size = {w,h},
 		text = self.text,
 		text_alignment = {self.halign,self.valign},
-		text_color = {1,1,1,1},
+		text_color = self.focused and {1,1,0,1} or {1,1,1,1},
 		text_font = self.font}
 	self:canvas_compile()
 end
