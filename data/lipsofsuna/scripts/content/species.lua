@@ -335,9 +335,8 @@ Species{
 		{name = "hand.L", node = "#hand.L"},
 		{name = "hand.R", node = "#hand.R"}},
 	skills = {
-		{name = "dexterity", max = 5, val = 5},
-		{name = "health", max = 500, val = 500},
-		{name = "strength", max = 5, val = 5}}}
+		{name = "health", max = 50, val = 50}}}
+
 
 Species{
 	name = "plague rat",

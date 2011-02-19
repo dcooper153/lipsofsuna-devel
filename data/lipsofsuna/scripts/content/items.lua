@@ -481,7 +481,7 @@ Itemspec{
 	model = "woodenclub1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["log"] = 1},
-	damage = 10,
+	damage = 15,
 	damage_bonus_dexterity = 0.2,
 	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R"}
