@@ -85,7 +85,7 @@ Widgets.ItemButton.reshaped = function(self)
 	if self.count and self.count > 1 then
 		self:canvas_text{
 			dest_position = {0,0},
-			dest_size = {w,h},
+			dest_size = {w-10,h},
 			text = tostring(self.count),
 			text_alignment = {1,0.5},
 			text_color = self.drag and {1,1,1,a} or self.focused and {1,1,0,a} or {1,1,1,a},
