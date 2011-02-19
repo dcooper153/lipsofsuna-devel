@@ -31,8 +31,11 @@ Target.pick_look = function()
 	local p,o = Target:pick_ray{ray1 = r1, ray2 = r2, ignore = ignore}
 	Target.target_object = o
 	if o then
-		local s = o.name and o.name ~= "" and (" " .. o.name)
-		Gui:set_target_text("Use" .. (s or ""))
+		if o.name and o.name ~= "" then
+			Gui:set_target_text("Interact with " .. o.name)
+		else
+			Gui:set_target_text("Interact")
+		end
 		set = true
 	else
 		Gui:set_target_text()
