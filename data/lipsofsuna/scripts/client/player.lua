@@ -61,14 +61,20 @@ Player.camera_turn = 0
 Player.camera_turn_state = 0
 Player.camera:zoom{rate = -8}
 Player.update_camera = function(clss, secs)
-	-- Update turning.
-	clss.camera_turn_state = clss.camera_turn_state + clss.camera_turn * secs
-	clss.camera_turn_state = radian_wrap(clss.camera_turn_state)
-	clss.camera_turn = 0
-	-- Update tilting.
-	clss.camera_tilt_state = clss.camera_tilt_state - clss.camera_tilt * secs
-	clss.camera_tilt_state = radian_wrap(clss.camera_tilt_state)
-	clss.camera_tilt = 0
+	if Action.dict_press[Keys.LCTRL] then
+		-- Update turning.
+		clss.camera_turn_state = clss.camera_turn_state + clss.camera_turn * secs
+		clss.camera_turn_state = radian_wrap(clss.camera_turn_state)
+		clss.camera_turn = 0
+		-- Update tilting.
+		clss.camera_tilt_state = clss.camera_tilt_state - clss.camera_tilt * secs
+		clss.camera_tilt_state = radian_wrap(clss.camera_tilt_state)
+		clss.camera_tilt = 0
+	else
+		-- Reset mouse look.
+		clss.camera_turn_state = clss.camera_turn_state * math.max(1 - 3 * secs, 0)
+		clss.camera_tilt_state = clss.camera_tilt_state * math.max(1 - 3 * secs, 0)
+	end
 	-- Set the target transformation.
 	local pos,rot = clss:get_camera_transform()
 	Player.camera.target_position = pos
