@@ -17,7 +17,7 @@ Widgets.ItemList.setter = function(self, key, value)
 			self.buttons = {}
 			self:set_expand{col = 1}
 			for i = 1,value do
-				self.buttons[i] = Widgets.ItemButton{pressed = function() self:pressed(i) end}
+				self.buttons[i] = Widgets.ItemButton{pressed = function() self:activated(i) end}
 				self:set_child{col = 1, row = i, widget = self.buttons[i]}
 			end
 		else
@@ -29,7 +29,7 @@ Widgets.ItemList.setter = function(self, key, value)
 			self:set_expand{col = 1}
 			self:set_expand{col = 2}
 			for i = 1,value do
-				self.buttons[i] = Widgets.ItemButton{pressed = function() self:pressed(i) end}
+				self.buttons[i] = Widgets.ItemButton{pressed = function() self:activated(i) end}
 				self:set_child{
 					col = 1 + math.floor((i - 1) / rows),
 					row = 1 + (i - 1) % rows,
@@ -50,6 +50,9 @@ Widgets.ItemList.new = function(clss, args)
 	return self
 end
 
+Widgets.ItemList.activated = function(self, row)
+end
+
 Widgets.ItemList.get_item = function(self, args)
 	local widget = self.buttons[args.slot]
 	if not widget then return end
@@ -63,7 +66,4 @@ Widgets.ItemList.set_item = function(self, args)
 	widget.text = args.name
 	widget.count = args.count
 	widget.icon = args.icon
-end
-
-Widgets.ItemList.pressed = function(self, row)
 end

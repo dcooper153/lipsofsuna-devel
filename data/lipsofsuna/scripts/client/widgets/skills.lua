@@ -1,6 +1,4 @@
-require "client/widgets/listwidget"
-
-Widgets.Skills = Class(Widgets.List)
+Widgets.Skills = Class(Widget)
 
 Widgets.Skills.getter = function(self, key, value)
 	if key == "total" then

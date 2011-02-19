@@ -60,9 +60,7 @@ struct _LIWdgWidget
 	LIScrData* script;
 	unsigned int behind : 1;
 	unsigned int floating : 1;
-	unsigned int focusable : 1;
 	unsigned int fullscreen : 1;
-	unsigned int temporary : 1;
 	unsigned int visible : 1;
 
 	/* Canvas. */
@@ -237,19 +235,6 @@ LIAPICALL (void, liwdg_widget_set_floating, (
 	LIWdgWidget* self,
 	int          value));
 
-LIAPICALL (int, liwdg_widget_get_focusable, (
-	LIWdgWidget* self));
-
-LIAPICALL (void, liwdg_widget_set_focusable, (
-	LIWdgWidget* self,
-	int          value));
-
-LIAPICALL (int, liwdg_widget_get_focused, (
-	LIWdgWidget* self));
-
-LIAPICALL (void, liwdg_widget_set_focused, (
-	LIWdgWidget* self));
-
 LIAPICALL (int, liwdg_widget_get_fullscreen, (
 	LIWdgWidget* self));
 
@@ -333,13 +318,6 @@ LIAPICALL (void, liwdg_widget_set_spacings, (
 	LIWdgWidget* self,
 	int          column,
 	int          row));
-
-LIAPICALL (int, liwdg_widget_get_temporary, (
-	LIWdgWidget* self));
-
-LIAPICALL (void, liwdg_widget_set_temporary, (
-	LIWdgWidget* self,
-	int          value));
 
 LIAPICALL (int, liwdg_widget_get_visible, (
 	LIWdgWidget* self));

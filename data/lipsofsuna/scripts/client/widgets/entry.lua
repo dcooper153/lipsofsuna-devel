@@ -12,6 +12,10 @@ Widgets.Entry.clear = function(self, args)
 	self.text = ""
 end
 
+--- Handles input.
+-- @param self Entry widget.
+-- @param args Arguments.
+-- @return True if absorbed.
 Widgets.Entry.event = function(self, args)
 	if args.type == "keypress" then
 		if args.code == 8 then
@@ -28,6 +32,7 @@ Widgets.Entry.event = function(self, args)
 			-- Typing.
 			self.text = (self.text or "") .. args.text
 		end
+		return true
 	end
 end
 

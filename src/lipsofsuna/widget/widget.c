@@ -924,42 +924,6 @@ void liwdg_widget_set_floating (
 	}
 }
 
-int liwdg_widget_get_focusable (
-	LIWdgWidget* self)
-{
-	return self->focusable;
-}
-
-void liwdg_widget_set_focusable (
-	LIWdgWidget* self,
-	int          value)
-{
-	self->focusable = value;
-}
-
-/**
- * \brief Gets the focus state of the widget.
- * \param self Widget.
- * \return Nonzero if the widget has focus.
- */
-int liwdg_widget_get_focused (
-	LIWdgWidget* self)
-{
-	return (liwdg_manager_get_focus (self->manager) == self);
-}
-
-/**
- * \brief Gives focus to the widget.
- * \param self Widget.
- */
-void liwdg_widget_set_focused (
-	LIWdgWidget* self)
-{
-	if (liwdg_manager_get_focus (self->manager) != self &&
-	    liwdg_widget_get_visible (self))
-		liwdg_manager_set_focus (self->manager, self);
-}
-
 int liwdg_widget_get_fullscreen (
 	LIWdgWidget* self)
 {
@@ -1356,19 +1320,6 @@ void liwdg_widget_set_spacings (
 		self->row_spacing = row;
 		private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
 	}
-}
-
-int liwdg_widget_get_temporary (
-	LIWdgWidget* self)
-{
-	return self->temporary;
-}
-
-void liwdg_widget_set_temporary (
-	LIWdgWidget* self,
-	int          value)
-{
-	self->temporary = value;
 }
 
 int liwdg_widget_get_visible (

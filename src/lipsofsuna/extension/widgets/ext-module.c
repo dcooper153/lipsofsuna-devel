@@ -28,10 +28,6 @@ static void private_widget_allocation (
 	LIExtModule* module,
 	LIWdgWidget* widget);
 
-static int private_widget_event (
-	LIExtModule* module,
-	SDL_Event*   event);
-
 static int private_widget_tick (
 	LIExtModule* module,
 	float        secs);
@@ -81,9 +77,8 @@ LIExtModule* liext_widgets_new (
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (self->program->callbacks, self->program->engine, "event", -10, private_widget_event, self, self->calls + 0) ||
-	    !lical_callbacks_insert (self->program->callbacks, self->program->engine, "tick", 1, private_widget_tick, self, self->calls + 1) ||
-	    !lical_callbacks_insert (self->program->callbacks, self->widgets, "widget-allocation", 5, private_widget_allocation, self, self->calls + 2))
+	if (!lical_callbacks_insert (self->program->callbacks, self->program->engine, "tick", 1, private_widget_tick, self, self->calls + 0) ||
+	    !lical_callbacks_insert (self->program->callbacks, self->widgets, "widget-allocation", 5, private_widget_allocation, self, self->calls + 1))
 	{
 		liext_widgets_free (self);
 		return 0;
@@ -169,17 +164,6 @@ static void private_widget_allocation (
 	}
 	else
 		lua_pop (lua, 2);
-}
-
-static int private_widget_event (
-	LIExtModule* module,
-	SDL_Event*   event)
-{
-	if (module->client->moving)
-		return 1;
-	if (!liwdg_manager_event_sdl (module->widgets, event))
-		return 1;
-	return 0;
 }
 
 static int private_widget_tick (

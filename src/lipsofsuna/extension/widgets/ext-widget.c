@@ -750,6 +750,19 @@ static void Widget_setter_margins (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- The parent of this widget.
+ * -- @name Widget.parent
+ * -- @class table
+ */
+static void Widget_getter_parent (LIScrArgs* args)
+{
+	LIWdgWidget* self = args->self;
+
+	if (self->parent != NULL)
+		liscr_args_seti_data (args, self->parent->script);
+}
+
+/* @luadoc
  * --- Number of rows in the widget.
  * -- @name Widget.rows
  * -- @class table
@@ -797,23 +810,6 @@ static void Widget_setter_spacings (LIScrArgs* args)
 	liscr_args_gets_int (args, "horz", v + 0);
 	liscr_args_gets_int (args, "vert", v + 1);
 	liwdg_widget_set_spacings (args->self, v[0], v[1]);
-}
-
-/* @luadoc
- * --- True if the widget should be hidden if a click misses it.
- * -- @name Widget.visible
- * -- @class table
- */
-static void Widget_getter_temporary (LIScrArgs* args)
-{
-	liscr_args_seti_bool (args, liwdg_widget_get_temporary (args->self));
-}
-static void Widget_setter_temporary (LIScrArgs* args)
-{
-	int value;
-
-	if (liscr_args_geti_bool (args, 0, &value))
-		liwdg_widget_set_temporary (args->self, value);
 }
 
 /* @luadoc
@@ -918,9 +914,9 @@ void liext_script_widget (
 	liscr_class_insert_mvar (self, "fullscreen", Widget_getter_fullscreen, Widget_setter_fullscreen);
 	liscr_class_insert_mvar (self, "height", Widget_getter_height, NULL);
 	liscr_class_insert_mvar (self, "margins", Widget_getter_margins, Widget_setter_margins);
+	liscr_class_insert_mvar (self, "parent", Widget_getter_parent, NULL);
 	liscr_class_insert_mvar (self, "rows", Widget_getter_rows, Widget_setter_rows);
 	liscr_class_insert_mvar (self, "spacings", Widget_getter_spacings, Widget_setter_spacings);
-	liscr_class_insert_mvar (self, "temporary", Widget_getter_temporary, Widget_setter_temporary);
 	liscr_class_insert_mvar (self, "visible", Widget_getter_visible, Widget_setter_visible);
 	liscr_class_insert_mvar (self, "width", Widget_getter_width, NULL);
 	liscr_class_insert_mvar (self, "x", Widget_getter_x, Widget_setter_x);

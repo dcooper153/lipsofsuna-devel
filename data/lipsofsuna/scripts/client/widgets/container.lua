@@ -46,7 +46,7 @@ Widgets.Container.new = function(clss, args)
 		self:append_row(self.crafting)
 	end
 	-- Item list.
-	self.item_list = Widgets.ItemList{size = args.size, pressed = function(w, r) self:pressed(r) end}
+	self.item_list = Widgets.ItemList{size = args.size, activated = function(w, r) self:activated(r) end}
 	self.group = Widgets.Frame{cols = 1, rows = 3}
 	self.group:set_expand{col = 1, row = 1}
 	self.group:set_child{col = 1, row = 1, widget = self.item_list}
@@ -57,6 +57,17 @@ Widgets.Container.new = function(clss, args)
 	self.button_close = Widgets.Button{text = "Close", pressed = function() self:close() end}
 	self.group:set_child{col = 1, row = 3, widget = self.button_close}
 	return self
+end
+
+--- Called when a slot was pressed.
+-- @param self Container widget.
+-- @param slot Slot pressed.
+Widgets.Container.activated = function(self, slot)
+	if Target.active then
+		Target:select_container(self.id, slot)
+	else
+		Drag:clicked_container(self.id, slot)
+	end
 end
 
 --- Closes the container.
@@ -91,17 +102,6 @@ Widgets.Container.get_item = function(self, args)
 		if not widget then return end
 		if not widget.text or #widget.text == 0 then return end
 		return widget
-	end
-end
-
---- Called when a slot was pressed.
--- @param self Container widget.
--- @param slot Slot pressed.
-Widgets.Container.pressed = function(self, slot)
-	if Target.active then
-		Target:select_container(self.id, slot)
-	else
-		Drag:clicked_container(self.id, slot)
 	end
 end
 
@@ -155,9 +155,13 @@ Widgets.Container.update = function(self)
 	self.crafting:clear()
 	for k,v in pairs(craftable) do
 		local spec = Itemspec:find{name = v}
-		local widget = Widgets.ItemButton{index = index, icon = spec and spec.icon, text = v, pressed = function(w)
-			Network:send{packet = Packet(packets.CRAFTING, "uint32", self.id, "string", w.text)}
-		end}
+		local widget = Widgets.ItemButton{index = index, icon = spec and spec.icon, text = v,
+			pressed = function(w)
+				Network:send{packet = Packet(packets.CRAFTING, "uint32", self.id, "string", w.text)}
+			end,
+			scrolled = function(w, args)
+				self.crafting:scrolled(args)
+			end}
 		self.crafting:append{widget = widget}
 		index = index + 1
 	end

@@ -58,6 +58,10 @@ Widgets.List.get_offset = function(self)
 	return self.scroll.offset
 end
 
+Widgets.List.scrolled = function(self, args)
+	return self.scroll:scrolled(args)
+end
+
 --- Scrolls the list widget.
 -- @param self List widget.
 -- @param offset Scroll offset in rows.

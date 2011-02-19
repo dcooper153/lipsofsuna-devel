@@ -6,6 +6,23 @@ Sectors.instance:erase_world()
 
 Views = {}
 
+local oldpopup = Widget.popup
+Widget.popup = function(self, args)
+	if Widgets.popup then
+		Widgets.popup.visible = false
+	end
+	Widgets.popup = self
+	return oldpopup(self, args)
+end
+
+Widgets.find_handler_widget = function(clss, handler, args)
+	local w = clss:find_widget(args)
+	while w do
+		if w[handler] then return w end
+		w = w.parent
+	end
+end
+
 require "client/widgets/background"
 require "client/widgets/button"
 require "client/widgets/colorselector"

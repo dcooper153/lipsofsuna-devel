@@ -93,6 +93,25 @@ Widgets.Scrollbar.reshaped = function(self)
 	self:canvas_compile()
 end
 
+Widgets.Scrollbar.scrolled = function(self, args)
+	if args.button == 4 then
+		-- Scroll up.
+		if self.offset > 1 then
+			self.offset = self.offset - 1
+			self:reshaped()
+			self:changed(self.offset)
+		end
+	else
+		-- Scroll down.
+		if self.offset < self.max - self.page then
+			self.offset = self.offset + 1
+			self:reshaped()
+			self:changed(self.offset)
+		end
+	end
+	return true
+end
+
 Widgets.Scrollbar.set_range = function(self, max, offset, page)
 	if offset then self.offset = offset end
 	if page then self.page = page end

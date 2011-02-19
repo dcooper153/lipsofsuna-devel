@@ -121,6 +121,25 @@ Widgets.ComboBox.pressed = function(self)
 	end
 end
 
+Widgets.ComboBox.scrolled = function(self, args)
+	if self.menu.rows == 0 then return end
+	if args.button == 4 then
+		-- Previous item.
+		if self.value > 1 then
+			self:activate{index = self.value - 1}
+		else
+			self:activate{index = self.menu.rows} 
+		end
+	else
+		-- Next item.
+		if self.value < self.menu.rows then
+			self:activate{index = self.value + 1}
+		else
+			self:activate{index = 1} 
+		end
+	end
+end
+
 Widgets.ComboBox.set_items = function(self, items)
 	self:clear()
 	for k,v in ipairs(items) do

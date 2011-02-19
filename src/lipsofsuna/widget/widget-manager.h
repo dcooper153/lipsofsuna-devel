@@ -47,17 +47,6 @@ struct _LIWdgManager
 	} dialogs;
 	struct
 	{
-		int active;
-		int startx;
-		int starty;
-	} drag;
-	struct
-	{
-		int x;
-		int y;
-	} pointer;
-	struct
-	{
 		LIWdgWidget* iter;
 		LIWdgWidget* grab;
 	} widgets;
@@ -74,22 +63,6 @@ LIAPICALL (void, liwdg_manager_free, (
 LIAPICALL (int, liwdg_manager_alloc_widgets, (
 	LIWdgManager* self,
 	              ...));
-
-LIAPICALL (void, liwdg_manager_cycle_focus, (
-	LIWdgManager* self,
-	int           next));
-
-LIAPICALL (void, liwdg_manager_cycle_window_focus, (
-	LIWdgManager* self,
-	int           next));
-
-LIAPICALL (int, liwdg_manager_event, (
-	LIWdgManager* self,
-	LIWdgEvent*   event));
-
-LIAPICALL (int, liwdg_manager_event_sdl, (
-	LIWdgManager* manager,
-	SDL_Event*    event));
 
 LIAPICALL (LIFntFont*, liwdg_manager_find_font, (
 	LIWdgManager* self,
@@ -123,13 +96,6 @@ LIAPICALL (void, liwdg_manager_render, (
 LIAPICALL (void, liwdg_manager_update, (
 	LIWdgManager* self,
 	float         secs));
-
-LIAPICALL (LIWdgWidget*, liwdg_manager_get_focus, (
-	LIWdgManager* self));
-
-LIAPICALL (void, liwdg_manager_set_focus, (
-	LIWdgManager* self,
-	LIWdgWidget*  widget));
 
 LIAPICALL (void, liwdg_manager_get_projection, (
 	LIWdgManager* self,

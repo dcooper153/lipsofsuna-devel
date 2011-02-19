@@ -167,14 +167,53 @@ Eventhandler{type = "keyrelease", func = function(self, args)
 	Action:event(args)
 end}
 
+local handlepopups = function(w)
+	if not Widgets.popup then return end
+	local p = w
+	while p do
+		if p == Widgets.popup then return end
+		p = p.parent
+	end
+	Widgets.popup.visible = false
+	Widgets.popup = nil
+	return true
+end
+
 Eventhandler{type = "mousepress", func = function(self, args)
-	Action:event(args, Gui.mode ~= "game" and {})
+	if Gui.mode ~= "game" then
+		if args.button ~= 4 and args.button ~= 5 then
+			local w = Widgets:find_handler_widget("pressed")
+			if handlepopups(w) then return end
+			if w then return w:pressed(args) end
+		else
+			local w = Widgets:find_handler_widget("scrolled")
+			if handlepopups(w) then return end
+			if w then return w:scrolled(args) end
+		end
+		Action:event(args, {})
+	else
+		Action:event(args, Gui.mode ~= "game" and {})
+	end
 end}
 
 Eventhandler{type = "mouserelease", func = function(self, args)
-	Action:event(args, Gui.mode ~= "game" and {})
+	if Gui.mode ~= "game" then
+		local w = Widgets:find_handler_widget("event")
+		if not w or not w:event(args) then
+			Action:event(args, {})
+		end
+	else
+		Action:event(args, Gui.mode ~= "game" and {})
+	end
 end}
 
 Eventhandler{type = "mousemotion", func = function(self, args)
-	Action:event(args, Gui.mode ~= "game" and {})
+	if Gui.mode ~= "game" then
+		local w = Widgets:find_handler_widget("event")
+		if not w or not w:event(args) then
+			Action:event(args, {})
+		end
+	else
+		Action:event(args, Gui.mode ~= "game" and {})
+	end
 end}

@@ -26,6 +26,13 @@ Widgets.Cursor.inst = Widgets.Cursor({
 	offset = {0, 0},
 	size = {32, 32}})
 
+Eventhandler{type = "mousepress", func = function(self, args)
+	local w = Widgets.focused_widget
+	if w and w.pressed then
+		w:pressed(args)
+	end
+end}
+
 Eventhandler{type = "keypress", func = function(self, args)
 	local w = Widgets.focused_widget
 	if w and w.event then

@@ -57,42 +57,6 @@ static void Widgets_add_font_style (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Cycles widget focus.
- * --
- * -- @param clss Widgets class.
- * -- @param args Arguments.<ul>
- * --   <li>backward: True if should cycle backward.</li></ul>
- * function Widgets.cycle_focus(clss, args)
- */
-static void Widgets_cycle_focus (LIScrArgs* args)
-{
-	int prev = 0;
-	LIExtModule* module;
-
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_WIDGETS);
-	liscr_args_gets_bool (args, "backward", &prev);
-	liwdg_manager_cycle_focus (module->widgets, !prev);
-}
-
-/* @luadoc
- * --- Cycles window focus.
- * --
- * -- @param clss Widgets class.
- * -- @param args Arguments.<ul>
- * --   <li>backward: True if should cycle backward.</li></ul>
- * function Widgets.cycle_focus(clss, args)
- */
-static void Widgets_cycle_window_focus (LIScrArgs* args)
-{
-	int prev = 0;
-	LIExtModule* module;
-
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_WIDGETS);
-	liscr_args_gets_bool (args, "backward", &prev);
-	liwdg_manager_cycle_window_focus (module->widgets, !prev);
-}
-
-/* @luadoc
  * --- Draws the user interface.
  * -- @param clss Widgets class.
  * function Widgets.draw(clss)
@@ -106,19 +70,54 @@ static void Widgets_draw (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Finds a widget by screen position.
+ * -- @param clss Widgets class.
+ * -- @param args Arguments.<ul>
+ * --   <li>1,point: Screen position.</li></ul>
+ * function Widgets.find_widget(clss, args)
+ */
+static void Widgets_find_widget (LIScrArgs* args)
+{
+	int x;
+	int y;
+	LIExtModule* module;
+	LIWdgWidget* widget;
+	LIMatVector vector;
+	LIScrData* data;
+
+	if (!liscr_args_gets_vector (args, "point", &vector) &&
+	    !liscr_args_geti_vector (args, 0, &vector))
+	{
+		SDL_GetMouseState (&x, &y);
+		vector = limat_vector_init (x, y, 0.0f);
+	}
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_WIDGETS);
+	widget = liwdg_manager_find_widget_by_point (module->widgets, (int) vector.x, (int) vector.y);
+	if (widget == NULL)
+		return;
+	data = liwdg_widget_get_script (widget);
+	if (data == NULL)
+		return;
+	liscr_args_seti_data (args, data);
+}
+
+/* @luadoc
  * --- Currently focused widget.
  * -- @name Widgets.focused_widget
  * -- @class table
  */
 static void Widgets_getter_focused_widget (LIScrArgs* args)
 {
+	int x;
+	int y;
 	LIExtModule* module;
 	LIWdgWidget* widget;
 	LIScrData* data;
 
+	SDL_GetMouseState (&x, &y);
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_WIDGETS);
-	widget = liwdg_manager_find_widget_by_point (module->widgets,
-		module->widgets->pointer.x, module->widgets->pointer.y);
+	widget = liwdg_manager_find_widget_by_point (module->widgets, x, y);
 	if (widget == NULL)
 		return;
 	data = liwdg_widget_get_script (widget);
@@ -136,9 +135,8 @@ void liext_script_widgets (
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_WIDGETS, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "add_font_style", Widgets_add_font_style);
-	liscr_class_insert_cfunc (self, "cycle_focus", Widgets_cycle_focus);
-	liscr_class_insert_cfunc (self, "cycle_window_focus", Widgets_cycle_window_focus);
 	liscr_class_insert_cfunc (self, "draw", Widgets_draw);
+	liscr_class_insert_cfunc (self, "find_widget", Widgets_find_widget);
 	liscr_class_insert_cvar (self, "focused_widget", Widgets_getter_focused_widget, NULL);
 }
 
