@@ -31,6 +31,7 @@ Species.dict_name = {}
 --   <li>gravity: Gravity vector.</li>
 --   <li>inventory_items: List of inventory items to give when the creature is spawned.</li>
 --   <li>inventory_size: Number of inventory slots the creature has.</li>
+--   <li>jump_force: Mass-independent jump force of the creature.</li>
 --   <li>mass: Mass in kilograms.</li>
 --   <li>model: Model name.</li>
 --   <li>skill_quota: Number of skill points the creature can distribute over skills.</li>
@@ -124,6 +125,7 @@ Species.new = function(clss, args)
 	copy("gravity", Vector(0, -15, 0))
 	copy("inventory_items", {})
 	copy("inventory_size", 0)
+	copy("jump_force", 8)
 	copy("mass", 50)
 	copy("skill_quota", 200)
 	copy("speed_walk", 3)

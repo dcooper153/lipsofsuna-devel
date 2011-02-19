@@ -418,7 +418,7 @@ Creature.jump = function(self)
 	self.jumping = true
 	Effect:play{effect = "jump1", object = self}
 	self:animate{animation = "jump", channel = Animation.CHANNEL_JUMP, permanent = true}
-	Object.jump(self, {impulse = Vector(v.x, 400, v.z)})
+	Object.jump(self, {impulse = Vector(v.x, self.spec.jump_force * self.spec.mass, v.z)})
 end
 
 --- Loots the object.

@@ -299,6 +299,7 @@ Species{
 	feat_anims = {"bite"},
 	inventory_size = 3,
 	inventory_items = {"hide", "hide"},
+	jump_force = 3,
 	model = "bloodworm2",
 	speed_walk = 1,
 	skills = {
@@ -348,6 +349,7 @@ Species{
 	feat_anims = {"bite"},
 	inventory_size = 3,
 	inventory_items = {"hide", "hide"},
+	jump_force = 6,
 	model = "plaguerat1", -- FIXME
 	speed_walk = 1,
 	skills = {
@@ -361,6 +363,7 @@ Species{
 	factions = {"evil"},
 	feat_anims = {"bite"},
 	inventory_size = 0,
+	jump_force = 4,
 	model = "slime2", -- FIXME
 	speed_walk = 1,
 	skills = {
