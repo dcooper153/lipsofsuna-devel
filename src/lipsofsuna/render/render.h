@@ -41,6 +41,7 @@ struct _LIRenRender
 	LIAlgStrdic* shaders;
 	LIAlgStrdic* images;
 	LIAlgU32dic* models;
+	LIAlgPtrdic* models_ptr;
 	LIPthPaths* paths;
 	LIRenContext* context;
 	struct

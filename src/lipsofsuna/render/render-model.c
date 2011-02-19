@@ -74,7 +74,17 @@ LIRenModel* liren_model_new (
 	}
 
 	/* Add to dictionary. */
-	if (!lialg_u32dic_insert (render->models, id, self))
+	if (self->id)
+	{
+		if (!lialg_u32dic_insert (render->models, id, self))
+		{
+			private_clear_materials (self);
+			private_clear_model (self);
+			lisys_free (self);
+			return NULL;
+		}
+	}
+	if (!lialg_ptrdic_insert (render->models_ptr, self, self))
 	{
 		private_clear_materials (self);
 		private_clear_model (self);
@@ -94,7 +104,9 @@ void
 liren_model_free (LIRenModel* self)
 {
 	/* Remove from dictionary. */
-	lialg_u32dic_remove (self->render->models, self->id);
+	if (self->id)
+		lialg_u32dic_remove (self->render->models, self->id);
+	lialg_ptrdic_remove (self->render->models_ptr, self);
 
 	/* Free self. */
 	private_clear_materials (self);

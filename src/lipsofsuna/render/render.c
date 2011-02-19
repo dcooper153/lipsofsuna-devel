@@ -63,7 +63,7 @@ void liren_render_free (
 	LIRenRender* self)
 {
 	LIAlgStrdicIter iter1;
-	LIAlgU32dicIter iter2;
+	LIAlgPtrdicIter iter2;
 	LIRenImage* image;
 	LIRenModel* model;
 	LIRenShader* shader;
@@ -87,13 +87,15 @@ void liren_render_free (
 
 	/* Free models. */
 	if (self->models != NULL)
+		lialg_u32dic_free (self->models);
+	if (self->models_ptr != NULL)
 	{
-		LIALG_U32DIC_FOREACH (iter2, self->models)
+		LIALG_PTRDIC_FOREACH (iter2, self->models_ptr)
 		{
 			model = iter2.value;
 			liren_model_free (model);
 		}
-		lialg_u32dic_free (self->models);
+		lialg_ptrdic_free (self->models_ptr);
 	}
 
 	/* Free images. */
@@ -193,7 +195,7 @@ int liren_render_load_image (
 	LIRenRender* self,
 	const char*  name)
 {
-	LIAlgU32dicIter iter;
+	LIAlgPtrdicIter iter;
 	LIRenImage* image;
 	LIRenModel* model;
 
@@ -217,7 +219,7 @@ int liren_render_load_image (
 		return 0;
 
 	/* Replace in all models. */
-	LIALG_U32DIC_FOREACH (iter, self->models)
+	LIALG_PTRDIC_FOREACH (iter, self->models_ptr)
 	{
 		model = iter.value;
 		liren_model_replace_image (model, image);
@@ -311,6 +313,9 @@ static int private_init_resources (
 	/* Initialize model dicrionaries. */
 	self->models = lialg_u32dic_new ();
 	if (self->models == NULL)
+		return 0;
+	self->models_ptr = lialg_ptrdic_new ();
+	if (self->models_ptr == NULL)
 		return 0;
 
 	/* Initialize shader dictionary. */
