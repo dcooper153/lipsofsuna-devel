@@ -790,8 +790,10 @@ Creature.combat_updaters =
 {
 	attack = function(self)
 		-- Maintain distance to the target.
-		local dist = (self.target.position - self.position).length
+		local diff = self.target.position - self.position
+		local dist = diff.length
 		local hint = self.spec.ai_distance_hint + self.target.spec.ai_distance_hint
+		if diff.y > 0.5 then self:jump() end
 		if dist < hint then
 			self:set_movement(-0.25)
 		elseif dist > hint + 2 then
@@ -816,8 +818,10 @@ Creature.combat_updaters =
 	end,
 	normal = function(self)
 		-- Maintain distance to the target.
-		local dist = (self.target.position - self.position).length
+		local diff = self.target.position - self.position
+		local dist = diff.length
 		local hint = self.spec.ai_distance_hint + self.target.spec.ai_distance_hint
+		if diff.y > 0.5 then self:jump() end
 		if dist >= hint + 4 then
 			self:set_movement(1)
 		elseif dist >= hint + 3 then
