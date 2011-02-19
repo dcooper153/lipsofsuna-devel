@@ -102,6 +102,22 @@ Object.clone = function(self)
 	return Object:load{data = data}
 end
 
+--- Checks if the object contains the given object in its inventory.<br/>
+-- The check is recursive so all the containers contained by the object
+-- are also tested. The object is also considered to contain itself.
+-- @param self Object.
+-- @param object Object.
+-- @return Container object and slot if found, nil otherwise.
+Object.contains_item = function(self, object)
+	local p = object
+	while p do
+		if p == self then return true end
+		local inv = Inventory:find{object = p}
+		if not inv then return end
+		p = inv.owner
+	end
+end
+
 --- Causes the object to take damage.
 -- @param self Object.
 -- @param amount Amount of damage.

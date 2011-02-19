@@ -32,6 +32,10 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 	-- Try to move the item.
 	local srcobj = srcinv:get_object{slot = srcslot}
 	if not srcobj then return end
+	if srcobj:contains_item(dstinv.owner) then
+		user:send{packet = Packet(packets.MESSAGE, "string", "Can't place it inside itself.")}
+		return
+	end
 	local dstobj = dstinv:get_object{slot = dstslot}
 	if not dstobj then
 		srcobj:detach()
