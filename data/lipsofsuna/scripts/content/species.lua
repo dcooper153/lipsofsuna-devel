@@ -205,7 +205,7 @@ Species{
 		{name = "strength", max = 4, val = 2},
 		{name = "willpower", max = 8, val = 3}},
 	hair_styles = {		
-		{"trogshort", "trogfemshorthair1"}},
+		{"troglong", "trogfemlonghair1"},{"trogshort", "trogfemshorthair1"}},
 	skin_styles = {
 		{""}}}
 	
