@@ -15,8 +15,8 @@ Widgets.Frame.setter = function(self, key, value)
 				self.margins = {10,17,5,17}
 				self.spacings = {0,0}
 			elseif value == "quickbar" then
-				self.spacings = {0,1}
-				self.margins = {77,0,45,0}
+				self.spacings = {0,16}
+				self.margins = {77,0,10,0}
 			elseif value == "title" then
 				self.margins = {100,100,0,10}
 			end

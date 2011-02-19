@@ -28,9 +28,8 @@ Gui.init = function(clss)
 		Network:send{packet = Packet(packets.CHAT, "string", self.text)}
 		self:clear()
 	end
-	Gui.chat_group = Widget{cols = 1}
+	Gui.chat_group = Widget{cols = 1, spacings = {0,0}}
 	Gui.chat_group:append_row(Gui.chat_history)
-	Gui.chat_group:append_row(Gui.chat_entry)
 	Gui.chat_group:set_expand{col = 1, row = 1}
 	-- Skill group.
 	Gui.skill_health = Widgets.SkillControl{compact = true}
@@ -40,13 +39,18 @@ Gui.init = function(clss)
 	skillgrp:append_row(Gui.skill_mana)
 	-- Skills group.
 	local pad = Widget()
+	local grp = Widget{cols = 2, rows = 1, spacings = {0, 0}}
 	pad:set_request{width = 64}
+	grp:set_child{col = 1, row = 1, widget = Widgets.Label{text = ">"}}
+	grp:set_child{col = 2, row = 1, widget = Gui.chat_entry}
+	grp:set_expand{col = 2}
 	Gui.fps_label = Widgets.Label{valign = 1}
-	Gui.skills_group = Widgets.Frame{rows = 1, style = "quickbar"}
-	Gui.skills_group:append_col(skillgrp)
-	Gui.skills_group:append_col(pad)
-	Gui.skills_group:append_col(Quickslots.group)
-	Gui.skills_group:append_col(Gui.fps_label)
+	Gui.skills_group = Widgets.Frame{cols = 4, rows = 2, style = "quickbar"}
+	Gui.skills_group:set_child{col = 1, row = 2, widget = skillgrp}
+	Gui.skills_group:set_child{col = 2, row = 2, widget = pad}
+	Gui.skills_group:set_child{col = 3, row = 1, widget = grp}
+	Gui.skills_group:set_child{col = 3, row = 2, widget = Quickslots.group}
+	Gui.skills_group:set_child{col = 4, row = 2, widget = Gui.fps_label}
 	Gui.skills_group:set_expand{col = 3}
 	-- Modifiers.
 	Gui.modifiers = Widgets.Modifiers()
@@ -55,12 +59,12 @@ Gui.init = function(clss)
 	Gui.top_group:append_col(Gui.chat_group)
 	Gui.top_group:append_col(Gui.modifiers)
 	Gui.top_group:set_expand{col = 1}
-	Gui.center_group = Widget{cols = 1}
+	Gui.center_group = Widget{cols = 1, spacings = {0,0}}
 	Gui.center_group:append_row(Gui.top_group)
 	Gui.center_group:append_row(Gui.menus)
 	Gui.center_group:append_row(Gui.skills_group)
 	Gui.center_group:set_expand{col = 1, row = 1}
-	Gui.scene = Widgets.Scene{rows = 1, camera = Player.camera, margins = {5,5,5,0}}
+	Gui.scene = Widgets.Scene{rows = 1, camera = Player.camera, margins = {5,5,0,0}}
 	Gui.scene:append_col(Gui.center_group)
 	Gui.scene:set_expand{col = 1, row = 1}
 	Gui.bottom = Widget{rows = 1}
