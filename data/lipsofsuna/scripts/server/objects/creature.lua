@@ -367,7 +367,7 @@ Creature.find_best_feat = function(self, args)
 				-- TODO: Take more factors into account?
 				local score = feat:calculate_damage{attacker = self, target = args.target, weapon = args.weapon}
 				if score and score > 0 then
-					score = score + 5 * math.random()
+					score = score + 100 * math.random()
 					-- Maintain the best feat.
 					if score > best_score then
 						best_feat = feat
