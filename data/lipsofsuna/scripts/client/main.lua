@@ -48,6 +48,7 @@ require "client/equipment"
 require "client/quickslots"
 require "client/gui"
 require "client/object"
+require "client/player"
 require "client/slots"
 require "client/target"
 require "client/shaders/adamantium"
@@ -60,6 +61,7 @@ require "client/shaders/fur"
 require "client/shaders/hair"
 require "client/shaders/luminous"
 require "client/shaders/normalmap"
+require "client/shaders/nolitdiff"
 require "client/shaders/particle"
 require "client/shaders/postprocess"
 require "client/shaders/skin"
@@ -77,6 +79,8 @@ require "client/views/options"
 require "client/views/quests"
 require "client/views/skills"
 require "client/views/startup"
+
+Player.crosshair = Object{model = "crosshair1"}
 
 Eventhandler{type = "quit", func = function(self, args)
 	Program.quit = true

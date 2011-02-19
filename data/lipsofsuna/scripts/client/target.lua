@@ -11,15 +11,35 @@ function Target.cancel(self)
 	self.active = false
 end
 
---- Picks an object or a tile from the scene based on the look vector of the player.
--- @param clss Target class.
--- @param args Arguments or nil.<ul>
---   <li>ignore: Dictionary of objects to ignore or nil.</li></ul>
--- @return Vector and object
-Target.pick_look = function(clss, args)
-	if not Player.object then return end
+Target.pick_look = function()
+	-- Make sure that the player is logged in.
+	if not Player.object then
+		Target.target_object = nil
+		Player.crosshair.realized = false
+		return
+	end
+	-- Ignore the crosshair, the player, and her equipment.
+	local ignore = {[Player.crosshair] = true, [Player.object] = true}
+	local slots = Slots:find{owner = Player.object}
+	if slots then
+		for k,v in pairs(slots.slots) do
+			ignore[v] = true
+		end
+	end
+	-- Ray pick an object in front of the player.
 	local r1,r2 = Player:get_picking_ray_1st()
-	return clss:pick_ray{ray1 = r1, ray2 = r2, ignore = args and args.ignore}
+	local p,o = Target:pick_ray{ray1 = r1, ray2 = r2, ignore = ignore}
+	Target.target_object = o
+	if o then
+		local s = o.name and o.name ~= "" and (" " .. o.name)
+		Gui:set_target_text("Use" .. (s or ""))
+		set = true
+	else
+		Gui:set_target_text()
+	end
+	-- Update the crosshair.
+	Player.crosshair.position = (p or r2) - (r2 - r1):normalize() * 0.1
+	Player.crosshair.realized = true
 end
 
 --- Picks an object or a tile from the scene based on a ray.
@@ -121,25 +141,9 @@ function Target.select_scene(self)
 end
 
 -- Periodically check if the're an object in front of the player.
-Timer{delay = 0.2, func = function()
+Timer{delay = 0.05, func = function()
 	if Player.object and Client.moving then
-		-- Ignore the player and the equipment.
-		local ignore = {[Player.object] = true}
-		local slots = Slots:find{owner = Player.object}
-		if slots then
-			for k,v in pairs(slots.slots) do
-				ignore[v] = true
-			end
-		end
-		-- Ray pick an object in front of the player.
-		local p,o = Target:pick_look{ignore = ignore}
-		if o then
-			local s = o.name and o.name ~= "" and (" " .. o.name)
-			Gui:set_target_text("Use" .. (s or ""))
-		else
-			Gui:set_target_text()
-		end
-		Target.target_object = o
+		Target:pick_look()
 	else
 		Target.target_object = nil
 	end
