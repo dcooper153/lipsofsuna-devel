@@ -54,7 +54,7 @@ Featanimspec{
 	animation = "punch",
 	categories = {"melee"},
 	description = "Hit with your right hand",
-	cooldown = 0.5,
+	cooldown = 1,
 	effect = "swing1",
 	effect_impact = "impact1",
 	required_weapon = "melee",
