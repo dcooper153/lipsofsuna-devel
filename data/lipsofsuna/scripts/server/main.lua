@@ -88,3 +88,5 @@ while not Program.quit do
 	end
 end
 
+-- Save at exit.
+Serialize:save()
