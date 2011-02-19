@@ -36,13 +36,12 @@ Feat.apply = function(self, args)
 		if k == "health" then
 			-- Increase or decrease health.
 			if args.target then
-				local damage = self:calculate_damage(args)
-				if damage > 0 then
+				if info.influences.health < 0 then
 					local armor = args.target.armor_class or 0
 					local mult = math.max(0.2, 1 - armor)
-					damage = damage * mult
+					info.influences.health = info.influences.health * mult
 				end
-				args.target:damaged(damage)
+				args.target:damaged(-info.influences.health)
 			end
 		elseif k == "plague" then
 			-- Summon plagued beasts.
