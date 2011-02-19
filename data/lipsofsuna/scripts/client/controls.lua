@@ -148,7 +148,7 @@ Action{name = "Use", mode = "press", key1 = Keys.SPACE, func = function()
 end}
 
 Action{name = "Zoom", mode = "analog", key1 = "mouse4", key2 = "mouse5", func = function(v)
-	Player.camera:zoom{rate = 2 * v}
+	Player.camera:zoom{rate = 1 * v}
 end}
 
 ------------------------------------------------------------------------------
