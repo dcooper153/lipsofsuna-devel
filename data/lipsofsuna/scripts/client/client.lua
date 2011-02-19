@@ -105,6 +105,11 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	local ok,i,t,s,m,n,x,y,z,rx,ry,rz,rw = event.packet:read("uint32", "string", "string", "string", "string", "float", "float", "float", "float", "float", "float", "float")
 	if not ok then return end
 	-- Create the object.
+	local spec
+	if t == "item" then spec = Itemspec:find{name = s}
+	elseif t == "obstacle" then spec = Obstaclespec:find{name = s}
+	elseif t == "species" then spec = Species:find{name = s} end
+	if spec and n == "" then n = spec.name end
 	local o = Object{id = i, model = m, name = n, position = Vector(x, y, z), spec = s, type = t}
 	if t == "species" then o.race = s end
 	-- Apply optional customizations.
