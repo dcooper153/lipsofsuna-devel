@@ -321,7 +321,7 @@ Species{
 	factions = {"evil"},
 	feat_anims = {"right hand","bite"},
 	inventory_size = 5,
-	inventory_items = {"wooden club"},
+	inventory_items = {"wooden club", "lizard scale", "lizard scale", "lizard scale"},
 	mass = 100,
 	speed_walk = 3,
 	equipment_slots = {

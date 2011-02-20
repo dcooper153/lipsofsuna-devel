@@ -108,6 +108,13 @@ Itemspec{
 	stacking = true}
 
 Itemspec{
+	name = "lizard scale",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"material"},
+	stacking = true}
+
+Itemspec{
 	name = "log",
 	model = "book-000", -- FIXME
 	mass = 1,
@@ -606,6 +613,37 @@ Itemspec{
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {skirt = "aerleatherskirt1", panties = "panties2"}},
 	equipment_slot = "lowerbody"}
+
+Itemspec{
+	name = "lizard boots",
+	model = "boots2",
+	armor_class = 0.5,
+	categories = {"armor"},
+	crafting_materials = {["lizard scale"] = 4},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {legs1 = "aerboots2"}},
+	equipment_slot = "feet"}
+
+Itemspec{
+	name = "lizard dress",
+	model = "book-000",
+	armor_class = 0.1,
+	categories = {"armor"},
+	crafting_materials = {["lizard scale"] = 6},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {dress1 = "aerdress2", panties = "panties2"}},
+	equipment_slot = "upperbody"}
+
+Itemspec{
+	name = "lizard gloves",
+	model = "gloves2",
+	armor_class = 0.5,
+	categories = {"armor"},
+	crafting_materials = {["lizard scale"] = 4},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {arms1 = "aergloves2"}},
+	equipment_slot = "hands"}
+
 Itemspec{
 	name = "leather chest",
 	model = "book-000",

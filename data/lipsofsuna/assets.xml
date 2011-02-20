@@ -87,6 +87,9 @@
     <url>http://opengameart.org/user/681</url>
   </author-info>
   <author-info>
+    <name>major4zmeakrob</name>
+  </author-info>
+  <author-info>
     <name>thecubber</name>
   </author-info>
   <author-info>
@@ -160,16 +163,6 @@
   </asset>
 
   <asset>
-    <file>import/aeritem1.blend</file>
-    <author>Ari Mustonen</author>
-    <license>Creative Commons BY-SA 3.0</license>
-    <dep>import/aer1.png</dep>
-    <dep>import/aer1n.png</dep>
-    <status>incomplete</status>
-    <type>model</type>
-  </asset>
-
-  <asset>
     <file>import/aer1.png</file>
     <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>
@@ -187,6 +180,25 @@
     <tag>character</tag>
     <tag>player</tag>
     <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/aeritem1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/aer1.png</dep>
+    <dep>import/aer1n.png</dep>
+    <status>incomplete</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/aerleather1.blend</file>
+    <author>major4zmeakrob</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.blendswap.com/3D-models/characters/aika-thompson/</source>
+    <status>incomplete</status>
+    <type>model</type>
   </asset>
 
   <asset>
