@@ -41,23 +41,23 @@ enum
 	LIWDG_MATCH_TOPRIGHT,
 };
 
-static void
-private_attach_window (LIWdgManager* self,
-                       LIWdgWidget*  widget);
+static void private_attach_window (
+	LIWdgManager* self,
+	LIWdgWidget*  widget);
 
-static void
-private_detach_window (LIWdgManager* self,
-                       LIWdgWidget*  widget);
+static void private_detach_window (
+	LIWdgManager* self,
+	LIWdgWidget*  widget);
 
-static LIWdgWidget*
-private_find_window (LIWdgManager* self,
-                     int           x,
-                     int           y,
-                     int*          match);
+static LIWdgWidget* private_find_window (
+	LIWdgManager* self,
+	int           x,
+	int           y,
+	int*          match);
 
-static void
-private_resize_window (LIWdgManager* self,
-                       LIWdgWidget*  window);
+static void private_resize_window (
+	LIWdgManager* self,
+	LIWdgWidget*  window);
 
 static int private_load_config (
 	LIWdgManager* self,
@@ -102,11 +102,10 @@ LIWdgManager* liwdg_manager_new (
 
 /**
  * \brief Freed the widget manager.
- *
  * \param self Widget manager.
  */
-void
-liwdg_manager_free (LIWdgManager* self)
+void liwdg_manager_free (
+	LIWdgManager* self)
 {
 	lisys_assert (self->dialogs.bottom == NULL);
 	lisys_assert (self->dialogs.top == NULL);
@@ -118,13 +117,12 @@ liwdg_manager_free (LIWdgManager* self)
 
 /**
  * \brief Stores allocated widgets to pointers.
- *
  * \param self Widget manager.
  * \param ... List of pointer-to-pointer and pointer pairs terminated by NULL.
  */
-int
-liwdg_manager_alloc_widgets (LIWdgManager* self,
-                                           ...)
+int liwdg_manager_alloc_widgets (
+	LIWdgManager* self,
+	              ...)
 {
 	int fail;
 	va_list args;
@@ -237,19 +235,19 @@ LIWdgWidget* liwdg_manager_find_widget_by_point (
  * \param y Screen Y coordinate.
  * \return Widget or NULL.
  */
-LIWdgWidget*
-liwdg_manager_find_window_by_point (LIWdgManager* self,
-                                    int           x,
-                                    int           y)
+LIWdgWidget* liwdg_manager_find_window_by_point (
+	LIWdgManager* self,
+	int           x,
+	int           y)
 {
 	int match;
 
 	return private_find_window (self, x, y, &match);
 }
 
-int
-liwdg_manager_insert_window (LIWdgManager* self,
-                             LIWdgWidget*  widget)
+int liwdg_manager_insert_window (
+	LIWdgManager* self,
+	LIWdgWidget*  widget)
 {
 	LIWdgSize size;
 
@@ -266,9 +264,9 @@ liwdg_manager_insert_window (LIWdgManager* self,
 	return 1;
 }
 
-int
-liwdg_manager_remove_window (LIWdgManager* self,
-                             LIWdgWidget*  widget)
+int liwdg_manager_remove_window (
+	LIWdgManager* self,
+	LIWdgWidget*  widget)
 {
 	lisys_assert (widget->floating);
 	lisys_assert (widget->prev != NULL || widget == self->dialogs.top);
@@ -316,9 +314,9 @@ void liwdg_manager_render (
 	}
 }
 
-void
-liwdg_manager_update (LIWdgManager* self,
-                      float         secs)
+void liwdg_manager_update (
+	LIWdgManager* self,
+	float         secs)
 {
 	int x;
 	int y;
@@ -361,28 +359,26 @@ liwdg_manager_update (LIWdgManager* self,
 
 /**
  * \brief Gets the projection matrix used for rendering widgets.
- *
  * \param self Widget manager.
  * \param matrix Return location for the projection matrix.
  */
-void
-liwdg_manager_get_projection (LIWdgManager* self,
-                              LIMatMatrix*  matrix)
+void liwdg_manager_get_projection (
+	LIWdgManager* self,
+	LIMatMatrix*  matrix)
 {
 	*matrix = self->projection;
 }
 
 /**
  * \brief Gets the screen size.
- *
  * \param self Widget manager.
  * \param width Return location for the width or NULL.
  * \param height Return location for the height or NULL.
  */
-void
-liwdg_manager_get_size (LIWdgManager* self,
-                        int*          width,
-                        int*          height)
+void liwdg_manager_get_size (
+	LIWdgManager* self,
+	int*          width,
+	int*          height)
 {
 	if (width != NULL)
 		*width = self->width;
@@ -392,15 +388,14 @@ liwdg_manager_get_size (LIWdgManager* self,
 
 /**
  * \brief Sets the root window size.
- *
  * \param self Widget manager.
  * \param width Width in pixels.
  * \param height Height in pixels.
  */
-void
-liwdg_manager_set_size (LIWdgManager* self,
-                        int           width,
-                        int           height)
+void liwdg_manager_set_size (
+	LIWdgManager* self,
+	int           width,
+	int           height)
 {
 	/* Update projection matrix. */
 	self->width = width;
@@ -410,9 +405,9 @@ liwdg_manager_set_size (LIWdgManager* self,
 
 /*****************************************************************************/
 
-static void
-private_attach_window (LIWdgManager* self,
-                       LIWdgWidget*  widget)
+static void private_attach_window (
+	LIWdgManager* self,
+	LIWdgWidget*  widget)
 {
 	widget->prev = NULL;
 	widget->next = self->dialogs.top;
@@ -423,9 +418,9 @@ private_attach_window (LIWdgManager* self,
 	self->dialogs.top = widget;
 }
 
-static void
-private_detach_window (LIWdgManager* self,
-                       LIWdgWidget*  widget)
+static void private_detach_window (
+	LIWdgManager* self,
+	LIWdgWidget*  widget)
 {
 	if (widget->next != NULL)
 		widget->next->prev = widget->prev;
@@ -437,11 +432,11 @@ private_detach_window (LIWdgManager* self,
 		self->dialogs.top = widget->next;
 }
 
-static LIWdgWidget*
-private_find_window (LIWdgManager* self,
-                     int           x,
-                     int           y,
-                     int*          match)
+static LIWdgWidget* private_find_window (
+	LIWdgManager* self,
+	int           x,
+	int           y,
+	int*          match)
 {
 	LIWdgRect rect;
 	LIWdgWidget* widget;
@@ -462,9 +457,9 @@ private_find_window (LIWdgManager* self,
 	return NULL;
 }
 
-static void
-private_resize_window (LIWdgManager* self,
-                       LIWdgWidget*  window)
+static void private_resize_window (
+	LIWdgManager* self,
+	LIWdgWidget*  window)
 {
 	LIWdgRect rect;
 	LIWdgSize size;
