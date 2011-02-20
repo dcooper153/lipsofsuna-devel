@@ -25,7 +25,8 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 	if type(dstslot) == "string" then
 		if not dstinv.owner.spec.equipment_slots then return end
 		if not dstinv.owner.spec.equipment_slots[dstslot] then return end
-		if srcobj.spec.equipment_slot ~= dstslot then return end
+		if not srcobj.spec.equipment_slot then return end
+		dstslot = srcobj.spec.equipment_slot
 	elseif dstslot < 1 then
 		dstslot = dstinv:get_empty_slot()
 		if not dstslot then return end
