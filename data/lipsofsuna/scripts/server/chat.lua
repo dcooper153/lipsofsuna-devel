@@ -14,6 +14,17 @@ ChatCommand.new = function(clss, args)
 	return self
 end
 
+-- Spawn.
+ChatCommand{pattern = "^/spawn item (.*)$", func = function(player, matches)
+	local spec = Itemspec:find{name = matches[1]}
+	if not spec then return end
+	Item{
+		spec = spec,
+		position = player.position,
+		random = true,
+		realized = true}
+end}
+
 -- Suicide.
 ChatCommand{pattern = "^/suicide$", func = function(player, matches)
 	player:die()
