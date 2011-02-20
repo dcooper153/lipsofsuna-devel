@@ -67,7 +67,7 @@ Widgets.Scene.reshaped = function(self)
 		self:canvas_image{
 			dest_position = {6,h-77},
 			dest_size = {74,74},
-			rotation = math.pi * (1 - 2 * x),
+			rotation = -(math.pi * (1 - 2 * x)),
 			rotation_center = Vector{44,h-40},
 			source_image = "compass1",
 			source_position = {42,2},
