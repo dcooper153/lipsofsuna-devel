@@ -13,6 +13,8 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 	if not srcinv or not srcinv:subscribed{object = user} then return end
 	local dstinv = Inventory:find{id = dstid}
 	if not dstinv or not dstinv:subscribed{object = user} then return end
+	local srcobj = srcinv:get_object{slot = srcslot}
+	if not srcobj then return end
 	-- Validate slots.
 	if type(srcslot) == "string" then
 		if not srcinv.owner.spec.equipment_slots then return end
@@ -23,6 +25,7 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 	if type(dstslot) == "string" then
 		if not dstinv.owner.spec.equipment_slots then return end
 		if not dstinv.owner.spec.equipment_slots[dstslot] then return end
+		if srcobj.spec.equipment_slot ~= dstslot then return end
 	elseif dstslot < 1 then
 		dstslot = dstinv:get_empty_slot()
 		if not dstslot then return end
@@ -30,8 +33,6 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 		return
 	end
 	-- Try to move the item.
-	local srcobj = srcinv:get_object{slot = srcslot}
-	if not srcobj then return end
 	if srcobj:contains_item(dstinv.owner) then
 		user:send{packet = Packet(packets.MESSAGE, "string", "Can't place it inside itself.")}
 		return
