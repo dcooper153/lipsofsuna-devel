@@ -52,7 +52,7 @@ Feat.apply = function(self, args)
 						-1 + 2 * math.random(),
 						-1 + 2 * math.random(),
 						-1 + 2 * math.random())
-					local o = Creature{spec = s, position = p, realized = true}
+					local o = Creature{spec = s, position = p, random = true, realized = true}
 					o:inflict_modifier("plague", 10000)
 				end
 			end

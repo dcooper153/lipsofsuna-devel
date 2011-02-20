@@ -101,6 +101,7 @@ Voxel.place_creature = function(clss, args)
 	Creature{
 		spec = spec,
 		position = args.point * Config.tilewidth,
+		random = true,
 		realized = true}
 end
 
@@ -182,6 +183,7 @@ Voxel.place_pattern = function(clss, args)
 			Item{
 				spec = spec,
 				position = point * Config.tilewidth,
+				random = true,
 				realized = true}
 		end
 	end
@@ -193,6 +195,7 @@ Voxel.place_pattern = function(clss, args)
 			Creature{
 				spec = spec,
 				position = point * Config.tilewidth,
+				random = true,
 				realized = true}
 		end
 	end

@@ -25,7 +25,7 @@ ChatCommand{pattern = "^/spawn item (.*)$", func = function(player, matches)
 		realized = true}
 end}
 
--- Spawn species.
+-- Spawn obstacles.
 ChatCommand{pattern = "^/spawn obstacle (.*)$", func = function(player, matches)
 	local spec = Obstaclespec:find{name = matches[1]}
 	if not spec then return end
@@ -42,6 +42,7 @@ ChatCommand{pattern = "^/spawn species (.*)$", func = function(player, matches)
 	Creature{
 		spec = spec,
 		position = player.position,
+		random = true,
 		realized = true}
 end}
 

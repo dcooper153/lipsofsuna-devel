@@ -59,11 +59,16 @@ Creature.setter = function(self, key, value)
 				regen = Config.skillregen}
 		end
 		-- Create inventory.
+		-- When the map generator or an admin command creates an object, the
+		-- random field is set to indicate that items should be generated.
+		-- The field isn't saved so items are only created once as expected.
 		self.inventory = self.inventory or Inventory{owner = self, size = spec.inventory_size} -- FIXME: Resizing not supported.
-		for k,v in pairs(spec.inventory_items) do
-			self:add_item{object = Item{spec = Itemspec:find{name = v}}}
+		if self.random then
+			for k,v in pairs(spec.inventory_items) do
+				self:add_item{object = Item{spec = Itemspec:find{name = v}}}
+			end
+			self:equip_best_items()
 		end
-		self:equip_best_items()
 		-- Create map marker.
 		if spec.marker then
 			self.marker = Marker{name = spec.marker, position = self.position, target = self.id}
@@ -111,6 +116,7 @@ Creature.new = function(clss, args)
 	copy("name")
 	copy("nose_style")
 	copy("physics", "kinematic")
+	copy("random")
 	copy("rotation")
 	copy("position")
 	copy("skin_style")

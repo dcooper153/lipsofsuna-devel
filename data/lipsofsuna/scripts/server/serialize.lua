@@ -23,13 +23,10 @@ end
 Serialize.encode_inventory = function(clss, inv)
 	if not inv then return "" end
 	local str = ""
-	for i=1,inv.size do
-		local obj = inv:get_object{slot = i}
-		if obj then
-			obj:save()
-			str = str .. "self.inventory:set_object{slot=" .. serialize_value(i) ..
-				",object=Object:load{id=" .. serialize_value(obj.id) ..  "}}\n"
-		end
+	for slot,obj in pairs(inv.slots) do
+		obj:save()
+		str = str .. "self.inventory:set_object{slot=" .. serialize_value(slot) ..
+			",object=Object:load{id=" .. serialize_value(obj.id) ..  "}}\n"
 	end
 	return str
 end
@@ -42,15 +39,9 @@ Serialize.encode_skills = function(clss, skills)
 	if not skills then return "" end
 	local str = "self.skills.enabled=" .. serialize_value(skills.enabled) .. "\n"
 	for k,v in pairs(skills:get_names()) do
-		local max = skills:get_maximum{skill = v}
 		local val = skills:get_value{skill = v}
-		local regn = skills:get_regen{skill = v}
-		local prot = skills:get_protect{skill = v}
-		str = str .. "self.skills:register{prot=" .. serialize_value(prot) ..
-			",skill=" .. serialize_value(v) ..
-			",value=" .. serialize_value(val) ..
-			",maximum=" .. serialize_value(max) ..
-			",regen=" .. serialize_value(regn) .. "}\n"
+		str = str .. "self.skills:set_value{skill=" .. serialize_value(v) ..
+			",value=" .. serialize_value(val) .. "}\n"
 	end
 	return str
 end

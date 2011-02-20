@@ -30,6 +30,7 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		nose_scale = no,
 		physics = "static",
 		position = Config.spawn,
+		random = true,
 		realized = true,
 		skin_style = {skin, skinr, sking, skinb},
 		spec = spec}

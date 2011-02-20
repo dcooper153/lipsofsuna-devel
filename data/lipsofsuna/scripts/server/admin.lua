@@ -82,6 +82,7 @@ Protocol:add_handler{type = "ADMIN_SPAWN", func = function(args)
 			Creature{
 				spec = spec,
 				position = player.position,
+				random = true,
 				realized = true}
 		elseif msg then
 			local object = Object{
