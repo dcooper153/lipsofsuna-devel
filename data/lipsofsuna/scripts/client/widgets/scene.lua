@@ -63,21 +63,19 @@ Widgets.Scene.reshaped = function(self)
 	local h = self.height
 	self:canvas_clear()
 	if self.compass then
-		local x = (self.compass + 1) % 1
 		self:canvas_image{
 			dest_position = {6,h-77},
 			dest_size = {74,74},
-			rotation = -(math.pi * (1 - 2 * x)),
+			rotation = self.compass,
 			rotation_center = Vector{44,h-40},
 			source_image = "compass1",
 			source_position = {42,2},
 			source_tiling = {0,74,0,0,74,0}}
 		if self.compass_quest then
-			x = (self.compass_quest - x + 2) % 1
 			self:canvas_image{
 				dest_position = {38,h-77},
 				dest_size = {12,50},
-				rotation = math.pi * (1 + 2 * x),
+				rotation = self.compass_quest + self.compass + math.pi,
 				rotation_center = Vector{44,h-40},
 				source_image = "compass1",
 				source_position = {0,0},

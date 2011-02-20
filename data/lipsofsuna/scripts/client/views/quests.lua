@@ -19,16 +19,21 @@ Views.Quests.back = function(self)
 	Gui:set_mode("menu")
 end
 
---- Gets the compass direction for the currently shown quest.
+--- Gets the compass direction for the currently shown quest.<br/>
+-- The returned direction is in radians. The coordinate convention is:<ul>
+--  <li>north: 0*pi rad</li>
+--  <li>east: 0.5*pi rad</li>
+--  <li>south: 1*pi rad</li>
+--  <li>west: 1.5*pi rad</li></ul>
 -- @param self Quest class.
--- @return Compass direction or nil.
+-- @return Compass direction in radians, or nil.
 Views.Quests.get_compass_direction = function(self)
 	if self.shown_quest then
 		local quest = Quest:find{name = self.shown_quest}
 		if not quest or not quest.marker then return end
 		if not Player.object then return end
 		local diff = quest.marker - Player.object.position
-		return 1 - (math.atan2(diff.z, -diff.x) / (2 * math.pi) - 0.25)
+		return 0.5 * math.pi + math.atan2(diff.z, -diff.x)
 	end
 end
 

@@ -131,7 +131,7 @@ Player.update_rotation = function(clss, secs)
 		clss:send_rotation()
 	end
 	-- Update compass rotation.
-	Gui.scene.compass = -clss.rotation_curr.euler[1] / (2 * math.pi)
+	Gui.scene.compass = math.pi - clss.rotation_curr.euler[1]
 	Gui.scene.compass_quest = Views.Quests.inst:get_compass_direction()
 end
 
