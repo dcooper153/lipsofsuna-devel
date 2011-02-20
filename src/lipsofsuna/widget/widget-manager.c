@@ -323,7 +323,6 @@ void liwdg_manager_update (
 	int cx;
 	int cy;
 	int buttons;
-	LIWdgEvent event;
 	LIWdgWidget* widget;
 
 	if (self->widgets.grab != NULL)
@@ -336,18 +335,6 @@ void liwdg_manager_update (
 			SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
 			SDL_WarpMouse (cx, cy);
 			SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
-		}
-
-		/* Cursor delta events. */
-		if (x != cx || y != cy)
-		{
-			event.type = LIWDG_EVENT_TYPE_MOTION;
-			event.motion.x = cx;
-			event.motion.y = cy;
-			event.motion.dx = x - cx;
-			event.motion.dy = y - cy;
-			event.motion.buttons = buttons;
-			liwdg_widget_event (self->widgets.grab, &event);
 		}
 	}
 	for (widget = self->dialogs.top ; widget != NULL ; widget = self->widgets.iter)

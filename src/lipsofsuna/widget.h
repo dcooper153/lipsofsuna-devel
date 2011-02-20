@@ -20,7 +20,6 @@
 
 #include "widget/widget.h"
 #include "widget/widget-element.h"
-#include "widget/widget-event.h"
 #include "widget/widget-manager.h"
 #include "widget/widget-styles.h"
 #include "widget/widget-types.h"

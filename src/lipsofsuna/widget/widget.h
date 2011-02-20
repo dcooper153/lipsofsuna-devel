@@ -21,7 +21,6 @@
 #include <lipsofsuna/system.h>
 #include <lipsofsuna/script.h>
 #include <lipsofsuna/video.h>
-#include "widget-event.h"
 #include "widget-manager.h"
 #include "widget-types.h"
 
@@ -131,10 +130,6 @@ LIAPICALL (void, liwdg_widget_detach_child, (
 
 LIAPICALL (void, liwdg_widget_draw, (
 	LIWdgWidget* self));
-
-LIAPICALL (int, liwdg_widget_event, (
-	LIWdgWidget* self,
-	LIWdgEvent*  event));
 
 LIAPICALL (void, liwdg_widget_foreach_child, (
 	LIWdgWidget* self,

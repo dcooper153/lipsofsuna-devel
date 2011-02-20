@@ -438,56 +438,6 @@ void liwdg_widget_draw (
 }
 
 /**
- * \brief Handles an event.
- *
- * \param self Widget.
- * \param event Event.
- * \return Nonzero if passed through unhandled, zero if absorbed by the widget.
- */
-int liwdg_widget_event (
-	LIWdgWidget* self,
-	LIWdgEvent*  event)
-{
-	int x = -1;
-	int y = -1;
-	LIWdgWidget* child;
-
-	/* Get cursor position for mouse events. */
-	switch (event->type)
-	{
-		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
-		case LIWDG_EVENT_TYPE_BUTTON_RELEASE:
-			x = event->button.x;
-			y = event->button.y;
-			break;
-		case LIWDG_EVENT_TYPE_MOTION:
-			x = event->motion.x;
-			y = event->motion.y;
-			break;
-	}
-
-	/* Propagate the event to a child. */
-	if (x != -1 && liwdg_widget_get_visible (self))
-	{
-		child = liwdg_widget_child_at (self, x, y);
-		if (child != NULL)
-		{
-			if (!liwdg_widget_event (child, event))
-				return 0;
-		}
-	}
-
-	/* Handle the event on our own. */
-	switch (event->type)
-	{
-		case LIWDG_EVENT_TYPE_BUTTON_PRESS:
-			return lical_callbacks_call (self->manager->callbacks, self, "pressed", lical_marshal_DATA_PTR, self);
-	}
-
-	return 1;
-}
-
-/**
  * \brief Calls the passed function for each child.
  * \param self Container.
  * \param call Function to call.
