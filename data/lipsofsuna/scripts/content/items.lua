@@ -642,7 +642,7 @@ Itemspec{
 	crafting_materials = {["lizard scale"] = 4},
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {arms1 = "aergloves2"}},
-	equipment_slot = "hands"}
+	equipment_slot = "arms"}
 
 Itemspec{
 	name = "leather chest",
