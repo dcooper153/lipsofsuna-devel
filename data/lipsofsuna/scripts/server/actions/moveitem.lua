@@ -8,11 +8,11 @@
 -- @return True on success.
 Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstslot)
 	-- Find inventories.
-	if srcinv == dstinv and srcslot == dstslot then return end
 	local srcinv = Inventory:find{id = srcid}
 	if not srcinv or not srcinv:subscribed{object = user} then return end
 	local dstinv = Inventory:find{id = dstid}
 	if not dstinv or not dstinv:subscribed{object = user} then return end
+	if srcinv == dstinv and srcslot == dstslot then return end
 	local srcobj = srcinv:get_object{slot = srcslot}
 	if not srcobj then return end
 	-- Validate slots.
