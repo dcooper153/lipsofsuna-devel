@@ -697,7 +697,7 @@ Itemspec{
 
 Itemspec{
 	name = "workbench",
-	model = "chest1",
+	model = "workbench1",
 	mass = 15,
 	animation_looted = "open",
 	animation_looting = "opening",
