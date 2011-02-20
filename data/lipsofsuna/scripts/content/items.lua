@@ -618,8 +618,16 @@ Itemspec{
 	icon = "cloth1"}
 
 Itemspec{
-	name = "wooden shield",
+	name = "generic shield",
 	model = "shield-000",
+	armor_class = 0.08,
+	categories = {"shield"},
+	crafting_materials = {["log"] = 1},
+	equipment_slot = "hand.L"}
+
+Itemspec{
+	name = "wooden shield",
+	model = "shield-001-wood1",
 	armor_class = 0.08,
 	categories = {"shield"},
 	crafting_materials = {["log"] = 1},
