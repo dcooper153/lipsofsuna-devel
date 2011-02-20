@@ -384,6 +384,51 @@ Object.update_model = function(self)
 	end
 end
 
+--- Plays footstep sounds for creatures.
+-- @param self Object.
+-- @param secs Seconds since the last update.
+Object.update_sound = function(self, secs)
+	-- Check for an applicable species.
+	local spec = self.spec
+	if not spec or not spec.footstep_sound then return end
+	-- Check for an applicable animation.
+	local anim = self:get_animation{channel = 1}
+	if not anim then return end
+	if anim.animation == "dead" or anim.animation == "idle" then return end
+	-- Find the foot anchors.
+	-- These are needed for foot position tracking so that we know when and
+	-- where to play the positional sound.
+	local lnode = self:find_node{name = "#foot.L", space = "world"}
+	if not lnode then return end
+	local rnode = self:find_node{name = "#foot.R", space = "world"}
+	if not rnode then return end
+	-- Ground check.
+	-- We don't want to play footsteps if the character is flying.
+	if not Physics:cast_ray{src = lnode, dst = lnode - Vector(0,spec.footstep_height)} and
+	   not Physics:cast_ray{src = rnode, dst = rnode - Vector(0,spec.footstep_height)} then
+		self.lfoot_prev = nil
+		self.rfoot_prev = nil
+		return
+	end
+	-- Left foot.
+	-- We play the sound when the node crosses from the local positive Z axis
+	-- to the negative. Using the Y distance to the ground is too error prone
+	-- so this approximation is the best approach I have found so far.
+	self.lfoot_prev = self.lfoot_curr
+	self.lfoot_curr = self:find_node{name = "#foot.L"}
+	if self.lfoot_prev and self.lfoot_curr.z < 0 and self.lfoot_prev.z >= 0 then
+		Effect:play_world(spec.footstep_sound, lnode)
+	end
+	-- Right foot.
+	-- Works the same way with the left foot.
+	self.rfoot_prev = self.rfoot_curr
+	self.rfoot_curr = self:find_node{name = "#foot.R"}
+	if self.rfoot_prev and self.rfoot_curr.z < 0 and self.rfoot_prev.z >= 0 then
+		Effect:play_world(spec.footstep_sound, rnode)
+	end
+	return true
+end
+
 --- Updates the rotation and tilt of the object.
 -- @param self Object.
 -- @param quat Rotation quaternion.

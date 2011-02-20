@@ -46,6 +46,8 @@ Species.dict_name = {}
 --   <li>falling_damage_speed: Speed in meters per seconds after which the creature starts taking falling damage.</li>
 --   <li>feat_animations: List of know feat types.</li>
 --   <li>feat_effects: List of know feat effects.</li>
+--   <li>footstep_height: Footstep height.</li>
+--   <li>footstep_sound: Name of the footstep sound effect.</li>
 --   <li>gravity: Gravity vector.</li>
 --   <li>interactive: False to make the object not appear interactive.</li>
 --   <li>inventory_items: List of inventory items to give when the creature is spawned.</li>
@@ -241,6 +243,8 @@ Species.new = function(clss, args)
 	copy("effect_physical_damage")
 	copy("falling_damage_rate", 10)
 	copy("falling_damage_speed", 10)
+	copy("footstep_height")
+	copy("footstep_sound")
 	copy("gravity", Vector(0,-15,0))
 	copy("interactive", true)
 	copy("inventory_size", 0)

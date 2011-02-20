@@ -139,6 +139,11 @@ Effect{
 	sound = "selfdestructcountdown1"}
 
 Effect{
+	name = "step1",
+	sound = "step1",
+	sound_volume = 0.7}
+
+Effect{
 	name = "swing1",
 	sound = "swing-000"}
 

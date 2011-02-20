@@ -2855,6 +2855,20 @@
   </asset>
 
   <asset>
+    <file>sounds/step1.ogg</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>sounds/step2.ogg</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <type>sound effect</type>
+  </asset>
+
+  <asset>
     <file>sounds/swing-001.flac</file>
     <author>Independent.nu</author>
     <license>CC0</license>

@@ -154,6 +154,7 @@ Eventhandler{type = "tick", func = function(self, args)
 			for k,v in pairs(Object.objects) do
 				if v.animated then
 					v:update_animations{secs = animt}
+					v:update_sound(animt)
 					v:deform_mesh()
 				end
 			end

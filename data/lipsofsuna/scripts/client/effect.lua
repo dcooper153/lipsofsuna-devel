@@ -21,6 +21,7 @@ Effect.play_object = function(clss, name, object, node)
 		sound_delay = effect.sound_delay,
 		sound_pitch = effect.sound_pitch,
 		sound_positional = effect.sound_positional,
+		sound_volume = effect.sound_volume,
 		realized = true}
 	-- Quake the camera.
 	Client:apply_quake(object.position, effect.quake)
@@ -38,6 +39,7 @@ Effect.play_world = function(clss, name, position)
 		sound_delay = effect.sound_delay,
 		sound_pitch = effect.sound_pitch,
 		sound_positional = effect.sound_positional,
+		sound_volume = effect.sound_volume,
 		realized = true}
 	-- Quake the camera.
 	Client:apply_quake(Vector(x,y,z), effect.quake)

@@ -85,6 +85,8 @@ Species{
 	factions = {"good"},
 	feat_anims = {"build", "right hand", "ranged", "ranged spell", "spell on self", "spell on touch", "throw"},
 	feat_effects = {"home","follow","berserk", "black haze", "dig", "fire damage", "firewall", "light", "mindless march", "magic missile", "physical damage", "restore health", "sanctuary", "travel", "wilderness"},
+	footstep_height = 0.3,
+	footstep_sound = "step1",
 	inventory_size = 20,
 	skill_quota = 200,
 	speed_walk = 2,
