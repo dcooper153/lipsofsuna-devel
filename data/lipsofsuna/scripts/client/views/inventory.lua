@@ -66,7 +66,7 @@ Views.Inventory.close = function(self)
 	-- Close containers.
 	for i = 1,self.containers.cols do
 		local w = self.containers:get_child{col = i, row = 3}
-		w:close()
+		if w then w:close() end
 	end
 end
 
