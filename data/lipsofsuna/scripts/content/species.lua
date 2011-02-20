@@ -217,39 +217,31 @@ Species{
 	name = "aer-player",
 	base = "aer",
 	ai_enabled = false,
-	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
 
 Species{
 	name = "android-player",
 	base = "android",
 	ai_enabled = false,
-	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
 
 Species{
 	name = "devora-player",
 	base = "devora",
 	ai_enabled = false,
-	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
 
 Species{
 	name = "kraken-player",
 	base = "kraken",
 	ai_enabled = false,
-	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
 
 Species{
 	name = "wyrm-player",
 	base = "wyrm",
 	ai_enabled = false,
-	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
-
-
-Species{
-	name = "companion",
-	base = Species.base_aer,
-	dialog = "companion",
-	hair_style = {"hair1",255,255,255},
-	inventory_items = {"saw", "torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
 
 ------------------------------------------------------------------------------
 -- Friendly creatures.
