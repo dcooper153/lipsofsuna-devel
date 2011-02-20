@@ -202,6 +202,7 @@ class LICollision:
 					bmax[1] = b[1]
 				if bmax[2] < b[2]:
 					bmax[2] = b[2]
+			center = 0.5 * (bmax + bmin)
 			# Save the old selection.
 			selection = []
 			for obj in bpy.data.objects:
@@ -218,13 +219,13 @@ class LICollision:
 			modifier = icohull.modifiers.new('shrinkwrap', 'SHRINKWRAP')
 			modifier.target = object
 			# Apply the shrinkwrap modifier.
+			translation = mathutils.Matrix.Translation((center.x, center.y, center.z))
+			icohull.matrix_local = object.matrix_local * translation
 			oldmesh = icohull.data
 			icohull.data = icohull.create_mesh(bpy.context.scene, True, 'PREVIEW')
 			bpy.data.meshes.remove(oldmesh)
 			# Fix the coordinate system.
-			center = 0.5 * (bmax + bmin)
-			translation = mathutils.Matrix.Translation((center.x, center.y, center.z))
-			icohull.matrix_local = LIFormat.matrix * translation * icohull.matrix_local
+			icohull.matrix_local = LIFormat.matrix * icohull.matrix_local
 			bpy.ops.object.rotation_apply()
 			# Collect the resulting vertices.
 			shape = LIShape('default')
