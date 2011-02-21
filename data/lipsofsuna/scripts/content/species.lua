@@ -314,6 +314,15 @@ Species{
 		{name = "health", max = 100, val = 100}}}
 
 Species{
+	name = "feral devora",
+	base = "devora",
+	categories = {"enemy"},
+	factions = {"evil"},
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"dress"}}
+
+Species{
 	name = "lizardman",
 	model = "lizardman2",
 	ai_distance_hint = 1.0,
