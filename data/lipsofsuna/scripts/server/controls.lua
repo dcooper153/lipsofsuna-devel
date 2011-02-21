@@ -28,17 +28,12 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		hair_style = {hair, hairr, hairg, hairb},
 		name = (na ~= "" and na or "Player"),
 		nose_scale = no,
-		physics = "static",
-		position = Config.spawn,
 		random = true,
 		realized = true,
 		skin_style = {skin, skinr, sking, skinb},
 		spec = spec}
 	Player.clients[args.client] = o
-	Timer{delay = 1, func = function(self)
-		o.physics = "kinematic"
-		self:disable()
-	end}
+	o:teleport{position = Config.spawn}
 	-- Set skills.
 	local names = {"dexterity", "health", "intelligence", "perception", "strength", "willpower"}
 	local values = {s1, s2, s3, s4, s5, s6}

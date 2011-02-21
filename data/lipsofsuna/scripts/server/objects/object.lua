@@ -452,19 +452,27 @@ end
 --   <li>position: World position.</li></ul>
 -- @return True on success.
 Object.teleport = function(self, args)
+	-- Set the position.
 	if args.marker then
-		-- Teleport to a map marker.
 		local marker = Marker:find{name = args.marker}
-		if marker and marker.position then
-			self.position = marker.position + Vector(0, 2, 0)
-			return true
-		end
-	end
-	if args.position then
-		-- Teleport to a world position.
+		if not marker or not marker.position then return end
+		self.position = marker.position + Vector(0, 2, 0)
+	elseif args.position then
 		self.position = args.position
-		return true
-	end
+	else return end
+	-- Freeze until terrain has been loaded.
+	-- When teleporting to an unloaded sector, it'll take some time until
+	-- the terrain has been loaded. Until then, the sector is empty and the
+	-- object would fall inside ground. This is avoided by freezing the
+	-- object for a short period of time.
+	local mode = self.physics
+	self.physics = "static"
+	self.realized = true
+	Timer{delay = 4, func = function(timer)
+		self.physics = mode
+		timer:disable()
+	end}
+	return true
 end
 
 --- Called when the object is used.
