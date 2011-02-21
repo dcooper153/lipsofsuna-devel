@@ -30,13 +30,8 @@ Widgets.Container.new = function(clss, args)
 		end
 	end
 	if slots then
-		self.equipment = Widgets.Equipment{spec = spec, pressed = function(widget, slot)
-			if Target.active then
-				Target:select_equipment(slot)
-			else
-				Drag:clicked_equipment(self.id, slot)
-			end
-		end}
+		self.equipment = Widgets.Equipment{spec = spec, pressed = function(widget, args, slot)
+			self:activated(args, slot) end}
 		self:append_row(self.equipment)
 	end
 	-- Crafting list.
@@ -46,7 +41,7 @@ Widgets.Container.new = function(clss, args)
 		self:append_row(self.crafting)
 	end
 	-- Item list.
-	self.item_list = Widgets.ItemList{size = args.size, activated = function(w, r) self:activated(r) end}
+	self.item_list = Widgets.ItemList{size = args.size, activated = function(w, r, a) self:activated(a, r) end}
 	self.group = Widgets.Frame{cols = 1, rows = 3}
 	self.group:set_expand{col = 1, row = 1}
 	self.group:set_child{col = 1, row = 1, widget = self.item_list}
@@ -61,12 +56,15 @@ end
 
 --- Called when a slot was pressed.
 -- @param self Container widget.
+-- @param args Event arguments.
 -- @param slot Slot pressed.
-Widgets.Container.activated = function(self, slot)
+Widgets.Container.activated = function(self, args, slot)
 	if Target.active then
 		Target:select_container(self.id, slot)
-	else
+	elseif args and args.button == 1 then
 		Drag:clicked_container(self.id, slot)
+	elseif args and args.button == 3 then
+		Commands:use(self.id, slot)
 	end
 end
 

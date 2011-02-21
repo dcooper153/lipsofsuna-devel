@@ -232,13 +232,35 @@ end
 -- @param self Object.
 -- @param user User.
 Item.use_cb = function(self, user)
+	-- Actions that take preference over picking up.
+	-- Containers are looted instead of being picked up since the player
+	-- usually doesn't want to pick up heavy chests. Books are read since
+	-- they aren't horribly useful after being read once.
 	if self.spec.categories["container"] then
 		self:loot(user)
+		return
 	elseif self.spec.categories["book"] then
 		user:send{packet = Packet(packets.BOOK,
 			"string", self.spec.name,
 			"string", self.spec.book_text)}
-	elseif self.spec.categories["potion"] then
+		return
+	end
+	-- Pick up items not yet in the inventory of the user.
+	-- This has the side-effect of not allowing items to be used before
+	-- taken out of containers.
+	local inv = Inventory:find{object = self}
+	if not inv then
+		Action:move_from_world_to_inv(self, user.id, self.id)
+		return
+	end
+	local _,slot = inv:find_object{object = self}
+	if inv.owner ~= user then
+		Actions:move_from_inv_to_inv(user, inv.owner.id, slot, user.id, 0)
+		return
+	end
+	-- Perform a type specific action.
+	-- These are actions that can only be performed to inventory items.
+	if self.spec.categories["potion"] then
 		local types =
 		{
 			["lesser health potion"] = { skill = "health", value = 10 },
@@ -257,6 +279,16 @@ Item.use_cb = function(self, user)
 		skills:set_value{skill = type.skill, value = value + type.value}
 		Effect:play{effect = "impact1", object = user}
 		self:subtract{count = 1}
+	elseif self.spec.equipment_slot then
+		if type(slot) == "string" then
+			-- Unequip items in equipment slots.
+			local dstslot = user.inventory:get_empty_slot()
+			if not dstslot then return end
+			Actions:move_from_inv_to_inv(user, inv.owner.id, slot, user.id, dstslot)
+		else
+			-- Equip items in inventory slots.
+			Actions:move_from_inv_to_inv(user, inv.owner.id, slot, user.id, self.spec.equipment_slot)
+		end
 	end
 end
 

@@ -49,13 +49,22 @@ end
 -- @param self Inventory.
 -- @param args Arguments.<ul>
 --   <li>name: Item name to match.</li>
+--   <li>object: Object to match.</li>
 --   <li>type: Item category name to match.</li></ul>
 -- @return Object and slot name or number, or nil if not found.
 Inventory.find_object = function(self, args)
-	for k,v in pairs(self.slots) do
-		if (not args.name or (v.name and v.name == args.name)) and
-		   (not args.type or (v.spec.categories[args.type])) then
-			return v, k
+	if args.object then
+		-- Search by object
+		for k,v in pairs(self.slots) do
+			if v == args.object then return v, k end
+		end
+	else
+		-- Search by name and type.
+		for k,v in pairs(self.slots) do
+			if (not args.name or (v.name and v.name == args.name)) and
+			   (not args.type or (v.spec.categories[args.type])) then
+				return v, k
+			end
 		end
 	end
 end

@@ -276,13 +276,21 @@ end}
 Protocol:add_handler{type = "USE", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
-	if not player.dead then
-		local ok,inv,slot = args.packet:read("uint32", "uint32")
-		if ok then
-			local object = player:find_target(inv, slot)
-			if object and object.use_cb then
-				object:use_cb(player)
-			end
-		end
+	if player.dead then return end
+	-- Read the source type.
+	local ok,inv,type = args.packet:read("uint32", "uint8")
+	if not ok then return end
+	-- Read the source slot.
+	local slot
+	if type == 0 then
+		ok,slot = args.packet:resume("uint32")
+	else
+		ok,slot = args.packet:resume("string")
+	end
+	if not ok then return end
+	-- Use the object.
+	local object = player:find_target(inv, slot)
+	if object and object.use_cb then
+		object:use_cb(player)
 	end
 end}
