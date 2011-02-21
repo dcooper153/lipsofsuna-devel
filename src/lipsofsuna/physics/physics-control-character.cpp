@@ -182,7 +182,7 @@ static void private_calculate_control (
 	   to hack the velocity too much or else the character will be able to push
 	   heavy objects effortlessly. */
 	speed_factor = limat_smoothstep (current_speed, 0.0f, 7.0f);
-	speed_factor = limat_mix (0.5f, 0.1f, speed_factor);
+	speed_factor = limat_mix (0.5f, 0.3f, speed_factor);
 	if ((target_speed > 0.0f && current_speed < speed_factor * target_speed) ||
 	    (target_speed < 0.0f && current_speed > speed_factor * target_speed))
 		*velocity_result = *direction * target_speed * speed_factor;
