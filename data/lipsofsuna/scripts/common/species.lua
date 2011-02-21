@@ -24,6 +24,9 @@ Species.dict_name = {}
 --   <li>aim_ray_center: Center vector of the aim ray.</li>
 --   <li>aim_ray_end: Aim ray end distance.</li>
 --   <li>aim_ray_start: Aim ray start distance.</li>
+--   <li>blocking_armor: How much armor class blocking offsers.</li>
+--   <li>blocking_cooldown: Time in seconds how long it takes to leave the blocking stance.</li>
+--   <li>blocking_delay: Time in seconds how long it takes to enter the blocking stance.</li>
 --   <li>equipment_slots: List of equipment slots.</li>
 --   <li>factions: List of factions.</li>
 --   <li>feat_animations: List of know feat types.</li>
@@ -122,6 +125,9 @@ Species.new = function(clss, args)
 	copy("aim_ray_center", Vector(0, 1, 0))
 	copy("aim_ray_end", 5)
 	copy("aim_ray_start", 0.1)
+	copy("blocking_armor", 0.5)
+	copy("blocking_cooldown", 0.4)
+	copy("blocking_delay", 0.4)
 	copy("gravity", Vector(0, -15, 0))
 	copy("inventory_items", {})
 	copy("inventory_size", 0)

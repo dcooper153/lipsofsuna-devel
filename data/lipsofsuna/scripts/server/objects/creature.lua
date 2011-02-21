@@ -172,7 +172,7 @@ Creature.calculate_animation = function(self)
 	if back then anim = "walk-back"
 	elseif front and right then anim = "run-right"
 	elseif front and left then anim = "run-left"
-	elseif front and run then anim = "run"
+	elseif front and run and not self.blocking then anim = "run"
 	elseif front then anim = "walk"
 	elseif left then anim = "strafe-left"
 	elseif right then anim = "strafe-right"
@@ -202,7 +202,7 @@ end
 -- @param self Object.
 Creature.calculate_speed = function(self)
 	-- Base speed.
-	local s = self.running and self.spec.speed_run or self.spec.speed_walk
+	local s = (self.running and not self.blocking) and self.spec.speed_run or self.spec.speed_walk
 	-- Skill bonuses.
 	local str = self.skills:get_value{skill = "strength"} or 0
 	local agi = self.skills:get_value{skill = "agility"} or 0
@@ -386,7 +386,7 @@ Creature.find_best_feat = function(self, args)
 			if feat:usable{user = self} then
 				-- Calculate feat score.
 				-- TODO: Take more factors into account?
-				local score = feat:calculate_damage{attacker = self, target = args.target, weapon = args.weapon}
+				local score = -feat:calculate_health_influence{attacker = self, target = args.target, weapon = args.weapon}
 				if score and score > 0 then
 					score = score + 100 * math.random()
 					-- Maintain the best feat.
@@ -493,6 +493,23 @@ Creature.scan_enemies = function(self)
 	end
 end
 
+--- Enables or disables the blocking stance.
+-- @param self Creature.
+-- @param value True to block.
+Creature.set_block = function(self, value)
+	if value and self.blocking then return end
+	if not value and not self.blocking then return end
+	if value then
+		self.blocking = Program.time
+		self:animate{animation = "block", channel = Animation.CHANNEL_BLOCK, weight = 10, permanent = true}
+	else
+		self.blocking = nil
+		self:animate{channel = Animation.CHANNEL_BLOCK}
+	end
+	self:calculate_speed()
+	self:calculate_animation()
+end
+
 --- Sets the forward/backward movement state of the creature.
 -- @param self Object.
 -- @param value Movement rate.
@@ -584,6 +601,7 @@ Creature.update = function(self, secs)
 		return
 	end
 	-- Update feat cooldown.
+	if self.blocking then self.cooldown = self.spec.blocking_cooldown end
 	if self.cooldown then
 		self.cooldown = self.cooldown - secs
 		if self.cooldown <= 0 then

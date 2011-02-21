@@ -29,18 +29,21 @@ Feat.apply = function(self, args)
 			args.target:impulse{impulse = args.attacker.rotation * Vector(0, 0, -100)}
 		end
 	end
+	-- Cooldown.
+	-- The base cooldown has already been applied but we add some extra
+	-- if the target was blocking in order to penalize rampant swinging.
+	if anim.categories["melee"] and args.attacker and args.target and args.target.blocking then
+		if Program.time - args.target.blocking > args.target.spec.blocking_delay then
+			args.attacker.cooldown = args.attacker.cooldown * 2
+		end
+	end
 	-- Influences.
 	local info = self:get_info()
-	info.influences.health = -self:calculate_damage(args)
+	info.influences.health = self:calculate_health_influence(args)
 	for k,v in pairs(info.influences) do
 		if k == "health" then
 			-- Increase or decrease health.
 			if args.target then
-				if info.influences.health < 0 then
-					local armor = args.target.armor_class or 0
-					local mult = math.max(0.2, 1 - armor)
-					info.influences.health = info.influences.health * mult
-				end
 				args.target:damaged(-info.influences.health)
 				-- Anger hurt creatures.
 				if info.influences.health < 0 then
@@ -95,7 +98,7 @@ Feat.apply = function(self, args)
 	end
 end
 
---- Calculates the damage of the feat.
+--- Calculates how much the feat will change the health of the target.
 -- @param self Feat.
 -- @param args Arguments.<ul>
 --   <li>attacker: Attacking creature.</li>
@@ -103,18 +106,19 @@ end
 --   <li>projectile: Fired object or nil.</li>
 --   <li>target: Attacked creature or nil.</li>
 --   <li>weapon: Used weapon or nil.</li></ul>
--- @return Damage.
-Feat.calculate_damage = function(self, args)
-	-- Base damage.
-	-- The base damage depends on the feat and the type of weapon and ammunition used.
+-- @return Health influence.
+Feat.calculate_health_influence = function(self, args)
+	-- Base influence.
+	-- The base influence depends on the feat and the type of weapon and ammunition used.
+	-- It's positive for healing feats and negative for attack feats.
 	local spec1 = args.weapon and args.weapon.spec
 	local spec2 = args.projectile and args.projectile.spec
 	local info = self:get_info()
-	local damage = -(info.influences.health or 0)
+	local influence = info.influences.health or 0
 	if spec1 or spec2 then
-		damage = damage + (spec1 and spec1.damage or 0) + (spec2 and spec2.damage or 0)
-	else
-		damage = damage + 3
+		influence = influence - (spec1 and spec1.damage or 0) - (spec2 and spec2.damage or 0)
+	elseif influence > 0 then
+		influence = influence - 3
 	end
 	-- Damage bonus from skills.
 	-- The bonus damage depends on the type of weapon and ammunition used.
@@ -142,10 +146,23 @@ Feat.calculate_damage = function(self, args)
 	end
 	for k,v in pairs(bonuses) do
 		if skills:has_skill{skill = k} then
-			damage = damage + v * skills:get_value{skill = k}
+			influence = influence - v * skills:get_value{skill = k}
 		end
 	end
-	return damage
+	-- Damage reduction by armor and blocking.
+	-- Not applied to healing feats.
+	if influence < 0 and args.target then
+		local armor = args.target.armor_class or 0
+		if args.target.blocking then
+			local delay = args.target.spec.blocking_delay
+			local elapsed = Program.time - args.target.blocking
+			local frac = math.min(1, elapsed / delay)
+			armor = armor + frac * args.target.spec.blocking_armor
+		end
+		local mult = math.max(0.0, 1 - armor)
+		influence = influence * mult
+	end
+	return influence
 end
 
 --- Performs a feat

@@ -11,6 +11,10 @@ Action{name = "Attack", mode = "press", key1 = "mouse1", func = function()
 	Network:send{packet = Packet(packets.SHOOT)}
 end}
 
+Action{name = "Block", mode = "toggle", key1 = "mouse3", func = function(v)
+	Network:send{packet = Packet(packets.PLAYER_BLOCK, "bool", v)}
+end}
+
 Action{name = "Camera", mode = "press", key1 = Keys.y, func = function()
 	if Player.camera.mode == "first-person" then
 		Player.camera.mode = "third-person"

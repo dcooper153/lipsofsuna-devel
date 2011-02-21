@@ -213,7 +213,7 @@ Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
 		-- Torch holding hack.
 		if slot == "hand.L" then
 			if spec then
-				o:animate{animation = "hold-left", channel = Animation.CHANNEL_LEFT_HAND, weight = 3,
+				o:animate{animation = "hold-left", channel = Animation.CHANNEL_LEFT_HAND, weight = 2,
 					fade_in = 0.5, fade_out = 0.5, permanent = true}
 			else
 				o:animate{animation = "empty", channel = Animation.CHANNEL_LEFT_HAND}

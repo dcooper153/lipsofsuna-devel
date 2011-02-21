@@ -29,7 +29,7 @@ if you post there.]])}
 * Comma: Pick up
 * Shift: Run
 * Left mouse button: Attack
-* Right mouse button: Use inventory items
+* Right mouse button: Block / use item
 * Mouse wheel: Zoom camera
 * Left control: Camera rotation mode]]}
 	-- Hints.

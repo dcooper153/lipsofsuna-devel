@@ -85,6 +85,7 @@ do
 	add("OBJECT_SLOT")
 	add("OBJECT_SPEECH")
 	add("PARTICLE_RAY")
+	add("PLAYER_BLOCK")
 	add("PLAYER_MOVE")
 	add("PLAYER_TURN")
 	add("QUEST_MARKER")
@@ -123,6 +124,7 @@ Animation.CHANNEL_CROUCH = 4
 Animation.CHANNEL_STRAFE = 5
 Animation.CHANNEL_ACTION = 6
 Animation.CHANNEL_JUMP = 7
+Animation.CHANNEL_BLOCK = 8
 Animation.CHANNEL_LEFT_HAND = 125
 Animation.CHANNEL_RIGHT_HAND = 126
 Animation.CHANNEL_TILT = 127
