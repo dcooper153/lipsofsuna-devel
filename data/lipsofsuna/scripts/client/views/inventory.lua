@@ -124,9 +124,16 @@ end}
 Protocol:add_handler{type = "INVENTORY_CLOSED", func = function(event)
 	local ok,id = event.packet:read("uint32")
 	if not ok then return end
+	-- Close the container widget if it's still open.
 	local cont = Widgets.Container:find(id)
-	if not cont then return end
-	cont:close(true)
+	if cont then cont:close(true) end
+	-- Clear interrupted item drags.
+	-- The container may close if another player picks it up or moves
+	-- it out of reach. If that happens, any drags from that container
+	-- need to be cancelled to avoid problems.
+	if Drag.drag and Drag.drag[2] == id then
+		Drag:cancel()
+	end
 end}
 
 -- Adds an item to a container.
@@ -138,6 +145,13 @@ Protocol:add_handler{type = "INVENTORY_ITEM_ADDED", func = function(event)
 	local spec = Itemspec:find{name = name}
 	local icon = spec and spec.icon
 	cont:set_item{slot = (sslot ~= "" and sslot or islot), icon = icon, name = name, count = count}
+	-- Clear interrupted item drags.
+	-- When multiple players try to drag the same item, the fastest drag
+	-- succeeds. Other drags need to be cancelled so that the drag icon
+	-- disappears and the source slot isn't incorrectly left grayed out.
+	if Drag.drag and Drag.drag[2] == id and Drag.drag[3] == slot then
+		Drag:cancel()
+	end
 end}
 
 -- Removes an item from a container.
@@ -146,5 +160,14 @@ Protocol:add_handler{type = "INVENTORY_ITEM_REMOVED", func = function(event)
 	if not ok then return end
 	local cont = Widgets.Container:find(id)
 	if not cont then return end
-	cont:set_item{slot = (sslot ~= "" and sslot or islot)}
+	-- Remove from the container.
+	local slot = (sslot ~= "" and sslot or islot)
+	cont:set_item{slot = slot}
+	-- Clear interrupted item drags.
+	-- When multiple players try to drag the same item, the fastest drag
+	-- succeeds. Other drags need to be cancelled so that the drag icon
+	-- disappears and the source slot isn't incorrectly left grayed out.
+	if Drag.drag and Drag.drag[2] == id and Drag.drag[3] == slot then
+		Drag:cancel()
+	end
 end}
