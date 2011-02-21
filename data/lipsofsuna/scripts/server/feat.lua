@@ -42,6 +42,10 @@ Feat.apply = function(self, args)
 					info.influences.health = info.influences.health * mult
 				end
 				args.target:damaged(-info.influences.health)
+				-- Anger hurt creatures.
+				if info.influences.health < 0 then
+					args.target:add_enemy(args.attacker)
+				end
 			end
 		elseif k == "plague" then
 			-- Summon plagued beasts.

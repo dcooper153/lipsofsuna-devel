@@ -144,6 +144,21 @@ Creature.new = function(clss, args)
 	return self
 end
 
+--- Adds an object to the list of known enemies.<br/>
+-- This function skips faction checks and adds the object directly to the
+-- list. Hence, calling this temporarily makes the creature angry at the
+-- passed object.
+-- @param self Object.
+-- @param object Object to add to the list of enemies.
+Creature.add_enemy = function(self, object)
+	local enemy = self.enemies[object]
+	if enemy then
+		enemy[2] = Program.time
+	else
+		self.enemies[object] = {object, Program.time}
+	end
+end
+
 --- Calculates the animation state based on the active controls.
 -- @param self Object.
 Creature.calculate_animation = function(self)

@@ -59,6 +59,12 @@ Object.load = function(clss, args)
 	end
 end
 
+--- Default add enemy call.
+-- @param self Object.
+-- @param object Object to add to the list of enemies.
+Object.add_enemy = function(self, object)
+end
+
 --- Merges or adds an item to the slots or inventory of the object.
 -- @param self Object.
 -- @param args Arguments.<ul>
