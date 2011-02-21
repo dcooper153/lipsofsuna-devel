@@ -250,13 +250,11 @@ Item.use_cb = function(self, user)
 	-- taken out of containers.
 	local inv = Inventory:find{object = self}
 	if not inv then
-		Action:move_from_world_to_inv(self, user.id, self.id)
-		return
+		return Actions:move_from_world_to_inv(user, self.id, user.id, 0)
 	end
 	local _,slot = inv:find_object{object = self}
 	if inv.owner ~= user then
-		Actions:move_from_inv_to_inv(user, inv.owner.id, slot, user.id, 0)
-		return
+		return Actions:move_from_inv_to_inv(user, inv.owner.id, slot, user.id, 0)
 	end
 	-- Perform a type specific action.
 	-- These are actions that can only be performed to inventory items.
