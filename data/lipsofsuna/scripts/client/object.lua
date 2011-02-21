@@ -1,3 +1,5 @@
+Object.physics_position_correction = Vector(0, -0.2, 0)
+
 local oldanimate = Object.animate
 Object.animate = function(self, args)
 	if not self.animated then

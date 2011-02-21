@@ -82,7 +82,13 @@ Protocol:add_handler{type = "OBJECT_MOVED", func = function(event)
 	if ok then
 		local o = Object:find{id = i}
 		if not o then return end
-		o:set_motion_state(Vector(x, y, z), Quaternion(rx, ry, rz, rw), Vector(vx, vy, vz))
+		-- Apply position correction.
+		-- Objects controlled by physics would normally float in the air
+		-- due to collision margins so we need to apply compensation.
+		local p = Vector(x, y, z)
+		if o.type == "item" or o.type == "species" then p = p + Object.physics_position_correction end
+		-- Set the target interpolation position.
+		o:set_motion_state(p, Quaternion(rx, ry, rz, rw), Vector(vx, vy, vz))
 	end
 end}
 
@@ -104,13 +110,19 @@ end}
 Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	local ok,i,t,s,m,n,x,y,z,rx,ry,rz,rw = event.packet:read("uint32", "string", "string", "string", "string", "float", "float", "float", "float", "float", "float", "float")
 	if not ok then return end
-	-- Create the object.
+	-- Get the object specification.
 	local spec
 	if t == "item" then spec = Itemspec:find{name = s}
 	elseif t == "obstacle" then spec = Obstaclespec:find{name = s}
 	elseif t == "species" then spec = Species:find{name = s} end
 	if spec and n == "" then n = spec.name end
-	local o = Object{id = i, model = m, name = n, position = Vector(x, y, z), spec = s, type = t}
+	-- Apply position correction.
+	-- Objects controlled by physics would normally float in the air
+	-- due to collision margins so we need to apply compensation.
+	local p = Vector(x, y, z)
+	if t == "item" or t == "species" then p = p + Object.physics_position_correction end
+	-- Create the object.
+	local o = Object{id = i, model = m, name = n, position = p, spec = s, type = t}
 	if t == "species" then o.race = s end
 	-- Apply optional customizations.
 	local ok,ge,bo,no,bu,eye,eyer,eyeg,eyeb,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = event.packet:resume(
