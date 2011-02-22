@@ -33,11 +33,15 @@ Views.Options.new = function(clss)
 	self.sound_volume = 1.0
 	self.music_volume = 0.1
 	-- Create a sorted list of video modes.
+	-- Some of the views don't fit in the screen unless the height is at least
+	-- 720 pixels so we filter out any modes smaller than that.
 	self.video_modes = {}
 	for k,v in ipairs(Client.video_modes) do
-		table.insert(self.video_modes, {"" .. v[1] .. "x" .. v[2], function()
-			self:set_video_mode(v[1], v[2], true)
-		end, width = v[1], height = v[2]})
+		if v[2] >= 720 then
+			table.insert(self.video_modes, {"" .. v[1] .. "x" .. v[2], function()
+				self:set_video_mode(v[1], v[2], true)
+			end, width = v[1], height = v[2]})
+		end
 	end
 	table.sort(self.video_modes, function(a, b)
 		if a.height < b.height then return true end
