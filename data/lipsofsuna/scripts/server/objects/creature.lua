@@ -596,10 +596,10 @@ Creature.update = function(self, secs)
 	end
 	-- Fix stuck creatures.
 	if not self:stuck_check() then return end
+	-- Prevent sectors from unloading if a player is present.
+	if self.client then self:refresh() end
 	-- Skip all controls if we are dead.
-	if self.dead then
-		return
-	end
+	if self.dead then return end
 	-- Update feat cooldown.
 	if self.blocking then self.cooldown = self.spec.blocking_cooldown end
 	if self.cooldown then
@@ -609,10 +609,7 @@ Creature.update = function(self, secs)
 		end
 	end
 	-- Skip the rest if AI is disabled.
-	if not self.spec.ai_enabled then
-		self:refresh()
-		return
-	end
+	if not self.spec.ai_enabled then return end
 	-- Maintain timers.
 	self.state_timer = self.state_timer + secs
 	self.update_timer = self.update_timer + secs
