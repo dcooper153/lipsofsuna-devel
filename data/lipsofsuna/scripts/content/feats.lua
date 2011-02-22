@@ -102,7 +102,6 @@ Featanimspec{
 	animation = "throw",
 	categories = {"throw"},
 	cooldown = 1,
-	description = "Throw grenades or other throwing weapons",
 	effect = "swing1",
 	effect_impact = "impact1",
 	required_weapon = "throwable",
