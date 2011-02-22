@@ -1,5 +1,27 @@
 Drag = Class()
 
+--- Cancels the active drag and restores the UI to the original state.
+-- @param self Drag.
+Drag.cancel = function(self)
+	self:clear()
+end
+
+--- Clears the drag state after finishing a drag.
+-- @param self Drag.
+Drag.clear = function(self)
+	-- Restore items slots back to normal.
+	if not self.drag then return end
+	if self.drag[1] == "equ" or self.drag[1] == "inv" then
+		local item = Views.Inventory.inst:get_item{id = self.drag[2], slot = self.drag[3]}
+		if item then item.drag = nil end
+	end
+	-- Reset the cursor.
+	Widgets.Cursor.inst.text = nil
+	Widgets.Cursor.inst.icon = nil
+	-- Clear the drag.
+	self.drag = nil
+end
+
 --- Called when a container is clicked with the purpose of starting or stopping a drag.
 -- @param self Drag.
 -- @param inv Inventory number of the container.
@@ -36,6 +58,21 @@ Drag.clicked_container = function(self, inv, slot)
 	item.drag = true
 end
 
+--- Called when a quickslot is clicked with the purpose of stopping a drag.
+-- @param self Drag.
+-- @param index Quickslot index number.
+-- @return True if the click was handled by the drag and drop system.
+Drag.clicked_quickslot = function(self, index)
+	if not self.drag then return end
+	if self.drag[1] == "equ" or self.drag[1] == "inv" then
+		Quickslots:assign_item(index, Widgets.Cursor.inst.text)
+		self:clear()
+	else
+		self:cancel()
+	end
+	return true
+end
+
 --- Called when the scene is clicked with the purpose of stopping a drag.
 -- @param self Drag.
 -- @return True if the click was handled by the drag and drop system.
@@ -53,22 +90,4 @@ Drag.clicked_scene = function(self)
 		return true
 	end
 	-- TODO: Dragging from the world to the inventory.
-end
-
-Drag.cancel = function(self)
-	self:clear()
-end
-
-Drag.clear = function(self)
-	-- Restore items slots back to normal.
-	if not self.drag then return end
-	if self.drag[1] == "equ" or self.drag[1] == "inv" then
-		local item = Views.Inventory.inst:get_item{id = self.drag[2], slot = self.drag[3]}
-		if item then item.drag = nil end
-	end
-	-- Reset the cursor.
-	Widgets.Cursor.inst.text = nil
-	Widgets.Cursor.inst.icon = nil
-	-- Clear the drag.
-	self.drag = nil
 end

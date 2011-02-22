@@ -1,4 +1,10 @@
 Iconspec{
+	name = "missing1",
+	image = "skills1",
+	offset = {96,0},
+	size = {32,32}}
+
+Iconspec{
 	name = "potion1",
 	image = "icons1",
 	position = {0,0},

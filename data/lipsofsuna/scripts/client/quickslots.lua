@@ -5,7 +5,13 @@ Quickslots.init = function(clss)
 	clss.group = Widget{rows = 1, spacings = {0,0}}
 	clss.buttons = {}
 	for i = 1,12 do
-		clss.buttons[i] = Widgets.Quickslot{pressed = function() clss:activate(i) end}
+		clss.buttons[i] = Widgets.Quickslot{pressed = function(w, a)
+			if a.button == 3 then
+				clss:assign_none(i)
+			else
+				clss:activate(i)
+			end
+		end}
 		clss.group:append_col(clss.buttons[i])
 		if i == 4 or i == 8 then
 			local pad = Widget()
@@ -17,7 +23,8 @@ end
 
 Quickslots.assign_none = function(clss, index)
 	clss.buttons[index].feat = nil
-	clss.buttons[index].icon = Iconspec:find{name = "skill-none"}
+	clss.buttons[index].item = nil
+	clss.buttons[index].icon = nil
 end
 
 Quickslots.assign_feat = function(clss, index, feat)
@@ -33,12 +40,37 @@ Quickslots.assign_feat = function(clss, index, feat)
 		end
 	end
 	clss.buttons[index].feat = feat
+	clss.buttons[index].item = nil
 	clss.buttons[index].icon = icon
 end
 
+--- Assigns an item to a quickslot.
+-- @param clss Quickslots class.
+-- @param index Quickslot index number.
+-- @param name Name of the item spec to be assigned.
+Quickslots.assign_item = function(clss, index, name)
+	-- Find the icon.
+	local icon
+	local spec = Itemspec:find{name = name}
+	if spec then icon = Iconspec:find{name = spec.icon} end
+	if not icon then icon = Iconspec:find{name = "missing1"} end
+	-- Assign the item.
+	clss.buttons[index].feat = nil
+	clss.buttons[index].item = name
+	clss.buttons[index].icon = icon
+end
+
+--- Called when the quickslot is clicked or accessed by a hotkey.<br/>
+-- If a quickslot is activated while dragging an item, the item is assigned
+-- to the slot. Otherwise, the item or feat in the slot is activated.
+-- @param clss Quickslots class.
+-- @param index Quickslot index number.
 Quickslots.activate = function(clss, index)
+	if Drag:clicked_quickslot(index) then return end
 	local feat = clss.buttons[index].feat
+	local item = clss.buttons[index].item
 	if feat then
+		-- Activate a feat.
 		local names = {}
 		local values = {}
 		for i = 1,3 do
@@ -57,6 +89,13 @@ Quickslots.activate = function(clss, index)
 			"string", names[2], "float", values[2],
 			"string", names[3], "float", values[3],
 			"bool", false)}
+	elseif item then
+		-- Use an item.
+		local cont = Views.Inventory.inst.container
+		if not cont then return end
+		local slot = cont:find_item{name = item}
+		if not slot then return end
+		Commands:use(cont.id, slot)
 	end
 end
 

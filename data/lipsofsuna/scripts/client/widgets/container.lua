@@ -103,6 +103,25 @@ Widgets.Container.get_item = function(self, args)
 	end
 end
 
+--- Finds an item by name and returns its slot.
+-- @param self Container widget.
+-- @param args Arguments.<ul>
+--   <li>name: Item name.</li></ul>
+-- @return Slot or nil.
+Widgets.Container.find_item = function(self, args)
+	-- Search from equipment slots.
+	if self.equipment then
+		for slot,item in pairs(self.equipment.dict_name) do
+			if item.text == args.name then return slot end
+		end
+	end
+	-- Search from inventory slots.
+	for i = 1,self.item_list.size do
+		local item = self.item_list:get_item{slot = i}
+		if item and item.text == args.name then return i end
+	end
+end
+
 --- Sets the item of a slot.
 -- @param self Container widget.
 -- @param args Arguments.<ul>
