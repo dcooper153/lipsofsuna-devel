@@ -1,3 +1,19 @@
+0.2.1
+
+ * New UI theme and various usability improvements.
+ * More usable inventory management.
+ * Added a crosshair and improved the camera behavior.
+ * New items: jar, chest, workbench, wooden club, leather armor set, lizard armor set.
+ * New monsters: plague rat, plague slime, troglodyte, lizardman, feral devora.
+ * New feats: sanctuary, black haze.
+ * Crafting is now done with workbenches.
+ * Lootable containers and corpses.
+ * Better character animations.
+ * Unlockable fast travel portals.
+ * Options persist across sessions.
+ * Graphics engine optimizations.
+ * An icon and a menu item for the Ubuntu package.
+
 0.2.0
 
  * Vastly improved map generation algorithm.
