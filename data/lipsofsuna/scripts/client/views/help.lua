@@ -34,10 +34,14 @@ if you post there.]])}
 * Left control: Camera rotation mode]]}
 	-- Hints.
 	local label_hints = Widgets.Text{text = fmt(
-[[You can activate NPCs, obstacles, and items by pressing space and
-clicking on the object of interest. You can collect crafting materials,
-access the crafting system, and discover quests by activating various
-things.]])}
+[[You can activate NPCs, obstacles, and items by looking them and pressing
+the spacebar. You can collect crafting materials, access the crafting system,
+loot corpses, and discover quests by activating various things.
+
+Crafting is done with a workbench. Access the workbench, place materials
+inside it, and select the item you want to craft from the list. As your
+first task, you might want to craft spare workbenches that you can take
+with you.]])}
 	-- Contributing.
 	local label_contributing = Widgets.Text{text = fmt(
 [[If the game, in its current modest state, managed to spark your interest,
