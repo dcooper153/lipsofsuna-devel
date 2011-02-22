@@ -42,10 +42,6 @@ struct _LIMdlMaterial
 	} textures;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 LIAPICALL (int, limdl_material_init, (
 	LIMdlMaterial* self));
 
@@ -81,9 +77,17 @@ LIAPICALL (int, limdl_material_write, (
 	LIMdlMaterial* self,
 	LIArcWriter*   writer));
 
+LIAPICALL (void, limdl_material_set_diffuse, (
+	LIMdlMaterial* self,
+	const float*   value));
+
 LIAPICALL (int, limdl_material_set_shader, (
 	LIMdlMaterial* self,
 	const char*    value));
+
+LIAPICALL (void, limdl_material_set_specular, (
+	LIMdlMaterial* self,
+	const float*   value));
 
 LIAPICALL (int, limdl_material_set_texture, (
 	LIMdlMaterial* self,
@@ -91,9 +95,5 @@ LIAPICALL (int, limdl_material_set_texture, (
 	int            type,
 	int            flags,
 	const char*    name));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -364,15 +364,26 @@ limdl_material_write (LIMdlMaterial* self,
 }
 
 /**
+ * \brief Sets the diffuse color of the material.
+ * \param self Material.
+ * \param value Array of four floats.
+ */
+void limdl_material_set_diffuse (
+	LIMdlMaterial* self,
+	const float*   value)
+{
+	memcpy (self->diffuse, value, 4 * sizeof (float));
+}
+
+/**
  * \brief Sets the shader of the material.
- *
  * \param self Material.
  * \param value Shader name.
  * \return Nonzero on success.
  */
-int
-limdl_material_set_shader (LIMdlMaterial* self,
-                           const char*    value)
+int limdl_material_set_shader (
+	LIMdlMaterial* self,
+	const char*    value)
 {
 	char* tmp;
 
@@ -386,8 +397,19 @@ limdl_material_set_shader (LIMdlMaterial* self,
 }
 
 /**
+ * \brief Sets the specular color of the material.
+ * \param self Material.
+ * \param value Array of four floats.
+ */
+void limdl_material_set_specular (
+	LIMdlMaterial* self,
+	const float*   value)
+{
+	memcpy (self->specular, value, 4 * sizeof (float));
+}
+
+/**
  * \brief Sets texture unit information.
- *
  * \param self Material.
  * \param unit Texture unit.
  * \param type Texture type.

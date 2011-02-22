@@ -79,6 +79,16 @@ static void Model_calculate_bounds (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Updates the render and physics meshes of the model.
+ * -- @param self Object.
+ * function Model.changed(self)
+ */
+static void Model_changed (LIScrArgs* args)
+{
+	lieng_model_changed (args->self);
+}
+
+/* @luadoc
  * --- Creates a copy of the model.
  * -- @param self Model.
  * -- @param args Arguments.
@@ -180,6 +190,7 @@ void liscr_script_model (
 	liscr_class_set_userdata (self, LISCR_SCRIPT_OBJECT, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_mfunc (self, "calculate_bounds", Model_calculate_bounds);
+	liscr_class_insert_mfunc (self, "changed", Model_changed);
 	liscr_class_insert_mfunc (self, "copy", Model_copy);
 	liscr_class_insert_mfunc (self, "load", Model_load);
 	liscr_class_insert_mfunc (self, "merge", Model_merge);

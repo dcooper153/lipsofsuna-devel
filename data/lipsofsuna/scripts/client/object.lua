@@ -59,20 +59,20 @@ Object.create_character_model = function(self, args)
 	-- Create skeleton.
 	local m = Model:load{file = meshes.skeleton}
 	m = m:copy()
-	m.vertex_policy = "dynamic"
 	-- Add other meshes.
 	for k,v in pairs(meshes) do
 		if k ~= "skeleton" then
 			m:merge(Model:load{file = v})
 		end
 	end
-	-- Recalculate bounding box.
-	m:calculate_bounds()
-	self.model = m
 	-- Colorize materials.
 	m:edit_material{match_shader = "hair", diffuse = args.hair_color}
 	m:edit_material{match_shader = "skin", diffuse = args.skin_color}
 	m:edit_material{match_texture = "eye1", diffuse = args.eye_color}
+	-- Recalculate bounding box.
+	m:calculate_bounds()
+	m:changed()
+	self.model = m
 	-- Apply custom deformations.
 	self.animated = true
 	self:animate{animation = "empty", channel = Animation.CHANNEL_CUSTOMIZE,

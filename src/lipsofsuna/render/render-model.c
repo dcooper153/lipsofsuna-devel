@@ -186,44 +186,6 @@ int liren_model_deform (
 }
 
 /**
- * \brief Finds a material by shader and/or texture.
- * \param self Model.
- * \param shader Shader name or NULL.
- * \param texture Texture name or NULL.
- * \return Material or NULL.
- */
-LIRenMaterial* liren_model_find_material (
-	LIRenModel* self,
-	const char* shader,
-	const char* texture)
-{
-	int i;
-	LIRenMaterial* material;
-
-	for (i = 0 ; i < self->materials.count ; i++)
-	{
-		material = self->materials.array[i];
-		if (shader != NULL)
-		{
-			/* The name of either the shader must match. */
-			if (material->shader != NULL && strcmp (shader, material->shader->name))
-				continue;
-		}
-		if (texture != NULL)
-		{
-			/* The name of the first texture must match. */
-			if (!material->textures.count || material->textures.array[0].image == NULL)
-				continue;
-			if (strcmp (texture, material->textures.array[0].image->name))
-				continue;
-		}
-		return material;
-	}
-
-	return NULL;
-}
-
-/**
  * \brief Calculates the first intersection of the model and a ray.
  * \param self Model.
  * \param ray0 Start point of the ray, in model space.

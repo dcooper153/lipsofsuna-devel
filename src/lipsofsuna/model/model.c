@@ -450,6 +450,44 @@ int limdl_model_find_material (
 }
 
 /**
+ * \brief Finds a material by shader and/or texture.
+ * \param self Model.
+ * \param shader Shader name or NULL.
+ * \param texture Texture name or NULL.
+ * \return Material or NULL.
+ */
+LIMdlMaterial* limdl_model_find_material_by_texture (
+	LIMdlModel* self,
+	const char* shader,
+	const char* texture)
+{
+	int i;
+	LIMdlMaterial* material;
+
+	for (i = 0 ; i < self->materials.count ; i++)
+	{
+		material = self->materials.array + i;
+		if (shader != NULL)
+		{
+			/* The name of the shader must match. */
+			if (material->shader != NULL && strcmp (shader, material->shader))
+				continue;
+		}
+		if (texture != NULL)
+		{
+			/* The name of the first texture must match. */
+			if (!material->textures.count || material->textures.array[0].string == NULL)
+				continue;
+			if (strcmp (texture, material->textures.array[0].string))
+				continue;
+		}
+		return material;
+	}
+
+	return NULL;
+}
+
+/**
  * \brief Finds a node by name.
  * \param self Model.
  * \param name Name of the node to find.

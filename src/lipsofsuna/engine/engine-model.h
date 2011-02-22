@@ -43,6 +43,9 @@ LIAPICALL (void, lieng_model_free, (
 LIAPICALL (void, lieng_model_calculate_bounds, (
 	LIEngModel* self));
 
+LIAPICALL (void, lieng_model_changed, (
+	LIEngModel* self));
+
 LIAPICALL (int, lieng_model_load, (
 	LIEngModel* self,
 	const char* name,

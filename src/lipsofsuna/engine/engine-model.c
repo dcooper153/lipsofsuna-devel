@@ -123,14 +123,27 @@ void lieng_model_free (
 	lisys_free (self);
 }
 
+/**
+ * \brief Emits a model change event.
+ *
+ * Calling this causes any extensions that use the model to update their
+ * copies of it. Notably, the renderer extension requires you to call this
+ * after doing custom modifications to the model that you need to display.
+ *
+ * \param self Model.
+ */
+void lieng_model_changed (
+	LIEngModel* self)
+{
+	if (self->model != NULL)
+		private_changed (self);
+}
+
 void lieng_model_calculate_bounds (
 	LIEngModel* self)
 {
 	if (self->model != NULL)
-	{
 		limdl_model_calculate_bounds (self->model);
-		lical_callbacks_call (self->engine->callbacks, self->engine, "model-changed", lical_marshal_DATA_PTR, self);
-	}
 }
 
 int lieng_model_load (
@@ -165,21 +178,21 @@ int lieng_model_load (
 	return 1;
 }
 
+/**
+ * \brief Merges the mesh from a model to another.
+ * \param self Destination model.
+ * \param model Source model.
+ * \return Nonzero on success.
+ */
 int lieng_model_merge (
 	LIEngModel* self,
 	LIEngModel* model)
 {
-	int ret;
-
-	ret = limdl_model_merge (self->model, model->model);
-	private_changed (self);
-
-	return ret;
+	return limdl_model_merge (self->model, model->model);
 }
 
 /**
  * \brief Gets the bounds of the model.
- *
  * \param self Module.
  * \param result Return location for the bounds.
  */

@@ -99,6 +99,11 @@ LIAPICALL (int, limdl_model_find_material, (
 	const LIMdlModel*    self,
 	const LIMdlMaterial* material));
 
+LIAPICALL (LIMdlMaterial*, limdl_model_find_material_by_texture, (
+	LIMdlModel* self,
+	const char* shader,
+	const char* texture));
+
 LIAPICALL (LIMdlNode*, limdl_model_find_node, (
 	const LIMdlModel* self,
 	const char*       name));

@@ -48,29 +48,25 @@ static void Model_edit_material (LIScrArgs* args)
 	const char* shader = NULL;
 	const char* texture = NULL;
 	LIExtModule* module;
-	LIEngModel* engmdl;
-	LIRenModel* model;
-	LIRenMaterial* material;
+	LIEngModel* model;
+	LIMdlMaterial* material;
 
-	/* Get the render model. */
+	/* Get the engine model. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER_MODEL);
-	engmdl = args->self;
-	model = liren_render_find_model (module->client->render, engmdl->id);
-	if (model == NULL)
-		return;
+	model = args->self;
 
 	/* Find the modified material. */
 	liscr_args_gets_string (args, "match_shader", &shader);
 	liscr_args_gets_string (args, "match_texture", &texture);
-	material = liren_model_find_material (model, shader, texture);
+	material = limdl_model_find_material_by_texture (model->model, shader, texture);
 	if (material == NULL)
 		return;
 
 	/* Edit the material properties. */
 	if (liscr_args_gets_floatv (args, "diffuse", 4, color))
-		liren_material_set_diffuse (material, color);
+		limdl_material_set_diffuse (material, color);
 	if (liscr_args_gets_floatv (args, "specular", 4, color))
-		liren_material_set_specular (material, color);
+		limdl_material_set_specular (material, color);
 }
 
 /*****************************************************************************/
