@@ -87,6 +87,7 @@ Item.new = function(clss, args)
 	copy("spec")
 	copy("looted")
 	copy("realized")
+	clss.stuck_check_dict[self.id] = self
 	return self
 end
 
@@ -325,3 +326,12 @@ Item.write = function(self)
 		Serialize:encode_inventory(self.inventory) ..
 		"return self"
 end
+
+-- These take care of checking that items don't fall through ground.
+Item.stuck_check_dict = {}
+setmetatable(Item.stuck_check_dict, {__mode = "v"})
+Item.stuck_fix_timer = Timer{delay = 3, func = function()
+	for k,v in pairs(Item.stuck_check_dict) do
+		v:stuck_check()
+	end
+end}
