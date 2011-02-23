@@ -290,7 +290,13 @@ static void private_triangulate_rounded (
 
 	/* Deform the cube. */
 #define SMOOTH_CORNER(vx,vy,vz, ox,oy,oz, ix,iy,iz)\
-	if (!types[ox][oy][oz])\
+	if (!types[ox][oy][oz] &&\
+	   (!types[ix][oy][oz] || voxels[ix][oy][oz]->material->type != LIVOX_MATERIAL_TYPE_CUBE) &&\
+	   (!types[ox][iy][oz] || voxels[ox][iy][oz]->material->type != LIVOX_MATERIAL_TYPE_CUBE) &&\
+	   (!types[ix][iy][oz] || voxels[ix][iy][oz]->material->type != LIVOX_MATERIAL_TYPE_CUBE) &&\
+	   (!types[ox][oy][iz] || voxels[ox][oy][iz]->material->type != LIVOX_MATERIAL_TYPE_CUBE) &&\
+	   (!types[ix][oy][iz] || voxels[ix][oy][iz]->material->type != LIVOX_MATERIAL_TYPE_CUBE) &&\
+	   (!types[ox][iy][iz] || voxels[ox][iy][iz]->material->type != LIVOX_MATERIAL_TYPE_CUBE))\
 	{\
 		if (!types[ox][iy][oz] && !types[ox][oy][iz] && !types[ox][iy][iz])\
 		{\
