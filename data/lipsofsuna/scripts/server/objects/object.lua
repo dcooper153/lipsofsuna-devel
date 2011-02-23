@@ -282,7 +282,7 @@ Object.get_tile_range = function(self)
 	local size = Vector(1,self.spec.type == "creature" and 2 or 1,1)
 	local src = self.position * Config.tilescale
 	src.x = math.floor(src.x)
-	src.y = math.floor(src.y + 0.1)
+	src.y = math.floor(src.y + 0.3)
 	src.z = math.floor(src.z)
 	return src, src + size - Vector(1,1,1)
 end
@@ -386,7 +386,7 @@ Object.stuck_check = function(self)
 		if self.stuck < 10 then
 			self:stuck_fix()
 		else
-			print("Warning: An object was deleted because it was permanently stuck!")
+			print("Warning: " .. (self.spec.name or "an object") .. " was deleted because it was permanently stuck!")
 			self.realized = false
 			return
 		end
@@ -411,7 +411,7 @@ Object.stuck_fix = function(self)
 	local t,p = Voxel:find_tile{match = "empty", point = src * Config.tilewidth, radius = 5 * Config.tilewidth}
 	if not t then return end
 	-- Move the object to the empty tile.
-	self.position = (p + Vector(0.5, 0.1, 0.5)) * Config.tilewidth
+	self.position = (p + Vector(0.5, 0.2, 0.5)) * Config.tilewidth
 	return true
 end
 
