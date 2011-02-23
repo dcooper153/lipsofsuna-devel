@@ -141,7 +141,7 @@ end
 --   <li>name: Pattern name.</li>
 --   <li>point: Position vector, in tiles.</li></ul>
 Voxel.place_pattern = function(clss, args)
-	local pat = Pattern:find(args)
+	local pat = Pattern:random(args)
 	if not pat then return end
 	-- Create tiles.
 	for k,v in pairs(pat.tiles) do
@@ -259,7 +259,7 @@ Generator.paint_corridor = function(clss, src, dst)
 		ipos.x = math.floor(pos.x + 0.5) + math.random(0, 3)
 		ipos.y = math.floor(pos.y + 0.5) + math.random(0, 3)
 		ipos.z = math.floor(pos.z + 0.5) + math.random(0, 3)
-		Voxel:place_pattern{name = "corridor1", point = ipos}
+		Voxel:place_pattern{category = "corridor", point = ipos}
 		local step = math.random(1, 3)
 		pos = pos + dir * step
 		l = l + step
