@@ -25,6 +25,7 @@
 #include <lipsofsuna/model.h>
 #include "voxel-build.h"
 #include "voxel-material.h"
+#include "voxel-triangulate.h"
 
 #define CULL_EPSILON 0.01f
 
@@ -33,34 +34,6 @@
    current scripts don't edit the materials after initialization so it works,
    but it needs to be fixed in the future. */
 #warning Thread-safety issues in terrain builder
-
-typedef struct _LIVoxVoxelB LIVoxVoxelB;
-struct _LIVoxVoxelB
-{
-	int index;
-	int type;
-	LIEngModel* model;
-	LIMatVector position;
-	LIVoxMaterial* material;
-};
-
-struct _LIVoxBuilder
-{
-	int model_wanted;
-	int physics_wanted;
-	int offset[3];
-	int size[3];
-	int step[3];
-	float tile_width;
-	float vertex_scale;
-	LIEngEngine* engine;
-	LIMdlBuilder* model_builder;
-	LIPhyTerrain* physics;
-	LIPhyPhysics* physics_manager;
-	LIVoxManager* manager;
-	LIVoxVoxel* voxels;
-	LIVoxVoxelB* voxelsb;
-};
 
 static int private_build (
 	LIVoxBuilder* self);
@@ -74,6 +47,7 @@ static int private_merge_triangles_model (
 	LIVoxVoxelB*  voxel,
 	int           types[3][3][3],
 	LIMatVector*  coords,
+	int*          faces,
 	int           count);
 
 static int private_merge_triangles_physics (
@@ -87,11 +61,6 @@ static void private_merge_voxel (
 	int           vx,
 	int           vy,
 	int           vz);
-
-static int private_triangulate_cube (
-	LIVoxBuilder* self,
-	int           types[3][3][3],
-	LIMatVector*  result);
 
 /*****************************************************************************/
 
@@ -363,6 +332,7 @@ static int private_merge_triangles_model (
 	LIVoxVoxelB*  voxel,
 	int           types[3][3][3],
 	LIMatVector*  coords,
+	int*          faces,
 	int           count)
 {
 	int i;
@@ -412,9 +382,9 @@ static int private_merge_triangles_model (
 			if (self->model_wanted)
 			{
 				splat = 0.0f;
-				xr = (int)(coords[i + j].x / 0.34f);
-				yr = (int)(coords[i + j].y / 0.34f);
-				zr = (int)(coords[i + j].z / 0.34f);
+				xr = LIMAT_CLAMP ((int)(coords[i + j].x / 0.34f), 0, 2);
+				yr = LIMAT_CLAMP ((int)(coords[i + j].y / 0.34f), 0, 2);
+				zr = LIMAT_CLAMP ((int)(coords[i + j].z / 0.34f), 0, 2);
 				for (z = regions[zr] ; z <= regions[zr + 1] ; z++)
 				for (y = regions[yr] ; y <= regions[yr + 1] ; y++)
 				for (x = regions[xr] ; x <= regions[xr + 1] ; x++)
@@ -431,24 +401,24 @@ static int private_merge_triangles_model (
 			/* Calculate texture coordinates. */
 			if (self->model_wanted)
 			{
-				if (hypotf (coord[0].x - coord[1].x, coord[0].z - coord[1].z) >= LIMAT_EPSILON &&
-					hypotf (coord[1].x - coord[2].x, coord[1].z - coord[2].z) >= LIMAT_EPSILON &&
-					hypotf (coord[2].x - coord[0].x, coord[2].z - coord[0].z) >= LIMAT_EPSILON)
+				switch (faces[i / 3])
 				{
-					uv[0] = scale * coord[j].x;
-					uv[1] = scale * coord[j].z;
-				}
-				else if (LIMAT_ABS (coord[0].x - coord[1].x) < LIMAT_EPSILON &&
-						 LIMAT_ABS (coord[1].x - coord[2].x) < LIMAT_EPSILON &&
-						 LIMAT_ABS (coord[2].x - coord[0].x) < LIMAT_EPSILON)
-				{
-					uv[0] = scale * coord[j].z;
-					uv[1] = scale * coord[j].y;
-				}
-				else
-				{
-					uv[0] = scale * coord[j].x;
-					uv[1] = scale * coord[j].y;
+					case LIVOX_TRIANGULATE_NEGATIVE_X:
+					case LIVOX_TRIANGULATE_POSITIVE_X:
+						uv[0] = scale * coord[j].z;
+						uv[1] = scale * coord[j].y;
+						break;
+					case LIVOX_TRIANGULATE_NEGATIVE_Y:
+					case LIVOX_TRIANGULATE_POSITIVE_Y:
+						uv[0] = scale * coord[j].x;
+						uv[1] = scale * coord[j].z;
+						break;
+					case LIVOX_TRIANGULATE_NEGATIVE_Z:
+					case LIVOX_TRIANGULATE_POSITIVE_Z:
+					default:
+						uv[0] = scale * coord[j].x;
+						uv[1] = scale * coord[j].y;
+						break;
 				}
 			}
 
@@ -492,13 +462,11 @@ static void private_merge_voxel (
 	int           vy,
 	int           vz)
 {
-	int x;
-	int y;
-	int z;
 	int count;
 	int size[3];
 	int types[3][3][3];
-	LIMatVector coords[64];
+	int faces[200];
+	LIMatVector coords[600];
 	LIVoxVoxelB* voxel;
 
 	/* Skip empty voxels. */
@@ -506,15 +474,8 @@ static void private_merge_voxel (
 	if (!voxel->type)
 		return;
 
-	/* Get neighborhood. */
-	for (z = -1 ; z <= 1 ; z++)
-	for (y = -1 ; y <= 1 ; y++)
-	for (x = -1 ; x <= 1 ; x++)
-		types[x + 1][y + 1][z + 1] = self->voxelsb[(x + vx) + (y + vy) * self->step[1] + (z + vz) * self->step[2]].type;
-
 	/* Generate triangles. */
-	/* TODO: Support different kinds of triangulation schemes. */
-	count = private_triangulate_cube (self, types, coords);
+	count = livox_triangulate_voxel (self, vx, vy, vz, coords, faces, types);
 	if (!count)
 		return;
 
@@ -524,7 +485,7 @@ static void private_merge_voxel (
 		if (self->model_builder == NULL)
 			self->model_builder = limdl_builder_new (NULL);
 		if (self->model_builder != NULL)
-			private_merge_triangles_model (self, voxel, types, coords, count);
+			private_merge_triangles_model (self, voxel, types, coords, faces, count);
 	}
 
 	/* Add triangles to the physics shape. */
@@ -543,77 +504,6 @@ static void private_merge_voxel (
 		if (self->physics != NULL)
 			private_merge_triangles_physics (self, voxel, coords, count);
 	}
-}
-
-static int private_triangulate_cube (
-	LIVoxBuilder* self,
-	int           types[3][3][3],
-	LIMatVector*  result)
-{
-	int count;
-	const LIMatVector cubevert[2][2][2] = {
-		{{{ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 1.0f }},
-		 {{ 0.0f, 1.0f, 0.0f }, { 0.0f, 1.0f, 1.0f }}},
-		{{{ 1.0f, 0.0f, 0.0f }, { 1.0f, 0.0f, 1.0f }},
-		 {{ 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 1.0f }}}};
-
-	count = 0;
-	if (!types[0][1][1])
-	{
-		result[count++] = cubevert[0][0][0];
-		result[count++] = cubevert[0][1][1];
-		result[count++] = cubevert[0][1][0];
-		result[count++] = cubevert[0][0][0];
-		result[count++] = cubevert[0][0][1];
-		result[count++] = cubevert[0][1][1];
-	}
-	if (!types[2][1][1])
-	{
-		result[count++] = cubevert[1][0][0];
-		result[count++] = cubevert[1][1][0];
-		result[count++] = cubevert[1][1][1];
-		result[count++] = cubevert[1][0][0];
-		result[count++] = cubevert[1][1][1];
-		result[count++] = cubevert[1][0][1];
-	}
-	if (!types[1][0][1])
-	{
-		result[count++] = cubevert[0][0][0];
-		result[count++] = cubevert[1][0][0];
-		result[count++] = cubevert[1][0][1];
-		result[count++] = cubevert[0][0][0];
-		result[count++] = cubevert[1][0][1];
-		result[count++] = cubevert[0][0][1];
-	}
-	if (!types[1][2][1])
-	{
-		result[count++] = cubevert[0][1][0];
-		result[count++] = cubevert[1][1][1];
-		result[count++] = cubevert[1][1][0];
-		result[count++] = cubevert[0][1][0];
-		result[count++] = cubevert[0][1][1];
-		result[count++] = cubevert[1][1][1];
-	}
-	if (!types[1][1][0])
-	{
-		result[count++] = cubevert[0][0][0];
-		result[count++] = cubevert[1][1][0];
-		result[count++] = cubevert[1][0][0];
-		result[count++] = cubevert[0][0][0];
-		result[count++] = cubevert[0][1][0];
-		result[count++] = cubevert[1][1][0];
-	}
-	if (!types[1][1][2])
-	{
-		result[count++] = cubevert[0][0][1];
-		result[count++] = cubevert[1][0][1];
-		result[count++] = cubevert[1][1][1];
-		result[count++] = cubevert[0][0][1];
-		result[count++] = cubevert[1][1][1];
-		result[count++] = cubevert[0][1][1];
-	}
-
-	return count;
 }
 
 /** @} */

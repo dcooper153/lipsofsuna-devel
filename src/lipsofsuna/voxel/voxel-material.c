@@ -39,6 +39,7 @@ LIVoxMaterial* livox_material_new ()
 	if (self == NULL)
 		return NULL;
 	self->texture_scale = 1.0f;
+	self->type = LIVOX_MATERIAL_TYPE_CUBE;
 
 	/* Allocate name. */
 	self->name = listr_dup ("");

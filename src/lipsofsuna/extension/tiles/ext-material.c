@@ -284,6 +284,46 @@ static void Material_setter_texture_scale (LIScrArgs* args)
 		self->texture_scale = value;
 }
 
+/* @luadoc
+ * --- Material type.
+ * -- @name Material.type
+ * -- @class table
+ */
+static void Material_getter_type (LIScrArgs* args)
+{
+	LIVoxMaterial* self;
+
+	self = args->self;
+	switch (self->type)
+	{
+		case LIVOX_MATERIAL_TYPE_ROUNDED:
+			liscr_args_seti_string (args, "rounded");
+			break;
+		case LIVOX_MATERIAL_TYPE_ROUNDED_FRACTAL:
+			liscr_args_seti_string (args, "rounded fractal");
+			break;
+		default:
+			liscr_args_seti_string (args, "cube");
+			break;
+	}
+}
+static void Material_setter_type (LIScrArgs* args)
+{
+	const char* value;
+	LIVoxMaterial* self;
+
+	self = args->self;
+	if (liscr_args_geti_string (args, 0, &value))
+	{
+		if (!strcmp (value, "cube"))
+			self->type = LIVOX_MATERIAL_TYPE_CUBE;
+		else if (!strcmp (value, "rounded"))
+			self->type = LIVOX_MATERIAL_TYPE_ROUNDED;
+		else if (!strcmp (value, "rounded fractal"))
+			self->type = LIVOX_MATERIAL_TYPE_ROUNDED_FRACTAL;
+	}
+}
+
 /*****************************************************************************/
 
 void liext_script_material (
@@ -303,6 +343,7 @@ void liext_script_material (
 	liscr_class_insert_mvar (self, "specular", Material_getter_specular, Material_setter_specular);
 	liscr_class_insert_mvar (self, "texture", Material_getter_texture, Material_setter_texture);
 	liscr_class_insert_mvar (self, "texture_scale", Material_getter_texture_scale, Material_setter_texture_scale);
+	liscr_class_insert_mvar (self, "type", Material_getter_type, Material_setter_type);
 }
 
 /** @} */

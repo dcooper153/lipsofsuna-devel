@@ -24,17 +24,23 @@
 #include <lipsofsuna/system.h>
 #include "voxel-types.h"
 
-#define LIVOX_MATERIAL_FORMAT 0
-
 enum
 {
 	LIVOX_MATERIAL_FLAG_OCCLUDER = 0x01
+};
+
+enum
+{
+	LIVOX_MATERIAL_TYPE_CUBE,
+	LIVOX_MATERIAL_TYPE_ROUNDED,
+	LIVOX_MATERIAL_TYPE_ROUNDED_FRACTAL
 };
 
 struct _LIVoxMaterial
 {
 	int id;
 	int flags;
+	int type;
 	char* name;
 	float friction;
 	float texture_scale;
