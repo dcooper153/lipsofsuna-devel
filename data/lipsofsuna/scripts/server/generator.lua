@@ -220,6 +220,20 @@ Region.create_link = function(self, region)
 	return link
 end
 
+Region.get_link_point = function(self, dst)
+	local ctr = self.point + self.size * 0.5
+	local dir = (dst - ctr):normalize()
+	if math.abs(dir.x) < math.abs(dir.z) then
+		dir.y = -1
+		dir.z = dir.z < 0 and -1 or 1
+	else
+		dir.x = dir.x < 0 and -1 or 1
+		dir.y = -1
+	end
+	local pt = ctr + Vector(dir.x * self.size.x, dir.y * self.size.y, dir.z * self.size.z) * 0.5
+	return pt:floor()
+end
+
 ------------------------------------------------------------------------------
 
 Generator = Class()
@@ -425,8 +439,8 @@ Generator.generate = function(clss, args)
 	-- Paint corridors.
 	clss:update_status(0, "Creating corridors")
 	for i,link in ipairs(clss.links) do
-		local src = (link[1].point + link[1].size * 0.5):floor()
-		local dst = (link[2].point + link[2].size * 0.5):floor()
+		local src = link[1]:get_link_point(link[2].point)
+		local dst = link[2]:get_link_point(link[1].point)
 		clss:paint_corridor(src, dst)
 		clss:update_status(i / linkn)
 	end
