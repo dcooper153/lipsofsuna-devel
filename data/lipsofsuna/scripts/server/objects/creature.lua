@@ -753,7 +753,7 @@ Creature.state_updaters =
 		if dist < 0.5 then
 			self:set_movement(0)
 		else
-			self:set_movement(0.3)
+			self:set_movement(0.8)
 		end
 	end
 }
@@ -810,7 +810,7 @@ Creature.state_switchers =
 		-- Select target point.
 		-- TODO: Should check for walls.
 		local rot = Quaternion{axis = Vector(0,1,0), angle = math.random() * 6.28}
-		self.target = self.position + rot * Vector(0, 0, 5)
+		self.target = self.position + rot * Vector(0, 0, 10)
 		-- Switch to waiting mode after wandering enough.
 		if self.spec.ai_wait_allowed then
 			if self.state_timer > self.spec.ai_wander_time then
