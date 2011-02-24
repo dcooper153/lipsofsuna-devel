@@ -283,8 +283,6 @@ void liren_model_update_transparency (
 	int i;
 	int j;
 	void* vtxdata;
-	LIMatVector vtx[3];
-	LIMatVector center;
 	LIRenFormat format;
 	LIRenModelGroup* group;
 	LIRenMaterial* material;
@@ -292,42 +290,30 @@ void liren_model_update_transparency (
 	/* Update each material group. */
 	for (i = 0 ; i < self->groups.count ; i++)
 	{
-		/* Remove old sort coordinates. */
+		/* Check if transparency center is needed. */
 		group = self->groups.array + i;
-		lisys_free (group->face_sort_coords);
-		group->face_sort_coords = NULL;
-
-		/* Check if new sort coordinates are needed. */
+		group->center = limat_vector_init (0.0f, 0.0f, 0.0f);
 		material = self->materials.array[i];
 		if (material->shader == NULL)
 			continue;
 		if (!material->shader->sort)
 			continue;
 
-		/* Allocate space for the sort coordinates. */
-		group->face_sort_coords = lisys_calloc (group->count / 3, sizeof (LIMatVector));
-		if (group->face_sort_coords == NULL)
-			continue;
-
 		/* Download the deformed vertices from video memory. */
 		liren_mesh_get_format (&self->mesh, &format);
 		vtxdata = liren_mesh_lock_vertices (&self->mesh, group->start, group->count);
 		if (vtxdata == NULL)
-		{
-			lisys_free (group->face_sort_coords);
-			group->face_sort_coords = NULL;
 			continue;
-		}
 
-		/* Calculate the center point of each triangle. */
-		for (j = 0 ; j < group->count ; j += 3)
+		/* Calculate the center of the group. */
+		if (group->count > 0)
 		{
-			vtx[0] = *((LIMatVector*)(vtxdata + format.vtx_offset + format.size * (j + 0)));
-			vtx[1] = *((LIMatVector*)(vtxdata + format.vtx_offset + format.size * (j + 1)));
-			vtx[2] = *((LIMatVector*)(vtxdata + format.vtx_offset + format.size * (j + 2)));
-			center = limat_vector_add (limat_vector_add (vtx[0], vtx[1]), vtx[2]);
-			center = limat_vector_multiply (center, 1.0f / 3.0f);
-			group->face_sort_coords[j / 3] = center;
+			for (j = 0 ; j < group->count ; j++)
+			{
+				group->center = limat_vector_add (group->center,
+					*((LIMatVector*)(vtxdata + format.vtx_offset + format.size * j)));
+			}
+			group->center = limat_vector_multiply (group->center, 1.0f / group->count);
 		}
 
 		/* Unmap the deformed vertices. */
@@ -402,13 +388,8 @@ static void private_clear_materials (
 static void private_clear_model (
 	LIRenModel* self)
 {
-	int i;
-
 	liren_particles_clear (&self->particles);
 	liren_mesh_clear (&self->mesh);
-
-	for (i = 0 ; i < self->groups.count ; i++)
-		lisys_free (self->groups.array[i].face_sort_coords);
 	lisys_free (self->groups.array);
 	self->groups.array = NULL;
 	self->groups.count = 0;

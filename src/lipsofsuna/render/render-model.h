@@ -33,7 +33,7 @@ struct _LIRenModelGroup
 {
 	int start;
 	int count;
-	LIMatVector* face_sort_coords;
+	LIMatVector center;
 };
 
 struct _LIRenModel
