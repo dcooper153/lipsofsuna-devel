@@ -117,7 +117,7 @@ void LIPhyCharacterAction::updateAction (
 	speed = this->object->config.movement * this->object->config.speed;
 	if (speed != 0.0f)
 	{
-		private_calculate_control (-dotz, speed, &forward, &velx, &accel);
+		private_calculate_control (-dotz, speed, &forward, &velz, &accel);
 		velz *= damp0;
 	}
 	else if (ground)
