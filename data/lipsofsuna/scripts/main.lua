@@ -53,6 +53,7 @@ require "common/sectors"
 require "common/species"
 require "common/thread"
 require "common/timer"
+require "common/voxel"
 
 if Settings.server then
 require "core/object-physics"
