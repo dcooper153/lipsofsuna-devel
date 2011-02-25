@@ -32,23 +32,23 @@ Widgets.Scene.pick = function(self)
 end
 
 Widgets.Scene.pressed = function(self)
-	if not Drag:clicked_scene() then
+	if not Drag or not Drag:clicked_scene() then
 		Target:select_scene()
 	end
 end
 
 Widgets.Scene.render = function(self)
-	Player.camera.viewport = {self.x, self.y, self.width, self.height}
+	self.camera.viewport = {self.x, self.y, self.width, self.height}
 	self.scene:draw_begin{
-		hdr = Views.Options.inst.bloom_enabled,
+		hdr = Views and Views.Options.inst.bloom_enabled,
 		modelview = self.camera.modelview,
-		multisamples = Views.Options.inst.multisamples,
+		multisamples = Views and Views.Options.inst.multisamples,
 		projection = self.camera.projection,
 		viewport = self.camera.viewport}
 	self.scene:draw_pass{pass = 1} -- Depth pass
 	self.scene:draw_pass{pass = 4} -- Opaque pass
 	self.scene:draw_pass{pass = 6, sorting = true} -- Transparent pass
-	if Views.Options.inst.bloom_enabled then
+	if Views and Views.Options.inst.bloom_enabled then
 		self.scene:draw_post_process{mipmaps = true, shader = "postprocess-hdr"}
 	end
 	self.scene:draw_end()
