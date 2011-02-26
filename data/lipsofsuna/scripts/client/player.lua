@@ -68,6 +68,40 @@ Player.get_picking_ray_3rd = function(clss)
 	return pos,pos + rot * Vector(0,0,-50)
 end
 
+Player.pick_look = function(clss)
+	-- Make sure that the player is logged in.
+	if not clss.object then
+		Target.target_object = nil
+		clss.crosshair.realized = false
+		return
+	end
+	-- Ignore the crosshair, the player, and her equipment.
+	local ignore = {[clss.crosshair] = true, [clss.object] = true}
+	local slots = Slots:find{owner = clss.object}
+	if slots then
+		for k,v in pairs(slots.slots) do
+			ignore[v] = true
+		end
+	end
+	-- Ray pick an object in front of the player.
+	local r1,r2 = clss:get_picking_ray_1st()
+	local p,o = Target:pick_ray{ray1 = r1, ray2 = r2, ignore = ignore}
+	Target.target_object = o
+	if o then
+		if o.name and o.name ~= "" then
+			Gui:set_target_text("Interact with " .. o.name)
+		else
+			Gui:set_target_text("Interact")
+		end
+		set = true
+	else
+		Gui:set_target_text()
+	end
+	-- Update the crosshair.
+	clss.crosshair.position = (p or r2) - (r2 - r1):normalize() * 0.1
+	clss.crosshair.realized = true
+end
+
 Player.camera = Camera{far = 40.0, fov = 1.1, mode = "third-person", near = 0.01, position_smoothing = 0.15, rotation_smoothing = 0.15}
 Player.camera_tilt = 0
 Player.camera_tilt_state = 0
@@ -143,3 +177,12 @@ end
 
 Player.update_pose = function(clss, secs)
 end
+
+-- Periodically check if there's an object in front of the player.
+Timer{delay = 0.05, func = function()
+	if Player.object and Client.moving then
+		Player:pick_look()
+	else
+		Target.target_object = nil
+	end
+end}
