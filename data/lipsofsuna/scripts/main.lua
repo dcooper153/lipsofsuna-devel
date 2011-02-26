@@ -99,6 +99,8 @@ require "content/quests/sanctuary"
 if Settings.quit then Program.quit = true end
 if Settings.server then
 	require "server/main"
+elseif Settings.editor then
+	require "editor/main"
 else
 	require "client/main"
 end

@@ -7,7 +7,20 @@ Settings.port = 10101
 -- @param clss Settings class.
 Settings.parse_command_line = function(clss)
 	local i = 1
-	local a = Settings.arguments
+	local a = clss.arguments
+	local parse_pattern = function()
+		local num = 0
+		while i <= #a and string.sub(a[i], 1, 1) ~= "-" do
+			if clss.pattern then
+				clss.pattern = clss.region .. " " .. a[i]
+			else
+				clss.pattern = a[i]
+			end
+			i = i + 1
+		end
+		if not clss.pattern then clss.pattern = "spawnpoint1" end
+		return num
+	end
 	local parse_addr_port = function()
 		if i > #a or string.sub(a[i], 1, 1) == "-" then return 0 end
 		Settings.address = a[i]
@@ -17,7 +30,11 @@ Settings.parse_command_line = function(clss)
 	end
 	-- Parse arguments.
 	while i <= #a do
-		if a[i] == "--generate" then
+		if a[i] == "--editor" then
+			clss.editor = true
+			i = i + 1
+			i = i + parse_pattern()
+		elseif a[i] == "--generate" then
 			clss.generate = true
 			i = i + 1
 		elseif a[i] == "--help" or a[i] == "-h" then
@@ -46,13 +63,17 @@ Settings.parse_command_line = function(clss)
 		end
 	end
 	-- Host by default.
-	if not clss.client and not clss.server then
+	if not clss.client and not clss.server and not clss.editor then
 		clss.host = true
 		clss.client = true
 	end
 	-- Check for validity.
 	if clss.help then return end
+	if clss.host and clss.editor then return end
+	if clss.join and clss.editor then return end
 	if clss.client and clss.server then return end
+	if clss.client and clss.editor then return end
+	if clss.editor and clss.server then return end
 	if not clss.host and not clss.server and clss.generate then return end
 	return true
 end
@@ -64,6 +85,7 @@ Settings.usage = function(clss)
 	return [[Usage: lipsofsuna lipsofsuna [options]
 
 Options:
+  --editor <region>        Edit a map region.
   --generate               Generate a new map.
   --help                   Show this help message and exit.
   --host localhost <port>  Start a server and join it.
