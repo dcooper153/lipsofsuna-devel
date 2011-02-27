@@ -211,13 +211,29 @@ Editor.save = function(self)
 	table.sort(items, sortobj)
 	table.sort(obstacles, sortobj)
 	table.sort(species, sortobj)
+	-- Format categories.
+	local t = "Pattern{\n\tname = \"" .. self.pattern.name .. "\",\n\tsize = " .. tostring(self.size) .. ",\n"
+	if self.pattern.categories then
+		local categories = {}
+		for k,v in pairs(self.pattern.categories) do
+			table.insert(categories, k)
+		end
+		table.sort(categories)
+		t = t .. "\tcategories = {"
+		local comma
+		for k,v in ipairs(categories) do
+			if comma then t = t .. "," end
+			t = t .. "\"" .. v .. "\""
+			comma = true
+		end
+		t = t .. "},\n"
+	end
 	-- Format objects.
 	local addobj = function(t, k, v)
 		local p = roundvec(v.position)
 		if k > 1 then t = t .. ",\n" end
 		return t .. "\t\t{" .. p[1] .. "," .. p[2] .. "," .. p[3] .. ",\"" .. v.spec.name .. "\"}"
 	end
-	local t = "Pattern{\n\tname = \"" .. self.pattern.name .. "\",\n\tsize = " .. tostring(self.size) .. ",\n"
 	local comma
 	if #items > 0 then
 		t = t .. "\titems = {\n"
@@ -270,7 +286,7 @@ Editor.save = function(self)
 	if not first then
 		t = t .. "}"
 	end
-	t = t .. "}"
+	t = t .. "}\n"
 	-- Print to the console.
 	print(t)
 end
