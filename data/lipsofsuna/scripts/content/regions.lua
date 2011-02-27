@@ -12,6 +12,7 @@ Regionspec{
 	depth = {2950,3000},
 	distance = {"Lips",30,50},
 	links = {"Sanctuary", "Chara's Root Grove"},
+	random_resources = false,
 	size = {16,8,16}}
 
 Regionspec{

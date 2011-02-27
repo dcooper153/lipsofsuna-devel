@@ -28,6 +28,16 @@ Aabb.intersects = function(self, aabb)
 	return true
 end
 
+Aabb.intersects_point = function(self, point)
+	if point.x < self.point.x then return end
+	if point.y < self.point.y then return end
+	if point.z < self.point.z then return end
+	if point.x > self.point.x + self.size.x then return end
+	if point.y > self.point.y + self.size.x then return end
+	if point.z > self.point.z + self.size.x then return end
+	return true
+end
+
 Config = {}
 Config.tilewidth = 32 / Voxel.tiles_per_line
 Config.tilescale = 1 / Config.tilewidth

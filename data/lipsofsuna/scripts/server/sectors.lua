@@ -102,17 +102,35 @@ Sectors.format_generated_sector = function(self, sector)
 			end
 		end
 	end
+	-- Find regions that prohibit generation.
+	prohibited = {}
+	local size = Vector(Voxel.tiles_per_line, Voxel.tiles_per_line, Voxel.tiles_per_line)
+	local aabb = Aabb{point = org, size = size}
+	for k,v in pairs(Generator.regions_dict_id) do
+		if not v.random_resources and aabb:intersects(v.aabb) then
+			table.insert(prohibited, v.aabb)
+		end
+	end
+	local validate_position = function(p)
+		for k,v in pairs(prohibited) do
+			if v:intersects_point(p) then return end
+		end
+		return true
+	end
+	-- Generate resources.
 	local p = Vector()
-	for i=1,100 do
+	for i=1,50 do
 		p.x = org.x + math.random(1, Voxel.tiles_per_line - 1)
 		p.y = org.y + math.random(1, Voxel.tiles_per_line - 1)
 		p.z = org.z + math.random(1, Voxel.tiles_per_line - 1)
-		local t = Voxel:get_tile{point = p}
-		if t ~= 0 then
-			local m = mats[math.random(1,#mats)]
-			if m then create_vein(p, m.id, 1) end
-		else
-			create_plant_or_item(p)
+		if validate_position(p) then
+			local t = Voxel:get_tile{point = p}
+			if t ~= 0 then
+				local m = mats[math.random(1,#mats)]
+				if m then create_vein(p, m.id, 1) end
+			else
+				create_plant_or_item(p)
+			end
 		end
 	end
 end
