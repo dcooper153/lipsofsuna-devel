@@ -3,11 +3,6 @@ Quest{
 	status = "inactive"}
 
 Pattern{
-	name = "mourning adventurer town",
-	creatures = {
-		{0,0,0,"mourning adventurer"}}}
-
-Pattern{
 	name = "mourning adventurer lost",
 	creatures = {
 		{0,0,0,"lost adventurer"},

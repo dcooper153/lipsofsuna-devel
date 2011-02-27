@@ -35,7 +35,7 @@ Generator = Class()
 Generator.map_size = Vector(500, 500, 500)
 Generator.map_start = Vector(1500, 2750, 1500) - Generator.map_size * 0.5
 Generator.map_end = Vector(1500, 2750, 1500) + Generator.map_size * 0.5
-Generator.map_version = "3"
+Generator.map_version = "4"
 
 --- Informs clients of the generator status.
 -- @param clss Generator class.
@@ -244,14 +244,8 @@ Generator.generate = function(clss, args)
 	local region_funcs = {
 		-- TODO
 		["Lips"] = function(r)
-			Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "house1"}
-			Voxel:place_pattern{point = r.point + Vector(13,0,1), name = "house1"}
-			Voxel:place_pattern{point = r.point + Vector(14,0,1), name = "house1"}
-			Voxel:place_pattern{point = r.point + Vector(12,0,12), name = "spawnpoint1"}
-			Voxel:place_pattern{point = r.point + Vector(9,2,9), name = "mourning adventurer town"}
+			Voxel:place_pattern{point = r.point + Vector(0,0,0), name = "lips1"}
 			Voxel:place_pattern{point = r.point + Vector(4,1,4), name = "peculiar pet"}
-			Voxel:place_creature{point = r.point + Vector(3,0,14), name = "lipscitizen"}
-			Voxel:place_creature{point = r.point + Vector(8,0,9), name = "lipscitizen"}
 		end,
 		["Chara's Root Grove"] = function(r)
 			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "roots of world"}

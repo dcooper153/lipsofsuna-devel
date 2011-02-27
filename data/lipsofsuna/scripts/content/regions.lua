@@ -4,7 +4,7 @@ Regionspec{
 	depth = {3000,3000},
 	links = {"Portal of Lips", "Sanctuary", "Chara's Root Grove"},
 	position = {1536,1536},
-	size = {32,8,32}}
+	size = {32,16,32}}
 
 Regionspec{
 	name = "Portal of Lips",

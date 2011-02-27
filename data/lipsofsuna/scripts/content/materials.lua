@@ -25,11 +25,33 @@ Material{
 	type = "rounded"}
 
 Material{
+	name = "brick1",
+	shader = "terrain",
+	texture = {"bricks3", "bricks3n", "stone-001"},
+	texture_scale = 0.11,
+	type = "cube"}
+
+Material{
 	name = "brittlerock1",
 	shader = "terrain",
 	texture = {"granite1", "granite1n", "stone-001"}, -- FIXME
 	texture_scale = 0.11,
 	type = "rounded"}
+
+Material{
+	name = "cobbles1",
+	shader = "terrain",
+	texture = {"cobbles1", "cobbles1n", "stone-001"},
+	texture_scale = 0.13,
+	type = "rounded"}
+
+Material{
+	mining_materials = {["granite stone"] = 1},
+	name = "concrete1",
+	shader = "terrain",
+	texture = {"granite1", "granite1n", "stone-001"},
+	texture_scale = 0.33,
+	type = "cube"}
 
 Material{
 	mining_materials = {["crimson stone"] = 1},
