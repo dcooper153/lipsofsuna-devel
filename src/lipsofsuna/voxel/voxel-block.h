@@ -23,6 +23,18 @@
 #include <lipsofsuna/system.h>
 #include "voxel-types.h"
 
+enum
+{
+	LIVOX_DIRTY_NEGATIVE_X = 0x01,
+	LIVOX_DIRTY_POSITIVE_X = 0x02,
+	LIVOX_DIRTY_NEGATIVE_Y = 0x04,
+	LIVOX_DIRTY_POSITIVE_Y = 0x08,
+	LIVOX_DIRTY_NEGATIVE_Z = 0x10,
+	LIVOX_DIRTY_POSITIVE_Z = 0x20,
+	LIVOX_DIRTY_PROPAGATED = 0x40,
+	LIVOX_DIRTY_EXPLICIT = 0x80,
+};
+
 typedef struct _LIVoxBlock LIVoxBlock;
 typedef struct _LIVoxBlockAddr LIVoxBlockAddr;
 

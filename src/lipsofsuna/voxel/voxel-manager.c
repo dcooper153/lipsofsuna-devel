@@ -390,6 +390,8 @@ livox_manager_mark_updates (LIVoxManager* self)
 		for (y = 0 ; y < self->blocks_per_line ; y++)
 		for (x = 0 ; x < self->blocks_per_line ; x++, i++)
 		{
+			if (!(sector->blocks[i].dirty & LIVOX_DIRTY_EXPLICIT))
+				continue;
 			for (j = 0 ; j < 26 ; j++)
 			{
 				if ((sector->blocks[i].dirty & neighbors[j].mask) != neighbors[j].mask)
@@ -591,8 +593,8 @@ livox_manager_set_voxel (LIVoxManager*     self,
 
 /*****************************************************************************/
 
-static void
-private_clear_materials (LIVoxManager* self)
+static void private_clear_materials (
+	LIVoxManager* self)
 {
 	LIAlgU32dicIter iter;
 	LIVoxMaterial* material;
@@ -605,12 +607,12 @@ private_clear_materials (LIVoxManager* self)
 	lialg_u32dic_clear (self->materials);
 }
 
-static void
-private_mark_block (LIVoxManager* self,
-                    LIVoxSector*  sector,
-                    int           x,
-                    int           y,
-                    int           z)
+static void private_mark_block (
+	LIVoxManager* self,
+	LIVoxSector*  sector,
+	int           x,
+	int           y,
+	int           z)
 {
 	int sx;
 	int sy;
@@ -658,7 +660,7 @@ private_mark_block (LIVoxManager* self,
 	if (sector1 == NULL)
 		return;
 	block = livox_sector_get_block (sector1, x, y, z);
-	block->dirty |= 0x80;
+	block->dirty |= LIVOX_DIRTY_PROPAGATED;
 	sector1->dirty = 1;
 }
 

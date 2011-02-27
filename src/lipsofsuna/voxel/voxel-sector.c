@@ -459,14 +459,14 @@ static int private_set_voxel (
 	block = livox_sector_get_block (self, x / m, y / m, z / m);
 	x %= m;
 	y %= m;
-	z %= m--;
-	if (x == 0) block->dirty |= 0x01;
-	if (x == m) block->dirty |= 0x02;
-	if (y == 0) block->dirty |= 0x04;
-	if (y == m) block->dirty |= 0x08;
-	if (z == 0) block->dirty |= 0x10;
-	if (z == m) block->dirty |= 0x20;
-	block->dirty |= 0x80;
+	z %= m;
+	if (x == 0) block->dirty |= LIVOX_DIRTY_NEGATIVE_X;
+	if (x == m - 1) block->dirty |= LIVOX_DIRTY_POSITIVE_X;
+	if (y == 0) block->dirty |= LIVOX_DIRTY_NEGATIVE_Y;
+	if (y == m - 1) block->dirty |= LIVOX_DIRTY_POSITIVE_Y;
+	if (z == 0) block->dirty |= LIVOX_DIRTY_NEGATIVE_Z;
+	if (z == m - 1) block->dirty |= LIVOX_DIRTY_POSITIVE_Z;
+	block->dirty |= LIVOX_DIRTY_EXPLICIT;
 	block->stamp++;
 
 	return 1;

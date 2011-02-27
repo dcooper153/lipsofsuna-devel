@@ -338,7 +338,7 @@ static void private_worker_thread (
 		lithr_mutex_unlock (self->tasks.mutex);
 
 		/* Process the task. */
-		if (!livox_builder_build (task->builder, &task->model, NULL) || task->model == NULL)
+		if (!livox_builder_build (task->builder, &task->model, NULL))
 		{
 			livox_builder_free (task->builder);
 			lithr_mutex_lock (self->tasks.mutex);

@@ -267,7 +267,8 @@ static int private_process_result (
 	}
 	block->terrain = task->terrain;
 	task->terrain = NULL;
-	liphy_terrain_set_realized (block->terrain, 1);
+	if (block->terrain != NULL)
+		liphy_terrain_set_realized (block->terrain, 1);
 
 	return 1;
 }
@@ -336,7 +337,7 @@ static void private_worker_thread (
 		lithr_mutex_unlock (self->tasks.mutex);
 
 		/* Process the task. */
-		if (!livox_builder_build (task->builder, NULL, &task->terrain) || task->terrain == NULL)
+		if (!livox_builder_build (task->builder, NULL, &task->terrain))
 		{
 			livox_builder_free (task->builder);
 			lisys_free (task);
