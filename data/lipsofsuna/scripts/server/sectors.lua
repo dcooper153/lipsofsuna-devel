@@ -26,12 +26,14 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 	end
 	-- Spawn monsters.
 	local org = self:get_sector_offset(sector)
+	local spawn = Config.spawn * Voxel.tile_scale
 	for i = 1,monsters do
 		for j = 1,30 do
 			local c = Vector()
 			c.x = org.x + 5 + math.random(0, Voxel.tiles_per_line - 10)
 			c.y = org.y + 5 + math.random(0, Voxel.tiles_per_line - 10)
 			c.z = org.z + 5 + math.random(0, Voxel.tiles_per_line - 10)
+			if (c - spawn).length < 50 then break end
 			local t,p = Voxel:find_tile{match = "empty", point = c * Config.tilewidth, radius = 3 * Config.tilewidth}
 			if t and Voxel:get_tile{point = p + Vector(0, 1, 0)} == 0 then
 				p = p + Vector(0.5, 0.5, 0.5)
