@@ -57,6 +57,7 @@ LIVoxMaterial* livox_material_new ()
 		livox_material_free (self);
 		return NULL;
 	}
+	self->material.flags |= LIMDL_MATERIAL_FLAG_CULLFACE;
 
 	return self;
 }

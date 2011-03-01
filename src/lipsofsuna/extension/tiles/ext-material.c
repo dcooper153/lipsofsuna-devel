@@ -75,6 +75,31 @@ static void Material_new (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Face culling toggle.
+ * -- @name Material.cullface
+ * -- @class table
+ */
+static void Material_getter_cullface (LIScrArgs* args)
+{
+	LIVoxMaterial* self = args->self;
+
+	liscr_args_seti_int (args, (self->material.flags & LIMDL_MATERIAL_FLAG_CULLFACE) != 0);
+}
+static void Material_setter_cullface (LIScrArgs* args)
+{
+	int value;
+	LIVoxMaterial* self = args->self;
+
+	if (liscr_args_geti_bool (args, 0, &value))
+	{
+		if (value)
+			self->material.flags |= LIMDL_MATERIAL_FLAG_CULLFACE;
+		else
+			self->material.flags &= ~LIMDL_MATERIAL_FLAG_CULLFACE;
+	}
+}
+
+/* @luadoc
  * --- Diffuse color.
  * -- @name Material.diffuse
  * -- @class table
@@ -333,6 +358,7 @@ void liext_script_material (
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_MATERIAL, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Material_new);
+	liscr_class_insert_mvar (self, "cullface", Material_getter_cullface, Material_setter_cullface);
 	liscr_class_insert_mvar (self, "diffuse", Material_getter_diffuse, Material_setter_diffuse);
 	liscr_class_insert_mvar (self, "flags", Material_getter_flags, Material_setter_flags);
 	liscr_class_insert_mvar (self, "friction", Material_getter_friction, Material_setter_friction);
