@@ -73,7 +73,7 @@ Feat.apply = function(self, args)
 	-- Digging.
 	if anim.categories["melee"] and args.tile and args.weapon then
 		if args.weapon.spec.categories["mattock"] then
-			Voxel:damage(args.tile, args.damage, "mattock")
+			Voxel:damage(args.attacker, args.tile)
 		end
 	end
 	-- Building.
