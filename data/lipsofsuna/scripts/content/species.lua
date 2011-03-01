@@ -71,6 +71,31 @@ Species{
 		{name = "willpower", max = 80, val = 30}}}
 
 Species{
+	name = "aermale",
+	base = "race",
+	equipment_class = "aermale",
+	model = "aermale1",
+	models = {
+		skeleton = "aermale1",
+		arms = "aermale1arms1",
+		head = "aermale1head1",
+		legs = "aermale1legs1",
+		feet = "aermale1feet1",
+		eyes = "aermale1eyes1",
+		upper = "aermale1chest1"},
+	hair_styles = {
+		
+		{"Short", "aermale1hair1"}},
+
+	skills = {
+		{name = "dexterity", max = 80, val = 30},
+		{name = "health", max = 100, val = 50},
+		{name = "intelligence", max = 100, val = 50},
+		{name = "perception", max = 60, val = 20},
+		{name = "strength", max = 40, val = 20},
+		{name = "willpower", max = 80, val = 30}}}
+
+Species{
 	name = "android",
 	base = "race",
 	equipment_class = "android",
@@ -253,6 +278,14 @@ Species{
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {"leather top", "leather pants", "leather leggings"}}
+
+Species{
+	name = "lipscitizenmale",
+	base = "aermale",
+	dialog = "lipscitizen",
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"shirt", "pants", "boots"}}
 
 Species{
 	name = "seirei",

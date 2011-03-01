@@ -2378,3 +2378,20 @@
     <type>model</type>
   </asset>
 </assets>
+ <asset>
+    <file>graphics/aermale1*.lmdl</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>character</tag>
+    <type>model</type>
+  </asset>
+ <asset>
+    <file>import/aermale1.blend</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>character</tag>
+    <type>model</type>
+  </asset>
+</assets>

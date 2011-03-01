@@ -671,6 +671,36 @@ Itemspec{
 	crafting_materials = {["log"] = 1},
 	equipment_slot = "hand.L"}
 
+Itemspec{
+	name = "shirt",
+	model = "book-000",
+	armor_class = 0.04,
+	categories = {"armor"},
+	crafting_materials = {hide = 1},
+	equipment_models = {
+		["aermale"] = {upper = "aermale1shirt1"}},
+	equipment_slot = "upperbody",
+	icon = "cloth1"}
+Itemspec{
+	name = "pants",
+	model = "book-000",
+	armor_class = 0.04,
+	categories = {"armor"},
+	crafting_materials = {hide = 1},
+	equipment_models = {
+		["aermale"] = {legs = "aermale1pants1"}},
+	equipment_slot = "lowerbody",
+	icon = "cloth1"}
+Itemspec{
+	name = "boots",
+	model = "book-000",
+	armor_class = 0.04,
+	categories = {"armor"},
+	crafting_materials = {hide = 1},
+	equipment_models = {
+		["aermale"] = {feet = "aermale1boots1"}},
+	equipment_slot = "feet",
+	icon = "cloth1"}
 ------------------------------------------------------------------------------
 -- Miscellaneous.
 
