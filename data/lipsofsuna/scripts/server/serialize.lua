@@ -4,6 +4,8 @@ Serialize.data_version = "4"
 --- Initializes the serializer.
 -- @param clss Serialize class.
 Serialize.init = function(clss)
+	clss.accounts = Database{name = "accounts" .. Settings.file .. ".sqlite"}
+	clss.accounts:query("CREATE TABLE IF NOT EXISTS accounts (login TEXT PRIMARY KEY,password TEXT,permissions INTEGER,character TEXT);")
 	clss.db = Database{name = "save" .. Settings.file .. ".sqlite"}
 	clss.sectors = Sectors{database = clss.db}
 	clss.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
@@ -64,6 +66,17 @@ Serialize.load = function(clss)
 	clss:load_quests()
 end
 
+--- Loads an account from the account database.
+-- @param clss Serialize class.
+-- @param login Login name.
+-- @return Account database row or nil.
+Serialize.load_account = function(clss, login)
+	local r = clss.accounts:query("SELECT login,password,permissions,character FROM accounts WHERE login=?;", {login})
+	for k,v in ipairs(r) do
+		return v
+	end
+end
+
 --- Loads map markers from the database.
 -- @param clss Serialize class.
 Serialize.load_markers = function(clss)
@@ -92,6 +105,30 @@ Serialize.save = function(clss, erase)
 	clss.sectors:save_world(erase)
 	clss:save_markers(erase)
 	clss:save_quests(erase)
+	clss:save_accounts(erase)
+end
+
+--- Saves a player account.
+-- @param clss Serialize class.
+-- @param account Account.
+-- @param object Player object or nil.
+Serialize.save_account = function(clss, account, object)
+	clss.accounts:query("BEGIN TRANSACTION;")
+	clss.accounts:query("REPLACE INTO accounts (login,password,permissions,character) VALUES (?,?,?,?);",
+		{account.login, account.password, account.permissions, object and object:write()})
+	clss.accounts:query("END TRANSACTION;")
+end
+
+--- Saves all active player accounts.
+-- @param clss Serialize class.
+-- @param erase True to erase existing database entries first.
+Serialize.save_accounts = function(clss, erase)
+	if erase then
+		clss.accounts:query("DELETE FROM accounts;")
+	end
+	for k,v in pairs(Player.clients) do
+		clss:save_account(v.account, v)
+	end
 end
 
 --- Saves a map marker.

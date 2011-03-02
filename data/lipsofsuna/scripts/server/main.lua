@@ -1,6 +1,7 @@
 print "INFO: Loading server scripts."
 
 require "server/util"
+require "server/account"
 require "server/serialize"
 require "server/controls"
 require "server/chat"

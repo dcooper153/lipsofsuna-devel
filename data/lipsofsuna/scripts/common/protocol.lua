@@ -49,6 +49,7 @@ do
 	add("CHARACTER_ACCEPT")
 	add("CHARACTER_CREATE")
 	add("CHAT")
+	add("CLIENT_AUTHENTICATE")
 	add("CRAFTING")
 	add("CROUCH")
 	add("DIALOG_ANSWER")

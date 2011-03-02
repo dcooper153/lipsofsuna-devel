@@ -1,4 +1,21 @@
+local spawn_player = function(object, client)
+	-- Inform client.
+	Network:send{client = client, packet = Packet(packets.CHARACTER_ACCEPT)}
+	-- Add to the map.
+	Player.clients[client] = object
+	object:teleport{position = Config.spawn}
+	object.realized = true
+	-- Transmit active and completed quests.
+	for k,q in pairs(Quest.dict_name) do
+		q:send{client = object}
+		q:send_marker{client = object}
+	end
+end
+
 Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
+	-- Make sure the client has been authenticated.
+	local account = Account.dict_client[args.client]
+	if not account then return end
 	-- Make sure not created already.
 	local player = Player:find{client = args.client}
 	if player then return end
@@ -15,11 +32,11 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	local spec = Species:find{name = ra .. "-player"}
 	if not spec then return end
 	-- TODO: Input validation.
-	Network:send{client = args.client, packet = Packet(packets.CHARACTER_ACCEPT)}
 	-- Create character. To prevent the player from falling inside the ground
 	-- when spawned in a yet to be loaded region, we disable the physics of
 	-- the object for a short while.
 	local o = Player{
+		account = account,
 		body_scale = bo,
 		bust_scale = bu,
 		client = args.client,
@@ -29,11 +46,8 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		name = (na ~= "" and na or "Player"),
 		nose_scale = no,
 		random = true,
-		realized = true,
 		skin_style = {skin, skinr, sking, skinb},
 		spec = spec}
-	Player.clients[args.client] = o
-	o:teleport{position = Config.spawn}
 	-- Set skills.
 	local names = {"dexterity", "health", "intelligence", "perception", "strength", "willpower"}
 	local values = {s1, s2, s3, s4, s5, s6}
@@ -43,11 +57,46 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		local real = o.skills:get_maximum{skill = names[i]}
 		o.skills:set_value{skill = names[i], value = 0.666 * real}
 	end
-	-- Transmit active and completed quests.
-	for k,q in pairs(Quest.dict_name) do
-		q:send{client = o}
-		q:send_marker{client = o}
+	-- Add to the map.
+	spawn_player(o, args.client)
+	Serialize:save_account(account, o)
+end}
+
+Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
+	-- Make sure not authenticated already.
+	local account = Account.dict_client[args.client]
+	if account then return end
+	-- Read credentials.
+	local ok,login,pass = args.packet:read("string", "string")
+	if not ok then
+		Network:disconnect(args.client)
+		return
 	end
+	-- Load or create the account.
+	-- The password is also checked in case of an existing account. If the
+	-- check fails, Account() returns nil and we disconnect the client.
+	account = Account(login, pass)
+	if not account then
+		Network:disconnect(args.client)
+		return
+	end
+	Account.dict_client[args.client] = account
+	-- Create existing characters.
+	if account.character then
+		local func = assert(loadstring("return function()\n" .. account.character .. "\nend"))()
+		if func then
+			local object = func()
+			if object then
+				Network:send{client = args.client, packet = Packet(packets.CHARACTER_ACCEPT)}
+				object.account = account
+				object:set_client(args.client)
+				spawn_player(object, args.client)
+				return
+			end
+		end
+	end
+	-- Enter the character creation mode.
+	Network:send{client = args.client, packet = Packet(packets.CHARACTER_CREATE)}
 end}
 
 Protocol:add_handler{type = "CROUCH", func = function(args)

@@ -80,6 +80,10 @@ Eventhandler{type = "tick", func = function(self, args)
 	end
 end}
 
+Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(event)
+	Network:send{packet = Packet(packets.CLIENT_AUTHENTICATE, "string", Settings.account, "string", Settings.password)}
+end}
+
 Protocol:add_handler{type = "GENERATOR_STATUS", func = function(event)
 	local ok,s,f = event.packet:read("string", "float")
 	if ok then

@@ -12,6 +12,7 @@ end
 --- Creates a new player object.
 -- @param clss Player class.
 -- @param args Arguments.<ul>
+--   <li>account: Account data.</li>
 --   <li>angular: Angular velocity.</li>
 --   <li>body_scale: Scale factor of the body.</li>
 --   <li>bust_scale: Scale factor of the bust.</li>
@@ -32,17 +33,8 @@ end
 -- @return Player.
 Player.new = function(clss, args)
 	local self = Creature.new(clss, args)
-	self.client = args.client
-	self.vision = Vision{object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
-	self.vision.terrain = {}
-	self.inventory:subscribe{object = self, callback = function(args) self:inventory_cb(args) end}
-
-	-- Terrain listener.
-	self.player_timer = Timer{delay = 0.2, func = function()
-		self:update_vision_radius()
-		self:vision_cb{type = "player-tick"}
-	end}
-
+	self.account = args.account
+	if args.client then self:set_client(args.client) end
 	return self
 end
 
@@ -55,6 +47,18 @@ end
 		self:damaged(damage)
 	end
 end--]]
+
+Player.set_client = function(self, client)
+	self.client = client
+	self.vision = Vision{object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
+	self.vision.terrain = {}
+	self.inventory:subscribe{object = self, callback = function(args) self:inventory_cb(args) end}
+	-- Terrain listener.
+	self.player_timer = Timer{delay = 0.2, func = function()
+		self:update_vision_radius()
+		self:vision_cb{type = "player-tick"}
+	end}
+end
 
 --- Causes the player to die and respawn.
 -- @param self Player.
@@ -96,6 +100,7 @@ end
 
 Player.respawn = function(self)
 	self:detach()
+	Serialize:save_account(self.account)
 end
 
 Player.inventory_cb = function(self, args)
@@ -284,15 +289,60 @@ Player.vision_cb = function(self, args)
 	if fun then fun(args) end
 end
 
+--- Serializes the object to a string.
+-- @param self Object.
+-- @return Data string.
+Player.write = function(self)
+	return string.format("local self=Player{" ..
+		"angular=%s,body_scale=%s,bust_scale=%s,dead=%s,eye_style={%s,%s,%s,%s}," ..
+		"gender=%s,hair_style={%s,%s,%s,%s},name=%s,nose_scale=%s,physics=%s," ..
+		"position=%s,rotation=%s,skin_style={%s,%s,%s,%s},spec=%s}\n%s%s%s",
+		serialize_value(self.angular),
+		serialize_value(self.body_scale),
+		serialize_value(self.bust_scale),
+		serialize_value(self.dead),
+		serialize_value(self.eye_style[1]),
+		serialize_value(self.eye_style[2]),
+		serialize_value(self.eye_style[3]),
+		serialize_value(self.eye_style[4]),
+		serialize_value(self.gender),
+		serialize_value(self.hair_style[1]),
+		serialize_value(self.hair_style[2]),
+		serialize_value(self.hair_style[3]),
+		serialize_value(self.hair_style[4]),
+		serialize_value(self.name),
+		serialize_value(self.nose_scale),
+		serialize_value(self.physics),
+		serialize_value(self.position),
+		serialize_value(self.rotation),
+		serialize_value(self.skin_style[1]),
+		serialize_value(self.skin_style[2]),
+		serialize_value(self.skin_style[3]),
+		serialize_value(self.skin_style[4]),
+		serialize_value(self.spec.name),
+		Serialize:encode_skills(self.skills),
+		Serialize:encode_inventory(self.inventory),
+		"return self")
+end
+
 ------------------------------------------------------------------------------
 
 Eventhandler{type = "login", func = function(self, event)
 	print("Client login")
-	Network:send{client = event.client, packet = Packet(packets.CHARACTER_CREATE)}
+	Network:send{client = event.client, packet = Packet(packets.CLIENT_AUTHENTICATE)}
 end}
 Eventhandler{type = "logout", func = function(self, event)
 	print("Client logout")
+	-- Detach the player object.
 	local object = Player.clients[event.client]
-	if not object then return end
-	object:detach()
+	if object then
+		object:detach()
+		Player.clients[event.client] = nil
+	end
+	-- Update the account.
+	local account = Account.dict_client[event.client]
+	if account then
+		Serialize:save_account(account, object)
+		Account.dict_client[event.client] = nil
+	end
 end}
