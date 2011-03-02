@@ -62,30 +62,22 @@ float liext_cameras_clip_camera (
 	LIMatTransform* end)
 {
 	int hit;
-	LIMatAabb aabb;
 	LIPhyCollision tmp;
 	LIPhyPhysics* physics;
-	LIPhyShape* shape;
 
 	/* Find the physics manager. */
 	physics = limai_program_find_component (self->program, "physics");
 	if (physics == NULL)
 		return 1.0f;
 
-	/* Create sweep shape. */
-	/* FIXME: Could use a more accurate shape. */
-	lialg_camera_get_bounds (camera, &aabb);
-	shape = liphy_shape_new (physics);
-	if (shape == NULL)
-		return 1.0f;
-	liphy_shape_add_aabb (shape, &aabb, NULL);
-
-	/* Sweep the shape. */
-	hit = liphy_physics_cast_shape (physics, start, end, shape,
+	/* Find the clip distance with a ray cast. */
+	/* A convex cast might sound like a better idea but it makes the behavior
+	   less predictable so scripting will suffer. The gain is also relatively
+	   small so we just use a ray cast now. */
+	hit = liphy_physics_cast_ray (physics, &start->position, &end->position,
 		LICLI_PHYSICS_GROUP_CAMERA, LIPHY_GROUP_STATICS | LIPHY_GROUP_TILES, NULL, 0, &tmp);
-	liphy_shape_free (shape);
 
-	/* Clip the camera. */
+	/* Return the clip distance. */
 	if (hit)
 		return tmp.fraction;
 	else
