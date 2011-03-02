@@ -4,6 +4,7 @@ Settings.addr = "localhost"
 Settings.port = 10101
 Settings.account = "guest"
 Settings.password = ""
+Settings.file = 1
 
 --- Parses command line arguments.
 -- @param clss Settings class.
@@ -42,6 +43,13 @@ Settings.parse_command_line = function(clss)
 			clss.editor = true
 			i = i + 1
 			i = i + parse_pattern()
+		elseif a[i] == "--file" or a[i] == "-f" then
+			i = i + 1
+			if i <= #a then
+				local f = tonumber(a[i])
+				if f then clss.file = f end
+				i = i + 1
+			end
 		elseif a[i] == "--generate" or a[i] == "-g" then
 			clss.generate = true
 			i = i + 1
@@ -101,6 +109,7 @@ Settings.usage = function(clss)
 Options:
   -a --account <account>      Name of the player account.
   -E --editor <pattern>       Edit a map region.
+  -f --file <number>          Save file number.
   -g --generate               Generate a new map.
   -h --help                   Show this help message and exit.
   -H --host localhost <port>  Start a server and join it.
