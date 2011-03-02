@@ -4,7 +4,7 @@ Serialize.data_version = "4"
 --- Initializes the serializer.
 -- @param clss Serialize class.
 Serialize.init = function(clss)
-	clss.db = Database{name = "save.db"}
+	clss.db = Database{name = "save" .. Settings.file .. ".sqlite"}
 	clss.sectors = Sectors{database = clss.db}
 	clss.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
 	if clss:get_value("data_version") ~= clss.data_version then

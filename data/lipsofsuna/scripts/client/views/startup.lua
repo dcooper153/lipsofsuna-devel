@@ -32,7 +32,7 @@ Startup.enter = function(clss)
 	if Settings.host then
 		-- Host a game.
 		Program:unload_world()
-		Client:host("--server " .. Settings.addr .. " " .. Settings.port)
+		Client:host("--file " .. Settings.file .. " --server " .. Settings.addr .. " " .. Settings.port)
 		clss:set_state("Starting the server on port " .. Settings.port .. "...", "Retry")
 		clss.host_wait_timer = Timer{delay = 2, func = function(timer)
 			if Network:join{host = "localhost", Settings.port} then
