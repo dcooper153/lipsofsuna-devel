@@ -179,6 +179,7 @@ int liphy_physics_cast_ray (
 	/* Inspect results. */
 	if (result != NULL)
 	{
+		result->fraction = test.m_closestHitFraction;
 		result->point = limat_vector_init (test.m_hitPointWorld[0], test.m_hitPointWorld[1], test.m_hitPointWorld[2]);
 		result->normal = limat_vector_init (test.m_hitNormalWorld[0], test.m_hitNormalWorld[1], test.m_hitNormalWorld[2]);
 		pointer = (LIPhyPointer*) test.m_collisionObject->getUserPointer ();
