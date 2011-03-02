@@ -2,6 +2,8 @@ Settings = Class()
 Settings.arguments = string.split(Program.args)
 Settings.addr = "localhost"
 Settings.port = 10101
+Settings.account = "guest"
+Settings.password = ""
 
 --- Parses command line arguments.
 -- @param clss Settings class.
@@ -30,30 +32,42 @@ Settings.parse_command_line = function(clss)
 	end
 	-- Parse arguments.
 	while i <= #a do
-		if a[i] == "--editor" then
+		if a[i] == "--account" or a[i] == "-a" then
+			i = i + 1
+			if i <= #a then
+				clss.account = a[i]
+				i = i + 1
+			end
+		elseif a[i] == "--editor" or a[i] == "-E" then
 			clss.editor = true
 			i = i + 1
 			i = i + parse_pattern()
-		elseif a[i] == "--generate" then
+		elseif a[i] == "--generate" or a[i] == "-g" then
 			clss.generate = true
 			i = i + 1
 		elseif a[i] == "--help" or a[i] == "-h" then
 			clss.help = true
 			i = i + 1
-		elseif a[i] == "--host" then
+		elseif a[i] == "--host" or a[i] == "-H" then
 			clss.host = true
 			clss.client = true
 			i = i + 1
 			i = i + parse_addr_port()
-		elseif a[i] == "--join" then
+		elseif a[i] == "--join" or a[i] == "-J" then
 			clss.join = true
 			clss.client = true
 			i = i + 1
 			i = i + parse_addr_port()
-		elseif a[i] == "--quit" then
+		elseif a[i] == "--password" or a[i] == "-p" then
+			i = i + 1
+			if i <= #a then
+				clss.password = a[i]
+				i = i + 1
+			end
+		elseif a[i] == "--quit" or a[i] == "-q" then
 			clss.quit = true
 			i = i + 1
-		elseif a[i] == "--server" then
+		elseif a[i] == "--server" or a[i] == "-S" then
 			clss.server = true
 			i = i + 1
 			i = i + parse_addr_port()
@@ -85,11 +99,13 @@ Settings.usage = function(clss)
 	return [[Usage: lipsofsuna lipsofsuna [options]
 
 Options:
-  --editor <region>        Edit a map region.
-  --generate               Generate a new map.
-  --help                   Show this help message and exit.
-  --host localhost <port>  Start a server and join it.
-  --join <server> <port>   Join a remove server.
-  --quit                   Quit immediately after startup.
-  --server                 Run as a dedicated server.]]
+  -a --account <account>      Name of the player account.
+  -E --editor <pattern>       Edit a map region.
+  -g --generate               Generate a new map.
+  -h --help                   Show this help message and exit.
+  -H --host localhost <port>  Start a server and join it.
+  -J --join <server> <port>   Join a remove server.
+  -p --password <password>    Password of the player account.
+  -q --quit                   Quit immediately after startup.
+  -S --server                 Run as a dedicated server.]]
 end
