@@ -32,21 +32,42 @@ Player.get_camera_transform_3rd = function(clss)
 	local turn = clss.camera_turn_state + clss.turn_state
 	local tilt = clss.camera_tilt_state - clss.tilt_state
 	local rot = Quaternion:new_euler(turn, 0, tilt)
+	-- Find the camera offset.
+	local spec = Species:find{name = clss.species}
+	local rel = spec and spec.camera_center or Vector(0, 2, 0)
+	local turn1 = Quaternion:new_euler(turn)
 	-- Calculate the center position.
 	-- If there's room, the camera is placed slightly to the right so that
 	-- the character doesn't obstruct the crosshair so badly.
-	local spec = Species:find{name = clss.species}
-	local rel = spec and spec.camera_center or Vector(0, 2, 0)
+	local best_center = clss.object.position + rel
+	local best_score = -1
+	local stepl = 0.26
+	local stepn = 5
+	local steps = stepn
 	local r1 = clss.object.position + rel
-	local r2 = r1 + Quaternion:new_euler(turn) * Vector(1.3)
-	local ctr = Voxel:intersect_ray(r1, r2)
+	local r2 = r1 + turn1 * Vector(stepl * stepn)
+	local ctr = Physics:cast_ray{src = r1, dst = r2, ignore = clss.object}
 	if ctr then
-		ctr = r1 + (ctr - r1) * 0.9
-	else
-		ctr = r2
+		steps = math.floor((ctr.point - r1).length / stepl)
+		steps = math.max(0, steps - 1)
+	end
+	for i=0,steps do
+		-- Calculate the score of the camera position.
+		-- Camera positions that have the best displacement to the side and
+		-- the most distance to the target before hitting a wall are favored.
+		local center = r1 + turn1 * Vector(i * stepl)
+		local back = Voxel:intersect_ray(center, center + rot * Vector(0,0,5))
+		local dist = back and (back - center).length or 5
+		local score = 3 * dist + (i + 1)
+		-- Choose the best camera center.
+		if best_score <= score then
+			local side = i * stepl
+			best_score = score
+			best_center = center
+		end
 	end
 	-- Return the final transformation.
-	return ctr, rot
+	return best_center, rot
 end
 
 Player.get_picking_ray_1st = function(clss)
