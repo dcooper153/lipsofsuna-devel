@@ -51,6 +51,7 @@ static void private_free_database (
  */
 static void Database_new (LIScrArgs* args)
 {
+	int ok;
 	char* path;
 	const char* ptr;
 	const char* name;
@@ -66,7 +67,14 @@ static void Database_new (LIScrArgs* args)
 		return;
 	for (ptr = name ; *ptr != '\0' ; ptr++)
 	{
-		if ((*ptr < 'a' || *ptr > 'z') && *ptr != '-' && *ptr != '.')
+		if (*ptr >= 'a' && *ptr <= 'z') ok = 1;
+		else if (*ptr >= 'A' && *ptr <= 'Z') ok = 1;
+		else if (*ptr >= '0' && *ptr <= '9') ok = 1;
+		else if (*ptr == '-') ok = 1;
+		else if (*ptr == '_') ok = 1;
+		else if (*ptr == '.') ok = 1;
+		else ok = 0;
+		if (!ok)
 		{
 			lisys_error_set (EINVAL, "invalid database name `%s'", name);
 			lisys_error_report ();
