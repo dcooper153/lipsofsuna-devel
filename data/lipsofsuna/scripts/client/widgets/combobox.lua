@@ -4,6 +4,10 @@ require "client/widgets/menuitem"
 
 Widgets.ComboBox = Class(Widgets.Button)
 
+--- Creates a new combo box.
+-- @param clss Combo box class.
+-- @param args Arguments.
+-- @return Combo box.
 Widgets.ComboBox.new = function(clss, args)
 	local self = Widgets.Button.new(clss)
 	self.value = 1
@@ -72,6 +76,8 @@ Widgets.ComboBox.append = function(self, args)
 	self.menu:append_row(widget)
 end
 
+--- Clears the choice list of the combo box.
+-- @param self Combo box.
 Widgets.ComboBox.clear = function(self)
 	self.value = 1
 	self.menu.rows = 0
@@ -99,17 +105,20 @@ Widgets.ComboBox.popup = function(self)
 	Widgets.ComboBox.active = self
 end
 
-Widgets.ComboBox.pressed = function(self)
+--- Handles mouse clicks to the combo box.
+-- @param self Combo box.
+-- @param args Event arguments.
+Widgets.ComboBox.pressed = function(self, args)
 	if self.menu.rows == 0 then return end
 	local p = Client.cursor_pos
-	if p.x - self.x < 10 then
+	if p.x - self.x < 15 then
 		-- Previous item.
 		if self.value > 1 then
 			self:activate{index = self.value - 1}
 		else
 			self:activate{index = self.menu.rows} 
 		end
-	elseif p.x - self.x > self.width - 11 then
+	elseif p.x - self.x > self.width - 16 then
 		-- Next item.
 		if self.value < self.menu.rows then
 			self:activate{index = self.value + 1}
@@ -122,9 +131,12 @@ Widgets.ComboBox.pressed = function(self)
 	end
 end
 
+--- Handles scroll wheel input of the combo box.
+-- @param self Combo box.
+-- @param args Event arguments.
 Widgets.ComboBox.scrolled = function(self, args)
 	if self.menu.rows == 0 then return end
-	if args.button == 4 then
+	if args.button == 5 then
 		-- Previous item.
 		if self.value > 1 then
 			self:activate{index = self.value - 1}
@@ -141,6 +153,9 @@ Widgets.ComboBox.scrolled = function(self, args)
 	end
 end
 
+--- Sets the choice list of the combo box.
+-- @param self Combo box.
+-- @param items List of choices.
 Widgets.ComboBox.set_items = function(self, items)
 	self:clear()
 	for k,v in ipairs(items) do
@@ -152,12 +167,14 @@ Widgets.ComboBox.set_items = function(self, items)
 	end
 end
 
+--- Rebuilds the combo box.
+-- @param self Combo box.
 Widgets.ComboBox.reshaped = function(self)
 	self:set_request{
 		font = self.font,
 		internal = true,
 		paddings = {2,12,12,2},
-		text = self.text}
+		text = (self.text or "") .. " "}
 	local w = self.width
 	local h = self.height
 	-- Background.
