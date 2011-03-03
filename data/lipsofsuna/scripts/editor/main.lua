@@ -17,7 +17,6 @@ require "client/shaders/postprocess"
 require "client/shaders/skin"
 require "client/shaders/terrain"
 require "client/shaders/widget"
-require "client/widgets/widgets"
 require "client/widgets/background"
 require "client/widgets/scene"
 

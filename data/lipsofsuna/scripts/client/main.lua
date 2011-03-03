@@ -6,7 +6,6 @@ Sectors.instance:erase_world()
 
 Views = {}
 
-require "client/widgets/widgets"
 require "client/widgets/background"
 require "client/widgets/colorselector"
 require "client/widgets/container"

@@ -24,17 +24,11 @@ Widgets.Cursor.inst = Widgets.Cursor({
 	size = {32, 32}})
 
 Eventhandler{type = "mousepress", func = function(self, args)
-	local w = Widgets.focused_widget
-	if w and w.pressed then
-		w:pressed(args)
-	end
+	Widgets:handle_event(args)
 end}
 
 Eventhandler{type = "keypress", func = function(self, args)
-	local w = Widgets.focused_widget
-	if w and w.event then
-		w:event(args)
-	end
+	Widgets:handle_event(args)
 end}
 
 Eventhandler{type = "quit", func = function(self, args)
@@ -58,14 +52,5 @@ while not Program.quit do
 	Widgets:draw()
 	Client:swap_buffers()
 	-- Focus widgets.
-	local w = Widgets.focused_widget
-	if Widgets.focused_widget_prev ~= w then
-		if Widgets.focused_widget_prev then
-			Widgets.focused_widget_prev.focused = false
-		end
-		if w then
-			w.focused = true
-		end
-		Widgets.focused_widget_prev = w
-	end
+	Widgets:update()
 end
