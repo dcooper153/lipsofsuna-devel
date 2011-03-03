@@ -1,4 +1,4 @@
-require "client/label"
+require "label"
 
 Widgets.Entry = Class(Widgets.Label)
 
