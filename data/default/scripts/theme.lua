@@ -35,4 +35,6 @@ Widgets.Background.reshaped = function(self)
 end
 
 Widgets:add_font_style("default", "serif", 14)
+Widgets:add_font_style("bigger", "serif", 18)
+Widgets:add_font_style("medium", "serif", 24)
 Widgets:add_font_style("mainmenu", "serif", 64)
