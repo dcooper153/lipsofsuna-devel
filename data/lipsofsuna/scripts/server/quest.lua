@@ -1,4 +1,4 @@
-require "common/eventhandler"
+require "system/eventhandler"
 
 --- Marks the quest as active.
 -- @param clss Quest class.

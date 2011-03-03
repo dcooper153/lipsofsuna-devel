@@ -13,16 +13,18 @@ if not Settings:parse_command_line() then
 end
 
 require "system/database"
+require "system/eventhandler"
 require "system/network"
+require "system/thread"
 require "system/tiles"
 require "system/tiles-physics"
+require "system/timer"
 Voxel.blocks_per_line = 4
 Voxel.tiles_per_line = 24
 require "common/bitwise"
 require "common/color"
 require "common/crafting"
 require "common/effect"
-require "common/eventhandler"
 require "common/faction"
 require "common/feat"
 require "common/iconspec"
@@ -39,8 +41,6 @@ require "common/quest"
 require "common/regionspec"
 require "common/sectors"
 require "common/species"
-require "common/thread"
-require "common/timer"
 require "common/voxel"
 
 if Settings.server then

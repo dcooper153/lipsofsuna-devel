@@ -222,8 +222,6 @@ end
 -- @name Skills.owner
 -- @class table
 
-require "common/timer"
-
 Timer{delay = 1, func = function(self, secs)
 	for k,v in pairs(Skills.dict) do
 		if v.enabled then
