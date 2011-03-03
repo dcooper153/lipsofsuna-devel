@@ -28,7 +28,8 @@ LIAPICALL (LIScrScript*, liscr_script_new, ());
 
 LIAPICALL (int, liscr_script_load, (
 	LIScrScript* self,
-	const char*  path));
+	const char*  path,
+	const char*  path_core));
 
 LIAPICALL (void, liscr_script_free, (
 	LIScrScript* self));

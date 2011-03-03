@@ -1,4 +1,4 @@
-require "core/tiles"
+require "system/tiles"
 require "common/model"
 
 Material.dict_id = {}

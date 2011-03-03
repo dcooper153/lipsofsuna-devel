@@ -180,22 +180,37 @@ liscr_script_find_class (LIScrScript* self,
 
 /**
  * \brief Attaches a file to the script.
- *
  * \param self Script.
  * \param path Path to the file.
+ * \param path_core Core include path.
  * \return Nonzero on success.
  */
-int
-liscr_script_load (LIScrScript* self,
-                   const char*  path)
+int liscr_script_load (
+	LIScrScript* self,
+	const char*  path,
+	const char*  path_core)
 {
 	int ret;
 	char* inc;
+	char* inc1;
+	char* inc2;
 
-	/* Set include path. */
-	inc = lisys_path_format (LISYS_PATH_PATHNAME, path, LISYS_PATH_SEPARATOR, "?.lua", NULL);
+	/* Construct the include path. */
+	inc1 = lisys_path_format (LISYS_PATH_PATHNAME, path, LISYS_PATH_SEPARATOR, "?.lua", NULL);
+	inc2 = lisys_path_format (path_core, LISYS_PATH_SEPARATOR, "?.lua", NULL);
+	if (inc1 == NULL || inc2 == NULL)
+	{
+		lisys_free (inc1);
+		lisys_free (inc2);
+		return 0;
+	}
+	inc = listr_format ("%s;%s", inc1, inc2);
+	lisys_free (inc1);
+	lisys_free (inc2);
 	if (inc == NULL)
 		return 0;
+
+	/* Set the include path. */
 	lua_getfield (self->lua, LUA_GLOBALSINDEX, "package");
 	lua_pushstring (self->lua, inc);
 	lua_setfield (self->lua, -2, "path");

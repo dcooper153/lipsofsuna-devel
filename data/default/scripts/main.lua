@@ -1,13 +1,3 @@
-local oldrequire = require
-require = function(arg)
-	local s,e = string.find(arg, "core/")
-	if s then
-		Program:load_extension(string.sub(arg, e + 1))
-	else
-		oldrequire(arg)
-	end
-end
-
 if Program.args == "--help" or Program.args == "-h" then
 	print("Usage: lipsofsuna [modname] [options]\n")
 	print("Options:")
@@ -18,10 +8,10 @@ if Program.args == "--help" or Program.args == "-h" then
 	return
 end
 
-require "core/graphics"
-require "core/render"
-require "core/sound"
-require "core/widgets"
+require "system/graphics"
+require "system/render"
+require "system/sound"
+require "system/widgets"
 require "eventhandler"
 require "cursor"
 require "entry"

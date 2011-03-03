@@ -237,13 +237,22 @@ int limai_program_execute_script (
 {
 	int ret;
 	char* path;
+	char* path_core;
+
+	/* Get paths. */
+	path = lipth_paths_get_script (self->paths, file);
+	path_core = lisys_path_concat (self->paths->global_data, NULL);
+	if (path == NULL || path_core == NULL)
+	{
+		lisys_free (path);
+		lisys_free (path_core);
+		return 0;
+	}
 
 	/* Load the script. */
-	path = lipth_paths_get_script (self->paths, file);
-	if (path == NULL)
-		return 0;
-	ret = liscr_script_load (self->script, path);
+	ret = liscr_script_load (self->script, path, path_core);
 	lisys_free (path);
+	lisys_free (path_core);
 	if (!ret)
 		return 0;
 

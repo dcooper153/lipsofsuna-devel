@@ -1,15 +1,3 @@
-local oldrequire = require
-require = function(arg)
-	local s,e = string.find(arg, "core/")
-	if s then
-		local name = string.sub(arg, e + 1)
-		if not Program:load_extension(name) then
-			error("loading extension `" .. name .. "' failed")
-		end
-	else
-		oldrequire(arg)
-	end
-end
 string.split = function(self, sep)
 	local sep,fields = sep or " ", {}
 	local pattern = string.format("([^%s]+)", sep)
@@ -24,10 +12,10 @@ if not Settings:parse_command_line() then
 	return
 end
 
-require "core/database"
-require "core/network"
-require "core/tiles"
-require "core/tiles-physics"
+require "system/database"
+require "system/network"
+require "system/tiles"
+require "system/tiles-physics"
 Voxel.blocks_per_line = 4
 Voxel.tiles_per_line = 24
 require "common/bitwise"
@@ -56,23 +44,23 @@ require "common/timer"
 require "common/voxel"
 
 if Settings.server then
-require "core/object-physics"
+require "system/object-physics"
 require "common/vision"
 require "common/inventory"
 require "common/skills"
 Object.load_meshes = false
 else
-require "core/animation"
-require "core/graphics"
-require "core/camera"
-require "core/object-render"
-require "core/render"
-require "core/sound"
-require "core/speech"
-require "core/tiles-physics"
-require "core/tiles-render"
-require "core/reload"
-require "core/widgets"
+require "system/animation"
+require "system/graphics"
+require "system/camera"
+require "system/object-render"
+require "system/render"
+require "system/sound"
+require "system/speech"
+require "system/tiles-physics"
+require "system/tiles-render"
+require "system/reload"
+require "system/widgets"
 require "client/shader"
 require "client/shaders/skeletal"
 end
