@@ -1,4 +1,4 @@
-require "client/widgets/label"
+require "system/widgets/label"
 
 Widgets.MenuItem = Class(Widgets.Label)
 

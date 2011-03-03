@@ -1,6 +1,6 @@
-require "client/widgets/button"
-require "client/widgets/frame"
-require "client/widgets/menuitem"
+require "system/widgets/button"
+require "system/widgets/frame"
+require "system/widgets/menuitem"
 
 Widgets.ComboBox = Class(Widgets.Button)
 

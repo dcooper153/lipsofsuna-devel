@@ -1,5 +1,3 @@
-require "client/widgets/frame"
-
 Widgets.Equipment = Class(Widgets.Frame)
 
 Widgets.Equipment.new = function(clss, args)

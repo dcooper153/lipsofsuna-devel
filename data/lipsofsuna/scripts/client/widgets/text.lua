@@ -1,5 +1,3 @@
-require "client/widgets/frame"
-
 Widgets.Text = Class(Widgets.Frame)
 
 Widgets.Text.setter = function(self, key, value)

@@ -1,5 +1,3 @@
-require "client/widgets/label"
-
 Widgets.Log = Class(Widgets.Label)
 
 Widgets.Log.new = function(clss, args)

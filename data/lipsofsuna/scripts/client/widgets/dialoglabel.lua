@@ -1,5 +1,3 @@
-require "client/widgets/label"
-
 Widgets.DialogLabel = Class(Widgets.Label)
 
 Widgets.DialogLabel.new = function(clss, args)

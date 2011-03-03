@@ -1,5 +1,3 @@
-require "client/widgets/label"
-
 Widgets.DialogChoice = Class(Widgets.Label)
 
 Widgets.DialogChoice.new = function(clss, args)

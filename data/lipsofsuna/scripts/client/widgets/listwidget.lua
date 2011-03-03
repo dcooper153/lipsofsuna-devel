@@ -1,4 +1,3 @@
-require "client/widgets/frame"
 require "client/widgets/scrollbar"
 
 Widgets.List = Class(Widgets.Frame)

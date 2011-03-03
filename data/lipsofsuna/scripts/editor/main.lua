@@ -19,11 +19,7 @@ require "client/shaders/terrain"
 require "client/shaders/widget"
 require "client/widgets/widgets"
 require "client/widgets/background"
-require "client/widgets/button"
-require "client/widgets/combobox"
 require "client/widgets/cursor"
-require "client/widgets/frame"
-require "client/widgets/label"
 require "client/widgets/scene"
 
 local oldsetter = Object.setter
