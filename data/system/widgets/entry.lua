@@ -2,6 +2,17 @@ require "system/widgets/label"
 
 Widgets.Entry = Class(Widgets.Label)
 
+Widgets.Entry.setter = function(self, key, value)
+	if key == "password" then
+		if self.password ~= value then
+			Widgets.Label.setter(self, key, value)
+			self:reshaped()
+		end
+	else
+		Widgets.Label.setter(self, key, value)
+	end
+end
+
 --- Creates a new text entry widget.
 -- @param clss Entry class.
 -- @param args Arguments.
@@ -45,13 +56,24 @@ end
 --- Rebuilds the entry widget.
 -- @param self Entry widget.
 Widgets.Entry.reshaped = function(self)
+	-- Format the text.
+	-- In password mode, all characters are replaced with '*'.
+	local text
+	if self.password and self.text then
+		text = ""
+		for i=1,#self.text do text = text .. "*" end
+	else
+		text = self.text or ""
+	end
+	-- Calculate the size request.
 	self:set_request{
 		font = self.font,
 		internal = true,
 		paddings = {2,2,2,2},
-		text = (self.text or "") .. "\n"}
+		text = text .. "\n"}
 	local w = self.width
 	local h = self.height
+	-- Pack the background.
 	self:canvas_clear()
 	if not self.transparent then
 		self:canvas_image{
@@ -61,10 +83,11 @@ Widgets.Entry.reshaped = function(self)
 			source_position = self.focused and {967,383} or {910,383},
 			source_tiling = {15,25,15,10,14,10}}
 	end
+	-- Pack the text.
 	self:canvas_text{
 		dest_position = {2,0},
 		dest_size = {w,h},
-		text = self.text and (self.text .. (self.focused and "|" or "")),
+		text = text .. (self.focused and "|" or ""),
 		text_alignment = {0,0.5},
 		text_color = self.focused and {1,1,1,1} or {0.6,0.6,0.6,1},
 		text_font = self.font}
