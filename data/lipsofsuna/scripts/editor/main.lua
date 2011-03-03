@@ -19,7 +19,6 @@ require "client/shaders/terrain"
 require "client/shaders/widget"
 require "client/widgets/widgets"
 require "client/widgets/background"
-require "client/widgets/cursor"
 require "client/widgets/scene"
 
 local oldsetter = Object.setter
