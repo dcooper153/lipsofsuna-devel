@@ -271,6 +271,9 @@ Generator.generate = function(clss, args)
 		end,
 		["Sanctuary"] = function(r)
 			Voxel:place_pattern{point = r.point + Vector(3,0,3), name = "sanctuary"}
+		end,
+		["Silverspring"] = function(r)
+			Voxel:place_pattern{point = r.point, name = "silverspring1"}
 		end}
 	for _,reg in pairs(clss.regions_dict_id) do
 		Voxel:fill_region{point = reg.point, size = reg.size}

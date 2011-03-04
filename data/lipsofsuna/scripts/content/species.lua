@@ -402,3 +402,15 @@ Species{
 	speed_walk = 2,
 	skills = {
 		{name = "health", max = 30, val = 30}}}
+
+------------------------------------------------------------------------------
+-- Silverspring creatures.
+
+Species{
+	name = "The Hoarder",
+	base = "aermale",
+	dialog = "the hoarder",
+	marker = "the hoarder",
+	eye_style = {"default",255,32,32},
+	hair_style = {"hair2",200,20,180},
+	inventory_items = {"shirt", "pants", "boots"}}

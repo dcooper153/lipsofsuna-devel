@@ -75,3 +75,11 @@ Regionspec{
 	categories = {"random"},
 	depth = {2500, 3000},
 	size = {8,8,8}}
+
+Regionspec{
+	name = "Silverspring",
+	categories = {"special"},
+	depth = {2900, 3000},
+	distance = {"Lips",30,60},
+	links = {"Chara's Root Grove", "Lips", "Portal of Lips", "Sanctuary"},
+	size = {32,16,32}}
