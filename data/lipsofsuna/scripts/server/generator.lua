@@ -301,6 +301,7 @@ Generator.generate = function(clss, args)
 	clss:update_status(0, "Saving quests")
 	Serialize:save_markers(true)
 	Serialize:save_quests(true)
+	Serialize:save_accounts(true)
 	-- Discard events emitted during map generation so that they
 	-- don't trigger when the game starts.
 	clss:update_status(0, "Finishing")
