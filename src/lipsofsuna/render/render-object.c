@@ -156,7 +156,7 @@ int liren_object_intersect_ray (
 	raylocal1 = limat_transform_transform (inverse, *ray1);
 
 	/* Avoid the expensive per triangle test with and AABB test whenever possible. */
-	if (!limat_intersect_aabb_line_near (&self->model->bounds, &raylocal0, &raylocal1, &resultlocal))
+	if (!limat_intersect_aabb_line_fast (&self->model->bounds, &raylocal0, &raylocal1))
 		return 0;
 
 	/* Get the intersection point in the model space. */

@@ -426,6 +426,43 @@ static void Voxel_get_tile (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Intersects a ray with map tiles.
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>1,start_point: Ray start point in world space.</li>
+ * --   <li>2,end_point: Ray end point in world space.</li></ul>
+ * -- @return Position vector in world space, tile index vector.
+ * function Voxel.intersect_ray(self, args)
+ */
+static void Voxel_intersect_ray (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIMatVector ray0;
+	LIMatVector ray1;
+	LIMatVector point;
+	LIMatVector tile;
+
+	/* Get arguments. */
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	if (!liscr_args_geti_vector (args, 0, &ray0) &&
+	    !liscr_args_gets_vector (args, "start_point", &ray0))
+		return;
+	if (!liscr_args_geti_vector (args, 1, &ray1) &&
+	    !liscr_args_gets_vector (args, "end_point", &ray1))
+		return;
+
+	/* Intersect with terrain. */
+	ray0 = limat_vector_multiply (ray0, 1.0f / module->voxels->tile_width);
+	ray1 = limat_vector_multiply (ray1, 1.0f / module->voxels->tile_width);
+	if (livox_manager_intersect_ray (module->voxels, &ray0, &ray1, &point, &tile))
+	{
+		point = limat_vector_multiply (point, module->voxels->tile_width);
+		liscr_args_seti_vector (args, &point);
+		liscr_args_seti_vector (args, &tile);
+	}
+}
+
+/* @luadoc
  * --- Pastes a terrain region from a packet to the map.
  * -- @param clss Voxel class.
  * -- @param args Arguments.<ul>
@@ -726,6 +763,7 @@ void liext_script_voxel (
 	liscr_class_insert_cfunc (self, "find_tile", Voxel_find_tile);
 	liscr_class_insert_cfunc (self, "get_block", Voxel_get_block);
 	liscr_class_insert_cfunc (self, "get_tile", Voxel_get_tile);
+	liscr_class_insert_cfunc (self, "intersect_ray", Voxel_intersect_ray);
 	liscr_class_insert_cfunc (self, "paste_region", Voxel_paste_region);
 	liscr_class_insert_cfunc (self, "set_block", Voxel_set_block);
 	liscr_class_insert_cfunc (self, "set_tile", Voxel_set_tile);

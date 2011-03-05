@@ -333,6 +333,55 @@ livox_manager_insert_material (LIVoxManager*  self,
 	return 1;
 }
 
+/**
+ * \brief Finds the intersection with a ray and a tile.
+ * \param self Voxel manager.
+ * \param ray0 Ray start, in tiles.
+ * \param ray1 Ray end, in tiles.
+ * \param result_point Return location for the intersection point, in tiles.
+ * \param result_tile Return location for the intersecting tile.
+ * \return Nonzero if intersected.
+ */
+int livox_manager_intersect_ray (
+	LIVoxManager*      self,
+	const LIMatVector* ray0,
+	const LIMatVector* ray1,
+	LIMatVector*       result_point,
+	LIMatVector*       result_tile)
+{
+#define STEP_SIZE 0.05
+	float i;
+	float len;
+	LIMatVector dir;
+	LIMatVector pos;
+	LIVoxVoxel voxel;
+
+	/* Calculate step size. */
+	dir = limat_vector_subtract (*ray1, *ray0);
+	len = limat_vector_get_length (dir);
+	dir = limat_vector_normalize (dir);
+
+	/* Walk through tiles in the path. */
+	/* This can miss tiles in some corner cases but it's good enough for
+	   normal use cases. */
+	for (i = 0.0f ; i <= len + 0.5f * STEP_SIZE ; i += STEP_SIZE)
+	{
+		pos = limat_vector_add (*ray0, limat_vector_multiply (dir, i));
+		livox_manager_get_voxel (self, (int) pos.x, (int) pos.y, (int) pos.z, &voxel);
+		if (voxel.type)
+		{
+			*result_point = pos;
+			result_tile->x = (int) pos.x;
+			result_tile->y = (int) pos.y;
+			result_tile->z = (int) pos.z;
+			return 1;
+		}
+	}
+
+	return 0;
+#undef STEP_SIZE
+}
+
 void
 livox_manager_mark_updates (LIVoxManager* self)
 {

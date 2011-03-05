@@ -210,8 +210,10 @@ int liren_model_intersect_ray (
 	LIRenFormat format;
 
 	/* Fast exit if no intersection with the bounding box. */
-	if (!limat_intersect_aabb_line_near (&self->bounds, ray0, ray1, &p))
+	if (!limat_intersect_aabb_line_fast (&self->bounds, ray0, ray1))
 		return 0;
+
+	Uint32 start = SDL_GetTicks();
 
 	/* Test for intersection for each face in the model. */
 	liren_mesh_get_format (&self->mesh, &format);
@@ -241,6 +243,9 @@ int liren_model_intersect_ray (
 	liren_mesh_unlock_vertices (&self->mesh);
 	if (found)
 		*result = best_point;
+
+	Uint32 end = SDL_GetTicks();
+	printf("ARRR id=%d t=%d f=%d\n", self->id, end - start, self->mesh.counts[2]);
 
 	return found;
 }

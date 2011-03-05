@@ -97,6 +97,13 @@ LIAPICALL (int, livox_manager_insert_material, (
 	LIVoxManager*  self,
 	LIVoxMaterial* material));
 
+LIAPICALL (int, livox_manager_intersect_ray, (
+	LIVoxManager*      self,
+	const LIMatVector* ray0,
+	const LIMatVector* ray1,
+	LIMatVector*       result_point,
+	LIMatVector*       result_tile));
+
 LIAPICALL (void, livox_manager_mark_updates, (
 	LIVoxManager* self));
 

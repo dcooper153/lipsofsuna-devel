@@ -40,9 +40,9 @@
  * --   <li>1,start_point: Ray start point in world space.</li>
  * --   <li>2,end_point: Ray end point in world space.</li></ul>
  * -- @return Position vector in world space, tile index vector.
- * function Voxel.intersect_ray(self, args)
+ * function Voxel.intersect_render_ray(self, args)
  */
-static void Voxel_intersect_ray (LIScrArgs* args)
+static void Voxel_intersect_render_ray (LIScrArgs* args)
 {
 	int index[3];
 	float d;
@@ -69,6 +69,7 @@ static void Voxel_intersect_ray (LIScrArgs* args)
 		return;
 
 	/* Calculate the closest intersection point. */
+#warning Voxel_intersect_render_ray is unusable slow because it iterates through all blocks.
 	LIALG_MEMDIC_FOREACH (iter, module->blocks)
 	{
 		block = iter.value;
@@ -110,7 +111,7 @@ void liext_script_tiles_render (
 	void*       data)
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_TILES_RENDER, data);
-	liscr_class_insert_cfunc (self, "intersect_ray", Voxel_intersect_ray);
+	liscr_class_insert_cfunc (self, "intersect_render_ray", Voxel_intersect_render_ray);
 }
 
 /** @} */

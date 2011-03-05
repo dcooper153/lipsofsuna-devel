@@ -112,6 +112,85 @@ static inline int limat_intersect_aabb_line (
 }
 
 /**
+ * \brief Gets the intersection points of an AABB and a line.
+ * \param self Axis-aligned bounding box.
+ * \param p0 Point on the line.
+ * \param p1 Point on the line.
+ * \return Nonzero if intersects.
+ */
+static inline int limat_intersect_aabb_line_fast (
+	const LIMatAabb*   self,
+	const LIMatVector* p0,
+	const LIMatVector* p1)
+{
+	float d;
+	LIMatVector dir;
+	LIMatVector pt;
+
+	dir = limat_vector_subtract (*p1, *p0);
+	dir = limat_vector_normalize (dir);
+	if (dir.x >  LIMAT_VECTOR_EPSILON ||
+	    dir.x < -LIMAT_VECTOR_EPSILON)
+	{
+		/* Left. */
+		d = (self->min.x - p0->x) / dir.x;
+		pt.y = dir.y * d + p0->x;
+		pt.z = dir.z * d + p0->y;
+		if (pt.y >= self->min.y && pt.y < self->max.y &&
+		    pt.z >= self->min.z && pt.z < self->max.z)
+			return 1;
+
+		/* Right. */
+		d = (self->max.x - p0->x) / dir.x;
+		pt.y = dir.y * d + p0->x;
+		pt.z = dir.z * d + p0->y;
+		if (pt.y >= self->min.y && pt.y < self->max.y &&
+		    pt.z >= self->min.z && pt.z < self->max.z)
+			return 1;
+	}
+	if (dir.y >  LIMAT_VECTOR_EPSILON ||
+	    dir.y < -LIMAT_VECTOR_EPSILON)
+	{
+		/* Bottom. */
+		d = (self->min.y - p0->y) / dir.y;
+		pt.x = dir.x * d + p0->x;
+		pt.z = dir.z * d + p0->z;
+		if (pt.x >= self->min.x && pt.x < self->max.x &&
+		    pt.z >= self->min.z && pt.z < self->max.z)
+			return 1;
+
+		/* Top. */
+		d = (self->max.y - p0->y) / dir.y;
+		pt.x = dir.x * d + p0->x;
+		pt.z = dir.z * d + p0->z;
+		if (pt.x >= self->min.x && pt.x < self->max.x &&
+		    pt.z >= self->min.z && pt.z < self->max.z)
+			return 1;
+	}
+	if (dir.z >  LIMAT_VECTOR_EPSILON ||
+	    dir.z < -LIMAT_VECTOR_EPSILON)
+	{
+		/* Near. */
+		d = (self->min.z - p0->z) / dir.z;
+		pt.x = dir.x * d + p0->x;
+		pt.y = dir.y * d + p0->y;
+		if (pt.x >= self->min.x && pt.x < self->max.x &&
+		    pt.y >= self->min.y && pt.y < self->max.y)
+			return 1;
+
+		/* Far. */
+		d = (self->max.z - p0->z) / dir.z;
+		pt.x = dir.x * d + p0->x;
+		pt.y = dir.y * d + p0->y;
+		if (pt.x >= self->min.x && pt.x < self->max.x &&
+		    pt.y >= self->min.y && pt.y < self->max.y)
+			return 1;
+	}
+
+	return 0;
+}
+
+/**
  * \brief Gets the furthest intersection point of an AABB and an infinite ray.
  *
  * This is a picking function that can be used for picking a point on an AABB
