@@ -15,6 +15,16 @@ Region.create_link = function(self, region)
 	return link
 end
 
+--- Gets the depth layer range of the region.
+-- @param self Region.
+-- @return First layer, last layer.
+Region.get_layer_range = function(self)
+	local layer = (self.point.y - Generator.layer_offset) / Generator.layer_size
+	local min = math.max(1, layer)
+	local max = math.max(0, math.min(Generator.layer_count, layer + 2))
+	return math.floor(min), math.ceil(max) 
+end
+
 Region.get_link_point = function(self, dst)
 	local ctr = self.point + self.size * 0.5
 	local dir = (dst - ctr):normalize()
@@ -25,7 +35,7 @@ Region.get_link_point = function(self, dst)
 		dir.x = dir.x < 0 and -1 or 1
 		dir.y = -1
 	end
-	local pt = ctr + Vector(dir.x * self.size.x, dir.y * self.size.y, dir.z * self.size.z) * 0.5
+	local pt = ctr + Vector(dir.x * self.size.x, dir.y * self.size.y, dir.z * self.size.z) * 0.5 + Vector(0,3)
 	return pt:floor()
 end
 
@@ -36,6 +46,21 @@ Generator.map_size = Vector(500, 500, 500)
 Generator.map_start = Vector(1500, 2750, 1500) - Generator.map_size * 0.5
 Generator.map_end = Vector(1500, 2750, 1500) + Generator.map_size * 0.5
 Generator.map_version = "4"
+Generator.layer_offset = 2500
+Generator.layer_count = 20
+Generator.layer_size = Generator.map_size.y / Generator.layer_count
+
+Generator.add_region = function(clss, region)
+	-- Store by name.
+	table.insert(clss.regions_dict_id, region)
+	clss.regions_dict_name[region.spec.name] = region
+	-- Store by layers.
+	local min,max = region:get_layer_range()
+	for i=min,max do
+		local dict = clss.regions_dict_layer[i]
+		table.insert(dict, region)
+	end
+end
 
 --- Informs clients of the generator status.
 -- @param clss Generator class.
@@ -59,20 +84,31 @@ end
 -- @param src Source point in tiles.
 -- @param dst Destination point in tiles.
 Generator.paint_corridor = function(clss, src, dst)
-	local dir = (dst - src):normalize()
-	local len = math.floor((dst - src).length)
-	local pos = Vector(src.x, src.y, src.z)
-	local ipos = Vector()
-	local l = 0
-	while l < len do
-		ipos.x = math.floor(pos.x + 0.5) + math.random(0, 3)
-		ipos.y = math.floor(pos.y + 0.5) + math.random(0, 3)
-		ipos.z = math.floor(pos.z + 0.5) + math.random(0, 3)
-		Voxel:place_pattern{category = "corridor", point = ipos}
-		local step = math.random(1, 3)
-		pos = pos + dir * step
-		l = l + step
+	local vec = dst - src
+	local abs = Vector(math.abs(vec.x), math.abs(vec.y), math.abs(vec.z))
+	-- Draw the tunnel line.
+	if abs.x >= abs.y and abs.x >= abs.z then
+		-- Walk along the X axis.
+		local step = vec * (1/abs.x)
+		for x=0,abs.x do
+			Voxel:place_pattern{category = "corridorx", point = (src + step * x):floor()}
+		end
+	elseif abs.y >= abs.z then
+		-- Walk along the Y axis.
+		local step = vec * (1/abs.y)
+		for y=0,abs.y do
+			Voxel:place_pattern{category = "corridory", point = (src + step * y):floor()}
+		end
+	else
+		-- Walk along the Z axis.
+		local step = vec * (1/abs.z)
+		for z=0,abs.z do
+			Voxel:place_pattern{category = "corridorz", point = (src + step * z):floor()}
+		end
 	end
+	-- Draw the endpoints.
+	Voxel:place_pattern{category = "corridor", point = src}
+	Voxel:place_pattern{category = "corridor", point = dst}
 end
 
 --- Places a region to the map.
@@ -117,10 +153,9 @@ Generator.place_region = function(clss, reg)
 		pos.z = rel.z
 		aabb.point = pos - Vector(5,5,5)
 	end
-	-- Store the region.
+	-- Create the region.
 	local region = Region{aabb = aabb, point = pos, size = size, spec = reg}
-	table.insert(clss.regions_dict_id, region)
-	clss.regions_dict_name[reg.name] = region
+	clss:add_region(region)
 	return region
 end
 
@@ -154,6 +189,10 @@ Generator.generate = function(clss, args)
 	clss.links = {}
 	clss.regions_dict_id = {}
 	clss.regions_dict_name = {}
+	clss.regions_dict_layer = {}
+	for i=1,clss.layer_count do
+		clss.regions_dict_layer[i] = {}
+	end
 	-- Reset the world.
 	clss:update_status(0, "Resetting world")
 	Marker:reset()
@@ -214,21 +253,23 @@ Generator.generate = function(clss, args)
 		clss:subdivide_link(link)
 		return true
 	end
-	for layer = 0,20 do
-		local y = clss.map_start.y + clss.map_size.y * (layer / 20)
-		local limit = 0.1 * clss.map_size.y
-		local retry = 0
-		local created = 0
-		while retry < 100 and created < 20 do
-			local reg1 = clss.regions_dict_id[math.random(1, regionn)]
-			local reg2 = clss.regions_dict_id[math.random(1, regionn)]
-			if math.abs(reg1.point.y - y) < limit and reglink(reg1, reg2) then
-				created = created + 1
-			else
-				retry = retry + 1
+	for layer = 1,clss.layer_count do
+		local dict = clss.regions_dict_layer[layer]
+		local count = #dict
+		if count > 1 then
+			local retry = 0
+			local created = 0
+			while retry < 10 and created < 10 do
+				local reg1 = dict[math.random(1, count)]
+				local reg2 = dict[math.random(1, count)]
+				if reglink(reg1, reg2) then
+					created = created + 1
+				else
+					retry = retry + 1
+				end
 			end
 		end
-		clss:update_status(layer / 20)
+		clss:update_status(layer / clss.layer_count)
 	end
 	linkn = #clss.links
 	-- Paint corridors.
@@ -331,27 +372,25 @@ Generator.subdivide_link_recursive = function(clss, link)
 	-- Select the type for the new region.
 	local spec = Regionspec:random{category = "random"}
 	if not spec then return end
-	-- Calculate the subdivision.
+	-- Calculate the subdivision center.
 	local src = link[1].point
 	local dst = link[2].point
 	local len = (dst - src).length
-	if len - 2 * (link[1].size.length + link[2].size.length) < 1 then return end
+	if len - (link[1].size.length + link[2].size.length) < 1 then return end
 	local rel = src + (dst - src) * (0.3 + 0.4 * math.random())
+	-- Calculate the direction vector.
+	local forward = (dst - src):normalize()
+	local side = forward:cross(Vector(0,1)):normalize()
 	-- Find the position for the new region.
 	local ok = nil
 	local pos = Vector()
 	local size = Vector(spec.size[1], spec.size[2], spec.size[3])
-	local aabb = Aabb{point = pos, size = size + Vector(10,10,10)}
-	local dist = {0,math.ceil(0.3 * len)}
+	local aabb = Aabb{point = pos, size = size}
+	local dist = math.ceil(0.5 * len)
 	for i = 1,20 do
-		pos.x = math.random(dist[1], dist[2])
-		pos.y = math.random(dist[1], dist[2])
-		pos.z = math.random(dist[1], dist[2])
-		if math.random(0, 1) == 1 then pos.x = -pos.x end
-		if math.random(0, 1) == 1 then pos.y = -pos.y end
-		if math.random(0, 1) == 1 then pos.z = -pos.z end
+		pos = side * math.random(-dist, dist)
 		pos = (pos + rel):floor()
-		aabb.point = pos - Vector(5,5,5)
+		aabb.point = pos
 		if clss:validate_region_position(aabb) then
 			ok = true
 			break
@@ -360,7 +399,7 @@ Generator.subdivide_link_recursive = function(clss, link)
 	if not ok then return end
 	-- Create the new region.
 	local region = Region{aabb = aabb, point = pos, size = size, spec = spec}
-	table.insert(clss.regions_dict_id, region)
+	clss:add_region(region)
 	-- Link the new region to the path.
 	local link1 = region:create_link(link[2])
 	link[2] = region

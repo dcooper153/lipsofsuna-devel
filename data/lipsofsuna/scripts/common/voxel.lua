@@ -92,17 +92,13 @@ Voxel.place_pattern = function(clss, args)
 			for x = v[1],v[1]+v[5] do
 				for y = v[2],v[2]+v[6] do
 					for z = v[3],v[3]+v[7] do
-						Voxel:set_tile{
-							point = args.point + Vector(x, y, z),
-							tile = tile}
+						Voxel:set_tile(args.point + Vector(x, y, z), tile)
 					end
 				end
 			end
 		else
 			-- Fill individual tile.
-			Voxel:set_tile{
-				point = args.point + Vector(v[1], v[2], v[3]),
-				tile = tile}
+			Voxel:set_tile(args.point + Vector(v[1], v[2], v[3]), tile)
 		end
 	end
 	-- Create obstacles.

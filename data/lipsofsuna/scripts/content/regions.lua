@@ -9,8 +9,8 @@ Regionspec{
 Regionspec{
 	name = "Portal of Lips",
 	categories = {"special"},
-	depth = {2950,3000},
-	distance = {"Lips",30,50},
+	depth = {2970,3000},
+	distance = {"Lips",40,50},
 	links = {"Sanctuary", "Chara's Root Grove"},
 	random_resources = false,
 	size = {16,8,16}}
@@ -18,15 +18,15 @@ Regionspec{
 Regionspec{
 	name = "Sanctuary",
 	categories = {"special"},
-	depth = {2950,3000},
-	distance = {"Lips",30,70},
+	depth = {2970,3000},
+	distance = {"Lips",40,70},
 	size = {20,15,26}}
 
 Regionspec{
 	name = "Chara's Root Grove",
 	categories = {"special"},
-	depth = {2900,2975},
-	distance = {"Lips",50,100},
+	depth = {2920,2975},
+	distance = {"Lips",80,100},
 	links = {"Midguard"},
 	size = {16,8,16}}
 
@@ -81,5 +81,5 @@ Regionspec{
 	categories = {"special"},
 	depth = {2900, 3000},
 	distance = {"Lips",30,60},
-	links = {"Chara's Root Grove", "Lips", "Portal of Lips", "Sanctuary"},
+	links = {"Chara's Root Grove", "Portal of Lips", "Sanctuary"},
 	size = {32,16,32}}

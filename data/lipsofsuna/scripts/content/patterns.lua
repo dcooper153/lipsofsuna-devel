@@ -7,24 +7,28 @@ Pattern{
 		{-1,2,-1,nil,3,3,1}}}
 
 Pattern{
-	name = "corridor2",
-	categories = {"corridor"},
+	name = "corridorx1",
+	categories = {"corridorx"},
 	tiles = {
-		{-1,-2,-1,nil,3,3,1},
-		{-2,-1,-2,nil,5,5,3},
-		{-1,2,-1,nil,3,3,1},
-		{-3,0,0,nil,1,1,2},
-		{3,0,-1,nil,1,2,2}}}
+		{0,-1,-2,nil,0,2,0},
+		{0,-2,-1,nil,0,5,2},
+		{0,-1,2,nil,0,2,0}}}
 
 Pattern{
-	name = "corridor3",
-	categories = {"corridor"},
+	name = "corridory1",
+	categories = {"corridory"},
 	tiles = {
-		{-1,-2,-1,nil,3,3,1},
-		{-2,-1,-2,nil,5,5,3},
-		{-1,2,-1,nil,3,3,1},
-		{0,3,0,nil,1,1,2},
-		{1,-4,0,nil,1,2,2}}}
+		{-1,0,-2,nil,2,0,0},
+		{-2,0,-1,nil,5,0,2},
+		{-1,0,2,nil,2,0,0}}}
+
+Pattern{
+	name = "corridorz1",
+	categories = {"corridorz"},
+	tiles = {
+		{-1,-2,0,nil,2,0,0},
+		{-2,-1,0,nil,5,2,0},
+		{-1,2,0,nil,2,0,0}}}
 
 Pattern{
 	name = "dungeon1",
