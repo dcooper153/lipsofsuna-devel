@@ -80,16 +80,22 @@ int livox_triangulate_voxel (
 		 {{ 1.0f, 0.5f, 0.0f }, { 1.0f, 0.5f, 0.5f }, { 1.0f, 0.5f, 1.0f }},
 		 {{ 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }}}};
 
-	/* Get neighborhood. */
+	/* Get the neighborhood. */
+	/* If the neighborhood is full of tiles, the centermost one isn't
+	   visible and we can exit early. */
+	count = 0;
 	for (z = -1 ; z <= 1 ; z++)
 	for (y = -1 ; y <= 1 ; y++)
 	for (x = -1 ; x <= 1 ; x++)
 	{
 		voxels[x + 1][y + 1][z + 1] = self->voxelsb + (x + vx) + (y + vy) * self->step[1] + (z + vz) * self->step[2];
 		result_types[x + 1][y + 1][z + 1] = voxels[x + 1][y + 1][z + 1]->type;
+		count += (voxels[x + 1][y + 1][z + 1]->type != 0);
 	}
+	if (count == 27)
+		return 0;
 
-	/* TODO: Support different kinds of triangulation schemes. */
+	/* Deform the voxel cube. */
 	switch (voxels[1][1][1]->material->type)
 	{
 		case LIVOX_MATERIAL_TYPE_ROUNDED:
