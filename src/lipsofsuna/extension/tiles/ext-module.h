@@ -30,6 +30,7 @@ typedef struct _LIExtModule LIExtModule;
 
 struct _LIExtModule
 {
+	float timer;
 	LICalHandle calls[1];
 	LIMaiProgram* program;
 	LIVoxManager* voxels;

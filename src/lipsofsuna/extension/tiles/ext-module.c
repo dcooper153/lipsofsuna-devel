@@ -24,6 +24,8 @@
 
 #include "ext-module.h"
 
+#define REBUILD_TIMER 0.2
+
 static int private_tick (
 	LIExtModule* self,
 	float        secs);
@@ -114,8 +116,13 @@ static int private_tick (
 	LIExtModule* self,
 	float        secs)
 {
-	livox_manager_mark_updates (self->voxels);
-	livox_manager_update_marked (self->voxels);
+	self->timer += secs;
+	if (self->timer >= REBUILD_TIMER)
+	{
+		livox_manager_mark_updates (self->voxels);
+		livox_manager_update_marked (self->voxels);
+		self->timer = 0;
+	}
 
 	return 1;
 }
