@@ -307,6 +307,15 @@ Species{
 	inventory_items = {"iron sword", "leather top", "leather pants", "leather leggings"}}
 
 Species{
+	name = "brigandmale",
+	base = "aermale",
+	categories = {"enemy"},
+	factions = {"evil"},
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"shirt", "pants", "boots"}}
+
+Species{
 	name = "troglodyte female",
 	base = "trogfemale",
 	categories = {"enemy"},
