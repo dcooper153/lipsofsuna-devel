@@ -360,6 +360,7 @@ Species{
 	model = "lizardman2",
 	ai_distance_hint = 1.0,
 	ai_enable_defend = false,
+	categories = {"enemy"},
 	factions = {"evil"},
 	feat_anims = {"right hand","bite"},
 	inventory_size = 5,
