@@ -79,6 +79,10 @@
     <url>http://opengameart.org/user/301</url>
   </author-info>
   <author-info>
+    <name>anonymous</name>
+    <url>http://www.blendswap.com/3D-models/author/anonymous/</url>
+  </author-info>
+  <author-info>
     <name>hiponboy</name>
     <url>http://opengameart.org/user/783</url>
   </author-info>
@@ -1563,6 +1567,37 @@
     <dep>import/particle1.png</dep>
     <status>placeholder</status>
     <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/shield1.blend</file>
+    <author>anonymous</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://www.blendswap.com/3D-models/weapons/weapons/</source>
+    <dep>import/shield1.png</dep>
+    <dep>import/shield1n.png</dep>
+    <status>complete</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/shield1.png</file>
+    <author>anonymous</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://www.blendswap.com/3D-models/weapons/weapons/</source>
+    <status>usable</status>
+    <type>texture</type>
+    <comment>Baked from the original model.</comment>
+  </asset>
+
+  <asset>
+    <file>import/shield1n.png</file>
+    <author>anonymous</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://www.blendswap.com/3D-models/weapons/weapons/</source>
+    <status>usable</status>
+    <type>normalmap</type>
+    <comment>Baked from the original model.</comment>
   </asset>
 
   <asset>

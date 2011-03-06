@@ -656,11 +656,11 @@ Itemspec{
 	icon = "cloth1"}
 
 Itemspec{
-	name = "generic shield",
-	model = "shield-000",
+	name = "round shield",
+	model = "shield1",
 	armor_class = 0.08,
 	categories = {"shield"},
-	crafting_materials = {["log"] = 1},
+	crafting_materials = {["log"] = 5, ["iron ingot"] = 3},
 	equipment_slot = "hand.L"}
 
 Itemspec{
