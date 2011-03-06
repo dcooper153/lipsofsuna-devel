@@ -401,7 +401,7 @@ static void Voxel_get_block (LIScrArgs* args)
  * --- Gets the contents of a tile.
  * -- @param clss Voxel class.
  * -- @param args Arguments.<ul>
- * --   <li>point: Tile index vector. (required)</li></ul>
+ * --   <li>1,point: Tile index vector. (required)</li></ul>
  * -- @return Tile.
  * function Voxel.get_tile(clss, args)
  */
@@ -412,17 +412,18 @@ static void Voxel_get_tile (LIScrArgs* args)
 	LIMatVector point;
 	LIVoxVoxel voxel;
 
-	if (liscr_args_gets_vector (args, "point", &point))
-	{
-		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-		lim = module->voxels->tiles_per_line * module->program->sectors->count;
-		if (point.x < 0.0f || point.x >= lim ||
-		    point.y < 0.0f || point.y >= lim ||
-		    point.z < 0.0f || point.z >= lim)
-			return;
-		livox_manager_get_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, &voxel);
-		liscr_args_seti_int (args, voxel.type);
-	}
+	if (!liscr_args_geti_vector (args, 0, &point) &&
+	    !liscr_args_gets_vector (args, "point", &point))
+		return;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	lim = module->voxels->tiles_per_line * module->program->sectors->count;
+	if (point.x < 0.0f || point.x >= lim ||
+	    point.y < 0.0f || point.y >= lim ||
+	    point.z < 0.0f || point.z >= lim)
+		return;
+	livox_manager_get_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, &voxel);
+	liscr_args_seti_int (args, voxel.type);
 }
 
 /* @luadoc
@@ -629,8 +630,8 @@ static void Voxel_set_block (LIScrArgs* args)
  * --- Sets the contents of a tile.
  * -- @param clss Voxel class.
  * -- @param args Arguments.<ul>
- * --   <li>point: Tile index vector.</li>
- * --   <li>tile: Tile number.</li></ul>
+ * --   <li>1,point: Tile index vector.</li>
+ * --   <li>2,tile: Tile number.</li></ul>
  * function Voxel.set_tile(clss, args)
  */
 static void Voxel_set_tile (LIScrArgs* args)
@@ -641,18 +642,21 @@ static void Voxel_set_tile (LIScrArgs* args)
 	LIMatVector point;
 	LIVoxVoxel voxel;
 
-	if (liscr_args_gets_vector (args, "point", &point) &&
-	    liscr_args_gets_int (args, "tile", &type))
-	{
-		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-		lim = module->voxels->tiles_per_line * module->program->sectors->count;
-		if (point.x < 0.0f || point.x >= lim ||
-		    point.y < 0.0f || point.y >= lim ||
-		    point.z < 0.0f || point.z >= lim)
-			return;
-		livox_voxel_init (&voxel, type);
-		livox_manager_set_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, &voxel);
-	}
+	if (!liscr_args_geti_vector (args, 0, &point) &&
+	    !liscr_args_gets_vector (args, "point", &point))
+		return;
+	if (!liscr_args_geti_int (args, 1, &type) &&
+	    !liscr_args_gets_int (args, "tile", &type))
+		return;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	lim = module->voxels->tiles_per_line * module->program->sectors->count;
+	if (point.x < 0.0f || point.x >= lim ||
+	    point.y < 0.0f || point.y >= lim ||
+	    point.z < 0.0f || point.z >= lim)
+		return;
+	livox_voxel_init (&voxel, type);
+	livox_manager_set_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, &voxel);
 }
 
 /* @luadoc
