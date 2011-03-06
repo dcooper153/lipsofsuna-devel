@@ -776,6 +776,18 @@ Itemspec{
 	stacking = false}
 
 ------------------------------------------------------------------------------
+-- Decorations
+
+Itemspec{
+	name = "chair",
+	model = "chair1",
+	mass = 10,
+	categories = {"furniture"},
+	crafting_materials = {log = 5},
+	health = 30,
+	stacking = false}
+
+------------------------------------------------------------------------------
 -- FIXME
 
 Itemspec{

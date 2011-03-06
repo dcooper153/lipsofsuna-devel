@@ -90,6 +90,10 @@
     <name>major4zmeakrob</name>
   </author-info>
   <author-info>
+    <name>solvalou</name>
+    <url>http://opengameart.org/users/solvalou</url>
+  </author-info>
+  <author-info>
     <name>thecubber</name>
   </author-info>
   <author-info>
@@ -526,6 +530,25 @@
     <status>textured</status>
     <tag>item</tag>
     <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/chair1.blend</file>
+    <author>solvalou</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/chair1.png</dep>
+    <source>http://opengameart.org/content/low-poly-chair</source>
+    <status>complete</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/chair1.png</file>
+    <author>solvalou</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/low-poly-chair</source>
+    <status>complete</status>
+    <type>texture</type>
   </asset>
 
   <asset>
