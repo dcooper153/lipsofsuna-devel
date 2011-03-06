@@ -55,6 +55,13 @@ Pattern{
 Pattern{
 	name = "lips1",
 	size = Vector(32,16,32),
+	items = {
+		{21.92,5.99,4.02,"chair"},
+		{22.09,0.99,3.35,"chair"},
+		{23.22,5.99,3.86,"chair"},
+		{23.3,0.99,3.43,"chair"},
+		{24.35,0.98,3.48,"chair"},
+		{24.5,5.99,3.63,"chair"}},
 	obstacles = {
 		{2.93,0.99,23.81,"rust sprig tree"},
 		{7,2,10.99,"rust sprig tree"},
