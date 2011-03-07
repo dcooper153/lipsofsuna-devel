@@ -178,7 +178,8 @@ int liphy_model_set_model (
 {
 	/* Terrain data can't be rebuilt, though we don't need that right now anyway. */
 	self->model = model;
-	private_build_object (self);
+	self->flags &= ~BUILT_OBJECT;
+	liphy_model_build (self, 0);
 
 	return 1;
 }

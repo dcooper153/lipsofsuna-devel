@@ -605,8 +605,6 @@ void liphy_object_set_model (
 	LIPhyObject* self,
 	LIPhyModel*  model)
 {
-	if (model != NULL)
-		liphy_model_build (model, 0);
 	if (model != self->model)
 	{
 		self->model = model;
