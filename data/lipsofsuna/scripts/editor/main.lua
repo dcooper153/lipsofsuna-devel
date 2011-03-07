@@ -330,6 +330,8 @@ Eventhandler{type = "keypress", func = function(self, args)
 			c.target_position = c.target_position + c.rotation * Vector(1,0,0)
 		elseif args.code == Keys.F1 then
 			Editor.inst:save()
+		elseif args.code == Keys.PRINT then
+			Client:screenshot()
 		end
 	end
 end}
