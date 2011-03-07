@@ -25,7 +25,8 @@
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
-	LICalHandle calls[3];
+	int simulate;
+	LICalHandle calls[4];
 	LIMaiProgram* program;
 	LIPhyPhysics* physics;
 };

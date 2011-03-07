@@ -16,7 +16,9 @@ require "system/database"
 require "system/eventhandler"
 require "system/network"
 require "system/thread"
+require "system/object-physics"
 require "system/tiles"
+require "system/tiles-physics"
 require "system/tiles-physics"
 require "system/timer"
 Voxel.blocks_per_line = 4
@@ -44,11 +46,11 @@ require "common/species"
 require "common/voxel"
 
 if Settings.server then
-require "system/object-physics"
 require "common/vision"
 require "common/inventory"
 require "common/skills"
 Object.load_meshes = false
+Physics.enable_simulation = true
 else
 require "system/animation"
 require "system/graphics"
@@ -57,7 +59,6 @@ require "system/object-render"
 require "system/render"
 require "system/sound"
 require "system/speech"
-require "system/tiles-physics"
 require "system/tiles-render"
 require "system/reload"
 require "system/widgets"

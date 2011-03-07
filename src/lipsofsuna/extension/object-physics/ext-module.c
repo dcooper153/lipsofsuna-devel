@@ -66,10 +66,6 @@ static void private_physics_transform (
 	LIExtModule* self,
 	LIPhyObject* object);
 
-static int private_tick (
-	LIExtModule* self,
-	float        secs);
-
 /*****************************************************************************/
 
 LIMaiExtensionInfo liext_object_physics_info =
@@ -116,8 +112,7 @@ LIExtModule* liext_object_physics_new (
 	    !lical_callbacks_insert (program->callbacks, program->engine, "object-new", -65535, private_object_new, self, self->calls + 6) ||
 	    !lical_callbacks_insert (program->callbacks, program->engine, "object-transform", -65535, private_object_transform, self, self->calls + 7) ||
 	    !lical_callbacks_insert (program->callbacks, self->physics, "object-transform", -65535, private_physics_transform, self, self->calls + 8) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", -65535, private_object_visibility, self, self->calls + 9) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", -65535, private_tick, self, self->calls + 10))
+	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", -65535, private_object_visibility, self, self->calls + 9))
 	{
 		liext_object_physics_free (self);
 		return NULL;
@@ -345,16 +340,6 @@ static int private_object_visibility (
 		liphy_object_set_transform (phyobj, &transform);
 	}
 	liphy_object_set_realized (phyobj, value);
-
-	return 1;
-}
-
-static int private_tick (
-	LIExtModule* self,
-	float        secs)
-{
-	/* Update physics. */
-	liphy_physics_update (self->physics, secs);
 
 	return 1;
 }
