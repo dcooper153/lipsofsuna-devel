@@ -197,7 +197,7 @@ end
 -- @param self Chargen.
 Views.Chargen.random = function(self)
 	self:set_race(math.random(1, #self.list_races))
-	self:update_model()
+	self.update_needed = true
 	self.skills:show(1)
 end
 
@@ -205,50 +205,50 @@ Views.Chargen.set_gender = function(self, index)
 	self.combo_gender.value = index
 	self.combo_gender.text = self.list_genders[index][1]
 	self.gender = self.list_genders[index][2]
-	self:update_model()
+	self.update_needed = true
 end
 
 Views.Chargen.set_bust_scale = function(self, value)
 	self.scroll_bust_scale.value = value
-	self:update_model()
+	self.update_needed = true
 end
 
 Views.Chargen.set_eye_style = function(self, index)
 	self.combo_eye_style.value = index
 	self.combo_eye_style.text = self.list_eye_styles[index][1]
 	self.eye_style = self.list_eye_styles[index][2]
-	self:update_model()
+	self.update_needed = true
 end
 
 Views.Chargen.set_eye_color = function(self, r, g, b)
 	self.color_eye.red = r
 	self.color_eye.green = g
 	self.color_eye.blue = b
-	self:update_model()
+	self.update_needed = true
 end
 
 Views.Chargen.set_hair_style = function(self, index)
 	self.combo_hair_style.value = index
 	self.combo_hair_style.text = self.list_hair_styles[index][1]
 	self.hair_style = self.list_hair_styles[index][2]
-	self:update_model()
+	self.update_needed = true
 end
 
 Views.Chargen.set_hair_color = function(self, r, g, b)
 	self.color_hair.red = r
 	self.color_hair.green = g
 	self.color_hair.blue = b
-	self:update_model()
+	self.update_needed = true
 end
 
 Views.Chargen.set_height = function(self, value)
 	self.scroll_height.value = value
-	self:update_model()
+	self.update_needed = true
 end
 
 Views.Chargen.set_nose_scale = function(self, value)
 	self.scroll_nose_scale.value = value
-	self:update_model()
+	self.update_needed = true
 end
 
 Views.Chargen.get_race = function(self)
@@ -309,7 +309,7 @@ Views.Chargen.set_race = function(self, index)
 	self:set_height(spec.body_scale[1] + math.random() * (spec.body_scale[2] - spec.body_scale[1]))
 	self:set_bust_scale(spec.bust_scale[1] + math.random() * (spec.bust_scale[2] - spec.bust_scale[1]))
 	self:set_nose_scale(spec.nose_scale[1] + math.random() * (spec.nose_scale[2] - spec.nose_scale[1]))
-	self:update_model()
+	self.update_needed = true
 	-- Randomize the name.
 	self.entry_name.text = Names:random{race = self.list_races[self.combo_race.value][2], gender = "female"}
 	-- Reset skills.
@@ -320,18 +320,22 @@ Views.Chargen.set_skin_style = function(self, index)
 	self.combo_skin_style.value = index
 	self.combo_skin_style.text = self.list_skin_styles[index][1]
 	self.skin_style = self.list_skin_styles[index][2]
-	self:update_model()
+	self.update_needed = true
 end
 
 Views.Chargen.set_skin_color = function(self, r, g, b)
 	self.color_skin.red = r
 	self.color_skin.green = g
 	self.color_skin.blue = b
-	self:update_model()
+	self.update_needed = true
 end
 
 Views.Chargen.update = function(self, secs)
 	-- Update model.
+	if self.update_needed then
+		self.update_needed = nil
+		self:update_model()
+	end
 	local rot = Quaternion{axis = Vector(0, 1, 0), angle = math.pi * 0.1 * secs}
 	self.object.rotation = self.object.rotation * rot
 	self.object:refresh()
