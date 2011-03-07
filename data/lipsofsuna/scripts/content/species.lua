@@ -81,6 +81,7 @@ Species{
 		eyes = "aermale1eyes1",
 		upper = "aermale1chest1"},
 	hair_styles = {
+		{"Bald", ""},
 		{"Short", "aermale1hair1"}}}
 
 Species{
@@ -268,7 +269,7 @@ Species{
 	name = "aermale-player",
 	base = "aermale",
 	ai_enabled = false,
-	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
+	inventory_items = {"torch", "workbench", "shirt", "pants", "leather boots"}}
 
 Species{
 	name = "android-player",
@@ -280,7 +281,7 @@ Species{
 	name = "androidmale-player",
 	base = "androidmale",
 	ai_enabled = false,
-	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
+	inventory_items = {"torch", "workbench", "shirt", "pants", "leather boots"}}
 
 Species{
 	name = "devora-player",
@@ -304,7 +305,7 @@ Species{
 	name = "wyrmmale-player",
 	base = "wyrmmale",
 	ai_enabled = false,
-	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
+	inventory_items = {"torch", "workbench", "shirt", "pants", "leather boots"}}
 
 ------------------------------------------------------------------------------
 -- Friendly creatures.
