@@ -5,6 +5,14 @@ Sectors.instance = Sectors{database = db, save_objects = false}
 Sectors.instance:erase_world()
 
 Views = {}
+Physics.GROUP_OBJECT = 0x0001
+Physics.GROUP_EQUIPMENT = 0x0002
+Physics.GROUP_CROSSHAIR = 0x0004
+Physics.GROUP_PLAYER = 0x0008
+Physics.GROUP_STATIC = 0x4000
+Physics.GROUP_TILES = 0x8000
+Physics.MASK_CAMERA = 0xF001
+Physics.MASK_PICK = 0xF001
 
 require "client/widgets/background"
 require "client/widgets/colorselector"
@@ -74,7 +82,7 @@ require "client/views/quests"
 require "client/views/skills"
 require "client/views/startup"
 
-Player.crosshair = Object{model = "crosshair1"}
+Player.crosshair = Object{model = "crosshair1", collision_group = Physics.GROUP_CROSSHAIR}
 
 -- Initialize the UI state.
 Widgets.Cursor.inst = Widgets.Cursor(Iconspec:find{name = "cursor1"})

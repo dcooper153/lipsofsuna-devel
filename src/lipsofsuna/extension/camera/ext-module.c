@@ -75,7 +75,7 @@ float liext_cameras_clip_camera (
 	   less predictable so scripting will suffer. The gain is also relatively
 	   small so we just use a ray cast now. */
 	hit = liphy_physics_cast_ray (physics, &start->position, &end->position,
-		LICLI_PHYSICS_GROUP_CAMERA, LIPHY_GROUP_STATICS | LIPHY_GROUP_TILES, NULL, 0, &tmp);
+		camera->config.collision_group, camera->config.collision_mask, NULL, 0, &tmp);
 
 	/* Return the clip distance. */
 	if (hit)

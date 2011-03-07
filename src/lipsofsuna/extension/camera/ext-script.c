@@ -270,6 +270,50 @@ static void Camera_zoom (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- The collision group of the camera.
+ * -- @name Camera.collision_group
+ * -- @class table
+ */
+static void Camera_getter_collision_group (LIScrArgs* args)
+{
+	LIAlgCamera* camera;
+
+	camera = args->self;
+	liscr_args_seti_int (args, camera->config.collision_group);
+}
+static void Camera_setter_collision_group (LIScrArgs* args)
+{
+	int value;
+	LIAlgCamera* camera;
+
+	camera = args->self;
+	if (liscr_args_geti_int (args, 0, &value))
+		camera->config.collision_group = value;
+}
+
+/* @luadoc
+ * --- The collision mask of the camera.
+ * -- @name Camera.collision_mask
+ * -- @class table
+ */
+static void Camera_getter_collision_mask (LIScrArgs* args)
+{
+	LIAlgCamera* camera;
+
+	camera = args->self;
+	liscr_args_seti_int (args, camera->config.collision_mask);
+}
+static void Camera_setter_collision_mask (LIScrArgs* args)
+{
+	int value;
+	LIAlgCamera* camera;
+
+	camera = args->self;
+	if (liscr_args_geti_int (args, 0, &value))
+		camera->config.collision_mask = value;
+}
+
+/* @luadoc
  * --- Far plane of the camera.
  * -- @name Camera.far
  * -- @class table
@@ -574,6 +618,8 @@ void liext_script_camera (
 	liscr_class_insert_mfunc (self, "update", Camera_update);
 	liscr_class_insert_mfunc (self, "warp", Camera_warp);
 	liscr_class_insert_mfunc (self, "zoom", Camera_zoom);
+	liscr_class_insert_mvar (self, "collision_group", Camera_getter_collision_group, Camera_setter_collision_group);
+	liscr_class_insert_mvar (self, "collision_mask", Camera_getter_collision_mask, Camera_setter_collision_mask);
 	liscr_class_insert_mvar (self, "far", NULL, Camera_setter_far);
 	liscr_class_insert_mvar (self, "fov", Camera_getter_fov, Camera_setter_fov);
 	liscr_class_insert_mvar (self, "mode", Camera_getter_mode, Camera_setter_mode);

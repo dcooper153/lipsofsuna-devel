@@ -46,7 +46,7 @@ Player.get_camera_transform_3rd = function(clss)
 	local steps = stepn
 	local r1 = clss.object.position + rel
 	local r2 = r1 + turn1 * Vector(stepl * stepn)
-	local ctr = Physics:cast_ray{src = r1, dst = r2, ignore = clss.object}
+	local ctr = Physics:cast_ray{collision_mask = Physics.MASK_CAMERA, src = r1, dst = r2}
 	if ctr then
 		steps = math.floor((ctr.point - r1).length / stepl)
 		steps = math.max(0, steps - 1)
@@ -56,8 +56,8 @@ Player.get_camera_transform_3rd = function(clss)
 		-- Camera positions that have the best displacement to the side and
 		-- the most distance to the target before hitting a wall are favored.
 		local center = r1 + turn1 * Vector(i * stepl)
-		local back = Voxel:intersect_ray(center, center + rot * Vector(0,0,5))
-		local dist = back and (back - center).length or 5
+		local back = Physics:cast_ray{collision_mask = Physics.MASK_CAMERA, src = center, dst = center + rot * Vector(0,0,5)}
+		local dist = back and (back.point - center).length or 5
 		local score = 3 * dist + (i + 1)
 		-- Choose the best camera center.
 		if best_score <= score then
@@ -89,14 +89,7 @@ Player.get_picking_ray_3rd = function(clss)
 	return pos,pos + rot * Vector(0,0,-50)
 end
 
-Player.pick_look = function(clss)
-	-- Make sure that the player is logged in.
-	if not clss.object then
-		Target.target_object = nil
-		clss.crosshair.realized = false
-		return
-	end
-	-- Ignore the crosshair, the player, and her equipment.
+Player.get_ignored_objects = function(clss)
 	local ignore = {clss.crosshair, clss.object}
 	local slots = Slots:find{owner = clss.object}
 	if slots then
@@ -104,9 +97,19 @@ Player.pick_look = function(clss)
 			table.insert(ignore, v)
 		end
 	end
+	return ignore
+end
+
+Player.pick_look = function(clss)
+	-- Make sure that the player is logged in.
+	if not clss.object then
+		Target.target_object = nil
+		clss.crosshair.realized = false
+		return
+	end
 	-- Ray pick an object in front of the player.
 	local r1,r2 = clss:get_picking_ray_1st()
-	local p,o = Target:pick_ray{ray1 = r1, ray2 = r2, ignore = ignore}
+	local p,o = Target:pick_ray{ray1 = r1, ray2 = r2}
 	Target.target_object = o
 	if o then
 		if o.name and o.name ~= "" then
@@ -123,7 +126,7 @@ Player.pick_look = function(clss)
 	clss.crosshair.realized = true
 end
 
-Player.camera = Camera{far = 40.0, fov = 1.1, mode = "third-person", near = 0.01, position_smoothing = 0.15, rotation_smoothing = 0.15}
+Player.camera = Camera{collision_mask = Physics.MASK_CAMERA, far = 40.0, fov = 1.1, mode = "third-person", near = 0.01, position_smoothing = 0.15, rotation_smoothing = 0.15}
 Player.camera_tilt = 0
 Player.camera_tilt_state = 0
 Player.camera_turn = 0

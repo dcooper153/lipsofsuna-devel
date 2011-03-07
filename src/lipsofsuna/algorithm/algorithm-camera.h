@@ -36,6 +36,8 @@ struct _LIAlgCamera
 {
 	struct
 	{
+		int collision_mask;
+		int collision_group;
 		float distance;
 		LIAlgCameraDriver driver;
 		LIAlgCameraClip clip_func;

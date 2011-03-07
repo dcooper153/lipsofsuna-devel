@@ -66,6 +66,8 @@ LIAlgCamera* lialg_camera_new ()
 	self = lisys_calloc (1, sizeof (LIAlgCamera));
 	if (self == NULL)
 		return NULL;
+	self->config.collision_group = 0xFFFF;
+	self->config.collision_mask = 0xFFFF;
 	self->config.driver = LIALG_CAMERA_FIRSTPERSON;
 	self->config.distance = LIALG_CAMERA_DEFAULT_ZOOM;
 	self->smoothing.pos = 0.5f;

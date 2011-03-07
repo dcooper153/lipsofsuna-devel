@@ -97,6 +97,7 @@ Protocol:add_handler{type = "OBJECT_SELF", func = function(event)
 	if ok then
 		local o = Object:find{id = i}
 		if o then
+			o.collision_group = Physics.GROUP_PLAYER
 			Player.species = o.race or "aer"
 			Camera.mode = "third-person"
 			Quickslots:reset()
@@ -122,7 +123,8 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	local p = Vector(x, y, z)
 	if t == "item" or t == "species" then p = p + Object.physics_position_correction end
 	-- Create the object.
-	local o = Object{id = i, model = m, name = n, position = p, spec = s, type = t}
+	local o = Object{id = i, model = m, name = n, position = p, spec = s, type = t,
+		collision_group = Physics.GROUP_OBJECT}
 	if t == "species" then o.race = s end
 	-- Apply optional customizations.
 	local ok,ge,bo,no,bu,eye,eyer,eyeg,eyeb,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = event.packet:resume(

@@ -19,7 +19,7 @@ Slots.set_object = function(self, args)
 		object:update_model(args)
 	else
 		-- Create item.
-		object = Object{model = args.model}
+		object = Object{model = args.model, collision_group = Physics.GROUP_EQUIPMENT}
 		object:update_model(args)
 		self.slots[args.slot] = object
 	end

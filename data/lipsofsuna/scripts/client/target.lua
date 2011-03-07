@@ -28,7 +28,7 @@ Target.pick_ray = function(clss, args)
 		r1,r2 = args.camera:picking_ray{cursor = Client.cursor_pos}
 	end
 	-- Pick from the scene.
-	local ret = Physics:cast_ray{src = r1, dst = r2, ignore = args.ignore}
+	local ret = Physics:cast_ray{collision_mask = Physics.MASK_PICK, src = r1, dst = r2, ignore = args.ignore}
 	if not ret then return end
 	return ret.point, ret.object, ret.tile
 end
