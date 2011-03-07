@@ -829,7 +829,7 @@ void liphy_object_set_transform (
 
 	/* Calculate displacement. */
 	/* Due to the center of mass transform of the collision shape, the
-	   object may need to displaced for it to appear in the right place. */
+	   object may need to be displaced for it to appear in the right place. */
 	if (self->shape != NULL)
 	{
 		LIMatVector ctr = self->center_of_mass;
@@ -933,6 +933,7 @@ static void private_update_state (
 
 	/* Remove all constraints involving us. */
 	liphy_physics_clear_constraints (self->physics, self);
+	liphy_object_get_transform (self, &transform);
 
 	/* Remove old controller. */
 	if (self->control != NULL)
@@ -941,7 +942,6 @@ static void private_update_state (
 		self->control = NULL;
 	}
 	self->shape = NULL;
-	liphy_object_get_transform (self, &transform);
 
 	/* Create new controller. */
 	if (self->flags & PRIVATE_REALIZED)
