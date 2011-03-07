@@ -24,6 +24,54 @@
 
 #include "ext-module.h"
 
+static int private_build_ignore_list (
+	LIExtModule*  module,
+	LIScrArgs*    args,
+	LIPhyObject** result,
+	int           limit)
+{
+	int i;
+	int count = 0;
+	LIScrData* data;
+	LIEngObject* object;
+
+	/* Add an individual object to the ignore list. */
+	if (liscr_args_gets_data (args, "ignore", LISCR_SCRIPT_OBJECT, &data))
+	{
+		object = liscr_data_get_data (data);
+		result[0] = liphy_physics_find_object (module->physics, object->id);
+		if (result[0] != NULL)
+			return 1;
+		return 0;
+	}
+
+	/* Add multiple objects to the ignore list. */
+	if (liscr_args_gets_table (args, "ignore"))
+	{
+		for (i = 1 ; i <= limit ; i++)
+		{
+			lua_pushnumber (args->lua, i);
+			lua_gettable (args->lua, -2);
+			data = liscr_isdata (args->lua, -1, LISCR_SCRIPT_OBJECT);
+			if (data != NULL)
+			{
+				object = liscr_data_get_data (data);
+				result[count] = liphy_physics_find_object (module->physics, object->id);
+				if (result[count] != NULL)
+					count++;
+			}
+			lua_pop (args->lua, 1);
+			if (data == NULL)
+				break;
+		}
+		lua_pop (args->lua, 1);
+	}
+
+	return count;
+}
+
+/*****************************************************************************/
+
 /* @luadoc
  * module "core/physics"
  * --- Physics simulation support.
@@ -37,7 +85,7 @@
  * -- @param args Arguments.<ul>
  * --   <li>collision_group: Collision group.</li>
  * --   <li>collision_mask: Collision mask.</li>
- * --   <li>ignore: Object to ignore.</li>
+ * --   <li>ignore: Object or table of objects to ignore.</li>
  * --   <li>src: Start point vector in world space.</li>
  * --   <li>dst: End point vector in world space.</li></ul>
  * -- @return Table with point, normal, object and tile. Nil if no collision occurred.
@@ -45,7 +93,7 @@
  */
 static void Physics_cast_ray (LIScrArgs* args)
 {
-	int ignore = 0;
+	int ignore;
 	int group = LIPHY_DEFAULT_COLLISION_GROUP;
 	int mask = LIPHY_DEFAULT_COLLISION_MASK;
 	LIMatVector start;
@@ -54,8 +102,7 @@ static void Physics_cast_ray (LIScrArgs* args)
 	LIExtModule* module;
 	LIMatVector vector;
 	LIPhyCollision result;
-	LIPhyObject* ignores[1];
-	LIScrData* data;
+	LIPhyObject* ignores[100];
 
 	/* Handle arguments. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PHYSICS);
@@ -64,13 +111,7 @@ static void Physics_cast_ray (LIScrArgs* args)
 		return;
 	liscr_args_gets_int (args, "collision_group", &group);
 	liscr_args_gets_int (args, "collision_mask", &mask);
-	if (liscr_args_gets_data (args, "ignore", LISCR_SCRIPT_OBJECT, &data))
-	{
-		hitobj = liscr_data_get_data (data);
-		ignores[0] = liphy_physics_find_object (module->physics, hitobj->id);
-		if (ignores[0] != NULL)
-			ignore = 1;
-	}
+	ignore = private_build_ignore_list (module, args, ignores, sizeof (ignores) / sizeof (*ignores));
 
 	if (liphy_physics_cast_ray (module->physics, &start, &end, group, mask, ignores, ignore, &result))
 	{
@@ -97,7 +138,7 @@ static void Physics_cast_ray (LIScrArgs* args)
  * -- @param args Arguments.<ul>
  * --   <li>collision_group: Collision group.</li>
  * --   <li>collision_mask: Collision mask.</li>
- * --   <li>ignore: Object to ignore.</li>
+ * --   <li>ignore: Object or table of objects to ignore.</li>
  * --   <li>radius: Radius in world units.</li>
  * --   <li>src: Start point vector in world space.</li>
  * --   <li>dst: End point vector in world space.</li></ul>
@@ -106,7 +147,7 @@ static void Physics_cast_ray (LIScrArgs* args)
  */
 static void Physics_cast_sphere (LIScrArgs* args)
 {
-	int ignore = 0;
+	int ignore;
 	int group = LIPHY_DEFAULT_COLLISION_GROUP;
 	int mask = LIPHY_DEFAULT_COLLISION_MASK;
 	float radius = 0.5f;
@@ -116,8 +157,7 @@ static void Physics_cast_sphere (LIScrArgs* args)
 	LIExtModule* module;
 	LIMatVector vector;
 	LIPhyCollision result;
-	LIPhyObject* ignores[1];
-	LIScrData* data;
+	LIPhyObject* ignores[100];
 
 	/* Handle arguments. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PHYSICS);
@@ -128,13 +168,7 @@ static void Physics_cast_sphere (LIScrArgs* args)
 	liscr_args_gets_int (args, "collision_mask", &mask);
 	if (liscr_args_gets_float (args, "radius", &radius))
 		radius = LIMAT_MAX (0.02f, radius);
-	if (liscr_args_gets_data (args, "ignore", LISCR_SCRIPT_OBJECT, &data))
-	{
-		hitobj = liscr_data_get_data (data);
-		ignores[0] = liphy_physics_find_object (module->physics, hitobj->id);
-		if (ignores[0] != NULL)
-			ignore = 1;
-	}
+	ignore = private_build_ignore_list (module, args, ignores, sizeof (ignores) / sizeof (*ignores));
 
 	if (liphy_physics_cast_ray (module->physics, &start, &end, group, mask, ignores, ignore, &result))
 	{
