@@ -310,11 +310,16 @@ public:
 	virtual btScalar addSingleResult (btCollisionWorld::LocalRayResult& result, bool world)
 	{
 		int i;
-		LIPhyObject* hit = (LIPhyObject*) result.m_collisionObject->getUserPointer ();
-		for (i = 0 ; i < this->ignore_count ; i++)
+		LIPhyObject* object;
+		LIPhyPointer* pointer = (LIPhyPointer*) result.m_collisionObject->getUserPointer ();
+		if (pointer->object)
 		{
-			if (hit == this->ignore_array[i])
-				return 1.0;
+			object = (LIPhyObject*) pointer->pointer;
+			for (i = 0 ; i < this->ignore_count ; i++)
+			{
+				if (object == this->ignore_array[i])
+					return 1.0;
+			}
 		}
 		return btCollisionWorld::ClosestRayResultCallback::addSingleResult (result, world);
 	}
