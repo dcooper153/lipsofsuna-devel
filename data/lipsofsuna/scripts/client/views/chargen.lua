@@ -331,10 +331,11 @@ Views.Chargen.update = function(self, secs)
 end
 
 Views.Chargen.update_model = function(self)
+	local spec = Species:find{name = self.race .. "-player"}
 	self.object:create_character_model{
 		body_scale = self.scroll_height.value,
 		bust_scale = self.scroll_bust_scale.value,
-		equipment = {"dress"}, -- TODO
+		equipment = spec and spec.inventory_items,
 		eye_color = {self.color_eye.red, self.color_eye.green, self.color_eye.blue},
 		hair_color = {self.color_hair.red, self.color_hair.green, self.color_hair.blue},
 		hair_style = self.hair_style,
