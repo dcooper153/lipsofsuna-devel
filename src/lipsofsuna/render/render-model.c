@@ -185,69 +185,9 @@ int liren_model_deform (
 	return 1;
 }
 
-/**
- * \brief Calculates the first intersection of the model and a ray.
- * \param self Model.
- * \param ray0 Start point of the ray, in model space.
- * \param ray1 End point of the ray, in model space.
- * \param result Return location for the intersection point.
- * \return Nonzero if an intersection was found, zero if not.
- */
-int liren_model_intersect_ray (
-	const LIRenModel*  self,
-	const LIMatVector* ray0,
-	const LIMatVector* ray1,
-	LIMatVector*       result)
-{
-	int i;
-	int found = 0;
-	float d;
-	float best_dist = 0.0f;
-	void* vtxdata;
-	LIMatTriangle triangle;
-	LIMatVector best_point = { 0.0f, 0.0f, 0.0f };
-	LIMatVector p;
-	LIRenFormat format;
-
-	/* Fast exit if no intersection with the bounding box. */
-	if (!limat_intersect_aabb_line_fast (&self->bounds, ray0, ray1))
-		return 0;
-
-	/* Test for intersection for each face in the model. */
-	liren_mesh_get_format (&self->mesh, &format);
-	vtxdata = liren_mesh_lock_vertices (&self->mesh, 0, self->mesh.counts[2]);
-	if (vtxdata == NULL)
-		return 0;
-	for (i = 0 ; i < self->mesh.counts[2] ; i += 3)
-	{
-		/* Get the next triangle. */
-		limat_triangle_set_from_points (&triangle,
-			(LIMatVector*)(vtxdata + format.vtx_offset + format.size * (i + 0)),
-			(LIMatVector*)(vtxdata + format.vtx_offset + format.size * (i + 1)),
-			(LIMatVector*)(vtxdata + format.vtx_offset + format.size * (i + 2)));
-
-		/* Check for an intersection. */
-		if (limat_triangle_intersects_ray (&triangle, ray0, ray1, &p))
-		{
-			d = limat_vector_get_length (limat_vector_subtract (p, *ray0));
-			if (!found || d < best_dist)
-			{
-				best_dist = d;
-				best_point = p;
-				found = 1;
-			}
-		}
-	}
-	liren_mesh_unlock_vertices (&self->mesh);
-	if (found)
-		*result = best_point;
-
-	return found;
-}
-
-void
-liren_model_replace_image (LIRenModel* self,
-                           LIRenImage* image)
+void liren_model_replace_image (
+	LIRenModel* self,
+	LIRenImage* image)
 {
 	int i;
 	int j;

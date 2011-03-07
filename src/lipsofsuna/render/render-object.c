@@ -127,49 +127,6 @@ liren_object_deform (LIRenObject* self)
 }
 
 /**
- * \brief Calculates the first intersection of the object and a ray.
- * \param self Model.
- * \param ray0 Start point of the ray, in world space.
- * \param ray1 End point of the ray, in world space.
- * \param detail Nonzero to do detailed, per triangle intersection testing.
- * \param result Return location for the intersection point.
- * \return Nonzero if an intersection was found, zero if not.
- */
-int liren_object_intersect_ray (
-	const LIRenObject* self,
-	const LIMatVector* ray0,
-	const LIMatVector* ray1,
-	int                detail,
-	LIMatVector*       result)
-{
-	LIMatTransform inverse;
-	LIMatVector raylocal0;
-	LIMatVector raylocal1;
-	LIMatVector resultlocal;
-
-	if (!self->model)
-		return 0;
-
-	/* Move the ray to the model space. */
-	inverse = limat_transform_invert (self->transform);
-	raylocal0 = limat_transform_transform (inverse, *ray0);
-	raylocal1 = limat_transform_transform (inverse, *ray1);
-
-	/* Avoid the expensive per triangle test with and AABB test whenever possible. */
-	if (!limat_intersect_aabb_line_fast (&self->model->bounds, &raylocal0, &raylocal1))
-		return 0;
-
-	/* Get the intersection point in the model space. */
-	if (detail && !liren_model_intersect_ray (self->model, &raylocal0, &raylocal1, &resultlocal))
-		return 0;
-
-	/* Move the intersection point to the world space. */
-	*result = limat_transform_transform (self->transform, resultlocal);
-
-	return 1;
-}
-
-/**
  * \brief Sets the particle animation state of the object.
  * \param self Object.
  * \param start Animation offset in seconds.

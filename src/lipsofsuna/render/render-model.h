@@ -68,12 +68,6 @@ LIAPICALL (int, liren_model_deform, (
 	const char*      shader,
 	const LIMdlPose* pose));
 
-LIAPICALL (int, liren_model_intersect_ray, (
-	const LIRenModel*  self,
-	const LIMatVector* ray0,
-	const LIMatVector* ray1,
-	LIMatVector*       result));
-
 LIAPICALL (void, liren_model_replace_image, (
 	LIRenModel* self,
 	LIRenImage* image));
