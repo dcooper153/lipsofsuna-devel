@@ -3,6 +3,7 @@ Regionspec{
 	categories = {"special"},
 	depth = {3000,3000},
 	links = {"Portal of Lips", "Sanctuary", "Chara's Root Grove"},
+	pattern_name = "lips1",
 	position = {1536,1536},
 	size = {32,16,32}}
 
@@ -68,12 +69,14 @@ Regionspec{
 	name = "Random: Dungeon",
 	categories = {"random"},
 	depth = {2500, 3000},
+	pattern_category = "dungeon",
 	size = {8,8,8}}
 
 Regionspec{
 	name = "Random: Nature",
 	categories = {"random"},
 	depth = {2500, 3000},
+	pattern_category = "nature",
 	size = {8,8,8}}
 
 Regionspec{
@@ -82,4 +85,5 @@ Regionspec{
 	depth = {2900, 3000},
 	distance = {"Lips",30,60},
 	links = {"Chara's Root Grove", "Portal of Lips", "Sanctuary"},
+	pattern_name = "silverspring1",
 	size = {32,16,32}}

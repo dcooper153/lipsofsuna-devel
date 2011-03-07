@@ -114,8 +114,14 @@ end
 --- Places a region to the map.
 -- @param clss Generator class.
 -- @param reg Region spec.
-Generator.place_region = function(clss, reg)
-	-- Determine the approximate position.
+-- @param pat Pattern spec.
+-- @return Region or nil.
+Generator.place_region = function(clss, reg, pat)
+	-- Choose the pattern of the region.
+	-- If a pattern is specified, the size of the region may change. That
+	-- affects the placement so the pattern needs to be chosen first.
+	local size = pat and pat.size or Vector(reg.size[1], reg.size[2], reg.size[3])
+ 	-- Determine the approximate position.
 	-- Regions can be placed randomly or relative to each other. Here we
 	-- decide the range of positions that are valid for the region.
 	local rel = nil
@@ -135,7 +141,6 @@ Generator.place_region = function(clss, reg)
 	-- positions until one is found where they fit. Regions with fixed
 	-- positions are simply placed there without any checks.
 	local pos = Vector()
-	local size = Vector(reg.size[1], reg.size[2], reg.size[3])
 	local aabb = Aabb{point = pos, size = size + Vector(6,6,6)}
 	if dist then
 		repeat
@@ -154,7 +159,7 @@ Generator.place_region = function(clss, reg)
 		aabb.point = pos - Vector(5,5,5)
 	end
 	-- Create the region.
-	local region = Region{aabb = aabb, point = pos, size = size, spec = reg}
+	local region = Region{aabb = aabb, pattern = pat, point = pos, size = size, spec = reg}
 	clss:add_region(region)
 	return region
 end
@@ -206,7 +211,8 @@ Generator.generate = function(clss, args)
 		local skipped = 0
 		for name,reg in pairs(special) do
 			if not clss.regions_dict_name[name] then
-				if not clss:place_region(reg) then
+				local pat = Pattern:random{category = reg.pattern_category, name = reg.pattern_name}
+				if not clss:place_region(reg, pat) then
 					skipped = skipped + 1
 				end
 			end
@@ -272,22 +278,10 @@ Generator.generate = function(clss, args)
 		clss:update_status(layer / clss.layer_count)
 	end
 	linkn = #clss.links
-	-- Paint corridors.
-	clss:update_status(0, "Creating corridors")
-	for i,link in ipairs(clss.links) do
-		local src = link[1]:get_link_point(link[2].point)
-		local dst = link[2]:get_link_point(link[1].point)
-		clss:paint_corridor(src, dst)
-		clss:update_status(i / linkn)
-	end
 	-- Paint regions.
 	clss:update_status(0, "Creating regions")
 	local region_funcs = {
-		-- TODO
-		["Lips"] = function(r)
-			Voxel:place_pattern{point = r.point + Vector(0,0,0), name = "lips1"}
-			Voxel:place_pattern{point = r.point + Vector(4,1,4), name = "peculiar pet"}
-		end,
+		-- TODO: Get rid of these and use region.pattern_name instead
 		["Chara's Root Grove"] = function(r)
 			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "roots of world"}
 			Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "mourning adventurer lost"}
@@ -304,22 +298,27 @@ Generator.generate = function(clss, args)
 		["Portal of Midguard"] = function(r)
 			Voxel:place_pattern{point = r.point + Vector(0,0,0), name = "portal of midguard"}
 		end,
-		["Random: Dungeon"] = function(r)
-			Voxel:place_pattern{point = r.point, name = "dungeon1"}
-		end,
-		["Random: Nature"] = function(r)
-			Voxel:place_pattern{point = r.point, name = "nature1"}
-		end,
 		["Sanctuary"] = function(r)
 			Voxel:place_pattern{point = r.point + Vector(3,0,3), name = "sanctuary"}
-		end,
-		["Silverspring"] = function(r)
-			Voxel:place_pattern{point = r.point, name = "silverspring1"}
 		end}
 	for _,reg in pairs(clss.regions_dict_id) do
 		Voxel:fill_region{point = reg.point, size = reg.size}
-		local func = region_funcs[reg.spec.name]
-		if func then func(reg) end
+		if reg.pattern then
+			-- Random patterns.
+			Voxel:place_pattern{point = reg.point, name = reg.pattern.name}
+		else
+			-- Hardcoded patterns.
+			local func = region_funcs[reg.spec.name]
+			if func then func(reg) end
+		end
+	end
+	-- Paint corridors.
+	clss:update_status(0, "Creating corridors")
+	for i,link in ipairs(clss.links) do
+		local src = link[1]:get_link_point(link[2].point)
+		local dst = link[2]:get_link_point(link[1].point)
+		clss:paint_corridor(src, dst)
+		clss:update_status(i / linkn)
 	end
 	-- Find used sectors.
 	clss:update_status(0, "Counting sectors")
@@ -365,18 +364,38 @@ end
 -- @param link Link to subdivide.
 -- @return Link or nil.
 Generator.subdivide_link = function(clss, link)
-	clss:subdivide_link_recursive(link)
+	-- Check if the path is long enough.
+	local src = link[1].point + link[1].size * 0.5
+	local dst = link[2].point + link[2].size * 0.5
+	local len = (src - dst).length - (link[1].size.length + link[2].size.length) / 2
+	if len < 7 then return end
+	-- Try to subdive the link.
+	for i = 1,100 do
+		-- Select the type for the new region.
+		local spec = Regionspec:random{category = "random"}
+		if not spec then return end
+		local pattern = Pattern:random{category = spec.pattern_category, name = spec.pattern_name}
+		if not pattern then return end
+		-- Check if the pattern fits.
+		local region = clss:subdivide_link_test(link, spec, pattern)
+		if region then
+			-- Link the new region to the path.
+			clss:add_region(region)
+			local link1 = region:create_link(link[2])
+			link[2] = region
+			table.insert(clss.links, link1)
+			-- Recursively subdivide the new paths.
+			clss:subdivide_link(link)
+			clss:subdivide_link(link1)
+			return link1
+		end
+	end
 end
 
-Generator.subdivide_link_recursive = function(clss, link)
-	-- Select the type for the new region.
-	local spec = Regionspec:random{category = "random"}
-	if not spec then return end
+Generator.subdivide_link_test = function(clss, link, spec, pattern)
 	-- Calculate the subdivision center.
 	local src = link[1].point
 	local dst = link[2].point
-	local len = (dst - src).length
-	if len - (link[1].size.length + link[2].size.length) < 1 then return end
 	local rel = src + (dst - src) * (0.3 + 0.4 * math.random())
 	-- Calculate the direction vector.
 	local forward = (dst - src):normalize()
@@ -384,30 +403,17 @@ Generator.subdivide_link_recursive = function(clss, link)
 	-- Find the position for the new region.
 	local ok = nil
 	local pos = Vector()
-	local size = Vector(spec.size[1], spec.size[2], spec.size[3])
+	local size = pattern.size
 	local aabb = Aabb{point = pos, size = size}
-	local dist = math.ceil(0.5 * len)
-	for i = 1,20 do
+	local dist = math.ceil((dst - src).length)
+	for i = 1,10 do
 		pos = side * math.random(-dist, dist)
 		pos = (pos + rel):floor()
 		aabb.point = pos
 		if clss:validate_region_position(aabb) then
-			ok = true
-			break
+			return Region{aabb = aabb, pattern = pattern, point = pos, size = size, spec = spec}
 		end
 	end
-	if not ok then return end
-	-- Create the new region.
-	local region = Region{aabb = aabb, point = pos, size = size, spec = spec}
-	clss:add_region(region)
-	-- Link the new region to the path.
-	local link1 = region:create_link(link[2])
-	link[2] = region
-	table.insert(clss.links, link1)
-	-- Recursively subdivide the new paths.
-	clss:subdivide_link_recursive(link)
-	clss:subdivide_link_recursive(link1)
-	return link1
 end
 
 --- Updates the network status while the generator is active.

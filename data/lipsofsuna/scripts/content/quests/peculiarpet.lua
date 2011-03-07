@@ -2,12 +2,6 @@ Quest{
 	name = "Peculiar Pet",
 	status = "inactive"}
 
-Pattern{
-	name = "peculiar pet",
-	creatures = {
-		{0,0,0,"peculiar pet worm"},
-		{1.3,0,0,"peculiar pet npc"}}}
-
 Species{
 	name = "peculiar pet npc",
 	base = "aer",
