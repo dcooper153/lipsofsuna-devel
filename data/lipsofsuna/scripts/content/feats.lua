@@ -130,8 +130,8 @@ Feateffectspec{
 	influences = {{"health", -5, -0.95}},
 	projectile = "fireball1",
 	skill_mult = {intelligence = 1, willpower = 1},
-	reagent_base = {mushroom = 1},
-	reagent_mult = {mushroom = 0.1}}
+	reagent_base = {["milky powder"] = 1},
+	reagent_mult = {["milky powder"] = 0.1}}
 
 Feateffectspec{
 	name = "physical damage",
@@ -150,8 +150,8 @@ Feateffectspec{
 	influences = {{"health", 5, 1.06}},
 	skill_base = {intelligence = 10, willpower = 5},
 	skill_mult = {intelligence = 1, willpower = 0.1},
-	reagent_base = {mushroom = 1},
-	reagent_mult = {mushroom = 0.09}}
+	reagent_base = {["milky powder"] = 1},
+	reagent_mult = {["milky powder"] = 0.09}}
 
 Feateffectspec{
 	name = "sanctuary",
@@ -160,6 +160,5 @@ Feateffectspec{
 	effect = "heal1",
 	icon = "modifier-sanctuary",
 	influences = {{"sanctuary", 30, 2}},
---	skill_base = {intelligence = 25, willpower = 25},
---	reagent_base = {mushroom = 3}}
-	skill_base = {intelligence = 1, willpower = 1}}
+	reagent_base = {["milky powder"] = 3},
+	skill_base = {intelligence = 20, willpower = 20}}

@@ -125,6 +125,16 @@ Itemspec{
 	stacking = true}
 
 Itemspec{
+	name = "milky powder",
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {"material"},
+	crafting_count = 20,
+	crafting_materials = {["mushroom"] = 1},
+	stacking = true,
+	icon = "mushroom1"}
+
+Itemspec{
 	name = "mushroom",
 	model = "mushroom-000",--"mushroom-001"..."mushroom-008"
 	mass = 1,
