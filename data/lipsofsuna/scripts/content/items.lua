@@ -564,24 +564,35 @@ Itemspec{
 	equipment_slot = "head"}
 
 Itemspec{
+	name = "leather helm",
+	model = "book-000",
+	armor_class = 0.04,
+	categories = {"armor"},
+	crafting_materials = {hide = 2},
+	equipment_models = {
+		["aermale"] = {hair = "aermale1leatherhead2"}},
+	equipment_slot = "head"}
+
+Itemspec{
 	name = "leather leggings",
 	model = "book-000",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor1"},["aermale"] = {legs = "aermale1leatherlegs2"}},
+		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor1"}},
 	equipment_slot = "feet"}
 
+
 Itemspec{
-	name = "leather torso",
+	name = "leather gloves",
 	model = "book-000",
 	armor_class = 0.04,
 	categories = {"armor"},
-	crafting_materials = {hide = 4},
+	crafting_materials = {["hide"] = 2},
 	equipment_models = {
-		["aermale"] = {legs = "aermale1leatherlegs2"}},
-	equipment_slot = "lowerbody"}
+		["aermale"] = {arms = "aermale1leatherarms2"}},
+	equipment_slot = "arms"}
 
 Itemspec{
 	name = "leather boots",
@@ -590,7 +601,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor2", legs1 = "boots1"}},
+		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor2", legs1 = "boots1"},["aermale"] = {feet = "aermale1boots1"}},
 	equipment_slot = "feet"}
 
 Itemspec{
@@ -600,9 +611,18 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"}},
+		["aer/android/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},["aermale"] = {legs = "aermale1leatherlegs2"}},
 	equipment_slot = "lowerbody"}
 
+Itemspec{
+	name = "leather brigand pants",
+	model = "book-000",
+	armor_class = 0.04,
+	categories = {"armor"},
+	crafting_materials = {hide = 4},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},["aermale"] = {legs = "aermale1leatherlegs1"}},
+	equipment_slot = "lowerbody"}
 Itemspec{
 	name = "leather top",
 	model = "book-000",
@@ -666,6 +686,17 @@ Itemspec{
 	icon = "cloth1"}
 
 Itemspec{
+	name = "leather brigand chest",
+	model = "book-000",
+	armor_class = 0.04,
+	categories = {"armor"},
+	crafting_materials = {hide = 4},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest1"}},
+	equipment_slot = "upperbody",
+	icon = "cloth1"}
+
+Itemspec{
 	name = "round shield",
 	model = "shield1",
 	armor_class = 0.08,
@@ -701,16 +732,7 @@ Itemspec{
 		["aermale"] = {legs = "aermale1pants1"}},
 	equipment_slot = "lowerbody",
 	icon = "cloth1"}
-Itemspec{
-	name = "boots",
-	model = "book-000",
-	armor_class = 0.04,
-	categories = {"armor"},
-	crafting_materials = {hide = 1},
-	equipment_models = {
-		["aermale"] = {feet = "aermale1boots1"}},
-	equipment_slot = "feet",
-	icon = "cloth1"}
+
 ------------------------------------------------------------------------------
 -- Miscellaneous.
 
