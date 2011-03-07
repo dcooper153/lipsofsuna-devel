@@ -128,9 +128,9 @@ int limdl_shape_write (
 			return 0;
 		for (j = 0 ; j < part->vertices.count ; j++)
 		{
-			if (!liarc_writer_append_float (writer, part->vertices.array[i].x) ||
-				!liarc_writer_append_float (writer, part->vertices.array[i].y) ||
-				!liarc_writer_append_float (writer, part->vertices.array[i].z))
+			if (!liarc_writer_append_float (writer, part->vertices.array[j].x) ||
+				!liarc_writer_append_float (writer, part->vertices.array[j].y) ||
+				!liarc_writer_append_float (writer, part->vertices.array[j].z))
 				return 0;
 		}
 	}
