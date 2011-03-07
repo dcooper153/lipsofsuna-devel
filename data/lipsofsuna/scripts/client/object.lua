@@ -2,9 +2,12 @@ Object.physics_position_correction = Vector(0, -0.2, 0)
 
 local oldanimate = Object.animate
 Object.animate = function(self, args)
-	if not self.animated then
+	if not self.animated and self.model then
+		local m = self.model:copy()
+		m:calculate_bounds()
+		m:changed()
+		self.model = m
 		self.animated = true
-		self.model = self.model and self.model:copy()
 	end
 	oldanimate(self, args)
 end
