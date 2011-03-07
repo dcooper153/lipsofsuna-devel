@@ -32,9 +32,6 @@ Species{
 	nose_scale = {0.5, 2.0},
 	eye_styles = {
 		{"Default", ""}},
-	genders = {
-		{"Female", "female"},
-		{"Male", "male"}},
 	hair_styles = {
 		{"Bald", ""},
 		{"Long", "hair2"},
@@ -72,7 +69,7 @@ Species{
 
 Species{
 	name = "aermale",
-	base = "race",
+	base = "aer",
 	equipment_class = "aermale",
 	model = "aermale1",
 	models = {
@@ -84,16 +81,7 @@ Species{
 		eyes = "aermale1eyes1",
 		upper = "aermale1chest1"},
 	hair_styles = {
-		
-		{"Short", "aermale1hair1"}},
-
-	skills = {
-		{name = "dexterity", max = 80, val = 30},
-		{name = "health", max = 100, val = 50},
-		{name = "intelligence", max = 100, val = 50},
-		{name = "perception", max = 60, val = 20},
-		{name = "strength", max = 40, val = 20},
-		{name = "willpower", max = 80, val = 30}}}
+		{"Short", "aermale1hair1"}}}
 
 Species{
 	name = "android",
@@ -122,13 +110,29 @@ Species{
 		{name = "strength", max = 80, val = 30},
 		{name = "willpower", max = 40, val = 20}}}
 
+-- TODO
+Species{
+	name = "androidmale",
+	base = "android",
+	equipment_class = "aermale",
+	model = "aermale1",
+	models = {
+		skeleton = "aermale1",
+		arms = "aermale1arms1",
+		head = "aermale1head1",
+		legs = "aermale1legs1",
+		feet = "aermale1feet1",
+		eyes = "aermale1eyes1",
+		upper = "aermale1chest1"},
+	hair_styles = {
+		{"Short", "aermale1hair1"}}}
+
 Species{
 	name = "devora",
 	base = "race",
 	aim_ray_center = Vector(0, 1, 0),
 	camera_center = Vector(0, 1, 0),
 	equipment_class = "devora",
-	genders = {{"Genderless", "female"}},
 	hair_styles = {
 		{"Bald", ""},
 		{"Plant 1", "devorahair1"},
@@ -160,7 +164,6 @@ Species{
 	name = "kraken",
 	base = "race",
 	equipment_class = "kraken",
-	genders = {{"Female", "female"}},
 	model = "aer1",
 	models = {
 		skeleton = "aer1",
@@ -211,6 +214,23 @@ Species{
 		{name = "strength", max = 100, val = 50},
 		{name = "willpower", max = 60, val = 20}}}
 
+-- TODO
+Species{
+	name = "wyrmmale",
+	base = "wyrm",
+	equipment_class = "aermale",
+	model = "aermale1",
+	models = {
+		skeleton = "aermale1",
+		arms = "aermale1arms1",
+		head = "aermale1head1",
+		legs = "aermale1legs1",
+		feet = "aermale1feet1",
+		eyes = "aermale1eyes1",
+		upper = "aermale1chest1"},
+	hair_styles = {
+		{"Short", "aermale1hair1"}}}
+
 Species{
 	name = "trogfemale",
 	base = "race",
@@ -229,11 +249,11 @@ Species{
 		{name = "perception", max = 60, val = 20},
 		{name = "strength", max = 4, val = 2},
 		{name = "willpower", max = 8, val = 3}},
-	hair_styles = {		
-		{"troglong", "trogfemlonghair1"},{"trogshort", "trogfemshorthair1"}},
+	hair_styles = {	
+		{"troglong", "trogfemlonghair1"},
+		{"trogshort", "trogfemshorthair1"}},
 	skin_styles = {
 		{""}}}
-	
 
 ------------------------------------------------------------------------------
 -- Playable races.
@@ -245,8 +265,20 @@ Species{
 	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
 
 Species{
+	name = "aermale-player",
+	base = "aermale",
+	ai_enabled = false,
+	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+
+Species{
 	name = "android-player",
 	base = "android",
+	ai_enabled = false,
+	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+
+Species{
+	name = "androidmale-player",
+	base = "androidmale",
 	ai_enabled = false,
 	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
 
@@ -265,6 +297,12 @@ Species{
 Species{
 	name = "wyrm-player",
 	base = "wyrm",
+	ai_enabled = false,
+	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+
+Species{
+	name = "wyrmmale-player",
+	base = "wyrmmale",
 	ai_enabled = false,
 	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
 

@@ -86,7 +86,6 @@ end
 --   <li>bust_scale: Scale factor of the bust.</li>
 --   <li>dead: True for a dead creature.</li>
 --   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
---   <li>gender: Gender.</li>
 --   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
 --   <li>id: Unique object ID or nil for a random free one.</li>
 --   <li>jumped: Jump timer.</li>
@@ -109,7 +108,6 @@ Creature.new = function(clss, args)
 	copy("body_scale")
 	copy("bust_scale")
 	copy("dead")
-	copy("gender")
 	copy("eye_style")
 	copy("hair_style")
 	copy("jumped", 0)

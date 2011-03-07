@@ -1,11 +1,14 @@
 Views.Chargen = Class(Widgets.Scene)
 Views.Chargen.mode = "chargen"
 Views.Chargen.list_races = {
-	{"Aer", "aer"},
-	{"Android", "android"},
-	{"Devora", "devora"},
-	{"Kraken", "kraken"},
-	{"Wyrm", "wyrm"}}
+	{"Aer - female", "aer"},
+	{"Aer - male", "aermale"},
+	{"Android - female", "android"},
+	{"Android - male", "androidmale"},
+	{"Devora - genderless", "devora"},
+	{"Kraken - female", "kraken"},
+	{"Wyrm - female", "wyrm"},
+	{"Wyrm - male", "wyrmmale"}}
 
 --- Creates a new chargen view.
 -- @param clss Chargen class.
@@ -28,14 +31,13 @@ Views.Chargen.new = function(clss)
 	self.object = Object{position = Vector(1, 1, 1), type = "character"}
 	self.light = Light{ambient = {1.0,1.0,1.0,1.0}, diffuse={1.0,1.0,1.0,1.0}, equation={2,0.3,0.03}}
 	self.timer = Timer{enabled = false, func = function(timer, secs) self:update(secs) end}
-	self.list_genders = {}
 	self.list_hair_styles = {}
 	self.list_eye_styles = {}
 	self.list_skin_styles = {}
 	-- Character name.
 	self.label_name = Widgets.Label{text = "Name:"}
 	self.entry_name = Widgets.Entry()
-	-- Race and gender selectors.
+	-- Race selector.
 	local races = {}
 	for k,v in ipairs(self.list_races) do
 		table.insert(races, {v[1], function() self:set_race(k) end})
@@ -43,8 +45,6 @@ Views.Chargen.new = function(clss)
 	self.label_race = Widgets.Label{text = "Race:"}
 	self.label_race:set_request{width = 100}
 	self.combo_race = Widgets.ComboBox(races)
-	self.label_gender = Widgets.Label{text = "Gender:"}
-	self.combo_gender = Widgets.ComboBox()
 	-- Eye style and color selectors.
 	self.label_eye_style = Widgets.Label{text = "Eyes:"}
 	self.combo_eye_style = Widgets.ComboBox()
@@ -89,13 +89,11 @@ Views.Chargen.new = function(clss)
 	self.group_hair:set_child{row = 1, col = 2, widget = self.combo_hair_color}
 	self.group_hair:set_expand{col = 1}
 	self.group_hair:set_expand{col = 2}
-	self.group_race = Widget{rows = 3, cols = 2, spacings = {0,2}}
+	self.group_race = Widget{rows = 2, cols = 2, spacings = {0,2}}
 	self.group_race:set_child{row = 1, col = 1, widget = self.label_name}
 	self.group_race:set_child{row = 1, col = 2, widget = self.entry_name}
 	self.group_race:set_child{row = 2, col = 1, widget = self.label_race}
 	self.group_race:set_child{row = 2, col = 2, widget = self.combo_race}
-	self.group_race:set_child{row = 3, col = 1, widget = self.label_gender}
-	self.group_race:set_child{row = 3, col = 2, widget = self.combo_gender}
 	self.group_race:set_expand{col = 2}
 	self.group_race1 = Widgets.Frame{rows = 2, cols = 1}
 	self.group_race1:set_child{row = 1, col = 1, widget = self.group_race}
@@ -145,7 +143,6 @@ Views.Chargen.apply = function(self)
 	local packet = Packet(packets.CHARACTER_CREATE,
 		"string", self.entry_name.text,
 		"string", self.list_races[self.combo_race.value][2],
-		"string", self.list_genders[self.combo_gender.value][2],
 		"uint8", self.skills:get_value("dexterity"),
 		"uint8", self.skills:get_value("health"),
 		"uint8", self.skills:get_value("intelligence"),
@@ -201,13 +198,6 @@ Views.Chargen.random = function(self)
 	self.skills:show(1)
 end
 
-Views.Chargen.set_gender = function(self, index)
-	self.combo_gender.value = index
-	self.combo_gender.text = self.list_genders[index][1]
-	self.gender = self.list_genders[index][2]
-	self.update_needed = true
-end
-
 Views.Chargen.set_bust_scale = function(self, value)
 	self.scroll_bust_scale.value = value
 	self.update_needed = true
@@ -261,13 +251,6 @@ Views.Chargen.set_race = function(self, index)
 	self.combo_race.text = self.list_races[index][1]
 	self.race = self.list_races[index][2]
 	local spec = self:get_race()
-	-- Rebuild the gender list.
-	self.list_genders = {}
-	self.combo_gender:clear()
-	for k,v in ipairs(spec.genders) do
-		self.list_genders[k] = v
-		self.combo_gender:append{text = v[1], pressed = function() self:set_gender(k) end}
-	end
 	-- Rebuild the eye style list.
 	self.list_eye_styles = {}
 	self.combo_eye_style:clear()
@@ -300,7 +283,6 @@ Views.Chargen.set_race = function(self, index)
 	self.scroll_bust_scale.min = spec.bust_scale[1]
 	self.scroll_bust_scale.max = spec.bust_scale[2]
 	-- Randomize the affected fields.
-	self:set_gender(1)--math.random(1, #self.list_genders))
 	self:set_eye_style(math.random(1, #self.list_eye_styles))
 	self:set_eye_color(math.random(), math.random(), math.random())
 	self:set_hair_style(math.random(1, #self.list_hair_styles))
@@ -354,7 +336,6 @@ Views.Chargen.update_model = function(self)
 		bust_scale = self.scroll_bust_scale.value,
 		equipment = {"dress"}, -- TODO
 		eye_color = {self.color_eye.red, self.color_eye.green, self.color_eye.blue},
-		gender = self.gender,
 		hair_color = {self.color_hair.red, self.color_hair.green, self.color_hair.blue},
 		hair_style = self.hair_style,
 		nose_scale = self.scroll_nose_scale.value,

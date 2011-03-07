@@ -18,7 +18,6 @@ end
 --   <li>bust_scale: Scale factor of the bust.</li>
 --   <li>client: Client controlling the character.</li>
 --   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
---   <li>gender: Gender.</li>
 --   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
 --   <li>id: Unique object ID or nil for a random free one.</li>
 --   <li>jumped: Jump timer.</li>
@@ -217,8 +216,7 @@ Player.vision_cb = function(self, args)
 				"float", o.rotation.x, "float", o.rotation.y, "float", o.rotation.z, "float", o.rotation.w)
 			-- Append optional customizations.
 			if o.spec.type == "species" and o.spec.models then
-				p:write("string", o.gender or "female",
-					"float", o.body_scale or 1,
+				p:write("float", o.body_scale or 1,
 					"float", o.nose_scale or 1,
 					"float", o.bust_scale or 1,
 					"string", o.eye_style and o.eye_style[1] or "",
@@ -295,7 +293,7 @@ end
 Player.write = function(self)
 	return string.format("local self=Player{" ..
 		"angular=%s,body_scale=%s,bust_scale=%s,dead=%s,eye_style={%s,%s,%s,%s}," ..
-		"gender=%s,hair_style={%s,%s,%s,%s},name=%s,nose_scale=%s,physics=%s," ..
+		"hair_style={%s,%s,%s,%s},name=%s,nose_scale=%s,physics=%s," ..
 		"position=%s,rotation=%s,skin_style={%s,%s,%s,%s},spec=%s}\n%s%s%s",
 		serialize_value(self.angular),
 		serialize_value(self.body_scale),
@@ -305,7 +303,6 @@ Player.write = function(self)
 		serialize_value(self.eye_style[2]),
 		serialize_value(self.eye_style[3]),
 		serialize_value(self.eye_style[4]),
-		serialize_value(self.gender),
 		serialize_value(self.hair_style[1]),
 		serialize_value(self.hair_style[2]),
 		serialize_value(self.hair_style[3]),

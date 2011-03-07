@@ -23,7 +23,6 @@ end
 --   <li>body_scale: Scale factor.</li>
 --   <li>bust_scale: Bust scale factor.</li>
 --   <li>equipment: List of equipment.</li>
---   <li>gender: Gender string.</li>
 --   <li>hair_color: Hair color string.</li>
 --   <li>hair_style: Hair style string.</li>
 --   <li>nose_scale: Nose scale factor.</li>
@@ -31,7 +30,7 @@ end
 Object.create_character_model = function(self, args)
 	local lod = (Views.Options.inst.model_quality == 0)
 	-- Get the species.
-	local name = args.race .. (args.gender == "male" and "m" or "")
+	local name = args.race
 	local species = Species:find{name = name}
 	if not species then return end
 	-- Get the base meshes.
@@ -105,7 +104,6 @@ Object.update_model = function(self)
 			equipment = self.equipment,
 			eye_color = self.eye_color,
 			eye_style = self.eye_style,
-			gender = self.gender,
 			hair_color = self.hair_color,
 			hair_style = self.hair_style,
 			nose_scale = self.nose_scale,

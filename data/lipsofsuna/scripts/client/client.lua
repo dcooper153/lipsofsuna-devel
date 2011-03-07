@@ -127,13 +127,12 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		collision_group = Physics.GROUP_OBJECT}
 	if t == "species" then o.race = s end
 	-- Apply optional customizations.
-	local ok,ge,bo,no,bu,eye,eyer,eyeg,eyeb,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = event.packet:resume(
-		"string", "float", "float", "float",
+	local ok,bo,no,bu,eye,eyer,eyeg,eyeb,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = event.packet:resume(
+		"float", "float", "float",
 		"string", "uint8", "uint8", "uint8",
 		"string", "uint8", "uint8", "uint8",
 		"string", "uint8", "uint8", "uint8")
 	if ok then
-		o.gender = ge
 		o.body_scale = bo
 		o.bust_scale = bu
 		o.nose_scale = no
@@ -144,7 +143,6 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		o.skin_style = skin
 		o.skin_color = {skinr / 255, sking / 255, skinb / 255}
 	else
-		o.gender = nil
 		o.body_scale = nil
 		o.bust_scale = nil
 		o.nose_scale = nil
