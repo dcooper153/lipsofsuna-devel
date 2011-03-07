@@ -3,6 +3,7 @@
 -- @param args Arguments.<ul>
 --   <li>attacker: Attacking creature.</li>
 --   <li>point: Hit point in world space.</li>
+--   <li>projectile: Projectile.</li>
 --   <li>target: Attacked creature.</li>
 --   <li>tile: Attacked tile or nil.</li>
 --   <li>weapon: Used weapon.</li></ul>
@@ -248,6 +249,7 @@ Feat.perform = function(self, args)
 						local ammo = args.user:split_items{name = name, count = count}
 						if ammo then
 							ammo:fire{collision = true, feat = feat, owner = args.user, weapon = weapon}
+							return
 						end
 					end
 					for index,data in ipairs(feat.effects) do
@@ -256,6 +258,7 @@ Feat.perform = function(self, args)
 							local ammo = Object{model = effect.projectile, physics = "rigid"}
 							ammo.gravity = Vector()
 							ammo:fire{collision = true, feat = feat, owner = args.user, weapon = weapon}
+							return
 						end
 					end
 				end)

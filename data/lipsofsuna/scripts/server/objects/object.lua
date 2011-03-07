@@ -185,7 +185,8 @@ end
 --   <li>owner: Object firing the projectile. (required)</li>
 --   <li>point: Firing point relative to the owner.</li>
 --   <li>speed: Initial speed.</li>
---   <li>timer: Trigger at timeout.</li></ul>
+--   <li>timer: Trigger at timeout.</li>
+--   <li>weapon: Used weapon.</ul>
 -- @return True on success.
 Object.fire = function(self, args)
 	if not args.owner or not args.feat then return end
@@ -198,7 +199,8 @@ Object.fire = function(self, args)
 				point = result.point,
 				projectile = self,
 				target = result.object,
-				tile = result.tile}
+				tile = result.tile,
+				weapon = args.weapon}
 			self.realized = false
 			self.contact_cb = nil
 		end
