@@ -262,49 +262,49 @@ Species{
 	name = "aer-player",
 	base = "aer",
 	ai_enabled = false,
-	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
 
 Species{
 	name = "aermale-player",
 	base = "aermale",
 	ai_enabled = false,
-	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
 
 Species{
 	name = "android-player",
 	base = "android",
 	ai_enabled = false,
-	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
 
 Species{
 	name = "androidmale-player",
 	base = "androidmale",
 	ai_enabled = false,
-	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
 
 Species{
 	name = "devora-player",
 	base = "devora",
 	ai_enabled = false,
-	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
 
 Species{
 	name = "kraken-player",
 	base = "kraken",
 	ai_enabled = false,
-	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
 
 Species{
 	name = "wyrm-player",
 	base = "wyrm",
 	ai_enabled = false,
-	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
 
 Species{
 	name = "wyrmmale-player",
 	base = "wyrmmale",
 	ai_enabled = false,
-	inventory_items = {"torch", "wooden dagger", "wooden mattock", "dress", "leather leggings"}}
+	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
 
 ------------------------------------------------------------------------------
 -- Friendly creatures.
