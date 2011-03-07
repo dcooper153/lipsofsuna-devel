@@ -285,7 +285,7 @@ Species{
 	dialog = "lipscitizen",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"shirt", "pants", "boots"}}
+	inventory_items = {"leather chest", "leather torso", "boots"}}
 
 Species{
 	name = "seirei",
@@ -313,7 +313,7 @@ Species{
 	factions = {"evil"},
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"shirt", "pants", "boots"}}
+	inventory_items = {"leather chest", "leather torso", "boots"}}
 
 Species{
 	name = "troglodyte female",

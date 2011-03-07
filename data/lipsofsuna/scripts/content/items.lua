@@ -570,8 +570,18 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor1"}},
+		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor1"},["aermale"] = {legs = "aermale1leatherlegs2"}},
 	equipment_slot = "feet"}
+
+Itemspec{
+	name = "leather torso",
+	model = "book-000",
+	armor_class = 0.04,
+	categories = {"armor"},
+	crafting_materials = {hide = 4},
+	equipment_models = {
+		["aermale"] = {legs = "aermale1leatherlegs2"}},
+	equipment_slot = "lowerbody"}
 
 Itemspec{
 	name = "leather boots",
@@ -651,7 +661,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {upper1 = "aerleatherchest1"}},
+		["aer/android/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest2"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
 
