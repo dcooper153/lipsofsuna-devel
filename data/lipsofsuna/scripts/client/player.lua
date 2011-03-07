@@ -97,11 +97,11 @@ Player.pick_look = function(clss)
 		return
 	end
 	-- Ignore the crosshair, the player, and her equipment.
-	local ignore = {[clss.crosshair] = true, [clss.object] = true}
+	local ignore = {clss.crosshair, clss.object}
 	local slots = Slots:find{owner = clss.object}
 	if slots then
 		for k,v in pairs(slots.slots) do
-			ignore[v] = true
+			table.insert(ignore, v)
 		end
 	end
 	-- Ray pick an object in front of the player.
