@@ -191,6 +191,14 @@ Protocol:add_handler{type = "OBJECT_SKILL", func = function(event)
 				end
 			end
 			o.health = v
+			-- Set the correct collision shape.
+			-- Dead creatures have a different collision shape. We switch between
+			-- the two when the health changes between zero and non-zero.
+			if o.health == 0 and o.animated then
+				o.shape = "dead"
+			else
+				o.shape = "default"
+			end
 		end
 	end
 end}
