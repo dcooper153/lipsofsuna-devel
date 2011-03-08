@@ -511,8 +511,8 @@ Itemspec{
 	damage = 15,
 	damage_bonus_dexterity = 0.2,
 	damage_bonus_strength = 0.2,
-	animation_hold = "hold-blunt",
-	animation_attack = "attack-blunt",
+	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_attack = {animation = "attack-blunt", channel = "equip-right"},
 	equipment_slot = "hand.R"}
 
 ------------------------------------------------------------------------------
