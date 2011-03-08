@@ -41,13 +41,15 @@ static void private_queue_vec (
 void liren_uniforms_init (
 	LIRenUniforms* self)
 {
-	/* Generate objects. */
+	/* Initialize self. */
 	memset (self, 0, sizeof (LIRenUniforms));
+	self->flush_range_start = 0;
+	self->flush_range_end = 0;
+
+	/* Generate the uniform buffer. */
 	glGenBuffers (1, &self->uniform_buffer);
 	glBindBuffer (GL_UNIFORM_BUFFER, self->uniform_buffer);
-	glBufferData (GL_UNIFORM_BUFFER, LIREN_UNIFORM_BUFFER_SIZE, NULL, GL_DYNAMIC_DRAW);
-	self->flush_range_start = LIREN_UNIFORM_BUFFER_SIZE;
-	self->flush_range_end = 0;
+	glBufferData (GL_UNIFORM_BUFFER, LIREN_UNIFORM_BUFFER_SIZE, self->data, GL_DYNAMIC_DRAW);
 }
 
 void liren_uniforms_clear (
