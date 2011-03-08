@@ -31,7 +31,7 @@ Widgets.handle_event = function(clss, args)
 		end
 	elseif generic[args.type] then
 		-- Other events.
-		local w = clss.focused_widget_prev
+		local w = clss:find_handler_widget("event")
 		if w and w.event then
 			w:event(args)
 			return true

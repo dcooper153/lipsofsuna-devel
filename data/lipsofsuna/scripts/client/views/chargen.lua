@@ -17,6 +17,7 @@ Views.Chargen.new = function(clss)
 	-- Preview scene.
 	local camera = Camera{far = 60.0, near = 0.3, mode = "first-person"}
 	local self = Widgets.Scene.new(clss, {rows = 1, behind = true, fullscreen = true, camera = camera, spacings = {0,0}})
+	self.offset = Vector(0, 1.8, -2)
 	self.margins = {5,5,5,5}
 	self.skills_text = Widgets.Text()
 	self.skills = Widgets.Skills()
@@ -186,16 +187,44 @@ Views.Chargen.enter = function(self)
 	self.camera:warp()
 end
 
+Views.Chargen.pressed = function(self, args)
+	if args.button == 1 then
+		self.dragging = true
+	end
+end
+
+Views.Chargen.event = function(self, args)
+	if args.type == "mouserelease" then
+		if args.button == 1 then
+			self.dragging = nil
+		end
+	elseif args.type == "mousemotion" then
+		if self.dragging then
+			local y = self.offset.y + args.dy / 300
+			self.offset.y = math.min(math.max(y, 1), 2)
+			self:rotate(math.pi * args.dx / 300)
+		end
+	end
+end
+
 Views.Chargen.quit = function(self)
 	Program.quit = true
 end
 
---- Randomizes the character
+--- Randomizes the character.
 -- @param self Chargen.
 Views.Chargen.random = function(self)
 	self:set_race(math.random(1, #self.list_races))
 	self.update_needed = true
 	self.skills:show(1)
+end
+
+--- Rotates the character.
+-- @param self Chargen.
+-- @param rad Radians.
+Views.Chargen.rotate = function(self, rad)
+	local rot = Quaternion{axis = Vector(0, 1, 0), angle = rad}
+	self.object.rotation = self.object.rotation * rot
 end
 
 Views.Chargen.set_bust_scale = function(self, value)
@@ -318,13 +347,11 @@ Views.Chargen.update = function(self, secs)
 		self.update_needed = nil
 		self:update_model()
 	end
-	local rot = Quaternion{axis = Vector(0, 1, 0), angle = math.pi * 0.1 * secs}
-	self.object.rotation = self.object.rotation * rot
 	self.object:refresh()
 	-- Update light.
 	self.light.position = self.object.position + self.object.rotation * Vector(0, 2, -5)
 	-- Update camera.
-	self.camera.target_position = self.object.position + Vector(0, 1.8, -2)
+	self.camera.target_position = self.object.position + self.offset
 	self.camera.target_rotation = Quaternion{axis = Vector(0, 1, 0), angle = math.pi}
 	self.camera.viewport = {self.x, self.y, self.width, self.height}
 	self.camera:update(secs)
