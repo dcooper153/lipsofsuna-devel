@@ -195,6 +195,8 @@ Itemspec{
 Itemspec{
 	name = "adamantium hatchet",
 	model = "axe-000",
+	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_attack = {animation = "attack-blunt", channel = "attack-right"},
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
 	damage = 20,
@@ -205,6 +207,8 @@ Itemspec{
 Itemspec{
 	name = "adamantium mattock",
 	model = "mattock-000",
+	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_attack = {animation = "attack-blunt", channel = "attack-right"},
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["adamantium"] = 9},
 	damage = 20,
@@ -270,6 +274,8 @@ Itemspec{
 Itemspec{
 	name = "aquanite hatchet",
 	model = "axe-000",
+	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_attack = {animation = "attack-blunt", channel = "attack-right"},
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
 	damage = 15,
@@ -280,6 +286,8 @@ Itemspec{
 Itemspec{
 	name = "aquanite mattock",
 	model = "mattock-000",
+	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_attack = {animation = "attack-blunt", channel = "attack-right"},
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 9},
 	damage = 15,
@@ -345,6 +353,8 @@ Itemspec{
 Itemspec{
 	name = "crimson hatchet",
 	model = "axe-000",
+	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_attack = {animation = "attack-blunt", channel = "attack-right"},
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 3},
 	damage = 15,
@@ -355,6 +365,8 @@ Itemspec{
 Itemspec{
 	name = "crimson mattock",
 	model = "mattock-000",
+	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_attack = {animation = "attack-blunt", channel = "attack-right"},
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 9},
 	damage = 15,
@@ -447,6 +459,7 @@ Itemspec{
 Itemspec{
 	name = "wooden crossbow",
 	model = "bow1", -- FIXME
+	animation_attack = {animation = "fire-bow", channel = "attack-right"},
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["log"] = 3},
@@ -467,6 +480,8 @@ Itemspec{
 Itemspec{
 	name = "wooden hatchet",
 	model = "axe-000",
+	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_attack = {animation = "attack-blunt", channel = "attack-right"},
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["log"] = 1},
 	damage = 5,
@@ -477,6 +492,8 @@ Itemspec{
 Itemspec{
 	name = "wooden mattock",
 	model = "mattock-000",
+	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_attack = {animation = "attack-blunt", channel = "attack-right"},
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["log"] = 3},
 	damage = 5,
@@ -496,23 +513,13 @@ Itemspec{
 Itemspec{
 	name = "wooden club",
 	model = "woodenclub1",
-	categories = {"melee", "weapon"},
-	crafting_materials = {["log"] = 1},
-	damage = 15,
-	damage_bonus_dexterity = 0.2,
-	damage_bonus_strength = 0.2,
-	equipment_slot = "hand.R"}
-
-Itemspec{
-	name = "blunt test",
-	model = "woodenclub1",
-	categories = {"melee", "weapon"},
-	crafting_materials = {["log"] = 1},
-	damage = 15,
-	damage_bonus_dexterity = 0.2,
-	damage_bonus_strength = 0.2,
 	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
-	animation_attack = {animation = "attack-blunt", channel = "equip-right"},
+	animation_attack = {animation = "attack-blunt", channel = "attack-right"},
+	categories = {"melee", "weapon"},
+	crafting_materials = {["log"] = 1},
+	damage = 15,
+	damage_bonus_dexterity = 0.2,
+	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R"}
 
 ------------------------------------------------------------------------------
