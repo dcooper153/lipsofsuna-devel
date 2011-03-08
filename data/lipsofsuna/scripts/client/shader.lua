@@ -84,34 +84,38 @@ float los_light_diffuse(in vec3 coord, in vec3 normal)
 }]]
 
 Shader.los_lighting_default = function(co, no, lv, sp)
-	local specmap = sp and (sp .. ".rgb * ") or ""
-	return [[int lighting_index;
+	return string.format([[int lighting_index;
 	vec4 lighting = vec4(0.0, 0.0, 0.0, 1.0);
 	for(lighting_index = 0 ; lighting_index < LOS_LIGHT_MAX ; lighting_index++)
 	{
-		vec3 lv = ]] .. lv .. [[[lighting_index];
+		vec3 lv = %s[lighting_index];
 		float fattn = 1.0 / dot(LOS_light[lighting_index].equation, vec3(1.0, length(lv), dot(lv, lv)));
-		float fdiff = max(0.0, dot(]] .. no .. [[, normalize(lv)));
-		float fspec = pow(max(0.0, dot(]] .. no .. [[, reflect(-normalize(]] .. co .. [[), ]] .. no .. [[))), LOS_material_shininess);
+		float fdiff = max(0.0, dot(%s, normalize(lv)));
+		float coeff = max(0.0, dot(%s, reflect(-normalize(lv), %s)));
+		float fspec = pow(max(0.0, coeff), LOS_material_shininess);
 		lighting.rgb += fattn * (LOS_light[lighting_index].ambient.rgb +
 			fdiff * LOS_light[lighting_index].diffuse.rgb +
-			fspec * LOS_light[lighting_index].specular.rgb * ]] .. specmap .. [[LOS_material_specular.rgb);
-	}]]
+			fspec * LOS_light[lighting_index].specular.rgb * %sLOS_material_specular.rgb);
+	}]], lv, no, no, no, sp and (sp .. ".rgb * ") or "")
 end
 
 Shader.los_lighting_hair = function(co, no, ta, lv)
-	return [[int lighting_index;
+	return string.format([[int lighting_index;
 	vec4 lighting = vec4(0.0, 0.0, 0.0, 1.0);
 	for(lighting_index = 0 ; lighting_index < LOS_LIGHT_MAX ; lighting_index++)
 	{
-		vec3 lv = ]] .. lv .. [[[lighting_index];
+		vec3 lv = %s[lighting_index];
 		float fattn = 1.0 / dot(LOS_light[lighting_index].equation, vec3(1.0, length(lv), dot(lv, lv)));
-		float fdiff = max(0.0, 0.25 + 0.75 * dot(]] .. no .. [[, normalize(lv)));
-		float fspec = pow(max(0.0, dot(]] .. no .. [[, reflect(-normalize(]] .. co .. [[), ]] .. no .. [[))), LOS_material_shininess);
+		float fdiff = max(0.0, 0.25 + 0.75 * dot(%s, normalize(lv)));
+		float coeff1 = max(0.0, dot(%s, reflect(-normalize(lv), %s)));
+		float tanref = max(0.0, dot(%s, reflect(-normalize(%s), %s)));
+		float coeff2 = sqrt(1.0 - tanref * tanref);
+		float coeff = mix(coeff1, coeff2, 0.6);
+		float fspec = pow(coeff, LOS_material_shininess);
 		lighting.rgb += fattn * (LOS_light[lighting_index].ambient.rgb +
 			fdiff * LOS_light[lighting_index].diffuse.rgb +
 			fspec * LOS_light[lighting_index].specular.rgb * LOS_material_specular.rgb);
-	}]]
+	}]], lv, no, no, no, ta, co, no)
 end
 
 Shader.los_lighting_vectors = function(lv, co)
