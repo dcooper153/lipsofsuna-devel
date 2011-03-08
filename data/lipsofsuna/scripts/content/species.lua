@@ -88,28 +88,28 @@ Species{
 	name = "android",
 	base = "race",
 	equipment_class = "android",
-	model = "aer1",
+	model = "android1",
 	models = {
-		skeleton = "aer1",
-		arms = "aerarmnude1",
-		head = "aerhead1",
-		legs = "aerlegnude1",
-		lower = "aerlowernude1",
-		upper = "aeruppernude1"},
-	models_lod = {
-		skeleton = "aer1",
-		arms = "aerarmnude1l",
-		head = "aerhead1l",
-		legs = "aerlegnude1l",
-		lower = "aerlowernude1l",
-		upper = "aeruppernude1l"},
+		skeleton = "android1",
+		arms = "androidarmnude1",
+		feet = "androidfootnude1",
+		hand = "androidhand1",
+		head = "androidhead1",
+		legs = "androidlegnude1",
+		lower = "androidlowernude1",
+		upper = "androiduppernude1"},
 	skills = {
 		{name = "dexterity", max = 60, val = 20},
 		{name = "health", max = 100, val = 50},
 		{name = "intelligence", max = 80, val = 30},
 		{name = "perception", max = 100, val = 50},
 		{name = "strength", max = 80, val = 30},
-		{name = "willpower", max = 40, val = 20}}}
+		{name = "willpower", max = 40, val = 20}},
+	hair_styles = {
+		{"Bald", ""},
+		{"Pigtails", "androidhair1"},
+		{"Long", "androidhair2"},
+		{"Drill", "androidhair3"}}}
 
 -- TODO
 Species{

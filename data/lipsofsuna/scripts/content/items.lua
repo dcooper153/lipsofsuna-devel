@@ -534,11 +534,11 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {log = 1},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {upper1 = "aerchinadress1", panties = "panties2"},
+		["aer/kraken/wyrm"] = {upper1 = "aerchinadress1", panties = "panties2"},
+		["android"] = {upper1 = "androidchinadress1"},
 		["devora"] = {upper1 = "devorachinadress1"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
-
 
 Itemspec{
 	name = "trog rags",
@@ -558,7 +558,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 3},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {legs = "aerlegplate1"}},
+		["aer/kraken/wyrm"] = {legs = "aerlegplate1"}},
 	equipment_slot = "feet"}
 
 Itemspec{
@@ -568,7 +568,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 2},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {arms = "aerarmplate2"}},
+		["aer/kraken/wyrm"] = {arms = "aerarmplate2"}},
 	equipment_slot = "arms"}
 
 Itemspec{
@@ -578,7 +578,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 5},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {upper = "aerupperplate1", lower = "aerlowerplate1"}},
+		["aer/kraken/wyrm"] = {upper = "aerupperplate1", lower = "aerlowerplate1"}},
 	equipment_slot = "upperbody"}
 
 Itemspec{
@@ -608,7 +608,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor1"}},
+		["aer/kraken/wyrm"] = {legs = "aerlegarmor1"}},
 	equipment_slot = "feet"}
 
 
@@ -639,7 +639,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},["aermale"] = {legs = "aermale1leatherlegs2"}},
+		["aer/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},["aermale"] = {legs = "aermale1leatherlegs2"}},
 	equipment_slot = "lowerbody"}
 
 Itemspec{
@@ -649,7 +649,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},["aermale"] = {legs = "aermale1leatherlegs1"}},
+		["aer/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},["aermale"] = {legs = "aermale1leatherlegs1"}},
 	equipment_slot = "lowerbody"}
 Itemspec{
 	name = "leather top",
@@ -658,7 +658,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {upper1 = "bra1"}},
+		["aer/kraken/wyrm"] = {upper1 = "bra1"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
 
@@ -669,7 +669,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {skirt = "aerleatherskirt1", panties = "panties2"}},
+		["aer/kraken/wyrm"] = {skirt = "aerleatherskirt1", panties = "panties2"}},
 	equipment_slot = "lowerbody"}
 
 Itemspec{
@@ -689,7 +689,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {["lizard scale"] = 6},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {dress1 = "aerdress2", panties = "panties2"}},
+		["aer/kraken/wyrm"] = {dress1 = "aerdress2", panties = "panties2"}},
 	equipment_slot = "upperbody"}
 
 Itemspec{
@@ -709,7 +709,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest2"}},
+		["aer/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest2"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
 
@@ -720,7 +720,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest1"}},
+		["aer/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest1"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1"}
 
