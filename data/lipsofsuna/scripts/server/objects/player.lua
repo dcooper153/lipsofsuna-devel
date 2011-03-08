@@ -309,7 +309,7 @@ Player.write = function(self)
 		serialize_value(self.hair_style[4]),
 		serialize_value(self.name),
 		serialize_value(self.nose_scale),
-		serialize_value(self.physics),
+		serialize_value(self.dead and "rigid" or "kinematic"),
 		serialize_value(self.position),
 		serialize_value(self.rotation),
 		serialize_value(self.skin_style[1]),
