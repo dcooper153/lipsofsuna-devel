@@ -296,9 +296,6 @@ end
 -- @param user User object.
 -- @param slot Slot name.
 Item.equipped = function(self, user, slot)
-	if self.spec.categories["shield"] then
-		user:animate{animation = "hold-left", channel = Animation.CHANNEL_EQUIP_LEFT, weight = 10.0, permanent = true}
-	end
 end
 
 --- Called when the item is being unequipped.
@@ -306,9 +303,6 @@ end
 -- @param user User object.
 -- @param slot Slot name.
 Item.unequipped = function(self, user, slot)
-	if self.spec.categories["shield"] then
-		user:animate{channel = Animation.CHANNEL_EQUIP_LEFT}
-	end
 end
 
 --- Serializes the object to a string.

@@ -202,6 +202,9 @@ Protocol:add_handler{type = "OBJECT_SKILL", func = function(event)
 end}
 
 Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
+	local channels = {
+		["equip-left"] = Animation.CHANNEL_EQUIP_LEFT,
+		["equip-right"] = Animation.CHANNEL_EQUIP_RIGHT}
 	local ok,i,count,spec,slot = event.packet:read("uint32", "uint32", "string", "string")
 	if ok then
 		local o = Object:find{id = i}
@@ -230,14 +233,26 @@ Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
 				o:update_model()
 			end
 		end
-		-- Torch holding hack.
-		if slot == "hand.L" then
-			if spec then
-				o:animate{animation = "hold-left", channel = Animation.CHANNEL_LEFT_HAND, weight = 2,
-					fade_in = 0.5, fade_out = 0.5, permanent = true}
+		-- Equip animations.
+		if o.equipment_animations and o.equipment_animations[slot] then
+			local a = o.equipment_animations[slot]
+			o:animate{channel = channels[a.channel or 0]}
+			o.equipment_animations[slot] = nil
+		end
+		if spec and spec.animation_hold then
+			local a = spec.animation_hold
+			if not o.equipment_animations then
+				o.equipment_animations = {[slot] = a}
 			else
-				o:animate{animation = "empty", channel = Animation.CHANNEL_LEFT_HAND}
+				o.equipment_animations[slot] = a
 			end
+			o:animate{
+				animation = a.animation,
+				channel = channels[a.channel or 0],
+				fade_in = a.fade_in or 0.5,
+				fade_out = a.fade_out or 0.5,
+				permanent = a.permanent == true or a.permanent == nil,
+				weight = a.weight or 2}
 		end
 	end
 end}

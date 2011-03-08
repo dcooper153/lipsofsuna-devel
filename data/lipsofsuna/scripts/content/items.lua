@@ -709,6 +709,7 @@ Itemspec{
 Itemspec{
 	name = "round shield",
 	model = "shield1",
+	animation_hold = {animation = "hold-left", channel = "equip-left"},
 	armor_class = 0.08,
 	categories = {"shield"},
 	crafting_materials = {["log"] = 5, ["iron ingot"] = 3},
@@ -717,6 +718,7 @@ Itemspec{
 Itemspec{
 	name = "wooden shield",
 	model = "shield-001-wood1",
+	animation_hold = {animation = "hold-left", channel = "equip-left"},
 	armor_class = 0.08,
 	categories = {"shield"},
 	crafting_materials = {["log"] = 1},
@@ -771,6 +773,7 @@ Itemspec{
 Itemspec{
 	name = "torch",
 	model = "torch1",
+	animation_hold = {animation = "hold-left", channel = "equip-left"},
 	categories = {"misc"},
 	crafting_materials = {["log"] = 1},
 	equipment_slot = "hand.L",
