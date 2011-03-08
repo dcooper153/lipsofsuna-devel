@@ -503,6 +503,17 @@ Itemspec{
 	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R"}
 
+Itemspec{
+	name = "blunt test",
+	model = "woodenclub1",
+	categories = {"melee", "weapon"},
+	crafting_materials = {["log"] = 1},
+	damage = 15,
+	damage_bonus_dexterity = 0.2,
+	damage_bonus_strength = 0.2,
+	animation_hold = "hold-blunt",
+	animation_attack = "attack-blunt",
+	equipment_slot = "hand.R"}
 
 ------------------------------------------------------------------------------
 -- Armor.
