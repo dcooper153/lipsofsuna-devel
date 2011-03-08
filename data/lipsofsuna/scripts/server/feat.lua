@@ -193,9 +193,7 @@ Feat.perform = function(self, args)
 		if anim.effect then
 			Effect:play{effect = anim.effect, object = args.user}
 		end
-		if anim.animation then
-			args.user:animate{animation = anim.animation, weight = 100.0}
-		end
+		Vision:event{type = "object-feat", object = args.user, anim = anim}
 	end
 	-- Call the feat function.
 	if not info or anim.toggle or not args.stop then

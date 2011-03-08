@@ -78,6 +78,7 @@ do
 	add("MOVE_ITEM")
 	add("OBJECT_ANIMATED")
 	add("OBJECT_EFFECT")
+	add("OBJECT_FEAT")
 	add("OBJECT_HIDDEN")
 	add("OBJECT_MOVED")
 	add("OBJECT_SELF")

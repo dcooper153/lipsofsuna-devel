@@ -190,6 +190,10 @@ Player.vision_cb = function(self, args)
 			local o = args.object
 			self:send{packet = Packet(packets.OBJECT_EFFECT, "uint32", o.id, "string", args.effect)}
 		end,
+		["object-feat"] = function(args)
+			local o = args.object
+			self:send{packet = Packet(packets.OBJECT_FEAT, "uint32", o.id, "string", args.anim.name)}
+		end,
 		["object-hidden"] = function(args)
 			local o = args.object
 			self:send{packet = Packet(packets.OBJECT_HIDDEN, "uint32", o.id)}

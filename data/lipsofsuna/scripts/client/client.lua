@@ -50,6 +50,34 @@ end}
 Protocol:add_handler{type = "OBJECT_DAMAGE", func = function(args)
 end}
 
+Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
+	local channels = {
+		["attack-left"] = CHANNEL_LEFT_HAND,
+		["attack-right"] = CHANNEL_RIGHT_HAND}
+	local ok,i,a = event.packet:read("uint32", "string")
+	if not ok then return end
+	-- Find the object.
+	local obj = Object:find{id = i}
+	if not obj then return end
+	-- Find the feat animation.
+	local anim = Featanimspec:find{name = a}
+	if not anim then return end
+	-- Play the animation.
+	local animation = {animation = anim.animation, fade_in = 0.5, fade_out = 0.5, weight = 100}
+	if anim.slot then
+		local weapon = Itemspec:find{name = obj.equipment[anim.slot]}
+		if weapon and weapon.animation_attack then
+			local a = weapon.animation_attack
+			animation.animation = a.animation
+			animation.channel = channels[a.channel]
+			if a.fade_in then animation.fade_in = a.fade_in end
+			if a.fade_out then animation.fade_out = a.fade_out end
+			if a.weight then animation.weight = a.weight end
+		end
+	end
+	obj:animate(animation)
+end}
+
 Protocol:add_handler{type = "OBJECT_EFFECT", func = function(event)
 	local ok,i,e = event.packet:read("uint32", "string")
 	if ok then
@@ -228,10 +256,9 @@ Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
 		else
 			-- Add-on equipment.
 			slots:set_object{slot = slot, model = spec.model}
-			if o.equipment and o.equipment[slot] then
-				o.equipment[slot] = nil
-				o:update_model()
-			end
+			o.equipment = o.equipment or {}
+			o.equipment[slot] = spec.name
+			o:update_model()
 		end
 		-- Equip animations.
 		if o.equipment_animations and o.equipment_animations[slot] then
