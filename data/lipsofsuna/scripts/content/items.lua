@@ -194,7 +194,7 @@ Itemspec{
 
 Itemspec{
 	name = "adamantium hatchet",
-	model = "axe-000",
+	model = "axe1",
 	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
 	animation_attack = {animation = "attack-axe", channel = "attack-right"},
 	categories = {"hatchet", "melee", "weapon"},
@@ -273,7 +273,7 @@ Itemspec{
 
 Itemspec{
 	name = "aquanite hatchet",
-	model = "axe-000",
+	model = "axe1",
 	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
 	animation_attack = {animation = "attack-axe", channel = "attack-right"},
 	categories = {"hatchet", "melee", "weapon"},
@@ -352,7 +352,7 @@ Itemspec{
 
 Itemspec{
 	name = "crimson hatchet",
-	model = "axe-000",
+	model = "axe1",
 	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
 	animation_attack = {animation = "attack-axe", channel = "attack-right"},
 	categories = {"hatchet", "melee", "weapon"},
@@ -417,7 +417,7 @@ Itemspec{
 
 Itemspec{
 	name = "iron hatchet",
-	model = "axe-000",
+	model = "axe1",
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 1},
 	damage = 10,
@@ -481,7 +481,7 @@ Itemspec{
 
 Itemspec{
 	name = "wooden hatchet",
-	model = "axe-000",
+	model = "axe1",
 	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
 	animation_attack = {animation = "attack-axe", channel = "attack-right"},
 	categories = {"hatchet", "melee", "weapon"},

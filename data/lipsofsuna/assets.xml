@@ -286,15 +286,16 @@
   </asset>
 
   <asset>
-    <file>import/axe-000.blend</file>
+    <file>import/axe1.blend</file>
     <author>tidbit (Joseph)</author>
     <license>Creative Commons BY 3.0</license>
+    <dep>axe1.png</dep>
     <status>usable</status>
     <type>model</type>
   </asset>
 
   <asset>
-    <file>import/axe-000.png</file>
+    <file>import/axe1.png</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>
     <status>usable</status>
