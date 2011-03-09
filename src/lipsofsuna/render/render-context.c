@@ -382,6 +382,9 @@ void liren_context_set_material (
 	LIRenContext*        self,
 	const LIRenMaterial* value)
 {
+	lisys_assert (value->shininess > 0.0f);
+	lisys_assert (value->shininess <= 127.0f);
+
 	liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_MATERIAL_DIFFUSE, value->diffuse);
 	liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_MATERIAL_PARAM0, value->parameters);
 	liren_uniforms_set_float (&self->uniforms, LIREN_UNIFORM_MATERIAL_SHININESS, value->shininess);

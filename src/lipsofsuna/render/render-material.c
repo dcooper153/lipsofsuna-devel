@@ -66,7 +66,7 @@ LIRenMaterial* liren_material_new_from_model (
 	if (material->flags & LIMDL_MATERIAL_FLAG_TRANSPARENCY)
 		self->flags |= LIREN_MATERIAL_FLAG_TRANSPARENCY;
 	self->parameters[0] = material->emission;
-	self->shininess = material->shininess;
+	self->shininess = LIMAT_CLAMP (material->shininess, 1.0f, 127.0f);
 	self->diffuse[0] = material->diffuse[0];
 	self->diffuse[1] = material->diffuse[1];
 	self->diffuse[2] = material->diffuse[2];
