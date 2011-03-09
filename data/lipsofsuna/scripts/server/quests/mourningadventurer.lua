@@ -20,9 +20,8 @@ die = function(self)
 	local quest = Quest:find{name = "Mourning Adventurer"}
 	if not quest then return end
 	if Bitwise:band(quest.progress, 0x14) == 0 then
-		quest:marker("mourning adventurer town")
-		quest:update{status = "completed", progress = Bitwise:bor(quest.progress, 0xFF), text =
-			"The mourning adventurer is dead."}
+		quest:update{status = "completed", progress = Bitwise:bor(quest.progress, 0xFF),
+			marker = "mourning adventurer town", text = "The mourning adventurer is dead."}
 	end
 end,
 main = function(self)
@@ -67,8 +66,8 @@ main = function(self)
 			self:line("I barely managed to escape but she's still there somewhere!")
 			self:line("Please, you need to find her!")
 			if quest.progress == 0 then
-				quest:marker("mourning adventurer town")
-				quest:update{status = "active", progress = Bitwise:bor(quest.progress, 0x1), text =
+				quest:update{status = "active", progress = Bitwise:bor(quest.progress, 0x1),
+					marker = "mourning adventurer town", text =
 					"A person in the town of Lips has requested us to find her friend who " ..
 					"got separated from her as they were ambushed by monsters."}
 			end
@@ -78,15 +77,14 @@ main = function(self)
 			self:line("We were going to take a look at the place but then the monsters attacked.")
 			local q2 = Quest:find{name = "Roots of World"}
 			if q2 and q2.status == "inactive" then
-				q2:marker("chara")
-				q2:update{status = "active", progress = 0, text =
+				q2:update{status = "active", progress = 0, marker = "chara", text =
 					"A person in the town of Lips has told us of weird grove of roots " ..
 					"illuminated by a brigh glow. Perhaps we should search the grove " ..
 					"for clues about the fate of the World Tree."}
 			end
 			if not Bitwise:bchk(quest.progress, 0x20) then
-				quest:marker("mourning adventurer lost")
-				quest:update{status = "active", progress = Bitwise:bor(quest.progress, 0x20), text =
+				quest:update{status = "active", progress = Bitwise:bor(quest.progress, 0x20),
+					marker = "mourning adventurer lost", text =
 					"A person in the town of Lips has requested us to find her friend who " ..
 					"got separated from her as they were ambushed by monsters. She has " ..
 					"informed us about the place where the ambush occurred."}
@@ -100,8 +98,8 @@ main = function(self)
 			self:line("Don't say anything, it isn't your fault.")
 			if not Bitwise:bchk(quest.progress, 0x10) then
 				self:line("You tried to help so let me teach you something that might help you in your journey.")
-				quest:marker("mourningadventurer_townchar")
-				quest:update{status = "completed", progress = Bitwise:bor(quest.progress, 0x10), text =
+				quest:update{status = "completed", progress = Bitwise:bor(quest.progress, 0x10),
+					marker = "mourning adventurer town", text =
 					"We have told waiting in the town of Lips that her friend was killed " ..
 					"by the monsters that attacked them."}
 				Feat:unlock() --TODO: Shouldn't be a combat ability.
@@ -117,9 +115,9 @@ main = function(self)
 	local quest = Quest:find{name = "Mourning Adventurer"}
 	if not quest then return end
 	if not Bitwise:bchk(quest.progress, 0x8) then
-		quest:marker("mourning adventurer town")
-		quest:update{status = "active", progress = Bitwise:bor(quest.progress, 0x8), text =
-			"The lost adventurer is dead. We should let her worried friend know it."}
+		quest:update{status = "active", progress = Bitwise:bor(quest.progress, 0x8),
+			marker = "mourning adventurer town",
+			text = "The lost adventurer is dead. We should let her worried friend know it."}
 	end
 	self:line("(She's dead.)")
 end}

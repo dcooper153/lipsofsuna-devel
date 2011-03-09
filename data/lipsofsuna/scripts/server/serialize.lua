@@ -10,8 +10,8 @@ Serialize.init = function(clss)
 	clss.sectors = Sectors{database = clss.db}
 	clss.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
 	if clss:get_value("data_version") ~= clss.data_version then
-		clss.db:query("DROP TABLE markers;")
-		clss.db:query("DROP TABLE quests;")
+		clss.db:query("DROP TABLE IF EXISTS markers;")
+		clss.db:query("DROP TABLE IF EXISTS quests;")
 	end
 	clss.db:query("CREATE TABLE IF NOT EXISTS markers (name TEXT PRIMARY KEY,id INTEGER,x FLOAT,y FLOAT,z FLOAT);")
 	clss.db:query("CREATE TABLE IF NOT EXISTS quests (name TEXT PRIMARY KEY,progress FLOAT,status TEXT,desc TEXT,marker TEXT);")

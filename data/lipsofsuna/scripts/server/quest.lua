@@ -36,18 +36,6 @@ Quest.complete = function(clss, args)
 	end
 end
 
---- Sets the active map marker of the quest.
--- @param self Quest.
--- @param name Marker name or nil.
-Quest.marker = function(self, name)
-	local m = Marker:find{name = name}
-	if m and self.marker ~= m then
-		self.marker = name
-		self:send_marker{all = true}
-		Serialize:save_quest(self)
-	end
-end
-
 --- Sends the quest status to a client or clients.
 -- @param self Quest.
 -- @param args Arguments.<ul>

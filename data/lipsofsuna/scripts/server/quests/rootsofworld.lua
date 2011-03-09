@@ -116,8 +116,7 @@ main = function(self)
 				--TODO: Open the portal.
 				local q1 = Quest:find{name = "Chara's Illusion"}
 				if q1 and q1.status == "inactive" then
-					q1:marker("chara's portal")
-					q1:update{status = "active", progress = 0, text =
+					q1:update{status = "active", progress = 0, marker = "chara's portal", text =
 						"Chara has opened a portal in her root grove for us. She has told us " ..
 						"to step in to learn about defeating Erinyes."}
 				end
