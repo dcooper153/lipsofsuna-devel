@@ -619,7 +619,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {["hide"] = 2},
 	equipment_models = {
-		["aermale"] = {arms = "aermale1leatherarms2"}},
+		["aermale"] = {hands = "aermale1leatherarms2"}},
 	equipment_slot = "arms"}
 
 Itemspec{

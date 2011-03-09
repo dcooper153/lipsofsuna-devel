@@ -75,6 +75,7 @@ Species{
 	models = {
 		skeleton = "aermale1",
 		arms = "aermale1arms1",
+		hands = "aermale1hands1",
 		head = "aermale1head1",
 		legs = "aermale1legs1",
 		feet = "aermale1feet1",
@@ -120,6 +121,7 @@ Species{
 	models = {
 		skeleton = "aermale1",
 		arms = "aermale1arms1",
+		hands = "aermale1hands1",
 		head = "aermale1head1",
 		legs = "aermale1legs1",
 		feet = "aermale1feet1",
@@ -224,6 +226,7 @@ Species{
 	models = {
 		skeleton = "aermale1",
 		arms = "aermale1arms1",
+		hands = "aermale1hands1",
 		head = "aermale1head1",
 		legs = "aermale1legs1",
 		feet = "aermale1feet1",
