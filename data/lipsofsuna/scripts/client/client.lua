@@ -202,15 +202,19 @@ Protocol:add_handler{type = "OBJECT_SKILL", func = function(event)
 			if o.health then
 				local diff = v - o.health
 				if math.abs(diff) > 2 then
-					local red = {1,0,0,1}
-					local green = {0,1,0,1}
+					local code = (diff > 0 and 0x01 or 0x00) + (o == Player.object and 0x10 or 0x00)
+					local colors = {
+						[0x00] = {1,1,0,1},
+						[0x01] = {0,1,1,1},
+						[0x10] = {1,0,0,1},
+						[0x11] = {0,1,0,1}}
 					EffectObject{
 						life = 3,
 						object = o,
 						position = Vector(0,2,0),
 						realized = true,
 						text = tostring(diff),
-						text_color = diff > 0 and green or red,
+						text_color = colors[code],
 						text_fade_time = 1,
 						text_font = "medium",
 						velocity = Vector(0,0.5,0)}
