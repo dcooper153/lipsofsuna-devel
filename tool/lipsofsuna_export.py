@@ -31,6 +31,53 @@ LIFormat = LIEnum()
 
 ##############################################################################
 
+class LIExportFinishedDialog(bpy.types.Operator):
+	bl_idname = "object.lipsofsuna_export_finished_operator"
+	bl_label = "EXPORTING FINISHED"
+
+	def draw(self, context):
+		layout = self.layout
+		if len(LIFormat.files):
+			col = layout.column()
+			flow = col.row()
+			col1 = flow.column()
+			col1.label(text = "FILE")
+			col2 = flow.column()
+			col2.scale_x = 0.3
+			col2.label(text = "VTX")
+			col3 = flow.column()
+			col3.scale_x = 0.15
+			col3.label(text = "MAT")
+			col4 = flow.column()
+			col4.scale_x = 0.15
+			col4.label(text = "ANI")
+			col5 = flow.column()
+			col5.scale_x = 0.15
+			col5.label(text = "NOD")
+			for file in LIFormat.files:
+				info = file.get_info()
+				col1.label(text = file.filename)
+				col2.label(text = "%s" % info[0])
+				col3.label(text = "%s" % info[1])
+				col4.label(text = "%s" % info[2])
+				col5.label(text = "%s" % info[3])
+			layout.column()
+		else:
+			col = layout.column()
+			col.label(text = "No objects were exported.")
+			row = col.row()
+			row.label(text = "Add the custom property 'file' to your objects.")
+
+	def execute(self, context):
+		return {'FINISHED'}
+
+	def invoke(self, context, event):
+		return context.window_manager.invoke_props_dialog(self)
+
+bpy.utils.register_class(LIExportFinishedDialog)
+
+##############################################################################
+
 def object_files(object):
 	if object.library:
 		return []
@@ -45,19 +92,17 @@ def object_files(object):
 	except:
 		lod = 'false'
 	try:
-		path = os.path.split(bpy.data.filepath)[0]
-		path = os.path.join(os.path.split(path)[0], "graphics")
 		prop = object['file'].split(',')
 		result = []
 		for item in prop:
 			if item != '':
 				if lod == 'true':
-					result.append(os.path.join(path, item + 'l.lmdl'))
+					result.append(item + 'l.lmdl')
 				else:
-					result.append(os.path.join(path, item + '.lmdl'))
+					result.append(item + '.lmdl')
 		return result
 	except:
-		return LIFormat.files
+		return []
 
 ##############################################################################
 
@@ -994,7 +1039,11 @@ class LIFile:
 		origobjs = {}
 		self.coll = LICollision()
 		self.mesh = None
-		self.filepath = file
+		# Determine the file name.
+		self.filename = file
+		path = os.path.split(bpy.data.filepath)[0]
+		path = os.path.join(os.path.split(path)[0], "graphics")
+		self.filepath = os.path.join(path, file)
 		# Find objects.
 		for obj in bpy.data.objects:
 			origobjs[obj] = True
@@ -1071,6 +1120,16 @@ class LIFile:
 		self.hier = LIHierarchy(file)
 		# Build particle animations.
 		self.particles = LIParticles(file)
+
+	def get_info(self):
+		info = [0, 0, 0, 0]
+		if self.mesh:
+			info[0] = len(self.mesh.vertlist)
+			info[1] = len(self.mesh.matlist)
+		if self.hier:
+			info[2] = len(self.hier.animlist)
+			info[3] = len(self.hier.nodelist)
+		return info
 
 	def write(self):
 		if not self.mesh and not self.hier:
@@ -1199,21 +1258,19 @@ class LIExporter(bpy.types.Operator):
 			for file in object_files(obj):
 				if file not in files:
 					files.append(file)
-		# If no target file was specified by any object, assume that the
-		# user wanted to export all the objects to the default file.
-		if not len(files):
-			path,name = os.path.split(bpy.data.filepath)
-			path = os.path.join(os.path.split(path)[0], "graphics")
-			name = os.path.splitext(name)[0] + ".lmdl"
-			files = [os.path.join(path, name)]
-			LIFormat.files = files
+		files.sort()
 		# Export each file.
-		for file in files:
-			f = LIFile(file)
-			f.write()
+		LIFormat.files = []
+		if len(files):
+			for file in files:
+				f = LIFile(file)
+				f.write()
+				LIFormat.files.append(f)
 		# Restore state.
 		bpy.context.scene.layers = origlayers
 		bpy.context.scene.frame_set(origframe)
+		# Show the results.
+		bpy.ops.object.lipsofsuna_export_finished_operator('INVOKE_DEFAULT')
 		return {'FINISHED'}
 
 	def invoke(self, context, event):
