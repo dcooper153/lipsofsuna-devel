@@ -372,8 +372,8 @@ void liren_context_set_light (
 		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_AMBIENT + index, black);
 		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_DIFFUSE + index, black);
 		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_EQUATION + index, infinite);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION + index, black);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION_PREMULT + index, black);
+		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION + index, infinite);
+		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION_PREMULT + index, infinite);
 		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_SPECULAR + index, black);
 	}
 }
