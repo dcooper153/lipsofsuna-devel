@@ -28,34 +28,42 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 		if not srcobj.spec.equipment_slot then return end
 		dstslot = srcobj.spec.equipment_slot
 	elseif dstslot < 1 then
-		dstslot = dstinv:get_empty_slot()
-		if not dstslot then return end
+		dstslot = nil
 	elseif dstslot > dstinv.size then
 		return
 	end
-	-- Try to move the item.
+	-- Validate container.
 	if srcobj:contains_item(dstinv.owner) then
 		user:send{packet = Packet(packets.MESSAGE, "string", "Can't place it inside itself.")}
 		return
-	end
-	local dstobj = dstinv:get_object{slot = dstslot}
-	if not dstobj then
-		srcobj:detach()
-		dstinv:set_object{slot = dstslot, object = srcobj}
-		return true
 	end
 	-- Try to merge with other items.
 	if dstinv:merge_object{object = srcobj, slot = dstslot} then
 		return true
 	end
-	-- Try to displace the other item.
-	local tmpslot = dstinv:get_empty_slot()
-	if not tmpslot then return end
-	dstobj:detach()
-	dstinv:set_object{slot = tmpslot, object = dstobj}
-	srcobj:detach()
-	dstinv:set_object{slot = dstslot, object = srcobj}
-	return true
+	if dstslot then
+		-- Try to move the item.
+		local dstobj = dstinv:get_object{slot = dstslot}
+		if not dstobj then
+			srcobj:detach()
+			dstinv:set_object{slot = dstslot, object = srcobj}
+			return true
+		end
+		-- Try to displace the other item.
+		local tmpslot = dstinv:get_empty_slot()
+		if not tmpslot then return end
+		dstobj:detach()
+		dstinv:set_object{slot = tmpslot, object = dstobj}
+		srcobj:detach()
+		dstinv:set_object{slot = dstslot, object = srcobj}
+		return true
+	else
+		-- Try to place into any free slot.
+		dstslot = dstinv:get_empty_slot()
+		if not dstslot then return end
+		dstinv:set_object{slot = dstslot, object = dstobj}
+		return true
+	end
 end
 
 --- Drops an inventory item.
