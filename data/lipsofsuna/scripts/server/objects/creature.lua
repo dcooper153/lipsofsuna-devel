@@ -69,6 +69,21 @@ Creature.setter = function(self, key, value)
 			end
 			self:equip_best_items()
 		end
+		-- Create random loot.
+		-- The same about random objects applies as above.
+		if self.random and spec.loot_categories then
+			local num_cat = #spec.loot_categories
+			local num_item
+			if spec.loot_count then
+				num_item = math.random(spec.loot_count[1], spec.loot_count[2])
+			else
+				num_item = math.random(0, self.inventory.size)
+			end
+			for i = 1,num_item do
+				local cat = spec.loot_categories[math.random(1, num_cat)]
+				self:add_item{object = Item{spec = Itemspec:random{category = cat}}}
+			end
+		end
 		-- Create map marker.
 		if spec.marker then
 			self.marker = Marker{name = spec.marker, position = self.position, target = self.id}

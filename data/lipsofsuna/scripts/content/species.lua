@@ -346,7 +346,9 @@ Species{
 	factions = {"evil"},
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"iron sword", "leather top", "leather pants", "leather leggings"}}
+	inventory_items = {"iron sword", "leather top", "leather pants", "leather leggings"},
+	loot_categories = {"armor", "material", "potion", "shield", "weapon"},
+	loot_count = {2, 4}}
 
 Species{
 	name = "brigandmale",
@@ -355,7 +357,9 @@ Species{
 	factions = {"evil"},
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"leather brigand chest", "leather brigand pants", "leather boots", "leather gloves", "leather helm"}}
+	inventory_items = {"leather brigand chest", "leather brigand pants", "leather boots", "leather gloves", "leather helm"},
+	loot_categories = {"armor", "material", "potion", "shield", "weapon"},
+	loot_count = {2, 4}}
 
 Species{
 	name = "troglodyte female",
@@ -364,7 +368,9 @@ Species{
 	factions = {"evil"},
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"wooden club", "trog rags"}}
+	inventory_items = {"wooden club", "trog rags"},
+	loot_categories = {"material"},
+	loot_count = {2, 4}}
 
 Species{
 	name = "bloodworm",
@@ -404,7 +410,9 @@ Species{
 	factions = {"evil"},
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"}}
+	inventory_items = {"dress"},
+	loot_categories = {"material"},
+	loot_count = {2, 4}}
 
 Species{
 	name = "lizardman",
@@ -416,6 +424,8 @@ Species{
 	feat_anims = {"right hand","bite"},
 	inventory_size = 5,
 	inventory_items = {"wooden club", "lizard scale", "lizard scale", "lizard scale"},
+	loot_categories = {"material"},
+	loot_count = {2, 4},
 	mass = 100,
 	speed_walk = 3,
 	equipment_slots = {

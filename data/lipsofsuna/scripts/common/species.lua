@@ -35,6 +35,8 @@ Species.dict_name = {}
 --   <li>inventory_items: List of inventory items to give when the creature is spawned.</li>
 --   <li>inventory_size: Number of inventory slots the creature has.</li>
 --   <li>jump_force: Mass-independent jump force of the creature.</li>
+--   <li>loot_categories: List of item categories this creature can have as random loot.</li>
+--   <li>loot_count: Minimum and maximum number of random loot items this creature can have.</li>
 --   <li>mass: Mass in kilograms.</li>
 --   <li>model: Model name.</li>
 --   <li>skill_quota: Number of skill points the creature can distribute over skills.</li>
