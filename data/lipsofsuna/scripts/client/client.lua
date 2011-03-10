@@ -64,7 +64,7 @@ Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
 	if not anim then return end
 	-- Play the animation.
 	local animation = {animation = anim.animation, fade_in = 0.5, fade_out = 0.5, weight = 100}
-	if anim.slot then
+	if anim.slot and obj.equipment then
 		local weapon = Itemspec:find{name = obj.equipment[anim.slot]}
 		if weapon and weapon.animation_attack then
 			local a = weapon.animation_attack
