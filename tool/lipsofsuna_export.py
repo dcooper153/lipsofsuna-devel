@@ -55,7 +55,7 @@ class LIExportFinishedDialog(bpy.types.Operator):
 			col5.scale_x = 0.15
 			col5.label(text = "NOD")
 			for file in LIFormat.files:
-				info = file.get_info()
+				info = file.get_finish_info()
 				col1.label(text = file.filename)
 				col2.label(text = "%s" % info[0])
 				col3.label(text = "%s" % info[1])
@@ -112,7 +112,9 @@ class LIAnimation:
 		self.hierarchy = hierarchy
 		self.armature = armat
 		self.name = name
+		self.state = None
 		self.tracks = tracks
+		self.framelist = []
 		# Determine the duration of the animation.
 		self.frame_start = None
 		self.frame_end = None
@@ -165,38 +167,47 @@ class LIAnimation:
 				self.channeldict[name] = True
 				self.channellist.append(name)
 
-	def write(self, writer):
-		# TODO: Make sure that there are no solo tracks.
-		# Make sure that there is no active action.
-		self.armature.animation_data.action = None
-		# Disable blend in/out to avoid broken frames at start or end.
-		for track in self.armature.animation_data.nla_tracks:
-			for strip in track.strips:
-				strip.use_auto_blend = False
-				strip.blend_in = 0.0
-				strip.blend_out = 0.0
-		# Mute tracks that don't belong to the animation.
-		for track in self.armature.animation_data.nla_tracks:
-			if track.name != self.name:
-				track.mute = True
-			else:
-				track.mute = False
-		# Reset the armature to the rest pose.
-		self.hierarchy.rest_pose()
-		# Stabilize constraints.
-		bpy.context.scene.frame_set(self.frame_start)
-		bpy.context.scene.frame_set(self.frame_start)
-		# Evaluate channels for each frame.
-		framelist = []
-		for frame in range(self.frame_start, self.frame_end):
-			# Switch frame.
+	def process(self):
+		if self.state == None:
+			# TODO: Make sure that there are no solo tracks.
+			# Make sure that there is no active action.
+			self.armature.animation_data.action = None
+			# Disable blend in/out to avoid broken frames at start or end.
+			for track in self.armature.animation_data.nla_tracks:
+				for strip in track.strips:
+					strip.use_auto_blend = False
+					strip.blend_in = 0.0
+					strip.blend_out = 0.0
+			# Mute tracks that don't belong to the animation.
+			for track in self.armature.animation_data.nla_tracks:
+				if track.name != self.name:
+					track.mute = True
+				else:
+					track.mute = False
+			# Reset the armature to the rest pose.
+			self.hierarchy.rest_pose()
+			# Stabilize constraints.
+			bpy.context.scene.frame_set(self.frame_start)
+			bpy.context.scene.frame_set(self.frame_start)
+			self.state = 0
+			return False
+		else:
+			# Switch to the processed frame.
+			frame = self.frame_start + self.state
+			if frame >= self.frame_end:
+				return True
+			bpy.context.scene.frame_set(frame)
 			bpy.context.scene.frame_set(frame)
 			# Get channel transformations.
 			xforms = []
 			for chan in self.channellist:
 				node = self.hierarchy.nodedict[chan]
 				xforms.append(node.get_pose_transform())
-			framelist.append(xforms)
+			self.framelist.append(xforms)
+			self.state += 1
+			return False
+
+	def write(self, writer):
 		# Writer header.
 		writer.write_string(self.name)
 		writer.write_int(len(self.channellist))
@@ -209,7 +220,7 @@ class LIAnimation:
 		# Write channel transformations.
 		for frame in range(0, self.frame_end - self.frame_start):
 			for chan in range(len(self.channellist)):
-				xform = framelist[frame][chan]
+				xform = self.framelist[frame][chan]
 				writer.write_float(xform[0].x)
 				writer.write_float(xform[0].y)
 				writer.write_float(xform[0].z)
@@ -309,6 +320,7 @@ class LIHierarchy:
 
 	def __init__(self, file):
 		self.file = file
+		self.state = 0
 		# Reset armatures to rest pose.
 		self.rest_pose()
 		# Build the node hierarchy.
@@ -342,6 +354,20 @@ class LIHierarchy:
 	def add_node(self, node):
 		self.nodedict[node.name] = node
 		self.nodelist.append(node)
+
+	def get_progress_info(self):
+		if self.state >= len(self.animlist):
+			return None
+		anim = self.animlist[self.state]
+		return anim.name
+
+	def process(self):
+		if self.state >= len(self.animlist):
+			return True
+		anim = self.animlist[self.state]
+		if anim.process():
+			self.state += 1
+		return False
 
 	# \brief Resets all armatures in the scene to their rest positions.
 	def rest_pose(self):
@@ -1035,93 +1061,20 @@ class LIVertex:
 class LIFile:
 
 	def __init__(self, file):
-		tempobjs = []
-		origobjs = {}
+		self.tempobjs = []
+		self.origobjs = {}
 		self.coll = LICollision()
+		self.hier = None
 		self.mesh = None
+		self.object = None
+		self.state = 0
 		# Determine the file name.
 		self.filename = file
 		path = os.path.split(bpy.data.filepath)[0]
 		path = os.path.join(os.path.split(path)[0], "graphics")
 		self.filepath = os.path.join(path, file)
-		# Find objects.
-		for obj in bpy.data.objects:
-			origobjs[obj] = True
-		# Create collision shapes.
-		for obj in bpy.data.objects:
-			if obj.type == 'MESH' and file in object_files(obj):
-				self.coll.add_mesh(obj)
-		# Select meshes.
-		for obj in bpy.data.objects:
-			sel = False
-			if obj.type == 'MESH' and file in object_files(obj):
-				try:
-					sel = (obj["render"] != "false")
-				except:
-					sel = True
-			obj.select = sel
-		# Duplicate meshes.
-		bpy.ops.object.duplicate()
-		# Select duplicates.
-		for obj in bpy.data.objects:
-			if obj.select:
-				if obj in origobjs:
-					# Unselect originals.
-					obj.select = False
-				else:
-					# Select duplicates.
-					obj.select = True
-					tempobjs.append(obj)
-		# Apply modifiers to duplicated meshes.
-		for obj in tempobjs:
-			# Remove unwanted modifiers.
-			for mod in obj.modifiers:
-				if mod.type == 'ARMATURE':
-					obj.modifiers.remove(mod)
-			# Apply modifiers.
-			oldmesh = obj.data
-			obj.data = obj.create_mesh(bpy.context.scene, True, 'PREVIEW')
-			bpy.data.meshes.remove(oldmesh)
-		# Simplify duplicated meshes.
-		for obj in tempobjs:
-			# Apply transformation.
-			bpy.context.scene.objects.active = obj
-			bpy.ops.object.location_clear()
-			bpy.ops.object.scale_apply()
-			obj.matrix_local = LIFormat.matrix * obj.matrix_local
-			bpy.ops.object.rotation_apply()
-			# Triangulate.
-			if obj.mode != 'EDIT':
-				bpy.ops.object.editmode_toggle()
-			bpy.ops.mesh.select_all(action='SELECT')
-			bpy.ops.mesh.quads_convert_to_tris()
-			bpy.ops.object.editmode_toggle()
-			# Tidy vertex weights.
-			bpy.ops.object.vertex_group_clean(all_groups=True)
-		if len(tempobjs):
-			# Join meshes.
-			bpy.ops.object.join()
-			object = bpy.context.scene.objects.active
-			# Build the mesh.
-			try:
-				self.mesh = LIMesh(object)
-			except Exception as e:
-				bpy.ops.object.delete()
-				raise e
-			# Build the default collision shape.
-			# We remove the armature and build a convex hull using shrinkwrap.
-			if self.mesh:
-				for mod in object.modifiers:
-					object.modifiers.remove(mod)
-				self.coll.add_default(object)
-			# Delete the temporary mesh.
-			bpy.ops.object.delete()
-		# Build the node hierarchy.
-		self.hier = LIHierarchy(file)
-		# Build particle animations.
-		self.particles = LIParticles(file)
 
-	def get_info(self):
+	def get_finish_info(self):
 		info = [0, 0, 0, 0]
 		if self.mesh:
 			info[0] = len(self.mesh.vertlist)
@@ -1130,6 +1083,138 @@ class LIFile:
 			info[2] = len(self.hier.animlist)
 			info[3] = len(self.hier.nodelist)
 		return info
+
+	def get_progress_info(self):
+		if self.hier:
+			info = self.hier.get_progress_info()
+			if info:
+				return "Exporting %s (%s)" % (self.filename, info)
+		return "Exporting %s" % self.filename
+
+	# \brief Iteratively collects the data belonging to the file.
+	# \return True when done, False if more work remains.
+	def process(self):
+		# Find objects.
+		if self.state == 0:
+			for obj in bpy.data.objects:
+				self.origobjs[obj] = True
+			self.state += 1
+			return False
+		# Create collision shapes.
+		elif self.state == 1:
+			for obj in bpy.data.objects:
+				if obj.type == 'MESH' and self.filename in object_files(obj):
+					self.coll.add_mesh(obj)
+			self.state += 1
+			return False
+		# Select meshes.
+		elif self.state == 2:
+			for obj in bpy.data.objects:
+				sel = False
+				if obj.type == 'MESH' and self.filename in object_files(obj):
+					try:
+						sel = (obj["render"] != "false")
+					except:
+						sel = True
+				obj.select = sel
+			self.state += 1
+			return False
+		# Duplicate the meshes and select them.
+		elif self.state == 3:
+			bpy.ops.object.duplicate()
+			for obj in bpy.data.objects:
+				if obj.select:
+					if obj in self.origobjs:
+						# Unselect originals.
+						obj.select = False
+					else:
+						# Select duplicates.
+						obj.select = True
+						self.tempobjs.append(obj)
+			self.state += 1
+			return False
+		# Apply modifiers to the duplicated meshes.
+		elif self.state == 4:
+			for obj in self.tempobjs:
+				# Remove unwanted modifiers.
+				for mod in obj.modifiers:
+					if mod.type == 'ARMATURE':
+						obj.modifiers.remove(mod)
+				# Apply modifiers.
+				oldmesh = obj.data
+				obj.data = obj.create_mesh(bpy.context.scene, True, 'PREVIEW')
+				bpy.data.meshes.remove(oldmesh)
+			self.state += 1
+			return False
+		# Simplify the duplicated meshes.
+		elif self.state == 5:
+			for obj in self.tempobjs:
+				# Apply transformation.
+				bpy.context.scene.objects.active = obj
+				bpy.ops.object.location_clear()
+				bpy.ops.object.scale_apply()
+				obj.matrix_local = LIFormat.matrix * obj.matrix_local
+				bpy.ops.object.rotation_apply()
+				# Triangulate.
+				if obj.mode != 'EDIT':
+					bpy.ops.object.editmode_toggle()
+				bpy.ops.mesh.select_all(action='SELECT')
+				bpy.ops.mesh.quads_convert_to_tris()
+				bpy.ops.object.editmode_toggle()
+				# Tidy vertex weights.
+				bpy.ops.object.vertex_group_clean(all_groups=True)
+			self.state += 1
+			return False
+		# Join the duplicated meshes.
+		elif self.state == 6:
+			if len(self.tempobjs) > 1:
+				bpy.ops.object.join()
+			if len(self.tempobjs):
+				self.object = bpy.context.scene.objects.active
+			self.state += 1
+			return False
+		# Build the mesh.
+		elif self.state == 7:
+			if self.object != None:
+				try:
+					self.mesh = LIMesh(self.object)
+				except Exception as e:
+					bpy.ops.object.delete()
+					raise e
+			self.state += 1
+			return False
+		# Build the default collision shape.
+		elif self.state == 8:
+			# Remove the armature and build a convex hull using shrinkwrap.
+			if self.mesh:
+				for mod in self.object.modifiers:
+					self.object.modifiers.remove(mod)
+				self.coll.add_default(self.object)
+			self.state += 1
+			return False
+		# Delete the temporary mesh.
+		elif self.state == 9:
+			if self.object != None:
+				bpy.ops.object.delete()
+			self.state += 1
+			return False
+		# Build the node hierarchy.
+		elif self.state == 10:
+			self.hier = LIHierarchy(self.filename)
+			self.state += 1
+			return False
+		# Bake skeletal animations.
+		elif self.state == 11:
+			if self.hier == None or self.hier.process():
+				self.state += 1
+			return False
+		# Build particle animations.
+		elif self.state == 12:
+			self.particles = LIParticles(self.filename)
+			self.state += 1
+			return False
+		else:
+			return True
 
 	def write(self):
 		if not self.mesh and not self.hier:
@@ -1245,36 +1330,62 @@ class LIExporter(bpy.types.Operator):
 	bl_label = 'Export to Lips of Suna (.lmdl)'
 
 	def execute(self, context):
-		# Adjust state.
-		alllayers = [True for x in range(0, 20)]
-		origlayers = [x for x in bpy.context.scene.layers]
-		origframe = bpy.context.scene.frame_current
-		bpy.context.scene.layers = alllayers
-		if bpy.context.scene.objects.active:
-			bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
-		# Find target files.
-		files = []
-		for obj in bpy.data.objects:
-			for file in object_files(obj):
-				if file not in files:
-					files.append(file)
-		files.sort()
-		# Export each file.
-		LIFormat.files = []
-		if len(files):
-			for file in files:
-				f = LIFile(file)
-				f.write()
-				LIFormat.files.append(f)
-		# Restore state.
-		bpy.context.scene.layers = origlayers
-		bpy.context.scene.frame_set(origframe)
-		# Show the results.
-		bpy.ops.object.lipsofsuna_export_finished_operator('INVOKE_DEFAULT')
-		return {'FINISHED'}
+		if self.process():
+			bpy.context.scene.frame_set(bpy.context.scene.frame_current)
+			return {'RUNNING_MODAL'}
+		else:
+			return {'FINISHED'}
 
 	def invoke(self, context, event):
-		return self.execute(context)
+		LIFormat.files = []
+		self.done = False
+		self.state = 0
+		self.files = []
+		self.message = ""
+		self.orig_layers = [x for x in bpy.context.scene.layers]
+		self.orig_frame = bpy.context.scene.frame_current
+		# Initialize the state.
+		bpy.context.scene.layers = [True for x in range(0, 20)]
+		if bpy.context.scene.objects.active:
+			bpy.ops.object.mode_set(mode='OBJECT', toggle=False)
+		# Find exported files.
+		for obj in bpy.data.objects:
+			for file in object_files(obj):
+				if file not in self.files:
+					self.files.append(file)
+		self.files.sort()
+		# Start exporting the files.
+		# It seems that there's no way to update the GUI without user
+		# input so we have to export in one pass even though our code
+		# could easily do it iteratively.
+		while self.process():
+			pass
+		return {'FINISHED'}
+
+	def process(self):
+		if self.state < len(self.files):
+			# Get the processed file.
+			if len(LIFormat.files) <= self.state:
+				file = LIFile(self.files[self.state])
+				LIFormat.files.append(file)
+			else:
+				file = LIFormat.files[self.state]
+			# Process the file some.
+			if file.process():
+				file.write()
+				self.state += 1
+			self.message = file.get_progress_info()
+			return True
+		elif self.state == len(self.files):
+			# Restore state.
+			bpy.context.scene.layers = self.orig_layers
+			bpy.context.scene.frame_set(self.orig_frame)
+			# Show the results.
+			bpy.ops.object.lipsofsuna_export_finished_operator('INVOKE_DEFAULT')
+			self.state += 1
+			return False
+		else:
+			return False
 
 ##############################################################################
 
