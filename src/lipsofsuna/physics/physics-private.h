@@ -306,6 +306,9 @@ public:
 	{
 		this->ignore_count = ignore_count;
 		this->ignore_array = ignore_array;
+		this->object = NULL;
+		this->terrain = NULL;
+		this->terrain_index = 0;
 	}
 	virtual btScalar addSingleResult (btCollisionWorld::LocalRayResult& result, bool world)
 	{
@@ -320,12 +323,24 @@ public:
 				if (object == this->ignore_array[i])
 					return 1.0;
 			}
+			this->object = object;
+			this->terrain = NULL;
+			this->terrain_index = 0;
+		}
+		else if (result.m_localShapeInfo != NULL)
+		{
+			this->object = NULL;
+			this->terrain = (LIPhyTerrain*) pointer->pointer;
+			this->terrain_index = this->terrain->materials.array[result.m_localShapeInfo->m_triangleIndex];
 		}
 		return btCollisionWorld::ClosestRayResultCallback::addSingleResult (result, world);
 	}
-protected:
+public:
 	int ignore_count;
 	LIPhyObject** ignore_array;
+	LIPhyObject* object;
+	LIPhyTerrain* terrain;
+	int terrain_index;
 };
 
 class LIPhyPrivateConvexcastWorld : public btCollisionWorld::ClosestConvexResultCallback
@@ -336,6 +351,9 @@ public:
 	{
 		this->ignore_count = ignore_count;
 		this->ignore_array = ignore_array;
+		this->object = NULL;
+		this->terrain = NULL;
+		this->terrain_index = 0;
 	}
 	virtual btScalar addSingleResult (btCollisionWorld::LocalConvexResult& result, bool world)
 	{
@@ -350,12 +368,24 @@ public:
 				if (object == this->ignore_array[i])
 					return 1.0;
 			}
+			this->object = object;
+			this->terrain = NULL;
+			this->terrain_index = 0;
+		}
+		else if (result.m_localShapeInfo != NULL)
+		{
+			this->object = NULL;
+			this->terrain = (LIPhyTerrain*) pointer->pointer;
+			this->terrain_index = this->terrain->materials.array[result.m_localShapeInfo->m_triangleIndex];
 		}
 		return ClosestConvexResultCallback::addSingleResult (result, world);
 	}
-protected:
+public:
 	int ignore_count;
 	LIPhyObject** ignore_array;
+	LIPhyObject* object;
+	LIPhyTerrain* terrain;
+	int terrain_index;
 };
 
 class LIPhyPrivateRaycastTerrain : public btTriangleRaycastCallback

@@ -165,7 +165,6 @@ int liphy_physics_cast_ray (
 	btVector3 src (start->x, start->y, start->z);
 	btVector3 dst (end->x, end->y, end->z);
 	btCollisionWorld* collision = self->dynamics->getCollisionWorld ();
-	LIPhyPointer* pointer;
 
 	/* Cast the ray. */
 	LIPhyPrivateRaycastWorld test (ignore_array, ignore_count, src, dst);
@@ -182,19 +181,9 @@ int liphy_physics_cast_ray (
 		result->fraction = test.m_closestHitFraction;
 		result->point = limat_vector_init (test.m_hitPointWorld[0], test.m_hitPointWorld[1], test.m_hitPointWorld[2]);
 		result->normal = limat_vector_init (test.m_hitNormalWorld[0], test.m_hitNormalWorld[1], test.m_hitNormalWorld[2]);
-		pointer = (LIPhyPointer*) test.m_collisionObject->getUserPointer ();
-		if (pointer->object)
-		{
-			result->object = (LIPhyObject*) pointer->pointer;
-			result->terrain = NULL;
-			result->terrain_index = 0;
-		}
-		else
-		{
-			result->object = NULL;
-			result->terrain = (LIPhyTerrain*) pointer->pointer;
-			result->terrain_index = 0;
-		}
+		result->object = test.object;
+		result->terrain = test.terrain;
+		result->terrain_index = test.terrain_index;
 	}
 
 	return 1;
@@ -234,7 +223,6 @@ int liphy_physics_cast_shape (
 	btCollisionWorld* collision;
 	btConvexShape* btshape;
 	LIPhyPrivateConvexcastWorld test (ignore_array, ignore_count);
-	LIPhyPointer* pointer;
 	btTransform btstart (
 		btQuaternion (start->rotation.x, start->rotation.y, start->rotation.z, start->rotation.w),
 		btVector3 (start->position.x, start->position.y, start->position.z));
@@ -259,25 +247,11 @@ int liphy_physics_cast_shape (
 		{
 			best = test.m_closestHitFraction;
 			result->fraction = test.m_closestHitFraction;
-			result->normal.x = test.m_hitNormalWorld[0];
-			result->normal.y = test.m_hitNormalWorld[1];
-			result->normal.z = test.m_hitNormalWorld[2];
-			result->point.x = test.m_hitPointWorld[0];
-			result->point.y = test.m_hitPointWorld[1];
-			result->point.z = test.m_hitPointWorld[2];
-			pointer = (LIPhyPointer*) test.m_hitCollisionObject->getUserPointer ();
-			if (pointer->object)
-			{
-				result->object = (LIPhyObject*) pointer->pointer;
-				result->terrain = NULL;
-				result->terrain_index = 0;
-			}
-			else
-			{
-				result->object = NULL;
-				result->terrain = (LIPhyTerrain*) pointer->pointer;
-				result->terrain_index = 0;
-			}
+			result->point = limat_vector_init (test.m_hitPointWorld[0], test.m_hitPointWorld[1], test.m_hitPointWorld[2]);
+			result->normal = limat_vector_init (test.m_hitNormalWorld[0], test.m_hitNormalWorld[1], test.m_hitNormalWorld[2]);
+			result->object = test.object;
+			result->terrain = test.terrain;
+			result->terrain_index = test.terrain_index;
 		}
 	}
 
