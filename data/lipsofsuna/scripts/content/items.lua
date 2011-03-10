@@ -535,6 +535,18 @@ Itemspec{
 	damage_bonus_strength = 0.2,
 	armor_class = 0.04,
 	equipment_slot = "hand.R"}
+Itemspec{
+	name = "luminous staff",
+	model = "staff1",
+	animation_hold = {animation = "hold-staff", channel = "equip-right"},
+	animation_attack = {animation = "attack-staff", channel = "attack-right"},
+	categories = {"melee", "weapon"},
+	crafting_materials = {["log"] = 1},
+	damage = 15,
+	damage_bonus_perception = 0.2,
+	damage_bonus_willpower = 0.2,
+	armor_class = 0.04,
+	equipment_slot = "hand.R"}
 
 
 ------------------------------------------------------------------------------
