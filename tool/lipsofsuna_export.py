@@ -79,30 +79,49 @@ bpy.utils.register_class(LIExportFinishedDialog)
 ##############################################################################
 
 def object_files(object):
-	if object.library:
-		return []
-	try:
-		prop = object['export']
-		if prop == "false":
-			return []
-	except:
-		pass
-	try:
-		lod = object['lod']
-	except:
-		lod = 'false'
-	try:
-		prop = object['file'].split(',')
-		result = []
-		for item in prop:
-			if item != '':
-				if lod == 'true':
-					result.append(item + 'l.lmdl')
-				else:
-					result.append(item + '.lmdl')
-		return result
-	except:
-		return []
+	def getprop(obj, prop):
+		try:
+			return obj[prop]
+		except:
+			return ""
+	files = getprop(object, 'file').split(',')
+	if getprop(object, 'lod') == 'true':
+		return [f + 'l.lmdl' for f in files if len(f)]
+	else:
+		return [f + '.lmdl' for f in files if len(f)]
+
+def object_check_export(object, file, type='NODE'):
+	def getprop(object, prop):
+		try:
+			return object[prop]
+		except:
+			return ""
+	# Make sure that the filename matches.
+	if file not in object_files(object):
+		return False
+	# Make sure that the type is a requested one.
+	if type == 'NODE':
+		return True
+	elif type == 'PARTICLE':
+		if object.type != 'MESH':
+			return False
+		if getprop(object, 'shape') != "":
+			return False
+		return True
+	elif type == 'RENDER':
+		if object.type != 'MESH':
+			return False
+		if getprop(object, 'shape') != "" or getprop(object, 'render') == "false":
+			return False
+		return True
+	elif type == 'SHAPE':
+		if object.type != 'MESH':
+			return False
+		if getprop(object, 'shape') == "":
+			return False
+		return True
+	else:
+		return False
 
 ##############################################################################
 
@@ -329,6 +348,9 @@ class LIHierarchy:
 		self.nodelist = []
 		self.add_node(self.node)
 		self.node.add_children()
+		if len(self.nodelist) == 1:
+			self.nodedict = {}
+			self.nodelist = []
 		# Check for armatures.
 		self.armature = None
 		for node in self.nodelist:
@@ -633,7 +655,7 @@ class LINode:
 		self.loc,self.rot = self.get_rest_transform()
 
 	def add_object(self, object):
-		if self.hierarchy.file in object_files(object):
+		if object_check_export(object, self.hierarchy.file, 'NODE'):
 			if object.type == 'ARMATURE':
 				self.add_node(LINodeArmature(self, object))
 			if object.type == 'EMPTY':
@@ -661,6 +683,9 @@ class LINode:
 		if self.object.parent_bone:
 			parentbone = self.object.parent.pose.bones[self.object.parent_bone]
 			parentmatr = parentbone.matrix * mathutils.Matrix.Translation(self.parent.len)
+			matrix = parentmatr.inverted() * matrix
+		elif self.object.parent:
+			parentmatr = self.object.parent.matrix_local
 			matrix = parentmatr.inverted() * matrix
 		loc = matrix.to_translation()
 		rot = matrix.to_3x3().to_quaternion().normalized()
@@ -844,6 +869,29 @@ class LINodeRoot(LINode):
 		self.rot = LIFormat.quat
 		self.loc = mathutils.Vector((0, 0, 0))
 
+	# \brief Recursively adds children to the node.
+	def add_children(self):
+		def add_object(object):
+			if object_check_export(object, self.hierarchy.file, 'NODE'):
+				if object.type == 'ARMATURE':
+					self.add_node(LINodeArmature(self, object))
+				if object.type == 'EMPTY':
+					self.add_node(LINode(self, object))
+				if object.type == 'LAMP' and (object.data.type == 'SPOT' or object.data.type == 'POINT'):
+					self.add_node(LINodeLight(self, object))
+		# Add child objects.
+		for object in bpy.data.objects:
+			if object.parent == None:
+				# Add unparented objects.
+				add_object(object)
+			elif object.parent.type == "MESH":
+				# Add objects parented to meshes that belong to the same file.
+				if object_check_export(object.parent, self.hierarchy.file, 'NODE'):
+					add_object(object)
+		# Recurse to children.
+		for node in self.nodes:
+			node.add_children()
+
 class LIParticle:
 
 	def __init__(self):
@@ -881,7 +929,7 @@ class LIParticles:
 		self.particlesystems = []
 		obj = bpy.context.scene.objects.active
 		for object in bpy.context.scene.objects:
-			if self.file in object_files(object):
+			if object_check_export(object, self.file, 'PARTICLE'):
 				for sys in object.particle_systems:
 					self.particlesystems.append(LIParticleSystem(object, sys))
 		# Calculate total animation length.
@@ -1103,7 +1151,7 @@ class LIFile:
 		# Create collision shapes.
 		elif self.state == 1:
 			for obj in bpy.data.objects:
-				if obj.type == 'MESH' and self.filename in object_files(obj):
+				if object_check_export(obj, self.filename, 'SHAPE'):
 					self.coll.add_mesh(obj)
 			self.state += 1
 			return False
@@ -1111,11 +1159,8 @@ class LIFile:
 		elif self.state == 2:
 			for obj in bpy.data.objects:
 				sel = False
-				if obj.type == 'MESH' and self.filename in object_files(obj):
-					try:
-						sel = (obj["render"] != "false")
-					except:
-						sel = True
+				if object_check_export(obj, self.filename, 'RENDER'):
+					sel = True
 				obj.select = sel
 			self.state += 1
 			return False
