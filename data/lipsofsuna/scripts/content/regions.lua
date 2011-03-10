@@ -26,9 +26,19 @@ Regionspec{
 Regionspec{
 	name = "Chara's Root Grove",
 	categories = {"special"},
-	depth = {2920,2975},
+	depth = {2930,2950},
 	distance = {"Lips",80,100},
 	links = {"Midguard"},
+	pattern_name = "charasgrove1",
+	size = {16,8,16}}
+
+Regionspec{
+	name = "Lost Adventurer",
+	categories = {"special"},
+	depth = {2930,2950},
+	distance = {"Chara's Root Grove",10,20},
+	links = {"Chara's Root Grove"},
+	pattern_name = "lostadventurer1",
 	size = {16,8,16}}
 
 Regionspec{

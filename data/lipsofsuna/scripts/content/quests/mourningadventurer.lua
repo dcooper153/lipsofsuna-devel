@@ -3,10 +3,11 @@ Quest{
 	status = "inactive"}
 
 Pattern{
-	name = "mourning adventurer lost",
+	name = "lostadventurer1",
+	size = Vector(16,8,16),
 	creatures = {
-		{0,0,0,"lost adventurer"},
-		{2,0,0,"dragon"}}}
+		{5,0,5,"lost adventurer"},
+		{7,0,7,"dragon"}}}
 
 Species{
 	name = "mourning adventurer",

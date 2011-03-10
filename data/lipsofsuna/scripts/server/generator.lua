@@ -282,10 +282,6 @@ Generator.generate = function(clss, args)
 	clss:update_status(0, "Creating regions")
 	local region_funcs = {
 		-- TODO: Get rid of these and use region.pattern_name instead
-		["Chara's Root Grove"] = function(r)
-			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "roots of world"}
-			Voxel:place_pattern{point = r.point + Vector(2,0,2), name = "mourning adventurer lost"}
-		end,
 		["Chara's Illusion"] = function(r)
 			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "chara's illusion"}
 		end,
