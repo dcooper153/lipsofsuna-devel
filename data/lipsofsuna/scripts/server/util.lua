@@ -91,7 +91,7 @@ Voxel.damage = function(self, user, point)
 	if not m then return end
 	-- Change tile type.
 	local n = Material:find{name = m.mining_transform}
-	Voxel:set_tile{point = point, tile = n and n.id or 0}
+	Voxel:set_tile(point, n and n.id or 0)
 	-- Create materials.
 	if m.mining_materials then
 		for k,v in pairs(m.mining_materials) do

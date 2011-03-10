@@ -91,7 +91,7 @@ Feat.apply = function(self, args)
 					if not tile:intersects(char) then
 						local o = args.weapon:split{count = need}
 						o:detach()
-						Voxel:set_tile{point = p, tile = m.id}
+						Voxel:set_tile(p, m.id)
 					end
 				end
 			end

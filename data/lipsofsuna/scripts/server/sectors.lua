@@ -99,7 +99,7 @@ Sectors.format_generated_sector = function(self, sector)
 			if math.random() < 0.3 then
 				local t = Voxel:get_tile{point = ctr + v}
 				if t ~= 0 then
-					Voxel:set_tile{point = ctr + v, tile = mat}
+					Voxel:set_tile(ctr + v, mat)
 				end
 			end
 		end

@@ -179,7 +179,7 @@ Editor.pressed = function(self, args)
 		local mat = Material:find{name = self.combo_tiles.text}
 		local t,p = Voxel:find_tile{match = "empty", point = point}
 		if p then
-			Voxel:set_tile{point = p, tile = mat.id}
+			Voxel:set_tile(p, mat.id)
 			self.prev_tiles[2] = self.prev_tiles[1]
 			self.prev_tiles[1] = p
 		end
@@ -189,7 +189,7 @@ Editor.pressed = function(self, args)
 				object.realized = false
 			end
 		elseif tile then
-			Voxel:set_tile{point = tile, tile = 0}
+			Voxel:set_tile(tile, 0)
 		end
 	end
 end
