@@ -56,6 +56,7 @@ Editor.new = function(clss)
 	local pattern = Pattern:find{name = Settings.pattern}
 	if not pattern then return end
 	local self = Class.new(clss)
+	self.prev_tiles = {}
 	-- Load the pattern.
 	self.pattern = pattern
 	self.origin = Vector(100,100,100)
@@ -137,8 +138,32 @@ Editor.new = function(clss)
 	return self
 end
 
+Editor.fill = function(self, p1, p2, erase)
+	-- Find the fill material.
+	local mat = 0
+	if not erase then
+		local m = Material:find{name = self.combo_tiles.text}
+		if m then mat = m.id end
+	end
+	-- Fix the order of the range.
+	local x1,x2 = p1.x,p2.x
+	local y1,y2 = p1.y,p2.y
+	local z1,z2 = p1.z,p2.z
+	if x1 > x2 then x1,x2 = x2,x1 end
+	if y1 > y2 then y1,y2 = y2,y1 end
+	if z1 > z2 then z1,z2 = z2,z1 end
+	-- Fill all voxels within the range.
+	for x = x1,x2 do
+		for y = y1,y2 do
+			for z = z1,z2 do
+				Voxel:set_tile(Vector(x,y,z), mat)
+			end
+		end
+	end
+end
+
 Editor.pressed = function(self, args)
-	local point,object = Target:pick_ray{camera = self.camera}
+	local point,object,tile = Target:pick_ray{camera = self.camera}
 	if not point then return end
 	if args.button ~= 1 then return end
 	if self.mode == "add item" then
@@ -153,15 +178,18 @@ Editor.pressed = function(self, args)
 	elseif self.mode == "add tile" then
 		local mat = Material:find{name = self.combo_tiles.text}
 		local t,p = Voxel:find_tile{match = "empty", point = point}
-		if p then Voxel:set_tile{point = p, tile = mat.id} end
+		if p then
+			Voxel:set_tile{point = p, tile = mat.id}
+			self.prev_tiles[2] = self.prev_tiles[1]
+			self.prev_tiles[1] = p
+		end
 	elseif self.mode == "delete" then
 		if object then
 			if object.spec then
 				object.realized = false
 			end
-		else
-			local t,p = Voxel:find_tile{match = "full", point = point}
-			if p then Voxel:set_tile{point = p, tile = 0} end
+		elseif tile then
+			Voxel:set_tile{point = tile, tile = 0}
 		end
 	end
 end
@@ -328,6 +356,16 @@ Eventhandler{type = "keypress", func = function(self, args)
 		elseif args.code == Keys.r then
 			-- Right.
 			c.target_position = c.target_position + c.rotation * Vector(1,0,0)
+		elseif args.code == Keys.f then
+			-- Fill.
+			if Editor.inst.prev_tiles[1] and Editor.inst.prev_tiles[2] then
+				Editor.inst:fill(Editor.inst.prev_tiles[1], Editor.inst.prev_tiles[2])
+			end
+		elseif args.code == Keys.k then
+			-- Erase.
+			if Editor.inst.prev_tiles[1] and Editor.inst.prev_tiles[2] then
+				Editor.inst:fill(Editor.inst.prev_tiles[1], Editor.inst.prev_tiles[2], true)
+			end
 		elseif args.code == Keys.F1 then
 			Editor.inst:save()
 		elseif args.code == Keys.PRINT then
