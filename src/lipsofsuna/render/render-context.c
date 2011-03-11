@@ -597,5 +597,12 @@ void liren_context_set_textures_raw (
 	}
 }
 
+void liren_context_set_time (
+	LIRenContext* self,
+	float         time)
+{
+	liren_uniforms_set_float (&self->uniforms, LIREN_UNIFORM_TIME, time);
+}
+
 /** @} */
 /** @} */

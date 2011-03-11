@@ -29,6 +29,7 @@
 
 struct _LIRenScene
 {
+	float time;
 	LIAlgPtrdic* groups;
 	LIAlgU32dic* objects;
 	LIRenRender* render;

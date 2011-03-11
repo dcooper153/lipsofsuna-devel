@@ -147,6 +147,7 @@ int liren_scene_render_begin (
 	liren_context_set_frustum (context, frustum);
 	liren_context_set_projection (context, projection);
 	liren_context_set_viewmatrix (context, modelview);
+	liren_context_set_time (context, self->time);
 
 	/* Depth sort scene. */
 	if (!private_sort_scene (self, context))
@@ -407,16 +408,18 @@ void liren_scene_render_postproc (
 
 /**
  * \brief Updates the scene.
- *
  * \param self Scene.
  * \param secs Number of seconds since the last update.
  */
-void
-liren_scene_update (LIRenScene* self,
-                    float       secs)
+void liren_scene_update (
+	LIRenScene* self,
+	float       secs)
 {
 	LIAlgU32dicIter iter;
 	LIRenObject* object;
+
+	/* Update the effect timer. */
+	self->time += secs;
 
 	/* Update objects. */
 	LIALG_U32DIC_FOREACH (iter, self->objects)

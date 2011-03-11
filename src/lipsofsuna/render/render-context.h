@@ -232,4 +232,8 @@ LIAPICALL (void, liren_context_set_textures_raw, (
 	GLuint*       value,
 	int           count));
 
+LIAPICALL (void, liren_context_set_time, (
+	LIRenContext* self,
+	float         time));
+
 #endif
