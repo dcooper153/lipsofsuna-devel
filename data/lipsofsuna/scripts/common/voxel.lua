@@ -13,8 +13,12 @@ Voxel.check_empty = function(clss, src, dst)
 			v.y = y
 			for z = src.z,dst.z do
 				v.z = z
-				if clss:get_tile{point = v} ~= 0 then
-					return
+				local t = clss:get_tile(v)
+				if t ~= 0 then
+					local m = Material:find{id = t}
+					if m and m.type ~= "liquid" then
+						return
+					end
 				end
 			end
 		end
