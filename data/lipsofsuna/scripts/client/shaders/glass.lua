@@ -3,6 +3,9 @@ Shader{name = "glass",
 -- Medium quality program.
 medium = {
 sort = true,
+pass6_blend = true,
+pass6_blend_src = "src_alpha",
+pass6_blend_dst = "one_minus_src_alpha",
 pass6_depth_func = "lequal",
 pass6_depth_write = false,
 pass6_vertex = [[
@@ -22,11 +25,6 @@ void main()
 	OUT.texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
-pass6_blend = true,
-pass6_blend_src = "src_alpha",
-pass6_blend_dst = "one_minus_src_alpha",
-pass6_depth_func = "lequal",
-pass6_depth_write = false,
 pass6_fragment = [[
 in fragvar
 {
