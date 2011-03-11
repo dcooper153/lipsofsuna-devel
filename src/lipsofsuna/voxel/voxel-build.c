@@ -28,6 +28,7 @@
 #include "voxel-triangulate.h"
 
 #define CULL_EPSILON 0.01f
+#define LIVOX_ISEMPTY(m)
 
 /* The builder isn't completely thread-safe at the moment. The biggest issue is
    that material data is queried from the voxel manager without locking. Our
@@ -491,7 +492,7 @@ static void private_merge_voxel (
 	/* Add triangles to the physics shape. */
 	/* This modifies the coordinates in-place so the order in which we
 	   update the model and the physics shape is significant. */
-	if (self->physics_wanted)
+	if (self->physics_wanted && voxel->material->type != LIVOX_MATERIAL_TYPE_LIQUID)
 	{
 		if (self->physics == NULL)
 		{

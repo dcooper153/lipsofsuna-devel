@@ -63,11 +63,16 @@ int livox_triangulate_voxel (
 	int*          result_faces,
 	int           result_types[3][3][3])
 {
+#define FILLED(x,y,z) (result_types[x][y][z])
+#define SOLID(x,y,z) (result_types[x][y][z] && voxels[x][y][z]->material->type != LIVOX_MATERIAL_TYPE_LIQUID)
+#define OCCLUDES(x,y,z) ((liquid && FILLED(x,y,z)) || (!liquid && SOLID(x,y,z)))
 	int x;
 	int y;
 	int z;
 	int count;
 	int count_faces;
+	int liquid = 0;
+	LIVoxVoxelB* voxel;
 	LIVoxVoxelB* voxels[3][3][3];
 	LIMatVector v[3][3][3] = {
 		{{{ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.5f }, { 0.0f, 0.0f, 1.0f }},
@@ -81,16 +86,17 @@ int livox_triangulate_voxel (
 		 {{ 1.0f, 1.0f, 0.0f }, { 1.0f, 1.0f, 0.5f }, { 1.0f, 1.0f, 1.0f }}}};
 
 	/* Get the neighborhood. */
-	/* If the neighborhood is full of tiles, the centermost one isn't
-	   visible and we can exit early. */
+	/* If the neighborhood is full of solid tiles, the centermost one isn't
+	   visible and we can exit early. Liquid tiles don't count towards this. */
 	count = 0;
 	for (z = -1 ; z <= 1 ; z++)
 	for (y = -1 ; y <= 1 ; y++)
 	for (x = -1 ; x <= 1 ; x++)
 	{
-		voxels[x + 1][y + 1][z + 1] = self->voxelsb + (x + vx) + (y + vy) * self->step[1] + (z + vz) * self->step[2];
-		result_types[x + 1][y + 1][z + 1] = voxels[x + 1][y + 1][z + 1]->type;
-		count += (voxels[x + 1][y + 1][z + 1]->type != 0);
+		voxel = self->voxelsb + (x + vx) + (y + vy) * self->step[1] + (z + vz) * self->step[2];
+		voxels[x + 1][y + 1][z + 1] = voxel;
+		result_types[x + 1][y + 1][z + 1] = voxel->type;
+		count += SOLID(x + 1, y + 1, z + 1);
 	}
 	if (count == 27)
 		return 0;
@@ -98,6 +104,9 @@ int livox_triangulate_voxel (
 	/* Deform the voxel cube. */
 	switch (voxels[1][1][1]->material->type)
 	{
+		case LIVOX_MATERIAL_TYPE_LIQUID:
+			liquid = 1;
+			break;
 		case LIVOX_MATERIAL_TYPE_ROUNDED:
 			private_triangulate_rounded (self, voxels, result_types, v);
 			break;
@@ -110,7 +119,7 @@ int livox_triangulate_voxel (
 	/* Triangulate the deformed cube. */
 	count = 0;
 	count_faces = 0;
-	if (!result_types[0][1][1])
+	if (!OCCLUDES (0, 1, 1))
 	{
 		for (y = 0 ; y < 2 ; y++)
 		for (z = 0 ; z < 2 ; z++)
@@ -125,7 +134,7 @@ int livox_triangulate_voxel (
 			result_faces[count_faces++] = LIVOX_TRIANGULATE_NEGATIVE_X;
 		}
 	}
-	if (!result_types[2][1][1])
+	if (!OCCLUDES (2, 1, 1))
 	{
 		for (y = 0 ; y < 2 ; y++)
 		for (z = 0 ; z < 2 ; z++)
@@ -140,7 +149,7 @@ int livox_triangulate_voxel (
 			result_faces[count_faces++] = LIVOX_TRIANGULATE_POSITIVE_X;
 		}
 	}
-	if (!result_types[1][0][1])
+	if (!OCCLUDES (1, 0, 1))
 	{
 		for (x = 0 ; x < 2 ; x++)
 		for (z = 0 ; z < 2 ; z++)
@@ -155,7 +164,7 @@ int livox_triangulate_voxel (
 			result_faces[count_faces++] = LIVOX_TRIANGULATE_NEGATIVE_Y;
 		}
 	}
-	if (!result_types[1][2][1])
+	if (!OCCLUDES (1, 2, 1))
 	{
 		for (x = 0 ; x < 2 ; x++)
 		for (z = 0 ; z < 2 ; z++)
@@ -170,7 +179,7 @@ int livox_triangulate_voxel (
 			result_faces[count_faces++] = LIVOX_TRIANGULATE_POSITIVE_Y;
 		}
 	}
-	if (!result_types[1][1][0])
+	if (!OCCLUDES (1, 1, 0))
 	{
 		for (x = 0 ; x < 2 ; x++)
 		for (y = 0 ; y < 2 ; y++)
@@ -185,7 +194,7 @@ int livox_triangulate_voxel (
 			result_faces[count_faces++] = LIVOX_TRIANGULATE_NEGATIVE_Z;
 		}
 	}
-	if (!result_types[1][1][2])
+	if (!OCCLUDES (1, 1, 2))
 	{
 		for (x = 0 ; x < 2 ; x++)
 		for (y = 0 ; y < 2 ; y++)
@@ -200,6 +209,9 @@ int livox_triangulate_voxel (
 			result_faces[count_faces++] = LIVOX_TRIANGULATE_POSITIVE_Z;
 		}
 	}
+#undef FILLED
+#undef SOLID
+#undef OCCLUDES
 
 	return count;
 }

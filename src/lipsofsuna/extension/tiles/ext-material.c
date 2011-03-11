@@ -321,6 +321,9 @@ static void Material_getter_type (LIScrArgs* args)
 	self = args->self;
 	switch (self->type)
 	{
+		case LIVOX_MATERIAL_TYPE_LIQUID:
+			liscr_args_seti_string (args, "liquid");
+			break;
 		case LIVOX_MATERIAL_TYPE_ROUNDED:
 			liscr_args_seti_string (args, "rounded");
 			break;
@@ -342,6 +345,8 @@ static void Material_setter_type (LIScrArgs* args)
 	{
 		if (!strcmp (value, "cube"))
 			self->type = LIVOX_MATERIAL_TYPE_CUBE;
+		else if (!strcmp (value, "liquid"))
+			self->type = LIVOX_MATERIAL_TYPE_LIQUID;
 		else if (!strcmp (value, "rounded"))
 			self->type = LIVOX_MATERIAL_TYPE_ROUNDED;
 		else if (!strcmp (value, "rounded fractal"))
