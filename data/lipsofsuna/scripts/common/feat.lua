@@ -158,3 +158,24 @@ Feat.get_info = function(self)
 		required_skills = skills,
 		required_weapon = anim and anim.required_weapon}
 end
+
+--- Creates a new feat from a data string.
+-- @param clss Feat class.
+-- @param args Arguments.<ul>
+--  <li>data: Data string.</li></ul>
+-- @return Feat or nil.
+Feat.load = function(clss, args)
+	if args.data then
+		local func = assert(loadstring("return function()\n" .. args.data .. "\nend"))()
+		if func then return func() end
+	end
+end
+
+--- Saves the feat to a data string.
+-- @param self Feat.
+-- @return String.
+Feat.write = function(self)
+	return string.format("return Feat%s", serialize{
+		animation = self.animation,
+		effects = self.effects})
+end

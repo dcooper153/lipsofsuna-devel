@@ -1,7 +1,8 @@
 print "INFO: Loading client scripts."
 
-local db = Database{name = "client.sql"}
-Sectors.instance = Sectors{database = db, save_objects = false}
+Client.db = Database{name = "client.sqlite"}
+Client.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
+Sectors.instance = Sectors{database = Client.db, save_objects = false}
 Sectors.instance:erase_world()
 
 Views = {}

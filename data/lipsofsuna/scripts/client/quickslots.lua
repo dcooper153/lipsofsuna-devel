@@ -19,12 +19,17 @@ Quickslots.init = function(clss)
 			clss.group:append_col(pad)
 		end
 	end
+	-- Load the quickslots.
+	clss.db = Client.db
+	clss.db:query("CREATE TABLE IF NOT EXISTS quickslots (slot INTEGER PRIMARY KEY,item TEXT,feat TEXT);")
+	clss:load()
 end
 
 Quickslots.assign_none = function(clss, index)
 	clss.buttons[index].feat = nil
 	clss.buttons[index].item = nil
 	clss.buttons[index].icon = nil
+	clss:save()
 end
 
 Quickslots.assign_feat = function(clss, index, feat)
@@ -42,6 +47,7 @@ Quickslots.assign_feat = function(clss, index, feat)
 	clss.buttons[index].feat = feat
 	clss.buttons[index].item = nil
 	clss.buttons[index].icon = icon
+	clss:save()
 end
 
 --- Assigns an item to a quickslot.
@@ -58,6 +64,7 @@ Quickslots.assign_item = function(clss, index, name)
 	clss.buttons[index].feat = nil
 	clss.buttons[index].item = name
 	clss.buttons[index].icon = icon
+	clss:save()
 end
 
 --- Called when the quickslot is clicked or accessed by a hotkey.<br/>
@@ -99,10 +106,35 @@ Quickslots.activate = function(clss, index)
 	end
 end
 
-Quickslots.reset = function(clss)
+Quickslots.load = function(clss)
+	clss.loading = true
+	-- First set defaults.
 	clss:assign_feat(1, Feat{animation = "spell on self", effects = {{"restore health", 10}}})
 	clss:assign_feat(2, Feat{animation = "ranged spell", effects = {{"fire damage", 10}}})
 	clss:assign_feat(3, Feat{animation = "ranged", effects = {{"physical damage", 1}}})
+	-- Load from the database.
+	local rows = clss.db:query("SELECT slot,item,feat FROM quickslots;")
+	for k,v in ipairs(rows) do
+		if v[1] >= 1 and v[1] <= 12 then
+			if v[2] and v[2] ~= "" then
+				clss:assign_item(v[1], v[2])
+			elseif v[3] and v[3] ~= "" then
+				clss:assign_feat(v[1], Feat:load{data = v[3]})
+			else
+				clss:assign_none(v[1])
+			end
+		end
+	end
+	clss.loading = nil
+end
+
+Quickslots.save = function(clss)
+	if clss.loading then return end
+	for k,v in ipairs(clss.buttons) do
+		local feat = v.feat and v.feat:write()
+		local item = v.item
+		clss.db:query("REPLACE INTO quickslots (slot,item,feat) VALUES (?,?,?);", {k, item, feat})
+	end
 end
 
 Quickslots:init()

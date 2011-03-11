@@ -96,7 +96,7 @@ Views.Feats.assign = function(self)
 		table.insert(values, self.scroll_effect[i].value)
 	end
 	-- Create a feat from the animation and the effects.
-	local feat = {animation = self.combo_anim.text ~= "" and self.combo_anim.text, effects = {}}
+	local feat = Feat{animation = self.combo_anim.text ~= "" and self.combo_anim.text, effects = {}}
 	for i = 1,3 do
 		feat.effects[i] = {effects[i], values[i]}
 	end
