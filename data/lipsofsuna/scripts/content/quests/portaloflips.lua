@@ -8,8 +8,3 @@ Obstaclespec{
 	categories = {"portal", "special"},
 	dialog = "portal of lips",
 	marker = "portal of lips"}
-
-Pattern{
-	name = "portal of lips",
-	obstacles = {
-		{8,0,8,"portal of lips"}}}

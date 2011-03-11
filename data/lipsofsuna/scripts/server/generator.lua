@@ -117,10 +117,10 @@ end
 -- @param pat Pattern spec.
 -- @return Region or nil.
 Generator.place_region = function(clss, reg, pat)
-	-- Choose the pattern of the region.
-	-- If a pattern is specified, the size of the region may change. That
-	-- affects the placement so the pattern needs to be chosen first.
-	local size = pat and pat.size or Vector(reg.size[1], reg.size[2], reg.size[3])
+	if not pat then
+		error(string.format("ERROR: No pattern was found for region `%s'.", reg.name))
+	end
+	local size = pat.size
  	-- Determine the approximate position.
 	-- Regions can be placed randomly or relative to each other. Here we
 	-- decide the range of positions that are valid for the region.
@@ -141,7 +141,7 @@ Generator.place_region = function(clss, reg, pat)
 	-- positions until one is found where they fit. Regions with fixed
 	-- positions are simply placed there without any checks.
 	local pos = Vector()
-	local aabb = Aabb{point = pos, size = size + Vector(6,6,6)}
+	local aabb = Aabb{point = pos, size = size + Vector(2,2,2)}
 	if dist then
 		repeat
 			pos.x = math.random(dist[2], dist[3])
@@ -150,7 +150,7 @@ Generator.place_region = function(clss, reg, pat)
 			if math.random(0, 1) == 1 then pos.x = -pos.x end
 			if math.random(0, 1) == 1 then pos.z = -pos.z end
 			pos = pos + rel
-			aabb.point = pos - Vector(3,3,3)
+			aabb.point = pos - Vector(1,1,1)
 		until clss:validate_region_position(aabb)
 	else
 		pos.x = rel.x
@@ -280,33 +280,9 @@ Generator.generate = function(clss, args)
 	linkn = #clss.links
 	-- Paint regions.
 	clss:update_status(0, "Creating regions")
-	local region_funcs = {
-		-- TODO: Get rid of these and use region.pattern_name instead
-		["Chara's Illusion"] = function(r)
-			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "chara's illusion"}
-		end,
-		["Erinyes' Lair"] = function(r)
-			Voxel:place_pattern{point = r.point + Vector(4,0,4), name = "erinyes' lair"}
-		end,
-		["Portal of Lips"] = function(r)
-			Voxel:place_pattern{point = r.point + Vector(0,0,0), name = "portal of lips"}
-		end,
-		["Portal of Midguard"] = function(r)
-			Voxel:place_pattern{point = r.point + Vector(0,0,0), name = "portal of midguard"}
-		end,
-		["Sanctuary"] = function(r)
-			Voxel:place_pattern{point = r.point + Vector(3,0,3), name = "sanctuary"}
-		end}
 	for _,reg in pairs(clss.regions_dict_id) do
-		Voxel:fill_region{point = reg.point, size = reg.size}
-		if reg.pattern then
-			-- Random patterns.
-			Voxel:place_pattern{point = reg.point, name = reg.pattern.name}
-		else
-			-- Hardcoded patterns.
-			local func = region_funcs[reg.spec.name]
-			if func then func(reg) end
-		end
+		Voxel:fill_region{point = reg.point, size = reg.pattern.size}
+		Voxel:place_pattern{point = reg.point, name = reg.pattern.name}
 	end
 	-- Paint corridors.
 	clss:update_status(0, "Creating corridors")

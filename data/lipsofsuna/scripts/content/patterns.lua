@@ -93,6 +93,12 @@ Pattern{
 		{0,9,9,"granite1"}, {9,9,9,"granite1"}}}
 
 Pattern{
+	name = "charasillusion1",
+	size = Vector(8,8,8),
+	obstacles = {
+		{4,0,4,"portal of illusion"}}}
+
+Pattern{
 	name = "dungeon1",
 	size = Vector(7,7,7),
 	obstacles = {
@@ -603,6 +609,18 @@ Pattern{
 		{0,11,19,"brick1"}, {1,11,19,"brick1"}, {2,11,19,"brick1"}, {3,11,19,"brick1"}, {4,11,19,"brick1"}, {5,11,19,"brick1"}, {6,11,19,"brick1"}, {7,11,19,"brick1"}, {8,11,19,"brick1"}, {9,11,19,"brick1"}, {10,11,19,"brick1"}, {11,11,19,"brick1"}, {12,11,19,"brick1"}, {13,11,19,"brick1"}, {14,11,19,"brick1"}}}
 
 Pattern{
+	name = "erinyeslair1",
+	size = Vector(32,16,32),
+	creatures = {
+		{2,0,2,"Erinyes"}},
+	obstacles = {
+		{4,0,4,"erinyes' portal"}}}
+
+Pattern{
+	name = "erinyesportal1",
+	size = Vector(16,16,16)}
+
+Pattern{
 	name = "nature1",
 	obstacles = {
 		{2,1,2,"tree"},
@@ -834,6 +852,45 @@ Pattern{
 		{3,1,30,"granite1"}, {20,1,30,"soil1"}, {31,1,30,"granite1"},
 		{0,0,31,"granite1"}, {1,0,31,"granite1"}, {2,0,31,"granite1"}, {3,0,31,"granite1"}, {4,0,31,"granite1"}, {5,0,31,"granite1"}, {6,0,31,"granite1"}, {7,0,31,"granite1"}, {8,0,31,"granite1"}, {9,0,31,"granite1"}, {10,0,31,"granite1"}, {11,0,31,"granite1"}, {12,0,31,"granite1"}, {13,0,31,"granite1"}, {14,0,31,"granite1"}, {15,0,31,"granite1"}, {16,0,31,"granite1"}, {17,0,31,"granite1"}, {18,0,31,"soil1"}, {19,0,31,"soil1"}, {20,0,31,"soil1"}, {21,0,31,"soil1"}, {22,0,31,"grass1"}, {23,0,31,"grass1"}, {24,0,31,"grass1"}, {25,0,31,"granite1"}, {26,0,31,"granite1"}, {27,0,31,"soil1"}, {28,0,31,"soil1"}, {29,0,31,"soil1"}, {30,0,31,"soil1"}, {31,0,31,"soil1"},
 		{19,1,31,"soil1"}, {20,1,31,"soil1"}, {25,1,31,"granite1"}, {31,1,31,"granite1"}}}
+
+Pattern{
+	name = "midguard1",
+	size = Vector(64,64,64)}
+
+Pattern{
+	name = "portaloflips1",
+	size = Vector(8,8,8),
+	obstacles = {
+		{4,0,4,"portal of lips"}}}
+
+Pattern{
+	name = "portalofmidguard1",
+	size = Vector(8,8,8),
+	obstacles = {
+		{4,0,4,"portal of midguard"}}}
+
+Pattern{
+	name = "sanctuary1",
+	size = Vector(32,24,32),
+	obstacles = {
+		{17,2,17,"sanctuary device"}},
+	tiles = {
+		{9,0,9,"concrete1",14,0,14},-- Base
+		{14,0,24,"concrete1",3,0,0}, -- Doorstep
+		{9,1,9,"brick1",14,5,14}, -- Walls
+		{9,7,10,"concrete1",14,0,12}, -- Ceiling
+		{10,1,10,nil,12,4,12}, -- Inside
+		{15,1,23,nil,1,2,1}, -- Door
+		{12,2,9,nil,0,1,0}, -- Window
+		{20,2,9,nil,0,1,0}, -- Window
+		{12,2,23,nil,0,1,0}, -- Window
+		{20,2,23,nil,0,1,0}, -- Window
+		{9,2,12,nil,0,1,0}, -- Window
+		{9,2,16,nil,0,1,0}, -- Window
+		{9,2,20,nil,0,1,0}, -- Window
+		{23,2,12,nil,0,1,0}, -- Window
+		{23,2,16,nil,0,1,0}, -- Window
+		{23,2,20,nil,0,1,0}}} -- Window
 
 Pattern{
 	name = "silverspring1",

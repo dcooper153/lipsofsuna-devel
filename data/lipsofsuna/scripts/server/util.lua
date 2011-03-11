@@ -45,8 +45,8 @@ Config.gravity = Vector(0, -20, 0)
 Config.skillregen = 0.5
 
 local reg = Regionspec:find{name = "Lips"}
-Config.center = Vector(reg.position[1] + reg.size[1] * 0.5, reg.depth[1], reg.position[2] + reg.size[3] * 0.5) * Config.tilewidth
-Config.spawn = Config.center + Vector(0, 3, 0)
+Config.center = Vector(reg.position[1], reg.depth[1], reg.position[2]) * Config.tilewidth
+Config.spawn = Config.center + Vector(17, 7, 17)
 
 Skills.get_total = function(self)
 	local n = self:get_names()
