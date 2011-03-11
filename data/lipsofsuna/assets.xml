@@ -1366,6 +1366,15 @@
   </asset>
 
   <asset>
+    <file>import/noise1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <comment>This is a special texture used by the lava and water shaders.</comment>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
     <file>import/particle1.png</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>

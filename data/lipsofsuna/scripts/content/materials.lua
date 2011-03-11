@@ -104,8 +104,10 @@ Material{
 
 Material{
 	name = "magma1",
-	shader = "terrain",
-	texture = {"wood1", "wood1n", "stone-001"}} -- FIXME
+	cullface = false,
+	shader = "lava",
+	texture = {"noise1", "noise1", "stone-001"},
+	type = "liquid"}
 
 Material{
 	mining_materials = {["iron ingot"] = 1},
@@ -132,8 +134,10 @@ Material{
 
 Material{
 	name = "water1",
-	shader = "terrain",
-	texture = {"wood1", "wood1n", "stone-001"}} -- FIXME
+	cullface = false,
+	shader = "water",
+	texture = {"noise1", "noise1", "stone-001"},
+	type = "liquid"}
 
 Material{
 	mining_materials = {["log"] = 1},
