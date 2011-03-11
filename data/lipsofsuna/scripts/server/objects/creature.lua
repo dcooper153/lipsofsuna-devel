@@ -220,6 +220,10 @@ Creature.calculate_speed = function(self)
 	local str = self.skills:get_value{skill = "strength"} or 0
 	local agi = self.skills:get_value{skill = "agility"} or 0
 	s = s * (1 + agi / 100 + str / 150)
+	-- Water friction.
+	if self.submerged then
+		s = s - s * self.submerged * self.spec.water_friction
+	end
 	-- Update speed.
 	if s ~= self.speed then
 		self.speed = s
@@ -444,15 +448,26 @@ Creature.inflict_modifier = function(self, name, strength)
 end
 
 Creature.jump = function(self)
-	if not self.ground then return end
 	local t = Program.time
 	if t - self.jumped < 0.5 then return end
-	local v = self.velocity
-	self.jumped = t
-	self.jumping = true
-	Effect:play{effect = "jump1", object = self}
-	self:animate{animation = "jump", channel = Animation.CHANNEL_JUMP, permanent = true}
-	Object.jump(self, {impulse = Vector(v.x, self.spec.jump_force * self.spec.mass, v.z)})
+	if self.submerged and self.submerged > 0.4 then
+		-- Swimming upwards.
+		local v = self.velocity
+		self.jumped = t - 0.3
+		self.jumping = true
+		if v.y < self.speed then
+			Object.jump(self, {impulse = Vector(v.x, self.spec.swim_force * self.spec.mass, v.z)})
+		end
+	else
+		-- Jumping.
+		if not self.ground then return end
+		local v = self.velocity
+		self.jumped = t
+		self.jumping = true
+		Effect:play{effect = "jump1", object = self}
+		self:animate{animation = "jump", channel = Animation.CHANNEL_JUMP, permanent = true}
+		Object.jump(self, {impulse = Vector(v.x, self.spec.jump_force * self.spec.mass, v.z)})
+	end
 end
 
 --- Loots the object.
@@ -598,8 +613,12 @@ Creature.update = function(self, secs)
 	if self.jumping then
 		self.jump_timer = (self.jump_timer or 0) + secs
 		if self.jump_timer > 0.2 and Program.time - self.jumped > 0.5 and self.ground then
-			Effect:play{effect = "thud1", object = self}
-			self:animate{animation = "land", channel = Animation.CHANNEL_JUMP, weight = 10.0}
+			if not self.submerged or self.submerged < 0.3 then
+				Effect:play{effect = "thud1", object = self}
+				self:animate{animation = "land", channel = Animation.CHANNEL_JUMP, weight = 10.0}
+			else
+				self:animate{channel = Animation.CHANNEL_JUMP}
+			end
 			self.jumping = nil
 		end
 	end
@@ -607,8 +626,9 @@ Creature.update = function(self, secs)
 	if self.modifiers then
 		Modifier:update(self, secs)
 	end
-	-- Fix stuck creatures.
-	if not self:stuck_check() then return end
+	-- Update physics environment.
+	-- This also takes care of fixing stuck creatures.
+	if not self:update_environment(secs) then return end
 	-- Prevent sectors from unloading if a player is present.
 	if self.client then self:refresh() end
 	-- Skip all controls if we are dead.
@@ -674,6 +694,45 @@ Creature.update_ai_state = function(self)
 	-- Handle any other state changes.
 	local func = self.state_switchers[self.state]
 	func(self)
+end
+
+--- Updates the environment of the object and tries to fix it if necessary.
+-- @param self Object.
+-- @param secs Seconds since the last update.
+-- @return Boolean and environment statistics. The boolean is true if the object isn't permanently stuck.
+Creature.update_environment = function(self, secs)
+	-- Environment scan and stuck handling.
+	local ret,env = Object.update_environment(self, secs)
+	if not ret or not env then return ret, env end
+	-- Liquid physics.
+	local liquid = env.liquid / env.total
+	local magma = env.magma / env.total
+	if liquid ~= (self.submerged or 0) then
+		self.submerged = liquid > 0 and liquid or nil
+		self.gravity = Config.gravity * (1 - liquid) + self.spec.water_gravity * liquid
+		self:calculate_speed()
+	end
+	if magma ~= (self.submerged_in_magma or 0) then
+		self.submerged_in_magma = magma > 0 and magma or nil
+	end
+	-- Apply liquid damage.
+	if not self.dead and self.submerged then
+		local magma = self.submerged_in_magma or 0
+		local water = self.submerged - magma
+		if magma > 0 and self.damage_from_magma ~= 0 then
+			self:damaged(self.spec.damage_from_magma * magma * secs)
+		end
+		if water > 0 and self.damage_from_water ~= 0 then
+			self:damaged(self.spec.damage_from_water * water * secs)
+		end
+	end
+	-- Apply liquid friction.
+	-- FIXME: Framerate dependent.
+	if self.submerged then
+		local damp = self.submerged * self.spec.water_friction * secs
+		self.velocity = self.velocity - self.velocity * damp
+	end
+	return true, res
 end
 
 --- Serializes the object to a string.

@@ -88,6 +88,8 @@ Species{
 Species{
 	name = "android",
 	base = "race",
+	damage_from_magma = 2,
+	damage_from_water = 5,
 	equipment_class = "android",
 	model = "android1",
 	models = {
@@ -135,6 +137,7 @@ Species{
 	base = "race",
 	aim_ray_center = Vector(0, 1, 0),
 	camera_center = Vector(0, 1, 0),
+	damage_from_magma = 9,
 	equipment_class = "devora",
 	hair_styles = {
 		{"Bald", ""},
@@ -166,6 +169,8 @@ Species{
 Species{
 	name = "kraken",
 	base = "race",
+	damage_from_magma = 9,
+	damage_from_water = -2,
 	equipment_class = "kraken",
 	model = "aer1",
 	models = {
@@ -188,11 +193,13 @@ Species{
 		{name = "intelligence", max = 60, val = 20},
 		{name = "perception", max = 40, val = 20},
 		{name = "strength", max = 80, val = 30},
-		{name = "willpower", max = 100, val = 50}}}
+		{name = "willpower", max = 100, val = 50}},
+	water_friction = 0}
 
 Species{
 	name = "wyrm",
 	base = "race",
+	damage_from_magma = 0,
 	equipment_class = "wyrm",
 	model = "aer1",
 	models = {

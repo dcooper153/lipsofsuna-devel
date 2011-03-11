@@ -105,6 +105,7 @@ Material{
 Material{
 	name = "magma1",
 	cullface = false,
+	magma = true,
 	shader = "lava",
 	texture = {"noise1", "noise1", "stone-001"},
 	type = "liquid"}

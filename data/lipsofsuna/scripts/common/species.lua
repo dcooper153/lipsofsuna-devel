@@ -27,6 +27,8 @@ Species.dict_name = {}
 --   <li>blocking_armor: How much armor class blocking offsers.</li>
 --   <li>blocking_cooldown: Time in seconds how long it takes to leave the blocking stance.</li>
 --   <li>blocking_delay: Time in seconds how long it takes to enter the blocking stance.</li>
+--   <li>damage_from_magma: Points of damage from magma per second.</li>
+--   <li>damage_from_water: Points of damage from water per second.</li>
 --   <li>equipment_slots: List of equipment slots.</li>
 --   <li>factions: List of factions.</li>
 --   <li>feat_animations: List of know feat types.</li>
@@ -43,9 +45,12 @@ Species.dict_name = {}
 --   <li>skills: List of skills.</li>
 --   <li>speed_run: Turning speed in meters per second.</li>
 --   <li>speed_walk: Walking speed in meters per second.</li>
+--   <li>swim_force: Mass-independent upward swim force of the creature.</li>
 --   <li>tilt_bone: Name of the tilt bone of the creature.</li>
 --   <li>tilt_limit: Tilt limit in radians of the tilting bone.</li>
---   <li>view_cone: View cone angle in radians.</li></ul>
+--   <li>view_cone: View cone angle in radians.</li>
+--   <li>water_friction: How much being in water slows the creature down.</li>
+--   <li>water_gravity: The gravity of the creature in water.</li></ul>
 -- @return New species.
 Species.new = function(clss, args)
 	-- Copy arguments from the base species.
@@ -130,6 +135,8 @@ Species.new = function(clss, args)
 	copy("blocking_armor", 0.5)
 	copy("blocking_cooldown", 0.4)
 	copy("blocking_delay", 0.4)
+	copy("damage_from_magma", 6)
+	copy("damage_from_water", 0)
 	copy("gravity", Vector(0, -15, 0))
 	copy("inventory_items", {})
 	copy("inventory_size", 0)
@@ -138,8 +145,11 @@ Species.new = function(clss, args)
 	copy("skill_quota", 200)
 	copy("speed_walk", 3)
 	copy("speed_run", 6)
+	copy("swim_force", 3.5)
 	copy("tilt_limit", math.pi)
 	copy("view_cone", 0.8 * math.pi)
+	copy("water_friction", 0.6)
+	copy("water_gravity", Vector(0,-3,0))
 	return self
 end
 

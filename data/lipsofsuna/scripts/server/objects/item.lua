@@ -7,24 +7,6 @@ Item.setter = function(self, key, value)
 			self:animate{animation = value and self.spec.animation_looted, channel = 1, permanent = value and true}
 			Object.setter(self, key, value)
 		end
-	elseif key == "realized" then
-		-- Avoid objects getting stuck inside walls.
-		-- When object is created, we start a timer that periodically checks
-		-- if the object is stuck until it isn't or there's no way to fix it.
-		if value == self.realized then return end
-		if value then
-			self.stuck_timer = Timer{delay = 0.5, func = function(timer)
-				timer.counter = (timer.counter or 0) + 1
-				if not self:stuck_check() or (not self.stuck and timer.counter > 10) then
-					timer:disable()
-					self.stuck_timer = nil
-				end
-			end}
-		elseif self.stuck_timer then
-			self.stuck_timer:disable()
-			self.stuck_timer = nil
-		end
-		Object.setter(self, key, value)
 	elseif key == "spec" then
 		local spec = type(value) == "string" and Itemspec:find{name = value} or value
 		if not spec then return end
@@ -305,6 +287,30 @@ end
 Item.unequipped = function(self, user, slot)
 end
 
+--- Updates the environment of the object and tries to fix it if necessary.
+-- @param self Object.
+-- @param secs Seconds since the last update.
+-- @return Boolean and environment statistics. The boolean is true if the object isn't permanently stuck.
+Item.update_environment = function(self, secs)
+	-- Environment scan and stuck handling.
+	local ret,env = Object.update_environment(self, secs)
+	if not ret or not env then return ret, env end
+	-- Liquid physics.
+	local liquid = env.liquid / env.total
+	local magma = env.magma / env.total
+	if liquid ~= (self.submerged or 0) then
+		self.submerged = liquid > 0 and liquid or nil
+		self.gravity = Config.gravity * (1 - liquid) + self.spec.water_gravity * liquid
+	end
+	-- Apply liquid friction.
+	-- FIXME: Framerate dependent.
+	if self.submerged then
+		local damp = self.submerged * self.spec.water_friction * secs
+		self.velocity = self.velocity - self.velocity * damp
+	end
+	return true, res
+end
+
 --- Serializes the object to a string.
 -- @param self Object.
 -- @return Data string.
@@ -324,8 +330,8 @@ end
 -- These take care of checking that items don't fall through ground.
 Item.stuck_check_dict = {}
 setmetatable(Item.stuck_check_dict, {__mode = "v"})
-Item.stuck_fix_timer = Timer{delay = 3, func = function()
+Item.stuck_fix_timer = Timer{delay = 0.2, func = function(timer, secs)
 	for k,v in pairs(Item.stuck_check_dict) do
-		v:stuck_check()
+		v:update_environment(secs)
 	end
 end}

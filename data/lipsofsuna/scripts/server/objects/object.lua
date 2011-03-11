@@ -267,15 +267,6 @@ Object.get_name_with_count = function(self)
 	return name
 end
 
---- Returns true if the object is stuck inside a wall.
--- @param self Object.
--- @return True if stuck. 
-Object.get_stuck = function(self, value)
-	if not self.realized then return end
-	local src,dst = self:get_tile_range()
-	return not Voxel:check_empty(src, dst)
-end
-
 --- Returns the range of tiles occupied by the object.
 -- @param self Object.
 -- @return Start vector, size vector.
@@ -379,29 +370,6 @@ Object.split_items = function(self, args)
 	return obj
 end
 
---- Checks if the object is stuck and tries to fix it if it is.
--- @param self Object.
--- @return True if not permanently stuck.
-Object.stuck_check = function(self)
-	if self:get_stuck() then
-		self.stuck = (self.stuck or 0) + 2
-		if self.stuck < 10 then
-			self:stuck_fix()
-		else
-			print("Warning: " .. (self.spec.name or "an object") .. " was deleted because it was permanently stuck!")
-			self.realized = false
-			return
-		end
-	elseif self.stuck then
-		if self.stuck > 1 then
-			self.stuck = self.stuck -1
-		else
-			self.stuck = nil
-		end
-	end
-	return true
-end
-
 --- Fixes the position of a stuck object.
 -- @param self Object.
 -- @return True if fixing succeeded.
@@ -475,6 +443,35 @@ Object.teleport = function(self, args)
 		timer:disable()
 	end}
 	return true
+end
+
+--- Updates the environment of the object and tries to fix it if necessary.
+-- @param self Object.
+-- @param secs Seconds since the last update.
+-- @return Boolean and environment statistics. The boolean is true if the object isn't permanently stuck.
+Object.update_environment = function(self, secs)
+	-- Count tiles affecting us.
+	if not self.realized then return true end
+	local src,dst = self:get_tile_range()
+	local res = Voxel:check_range(src, dst)
+	-- Stuck handling.
+	if res.solid > 0 then
+		self.stuck = (self.stuck or 0) + 2
+		if self.stuck < 10 then
+			self:stuck_fix()
+		else
+			print("Warning: " .. (self.spec.name or "an object") .. " was deleted because it was permanently stuck!")
+			self.realized = false
+			return nil, res
+		end
+	elseif self.stuck then
+		if self.stuck > 1 then
+			self.stuck = self.stuck -1
+		else
+			self.stuck = nil
+		end
+	end
+	return true, res
 end
 
 --- Called when the object is used.

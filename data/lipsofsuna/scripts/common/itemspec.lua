@@ -44,14 +44,7 @@ Itemspec.dict_name = {}
 -- @return New item specification.
 Itemspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
-	self.armor_class = self.armor_class or 0
 	self.crafting_enabled = (self.crafting_count or self.crafting_materials or self.crafting_skills) and true
-	self.crafting_count = self.crafting_count or 1
-	self.crafting_materials = self.crafting_materials or {}
-	self.crafting_skills = self.crafting_skills or {}
-	self.destroy_actions = self.destroy_actions or {}
-	self.inventory_items = self.inventory_items or {}
-	self.mass = self.mass or 10
 	-- Models.
 	-- The table, if present, maps a list of models for one or more species.
 	-- The race name can contain multiple races separated by a slash.
@@ -63,6 +56,17 @@ Itemspec.new = function(clss, args)
 			end
 		end
 	end
+	-- Default values.
+	local copy = function(f, d) if self[f] == nil then self[f] = d end end
+	copy("armor_class", 0)
+	copy("crafting_count", 1)
+	copy("crafting_materials", {})
+	copy("crafting_skills", {})
+	copy("destroy_actions", {})
+	copy("inventory_items", {})
+	copy("mass", 10)
+	copy("water_friction", 0.9)
+	copy("water_gravity", Vector(0,-3,0))
 	return self
 end
 

@@ -1,11 +1,12 @@
 Voxel.tile_size = 32 / Voxel.tiles_per_line
 Voxel.tile_scale = 1 / Voxel.tile_size
 
---- Returns true if the requested range of tiles is empty.
+--- Checks what kind of tiles are within the range.
 -- @param src Tile range start.
 -- @param dst Tile range end.
--- @return True if the range is empty.
-Voxel.check_empty = function(clss, src, dst)
+-- @return Table of scan result.
+Voxel.check_range = function(clss, src, dst)
+	local result = {empty = 0, liquid = 0, magma = 0, solid = 0, total = 0}
 	local v = Vector()
 	for x = src.x,dst.x do
 		v.x = x
@@ -14,16 +15,24 @@ Voxel.check_empty = function(clss, src, dst)
 			for z = src.z,dst.z do
 				v.z = z
 				local t = clss:get_tile(v)
-				if t ~= 0 then
+				if t == 0 then
+					result.empty = result.empty + 1
+				else
 					local m = Material:find{id = t}
-					if m and m.type ~= "liquid" then
-						return
+					if m and m.type == "liquid" then
+						result.liquid = result.liquid + 1
+						if m.magma then
+							result.magma = result.magma + 1
+						end
+					else
+						result.solid = result.solid + 1
 					end
 				end
+				result.total = result.total + 1
 			end
 		end
 	end
-	return true
+	return result
 end
 
 --- Places a monster to the map.

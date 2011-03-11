@@ -88,7 +88,7 @@ Sectors.format_generated_sector = function(self, sector)
 		ctr = ctr + Vector (0.5, 0, 0.5)
 		if math.random() < 0.1 then
 			Voxel:place_item{point = ctr, category = "generate"}
-		elseif math.random() < 0.4 and Voxel:check_empty(src, dst) then
+		elseif math.random() < 0.4 and Voxel:check_range(src, dst).solid == 0 then
 			Voxel:place_obstacle{point = ctr, category = "tree"}
 		else
 			Voxel:place_obstacle{point = ctr, category = "small-plant"}
