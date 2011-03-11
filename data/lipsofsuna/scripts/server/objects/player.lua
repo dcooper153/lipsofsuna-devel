@@ -295,32 +295,20 @@ end
 -- @param self Object.
 -- @return Data string.
 Player.write = function(self)
-	return string.format("local self=Player{" ..
-		"angular=%s,body_scale=%s,bust_scale=%s,dead=%s,eye_style={%s,%s,%s,%s}," ..
-		"hair_style={%s,%s,%s,%s},name=%s,nose_scale=%s,physics=%s," ..
-		"position=%s,rotation=%s,skin_style={%s,%s,%s,%s},spec=%s}\n%s%s%s",
-		serialize_value(self.angular),
-		serialize_value(self.body_scale),
-		serialize_value(self.bust_scale),
-		serialize_value(self.dead),
-		serialize_value(self.eye_style[1]),
-		serialize_value(self.eye_style[2]),
-		serialize_value(self.eye_style[3]),
-		serialize_value(self.eye_style[4]),
-		serialize_value(self.hair_style[1]),
-		serialize_value(self.hair_style[2]),
-		serialize_value(self.hair_style[3]),
-		serialize_value(self.hair_style[4]),
-		serialize_value(self.name),
-		serialize_value(self.nose_scale),
-		serialize_value(self.dead and "rigid" or "kinematic"),
-		serialize_value(self.position),
-		serialize_value(self.rotation),
-		serialize_value(self.skin_style[1]),
-		serialize_value(self.skin_style[2]),
-		serialize_value(self.skin_style[3]),
-		serialize_value(self.skin_style[4]),
-		serialize_value(self.spec.name),
+	return string.format("local self=Player%s\n%s%s%s", serialize{
+		angular = self.angular,
+		body_scale = self.body_scale,
+		bust_scale = self.bust_scale,
+		dead = self.dead,
+		eye_style = self.eye_style,
+		hair_style = self.hair_style,
+		name = self.name,
+		nose_scale = self.nose_scale,
+		physics = self.dead and "rigid" or "kinematic",
+		position = self.position,
+		rotation = self.rotation,
+		skin_style = self.skin_style,
+		spec = self.spec.name},
 		Serialize:encode_skills(self.skills),
 		Serialize:encode_inventory(self.inventory),
 		"return self")

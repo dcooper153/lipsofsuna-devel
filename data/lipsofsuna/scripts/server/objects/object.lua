@@ -490,13 +490,13 @@ end
 -- @param self Object.
 -- @return Data string.
 Object.write = function(self)
-	return "local self=Object{" ..
-		"angular=" .. serialize_value(self.angular) .. "," ..
-		"id=" .. serialize_value(self.id) .. "," ..
-		"mass=" .. serialize_value(self.mass) .. "," ..
-		"name=" .. serialize_value(self.name) .. "," ..
-		"model=" .. serialize_value(self.model_name) .. "," ..
-		"position=" .. serialize_value(self.position) .. "," ..
-		"rotation=" .. serialize_value(self.rotation) .. "}\n" ..
-		"return self"
+	return string.format("local self=Object%s\n%s", serialize{
+		angular = self.angular,
+		id = self.id,
+		mass = self.mass,
+		name = self.name,
+		model = self.model_name,
+		position = self.position,
+		rotation = self.rotation},
+		"return self")
 end

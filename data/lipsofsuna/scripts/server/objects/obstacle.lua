@@ -88,12 +88,12 @@ end
 -- @param self Object.
 -- @return Data string.
 Obstacle.write = function(self)
-	return "local self=Obstacle{" ..
-		"angular=" .. serialize_value(self.angular) .. "," ..
-		"health=" .. serialize_value(self.health) .. "," ..
-		"id=" .. serialize_value(self.id) .. "," ..
-		"position=" .. serialize_value(self.position) .. "," ..
-		"rotation=" .. serialize_value(self.rotation) .. "," ..
-		"spec=" .. serialize_value(self.spec.name) .. "}\n" ..
-		"return self"
+	return string.format("local self=Obstacle%s\n%s", serialize{
+		angular = self.angular,
+		health = self.health,
+		id = self.id,
+		position = self.position,
+		rotation = self.rotation,
+		spec = self.spec.name},
+		"return self")
 end

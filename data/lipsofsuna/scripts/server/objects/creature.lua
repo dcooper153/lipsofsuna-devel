@@ -680,17 +680,17 @@ end
 -- @param self Object.
 -- @return Data string.
 Creature.write = function(self)
-	return "local self=Creature{" ..
-		"angular=" .. serialize_value(self.angular) .. "," ..
-		"dead=" .. serialize_value(self.dead) .. "," ..
-		"id=" .. serialize_value(self.id) .. "," ..
-		"physics=" .. serialize_value(self.physics) .. "," ..
-		"position=" .. serialize_value(self.position) .. "," ..
-		"rotation=" .. serialize_value(self.rotation) .. "," ..
-		"spec=" .. serialize_value(self.spec.name) .. "}\n" ..
-		Serialize:encode_skills(self.skills) ..
-		Serialize:encode_inventory(self.inventory) ..
-		"return self"
+	return string.format("local self=Creature%s\n%s%s%s", serialize{
+		angular = self.angular,
+		dead = self.dead,
+		id = self.id,
+		physics = self.physics,
+		position = self.position,
+		rotation = self.rotation,
+		spec = self.spec.name},
+		Serialize:encode_skills(self.skills),
+		Serialize:encode_inventory(self.inventory),
+		"return self")
 end
 
 ------------------------------------------------------------------------------

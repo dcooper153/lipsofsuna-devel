@@ -309,16 +309,16 @@ end
 -- @param self Object.
 -- @return Data string.
 Item.write = function(self)
-	return "local self=Item{" ..
-		"angular=" .. serialize_value(self.angular) .. "," ..
-		"count=" .. serialize_value(self.count) .. "," ..
-		"id=" .. serialize_value(self.id) .. "," ..
-		"looted=" .. serialize_value(self.looted) .. "," ..
-		"spec=" .. serialize_value(self.spec.name) .. "," ..
-		"position=" .. serialize_value(self.position) .. "," ..
-		"rotation=" .. serialize_value(self.rotation) .. "}\n" ..
-		Serialize:encode_inventory(self.inventory) ..
-		"return self"
+	return string.format("local self=Item%s\n%s%s", serialize{
+		angular = self.angular,
+		count = self.count,
+		id = self.id,
+		looted = self.looted,
+		spec = self.spec.name,
+		position = self.position,
+		rotation = self.rotation},
+		Serialize:encode_inventory(self.inventory),
+		"return self")
 end
 
 -- These take care of checking that items don't fall through ground.
