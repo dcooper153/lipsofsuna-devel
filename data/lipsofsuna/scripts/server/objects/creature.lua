@@ -319,6 +319,8 @@ Creature.die = function(self)
 	-- Playback animation.
 	self:animate{animation = "death", weight = 10}
 	self:animate{animation = "dead", channel = Animation.CHANNEL_WALK, weight = 0.1, permanent = true}
+	self:animate{channel = Animation.CHANNEL_JUMP}
+	self:animate{channel = Animation.CHANNEL_BLOCK}
 	-- Drop held items.
 	local o = self:get_item{slot = "hand.L"}
 	if o then
@@ -332,6 +334,8 @@ Creature.die = function(self)
 		o.position = self.position
 		o.realized = true
 	end
+	-- Emit a vision event.
+	Vision:event{type = "object-dead", object = self, dead = true}
 	--Object.die(self)
 	return true
 end

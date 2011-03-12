@@ -143,7 +143,8 @@ end
 -- @param quat Quaternion.
 Object.update_rotation = function(self, quat)
 	local spec = Species:find{name = self.race}
-	if spec and spec.tilt_bone then
+	self.rotation_real = quat
+	if not self.dead and spec and spec.tilt_bone then
 		local euler = quat.euler
 		local bodyq = Quaternion:new_euler(euler[1], euler[2], 0)
 		local boneq = Quaternion{axis = Vector(1,0,0), angle = -euler[3]}

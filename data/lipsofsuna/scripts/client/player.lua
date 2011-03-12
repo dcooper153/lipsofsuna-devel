@@ -164,6 +164,7 @@ Player.rotation_curr = Quaternion()
 Player.rotation_prev = Quaternion()
 Player.rotation_sync_timer = 0
 Player.update_rotation = function(clss, secs)
+	if clss.object.dead then return end
 	local spec = Species:find{name = Player.object.race}
 	-- Update turning.
 	clss.turn_state = clss.turn_state + clss.turn * secs

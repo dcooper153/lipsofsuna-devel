@@ -50,6 +50,20 @@ end}
 Protocol:add_handler{type = "OBJECT_DAMAGE", func = function(args)
 end}
 
+Protocol:add_handler{type = "OBJECT_DEAD", func = function(args)
+	local ok,i,b = args.packet:read("uint32", "bool")
+	if not ok then return end
+	-- Find the object.
+	local obj = Object:find{id = i}
+	if not obj then return end
+	-- Update death status.
+	if obj.dead == b then return end
+	obj.dead = b
+	if obj.rotation_real then
+		obj:update_rotation(obj.rotation_real)
+	end
+end}
+
 Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
 	local channels = {
 		["attack-left"] = CHANNEL_LEFT_HAND,
@@ -154,12 +168,13 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		collision_group = Physics.GROUP_OBJECT}
 	if t == "species" then o.race = s end
 	-- Apply optional customizations.
-	local ok,bo,no,bu,eye,eyer,eyeg,eyeb,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = event.packet:resume(
-		"float", "float", "float",
+	local ok,de,bo,no,bu,eye,eyer,eyeg,eyeb,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = event.packet:resume(
+		"bool", "float", "float", "float",
 		"string", "uint8", "uint8", "uint8",
 		"string", "uint8", "uint8", "uint8",
 		"string", "uint8", "uint8", "uint8")
 	if ok then
+		o.dead = de
 		o.body_scale = bo
 		o.bust_scale = bu
 		o.nose_scale = no
@@ -170,6 +185,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		o.skin_style = skin
 		o.skin_color = {skinr / 255, sking / 255, skinb / 255}
 	else
+		o.dead = nil
 		o.body_scale = nil
 		o.bust_scale = nil
 		o.nose_scale = nil

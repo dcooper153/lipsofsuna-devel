@@ -77,6 +77,7 @@ do
 	add("MODIFIER_REMOVE")
 	add("MOVE_ITEM")
 	add("OBJECT_ANIMATED")
+	add("OBJECT_DEAD")
 	add("OBJECT_EFFECT")
 	add("OBJECT_FEAT")
 	add("OBJECT_HIDDEN")

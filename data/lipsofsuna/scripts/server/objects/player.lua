@@ -186,6 +186,10 @@ Player.vision_cb = function(self, args)
 				"bool", args.permanent or false, "float", args.time or 0.0,
 				"float", args.weight or 1.0)}
 		end,
+		["object-dead"] = function(args)
+			local o = args.object
+			self:send{packet = Packet(packets.OBJECT_DEAD, "uint32", o.id, "bool", args.dead)}
+		end,
 		["object-effect"] = function(args)
 			local o = args.object
 			self:send{packet = Packet(packets.OBJECT_EFFECT, "uint32", o.id, "string", args.effect)}
@@ -220,7 +224,8 @@ Player.vision_cb = function(self, args)
 				"float", o.rotation.x, "float", o.rotation.y, "float", o.rotation.z, "float", o.rotation.w)
 			-- Append optional customizations.
 			if o.spec.type == "species" and o.spec.models then
-				p:write("float", o.body_scale or 1,
+				p:write("bool", o.dead or false,
+					"float", o.body_scale or 1,
 					"float", o.nose_scale or 1,
 					"float", o.bust_scale or 1,
 					"string", o.eye_style and o.eye_style[1] or "",
