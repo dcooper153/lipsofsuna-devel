@@ -634,8 +634,10 @@ Creature.update = function(self, secs)
 		self.jump_timer = (self.jump_timer or 0) + secs
 		if self.jump_timer > 0.2 and Program.time - self.jumped > 0.5 and self.ground then
 			if not self.submerged or self.submerged < 0.3 then
-				Effect:play{effect = "thud1", object = self}
 				self:animate{animation = "land", channel = Animation.CHANNEL_JUMP, weight = 10.0}
+				if self.spec.effect_landing then
+					Effect:play{effect = self.spec.effect_landing, object = self}
+				end
 			else
 				self:animate{channel = Animation.CHANNEL_JUMP}
 			end

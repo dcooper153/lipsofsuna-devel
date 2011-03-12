@@ -30,6 +30,7 @@ Species.dict_name = {}
 --   <li>damage_from_magma: Points of damage from magma per second.</li>
 --   <li>damage_from_water: Points of damage from water per second.</li>
 --   <li>effect_falling_damage: Name of the effect played when the creature takes falling damage.</li>
+--   <li>effect_landing: Name of the effect played when the creature lands after jumping.</li>
 --   <li>equipment_slots: List of equipment slots.</li>
 --   <li>factions: List of factions.</li>
 --   <li>falling_damage_rate: Number of points of damage per every meters per second exceeding the falling damage speed.</li>
