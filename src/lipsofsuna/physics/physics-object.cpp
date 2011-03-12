@@ -239,7 +239,6 @@ int liphy_object_cast_sphere (
 
 /**
  * \brief Modifies the velocity of the object with an impulse.
- *
  * \param self Object.
  * \param point Impulse point relative to the body.
  * \param impulse Impulse force.
@@ -249,11 +248,11 @@ void liphy_object_impulse (
 	const LIMatVector* point,
 	const LIMatVector* impulse)
 {
-	btVector3 v0 (impulse->x, impulse->y, impulse->z);
-	btVector3 v1 (point->x, point->y, point->z);
+	btVector3 pos (point->x, point->y, point->z);
+	btVector3 imp (impulse->x, impulse->y, impulse->z);
 
 	if (self->control != NULL)
-		self->control->apply_impulse (v0, v1);
+		self->control->apply_impulse (pos, imp);
 }
 
 /**
@@ -306,7 +305,7 @@ void liphy_object_jump (
 {
 	LIMatVector o = { 0.0f, 0.0f, 0.0f };
 
-	liphy_object_impulse (self, impulse, &o);
+	liphy_object_impulse (self, &o, impulse);
 }
 
 /**

@@ -53,6 +53,7 @@ LIPhyControlRigid::~LIPhyControlRigid ()
 
 void LIPhyControlRigid::apply_impulse (const btVector3& pos, const btVector3& imp)
 {
+	this->body.activate ();
 	this->body.applyImpulse (imp, pos);
 }
 

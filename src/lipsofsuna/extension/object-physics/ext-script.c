@@ -69,14 +69,14 @@ static void Object_approach (LIScrArgs* args)
  * --
  * -- @param self Object.
  * -- @param args Arguments.<ul>
- * --   <li>point: Point of impulse. (required)</li>
- * --   <li>impulse: Force of impulse. (required)</li></ul>
+ * --   <li>1,impulse: Force of impulse.</li>
+ * --   <li>2,point: Point of impulse or nil.</li></ul>
  * function Object.impulse(self, args)
  */
 static void Object_impulse (LIScrArgs* args)
 {
 	LIMatVector impulse;
-	LIMatVector point;
+	LIMatVector point = { 0.0f, 0.0f, 0.0f };
 	LIExtModule* module;
 	LIPhyObject* object;
 
@@ -86,9 +86,13 @@ static void Object_impulse (LIScrArgs* args)
 	if (object == NULL)
 		return;
 
-	if (liscr_args_gets_vector (args, "impulse", &impulse) &&
-	    liscr_args_gets_vector (args, "point", &point))
+	if (liscr_args_geti_vector (args, 0, &impulse) ||
+	    liscr_args_gets_vector (args, "impulse", &impulse))
+	{
+		if (!liscr_args_geti_vector (args, 1, &point))
+			liscr_args_gets_vector (args, "point", &point);
 		liphy_object_impulse (object, &point, &impulse);
+	}
 }
 
 /* @luadoc
