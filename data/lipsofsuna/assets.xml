@@ -1411,6 +1411,15 @@
   </asset>
 
   <asset>
+    <file>import/particle2.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>particle</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
     <file>import/particle-000.png</file>
     <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>
@@ -1560,6 +1569,14 @@
     <status>FIXME</status>
     <tag>internal</tag>
     <tag>rune</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/sanctuary1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
     <type>model</type>
   </asset>
 

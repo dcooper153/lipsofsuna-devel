@@ -47,6 +47,11 @@ Effect{
 	sound = "quest1"}
 
 Effect{
+	name = "sanctuary1",
+	model = "sanctuary1",
+	sound = "spell-000"}
+
+Effect{
 	name = "swing1",
 	sound = "swing-000"}
 

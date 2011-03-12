@@ -21,7 +21,11 @@ Feat.apply = function(self, args)
 		end
 	end
 	for effect in pairs(effects) do
-		Effect:play{effect = effect, point = args.point}
+		if args.target then
+			Effect:play{effect = effect, object = args.target}
+		else
+			Effect:play{effect = effect, point = args.point}
+		end
 	end
 	-- Impulse.
 	if anim.categories["melee"] or anim.categories["ranged"] or

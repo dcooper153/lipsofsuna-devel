@@ -157,7 +157,7 @@ Feateffectspec{
 	name = "sanctuary",
 	categories = {"spell"},
 	description = "Protect from death",
-	effect = "heal1",
+	effect = "sanctuary1",
 	icon = "modifier-sanctuary",
 	influences = {{"sanctuary", 30, 2}},
 	reagent_base = {["milky powder"] = 3},
