@@ -12,6 +12,10 @@ Effect{
 	model = "dust1"}
 
 Effect{
+	name = "collapse2",
+	model = "dust2"}
+
+Effect{
 	name = "growl1",
 	sound = "growl-000",
 	sound_pitch = 0.1}

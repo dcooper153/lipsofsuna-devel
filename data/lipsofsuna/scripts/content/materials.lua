@@ -25,6 +25,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_collapse = "collapse1",
 	name = "brick1",
 	shader = "terrain",
 	texture = {"bricks3", "bricks3n", "stone-001"},
@@ -32,6 +33,7 @@ Material{
 	type = "cube"}
 
 Material{
+	effect_collapse = "collapse1",
 	name = "brittlerock1",
 	shader = "terrain",
 	texture = {"granite1", "granite1n", "stone-001"}, -- FIXME
@@ -39,6 +41,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_collapse = "collapse1",
 	name = "cobbles1",
 	shader = "terrain",
 	texture = {"cobbles1", "cobbles1n", "stone-001"},
@@ -64,6 +67,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_collapse = "collapse2",
 	mining_materials = {["ferrostone"] = 1},
 	name = "ferrostone1",
 	shader = "terrain",
@@ -82,6 +86,7 @@ Material{
 	type = "rounded fractal"}
 
 Material{
+	effect_collapse = "collapse2",
 	mining_transform = "soil1",
 	name = "grass1",
 	shader = "terrain",
@@ -120,6 +125,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_collapse = "collapse2",
 	mining_materials = {["sand chunk"] = 1},
 	name = "sand1",
 	shader = "terrain",
@@ -128,6 +134,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_collapse = "collapse2",
 	mining_materials = {["soil chunk"] = 1},
 	name = "soil1",
 	shader = "terrain",
@@ -143,6 +150,7 @@ Material{
 	type = "liquid"}
 
 Material{
+	effect_collapse = "collapse2",
 	mining_materials = {["log"] = 1},
 	name = "wood1",
 	shader = "terrain",

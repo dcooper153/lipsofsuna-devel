@@ -807,6 +807,15 @@
   </asset>
 
   <asset>
+    <file>import/dust2.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>particle</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
     <file>import/ears-000.png</file>
     <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>
