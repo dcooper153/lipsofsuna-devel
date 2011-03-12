@@ -84,7 +84,10 @@ Species{
 		upper = "aermale1chest1"},
 	hair_styles = {
 		{"Bald", ""},
-		{"Short", "aermale1hair1"}}}
+		{"Short", "aermale1hair1"}},
+	timing_attack_throw = 4,
+	timing_spell_ranged = 4,
+	timing_spell_touch = 4}
 
 Species{
 	name = "android",

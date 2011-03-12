@@ -62,7 +62,6 @@ Featanimspec{
 
 Featanimspec{
 	name = "ranged",
-	action_frames = {10, 10},
 	animation = "fire-bow",
 	categories = {"ranged"},
 	cooldown = 1,
@@ -98,7 +97,6 @@ Featanimspec{
 
 Featanimspec{
 	name = "throw",
-	action_frames = {10, 10},
 	animation = "throw",
 	categories = {"throw"},
 	cooldown = 1,

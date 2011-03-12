@@ -52,6 +52,13 @@ Species.dict_name = {}
 --   <li>swim_force: Mass-independent upward swim force of the creature.</li>
 --   <li>tilt_bone: Name of the tilt bone of the creature.</li>
 --   <li>tilt_limit: Tilt limit in radians of the tilting bone.</li>
+--   <li>timing_attack_blunt: Timing of blunt attack impact, in frames.</li>
+--   <li>timing_attack_ranged: Timing of ranged attack firing, in frames.</li>
+--   <li>timing_attack_throw: Timing of releasing the thrown item, in frames.</li>
+--   <li>timing_build: Timing of releasing the thrown item, in frames.</li>
+--   <li>timing_spell_ranged: Timing of casting a ranged spell projectile, in frames.</li>
+--   <li>timing_spell_self: Timing of casting a spell on self, in frames.</li>
+--   <li>timing_spell_touch: Timing of casting a spell on touch, in frames.</li>
 --   <li>view_cone: View cone angle in radians.</li>
 --   <li>water_friction: How much being in water slows the creature down.</li>
 --   <li>water_gravity: The gravity of the creature in water.</li></ul>
@@ -153,6 +160,13 @@ Species.new = function(clss, args)
 	copy("speed_run", 6)
 	copy("swim_force", 3.5)
 	copy("tilt_limit", math.pi)
+	copy("timing_attack_blunt", 10)
+	copy("timing_attack_ranged", 10)
+	copy("timing_attack_throw", 10)
+	copy("timing_build", 10)
+	copy("timing_spell_ranged", 10)
+	copy("timing_spell_self", 10)
+	copy("timing_spell_touch", 10)
 	copy("view_cone", 0.8 * math.pi)
 	copy("water_friction", 0.6)
 	copy("water_gravity", Vector(0,-3,0))
