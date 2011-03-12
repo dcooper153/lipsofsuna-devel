@@ -86,7 +86,8 @@ Voxel.player_contact = function(self, player, point)
 end
 
 Voxel.damage = function(self, user, point)
-	local t = Voxel:get_tile{point = point}
+	local t = Voxel:get_tile(point)
+	if t == 0 then return end
 	local m = Material:find{id = t}
 	if not m then return end
 	-- Play collapse effect.
