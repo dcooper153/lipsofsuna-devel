@@ -36,12 +36,13 @@ Widgets.Label.new = function(clss, args)
 end
 
 Widgets.Label.reshaped = function(self)
+	local wrap = self:get_request()
 	self:set_request{
 		font = self.font,
 		internal = true,
 		paddings = {2,2,2,2},
 		text = self.text,
-		width = self:get_request()}
+		width = wrap and (wrap - 4)}
 	local w = self.width
 	local h = self.height
 	local f = self.focused

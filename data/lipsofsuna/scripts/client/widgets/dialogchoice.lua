@@ -3,16 +3,18 @@ Widgets.DialogChoice = Class(Widgets.Label)
 Widgets.DialogChoice.new = function(clss, args)
 	local self = Widgets.Label.new(clss, args)
 	self.font = "medium"
+	self:set_request{width = 800}
 	return self
 end
 
 Widgets.DialogChoice.reshaped = function(self)
+	local wrap = self:get_request() or 800
 	self:set_request{
 		font = self.font,
 		internal = true,
 		paddings = {2,2,2,2},
 		text = self.text,
-		width = self:get_request()}
+		width = wrap - 4}
 	local w = self.width
 	local h = self.height
 	self:canvas_clear()
