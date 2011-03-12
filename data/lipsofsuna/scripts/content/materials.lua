@@ -46,6 +46,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_collapse = "collapse1",
 	mining_materials = {["granite stone"] = 1},
 	name = "concrete1",
 	shader = "terrain",
@@ -72,6 +73,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_collapse = "collapse1",
 	mining_materials = {["granite stone"] = 1},
 	name = "granite1",
 	shader = "terrain",

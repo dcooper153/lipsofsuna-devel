@@ -789,6 +789,24 @@
   </asset>
 
   <asset>
+    <file>import/dust1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>particle</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/dust1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>usable</status>
+    <tag>particle</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
     <file>import/ears-000.png</file>
     <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>

@@ -8,6 +8,10 @@ Effect{
 	sound = "fire-000"}
 
 Effect{
+	name = "collapse1",
+	model = "dust1"}
+
+Effect{
 	name = "growl1",
 	sound = "growl-000",
 	sound_pitch = 0.1}

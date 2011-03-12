@@ -89,6 +89,11 @@ Voxel.damage = function(self, user, point)
 	local t = Voxel:get_tile{point = point}
 	local m = Material:find{id = t}
 	if not m then return end
+	-- Play collapse effect.
+	if m.effect_collapse then
+		local center = (point + Vector(0.5,0.5,0.5)) * Voxel.tile_size
+		Effect:play{effect = m.effect_collapse, point = center}
+	end
 	-- Change tile type.
 	local n = Material:find{name = m.mining_transform}
 	Voxel:set_tile(point, n and n.id or 0)
