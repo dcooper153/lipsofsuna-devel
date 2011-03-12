@@ -78,6 +78,12 @@ int liren_particles_init (
 			dstsystem->frame_end_emit = srcsystem->frame_end_emit;
 			dstsystem->particle_start = self->particles.count;
 			dstsystem->particle_size = srcsystem->particle_size;
+			dstsystem->shader = listr_dup (srcsystem->shader);
+			if (dstsystem->shader == NULL)
+			{
+				liren_particles_clear (self);
+				return 0;
+			}
 			dstsystem->image = liren_render_find_image (render, srcsystem->texture);
 			if (dstsystem->image == NULL)
 			{
@@ -178,6 +184,10 @@ int liren_particles_init (
 void liren_particles_clear (
 	LIRenParticles* self)
 {
+	int i;
+
+	for (i = 0 ; i < self->systems.count ; i++)
+		lisys_free (self->systems.array[i].shader);
 	lisys_free (self->particles.array);
 	lisys_free (self->frames.array);
 	lisys_free (self->systems.array);
@@ -243,7 +253,6 @@ void liren_particles_sort (
 	float                 time,
 	int                   loop,
 	const LIMatTransform* transform,
-	LIRenShader*          shader,
 	LIRenSort*            sort)
 {
 	int i;
@@ -251,11 +260,15 @@ void liren_particles_sort (
 	float color[4];
 	LIMatVector coord;
 	LIRenParticleSystem* system;
+	LIRenShader* shader;
 
 	for (i = 0 ; i < self->systems.count ; i++)
 	{
 		system = self->systems.array + i;
 		if (system->image == NULL)
+			continue;
+		shader = liren_render_find_shader (sort->render, system->shader);
+		if (shader == NULL)
 			continue;
 		for (j = system->particle_start ; j < system->particle_end ; j++)
 		{

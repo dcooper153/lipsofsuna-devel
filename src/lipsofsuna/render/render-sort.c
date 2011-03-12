@@ -210,7 +210,6 @@ int liren_sort_add_object (
 	LIRenObject* object)
 {
 	LIMatAabb bounds;
-	LIRenShader* shader;
 
 	/* Add each face group of the model. */
 	liren_object_get_bounds (object, &bounds);
@@ -218,16 +217,11 @@ int liren_sort_add_object (
 		return 0;
 
 	/* Add particle systems of the object. */
-	shader = liren_render_find_shader (self->render, "particle");
-	if (shader != NULL)
-	{
-		liren_particles_sort (
-			&object->model->particles,
-			object->particle.time,
-			object->particle.loop,
-			&object->transform,
-			shader, self);
-	}
+	liren_particles_sort (
+		&object->model->particles,
+		object->particle.time,
+		object->particle.loop,
+		&object->transform, self);
 
 	return 1;
 }

@@ -41,10 +41,12 @@ struct _LIMdlParticleFrame
 
 struct _LIMdlParticleSystem
 {
+	int flags;
 	int frame_start;
 	int frame_end_emit;
 	int frame_end;
 	float particle_size;
+	char* shader;
 	char* texture;
 	struct
 	{

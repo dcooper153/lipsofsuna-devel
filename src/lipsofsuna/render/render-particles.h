@@ -49,6 +49,7 @@ struct _LIRenParticleSystem
 	int particle_start;
 	int particle_end;
 	float particle_size;
+	char* shader;
 	LIRenImage* image;
 };
 
@@ -95,7 +96,6 @@ LIAPICALL (void, liren_particles_sort, (
 	float                 time,
 	int                   loop,
 	const LIMatTransform* transform,
-	LIRenShader*          shader,
 	LIRenSort*            sort));
 
 #endif

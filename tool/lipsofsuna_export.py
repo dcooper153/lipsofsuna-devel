@@ -16,6 +16,7 @@ class LIEnum:
 		self.NODETYPE_BONE = 0
 		self.NODETYPE_EMPTY = 1
 		self.NODETYPE_LIGHT = 2
+		self.PARTICLEFLAG_NEWFORMAT = 0x80000000
 		self.TEXFLAG_BILINEAR = 1
 		self.TEXFLAG_CLAMP = 2
 		self.TEXFLAG_MIPMAP = 4
@@ -972,11 +973,18 @@ class LIParticleSystem:
 		self.frame_end = int(self.system.settings.frame_end)
 		self.lifetime = int(self.system.settings.lifetime)
 		self.particle_size = self.system.settings.particle_size
-		# Set material texture.
+		# Set material properties.
+		self.shader = "particle"
 		self.texture = "particle1"
 		mat = self.system.settings.material - 1
 		if mat < len(self.object.material_slots):
+			# Set material shader.
 			mat = self.object.material_slots[mat]
+			try:
+				self.shader = mat.material["shader"]
+			except:
+				pass
+			# Set material texture.
 			tex = mat.material.texture_slots[0]
 			if tex and tex.texture and tex.texture.type == "IMAGE":
 				img = tex.texture.image
@@ -1002,10 +1010,12 @@ class LIParticleSystem:
 		for i in range(len(self.particles) - 1, -1, -1):
 			if self.particles[i].is_empty():
 				del self.particles[i]
+		writer.write_int(LIFormat.PARTICLEFLAG_NEWFORMAT)
 		writer.write_int(self.frame_start)
 		writer.write_int(self.frame_end)
 		writer.write_int(self.frame_end + self.lifetime)
 		writer.write_float(self.particle_size)
+		writer.write_string(self.shader)
 		writer.write_string(self.texture)
 		writer.write_int(len(self.particles))
 		writer.write_marker()
