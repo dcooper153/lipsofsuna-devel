@@ -20,7 +20,6 @@ Player.apply_quake = function(clss, point, magnitude)
 	if point and magnitude and clss.object then
 		local dist = (clss.object.position - point).length
 		local quake = math.min(math.max(magnitude / (0.05 * dist * dist + 0.5), 0), 1)
-		print("QUAKE", clss.object.position, point, magnitude, quake)
 		clss.camera.quake = math.max(clss.camera.quake or 0, quake)
 	end
 end
