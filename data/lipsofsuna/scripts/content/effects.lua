@@ -5,6 +5,7 @@ Effect{
 Effect{
 	name = "explosion1",
 	model = "explosion1",
+	quake = 1,
 	sound = "explosion1"}
 
 Effect{

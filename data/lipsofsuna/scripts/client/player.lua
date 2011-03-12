@@ -12,6 +12,19 @@ local radian_wrap = function(x)
 	end
 end
 
+--- Applies a world space quake.
+-- @param clss Player class.
+-- @param point Quake point in world space.
+-- @param magnitude Quake magnitude.
+Player.apply_quake = function(clss, point, magnitude)
+	if point and magnitude and clss.object then
+		local dist = (clss.object.position - point).length
+		local quake = math.min(math.max(magnitude / (0.05 * dist * dist + 0.5), 0), 1)
+		print("QUAKE", clss.object.position, point, magnitude, quake)
+		clss.camera.quake = math.max(clss.camera.quake or 0, quake)
+	end
+end
+
 Player.get_camera_transform = function(clss)
 	if clss.camera.mode == "first-person" then
 		return clss:get_camera_transform_1st()
@@ -149,6 +162,14 @@ Player.update_camera = function(clss, secs)
 	end
 	-- Set the target transformation.
 	local pos,rot = clss:get_camera_transform()
+	if clss.camera.quake then
+		local rnd = Vector(2*math.random()-1, 2*math.random()-1, 2*math.random()-1)
+		pos = pos + rnd * 6 * math.min(1, clss.camera.quake)
+		clss.camera.quake = clss.camera.quake - secs
+		if clss.camera.quake < 0 then
+			clss.camera.quake = 0
+		end
+	end
 	Player.camera.target_position = pos
 	Player.camera.target_rotation = rot
 	-- Interpolate.

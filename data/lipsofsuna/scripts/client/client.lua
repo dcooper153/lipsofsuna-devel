@@ -108,6 +108,8 @@ Protocol:add_handler{type = "OBJECT_EFFECT", func = function(event)
 			sound = effect.sound,
 			sound_pitch = effect.sound_pitch,
 			realized = true}
+		-- Quake the camera.
+		Player:apply_quake(obj.position, effect.quake)
 	end
 end}
 
@@ -215,6 +217,7 @@ Protocol:add_handler{type = "OBJECT_SKILL", func = function(event)
 		-- Display health changes.
 		if s == "health" then
 			if o.health then
+				-- Show a health change text.
 				local diff = v - o.health
 				if math.abs(diff) > 2 then
 					local code = (diff > 0 and 0x01 or 0x00) + (o == Player.object and 0x10 or 0x00)
@@ -233,6 +236,10 @@ Protocol:add_handler{type = "OBJECT_SKILL", func = function(event)
 						text_fade_time = 1,
 						text_font = "medium",
 						velocity = Vector(0,0.5,0)}
+				end
+				-- Quake the camera if the player was hurt.
+				if o == Player.object and diff < -5 then
+					Player:apply_quake(o.position, 0.01 * (5 - diff))
 				end
 			end
 			o.health = v
@@ -333,5 +340,7 @@ Protocol:add_handler{type = "WORLD_EFFECT", func = function(event)
 			sound = effect.sound,
 			sound_pitch = effect.sound_pitch,
 			realized = true}
+		-- Quake the camera.
+		Player:apply_quake(Vector(x,y,z), effect.quake)
 	end
 end}
