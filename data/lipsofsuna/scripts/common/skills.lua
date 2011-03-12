@@ -176,6 +176,33 @@ Skills.register = function(self, args)
 	return v
 end
 
+--- Sets attributes of a skill.
+-- @param self Skills.
+-- @param args Arguments.<ul>
+--   <li>skill: Skill name.</li>
+--   <li>maximum: Maximum value.</li>
+--   <li>regen: Regeneration rate.</li>
+--   <li>value: Current value.</li></ul>
+Skills.set = function(self, args)
+	if not args.skill then return end
+	local v = self.skills[args.skill]
+	if not v then return end
+	local old = math.floor(v.value)
+	if args.maximum then
+		v.maximum = args.maximum
+		v.value = math.min(v.value, v.maximum)
+	end
+	if args.value then
+		v.value = math.max(0, math.min(args.value, v.maximum))
+	end
+	if args.regen then
+		v.regen = args.regen
+	end
+	if math.floor(v.value) ~= old then
+		Vision:event{type = "skill-changed", object = self.owner, skill = args.skill}
+	end
+end
+
 --- Sets the maximum value of a skill.
 -- @param self Skills.
 -- @param args Arguments.<ul>

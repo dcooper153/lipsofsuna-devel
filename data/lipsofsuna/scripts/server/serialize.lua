@@ -27,8 +27,8 @@ Serialize.encode_inventory = function(clss, inv)
 	local str = ""
 	for slot,obj in pairs(inv.slots) do
 		obj:save()
-		str = str .. "self.inventory:set_object{slot=" .. serialize(slot) ..
-			",object=Object:load{id=" .. serialize(obj.id) ..  "}}\n"
+		str = string.format("%sself.inventory:set_object{slot=%s,object=Object:load{id=%s}}\n",
+			str, serialize(slot), serialize(obj.id))
 	end
 	return str
 end
@@ -39,11 +39,12 @@ end
 -- @return String.
 Serialize.encode_skills = function(clss, skills)
 	if not skills then return "" end
-	local str = "self.skills.enabled=" .. serialize(skills.enabled) .. "\n"
+	local str = string.format("self.skills.enabled=%s\n", serialize(skills.enabled))
 	for k,v in pairs(skills:get_names()) do
 		local val = skills:get_value{skill = v}
-		str = str .. "self.skills:set_value{skill=" .. serialize(v) ..
-			",value=" .. serialize(val) .. "}\n"
+		local max = skills:get_maximum{skill = v}
+		str = string.format("%sself.skills:set{skill=%s,maximum=%s,value=%s}\n",
+			str, serialize(v), serialize(max), serialize(val))
 	end
 	return str
 end
