@@ -43,6 +43,7 @@ Species{
 Species{
 	name = "aer",
 	base = "race",
+	effect_falling_damage = "aerhurt1",
 	equipment_class = "aer",
 	model = "aer1",
 	models = {

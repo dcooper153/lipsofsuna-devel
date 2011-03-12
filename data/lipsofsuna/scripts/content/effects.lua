@@ -1,4 +1,8 @@
 Effect{
+	name = "aerhurt1",
+	sound = "thud-000"}
+
+Effect{
 	name = "explosion1",
 	model = "explosion1",
 	sound = "explosion1"}

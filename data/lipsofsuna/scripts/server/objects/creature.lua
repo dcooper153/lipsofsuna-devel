@@ -613,6 +613,22 @@ end
 -- @param self Object.
 -- @param secs Seconds since the last update.
 Creature.update = function(self, secs)
+	-- Check for falling damage.
+	if self.velocity_prev then
+		local limity = self.spec.falling_damage_speed
+		local prevy = self.velocity_prev.y
+		local diffy = self.velocity.y - prevy
+		if prevy < -limity and diffy > limity then
+			local damage = (diffy - limity) * self.spec.falling_damage_rate
+			if damage > 2 then
+				self:damaged(damage)
+				if self.spec.effect_falling_damage then
+					Effect:play{effect = self.spec.effect_falling_damage, object = self}
+				end
+			end
+		end
+	end
+	self.velocity_prev = self.velocity
 	-- Play the landing animation after jumping.
 	if self.jumping then
 		self.jump_timer = (self.jump_timer or 0) + secs
