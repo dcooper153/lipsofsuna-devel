@@ -465,12 +465,16 @@ Creature.jump = function(self)
 	else
 		-- Jumping.
 		if not self.ground then return end
-		local v = self.velocity
-		self.jumped = t
-		self.jumping = true
 		Effect:play{effect = "jump1", object = self}
-		self:animate{animation = "jump", channel = Animation.CHANNEL_JUMP, permanent = true}
-		Object.jump(self, {impulse = Vector(v.x, self.spec.jump_force * self.spec.mass, v.z)})
+		self:animate{animation = "jump", channel = Animation.CHANNEL_JUMP}
+		Thread(function(thread)
+			Thread:sleep(self.spec.timing_jump * 0.05)
+			if not self.realized then return end
+			local v = self.velocity
+			self.jumped = t
+			self.jumping = true
+			Object.jump(self, {impulse = Vector(v.x, self.spec.jump_force * self.spec.mass, v.z)})
+		end)
 	end
 end
 
