@@ -854,6 +854,8 @@ Itemspec{
 	crafting_materials = {["log"] = 1},
 	equipment_slot = "hand.L",
 	icon = "torch1",
+	special_effects = {
+		{slot = "flame", model = "torchfx1"}},
 	water_gravity = Vector(0,1,0)}
 
 ------------------------------------------------------------------------------

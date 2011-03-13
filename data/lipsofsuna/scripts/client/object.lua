@@ -13,6 +13,14 @@ Object.animate = function(self, args)
 end
 
 Object.detach = function(self)
+	-- Hide special effects.
+	if self.special_effects then
+		for k,v in pairs(self.special_effects) do
+			v.realized = false
+		end
+	end
+	-- Hide self.
+	self.realized = false
 end
 
 --- Creates a customized character model for the object.<br/>
@@ -90,14 +98,26 @@ Object.create_character_model = function(self, args)
 	self:deform_mesh()
 end
 
+Object.update = function(self, secs)
+	if not self.realized then return end
+	-- Update special effects.
+	if self.special_effects then
+		local p = self.position
+		for k,v in pairs(self.special_effects) do
+			local n = self:find_node{name = v.slot}
+			if n then p = p + self.rotation * n end
+			v.position = p
+		end
+	end
+end
+
 Object.update_model = function(self)
 	-- Instantiate the model for creatures.
 	if self.type == "creature" and self.model and self.model.name then
 		self.model = self.model:copy()
 	end
 	-- Character customizations.
-	local spec = self.race and Species:find{name = self.race}
-	if spec and spec.models then
+	if self.spec and self.spec.models then
 		self:create_character_model{
 			body_scale = self.body_scale,
 			bust_scale = self.bust_scale,
@@ -112,25 +132,19 @@ Object.update_model = function(self)
 			skin_style = self.skin_style}
 	end
 	-- Create the customization animation.
-	if spec and (spec.models or spec.tilt_bone) then
+	if self.spec and (self.spec.models or self.spec.tilt_bone) then
 		self:animate{animation = "empty", channel = Animation.CHANNEL_TILT,
 			weight = 1000, permanent = true}
 	end
-	-- Particle hacks.
-	if self.model_name == "torch1" and not self.particle_hack then
-		Thread(function()
-			coroutine.yield()
-			local fx = Object{model = "torchfx1", position = self.position, realized = true}
-			self.particle_hack = fx
-			while self.realized and self.particle_hack == fx do
-				local p = self.position
-				local n = self:find_node{name = "#flame"}
-				if n then p = p + self.rotation * n end
-				fx.position = p
-				coroutine.yield()
-			end
-			fx.realized = false
-		end)
+	-- Create special effects.
+	if self.spec and self.spec.special_effects and #self.spec.special_effects then
+		self.special_effects = {}
+		for k,v in pairs(self.spec.special_effects) do
+			local fx = Object{model = v.model, position = self.position, realized = true, slot = "#" .. v.slot}
+			table.insert(self.special_effects, fx)
+		end
+	else
+		self.special_effects = nil
 	end
 end
 

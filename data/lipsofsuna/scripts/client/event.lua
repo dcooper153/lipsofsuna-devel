@@ -65,6 +65,10 @@ Eventhandler{type = "tick", func = function(self, args)
 		end
 		ipolt = ipolt - 1/60
 	end
+	-- Update special effects.
+	for k,v in pairs(Object.objects) do
+		v:update(secs)
+	end
 	-- Update equipment positions.
 	for k,v in pairs(Slots.dict_owner) do
 		v:update()

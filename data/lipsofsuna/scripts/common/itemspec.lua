@@ -40,6 +40,7 @@ Itemspec.dict_name = {}
 --   <li>mass: Mass in kilograms.</li>
 --   <li>model: Model to use for the item. (required)</li>
 --   <li>name: Name of the item type. (required)</li>
+--   <li>special_effects: List of special effects to render.</li>
 --   <li>stacking: True to allow the item to stack in the inventory.</li></ul>
 -- @return New item specification.
 Itemspec.new = function(clss, args)
@@ -65,6 +66,7 @@ Itemspec.new = function(clss, args)
 	copy("destroy_actions", {})
 	copy("inventory_items", {})
 	copy("mass", 10)
+	copy("special_effects", {})
 	copy("water_friction", 0.9)
 	copy("water_gravity", Vector(0,-3,0))
 	return self

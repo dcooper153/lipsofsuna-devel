@@ -47,6 +47,7 @@ Species.dict_name = {}
 --   <li>model: Model name.</li>
 --   <li>skill_quota: Number of skill points the creature can distribute over skills.</li>
 --   <li>skills: List of skills.</li>
+--   <li>special_effects: List of special effects to render.</li>
 --   <li>speed_run: Turning speed in meters per second.</li>
 --   <li>speed_walk: Walking speed in meters per second.</li>
 --   <li>swim_force: Mass-independent upward swim force of the creature.</li>
@@ -157,6 +158,7 @@ Species.new = function(clss, args)
 	copy("jump_force", 8)
 	copy("mass", 50)
 	copy("skill_quota", 200)
+	copy("special_effects", {})
 	copy("speed_walk", 3)
 	copy("speed_run", 6)
 	copy("swim_force", 3.5)

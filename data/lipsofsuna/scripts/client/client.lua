@@ -117,7 +117,7 @@ Protocol:add_handler{type = "OBJECT_HIDDEN", func = function(event)
 	local ok,i = event.packet:read("uint32")
 	if ok then
 		local o = Object:find{id = i}
-		if o then o.realized = false end
+		if o then o:detach() end
 	end
 end}
 
@@ -166,7 +166,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	local p = Vector(x, y, z)
 	if t == "item" or t == "species" then p = p + Object.physics_position_correction end
 	-- Create the object.
-	local o = Object{id = i, model = m, name = n, position = p, spec = s, type = t,
+	local o = Object{id = i, model = m, name = n, position = p, spec = spec, type = t,
 		collision_group = Physics.GROUP_OBJECT}
 	if t == "species" then o.race = s end
 	-- Apply optional customizations.
@@ -281,7 +281,7 @@ Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
 			o:update_model()
 		else
 			-- Add-on equipment.
-			slots:set_object{slot = slot, model = spec.model}
+			slots:set_object{slot = slot, model = spec.model, spec = spec}
 			o.equipment = o.equipment or {}
 			o.equipment[slot] = spec.name
 			o:update_model()
