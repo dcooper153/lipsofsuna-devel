@@ -28,7 +28,9 @@
 #include "render-types.h"
 #include "render-uniforms.h"
 
-#define LIREN_CONTEXT_MAX_LIGHTS 3
+/* If you changed this, also remember change LOS_LIGHT_MAX in shader program
+ * and uniforms in the uniform list and in liren_uniforms_setup(). */
+#define LIREN_CONTEXT_MAX_LIGHTS 6
 
 typedef struct _LIRenContextTexture LIRenContextTexture;
 struct _LIRenContextTexture
