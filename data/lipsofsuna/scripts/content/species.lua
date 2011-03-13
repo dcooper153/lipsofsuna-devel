@@ -34,9 +34,11 @@ Species{
 		{"Default", ""}},
 	hair_styles = {
 		{"Bald", ""},
-		{"Long", "hair2"},
 		{"Pigtails", "hair1"},
-		{"Short", "aershorthair1"}},
+		{"Pigtails long", "hair3"},
+		{"Long", "hair2"},
+		--{"Short", "aershorthair1"} -- TODO: Adapt to head mesh changes
+		{"Drill", "hair4"}},
 	skin_styles = {
 		{"Default", ""}}}
 
@@ -111,13 +113,7 @@ Species{
 		{name = "intelligence", max = 80, val = 30},
 		{name = "perception", max = 100, val = 50},
 		{name = "strength", max = 80, val = 30},
-		{name = "willpower", max = 40, val = 20}},
-	hair_styles = {
-		{"Bald", ""},
-		{"Pigtails", "androidhair1"},
-		{"Pigtails long", "hair3"},
-		{"Long", "androidhair2"},
-		{"Drill", "androidhair3"}}}
+		{name = "willpower", max = 40, val = 20}}}
 
 -- TODO
 Species{
