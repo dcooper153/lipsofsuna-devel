@@ -203,7 +203,7 @@ static int private_compile (
 	const GLchar* headers[4] =
 	{
 		/* Common */
-		"#define LOS_LIGHT_MAX 6\n"
+		"#define LOS_LIGHT_MAX 5\n"
 		"layout(shared) uniform LOSDATA\n{\n"
 		"	vec4 LOS_material_diffuse;\n"
 		"	vec4 LOS_material_param_0;\n"
