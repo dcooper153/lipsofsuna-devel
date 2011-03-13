@@ -472,7 +472,18 @@ Species{
 	speed_walk = 2,
 	skills = {
 		{name = "health", max = 30, val = 30}}}
-
+Species{
+	name = "stone imp",
+	ai_enable_defend = false,
+	categories = {"enemy", "plague"},
+	factions = {"evil"},
+	feat_anims = {"bite"},
+	inventory_size = 0,
+	jump_force = 4,
+	model = "stoneimp1", -- FIXME
+	speed_walk = 1,
+	skills = {
+		{name = "health", max = 20, val = 20}}}
 ------------------------------------------------------------------------------
 -- Silverspring creatures.
 
