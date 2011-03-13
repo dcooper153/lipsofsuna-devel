@@ -49,6 +49,10 @@
     <url>http://opengameart.org/user/99</url>
   </author-info>
   <author-info>
+    <name>Lauris Kaplinski</name>
+    <url>http://khayyam.kaplinski.com/</url>
+  </author-info>
+  <author-info>
     <name>Martin Frydenlund</name>
   </author-info>
   <author-info>
@@ -1083,6 +1087,38 @@
     <status>incomplete</status>
     <tag>tile</tag>
     <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/hair1.blend</file>
+    <author>Lauris Kaplinski</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.blendswap.com/3D-models/characters/sara-tween-girl/</source>
+    <dep>import/hair2.png</dep>
+    <dep>import/hair2n.png</dep>
+    <status>complete</status>
+    <type>model</type>
+    <comment>Minor modifications were done to fit the mesh with our rigs.</comment>
+  </asset>
+
+  <asset>
+    <file>import/hair2.png</file>
+    <author>Lauris Kaplinski</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.blendswap.com/3D-models/characters/sara-tween-girl/</source>
+    <status>complete</status>
+    <type>texture</type>
+    <comment>Desaturated to make it compatible with our hair coloring system.</comment>
+  </asset>
+
+  <asset>
+    <file>import/hair2n.png</file>
+    <author>Lauris Kaplinski</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.blendswap.com/3D-models/characters/sara-tween-girl/</source>
+    <status>usable</status>
+    <type>normalmap</type>
+    <comment>Generated from hair2.png</comment>
   </asset>
 
   <asset>

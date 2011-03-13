@@ -115,6 +115,7 @@ Species{
 	hair_styles = {
 		{"Bald", ""},
 		{"Pigtails", "androidhair1"},
+		{"Pigtails long", "hair3"},
 		{"Long", "androidhair2"},
 		{"Drill", "androidhair3"}}}
 
