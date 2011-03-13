@@ -476,7 +476,7 @@ Species{
 Species{
 	name = "stone imp",
 	ai_enable_defend = false,
-	categories = {"enemy", "plague"},
+	categories = {"enemy", "mining"},
 	factions = {"evil"},
 	feat_anims = {"bite"},
 	inventory_size = 0,

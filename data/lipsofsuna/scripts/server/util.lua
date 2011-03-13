@@ -113,4 +113,12 @@ Voxel.damage = function(self, user, point)
 			end
 		end
 	end
+	-- Spawn random monsters.
+	if not n and math.random() < 0.03 then
+		local spec = Species:random{category = "mining"}
+		if spec then
+			local offset = (point + Vector(0.5,0.1,0.5)) * Voxel.tile_size
+			local object = Creature{random = true, spec = spec, position = offset, realized = true}
+		end
+	end
 end
