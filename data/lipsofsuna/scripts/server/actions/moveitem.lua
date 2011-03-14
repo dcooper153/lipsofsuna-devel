@@ -42,6 +42,13 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 		return true
 	end
 	if dstslot then
+		-- Try to equip the item.
+		-- Equiping needs special handling due to items that reserve multiple
+		-- slots. When such an item is equiped or replaced, multiple slots may
+		-- require changes.
+		if type(dstslot) == "string" then
+			return dstinv.owner:equip_item{object = srcobj}
+		end
 		-- Try to move the item.
 		local dstobj = dstinv:get_object{slot = dstslot}
 		if not dstobj then

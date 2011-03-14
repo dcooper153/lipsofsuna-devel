@@ -348,7 +348,38 @@ end
 Creature.equip_item = function(self, args)
 	local slot = args.object.spec.equipment_slot
 	if not slot then return end
+	local spec = args.object and args.object.spec
+	-- Unequip the item in the destination slot.
 	if not self:unequip_item{slot = slot} then return end
+	-- Unequip items in slots reserved by the item.
+	-- This handles cases such as a shield being in the left hand and a
+	-- two-handed weapon being equipped into the right hand.
+	if spec and spec.equipment_slots_reserved then
+		for k in pairs(spec.equipment_slots_reserved) do
+			if not self:unequip_item{slot = k} then return end
+		end
+	end
+	-- Unequip items whose slot reservations conflict with the new item.
+	-- This handles cases such as a two-handed weapon being in the right
+	-- hand and a shield being equipped into the left hand.
+	if spec then
+		for k,v in pairs(self.inventory.slots) do
+			local conflict
+			if type(k) == "string" and v.spec.equipment_slots_reserved then
+				if v.spec.equipment_slots_reserved[slot] then
+					conflict = true
+				elseif spec.equipment_slots_reserved then
+					for k1 in pairs(args.object.spec_equipment_slots_reserved) do
+						if v.equipment_slots_reserved[k1] then conflict = true end
+					end
+				end
+			end
+			if conflict then
+				if not self:unequip_item{slot = k} then return end
+			end
+		end
+	end
+	-- Equip the item.
 	self.inventory:set_object{object = args.object, slot = slot}
 	return true
 end

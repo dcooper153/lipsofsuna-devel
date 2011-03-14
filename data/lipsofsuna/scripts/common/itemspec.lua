@@ -30,6 +30,7 @@ Itemspec.dict_name = {}
 --   <li>destroy_timer: Time in seconds after which to destruct when thrown.</li>
 --   <li>equipment_models: Dictionary of equipment models or nil.</li>
 --   <li>equipment_slot: Equipment slot into which the item can be placed.</li>
+--   <li>equipment_slots_reserved: List of equipment slots that the item reserves in addition to the main slot.</li>
 --   <li>health: Number of hit points the item has.</li>
 --   <li>icon: Icon name.</li>
 --   <li>inventory_items: List of inventory items for containers.</li>
@@ -46,6 +47,13 @@ Itemspec.dict_name = {}
 Itemspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.crafting_enabled = (self.crafting_count or self.crafting_materials or self.crafting_skills) and true
+	-- Reserved equipment slots.
+	if args.equipment_slots_reserved then
+		self.equipment_slots_reserved = {}
+		for k,v in pairs(args.equipment_slots_reserved) do
+			self.equipment_slots_reserved[v] = true
+		end
+	end
 	-- Models.
 	-- The table, if present, maps a list of models for one or more species.
 	-- The race name can contain multiple races separated by a slash.
