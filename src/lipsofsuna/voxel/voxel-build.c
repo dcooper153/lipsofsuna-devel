@@ -421,13 +421,13 @@ static int private_merge_triangles_model (
 						uv[1] = -scale * coord[j].z;
 						break;
 					case LIVOX_TRIANGULATE_NEGATIVE_Z:
-						uv[0] = scale * coord[j].y;
-						uv[1] = scale * coord[j].x;
+						uv[0] = -scale * coord[j].x;
+						uv[1] = scale * coord[j].y;
 						break;
 					case LIVOX_TRIANGULATE_POSITIVE_Z:
 					default:
-						uv[0] = scale * coord[j].y;
-						uv[1] = -scale * coord[j].x;
+						uv[0] = scale * coord[j].x;
+						uv[1] = scale * coord[j].y;
 						break;
 				}
 			}
