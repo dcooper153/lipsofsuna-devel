@@ -17,9 +17,10 @@ Widgets.find_handler_widget = function(clss, handler, args)
 end
 
 Widgets.handle_event = function(clss, args)
+	if Client.moving then return end
 	local generic = {keypress = true, keyrelease = true, mousemotion = true, mouserelease = true}
 	if args.type == "mousepress" then
-		-- Mouse button pressed and scroll wheel.
+		-- Mouse button pressed or wheel scrolled.
 		if args.button ~= 4 and args.button ~= 5 then
 			local w = clss:find_handler_widget("pressed")
 			if clss:handle_popups(w) then return end
@@ -52,7 +53,10 @@ Widgets.handle_popups = function(clss, w)
 end
 
 Widgets.update = function(clss)
-	local w = clss.focused_widget
+	local w
+	if not Client.moving then
+		w = clss.focused_widget
+	end
 	if clss.focused_widget_prev ~= w then
 		if clss.focused_widget_prev then
 			clss.focused_widget_prev.focused = false
