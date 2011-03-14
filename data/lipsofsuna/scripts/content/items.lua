@@ -196,7 +196,7 @@ Itemspec{
 Itemspec{
 	name = "adamantium hatchet",
 	model = "axe1",
-	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_hold = {animation = "hold-axe", channel = "equip-right"},
 	animation_attack = {animation = "attack-axe", channel = "attack-right"},
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
@@ -275,7 +275,7 @@ Itemspec{
 Itemspec{
 	name = "aquanite hatchet",
 	model = "axe1",
-	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_hold = {animation = "hold-axe", channel = "equip-right"},
 	animation_attack = {animation = "attack-axe", channel = "attack-right"},
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
@@ -354,7 +354,7 @@ Itemspec{
 Itemspec{
 	name = "crimson hatchet",
 	model = "axe1",
-	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_hold = {animation = "hold-axe", channel = "equip-right"},
 	animation_attack = {animation = "attack-axe", channel = "attack-right"},
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 3},
@@ -423,7 +423,7 @@ Itemspec{
 	crafting_materials = {["iron ingot"] = 1},
 	damage = 10,
 	damage_bonus_strength = 0.2,
-	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_hold = {animation = "hold-axe", channel = "equip-right"},
 	animation_attack = {animation = "attack-axe", channel = "attack-right"},
 	equipment_slot = "hand.R",
 	icon = "axe1"}
@@ -485,7 +485,7 @@ Itemspec{
 Itemspec{
 	name = "wooden hatchet",
 	model = "axe1",
-	animation_hold = {animation = "hold-blunt", channel = "equip-right"},
+	animation_hold = {animation = "hold-axe", channel = "equip-right"},
 	animation_attack = {animation = "attack-axe", channel = "attack-right"},
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["log"] = 1},
