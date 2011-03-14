@@ -557,6 +557,8 @@ Itemspec{
 	damage_bonus_willpower = 0.2,
 	armor_class = 0.04,
 	equipment_slot = "hand.R",
+	special_effects = {
+		{slot = "flame", model = "torchfx1"},{slot = "flame2", model = "torchfx1"}},
 	water_gravity = Vector(0,1,0)}
 
 ------------------------------------------------------------------------------
