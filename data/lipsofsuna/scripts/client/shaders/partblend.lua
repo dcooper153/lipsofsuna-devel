@@ -32,9 +32,10 @@ void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
 	vec3 normal = vec3(0.0,0.0,1.0);
+	vec3 halfvector[LOS_LIGHT_MAX];
 	vec3 lightvector[LOS_LIGHT_MAX];
-	]] .. Shader.los_lighting_vectors("lightvector", "tmp.xyz") .. [[
-	]] .. Shader.los_lighting_default("tmp.xyz", "normal", "lightvector") .. [[
+	]] .. Shader.los_lighting_vectors("lightvector", "halfvector", "tmp.xyz") .. [[
+	]] .. Shader.los_lighting_default("tmp.xyz", "normal", "lightvector", "halfvector") .. [[
 	OUT.color = vec4(LOS_normal,LOS_texcoord.x) * lighting;
 	vec4 ref1 = LOS_matrix_projection * tmp;
 	vec4 ref2 = LOS_matrix_projection * (tmp - vec4(LOS_texcoord.yy, 0.0, 0.0));

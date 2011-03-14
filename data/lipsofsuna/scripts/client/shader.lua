@@ -62,7 +62,13 @@ Shader.set_quality = function(self, value)
 	end
 end
 
-Shader.los_lighting_default = function(co, no, lv, sp)
+--- Calculates lighting and stores it to a variable named lighting.
+-- @param co Variable name that contains the fragment coordinate.
+-- @param no Variable name that contains the fragment normal.
+-- @param lv Array name that contains the light vectors.
+-- @param hv Array name that contains the light half vectors.
+-- @param sp Variable name that contains additional specular color.
+Shader.los_lighting_default = function(co, no, lv, hv, sp)
 	return string.format([[int lighting_index;
 	vec4 lighting = vec4(0.0, 0.0, 0.0, 1.0);
 	for(lighting_index = 0 ; lighting_index < LOS_LIGHT_MAX ; lighting_index++)
@@ -70,15 +76,21 @@ Shader.los_lighting_default = function(co, no, lv, sp)
 		vec3 lv = %s[lighting_index];
 		float fattn = 1.0 / dot(LOS_light[lighting_index].equation, vec3(1.0, length(lv), dot(lv, lv)));
 		float fdiff = max(0.0, dot(%s, normalize(lv)));
-		float coeff = max(0.0, dot(%s, reflect(-normalize(lv), %s)));
+		float coeff = max(0.0, dot(%s, normalize(%s)));
 		float fspec = pow(max(0.0, coeff), LOS_material_shininess);
 		lighting.rgb += fattn * (LOS_light[lighting_index].ambient.rgb +
 			fdiff * LOS_light[lighting_index].diffuse.rgb +
-			fspec * LOS_light[lighting_index].specular.rgb * %sLOS_material_specular.rgb);
-	}]], lv, no, no, no, sp and (sp .. ".rgb * ") or "")
+			fdiff * fspec * LOS_light[lighting_index].specular.rgb * %sLOS_material_specular.rgb);
+	}]], lv, no, no, hv, sp and (sp .. ".rgb * ") or "")
 end
 
-Shader.los_lighting_hair = function(co, no, ta, lv)
+--- Calculates lighting and stores it to a variable named lighting.
+-- @param co Variable name that contains the fragment coordinate.
+-- @param no Variable name that contains the fragment normal.
+-- @param ta Variable name that contains the fragment tangent.
+-- @param lv Array name that contains the light vectors.
+-- @param hv Array name that contains the light half vectors.
+Shader.los_lighting_hair = function(co, no, ta, lv, hv)
 	return string.format([[int lighting_index;
 	vec4 lighting = vec4(0.0, 0.0, 0.0, 1.0);
 	for(lighting_index = 0 ; lighting_index < LOS_LIGHT_MAX ; lighting_index++)
@@ -86,21 +98,29 @@ Shader.los_lighting_hair = function(co, no, ta, lv)
 		vec3 lv = %s[lighting_index];
 		float fattn = 1.0 / dot(LOS_light[lighting_index].equation, vec3(1.0, length(lv), dot(lv, lv)));
 		float fdiff = max(0.0, 0.25 + 0.75 * dot(%s, normalize(lv)));
-		float coeff1 = max(0.0, dot(%s, reflect(-normalize(lv), %s)));
+		float coeff1 = max(0.0, dot(%s, normalize(%s)));
 		float tanref = max(0.0, dot(%s, reflect(-normalize(%s), %s)));
 		float coeff2 = sqrt(1.0 - tanref * tanref);
 		float coeff = mix(coeff1, coeff2, 0.6);
 		float fspec = pow(coeff, LOS_material_shininess);
 		lighting.rgb += fattn * (LOS_light[lighting_index].ambient.rgb +
 			fdiff * LOS_light[lighting_index].diffuse.rgb +
-			fspec * LOS_light[lighting_index].specular.rgb * LOS_material_specular.rgb);
-	}]], lv, no, no, no, ta, co, no)
+			fdiff * fspec * LOS_light[lighting_index].specular.rgb * LOS_material_specular.rgb);
+	}]], lv, no, no, hv, ta, co, no)
 end
 
-Shader.los_lighting_vectors = function(lv, co)
-	return [[int lighting_vindex;
+--- Calculates the light vectors and half vectors.
+-- @param lv Array name where to return light vectors.
+-- @param hv Array name where to return half vectors.
+-- @oaran co Variable name that contains the transformed vertex coordinate.
+Shader.los_lighting_vectors = function(lv, hv, co)
+	return string.format([[int lighting_vindex;
 	for(lighting_vindex = 0 ; lighting_vindex < LOS_LIGHT_MAX ; lighting_vindex++)
-		]] .. lv .. [[[lighting_vindex] = LOS_light[lighting_vindex].position_premult - ]] .. co .. [[;]]
+	{
+		vec3 lighting_vector = LOS_light[lighting_vindex].position_premult - %s;
+		%s[lighting_vindex] = lighting_vector;
+		%s[lighting_vindex] = normalize(lighting_vector - %s);
+	}]], co, lv, hv, co)
 end
 
 Shader.los_normal_mapping = [[

@@ -24,6 +24,7 @@ pass4_vertex = [[
 out fragvar
 {
 	vec3 coord;
+	vec3 halfvector[LOS_LIGHT_MAX];
 	vec3 lightvector[LOS_LIGHT_MAX];
 	vec3 normal;
 	vec2 texcoord;
@@ -31,7 +32,7 @@ out fragvar
 void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
-	]] .. Shader.los_lighting_vectors("OUT.lightvector", "tmp.xyz") .. [[
+	]] .. Shader.los_lighting_vectors("OUT.lightvector", "OUT.halfvector", "tmp.xyz") .. [[
 	OUT.coord = LOS_coord.xyz;
 	OUT.normal = LOS_matrix_normal * LOS_normal;
 	OUT.texcoord = LOS_texcoord;
@@ -41,6 +42,7 @@ pass4_fragment = [[
 in fragvar
 {
 	vec3 coord;
+	vec3 halfvector[LOS_LIGHT_MAX];
 	vec3 lightvector[LOS_LIGHT_MAX];
 	vec3 normal;
 	vec2 texcoord;
@@ -74,6 +76,6 @@ void main()
 	float b = swirlynoise(2.5 * vec3(x.x, 0.8*x.y, x.z)) + swirlynoise(2.5 * vec3(x.x+0.05, 0.8*x.y, x.z+0.05));
 	b = pow(4.0, b);
 	vec4 diffuse = vec4(0.3*a,0.2+0.3*a,0.1+0.7*a,1.0) * vec4(0.8*b,0.8*b,0.1+b,1.0);
-	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector") .. [[
+	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector", "IN.halfvector") .. [[
 	LOS_output_0 = LOS_material_diffuse * diffuse * lighting * vec4(1.0,1.0,1.0,0.5);
 }]]}}

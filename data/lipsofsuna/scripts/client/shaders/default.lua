@@ -60,6 +60,7 @@ pass4_vertex = [[
 out fragvar
 {
 	vec3 coord;
+	vec3 halfvector[LOS_LIGHT_MAX];
 	vec3 lightvector[LOS_LIGHT_MAX];
 	vec3 normal;
 	vec2 texcoord;
@@ -67,7 +68,7 @@ out fragvar
 void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
-	]] .. Shader.los_lighting_vectors("OUT.lightvector", "tmp.xyz") .. [[
+	]] .. Shader.los_lighting_vectors("OUT.lightvector", "OUT.halfvector", "tmp.xyz") .. [[
 	OUT.coord = tmp.xyz;
 	OUT.normal = LOS_matrix_normal * LOS_normal;
 	OUT.texcoord = LOS_texcoord;
@@ -77,6 +78,7 @@ pass4_fragment = [[
 in fragvar
 {
 	vec3 coord;
+	vec3 halfvector[LOS_LIGHT_MAX];
 	vec3 lightvector[LOS_LIGHT_MAX];
 	vec3 normal;
 	vec2 texcoord;
@@ -85,6 +87,6 @@ void main()
 {
 	vec3 normal = normalize(IN.normal);
 	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
-	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector") .. [[
+	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector", "IN.halfvector") .. [[
 	LOS_output_0 = LOS_material_diffuse * diffuse * lighting;
 }]]}}

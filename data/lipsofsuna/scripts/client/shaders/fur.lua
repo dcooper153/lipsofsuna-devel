@@ -67,9 +67,10 @@ void main()
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
 	vec3 normal = LOS_matrix_normal * LOS_normal;
 	OUT.texcoord = LOS_texcoord;
+	vec3 halfvector[LOS_LIGHT_MAX];
 	vec3 lightvector[LOS_LIGHT_MAX];
-	]] .. Shader.los_lighting_vectors("lightvector", "tmp.xyz") .. [[
-	]] .. Shader.los_lighting_default("tmp.xyz", "normal", "lightvector") .. [[
+	]] .. Shader.los_lighting_vectors("lightvector", "halfvector", "tmp.xyz") .. [[
+	]] .. Shader.los_lighting_default("tmp.xyz", "normal", "lightvector", "halfvector") .. [[
 	OUT.light = lighting;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
@@ -119,9 +120,10 @@ void main()
 	OUT.coord = tmp.xyz;
 	OUT.normal = LOS_matrix_normal * LOS_normal;
 	OUT.texcoord = LOS_texcoord;
+	vec3 halfvector[LOS_LIGHT_MAX];
 	vec3 lightvector[LOS_LIGHT_MAX];
-	]] .. Shader.los_lighting_vectors("lightvector", "tmp.xyz") .. [[
-	]] .. Shader.los_lighting_default("tmp.xyz", "OUT.normal", "lightvector") .. [[
+	]] .. Shader.los_lighting_vectors("lightvector", "halfvector", "tmp.xyz") .. [[
+	]] .. Shader.los_lighting_default("tmp.xyz", "OUT.normal", "lightvector", "halfvector") .. [[
 	OUT.light = lighting;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
