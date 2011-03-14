@@ -76,7 +76,7 @@ Shader.los_lighting_default = function(co, no, lv, hv, sp)
 		vec3 lv = %s[lighting_index];
 		float fattn = 1.0 / dot(LOS_light[lighting_index].equation, vec3(1.0, length(lv), dot(lv, lv)));
 		float fdiff = max(0.0, dot(%s, normalize(lv)));
-		float coeff = max(0.0, dot(%s, normalize(%s)));
+		float coeff = max(0.0, dot(%s, normalize(%s[lighting_index])));
 		float fspec = pow(max(0.0, coeff), LOS_material_shininess);
 		lighting.rgb += fattn * (LOS_light[lighting_index].ambient.rgb +
 			fdiff * LOS_light[lighting_index].diffuse.rgb +
@@ -98,7 +98,7 @@ Shader.los_lighting_hair = function(co, no, ta, lv, hv)
 		vec3 lv = %s[lighting_index];
 		float fattn = 1.0 / dot(LOS_light[lighting_index].equation, vec3(1.0, length(lv), dot(lv, lv)));
 		float fdiff = max(0.0, 0.25 + 0.75 * dot(%s, normalize(lv)));
-		float coeff1 = max(0.0, dot(%s, normalize(%s)));
+		float coeff1 = max(0.0, dot(%s, normalize(%s[lighting_index])));
 		float tanref = max(0.0, dot(%s, reflect(-normalize(%s), %s)));
 		float coeff2 = sqrt(1.0 - tanref * tanref);
 		float coeff = mix(coeff1, coeff2, 0.6);
