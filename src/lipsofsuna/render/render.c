@@ -23,6 +23,7 @@
  */
 
 #include <lipsofsuna/system.h>
+#include <lipsofsuna/video.h>
 #include "render.h"
 #include "render-draw.h"
 
@@ -239,6 +240,46 @@ void liren_render_update (
 {
 	/* Update time. */
 	self->helpers.time += secs;
+}
+
+int liren_render_get_anisotropy (
+	const LIRenRender* self)
+{
+	return self->anisotrophy;
+}
+
+void liren_render_set_anisotropy (
+	LIRenRender* self,
+	int          value)
+{
+	int binding;
+	LIAlgStrdicIter iter;
+	LIRenImage* image;
+
+	/* Check for changes. */
+	/* The OpenGL implementation takes care of clamping the filter setting to
+	   to the maximum supported by the implementation. AMD driver seems to
+	   return zero for GL_MAX_TEXTURE_MAX_ANISTROPY_EXT so it's not even
+	   possible to clamp to any meaningful value here. */
+	if (!GLEW_EXT_texture_filter_anisotropic)
+		return;
+	value = LIMAT_MIN (value, 128);
+	if (value == self->anisotrophy)
+		return;
+	self->anisotrophy = value;
+
+	/* Update the anisotrophy setting of each image. */
+	glGetIntegerv (GL_TEXTURE_BINDING_2D, &binding);
+	LIALG_STRDIC_FOREACH (iter, self->images)
+	{
+		image = iter.value;
+		if (image->texture != NULL)
+		{
+			glBindTexture (GL_TEXTURE_2D, image->texture->texture);
+			glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, value);
+		}
+	}
+	glBindTexture (GL_TEXTURE_2D, binding);
 }
 
 LIRenContext* liren_render_get_context (

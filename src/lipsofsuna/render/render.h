@@ -36,6 +36,7 @@
 
 struct _LIRenRender
 {
+	int anisotrophy;
 	LIAlgPtrdic* scenes;
 	LIAlgRandom random;
 	LIAlgStrdic* shaders;
@@ -93,6 +94,13 @@ LIAPICALL (int, liren_render_load_image, (
 LIAPICALL (void, liren_render_update, (
 	LIRenRender* self,
 	float        secs));
+
+LIAPICALL (int, liren_render_get_anisotropy, (
+	const LIRenRender* self));
+
+LIAPICALL (void, liren_render_set_anisotropy, (
+	LIRenRender* self,
+	int          value));
 
 LIAPICALL (LIRenContext*, liren_render_get_context, (
 	LIRenRender* self));

@@ -22,6 +22,7 @@
 #include <lipsofsuna/extension.h>
 
 #define LIEXT_SCRIPT_LIGHT "Light"
+#define LIEXT_SCRIPT_RENDER "Render"
 #define LIEXT_SCRIPT_SCENE "Scene"
 #define LIEXT_SCRIPT_SHADER "Shader"
 
@@ -41,6 +42,10 @@ void liext_render_free (
 /*****************************************************************************/
 
 void liext_script_light (
+	LIScrClass* self,
+	void*       data);
+
+void liext_script_render (
 	LIScrClass* self,
 	void*       data);
 

@@ -25,8 +25,9 @@ Views.Options.new = function(clss)
 	self.window_width = 1024
 	self.window_height = 768
 	self.model_quality = 1
-	self.animation_quality = 1.0
-	self.mouse_sensitivity = 1.0
+	self.animation_quality = 1
+	self.anisotrophic_filter = 0
+	self.mouse_sensitivity = 1
 	self.multisamples = 2
 	self.shader_quality = 2
 	self.transparency_quality = 0.3
@@ -63,6 +64,13 @@ Views.Options.new = function(clss)
 	self.scroll_multisamples.pressed = function(widget)
 		local v = widget:get_value_at(Client.cursor_pos)
 		self:set_multisamples(2 ^ math.floor(v + 0.5))
+	end
+	-- Anisotrophy quality.
+	self.scroll_anisotrophy = Widgets.Progress{min = 0, max = 16, text = tostring(self.anisotrophic_filter) .. "x", value = self.anisotrophic_filter}
+	self.scroll_anisotrophy:set_request{width = 100}
+	self.scroll_anisotrophy.pressed = function(widget)
+		local v = widget:get_value_at(Client.cursor_pos)
+		self:set_anisotrophic_filter(math.floor(v + 0.5))
 	end
 	-- Model quality adjustment.
 	self.button_model_quality = Widgets.Button{text = "High quality"}
@@ -142,6 +150,7 @@ Views.Options.new = function(clss)
 	quality_group:append_row(Widgets.Label{text = "Models"}, self.button_model_quality)
 	quality_group:append_row(Widgets.Label{text = "Shaders"}, self.combo_shader_quality)
 	quality_group:append_row(Widgets.Label{text = "Antialiasing"}, self.scroll_multisamples)
+	quality_group:append_row(Widgets.Label{text = "Anisotrophy"}, self.scroll_anisotrophy)
 	quality_group:append_row(Widgets.Label{text = "Animation"}, self.scroll_animation)
 	quality_group:append_row(Widgets.Label{text = "Transparency"}, self.scroll_transparency)
 	quality_group:append_row(Widgets.Label{text = "VSync"}, self.button_vsync)
@@ -194,6 +203,7 @@ end
 Views.Options.load = function(self)
 	local opts = {
 		animation_quality = function(v) self:set_animation_quality(tonumber(v)) end,
+		anisotrophic_filter = function(v) self:set_anisotrophic_filter(tonumber(v)) end,
 		bloom = function(v) self:set_bloom(v == "true") end,
 		bloom_exposure = function(v) self:set_bloom_exposure(tonumber(v)) end,
 		bloom_luminance = function(v) self:set_bloom_luminance(tonumber(v)) end,
@@ -234,6 +244,7 @@ Views.Options.save = function(self)
 		self.db:query("REPLACE INTO keyval (key,value) VALUES (?,?);", {k, tostring(v)})
 	end
 	write("animation_quality", self.animation_quality)
+	write("anisotrophic_filter", self.anisotrophic_filter)
 	write("bloom", self.bloom_enabled or false)
 	write("bloom_exposure", Bloom.exposure)
 	write("bloom_luminance", Bloom.luminance)
@@ -253,6 +264,14 @@ end
 Views.Options.set_animation_quality = function(self, v)
 	self.animation_quality = v
 	self.scroll_animation.value = v
+	self:changed()
+end
+
+Views.Options.set_anisotrophic_filter = function(self, v)
+	self.anisotrophic_filter = v
+	self.scroll_anisotrophy.value = v
+	self.scroll_anisotrophy.text = tonumber(v) .. "x"
+	Render.anisotrophy = v
 	self:changed()
 end
 
