@@ -861,17 +861,15 @@ Itemspec{
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
-	name = "firestone",
+	name = "imp stone",
 	model = "firestone1",
+	equipment_slot = "hand.L",
 	animation_hold = {animation = "hold-left", channel = "equip-left"},
 	categories = {"misc"},
-	equipment_slot = "hand.L",
-	icon = "torch1",
-	special_effects = {
-		{slot = "flame", model = "torchfx1"}},
 	water_gravity = Vector(0,1,0)}
+
 Itemspec{
-	name = "firestone grenade",
+	name = "firestone",
 	model = "firestone1",
 	mass = 4,
 	categories = {"explosive", "throwable", "weapon"},

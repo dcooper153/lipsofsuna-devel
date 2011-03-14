@@ -479,14 +479,16 @@ Species{
 	categories = {"enemy", "mining"},
 	factions = {"evil"},
 	feat_anims = {"bite"},
-	inventory_size = 0,
+	inventory_size = 2,
+	equipment_slots = {
+		{name = "hand.R", node = "#hand.R"},
+		{name = "hand.L", node = "#hand.L"}},
+	inventory_items = {"imp stone"},
 	jump_force = 4,
-	model = "stoneimp1",
+	model = "stoneimp2",
 	speed_walk = 1,
 	skills = {
 		{name = "health", max = 20, val = 20}},
-	-- maybe no fx for regular stone imp? special_effects = {
-	--	{slot = "hand.L", model = "torchfx1"}}
 	}
 Species{
 	name = "fire imp",
@@ -494,15 +496,15 @@ Species{
 	categories = {"enemy", "mining"},
 	factions = {"evil"},
 	feat_anims = {"bite"},
-	inventory_items = {"firestone"},
+	
 	jump_force = 4,
 	model = "stoneimp2",
 	speed_walk = 1,
+	inventory_size = 2,
 	equipment_slots = {
 		{name = "hand.R", node = "#hand.R"},
 		{name = "hand.L", node = "#hand.L"}},
-	loot_categories = {"misc"},
-	loot_count = {2, 4},
+	inventory_items = {"firestone"},
 	skills = {
 		{name = "health", max = 20, val = 20}}}
 
