@@ -94,6 +94,7 @@ void main()
 {
 	vec3 tangent = normalize(IN.tangent);
 	vec3 normal = los_normal_mapping(IN.normal, tangent, IN.texcoord, LOS_diffuse_texture_1);
+	normal = mix(normal, normalize(IN.normal), IN.splatting);
 	vec4 diffuse0 = texture(LOS_diffuse_texture_0, IN.texcoord);
 	vec4 diffuse1 = texture(LOS_diffuse_texture_2, IN.texcoord);
 	vec4 diffuse = LOS_material_diffuse * mix(diffuse0, diffuse1, IN.splatting);
