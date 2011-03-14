@@ -483,7 +483,7 @@ Species{
 	equipment_slots = {
 		{name = "hand.R", node = "#hand.R"},
 		{name = "hand.L", node = "#hand.L"}},
-	inventory_items = {"imp stone"},
+	inventory_items = {"impstone"},
 	jump_force = 4,
 	model = "stoneimp2",
 	speed_walk = 1,
@@ -496,7 +496,6 @@ Species{
 	categories = {"enemy", "mining"},
 	factions = {"evil"},
 	feat_anims = {"bite"},
-	
 	jump_force = 4,
 	model = "stoneimp2",
 	speed_walk = 1,

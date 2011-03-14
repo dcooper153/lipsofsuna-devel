@@ -861,11 +861,13 @@ Itemspec{
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
-	name = "imp stone",
+	name = "impstone",
 	model = "firestone1",
-	equipment_slot = "hand.L",
-	animation_hold = {animation = "hold-left", channel = "equip-left"},
-	categories = {"misc"},
+	equipment_slot = "hand.R",
+	categories = {"throwable", "weapon"},
+	damage = 5,
+	mass = 4,
+	stacking = false,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -881,7 +883,7 @@ Itemspec{
 	special_effects = {
 		{slot = "flame", model = "torchfx1"}},
 	health = 1,
-	stacking = true}
+	stacking = false}
 ------------------------------------------------------------------------------
 -- Containers.
 
