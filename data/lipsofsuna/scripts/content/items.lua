@@ -858,6 +858,30 @@ Itemspec{
 		{slot = "flame", model = "torchfx1"}},
 	water_gravity = Vector(0,1,0)}
 
+Itemspec{
+	name = "firestone",
+	model = "firestone1",
+	animation_hold = {animation = "hold-left", channel = "equip-left"},
+	categories = {"misc"},
+	equipment_slot = "hand.L",
+	icon = "torch1",
+	special_effects = {
+		{slot = "flame", model = "torchfx1"}},
+	water_gravity = Vector(0,1,0)}
+Itemspec{
+	name = "firestone grenade",
+	model = "firestone1",
+	mass = 4,
+	categories = {"explosive", "throwable", "weapon"},
+	damage = 40,
+	damage_bonus_intelligence = 0.2,
+	destroy_actions = {"explode"},
+	destroy_timer = 5,
+	equipment_slot = "hand.R",
+	special_effects = {
+		{slot = "flame", model = "torchfx1"}},
+	health = 1,
+	stacking = true}
 ------------------------------------------------------------------------------
 -- Containers.
 
