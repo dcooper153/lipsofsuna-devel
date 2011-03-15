@@ -355,6 +355,7 @@ int livox_manager_intersect_ray (
 	LIMatVector dir;
 	LIMatVector pos;
 	LIVoxVoxel voxel;
+	LIVoxMaterial* material;
 
 	/* Calculate step size. */
 	dir = limat_vector_subtract (*ray1, *ray0);
@@ -368,14 +369,16 @@ int livox_manager_intersect_ray (
 	{
 		pos = limat_vector_add (*ray0, limat_vector_multiply (dir, i));
 		livox_manager_get_voxel (self, (int) pos.x, (int) pos.y, (int) pos.z, &voxel);
-		if (voxel.type)
-		{
-			*result_point = pos;
-			result_tile->x = (int) pos.x;
-			result_tile->y = (int) pos.y;
-			result_tile->z = (int) pos.z;
-			return 1;
-		}
+		if (!voxel.type)
+			continue;
+		material = livox_manager_find_material (self, voxel.type);
+		if (material == NULL || material->type == LIVOX_MATERIAL_TYPE_LIQUID)
+			continue;
+		*result_point = pos;
+		result_tile->x = (int) pos.x;
+		result_tile->y = (int) pos.y;
+		result_tile->z = (int) pos.z;
+		return 1;
 	}
 
 	return 0;
