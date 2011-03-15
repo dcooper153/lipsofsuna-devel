@@ -429,18 +429,7 @@ Object.teleport = function(self, args)
 	elseif args.position then
 		self.position = args.position
 	else return end
-	-- Freeze until terrain has been loaded.
-	-- When teleporting to an unloaded sector, it'll take some time until
-	-- the terrain has been loaded. Until then, the sector is empty and the
-	-- object would fall inside ground. This is avoided by freezing the
-	-- object for a short period of time.
-	local mode = self.physics
-	self.physics = "static"
 	self.realized = true
-	Timer{delay = 4, func = function(timer)
-		self.physics = mode
-		timer:disable()
-	end}
 	return true
 end
 
