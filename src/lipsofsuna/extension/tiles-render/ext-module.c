@@ -151,7 +151,8 @@ void liext_tiles_render_free (
 	for (task = self->tasks.completed ; task != NULL ; task = task_next)
 	{
 		task_next = task->next;
-		limdl_model_free (task->model);
+		if (task->model != NULL)
+			limdl_model_free (task->model);
 		lisys_free (task);
 	}
 
