@@ -40,8 +40,8 @@ struct _LIVoxBlockIter
 	     iter.block != NULL ; \
 	     livox_block_iter_next (&iter))
 
-static inline int
-livox_block_iter_next (LIVoxBlockIter* self)
+static inline int livox_block_iter_next (
+	LIVoxBlockIter* self)
 {
 	int x;
 	int y;
@@ -53,7 +53,7 @@ livox_block_iter_next (LIVoxBlockIter* self)
 	/* Find next block. */
 	for (sector = self->sectors.sector ; sector != NULL ; sector = self->sectors.sector)
 	{
-		voxsec = lialg_strdic_find (sector->content, "voxel");
+		voxsec = (LIVoxSector*) lialg_strdic_find (sector->content, "voxel");
 		if (voxsec != NULL && self->blocks < self->voxels->blocks_per_sector)
 		{
 			while (++self->blocks < self->voxels->blocks_per_sector)
@@ -79,13 +79,13 @@ livox_block_iter_next (LIVoxBlockIter* self)
 	return 0;
 }
 
-static inline int
-livox_block_iter_first (LIVoxBlockIter* self,
-                        LIVoxManager*   manager,
-                        void*           filter)
+static inline int livox_block_iter_first (
+	LIVoxBlockIter* self,
+	LIVoxManager*   manager,
+	void*           filter)
 {
 	self->voxels = manager;
-	self->filter = filter;
+	self->filter = (int(*)(LIVoxBlock*)) filter;
 	self->blocks = -1;
 
 	/* Find first sector. */
@@ -121,11 +121,11 @@ struct _LIVoxVoxelIter
 	     iter.sector != NULL ; \
 	     livox_voxel_iter_next (&iter))
 
-static inline int
-livox_voxel_iter_first (LIVoxVoxelIter* self,
-                        LIVoxManager*   voxels,
-                        LIAlgRange*     tiles,
-                        int             load)
+static inline int livox_voxel_iter_first (
+	LIVoxVoxelIter* self,
+	LIVoxManager*   voxels,
+	LIAlgRange*     tiles,
+	int             load)
 {
 	int ret;
 	int offset[3];
@@ -150,7 +150,8 @@ livox_voxel_iter_first (LIVoxVoxelIter* self,
 		goto empty;
 	while (1)
 	{
-		self->sector = lialg_sectors_data_index (self->voxels->sectors, "voxel", self->rangei0.index, self->load);
+		self->sector = (LIVoxSector*) lialg_sectors_data_index (
+			self->voxels->sectors, "voxel", self->rangei0.index, self->load);
 		if (self->sector != NULL)
 			break;
 		if (!lialg_range_iter_next (&self->rangei0))
@@ -189,8 +190,8 @@ empty:
 	return 0;
 }
 
-static inline int
-livox_voxel_iter_next (LIVoxVoxelIter* self)
+static inline int livox_voxel_iter_next (
+	LIVoxVoxelIter* self)
 {
 	int ret;
 	int offset[3];
@@ -212,7 +213,8 @@ livox_voxel_iter_next (LIVoxVoxelIter* self)
 			self->sector = NULL;
 			return 0;
 		}
-		self->sector = lialg_sectors_data_index (self->voxels->sectors, "voxel", self->rangei0.index, self->load);
+		self->sector = (LIVoxSector*) lialg_sectors_data_index (
+			self->voxels->sectors, "voxel", self->rangei0.index, self->load);
 		if (self->sector != NULL)
 			break;
 	}

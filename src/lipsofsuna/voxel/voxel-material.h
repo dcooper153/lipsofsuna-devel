@@ -18,10 +18,9 @@
 #ifndef __VOXEL_MATERIAL_H__
 #define __VOXEL_MATERIAL_H__
 
-#include <lipsofsuna/archive.h>
-#include <lipsofsuna/engine.h>
-#include <lipsofsuna/model.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/archive.h"
+#include "lipsofsuna/model.h"
+#include "lipsofsuna/system.h"
 #include "voxel-types.h"
 
 enum
