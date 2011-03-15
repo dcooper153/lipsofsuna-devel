@@ -142,7 +142,7 @@ Creature.new = function(clss, args)
 	self:set_state{state = "wander"}
 	self:set_movement(0)
 	if self.dead then
-		self:animate{animation = "dead", channel = Animation.CHANNEL_WALK, weight = 0.1, permanent = true}
+		self:animate{animation = "death", channel = Animation.CHANNEL_WALK, permanent = true, repeat_start = 10, time = 10}
 	end
 	copy("realized")
 
@@ -317,8 +317,7 @@ Creature.die = function(self)
 	-- Disable skills.
 	self.skills.enabled = false
 	-- Playback animation.
-	self:animate{animation = "death", weight = 10}
-	self:animate{animation = "dead", channel = Animation.CHANNEL_WALK, weight = 0.1, permanent = true}
+	self:animate{animation = "death", channel = Animation.CHANNEL_WALK, permanent = true, repeat_start = 10}
 	self:animate{channel = Animation.CHANNEL_JUMP}
 	self:animate{channel = Animation.CHANNEL_BLOCK}
 	-- Drop held items.
@@ -568,7 +567,7 @@ Creature.set_block = function(self, value)
 	if not value and not self.blocking then return end
 	if value then
 		self.blocking = Program.time
-		self:animate{animation = "block", channel = Animation.CHANNEL_BLOCK, weight = 10, permanent = true}
+		self:animate{animation = "block", channel = Animation.CHANNEL_BLOCK, permanent = true, repeat_start = 10, weight = 10}
 	else
 		self.blocking = nil
 		self:animate{channel = Animation.CHANNEL_BLOCK}
