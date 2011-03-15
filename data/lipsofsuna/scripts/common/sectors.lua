@@ -66,29 +66,20 @@ Sectors.load_sector = function(self, sector)
 			terrain = true
 		end
 	end
-	-- Load objects. Since tiles are loaded in background, we need to wait for them to be
-	-- loaded before creation the object or else the object will fall inside the ground.
-	-- TODO: Should use a tiles-loaded event to determine when the tiles have been loaded.
+	-- Load objects.
 	if self.save_objects then
 		local rows = self.database:query("SELECT * FROM objects WHERE sector=?;", {sector})
-		Timer{delay = 1, func = function(timer)
-			for k,v in ipairs(rows) do
-				local func = assert(loadstring("return function()\n" .. v[3] .. "\nend"))()
-				if func then
-					local object = func()
-					if object then object.realized = true end
-					table.insert(objects, object)
-				end
+		for k,v in ipairs(rows) do
+			local func = assert(loadstring("return function()\n" .. v[3] .. "\nend"))()
+			if func then
+				local object = func()
+				if object then object.realized = true end
+				table.insert(objects, object)
 			end
-			timer:disable()
-			self:created_sector(sector, terrain, objects)
-		end}
-	else
-		Timer{delay = 1, func = function(timer)
-			timer:disable()
-			self:created_sector(sector, terrain, objects)
-		end}
+		end
+		self:created_sector(sector, terrain, objects)
 	end
+	self:created_sector(sector, terrain, objects)
 end
 
 --- Saves a sector to the database.
