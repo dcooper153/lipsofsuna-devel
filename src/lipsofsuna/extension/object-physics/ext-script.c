@@ -195,7 +195,9 @@ static void Object_sweep_sphere (LIScrArgs* args)
 		}
 		if (result.terrain != NULL)
 		{
-			liphy_terrain_get_tile (result.terrain, result.terrain_index, &vector);
+			vector.x = result.terrain_tile[0];
+			vector.y = result.terrain_tile[1];
+			vector.z = result.terrain_tile[2];
 			liscr_args_sets_vector (args, "tile", &vector);
 		}
 	}

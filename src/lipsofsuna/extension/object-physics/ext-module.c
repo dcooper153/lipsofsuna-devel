@@ -206,7 +206,9 @@ static void private_object_contact (
 	else
 	{
 		object0 = liphy_object_get_userdata (contact->object0);
-		liphy_terrain_get_tile (contact->terrain, contact->terrain_index, &vector);
+		vector.x = contact->terrain_tile[0];
+		vector.y = contact->terrain_tile[1];
+		vector.z = contact->terrain_tile[2];
 		point = liscr_vector_new (script, &contact->point);
 		normal = liscr_vector_new (script, &contact->normal);
 		tile = liscr_vector_new (script, &vector);

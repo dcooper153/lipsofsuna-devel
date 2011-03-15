@@ -18,18 +18,14 @@
 #ifndef __VOXEL_BUILD_H__
 #define __VOXEL_BUILD_H__
 
-#include <lipsofsuna/engine.h>
-#include <lipsofsuna/model.h>
-#include <lipsofsuna/physics.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/model.h"
+#include "lipsofsuna/system.h"
 #include "voxel-manager.h"
 
 typedef struct _LIVoxBuilder LIVoxBuilder;
 
 LIAPICALL (LIVoxBuilder*, livox_builder_new, (
 	LIVoxManager* manager,
-	LIEngEngine*  engine,
-	LIPhyPhysics* physics,
 	int           xstart,
 	int           ystart,
 	int           zstart,
@@ -41,9 +37,8 @@ LIAPICALL (void, livox_builder_free, (
 	LIVoxBuilder* self));
 
 LIAPICALL (int, livox_builder_build, (
-	LIVoxBuilder*  self,
-	LIMdlModel**   result_model,
-	LIPhyTerrain** result_physics));
+	LIVoxBuilder* self,
+	LIMdlModel**  result));
 
 LIAPICALL (int, livox_build_occlusion, (
 	LIVoxManager* manager,

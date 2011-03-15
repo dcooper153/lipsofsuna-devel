@@ -52,7 +52,7 @@ typedef void (*LIPhyTransformCall)(LIPhyObject* object);
 
 struct _LIPhyContact
 {
-	int terrain_index;
+	int terrain_tile[3];
 	float impulse;
 	LIMatVector point;
 	LIMatVector normal;
@@ -63,7 +63,7 @@ struct _LIPhyContact
 
 struct _LIPhyCollision
 {
-	int terrain_index;
+	int terrain_tile[3];
 	float fraction;
 	LIMatVector normal;
 	LIMatVector point;

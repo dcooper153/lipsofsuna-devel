@@ -15,21 +15,38 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_BLOCK_H__
-#define __EXT_BLOCK_H__
+#ifndef __PHYSICS_TERRAIN_HPP__
+#define __PHYSICS_TERRAIN_HPP__
 
-#include "ext-module.h"
+#include "physics-private.h"
+#include <btBulletCollisionCommon.h>
+#include "lipsofsuna/voxel.h"
 
-struct _LIExtBlock
+class LIPhyTerrainShape;
+
+struct _LIPhyTerrain
 {
-	LIExtModule* module;
-	LIPhyTerrain* terrain;
+	int collision_group;
+	int collision_mask;
+	int realized;
+	btCollisionObject* object;
+	LIPhyTerrainShape* shape;
+	LIPhyPhysics* physics;
+	LIVoxManager* voxels;
 };
 
-LIExtBlock* liext_tiles_physics_block_new (
-	LIExtModule* module);
-
-void liext_tiles_physics_block_free (
-	LIExtBlock* self);
+class LIPhyTerrainShape : public btBoxShape
+{
+public:
+	LIPhyTerrainShape (LIPhyTerrain* t) : btBoxShape (btVector3 (10000.0f, 10000.0f, 10000.0f)), terrain (t)
+	{
+		this->m_shapeType = CUSTOM_CONVEX_SHAPE_TYPE;
+	}
+	virtual const char* getName () const
+	{
+		return "Terrain";
+	}
+	LIPhyTerrain* terrain;
+};
 
 #endif

@@ -31,6 +31,7 @@
 #include <lipsofsuna/callback.h>
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/model.h>
+#include "physics-dynamics-world.hpp"
 #include "physics-types.h"
 
 #define LIPHY_BROADPHASE_DBVT
@@ -53,7 +54,7 @@ struct _LIPhyPhysics
 	btDefaultCollisionConfiguration* configuration;
 	btCollisionDispatcher* dispatcher;
 	btConstraintSolver* solver;
-	btDiscreteDynamicsWorld* dynamics;
+	LIPhyDynamicsWorld* dynamics;
 	btGhostPairCallback* ghostcallback;
 	LIAlgList* constraints;
 	LIAlgList* controllers;
@@ -104,38 +105,10 @@ struct _LIPhyPointer
 {
 	int object;
 	void* pointer;
+	int tile[3];
 };
 
-struct _LIPhyTerrain
-{
-	int collision_group;
-	int collision_mask;
-	int offset[3];
-	int realized;
-	int size[3];
-	btBvhTriangleMeshShape* shape;
-	btCollisionObject* object;
-	btTriangleIndexVertexArray* vertex_array;
-	LIPhyPhysics* physics;
-	struct
-	{
-		int count;
-		int capacity;
-		int* array;
-	} indices;
-	struct
-	{
-		int count;
-		int capacity;
-		int* array;
-	} materials;
-	struct
-	{
-		int count;
-		int capacity;
-		btScalar* array;
-	} vertices;
-};
+#include "physics-terrain.hpp"
 
 struct _LIPhyObject
 {
@@ -298,131 +271,7 @@ public:
 
 /*****************************************************************************/
 
-class LIPhyPrivateRaycastWorld : public btCollisionWorld::ClosestRayResultCallback
-{
-public:
-	LIPhyPrivateRaycastWorld (LIPhyObject** ignore_array, int ignore_count, const btVector3& src, const btVector3& dst) :
-		btCollisionWorld::ClosestRayResultCallback (src, dst)
-	{
-		this->ignore_count = ignore_count;
-		this->ignore_array = ignore_array;
-		this->object = NULL;
-		this->terrain = NULL;
-		this->terrain_index = 0;
-	}
-	virtual btScalar addSingleResult (btCollisionWorld::LocalRayResult& result, bool world)
-	{
-		int i;
-		LIPhyObject* object;
-		LIPhyPointer* pointer = (LIPhyPointer*) result.m_collisionObject->getUserPointer ();
-		if (pointer->object)
-		{
-			object = (LIPhyObject*) pointer->pointer;
-			for (i = 0 ; i < this->ignore_count ; i++)
-			{
-				if (object == this->ignore_array[i])
-					return 1.0;
-			}
-			this->object = object;
-			this->terrain = NULL;
-			this->terrain_index = 0;
-		}
-		else if (result.m_localShapeInfo != NULL)
-		{
-			this->object = NULL;
-			this->terrain = (LIPhyTerrain*) pointer->pointer;
-			this->terrain_index = this->terrain->materials.array[result.m_localShapeInfo->m_triangleIndex];
-		}
-		return btCollisionWorld::ClosestRayResultCallback::addSingleResult (result, world);
-	}
-public:
-	int ignore_count;
-	LIPhyObject** ignore_array;
-	LIPhyObject* object;
-	LIPhyTerrain* terrain;
-	int terrain_index;
-};
-
-class LIPhyPrivateConvexcastWorld : public btCollisionWorld::ClosestConvexResultCallback
-{
-public:
-	LIPhyPrivateConvexcastWorld (LIPhyObject** ignore_array, int ignore_count) :
-		btCollisionWorld::ClosestConvexResultCallback (btVector3 (0.0, 0.0, 0.0), btVector3 (0.0, 0.0, 0.0))
-	{
-		this->ignore_count = ignore_count;
-		this->ignore_array = ignore_array;
-		this->object = NULL;
-		this->terrain = NULL;
-		this->terrain_index = 0;
-	}
-	virtual btScalar addSingleResult (btCollisionWorld::LocalConvexResult& result, bool world)
-	{
-		int i;
-		LIPhyObject* object;
-		LIPhyPointer* pointer = (LIPhyPointer*) result.m_hitCollisionObject->getUserPointer ();
-		if (pointer->object)
-		{
-			object = (LIPhyObject*) pointer->pointer;
-			for (i = 0 ; i < this->ignore_count ; i++)
-			{
-				if (object == this->ignore_array[i])
-					return 1.0;
-			}
-			this->object = object;
-			this->terrain = NULL;
-			this->terrain_index = 0;
-		}
-		else if (result.m_localShapeInfo != NULL)
-		{
-			this->object = NULL;
-			this->terrain = (LIPhyTerrain*) pointer->pointer;
-			this->terrain_index = this->terrain->materials.array[result.m_localShapeInfo->m_triangleIndex];
-		}
-		return ClosestConvexResultCallback::addSingleResult (result, world);
-	}
-public:
-	int ignore_count;
-	LIPhyObject** ignore_array;
-	LIPhyObject* object;
-	LIPhyTerrain* terrain;
-	int terrain_index;
-};
-
-class LIPhyPrivateRaycastTerrain : public btTriangleRaycastCallback
-{
-public:
-	LIPhyPrivateRaycastTerrain (const btVector3& a, const btVector3& b) : btTriangleRaycastCallback (a, b)
-	{
-		this->triangle_index = 0;
-	}
-	virtual btScalar reportHit (const btVector3& hitNormalLocal, btScalar hitFraction, int partId, int triangleIndex)
-	{
-		this->triangle_index = triangleIndex;
-		this->normal = hitNormalLocal;
-		return hitFraction;
-	}
-	int triangle_index;
-	btVector3 normal;
-};
-
-class LIPhyPrivateConvexcastTerrain : public btTriangleConvexcastCallback
-{
-public:
-	LIPhyPrivateConvexcastTerrain (const btConvexShape* convexShape, const btTransform& convexShapeFrom, const btTransform& convexShapeTo, const btTransform& triangleToWorld, const btScalar triangleCollisionMargin) :
-		btTriangleConvexcastCallback (convexShape, convexShapeFrom, convexShapeTo, triangleToWorld, triangleCollisionMargin)
-	{
-		this->triangle_index = 0;
-	}
-	virtual btScalar reportHit (const btVector3& hitNormalLocal, const btVector3& hitPointLocal, btScalar hitFraction, int partId, int triangleIndex)
-	{
-		this->triangle_index = triangleIndex;
-		this->normal = hitNormalLocal;
-		this->point = hitPointLocal;
-		return hitFraction;
-	}
-	int triangle_index;
-	btVector3 normal;
-	btVector3 point;
-};
+#include "physics-convexcast.hpp"
+#include "physics-raycast.hpp"
 
 #endif

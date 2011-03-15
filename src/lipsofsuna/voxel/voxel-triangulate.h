@@ -18,10 +18,8 @@
 #ifndef __VOXEL_TRIANGULATE_H__
 #define __VOXEL_TRIANGULATE_H__
 
-#include <lipsofsuna/engine.h>
-#include <lipsofsuna/model.h>
-#include <lipsofsuna/physics.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/model.h"
+#include "lipsofsuna/system.h"
 #include "voxel-build.h"
 
 enum
@@ -39,24 +37,18 @@ struct _LIVoxVoxelB
 {
 	int index;
 	int type;
-	LIEngModel* model;
 	LIMatVector position;
 	LIVoxMaterial* material;
 };
 
 struct _LIVoxBuilder
 {
-	int model_wanted;
-	int physics_wanted;
 	int offset[3];
 	int size[3];
 	int step[3];
 	float tile_width;
 	float vertex_scale;
-	LIEngEngine* engine;
 	LIMdlBuilder* model_builder;
-	LIPhyTerrain* physics;
-	LIPhyPhysics* physics_manager;
 	LIVoxManager* manager;
 	LIVoxVoxel* voxels;
 	LIVoxVoxelB* voxelsb;

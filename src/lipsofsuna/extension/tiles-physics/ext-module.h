@@ -22,45 +22,20 @@
 #include "lipsofsuna/thread.h"
 #include "lipsofsuna/voxel.h"
 
-typedef struct _LIExtBlock LIExtBlock;
-typedef struct _LIExtBuildTask LIExtBuildTask;
 typedef struct _LIExtModule LIExtModule;
-
-struct _LIExtBuildTask
-{
-	LIVoxBlockAddr addr;
-	LIVoxBuilder* builder;
-	LIPhyTerrain* terrain;
-	LIExtBuildTask* next;
-};
 
 struct _LIExtModule
 {
-	LIAlgMemdic* blocks;
-	LICalHandle calls[4];
 	LIMaiProgram* program;
 	LIPhyPhysics* physics;
+	LIPhyTerrain* terrain;
 	LIVoxManager* voxels;
-	struct
-	{
-		LIThrAsyncCall* worker;
-		LIThrMutex* mutex;
-		LIExtBuildTask* pending;
-		LIExtBuildTask* completed;
-	} tasks;
 };
 
 LIExtModule* liext_tiles_physics_new (
 	LIMaiProgram* program);
 
 void liext_tiles_physics_free (
-	LIExtModule* self);
-
-int liext_tiles_physics_build_block (
-	LIExtModule*    self,
-	LIVoxBlockAddr* addr);
-
-void liext_tiles_physics_clear (
 	LIExtModule* self);
 
 #endif

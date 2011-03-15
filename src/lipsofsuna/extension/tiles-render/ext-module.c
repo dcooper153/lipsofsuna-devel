@@ -221,7 +221,6 @@ static int private_block_load (
 
 	/* Initialize a new terrain builder. */
 	task->builder = livox_builder_new (self->voxels,
-		self->program->engine, NULL,
 		manager->tiles_per_line * event->sector[0] + blockw * event->block[0],
 		manager->tiles_per_line * event->sector[1] + blockw * event->block[1],
 		manager->tiles_per_line * event->sector[2] + blockw * event->block[2],
@@ -339,7 +338,7 @@ static void private_worker_thread (
 		lithr_mutex_unlock (self->tasks.mutex);
 
 		/* Process the task. */
-		if (!livox_builder_build (task->builder, &task->model, NULL))
+		if (!livox_builder_build (task->builder, &task->model))
 		{
 			livox_builder_free (task->builder);
 			lithr_mutex_lock (self->tasks.mutex);

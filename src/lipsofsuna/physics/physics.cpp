@@ -22,8 +22,9 @@
  * @{
  */
 
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "physics.h"
+#include "physics-collision-configuration.hpp"
 #include "physics-constraint.h"
 #include "physics-model.h"
 #include "physics-object.h"
@@ -85,11 +86,10 @@ LIPhyPhysics* liphy_physics_new (
 		self->broadphase = new bt32BitAxisSweep3 (vmin, vmax, MAXPROXIES);
 #endif
 		self->broadphase->getOverlappingPairCache ()->setInternalGhostPairCallback (self->ghostcallback);
-		self->configuration = new btDefaultCollisionConfiguration ();
+		self->configuration = new LIPhyCollisionConfiguration ();
 		self->dispatcher = new btCollisionDispatcher (self->configuration);
 		self->solver = new btSequentialImpulseConstraintSolver ();
-		self->dynamics = new btDiscreteDynamicsWorld (self->dispatcher, self->broadphase, self->solver, self->configuration);
-		self->dynamics->setGravity (btVector3 (0.0f, -10.0f, 0.0f));
+		self->dynamics = new LIPhyDynamicsWorld (self->dispatcher, self->broadphase, self->solver, self->configuration);
 		self->dynamics->setInternalTickCallback (private_internal_tick, self);
 	}
 	catch (...)
@@ -167,7 +167,7 @@ int liphy_physics_cast_ray (
 	btCollisionWorld* collision = self->dynamics->getCollisionWorld ();
 
 	/* Cast the ray. */
-	LIPhyPrivateRaycastWorld test (ignore_array, ignore_count, src, dst);
+	LIPhyRaycastWorld test (ignore_array, ignore_count, src, dst);
 	test.m_closestHitFraction = 1.0f;
 	test.m_collisionFilterGroup = group;
 	test.m_collisionFilterMask = mask;
@@ -183,7 +183,9 @@ int liphy_physics_cast_ray (
 		result->normal = limat_vector_init (test.m_hitNormalWorld[0], test.m_hitNormalWorld[1], test.m_hitNormalWorld[2]);
 		result->object = test.object;
 		result->terrain = test.terrain;
-		result->terrain_index = test.terrain_index;
+		result->terrain_tile[0] = test.terrain_tile[0];
+		result->terrain_tile[1] = test.terrain_tile[1];
+		result->terrain_tile[2] = test.terrain_tile[2];
 	}
 
 	return 1;
@@ -222,7 +224,7 @@ int liphy_physics_cast_shape (
 	float best;
 	btCollisionWorld* collision;
 	btConvexShape* btshape;
-	LIPhyPrivateConvexcastWorld test (ignore_array, ignore_count);
+	LIPhyConvexcastWorld test (ignore_array, ignore_count);
 	btTransform btstart (
 		btQuaternion (start->rotation.x, start->rotation.y, start->rotation.z, start->rotation.w),
 		btVector3 (start->position.x, start->position.y, start->position.z));
@@ -251,7 +253,9 @@ int liphy_physics_cast_shape (
 			result->normal = limat_vector_init (test.m_hitNormalWorld[0], test.m_hitNormalWorld[1], test.m_hitNormalWorld[2]);
 			result->object = test.object;
 			result->terrain = test.terrain;
-			result->terrain_index = test.terrain_index;
+			result->terrain_tile[0] = test.terrain_tile[0];
+			result->terrain_tile[1] = test.terrain_tile[1];
+			result->terrain_tile[2] = test.terrain_tile[2];
 		}
 	}
 
@@ -294,7 +298,7 @@ int liphy_physics_cast_sphere (
 	LIPhyPointer* pointer;
 
 	/* Initialize sweep. */
-	LIPhyPrivateConvexcastWorld test (ignore_array, ignore_count);
+	LIPhyConvexcastWorld test (ignore_array, ignore_count);
 	test.m_closestHitFraction = 1.0f;
 	test.m_collisionFilterGroup = group;
 	test.m_collisionFilterMask = mask;
@@ -316,13 +320,17 @@ int liphy_physics_cast_sphere (
 		{
 			result->object = (LIPhyObject*) pointer->pointer;
 			result->terrain = NULL;
-			result->terrain_index = 0;
+			result->terrain_tile[0] = 0;
+			result->terrain_tile[1] = 0;
+			result->terrain_tile[2] = 0;
 		}
 		else
 		{
 			result->object = NULL;
 			result->terrain = (LIPhyTerrain*) pointer->pointer;
-			result->terrain_index = 0;
+			result->terrain_tile[0] = pointer->tile[0];
+			result->terrain_tile[1] = pointer->tile[1];
+			result->terrain_tile[2] = pointer->tile[2];
 			liphy_terrain_cast_sphere (result->terrain, start, end, radius, result);
 		}
 		return 1;
@@ -448,21 +456,17 @@ static bool private_contact_processed (
 	else
 	{
 		contact.terrain = (LIPhyTerrain*) pointer0->pointer;
-		if (point.m_index0 >= contact.terrain->materials.count)
-			return false;
-		contact.terrain_index = contact.terrain->materials.array[point.m_index0];
+		memcpy (contact.terrain_tile, pointer1->tile, 3 * sizeof (int));
 	}
 	if (pointer1->object)
 	{
 		contact.object1 = (LIPhyObject*) pointer1->pointer;
-		physics = contact.object0->physics;
+		physics = contact.object1->physics;
 	}
 	else
 	{
 		contact.terrain = (LIPhyTerrain*) pointer1->pointer;
-		if (point.m_index1 >= contact.terrain->materials.count)
-			return false;
-		contact.terrain_index = contact.terrain->materials.array[point.m_index1];
+		memcpy (contact.terrain_tile, pointer1->tile, 3 * sizeof (int));
 	}
 
 	/* Make sure that the contact involved at least one object with a contact

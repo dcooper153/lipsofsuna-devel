@@ -18,43 +18,21 @@
 #ifndef __PHYSICS_TERRAIN_H__
 #define __PHYSICS_TERRAIN_H__
 
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/model.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/model.h"
+#include "lipsofsuna/system.h"
+#include "lipsofsuna/voxel.h"
 #include "physics.h"
 #include "physics-types.h"
 
 LIAPICALL (LIPhyTerrain*, liphy_terrain_new, (
 	LIPhyPhysics* physics,
-	const int*    offset,
-	const int*    size,
+	LIVoxManager* voxels,
 	int           collision_group,
 	int           collision_mask));
 
 LIAPICALL (void, liphy_terrain_free, (
 	LIPhyTerrain* self));
-
-LIAPICALL (void, liphy_terrain_clear, (
-	LIPhyTerrain* self));
-
-LIAPICALL (int, liphy_terrain_add_aabb, (
-	LIPhyTerrain*         self,
-	const LIMatAabb*      aabb,
-	const LIMatTransform* transform));
-
-LIAPICALL (int, liphy_terrain_add_model, (
-	LIPhyTerrain*         self,
-	int                   index,
-	LIPhyModel*           model,
-	const LIMatTransform* transform,
-	float                 scale));
-
-LIAPICALL (int, liphy_terrain_add_vertices, (
-	LIPhyTerrain*         self,
-	int                   index,
-	const LIMatVector*    vertices,
-	int                   count,
-	const LIMatTransform* transform));
 
 LIAPICALL (int, liphy_terrain_cast_ray, (
 	const LIPhyTerrain* self,
@@ -75,11 +53,6 @@ LIAPICALL (int, liphy_terrain_cast_sphere, (
 	const LIMatVector*  end,
 	float               radius,
 	LIPhyCollision*     result));
-
-LIAPICALL (void, liphy_terrain_get_tile, (
-	LIPhyTerrain* self,
-	int           index,
-	LIMatVector*  result));
 
 LIAPICALL (void, liphy_terrain_set_realized, (
 	LIPhyTerrain* self,
