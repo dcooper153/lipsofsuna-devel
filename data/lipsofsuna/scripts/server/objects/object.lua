@@ -81,6 +81,7 @@ end
 -- @param args Arguments.<ul>
 --   <li>animation: Animation name.</li>
 --   <li>permanent: True to keep playing.</li>
+--   <li>repeat_start: The repeat start time in seconds.</li>
 --   <li>weight: Blending weight.</li></ul>
 -- @return True if started a new animation.
 Object.animate = function(self, args)
@@ -89,7 +90,7 @@ Object.animate = function(self, args)
 		if not self.animations then self.animations = {} end
 		local prev = self.animations[args.channel]
 		if prev and prev[1] == args.animation and prev[2] == args.weight then return end
-		self.animations[args.channel] = {args.animation, args.weight, Program.time}
+		self.animations[args.channel] = {args.animation, args.weight, Program.time, args.repeat_start}
 	elseif self.animations and args.channel then
 		self.animations[args.channel] = nil
 	end

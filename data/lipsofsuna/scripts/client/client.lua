@@ -36,13 +36,13 @@ end}
 -- Vision management.
 
 Protocol:add_handler{type = "OBJECT_ANIMATED", func = function(event)
-	local ok,i,a,c,perm,time,weig = event.packet:read("uint32", "string", "uint8", "bool", "float", "float")
+	local ok,i,a,c,perm,time,weig,start = event.packet:read("uint32", "string", "uint8", "bool", "float", "float", "float")
 	if ok then
 		local o = Object:find{id = i}
 		if o then
 			local anim = (a ~= "" and a or nil)
 			local chan = (c < 255 and c or nil)
-			o:animate{animation = anim, channel = chan, fade_in = 0.3, fade_out = 0.3, permanent = perm, time = time, weight = weig}
+			o:animate{animation = anim, channel = chan, fade_in = 0.3, fade_out = 0.3, permanent = perm, repeat_start = start, time = time, weight = weig}
 		end
 	end
 end}
