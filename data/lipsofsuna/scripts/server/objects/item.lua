@@ -69,7 +69,8 @@ Item.new = function(clss, args)
 	copy("spec")
 	copy("looted")
 	copy("realized")
-	clss.stuck_check_dict[self.id] = self
+	self.update_timer = 0.3 * math.random()
+	clss.update_list[self.id] = self
 	return self
 end
 
@@ -348,10 +349,17 @@ Item.write = function(self)
 end
 
 -- These take care of checking that items don't fall through ground.
-Item.stuck_check_dict = {}
-setmetatable(Item.stuck_check_dict, {__mode = "v"})
-Item.stuck_fix_timer = Timer{delay = 0.2, func = function(timer, secs)
-	for k,v in pairs(Item.stuck_check_dict) do
-		v:update_environment(secs)
+Item.update_list = {}
+Item.update_timer = Timer{delay = 0.5, func = function(timer, secs)
+	local kept = {}
+	for k,v in pairs(Item.update_list) do
+		if v.realized then kept[k] = v end
+		v.update_timer = v.update_timer + secs
+		if v.update_timer > 1.0 then
+			v.update_timer = 0.1 * math.random()
+			v:update_environment(secs)
+		end
 	end
+	Item.update_list = kept
+	setmetatable(Item.update_list, {__mode = "v"})
 end}
