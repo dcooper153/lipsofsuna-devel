@@ -460,12 +460,12 @@ Creature.get_attack_ray = function(self)
 	local ctr = self.spec.aim_ray_center
 	if self.tilt then
 		local rot = Quaternion:new_euler(self.tilt.euler)
-		local src = ctr + rot * Vector(0, 0, -self.spec.aim_ray_start)
-		local dst = ctr + rot * Vector(0, 0, -self.spec.aim_ray_end)
+		local src = self.position + self.rotation * (ctr + rot * Vector(0, 0, -self.spec.aim_ray_start))
+		local dst = self.position + self.rotation * (ctr + rot * Vector(0, 0, -self.spec.aim_ray_end))
 		return src, dst
 	else
-		local src = ctr + Vector(0, 0, -self.spec.aim_ray_start)
-		local dst = ctr + Vector(0, 0, -self.spec.aim_ray_end)
+		local src = self.position + self.rotation * (ctr + Vector(0, 0, -self.spec.aim_ray_start))
+		local dst = self.position + self.rotation * (ctr + Vector(0, 0, -self.spec.aim_ray_end))
 		return src, dst
 	end
 end

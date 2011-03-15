@@ -183,7 +183,7 @@ end
 --   <li>collision: Trigger at collision.</li>
 --   <li>feat: Feat.</li>
 --   <li>owner: Object firing the projectile. (required)</li>
---   <li>point: Firing point relative to the owner.</li>
+--   <li>point: Firing point in world space.</li>
 --   <li>speed: Initial speed.</li>
 --   <li>timer: Trigger at timeout.</li>
 --   <li>weapon: Used weapon.</ul>
@@ -214,16 +214,15 @@ Object.fire = function(self, args)
 	end
 	-- Add the projectile to the world.
 	local src,dst = args.owner:get_attack_ray()
-	local vec = args.owner.rotation * (dst - src)
 	self:detach()
 	self.owner = args.owner
-	self.position = args.owner.position + args.owner.rotation * src
+	self.position = src
 	if args.owner.tilt then
 		self.rotation = args.owner.rotation * args.owner.tilt
 	else
 		self.rotation = args.owner.rotation
 	end
-	self.velocity = vec:normalize() * (args.speed or 20)
+	self.velocity = (dst - src):normalize() * (args.speed or 20)
 	self.save = false
 	self.realized = true
 end

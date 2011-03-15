@@ -127,7 +127,7 @@ Item.die = function(self)
 			for k1,v1 in pairs(Object:find{point = self.position, radius = r2}) do
 				local diff = v1.position - self.position
 				local frac = 0.3 * diff.length / r2
-				local mult = 100 * math.min(50, v1.mass)
+				local mult = 10 * math.min(100, v1.mass)
 				local impulse = diff:normalize() * (mult * (1 - frac))
 				v1:impulse{impulse = impulse, point = Vector()}
 				v1:damaged(40 * (1 - frac))

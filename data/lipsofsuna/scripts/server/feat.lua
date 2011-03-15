@@ -206,13 +206,12 @@ Feat.perform = function(self, args)
 			local weapon = args.user:get_item{slot = slot}
 			if anim.categories["build"] then
 				-- Build terrain or machines.
-				-- While the attack animation is played, a sphere is swept along
-				-- the path of the attack point. If a tile collides with the
-				-- sphere, a new tile attached to it.
+				-- While the attack animation is played, an attack ray is cast.
+				-- If a tile collides with the ray, a new tile is attached to it.
 				Thread(function(self)
 					Thread:sleep(args.user.spec.timing_build * 0.05)
 					local src,dst = args.user:get_attack_ray(args)
-					local r = args.user:sweep_sphere{src = src, dst = dst, radius = 0.1}
+					local r = Physics:cast_ray{src = src, dst = dst}
 					if not r or not r.tile then return end
 					feat:apply{
 						attacker = args.user,
@@ -224,13 +223,12 @@ Feat.perform = function(self, args)
 			end
 			if anim.categories["melee"] then
 				-- Melee attack.
-				-- While the attack animation is played, a sphere is swept along
-				-- the path of the attack point. The first object or tile that
-				-- collides with the sphere is damaged.
+				-- While the attack animation is played, an attack ray is cast.
+				-- The first object or tile that collides with the ray is damaged.
 				Thread(function(self)
 					Thread:sleep(args.user.spec.timing_attack_blunt * 0.05)
 					local src,dst = args.user:get_attack_ray(args)
-					local r = args.user:sweep_sphere{src = src, dst = dst, radius = 0.1}
+					local r = Physics:cast_ray{src = src, dst = dst}
 					if not r then return end
 					feat:apply{
 						attacker = args.user,
@@ -289,12 +287,9 @@ Feat.perform = function(self, args)
 				-- care of damaging the hit object or tile.
 				Thread(function(self)
 					Thread:sleep(args.user.spec.timing_attack_throw * 0.05)
-					local src = args.user:get_attack_ray(args)
-					local point = args.user.position + args.user.rotation * src
 					local proj = weapon:fire{
 						collision = not weapon.spec.destroy_timer,
 						feat = feat,
-						point = point,
 						owner = args.user,
 						speed = 10,
 						timer = weapon.spec.destroy_timer}
@@ -302,13 +297,12 @@ Feat.perform = function(self, args)
 			end
 			if anim.categories["touch"] then
 				-- Touch spell.
-				-- While the attack animation is played, a sphere is swept along
-				-- the path of the attack point. The first object or tile that
-				-- collides with the sphere is damaged.
+				-- While the attack animation is played, an attack ray is cast.
+				-- The first object or tile that collides with the ray is damaged.
 				Thread(function(self)
 					Thread:sleep(args.user.spec.timing_spell_touch * 0.05)
 					local src,dst = args.user:get_attack_ray(args)
-					local r = args.user:sweep_sphere{src = src, dst = dst, radius = 0.1}
+					local r = Physics:cast_ray{src = src, dst = dst}
 					if not r then return end
 					feat:apply{
 						attacker = args.user,
