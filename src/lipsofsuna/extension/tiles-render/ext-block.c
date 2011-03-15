@@ -64,55 +64,5 @@ void liext_tiles_render_block_clear (
 	}
 }
 
-int liext_tiles_render_block_build (
-	LIExtBlock*     self,
-	LIVoxBlockAddr* addr)
-{
-	int blockw;
-	LIMdlModel* model = NULL;
-	LIVoxBuilder* builder;
-	LIVoxManager* manager;
-
-	/* Free old objects. */
-	liext_tiles_render_block_clear (self);
-
-	/* Build new objects. */
-	manager = self->module->voxels;
-	blockw = manager->tiles_per_line / manager->blocks_per_line;
-	builder = livox_builder_new (self->module->voxels,
-		self->module->program->engine, NULL,
-		manager->tiles_per_line * addr->sector[0] + blockw * addr->block[0],
-		manager->tiles_per_line * addr->sector[1] + blockw * addr->block[1],
-		manager->tiles_per_line * addr->sector[2] + blockw * addr->block[2],
-		blockw, blockw, blockw);
-	if (builder == NULL)
-		return 0;
-	if (!livox_builder_build (builder, &model, NULL))
-	{
-		livox_builder_free (builder);
-		return 0;
-	}
-	livox_builder_free (builder);
-
-	/* Create render model if not empty. */
-	if (model != NULL)
-	{
-		self->model = liren_model_new (self->module->client->render, model, 0);
-		limdl_model_free (model);
-		if (self->model != NULL)
-		{
-			self->object = liren_object_new (self->module->client->scene, 0);
-			if (self->object != NULL)
-				liren_object_set_model (self->object, self->model);
-		}
-	}
-
-	/* Realize if not empty. */
-	if (self->object != NULL)
-		liren_object_set_realized (self->object, 1);
-
-	return 1;
-}
-
 /** @} */
 /** @} */

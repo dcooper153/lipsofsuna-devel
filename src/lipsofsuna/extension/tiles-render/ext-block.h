@@ -33,10 +33,6 @@ LIExtBlock* liext_tiles_render_block_new (
 void liext_tiles_render_block_free (
 	LIExtBlock* self);
 
-int liext_tiles_render_block_build (
-	LIExtBlock*     self,
-	LIVoxBlockAddr* addr);
-
 void liext_tiles_render_block_clear (
 	LIExtBlock* self);
 
