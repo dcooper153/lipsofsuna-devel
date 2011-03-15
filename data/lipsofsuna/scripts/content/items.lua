@@ -116,12 +116,29 @@ Itemspec{
 
 Itemspec{
 	name = "log",
-	model = "book-000", -- FIXME
+	model = "log1",
 	mass = 1,
-	categories = {"build", "material"},
+	categories = {"build", "material","throwable"},
+	animation_hold = {animation = "hold-bulky", channel = "equip-right"},
+	animation_attack = {animation = "throw-bulky", channel = "attack-right"},
 	construct_tile = "wood1",
 	construct_tile_count = 1,
 	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
+	stacking = true,
+	water_gravity = Vector(0,1,0)}
+
+Itemspec{
+	name = "another log",
+	model = "log2",
+	mass = 1,
+	categories = {"build", "material","throwable"},
+	animation_hold = {animation = "hold-bulky", channel = "equip-right"},
+	animation_attack = {animation = "throw-bulky", channel = "attack-right"},
+	construct_tile = "wood1",
+	construct_tile_count = 1,
+	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
 	stacking = true,
 	water_gravity = Vector(0,1,0)}
 
@@ -867,6 +884,8 @@ Itemspec{
 	model = "firestone1",
 	equipment_slot = "hand.R",
 	categories = {"throwable", "weapon"},
+	animation_hold = {animation = "hold-bulky", channel = "equip-right"},
+	animation_attack = {animation = "throw-bulky", channel = "attack-right"},
 	damage = 5,
 	mass = 4,
 	stacking = false,
@@ -877,6 +896,8 @@ Itemspec{
 	model = "firestone1",
 	mass = 4,
 	categories = {"explosive", "throwable", "weapon"},
+	animation_hold = {animation = "hold-bulky", channel = "equip-right"},
+	animation_attack = {animation = "throw-bulky", channel = "attack-right"},
 	damage = 40,
 	damage_bonus_intelligence = 0.2,
 	destroy_actions = {"explode"},
