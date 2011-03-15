@@ -152,6 +152,7 @@ lieng_object_ref (LIEngObject* self,
  * \param channel Channel index.
  * \param animation Animation name or NULL.
  * \param permanent Nonzero if should repeat infinitely.
+ * \param repeat_start Starting time when repeating.
  * \param priority_scale Scaling blending priority.
  * \param priority_transform Location and rotation blending priority.
  * \param time Starting time in seconds.
@@ -164,6 +165,7 @@ int lieng_object_animate (
 	int          channel,
 	const char*  animation,
 	int          permanent,
+	int          repeat_start,
 	float        priority_scale,
 	float        priority_transform,
 	float        time,
@@ -200,6 +202,7 @@ int lieng_object_animate (
 	{
 		limdl_pose_set_channel_animation (self->pose, channel, animation);
 		limdl_pose_set_channel_repeats (self->pose, channel, permanent? -1 : 1);
+		limdl_pose_set_channel_repeat_start (self->pose, channel, repeat_start);
 		limdl_pose_set_channel_priority_scale (self->pose, channel, priority_scale);
 		limdl_pose_set_channel_priority_transform (self->pose, channel, priority_transform);
 		limdl_pose_set_channel_position (self->pose, channel, time);

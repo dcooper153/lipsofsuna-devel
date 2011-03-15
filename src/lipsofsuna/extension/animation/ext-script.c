@@ -42,6 +42,7 @@
  * --   <li>weight: Blending weight.</li>
  * --   <li>time: Starting time.</li>
  * --   <li>permanent: True if should keep repeating.</li></ul>
+ * --   <li>repeat_start: Starting time when repeating.</li>
  * -- @return True if started a new animation.
  * function Object.animate(self, args)
  */
@@ -49,6 +50,7 @@ static void Object_animate (LIScrArgs* args)
 {
 	int ret;
 	int repeat = 0;
+	int repeat_start = 0;
 	int channel = -1;
 	float fade_in = 0.0f;
 	float fade_out = 0.0f;
@@ -65,11 +67,13 @@ static void Object_animate (LIScrArgs* args)
 	liscr_args_gets_float (args, "weight_scale", &weight_scale);
 	liscr_args_gets_float (args, "time", &time);
 	liscr_args_gets_bool (args, "permanent", &repeat);
+	liscr_args_gets_int (args, "repeat_start", &repeat_start);
 	if (channel < 1 || channel > 255)
 		channel = -1;
 	else
 		channel--;
-	ret = lieng_object_animate (args->self, channel, animation, repeat, weight_scale, weight, time, fade_in, fade_out);
+	repeat_start = LIMAT_MAX (0, repeat_start);
+	ret = lieng_object_animate (args->self, channel, animation, repeat, repeat_start, weight_scale, weight, time, fade_in, fade_out);
 	liscr_args_seti_bool (args, ret);
 }
 
@@ -221,6 +225,7 @@ static void Object_get_animation (LIScrArgs* args)
 		return;
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
 	liscr_args_sets_string (args, "animation", anim->name);
+	liscr_args_sets_bool (args, "repeat_start", limdl_pose_get_channel_repeat_start (object->pose, chan));
 	liscr_args_sets_float (args, "time", limdl_pose_get_channel_position (object->pose, chan));
 	liscr_args_sets_float (args, "weight", limdl_pose_get_channel_priority_transform (object->pose, chan));
 	liscr_args_sets_float (args, "weight_scale", limdl_pose_get_channel_priority_scale (object->pose, chan));

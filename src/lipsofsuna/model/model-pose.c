@@ -368,6 +368,31 @@ void limdl_pose_set_channel_animation (
 	chan->animation = anim;
 }
 
+int limdl_pose_get_channel_repeat_start (
+	const LIMdlPose* self,
+	int              channel)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_find_channel (self, channel);
+	if (chan == NULL)
+		return 0;
+	return chan->repeat_start;
+}
+
+void limdl_pose_set_channel_repeat_start (
+	LIMdlPose* self,
+	int        channel,
+	int        value)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_create_channel (self, channel);
+	if (chan == NULL)
+		return;
+	chan->repeat_start = value;
+}
+
 void limdl_pose_set_channel_fade_in (
 	LIMdlPose* self,
 	int        channel,
@@ -882,6 +907,7 @@ static int private_play_channel (
 {
 	int cycles;
 	float duration;
+	float start;
 
 	/* Skip empty. */
 	duration = limdl_animation_get_duration (channel->animation);
@@ -895,11 +921,25 @@ static int private_play_channel (
 
 	/* Advance time. */
 	channel->time += secs;
-	cycles = (int) floor (channel->time / duration);
-	channel->time = channel->time - duration * cycles;
 
 	/* Handle looping. */
-	channel->repeat += cycles;
+	if (channel->time > duration)
+	{
+		start = LIMAT_CLAMP (channel->repeat_start, 0.0f, duration);
+		if (start < duration)
+		{
+			cycles = (int) floor ((channel->time - start) / (duration - start));
+			channel->time = channel->time - (duration - start) * cycles;
+			channel->repeat += cycles;
+		}
+		else
+		{
+			channel->time = duration;
+			channel->repeat++;
+		}
+	}
+
+	/* Handle ending. */
 	if (channel->repeats != -1 && channel->repeat >= channel->repeats)
 		return 0;
 
@@ -1038,7 +1078,7 @@ static float private_get_channel_weight (
 	end = channel->repeats * duration;
 
 	/* Fade in period. */
-	if (time < channel->fade_in)
+	if (!channel->repeat && time < channel->fade_in)
 		return time / channel->fade_in;
 
 	/* No fade period. */

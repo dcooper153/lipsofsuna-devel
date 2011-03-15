@@ -61,6 +61,7 @@ LIAPICALL (int, lieng_object_animate, (
 	int          channel,
 	const char*  animation,
 	int          permanent,
+	int          repeat_start,
 	float        priority_scale,
 	float        priority_transform,
 	float        time,
