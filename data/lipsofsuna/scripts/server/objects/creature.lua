@@ -482,8 +482,11 @@ Creature.inflict_modifier = function(self, name, strength)
 end
 
 Creature.jump = function(self)
+	-- Check for preconditions.
+	if self.blocking then return end
 	local t = Program.time
 	if t - self.jumped < 0.5 then return end
+	-- Jump or swim.
 	if self.submerged and self.submerged > 0.4 then
 		-- Swimming upwards.
 		local v = self.velocity
