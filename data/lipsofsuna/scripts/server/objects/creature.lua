@@ -499,13 +499,13 @@ Creature.jump = function(self)
 		-- Jumping.
 		if not self.ground then return end
 		self.jumped = t
+		self.jumping = true
 		Effect:play{effect = "jump1", object = self}
 		self:animate{animation = "jump", channel = Animation.CHANNEL_JUMP}
 		Thread(function(thread)
 			Thread:sleep(self.spec.timing_jump * 0.05)
 			if not self.realized then return end
 			local v = self.velocity
-			self.jumping = true
 			Object.jump(self, {impulse = Vector(v.x, self.spec.jump_force * self.spec.mass, v.z)})
 		end)
 	end
@@ -566,6 +566,7 @@ end
 -- @param self Creature.
 -- @param value True to block.
 Creature.set_block = function(self, value)
+	if self.jumping then return end
 	if value and self.blocking then return end
 	if not value and not self.blocking then return end
 	if value then
