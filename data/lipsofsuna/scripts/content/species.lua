@@ -4,7 +4,45 @@ local regen = 0.5
 -- Base races.
 
 Species{
+	name = "base",
+	animations = {
+		["attack axe"] = {animation = "attack-axe", channel = 2, weight = 30},
+		["attack blunt"] = {animation = "attack-blunt", channel = 2, weight = 30},
+		["attack bow"] = {animation = "fire-bow", channel = 2, weight = 30},
+		["attack fist"] = {animation = "punch", channel = 2, weight = 30},
+		["attack staff"] = {animation = "attack-staff", channel = 2, weight = 30},
+		["block start"] = {animation = "block", channel = 2, permanent = true, repeat_start = 10, weight = 5},
+		["block stop"] = {animation = "block-stop", channel = 2},
+		["build"] = {animation = "punch", channel = 2, weight = 30},
+		["hold axe"] = {animation = "hold-axe", channel = 3, weight = 20},
+		["hold bulky"] = {animation = "hold-bulky", channel = 3, weight = 20},
+		["hold staff"] = {animation = "hold-staff", channel = 3, weight = 20},
+		["hold shield"] = {animation = "hold-left", channel = 4, weight = 5},
+		["hold torch"] = {animation = "hold-left", channel = 4, weight = 50},
+		["dead"] = {animation = "death", channel = 1, permanent = true, repeat_start = 10, time = 10},
+		["death"] = {animation = "death", channel = 1, permanent = true, repeat_start = 10},
+		["idle"] = {animation = "idle", channel = 1, permanent = true},
+		["run"] = {animation = "run", channel = 1, permanent = true},
+		["jump"] = {animation = "jump", channel = 2, fade_out = 0.4, permanent = true, repeat_start = 10, weight = 10},
+		["land ground"] = {animation = "land", channel = 2, fade_in = 0.1, fade_out = 0.1, weight = 10},
+		["land water"] = {animation = "land", channel = 2},
+		["pick up"] = {animation = "pickup", channel = 2, weight = 10},
+		["run left"] = {animation = "run-left", channel = 1, permanent = true},
+		["run right"] = {animation = "run-right", channel = 1, permanent = true},
+		["spell ranged"] = {animation = "cast-spell", channel = 2, weight = 30},
+		["spell self"] = {animation = "cast-spell", channel = 2, weight = 30},
+		["spell touch"] = {animation = "cast-spell", channel = 2, weight = 30},
+		["strafe left"] = {animation = "strafe-left", channel = 1, permanent = true},
+		["strafe right"] = {animation = "strafe-right", channel = 1, permanent = true},
+		["throw"] = {animation = "throw", channel = 2, weight = 10},
+		["throw bulky"] = {animation = "throw-bulky", channel = 2, weight = 10},
+		["throw grenade"] = {animation = "throw", channel = 2, weight = 10},
+		["walk"] = {animation = "walk", channel = 1, permanent = true},
+		["walk back"] = {animation = "walk-back", channel = 1, permanent = true}}}
+
+Species{
 	name = "race",
+	base = "base",
 	aim_ray_center = Vector(0, 1.5, 0),
 	aim_ray_end = 5,
 	aim_ray_start = 0.5,
@@ -382,8 +420,11 @@ Species{
 
 Species{
 	name = "bloodworm",
+	base = "base",
 	ai_enable_strafe = false,
 	ai_enable_defend = false,
+	animations = {
+		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"enemy"},
 	factions = {"evil"},
 	feat_anims = {"bite"},
@@ -397,10 +438,15 @@ Species{
 
 Species{
 	name = "dragon",
+	base = "base",
 	model = "dragon1",
 	ai_distance_hint = 2.5,
 	ai_enable_strafe = false,
 	ai_enable_defend = false,
+	animations = {
+		["attack bite"] = {animation = "bite", channel = 2, weight = 30},
+		["attack left claw"] = {animation = "claw-left", channel = 2, weight = 30},
+		["attack right claw"] = {animation = "claw-right", channel = 2, weight = 30}},
 	factions = {"evil"},
 	feat_anims = {"dragon bite", "left claw", "right claw"},
 	inventory_size = 10,
@@ -424,9 +470,12 @@ Species{
 
 Species{
 	name = "lizardman",
+	base = "base",
 	model = "lizardman2",
 	ai_distance_hint = 1.0,
 	ai_enable_defend = false,
+	animations = {
+		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"enemy"},
 	factions = {"evil"},
 	feat_anims = {"right hand","bite"},
@@ -446,8 +495,11 @@ Species{
 
 Species{
 	name = "plague rat",
+	base = "base",
 	ai_enable_strafe = false,
 	ai_enable_defend = false,
+	animations = {
+		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"enemy", "plague"},
 	factions = {"evil"},
 	feat_anims = {"bite"},
@@ -461,8 +513,11 @@ Species{
 
 Species{
 	name = "plague slime",
+	base = "base",
 	ai_enable_strafe = false,
 	ai_enable_defend = false,
+	animations = {
+		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"enemy", "plague"},
 	factions = {"evil"},
 	feat_anims = {"bite"},
@@ -475,6 +530,9 @@ Species{
 
 Species{
 	name = "stone imp",
+	base = "base",
+	animations = {
+		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	ai_enable_defend = false,
 	categories = {"enemy", "mining"},
 	factions = {"evil"},
@@ -488,10 +546,13 @@ Species{
 	model = "stoneimp2",
 	speed_walk = 1,
 	skills = {
-		{name = "health", max = 20, val = 20}},
-	}
+		{name = "health", max = 20, val = 20}}}
+
 Species{
 	name = "fire imp",
+	base = "base",
+	animations = {
+		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	ai_enable_defend = false,
 	categories = {"enemy", "mining"},
 	factions = {"evil"},

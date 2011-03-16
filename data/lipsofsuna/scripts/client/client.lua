@@ -36,15 +36,16 @@ end}
 -- Vision management.
 
 Protocol:add_handler{type = "OBJECT_ANIMATED", func = function(event)
-	local ok,i,a,c,perm,time,weig,start = event.packet:read("uint32", "string", "uint8", "bool", "float", "float", "float")
-	if ok then
-		local o = Object:find{id = i}
-		if o then
-			local anim = (a ~= "" and a or nil)
-			local chan = (c < 255 and c or nil)
-			o:animate{animation = anim, channel = chan, fade_in = 0.3, fade_out = 0.3, permanent = perm, repeat_start = start, time = time, weight = weig}
-		end
+	local ok,i,a,t = event.packet:read("uint32", "string", "float")
+	if not ok then return end
+	local o = Object:find{id = i}
+	if not o then return end
+	local args = {animation = a, fade_in = 0.3, fade_out = 0.3, time = t}
+	local anim = o.spec and o.spec.animations[a]
+	if anim then
+		for k,v in pairs(anim) do args[k] = v end
 	end
+	o:animate(args)
 end}
 
 Protocol:add_handler{type = "OBJECT_DAMAGE", func = function(args)
@@ -65,31 +66,28 @@ Protocol:add_handler{type = "OBJECT_DEAD", func = function(args)
 end}
 
 Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
-	local channels = {
-		["attack-left"] = CHANNEL_LEFT_HAND,
-		["attack-right"] = CHANNEL_RIGHT_HAND}
 	local ok,i,a = event.packet:read("uint32", "string")
 	if not ok then return end
 	-- Find the object.
 	local obj = Object:find{id = i}
 	if not obj then return end
+	if not obj.spec then return end
+	if not obj.spec.animations then return end
 	-- Find the feat animation.
 	local anim = Featanimspec:find{name = a}
 	if not anim then return end
-	-- Play the animation.
-	local animation = {animation = anim.animation, fade_in = 0.5, fade_out = 0.5, weight = 100}
+	-- Find the character animation.
+	-- The animation of the feat may be overridden by a weapon specific
+	-- animation if there's a weapon in the slot used by the feat.
+	local animation = anim.animation
 	if anim.slot and obj.equipment then
 		local weapon = Itemspec:find{name = obj.equipment[anim.slot]}
 		if weapon and weapon.animation_attack then
-			local a = weapon.animation_attack
-			animation.animation = a.animation
-			animation.channel = channels[a.channel]
-			if a.fade_in then animation.fade_in = a.fade_in end
-			if a.fade_out then animation.fade_out = a.fade_out end
-			if a.weight then animation.weight = a.weight end
+			animation = weapon.animation_attack
 		end
 	end
-	obj:animate(animation)
+	-- Play the animation.
+	obj:animate_spec(animation)
 end}
 
 Protocol:add_handler{type = "OBJECT_EFFECT", func = function(event)
@@ -256,9 +254,6 @@ Protocol:add_handler{type = "OBJECT_SKILL", func = function(event)
 end}
 
 Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
-	local channels = {
-		["equip-left"] = Animation.CHANNEL_EQUIP_LEFT,
-		["equip-right"] = Animation.CHANNEL_EQUIP_RIGHT}
 	local ok,i,count,spec,slot = event.packet:read("uint32", "uint32", "string", "string")
 	if ok then
 		local o = Object:find{id = i}
@@ -287,25 +282,13 @@ Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
 			o:update_model()
 		end
 		-- Equip animations.
-		if o.equipment_animations and o.equipment_animations[slot] then
-			local a = o.equipment_animations[slot]
-			o:animate{channel = channels[a.channel or 0]}
-			o.equipment_animations[slot] = nil
-		end
-		if spec and spec.animation_hold then
-			local a = spec.animation_hold
-			if not o.equipment_animations then
-				o.equipment_animations = {[slot] = a}
-			else
+		if spec then
+			local a = o:animate_spec(spec.animation_hold)
+			if o.equipment_animations then
 				o.equipment_animations[slot] = a
+			else
+				o.equipment_animations = {[slot] = a}
 			end
-			o:animate{
-				animation = a.animation,
-				channel = channels[a.channel or 0],
-				fade_in = a.fade_in or 0.5,
-				fade_out = a.fade_out or 0.5,
-				permanent = a.permanent == true or a.permanent == nil,
-				weight = a.weight or 2}
 		end
 	end
 end}

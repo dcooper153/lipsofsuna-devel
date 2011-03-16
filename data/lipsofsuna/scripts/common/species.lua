@@ -24,6 +24,7 @@ Species.dict_name = {}
 --   <li>aim_ray_center: Center vector of the aim ray.</li>
 --   <li>aim_ray_end: Aim ray end distance.</li>
 --   <li>aim_ray_start: Aim ray start distance.</li>
+--   <li>animations: Dictionary of animation playback rules.</li>
 --   <li>blocking_armor: How much armor class blocking offsers.</li>
 --   <li>blocking_cooldown: Time in seconds how long it takes to leave the blocking stance.</li>
 --   <li>blocking_delay: Time in seconds how long it takes to enter the blocking stance.</li>
@@ -70,9 +71,9 @@ Species.new = function(clss, args)
 	-- The arguments used to initialize each species have been stored to the
 	-- args field of the instance so that they can be easily copied to the
 	-- inherited species here.
-	if args.base then
+	local base = args.base and Species:find{name = args.base}
+	if base then
 		local t = {}
-		local base = Species:find{name = args.base}
 		for k,v in pairs(base.args) do t[k] = v end
 		for k,v in pairs(args) do t[k] = v end
 		args = t
@@ -84,13 +85,24 @@ Species.new = function(clss, args)
 	-- allow easy inheritance.
 	local self = Spec.new(clss, args)
 	self.args = args
-	self.equipment_slots = {}
-	self.factions = {}
-	self.feat_anims = {}
-	self.feat_effects = {}
-	self.skills = {}
+	-- Animations.
+	-- Inheritance of animations is special in that they're inherited
+	-- in per animation basis instead of the usual all or none inheritance.
+	-- This allows species to replace individual animations easily.
+	self.animations = {}
+	if base and base.animations then
+		for k,v in pairs(base.animations) do
+			self.animations[k] = v
+		end
+	end
+	if args.animations then
+		for k,v in pairs(args.animations) do
+			self.animations[k] = v
+		end
+	end
 	-- Equipment slots.
 	-- Converted from a list to a dictionary to make searching easier.
+	self.equipment_slots = {}
 	if args.equipment_slots then
 		for k,v in pairs(args.equipment_slots) do
 			self.equipment_slots[v.name] = v
@@ -99,8 +111,8 @@ Species.new = function(clss, args)
 	-- Factions.
 	-- Converted from a list to a dictionary to make searching easier.
 	-- The faction names are also replaced by the faction objects themselves.
+	self.factions = {}
 	if args.factions then
-		self.factions = {}
 		for k,v in pairs(args.factions) do
 			self.factions[v] = Faction:find{name = v}
 		end
@@ -108,11 +120,13 @@ Species.new = function(clss, args)
 	-- Feats.
 	-- Converted from a list to a dictionary to make searching easier.
 	-- The key is the name of the feat and the value is unused.
+	self.feat_anims = {}
 	if args.feat_anims then
 		for k,v in pairs(args.feat_anims) do
 			self.feat_anims[v] = true
 		end
 	end
+	self.feat_effects = {}
 	if args.feat_effects then
 		for k,v in pairs(args.feat_effects) do
 			self.feat_effects[v] = true
@@ -120,6 +134,7 @@ Species.new = function(clss, args)
 	end
 	-- Skills.
 	-- Converted from a list to a dictionary to make searching easier.
+	self.skills = {}
 	if args.skills then
 		for k,v in pairs(args.skills) do
 			self.skills[v.name] = v

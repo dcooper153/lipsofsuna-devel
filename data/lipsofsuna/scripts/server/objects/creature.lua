@@ -141,9 +141,7 @@ Creature.new = function(clss, args)
 	self:calculate_combat_ratings()
 	self:set_state{state = "wander"}
 	self:set_movement(0)
-	if self.dead then
-		self:animate{animation = "death", channel = Animation.CHANNEL_WALK, permanent = true, repeat_start = 10, time = 10}
-	end
+	if self.dead then self:animate("dead") end
 	copy("realized")
 
 	Thread(function()
@@ -182,16 +180,14 @@ Creature.calculate_animation = function(self)
 	local right = self.strafing > 0
 	local run = self.running
 	-- Select the animation.
-	if back then anim = "walk-back"
-	elseif front and right then anim = "run-right"
-	elseif front and left then anim = "run-left"
-	elseif front and run and not self.blocking then anim = "run"
-	elseif front then anim = "walk"
-	elseif left then anim = "strafe-left"
-	elseif right then anim = "strafe-right"
-	else anim = "idle" end
-	-- Playback the animation.
-	self:animate{animation = anim, channel = Animation.CHANNEL_WALK, weight = 0.1, permanent = true}
+	if back then self:animate("walk back")
+	elseif front and right then self:animate("run right")
+	elseif front and left then self:animate("run left")
+	elseif front and run and not self.blocking then self:animate("run")
+	elseif front then self:animate("walk")
+	elseif left then self:animate("strafe left")
+	elseif right then self:animate("strafe right")
+	else self:animate("idle") end
 end
 
 --- Updates the combat ratings of the creature.
@@ -317,9 +313,7 @@ Creature.die = function(self)
 	-- Disable skills.
 	self.skills.enabled = false
 	-- Playback animation.
-	self:animate{animation = "death", channel = Animation.CHANNEL_WALK, permanent = true, repeat_start = 10}
-	self:animate{channel = Animation.CHANNEL_JUMP}
-	self:animate{channel = Animation.CHANNEL_BLOCK}
+	self:animate("death")
 	-- Drop held items.
 	local o = self:get_item{slot = "hand.L"}
 	if o then
@@ -501,7 +495,7 @@ Creature.jump = function(self)
 		self.jumped = t
 		self.jumping = true
 		Effect:play{effect = "jump1", object = self}
-		self:animate{animation = "jump", channel = Animation.CHANNEL_JUMP}
+		self:animate("jump")
 		Thread(function(thread)
 			Thread:sleep(self.spec.timing_jump * 0.05)
 			if not self.realized then return end
@@ -571,10 +565,10 @@ Creature.set_block = function(self, value)
 	if not value and not self.blocking then return end
 	if value then
 		self.blocking = Program.time
-		self:animate{animation = "block", channel = Animation.CHANNEL_BLOCK, permanent = true, repeat_start = 10, weight = 10}
+		self:animate("block start")
 	else
 		self.blocking = nil
-		self:animate{channel = Animation.CHANNEL_BLOCK}
+		self:animate("block stop")
 	end
 	self:calculate_speed()
 	self:calculate_animation()
@@ -672,12 +666,12 @@ Creature.update = function(self, secs)
 		self.jump_timer = (self.jump_timer or 0) + secs
 		if self.jump_timer > 0.2 and Program.time - self.jumped > 0.5 and self.ground then
 			if not self.submerged or self.submerged < 0.3 then
-				self:animate{animation = "land", channel = Animation.CHANNEL_JUMP, weight = 10.0}
+				self:animate("land ground")
 				if self.spec.effect_landing then
 					Effect:play{effect = self.spec.effect_landing, object = self}
 				end
 			else
-				self:animate{channel = Animation.CHANNEL_JUMP}
+				self:animate("land water")
 			end
 			self.jumping = nil
 		end

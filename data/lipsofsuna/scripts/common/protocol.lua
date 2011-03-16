@@ -120,15 +120,5 @@ end
 moveitem = { INVENTORY = 0, EQUIPMENT = 1, WORLD = 2 }
 
 Animation = {}
-Animation.CHANNEL_WALK = 1
-Animation.CHANNEL_EQUIP_LEFT = 2
-Animation.CHANNEL_EQUIP_RIGHT = 3
-Animation.CHANNEL_CROUCH = 4
-Animation.CHANNEL_STRAFE = 5
-Animation.CHANNEL_ACTION = 6
-Animation.CHANNEL_JUMP = 7
-Animation.CHANNEL_BLOCK = 8
-Animation.CHANNEL_LEFT_HAND = 125
-Animation.CHANNEL_RIGHT_HAND = 126
 Animation.CHANNEL_TILT = 127
 Animation.CHANNEL_CUSTOMIZE = 128

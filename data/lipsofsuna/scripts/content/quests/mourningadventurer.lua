@@ -12,6 +12,8 @@ Pattern{
 Species{
 	name = "mourning adventurer",
 	base = "aer",
+	animations = {
+		["idle"] = {animation = "tired", channel = 1, permanent = true}},
 	dialog = "mourning adventurer town",
 	marker = "mourning adventurer town",
 	ai_enable_combat = false,

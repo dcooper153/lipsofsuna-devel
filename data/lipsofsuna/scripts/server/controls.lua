@@ -98,21 +98,6 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
 	Network:send{client = args.client, packet = Packet(packets.CHARACTER_CREATE)}
 end}
 
-Protocol:add_handler{type = "CROUCH", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if not player.dead then
-		local ok,on = args.packet:read("bool")
-		if ok and on then
-			player:animate{animation = "crouch", channel = Animation.CHANNEL_CROUCH, weight = 0.5, permanent = true}
-			player.crouch = true
-		else
-			player:animate{channel = Animation.CHANNEL_CROUCH}
-			player.crouch = nil
-		end
-	end
-end}
-
 Protocol:add_handler{type = "EXAMINE", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end

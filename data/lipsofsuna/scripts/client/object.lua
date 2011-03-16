@@ -12,6 +12,24 @@ Object.animate = function(self, args)
 	oldanimate(self, args)
 end
 
+Object.animate_spec = function(self, name)
+	-- Find the animation from the spec.
+	if not self.spec then return end
+	if not self.spec.animations then return end
+	local a = self.spec.animations[name]
+	if not a then return end
+	-- Play the animation.
+	self:animate{
+		animation = a.animation,
+		channel = a.channel,
+		fade_in = a.fade_in or 0.5,
+		fade_out = a.fade_out or 0.5,
+		permanent = a.permanent,
+		repeat_start = a.repeat_start,
+		weight = a.weight or 2}
+	return a
+end
+
 Object.detach = function(self)
 	-- Hide special effects.
 	if self.special_effects then

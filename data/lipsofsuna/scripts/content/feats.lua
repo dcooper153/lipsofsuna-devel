@@ -1,6 +1,6 @@
 Featanimspec{
 	name = "bite",
-	animation = "bite",
+	animation = "attack bite",
 	categories = {"melee"},
 	cooldown = 2,
 	effect = "growl1",
@@ -10,7 +10,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "build",
-	animation = "punch",
+	animation = "build",
 	categories = {"build"},
 	cooldown = 0.5,
 	effect = "swing1",
@@ -20,7 +20,7 @@ Featanimspec{
 Featanimspec{
 	name = "dragon bite",
 	action_frames = {0, 30},
-	animation = "bite",
+	animation = "attack bite",
 	categories = {"melee"},
 	cooldown = 4,
 	effect_impact = "impact1",
@@ -30,7 +30,7 @@ Featanimspec{
 Featanimspec{
 	name = "left claw",
 	action_frames = {0, 15},
-	animation = "claw-left",
+	animation = "attack left claw",
 	categories = {"melee"},
 	cooldown = 2,
 	effect = "swing1",
@@ -41,7 +41,7 @@ Featanimspec{
 Featanimspec{
 	name = "right claw",
 	action_frames = {0, 15},
-	animation = "claw-right",
+	animation = "attack right claw",
 	categories = {"melee"},
 	cooldown = 2,
 	effect = "swing1",
@@ -51,7 +51,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "right hand",
-	animation = "punch",
+	animation = "attack fist",
 	categories = {"melee"},
 	description = "Hit with your right hand",
 	cooldown = 1,
@@ -62,7 +62,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "ranged",
-	animation = "fire-bow",
+	animation = "attack bow",
 	categories = {"ranged"},
 	cooldown = 1,
 	description = "Fire a ranged weapon",
@@ -73,7 +73,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "ranged spell",
-	animation = "cast-spell",
+	animation = "spell ranged",
 	categories = {"ranged", "spell"},
 	cooldown = 2,
 	description = "Cast a magical projectile",
@@ -81,7 +81,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "spell on self",
-	animation = "cast-spell",
+	animation = "spell self",
 	categories = {"self", "spell"},
 	cooldown = 2,
 	description = "Cast a spell on yourself",
@@ -89,7 +89,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "spell on touch",
-	animation = "cast-spell",
+	animation = "spell touch",
 	categories = {"spell", "touch"},
 	cooldown = 2,
 	description = "Cast a short range touch spell",

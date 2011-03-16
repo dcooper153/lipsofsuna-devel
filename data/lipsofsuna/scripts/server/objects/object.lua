@@ -78,26 +78,26 @@ end
 
 --- Plays an animation.
 -- @param self Object.
--- @param args Arguments.<ul>
---   <li>animation: Animation name.</li>
---   <li>permanent: True to keep playing.</li>
---   <li>repeat_start: The repeat start time in seconds.</li>
---   <li>weight: Blending weight.</li></ul>
+-- @param name Animation name.
 -- @return True if started a new animation.
-Object.animate = function(self, args)
+Object.animate = function(self, name)
 	-- Maintain channels.
-	if args.permanent then
-		if not self.animations then self.animations = {} end
-		local prev = self.animations[args.channel]
-		if prev and prev[1] == args.animation and prev[2] == args.weight then return end
-		self.animations[args.channel] = {args.animation, args.weight, Program.time, args.repeat_start}
-	elseif self.animations and args.channel then
-		self.animations[args.channel] = nil
+	-- When objects enter the vision of a player, the player class enumerates
+	-- through the persistent animations and sends them to the client. We need
+	-- to store them so that newly seen objects don't appear unanimated.
+	local anim = self.spec.animations[name]
+	if anim and anim.channel then
+		if anim.permanent then
+			if not self.animations then self.animations = {} end
+			local prev = self.animations[anim.channel]
+			if prev and prev[1] == name then return end
+			self.animations[anim.channel] = {name, Program.time}
+		else
+			self.animations[anim.channel] = nil
+		end
 	end
 	-- Emit a vision event.
-	args.type = "object-animated"
-	args.object = self
-	Vision:event(args)
+	Vision:event({type = "object-animated", animation = name, object = self})
 	return true
 end
 
@@ -292,7 +292,7 @@ end
 Object.loot = function(self, user)
 	if self.inventory then
 		self.inventory:subscribe{object = user, callback = function(args) user:inventory_cb(args) end}
-		self:animate{animation = self.spec.animation_looting, weight = 10}
+		self:animate("loot")
 		self.looted = true
 	end
 end

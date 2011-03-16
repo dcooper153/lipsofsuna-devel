@@ -152,7 +152,7 @@ Player.vision_cb = function(self, args)
 	local sendinfo = function(o)
 		if o.animations then
 			for k,v in pairs(o.animations) do
-				funs["object-animated"]({animation = v[1], channel = k, object = o, permanent = true, repeat_start = v[4], time = Program.time - v[3], weight = v[2]})
+				funs["object-animated"]({animation = v[1], object = o, time = Program.time - v[2]})
 			end
 		end
 		if o.inventory then
@@ -182,9 +182,7 @@ Player.vision_cb = function(self, args)
 		["object-animated"] = function(args)
 			local o = args.object
 			self:send{packet = Packet(packets.OBJECT_ANIMATED, "uint32", o.id,
-				"string", args.animation or "", "uint8", args.channel or 255,
-				"bool", args.permanent or false, "float", args.time or 0.0,
-				"float", args.weight or 1.0, "float", args.repeat_start or 0.0)}
+				"string", args.animation or "", "float", args.time or 0.0)}
 		end,
 		["object-dead"] = function(args)
 			local o = args.object

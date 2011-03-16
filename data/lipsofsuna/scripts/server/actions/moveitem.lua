@@ -92,7 +92,7 @@ Actions.move_from_inv_to_world = function(clss, user, srcid, srcslot)
 	srcobj.rotation = Quaternion()
 	srcobj.realized = true
 	-- Animate the user.
-	user:animate{animation = "pickup", channel = Animation.CHANNEL_ACTION, weight = 10}
+	user:animate("pick up")
 	user.cooldown = 1
 	return true
 end
@@ -130,7 +130,7 @@ Actions.move_from_world_to_inv = function(clss, user, srcid, dstid, dstslot)
 		return
 	end
 	-- Animate the user.
-	user:animate{animation = "pickup", channel = Animation.CHANNEL_ACTION, weight = 10}
+	user:animate("pick up")
 	user.cooldown = 1
 	return true
 end

@@ -10,8 +10,9 @@ Itemspec.dict_name = {}
 -- @param clss Itemspec class.
 -- @param args Arguments.<ul>
 --   <li>ammo_type: Name of the ammunition item type.</li>
---   <li>animation_looted: Looted animation name.</li>
---   <li>animation_looting: Looting animation name.</li>
+--   <li>animation_attack: Attack animation name for creatures wielding the item.</li>
+--   <li>animation_hold: Hold animation name for creatures wielding the item.</li>
+--   <li>animations: Dictionary of animation playback rules.</li>
 --   <li>armor_class: How much protection the item offers when equipped.</li>
 --   <li>categories: List of categories to which the item belongs.</li>
 --   <li>construct_tile: Tile type to construct when used.</li>
@@ -67,6 +68,7 @@ Itemspec.new = function(clss, args)
 	end
 	-- Default values.
 	local copy = function(f, d) if self[f] == nil then self[f] = d end end
+	copy("animations", {})
 	copy("armor_class", 0)
 	copy("crafting_count", 1)
 	copy("crafting_materials", {})

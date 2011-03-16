@@ -2,12 +2,7 @@ Item = Class(Object)
 Item.pickable = true
 
 Item.setter = function(self, key, value)
-	if key == "looted" then
-		if self.looted ~= value then
-			self:animate{animation = value and self.spec.animation_looted, channel = 1, permanent = value and true}
-			Object.setter(self, key, value)
-		end
-	elseif key == "spec" then
+	if key == "spec" then
 		local spec = type(value) == "string" and Itemspec:find{name = value} or value
 		if not spec then return end
 		Object.setter(self, key, spec)
@@ -71,6 +66,7 @@ Item.new = function(clss, args)
 	copy("realized")
 	self.update_timer = 0.3 * math.random()
 	clss.update_list[self.id] = self
+	if self.looted then self:animate("looted") end
 	return self
 end
 
@@ -197,7 +193,7 @@ Item.fire = function(self, args)
 				-- Disable boomerang mode.
 				proj.timer:disable()
 				proj.gravity = Config.gravity
-				proj:animate{channel = 2}
+				proj:animate("fly stop")
 				proj.contact_cb = nil
 			end
 		end
@@ -205,7 +201,7 @@ Item.fire = function(self, args)
 		if proj.spec.categories["boomerang"] then
 			proj.rotated = 0
 			proj.rotation = Quaternion{axis = Vector(0,0,1), angle = -0.5 * math.pi}
-			proj:animate{animation = "fly", channel = 2, permanent = true}
+			proj:animate("fly start")
 			proj.gravity = Vector(0,2,0)
 			proj.timer = Timer{delay = 0, func = function(self, secs)
 				-- Adjust velocity vector.
