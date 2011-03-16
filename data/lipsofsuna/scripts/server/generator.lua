@@ -210,7 +210,7 @@ Generator.generate = function(clss, args)
 	while true do
 		local skipped = 0
 		for name,reg in pairs(special) do
-			if not clss.regions_dict_name[name] then
+			if not clss.regions_dict_name[reg.name] then
 				local pat = Pattern:random{category = reg.pattern_category, name = reg.pattern_name}
 				if not clss:place_region(reg, pat) then
 					skipped = skipped + 1
@@ -265,7 +265,7 @@ Generator.generate = function(clss, args)
 		if count > 1 then
 			local retry = 0
 			local created = 0
-			while retry < 10 and created < 10 do
+			while retry < 3 and created < 7 do
 				local reg1 = dict[math.random(1, count)]
 				local reg2 = dict[math.random(1, count)]
 				if reglink(reg1, reg2) then
@@ -340,9 +340,9 @@ Generator.subdivide_link = function(clss, link)
 	local src = link[1].point + link[1].size * 0.5
 	local dst = link[2].point + link[2].size * 0.5
 	local len = (src - dst).length - (link[1].size.length + link[2].size.length) / 2
-	if len < 7 then return end
-	-- Try to subdive the link.
-	for i = 1,100 do
+	if len < 15 then return end
+	-- Try to subdivide the link.
+	for i = 1,20 do
 		-- Select the type for the new region.
 		local spec = Regionspec:random{category = "random"}
 		if not spec then return end
@@ -379,7 +379,7 @@ Generator.subdivide_link_test = function(clss, link, spec, pattern)
 	local aabb = Aabb{point = pos, size = size}
 	local dist = math.ceil((dst - src).length)
 	for i = 1,10 do
-		pos = side * math.random(-dist, dist)
+		pos = side * 0.5 * math.random(-dist, dist)
 		pos = (pos + rel):floor()
 		aabb.point = pos
 		if clss:validate_region_position(aabb) then
