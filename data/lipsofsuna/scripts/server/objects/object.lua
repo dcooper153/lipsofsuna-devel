@@ -224,7 +224,6 @@ Object.fire = function(self, args)
 		self.rotation = args.owner.rotation
 	end
 	self.velocity = (dst - src):normalize() * (args.speed or 20)
-	self.save = false
 	self.realized = true
 end
 
