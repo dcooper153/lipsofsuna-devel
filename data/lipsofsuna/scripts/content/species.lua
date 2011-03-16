@@ -15,6 +15,7 @@ Species{
 		["block stop"] = {animation = "block-stop", channel = 2},
 		["build"] = {animation = "punch", channel = 2, weight = 30},
 		["hold axe"] = {animation = "hold-axe", channel = 3, permanent = true, repeat_start = 10, weight = 5},
+		["hold blunt"] = {animation = "hold-blunt", channel = 3, permanent = true, repeat_start = 10, weight = 5},
 		["hold bulky"] = {animation = "hold-bulky", channel = 3, permanent = true, repeat_start = 10, weight = 5},
 		["hold staff"] = {animation = "hold-staff", channel = 3, permanent = true, repeat_start = 10, weight = 5},
 		["hold shield"] = {animation = "hold-left", channel = 4, permanent = true, repeat_start = 10, weight = 5},

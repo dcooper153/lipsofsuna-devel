@@ -225,8 +225,8 @@ Itemspec{
 Itemspec{
 	name = "adamantium mattock",
 	model = "mattock-000",
-	animation_hold = "hold blunt",
-	animation_attack = "attack blunt",
+	animation_hold = "hold axe",
+	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["adamantium"] = 9},
 	damage = 20,
@@ -306,8 +306,8 @@ Itemspec{
 Itemspec{
 	name = "aquanite mattock",
 	model = "mattock-000",
-	animation_hold = "hold blunt",
-	animation_attack = "attack blunt",
+	animation_hold = "hold axe",
+	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 9},
 	damage = 15,
@@ -387,8 +387,8 @@ Itemspec{
 Itemspec{
 	name = "crimson mattock",
 	model = "mattock-000",
-	animation_hold = "hold blunt",
-	animation_attack = "attack blunt",
+	animation_hold = "hold axe",
+	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 9},
 	damage = 15,
@@ -454,6 +454,8 @@ Itemspec{
 	model = "mattock-000",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 3},
+	animation_hold = "hold axe",
+	animation_attack = "attack axe",
 	damage = 10,
 	damage_bonus_strength = 0.1,
 	equipment_slot = "hand.R"}
@@ -519,8 +521,8 @@ Itemspec{
 Itemspec{
 	name = "wooden mattock",
 	model = "mattock-000",
-	animation_hold = "hold blunt",
-	animation_attack = "attack blunt",
+	animation_hold = "hold axe",
+	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["log"] = 3},
 	damage = 5,
