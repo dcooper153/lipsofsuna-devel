@@ -282,13 +282,17 @@ Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
 			o:update_model()
 		end
 		-- Equip animations.
+		local a
 		if spec then
-			local a = o:animate_spec(spec.animation_hold)
-			if o.equipment_animations then
-				o.equipment_animations[slot] = a
-			else
-				o.equipment_animations = {[slot] = a}
+			a = o:animate_spec(spec.animation_hold)
+		end
+		if o.equipment_animations then
+			if not a and o.equipment_animations[slot] then
+				o:animate{channel = o.equipment_animations[slot].channel}
 			end
+			o.equipment_animations[slot] = a
+		else
+			o.equipment_animations = {[slot] = a}
 		end
 	end
 end}
