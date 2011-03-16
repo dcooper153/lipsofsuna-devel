@@ -88,25 +88,21 @@ static void Object_animate (LIScrArgs* args)
 static void Object_animate_fade (LIScrArgs* args)
 {
 	int channel = 0;
-	float time = 0.0f;
-	float rate;
+	float time = LIMDL_POSE_FADE_AUTOMATIC;
 	LIEngObject* object;
 
 	if (!liscr_args_gets_int (args, "channel", &channel))
 		return;
-	liscr_args_gets_float (args, "duration", &time);
+	if (liscr_args_gets_float (args, "duration", &time))
+		time = LIMAT_MAX (0, time);
 
 	if (channel < 1 || channel > 255)
 		return;
 	channel--;
-	if (time <= 0.0f)
-		rate = 1000.0f;
-	else
-		rate = 1.0f / time;
 
 	object = args->self;
 	if (object->pose != NULL)
-		limdl_pose_fade_channel (object->pose, channel, rate);
+		limdl_pose_fade_channel (object->pose, channel, time);
 }
 
 /* @luadoc

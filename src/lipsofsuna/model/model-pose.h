@@ -50,10 +50,13 @@ struct _LIMdlPoseChannel
 
 struct _LIMdlPoseFade
 {
-	float rate;
 	float time;
+	float time_fade;
+	float fade_out;
 	float priority_scale;
 	float priority_transform;
+	float current_weight_scale;
+	float current_weight_transform;
 	LIMdlPoseFade* prev;
 	LIMdlPoseFade* next;
 	LIMdlAnimation* animation;

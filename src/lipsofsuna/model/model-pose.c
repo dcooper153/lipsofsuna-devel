@@ -64,9 +64,16 @@ static void private_transform_node (
 	LIMdlPose* self,
 	LIMdlNode* node);
 
-static float private_get_channel_weight (
+static void private_get_channel_weight (
 	const LIMdlPose*        self,
-	const LIMdlPoseChannel* channel);
+	const LIMdlPoseChannel* channel,
+	float*                  scale,
+	float*                  transform);
+
+static float private_smooth_fade (
+	float channel_weight,
+	float fade_offset,
+	float fade_length);
 
 static LIMdlAnimation private_empty_anim =
 {
@@ -146,14 +153,13 @@ void limdl_pose_destroy_channel (
  *
  * \param self Model pose.
  * \param channel Channel number.
- * \param rate Amount of fade out per second or LIMDL_POSE_FADE_AUTOMATIC.
+ * \param secs Fade out time in seconds or LIMDL_POSE_FADE_AUTOMATIC.
  */
 void limdl_pose_fade_channel (
 	LIMdlPose* self,
 	int        channel,
-	float      rate)
+	float      secs)
 {
-	float weight;
 	LIMdlPoseFade* fade;
 	LIMdlPoseChannel* chan;
 
@@ -162,11 +168,11 @@ void limdl_pose_fade_channel (
 		return;
 
 	/* Handle auto rate. */
-	if (rate == LIMDL_POSE_FADE_AUTOMATIC)
+	if (secs == LIMDL_POSE_FADE_AUTOMATIC)
 	{
 		if (chan->fade_out < LIMAT_EPSILON)
 			return;
-		rate = 1.0f / chan->fade_out;
+		secs = chan->fade_out;
 	}
 
 	/* Create a fade sequence. */
@@ -176,11 +182,12 @@ void limdl_pose_fade_channel (
 		limdl_pose_destroy_channel (self, channel);
 		return;
 	}
-	weight = private_get_channel_weight (self, chan);
-	fade->priority_transform = chan->priority_transform * weight;
-	fade->priority_scale = chan->priority_scale * weight;
-	fade->rate = fade->priority_transform * rate;
+	private_get_channel_weight (self, chan, &fade->priority_scale, &fade->priority_transform);
+	fade->fade_out = secs;
 	fade->time = chan->time;
+	fade->time_fade = 0.0f;
+	fade->current_weight_transform = fade->priority_transform;
+	fade->current_weight_scale = fade->priority_scale;
 	fade->animation = limdl_animation_new_copy (chan->animation);
 	if (fade->animation == NULL)
 	{
@@ -273,10 +280,19 @@ void limdl_pose_update (
 	/* Update fade sequences. */
 	for (fade = self->fades ; fade != NULL ; fade = fade_next)
 	{
+		/* Calculate smooth fading. */
+		fade->current_weight_scale = private_smooth_fade (
+			fade->priority_scale, fade->time_fade, fade->fade_out);
+		fade->current_weight_transform = private_smooth_fade (
+			fade->priority_transform, fade->time_fade, fade->fade_out);
+
+		/* Update time and weights. */
 		fade_next = fade->next;
 		fade->time += secs;
-		fade->priority_transform -= secs * fade->rate;
-		if (fade->priority_transform <= 0.0f)
+		fade->time_fade += secs;
+
+		/* Remove the fade when its influence reaches zero. */
+		if (fade->time_fade >= fade->fade_out)
 		{
 			private_fade_remove (self, fade);
 			private_fade_free (fade);
@@ -957,6 +973,7 @@ static void private_transform_node (
 	float total_scale;
 	float total_transform;
 	float weight;
+	float weight1;
 	LIAlgU32dicIter iter;
 	LIMatQuaternion bonerot;
 	LIMatQuaternion rotation;
@@ -979,9 +996,9 @@ static void private_transform_node (
 		chan = iter.value;
 		if (limdl_animation_get_channel (chan->animation, node->name) != -1)
 		{
-			weight = private_get_channel_weight (self, chan);
-			total_transform += chan->priority_transform * weight;
-			total_scale += chan->priority_scale * weight;
+			private_get_channel_weight (self, chan, &weight, &weight1);
+			total_scale += weight;
+			total_transform += weight1;
 			channels++;
 		}
 	}
@@ -991,8 +1008,8 @@ static void private_transform_node (
 	{
 		if (limdl_animation_get_channel (fade->animation, node->name) != -1)
 		{
-			total_transform += fade->priority_transform;
-			total_scale += fade->priority_scale;
+			total_transform += fade->current_weight_transform;
+			total_scale += fade->current_weight_scale;
 			channels++;
 		}
 	}
@@ -1008,9 +1025,9 @@ static void private_transform_node (
 			{
 				bonepos = transform.position;
 				bonerot = transform.rotation;
-				weight = private_get_channel_weight (self, chan);
-				rotation = limat_quaternion_nlerp (bonerot, rotation, chan->priority_transform * weight / total_transform);
-				position = limat_vector_lerp (bonepos, position, chan->priority_transform * weight / total_transform);
+				private_get_channel_weight (self, chan, &weight1, &weight);
+				rotation = limat_quaternion_nlerp (bonerot, rotation, weight / total_transform);
+				position = limat_vector_lerp (bonepos, position, weight / total_transform);
 			}
 		}
 
@@ -1021,7 +1038,7 @@ static void private_transform_node (
 			{
 				bonepos = transform.position;
 				bonerot = transform.rotation;
-				weight = fade->priority_transform;
+				weight = fade->current_weight_transform;
 				rotation = limat_quaternion_nlerp (bonerot, rotation, weight / total_transform);
 				position = limat_vector_lerp (bonepos, position, weight / total_transform);
 			}
@@ -1037,8 +1054,8 @@ static void private_transform_node (
 			chan = iter.value;
 			if (limdl_animation_get_transform (chan->animation, node->name, chan->time, &scale1, &transform))
 			{
-				weight = private_get_channel_weight (self, chan);
-				scale += scale1 * chan->priority_scale / total_scale;
+				private_get_channel_weight (self, chan, &weight, &weight1);
+				scale += scale1 * weight / total_scale;
 			}
 		}
 
@@ -1047,8 +1064,8 @@ static void private_transform_node (
 		{
 			if (limdl_animation_get_transform (fade->animation, node->name, fade->time, &scale1, &transform))
 			{
-				weight = fade->priority_transform;
-				scale += scale1 * fade->priority_scale / total_scale;
+				weight = fade->current_weight_scale;
+				scale += scale1 * weight / total_scale;
 			}
 		}
 	}
@@ -1065,9 +1082,11 @@ static void private_transform_node (
 		private_transform_node (self, node->nodes.array[i]);
 }
 
-static float private_get_channel_weight (
+static void private_get_channel_weight (
 	const LIMdlPose*        self,
-	const LIMdlPoseChannel* channel)
+	const LIMdlPoseChannel* channel,
+	float*                  scale,
+	float*                  transform)
 {
 	float end;
 	float time;
@@ -1079,14 +1098,50 @@ static float private_get_channel_weight (
 
 	/* Fade in period. */
 	if (!channel->repeat && time < channel->fade_in)
-		return time / channel->fade_in;
+	{
+		*scale = private_smooth_fade (channel->priority_scale,
+			channel->fade_in - time, channel->fade_in);
+		*transform = private_smooth_fade (channel->priority_transform,
+			channel->fade_in - time, channel->fade_in);
+		return;
+	}
 
 	/* No fade period. */
 	if (channel->repeats == -1 || time < end - channel->fade_out)
-		return 1.0f;
+	{
+		*scale = channel->priority_scale;
+		*transform = channel->priority_transform;
+		return;
+	}
 
 	/* Fade out period. */
-	return 1.0f - (end - time) / channel->fade_out;
+	*scale = private_smooth_fade (channel->priority_scale,
+		time - (end - channel->fade_out), channel->fade_out);
+	*transform = private_smooth_fade (channel->priority_transform,
+		time - (end - channel->fade_out), channel->fade_out);
+}
+
+static float private_smooth_fade (
+	float channel_weight,
+	float fade_offset,
+	float fade_length)
+{
+	float weight_base;
+	float weight_scaled;
+	float weight_smoothing;
+
+	/* Calculates smooth fading. */
+	/* Linear fading of channels with wildly different weights doesn't
+	   look nice because the channel with the largest weight dominates.
+	   This is particularly problematic with cross-fading since there's
+	   no cross-fading at all without compensating for the difference. */
+	/* We reduce the problem by applying smoothstep() to the excess weight.
+	   This compensates for the weight difference by smoothly bringing the
+	   weight of the sequence closer to the [0,1] range. */
+	weight_base = 1.0f - (fade_offset / fade_length);
+	weight_scaled = weight_base * channel_weight;
+	weight_smoothing = 1.0f - limat_smoothstep (fade_offset, 0.0f, fade_length);
+	return weight_base + (weight_scaled - weight_base) * weight_smoothing;
 }
 
 /** @} */
