@@ -12,6 +12,7 @@ Obstaclespec.dict_name = {}
 --   <li>harvest_effect: Effect to play when harvested.</li>
 --   <li>harvest_materials: Dictionary of harvestable materials.</li>
 --   <li>destroy_actions: List of actions to perform when the obstacle is destroyed.</li>
+--   <li>destroy_items: List of items to spawn when the obstacle is destroyed.</li>
 --   <li>health: Number of hit points the obstacle has.</li>
 --   <li>mass: Mass in kilograms.</li>
 --   <li>model: Model to use for the obstacle. (required)</li>
@@ -20,12 +21,14 @@ Obstaclespec.dict_name = {}
 -- @return New item specification.
 Obstaclespec.new = function(clss, args)
 	local self = Spec.new(clss, args)
+	local copy = function(f, d) if self[f] == nil then self[f] = d end end
 	self.harvest_enabled = args.harvest_materials ~= nil
-	self.harvest_behavior = self.harvest_behavior or "keep"
-	self.harvest_materials = self.harvest_materials or {}
-	self.destroy_actions = self.destroy_actions or {}
-	self.mass = self.mass or 10
-	self.physics = self.physics or "static"
+	copy("harvest_behavior", "keep")
+	copy("harvest_materials", {})
+	copy("destroy_actions", {})
+	copy("destroy_items", {})
+	copy("mass", 10)
+	copy("physics", "static")
 	return self
 end
 

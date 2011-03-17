@@ -2,17 +2,23 @@ Obstaclespec{
 	name = "tree",
 	model = "tree1",
 	categories = {"tree"},
-	health = 100,
-	harvest_effect = "harvest1",
-	harvest_materials = { log = 1 }}
+	destroy_items = {
+		{"log",Vector(0,0,0)},
+		{"log",Vector(0,1,0)},
+		{"log",Vector(0,2,0)},
+		{"log",Vector(0,3,0)}},
+	health = 50}
 
 Obstaclespec{
 	name = "rust sprig tree",
 	model = "tree2",
 	categories = {"tree"},
-	health = 100,
-	harvest_effect = "harvest1",
-	harvest_materials = { log = 1 }}
+	destroy_items = {
+		{"log",Vector(0,0,0)},
+		{"log",Vector(0,1,0)},
+		{"log",Vector(0,2,0)},
+		{"log",Vector(0,3,0)}},
+	health = 50}
 
 Obstaclespec{
 	name = "mushroom",

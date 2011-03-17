@@ -59,6 +59,20 @@ Obstacle.damaged = function(self, amount)
 	end
 end
 
+--- Hides the object and purges it from the database.
+-- @param self Object to kill.
+Obstacle.die = function(self)
+	for k,v in ipairs(self.spec.destroy_items) do
+		local spec = Itemspec:find{name = v[1]}
+		if spec then
+			local p = self.position + self.rotation * (v[2] or Vector())
+			local r = self.rotation * (v[3] or Quaternion())
+			local o = Item{random = true, spec = spec, position = p, rotation = r, realized = true}
+		end
+	end
+	Object.die(self)
+end
+
 --- Called when the object is used.
 -- @param self Object.
 -- @param user User.
