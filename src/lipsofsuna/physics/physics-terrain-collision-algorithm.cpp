@@ -71,8 +71,8 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 #if 0
 	shape_convex->getAabb (transform, aabb_min, aabb_max);
 #else
-	aabb_min = transform * btVector3 (-2, -2, -2);
-	aabb_max = transform * btVector3 (2, 2, 2);
+	aabb_min = transform * btVector3 (-4, -4, -4);
+	aabb_max = transform * btVector3 (4, 4, 4);
 	for (i = 0 ; i < 3 ; i++)
 	{
 		float v1 = aabb_min[i];
