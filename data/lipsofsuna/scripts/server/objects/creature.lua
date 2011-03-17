@@ -133,6 +133,7 @@ Creature.new = function(clss, args)
 	copy("rotation")
 	copy("position")
 	copy("skin_style")
+	copy("carried_weight", 0)
 	copy("spec")
 	self.anim_timer = 0
 	self.enemies = {}
@@ -219,6 +220,10 @@ Creature.calculate_speed = function(self)
 	-- Water friction.
 	if self.submerged then
 		s = s - s * self.submerged * self.spec.water_friction
+	end
+	-- Burdening penalty.
+	if self:get_burdened() then
+		s = math.max(1, s * 0.3)
 	end
 	-- Update speed.
 	if s ~= self.speed then
@@ -463,6 +468,21 @@ Creature.get_attack_ray = function(self)
 	end
 end
 
+--- Returns the burdening limit of the creature.
+-- @param self creature.
+-- @return Burdening limit in kilograms
+Creature.get_burden_limit = function(self)
+	local str = self.skills:get_value{skill = "strength"} or 10
+	return 100 + 2 * str
+end
+
+--- Returns true if the creature is burdened.
+-- @param self Creature.
+-- @return True if burdened.
+Creature.get_burdened = function(self)
+	return self.carried_weight > self:get_burden_limit()
+end
+
 --- Inflicts a modifier on the object.
 -- @param self Object.
 -- @param name Modifier name.
@@ -483,6 +503,7 @@ Creature.jump = function(self)
 	-- Jump or swim.
 	if self.submerged and self.submerged > 0.4 then
 		-- Swimming upwards.
+		if self:get_burdened() then return end
 		local v = self.velocity
 		self.jumped = t - 0.3
 		self.jumping = true
@@ -491,7 +512,7 @@ Creature.jump = function(self)
 		end
 	else
 		-- Jumping.
-		if not self.ground then return end
+		if not self.ground or self:get_burdened() then return end
 		self.jumped = t
 		self.jumping = true
 		Effect:play{effect = "jump1", object = self}
@@ -679,6 +700,28 @@ Creature.update = function(self, secs)
 	-- Update modifiers.
 	if self.modifiers then
 		Modifier:update(self, secs)
+	end
+	-- Update burdening.
+	-- The burdening status may change when the contents of the inventory
+	-- or any subinventory change or if the strength skill level changes.
+	-- The burdening status decreases movement speed and disables jumping.
+	local prev_limit = self.burden_limit or 0
+	local curr_limit = math.floor(self:get_burden_limit())
+	local prev_burden = self:get_burdened()
+	local curr_weight = math.ceil(self:calculate_carried_weight())
+	if curr_weight ~= self.carried_weight or prev_limit ~= curr_limit then
+		self.carried_weight = curr_weight
+		self.burden_limit = curr_limit
+		self:send{packet = Packet{packets.PLAYER_WEIGHT, "uint16", curr_weight, "uint16", curr_limit}}
+	end
+	local curr_burden = self:get_burdened()
+	if prev_burden ~= curr_burden then
+		self:calculate_speed()
+		if curr_burden then
+			self:send{packet = Packet{packets.MESSAGE, "string", "You're now burdened."}}
+		else
+			self:send{packet = Packet{packets.MESSAGE, "string", "You're no longer burdened."}}
+		end
 	end
 	-- Update physics environment.
 	-- This also takes care of fixing stuck creatures.

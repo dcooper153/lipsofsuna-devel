@@ -122,6 +122,13 @@ Widgets.Container.find_item = function(self, args)
 	end
 end
 
+--- Adds an extra child widget.
+-- @param self Container widget.
+-- @param widget Widget.
+Widgets.Container.set_extra_widget = function(self, widget)
+	self.group:set_child{col = 1, row = 3, widget = widget}
+end
+
 --- Sets the item of a slot.
 -- @param self Container widget.
 -- @param args Arguments.<ul>

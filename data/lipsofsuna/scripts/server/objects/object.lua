@@ -101,6 +101,18 @@ Object.animate = function(self, name)
 	return true
 end
 
+--- Calculates the weight of contained items.
+-- @param self Object.
+-- @return Weight in kilograms.
+Object.calculate_carried_weight = function(self)
+	if not self.inventory then return 0 end
+	local w = 0
+	for k,v in pairs(self.inventory.slots) do
+		w = w + v.mass * v.count + v:calculate_carried_weight()
+	end
+	return w
+end
+
 --- Clones the object.
 -- @param self Object.
 -- @return New object.

@@ -91,6 +91,7 @@ do
 	add("PLAYER_BLOCK")
 	add("PLAYER_MOVE")
 	add("PLAYER_TURN")
+	add("PLAYER_WEIGHT")
 	add("QUEST_MARKER")
 	add("QUEST_STATUS")
 	add("RUN")

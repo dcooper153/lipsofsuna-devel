@@ -15,6 +15,17 @@ Views.Inventory.new = function(clss)
 	self.containers:set_expand{row = 1}
 	self:set_child{col = 1, row = 1, widget = self.group}
 	self:set_child{col = 2, row = 1, widget = self.containers}
+	-- Weight widget.
+	-- This is injected to the owned inventory widget.
+	self.group_weight = Widget{rows = 1, cols = 4, spacings = {0,0}, margins={5,0,0,0}}
+	self.label_weight1 = Widgets.Label{text = "Weight:"}
+	self.label_weight2 = Widgets.Label()
+	self.label_weight3 = Widgets.Label{text = "/"}
+	self.label_weight4 = Widgets.Label()
+	self.group_weight:set_child{col = 1, row = 1, widget = self.label_weight1}
+	self.group_weight:set_child{col = 2, row = 1, widget = self.label_weight2}
+	self.group_weight:set_child{col = 3, row = 1, widget = self.label_weight3}
+	self.group_weight:set_child{col = 4, row = 1, widget = self.label_weight4}
 	return self
 end
 
@@ -28,6 +39,7 @@ Views.Inventory.add_container = function(self, widget, own)
 		widget.button_close.visible = false
 		self.container = widget
 		self.group:set_child{col = 1, row = 3, widget = widget}
+		widget:set_extra_widget(self.group_weight)
 	else
 		local text = widget.crafting and "Workbench" or "Loot"
 		widget.button_close.visible = true
@@ -102,6 +114,20 @@ Views.Inventory.set_item = function(self, slot, name, count)
 	end
 end
 
+--- Sets the displayed weight and burdening limit.
+-- @param self Inventory view.
+-- @param weight Weight in kilograms.
+-- @param limit Burdening limit in kilograms.
+Views.Inventory.set_weight = function(self, weight, limit)
+	self.label_weight2.text = tostring(weight)
+	self.label_weight4.text = tostring(limit)
+	if weight <= limit then
+		self.label_weight2.color = {1,1,1,1}
+	else
+		self.label_weight2.color = {1,0,0,1}
+	end
+end
+
 ------------------------------------------------------------------------------
 
 Views.Inventory.inst = Views.Inventory()
@@ -170,4 +196,11 @@ Protocol:add_handler{type = "INVENTORY_ITEM_REMOVED", func = function(event)
 	if Drag.drag and Drag.drag[2] == id and Drag.drag[3] == slot then
 		Drag:cancel()
 	end
+end}
+
+-- Updates the weight and burdening limit of the player.
+Protocol:add_handler{type = "PLAYER_WEIGHT", func = function(event)
+	local ok,w,l = event.packet:read("uint16", "uint16")
+	if not ok then return end
+	Views.Inventory.inst:set_weight(w, l)
 end}

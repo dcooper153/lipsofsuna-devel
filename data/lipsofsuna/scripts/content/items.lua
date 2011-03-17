@@ -4,21 +4,21 @@
 Itemspec{
 	name = "adamantium",
 	model = "adamantium1",
-	mass = 1,
+	mass = 3,
 	categories = {"material"},
 	stacking = true}
 
 Itemspec{
 	name = "aquanite stone",
 	model = "aquanitestone1",
-	mass = 1,
+	mass = 3,
 	categories = {"material"},
 	stacking = true}
 
 Itemspec{
 	name = "basalt stone",
 	model = "basaltstone1",
-	mass = 1,
+	mass = 3,
 	categories = {"build", "material"},
 	construct_tile = "basalt1",
 	construct_tile_count = 1,
@@ -35,7 +35,7 @@ Itemspec{
 Itemspec{
 	name = "crimson stone",
 	model = "crimsonstone1",
-	mass = 1,
+	mass = 3,
 	categories = {"material"},
 	stacking = true}
 
@@ -49,7 +49,7 @@ Itemspec{
 Itemspec{
 	name = "ferrostone",
 	model = "ferrostone1",
-	mass = 1,
+	mass = 5,
 	categories = {"build", "material"},
 	construct_tile = "ferrostone1",
 	construct_tile_count = 1,
@@ -74,25 +74,27 @@ Itemspec{
 Itemspec{
 	name = "glass ingot",
 	model = "book-000", -- FIXME
-	mass = 3,
 	categories = {"material"},
 	crafting_materials = {["sand chunk"] = 1},
+	health = 10,
+	mass = 3,
 	stacking = true}
 
 Itemspec{
 	name = "granite stone",
 	model = "granitestone1",
-	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "granite1",
 	construct_tile_count = 1,
 	equipment_slot = "hand.R",
+	health = 50,
+	mass = 3,
 	stacking = true}
 
 Itemspec{
 	name = "iron ingot",
 	model = "book-000", -- FIXME
-	mass = 3,
+	mass = 5,
 	categories = {"build", "material"},
 	construct_tile = "iron1",
 	construct_tile_count = 1,
@@ -117,7 +119,6 @@ Itemspec{
 Itemspec{
 	name = "log",
 	model = "log1",
-	mass = 1,
 	categories = {"build", "material","throwable"},
 	animation_hold = "hold bulky",
 	animation_attack = "throw bulky",
@@ -125,13 +126,14 @@ Itemspec{
 	construct_tile_count = 1,
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
+	health = 50,
+	mass = 3,
 	stacking = true,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "another log",
 	model = "log2",
-	mass = 1,
 	categories = {"build", "material","throwable"},
 	animation_hold = "hold bulky",
 	animation_attack = "throw bulky",
@@ -139,45 +141,49 @@ Itemspec{
 	construct_tile_count = 1,
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
+	health = 50,
+	mass = 3,
 	stacking = true,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "milky powder",
 	model = "book-000", -- FIXME
-	mass = 1,
 	categories = {"material"},
 	crafting_count = 20,
 	crafting_materials = {["mushroom"] = 1},
+	mass = 1,
 	stacking = true,
 	icon = "mushroom1"}
 
 Itemspec{
 	name = "mushroom",
 	model = "mushroom-000",--"mushroom-001"..."mushroom-008"
-	mass = 1,
 	categories = {"material"},
+	mass = 1,
 	stacking = true,
 	icon = "mushroom1"}
 
 Itemspec{
 	name = "sand chunk",
 	model = "sandchunk1",
-	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "sand1",
 	construct_tile_count = 1,
 	equipment_slot = "hand.R",
+	health = 50,
+	mass = 3,
 	stacking = true}
 
 Itemspec{
 	name = "soil chunk",
 	model = "soilchunk1",
-	mass = 1,
 	categories = {"build", "material"},
 	construct_tile = "soil1",
 	construct_tile_count = 1,
 	equipment_slot = "hand.R",
+	health = 50,
+	mass = 3,
 	stacking = true}
 
 Itemspec{
@@ -199,7 +205,8 @@ Itemspec{
 	damage = 30,
 	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1"}
+	icon = "bow1",
+	mass = 15}
 
 Itemspec{
 	name = "adamantium dagger",
@@ -208,7 +215,8 @@ Itemspec{
 	crafting_materials = {["adamantium"] = 3},
 	damage = 20,
 	damage_bonus_dexterity = 0.4,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	mass = 15}
 
 Itemspec{
 	name = "adamantium hatchet",
@@ -220,7 +228,8 @@ Itemspec{
 	damage = 20,
 	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R",
-	icon = "axe1"}
+	icon = "axe1",
+	mass = 15}
 
 Itemspec{
 	name = "adamantium mattock",
@@ -231,7 +240,8 @@ Itemspec{
 	crafting_materials = {["adamantium"] = 9},
 	damage = 20,
 	damage_bonus_strength = 0.1,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	mass = 15}
 
 Itemspec{
 	name = "adamantium musket",
@@ -243,7 +253,8 @@ Itemspec{
 	damage_bonus_intelligence = 0.2,
 	damage_bonus_perception = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1"}
+	icon = "bow1",
+	mass = 15}
 
 Itemspec{
 	name = "adamantium sword",
@@ -253,7 +264,8 @@ Itemspec{
 	damage = 40,
 	damage_bonus_dexterity = 0.2,
 	damage_bonus_strength = 0.2,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	mass = 15}
 
 Itemspec{
 	name = "aquanite crossbow",
@@ -264,7 +276,8 @@ Itemspec{
 	damage = 22,
 	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1"}
+	icon = "bow1",
+	mass = 15}
 
 Itemspec{
 	name = "aquanite dagger",
@@ -273,7 +286,8 @@ Itemspec{
 	crafting_materials = {["aquanite stone"] = 3},
 	damage = 15,
 	damage_bonus_dexterity = 0.4,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	mass = 15}
 
 Itemspec{
 	name = "aquanite grenade",
@@ -289,6 +303,7 @@ Itemspec{
 	destroy_timer = 3,
 	equipment_slot = "hand.R",
 	health = 1,
+	mass = 5,
 	stacking = true}
 
 Itemspec{
@@ -301,7 +316,8 @@ Itemspec{
 	damage = 15,
 	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R",
-	icon = "axe1"}
+	icon = "axe1",
+	mass = 15}
 
 Itemspec{
 	name = "aquanite mattock",
@@ -312,7 +328,8 @@ Itemspec{
 	crafting_materials = {["aquanite stone"] = 9},
 	damage = 15,
 	damage_bonus_strength = 0.1,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	mass = 15}
 
 Itemspec{
 	name = "aquanite musket",
@@ -324,7 +341,8 @@ Itemspec{
 	damage_bonus_intelligence = 0.2,
 	damage_bonus_perception = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1"}
+	icon = "bow1",
+	mass = 15}
 
 Itemspec{
 	name = "aquanite sword",
@@ -334,7 +352,8 @@ Itemspec{
 	damage = 30,
 	damage_bonus_dexterity = 0.2,
 	damage_bonus_strength = 0.2,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	mass = 15}
 
 Itemspec{
 	name = "crimson crossbow",
@@ -345,7 +364,8 @@ Itemspec{
 	damage = 22,
 	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1"}
+	icon = "bow1",
+	mass = 15}
 
 Itemspec{
 	name = "crimson dagger",
@@ -354,7 +374,8 @@ Itemspec{
 	crafting_materials = {["crimson stone"] = 3},
 	damage = 15,
 	damage_bonus_dexterity = 0.4,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	mass = 15}
 
 Itemspec{
 	name = "crimson grenade",
@@ -370,6 +391,7 @@ Itemspec{
 	destroy_timer = 3,
 	equipment_slot = "hand.R",
 	health = 1,
+	mass = 5,
 	stacking = true}
 
 Itemspec{
@@ -382,7 +404,8 @@ Itemspec{
 	damage = 15,
 	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R",
-	icon = "axe1"}
+	icon = "axe1",
+	mass = 15}
 
 Itemspec{
 	name = "crimson mattock",
@@ -393,7 +416,8 @@ Itemspec{
 	crafting_materials = {["crimson stone"] = 9},
 	damage = 15,
 	damage_bonus_strength = 0.1,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	mass = 15}
 
 Itemspec{
 	name = "crimson musket",
@@ -405,7 +429,8 @@ Itemspec{
 	damage_bonus_intelligence = 0.2,
 	damage_bonus_perception = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1"}
+	icon = "bow1",
+	mass = 15}
 
 Itemspec{
 	name = "crimson sword",
@@ -415,7 +440,8 @@ Itemspec{
 	damage = 30,
 	damage_bonus_dexterity = 0.2,
 	damage_bonus_strength = 0.2,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	mass = 15}
 
 Itemspec{
 	name = "iron crossbow",
@@ -426,7 +452,8 @@ Itemspec{
 	damage = 15,
 	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1"}
+	icon = "bow1",
+	mass = 15}
 
 Itemspec{
 	name = "iron dagger",
@@ -435,19 +462,21 @@ Itemspec{
 	crafting_materials = {["iron ingot"] = 1},
 	damage = 10,
 	damage_bonus_dexterity = 0.4,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	mass = 5}
 
 Itemspec{
 	name = "iron hatchet",
 	model = "axe1",
 	categories = {"hatchet", "melee", "weapon"},
-	crafting_materials = {["iron ingot"] = 1},
+	crafting_materials = {["iron ingot"] = 2},
 	damage = 10,
 	damage_bonus_strength = 0.2,
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	equipment_slot = "hand.R",
-	icon = "axe1"}
+	icon = "axe1",
+	mass = 10}
 
 Itemspec{
 	name = "iron mattock",
@@ -458,7 +487,8 @@ Itemspec{
 	animation_attack = "attack axe",
 	damage = 10,
 	damage_bonus_strength = 0.1,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	mass = 15}
 
 Itemspec{
 	name = "iron musket",
@@ -470,17 +500,19 @@ Itemspec{
 	damage_bonus_intelligence = 0.2,
 	damage_bonus_perception = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1"}
+	icon = "bow1",
+	mass = 20}
 
 Itemspec{
 	name = "iron sword",
 	model = "sword1",
 	categories = {"melee", "weapon"},
-	crafting_materials = {["iron ingot"] = 1},
+	crafting_materials = {["iron ingot"] = 3},
 	damage = 10,
 	damage_bonus_dexterity = 0.2,
 	damage_bonus_strength = 0.2,
-	equipment_slot = "hand.R"}
+	equipment_slot = "hand.R",
+	mass = 15}
 
 Itemspec{
 	name = "wooden crossbow",
@@ -493,7 +525,8 @@ Itemspec{
 	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R",
 	icon = "bow1",
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,1,0),
+	mass = 7}
 
 Itemspec{
 	name = "wooden dagger",
@@ -503,7 +536,8 @@ Itemspec{
 	damage = 5,
 	damage_bonus_dexterity = 0.4,
 	equipment_slot = "hand.R",
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,1,0),
+	mass = 7}
 
 Itemspec{
 	name = "wooden hatchet",
@@ -516,7 +550,8 @@ Itemspec{
 	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R",
 	icon = "axe1",
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,1,0),
+	mass = 7}
 
 Itemspec{
 	name = "wooden mattock",
@@ -528,7 +563,8 @@ Itemspec{
 	damage = 5,
 	damage_bonus_strength = 0.1,
 	equipment_slot = "hand.R",
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,1,0),
+	mass = 7}
 
 Itemspec{
 	name = "wooden sword",
@@ -539,7 +575,8 @@ Itemspec{
 	damage_bonus_dexterity = 0.2,
 	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R",
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,1,0),
+	mass = 7}
 
 Itemspec{
 	name = "wooden club",
@@ -552,7 +589,8 @@ Itemspec{
 	damage_bonus_dexterity = 0.2,
 	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R",
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,1,0),
+	mass = 7}
 
 Itemspec{
 	name = "wooden staff",
@@ -567,7 +605,8 @@ Itemspec{
 	armor_class = 0.04,
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,1,0),
+	mass = 7}
 
 Itemspec{
 	name = "luminous staff",
@@ -584,7 +623,8 @@ Itemspec{
 	equipment_slots_reserved = {"hand.L"},
 	special_effects = {
 		{slot = "flame", model = "torchfx1"},{slot = "flame2", model = "torchfx1"}},
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,1,0),
+	mass = 7}
 
 ------------------------------------------------------------------------------
 -- Armor.
@@ -603,6 +643,7 @@ Itemspec{
 		["devora"] = {upper1 = "devorachinadress1"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1",
+	mass = 1,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -615,6 +656,7 @@ Itemspec{
 		["troglodyte female"] = {upper1 = "trogfemrags1"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1",
+	mass = 1,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -625,7 +667,8 @@ Itemspec{
 	crafting_materials = {["iron ingot"] = 3},
 	equipment_models = {
 		["aer/kraken/wyrm"] = {legs = "aerlegplate1"}},
-	equipment_slot = "feet"}
+	equipment_slot = "feet",
+	mass = 15}
 
 Itemspec{
 	name = "iron gauntlets",
@@ -635,7 +678,8 @@ Itemspec{
 	crafting_materials = {["iron ingot"] = 2},
 	equipment_models = {
 		["aer/kraken/wyrm"] = {arms = "aerarmplate2"}},
-	equipment_slot = "arms"}
+	equipment_slot = "arms",
+	mass = 10}
 
 Itemspec{
 	name = "iron breastplate",
@@ -645,7 +689,8 @@ Itemspec{
 	crafting_materials = {["iron ingot"] = 5},
 	equipment_models = {
 		["aer/kraken/wyrm"] = {upper = "aerupperplate1", lower = "aerlowerplate1"}},
-	equipment_slot = "upperbody"}
+	equipment_slot = "upperbody",
+	mass = 25}
 
 Itemspec{
 	name = "kitty headband",
@@ -656,6 +701,7 @@ Itemspec{
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {headband = "headband1"}},
 	equipment_slot = "head",
+	mass = 1,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -667,6 +713,7 @@ Itemspec{
 	equipment_models = {
 		["aermale"] = {hair = "aermale1leatherhead2"}},
 	equipment_slot = "head",
+	mass = 3,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -678,6 +725,7 @@ Itemspec{
 	equipment_models = {
 		["aer/kraken/wyrm"] = {legs = "aerlegarmor1"}},
 	equipment_slot = "feet",
+	mass = 5,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -689,6 +737,7 @@ Itemspec{
 	equipment_models = {
 		["aermale"] = {hands = "aermale1leatherarms2"}},
 	equipment_slot = "arms",
+	mass = 3,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -700,6 +749,7 @@ Itemspec{
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor2", legs1 = "boots1"},["aermale"] = {feet = "aermale1boots1"}},
 	equipment_slot = "feet",
+	mass = 3,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -711,6 +761,7 @@ Itemspec{
 	equipment_models = {
 		["aer/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},["aermale"] = {legs = "aermale1leatherlegs2"}},
 	equipment_slot = "lowerbody",
+	mass = 5,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -722,6 +773,7 @@ Itemspec{
 	equipment_models = {
 		["aer/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},["aermale"] = {legs = "aermale1leatherlegs1"}},
 	equipment_slot = "lowerbody",
+	mass = 5,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -734,6 +786,7 @@ Itemspec{
 		["aer/kraken/wyrm"] = {upper1 = "bra1"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1",
+	mass = 5,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -745,6 +798,7 @@ Itemspec{
 	equipment_models = {
 		["aer/kraken/wyrm"] = {skirt = "aerleatherskirt1", panties = "panties2"}},
 	equipment_slot = "lowerbody",
+	mass = 5,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -756,6 +810,7 @@ Itemspec{
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {legs1 = "aerboots2"}},
 	equipment_slot = "feet",
+	mass = 4,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -767,6 +822,7 @@ Itemspec{
 	equipment_models = {
 		["aer/kraken/wyrm"] = {dress1 = "aerdress2", panties = "panties2"}},
 	equipment_slot = "upperbody",
+	mass = 7,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -778,6 +834,7 @@ Itemspec{
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {arms1 = "aergloves2"}},
 	equipment_slot = "arms",
+	mass = 4,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -790,6 +847,7 @@ Itemspec{
 		["aer/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest2"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1",
+	mass = 5,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -802,6 +860,7 @@ Itemspec{
 		["aer/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest1"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1",
+	mass = 5,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -810,7 +869,8 @@ Itemspec{
 	animation_hold = "hold shield",
 	armor_class = 0.08,
 	categories = {"shield"},
-	crafting_materials = {["log"] = 5, ["iron ingot"] = 3},
+	crafting_materials = {["log"] = 3, ["iron ingot"] = 3},
+	mass = 24,
 	equipment_slot = "hand.L"}
 
 Itemspec{
@@ -821,6 +881,7 @@ Itemspec{
 	categories = {"shield"},
 	crafting_materials = {["log"] = 1},
 	equipment_slot = "hand.L",
+	mass = 7,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -833,6 +894,7 @@ Itemspec{
 		["aermale"] = {upper = "aermale1shirt1"}},
 	equipment_slot = "upperbody",
 	icon = "cloth1",
+	mass = 1,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -845,6 +907,7 @@ Itemspec{
 		["aermale"] = {legs = "aermale1pants1"}},
 	equipment_slot = "lowerbody",
 	icon = "cloth1",
+	mass = 1,
 	water_gravity = Vector(0,1,0)}
 
 ------------------------------------------------------------------------------
@@ -853,19 +916,19 @@ Itemspec{
 Itemspec{
 	name = "arrow",
 	model = "arrow-000",
-	mass = 1,
 	categories = {"arrow"},
 	damage = 5,
 	crafting_count = 10,
 	crafting_materials = {["log"] = 1},
 	icon = "arrow1",
+	mass = 1,
 	stacking = true,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "bullet",
 	model = "arrow-000", -- FIXME
-	mass = 1,
+	mass = 3,
 	categories = {"bullet"},
 	damage = 5,
 	crafting_count = 10,
@@ -881,6 +944,7 @@ Itemspec{
 	crafting_materials = {["log"] = 1},
 	equipment_slot = "hand.L",
 	icon = "torch1",
+	mass = 3,
 	special_effects = {
 		{slot = "flame", model = "torchfx1"}},
 	water_gravity = Vector(0,1,0)}
@@ -900,7 +964,6 @@ Itemspec{
 Itemspec{
 	name = "firestone",
 	model = "firestone1",
-	mass = 4,
 	categories = {"explosive", "throwable", "weapon"},
 	animation_hold = "hold bulky",
 	animation_attack = "throw bulky",
@@ -909,10 +972,12 @@ Itemspec{
 	destroy_actions = {"explode"},
 	destroy_timer = 5,
 	equipment_slot = "hand.R",
+	health = 1,
+	mass = 4,
 	special_effects = {
 		{slot = "flame", model = "torchfx1"}},
-	health = 1,
 	stacking = false}
+
 ------------------------------------------------------------------------------
 -- Containers.
 
@@ -947,7 +1012,7 @@ Itemspec{
 Itemspec{
 	name = "workbench",
 	model = "workbench1",
-	mass = 15,
+	mass = 30,
 	animation_looted = "open",
 	animation_looting = "opening",
 	categories = {"container", "workbench"},
