@@ -127,7 +127,7 @@ Shader.los_normal_mapping = [[
 vec3 los_normal_mapping(in vec3 normal, in vec3 tangent, in vec2 texcoord, in sampler2D sampler)
 {
 	vec3 tmp = normalize(normal);
-	mat3 tangentspace = mat3(tangent, cross(tmp, tangent), tmp);
+	mat3 tangentspace = mat3(tangent, cross(tangent, tmp), tmp);
 	vec3 n = normalize(texture(sampler, texcoord).xyz * 2.0 - 1.0);
 	return normalize(tangentspace * n);
 }]]
