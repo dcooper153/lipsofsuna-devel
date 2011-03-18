@@ -60,27 +60,14 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 	}
 	lisys_assert (object_convex->getCollisionShape ()->getShapeType () == CONVEX_HULL_SHAPE_PROXYTYPE);
 	lisys_assert (object_terrain->getCollisionShape ()->getShapeType () == CUSTOM_CONVEX_SHAPE_TYPE);
-	shape_convex = (btConvexHullShape*) body1->getCollisionShape ();
+	shape_convex = (btConvexHullShape*) object_convex->getCollisionShape ();
 	shape_terrain = (LIPhyTerrainShape*) object_terrain->getCollisionShape ();
 	pointer = (LIPhyPointer*) object_terrain->getUserPointer ();
 
 	/* Get the range of intersecting tiles. */
-	/* FIXME: Children of compound shapes return nonsensical AABBs. */
 	tile_size = shape_terrain->terrain->voxels->tile_width;
 	transform = object_convex->getWorldTransform ();
-#if 0
 	shape_convex->getAabb (transform, aabb_min, aabb_max);
-#else
-	aabb_min = transform * btVector3 (-4, -4, -4);
-	aabb_max = transform * btVector3 (4, 4, 4);
-	for (i = 0 ; i < 3 ; i++)
-	{
-		float v1 = aabb_min[i];
-		float v2 = aabb_max[i];
-		aabb_min[i] = LIMAT_MIN (v1, v2);
-		aabb_max[i] = LIMAT_MAX (v1, v2);
-	}
-#endif
 	aabb_min /= tile_size;
 	aabb_max /= tile_size;
 	for (i = 0 ; i < 3 ; i++)
