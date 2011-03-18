@@ -79,6 +79,18 @@ bpy.utils.register_class(LIExportFinishedDialog)
 
 ##############################################################################
 
+def material_files(material):
+	def getprop(mat, prop):
+		try:
+			return mat[prop]
+		except:
+			return ""
+	files = getprop(material, 'file').split(',')
+	if getprop(material, 'lod') == 'true':
+		return [f + 'l.lmdl' for f in files if len(f)]
+	else:
+		return [f + '.lmdl' for f in files if len(f)]
+
 def object_files(object):
 	def getprop(obj, prop):
 		try:
@@ -512,7 +524,7 @@ class LIMaterial:
 
 class LIMesh:
 
-	def __init__(self, obj):
+	def __init__(self, obj, file):
 		mesh = obj.data
 		# Initialize storage.
 		self.matdict = {}
@@ -527,11 +539,17 @@ class LIMesh:
 			verts = [mesh.vertices[x] for x in face.vertices]
 			indices = [x for x in face.vertices]
 			# Material attributes.
+			# Materials may have a file property that limits exporting of the face
+			# to a certain file. We need to check that the file is correct and skip
+			# the face if it isn't.
 			idx = face.material_index
 			bmat = None
 			bimg = None
 			if idx < len(obj.material_slots):
 				bmat = obj.material_slots[idx].material
+				files = material_files(bmat)
+				if len(files) and file not in files:
+					continue
 			# Texture attributes.
 			if mesh.uv_textures.active:
 				buvs = mesh.uv_textures.active.data[face.index]
@@ -1232,7 +1250,7 @@ class LIFile:
 		elif self.state == 7:
 			if self.object != None:
 				try:
-					self.mesh = LIMesh(self.object)
+					self.mesh = LIMesh(self.object, self.filename)
 				except Exception as e:
 					bpy.ops.object.delete()
 					raise e
