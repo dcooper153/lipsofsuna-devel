@@ -49,7 +49,14 @@ Feat.apply = function(self, args)
 		if k == "health" then
 			-- Increase or decrease health.
 			if args.target then
-				args.target:damaged(-info.influences.health)
+				-- Apply with randomization.
+				local val = info.influences.health
+				if val < 0 then
+					val = math.min(-1, val + val * 0.5 * math.random())
+				else
+					val = math.max(1, val + val * 0.5 * math.random())
+				end
+				args.target:damaged(-val)
 				-- Anger hurt creatures.
 				if info.influences.health < 0 then
 					args.target:add_enemy(args.attacker)
