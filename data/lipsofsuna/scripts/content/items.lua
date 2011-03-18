@@ -4,6 +4,7 @@
 Itemspec{
 	name = "adamantium",
 	model = "adamantium1",
+	icon = "stone2",
 	mass = 3,
 	categories = {"material"},
 	stacking = true}
@@ -11,6 +12,7 @@ Itemspec{
 Itemspec{
 	name = "aquanite stone",
 	model = "aquanitestone1",
+	icon = "stone2",
 	mass = 3,
 	categories = {"material"},
 	stacking = true}
@@ -18,6 +20,7 @@ Itemspec{
 Itemspec{
 	name = "basalt stone",
 	model = "basaltstone1",
+	icon = "stone1",
 	mass = 3,
 	categories = {"build", "material"},
 	construct_tile = "basalt1",
@@ -35,6 +38,7 @@ Itemspec{
 Itemspec{
 	name = "crimson stone",
 	model = "crimsonstone1",
+	icon = "stone2",
 	mass = 3,
 	categories = {"material"},
 	stacking = true}
@@ -49,6 +53,7 @@ Itemspec{
 Itemspec{
 	name = "ferrostone",
 	model = "ferrostone1",
+	icon = "stone2",
 	mass = 5,
 	categories = {"build", "material"},
 	construct_tile = "ferrostone1",
@@ -74,6 +79,7 @@ Itemspec{
 Itemspec{
 	name = "glass ingot",
 	model = "book-000", -- FIXME
+	icon = "ingot1",
 	categories = {"material"},
 	crafting_materials = {["sand chunk"] = 1},
 	health = 10,
@@ -83,6 +89,7 @@ Itemspec{
 Itemspec{
 	name = "granite stone",
 	model = "granitestone1",
+	icon = "stone1",
 	categories = {"build", "material"},
 	construct_tile = "granite1",
 	construct_tile_count = 1,
@@ -94,6 +101,7 @@ Itemspec{
 Itemspec{
 	name = "iron ingot",
 	model = "book-000", -- FIXME
+	icon = "ingot1",
 	mass = 5,
 	categories = {"build", "material"},
 	construct_tile = "iron1",
@@ -105,6 +113,7 @@ Itemspec{
 Itemspec{
 	name = "hide",
 	model = "book-000", -- FIXME
+	icon = "hide1",
 	mass = 1,
 	categories = {"material"},
 	stacking = true}
@@ -119,6 +128,7 @@ Itemspec{
 Itemspec{
 	name = "log",
 	model = "log1",
+	icon = "log1",
 	categories = {"build", "material","throwable"},
 	animation_hold = "hold bulky",
 	animation_attack = "throw bulky",
@@ -134,6 +144,7 @@ Itemspec{
 Itemspec{
 	name = "another log",
 	model = "log2",
+	icon = "log1",
 	categories = {"build", "material","throwable"},
 	animation_hold = "hold bulky",
 	animation_attack = "throw bulky",
@@ -149,20 +160,20 @@ Itemspec{
 Itemspec{
 	name = "milky powder",
 	model = "book-000", -- FIXME
+	icon = "mushroom1",
 	categories = {"material"},
 	crafting_count = 20,
 	crafting_materials = {["mushroom"] = 1},
 	mass = 1,
-	stacking = true,
-	icon = "mushroom1"}
+	stacking = true}
 
 Itemspec{
 	name = "mushroom",
 	model = "mushroom-000",--"mushroom-001"..."mushroom-008"
+	icon = "mushroom1",
 	categories = {"material"},
 	mass = 1,
-	stacking = true,
-	icon = "mushroom1"}
+	stacking = true}
 
 Itemspec{
 	name = "sand chunk",
@@ -199,18 +210,19 @@ Itemspec{
 Itemspec{
 	name = "adamantium crossbow",
 	model = "bow1", -- FIXME
+	icon = "bow1",
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["adamantium"] = 9},
 	damage = 30,
 	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1",
 	mass = 15}
 
 Itemspec{
 	name = "adamantium dagger",
 	model = "sword1", -- FIXME
+	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
 	damage = 20,
@@ -221,6 +233,7 @@ Itemspec{
 Itemspec{
 	name = "adamantium hatchet",
 	model = "axe1",
+	icon = "axe1",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
@@ -228,12 +241,12 @@ Itemspec{
 	damage = 20,
 	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R",
-	icon = "axe1",
 	mass = 15}
 
 Itemspec{
 	name = "adamantium mattock",
 	model = "mattock-000",
+	icon = "mattock1",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
@@ -246,6 +259,7 @@ Itemspec{
 Itemspec{
 	name = "adamantium musket",
 	model = "bow1", -- FIXME
+	icon = "bow1",
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["adamantium"] = 15, ["log"] = 2},
@@ -253,12 +267,12 @@ Itemspec{
 	damage_bonus_intelligence = 0.2,
 	damage_bonus_perception = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1",
 	mass = 15}
 
 Itemspec{
 	name = "adamantium sword",
 	model = "sword1",
+	icon = "sword1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
 	damage = 40,
@@ -270,18 +284,19 @@ Itemspec{
 Itemspec{
 	name = "aquanite crossbow",
 	model = "bow1", -- FIXME
+	icon = "bow1",
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["aquanite stone"] = 9},
 	damage = 22,
 	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1",
 	mass = 15}
 
 Itemspec{
 	name = "aquanite dagger",
 	model = "sword1", -- FIXME
+	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
 	damage = 15,
@@ -309,6 +324,7 @@ Itemspec{
 Itemspec{
 	name = "aquanite hatchet",
 	model = "axe1",
+	icon = "axe1",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
@@ -316,12 +332,12 @@ Itemspec{
 	damage = 15,
 	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R",
-	icon = "axe1",
 	mass = 15}
 
 Itemspec{
 	name = "aquanite mattock",
 	model = "mattock-000",
+	icon = "mattock1",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
@@ -334,6 +350,7 @@ Itemspec{
 Itemspec{
 	name = "aquanite musket",
 	model = "bow1", -- FIXME
+	icon = "bow1",
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["aquanite stone"] = 15, ["log"] = 2},
@@ -341,12 +358,12 @@ Itemspec{
 	damage_bonus_intelligence = 0.2,
 	damage_bonus_perception = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1",
 	mass = 15}
 
 Itemspec{
 	name = "aquanite sword",
 	model = "sword1",
+	icon = "sword1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
 	damage = 30,
@@ -358,18 +375,19 @@ Itemspec{
 Itemspec{
 	name = "crimson crossbow",
 	model = "bow1", -- FIXME
+	icon = "bow1",
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["crimson stone"] = 9},
 	damage = 22,
 	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1",
 	mass = 15}
 
 Itemspec{
 	name = "crimson dagger",
 	model = "sword1", -- FIXME
+	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 3},
 	damage = 15,
@@ -397,6 +415,7 @@ Itemspec{
 Itemspec{
 	name = "crimson hatchet",
 	model = "axe1",
+	icon = "axe1",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
@@ -404,12 +423,12 @@ Itemspec{
 	damage = 15,
 	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R",
-	icon = "axe1",
 	mass = 15}
 
 Itemspec{
 	name = "crimson mattock",
 	model = "mattock-000",
+	icon = "mattock1",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
@@ -422,6 +441,7 @@ Itemspec{
 Itemspec{
 	name = "crimson musket",
 	model = "bow1", -- FIXME
+	icon = "bow1",
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["crimson stone"] = 15, ["log"] = 2},
@@ -429,12 +449,12 @@ Itemspec{
 	damage_bonus_intelligence = 0.2,
 	damage_bonus_perception = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1",
 	mass = 15}
 
 Itemspec{
 	name = "crimson sword",
 	model = "sword1",
+	icon = "sword1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 3},
 	damage = 30,
@@ -446,18 +466,19 @@ Itemspec{
 Itemspec{
 	name = "iron crossbow",
 	model = "bow1", -- FIXME
+	icon = "bow1",
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["iron ingot"] = 3},
 	damage = 15,
 	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1",
 	mass = 15}
 
 Itemspec{
 	name = "iron dagger",
 	model = "sword1", -- FIXME
+	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 1},
 	damage = 10,
@@ -468,6 +489,7 @@ Itemspec{
 Itemspec{
 	name = "iron hatchet",
 	model = "axe1",
+	icon = "axe1",
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 2},
 	damage = 10,
@@ -475,12 +497,12 @@ Itemspec{
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	equipment_slot = "hand.R",
-	icon = "axe1",
 	mass = 10}
 
 Itemspec{
 	name = "iron mattock",
 	model = "mattock-000",
+	icon = "mattock1",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 3},
 	animation_hold = "hold axe",
@@ -493,6 +515,7 @@ Itemspec{
 Itemspec{
 	name = "iron musket",
 	model = "bow1", -- FIXME
+	icon = "bow1",
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["iron ingot"] = 5, ["log"] = 2},
@@ -500,12 +523,12 @@ Itemspec{
 	damage_bonus_intelligence = 0.2,
 	damage_bonus_perception = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1",
 	mass = 20}
 
 Itemspec{
 	name = "iron sword",
 	model = "sword1",
+	icon = "sword1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 3},
 	damage = 10,
@@ -517,6 +540,7 @@ Itemspec{
 Itemspec{
 	name = "wooden crossbow",
 	model = "bow1", -- FIXME
+	icon = "bow1",
 	animation_attack = "attack bow",
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
@@ -524,13 +548,13 @@ Itemspec{
 	damage = 7,
 	damage_bonus_dexterity = 0.2,
 	equipment_slot = "hand.R",
-	icon = "bow1",
 	water_gravity = Vector(0,1,0),
 	mass = 7}
 
 Itemspec{
 	name = "wooden dagger",
 	model = "sword1", -- FIXME
+	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["log"] = 1},
 	damage = 5,
@@ -542,6 +566,7 @@ Itemspec{
 Itemspec{
 	name = "wooden hatchet",
 	model = "axe1",
+	icon = "axe1",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
@@ -549,13 +574,13 @@ Itemspec{
 	damage = 5,
 	damage_bonus_strength = 0.2,
 	equipment_slot = "hand.R",
-	icon = "axe1",
 	water_gravity = Vector(0,1,0),
 	mass = 7}
 
 Itemspec{
 	name = "wooden mattock",
 	model = "mattock-000",
+	icon = "mattock1",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
@@ -569,6 +594,7 @@ Itemspec{
 Itemspec{
 	name = "wooden sword",
 	model = "sword1",
+	icon = "sword1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["log"] = 1},
 	damage = 10,
@@ -581,6 +607,7 @@ Itemspec{
 Itemspec{
 	name = "wooden club",
 	model = "woodenclub1",
+	icon = "mace1",
 	animation_hold = "hold blunt",
 	animation_attack = "attack blunt",
 	categories = {"melee", "weapon"},
@@ -595,6 +622,7 @@ Itemspec{
 Itemspec{
 	name = "wooden staff",
 	model = "spear1",
+	icon = "staff1",
 	animation_hold = "hold staff",
 	animation_attack = "attack staff",
 	categories = {"melee", "weapon"},
@@ -611,6 +639,7 @@ Itemspec{
 Itemspec{
 	name = "luminous staff",
 	model = "staff1",
+	icon = "staff2",
 	animation_hold = "hold staff",
 	animation_attack = "attack staff",
 	categories = {"melee", "weapon"},
@@ -634,6 +663,7 @@ Itemspec{
 Itemspec{
 	name = "dress",
 	model = "chinadress1",
+	icon = "cloth1",
 	armor_class = 0.02,
 	categories = {"armor"},
 	crafting_materials = {log = 1},
@@ -642,26 +672,26 @@ Itemspec{
 		["android"] = {upper1 = "androidchinadress1"},
 		["devora"] = {upper1 = "devorachinadress1"}},
 	equipment_slot = "upperbody",
-	icon = "cloth1",
 	mass = 1,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "trog rags",
 	model = "book-000",
+	icon = "cloth1",
 	armor_class = 0.02,
 	categories = {"armor"},
 	crafting_materials = {log = 1},
 	equipment_models = {
 		["troglodyte female"] = {upper1 = "trogfemrags1"}},
 	equipment_slot = "upperbody",
-	icon = "cloth1",
 	mass = 1,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "iron greaves",
 	model = "book-000",
+	icon = "metalboot1",
 	armor_class = 0.08,
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 3},
@@ -673,17 +703,20 @@ Itemspec{
 Itemspec{
 	name = "iron gauntlets",
 	model = "book-000",
+	icon = "metalglove1",
 	armor_class = 0.08,
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 2},
 	equipment_models = {
 		["aer/kraken/wyrm"] = {arms = "aerarmplate2"}},
 	equipment_slot = "arms",
+
 	mass = 10}
 
 Itemspec{
 	name = "iron breastplate",
 	model = "book-000",
+	icon = "metalarmor1",
 	armor_class = 0.18,
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 5},
@@ -707,6 +740,7 @@ Itemspec{
 Itemspec{
 	name = "leather helm",
 	model = "book-000",
+	icon = "leatherhelm1",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 2},
@@ -719,6 +753,7 @@ Itemspec{
 Itemspec{
 	name = "leather leggings",
 	model = "book-000",
+	icon = "leatherarmor1",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
@@ -731,6 +766,7 @@ Itemspec{
 Itemspec{
 	name = "leather gloves",
 	model = "book-000",
+	icon = "leatherglove1",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {["hide"] = 2},
@@ -743,6 +779,7 @@ Itemspec{
 Itemspec{
 	name = "leather boots",
 	model = "boots1",
+	icon = "leatherboot1",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
@@ -755,6 +792,7 @@ Itemspec{
 Itemspec{
 	name = "leather pants",
 	model = "book-000",
+	icon = "leatherarmor1",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
@@ -767,6 +805,7 @@ Itemspec{
 Itemspec{
 	name = "leather brigand pants",
 	model = "book-000",
+	icon = "leatherarmor1",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
@@ -779,19 +818,20 @@ Itemspec{
 Itemspec{
 	name = "leather top",
 	model = "book-000",
+	icon = "leatherarmor1",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
 		["aer/kraken/wyrm"] = {upper1 = "bra1"}},
 	equipment_slot = "upperbody",
-	icon = "cloth1",
 	mass = 5,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "leather skirt",
 	model = "book-000",
+	icon = "leatherarmor1",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
@@ -804,6 +844,7 @@ Itemspec{
 Itemspec{
 	name = "lizard boots",
 	model = "boots2",
+	icon = "lizardboot1",
 	armor_class = 0.5,
 	categories = {"armor"},
 	crafting_materials = {["lizard scale"] = 4},
@@ -815,6 +856,7 @@ Itemspec{
 
 Itemspec{
 	name = "lizard dress",
+	icon = "lizardarmor1",
 	model = "book-000",
 	armor_class = 0.1,
 	categories = {"armor"},
@@ -828,6 +870,7 @@ Itemspec{
 Itemspec{
 	name = "lizard gloves",
 	model = "gloves2",
+	icon = "lizardglove1",
 	armor_class = 0.5,
 	categories = {"armor"},
 	crafting_materials = {["lizard scale"] = 4},
@@ -840,6 +883,7 @@ Itemspec{
 Itemspec{
 	name = "leather chest",
 	model = "book-000",
+	icon = "leatherarmor1",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
@@ -853,6 +897,7 @@ Itemspec{
 Itemspec{
 	name = "leather brigand chest",
 	model = "book-000",
+	icon = "lizardarmor1",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
@@ -865,6 +910,7 @@ Itemspec{
 
 Itemspec{
 	name = "round shield",
+	icon = "shield1",
 	model = "shield1",
 	animation_hold = "hold shield",
 	armor_class = 0.08,
@@ -875,6 +921,7 @@ Itemspec{
 
 Itemspec{
 	name = "wooden shield",
+	icon = "shield1",
 	model = "shield-001-wood1",
 	animation_hold = "hold shield",
 	armor_class = 0.08,
@@ -887,6 +934,7 @@ Itemspec{
 Itemspec{
 	name = "shirt",
 	model = "book-000",
+	icon = "cloth1",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 1},
@@ -899,6 +947,7 @@ Itemspec{
 
 Itemspec{
 	name = "pants",
+	icon = "cloth1",
 	model = "book-000",
 	armor_class = 0.04,
 	categories = {"armor"},
@@ -952,6 +1001,7 @@ Itemspec{
 Itemspec{
 	name = "impstone",
 	model = "firestone1",
+	icon = "stone1",
 	equipment_slot = "hand.R",
 	categories = {"throwable", "weapon"},
 	animation_hold = "hold bulky",
@@ -963,6 +1013,7 @@ Itemspec{
 
 Itemspec{
 	name = "firestone",
+	icon = "stone2",
 	model = "firestone1",
 	categories = {"explosive", "throwable", "weapon"},
 	animation_hold = "hold bulky",
@@ -1012,6 +1063,7 @@ Itemspec{
 Itemspec{
 	name = "workbench",
 	model = "workbench1",
+	icon = "workbench1",
 	mass = 30,
 	animation_looted = "open",
 	animation_looting = "opening",
@@ -1066,6 +1118,7 @@ Itemspec{
 
 Itemspec{
 	name = "gem",
+	icon = "gem1",
 	model = "gem-000",
 	mass = 2,
 	categories = {"reagent"},
@@ -1139,6 +1192,7 @@ Itemspec{
 
 Itemspec{
 	name = "Steamworks",
+	icon = "scroll1",
 	model = "book-000",
 	mass = 2,
 	categories = {"book"},
