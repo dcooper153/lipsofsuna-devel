@@ -10,7 +10,7 @@ top = '.'
 out = '.build'
 
 CORE_DIRS = 'ai algorithm archive binding callback client engine extension font generator image main math model network particle paths physics reload render script server sound string system thread video voxel widget'
-EXTS_DIRS = 'animation camera database graphics network object-physics object-render physics reload render skeleton sound speech tiles tiles-physics tiles-render widgets'
+EXTS_DIRS = 'animation camera database graphics network noise object-physics object-render physics reload render skeleton sound speech tiles tiles-physics tiles-render widgets'
 CORE_EXCL = 'src/lipsofsuna/math/unittest.c'
 
 def options(ctx):

@@ -30,6 +30,7 @@ extern LIMaiExtensionInfo liext_camera_info;
 extern LIMaiExtensionInfo liext_database_info;
 extern LIMaiExtensionInfo liext_graphics_info;
 extern LIMaiExtensionInfo liext_network_info;
+extern LIMaiExtensionInfo liext_noise_info;
 extern LIMaiExtensionInfo liext_object_physics_info;
 extern LIMaiExtensionInfo liext_object_render_info;
 extern LIMaiExtensionInfo liext_physics_info;
@@ -63,6 +64,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "database", &liext_database_info },
 		{ "graphics", &liext_graphics_info },
 		{ "network", &liext_network_info },
+		{ "noise", &liext_noise_info },
 		{ "object-physics", &liext_object_physics_info },
 		{ "object-render", &liext_object_render_info },
 		{ "physics", &liext_physics_info },
