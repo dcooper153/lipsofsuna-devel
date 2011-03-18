@@ -482,8 +482,10 @@ int liscr_args_geti_table (
 			return 0;
 		index += self->args_start;
 		if (lua_type (self->lua, index) == LUA_TTABLE)
+		{
+			lua_pushvalue (self->lua, index);
 			return 1;
-		lua_pushvalue (self->lua, index);
+		}
 	}
 
 	return 0;
