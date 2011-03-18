@@ -30,6 +30,7 @@ struct _LIPhyTerrain
 	int collision_mask;
 	int realized;
 	btCollisionObject* object;
+	LIPhyPointer* pointer;
 	LIPhyTerrainShape* shape;
 	LIPhyPhysics* physics;
 	LIVoxManager* voxels;

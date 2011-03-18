@@ -43,7 +43,6 @@ LIPhyTerrain* liphy_terrain_new (
 {
 	btQuaternion r(0.0f, 0.0f, 0.0f, 1.0f);
 	btVector3 p(0.0f, 0.0f, 0.0f);
-	LIPhyPointer* pointer;
 	LIPhyTerrain* self;
 
 	/* Allocate self. */
@@ -56,14 +55,14 @@ LIPhyTerrain* liphy_terrain_new (
 	self->collision_mask = collision_mask;
 
 	/* Prepare collision object to tile index lookup. */
-	pointer = (LIPhyPointer*) lisys_calloc (1, sizeof (LIPhyPointer));
-	if (pointer == NULL)
+	self->pointer = (LIPhyPointer*) lisys_calloc (1, sizeof (LIPhyPointer));
+	if (self->pointer == NULL)
 	{
 		lisys_free (self);
 		return NULL;
 	}
-	pointer->object = 0;
-	pointer->pointer = self;
+	self->pointer->object = 0;
+	self->pointer->pointer = self;
 
 	/* Create the collision shape. */
 	self->shape = new LIPhyTerrainShape (self);
@@ -74,7 +73,7 @@ LIPhyTerrain* liphy_terrain_new (
 	self->object->setActivationState (DISABLE_DEACTIVATION);
 	self->object->setCollisionShape (self->shape);
 	self->object->setWorldTransform (btTransform (r, p));
-	self->object->setUserPointer (pointer);
+	self->object->setUserPointer (self->pointer);
 
 	return self;
 }
@@ -89,6 +88,7 @@ void liphy_terrain_free (
 	liphy_terrain_set_realized (self, 0);
 	delete self->object;
 	delete self->shape;
+	lisys_free (self->pointer);
 	lisys_free (self);
 }
 
