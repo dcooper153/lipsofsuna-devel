@@ -660,6 +660,57 @@ static void Voxel_set_tile (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Sets the contents of a tiles.
+ * -- @param clss Voxel class.
+ * -- @param args Arguments.<ul>
+ * --   <li>1,tile: Tile number.</li>
+ * --   <li>2,points: List of tile index vectors.</li></ul>
+ * function Voxel.set_tiles(clss, args)
+ */
+static void Voxel_set_tiles (LIScrArgs* args)
+{
+	int i;
+	int lim;
+	int type = 0;
+	int top;
+	LIExtModule* module;
+	LIMatVector* point;
+	LIScrData* data;
+	LIVoxVoxel voxel;
+
+	if (!liscr_args_geti_int (args, 0, &type) &&
+	    !liscr_args_gets_int (args, "tile", &type))
+		return;
+	if (!liscr_args_geti_table (args, 1) &&
+	    !liscr_args_gets_table (args, "points"))
+		return;
+
+	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	lim = module->voxels->tiles_per_line * module->program->sectors->count;
+	top = lua_gettop (args->lua) + 1;
+	livox_voxel_init (&voxel, type);
+
+	for (i = 1 ; ; i++, lua_pop (args->lua, 1))
+	{
+		lua_pushnumber (args->lua, i);
+		lua_gettable (args->lua, -2);
+		data = liscr_isdata (args->lua, top, LISCR_SCRIPT_VECTOR);
+		if (data == NULL)
+		{
+			lua_pop (args->lua, 1);
+			break;
+		}
+		point = liscr_data_get_data (data);
+		if (point->x < 0.0f || point->x >= lim ||
+		    point->y < 0.0f || point->y >= lim ||
+		    point->z < 0.0f || point->z >= lim)
+			continue;
+		livox_manager_set_voxel (module->voxels, (int) point->x, (int) point->y, (int) point->z, &voxel);
+	}
+	lua_pop (args->lua, 1);
+}
+
+/* @luadoc
  * --- Number of blocks per sector edge.
  * -- @name Voxel.blocks_per_line
  * -- @class table
@@ -771,6 +822,7 @@ void liext_script_voxel (
 	liscr_class_insert_cfunc (self, "paste_region", Voxel_paste_region);
 	liscr_class_insert_cfunc (self, "set_block", Voxel_set_block);
 	liscr_class_insert_cfunc (self, "set_tile", Voxel_set_tile);
+	liscr_class_insert_cfunc (self, "set_tiles", Voxel_set_tiles);
 	liscr_class_insert_cvar (self, "blocks_per_line", Voxel_getter_blocks_per_line, Voxel_setter_blocks_per_line);
 	liscr_class_insert_cvar (self, "fill", Voxel_getter_fill, Voxel_setter_fill);
 	liscr_class_insert_cvar (self, "materials", Voxel_getter_materials, NULL);
