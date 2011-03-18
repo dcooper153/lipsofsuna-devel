@@ -102,7 +102,7 @@ static inline uint32_t lialg_random_range (
 	uint32_t     end)
 {
 	lialg_random_rand (self);
-	return start + self->state % (start - end);
+	return start + self->state % (end - start);
 }
 
 #endif
