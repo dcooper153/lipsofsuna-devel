@@ -6,7 +6,7 @@ local regen = 0.5
 Species{
 	name = "base",
 	animations = {
-		["attack axe"] = {animation = "attack-axe", channel = 2, weight = 30},
+		["attack axe"] = {animation = "attack-axe", fade_in = 0.1, channel = 2, weight = 30},
 		["attack blunt"] = {animation = "attack-blunt", channel = 2, weight = 30},
 		["attack bow"] = {animation = "fire-bow", channel = 2, weight = 30},
 		["attack fist"] = {animation = "punch", channel = 2, weight = 30},
