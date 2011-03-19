@@ -49,6 +49,9 @@ Generator.map_version = "4"
 Generator.layer_offset = 2500
 Generator.layer_count = 20
 Generator.layer_size = Generator.map_size.y / Generator.layer_count
+Generator.bin_size = 6
+Generator.bin_stride = 512
+Generator.bin_stride2 = 512*512
 
 Generator.add_region = function(clss, region)
 	-- Store by name.
@@ -59,6 +62,22 @@ Generator.add_region = function(clss, region)
 	for i=min,max do
 		local dict = clss.regions_dict_layer[i]
 		table.insert(dict, region)
+	end
+	-- Add to the space partitioning table.
+	clss:for_each_bin(region.point, region.size, function(i)
+		clss.bins[i] = true
+	end)
+end
+
+Generator.for_each_bin = function(clss, point, size, func)
+	local p = (point * (1 / clss.bin_size)):floor()
+	local s = (size * (1 / clss.bin_size)):ceil()
+	for x = p.x,p.x+s.x do
+		for y = p.y,p.y+s.y do
+			for z = p.z,p.z+s.z do
+				func(x + clss.bin_stride * y + clss.bin_stride2 * z)
+			end
+		end
 	end
 end
 
@@ -175,10 +194,11 @@ Generator.validate_region_position = function(clss, aabb)
 	if aabb.point.x + aabb.size.x > clss.map_end.x then return end
 	if aabb.point.y + aabb.size.y > clss.map_end.y then return end
 	if aabb.point.z + aabb.size.z > clss.map_end.z then return end
-	for k,v in pairs(clss.regions_dict_id) do
-		if aabb:intersects(v.aabb) then return end
-	end
-	return true
+	local hit
+	clss:for_each_bin(aabb.point, aabb.size, function(i)
+		hit = hit or clss.bins[i]
+	end)
+	return not hit
 end
 
 --- Generates the world map.
@@ -191,6 +211,7 @@ Generator.generate = function(clss, args)
 	end
 	Player.clients = {}
 	-- Initialize state.
+	clss.bins = {}
 	clss.links = {}
 	clss.regions_dict_id = {}
 	clss.regions_dict_name = {}
