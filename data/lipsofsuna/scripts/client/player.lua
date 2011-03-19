@@ -33,9 +33,19 @@ Player.get_camera_transform = function(clss)
 end
 
 Player.get_camera_transform_1st = function(clss)
-	local pos,rot = clss:get_camera_transform_3rd()
-	local node = clss.object:find_node{name = "#camera"}
-	if node then pos = clss.object.position + clss.object.rotation * node end
+	-- Calculate the rotation.
+	local turn = clss.camera_turn_state + clss.turn_state
+	local tilt = clss.camera_tilt_state - clss.tilt_state
+	local rot = Quaternion:new_euler(turn, 0, tilt)
+	-- Find the camera offset.
+	local spec = Species:find{name = clss.species}
+	local rel = spec and spec.camera_center or Vector(0, 2, 0)
+	local pos = clss.object.position + clss.object.rotation * rel
+	local npos,nrot = clss.object:find_node{name = "#camera"}
+	if npos then
+		pos = clss.object.position + clss.object.rotation * npos
+		rot = rot * nrot
+	end
 	return pos,rot
 end
 
