@@ -43,8 +43,14 @@ Player.get_camera_transform_1st = function(clss)
 	local pos = clss.object.position + clss.object.rotation * rel
 	local npos,nrot = clss.object:find_node{name = "#camera"}
 	if npos then
+		-- The position of the camera node is always used but the rotation is
+		-- ignored most of the time since the rotation component of the node
+		-- is highly annoying in many animations. However, the rotation is used
+		-- when the player dies to avoid the camera facing inside the corpse.
 		pos = clss.object.position + clss.object.rotation * npos
-		rot = rot * nrot
+		if clss.object.dead then
+			rot = rot * nrot
+		end
 	end
 	return pos,rot
 end
