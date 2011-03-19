@@ -286,7 +286,7 @@ Generator.generate = function(clss, args)
 		if count > 1 then
 			local retry = 0
 			local created = 0
-			while retry < 3 and created < 7 do
+			while retry < 2 and created < 4 do
 				local reg1 = dict[math.random(1, count)]
 				local reg2 = dict[math.random(1, count)]
 				if reglink(reg1, reg2) then
@@ -361,7 +361,7 @@ Generator.subdivide_link = function(clss, link)
 	local src = link[1].point + link[1].size * 0.5
 	local dst = link[2].point + link[2].size * 0.5
 	local len = (src - dst).length - (link[1].size.length + link[2].size.length) / 2
-	if len < 15 then return end
+	if len < 25 then return end
 	-- Try to subdivide the link.
 	for i = 1,20 do
 		-- Select the type for the new region.
