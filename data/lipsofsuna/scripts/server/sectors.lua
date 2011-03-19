@@ -1,3 +1,6 @@
+Sectors.seed1 = math.random(10000, 60000)
+Sectors.seed2 = math.random(10000, 60000)
+
 --- Gets the offset of the sector in tiles.
 -- @param self Sectors.
 -- @param sector Sector index.
@@ -10,12 +13,56 @@ Sectors.get_sector_offset = function(self, sector)
 	return Vector(sx, sy, sz) * Voxel.tiles_per_line
 end
 
+Sectors.create_fractal_regions = function(self, sector, filter)
+	local org = Sectors.instance:get_sector_offset(sector)
+	if filter then
+		-- Fill valid blocks.
+		local w = 6
+		local size = Vector(w,w,w)
+		local aabb = Aabb{size = size}
+		for x = 0,3 do aabb.point.x = org.x + w*x
+			for y = 0,3 do aabb.point.y = org.y + w*y
+				for z = 0,3 do aabb.point.z = org.z + w*z
+					if filter(aabb) then
+						Sectors.instance:create_fractal_terrain(aabb.point, aabb.size)
+					end
+				end
+			end
+		end
+	else
+		-- Fill the whole sector.
+		local w = Voxel.tiles_per_line
+		local size = Vector(w,w,w)
+		Sectors.instance:create_fractal_terrain(org, size)
+	end
+end
+
+Sectors.create_fractal_terrain = function(self, org, size)
+	-- Create common tiles.
+	local mats = {
+		Material:find{name = "ferrostone1"},
+		Material:find{name = "sand1"},
+		Material:find{name = "soil1"}}
+	local m = mats[math.random(1,#mats)]
+	if m then
+		local scale = Vector(0.3,0.3,0.3)
+		Noise:perlin_terrain(org, org + size, m.id, 0.8, scale, 2, 3, 0.25, self.seed2)
+	end
+	-- Create caverns.
+	local scale = Vector(0.4,0.5,0.4)
+	local p = Noise:perlin_terrain(org, org + size, 0, 0.85, scale, 4, 3, 0.3, self.seed1)
+end
+
 --- Called when a sector is created by the game.
 -- @param self Sectors.
 -- @param sector Sector index.
 -- @param terrain True if terrain was loaded.
 -- @param objects Array of objects.
 Sectors.created_sector = function(self, sector, terrain, objects)
+	-- Create fractal terrain for newly found sectors.
+	if not terrain then
+		self:create_fractal_regions(sector)
+	end
 	-- Count monsters.
 	local monsters = 1
 	for k,obj in pairs(objects) do

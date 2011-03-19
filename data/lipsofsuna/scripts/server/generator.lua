@@ -320,9 +320,18 @@ Generator.generate = function(clss, args)
 	for k in pairs(sectors) do
 		sectorn = sectorn + 1
 	end
+	-- Create fractal terrain.
+	clss:update_status(0, "Randomizing terrain")
+	local index = 0
+	for k in pairs(sectors) do
+		Sectors.instance:create_fractal_regions(k,
+			function(aabb) return clss:validate_region_position(aabb) end)
+		clss:update_status(index / sectorn)
+		index = index + 1
+	end
 	-- Randomize tiles.
 	clss:update_status(0, "Creating resource deposits")
-	local index = 0
+	index = 0
 	for k in pairs(sectors) do
 		Sectors:format_generated_sector(k)
 		clss:update_status(index / sectorn)
