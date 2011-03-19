@@ -5,6 +5,10 @@ Actions.register = function(self, args)
 	self[args.name] = args.func
 end
 
+Vector.ceil = function(self)
+	return Vector(math.ceil(self.x), math.ceil(self.y), math.ceil(self.z))
+end
+
 Vector.floor = function(self)
 	return Vector(math.floor(self.x), math.floor(self.y), math.floor(self.z))
 end
