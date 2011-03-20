@@ -752,13 +752,13 @@ Itemspec{
 
 Itemspec{
 	name = "leather leggings",
-	model = "book-000",
+	model = "leggings1",
 	icon = "leatherarmor1",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
-		["aer/kraken/wyrm"] = {legs = "aerlegarmor1"}},
+		["aer/kraken/wyrm"] = {feet = false, legs = "aerleggings1"}},
 	equipment_slot = "feet",
 	mass = 5,
 	water_gravity = Vector(0,1,0)}
