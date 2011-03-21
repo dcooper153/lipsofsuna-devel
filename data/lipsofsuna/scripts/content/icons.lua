@@ -150,7 +150,7 @@ Iconspec{
 Iconspec{
 	name = "potion1",
 	image = "icons1",
-	position = {0,40},
+	offset = {0,40},
 	size = {20,20}}
 
 Iconspec{
