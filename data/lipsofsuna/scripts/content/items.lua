@@ -706,7 +706,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 3},
 	equipment_models = {
-		["aer/kraken/wyrm"] = {legs = "aerlegplate1"}},
+		["aer/kraken/wyrm"] = {feet = false, legs = "aerlegplate1"}},
 	equipment_slot = "feet",
 	mass = 15}
 
