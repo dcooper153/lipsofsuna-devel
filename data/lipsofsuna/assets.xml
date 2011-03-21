@@ -1536,8 +1536,24 @@
     <file>import/plate1.blend</file>
     <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>
-    <status>incomplete</status>
+    <status>usable</status>
     <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/platemail1.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/platemail1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>usable</status>
+    <type>normalmap</type>
   </asset>
 
   <asset>

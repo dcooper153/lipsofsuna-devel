@@ -718,7 +718,7 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 2},
 	equipment_models = {
-		["aer/kraken/wyrm"] = {arms = "aerarmplate2"}},
+		["aer/kraken/wyrm"] = {arms = "aerarmplate1"}},
 	equipment_slot = "arms",
 
 	mass = 10}
