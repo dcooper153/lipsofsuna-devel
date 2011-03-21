@@ -261,12 +261,8 @@ Item.use_cb = function(self, user)
 	if self.spec.categories["potion"] then
 		local types =
 		{
-			["lesser health potion"] = { skill = "health", value = 10 },
 			["health potion"] = { skill = "health", value = 30 },
-			["greater health potion"] = { skill = "health", value = 60 },
-			["lesser mana potion"] = { skill = "willpower", value = 10 },
 			["mana potion"] = { skill = "willpower", value = 30 },
-			["greater mana potion"] = { skill = "willpower", value = 60 }
 		}
 		local type = types[self.name]
 		if not type then return end
@@ -277,6 +273,7 @@ Item.use_cb = function(self, user)
 		skills:set_value{skill = type.skill, value = value + type.value}
 		Effect:play{effect = "impact1", object = user}
 		self:subtract{count = 1}
+		user:add_item{object = Item{spec = Itemspec:find{name = "empty bottle"}}}
 	elseif self.spec.equipment_slot then
 		if type(slot) == "string" then
 			-- Unequip items in equipment slots.

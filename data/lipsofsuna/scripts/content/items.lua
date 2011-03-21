@@ -996,6 +996,15 @@ Itemspec{
 	stacking = true}
 
 Itemspec{
+	name = "empty bottle",
+	model = "emptypotion1",
+	categories = {"misc"},
+	crafting_materials = {["glass ingot"] = 1},
+	damage = 5,
+	mass = 1,
+	stacking = true}
+
+Itemspec{
 	name = "torch",
 	model = "torch1",
 	animation_hold = "hold torch",
@@ -1135,58 +1144,14 @@ Itemspec{
 	stacking = true}
 
 Itemspec{
-	name = "greater health potion",
-	model = "potion3",
-	mass = 2,
-	categories = {"potion"},
-	crafting_materials = {mushroom = 1},
-	crafting_skills = {intelligence = 75},
-	stacking = true,
-	icon = "potion1",
-	water_gravity = Vector(0,1,0)}
-
-Itemspec{
-	name = "greater mana potion",
-	model = "potion7",
-	mass = 2,
-	categories = {"potion"},
-	crafting_materials = {mushroom = 1},
-	crafting_skills = {intelligence = 75},
-	stacking = true,
-	icon = "potion2",
-	water_gravity = Vector(0,1,0)}
-
-Itemspec{
 	name = "health potion",
 	model = "potion3",
 	mass = 2,
 	categories = {"potion"},
-	crafting_materials = {mushroom = 1},
+	crafting_materials = {["empty bottle"] = 1, ["milky powder"] = 1},
 	crafting_skills = {intelligence = 50},
 	stacking = true,
 	icon = "potion1",
-	water_gravity = Vector(0,1,0)}
-
-Itemspec{
-	name = "lesser health potion",
-	model = "potion3",
-	mass = 2,
-	categories = {"potion"},
-	crafting_materials = {mushroom = 1},
-	crafting_skills = {intelligence = 25},
-	stacking = true,
-	icon = "potion1",
-	water_gravity = Vector(0,1,0)}
-
-Itemspec{
-	name = "lesser mana potion",
-	model = "potion7",
-	mass = 2,
-	categories = {"potion"},
-	crafting_materials = {mushroom = 1},
-	crafting_skills = {intelligence = 25},
-	stacking = true,
-	icon = "potion2",
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
@@ -1194,7 +1159,7 @@ Itemspec{
 	model = "potion7",
 	mass = 2,
 	categories = {"potion"},
-	crafting_materials = {mushroom = 1},
+	crafting_materials = {["empty bottle"] = 1, ["milky powder"] = 3},
 	crafting_skills = {intelligence = 50},
 	stacking = true,
 	icon = "potion2",
