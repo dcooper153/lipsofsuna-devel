@@ -66,6 +66,22 @@ Damage.impulse = function(self, value)
 	return 0.03 * value
 end
 
+Utils = Class()
+
+--- Checks if there's room for the model in the given point in space.
+-- @param clss Utils class.
+-- @param point Point in world space.
+-- @param model Model name.
+-- @return True if there's room for the model.
+Utils.check_room = function(clss, point, model)
+	-- FIXME: Should rather do physics based testings.
+	for k,v in pairs(Object.objects) do
+		local d = (v.position - point).length
+		if d < 1.5 then return end
+	end
+	return true
+end
+
 --- Handles interaction between players and terrain.
 -- @param self Voxels class.
 -- @param player Player object.

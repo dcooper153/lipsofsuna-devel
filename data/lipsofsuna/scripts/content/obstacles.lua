@@ -1,7 +1,7 @@
 Obstaclespec{
 	name = "tree",
 	model = "tree1",
-	categories = {"tree"},
+	categories = {"tree", "wilderness"},
 	destroy_items = {
 		{"log",Vector(0,0,0)},
 		{"log",Vector(0,1,0)},
@@ -12,7 +12,7 @@ Obstaclespec{
 Obstaclespec{
 	name = "rust sprig tree",
 	model = "tree2",
-	categories = {"tree"},
+	categories = {"tree", "wilderness"},
 	destroy_items = {
 		{"log",Vector(0,0,0)},
 		{"log",Vector(0,1,0)},

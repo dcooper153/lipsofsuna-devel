@@ -160,3 +160,15 @@ Feateffectspec{
 	influences = {{"sanctuary", 30, 2}},
 	reagent_base = {["milky powder"] = 3},
 	skill_base = {intelligence = 20, willpower = 20}}
+
+Feateffectspec{
+	name = "wilderness",
+	categories = {"spell"},
+	description = "Grow plants from soil",
+	effect = "wilderness1",
+	icon = "wilderness1",
+	influences = {{"wilderness", 5, 1.06}},
+	reagent_base = {["milky powder"] = 1},
+	reagent_mult = {["milky powder"] = 0.09},
+	skill_base = {intelligence = 10, willpower = 5},
+	skill_mult = {intelligence = 1, willpower = 0.1}}
