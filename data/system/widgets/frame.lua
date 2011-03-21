@@ -34,6 +34,7 @@ Widgets.Frame.setter = function(self, key, value)
 		end
 	elseif key == "text" then
 		if self.text ~= value then
+			if self.label then self.label.text = value end
 			Widget.setter(self, key, value)
 			self:reshaped()
 		end
@@ -54,7 +55,8 @@ Widgets.Frame.new = function(clss, args)
 		if args.text then
 			self.cols = 1
 			self.rows = 1
-			self:append_row(Widgets.Label{font = "medium", text = args.text, valign = 0.5, halign = 0.5})
+			self.label = Widgets.Label{font = "medium", text = args.text, valign = 0.5, halign = 0.5}
+			self:append_row(self.label)
 			self:set_expand{row = 1, col = 1}
 		end
 	end

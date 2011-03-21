@@ -15,6 +15,8 @@ end
 
 Widgets.MenuItem.new = function(clss, args)
 	local self = Widgets.Label.new(clss, args)
+	self.color = args.color or {1,1,1,1}
+	self.color_focus = args.color_focus or {1,1,0,1}
 	return self
 end
 
@@ -32,7 +34,7 @@ Widgets.MenuItem.reshaped = function(self)
 		dest_size = {w,h},
 		text = self.text,
 		text_alignment = {self.halign,self.valign},
-		text_color = self.focused and {1,1,0,1} or {1,1,1,1},
+		text_color = self.focused and self.color_focus or self.color,
 		text_font = self.font}
 	if self.arrow then
 		self:canvas_text{
@@ -40,7 +42,7 @@ Widgets.MenuItem.reshaped = function(self)
 			dest_size = {w,h},
 			text = ">",
 			text_alignment = {1,self.valign},
-			text_color = self.focused and {1,1,0,1} or {1,1,1,1},
+			text_color = self.focused and self.color_focus or self.color,
 			text_font = self.font}
 	end
 	self:canvas_compile()

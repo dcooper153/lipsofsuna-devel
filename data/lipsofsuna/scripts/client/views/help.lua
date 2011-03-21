@@ -55,7 +55,7 @@ interested in writing gameplay scripts in Lua are also needed badly. We
 can certainly find something to do for other people too so the lack of
 work isn't an obstacle at least.]])}
 	-- Main.
-	local self = Widgets.Menu.new(clss, {
+	local self = Widgets.Menu.new(clss, {text = "Help",
 		{"About", label_about},
 		{"Controls", label_controls},
 		{"Hints", label_hints},

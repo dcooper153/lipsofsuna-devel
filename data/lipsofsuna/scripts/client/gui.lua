@@ -5,11 +5,11 @@ Gui = Class()
 Gui.init = function(clss)
 	Gui.skills = Views.Skills{main = true, sync = true}
 	-- Admin menu.
-	Gui.menu_widget_admin = Widgets.Menu{
+	Gui.menu_widget_admin = Widgets.Menu{text = "Admin",
 		{"Editor", Editing.dialog},
 		{"Save", function() Network:send{packet = Packet(packets.ADMIN_SAVE)} end},
 		{"Shutdown", function() Network:send{packet = Packet(packets.ADMIN_SHUTDOWN)} end}}
-	Gui.menu_widget_main = Widgets.Menu{
+	Gui.menu_widget_main = Widgets.Menu{text = "Menu",
 		{"Feats", function() clss:set_mode("feats", 2) end, arrow = true},
 		{"Inventory", function() clss:set_mode("inventory", 2) end, arrow = true},
 		{"Quests", function() clss:set_mode("quests", 2) end, arrow = true},
