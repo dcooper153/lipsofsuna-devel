@@ -7,7 +7,8 @@ Obstaclespec{
 		{"log",Vector(0,1,0)},
 		{"log",Vector(0,2,0)},
 		{"log",Vector(0,3,0)}},
-	health = 50}
+	health = 50,
+	vulnerabilities = {fire = 2, hatchet = 2}}
 
 Obstaclespec{
 	name = "rust sprig tree",
@@ -18,7 +19,8 @@ Obstaclespec{
 		{"log",Vector(0,1,0)},
 		{"log",Vector(0,2,0)},
 		{"log",Vector(0,3,0)}},
-	health = 50}
+	health = 50,
+	vulnerabilities = {fire = 2, hatchet = 2}}
 
 Obstaclespec{
 	name = "mushroom",

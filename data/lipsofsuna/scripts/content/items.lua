@@ -214,8 +214,8 @@ Itemspec{
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["adamantium"] = 9},
-	damage = 30,
-	damage_bonus_dexterity = 0.2,
+	influences_base = {physical = -30},
+	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -225,8 +225,8 @@ Itemspec{
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
-	damage = 20,
-	damage_bonus_dexterity = 0.4,
+	influences_base = {physical = -20},
+	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -238,8 +238,8 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
-	damage = 20,
-	damage_bonus_strength = 0.2,
+	influences_base = {hatchet = -20, physical = -20},
+	influences_bonus = {strength = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -251,8 +251,8 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["adamantium"] = 9},
-	damage = 20,
-	damage_bonus_strength = 0.1,
+	influences_base = {physical = -20},
+	influences_bonus = {strength = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -263,9 +263,8 @@ Itemspec{
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["adamantium"] = 15, ["log"] = 2},
-	damage = 50,
-	damage_bonus_intelligence = 0.2,
-	damage_bonus_perception = 0.2,
+	influences_base = {physical = -50},
+	influences_bonus = {intelligence = 0.005, perception = 0.005},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -277,9 +276,8 @@ Itemspec{
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
-	damage = 40,
-	damage_bonus_dexterity = 0.2,
-	damage_bonus_strength = 0.2,
+	influences_base = {physical = -40},
+	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -290,8 +288,8 @@ Itemspec{
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["aquanite stone"] = 9},
-	damage = 22,
-	damage_bonus_dexterity = 0.2,
+	influences_base = {cold = -11, physical = -11},
+	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -301,8 +299,8 @@ Itemspec{
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
-	damage = 15,
-	damage_bonus_dexterity = 0.4,
+	influences_base = {cold = -7, physical = -7},
+	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -314,8 +312,8 @@ Itemspec{
 	animation_hold = "hold grenade",
 	categories = {"explosive", "throwable", "weapon"},
 	crafting_materials = {["aquanite stone"] = 1, ["iron ingot"] = 1},
-	damage = 40,
-	damage_bonus_intelligence = 0.2,
+	influences_base = {cold = -30, physical = -10},
+	influences_bonus = {intelligence = 0.01},
 	destroy_actions = {"explode"},
 	destroy_timer = 3,
 	equipment_slot = "hand.R",
@@ -331,8 +329,8 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
-	damage = 15,
-	damage_bonus_strength = 0.2,
+	influences_base = {cold = -7, hatchet = -14, physical = -7},
+	influences_bonus = {strength = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -344,8 +342,8 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 9},
-	damage = 15,
-	damage_bonus_strength = 0.1,
+	influences_base = {cold = -7, physical = -7},
+	influences_bonus = {strength = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -356,9 +354,8 @@ Itemspec{
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["aquanite stone"] = 15, ["log"] = 2},
-	damage = 37,
-	damage_bonus_intelligence = 0.2,
-	damage_bonus_perception = 0.2,
+	influences_base = {cold = -18, physical = -18},
+	influences_bonus = {intelligence = 0.005, perception = 0.005},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -370,9 +367,8 @@ Itemspec{
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
-	damage = 30,
-	damage_bonus_dexterity = 0.2,
-	damage_bonus_strength = 0.2,
+	influences_base = {cold = -15, physical = -15},
+	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -383,8 +379,8 @@ Itemspec{
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["crimson stone"] = 9},
-	damage = 22,
-	damage_bonus_dexterity = 0.2,
+	influences_base = {fire = -11, physical = -11},
+	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -394,8 +390,8 @@ Itemspec{
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 3},
-	damage = 15,
-	damage_bonus_dexterity = 0.4,
+	influences_base = {fire = -7, physical = -7},
+	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -407,8 +403,8 @@ Itemspec{
 	animation_hold = "hold grenade",
 	categories = {"explosive", "throwable", "weapon"},
 	crafting_materials = {["crimson stone"] = 1, ["iron ingot"] = 1},
-	damage = 40,
-	damage_bonus_intelligence = 0.2,
+	influences_base = {fire = -30, physical = -10},
+	influences_bonus = {intelligence = 0.01},
 	destroy_actions = {"explode"},
 	destroy_timer = 3,
 	equipment_slot = "hand.R",
@@ -424,8 +420,8 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 3},
-	damage = 15,
-	damage_bonus_strength = 0.2,
+	influences_base = {fire = -7, hatchet = -14, physical = -7},
+	influences_bonus = {strength = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -437,8 +433,8 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 9},
-	damage = 15,
-	damage_bonus_strength = 0.1,
+	influences_base = {fire = -7, physical = -7},
+	influences_bonus = {strength = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -449,9 +445,8 @@ Itemspec{
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["crimson stone"] = 15, ["log"] = 2},
-	damage = 37,
-	damage_bonus_intelligence = 0.2,
-	damage_bonus_perception = 0.2,
+	influences_base = {fire = -16, physical = -16},
+	influences_bonus = {intelligence = 0.005, perception = 0.005},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -463,9 +458,8 @@ Itemspec{
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 3},
-	damage = 30,
-	damage_bonus_dexterity = 0.2,
-	damage_bonus_strength = 0.2,
+	influences_base = {fire = -15, physical = -15},
+	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -476,8 +470,8 @@ Itemspec{
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["iron ingot"] = 3},
-	damage = 15,
-	damage_bonus_dexterity = 0.2,
+	influences_base = {physical = -15},
+	influences_bonus = {dexterity = 0.005},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -487,8 +481,8 @@ Itemspec{
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 1},
-	damage = 10,
-	damage_bonus_dexterity = 0.4,
+	influences_base = {physical = -10},
+	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	mass = 5}
 
@@ -498,8 +492,8 @@ Itemspec{
 	icon = "axe1",
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 2},
-	damage = 10,
-	damage_bonus_strength = 0.2,
+	influences_base = {hatchet = -10, physical = -10},
+	influences_bonus = {strength = 0.01},
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	equipment_slot = "hand.R",
@@ -513,8 +507,8 @@ Itemspec{
 	crafting_materials = {["iron ingot"] = 3},
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
-	damage = 10,
-	damage_bonus_strength = 0.1,
+	influences_base = {physical = -10},
+	influences_bonus = {strength = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -525,9 +519,8 @@ Itemspec{
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["iron ingot"] = 5, ["log"] = 2},
-	damage = 25,
-	damage_bonus_intelligence = 0.2,
-	damage_bonus_perception = 0.2,
+	influences_base = {physical = -25},
+	influences_bonus = {intelligence = 0.005, perception = 0.005},
 	equipment_slot = "hand.R",
 	mass = 20}
 
@@ -539,9 +532,8 @@ Itemspec{
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 3},
-	damage = 10,
-	damage_bonus_dexterity = 0.2,
-	damage_bonus_strength = 0.2,
+	influences_base = {physical = -10},
+	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -553,8 +545,8 @@ Itemspec{
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["log"] = 3},
-	damage = 7,
-	damage_bonus_dexterity = 0.2,
+	influences_base = {physical = -7},
+	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	water_gravity = Vector(0,1,0),
 	mass = 7}
@@ -565,8 +557,8 @@ Itemspec{
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["log"] = 1},
-	damage = 5,
-	damage_bonus_dexterity = 0.4,
+	influences_base = {physical = -5},
+	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	water_gravity = Vector(0,1,0),
 	mass = 7}
@@ -579,8 +571,8 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["log"] = 1},
-	damage = 5,
-	damage_bonus_strength = 0.2,
+	influences_base = {hatchet = -5, physical = -5},
+	influences_bonus = {strength = 0.01},
 	equipment_slot = "hand.R",
 	water_gravity = Vector(0,1,0),
 	mass = 7}
@@ -593,8 +585,8 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["log"] = 3},
-	damage = 5,
-	damage_bonus_strength = 0.1,
+	influences_base = {physical = -5},
+	influences_bonus = {strength = 0.01},
 	equipment_slot = "hand.R",
 	water_gravity = Vector(0,1,0),
 	mass = 7}
@@ -607,9 +599,8 @@ Itemspec{
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["log"] = 1},
-	damage = 10,
-	damage_bonus_dexterity = 0.2,
-	damage_bonus_strength = 0.2,
+	influences_base = {physical = -10},
+	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	equipment_slot = "hand.R",
 	water_gravity = Vector(0,1,0),
 	mass = 7}
@@ -622,9 +613,8 @@ Itemspec{
 	animation_attack = "attack blunt",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["log"] = 1},
-	damage = 15,
-	damage_bonus_dexterity = 0.2,
-	damage_bonus_strength = 0.2,
+	influences_base = {physical = -15},
+	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	equipment_slot = "hand.R",
 	water_gravity = Vector(0,1,0),
 	mass = 7}
@@ -637,9 +627,8 @@ Itemspec{
 	animation_attack = "attack staff",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["log"] = 1},
-	damage = 15,
-	damage_bonus_dexterity = 0.2,
-	damage_bonus_strength = 0.2,
+	influences_base = {physical = -15},
+	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	armor_class = 0.04,
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
@@ -654,9 +643,8 @@ Itemspec{
 	animation_attack = "attack staff",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["log"] = 1},
-	damage = 15,
-	damage_bonus_perception = 0.2,
-	damage_bonus_willpower = 0.2,
+	influences_base = {physical = -15},
+	influences_bonus = {perception = 0.005, willpower = 0.005},
 	armor_class = 0.04,
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
@@ -976,7 +964,7 @@ Itemspec{
 	name = "arrow",
 	model = "arrow-000",
 	categories = {"arrow"},
-	damage = 5,
+	influences_base = {physical = -5},
 	crafting_count = 10,
 	crafting_materials = {["log"] = 1},
 	icon = "arrow1",
@@ -989,7 +977,7 @@ Itemspec{
 	model = "arrow-000", -- FIXME
 	mass = 3,
 	categories = {"bullet"},
-	damage = 5,
+	influences_base = {physical = -5},
 	crafting_count = 10,
 	crafting_materials = {["iron ingot"] = 1, ["crimson stone"] = 3},
 	icon = "arrow1",
@@ -1000,7 +988,7 @@ Itemspec{
 	model = "emptypotion1",
 	categories = {"misc"},
 	crafting_materials = {["glass ingot"] = 1},
-	damage = 5,
+	health = 5,
 	mass = 1,
 	stacking = true}
 
@@ -1025,7 +1013,7 @@ Itemspec{
 	categories = {"throwable", "weapon"},
 	animation_hold = "hold bulky",
 	animation_attack = "throw bulky",
-	damage = 5,
+	influences_base = {physical = -5},
 	mass = 4,
 	stacking = false,
 	water_gravity = Vector(0,1,0)}
@@ -1037,8 +1025,8 @@ Itemspec{
 	categories = {"explosive", "throwable", "weapon"},
 	animation_hold = "hold bulky",
 	animation_attack = "throw bulky",
-	damage = 40,
-	damage_bonus_intelligence = 0.2,
+	influences_base = {fire = -10, physical = -10},
+	influences_bonus = {strength = 0.01},
 	destroy_actions = {"explode"},
 	destroy_timer = 5,
 	equipment_slot = "hand.R",
@@ -1129,8 +1117,8 @@ Itemspec{
 	model = "boomerang1",
 	categories = {"boomerang", "throwable", "weapon"},
 	crafting_materials = {log = 1},
-	damage = 20,
-	damage_bonus_dexterity = 0.2,
+	influences_base = {physical = -20},
+	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	stacking = true,
 	water_gravity = Vector(0,1,0)}

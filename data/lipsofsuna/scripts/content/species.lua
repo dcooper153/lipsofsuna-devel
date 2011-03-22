@@ -198,7 +198,8 @@ Species{
 		{name = "intelligence", max = 40, val = 20},
 		{name = "perception", max = 80, val = 30},
 		{name = "strength", max = 60, val = 20},
-		{name = "willpower", max = 80, val = 30}}}
+		{name = "willpower", max = 80, val = 30}},
+	vulnerabilities = {fire = 2, physical = 0.8}}
 
 Species{
 	name = "kraken",
@@ -223,6 +224,7 @@ Species{
 		{name = "perception", max = 40, val = 20},
 		{name = "strength", max = 80, val = 30},
 		{name = "willpower", max = 100, val = 50}},
+	vulnerabilities = {cold = 0.5, fire = 2},
 	water_friction = 0}
 
 Species{
@@ -246,7 +248,8 @@ Species{
 		{name = "intelligence", max = 80, val = 30},
 		{name = "perception", max = 80, val = 30},
 		{name = "strength", max = 100, val = 50},
-		{name = "willpower", max = 60, val = 20}}}
+		{name = "willpower", max = 60, val = 20}},
+	vulnerabilities = {cold = 2, fire = 0.5}}
 
 -- TODO
 Species{
@@ -440,7 +443,8 @@ Species{
 	mass = 1000,
 	speed_walk = 1,
 	skills = {
-		{name = "health", max = 100, val = 100}}}
+		{name = "health", max = 100, val = 100}},
+	vulnerabilities = {cold = 2, fire = 0.3}}
 
 Species{
 	name = "feral devora",
@@ -511,7 +515,8 @@ Species{
 	model = "slime2", -- FIXME
 	speed_walk = 2,
 	skills = {
-		{name = "health", max = 30, val = 30}}}
+		{name = "health", max = 30, val = 30}},
+	vulnerabilities = {cold = 1.5, fire = 1.5, physical = 0.6}}
 
 Species{
 	name = "stone imp",
@@ -531,7 +536,8 @@ Species{
 	model = "stoneimp2",
 	speed_walk = 1,
 	skills = {
-		{name = "health", max = 20, val = 20}}}
+		{name = "health", max = 20, val = 20}},
+	vulnerabilities = {cold = 1.1, fire = 1.1, physical = 0.8}}
 
 Species{
 	name = "fire imp",
@@ -551,7 +557,8 @@ Species{
 		{name = "hand.L", node = "#hand.L"}},
 	inventory_items = {"firestone"},
 	skills = {
-		{name = "health", max = 20, val = 20}}}
+		{name = "health", max = 20, val = 20}},
+	vulnerabilities = {cold = 2, fire = 0.4, physical = 0.8}}
 
 ------------------------------------------------------------------------------
 -- Silverspring creatures.

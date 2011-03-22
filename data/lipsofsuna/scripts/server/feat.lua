@@ -1,3 +1,5 @@
+local oldinfo = Feat.get_info
+
 --- Applies the feat.
 -- @param self Feat.
 -- @param args Arguments.<ul>
@@ -43,8 +45,7 @@ Feat.apply = function(self, args)
 		end
 	end
 	-- Influences.
-	local info = self:get_info()
-	info.influences.health = self:calculate_health_influence(args)
+	local info = self:get_info(args)
 	for k,v in pairs(info.influences) do
 		if k == "health" then
 			-- Increase or decrease health.
@@ -163,7 +164,7 @@ Feat.apply = function(self, args)
 	end
 end
 
---- Calculates how much the feat will change the health of the target.
+--- Gets the skill and reagent requirements of the feat.
 -- @param self Feat.
 -- @param args Arguments.<ul>
 --   <li>attacker: Attacking creature.</li>
@@ -171,52 +172,69 @@ end
 --   <li>projectile: Fired object or nil.</li>
 --   <li>target: Attacked creature or nil.</li>
 --   <li>weapon: Used weapon or nil.</li></ul>
--- @return Health influence.
-Feat.calculate_health_influence = function(self, args)
-	-- Base influence.
-	-- The base influence depends on the feat and the type of weapon and ammunition used.
-	-- It's positive for healing feats and negative for attack feats.
-	local spec1 = args.weapon and args.weapon.spec
-	local spec2 = args.projectile and args.projectile.spec
-	local info = self:get_info()
-	local influence = info.influences.health or 0
-	if spec1 or spec2 then
-		influence = influence - (spec1 and spec1.damage or 0) - (spec2 and spec2.damage or 0)
-	elseif influence > 0 then
-		influence = influence - 3
-	end
-	-- Damage bonus from skills.
-	-- The bonus damage depends on the type of weapon and ammunition used.
-	-- The hardcoded bare-handed bonuses only apply to melee attacks.
-	local bonuses
-	local skills = args.attacker and args.attacker.skills
-	if not skills then return damage end
-	if spec1 or spec2 then
-		spec1 = spec1 or {}
-		spec2 = spec2 or {}
-		bonuses = {
-			dexterity = (spec1.damage_bonus_dexterity or 0) + (spec2.damage_bonus_dexterity or 0),
-			health = (spec1.damage_bonus_health or 0) + (spec2.damage_bonus_health or 0),
-			intelligence = (spec1.damage_bonus_intelligence or 0) + (spec2.damage_bonus_intelligence or 0),
-			perception = (spec1.damage_bonus_percention or 0) + (spec2.damage_bonus_percention or 0),
-			strength = (spec1.damage_bonus_strength or 0) + (spec2.damage_bonus_strength or 0),
-			willpower = (spec1.damage_bonus_willpower or 0) + (spec2.damage_bonus_willpower or 0)}
-	elseif info.animation.categories["melee"] then
-		bonuses = {
-			dexterity = 0.1,
-			strength = 0.06,
-			willpower = 0.06}
-	else
-		bonuses = {}
-	end
-	for k,v in pairs(bonuses) do
-		if skills:has_skill{skill = k} then
-			influence = influence - v * skills:get_value{skill = k}
+-- @return Feat info table.
+Feat.get_info = function(self, args)
+	-- Get the feat specific requirements and influences.
+	local info = oldinfo(self)
+	local health_influences = {cold = 1, fire = 1, physical = 1, poison = 1}
+	-- Add weapon specific influences.
+	-- In addition to the base influences, weapons may grant bonuses for
+	-- having points in certain skills. The skill bonuses are multiplicative
+	-- since the system is easier to balance that way.
+	if args and args.weapon then
+		if args.weapon.spec.influences_base then
+			local mult = 1
+			local bonuses = args.weapon.spec.influences_bonus
+			if bonuses and args.attacker.skills then
+				for k,v in pairs(bonuses) do
+					local s = args.attacker.skills:get_value{skill = k}
+					if s then mult = mult * (1 + v * s) end
+				end
+			end
+			for k,v in pairs(args.weapon.spec.influences_base) do
+				local prev = info.influences[k]
+				info.influences[k] = (prev or 0) + mult * v
+			end
+		end
+	-- Add bare-handed specific influences.
+	-- Works like the weapon variant but uses hardcoded influences.
+	-- Bare-handed influence bonuses only apply to melee feats.
+	elseif args and info.animation.categories["melee"] then
+		local mult = 1
+		local bonuses = {dexterity = 0.02, strength = 0.01, willpower = 0.02}
+		if args.attacker.skills then
+			for k,v in pairs(bonuses) do
+				local s = args.attacker.skills:get_value{skill = k}
+				if s then mult = mult * (1 + v * s) end
+			end
+		end
+		local influences = {physical = -3}
+		for k,v in pairs(influences) do
+			local prev = info.influences[k]
+			info.influences[k] = (prev or 0) + mult * v
 		end
 	end
-	-- Damage reduction by armor and blocking.
-	-- Not applied to healing feats.
-	if influence < 0 and args.target then
+	-- Add projectile specific influences.
+	-- Works like the weapon variant but uses the projectile as the item.
+	if args and args.projectile and args.projectile.spec.influences_base then
+		local mult = 1
+		local bonuses = args.projectile.spec.influences_bonus
+		if bonuses then
+			for k,v in pairs(bonuses) do
+				local s = skills:get_value{skill = k}
+				if s then mult = mult * (1 + v * s) end
+			end
+		end
+		for k,v in pairs(args.projectile.spec.influences_base) do
+			local prev = info.influences[k]
+			info.influences[k] = (prev or 0) + mult * v
+		end
+	end
+	-- Apply target armor and blocking.
+	-- Only a limited number of influence types is affects by this.
+	-- Positive influences that would increase stats are never blocked.
+	if args and args.target then
+		local reduce = {cold = true, fire = true, physical = true}
 		local armor = args.target.armor_class or 0
 		if args.target.blocking then
 			local delay = args.target.spec.blocking_delay
@@ -225,9 +243,37 @@ Feat.calculate_health_influence = function(self, args)
 			armor = armor + frac * args.target.spec.blocking_armor
 		end
 		local mult = math.max(0.0, 1 - armor)
-		influence = influence * mult
+		for k,v in pairs(info.influences) do
+			if reduce[k] then
+				local prev = info.influences[k]
+				if prev < 0 then
+					info.influences[k] = prev * mult
+				end
+			end
+		end
 	end
-	return influence
+	-- Apply target vulnerabilities.
+	-- Individual influences are multiplied by the vulnerability coefficients
+	-- of the target and summed together to the total health influence.
+	local vuln = args and args.target and args.target.spec.vulnerabilities
+	if not vuln then vuln = health_influences end
+	local health = info.influences.health or 0
+	for k,v in pairs(info.influences) do
+		local mult = vuln[k] or health_influences[k]
+		if mult then
+			local val = v * mult
+			info.influences[k] = val 
+			health = health + val
+		end
+	end
+	-- Set the total health influence.
+	-- This is the actual value added to the health of the target. The
+	-- individual influence components remain in the table may be used
+	-- by special feats but they aren't used for regular health changes.
+	if health ~= 0 then
+		info.influences.health = health
+	end
+	return info
 end
 
 --- Performs a feat
