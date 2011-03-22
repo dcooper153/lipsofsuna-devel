@@ -163,7 +163,7 @@ end
 --- Hides the object and purges it from the database.
 -- @param self Object to kill.
 Object.die = function(self)
-	self.realized = false
+	self:detach()
 	self:purge()
 end
 

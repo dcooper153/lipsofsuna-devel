@@ -137,9 +137,17 @@ Feat.apply = function(self, args)
 		end
 	end
 	-- Digging.
-	if anim.categories["melee"] and args.tile and args.weapon then
-		if args.weapon.spec.categories["mattock"] or math.random(1, 5) == 5 then
+	if anim.categories["melee"] and args.tile then
+		-- Break the tile.
+		if (args.weapon and args.weapon.spec.categories["mattock"]) or math.random(1, 5) == 5 then
 			Voxel:damage(args.attacker, args.tile)
+		end
+		-- Damage the weapon.
+		if args.weapon and args.weapon.spec.damage_mining then
+			if not args.weapon:damaged(2 * args.weapon.spec.damage_mining * math.random()) then
+				args.attacker:send{packet = Packet(packets.MESSAGE, "string",
+					"The " .. args.weapon.spec.name .. " broke!")}
+			end
 		end
 	end
 	-- Building.

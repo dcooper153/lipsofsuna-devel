@@ -84,16 +84,19 @@ end
 --- Causes the item to take damage.
 -- @param self Object.
 -- @param amount Amount of damage.
+-- @return True if not broken yet.
 Item.damaged = function(self, amount)
 	-- Items whose spec has no health are indestructible.
-	if not self.spec.health then return end
+	if not self.spec.health then return true end
 	-- Subtract health.
 	local h = self.health or self.spec.health
 	self.health = math.max(0, h - amount)
 	-- Destroy when out of health.
 	if self.health == 0 then
 		self:die()
+		return
 	end
+	return true
 end
 
 --- Destroys the item.

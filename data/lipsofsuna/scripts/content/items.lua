@@ -298,9 +298,11 @@ Itemspec{
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
+	damage_mining = 1,
 	influences_base = {cold = -7, physical = -7},
 	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
+	health = 500,
 	mass = 15}
 
 Itemspec{
@@ -311,12 +313,13 @@ Itemspec{
 	animation_hold = "hold grenade",
 	categories = {"explosive", "throwable", "weapon"},
 	crafting_materials = {["aquanite stone"] = 1, ["iron ingot"] = 1},
-	influences_base = {cold = -30, physical = -10},
-	influences_bonus = {intelligence = 0.01},
+	damage_mining = 1,
 	destroy_actions = {"explode"},
 	destroy_timer = 3,
 	equipment_slot = "hand.R",
 	health = 1,
+	influences_base = {cold = -30, physical = -10},
+	influences_bonus = {intelligence = 0.01},
 	mass = 5,
 	stacking = true}
 
@@ -328,9 +331,11 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
 	influences_base = {cold = -7, hatchet = -14, physical = -7},
 	influences_bonus = {strength = 0.01},
-	equipment_slot = "hand.R",
+	health = 500,
 	mass = 15}
 
 Itemspec{
@@ -341,9 +346,11 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 9},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 500,
 	influences_base = {cold = -7, physical = -7},
 	influences_bonus = {strength = 0.01},
-	equipment_slot = "hand.R",
 	mass = 15}
 
 Itemspec{
@@ -353,9 +360,9 @@ Itemspec{
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["aquanite stone"] = 15, ["log"] = 2},
+	equipment_slot = "hand.R",
 	influences_base = {cold = -18, physical = -18},
 	influences_bonus = {intelligence = 0.005, perception = 0.005},
-	equipment_slot = "hand.R",
 	mass = 15}
 
 Itemspec{
@@ -366,9 +373,11 @@ Itemspec{
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 500,
 	influences_base = {cold = -15, physical = -15},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
-	equipment_slot = "hand.R",
 	mass = 15}
 
 Itemspec{
@@ -378,9 +387,9 @@ Itemspec{
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["crimson stone"] = 9},
+	equipment_slot = "hand.R",
 	influences_base = {fire = -11, physical = -11},
 	influences_bonus = {dexterity = 0.01},
-	equipment_slot = "hand.R",
 	mass = 15}
 
 Itemspec{
@@ -389,9 +398,11 @@ Itemspec{
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 3},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 500,
 	influences_base = {fire = -7, physical = -7},
 	influences_bonus = {dexterity = 0.01},
-	equipment_slot = "hand.R",
 	mass = 15}
 
 Itemspec{
@@ -419,9 +430,11 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 3},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 500,
 	influences_base = {fire = -7, hatchet = -14, physical = -7},
 	influences_bonus = {strength = 0.01},
-	equipment_slot = "hand.R",
 	mass = 15}
 
 Itemspec{
@@ -432,9 +445,11 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 9},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 500,
 	influences_base = {fire = -7, physical = -7},
 	influences_bonus = {strength = 0.01},
-	equipment_slot = "hand.R",
 	mass = 15}
 
 Itemspec{
@@ -457,9 +472,11 @@ Itemspec{
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 3},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 500,
 	influences_base = {fire = -15, physical = -15},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
-	equipment_slot = "hand.R",
 	mass = 15}
 
 Itemspec{
@@ -480,35 +497,41 @@ Itemspec{
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 1},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 220,
 	influences_base = {physical = -10},
 	influences_bonus = {dexterity = 0.01},
-	equipment_slot = "hand.R",
 	mass = 5}
 
 Itemspec{
 	name = "iron hatchet",
 	model = "axe1",
 	icon = "axe1",
-	categories = {"hatchet", "melee", "weapon"},
-	crafting_materials = {["iron ingot"] = 2},
-	influences_base = {hatchet = -10, physical = -10},
-	influences_bonus = {strength = 0.01},
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
+	categories = {"hatchet", "melee", "weapon"},
+	crafting_materials = {["iron ingot"] = 2},
+	damage_mining = 1,
 	equipment_slot = "hand.R",
+	health = 220,
+	influences_base = {hatchet = -10, physical = -10},
+	influences_bonus = {strength = 0.01},
 	mass = 10}
 
 Itemspec{
 	name = "iron mattock",
 	model = "mattock-000",
 	icon = "mattock1",
-	categories = {"mattock", "melee", "weapon"},
-	crafting_materials = {["iron ingot"] = 3},
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
+	categories = {"mattock", "melee", "weapon"},
+	crafting_materials = {["iron ingot"] = 3},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 220,
 	influences_base = {physical = -10},
 	influences_bonus = {strength = 0.01},
-	equipment_slot = "hand.R",
 	mass = 15}
 
 Itemspec{
@@ -518,9 +541,9 @@ Itemspec{
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["iron ingot"] = 5, ["log"] = 2},
+	equipment_slot = "hand.R",
 	influences_base = {physical = -25},
 	influences_bonus = {intelligence = 0.005, perception = 0.005},
-	equipment_slot = "hand.R",
 	mass = 20}
 
 Itemspec{
@@ -531,9 +554,11 @@ Itemspec{
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 3},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 220,
 	influences_base = {physical = -10},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
-	equipment_slot = "hand.R",
 	mass = 15}
 
 Itemspec{
@@ -542,10 +567,11 @@ Itemspec{
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["granite stone"] = 2},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
 	influences_base = {physical = -5},
 	influences_bonus = {dexterity = 0.005},
-	equipment_slot = "hand.R",
-	water_gravity = Vector(0,1,0),
+	health = 130,
 	mass = 6}
 
 Itemspec{
@@ -556,10 +582,11 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["granite stone"] = 3},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 130,
 	influences_base = {hatchet = -5, physical = -5},
 	influences_bonus = {strength = 0.01},
-	equipment_slot = "hand.R",
-	water_gravity = Vector(0,1,0),
 	mass = 9}
 
 Itemspec{
@@ -570,10 +597,11 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["granite stone"] = 4},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 130,
 	influences_base = {physical = -5},
 	influences_bonus = {strength = 0.01},
-	equipment_slot = "hand.R",
-	water_gravity = Vector(0,1,0),
 	mass = 12}
 
 Itemspec{
@@ -584,10 +612,11 @@ Itemspec{
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["granite stone"] = 5},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 130,
 	influences_base = {physical = -10},
 	influences_bonus = {dexterity = 0.002, strength = 0.005},
-	equipment_slot = "hand.R",
-	water_gravity = Vector(0,1,0),
 	mass = 15}
 
 Itemspec{
@@ -597,7 +626,7 @@ Itemspec{
 	animation_attack = "attack bow",
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
-	crafting_materials = {["log"] = 3},
+	crafting_materials = {["log"] = 5},
 	influences_base = {physical = -7},
 	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
@@ -609,12 +638,14 @@ Itemspec{
 	model = "sword1", -- FIXME
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
-	crafting_materials = {["log"] = 1},
+	crafting_materials = {["log"] = 2},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 100,
 	influences_base = {physical = -5},
 	influences_bonus = {dexterity = 0.01},
-	equipment_slot = "hand.R",
-	water_gravity = Vector(0,1,0),
-	mass = 7}
+	mass = 7,
+	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "wooden hatchet",
@@ -623,12 +654,14 @@ Itemspec{
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
-	crafting_materials = {["log"] = 1},
+	crafting_materials = {["log"] = 3},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 100,
 	influences_base = {hatchet = -5, physical = -5},
 	influences_bonus = {strength = 0.01},
-	equipment_slot = "hand.R",
-	water_gravity = Vector(0,1,0),
-	mass = 7}
+	mass = 7,
+	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "wooden mattock",
@@ -637,12 +670,14 @@ Itemspec{
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
-	crafting_materials = {["log"] = 3},
+	crafting_materials = {["log"] = 4},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 100,
 	influences_base = {physical = -5},
 	influences_bonus = {strength = 0.01},
-	equipment_slot = "hand.R",
-	water_gravity = Vector(0,1,0),
-	mass = 7}
+	mass = 7,
+	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "wooden sword",
@@ -651,12 +686,14 @@ Itemspec{
 	animation_hold = "hold sword",
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
-	crafting_materials = {["log"] = 1},
+	crafting_materials = {["log"] = 5},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 100,
 	influences_base = {physical = -10},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
-	equipment_slot = "hand.R",
-	water_gravity = Vector(0,1,0),
-	mass = 7}
+	mass = 7,
+	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "wooden club",
@@ -665,12 +702,14 @@ Itemspec{
 	animation_hold = "hold blunt",
 	animation_attack = "attack blunt",
 	categories = {"melee", "weapon"},
-	crafting_materials = {["log"] = 1},
+	crafting_materials = {["log"] = 4},
+	damage_mining = 1,
+	equipment_slot = "hand.R",
+	health = 100,
 	influences_base = {physical = -15},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
-	equipment_slot = "hand.R",
-	water_gravity = Vector(0,1,0),
-	mass = 7}
+	mass = 7,
+	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "wooden staff",
@@ -679,14 +718,15 @@ Itemspec{
 	animation_hold = "hold staff",
 	animation_attack = "attack staff",
 	categories = {"melee", "weapon"},
-	crafting_materials = {["log"] = 1},
-	influences_base = {physical = -15},
-	influences_bonus = {dexterity = 0.005, strength = 0.005},
-	armor_class = 0.04,
+	crafting_materials = {["log"] = 5},
+	damage_mining = 1,
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
-	water_gravity = Vector(0,1,0),
-	mass = 7}
+	health = 100,
+	influences_base = {physical = -15},
+	influences_bonus = {dexterity = 0.005, strength = 0.005},
+	mass = 7,
+	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "luminous staff",
@@ -695,16 +735,18 @@ Itemspec{
 	animation_hold = "hold staff",
 	animation_attack = "attack staff",
 	categories = {"melee", "weapon"},
-	crafting_materials = {["log"] = 1},
-	influences_base = {physical = -15},
-	influences_bonus = {perception = 0.005, willpower = 0.005},
-	armor_class = 0.04,
+	crafting_materials = {["log"] = 5, ["crimson stone"] = 2},
+	damage_mining = 1,
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
+	health = 300,
+	influences_base = {fire = -3, physical = -15},
+	influences_bonus = {perception = 0.005, willpower = 0.005},
+	mass = 7,
 	special_effects = {
-		{slot = "flame", model = "torchfx1"},{slot = "flame2", model = "torchfx1"}},
-	water_gravity = Vector(0,1,0),
-	mass = 7}
+		{slot = "flame", model = "torchfx1"},
+		{slot = "flame2", model = "torchfx1"}},
+	water_gravity = Vector(0,1,0)}
 
 ------------------------------------------------------------------------------
 -- Armor.
