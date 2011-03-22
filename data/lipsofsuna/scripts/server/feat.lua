@@ -203,9 +203,9 @@ Feat.calculate_health_influence = function(self, args)
 			willpower = (spec1.damage_bonus_willpower or 0) + (spec2.damage_bonus_willpower or 0)}
 	elseif info.animation.categories["melee"] then
 		bonuses = {
-			dexterity = 0.2,
-			strength = 0.2,
-			willpower = 0.1}
+			dexterity = 0.1,
+			strength = 0.06,
+			willpower = 0.06}
 	else
 		bonuses = {}
 	end
