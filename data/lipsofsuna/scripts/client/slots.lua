@@ -35,7 +35,7 @@ Slots.update = function(self)
 			object.realized = true
 		else
 			-- Hide slot.
-			object.realized = false
+			object:detach()
 		end
 	end
 end
