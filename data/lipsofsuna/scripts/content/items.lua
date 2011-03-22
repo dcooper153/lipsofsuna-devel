@@ -164,7 +164,7 @@ Itemspec{
 	categories = {"material"},
 	crafting_count = 20,
 	crafting_materials = {["mushroom"] = 1},
-	mass = 1,
+	mass = 0.05,
 	stacking = true}
 
 Itemspec{
@@ -721,6 +721,7 @@ Itemspec{
 	equipment_models = {
 		["aer/kraken/wyrm"] = {upper = "aerupperplate1", lower = "aerlowerplate1"}},
 	equipment_slot = "upperbody",
+	equipment_slots_reserved = {"lowerbody"},
 	mass = 25}
 
 Itemspec{
@@ -1042,13 +1043,13 @@ Itemspec{
 Itemspec{
 	name = "chest",
 	model = "chest1",
-	mass = 100,
+	mass = 30,
 	animations = {
 		["loot"] = {animation = "opening", channel = 1, permanent = true, repeat_start = 10},
 		["looted"] = {animation = "open", channel = 1, permanent = true, repeat_start = 10, time = 10}},
 	categories = {"container", "generate"},
-	crafting_materials = {log = 1},
-	inventory_size = 4,
+	crafting_materials = {log = 10},
+	inventory_size = 8,
 	inventory_type = "chest",
 	loot_categories = {"armor", "book", "material", "misc", "potion", "shield", "weapon"},
 	loot_count = {2, 4},
@@ -1058,7 +1059,7 @@ Itemspec{
 Itemspec{
 	name = "jar",
 	model = "jar1",
-	mass = 10,
+	mass = 9,
 	categories = {"container", "generate"},
 	crafting_materials = {["granite stone"] = 3},
 	inventory_size = 4,
@@ -1071,11 +1072,11 @@ Itemspec{
 	name = "workbench",
 	model = "workbench1",
 	icon = "workbench1",
-	mass = 30,
+	mass = 21,
 	animation_looted = "open",
 	animation_looting = "opening",
 	categories = {"container", "workbench"},
-	crafting_materials = {log = 1},
+	crafting_materials = {log = 7},
 	inventory_size = 4,
 	inventory_type = "workbench",
 	stacking = false,
