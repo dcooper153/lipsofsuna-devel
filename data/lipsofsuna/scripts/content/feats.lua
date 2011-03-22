@@ -5,7 +5,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "growl1",
 	effect_impact = "impact1",
-	influences = {{"health", -10}},
+	influences = {{"physical", -10}},
 	slot = "mouth"}
 
 Featanimspec{
@@ -24,7 +24,7 @@ Featanimspec{
 	categories = {"melee"},
 	cooldown = 4,
 	effect_impact = "impact1",
-	influences = {{"health", -50}},
+	influences = {{"physical", -50}},
 	slot = "mouth"}
 
 Featanimspec{
@@ -35,7 +35,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
-	influences = {{"health", -30}},
+	influences = {{"physical", -30}},
 	slot = "hand.L"}
 
 Featanimspec{
@@ -46,7 +46,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
-	influences = {{"health", -30}},
+	influences = {{"physical", -30}},
 	slot = "hand.R"}
 
 Featanimspec{
