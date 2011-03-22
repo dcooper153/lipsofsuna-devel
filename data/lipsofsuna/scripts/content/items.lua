@@ -58,7 +58,6 @@ Itemspec{
 	categories = {"build", "material"},
 	construct_tile = "ferrostone1",
 	construct_tile_count = 1,
-	crafting_materials = {["granite stone"] = 2},
 	equipment_slot = "hand.R",
 	stacking = true}
 
@@ -535,6 +534,60 @@ Itemspec{
 	influences_base = {physical = -10},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	equipment_slot = "hand.R",
+	mass = 15}
+
+Itemspec{
+	name = "stone dagger",
+	model = "sword1", -- FIXME
+	icon = "dagger1",
+	categories = {"melee", "weapon"},
+	crafting_materials = {["granite stone"] = 2},
+	influences_base = {physical = -5},
+	influences_bonus = {dexterity = 0.005},
+	equipment_slot = "hand.R",
+	water_gravity = Vector(0,1,0),
+	mass = 6}
+
+Itemspec{
+	name = "stone hatchet",
+	model = "axe1",
+	icon = "axe1",
+	animation_hold = "hold axe",
+	animation_attack = "attack axe",
+	categories = {"hatchet", "melee", "weapon"},
+	crafting_materials = {["granite stone"] = 3},
+	influences_base = {hatchet = -5, physical = -5},
+	influences_bonus = {strength = 0.01},
+	equipment_slot = "hand.R",
+	water_gravity = Vector(0,1,0),
+	mass = 9}
+
+Itemspec{
+	name = "stone mattock",
+	model = "mattock-000",
+	icon = "mattock1",
+	animation_hold = "hold axe",
+	animation_attack = "attack axe",
+	categories = {"mattock", "melee", "weapon"},
+	crafting_materials = {["granite stone"] = 4},
+	influences_base = {physical = -5},
+	influences_bonus = {strength = 0.01},
+	equipment_slot = "hand.R",
+	water_gravity = Vector(0,1,0),
+	mass = 12}
+
+Itemspec{
+	name = "stone sword",
+	model = "sword1",
+	icon = "sword1",
+	animation_hold = "hold sword",
+	animation_attack = "attack sword",
+	categories = {"melee", "weapon"},
+	crafting_materials = {["granite stone"] = 5},
+	influences_base = {physical = -10},
+	influences_bonus = {dexterity = 0.002, strength = 0.005},
+	equipment_slot = "hand.R",
+	water_gravity = Vector(0,1,0),
 	mass = 15}
 
 Itemspec{
