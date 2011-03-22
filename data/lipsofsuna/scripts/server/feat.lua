@@ -138,7 +138,7 @@ Feat.apply = function(self, args)
 	end
 	-- Digging.
 	if anim.categories["melee"] and args.tile and args.weapon then
-		if args.weapon.spec.categories["mattock"] then
+		if args.weapon.spec.categories["mattock"] or math.random(1, 5) == 5 then
 			Voxel:damage(args.attacker, args.tile)
 		end
 	end
