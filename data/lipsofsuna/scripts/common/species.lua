@@ -55,6 +55,7 @@ Species.dict_name = {}
 --   <li>tilt_bone: Name of the tilt bone of the creature.</li>
 --   <li>tilt_limit: Tilt limit in radians of the tilting bone.</li>
 --   <li>timing_attack_blunt: Timing of blunt attack impact, in frames.</li>
+--   <li>timing_attack_explode: Timing of explosion attack, in frames.</li>
 --   <li>timing_attack_ranged: Timing of ranged attack firing, in frames.</li>
 --   <li>timing_attack_throw: Timing of releasing the thrown item, in frames.</li>
 --   <li>timing_build: Timing of releasing the thrown item, in frames.</li>
@@ -179,6 +180,7 @@ Species.new = function(clss, args)
 	copy("swim_force", 3.5)
 	copy("tilt_limit", math.pi)
 	copy("timing_attack_blunt", 10)
+	copy("timing_attack_explode", 60)
 	copy("timing_attack_ranged", 10)
 	copy("timing_attack_throw", 10)
 	copy("timing_build", 10)

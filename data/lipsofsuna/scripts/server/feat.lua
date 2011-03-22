@@ -352,6 +352,15 @@ Feat.perform = function(self, args)
 						weapon = weapon}
 				end)
 			end
+			if anim.categories["explode"] then
+				-- Self-destruction.
+				-- The creature explodes after the animation has played.
+				Thread(function(self)
+					Thread:sleep(args.user.spec.timing_attack_explode * 0.05)
+					args.user:die()
+					Utils:explosion(args.user.position)
+				end)
+			end
 			if anim.categories["ranged"] then
 				-- Ranged attack.
 				-- A projectile is fired at the specific time into the attack

@@ -108,30 +108,7 @@ Item.die = function(self)
 	-- Execute destruction actions.
 	for k,v in ipairs(self.spec.destroy_actions) do
 		if v == "explode" then
-			local r1 = 1
-			local r2 = (r1 + 3) * Voxel.tile_size
-			Particles:create(self.position, "explosion1")
-			-- Damage nearby tiles.
-			local _,ctr = Voxel:find_tile{point = self.position}
-			for x=-r1,r1 do
-				for y=-r1,r1 do
-					for z=-r1,r1 do
-						local o = Vector(x,y,z)
-						if o.length < r1 + 0.6 then
-							Voxel:damage(nil, ctr + o)
-						end
-					end
-				end
-			end
-			-- Damage nearby objects.
-			for k1,v1 in pairs(Object:find{point = self.position, radius = r2}) do
-				local diff = v1.position - self.position
-				local frac = 0.3 * diff.length / r2
-				local mult = 10 * math.min(100, v1.mass)
-				local impulse = diff:normalize() * (mult * (1 - frac))
-				v1:impulse{impulse = impulse, point = Vector()}
-				v1:damaged(40 * (1 - frac))
-			end
+			Utils:explosion(self.position)
 		end
 	end
 	-- Remove from the world.

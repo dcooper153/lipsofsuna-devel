@@ -28,6 +28,14 @@ Featanimspec{
 	slot = "mouth"}
 
 Featanimspec{
+	name = "explode",
+	animation = "explode",
+	categories = {"explode", "melee"},
+	cooldown = 2,
+	influences = {{"physical", -1}},
+	effect = "swing1"}
+
+Featanimspec{
 	name = "left claw",
 	action_frames = {0, 15},
 	animation = "attack left claw",

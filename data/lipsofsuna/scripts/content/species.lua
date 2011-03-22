@@ -547,7 +547,7 @@ Species{
 	ai_enable_defend = false,
 	categories = {"enemy", "mining"},
 	factions = {"evil"},
-	feat_anims = {"bite"},
+	feat_anims = {"bite", "explode"},
 	jump_force = 4,
 	model = "stoneimp2",
 	speed_walk = 1,

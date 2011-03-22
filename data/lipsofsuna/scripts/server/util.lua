@@ -82,6 +82,38 @@ Utils.check_room = function(clss, point, model)
 	return true
 end
 
+--- Creates an explosion.
+-- @param clss Utils class.
+-- @param point Point in world space.
+-- @param radius Radius in tiles.
+-- @return True if there's room for the model.
+Utils.explosion = function(clss, point, radius)
+	local r1 = radius or 1
+	local r2 = (r1 + 3) * Voxel.tile_size
+	Particles:create(point, "explosion1")
+	-- Damage nearby tiles.
+	local _,ctr = Voxel:find_tile{point = point}
+	for x=-r1,r1 do
+		for y=-r1,r1 do
+			for z=-r1,r1 do
+				local o = Vector(x,y,z)
+				if o.length < r1 + 0.6 then
+					Voxel:damage(nil, ctr + o)
+				end
+			end
+		end
+	end
+	-- Damage nearby objects.
+	for k1,v1 in pairs(Object:find{point = point, radius = r2}) do
+		local diff = v1.position - point
+		local frac = 0.3 * diff.length / r2
+		local mult = 10 * math.min(100, v1.mass)
+		local impulse = diff:normalize() * (mult * (1 - frac))
+		v1:impulse{impulse = impulse, point = Vector()}
+		v1:damaged(40 * (1 - frac))
+	end
+end
+
 --- Handles interaction between players and terrain.
 -- @param self Voxels class.
 -- @param player Player object.
