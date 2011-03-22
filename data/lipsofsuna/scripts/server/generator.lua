@@ -162,7 +162,8 @@ Generator.place_region = function(clss, reg, pat)
 	local pos = Vector()
 	local aabb = Aabb{point = pos, size = size + Vector(2,2,2)}
 	if dist then
-		repeat
+		local success
+		for retry=1,50 do
 			pos.x = math.random(dist[2], dist[3])
 			pos.y = math.random(reg.depth[1], reg.depth[2])
 			pos.z = math.random(dist[2], dist[3])
@@ -170,7 +171,12 @@ Generator.place_region = function(clss, reg, pat)
 			if math.random(0, 1) == 1 then pos.z = -pos.z end
 			pos = pos + rel
 			aabb.point = pos - Vector(1,1,1)
-		until clss:validate_region_position(aabb)
+			if clss:validate_region_position(aabb) then
+				success = true
+				break
+			end
+		end
+		if not success then return end
 	else
 		pos.x = rel.x
 		pos.y = math.random(reg.depth[1], reg.depth[2])
@@ -205,20 +211,48 @@ end
 -- @param clss Generator class.
 -- @param args Arguments.
 Generator.generate = function(clss, args)
+	local reset_state = function()
+		-- Initialize state.
+		clss.bins = {}
+		clss.links = {}
+		clss.regions_dict_id = {}
+		clss.regions_dict_name = {}
+		clss.regions_dict_layer = {}
+		for i=1,clss.layer_count do
+			clss.regions_dict_layer[i] = {}
+		end
+	end
+	local place_regions = function()
+		local special = Regionspec:find{category = "special"}
+		while true do
+			local placed = 0
+			local skipped = 0
+			-- Try to place one or more regions.
+			-- Regions are often placed relative to each other so we need to
+			-- add them iteratively in the other of least dependencies.
+			for name,reg in pairs(special) do
+				if not clss.regions_dict_name[reg.name] then
+					local pat = Pattern:random{category = reg.pattern_category, name = reg.pattern_name}
+					if not clss:place_region(reg, pat) then
+						skipped = skipped + 1
+					else
+						placed = placed + 1
+					end
+				end
+			end
+			-- The generator may sometimes run into a dead end where a region
+			-- can't be placed without violating the constraints. In such a
+			-- case, nil is returned and generation is restarted from scratch.
+			if placed == 0 then return end
+			if skipped == 0 then break end
+		end
+		return true
+	end
 	-- Remove all player characters.
 	for k,v in pairs(Player.clients) do
 		v:detach(true)
 	end
 	Player.clients = {}
-	-- Initialize state.
-	clss.bins = {}
-	clss.links = {}
-	clss.regions_dict_id = {}
-	clss.regions_dict_name = {}
-	clss.regions_dict_layer = {}
-	for i=1,clss.layer_count do
-		clss.regions_dict_layer[i] = {}
-	end
 	-- Reset the world.
 	clss:update_status(0, "Resetting world")
 	Marker:reset()
@@ -226,20 +260,10 @@ Generator.generate = function(clss, args)
 	-- Place special areas.
 	-- Regions have dependencies so we need to place them in several passes.
 	-- The region tables are filled but the map is all empty after this.
-	clss:update_status(0, "Placing regions")
-	local special = Regionspec:find{category = "special"}
-	while true do
-		local skipped = 0
-		for name,reg in pairs(special) do
-			if not clss.regions_dict_name[reg.name] then
-				local pat = Pattern:random{category = reg.pattern_category, name = reg.pattern_name}
-				if not clss:place_region(reg, pat) then
-					skipped = skipped + 1
-				end
-			end
-		end
-		if skipped == 0 then break end
-	end
+	repeat
+		reset_state()
+		clss:update_status(0, "Placing regions")
+	until place_regions()
 	-- Initialize connectivity.
 	-- A cyclic graph is created out of the special areas by creating links
 	-- between them according to the rules in the region specs.
