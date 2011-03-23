@@ -856,7 +856,8 @@ Itemspec{
 	crafting_materials = {hide = 4},
 	equipment_models = {
 		["aer/kraken/wyrm"] = {feet = false, legs = "aerleggings1"},
-		["android"] = {feet = false, legs = "androidleggings1"}},
+		["android"] = {feet = false, legs = "androidleggings1"},
+		["devora"] = {feet = false, legs = "devoraleggings1"}},
 	equipment_slot = "feet",
 	mass = 5,
 	water_gravity = Vector(0,1,0)}
