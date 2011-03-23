@@ -828,7 +828,8 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {hide = 2},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {headband = "headband1"}},
+		["aer/android/kraken/wyrm"] = {headband = "aerheadband1"},
+		["devora"] = {headband = "devoraheadband1"}},
 	equipment_slot = "head",
 	mass = 1,
 	water_gravity = Vector(0,1,0)}
