@@ -138,7 +138,7 @@ Species{
 		skeleton = "android1",
 		arms = "androidarm1",
 		feet = "androidfoot1",
-		hand = "androidhand1",
+		hands = "androidhand1",
 		head = "androidhead1",
 		legs = "androidleg1",
 		lower = "androidlower1",

@@ -789,7 +789,8 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 3},
 	equipment_models = {
-		["aer/kraken/wyrm"] = {feet = false, legs = "aerlegplate1"}},
+		["aer/kraken/wyrm"] = {feet = false, legs = "aerlegplate1"},
+		["android"] = {feet = false, legs = "androidlegplate1"}},
 	equipment_slot = "feet",
 	mass = 15}
 
@@ -801,9 +802,9 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 2},
 	equipment_models = {
-		["aer/kraken/wyrm"] = {arms = "aerarmplate1"}},
+		["aer/kraken/wyrm"] = {arms = "aerarmplate1", hands = false},
+		["android"] = {arms = "androidarmplate1", hands = false}},
 	equipment_slot = "arms",
-
 	mass = 10}
 
 Itemspec{
@@ -814,7 +815,8 @@ Itemspec{
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 5},
 	equipment_models = {
-		["aer/kraken/wyrm"] = {upper = "aerupperplate1", lower = "aerlowerplate1"}},
+		["aer/kraken/wyrm"] = {upper = "aerupperplate1", lower = "aerlowerplate1"},
+		["android"] = {upper = "androidupperplate1", lower = "androidlowerplate1"}},
 	equipment_slot = "upperbody",
 	equipment_slots_reserved = {"lowerbody"},
 	mass = 25}
