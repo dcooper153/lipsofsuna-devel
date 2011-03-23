@@ -942,41 +942,41 @@ Itemspec{
 
 Itemspec{
 	name = "lizard boots",
-	model = "boots2",
-	icon = "lizardboot1",
 	armor_class = 0.5,
 	categories = {"armor"},
 	crafting_materials = {["lizard scale"] = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {legs1 = "aerboots2"}},
+		["aer/android/kraken/wyrm"] = {feet = "aerlizardboots1"}},
 	equipment_slot = "feet",
+	icon = "lizardboot1",
 	mass = 4,
+	model = "lizardboots1",
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "lizard dress",
-	icon = "lizardarmor1",
-	model = "book-000",
 	armor_class = 0.1,
 	categories = {"armor"},
 	crafting_materials = {["lizard scale"] = 6},
 	equipment_models = {
-		["aer/kraken/wyrm"] = {dress1 = "aerdress2", panties = "panties2"}},
+		["aer/kraken/wyrm"] = {dress1 = "aerlizarddress1", panties = "panties2"}},
 	equipment_slot = "upperbody",
+	icon = "lizardarmor1",
 	mass = 7,
+	model = "lizarddress1",
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "lizard gloves",
-	model = "gloves2",
-	icon = "lizardglove1",
 	armor_class = 0.5,
 	categories = {"armor"},
 	crafting_materials = {["lizard scale"] = 4},
 	equipment_models = {
-		["aer/android/kraken/wyrm"] = {arms1 = "aergloves2"}},
+		["aer/android/kraken/wyrm"] = {hands = "aerlizardgloves1"}},
 	equipment_slot = "arms",
+	icon = "lizardglove1",
 	mass = 4,
+	model = "lizardgloves1",
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
