@@ -132,14 +132,6 @@ vec3 los_normal_mapping(in vec3 normal, in vec3 tangent, in vec2 texcoord, in sa
 	return normalize(tangentspace * n);
 }]]
 
-Shader.los_triangle_tangent = [[
-vec3 los_triangle_tangent(in vec3 co0, in vec3 co1, in vec3 co2, in vec2 uv0, in vec2 uv1, in vec2 uv2)
-{
-	vec3 ed0 = co1 - co0;
-	vec3 ed1 = co2 - co0;
-	return normalize(ed1 * (uv1.y - uv0.y) - ed0 * (uv2.y - uv0.y));
-}]]
-
 Shader.los_shadow_mapping = [[
 float los_shadow_mapping(in vec4 lightcoord, in sampler2DShadow sampler)
 {

@@ -115,9 +115,10 @@ void main()
 	int i;
 	vec3 ed0 = geo_coord[1] - geo_coord[0];
 	vec3 ed1 = geo_coord[2] - geo_coord[0];
-	LOS_output_tangent = normalize(
-		ed1 * (geo_texcoord[1].y - geo_texcoord[0].y) -
-		ed0 * (geo_texcoord[2].y - geo_texcoord[0].y));
+	vec2 uv0 = geo_texcoord[1] - geo_texcoord[0];
+	vec2 uv1 = geo_texcoord[2] - geo_texcoord[0];
+	float sign = uv0.x * uv1.y - uv1.x * uv0.y;
+	LOS_output_tangent = normalize(sign * (ed1 * uv0.y - ed0 * uv1.y));
 	for(i = 0 ; i < gl_VerticesIn ; i++)
 	{
 		LOS_output_coord = geo_coord[i];
