@@ -6,12 +6,12 @@ local regen = 0.5
 Species{
 	name = "base",
 	animations = {
-		["attack axe"] = {animation = "attack-axe", fade_in = 0.1, channel = 2, weight = 30},
-		["attack blunt"] = {animation = "attack-blunt", channel = 2, weight = 30},
-		["attack bow"] = {animation = "fire-bow", channel = 2, weight = 30},
-		["attack fist"] = {animation = "punch", channel = 2, fade_out = 0.1, weight = 30},
-		["attack sword"] = {animation = "attack-blunt", channel = 2, weight = 30},
-		["attack staff"] = {animation = "attack-staff", channel = 2, weight = 30},
+		["attack axe"] = {animation = "attack-axe", channel = 2, fade_in = 0.1, weight = 100},
+		["attack blunt"] = {animation = "attack-blunt", channel = 2, fade_in = 0.1, weight = 100},
+		["attack bow"] = {animation = "fire-bow", channel = 2, weight = 100},
+		["attack fist"] = {animation = "punch", channel = 2, fade_out = 0.1, weight = 100},
+		["attack sword"] = {animation = "attack-blunt", channel = 2, weight = 100},
+		["attack staff"] = {animation = "attack-staff", channel = 2, weight = 100},
 		["block start"] = {animation = "block", channel = 2, fade_in = 0.6, fade_out = 0.6, permanent = true, repeat_start = 10, weight = 50},
 		["block stop"] = {animation = "block-stop", channel = 2},
 		["build"] = {animation = "punch", channel = 2, weight = 30},
@@ -86,6 +86,9 @@ Species{
 Species{
 	name = "aer",
 	base = "race",
+	animations = {
+		["land ground"] = {animation = "land", channel = 2, fade_in = 0.1, fade_out = 0.5, weight = 10},
+		["attack sword"] = {animation = "attack-slash", channel = 2, fade_in = 0.1, weight = 30}},
 	effect_falling_damage = "aerhurt1",
 	equipment_class = "aer",
 	model = "aer1",
@@ -174,7 +177,7 @@ Species{
 	base = "race",
 	aim_ray_center = Vector(0, 1, 0),
 	animations = {
-		["attack sword"] = {animation = "attack-slash", channel = 2, weight = 30}},
+		["attack sword"] = {animation = "attack-slash", channel = 2, fade_in = 0.1, weight = 100}},
 	camera_center = Vector(0, 1, 0),
 	damage_from_magma = 9,
 	equipment_class = "devora",
