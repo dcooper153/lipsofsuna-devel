@@ -1195,6 +1195,37 @@ Itemspec{
 	stacking = false,
 	water_gravity = Vector(0,1,0)}
 
+Itemspec{
+	name = "wood chair",
+	model = "chair2",
+	mass = 10,
+	categories = {"furniture"},
+	crafting_materials = {log = 5},
+	health = 30,
+	stacking = false,
+	water_gravity = Vector(0,1,0)}
+
+Itemspec{
+	name = "wood bench",
+	model = "bench1",
+	mass = 15,
+	categories = {"furniture"},
+	crafting_materials = {log = 6},
+	health = 30,
+	stacking = false,
+	water_gravity = Vector(0,1,0)}
+
+Itemspec{
+	name = "wood table",
+	model = "table1",
+	mass = 20,
+	categories = {"furniture"},
+	crafting_materials = {log = 7},
+	health = 30,
+	stacking = false,
+	water_gravity = Vector(0,1,0)}
+
+
 ------------------------------------------------------------------------------
 -- FIXME
 
