@@ -769,6 +769,20 @@ Itemspec{
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
+	name = "fedora",
+	model = "fedora1",
+	icon = "leatherarmor1",
+	armor_class = 0.02,
+	categories = {"armor"},
+	crafting_materials = {hide = 2},
+	equipment_models = {
+		["aer/android/kraken/wyrm"] = {hat = "aerfedora1"},
+		["devora"] = {hat = "devorafedora1"}},
+	equipment_slot = "head",
+	mass = 5,
+	water_gravity = Vector(0,1,0)}
+
+Itemspec{
 	name = "trog rags",
 	model = "book-000",
 	icon = "cloth1",

@@ -879,6 +879,40 @@
   </asset>
 
   <asset>
+    <file>import/fedora1.blend</file>
+    <author>Brian Rocz</author>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <source>http://www.blendswap.com/3D-models/clothes/fedora/</source>
+    <dep>import/fedora1.png</dep>
+    <dep>import/fedora1n.png</dep>
+    <status>complete</status>
+    <type>model</type>
+    <comment>Manually retopologized and fitted to the original texture.</comment>
+  </asset>
+
+  <asset>
+    <file>import/fedora1.png</file>
+    <author>Brian Rocz</author>
+    <license>CC0</license>
+    <source>http://www.blendswap.com/3D-models/clothes/fedora/</source>
+    <status>complete</status>
+    <type>texture</type>
+    <comment>Applied contrast stretching.</comment>
+  </asset>
+
+  <asset>
+    <file>import/fedora1n.png</file>
+    <author>Brian Rocz</author>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <source>http://www.blendswap.com/3D-models/clothes/fedora/</source>
+    <status>complete</status>
+    <type>normalmap</type>
+    <comment>Baked from the high polygon model.</comment>
+  </asset>
+
+  <asset>
     <file>import/fence-000.blend</file>
     <author>tidbit (Joseph)</author>
     <license>Creative Commons BY 3.0</license>
