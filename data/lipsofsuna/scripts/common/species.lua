@@ -59,7 +59,9 @@ Species.dict_name = {}
 --   <li>timing_attack_ranged: Timing of ranged attack firing, in frames.</li>
 --   <li>timing_attack_throw: Timing of releasing the thrown item, in frames.</li>
 --   <li>timing_build: Timing of releasing the thrown item, in frames.</li>
+--   <li>timing_drop: Timing of dropping an item, in frames.</li>
 --   <li>timing_jump: Timing of lifting off when jumping, in frames.</li>
+--   <li>timing_pickup: Timing of picking up an item, in frames.</li>
 --   <li>timing_spell_ranged: Timing of casting a ranged spell projectile, in frames.</li>
 --   <li>timing_spell_self: Timing of casting a spell on self, in frames.</li>
 --   <li>timing_spell_touch: Timing of casting a spell on touch, in frames.</li>
@@ -184,7 +186,9 @@ Species.new = function(clss, args)
 	copy("timing_attack_ranged", 10)
 	copy("timing_attack_throw", 10)
 	copy("timing_build", 10)
+	copy("timing_drop", 5)
 	copy("timing_jump", 5)
+	copy("timing_pickup", 15)
 	copy("timing_spell_ranged", 10)
 	copy("timing_spell_self", 10)
 	copy("timing_spell_touch", 10)

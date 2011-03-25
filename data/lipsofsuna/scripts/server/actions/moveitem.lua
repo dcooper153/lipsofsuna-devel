@@ -87,13 +87,10 @@ Actions.move_from_inv_to_world = function(clss, user, srcid, srcslot)
 	local srcobj = srcinv:get_object{slot = srcslot}
 	if not srcobj then return end
 	srcobj:detach()
-	srcobj.position = user.position
+	srcobj.position = user.position + user.rotation * Vector(0,0,-1) + Vector(0,1)
 	srcobj.velocity = Vector()
 	srcobj.rotation = Quaternion()
 	srcobj.realized = true
-	-- Animate the user.
-	user:animate("pick up")
-	user.cooldown = 1
 	return true
 end
 
@@ -129,8 +126,5 @@ Actions.move_from_world_to_inv = function(clss, user, srcid, dstid, dstslot)
 	elseif not dstinv:merge_object{object = srcobj, slot = dstslot} then
 		return
 	end
-	-- Animate the user.
-	user:animate("pick up")
-	user.cooldown = 1
 	return true
 end

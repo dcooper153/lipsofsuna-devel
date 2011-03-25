@@ -24,6 +24,7 @@ Species{
 		["hold torch"] = {animation = "hold-left", channel = 4, permanent = true, repeat_start = 10, weight = 5},
 		["dead"] = {animation = "death", channel = 1, permanent = true, repeat_start = 10, time = 10},
 		["death"] = {animation = "death", channel = 1, permanent = true, repeat_start = 10},
+		["drop"] = {animation = "pickup", channel = 2, weight = 10},
 		["idle"] = {animation = "idle", channel = 1, permanent = true},
 		["run"] = {animation = "run", channel = 1, permanent = true},
 		["jump"] = {animation = "jump", channel = 2, fade_out = 0.4, permanent = true, repeat_start = 10, weight = 10},

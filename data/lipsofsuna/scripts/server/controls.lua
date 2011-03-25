@@ -194,9 +194,19 @@ Protocol:add_handler{type = "MOVE_ITEM", func = function(args)
 	elseif dst ~= moveitem.WORLD then return end
 	-- Perform the item move.
 	if src == moveitem.WORLD then
-		return Actions:move_from_world_to_inv(player, srcid, dstid, dstslot)
+		if player.cooldown then return end
+		player:animate("pick up")
+		player.cooldown = player.spec.timing_pickup * 0.05 + 0.2
+		Timer{delay = player.spec.timing_pickup * 0.05, func = function(timer)
+			Actions:move_from_world_to_inv(player, srcid, dstid, dstslot)
+			timer:disable()
+		end}
 	elseif dst == moveitem.WORLD then
-		return Actions:move_from_inv_to_world(player, srcid, srcslot)
+		player:animate("drop")
+		Timer{delay = player.spec.timing_drop * 0.05, func = function(timer)
+			Actions:move_from_inv_to_world(player, srcid, srcslot)
+			timer:disable()
+		end}
 	else
 		return Actions:move_from_inv_to_inv(player, srcid, srcslot, dstid, dstslot)
 	end
