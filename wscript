@@ -4,7 +4,7 @@ import Options
 import Utils
 
 APPNAME='lipsofsuna'
-VERSION='0.2.1'
+VERSION='0.3.0'
 
 top = '.'
 out = '.build'

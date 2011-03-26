@@ -1,65 +1,81 @@
+0.3.0
+
+  * Less blocky cave walls.
+  * Saving and loading of player characters.
+  * Multiplayer account management.
+  * Fractal terrain and more map regions.
+  * Improvements to camera behavior.
+  * Functional water and magma.
+  * Explosions deform terrain and throw items around.
+  * Creatures suffer damage from falling long distances.
+  * Elemental damage and creature specific vulnerabilities.
+  * Races: aer male, android female.
+  * Monsters: stone imp, fire imp.
+  * Feats: wilderness.
+  * Items: stone weapons, fedora, textures for several existing items.
+
 0.2.1
 
- * New UI theme and various usability improvements.
- * More usable inventory management.
- * Added a crosshair and improved the camera behavior.
- * New items: jar, chest, workbench, wooden club, leather armor set, lizard armor set.
- * New monsters: plague rat, plague slime, troglodyte, lizardman, feral devora.
- * New feats: sanctuary, black haze.
- * Crafting is now done with workbenches.
- * Lootable containers and corpses.
- * Better character animations.
- * Unlockable fast travel portals.
- * Options persist across sessions.
- * Graphics engine optimizations.
- * An icon and a menu item for the Ubuntu package.
+  * New UI theme and various usability improvements.
+  * More usable inventory management.
+  * Added a crosshair and improved the camera behavior.
+  * New items: jar, chest, workbench, wooden club, leather armor set, lizard armor set.
+  * New monsters: plague rat, plague slime, troglodyte, lizardman, feral devora.
+  * New feats: sanctuary, black haze.
+  * Crafting is now done with workbenches.
+  * Lootable containers and corpses.
+  * Better character animations.
+  * Unlockable fast travel portals.
+  * Options persist across sessions.
+  * Graphics engine optimizations.
+  * An icon and a menu item for the Ubuntu package.
 
 0.2.0
 
- * Vastly improved map generation algorithm.
- * Added the first part of the main quest and one side quest.
- * Added a quest compass to make it easier to find quest objectives.
- * Mining ores and other material from map tiles.
- * New monsters: dragon, aer brigands.
- * New items: ore stones, plate armor, weapon variants craftable of different ores.
- * Armor class is taken into account when calculating damage.
- * Improved feat system with support for custom feats.
+  * Vastly improved map generation algorithm.
+  * Added the first part of the main quest and one side quest.
+  * Added a quest compass to make it easier to find quest objectives.
+  * Mining ores and other material from map tiles.
+  * New monsters: dragon, aer brigands.
+  * New items: ore stones, plate armor, weapon variants craftable of different ores.
+  * Armor class is taken into account when calculating damage.
+  * Improved feat system with support for custom feats.
 
 0.1.3
 
- * Models: China dress, boomerang, another tree.
- * Animations: Spell casting, ranged attack, throwing.
- * The eye, hair, and skin colors of the character can be customized.
- * Breast size slider and a few other body proportion adjustment widgets.
- * Support for inventory item icons and added a couple of icons.
- * Corpses have better physics.
- * Animation and transparency quality are configurable via the options screen.
- * Fixed issues that prevented the game from compiling with MingGW.
- * Fixed networking issues in Windows by migrating to ENet.
- * Support for running the game in a dedicated server mode.
- * Decreased memory usage by properly swapping out inactive map sectors.
- * Various terrain system improvements and optimizations.
- * Buildings are broken due to ongoing terrain system changes.
+  * Models: China dress, boomerang, another tree.
+  * Animations: Spell casting, ranged attack, throwing.
+  * The eye, hair, and skin colors of the character can be customized.
+  * Breast size slider and a few other body proportion adjustment widgets.
+  * Support for inventory item icons and added a couple of icons.
+  * Corpses have better physics.
+  * Animation and transparency quality are configurable via the options screen.
+  * Fixed issues that prevented the game from compiling with MingGW.
+  * Fixed networking issues in Windows by migrating to ENet.
+  * Support for running the game in a dedicated server mode.
+  * Decreased memory usage by properly swapping out inactive map sectors.
+  * Various terrain system improvements and optimizations.
+  * Buildings are broken due to ongoing terrain system changes.
 
 0.1.2
 
- * Fixed several memory leaks.
- * Fixed multiplayer and added server selection to the startup screen.
- * Fixed a crash when joystick axis input was received.
- * Hardware accelerated animations.
- * Disabled bloom by default to lower hardware requirements.
- * Improved the performance of rendering transparent objects.
- * Fixed the usage of mana potions.
- * Added more map generation rules and increased the size of the map.
- * Miscellaneous small performance optimizations.
- * Added sound effects for quest updates and inventory item management.
+  * Fixed several memory leaks.
+  * Fixed multiplayer and added server selection to the startup screen.
+  * Fixed a crash when joystick axis input was received.
+  * Hardware accelerated animations.
+  * Disabled bloom by default to lower hardware requirements.
+  * Improved the performance of rendering transparent objects.
+  * Fixed the usage of mana potions.
+  * Added more map generation rules and increased the size of the map.
+  * Miscellaneous small performance optimizations.
+  * Added sound effects for quest updates and inventory item management.
 
 0.1.1
 
- * Included the NEWS file.
- * Lowered OpenGL requirements to 3.2 from 3.3.
- * Nvidia compatiblity fixes for shaders.
- * Fixed errors in the configuration script.
- * Objects can be used by looking at them and pressing space.
- * Major user interface improvements, including massive speedups.
- * Quest menu that shows statuses and descriptions of quests.
+  * Included the NEWS file.
+  * Lowered OpenGL requirements to 3.2 from 3.3.
+  * Nvidia compatiblity fixes for shaders.
+  * Fixed errors in the configuration script.
+  * Objects can be used by looking at them and pressing space.
+  * Major user interface improvements, including massive speedups.
+  * Quest menu that shows statuses and descriptions of quests.
