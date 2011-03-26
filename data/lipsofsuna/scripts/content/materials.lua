@@ -4,7 +4,7 @@ Material{
 	shader = "adamantium",
 	shininess = 100,
 	texture = {"adamantium1", "stone-001"},
-	texture_scale = 0.33,
+	texture_scale = 0.11,
 	type = "rounded"}
 
 Material{
@@ -28,6 +28,7 @@ Material{
 	effect_collapse = "collapse1",
 	name = "brick1",
 	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
 	texture = {"bricks3", "bricks3n", "stone-001"},
 	texture_scale = 0.11,
 	type = "cube"}
@@ -36,6 +37,7 @@ Material{
 	effect_collapse = "collapse1",
 	name = "brittlerock1",
 	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
 	texture = {"granite1", "granite1n", "stone-001"}, -- FIXME
 	texture_scale = 0.11,
 	type = "rounded"}
@@ -44,8 +46,9 @@ Material{
 	effect_collapse = "collapse1",
 	name = "cobbles1",
 	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
 	texture = {"cobbles1", "cobbles1n", "stone-001"},
-	texture_scale = 0.13,
+	texture_scale = 0.11,
 	type = "rounded"}
 
 Material{
@@ -53,8 +56,9 @@ Material{
 	mining_materials = {["granite stone"] = 1},
 	name = "concrete1",
 	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
 	texture = {"granite1", "granite1n", "stone-001"},
-	texture_scale = 0.33,
+	texture_scale = 0.11,
 	type = "cube"}
 
 Material{
@@ -81,6 +85,7 @@ Material{
 	mining_materials = {["granite stone"] = 1},
 	name = "granite1",
 	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
 	texture = {"granite1", "granite1n", "stone-001"},
 	texture_scale = 0.11,
 	type = "rounded fractal"}
@@ -90,6 +95,7 @@ Material{
 	mining_transform = "soil1",
 	name = "grass1",
 	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
 	texture = {"grass-000", "grass-000-nml", "stone-001"},
 	texture_scale = 0.11,
 	type = "rounded"}
@@ -98,7 +104,6 @@ Material{
 	name = "ice1",
 	shader = "terrain",
 	shininess = 100,
-	specular = {1,1,1,1},
 	texture = {"ice1", "ice1n", "stone-001"},
 	texture_scale = 0.11,
 	type = "rounded"}
@@ -122,6 +127,7 @@ Material{
 	name = "pipe1",
 	shader = "terrain",
 	texture = {"wood1", "wood1n", "stone-001"}, -- FIXME
+	texture_scale = 0.11,
 	type = "rounded"}
 
 Material{
@@ -129,8 +135,9 @@ Material{
 	mining_materials = {["sand chunk"] = 1},
 	name = "sand1",
 	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
 	texture = {"sand1", "sand1n", "stone-001"},
-	texture_scale = 0.22,
+	texture_scale = 0.11,
 	type = "rounded"}
 
 Material{
@@ -138,6 +145,7 @@ Material{
 	mining_materials = {["soil chunk"] = 1},
 	name = "soil1",
 	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
 	texture = {"soil1", "soil1n", "stone-001"},
 	texture_scale = 0.11,
 	type = "rounded"}
@@ -147,6 +155,7 @@ Material{
 	cullface = false,
 	shader = "water",
 	texture = {"noise1", "noise1", "stone-001"},
+	texture_scale = 0.11,
 	type = "liquid"}
 
 Material{
@@ -154,5 +163,6 @@ Material{
 	mining_materials = {["log"] = 1},
 	name = "wood1",
 	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
 	texture = {"wood1", "wood1n", "stone-001"},
 	texture_scale = 0.11}

@@ -59,6 +59,9 @@ void main()
 	vec4 diffuse0 = mix(texture(LOS_diffuse_texture_0, IN.texcoord), texture(LOS_diffuse_texture_0, IN.texcoord1), 0.5);
 	vec4 diffuse1 = texture(LOS_diffuse_texture_1, IN.texcoord);
 	vec4 diffuse = LOS_material_diffuse * mix(diffuse0, diffuse1, IN.splatting);
-	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector", "IN.halfvector") .. [[
+	vec4 specular_splat = mix(LOS_material_specular, vec4(0.5), IN.splatting);
+	float shininess_splat = mix(LOS_material_shininess, 1.0, IN.splatting);
+	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector", "IN.halfvector",
+		"specular_splat", "shininess_splat") .. [[
 	LOS_output_0 = LOS_material_diffuse * diffuse * lighting;
 }]]}}

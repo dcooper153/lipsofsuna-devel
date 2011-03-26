@@ -68,7 +68,8 @@ end
 -- @param lv Array name that contains the light vectors.
 -- @param hv Array name that contains the light half vectors.
 -- @param sp Variable name that contains additional specular color.
-Shader.los_lighting_default = function(co, no, lv, hv, sp)
+-- @param sh Variable name that contains shininess override value.
+Shader.los_lighting_default = function(co, no, lv, hv, sp, sh)
 	return string.format([[int lighting_index;
 	vec4 lighting = vec4(0.0, 0.0, 0.0, 1.0);
 	for(lighting_index = 0 ; lighting_index < LOS_LIGHT_MAX ; lighting_index++)
@@ -77,11 +78,11 @@ Shader.los_lighting_default = function(co, no, lv, hv, sp)
 		float fattn = 1.0 / dot(LOS_light[lighting_index].equation, vec3(1.0, length(lv), dot(lv, lv)));
 		float fdiff = max(0.0, dot(%s, normalize(lv)));
 		float coeff = max(0.0, dot(%s, normalize(%s[lighting_index])));
-		float fspec = pow(max(0.0, coeff), LOS_material_shininess);
+		float fspec = pow(max(0.0, coeff), %s);
 		lighting.rgb += fattn * (LOS_light[lighting_index].ambient.rgb +
 			fdiff * LOS_light[lighting_index].diffuse.rgb +
-			fdiff * fspec * LOS_light[lighting_index].specular.rgb * %sLOS_material_specular.rgb);
-	}]], lv, no, no, hv, sp and (sp .. ".rgb * ") or "")
+			fdiff * fspec * LOS_light[lighting_index].specular.rgb * %s.rgb);
+	}]], lv, no, no, hv, sh or "LOS_material_shininess", sp or "LOS_material_specular")
 end
 
 --- Calculates lighting and stores it to a variable named lighting.

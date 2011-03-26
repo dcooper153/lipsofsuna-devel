@@ -78,7 +78,7 @@ void main()
 	OUT.splatting = length(LOS_normal) - 1.0;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
-pass4_fragment = [[
+pass4_fragment = Shader.los_normal_mapping .. [[
 in fragvar
 {
 	vec3 coord;
@@ -88,8 +88,7 @@ in fragvar
 	vec3 tangent;
 	vec2 texcoord;
 	float splatting;
-} IN;]]
-.. Shader.los_normal_mapping .. [[
+} IN;
 void main()
 {
 	vec3 tangent = normalize(IN.tangent);
@@ -98,6 +97,9 @@ void main()
 	vec4 diffuse0 = texture(LOS_diffuse_texture_0, IN.texcoord);
 	vec4 diffuse1 = texture(LOS_diffuse_texture_2, IN.texcoord);
 	vec4 diffuse = LOS_material_diffuse * mix(diffuse0, diffuse1, IN.splatting);
-	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector", "IN.halfvector") .. [[
-	LOS_output_0 = LOS_material_diffuse * diffuse * lighting;
+	vec4 specular_splat = mix(LOS_material_specular, vec4(0.5), IN.splatting);
+	float shininess_splat = mix(1.0, 1.0, IN.splatting);
+	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector", "IN.halfvector",
+		"specular_splat", "shininess_splat") .. [[
+	LOS_output_0 = diffuse * lighting;
 }]]}}

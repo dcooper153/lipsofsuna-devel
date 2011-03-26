@@ -91,7 +91,7 @@ void main()
 	vec3 tangent = normalize(IN.tangent);
 	vec3 normal = los_normal_mapping(IN.normal, tangent, IN.texcoord, LOS_diffuse_texture_1);
 	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
-	vec4 specular = texture(LOS_diffuse_texture_2, IN.texcoord);
+	vec4 specular = LOS_material_specular * texture(LOS_diffuse_texture_2, IN.texcoord);
 	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector", "IN.halfvector", "specular") .. [[
 	LOS_output_0 = LOS_material_diffuse * diffuse * lighting;
 }]]}}
