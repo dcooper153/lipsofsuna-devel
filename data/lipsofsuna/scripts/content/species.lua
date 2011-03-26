@@ -134,6 +134,18 @@ Species{
 Species{
 	name = "android",
 	base = "race",
+	animations = {
+		["attack axe"] = {animation = "punch", channel = 2, fade_in = 0.1, weight = 100},
+		["attack blunt"] = {animation = "punch", channel = 2, fade_in = 0.1, weight = 100},
+		["attack sword"] = {animation = "punch", channel = 2, weight = 100},
+		["attack staff"] = {animation = "punch", channel = 2, weight = 100},
+		["hold axe"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
+		["hold blunt"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
+		["hold bulky"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
+		["hold staff"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
+		["hold shield"] = {animation = "hold-left", channel = 4, permanent = true, repeat_start = 10, weight = 5},
+		["hold sword"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
+		["hold torch"] = {animation = "hold-left", channel = 4, permanent = true, repeat_start = 10, weight = 5}},
 	damage_from_magma = 2,
 	damage_from_water = 5,
 	equipment_class = "android",
