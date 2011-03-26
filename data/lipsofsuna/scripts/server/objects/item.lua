@@ -230,7 +230,7 @@ Item.use_cb = function(self, user)
 	-- taken out of containers.
 	local inv = Inventory:find{object = self}
 	if not inv then
-		return Actions:move_from_world_to_inv(user, self.id, user.id, 0)
+		return user:pick_up(self.id, user.id, 0)
 	end
 	local _,slot = inv:find_object{object = self}
 	if inv.owner ~= user then

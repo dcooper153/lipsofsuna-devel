@@ -535,6 +535,21 @@ Creature.loot = function(self, user)
 	return Object.loot(self, user)
 end
 
+--- Picks up an object.
+-- @param self Object.
+-- @param src_id ID of the picked up object.
+-- @param dst_id ID of the inventory where to place the object.
+-- @param dst_slot Name of the inventory slot where to place the object.
+Creature.pick_up = function(self, src_id, dst_id, dst_slot)
+	if self.cooldown then return end
+	self:animate("pick up")
+	self.cooldown = self.spec.timing_pickup * 0.05 + 0.2
+	Timer{delay = self.spec.timing_pickup * 0.05, func = function(timer)
+		Actions:move_from_world_to_inv(self, src_id, dst_id, dst_slot)
+		timer:disable()
+	end}
+end
+
 --- Removes a modifier.
 -- @param self Object.
 -- @param name Modifier name.
