@@ -4,9 +4,9 @@ Player.species = "aer" -- FIXME
 
 local radian_wrap = function(x)
 	if x < -math.pi then
-		return math.pi - math.mod(x, math.pi)
+		return x + 2 * math.pi
 	elseif x > math.pi then
-		return -math.pi + math.mod(x, math.pi)
+		return x - 2 * math.pi
 	else
 		return x
 	end
