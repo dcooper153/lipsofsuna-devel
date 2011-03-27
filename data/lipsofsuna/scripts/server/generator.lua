@@ -379,7 +379,8 @@ Generator.generate = function(clss, args)
 	Program:update()
 	repeat until not Program:pop_event()
 	-- Inform players of the generation being complete.
-	local status = Packet(packets.CHARACTER_CREATE)
+	-- All accounts were erased so clients need to re-authenticate.
+	local status = Packet(packets.CLIENT_AUTHENTICATE)
 	for k,v in pairs(Network.clients) do
 		Network:send{client = v, packet = status}
 	end
