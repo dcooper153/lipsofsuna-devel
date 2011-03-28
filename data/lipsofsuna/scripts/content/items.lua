@@ -215,7 +215,10 @@ Itemspec{
 	crafting_materials = {["adamantium"] = 9},
 	influences_base = {physical = -30},
 	influences_bonus = {dexterity = 0.01},
+	animation_hold = "hold crossbow",
+	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
 	mass = 15}
 
 Itemspec{
@@ -253,6 +256,7 @@ Itemspec{
 	influences_base = {physical = -20},
 	influences_bonus = {strength = 0.01},
 	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
 	mass = 15}
 
 Itemspec{
@@ -264,7 +268,10 @@ Itemspec{
 	crafting_materials = {["adamantium"] = 15, ["log"] = 2},
 	influences_base = {physical = -50},
 	influences_bonus = {intelligence = 0.005, perception = 0.005},
+	animation_hold = "hold crossbow",
+	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
 	mass = 15}
 
 Itemspec{
@@ -289,7 +296,10 @@ Itemspec{
 	crafting_materials = {["aquanite stone"] = 9},
 	influences_base = {cold = -11, physical = -11},
 	influences_bonus = {dexterity = 0.01},
+	animation_hold = "hold crossbow",
+	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
 	mass = 15}
 
 Itemspec{
@@ -360,7 +370,10 @@ Itemspec{
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["aquanite stone"] = 15, ["log"] = 2},
+	animation_hold = "hold crossbow",
+	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
 	influences_base = {cold = -18, physical = -18},
 	influences_bonus = {intelligence = 0.005, perception = 0.005},
 	mass = 15}
@@ -387,7 +400,10 @@ Itemspec{
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["crimson stone"] = 9},
+	animation_hold = "hold crossbow",
+	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
 	influences_base = {fire = -11, physical = -11},
 	influences_bonus = {dexterity = 0.01},
 	mass = 15}
@@ -461,7 +477,10 @@ Itemspec{
 	crafting_materials = {["crimson stone"] = 15, ["log"] = 2},
 	influences_base = {fire = -16, physical = -16},
 	influences_bonus = {intelligence = 0.005, perception = 0.005},
+	animation_hold = "hold crossbow",
+	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
 	mass = 15}
 
 Itemspec{
@@ -488,7 +507,10 @@ Itemspec{
 	crafting_materials = {["iron ingot"] = 3},
 	influences_base = {physical = -15},
 	influences_bonus = {dexterity = 0.005},
+	animation_hold = "hold crossbow",
+	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
 	mass = 15}
 
 Itemspec{
@@ -541,7 +563,10 @@ Itemspec{
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["iron ingot"] = 5, ["log"] = 2},
+	animation_hold = "hold crossbow",
+	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
 	influences_base = {physical = -25},
 	influences_bonus = {intelligence = 0.005, perception = 0.005},
 	mass = 20}
@@ -620,18 +645,37 @@ Itemspec{
 	mass = 15}
 
 Itemspec{
-	name = "wooden crossbow",
+	name = "wooden bow",
 	model = "bow1", -- FIXME
 	icon = "bow1",
-	animation_attack = "attack bow",
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["log"] = 5},
 	influences_base = {physical = -7},
 	influences_bonus = {dexterity = 0.01},
+	animation_hold = "hold bow",
+	animation_attack = "attack bow",
 	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
 	water_gravity = Vector(0,1,0),
 	mass = 7}
+
+Itemspec{
+	name = "wooden crossbow",
+	model = "bow1", -- FIXME
+	icon = "bow1",
+	ammo_type = "arrow",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["log"] = 5},
+	influences_base = {physical = -7},
+	influences_bonus = {dexterity = 0.01},
+	animation_hold = "hold crossbow",
+	animation_attack = "attack crossbow",
+	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
+	water_gravity = Vector(0,1,0),
+	mass = 7}
+
 
 Itemspec{
 	name = "wooden dagger",
