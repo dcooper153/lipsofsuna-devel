@@ -659,6 +659,37 @@ Itemspec{
 	equipment_slots_reserved = {"hand.L"},
 	water_gravity = Vector(0,1,0),
 	mass = 7}
+Itemspec{
+	name = "fire bow",
+	model = "bow1", -- FIXME
+	icon = "bow1",
+	ammo_type = "fire arrow",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["log"] = 5},
+	influences_base = {physical = -7},
+	influences_bonus = {dexterity = 0.01},
+	animation_hold = "hold bow",
+	animation_attack = "attack bow",
+	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
+	water_gravity = Vector(0,1,0),
+	mass = 7}
+
+Itemspec{
+	name = "explosive bow",
+	model = "bow1", -- FIXME
+	icon = "bow1",
+	ammo_type = "explosive arrow",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["log"] = 5},
+	influences_base = {physical = -7},
+	influences_bonus = {dexterity = 0.01},
+	animation_hold = "hold bow",
+	animation_attack = "attack bow",
+	equipment_slot = "hand.R",
+	equipment_slots_reserved = {"hand.L"},
+	water_gravity = Vector(0,1,0),
+	mass = 7}
 
 Itemspec{
 	name = "wooden crossbow",
@@ -1130,6 +1161,34 @@ Itemspec{
 	mass = 1,
 	stacking = true,
 	water_gravity = Vector(0,1,0)}
+Itemspec{
+	name = "fire arrow",
+	model = "arrow-000",
+	categories = {"arrow"},
+	influences_base = {physical = -5},
+	crafting_count = 10,
+	crafting_materials = {["log"] = 1},
+	icon = "arrow1",
+	mass = 1,
+	stacking = true,
+	special_effects = {
+		{slot = "root", model = "torchfx1"}},
+	water_gravity = Vector(0,1,0)}
+
+Itemspec{
+	name = "explosive arrow",
+	model = "arrow-000",
+	categories = {"arrow","explosive"},
+	influences_base = {physical = -5},
+	crafting_count = 10,
+	crafting_materials = {["log"] = 1},
+	destroy_timer = 5,
+	destroy_actions = {"explode"},
+	icon = "arrow1",
+	mass = 1,
+	stacking = true,
+	water_gravity = Vector(0,1,0)}
+
 
 Itemspec{
 	name = "bullet",
