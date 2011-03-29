@@ -463,8 +463,8 @@ static int private_envmap_create (
 		for (j = 0 ; j < material->textures.count ; j++)
 		{
 			texture = material->textures.array + j;
-			if (texture->type == LIMDL_TEXTURE_TYPE_ENVMAP)
-				texture->texture = self->cubemap.map;
+/*			if (texture->type == LIMDL_TEXTURE_TYPE_ENVMAP)
+				texture->texture = self->cubemap.map;*/
 		}
 	}
 

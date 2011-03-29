@@ -27,7 +27,6 @@
 struct _LIWdgStyles
 {
 	LIAlgStrdic* fonts;
-	LIAlgStrdic* images;
 	LIPthPaths* paths;
 	LIWdgManager* manager;
 };
@@ -44,9 +43,5 @@ LIAPICALL (LIFntFont*, liwdg_styles_load_font, (
 	const char*  name,
 	const char*  file,
 	int          size));
-
-LIAPICALL (LIImgTexture*, liwdg_styles_load_image, (
-	LIWdgStyles* self,
-	const char*  name));
 
 #endif

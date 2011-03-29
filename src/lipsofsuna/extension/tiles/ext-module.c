@@ -82,6 +82,9 @@ LIExtModule* liext_tiles_new (
 void liext_tiles_free (
 	LIExtModule* self)
 {
+	/* Remove callbacks. */
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
+
 	/* Unregister component. */
 	if (self->voxels != NULL)
 		limai_program_remove_component (self->program, "voxels");

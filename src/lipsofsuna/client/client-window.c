@@ -174,6 +174,7 @@ static int private_resize (
 		flags = SDL_OPENGL | SDL_RESIZABLE;
 
 	/* Recreate surface. */
+	/* This destroys all graphics data in Windows. */
 	SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 0);
 	SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 0);
 	if (sync)
@@ -195,6 +196,14 @@ static int private_resize (
 	self->mode.height = height;
 	self->mode.fullscreen = fullscreen;
 	self->mode.vsync = sync;
+
+	/* Reload all graphics. */
+	/* Since changing the video mode erases the OpenGL context in Windows,
+	   we have to reload all textures, shaders, vertex buffers, etc. */
+#ifdef WIN32
+	if (self->client->render != NULL)
+		lical_callbacks_call (self->client->program->callbacks, self->client->program, "context-lost", lical_marshal_DATA);
+#endif
 
 	return 1;
 }

@@ -91,6 +91,9 @@ LIAPICALL (int, liren_render_load_image, (
 	LIRenRender* self,
 	const char*  name));
 
+LIAPICALL (void, liren_render_reload, (
+	LIRenRender* self));
+
 LIAPICALL (void, liren_render_update, (
 	LIRenRender* self,
 	float        secs));

@@ -546,9 +546,9 @@ void liren_context_set_textures (
 	for (i = 0 ; i < c ; i++)
 	{
 		texture = self->textures.array + i;
-		if (texture->texture != value[i].texture)
+		if (texture->texture != liren_texture_get_texture (value + i))
 		{
-			texture->texture = value[i].texture;
+			texture->texture = liren_texture_get_texture (value + i);
 			glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_DIFFUSE_TEXTURE_0 + i);
 			glBindTexture (GL_TEXTURE_2D, texture->texture);
 		}

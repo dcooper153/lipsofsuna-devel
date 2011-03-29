@@ -27,6 +27,12 @@
 #include "render.h"
 #include "render-draw.h"
 
+static void private_free_helpers (
+	LIRenRender* self);
+
+static int private_init_helpers (
+	LIRenRender* self);
+
 static int private_init_resources (
 	LIRenRender* self);
 
@@ -70,10 +76,7 @@ void liren_render_free (
 	LIRenShader* shader;
 
 	/* Free helper resources. */
-	glDeleteTextures (1, &self->helpers.noise);
-	glDeleteTextures (1, &self->helpers.depth_texture_max);
-	if (self->helpers.empty_image != NULL)
-		liren_image_free (self->helpers.empty_image);
+	private_free_helpers (self);
 
 	/* Free shaders. */
 	if (self->shaders != NULL)
@@ -115,17 +118,6 @@ void liren_render_free (
 	{
 		lisys_assert (self->scenes->size == 0);
 		lialg_ptrdic_free (self->scenes);
-	}
-
-	if (self->helpers.unit_quad != NULL)
-	{
-		liren_buffer_free (self->helpers.unit_quad);
-		lisys_free (self->helpers.unit_quad);
-	}
-	if (self->immediate.buffer != NULL)
-	{
-		liren_buffer_free (self->immediate.buffer);
-		lisys_free (self->immediate.buffer);
 	}
 
 	if (self->context != NULL)
@@ -216,7 +208,7 @@ int liren_render_load_image (
 	}
 
 	/* Reload existing image. */
-	if (!liren_image_load (image))
+	if (!liren_image_reload (image))
 		return 0;
 
 	/* Replace in all models. */
@@ -227,6 +219,31 @@ int liren_render_load_image (
 	}
 
 	return 1;
+}
+
+/**
+ * \brief Reloads all images, shaders and other graphics state.
+ *
+ * This function is called when the video mode changes in Windows. It
+ * reloads all data that was lost when the context was erased.
+ *
+ * \param self Renderer.
+ */
+void liren_render_reload (
+	LIRenRender* self)
+{
+	LIAlgStrdicIter iter;
+	LIAlgPtrdicIter iter1;
+
+	private_free_helpers (self);
+	private_init_helpers (self);
+
+	LIALG_STRDIC_FOREACH (iter, self->shaders)
+		liren_shader_reload (iter.value);
+	LIALG_STRDIC_FOREACH (iter, self->images)
+		liren_image_reload (iter.value);
+	LIALG_PTRDIC_FOREACH (iter1, self->models_ptr)
+		liren_model_reload (iter1.value);
 }
 
 /**
@@ -290,7 +307,29 @@ LIRenContext* liren_render_get_context (
 
 /*****************************************************************************/
 
-static int private_init_resources (
+static void private_free_helpers (
+	LIRenRender* self)
+{
+	glDeleteTextures (1, &self->helpers.noise);
+	glDeleteTextures (1, &self->helpers.depth_texture_max);
+	self->helpers.noise = 0;
+	self->helpers.depth_texture_max = 0;
+
+	if (self->helpers.empty_image != NULL)
+		liren_image_free (self->helpers.empty_image);
+	if (self->helpers.unit_quad != NULL)
+	{
+		liren_buffer_free (self->helpers.unit_quad);
+		lisys_free (self->helpers.unit_quad);
+	}
+	if (self->immediate.buffer != NULL)
+	{
+		liren_buffer_free (self->immediate.buffer);
+		lisys_free (self->immediate.buffer);
+	}
+}
+
+static int private_init_helpers (
 	LIRenRender* self)
 {
 	int x;
@@ -333,35 +372,9 @@ static int private_init_resources (
 		236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
 	};
 
-	/* Initialize context manager. */
-	self->context = lisys_calloc (1, sizeof (LIRenContext));
-	if (self->context == NULL)
-		return 0;
-	self->context->render = self;
-	liren_uniforms_init (&self->context->uniforms);
-	liren_context_init (self->context);
-
-	/* Initialize image dictionary. */
-	self->images = lialg_strdic_new ();
-	if (self->images == NULL)
-		return 0;
-
 	/* Initialize empty image. */
 	self->helpers.empty_image = liren_image_new (self, "empty");
 	if (self->helpers.empty_image == NULL)
-		return 0;
-
-	/* Initialize model dicrionaries. */
-	self->models = lialg_u32dic_new ();
-	if (self->models == NULL)
-		return 0;
-	self->models_ptr = lialg_ptrdic_new ();
-	if (self->models_ptr == NULL)
-		return 0;
-
-	/* Initialize shader dictionary. */
-	self->shaders = lialg_strdic_new ();
-	if (self->shaders == NULL)
 		return 0;
 
 	/* Initialize default depth texture. */
@@ -413,6 +426,42 @@ static int private_init_resources (
 		return 0;
 	if (!liren_buffer_init (self->immediate.buffer, NULL, 0,
 	     &immediate_vertex_format, NULL, 300000, LIREN_BUFFER_TYPE_STREAM))
+		return 0;
+
+	return 1;
+}
+
+static int private_init_resources (
+	LIRenRender* self)
+{
+	/* Initialize context manager. */
+	self->context = lisys_calloc (1, sizeof (LIRenContext));
+	if (self->context == NULL)
+		return 0;
+	self->context->render = self;
+	liren_uniforms_init (&self->context->uniforms);
+	liren_context_init (self->context);
+
+	/* Initialize image dictionary. */
+	self->images = lialg_strdic_new ();
+	if (self->images == NULL)
+		return 0;
+
+	/* Initialize model dictionaries. */
+	self->models = lialg_u32dic_new ();
+	if (self->models == NULL)
+		return 0;
+	self->models_ptr = lialg_ptrdic_new ();
+	if (self->models_ptr == NULL)
+		return 0;
+
+	/* Initialize shader dictionary. */
+	self->shaders = lialg_strdic_new ();
+	if (self->shaders == NULL)
+		return 0;
+
+	/* Initialize helpers. */
+	if (!private_init_helpers (self))
 		return 0;
 
 	return 1;

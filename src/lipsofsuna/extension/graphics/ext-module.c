@@ -24,6 +24,11 @@
 
 #include "ext-module.h"
 
+static void private_context_lost (
+	LIExtModule* self);
+
+/*****************************************************************************/
+
 LIMaiExtensionInfo liext_graphics_info =
 {
 	LIMAI_EXTENSION_VERSION, "Graphics",
@@ -50,15 +55,33 @@ LIExtModule* liext_graphics_new (
 		return NULL;
 	}
 
+	/* Register callbacks. */
+	if (!lical_callbacks_insert (program->callbacks, program, "context-lost", 0, private_context_lost, self, self->calls + 0))
+	{
+		liext_graphics_free (self);
+		return NULL;
+	}
+
 	return self;
 }
 
 void liext_graphics_free (
 	LIExtModule* self)
 {
+	/* Remove callbacks. */
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
+
 	if (self->client != NULL)
 		licli_client_free (self->client);
 	lisys_free (self);
+}
+
+/*****************************************************************************/
+
+static void private_context_lost (
+	LIExtModule* self)
+{
+	liren_render_reload (self->client->render);
 }
 
 /** @} */

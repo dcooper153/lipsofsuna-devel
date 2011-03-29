@@ -29,6 +29,10 @@ struct _LIRenMesh
 	int counts[3];
 	GLuint buffers[3];
 	GLuint arrays[2];
+	int reload_index_count;
+	void* reload_index_data;
+	int reload_vertex_count;
+	void* reload_vertex_data;
 };
 
 LIAPICALL (int, liren_mesh_init, (
@@ -48,6 +52,9 @@ LIAPICALL (void*, liren_mesh_lock_vertices, (
 	const LIRenMesh* self,
 	int              start,
 	int              count));
+
+LIAPICALL (void, liren_mesh_reload, (
+	LIRenMesh* self));
 
 LIAPICALL (void, liren_mesh_unlock_vertices, (
 	const LIRenMesh* self));

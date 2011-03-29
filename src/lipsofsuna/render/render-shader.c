@@ -128,12 +128,38 @@ int liren_shader_compile (
 	int          depth_write,
 	GLenum       depth_func)
 {
+	int ret;
+	char* name;
+
+	name = listr_format ("%s[%d]", self->name, pass);
+	if (name == NULL)
+		return 0;
 	liren_program_set_alpha_to_coverage (self->passes + pass, alpha_to_coverage);
 	liren_program_set_blend (self->passes + pass, blend_enable, blend_src, blend_dst);
 	liren_program_set_color (self->passes + pass, color_write);
 	liren_program_set_depth (self->passes + pass, depth_test, depth_write, depth_func);
-	return liren_program_compile (self->passes + pass, self->name,
+	ret = liren_program_compile (self->passes + pass, name,
 		vertex, geometry, fragment, feedback);
+	lisys_free (name);
+
+	return ret;
+}
+
+/**
+ * \brief Reloads the shader.
+ *
+ * This function is called when the video mode changes in Windows. It
+ * reloads the shader that was lost when the context was erased.
+ *
+ * \param self Shader.
+ */
+void liren_shader_reload (
+	LIRenShader* self)
+{
+	int i;
+
+	for (i = 0 ; i < LIREN_SHADER_PASS_COUNT ; i++)
+		liren_program_reload (self->passes + i);
 }
 
 int liren_shader_get_sort (

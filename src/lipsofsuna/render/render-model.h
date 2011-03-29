@@ -68,6 +68,9 @@ LIAPICALL (int, liren_model_deform, (
 	const char*      shader,
 	const LIMdlPose* pose));
 
+LIAPICALL (void, liren_model_reload, (
+	LIRenModel* self));
+
 LIAPICALL (void, liren_model_replace_image, (
 	LIRenModel* self,
 	LIRenImage* image));

@@ -18,31 +18,33 @@
 #ifndef __RENDER_IMAGE_H__
 #define __RENDER_IMAGE_H__
 
-#include <lipsofsuna/image.h>
+#include "lipsofsuna/image.h"
+#include "lipsofsuna/system.h"
 #include "render-types.h"
 
 typedef struct _LIRenImage LIRenImage;
 struct _LIRenImage
 {
 	int added;
+	int empty;
 	char* name;
 	char* path;
 	LIImgTexture* texture;
 	LIRenRender* render;
 };
 
-LIRenImage*
-liren_image_new (LIRenRender* render,
-                 const char*  name);
+LIAPICALL (LIRenImage*, liren_image_new, (
+	LIRenRender* render,
+	const char*  name));
 
-LIRenImage*
-liren_image_new_from_file (LIRenRender* render,
-                           const char*  name);
+LIAPICALL (LIRenImage*, liren_image_new_from_file, (
+	LIRenRender* render,
+	const char*  name));
 
-void
-liren_image_free (LIRenImage* self);
+LIAPICALL (void, liren_image_free, (
+	LIRenImage* self));
 
-int
-liren_image_load (LIRenImage* self);
+LIAPICALL (int, liren_image_reload, (
+	LIRenImage* self));
 
 #endif

@@ -42,8 +42,7 @@ LIWdgStyles* liwdg_styles_new (
 
 	/* Allocate resource lists. */
 	self->fonts = lialg_strdic_new ();
-	self->images = lialg_strdic_new ();
-	if (self->fonts == NULL || self->images == NULL)
+	if (self->fonts == NULL)
 	{
 		liwdg_styles_free (self);
 		return NULL;
@@ -62,12 +61,6 @@ void liwdg_styles_free (
 		LIALG_STRDIC_FOREACH (iter, self->fonts)
 			lifnt_font_free (iter.value);
 		lialg_strdic_free (self->fonts);
-	}
-	if (self->images != NULL)
-	{
-		LIALG_STRDIC_FOREACH (iter, self->images)
-			liimg_texture_free (iter.value);
-		lialg_strdic_free (self->images);
 	}
 	lisys_free (self);
 }
@@ -108,44 +101,6 @@ LIFntFont* liwdg_styles_load_font (
 	}
 
 	return font;
-}
-
-LIImgTexture* liwdg_styles_load_image (
-	LIWdgStyles* self,
-	const char*  name)
-{
-	char* file;
-	char* path;
-	LIImgTexture* texture;
-
-	/* Check for existing. */
-	texture = lialg_strdic_find (self->images, name);
-	if (texture != NULL)
-		return texture;
-
-	/* Format path. */
-	file = listr_concat (name, ".dds");
-	if (file == NULL)
-		return NULL;
-	path = lipth_paths_get_graphics (self->paths, file);
-	free (file);
-	if (path == NULL)
-		return NULL;
-
-	/* Load texture. */
-	texture = liimg_texture_new_from_file (path);
-	lisys_free (path);
-	if (texture == NULL)
-		return NULL;
-
-	/* Add to list. */
-	if (!lialg_strdic_insert (self->images, name, texture))
-	{
-		liimg_texture_free (texture);
-		return NULL;
-	}
-
-	return texture;
 }
 
 /** @} */

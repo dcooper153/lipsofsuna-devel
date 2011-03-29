@@ -106,8 +106,8 @@ LIFntFont* lifnt_font_new (
 	return self;
 }
 
-void
-lifnt_font_free (LIFntFont* self)
+void lifnt_font_free (
+	LIFntFont* self)
 {
 	LIAlgU32dicIter iter;
 
@@ -127,15 +127,33 @@ lifnt_font_free (LIFntFont* self)
 }
 
 /**
+ * \brief Reloads the font.
+ *
+ * This function is called when the video mode changes in Windows. It
+ * forces a reload of the cached glyphs.
+ *
+ * \param self Font.
+ */
+void lifnt_font_reload (
+	LIFntFont* self)
+{
+	LIAlgU32dicIter iter;
+
+	LIALG_U32DIC_FOREACH (iter, self->index)
+		lisys_free (iter.value);
+	lialg_u32dic_clear (self->index);
+}
+
+/**
  * \brief Gets the horizontal advance of the glyph.
  *
  * \param self A font.
  * \param glyph A wide character.
  * \return The advance in pixels.
  */
-int
-lifnt_font_get_advance (LIFntFont* self,
-                        wchar_t    glyph)
+int lifnt_font_get_advance (
+	LIFntFont* self,
+	wchar_t    glyph)
 {
 	LIFntFontGlyph* cached;
 
@@ -150,8 +168,8 @@ lifnt_font_get_advance (LIFntFont* self,
 	return cached->advance;
 }
 
-int
-lifnt_font_get_height (const LIFntFont* self)
+int lifnt_font_get_height (
+	const LIFntFont* self)
 {
 	return self->font_height;
 }
@@ -213,9 +231,9 @@ void lifnt_font_get_vertices (
 
 /*****************************************************************************/
 
-static LIFntFontGlyph*
-private_cache_glyph (LIFntFont* self,
-                     wchar_t    glyph)
+static LIFntFontGlyph* private_cache_glyph (
+	LIFntFont* self,
+	wchar_t    glyph)
 {
 	int index;
 	int advance;

@@ -184,11 +184,20 @@ LIFntFont* liwdg_manager_find_font (
 	return lialg_strdic_find (self->styles->fonts, name);
 }
 
-LIImgTexture* liwdg_manager_find_image (
+LIRenImage* liwdg_manager_find_image (
 	LIWdgManager* self,
 	const char*   name)
 {
-	return liwdg_styles_load_image (self->styles, name);
+	LIRenImage* image;
+
+	image = liren_render_find_image (self->render, name);
+	if (image == NULL)
+	{
+		liren_render_load_image (self->render, name);
+		image = liren_render_find_image (self->render, name);
+	}
+
+	return image;
 }
 
 /**
@@ -262,6 +271,23 @@ int liwdg_manager_insert_window (
 	private_resize_window (self, widget);
 
 	return 1;
+}
+
+/**
+ * \brief Reloads all fonts.
+ *
+ * This function is called when the video mode changes in Windows. It
+ * reloads all fonts that were lost when the context was erased.
+ *
+ * \param self Renderer.
+ */
+void liwdg_manager_reload (
+	LIWdgManager* self)
+{
+	LIAlgStrdicIter iter;
+
+	LIALG_STRDIC_FOREACH (iter, self->styles->fonts)
+		lifnt_font_reload (iter.value);
 }
 
 int liwdg_manager_remove_window (

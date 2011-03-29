@@ -28,7 +28,6 @@ struct _LIRenTexture
 	int id;
 	int width;
 	int height;
-	GLuint texture;
 	LIMdlTextureType type;
 	LIRenImage* image;
 };
@@ -42,5 +41,8 @@ LIAPICALL (void, liren_texture_free, (
 LIAPICALL (void, liren_texture_set_image, (
 	LIRenTexture* self,
 	LIRenImage*   value));
+
+LIAPICALL (GLuint, liren_texture_get_texture, (
+	LIRenTexture* self));
 
 #endif

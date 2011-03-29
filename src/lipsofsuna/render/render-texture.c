@@ -40,10 +40,18 @@ void liren_texture_set_image (
 	LIRenImage*   value)
 {
 	self->image = value;
-	if (value != NULL && value->texture != NULL)
+	/*if (value != NULL && value->texture != NULL)
 		self->texture = value->texture->texture;
 	else
-		self->texture = 0;
+		self->texture = 0;*/
+}
+
+GLuint liren_texture_get_texture (
+	LIRenTexture* self)
+{
+	if (self->image != NULL && self->image->texture != NULL)
+		return self->image->texture->texture;
+	return 0;
 }
 
 /** @} */

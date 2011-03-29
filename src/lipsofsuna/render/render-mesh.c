@@ -110,6 +110,14 @@ int liren_mesh_init (
 	/* Don't break the active vertex array. */
 	glBindVertexArray (restore);
 
+	/* Store values needed by the Windows context rebuild. */
+	self->reload_index_count = index_count;
+	self->reload_index_data = calloc (1, self->sizes[0]);
+	memcpy (self->reload_index_data, index_data, self->sizes[0]);
+	self->reload_vertex_count = vertex_count;
+	self->reload_vertex_data = calloc (1, self->sizes[1]);
+	memcpy (self->reload_vertex_data, vertex_data, self->sizes[1]);
+
 	return 1;
 }
 
@@ -118,6 +126,8 @@ void liren_mesh_clear (
 {
 	glDeleteVertexArrays (2, self->arrays);
 	glDeleteBuffers (3, self->buffers);
+	lisys_free (self->reload_index_data);
+	lisys_free (self->reload_vertex_data);
 	memset (self, 0, sizeof (LIRenMesh));
 }
 
@@ -165,6 +175,27 @@ void* liren_mesh_lock_vertices (
 	}
 	else
 		return NULL;
+}
+
+/**
+ * \brief Reloads the mesh.
+ *
+ * This function is called when the video mode changes in Windows. It
+ * reloads the mesh that was lost when the context was erased.
+ *
+ * \param self Mesh.
+ */
+void liren_mesh_reload (
+	LIRenMesh* self)
+{
+	LIRenMesh tmp;
+
+	if (liren_mesh_init (&tmp, self->reload_index_data, self->reload_index_count,
+	    self->reload_vertex_data, self->reload_vertex_count))
+	{
+		liren_mesh_clear (self);
+		*self = tmp;
+	}
 }
 
 void liren_mesh_unlock_vertices (

@@ -68,7 +68,7 @@ LIAPICALL (LIFntFont*, liwdg_manager_find_font, (
 	LIWdgManager* self,
 	const char*   name));
 
-LIAPICALL (LIImgTexture*, liwdg_manager_find_image, (
+LIAPICALL (LIRenImage*, liwdg_manager_find_image, (
 	LIWdgManager* self,
 	const char*   name));
 
@@ -85,6 +85,9 @@ LIAPICALL (LIWdgWidget*, liwdg_manager_find_window_by_point, (
 LIAPICALL (int, liwdg_manager_insert_window, (
 	LIWdgManager* self,
 	LIWdgWidget*  widget));
+
+LIAPICALL (void, liwdg_manager_reload, (
+	LIWdgManager* self));
 
 LIAPICALL (int, liwdg_manager_remove_window, (
 	LIWdgManager* self,

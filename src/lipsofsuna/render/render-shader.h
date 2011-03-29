@@ -64,6 +64,9 @@ LIAPICALL (int, liren_shader_compile, (
 	int          depth_write,
 	GLenum       depth_func));
 
+LIAPICALL (void, liren_shader_reload, (
+	LIRenShader* self));
+
 LIAPICALL (int, liren_shader_get_sort, (
 	LIRenShader* self));
 

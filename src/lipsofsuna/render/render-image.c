@@ -31,15 +31,21 @@ static const uint8_t missing_image[16] =
 	255, 255, 255, 255, 255, 255, 255, 255
 };
 
-static int
-private_init (LIRenImage* self,
-              const char* name);
+static int private_init (
+	LIRenImage* self,
+	const char* name);
 
 /*****************************************************************************/
 
-LIRenImage*
-liren_image_new (LIRenRender* render,
-                 const char*  name)
+/**
+ * \brief Creates an empty image.
+ * \param render Renderer.
+ * \param name Image name.
+ * \return Image or NULL.
+ */
+LIRenImage* liren_image_new (
+	LIRenRender* render,
+	const char*  name)
 {
 	LIRenImage* self;
 
@@ -48,6 +54,7 @@ liren_image_new (LIRenRender* render,
 	if (self == NULL)
 		return NULL;
 	self->render = render;
+	self->empty = 1;
 
 	/* Set name and path. */
 	if (!private_init (self, name))
@@ -56,9 +63,8 @@ liren_image_new (LIRenRender* render,
 		return NULL;
 	}
 
-	/* Create dummy texture. */
-	self->texture = liimg_texture_new_from_rgba (2, 2, missing_image);
-	if (self->texture == NULL)
+	/* Load texture. */
+	if (!liren_image_reload (self))
 	{
 		liren_image_free (self);
 		return NULL;
@@ -67,9 +73,15 @@ liren_image_new (LIRenRender* render,
 	return self;
 }
 
-LIRenImage*
-liren_image_new_from_file (LIRenRender* render,
-                           const char*  name)
+/**
+ * \brief Creates an image from a file.
+ * \param render Renderer.
+ * \param name Image name.
+ * \return Image or NULL.
+ */
+LIRenImage* liren_image_new_from_file (
+	LIRenRender* render,
+	const char*  name)
 {
 	LIRenImage* self;
 
@@ -87,7 +99,7 @@ liren_image_new_from_file (LIRenRender* render,
 	}
 
 	/* Load texture. */
-	if (!liren_image_load (self))
+	if (!liren_image_reload (self))
 	{
 		liren_image_free (self);
 		return NULL;
@@ -96,6 +108,10 @@ liren_image_new_from_file (LIRenRender* render,
 	return self;
 }
 
+/**
+ * \brief Frees the image.
+ * \param self Image.
+ */
 void liren_image_free (
 	LIRenImage* self)
 {
@@ -110,14 +126,25 @@ void liren_image_free (
 	lisys_free (self);
 }
 
-int
-liren_image_load (LIRenImage* self)
+/**
+ * \brief Loads or reloads the image.
+ * \param self Image.
+ * \return Nonzero on success.
+ */
+int liren_image_reload (
+	LIRenImage* self)
 {
 	LIImgTexture* texture;
 
-	texture = liimg_texture_new_from_file (self->path);
+	/* Load to a temporary texture. */
+	if (self->empty)
+		texture = liimg_texture_new_from_rgba (2, 2, missing_image);
+	else
+		texture = liimg_texture_new_from_file (self->path);
 	if (texture == NULL)
 		return 0;
+
+	/* Use the loaded texture on success. */
 	if (self->texture != NULL)
 		liimg_texture_free (self->texture);
 	self->texture = texture;

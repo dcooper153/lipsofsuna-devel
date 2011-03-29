@@ -39,6 +39,11 @@ struct _LIRenProgram
 	GLuint vertex;
 	GLuint geometry;
 	GLuint fragment;
+	char* reload_name;
+	char* reload_vertex;
+	char* reload_geometry;
+	char* reload_fragment;
+	int reload_feedback;
 };
 
 LIAPICALL (int, liren_program_init, (
@@ -55,6 +60,9 @@ LIAPICALL (int, liren_program_compile, (
 	const char*   geometry,
 	const char*   fragment,
 	int           feedback));
+
+LIAPICALL (void, liren_program_reload, (
+	LIRenProgram* self));
 
 LIAPICALL (void, liren_program_set_alpha_to_coverage, (
 	LIRenProgram* self,

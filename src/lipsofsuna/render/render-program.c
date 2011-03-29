@@ -78,6 +78,10 @@ int liren_program_init (
 void liren_program_clear (
 	LIRenProgram* self)
 {
+	lisys_free (self->reload_name);
+	lisys_free (self->reload_vertex);
+	lisys_free (self->reload_geometry);
+	lisys_free (self->reload_fragment);
 	glDeleteProgram (self->program);
 	glDeleteShader (self->vertex);
 	glDeleteShader (self->geometry);
@@ -105,12 +109,15 @@ int liren_program_compile (
 {
 	LIRenProgram tmp;
 
+	/* Test with a temporary program. */
 	liren_program_init (&tmp, self->render);
 	if (!private_compile (&tmp, name, vertex, geometry, fragment, feedback))
 	{
 		liren_program_clear (&tmp);
 		return 0;
 	}
+
+	/* Use the compiled program on success. */
 	glDeleteProgram (self->program);
 	glDeleteShader (self->vertex);
 	glDeleteShader (self->geometry);
@@ -120,7 +127,61 @@ int liren_program_compile (
 	self->geometry = tmp.geometry;
 	self->fragment = tmp.fragment;
 
+	/* Store values needed by the Windows context rebuild. */
+	/* When the program is reloaded, this function is called with the
+	   arguments stored to self->reload_*. We should not free the old
+	   values in that case because we'd end up trying to duplicate what
+	   we just freed. */
+	if (self->reload_name != name)
+	{
+		lisys_free (self->reload_name);
+		self->reload_name = listr_dup (name);
+	}
+	if (self->reload_vertex != vertex)
+	{
+		lisys_free (self->reload_vertex);
+		self->reload_vertex = listr_dup (vertex);
+	}
+	if (self->reload_geometry != geometry)
+	{
+		lisys_free (self->reload_geometry);
+		if (geometry != NULL)
+			self->reload_geometry = listr_dup (geometry);
+		else
+			self->reload_geometry = NULL;
+	}
+	if (self->reload_fragment != fragment)
+	{
+		lisys_free (self->reload_fragment);
+		self->reload_fragment = listr_dup (fragment);
+		self->reload_feedback = feedback;
+	}
+
 	return 1;
+}
+
+/**
+ * \brief Reloads the shader program.
+ *
+ * This function is called when the video mode changes in Windows. It
+ * reloads the shader program that was lost when the context was erased.
+ *
+ * \param self Shader program.
+ */
+void liren_program_reload (
+	LIRenProgram* self)
+{
+	if (self->reload_vertex != NULL)
+	{
+		lisys_assert (self->reload_name != NULL);
+		lisys_assert (self->reload_fragment != NULL);
+		liren_program_compile (self,
+			self->reload_name,
+			self->reload_vertex,
+			self->reload_geometry,
+			self->reload_fragment,
+			self->reload_feedback);
+	}
 }
 
 void liren_program_set_alpha_to_coverage (

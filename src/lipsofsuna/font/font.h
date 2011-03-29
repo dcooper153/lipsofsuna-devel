@@ -66,6 +66,9 @@ LIAPICALL (LIFntFont*, lifnt_font_new, (
 LIAPICALL (void, lifnt_font_free, (
 	LIFntFont* self));
 
+LIAPICALL (void, lifnt_font_reload, (
+	LIFntFont* self));
+
 LIAPICALL (int, lifnt_font_get_advance, (
 	LIFntFont* self,
 	wchar_t    glyph));

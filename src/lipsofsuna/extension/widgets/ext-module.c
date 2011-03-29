@@ -24,6 +24,9 @@
 
 #include "ext-module.h"
 
+static void private_context_lost (
+	LIExtModule* self);
+
 static void private_widget_allocation (
 	LIExtModule* module,
 	LIWdgWidget* widget);
@@ -77,8 +80,9 @@ LIExtModule* liext_widgets_new (
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (self->program->callbacks, self->program->engine, "tick", 1, private_widget_tick, self, self->calls + 0) ||
-	    !lical_callbacks_insert (self->program->callbacks, self->widgets, "widget-allocation", 5, private_widget_allocation, self, self->calls + 1))
+	if (!lical_callbacks_insert (program->callbacks, program, "context-lost", 0, private_context_lost, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 1, private_widget_tick, self, self->calls + 1) ||
+	    !lical_callbacks_insert (program->callbacks, self->widgets, "widget-allocation", 5, private_widget_allocation, self, self->calls + 2))
 	{
 		liext_widgets_free (self);
 		return 0;
@@ -134,6 +138,12 @@ void liext_widgets_callback_paint (
 }
 
 /*****************************************************************************/
+
+static void private_context_lost (
+	LIExtModule* self)
+{
+	liwdg_manager_reload (self->widgets);
+}
 
 static void private_widget_allocation (
 	LIExtModule* module,

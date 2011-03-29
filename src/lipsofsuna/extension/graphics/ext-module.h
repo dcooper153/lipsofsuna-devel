@@ -26,8 +26,9 @@
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
-	LIMaiProgram* program;
+	LICalHandle calls[1];
 	LICliClient* client;
+	LIMaiProgram* program;
 };
 
 LIExtModule* liext_graphics_new (

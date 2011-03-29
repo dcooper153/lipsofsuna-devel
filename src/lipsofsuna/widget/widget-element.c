@@ -57,7 +57,7 @@ static void private_pack_verts (
 /*****************************************************************************/
 
 LIWdgElement* liwdg_element_new_image (
-	LIImgTexture*      texture,
+	LIRenImage*        image,
 	const float*       color,
 	const int*         dst_clip,
 	const int*         dst_pos,
@@ -73,7 +73,7 @@ LIWdgElement* liwdg_element_new_image (
 	self = lisys_calloc (1, sizeof (LIWdgElement));
 	if (self == NULL)
 		return 0;
-	self->texture = texture;
+	self->image = image;
 	if (color != NULL)
 		memcpy (self->text_color, color, 4 * sizeof (float));
 	else
@@ -96,8 +96,8 @@ LIWdgElement* liwdg_element_new_image (
 	}
 	else
 	{
-		self->src_tiling[1] = texture->width;
-		self->src_tiling[4] = texture->height;
+		self->src_tiling[1] = self->image->texture->width;
+		self->src_tiling[4] = self->image->texture->height;
 	}
 	self->rotation = rotation_angle;
 	if (rotation_center != NULL)
@@ -185,8 +185,8 @@ void liwdg_element_paint (
 		liren_context_set_projection (manager->context, &manager->projection);
 		liren_context_set_shader (manager->context, 0, manager->shader);
 		liren_context_set_diffuse (manager->context, self->text_color);
-		if (self->texture != NULL)
-			liren_context_set_textures_raw (manager->context, &self->texture->texture, 1);
+		if (self->image != NULL)
+			liren_context_set_textures_raw (manager->context, &self->image->texture->texture, 1);
 		else
 			liren_context_set_textures_raw (manager->context, &self->font->texture, 1);
 		liren_context_bind (manager->context);
@@ -220,7 +220,7 @@ void liwdg_element_update (
 	self->vertices.capacity = 0;
 
 	/* Format vertices. */
-	if (self->texture != NULL)
+	if (self->image != NULL)
 	{
 		if (self->src_tiling_enabled)
 			private_pack_tiled (self, rect);
@@ -290,10 +290,10 @@ static void private_pack_scaled (
 	float ty[2];
 
 	/* Calculate texture coordinates. */
-	tx[0] = (float)(self->src_pos[0]) / self->texture->width;
-	tx[1] = (float)(self->src_pos[0] + self->src_tiling[1]) / self->texture->width;
-	ty[0] = (float)(self->src_pos[1]) / self->texture->width;
-	ty[1] = (float)(self->src_pos[1] + self->src_tiling[4]) / self->texture->height;
+	tx[0] = (float)(self->src_pos[0]) / self->image->texture->width;
+	tx[1] = (float)(self->src_pos[0] + self->src_tiling[1]) / self->image->texture->width;
+	ty[0] = (float)(self->src_pos[1]) / self->image->texture->width;
+	ty[1] = (float)(self->src_pos[1] + self->src_tiling[4]) / self->image->texture->height;
 
 	/* Calculate pixels per texture unit. */
 	xs = tx[1] - tx[0];
@@ -419,14 +419,14 @@ static void private_pack_tiled (
 	h[2] = self->src_tiling[5];
 
 	/* Calculate texture coordinates. */
-	tx[0] = (float)(self->src_pos[0]) / self->texture->width;
-	tx[1] = (float)(self->src_pos[0] + self->src_tiling[0]) / self->texture->width;
-	tx[2] = (float)(self->src_pos[0] + self->src_tiling[0] + self->src_tiling[1]) / self->texture->width;
-	tx[3] = (float)(self->src_pos[0] + self->src_tiling[0] + self->src_tiling[1] + self->src_tiling[2]) / self->texture->width;
-	ty[0] = (float)(self->src_pos[1]) / self->texture->height;
-	ty[1] = (float)(self->src_pos[1] + self->src_tiling[3]) / self->texture->height;
-	ty[2] = (float)(self->src_pos[1] + self->src_tiling[3] + self->src_tiling[4]) / self->texture->height;
-	ty[3] = (float)(self->src_pos[1] + self->src_tiling[3] + self->src_tiling[4] + self->src_tiling[5]) / self->texture->height;
+	tx[0] = (float)(self->src_pos[0]) / self->image->texture->width;
+	tx[1] = (float)(self->src_pos[0] + self->src_tiling[0]) / self->image->texture->width;
+	tx[2] = (float)(self->src_pos[0] + self->src_tiling[0] + self->src_tiling[1]) / self->image->texture->width;
+	tx[3] = (float)(self->src_pos[0] + self->src_tiling[0] + self->src_tiling[1] + self->src_tiling[2]) / self->image->texture->width;
+	ty[0] = (float)(self->src_pos[1]) / self->image->texture->height;
+	ty[1] = (float)(self->src_pos[1] + self->src_tiling[3]) / self->image->texture->height;
+	ty[2] = (float)(self->src_pos[1] + self->src_tiling[3] + self->src_tiling[4]) / self->image->texture->height;
+	ty[3] = (float)(self->src_pos[1] + self->src_tiling[3] + self->src_tiling[4] + self->src_tiling[5]) / self->image->texture->height;
 
 	/* Pack corners. */
 	px = r.x;

@@ -196,7 +196,7 @@ static void Widget_canvas_image (LIScrArgs* args)
 	float rotation = 0.0f;
 	LIScrData* vector = NULL;
 	LIMatVector* rotation_center_ptr = NULL;
-	LIImgTexture* texture;
+	LIRenImage* image;
 	LIWdgWidget* widget;
 	LIWdgElement* elem;
 
@@ -204,8 +204,8 @@ static void Widget_canvas_image (LIScrArgs* args)
 	widget = args->self;
 	if (!liscr_args_gets_string (args, "source_image", &source_image))
 		return;
-	texture = liwdg_manager_find_image (widget->manager, source_image);
-	if (texture == NULL)
+	image = liwdg_manager_find_image (widget->manager, source_image);
+	if (image == NULL)
 		return;
 	if (liscr_args_gets_floatv (args, "color", 4, color) == 4)
 		color_ptr = color;
@@ -224,7 +224,7 @@ static void Widget_canvas_image (LIScrArgs* args)
 		rotation_center_ptr = liscr_data_get_data (vector);
 
 	/* Create the canvas element. */
-	elem = liwdg_element_new_image (texture, color_ptr, dest_clip_ptr, dest_position_ptr,
+	elem = liwdg_element_new_image (image, color_ptr, dest_clip_ptr, dest_position_ptr,
 		dest_size_ptr, source_position_ptr, source_tiling_ptr, rotation, rotation_center_ptr);
 	if (elem == NULL)
 		return;

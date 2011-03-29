@@ -185,6 +185,31 @@ int liren_model_deform (
 	return 1;
 }
 
+/**
+ * \brief Reloads the model.
+ *
+ * This function is called when the video mode changes in Windows. It
+ * reloads the model data that was lost when the context was erased.
+ *
+ * \param self Model.
+ */
+void liren_model_reload (
+	LIRenModel* self)
+{
+	LIMdlPose* pose;
+
+	/* Reload vertex buffers. */
+	liren_mesh_reload (&self->mesh);
+
+	/* Reset the pose. */
+	pose = limdl_pose_new ();
+	if (pose != NULL)
+	{
+		liren_model_deform (self, "skeletal", pose);
+		limdl_pose_free (pose);
+	}
+}
+
 void liren_model_replace_image (
 	LIRenModel* self,
 	LIRenImage* image)

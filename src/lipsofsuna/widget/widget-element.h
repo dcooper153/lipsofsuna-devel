@@ -36,9 +36,9 @@ struct _LIWdgElement
 	float text_align[2];
 	float text_color[4];
 	LIFntFont* font;
-	LIImgTexture* texture;
 	LIMatVector center;
 	LIRenBuffer* buffer;
+	LIRenImage* image;
 	LIWdgElement* next;
 	struct
 	{
@@ -49,7 +49,7 @@ struct _LIWdgElement
 };
 
 LIAPICALL (LIWdgElement*, liwdg_element_new_image, (
-	LIImgTexture*      texture,
+	LIRenImage*        image,
 	const float*       color,
 	const int*         dst_clip,
 	const int*         dst_pos,
