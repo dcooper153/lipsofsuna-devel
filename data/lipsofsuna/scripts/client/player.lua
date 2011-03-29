@@ -161,7 +161,7 @@ Player.camera_turn = 0
 Player.camera_turn_state = 0
 Player.camera:zoom{rate = -8}
 Player.update_camera = function(clss, secs)
-	if Action.dict_press[Keys.LCTRL] then
+	if Action.dict_press[Keysym.LCTRL] then
 		-- Update turning.
 		clss.camera_turn_state = clss.camera_turn_state + clss.camera_turn * secs
 		clss.camera_turn_state = radian_wrap(clss.camera_turn_state)

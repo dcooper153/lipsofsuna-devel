@@ -10,22 +10,25 @@ Action.mouse_sensitivity_y = 0.3
 Action.setter = function(self, key, value)
 	if key == "key1" then
 		if self.key1 ~= value then
-			local a = Action.dict_key[value]
-			if a and a.key1 == value then a.key1 = nil end
-			if a and a.key2 == value then a.key2 = nil end
 			if self.key1 then Action.dict_key[self.key1] = nil end
-			if value then Action.dict_key[value] = self end
-			Action.dict_key[value] = self
+			if value then
+				local a = Action.dict_key[value]
+				if a and a.key1 == value then a.key1 = nil end
+				if a and a.key2 == value then a.key2 = nil end
+				Action.dict_key[value] = self
+			end
 			Class.setter(self, key, value)
 			-- TODO: Inform binding UI
 		end
 	elseif key == "key2" then
 		if self.key2 ~= value then
-			local a = Action.dict_key[value]
-			if a and a.key1 == value then a.key1 = nil end
-			if a and a.key2 == value then a.key2 = nil end
 			if self.key2 then Action.dict_key[self.key2] = nil end
-			if value then Action.dict_key[value] = self end
+			if value then
+				local a = Action.dict_key[value]
+				if a and a.key1 == value then a.key1 = nil end
+				if a and a.key2 == value then a.key2 = nil end
+				Action.dict_key[value] = self
+			end
 			Class.setter(self, key, value)
 			-- TODO: Inform binding UI
 		end
@@ -38,7 +41,14 @@ Action.setter = function(self, key, value)
 end
 
 Action.new = function(clss, args)
-	local self = Class.new(clss, args)
+	local self = Class.new(clss)
+	local copy = function(k) if args and args[k] then self[k] = args[k] end end
+	copy("name")
+	copy("mode")
+	copy("func")
+	copy("mods")
+	copy("key1")
+	copy("key2")
 	self.enabled = not args or args.enabled ~= false
 	clss.dict_name[self.name] = self
 	table.insert(clss.dict_index, self)
