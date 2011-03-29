@@ -55,6 +55,7 @@ Object.load_meshes = false
 Physics.enable_simulation = true
 else
 require "system/animation"
+require "system/config-file"
 require "system/graphics"
 require "system/camera"
 require "system/object-render"

@@ -172,8 +172,7 @@ Views.Options.new = function(clss)
 	self:set_child{col = 2, row = 3, widget = Widgets.Frame{style = "title", text = "Volume"}}
 	self:set_child{col = 2, row = 4, widget = sound_group}
 	-- Load the options.
-	self.db = Database{name = "options.sqlite"}
-	self.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
+	self.config = ConfigFile{name = "options.cfg"}
 	self:load()
 	-- Make sure that shaders are compiled.
 	self:set_shader_quality(self.shader_quality)
@@ -218,11 +217,13 @@ Views.Options.load = function(self)
 		vsync = function(v) self.vsync = (v == "true") end,
 		window_height = function(v) self.window_height = tonumber(v) end,
 		window_width = function(v) self.window_width = tonumber(v) end}
-	-- Read values from the database.
-	local rows = self.db:query("SELECT key,value FROM keyval;")
-	for k,v in ipairs(rows) do
-		local opt = opts[v[1]]
-		if opt then opt(v[2]) end
+	-- Read values from the configuration file.
+	for k in pairs(opts) do
+		local v = self.config:get(k)
+		if v then
+			local opt = opts[k]
+			opt(v)
+		end
 	end
 	-- Set the video mode.
 	self:set_video_mode(self.window_width, self.window_height, self.fullscreen, self.vsync)
@@ -241,7 +242,7 @@ end
 
 Views.Options.save = function(self)
 	local write = function(k, v)
-		self.db:query("REPLACE INTO keyval (key,value) VALUES (?,?);", {k, tostring(v)})
+		self.config:set(k, tostring(v))
 	end
 	write("animation_quality", self.animation_quality)
 	write("anisotrophic_filter", self.anisotrophic_filter)
@@ -259,6 +260,7 @@ Views.Options.save = function(self)
 	write("vsync", self.vsync)
 	write("window_height", self.window_height)
 	write("window_width", self.window_width)
+	self.config:save()
 end
 
 Views.Options.set_animation_quality = function(self, v)
