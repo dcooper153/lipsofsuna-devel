@@ -288,42 +288,6 @@ Species{
 	hair_styles = {
 		{"Short", "aermale1hair1"}}}
 
-Species{
-	name = "trogfemale",
-	base = "race",
-	animations = {
-		["attack axe"] = {animation = "punch", channel = 2, fade_in = 0.1, weight = 100},
-		["attack blunt"] = {animation = "punch", channel = 2, fade_in = 0.1, weight = 100},
-		["attack sword"] = {animation = "punch", channel = 2, weight = 100},
-		["attack staff"] = {animation = "punch", channel = 2, weight = 100},
-		["hold axe"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
-		["hold blunt"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
-		["hold bulky"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
-		["hold staff"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
-		["hold shield"] = {animation = "hold-left", channel = 4, permanent = true, repeat_start = 10, weight = 5},
-		["hold sword"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
-		["hold torch"] = {animation = "hold-left", channel = 4, permanent = true, repeat_start = 10, weight = 5}},
-	model = "trogfem1",
-	models = {
-		skeleton = "trogfem1",
-		arms = "trogfemarmnude1",
-		head = "trogfemhead1",
-		legs = "trogfemlegnude1",
-		lower = "trogfemlowernude1",
-		upper = "trogfemuppernude1"},
-	skills = {
-		{name = "dexterity", max = 8, val = 3},
-		{name = "health", max = 100, val = 50},
-		{name = "intelligence", max = 10, val = 5},
-		{name = "perception", max = 60, val = 20},
-		{name = "strength", max = 4, val = 2},
-		{name = "willpower", max = 8, val = 3}},
-	hair_styles = {	
-		{"troglong", "trogfemlonghair1"},
-		{"trogshort", "trogfemshorthair1"}},
-	skin_styles = {
-		{""}}}
-
 ------------------------------------------------------------------------------
 -- Playable races.
 
@@ -428,14 +392,46 @@ Species{
 
 Species{
 	name = "troglodyte female",
-	base = "trogfemale",
+	base = "race",
+	animations = {
+		["attack axe"] = {animation = "punch", channel = 2, fade_in = 0.1, weight = 100},
+		["attack blunt"] = {animation = "punch", channel = 2, fade_in = 0.1, weight = 100},
+		["attack sword"] = {animation = "punch", channel = 2, weight = 100},
+		["attack staff"] = {animation = "punch", channel = 2, weight = 100},
+		["hold axe"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
+		["hold blunt"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
+		["hold bulky"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
+		["hold staff"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
+		["hold shield"] = {animation = "hold-left", channel = 4, permanent = true, repeat_start = 10, weight = 5},
+		["hold sword"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
+		["hold torch"] = {animation = "hold-left", channel = 4, permanent = true, repeat_start = 10, weight = 5}},
 	categories = {"enemy"},
-	factions = {"evil"},
 	eye_style = "random",
 	hair_style = "random",
+	factions = {"evil"},
 	inventory_items = {"wooden club", "trog rags"},
 	loot_categories = {"material"},
-	loot_count = {2, 4}}
+	loot_count = {2, 4},
+	model = "trogfem1",
+	models = {
+		skeleton = "trogfem1",
+		arms = "trogfemarmnude1",
+		head = "trogfemhead1",
+		legs = "trogfemlegnude1",
+		lower = "trogfemlowernude1",
+		upper = "trogfemuppernude1"},
+	skills = {
+		{name = "dexterity", max = 8, val = 3},
+		{name = "health", max = 100, val = 50},
+		{name = "intelligence", max = 10, val = 5},
+		{name = "perception", max = 60, val = 20},
+		{name = "strength", max = 4, val = 2},
+		{name = "willpower", max = 8, val = 3}},
+	hair_styles = {	
+		{"troglong", "trogfemlonghair1"},
+		{"trogshort", "trogfemshorthair1"}},
+	skin_styles = {
+		{""}}}
 
 Species{
 	name = "bloodworm",
