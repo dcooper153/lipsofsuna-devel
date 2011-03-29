@@ -92,7 +92,8 @@ Species{
 	base = "race",
 	animations = {
 		["land ground"] = {animation = "land", channel = 2, fade_in = 0.1, fade_out = 0.5, weight = 10},
-		["attack sword"] = {animation = "attack-slash", channel = 2, fade_in = 0.1, weight = 30}},
+		["attack staff"] = {animation = "attack-slash", channel = 2, weight = 100},
+		["attack sword"] = {animation = "attack-slash", channel = 2, fade_in = 0.1, weight = 100}},
 	effect_falling_damage = "aerhurt1",
 	equipment_class = "aer",
 	model = "aer1",
@@ -193,6 +194,7 @@ Species{
 	base = "race",
 	aim_ray_center = Vector(0, 1, 0),
 	animations = {
+		["attack staff"] = {animation = "attack-slash", channel = 2, weight = 100},
 		["attack sword"] = {animation = "attack-slash", channel = 2, fade_in = 0.1, weight = 100}},
 	camera_center = Vector(0, 1, 0),
 	damage_from_magma = 9,
