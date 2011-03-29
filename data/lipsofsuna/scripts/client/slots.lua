@@ -30,6 +30,8 @@ Slots.update = function(self)
 		if slot and slot.node and self.owner.realized then
 			-- Show slot.
 			local p,r = self.owner:find_node{name = slot.node, space = "world"}
+			local h = object:find_node{name = "#handle"}
+			if h then p = p - r * h end
 			object.position = p
 			object.rotation = r
 			object.realized = true

@@ -195,8 +195,7 @@ end
 -- @param args Arguments.<ul>
 --   <li>collision: Trigger at collision.</li>
 --   <li>feat: Feat.</li>
---   <li>owner: Object firing the projectile. (required)</li>
---   <li>point: Firing point in world space.</li>
+--   <li>owner: Object firing the projectile.</li>
 --   <li>speed: Initial speed.</li>
 --   <li>timer: Trigger at timeout.</li>
 --   <li>weapon: Used weapon.</ul>

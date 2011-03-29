@@ -136,8 +136,7 @@ end
 -- @param args Arguments.<ul>
 --   <li>collision: Trigger at collision.</li>
 --   <li>feat: Feat.</li>
---   <li>owner: Object firing the projectile. (required)</li>
---   <li>point: Firing point relative to the owner.</li>
+--   <li>owner: Object firing the projectile.</li>
 --   <li>speed: Initial speed.</li>
 --   <li>timer: Trigger at timeout.</li></ul>
 -- @return The split and fired item.
@@ -148,7 +147,9 @@ Item.fire = function(self, args)
 	Object.fire(proj, args)
 	-- Special handling for boomerangs.
 	if proj.spec.categories["boomerang"] then
-		-- Enable boomerange collisions.
+		-- Work around an initial collision with the user.
+		proj.position = proj.position + proj.rotation * Vector(0,0,-0.7)
+		-- Enable boomerang collisions.
 		-- The boomerang mode is disabled when a collision occurs and either the
 		-- collision object is damaged or the user catches the boomerang.
 		if args.collision then
@@ -164,38 +165,34 @@ Item.fire = function(self, args)
 				else
 					-- Damage target.
 					args.feat:apply{
-						attacker = args.user,
+						attacker = args.owner,
 						point = result.point,
 						projectile = proj,
 						target = result.object,
 						tile = result.tile}
 				end
 				-- Disable boomerang mode.
-				proj.timer:disable()
+				if proj.timer then proj.timer:disable() end
 				proj.gravity = Config.gravity
 				proj:animate("fly stop")
 				proj.contact_cb = nil
 			end
 		end
-		-- Enable boomerang rotation.
-		if proj.spec.categories["boomerang"] then
-			proj.rotated = 0
-			proj.rotation = Quaternion{axis = Vector(0,0,1), angle = -0.5 * math.pi}
-			proj:animate("fly start")
-			proj.gravity = Vector(0,2,0)
-			proj.timer = Timer{delay = 0, func = function(self, secs)
-				-- Adjust velocity vector.
-				local m = 1.55 * math.pi
-				local r = math.min(secs * 1.3 * math.pi, m - proj.rotated)
-				proj.velocity = Quaternion{axis = Vector(0,1,0), angle = r} * proj.velocity
-				-- Stop after a while.
-				proj.rotated = proj.rotated + r
-				if proj.rotated >= m then
-					self:disable()
-					proj.gravity = Config.gravity
-				end
-			end}
-		end
+		-- Enable boomerang return.
+		proj.state = 0
+		proj.rotation = Quaternion{axis = Vector(0,0,1), angle = -0.5 * math.pi}
+		proj:animate("fly start")
+		proj.gravity = Vector(0,2,0)
+		proj.timer = Timer{delay = 1, func = function(timer, secs)
+			if proj.state == 0 then
+				proj.velocity = proj.velocity * -1.0
+				proj.state = 1
+			else
+				proj.timer = nil
+				proj.gravity = Config.gravity
+				timer:disable()
+			end
+		end}
 	end
 	-- Return the fired projectile.
 	return proj

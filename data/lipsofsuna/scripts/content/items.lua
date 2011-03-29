@@ -394,6 +394,21 @@ Itemspec{
 	mass = 15}
 
 Itemspec{
+	name = "boomerang",
+	animations = {
+		["fly start"] = {animation = "fly", channel = 1, permanent = true},
+		["fly stop"] = {channel = 1, permanent = true}},
+	mass = 2,
+	model = "boomerang1",
+	categories = {"boomerang", "throwable", "weapon"},
+	crafting_materials = {log = 2},
+	influences_base = {physical = -10},
+	influences_bonus = {dexterity = 0.01},
+	equipment_slot = "hand.R",
+	stacking = true,
+	water_gravity = Vector(0,1,0)}
+
+Itemspec{
 	name = "crimson crossbow",
 	model = "bow1", -- FIXME
 	icon = "bow1",
@@ -1355,21 +1370,6 @@ Itemspec{
 	destroy_actions = {"explode"},
 	health = 1,
 	stacking = false,
-	water_gravity = Vector(0,1,0)}
-
-Itemspec{
-	name = "boomerang",
-	animations = {
-		["fly start"] = {animation = "fly", channel = 1, permanent = true},
-		["fly stop"] = {channel = 1, permanent = true}},
-	mass = 3,
-	model = "boomerang1",
-	categories = {"boomerang", "throwable", "weapon"},
-	crafting_materials = {log = 1},
-	influences_base = {physical = -20},
-	influences_bonus = {dexterity = 0.01},
-	equipment_slot = "hand.R",
-	stacking = true,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{

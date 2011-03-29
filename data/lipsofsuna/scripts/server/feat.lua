@@ -232,7 +232,7 @@ Feat.get_info = function(self, args)
 		local bonuses = args.projectile.spec.influences_bonus
 		if bonuses then
 			for k,v in pairs(bonuses) do
-				local s = skills:get_value{skill = k}
+				local s = args.attacker.skills:get_value{skill = k}
 				if s then mult = mult * (1 + v * s) end
 			end
 		end
