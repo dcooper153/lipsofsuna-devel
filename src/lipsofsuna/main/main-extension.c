@@ -27,6 +27,7 @@
 
 extern LIMaiExtensionInfo liext_animation_info;
 extern LIMaiExtensionInfo liext_camera_info;
+extern LIMaiExtensionInfo liext_config_file_info;
 extern LIMaiExtensionInfo liext_database_info;
 extern LIMaiExtensionInfo liext_graphics_info;
 extern LIMaiExtensionInfo liext_network_info;
@@ -61,6 +62,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 	{
 		{ "animation", &liext_animation_info },
 		{ "camera", &liext_camera_info },
+		{ "config-file", &liext_config_file_info },
 		{ "database", &liext_database_info },
 		{ "graphics", &liext_graphics_info },
 		{ "network", &liext_network_info },
