@@ -273,6 +273,9 @@ static int private_event (
 					"code", LISCR_TYPE_INT, event->key.keysym.sym,
 					"mods", LISCR_TYPE_INT, event->key.keysym.mod, NULL);
 			}
+			if (event->key.keysym.sym == SDLK_F4 &&
+			   (event->key.keysym.mod & KMOD_ALT))
+				self->program->quit = 1;
 			return 0;
 		case SDL_MOUSEMOTION:
 			limai_program_event (self->program, "mousemotion",
