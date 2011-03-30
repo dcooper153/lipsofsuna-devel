@@ -7,8 +7,11 @@ Widgets.Frame.setter = function(self, key, value)
 			if value == "default" then
 				self.margins = {10,7,10,20}
 			elseif value == "equipment" then
-				self.spacings = {0,2}
-				self.margins = {10,7,10,20}
+				self.spacings = {0,0}
+				self.margins = {10,7,0,0}
+			elseif value == "list" then
+				self.spacings = {0,0}
+				self.margins = {0,0,0,0}
 			elseif value == "paper" then
 				self.margins = {30,30,40,30}
 			elseif value == "popup" then
@@ -78,19 +81,15 @@ Widgets.Frame.reshaped = function(self)
 			source_position = {0,0},
 			source_tiling = {75,183,75,50,158,100}}
 	elseif self.style == "equipment" then
-		self:set_request{internal = true, width = 333, height = 165}
-		self:canvas_image{
-			dest_position = {0,0},
-			dest_size = {w,h},
-			source_image = "widgets1",
-			source_position = {0,0},
-			source_tiling = {75,183,75,50,158,100}}
+		self:set_request{internal = true, width = 90, height = 143}
 		self:canvas_image{
 			dest_position = {20,0},
-			dest_size = {300,185},
+			dest_size = {90,165},
 			source_image = "widgets1",
 			source_position = {0,327},
 			source_tiling = {0,300,0,0,185,0}}
+	elseif self.style == "list" then
+		self:set_request{internal = true, width = 64, height = 102}
 	elseif self.style == "paper" then
 		self:set_request{internal = true, width = 333, height = 220}
 		self:canvas_image{

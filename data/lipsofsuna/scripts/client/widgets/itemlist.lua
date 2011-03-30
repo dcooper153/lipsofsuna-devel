@@ -1,40 +1,18 @@
 Widgets.ItemList = Class(Widget)
 
-Widgets.ItemList.getter = function(self, key)
-	if key == "size" then
-		return self.rows
-	else
-		return Widget.getter(self, key)
-	end
-end
-
 Widgets.ItemList.setter = function(self, key, value)
 	if key == "size" then
-		if value <= 10 then
-			-- Small inventories are single column.
-			self.cols = 1
-			self.rows = value
-			self.buttons = {}
-			self:set_expand{col = 1}
-			for i = 1,value do
-				self.buttons[i] = Widgets.ItemButton{pressed = function(w, a) self:activated(i, a) end}
-				self:set_child{col = 1, row = i, widget = self.buttons[i]}
-			end
-		else
-			-- Large inventories are dual column.
-			local rows = math.ceil(value / 2)
-			self.cols = 2
-			self.rows = rows
-			self.buttons = {}
-			self:set_expand{col = 1}
-			self:set_expand{col = 2}
-			for i = 1,value do
-				self.buttons[i] = Widgets.ItemButton{pressed = function(w, a) self:activated(i, a) end}
-				self:set_child{
-					col = 1 + math.floor((i - 1) / rows),
-					row = 1 + (i - 1) % rows,
-					widget = self.buttons[i]}
-			end
+		Widget.setter(self, key, value)
+		local rows = math.ceil(value / 5)
+		self.cols = 5
+		self.rows = rows
+		self.buttons = {}
+		for i = 1,value do
+			self.buttons[i] = Widgets.ItemButton{pressed = function(w, a) self:activated(i, a) end}
+			self:set_child{
+				col = 1 + math.floor((i - 1) / rows),
+				row = 1 + (i - 1) % rows,
+				widget = self.buttons[i]}
 		end
 	else
 		Widget.setter(self, key, value)

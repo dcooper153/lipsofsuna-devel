@@ -21,6 +21,13 @@ Widgets.Container.new = function(clss, args)
 	self.id = args.id
 	self:set_request{width = 200}
 	clss.dict_id[args.id] = self
+	-- Item list.
+	self.item_list = Widgets.ItemList{size = args.size, activated = function(w, r, a) self:activated(a, r) end}
+	self.group = Widgets.Frame{cols = 3, rows = 3}
+	self.group:set_expand{col = 1, row = 1}
+	self.group:set_child{col = 1, row = 1, widget = self.item_list}
+	self:append_row(self.group)
+	self:set_expand{col = 1, row = 1}
 	-- Equipment list.
 	local slots = nil
 	if args.spec and args.spec.equipment_slots then
@@ -32,21 +39,14 @@ Widgets.Container.new = function(clss, args)
 	if slots then
 		self.equipment = Widgets.Equipment{spec = spec, pressed = function(widget, args, slot)
 			self:activated(args, slot) end}
-		self:append_row(self.equipment)
+		self.group:set_child{col = 2, row = 1, widget = self.equipment}
 	end
 	-- Crafting list.
 	if args.spec and args.spec.inventory_type == "workbench" then
 		self.crafting = Widgets.List()
-		self.crafting:set_request{height = 190}
-		self:append_row(self.crafting)
+		--self.crafting:set_request{height = 32}
+		self.group:set_child{col = 1, row = 2, widget = self.crafting}
 	end
-	-- Item list.
-	self.item_list = Widgets.ItemList{size = args.size, activated = function(w, r, a) self:activated(a, r) end}
-	self.group = Widgets.Frame{cols = 1, rows = 3}
-	self.group:set_expand{col = 1, row = 1}
-	self.group:set_child{col = 1, row = 1, widget = self.item_list}
-	self:append_row(self.group)
-	self:set_expand{col = 1, row = 1}
 	-- Close button.
 	self.closed = args.closed
 	self.button_close = Widgets.Button{text = "Close", pressed = function() self:close() end}
@@ -162,7 +162,9 @@ Widgets.Container.update = function(self)
 	local items = {}
 	for i = 1,self.item_list.size do
 		local item = self.item_list:get_item{slot = i}
-		if item then items[item.text] = item.count end
+		if item then
+			items[item.text] = item.count
+		end
 	end
 	-- Calculate craftable items.
 	local get_item = function(name)
@@ -174,6 +176,7 @@ Widgets.Container.update = function(self)
 	craftable = Crafting:get_craftable{get_item = get_item, get_skill = get_skill}
 	table.sort(craftable)
 	-- Rebuild the crafting list.
+	local row = Widget{rows = 1, spacings = {0,0}}
 	local index = 1
 	local offset = self.crafting:get_offset()
 	self.crafting:clear()
@@ -186,8 +189,15 @@ Widgets.Container.update = function(self)
 			scrolled = function(w, args)
 				self.crafting:scrolled(args)
 			end}
-		self.crafting:append{widget = widget}
+		row:append_col(widget)
+		if row.cols == 8 then
+			self.crafting:append{widget = row}
+			row = Widget{rows = 1, spacings = {0,0}}
+		end
 		index = index + 1
+	end
+	if row.cols > 0 then
+		self.crafting:append{widget = row}
 	end
 	self.crafting:set_offset(offset)
 end

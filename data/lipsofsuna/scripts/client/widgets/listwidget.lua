@@ -6,12 +6,12 @@ Widgets.List = Class(Widgets.Frame)
 -- @param clss List widget class.
 -- @param args Arguments.
 Widgets.List.new = function(clss, args)
-	local self = Widgets.Frame.new(clss, {rows = 1, cols = 2, spacings = {0,0}})
+	local self = Widgets.Frame.new(clss, {rows = 1, cols = 2, spacings = {0,0}, style = "list"})
 	self.table = {}
 	self.list = Widget{cols = 1, spacings = {0,0}}
 	self.list:set_expand{col = 1}
 	self.scroll = Widgets.Scrollbar{changed = function(w, p) self:set_offset(p) end}
-	self.scroll:set_range(0, 1, 8)
+	self.scroll:set_range(0, 1, 3)
 	self:set_child{col = 1, row = 1, widget = self.list}
 	self:set_child{col = 2, row = 1, widget = self.scroll}
 	self:set_expand{col = 1, row = 1}
