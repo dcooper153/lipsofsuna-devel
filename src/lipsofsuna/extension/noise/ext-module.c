@@ -24,15 +24,18 @@
 
 #include "ext-module.h"
 
-static float private_noise (
-	float x,
-	float y,
-	float z);
+#define NOISE_SCALE 0x7FFFFFFF
+#define NOISE_SCALE2 0x40000000
 
-static float private_smooth_noise (
-	float x,
-	float y,
-	float z);
+static uint32_t private_noise (
+	int x,
+	int y,
+	int z);
+
+static uint32_t private_smooth_noise (
+	int x,
+	int y,
+	int z);
 
 static float private_interpolated_noise (
 	float x,
@@ -105,26 +108,27 @@ float liext_noise_perlin_noise (
 
 /*****************************************************************************/
 
-static float private_noise (
-	float x,
-	float y,
-	float z)
+static uint32_t private_noise (
+	int x,
+	int y,
+	int z)
 {
 	uint32_t m = x + y * 57 + z * 7919;
 	uint32_t n = (m << 13) ^ m;
-	uint32_t o = (n * (n * n * 15731 + 789221) + 1376312589) & 0x7FFFFFFF;
-	return (1 - o / 1073741824);    
+	uint32_t o = (n * (n * n * 15731 + 789221) + 1376312589) & NOISE_SCALE;
+	return o;
 }
 
-static float private_smooth_noise (
-	float x,
-	float y,
-	float z)
+static uint32_t private_smooth_noise (
+	int x,
+	int y,
+	int z)
 {
-	return 0.4f * private_noise(x, y, z) + 0.1 * (
-		private_noise(x-1, y, z) + private_noise(x+1, y, z) +
-		private_noise(x, y-1, z) + private_noise(x, y+1, z) +
-		private_noise(x, y, z-1) + private_noise(x, y, z+1));
+	return private_noise(x, y, z);
+/*	return (private_noise(x, y, z) >> 2) +
+		(private_noise(x-1, y, z) >> 3) + (private_noise(x+1, y, z) >> 3) +
+		(private_noise(x, y-1, z) >> 3) + (private_noise(x, y+1, z) >> 3) +
+		(private_noise(x, y, z-1) >> 3) + (private_noise(x, y, z+1) >> 3);*/
 }
 
 static float private_interpolated_noise (
@@ -135,6 +139,7 @@ static float private_interpolated_noise (
 	int ix = (int) x;
 	int iy = (int) y;
 	int iz = (int) z;
+	float s = 1.0f / NOISE_SCALE2;
 	float v000 = private_smooth_noise (ix, iy, iz);
 	float v100 = private_smooth_noise (ix + 1, iy, iz);
 	float v010 = private_smooth_noise (ix, iy + 1, iz);
@@ -144,14 +149,14 @@ static float private_interpolated_noise (
 	float v011 = private_smooth_noise (ix, iy + 1, iz + 1);
 	float v111 = private_smooth_noise (ix + 1, iy + 1, iz + 1);
 	float fx = x - ix;
-	float v00 = limat_mix (v000, v100, fx);
-	float v10 = limat_mix (v010, v110, fx);
-	float v01 = limat_mix (v001, v101, fx);
-	float v11 = limat_mix (v011, v111, fx);
+	float v00 = limat_mix (v000 * s, v100 * s, fx);
+	float v10 = limat_mix (v010 * s, v110 * s, fx);
+	float v01 = limat_mix (v001 * s, v101 * s, fx);
+	float v11 = limat_mix (v011 * s, v111 * s, fx);
 	float fy = y - iy;
 	float v0 = limat_mix (v00, v10, fy);
 	float v1 = limat_mix (v01, v11, fy);
-	return limat_mix (v0, v1, z - iz);
+	return 1.0f - limat_mix (v0, v1, z - iz);
 }
 
 /** @} */
