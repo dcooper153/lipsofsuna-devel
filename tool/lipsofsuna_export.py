@@ -1405,7 +1405,7 @@ class LIObjectExportSettingsOperator(bpy.types.Operator):
 		('particle', 'Particle animations', ''),\
 		('shape', 'Collision shape', ''),\
 		('render', 'Graphics', ''),\
-		('none', 'Nothing', '')],
+		('none', 'Disabled', '')],
 		default='none')
 	li_file = bpy.props.StringProperty(name='File name', description='Target file name without path or extension')
 	li_shape = bpy.props.StringProperty(name='Shape name', description='The name of the exported collision shape')
@@ -1436,14 +1436,19 @@ class LIObjectExportSettingsOperator(bpy.types.Operator):
 			setprop(context.object, 'file', self.li_file)
 			setprop(context.object, 'render', None)
 			setprop(context.object, 'shape', None)
+			setprop(context.object, 'export', None)
 		elif self.li_export == 'shape':
 			setprop(context.object, 'file', self.li_file)
 			setprop(context.object, 'render', 'false')
 			setprop(context.object, 'shape', self.li_shape or 'default')
+			setprop(context.object, 'export', None)
 		elif self.li_export == 'particle':
 			setprop(context.object, 'file', self.li_file)
 			setprop(context.object, 'render', 'false')
 			setprop(context.object, 'shape', None)
+			setprop(context.object, 'export', None)
+		elif self.li_export == 'none':
+			setprop(context.object, 'export', 'false')
 		else:
 			setprop(context.object, 'file', None)
 			setprop(context.object, 'render', None)
