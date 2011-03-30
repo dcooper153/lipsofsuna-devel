@@ -19,7 +19,16 @@ Widgets.Tooltip.append = function(self, what)
 end
 
 Widgets.Tooltip.popup = function(self, point)
+	local mode = Client.video_mode
 	self.floating = true
-	self.x = point.x
-	self.y = point.y
+	if point.x > mode[1] - self.width then
+		self.x = mode[1] - self.width
+	else
+		self.x = point.x
+	end
+	if point.y > mode[2] - self.height then
+		self.y = mode[2] - self.height
+	else
+		self.y = point.y
+	end
 end
