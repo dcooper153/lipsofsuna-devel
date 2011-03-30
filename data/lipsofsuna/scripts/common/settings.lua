@@ -1,6 +1,6 @@
 Settings = Class()
 Settings.arguments = string.split(Program.args)
-Settings.addr = "localhost"
+Settings.address = "localhost"
 Settings.port = 10101
 Settings.account = "guest"
 Settings.password = ""

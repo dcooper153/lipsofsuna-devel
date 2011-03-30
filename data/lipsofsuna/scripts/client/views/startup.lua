@@ -42,7 +42,7 @@ Startup.retry = function(clss)
 	if Settings.host then
 		-- Host a game.
 		Program:unload_world()
-		Client:host("--file " .. Settings.file .. " --server " .. Settings.addr .. " " .. Settings.port)
+		Client:host("--file " .. Settings.file .. " --server " .. Settings.address .. " " .. Settings.port)
 		clss:set_state("Starting the server on port " .. Settings.port .. "...", "Retry")
 		clss.host_wait_timer = Timer{delay = 2, func = function(timer)
 			if Network:join{host = "localhost", Settings.port} then
@@ -57,11 +57,11 @@ Startup.retry = function(clss)
 	else
 		-- Join a game.
 		Program:unload_world()
-		if Network:join{host = Settings.addr, port = Settings.port} then
-			clss:set_state("Connecting to " .. Settings.addr .. ":" .. Settings.port .. "...", "Retry")
+		if Network:join{host = Settings.address, port = Settings.port} then
+			clss:set_state("Connecting to " .. Settings.address .. ":" .. Settings.port .. "...", "Retry")
 			clss.connecting = true
 		else
-			clss:set_state("Failed to connect to " .. Settings.addr .. ":" .. Settings.port .. "!", "Retry")
+			clss:set_state("Failed to connect to " .. Settings.address .. ":" .. Settings.port .. "!", "Retry")
 			clss.connecting = nil
 		end
 	end
