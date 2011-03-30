@@ -39,6 +39,7 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 	end
 	-- Try to merge with other items.
 	if dstinv:merge_object{object = srcobj, slot = dstslot} then
+		srcobj:detach()
 		return true
 	end
 	if dstslot then
