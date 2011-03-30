@@ -5,6 +5,7 @@ Widgets.ItemButton.setter = function(self, key, value)
 		if self.count ~= value then
 			Widget.setter(self, key, value)
 			self:reshaped()
+			self:update_tooltip()
 		end
 	elseif key == "drag" then
 		if self.drag ~= value then
@@ -25,11 +26,13 @@ Widgets.ItemButton.setter = function(self, key, value)
 		if self.icon ~= value then
 			Widget.setter(self, key, value)
 			self:reshaped()
+			self:update_tooltip()
 		end
 	elseif key == "text" then
 		if self.text ~= value then
 			Widget.setter(self, key, value)
 			self:reshaped()
+			self:update_tooltip()
 		end
 	else
 		Widget.setter(self, key, value)
@@ -95,4 +98,13 @@ Widgets.ItemButton.reshaped = function(self)
 end
 
 Widgets.ItemButton.pressed = function(self, args)
+end
+
+Widgets.ItemButton.update_tooltip = function(self, args)
+	local spec = Itemspec:find{name = self.text}
+	if not spec then
+		self.tooltip = nil
+	else
+		self.tooltip = Widgets.Itemtooltip{count = self.count, spec = spec}
+	end
 end

@@ -1309,6 +1309,7 @@ Itemspec{
 	animation_looting = "opening",
 	categories = {"container", "workbench"},
 	crafting_materials = {log = 7},
+	description = "Right click and drag materials inside to craft.",
 	inventory_size = 4,
 	inventory_type = "workbench",
 	stacking = false,
@@ -1387,6 +1388,7 @@ Itemspec{
 	categories = {"potion"},
 	crafting_materials = {["empty bottle"] = 1, ["milky powder"] = 1},
 	crafting_skills = {intelligence = 50},
+	description = "Right click to heal yourself.",
 	stacking = true,
 	icon = "potion1",
 	water_gravity = Vector(0,1,0)}
@@ -1398,6 +1400,7 @@ Itemspec{
 	categories = {"potion"},
 	crafting_materials = {["empty bottle"] = 1, ["milky powder"] = 3},
 	crafting_skills = {intelligence = 50},
+	description = "Right click to replenish your willpower.",
 	stacking = true,
 	icon = "potion2",
 	water_gravity = Vector(0,1,0)}

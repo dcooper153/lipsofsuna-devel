@@ -19,6 +19,8 @@ Widgets.Frame.setter = function(self, key, value)
 				self.margins = {77,0,10,0}
 			elseif value == "title" then
 				self.margins = {100,100,0,10}
+			elseif value == "tooltip" then
+				self.margins = {5,16,0,11}
 			end
 			self:reshaped()
 		end
@@ -127,6 +129,14 @@ Widgets.Frame.reshaped = function(self)
 			source_image = "widgets1",
 			source_position = {672,325},
 			source_tiling = {100,73,100,0,45,0}}
+	elseif self.style == "tooltip" then
+		self:set_request{internal = true, width = 100, height = 20}
+		self:canvas_image{
+			dest_position = {0,0},
+			dest_size = {w,h},
+			source_image = "widgets1",
+			source_position = {720,0},
+			source_tiling = {10,80,21,10,30,21}}
 	end
 	self:canvas_compile()
 end

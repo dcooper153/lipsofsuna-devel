@@ -32,10 +32,23 @@ Widgets.Cursor.new = function(clss, cursor)
 end
 
 Widgets.Cursor.update = function(self)
+	-- Update position.
 	local c = Client.cursor_pos
 	self.floating = not Client.moving
 	self.x = c.x + 1
 	self.y = c.y + 1
+	-- Show tooltips.
+	if self.tooltip then
+		self.tooltip.floating = false
+		self.tooltip = nil
+	end
+	if self.floating then
+		local w = Widgets:find_handler_widget("tooltip")
+		if w and w.tooltip then
+			self.tooltip = w.tooltip
+			w.tooltip:popup(c + Vector(5,5))
+		end
+	end
 end
 
 Widgets.Cursor.reshaped = function(self)
