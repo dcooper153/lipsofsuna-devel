@@ -6,20 +6,10 @@ Widgets.Cursor.setter = function(self, key, value)
 			Widget.setter(self, key, value)
 			self:reshaped()
 		end
-	elseif key == "font" then
-		if self.font ~= value then
+	elseif key == "widget" then
+		if self.widget ~= value then
 			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "icon" then
-		if self.icon ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "text" then
-		if self.text ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
+			self:set_child{col = 1, row = 1, widget = value}
 		end
 	else
 		Widget.setter(self, key, value)
@@ -27,7 +17,7 @@ Widgets.Cursor.setter = function(self, key, value)
 end
 
 Widgets.Cursor.new = function(clss, cursor)
-	local self = Widget.new(clss, {cursor = cursor, font = "default"})
+	local self = Widget.new(clss, {cursor = cursor, cols = 1, rows = 1})
 	return self
 end
 
@@ -42,6 +32,7 @@ Widgets.Cursor.update = function(self)
 		self.tooltip.floating = false
 		self.tooltip = nil
 	end
+	if self.widget then return end
 	if self.floating then
 		local w = Widgets:find_handler_widget("tooltip")
 		if w and w.tooltip then
@@ -57,18 +48,8 @@ Widgets.Cursor.reshaped = function(self)
 	self:set_request{
 		internal = true,
 		height = cursor and cursor.size[2] or 16,
-		text = self.text}
-	local w = self.width
-	local h = self.height
+		width = cursor and cursor.size[1] or 16}
 	self:canvas_clear()
-	if self.icon then
-		self:canvas_image{
-			dest_position = {0,0},
-			dest_size = icon.size,
-			source_image = icon.image,
-			source_position = icon.offset,
-			source_tiling = {0,icon.size[1],0,0,icon.size[1],0}}
-	end
 	if self.cursor then
 		self:canvas_image{
 			dest_position = {0,0},
@@ -76,15 +57,6 @@ Widgets.Cursor.reshaped = function(self)
 			source_image = cursor.image,
 			source_position = cursor.offset,
 			source_tiling = {0,cursor.size[1],0,0,cursor.size[1],0}}
-	end
-	if self.text then
-		self:canvas_text{
-			dest_position = {0,0},
-			dest_size = {w,h},
-			text = self.text,
-			text_alignment = {0,1},
-			text_color = {1,1,1,1},
-			text_font = self.font}
 	end
 	self:canvas_compile()
 end

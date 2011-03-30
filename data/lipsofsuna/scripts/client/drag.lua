@@ -16,8 +16,7 @@ Drag.clear = function(self)
 		if item then item.drag = nil end
 	end
 	-- Reset the cursor.
-	Widgets.Cursor.inst.text = nil
-	Widgets.Cursor.inst.icon = nil
+	Widgets.Cursor.inst.widget = nil
 	-- Clear the drag.
 	self.drag = nil
 end
@@ -48,12 +47,12 @@ Drag.clicked_container = function(self, inv, slot)
 	if not item then return end
 	-- Update the cursor.
 	if type(slot) == "number" then
-		self.drag = {"inv", inv, slot}
+		self.drag = {"inv", inv, slot, item.text}
 	else
-		self.drag = {"equ", inv, slot}
+		self.drag = {"equ", inv, slot, item.text}
 	end
-	Widgets.Cursor.inst.text = item.text
-	Widgets.Cursor.inst.icon = Iconspec:find{name = item.icon}
+	local spec = Itemspec:find{name = item.text}
+	Widgets.Cursor.inst.widget = Widgets.Itemtooltip{count = item.count, spec = spec}
 	-- Hide the dragged item.
 	item.drag = true
 end
@@ -65,7 +64,7 @@ end
 Drag.clicked_quickslot = function(self, index)
 	if not self.drag then return end
 	if self.drag[1] == "equ" or self.drag[1] == "inv" then
-		Quickslots:assign_item(index, Widgets.Cursor.inst.text)
+		Quickslots:assign_item(index, self.drag[4])
 		self:clear()
 	else
 		self:cancel()
