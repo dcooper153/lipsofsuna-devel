@@ -17,12 +17,12 @@ Sectors.create_fractal_regions = function(self, sector, filter)
 	local org = Sectors.instance:get_sector_offset(sector)
 	if filter then
 		-- Fill valid blocks.
-		local w = 6
+		local w = 4
 		local size = Vector(w,w,w)
 		local aabb = Aabb{size = size}
-		for x = 0,3 do aabb.point.x = org.x + w*x
-			for y = 0,3 do aabb.point.y = org.y + w*y
-				for z = 0,3 do aabb.point.z = org.z + w*z
+		for x = 0,5 do aabb.point.x = org.x + w*x
+			for y = 0,5 do aabb.point.y = org.y + w*y
+				for z = 0,5 do aabb.point.z = org.z + w*z
 					if filter(aabb) then
 						Sectors.instance:create_fractal_terrain(aabb.point, aabb.size)
 					end
@@ -46,11 +46,11 @@ Sectors.create_fractal_terrain = function(self, org, size)
 	local m = mats[math.random(1,#mats)]
 	if m then
 		local scale = Vector(0.3,0.3,0.3)
-		Noise:perlin_terrain(org, org + size, m.id, 0.8, scale, 2, 3, 0.25, self.seed2)
+		Noise:perlin_terrain(org, org + size, m.id, 0.5, scale, 4, 4, 0.25, self.seed2)
 	end
 	-- Create caverns.
-	local scale = Vector(0.4,0.5,0.4)
-	local p = Noise:perlin_terrain(org, org + size, 0, 0.85, scale, 4, 3, 0.3, self.seed1)
+	local scale = Vector(0.15,0.3,0.15)
+	local p = Noise:perlin_terrain(org, org + size, 0, 0.2, scale, 2, 2, 0.3, self.seed1)
 end
 
 --- Called when a sector is created by the game.

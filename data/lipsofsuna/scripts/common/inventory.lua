@@ -125,6 +125,7 @@ Inventory.merge_object = function(self, args)
 		local object = self:get_object{slot = args.slot}
 		if type(object) ~= "userdata" then return end
 		if object and object:merge{object = args.object} then
+			args.object:detach()
 			self:update_slot{slot = args.slot}
 			return true
 		end

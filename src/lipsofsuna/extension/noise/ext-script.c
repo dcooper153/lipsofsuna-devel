@@ -91,9 +91,11 @@ static void Noise_perlin_noise (LIScrArgs* args)
  */
 static void Noise_perlin_terrain (LIScrArgs* args)
 {
+	int i;
 	int min[3];
 	int max[3];
 	int pos[3];
+	int size[3];
 	int tile = 0;
 	int seed = 0;
 	int octaves = 4;
@@ -105,7 +107,7 @@ static void Noise_perlin_terrain (LIScrArgs* args)
 	LIMatVector point1;
 	LIMatVector point2;
 	LIMatVector scale = { 1.0f, 1.0f, 1.0f};
-	LIVoxVoxel tmp;
+	LIVoxVoxel* tmp;
 	LIVoxManager* voxels;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NOISE);
@@ -133,22 +135,43 @@ static void Noise_perlin_terrain (LIScrArgs* args)
 	if (!liscr_args_geti_int (args, 8, &seed))
 		liscr_args_gets_int (args, "seed", &seed);
 
-	livox_voxel_init (&tmp, tile);
+	/* Calculate the size of the area. */
 	min[0] = (int) point1.x;
 	min[1] = (int) point1.y;
 	min[2] = (int) point1.z;
 	max[0] = (int) point2.x;
 	max[1] = (int) point2.y;
 	max[2] = (int) point2.z;
-	for (pos[2] = min[2] ; pos[2] < max[2] ; pos[2]++)
+	size[0] = max[0] - min[0];
+	size[1] = max[1] - min[1];
+	size[2] = max[2] - min[2];
+	if (!size[0] || !size[1] || !size[2])
+		return;
+
+	/* Batch copy terrain data. */
+	/* Reading all tiles at once is faster than operating on
+	   individual tiles since there are fewer sector lookups. */
+	tmp = lisys_calloc (size[0] * size[1] * size[2], sizeof (LIVoxVoxel));
+	if (tmp == NULL)
+		return;
+	livox_manager_copy_voxels (voxels, min[0], min[1], min[2],
+		size[0], size[1], size[2], tmp);
+
+	/* Apply thresholded perlin noise to the copied tiles. */
+	for (i = 0, pos[2] = min[2] ; pos[2] < max[2] ; pos[2]++)
 	for (pos[1] = min[1] ; pos[1] < max[1] ; pos[1]++)
-	for (pos[0] = min[0] ; pos[0] < max[0] ; pos[0]++)
+	for (pos[0] = min[0] ; pos[0] < max[0] ; pos[0]++, i++)
 	{
 		value = liext_noise_perlin_noise (module, scale.x * pos[0],
 			scale.y * pos[1], scale.z * pos[2], seed, octaves, frequency, persistence);
 		if (value >= threshold)
-			livox_manager_set_voxel (voxels, pos[0], pos[1], pos[2], &tmp);
+			livox_voxel_init (tmp + i, tile);
 	}
+
+	/* Batch write the copied tiles. */
+	livox_manager_paste_voxels (voxels, min[0], min[1], min[2],
+		size[0], size[1], size[2], tmp);
+	lisys_free (tmp);
 }
 
 /* @luadoc

@@ -395,7 +395,7 @@ Generator.subdivide_link = function(clss, link)
 	local src = link[1].point + link[1].size * 0.5
 	local dst = link[2].point + link[2].size * 0.5
 	local len = (src - dst).length - (link[1].size.length + link[2].size.length) / 2
-	if len < 25 then return end
+	if len < 50 then return end
 	-- Try to subdivide the link.
 	for i = 1,20 do
 		-- Select the type for the new region.
