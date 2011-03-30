@@ -166,7 +166,7 @@ Protocol:add_handler{type = "MOVE_ITEM", func = function(args)
 	if not player then return end
 	if player.dead then return end
 	-- Read the source and destination types.
-	local ok,src,dst = args.packet:read("uint8", "uint8")
+	local ok,src,dst,count = args.packet:read("uint8", "uint8", "uint32")
 	if not ok then return end
 	if src == moveitem.WORLD and dst == moveitem.WORLD then return end
 	-- Read the detailed source information.
@@ -198,11 +198,11 @@ Protocol:add_handler{type = "MOVE_ITEM", func = function(args)
 	elseif dst == moveitem.WORLD then
 		player:animate("drop")
 		Timer{delay = player.spec.timing_drop * 0.05, func = function(timer)
-			Actions:move_from_inv_to_world(player, srcid, srcslot)
+			Actions:move_from_inv_to_world(player, srcid, srcslot, count)
 			timer:disable()
 		end}
 	else
-		return Actions:move_from_inv_to_inv(player, srcid, srcslot, dstid, dstslot)
+		return Actions:move_from_inv_to_inv(player, srcid, srcslot, dstid, dstslot, count)
 	end
 end}
 

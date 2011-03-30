@@ -6,6 +6,25 @@ Drag.cancel = function(self)
 	self:clear()
 end
 
+--- Changes the count of dragged items, effectively allowing stack splitting.
+-- @param self Drag.
+-- @param delta Size of change.
+Drag.change_count = function(self, delta)
+	-- Make sure that the dragged item exists.
+	local item = Views.Inventory.inst:get_item{id = self.drag[2], slot = self.drag[3]}
+	if not item then return end
+	-- Update the drag count.
+	local new = self.drag[5] + delta
+	new = math.max(new, 1)
+	new = math.min(new, item.count)
+	if new == self.drag[5] then return end
+	self.drag[5] = new
+	-- Update the cursor.
+	local spec = Itemspec:find{name = item.text}
+	Widgets.Cursor.inst.widget = Widgets.Itemtooltip{
+		count = item.count, count_drag = self.drag[5], spec = spec}
+end
+
 --- Clears the drag state after finishing a drag.
 -- @param self Drag.
 Drag.clear = function(self)
@@ -32,9 +51,9 @@ Drag.clicked_container = function(self, inv, slot)
 	if self.drag then
 		if self.drag[1] == "equ" or self.drag[1] == "inv" then
 			if type(slot) == "number" then
-				Equipment:move(self.drag[1], self.drag[2], self.drag[3], "inv", inv, slot)
+				Equipment:move(self.drag[1], self.drag[2], self.drag[3], "inv", inv, slot, self.drag[5])
 			else
-				Equipment:move(self.drag[1], self.drag[2], self.drag[3], "equ", inv, slot)
+				Equipment:move(self.drag[1], self.drag[2], self.drag[3], "equ", inv, slot, self.drag[5])
 			end
 			self:clear()
 		else
@@ -47,12 +66,13 @@ Drag.clicked_container = function(self, inv, slot)
 	if not item then return end
 	-- Update the cursor.
 	if type(slot) == "number" then
-		self.drag = {"inv", inv, slot, item.text}
+		self.drag = {"inv", inv, slot, item.text, item.count}
 	else
-		self.drag = {"equ", inv, slot, item.text}
+		self.drag = {"equ", inv, slot, item.text, item.count}
 	end
 	local spec = Itemspec:find{name = item.text}
-	Widgets.Cursor.inst.widget = Widgets.Itemtooltip{count = item.count, spec = spec}
+	Widgets.Cursor.inst.widget = Widgets.Itemtooltip{
+		count = item.count, count_drag = item.count, spec = spec}
 	-- Hide the dragged item.
 	item.drag = true
 end

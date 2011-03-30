@@ -5,8 +5,9 @@
 -- @param srcslot Source inventory or equipment slot.
 -- @param dstid Destination inventory ID.
 -- @param dstslot Destination inventory or equipment slot.
+-- @param count Number of items to split from the stack.
 -- @return True on success.
-Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstslot)
+Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstslot, count)
 	-- Find inventories.
 	local srcinv = Inventory:find{id = srcid}
 	if not srcinv or not srcinv:subscribed{object = user} then return end
@@ -37,6 +38,20 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 		user:send{packet = Packet(packets.MESSAGE, "string", "Can't place it inside itself.")}
 		return
 	end
+	-- Validate the count and split stacks.
+	local undo = function() return false end
+	local split = count or srcobj.count
+	split = math.max(split, 1)
+	split = math.min(split, srcobj.count)
+	if split ~= srcobj.count then
+		local splitsrc = srcobj
+		srcobj = srcobj:split{count = split}
+		undo = function()
+			splitsrc:merge{object = srcobj}
+			srcobj:detach()
+			return false
+		end
+	end
 	-- Try to merge with other items.
 	if dstinv:merge_object{object = srcobj, slot = dstslot} then
 		srcobj:detach()
@@ -48,7 +63,10 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 		-- slots. When such an item is equiped or replaced, multiple slots may
 		-- require changes.
 		if type(dstslot) == "string" then
-			return dstinv.owner:equip_item{object = srcobj}
+			if not dstinv.owner:equip_item{object = srcobj} then
+				return undo()
+			end
+			return true
 		end
 		-- Try to move the item.
 		local dstobj = dstinv:get_object{slot = dstslot}
@@ -59,7 +77,7 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 		end
 		-- Try to displace the other item.
 		local tmpslot = dstinv:get_empty_slot()
-		if not tmpslot then return end
+		if not tmpslot then return undo() end
 		dstobj:detach()
 		dstinv:set_object{slot = tmpslot, object = dstobj}
 		srcobj:detach()
@@ -68,7 +86,7 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 	else
 		-- Try to place into any free slot.
 		dstslot = dstinv:get_empty_slot()
-		if not dstslot then return end
+		if not dstslot then return undo() end
 		dstinv:set_object{slot = dstslot, object = dstobj}
 		return true
 	end

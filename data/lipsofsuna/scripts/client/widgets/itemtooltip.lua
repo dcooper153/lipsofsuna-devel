@@ -19,7 +19,11 @@ Widgets.Itemtooltip.new = function(clss, args)
 	end
 	-- Count.
 	if spec.stacking then
-		self:append("count: " .. tostring(count))
+		if args.count_drag then
+			self:append(string.format("count: %d/%d", args.count_drag, count))
+		else
+			self:append("count: " .. tostring(count))
+		end
 	end
 	-- Weight.
 	self:append_row("weight: " .. (spec.mass * count))

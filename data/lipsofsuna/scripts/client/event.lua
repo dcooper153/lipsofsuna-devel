@@ -11,7 +11,11 @@ Eventhandler{type = "keyrelease", func = function(self, args)
 end}
 
 Eventhandler{type = "mousepress", func = function(self, args)
-	if Gui.mode ~= "game" then
+	if args.button == 4 and Drag.drag then
+		Drag:change_count(1)
+	elseif args.button == 5 and Drag.drag then
+		Drag:change_count(-1)
+	elseif Gui.mode ~= "game" then
 		Widgets:handle_event(args)
 		Action:event(args, {})
 	else
