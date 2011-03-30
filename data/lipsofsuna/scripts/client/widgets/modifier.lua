@@ -7,6 +7,10 @@ Widgets.Modifier.setter = function(self, key, value)
 			Widget.setter(self, key, value)
 			self:reshaped()
 		end
+	elseif key == "name" then
+		Widget.setter(self, key, value)
+		self.tooltip = Widgets.Tooltip()
+		self.tooltip:append(Widgets.Label{text = value})
 	elseif key == "time" then
 		Widget.setter(self, key, value)
 		local t = math.ceil((value + 0.1) / 5) * 5
