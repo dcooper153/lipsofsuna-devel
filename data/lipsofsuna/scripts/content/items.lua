@@ -1046,7 +1046,7 @@ Itemspec{
 
 Itemspec{
 	name = "lizard boots",
-	armor_class = 0.5,
+	armor_class = 0.05,
 	categories = {"armor"},
 	crafting_materials = {["lizard scale"] = 4},
 	equipment_models = {
@@ -1072,7 +1072,7 @@ Itemspec{
 
 Itemspec{
 	name = "lizard gloves",
-	armor_class = 0.5,
+	armor_class = 0.05,
 	categories = {"armor"},
 	crafting_materials = {["lizard scale"] = 4},
 	equipment_models = {
