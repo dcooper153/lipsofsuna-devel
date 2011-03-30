@@ -7,7 +7,7 @@ Startup.init = function(clss)
 	clss.group:set_expand{col = 1, row = 1}
 	clss.group:set_expand{col = 3}
 	clss.text = Widgets.Label()
-	clss.button_retry = Widgets.Label{font = "mainmenu", text = "Retry", pressed = function() clss:execute() end}
+	clss.button_retry = Widgets.Label{font = "mainmenu", text = "Retry", pressed = function() clss:retry() end}
 	clss.button_quit = Widgets.Label{font = "mainmenu", text = "Quit", pressed = function() Program:shutdown() end}
 	clss.group2 = Widget{cols = 4, rows = 1, margins = {bottom=30}, spacings = {horz=40}}
 	clss.group2:set_child{col = 2, row = 1, widget = clss.button_retry}
@@ -29,6 +29,16 @@ end
 -- @param clss Startup class.
 Startup.enter = function(clss)
 	clss.group.floating = true
+	clss:retry()
+end
+
+--- Retries hosting or joining.
+-- @param clss Startup class.
+Startup.retry = function(clss)
+	if clss.host_wait_timer then
+		clss.host_wait_timer:disable()
+		clss.host_wait_timer = nil
+	end
 	if Settings.host then
 		-- Host a game.
 		Program:unload_world()
