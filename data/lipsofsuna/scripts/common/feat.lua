@@ -85,6 +85,22 @@ Feat.new = function(clss, args)
 	return self
 end
 
+--- Gets the icon of the feat.
+-- @param self Feat.
+-- @return Iconspec or nil.
+Feat.get_icon = function(self)
+	local icon = nil
+	for i = 1,3 do
+		local effect = self.effects[i]
+		if effect then
+			spec = Feateffectspec:find{name = effect[1]}
+			icon = spec and Iconspec:find{name = spec.icon}
+			if icon then break end
+		end
+	end
+	return icon
+end
+
 --- Gets the skill and reagent requirements of the feat.
 -- @param self Feat.
 -- @return Feat info table.

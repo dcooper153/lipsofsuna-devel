@@ -29,24 +29,16 @@ Quickslots.assign_none = function(clss, index)
 	clss.buttons[index].feat = nil
 	clss.buttons[index].item = nil
 	clss.buttons[index].icon = nil
+	clss.buttons[index].tooltip = nil
 	clss:save()
 end
 
 Quickslots.assign_feat = function(clss, index, feat)
-	local icon = nil
-	if feat then
-		for i = 1,3 do
-			local effect = feat.effects[i]
-			if effect then
-				spec = Feateffectspec:find{name = effect[1]}
-				icon = spec and Iconspec:find{name = spec.icon}
-				if icon then break end
-			end
-		end
-	end
+	local icon = feat:get_icon()
 	clss.buttons[index].feat = feat
 	clss.buttons[index].item = nil
 	clss.buttons[index].icon = icon
+	clss.buttons[index].tooltip = Widgets.Feattooltip{feat = feat}
 	clss:save()
 end
 
@@ -64,6 +56,7 @@ Quickslots.assign_item = function(clss, index, name)
 	clss.buttons[index].feat = nil
 	clss.buttons[index].item = name
 	clss.buttons[index].icon = icon
+	clss.buttons[index].tooltip = Widgets.Itemtooltip{spec = spec}
 	clss:save()
 end
 
