@@ -36,11 +36,13 @@ end
 Widgets.Modifiers.remove = function(self, name)
 	local icon = self.dict_name[name]
 	if not icon then return end
+	-- Remove from dictionaries.
 	Widget.remove(self, {col = icon.id})
-	self.dict_id[icon.id] = nil
 	self.dict_name[icon.name] = nil
+	table.remove(self.dict_id, icon.id)
+	-- Update indices of modifiers after the removed index.
 	for id = icon.id,#self.dict_id do
-		self.dict_id[id] = id
+		self.dict_id[id].id = id
 	end
 end
 
