@@ -217,6 +217,22 @@ Itemspec{
 ------------------------------------------------------------------------------
 -- Weapons.
 
+-- (materials sorted by durability)
+-- weapon \ material	W  S  Q  I  C  A
+-- ======================================
+-- mattock		+  +  +  +  +  +
+-- staff		+  -  -  -  -  -
+--
+-- dagger		+  +  +  +  +  +
+-- hatchet		+  +  +  +  +  +
+-- sword		+  +  +  +  +  +
+-- club 	        +  -  -  -  -  -
+--
+-- grenade		-  -  +  -  +  -
+--
+-- crossbow		+  -  +  +  +  +
+-- musket		-  -  +  +  +  +
+
 Itemspec{
 	name = "adamantium crossbow",
 	model = "bow1", -- FIXME
