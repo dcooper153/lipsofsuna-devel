@@ -175,7 +175,7 @@ static void Network_update (LIScrArgs* args)
  * -- @name Network.clients
  * -- @class table
  */
-static void Network_getter_clients (LIScrArgs* args)
+static void Network_get_clients (LIScrArgs* args)
 {
 	LIAlgU32dicIter iter;
 	LIExtClient* client;
@@ -197,14 +197,14 @@ static void Network_getter_clients (LIScrArgs* args)
  * -- @name Network.closed
  * -- @class table
  */
-static void Network_getter_closed (LIScrArgs* args)
+static void Network_get_closed (LIScrArgs* args)
 {
 	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NETWORK);
 	liscr_args_seti_bool (args, liext_network_get_closed (module));
 }
-static void Network_setter_closed (LIScrArgs* args)
+static void Network_set_closed (LIScrArgs* args)
 {
 	int value;
 	LIExtModule* module;
@@ -220,7 +220,7 @@ static void Network_setter_closed (LIScrArgs* args)
  * -- @name Network.connected
  * -- @class table
  */
-static void Network_getter_connected (LIScrArgs* args)
+static void Network_get_connected (LIScrArgs* args)
 {
 	LIExtModule* module;
 
@@ -240,9 +240,10 @@ liext_script_network (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "send", Network_send);
 	liscr_class_insert_cfunc (self, "shutdown", Network_shutdown);
 	liscr_class_insert_cfunc (self, "update", Network_update);
-	liscr_class_insert_cvar (self, "clients", Network_getter_clients, NULL);
-	liscr_class_insert_cvar (self, "closed", Network_getter_closed, Network_setter_closed);
-	liscr_class_insert_cvar (self, "connected", Network_getter_connected, NULL);
+	liscr_class_insert_cfunc (self, "get_clients", Network_get_clients);
+	liscr_class_insert_cfunc (self, "get_closed", Network_get_closed);
+	liscr_class_insert_cfunc (self, "set_closed", Network_set_closed);
+	liscr_class_insert_cfunc (self, "get_connected", Network_get_connected);
 }
 
 /** @} */
