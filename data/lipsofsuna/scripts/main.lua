@@ -12,6 +12,7 @@ if not Settings:parse_command_line() then
 	return
 end
 
+require "system/config-file"
 require "system/database"
 require "system/eventhandler"
 require "system/network"
@@ -55,7 +56,6 @@ Object.load_meshes = false
 Physics.enable_simulation = true
 else
 require "system/animation"
-require "system/config-file"
 require "system/graphics"
 require "system/camera"
 require "system/keysym"

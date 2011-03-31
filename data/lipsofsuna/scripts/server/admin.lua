@@ -1,5 +1,8 @@
-
 Protocol:add_handler{type = "ADMIN_DELETE", func = function(args)
+	-- Check for permissions.
+	local player = Player:find{client = args.client}
+	if not player.admin then return player:send("You have no permission to do that.") end
+	-- Delete objects.
 	args.packet:read()
 	while true do
 		local ok,id = args.packet:resume("uint32")
@@ -12,32 +15,30 @@ Protocol:add_handler{type = "ADMIN_DELETE", func = function(args)
 	end
 end}
 
-Protocol:add_handler{type = "ADMIN_DUPLICATE", func = function(args)
-	args.packet:read()
-	while true do
-		local ok,id = args.packet:resume("uint32")
-		if not ok then break end
-		local obj = Object:find{id = id}
-		if obj then
-			Object:new{position = obj.position, rotation = obj.rotation, model = obj.model,
-				static = true, realized = true}
-		end
-	end
-end}
-
 Protocol:add_handler{type = "ADMIN_SAVE", func = function(args)
+	-- Check for permissions.
+	local player = Player:find{client = args.client}
+	if not player.admin then return player:send("You have no permission to do that.") end
+	-- Save.
 	print("Saving world state...")
 	Serialize:save()
 	print("Done")
 end}
 
 Protocol:add_handler{type = "ADMIN_SHUTDOWN", func = function(args)
+	-- Check for permissions.
+	local player = Player:find{client = args.client}
+	if not player.admin then return player:send("You have no permission to do that.") end
+	-- Save and shutdown.
 	Serialize:save()
 	Program:shutdown()
 end}
 
 Protocol:add_handler{type = "ADMIN_SPAWN", func = function(args)
+	-- Check for permissions.
 	local player = Player:find{client = args.client}
+	if not player.admin then return player:send("You have no permission to do that.") end
+	-- Spawn an object.
 	local ok,typ,msg = args.packet:read("string", "string")
 	if ok then
 		if msg == "" then msg = nil end

@@ -5,7 +5,8 @@ ChatCommand.dict_id = {}
 -- @param clss Chat command class.
 -- @param args Arguments.<ul>
 --   <li>func: Handler function.</li>
---   <li>pattern: Pattern to match.</li></ul>
+--   <li>pattern: Pattern to match.</li>
+--   <li>permission: Permission level.</ul>
 -- @return New chat command.
 ChatCommand.new = function(clss, args)
 	local self = Class.new(clss, args)
@@ -14,8 +15,30 @@ ChatCommand.new = function(clss, args)
 	return self
 end
 
+-- Grant admin privileges.
+ChatCommand{pattern = "^/grant admin ([a-zA-Z0-9]*)$", permission = "admin", func = function(player, matches)
+	if not Config.inst.admins[matches] then
+		Config.inst.admins[matches] = true
+		Config.inst:save()
+		player:send("Admin privileges have been granted to " .. matches)
+	else
+		player:send("Admin privileges have already been granted to " .. matches)
+	end
+end}
+
+-- Revoke admin privileges.
+ChatCommand{pattern = "^/revoke admin ([a-zA-Z0-9]*)$", permission = "admin", func = function(player, matches)
+	if Config.inst.admins[matches] then
+		Config.inst.admins[matches] = nil
+		Config.inst:save()
+		player:send("Admin privileges have been revoked from " .. matches)
+	else
+		player:send("Admin privileges have already been revoked from " .. matches)
+	end
+end}
+
 -- Spawn item.
-ChatCommand{pattern = "^/spawn item (.*)$", func = function(player, matches)
+ChatCommand{pattern = "^/spawn item (.*)$", permission = "admin", func = function(player, matches)
 	local spec = Itemspec:find{name = matches[1]}
 	if not spec then return end
 	Item{
@@ -26,7 +49,7 @@ ChatCommand{pattern = "^/spawn item (.*)$", func = function(player, matches)
 end}
 
 -- Spawn obstacles.
-ChatCommand{pattern = "^/spawn obstacle (.*)$", func = function(player, matches)
+ChatCommand{pattern = "^/spawn obstacle (.*)$", permission = "admin", func = function(player, matches)
 	local spec = Obstaclespec:find{name = matches[1]}
 	if not spec then return end
 	Obstacle{
@@ -36,7 +59,7 @@ ChatCommand{pattern = "^/spawn obstacle (.*)$", func = function(player, matches)
 end}
 
 -- Spawn species.
-ChatCommand{pattern = "^/spawn species (.*)$", func = function(player, matches)
+ChatCommand{pattern = "^/spawn species (.*)$", permission = "admin", func = function(player, matches)
 	local spec = Species:find{name = matches[1]}
 	if not spec then return end
 	Creature{
@@ -47,12 +70,12 @@ ChatCommand{pattern = "^/spawn species (.*)$", func = function(player, matches)
 end}
 
 -- Suicide.
-ChatCommand{pattern = "^/suicide$", func = function(player, matches)
+ChatCommand{pattern = "^/suicide$", permission = "player", func = function(player, matches)
 	player:die()
 end}
 
 -- Teleportation.
-ChatCommand{pattern = "^/teleport (.*)$", func = function(player, matches)
+ChatCommand{pattern = "^/teleport (.*)$", permission = "admin", func = function(player, matches)
 	if player:teleport{marker = matches[1]} then
 		player:send{packet = Packet(packets.MESSAGE, "string", "/teleport: Teleported to " .. matches[1] .. ".")}
 	else
@@ -61,12 +84,12 @@ ChatCommand{pattern = "^/teleport (.*)$", func = function(player, matches)
 end}
 
 -- Any other command.
-ChatCommand{pattern = "^(/[^ ]*).*", func = function(player, matches)
-	player:send{packet = Packet(packets.MESSAGE, "string", "Unrecognized command.")}
+ChatCommand{pattern = "^(/[^ ]*).*", permission = "player", func = function(player, matches)
+	player:send("Unrecognized command.")
 end}
 
 -- Normal chat.
-ChatCommand{pattern = ".*", func = function(player, matches)
+ChatCommand{pattern = ".*", permission = "player", func = function(player, matches)
 	player:say(matches[1])
 end}
 
@@ -77,7 +100,12 @@ Protocol:add_handler{type = "CHAT", func = function(args)
 	if ok then
 		for k,v in ipairs(ChatCommand.dict_id) do
 			local matches = string.match(msg, v.pattern)
-			if matches then return v.func(player, {matches}) end
+			if matches then
+				if v.permission == "admin" and not player.admin then
+					return player:send("You have no permission to do that.")
+				end
+				return v.func(player, {matches})
+			end
 		end
 	end
 end}

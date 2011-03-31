@@ -122,11 +122,15 @@ end
 
 --- Saves all active player accounts.
 -- @param clss Serialize class.
--- @param erase True to erase existing database entries first.
+-- @param erase True to erase existing characters, "all" to erase all account data.
 Serialize.save_accounts = function(clss, erase)
-	if erase then
+	-- Delete accounts or characters.
+	if erase == "all" then
 		clss.accounts:query("DELETE FROM accounts;")
+	elseif erase then
+		clss.accounts:query("UPDATE accounts SET character = NULL;")
 	end
+	-- Write accounts.
 	for k,v in pairs(Player.clients) do
 		clss:save_account(v.account, v)
 	end

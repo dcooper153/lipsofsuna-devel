@@ -4,7 +4,9 @@ local oldsetter = Object.setter
 local objspec = Spec{name = "object", type = "object"}
 
 Object.getter = function(self, key)
-	if key == "count" then
+	if key == "admin" then
+		return self.account and Config.inst.admins[self.account.login]
+	elseif key == "count" then
 		return oldgetter(self, key) or 1
 	elseif key == "spec" then
 		return oldgetter(self, key) or objspec
@@ -14,7 +16,14 @@ Object.getter = function(self, key)
 end
 
 Object.setter = function(self, key, value)
-	if key == "contact_cb" then
+	if key == "admin" then
+		if value then
+			Config.inst.admins[self] = true
+		else
+			Config.inst.admins[self] = nil
+		end
+		Config.inst:save()
+	elseif key == "contact_cb" then
 		oldsetter(self, key, value)
 		self.contact_events = (type(value) == "function")
 	elseif key == "count" then
@@ -283,7 +292,7 @@ end
 Object.get_tile_range = function(self)
 	-- TODO: Should depend on species.
 	local size = Vector(1,self.spec.type == "creature" and 2 or 1,1)
-	local src = self.position * Config.tilescale
+	local src = self.position * Voxel.tile_scale
 	src.x = math.floor(src.x)
 	src.y = math.floor(src.y + 0.3)
 	src.z = math.floor(src.z)
@@ -345,11 +354,16 @@ end
 --- Sends a packet to the client controlling the object.
 -- @param self Object.
 -- @param args Arguments.<ul>
---   <li>packet: Packet. (required)</li>
+--   <li>packet: Packet.</li>
 --   <li>reliable: False for unreliable.</li></ul>
 Object.send = function(self, args)
 	if self.client then
-		Network:send{client = self.client, packet = args.packet, reliable = args.reliable}
+		if type(args) == "string" then
+			local packet = Packet(packets.MESSAGE, "string", args)
+			Network:send{client = self.client, packet = packet, reliable = true}
+		else
+			Network:send{client = self.client, packet = args.packet, reliable = args.reliable}
+		end
 	end
 end
 

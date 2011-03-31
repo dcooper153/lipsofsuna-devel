@@ -42,16 +42,6 @@ Aabb.intersects_point = function(self, point)
 	return true
 end
 
-Config = {}
-Config.tilewidth = 32 / Voxel.tiles_per_line
-Config.tilescale = 1 / Config.tilewidth
-Config.gravity = Vector(0, -20, 0)
-Config.skillregen = 0.5
-
-local reg = Regionspec:find{name = "Lips"}
-Config.center = Vector(reg.position[1], reg.depth[1], reg.position[2]) * Config.tilewidth
-Config.spawn = Config.center + Vector(17, 7, 17)
-
 Skills.get_total = function(self)
 	local n = self:get_names()
 	local t = 0
