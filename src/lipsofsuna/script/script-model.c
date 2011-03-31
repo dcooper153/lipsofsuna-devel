@@ -168,19 +168,6 @@ static void Model_merge (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Unique ID of the model.
- * -- @name Model.id
- * -- @class table
- */
-static void Model_getter_id (LIScrArgs* args)
-{
-	LIEngModel* self;
-
-	self = args->self;
-	liscr_args_seti_int (args, self->id);
-}
-
 /*****************************************************************************/
 
 void liscr_script_model (
@@ -195,7 +182,6 @@ void liscr_script_model (
 	liscr_class_insert_mfunc (self, "load", Model_load);
 	liscr_class_insert_mfunc (self, "merge", Model_merge);
 	liscr_class_insert_cfunc (self, "new", Model_new);
-	liscr_class_insert_mvar (self, "id", Model_getter_id, NULL);
 }
 
 /** @} */
