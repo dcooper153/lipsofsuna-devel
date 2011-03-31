@@ -70,7 +70,7 @@ static void Light_new (LIScrArgs* args)
  * -- @name Light.ambient
  * -- @class table
  */
-static void Light_getter_ambient (LIScrArgs* args)
+static void Light_get_ambient (LIScrArgs* args)
 {
 	LIRenLight* light;
 
@@ -81,7 +81,7 @@ static void Light_getter_ambient (LIScrArgs* args)
 	liscr_args_seti_float (args, light->ambient[2]);
 	liscr_args_seti_float (args, light->ambient[3]);
 }
-static void Light_setter_ambient (LIScrArgs* args)
+static void Light_set_ambient (LIScrArgs* args)
 {
 	int i;
 	float value[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -98,7 +98,7 @@ static void Light_setter_ambient (LIScrArgs* args)
  * -- @name Light.diffuse
  * -- @class table
  */
-static void Light_getter_diffuse (LIScrArgs* args)
+static void Light_get_diffuse (LIScrArgs* args)
 {
 	LIRenLight* light;
 
@@ -109,7 +109,7 @@ static void Light_getter_diffuse (LIScrArgs* args)
 	liscr_args_seti_float (args, light->diffuse[2]);
 	liscr_args_seti_float (args, light->diffuse[3]);
 }
-static void Light_setter_diffuse (LIScrArgs* args)
+static void Light_set_diffuse (LIScrArgs* args)
 {
 	int i;
 	float value[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -127,11 +127,11 @@ static void Light_setter_diffuse (LIScrArgs* args)
  * -- @name Light.enabled
  * -- @class table
  */
-static void Light_getter_enabled (LIScrArgs* args)
+static void Light_get_enabled (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liren_light_get_enabled (args->self));
 }
-static void Light_setter_enabled (LIScrArgs* args)
+static void Light_set_enabled (LIScrArgs* args)
 {
 	int value;
 	LIRenLight* light;
@@ -151,7 +151,7 @@ static void Light_setter_enabled (LIScrArgs* args)
  * -- @name Light.equation
  * -- @class table
  */
-static void Light_getter_equation (LIScrArgs* args)
+static void Light_get_equation (LIScrArgs* args)
 {
 	LIRenLight* light;
 
@@ -161,7 +161,7 @@ static void Light_getter_equation (LIScrArgs* args)
 	liscr_args_seti_float (args, light->equation[1]);
 	liscr_args_seti_float (args, light->equation[2]);
 }
-static void Light_setter_equation (LIScrArgs* args)
+static void Light_set_equation (LIScrArgs* args)
 {
 	int i;
 	float value[3] = { 1.0f, 0.0f, 0.0f };
@@ -178,14 +178,14 @@ static void Light_setter_equation (LIScrArgs* args)
  * -- @name Light.position
  * -- @class table
  */
-static void Light_getter_position (LIScrArgs* args)
+static void Light_get_position (LIScrArgs* args)
 {
 	LIMatTransform transform;
 
 	liren_light_get_transform (args->self, &transform);
 	liscr_args_seti_vector (args, &transform.position);
 }
-static void Light_setter_position (LIScrArgs* args)
+static void Light_set_position (LIScrArgs* args)
 {
 	LIMatTransform transform;
 	LIMatVector vector;
@@ -203,11 +203,11 @@ static void Light_setter_position (LIScrArgs* args)
  * -- @name Light.priority
  * -- @class table
  */
-static void Light_getter_priority (LIScrArgs* args)
+static void Light_get_priority (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, liren_light_get_priority (args->self));
 }
-static void Light_setter_priority (LIScrArgs* args)
+static void Light_set_priority (LIScrArgs* args)
 {
 	float value;
 
@@ -221,14 +221,14 @@ static void Light_setter_priority (LIScrArgs* args)
  * -- @name Light.rotation
  * -- @class table
  */
-static void Light_getter_rotation (LIScrArgs* args)
+static void Light_get_rotation (LIScrArgs* args)
 {
 	LIMatTransform transform;
 
 	liren_light_get_transform (args->self, &transform);
 	liscr_args_seti_quaternion (args, &transform.rotation);
 }
-static void Light_setter_rotation (LIScrArgs* args)
+static void Light_set_rotation (LIScrArgs* args)
 {
 	LIMatTransform transform;
 	LIMatQuaternion value;
@@ -246,11 +246,11 @@ static void Light_setter_rotation (LIScrArgs* args)
  * -- @name Light.shadow_casting
  * -- @class table
  */
-static void Light_getter_shadow_casting (LIScrArgs* args)
+static void Light_get_shadow_casting (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liren_light_get_shadow (args->self));
 }
-static void Light_setter_shadow_casting (LIScrArgs* args)
+static void Light_set_shadow_casting (LIScrArgs* args)
 {
 	int value;
 
@@ -263,13 +263,13 @@ static void Light_setter_shadow_casting (LIScrArgs* args)
  * -- @name Light.shadow_far
  * -- @class table
  */
-static void Light_getter_shadow_far (LIScrArgs* args)
+static void Light_get_shadow_far (LIScrArgs* args)
 {
 	LIRenLight* self = args->self;
 
 	liscr_args_seti_float (args, self->shadow_far);
 }
-static void Light_setter_shadow_far (LIScrArgs* args)
+static void Light_set_shadow_far (LIScrArgs* args)
 {
 	float value;
 	LIRenLight* self = args->self;
@@ -286,13 +286,13 @@ static void Light_setter_shadow_far (LIScrArgs* args)
  * -- @name Light.shadow_near
  * -- @class table
  */
-static void Light_getter_shadow_near (LIScrArgs* args)
+static void Light_get_shadow_near (LIScrArgs* args)
 {
 	LIRenLight* self = args->self;
 
 	liscr_args_seti_float (args, self->shadow_near);
 }
-static void Light_setter_shadow_near (LIScrArgs* args)
+static void Light_set_shadow_near (LIScrArgs* args)
 {
 	float value;
 	LIRenLight* self = args->self;
@@ -309,7 +309,7 @@ static void Light_setter_shadow_near (LIScrArgs* args)
  * -- @name Light.specular
  * -- @class table
  */
-static void Light_getter_specular (LIScrArgs* args)
+static void Light_get_specular (LIScrArgs* args)
 {
 	LIRenLight* light;
 
@@ -320,7 +320,7 @@ static void Light_getter_specular (LIScrArgs* args)
 	liscr_args_seti_float (args, light->specular[2]);
 	liscr_args_seti_float (args, light->specular[3]);
 }
-static void Light_setter_specular (LIScrArgs* args)
+static void Light_set_specular (LIScrArgs* args)
 {
 	int i;
 	float value[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -337,13 +337,13 @@ static void Light_setter_specular (LIScrArgs* args)
  * -- @name Light.spot_cutoff
  * -- @class table
  */
-static void Light_getter_spot_cutoff (LIScrArgs* args)
+static void Light_get_spot_cutoff (LIScrArgs* args)
 {
 	LIRenLight* self = args->self;
 
 	liscr_args_seti_float (args, self->cutoff);
 }
-static void Light_setter_spot_cutoff (LIScrArgs* args)
+static void Light_set_spot_cutoff (LIScrArgs* args)
 {
 	float value;
 	LIRenLight* self = args->self;
@@ -360,13 +360,13 @@ static void Light_setter_spot_cutoff (LIScrArgs* args)
  * -- @name Light.spot_cutoff
  * -- @class table
  */
-static void Light_getter_spot_exponent (LIScrArgs* args)
+static void Light_get_spot_exponent (LIScrArgs* args)
 {
 	LIRenLight* self = args->self;
 
 	liscr_args_seti_float (args, self->exponent);
 }
-static void Light_setter_spot_exponent (LIScrArgs* args)
+static void Light_set_spot_exponent (LIScrArgs* args)
 {
 	float value;
 	LIRenLight* self = args->self;
@@ -384,19 +384,32 @@ void liext_script_light (
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_LIGHT, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Light_new);
-	liscr_class_insert_mvar (self, "ambient", Light_getter_ambient, Light_setter_ambient);
-	liscr_class_insert_mvar (self, "diffuse", Light_getter_diffuse, Light_setter_diffuse);
-	liscr_class_insert_mvar (self, "enabled", Light_getter_enabled, Light_setter_enabled);
-	liscr_class_insert_mvar (self, "equation", Light_getter_equation, Light_setter_equation);
-	liscr_class_insert_mvar (self, "position", Light_getter_position, Light_setter_position);
-	liscr_class_insert_mvar (self, "priority", Light_getter_priority, Light_setter_priority);
-	liscr_class_insert_mvar (self, "rotation", Light_getter_rotation, Light_setter_rotation);
-	liscr_class_insert_mvar (self, "shadow_casting", Light_getter_shadow_casting, Light_setter_shadow_casting);
-	liscr_class_insert_mvar (self, "shadow_far", Light_getter_shadow_far, Light_setter_shadow_far);
-	liscr_class_insert_mvar (self, "shadow_near", Light_getter_shadow_near, Light_setter_shadow_near);
-	liscr_class_insert_mvar (self, "specular", Light_getter_specular, Light_setter_specular);
-	liscr_class_insert_mvar (self, "spot_cutoff", Light_getter_spot_cutoff, Light_setter_spot_cutoff);
-	liscr_class_insert_mvar (self, "spot_exponent", Light_getter_spot_exponent, Light_setter_spot_exponent);
+	liscr_class_insert_mfunc (self, "get_ambient", Light_get_ambient);
+	liscr_class_insert_mfunc (self, "get_diffuse", Light_get_diffuse);
+	liscr_class_insert_mfunc (self, "get_enabled", Light_get_enabled);
+	liscr_class_insert_mfunc (self, "get_equation", Light_get_equation);
+	liscr_class_insert_mfunc (self, "get_position", Light_get_position);
+	liscr_class_insert_mfunc (self, "get_priority", Light_get_priority);
+	liscr_class_insert_mfunc (self, "get_rotation", Light_get_rotation);
+	liscr_class_insert_mfunc (self, "get_shadow_casting", Light_get_shadow_casting);
+	liscr_class_insert_mfunc (self, "get_shadow_far", Light_get_shadow_far);
+	liscr_class_insert_mfunc (self, "get_shadow_near", Light_get_shadow_near);
+	liscr_class_insert_mfunc (self, "get_specular", Light_get_specular);
+	liscr_class_insert_mfunc (self, "get_spot_cutoff", Light_get_spot_cutoff);
+	liscr_class_insert_mfunc (self, "get_spot_exponent", Light_get_spot_exponent);
+	liscr_class_insert_mfunc (self, "set_ambient", Light_set_ambient);
+	liscr_class_insert_mfunc (self, "set_diffuse", Light_set_diffuse);
+	liscr_class_insert_mfunc (self, "set_enabled", Light_set_enabled);
+	liscr_class_insert_mfunc (self, "set_equation", Light_set_equation);
+	liscr_class_insert_mfunc (self, "set_position", Light_set_position);
+	liscr_class_insert_mfunc (self, "set_priority", Light_set_priority);
+	liscr_class_insert_mfunc (self, "set_rotation", Light_set_rotation);
+	liscr_class_insert_mfunc (self, "set_shadow_casting", Light_set_shadow_casting);
+	liscr_class_insert_mfunc (self, "set_shadow_far", Light_set_shadow_far);
+	liscr_class_insert_mfunc (self, "set_shadow_near", Light_set_shadow_near);
+	liscr_class_insert_mfunc (self, "set_specular", Light_set_specular);
+	liscr_class_insert_mfunc (self, "set_spot_cutoff", Light_set_spot_cutoff);
+	liscr_class_insert_mfunc (self, "set_spot_exponent", Light_set_spot_exponent);
 }
 
 /** @} */
