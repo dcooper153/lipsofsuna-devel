@@ -5,14 +5,8 @@ string.split = function(self, sep)
 	return fields
 end
 
--- Handle command line arguments.
-require "common/settings"
-if not Settings:parse_command_line() then
-	print(Settings:usage())
-	return
-end
-
 require "system/config-file"
+require "system/core"
 require "system/database"
 require "system/eventhandler"
 require "system/network"
@@ -25,6 +19,14 @@ require "system/tiles"
 require "system/tiles-physics"
 require "system/tiles-physics"
 require "system/timer"
+
+-- Handle command line arguments.
+require "common/settings"
+if not Settings:parse_command_line() then
+	print(Settings:usage())
+	return
+end
+
 Voxel.blocks_per_line = 4
 Voxel.tiles_per_line = 24
 require "common/bitwise"

@@ -28,10 +28,19 @@
 #include "script-private.h"
 #include "script-util.h"
 
+#define ALL_USERDATA_IS_OURS
+
 LIScrClass* liscr_isanyclass (
 	lua_State*  lua,
 	int         arg)
 {
+#ifdef ALL_USERDATA_IS_OURS
+	LIScrClass* ptr;
+	ptr = lua_touserdata (lua, arg);
+	if (ptr == NULL || ptr->signature != 'C')
+		return NULL;
+	return ptr;
+#else
 	int ret;
 	void* ptr;
 
@@ -54,12 +63,20 @@ LIScrClass* liscr_isanyclass (
 		return NULL;
 
 	return ptr;
+#endif
 }
 
 LIScrData* liscr_isanydata (
 	lua_State* lua,
 	int        arg)
 {
+#ifdef ALL_USERDATA_IS_OURS
+	LIScrData* ptr;
+	ptr = lua_touserdata (lua, arg);
+	if (ptr == NULL || ptr->signature != 'D')
+		return NULL;
+	return ptr;
+#else
 	int ret;
 	void* ptr;
 
@@ -82,6 +99,7 @@ LIScrData* liscr_isanydata (
 		return NULL;
 
 	return ptr;
+#endif
 }
 
 /**

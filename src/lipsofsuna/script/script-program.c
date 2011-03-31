@@ -196,7 +196,7 @@ static void Program_update (LIScrArgs* args)
  * -- @name Program.args
  * -- @class table
  */
-static void Program_getter_args (LIScrArgs* args)
+static void Program_get_args (LIScrArgs* args)
 {
 	LIMaiProgram* program;
 
@@ -209,14 +209,14 @@ static void Program_getter_args (LIScrArgs* args)
  * -- @name Program.quit
  * -- @class table
  */
-static void Program_getter_quit (LIScrArgs* args)
+static void Program_get_quit (LIScrArgs* args)
 {
 	LIMaiProgram* program;
 
 	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PROGRAM);
 	liscr_args_seti_bool (args, program->quit);
 }
-static void Program_setter_quit (LIScrArgs* args)
+static void Program_set_quit (LIScrArgs* args)
 {
 	int value;
 	LIMaiProgram* program;
@@ -231,7 +231,7 @@ static void Program_setter_quit (LIScrArgs* args)
  * -- @name Program.sectors
  * -- @class table
  */
-static void Program_getter_sectors (LIScrArgs* args)
+static void Program_get_sectors (LIScrArgs* args)
 {
 	int idle;
 	LIAlgSector* sector;
@@ -253,14 +253,14 @@ static void Program_getter_sectors (LIScrArgs* args)
  * -- @name Program.quit
  * -- @class table
  */
-static void Program_getter_sleep (LIScrArgs* args)
+static void Program_get_sleep (LIScrArgs* args)
 {
 	LIMaiProgram* program;
 
 	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PROGRAM);
 	liscr_args_seti_float (args, program->sleep / 1000000.0f);
 }
-static void Program_setter_sleep (LIScrArgs* args)
+static void Program_set_sleep (LIScrArgs* args)
 {
 	float value;
 	LIMaiProgram* program;
@@ -275,7 +275,7 @@ static void Program_setter_sleep (LIScrArgs* args)
  * -- @name Program.tick
  * -- @class table
  */
-static void Program_getter_tick (LIScrArgs* args)
+static void Program_get_tick (LIScrArgs* args)
 {
 	LIMaiProgram* program;
 
@@ -288,7 +288,7 @@ static void Program_getter_tick (LIScrArgs* args)
  * -- @name Program.time
  * -- @class table
  */
-static void Program_getter_time (LIScrArgs* args)
+static void Program_get_time (LIScrArgs* args)
 {
 	LIMaiProgram* program;
 
@@ -298,9 +298,9 @@ static void Program_getter_time (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void
-liscr_script_program (LIScrClass* self,
-                      void*       data)
+void liscr_script_program (
+	LIScrClass* self,
+	void*       data)
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_PROGRAM, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
@@ -312,12 +312,14 @@ liscr_script_program (LIScrClass* self,
 	liscr_class_insert_cfunc (self, "unload_world", Program_unload_world);
 	liscr_class_insert_cfunc (self, "shutdown", Program_shutdown);
 	liscr_class_insert_cfunc (self, "update", Program_update);
-	liscr_class_insert_cvar (self, "args", Program_getter_args, NULL);
-	liscr_class_insert_cvar (self, "quit", Program_getter_quit, Program_setter_quit);
-	liscr_class_insert_cvar (self, "sectors", Program_getter_sectors, NULL);
-	liscr_class_insert_cvar (self, "sleep", Program_getter_sleep, Program_setter_sleep);
-	liscr_class_insert_cvar (self, "tick", Program_getter_tick, NULL);
-	liscr_class_insert_cvar (self, "time", Program_getter_time, NULL);
+	liscr_class_insert_cfunc (self, "get_args", Program_get_args);
+	liscr_class_insert_cfunc (self, "get_quit", Program_get_quit);
+	liscr_class_insert_cfunc (self, "set_quit", Program_set_quit);
+	liscr_class_insert_cfunc (self, "get_sectors", Program_get_sectors);
+	liscr_class_insert_cfunc (self, "get_sleep", Program_get_sleep);
+	liscr_class_insert_cfunc (self, "set_sleep", Program_set_sleep);
+	liscr_class_insert_cfunc (self, "get_tick", Program_get_tick);
+	liscr_class_insert_cfunc (self, "get_time", Program_get_time);
 }
 
 /** @} */
