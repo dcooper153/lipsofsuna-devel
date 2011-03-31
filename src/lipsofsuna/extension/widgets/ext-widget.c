@@ -634,11 +634,11 @@ static void Widget_set_request (LIScrArgs* args)
  * -- @name Widget.behind
  * -- @class table
  */
-static void Widget_getter_behind (LIScrArgs* args)
+static void Widget_get_behind (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_widget_get_behind (args->self));
 }
-static void Widget_setter_behind (LIScrArgs* args)
+static void Widget_set_behind (LIScrArgs* args)
 {
 	int value;
 
@@ -651,7 +651,7 @@ static void Widget_setter_behind (LIScrArgs* args)
  * -- @name Widget.cols
  * -- @class table
  */
-static void Widget_getter_cols (LIScrArgs* args)
+static void Widget_get_cols (LIScrArgs* args)
 {
 	int w;
 	int h;
@@ -659,7 +659,7 @@ static void Widget_getter_cols (LIScrArgs* args)
 	liwdg_widget_get_size (args->self, &w, &h);
 	liscr_args_seti_int (args, w);
 }
-static void Widget_setter_cols (LIScrArgs* args)
+static void Widget_set_cols (LIScrArgs* args)
 {
 	int w;
 	int h;
@@ -675,11 +675,11 @@ static void Widget_setter_cols (LIScrArgs* args)
  * -- @name Widget.floating
  * -- @class table
  */
-static void Widget_getter_floating (LIScrArgs* args)
+static void Widget_get_floating (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_widget_get_floating (args->self));
 }
-static void Widget_setter_floating (LIScrArgs* args)
+static void Widget_set_floating (LIScrArgs* args)
 {
 	int value;
 
@@ -692,11 +692,11 @@ static void Widget_setter_floating (LIScrArgs* args)
  * -- @name Widget.fullscreen
  * -- @class table
  */
-static void Widget_getter_fullscreen (LIScrArgs* args)
+static void Widget_get_fullscreen (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_widget_get_fullscreen (args->self));
 }
-static void Widget_setter_fullscreen (LIScrArgs* args)
+static void Widget_set_fullscreen (LIScrArgs* args)
 {
 	int value;
 
@@ -709,7 +709,7 @@ static void Widget_setter_fullscreen (LIScrArgs* args)
  * -- @name Widget.height
  * -- @class table
  */
-static void Widget_getter_height (LIScrArgs* args)
+static void Widget_get_height (LIScrArgs* args)
 {
 	LIWdgRect rect;
 
@@ -722,7 +722,7 @@ static void Widget_getter_height (LIScrArgs* args)
  * -- @name Widget.margins
  * -- @class table
  */
-static void Widget_getter_margins (LIScrArgs* args)
+static void Widget_get_margins (LIScrArgs* args)
 {
 	int v[4];
 
@@ -733,7 +733,7 @@ static void Widget_getter_margins (LIScrArgs* args)
 	liscr_args_sets_float (args, "top", v[2]);
 	liscr_args_sets_float (args, "bottom", v[3]);
 }
-static void Widget_setter_margins (LIScrArgs* args)
+static void Widget_set_margins (LIScrArgs* args)
 {
 	int v[4];
 
@@ -754,7 +754,7 @@ static void Widget_setter_margins (LIScrArgs* args)
  * -- @name Widget.parent
  * -- @class table
  */
-static void Widget_getter_parent (LIScrArgs* args)
+static void Widget_get_parent (LIScrArgs* args)
 {
 	LIWdgWidget* self = args->self;
 
@@ -767,7 +767,7 @@ static void Widget_getter_parent (LIScrArgs* args)
  * -- @name Widget.rows
  * -- @class table
  */
-static void Widget_getter_rows (LIScrArgs* args)
+static void Widget_get_rows (LIScrArgs* args)
 {
 	int w;
 	int h;
@@ -775,7 +775,7 @@ static void Widget_getter_rows (LIScrArgs* args)
 	liwdg_widget_get_size (args->self, &w, &h);
 	liscr_args_seti_int (args, h);
 }
-static void Widget_setter_rows (LIScrArgs* args)
+static void Widget_set_rows (LIScrArgs* args)
 {
 	int w;
 	int h;
@@ -791,7 +791,7 @@ static void Widget_setter_rows (LIScrArgs* args)
  * -- @name Widget.margins
  * -- @class table
  */
-static void Widget_getter_spacings (LIScrArgs* args)
+static void Widget_get_spacings (LIScrArgs* args)
 {
 	int v[2];
 
@@ -800,7 +800,7 @@ static void Widget_getter_spacings (LIScrArgs* args)
 	liscr_args_sets_int (args, "horz", v[0]);
 	liscr_args_sets_int (args, "vert", v[1]);
 }
-static void Widget_setter_spacings (LIScrArgs* args)
+static void Widget_set_spacings (LIScrArgs* args)
 {
 	int v[4];
 
@@ -817,11 +817,11 @@ static void Widget_setter_spacings (LIScrArgs* args)
  * -- @name Widget.visible
  * -- @class table
  */
-static void Widget_getter_visible (LIScrArgs* args)
+static void Widget_get_visible (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_widget_get_visible (args->self));
 }
-static void Widget_setter_visible (LIScrArgs* args)
+static void Widget_set_visible (LIScrArgs* args)
 {
 	int value;
 
@@ -834,7 +834,7 @@ static void Widget_setter_visible (LIScrArgs* args)
  * -- @name Widget.width
  * -- @class table
  */
-static void Widget_getter_width (LIScrArgs* args)
+static void Widget_get_width (LIScrArgs* args)
 {
 	LIWdgRect rect;
 
@@ -847,14 +847,14 @@ static void Widget_getter_width (LIScrArgs* args)
  * -- @name Widget.x
  * -- @class table
  */
-static void Widget_getter_x (LIScrArgs* args)
+static void Widget_get_x (LIScrArgs* args)
 {
 	LIWdgRect rect;
 
 	liwdg_widget_get_allocation (args->self, &rect);
 	liscr_args_seti_float (args, rect.x);
 }
-static void Widget_setter_x (LIScrArgs* args)
+static void Widget_set_x (LIScrArgs* args)
 {
 	LIWdgRect rect;
 
@@ -868,14 +868,14 @@ static void Widget_setter_x (LIScrArgs* args)
  * -- @name Widget.y
  * -- @class table
  */
-static void Widget_getter_y (LIScrArgs* args)
+static void Widget_get_y (LIScrArgs* args)
 {
 	LIWdgRect rect;
 
 	liwdg_widget_get_allocation (args->self, &rect);
 	liscr_args_seti_float (args, rect.y);
 }
-static void Widget_setter_y (LIScrArgs* args)
+static void Widget_set_y (LIScrArgs* args)
 {
 	LIWdgRect rect;
 
@@ -908,19 +908,29 @@ void liext_script_widget (
 	liscr_class_insert_mfunc (self, "set_child", Widget_set_child);
 	liscr_class_insert_mfunc (self, "set_expand", Widget_set_expand);
 	liscr_class_insert_mfunc (self, "set_request", Widget_set_request);
-	liscr_class_insert_mvar (self, "behind", Widget_getter_behind, Widget_setter_behind);
-	liscr_class_insert_mvar (self, "cols", Widget_getter_cols, Widget_setter_cols);
-	liscr_class_insert_mvar (self, "floating", Widget_getter_floating, Widget_setter_floating);
-	liscr_class_insert_mvar (self, "fullscreen", Widget_getter_fullscreen, Widget_setter_fullscreen);
-	liscr_class_insert_mvar (self, "height", Widget_getter_height, NULL);
-	liscr_class_insert_mvar (self, "margins", Widget_getter_margins, Widget_setter_margins);
-	liscr_class_insert_mvar (self, "parent", Widget_getter_parent, NULL);
-	liscr_class_insert_mvar (self, "rows", Widget_getter_rows, Widget_setter_rows);
-	liscr_class_insert_mvar (self, "spacings", Widget_getter_spacings, Widget_setter_spacings);
-	liscr_class_insert_mvar (self, "visible", Widget_getter_visible, Widget_setter_visible);
-	liscr_class_insert_mvar (self, "width", Widget_getter_width, NULL);
-	liscr_class_insert_mvar (self, "x", Widget_getter_x, Widget_setter_x);
-	liscr_class_insert_mvar (self, "y", Widget_getter_y, Widget_setter_y);
+	liscr_class_insert_mfunc (self, "get_behind", Widget_get_behind);
+	liscr_class_insert_mfunc (self, "set_behind", Widget_set_behind);
+	liscr_class_insert_mfunc (self, "get_cols", Widget_get_cols);
+	liscr_class_insert_mfunc (self, "set_cols", Widget_set_cols);
+	liscr_class_insert_mfunc (self, "get_floating", Widget_get_floating);
+	liscr_class_insert_mfunc (self, "set_floating", Widget_set_floating);
+	liscr_class_insert_mfunc (self, "get_fullscreen", Widget_get_fullscreen);
+	liscr_class_insert_mfunc (self, "set_fullscreen", Widget_set_fullscreen);
+	liscr_class_insert_mfunc (self, "get_height", Widget_get_height);
+	liscr_class_insert_mfunc (self, "get_margins", Widget_get_margins);
+	liscr_class_insert_mfunc (self, "set_margins", Widget_set_margins);
+	liscr_class_insert_mfunc (self, "get_parent", Widget_get_parent);
+	liscr_class_insert_mfunc (self, "get_rows", Widget_get_rows);
+	liscr_class_insert_mfunc (self, "set_rows", Widget_set_rows);
+	liscr_class_insert_mfunc (self, "get_spacings", Widget_get_spacings);
+	liscr_class_insert_mfunc (self, "set_spacings", Widget_set_spacings);
+	liscr_class_insert_mfunc (self, "get_visible", Widget_get_visible);
+	liscr_class_insert_mfunc (self, "set_visible", Widget_set_visible);
+	liscr_class_insert_mfunc (self, "get_width", Widget_get_width);
+	liscr_class_insert_mfunc (self, "get_x", Widget_get_x);
+	liscr_class_insert_mfunc (self, "set_x", Widget_set_x);
+	liscr_class_insert_mfunc (self, "get_y", Widget_get_y);
+	liscr_class_insert_mfunc (self, "set_y", Widget_set_y);
 }
 
 /** @} */
