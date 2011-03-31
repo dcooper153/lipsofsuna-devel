@@ -274,14 +274,14 @@ static void Camera_zoom (LIScrArgs* args)
  * -- @name Camera.collision_group
  * -- @class table
  */
-static void Camera_getter_collision_group (LIScrArgs* args)
+static void Camera_get_collision_group (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
 
 	camera = args->self;
 	liscr_args_seti_int (args, camera->config.collision_group);
 }
-static void Camera_setter_collision_group (LIScrArgs* args)
+static void Camera_set_collision_group (LIScrArgs* args)
 {
 	int value;
 	LIAlgCamera* camera;
@@ -296,14 +296,14 @@ static void Camera_setter_collision_group (LIScrArgs* args)
  * -- @name Camera.collision_mask
  * -- @class table
  */
-static void Camera_getter_collision_mask (LIScrArgs* args)
+static void Camera_get_collision_mask (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
 
 	camera = args->self;
 	liscr_args_seti_int (args, camera->config.collision_mask);
 }
-static void Camera_setter_collision_mask (LIScrArgs* args)
+static void Camera_set_collision_mask (LIScrArgs* args)
 {
 	int value;
 	LIAlgCamera* camera;
@@ -318,7 +318,7 @@ static void Camera_setter_collision_mask (LIScrArgs* args)
  * -- @name Camera.far
  * -- @class table
  */
-static void Camera_setter_far (LIScrArgs* args)
+static void Camera_set_far (LIScrArgs* args)
 {
 	float value;
 	LIAlgCamera* camera;
@@ -335,11 +335,11 @@ static void Camera_setter_far (LIScrArgs* args)
  * -- @name Camera.fov
  * -- @class table
  */
-static void Camera_getter_fov (LIScrArgs* args)
+static void Camera_get_fov (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, lialg_camera_get_fov (args->self));
 }
-static void Camera_setter_fov (LIScrArgs* args)
+static void Camera_set_fov (LIScrArgs* args)
 {
 	float fov = M_PI / 5.0f;
 
@@ -355,7 +355,7 @@ static void Camera_setter_fov (LIScrArgs* args)
  * -- @name Camera.mode
  * -- @class table
  */
-static void Camera_getter_mode (LIScrArgs* args)
+static void Camera_get_mode (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
 
@@ -373,7 +373,7 @@ static void Camera_getter_mode (LIScrArgs* args)
 			break;
 	}
 }
-static void Camera_setter_mode (LIScrArgs* args)
+static void Camera_set_mode (LIScrArgs* args)
 {
 	const char* value;
 	LIAlgCamera* camera;
@@ -395,7 +395,7 @@ static void Camera_setter_mode (LIScrArgs* args)
  * -- @name Camera.modelview
  * -- @class table
  */
-static void Camera_getter_modelview (LIScrArgs* args)
+static void Camera_get_modelview (LIScrArgs* args)
 {
 	int i;
 	LIAlgCamera* camera;
@@ -413,7 +413,7 @@ static void Camera_getter_modelview (LIScrArgs* args)
  * -- @name Camera.far
  * -- @class table
  */
-static void Camera_setter_near (LIScrArgs* args)
+static void Camera_set_near (LIScrArgs* args)
 {
 	float value;
 	LIAlgCamera* camera;
@@ -430,7 +430,7 @@ static void Camera_setter_near (LIScrArgs* args)
  * -- @name Camera.position
  * -- @class table
  */
-static void Camera_getter_position (LIScrArgs* args)
+static void Camera_get_position (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
 	LIMatTransform transform;
@@ -445,7 +445,7 @@ static void Camera_getter_position (LIScrArgs* args)
  * -- @name Camera.position_smoothing
  * -- @class table
  */
-static void Camera_getter_position_smoothing (LIScrArgs* args)
+static void Camera_get_position_smoothing (LIScrArgs* args)
 {
 	float pos;
 	float rot;
@@ -453,7 +453,7 @@ static void Camera_getter_position_smoothing (LIScrArgs* args)
 	lialg_camera_get_smoothing (args->self, &pos, &rot);
 	liscr_args_seti_float (args, pos);
 }
-static void Camera_setter_position_smoothing (LIScrArgs* args)
+static void Camera_set_position_smoothing (LIScrArgs* args)
 {
 	float pos;
 	float rot;
@@ -468,7 +468,7 @@ static void Camera_setter_position_smoothing (LIScrArgs* args)
  * -- @name Camera.projection
  * -- @class table
  */
-static void Camera_getter_projection (LIScrArgs* args)
+static void Camera_get_projection (LIScrArgs* args)
 {
 	int i;
 	LIAlgCamera* camera;
@@ -486,7 +486,7 @@ static void Camera_getter_projection (LIScrArgs* args)
  * -- @name Camera.rotation
  * -- @class table
  */
-static void Camera_getter_rotation (LIScrArgs* args)
+static void Camera_get_rotation (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
 	LIMatTransform transform;
@@ -501,7 +501,7 @@ static void Camera_getter_rotation (LIScrArgs* args)
  * -- @name Camera.rotation_smoothing
  * -- @class table
  */
-static void Camera_getter_rotation_smoothing (LIScrArgs* args)
+static void Camera_get_rotation_smoothing (LIScrArgs* args)
 {
 	float pos;
 	float rot;
@@ -509,7 +509,7 @@ static void Camera_getter_rotation_smoothing (LIScrArgs* args)
 	lialg_camera_get_smoothing (args->self, &pos, &rot);
 	liscr_args_seti_float (args, rot);
 }
-static void Camera_setter_rotation_smoothing (LIScrArgs* args)
+static void Camera_set_rotation_smoothing (LIScrArgs* args)
 {
 	float pos;
 	float rot;
@@ -524,7 +524,7 @@ static void Camera_setter_rotation_smoothing (LIScrArgs* args)
  * -- @name Camera.center
  * -- @class table
  */
-static void Camera_setter_target_position (LIScrArgs* args)
+static void Camera_set_target_position (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
 	LIMatTransform transform;
@@ -535,7 +535,7 @@ static void Camera_setter_target_position (LIScrArgs* args)
 	liscr_args_geti_vector (args, 0, &transform.position);
 	lialg_camera_set_center (camera, &transform);
 }
-static void Camera_getter_target_position (LIScrArgs* args)
+static void Camera_get_target_position (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
 	LIMatTransform transform;
@@ -550,7 +550,7 @@ static void Camera_getter_target_position (LIScrArgs* args)
  * -- @name Camera.center
  * -- @class table
  */
-static void Camera_setter_target_rotation (LIScrArgs* args)
+static void Camera_set_target_rotation (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
 	LIMatTransform transform;
@@ -561,7 +561,7 @@ static void Camera_setter_target_rotation (LIScrArgs* args)
 	liscr_args_geti_quaternion (args, 0, &transform.rotation);
 	lialg_camera_set_center (camera, &transform);
 }
-static void Camera_getter_target_rotation (LIScrArgs* args)
+static void Camera_get_target_rotation (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
 	LIMatTransform transform;
@@ -576,7 +576,7 @@ static void Camera_getter_target_rotation (LIScrArgs* args)
  * -- @name Camera.viewport
  * -- @class table
  */
-static void Camera_getter_viewport (LIScrArgs* args)
+static void Camera_get_viewport (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
 
@@ -587,7 +587,7 @@ static void Camera_getter_viewport (LIScrArgs* args)
 	liscr_args_seti_float (args, camera->view.viewport[2]);
 	liscr_args_seti_float (args, camera->view.viewport[3]);
 }
-static void Camera_setter_viewport (LIScrArgs* args)
+static void Camera_set_viewport (LIScrArgs* args)
 {
 	int viewport[4];
 	LIAlgCamera* camera;
@@ -618,21 +618,30 @@ void liext_script_camera (
 	liscr_class_insert_mfunc (self, "update", Camera_update);
 	liscr_class_insert_mfunc (self, "warp", Camera_warp);
 	liscr_class_insert_mfunc (self, "zoom", Camera_zoom);
-	liscr_class_insert_mvar (self, "collision_group", Camera_getter_collision_group, Camera_setter_collision_group);
-	liscr_class_insert_mvar (self, "collision_mask", Camera_getter_collision_mask, Camera_setter_collision_mask);
-	liscr_class_insert_mvar (self, "far", NULL, Camera_setter_far);
-	liscr_class_insert_mvar (self, "fov", Camera_getter_fov, Camera_setter_fov);
-	liscr_class_insert_mvar (self, "mode", Camera_getter_mode, Camera_setter_mode);
-	liscr_class_insert_mvar (self, "near", NULL, Camera_setter_near);
-	liscr_class_insert_mvar (self, "modelview", Camera_getter_modelview, NULL);
-	liscr_class_insert_mvar (self, "position", Camera_getter_position, NULL);
-	liscr_class_insert_mvar (self, "position_smoothing", Camera_getter_position_smoothing, Camera_setter_position_smoothing);
-	liscr_class_insert_mvar (self, "projection", Camera_getter_projection, NULL);
-	liscr_class_insert_mvar (self, "rotation", Camera_getter_rotation, NULL);
-	liscr_class_insert_mvar (self, "rotation_smoothing", Camera_getter_rotation_smoothing, Camera_setter_rotation_smoothing);
-	liscr_class_insert_mvar (self, "target_position", Camera_getter_target_position, Camera_setter_target_position);
-	liscr_class_insert_mvar (self, "target_rotation", Camera_getter_target_rotation, Camera_setter_target_rotation);
-	liscr_class_insert_mvar (self, "viewport", Camera_getter_viewport, Camera_setter_viewport);
+	liscr_class_insert_mfunc (self, "get_collision_group", Camera_get_collision_group);
+	liscr_class_insert_mfunc (self, "set_collision_group", Camera_set_collision_group);
+	liscr_class_insert_mfunc (self, "get_collision_mask", Camera_get_collision_mask);
+	liscr_class_insert_mfunc (self, "set_collision_mask", Camera_set_collision_mask);
+	liscr_class_insert_mfunc (self, "set_far", Camera_set_far);
+	liscr_class_insert_mfunc (self, "get_fov", Camera_get_fov);
+	liscr_class_insert_mfunc (self, "set_fov", Camera_set_fov);
+	liscr_class_insert_mfunc (self, "get_mode", Camera_get_mode);
+	liscr_class_insert_mfunc (self, "set_mode", Camera_set_mode);
+	liscr_class_insert_mfunc (self, "set_near", Camera_set_near);
+	liscr_class_insert_mfunc (self, "get_modelview", Camera_get_modelview);
+	liscr_class_insert_mfunc (self, "get_position", Camera_get_position);
+	liscr_class_insert_mfunc (self, "get_position_smoothing", Camera_get_position_smoothing);
+	liscr_class_insert_mfunc (self, "set_position_smoothing", Camera_set_position_smoothing);
+	liscr_class_insert_mfunc (self, "get_projection", Camera_get_projection);
+	liscr_class_insert_mfunc (self, "get_rotation", Camera_get_rotation);
+	liscr_class_insert_mfunc (self, "get_rotation_smoothing", Camera_get_rotation_smoothing);
+	liscr_class_insert_mfunc (self, "set_rotation_smoothing", Camera_set_rotation_smoothing);
+	liscr_class_insert_mfunc (self, "get_target_position", Camera_get_target_position);
+	liscr_class_insert_mfunc (self, "set_target_position", Camera_set_target_position);
+	liscr_class_insert_mfunc (self, "get_target_rotation", Camera_get_target_rotation);
+	liscr_class_insert_mfunc (self, "set_target_rotation", Camera_set_target_rotation);
+	liscr_class_insert_mfunc (self, "get_viewport", Camera_get_viewport);
+	liscr_class_insert_mfunc (self, "set_viewport", Camera_set_viewport);
 }
 
 /** @} */
