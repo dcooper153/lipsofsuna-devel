@@ -238,7 +238,7 @@ static void Quaternion_normalize (LIScrArgs* args)
  * -- @name Quaternion.conjugate
  * -- @class table
  */
-static void Quaternion_getter_conjugate (LIScrArgs* args)
+static void Quaternion_get_conjugate (LIScrArgs* args)
 {
 	LIMatQuaternion* data;
 	LIMatQuaternion tmp;
@@ -253,7 +253,7 @@ static void Quaternion_getter_conjugate (LIScrArgs* args)
  * -- @name Quaternion.euler
  * -- @class table
  */
-static void Quaternion_getter_euler (LIScrArgs* args)
+static void Quaternion_get_euler (LIScrArgs* args)
 {
 	float e[3];
 	LIMatQuaternion* data;
@@ -271,7 +271,7 @@ static void Quaternion_getter_euler (LIScrArgs* args)
  * -- @name Quaternion.length
  * -- @class table
  */
-static void Quaternion_getter_length (LIScrArgs* args)
+static void Quaternion_get_length (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, limat_quaternion_get_length (*((LIMatQuaternion*) args->self)));
 }
@@ -281,11 +281,11 @@ static void Quaternion_getter_length (LIScrArgs* args)
  * -- @name Quaternion.w
  * -- @class table
  */
-static void Quaternion_getter_w (LIScrArgs* args)
+static void Quaternion_get_w (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, ((LIMatQuaternion*) args->self)->w);
 }
-static void Quaternion_setter_w (LIScrArgs* args)
+static void Quaternion_set_w (LIScrArgs* args)
 {
 	liscr_args_geti_float (args, 0, &((LIMatQuaternion*) args->self)->w);
 }
@@ -295,11 +295,11 @@ static void Quaternion_setter_w (LIScrArgs* args)
  * -- @name Quaternion.x
  * -- @class table
  */
-static void Quaternion_getter_x (LIScrArgs* args)
+static void Quaternion_get_x (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, ((LIMatQuaternion*) args->self)->x);
 }
-static void Quaternion_setter_x (LIScrArgs* args)
+static void Quaternion_set_x (LIScrArgs* args)
 {
 	liscr_args_geti_float (args, 0, &((LIMatQuaternion*) args->self)->x);
 }
@@ -309,11 +309,11 @@ static void Quaternion_setter_x (LIScrArgs* args)
  * -- @name Quaternion.y
  * -- @class table
  */
-static void Quaternion_getter_y (LIScrArgs* args)
+static void Quaternion_get_y (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, ((LIMatQuaternion*) args->self)->y);
 }
-static void Quaternion_setter_y (LIScrArgs* args)
+static void Quaternion_set_y (LIScrArgs* args)
 {
 	liscr_args_geti_float (args, 0, &((LIMatQuaternion*) args->self)->y);
 }
@@ -323,11 +323,11 @@ static void Quaternion_setter_y (LIScrArgs* args)
  * -- @name Quaternion.z
  * -- @class table
  */
-static void Quaternion_getter_z (LIScrArgs* args)
+static void Quaternion_get_z (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, ((LIMatQuaternion*) args->self)->z);
 }
-static void Quaternion_setter_z (LIScrArgs* args)
+static void Quaternion_set_z (LIScrArgs* args)
 {
 	liscr_args_geti_float (args, 0, &((LIMatQuaternion*) args->self)->z);
 }
@@ -347,13 +347,17 @@ void liscr_script_quaternion (
 	liscr_class_insert_mfunc (self, "__tostring", Quaternion___tostring);
 	liscr_class_insert_mfunc (self, "nlerp", Quaternion_nlerp);
 	liscr_class_insert_mfunc (self, "normalize", Quaternion_normalize);
-	liscr_class_insert_mvar (self, "conjugate", Quaternion_getter_conjugate, NULL);
-	liscr_class_insert_mvar (self, "euler", Quaternion_getter_euler, NULL);
-	liscr_class_insert_mvar (self, "length", Quaternion_getter_length, NULL);
-	liscr_class_insert_mvar (self, "x", Quaternion_getter_x, Quaternion_setter_x);
-	liscr_class_insert_mvar (self, "y", Quaternion_getter_y, Quaternion_setter_y);
-	liscr_class_insert_mvar (self, "z", Quaternion_getter_z, Quaternion_setter_z);
-	liscr_class_insert_mvar (self, "w", Quaternion_getter_w, Quaternion_setter_w);
+	liscr_class_insert_mfunc (self, "get_conjugate", Quaternion_get_conjugate);
+	liscr_class_insert_mfunc (self, "get_euler", Quaternion_get_euler);
+	liscr_class_insert_mfunc (self, "get_length", Quaternion_get_length);
+	liscr_class_insert_mfunc (self, "get_x", Quaternion_get_x);
+	liscr_class_insert_mfunc (self, "set_x", Quaternion_set_x);
+	liscr_class_insert_mfunc (self, "get_y", Quaternion_get_y);
+	liscr_class_insert_mfunc (self, "set_y", Quaternion_set_y);
+	liscr_class_insert_mfunc (self, "get_z", Quaternion_get_z);
+	liscr_class_insert_mfunc (self, "set_z", Quaternion_set_z);
+	liscr_class_insert_mfunc (self, "get_w", Quaternion_get_w);
+	liscr_class_insert_mfunc (self, "set_w", Quaternion_set_w);
 }
 
 /**
