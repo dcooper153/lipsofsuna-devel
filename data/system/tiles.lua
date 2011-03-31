@@ -40,3 +40,26 @@ Material.setter = function(self, key, value)
 	if matsetterfunc then return matsetterfunc(self, value) end
 	return Class.setter(self, key, value)
 end
+
+local voxel_getters = {
+	blocks_per_line = function(s) return s:get_blocks_per_line() end,
+	fill = function(s) return s:get_fill() end,
+	materials = function(s) return s:get_materials() end,
+	tiles_per_line = function(s) return s:get_tiles_per_line() end}
+
+local voxel_setters = {
+	blocks_per_line = function(s, v) s:set_blocks_per_line(v) end,
+	fill = function(s, v) s:set_fill(v) end,
+	tiles_per_line = function(s, v) s:set_tiles_per_line(v) end}
+
+Voxel.getter = function(self, key)
+	local voxelgetterfunc = voxel_getters[key]
+	if voxelgetterfunc then return voxelgetterfunc(self) end
+	return Class.getter(self, key)
+end
+
+Voxel.setter = function(self, key, value)
+	local voxelsetterfunc = voxel_setters[key]
+	if voxelsetterfunc then return voxelsetterfunc(self, value) end
+	return Class.setter(self, key, value)
+end

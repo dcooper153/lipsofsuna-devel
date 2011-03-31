@@ -715,14 +715,14 @@ static void Voxel_set_tiles (LIScrArgs* args)
  * -- @name Voxel.blocks_per_line
  * -- @class table
  */
-static void Voxel_getter_blocks_per_line (LIScrArgs* args)
+static void Voxel_get_blocks_per_line (LIScrArgs* args)
 {
 	LIExtModule* self;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
 	liscr_args_seti_int (args, self->voxels->blocks_per_line);
 }
-static void Voxel_setter_blocks_per_line (LIScrArgs* args)
+static void Voxel_set_blocks_per_line (LIScrArgs* args)
 {
 	int count;
 	LIExtModule* self;
@@ -740,7 +740,7 @@ static void Voxel_setter_blocks_per_line (LIScrArgs* args)
  * -- @name Voxel.fill
  * -- @class table
  */
-static void Voxel_getter_fill (LIScrArgs* args)
+static void Voxel_get_fill (LIScrArgs* args)
 {
 	LIExtModule* self;
 
@@ -748,7 +748,7 @@ static void Voxel_getter_fill (LIScrArgs* args)
 	if (self->voxels->fill)
 		liscr_args_seti_int (args, self->voxels->fill);
 }
-static void Voxel_setter_fill (LIScrArgs* args)
+static void Voxel_set_fill (LIScrArgs* args)
 {
 	int type = 0;
 	LIExtModule* self;
@@ -763,7 +763,7 @@ static void Voxel_setter_fill (LIScrArgs* args)
  * -- @name Voxel.materials
  * -- @class table
  */
-static void Voxel_getter_materials (LIScrArgs* args)
+static void Voxel_get_materials (LIScrArgs* args)
 {
 	LIAlgU32dicIter iter;
 	LIExtModule* module;
@@ -783,14 +783,14 @@ static void Voxel_getter_materials (LIScrArgs* args)
  * -- @name Voxel.tiles_per_line
  * -- @class table
  */
-static void Voxel_getter_tiles_per_line (LIScrArgs* args)
+static void Voxel_get_tiles_per_line (LIScrArgs* args)
 {
 	LIExtModule* self;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
 	liscr_args_seti_int (args, self->voxels->tiles_per_line);
 }
-static void Voxel_setter_tiles_per_line (LIScrArgs* args)
+static void Voxel_set_tiles_per_line (LIScrArgs* args)
 {
 	int count;
 	LIExtModule* self;
@@ -823,10 +823,13 @@ void liext_script_voxel (
 	liscr_class_insert_cfunc (self, "set_block", Voxel_set_block);
 	liscr_class_insert_cfunc (self, "set_tile", Voxel_set_tile);
 	liscr_class_insert_cfunc (self, "set_tiles", Voxel_set_tiles);
-	liscr_class_insert_cvar (self, "blocks_per_line", Voxel_getter_blocks_per_line, Voxel_setter_blocks_per_line);
-	liscr_class_insert_cvar (self, "fill", Voxel_getter_fill, Voxel_setter_fill);
-	liscr_class_insert_cvar (self, "materials", Voxel_getter_materials, NULL);
-	liscr_class_insert_cvar (self, "tiles_per_line", Voxel_getter_tiles_per_line, Voxel_setter_tiles_per_line);
+	liscr_class_insert_cfunc (self, "get_blocks_per_line", Voxel_get_blocks_per_line);
+	liscr_class_insert_cfunc (self, "set_blocks_per_line", Voxel_set_blocks_per_line);
+	liscr_class_insert_cfunc (self, "get_fill", Voxel_get_fill);
+	liscr_class_insert_cfunc (self, "set_fill", Voxel_set_fill);
+	liscr_class_insert_cfunc (self, "get_materials", Voxel_get_materials);
+	liscr_class_insert_cfunc (self, "get_tiles_per_line", Voxel_get_tiles_per_line);
+	liscr_class_insert_cfunc (self, "set_tiles_per_line", Voxel_set_tiles_per_line);
 }
 
 /** @} */
