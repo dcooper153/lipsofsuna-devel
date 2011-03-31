@@ -56,18 +56,6 @@ LIAPICALL (void, liscr_args_init_func, (
 	LIScrClass* clss,
 	LIScrData*  data));
 
-LIAPICALL (void, liscr_args_init_getter, (
-	LIScrArgs*  self,
-	lua_State*  lua,
-	LIScrClass* clss,
-	LIScrData*  data));
-
-LIAPICALL (void, liscr_args_init_setter, (
-	LIScrArgs*  self,
-	lua_State*  lua,
-	LIScrClass* clss,
-	LIScrData*  data));
-
 LIAPICALL (void, liscr_args_call_setters, (
 	LIScrArgs* self,
 	LIScrData* data));

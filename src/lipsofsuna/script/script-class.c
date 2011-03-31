@@ -33,18 +33,11 @@ void private_inherit (
 	LIScrClass* self,
 	LIScrClass* base);
 
-static int
-private_insert_func (LIScrClass*   self,
-                     int           member,
-                     const char*   name,
-                     LIScrArgsFunc func);
-
-static int
-private_insert_var (LIScrClass*   self,
-                    int           member,
-                    const char*   name,
-                    LIScrArgsFunc args,
-                    LIScrArgsFunc setter);
+static int private_insert_func (
+	LIScrClass*   self,
+	int           member,
+	const char*   name,
+	LIScrArgsFunc func);
 
 /*****************************************************************************/
 
@@ -154,8 +147,6 @@ LIScrClass* liscr_class_new_full (
 void liscr_class_free (
 	LIScrClass* self)
 {
-	int i;
-
 	/* Remove from class lookup. */
 	lua_pushlightuserdata (self->script->lua, LISCR_SCRIPT_LOOKUP_CLASS);
 	lua_gettable (self->script->lua, LUA_REGISTRYINDEX);
@@ -164,14 +155,6 @@ void liscr_class_free (
 	lua_pushnil (self->script->lua);
 	lua_settable (self->script->lua, -3);
 	lua_pop (self->script->lua, 1);
-
-	/* Free accessors. */
-	if (self->vars.array != NULL)
-	{
-		for (i = 0 ; i < self->vars.count ; i++)
-			lisys_free (self->vars.array[i].name);
-		lisys_free (self->vars.array);
-	}
 
 	/* Free class variable. */
 	if (self->script->lua != NULL)
@@ -220,24 +203,6 @@ liscr_class_insert_cfunc (LIScrClass*   self,
                           LIScrArgsFunc func)
 {
 	return private_insert_func (self, 0, name, func);
-}
-
-/**
- * \brief Inserts a class variable accessor to the class.
- *
- * \param self Class.
- * \param name Name for the accessor.
- * \param getter Function pointer or NULL.
- * \param setter Function pointer or NULL.
- * \return Nonzero on success.
- */
-int
-liscr_class_insert_cvar (LIScrClass*   self,
-                         const char*   name,
-                         LIScrArgsFunc getter,
-                         LIScrArgsFunc setter)
-{
-	return private_insert_var (self, 0, name, getter, setter);
 }
 
 /**
@@ -539,11 +504,11 @@ void private_inherit (
 		liscr_class_set_userdata (self, iter.key, iter.value);
 }
 
-static int
-private_insert_func (LIScrClass*   self,
-                     int           member,
-                     const char*   name,
-                     LIScrArgsFunc func)
+static int private_insert_func (
+	LIScrClass*   self,
+	int           member,
+	const char*   name,
+	LIScrArgsFunc func)
 {
 	liscr_pushclasspriv (self->script->lua, self);
 	lua_pushstring (self->script->lua, name);
@@ -555,47 +520,6 @@ private_insert_func (LIScrClass*   self,
 		lua_pushcclosure (self->script->lua, liscr_marshal_CLASS, 2);
 	lua_rawset (self->script->lua, -3);
 	lua_pop (self->script->lua, 1);
-
-	return 1;
-}
-
-static int
-private_insert_var (LIScrClass*   self,
-                    int           member,
-                    const char*   name,
-                    LIScrArgsFunc getter,
-                    LIScrArgsFunc setter)
-{
-	int i;
-	LIScrClassMemb* tmp;
-
-	/* Overwrite existing. */
-	for (i = 0 ; i < self->vars.count ; i++)
-	{
-		tmp = self->vars.array + i;
-		if (!strcmp (tmp->name, name))
-		{
-			tmp->member = member;
-			tmp->getter = getter;
-			tmp->setter = setter;
-			return 1;
-		}
-	}
-
-	/* Create new. */
-	tmp = lisys_realloc (self->vars.array, (self->vars.count + 1) * sizeof (LIScrClassMemb));
-	if (tmp == NULL)
-		return 0;
-	self->vars.array = tmp;
-	tmp += self->vars.count;
-	tmp->member = member;
-	tmp->getter = getter;
-	tmp->setter = setter;
-	tmp->name = listr_dup (name);
-	if (tmp->name == NULL)
-		return 0;
-	self->vars.count++;
-	self->flags |= LISCR_CLASS_FLAG_SORT_VARS;
 
 	return 1;
 }

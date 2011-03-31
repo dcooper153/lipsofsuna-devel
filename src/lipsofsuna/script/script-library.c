@@ -25,44 +25,6 @@
 #include "lipsofsuna/script.h"
 #include "script-private.h"
 
-static int private_member_compare (
-	const void* a,
-	const void* b)
-{
-	const LIScrClassMemb* aa = a;
-	const LIScrClassMemb* bb = b;
-
-	return strcmp (aa->name, bb->name);
-}
-
-static LIScrClassMemb* private_find_var (
-	LIScrClass* self,
-	const char* name)
-{
-	LIScrClass* ptr;
-	LIScrClassMemb tmp;
-	LIScrClassMemb* func;
-
-	tmp.name = (char*) name;
-	for (ptr = self ; ptr != NULL ; ptr = ptr->base)
-	{
-		if (ptr->flags & LISCR_CLASS_FLAG_SORT_VARS)
-		{
-			ptr->flags &= ~LISCR_CLASS_FLAG_SORT_VARS;
-			qsort (ptr->vars.array, ptr->vars.count,
-				sizeof (LIScrClassMemb), private_member_compare);
-		}
-		func = bsearch (&tmp, ptr->vars.array, ptr->vars.count,
-			sizeof (LIScrClassMemb), private_member_compare);
-		if (func != NULL)
-			return func;
-	}
-
-	return NULL;
-}
-
-/*****************************************************************************/
-
 /* @luadoc
  * module "builtin/class"
  * --- Inherit classes.
@@ -169,9 +131,7 @@ static int Class_getter (lua_State* lua)
 	LIScrClass* ptr;
 	LIScrClass* clss;
 	LIScrClass* clss1;
-	LIScrClassMemb* func;
 	LIScrData* self;
-	LIScrArgs args;
 	LIScrScript* script;
 
 	/* Get class data. */
@@ -193,32 +153,7 @@ static int Class_getter (lua_State* lua)
 	if (!liscr_class_get_interface (clss, clss1->name))
 		return 0;
 
-	/* Getters. */
-	if (lua_isstring (lua, 2))
-	{
-		func = private_find_var (clss, lua_tostring (lua, 2));
-		if (func != NULL)
-		{
-			if (func->getter == NULL)
-				return 0;
-			if (func->member && self == NULL)
-				return 0;
-			if (!func->member && self != NULL)
-			{
-				liscr_pushclass (lua, clss);
-				lua_replace (lua, 1);
-				self = NULL;
-			}
-			liscr_args_init_getter (&args, lua, clss, self);
-			func->getter (&args);
-			if (!args.output_table)
-				return args.ret;
-			else
-				return 1;
-		}
-	}
-
-	/* Custom instance variables. */
+	/* Instance variables. */
 	if (self != NULL)
 	{
 		liscr_pushpriv (lua, self);
@@ -232,7 +167,7 @@ static int Class_getter (lua_State* lua)
 		lua_pop (lua, 2);
 	}
 
-	/* Custom class variables. */
+	/* Class variables. */
 	for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
 	{
 		liscr_pushclasspriv (lua, ptr);
@@ -260,9 +195,7 @@ static int Class_setter (lua_State* lua)
 {
 	LIScrClass* clss;
 	LIScrClass* clss1;
-	LIScrClassMemb* func;
 	LIScrData* self;
-	LIScrArgs args;
 	LIScrScript* script;
 
 	/* Get class data. */
@@ -285,29 +218,7 @@ static int Class_setter (lua_State* lua)
 	if (!liscr_class_get_interface (clss, clss1->name))
 		return 0;
 
-	/* Setters. */
-	if (lua_isstring (lua, 2))
-	{
-		func = private_find_var (clss, lua_tostring (lua, 2));
-		if (func != NULL)
-		{
-			if (func->setter == NULL)
-				return 0;
-			if (func->member && self == NULL)
-				return 0;
-			if (!func->member && self != NULL)
-			{
-				liscr_pushclass (lua, clss);
-				lua_replace (lua, 1);
-				self = NULL;
-			}
-			liscr_args_init_setter (&args, lua, clss, self);
-			func->setter (&args);
-			return 0;
-		}
-	}
-
-	/* Custom instance variables. */
+	/* Instance variables. */
 	if (self != NULL)
 	{
 		liscr_pushpriv (lua, self);
@@ -318,7 +229,7 @@ static int Class_setter (lua_State* lua)
 		return 0;
 	}
 
-	/* Custom class variables. */
+	/* Class variables. */
 	liscr_pushclasspriv (lua, clss);
 	lua_pushvalue (lua, 2);
 	lua_pushvalue (lua, 3);

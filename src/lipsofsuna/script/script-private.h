@@ -30,13 +30,6 @@
 #define LISCR_SCRIPT_LOOKUP_CLASS (NULL + 3)
 #define LISCR_SCRIPT_LOOKUP_DATA (NULL + 4)
 
-typedef struct _LIScrClassMemb LIScrClassMemb;
-
-enum
-{
-	LISCR_CLASS_FLAG_SORT_VARS = 0x1,
-};
-
 struct _LIScrClass
 {
 	char signature;
@@ -45,19 +38,6 @@ struct _LIScrClass
 	LIAlgStrdic* userdata;
 	LIScrClass* base;
 	LIScrScript* script;
-	struct
-	{
-		int count;
-		LIScrClassMemb* array;
-	} vars;
-};
-
-struct _LIScrClassMemb
-{
-	char* name;
-	int member;
-	LIScrArgsFunc getter;
-	LIScrArgsFunc setter;
 };
 
 struct _LIScrData

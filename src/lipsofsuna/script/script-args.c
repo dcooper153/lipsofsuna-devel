@@ -27,11 +27,11 @@
 #include "script-private.h"
 #include "script-util.h"
 
-void
-liscr_args_init_func (LIScrArgs*  self,
-                      lua_State*  lua,
-                      LIScrClass* clss,
-                      LIScrData*  data)
+void liscr_args_init_func (
+	LIScrArgs*  self,
+	lua_State*  lua,
+	LIScrClass* clss,
+	LIScrData*  data)
 {
 	memset (self, 0, sizeof (LIScrArgs));
 	self->lua = lua;
@@ -42,46 +42,6 @@ liscr_args_init_func (LIScrArgs*  self,
 		self->self = data->data;
 	self->args_start = 2;
 	self->args_count = lua_gettop (lua) - 1;
-	if (!liscr_isanyclass (lua, self->args_start) &&
-	    lua_type (self->lua, self->args_start) == LUA_TTABLE)
-	{
-		self->input_mode = LISCR_ARGS_INPUT_TABLE;
-		self->input_table = self->args_start;
-	}
-}
-
-void
-liscr_args_init_getter (LIScrArgs*  self,
-                        lua_State*  lua,
-                        LIScrClass* clss,
-                        LIScrData*  data)
-{
-	memset (self, 0, sizeof (LIScrArgs));
-	self->lua = lua;
-	self->script = clss->script;
-	self->clss = clss;
-	self->data = data;
-	if (data != NULL)
-		self->self = data->data;
-	self->args_start = 2;
-	self->args_count = 0;
-}
-
-void
-liscr_args_init_setter (LIScrArgs*  self,
-                        lua_State*  lua,
-                        LIScrClass* clss,
-                        LIScrData*  data)
-{
-	memset (self, 0, sizeof (LIScrArgs));
-	self->lua = lua;
-	self->script = clss->script;
-	self->clss = clss;
-	self->data = data;
-	if (data != NULL)
-		self->self = data->data;
-	self->args_start = 3;
-	self->args_count = lua_gettop (lua) - 2;
 	if (!liscr_isanyclass (lua, self->args_start) &&
 	    lua_type (self->lua, self->args_start) == LUA_TTABLE)
 	{
