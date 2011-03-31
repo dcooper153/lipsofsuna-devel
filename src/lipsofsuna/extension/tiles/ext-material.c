@@ -79,13 +79,13 @@ static void Material_new (LIScrArgs* args)
  * -- @name Material.cullface
  * -- @class table
  */
-static void Material_getter_cullface (LIScrArgs* args)
+static void Material_get_cullface (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
 
 	liscr_args_seti_int (args, (self->material.flags & LIMDL_MATERIAL_FLAG_CULLFACE) != 0);
 }
-static void Material_setter_cullface (LIScrArgs* args)
+static void Material_set_cullface (LIScrArgs* args)
 {
 	int value;
 	LIVoxMaterial* self = args->self;
@@ -104,7 +104,7 @@ static void Material_setter_cullface (LIScrArgs* args)
  * -- @name Material.diffuse
  * -- @class table
  */
-static void Material_getter_diffuse (LIScrArgs* args)
+static void Material_get_diffuse (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
 
@@ -114,7 +114,7 @@ static void Material_getter_diffuse (LIScrArgs* args)
 	liscr_args_seti_float (args, self->material.diffuse[2]);
 	liscr_args_seti_float (args, self->material.diffuse[3]);
 }
-static void Material_setter_diffuse (LIScrArgs* args)
+static void Material_set_diffuse (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
 
@@ -129,13 +129,13 @@ static void Material_setter_diffuse (LIScrArgs* args)
  * -- @name Material.flags
  * -- @class table
  */
-static void Material_getter_flags (LIScrArgs* args)
+static void Material_get_flags (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
 
 	liscr_args_seti_int (args, self->flags);
 }
-static void Material_setter_flags (LIScrArgs* args)
+static void Material_set_flags (LIScrArgs* args)
 {
 	int value;
 	LIVoxMaterial* self = args->self;
@@ -149,13 +149,13 @@ static void Material_setter_flags (LIScrArgs* args)
  * -- @name Material.friction
  * -- @class table
  */
-static void Material_getter_friction (LIScrArgs* args)
+static void Material_get_friction (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
 
 	liscr_args_seti_float (args, self->friction);
 }
-static void Material_setter_friction (LIScrArgs* args)
+static void Material_set_friction (LIScrArgs* args)
 {
 	float value;
 	LIVoxMaterial* self = args->self;
@@ -169,7 +169,7 @@ static void Material_setter_friction (LIScrArgs* args)
  * -- @name Material.id
  * -- @class table
  */
-static void Material_getter_id (LIScrArgs* args)
+static void Material_get_id (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
 
@@ -181,11 +181,11 @@ static void Material_getter_id (LIScrArgs* args)
  * -- @name Material.name
  * -- @class table
  */
-static void Material_getter_name (LIScrArgs* args)
+static void Material_get_name (LIScrArgs* args)
 {
 	liscr_args_seti_string (args, ((LIVoxMaterial*) args->self)->name);
 }
-static void Material_setter_name (LIScrArgs* args)
+static void Material_set_name (LIScrArgs* args)
 {
 	const char* value;
 
@@ -198,13 +198,13 @@ static void Material_setter_name (LIScrArgs* args)
  * -- @name Material.shader
  * -- @class table
  */
-static void Material_getter_shader (LIScrArgs* args)
+static void Material_get_shader (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
 
 	liscr_args_seti_string (args, self->material.shader);
 }
-static void Material_setter_shader (LIScrArgs* args)
+static void Material_set_shader (LIScrArgs* args)
 {
 	const char* value;
 	LIVoxMaterial* self = args->self;
@@ -218,13 +218,13 @@ static void Material_setter_shader (LIScrArgs* args)
  * -- @name Material.shininess
  * -- @class table
  */
-static void Material_getter_shininess (LIScrArgs* args)
+static void Material_get_shininess (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
 
 	liscr_args_seti_float (args, self->material.shininess);
 }
-static void Material_setter_shininess (LIScrArgs* args)
+static void Material_set_shininess (LIScrArgs* args)
 {
 	float value;
 	LIVoxMaterial* self = args->self;
@@ -238,7 +238,7 @@ static void Material_setter_shininess (LIScrArgs* args)
  * -- @name Material.specular
  * -- @class table
  */
-static void Material_getter_specular (LIScrArgs* args)
+static void Material_get_specular (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
 
@@ -248,7 +248,7 @@ static void Material_getter_specular (LIScrArgs* args)
 	liscr_args_seti_float (args, self->material.specular[2]);
 	liscr_args_seti_float (args, self->material.specular[3]);
 }
-static void Material_setter_specular (LIScrArgs* args)
+static void Material_set_specular (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
 
@@ -263,7 +263,7 @@ static void Material_setter_specular (LIScrArgs* args)
  * -- @name Material.texture
  * -- @class table
  */
-static void Material_getter_texture (LIScrArgs* args)
+static void Material_get_texture (LIScrArgs* args)
 {
 	int i;
 	LIVoxMaterial* self = args->self;
@@ -272,7 +272,7 @@ static void Material_getter_texture (LIScrArgs* args)
 	for (i = 0 ; i < self->material.textures.count ; i++)
 		liscr_args_seti_string (args, self->material.textures.array[i].string);
 }
-static void Material_setter_texture (LIScrArgs* args)
+static void Material_set_texture (LIScrArgs* args)
 {
 	int i;
 	const int texflags = LIMDL_TEXTURE_FLAG_BILINEAR | LIMDL_TEXTURE_FLAG_MIPMAP | LIMDL_TEXTURE_FLAG_REPEAT;
@@ -294,13 +294,13 @@ static void Material_setter_texture (LIScrArgs* args)
  * -- @name Material.texture_scale
  * -- @class table
  */
-static void Material_getter_texture_scale (LIScrArgs* args)
+static void Material_get_texture_scale (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
 
 	liscr_args_seti_float (args, self->texture_scale);
 }
-static void Material_setter_texture_scale (LIScrArgs* args)
+static void Material_set_texture_scale (LIScrArgs* args)
 {
 	float value;
 	LIVoxMaterial* self = args->self;
@@ -314,7 +314,7 @@ static void Material_setter_texture_scale (LIScrArgs* args)
  * -- @name Material.type
  * -- @class table
  */
-static void Material_getter_type (LIScrArgs* args)
+static void Material_get_type (LIScrArgs* args)
 {
 	LIVoxMaterial* self;
 
@@ -335,7 +335,7 @@ static void Material_getter_type (LIScrArgs* args)
 			break;
 	}
 }
-static void Material_setter_type (LIScrArgs* args)
+static void Material_set_type (LIScrArgs* args)
 {
 	const char* value;
 	LIVoxMaterial* self;
@@ -363,18 +363,29 @@ void liext_script_material (
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_MATERIAL, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Material_new);
-	liscr_class_insert_mvar (self, "cullface", Material_getter_cullface, Material_setter_cullface);
-	liscr_class_insert_mvar (self, "diffuse", Material_getter_diffuse, Material_setter_diffuse);
-	liscr_class_insert_mvar (self, "flags", Material_getter_flags, Material_setter_flags);
-	liscr_class_insert_mvar (self, "friction", Material_getter_friction, Material_setter_friction);
-	liscr_class_insert_mvar (self, "id", Material_getter_id, NULL);
-	liscr_class_insert_mvar (self, "name", Material_getter_name, Material_setter_name);
-	liscr_class_insert_mvar (self, "shader", Material_getter_shader, Material_setter_shader);
-	liscr_class_insert_mvar (self, "shininess", Material_getter_shininess, Material_setter_shininess);
-	liscr_class_insert_mvar (self, "specular", Material_getter_specular, Material_setter_specular);
-	liscr_class_insert_mvar (self, "texture", Material_getter_texture, Material_setter_texture);
-	liscr_class_insert_mvar (self, "texture_scale", Material_getter_texture_scale, Material_setter_texture_scale);
-	liscr_class_insert_mvar (self, "type", Material_getter_type, Material_setter_type);
+	liscr_class_insert_mfunc (self, "get_cullface", Material_get_cullface);
+	liscr_class_insert_mfunc (self, "set_cullface", Material_set_cullface);
+	liscr_class_insert_mfunc (self, "get_diffuse", Material_get_diffuse);
+	liscr_class_insert_mfunc (self, "set_diffuse", Material_set_diffuse);
+	liscr_class_insert_mfunc (self, "get_flags", Material_get_flags);
+	liscr_class_insert_mfunc (self, "set_flags", Material_set_flags);
+	liscr_class_insert_mfunc (self, "get_friction", Material_get_friction);
+	liscr_class_insert_mfunc (self, "set_friction", Material_set_friction);
+	liscr_class_insert_mfunc (self, "get_id", Material_get_id);
+	liscr_class_insert_mfunc (self, "get_name", Material_get_name);
+	liscr_class_insert_mfunc (self, "set_name", Material_set_name);
+	liscr_class_insert_mfunc (self, "get_shader", Material_get_shader);
+	liscr_class_insert_mfunc (self, "set_shader", Material_set_shader);
+	liscr_class_insert_mfunc (self, "get_shininess", Material_get_shininess);
+	liscr_class_insert_mfunc (self, "set_shininess", Material_set_shininess);
+	liscr_class_insert_mfunc (self, "get_specular", Material_get_specular);
+	liscr_class_insert_mfunc (self, "set_specular", Material_set_specular);
+	liscr_class_insert_mfunc (self, "get_texture", Material_get_texture);
+	liscr_class_insert_mfunc (self, "set_texture", Material_set_texture);
+	liscr_class_insert_mfunc (self, "get_texture_scale", Material_get_texture_scale);
+	liscr_class_insert_mfunc (self, "set_texture_scale", Material_set_texture_scale);
+	liscr_class_insert_mfunc (self, "get_type", Material_get_type);
+	liscr_class_insert_mfunc (self, "set_type", Material_set_type);
 }
 
 /** @} */
