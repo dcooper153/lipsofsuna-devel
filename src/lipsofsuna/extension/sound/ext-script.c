@@ -77,14 +77,14 @@ static void Sound_effect (LIScrArgs* args)
  * -- @name Sound.listener_position
  * -- @class table
  */
-static void Sound_getter_listener_position (LIScrArgs* args)
+static void Sound_get_listener_position (LIScrArgs* args)
 {
 	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
 	liscr_args_seti_vector (args, &module->listener_position);
 }
-static void Sound_setter_listener_position (LIScrArgs* args)
+static void Sound_set_listener_position (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIMatVector value;
@@ -101,14 +101,14 @@ static void Sound_setter_listener_position (LIScrArgs* args)
  * -- @name Sound.listener_rotation
  * -- @class table
  */
-static void Sound_getter_listener_rotation (LIScrArgs* args)
+static void Sound_get_listener_rotation (LIScrArgs* args)
 {
 	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
 	liscr_args_seti_quaternion (args, &module->listener_rotation);
 }
-static void Sound_setter_listener_rotation (LIScrArgs* args)
+static void Sound_set_listener_rotation (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIMatQuaternion value;
@@ -125,14 +125,14 @@ static void Sound_setter_listener_rotation (LIScrArgs* args)
  * -- @name Sound.listener_velocity
  * -- @class table
  */
-static void Sound_getter_listener_velocity (LIScrArgs* args)
+static void Sound_get_listener_velocity (LIScrArgs* args)
 {
 	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SOUND);
 	liscr_args_seti_vector (args, &module->listener_velocity);
 }
-static void Sound_setter_listener_velocity (LIScrArgs* args)
+static void Sound_set_listener_velocity (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIMatVector value;
@@ -149,7 +149,7 @@ static void Sound_setter_listener_velocity (LIScrArgs* args)
  * -- @name Sound.music
  * -- @class table
  */
-static void Sound_setter_music (LIScrArgs* args)
+static void Sound_set_music (LIScrArgs* args)
 {
 #ifndef LI_DISABLE_SOUND
 	const char* value;
@@ -168,7 +168,7 @@ static void Sound_setter_music (LIScrArgs* args)
  * -- @name Sound.music_fading
  * -- @class table
  */
-static void Sound_setter_music_fading (LIScrArgs* args)
+static void Sound_set_music_fading (LIScrArgs* args)
 {
 #ifndef LI_DISABLE_SOUND
 	float value;
@@ -188,7 +188,7 @@ static void Sound_setter_music_fading (LIScrArgs* args)
  * -- @name Sound.music_volume
  * -- @class table
  */
-static void Sound_setter_music_volume (LIScrArgs* args)
+static void Sound_set_music_volume (LIScrArgs* args)
 {
 #ifndef LI_DISABLE_SOUND
 	float value;
@@ -211,12 +211,15 @@ void liext_script_sound (
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_SOUND, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "effect", Sound_effect);
-	liscr_class_insert_cvar (self, "listener_position", Sound_getter_listener_position, Sound_setter_listener_position);
-	liscr_class_insert_cvar (self, "listener_rotation", Sound_getter_listener_rotation, Sound_setter_listener_rotation);
-	liscr_class_insert_cvar (self, "listener_velocity", Sound_getter_listener_velocity, Sound_setter_listener_velocity);
-	liscr_class_insert_cvar (self, "music", NULL, Sound_setter_music);
-	liscr_class_insert_cvar (self, "music_fading", NULL, Sound_setter_music_fading);
-	liscr_class_insert_cvar (self, "music_volume", NULL, Sound_setter_music_volume);
+	liscr_class_insert_cfunc (self, "get_listener_position", Sound_get_listener_position);
+	liscr_class_insert_cfunc (self, "set_listener_position", Sound_set_listener_position);
+	liscr_class_insert_cfunc (self, "get_listener_rotation", Sound_get_listener_rotation);
+	liscr_class_insert_cfunc (self, "set_listener_rotation", Sound_set_listener_rotation);
+	liscr_class_insert_cfunc (self, "get_listener_velocity", Sound_get_listener_velocity);
+	liscr_class_insert_cfunc (self, "set_listener_velocity", Sound_set_listener_velocity);
+	liscr_class_insert_cfunc (self, "set_music", Sound_set_music);
+	liscr_class_insert_cfunc (self, "set_music_fading", Sound_set_music_fading);
+	liscr_class_insert_cfunc (self, "set_music_volume", Sound_set_music_volume);
 }
 
 /** @} */
