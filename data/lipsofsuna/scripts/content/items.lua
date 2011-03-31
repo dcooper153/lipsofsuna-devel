@@ -1,11 +1,22 @@
 ------------------------------------------------------------------------------
 -- Materials.
 
+-- * materials (label used below in "weapons" section)
+-- tile \ state 	label	stone	ore	ingot
+-- ==================================================
+-- adamantium 		A	4	-	-
+-- aquanite 		Q	2	-	-
+-- crimson		C	4	-	-
+-- granite/ferro/iron	S	5	4	3
+-- basalt		S	5	-	-
+-- sand chunk/../glass	-	3	-	2
+-- soil chunk		-	3	-	-
+
 Itemspec{
 	name = "adamantium",
 	model = "adamantium1",
 	icon = "stone2",
-	mass = 3,
+	mass = 4,
 	categories = {"material"},
 	stacking = true}
 
@@ -13,7 +24,7 @@ Itemspec{
 	name = "aquanite stone",
 	model = "aquanitestone1",
 	icon = "stone2",
-	mass = 3,
+	mass = 2,
 	categories = {"material"},
 	stacking = true}
 
@@ -21,7 +32,7 @@ Itemspec{
 	name = "basalt stone",
 	model = "basaltstone1",
 	icon = "stone1",
-	mass = 3,
+	mass = 5,
 	categories = {"build", "material"},
 	construct_tile = "basalt1",
 	construct_tile_count = 1,
@@ -39,7 +50,7 @@ Itemspec{
 	name = "crimson stone",
 	model = "crimsonstone1",
 	icon = "stone2",
-	mass = 3,
+	mass = 4,
 	categories = {"material"},
 	stacking = true}
 
@@ -47,7 +58,7 @@ Itemspec{
 	name = "ferrostone",
 	model = "ferrostone1",
 	icon = "stone2",
-	mass = 5,
+	mass = 4,
 	categories = {"build", "material"},
 	construct_tile = "ferrostone1",
 	construct_tile_count = 1,
@@ -75,7 +86,7 @@ Itemspec{
 	categories = {"material"},
 	crafting_materials = {["sand chunk"] = 1},
 	health = 10,
-	mass = 3,
+	mass = 1.5,
 	stacking = true}
 
 Itemspec{
@@ -87,14 +98,14 @@ Itemspec{
 	construct_tile_count = 1,
 	equipment_slot = "hand.R",
 	health = 50,
-	mass = 3,
+	mass = 5,
 	stacking = true}
 
 Itemspec{
 	name = "iron ingot",
 	model = "book-000", -- FIXME
 	icon = "ingot1",
-	mass = 5,
+	mass = 2,
 	categories = {"build", "material"},
 	construct_tile = "iron1",
 	construct_tile_count = 1,
@@ -136,7 +147,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	health = 50,
-	mass = 3,
+	mass = 5,
 	stacking = true,
 	water_gravity = Vector(0,1,0)}
 
@@ -152,7 +163,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	health = 50,
-	mass = 3,
+	mass = 5,
 	stacking = true,
 	water_gravity = Vector(0,1,0)}
 
