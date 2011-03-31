@@ -619,7 +619,6 @@ static int private_init (
 	    !liscr_script_create_class (self->script, "Model", liscr_script_model, self) ||
 	    !liscr_script_create_class (self->script, "Object", liscr_script_object, self) ||
 	    !liscr_script_create_class (self->script, "Packet", liscr_script_packet, self->script) ||
-	    !liscr_script_create_class (self->script, "Path", liscr_script_path, self->script) ||
 	    !liscr_script_create_class (self->script, "Program", liscr_script_program, self) ||
 	    !liscr_script_create_class (self->script, "Quaternion", liscr_script_quaternion, self->script) ||
 	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script))

@@ -27,7 +27,6 @@
 #define LISCR_SCRIPT_MODEL "Model"
 #define LISCR_SCRIPT_OBJECT "Object"
 #define LISCR_SCRIPT_PACKET "Packet"
-#define LISCR_SCRIPT_PATH "Path"
 #define LISCR_SCRIPT_PROGRAM "Program"
 #define LISCR_SCRIPT_QUATERNION "Quaternion"
 #define LISCR_SCRIPT_VECTOR "Vector"
@@ -49,10 +48,6 @@ LIAPICALL (void, liscr_script_object, (
 	void*       data));
 
 LIAPICALL (void, liscr_script_packet, (
-	LIScrClass* self,
-	void*       data));
-
-LIAPICALL (void, liscr_script_path, (
 	LIScrClass* self,
 	void*       data));
 
