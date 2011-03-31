@@ -194,11 +194,9 @@ static void Object_find_node (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Gets animation information for the given animation channel.
- * --
+ * --- Gets animation information for the given animation channel.<br/>
  * -- If an animation is looping in the channel, a table containing the fields
  * -- animation, time, and weight is returned.
- * --
  * -- @param self Server class.
  * -- @param args Arguments.<ul>
  * --   <li>channel: Channel number. (required)</li></ul>
@@ -228,6 +226,28 @@ static void Object_get_animation (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Gets the list of active animations.
+ * -- @param self Server class.
+ * -- @return Animation list.
+ * function Object.get_animations(self)
+ */
+static void Object_get_animations (LIScrArgs* args)
+{
+	LIAlgU32dicIter iter;
+	LIEngObject* object;
+	LIMdlPoseChannel* channel;
+
+	object = args->self;
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+	LIALG_U32DIC_FOREACH (iter, object->pose->channels)
+	{
+		channel = iter.value;
+		if (channel->repeats == -1)
+			liscr_args_setf_string (args, iter.key + 1, channel->animation->name);
+	}
+}
+
+/* @luadoc
  * --- Updates the animations of the object.
  * -- @param self Object.
  * -- @param args Arguments.<ul>
@@ -245,27 +265,6 @@ static void Object_update_animations (LIScrArgs* args)
 		limdl_pose_update (self->pose, secs);
 }
 
-/* @luadoc
- * --- Table of channel numbers and animation names.<br/>
- * -- A list of permanent animations the object is playing back.
- * -- @name Object.animations
- */
-static void Object_getter_animations (LIScrArgs* args)
-{
-	LIAlgU32dicIter iter;
-	LIEngObject* object;
-	LIMdlPoseChannel* channel;
-
-	object = args->self;
-	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-	LIALG_U32DIC_FOREACH (iter, object->pose->channels)
-	{
-		channel = iter.value;
-		if (channel->repeats == -1)
-			liscr_args_setf_string (args, iter.key + 1, channel->animation->name);
-	}
-}
-
 /*****************************************************************************/
 
 void liext_script_object_animation (
@@ -277,8 +276,8 @@ void liext_script_object_animation (
 	liscr_class_insert_mfunc (self, "edit_pose", Object_edit_pose);
 	liscr_class_insert_mfunc (self, "find_node", Object_find_node);
 	liscr_class_insert_mfunc (self, "get_animation", Object_get_animation);
+	liscr_class_insert_mfunc (self, "get_animations", Object_get_animations);
 	liscr_class_insert_mfunc (self, "update_animations", Object_update_animations);
-	liscr_class_insert_mvar (self, "animations", Object_getter_animations, NULL);
 }
 
 /** @} */
