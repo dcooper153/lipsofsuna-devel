@@ -132,8 +132,10 @@ static int Class_getter (lua_State* lua)
 	LIScrClass* clss;
 	LIScrClass* clss1;
 	LIScrData* self;
+	LIScrScript* script;
 
 	/* Get class data. */
+	script = liscr_script (lua);
 	clss = liscr_isanyclass (lua, 1);
 	if (clss == NULL)
 	{
@@ -194,8 +196,10 @@ static int Class_setter (lua_State* lua)
 	LIScrClass* clss;
 	LIScrClass* clss1;
 	LIScrData* self;
+	LIScrScript* script;
 
 	/* Get class data. */
+	script = liscr_script (lua);
 	clss = liscr_isanyclass (lua, 1);
 	if (clss == NULL)
 	{
