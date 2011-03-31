@@ -21,6 +21,10 @@ ChatCommand{pattern = "^/grant admin ([a-zA-Z0-9]*)$", permission = "admin", fun
 		Config.inst.admins[matches] = true
 		Config.inst:save()
 		player:send("Admin privileges have been granted to " .. matches)
+		local affected = Account.dict_name[matches]
+		if affected and affected.client then
+			Network:send{client = affected.client, packet = Packet(packets.ADMIN_PRIVILEGE, "bool", true)}
+		end
 	else
 		player:send("Admin privileges have already been granted to " .. matches)
 	end
@@ -32,6 +36,10 @@ ChatCommand{pattern = "^/revoke admin ([a-zA-Z0-9]*)$", permission = "admin", fu
 		Config.inst.admins[matches] = nil
 		Config.inst:save()
 		player:send("Admin privileges have been revoked from " .. matches)
+		local affected = Account.dict_name[matches]
+		if affected and affected.client then
+			Network:send{client = affected.client, packet = Packet(packets.ADMIN_PRIVILEGE, "bool", false)}
+		end
 	else
 		player:send("Admin privileges have already been revoked from " .. matches)
 	end

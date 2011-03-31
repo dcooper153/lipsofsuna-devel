@@ -1,4 +1,5 @@
 Gui = Class()
+Gui.admin = true
 
 --- Initializes the in-game user interface.
 -- @param clss Gui class.
@@ -15,12 +16,11 @@ Gui.init = function(clss)
 		{"Quests", function() clss:set_mode("quests", 2) end, arrow = true},
 		{"Skills", function() clss:set_mode("skills", 2) end, arrow = true},
 		{"-----", function() end},
-		{"Admin", Gui.menu_widget_admin},
 		{"Options", function() clss:set_mode("options", 2) end, arrow = true},
+		{"Admin", Gui.menu_widget_admin},
 		{"Help", function() clss:set_mode("help", 2) end, arrow = true},
 		{"Quit", function() Program.quit = true end}}
 	Gui.menus = Widgets.Menus()
-	Gui.menus:open{level = 1, widget = Gui.menu_widget_main}
 	-- Bottom HUD.
 	Gui.chat_history = Widgets.Log()
 	Gui.chat_entry = Widgets.Entry{transparent = true}
@@ -74,6 +74,11 @@ Gui.init = function(clss)
 	Gui.main = Widget{cols = 1, behind = true, fullscreen = true}
 	Gui.main:append_row(Gui.bottom)
 	Gui.main:set_expand{col = 1, row = 1}
+end
+
+Gui.set_admin = function(self, admin)
+	if admin == self.admin then return end
+	Gui.menu_widget_main:replace(7, admin and {"Admin", Gui.menu_widget_admin})
 end
 
 Gui.set_mode = function(self, mode, level)

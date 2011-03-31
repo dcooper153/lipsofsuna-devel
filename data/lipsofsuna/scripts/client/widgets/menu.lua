@@ -34,3 +34,15 @@ Widgets.Menu.append = function(self, args)
 	end}
 	self.frame:append_row(button)
 end
+
+Widgets.Menu.replace = function(self, row, args)
+	local widget
+	if args then
+		widget = Widgets.MenuItem{font = "medium", text = args.text, arrow = args.arrow,
+			color = {0,0,0,1}, color_focus = {0.7,0.3,0.3,1}, pressed = function()
+			if args.widget then Gui.menus:open{level = self.level + 1, widget = args.widget} end
+			if args.pressed then args.pressed(self, row) end
+		end}
+	end
+	self.frame:set_child{row = row, col = 1, widget = widget}
+end

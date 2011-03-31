@@ -335,6 +335,7 @@ Eventhandler{type = "logout", func = function(self, event)
 	local account = Account.dict_client[event.client]
 	if account then
 		Serialize:save_account(account, object)
+		account.client = nil
 		Account.dict_client[event.client] = nil
 	end
 end}

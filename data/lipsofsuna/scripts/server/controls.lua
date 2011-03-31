@@ -79,8 +79,10 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
 		Network:disconnect(args.client)
 		return
 	end
+	account.client = args.client
 	Account.dict_client[args.client] = account
 	-- Create existing characters.
+	local created
 	if account.character then
 		local func = assert(loadstring("return function()\n" .. account.character .. "\nend"))()
 		if func then
@@ -90,12 +92,17 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
 				object.account = account
 				object:set_client(args.client)
 				spawn_player(object, args.client)
-				return
+				created = true
 			end
 		end
 	end
+	-- Inform about admin privileges.
+	local admin = (Config.inst.admins[login] == true)
+	Network:send{client = args.client, packet = Packet(packets.ADMIN_PRIVILEGE, "bool", admin)}
 	-- Enter the character creation mode.
-	Network:send{client = args.client, packet = Packet(packets.CHARACTER_CREATE)}
+	if not created then
+		Network:send{client = args.client, packet = Packet(packets.CHARACTER_CREATE)}
+	end
 end}
 
 Protocol:add_handler{type = "EXAMINE", func = function(args)

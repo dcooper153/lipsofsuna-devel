@@ -9,6 +9,12 @@ Eventhandler{type = "object-model", func = function(self, args)
 	--args.object:update_model{model = args.model}
 end}
 
+Protocol:add_handler{type = "ADMIN_PRIVILEGE", func = function(event)
+	local ok,b = event.packet:read("bool")
+	if not ok then return end
+	Gui:set_admin(b)
+end}
+
 Protocol:add_handler{type = "FEAT_UNLOCK", func = function(event)
 	local ok,n = event.packet:read("string")
 	if ok then

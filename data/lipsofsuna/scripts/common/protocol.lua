@@ -102,6 +102,7 @@ do
 	add("USE")
 	add("VOXEL_DIFF")
 	add("WORLD_EFFECT")
+	add("ADMIN_PRIVILEGE")
 end
 
 effects = {}
