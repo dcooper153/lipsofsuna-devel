@@ -185,7 +185,7 @@ static void Vector_normalize (LIScrArgs* args)
  * -- @name Vector.length
  * -- @class table
  */
-static void Vector_getter_length (LIScrArgs* args)
+static void Vector_get_length (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, limat_vector_get_length (*((LIMatVector*) args->self)));
 }
@@ -195,11 +195,11 @@ static void Vector_getter_length (LIScrArgs* args)
  * -- @name Vector.x
  * -- @class table
  */
-static void Vector_getter_x (LIScrArgs* args)
+static void Vector_get_x (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, ((LIMatVector*) args->self)->x);
 }
-static void Vector_setter_x (LIScrArgs* args)
+static void Vector_set_x (LIScrArgs* args)
 {
 	liscr_args_geti_float (args, 0, &((LIMatVector*) args->self)->x);
 }
@@ -209,11 +209,11 @@ static void Vector_setter_x (LIScrArgs* args)
  * -- @name Vector.y
  * -- @class table
  */
-static void Vector_getter_y (LIScrArgs* args)
+static void Vector_get_y (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, ((LIMatVector*) args->self)->y);
 }
-static void Vector_setter_y (LIScrArgs* args)
+static void Vector_set_y (LIScrArgs* args)
 {
 	liscr_args_geti_float (args, 0, &((LIMatVector*) args->self)->y);
 }
@@ -223,20 +223,20 @@ static void Vector_setter_y (LIScrArgs* args)
  * -- @name Vector.z
  * -- @class table
  */
-static void Vector_getter_z (LIScrArgs* args)
+static void Vector_get_z (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, ((LIMatVector*) args->self)->z);
 }
-static void Vector_setter_z (LIScrArgs* args)
+static void Vector_set_z (LIScrArgs* args)
 {
 	liscr_args_geti_float (args, 0, &((LIMatVector*) args->self)->z);
 }
 
 /*****************************************************************************/
 
-void
-liscr_script_vector (LIScrClass* self,
-                     void*       data)
+void liscr_script_vector (
+	LIScrClass* self,
+	void*       data)
 {
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "new", Vector_new);
@@ -247,10 +247,13 @@ liscr_script_vector (LIScrClass* self,
 	liscr_class_insert_mfunc (self, "cross", Vector_cross);
 	liscr_class_insert_mfunc (self, "dot", Vector_dot);
 	liscr_class_insert_mfunc (self, "normalize", Vector_normalize);
-	liscr_class_insert_mvar (self, "length", Vector_getter_length, NULL);
-	liscr_class_insert_mvar (self, "x", Vector_getter_x, Vector_setter_x);
-	liscr_class_insert_mvar (self, "y", Vector_getter_y, Vector_setter_y);
-	liscr_class_insert_mvar (self, "z", Vector_getter_z, Vector_setter_z);
+	liscr_class_insert_mfunc (self, "get_length", Vector_get_length);
+	liscr_class_insert_mfunc (self, "get_x", Vector_get_x);
+	liscr_class_insert_mfunc (self, "set_x", Vector_set_x);
+	liscr_class_insert_mfunc (self, "get_y", Vector_get_y);
+	liscr_class_insert_mfunc (self, "set_y", Vector_set_y);
+	liscr_class_insert_mfunc (self, "get_z", Vector_get_z);
+	liscr_class_insert_mfunc (self, "set_z", Vector_set_z);
 }
 
 /**
