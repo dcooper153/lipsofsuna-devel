@@ -229,7 +229,7 @@ static void Client_swap_buffers (LIScrArgs* args)
  * -- @name Client.cursor_pos
  * -- @class table
  */
-static void Client_getter_cursor_pos (LIScrArgs* args)
+static void Client_get_cursor_pos (LIScrArgs* args)
 {
 	int x;
 	int y;
@@ -248,7 +248,7 @@ static void Client_getter_cursor_pos (LIScrArgs* args)
  * -- @name Client.tick
  * -- @class table
  */
-static void Client_getter_fps (LIScrArgs* args)
+static void Client_get_fps (LIScrArgs* args)
 {
 	LICliClient* client;
 
@@ -261,14 +261,14 @@ static void Client_getter_fps (LIScrArgs* args)
  * -- @name Client.moving
  * -- @class table
  */
-static void Client_getter_moving (LIScrArgs* args)
+static void Client_get_moving (LIScrArgs* args)
 {
 	LICliClient* client;
 
 	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
 	liscr_args_seti_bool (args, licli_client_get_moving (client));
 }
-static void Client_setter_moving (LIScrArgs* args)
+static void Client_set_moving (LIScrArgs* args)
 {
 	int value;
 	LICliClient* client;
@@ -285,7 +285,7 @@ static void Client_setter_moving (LIScrArgs* args)
  * -- @name Client.title
  * -- @class table
  */
-static void Client_setter_title (LIScrArgs* args)
+static void Client_set_title (LIScrArgs* args)
 {
 	const char* value;
 	LICliClient* client;
@@ -302,7 +302,7 @@ static void Client_setter_title (LIScrArgs* args)
  * -- @name Client.video_mode
  * -- @class table
  */
-static void Client_getter_video_mode (LIScrArgs* args)
+static void Client_get_video_mode (LIScrArgs* args)
 {
 	LICliClient* client;
 
@@ -319,7 +319,7 @@ static void Client_getter_video_mode (LIScrArgs* args)
  * -- @name Client.video_modes
  * -- @class table
  */
-static void Client_getter_video_modes (LIScrArgs* args)
+static void Client_get_video_modes (LIScrArgs* args)
 {
 	int i;
 	SDL_Rect** modes;
@@ -357,12 +357,13 @@ void licli_script_client (
 	liscr_class_insert_cfunc (self, "screenshot", Client_screenshot);
 	liscr_class_insert_cfunc (self, "set_video_mode", Client_set_video_mode);
 	liscr_class_insert_cfunc (self, "swap_buffers", Client_swap_buffers);
-	liscr_class_insert_cvar (self, "cursor_pos", Client_getter_cursor_pos, NULL);
-	liscr_class_insert_cvar (self, "fps", Client_getter_fps, NULL);
-	liscr_class_insert_cvar (self, "moving", Client_getter_moving, Client_setter_moving);
-	liscr_class_insert_cvar (self, "title", NULL, Client_setter_title);
-	liscr_class_insert_cvar (self, "video_mode", Client_getter_video_mode, NULL);
-	liscr_class_insert_cvar (self, "video_modes", Client_getter_video_modes, NULL);
+	liscr_class_insert_cfunc (self, "get_cursor_pos", Client_get_cursor_pos);
+	liscr_class_insert_cfunc (self, "get_fps", Client_get_fps);
+	liscr_class_insert_cfunc (self, "get_moving", Client_get_moving);
+	liscr_class_insert_cfunc (self, "set_moving", Client_set_moving);
+	liscr_class_insert_cfunc (self, "set_title", Client_set_title);
+	liscr_class_insert_cfunc (self, "get_video_mode", Client_get_video_mode);
+	liscr_class_insert_cfunc (self, "get_video_modes", Client_get_video_modes);
 }
 
 /** @} */
