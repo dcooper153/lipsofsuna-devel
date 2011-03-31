@@ -38,14 +38,14 @@
  * -- @name Render.anisotrophy
  * -- @class table
  */
-static void Render_getter_anisotrophy (LIScrArgs* args)
+static void Render_get_anisotrophy (LIScrArgs* args)
 {
 	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER);
 	liscr_args_seti_int (args, liren_render_get_anisotropy (module->client->render));
 }
-static void Render_setter_anisotrophy (LIScrArgs* args)
+static void Render_set_anisotrophy (LIScrArgs* args)
 {
 	int value;
 	LIExtModule* module;
@@ -66,7 +66,8 @@ void liext_script_render (
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_RENDER, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cvar (self, "anisotrophy", Render_getter_anisotrophy, Render_setter_anisotrophy);
+	liscr_class_insert_cfunc (self, "get_anisotrophy", Render_get_anisotrophy);
+	liscr_class_insert_cfunc (self, "set_anisotrophy", Render_set_anisotrophy);
 }
 
 /** @} */

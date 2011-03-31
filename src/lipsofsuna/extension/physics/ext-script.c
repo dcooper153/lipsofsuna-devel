@@ -198,14 +198,14 @@ static void Physics_cast_sphere (LIScrArgs* args)
  * -- @name Physics.enable_simulation
  * -- @class table
  */
-static void Physics_getter_enable_simulation (LIScrArgs* args)
+static void Physics_get_enable_simulation (LIScrArgs* args)
 {
 	LIExtModule* module;
 
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PHYSICS);
 	liscr_args_seti_bool (args, module->simulate);
 }
-static void Physics_setter_enable_simulation (LIScrArgs* args)
+static void Physics_set_enable_simulation (LIScrArgs* args)
 {
 	int value;
 	LIExtModule* module;
@@ -225,7 +225,8 @@ void liext_script_physics (
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "cast_ray", Physics_cast_ray);
 	liscr_class_insert_cfunc (self, "cast_sphere", Physics_cast_sphere);
-	liscr_class_insert_cvar (self, "enable_simulation", Physics_getter_enable_simulation, Physics_setter_enable_simulation);
+	liscr_class_insert_cfunc (self, "get_enable_simulation", Physics_get_enable_simulation);
+	liscr_class_insert_cfunc (self, "set_enable_simulation", Physics_set_enable_simulation);
 }
 
 /** @} */

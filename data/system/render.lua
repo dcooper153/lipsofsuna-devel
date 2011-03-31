@@ -43,3 +43,13 @@ Light.setter = function(self, key, value)
 	if lightsetterfunc then return lightsetterfunc(self, value) end
 	return Class.setter(self, key, value)
 end
+
+Render.getter = function(self, key)
+	if key == "anisotrophy" then return self:get_anisotrophy() end
+	return Class.getter(self, key)
+end
+
+Render.setter = function(self, key, value)
+	if key == "anisotrophy" then return self:set_anisotrophy(value) end
+	return Class.setter(self, key, value)
+end

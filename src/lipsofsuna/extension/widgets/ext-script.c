@@ -107,7 +107,7 @@ static void Widgets_find_widget (LIScrArgs* args)
  * -- @name Widgets.focused_widget
  * -- @class table
  */
-static void Widgets_getter_focused_widget (LIScrArgs* args)
+static void Widgets_get_focused_widget (LIScrArgs* args)
 {
 	int x;
 	int y;
@@ -137,7 +137,7 @@ void liext_script_widgets (
 	liscr_class_insert_cfunc (self, "add_font_style", Widgets_add_font_style);
 	liscr_class_insert_cfunc (self, "draw", Widgets_draw);
 	liscr_class_insert_cfunc (self, "find_widget", Widgets_find_widget);
-	liscr_class_insert_cvar (self, "focused_widget", Widgets_getter_focused_widget, NULL);
+	liscr_class_insert_cfunc (self, "get_focused_widget", Widgets_get_focused_widget);
 }
 
 /** @} */

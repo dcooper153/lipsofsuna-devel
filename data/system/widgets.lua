@@ -41,6 +41,11 @@ Widget.setter = function(self, key, value)
 	return Class.setter(self, key, value)
 end
 
+Widgets.getter = function(self, key)
+	if key == "focused_widget" then return self:get_focused_widget() end
+	return Class.getter(self, key)
+end
+
 require "system/widgets/button"
 require "system/widgets/combo"
 require "system/widgets/cursor"

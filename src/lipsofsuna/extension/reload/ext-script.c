@@ -40,14 +40,14 @@
  * -- @name Reload.enabled
  * -- @class table
  */
-static void Reload_getter_enabled (LIScrArgs* args)
+static void Reload_get_enabled (LIScrArgs* args)
 {
 	LIExtReload* self;
 
 	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
 	liscr_args_seti_bool (args, liext_reload_get_enabled (self));
 }
-static void Reload_setter_enabled (LIScrArgs* args)
+static void Reload_set_enabled (LIScrArgs* args)
 {
 	int value;
 	LIExtReload* self;
@@ -67,7 +67,8 @@ liext_script_reload (LIScrClass* self,
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_RELOAD, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cvar (self, "enabled", Reload_getter_enabled, Reload_setter_enabled);
+	liscr_class_insert_cfunc (self, "get_enabled", Reload_get_enabled);
+	liscr_class_insert_cfunc (self, "set_enabled", Reload_set_enabled);
 }
 
 /** @} */
