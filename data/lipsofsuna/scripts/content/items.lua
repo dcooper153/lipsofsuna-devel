@@ -44,13 +44,6 @@ Itemspec{
 	stacking = true}
 
 Itemspec{
-	name = "dragon scale",
-	model = "book-000", -- FIXME
-	mass = 1,
-	categories = {"material"},
-	stacking = true}
-
-Itemspec{
 	name = "ferrostone",
 	model = "ferrostone1",
 	icon = "stone2",
@@ -113,6 +106,13 @@ Itemspec{
 	name = "hide",
 	model = "book-000", -- FIXME
 	icon = "hide1",
+	mass = 1,
+	categories = {"material"},
+	stacking = true}
+
+Itemspec{
+	name = "dragon scale",
+	model = "book-000", -- FIXME
 	mass = 1,
 	categories = {"material"},
 	stacking = true}
