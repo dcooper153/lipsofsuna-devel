@@ -334,7 +334,7 @@ static int Class_setter (lua_State* lua)
  * -- @name Class.class
  * -- @class table
  */
-static void Class_getter_class (LIScrArgs* args)
+static void Class_get_class (LIScrArgs* args)
 {
 	liscr_args_seti_class (args, args->clss);
 }
@@ -350,7 +350,7 @@ void liscr_script_class (
 	liscr_class_insert_cfunc (self, "new", Class_new);
 	liscr_class_insert_func (self, "getter", Class_getter);
 	liscr_class_insert_func (self, "setter", Class_setter);
-	liscr_class_insert_mvar (self, "class", Class_getter_class, NULL);
+	liscr_class_insert_mfunc (self, "get_class", Class_get_class);
 }
 
 /** @} */
