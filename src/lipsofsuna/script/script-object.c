@@ -29,42 +29,10 @@
 
 /* @luadoc
  * module "builtin/object"
- * ---
- * -- Manipulate objects.
+ * --- Manipulate objects.
  * -- @name Object
  * -- @class table
  */
-
-/* @luadoc
- * --- Adds an additional model mesh to the object.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>model: Model. (required)</li></ul>
- * function Object.add_model(self, args)
- */
-static void Object_add_model (LIScrArgs* args)
-{
-	LIScrData* model;
-
-	if (liscr_args_gets_data (args, "model", LISCR_SCRIPT_MODEL, &model))
-	{
-		if (!lieng_object_merge_model (args->self, model->data))
-			lisys_error_report ();
-	}
-}
-
-/* @luadoc
- * --- Recalculates the bounding box of the model of the object.
- * -- @param self Object.
- * function Object.calculate_bounds(self)
- */
-static void Object_calculate_bounds (LIScrArgs* args)
-{
-	LIEngObject* self = args->self;
-
-	if (self->model != NULL)
-		lieng_model_calculate_bounds (self->model);
-}
 
 /* @luadoc
  * --- Finds all objects inside a sphere.
@@ -121,7 +89,6 @@ static void Object_find (LIScrArgs* args)
 
 /* @luadoc
  * --- Creates a new object.
- * --
  * -- @param clss Object class.
  * -- @param args Arguments.
  * -- @return New object.
@@ -157,6 +124,37 @@ static void Object_new (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Adds an additional model mesh to the object.
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>model: Model.</li></ul>
+ * function Object.add_model(self, args)
+ */
+static void Object_add_model (LIScrArgs* args)
+{
+	LIScrData* model;
+
+	if (liscr_args_gets_data (args, "model", LISCR_SCRIPT_MODEL, &model))
+	{
+		if (!lieng_object_merge_model (args->self, model->data))
+			lisys_error_report ();
+	}
+}
+
+/* @luadoc
+ * --- Recalculates the bounding box of the model of the object.
+ * -- @param self Object.
+ * function Object.calculate_bounds(self)
+ */
+static void Object_calculate_bounds (LIScrArgs* args)
+{
+	LIEngObject* self = args->self;
+
+	if (self->model != NULL)
+		lieng_model_calculate_bounds (self->model);
+}
+
+/* @luadoc
  * --- Prevents map sectors around the object from being unloaded.
  * -- @param self Object.
  * -- @param args Arguments.<ul>
@@ -172,27 +170,34 @@ static void Object_refresh (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Custom collision response callback.
- * --
+ * --- Custom collision response callback.<br/>
  * -- Function to be called every time the object collides with something.
- * --
  * -- @name Object.contact_cb
  * -- @class table
  */
 
 /* @luadoc
- * --- Model string.
- * -- @name Object.model
- * -- @class table
+ * --- Gets the model of the object.
+ * -- @param self Object.
+ * -- @return Model or nil.
+ * function Object.get_model(self)
  */
-static void Object_getter_model (LIScrArgs* args)
+static void Object_get_model (LIScrArgs* args)
 {
 	LIEngObject* self = args->self;
 
 	if (self->model != NULL)
 		liscr_args_seti_data (args, self->model->script);
 }
-static void Object_setter_model (LIScrArgs* args)
+
+/* @luadoc
+ * --- Sets the model of the object.
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>1: Model.</li></ul>
+ * function Object.set_model(self, args)
+ */
+static void Object_set_model (LIScrArgs* args)
 {
 	LIScrData* value;
 
@@ -201,19 +206,27 @@ static void Object_setter_model (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Position.
- * --
- * -- @name Object.position
- * -- @class table
+ * --- Gets the position of the object.
+ * -- @param self Object.
+ * -- @return Vector.
+ * function Object.get_position(self)
  */
-static void Object_getter_position (LIScrArgs* args)
+static void Object_get_position (LIScrArgs* args)
 {
 	LIMatTransform tmp;
 
 	lieng_object_get_transform (args->self, &tmp);
 	liscr_args_seti_vector (args, &tmp.position);
 }
-static void Object_setter_position (LIScrArgs* args)
+
+/* @luadoc
+ * --- Sets the position of the object.
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>1: Position vector.</li></ul>
+ * function Object.set_position(self, args)
+ */
+static void Object_set_position (LIScrArgs* args)
 {
 	LIMatTransform transform;
 	LIMatVector vector;
@@ -227,16 +240,24 @@ static void Object_setter_position (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Visibility status.
- * --
- * -- @name Object.realized
- * -- @class table
+ * --- Gets the realization status of the object.
+ * -- @param self Object.
+ * -- @return Boolean.
+ * function Object.get_realized(self)
  */
-static void Object_getter_realized (LIScrArgs* args)
+static void Object_get_realized (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, lieng_object_get_realized (args->self));
 }
-static void Object_setter_realized (LIScrArgs* args)
+
+/* @luadoc
+ * --- Sets the realization status of the object.
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>1: boolean.</li></ul>
+ * function Object.set_realized(self, args)
+ */
+static void Object_set_realized (LIScrArgs* args)
 {
 	int value;
 
@@ -245,19 +266,27 @@ static void Object_setter_realized (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Rotational orientation.
- * --
- * -- @name Object.rotation
- * -- @class table
+ * --- Gets the rotation of the object.
+ * -- @param self Object.
+ * -- @return Quaternion.
+ * function Object.get_rotation(self)
  */
-static void Object_getter_rotation (LIScrArgs* args)
+static void Object_get_rotation (LIScrArgs* args)
 {
 	LIMatTransform tmp;
 
 	lieng_object_get_transform (args->self, &tmp);
 	liscr_args_seti_quaternion (args, &tmp.rotation);
 }
-static void Object_setter_rotation (LIScrArgs* args)
+
+/* @luadoc
+ * --- Sets the rotation of the object.
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>1: Quaternion.</li></ul>
+ * function Object.set_rotation(self, args)
+ */
+static void Object_set_rotation (LIScrArgs* args)
 {
 	LIMatTransform transform;
 	LIScrData* quat;
@@ -271,12 +300,12 @@ static void Object_setter_rotation (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- The sector index of the object, or nil if the object isn't on the map.
- * --
- * -- @name Object.sector
- * -- @class table
+ * --- Gets the map sector of the object.
+ * -- @param self Object.
+ * -- @return Integer.
+ * function Object.get_sector(self)
  */
-static void Object_getter_sector (LIScrArgs* args)
+static void Object_get_sector (LIScrArgs* args)
 {
 	LIEngObject* self = args->self;
 
@@ -292,16 +321,20 @@ void liscr_script_object (
 {
 	liscr_class_set_userdata (self, LISCR_SCRIPT_OBJECT, data);
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_mfunc (self, "add_model", Object_add_model);
-	liscr_class_insert_mfunc (self, "calculate_bounds", Object_calculate_bounds);
 	liscr_class_insert_cfunc (self, "find", Object_find);
 	liscr_class_insert_cfunc (self, "new", Object_new);
+	liscr_class_insert_mfunc (self, "add_model", Object_add_model);
+	liscr_class_insert_mfunc (self, "calculate_bounds", Object_calculate_bounds);
 	liscr_class_insert_mfunc (self, "refresh", Object_refresh);
-	liscr_class_insert_mvar (self, "model", Object_getter_model, Object_setter_model);
-	liscr_class_insert_mvar (self, "position", Object_getter_position, Object_setter_position);
-	liscr_class_insert_mvar (self, "realized", Object_getter_realized, Object_setter_realized);
-	liscr_class_insert_mvar (self, "rotation", Object_getter_rotation, Object_setter_rotation);
-	liscr_class_insert_mvar (self, "sector", Object_getter_sector, NULL);
+	liscr_class_insert_mfunc (self, "get_model", Object_get_model);
+	liscr_class_insert_mfunc (self, "set_model", Object_set_model);
+	liscr_class_insert_mfunc (self, "get_position", Object_get_position);
+	liscr_class_insert_mfunc (self, "set_position", Object_set_position);
+	liscr_class_insert_mfunc (self, "get_realized", Object_get_realized);
+	liscr_class_insert_mfunc (self, "set_realized", Object_set_realized);
+	liscr_class_insert_mfunc (self, "get_rotation", Object_get_rotation);
+	liscr_class_insert_mfunc (self, "set_rotation", Object_set_rotation);
+	liscr_class_insert_mfunc (self, "get_sector", Object_get_sector);
 }
 
 /** @} */

@@ -216,7 +216,7 @@ static void Object_sweep_sphere (LIScrArgs* args)
  * -- @name Object.angular
  * -- @class table
  */
-static void Object_getter_angular (LIScrArgs* args)
+static void Object_get_angular (LIScrArgs* args)
 {
 	LIMatVector tmp;
 	LIExtModule* module;
@@ -231,7 +231,7 @@ static void Object_getter_angular (LIScrArgs* args)
 	liphy_object_get_angular (object, &tmp);
 	liscr_args_seti_vector (args, &tmp);
 }
-static void Object_setter_angular (LIScrArgs* args)
+static void Object_set_angular (LIScrArgs* args)
 {
 	LIMatVector vector;
 	LIExtModule* module;
@@ -253,7 +253,7 @@ static void Object_setter_angular (LIScrArgs* args)
  * -- @name Object.collision_group
  * -- @class table
  */
-static void Object_getter_collision_group (LIScrArgs* args)
+static void Object_get_collision_group (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
@@ -266,7 +266,7 @@ static void Object_getter_collision_group (LIScrArgs* args)
 
 	liscr_args_seti_int (args, liphy_object_get_collision_group (object));
 }
-static void Object_setter_collision_group (LIScrArgs* args)
+static void Object_set_collision_group (LIScrArgs* args)
 {
 	int value;
 	LIExtModule* module;
@@ -288,7 +288,7 @@ static void Object_setter_collision_group (LIScrArgs* args)
  * -- @name Object.collision_mask
  * -- @class table
  */
-static void Object_getter_collision_mask (LIScrArgs* args)
+static void Object_get_collision_mask (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
@@ -301,7 +301,7 @@ static void Object_getter_collision_mask (LIScrArgs* args)
 
 	liscr_args_seti_int (args, liphy_object_get_collision_mask (object));
 }
-static void Object_setter_collision_mask (LIScrArgs* args)
+static void Object_set_collision_mask (LIScrArgs* args)
 {
 	int value;
 	LIExtModule* module;
@@ -322,7 +322,7 @@ static void Object_setter_collision_mask (LIScrArgs* args)
  * -- @name Object.contact_events
  * -- @class table
  */
-static void Object_getter_contact_events (LIScrArgs* args)
+static void Object_get_contact_events (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
@@ -335,7 +335,7 @@ static void Object_getter_contact_events (LIScrArgs* args)
 
 	liscr_args_seti_bool (args, liphy_object_get_contact_events (object));
 }
-static void Object_setter_contact_events (LIScrArgs* args)
+static void Object_set_contact_events (LIScrArgs* args)
 {
 	int value;
 	LIExtModule* module;
@@ -357,7 +357,7 @@ static void Object_setter_contact_events (LIScrArgs* args)
  * -- @name Object.gravity
  * -- @class table
  */
-static void Object_getter_gravity (LIScrArgs* args)
+static void Object_get_gravity (LIScrArgs* args)
 {
 	LIMatVector tmp;
 	LIExtModule* module;
@@ -372,7 +372,7 @@ static void Object_getter_gravity (LIScrArgs* args)
 	liphy_object_get_gravity (object, &tmp);
 	liscr_args_seti_vector (args, &tmp);
 }
-static void Object_setter_gravity (LIScrArgs* args)
+static void Object_set_gravity (LIScrArgs* args)
 {
 	LIMatVector vector;
 	LIExtModule* module;
@@ -396,7 +396,7 @@ static void Object_setter_gravity (LIScrArgs* args)
  * -- @name Object.ground
  * -- @class table
  */
-static void Object_getter_ground (LIScrArgs* args)
+static void Object_get_ground (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
@@ -416,7 +416,7 @@ static void Object_getter_ground (LIScrArgs* args)
  * -- @name Object.mass
  * -- @class table
  */
-static void Object_getter_mass (LIScrArgs* args)
+static void Object_get_mass (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
@@ -429,7 +429,7 @@ static void Object_getter_mass (LIScrArgs* args)
 
 	liscr_args_seti_float (args, liphy_object_get_mass (object));
 }
-static void Object_setter_mass (LIScrArgs* args)
+static void Object_set_mass (LIScrArgs* args)
 {
 	float value;
 	LIExtModule* module;
@@ -455,7 +455,7 @@ static void Object_setter_mass (LIScrArgs* args)
  * -- @name Object.movement
  * -- @class table
  */
-static void Object_getter_movement (LIScrArgs* args)
+static void Object_get_movement (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
@@ -468,7 +468,7 @@ static void Object_getter_movement (LIScrArgs* args)
 
 	liscr_args_seti_float (args, liphy_object_get_movement (object));
 }
-static void Object_setter_movement (LIScrArgs* args)
+static void Object_set_movement (LIScrArgs* args)
 {
 	float value;
 	LIExtModule* module;
@@ -494,7 +494,7 @@ static void Object_setter_movement (LIScrArgs* args)
  * -- <li>"static": Static obstacle.</li>
  * -- <li>"vehicle": Vehicle physics.</li></ul>
  */
-static void Object_getter_physics (LIScrArgs* args)
+static void Object_get_physics (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
@@ -527,7 +527,7 @@ static void Object_getter_physics (LIScrArgs* args)
 			break;
 	}
 }
-static void Object_setter_physics (LIScrArgs* args)
+static void Object_set_physics (LIScrArgs* args)
 {
 	const char* str;
 	LIExtModule* module;
@@ -563,7 +563,7 @@ static void Object_setter_physics (LIScrArgs* args)
  * -- @name Object.shape
  * -- @class table
  */
-static void Object_getter_shape (LIScrArgs* args)
+static void Object_get_shape (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
@@ -576,7 +576,7 @@ static void Object_getter_shape (LIScrArgs* args)
 
 	liscr_args_seti_string (args, liphy_object_get_shape (object));
 }
-static void Object_setter_shape (LIScrArgs* args)
+static void Object_set_shape (LIScrArgs* args)
 {
 	const char* value;
 	LIExtModule* module;
@@ -600,7 +600,7 @@ static void Object_setter_shape (LIScrArgs* args)
  * -- @name Object.speed
  * -- @class table
  */
-static void Object_getter_speed (LIScrArgs* args)
+static void Object_get_speed (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
@@ -613,7 +613,7 @@ static void Object_getter_speed (LIScrArgs* args)
 
 	liscr_args_seti_float (args, liphy_object_get_speed (object));
 }
-static void Object_setter_speed (LIScrArgs* args)
+static void Object_set_speed (LIScrArgs* args)
 {
 	float value;
 	LIExtModule* module;
@@ -639,7 +639,7 @@ static void Object_setter_speed (LIScrArgs* args)
  * -- @name Object.strafing
  * -- @class table
  */
-static void Object_getter_strafing (LIScrArgs* args)
+static void Object_get_strafing (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
@@ -652,7 +652,7 @@ static void Object_getter_strafing (LIScrArgs* args)
 
 	liscr_args_seti_float (args, liphy_object_get_strafing (object));
 }
-static void Object_setter_strafing (LIScrArgs* args)
+static void Object_set_strafing (LIScrArgs* args)
 {
 	float value;
 	LIExtModule* module;
@@ -674,7 +674,7 @@ static void Object_setter_strafing (LIScrArgs* args)
  * -- @name Object.velocity
  * -- @class table
  */
-static void Object_getter_velocity (LIScrArgs* args)
+static void Object_get_velocity (LIScrArgs* args)
 {
 	LIMatVector tmp;
 	LIExtModule* module;
@@ -689,7 +689,7 @@ static void Object_getter_velocity (LIScrArgs* args)
 	liphy_object_get_velocity (object, &tmp);
 	liscr_args_seti_vector (args, &tmp);
 }
-static void Object_setter_velocity (LIScrArgs* args)
+static void Object_set_velocity (LIScrArgs* args)
 {
 	LIMatVector vector;
 	LIExtModule* module;
@@ -717,19 +717,31 @@ void liext_script_object (
 	liscr_class_insert_mfunc (self, "insert_hinge_constraint", Object_insert_hinge_constraint);
 	liscr_class_insert_mfunc (self, "jump", Object_jump);
 	liscr_class_insert_mfunc (self, "sweep_sphere", Object_sweep_sphere);
-	liscr_class_insert_mvar (self, "angular", Object_getter_angular, Object_setter_angular);
-	liscr_class_insert_mvar (self, "collision_group", Object_getter_collision_group, Object_setter_collision_group);
-	liscr_class_insert_mvar (self, "collision_mask", Object_getter_collision_mask, Object_setter_collision_mask);
-	liscr_class_insert_mvar (self, "contact_events", Object_getter_contact_events, Object_setter_contact_events);
-	liscr_class_insert_mvar (self, "gravity", Object_getter_gravity, Object_setter_gravity);
-	liscr_class_insert_mvar (self, "ground", Object_getter_ground, NULL);
-	liscr_class_insert_mvar (self, "mass", Object_getter_mass, Object_setter_mass);
-	liscr_class_insert_mvar (self, "physics", Object_getter_physics, Object_setter_physics);
-	liscr_class_insert_mvar (self, "shape", Object_getter_shape, Object_setter_shape);
-	liscr_class_insert_mvar (self, "speed", Object_getter_speed, Object_setter_speed);
-	liscr_class_insert_mvar (self, "strafing", Object_getter_strafing, Object_setter_strafing);
-	liscr_class_insert_mvar (self, "movement", Object_getter_movement, Object_setter_movement);
-	liscr_class_insert_mvar (self, "velocity", Object_getter_velocity, Object_setter_velocity);
+	liscr_class_insert_mfunc (self, "get_angular", Object_get_angular);
+	liscr_class_insert_mfunc (self, "set_angular", Object_set_angular);
+	liscr_class_insert_mfunc (self, "get_collision_group", Object_get_collision_group);
+	liscr_class_insert_mfunc (self, "set_collision_group", Object_set_collision_group);
+	liscr_class_insert_mfunc (self, "get_collision_mask", Object_get_collision_mask);
+	liscr_class_insert_mfunc (self, "set_collision_mask", Object_set_collision_mask);
+	liscr_class_insert_mfunc (self, "get_contact_events", Object_get_contact_events);
+	liscr_class_insert_mfunc (self, "set_contact_events", Object_set_contact_events);
+	liscr_class_insert_mfunc (self, "get_gravity", Object_get_gravity);
+	liscr_class_insert_mfunc (self, "set_gravity", Object_set_gravity);
+	liscr_class_insert_mfunc (self, "get_ground", Object_get_ground);
+	liscr_class_insert_mfunc (self, "get_mass", Object_get_mass);
+	liscr_class_insert_mfunc (self, "set_mass", Object_set_mass);
+	liscr_class_insert_mfunc (self, "get_movement", Object_get_movement);
+	liscr_class_insert_mfunc (self, "set_movement", Object_set_movement);
+	liscr_class_insert_mfunc (self, "get_physics", Object_get_physics);
+	liscr_class_insert_mfunc (self, "set_physics", Object_set_physics);
+	liscr_class_insert_mfunc (self, "get_shape", Object_get_shape);
+	liscr_class_insert_mfunc (self, "set_shape", Object_set_shape);
+	liscr_class_insert_mfunc (self, "get_speed", Object_get_speed);
+	liscr_class_insert_mfunc (self, "set_speed", Object_set_speed);
+	liscr_class_insert_mfunc (self, "get_strafing", Object_get_strafing);
+	liscr_class_insert_mfunc (self, "set_strafing", Object_set_strafing);
+	liscr_class_insert_mfunc (self, "get_velocity", Object_get_velocity);
+	liscr_class_insert_mfunc (self, "set_velocity", Object_set_velocity);
 }
 
 /** @} */

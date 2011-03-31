@@ -1,51 +1,37 @@
 local oldanimate = Object.animate
-local oldgetter = Object.getter
-local oldsetter = Object.setter
 local objspec = Spec{name = "object", type = "object"}
 
-Object.getter = function(self, key)
-	if key == "admin" then
-		return self.account and Config.inst.admins[self.account.login]
-	elseif key == "count" then
-		return oldgetter(self, key) or 1
-	elseif key == "spec" then
-		return oldgetter(self, key) or objspec
-	else
-		return oldgetter(self, key)
-	end
+Object.getters.admin = function(self)
+	local a = Class.getter(self, "account")
+	return a and Config.inst.admins[a.login]
 end
-
-Object.setter = function(self, key, value)
-	if key == "admin" then
-		if value then
-			Config.inst.admins[self] = true
-		else
-			Config.inst.admins[self] = nil
-		end
-		Config.inst:save()
-	elseif key == "contact_cb" then
-		oldsetter(self, key, value)
-		self.contact_events = (type(value) == "function")
-	elseif key == "count" then
-		-- Store the new count.
-		if self.count == value then return end
-		if value ~= 0 then
-			oldsetter(self, key, value)
-		else
-			oldsetter(self, key, nil)
-		end
-		-- Update the inventory containing the object.
-		local inventory = Inventory:find{object = self}
-		if inventory then
-			for k,v in pairs(inventory.slots) do
-				if v == self then
-					inventory:update_slot{slot = k}
-					break
-				end
+Object.getters.count = function(self)
+	return Class.getter(self, "count") or 1
+end
+Object.getters.spec = function(self)
+	return Class.getter(self, "spec") or objspec
+end
+Object.setters.admin = function(self, v)
+	Config.inst.admins[self] = v and true or nil
+	Config.inst:save()
+end
+Object.setters.contact_cb = function(self, v)
+	Class.setter(self, "contact_cb", v)
+	Class.setter(self, "contact_events", (type(v) == "function"))
+end
+Object.setters.count = function(self, v)
+	-- Store the new count.
+	if Class.getter(self, "count") == v then return end
+	Class.setter(self, "count", v ~= 0 and v or nil)
+	-- Update the inventory containing the object.
+	local inventory = Inventory:find{object = self}
+	if inventory then
+		for k,v in pairs(inventory.slots) do
+			if v == self then
+				inventory:update_slot{slot = k}
+				break
 			end
 		end
-	else
-		oldsetter(self, key, value)
 	end
 end
 
