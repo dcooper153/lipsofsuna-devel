@@ -1174,7 +1174,7 @@ Itemspec{
 	water_gravity = Vector(0,1,0)}
 
 ------------------------------------------------------------------------------
--- Miscellaneous.
+-- Ammo.
 
 Itemspec{
 	name = "arrow",
@@ -1187,6 +1187,7 @@ Itemspec{
 	mass = 1,
 	stacking = true,
 	water_gravity = Vector(0,1,0)}
+
 Itemspec{
 	name = "fire arrow",
 	model = "arrow-000",
@@ -1215,7 +1216,6 @@ Itemspec{
 	stacking = true,
 	water_gravity = Vector(0,1,0)}
 
-
 Itemspec{
 	name = "bullet",
 	model = "arrow-000", -- FIXME
@@ -1226,6 +1226,9 @@ Itemspec{
 	crafting_materials = {["iron ingot"] = 1, ["crimson stone"] = 3},
 	icon = "arrow1",
 	stacking = true}
+
+------------------------------------------------------------------------------
+-- Miscellaneous.
 
 Itemspec{
 	name = "empty bottle",
