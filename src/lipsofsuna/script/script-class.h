@@ -59,12 +59,6 @@ LIAPICALL (int, liscr_class_insert_mfunc, (
 	const char*   name,
 	LIScrArgsFunc func));
 
-LIAPICALL (int, liscr_class_insert_mvar, (
-	LIScrClass*   self,
-	const char*   name,
-	LIScrArgsFunc getter,
-	LIScrArgsFunc setter));
-
 LIAPICALL (int, liscr_class_get_interface, (
 	const LIScrClass* self,
 	const char*       name));

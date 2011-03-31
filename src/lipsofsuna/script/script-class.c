@@ -261,35 +261,16 @@ void liscr_class_insert_func (
 
 /**
  * \brief Inserts a member function to the class.
- *
  * \param self Class.
  * \param name Function name.
  * \param func Function pointer.
  */
-int
-liscr_class_insert_mfunc (LIScrClass*   self,
-                          const char*   name,
-                          LIScrArgsFunc func)
+int liscr_class_insert_mfunc (
+	LIScrClass*   self,
+	const char*   name,
+	LIScrArgsFunc func)
 {
 	return private_insert_func (self, 1, name, func);
-}
-
-/**
- * \brief Inserts a member variable accessor to the class.
- *
- * \param self Class.
- * \param name Name for the accessor.
- * \param getter Function pointer or NULL.
- * \param setter Function pointer or NULL.
- * \return Nonzero on success.
- */
-int
-liscr_class_insert_mvar (LIScrClass*  self,
-                        const char*   name,
-                        LIScrArgsFunc getter,
-                        LIScrArgsFunc setter)
-{
-	return private_insert_var (self, 1, name, getter, setter);
 }
 
 /**
