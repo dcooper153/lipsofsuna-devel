@@ -90,6 +90,13 @@ Eventhandler{type = "tick", func = function(self, args)
 	end
 end}
 
+Protocol:add_handler{type = "AUTHENTICATE_REJECT", func = function(event)
+	local ok,s = event.packet:read("string")
+	if not ok then return end
+	Gui:set_mode("startup")
+	Startup:set_state("Authentication failed: " .. s, "Retry")
+end}
+
 Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(event)
 	Network:send{packet = Packet(packets.CLIENT_AUTHENTICATE, "string", Settings.account, "string", Settings.password)}
 end}

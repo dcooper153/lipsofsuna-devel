@@ -68,6 +68,7 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
 	-- Read credentials.
 	local ok,login,pass = args.packet:read("string", "string")
 	if not ok then
+		Network:send{client = args.client, packet = Packet(packets.AUTHENTICATE_REJECT, "string", "Protocol mismatch.")}
 		Network:disconnect(args.client)
 		return
 	end
@@ -76,6 +77,7 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
 	-- check fails, Account() returns nil and we disconnect the client.
 	account = Account(login, pass)
 	if not account then
+		Network:send{client = args.client, packet = Packet(packets.AUTHENTICATE_REJECT, "string", "Invalid account name or password.")}
 		Network:disconnect(args.client)
 		return
 	end

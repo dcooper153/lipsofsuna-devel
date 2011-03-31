@@ -103,6 +103,7 @@ do
 	add("VOXEL_DIFF")
 	add("WORLD_EFFECT")
 	add("ADMIN_PRIVILEGE")
+	add("AUTHENTICATE_REJECT")
 end
 
 effects = {}
