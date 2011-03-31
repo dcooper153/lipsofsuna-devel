@@ -134,7 +134,7 @@ static void Packet_write (LIScrArgs* args)
  * -- @name Packet.size
  * -- @class table
  */
-static void Packet_getter_size (LIScrArgs* args)
+static void Packet_get_size (LIScrArgs* args)
 {
 	LIScrPacket* self;
 
@@ -151,7 +151,7 @@ static void Packet_getter_size (LIScrArgs* args)
  * -- @name Packet.type
  * -- @class table
  */
-static void Packet_getter_type (LIScrArgs* args)
+static void Packet_get_type (LIScrArgs* args)
 {
 	LIScrPacket* self;
 
@@ -161,7 +161,7 @@ static void Packet_getter_type (LIScrArgs* args)
 	else
 		liscr_args_seti_int (args, ((uint8_t*) liarc_writer_get_buffer (self->writer))[0]);
 }
-static void Packet_setter_type (LIScrArgs* args)
+static void Packet_set_type (LIScrArgs* args)
 {
 	int value;
 	uint8_t* buffer;
@@ -189,8 +189,9 @@ void liscr_script_packet (
 	liscr_class_insert_mfunc (self, "read", Packet_read);
 	liscr_class_insert_mfunc (self, "resume", Packet_resume);
 	liscr_class_insert_mfunc (self, "write", Packet_write);
-	liscr_class_insert_mvar (self, "size", Packet_getter_size, NULL);
-	liscr_class_insert_mvar (self, "type", Packet_getter_type, Packet_setter_type);
+	liscr_class_insert_mfunc (self, "get_size", Packet_get_size);
+	liscr_class_insert_mfunc (self, "get_type", Packet_get_type);
+	liscr_class_insert_mfunc (self, "set_type", Packet_set_type);
 }
 
 LIScrData* liscr_packet_new_readable (
