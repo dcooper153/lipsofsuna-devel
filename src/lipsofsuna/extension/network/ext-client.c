@@ -79,7 +79,27 @@ void liext_client_free (
 	/* Remove from the client list. */
 	lialg_u32dic_remove (self->module->clients, self->id);
 
+	/* Mark peer data as removed. */
+	/* We get a disconnection event even after the a manual disconnect but
+	   the client struct is already freed. We use the NULL peer data pointer
+	   to identify the condition and hence avoid a double free. */
+	self->peer->data = NULL;
+
 	lisys_free (self);
+}
+
+/**
+ * \brief Marks the client as disconnected.
+ * \param self Client.
+ */
+void liext_client_disconnect (
+	LIExtClient* self)
+{
+	if (self->connected)
+	{
+		self->connected = 0;
+		self->disconnect_time = lisys_time (NULL);
+	}
 }
 
 /**

@@ -36,6 +36,9 @@ LIExtClient* liext_client_new (
 void liext_client_free (
 	LIExtClient* self);
 
+void liext_client_disconnect (
+	LIExtClient* self);
+
 void liext_client_send (
 	LIExtClient* self,
 	LIArcWriter* writer,

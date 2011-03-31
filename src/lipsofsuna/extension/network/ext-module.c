@@ -25,7 +25,7 @@
 #include "ext-module.h"
 #include "ext-client.h"
 
-#define DISCONNECT_TIMEOUT 3
+#define DISCONNECT_TIMEOUT 2
 #define MAX_CLIENTS 32
 #define MAX_CHANNELS 1
 
@@ -233,12 +233,16 @@ void liext_network_update (
 						enet_peer_reset (event.peer);
 					break;
 				case ENET_EVENT_TYPE_RECEIVE:
-					private_message_server (self, &event);
+					if (event.peer->data != NULL)
+						private_message_server (self, &event);
 					enet_packet_destroy (event.packet);
 					break;
 				case ENET_EVENT_TYPE_DISCONNECT:
-					liext_client_free (event.peer->data);
-					event.peer->data = NULL;
+					if (event.peer->data != NULL)
+					{
+						liext_client_free (event.peer->data);
+						event.peer->data = NULL;
+					}
 					break;
 				default:
 					break;
@@ -250,7 +254,7 @@ void liext_network_update (
 			if (!client->connected && lisys_time (NULL) - client->disconnect_time > DISCONNECT_TIMEOUT)
 			{
 				enet_peer_reset (client->peer);
-				lisys_free (client);
+				liext_client_free (client);
 			}
 		}
 	}

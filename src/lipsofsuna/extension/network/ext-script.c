@@ -52,7 +52,7 @@ static void Network_disconnect (LIScrArgs* args)
 		return;
 	client = liext_network_find_client (module, id);
 	if (client != NULL)
-		liext_client_free (client);
+		liext_client_disconnect (client);
 }
 
 /* @luadoc
