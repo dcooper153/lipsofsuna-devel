@@ -170,13 +170,6 @@ static void Object_refresh (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Custom collision response callback.<br/>
- * -- Function to be called every time the object collides with something.
- * -- @name Object.contact_cb
- * -- @class table
- */
-
-/* @luadoc
  * --- Gets the model of the object.
  * -- @param self Object.
  * -- @return Model or nil.

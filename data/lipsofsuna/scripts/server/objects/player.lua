@@ -37,16 +37,6 @@ Player.new = function(clss, args)
 	return self
 end
 
---[[Player.contact_cb = function(self, result)
-	local damage = Damage:impulse(result.impulse)
-	local resist = Voxel:player_contact(self, result.point)
-	if damage > resist then
-		damage = damage - resist
-		Effect:play{effect = "impact1", point = result.point}
-		self:damaged(damage)
-	end
-end--]]
-
 Player.set_client = function(self, client)
 	self.client = client
 	self.vision = Vision{object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
@@ -64,7 +54,6 @@ end
 Player.die = function(self)
 	if Creature.die(self) then
 		self:send{packet = Packet(packets.MESSAGE, "string", "You have died...")}
-		self.contact_cb = false
 	else
 		self:send{packet = Packet(packets.MESSAGE, "string", "Saved by Sanctuary.")}
 	end

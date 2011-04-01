@@ -81,6 +81,44 @@ Item.clone = function(self)
 		rotation = self.rotation}
 end
 
+--- Handles physics contacts.
+-- @param self Object.
+-- @param result Contact result.
+Item.contact_cb = function(self, result)
+	if self.spec.categories["boomerang"] then
+		-- Boomerang mode.
+		if result.object == self.contact_args.owner then
+			-- Owner catch.
+			local o = self.contact_args.owner:get_item{slot = "hand.R"}
+			if not o then
+				self.contact_args.owner:set_item{slot = "hand.R", object = self}
+			elseif not o:merge{object = self} then
+				self.contact_args.owner:add_item{object = proj}
+			end
+		else
+			-- Damage target.
+			self.contact_args.feat:apply{
+				attacker = self.contact_args.owner,
+				point = result.point,
+				projectile = self,
+				target = result.object,
+				tile = result.tile}
+		end
+		-- Disable boomerang mode.
+		if self.timer then
+			self.timer:disable()
+			self.timer = nil
+		end
+		self.contact_events = false
+		self.contact_args = nil
+		self.gravity = Config.gravity
+		self:animate("fly stop")
+	else
+		-- Projectile mode.
+		Object.contact_cb(self, result)
+	end
+end
+
 --- Causes the item to take damage.
 -- @param self Object.
 -- @param amount Amount of damage.
@@ -149,35 +187,6 @@ Item.fire = function(self, args)
 	if proj.spec.categories["boomerang"] then
 		-- Work around an initial collision with the user.
 		proj.position = proj.position + proj.rotation * Vector(0,0,-0.7)
-		-- Enable boomerang collisions.
-		-- The boomerang mode is disabled when a collision occurs and either the
-		-- collision object is damaged or the user catches the boomerang.
-		if args.collision then
-			proj.contact_cb = function(_, result)
-				if result.object == proj.owner then
-					-- Owner catch.
-					local o = proj.owner:get_item{slot = "hand.R"}
-					if not o then
-						proj.owner:set_item{slot = "hand.R", object = proj}
-					elseif not o:merge{object = proj} then
-						proj.owner:add_item{object = proj}
-					end
-				else
-					-- Damage target.
-					args.feat:apply{
-						attacker = args.owner,
-						point = result.point,
-						projectile = proj,
-						target = result.object,
-						tile = result.tile}
-				end
-				-- Disable boomerang mode.
-				if proj.timer then proj.timer:disable() end
-				proj.gravity = Config.gravity
-				proj:animate("fly stop")
-				proj.contact_cb = nil
-			end
-		end
 		-- Enable boomerang return.
 		proj.state = 0
 		proj.rotation = Quaternion{axis = Vector(0,0,1), angle = -0.5 * math.pi}

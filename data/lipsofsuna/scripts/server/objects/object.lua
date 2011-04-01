@@ -15,10 +15,6 @@ Object.setters.admin = function(self, v)
 	Config.inst.admins[self] = v and true or nil
 	Config.inst:save()
 end
-Object.setters.contact_cb = function(self, v)
-	Class.setter(self, "contact_cb", v)
-	Class.setter(self, "contact_events", (type(v) == "function"))
-end
 Object.setters.count = function(self, v)
 	-- Store the new count.
 	if Class.getter(self, "count") == v then return end
@@ -33,6 +29,28 @@ Object.setters.count = function(self, v)
 			end
 		end
 	end
+end
+
+--- Handles physics contacts.
+-- @param self Object.
+-- @param result Contact result.
+Object.contact_cb = function(self, result)
+	if not self.contact_args then
+		self.contact_args = nil
+		self.contact_events = false
+		return
+	end
+	if result.object == self.contact_args.owner then return end
+	self.contact_args.feat:apply{
+		attacker = self.contact_args.owner,
+		point = result.point,
+		projectile = self,
+		target = result.object,
+		tile = result.tile,
+		weapon = self.contact_args.weapon}
+	self.contact_args = nil
+	self.contact_events = false
+	self.realized = false
 end
 
 --- Creates a new object from a data string or database entry.
@@ -199,18 +217,8 @@ Object.fire = function(self, args)
 	if not args.owner or not args.feat then return end
 	-- Enable collision callback.
 	if args.collision then
-		self.contact_cb = function(_, result)
-			if result.object == self.owner then return end
-			args.feat:apply{
-				attacker = args.owner,
-				point = result.point,
-				projectile = self,
-				target = result.object,
-				tile = result.tile,
-				weapon = args.weapon}
-			self.realized = false
-			self.contact_cb = nil
-		end
+		self.contact_args = args
+		self.contact_events = true
 	end
 	-- Enable destruction timer.
 	if args.timer then
