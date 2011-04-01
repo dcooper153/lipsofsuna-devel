@@ -8,9 +8,11 @@ if Program.args == "--help" or Program.args == "-h" then
 	return
 end
 
+require "system/core"
 require "system/database"
 require "system/eventhandler"
 require "system/graphics"
+require "system/math"
 require "system/render"
 require "system/sound"
 require "system/widgets"
