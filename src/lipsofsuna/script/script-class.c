@@ -378,10 +378,8 @@ int liscr_class_default___index (
 	LIScrClass* ptr;
 	LIScrClass* clss;
 	LIScrData* self;
-	LIScrScript* script;
 
 	/* Get class data. */
-	script = liscr_script (lua);
 	clss = liscr_isanyclass (lua, 1);
 	if (clss == NULL)
 	{
@@ -390,8 +388,6 @@ int liscr_class_default___index (
 			return 0;
 		clss = liscr_data_get_class (self);
 	}
-	else
-		self = NULL;
 	luaL_checkany (lua, 2);
 
 	/* Custom getter. */
@@ -438,10 +434,8 @@ int liscr_class_default___newindex (
 	LIScrClass* ptr;
 	LIScrClass* clss;
 	LIScrData* self;
-	LIScrScript* script;
 
 	/* Get class data. */
-	script = liscr_script (lua);
 	clss = liscr_isanyclass (lua, 1);
 	if (clss == NULL)
 	{
@@ -450,8 +444,6 @@ int liscr_class_default___newindex (
 			return 0;
 		clss = liscr_data_get_class (self);
 	}
-	else
-		self = NULL;
 	luaL_checkany (lua, 2);
 	luaL_checkany (lua, 3);
 
