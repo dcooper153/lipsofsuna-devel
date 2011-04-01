@@ -15,7 +15,7 @@
 Itemspec{
 	name = "adamantium",
 	model = "adamantium1",
-	icon = "stone2",
+	icon = "greymineral1",
 	mass = 4,
 	categories = {"material"},
 	stacking = true}
@@ -123,6 +123,7 @@ Itemspec{
 
 Itemspec{
 	name = "dragon scale",
+	icon = "bone1", -- FIXME
 	model = "book-000", -- FIXME
 	mass = 1,
 	categories = {"material"},
@@ -130,6 +131,7 @@ Itemspec{
 
 Itemspec{
 	name = "lizard scale",
+	icon = "bone1", -- FIXME
 	model = "book-000", -- FIXME
 	mass = 1,
 	categories = {"material"},
@@ -170,7 +172,7 @@ Itemspec{
 Itemspec{
 	name = "milky powder",
 	model = "book-000", -- FIXME
-	icon = "mushroom1",
+	icon = "potion3",
 	categories = {"material"},
 	crafting_count = 20,
 	crafting_materials = {["mushroom"] = 1},
@@ -188,6 +190,7 @@ Itemspec{
 Itemspec{
 	name = "sand chunk",
 	model = "sandchunk1",
+	icon = "sand1",
 	categories = {"build", "material"},
 	construct_tile = "sand1",
 	construct_tile_count = 1,
@@ -199,6 +202,7 @@ Itemspec{
 Itemspec{
 	name = "soil chunk",
 	model = "soilchunk1",
+	icon = "dirt1",
 	categories = {"build", "material"},
 	construct_tile = "soil1",
 	construct_tile_count = 1,
@@ -236,7 +240,7 @@ Itemspec{
 Itemspec{
 	name = "adamantium crossbow",
 	model = "bow1", -- FIXME
-	icon = "bow1",
+	icon = "crossbow2",
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["adamantium"] = 9},
@@ -261,7 +265,7 @@ Itemspec{
 
 Itemspec{
 	name = "adamantium hatchet",
-	model = "axe1",
+	model = "axe3",
 	icon = "axe1",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
@@ -289,7 +293,7 @@ Itemspec{
 Itemspec{
 	name = "adamantium musket",
 	model = "bow1", -- FIXME
-	icon = "bow1",
+	icon = "musket1",
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["adamantium"] = 15, ["log"] = 2},
@@ -304,7 +308,7 @@ Itemspec{
 Itemspec{
 	name = "adamantium sword",
 	model = "sword1",
-	icon = "sword1",
+	icon = "sword3",
 	animation_hold = "hold sword",
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
@@ -317,7 +321,7 @@ Itemspec{
 Itemspec{
 	name = "aquanite crossbow",
 	model = "bow1", -- FIXME
-	icon = "bow1",
+	icon = "crossbow1",
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["aquanite stone"] = 9},
@@ -345,6 +349,7 @@ Itemspec{
 Itemspec{
 	name = "aquanite grenade",
 	model = "grenade1",
+	icon = "grenade1",
 	mass = 3,
 	animation_attack = "throw grenade",
 	animation_hold = "hold grenade",
@@ -363,7 +368,7 @@ Itemspec{
 Itemspec{
 	name = "aquanite hatchet",
 	model = "axe1",
-	icon = "axe1",
+	icon = "axe2",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
@@ -393,7 +398,7 @@ Itemspec{
 Itemspec{
 	name = "aquanite musket",
 	model = "bow1", -- FIXME
-	icon = "bow1",
+	icon = "musket1",
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["aquanite stone"] = 15, ["log"] = 2},
@@ -408,7 +413,7 @@ Itemspec{
 Itemspec{
 	name = "aquanite sword",
 	model = "sword1",
-	icon = "sword1",
+	icon = "sword2",
 	animation_hold = "hold sword",
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
@@ -427,6 +432,7 @@ Itemspec{
 		["fly stop"] = {channel = 1, permanent = true}},
 	mass = 2,
 	model = "boomerang1",
+	icon = "boomerang1",
 	categories = {"boomerang", "throwable", "weapon"},
 	crafting_materials = {log = 2},
 	influences_base = {physical = -10},
@@ -438,7 +444,7 @@ Itemspec{
 Itemspec{
 	name = "crimson crossbow",
 	model = "bow1", -- FIXME
-	icon = "bow1",
+	icon = "crossbow1",
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["crimson stone"] = 9},
@@ -466,6 +472,7 @@ Itemspec{
 Itemspec{
 	name = "crimson grenade",
 	model = "grenade1",
+	icon = "grenade1",
 	mass = 3,
 	animation_attack = "throw grenade",
 	animation_hold = "hold grenade",
@@ -483,7 +490,7 @@ Itemspec{
 Itemspec{
 	name = "crimson hatchet",
 	model = "axe1",
-	icon = "axe1",
+	icon = "axe2",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
@@ -513,7 +520,7 @@ Itemspec{
 Itemspec{
 	name = "crimson musket",
 	model = "bow1", -- FIXME
-	icon = "bow1",
+	icon = "musket1",
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["crimson stone"] = 15, ["log"] = 2},
@@ -528,7 +535,7 @@ Itemspec{
 Itemspec{
 	name = "crimson sword",
 	model = "sword1",
-	icon = "sword1",
+	icon = "sword2",
 	animation_hold = "hold sword",
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
@@ -543,7 +550,7 @@ Itemspec{
 Itemspec{
 	name = "iron crossbow",
 	model = "bow1", -- FIXME
-	icon = "bow1",
+	icon = "crossbow1",
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["iron ingot"] = 3},
@@ -571,7 +578,7 @@ Itemspec{
 Itemspec{
 	name = "iron hatchet",
 	model = "axe1",
-	icon = "axe1",
+	icon = "axe2",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
@@ -601,7 +608,7 @@ Itemspec{
 Itemspec{
 	name = "iron musket",
 	model = "bow1", -- FIXME
-	icon = "bow1",
+	icon = "musket1",
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["iron ingot"] = 5, ["log"] = 2},
@@ -616,7 +623,7 @@ Itemspec{
 Itemspec{
 	name = "iron sword",
 	model = "sword1",
-	icon = "sword1",
+	icon = "sword2",
 	animation_hold = "hold sword",
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
@@ -704,7 +711,7 @@ Itemspec{
 Itemspec{
 	name = "fire bow",
 	model = "bow1", -- FIXME
-	icon = "bow1",
+	icon = "bow2",
 	ammo_type = "fire arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["log"] = 5},
@@ -720,7 +727,7 @@ Itemspec{
 Itemspec{
 	name = "explosive bow",
 	model = "bow1", -- FIXME
-	icon = "bow1",
+	icon = "bow2",
 	ammo_type = "explosive arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["log"] = 5},
@@ -1120,28 +1127,26 @@ Itemspec{
 	equipment_models = {
 		["aer/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest2"}},
 	equipment_slot = "upperbody",
-	icon = "cloth1",
 	mass = 5,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "leather brigand chest",
 	model = "book-000",
-	icon = "lizardarmor1",
+	icon = "leatherarmor1",
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
 	equipment_models = {
 		["aer/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest1"}},
 	equipment_slot = "upperbody",
-	icon = "cloth1",
 	mass = 5,
 	water_gravity = Vector(0,1,0)}
 
 Itemspec{
 	name = "round shield",
 	icon = "shield1",
-	model = "shield1",
+	model = "woodshield1",
 	animation_hold = "hold shield",
 	armor_class = 0.08,
 	categories = {"shield"},
@@ -1151,7 +1156,7 @@ Itemspec{
 
 Itemspec{
 	name = "wooden shield",
-	icon = "shield1",
+	icon = "woodshield2",
 	model = "shield-001-wood1",
 	animation_hold = "hold shield",
 	armor_class = 0.08,
@@ -1171,7 +1176,6 @@ Itemspec{
 	equipment_models = {
 		["aermale"] = {upper = "aermale1shirt1"}},
 	equipment_slot = "upperbody",
-	icon = "cloth1",
 	mass = 1,
 	water_gravity = Vector(0,1,0)}
 
@@ -1185,7 +1189,6 @@ Itemspec{
 	equipment_models = {
 		["aermale"] = {legs = "aermale1pants1"}},
 	equipment_slot = "lowerbody",
-	icon = "cloth1",
 	mass = 1,
 	water_gravity = Vector(0,1,0)}
 
@@ -1253,6 +1256,7 @@ Itemspec{
 	crafting_materials = {["glass ingot"] = 1},
 	health = 5,
 	mass = 1,
+	icon = "potion3", -- FIXME
 	stacking = true}
 
 Itemspec{
@@ -1305,6 +1309,7 @@ Itemspec{
 Itemspec{
 	name = "chest",
 	model = "chest1",
+	icon = "chest1",
 	mass = 30,
 	animations = {
 		["loot"] = {animation = "opening", channel = 1, permanent = true, repeat_start = 10},
@@ -1321,6 +1326,7 @@ Itemspec{
 Itemspec{
 	name = "jar",
 	model = "jar1",
+	icon = "potion3", -- FIXME
 	mass = 9,
 	categories = {"container", "generate"},
 	crafting_materials = {["granite stone"] = 3},
@@ -1350,6 +1356,7 @@ Itemspec{
 
 Itemspec{
 	name = "chair",
+	icon = "chest1", -- FIXME
 	model = "chair1",
 	mass = 10,
 	categories = {"furniture"},
@@ -1361,6 +1368,7 @@ Itemspec{
 Itemspec{
 	name = "wood chair",
 	model = "chair2",
+	icon = "chest1", -- FIXME
 	mass = 10,
 	categories = {"furniture"},
 	crafting_materials = {log = 5},
@@ -1371,6 +1379,7 @@ Itemspec{
 Itemspec{
 	name = "wood bench",
 	model = "bench1",
+	icon = "chest1", -- FIXME
 	mass = 15,
 	categories = {"furniture"},
 	crafting_materials = {log = 6},
@@ -1381,6 +1390,7 @@ Itemspec{
 Itemspec{
 	name = "wood table",
 	model = "table1",
+	icon = "chest1", -- FIXME
 	mass = 20,
 	categories = {"furniture"},
 	crafting_materials = {log = 7},
