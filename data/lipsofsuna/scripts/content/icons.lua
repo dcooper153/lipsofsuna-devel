@@ -442,7 +442,7 @@ Iconspec{
 
 Iconspec{
 	name = "modifier-nature",
-	image = "icons2,
+	image = "icons2",
 	offset = {68,0},
 	size = {34,34}}
 
