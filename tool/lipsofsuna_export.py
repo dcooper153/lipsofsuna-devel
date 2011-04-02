@@ -1,3 +1,16 @@
+bl_info = {
+	"name": "Export Lips of Suna (.lmdl)",
+	"author": "Lips of Suna development team",
+	"version": (1, 0),
+	"blender": (2, 5, 7),
+	"api": 35622,
+	"location": "File > Export",
+	"description": "Lips of Suna (.lmdl)",
+	"warning": "",
+	"wiki_url": "http://sourceforge.net/apps/trac/lipsofsuna/wiki",
+	"tracker_url": "http://sourceforge.net/apps/trac/lipsofsuna/wiki",
+	"category": "Import-Export"}
+
 import array, math, os, struct, sys, bpy, mathutils
 
 class LIEnum:
@@ -310,7 +323,7 @@ class LICollision:
 			translation = mathutils.Matrix.Translation((center.x, center.y, center.z))
 			icohull.matrix_local = object.matrix_local * translation
 			oldmesh = icohull.data
-			icohull.data = icohull.create_mesh(bpy.context.scene, True, 'PREVIEW')
+			icohull.data = icohull.to_mesh(bpy.context.scene, True, 'PREVIEW')
 			bpy.data.meshes.remove(oldmesh)
 			# Fix the coordinate system.
 			icohull.matrix_local = LIFormat.matrix * icohull.matrix_local
@@ -1215,7 +1228,7 @@ class LIFile:
 						obj.modifiers.remove(mod)
 				# Apply modifiers.
 				oldmesh = obj.data
-				obj.data = obj.create_mesh(bpy.context.scene, True, 'PREVIEW')
+				obj.data = obj.to_mesh(bpy.context.scene, True, 'PREVIEW')
 				bpy.data.meshes.remove(oldmesh)
 			self.state += 1
 			return False
@@ -1350,7 +1363,7 @@ class LIFile:
 
 	def write_block(self, name, data):
 		self.file.write(name.encode())
-		self.file.write(struct.pack('c', '\0'))
+		self.file.write(struct.pack('B', 0))
 		self.file.write(struct.pack("!I", data.pos))
 		self.file.write(data.data)
 
@@ -1391,7 +1404,7 @@ class LIWriter:
 		if self.debug:
 			self.debug.write("\"" + value + "\" ")
 		self.data += value.encode()
-		self.data += struct.pack('c', '\0')
+		self.data += struct.pack('B', 0)
 		self.pos += len(value) + 1
 
 ##############################################################################
