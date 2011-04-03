@@ -27,31 +27,30 @@ require "client/widgets/scene"
 require "editor/controls"
 require "editor/events"
 
-local oldsetter = Object.setter
-Object.setter = function(self, key, value)
-	if key == "spec" then
-		oldsetter(self, key, value)
-		self.model = value.model
-		if value.models then
-			local m = self.model:copy()
-			for k,v in pairs(value.models) do
+Object:add_getters{
+	spec = function(s) return rawget(s, "__spec") end}
+
+Object:add_setters{
+	spec = function(s, v)
+		rawset(s, "__spec", v)
+		s.model = v.model
+		if v.models then
+			local m = s.model:copy()
+			for k,v in pairs(v.models) do
 				if k ~= "skeleton" then
 					m:merge(Model:load{file = v})
 				end
 			end
 			m:calculate_bounds()
 			m:changed()
-			self.model = m
+			s.model = m
 		end
-		if value.type == "species" then
-			self:animate{animation = "idle", channel = 1, permanent = true}
-			self:update_animations{secs = 0}
-			self:deform_mesh()
+		if v.type == "species" then
+			s:animate{animation = "idle", channel = 1, permanent = true}
+			s:update_animations{secs = 0}
+			s:deform_mesh()
 		end
-	else
-		oldsetter(self, key, value)
-	end
-end
+	end}
 
 Object.move = function(self, value, step)
 	self.position = self.position + value * step
@@ -320,7 +319,7 @@ Editor.save = function(self)
 		for y = 0,self.size.y-1 do
 			newline = true
 			for x = 0,self.size.x-1 do
-				local v = Voxel:get_tile{point = self.origin + Vector(x, y, z)}
+				local v = Voxel:get_tile(self.origin + Vector(x, y, z))
 				if v ~= 0 then
 					local mat = Material:find{id = v}
 					if mat then

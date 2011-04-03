@@ -24,23 +24,6 @@
 
 #include "ext-module.h"
 
-/* @luadoc
- * module "core/tiles"
- * --- Use dynamic voxel terrain.
- * -- @name Voxel
- * -- @class table
- */
-
-/* @luadoc
- * --- Copies a terrain region into a packet.
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>point: Tile index vector.</li>
- * --   <li>sector: Sector index.</li>
- * --   <li>size: Region size, in tiles.</li></ul>
- * -- @return Packet writer.
- * function Voxel.copy_region(clss, args)
- */
 static void Voxel_copy_region (LIScrArgs* args)
 {
 	int i;
@@ -55,7 +38,7 @@ static void Voxel_copy_region (LIScrArgs* args)
 	LIVoxVoxel* result;
 
 	/* Get region offset and size. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 	if (liscr_args_gets_int (args, "sector", &sector))
 	{
 		lialg_sectors_index_to_offset (module->program->sectors, sector,
@@ -117,15 +100,6 @@ static void Voxel_copy_region (LIScrArgs* args)
 	lisys_free (result);
 }
 
-/* @luadoc
- * --- Fills a terrain region.
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>point: Tile index vector. (required)</li>
- * --   <li>size: Size vector. (required)</li>
- * --   <li>tile: Tile data.</ul>
- * function Voxel.fill_region(clss, args)
- */
 static void Voxel_fill_region (LIScrArgs* args)
 {
 	int i;
@@ -155,23 +129,13 @@ static void Voxel_fill_region (LIScrArgs* args)
 		tiles[i] = tile;
 
 	/* Paste tiles to the map. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 	livox_manager_paste_voxels (module->voxels,
 		(int) pos.x, (int) pos.y, (int) pos.z,
 		(int) size.x, (int) size.y, (int) size.z, tiles);
 	lisys_free (tiles);
 }
 
-/* @luadoc
- * --- Finds all blocks near the given point.
- * --
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>point: Position vector. (required)</li>
- * --   <li>radius: Radius.</li></ul>
- * -- @return Table of block indices and modification stamps.
- * function Voxel.find_blocks(clss, args)
- */
 static void Voxel_find_blocks (LIScrArgs* args)
 {
 	int sx;
@@ -199,7 +163,7 @@ static void Voxel_find_blocks (LIScrArgs* args)
 		return;
 	liscr_args_gets_float (args, "radius", &radius);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 	line = module->voxels->blocks_per_line * module->voxels->sectors->count;
 
 	/* Calculate sight volume. */
@@ -244,33 +208,23 @@ static void Voxel_find_blocks (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Finds information on a material.
- * --
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>id: Material ID.</li></ul>
- * -- @return Material or nil.
- */
 static void Voxel_find_material (LIScrArgs* args)
 {
 	int id;
 	LIExtModule* module;
-	LIScrClass* clss;
 	LIScrData* data;
 	LIVoxMaterial* material;
 
 	if (liscr_args_gets_int (args, "id", &id))
 	{
-		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 		material = livox_manager_find_material (module->voxels, id);
 		if (material == NULL)
 			return;
 		material = livox_material_new_copy (material);
 		if (material == NULL)
 			return;
-		clss = liscr_script_find_class (args->script, LIEXT_SCRIPT_MATERIAL);
-		data = liscr_data_new (args->script, material, clss, livox_material_free);
+		data = liscr_data_new (args->script, material, LIEXT_SCRIPT_MATERIAL, livox_material_free);
 		if (data == NULL)
 		{
 			livox_material_free (material);
@@ -281,15 +235,6 @@ static void Voxel_find_material (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Finds the tile nearest to the given point.
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>match: Tiles to search for. ("all"/"empty"/"full")</li>
- * --   <li>point: Position vector in world space. (required)</li></ul>
- * -- @return Tile and voxel index vector, or nil.
- * function Voxel.find_tile(clss, args)
- */
 static void Voxel_find_tile (LIScrArgs* args)
 {
 	int index[3];
@@ -304,7 +249,7 @@ static void Voxel_find_tile (LIScrArgs* args)
 	if (liscr_args_gets_vector (args, "point", &point))
 	{
 		/* Search mode. */
-		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 		if (liscr_args_gets_string (args, "match", &tmp))
 		{
 			if (!strcmp (tmp, "all")) flags = LIVOX_FIND_ALL;
@@ -328,16 +273,6 @@ static void Voxel_find_tile (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Gets the data of a voxel block.
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>index: Block index. (required)</li>
- * --   <li>packet: Packet writer.</li>
- * --   <li>type: Packet type.</li></ul>
- * -- @return Packet writer or nil.
- * function Voxel.get_block(clss, args)
- */
 static void Voxel_get_block (LIScrArgs* args)
 {
 	int tmp;
@@ -352,7 +287,7 @@ static void Voxel_get_block (LIScrArgs* args)
 	/* Get block index. */
 	if (!liscr_args_gets_int (args, "index", &index))
 		return;
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 	tmp = index;
 	addr.block[0] = tmp % module->voxels->blocks_per_line;
 	addr.sector[0] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
@@ -397,14 +332,6 @@ static void Voxel_get_block (LIScrArgs* args)
 	liscr_data_unref (data);
 }
 
-/* @luadoc
- * --- Gets the contents of a tile.
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>1,point: Tile index vector. (required)</li></ul>
- * -- @return Tile.
- * function Voxel.get_tile(clss, args)
- */
 static void Voxel_get_tile (LIScrArgs* args)
 {
 	int lim;
@@ -416,7 +343,7 @@ static void Voxel_get_tile (LIScrArgs* args)
 	    !liscr_args_gets_vector (args, "point", &point))
 		return;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 	lim = module->voxels->tiles_per_line * module->program->sectors->count;
 	if (point.x < 0.0f || point.x >= lim ||
 	    point.y < 0.0f || point.y >= lim ||
@@ -426,15 +353,6 @@ static void Voxel_get_tile (LIScrArgs* args)
 	liscr_args_seti_int (args, voxel.type);
 }
 
-/* @luadoc
- * --- Intersects a ray with map tiles.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>1,start_point: Ray start point in world space.</li>
- * --   <li>2,end_point: Ray end point in world space.</li></ul>
- * -- @return Position vector in world space, tile index vector.
- * function Voxel.intersect_ray(self, args)
- */
 static void Voxel_intersect_ray (LIScrArgs* args)
 {
 	LIExtModule* module;
@@ -444,7 +362,7 @@ static void Voxel_intersect_ray (LIScrArgs* args)
 	LIMatVector tile;
 
 	/* Get arguments. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 	if (!liscr_args_geti_vector (args, 0, &ray0) &&
 	    !liscr_args_gets_vector (args, "start_point", &ray0))
 		return;
@@ -463,15 +381,6 @@ static void Voxel_intersect_ray (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Pastes a terrain region from a packet to the map.
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>packet: Data packet.</li>
- * --   <li>point: Tile index vector.</li>
- * --   <li>sector: Sector index.</li></ul>
- * function Voxel.paste_region(clss, args)
- */
 static void Voxel_paste_region (LIScrArgs* args)
 {
 	int i;
@@ -488,7 +397,7 @@ static void Voxel_paste_region (LIScrArgs* args)
 	LIVoxVoxel* voxels;
 
 	/* Get region offset. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 	if (liscr_args_gets_int (args, "sector", &sector))
 	{
 		lialg_sectors_index_to_offset (module->program->sectors, sector,
@@ -567,15 +476,6 @@ static void Voxel_paste_region (LIScrArgs* args)
 	lisys_free (voxels);
 }
 
-/* @luadoc
- * --- Sets the contents of a voxel block.
- * --
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>packet: Packet reader.</li></ul>
- * -- @return True on success.
- * Voxel.set_block(clss, args)
- */
 static void Voxel_set_block (LIScrArgs* args)
 {
 	uint8_t skip;
@@ -601,7 +501,7 @@ static void Voxel_set_block (LIScrArgs* args)
 	/* Read block offset. */
 	if (!liarc_reader_get_uint32 (packet->reader, &index))
 		return;
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 	tmp = index;
 	addr.block[0] = tmp % module->voxels->blocks_per_line;
 	addr.sector[0] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
@@ -626,14 +526,6 @@ static void Voxel_set_block (LIScrArgs* args)
 	liscr_args_seti_bool (args, 1);
 }
 
-/* @luadoc
- * --- Sets the contents of a tile.
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>1,point: Tile index vector.</li>
- * --   <li>2,tile: Tile number.</li></ul>
- * function Voxel.set_tile(clss, args)
- */
 static void Voxel_set_tile (LIScrArgs* args)
 {
 	int lim;
@@ -649,7 +541,7 @@ static void Voxel_set_tile (LIScrArgs* args)
 	    !liscr_args_gets_int (args, "tile", &type))
 		return;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 	lim = module->voxels->tiles_per_line * module->program->sectors->count;
 	if (point.x < 0.0f || point.x >= lim ||
 	    point.y < 0.0f || point.y >= lim ||
@@ -659,14 +551,6 @@ static void Voxel_set_tile (LIScrArgs* args)
 	livox_manager_set_voxel (module->voxels, (int) point.x, (int) point.y, (int) point.z, &voxel);
 }
 
-/* @luadoc
- * --- Sets the contents of a tiles.
- * -- @param clss Voxel class.
- * -- @param args Arguments.<ul>
- * --   <li>1,tile: Tile number.</li>
- * --   <li>2,points: List of tile index vectors.</li></ul>
- * function Voxel.set_tiles(clss, args)
- */
 static void Voxel_set_tiles (LIScrArgs* args)
 {
 	int i;
@@ -685,7 +569,7 @@ static void Voxel_set_tiles (LIScrArgs* args)
 	    !liscr_args_gets_table (args, "points"))
 		return;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 	lim = module->voxels->tiles_per_line * module->program->sectors->count;
 	top = lua_gettop (args->lua) + 1;
 	livox_voxel_init (&voxel, type);
@@ -710,66 +594,51 @@ static void Voxel_set_tiles (LIScrArgs* args)
 	lua_pop (args->lua, 1);
 }
 
-/* @luadoc
- * --- Number of blocks per sector edge.
- * -- @name Voxel.blocks_per_line
- * -- @class table
- */
 static void Voxel_get_blocks_per_line (LIScrArgs* args)
 {
-	LIExtModule* self;
+	LIExtModule* module;
 
-	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-	liscr_args_seti_int (args, self->voxels->blocks_per_line);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
+	liscr_args_seti_int (args, module->voxels->blocks_per_line);
 }
 static void Voxel_set_blocks_per_line (LIScrArgs* args)
 {
 	int count;
-	LIExtModule* self;
+	LIExtModule* module;
 
-	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
 	if (liscr_args_geti_int (args, 0, &count))
 	{
-		if (!livox_manager_configure (self->voxels, count, self->voxels->tiles_per_line))
+		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
+		if (!livox_manager_configure (module->voxels, count, module->voxels->tiles_per_line))
 			lisys_error_report ();
 	}
 }
 
-/* @luadoc
- * --- Fill type for empty sectors.
- * -- @name Voxel.fill
- * -- @class table
- */
 static void Voxel_get_fill (LIScrArgs* args)
 {
-	LIExtModule* self;
+	LIExtModule* module;
 
-	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-	if (self->voxels->fill)
-		liscr_args_seti_int (args, self->voxels->fill);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
+	if (module->voxels->fill)
+		liscr_args_seti_int (args, module->voxels->fill);
 }
 static void Voxel_set_fill (LIScrArgs* args)
 {
 	int type = 0;
-	LIExtModule* self;
+	LIExtModule* module;
 
-	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 	liscr_args_geti_int (args, 0, &type);
-	livox_manager_set_fill (self->voxels, type);
+	livox_manager_set_fill (module->voxels, type);
 }
 
-/* @luadoc
- * --- List of material IDs.
- * -- @name Voxel.materials
- * -- @class table
- */
 static void Voxel_get_materials (LIScrArgs* args)
 {
 	LIAlgU32dicIter iter;
 	LIExtModule* module;
 	LIVoxMaterial* material;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 	LIALG_U32DIC_FOREACH (iter, module->voxels->materials)
 	{
@@ -778,27 +647,22 @@ static void Voxel_get_materials (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Number of tiles per sector edge.
- * -- @name Voxel.tiles_per_line
- * -- @class table
- */
 static void Voxel_get_tiles_per_line (LIScrArgs* args)
 {
-	LIExtModule* self;
+	LIExtModule* module;
 
-	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
-	liscr_args_seti_int (args, self->voxels->tiles_per_line);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
+	liscr_args_seti_int (args, module->voxels->tiles_per_line);
 }
 static void Voxel_set_tiles_per_line (LIScrArgs* args)
 {
 	int count;
-	LIExtModule* self;
+	LIExtModule* module;
 
-	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_VOXEL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
 	if (liscr_args_geti_int (args, 0, &count))
 	{
-		if (!livox_manager_configure (self->voxels, self->voxels->blocks_per_line, count))
+		if (!livox_manager_configure (module->voxels, module->voxels->blocks_per_line, count))
 			lisys_error_report ();
 	}
 }
@@ -806,30 +670,27 @@ static void Voxel_set_tiles_per_line (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_voxel (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_VOXEL, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "copy_region", Voxel_copy_region);
-	liscr_class_insert_cfunc (self, "fill_region", Voxel_fill_region);
-	liscr_class_insert_cfunc (self, "find_blocks", Voxel_find_blocks);
-	liscr_class_insert_cfunc (self, "find_material", Voxel_find_material);
-	liscr_class_insert_cfunc (self, "find_tile", Voxel_find_tile);
-	liscr_class_insert_cfunc (self, "get_block", Voxel_get_block);
-	liscr_class_insert_cfunc (self, "get_tile", Voxel_get_tile);
-	liscr_class_insert_cfunc (self, "intersect_ray", Voxel_intersect_ray);
-	liscr_class_insert_cfunc (self, "paste_region", Voxel_paste_region);
-	liscr_class_insert_cfunc (self, "set_block", Voxel_set_block);
-	liscr_class_insert_cfunc (self, "set_tile", Voxel_set_tile);
-	liscr_class_insert_cfunc (self, "set_tiles", Voxel_set_tiles);
-	liscr_class_insert_cfunc (self, "get_blocks_per_line", Voxel_get_blocks_per_line);
-	liscr_class_insert_cfunc (self, "set_blocks_per_line", Voxel_set_blocks_per_line);
-	liscr_class_insert_cfunc (self, "get_fill", Voxel_get_fill);
-	liscr_class_insert_cfunc (self, "set_fill", Voxel_set_fill);
-	liscr_class_insert_cfunc (self, "get_materials", Voxel_get_materials);
-	liscr_class_insert_cfunc (self, "get_tiles_per_line", Voxel_get_tiles_per_line);
-	liscr_class_insert_cfunc (self, "set_tiles_per_line", Voxel_set_tiles_per_line);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_copy_region", Voxel_copy_region);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_fill_region", Voxel_fill_region);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_find_blocks", Voxel_find_blocks);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_find_material", Voxel_find_material);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_find_tile", Voxel_find_tile);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_get_block", Voxel_get_block);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_get_tile", Voxel_get_tile);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_intersect_ray", Voxel_intersect_ray);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_paste_region", Voxel_paste_region);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_set_block", Voxel_set_block);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_set_tile", Voxel_set_tile);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_set_tiles", Voxel_set_tiles);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_get_blocks_per_line", Voxel_get_blocks_per_line);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_set_blocks_per_line", Voxel_set_blocks_per_line);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_get_fill", Voxel_get_fill);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_set_fill", Voxel_set_fill);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_get_materials", Voxel_get_materials);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_get_tiles_per_line", Voxel_get_tiles_per_line);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_set_tiles_per_line", Voxel_set_tiles_per_line);
 }
 
 /** @} */

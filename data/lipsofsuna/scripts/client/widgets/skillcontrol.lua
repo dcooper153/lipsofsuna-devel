@@ -1,41 +1,5 @@
 Widgets.SkillControl = Class(Widget)
 
-Widgets.SkillControl.setter = function(self, key, value)
-	if key == "cap" then
-		if self.cap ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "compact" then
-		if self.compact ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "icon" then
-		if self.icon ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "max" then
-		if self.max ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "text" then
-		if self.text ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "value" then
-		if self.value ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	else
-		Widget.setter(self, key, value)
-	end
-end
-
 Widgets.SkillControl.new = function(clss, args)
 	local self = Widget.new(clss, args)
 	self.cap = self.cap or 0
@@ -117,3 +81,43 @@ Widgets.SkillControl.reshaped = function(self)
 		text_font = "tiny"}
 	self:canvas_compile()
 end
+
+Widgets.SkillControl:add_getters{
+	cap = function(s) return rawget(s, "__cap") end,
+	compact = function(s) return rawget(s, "__compact") end,
+	icon = function(s) return rawget(s, "__icon") end,
+	max = function(s) return rawget(s, "__max") end,
+	text = function(s) return rawget(s, "__text") end,
+	value = function(s) return rawget(s, "__value") end}
+
+Widgets.SkillControl:add_setters{
+	cap = function(s, v)
+		if s.cap == v then return end
+		rawset(s, "__cap", v)
+		s:reshaped()
+	end,
+	compact = function(s, v)
+		if s.compact == v then return end
+		rawset(s, "__compact", v)
+		s:reshaped()
+	end,
+	icon = function(s, v)
+		if s.icon == v then return end
+		rawset(s, "__icon", v)
+		s:reshaped()
+	end,
+	max = function(s, v)
+		if s.max == v then return end
+		rawset(s, "__max", v)
+		s:reshaped()
+	end,
+	text = function(s, v)
+		if s.text == v then return end
+		rawset(s, "__text", v)
+		s:reshaped()
+	end,
+	value = function(s, v)
+		if s.value == v then return end
+		rawset(s, "__value", v)
+		s:reshaped()
+	end}

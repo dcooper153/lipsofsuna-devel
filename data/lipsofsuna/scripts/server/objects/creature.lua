@@ -1,28 +1,26 @@
 Creature = Class(Object)
+Creature.class_name = "Creature"
 
-Creature.getter = function(self, key)
-	if key == "armor_class" then
+Creature:add_getters{
+	armor_class = function(s)
 		local value = 0
-		for k,v in pairs(self.spec.equipment_slots) do
-			local i = self:get_item{slot = v.name}
+		for k,v in pairs(s.spec.equipment_slots) do
+			local i = s:get_item{slot = v.name}
 			value = value + (i and i.spec.armor_class or 0)
 		end
 		return value
-	else
-		return Object.getter(self, key)
-	end
-end
+	end}
 
-Creature.setter = function(self, key, value)
-	if key == "spec" then
-		local spec = type(value) == "string" and Species:find{name = value} or value
-		if self.spec == spec then return end
-		Object.setter(self, key, spec)
-		self.model = spec.model
-		self.mass = spec.mass
-		self.friction_liquid = spec.water_friction
-		self.gravity = spec.gravity
-		self.gravity_liquid = spec.water_gravity
+Creature:add_setters{
+	spec = function(s, v)
+		local spec = type(v) == "string" and Species:find{name = v} or v
+		if s.spec == spec then return end
+		rawset(s, "__spec", spec)
+		s.model = spec.model
+		s.mass = spec.mass
+		s.friction_liquid = spec.water_friction
+		s.gravity = spec.gravity
+		s.gravity_liquid = spec.water_gravity
 		-- Set appearance.
 		if spec.eye_style then
 			if spec.eye_style == "random" then
@@ -32,9 +30,9 @@ Creature.setter = function(self, key, value)
 				rgb[2] = math.floor(255 * rgb[1] + 0.5)
 				rgb[3] = math.floor(255 * rgb[1] + 0.5)
 				table.insert(rgb, 1, s[2])
-				self.eye_style = rgb
+				s.eye_style = rgb
 			else
-				self.eye_style = spec.eye_style
+				s.eye_style = spec.eye_style
 			end
 		end
 		if spec.hair_style then
@@ -43,17 +41,17 @@ Creature.setter = function(self, key, value)
 				local r = math.random(0, 255)
 				local g = math.random(0, 255)
 				local b = math.random(0, 255)
-				self.hair_style = {s[2], r, g, b}
+				s.hair_style = {s[2], r, g, b}
 			else
-				self.hair_style = spec.hair_style
+				s.hair_style = spec.hair_style
 			end
 		end
 		-- Create skills.
-		self.skills = self.skills or Skills{owner = self}
-		self.skills:clear()
+		s.skills = s.skills or Skills{owner = s}
+		s.skills:clear()
 		for k,v in pairs(spec.skills) do
 			local prot = v.name == "health" and "public" or "private"
-			self.skills:register{
+			s.skills:register{
 				prot = prot,
 				name = v.name,
 				maximum = v.val,
@@ -64,40 +62,47 @@ Creature.setter = function(self, key, value)
 		-- When the map generator or an admin command creates an object, the
 		-- random field is set to indicate that items should be generated.
 		-- The field isn't saved so items are only created once as expected.
-		self.inventory = self.inventory or Inventory{owner = self, size = spec.inventory_size} -- FIXME: Resizing not supported.
-		if self.random then
+		s.inventory = s.inventory or Inventory{owner = s, size = spec.inventory_size} -- FIXME: Resizing not supported.
+		if s.random then
 			for k,v in pairs(spec.inventory_items) do
-				self:add_item{object = Item{spec = Itemspec:find{name = v}}}
+				local itemspec = Itemspec:find{name = v}
+				if itemspec then
+					s:add_item{object = Item{spec = itemspec}}
+				else
+					print(string.format("WARNING: Creature '%s' uses an invalid inventory item name '%s'", s.spec.name, v))
+				end
 			end
-			self:equip_best_items()
+			s:equip_best_items()
 		end
 		-- Create random loot.
 		-- The same about random objects applies as above.
-		if self.random and spec.loot_categories then
+		if s.random and spec.loot_categories then
 			local num_cat = #spec.loot_categories
 			local num_item
 			if spec.loot_count then
 				num_item = math.random(spec.loot_count[1], spec.loot_count[2])
 			else
-				num_item = math.random(0, self.inventory.size)
+				num_item = math.random(0, s.inventory.size)
 			end
 			for i = 1,num_item do
 				local cat = spec.loot_categories[math.random(1, num_cat)]
-				self:add_item{object = Item{spec = Itemspec:random{category = cat}}}
+				local itemspec = Itemspec:random{category = cat}
+				if itemspec then
+					s:add_item{object = Item{spec = itemspec}}
+				else
+					print(string.format("WARNING: Creature '%s' uses an invalid inventory item category '%s'", s.spec.name, v))
+				end
 			end
 		end
 		-- Create map marker.
 		if spec.marker then
-			self.marker = Marker{name = spec.marker, position = self.position, target = self.id}
+			s.marker = Marker{name = spec.marker, position = s.position, target = s.id}
 		end
 		-- Kill dead quest characters.
 		if spec.dead then
-			self.dead = true
+			s.dead = true
 		end
-	else
-		Object.setter(self, key, value)
-	end
-end
+	end}
 
 --- Creates a new creature.
 -- @param clss Creature class.
@@ -486,7 +491,7 @@ end
 Creature.get_attack_ray = function(self)
 	local ctr = self.spec.aim_ray_center
 	if self.tilt then
-		local rot = Quaternion:new_euler(self.tilt.euler)
+		local rot = Quaternion{euler = self.tilt.euler}
 		local src = self.position + self.rotation * (ctr + rot * Vector(0, 0, -self.spec.aim_ray_start))
 		local dst = self.position + self.rotation * (ctr + rot * Vector(0, 0, -self.spec.aim_ray_end))
 		return src, dst

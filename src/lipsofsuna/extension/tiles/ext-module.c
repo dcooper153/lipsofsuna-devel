@@ -73,8 +73,10 @@ LIExtModule* liext_tiles_new (
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (program->script, "Material", liext_script_material, self);
-	liscr_script_create_class (program->script, "Voxel", liext_script_voxel, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_MATERIAL, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_VOXEL, self);
+	liext_script_material (program->script);
+	liext_script_voxel (program->script);
 
 	return self;
 }

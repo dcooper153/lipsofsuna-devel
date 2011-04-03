@@ -7,39 +7,6 @@ Action.mods = 0
 Action.mouse_sensitivity_x = 0.5
 Action.mouse_sensitivity_y = 0.3
 
-Action.setter = function(self, key, value)
-	if key == "key1" then
-		if self.key1 ~= value then
-			if self.key1 then Action.dict_key[self.key1] = nil end
-			if value then
-				local a = Action.dict_key[value]
-				if a and a.key1 == value then a.key1 = nil end
-				if a and a.key2 == value then a.key2 = nil end
-				Action.dict_key[value] = self
-			end
-			Class.setter(self, key, value)
-			-- TODO: Inform binding UI
-		end
-	elseif key == "key2" then
-		if self.key2 ~= value then
-			if self.key2 then Action.dict_key[self.key2] = nil end
-			if value then
-				local a = Action.dict_key[value]
-				if a and a.key1 == value then a.key1 = nil end
-				if a and a.key2 == value then a.key2 = nil end
-				Action.dict_key[value] = self
-			end
-			Class.setter(self, key, value)
-			-- TODO: Inform binding UI
-		end
-	elseif key == "keys" then
-		self.key1 = keys[1]
-		self.key2 = keys[2]
-	else
-		Class.setter(self, key, value)
-	end
-end
-
 Action.new = function(clss, args)
 	local self = Class.new(clss)
 	local copy = function(k) if args and args[k] then self[k] = args[k] end end
@@ -91,3 +58,38 @@ Action.event = function(clss, args, list)
 		digital(args.code, false)
 	end
 end
+
+Action:add_getters{
+	key1 = function(s) return rawget(s, "__key1") end,
+	key2 = function(s) return rawget(s, "__key2") end,
+	keys = function(s) return {s.key1, s.key2} end}
+
+Action:add_setters{
+	key1 = function(s, v)
+		if s.key1 == v then return end
+		if s.key1 then Action.dict_key[s.key1] = nil end
+		if v then
+			local a = Action.dict_key[v]
+			if a and a.key1 == v then a.key1 = nil end
+			if a and a.key2 == v then a.key2 = nil end
+			Action.dict_key[v] = s
+		end
+		rawset(s, "__key1", v)
+		-- TODO: Inform binding UI
+	end,
+	key2 = function(s, v)
+		if s.key2 == v then return end
+		if s.key2 then Action.dict_key[s.key2] = nil end
+		if v then
+			local a = Action.dict_key[v]
+			if a and a.key1 == v then a.key1 = nil end
+			if a and a.key2 == v then a.key2 = nil end
+			Action.dict_key[v] = s
+		end
+		rawset(s, "__key2", v)
+		-- TODO: Inform binding UI
+	end,
+	keys = function(s, v)
+		s.key1 = keys[1]
+		s.key2 = keys[2]
+	end}

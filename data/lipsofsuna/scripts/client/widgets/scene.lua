@@ -1,26 +1,5 @@
 Widgets.Scene = Class(Widget)
 
-Widgets.Scene.setter = function(self, key, value)
-	if key == "action" then
-		if self.action ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "compass" then
-		if self.compass ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "compass_quest" then
-		if self.compass_quest ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	else
-		Widget.setter(self, key, value)
-	end
-end
-
 Widgets.Scene.new = function(clss, args)
 	local self = Widget.new(clss, args)
 	self.scene = Scene()
@@ -67,7 +46,7 @@ Widgets.Scene.reshaped = function(self)
 			dest_position = {6,h-77},
 			dest_size = {74,74},
 			rotation = self.compass,
-			rotation_center = Vector{44,h-40},
+			rotation_center = Vector(44,h-40),
 			source_image = "compass1",
 			source_position = {42,2},
 			source_tiling = {0,74,0,0,74,0}}
@@ -76,7 +55,7 @@ Widgets.Scene.reshaped = function(self)
 				dest_position = {38,h-77},
 				dest_size = {12,50},
 				rotation = self.compass_quest + self.compass + math.pi,
-				rotation_center = Vector{44,h-40},
+				rotation_center = Vector(44,h-40),
 				source_image = "compass1",
 				source_position = {0,0},
 				source_tiling = {0,12,0,0,50,0}}
@@ -101,3 +80,25 @@ Widgets.Scene.reshaped = function(self)
 	end
 	self:canvas_compile()
 end
+
+Widgets.Scene:add_getters{
+	action = function(s) return rawget(s, "__action") end,
+	compass = function(s) return rawget(s, "__compass") end,
+	compass_quest = function(s) return rawget(s, "__compass_quest") end}
+
+Widgets.Scene:add_setters{
+	action = function(s, v)
+		if s.action == v then return end
+		rawset(s, "__action", v)
+		s:reshaped()
+	end,
+	compass = function(s, v)
+		if s.compass == v then return end
+		rawset(s, "__compass", v)
+		s:reshaped()
+	end,
+	compass_quest = function(s, v)
+		if s.compass_quest == v then return end
+		rawset(s, "__compass_quest", v)
+		s:reshaped()
+	end}

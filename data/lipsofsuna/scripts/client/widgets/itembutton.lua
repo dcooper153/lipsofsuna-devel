@@ -1,49 +1,14 @@
 Widgets.ItemButton = Class(Widget)
 
-Widgets.ItemButton.setter = function(self, key, value)
-	if key == "count" then
-		if self.count ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-			self:update_tooltip()
-		end
-	elseif key == "drag" then
-		if self.drag ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "focused" then
-		if self.focused ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "font" then
-		if self.font ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "icon" then
-		if self.icon ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-			self:update_tooltip()
-		end
-	elseif key == "text" then
-		if self.text ~= value then
-			Widget.setter(self, key, value)
-			self:update_tooltip()
-		end
-	else
-		Widget.setter(self, key, value)
-	end
-end
-
 Widgets.ItemButton.new = function(clss, args)
 	local self = Widget.new(clss, args)
 	self.font = self.font or "default"
 	self.icon = self.icon or ""
 	self.text = self.text or ""
 	return self
+end
+
+Widgets.ItemButton.pressed = function(self, args)
 end
 
 Widgets.ItemButton.reshaped = function(self)
@@ -86,9 +51,6 @@ Widgets.ItemButton.reshaped = function(self)
 	self:canvas_compile()
 end
 
-Widgets.ItemButton.pressed = function(self, args)
-end
-
 Widgets.ItemButton.update_tooltip = function(self, args)
 	local spec = Itemspec:find{name = self.text}
 	if not spec then
@@ -97,3 +59,45 @@ Widgets.ItemButton.update_tooltip = function(self, args)
 		self.tooltip = Widgets.Itemtooltip{count = self.count, spec = spec}
 	end
 end
+
+Widgets.ItemButton:add_getters{
+	count = function(self) return rawget(self, "__count") end,
+	drag = function(self) return rawget(self, "__drag") end,
+	focused = function(self) return rawget(self, "__focused") end,
+	font = function(self) return rawget(self, "__font") end,
+	icon = function(self) return rawget(self, "__icon") end,
+	text = function(self) return rawget(self, "__text") end}
+
+Widgets.ItemButton:add_setters{
+	count = function(self, value)
+		if self.count == value then return end
+		rawset(self, "__count", value)
+		self:reshaped()
+		self:update_tooltip()
+	end,
+	drag = function(self, value)
+		if self.drag == value then return end
+		rawset(self, "__drag", value)
+		self:reshaped()
+	end,
+	focused = function(self, value)
+		if self.focused == value then return end
+		rawset(self, "__focused", value)
+		self:reshaped()
+	end,
+	font = function(self, value)
+		if self.font == value then return end
+		rawset(self, "__font", value)
+		self:reshaped()
+	end,
+	icon = function(self, value)
+		if self.icon == value then return end
+		rawset(self, "__icon", value)
+		self:update_tooltip()
+		self:reshaped()
+	end,
+	text = function(self, value)
+		if self.text == value then return end
+		rawset(self, "__text", value)
+		self:update_tooltip()
+	end}

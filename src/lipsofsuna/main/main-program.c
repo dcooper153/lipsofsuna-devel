@@ -31,35 +31,17 @@ static int private_init (
 	const char*   name,
 	const char*   args);
 
-static int private_object_model (
-	LIMaiProgram* self,
-	LIEngObject*  object,
-	LIEngModel*   model);
-
 static int private_object_motion (
 	LIMaiProgram* self,
 	LIEngObject*  object);
 
-static int private_object_new (
-	LIMaiProgram* self,
-	LIEngObject*  object);
-
-static int private_object_reset (
-	LIMaiProgram* self,
-	LIEngObject*  object);
-
-static int private_object_visibility (
-	LIMaiProgram* self,
-	LIEngObject*  object,
-	int           visible);
-
 static int private_sector_free (
 	LIMaiProgram* self,
-	LIEngSector*  sector);
+	int           sector);
 
 static int private_sector_load (
 	LIMaiProgram* self,
-	LIEngSector*  sector);
+	int           sector);
 
 static int private_tick (
 	LIMaiProgram* self,
@@ -125,11 +107,6 @@ void limai_program_free (
 	/* Free script. */
 	if (self->script != NULL)
 		liscr_script_free (self->script);
-
-	/* Free event queue. */
-	lialg_list_free (self->event_first);
-	self->event_first = NULL;
-	self->event_last = NULL;
 
 	/* Free extensions. */
 	if (self->extensions != NULL)
@@ -483,57 +460,6 @@ int limai_program_insert_component (
 }
 
 /**
- * \brief Pops an event from the event queue.
- *
- * The returned event has one extra reference that is considered the
- * property of the caller from now on.
- *
- * \param self Program.
- * \return Event or nil.
- */
-LIScrData* limai_program_pop_event (
-	LIMaiProgram* self)
-{
-	LIAlgList* ptr;
-	LIScrData* event;
-
-	/* Get oldest event. */
-	if (self->event_last == NULL)
-		return NULL;
-	event = self->event_last->data;
-
-	/* Remove from queue. */
-	ptr = self->event_last->prev;
-	lialg_list_remove (&self->event_first, self->event_last);
-	self->event_last = ptr;
-
-	return event;
-}
-
-/**
- * \brief Pushes an event to the event queue.
- *
- * The event will be referenced once upon success. If the caller holds no references to it,
- * it will be subject to garbage collection after passed to scripts and handled by them.
- *
- * \param self Program.
- * \param event Event.
- * \return Nonzero on success.
- */
-int limai_program_push_event (
-	LIMaiProgram* self,
-	LIScrData*    event)
-{
-	if (!lialg_list_prepend (&self->event_first, event))
-		return 0;
-	if (self->event_last == NULL)
-		self->event_last = self->event_first;
-	liscr_data_ref (event);
-
-	return 1;
-}
-
-/**
  * \brief Unregisters a component.
  *
  * \param self Program.
@@ -587,10 +513,15 @@ int limai_program_update (
 	self->tick = self->tick / LIMAI_PROGRAM_FPS_TICKS;
 
 	/* Update subsystems. */
+	/* Garbage collection is disabled so that we don't need to worry about
+	   objects getting collected while the physics simulation or something
+	   else is working on them and generating events. */
+	liscr_script_set_gc (self->script, 0);
 	lialg_sectors_update (self->sectors, secs);
 	liscr_script_update (self->script, secs);
 	lieng_engine_update (self->engine, secs);
 	lical_callbacks_call (self->callbacks, self->engine, "tick", lical_marshal_DATA_FLT, secs);
+	liscr_script_set_gc (self->script, 1);
 
 	/* Sleep until end of frame. */
 	if (self->sleep > (int)(1000000 * secs))
@@ -661,7 +592,6 @@ static int private_init (
 	self->script = liscr_script_new ();
 	if (self->script == NULL)
 		return 0;
-	liscr_script_set_userdata (self->script, self);
 
 	/* Initialize timer. */
 	gettimeofday (&self->start, NULL);
@@ -669,43 +599,22 @@ static int private_init (
 	self->curr_tick = self->start;
 
 	/* Register classes. */
-	if (!liscr_script_create_class (self->script, "Class", liscr_script_class, self->script) ||
-	    !liscr_script_create_class (self->script, "Event", liscr_script_event, self->script) ||
-	    !liscr_script_create_class (self->script, "Model", liscr_script_model, self) ||
-	    !liscr_script_create_class (self->script, "Object", liscr_script_object, self) ||
-	    !liscr_script_create_class (self->script, "Packet", liscr_script_packet, self->script) ||
-	    !liscr_script_create_class (self->script, "Program", liscr_script_program, self) ||
-	    !liscr_script_create_class (self->script, "Quaternion", liscr_script_quaternion, self->script) ||
-	    !liscr_script_create_class (self->script, "Vector", liscr_script_vector, self->script))
-		return 0;
+	liscr_script_set_userdata (self->script, LISCR_SCRIPT_PROGRAM, self);
+	liscr_script_model (self->script);
+	liscr_script_packet (self->script);
+	liscr_script_program (self->script);
+	liscr_script_object (self->script);
+	liscr_script_quaternion (self->script);
+	liscr_script_vector (self->script);
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (self->callbacks, self->engine, "object-model", 65535, private_object_model, self, self->calls + 0) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "object-motion", 63353, private_object_motion, self, self->calls + 1) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "object-new", 65535, private_object_new, self, self->calls + 2) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "object-reset", 65535, private_object_reset, self, self->calls + 3) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "object-visibility", 65535, private_object_visibility, self, self->calls + 4) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "sector-free", 65535, private_sector_free, self, self->calls + 5) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "sector-load", 65535, private_sector_load, self, self->calls + 6) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "tick", 2, private_tick, self, self->calls + 7))
+	if (!lical_callbacks_insert (self->callbacks, self->engine, "object-motion", 63353, private_object_motion, self, self->calls + 0) ||
+	    !lical_callbacks_insert (self->callbacks, self->engine, "sector-free", 65535, private_sector_free, self, self->calls + 1) ||
+	    !lical_callbacks_insert (self->callbacks, self->engine, "sector-load", 65535, private_sector_load, self, self->calls + 2) ||
+	    !lical_callbacks_insert (self->callbacks, self->engine, "tick", 2, private_tick, self, self->calls + 3))
 		return 0;
 
 	lialg_random_init (&self->random, lisys_time (NULL));
-
-	return 1;
-}
-
-static int private_object_model (
-	LIMaiProgram* self,
-	LIEngObject*  object,
-	LIEngModel*   model)
-{
-	if (object->script != NULL && model != NULL)
-	{
-		limai_program_event (self, "object-model",
-			"object", LISCR_SCRIPT_OBJECT, object->script,
-			"model", LISCR_SCRIPT_MODEL, model->script, NULL);
-	}
 
 	return 1;
 }
@@ -734,69 +643,7 @@ static int private_object_motion (
 		object->transform_event = object->transform;
 
 		/* Emit an object-motion event. */
-		limai_program_event (self, "object-motion",
-			"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
-	}
-
-	return 1;
-}
-
-static int private_object_new (
-	LIMaiProgram* self,
-	LIEngObject*  object)
-{
-	if (object->script != NULL)
-	{
-		limai_program_event (self, "object-new",
-			"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
-	}
-
-	return 1;
-}
-
-static int private_object_reset (
-	LIMaiProgram* self,
-	LIEngObject*  object)
-{
-	lua_State* lua;
-
-	if (object->script != NULL)
-	{
-		/* Emit an event. */
-		limai_program_event (self, "object-reset",
-			"object", LISCR_SCRIPT_OBJECT, object->script, NULL);
-
-		/* Call the reset function provided by scripts. */
-		lua = liscr_script_get_lua (self->script);
-		liscr_pushdata (lua, object->script);
-		lua_getfield (lua, -1, "reset");
-		if (lua_type (lua, -1) == LUA_TFUNCTION)
-		{
-			liscr_pushdata (lua, object->script);
-			if (lua_pcall (lua, 1, 0, 0) != 0)
-			{
-				lisys_error_set (EINVAL, lua_tostring (lua, -1));
-				lua_pop (lua, 1);
-			}
-			lua_pop (lua, 1);
-		}
-		else
-			lua_pop (lua, 2);
-	}
-
-	return 1;
-}
-
-static int private_object_visibility (
-	LIMaiProgram* self,
-	LIEngObject*  object,
-	int           visible)
-{
-	if (object->script != NULL)
-	{
-		limai_program_event (self, "object-visibility",
-			"object", LISCR_SCRIPT_OBJECT, object->script,
-			"visible", LISCR_TYPE_BOOLEAN, visible, NULL);
+		limai_program_event (self, "object-motion", "object", LISCR_SCRIPT_OBJECT, object->script, NULL);
 	}
 
 	return 1;
@@ -804,25 +651,25 @@ static int private_object_visibility (
 
 static int private_sector_free (
 	LIMaiProgram* self,
-	LIEngSector*  sector)
+	int           sector)
 {
-	limai_program_event (self, "sector-free", "sector", LISCR_TYPE_INT, sector->sector->index, NULL);
+	limai_program_event (self, "sector-free", "sector", LISCR_TYPE_INT, sector, NULL);
 
 	return 1;
 }
 
 static int private_sector_load (
 	LIMaiProgram* self,
-	LIEngSector*  sector)
+	int           sector)
 {
-	limai_program_event (self, "sector-load", "sector", LISCR_TYPE_INT, sector->sector->index, NULL);
+	limai_program_event (self, "sector-load", "sector", LISCR_TYPE_INT, sector, NULL);
 
 	return 1;
 }
 
 static int private_tick (
 	LIMaiProgram* self,
-	float        secs)
+	float         secs)
 {
 	limai_program_event (self, "tick", "secs", LISCR_TYPE_FLOAT, secs, NULL);
 

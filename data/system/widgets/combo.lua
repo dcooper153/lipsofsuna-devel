@@ -3,6 +3,7 @@ require "system/widgets/frame"
 require "system/widgets/menuitem"
 
 Widgets.ComboBox = Class(Widgets.Button)
+Widgets.ComboBox.class_name = "Widgets.ComboBox"
 
 --- Creates a new combo box.
 -- @param clss Combo box class.
@@ -11,8 +12,7 @@ Widgets.ComboBox = Class(Widgets.Button)
 Widgets.ComboBox.new = function(clss, args)
 	local self = Widgets.Button.new(clss)
 	self.value = 1
-	self.menu = Widgets.Frame{cols = 1, style = "popup", temporary = true}
-	self.menu:set_expand{col = 1}
+	self.menu = Widgets.Frame{cols = 1, expand_col = 1, style = "popup", temporary = true}
 	-- Copy arguments.
 	for k,v in pairs(args or {}) do
 		if type(k) ~= "number" then

@@ -1,17 +1,7 @@
 require "system/widgets/label"
 
 Widgets.Entry = Class(Widgets.Label)
-
-Widgets.Entry.setter = function(self, key, value)
-	if key == "password" then
-		if self.password ~= value then
-			Widgets.Label.setter(self, key, value)
-			self:reshaped()
-		end
-	else
-		Widgets.Label.setter(self, key, value)
-	end
-end
+Widgets.Entry.class_name = "Widgets.Entry"
 
 --- Creates a new text entry widget.
 -- @param clss Entry class.
@@ -93,3 +83,13 @@ Widgets.Entry.reshaped = function(self)
 		text_font = self.font}
 	self:canvas_compile()
 end
+
+Widgets.Entry:add_getters{
+	password = function(s) return rawget(s, "__password") end}
+
+Widgets.Entry:add_setters{
+	password = function(s, v)
+		if s.password == v then return end
+		rawset(s, "__password", v and true or nil)
+		s:reshaped()
+	end}

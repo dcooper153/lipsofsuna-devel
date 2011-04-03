@@ -68,10 +68,4 @@ int liext_tiles_render_build_block (
 void liext_tiles_render_clear_all (
 	LIExtModule* self);
 
-/*****************************************************************************/
-
-void liext_script_tiles_render (
-	LIScrClass* self,
-	void*       data);
-
 #endif

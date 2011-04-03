@@ -51,7 +51,7 @@ Voxel.place_creature = function(clss, args)
 		position = args.point * clss.tile_size,
 		random = true,
 		realized = true,
-		rotation = args.rotation and Quaternion:new_euler(args.rotation * 2 * math.pi, 0, 0)})
+		rotation = args.rotation and Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}})
 end
 
 --- Places an item to the map.
@@ -70,7 +70,7 @@ Voxel.place_item = function(clss, args)
 		position = args.point * clss.tile_size,
 		random = true,
 		realized = true,
-		rotation = args.rotation and Quaternion:new_euler(args.rotation * 2 * math.pi, 0, 0)})
+		rotation = args.rotation and Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}})
 end
 
 --- Places an obstacle to the map.
@@ -87,7 +87,7 @@ Voxel.place_obstacle = function(clss, args)
 		spec = spec,
 		position = args.point * clss.tile_size,
 		realized = true,
-		rotation = args.rotation and Quaternion:new_euler(args.rotation * 2 * math.pi, 0, 0)})
+		rotation = args.rotation and Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}})
 end
 
 --- Places a predefined map pattern to the map.

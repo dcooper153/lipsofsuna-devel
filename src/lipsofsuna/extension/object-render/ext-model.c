@@ -24,24 +24,6 @@
 
 #include "ext-module.h"
 
-/* @luadoc
- * module "core/object-render"
- * ---
- * -- Control rendering of models.
- * -- @name Object
- * -- @class table
- */
-
-/* @luadoc
- * --- Edits the matching material.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>diffuse: Diffuse color to set or nil.</li>
- * --   <li>match_shader: Shader name to match or nil.</li>
- * --   <li>match_texture: Texture name to match or nil.</li>
- * --   <li>specular: Specular color to set or nil.</li>
- * function Model.edit_material(self, args)
- */
 static void Model_edit_material (LIScrArgs* args)
 {
 	int i;
@@ -52,7 +34,8 @@ static void Model_edit_material (LIScrArgs* args)
 	LIEngModel* model;
 	LIMdlMaterial* material;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER_MODEL);
+	/* Get the engine model. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_MODEL);
 	model = args->self;
 	liscr_args_gets_string (args, "match_shader", &shader);
 	liscr_args_gets_string (args, "match_texture", &texture);
@@ -70,14 +53,6 @@ static void Model_edit_material (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Morphs a model with one of its shape keys.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>1,shape: Shape key name.</li>
- * --   <li>2,value: Shape influence name to match or nil.</li></ul>
- * function Model.morph(self, args)
- */
 static void Model_morph (LIScrArgs* args)
 {
 	float value = 0.5f;
@@ -97,12 +72,10 @@ static void Model_morph (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_render_model (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_RENDER_MODEL, data);
-	liscr_class_insert_mfunc (self, "edit_material", Model_edit_material);
-	liscr_class_insert_mfunc (self, "morph", Model_morph);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_edit_material", Model_edit_material);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_morph", Model_morph);
 }
 
 /** @} */

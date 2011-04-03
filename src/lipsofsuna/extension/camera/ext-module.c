@@ -44,7 +44,8 @@ LIExtModule* liext_cameras_new (
 	self->client = limai_program_find_component (program, "client");
 
 	/* Register classes. */
-	liscr_script_create_class (program->script, "Camera", liext_script_camera, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_CAMERA, self);
+	liext_script_camera (program->script);
 
 	return self;
 }

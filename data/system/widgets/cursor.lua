@@ -1,20 +1,5 @@
 Widgets.Cursor = Class(Widget)
-
-Widgets.Cursor.setter = function(self, key, value)
-	if key == "cursor" then
-		if self.cursor ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "widget" then
-		if self.widget ~= value then
-			Widget.setter(self, key, value)
-			self:set_child{col = 1, row = 1, widget = value}
-		end
-	else
-		Widget.setter(self, key, value)
-	end
-end
+Widgets.Cursor.class_name = "Widgets.Cursor"
 
 Widgets.Cursor.new = function(clss, cursor)
 	local self = Widget.new(clss, {cursor = cursor, cols = 1, rows = 1})
@@ -60,3 +45,19 @@ Widgets.Cursor.reshaped = function(self)
 	end
 	self:canvas_compile()
 end
+
+Widgets.Cursor:add_getters{
+	cursor = function(s) return rawget(s, "__cursor") end,
+	widget = function(s) return rawget(s, "__widget") end}
+
+Widgets.Cursor:add_setters{
+	cursor = function(s, v)
+		if s.cursor == v then return end
+		rawset(s, "__cursor", v)
+		s:reshaped()
+	end,
+	widget = function(s, v)
+		if s.widget == v then return end
+		rawset(s, "__widget", v)
+		s:set_child(1, 1, v)
+	end}

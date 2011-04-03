@@ -1,26 +1,5 @@
 Widgets.ColorSelector = Class(Widget)
 
-Widgets.ColorSelector.setter = function(self, key, value)
-	if key == "blue" then
-		if self.blue ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "green" then
-		if self.green ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "red" then
-		if self.red ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	else
-		Widget.setter(self, key, value)
-	end
-end
-
 Widgets.ColorSelector.new = function(clss, args)
 	local self = Widget.new(clss, args)
 	self.red = self.red or 1
@@ -71,3 +50,25 @@ Widgets.ColorSelector.reshaped = function(self)
 	end
 	self:canvas_compile()
 end
+
+Widgets.ColorSelector:add_getters{
+	blue = function(self) return rawget(self, "__blue") end,
+	green = function(self) return rawget(self, "__green") end,
+	red = function(self) return rawget(self, "__red") end}
+
+Widgets.ColorSelector:add_setters{
+	blue = function(self, value)
+		if self.blue == value then return end
+		rawset(self, "__blue", value)
+		self:reshaped()
+	end,
+	green = function(self, value)
+		if self.green == value then return end
+		rawset(self, "__green", value)
+		self:reshaped()
+	end,
+	red = function(self, value)
+		if self.red == value then return end
+		rawset(self, "__red", value)
+		self:reshaped()
+	end}

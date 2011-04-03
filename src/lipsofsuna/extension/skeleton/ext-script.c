@@ -24,19 +24,6 @@
 
 #include "ext-module.h"
 
-/* @luadoc
- * module "core/skeleton"
- * --- Example extension.
- * -- @name Skeleton
- * -- @class table
- */
-
-/* @luadoc
- * --- Example function.
- * --
- * -- @param self Skeleton class.
- * Skeleton.test(self)
- */
 static void Skeleton_test (LIScrArgs* args)
 {
 	printf ("Skeleton.test\n");
@@ -45,12 +32,9 @@ static void Skeleton_test (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_skeleton (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_SKELETON, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "test", Skeleton_test);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SKELETON, "skeleton_test", Skeleton_test);
 }
 
 /** @} */

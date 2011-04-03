@@ -1,15 +1,5 @@
 Widgets.Skills = Class(Widget)
 
-Widgets.Skills.getter = function(self, key, value)
-	if key == "total" then
-		local t = 0
-		for k,v in pairs(self.dict_id) do t = t + v.value end
-		return t
-	else
-		return Widget.getter(self, key, value)
-	end
-end
-
 --- Creates a new skills widget.
 -- @param clss Skills widget class.
 -- @return Skills widget.
@@ -91,3 +81,10 @@ end
 -- @param index Skill number.
 Widgets.Skills.shown = function(self, widget)
 end
+
+Widgets.Skills:add_getters{
+	total = function(s)
+		local t = 0
+		for k,v in pairs(s.dict_id) do t = t + v.value end
+		return t
+	end}

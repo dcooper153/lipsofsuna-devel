@@ -37,7 +37,6 @@ void liext_databases_free (
 /*****************************************************************************/
 
 void liext_script_database (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

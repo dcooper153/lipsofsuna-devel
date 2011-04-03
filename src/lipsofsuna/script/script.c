@@ -24,7 +24,7 @@
 
 #include <lipsofsuna/system.h>
 #include "script.h"
-#include "script-class.h"
+#include "script-args.h"
 #include "script-data.h"
 #include "script-private.h"
 #include "script-util.h"
@@ -41,12 +41,19 @@ LIScrScript* liscr_script_new ()
 	self = lisys_calloc (1, sizeof (LIScrScript));
 	if (self == NULL)
 		return NULL;
+	self->userdata = lialg_strdic_new ();
+	if (self->userdata == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
 
 	/* Allocate script. */
 	self->lua = lua_open ();
 	if (self->lua == NULL)
 	{
 		lisys_error_set (ENOMEM, "cannot allocate script");
+		lialg_strdic_free (self->userdata);
 		lisys_free (self);
 		return NULL;
 	}
@@ -81,15 +88,6 @@ LIScrScript* liscr_script_new ()
 	lua_newtable (self->lua);
 	lua_settable (self->lua, LUA_REGISTRYINDEX);
 
-	/* Create pointer->class lookup table. */
-	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_LOOKUP_CLASS);
-	lua_newtable (self->lua);
-	lua_newtable (self->lua);
-	lua_pushstring (self->lua, "v");
-	lua_setfield (self->lua, -2, "__mode");
-	lua_setmetatable (self->lua, -2);
-	lua_settable (self->lua, LUA_REGISTRYINDEX);
-
 	/* Create pointer->data lookup table. */
 	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_LOOKUP_DATA);
 	lua_newtable (self->lua);
@@ -98,6 +96,10 @@ LIScrScript* liscr_script_new ()
 	lua_setfield (self->lua, -2, "__mode");
 	lua_setmetatable (self->lua, -2);
 	lua_settable (self->lua, LUA_REGISTRYINDEX);
+
+	/* Initialize the function table. */
+	lua_newtable (self->lua);
+	lua_setglobal (self->lua, "Los");
 
 	/* Initialize random numbers. */
 	lua_getglobal (self->lua, "math");
@@ -116,66 +118,47 @@ LIScrScript* liscr_script_new ()
 
 /**
  * \brief Frees the script.
- *
  * \param self Script.
  */
-void
-liscr_script_free (LIScrScript* self)
+void liscr_script_free (LIScrScript* self)
 {
 	/* Grabage collect everything. */
 	lua_close (self->lua);
 	self->lua = NULL;
 
+	lialg_strdic_free (self->userdata);
 	lisys_free (self);
 }
 
-/**
- * \brief Creates a new class.
- *
- * \param self Script.
- * \param name Name for the class.
- * \param init Initialization function.
- * \param data Data passed to the function.
- * \return Class owned by the script or NULL.
- */
-LIScrClass*
-liscr_script_create_class (LIScrScript*   self,
-                           const char*    name,
-                           LIScrClassInit init,
-                           void*          data)
+void liscr_script_insert_cfunc (
+	LIScrScript*  self,
+	const char*   clss,
+	const char*   name,
+	LIScrArgsFunc func)
 {
-	LIScrClass* clss;
-
-	/* Create class. */
-	clss = liscr_class_new (self, name);
-	if (clss == NULL)
-		return NULL;
-
-	/* Call initializer. */
-	init (clss, data);
-
-	return clss;
+	lua_getglobal (self->lua, "Los");
+	lua_pushstring (self->lua, name);
+	lua_pushlightuserdata (self->lua, self);
+	lua_pushlightuserdata (self->lua, func);
+	lua_pushcclosure (self->lua, liscr_marshal_CLASS, 2);
+	lua_rawset (self->lua, -3);
+	lua_pop (self->lua, 1);
 }
 
-/**
- * \brief Finds a built-in class by name.
- *
- * \param self Script.
- * \param name Class identifier.
- * \return Class or NULL.
- */
-LIScrClass*
-liscr_script_find_class (LIScrScript* self,
-                         const char*  name)
+void liscr_script_insert_mfunc (
+	LIScrScript*  self,
+	const char*   clss,
+	const char*   name,
+	LIScrArgsFunc func)
 {
-	LIScrClass* clss;
-
-	/* Search from the registry by name. */
-	lua_getfield (self->lua, LUA_REGISTRYINDEX, name);
-	clss = liscr_isclass (self->lua, -1, name);
+	lua_getglobal (self->lua, "Los");
+	lua_pushstring (self->lua, name);
+	lua_pushlightuserdata (self->lua, self);
+	lua_pushstring (self->lua, clss);
+	lua_pushlightuserdata (self->lua, func);
+	lua_pushcclosure (self->lua, liscr_marshal_DATA, 3);
+	lua_rawset (self->lua, -3);
 	lua_pop (self->lua, 1);
-
-	return clss;
 }
 
 /**
@@ -248,25 +231,23 @@ int liscr_script_load (
 
 /**
  * \brief Updates the script.
- *
  * \param self Script.
  * \param secs Duration of the tick in seconds.
  */
-void
-liscr_script_update (LIScrScript* self,
-                     float        secs)
+void liscr_script_update (
+	LIScrScript* self,
+	float        secs)
 {
 }
 
 /**
  * \brief Enables or disables garbage collection.
- *
  * \param self Script.
  * \param value Nonzero to enable.
  */
-void
-liscr_script_set_gc (LIScrScript* self,
-                     int          value)
+void liscr_script_set_gc (
+	LIScrScript* self,
+	int          value)
 {
 	if (value)
 		lua_gc (self->lua, LUA_GCRESTART, 0);
@@ -280,17 +261,19 @@ lua_State* liscr_script_get_lua (
 	return self->lua;
 }
 
-void*
-liscr_script_get_userdata (LIScrScript* self)
+void* liscr_script_get_userdata (
+	LIScrScript* self,
+	const char*  key)
 {
-	return self->userpointer;
+	return lialg_strdic_find (self->userdata, key);
 }
 
-void
-liscr_script_set_userdata (LIScrScript* self,
-                           void*        data)
+void liscr_script_set_userdata (
+	LIScrScript* self,
+	const char*  key,
+	void*        value)
 {
-	self->userpointer = data;
+	lialg_strdic_insert (self->userdata, key, value);
 }
 
 /** @} */

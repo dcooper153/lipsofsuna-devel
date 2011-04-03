@@ -25,26 +25,6 @@
 #include "ext-module.h"
 #include "ext-speech.h"
 
-/* @luadoc
- * module "core/speech"
- * --- Display speech above objects.
- * -- @name Sound
- * -- @class table
- */
-
-/* @luadoc
- * --- Displays a message above the object.
- * -- @param self Speech class.
- * -- @param args Arguments.<ul>
- * --   <li>diffuse: Diffuse color.</li>
- * --   <li>fade_exponent: Fade exponent.</li>
- * --   <li>fade_time: Fade time in seconds, or nil.</li>
- * --   <li>life_time: Life time in seconds, or nil.</li>
- * --   <li>font: Font name or nil.</li>
- * --   <li>object: Object.</li>
- * --   <li>message: Speech string. (required)</li></ul>
- * function Speech.add(self, args)
- */
 static void Speech_add (LIScrArgs* args)
 {
 	int id;
@@ -63,7 +43,7 @@ static void Speech_add (LIScrArgs* args)
 		id = ((LIEngObject*) liscr_data_get_data (object))->id;
 	else
 		return;
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPEECH);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SPEECH);
 	speech = liext_speeches_set_speech (module, id, diffuse, font, msg);
 	if (speech != NULL)
 	{
@@ -76,15 +56,6 @@ static void Speech_add (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Draws the speech texts to the framebuffer.
- * -- @param self Speech class.
- * -- @param args Arguments.<ul>
- * --   <li>modelview: Modelview matrix.</li>
- * --   <li>projection: Projection matrix.</li>
- * --   <li>viewport: Viewport array.</li></ul>
- * function Speech.draw(self)
- */
 static void Speech_draw (LIScrArgs* args)
 {
 	GLint viewport[4];
@@ -92,7 +63,7 @@ static void Speech_draw (LIScrArgs* args)
 	LIMatMatrix modelview;
 	LIMatMatrix projection;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SPEECH);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SPEECH);
 
 	/* Get arguments. */
 	modelview = limat_matrix_identity ();
@@ -116,14 +87,11 @@ static void Speech_draw (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void
-liext_script_speech (LIScrClass* self,
-                     void*       data)
+void liext_script_speech (
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_SPEECH, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "add", Speech_add);
-	liscr_class_insert_cfunc (self, "draw", Speech_draw);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SPEECH, "speech_add", Speech_add);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SPEECH, "speech_draw", Speech_draw);
 }
 
 /** @} */

@@ -1,28 +1,59 @@
-if not Program:load_extension("sound") then
+require "system/class"
+require "system/math"
+
+if not Los.program_load_extension("sound") then
 	error("loading extension `sound' failed")
 end
 
-local sound_getters = {
-	listener_position = function(s) return s:get_listener_position() end,
-	listener_rotation = function(s) return s:get_listener_rotation() end,
-	listener_velocity = function(s) return s:get_listener_velocity() end}
+------------------------------------------------------------------------------
 
-local sound_setters = {
-	listener_position = function(s, v) return s:set_listener_position(v) end,
-	listener_rotation = function(s, v) return s:set_listener_rotation(v) end,
-	listener_velocity = function(s, v) return s:set_listener_velocity(v) end,
-	music = function(s, v) s:set_music(v) end,
-	music_fading = function(s, v) s:set_music_fading(v) end,
-	music_volume = function(s, v) s:set_music_volume(v) end}
+Sound = Class()
+Sound.class_name = "Sound"
 
-Sound.getter = function(self, key)
-	local soundgetterfunc = sound_getters[key]
-	if soundgetterfunc then return soundgetterfunc(self) end
-	return Class.getter(self, key)
+--- Plays a sound effect.
+-- @param clss Sound class.
+-- @param args Arguments.<ul>
+--   <li>effect: Sample string.</li>
+--   <li>object: Object.</li>
+--   <li>pitch: Pitch shift multiplier.</li>
+--   <li>volume: Volume multiplier.</li></ul>
+Sound.effect = function(clss, args)
+	Los.sound_effect{effect = args.effect, object = args.object.handle, pitch = args.pitch, volume = args.volume}
 end
 
-Sound.setter = function(self, key, value)
-	local soundsetterfunc = sound_setters[key]
-	if soundsetterfunc then return soundsetterfunc(self, value) end
-	return Class.setter(self, key, value)
-end
+--- Position of the listener.
+-- @name Sound.listener_position
+-- @class table
+
+--- Rotation of the listener.
+-- @name Sound.listener_rotation
+-- @class table
+
+--- Velocity of the listener.
+-- @name Sound.listener_velocity
+-- @class table
+
+--- Music track name.
+-- @name Sound.music
+-- @class table
+
+--- Music fading time.
+-- @name Sound.music_fading
+-- @class table
+
+--- Music volume.
+-- @name Sound.music_volume
+-- @class table
+
+Sound.class_getters = {
+	listener_position = function(s) return Class.new(Vector, {handle = Los.sound_get_listener_position()}) end,
+	listener_rotation = function(s) return Class.new(Vector, {handle = Los.sound_get_listener_rotation()}) end,
+	listener_velocity = function(s) return Class.new(Vector, {handle = Los.sound_get_listener_velocity()}) end}
+
+Sound.class_setters = {
+	listener_position = function(s, v) return Los.sound_set_listener_position(v.handle) end,
+	listener_rotation = function(s, v) return Los.sound_set_listener_rotation(v.handle) end,
+	listener_velocity = function(s, v) return Los.sound_set_listener_velocity(v.handle) end,
+	music = function(s, v) Los.sound_set_music(v) end,
+	music_fading = function(s, v) Los.sound_set_music_fading(v) end,
+	music_volume = function(s, v) Los.sound_set_music_volume(v) end}

@@ -164,7 +164,7 @@ char* lipth_paths_get_data (
 		return NULL;
 	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
 		return path;
-	free (path);
+	lisys_free (path);
 
 	/* Try the real path. */
 	return lisys_path_concat (self->module_data, name, NULL);
@@ -189,7 +189,7 @@ char* lipth_paths_get_font (
 		return NULL;
 	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
 		return path;
-	free (path);
+	lisys_free (path);
 
 	/* Try the real path. */
 	return lisys_path_concat (self->module_data, "fonts", name, NULL);
@@ -214,7 +214,7 @@ char* lipth_paths_get_graphics (
 		return NULL;
 	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
 		return path;
-	free (path);
+	lisys_free (path);
 
 	/* Try the real path. */
 	return lisys_path_concat (self->module_data, "graphics", name, NULL);
@@ -239,7 +239,7 @@ char* lipth_paths_get_script (
 		return NULL;
 	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
 		return path;
-	free (path);
+	lisys_free (path);
 
 	/* Try the real path. */
 	return lisys_path_concat (self->module_data, "scripts", name, NULL);
@@ -264,7 +264,7 @@ char* lipth_paths_get_sound (
 		return NULL;
 	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
 		return path;
-	free (path);
+	lisys_free (path);
 
 	/* Try the real path. */
 	return lisys_path_concat (self->module_data, "sounds", name, NULL);
@@ -316,7 +316,6 @@ char* lipth_paths_get_sql (
 
 /**
  * \brief Gets the game root directory.
- *
  * \return Path or NULL.
  */
 char* lipth_paths_get_root ()

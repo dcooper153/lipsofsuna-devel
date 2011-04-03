@@ -26,19 +26,6 @@
 
 #define SCRIPT_POINTER_MODEL ((void*) -1)
 
-/* @luadoc
- * module "core/tiles"
- * --- Terrain material.
- * -- @name Material
- * -- @class table
- */
-
-/* @luadoc
- * --- Creates a new terrain material.
- * -- @param clss Material class.
- * -- @param args Arguments.
- * -- @return Material.
- */
 static void Material_new (LIScrArgs* args)
 {
 	LIExtModule* module;
@@ -46,7 +33,7 @@ static void Material_new (LIScrArgs* args)
 	LIVoxMaterial* material;
 
 	/* Allocate material. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_MATERIAL);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_MATERIAL);
 	material = livox_material_new ();
 	if (material == NULL)
 		return;
@@ -63,27 +50,21 @@ static void Material_new (LIScrArgs* args)
 	}
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, material, args->clss, NULL);
+	data = liscr_data_new (args->script, material, LIEXT_SCRIPT_MATERIAL, NULL);
 	if (data == NULL)
 	{
 		livox_manager_remove_material (module->voxels, material->id);
 		return;
 	}
-	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
 	liscr_data_unref (data);
 }
 
-/* @luadoc
- * --- Face culling toggle.
- * -- @name Material.cullface
- * -- @class table
- */
 static void Material_get_cullface (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
 
-	liscr_args_seti_int (args, (self->material.flags & LIMDL_MATERIAL_FLAG_CULLFACE) != 0);
+	liscr_args_seti_bool (args, (self->material.flags & LIMDL_MATERIAL_FLAG_CULLFACE) != 0);
 }
 static void Material_set_cullface (LIScrArgs* args)
 {
@@ -99,11 +80,6 @@ static void Material_set_cullface (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Diffuse color.
- * -- @name Material.diffuse
- * -- @class table
- */
 static void Material_get_diffuse (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
@@ -124,11 +100,6 @@ static void Material_set_diffuse (LIScrArgs* args)
 	liscr_args_geti_float (args, 3, self->material.diffuse + 3);
 }
 
-/* @luadoc
- * --- Material flags.
- * -- @name Material.flags
- * -- @class table
- */
 static void Material_get_flags (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
@@ -144,11 +115,6 @@ static void Material_set_flags (LIScrArgs* args)
 		self->flags = value;
 }
 
-/* @luadoc
- * --- Material friction.
- * -- @name Material.friction
- * -- @class table
- */
 static void Material_get_friction (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
@@ -164,11 +130,6 @@ static void Material_set_friction (LIScrArgs* args)
 		self->friction = value;
 }
 
-/* @luadoc
- * --- Material ID.
- * -- @name Material.id
- * -- @class table
- */
 static void Material_get_id (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
@@ -176,11 +137,6 @@ static void Material_get_id (LIScrArgs* args)
 	liscr_args_seti_int (args, self->id);
 }
 
-/* @luadoc
- * --- Material name.
- * -- @name Material.name
- * -- @class table
- */
 static void Material_get_name (LIScrArgs* args)
 {
 	liscr_args_seti_string (args, ((LIVoxMaterial*) args->self)->name);
@@ -193,11 +149,6 @@ static void Material_set_name (LIScrArgs* args)
 		livox_material_set_name (args->self, value);
 }
 
-/* @luadoc
- * --- Surface shader.
- * -- @name Material.shader
- * -- @class table
- */
 static void Material_get_shader (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
@@ -213,11 +164,6 @@ static void Material_set_shader (LIScrArgs* args)
 		limdl_material_set_shader (&self->material, value);
 }
 
-/* @luadoc
- * --- Shininess.
- * -- @name Material.shininess
- * -- @class table
- */
 static void Material_get_shininess (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
@@ -233,11 +179,6 @@ static void Material_set_shininess (LIScrArgs* args)
 		self->material.shininess = value;
 }
 
-/* @luadoc
- * --- Specular color.
- * -- @name Material.specular
- * -- @class table
- */
 static void Material_get_specular (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
@@ -258,11 +199,6 @@ static void Material_set_specular (LIScrArgs* args)
 	liscr_args_geti_float (args, 3, self->material.specular + 3);
 }
 
-/* @luadoc
- * --- Texture list.
- * -- @name Material.texture
- * -- @class table
- */
 static void Material_get_texture (LIScrArgs* args)
 {
 	int i;
@@ -289,11 +225,6 @@ static void Material_set_texture (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Texture scale factor.
- * -- @name Material.texture_scale
- * -- @class table
- */
 static void Material_get_texture_scale (LIScrArgs* args)
 {
 	LIVoxMaterial* self = args->self;
@@ -309,11 +240,6 @@ static void Material_set_texture_scale (LIScrArgs* args)
 		self->texture_scale = value;
 }
 
-/* @luadoc
- * --- Material type.
- * -- @name Material.type
- * -- @class table
- */
 static void Material_get_type (LIScrArgs* args)
 {
 	LIVoxMaterial* self;
@@ -357,35 +283,32 @@ static void Material_set_type (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_material (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_MATERIAL, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "new", Material_new);
-	liscr_class_insert_mfunc (self, "get_cullface", Material_get_cullface);
-	liscr_class_insert_mfunc (self, "set_cullface", Material_set_cullface);
-	liscr_class_insert_mfunc (self, "get_diffuse", Material_get_diffuse);
-	liscr_class_insert_mfunc (self, "set_diffuse", Material_set_diffuse);
-	liscr_class_insert_mfunc (self, "get_flags", Material_get_flags);
-	liscr_class_insert_mfunc (self, "set_flags", Material_set_flags);
-	liscr_class_insert_mfunc (self, "get_friction", Material_get_friction);
-	liscr_class_insert_mfunc (self, "set_friction", Material_set_friction);
-	liscr_class_insert_mfunc (self, "get_id", Material_get_id);
-	liscr_class_insert_mfunc (self, "get_name", Material_get_name);
-	liscr_class_insert_mfunc (self, "set_name", Material_set_name);
-	liscr_class_insert_mfunc (self, "get_shader", Material_get_shader);
-	liscr_class_insert_mfunc (self, "set_shader", Material_set_shader);
-	liscr_class_insert_mfunc (self, "get_shininess", Material_get_shininess);
-	liscr_class_insert_mfunc (self, "set_shininess", Material_set_shininess);
-	liscr_class_insert_mfunc (self, "get_specular", Material_get_specular);
-	liscr_class_insert_mfunc (self, "set_specular", Material_set_specular);
-	liscr_class_insert_mfunc (self, "get_texture", Material_get_texture);
-	liscr_class_insert_mfunc (self, "set_texture", Material_set_texture);
-	liscr_class_insert_mfunc (self, "get_texture_scale", Material_get_texture_scale);
-	liscr_class_insert_mfunc (self, "set_texture_scale", Material_set_texture_scale);
-	liscr_class_insert_mfunc (self, "get_type", Material_get_type);
-	liscr_class_insert_mfunc (self, "set_type", Material_set_type);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_MATERIAL, "material_new", Material_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_cullface", Material_get_cullface);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_cullface", Material_set_cullface);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_diffuse", Material_get_diffuse);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_diffuse", Material_set_diffuse);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_flags", Material_get_flags);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_flags", Material_set_flags);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_friction", Material_get_friction);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_friction", Material_set_friction);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_id", Material_get_id);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_name", Material_get_name);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_name", Material_set_name);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_shader", Material_get_shader);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_shader", Material_set_shader);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_shininess", Material_get_shininess);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_shininess", Material_set_shininess);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_specular", Material_get_specular);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_specular", Material_set_specular);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_texture", Material_get_texture);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_texture", Material_set_texture);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_texture_scale", Material_get_texture_scale);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_texture_scale", Material_set_texture_scale);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_type", Material_get_type);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_type", Material_set_type);
 }
 
 /** @} */

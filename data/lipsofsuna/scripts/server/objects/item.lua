@@ -1,11 +1,12 @@
 Item = Class(Object)
+Item.class_name = "Item"
 Item.pickable = true
 
-Item.setter = function(self, key, value)
-	if key == "spec" then
+Item:add_setters{
+	spec = function(self, value)
 		local spec = type(value) == "string" and Itemspec:find{name = value} or value
 		if not spec then return end
-		Object.setter(self, key, spec)
+		rawset(self, "__spec", spec)
 		self.mass = spec.mass
 		self.model = spec.model
 		self.name = spec.name
@@ -36,10 +37,8 @@ Item.setter = function(self, key, value)
 				self:add_item{object = Item{spec = Itemspec:random{category = cat}}}
 			end
 		end
-	else
-		Object.setter(self, key, value)
-	end
-end
+	end}
+
 
 --- Creates an item.
 -- @param clss Item class.

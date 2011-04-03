@@ -1,4 +1,5 @@
 Eventhandler = Class()
+Eventhandler.class_name = "Eventhandler"
 Eventhandler.handlers = {}
 setmetatable(Eventhandler.handlers, {__mode = "v"})
 
@@ -34,6 +35,16 @@ end
 -- @param clss Event handler class.
 -- @param args Event arguments.
 Eventhandler.event = function(clss, args)
+	-- Translate handles.
+	if args.type == "packet" then
+		args.packet = Class.new(Packet, {handle = args.packet})
+	end
+	for k,v in pairs(args) do
+		if type(v) == "userdata" then
+			args[k] = __userdata_lookup[v]
+		end
+	end
+	-- Invoke event handlers.
 	for k,v in pairs(clss.handlers) do
 		if k.type == args.type then
 			k:func(args)

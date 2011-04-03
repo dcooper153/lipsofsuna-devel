@@ -70,7 +70,8 @@ LIExtReload* liext_reload_new (
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (program->script, "Reload", liext_script_reload, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_RELOAD, self);
+	liext_script_reload (program->script);
 
 	return self;
 }
@@ -130,16 +131,14 @@ static void private_reload_image (
 	const char*  name)
 {
 	liren_render_load_image (self->client->render, name);
-	limai_program_event (self->program, "reload-image",
-		"file", LISCR_TYPE_STRING, name, NULL);
+	limai_program_event (self->program, "reload-image", "file", LISCR_TYPE_STRING, name, NULL);
 }
 
 static void private_reload_model (
 	LIExtReload* self,
 	const char*  name)
 {
-	limai_program_event (self->program, "reload-model",
-		"file", LISCR_TYPE_STRING, name, NULL);
+	limai_program_event (self->program, "reload-model", "file", LISCR_TYPE_STRING, name, NULL);
 }
 
 /** @} */

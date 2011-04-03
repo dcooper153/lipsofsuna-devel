@@ -12,7 +12,7 @@ Action{name = "camera", mode = "press", key1 = Keysym.y, func = function()
 		if Player.object then
 			local e = Player.object.rotation.euler
 			e[3] = 0
-			Player.object.rotation = Quaternion:new_euler(e)
+			Player.object.rotation = Quaternion{euler = e}
 		end
 	else
 		Player.camera.mode = "first-person"

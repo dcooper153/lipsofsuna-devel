@@ -28,10 +28,8 @@
 #define LISCR_TYPE_STRING ((void*) -4)
 
 typedef struct _LIScrArgs LIScrArgs;
-typedef struct _LIScrClass LIScrClass;
 typedef struct _LIScrData LIScrData;
 typedef struct _LIScrScript LIScrScript;
-typedef void (*LIScrClassInit)(LIScrClass*, void*);
 typedef void (*LIScrGCFunc)();
 typedef int (*LIScrMarshal)(lua_State*);
 typedef void (*LIScrArgsFunc)(LIScrArgs*);

@@ -73,6 +73,10 @@ LIAPICALL (LIPhyObject*, liphy_physics_find_object, (
 	LIPhyPhysics* self,
 	uint32_t      id));
 
+LIAPICALL (void, liphy_physics_remove_model, (
+	LIPhyPhysics* self,
+	LIPhyModel*   model));
+
 LIAPICALL (void, liphy_physics_update, (
 	LIPhyPhysics* self,
 	float         secs));

@@ -50,7 +50,6 @@ void liext_cameras_update (
 /*****************************************************************************/
 
 void liext_script_camera (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

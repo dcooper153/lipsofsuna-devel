@@ -216,8 +216,8 @@ static int private_init (
 		return 0;
 
 	/* Register classes. */
-	if (!liscr_script_create_class (program->script, "Client", licli_script_client, self))
-		return 0;
+	liscr_script_set_userdata (program->script, LICLI_SCRIPT_CLIENT, self);
+	licli_script_client (program->script);
 
 	/* Register callbacks. */
 	lical_callbacks_insert (program->callbacks, program->engine, "event", -5, private_event, self, NULL);
@@ -235,23 +235,15 @@ static int private_event (
 	switch (event->type)
 	{
 		case SDL_JOYAXISMOTION:
-			limai_program_event (self->program, "joystickmotion",
-				"axis", LISCR_TYPE_INT, event->jaxis.axis + 1,
-				"value", LISCR_TYPE_FLOAT, event->jaxis.value / 32768.0f, NULL);
+			limai_program_event (self->program, "joystickmotion", "axis", LISCR_TYPE_INT, event->jaxis.axis + 1, "value", LISCR_TYPE_FLOAT, event->jaxis.value / 32768.0f, NULL);
 			return 0;
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
-			limai_program_event (self->program,
-				(event->type == SDL_JOYBUTTONDOWN)? "joystickpress" : "joystickrelease",
-				"button", LISCR_TYPE_INT, event->jbutton.button, NULL);
+			limai_program_event (self->program, (event->type == SDL_JOYBUTTONDOWN)? "joystickpress" : "joystickrelease", "button", LISCR_TYPE_INT, event->jbutton.button, NULL);
 			return 0;
 		case SDL_MOUSEBUTTONDOWN:
 		case SDL_MOUSEBUTTONUP:
-			limai_program_event (self->program,
-				(event->type == SDL_MOUSEBUTTONDOWN)? "mousepress" : "mouserelease",
-				"button", LISCR_TYPE_INT, event->button.button,
-				"x", LISCR_TYPE_INT, event->button.x,
-				"y", LISCR_TYPE_INT, event->button.y, NULL);
+			limai_program_event (self->program, (event->type == SDL_MOUSEBUTTONDOWN)? "mousepress" : "mouserelease", "button", LISCR_TYPE_INT, event->button.button, "x", LISCR_TYPE_INT, event->button.x, "y", LISCR_TYPE_INT, event->button.y, NULL);
 			return 0;
 		case SDL_KEYDOWN:
 		case SDL_KEYUP:
@@ -259,30 +251,19 @@ static int private_event (
 				str = listr_wchar_to_utf8 (event->key.keysym.unicode);
 			if (str != NULL)
 			{
-				limai_program_event (self->program,
-					(event->type == SDL_KEYDOWN)? "keypress" : "keyrelease",
-					"code", LISCR_TYPE_INT, event->key.keysym.sym,
-					"mods", LISCR_TYPE_INT, event->key.keysym.mod,
-					"text", LISCR_TYPE_STRING, str, NULL);
+				limai_program_event (self->program, (event->type == SDL_KEYDOWN)? "keypress" : "keyrelease", "code", LISCR_TYPE_INT, event->key.keysym.sym, "mods", LISCR_TYPE_INT, event->key.keysym.mod, "text", LISCR_TYPE_STRING, str, NULL);
 				lisys_free (str);
 			}
 			else
 			{
-				limai_program_event (self->program,
-					(event->type == SDL_KEYDOWN)? "keypress" : "keyrelease",
-					"code", LISCR_TYPE_INT, event->key.keysym.sym,
-					"mods", LISCR_TYPE_INT, event->key.keysym.mod, NULL);
+				limai_program_event (self->program, (event->type == SDL_KEYDOWN)? "keypress" : "keyrelease", "code", LISCR_TYPE_INT, event->key.keysym.sym, "mods", LISCR_TYPE_INT, event->key.keysym.mod, NULL);
 			}
 			if (event->key.keysym.sym == SDLK_F4 &&
 			   (event->key.keysym.mod & KMOD_ALT))
 				self->program->quit = 1;
 			return 0;
 		case SDL_MOUSEMOTION:
-			limai_program_event (self->program, "mousemotion",
-				"x", LISCR_TYPE_INT, event->motion.x,
-				"y", LISCR_TYPE_INT, event->motion.y,
-				"dx", LISCR_TYPE_INT, event->motion.xrel,
-				"dy", LISCR_TYPE_INT, event->motion.yrel, NULL);
+			limai_program_event (self->program, "mousemotion", "x", LISCR_TYPE_INT, event->motion.x, "y", LISCR_TYPE_INT, event->motion.y, "dx", LISCR_TYPE_INT, event->motion.xrel, "dy", LISCR_TYPE_INT, event->motion.yrel, NULL);
 			return 0;
 		case SDL_QUIT:
 			limai_program_event (self->program, "quit", NULL);

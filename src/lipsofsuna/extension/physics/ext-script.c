@@ -72,25 +72,6 @@ static int private_build_ignore_list (
 
 /*****************************************************************************/
 
-/* @luadoc
- * module "core/physics"
- * --- Physics simulation support.
- * -- @name Physics
- * -- @class table
- */
-
-/* @luadoc
- * --- Performs a ray cast test.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>collision_group: Collision group.</li>
- * --   <li>collision_mask: Collision mask.</li>
- * --   <li>ignore: Object or table of objects to ignore.</li>
- * --   <li>src: Start point vector in world space.</li>
- * --   <li>dst: End point vector in world space.</li></ul>
- * -- @return Table with point, normal, object and tile. Nil if no collision occurred.
- * function Physics.cast_ray(self, args)
- */
 static void Physics_cast_ray (LIScrArgs* args)
 {
 	int ignore;
@@ -105,7 +86,7 @@ static void Physics_cast_ray (LIScrArgs* args)
 	LIPhyObject* ignores[100];
 
 	/* Handle arguments. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PHYSICS);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS);
 	if (!liscr_args_gets_vector (args, "src", &start) ||
 	    !liscr_args_gets_vector (args, "dst", &end))
 		return;
@@ -134,19 +115,6 @@ static void Physics_cast_ray (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Performs a sphere cast test.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>collision_group: Collision group.</li>
- * --   <li>collision_mask: Collision mask.</li>
- * --   <li>ignore: Object or table of objects to ignore.</li>
- * --   <li>radius: Radius in world units.</li>
- * --   <li>src: Start point vector in world space.</li>
- * --   <li>dst: End point vector in world space.</li></ul>
- * -- @return Table with point, normal, object and tile. Nil if no collision occurred.
- * function Physics.cast_sphere(self, args)
- */
 static void Physics_cast_sphere (LIScrArgs* args)
 {
 	int ignore;
@@ -162,7 +130,7 @@ static void Physics_cast_sphere (LIScrArgs* args)
 	LIPhyObject* ignores[100];
 
 	/* Handle arguments. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PHYSICS);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS);
 	if (!liscr_args_gets_vector (args, "src", &start) ||
 	    !liscr_args_gets_vector (args, "dst", &end))
 		return;
@@ -193,16 +161,11 @@ static void Physics_cast_sphere (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Physics simulation toggle.
- * -- @name Physics.enable_simulation
- * -- @class table
- */
 static void Physics_get_enable_simulation (LIScrArgs* args)
 {
 	LIExtModule* module;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PHYSICS);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS);
 	liscr_args_seti_bool (args, module->simulate);
 }
 static void Physics_set_enable_simulation (LIScrArgs* args)
@@ -210,7 +173,7 @@ static void Physics_set_enable_simulation (LIScrArgs* args)
 	int value;
 	LIExtModule* module;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_PHYSICS);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS);
 	if (liscr_args_geti_bool (args, 0, &value))
 		module->simulate = value;
 }
@@ -218,15 +181,12 @@ static void Physics_set_enable_simulation (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_physics (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_PHYSICS, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "cast_ray", Physics_cast_ray);
-	liscr_class_insert_cfunc (self, "cast_sphere", Physics_cast_sphere);
-	liscr_class_insert_cfunc (self, "get_enable_simulation", Physics_get_enable_simulation);
-	liscr_class_insert_cfunc (self, "set_enable_simulation", Physics_set_enable_simulation);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS, "physics_cast_ray", Physics_cast_ray);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS, "physics_cast_sphere", Physics_cast_sphere);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS, "physics_get_enable_simulation", Physics_get_enable_simulation);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_PHYSICS, "physics_set_enable_simulation", Physics_set_enable_simulation);
 }
 
 /** @} */

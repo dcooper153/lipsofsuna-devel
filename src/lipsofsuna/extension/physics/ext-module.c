@@ -76,7 +76,8 @@ LIExtModule* liext_physics_new (
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (program->script, "Physics", liext_script_physics, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_PHYSICS, self);
+	liext_script_physics (program->script);
 
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (program->callbacks, program->engine, "model-changed", 1, private_model_changed, self, self->calls + 0) ||

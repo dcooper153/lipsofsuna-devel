@@ -82,7 +82,7 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 			c.z = org.z + 5 + math.random(0, Voxel.tiles_per_line - 10)
 			if (c - spawn).length < 50 then break end
 			local t,p = Voxel:find_tile{match = "empty", point = c * Config.tilewidth, radius = 3 * Config.tilewidth}
-			if t and Voxel:get_tile{point = p + Vector(0, 1, 0)} == 0 then
+			if t and Voxel:get_tile(p + Vector(0, 1, 0)) == 0 then
 				p = p + Vector(0.5, 0.5, 0.5)
 				Voxel:place_creature{point = p, category = "enemy"}
 				break
@@ -128,7 +128,7 @@ Sectors.format_generated_sector = function(self, sector)
 			i = i + 1
 			ctr.y = ctr.y - 1
 			if i > 10 then return end
-		until Voxel:get_tile{point = ctr} ~= 0
+		until Voxel:get_tile(ctr) ~= 0
 		ctr.y = ctr.y + 1
 		local src = ctr + Vector(-1,1,-1)
 		local dst = ctr + Vector(1,3,1)
@@ -144,7 +144,7 @@ Sectors.format_generated_sector = function(self, sector)
 	local create_vein = function(ctr, mat)
 		for k,v in pairs(points) do
 			if math.random() < 0.3 then
-				local t = Voxel:get_tile{point = ctr + v}
+				local t = Voxel:get_tile(ctr + v)
 				if t ~= 0 then
 					Voxel:set_tile(ctr + v, mat)
 				end
@@ -173,7 +173,7 @@ Sectors.format_generated_sector = function(self, sector)
 		p.y = org.y + math.random(1, Voxel.tiles_per_line - 1)
 		p.z = org.z + math.random(1, Voxel.tiles_per_line - 1)
 		if validate_position(p) then
-			local t = Voxel:get_tile{point = p}
+			local t = Voxel:get_tile(p)
 			if t ~= 0 then
 				local m = mats[math.random(1,#mats)]
 				if m then create_vein(p, m.id, 1) end

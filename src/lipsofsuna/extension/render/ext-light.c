@@ -24,20 +24,6 @@
 
 #include "ext-module.h"
 
-/* @luadoc
- * module "core/render"
- * --- Create and manipulate light sources.
- * -- @name Light
- * -- @class table
- */
-
-/* @luadoc
- * --- Creates a new light source.
- * -- @param clss Light class.
- * -- @param args Arguments.
- * -- @return New light source.
- * function Light.new(clss, args)
- */
 static void Light_new (LIScrArgs* args)
 {
 	LIExtModule* module;
@@ -48,28 +34,22 @@ static void Light_new (LIScrArgs* args)
 	const float equation[3] = { 1.0f, 1.0f, 1.0f };
 
 	/* Allocate self. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_LIGHT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_LIGHT);
 	self = liren_light_new (module->client->scene, black, white, white, equation, M_PI, 0.0f, 0);
 	if (self == NULL)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, args->clss, liren_light_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_LIGHT, liren_light_free);
 	if (data == NULL)
 	{
 		liren_light_free (self);
 		return;
 	}
-	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
 	liscr_data_unref (data);
 }
 
-/* @luadoc
- * --- The ambient color of the light source.
- * -- @name Light.ambient
- * -- @class table
- */
 static void Light_get_ambient (LIScrArgs* args)
 {
 	LIRenLight* light;
@@ -93,11 +73,6 @@ static void Light_set_ambient (LIScrArgs* args)
 	memcpy (light->ambient, value, 4 * sizeof (float));
 }
 
-/* @luadoc
- * --- The diffuse color of the light source.
- * -- @name Light.diffuse
- * -- @class table
- */
 static void Light_get_diffuse (LIScrArgs* args)
 {
 	LIRenLight* light;
@@ -121,12 +96,6 @@ static void Light_set_diffuse (LIScrArgs* args)
 	memcpy (light->diffuse, value, 4 * sizeof (float));
 }
 
-/* @luadoc
- * --- Enables or disables the light.
- * --
- * -- @name Light.enabled
- * -- @class table
- */
 static void Light_get_enabled (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liren_light_get_enabled (args->self));
@@ -146,11 +115,6 @@ static void Light_set_enabled (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- The attenuation equation of the light source.
- * -- @name Light.equation
- * -- @class table
- */
 static void Light_get_equation (LIScrArgs* args)
 {
 	LIRenLight* light;
@@ -173,11 +137,6 @@ static void Light_set_equation (LIScrArgs* args)
 	memcpy (light->equation, value, 3 * sizeof (float));
 }
 
-/* @luadoc
- * --- Gets or sets the position of the light.
- * -- @name Light.position
- * -- @class table
- */
 static void Light_get_position (LIScrArgs* args)
 {
 	LIMatTransform transform;
@@ -198,11 +157,6 @@ static void Light_set_position (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- The priority of the light, higher means more important.
- * -- @name Light.priority
- * -- @class table
- */
 static void Light_get_priority (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, liren_light_get_priority (args->self));
@@ -215,12 +169,6 @@ static void Light_set_priority (LIScrArgs* args)
 		liren_light_set_priority (args->self, value);
 }
 
-
-/* @luadoc
- * --- Gets or sets the rotation of the light.
- * -- @name Light.rotation
- * -- @class table
- */
 static void Light_get_rotation (LIScrArgs* args)
 {
 	LIMatTransform transform;
@@ -241,11 +189,6 @@ static void Light_set_rotation (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Enables or disables shadow casting.
- * -- @name Light.shadow_casting
- * -- @class table
- */
 static void Light_get_shadow_casting (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liren_light_get_shadow (args->self));
@@ -258,11 +201,6 @@ static void Light_set_shadow_casting (LIScrArgs* args)
 		liren_light_set_shadow (args->self, value);
 }
 
-/* @luadoc
- * --- Far place distance of the shadow projection.
- * -- @name Light.shadow_far
- * -- @class table
- */
 static void Light_get_shadow_far (LIScrArgs* args)
 {
 	LIRenLight* self = args->self;
@@ -281,11 +219,6 @@ static void Light_set_shadow_far (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Near place distance of the shadow projection.
- * -- @name Light.shadow_near
- * -- @class table
- */
 static void Light_get_shadow_near (LIScrArgs* args)
 {
 	LIRenLight* self = args->self;
@@ -304,11 +237,6 @@ static void Light_set_shadow_near (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- The specular color of the light source.
- * -- @name Light.specular
- * -- @class table
- */
 static void Light_get_specular (LIScrArgs* args)
 {
 	LIRenLight* light;
@@ -332,11 +260,6 @@ static void Light_set_specular (LIScrArgs* args)
 	memcpy (light->specular, value, 4 * sizeof (float));
 }
 
-/* @luadoc
- * --- Spot cutoff angle of the light, in radians.
- * -- @name Light.spot_cutoff
- * -- @class table
- */
 static void Light_get_spot_cutoff (LIScrArgs* args)
 {
 	LIRenLight* self = args->self;
@@ -355,11 +278,6 @@ static void Light_set_spot_cutoff (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Spot exponent of the light.
- * -- @name Light.spot_cutoff
- * -- @class table
- */
 static void Light_get_spot_exponent (LIScrArgs* args)
 {
 	LIRenLight* self = args->self;
@@ -378,38 +296,35 @@ static void Light_set_spot_exponent (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_light (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_LIGHT, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "new", Light_new);
-	liscr_class_insert_mfunc (self, "get_ambient", Light_get_ambient);
-	liscr_class_insert_mfunc (self, "get_diffuse", Light_get_diffuse);
-	liscr_class_insert_mfunc (self, "get_enabled", Light_get_enabled);
-	liscr_class_insert_mfunc (self, "get_equation", Light_get_equation);
-	liscr_class_insert_mfunc (self, "get_position", Light_get_position);
-	liscr_class_insert_mfunc (self, "get_priority", Light_get_priority);
-	liscr_class_insert_mfunc (self, "get_rotation", Light_get_rotation);
-	liscr_class_insert_mfunc (self, "get_shadow_casting", Light_get_shadow_casting);
-	liscr_class_insert_mfunc (self, "get_shadow_far", Light_get_shadow_far);
-	liscr_class_insert_mfunc (self, "get_shadow_near", Light_get_shadow_near);
-	liscr_class_insert_mfunc (self, "get_specular", Light_get_specular);
-	liscr_class_insert_mfunc (self, "get_spot_cutoff", Light_get_spot_cutoff);
-	liscr_class_insert_mfunc (self, "get_spot_exponent", Light_get_spot_exponent);
-	liscr_class_insert_mfunc (self, "set_ambient", Light_set_ambient);
-	liscr_class_insert_mfunc (self, "set_diffuse", Light_set_diffuse);
-	liscr_class_insert_mfunc (self, "set_enabled", Light_set_enabled);
-	liscr_class_insert_mfunc (self, "set_equation", Light_set_equation);
-	liscr_class_insert_mfunc (self, "set_position", Light_set_position);
-	liscr_class_insert_mfunc (self, "set_priority", Light_set_priority);
-	liscr_class_insert_mfunc (self, "set_rotation", Light_set_rotation);
-	liscr_class_insert_mfunc (self, "set_shadow_casting", Light_set_shadow_casting);
-	liscr_class_insert_mfunc (self, "set_shadow_far", Light_set_shadow_far);
-	liscr_class_insert_mfunc (self, "set_shadow_near", Light_set_shadow_near);
-	liscr_class_insert_mfunc (self, "set_specular", Light_set_specular);
-	liscr_class_insert_mfunc (self, "set_spot_cutoff", Light_set_spot_cutoff);
-	liscr_class_insert_mfunc (self, "set_spot_exponent", Light_set_spot_exponent);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_LIGHT, "light_new", Light_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_get_ambient", Light_get_ambient);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_get_diffuse", Light_get_diffuse);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_get_enabled", Light_get_enabled);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_get_equation", Light_get_equation);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_get_position", Light_get_position);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_get_priority", Light_get_priority);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_get_rotation", Light_get_rotation);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_get_shadow_casting", Light_get_shadow_casting);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_get_shadow_far", Light_get_shadow_far);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_get_shadow_near", Light_get_shadow_near);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_get_specular", Light_get_specular);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_get_spot_cutoff", Light_get_spot_cutoff);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_get_spot_exponent", Light_get_spot_exponent);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_ambient", Light_set_ambient);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_diffuse", Light_set_diffuse);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_enabled", Light_set_enabled);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_equation", Light_set_equation);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_position", Light_set_position);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_priority", Light_set_priority);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_rotation", Light_set_rotation);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_shadow_casting", Light_set_shadow_casting);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_shadow_far", Light_set_shadow_far);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_shadow_near", Light_set_shadow_near);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_specular", Light_set_specular);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_spot_cutoff", Light_set_spot_cutoff);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_spot_exponent", Light_set_spot_exponent);
 }
 
 /** @} */

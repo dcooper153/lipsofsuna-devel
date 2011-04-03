@@ -1,35 +1,41 @@
 local oldanimate = Object.animate
 local objspec = Spec{name = "object", type = "object"}
 
-Object.getters.admin = function(self)
-	local a = Class.getter(self, "account")
-	return a and Config.inst.admins[a.login]
-end
-Object.getters.count = function(self)
-	return Class.getter(self, "count") or 1
-end
-Object.getters.spec = function(self)
-	return Class.getter(self, "spec") or objspec
-end
-Object.setters.admin = function(self, v)
-	Config.inst.admins[self] = v and true or nil
-	Config.inst:save()
-end
-Object.setters.count = function(self, v)
-	-- Store the new count.
-	if Class.getter(self, "count") == v then return end
-	Class.setter(self, "count", v ~= 0 and v or nil)
-	-- Update the inventory containing the object.
-	local inventory = Inventory:find{object = self}
-	if inventory then
-		for k,v in pairs(inventory.slots) do
-			if v == self then
-				inventory:update_slot{slot = k}
-				break
+Object:add_getters{
+	admin = function(s)
+		local a = rawget(s, "account")
+		return a and Config.inst.admins[a.login]
+	end,
+	count = function(s)
+		return rawget(s, "__count") or 1
+	end,
+	spec = function(s)
+		return rawget(s, "__spec") or objspec
+	end}
+
+Object:add_setters{
+	admin = function(s, v)
+		Config.inst.admins[s] = v and true or nil
+		Config.inst:save()
+	end,
+	count = function(s, v)
+		-- Store the new count.
+		if s.count == v then return end
+		rawset(s, "__count", v ~= 0 and v or nil)
+		-- Update the inventory containing the object.
+		local inventory = Inventory:find{object = s}
+		if inventory then
+			for k,v in pairs(inventory.slots) do
+				if v == self then
+					inventory:update_slot{slot = k}
+					break
+				end
 			end
 		end
-	end
-end
+	end,
+	spec = function(s, v)
+		rawset(s, "__spec", v)
+	end}
 
 --- Handles physics contacts.
 -- @param self Object.
@@ -392,6 +398,7 @@ end
 -- @param self Object.
 -- @return True if fixing succeeded.
 Object.stuck_fix = function(self)
+	do return true end
 	-- Get the tile position of the object.
 	local src = self:get_tile_range()
 	-- Find the closest empty tile.
@@ -457,12 +464,15 @@ end
 -- @param secs Seconds since the last update.
 -- @return Boolean and environment statistics. The boolean is true if the object isn't permanently stuck.
 Object.update_environment = function(self, secs)
+	if not self.env_timer then self.env_timer = 0 end
+	self.env_timer = self.env_timer + secs
+	if self.env_timer < 2 then return true end
 	-- Count tiles affecting us.
 	if not self.realized then return true end
 	local src,dst = self:get_tile_range()
 	local res = Voxel:check_range(src, dst)
 	-- Stuck handling.
-	if res.solid > 0 then
+--[[	if res.solid > 0 then
 		self.stuck = (self.stuck or 0) + 2
 		if self.stuck < 10 then
 			self:stuck_fix()
@@ -477,7 +487,7 @@ Object.update_environment = function(self, secs)
 		else
 			self.stuck = nil
 		end
-	end
+	end--]]
 	return true, res
 end
 

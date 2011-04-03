@@ -1,52 +1,5 @@
 Widgets.Frame = Class(Widget)
-
-Widgets.Frame.setter = function(self, key, value)
-	if key == "style" then
-		if self.style ~= value then
-			Widget.setter(self, key, value)
-			if value == "default" then
-				self.margins = {10,7,10,20}
-			elseif value == "equipment" then
-				self.spacings = {0,0}
-				self.margins = {10,7,0,0}
-			elseif value == "list" then
-				self.spacings = {0,0}
-				self.margins = {0,0,0,0}
-			elseif value == "paper" then
-				self.margins = {30,30,40,30}
-			elseif value == "popup" then
-				self.margins = {10,17,5,17}
-				self.spacings = {0,0}
-			elseif value == "quickbar" then
-				self.spacings = {0,16}
-				self.margins = {77,0,10,0}
-			elseif value == "title" then
-				self.margins = {100,100,0,10}
-			elseif value == "tooltip" then
-				self.margins = {5,16,0,11}
-			end
-			self:reshaped()
-		end
-	elseif key == "focused" then
-		if self.focused ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "font" then
-		if self.font ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "text" then
-		if self.text ~= value then
-			if self.label then self.label.text = value end
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	else
-		Widget.setter(self, key, value)
-	end
-end
+Widgets.Frame.class_name = "Widgets.Frame"
 
 --- Creates a new frame widget.
 -- @param clss Frame widget class.
@@ -139,3 +92,53 @@ Widgets.Frame.reshaped = function(self)
 	end
 	self:canvas_compile()
 end
+
+Widgets.Frame:add_getters{
+	style = function(s) return rawget(s, "__style") end,
+	focused = function(s) return rawget(s, "__focused") end,
+	font = function(s) return rawget(s, "__font") end,
+	text = function(s) return rawget(s, "__text") end}
+
+Widgets.Frame:add_setters{
+	style = function(s, v)
+		if s.style == v then return end
+		rawset(s, "__style", v)
+		if v == "default" then
+			s.margins = {10,7,10,20}
+		elseif v == "equipment" then
+			s.spacings = {0,0}
+			s.margins = {10,7,0,0}
+		elseif v == "list" then
+			s.spacings = {0,0}
+			s.margins = {0,0,0,0}
+		elseif v == "paper" then
+			s.margins = {30,30,40,30}
+		elseif v == "popup" then
+			s.margins = {10,17,5,17}
+			s.spacings = {0,0}
+		elseif v == "quickbar" then
+			s.spacings = {0,16}
+			s.margins = {77,0,10,0}
+		elseif v == "title" then
+			s.margins = {100,100,0,10}
+		elseif v == "tooltip" then
+			s.margins = {5,16,0,11}
+		end
+		s:reshaped()
+	end,
+	focused = function(s, v)
+		if s.focused == v then return end
+		rawset(s, "__focused", v)
+		s:reshaped()
+	end,
+	font = function(s, v)
+		if s.font == v then return end
+		rawset(s, "__font", v)
+		s:reshaped()
+	end,
+	text = function(s, v)
+		if s.text == v then return end
+		if s.label then s.label.text = v end
+		rawset(s, "__text", v)
+		s:reshaped()
+	end}

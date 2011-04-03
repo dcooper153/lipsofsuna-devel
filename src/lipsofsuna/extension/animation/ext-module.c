@@ -35,7 +35,6 @@ LIExtModule* liext_animation_new (
 	LIMaiProgram* program)
 {
 	LIExtModule* self;
-	LIScrClass* clss;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
@@ -44,8 +43,8 @@ LIExtModule* liext_animation_new (
 	self->program = program;
 
 	/* Register classes. */
-	clss = liscr_script_find_class (program->script, "Object");
-	liext_script_object_animation (clss, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_ANIMATION, self);
+	liext_script_object_animation (program->script);
 
 	return self;
 }

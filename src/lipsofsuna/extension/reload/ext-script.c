@@ -25,26 +25,11 @@
 #include "ext-module.h"
 #include "ext-reload.h"
 
-/* @luadoc
- * module "core/reload"
- * --- Reload modified data files without restarting.
- * -- @name Reload
- * -- @class table
- */
-
-/* @luadoc
- * --- Automatic reload flag.
- * --
- * -- False by default.
- * --
- * -- @name Reload.enabled
- * -- @class table
- */
 static void Reload_get_enabled (LIScrArgs* args)
 {
 	LIExtReload* self;
 
-	self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
+	self = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RELOAD);
 	liscr_args_seti_bool (args, liext_reload_get_enabled (self));
 }
 static void Reload_set_enabled (LIScrArgs* args)
@@ -54,21 +39,18 @@ static void Reload_set_enabled (LIScrArgs* args)
 
 	if (liscr_args_geti_bool (args, 0, &value))
 	{
-		self = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RELOAD);
+		self = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RELOAD);
 		liext_reload_set_enabled (self, value);
 	}
 }
 
 /*****************************************************************************/
 
-void
-liext_script_reload (LIScrClass* self,
-                     void*       data)
+void liext_script_reload (
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_RELOAD, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "get_enabled", Reload_get_enabled);
-	liscr_class_insert_cfunc (self, "set_enabled", Reload_set_enabled);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RELOAD, "reload_get_enabled", Reload_get_enabled);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RELOAD, "reload_set_enabled", Reload_set_enabled);
 }
 
 /** @} */

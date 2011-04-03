@@ -23,10 +23,14 @@
  */
 
 #include "script.h"
-#include "script-class.h"
 #include "script-data.h"
 #include "script-private.h"
 #include "script-util.h"
+
+static int private_gc (
+	lua_State* lua);
+
+/*****************************************************************************/
 
 /**
  * \brief Allocates a script userdata object.
@@ -38,14 +42,14 @@
  *
  * \param script Script.
  * \param data Wrapped data.
- * \param clss Class.
+ * \param type Type identifier string.
  * \param free Free function called by garbage collector.
  * \return New script userdata or NULL.
  */
 LIScrData* liscr_data_new (
 	LIScrScript* script,
 	void*        data,
-	LIScrClass*  clss,
+	const char*  type,
 	LIScrGCFunc  free)
 {
 	LIScrData* object;
@@ -59,11 +63,13 @@ LIScrData* liscr_data_new (
 	}
 	memset (object, 0, sizeof (LIScrData));
 	object->signature = 'D';
-	object->clss = clss;
+	object->type = type;
 	object->script = script;
 	object->data = data;
 	object->free = free;
-	liscr_pushclasspriv (script->lua, clss);
+	lua_newtable (script->lua);
+	lua_pushcfunction (script->lua, private_gc);
+	lua_setfield (script->lua, -2, "__gc");
 	lua_setmetatable (script->lua, -2);
 
 	/* Add to lookup table. */
@@ -93,13 +99,13 @@ LIScrData* liscr_data_new (
  *
  * \param script Script.
  * \param size Wrapped data size.
- * \param clss Class.
+ * \param type Type identifier string.
  * \return New script userdata or NULL.
  */
 LIScrData* liscr_data_new_alloc (
 	LIScrScript* script,
 	size_t       size,
-	LIScrClass*  clss)
+	const char*  type)
 {
 	void* data;
 	LIScrData* self;
@@ -107,7 +113,7 @@ LIScrData* liscr_data_new_alloc (
 	data = lisys_calloc (1, size);
 	if (data == NULL)
 		return NULL;
-	self = liscr_data_new (script, data, clss, lisys_free);
+	self = liscr_data_new (script, data, type, lisys_free);
 	if (self == NULL)
 	{
 		lisys_free (data);
@@ -199,44 +205,6 @@ void liscr_data_unref (
 }
 
 /**
- * \brief Gets the class of the userdata.
- * \param self Script userdata.
- * \return Script class.
- */
-LIScrClass* liscr_data_get_class (
-	LIScrData* self)
-{
-	return self->clss;
-}
-
-/**
- * \brief Sets the class of the userdata to a compatible class.
- * \param self Script userdata.
- * \param clss Script class.
- * \return Nonzero if set successfully.
- */
-int liscr_data_set_class (
-	LIScrData*  self,
-	LIScrClass* clss)
-{
-	LIScrClass* ptr;
-
-	/* Check for compatibility. */
-	for (ptr = clss ; ptr != NULL ; ptr = ptr->base)
-	{
-		if (ptr == self->clss)
-			break;
-	}
-	if (ptr == NULL)
-		return 0;
-
-	/* Set the class. */
-	self->clss = clss;
-
-	return 1;
-}
-
-/**
  * \brief Gets the C data stored to the userdata.
  * \param self Script userdata.
  * \return Script.
@@ -256,6 +224,21 @@ LIScrScript* liscr_data_get_script (
 	LIScrData* self)
 {
 	return self->script;
+}
+
+/*****************************************************************************/
+
+static int private_gc (
+	lua_State* lua)
+{
+	char* data;
+
+	data = lua_touserdata (lua, 1);
+	lisys_assert (data != NULL);
+	lisys_assert (*data == 'D');
+	liscr_data_free ((void*) data);
+
+	return 0;
 }
 
 /** @} */

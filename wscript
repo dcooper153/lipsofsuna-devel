@@ -283,49 +283,12 @@ def html(ctx):
 	import re
 	import shutil
 	# Initialize directories.
-	tmpdir = os.path.join(out, 'docs')
 	luadir = os.path.join(ctx.path.abspath(), 'docs', 'html', 'lua')
-	shutil.rmtree(tmpdir, True)
 	shutil.rmtree(luadir, True)
-	os.makedirs(tmpdir)
 	os.makedirs(luadir)
 	# Compile the Doxygen documentation.
 	ctx.exec_command('doxygen docs/Doxyfile')
 	Logs.pprint('GREEN', "Built Doxygen documentation")
-	# Extract script documentation from the source files.
-	def parse(dict, path):
-		def flush(name, text):
-			if text != '':
-				if name not in dict:
-					dict[name] = ''
-				dict[name] += text
-		name = 'FIXME'
-		text = ''
-		file = open(path, "r")
-		block = False
-		for l in file:
-			if re.match('/\* @luadoc', l):
-				block = True
-			elif re.match(' \*/', l):
-				if block:
-					text += "\n"
-				block = False
-			elif block and re.match(' \* module \".*\"\n', l):
-				flush(name, text)
-				name = l.split('"')[1]
-				text = l.replace(' * ', '')
-			elif block and re.match(' * ', l):
-				text += l.replace(' * ', '')
-		file.close()
-		flush(name, text)
-	dict = {}
-	for f in ctx.path.ant_glob('src/**/*.c'):
-		parse(dict, f.abspath())
 	# Compile the script documentation.
-	for k in dict:
-		file = open(os.path.join(tmpdir, k.replace('/', '-') + '.lua'), "w")
-		file.write(dict[k])
-		file.close()
-	ctx.exec_command('luadoc --nofiles -d "%s" "%s"' % (luadir, tmpdir))
-	shutil.rmtree(tmpdir)
+	ctx.exec_command('luadoc -d docs/html/lua data/system data/lipsofsuna/scripts/common')
 	Logs.pprint('GREEN', "Built Lua documentation")

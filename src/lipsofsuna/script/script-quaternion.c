@@ -25,28 +25,6 @@
 #include "lipsofsuna/script.h"
 #include "script-private.h"
 
-/* @luadoc
- * module "builtin/quaternion"
- * --- Present rotations in three dimensions.
- * -- @name Quaternion
- * -- @class table
- */
-
-/* @luadoc
- * --- Creates a new quaternion.
- * -- @param self Quaternion class.
- * -- @param args Arguments.<ul>
- * --   <li>1,x: Optional X value, default is 0.</li>
- * --   <li>2,y: Optional Y value, default is 0.</li>
- * --   <li>3,z: Optional Z value, default is 0.</li>
- * --   <li>4,w: Optional W value, default is 1.</li>
- * --   <li>angle: Angle of rotation in radians.</li>
- * --   <li>axis: Axis of rotation.</li>
- * --   <li>dir: Look direction vector.</li>
- * --   <li>up: Up direction vector.</li></ul>
- * -- @return New quaternion.
- * function Quaternion.new(self, args)
- */
 static void Quaternion_new (LIScrArgs* args)
 {
 	float angle;
@@ -80,13 +58,6 @@ static void Quaternion_new (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &quat);
 }
 
-/* @luadoc
- * --- Creates a new quaternion.
- * -- @param self Quaternion class.
- * -- @param euler Euler angles.
- * -- @return New quaternion.
- * function Quaternion.new_euler(self, euler)
- */
 static void Quaternion_new_euler (LIScrArgs* args)
 {
 	float euler[3] = { 0.0f, 0.0f, 0.0f };
@@ -99,14 +70,7 @@ static void Quaternion_new_euler (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &quat);
 }
 
-/* @luadoc
- * --- Calculates the sum of two quaternions.
- * -- @param self Quaternion.
- * -- @param quat Quaternion.
- * -- @return New quaternion.
- * function Quaternion.__add(self, quat)
- */
-static void Quaternion___add (LIScrArgs* args)
+static void Quaternion_add (LIScrArgs* args)
 {
 	LIMatQuaternion tmp;
 	LIScrData* b;
@@ -118,18 +82,7 @@ static void Quaternion___add (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &tmp);
 }
 
-/* @luadoc
- * --- Multiplies the quaternion with another value.<br/>
- * -- The second value can be a scalar, a vector, or another quaternion.
- * -- If it is a scalar, all the components of the quaternion are multiplied by it.
- * -- If it is a vector, the vector is rotated by the quaternion, and
- * -- if it is another quaternion, the rotations of the quaternions are concatenated.
- * -- @param self Quaternion.
- * -- @param value Quaternion, vector, or number.
- * -- @return New quaternion or vector.
- * function Quaternion.__mul(self, value)
- */
-static void Quaternion___mul (LIScrArgs* args)
+static void Quaternion_mul (LIScrArgs* args)
 {
 	float s;
 	LIMatQuaternion q;
@@ -160,14 +113,7 @@ static void Quaternion___mul (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Subtracts a quaternion from another.
- * -- @param self Quaternion.
- * -- @param quat Quaternion.
- * -- @return New quaternion.
- * function Quaternion.__sub(self, quat)
- */
-static void Quaternion___sub (LIScrArgs* args)
+static void Quaternion_sub (LIScrArgs* args)
 {
 	LIMatQuaternion tmp;
 	LIScrData* b;
@@ -179,13 +125,7 @@ static void Quaternion___sub (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &tmp);
 }
 
-/* @luadoc
- * --- Converts the quaternion to a string.
- * -- @param self Quaternion.
- * -- @return String.
- * function Quaternion.__tostring(self)
- */
-static void Quaternion___tostring (LIScrArgs* args)
+static void Quaternion_tostring (LIScrArgs* args)
 {
 	char buffer[256];
 	LIMatQuaternion* self;
@@ -195,14 +135,6 @@ static void Quaternion___tostring (LIScrArgs* args)
 	liscr_args_seti_string (args, buffer);
 }
 
-/* @luadoc
- * --- Normalized linear interpolation.
- * -- @param self Quaternion.
- * -- @param quat Quaternion.
- * -- @param blend Interpolation factor.
- * -- @return New quaternion.
- * function Quaternion.nlerp(self, quat, blend)
- */
 static void Quaternion_nlerp (LIScrArgs* args)
 {
 	float val;
@@ -219,12 +151,6 @@ static void Quaternion_nlerp (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Calculates the normalized form of the quaternion.
- * -- @param self Quaternion.
- * -- @return New quaternion.
- * function Quaternion.normalize(self)
- */
 static void Quaternion_normalize (LIScrArgs* args)
 {
 	LIMatQuaternion tmp;
@@ -233,11 +159,6 @@ static void Quaternion_normalize (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &tmp);
 }
 
-/* @luadoc
- * --- The conjugate of the quaternion.
- * -- @name Quaternion.conjugate
- * -- @class table
- */
 static void Quaternion_get_conjugate (LIScrArgs* args)
 {
 	LIMatQuaternion* data;
@@ -248,11 +169,6 @@ static void Quaternion_get_conjugate (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &tmp);
 }
 
-/* @luadoc
- * --- Euler angle presentation of the quaternion.
- * -- @name Quaternion.euler
- * -- @class table
- */
 static void Quaternion_get_euler (LIScrArgs* args)
 {
 	float e[3];
@@ -266,21 +182,11 @@ static void Quaternion_get_euler (LIScrArgs* args)
 	liscr_args_seti_float (args, e[2]);
 }
 
-/* @luadoc
- * --- Length.
- * -- @name Quaternion.length
- * -- @class table
- */
 static void Quaternion_get_length (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, limat_quaternion_get_length (*((LIMatQuaternion*) args->self)));
 }
 
-/* @luadoc
- * --- W value.
- * -- @name Quaternion.w
- * -- @class table
- */
 static void Quaternion_get_w (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, ((LIMatQuaternion*) args->self)->w);
@@ -290,11 +196,6 @@ static void Quaternion_set_w (LIScrArgs* args)
 	liscr_args_geti_float (args, 0, &((LIMatQuaternion*) args->self)->w);
 }
 
-/* @luadoc
- * --- X value.
- * -- @name Quaternion.x
- * -- @class table
- */
 static void Quaternion_get_x (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, ((LIMatQuaternion*) args->self)->x);
@@ -304,11 +205,6 @@ static void Quaternion_set_x (LIScrArgs* args)
 	liscr_args_geti_float (args, 0, &((LIMatQuaternion*) args->self)->x);
 }
 
-/* @luadoc
- * --- Y value.
- * -- @name Quaternion.y
- * -- @class table
- */
 static void Quaternion_get_y (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, ((LIMatQuaternion*) args->self)->y);
@@ -318,11 +214,6 @@ static void Quaternion_set_y (LIScrArgs* args)
 	liscr_args_geti_float (args, 0, &((LIMatQuaternion*) args->self)->y);
 }
 
-/* @luadoc
- * --- Z value.
- * -- @name Quaternion.z
- * -- @class table
- */
 static void Quaternion_get_z (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, ((LIMatQuaternion*) args->self)->z);
@@ -335,29 +226,27 @@ static void Quaternion_set_z (LIScrArgs* args)
 /*****************************************************************************/
 
 void liscr_script_quaternion (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "new", Quaternion_new);
-	liscr_class_insert_cfunc (self, "new_euler", Quaternion_new_euler);
-	liscr_class_insert_mfunc (self, "__add", Quaternion___add);
-	liscr_class_insert_mfunc (self, "__mul", Quaternion___mul);
-	liscr_class_insert_mfunc (self, "__sub", Quaternion___sub);
-	liscr_class_insert_mfunc (self, "__tostring", Quaternion___tostring);
-	liscr_class_insert_mfunc (self, "nlerp", Quaternion_nlerp);
-	liscr_class_insert_mfunc (self, "normalize", Quaternion_normalize);
-	liscr_class_insert_mfunc (self, "get_conjugate", Quaternion_get_conjugate);
-	liscr_class_insert_mfunc (self, "get_euler", Quaternion_get_euler);
-	liscr_class_insert_mfunc (self, "get_length", Quaternion_get_length);
-	liscr_class_insert_mfunc (self, "get_x", Quaternion_get_x);
-	liscr_class_insert_mfunc (self, "set_x", Quaternion_set_x);
-	liscr_class_insert_mfunc (self, "get_y", Quaternion_get_y);
-	liscr_class_insert_mfunc (self, "set_y", Quaternion_set_y);
-	liscr_class_insert_mfunc (self, "get_z", Quaternion_get_z);
-	liscr_class_insert_mfunc (self, "set_z", Quaternion_set_z);
-	liscr_class_insert_mfunc (self, "get_w", Quaternion_get_w);
-	liscr_class_insert_mfunc (self, "set_w", Quaternion_set_w);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new", Quaternion_new);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new_euler", Quaternion_new_euler);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_add", Quaternion_add);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_mul", Quaternion_mul);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_sub", Quaternion_sub);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_tostring", Quaternion_tostring);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_nlerp", Quaternion_nlerp);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_normalize", Quaternion_normalize);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_get_conjugate", Quaternion_get_conjugate);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_get_euler", Quaternion_get_euler);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_get_length", Quaternion_get_length);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_get_x", Quaternion_get_x);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_set_x", Quaternion_set_x);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_get_y", Quaternion_get_y);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_set_y", Quaternion_set_y);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_get_z", Quaternion_get_z);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_set_z", Quaternion_set_z);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_get_w", Quaternion_get_w);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_set_w", Quaternion_set_w);
 }
 
 /**
@@ -373,11 +262,9 @@ LIScrData* liscr_quaternion_new (
 	LIScrScript*           script,
 	const LIMatQuaternion* quaternion)
 {
-	LIScrClass* clss;
 	LIScrData* self;
 
-	clss = liscr_script_find_class (script, LISCR_SCRIPT_QUATERNION);
-	self = liscr_data_new_alloc (script, sizeof (LIMatQuaternion), clss);
+	self = liscr_data_new_alloc (script, sizeof (LIMatQuaternion), LISCR_SCRIPT_QUATERNION);
 	if (self == NULL)
 		return NULL;
 	*((LIMatQuaternion*) self->data) = *quaternion;

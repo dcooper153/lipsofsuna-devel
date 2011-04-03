@@ -27,27 +27,12 @@
 #include <lipsofsuna/script.h>
 #include "script-private.h"
 
-/* @luadoc
- * module "builtin/model"
- * ---
- * -- Load and manipulate models.
- * -- @name Model
- * -- @class table
- */
-
-/* @luadoc
- * --- Creates a new model.
- * -- @param clss Model class.
- * -- @param args Arguments.
- * -- @return New model.
- * function Model.new(clss, args)
- */
 static void Model_new (LIScrArgs* args)
 {
 	LIEngModel* self;
 	LIMaiProgram* program;
 
-	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
 
 	/* Allocate model. */
 	self = lieng_model_new (program->engine);
@@ -55,7 +40,7 @@ static void Model_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, self, args->clss, lieng_model_free);
+	self->script = liscr_data_new (args->script, self, LISCR_SCRIPT_MODEL, lieng_model_free);
 	if (self->script == NULL)
 	{
 		lieng_model_free (self);
@@ -63,44 +48,16 @@ static void Model_new (LIScrArgs* args)
 	}
 
 	/* Initialize userdata. */
-	liscr_args_call_setters (args, self->script);
 	liscr_args_seti_data (args, self->script);
 	liscr_data_unref (self->script);
 }
 
-/* @luadoc
- * --- Recalculates the bounding box of the model.
- * -- @param self Model.
- * function Model.calculate_bounds(self)
- */
-static void Model_calculate_bounds (LIScrArgs* args)
-{
-	lieng_model_calculate_bounds (args->self);
-}
-
-/* @luadoc
- * --- Updates the render and physics meshes of the model.
- * -- @param self Object.
- * function Model.changed(self)
- */
-static void Model_changed (LIScrArgs* args)
-{
-	lieng_model_changed (args->self);
-}
-
-/* @luadoc
- * --- Creates a copy of the model.
- * -- @param self Model.
- * -- @param args Arguments.
- * -- @return New model.
- * function model.copy(self, args)
- */
 static void Model_copy (LIScrArgs* args)
 {
 	LIEngModel* self;
 	LIMaiProgram* program;
 
-	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
 
 	/* Allocate model. */
 	self = lieng_model_new_copy (args->self);
@@ -108,7 +65,7 @@ static void Model_copy (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, self, args->clss, lieng_model_free);
+	self->script = liscr_data_new (args->script, self, LISCR_SCRIPT_MODEL, lieng_model_free);
 	if (self->script == NULL)
 	{
 		lieng_model_free (self);
@@ -116,20 +73,20 @@ static void Model_copy (LIScrArgs* args)
 	}
 
 	/* Initialize userdata. */
-	liscr_args_call_setters (args, self->script);
 	liscr_args_seti_data (args, self->script);
 	liscr_data_unref (self->script);
 }
 
-/* @luadoc
- * --- Loads the model from a file.
- * -- @param self Model.
- * -- @param args Arguments.<ul>
- * --   <li>1,file: Filename.</li>
- * --   <li>2,mesh: False to not load the mesh.</li></ul>
- * -- @return True if loaded successfully.
- * function Model.load(self, args)
- */
+static void Model_calculate_bounds (LIScrArgs* args)
+{
+	lieng_model_calculate_bounds (args->self);
+}
+
+static void Model_changed (LIScrArgs* args)
+{
+	lieng_model_changed (args->self);
+}
+
 static void Model_load (LIScrArgs* args)
 {
 	int mesh = 1;
@@ -149,13 +106,6 @@ static void Model_load (LIScrArgs* args)
 	liscr_args_seti_bool (args, 1);
 }
 
-/* @luadoc
- * --- Adds an additional model mesh to the model.
- * -- @param self Model.
- * -- @param args Arguments.<ul>
- * --   <li>1,model: Model. (required)</li></ul>
- * function Model.merge(self, args)
- */
 static void Model_merge (LIScrArgs* args)
 {
 	LIScrData* model;
@@ -171,17 +121,14 @@ static void Model_merge (LIScrArgs* args)
 /*****************************************************************************/
 
 void liscr_script_model (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LISCR_SCRIPT_OBJECT, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_mfunc (self, "calculate_bounds", Model_calculate_bounds);
-	liscr_class_insert_mfunc (self, "changed", Model_changed);
-	liscr_class_insert_mfunc (self, "copy", Model_copy);
-	liscr_class_insert_mfunc (self, "load", Model_load);
-	liscr_class_insert_mfunc (self, "merge", Model_merge);
-	liscr_class_insert_cfunc (self, "new", Model_new);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_MODEL, "model_new", Model_new);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_copy", Model_copy);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_calculate_bounds", Model_calculate_bounds);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_changed", Model_changed);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_load", Model_load);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_merge", Model_merge);
 }
 
 /** @} */

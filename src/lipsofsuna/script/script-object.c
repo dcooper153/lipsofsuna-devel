@@ -27,23 +27,6 @@
 #include "lipsofsuna/script.h"
 #include "script-private.h"
 
-/* @luadoc
- * module "builtin/object"
- * --- Manipulate objects.
- * -- @name Object
- * -- @class table
- */
-
-/* @luadoc
- * --- Finds all objects inside a sphere.
- * -- @param clss Object class.
- * -- @param args Arguments.<ul>
- * --   <li>point: Center point. (required)</li>
- * --   <li>radius: Search radius.</li>
- * --   <li>sector: Return all object in this sector.</li></ul>
- * -- @return Table of matching objects.
- * function Object.find(clss, args)
- */
 static void Object_find (LIScrArgs* args)
 {
 	int id;
@@ -56,7 +39,8 @@ static void Object_find (LIScrArgs* args)
 	LIMatVector diff;
 	LIMaiProgram* program;
 
-	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+	/* Find class data. */
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
 
 	/* Radial find mode. */
 	if (liscr_args_gets_vector (args, "point", &center))
@@ -87,20 +71,14 @@ static void Object_find (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Creates a new object.
- * -- @param clss Object class.
- * -- @param args Arguments.
- * -- @return New object.
- * function Object.new(clss, args)
- */
 static void Object_new (LIScrArgs* args)
 {
 	int realize = 0;
 	LIEngObject* self;
 	LIMaiProgram* program;
 
-	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_OBJECT);
+	/* Find class data. */
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
 
 	/* Allocate object. */
 	self = lieng_object_new (program->engine, 0);
@@ -108,7 +86,7 @@ static void Object_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, self, args->clss, lieng_object_free);
+	self->script = liscr_data_new (args->script, self, LISCR_SCRIPT_OBJECT, lieng_object_free);
 	if (self->script == NULL)
 	{
 		lieng_object_free (self);
@@ -116,51 +94,12 @@ static void Object_new (LIScrArgs* args)
 	}
 
 	/* Initialize userdata. */
-	liscr_args_call_setters_except (args, self->script, "realized");
 	liscr_args_gets_bool (args, "realized", &realize);
 	liscr_args_seti_data (args, self->script);
 	liscr_data_unref (self->script);
 	lieng_object_set_realized (self, realize);
 }
 
-/* @luadoc
- * --- Adds an additional model mesh to the object.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>model: Model.</li></ul>
- * function Object.add_model(self, args)
- */
-static void Object_add_model (LIScrArgs* args)
-{
-	LIScrData* model;
-
-	if (liscr_args_gets_data (args, "model", LISCR_SCRIPT_MODEL, &model))
-	{
-		if (!lieng_object_merge_model (args->self, model->data))
-			lisys_error_report ();
-	}
-}
-
-/* @luadoc
- * --- Recalculates the bounding box of the model of the object.
- * -- @param self Object.
- * function Object.calculate_bounds(self)
- */
-static void Object_calculate_bounds (LIScrArgs* args)
-{
-	LIEngObject* self = args->self;
-
-	if (self->model != NULL)
-		lieng_model_calculate_bounds (self->model);
-}
-
-/* @luadoc
- * --- Prevents map sectors around the object from being unloaded.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>radius: Refresh radius.</li></ul>
- * function Object.refresh(self, args)
- */
 static void Object_refresh (LIScrArgs* args)
 {
 	float radius = 32.0f;
@@ -169,12 +108,6 @@ static void Object_refresh (LIScrArgs* args)
 	lieng_object_refresh (args->self, radius);
 }
 
-/* @luadoc
- * --- Gets the model of the object.
- * -- @param self Object.
- * -- @return Model or nil.
- * function Object.get_model(self)
- */
 static void Object_get_model (LIScrArgs* args)
 {
 	LIEngObject* self = args->self;
@@ -183,13 +116,6 @@ static void Object_get_model (LIScrArgs* args)
 		liscr_args_seti_data (args, self->model->script);
 }
 
-/* @luadoc
- * --- Sets the model of the object.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>1: Model.</li></ul>
- * function Object.set_model(self, args)
- */
 static void Object_set_model (LIScrArgs* args)
 {
 	LIScrData* value;
@@ -198,12 +124,6 @@ static void Object_set_model (LIScrArgs* args)
 		lieng_object_set_model (args->self, value->data);
 }
 
-/* @luadoc
- * --- Gets the position of the object.
- * -- @param self Object.
- * -- @return Vector.
- * function Object.get_position(self)
- */
 static void Object_get_position (LIScrArgs* args)
 {
 	LIMatTransform tmp;
@@ -212,13 +132,6 @@ static void Object_get_position (LIScrArgs* args)
 	liscr_args_seti_vector (args, &tmp.position);
 }
 
-/* @luadoc
- * --- Sets the position of the object.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>1: Position vector.</li></ul>
- * function Object.set_position(self, args)
- */
 static void Object_set_position (LIScrArgs* args)
 {
 	LIMatTransform transform;
@@ -232,24 +145,11 @@ static void Object_set_position (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Gets the realization status of the object.
- * -- @param self Object.
- * -- @return Boolean.
- * function Object.get_realized(self)
- */
 static void Object_get_realized (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, lieng_object_get_realized (args->self));
 }
 
-/* @luadoc
- * --- Sets the realization status of the object.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>1: boolean.</li></ul>
- * function Object.set_realized(self, args)
- */
 static void Object_set_realized (LIScrArgs* args)
 {
 	int value;
@@ -258,12 +158,6 @@ static void Object_set_realized (LIScrArgs* args)
 		lieng_object_set_realized (args->self, value);
 }
 
-/* @luadoc
- * --- Gets the rotation of the object.
- * -- @param self Object.
- * -- @return Quaternion.
- * function Object.get_rotation(self)
- */
 static void Object_get_rotation (LIScrArgs* args)
 {
 	LIMatTransform tmp;
@@ -272,13 +166,6 @@ static void Object_get_rotation (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &tmp.rotation);
 }
 
-/* @luadoc
- * --- Sets the rotation of the object.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>1: Quaternion.</li></ul>
- * function Object.set_rotation(self, args)
- */
 static void Object_set_rotation (LIScrArgs* args)
 {
 	LIMatTransform transform;
@@ -292,12 +179,6 @@ static void Object_set_rotation (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Gets the map sector of the object.
- * -- @param self Object.
- * -- @return Integer.
- * function Object.get_sector(self)
- */
 static void Object_get_sector (LIScrArgs* args)
 {
 	LIEngObject* self = args->self;
@@ -309,25 +190,20 @@ static void Object_get_sector (LIScrArgs* args)
 /*****************************************************************************/
 
 void liscr_script_object (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LISCR_SCRIPT_OBJECT, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "find", Object_find);
-	liscr_class_insert_cfunc (self, "new", Object_new);
-	liscr_class_insert_mfunc (self, "add_model", Object_add_model);
-	liscr_class_insert_mfunc (self, "calculate_bounds", Object_calculate_bounds);
-	liscr_class_insert_mfunc (self, "refresh", Object_refresh);
-	liscr_class_insert_mfunc (self, "get_model", Object_get_model);
-	liscr_class_insert_mfunc (self, "set_model", Object_set_model);
-	liscr_class_insert_mfunc (self, "get_position", Object_get_position);
-	liscr_class_insert_mfunc (self, "set_position", Object_set_position);
-	liscr_class_insert_mfunc (self, "get_realized", Object_get_realized);
-	liscr_class_insert_mfunc (self, "set_realized", Object_set_realized);
-	liscr_class_insert_mfunc (self, "get_rotation", Object_get_rotation);
-	liscr_class_insert_mfunc (self, "set_rotation", Object_set_rotation);
-	liscr_class_insert_mfunc (self, "get_sector", Object_get_sector);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_OBJECT, "object_find", Object_find);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_OBJECT, "object_new", Object_new);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_refresh", Object_refresh);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_model", Object_get_model);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_model", Object_set_model);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_position", Object_get_position);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_position", Object_set_position);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_realized", Object_get_realized);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_realized", Object_set_realized);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_rotation", Object_get_rotation);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_rotation", Object_set_rotation);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_sector", Object_get_sector);
 }
 
 /** @} */

@@ -38,23 +38,6 @@ static void private_write (
 
 /*****************************************************************************/
 
-/* @luadoc
- * module "builtin/packet"
- * ---
- * -- Send and receive network data.
- * -- @name Packet
- * -- @class table
- */
-
-/* @luadoc
- * ---
- * -- Creates a new packet.
- * -- @param self Packet class.
- * -- @param type Packet type.
- * -- @param ... Packet contents.
- * -- @return New packet.
- * function Packet.new(self, type, ...)
- */
 static void Packet_new (LIScrArgs* args)
 {
 	int type = 0;
@@ -75,14 +58,6 @@ static void Packet_new (LIScrArgs* args)
 	liscr_data_unref (self);
 }
 
-/* @luadoc
- * ---
- * -- Reads data starting from the beginning of the packet.
- * -- @param self Packet.
- * -- @param ... Types to read.
- * -- @return Boolean and a list of read values.
- * function Packet.read(self, ...)
- */
 static void Packet_read (LIScrArgs* args)
 {
 	LIScrPacket* self;
@@ -95,14 +70,6 @@ static void Packet_read (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * ---
- * -- Reads data starting from the last read positiong of the packet.
- * -- @param self Packet.
- * -- @param ... Types to read.
- * -- @return Boolean and a list of read values.
- * function Packet.resume(self, ...)
- */
 static void Packet_resume (LIScrArgs* args)
 {
 	LIScrPacket* self;
@@ -112,13 +79,6 @@ static void Packet_resume (LIScrArgs* args)
 		private_read (self, args);
 }
 
-/* @luadoc
- * ---
- * -- Appends data to the packet.
- * -- @param self Packet.
- * -- @param ... Types to write.
- * function Packet.write(self, ...)
- */
 static void Packet_write (LIScrArgs* args)
 {
 	LIScrPacket* self;
@@ -128,12 +88,6 @@ static void Packet_write (LIScrArgs* args)
 		private_write (self, args, 0);
 }
 
-/* @luadoc
- * ---
- * -- Size in bytes.
- * -- @name Packet.size
- * -- @class table
- */
 static void Packet_get_size (LIScrArgs* args)
 {
 	LIScrPacket* self;
@@ -145,12 +99,6 @@ static void Packet_get_size (LIScrArgs* args)
 		liscr_args_seti_int (args, liarc_writer_get_length (self->writer));
 }
 
-/* @luadoc
- * ---
- * -- Type number.
- * -- @name Packet.type
- * -- @class table
- */
 static void Packet_get_type (LIScrArgs* args)
 {
 	LIScrPacket* self;
@@ -181,24 +129,21 @@ static void Packet_set_type (LIScrArgs* args)
 /*****************************************************************************/
 
 void liscr_script_packet (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "new", Packet_new);
-	liscr_class_insert_mfunc (self, "read", Packet_read);
-	liscr_class_insert_mfunc (self, "resume", Packet_resume);
-	liscr_class_insert_mfunc (self, "write", Packet_write);
-	liscr_class_insert_mfunc (self, "get_size", Packet_get_size);
-	liscr_class_insert_mfunc (self, "get_type", Packet_get_type);
-	liscr_class_insert_mfunc (self, "set_type", Packet_set_type);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PACKET, "packet_new", Packet_new);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_PACKET, "packet_read", Packet_read);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_PACKET, "packet_resume", Packet_resume);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_PACKET, "packet_write", Packet_write);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_PACKET, "packet_get_size", Packet_get_size);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_PACKET, "packet_get_type", Packet_get_type);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_PACKET, "packet_set_type", Packet_set_type);
 }
 
 LIScrData* liscr_packet_new_readable (
 	LIScrScript*       script,
 	const LIArcReader* reader)
 {
-	LIScrClass* clss;
 	LIScrData* data;
 	LIScrPacket* self;
 
@@ -224,8 +169,7 @@ LIScrData* liscr_packet_new_readable (
 	memcpy (self->buffer, reader->buffer, reader->length);
 
 	/* Allocate script data. */
-	clss = liscr_script_find_class (script, LISCR_SCRIPT_PACKET);
-	data = liscr_data_new (script, self, clss, liscr_packet_free);
+	data = liscr_data_new (script, self, LISCR_SCRIPT_PACKET, liscr_packet_free);
 	if (data == NULL)
 	{
 		liarc_reader_free (self->reader);
@@ -240,7 +184,6 @@ LIScrData* liscr_packet_new_writable (
 	LIScrScript* script,
 	int          type)
 {
-	LIScrClass* clss;
 	LIScrData* data;
 	LIScrPacket* self;
 
@@ -258,8 +201,7 @@ LIScrData* liscr_packet_new_writable (
 	}
 
 	/* Allocate script data. */
-	clss = liscr_script_find_class (script, LISCR_SCRIPT_PACKET);
-	data = liscr_data_new (script, self, clss, liscr_packet_free);
+	data = liscr_data_new (script, self, LISCR_SCRIPT_PACKET, liscr_packet_free);
 	if (data == NULL)
 	{
 		liarc_writer_free (self->writer);

@@ -31,37 +31,26 @@
 #define LISCR_SCRIPT_QUATERNION "Quaternion"
 #define LISCR_SCRIPT_VECTOR "Vector"
 
-LIAPICALL (void, liscr_script_class, (
-	LIScrClass* clss,
-	void*       data));
-
 LIAPICALL (void, liscr_script_event, (
-	LIScrClass* clss,
-	void*       data));
+	LIScrScript* self));
 
 LIAPICALL (void, liscr_script_model, (
-	LIScrClass* self,
-	void*       data));
+	LIScrScript* self));
 
 LIAPICALL (void, liscr_script_object, (
-	LIScrClass* self,
-	void*       data));
+	LIScrScript* self));
 
 LIAPICALL (void, liscr_script_packet, (
-	LIScrClass* self,
-	void*       data));
+	LIScrScript* self));
 
 LIAPICALL (void, liscr_script_program, (
-	LIScrClass* self,
-	void*       data));
+	LIScrScript* self));
 
 LIAPICALL (void, liscr_script_quaternion, (
-	LIScrClass* self,
-	void*       data));
+	LIScrScript* self));
 
 LIAPICALL (void, liscr_script_vector, (
-	LIScrClass* self,
-	void*       data));
+	LIScrScript* self));
 
 /*****************************************************************************/
 
@@ -75,7 +64,6 @@ LIAPICALL (LIScrData*, liscr_vector_new, (
 
 /*****************************************************************************/
 
-#include "script-event.h"
 #include "script-packet.h"
 
 #endif

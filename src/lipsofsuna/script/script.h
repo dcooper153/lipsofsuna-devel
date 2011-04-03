@@ -34,15 +34,17 @@ LIAPICALL (int, liscr_script_load, (
 LIAPICALL (void, liscr_script_free, (
 	LIScrScript* self));
 
-LIAPICALL (LIScrClass*, liscr_script_create_class, (
-	LIScrScript*   self,
-	const char*    name,
-	LIScrClassInit init,
-	void*          data));
+LIAPICALL (void, liscr_script_insert_cfunc, (
+	LIScrScript*  self,
+	const char*   clss,
+	const char*   name,
+	LIScrArgsFunc func));
 
-LIAPICALL (LIScrClass*, liscr_script_find_class, (
-	LIScrScript* self,
-	const char*  name));
+LIAPICALL (void, liscr_script_insert_mfunc, (
+	LIScrScript*  self,
+	const char*   clss,
+	const char*   name,
+	LIScrArgsFunc func));
 
 LIAPICALL (void, liscr_script_update, (
 	LIScrScript* self,
@@ -56,10 +58,12 @@ LIAPICALL (lua_State*, liscr_script_get_lua, (
 	LIScrScript* self));
 
 LIAPICALL (void*, liscr_script_get_userdata, (
-	LIScrScript* self));
+	LIScrScript* self,
+	const char*  key));
 
 LIAPICALL (void, liscr_script_set_userdata, (
 	LIScrScript* self,
-	void*        data));
+	const char*  key,
+	void*        value));
 
 #endif

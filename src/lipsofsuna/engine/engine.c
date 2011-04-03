@@ -229,30 +229,24 @@ private_init (LIEngEngine* self)
 	return 1;
 }
 
-static void
-private_sector_free (void*        self,
-                     LIAlgSector* sector)
+static void private_sector_free (
+	void*        self,
+	LIAlgSector* sector)
 {
 	LIEngEngine* engine = self;
-	LIEngSector* sector_;
 
 	/* Invoke callbacks. */
-	sector_ = lialg_strdic_find (sector->content, "engine");
-	lisys_assert (sector_ != NULL);
-	lical_callbacks_call (engine->callbacks, self, "sector-free", lical_marshal_DATA_PTR, sector_);
+	lical_callbacks_call (engine->callbacks, self, "sector-free", lical_marshal_DATA_INT, sector->index);
 }
 
-static void
-private_sector_load (void*        self,
-                     LIAlgSector* sector)
+static void private_sector_load (
+	void*        self,
+	LIAlgSector* sector)
 {
 	LIEngEngine* engine = self;
-	LIEngSector* sector_;
 
 	/* Invoke callbacks. */
-	sector_ = lialg_strdic_find (sector->content, "engine");
-	lisys_assert (sector_ != NULL);
-	lical_callbacks_call (engine->callbacks, self, "sector-load", lical_marshal_DATA_PTR, sector_);
+	lical_callbacks_call (engine->callbacks, self, "sector-load", lical_marshal_DATA_INT, sector->index);
 }
 
 /** @} */

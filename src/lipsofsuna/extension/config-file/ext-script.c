@@ -117,21 +117,6 @@ static int private_line_compare (
 
 /*****************************************************************************/
 
-/* @luadoc
- * module "core/config-file"
- * --- Config file extension.
- * -- @name ConfigFile
- * -- @class table
- */
-
-/* @luadoc
- * --- Opens a configuration file.
- * -- @param clss ConfigFile class.
- * -- @param args Arguments.<ul>
- * --   <li>1,name: Unique configuration file name.</li></ul>
- * -- @return New tile.
- * function ConfigFile.new(clss, args)
- */
 static void ConfigFile_new (LIScrArgs* args)
 {
 	int ok;
@@ -141,7 +126,7 @@ static void ConfigFile_new (LIScrArgs* args)
 	LIExtModule* module;
 	LIScrData* data;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CONFIG_FILE);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_CONFIG_FILE);
 
 	/* Get and validate the filename. */
 	if (!liscr_args_geti_string (args, 0, &name) &&
@@ -170,25 +155,16 @@ static void ConfigFile_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, cfg, args->clss, private_free_config);
+	data = liscr_data_new (args->script, cfg, LIEXT_SCRIPT_CONFIG_FILE, private_free_config);
 	if (data == NULL)
 	{
 		private_free_config (cfg);
 		return;
 	}
-	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
 	liscr_data_unref (data);
 }
 
-/* @luadoc
- * --- Gets a configuration value.
- * -- @param self Configuration file.
- * -- @param args Arguments.<ul>
- * --   <li>1,key: Key string.</li></ul>
- * -- @return Value string or nil.
- * function ConfigFile.get(self, args)
- */
 static void ConfigFile_get (LIScrArgs* args)
 {
 	const char* key;
@@ -205,11 +181,6 @@ static void ConfigFile_get (LIScrArgs* args)
 		liscr_args_seti_string (args, value);
 }
 
-/* @luadoc
- * --- Saves the configuration file.
- * -- @param self Configuration file.
- * function ConfigFile.save(self)
- */
 static void ConfigFile_save (LIScrArgs* args)
 {
 	int i;
@@ -286,14 +257,6 @@ static void ConfigFile_save (LIScrArgs* args)
 	lisys_free (line_arr);
 }
 
-/* @luadoc
- * --- Sets a configuration value.
- * -- @param self Configuration file.
- * -- @param args Arguments.<ul>
- * --   <li>1,key: Key string.</li>
- * --   <li>2,value: Value string.</li></ul>
- * function ConfigFile.set(self, args)
- */
 static void ConfigFile_set (LIScrArgs* args)
 {
 	char* tmp;
@@ -330,15 +293,12 @@ static void ConfigFile_set (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_config_file (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_CONFIG_FILE, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "new", ConfigFile_new);
-	liscr_class_insert_mfunc (self, "get", ConfigFile_get);
-	liscr_class_insert_mfunc (self, "save", ConfigFile_save);
-	liscr_class_insert_mfunc (self, "set", ConfigFile_set);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_CONFIG_FILE, "config_file_new", ConfigFile_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CONFIG_FILE, "config_file_get", ConfigFile_get);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CONFIG_FILE, "config_file_save", ConfigFile_save);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CONFIG_FILE, "config_file_set", ConfigFile_set);
 }
 
 /** @} */

@@ -93,11 +93,15 @@ error:
  *
  * \param self Object.
  */
-void
-lieng_object_free (LIEngObject* self)
+void lieng_object_free (
+	LIEngObject* self)
 {
 	/* Unrealize. */
-	lieng_object_set_realized (self, 0);
+	/* When the execution gets here, the script data of the object has been
+	   garbage collected. Hence, we need to be careful not to generate any
+	   script events that refer to it. */
+	if (lieng_object_get_realized (self))
+		lieng_object_set_realized (self, 0);
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "object-free", lical_marshal_DATA_PTR, self);
@@ -111,38 +115,6 @@ lieng_object_free (LIEngObject* self)
 
 	/* Free all memory. */
 	lisys_free (self);
-}
-
-/**
- * \brief References or unreferences the object.
- *
- * If the reference count reaches zero, the object is queued for removal. If
- * the engine is compiled with Lua scripting enabled, the object will be
- * garbage collected by Lua.
- *
- * \param self Object.
- * \param count Number of times to reference, negative to unreference.
- */
-void
-lieng_object_ref (LIEngObject* self,
-                  int          count)
-{
-#ifndef LIENG_DISABLE_SCRIPTS
-	int i;
-
-	if (self->script != NULL)
-	{
-		for (i = count ; i > 0 ; i--)
-			liscr_data_ref (self->script);
-		for (i = count ; i < 0 ; i++)
-			liscr_data_unref (self->script);
-		return;
-	}
-#endif
-	self->refs += count;
-	lisys_assert (self->refs >= 0);
-	if (self->refs <= 0)
-		lieng_object_free (self);
 }
 
 /**
@@ -417,16 +389,6 @@ int lieng_object_set_model (
 		limdl_pose_set_model (self->pose, NULL);
 	self->model = model;
 
-	/* Reference the model. */
-	liscr_pushpriv (lua, self->script);
-	lua_pushlightuserdata (lua, SCRIPT_POINTER_MODEL);
-	if (model != NULL)
-		liscr_pushdata (lua, model->script);
-	else
-		lua_pushnil (lua);
-	lua_settable (lua, -3);
-	lua_pop (lua, 1);
-
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "object-model", lical_marshal_DATA_PTR_PTR, self, model);
 
@@ -481,9 +443,6 @@ lieng_object_set_realized (LIEngObject* self,
 
 		/* Invoke callbacks. */
 		lical_callbacks_call (self->engine->callbacks, self->engine, "object-visibility", lical_marshal_DATA_PTR_INT, self, 1);
-
-		/* Protect from deletion. */
-		lieng_object_ref (self, 1);
 	}
 	else
 	{
@@ -493,9 +452,6 @@ lieng_object_set_realized (LIEngObject* self,
 		/* Remove from map. */
 		lieng_sector_remove_object (self->sector, self);
 		self->sector = NULL;
-
-		/* Remove protection. */
-		lieng_object_ref (self, -1);
 	}
 
 	return 1;

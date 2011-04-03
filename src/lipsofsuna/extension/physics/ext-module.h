@@ -40,7 +40,6 @@ void liext_physics_free (
 /*****************************************************************************/
 
 void liext_script_physics (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

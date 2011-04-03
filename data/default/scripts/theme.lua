@@ -1,15 +1,5 @@
 Widgets.Background = Class(Widget)
-
-Widgets.Background.setter = function(self, key, value)
-	if key == "image" then
-		if self.image ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	else
-		Widget.setter(self, key, value)
-	end
-end
+Widgets.Background.class_name = "Widgets.Background"
 
 Widgets.Background.new = function(clss, args)
 	local self = Widget.new(clss, args)
@@ -33,6 +23,16 @@ Widgets.Background.reshaped = function(self)
 	end
 	self:canvas_compile()
 end
+
+Widgets.Background:add_getters{
+	image = function(s) return rawget(s, "__image") end}
+
+Widgets.Background:add_setters{
+	image = function(s, v)
+		if s.image == v then return end
+		rawset(s, "__image", v)
+		s:reshaped()
+	end}
 
 Widgets:add_font_style("default", "serif", 14)
 Widgets:add_font_style("bigger", "serif", 18)

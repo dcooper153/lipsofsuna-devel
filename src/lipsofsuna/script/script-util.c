@@ -23,48 +23,11 @@
  */
 
 #include "script.h"
-#include "script-class.h"
 #include "script-data.h"
 #include "script-private.h"
 #include "script-util.h"
 
 #define ALL_USERDATA_IS_OURS
-
-LIScrClass* liscr_isanyclass (
-	lua_State*  lua,
-	int         arg)
-{
-#ifdef ALL_USERDATA_IS_OURS
-	LIScrClass* ptr;
-	ptr = lua_touserdata (lua, arg);
-	if (ptr == NULL || ptr->signature != 'C')
-		return NULL;
-	return ptr;
-#else
-	int ret;
-	void* ptr;
-
-	/* Check if a userdata. */
-	ptr = lua_touserdata (lua, arg);
-	if (ptr == NULL)
-		return NULL;
-
-	/* Get the class lookup table. */
-	lua_pushlightuserdata (lua, LISCR_SCRIPT_LOOKUP_CLASS);
-	lua_gettable (lua, LUA_REGISTRYINDEX);
-	lisys_assert (lua_type (lua, -1) == LUA_TTABLE);
-
-	/* Check if in the lookup table. */
-	lua_pushlightuserdata (lua, ptr);
-	lua_gettable (lua, -2);
-	ret = lua_isuserdata (lua, -1);
-	lua_pop (lua, 2);
-	if (!ret)
-		return NULL;
-
-	return ptr;
-#endif
-}
 
 LIScrData* liscr_isanydata (
 	lua_State* lua,
@@ -103,35 +66,6 @@ LIScrData* liscr_isanydata (
 }
 
 /**
- * \brief Gets a class from stack.
- *
- * If the type check fails, NULL is returned.
- *
- * Consumes: 0.
- * Returns: 0.
- *
- * \param lua Lua state.
- * \param arg Stack index.
- * \param meta Class type.
- * \return Class owned by Lua or NULL.
- */
-LIScrClass* liscr_isclass (
-	lua_State*  lua,
-	int         arg,
-	const char* meta)
-{
-	LIScrClass* clss;
-
-	clss = liscr_isanyclass (lua, arg);
-	if (clss == NULL)
-		return NULL;
-	if (!liscr_class_get_interface (clss, meta))
-		return NULL;
-
-	return clss;
-}
-
-/**
  * \brief Gets a userdata from stack.
  *
  * If the type check fails, NULL is returned.
@@ -154,101 +88,10 @@ LIScrData* liscr_isdata (
 	data = liscr_isanydata (lua, arg);
 	if (data == NULL)
 		return NULL;
-	if (!liscr_class_get_interface (data->clss, meta))
+	if (strcmp (data->type, meta))
 		return NULL;
 
 	return data;
-}
-
-/**
- * \brief Copies fields from a table to a userdata.
- *
- * \param lua Lua state.
- * \param data Destination userdata.
- * \param arg Index of the source table.
- * \return Nonzero on success.
- */
-int liscr_copyargs (
-	lua_State* lua,
-	LIScrData* data,
-	int        arg)
-{
-	if (lua_type (lua, arg) != LUA_TTABLE)
-		return 0;
-
-	/* Get write indexer. */
-	liscr_pushdata (lua, data);
-	lua_getfield (lua, -1, "__newindex");
-	if (lua_type (lua, -1) != LUA_TFUNCTION)
-	{
-		lua_pop (lua, 2);
-		lisys_assert (0);
-		return 0;
-	}
-
-	/* Call it for each table value. */
-	lua_pushnil (lua);
-	while (lua_next (lua, arg) != 0)
-	{
-		lua_pushvalue (lua, -3);
-		lua_pushvalue (lua, -5);
-		lua_pushvalue (lua, -4);
-		lua_pushvalue (lua, -4);
-		if (lua_pcall (lua, 3, 0, 0))
-		{
-			lisys_error_set (EINVAL, lua_tostring (lua, -1));
-			lisys_error_report ();
-			lua_pop (lua, 1);
-		}
-		lua_pop (lua, 1);
-	}
-	lua_pop (lua, 3);
-
-	return 1;
-}
-
-/**
- * \brief Pushes the class to stack.
- *
- * Consumes: 0.
- * Returns: 1.
- *
- * \param lua Lua state.
- * \param clss Pointer to script class.
- */
-void liscr_pushclass (
-	lua_State*  lua,
-	LIScrClass* clss)
-{
-	/* Get the class lookup table. */
-	lua_pushlightuserdata (lua, LISCR_SCRIPT_LOOKUP_CLASS);
-	lua_gettable (lua, LUA_REGISTRYINDEX);
-	lisys_assert (lua_type (lua, -1) == LUA_TTABLE);
-
-	/* Fetch by pointer. */
-	lua_pushlightuserdata (lua, clss);
-	lua_gettable (lua, -2);
-	lua_remove (lua, -2);
-	lisys_assert (lua_type (lua, -1) == LUA_TUSERDATA);
-}
-
-/**
- * \brief Pushes the environment table of the clss to stack.
- *
- * Consumes: 0.
- * Returns: 1.
- *
- * \param lua Lua state.
- * \param clss Class.
- */
-void liscr_pushclasspriv (
-	lua_State*  lua,
-	LIScrClass* clss)
-{
-	liscr_pushclass (lua, clss);
-	lua_getfenv (lua, -1);
-	lua_remove (lua, -2);
-	lisys_assert (lua_istable (lua, -1));
 }
 
 /**
@@ -271,25 +114,6 @@ void liscr_pushdata (
 	lua_gettable (lua, -2);
 	lua_remove (lua, -2);
 	lisys_assert (lua_isuserdata (lua, -1));
-}
-
-/**
- * \brief Pushes the environment table of the userdata to stack.
- *
- * Consumes: 0.
- * Returns: 1.
- *
- * \param lua Lua state.
- * \param object Pointer to script userdata.
- */
-void liscr_pushpriv (
-	lua_State* lua,
-	LIScrData* object)
-{
-	liscr_pushdata (lua, object);
-	lua_getfenv (lua, -1);
-	lua_remove (lua, -2);
-	lisys_assert (lua_istable (lua, -1));
 }
 
 /**

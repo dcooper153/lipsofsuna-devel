@@ -1,4 +1,31 @@
 Obstacle = Class(Object)
+Obstacle.class_name = "Obstacle"
+
+Obstacle:add_setters{
+	realized = function(self, value)
+		Object.setters.realized(self, value)
+		if value then
+			for k,v in pairs(self.spec.constraints) do
+				if v[1] == "hinge" then
+					self:insert_hinge_constraint{position = v[2], axis = v[3]}
+				end
+			end
+		end
+	end,
+	spec = function(self, value)
+		local spec = type(value) == "string" and Obstaclespec:find{name = value} or value
+		if not spec then return end
+		rawset(self, "spec", spec)
+		self.collision_group = spec.collision_group
+		self.collision_mask = spec.collision_mask
+		self.model = spec.model
+		self.mass = spec.mass
+		self.gravity = spec.gravity
+		self.physics = spec.physics
+		if spec.marker then
+			self.marker = Marker{name = spec.marker, position = self.position, target = self.id}
+		end
+	end}
 
 --- Creates an obstacle.
 -- @param clss Mover class.
@@ -19,38 +46,6 @@ Obstacle.new = function(clss, args)
 	copy("spec")
 	copy("realized")
 	return self
-end
-
---- Implements setters.
--- @param self Obstacle or Obstacle class.
--- @param key Key.
--- @param value Value.
-Obstacle.setter = function(self, key, value)
-	if key == "spec" then
-		local spec = type(value) == "string" and Obstaclespec:find{name = value} or value
-		if not spec then return end
-		Object.setter(self, key, spec)
-		self.collision_group = spec.collision_group
-		self.collision_mask = spec.collision_mask
-		self.model = spec.model
-		self.mass = spec.mass
-		self.gravity = spec.gravity
-		self.physics = spec.physics
-		if spec.marker then
-			self.marker = Marker{name = spec.marker, position = self.position, target = self.id}
-		end
-	elseif key == "realized" then
-		Object.setter(self, key, value)
-		if value then
-			for k,v in pairs(self.spec.constraints) do
-				if v[1] == "hinge" then
-					self:insert_hinge_constraint{position = v[2], axis = v[3]}
-				end
-			end
-		end
-	else
-		Object.setter(self, key, value)
-	end
 end
 
 --- Causes the obstacle to take damage.

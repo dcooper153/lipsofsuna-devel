@@ -20,7 +20,7 @@
 
 #include <lipsofsuna/extension.h>
 
-#define LISCR_SCRIPT_PHYSICS_OBJECT "PhysicsObject"
+#define LIEXT_SCRIPT_PHYSICS_OBJECT "PhysicsObject"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
@@ -39,8 +39,7 @@ void liext_object_physics_free (
 
 /*****************************************************************************/
 
-void liext_script_object (
-	LIScrClass* self,
-	void*       data);
+void liext_script_physics_object (
+	LIScrScript* self);
 
 #endif

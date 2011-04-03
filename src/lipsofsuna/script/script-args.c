@@ -28,78 +28,27 @@
 #include "script-util.h"
 
 void liscr_args_init_func (
-	LIScrArgs*  self,
-	lua_State*  lua,
-	LIScrClass* clss,
-	LIScrData*  data)
+	LIScrArgs*   self,
+	lua_State*   lua,
+	LIScrScript* script,
+	LIScrData*   data)
 {
 	memset (self, 0, sizeof (LIScrArgs));
 	self->lua = lua;
-	self->script = clss->script;
-	self->clss = clss;
+	self->script = script;
 	self->data = data;
 	if (data != NULL)
+	{
 		self->self = data->data;
-	self->args_start = 2;
-	self->args_count = lua_gettop (lua) - 1;
-	if (!liscr_isanyclass (lua, self->args_start) &&
-	    lua_type (self->lua, self->args_start) == LUA_TTABLE)
+		self->args_start = 2;
+	}
+	else
+		self->args_start = 1;
+	self->args_count = lua_gettop (lua) + 1 - self->args_start;
+	if (lua_type (self->lua, self->args_start) == LUA_TTABLE)
 	{
 		self->input_mode = LISCR_ARGS_INPUT_TABLE;
 		self->input_table = self->args_start;
-	}
-}
-
-void
-liscr_args_call_setters (LIScrArgs* self,
-                         LIScrData* data)
-{
-	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
-		liscr_copyargs (self->lua, data, self->input_table);
-}
-
-void
-liscr_args_call_setters_except (LIScrArgs*  self,
-                                LIScrData*  data,
-                                const char* except)
-{
-	const char* tmp;
-
-	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
-	{
-		/* Get write indexer. */
-		liscr_pushdata (self->lua, data);
-		lua_getfield (self->lua, -1, "__newindex");
-		if (lua_type (self->lua, -1) != LUA_TFUNCTION)
-		{
-			lua_pop (self->lua, 2);
-			lisys_assert (0);
-			return;
-		}
-
-		/* Call it for each table value. */
-		lua_pushnil (self->lua);
-		while (lua_next (self->lua, self->input_table) != 0)
-		{
-			tmp = lua_tostring (self->lua, -2);
-			if (tmp != NULL && !strcmp (tmp, except))
-			{
-				lua_pop (self->lua, 1);
-				continue;
-			}
-			lua_pushvalue (self->lua, -3);
-			lua_pushvalue (self->lua, -5);
-			lua_pushvalue (self->lua, -4);
-			lua_pushvalue (self->lua, -4);
-			if (lua_pcall (self->lua, 3, 0, 0))
-			{
-				lisys_error_set (EINVAL, lua_tostring (self->lua, -1));
-				lisys_error_report ();
-				lua_pop (self->lua, 1);
-			}
-			lua_pop (self->lua, 1);
-		}
-		lua_pop (self->lua, 2);
 	}
 }
 
@@ -161,42 +110,6 @@ int liscr_args_geti_bool_convert (
 	}
 
 	return ret;
-}
-
-int
-liscr_args_geti_class (LIScrArgs*   self,
-                       int          index,
-                       const char*  type,
-                       LIScrClass** result)
-{
-	LIScrClass* tmp;
-
-	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
-	{
-		lua_pushnumber (self->lua, index + 1);
-		lua_gettable (self->lua, self->input_table);
-		if (type != NULL)
-			tmp = liscr_isclass (self->lua, -1, type);
-		else
-			tmp = liscr_isanyclass (self->lua, -1);
-		lua_pop (self->lua, 1);
-		if (tmp != NULL)
-			*result = tmp;
-	}
-	else
-	{
-		if (index < 0 || index >= self->args_count)
-			return 0;
-		index += self->args_start;
-		if (type != NULL)
-			tmp = liscr_isclass (self->lua, index, type);
-		else
-			tmp = liscr_isanyclass (self->lua, index);
-		if (tmp != NULL)
-			*result = tmp;
-	}
-
-	return tmp != NULL;
 }
 
 int
@@ -499,29 +412,6 @@ liscr_args_gets_bool (LIScrArgs*  self,
 	}
 
 	return ret;
-}
-
-int
-liscr_args_gets_class (LIScrArgs*   self,
-                       const char*  name,
-                       const char*  type,
-                       LIScrClass** result)
-{
-	LIScrClass* tmp = NULL;
-
-	if (self->input_mode == LISCR_ARGS_INPUT_TABLE)
-	{
-		lua_getfield (self->lua, self->input_table, name);
-		if (type != NULL)
-			tmp = liscr_isclass (self->lua, -1, type);
-		else
-			tmp = liscr_isanyclass (self->lua, -1);
-		lua_pop (self->lua, 1);
-		if (tmp != NULL)
-			*result = tmp;
-	}
-
-	return tmp != NULL;
 }
 
 int
@@ -833,28 +723,6 @@ liscr_args_seti_bool (LIScrArgs* self,
 }
 
 void
-liscr_args_seti_class (LIScrArgs*  self,
-                       LIScrClass* value)
-{
-	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
-	{
-		liscr_pushclass (self->lua, value);
-		self->ret++;
-	}
-	else
-	{
-		if (!self->output_table)
-		{
-			lua_newtable (self->lua);
-			self->output_table = lua_gettop (self->lua);
-		}
-		lua_pushnumber (self->lua, ++self->ret);
-		liscr_pushclass (self->lua, value);
-		lua_settable (self->lua, self->output_table);
-	}
-}
-
-void
 liscr_args_seti_data (LIScrArgs* self,
                       LIScrData* value)
 {
@@ -1080,26 +948,6 @@ liscr_args_sets_bool (LIScrArgs*  self,
 }
 
 void
-liscr_args_sets_class (LIScrArgs*  self,
-                       const char* name,
-                       LIScrClass* value)
-{
-	if (self->output_mode == LISCR_ARGS_OUTPUT_TABLE)
-	{
-		if (!self->output_table)
-		{
-			lua_newtable (self->lua);
-			self->output_table = lua_gettop (self->lua);
-		}
-		if (value != NULL)
-		{
-			liscr_pushclass (self->lua, value);
-			lua_setfield (self->lua, self->output_table, name);
-		}
-	}
-}
-
-void
 liscr_args_sets_data (LIScrArgs*  self,
                       const char* name,
                       LIScrData*  value)
@@ -1237,17 +1085,16 @@ liscr_args_sets_vector (LIScrArgs*         self,
 
 /*****************************************************************************/
 
-int
-liscr_marshal_CLASS (lua_State* lua)
+int liscr_marshal_CLASS (lua_State* lua)
 {
 	LIScrArgs args;
-	LIScrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
-	void (*func)(LIScrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
+	LIScrScript* script;
+	void (*func)(LIScrArgs*);
 
-	clss = liscr_isclass (lua, 1, clss->name);
-	if (clss == NULL)
-		return 0;
-	liscr_args_init_func (&args, lua, clss, NULL);
+	script = lua_touserdata (lua, lua_upvalueindex (1));
+	func = lua_touserdata (lua, lua_upvalueindex (2));
+
+	liscr_args_init_func (&args, lua, script, NULL);
 	func (&args);
 
 	if (args.output_table)
@@ -1256,18 +1103,22 @@ liscr_marshal_CLASS (lua_State* lua)
 		return args.ret;
 }
 
-int
-liscr_marshal_DATA (lua_State* lua)
+int liscr_marshal_DATA (lua_State* lua)
 {
 	LIScrArgs args;
-	LIScrClass* clss = lua_touserdata (lua, lua_upvalueindex (1));
-	void (*func)(LIScrArgs*) = lua_touserdata (lua, lua_upvalueindex (2));
 	LIScrData* data;
+	LIScrScript* script;
+	const char* type;
+	void (*func)(LIScrArgs*);
 
-	data = liscr_isdata (lua, 1, clss->name);
+	script = lua_touserdata (lua, lua_upvalueindex (1));
+	type = lua_tostring (lua, lua_upvalueindex (2));
+	func = lua_touserdata (lua, lua_upvalueindex (3));
+
+	data = liscr_isdata (lua, 1, type);
 	if (data == NULL)
 		return 0;
-	liscr_args_init_func (&args, lua, data->clss, data);
+	liscr_args_init_func (&args, lua, script, data);
 	func (&args);
 
 	if (args.output_table)

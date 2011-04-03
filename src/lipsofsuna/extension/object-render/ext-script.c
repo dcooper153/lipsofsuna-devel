@@ -24,20 +24,6 @@
 
 #include "ext-module.h"
 
-/* @luadoc
- * module "core/object-render"
- * ---
- * -- Control rendering of objects.
- * -- @name Object
- * -- @class table
- */
-
-/* @luadoc
- * --- Deforms the mesh of the object according to its animation pose.
- * --
- * -- @param self Object.
- * function Object.deform_mesh(self)
- */
 static void Object_deform_mesh (LIScrArgs* args)
 {
 	LIExtModule* module;
@@ -45,7 +31,7 @@ static void Object_deform_mesh (LIScrArgs* args)
 	LIRenObject* object;
 
 	/* Get render object. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
 	engobj = args->self;
 	object = liren_scene_find_object (module->scene, engobj->id);
 	if (object == NULL)
@@ -55,14 +41,6 @@ static void Object_deform_mesh (LIScrArgs* args)
 	liren_object_deform (object);
 }
 
-/* @luadoc
- * --- Starts the particle animation of the object.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>loop: True to loop infinitely.</li>
- * --   <li>time: Animation offset in seconds.</li></ul>
- * function Object.particle_animation(self)
- */
 static void Object_particle_animation (LIScrArgs* args)
 {
 	int loop = 1;
@@ -72,7 +50,7 @@ static void Object_particle_animation (LIScrArgs* args)
 	LIRenObject* object;
 
 	/* Get render object. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
 	engobj = args->self;
 	object = liren_scene_find_object (module->scene, engobj->id);
 	if (object == NULL)
@@ -86,11 +64,6 @@ static void Object_particle_animation (LIScrArgs* args)
 	liren_object_particle_animation (object, start, loop);
 }
 
-/* @luadoc
- * --- Recalculates the positions of transparent faces for correct depth sorting.
- * -- @param self Object.
- * function Object.update_transparency(self)
- */
 static void Object_update_transparency (LIScrArgs* args)
 {
 	LIExtModule* module;
@@ -98,7 +71,7 @@ static void Object_update_transparency (LIScrArgs* args)
 	LIRenObject* object;
 
 	/* Get render object. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
 	engobj = args->self;
 	object = liren_scene_find_object (module->scene, engobj->id);
 	if (object == NULL)
@@ -112,13 +85,11 @@ static void Object_update_transparency (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_render_object (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_RENDER_OBJECT, data);
-	liscr_class_insert_mfunc (self, "deform_mesh", Object_deform_mesh);
-	liscr_class_insert_mfunc (self, "particle_animation", Object_particle_animation);
-	liscr_class_insert_mfunc (self, "update_transparency", Object_update_transparency);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_deform_mesh", Object_deform_mesh);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_particle_animation", Object_particle_animation);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_update_transparency", Object_update_transparency);
 }
 
 /** @} */

@@ -36,7 +36,7 @@ Player.get_camera_transform_1st = function(clss)
 	-- Calculate the rotation.
 	local turn = clss.camera_turn_state + clss.turn_state
 	local tilt = clss.camera_tilt_state - clss.tilt_state
-	local rot = Quaternion:new_euler(turn, 0, tilt)
+	local rot = Quaternion{euler = {turn, 0, tilt}}
 	-- Find the camera offset.
 	local spec = Species:find{name = clss.species}
 	local rel = spec and spec.camera_center or Vector(0, 2, 0)
@@ -59,11 +59,11 @@ Player.get_camera_transform_3rd = function(clss)
 	-- Calculate the rotation.
 	local turn = clss.camera_turn_state + clss.turn_state
 	local tilt = clss.camera_tilt_state - clss.tilt_state
-	local rot = Quaternion:new_euler(turn, 0, tilt)
+	local rot = Quaternion{euler = {turn, 0, tilt}}
 	-- Find the camera offset.
 	local spec = Species:find{name = clss.species}
 	local rel = spec and spec.camera_center or Vector(0, 2, 0)
-	local turn1 = Quaternion:new_euler(turn)
+	local turn1 = Quaternion{euler = {turn}}
 	-- Calculate the center position.
 	-- If there's room, the camera is placed slightly to the right so that
 	-- the character doesn't obstruct the crosshair so badly.
@@ -104,7 +104,7 @@ Player.get_picking_ray_1st = function(clss)
 	-- Calculate the rotation.
 	local euler = Player.object.rotation.euler
 	euler[3] = euler[3] - clss.tilt_state
-	local rot = Quaternion:new_euler(euler)
+	local rot = Quaternion{euler = euler}
 	-- Project the ray.
 	local ctr = Player.object.position + Player.object.rotation * spec.aim_ray_center
 	return ctr,ctr + rot * Vector(0, 0, -5)
@@ -214,7 +214,7 @@ Player.update_rotation = function(clss, secs)
 	end
 	clss.tilt = 0
 	-- Update rotation.
-	local r = Quaternion:new_euler(clss.turn_state, 0, -clss.tilt_state)
+	local r = Quaternion{euler = {clss.turn_state, 0, -clss.tilt_state}}
 	clss.object:update_rotation(r)
 	clss.rotation_curr = r
 	-- Sync rotation with the server.

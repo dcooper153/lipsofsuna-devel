@@ -27,23 +27,12 @@
 
 #define LISCR_SCRIPT_SELF (NULL + 1)
 #define LISCR_SCRIPT_REFS (NULL + 2)
-#define LISCR_SCRIPT_LOOKUP_CLASS (NULL + 3)
-#define LISCR_SCRIPT_LOOKUP_DATA (NULL + 4)
-
-struct _LIScrClass
-{
-	char signature;
-	int flags;
-	char* name;
-	LIAlgStrdic* userdata;
-	LIScrClass* base;
-	LIScrScript* script;
-};
+#define LISCR_SCRIPT_LOOKUP_DATA (NULL + 3)
 
 struct _LIScrData
 {
 	char signature;
-	LIScrClass* clss;
+	const char* type;
 	LIScrScript* script;
 	LIScrGCFunc free;
 	void* data;
@@ -52,8 +41,8 @@ struct _LIScrData
 
 struct _LIScrScript
 {
-	void* userpointer;
 	lua_State* lua;
+	LIAlgStrdic* userdata;
 };
 
 #endif

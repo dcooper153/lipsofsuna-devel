@@ -73,8 +73,7 @@ void liext_client_free (
 	LIExtClient* self)
 {
 	/* Signal logout. */
-	limai_program_event (self->module->program, "logout",
-		"client", LISCR_TYPE_INT, self->id, NULL);
+	limai_program_event (self->module->program, "logout", "client", LISCR_TYPE_INT, self->id, NULL);
 
 	/* Remove from the client list. */
 	lialg_u32dic_remove (self->module->clients, self->id);

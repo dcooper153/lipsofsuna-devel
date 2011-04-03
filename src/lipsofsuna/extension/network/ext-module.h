@@ -84,7 +84,6 @@ int liext_network_get_connected (
 /*****************************************************************************/
 
 void liext_script_network (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

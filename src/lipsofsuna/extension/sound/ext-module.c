@@ -80,7 +80,8 @@ LIExtModule* liext_sound_new (
 #endif
 
 	/* Register classes. */
-	liscr_script_create_class (program->script, "Sound", liext_script_sound, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_SOUND, self);
+	liext_script_sound (program->script);
 
 	return self;
 }

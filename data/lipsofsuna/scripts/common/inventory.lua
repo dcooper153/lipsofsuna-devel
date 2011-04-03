@@ -105,11 +105,11 @@ end
 --   <li>slot: Slot name or number if requiring a specific slot.</li></ul>
 -- @return True if merged or added.
 Inventory.merge_object = function(self, args)
-	if type(args.object) ~= "userdata" then return end
+	if type(args.object) ~= "table" then return end
 	if type(args.slot) == "number" then
 		-- Merge or insert to a specific inventory slot.
 		local object = self:get_object{slot = args.slot}
-		if type(object) ~= "userdata" then return end
+		if type(object) ~= "table" then return end
 		if not object then
 			self:set_object(args)
 			return true
@@ -123,7 +123,7 @@ Inventory.merge_object = function(self, args)
 	elseif type(args.slot) == "string" then
 		-- Merge or insert to specific equipment slot.
 		local object = self:get_object{slot = args.slot}
-		if type(object) ~= "userdata" then return end
+		if type(object) ~= "table" then return end
 		if object and object:merge{object = args.object} then
 			args.object:detach()
 			self:update_slot{slot = args.slot}
@@ -210,7 +210,7 @@ Inventory.set_object = function(self, args)
 	if oldobj == args.object then return end
 	-- Maintain dictionaries.
 	if oldobj then Inventory.dict_object[oldobj] = nil end
-	if type(args.object) == "userdata" then
+	if type(args.object) == "table" then
 		args.object:detach()
 		Inventory.dict_object[args.object] = self
 	end

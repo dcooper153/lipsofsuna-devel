@@ -1,25 +1,5 @@
 Widgets.Button = Class(Widget)
-
-Widgets.Button.setter = function(self, key, value)
-	if key == "focused" then
-		if self.focused ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "font" then
-		if self.font ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "text" then
-		if self.text ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	else
-		Widget.setter(self, key, value)
-	end
-end
+Widgets.Button.class_name = "Widgets.Button"
 
 Widgets.Button.new = function(clss, args)
 	local self = Widget.new(clss, args)
@@ -55,3 +35,25 @@ Widgets.Button.reshaped = function(self)
 		text_font = self.font}
 	self:canvas_compile()
 end
+
+Widgets.Button:add_getters{
+	focused = function(s) return rawget(s, "__focused") end,
+	font = function(s) return rawget(s, "__font") end,
+	text = function(s) return rawget(s, "__text") end}
+
+Widgets.Button:add_setters{
+	focused = function(s, v)
+		if s.focused == v then return end
+		rawset(s, "__focused", v)
+		s:reshaped()
+	end,
+	font = function(s, v)
+		if s.font == v then return end
+		rawset(s, "__font", v)
+		s:reshaped()
+	end,
+	text = function(s, v)
+		if s.text == v then return end
+		rawset(s, "__text", v)
+		s:reshaped()
+	end}

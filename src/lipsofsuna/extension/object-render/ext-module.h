@@ -43,11 +43,9 @@ void liext_object_render_free (
 /*****************************************************************************/
 
 void liext_script_render_model (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 void liext_script_render_object (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

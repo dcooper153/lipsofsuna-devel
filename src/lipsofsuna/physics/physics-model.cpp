@@ -115,6 +115,10 @@ void liphy_model_free (LIPhyModel* self)
 	LIAlgStrdicIter iter;
 	LIPhyShape* shape;
 
+	/* Bullet can't handle objects being deleted during the simulation tick.
+	   To avoid problems, the code should never get here during it. */
+	assert (!self->physics->updating);
+
 	/* Remove from dictionary. */
 	lialg_u32dic_remove (self->physics->models, self->id);
 

@@ -403,7 +403,8 @@ static int private_init (
 		return 0;
 
 	/* Register classes. */
-	liscr_script_create_class (self->program->script, "Network", liext_script_network, self);
+	liscr_script_set_userdata (self->program->script, LIEXT_SCRIPT_NETWORK, self);
+	liext_script_network (self->program->script);
 
 	return 1;
 }
@@ -420,8 +421,7 @@ static int private_connect (
 		return 0;
 
 	/* Emit a login event. */
-	limai_program_event (self->program, "login",
-		"client", LISCR_TYPE_INT, client->id, NULL);
+	limai_program_event (self->program, "login", "client", LISCR_TYPE_INT, client->id, NULL);
 
 	return 1;
 }
@@ -454,9 +454,7 @@ static int private_message_client (
 	packet = liscr_packet_new_readable (self->program->script, reader);
 	if (packet != NULL)
 	{
-		limai_program_event (self->program, "packet",
-			"message", LISCR_TYPE_INT, data[0],
-			"packet", LISCR_SCRIPT_PACKET, packet, NULL);
+		limai_program_event (self->program, "packet", "message", LISCR_TYPE_INT, data[0], "packet", LISCR_SCRIPT_PACKET, packet, NULL);
 		liscr_data_unref (packet);
 	}
 	liarc_reader_free (reader);
@@ -489,10 +487,7 @@ static int private_message_server (
 	packet = liscr_packet_new_readable (self->program->script, reader);
 	if (packet != NULL)
 	{
-		limai_program_event (self->program, "packet",
-			"message", LISCR_TYPE_INT, ((uint8_t*) event->packet->data)[0],
-			"client", LISCR_TYPE_INT, client->id,
-			"packet", LISCR_SCRIPT_PACKET, packet, NULL);
+		limai_program_event (self->program, "packet", "message", LISCR_TYPE_INT, ((uint8_t*) event->packet->data)[0], "client", LISCR_TYPE_INT, client->id, "packet", LISCR_SCRIPT_PACKET, packet, NULL);
 		liscr_data_unref (packet);
 	}
 	liarc_reader_free (reader);

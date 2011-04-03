@@ -24,47 +24,6 @@
 
 #include "ext-module.h"
 
-static int private_callback_pressed (
-	LIScrData* data)
-{
-	LIScrScript* script = liscr_data_get_script (data);
-	lua_State* lua = liscr_script_get_lua (script);
-
-	liscr_pushdata (lua, data);
-	lua_getfield (lua, -1, "pressed");
-	if (lua_type (lua, -1) == LUA_TFUNCTION)
-	{
-		lua_pushvalue (lua, -2);
-		lua_remove (lua, -3);
-		if (lua_pcall (lua, 1, 0, 0) != 0)
-		{
-			lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.pressed: %s", lua_tostring (lua, -1));
-			lisys_error_report ();
-			lua_pop (lua, 1);
-		}
-		return 0;
-	}
-	else
-		lua_pop (lua, 2);
-	return 1;
-}
-
-/*****************************************************************************/
-
-/* @luadoc
- * module "core/widgets"
- * --- Manipulate widgets.
- * -- @name Widget
- * -- @class table
- */
-
-/* @luadoc
- * --- Creates a new widget.
- * -- @param clss Widget class.
- * -- @param args Arguments.
- * -- @return New widget.
- * function Widget.new(clss, args)
- */
 static void Widget_new (LIScrArgs* args)
 {
 	LIExtModule* module;
@@ -72,13 +31,13 @@ static void Widget_new (LIScrArgs* args)
 	LIWdgWidget* self;
 
 	/* Allocate userdata. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_WIDGET);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_WIDGET);
 	self = liwdg_widget_new (module->widgets);
 	if (self == NULL)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, args->clss, liwdg_widget_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_WIDGET, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
@@ -86,17 +45,9 @@ static void Widget_new (LIScrArgs* args)
 	}
 	liwdg_widget_set_script (self, data);
 	liwdg_widget_insert_callback (self, "paint", liext_widgets_callback_paint, data);
-	liwdg_widget_insert_callback (self, "pressed", private_callback_pressed, data);
-	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
 }
 
-/* @luadoc
- * --- Appends a column to the widget.
- * -- @param self Widget.
- * -- @param args List of widgets.
- * function Widget.append_row(self, args)
- */
 static void Widget_append_col (LIScrArgs* args)
 {
 	int i;
@@ -117,13 +68,6 @@ static void Widget_append_col (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Appends a row to the widget.
- * --
- * -- @param self Widget.
- * -- @param args List of widgets.
- * function Widget.append_row(self, args)
- */
 static void Widget_append_row (LIScrArgs* args)
 {
 	int i;
@@ -144,40 +88,16 @@ static void Widget_append_row (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Clears the canvas of the widget.
- * -- @param self Widget.
- * function Widget.canvas_clear(self)
- */
 static void Widget_canvas_clear (LIScrArgs* args)
 {
 	liwdg_widget_canvas_clear (args->self);
 }
 
-/* @luadoc
- * --- Compiles the canvas of the widget.
- * -- @param self Widget.
- * function Widget.canvas_compile(self)
- */
 static void Widget_canvas_compile (LIScrArgs* args)
 {
 	liwdg_widget_canvas_compile (args->self);
 }
 
-/* @luadoc
- * --- Packs an image to the canvas of the widget.
- * -- @param self Widget.
- * -- @param args Arguments.<ul>
- * --   <li>color: RGBA color or nil.</li>
- * --   <li>dest_clip: {x,y,w,h} or nil.</li>
- * --   <li>dest_position: {x,y} or nil.</li>
- * --   <li>dest_size: {w,h} or nil.</li>
- * --   <li>rotation: Rotation angle in radians or nil.</li>
- * --   <li>rotation_center: Rotation center vector or nil.</li>
- * --   <li>source_position: {x,y} or nil.</li>
- * --   <li>source_tiling: {x1,x2,x3,y1,y2,y3} or nil.</li></ul>
- * function Widget.canvas_image(self, args)
- */
 static void Widget_canvas_image (LIScrArgs* args)
 {
 	float color[4];
@@ -235,21 +155,6 @@ static void Widget_canvas_image (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Packs text to the canvas of the widget.
- * -- @param self Widget.
- * -- @param args Arguments.<ul>
- * --   <li>dest_clip: {x,y,w,h} or nil.</li>
- * --   <li>dest_position: {x,y} or nil.</li>
- * --   <li>dest_size: {w,h} or nil.</li>
- * --   <li>rotation: Rotation angle in radians or nil.</li>
- * --   <li>rotation_center: Rotation center vector or nil.</li>
- * --   <li>text: String.</li></ul>
- * --   <li>text_alignment: {x,y} or nil.</li>
- * --   <li>text_color: {r,g,b,a} or nil.</li></ul>
- * --   <li>text_font: Font name or nil.</li></ul>
- * function Widget.canvas_text(self, args)
- */
 static void Widget_canvas_text (LIScrArgs* args)
 {
 	int dest_clip[4];
@@ -305,16 +210,6 @@ static void Widget_canvas_text (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Gets a child widget.
- * --
- * -- @param self Widget.
- * -- @param args Arguments.<ul>
- * --   <li>row: Row number.</li>
- * --   <li>col: Column number.</li></ul>
- * -- @return Widget or nil.
- * function Widget.get_child(self, args)
- */
 static void Widget_get_child (LIScrArgs* args)
 {
 	int x = 1;
@@ -324,8 +219,8 @@ static void Widget_get_child (LIScrArgs* args)
 	LIWdgWidget* widget;
 
 	liwdg_widget_get_size (args->self, &w, &h);
-	liscr_args_gets_int (args, "col", &x);
-	liscr_args_gets_int (args, "row", &y);
+	liscr_args_geti_int (args, 0, &x);
+	liscr_args_geti_int (args, 1, &y);
 	if (x <= 0 || x > w || y <= 0 || y > h)
 		return;	
 	widget = liwdg_widget_get_child (args->self, x - 1, y - 1);
@@ -333,13 +228,6 @@ static void Widget_get_child (LIScrArgs* args)
 		liscr_args_seti_data (args, liwdg_widget_get_script (widget));
 }
 
-/* @luadoc
- * --- Gets the size request of the widget.
- * -- @param self Widget.
- * -- @param args Arguments.<ul>
- * --   <li>internal: True to get the internal request.</li></ul>
- * function Widget.get_request(self, args)
- */
 static void Widget_get_request (LIScrArgs* args)
 {
 	int internal = 0;
@@ -363,14 +251,6 @@ static void Widget_get_request (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Inserts a column to the widget.
- * -- @param self Widget.
- * -- @param args Arguments.<ul>
- * --   <li>1,col: Column index or nil.</li>
- * --   <li>2,widget: Widget or nil.</li></ul>
- * function Widget.insert_col(self, args)
- */
 static void Widget_insert_col (LIScrArgs* args)
 {
 	int w;
@@ -399,14 +279,6 @@ static void Widget_insert_col (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Inserts a row to the widget.
- * -- @param self Widget.
- * -- @param args Arguments.<ul>
- * --   <li>1,row: Row index or nil.</li>
- * --   <li>2,widget: Widget or nil.</li></ul>
- * function Widget.insert_row(self, args)
- */
 static void Widget_insert_row (LIScrArgs* args)
 {
 	int w;
@@ -435,17 +307,6 @@ static void Widget_insert_row (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Pops up the widget.
- * -- @param self Widget.
- * -- @param args Arguments.<ul>
- * --   <li>x: X coordinate.</li>
- * --   <li>y: Y coordinate.</li>
- * --   <li>width: Width allocation.</li>
- * --   <li>height: Height allocation.</li>
- * --   <li>dir: Popup direction. ("left"/"right"/"up"/"down")</li></ul>
- * function Widget.popup(self, args)
- */
 static void Widget_popup (LIScrArgs* args)
 {
 	const char* dir;
@@ -483,14 +344,6 @@ static void Widget_popup (LIScrArgs* args)
 	liscr_data_ref (args->data);
 }
 
-/* @luadoc
- * --- Removes a row or a column from the widget.
- * -- @param self Widget.
- * -- @param args Arguments.<ul>
- * --   <li>col: Column index.</li>
- * --   <li>row: Row index.</li></ul>
- * function Widget.remove(self, args)
- */
 static void Widget_remove (LIScrArgs* args)
 {
 	int w;
@@ -505,15 +358,6 @@ static void Widget_remove (LIScrArgs* args)
 		liwdg_widget_remove_row (args->self, row - 1);
 }
 
-/* @luadoc
- * --- Places a widget inside the group.
- * -- @param self Widget.
- * -- @param args Arguments.<ul>
- * --   <li>col: Column number. (required)</li>
- * --   <li>row: Row number. (required)</li>
- * --   <li>widget: Widget.</li></ul>
- * function Widget.set_child(self, args)
- */
 static void Widget_set_child (LIScrArgs* args)
 {
 	int x = 1;
@@ -523,10 +367,10 @@ static void Widget_set_child (LIScrArgs* args)
 	LIScrData* data = NULL;
 
 	/* Arguments. */
-	if (!liscr_args_gets_int (args, "col", &x) ||
-	    !liscr_args_gets_int (args, "row", &y))
+	if (!liscr_args_geti_int (args, 0, &x) ||
+	    !liscr_args_geti_int (args, 1, &y))
 		return;
-	liscr_args_gets_data (args, "widget", LIEXT_SCRIPT_WIDGET, &data);
+	liscr_args_geti_data (args, 2, LIEXT_SCRIPT_WIDGET, &data);
 	liwdg_widget_get_size (args->self, &w, &h);
 	if (x < 1 || x > w || y < 1 || y > h)
 		return;
@@ -541,15 +385,6 @@ static void Widget_set_child (LIScrArgs* args)
 		liwdg_widget_set_child (args->self, x - 1, y - 1, NULL);
 }
 
-/* @luadoc
- * --- Enables or disables row or column expansion.
- * -- @param self Widget.
- * -- @param args Arguments.<ul>
- * --   <li>row: Row number.</li>
- * --   <li>col: Column number.</li>
- * --   <li>expand: Boolean.</li></ul>
- * function Widget.set_expand(self, args)
- */
 static void Widget_set_expand (LIScrArgs* args)
 {
 	int i;
@@ -558,25 +393,22 @@ static void Widget_set_expand (LIScrArgs* args)
 	int expand = 1;
 
 	liwdg_widget_get_size (args->self, &w, &h);
-	liscr_args_gets_bool (args, "expand", &expand);
-	if (liscr_args_gets_int (args, "col", &i) && i >= 1 && i <= w)
-		liwdg_widget_set_col_expand (args->self, i - 1, expand);
-	if (liscr_args_gets_int (args, "row", &i) && i >= 1 && i <= h)
-		liwdg_widget_set_row_expand (args->self, i - 1, expand);
+	if (!liscr_args_geti_bool (args, 2, &expand))
+		liscr_args_gets_bool (args, "expand", &expand);
+	if (liscr_args_geti_int (args, 0, &i) ||
+	    liscr_args_gets_int (args, "col", &i))
+	{
+		if (i >= 1 && i <= w)
+			liwdg_widget_set_col_expand (args->self, i - 1, expand);
+	}
+	if (liscr_args_geti_int (args, 2, &i) ||
+	    liscr_args_gets_int (args, "row", &i))
+	{
+		if (i >= 1 && i <= h)
+			liwdg_widget_set_row_expand (args->self, i - 1, expand);
+	}
 }
 
-/* @luadoc
- * --- Sets the size request of the widget.
- * -- @param self Widget.
- * -- @param args Arguments.<ul>
- * --   <li>font: Font to use when calculating from text.</li>
- * --   <li>internal: Set the internal request instead of the user request.</li>
- * --   <li>width: Width request.</li>
- * --   <li>height: Height request.</li>
- * --   <li>paddings: Additional paddings to add or nil.</li>
- * --   <li>text: Text to use when calculating from text.</li></ul>
- * function Widget.set_request(self, args)
- */
 static void Widget_set_request (LIScrArgs* args)
 {
 	int internal = 0;
@@ -629,11 +461,6 @@ static void Widget_set_request (LIScrArgs* args)
 		liwdg_widget_set_request (args->self, 2, size.width, size.height);
 }
 
-/* @luadoc
- * --- Behind flag.
- * -- @name Widget.behind
- * -- @class table
- */
 static void Widget_get_behind (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_widget_get_behind (args->self));
@@ -646,11 +473,6 @@ static void Widget_set_behind (LIScrArgs* args)
 		liwdg_widget_set_behind (args->self, value);
 }
 
-/* @luadoc
- * --- Number of columns in the widget.
- * -- @name Widget.cols
- * -- @class table
- */
 static void Widget_get_cols (LIScrArgs* args)
 {
 	int w;
@@ -670,11 +492,6 @@ static void Widget_set_cols (LIScrArgs* args)
 		liwdg_widget_set_size (args->self, cols, h);
 }
 
-/* @luadoc
- * --- Floating flag.
- * -- @name Widget.floating
- * -- @class table
- */
 static void Widget_get_floating (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_widget_get_floating (args->self));
@@ -687,11 +504,6 @@ static void Widget_set_floating (LIScrArgs* args)
 		liwdg_widget_set_floating (args->self, value);
 }
 
-/* @luadoc
- * --- Fullscreen flag.
- * -- @name Widget.fullscreen
- * -- @class table
- */
 static void Widget_get_fullscreen (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_widget_get_fullscreen (args->self));
@@ -704,11 +516,6 @@ static void Widget_set_fullscreen (LIScrArgs* args)
 		liwdg_widget_set_fullscreen (args->self, value);
 }
 
-/* @luadoc
- * --- Height of the widget.
- * -- @name Widget.height
- * -- @class table
- */
 static void Widget_get_height (LIScrArgs* args)
 {
 	LIWdgRect rect;
@@ -717,11 +524,6 @@ static void Widget_get_height (LIScrArgs* args)
 	liscr_args_seti_float (args, rect.height);
 }
 
-/* @luadoc
- * --- Margin widths.
- * -- @name Widget.margins
- * -- @class table
- */
 static void Widget_get_margins (LIScrArgs* args)
 {
 	int v[4];
@@ -749,11 +551,6 @@ static void Widget_set_margins (LIScrArgs* args)
 	liwdg_widget_set_margins (args->self, v[0], v[1], v[2], v[3]);
 }
 
-/* @luadoc
- * --- The parent of this widget.
- * -- @name Widget.parent
- * -- @class table
- */
 static void Widget_get_parent (LIScrArgs* args)
 {
 	LIWdgWidget* self = args->self;
@@ -762,11 +559,6 @@ static void Widget_get_parent (LIScrArgs* args)
 		liscr_args_seti_data (args, self->parent->script);
 }
 
-/* @luadoc
- * --- Number of rows in the widget.
- * -- @name Widget.rows
- * -- @class table
- */
 static void Widget_get_rows (LIScrArgs* args)
 {
 	int w;
@@ -786,11 +578,6 @@ static void Widget_set_rows (LIScrArgs* args)
 		liwdg_widget_set_size (args->self, w, rows);
 }
 
-/* @luadoc
- * --- Child spacings.
- * -- @name Widget.margins
- * -- @class table
- */
 static void Widget_get_spacings (LIScrArgs* args)
 {
 	int v[2];
@@ -812,11 +599,6 @@ static void Widget_set_spacings (LIScrArgs* args)
 	liwdg_widget_set_spacings (args->self, v[0], v[1]);
 }
 
-/* @luadoc
- * --- Visibility flag.
- * -- @name Widget.visible
- * -- @class table
- */
 static void Widget_get_visible (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_widget_get_visible (args->self));
@@ -829,11 +611,6 @@ static void Widget_set_visible (LIScrArgs* args)
 		liwdg_widget_set_visible (args->self, value);
 }
 
-/* @luadoc
- * --- Width of the widget
- * -- @name Widget.width
- * -- @class table
- */
 static void Widget_get_width (LIScrArgs* args)
 {
 	LIWdgRect rect;
@@ -842,11 +619,6 @@ static void Widget_get_width (LIScrArgs* args)
 	liscr_args_seti_float (args, rect.width);
 }
 
-/* @luadoc
- * --- Left edge position.
- * -- @name Widget.x
- * -- @class table
- */
 static void Widget_get_x (LIScrArgs* args)
 {
 	LIWdgRect rect;
@@ -863,11 +635,6 @@ static void Widget_set_x (LIScrArgs* args)
 	liwdg_widget_set_allocation (args->self, rect.x, rect.y, rect.width, rect.height);
 }
 
-/* @luadoc
- * --- Top edge position.
- * -- @name Widget.y
- * -- @class table
- */
 static void Widget_get_y (LIScrArgs* args)
 {
 	LIWdgRect rect;
@@ -887,50 +654,47 @@ static void Widget_set_y (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_widget (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_WIDGET, data);
-	liscr_class_insert_cfunc (self, "new", Widget_new);
-	liscr_class_insert_mfunc (self, "append_col", Widget_append_col);
-	liscr_class_insert_mfunc (self, "append_row", Widget_append_row);
-	liscr_class_insert_mfunc (self, "canvas_clear", Widget_canvas_clear);
-	liscr_class_insert_mfunc (self, "canvas_compile", Widget_canvas_compile);
-	liscr_class_insert_mfunc (self, "canvas_image", Widget_canvas_image);
-	liscr_class_insert_mfunc (self, "canvas_text", Widget_canvas_text);
-	liscr_class_insert_mfunc (self, "get_child", Widget_get_child);
-	liscr_class_insert_mfunc (self, "get_request", Widget_get_request);
-	liscr_class_insert_mfunc (self, "insert_col", Widget_insert_col);
-	liscr_class_insert_mfunc (self, "insert_row", Widget_insert_row);
-	liscr_class_insert_mfunc (self, "popup", Widget_popup);
-	liscr_class_insert_mfunc (self, "remove", Widget_remove);
-	liscr_class_insert_mfunc (self, "set_child", Widget_set_child);
-	liscr_class_insert_mfunc (self, "set_expand", Widget_set_expand);
-	liscr_class_insert_mfunc (self, "set_request", Widget_set_request);
-	liscr_class_insert_mfunc (self, "get_behind", Widget_get_behind);
-	liscr_class_insert_mfunc (self, "set_behind", Widget_set_behind);
-	liscr_class_insert_mfunc (self, "get_cols", Widget_get_cols);
-	liscr_class_insert_mfunc (self, "set_cols", Widget_set_cols);
-	liscr_class_insert_mfunc (self, "get_floating", Widget_get_floating);
-	liscr_class_insert_mfunc (self, "set_floating", Widget_set_floating);
-	liscr_class_insert_mfunc (self, "get_fullscreen", Widget_get_fullscreen);
-	liscr_class_insert_mfunc (self, "set_fullscreen", Widget_set_fullscreen);
-	liscr_class_insert_mfunc (self, "get_height", Widget_get_height);
-	liscr_class_insert_mfunc (self, "get_margins", Widget_get_margins);
-	liscr_class_insert_mfunc (self, "set_margins", Widget_set_margins);
-	liscr_class_insert_mfunc (self, "get_parent", Widget_get_parent);
-	liscr_class_insert_mfunc (self, "get_rows", Widget_get_rows);
-	liscr_class_insert_mfunc (self, "set_rows", Widget_set_rows);
-	liscr_class_insert_mfunc (self, "get_spacings", Widget_get_spacings);
-	liscr_class_insert_mfunc (self, "set_spacings", Widget_set_spacings);
-	liscr_class_insert_mfunc (self, "get_visible", Widget_get_visible);
-	liscr_class_insert_mfunc (self, "set_visible", Widget_set_visible);
-	liscr_class_insert_mfunc (self, "get_width", Widget_get_width);
-	liscr_class_insert_mfunc (self, "get_x", Widget_get_x);
-	liscr_class_insert_mfunc (self, "set_x", Widget_set_x);
-	liscr_class_insert_mfunc (self, "get_y", Widget_get_y);
-	liscr_class_insert_mfunc (self, "set_y", Widget_set_y);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_WIDGET, "widget_new", Widget_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_append_col", Widget_append_col);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_append_row", Widget_append_row);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_canvas_clear", Widget_canvas_clear);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_canvas_compile", Widget_canvas_compile);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_canvas_image", Widget_canvas_image);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_canvas_text", Widget_canvas_text);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_child", Widget_get_child);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_request", Widget_get_request);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_insert_col", Widget_insert_col);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_insert_row", Widget_insert_row);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_popup", Widget_popup);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_remove", Widget_remove);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_child", Widget_set_child);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_expand", Widget_set_expand);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_request", Widget_set_request);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_behind", Widget_get_behind);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_behind", Widget_set_behind);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_cols", Widget_get_cols);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_cols", Widget_set_cols);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_floating", Widget_get_floating);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_floating", Widget_set_floating);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_fullscreen", Widget_get_fullscreen);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_fullscreen", Widget_set_fullscreen);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_height", Widget_get_height);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_margins", Widget_get_margins);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_margins", Widget_set_margins);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_parent", Widget_get_parent);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_rows", Widget_get_rows);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_rows", Widget_set_rows);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_spacings", Widget_get_spacings);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_spacings", Widget_set_spacings);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_visible", Widget_get_visible);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_visible", Widget_set_visible);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_width", Widget_get_width);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_x", Widget_get_x);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_x", Widget_set_x);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_y", Widget_get_y);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_y", Widget_set_y);
 }
 
 /** @} */

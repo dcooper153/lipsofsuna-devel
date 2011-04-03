@@ -18,14 +18,12 @@
 #ifndef __CLIENT_SCRIPT_H__
 #define __CLIENT_SCRIPT_H__
 
-#include <lipsofsuna/script.h>
-#include <lipsofsuna/system.h>
-#include <lipsofsuna/widget.h>
+#include "lipsofsuna/script.h"
+#include "lipsofsuna/system.h"
 
 #define LICLI_SCRIPT_CLIENT "Client"
 
 LIAPICALL (void, licli_script_client, (
-	LIScrClass* self,
-	void*       data));
+	LIScrScript* self));
 
 #endif

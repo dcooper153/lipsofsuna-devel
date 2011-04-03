@@ -1,21 +1,5 @@
 Widgets.Quickslot = Class(Widget)
 
-Widgets.Quickslot.setter = function(self, key, value)
-	if key == "focused" then
-		if self.focused ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "icon" then
-		if self.icon ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	else
-		Widget.setter(self, key, value)
-	end
-end
-
 Widgets.Quickslot.new = function(clss, args)
 	local self = Widget.new(clss, args)
 	self.margins = {3,2,5,4}
@@ -61,3 +45,19 @@ end
 
 Widgets.Quickslot.pressed = function(self, args)
 end
+
+Widgets.Quickslot:add_getters{
+	focused = function(self) return rawget(self, "__focused") end,
+	icon = function(self) return rawget(self, "__icon") end}
+
+Widgets.Quickslot:add_setters{
+	focused = function(self, value)
+		if self.focused == value then return end
+		rawset(self, "__focused", value)
+		self:reshaped()
+	end,
+	icon = function(self, value)
+		if self.icon == value then return end
+		rawset(self, "__icon", value)
+		self:reshaped()
+	end}

@@ -72,7 +72,6 @@ void liext_speech_object_free (
 /*****************************************************************************/
 
 void liext_script_speech (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

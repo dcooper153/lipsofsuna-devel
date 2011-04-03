@@ -1,28 +1,5 @@
 Widgets.Text = Class(Widgets.Frame)
-
-Widgets.Text.setter = function(self, key, value)
-	if key == "color" then
-		if self.color ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "font" then
-		if self.font ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "text" then
-		if type(value) == "string" then
-			Widget.setter(self, key, {{value}})
-		else
-			Widget.setter(self, key, value)
-		end
-		self:build()
-		self:reshaped()
-	else
-		Widgets.Frame.setter(self, key, value)
-	end
-end
+Widgets.Text.class_name = "Widgets.Text"
 
 Widgets.Text.new = function(clss, args)
 	local arg = function(n, d) return args and args[n] or d end
@@ -55,3 +32,29 @@ Widgets.Text.build = function(self)
 		self:set_expand{row = self.rows}
 	end
 end
+
+Widgets.Text:add_getters{
+	color = function(s) return rawget(s, "__color") end,
+	font = function(s) return rawget(s, "__font") end,
+	text = function(s) return rawget(s, "__text") end}
+
+Widgets.Text:add_setters{
+	color = function(s, v)
+		if s.color == v then return end
+		rawset(s, "__color", v)
+		s:reshaped()
+	end,
+	font = function(s, v)
+		if s.font == v then return end
+		rawset(s, "__font", v)
+		s:reshaped()
+	end,
+	text = function(s, v)
+		if type(v) == "string" then
+			rawset(s, "__text", {{v}})
+		else
+			rawset(s, "__text", v)
+		end
+		s:build()
+		s:reshaped()
+	end}

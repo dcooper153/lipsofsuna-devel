@@ -1,13 +1,3 @@
-local oldpopup = Widget.popup
-
-Widget.popup = function(self, args)
-	if Widgets.popup then
-		Widgets.popup.visible = false
-	end
-	Widgets.popup = self
-	return oldpopup(self, args)
-end
-
 Widgets.find_handler_widget = function(clss, handler, args)
 	local w = clss:find_widget(args)
 	while w do
@@ -57,13 +47,10 @@ Widgets.update = function(clss)
 	if not Client.moving then
 		w = clss.focused_widget
 	end
-	if clss.focused_widget_prev ~= w then
-		if clss.focused_widget_prev then
-			clss.focused_widget_prev.focused = false
-		end
-		if w then
-			w.focused = true
-		end
+	local o = clss.focused_widget_prev
+	if o ~= w then
+		if o then o.focused = nil end
+		if w then w.focused = true end
 		clss.focused_widget_prev = w
 	end
 end

@@ -20,7 +20,6 @@
 
 #include "script/script.h"
 #include "script/script-args.h"
-#include "script/script-class.h"
 #include "script/script-data.h"
 #include "script/script-library.h"
 #include "script/script-util.h"

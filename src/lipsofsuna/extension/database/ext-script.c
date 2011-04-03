@@ -33,22 +33,6 @@ static void private_free_database (
 
 /*****************************************************************************/
 
-/* @luadoc
- * module "core/database"
- * --- Database extension.
- * -- @name Database
- * -- @class table
- */
-
-/* @luadoc
- * --- Opens a new database.
- * --
- * -- @param clss Database class.
- * -- @param args Arguments.<ul>
- * --   <li>1,name: Unique database name.</li></ul>
- * -- @return New tile.
- * function Database.new(clss, args)
- */
 static void Database_new (LIScrArgs* args)
 {
 	int ok;
@@ -59,7 +43,7 @@ static void Database_new (LIScrArgs* args)
 	LIExtModule* module;
 	LIScrData* data;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_DATABASE);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_DATABASE);
 
 	/* Get and validate the filename. */
 	if (!liscr_args_geti_string (args, 0, &name) &&
@@ -98,35 +82,16 @@ static void Database_new (LIScrArgs* args)
 	lisys_free (path);
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, sql, args->clss, private_free_database);
+	data = liscr_data_new (args->script, sql, LIEXT_SCRIPT_DATABASE, private_free_database);
 	if (data == NULL)
 	{
 		sqlite3_close (sql);
 		return;
 	}
-	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
 	liscr_data_unref (data);
 }
 
-/* @luadoc
- * --- Queries the database.
- * -- <br/>
- * -- Executes an SQLite query and returns the results in a table. The returned
- * -- table contains a list of tables that denote the rows of the result. The row
- * -- tables further contain a list of values that denote the contents of the columns.
- * -- <br/>
- * -- You can avoid escaping the arguments required by the query by writing a `?' in
- * -- place of the argument in the query and then passing the value in the binding
- * -- array. The binding array is a simple table that contains the arguments in the
- * -- same order as the query.
- * -- @param self Database.
- * -- @param args Arguments.<ul>
- * --   <li>1,query: Query string.</li>
- * --   <li>2,bind: Array of values to bind to the statement.</ul>
- * -- @return Table of rows.
- * Database.query(self, args)
- */
 static void Database_query (LIScrArgs* args)
 {
 	int i;
@@ -312,13 +277,10 @@ static void Database_query (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_database (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_DATABASE, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "new", Database_new);
-	liscr_class_insert_mfunc (self, "query", Database_query);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_DATABASE, "database_new", Database_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_DATABASE, "database_query", Database_query);
 }
 
 /** @} */

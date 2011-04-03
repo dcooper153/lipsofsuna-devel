@@ -1,22 +1,6 @@
 Views.Options = Class(Widget)
 Views.Options.mode = "options"
 
-Views.Options.getter = function(self, key, value)
-	if key == "fullscreen" then
-		return Widget.getter(self, "_fullscreen")
-	else
-		return Widget.getter(self, key)
-	end
-end
-
-Views.Options.setter = function(self, key, value)
-	if key == "fullscreen" then
-		Widget.setter(self, "_fullscreen", value)
-	else
-		Widget.setter(self, key, value)
-	end
-end
-
 Views.Options.new = function(clss)
 	-- Allocate self.
 	local self = Widget.new(clss, {cols = 2, rows = 4, spacings = {5,0}})
@@ -377,5 +361,11 @@ Views.Options.set_vsync = function(self, v)
 	self:set_video_mode(self.window_width, self.window_height, self.fullscreen, self.vsync)
 	self.button_vsync.text = self.vsync and "Enabled" or "Disabled"
 end
+
+Views.Options:add_getters{
+	fullscreen = function(self) return rawget(self, "__fullscreen") end}
+
+Views.Options:add_setters{
+	fullscreen = function(self, value) rawset(self, "__fullscreen", value) end}
 
 Views.Options.inst = Views.Options()

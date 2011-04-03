@@ -104,7 +104,7 @@ lifnt_layout_append_string (LIFntLayout* self,
 	/* Allocate glyphs. */
 	if (self->n_glyphs + length > self->c_glyphs)
 	{
-		glyph = realloc (self->glyphs, (self->n_glyphs + length) * sizeof (LIFntLayoutGlyph));
+		glyph = lisys_realloc (self->glyphs, (self->n_glyphs + length) * sizeof (LIFntLayoutGlyph));
 		if (glyph == NULL)
 		{
 			lisys_free (wstr);
@@ -134,7 +134,7 @@ void
 lifnt_layout_clear (LIFntLayout* self)
 {
 	self->dirty = 1;
-	self->glyphs = realloc (self->glyphs, LIFNT_TEXT_DEFAULT_CAPACITY * sizeof (LIFntLayoutGlyph));
+	self->glyphs = lisys_realloc (self->glyphs, LIFNT_TEXT_DEFAULT_CAPACITY * sizeof (LIFntLayoutGlyph));
 	self->n_glyphs = 0;
 	self->c_glyphs = LIFNT_TEXT_DEFAULT_CAPACITY;
 }

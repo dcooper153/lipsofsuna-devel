@@ -38,7 +38,6 @@ struct _LIScrArgs
 {
 	lua_State* lua;
 	LIScrScript* script;
-	LIScrClass* clss;
 	LIScrData* data;
 	void* self;
 	int ret;
@@ -51,19 +50,10 @@ struct _LIScrArgs
 };
 
 LIAPICALL (void, liscr_args_init_func, (
-	LIScrArgs*  self,
-	lua_State*  lua,
-	LIScrClass* clss,
-	LIScrData*  data));
-
-LIAPICALL (void, liscr_args_call_setters, (
-	LIScrArgs* self,
-	LIScrData* data));
-
-LIAPICALL (void, liscr_args_call_setters_except, (
-	LIScrArgs*  self,
-	LIScrData*  data,
-	const char* except));
+	LIScrArgs*   self,
+	lua_State*   lua,
+	LIScrScript* script,
+	LIScrData*   data));
 
 LIAPICALL (int, liscr_args_geti_bool, (
 	LIScrArgs*  self,
@@ -74,12 +64,6 @@ LIAPICALL (int, liscr_args_geti_bool_convert, (
 	LIScrArgs*  self,
 	int         index,
 	int*        result));
-
-LIAPICALL (int, liscr_args_geti_class, (
-	LIScrArgs*   self,
-	int          index,
-	const char*  type,
-	LIScrClass** result));
 
 LIAPICALL (int, liscr_args_geti_data, (
 	LIScrArgs*  self,
@@ -126,12 +110,6 @@ LIAPICALL (int, liscr_args_gets_bool, (
 	LIScrArgs*  self,
 	const char* name,
 	int*        result));
-
-LIAPICALL (int, liscr_args_gets_class, (
-	LIScrArgs*   self,
-	const char*  name,
-	const char*  type,
-	LIScrClass** result));
 
 LIAPICALL (int, liscr_args_gets_data, (
 	LIScrArgs*  self,
@@ -203,10 +181,6 @@ LIAPICALL (void, liscr_args_seti_bool, (
 	LIScrArgs* self,
 	int        value));
 
-LIAPICALL (void, liscr_args_seti_class, (
-	LIScrArgs*  self,
-	LIScrClass* value));
-
 LIAPICALL (void, liscr_args_seti_data, (
 	LIScrArgs* self,
 	LIScrData* value));
@@ -241,11 +215,6 @@ LIAPICALL (void, liscr_args_sets_bool, (
 	LIScrArgs*  self,
 	const char* name,
 	int         value));
-
-LIAPICALL (void, liscr_args_sets_class, (
-	LIScrArgs*  self,
-	const char* name,
-	LIScrClass* value));
 
 LIAPICALL (void, liscr_args_sets_data, (
 	LIScrArgs*  self,
@@ -283,10 +252,8 @@ LIAPICALL (void, liscr_args_sets_vector, (
 
 /*****************************************************************************/
 
-int
-liscr_marshal_CLASS (lua_State* lua);
+int liscr_marshal_CLASS (lua_State* lua);
 
-int
-liscr_marshal_DATA (lua_State* lua);
+int liscr_marshal_DATA (lua_State* lua);
 
 #endif

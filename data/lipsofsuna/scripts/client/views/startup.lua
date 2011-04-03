@@ -28,6 +28,7 @@ end
 --- Finishes the startup when connection has been established.
 -- @param clss Startup class.
 Startup.close = function(clss)
+	clss.group.floating = false
 	clss.connecting = nil
 	clss.joined = true
 end

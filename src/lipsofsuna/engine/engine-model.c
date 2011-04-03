@@ -112,10 +112,24 @@ LIEngModel* lieng_model_new_copy (
 void lieng_model_free (
 	LIEngModel* self)
 {
+	LIAlgU32dicIter iter;
+	LIEngObject* object;
+
 	lialg_u32dic_remove (self->engine->models, self->id);
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, self->engine, "model-free", lical_marshal_DATA_PTR, self);
+
+	/* Remove from objects. */
+	/* Keeping the model alive when it's assigned to objects is the job of scripts.
+	   If they don't reference the model, we'll remove it even if it's in use. We
+	   prevent crashing by removing it from objects in such a case. */
+	LIALG_U32DIC_FOREACH (iter, self->engine->objects)
+	{
+		object = iter.value;
+		if (object->model == self)
+			object->model = NULL;
+	}
 
 	/* Free data. */
 	if (self->model != NULL)

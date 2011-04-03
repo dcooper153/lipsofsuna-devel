@@ -1,19 +1,8 @@
 Timer = Class()
+Timer.class_name = "Timer"
 Timer.dict_timer = {}
 Timer.dict_delete = {}
 setmetatable(Timer.dict_timer, {__mode = "v"})
-
-Timer.setter = function(self, key, value)
-	if key == "enabled" then
-		if value then
-			self:enable()
-		else
-			self:disable()
-		end
-	else
-		Class.setter(self, key, value)
-	end
-end
 
 --- Creates a new timer and enables it.<br/>
 -- The timer will not be subject to garbage collection when enabled.
@@ -49,6 +38,15 @@ Timer.enable = function(self)
 	Timer.dict_timer[self] = self.owner or true
 	self.updated = Program.time
 end
+
+Timer:add_setters{
+	enabled = function(s, v)
+		if v then
+			s:enable()
+		else
+			s:disable()
+		end
+	end}
 
 -- Register event handler.
 Eventhandler{type = "tick", func = function(self, args)

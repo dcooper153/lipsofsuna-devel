@@ -20,42 +20,16 @@
 
 #include "script-types.h"
 
-LIAPICALL (LIScrClass*, liscr_isanyclass, (
-	lua_State*  lua,
-	int         arg));
-
 LIAPICALL (LIScrData*, liscr_isanydata, (
 	lua_State* lua,
 	int        arg));
-
-LIAPICALL (LIScrClass*, liscr_isclass, (
-	lua_State*  lua,
-	int         arg,
-	const char* meta));
 
 LIAPICALL (LIScrData*, liscr_isdata, (
 	lua_State*  lua,
 	int         arg,
 	const char* meta));
 
-LIAPICALL (int, liscr_copyargs, (
-	lua_State* lua,
-	LIScrData* data,
-	int        arg));
-
-LIAPICALL (void, liscr_pushclass, (
-	lua_State*  lua,
-	LIScrClass* clss));
-
-LIAPICALL (void, liscr_pushclasspriv, (
-	lua_State*  lua,
-	LIScrClass* clss));
-
 LIAPICALL (void, liscr_pushdata, (
-	lua_State* lua,
-	LIScrData* object));
-
-LIAPICALL (void, liscr_pushpriv, (
 	lua_State* lua,
 	LIScrData* object));
 

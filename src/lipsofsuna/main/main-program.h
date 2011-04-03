@@ -43,13 +43,11 @@ struct _LIMaiProgram
 	struct timeval start;
 	struct timeval curr_tick;
 	struct timeval prev_tick;
-	LIAlgList* event_first;
-	LIAlgList* event_last;
 	LIAlgRandom random;
 	LIAlgSectors* sectors;
 	LIAlgStrdic* components;
 	LICalCallbacks* callbacks;
-	LICalHandle calls[8];
+	LICalHandle calls[4];
 	LIEngEngine* engine;
 	LIMaiExtension* extensions;
 	LIPthPaths* paths;
@@ -94,13 +92,6 @@ LIAPICALL (int, limai_program_insert_component, (
 LIAPICALL (int, limai_program_insert_extension, (
 	LIMaiProgram* self,
 	const char*   name));
-
-LIAPICALL (LIScrData*, limai_program_pop_event, (
-	LIMaiProgram* self));
-
-LIAPICALL (int, limai_program_push_event, (
-	LIMaiProgram* self,
-	LIScrData*    event));
 
 LIAPICALL (void, limai_program_remove_component, (
 	LIMaiProgram* self,

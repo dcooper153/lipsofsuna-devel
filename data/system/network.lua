@@ -1,42 +1,135 @@
-if not Program:load_extension("network") then
+require "system/class"
+
+if not Los.program_load_extension("network") then
 	error("loading extension `network' failed")
 end
 
-local network_getters = {
-	clients = function(s) return s:get_clients() end,
-	closed = function(s) return s:get_closed() end,
-	connected = function(s) return s:get_connected() end}
+------------------------------------------------------------------------------
 
-local network_setters = {
-	closed = function(s, v) s:set_closed(v) end}
+Network = Class()
+Network.class_name = "Network"
 
-Network.getter = function(self, key)
-	local networkgetterfunc = network_getters[key]
-	if networkgetterfunc then return networkgetterfunc(self) end
-	return Class.getter(self, key)
+--- Disconnects a client.
+-- @param clss Network class.
+-- @param args Arguments.<ul>
+--   <li>1,client: Client number. (required)</li></ul>
+Network.disconnect = function(clss, args)
+	Los.network_disconnect(args)
 end
 
-Network.setter = function(self, key, value)
-	local networksetterfunc = network_setters[key]
-	if networksetterfunc then return networksetterfunc(self, value) end
-	return Class.setter(self, key, value)
+--- Begins listening for clients.
+-- @param clss Network class.
+-- @param args Arguments.<ul>
+--   <li>port: Port to listen to.</li>
+--   <li>udp: True for UDP.</li></ul>
+-- @return True on success.
+Network.host = function(clss, args)
+	return Los.network_host(args)
 end
 
-local packet_getters = {
-	size = function(s) return s:get_size() end,
-	type = function(s) return s:get_type() end}
-
-local packet_setters = {
-	type = function(s, v) s:set_type(v) end}
-
-Packet.getter = function(self, key)
-	local packetgetterfunc = packet_getters[key]
-	if packetgetterfunc then return packetgetterfunc(self) end
-	return Class.getter(self, key)
+--- Connects to a server.
+-- @param clss Network class.
+-- @param args Arguments.<ul>
+--   <li>host: Server address.</li>
+--   <li>port: Port to listen to.</li>
+-- @return True on success.
+Network.join = function(clss, args)
+	return Los.network_join(args)
 end
 
-Packet.setter = function(self, key, value)
-	local packetsetterfunc = packet_setters[key]
-	if packetsetterfunc then return packetsetterfunc(self, value) end
-	return Class.setter(self, key, value)
+--- Sends a network packet to the client controlling the object.
+-- @param clss Network class.
+-- @param args Arguments.<ul>
+--   <li>client: Client ID if hosting.</li>
+--   <li>packet: Packet.</li>
+--   <li>reliable: Boolean.</li></ul>
+Network.send = function(clss, args)
+	Los.network_send{client = args.client, packet = args.packet.handle, reliable = args.reliable}
 end
+
+--- Disconnects all client and closes the network connection.
+-- @param clss Network class.
+Network.shutdown = function(self)
+	Los.network_shutdown()
+end
+
+--- Updates the network status and generates network events.
+-- @param clss Network class.
+Network.update = function(clss)
+	Los.network_update()
+end
+
+--- Gets the list of connected clients (read-only).
+-- @name Network.clients
+-- @class table
+
+--- Controls whether clients can connect to the server.
+-- @name Network.closed
+-- @class table
+
+--- Gets whether the game connected to network (read-only).
+-- @name Network.connected
+-- @class table
+
+Network.class_getters = {
+	clients = function(s) return Los.network_get_clients() end,
+	closed = function(s) return Los.network_get_closed() end,
+	connected = function(s) return Los.network_get_connected() end}
+
+Network.class_setters = {
+	closed = function(s, v) Los.network_set_closed(v) end}
+
+------------------------------------------------------------------------------
+
+Packet = Class()
+Packet.class_name = "Packet"
+
+--- Creates a new packet.
+-- @param self Packet class.
+-- @param type Packet type.
+-- @param ... Packet contents.
+-- @return New packet.
+Packet.new = function(clss, ...)
+	local self = Class.new(clss)
+	self.handle = Los.packet_new(...)
+	__userdata_lookup[self.handle] = self
+	return self
+end
+
+--- Reads data starting from the beginning of the packet.
+-- @param self Packet.
+-- @param ... Types to read.
+-- @return Boolean and a list of read values.
+Packet.read = function(self, ...)
+	return Los.packet_read(self.handle, ...)
+end
+
+--- Reads data starting from the last read positiong of the packet.
+-- @param self Packet.
+-- @param ... Types to read.
+-- @return Boolean and a list of read values.
+Packet.resume = function(self, ...)
+	return Los.packet_resume(self.handle, ...)
+end
+
+--- Appends data to the packet.
+-- @param self Packet.
+-- @param ... Types to write.
+Packet.write = function(self, ...)
+	return Los.packet_write(self.handle, ...)
+end
+
+--- Size in bytes.
+-- @name Packet.size
+-- @class table
+
+--- Type number.
+-- @name Packet.type
+-- @class table
+
+Packet:add_getters{
+	size = function(s) return Los.packet_get_size(s.handle) end,
+	type = function(s) return Los.packet_get_type(s.handle) end}
+
+Packet:add_setters{
+	type = function(s, v) Los.packet_set_type(s.handle, v) end}

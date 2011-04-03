@@ -30,15 +30,20 @@
 
 #define VOXEL_BORDER_TOLERANCE 0.05f
 
-static void
-private_clear_materials (LIVoxManager* self);
+static void private_clear_materials (
+	LIVoxManager* self);
 
-static void
-private_mark_block (LIVoxManager* self,
-                    LIVoxSector*  sector,
-                    int           x,
-                    int           y,
-                    int           z);
+static void private_mark_block (
+	LIVoxManager* self,
+	LIVoxSector*  sector,
+	int           x,
+	int           y,
+	int           z);
+
+static void private_configure (
+	LIVoxManager* self,
+	int           blocks_per_line,
+	int           tiles_per_line);
 
 /*****************************************************************************/
 
@@ -54,7 +59,7 @@ livox_manager_new (LICalCallbacks* callbacks,
 		return NULL;
 	self->callbacks = callbacks;
 	self->sectors = sectors;
-	livox_manager_configure (self, 4, 16);
+	private_configure (self, 4, 16);
 
 	/* Allocate materials. */
 	self->materials = lialg_u32dic_new ();
@@ -142,16 +147,12 @@ int livox_manager_configure (
 	int           blocks_per_line,
 	int           tiles_per_line)
 {
-	if (self->sectors->sectors->size)
+	if (self->sectors != NULL && self->sectors->sectors->size)
 	{
 		lisys_error_set (EINVAL, "cannot change grid settings when the map is populated");
 		return 0;
 	}
-	self->blocks_per_line = blocks_per_line;
-	self->blocks_per_sector = self->blocks_per_line * self->blocks_per_line * self->blocks_per_line;
-	self->tiles_per_line = tiles_per_line;
-	self->tiles_per_sector = self->tiles_per_line * self->tiles_per_line * self->tiles_per_line;
-	self->tile_width = self->sectors->width / self->tiles_per_line;
+	private_configure (self, blocks_per_line, tiles_per_line);
 
 	return 1;
 }
@@ -666,6 +667,18 @@ static void private_clear_materials (
 		livox_material_free (material);
 	}
 	lialg_u32dic_clear (self->materials);
+}
+
+static void private_configure (
+	LIVoxManager* self,
+	int           blocks_per_line,
+	int           tiles_per_line)
+{
+	self->blocks_per_line = blocks_per_line;
+	self->blocks_per_sector = self->blocks_per_line * self->blocks_per_line * self->blocks_per_line;
+	self->tiles_per_line = tiles_per_line;
+	self->tiles_per_sector = self->tiles_per_line * self->tiles_per_line * self->tiles_per_line;
+	self->tile_width = self->sectors->width / self->tiles_per_line;
 }
 
 static void private_mark_block (

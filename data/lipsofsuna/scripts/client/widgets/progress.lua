@@ -1,31 +1,5 @@
 Widgets.Progress = Class(Widget)
 
-Widgets.Progress.setter = function(self, key, value)
-	if key == "min" then
-		if self.min ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "max" then
-		if self.max ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "text" then
-		if self.text ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "value" then
-		if self.value ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	else
-		Widget.setter(self, key, value)
-	end
-end
-
 Widgets.Progress.new = function(clss, args)
 	local self = Widget.new(clss, args)
 	self.min = self.min or 0
@@ -77,3 +51,31 @@ Widgets.Progress.reshaped = function(self)
 		text_font = "tiny"}
 	self:canvas_compile()
 end
+
+Widgets.Progress:add_getters{
+	max = function(self) return rawget(self, "__max") end,
+	min = function(self) return rawget(self, "__min") end,
+	text = function(self) return rawget(self, "__text") end,
+	value = function(self) return rawget(self, "__value") end}
+
+Widgets.Progress:add_setters{
+	max = function(self, value)
+		if self.max == value then return end
+		rawset(self, "__max", value)
+		self:reshaped()
+	end,
+	min = function(self, value)
+		if self.min == value then return end
+		rawset(self, "__min", value)
+		self:reshaped()
+	end,
+	text = function(self, value)
+		if self.text == value then return end
+		rawset(self, "__text", value)
+		self:reshaped()
+	end,
+	value = function(self, value)
+		if self.value == value then return end
+		rawset(self, "__value", value)
+		self:reshaped()
+	end}

@@ -1,17 +1,6 @@
 Widgets.Icon = Class(Widget)
 Widgets.Icon.DEFAULT = {image="icons1", offset={0,0}, size={34,34}}
 
-Widgets.Icon.setter = function(self, key, value)
-	if key == "icon" then
-		if self.icon ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	else
-		Widget.setter(self, key, value)
-	end
-end
-
 Widgets.Icon.new = function(clss, args)
 	local self = Widget.new(clss, args)
 	self.icon = self.icon or clss.DEFAULT
@@ -38,3 +27,13 @@ end
 
 Widgets.Icon.pressed = function(self, args)
 end
+
+Widgets.Icon:add_getters{
+	icon = function(self) return rawget(self, "__icon") end}
+
+Widgets.Icon:add_setters{
+	icon = function(self, value)
+		if self.icon == value then return end
+		rawset(self, "__icon", value)
+		self:reshaped()
+	end}

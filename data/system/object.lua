@@ -1,69 +1,146 @@
-local getters = {
-	angular = function(s) return s:get_angular() end,
-	collision_group = function(s) return s:get_collision_group() end,
-	collision_mask = function(s) return s:get_collision_mask() end,
-	contact_events = function(s) return s:get_contact_events() end,
-	gravity = function(s) return s:get_gravity() end,
-	ground = function(s) return s:get_ground() end,
-	mass = function(s) return s:get_mass() end,
-	model = function(s) return s:get_model() end,
+require "system/model"
+
+Object = Class()
+Object.class_name = "Object"
+
+--- Finds all objects inside a sphere.
+-- @param clss Object class.
+-- @param args Arguments.<ul>
+--   <li>point: Center point.</li>
+--   <li>radius: Search radius.</li>
+--   <li>sector: Return all object in this sector.</li></ul>
+-- @return Table of matching objects.
+Object.find = function(clss, args)
+	local t = Los.object_find{
+		point = args.point and args.point.handle,
+		radius = args.radius,
+		sector = args.sector}
+	for k,v in pairs(t) do t[k] = __userdata_lookup[v] end
+	return t
+end
+
+--- Creates a new object.
+-- @param clss Object class.
+-- @param args Arguments.
+-- @return New object.
+Object.new = function(clss, args)
+	local self = Class.new(clss)
+	self.handle = Los.object_new()
+	__userdata_lookup[self.handle] = self
+	if args then
+		for k,v in pairs(args) do self[k] = v end
+	end
+	return self
+end
+
+--- Recalculates the bounding box of the model of the object.
+-- @param self Object.
+Object.calculate_bounds = function(self)
+	Los.object_calculate_bounds(self.handle)
+end
+
+--- Prevents map sectors around the object from being unloaded.
+-- @param self Object.
+-- @param args Arguments.<ul>
+--   <li>radius: Refresh radius.</li></ul>
+Object.refresh = function(self, args)
+	Los.object_refresh(self.handle, args)
+end
+
+--- The model of the object.
+-- @name Object.model
+-- @class table
+
+--- The position of the object.
+-- @name Object.position
+-- @class table
+
+--- The realization status of the object.
+-- @name Object.realized
+-- @class table
+
+--- The rotation of the object.
+-- @name Object.rotation
+-- @class table
+
+--- The map sector of the object (read-only).
+-- @name Object.sector
+-- @class table
+
+Object:add_getters{
+	model = function(s) return rawget(s, "__model") end,
 	model_name = function(s)
-		local m = s:get_model()
+		local m = rawget(s, "__model")
 		return m and m.name or ""
 	end,
-	movement = function(s) return Object.get_movement(s) end,
-	physics = function(s) return s:get_physics() end,
-	position = function(s) return s:get_position() end,
-	rotation = function(s) return s:get_rotation() end,
-	realized = function(s) return s:get_realized() end,
-	sector = function(s) return s:get_sector() end,
-	shape = function(s) return s:get_shape() end,
-	speed = function(s) return s:get_speed() end,
-	strafing = function(s) return Object.get_strafing(s) end,
-	velocity = function(s) return s:get_velocity() end}
+	position = function(s) return Class.new(Vector, {handle = Los.object_get_position(s.handle)}) end,
+	rotation = function(s) return Class.new(Quaternion, {handle = Los.object_get_rotation(s.handle)}) end,
+	realized = function(s) return Los.object_get_realized(s.handle) end,
+	sector = function(s) return Los.object_get_sector(s.handle) end}
 
-local setters = {
-	angular = function(s, v) s:set_angular(v) end,
-	collision_group = function(s, v) s:set_collision_group(v) end,
-	collision_mask = function(s, v) s:set_collision_mask(v) end,
-	contact_events = function(s, v) s:set_contact_events(v) end,
-	friction_liquid = function(s, v) s:set_friction_liquid(v) end,
-	gravity = function(s, v) s:set_gravity(v) end,
-	gravity_liquid = function(s, v) s:set_gravity_liquid(v) end,
-	ground = function(s, v) s:set_ground(v) end,
-	mass = function(s, v) s:set_mass(v) end,
+Object:add_setters{
 	model = function(s, v)
-		if type(v) == "string" then
-			s:set_model(Model:load{file = v, mesh = s.load_meshes})
+		local m = v
+		if type(v) == "string" then m = Model:load{file = v, mesh = s.load_meshes} end
+		rawset(s, "__model", m)
+		Los.object_set_model(s.handle, m and m.handle)
+	end,
+	model_name = function(s, v) s.model = Model:load{file = v, mesh = s.load_meshes} end,
+	position = function(s, v) Los.object_set_position(s.handle, v.handle) end,
+	rotation = function(s, v) Los.object_set_rotation(s.handle, v.handle) end,
+	realized = function(s, v)
+		if Los.object_get_realized(s.handle) == v then return end
+		if v then
+			__objects_realized[s] = true
+			Los.object_set_realized(s.handle, true)
+			Program:push_event{type = "object-visibility", visible = true}
 		else
-			s:set_model(v)
+			__objects_realized[s] = nil
+			Los.object_set_realized(s.handle, false)
+			Program:push_event{type = "object-visibility", visible = false}
 		end
-	end,
-	model_name = function(s, v)
-		s:set_model(Model:load{file = v, mesh = s.load_meshes})
-	end,
-	movement = function(s, v) Object.set_movement(s, v) end,
-	physics = function(s, v) s:set_physics(v) end,
-	position = function(s, v) s:set_position(v) end,
-	rotation = function(s, v) s:set_rotation(v) end,
-	realized = function(s, v) s:set_realized(v) end,
-	sector = function(s, v) s:set_sector(v) end,
-	shape = function(s, v) s:set_shape(v) end,
-	speed = function(s, v) s:set_speed(v) end,
-	strafing = function(s, v) Object.set_strafing(s, v) end,
-	velocity = function(s, v) s:set_velocity(v) end}
+	end}
 
-Object.getters = getters
-Object.setters = setters
-
-Object.getter = function(self, key)
-	local objectgetterfunc = getters[key]
-	if objectgetterfunc then return objectgetterfunc(self) end
-	return Class.getter(self, key)
+Object.unittest = function()
+	-- Getters and setters.
+	do
+		local obj = Object{position = Vector(1,2,3), realized = true}
+		assert(obj.position.class == Vector)
+		assert(obj.position.x == 1 and obj.position.y == 2 and obj.position.z == 3)
+		assert(obj.rotation.class == Quaternion)
+		assert(obj.realized)
+		assert(obj.sector == 0)
+		obj.realized = false
+		assert(obj.sector == nil)
+		collectgarbage()
+	end
+	-- Name field.
+	do
+		local obj = Object()
+		assert(obj.name == nil)
+		assert(obj.class_name == "Object")
+		obj.name = "Yui"
+		assert(obj.name == "Yui")
+		obj.name = nil
+		assert(obj.name == nil)
+		collectgarbage()
+	end
+	-- Keeping realized objects.
+	for i = 1,100 do Object{model = Model(), position = Vector(10*i,50,50), realized = true} end
+	collectgarbage()
+	local num = 0
+	for k,v in pairs(__objects_realized) do num = num + 1 end
+	assert(num == 100)
+	-- Physics simulation.
+	for i = 1,1000 do
+		local o = Object{model = Model(), position = Vector(50,50,50), realized = true}
+		Program:update()
+		o.realized = false
+	end
+	-- Unloading objects.
+	Program:unload_world()
+	for k,v in pairs(__objects_realized) do assert(false) end
+	collectgarbage()
 end
 
-Object.setter = function(self, key, value)
-	local objectsetterfunc = setters[key]
-	if objectsetterfunc then return objectsetterfunc(self, value) end
-	return Class.setter(self, key, value)
-end
+__objects_realized = {}

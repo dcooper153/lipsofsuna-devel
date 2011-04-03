@@ -1,13 +1,12 @@
-if not Program:load_extension("reload") then
+if not Los.program_load_extension("reload") then
 	error("loading extension `reload' failed")
 end
 
-Reload.getter = function(self, key)
-	if key == "enabled" then return self:get_enabled() end
-	return Class.getter(self, key)
-end
+Reload = Class()
+Reload.class_name = "Reload"
 
-Reload.setter = function(self, key, value)
-	if key == "enabled" then return self:set_enabled(value) end
-	return Class.setter(self, key, value)
-end
+Reload:add_getters{
+	function(s) return Los.reload_get_enabled() end}
+
+Reload:add_setters{
+	function(s, v) Los.reload_set_enabled(v) end}

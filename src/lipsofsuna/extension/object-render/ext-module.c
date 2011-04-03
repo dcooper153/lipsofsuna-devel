@@ -80,7 +80,6 @@ LIExtModule* liext_object_render_new (
 	LIMaiProgram* program)
 {
 	LIExtModule* self;
-	LIScrClass* clss;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
@@ -122,12 +121,10 @@ LIExtModule* liext_object_render_new (
 	}
 
 	/* Extend classes. */
-	clss = liscr_script_find_class (program->script, "Model");
-	if (clss != NULL)
-		liext_script_render_model (clss, self);
-	clss = liscr_script_find_class (program->script, "Object");
-	if (clss != NULL)
-		liext_script_render_object (clss, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_RENDER_MODEL, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_RENDER_OBJECT, self);
+	liext_script_render_model (program->script);
+	liext_script_render_object (program->script);
 
 	return self;
 }
@@ -172,13 +169,28 @@ static int private_model_free (
 	LIExtModule* self,
 	LIEngModel*  model)
 {
+	LIAlgU32dicIter iter;
 	LIRenModel* model_;
+	LIRenObject* object;
 
+	/* Find the model. */
 	lisys_assert (model != NULL);
-
 	model_ = liren_render_find_model (self->render, model->id);
-	if (model_ != NULL)
-		liren_model_free (model_);
+	if (model_ == NULL)
+		return 1;
+
+	/* Remove from objects. */
+	/* Keeping the model alive when it's assigned to objects is the job of scripts.
+	   If they don't reference the model, we'll remove it even if it's in use. We
+	   prevent crashing by removing it from objects in such a case. */
+	LIALG_U32DIC_FOREACH (iter, self->scene->objects)
+	{
+		object = iter.value;
+		if (object->model == model_)
+			liren_object_set_model (object, NULL);
+	}
+
+	liren_model_free (model_);
 
 	return 1;
 }

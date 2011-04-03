@@ -394,6 +394,26 @@ LIPhyObject* liphy_physics_find_object (
 }
 
 /**
+ * \brief Removes the model from all objects.
+ * \param self Physics simulation.
+ * \param model Physics model.
+ */
+void liphy_physics_remove_model (
+	LIPhyPhysics* self,
+	LIPhyModel*   model)
+{
+	LIAlgU32dicIter iter;
+	LIPhyObject* object;
+
+	LIALG_U32DIC_FOREACH (iter, self->objects)
+	{
+		object = (LIPhyObject*) iter.value;
+		if (object->model == model)
+			liphy_object_set_model (object, NULL);
+	}
+}
+
+/**
  * \brief Updates the physics simulation.
  * \param self Physics simulation.
  * \param secs Tick length in seconds.
@@ -403,7 +423,9 @@ void liphy_physics_update (
 	float         secs)
 {
 	/* Step simulation. */
+	self->updating = 1;
 	self->dynamics->stepSimulation (secs, 20);
+	self->updating = 0;
 }
 
 /**

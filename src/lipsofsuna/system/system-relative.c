@@ -38,10 +38,10 @@
 #include <windows.h>
 #endif
 #include "system-relative.h"
+#include "system-memory.h"
 
 /**
  * \brief Gets the file name of the calling executable.
- *
  * \return New string or NULL.
  */
 char*
@@ -58,10 +58,10 @@ lisys_relative_exename ()
 
 	/* Allocate memory. */
 	buf_size = PATH_MAX + 128;
-	path = (char *) malloc (buf_size);
+	path = (char *) lisys_malloc (buf_size);
 	if (path == NULL)
 		return NULL;
-	tmp = (char*) malloc (buf_size);
+	tmp = (char*) lisys_malloc (buf_size);
 	if (tmp == NULL)
 	{
 		free (path);
@@ -95,7 +95,7 @@ lisys_relative_exename ()
 		}
 
 		/* Return the final path. */
-		free (tmp);
+		lisys_free (tmp);
 		return path;
 	}
 
@@ -106,7 +106,7 @@ lisys_relative_exename ()
 		f = fopen ("/proc/self/maps", "r");
 		if (f == NULL)
 		{
-			free (path);
+			lisys_free (path);
 			return NULL;
 		}
 
@@ -114,7 +114,7 @@ lisys_relative_exename ()
 		if (fgets (path, (int) buf_size, f) == NULL)
 		{
 			fclose (f);
-			free (path);
+			lisys_free (path);
 			return NULL;
 		}
 
@@ -123,7 +123,7 @@ lisys_relative_exename ()
 		if (buf_size <= 0)
 		{
 			fclose (f);
-			free (path);
+			lisys_free (path);
 			return NULL;
 		}
 		if (path[buf_size - 1] == 10)
@@ -134,16 +134,20 @@ lisys_relative_exename ()
 		if (tmp == NULL)
 		{
 			fclose (f);
-			free (path);
+			lisys_free (path);
 			return NULL;
 		}
 	}
 
-	/* Return the name. */
-	tmp = strdup (tmp);
-	free (path);
+	/* Construct the final string. */
+	lisys_free (path);
+	path = calloc (strlen (tmp) + 1, sizeof (char));
+	if (path == NULL)
+		return NULL;
+	strcpy (path, tmp);
 	fclose (f);
-	return tmp;
+
+	return path;
 #elif defined WIN32
 	char* tmp;
 	char name[MAX_PATH];
@@ -162,7 +166,13 @@ lisys_relative_exename ()
 			*tmp = '/';
 	}
 
-	return strdup (name);
+	/* Construct the final string. */
+	tmp = lisys_calloc (strlen (name) + 1, sizeof (char));
+	if (tmp == NULL)
+		return NULL;
+	strcpy (tmp, name);
+
+	return tmp;
 #else
 #warning "Not supported."
 	return NULL;
@@ -171,11 +181,9 @@ lisys_relative_exename ()
 
 /**
  * \brief Gets the directory in which the calling executable is.
- *
  * \return New string or NULL.
  */
-char*
-lisys_relative_exedir ()
+char* lisys_relative_exedir ()
 {
 #if defined WIN32 || defined linux
 	char* tmp;
@@ -187,7 +195,7 @@ lisys_relative_exedir ()
 	ptr = strrchr (tmp, '/');
 	if (ptr == NULL)
 	{
-		free (tmp);
+		lisys_free (tmp);
 		return NULL;
 	}
 	*(ptr + 1) = '\0';

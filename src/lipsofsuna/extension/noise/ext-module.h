@@ -47,7 +47,6 @@ float liext_noise_perlin_noise (
 /*****************************************************************************/
 
 void liext_script_noise (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

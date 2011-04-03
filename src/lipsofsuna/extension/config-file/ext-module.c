@@ -43,7 +43,8 @@ LIExtModule* liext_config_file_new (
 	self->program = program;
 
 	/* Register classes. */
-	liscr_script_create_class (program->script, "ConfigFile", liext_script_config_file, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_CONFIG_FILE, self);
+	liext_script_config_file (program->script);
 
 	return self;
 }

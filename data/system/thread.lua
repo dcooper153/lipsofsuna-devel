@@ -1,4 +1,5 @@
 Thread = Class()
+Thread.class_name = "Thread"
 Thread.routines = {}
 
 --- Creates a thread executing a function.

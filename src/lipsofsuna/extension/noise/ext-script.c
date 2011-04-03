@@ -24,26 +24,6 @@
 
 #include "ext-module.h"
 
-/* @luadoc
- * module "core/noise"
- * --- Generate noise.
- * -- @name Noise
- * -- @class table
- */
-
-/* @luadoc
- * --- Generates Perlin noise.
- * -- @param self Noise class.
- * -- @param args Arguments.<ul>
- * --   <li>1,point: Position vector.</li>
- * --   <li>2,scale: Coordinate scale factor.</li>
- * --   <li>3,frequency: Noise frequency.</li>
- * --   <li>4,octaves: Number of octaves.
- * --   <li>5,persistence: Noise persistence.</li></ul>
- * --   <li>6,seed: Noise seed.</li></ul>
- * -- @return Noise value.
- * Noise.perlin_noise(self, args)
- */
 static void Noise_perlin_noise (LIScrArgs* args)
 {
 	int seed = 0;
@@ -54,7 +34,7 @@ static void Noise_perlin_noise (LIScrArgs* args)
 	LIMatVector point;
 	LIMatVector scale = { 1.0f, 1.0f, 1.0f};
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NOISE);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_NOISE);
 	if (!liscr_args_geti_vector (args, 0, &point) &&
 	    !liscr_args_gets_vector (args, "point", &point))
 		return;
@@ -73,22 +53,6 @@ static void Noise_perlin_noise (LIScrArgs* args)
 		scale.x * point.x, scale.y * point.y, scale.z * point.z, seed, octaves, frequency, persistence));
 }
 
-/* @luadoc
- * --- Finds all noise coordinates whose values exceed a threshold and creates voxel terrain out of them.
- * -- @param self Noise class.
- * -- @param args Arguments.<ul>
- * --   <li>1,min: Range start position vector.</li>
- * --   <li>2,max: Range end position vector.</li>
- * --   <li>3,tile: Tile type.</li>
- * --   <li>4,threshold: Threshold value.</li>
- * --   <li>5,scale: Coordinate scale factor.</li>
- * --   <li>6,frequency: Noise frequency.</li>
- * --   <li>7,octaves: Number of octaves.
- * --   <li>8,persistence: Noise persistence.</li>
- * --   <li>9,seed: Noise seed.</li></ul>
- * -- @return Table of vectors.
- * Noise.perlin_threshold(self, args)
- */
 static void Noise_perlin_terrain (LIScrArgs* args)
 {
 	int i;
@@ -110,7 +74,7 @@ static void Noise_perlin_terrain (LIScrArgs* args)
 	LIVoxVoxel* tmp;
 	LIVoxManager* voxels;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NOISE);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_NOISE);
 	voxels = limai_program_find_component (module->program, "voxels");
 	if (voxels == NULL)
 		return;
@@ -174,21 +138,6 @@ static void Noise_perlin_terrain (LIScrArgs* args)
 	lisys_free (tmp);
 }
 
-/* @luadoc
- * --- Finds all noise coordinates whose values exceed a threshold.
- * -- @param self Noise class.
- * -- @param args Arguments.<ul>
- * --   <li>1,min: Range start position vector.</li>
- * --   <li>2,max: Range end position vector.</li>
- * --   <li>3,threshold: Threshold value.</li>
- * --   <li>4,scale: Coordinate scale factor.</li>
- * --   <li>5,frequency: Noise frequency.</li>
- * --   <li>6,octaves: Number of octaves.
- * --   <li>7,persistence: Noise persistence.</li>
- * --   <li>8,seed: Noise seed.</li></ul>
- * -- @return Table of vectors.
- * Noise.perlin_threshold(self, args)
- */
 static void Noise_perlin_threshold (LIScrArgs* args)
 {
 	int min[3];
@@ -206,7 +155,7 @@ static void Noise_perlin_threshold (LIScrArgs* args)
 	LIMatVector point2;
 	LIMatVector scale = { 1.0f, 1.0f, 1.0f};
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_NOISE);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_NOISE);
 	if (!liscr_args_geti_vector (args, 0, &point1) &&
 	    !liscr_args_gets_vector (args, "min", &point1))
 		return;
@@ -250,14 +199,11 @@ static void Noise_perlin_threshold (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_noise (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_NOISE, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "perlin_noise", Noise_perlin_noise);
-	liscr_class_insert_cfunc (self, "perlin_terrain", Noise_perlin_terrain);
-	liscr_class_insert_cfunc (self, "perlin_threshold", Noise_perlin_threshold);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NOISE, "noise_perlin_noise", Noise_perlin_noise);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NOISE, "noise_perlin_terrain", Noise_perlin_terrain);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NOISE, "noise_perlin_threshold", Noise_perlin_threshold);
 }
 
 /** @} */

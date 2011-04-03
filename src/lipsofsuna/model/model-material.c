@@ -112,7 +112,7 @@ void
 limdl_material_free (LIMdlMaterial* self)
 {
 	limdl_material_clear_textures (self);
-	free (self->shader);
+	lisys_free (self->shader);
 }
 
 int

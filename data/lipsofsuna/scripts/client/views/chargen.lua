@@ -1,4 +1,5 @@
 Views.Chargen = Class(Widgets.Scene)
+Views.Chargen.class_name = "Views.Chargen"
 Views.Chargen.mode = "chargen"
 Views.Chargen.list_races = {
 	{"Aer - female", "aer"},
@@ -30,7 +31,7 @@ Views.Chargen.new = function(clss)
 		self.skills_text.text = {{skill.name, "medium"}, {skill.desc}}
 	end
 	self.object = Object{position = Vector(1, 1, 1), type = "character"}
-	self.light = Light{ambient = {1.0,1.0,1.0,1.0}, diffuse={1.0,1.0,1.0,1.0}, equation={2,0.3,0.03}}
+	self.light = Light{ambient = {1.0,1.0,1.0,1.0}, diffuse = {1.0,1.0,1.0,1.0}, equation = {2,0.3,0.03}}
 	self.timer = Timer{enabled = false, func = function(timer, secs) self:update(secs) end}
 	self.list_hair_styles = {}
 	self.list_eye_styles = {}

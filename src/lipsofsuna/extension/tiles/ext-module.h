@@ -52,15 +52,12 @@ LIVoxManager* liext_tiles_get_voxels (
 /*****************************************************************************/
 
 void liext_script_material (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 void liext_script_tile (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 void liext_script_voxel (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

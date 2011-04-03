@@ -46,11 +46,9 @@ void liext_widgets_callback_paint (
 /*****************************************************************************/
 
 void liext_script_widget (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 void liext_script_widgets (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

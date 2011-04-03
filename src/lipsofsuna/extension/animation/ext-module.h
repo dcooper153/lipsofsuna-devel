@@ -37,7 +37,6 @@ void liext_animation_free (
 /*****************************************************************************/
 
 void liext_script_object_animation (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

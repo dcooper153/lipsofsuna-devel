@@ -89,8 +89,10 @@ LIExtModule* liext_widgets_new (
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (program->script, "Widgets", liext_script_widgets, self);
-	liscr_script_create_class (program->script, "Widget", liext_script_widget, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_WIDGET, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_WIDGETS, self);
+	liext_script_widget (program->script);
+	liext_script_widgets (program->script);
 
 	return self;
 }
@@ -118,23 +120,20 @@ void liext_widgets_callback_paint (
 	LIScrScript* script = liscr_data_get_script (data);
 	lua_State* lua = liscr_script_get_lua (script);
 
-	/* Invoke callback. */
-	liscr_pushdata (lua, data);
-	lua_getfield (lua, -1, "render");
-	if (lua_type (lua, -1) == LUA_TFUNCTION)
+	/* Call a global function. */
+	lua_getglobal (lua, "__widget_render");
+	if (lua_type (lua, -1) != LUA_TFUNCTION)
 	{
-		/* Call the Lua function. */
-		lua_pushvalue (lua, -2);
-		lua_remove (lua, -3);
-		if (lua_pcall (lua, 1, 0, 0) != 0)
-		{
-			lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.render: %s", lua_tostring (lua, -1));
-			lisys_error_report ();
-			lua_pop (lua, 1);
-		}
+		lua_pop (lua, 1);
+		return;
 	}
-	else
-		lua_pop (lua, 2);
+	liscr_pushdata (lua, data);
+	if (lua_pcall (lua, 1, 0, 0) != 0)
+	{
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.render: %s", lua_tostring (lua, -1));
+		lisys_error_report ();
+		lua_pop (lua, 1);
+	}
 }
 
 /*****************************************************************************/
@@ -149,31 +148,23 @@ static void private_widget_allocation (
 	LIExtModule* module,
 	LIWdgWidget* widget)
 {
-	LIScrScript* script;
-	LIScrData* data;
-	lua_State* lua;
+	LIScrScript* script = module->program->script;
+	lua_State* lua = liscr_script_get_lua (script);
 
-	if (widget->script == NULL)
-		return;
-	data = widget->script;
-	script = liscr_data_get_script (data);
-	lua = liscr_script_get_lua (script);
-
-	liscr_pushdata (lua, data);
-	lua_getfield (lua, -1, "reshaped");
-	if (lua_type (lua, -1) == LUA_TFUNCTION)
+	/* Call a global function. */
+	lua_getglobal (lua, "__widget_reshape");
+	if (lua_type (lua, -1) != LUA_TFUNCTION)
 	{
-		lua_pushvalue (lua, -2);
-		lua_remove (lua, -3);
-		if (lua_pcall (lua, 1, 0, 0) != 0)
-		{
-			lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.reshaped: %s", lua_tostring (lua, -1));
-			lisys_error_report ();
-			lua_pop (lua, 1);
-		}
+		lua_pop (lua, 1);
+		return;
 	}
-	else
-		lua_pop (lua, 2);
+	liscr_pushdata (lua, widget->script);
+	if (lua_pcall (lua, 1, 0, 0) != 0)
+	{
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.reshaped: %s", lua_tostring (lua, -1));
+		lisys_error_report ();
+		lua_pop (lua, 1);
+	}
 }
 
 static int private_widget_tick (

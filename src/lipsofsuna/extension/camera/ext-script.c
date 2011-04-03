@@ -24,20 +24,6 @@
 
 #include "ext-module.h"
 
-/* @luadoc
- * module "core/camera"
- * --- Camera control.
- * -- @name Camera
- * -- @class table
- */
-
-/* @luadoc
- * --- Creates a new camera.
- * --
- * -- @param self Camera class.
- * -- @param args Arguments.
- * function Camera.new(self, args)
- */
 static void Camera_new (LIScrArgs* args)
 {
 	LIAlgCamera* self;
@@ -45,7 +31,7 @@ static void Camera_new (LIScrArgs* args)
 	LIScrData* data;
 
 	/* Allocate self. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_CAMERA);
 	self = lialg_camera_new ();
 	if (self == NULL)
 		return;
@@ -56,26 +42,16 @@ static void Camera_new (LIScrArgs* args)
 		module->client->window->mode.height);
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, args->clss, lialg_camera_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_CAMERA, lialg_camera_free);
 	if (data == NULL)
 	{
 		lialg_camera_free (self);
 		return;
 	}
-	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
 	liscr_data_unref (data);
 }
 
-/* @luadoc
- * --- Moves the camera forward or backward.
- * --
- * -- @param self Camera.
- * -- @param args Arguments.<ul>
- * --   <li>rate: Movement rate.</li>
- * --   <li>keep: True if should keep moving.</li></ul>
- * function Camera.move(self, args)
- */
 static void Camera_move (LIScrArgs* args)
 {
 	int keep = 0;
@@ -93,15 +69,6 @@ static void Camera_move (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Creates a picking ray for the current camera configuration.
- * -- @param self Camera.
- * -- @param args Arguments.<ul>
- * --   <li>cursor: Cursor position, in pixels.</li>
- * --   <li>far: Ray end distance, in world coordinate units.</li>
- * --   <li>near: Ray start distance, in world coordinate units.</li></ul>
- * function Camera.picking_ray(self, args)
- */
 static void Camera_picking_ray (LIScrArgs* args)
 {
 	float fardist = 50.0f;
@@ -138,13 +105,6 @@ static void Camera_picking_ray (LIScrArgs* args)
 	liscr_args_seti_vector (args, &ray1);
 }
 
-/* @luadoc
- * ---
- * -- Resets the look spring transformation of the camera.
- * --
- * -- @param self Camera.
- * function Camera.reset(self)
- */
 static void Camera_reset (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
@@ -156,15 +116,6 @@ static void Camera_reset (LIScrArgs* args)
 	lialg_camera_warp (camera);
 }
 
-/* @luadoc
- * --- Sets the tilting rate of the camera.
- * --
- * -- @param self Camera.
- * -- @param args Arguments.<ul>
- * --   <li>rate: Tilting rate.</li>
- * --   <li>keep: True if should keep tilting.</li></ul>
- * function Camera.tilt(self, args)
- */
 static void Camera_tilt (LIScrArgs* args)
 {
 	int keep = 0;
@@ -183,15 +134,6 @@ static void Camera_tilt (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Sets the turning rate of the camera.
- * --
- * -- @param self Camera.
- * -- @param args Arguments.<ul>
- * --   <li>rate: Turning rate.</li>
- * --   <li>keep: True if should keep turning.</li></ul>
- * function Camera.turn(self, args)
- */
 static void Camera_turn (LIScrArgs* args)
 {
 	int keep = 0;
@@ -210,24 +152,11 @@ static void Camera_turn (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Warps the camera to the target point.
- * -- @param self Camera.
- * function Camera.warp(self)
- */
 static void Camera_warp (LIScrArgs* args)
 {
 	lialg_camera_warp (args->self);
 }
 
-/* @luadoc
- * --- Animates the camera.
- * --
- * -- @param self Camera.
- * -- @param args Arguments.<ul>
- * --   <li>1,secs: Tick length. (required)</li></ul>
- * function Camera.update(self, args)
- */
 static void Camera_update (LIScrArgs* args)
 {
 	float secs;
@@ -237,21 +166,12 @@ static void Camera_update (LIScrArgs* args)
 	if (liscr_args_geti_float (args, 0, &secs) ||
 	    liscr_args_gets_float (args, "secs", &secs))
 	{
-		module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_CAMERA);
+		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_CAMERA);
 		camera = args->self;
 		liext_cameras_update (module, camera, secs);
 	}
 }
 
-/* @luadoc
- * --- Adjusts the zoom of the camera.
- * --
- * -- @param self Camera.
- * -- @param args Arguments.<ul>
- * --   <li>rate: Zooming rate.</li>
- * --   <li>keep: True if should keep zooming.</li></ul>
- * function Camera.zoom(self, args)
- */
 static void Camera_zoom (LIScrArgs* args)
 {
 	int keep = 0;
@@ -269,11 +189,6 @@ static void Camera_zoom (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- The collision group of the camera.
- * -- @name Camera.collision_group
- * -- @class table
- */
 static void Camera_get_collision_group (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
@@ -291,11 +206,6 @@ static void Camera_set_collision_group (LIScrArgs* args)
 		camera->config.collision_group = value;
 }
 
-/* @luadoc
- * --- The collision mask of the camera.
- * -- @name Camera.collision_mask
- * -- @class table
- */
 static void Camera_get_collision_mask (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
@@ -313,11 +223,6 @@ static void Camera_set_collision_mask (LIScrArgs* args)
 		camera->config.collision_mask = value;
 }
 
-/* @luadoc
- * --- Far plane of the camera.
- * -- @name Camera.far
- * -- @class table
- */
 static void Camera_set_far (LIScrArgs* args)
 {
 	float value;
@@ -330,11 +235,6 @@ static void Camera_set_far (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- The field of view of the camera.
- * -- @name Camera.fov
- * -- @class table
- */
 static void Camera_get_fov (LIScrArgs* args)
 {
 	liscr_args_seti_float (args, lialg_camera_get_fov (args->self));
@@ -347,14 +247,6 @@ static void Camera_set_fov (LIScrArgs* args)
 	lialg_camera_set_fov (args->self, fov);
 }
 
-/* @luadoc
- * --- Camera mode.
- * --
- * -- Recognized values: "first-person"/"manual"/"third-person".
- * --
- * -- @name Camera.mode
- * -- @class table
- */
 static void Camera_get_mode (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
@@ -390,11 +282,6 @@ static void Camera_set_mode (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Modelview matrix.
- * -- @name Camera.modelview
- * -- @class table
- */
 static void Camera_get_modelview (LIScrArgs* args)
 {
 	int i;
@@ -408,11 +295,6 @@ static void Camera_get_modelview (LIScrArgs* args)
 		liscr_args_seti_float (args, matrix.m[i]);
 }
 
-/* @luadoc
- * --- Near plane of the camera.
- * -- @name Camera.far
- * -- @class table
- */
 static void Camera_set_near (LIScrArgs* args)
 {
 	float value;
@@ -425,11 +307,6 @@ static void Camera_set_near (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Camera position.
- * -- @name Camera.position
- * -- @class table
- */
 static void Camera_get_position (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
@@ -440,11 +317,6 @@ static void Camera_get_position (LIScrArgs* args)
 	liscr_args_seti_vector (args, &transform.position);
 }
 
-/* @luadoc
- * --- The position smoothing factor of the camera.
- * -- @name Camera.position_smoothing
- * -- @class table
- */
 static void Camera_get_position_smoothing (LIScrArgs* args)
 {
 	float pos;
@@ -463,11 +335,6 @@ static void Camera_set_position_smoothing (LIScrArgs* args)
 	lialg_camera_set_smoothing (args->self, pos, rot);
 }
 
-/* @luadoc
- * --- Projection matrix.
- * -- @name Camera.projection
- * -- @class table
- */
 static void Camera_get_projection (LIScrArgs* args)
 {
 	int i;
@@ -481,11 +348,6 @@ static void Camera_get_projection (LIScrArgs* args)
 		liscr_args_seti_float (args, matrix.m[i]);
 }
 
-/* @luadoc
- * --- Camera rotation.
- * -- @name Camera.rotation
- * -- @class table
- */
 static void Camera_get_rotation (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
@@ -496,11 +358,6 @@ static void Camera_get_rotation (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &transform.rotation);
 }
 
-/* @luadoc
- * --- The rotation smoothing factor of the camera.
- * -- @name Camera.rotation_smoothing
- * -- @class table
- */
 static void Camera_get_rotation_smoothing (LIScrArgs* args)
 {
 	float pos;
@@ -519,11 +376,6 @@ static void Camera_set_rotation_smoothing (LIScrArgs* args)
 	lialg_camera_set_smoothing (args->self, pos, rot);
 }
 
-/* @luadoc
- * --- The position of the target of third person camera.
- * -- @name Camera.center
- * -- @class table
- */
 static void Camera_set_target_position (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
@@ -545,11 +397,6 @@ static void Camera_get_target_position (LIScrArgs* args)
 	liscr_args_seti_vector (args, &transform.position);
 }
 
-/* @luadoc
- * --- The rotation of the target of third person camera.
- * -- @name Camera.center
- * -- @class table
- */
 static void Camera_set_target_rotation (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
@@ -571,11 +418,6 @@ static void Camera_get_target_rotation (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &transform.rotation);
 }
 
-/* @luadoc
- * --- The viewport of the camera.
- * -- @name Camera.viewport
- * -- @class table
- */
 static void Camera_get_viewport (LIScrArgs* args)
 {
 	LIAlgCamera* camera;
@@ -604,44 +446,41 @@ static void Camera_set_viewport (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_camera (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_CAMERA, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "new", Camera_new);
-	liscr_class_insert_mfunc (self, "move", Camera_move);
-	liscr_class_insert_mfunc (self, "picking_ray", Camera_picking_ray);
-	liscr_class_insert_mfunc (self, "reset", Camera_reset);
-	liscr_class_insert_mfunc (self, "tilt", Camera_tilt);
-	liscr_class_insert_mfunc (self, "turn", Camera_turn);
-	liscr_class_insert_mfunc (self, "update", Camera_update);
-	liscr_class_insert_mfunc (self, "warp", Camera_warp);
-	liscr_class_insert_mfunc (self, "zoom", Camera_zoom);
-	liscr_class_insert_mfunc (self, "get_collision_group", Camera_get_collision_group);
-	liscr_class_insert_mfunc (self, "set_collision_group", Camera_set_collision_group);
-	liscr_class_insert_mfunc (self, "get_collision_mask", Camera_get_collision_mask);
-	liscr_class_insert_mfunc (self, "set_collision_mask", Camera_set_collision_mask);
-	liscr_class_insert_mfunc (self, "set_far", Camera_set_far);
-	liscr_class_insert_mfunc (self, "get_fov", Camera_get_fov);
-	liscr_class_insert_mfunc (self, "set_fov", Camera_set_fov);
-	liscr_class_insert_mfunc (self, "get_mode", Camera_get_mode);
-	liscr_class_insert_mfunc (self, "set_mode", Camera_set_mode);
-	liscr_class_insert_mfunc (self, "set_near", Camera_set_near);
-	liscr_class_insert_mfunc (self, "get_modelview", Camera_get_modelview);
-	liscr_class_insert_mfunc (self, "get_position", Camera_get_position);
-	liscr_class_insert_mfunc (self, "get_position_smoothing", Camera_get_position_smoothing);
-	liscr_class_insert_mfunc (self, "set_position_smoothing", Camera_set_position_smoothing);
-	liscr_class_insert_mfunc (self, "get_projection", Camera_get_projection);
-	liscr_class_insert_mfunc (self, "get_rotation", Camera_get_rotation);
-	liscr_class_insert_mfunc (self, "get_rotation_smoothing", Camera_get_rotation_smoothing);
-	liscr_class_insert_mfunc (self, "set_rotation_smoothing", Camera_set_rotation_smoothing);
-	liscr_class_insert_mfunc (self, "get_target_position", Camera_get_target_position);
-	liscr_class_insert_mfunc (self, "set_target_position", Camera_set_target_position);
-	liscr_class_insert_mfunc (self, "get_target_rotation", Camera_get_target_rotation);
-	liscr_class_insert_mfunc (self, "set_target_rotation", Camera_set_target_rotation);
-	liscr_class_insert_mfunc (self, "get_viewport", Camera_get_viewport);
-	liscr_class_insert_mfunc (self, "set_viewport", Camera_set_viewport);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_CAMERA, "camera_new", Camera_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_move", Camera_move);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_picking_ray", Camera_picking_ray);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_reset", Camera_reset);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_tilt", Camera_tilt);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_turn", Camera_turn);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_update", Camera_update);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_warp", Camera_warp);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_zoom", Camera_zoom);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_collision_group", Camera_get_collision_group);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_collision_group", Camera_set_collision_group);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_collision_mask", Camera_get_collision_mask);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_collision_mask", Camera_set_collision_mask);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_far", Camera_set_far);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_fov", Camera_get_fov);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_fov", Camera_set_fov);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_mode", Camera_get_mode);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_mode", Camera_set_mode);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_near", Camera_set_near);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_modelview", Camera_get_modelview);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_position", Camera_get_position);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_position_smoothing", Camera_get_position_smoothing);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_position_smoothing", Camera_set_position_smoothing);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_projection", Camera_get_projection);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_rotation", Camera_get_rotation);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_rotation_smoothing", Camera_get_rotation_smoothing);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_rotation_smoothing", Camera_set_rotation_smoothing);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_target_position", Camera_get_target_position);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_target_position", Camera_set_target_position);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_target_rotation", Camera_get_target_rotation);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_target_rotation", Camera_set_target_rotation);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_get_viewport", Camera_get_viewport);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_CAMERA, "camera_set_viewport", Camera_set_viewport);
 }
 
 /** @} */

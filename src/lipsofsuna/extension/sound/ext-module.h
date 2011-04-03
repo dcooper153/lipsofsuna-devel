@@ -98,7 +98,6 @@ void liext_object_free (
 /*****************************************************************************/
 
 void liext_script_sound (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

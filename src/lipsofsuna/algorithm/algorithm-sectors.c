@@ -443,7 +443,7 @@ private_free_sector (LIAlgSectors* self,
 
 	/* Invoke callbacks. */
 	if (self->sector_free_callback.callback != NULL)
-		self->sector_free_callback.callback (self->sector_load_callback.userdata, sector);
+		self->sector_free_callback.callback (self->sector_free_callback.userdata, sector);
 
 	/* Free sector data. */
 	LIALG_STRDIC_FOREACH (iter, self->content)

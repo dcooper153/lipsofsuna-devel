@@ -30,7 +30,6 @@
 typedef struct _LIExtReload LIExtReload;
 
 void liext_script_reload (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

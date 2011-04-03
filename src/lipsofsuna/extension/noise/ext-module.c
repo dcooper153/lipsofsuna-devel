@@ -63,7 +63,8 @@ LIExtModule* liext_noise_new (
 	self->program = program;
 
 	/* Register classes. */
-	liscr_script_create_class (program->script, "Noise", liext_script_noise, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_NOISE, self);
+	liext_script_noise (program->script);
 
 	return self;
 }

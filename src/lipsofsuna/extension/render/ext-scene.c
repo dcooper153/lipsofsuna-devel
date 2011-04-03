@@ -25,21 +25,6 @@
 #include <lipsofsuna/render.h>
 #include "ext-module.h"
 
-/* @luadoc
- * module "core/render"
- * ---
- * -- Display the game scene.
- * -- @name Scene
- * -- @class table
- */
-
-/* @luadoc
- * --- Creates a new scene rendering buffer.
- * --
- * -- @param clss Scene class.
- * -- @param args Arguments.
- * function Scene.new(clss, args)
- */
 static void Scene_new (LIScrArgs* args)
 {
 	LIExtModule* module;
@@ -47,34 +32,22 @@ static void Scene_new (LIScrArgs* args)
 	LIScrData* data;
 
 	/* Allocate self. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SCENE);
 	self = liren_deferred_new (module->client->render, 32, 32, 1, 0);
 	if (self == NULL)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, args->clss, liren_deferred_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SCENE, liren_deferred_free);
 	if (data == NULL)
 	{
 		liren_deferred_free (self);
 		return;
 	}
-	liscr_args_call_setters (args, data);
 	liscr_args_seti_data (args, data);
 	liscr_data_unref (data);
 }
 
-/* @luadoc
- * --- Begins scene rendering.
- * -- @param self Scene.
- * -- @param args Arguments.<ul>
- * --   <li>hdr: True to enable HDR.</li>
- * --   <li>modelview: Modelview matrix.</li>
- * --   <li>multisamples: Number of multisamples.</li>
- * --   <li>projection: Projection matrix.</li>
- * --   <li>viewport: Viewport array.</li></ul>
- * function Scene.draw_begin(self, args)
- */
 static void Scene_draw_begin (LIScrArgs* args)
 {
 	int hdr = 0;
@@ -86,7 +59,7 @@ static void Scene_draw_begin (LIScrArgs* args)
 	LIMatMatrix projection;
 	LIRenScene* scene;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SCENE);
 	scene = module->client->scene;
 
 	/* Get arguments. */
@@ -116,30 +89,17 @@ static void Scene_draw_begin (LIScrArgs* args)
 	liren_scene_render_begin (scene, args->self, &modelview, &projection, &frustum);
 }
 
-/* @luadoc
- * --- Ends scene rendering and draws the output to the framebuffer.
- * -- @param self Scene.
- * function Scene.draw_begin(self)
- */
 static void Scene_draw_end (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIRenScene* scene;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SCENE);
 	scene = module->client->scene;
 	liren_scene_render_end (scene);
 	glPopAttrib ();
 }
 
-/* @luadoc
- * --- Renders a scene pass.
- * -- @param self Scene.
- * -- @param args Arguments.<ul>
- * --   <li>pass: Pass number.</li>
- * --   <li>sorting: True to enable sorting.</li></ul>
- * function Scene.draw_pass(self, args)
- */
 static void Scene_draw_pass (LIScrArgs* args)
 {
 	int pass = 1;
@@ -147,7 +107,7 @@ static void Scene_draw_pass (LIScrArgs* args)
 	LIExtModule* module;
 	LIRenScene* scene;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SCENE);
 	scene = module->client->scene;
 	liscr_args_gets_int (args, "pass", &pass);
 	liscr_args_gets_bool (args, "sorting", &sorting);
@@ -157,16 +117,6 @@ static void Scene_draw_pass (LIScrArgs* args)
 	liren_scene_render_pass (scene, pass - 1, sorting);
 }
 
-/* @luadoc
- * ---
- * -- Applies post-processing shaders to the output buffer.
- * --
- * -- @param self Scene.
- * -- @param args Arguments.<ul>
- * --   <li>mipmaps: True to generate mipmaps.</li>
- * --   <li>shader: Post-processing shader name.</li></ul>
- * function Scene.draw_post_process(self, args)
- */
 static void Scene_draw_post_process (LIScrArgs* args)
 {
 	int mipmaps = 0;
@@ -174,7 +124,7 @@ static void Scene_draw_post_process (LIScrArgs* args)
 	LIExtModule* module;
 	LIRenScene* scene;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SCENE);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SCENE);
 	scene = module->client->scene;
 	liscr_args_gets_bool (args, "mipmaps", &mipmaps);
 	liscr_args_gets_string (args, "shader", &shader);
@@ -185,16 +135,13 @@ static void Scene_draw_post_process (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_scene (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_SCENE, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "new", Scene_new);
-	liscr_class_insert_mfunc (self, "draw_begin", Scene_draw_begin);
-	liscr_class_insert_mfunc (self, "draw_end", Scene_draw_end);
-	liscr_class_insert_mfunc (self, "draw_pass", Scene_draw_pass);
-	liscr_class_insert_mfunc (self, "draw_post_process", Scene_draw_post_process);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SCENE, "scene_new", Scene_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SCENE, "scene_draw_begin", Scene_draw_begin);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SCENE, "scene_draw_end", Scene_draw_end);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SCENE, "scene_draw_pass", Scene_draw_pass);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SCENE, "scene_draw_post_process", Scene_draw_post_process);
 }
 
 /** @} */

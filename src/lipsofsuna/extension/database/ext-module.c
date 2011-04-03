@@ -43,7 +43,8 @@ LIExtModule* liext_databases_new (
 	self->program = program;
 
 	/* Register classes. */
-	liscr_script_create_class (program->script, "Database", liext_script_database, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_DATABASE, self);
+	liext_script_database (program->script);
 
 	return self;
 }

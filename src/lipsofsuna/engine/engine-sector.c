@@ -57,11 +57,9 @@ lieng_sector_new (LIAlgSector* sector)
 
 /**
  * \brief Frees the sector.
- *
  * \param self Sector.
  */
-void
-lieng_sector_free (LIEngSector* self)
+void lieng_sector_free (LIEngSector* self)
 {
 	LIAlgU32dicIter iter;
 	LIEngObject* object;

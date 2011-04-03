@@ -43,7 +43,8 @@ LIExtModule* liext_skeleton_new (
 	self->program = program;
 
 	/* Register classes. */
-	liscr_script_create_class (program->script, "Skeleton", liext_script_skeleton, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_SKELETON, self);
+	liext_script_skeleton (program->script);
 
 	return self;
 }

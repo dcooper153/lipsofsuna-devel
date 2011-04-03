@@ -26,33 +26,12 @@
 #include <lipsofsuna/system.h>
 #include <lipsofsuna/client.h>
 
-/* @luadoc
- * module "builtin/client"
- * --- Access and manipulate the state of the client.
- * -- @name Client
- * -- @class table
- */
-
-/* @luadoc
- * --- Clears the screen.
- * -- @param clss Client class.
- * function Client.clear_buffer(clss)
- */
 static void Client_clear_buffer (LIScrArgs* args)
 {
 	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-/* @luadoc
- * --- Launches a server.
- * --
- * -- @param clss Client class.
- * -- @param args Arguments.<ul>
- * --   <li>1,args: String to pass to the server.</li></ul>
- * -- @return True on success.
- * function Client.host(clss, args)
- */
 static void Client_host (LIScrArgs* args)
 {
 	const char* str = "--server";
@@ -61,7 +40,7 @@ static void Client_host (LIScrArgs* args)
 	if (!liscr_args_gets_string (args, "args", &str))
 	    liscr_args_geti_string (args, 0, &str);
 
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
 	if (!licli_client_host (client, str))
 	{
 		lisys_error_report ();
@@ -70,12 +49,6 @@ static void Client_host (LIScrArgs* args)
 	liscr_args_seti_bool (args, 1);
 }
 
-/* @luadoc
- * --- Takes a screenshot.
- * -- @param clss Client class.
- * -- @return Screenshot filename.
- * function Client.screenshot(clss)
- */
 static void Client_screenshot (LIScrArgs* args)
 {
 	int i;
@@ -94,7 +67,7 @@ static void Client_screenshot (LIScrArgs* args)
 	LICliClient* client;
 
 	/* Get window size. */
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
 	width = client->window->mode.width;
 	height = client->window->mode.height;
 	pitch = 4 * width;
@@ -173,16 +146,6 @@ static void Client_screenshot (LIScrArgs* args)
 	lisys_free (file);
 }
 
-/* @luadoc
- * --- Sets the current video mode.
- * -- @param clss Client class.
- * -- @param args Arguments.<ul>
- * --   <li>1,width: Window width in pixels.</li>
- * --   <li>2,height: Window height in pixels.</li>
- * --   <li>3,fullscreen: True for fullscreen.</li></ul>
- * -- @return True on success.
- * function Client.set_video_mode(clss, args)
- */
 static void Client_set_video_mode (LIScrArgs* args)
 {
 	int width = 1024;
@@ -202,7 +165,7 @@ static void Client_set_video_mode (LIScrArgs* args)
 	width = LIMAT_MAX (320, width);
 	height = LIMAT_MAX (240, height);
 
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
 	if (!licli_window_set_size (client->window, width, height, fullscreen, vsync))
 	{
 		lisys_error_report ();
@@ -211,11 +174,6 @@ static void Client_set_video_mode (LIScrArgs* args)
 	liscr_args_seti_bool (args, 1);
 }
 
-/* @luadoc
- * --- Copies the rendered scene to the screen.
- * -- @param clss Client class.
- * function Client.swap_buffers(clss)
- */
 static void Client_swap_buffers (LIScrArgs* args)
 {
 	glBindFramebuffer (GL_FRAMEBUFFER, 0);
@@ -224,11 +182,6 @@ static void Client_swap_buffers (LIScrArgs* args)
 	SDL_GL_SwapBuffers ();
 }
 
-/* @luadoc
- * --- Gets the current cursor position.
- * -- @name Client.cursor_pos
- * -- @class table
- */
 static void Client_get_cursor_pos (LIScrArgs* args)
 {
 	int x;
@@ -236,36 +189,25 @@ static void Client_get_cursor_pos (LIScrArgs* args)
 	LICliClient* client;
 	LIMatVector tmp;
 
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
 	SDL_GetMouseState (&x, &y);
 	tmp = limat_vector_init (x, y, 0.0f);
 	liscr_args_seti_vector (args, &tmp);
 }
 
-/* @luadoc
- * --- Short term average frames per second.
- * --
- * -- @name Client.tick
- * -- @class table
- */
 static void Client_get_fps (LIScrArgs* args)
 {
 	LICliClient* client;
 
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
 	liscr_args_seti_float (args, client->program->fps);
 }
 
-/* @luadoc
- * --- Movement mode flag.
- * -- @name Client.moving
- * -- @class table
- */
 static void Client_get_moving (LIScrArgs* args)
 {
 	LICliClient* client;
 
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
 	liscr_args_seti_bool (args, licli_client_get_moving (client));
 }
 static void Client_set_moving (LIScrArgs* args)
@@ -275,16 +217,11 @@ static void Client_set_moving (LIScrArgs* args)
 
 	if (liscr_args_geti_bool (args, 0, &value))
 	{
-		client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+		client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
 		licli_client_set_moving (client, value);
 	}
 }
 
-/* @luadoc
- * --- Main window title.
- * -- @name Client.title
- * -- @class table
- */
 static void Client_set_title (LIScrArgs* args)
 {
 	const char* value;
@@ -292,21 +229,16 @@ static void Client_set_title (LIScrArgs* args)
 
 	if (liscr_args_geti_string (args, 0, &value))
 	{
-		client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+		client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
 		SDL_WM_SetCaption (value, value);
 	}
 }
 
-/* @luadoc
- * --- Current video mode.
- * -- @name Client.video_mode
- * -- @class table
- */
 static void Client_get_video_mode (LIScrArgs* args)
 {
 	LICliClient* client;
 
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 	liscr_args_seti_int (args, client->window->mode.width);
 	liscr_args_seti_int (args, client->window->mode.height);
@@ -314,18 +246,13 @@ static void Client_get_video_mode (LIScrArgs* args)
 	liscr_args_seti_bool (args, client->window->mode.vsync);
 }
 
-/* @luadoc
- * --- List of supported fullscreen modes.
- * -- @name Client.video_modes
- * -- @class table
- */
 static void Client_get_video_modes (LIScrArgs* args)
 {
 	int i;
 	SDL_Rect** modes;
 	LICliClient* client;
 
-	client = liscr_class_get_userdata (args->clss, LICLI_SCRIPT_CLIENT);
+	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 	modes = SDL_ListModes (NULL, SDL_OPENGL | SDL_FULLSCREEN);
 	if (modes != NULL && modes != (SDL_Rect**) -1)
@@ -347,23 +274,20 @@ static void Client_get_video_modes (LIScrArgs* args)
 /*****************************************************************************/
 
 void licli_script_client (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LICLI_SCRIPT_CLIENT, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "clear_buffer", Client_clear_buffer);
-	liscr_class_insert_cfunc (self, "host", Client_host);
-	liscr_class_insert_cfunc (self, "screenshot", Client_screenshot);
-	liscr_class_insert_cfunc (self, "set_video_mode", Client_set_video_mode);
-	liscr_class_insert_cfunc (self, "swap_buffers", Client_swap_buffers);
-	liscr_class_insert_cfunc (self, "get_cursor_pos", Client_get_cursor_pos);
-	liscr_class_insert_cfunc (self, "get_fps", Client_get_fps);
-	liscr_class_insert_cfunc (self, "get_moving", Client_get_moving);
-	liscr_class_insert_cfunc (self, "set_moving", Client_set_moving);
-	liscr_class_insert_cfunc (self, "set_title", Client_set_title);
-	liscr_class_insert_cfunc (self, "get_video_mode", Client_get_video_mode);
-	liscr_class_insert_cfunc (self, "get_video_modes", Client_get_video_modes);
+	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_clear_buffer", Client_clear_buffer);
+	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_host", Client_host);
+	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_screenshot", Client_screenshot);
+	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_set_video_mode", Client_set_video_mode);
+	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_swap_buffers", Client_swap_buffers);
+	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_cursor_pos", Client_get_cursor_pos);
+	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_fps", Client_get_fps);
+	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_moving", Client_get_moving);
+	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_set_moving", Client_set_moving);
+	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_set_title", Client_set_title);
+	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_video_mode", Client_get_video_mode);
+	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_video_modes", Client_get_video_modes);
 }
 
 /** @} */

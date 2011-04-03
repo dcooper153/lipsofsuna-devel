@@ -221,7 +221,7 @@ int liren_material_set_texture_count (
 		if (value > self->textures.count)
 		{
 			num = value - self->textures.count;
-			tmp = realloc (self->textures.array, value * sizeof (LIRenTexture));
+			tmp = lisys_realloc (self->textures.array, value * sizeof (LIRenTexture));
 			if (tmp == NULL)
 				return 0;
 			for (i = self->textures.count ; i < value ; i++)
@@ -233,7 +233,7 @@ int liren_material_set_texture_count (
 		{
 			for (i = value ; i < self->textures.count ; i++)
 				liren_texture_free (self->textures.array + i);
-			tmp = realloc (self->textures.array, value * sizeof (LIRenTexture));
+			tmp = lisys_realloc (self->textures.array, value * sizeof (LIRenTexture));
 			if (tmp != NULL)
 				self->textures.array = tmp;
 			self->textures.count = value;

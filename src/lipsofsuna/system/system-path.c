@@ -26,45 +26,40 @@
 #include <stdlib.h>
 #include <string.h>
 #include "system-error.h"
+#include "system-memory.h"
 #include "system-path.h"
+
+static char* private_strdup (
+	const char* str);
+
+/*****************************************************************************/
 
 /**
  * \brief Gets the file name without the path component.
- *
  * \param path Path string.
  * \return New string or NULL.
  */
-char*
-lisys_path_basename (const char* path)
+char* lisys_path_basename (
+	const char* path)
 {
 	char* ptr;
-	char* name;
 
-	/* Get filename. */
 	ptr = strrchr (path, '/');
 	if (ptr == NULL)
-		name = strdup (path);
-	else
-		name = strdup (ptr + 1);
-	if (name == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
-		return NULL;
-	}
+		return private_strdup (path);
 
-	return name;
+	return private_strdup (ptr + 1);
 }
 
 /**
  * \brief Checks if the path is a file name with the requested extension.
- *
  * \param path Path string.
  * \param ext File name extension without the leading period.
  * \return Nonzero if the file has the extension.
  */
-int
-lisys_path_check_ext (const char* path,
-                      const char* ext)
+int lisys_path_check_ext (
+	const char* path,
+	const char* ext)
 {
 	int plen;
 	int elen;
@@ -95,9 +90,9 @@ lisys_path_check_ext (const char* path,
  * \param ... NULL terminated list of path components.
  * \return A new string or NULL.
  */
-char*
-lisys_path_concat (const char* path,
-                               ...)
+char* lisys_path_concat (
+	const char* path,
+	            ...)
 {
 	int len;
 	int total;
@@ -123,7 +118,7 @@ lisys_path_concat (const char* path,
 	va_end (args);
 
 	/* Allocate a new string. */
-	self = malloc (total + 1);
+	self = lisys_malloc (total + 1);
 	if (self == NULL)
 	{
 		lisys_error_set (ENOMEM, "not enough memory to construct path");
@@ -147,6 +142,7 @@ lisys_path_concat (const char* path,
 		}
 	}
 	va_end (args);
+
 	return self;
 }
 
@@ -168,9 +164,9 @@ lisys_path_concat (const char* path,
  * \param ... Variable array of path format instructions.
  * \return Path string or NULL.
  */
-char*
-lisys_path_format (lisysPathFormat format,
-                                   ...)
+char* lisys_path_format (
+	lisysPathFormat format,
+	                ...)
 {
 	int cap;
 	int len;
@@ -185,7 +181,7 @@ lisys_path_format (lisysPathFormat format,
 	/* Allocate buffer. */
 	pos = 0;
 	cap = 64;
-	self = malloc (cap);
+	self = lisys_malloc (cap);
 	if (self == NULL)
 	{
 		lisys_error_set (ENOMEM, "not enough memory to construct path");
@@ -288,7 +284,7 @@ lisys_path_format (lisysPathFormat format,
 		{
 			while (cap <= pos + len)
 				cap <<= 1;
-			tmp = realloc (self, cap);
+			tmp = lisys_realloc (self, cap);
 			if (tmp == NULL)
 			{
 				error = 1;
@@ -314,7 +310,7 @@ lisys_path_format (lisysPathFormat format,
 	}
 
 	/* Shrink buffer. */
-	tmp = realloc (self, pos + 1);
+	tmp = lisys_realloc (self, pos + 1);
 	if (tmp != NULL)
 		self = tmp;
 
@@ -323,29 +319,28 @@ lisys_path_format (lisysPathFormat format,
 
 /**
  * \brief Gets the file name from a path.
- *
  * \param path Path string.
  * \return New string or NULL.
  */
-char*
-lisys_path_filename (const char* path)
+char* lisys_path_filename (
+	const char* path)
 {
 	const char* ptr;
 
 	ptr = strrchr (path, '/');
 	if (ptr == NULL)
-		return strdup (path);
-	return strdup (ptr + 1);
+		return private_strdup (path);
+
+	return private_strdup (ptr + 1);
 }
 
 /**
  * \brief Gets the extension from a path.
- *
  * \param path Path string.
  * \return New string or NULL.
  */
-char*
-lisys_path_fileext (const char* path)
+char* lisys_path_fileext (
+	const char* path)
 {
 	const char* ptr0;
 	const char* ptr1;
@@ -353,34 +348,50 @@ lisys_path_fileext (const char* path)
 	ptr0 = strrchr (path, '.');
 	ptr1 = strrchr (path, '/');
 	if (ptr0 == NULL)
-		return strdup ("");
+		return private_strdup ("");
 	if (ptr1 != NULL && ptr0 < ptr1)
-		return strdup ("");
-	return strdup (ptr0 + 1);
+		return private_strdup ("");
+	return private_strdup (ptr0 + 1);
 }
 
 /**
  * \brief Gets the base path name from a path.
- *
  * \param path Path string.
  * \return New string or NULL.
  */
-char*
-lisys_path_pathname (const char* path)
+char* lisys_path_pathname (
+	const char* path)
 {
 	char* ret;
 	const char* ptr;
 
 	ptr = strrchr (path, '/');
 	if (ptr == NULL)
-		return strdup (".");
+		return private_strdup (".");
 	if (ptr == path)
-		return strdup ("/");
-	ret = malloc (ptr - path + 1);
+		return private_strdup ("/");
+	ret = lisys_malloc (ptr - path + 1);
 	if (ret == NULL)
 		return NULL;
 	strncpy (ret, path, ptr - path);
 	ret[ptr - path] = '\0';
+	return ret;
+}
+
+/*****************************************************************************/
+
+static char* private_strdup (
+	const char* str)
+{
+	int len;
+	char* ret;
+
+	len = strlen (str);
+	ret = lisys_malloc (len);
+	if (ret == NULL)
+		return NULL;
+	strcpy (ret, str);
+
 	return ret;
 }
 

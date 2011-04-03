@@ -24,24 +24,6 @@
 
 #include "ext-module.h"
 
-/* @luadoc
- * module "core/object-physics"
- * ---
- * -- Control the physics simulation of objects.
- * -- @name Object
- * -- @class table
- */
-
-/* @luadoc
- * --- Makes the object approach a point.
- * --
- * -- @param self Object.
- * -- @param args Arguments.
- * --   <li>dist: Distance how close to target to get.</li>
- * --   <li>point: Point vector in world space. (required)</li>
- * --   <li>speed: Movement speed multiplier.</li></ul>
- * function Object.approach(self, args)
- */
 static void Object_approach (LIScrArgs* args)
 {
 	float dist = 0.0f;
@@ -51,7 +33,7 @@ static void Object_approach (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -64,15 +46,6 @@ static void Object_approach (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Lets an impulse force affect the object.
- * --
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>1,impulse: Force of impulse.</li>
- * --   <li>2,point: Point of impulse or nil.</li></ul>
- * function Object.impulse(self, args)
- */
 static void Object_impulse (LIScrArgs* args)
 {
 	LIMatVector impulse;
@@ -81,7 +54,7 @@ static void Object_impulse (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -95,15 +68,6 @@ static void Object_impulse (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Creates a hinge constraint.
- * --
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>position: Position vector.</li>
- * --   <li>axis: Axis of rotation.</li></ul>
- * function Object.insert_hinge_constraint(self, args)
- */
 static void Object_insert_hinge_constraint (LIScrArgs* args)
 {
 	LIMatVector pos;
@@ -112,26 +76,20 @@ static void Object_insert_hinge_constraint (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
-	if (liscr_args_gets_vector (args, "position", &pos))
+	if (liscr_args_geti_vector (args, 0, &pos) ||
+	    liscr_args_gets_vector (args, "position", &pos))
 	{
-		liscr_args_gets_vector (args, "axis", &axis);
+		if (!liscr_args_geti_vector (args, 1, &axis))
+			liscr_args_gets_vector (args, "axis", &axis);
 		liphy_constraint_new_hinge (module->physics, object, &pos, &axis, 0, 0.0f, 0.0f);
 	}
 }
 
-/* @luadoc
- * --- Causes the object to jump.
- * --
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>impulse: Force of impulse. (required)</li></ul>
- * function Object.jump(self, args)
- */
 static void Object_jump (LIScrArgs* args)
 {
 	LIMatVector impulse;
@@ -139,83 +97,15 @@ static void Object_jump (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
-	if (liscr_args_gets_vector (args, "impulse", &impulse))
+	if (liscr_args_geti_vector (args, 0, &impulse))
 		liphy_object_jump (object, &impulse);
 }
 
-/* @luadoc
- * --- Sweeps a sphere relative to the object.
- * --
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>src: Start point vector. (required)</li>
- * --   <li>dst: End point vector. (required)</li>
- * --   <li>radius: Sphere radius.</li></ul>
- * -- @return Table with point, normal, and object. Nil if no collision occurred.
- * function Object.sweep_sphere(self, args)
- */
-static void Object_sweep_sphere (LIScrArgs* args)
-{
-	float radius = 0.5f;
-	LIMatVector start;
-	LIMatVector end;
-	LIEngObject* hitobj;
-	LIExtModule* module;
-	LIMatVector vector;
-	LIPhyCollision result;
-	LIPhyObject* object;
-
-	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
-	if (object == NULL)
-		return;
-
-	if (!liscr_args_gets_vector (args, "src", &start) ||
-	    !liscr_args_gets_vector (args, "dst", &end))
-		return;
-	liscr_args_gets_float (args, "radius", &radius);
-
-	if (liphy_object_cast_sphere (object, &start, &end, radius, &result))
-	{
-		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
-		liscr_args_sets_float (args, "fraction", result.fraction);
-		liscr_args_sets_vector (args, "point", &result.point);
-		liscr_args_sets_vector (args, "normal", &result.normal);
-		if (result.object != NULL)
-		{
-			hitobj = liphy_object_get_userdata (result.object);
-			if (hitobj != NULL && hitobj->script != NULL)
-				liscr_args_sets_data (args, "object", hitobj->script);
-		}
-		if (result.terrain != NULL)
-		{
-			vector.x = result.terrain_tile[0];
-			vector.y = result.terrain_tile[1];
-			vector.z = result.terrain_tile[2];
-			liscr_args_sets_vector (args, "tile", &vector);
-		}
-	}
-}
-
-/* @luadoc
- * --- Angular velocity.
- * -- <br/>
- * -- Angular velocity specifies how the object rotates. The direction of the
- * -- vector points towards the axis of rotation and the length of the vector
- * -- specifies how fast the object rotates around its center point.
- * -- <br/>
- * -- Only supported by rigid bodies. Other kind of objects always return
- * -- a zero vector.
- * --
- * -- @name Object.angular
- * -- @class table
- */
 static void Object_get_angular (LIScrArgs* args)
 {
 	LIMatVector tmp;
@@ -223,7 +113,7 @@ static void Object_get_angular (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -238,7 +128,7 @@ static void Object_set_angular (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -247,19 +137,13 @@ static void Object_set_angular (LIScrArgs* args)
 		liphy_object_set_angular (object, &vector);
 }
 
-/* @luadoc
- * --- Collision group bitmask.
- * --
- * -- @name Object.collision_group
- * -- @class table
- */
 static void Object_get_collision_group (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -273,7 +157,7 @@ static void Object_set_collision_group (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -282,19 +166,13 @@ static void Object_set_collision_group (LIScrArgs* args)
 		liphy_object_set_collision_group (object, value);
 }
 
-/* @luadoc
- * --- Collision bitmask.
- * --
- * -- @name Object.collision_mask
- * -- @class table
- */
 static void Object_get_collision_mask (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -308,7 +186,7 @@ static void Object_set_collision_mask (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -317,18 +195,13 @@ static void Object_set_collision_mask (LIScrArgs* args)
 		liphy_object_set_collision_mask (object, value);
 }
 
-/* @luadoc
- * --- Contact event generation toggle.
- * -- @name Object.contact_events
- * -- @class table
- */
 static void Object_get_contact_events (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -342,7 +215,7 @@ static void Object_set_contact_events (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -351,12 +224,6 @@ static void Object_set_contact_events (LIScrArgs* args)
 		liphy_object_set_contact_events (object, value);
 }
 
-/* @luadoc
- * --- Gravity vector.
- * --
- * -- @name Object.gravity
- * -- @class table
- */
 static void Object_get_gravity (LIScrArgs* args)
 {
 	LIMatVector tmp;
@@ -364,7 +231,7 @@ static void Object_get_gravity (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -379,7 +246,7 @@ static void Object_set_gravity (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -388,11 +255,6 @@ static void Object_set_gravity (LIScrArgs* args)
 		liphy_object_set_gravity (object, &vector);
 }
 
-/* @luadoc
- * --- Liquid friction coefficient.
- * -- @name Object.friction_liquid
- * -- @class table
- */
 static void Object_get_friction_liquid (LIScrArgs* args)
 {
 	float tmp;
@@ -400,7 +262,7 @@ static void Object_get_friction_liquid (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -415,7 +277,7 @@ static void Object_set_friction_liquid (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -424,11 +286,6 @@ static void Object_set_friction_liquid (LIScrArgs* args)
 		liphy_object_set_friction_liquid (object, tmp);
 }
 
-/* @luadoc
- * --- Liquid gravity vector.
- * -- @name Object.gravity_liquid
- * -- @class table
- */
 static void Object_get_gravity_liquid (LIScrArgs* args)
 {
 	LIMatVector tmp;
@@ -436,7 +293,7 @@ static void Object_get_gravity_liquid (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -451,7 +308,7 @@ static void Object_set_gravity_liquid (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -460,21 +317,13 @@ static void Object_set_gravity_liquid (LIScrArgs* args)
 		liphy_object_set_gravity_liquid (object, &vector);
 }
 
-/* @luadoc
- * --- Ground contact flag.
- * -- <br/>
- * -- Only supported for creatures. Other kind of objects always return false.
- * --
- * -- @name Object.ground
- * -- @class table
- */
 static void Object_get_ground (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -482,19 +331,13 @@ static void Object_get_ground (LIScrArgs* args)
 	liscr_args_seti_bool (args, liphy_object_get_ground (object));
 }
 
-/* @luadoc
- * --- Mass.
- * --
- * -- @name Object.mass
- * -- @class table
- */
 static void Object_get_mass (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -508,7 +351,7 @@ static void Object_set_mass (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -517,23 +360,13 @@ static void Object_set_mass (LIScrArgs* args)
 		liphy_object_set_mass (object, value);
 }
 
-/* @luadoc
- * --- Movement direction.
- * -- <br/>
- * -- Only used by kinematic objects. The value of -1 means that the creature is
- * -- moving forward at walking speed. The value of 1 means backward, and the
- * -- value of 0 means no strafing.
- * --
- * -- @name Object.movement
- * -- @class table
- */
 static void Object_get_movement (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -547,7 +380,7 @@ static void Object_set_movement (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -556,23 +389,13 @@ static void Object_set_movement (LIScrArgs* args)
 		liphy_object_set_movement (object, value);
 }
 
-/* @luadoc
- * --- Physics simulation mode.
- * -- <br/>
- * -- Specifies the physics simulation mode of the object. The recognized values are:<ul>
- * -- <li>"kinematic": Kinematic character.</li>
- * -- <li>"none": Not included to the simulation.</li>
- * -- <li>"rigid": Rigid body simulation.</li>
- * -- <li>"static": Static obstacle.</li>
- * -- <li>"vehicle": Vehicle physics.</li></ul>
- */
 static void Object_get_physics (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -606,7 +429,7 @@ static void Object_set_physics (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -626,22 +449,13 @@ static void Object_set_physics (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Physics shape.<br/>
- * -- A model can contain multiple physics shapes. By setting the field,
- * -- you can switch to one of the alternative shapes. This can be used
- * -- to, for example, set a smaller collision shape when the creature
- * -- is crouching.
- * -- @name Object.shape
- * -- @class table
- */
 static void Object_get_shape (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -655,7 +469,7 @@ static void Object_set_shape (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -664,21 +478,13 @@ static void Object_set_shape (LIScrArgs* args)
 		liphy_object_set_shape (object, value);
 }
 
-/* @luadoc
- * --- Movement speed.
- * --
- * -- Only used by creature objects.
- * --
- * -- @name Object.speed
- * -- @class table
- */
 static void Object_get_speed (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -692,7 +498,7 @@ static void Object_set_speed (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -701,23 +507,13 @@ static void Object_set_speed (LIScrArgs* args)
 		liphy_object_set_speed (object, value);
 }
 
-/* @luadoc
- * --- Strafing direction.
- * -- <br/>
- * -- Only used by kinematic objects. The value of -1 means that the creature is
- * -- strafing to the left at walking speed. The value of 1 means right, and the
- * -- value of 0 means no strafing.
- * --
- * -- @name Object.strafing
- * -- @class table
- */
 static void Object_get_strafing (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -731,7 +527,7 @@ static void Object_set_strafing (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -740,12 +536,6 @@ static void Object_set_strafing (LIScrArgs* args)
 		liphy_object_set_strafing (object, value);
 }
 
-/* @luadoc
- * --- Linear velocity.
- * --
- * -- @name Object.velocity
- * -- @class table
- */
 static void Object_get_velocity (LIScrArgs* args)
 {
 	LIMatVector tmp;
@@ -753,7 +543,7 @@ static void Object_get_velocity (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -768,7 +558,7 @@ static void Object_set_velocity (LIScrArgs* args)
 	LIPhyObject* object;
 
 	/* Get physics object. */
-	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
 	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
 	if (object == NULL)
 		return;
@@ -779,45 +569,42 @@ static void Object_set_velocity (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void liext_script_object (
-	LIScrClass* self,
-	void*       data)
+void liext_script_physics_object (
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LISCR_SCRIPT_PHYSICS_OBJECT, data);
-	liscr_class_insert_mfunc (self, "approach", Object_approach);
-	liscr_class_insert_mfunc (self, "impulse", Object_impulse);
-	liscr_class_insert_mfunc (self, "insert_hinge_constraint", Object_insert_hinge_constraint);
-	liscr_class_insert_mfunc (self, "jump", Object_jump);
-	liscr_class_insert_mfunc (self, "sweep_sphere", Object_sweep_sphere);
-	liscr_class_insert_mfunc (self, "get_angular", Object_get_angular);
-	liscr_class_insert_mfunc (self, "set_angular", Object_set_angular);
-	liscr_class_insert_mfunc (self, "get_collision_group", Object_get_collision_group);
-	liscr_class_insert_mfunc (self, "set_collision_group", Object_set_collision_group);
-	liscr_class_insert_mfunc (self, "get_collision_mask", Object_get_collision_mask);
-	liscr_class_insert_mfunc (self, "set_collision_mask", Object_set_collision_mask);
-	liscr_class_insert_mfunc (self, "get_contact_events", Object_get_contact_events);
-	liscr_class_insert_mfunc (self, "set_contact_events", Object_set_contact_events);
-	liscr_class_insert_mfunc (self, "get_friction_liquid", Object_get_friction_liquid);
-	liscr_class_insert_mfunc (self, "set_friction_liquid", Object_set_friction_liquid);
-	liscr_class_insert_mfunc (self, "get_gravity", Object_get_gravity);
-	liscr_class_insert_mfunc (self, "set_gravity", Object_set_gravity);
-	liscr_class_insert_mfunc (self, "get_gravity_liquid", Object_get_gravity_liquid);
-	liscr_class_insert_mfunc (self, "set_gravity_liquid", Object_set_gravity_liquid);
-	liscr_class_insert_mfunc (self, "get_ground", Object_get_ground);
-	liscr_class_insert_mfunc (self, "get_mass", Object_get_mass);
-	liscr_class_insert_mfunc (self, "set_mass", Object_set_mass);
-	liscr_class_insert_mfunc (self, "get_movement", Object_get_movement);
-	liscr_class_insert_mfunc (self, "set_movement", Object_set_movement);
-	liscr_class_insert_mfunc (self, "get_physics", Object_get_physics);
-	liscr_class_insert_mfunc (self, "set_physics", Object_set_physics);
-	liscr_class_insert_mfunc (self, "get_shape", Object_get_shape);
-	liscr_class_insert_mfunc (self, "set_shape", Object_set_shape);
-	liscr_class_insert_mfunc (self, "get_speed", Object_get_speed);
-	liscr_class_insert_mfunc (self, "set_speed", Object_set_speed);
-	liscr_class_insert_mfunc (self, "get_strafing", Object_get_strafing);
-	liscr_class_insert_mfunc (self, "set_strafing", Object_set_strafing);
-	liscr_class_insert_mfunc (self, "get_velocity", Object_get_velocity);
-	liscr_class_insert_mfunc (self, "set_velocity", Object_set_velocity);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_approach", Object_approach);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_impulse", Object_impulse);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_insert_hinge_constraint", Object_insert_hinge_constraint);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_jump", Object_jump);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_angular", Object_get_angular);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_angular", Object_set_angular);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_collision_group", Object_get_collision_group);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_collision_group", Object_set_collision_group);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_collision_mask", Object_get_collision_mask);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_collision_mask", Object_set_collision_mask);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_contact_events", Object_get_contact_events);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_contact_events", Object_set_contact_events);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_friction_liquid", Object_get_friction_liquid);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_friction_liquid", Object_set_friction_liquid);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_gravity", Object_get_gravity);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_gravity", Object_set_gravity);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_gravity_liquid", Object_get_gravity_liquid);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_gravity_liquid", Object_set_gravity_liquid);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_ground", Object_get_ground);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_mass", Object_get_mass);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_mass", Object_set_mass);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_movement", Object_get_movement);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_movement", Object_set_movement);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_physics", Object_get_physics);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_physics", Object_set_physics);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_shape", Object_get_shape);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_shape", Object_set_shape);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_speed", Object_get_speed);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_speed", Object_set_speed);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_strafing", Object_get_strafing);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_strafing", Object_set_strafing);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_velocity", Object_get_velocity);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_velocity", Object_set_velocity);
 }
 
 /** @} */

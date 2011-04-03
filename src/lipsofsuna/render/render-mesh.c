@@ -112,10 +112,10 @@ int liren_mesh_init (
 
 	/* Store values needed by the Windows context rebuild. */
 	self->reload_index_count = index_count;
-	self->reload_index_data = calloc (1, self->sizes[0]);
+	self->reload_index_data = lisys_calloc (1, self->sizes[0]);
 	memcpy (self->reload_index_data, index_data, self->sizes[0]);
 	self->reload_vertex_count = vertex_count;
-	self->reload_vertex_data = calloc (1, self->sizes[1]);
+	self->reload_vertex_data = lisys_calloc (1, self->sizes[1]);
 	memcpy (self->reload_vertex_data, vertex_data, self->sizes[1]);
 
 	return 1;

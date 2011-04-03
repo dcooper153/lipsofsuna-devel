@@ -140,32 +140,6 @@ static void private_compile (
 
 /*****************************************************************************/
 
-/* @luadoc
- * module "core/render"
- * ---
- * -- Specify shaders.
- * -- @name Shader
- * -- @class table
- */
-
-/* @luadoc
- * --- Creates a new shader.
- * -- @param clss Shader class.
- * -- @param args Arguments.<ul>
- * --   <li>blend: True to enable blending.</li>
- * --   <li>blend_src: Source blend function.</li>
- * --   <li>blend_dst: Destination blend function.</li>
- * --   <li>depth_test: False to disable depth test.</li>
- * --   <li>depth_write: False to disable depth writes.</li>
- * --   <li>depth_func: Depth test function.</li>
- * --   <li>fragment: Fragment program code.</li>
- * --   <li>geometry: Geometry program code.</li>
- * --   <li>name: Unique shader name.</li>
- * --   <li>sort: True to allow depth sorting for materials with this shader.</li>
- * --   <li>transform_feedback: True to enable transform feedback.</li>
- * --   <li>vertex: Vertex program code.</li></ul>
- * function Shader.new(clss, args)
- */
 static void Shader_new (LIScrArgs* args)
 {
 	const char* name = "default";
@@ -173,8 +147,8 @@ static void Shader_new (LIScrArgs* args)
 	LIScrData* data;
 	LIRenShader* shader;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_SHADER);
-    liscr_args_gets_string (args, "name", &name);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SHADER);
+	liscr_args_gets_string (args, "name", &name);
 
 	/* Avoid duplicate names. */
 	shader = lialg_strdic_find (module->client->render->shaders, name);
@@ -193,7 +167,7 @@ static void Shader_new (LIScrArgs* args)
 	private_compile (shader, args);
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, shader, args->clss, liren_shader_free);
+	data = liscr_data_new (args->script, shader, LIEXT_SCRIPT_SHADER, liren_shader_free);
 	if (data == NULL)
 	{
 		liren_shader_free (shader);
@@ -203,23 +177,6 @@ static void Shader_new (LIScrArgs* args)
 	liscr_data_unref (data);
 }
 
-/* @luadoc
- * --- Recompiles the shader from new source code.
- * -- @param self Shader.
- * -- @param args Arguments.<ul>
- * --   <li>blend: True to enable blending.</li>
- * --   <li>blend_src: Source blend function.</li>
- * --   <li>blend_dst: Destination blend function.</li>
- * --   <li>depth_test: False to disable depth test.</li>
- * --   <li>depth_write: False to disable depth writes.</li>
- * --   <li>depth_func: Depth test function.</li>
- * --   <li>fragment: Fragment program code.</li>
- * --   <li>geometry: Geometry program code.</li>
- * --   <li>sort: True to allow depth sorting for materials with this shader.</li>
- * --   <li>transform_feedback: True to enable transform feedback.</li>
- * --   <li>vertex: Vertex program code.</li></ul>
- * function Shader.compile(self, args)
- */
 static void Shader_compile (LIScrArgs* args)
 {
 	private_compile (args->self, args);
@@ -228,13 +185,10 @@ static void Shader_compile (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_shader (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_SHADER, data);
-	liscr_class_insert_cfunc (self, "new", Shader_new);
-	liscr_class_insert_mfunc (self, "compile", Shader_compile);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SHADER, "shader_new", Shader_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SHADER, "shader_compile", Shader_compile);
 }
 
 /** @} */

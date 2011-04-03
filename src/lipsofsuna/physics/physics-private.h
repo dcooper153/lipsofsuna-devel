@@ -45,6 +45,7 @@ class LIPhyMotionState;
 
 struct _LIPhyPhysics
 {
+	int updating;
 	void* userdata;
 #ifdef LIPHY_BROADPHASE_DBVT
 	btDbvtBroadphase* broadphase;

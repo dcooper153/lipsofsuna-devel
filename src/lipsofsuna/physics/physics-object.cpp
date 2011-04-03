@@ -975,6 +975,10 @@ static void private_update_state (
 	LIMatTransform transform;
 	LIPhyShape* shape_;
 
+	/* Bullet can't handle objects being deleted during the simulation tick.
+	   To avoid problems, the code should never get here during it. */
+	assert (!self->physics->updating);
+
 	/* Remove all constraints involving us. */
 	liphy_physics_clear_constraints (self->physics, self);
 	liphy_object_get_transform (self, &transform);

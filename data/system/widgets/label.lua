@@ -1,30 +1,5 @@
 Widgets.Label = Class(Widget)
-
-Widgets.Label.setter = function(self, key, value)
-	if key == "color" then
-		if self.color ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "focused" then
-		if self.focused ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "font" then
-		if self.font ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	elseif key == "text" then
-		if self.text ~= value then
-			Widget.setter(self, key, value)
-			self:reshaped()
-		end
-	else
-		Widget.setter(self, key, value)
-	end
-end
+Widgets.Label.class_name = "Widgets.Label"
 
 Widgets.Label.new = function(clss, args)
 	local self = Widget.new(clss, args)
@@ -57,3 +32,31 @@ Widgets.Label.reshaped = function(self)
 		text_font = self.font}
 	self:canvas_compile()
 end
+
+Widgets.Label:add_getters{
+	color = function(s) return rawget(s, "__color") end,
+	focused = function(s) return rawget(s, "__focused") end,
+	font = function(s) return rawget(s, "__font") end,
+	text = function(s) return rawget(s, "__text") end}
+
+Widgets.Label:add_setters{
+	color = function(s, v)
+		if s.color == v then return end
+		rawset(s, "__color", v)
+		s:reshaped()
+	end,
+	focused = function(s, v)
+		if s.focused == v then return end
+		rawset(s, "__focused", v)
+		s:reshaped()
+	end,
+	font = function(s, v)
+		if s.font == v then return end
+		rawset(s, "__font", v)
+		s:reshaped()
+	end,
+	text = function(s, v)
+		if s.text == v then return end
+		rawset(s, "__text", v)
+		s:reshaped()
+	end}

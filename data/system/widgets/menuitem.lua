@@ -1,17 +1,7 @@
 require "system/widgets/label"
 
 Widgets.MenuItem = Class(Widgets.Label)
-
-Widgets.MenuItem.setter = function(self, key, value)
-	if key == "arrow" then
-		if self.arrow ~= value then
-			Widgets.Label.setter(self, key, value)
-			self:reshaped()
-		end
-	else
-		Widgets.Label.setter(self, key, value)
-	end
-end
+Widgets.MenuItem.class_name = "Widgets.MenuItem"
 
 Widgets.MenuItem.new = function(clss, args)
 	local self = Widgets.Label.new(clss, args)
@@ -47,3 +37,13 @@ Widgets.MenuItem.reshaped = function(self)
 	end
 	self:canvas_compile()
 end
+
+Widgets.MenuItem:add_getters{
+	arrow = function(s) return rawget(s, "__arrows") end}
+
+Widgets.MenuItem:add_setters{
+	arrow = function(s, v)
+		if s.arrow == v then return end
+		rawset(s, "__arrow", v)
+		s:reshaped()
+	end}

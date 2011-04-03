@@ -24,28 +24,6 @@
 
 #include "ext-module.h"
 
-/* @luadoc
- * module "core/animation"
- * --- Animation playback for objects.
- * -- @name Object
- * -- @class table
- */
-
-/* @luadoc
- * --- Sets or clears an animation.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>animation: Animation name.</li>
- * --   <li>channel: Channel number.</li>
- * --   <li>fade_in: Fade in duration in seconds.</li>
- * --   <li>fade_out: Fade out duration in seconds.</li>
- * --   <li>weight: Blending weight.</li>
- * --   <li>time: Starting time.</li>
- * --   <li>permanent: True if should keep repeating.</li></ul>
- * --   <li>repeat_start: Starting time when repeating.</li>
- * -- @return True if started a new animation.
- * function Object.animate(self, args)
- */
 static void Object_animate (LIScrArgs* args)
 {
 	int ret;
@@ -77,14 +55,6 @@ static void Object_animate (LIScrArgs* args)
 	liscr_args_seti_bool (args, ret);
 }
 
-/* @luadoc
- * --- Fades out an animation channel.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>channel: Channel number.</li>
- * --   <li>duration: Fade duration in seconds.</li></ul>
- * function Object.animate_fade(self, args)
- */
 static void Object_animate_fade (LIScrArgs* args)
 {
 	int channel = 0;
@@ -105,18 +75,6 @@ static void Object_animate_fade (LIScrArgs* args)
 		limdl_pose_fade_channel (object->pose, channel, time);
 }
 
-/* @luadoc
- * --- Edits the pose of a node.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>channel: Channel number.</li>
- * --   <li>frame: Frame number.</li>
- * --   <li>node: Node name. (required)</li>
- * --   <li>position: Position change relative to rest pose.</li>
- * --   <li>rotation: Rotation change relative to rest pose.</li>
- * --   <li>scale: Scale factor.</li></ul>
- * function Object.edit_pose(self, args)
- */
 static void Object_edit_pose (LIScrArgs* args)
 {
 	int frame = 0;
@@ -148,16 +106,6 @@ static void Object_edit_pose (LIScrArgs* args)
 	limdl_pose_set_channel_transform (self->pose, channel, frame, node, scale, &transform);
 }
 
-/* @luadoc
- * --- Finds a bone or an anchor by name.
- * --
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>name: Node name. (required)</li>
- * --   <li>space: Coordinate space. ("local"/"world")</li></ul>
- * -- @return Position and rotation, or nil if not found.
- * function Object.find_node(self, args)
- */
 static void Object_find_node (LIScrArgs* args)
 {
 	float scale;
@@ -193,16 +141,6 @@ static void Object_find_node (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &transform.rotation);
 }
 
-/* @luadoc
- * --- Gets animation information for the given animation channel.<br/>
- * -- If an animation is looping in the channel, a table containing the fields
- * -- animation, time, and weight is returned.
- * -- @param self Server class.
- * -- @param args Arguments.<ul>
- * --   <li>channel: Channel number. (required)</li></ul>
- * -- @return Animation info table or nil.
- * function Object.get_animation(self, args)
- */
 static void Object_get_animation (LIScrArgs* args)
 {
 	int chan;
@@ -225,12 +163,6 @@ static void Object_get_animation (LIScrArgs* args)
 	liscr_args_sets_float (args, "weight_scale", limdl_pose_get_channel_priority_scale (object->pose, chan));
 }
 
-/* @luadoc
- * --- Gets the list of active animations.
- * -- @param self Server class.
- * -- @return Animation list.
- * function Object.get_animations(self)
- */
 static void Object_get_animations (LIScrArgs* args)
 {
 	LIAlgU32dicIter iter;
@@ -247,13 +179,6 @@ static void Object_get_animations (LIScrArgs* args)
 	}
 }
 
-/* @luadoc
- * --- Updates the animations of the object.
- * -- @param self Object.
- * -- @param args Arguments.<ul>
- * --   <li>secs: Tick length.</li></ul>
- * function Object.update_animations(self, args)
- */
 static void Object_update_animations (LIScrArgs* args)
 {
 	float secs = 1.0f;
@@ -268,16 +193,15 @@ static void Object_update_animations (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_object_animation (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_insert_mfunc (self, "animate", Object_animate);
-	liscr_class_insert_mfunc (self, "animate_fade", Object_animate_fade);
-	liscr_class_insert_mfunc (self, "edit_pose", Object_edit_pose);
-	liscr_class_insert_mfunc (self, "find_node", Object_find_node);
-	liscr_class_insert_mfunc (self, "get_animation", Object_get_animation);
-	liscr_class_insert_mfunc (self, "get_animations", Object_get_animations);
-	liscr_class_insert_mfunc (self, "update_animations", Object_update_animations);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_animate", Object_animate);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_animate_fade", Object_animate_fade);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_edit_pose", Object_edit_pose);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_find_node", Object_find_node);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_animation", Object_get_animation);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_animations", Object_get_animations);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_update_animations", Object_update_animations);
 }
 
 /** @} */

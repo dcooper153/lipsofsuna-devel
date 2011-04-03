@@ -52,10 +52,6 @@ LIAPICALL (LIEngObject*, lieng_object_new, (
 LIAPICALL (void, lieng_object_free, (
 	LIEngObject* self));
 
-LIAPICALL (void, lieng_object_ref, (
-	LIEngObject* self,
-	int          count));
-
 LIAPICALL (int, lieng_object_animate, (
 	LIEngObject* self,
 	int          channel,

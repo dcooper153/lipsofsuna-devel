@@ -24,15 +24,6 @@
 
 #include "ext-module.h"
 
-/* @luadoc
- * --- Adds a font style.
- * -- @param clss Widgets class.
- * -- @param args Arguments.<ul>
- * --   <li>1,name: Font name.</li>
- * --   <li>2,file: Font file.</li>
- * --   <li>3,size: Font size.</li></ul>
- * function Widgets.add_font_style(clss, args)
- */
 static void Widgets_add_font_style (LIScrArgs* args)
 {
 	int size = 16;
@@ -51,31 +42,19 @@ static void Widgets_add_font_style (LIScrArgs* args)
 	    liscr_args_gets_int (args, "size", &size);
 
 	/* Load the font. */
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_WIDGETS);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_WIDGETS);
 	if (!liwdg_styles_load_font (module->widgets->styles, name, file, size))
 		lisys_error_report ();
 }
 
-/* @luadoc
- * --- Draws the user interface.
- * -- @param clss Widgets class.
- * function Widgets.draw(clss)
- */
 static void Widgets_draw (LIScrArgs* args)
 {
 	LIExtModule* module;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_WIDGETS);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_WIDGETS);
 	liwdg_manager_render (module->widgets);
 }
 
-/* @luadoc
- * --- Finds a widget by screen position.
- * -- @param clss Widgets class.
- * -- @param args Arguments.<ul>
- * --   <li>1,point: Screen position.</li></ul>
- * function Widgets.find_widget(clss, args)
- */
 static void Widgets_find_widget (LIScrArgs* args)
 {
 	int x;
@@ -92,7 +71,7 @@ static void Widgets_find_widget (LIScrArgs* args)
 		vector = limat_vector_init (x, y, 0.0f);
 	}
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_WIDGETS);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_WIDGETS);
 	widget = liwdg_manager_find_widget_by_point (module->widgets, (int) vector.x, (int) vector.y);
 	if (widget == NULL)
 		return;
@@ -102,11 +81,6 @@ static void Widgets_find_widget (LIScrArgs* args)
 	liscr_args_seti_data (args, data);
 }
 
-/* @luadoc
- * --- Currently focused widget.
- * -- @name Widgets.focused_widget
- * -- @class table
- */
 static void Widgets_get_focused_widget (LIScrArgs* args)
 {
 	int x;
@@ -116,7 +90,7 @@ static void Widgets_get_focused_widget (LIScrArgs* args)
 	LIScrData* data;
 
 	SDL_GetMouseState (&x, &y);
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_WIDGETS);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_WIDGETS);
 	widget = liwdg_manager_find_widget_by_point (module->widgets, x, y);
 	if (widget == NULL)
 		return;
@@ -129,15 +103,12 @@ static void Widgets_get_focused_widget (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_widgets (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_WIDGETS, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "add_font_style", Widgets_add_font_style);
-	liscr_class_insert_cfunc (self, "draw", Widgets_draw);
-	liscr_class_insert_cfunc (self, "find_widget", Widgets_find_widget);
-	liscr_class_insert_cfunc (self, "get_focused_widget", Widgets_get_focused_widget);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_WIDGETS, "widgets_add_font_style", Widgets_add_font_style);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_WIDGETS, "widgets_draw", Widgets_draw);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_WIDGETS, "widgets_find_widget", Widgets_find_widget);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_WIDGETS, "widgets_get_focused_widget", Widgets_get_focused_widget);
 }
 
 /** @} */

@@ -37,7 +37,6 @@ void liext_config_file_free (
 /*****************************************************************************/
 
 void liext_script_config_file (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

@@ -37,7 +37,6 @@ void liext_skeleton_free (
 /*****************************************************************************/
 
 void liext_script_skeleton (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif

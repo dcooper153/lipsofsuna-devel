@@ -25,24 +25,11 @@
 #include <lipsofsuna/render.h>
 #include "ext-module.h"
 
-/* @luadoc
- * module "core/render"
- * ---
- * -- Configure rendering settings.
- * -- @name Render
- * -- @class table
- */
-
-/* @luadoc
- * --- Anisotrophic filtering setting.
- * -- @name Render.anisotrophy
- * -- @class table
- */
 static void Render_get_anisotrophy (LIScrArgs* args)
 {
 	LIExtModule* module;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
 	liscr_args_seti_int (args, liren_render_get_anisotropy (module->client->render));
 }
 static void Render_set_anisotrophy (LIScrArgs* args)
@@ -50,7 +37,7 @@ static void Render_set_anisotrophy (LIScrArgs* args)
 	int value;
 	LIExtModule* module;
 
-	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER);
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
 	if (liscr_args_geti_int (args, 0, &value))
 	{
 		value = LIMAT_MAX (0, value);
@@ -61,13 +48,10 @@ static void Render_set_anisotrophy (LIScrArgs* args)
 /*****************************************************************************/
 
 void liext_script_render (
-	LIScrClass* self,
-	void*       data)
+	LIScrScript* self)
 {
-	liscr_class_set_userdata (self, LIEXT_SCRIPT_RENDER, data);
-	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
-	liscr_class_insert_cfunc (self, "get_anisotrophy", Render_get_anisotrophy);
-	liscr_class_insert_cfunc (self, "set_anisotrophy", Render_set_anisotrophy);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_get_anisotrophy", Render_get_anisotrophy);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_anisotrophy", Render_set_anisotrophy);
 }
 
 /** @} */

@@ -74,7 +74,8 @@ LIExtModule* liext_speeches_new (
 	}
 
 	/* Register classes. */
-	liscr_script_create_class (program->script, "Speech", liext_script_speech, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_SPEECH, self);
+	liext_script_speech (program->script);
 
 	return self;
 }

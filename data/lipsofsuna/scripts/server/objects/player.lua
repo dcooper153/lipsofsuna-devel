@@ -1,12 +1,12 @@
 Player = Class(Creature)
+Player.class_name = "Player"
 Player.clients = {}
-local findfunc = Player.find
 
 Player.find = function(clss, args)
 	if args and args.client then
 		return clss.clients[args.client]
 	end
-	return findfunc(clss, args)
+	return Creature.find(clss, args)
 end
 
 --- Creates a new player object.

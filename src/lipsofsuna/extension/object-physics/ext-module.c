@@ -79,7 +79,6 @@ LIExtModule* liext_object_physics_new (
 	LIMaiProgram* program)
 {
 	LIExtModule* self;
-	LIScrClass* clss;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
@@ -119,9 +118,8 @@ LIExtModule* liext_object_physics_new (
 	}
 
 	/* Extend the object class. */
-	clss = liscr_script_find_class (program->script, "Object");
-	if (clss != NULL)
-		liext_script_object (clss, self);
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_PHYSICS_OBJECT, self);
+	liext_script_physics_object (program->script);
 
 	return self;
 }
@@ -156,9 +154,18 @@ static int private_model_free (
 {
 	LIPhyModel* model_;
 
+	/* Find the model. */
 	model_ = liphy_physics_find_model (self->physics, model->id);
-	if (model_ != NULL)
-		liphy_model_free (model_);
+	if (model_ == NULL)
+		return 1;
+
+	/* Remove from objects. */
+	/* Keeping the model alive when it's assigned to objects is the job of scripts.
+	   If they don't reference the model, we'll remove it even if it's in use. We
+	   prevent crashing by removing it from objects in such a case. */
+	liphy_physics_remove_model (self->physics, model_);
+
+	liphy_model_free (model_);
 
 	return 1;
 }
@@ -194,12 +201,7 @@ static void private_object_contact (
 		object1 = liphy_object_get_userdata (contact->object1);
 		point = liscr_vector_new (script, &contact->point);
 		normal = liscr_vector_new (script, &contact->normal);
-		limai_program_event (self->program, "object-contact",
-			"impulse", LISCR_TYPE_FLOAT, contact->impulse,
-			"normal", LISCR_SCRIPT_VECTOR, normal, 
-			"object", LISCR_SCRIPT_OBJECT, object1->script,
-			"point", LISCR_SCRIPT_VECTOR, point,
-			"self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
+		limai_program_event (self->program, "object-contact", "impulse", LISCR_TYPE_FLOAT, contact->impulse, "normal", LISCR_SCRIPT_VECTOR, normal, "object", LISCR_SCRIPT_OBJECT, object1->script, "point", LISCR_SCRIPT_VECTOR, point, "self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
 		liscr_data_unref (point);
 		liscr_data_unref (normal);
 	}
@@ -212,12 +214,7 @@ static void private_object_contact (
 		point = liscr_vector_new (script, &contact->point);
 		normal = liscr_vector_new (script, &contact->normal);
 		tile = liscr_vector_new (script, &vector);
-		limai_program_event (self->program, "object-contact",
-			"impulse", LISCR_TYPE_FLOAT, contact->impulse,
-			"normal", LISCR_SCRIPT_VECTOR, normal, 
-			"point", LISCR_SCRIPT_VECTOR, point,
-			"tile", LISCR_SCRIPT_VECTOR, tile,
-			"self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
+		limai_program_event (self->program, "object-contact", "impulse", LISCR_TYPE_FLOAT, contact->impulse, "normal", LISCR_SCRIPT_VECTOR, normal,  "point", LISCR_SCRIPT_VECTOR, point, "tile", LISCR_SCRIPT_VECTOR, tile, "self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
 		liscr_data_unref (point);
 		liscr_data_unref (normal);
 		liscr_data_unref (tile);

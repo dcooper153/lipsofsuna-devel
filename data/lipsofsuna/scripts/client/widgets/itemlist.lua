@@ -1,24 +1,5 @@
 Widgets.ItemList = Class(Widget)
 
-Widgets.ItemList.setter = function(self, key, value)
-	if key == "size" then
-		Widget.setter(self, key, value)
-		local rows = math.ceil(value / 5)
-		self.cols = 5
-		self.rows = rows
-		self.buttons = {}
-		for i = 1,value do
-			self.buttons[i] = Widgets.ItemButton{pressed = function(w, a) self:activated(i, a) end}
-			self:set_child{
-				col = 1 + math.floor((i - 1) / rows),
-				row = 1 + (i - 1) % rows,
-				widget = self.buttons[i]}
-		end
-	else
-		Widget.setter(self, key, value)
-	end
-end
-
 Widgets.ItemList.new = function(clss, args)
 	local self = Widget.new(clss)
 	self.cols = 1
@@ -45,3 +26,22 @@ Widgets.ItemList.set_item = function(self, args)
 	widget.count = args.count
 	widget.icon = args.icon
 end
+
+Widgets.ItemList:add_getters{
+	size = function(s) return rawget(s, "__size") end}
+
+Widgets.ItemList:add_setters{
+	size = function(s, v)
+		rawset(s, "__size", v)
+		local rows = math.ceil(v / 5)
+		s.cols = 5
+		s.rows = rows
+		s.buttons = {}
+		for i = 1,v do
+			s.buttons[i] = Widgets.ItemButton{pressed = function(w, a) s:activated(i, a) end}
+			s:set_child(
+				1 + math.floor((i - 1) / rows),
+				1 + (i - 1) % rows,
+				s.buttons[i])
+		end
+	end}

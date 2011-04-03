@@ -42,19 +42,15 @@ void liext_render_free (
 /*****************************************************************************/
 
 void liext_script_light (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 void liext_script_render (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 void liext_script_scene (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 void liext_script_shader (
-	LIScrClass* self,
-	void*       data);
+	LIScrScript* self);
 
 #endif
