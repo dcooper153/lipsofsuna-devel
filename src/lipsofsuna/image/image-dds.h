@@ -48,6 +48,7 @@
 #define DDS_COMPRESS_DXT3 0x33545844
 #define DDS_COMPRESS_DXT5 0x35545844
 #define DDS_CAPS_COMPLEX 0x00000008
+#define DDS_CAPS_CUBEMAP 0x00000200
 #define DDS_CAPS_TEXTURE 0x00001000
 #define DDS_CAPS_MIPMAP 0x00400000
 
@@ -74,6 +75,7 @@ struct _LIImgDDSFormat
 	int alpha;
 	int bytes;
 	int type;
+	int cubemap;
 };
 
 typedef struct _LIImgDDSLevel LIImgDDSLevel;
@@ -250,16 +252,16 @@ static inline int liimg_dds_read_header (
 	}
 	formats[] =
 	{
-		{ 1, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF, { 1, 4, DDS_TYPE_RGBA8888 } },
-		{ 0, 24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000, { 0, 3, DDS_TYPE_RGB888 } },
-		{ 1, 32, 0x0000FF00, 0x00FF0000, 0xFF000000, 0x000000FF, { 1, 4, DDS_TYPE_BGRA8888 } },
-		{ 0, 24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000, { 0, 3, DDS_TYPE_BGR888 } },
-		{ 1, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000, { 1, 4, DDS_TYPE_ARGB8888 } },
-		{ 1, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000, { 1, 4, DDS_TYPE_ABGR8888 } },
-		{ 1, 16, 0xF000, 0x0F00, 0x00F0, 0x000F, { 1, 2, DDS_TYPE_RGBA4444 } },
-		{ 1, 16, 0x0F00, 0x00F0, 0x000F, 0xF000, { 1, 2, DDS_TYPE_ARGB4444 } },
-		{ 0, 16, 0xF800, 0x07E0, 0x001F, 0x0000, { 0, 2, DDS_TYPE_RGB565 } },
-		{ 0, 16, 0x001F, 0x07E0, 0xF800, 0x0000, { 0, 2, DDS_TYPE_BGR565 } }
+		{ 1, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF, { 1, 4, DDS_TYPE_RGBA8888, 0 } },
+		{ 0, 24, 0x00FF0000, 0x0000FF00, 0x000000FF, 0x00000000, { 0, 3, DDS_TYPE_RGB888, 0 } },
+		{ 1, 32, 0x0000FF00, 0x00FF0000, 0xFF000000, 0x000000FF, { 1, 4, DDS_TYPE_BGRA8888, 0 } },
+		{ 0, 24, 0x000000FF, 0x0000FF00, 0x00FF0000, 0x00000000, { 0, 3, DDS_TYPE_BGR888, 0 } },
+		{ 1, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000, { 1, 4, DDS_TYPE_ARGB8888, 0 } },
+		{ 1, 32, 0x000000FF, 0x0000FF00, 0x00FF0000, 0xFF000000, { 1, 4, DDS_TYPE_ABGR8888, 0 } },
+		{ 1, 16, 0xF000, 0x0F00, 0x00F0, 0x000F, { 1, 2, DDS_TYPE_RGBA4444, 0 } },
+		{ 1, 16, 0x0F00, 0x00F0, 0x000F, 0xF000, { 1, 2, DDS_TYPE_ARGB4444, 0 } },
+		{ 0, 16, 0xF800, 0x07E0, 0x001F, 0x0000, { 0, 2, DDS_TYPE_RGB565, 0 } },
+		{ 0, 16, 0x001F, 0x07E0, 0xF800, 0x0000, { 0, 2, DDS_TYPE_BGR565, 0 } }
 	};
 
 	/* Read header. */
@@ -297,15 +299,17 @@ static inline int liimg_dds_read_header (
 			case DDS_COMPRESS_DXT1:
 				self->info.alpha = 0;
 				self->info.type = DDS_TYPE_DXT1;
-				return 1;
+				break;
 			case DDS_COMPRESS_DXT3:
 				self->info.alpha = 1;
 				self->info.type = DDS_TYPE_DXT3;
-				return 1;
+				break;
 			case DDS_COMPRESS_DXT5:
 				self->info.alpha = 1;
 				self->info.type = DDS_TYPE_DXT5;
-				return 1;
+				break;
+			default:
+				return 0;
 		}
 	}
 	else
@@ -323,12 +327,16 @@ static inline int liimg_dds_read_header (
 			   (formats[i].amask == self->format.amask || !alpha))
 			{
 				self->info = formats[i].format;
-				return 1;
+				break;
 			}
 		}
 	}
 
-	return 0;
+	/* Check if this is a cube map. */
+	if (self->caps.caps2 & DDS_CAPS_CUBEMAP)
+		self->info.cubemap = 1;
+
+	return 1;
 }
 
 /**

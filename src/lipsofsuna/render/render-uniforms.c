@@ -65,6 +65,7 @@ void liren_uniforms_setup (
 {
 	int i;
 	const char* uniform_names[LIREN_UNIFORM_COUNT] = {
+		"LOS_camera_position",
 		"LOS_material_diffuse",
 		"LOS_material_param_0",
 		"LOS_material_shininess",

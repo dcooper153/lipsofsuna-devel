@@ -132,6 +132,9 @@ int liren_scene_render_begin (
 	LIMatMatrix*   projection,
 	LIMatFrustum*  frustum)
 {
+	float tmp[3];
+	LIMatMatrix inv;
+	LIMatVector eye;
 	LIRenContext* context;
 
 	lisys_assert (modelview != NULL);
@@ -148,6 +151,14 @@ int liren_scene_render_begin (
 	liren_context_set_projection (context, projection);
 	liren_context_set_viewmatrix (context, modelview);
 	liren_context_set_time (context, self->time);
+
+	/* Calculate camera position. */
+	inv = limat_matrix_invert (*modelview);
+	eye = limat_matrix_transform (inv, limat_vector_init (0.0f, 0.0f, 0.0f));
+	tmp[0] = eye.x;
+	tmp[1] = eye.y;
+	tmp[2] = eye.z;
+	liren_uniforms_set_vec3 (&context->uniforms, LIREN_UNIFORM_CAMERA_POSITION, tmp);
 
 	/* Depth sort scene. */
 	if (!private_sort_scene (self, context))

@@ -97,6 +97,7 @@ struct _LIRenContext
 	{
 		int count;
 		LIRenContextTexture array[9];
+		LIRenContextTexture cubemap;
 	} textures;
 };
 

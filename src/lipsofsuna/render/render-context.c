@@ -540,27 +540,49 @@ void liren_context_set_textures (
 {
 	int c;
 	int i;
+	GLenum gltarget;
+	GLuint gltexture;
 	LIRenContextTexture* texture;
 
 	c = LIMAT_MIN (count, 4);
 	for (i = 0 ; i < c ; i++)
 	{
 		texture = self->textures.array + i;
-		if (texture->texture != liren_texture_get_texture (value + i))
+		gltarget = liren_texture_get_target (value + i);
+		gltexture = liren_texture_get_texture (value + i);
+		/* Bind cube maps. */
+		/* Only one cube map is supported at a time and it's bound to a
+		   special sampler. The 2D sampler whose index contained a cube map
+		   is set to an empty texture. */
+		if (gltarget == GL_TEXTURE_CUBE_MAP)
 		{
-			texture->texture = liren_texture_get_texture (value + i);
+			if (self->textures.cubemap.texture != gltexture)
+			{
+				self->textures.cubemap.texture = gltexture;
+				glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_CUBE_TEXTURE);
+				glBindTexture (gltarget, gltexture);
+			}
+			gltarget = GL_TEXTURE_2D;
+			gltexture = self->render->helpers.empty_image->texture->texture;
+		}
+		/* Bind 2D textures. */
+		if (texture->texture != gltexture)
+		{
+			texture->texture = gltexture;
 			glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_DIFFUSE_TEXTURE_0 + i);
-			glBindTexture (GL_TEXTURE_2D, texture->texture);
+			glBindTexture (gltarget, gltexture);
 		}
 	}
 	for ( ; i < 4 ; i++)
 	{
 		texture = self->textures.array + i;
-		if (texture->texture != self->render->helpers.empty_image->texture->texture)
+		gltarget = GL_TEXTURE_2D;
+		gltexture = self->render->helpers.empty_image->texture->texture;
+		if (texture->texture != gltexture)
 		{
-			texture->texture = self->render->helpers.empty_image->texture->texture;
+			texture->texture = gltexture;
 			glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_DIFFUSE_TEXTURE_0 + i);
-			glBindTexture (GL_TEXTURE_2D, texture->texture);
+			glBindTexture (gltarget, gltexture);
 		}
 	}
 }

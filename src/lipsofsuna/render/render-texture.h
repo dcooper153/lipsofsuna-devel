@@ -42,7 +42,10 @@ LIAPICALL (void, liren_texture_set_image, (
 	LIRenTexture* self,
 	LIRenImage*   value));
 
+LIAPICALL (GLenum, liren_texture_get_target, (
+	const LIRenTexture* self));
+
 LIAPICALL (GLuint, liren_texture_get_texture, (
-	LIRenTexture* self));
+	const LIRenTexture* self));
 
 #endif

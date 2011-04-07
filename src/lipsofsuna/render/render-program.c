@@ -266,6 +266,7 @@ static int private_compile (
 		/* Common */
 		"#define LOS_LIGHT_MAX 5\n"
 		"layout(shared) uniform LOSDATA\n{\n"
+		"	vec3 LOS_camera_position;\n"
 		"	vec4 LOS_material_diffuse;\n"
 		"	vec4 LOS_material_param_0;\n"
 		"	float LOS_material_shininess;\n"

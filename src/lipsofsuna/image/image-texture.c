@@ -135,6 +135,10 @@ int liimg_texture_load (
 		return 0;
 	}
 	glDeleteTextures (1, &self->texture);
+	if (dds.info.cubemap)
+		self->target = GL_TEXTURE_CUBE_MAP;
+	else
+		self->target = GL_TEXTURE_2D;
 	self->texture = tex;
 	self->width = dds.header.width;
 	self->height = dds.header.height;

@@ -26,6 +26,7 @@ struct _LIImgTexture
 {
 	int width;
 	int height;
+	GLenum target;
 	GLuint texture;
 };
 

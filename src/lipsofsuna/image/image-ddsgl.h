@@ -88,6 +88,50 @@ static inline int liimg_ddsgl_get_format (
 }
 
 /**
+ * \brief Loads mipmap levels from a DDS texture file.
+ * \param dds DDS information structure.
+ * \param format DDS OpenGL information structure.
+ * \param file File pointer.
+ * \param target Texture target type.
+ * \param texture Texture.
+ * \return Nonzero on success.
+ */
+static inline int liimg_ddsgl_load_levels (
+	LIImgDDS*         dds,
+	LIImgDDSGLFormat* format,
+	FILE*             file,
+	GLenum            target,
+	GLuint            texture)
+{
+	int level;
+	LIImgDDSLevel lvl;
+
+	for (level = 0 ; !level || level < (int) dds->header.mipmaps ; level++)
+	{
+		if (!format->compressed)
+		{
+			/* Uncompressed format. */
+			if (!liimg_dds_read_level (dds, file, level, &lvl))
+				return 0;
+			glTexImage2D (target, level, format->internal, lvl.width,
+				lvl.height, 0, format->format, format->type, lvl.data);
+			lisys_free (lvl.data);
+		}
+		else
+		{
+			/* Compressed format. */
+			if (!liimg_dds_read_level (dds, file, level, &lvl))
+				return 0;
+			glCompressedTexImage2DARB (target, level, format->format,
+				lvl.width, lvl.height, 0, lvl.size, lvl.data);
+			lisys_free (lvl.data);
+		}
+	}
+
+	return 1;
+}
+
+/**
  * \brief Loads a DDS texture file.
  * \param file File pointer.
  * \param info Return location for DDS info or NULL.
@@ -99,56 +143,58 @@ static inline GLuint liimg_ddsgl_load_texture (
 {
 	int i;
 	GLuint texture;
+	GLenum target;
 	LIImgDDS dds;
 	LIImgDDSGLFormat fmt;
-	LIImgDDSLevel lvl;
 
 	/* Read header. */
 	if (!liimg_dds_read_header (&dds, file) ||
 	    !liimg_ddsgl_get_format (&dds, &fmt))
 		return 0;
+	if (fmt.compressed)
+	{
+		if (!GLEW_EXT_texture_compression_s3tc)
+			return 0;
+	}
 	if (info != NULL)
 		*info = dds;
 
-	/* Load image. */
+	/* Create a texture. */
+	if (dds.info.cubemap)
+		target = GL_TEXTURE_CUBE_MAP;
+	else
+		target = GL_TEXTURE_2D;
 	glGenTextures (1, &texture);
-	glBindTexture (GL_TEXTURE_2D, texture);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	if (!fmt.compressed)
+	glBindTexture (target, texture);
+	glTexParameteri (target, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri (target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	/* Load the mipmap levels. */
+	if (dds.info.cubemap)
 	{
-		/* Uncompressed format. */
-		for (i = 0 ; !i || i < (int) dds.header.mipmaps ; i++)
+		/* Cube map. */
+		for (i = 0 ; i < 6 ; i++)
 		{
-			if (!liimg_dds_read_level (&dds, file, i, &lvl))
+			if (!liimg_ddsgl_load_levels (&dds, &fmt, file, GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, texture))
 			{
 				glDeleteTextures (1, &texture);
 				return 0;
 			}
-			glTexImage2D (GL_TEXTURE_2D, i, fmt.internal, lvl.width,
-				lvl.height, 0, fmt.format, fmt.type, lvl.data);
-			lisys_free (lvl.data);
 		}
 	}
 	else
 	{
-		/* Compressed format. */
-		if (!GLEW_EXT_texture_compression_s3tc)
-			return 0;
-		for (i = 0 ; !i || i < (int) dds.header.mipmaps ; i++)
+		/* 2D texture. */
+		if (!liimg_ddsgl_load_levels (&dds, &fmt, file, GL_TEXTURE_2D, texture))
 		{
-			if (!liimg_dds_read_level (&dds, file, i, &lvl))
-			{
-				glDeleteTextures (1, &texture);
-				return 0;
-			}
-			glCompressedTexImage2DARB (GL_TEXTURE_2D, i, fmt.format,
-				lvl.width, lvl.height, 0, lvl.size, lvl.data);
-			lisys_free (lvl.data);
+			glDeleteTextures (1, &texture);
+			return 0;
 		}
 	}
+
+	/* Generate mipmap if not provided by the file. */
 	if (dds.header.mipmaps <= 1)
-		glGenerateMipmap (GL_TEXTURE_2D);
+		glGenerateMipmap (target);
 
 	return texture;
 }
