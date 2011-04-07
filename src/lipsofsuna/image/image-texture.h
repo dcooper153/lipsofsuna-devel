@@ -18,7 +18,8 @@
 #ifndef __IMAGE_TEXTURE_H__
 #define __IMAGE_TEXTURE_H__
 
-#include <lipsofsuna/video.h>
+#include "lipsofsuna/system.h"
+#include "lipsofsuna/video.h"
 
 typedef struct _LIImgTexture LIImgTexture;
 struct _LIImgTexture
@@ -28,22 +29,21 @@ struct _LIImgTexture
 	GLuint texture;
 };
 
-LIImgTexture*
-liimg_texture_new ();
+LIAPICALL (LIImgTexture*, liimg_texture_new, ());
 
-LIImgTexture*
-liimg_texture_new_from_rgba (int         width,
-                             int         height,
-                             const void* pixels);
+LIAPICALL (LIImgTexture*, liimg_texture_new_from_rgba, (
+	int         width,
+	int         height,
+	const void* pixels));
 
-LIImgTexture*
-liimg_texture_new_from_file (const char* path);
+LIAPICALL (LIImgTexture*, liimg_texture_new_from_file, (
+	const char* path));
 
-void
-liimg_texture_free (LIImgTexture* self);
+LIAPICALL (void, liimg_texture_free, (
+	LIImgTexture* self));
 
-int
-liimg_texture_load (LIImgTexture* self,
-                    const char*   path);
+LIAPICALL (int, liimg_texture_load, (
+	LIImgTexture* self,
+	const char*   path));
 
 #endif

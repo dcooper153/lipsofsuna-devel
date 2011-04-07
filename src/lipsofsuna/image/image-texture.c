@@ -30,11 +30,9 @@
 
 /**
  * \brief Creates a new empty texture.
- *
  * \return New texture or NULL.
  */
-LIImgTexture*
-liimg_texture_new ()
+LIImgTexture* liimg_texture_new ()
 {
 	LIImgTexture* self;
 
@@ -47,16 +45,15 @@ liimg_texture_new ()
 
 /**
  * \brief Creates a texture from RGBA data.
- *
  * \param width Width in pixels.
  * \param height Height in pixels.
  * \param pixels Pixel data.
  * \return New texture or NULL.
  */
-LIImgTexture*
-liimg_texture_new_from_rgba (int         width,
-                             int         height,
-                             const void* pixels)
+LIImgTexture* liimg_texture_new_from_rgba (
+	int         width,
+	int         height,
+	const void* pixels)
 {
 	LIImgTexture* self;
 
@@ -77,12 +74,11 @@ liimg_texture_new_from_rgba (int         width,
 
 /**
  * \brief Loads a texture from a file.
- *
  * \param path Path to the texture file.
  * \return New texture or NULL.
  */
-LIImgTexture*
-liimg_texture_new_from_file (const char* path)
+LIImgTexture* liimg_texture_new_from_file (
+	const char* path)
 {
 	LIImgTexture* self;
 
@@ -100,11 +96,10 @@ liimg_texture_new_from_file (const char* path)
 
 /**
  * \brief Frees the texture.
- *
  * \param self Texture.
  */
-void
-liimg_texture_free (LIImgTexture* self)
+void liimg_texture_free (
+	LIImgTexture* self)
 {
 	if (self->texture)
 		glDeleteTextures (1, &self->texture);
@@ -113,14 +108,13 @@ liimg_texture_free (LIImgTexture* self)
 
 /**
  * \brief Loads texture data from a DDS file.
- *
  * \param self Texture.
  * \param path Path to the file.
  * \return Nonzero on success.
  */
-int
-liimg_texture_load (LIImgTexture* self,
-                    const char*   path)
+int liimg_texture_load (
+	LIImgTexture* self,
+	const char*   path)
 {
 	FILE* file;
 	GLuint tex;
