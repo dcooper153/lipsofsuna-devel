@@ -412,7 +412,7 @@ Itemspec{
 
 Itemspec{
 	name = "aquanite sword",
-	model = "sword1",
+	model = "sword5",
 	icon = "sword2",
 	animation_hold = "hold sword",
 	animation_attack = "attack sword",
@@ -650,7 +650,7 @@ Itemspec{
 
 Itemspec{
 	name = "stone hatchet",
-	model = "axe1",
+	model = "stoneaxe1",
 	icon = "axe1",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",

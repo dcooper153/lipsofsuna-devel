@@ -86,6 +86,9 @@
     <url>http://opengameart.org/user/301</url>
   </author-info>
   <author-info>
+    <name>adrix89</name>
+  </author-info>
+  <author-info>
     <name>anonymous</name>
     <url>http://www.blendswap.com/3D-models/author/anonymous/</url>
   </author-info>
@@ -1981,6 +1984,35 @@
   </asset>
 
   <asset>
+    <file>import/stoneaxe1.blend</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/stone-axe</source>
+    <dep>stoneaxe1.png</dep>
+    <dep>stoneaxe1n.png</dep>
+    <status>complete</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/stoneaxe1.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/stone-axe</source>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/stoneaxe1n.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/stone-axe</source>
+    <status>complete</status>
+    <type>normalmap</type>
+  </asset>
+
+  <asset>
     <file>import/sword1.blend</file>
     <author>johndh</author>
     <license>Creative Commons BY-SA 3.0</license>
@@ -2009,6 +2041,25 @@
     <status>usable</status>
     <type>normalmap</type>
     <comment>Baked from the procedural textures.</comment>
+  </asset>
+
+  <asset>
+    <file>import/sword5.blend</file>
+    <author>Clint Bellanger</author>
+    <author>adrix89</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/kingdom-weapon-set</source>
+    <dep>import/sword5.png</dep>
+    <status>complete</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/sword5.png</file>
+    <author>adrix89</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>complete</status>
+    <type>texture</type>
   </asset>
 
   <asset>
