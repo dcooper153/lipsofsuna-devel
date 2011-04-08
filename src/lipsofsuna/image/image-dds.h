@@ -335,6 +335,8 @@ static inline int liimg_dds_read_header (
 	/* Check if this is a cube map. */
 	if (self->caps.caps2 & DDS_CAPS_CUBEMAP)
 		self->info.cubemap = 1;
+	else
+		self->info.cubemap = 0;
 
 	return 1;
 }
