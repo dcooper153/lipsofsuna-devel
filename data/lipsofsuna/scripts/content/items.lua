@@ -265,8 +265,8 @@ Itemspec{
 
 Itemspec{
 	name = "adamantium hatchet",
-	model = "axe3",
-	icon = "axe1",
+	model = "axe1",
+	icon = "axe3",
 	animation_hold = "hold axe",
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
@@ -1145,8 +1145,8 @@ Itemspec{
 
 Itemspec{
 	name = "round shield",
-	icon = "shield1",
-	model = "woodshield1",
+	icon = "woodshield1",
+	model = "shield1",
 	animation_hold = "hold shield",
 	armor_class = 0.08,
 	categories = {"shield"},

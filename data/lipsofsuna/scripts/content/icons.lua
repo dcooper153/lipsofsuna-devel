@@ -447,6 +447,36 @@ Iconspec{
 	size = {34,34}}
 
 Iconspec{
+	name = "modifier-mana",
+	image = "icons2",
+	offset = {0,34},
+	size = {34,34}}
+
+Iconspec{
+	name = "modifier-physical",
+	image = "icons2",
+	offset = {34,34},
+	size = {34,34}}
+
+Iconspec{
+	name = "modifier-speed",
+	image = "icons2",
+	offset = {68,34},
+	size = {34,34}}
+
+Iconspec{
+	name = "modifier-ice",
+	image = "icons2",
+	offset = {0,68},
+	size = {34,34}}
+
+Iconspec{
+	name = "modifier-spark",
+	image = "icons2",
+	offset = {0,102},
+	size = {34,34}}
+
+Iconspec{
 	name = "modifier-fireball",
 	image = "icons2",
 	offset = {0,136},
@@ -457,6 +487,24 @@ Iconspec{
 	name = "modifier-plague",
 	image = "icons2",
 	offset = {34,170},
+	size = {34,34}}
+
+Iconspec{
+	name = "modifier-earthmove",
+	image = "icons2",
+	offset = {0,204},
+	size = {34,34}}
+
+Iconspec{
+	name = "modifier-landslide",
+	image = "icons2",
+	offset = {34,204},
+	size = {34,34}}
+
+Iconspec{
+	name = "modifier-wall",
+	image = "icons2",
+	offset = {68,204},
 	size = {34,34}}
 
 

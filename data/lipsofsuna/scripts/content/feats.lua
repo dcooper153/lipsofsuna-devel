@@ -145,8 +145,10 @@ Feateffectspec{
 	categories = {"melee", "physical"},
 	description = "Inflict physical or telekinetic damage",
 	effect = "impact1",
+	icon = "modifier-physical",
 	influences = {{"physical", -5, -0.95}},
 	skill_mult = {strength = 1, dexterity = 0.5}}
+	
 
 Feateffectspec{
 	name = "restore health",
