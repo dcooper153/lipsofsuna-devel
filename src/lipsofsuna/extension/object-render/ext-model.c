@@ -44,6 +44,7 @@
  */
 static void Model_edit_material (LIScrArgs* args)
 {
+	int i;
 	float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	const char* shader = NULL;
 	const char* texture = NULL;
@@ -51,22 +52,22 @@ static void Model_edit_material (LIScrArgs* args)
 	LIEngModel* model;
 	LIMdlMaterial* material;
 
-	/* Get the engine model. */
 	module = liscr_class_get_userdata (args->clss, LIEXT_SCRIPT_RENDER_MODEL);
 	model = args->self;
-
-	/* Find the modified material. */
 	liscr_args_gets_string (args, "match_shader", &shader);
 	liscr_args_gets_string (args, "match_texture", &texture);
-	material = limdl_model_find_material_by_texture (model->model, shader, texture);
-	if (material == NULL)
-		return;
 
-	/* Edit the material properties. */
-	if (liscr_args_gets_floatv (args, "diffuse", 4, color))
-		limdl_material_set_diffuse (material, color);
-	if (liscr_args_gets_floatv (args, "specular", 4, color))
-		limdl_material_set_specular (material, color);
+	/* Edit each matching material. */
+	for (i = 0 ; i < model->model->materials.count ; i++)
+	{
+		material = model->model->materials.array + i;
+		if (!limdl_material_compare_shader_and_texture (material, shader, texture))
+			continue;
+		if (liscr_args_gets_floatv (args, "diffuse", 4, color))
+			limdl_material_set_diffuse (material, color);
+		if (liscr_args_gets_floatv (args, "specular", 4, color))
+			limdl_material_set_specular (material, color);
+	}
 }
 
 /*****************************************************************************/

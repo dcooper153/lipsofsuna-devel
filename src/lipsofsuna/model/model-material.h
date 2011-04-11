@@ -65,6 +65,11 @@ LIAPICALL (int, limdl_material_compare, (
 	const LIMdlMaterial* self,
 	const LIMdlMaterial* material));
 
+LIAPICALL (int, limdl_material_compare_shader_and_texture, (
+	const LIMdlMaterial* self,
+	const char*          shader,
+	const char*          texture));
+
 LIAPICALL (int, limdl_material_read, (
 	LIMdlMaterial* self,
 	LIArcReader*   reader));

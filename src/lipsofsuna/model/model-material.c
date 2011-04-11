@@ -186,6 +186,29 @@ limdl_material_compare (const LIMdlMaterial* self,
 	return 1;
 }
 
+int limdl_material_compare_shader_and_texture (
+	const LIMdlMaterial* self,
+	const char*          shader,
+	const char*          texture)
+{
+	if (shader != NULL)
+	{
+		/* The name of the shader must match. */
+		if (self->shader != NULL && strcmp (shader, self->shader))
+			return 0;
+	}
+	if (texture != NULL)
+	{
+		/* The name of the first texture must match. */
+		if (!self->textures.count || self->textures.array[0].string == NULL)
+			return 0;
+		if (strcmp (texture, self->textures.array[0].string))
+			return 0;
+	}
+
+	return 1;
+}
+
 /**
  * \brief Deserializes the material from a stream.
  *

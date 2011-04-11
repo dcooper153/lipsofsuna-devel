@@ -467,21 +467,8 @@ LIMdlMaterial* limdl_model_find_material_by_texture (
 	for (i = 0 ; i < self->materials.count ; i++)
 	{
 		material = self->materials.array + i;
-		if (shader != NULL)
-		{
-			/* The name of the shader must match. */
-			if (material->shader != NULL && strcmp (shader, material->shader))
-				continue;
-		}
-		if (texture != NULL)
-		{
-			/* The name of the first texture must match. */
-			if (!material->textures.count || material->textures.array[0].string == NULL)
-				continue;
-			if (strcmp (texture, material->textures.array[0].string))
-				continue;
-		}
-		return material;
+		if (limdl_material_compare_shader_and_texture (material, shader, texture))
+			return material;
 	}
 
 	return NULL;
