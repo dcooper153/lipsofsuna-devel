@@ -110,6 +110,10 @@ def object_files(object):
 			return obj[prop]
 		except:
 			return ""
+	# No files for explicitly disabled objects.
+	if getprop(object, 'export') == 'false':
+		return []
+	# Otherwise get the list from the file property.
 	files = getprop(object, 'file').split(',')
 	if getprop(object, 'lod') == 'true':
 		return [f + 'l.lmdl' for f in files if len(f)]
