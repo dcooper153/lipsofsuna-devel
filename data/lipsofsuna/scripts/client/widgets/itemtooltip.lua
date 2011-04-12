@@ -15,18 +15,39 @@ Widgets.Itemtooltip.new = function(clss, args)
 	-- Armor.
 	local count = args.count or 1
 	if spec.armor_class > 0 then
-		self:append("armor: " .. tostring(100 * spec.armor_class))
+		self:append("Armor: " .. tostring(100 * spec.armor_class))
 	end
 	-- Count.
 	if spec.stacking then
 		if args.count_drag then
 			self:append(string.format("count: %d/%d", args.count_drag, count))
 		else
-			self:append("count: " .. tostring(count))
+			self:append("Count: " .. tostring(count))
 		end
 	end
+	--Power.
+	
+	if spec.influences_base then
+		self:append(string.format("Power:"))
+		for k,v in pairs(spec.influences_base) do
+			if v < 0 then
+				self:append(string.format("  %s: +%d  damage", k, tostring(v * -1)))
+                        else
+				self:append(string.format("  %s: +%d  regenerative", k, tostring(v)))
+			end
+		end
+	end
+
+	if spec.crafting_materials then
+		self:append(string.format("Crafting Materials:"))
+		for k,v in pairs(spec.crafting_materials) do
+			self:append(string.format("  %s: %d", k, tostring(v)))
+		end
+	end
+
 	-- Weight.
-	self:append_row("weight: " .. (spec.mass * count))
+        --local mass = args.mass
+	self:append("Weight: " .. tostring(spec.mass * count))
 	-- Description.
 	if spec.description then
 		self:append(spec.description)
