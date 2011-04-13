@@ -244,7 +244,7 @@ Itemspec{
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["adamantium"] = 9},
-	influences_base = {physical = -30},
+	influences_base = {physical = -15},
 	influences_bonus = {dexterity = 0.01},
 	animation_hold = "hold crossbow",
 	animation_attack = "attack crossbow",
@@ -258,7 +258,7 @@ Itemspec{
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
-	influences_base = {physical = -20},
+	influences_base = {physical = -10},
 	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
@@ -271,7 +271,7 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
-	influences_base = {hatchet = -20, physical = -20},
+	influences_base = {hatchet = -10, physical = -10},
 	influences_bonus = {strength = 0.01},
 	equipment_slot = "hand.R",
 	mass = 15}
@@ -284,7 +284,7 @@ Itemspec{
 	animation_attack = "attack axe",
 	categories = {"mattock", "melee", "weapon"},
 	crafting_materials = {["adamantium"] = 9},
-	influences_base = {physical = -20},
+	influences_base = {physical = -10},
 	influences_bonus = {strength = 0.01},
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
@@ -297,7 +297,7 @@ Itemspec{
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["adamantium"] = 15, ["log"] = 2},
-	influences_base = {physical = -50},
+	influences_base = {physical = -25},
 	influences_bonus = {intelligence = 0.005, perception = 0.005},
 	animation_hold = "hold crossbow",
 	animation_attack = "attack crossbow",
@@ -313,7 +313,7 @@ Itemspec{
 	animation_attack = "attack sword",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
-	influences_base = {physical = -40},
+	influences_base = {physical = -20},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	equipment_slot = "hand.R",
 	mass = 15}
@@ -325,7 +325,7 @@ Itemspec{
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["aquanite stone"] = 9},
-	influences_base = {cold = -11, physical = -11},
+	influences_base = {cold = -6, physical = -6},
 	influences_bonus = {dexterity = 0.01},
 	animation_hold = "hold crossbow",
 	animation_attack = "attack crossbow",
@@ -340,7 +340,7 @@ Itemspec{
 	categories = {"melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
 	damage_mining = 1,
-	influences_base = {cold = -7, physical = -7},
+	influences_base = {cold = -4, physical = -4},
 	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	health = 500,
@@ -360,7 +360,7 @@ Itemspec{
 	destroy_timer = 3,
 	equipment_slot = "hand.R",
 	health = 1,
-	influences_base = {cold = -30, physical = -10},
+	influences_base = {cold = -15, physical = -5},
 	influences_bonus = {intelligence = 0.01},
 	mass = 5,
 	stacking = true}
@@ -375,7 +375,7 @@ Itemspec{
 	crafting_materials = {["aquanite stone"] = 3},
 	damage_mining = 1,
 	equipment_slot = "hand.R",
-	influences_base = {cold = -7, hatchet = -14, physical = -7},
+	influences_base = {cold = -4, hatchet = -7, physical = -4},
 	influences_bonus = {strength = 0.01},
 	health = 500,
 	mass = 15}
@@ -391,7 +391,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 500,
-	influences_base = {cold = -7, physical = -7},
+	influences_base = {cold = -3, physical = -4},
 	influences_bonus = {strength = 0.01},
 	mass = 15}
 
@@ -406,7 +406,7 @@ Itemspec{
 	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
-	influences_base = {cold = -18, physical = -18},
+	influences_base = {cold = -9, physical = -9},
 	influences_bonus = {intelligence = 0.005, perception = 0.005},
 	mass = 15}
 
@@ -421,7 +421,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 500,
-	influences_base = {cold = -15, physical = -15},
+	influences_base = {cold = -8, physical = -8},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	mass = 15}
 
@@ -435,7 +435,7 @@ Itemspec{
 	icon = "boomerang1",
 	categories = {"boomerang", "throwable", "weapon"},
 	crafting_materials = {log = 2},
-	influences_base = {physical = -10},
+	influences_base = {physical = -5},
 	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	stacking = true,
@@ -452,7 +452,7 @@ Itemspec{
 	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
-	influences_base = {fire = -11, physical = -11},
+	influences_base = {fire = -6, physical = -6},
 	influences_bonus = {dexterity = 0.01},
 	mass = 15}
 
@@ -465,7 +465,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 500,
-	influences_base = {fire = -7, physical = -7},
+	influences_base = {fire = -4, physical = -4},
 	influences_bonus = {dexterity = 0.01},
 	mass = 15}
 
@@ -478,7 +478,7 @@ Itemspec{
 	animation_hold = "hold grenade",
 	categories = {"explosive", "throwable", "weapon"},
 	crafting_materials = {["crimson stone"] = 1, ["iron ingot"] = 1},
-	influences_base = {fire = -30, physical = -10},
+	influences_base = {fire = -15, physical = -5},
 	influences_bonus = {intelligence = 0.01},
 	destroy_actions = {"explode"},
 	destroy_timer = 3,
@@ -498,7 +498,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 500,
-	influences_base = {fire = -7, hatchet = -14, physical = -7},
+	influences_base = {fire = -4, hatchet = -7, physical = -4},
 	influences_bonus = {strength = 0.01},
 	mass = 15}
 
@@ -513,7 +513,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 500,
-	influences_base = {fire = -7, physical = -7},
+	influences_base = {fire = -4, physical = -4},
 	influences_bonus = {strength = 0.01},
 	mass = 15}
 
@@ -524,7 +524,7 @@ Itemspec{
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["crimson stone"] = 15, ["log"] = 2},
-	influences_base = {fire = -16, physical = -16},
+	influences_base = {fire = -8, physical = -8},
 	influences_bonus = {intelligence = 0.005, perception = 0.005},
 	animation_hold = "hold crossbow",
 	animation_attack = "attack crossbow",
@@ -543,7 +543,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 500,
-	influences_base = {fire = -15, physical = -15},
+	influences_base = {fire = -8, physical = -8},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	mass = 15}
 
@@ -554,7 +554,7 @@ Itemspec{
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["iron ingot"] = 3},
-	influences_base = {physical = -15},
+	influences_base = {physical = -8},
 	influences_bonus = {dexterity = 0.005},
 	animation_hold = "hold crossbow",
 	animation_attack = "attack crossbow",
@@ -571,7 +571,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 220,
-	influences_base = {physical = -10},
+	influences_base = {physical = -5},
 	influences_bonus = {dexterity = 0.01},
 	mass = 5}
 
@@ -586,7 +586,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 220,
-	influences_base = {hatchet = -10, physical = -10},
+	influences_base = {hatchet = -5, physical = -5},
 	influences_bonus = {strength = 0.01},
 	mass = 10}
 
@@ -601,7 +601,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 220,
-	influences_base = {physical = -10},
+	influences_base = {physical = -5},
 	influences_bonus = {strength = 0.01},
 	mass = 15}
 
@@ -616,7 +616,7 @@ Itemspec{
 	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
-	influences_base = {physical = -25},
+	influences_base = {physical = -13},
 	influences_bonus = {intelligence = 0.005, perception = 0.005},
 	mass = 20}
 
@@ -631,7 +631,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 220,
-	influences_base = {physical = -10},
+	influences_base = {physical = -5},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	mass = 15}
 
@@ -643,7 +643,7 @@ Itemspec{
 	crafting_materials = {["granite stone"] = 2},
 	damage_mining = 1,
 	equipment_slot = "hand.R",
-	influences_base = {physical = -5},
+	influences_base = {physical = -3},
 	influences_bonus = {dexterity = 0.005},
 	health = 130,
 	mass = 6}
@@ -659,7 +659,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 130,
-	influences_base = {hatchet = -5, physical = -5},
+	influences_base = {hatchet = -3, physical = -3},
 	influences_bonus = {strength = 0.01},
 	mass = 9}
 
@@ -674,7 +674,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 130,
-	influences_base = {physical = -5},
+	influences_base = {physical = -3},
 	influences_bonus = {strength = 0.01},
 	mass = 12}
 
@@ -689,7 +689,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 130,
-	influences_base = {physical = -10},
+	influences_base = {physical = -5},
 	influences_bonus = {dexterity = 0.002, strength = 0.005},
 	mass = 15}
 
@@ -700,7 +700,7 @@ Itemspec{
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["log"] = 5},
-	influences_base = {physical = -7},
+	influences_base = {physical = -4},
 	influences_bonus = {dexterity = 0.01},
 	animation_hold = "hold bow",
 	animation_attack = "attack bow",
@@ -715,7 +715,7 @@ Itemspec{
 	ammo_type = "fire arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["log"] = 5},
-	influences_base = {physical = -7},
+	influences_base = {physical = -4},
 	influences_bonus = {dexterity = 0.01},
 	animation_hold = "hold bow",
 	animation_attack = "attack bow",
@@ -731,7 +731,7 @@ Itemspec{
 	ammo_type = "explosive arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["log"] = 5},
-	influences_base = {physical = -7},
+	influences_base = {physical = -4},
 	influences_bonus = {dexterity = 0.01},
 	animation_hold = "hold bow",
 	animation_attack = "attack bow",
@@ -747,7 +747,7 @@ Itemspec{
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["log"] = 5},
-	influences_base = {physical = -7},
+	influences_base = {physical = -4},
 	influences_bonus = {dexterity = 0.01},
 	animation_hold = "hold crossbow",
 	animation_attack = "attack crossbow",
@@ -766,7 +766,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 100,
-	influences_base = {physical = -5},
+	influences_base = {physical = -3},
 	influences_bonus = {dexterity = 0.01},
 	mass = 7,
 	water_gravity = Vector(0,1,0)}
@@ -782,7 +782,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 100,
-	influences_base = {hatchet = -5, physical = -5},
+	influences_base = {hatchet = -3, physical = -3},
 	influences_bonus = {strength = 0.01},
 	mass = 7,
 	water_gravity = Vector(0,1,0)}
@@ -798,7 +798,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 100,
-	influences_base = {physical = -5},
+	influences_base = {physical = -3},
 	influences_bonus = {strength = 0.01},
 	mass = 7,
 	water_gravity = Vector(0,1,0)}
@@ -814,7 +814,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 100,
-	influences_base = {physical = -10},
+	influences_base = {physical = -5},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	mass = 7,
 	water_gravity = Vector(0,1,0)}
@@ -830,7 +830,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 100,
-	influences_base = {physical = -15},
+	influences_base = {physical = -4},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	mass = 7,
 	water_gravity = Vector(0,1,0)}
@@ -847,7 +847,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	health = 100,
-	influences_base = {physical = -15},
+	influences_base = {physical = -4},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	mass = 7,
 	water_gravity = Vector(0,1,0)}
@@ -864,7 +864,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	health = 300,
-	influences_base = {fire = -3, physical = -15},
+	influences_base = {fire = -2, physical = -4},
 	influences_bonus = {perception = 0.005, willpower = 0.005},
 	mass = 7,
 	special_effects = {

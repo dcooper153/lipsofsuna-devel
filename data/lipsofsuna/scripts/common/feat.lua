@@ -85,6 +85,15 @@ Feat.new = function(clss, args)
 	return self
 end
 
+--- Creates a copy of the feat.
+Feat.copy = function(feat)
+	local self = Class.new(Feat)
+	self.animation = feat.animation
+	self.effects = {}
+	for k,v in pairs(feat.effects) do self.effects[k] = v end
+	return self
+end
+
 --- Gets the icon of the feat.
 -- @param self Feat.
 -- @return Iconspec or nil.

@@ -423,12 +423,10 @@ Species{
 		lower = "trogfemlowernude1",
 		upper = "trogfemuppernude1"},
 	skills = {
-		{name = "dexterity", max = 8, val = 3},
-		{name = "health", max = 100, val = 50},
-		{name = "intelligence", max = 10, val = 5},
-		{name = "perception", max = 60, val = 20},
-		{name = "strength", max = 4, val = 2},
-		{name = "willpower", max = 8, val = 3}},
+		{name = "dexterity", max = 15, val = 15},
+		{name = "health", max = 50, val = 50},
+		{name = "perception", max = 30, val = 30},
+		{name = "strength", max = 15, val = 15}},
 	hair_styles = {	
 		{"troglong", "trogfemlonghair1"},
 		{"trogshort", "trogfemshorthair1"}},
@@ -451,7 +449,8 @@ Species{
 	model = "bloodworm2",
 	speed_walk = 2,
 	skills = {
-		{name = "health", max = 30, val = 30}}}
+		{name = "health", max = 30, val = 30},
+		{name = "strength", max = 5, val = 5}}}
 
 Species{
 	name = "dragon",
@@ -466,13 +465,15 @@ Species{
 		["attack right claw"] = {animation = "claw-right", channel = 2, weight = 30}},
 	factions = {"evil"},
 	feat_anims = {"dragon bite", "left claw", "right claw"},
+	feat_effects = {"fire damage", "strength to physical damage"},
 	inventory_size = 10,
 	inventory_items = {"dragon scale", "dragon scale", "dragon scale", "dragon scale", "dragon scale",
 		"adamantium", "adamantium", "adamantium", "adamantium", "crimson stone", "crimson stone"},
 	mass = 1000,
 	speed_walk = 1,
 	skills = {
-		{name = "health", max = 100, val = 100}},
+		{name = "health", max = 100, val = 100},
+		{name = "strength", max = 100, val = 100}},
 	vulnerabilities = {cold = 2, fire = 0.3}}
 
 Species{
@@ -497,6 +498,7 @@ Species{
 	categories = {"enemy"},
 	factions = {"evil"},
 	feat_anims = {"right hand","bite"},
+	feat_effects = {"strength to physical damage"},
 	inventory_size = 5,
 	inventory_items = {"wooden club", "lizard scale", "lizard scale", "lizard scale"},
 	loot_categories = {"material"},
@@ -509,7 +511,27 @@ Species{
 	skills = {
 		{name = "dexterity", max = 5, val = 5},
 		{name = "health", max = 50, val = 50},
-		{name = "strength", max = 5, val = 5}}}
+		{name = "strength", max = 15, val = 15}}}
+
+Species{
+	name = "rat",
+	base = "base",
+	ai_enable_strafe = false,
+	ai_enable_defend = false,
+	animations = {
+		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
+	categories = {"enemy"},
+	factions = {"evil"},
+	feat_anims = {"bite"},
+	feat_effects = {"strength to physical damage"},
+	inventory_size = 3,
+	inventory_items = {"hide", "hide"},
+	jump_force = 6,
+	model = "plaguerat1", -- FIXME
+	speed_walk = 4,
+	skills = {
+		{name = "strength", max = 5, val = 5},
+		{name = "health", max = 30, val = 30}}}
 
 Species{
 	name = "plague rat",
@@ -518,16 +540,37 @@ Species{
 	ai_enable_defend = false,
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
-	categories = {"enemy", "plague"},
+	categories = {"plague"},
 	factions = {"evil"},
 	feat_anims = {"bite"},
+	feat_effects = {"strength to physical damage"},
 	inventory_size = 3,
 	inventory_items = {"hide", "hide"},
 	jump_force = 6,
-	model = "plaguerat1", -- FIXME
+	model = "plaguerat1",
 	speed_walk = 4,
 	skills = {
-		{name = "health", max = 30, val = 30}}}
+		{name = "health", max = 30, val = 30},
+		{name = "strength", max = 5, val = 5}}}
+
+Species{
+	name = "slime",
+	base = "base",
+	ai_enable_strafe = false,
+	ai_enable_defend = false,
+	animations = {
+		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
+	categories = {"plague"},
+	factions = {"evil"},
+	feat_anims = {"bite"},
+	feat_effects = {"strength to physical damage"},
+	inventory_size = 0,
+	jump_force = 4,
+	model = "slime2", -- FIXME
+	speed_walk = 2,
+	skills = {
+		{name = "health", max = 30, val = 30}},
+	vulnerabilities = {cold = 1.5, fire = 1.5, physical = 0.6}}
 
 Species{
 	name = "plague slime",
@@ -536,12 +579,13 @@ Species{
 	ai_enable_defend = false,
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
-	categories = {"enemy", "plague"},
+	categories = {"plague"},
 	factions = {"evil"},
 	feat_anims = {"bite"},
+	feat_effects = {"strength to physical damage"},
 	inventory_size = 0,
 	jump_force = 4,
-	model = "slime2", -- FIXME
+	model = "slime2",
 	speed_walk = 2,
 	skills = {
 		{name = "health", max = 30, val = 30}},
@@ -556,6 +600,7 @@ Species{
 	categories = {"enemy", "mining"},
 	factions = {"evil"},
 	feat_anims = {"bite"},
+	feat_effects = {"strength to physical damage"},
 	inventory_size = 2,
 	equipment_slots = {
 		{name = "hand.R", node = "#hand.R"},
@@ -565,7 +610,8 @@ Species{
 	model = "stoneimp2",
 	speed_walk = 1,
 	skills = {
-		{name = "health", max = 20, val = 20}},
+		{name = "health", max = 20, val = 20},
+		{name = "strength", max = 10, val = 10}},
 	vulnerabilities = {cold = 1.1, fire = 1.1, physical = 0.8}}
 
 Species{
@@ -577,6 +623,7 @@ Species{
 	categories = {"enemy", "mining"},
 	factions = {"evil"},
 	feat_anims = {"bite", "explode"},
+	feat_effects = {"fire damage", "strength to physical damage"},
 	jump_force = 4,
 	model = "stoneimp2",
 	speed_walk = 1,
@@ -586,7 +633,8 @@ Species{
 		{name = "hand.L", node = "#hand.L"}},
 	inventory_items = {"firestone"},
 	skills = {
-		{name = "health", max = 20, val = 20}},
+		{name = "health", max = 20, val = 20},
+		{name = "strength", max = 10, val = 10}},
 	vulnerabilities = {cold = 2, fire = 0.4, physical = 0.8}}
 
 ------------------------------------------------------------------------------

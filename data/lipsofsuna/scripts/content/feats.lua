@@ -1,60 +1,10 @@
 Featanimspec{
-	name = "bite",
-	animation = "attack bite",
-	categories = {"melee"},
-	cooldown = 2,
-	effect = "growl1",
-	effect_impact = "impact1",
-	influences = {{"physical", -10}},
-	slot = "mouth"}
-
-Featanimspec{
 	name = "build",
 	animation = "build",
 	categories = {"build"},
 	cooldown = 0.5,
 	effect = "swing1",
 	required_weapon = "build",
-	slot = "hand.R"}
-
-Featanimspec{
-	name = "dragon bite",
-	action_frames = {0, 30},
-	animation = "attack bite",
-	categories = {"melee"},
-	cooldown = 4,
-	effect_impact = "impact1",
-	influences = {{"physical", -50}},
-	slot = "mouth"}
-
-Featanimspec{
-	name = "explode",
-	animation = "explode",
-	categories = {"explode", "melee"},
-	cooldown = 2,
-	influences = {{"physical", -1}},
-	effect = "swing1"}
-
-Featanimspec{
-	name = "left claw",
-	action_frames = {0, 15},
-	animation = "attack left claw",
-	categories = {"melee"},
-	cooldown = 2,
-	effect = "swing1",
-	effect_impact = "impact1",
-	influences = {{"physical", -30}},
-	slot = "hand.L"}
-
-Featanimspec{
-	name = "right claw",
-	action_frames = {0, 15},
-	animation = "attack right claw",
-	categories = {"melee"},
-	cooldown = 2,
-	effect = "swing1",
-	effect_impact = "impact1",
-	influences = {{"physical", -30}},
 	slot = "hand.R"}
 
 Featanimspec{
@@ -114,6 +64,7 @@ Featanimspec{
 	slot = "hand.R"}
 
 ---------------------------------------------------------------------
+-- Effects usable to players.
 
 Feateffectspec{
 	name = "black haze",
@@ -146,9 +97,8 @@ Feateffectspec{
 	description = "Inflict physical or telekinetic damage",
 	effect = "impact1",
 	icon = "modifier-physical",
-	influences = {{"physical", -5, -0.95}},
+	influences = {{"physical", -1, -0.2}},
 	skill_mult = {strength = 1, dexterity = 0.5}}
-	
 
 Feateffectspec{
 	name = "restore health",
@@ -183,3 +133,72 @@ Feateffectspec{
 	reagent_mult = {["milky powder"] = 0.09},
 	skill_base = {intelligence = 10, willpower = 5},
 	skill_mult = {intelligence = 1, willpower = 0.1}}
+
+---------------------------------------------------------------------
+-- Animations and effects usable to monsters only.
+
+Featanimspec{
+	name = "bite",
+	animation = "attack bite",
+	categories = {"melee"},
+	cooldown = 2,
+	effect = "growl1",
+	effect_impact = "impact1",
+	influences = {{"physical", -1}},
+	slot = "mouth"}
+
+Featanimspec{
+	name = "dragon bite",
+	action_frames = {0, 30},
+	animation = "attack bite",
+	categories = {"melee"},
+	cooldown = 4,
+	effect_impact = "impact1",
+	influences = {{"physical", -50}},
+	slot = "mouth"}
+
+Featanimspec{
+	name = "explode",
+	animation = "explode",
+	categories = {"explode", "melee"},
+	cooldown = 2,
+	influences = {{"physical", -1}},
+	effect = "swing1"}
+
+Featanimspec{
+	name = "left claw",
+	action_frames = {0, 15},
+	animation = "attack left claw",
+	categories = {"melee"},
+	cooldown = 2,
+	effect = "swing1",
+	effect_impact = "impact1",
+	influences = {{"physical", -30}},
+	slot = "hand.L"}
+
+Featanimspec{
+	name = "right claw",
+	action_frames = {0, 15},
+	animation = "attack right claw",
+	categories = {"melee"},
+	cooldown = 2,
+	effect = "swing1",
+	effect_impact = "impact1",
+	influences = {{"physical", -30}},
+	slot = "hand.R"}
+
+Feateffectspec{
+	name = "dexterity to physical damage",
+	categories = {"melee", "physical"},
+	effect = "impact1",
+	icon = "modifier-physical",
+	influences = {{"physical", -1, -0.2}},
+	skill_mult = {dexterity = 1}}
+
+Feateffectspec{
+	name = "strength to physical damage",
+	categories = {"melee", "physical"},
+	effect = "impact1",
+	icon = "modifier-physical",
+	influences = {{"physical", -1, -0.2}},
+	skill_mult = {strength = 1}}
