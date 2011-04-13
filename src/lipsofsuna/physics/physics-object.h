@@ -24,10 +24,6 @@
 #include "physics-shape.h"
 #include "physics-types.h"
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 LIAPICALL (LIPhyObject*, liphy_object_new, (
 	LIPhyPhysics*    physics,
 	uint32_t         id,
@@ -113,11 +109,26 @@ LIAPICALL (void, liphy_object_set_control_mode, (
 LIAPICALL (LIPhyPhysics*, liphy_object_get_engine, (
 	LIPhyObject* self));
 
+LIAPICALL (float, liphy_object_get_friction_liquid, (
+	const LIPhyObject* self));
+
+LIAPICALL (void, liphy_object_set_friction_liquid, (
+	LIPhyObject* self,
+	float        value));
+
 LIAPICALL (void, liphy_object_get_gravity, (
 	const LIPhyObject* self,
 	LIMatVector*       value));
 
 LIAPICALL (void, liphy_object_set_gravity, (
+	LIPhyObject*       self,
+	const LIMatVector* value));
+
+LIAPICALL (void, liphy_object_get_gravity_liquid, (
+	const LIPhyObject* self,
+	LIMatVector*       value));
+
+LIAPICALL (void, liphy_object_set_gravity_liquid, (
 	LIPhyObject*       self,
 	const LIMatVector* value));
 
@@ -203,9 +214,5 @@ LIAPICALL (void, liphy_object_get_velocity, (
 LIAPICALL (void, liphy_object_set_velocity, (
 	LIPhyObject*       self,
 	const LIMatVector* value));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -34,6 +34,7 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 	int min[3];
 	int max[3];
 	int size[3];
+	float liquid;
 	float tile_size;
 	btCollisionObject* object_convex;
 	btCollisionObject* object_terrain;
@@ -41,7 +42,9 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 	btVector3 aabb_min;
 	btVector3 aabb_max;
 	btTransform transform;
-	LIPhyPointer* pointer;
+	LIPhyObject* object_info;
+	LIPhyPointer* pointer_convex;
+	LIPhyPointer* pointer_terrain;
 	LIPhyTerrainShape* shape_terrain;
 	LIVoxMaterial* material;
 	LIVoxVoxel* tile;
@@ -62,7 +65,9 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 	lisys_assert (object_terrain->getCollisionShape ()->getShapeType () == CUSTOM_CONVEX_SHAPE_TYPE);
 	shape_convex = (btConvexHullShape*) object_convex->getCollisionShape ();
 	shape_terrain = (LIPhyTerrainShape*) object_terrain->getCollisionShape ();
-	pointer = (LIPhyPointer*) object_terrain->getUserPointer ();
+	pointer_convex = (LIPhyPointer*) object_convex->getUserPointer ();
+	pointer_terrain = (LIPhyPointer*) object_terrain->getUserPointer ();
+	object_info = (LIPhyObject*) pointer_convex->pointer;
 
 	/* Get the range of intersecting tiles. */
 	tile_size = shape_terrain->terrain->voxels->tile_width;
@@ -90,6 +95,7 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 	object_terrain->setCollisionShape (&tmp_shape);
 
 	/* Process collisions with each tile. */
+	liquid = 0.0f;
 	transform.setIdentity ();
 	for (z = 0 ; z < size[2] ; z++)
 	for (y = 0 ; y < size[1] ; y++)
@@ -99,16 +105,44 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 		if (!tile->type)
 			continue;
 		material = livox_manager_find_material (shape_terrain->terrain->voxels, tile->type);
-		if (material == NULL || material->type == LIVOX_MATERIAL_TYPE_LIQUID)
+		if (material == NULL)
 			continue;
+		if (material->type == LIVOX_MATERIAL_TYPE_LIQUID)
+		{
+			liquid += 1.0f;
+			continue;
+		}
 		transform.setOrigin (aabb_min + btVector3 (x, y, z) * tile_size);
 		object_terrain->setWorldTransform (transform);
 		object_terrain->setInterpolationWorldTransform (transform);
-		pointer->tile[0] = min[0] + x;
-		pointer->tile[1] = min[1] + x;
-		pointer->tile[2] = min[2] + x;
+		pointer_terrain->tile[0] = min[0] + x;
+		pointer_terrain->tile[1] = min[1] + y;
+		pointer_terrain->tile[2] = min[2] + z;
 		btConvexConvexAlgorithm::processCollision (object_terrain, object_convex, dispatchInfo, resultOut);
 	}
+
+	/* Calculate liquid percentage. */
+	/* The collision shape often marginally intersects with irrelevant tiles.
+	   We compensate for that by amplifying the submerging percentage. */
+	liquid /= size[0] * size[1] * size[2];
+	liquid = LIMAT_MIN (1.0f, 1.3f * liquid);
+	object_info->submerged = liquid;
+
+	/* Apply liquid gravity. */
+	btVector3 gravity_normal = btVector3 (object_info->config.gravity.x,
+		object_info->config.gravity.y, object_info->config.gravity.z);
+	btVector3 gravity_liquid = btVector3 (object_info->config.gravity_liquid.x,
+		object_info->config.gravity_liquid.y, object_info->config.gravity_liquid.z);
+	object_info->control->set_gravity (liquid * gravity_liquid + (1.0f - liquid) * gravity_normal);
+
+	/* Apply liquid friction. */
+	btVector3 velocity;
+	object_info->control->get_velocity (&velocity);
+	velocity *= 1.0f - (object_info->config.friction_liquid / 60);
+	object_info->control->set_velocity (velocity);
+	object_info->control->get_angular (&velocity);
+	velocity *= 1.0f - (object_info->config.friction_liquid / 60);
+	object_info->control->set_angular (velocity);
 
 	/* Restore the terrain object. */
 	transform.setIdentity ();

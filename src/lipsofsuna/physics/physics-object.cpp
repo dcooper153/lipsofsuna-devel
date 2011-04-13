@@ -64,7 +64,9 @@ LIPhyObject* liphy_object_new (
 	self->pointer.object = 1;
 	self->pointer.pointer = self;
 	self->control_mode = control_mode;
+	self->config.friction_liquid = 0.5f;
 	self->config.gravity = limat_vector_init (0.0f, -10.0f, 0.0f);
+	self->config.gravity_liquid = limat_vector_init (0.0f, -2.0f, 0.0f);
 	self->config.mass = 10.0f;
 	self->config.speed = LIPHY_DEFAULT_SPEED;
 	self->config.character_step = 0.35;
@@ -495,8 +497,30 @@ LIPhyPhysics* liphy_object_get_engine (
 }
 
 /**
+ * \brief Returns the friction coefficient of the object in liquid.
+ * \param self Object.
+ * \return Friction coefficient.
+ */
+float liphy_object_get_friction_liquid (
+	const LIPhyObject* self)
+{
+	return self->config.friction_liquid;
+}
+
+/**
+ * \brief Sets the friction coefficient of the object in liquid.
+ * \param self Object.
+ * \param value Friction coefficient.
+ */
+void liphy_object_set_friction_liquid (
+	LIPhyObject* self,
+	float        value)
+{
+	self->config.friction_liquid = value;
+}
+
+/**
  * \brief Returns the gravity acceleration vector of the object.
- *
  * \param self Object.
  * \param value Return location for the gravity vector.
  */
@@ -509,7 +533,6 @@ void liphy_object_get_gravity (
 
 /**
  * \brief Sets the gravity acceleration vector of the object.
- *
  * \param self Object.
  * \param value Gravity vector.
  */
@@ -520,6 +543,30 @@ void liphy_object_set_gravity (
 	self->config.gravity = *value;
 	if (self->control != NULL)
 		self->control->set_gravity (btVector3 (value->x, value->y, value->z));
+}
+
+/**
+ * \brief Returns the gravity acceleration vector of the object in liquid.
+ * \param self Object.
+ * \param value Return location for the gravity vector.
+ */
+void liphy_object_get_gravity_liquid (
+	const LIPhyObject* self,
+	LIMatVector*       value)
+{
+	*value = self->config.gravity_liquid;
+}
+
+/**
+ * \brief Sets the gravity acceleration vector of the object in liquid.
+ * \param self Object.
+ * \param value Gravity vector.
+ */
+void liphy_object_set_gravity_liquid (
+	LIPhyObject*       self,
+	const LIMatVector* value)
+{
+	self->config.gravity_liquid = *value;
 }
 
 /**

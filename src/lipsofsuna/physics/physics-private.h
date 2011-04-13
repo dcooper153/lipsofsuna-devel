@@ -115,6 +115,7 @@ struct _LIPhyObject
 	int flags;
 	uint32_t id;
 	char* shape_name;
+	float submerged;
 	LIMatVector center_of_mass;
 	LIPhyControlMode control_mode;
 	LIPhyControl* control;
@@ -128,6 +129,7 @@ struct _LIPhyObject
 		int collision_group;
 		int collision_mask;
 		int contact_events;
+		float friction_liquid;
 		float mass;
 		float movement;
 		float speed;
@@ -136,6 +138,7 @@ struct _LIPhyObject
 		void* userdata;
 		LIMatVector angular;
 		LIMatVector gravity;
+		LIMatVector gravity_liquid;
 		LIMatVector velocity;
 	} config;
 };

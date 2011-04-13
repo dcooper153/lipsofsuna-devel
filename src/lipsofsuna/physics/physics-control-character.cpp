@@ -115,6 +115,7 @@ void LIPhyCharacterAction::updateAction (
 
 	/* Walking. */
 	speed = this->object->config.movement * this->object->config.speed;
+	speed *= 1.0f - this->object->config.friction_liquid * this->object->submerged;
 	if (speed != 0.0f)
 	{
 		private_calculate_control (-dotz, speed, &forward, &velz, &accel);
@@ -125,6 +126,7 @@ void LIPhyCharacterAction::updateAction (
 
 	/* Strafing. */
 	speed = this->object->config.strafing * this->object->config.speed;
+	speed *= 1.0f - this->object->config.friction_liquid * this->object->submerged;
 	if (speed != 0.0f)
 	{
 		private_calculate_control (dotx, speed, &right, &velx, &accel);

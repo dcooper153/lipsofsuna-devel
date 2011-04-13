@@ -193,8 +193,8 @@ Species.new = function(clss, args)
 	copy("timing_spell_self", 10)
 	copy("timing_spell_touch", 10)
 	copy("view_cone", 0.8 * math.pi)
-	copy("water_friction", 0.6)
-	copy("water_gravity", Vector(0,-3,0))
+	copy("water_friction", 0.8)
+	copy("water_gravity", Vector(0,-1,0))
 	return self
 end
 

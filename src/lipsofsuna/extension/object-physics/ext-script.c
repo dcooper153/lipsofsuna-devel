@@ -389,6 +389,78 @@ static void Object_set_gravity (LIScrArgs* args)
 }
 
 /* @luadoc
+ * --- Liquid friction coefficient.
+ * -- @name Object.friction_liquid
+ * -- @class table
+ */
+static void Object_get_friction_liquid (LIScrArgs* args)
+{
+	float tmp;
+	LIExtModule* module;
+	LIPhyObject* object;
+
+	/* Get physics object. */
+	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	if (object == NULL)
+		return;
+
+	tmp = liphy_object_get_friction_liquid (object);
+	liscr_args_seti_float (args, tmp);
+}
+static void Object_set_friction_liquid (LIScrArgs* args)
+{
+	float tmp;
+	LIExtModule* module;
+	LIPhyObject* object;
+
+	/* Get physics object. */
+	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	if (object == NULL)
+		return;
+
+	if (liscr_args_geti_float (args, 0, &tmp))
+		liphy_object_set_friction_liquid (object, tmp);
+}
+
+/* @luadoc
+ * --- Liquid gravity vector.
+ * -- @name Object.gravity_liquid
+ * -- @class table
+ */
+static void Object_get_gravity_liquid (LIScrArgs* args)
+{
+	LIMatVector tmp;
+	LIExtModule* module;
+	LIPhyObject* object;
+
+	/* Get physics object. */
+	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	if (object == NULL)
+		return;
+
+	liphy_object_get_gravity_liquid (object, &tmp);
+	liscr_args_seti_vector (args, &tmp);
+}
+static void Object_set_gravity_liquid (LIScrArgs* args)
+{
+	LIMatVector vector;
+	LIExtModule* module;
+	LIPhyObject* object;
+
+	/* Get physics object. */
+	module = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PHYSICS_OBJECT);
+	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	if (object == NULL)
+		return;
+
+	if (liscr_args_geti_vector (args, 0, &vector))
+		liphy_object_set_gravity_liquid (object, &vector);
+}
+
+/* @luadoc
  * --- Ground contact flag.
  * -- <br/>
  * -- Only supported for creatures. Other kind of objects always return false.
@@ -725,8 +797,12 @@ void liext_script_object (
 	liscr_class_insert_mfunc (self, "set_collision_mask", Object_set_collision_mask);
 	liscr_class_insert_mfunc (self, "get_contact_events", Object_get_contact_events);
 	liscr_class_insert_mfunc (self, "set_contact_events", Object_set_contact_events);
+	liscr_class_insert_mfunc (self, "get_friction_liquid", Object_get_friction_liquid);
+	liscr_class_insert_mfunc (self, "set_friction_liquid", Object_set_friction_liquid);
 	liscr_class_insert_mfunc (self, "get_gravity", Object_get_gravity);
 	liscr_class_insert_mfunc (self, "set_gravity", Object_set_gravity);
+	liscr_class_insert_mfunc (self, "get_gravity_liquid", Object_get_gravity_liquid);
+	liscr_class_insert_mfunc (self, "set_gravity_liquid", Object_set_gravity_liquid);
 	liscr_class_insert_mfunc (self, "get_ground", Object_get_ground);
 	liscr_class_insert_mfunc (self, "get_mass", Object_get_mass);
 	liscr_class_insert_mfunc (self, "set_mass", Object_set_mass);

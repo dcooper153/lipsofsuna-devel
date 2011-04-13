@@ -9,6 +9,9 @@ Item.setter = function(self, key, value)
 		self.mass = spec.mass
 		self.model = spec.model
 		self.name = spec.name
+		self.friction_liquid = spec.water_friction
+		self.gravity = spec.gravity
+		self.gravity_liquid = spec.water_gravity
 		-- Create the inventory.
 		if spec.inventory_size and not self.inventory then
 			self.inventory = Inventory{owner = self, size = spec.inventory_size}
@@ -65,7 +68,6 @@ Item.new = function(clss, args)
 	copy("looted")
 	copy("realized")
 	self.update_timer = 0.3 * math.random()
-	clss.update_list[self.id] = self
 	if self.looted then self:animate("looted") end
 	return self
 end
@@ -287,30 +289,6 @@ end
 Item.unequipped = function(self, user, slot)
 end
 
---- Updates the environment of the object and tries to fix it if necessary.
--- @param self Object.
--- @param secs Seconds since the last update.
--- @return Boolean and environment statistics. The boolean is true if the object isn't permanently stuck.
-Item.update_environment = function(self, secs)
-	-- Environment scan and stuck handling.
-	local ret,env = Object.update_environment(self, secs)
-	if not ret or not env then return ret, env end
-	-- Liquid physics.
-	local liquid = env.liquid / env.total
-	local magma = env.magma / env.total
-	if liquid ~= (self.submerged or 0) then
-		self.submerged = liquid > 0 and liquid or nil
-		self.gravity = Config.gravity * (1 - liquid) + self.spec.water_gravity * liquid
-	end
-	-- Apply liquid friction.
-	-- FIXME: Framerate dependent.
-	if self.submerged then
-		local damp = self.submerged * self.spec.water_friction * secs
-		self.velocity = self.velocity - self.velocity * damp
-	end
-	return true, res
-end
-
 --- Serializes the object to a string.
 -- @param self Object.
 -- @return Data string.
@@ -326,19 +304,3 @@ Item.write = function(self)
 		Serialize:encode_inventory(self.inventory),
 		"return self")
 end
-
--- These take care of checking that items don't fall through ground.
-Item.update_list = {}
-Item.update_timer = Timer{delay = 0.5, func = function(timer, secs)
-	local kept = {}
-	for k,v in pairs(Item.update_list) do
-		if v.realized then kept[k] = v end
-		v.update_timer = v.update_timer + secs
-		if v.update_timer > 1.0 then
-			v.update_timer = 0.1 * math.random()
-			v:update_environment(secs)
-		end
-	end
-	Item.update_list = kept
-	setmetatable(Item.update_list, {__mode = "v"})
-end}

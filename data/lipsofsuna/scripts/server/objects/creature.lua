@@ -20,7 +20,9 @@ Creature.setter = function(self, key, value)
 		Object.setter(self, key, spec)
 		self.model = spec.model
 		self.mass = spec.mass
+		self.friction_liquid = spec.water_friction
 		self.gravity = spec.gravity
+		self.gravity_liquid = spec.water_gravity
 		-- Set appearance.
 		if spec.eye_style then
 			if spec.eye_style == "random" then
@@ -217,10 +219,6 @@ Creature.calculate_speed = function(self)
 	local str = self.skills:get_value{skill = "strength"} or 0
 	local agi = self.skills:get_value{skill = "agility"} or 0
 	s = s * (1 + agi / 100 + str / 150)
-	-- Water friction.
-	if self.submerged then
-		s = s - s * self.submerged * self.spec.water_friction
-	end
 	-- Burdening penalty.
 	if self:get_burdened() then
 		s = math.max(1, s * 0.3)
@@ -847,7 +845,7 @@ end
 Creature.update_environment = function(self, secs)
 	-- Don't update every frame.
 	self.env_timer = (self.env_timer or 0) + secs
-	if self.env_timer < 0.2 then return end
+	if self.env_timer < 1.2 then return end
 	local tick = self.env_timer
 	self.env_timer = 0
 	-- Prevent sectors from unloading if a player is present.
@@ -860,8 +858,6 @@ Creature.update_environment = function(self, secs)
 	local magma = env.magma / env.total
 	if liquid ~= (self.submerged or 0) then
 		self.submerged = liquid > 0 and liquid or nil
-		self.gravity = Config.gravity * (1 - liquid) + self.spec.water_gravity * liquid
-		self:calculate_speed()
 	end
 	if magma ~= (self.submerged_in_magma or 0) then
 		self.submerged_in_magma = magma > 0 and magma or nil
@@ -876,12 +872,6 @@ Creature.update_environment = function(self, secs)
 		if water > 0 and self.damage_from_water ~= 0 then
 			self:damaged(self.spec.damage_from_water * water * tick)
 		end
-	end
-	-- Apply liquid friction.
-	-- FIXME: Framerate dependent.
-	if self.submerged then
-		local damp = self.submerged * self.spec.water_friction * tick
-		self.velocity = self.velocity - self.velocity * damp
 	end
 	return true, res
 end

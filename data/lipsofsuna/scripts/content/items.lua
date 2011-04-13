@@ -151,7 +151,7 @@ Itemspec{
 	health = 50,
 	mass = 5,
 	stacking = true,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "another log",
@@ -167,7 +167,7 @@ Itemspec{
 	health = 50,
 	mass = 5,
 	stacking = true,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "milky powder",
@@ -439,7 +439,7 @@ Itemspec{
 	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
 	stacking = true,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "crimson crossbow",
@@ -706,7 +706,7 @@ Itemspec{
 	animation_attack = "attack bow",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
-	water_gravity = Vector(0,1,0),
+	water_gravity = Vector(0,6,0),
 	mass = 7}
 Itemspec{
 	name = "fire bow",
@@ -721,7 +721,7 @@ Itemspec{
 	animation_attack = "attack bow",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
-	water_gravity = Vector(0,1,0),
+	water_gravity = Vector(0,6,0),
 	mass = 7}
 
 Itemspec{
@@ -737,7 +737,7 @@ Itemspec{
 	animation_attack = "attack bow",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
-	water_gravity = Vector(0,1,0),
+	water_gravity = Vector(0,6,0),
 	mass = 7}
 
 Itemspec{
@@ -753,7 +753,7 @@ Itemspec{
 	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
-	water_gravity = Vector(0,1,0),
+	water_gravity = Vector(0,6,0),
 	mass = 7}
 
 
@@ -769,7 +769,7 @@ Itemspec{
 	influences_base = {physical = -3},
 	influences_bonus = {dexterity = 0.01},
 	mass = 7,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "wooden hatchet",
@@ -785,7 +785,7 @@ Itemspec{
 	influences_base = {hatchet = -3, physical = -3},
 	influences_bonus = {strength = 0.01},
 	mass = 7,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "wooden mattock",
@@ -801,7 +801,7 @@ Itemspec{
 	influences_base = {physical = -3},
 	influences_bonus = {strength = 0.01},
 	mass = 7,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "wooden sword",
@@ -817,7 +817,7 @@ Itemspec{
 	influences_base = {physical = -5},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	mass = 7,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "wooden club",
@@ -833,7 +833,7 @@ Itemspec{
 	influences_base = {physical = -4},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	mass = 7,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "wooden staff",
@@ -850,7 +850,7 @@ Itemspec{
 	influences_base = {physical = -4},
 	influences_bonus = {dexterity = 0.005, strength = 0.005},
 	mass = 7,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "luminous staff",
@@ -870,7 +870,7 @@ Itemspec{
 	special_effects = {
 		{slot = "flame", model = "torchfx1"},
 		{slot = "flame2", model = "torchfx1"}},
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 ------------------------------------------------------------------------------
 -- Armor.
@@ -890,7 +890,7 @@ Itemspec{
 		["devora"] = {upper1 = "devorachinadress1"}},
 	equipment_slot = "upperbody",
 	mass = 1,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "fedora",
@@ -904,7 +904,7 @@ Itemspec{
 		["devora"] = {hat = "devorafedora1"}},
 	equipment_slot = "head",
 	mass = 5,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "trog rags",
@@ -917,7 +917,7 @@ Itemspec{
 		["troglodyte female"] = {upper1 = "trogfemrags1"}},
 	equipment_slot = "upperbody",
 	mass = 1,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "iron greaves",
@@ -970,7 +970,7 @@ Itemspec{
 		["devora"] = {headband = "devoraheadband1"}},
 	equipment_slot = "head",
 	mass = 1,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "leather helm",
@@ -983,7 +983,7 @@ Itemspec{
 		["aermale"] = {hair = "aermale1leatherhead2"}},
 	equipment_slot = "head",
 	mass = 3,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "leather leggings",
@@ -998,7 +998,7 @@ Itemspec{
 		["devora"] = {feet = false, legs = "devoraleggings1"}},
 	equipment_slot = "feet",
 	mass = 5,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "leather gloves",
@@ -1011,7 +1011,7 @@ Itemspec{
 		["aermale"] = {hands = "aermale1leatherarms2"}},
 	equipment_slot = "arms",
 	mass = 3,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "leather boots",
@@ -1024,7 +1024,7 @@ Itemspec{
 		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor2", legs1 = "boots1"},["aermale"] = {feet = "aermale1boots1"}},
 	equipment_slot = "feet",
 	mass = 3,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "leather pants",
@@ -1037,7 +1037,7 @@ Itemspec{
 		["aer/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},["aermale"] = {legs = "aermale1leatherlegs2"}},
 	equipment_slot = "lowerbody",
 	mass = 5,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "leather brigand pants",
@@ -1050,7 +1050,7 @@ Itemspec{
 		["aer/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},["aermale"] = {legs = "aermale1leatherlegs1"}},
 	equipment_slot = "lowerbody",
 	mass = 5,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "leather top",
@@ -1063,7 +1063,7 @@ Itemspec{
 		["aer/kraken/wyrm"] = {upper1 = "bra1"}},
 	equipment_slot = "upperbody",
 	mass = 5,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "leather skirt",
@@ -1076,7 +1076,7 @@ Itemspec{
 		["aer/kraken/wyrm"] = {skirt = "aerleatherskirt1", panties = "panties2"}},
 	equipment_slot = "lowerbody",
 	mass = 5,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "lizard boots",
@@ -1089,7 +1089,7 @@ Itemspec{
 	icon = "lizardboot1",
 	mass = 4,
 	model = "lizardboots1",
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "lizard dress",
@@ -1102,7 +1102,7 @@ Itemspec{
 	icon = "lizardarmor1",
 	mass = 7,
 	model = "lizarddress1",
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "lizard gloves",
@@ -1115,7 +1115,7 @@ Itemspec{
 	icon = "lizardglove1",
 	mass = 4,
 	model = "lizardgloves1",
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "leather chest",
@@ -1128,7 +1128,7 @@ Itemspec{
 		["aer/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest2"}},
 	equipment_slot = "upperbody",
 	mass = 5,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "leather brigand chest",
@@ -1141,7 +1141,7 @@ Itemspec{
 		["aer/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest1"}},
 	equipment_slot = "upperbody",
 	mass = 5,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "round shield",
@@ -1164,7 +1164,7 @@ Itemspec{
 	crafting_materials = {["log"] = 1},
 	equipment_slot = "hand.L",
 	mass = 7,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "shirt",
@@ -1177,7 +1177,7 @@ Itemspec{
 		["aermale"] = {upper = "aermale1shirt1"}},
 	equipment_slot = "upperbody",
 	mass = 1,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "pants",
@@ -1190,7 +1190,7 @@ Itemspec{
 		["aermale"] = {legs = "aermale1pants1"}},
 	equipment_slot = "lowerbody",
 	mass = 1,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 ------------------------------------------------------------------------------
 -- Ammo.
@@ -1205,7 +1205,7 @@ Itemspec{
 	icon = "arrow1",
 	mass = 1,
 	stacking = true,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "fire arrow",
@@ -1219,7 +1219,7 @@ Itemspec{
 	stacking = true,
 	special_effects = {
 		{slot = "root", model = "torchfx1"}},
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "explosive arrow",
@@ -1233,7 +1233,7 @@ Itemspec{
 	icon = "arrow1",
 	mass = 1,
 	stacking = true,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "bullet",
@@ -1270,7 +1270,7 @@ Itemspec{
 	mass = 3,
 	special_effects = {
 		{slot = "flame", model = "torchfx1"}},
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "impstone",
@@ -1283,7 +1283,7 @@ Itemspec{
 	influences_base = {physical = -5},
 	mass = 4,
 	stacking = false,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "firestone",
@@ -1321,7 +1321,7 @@ Itemspec{
 	loot_categories = {"armor", "book", "material", "misc", "potion", "shield", "weapon"},
 	loot_count = {2, 4},
 	stacking = false,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "jar",
@@ -1349,7 +1349,7 @@ Itemspec{
 	inventory_size = 4,
 	inventory_type = "workbench",
 	stacking = false,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 ------------------------------------------------------------------------------
 -- Decorations
@@ -1363,7 +1363,7 @@ Itemspec{
 	crafting_materials = {log = 5},
 	health = 30,
 	stacking = false,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "wood chair",
@@ -1374,7 +1374,7 @@ Itemspec{
 	crafting_materials = {log = 5},
 	health = 30,
 	stacking = false,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "wood bench",
@@ -1385,7 +1385,7 @@ Itemspec{
 	crafting_materials = {log = 6},
 	health = 30,
 	stacking = false,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "wood table",
@@ -1396,7 +1396,7 @@ Itemspec{
 	crafting_materials = {log = 7},
 	health = 30,
 	stacking = false,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 
 ------------------------------------------------------------------------------
@@ -1411,7 +1411,7 @@ Itemspec{
 	destroy_actions = {"explode"},
 	health = 1,
 	stacking = false,
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "gem",
@@ -1431,7 +1431,7 @@ Itemspec{
 	description = "Right click to heal yourself.",
 	stacking = true,
 	icon = "potion1",
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "mana potion",
@@ -1443,7 +1443,7 @@ Itemspec{
 	description = "Right click to replenish your willpower.",
 	stacking = true,
 	icon = "potion2",
-	water_gravity = Vector(0,1,0)}
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "Steamworks",
