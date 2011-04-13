@@ -675,7 +675,7 @@ Creature.set_state = function(self, args)
 	self.state = s
 	self.target = args.target
 	self.state_timer = 0
-	self.update_timer = 0
+	self.update_timer = math.random()
 	self.action_timer = 0
 	self.action_state = nil
 end
@@ -704,78 +704,12 @@ end
 -- @param self Object.
 -- @param secs Seconds since the last update.
 Creature.update = function(self, secs)
-	-- Check for falling damage.
-	if self.velocity_prev then
-		local limity = self.spec.falling_damage_speed
-		local prevy = self.velocity_prev.y
-		local diffy = self.velocity.y - prevy
-		if prevy < -limity and diffy > limity then
-			local damage = (diffy - limity) * self.spec.falling_damage_rate
-			if damage > 2 then
-				self:damaged(damage)
-				if self.spec.effect_falling_damage then
-					Effect:play{effect = self.spec.effect_falling_damage, object = self}
-				end
-			end
-		end
-	end
-	self.velocity_prev = self.velocity
-	-- Play the landing animation after jumping.
-	if self.jumping then
-		self.jump_timer = (self.jump_timer or 0) + secs
-		if self.jump_timer > 0.2 and Program.time - self.jumped > 0.5 and self.ground then
-			if not self.submerged or self.submerged < 0.3 then
-				self:animate("land ground")
-				if self.spec.effect_landing then
-					Effect:play{effect = self.spec.effect_landing, object = self}
-				end
-			else
-				self:animate("land water")
-			end
-			self.jumping = nil
-		end
-	end
-	-- Update modifiers.
-	if self.modifiers then
-		Modifier:update(self, secs)
-	end
-	-- Update burdening.
-	-- The burdening status may change when the contents of the inventory
-	-- or any subinventory change or if the strength skill level changes.
-	-- The burdening status decreases movement speed and disables jumping.
-	local prev_limit = self.burden_limit or 0
-	local curr_limit = math.floor(self:get_burden_limit())
-	local prev_burden = self:get_burdened()
-	local curr_weight = math.ceil(self:calculate_carried_weight())
-	if curr_weight ~= self.carried_weight or prev_limit ~= curr_limit then
-		self.carried_weight = curr_weight
-		self.burden_limit = curr_limit
-		self:send{packet = Packet{packets.PLAYER_WEIGHT, "uint16", curr_weight, "uint16", curr_limit}}
-	end
-	local curr_burden = self:get_burdened()
-	if prev_burden ~= curr_burden then
-		self:calculate_speed()
-		if curr_burden then
-			self:send{packet = Packet{packets.MESSAGE, "string", "You're now burdened."}}
-		else
-			self:send{packet = Packet{packets.MESSAGE, "string", "You're no longer burdened."}}
-		end
-	end
-	-- Update physics environment.
-	-- This also takes care of fixing stuck creatures.
-	if not self:update_environment(secs) then return end
-	-- Prevent sectors from unloading if a player is present.
-	if self.client then self:refresh() end
+	if self.modifiers then Modifier:update(self, secs) end
+	self:update_actions(secs)
+	self:update_burdening(secs)
+	self:update_environment(secs)
 	-- Skip all controls if we are dead.
 	if self.dead then return end
-	-- Update feat cooldown.
-	if self.blocking then self.cooldown = self.spec.blocking_cooldown end
-	if self.cooldown then
-		self.cooldown = self.cooldown - secs
-		if self.cooldown <= 0 then
-			self.cooldown = nil
-		end
-	end
 	-- Skip the rest if AI is disabled.
 	if not self.spec.ai_enabled then return end
 	-- Maintain timers.
@@ -789,6 +723,52 @@ Creature.update = function(self, secs)
 	-- Only consider state changes every couple of seconds.
 	if self.update_timer < self.spec.ai_update_delay then return end
 	self:update_ai_state()
+end
+
+Creature.update_actions = function(self, secs)
+	-- Update feat cooldown.
+	if self.blocking then self.cooldown = self.spec.blocking_cooldown end
+	if self.cooldown then
+		self.cooldown = self.cooldown - secs
+		if self.cooldown <= 0 then
+			self.cooldown = nil
+		end
+	end
+	-- Check for falling damage.
+	-- Don't update every frame.
+	self.fall_timer = (self.fall_timer or 0) + secs
+	if self.fall_timer > 0.3 then
+		if self.velocity_prev then
+			local limity = self.spec.falling_damage_speed
+			local prevy = self.velocity_prev.y
+			local diffy = self.velocity.y - prevy
+			if prevy < -limity and diffy > limity then
+				local damage = (diffy - limity) * self.spec.falling_damage_rate
+				if damage > 2 then
+					self:damaged(damage)
+					if self.spec.effect_falling_damage then
+						Effect:play{effect = self.spec.effect_falling_damage, object = self}
+					end
+				end
+			end
+		end
+		self.velocity_prev = self.velocity
+	end
+	-- Play the landing animation after jumping.
+	if self.jumping then
+		self.jump_timer = (self.jump_timer or 0) + secs
+		if self.jump_timer > 0.2 and Program.time - self.jumped > 0.8 and self.ground then
+			if not self.submerged or self.submerged < 0.3 then
+				self:animate("land ground")
+				if self.spec.effect_landing then
+					Effect:play{effect = self.spec.effect_landing, object = self}
+				end
+			else
+				self:animate("land water")
+			end
+			self.jumping = nil
+		end
+	end
 end
 
 --- Updates the AI state of the creature.<br/>
@@ -831,11 +811,47 @@ Creature.update_ai_state = function(self)
 	func(self)
 end
 
+Creature.update_burdening = function(self, secs)
+	-- Don't update every frame.
+	self.burden_timer = (self.burden_timer or 0) + secs
+	if self.burden_timer < 1 then return end
+	self.burden_timer = 0
+	-- Update burdening.
+	-- The burdening status may change when the contents of the inventory
+	-- or any subinventory change or if the strength skill level changes.
+	-- The burdening status decreases movement speed and disables jumping.
+	local prev_limit = self.burden_limit or 0
+	local curr_limit = math.floor(self:get_burden_limit())
+	local prev_burden = self:get_burdened()
+	local curr_weight = math.ceil(self:calculate_carried_weight())
+	if curr_weight ~= self.carried_weight or prev_limit ~= curr_limit then
+		self.carried_weight = curr_weight
+		self.burden_limit = curr_limit
+		self:send{packet = Packet{packets.PLAYER_WEIGHT, "uint16", curr_weight, "uint16", curr_limit}}
+	end
+	local curr_burden = self:get_burdened()
+	if prev_burden ~= curr_burden then
+		self:calculate_speed()
+		if curr_burden then
+			self:send{packet = Packet{packets.MESSAGE, "string", "You're now burdened."}}
+		else
+			self:send{packet = Packet{packets.MESSAGE, "string", "You're no longer burdened."}}
+		end
+	end
+end
+
 --- Updates the environment of the object and tries to fix it if necessary.
 -- @param self Object.
 -- @param secs Seconds since the last update.
 -- @return Boolean and environment statistics. The boolean is true if the object isn't permanently stuck.
 Creature.update_environment = function(self, secs)
+	-- Don't update every frame.
+	self.env_timer = (self.env_timer or 0) + secs
+	if self.env_timer < 0.2 then return end
+	local tick = self.env_timer
+	self.env_timer = 0
+	-- Prevent sectors from unloading if a player is present.
+	if self.client then self:refresh() end
 	-- Environment scan and stuck handling.
 	local ret,env = Object.update_environment(self, secs)
 	if not ret or not env then return ret, env end
@@ -855,16 +871,16 @@ Creature.update_environment = function(self, secs)
 		local magma = self.submerged_in_magma or 0
 		local water = self.submerged - magma
 		if magma > 0 and self.damage_from_magma ~= 0 then
-			self:damaged(self.spec.damage_from_magma * magma * secs)
+			self:damaged(self.spec.damage_from_magma * magma * tick)
 		end
 		if water > 0 and self.damage_from_water ~= 0 then
-			self:damaged(self.spec.damage_from_water * water * secs)
+			self:damaged(self.spec.damage_from_water * water * tick)
 		end
 	end
 	-- Apply liquid friction.
 	-- FIXME: Framerate dependent.
 	if self.submerged then
-		local damp = self.submerged * self.spec.water_friction * secs
+		local damp = self.submerged * self.spec.water_friction * tick
 		self.velocity = self.velocity - self.velocity * damp
 	end
 	return true, res
