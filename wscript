@@ -128,6 +128,10 @@ def configure(ctx):
 		if not ctx.check_cc(lib='GLEW', mandatory=False, uselib='CORE TEST', uselib_store='GLEW'):
 			ctx.check_cc(lib='GLEW32', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
 
+	# GL
+	if not ctx.check_cc(lib='GL', mandatory=False, uselib='CORE TEST', uselib_store='GLEW'):
+		ctx.check_cc(lib='OpenGL32', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
+
 	if ctx.env.SOUND:
 		# AL
 		if not ctx.check_cfg(package='openal', atleast_version='0.0.8', args='--cflags --libs', uselib_store="AL", mandatory=False):
