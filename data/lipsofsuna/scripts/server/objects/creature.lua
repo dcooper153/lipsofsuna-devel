@@ -306,7 +306,9 @@ Creature.die = function(self)
 		return
 	end
 	-- Death dialog.
-	Dialog:start{object = self, type = "die"}
+	if self.spec.dialog then
+		Dialog:start{object = self, name = self.spec.dialog .. " death"}
+	end
 	-- Disable controls.
 	self.dead = true
 	self.physics = "rigid"

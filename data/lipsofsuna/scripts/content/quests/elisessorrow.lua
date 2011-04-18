@@ -1,21 +1,21 @@
 Quest{
-	name = "Mourning Adventurer",
+	name = "Elise's Sorrow",
 	status = "inactive"}
 
 Pattern{
 	name = "lostadventurer1",
 	size = Vector(16,8,16),
 	creatures = {
-		{5,0,5,"lost adventurer"},
+		{5,0,5,"Noemi"},
 		{7,0,7,"dragon"}}}
 
 Species{
-	name = "mourning adventurer",
+	name = "Elise",
 	base = "aer",
 	animations = {
 		["idle"] = {animation = "tired", channel = 1, permanent = true}},
-	dialog = "mourning adventurer town",
-	marker = "mourning adventurer town",
+	dialog = "elise",
+	marker = "elise",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
 	hair_style = {"hair2",200,180,20},
@@ -23,10 +23,10 @@ Species{
 	factions = {"neutral"}}
 
 Species{
-	name = "lost adventurer",
+	name = "Noemi",
 	base = "aer",
-	dialog = "mourning adventurer lost",
-	marker = "mourning adventurer lost",
+	dialog = "noemi",
+	marker = "noemi",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
 	hair_style = {"hair2",200,180,20},

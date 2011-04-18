@@ -3,10 +3,10 @@ Quest{
 	status = "inactive"}
 
 Species{
-	name = "peculiar pet npc",
+	name = "Celine",
 	base = "aer",
-	dialog = "peculiar pet npc",
-	marker = "peculiar pet npc",
+	dialog = "celine",
+	marker = "celine",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
 	hair_style = {"hair1",0,255,0},
@@ -14,11 +14,11 @@ Species{
 	factions = {"peculiar pet"}}
 
 Species{
-	name = "peculiar pet worm",
+	name = "Puppy",
 	base = "bloodworm",
 	categories = {},
-	dialog = "peculiar pet worm",
-	marker = "peculiar pet worm",
+	dialog = "puppy",
+	marker = "puppy",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
 	factions = {"peculiar pet"}}

@@ -1,5 +1,5 @@
 Serialize = Class()
-Serialize.data_version = "4"
+Serialize.data_version = "5"
 
 --- Initializes the serializer.
 -- @param clss Serialize class.
@@ -10,11 +10,13 @@ Serialize.init = function(clss)
 	clss.sectors = Sectors{database = clss.db}
 	clss.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
 	if clss:get_value("data_version") ~= clss.data_version then
+		clss.db:query("DROP TABLE IF EXISTS dialog_flags;")
 		clss.db:query("DROP TABLE IF EXISTS markers;")
 		clss.db:query("DROP TABLE IF EXISTS quests;")
 	end
+	clss.db:query("CREATE TABLE IF NOT EXISTS dialog_flags (name TEXT PRIMARY KEY,value TEXT);")
 	clss.db:query("CREATE TABLE IF NOT EXISTS markers (name TEXT PRIMARY KEY,id INTEGER,x FLOAT,y FLOAT,z FLOAT);")
-	clss.db:query("CREATE TABLE IF NOT EXISTS quests (name TEXT PRIMARY KEY,progress FLOAT,status TEXT,desc TEXT,marker TEXT);")
+	clss.db:query("CREATE TABLE IF NOT EXISTS quests (name TEXT PRIMARY KEY,status TEXT,desc TEXT,marker TEXT);")
 	Sectors.instance = clss.sectors
 end
 
@@ -90,12 +92,16 @@ end
 --- Loads quests from the database.
 -- @param clss Serialize class.
 Serialize.load_quests = function(clss)
-	local r = clss.db:query("SELECT name,progress,status,desc,marker FROM quests;")
+	local r = clss.db:query("SELECT name,status,desc,marker FROM quests;")
 	for k,v in ipairs(r) do
 		local quest = Quest:find{name = v[1]}
 		if quest then
-			quest:update{progress = v[2], status = v[3], text = v[4], marker = v[5]}
+			quest:update{status = v[2], text = v[3], marker = v[4]}
 		end
+	end
+	local r = clss.db:query("SELECT name,value FROM dialog_flags;")
+	for k,v in ipairs(r) do
+		Dialog.flags[v[1]] = v[2]
 	end
 end
 
@@ -166,8 +172,8 @@ end
 -- @param quest Quest.
 Serialize.save_quest = function(clss, quest)
 	clss.db:query("BEGIN TRANSACTION;")
-	clss.db:query("REPLACE INTO quests (name,progress,status,desc,marker) VALUES (?,?,?,?,?);",
-		{quest.name, quest.progress, quest.status, quest.text, quest.marker})
+	clss.db:query("REPLACE INTO quests (name,status,desc,marker) VALUES (?,?,?,?);",
+		{quest.name, quest.status, quest.text, quest.marker})
 	clss.db:query("END TRANSACTION;")
 end
 
@@ -178,10 +184,14 @@ Serialize.save_quests = function(clss, erase)
 	clss.db:query("BEGIN TRANSACTION;")
 	if erase then
 		clss.db:query("DELETE FROM quests;")
+		clss.db:query("DELETE FROM dialog_flags;")
 	end
 	for k,v in pairs(Quest.dict_name) do
-		clss.db:query("REPLACE INTO quests (name,progress,status,desc) VALUES (?,?,?,?);",
-			{k, v.progress, v.status, v.text, v.marker})
+		clss.db:query("REPLACE INTO quests (name,status,desc) VALUES (?,?,?);",
+			{k, v.status, v.text, v.marker})
+	end
+	for k,v in pairs(Dialog.flags) do
+		clss.db:query("REPLACE INTO dialog_flags (name,value) VALUES (?,?);", {k, v})
 	end
 	clss.db:query("END TRANSACTION;")
 end

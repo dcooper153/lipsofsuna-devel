@@ -2,43 +2,25 @@ Dialog = Class()
 Dialog.dict_id = {}
 Dialog.dict_name = {}
 Dialog.dict_user = {}
+Dialog.flags = {}
 
 --- Creates a new dialog.
 -- @param clss Quest class.
 -- @param args Arguments.<ul>
---   <li>die: Death dialog function.</li>
---   <li>main: Normal dialog function.</li>
---   <li>name: Unique name.</li>
---   <li>unique: Only one instance of the dialog is allowed to run at once.</li></ul>
+--   <li>spec: Dialog spec.</li></ul>
 -- @return New dialog.
 Dialog.new = function(clss, args)
 	local self = Class.new(clss, args)
+	self.spec = args.spec
+	self.name = args.spec.name
 	-- Find a free ID.
 	local id = 1
 	while clss.dict_id[id] do id = math.random(1, 65535) end
 	self.id = id
-	-- Add to the dictionaries.
+	-- Add to dictionaries.
 	clss.dict_id[self.id] = self
 	clss.dict_name[self.name] = self
 	return self
-end
-
---- Creates a copy of the dialog.<br/>
--- @param self Dialog.
--- @return Dialog.
-Dialog.copy = function(self)
-	local copy = Class.new(Dialog)
-	-- Find a free ID.
-	local id = 1
-	while Dialog.dict_id[id] do id = math.random(1, 65535) end
-	copy.id = id
-	-- Add to the ID dictionary only.
-	Dialog.dict_id[copy.id] = copy
-	-- Copy other attributes.
-	copy.main = self.main
-	copy.name = self.name
-	copy.unique = self.unique
-	return copy
 end
 
 Dialog.close = function(self)
@@ -51,6 +33,8 @@ Dialog.close = function(self)
 	-- Detach from the object.
 	self.object.dialog = nil
 	-- Clear the state.
+	Dialog.dict_id[self.id] = nil
+	Dialog.dict_name[self.name] = nil
 	if self.user then
 		Dialog.dict_user[self.user] = nil
 	end
@@ -58,42 +42,127 @@ Dialog.close = function(self)
 	self.object = nil
 	self.user = nil
 	self.routine = nil
-	-- Remove completely if an instance.
-	if not self.unique then
-		Dialog.dict_id[self.id] = nil
-	end
 end
 
---- Finds a dialog.
--- @param clss Dialog class.
--- @param args Arguments.<ul>
---   <li>id: Dialog ID.</li>
---   <li>name: Dialog name.</li></ul>
--- @return Dialog or nil.
-Dialog.find = function(clss, args)
-	if args.id then return clss.dict_id[args.id] end
-	if args.name then return clss.dict_name[args.name] end
+--- Executes the dialog.
+-- @param self Dialog.
+Dialog.execute = function(self)
+	-- Command handlers of the virtual machine.
+	-- Handlers increment stack pointers and push and pop command arrays to the stack.
+	local commands = {
+		branch = function(vm, c)
+			vm[1].pos = vm[1].pos + 1
+			if (c.cond == nil or Dialog.flags[c.cond]) and
+			   (c.cond_dead == nil or self.object.dead) and
+			   (c.cond_not == nil or not Dialog.flags[c.cond_not]) then
+				table.insert(vm, 1, {exe = c, off = 1, pos = 1, len = #c - 1})
+			end
+		end,
+		["break"] = function(vm, c)
+			local num = c[2] or 1
+			for i = 1,num do
+				if not vm[1] then break end
+				table.remove(vm, 1)
+			end
+		end,
+		choice = function(vm, c)
+			local cmd = c
+			local cmds = {}
+			local opts = {}
+			repeat
+				if (cmd.cond == nil or Dialog.flags[cmd.cond]) and
+				   (cmd.cond_dead == nil or self.object.dead) and
+				   (cmd.cond_not == nil or not Dialog.flags[cmd.cond_not]) then
+					table.insert(opts, cmd[2])
+					cmds[cmd[2]] = cmd
+				end
+				vm[1].pos = vm[1].pos + 1
+				cmd = vm[1].exe[vm[1].pos + vm[1].off]
+			until not cmd or cmd[1] ~= "choice"
+			if #opts then
+				local sel = cmds[self:choice(opts)]
+				table.insert(vm, 1, {exe = sel, off = 2, pos = 1, len = #sel - 2})
+			end
+		end,
+		exit = function(vm, c)
+			for i = #vm,1,-1 do vm[i] = nil end
+		end,
+		feat = function(vm, c)
+			Feat:unlock(c)
+			vm[1].pos = vm[1].pos + 1
+		end,
+		flag = function(vm, c)
+			Dialog.flags[c[2]] = "true"
+			Serialize:save_quests()
+			vm[1].pos = vm[1].pos + 1
+		end,
+		func = function(vm, c)
+			local f = c[2]
+			vm[1].pos = vm[1].pos + 1
+			f(self)
+		end,
+		info = function(vm, c)
+			self:line(string.format("(%s)", c[2]))
+			vm[1].pos = vm[1].pos + 1
+		end,
+		loop = function(vm, c)
+			vm[1].pos = 1
+		end,
+		loot = function(vm, c)
+			self.object:loot(self.user)
+			for i = #vm,1,-1 do vm[i] = nil end
+		end,
+		quest = function(vm, c)
+			local q = Quest:find{name = c[2]}
+			if q then q:update(c) end
+			vm[1].pos = vm[1].pos + 1
+		end,
+		random = function(vm, c)
+			local o = math.random(2, #c)
+			vm[1].pos = vm[1].pos + 1
+			table.insert(vm, 1, {exe = c, off = o - 1, pos = 1, len = 1})
+		end,
+		say = function(vm, c)
+			self:line(string.format("%s: %s", c[2], c[3]))
+			vm[1].pos = vm[1].pos + 1
+		end,
+		teleport = function(vm, c)
+			self.user:teleport(c)
+			vm[1].pos = vm[1].pos + 1
+		end}
+	-- Initialize the virtual machine stack.
+	local vm = {{exe = self.spec.commands, off = 0, pos = 1, len = #self.spec.commands}}
+	-- Execute commands until the stack is empty.
+	while vm[1] do
+		if vm[1].pos > vm[1].len then
+			table.remove(vm, 1)
+		else
+			local cmd = vm[1].exe[vm[1].pos + vm[1].off]
+			local fun = commands[cmd[1]]
+			fun(vm, cmd)
+		end
+	end
 end
 
 --- Attempts to start a dialog.
 -- @param clss Dialog class.
 -- @param args Arguments.<ul>
---   <li>user: Object starting the dialog.</li>
+--   <li>name: Dialog name.</li>
 --   <li>object: Object whose dialog to start.</li>
---   <li>type: Dialog type. ("use"/"die")</ul>
+--   <li>user: Object starting the dialog.</li></ul>
 -- @return True if started.
 Dialog.start = function(clss, args)
 	-- Allow the target object and the player object both to engage
 	-- into only one dialog at a time.
 	if args.object.dialog then return end
 	if clss.dict_user[args.user] then return end
-	-- Find the dialog.
-	local dialog = Dialog:find{name = args.object.spec.dialog}
-	if not dialog then return end
-	-- Create a new instance if not unique.
-	if not dialog.unique then
-		dialog = dialog:copy()
-	end
+	-- Find the dialog spec.
+	local name = args.name or args.object.spec.dialog
+	local spec = Dialogspec:find{name = name}
+	if not spec then return end
+	if spec.unique and clss.dict_name[name] then return end
+	-- Create the dialog.
+	local dialog = Dialog{spec = spec}
 	-- Initialize the state.
 	dialog.answer = nil
 	dialog.object = args.object
@@ -101,17 +170,13 @@ Dialog.start = function(clss, args)
 	if args.user then
 		clss.dict_user[args.user] = true
 	end
-	if args.type == "die" then
-		dialog.routine = coroutine.create(dialog.die or function() end)
-	else
-		dialog.routine = coroutine.create(dialog.main or function() end)
-	end
 	-- Attach to the object.
 	dialog.object.dialog = dialog
 	if dialog.object.spec.type == "creature" then
 		dialog.object:update_ai_state()
 	end
 	-- Start the coroutine.
+	dialog.routine = coroutine.create(function() dialog:execute() end)
 	local r,e = coroutine.resume(dialog.routine, dialog)
 	if r == false then
 		print("Error in dialog `" .. dialog.name .. "': " .. e)

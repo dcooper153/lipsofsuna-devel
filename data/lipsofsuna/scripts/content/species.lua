@@ -347,7 +347,7 @@ Species{
 Species{
 	name = "lipscitizen",
 	base = "aer",
-	dialog = "lipscitizen",
+	dialog = "lips citizen",
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {"leather top", "leather pants", "leather leggings"}}
@@ -355,7 +355,7 @@ Species{
 Species{
 	name = "lipscitizenmale",
 	base = "aermale",
-	dialog = "lipscitizen",
+	dialog = "lips citizen",
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {"leather chest", "leather pants", "leather boots", "leather gloves", "leather helm"}}

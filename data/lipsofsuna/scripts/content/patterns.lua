@@ -676,10 +676,10 @@ Pattern{
 		{30.46,2,27.6,"rust sprig tree"}},
 	creatures = {
 		{3.61,0.99,7.61,"lipscitizen"},
-		{3,1,3,"peculiar pet worm"},
-		{4.3,1,3,"peculiar pet npc"},
+		{3,1,3,"Puppy"},
+		{4.3,1,3,"Celine"},
 		{21.84,0.99,17.52,"lipscitizen"},
-		{26.88,0.99,5.49,"mourning adventurer"}},
+		{26.88,0.99,5.49,"Elise"}},
 	tiles = {
 		{0,0,0,"granite1"}, {1,0,0,"granite1"}, {2,0,0,"granite1"}, {3,0,0,"granite1"}, {4,0,0,"granite1"}, {5,0,0,"granite1"}, {6,0,0,"granite1"}, {7,0,0,"granite1"}, {8,0,0,"granite1"}, {9,0,0,"granite1"}, {10,0,0,"granite1"}, {11,0,0,"granite1"}, {12,0,0,"granite1"}, {13,0,0,"granite1"}, {14,0,0,"granite1"}, {15,0,0,"granite1"}, {16,0,0,"granite1"}, {17,0,0,"granite1"}, {18,0,0,"granite1"}, {19,0,0,"granite1"}, {20,0,0,"granite1"}, {21,0,0,"granite1"}, {22,0,0,"granite1"}, {23,0,0,"granite1"}, {24,0,0,"granite1"}, {25,0,0,"granite1"}, {26,0,0,"granite1"}, {27,0,0,"granite1"}, {28,0,0,"granite1"}, {29,0,0,"granite1"}, {30,0,0,"granite1"}, {31,0,0,"granite1"},
 		{10,1,0,"granite1"}, {11,1,0,"granite1"}, {12,1,0,"granite1"}, {13,1,0,"granite1"}, {24,1,0,"granite1"}, {25,1,0,"granite1"},
