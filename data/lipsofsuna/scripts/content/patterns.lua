@@ -622,6 +622,13 @@ Pattern{
 	size = Vector(16,16,16)}
 
 Pattern{
+	name = "lostadventurer1",
+	size = Vector(16,8,16),
+	creatures = {
+		{5,0,5,"Noemi"},
+		{7,0,7,"dragon"}}}
+
+Pattern{
 	name = "nature1",
 	size = Vector(8,8,8),
 	categories = {"nature", "random"},
@@ -1036,15 +1043,18 @@ Pattern{
 	categories = {"silvespring"},
 	obstacles = {
 		{2.45,0.99,9.11,"rust sprig tree"},
-		{3.47,0.99,28.81,"rust sprig tree"},
+		{3.47,0.99,28.8,"rust sprig tree"},
 		{4.65,0.99,22.97,"rust sprig tree"},
-		{7.06,0.99,24.82,"rust sprig tree"},
-		{21.37,0.99,1.67,"rust sprig tree"},
-		{25.19,0.99,25.45,"rust sprig tree"},
-		{28.37,0.99,29.81,"rust sprig tree"},
+		{7.06,0.99,24.81,"rust sprig tree"},
+		{21.37,0.99,1.66,"rust sprig tree"},
+		{25.19,0.99,25.44,"rust sprig tree"},
+		{28.36,0.99,29.8,"rust sprig tree"},
 		{29.38,0.99,24.57,"rust sprig tree"}},
 	creatures = {
-		{18.16,2,27.79,"The Hoarder"}},
+		{18.16,2,27.79,"The Hoarder"},
+		{18.67,0.98,7.4,"Maurice"},
+		{20.74,0.99,10.73,"Martin"},
+		{23.73,0.98,9.17,"Agathe"}},
 	tiles = {
 		{0,0,0,"grass1"}, {1,0,0,"grass1"}, {2,0,0,"grass1"}, {3,0,0,"grass1"}, {4,0,0,"grass1"}, {5,0,0,"grass1"}, {6,0,0,"grass1"}, {7,0,0,"grass1"}, {8,0,0,"grass1"}, {9,0,0,"grass1"}, {10,0,0,"grass1"}, {11,0,0,"grass1"}, {12,0,0,"grass1"}, {13,0,0,"grass1"}, {14,0,0,"grass1"}, {15,0,0,"grass1"}, {16,0,0,"grass1"}, {17,0,0,"grass1"}, {18,0,0,"grass1"}, {19,0,0,"grass1"}, {20,0,0,"grass1"}, {21,0,0,"grass1"}, {22,0,0,"grass1"}, {23,0,0,"grass1"}, {24,0,0,"grass1"}, {25,0,0,"grass1"}, {26,0,0,"granite1"}, {27,0,0,"granite1"}, {28,0,0,"granite1"}, {29,0,0,"granite1"}, {30,0,0,"grass1"}, {31,0,0,"grass1"},
 		{27,1,0,"granite1"}, {28,1,0,"granite1"},

@@ -90,6 +90,10 @@ Creature.setter = function(self, key, value)
 		if spec.marker then
 			self.marker = Marker{name = spec.marker, position = self.position, target = self.id}
 		end
+		-- Kill dead quest characters.
+		if spec.dead then
+			self.dead = true
+		end
 	else
 		Object.setter(self, key, value)
 	end

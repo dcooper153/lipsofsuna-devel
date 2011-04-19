@@ -1,3 +1,6 @@
+------------------------------------------------------------------------------
+-- Plants
+
 Obstaclespec{
 	name = "tree",
 	model = "tree1",
@@ -30,3 +33,51 @@ Obstaclespec{
 	harvest_behavior = "destroy",
 	harvest_effect = "harvest1",
 	harvest_materials = { mushroom = 1 }}
+
+------------------------------------------------------------------------------
+-- Portals
+
+Obstaclespec{
+	name = "portal of illusion",
+	model = "portal1",
+	categories = {"portal", "special"},
+	dialog = "portal of illusion",
+	marker = "portal of illusion"}
+
+Obstaclespec{
+	name = "erinyes' portal",
+	model = "portal1",
+	categories = {"portal", "special"},
+	dialog = "erinyes' portal",
+	marker = "erinyes' portal"}
+
+Obstaclespec{
+	name = "portal of lips",
+	model = "portal1",
+	categories = {"portal", "special"},
+	dialog = "portal of lips",
+	marker = "portal of lips"}
+
+Obstaclespec{
+	name = "portal of midguard",
+	model = "portal1",
+	categories = {"portal", "special"},
+	dialog = "portal of midguard",
+	marker = "portal of midguard"}
+
+Obstaclespec{
+	name = "chara's portal",
+	model = "portal1",
+	categories = {"portal", "special"},
+	dialog = "chara's portal",
+	marker = "chara's portal"}
+
+------------------------------------------------------------------------------
+-- Quest obstacles
+
+Obstaclespec{
+	name = "sanctuary device",
+	model = "torch1",
+	categories = {"special"},
+	dialog = "sanctuary",
+	marker = "sanctuary"}

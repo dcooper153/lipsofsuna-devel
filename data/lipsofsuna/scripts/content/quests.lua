@@ -1,0 +1,11 @@
+Quest{name = "Agathe's House"}
+Quest{name = "Chara's Illusion"}
+Quest{name = "Elise's Sorrow"}
+Quest{name = "Erinyes"}
+Quest{name = "Maurice's House"}
+Quest{name = "Peculiar Pet"}
+Quest{name = "Portal of Lips"}
+Quest{name = "Portal of Midguard"}
+Quest{name = "Roots of World"}
+Quest{name = "Sanctuary"}
+Quest{name = "The Hoarder"}

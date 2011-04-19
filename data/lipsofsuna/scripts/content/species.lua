@@ -636,15 +636,3 @@ Species{
 		{name = "health", max = 20, val = 20},
 		{name = "strength", max = 10, val = 10}},
 	vulnerabilities = {cold = 2, fire = 0.4, physical = 0.8}}
-
-------------------------------------------------------------------------------
--- Silverspring creatures.
-
-Species{
-	name = "The Hoarder",
-	base = "aermale",
-	dialog = "the hoarder",
-	marker = "the hoarder",
-	eye_style = {"default",255,32,32},
-	hair_style = {"hair2",200,20,180},
-	inventory_items = {"shirt", "pants", "boots"}}
