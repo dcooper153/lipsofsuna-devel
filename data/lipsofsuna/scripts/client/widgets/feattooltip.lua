@@ -15,20 +15,28 @@ Widgets.Feattooltip.new = function(clss, args)
 	self:append(title)
 	-- Influences.
 	if info.influences then
-		self:append(string.format("Power:"))
+		local first = true
 		for k,v in pairs(info.influences) do
-			
+			if first then
+				self:append(string.format("Powers:"))
+				first = false
+			end
 			if v < 0 then
-			self:append(string.format("  %s: %+d damage", k, tostring(v * -1)))
+				self:append(string.format("  %s: %+d damage", k, -v))
 			else
-  			self:append(string.format("  %s: %+d regenerative", k, tostring(v)))
-                        end
+				self:append(string.format("  %s: %+d healing", k, v))
+			end
 		end
 	end
+	-- Reagents.
 	if info.required_reagents then
-		self:append(string.format("Reagents Required:"))
+		local first = true
 		for k,v in pairs(info.required_reagents) do
-			self:append(string.format("%s: %d", k, tostring(v)))
+			if first then
+				self:append(string.format("Reagents required:"))
+				first = false
+			end
+			self:append(string.format("  %s: %d", k, v))
 		end
 	end
 	return self
