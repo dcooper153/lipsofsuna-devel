@@ -5,12 +5,14 @@ Views.Quests.new = function(clss)
 	self.dict_name = {}
 	self.list = Widgets.List()
 	self.list.pressed = function(view, row) self:show(row) end
-	self.list:set_request{width = 100, height = 100}
 	self.quest_info = Widgets.QuestInfo()
 	self.title = Widgets.Frame{style = "title", text = "Quest"}
+	self.frame = Widgets.Frame{style = "default", cols = 1, rows = 1}
+	self.frame:set_child{col = 1, row = 1, widget = self.list}
+	self.frame:set_expand{col = 1, row = 1}
 	self:set_expand{col = 1, row = 2}
 	self:set_child{col = 1, row = 1, widget = self.title}
-	self:set_child{col = 1, row = 2, widget = self.list}
+	self:set_child{col = 1, row = 2, widget = self.frame}
 	self:set_child{col = 1, row = 3, widget = self.quest_info}
 	return self
 end
