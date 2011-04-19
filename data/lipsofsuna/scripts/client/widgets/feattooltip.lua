@@ -21,11 +21,13 @@ Widgets.Feattooltip.new = function(clss, args)
 				self:append(string.format("Powers:"))
 				first = false
 			end
-			if v < 0 then
-				self:append(string.format("  %s: %+d damage", k, -v))
-			else
-				self:append(string.format("  %s: %+d healing", k, v))
-			end
+			local units = {
+				plague = {"bearers"},
+				fire = {"healing", "damage"},
+				physical = {"healing", "damage"},
+				sanctuary = {"seconds"}}
+			local unit = units[k] and (v > 0 and units[k][1] or units[k][2])
+			self:append(string.format("  %s: %d %s", k, math.abs(v), unit or ""))
 		end
 	end
 	-- Reagents.

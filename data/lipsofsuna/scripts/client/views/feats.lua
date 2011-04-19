@@ -114,44 +114,17 @@ Views.Feats.changed = function(self)
 	-- Get effects and their magnitudes.
 	local effects = {}
 	local values = {}
+	local both = {}
 	for i = 1,3 do
 		table.insert(effects, self.combo_effect[i].text)
 		table.insert(values, self.scroll_effect[i].value)
+		table.insert(both, {self.combo_effect[i].text, self.scroll_effect[i].value})
 	end
 	-- Calculate skill and reagent requirements.
-	local reagents = {}
-	local skills = {}
-	for index,name in pairs(effects) do
-		local effect = Feateffectspec:find{name = name}
-		if effect then
-			-- Base skill requirements.
-			for skill,value in pairs(effect.skill_base) do
-				local val = skills[skill] or 0
-				skills[skill] = val + value
-			end
-			-- Magnitude based skill requirements.
-			for skill,mult in pairs(effect.skill_mult) do
-				local val = skills[skill] or 0
-				skills[skill] = val + mult * values[index]
-			end
-			-- Base reagent requirements.
-			for reagent,value in pairs(effect.reagent_base) do
-				local val = reagents[reagent] or 0
-				reagents[reagent] = val + value
-			end
-			-- Magnitude based reagent requirements.
-			for reagent,mult in pairs(effect.reagent_mult) do
-				local val = reagents[reagent] or 0
-				reagents[reagent] = val + mult * values[index]
-			end
-		end
-	end
-	for k,v in pairs(skills) do
-		skills[k] = math.max(1, math.ceil(v))
-	end
-	for k,v in pairs(reagents) do
-		reagents[k] = math.max(1, math.ceil(v))
-	end
+	local feat = Feat{animation = self.combo_anim.text, effects = both}
+	local info = feat:get_info()
+	local reagents = info.required_reagents
+	local skills = info.required_skills
 	-- Display skill requirements.
 	local skill_list = {}
 	for k,v in pairs(skills) do
@@ -180,10 +153,10 @@ Views.Feats.changed = function(self)
 	if anim then
 		desc = " - " .. anim.description
 		for i = 1,3 do
-			local name = self.combo_effect[i].text or ""
+			local name = effects[i] or ""
 			local effect = Feateffectspec:find{name = name}
 			if effect and effect.description then
-				desc = desc .. "\n - " .. effect.description
+				desc = string.format("%s\n - %s", desc, effect.description)
 			end
 		end
 	end
