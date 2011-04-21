@@ -29,6 +29,7 @@
 #include "model-particle.h"
 #include "model-node.h"
 #include "model-shape.h"
+#include "model-shape-key.h"
 #include "model-types.h"
 #include "model-vertex.h"
 
@@ -64,6 +65,7 @@ struct _LIMdlModel
 	struct { int count; LIMdlNode** array; } nodes;
 	struct { int count; LIMdlParticleSystem* array; } particlesystems;
 	struct { int count; LIMdlShape* array; } shapes;
+	struct { int count; LIMdlShapeKey* array; } shape_keys;
 	struct { int count; LIMdlVertex* array; } vertices;
 	struct { int count; LIMdlWeightGroup* array; } weightgroups;
 };
@@ -108,6 +110,10 @@ LIAPICALL (LIMdlNode*, limdl_model_find_node, (
 	const LIMdlModel* self,
 	const char*       name));
 
+LIAPICALL (LIMdlShapeKey*, limdl_model_find_shape_key, (
+	LIMdlModel* self,
+	const char* name));
+
 LIAPICALL (int, limdl_model_find_vertex, (
 	LIMdlModel*        self,
 	const LIMdlVertex* vertex));
@@ -120,6 +126,11 @@ LIAPICALL (int, limdl_model_find_weightgroup, (
 LIAPICALL (int, limdl_model_merge, (
 	LIMdlModel* self,
 	LIMdlModel* model));
+
+LIAPICALL (int, limdl_model_morph, (
+	LIMdlModel* self,
+	const char* shape,
+	float       value));
 
 LIAPICALL (int, limdl_model_write, (
 	const LIMdlModel* self,

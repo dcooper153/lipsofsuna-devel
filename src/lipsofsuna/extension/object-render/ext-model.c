@@ -70,6 +70,30 @@ static void Model_edit_material (LIScrArgs* args)
 	}
 }
 
+/* @luadoc
+ * --- Morphs a model with one of its shape keys.
+ * -- @param self Object.
+ * -- @param args Arguments.<ul>
+ * --   <li>1,shape: Shape key name.</li>
+ * --   <li>2,value: Shape influence name to match or nil.</li></ul>
+ * function Model.morph(self, args)
+ */
+static void Model_morph (LIScrArgs* args)
+{
+	float value = 0.5f;
+	const char* shape;
+	LIEngModel* model;
+
+	model = args->self;
+	if (!liscr_args_geti_string (args, 0, &shape) &&
+	    !liscr_args_gets_string (args, "shape", &shape))
+		return;
+	if (!liscr_args_geti_float (args, 1, &value))
+		liscr_args_gets_float (args, "value", &value);
+
+	liscr_args_seti_bool (args, limdl_model_morph (model->model, shape, value));
+}
+
 /*****************************************************************************/
 
 void liext_script_render_model (
@@ -78,6 +102,7 @@ void liext_script_render_model (
 {
 	liscr_class_set_userdata (self, LIEXT_SCRIPT_RENDER_MODEL, data);
 	liscr_class_insert_mfunc (self, "edit_material", Model_edit_material);
+	liscr_class_insert_mfunc (self, "morph", Model_morph);
 }
 
 /** @} */

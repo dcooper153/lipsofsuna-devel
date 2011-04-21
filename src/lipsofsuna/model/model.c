@@ -69,6 +69,10 @@ static int private_read_shapes (
 	LIMdlModel*  self,
 	LIArcReader* reader);
 
+static int private_read_shape_keys (
+	LIMdlModel*  self,
+	LIArcReader* reader);
+
 static int private_read_vertices (
 	LIMdlModel*  self,
 	LIArcReader* reader);
@@ -125,6 +129,10 @@ static int private_write_particles (
 	LIArcWriter*      writer);
 
 static int private_write_shapes (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
+
+static int private_write_shape_keys (
 	const LIMdlModel* self,
 	LIArcWriter*      writer);
 
@@ -339,6 +347,14 @@ void limdl_model_free (
 		lisys_free (self->shapes.array);
 	}
 
+	/* Free shape keys. */
+	if (self->shape_keys.array != NULL)
+	{
+		for (i = 0 ; i < self->shape_keys.count ; i++)
+			limdl_shape_key_clear (self->shape_keys.array + i);
+		lisys_free (self->shape_keys.array);
+	}
+
 	lisys_free (self);
 }
 
@@ -493,6 +509,27 @@ LIMdlNode* limdl_model_find_node (
 		node = limdl_node_find_node (node, name);
 		if (node != NULL)
 			return node;
+	}
+
+	return NULL;
+}
+
+/**
+ * \brief Finds a shape key by name.
+ * \param self Model.
+ * \param name Shape key name.
+ * \return Shape key or NULL.
+ */
+LIMdlShapeKey* limdl_model_find_shape_key (
+	LIMdlModel* self,
+	const char* name)
+{
+	int i;
+
+	for (i = 0 ; i < self->shape_keys.count ; i++)
+	{
+		if (!strcmp (self->shape_keys.array[i].name, name))
+			return self->shape_keys.array + i;
 	}
 
 	return NULL;
@@ -662,6 +699,36 @@ error:
 	return 0;
 }
 
+/**
+ * \brief Morphs the vertices of the model and one of its shape keys.
+ * \param self Model.
+ * \param shape Shape key name.
+ * \param value Shape key influence.
+ * \return Nonzero on success.
+ */
+int limdl_model_morph (
+	LIMdlModel* self,
+	const char* shape,
+	float       value)
+{
+	int i;
+	LIMdlShapeKey* key;
+
+	key = limdl_model_find_shape_key (self, shape);
+	if (key == NULL)
+		return 0;
+
+	for (i = 0 ; i < key->vertices.count && i < self->vertices.count ; i++)
+	{
+		self->vertices.array[i].coord = limat_vector_lerp (
+			key->vertices.array[i].coord, self->vertices.array[i].coord, value);
+		self->vertices.array[i].normal = limat_vector_normalize (limat_vector_lerp (
+			key->vertices.array[i].normal, self->vertices.array[i].normal, value));
+	}
+
+	return 1;
+}
+
 int limdl_model_write (
 	const LIMdlModel* self,
 	LIArcWriter*      writer)
@@ -799,6 +866,8 @@ static int private_read (
 			ret = private_read_faces (self, reader);
 		else if (mesh && !strcmp (id, "wei"))
 			ret = private_read_weights (self, reader);
+		else if (mesh && !strcmp (id, "shk"))
+			ret = private_read_shape_keys (self, reader);
 		else if (mesh && !strcmp (id, "nod"))
 			ret = private_read_nodes (self, reader);
 		else if (mesh && !strcmp (id, "ani"))
@@ -1077,6 +1146,34 @@ static int private_read_shapes (
 	return 1;
 }
 
+static int private_read_shape_keys (
+	LIMdlModel*  self,
+	LIArcReader* reader)
+{
+	int i;
+	uint32_t tmp;
+
+	/* Read header. */
+	if (!liarc_reader_get_uint32 (reader, &tmp))
+		return 0;
+	self->shape_keys.count = tmp;
+
+	/* Read shape keys. */
+	if (self->shape_keys.count)
+	{
+		self->shape_keys.array = lisys_calloc (self->shape_keys.count, sizeof (LIMdlShapeKey));
+		if (self->shape_keys.array == NULL)
+			return 0;
+		for (i = 0 ; i < self->shape_keys.count ; i++)
+		{
+			if (!limdl_shape_key_read (self->shape_keys.array + i, reader))
+				return 0;
+		}
+	}
+
+	return 1;
+}
+
 static int private_read_vertices (
 	LIMdlModel*  self,
 	LIArcReader* reader)
@@ -1247,6 +1344,7 @@ static int private_write (
 	    !private_write_block (self, "ver", private_write_vertices, writer) ||
 	    !private_write_block (self, "fac", private_write_faces, writer) ||
 	    !private_write_block (self, "wei", private_write_weights, writer) ||
+	    !private_write_block (self, "shk", private_write_shape_keys, writer) ||
 	    !private_write_block (self, "nod", private_write_nodes, writer) ||
 	    !private_write_block (self, "ani", private_write_animations, writer) ||
 	    !private_write_block (self, "hai", private_write_hairs, writer) ||
@@ -1500,6 +1598,30 @@ static int private_write_shapes (
 	{
 		shape = self->shapes.array + i;
 		if (!limdl_shape_write (shape, writer))
+			return 0;
+	}
+
+	return 1;
+}
+
+static int private_write_shape_keys (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
+{
+	int i;
+	LIMdlShapeKey* shape;
+
+	/* Check if writing is needed. */
+	if (!self->shape_keys.count)
+		return 1;
+
+	/* Write shape keys. */
+	if (!liarc_writer_append_uint32 (writer, self->shape_keys.count))
+		return 0;
+	for (i = 0 ; i < self->shape_keys.count ; i++)
+	{
+		shape = self->shape_keys.array + i;
+		if (!limdl_shape_key_write (shape, writer))
 			return 0;
 	}
 

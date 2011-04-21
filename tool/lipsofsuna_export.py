@@ -543,73 +543,132 @@ class LIMesh:
 
 	def __init__(self, obj, file):
 		mesh = obj.data
+		self.file = file
 		# Initialize storage.
 		self.matdict = {}
 		self.matlist = []
-		self.vertdict = {}
-		self.vertlist = []
+		self.shapekeydict = {}
+		self.shapekeylist = []
+		self.vertdict = {} # bl_vertex -> los_index
+		self.vertlist = [] # los_index -> los_vertex
+		self.vertmapping = [] # los_index -> bl_index
 		self.weightgroupdict = {}
 		self.weightgrouplist = []
+		# Reset shape keys.
+		shape_keys = {}
+		if obj.data.shape_keys:
+			index = 0
+			for k in obj.data.shape_keys.key_blocks:
+				shape_keys[k.name] = index
+				k.value = 1.0
+				index += 1
+			obj.data.update()
 		# Emit faces.
+		self.emit_faces(obj, mesh)
+		# Emit shape keys.
+		for name in shape_keys:
+			# Skip the basis shape.
+			index = shape_keys[name]
+			if index == 0:
+				continue
+			# Duplicate the object.
+			# This is needed because we delete the shape keys every time we
+			# save one and there may be multiple ones we want to save.
+			bpy.ops.object.duplicate()
+			tmpobj = None
+			obj.select = False
+			for obj1 in bpy.data.objects:
+				if obj1.select:
+					tmpobj = obj1
+					break
+			bpy.context.scene.objects.active = tmpobj
+			# Remove shape keys.
+			# Apparently the only way to get the vertex data of the shape key is
+			# to remove all shape keys. If the key we want is the last one removed,
+			# its vertices become the vertices of the mesh itself.
+			for i in range(len(shape_keys)-1,-1,-1):
+				blkey = tmpobj.data.shape_keys.key_blocks[i]
+				if blkey.name != name:
+					tmpobj.active_shape_key_index = i
+					bpy.ops.object.shape_key_remove()
+			tmpobj.active_shape_key_index = 0
+			bpy.ops.object.shape_key_remove()
+			# Record vertex positions.
+			# The vertex positions are taken from the temporary object to
+			# which they were baked by removing the shape keys.
+			key = LIShapeKey(self, tmpobj, name)
+			self.shapekeydict[name] = key
+			self.shapekeylist.append(key)
+			# Delete the temporary object.
+			bpy.ops.object.delete()
+			obj.select = True
+			bpy.context.scene.objects.active = obj
+
+	def emit_face(self, obj, mesh, face):
+		# Vertices.
+		verts = [mesh.vertices[x] for x in face.vertices]
+		indices = [x for x in face.vertices]
+		# Material attributes.
+		# Materials may have a file property that limits exporting of the face
+		# to a certain file. We need to check that the file is correct and skip
+		# the face if it isn't.
+		idx = face.material_index
+		bmat = None
+		bimg = None
+		if idx < len(obj.material_slots):
+			bmat = obj.material_slots[idx].material
+			files = material_files(bmat)
+			if len(files) and self.file not in files:
+				return
+		# Texture attributes.
+		if mesh.uv_textures.active:
+			buvs = mesh.uv_textures.active.data[face.index]
+			bimg = buvs.image
+			uvs = buvs.uv
+		else:
+			uvs = ((0, 0), (0, 0), (0, 0), (0, 0))
+		# Emit material.
+		key = (bmat and idx or -1, bimg and bimg.name or '')
+		if key not in self.matdict:
+			mat = LIMaterial(len(self.matlist), bmat, bimg)
+			self.matdict[key] = mat
+			self.matlist.append(mat)
+		else:
+			mat = self.matdict[key]
+		# Emit triangles.
+		for i in range(0, len(verts)):
+			# Vertex attributes.
+			bvert = verts[i]
+			no = face.use_smooth and bvert.normal or face.normal
+			uv = uvs[i]
+			# Emit vertex.
+			key = (indices[i], no.x, no.y, no.z, uv[0], uv[1])
+			if key not in self.vertdict:
+				# Add weights.
+				weights = []
+				for weight in bvert.groups:
+					group = obj.vertex_groups[weight.group]
+					if group.name not in self.weightgroupdict:
+						grpidx = len(self.weightgrouplist)
+						self.weightgroupdict[group.name] = grpidx
+						self.weightgrouplist.append(group.name)
+					else:
+						grpidx = self.weightgroupdict[group.name]
+					weights.append((grpidx, weight.weight))
+				# Add vertex.
+				vert = LIVertex(len(self.vertlist), bvert.co, no, uv, weights)
+				self.vertmapping.append(indices[i])
+				self.vertdict[key] = len(self.vertlist)
+				self.vertlist.append(vert)
+			else:
+				index = self.vertdict[key]
+				vert = self.vertlist[index]
+			# Emit index.
+			mat.indices.append(vert.index)
+
+	def emit_faces(self, obj, mesh):
 		for face in mesh.faces:
-			# Vertices.
-			verts = [mesh.vertices[x] for x in face.vertices]
-			indices = [x for x in face.vertices]
-			# Material attributes.
-			# Materials may have a file property that limits exporting of the face
-			# to a certain file. We need to check that the file is correct and skip
-			# the face if it isn't.
-			idx = face.material_index
-			bmat = None
-			bimg = None
-			if idx < len(obj.material_slots):
-				bmat = obj.material_slots[idx].material
-				files = material_files(bmat)
-				if len(files) and file not in files:
-					continue
-			# Texture attributes.
-			if mesh.uv_textures.active:
-				buvs = mesh.uv_textures.active.data[face.index]
-				bimg = buvs.image
-				uvs = buvs.uv
-			else:
-				uvs = ((0, 0), (0, 0), (0, 0), (0, 0))
-			# Emit material.
-			key = (bmat and idx or -1, bimg and bimg.name or '')
-			if key not in self.matdict:
-				mat = LIMaterial(len(self.matlist), bmat, bimg)
-				self.matdict[key] = mat
-				self.matlist.append(mat)
-			else:
-				mat = self.matdict[key]
-			# Emit face.
-			for i in range(0, len(verts)):
-				# Vertex attributes.
-				bvert = verts[i]
-				no = face.use_smooth and bvert.normal or face.normal
-				uv = uvs[i]
-				# Emit vertex.
-				key = (indices[i], no.x, no.y, no.z, uv[0], uv[1])
-				if key not in self.vertdict:
-					# Add weights.
-					weights = []
-					for weight in bvert.groups:
-						group = obj.vertex_groups[weight.group]
-						if group.name not in self.weightgroupdict:
-							grpidx = len(self.weightgrouplist)
-							self.weightgroupdict[group.name] = grpidx
-							self.weightgrouplist.append(group.name)
-						else:
-							grpidx = self.weightgroupdict[group.name]
-						weights.append((grpidx, weight.weight))
-					# Add vertex.
-					vert = LIVertex(len(self.vertlist), bvert.co, no, uv, weights)
-					self.vertdict[key] = vert
-					self.vertlist.append(vert)
-				else:
-					vert = self.vertdict[key]
-				# Emit index.
-				mat.indices.append(vert.index)
+			self.emit_face(obj, mesh, face)
 
 	def write_bounds(self, writer):
 		if not len(self.vertlist):
@@ -651,6 +710,15 @@ class LIMesh:
 		writer.write_marker()
 		for mat in self.matlist:
 			mat.write_info(writer)
+		return True
+
+	def write_shape_keys(self, writer):
+		if not len(self.shapekeylist):
+			return False
+		writer.write_int(len(self.shapekeylist))
+		writer.write_marker()
+		for key in self.shapekeylist:
+			key.write(writer)
 		return True
 
 	def write_vertices(self, writer):
@@ -1090,6 +1158,28 @@ class LIShapePart:
 			writer.write_float(v.z)
 			writer.write_marker()
 
+class LIShapeKey:
+
+	def __init__(self, mesh, obj, name):
+		self.name = name
+		self.vertices = []
+		for li_idx in range(len(mesh.vertmapping)):
+			bl_idx = mesh.vertmapping[li_idx]
+			self.vertices.append((obj.data.vertices[bl_idx].co, obj.data.vertices[bl_idx].normal))
+
+	def write(self, writer):
+		writer.write_string(self.name)
+		writer.write_int(len(self.vertices))
+		writer.write_marker()
+		for v in self.vertices:
+			writer.write_float(v[0].x)
+			writer.write_float(v[0].y)
+			writer.write_float(v[0].z)
+			writer.write_float(v[1].x)
+			writer.write_float(v[1].y)
+			writer.write_float(v[1].z)
+			writer.write_marker()
+
 class LITexture:
 
 	def __init__(self, index, tex, img):
@@ -1224,16 +1314,23 @@ class LIFile:
 			self.state += 1
 			return False
 		# Apply modifiers to the duplicated meshes.
+		# This is currently setup so that multires and armature are the only
+		# modifiers that can coexist with shape keys. If any other modifiers
+		# exist, the shape key information is lost.
 		elif self.state == 4:
 			for obj in self.tempobjs:
 				# Remove unwanted modifiers.
+				num = 0
 				for mod in obj.modifiers:
-					if mod.type == 'ARMATURE':
+					if mod.type == 'ARMATURE' or mod.type == 'MULTIRES':
 						obj.modifiers.remove(mod)
+					else:
+						num += 1
 				# Apply modifiers.
-				oldmesh = obj.data
-				obj.data = obj.to_mesh(bpy.context.scene, True, 'PREVIEW')
-				bpy.data.meshes.remove(oldmesh)
+				if num:
+					oldmesh = obj.data
+					obj.data = obj.to_mesh(bpy.context.scene, True, 'PREVIEW')
+					bpy.data.meshes.remove(oldmesh)
 			self.state += 1
 			return False
 		# Simplify the duplicated meshes.
@@ -1342,6 +1439,10 @@ class LIFile:
 			data.clear("wei")
 			if self.mesh.write_weights(data):
 				self.write_block("wei", data)
+			# Shape keys.
+			data.clear("shk")
+			if self.mesh.write_shape_keys(data):
+				self.write_block("shk", data)
 			# TODO: Hairs.
 		if self.hier:
 			# Nodes.
