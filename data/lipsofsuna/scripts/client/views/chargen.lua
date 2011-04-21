@@ -80,6 +80,15 @@ Views.Chargen.new = function(clss)
 	self.label_bust_scale = Widgets.Label{text = "Bust:"}
 	self.scroll_bust_scale = Widgets.Progress{min = 0, max = 1, value = 1,
 		pressed = function(widget) self:set_bust_scale(widget:get_value_at(Client.cursor_pos)) end}
+	-- Face style sliders.
+	self.label_face = {}
+	self.scroll_face = {}
+	local face_slider_names = {"Face 1", "Face 2", "Face 3"}
+	for i = 1,3 do
+		self.label_face[i] = Widgets.Label{text = face_slider_names[i]}
+		self.scroll_face[i] = Widgets.Progress{min = 0, max = 1, value = 0,
+			pressed = function(widget) self:set_face(i, widget:get_value_at(Client.cursor_pos)) end}
+	end
 	-- Apply and quit buttons.
 	self.button_create = Widgets.Button{text = "Create", pressed = function() self:apply() end}
 	self.button_create:set_request{height = 40}
@@ -99,7 +108,7 @@ Views.Chargen.new = function(clss)
 	self.group_race1 = Widgets.Frame{rows = 2, cols = 1}
 	self.group_race1:set_child{row = 1, col = 1, widget = self.group_race}
 	self.group_race1:set_child{row = 2, col = 1, widget = self.skills}
-	self.group_appearance = Widgets.Frame{rows = 9, cols = 2, spacings = {0,2}}
+	self.group_appearance = Widgets.Frame{rows = 12, cols = 2, spacings = {0,2}}
 	self.group_appearance:set_child{row = 1, col = 1, widget = self.label_eye_style}
 	self.group_appearance:set_child{row = 1, col = 2, widget = self.combo_eye_style}
 	self.group_appearance:set_child{row = 2, col = 1, widget = self.label_eye_color}
@@ -118,6 +127,12 @@ Views.Chargen.new = function(clss)
 	self.group_appearance:set_child{row = 8, col = 2, widget = self.scroll_nose_scale}
 	self.group_appearance:set_child{row = 9, col = 1, widget = self.label_bust_scale}
 	self.group_appearance:set_child{row = 9, col = 2, widget = self.scroll_bust_scale}
+	self.group_appearance:set_child{row = 10, col = 1, widget = self.label_face[1]}
+	self.group_appearance:set_child{row = 10, col = 2, widget = self.scroll_face[1]}
+	self.group_appearance:set_child{row = 11, col = 1, widget = self.label_face[2]}
+	self.group_appearance:set_child{row = 11, col = 2, widget = self.scroll_face[2]}
+	self.group_appearance:set_child{row = 12, col = 1, widget = self.label_face[3]}
+	self.group_appearance:set_child{row = 12, col = 2, widget = self.scroll_face[3]}
 	self.group_appearance:set_expand{col = 2}
 	self.group_buttons = Widget{rows = 2, cols = 1, margins = {0,0,5,5}}
 	self.group_buttons:set_child{row = 1, col = 1, widget = self.button_create}
@@ -144,23 +159,34 @@ Views.Chargen.apply = function(self)
 	local packet = Packet(packets.CHARACTER_CREATE,
 		"string", self.entry_name.text,
 		"string", self.list_races[self.combo_race.value][2],
+		-- Skills.
 		"uint8", self.skills:get_value("dexterity"),
 		"uint8", self.skills:get_value("health"),
 		"uint8", self.skills:get_value("intelligence"),
 		"uint8", self.skills:get_value("perception"),
 		"uint8", self.skills:get_value("strength"),
 		"uint8", self.skills:get_value("willpower"),
+		-- Body style.
 		"float", self.scroll_height.value,
 		"float", self.scroll_nose_scale.value,
 		"float", self.scroll_bust_scale.value,
+		-- Eye style.
 		"string", "default",
 		"uint8", 255 * self.color_eye.red,
 		"uint8", 255 * self.color_eye.green,
 		"uint8", 255 * self.color_eye.blue,
+		-- Face style.
+		"uint8", 255 * self.scroll_face[1].value,
+		"uint8", 255 * self.scroll_face[2].value,
+		"uint8", 255 * self.scroll_face[3].value,
+		"uint8", 0,
+		"uint8", 0,
+		-- Hair style.
 		"string", self.list_hair_styles[self.combo_hair_style.value][2],
 		"uint8", 255 * self.color_hair.red,
 		"uint8", 255 * self.color_hair.green,
 		"uint8", 255 * self.color_hair.blue,
+		-- Skin style.
 		"string", "default",
 		"uint8", 255 * self.color_skin.red,
 		"uint8", 255 * self.color_skin.green,
@@ -236,6 +262,11 @@ Views.Chargen.set_eye_style = function(self, index)
 	self.combo_eye_style.value = index
 	self.combo_eye_style.text = self.list_eye_styles[index][1]
 	self.eye_style = self.list_eye_styles[index][2]
+	self.update_needed = true
+end
+
+Views.Chargen.set_face = function(self, slider, value)
+	self.scroll_face[slider].value = value
 	self.update_needed = true
 end
 
@@ -364,6 +395,7 @@ Views.Chargen.update_model = function(self)
 		bust_scale = self.scroll_bust_scale.value,
 		equipment = spec and spec.inventory_items,
 		eye_color = {self.color_eye.red, self.color_eye.green, self.color_eye.blue},
+		face_style = {self.scroll_face[1].value, self.scroll_face[2].value, self.scroll_face[3].value},
 		hair_color = {self.color_hair.red, self.color_hair.green, self.color_hair.blue},
 		hair_style = self.hair_style,
 		nose_scale = self.scroll_nose_scale.value,

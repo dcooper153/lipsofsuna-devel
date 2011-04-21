@@ -20,13 +20,20 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	local player = Player:find{client = args.client}
 	if player then return end
 	-- Get character flags.
-	local ok,na,ra,s1,s2,s3,s4,s5,s6,bo,no,bu,eye,eyer,eyeg,eyeb,
+	local ok,na,ra,s1,s2,s3,s4,s5,s6,bo,no,bu,eye,eyer,eyeg,eyeb,f1,f2,f3,f4,f5,
 	hair,hairr,hairg,hairb,skin,skinr,sking,skinb = args.packet:read(
 		"string", "string",
+		-- Skills.
 		"uint8", "uint8", "uint8", "uint8", "uint8", "uint8",
+		-- Body style.
 		"float", "float", "float",
+		-- Eye style.
 		"string", "uint8", "uint8", "uint8",
+		-- Face style.
+		"uint8", "uint8", "uint8", "uint8", "uint8",
+		-- Hair style.
 		"string", "uint8", "uint8", "uint8",
+		-- Skin style.
 		"string", "uint8", "uint8", "uint8")
 	if not ok then return end
 	local spec = Species:find{name = ra .. "-player"}
@@ -41,6 +48,7 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		bust_scale = bu,
 		client = args.client,
 		eye_style = {eye, eyer, eyeg, eyeb},
+		face_style = {f1, f2, f3, f4, f5},
 		hair_style = {hair, hairr, hairg, hairb},
 		name = (na ~= "" and na or "Player"),
 		nose_scale = no,

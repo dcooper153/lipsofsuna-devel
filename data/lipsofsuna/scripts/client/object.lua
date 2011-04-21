@@ -49,6 +49,7 @@ end
 --   <li>body_scale: Scale factor.</li>
 --   <li>bust_scale: Bust scale factor.</li>
 --   <li>equipment: List of equipment.</li>
+--   <li>face_style: Array of face morphing weights.</li>
 --   <li>hair_color: Hair color string.</li>
 --   <li>hair_style: Hair style string.</li>
 --   <li>nose_scale: Nose scale factor.</li>
@@ -90,7 +91,18 @@ Object.create_character_model = function(self, args)
 	-- Add other meshes.
 	for k,v in pairs(meshes) do
 		if k ~= "skeleton" then
-			m:merge(Model:load{file = v})
+			if string.match(k, ".*head.*") then
+				local tmp = Model:load{file = v}
+				tmp = tmp:copy()
+				if args.face_style then
+					if args.face_style[1] then print("A", tmp:morph("face round", args.face_style[1])) end
+					if args.face_style[2] then print("B", tmp:morph("face rough", args.face_style[2])) end
+					if args.face_style[3] then print("C", tmp:morph("face frown", args.face_style[3])) end
+				end
+				m:merge(tmp)
+			else
+				m:merge(Model:load{file = v})
+			end
 		end
 	end
 	-- Colorize materials.
@@ -142,6 +154,7 @@ Object.update_model = function(self)
 			equipment = self.equipment,
 			eye_color = self.eye_color,
 			eye_style = self.eye_style,
+			face_style = self.face_style,
 			hair_color = self.hair_color,
 			hair_style = self.hair_style,
 			nose_scale = self.nose_scale,
