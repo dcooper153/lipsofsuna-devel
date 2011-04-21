@@ -72,7 +72,7 @@ void main()
 	vec3 halfvector[LOS_LIGHT_MAX];
 	vec3 lightvector[LOS_LIGHT_MAX];
 	]] .. Shader.los_lighting_vectors("lightvector", "halfvector", "tmp.xyz") .. [[
-	]] .. Shader.los_lighting_default("coord", "OUT.normal", "lightvector", "halfvector") .. [[
+	]] .. Shader.los_lighting_skin("coord", "OUT.normal", "lightvector", "halfvector") .. [[
 	OUT.light = lighting;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
@@ -129,7 +129,7 @@ void main()
 	OUT.texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
-pass4_fragment = [[
+pass4_fragment = Shader.los_normal_mapping .. [[
 in fragvar
 {
 	vec3 coord;
@@ -138,15 +138,16 @@ in fragvar
 	vec3 normal;
 	vec3 tangent;
 	vec2 texcoord;
-} IN;]]
-.. Shader.los_normal_mapping .. [[
+} IN;
 void main()
 {
 	vec3 tangent = normalize(IN.tangent);
 	vec3 normal = los_normal_mapping(IN.normal, tangent, IN.texcoord, LOS_diffuse_texture_1);
 	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
-	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector", "IN.halfvector") .. [[
-	float fake = abs(dot(normal, vec3(1.0,0.0,0.0))) + abs(dot(normal, vec3(0.0,1.0,0.0)));
-	diffuse = mix(LOS_material_diffuse * diffuse, vec4(0.5,0.0,0.0,1.0), 0.3 * fake - 0.15);
+	]] .. Shader.los_lighting_skin("IN.coord", "normal", "IN.lightvector", "IN.halfvector") .. [[
+	float fake1 = 0.5 * abs(dot(normal, vec3(1.0,0.0,0.0))) + abs(dot(normal, vec3(0.0,1.0,0.0)));
+	float fake2 = 1.0 - abs(dot(normal, vec3(0.0,0.0,1.0)));
+	float fake = mix(fake1, fake2, 0.7);
+	diffuse = LOS_material_diffuse * mix(diffuse, vec4(1.0,0.0,0.0,1.0), 0.3 * fake);
 	LOS_output_0 = diffuse * lighting;
 }]]}}

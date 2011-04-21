@@ -88,6 +88,42 @@ end
 --- Calculates lighting and stores it to a variable named lighting.
 -- @param co Variable name that contains the fragment coordinate.
 -- @param no Variable name that contains the fragment normal.
+-- @param lv Array name that contains the light vectors.
+-- @param hv Array name that contains the light half vectors.
+-- @param sp Variable name that contains additional specular color.
+-- @param sh Variable name that contains shininess override value.
+Shader.los_lighting_skin = function(co, no, lv, hv, sp, sh)
+	return string.format([[int lighting_index;
+	vec4 lighting = vec4(0.0, 0.0, 0.0, 1.0);
+	for(lighting_index = 0 ; lighting_index < LOS_LIGHT_MAX ; lighting_index++)
+	{
+		vec3 lv = %s[lighting_index];
+		vec3 no = %s;
+		vec3 co = normalize(%s);
+		vec3 hv = %s[lighting_index];
+		vec3 HV = normalize(hv);
+		float sh = %s/128.0;
+		float ndoth = dot(no, HV);
+		float ndotl = dot(no, normalize(lv));
+		/* Kelemen/Szirmay-Kalos specular. */
+		float m = 0.5;
+		float fexp = pow(1.0 - dot(co, HV), 5.0);
+		float fres = fexp + 0.028 * (1.0 - fexp);
+		vec4 beck = pow(2.0 * texture(LOS_diffuse_texture_3, vec2(ndoth, m)), vec4(10.0));
+		vec4 spec = clamp(beck * fres / dot(hv, hv), vec4(0.0), vec4(1.0));
+		float fspec = sh * ndotl * dot(spec, vec4(1.0, 0.625, 0.075, 0.005));
+		/* Combine. */
+		float fattn = 1.0 / dot(LOS_light[lighting_index].equation, vec3(1.0, length(lv), dot(lv, lv)));
+		float fdiff = max(0.0, dot(no, normalize(lv)));
+		lighting.rgb += fattn * (LOS_light[lighting_index].ambient.rgb +
+			fdiff * LOS_light[lighting_index].diffuse.rgb +
+			fspec * LOS_light[lighting_index].specular.rgb);
+	}]], lv, no, co, hv, sh or "LOS_material_shininess")
+end
+
+--- Calculates lighting and stores it to a variable named lighting.
+-- @param co Variable name that contains the fragment coordinate.
+-- @param no Variable name that contains the fragment normal.
 -- @param ta Variable name that contains the fragment tangent.
 -- @param lv Array name that contains the light vectors.
 -- @param hv Array name that contains the light half vectors.
