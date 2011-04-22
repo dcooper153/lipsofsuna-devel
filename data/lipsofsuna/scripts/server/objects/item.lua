@@ -87,6 +87,9 @@ end
 -- @param self Object.
 -- @param result Contact result.
 Item.contact_cb = function(self, result)
+	-- Multiple contact points might be generated during one frame so we
+	-- might have to skip some of the calls.
+	if not self.contact_args then return end
 	if self.spec.categories["boomerang"] then
 		-- Boomerang mode.
 		if result.object == self.contact_args.owner then
@@ -196,8 +199,11 @@ Item.fire = function(self, args)
 		proj.gravity = Vector(0,2,0)
 		proj.timer = Timer{delay = 1, func = function(timer, secs)
 			if proj.state == 0 then
-				proj.velocity = proj.velocity * -1.0
+				proj.velocity = proj.velocity * -2
 				proj.state = 1
+			elseif proj.state == 1 then
+				proj.velocity = proj.velocity * 2
+				proj.state = 2
 			else
 				proj.timer = nil
 				proj.gravity = Config.gravity
