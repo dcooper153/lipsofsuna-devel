@@ -73,10 +73,16 @@ liphy_constraint_new_hinge (LIPhyPhysics*      physics,
 	if (self == NULL)
 		return NULL;
 
+	/* Calculate displacement. */
+	/* Due to the center of mass transform of the collision shape, the
+	   hinge may need to be displaced for it to appear in the right place. */
+	LIMatVector ctr = object->center_of_mass;
+	btVector3 disp = -btVector3 (ctr.x, ctr.y, ctr.z);
+
 	/* Create hinge constraint. */
 	btVector3 bpos (point->x, point->y, point->z);
 	btVector3 baxis (axis->x, axis->y, axis->z);
-	btHingeConstraint* constraint = new btHingeConstraint ((btRigidBody&) *bobject, bpos, baxis);
+	btHingeConstraint* constraint = new btHingeConstraint ((btRigidBody&) *bobject, bpos + disp, baxis);
 	if (limit)
 		constraint->setLimit (limit_min, limit_max);
 
