@@ -1,3 +1,5 @@
+require "client/action"
+require "client/camera"
 require "client/shader"
 require "client/target"
 require "client/theme"
@@ -22,6 +24,8 @@ require "client/shaders/water"
 require "client/shaders/widget"
 require "client/widgets/background"
 require "client/widgets/scene"
+require "editor/controls"
+require "editor/events"
 
 local oldsetter = Object.setter
 Object.setter = function(self, key, value)
@@ -60,16 +64,15 @@ Editor.new = function(clss)
 	if not pattern then return end
 	local self = Class.new(clss)
 	self.prev_tiles = {}
+	self.mouse_sensitivity = 0.01
 	-- Load the pattern.
 	self.pattern = pattern
 	self.origin = Vector(100,100,100)
 	self.size = pattern.size or Vector(10,10,10)
 	Voxel:place_pattern{point = self.origin, name = Settings.pattern}
 	-- Camera and lighting.
-	self.camera = Camera{far = 40.0, fov = 1.1, mode = "first-person", near = 0.01, position_smoothing = 0.15, rotation_smoothing = 0.15}
-	self.camera.target_position = (self.origin + Vector(0,2,-5)) * Voxel.tile_size
-	self.camera.target_rotation = Quaternion(0, 1, 0, 0)
-	self.camera:warp()
+	self.camera = FirstPersonCamera()
+	self.camera:warp((self.origin + Vector(0,2,-5)) * Voxel.tile_size, Quaternion(0, 1, 0, 0))
 	self.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equation={1.0,0.0,0.01}, priority = 2}
 	self.light.enabled = true
 	-- Item selector.
@@ -326,75 +329,6 @@ Editor.update_corners = function(self)
 end
 
 ------------------------------------------------------------------------------
-
-Keys = {ESCAPE = 27, SPACE = 32, COMMA = 44,
-	a = 97, c = 99, d = 100, e = 101, f = 102, i = 105, k = 107, o = 111, q = 113, y = 121, z = 122,
-	x = 120, w = 119, r = 114, s = 115, F1 = 282, F2 = 283, F3 = 284, F4 = 285, F5 = 286,
-	F6 = 287, F7 = 288, F8 = 289, F9 = 290, F10 = 291, F11 = 292, F12 = 293,
-	LSHIFT = 304, RCTRL = 305, LCTRL = 306, PRINT = 316}
-Eventhandler{type = "keypress", func = function(self, args)
-	if not Widgets:handle_event(args) then
-		local c = Editor.inst.camera
-		if args.code == Keys.w then
-			-- Forward.
-			c.target_position = c.target_position + c.rotation * Vector(0,0,-1)
-		elseif args.code == Keys.s then
-			-- Backward.
-			c.target_position = c.target_position + c.rotation * Vector(0,0,1)
-		elseif args.code == Keys.a then
-			-- Turn left.
-			c.target_rotation = c.rotation * Quaternion{axis = Vector(0,1), angle = 0.3}
-		elseif args.code == Keys.d then
-			-- Turn right.
-			c.target_rotation = c.rotation * Quaternion{axis = Vector(0,1), angle = -0.3}
-		elseif args.code == Keys.q then
-			-- Up.
-			c.target_position = c.target_position + c.rotation * Vector(0,1,0)
-		elseif args.code == Keys.z then
-			-- Down.
-			c.target_position = c.target_position + c.rotation * Vector(0,-1,0)
-		elseif args.code == Keys.e then
-			-- Left.
-			c.target_position = c.target_position + c.rotation * Vector(-1,0,0)
-		elseif args.code == Keys.r then
-			-- Right.
-			c.target_position = c.target_position + c.rotation * Vector(1,0,0)
-		elseif args.code == Keys.f then
-			-- Fill.
-			if Editor.inst.prev_tiles[1] and Editor.inst.prev_tiles[2] then
-				Editor.inst:fill(Editor.inst.prev_tiles[1], Editor.inst.prev_tiles[2])
-			end
-		elseif args.code == Keys.k then
-			-- Erase.
-			if Editor.inst.prev_tiles[1] and Editor.inst.prev_tiles[2] then
-				Editor.inst:fill(Editor.inst.prev_tiles[1], Editor.inst.prev_tiles[2], true)
-			end
-		elseif args.code == Keys.F1 then
-			Editor.inst:save()
-		elseif args.code == Keys.PRINT then
-			Client:screenshot()
-		end
-	end
-end}
-
-Eventhandler{type = "keyrelease", func = function(self, args)
-end}
-
-Eventhandler{type = "mousepress", func = function(self, args)
-	Widgets:handle_event(args)
-end}
-
-Eventhandler{type = "quit", func = function(self, args)
-	Program.quit = true
-end}
-
-Eventhandler{type = "tick", func = function(self, args)
-	Editor.inst.camera:update(args.secs)
-	Editor.inst.light.position = Editor.inst.camera.target_position +
-		Editor.inst.camera.rotation * Vector(0,0,-5)
-	-- Update the cursor.
-	Widgets.Cursor.inst:update()
-end}
 
 -- Initialize the UI state.
 Widgets.Cursor.inst = Widgets.Cursor(Iconspec:find{name = "cursor1"})

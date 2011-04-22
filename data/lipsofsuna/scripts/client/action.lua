@@ -65,7 +65,7 @@ Action.event = function(clss, args, list)
 		clss.dict_press[args.code] = nil
 	end
 	-- Activate actions.
-	if not Player.object then return end
+	if Player and not Player.object then return end
 	local analog = function(k, v)
 		local a = clss.dict_key[k]
 		if not a or not a.enabled or (list and not list[a.name]) then return end
