@@ -40,6 +40,7 @@ Species.dict_name = {}
 --   <li>feat_animations: List of know feat types.</li>
 --   <li>feat_effects: List of know feat effects.</li>
 --   <li>gravity: Gravity vector.</li>
+--   <li>interactive: False to make the object not appear interactive.</li>
 --   <li>inventory_items: List of inventory items to give when the creature is spawned.</li>
 --   <li>inventory_size: Number of inventory slots the creature has.</li>
 --   <li>jump_force: Mass-independent jump force of the creature.</li>
@@ -173,6 +174,7 @@ Species.new = function(clss, args)
 	copy("falling_damage_rate", 3)
 	copy("falling_damage_speed", 12)
 	copy("gravity", Vector(0, -15, 0))
+	copy("interactive", true)
 	copy("inventory_items", {})
 	copy("inventory_size", 0)
 	copy("jump_force", 8)

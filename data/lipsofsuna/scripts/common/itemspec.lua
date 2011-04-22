@@ -29,6 +29,7 @@ Itemspec.dict_name = {}
 --   <li>equipment_slots_reserved: List of equipment slots that the item reserves in addition to the main slot.</li>
 --   <li>health: Number of hit points the item has.</li>
 --   <li>icon: Icon name.</li>
+--   <li>interactive: False to make the object not appear interactive.</li>
 --   <li>inventory_items: List of inventory items for containers.</li>
 --   <li>inventory_size: Size of the inventory, makes the item a container.</li>
 --   <li>inventory_type: Inventory type string.</li>
@@ -69,6 +70,7 @@ Itemspec.new = function(clss, args)
 	copy("crafting_materials", {})
 	copy("crafting_skills", {})
 	copy("destroy_actions", {})
+	copy("interactive", true)
 	copy("inventory_items", {})
 	copy("mass", 10)
 	copy("special_effects", {})

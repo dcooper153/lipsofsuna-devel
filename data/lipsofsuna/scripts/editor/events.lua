@@ -1,4 +1,5 @@
-local gui_actions = {menu = true, screenshot = true}
+local gui_actions = {menu = true, rotate = true, screenshot = true,
+	snap = true, translatex = true, translatey = true, translatez = true}
 
 Eventhandler{type = "keypress", func = function(self, args)
 	if not Client.moving then

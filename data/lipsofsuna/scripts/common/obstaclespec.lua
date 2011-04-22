@@ -14,6 +14,7 @@ Obstaclespec.dict_name = {}
 --   <li>destroy_actions: List of actions to perform when the obstacle is destroyed.</li>
 --   <li>destroy_items: List of items to spawn when the obstacle is destroyed.</li>
 --   <li>health: Number of hit points the obstacle has.</li>
+--   <li>interactive: False to make the object not appear interactive.</li>
 --   <li>mass: Mass in kilograms.</li>
 --   <li>model: Model to use for the obstacle. (required)</li>
 --   <li>name: Name of the obstacle type. (required)</li>
@@ -27,6 +28,7 @@ Obstaclespec.new = function(clss, args)
 	copy("harvest_materials", {})
 	copy("destroy_actions", {})
 	copy("destroy_items", {})
+	copy("interactive", true)
 	copy("mass", 10)
 	copy("physics", "static")
 	return self

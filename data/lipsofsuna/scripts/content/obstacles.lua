@@ -11,6 +11,7 @@ Obstaclespec{
 		{"log",Vector(0,2,0)},
 		{"log",Vector(0,3,0)}},
 	health = 50,
+	interactive = false,
 	vulnerabilities = {fire = 2, hatchet = 2}}
 
 Obstaclespec{
@@ -23,6 +24,7 @@ Obstaclespec{
 		{"log",Vector(0,2,0)},
 		{"log",Vector(0,3,0)}},
 	health = 50,
+	interactive = false,
 	vulnerabilities = {fire = 2, hatchet = 2}}
 
 Obstaclespec{
@@ -81,3 +83,12 @@ Obstaclespec{
 	categories = {"special"},
 	dialog = "sanctuary",
 	marker = "sanctuary"}
+
+------------------------------------------------------------------------------
+-- Map objects
+
+Obstaclespec{
+	name = "wooden stairs",
+	model = "stairs1",
+	categories = {"prop"},
+	interactive = false}

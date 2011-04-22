@@ -40,7 +40,8 @@ end
 -- @param args Arguments.<ul>
 --   <li>category: Species category.</li>
 --   <li>name: Species name.</li>
---   <li>point: Position vector, in tiles.</li></ul>
+--   <li>point: Position vector, in tiles.</li>
+--   <li>rotation: Rotation around Y axis.</li></ul>
 Voxel.place_creature = function(clss, args)
 	local spec = Species:random(args)
 	if not spec then return end
@@ -49,7 +50,8 @@ Voxel.place_creature = function(clss, args)
 		spec = spec,
 		position = args.point * clss.tile_size,
 		random = true,
-		realized = true})
+		realized = true,
+		rotation = args.rotation and Quaternion:new_euler(args.rotation * 2 * math.pi, 0, 0)})
 end
 
 --- Places an item to the map.
@@ -57,7 +59,8 @@ end
 -- @param args Arguments.<ul>
 --   <li>category: Item category.</li>
 --   <li>name: Item name.</li>
---   <li>point: Position vector, in tiles.</li></ul>
+--   <li>point: Position vector, in tiles.</li>
+--   <li>rotation: Rotation around Y axis.</li></ul>
 Voxel.place_item = function(clss, args)
 	local spec = Itemspec:random(args)
 	if not spec then return end
@@ -66,14 +69,16 @@ Voxel.place_item = function(clss, args)
 		spec = spec,
 		position = args.point * clss.tile_size,
 		random = true,
-		realized = true})
+		realized = true,
+		rotation = args.rotation and Quaternion:new_euler(args.rotation * 2 * math.pi, 0, 0)})
 end
 
 --- Places an obstacle to the map.
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
 --   <li>name: Obstacle name.</li>
---   <li>point: Position vector, in tiles.</li></ul>
+--   <li>point: Position vector, in tiles.</li>
+--   <li>rotation: Rotation around Y axis.</li></ul>
 Voxel.place_obstacle = function(clss, args)
 	local spec = Obstaclespec:random(args)
 	if not spec then return end
@@ -81,7 +86,8 @@ Voxel.place_obstacle = function(clss, args)
 	clss_.new(clss_, {
 		spec = spec,
 		position = args.point * clss.tile_size,
-		realized = true})
+		realized = true,
+		rotation = args.rotation and Quaternion:new_euler(args.rotation * 2 * math.pi, 0, 0)})
 end
 
 --- Places a predefined map pattern to the map.
@@ -117,16 +123,16 @@ Voxel.place_pattern = function(clss, args)
 	-- Create obstacles.
 	for k,v in pairs(pat.obstacles) do
 		local point = args.point + Vector(v[1], v[2], v[3])
-		clss:place_obstacle{name = v[4], point = point}
+		clss:place_obstacle{name = v[4], point = point, rotation = v[5]}
 	end
 	-- Create items.
 	for k,v in pairs(pat.items) do
 		local point = args.point + Vector(v[1], v[2], v[3])
-		clss:place_item{name = v[4], point = point}
+		clss:place_item{name = v[4], point = point, rotation = v[5]}
 	end
 	-- Create creatures.
 	for k,v in pairs(pat.creatures) do
 		local point = args.point + Vector(v[1], v[2], v[3])
-		clss:place_creature{name = v[4], point = point}
+		clss:place_creature{name = v[4], point = point, rotation = v[5]}
 	end
 end

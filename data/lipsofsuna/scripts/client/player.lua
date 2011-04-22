@@ -139,7 +139,7 @@ Player.pick_look = function(clss)
 	local r1,r2 = clss:get_picking_ray_1st()
 	local p,o = Target:pick_ray{ray1 = r1, ray2 = r2}
 	Target.target_object = o
-	if o then
+	if o and o.spec and o.spec.interactive then
 		if o.name and o.name ~= "" then
 			Gui:set_target_text("Interact with " .. o.name)
 		else

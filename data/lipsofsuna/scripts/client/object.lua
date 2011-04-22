@@ -95,9 +95,9 @@ Object.create_character_model = function(self, args)
 				local tmp = Model:load{file = v}
 				tmp = tmp:copy()
 				if args.face_style then
-					if args.face_style[1] then print("A", tmp:morph("face round", args.face_style[1])) end
-					if args.face_style[2] then print("B", tmp:morph("face rough", args.face_style[2])) end
-					if args.face_style[3] then print("C", tmp:morph("face frown", args.face_style[3])) end
+					if args.face_style[1] then tmp:morph("face round", args.face_style[1]) end
+					if args.face_style[2] then tmp:morph("face rough", args.face_style[2]) end
+					if args.face_style[3] then tmp:morph("face frown", args.face_style[3]) end
 				end
 				m:merge(tmp)
 			else

@@ -53,6 +53,29 @@ Object.setter = function(self, key, value)
 	end
 end
 
+Object.move = function(self, value, step)
+	self.position = self.position + value * step
+end
+
+Object.snap = function(self, step)
+	local v = self.position
+	v.x = v.x - v.x % step
+	v.y = v.y - v.y % step
+	v.z = v.z - v.z % step
+	self.position = v
+end
+
+--- Rotates the object with step snapping.
+-- @param self Object.
+-- @param value Step size.
+-- @param steps Number of steps per revolution.
+Object.rotate = function(self, value, steps)
+	local s = 2 * math.pi / steps
+	local e = self.rotation.euler
+	e[1] = math.floor(e[1] / s + value + 0.5) * s
+	self.rotation = Quaternion:new_euler(e)
+end
+
 for k,s in pairs(Shader.dict_name) do
 	s:set_quality(2)
 end
@@ -259,8 +282,15 @@ Editor.save = function(self)
 	-- Format objects.
 	local addobj = function(t, k, v)
 		local p = roundvec(v.position)
-		if k > 1 then t = t .. ",\n" end
-		return t .. "\t\t{" .. p[1] .. "," .. p[2] .. "," .. p[3] .. ",\"" .. v.spec.name .. "\"}"
+		local r = v.rotation.euler
+		if r[1] ~= 0 then
+			return string.format("%s%s\t\t{%f,%f,%f,%q,%.2f}",
+				t, k > 1 and ",\n" or "", p[1], p[2], p[3], v.spec.name,
+				math.floor(100 * r[1] / (2 * math.pi) + 0.5) / 100)
+		else
+			return string.format("%s%s\t\t{%f,%f,%f,%q}",
+				t, k > 1 and ",\n" or "", p[1], p[2], p[3], v.spec.name)
+		end
 	end
 	local comma
 	if #items > 0 then
