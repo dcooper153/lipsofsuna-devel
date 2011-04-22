@@ -92,3 +92,12 @@ Obstaclespec{
 	model = "stairs1",
 	categories = {"prop"},
 	interactive = false}
+
+Obstaclespec{
+	name = "wooden door",
+	model = "door1",
+	categories = {"prop"},
+	collision_mask = 0xFFFF,
+	constraints = {{"hinge",Vector(0,1.333,0)}},
+	interactive = false,
+	physics = "rigid"}

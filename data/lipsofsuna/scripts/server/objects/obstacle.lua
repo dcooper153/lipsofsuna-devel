@@ -12,8 +12,6 @@ Obstacle.new = function(clss, args)
 		end
 	end
 	copy("angular")
-	copy("collision_group", 0x8000)
-	copy("collision_mask", 0xFF)
 	copy("health")
 	copy("name")
 	copy("rotation")
@@ -32,12 +30,23 @@ Obstacle.setter = function(self, key, value)
 		local spec = type(value) == "string" and Obstaclespec:find{name = value} or value
 		if not spec then return end
 		Object.setter(self, key, spec)
+		self.collision_group = spec.collision_group
+		self.collision_mask = spec.collision_mask
 		self.model = spec.model
 		self.mass = spec.mass
 		self.gravity = spec.gravity
 		self.physics = spec.physics
 		if spec.marker then
 			self.marker = Marker{name = spec.marker, position = self.position, target = self.id}
+		end
+	elseif key == "realized" then
+		Object.setter(self, key, value)
+		if value then
+			for k,v in pairs(self.spec.constraints) do
+				if v[1] == "hinge" then
+					self:insert_hinge_constraint{position = v[2], axis = v[3]}
+				end
+			end
 		end
 	else
 		Object.setter(self, key, value)

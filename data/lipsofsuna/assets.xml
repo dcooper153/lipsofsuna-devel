@@ -755,34 +755,31 @@
   </asset>
 
   <asset>
-    <file>import/door-000-nml.png</file>
+    <file>import/door1n.png</file>
     <author>Georges Grondin</author>
     <author>Ari Mustonen</author>
     <license>CC0</license>
     <source>http://www.burningwell.org/gallery2/v/textures/buildings/windowsHouses/door968.jpg.html</source>
-    <status>complete</status>
-    <tag>door</tag>
-    <type>texture</type>
+    <status>incomplete</status>
+    <type>normalmap</type>
   </asset>
 
   <asset>
-    <file>import/door-000.blend</file>
+    <file>import/door1.blend</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>
-    <comment>Only has frame. Add the door itself.</comment>
     <status>incomplete</status>
     <tag>tile</tag>
     <type>model</type>
   </asset>
 
   <asset>
-    <file>import/door-000.png</file>
+    <file>import/door1.png</file>
     <author>Georges Grondin</author>
     <author>Ari Mustonen</author>
     <license>CC0</license>
     <source>http://www.burningwell.org/gallery2/v/textures/buildings/windowsHouses/door968.jpg.html</source>
     <status>complete</status>
-    <tag>door</tag>
     <type>texture</type>
   </asset>
 

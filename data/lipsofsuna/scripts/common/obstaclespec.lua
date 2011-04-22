@@ -7,6 +7,8 @@ Obstaclespec.dict_name = {}
 --- Creates a new obstacle specification.
 -- @param clss Obstaclespec class.
 -- @param args Arguments.<ul>
+--   <li>collision_group: Collision group.</li>
+--   <li>collision_mask: Collision mask.</li>
 --   <li>categories: List of categories to which the obstacle belongs.</li>
 --   <li>harvest_behavior: Harvest behavior. ("keep"/"destroy")</li>
 --   <li>harvest_effect: Effect to play when harvested.</li>
@@ -24,6 +26,9 @@ Obstaclespec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	local copy = function(f, d) if self[f] == nil then self[f] = d end end
 	self.harvest_enabled = args.harvest_materials ~= nil
+	copy("collision_group", 0x8000)
+	copy("collision_mask", 0xFF)
+	copy("constraints", {})
 	copy("harvest_behavior", "keep")
 	copy("harvest_materials", {})
 	copy("destroy_actions", {})
