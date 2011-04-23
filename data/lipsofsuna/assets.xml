@@ -913,84 +913,13 @@
   </asset>
 
   <asset>
-    <file>import/fence-000.blend</file>
+    <file>import/fence1.blend</file>
     <author>tidbit (Joseph)</author>
     <license>Creative Commons BY 3.0</license>
-    <dep>import/wood-004.png</dep>
-    <status>complete</status>
-    <tag>fence</tag>
-    <tag>tile</tag>
-    <type>model</type>
-  </asset>
-
-  <asset>
-    <file>import/fence-001.blend</file>
-    <author>tidbit (Joseph)</author>
-    <license>Creative Commons BY 3.0</license>
-    <dep>import/wood-004.png</dep>
-    <status>complete</status>
-    <tag>fence</tag>
-    <tag>tile</tag>
-    <type>model</type>
-  </asset>
-
-  <asset>
-    <file>import/fence-002.blend</file>
-    <author>Clint Bellanger</author>
-    <license>Creative Commons BY 3.0</license>
-    <dep>import/fence_color.png</dep>
-    <dep>import/fence_normal.png</dep>
-    <source>http://opengameart.org/content/stone-and-wood-barricade</source>
+    <dep>import/wood2.png</dep>
+    <dep>import/wood2n.png</dep>
     <status>usable</status>
-    <tag>fence</tag>
-    <tag>tile</tag>
     <type>model</type>
-  </asset>
-
-  <asset>
-    <file>import/fence-003.blend</file>
-    <author>Clint Bellanger</author>
-    <license>Creative Commons BY 3.0</license>
-    <dep>import/fence_color.png</dep>
-    <dep>import/fence_normal.png</dep>
-    <source>http://opengameart.org/content/stone-and-wood-barricade</source>
-    <status>usable</status>
-    <tag>fence</tag>
-    <tag>tile</tag>
-    <type>model</type>
-  </asset>
-
-  <asset>
-    <file>import/fence-004.blend</file>
-    <author>Clint Bellanger</author>
-    <license>Creative Commons BY 3.0</license>
-    <dep>import/fence_color.png</dep>
-    <dep>import/fence_normal.png</dep>
-    <source>http://opengameart.org/content/stone-and-wood-barricade</source>
-    <status>usable</status>
-    <tag>fence</tag>
-    <tag>tile</tag>
-    <type>model</type>
-  </asset>
-
-  <asset>
-    <file>import/fence_color.png</file>
-    <author>Clint Bellanger</author>
-    <license>Creative Commons BY 3.0</license>
-    <source>http://opengameart.org/content/stone-and-wood-barricade</source>
-    <status>usable</status>
-    <tag>fence</tag>
-    <type>texture</type>
-  </asset>
-
-  <asset>
-    <file>import/fence_normal.png</file>
-    <author>Clint Bellanger</author>
-    <license>Creative Commons BY 3.0</license>
-    <source>http://opengameart.org/content/stone-and-wood-barricade</source>
-    <status>usable</status>
-    <tag>fence</tag>
-    <type>normalmap</type>
   </asset>
 
   <asset>
@@ -2071,6 +2000,17 @@
   </asset>
 
   <asset>
+    <file>import/tiles1.blend</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/wood2.png</dep>
+    <dep>import/wood2n.png</dep>
+    <source>http://opengameart.org/content/cave-tileset</source>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
     <file>import/torch1.blend</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>
@@ -2254,6 +2194,24 @@
     <source>http://opengameart.org/content/cottage</source>
     <status>usable</status>
     <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/wood2.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cave-tileset</source>
+    <status>usable</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/wood2n.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cave-tileset</source>
+    <status>usable</status>
+    <type>texture</type>
   </asset>
 
   <asset>

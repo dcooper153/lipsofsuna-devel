@@ -88,6 +88,30 @@ Obstaclespec{
 -- Map objects
 
 Obstaclespec{
+	name = "wooden fence",
+	model = "fence1",
+	categories = {"prop"},
+	interactive = false}
+
+Obstaclespec{
+	name = "wooden mine support (forked)",
+	model = "minesupport1",
+	categories = {"prop"},
+	interactive = false}
+
+Obstaclespec{
+	name = "wooden mine support (wall)",
+	model = "minesupport2",
+	categories = {"prop"},
+	interactive = false}
+
+Obstaclespec{
+	name = "wooden mine support (simple)",
+	model = "minesupport3",
+	categories = {"prop"},
+	interactive = false}
+
+Obstaclespec{
 	name = "wooden stairs",
 	model = "stairs1",
 	categories = {"prop"},
