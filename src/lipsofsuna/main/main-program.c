@@ -182,7 +182,6 @@ void limai_program_free (
 
 /**
  * \brief Emits an event.
- *
  * \param self Program.
  * \param type Event type.
  * \param ... List of name,type,value triplets terminated by NULL.
@@ -201,7 +200,6 @@ void limai_program_event (
 
 /**
  * \brief Emits an event.
- *
  * \param self Program.
  * \param type Event type.
  * \param args Variable argument list.
@@ -211,17 +209,74 @@ void limai_program_eventva (
 	const char*   type,
 	va_list       args)
 {
-	LIScrData* event;
+	int pint;
+	void* pptr;
+	char* pstr;
+	float pfloat;
+	const char* type_;
+	const char* name;
+	lua_State* lua = liscr_script_get_lua (self->script);
 
-	/* Create event. */
-	event = liscr_event_newv (self->script, args);
-	if (event == NULL)
-		return;
-	liscr_event_set_type (event, type);
+	/* Get the event queue. */
+	lua_getglobal (lua, "__events");
+	if (lua_type (lua, -1) != LUA_TTABLE)
+	{
+		lua_pop (lua, 1);
+		lua_newtable (lua);
+		lua_pushvalue (lua, -1);
+		lua_setglobal (lua, "__events");
+	}
+	lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
 
-	/* Push to event list. */
-	limai_program_push_event (self, event);
-	liscr_data_unref (event);
+	/* Create the event. */
+	lua_newtable (lua);
+	lua_pushstring (lua, type);
+	lua_setfield (lua, -2, "type");
+	while (1)
+	{
+		/* Get name. */
+		name = va_arg (args, char*);
+		if (name == NULL)
+			break;
+
+		/* Duplicated from LIScrData due to the behavior of varargs
+		   being undefined when passed to a function and then reused. */
+		type_ = va_arg (args, char*);
+		if (type_ == LISCR_TYPE_BOOLEAN)
+		{
+			pint = va_arg (args, int);
+			lua_pushboolean (lua, pint);
+		}
+		else if (type_ == LISCR_TYPE_FLOAT)
+		{
+			pfloat = va_arg (args, double);
+			lua_pushnumber (lua, pfloat);
+		}
+		else if (type_ == LISCR_TYPE_INT)
+		{
+			pint = va_arg (args, int);
+			lua_pushnumber (lua, pint);
+		}
+		else if (type_ == LISCR_TYPE_STRING)
+		{
+			pstr = va_arg (args, char*);
+			lua_pushstring (lua, pstr);
+		}
+		else
+		{
+			pptr = va_arg (args, void*);
+			if (pptr == NULL)
+				break;
+			liscr_pushdata (lua, pptr);
+		}
+
+		/* Set field. */
+		lua_setfield (lua, -2, name);
+	}
+
+	/* Push to event queue. */
+	lua_settable (lua, -3);
+	lua_pop (lua, 1);
 }
 
 /**

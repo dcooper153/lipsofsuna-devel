@@ -21,3 +21,21 @@ Program.setter = function(self, key, value)
 	if programsetterfunc then return programsetterfunc(self, value) end
 	return Class.setter(self, key, value)
 end
+
+--- Pops an event from the event queue.
+-- @param clss Program class.
+-- @return Event table or nil.
+Program.pop_event = function(clss)
+	if not __events then return end
+	local t = __events[1]
+	if t then table.remove(__events, 1) end
+	return t
+end
+
+--- Pushes an event to the back of the event queue.
+-- @param clss Program class.
+-- @return event Event table.
+Program.push_event = function(clss, event)
+	if not __events then __events = {} end
+	table.insert(__events, event)
+end

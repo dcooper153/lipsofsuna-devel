@@ -91,46 +91,6 @@ static void Program_load_extension (LIScrArgs* args)
 }
 
 /* @luadoc
- * --- Pops an event from the event queue.
- * -- @param clss Program class.
- * -- @return Event or nil.
- * function Program.pop_event(clss)
- */
-static void Program_pop_event (LIScrArgs* args)
-{
-	LIMaiProgram* program;
-	LIScrData* data;
-
-	program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PROGRAM);
-	data = limai_program_pop_event (program);
-	if (data != NULL)
-	{
-		liscr_args_seti_data (args, data);
-		liscr_data_unref (data);
-	}
-}
-
-/* @luadoc
- * --- Pushes an event to the event queue.
- * -- @param clss Program class.
- * -- @param args Arguments.<ul>
- * --   <li>event: Event. (required)</li></ul>
- * function Program.push_event(clss, args)
- */
-static void Program_push_event (LIScrArgs* args)
-{
-	LIMaiProgram* program;
-	LIScrData* event;
-
-	if (liscr_args_gets_data (args, "event", LISCR_SCRIPT_EVENT, &event) ||
-	    liscr_args_geti_data (args, 0, LISCR_SCRIPT_EVENT, &event))
-	{
-		program = liscr_class_get_userdata (args->clss, LISCR_SCRIPT_PROGRAM);
-		limai_program_push_event (program, event);
-	}
-}
-
-/* @luadoc
  * --- Unloads a sector.<br/>
  * -- Unrealizes all objects in the sector and clears the terrain in the sector.
  * -- The sector is then removed from the sector list.
@@ -306,8 +266,6 @@ void liscr_script_program (
 	liscr_class_inherit (self, LISCR_SCRIPT_CLASS);
 	liscr_class_insert_cfunc (self, "launch_mod", Program_launch_mod);
 	liscr_class_insert_cfunc (self, "load_extension", Program_load_extension);
-	liscr_class_insert_cfunc (self, "pop_event", Program_pop_event);
-	liscr_class_insert_cfunc (self, "push_event", Program_push_event);
 	liscr_class_insert_cfunc (self, "unload_sector", Program_unload_sector);
 	liscr_class_insert_cfunc (self, "unload_world", Program_unload_world);
 	liscr_class_insert_cfunc (self, "shutdown", Program_shutdown);

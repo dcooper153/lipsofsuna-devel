@@ -75,7 +75,7 @@ Eventhandler{type = "tick", func = function(self, args)
 	end
 	-- Update special effects.
 	for k,v in pairs(Object.objects) do
-		v:update(secs)
+		v:update(args.secs)
 	end
 	-- Update player state.
 	if Player.object then
