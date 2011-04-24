@@ -187,7 +187,7 @@ Serialize.save_quests = function(clss, erase)
 		clss.db:query("DELETE FROM dialog_flags;")
 	end
 	for k,v in pairs(Quest.dict_name) do
-		clss.db:query("REPLACE INTO quests (name,status,desc) VALUES (?,?,?);",
+		clss.db:query("REPLACE INTO quests (name,status,desc,marker) VALUES (?,?,?,?);",
 			{k, v.status, v.text, v.marker})
 	end
 	for k,v in pairs(Dialog.flags) do
