@@ -35,6 +35,10 @@
 
 #define ENABLE_GRABS
 
+static void private_grab (
+	LICliClient* self,
+	int          value);
+
 static int private_init (
 	LICliClient*  self,
 	LIMaiProgram* program);
@@ -65,6 +69,7 @@ LICliClient* licli_client_new (
 	self = lisys_calloc (1, sizeof (LICliClient));
 	if (self == NULL)
 		return NULL;
+	self->active = 1;
 	self->program = program;
 
 	/* Initialize SDL. */
@@ -173,6 +178,13 @@ void licli_client_set_moving (
 	LICliClient* self,
 	int          value)
 {
+#ifdef ENABLE_GRABS
+	self->moving = value;
+	if (self->active && value)
+		private_grab (self, 1);
+	else
+		private_grab (self, 0);
+#else
 	int cx;
 	int cy;
 
@@ -181,23 +193,26 @@ void licli_client_set_moving (
 	{
 		cx = self->window->mode.width / 2;
 		cy = self->window->mode.height / 2;
-#ifdef ENABLE_GRABS
-		SDL_WM_GrabInput (SDL_GRAB_ON);
-#else
 		SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
 		SDL_WarpMouse (cx, cy);
 		SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
-#endif
 	}
-	else
-	{
-#ifdef ENABLE_GRABS
-		SDL_WM_GrabInput (SDL_GRAB_OFF);
 #endif
-	}
 }
 
 /*****************************************************************************/
+
+static void private_grab (
+	LICliClient* self,
+	int          value)
+{
+#ifdef ENABLE_GRABS
+	if (value)
+		SDL_WM_GrabInput (SDL_GRAB_ON);
+	else
+		SDL_WM_GrabInput (SDL_GRAB_OFF);
+#endif
+}
 
 static int private_init (
 	LICliClient*  self,
@@ -270,9 +285,22 @@ static int private_event (
 			break;
 		case SDL_ACTIVEEVENT:
 			if (event->active.state & SDL_APPINPUTFOCUS)
-				self->program->sleep = 5000;
-			else
-				self->program->sleep = 0;
+			{
+				if (event->active.gain)
+				{
+					self->active = 1;
+					self->program->sleep = 0;
+					if (self->moving)
+						private_grab (self, 1);
+				}
+				else
+				{
+					self->active = 0;
+					self->program->sleep = 100000;
+					if (self->moving)
+						private_grab (self, 0);
+				}
+			}
 			break;
 		case SDL_VIDEORESIZE:
 			if (!licli_window_set_size (self->window, event->resize.w, event->resize.h, 0, self->window->mode.vsync))

@@ -34,6 +34,7 @@
 
 struct _LICliClient
 {
+	int active;
 	int moving;
 	LICliWindow* window;
 	LIMaiProgram* program;
