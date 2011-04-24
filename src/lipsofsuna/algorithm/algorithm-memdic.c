@@ -26,22 +26,20 @@
 #include <lipsofsuna/system.h>
 #include "algorithm-memdic.h"
 
-static void
-private_node_free (LIAlgMemdicNode* self);
+static void private_memdic_node_free (
+	LIAlgMemdicNode* self);
 
-static int
-private_node_compare (const LIAlgMemdicNode* self,
-                      const LIAlgMemdicNode* node);
+static int private_memdic_node_compare (
+	const LIAlgMemdicNode* self,
+	const LIAlgMemdicNode* node);
 
 /*****************************************************************************/
 
 /**
  * \brief Creates a new associative array.
- *
  * \return New associative array or NULL.
  */
-LIAlgMemdic*
-lialg_memdic_new ()
+LIAlgMemdic* lialg_memdic_new ()
 {
 	LIAlgMemdic* self;
 
@@ -50,7 +48,7 @@ lialg_memdic_new ()
 		return NULL;
 	self->size = 0;
 	self->list = NULL;
-	self->tree = lialg_bst_new ((LIAlgBstCompare) private_node_compare, lisys_malloc, lisys_free);
+	self->tree = lialg_bst_new ((LIAlgBstCompare) private_memdic_node_compare, lisys_malloc, lisys_free);
 	if (self->tree == NULL)
 	{
 		lisys_free (self);
@@ -61,13 +59,12 @@ lialg_memdic_new ()
 
 /**
  * \brief Frees the associative array.
- *
  * \param self Associative array.
  */
-void
-lialg_memdic_free (LIAlgMemdic* self)
+void lialg_memdic_free (
+	LIAlgMemdic* self)
 {
-	lialg_bst_foreach (self->tree, (LIAlgBstForeach) private_node_free);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) private_memdic_node_free);
 	self->tree->root = NULL;
 	lialg_bst_free (self->tree);
 	lisys_free (self);
@@ -75,13 +72,12 @@ lialg_memdic_free (LIAlgMemdic* self)
 
 /**
  * \brief Clears the associative array.
- *
  * \param self Associative array.
  */
-void
-lialg_memdic_clear (LIAlgMemdic* self)
+void lialg_memdic_clear (
+	LIAlgMemdic* self)
 {
-	lialg_bst_foreach (self->tree, (LIAlgBstForeach) private_node_free);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) private_memdic_node_free);
 	self->size = 0;
 	self->list = NULL;
 	self->tree->root = NULL;
@@ -90,16 +86,15 @@ lialg_memdic_clear (LIAlgMemdic* self)
 
 /**
  * \brief Finds a value from the associative array.
- *
  * \param self Associative array.
  * \param key Key of the node.
  * \param keysize Size of the key.
  * \return Value or NULL.
  */
-void*
-lialg_memdic_find (LIAlgMemdic* self,
-                   const void*  key,
-                   int          keysize)
+void* lialg_memdic_find (
+	LIAlgMemdic* self,
+	const void*  key,
+	int          keysize)
 {
 	LIAlgMemdicNode tmp;
 	LIAlgMemdicNode* anode;
@@ -117,16 +112,15 @@ lialg_memdic_find (LIAlgMemdic* self,
 
 /**
  * \brief Finds a node from the associative array.
- *
  * \param self Associative array.
  * \param key Key of the node.
  * \param keysize Size of the key.
  * \return Associative array node or NULL.
  */
-LIAlgMemdicNode*
-lialg_memdic_find_node (LIAlgMemdic* self,
-                        const void*  key,
-                        int          keysize)
+LIAlgMemdicNode* lialg_memdic_find_node (
+	LIAlgMemdic* self,
+	const void*  key,
+	int          keysize)
 {
 	LIAlgMemdicNode tmp;
 	LIAlgBstNode* tnode;
@@ -142,18 +136,17 @@ lialg_memdic_find_node (LIAlgMemdic* self,
 
 /**
  * \brief Inserts data to the associative array.
- *
  * \param self Associative array.
  * \param key Key of the inserted node.
  * \param keysize Size of the key.
  * \param value Value of the inserted node.
  * \return Associative array node or NULL.
  */
-LIAlgMemdicNode*
-lialg_memdic_insert (LIAlgMemdic* self,
-                     const void*  key,
-                     int          keysize,
-                     void*        value)
+LIAlgMemdicNode* lialg_memdic_insert (
+	LIAlgMemdic* self,
+	const void*  key,
+	int          keysize,
+	void*        value)
 {
 	LIAlgMemdicNode* node;
 
@@ -187,16 +180,15 @@ lialg_memdic_insert (LIAlgMemdic* self,
 
 /**
  * \brief Removes data from the associative array.
- *
  * \param self Associative array.
  * \param key Key of the removed node.
  * \param keysize Size of the key.
  * \return Nonzero if a node was removed.
  */
-int
-lialg_memdic_remove (LIAlgMemdic* self,
-                     const void*  key,
-                     int          keysize)
+int lialg_memdic_remove (
+	LIAlgMemdic* self,
+	const void*  key,
+	int          keysize)
 {
 	LIAlgBstNode* tnode;
 	LIAlgMemdicNode* anode;
@@ -221,20 +213,19 @@ lialg_memdic_remove (LIAlgMemdic* self,
 		self->list = anode->next;
 	if (anode->next != NULL)
 		anode->next->prev = anode->prev;
-	private_node_free (anode);
+	private_memdic_node_free (anode);
 	self->size--;
 	return 0;
 }
 
 /**
  * \brief Removes a node from the associative array.
- *
  * \param self Associative array.
  * \param node Node to remove.
  */
-void
-lialg_memdic_remove_node (LIAlgMemdic*     self,
-                          LIAlgMemdicNode* node)
+void lialg_memdic_remove_node (
+	LIAlgMemdic*     self,
+	LIAlgMemdicNode* node)
 {
 	if (node->prev != NULL)
 		node->prev->next = node->next;
@@ -243,22 +234,22 @@ lialg_memdic_remove_node (LIAlgMemdic*     self,
 	if (node->next != NULL)
 		node->next->prev = node->prev;
 	lialg_bst_unlink (self->tree, &node->node);
-	private_node_free (node);
+	private_memdic_node_free (node);
 	self->size--;
 }
 
 /*****************************************************************************/
 
-static void
-private_node_free (LIAlgMemdicNode* self)
+static void private_memdic_node_free (
+	LIAlgMemdicNode* self)
 {
 	lisys_free (self->key);
 	lisys_free (self);
 }
 
-static int
-private_node_compare (const LIAlgMemdicNode* self,
-                      const LIAlgMemdicNode* node)
+static int private_memdic_node_compare (
+	const LIAlgMemdicNode* self,
+	const LIAlgMemdicNode* node)
 {
 	int ret;
 	int min;

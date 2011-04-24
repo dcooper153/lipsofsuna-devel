@@ -25,19 +25,17 @@
 #include <lipsofsuna/system.h>
 #include "algorithm-u32dic.h"
 
-static int
-private_node_compare (const LIAlgU32dicNode* self,
-                      const LIAlgU32dicNode* node);
+static int private_u32dic_node_compare (
+	const LIAlgU32dicNode* self,
+	const LIAlgU32dicNode* node);
 
 /*****************************************************************************/
 
 /**
  * \brief Creates a new associative array.
- *
  * \return New associative array or NULL.
  */
-LIAlgU32dic*
-lialg_u32dic_new ()
+LIAlgU32dic* lialg_u32dic_new ()
 {
 	LIAlgU32dic* self;
 
@@ -46,7 +44,7 @@ lialg_u32dic_new ()
 		return NULL;
 	self->size = 0;
 	self->list = NULL;
-	self->tree = lialg_bst_new ((LIAlgBstCompare) private_node_compare, lisys_malloc, lisys_free);
+	self->tree = lialg_bst_new ((LIAlgBstCompare) private_u32dic_node_compare, lisys_malloc, lisys_free);
 	if (self->tree == NULL)
 	{
 		lisys_free (self);
@@ -57,11 +55,10 @@ lialg_u32dic_new ()
 
 /**
  * \brief Frees the associative array.
- *
  * \param self Associative array.
  */
-void
-lialg_u32dic_free (LIAlgU32dic* self)
+void lialg_u32dic_free (
+	LIAlgU32dic* self)
 {
 	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free);
 	self->tree->root = NULL;
@@ -71,11 +68,10 @@ lialg_u32dic_free (LIAlgU32dic* self)
 
 /**
  * \brief Clears the associative array.
- *
  * \param self Associative array.
  */
-void
-lialg_u32dic_clear (LIAlgU32dic* self)
+void lialg_u32dic_clear (
+	LIAlgU32dic* self)
 {
 	lialg_bst_foreach (self->tree, (LIAlgBstForeach) lisys_free);
 	self->size = 0;
@@ -86,14 +82,13 @@ lialg_u32dic_clear (LIAlgU32dic* self)
 
 /**
  * \brief Finds a value from the associative array.
- *
  * \param self Associative array.
  * \param key Key of the node.
  * \return Value or NULL.
  */
-void*
-lialg_u32dic_find (LIAlgU32dic* self,
-                   uint32_t     key)
+void* lialg_u32dic_find (
+	LIAlgU32dic* self,
+	uint32_t     key)
 {
 	LIAlgU32dicNode tmp;
 	LIAlgU32dicNode* anode;
@@ -110,14 +105,13 @@ lialg_u32dic_find (LIAlgU32dic* self,
 
 /**
  * \brief Finds a node from the associative array.
- *
  * \param self Associative array.
  * \param key Key of the node.
  * \return Associative array node or NULL.
  */
-LIAlgU32dicNode*
-lialg_u32dic_find_node (LIAlgU32dic* self,
-                        uint32_t     key)
+LIAlgU32dicNode* lialg_u32dic_find_node (
+	LIAlgU32dic* self,
+	uint32_t     key)
 {
 	LIAlgU32dicNode tmp;
 	LIAlgBstNode* tnode;
@@ -132,16 +126,15 @@ lialg_u32dic_find_node (LIAlgU32dic* self,
 
 /**
  * \brief Inserts data to the associative array.
- *
  * \param self Associative array.
  * \param key Key of the inserted node.
  * \param value Value of the inserted node.
  * \return Associative array node or NULL.
  */
-LIAlgU32dicNode*
-lialg_u32dic_insert (LIAlgU32dic* self,
-                     uint32_t     key,
-                     void*        value)
+LIAlgU32dicNode* lialg_u32dic_insert (
+	LIAlgU32dic* self,
+	uint32_t     key,
+	void*        value)
 {
 	LIAlgU32dicNode* node;
 
@@ -168,14 +161,13 @@ lialg_u32dic_insert (LIAlgU32dic* self,
 
 /**
  * \brief Removes data from the associative array.
- *
  * \param self Associative array.
  * \param key Key of the removed node.
  * \return Nonzero if a node was removed.
  */
-int
-lialg_u32dic_remove (LIAlgU32dic* self,
-                     uint32_t     key)
+int lialg_u32dic_remove (
+	LIAlgU32dic* self,
+	uint32_t     key)
 {
 	LIAlgBstNode* tnode;
 	LIAlgU32dicNode* anode;
@@ -206,13 +198,12 @@ lialg_u32dic_remove (LIAlgU32dic* self,
 
 /**
  * \brief Removes a node from the associative array.
- *
  * \param self Associative array.
  * \param node Node to remove.
  */
-void
-lialg_u32dic_remove_node (LIAlgU32dic*     self,
-                          LIAlgU32dicNode* node)
+void lialg_u32dic_remove_node (
+	LIAlgU32dic*     self,
+	LIAlgU32dicNode* node)
 {
 	if (node->prev != NULL)
 		node->prev->next = node->next;
@@ -227,9 +218,9 @@ lialg_u32dic_remove_node (LIAlgU32dic*     self,
 
 /*****************************************************************************/
 
-static int
-private_node_compare (const LIAlgU32dicNode* self,
-                      const LIAlgU32dicNode* node)
+static int private_u32dic_node_compare (
+	const LIAlgU32dicNode* self,
+	const LIAlgU32dicNode* node)
 {
 	if (self->key < node->key) return -1;
 	if (self->key > node->key) return 1;

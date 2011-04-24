@@ -26,22 +26,20 @@
 #include <lipsofsuna/system.h>
 #include "algorithm-strdic.h"
 
-static void
-private_node_free (LIAlgStrdicNode* self);
+static void private_strdic_node_free (
+	LIAlgStrdicNode* self);
 
-static int
-private_node_compare (const LIAlgStrdicNode* self,
-                      const LIAlgStrdicNode* node);
+static int private_strdic_node_compare (
+	const LIAlgStrdicNode* self,
+	const LIAlgStrdicNode* node);
 
 /*****************************************************************************/
 
 /**
  * \brief Creates a new associative array.
- *
  * \return New associative array or NULL.
  */
-LIAlgStrdic*
-lialg_strdic_new ()
+LIAlgStrdic* lialg_strdic_new ()
 {
 	LIAlgStrdic* self;
 
@@ -50,7 +48,7 @@ lialg_strdic_new ()
 		return NULL;
 	self->size = 0;
 	self->list = NULL;
-	self->tree = lialg_bst_new ((LIAlgBstCompare) private_node_compare, lisys_malloc, lisys_free);
+	self->tree = lialg_bst_new ((LIAlgBstCompare) private_strdic_node_compare, lisys_malloc, lisys_free);
 	if (self->tree == NULL)
 	{
 		lisys_free (self);
@@ -61,13 +59,12 @@ lialg_strdic_new ()
 
 /**
  * \brief Frees the associative array.
- *
  * \param self Associative array.
  */
-void
-lialg_strdic_free (LIAlgStrdic* self)
+void lialg_strdic_free (
+	LIAlgStrdic* self)
 {
-	lialg_bst_foreach (self->tree, (LIAlgBstForeach) private_node_free);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) private_strdic_node_free);
 	self->tree->root = NULL;
 	lialg_bst_free (self->tree);
 	lisys_free (self);
@@ -75,13 +72,12 @@ lialg_strdic_free (LIAlgStrdic* self)
 
 /**
  * \brief Clears the associative array.
- *
  * \param self Associative array.
  */
-void
-lialg_strdic_clear (LIAlgStrdic* self)
+void lialg_strdic_clear (
+	LIAlgStrdic* self)
 {
-	lialg_bst_foreach (self->tree, (LIAlgBstForeach) private_node_free);
+	lialg_bst_foreach (self->tree, (LIAlgBstForeach) private_strdic_node_free);
 	self->size = 0;
 	self->list = NULL;
 	self->tree->root = NULL;
@@ -90,14 +86,13 @@ lialg_strdic_clear (LIAlgStrdic* self)
 
 /**
  * \brief Finds a value from the associative array.
- *
  * \param self Associative array.
  * \param key Key of the node.
  * \return Value or NULL.
  */
-void*
-lialg_strdic_find (LIAlgStrdic* self,
-                   const char*  key)
+void* lialg_strdic_find (
+	LIAlgStrdic* self,
+	const char*  key)
 {
 	LIAlgStrdicNode tmp;
 	LIAlgStrdicNode* anode;
@@ -107,21 +102,20 @@ lialg_strdic_find (LIAlgStrdic* self,
 	tnode = lialg_bst_find (self->tree, &tmp);
 	if (tnode == NULL)
 		return NULL;
-	anode = (LIAlgStrdicNode*)tnode->data;
+	anode = (LIAlgStrdicNode*) tnode->data;
 	lisys_assert (&anode->node == tnode);
 	return anode->value;
 }
 
 /**
  * \brief Finds a node from the associative array.
- *
  * \param self Associative array.
  * \param key Key of the node.
  * \return Associative array node or NULL.
  */
-LIAlgStrdicNode*
-lialg_strdic_find_node (LIAlgStrdic* self,
-                        const char*  key)
+LIAlgStrdicNode* lialg_strdic_find_node (
+	LIAlgStrdic* self,
+	const char*  key)
 {
 	LIAlgStrdicNode tmp;
 	LIAlgBstNode* tnode;
@@ -131,21 +125,20 @@ lialg_strdic_find_node (LIAlgStrdic* self,
 	if (tnode == NULL)
 		return NULL;
 	lisys_assert (&((LIAlgStrdicNode*) tnode->data)->node == tnode);
-	return (LIAlgStrdicNode*)tnode->data;
+	return (LIAlgStrdicNode*) tnode->data;
 }
 
 /**
  * \brief Inserts data to the associative array.
- *
  * \param self An associative array.
  * \param key Key of the inserted node.
  * \param value Value of the inserted node.
  * \return Associative array node or NULL.
  */
-LIAlgStrdicNode*
-lialg_strdic_insert (LIAlgStrdic* self,
-                     const char*  key,
-                     void*        value)
+LIAlgStrdicNode* lialg_strdic_insert (
+	LIAlgStrdic* self,
+	const char*  key,
+	void*        value)
 {
 	LIAlgStrdicNode* node;
 
@@ -177,14 +170,13 @@ lialg_strdic_insert (LIAlgStrdic* self,
 
 /**
  * \brief Removes data from the associative array.
- *
  * \param self Associative array.
  * \param key Key of the removed node.
  * \return Nonzero if a node was removed.
  */
-int
-lialg_strdic_remove (LIAlgStrdic* self,
-                     const char*    key)
+int lialg_strdic_remove (
+	LIAlgStrdic* self,
+	const char*    key)
 {
 	LIAlgBstNode* tnode;
 	LIAlgStrdicNode* anode;
@@ -208,20 +200,19 @@ lialg_strdic_remove (LIAlgStrdic* self,
 		self->list = anode->next;
 	if (anode->next != NULL)
 		anode->next->prev = anode->prev;
-	private_node_free (anode);
+	private_strdic_node_free (anode);
 	self->size--;
 	return 1;
 }
 
 /**
  * \brief Removes a node from the associative array.
- *
  * \param self Associative array.
  * \param node Node to remove.
  */
-void
-lialg_strdic_remove_node (LIAlgStrdic*     self,
-                          LIAlgStrdicNode* node)
+void lialg_strdic_remove_node (
+	LIAlgStrdic*     self,
+	LIAlgStrdicNode* node)
 {
 	if (node->prev != NULL)
 		node->prev->next = node->next;
@@ -230,22 +221,22 @@ lialg_strdic_remove_node (LIAlgStrdic*     self,
 	if (node->next != NULL)
 		node->next->prev = node->prev;
 	lialg_bst_unlink (self->tree, &node->node);
-	private_node_free (node);
+	private_strdic_node_free (node);
 	self->size--;
 }
 
 /*****************************************************************************/
 
-static void
-private_node_free (LIAlgStrdicNode* self)
+static void private_strdic_node_free (
+	LIAlgStrdicNode* self)
 {
 	lisys_free (self->key);
 	lisys_free (self);
 }
 
-static int
-private_node_compare (const LIAlgStrdicNode* self,
-                      const LIAlgStrdicNode* node)
+static int private_strdic_node_compare (
+	const LIAlgStrdicNode* self,
+	const LIAlgStrdicNode* node)
 {
 	return strcmp (self->key, node->key);
 }
