@@ -162,6 +162,16 @@ Quaternion.unittest = function()
 	local q3 = Quaternion{dir = Vector(0,0,1), up = Vector(0,1,0)}
 	assert(q3.y == -1)
 	assert(q3.length == 1)
+	-- Euler presentation.
+	local q4 = Quaternion{euler = {0,0,1.5}}
+	assert(q4.euler[1] == 0)
+	assert(q4.euler[2] == 0)
+	assert(q4.euler[3] == 1.5)
+	-- Multiplication vectors.
+	local q5 = q4 * q3
+	assert(q5.class == Quaternion)
+	local v1 = q4 * Vector(1,0,0)
+	assert(v1.class == Vector)
 end
 
 ------------------------------------------------------------------------------
