@@ -72,7 +72,7 @@ Object.rotate = function(self, value, steps)
 	local s = 2 * math.pi / steps
 	local e = self.rotation.euler
 	e[1] = math.floor(e[1] / s + value + 0.5) * s
-	self.rotation = Quaternion:new_euler(e)
+	self.rotation = Quaternion{euler = e}
 end
 
 for k,s in pairs(Shader.dict_name) do

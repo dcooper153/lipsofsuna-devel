@@ -37,7 +37,7 @@ FirstPersonCamera.get_picking_ray = function(self)
 	-- Calculate the rotation.
 	local euler = self.own_rot.euler
 	euler[3] = euler[3] - self.own_tilt
-	local rot = Quaternion:new_euler(euler)
+	local rot = Quaternion{euler = euler}
 	-- Project the ray.
 	local ctr = self.own_pos + self.own_rot * self.own_ray
 	return ctr,ctr + rot * Vector(0, 0, -5)
@@ -50,7 +50,7 @@ end
 FirstPersonCamera.rotate = function(self, turn, tilt)
 	self.own_turn = radian_wrap(self.own_turn + turn)
 	self.own_tilt = radian_wrap(self.own_tilt - tilt)
-	self.own_rot = Quaternion:new_euler(self.own_turn, 0, self.own_tilt)
+	self.own_rot = Quaternion{euler = {self.own_turn, 0, self.own_tilt}}
 end
 
 FirstPersonCamera.set_node_transform = function(self, pos, rot)

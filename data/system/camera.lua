@@ -33,8 +33,10 @@ end
 --   <li>cursor: Cursor position, in pixels.</li>
 --   <li>far: Ray end distance, in world coordinate units.</li>
 --   <li>near: Ray start distance, in world coordinate units.</li></ul>
+-- @return Start point, end point.
 Camera.picking_ray = function(self, args)
-	Los.camera_picking_ray(self.handle, {cursor = args.cursor.handle, far = args.far, near = args.near})
+	local a,b = Los.camera_picking_ray(self.handle, {cursor = args.cursor.handle, far = args.far, near = args.near})
+	return Class.new(Vector, {handle = a}), Class.new(Vector, {handle = b})
 end
 
 --- Resets the look spring transformation of the camera.
