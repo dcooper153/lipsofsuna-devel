@@ -12,7 +12,8 @@ Dialogspec{name = "puppy",
 			{"branch", cond = "puppy known",
 				{"branch", cond_not = "puppy touched",
 					{"quest", "Peculiar Pet", status = "active", text = "Celine has called us crazy because we told her that her pet, Puppy, is a bloodworm. However, no matter how you look at it, the bloodworm really is a bloodworm. It looks like one, feels like one, and even stinks like one."},
-					{"flag", "puppy touched"}}}}},
+					{"flag", "puppy touched"},
+					{"flag", "hallucinations known"}}}}},
 	{"choice", "(Leave the monster.)",
 		{"exit"}}}
 

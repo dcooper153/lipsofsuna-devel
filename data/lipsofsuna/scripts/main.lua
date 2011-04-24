@@ -104,6 +104,7 @@ require "content/dialogs/portalofillusion"
 require "content/dialogs/portaloflips"
 require "content/dialogs/portalofmidguard"
 require "content/dialogs/puppy"
+require "content/dialogs/roland"
 require "content/dialogs/sanctuary"
 require "content/dialogs/thehoarder"
 
