@@ -16,6 +16,7 @@ Featanimspec.dict_name = {}
 --   <li>effect_sound: Sound effect name.</li>
 --   <li>icon: Icon name.</li>
 --   <li>influences: List of {type, base} influences.</li>
+--   <li>name: Feat animation name.</li>
 --   <li>required_ammo: Table of required ammo.</li>
 --   <li>toggle: True to trigger the handler on the key release event as well.</li></ul>
 -- @return New feat animation.
@@ -49,7 +50,7 @@ Feateffectspec.dict_name = {}
 --   <li>effect: Effect name.</li>
 --   <li>influences: List of {type, base, mult} influences.</li>
 --   <li>locked: True for not unlocked yet.</li>
---   <li>name: Skill effect name.</li>
+--   <li>name: Feat effect name.</li>
 --   <li>radius: Area of effect radius.</li>
 --   <li>range: Maximum firing range for bullet and ray targeting modes.</li>
 --   <li>skill_base: List of base skill requirements.</li>

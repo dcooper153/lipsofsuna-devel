@@ -24,7 +24,7 @@ Itemspec.dict_name = {}
 --   <li>influences_bonus: Dictionary of skill names and influence multipliers.</li>
 --   <li>destroy_actions: List of actions to perform when the item is destroyed.</li>
 --   <li>destroy_timer: Time in seconds after which to destruct when thrown.</li>
---   <li>equipment_models: Dictionary of equipment models or nil.</li>
+--   <li>equipment_models: Dictionary of equipment models.</li>
 --   <li>equipment_slot: Equipment slot into which the item can be placed.</li>
 --   <li>equipment_slots_reserved: List of equipment slots that the item reserves in addition to the main slot.</li>
 --   <li>health: Number of hit points the item has.</li>
@@ -36,8 +36,8 @@ Itemspec.dict_name = {}
 --   <li>loot_categories: List of item categories this container can have as random loot.</li>
 --   <li>loot_count: Minimum and maximum number of random loot items this container can have.</li>
 --   <li>mass: Mass in kilograms.</li>
---   <li>model: Model to use for the item. (required)</li>
---   <li>name: Name of the item type. (required)</li>
+--   <li>model: Model to use for the item.</li>
+--   <li>name: Name of the item type.</li>
 --   <li>special_effects: List of special effects to render.</li>
 --   <li>stacking: True to allow the item to stack in the inventory.</li></ul>
 -- @return New item specification.

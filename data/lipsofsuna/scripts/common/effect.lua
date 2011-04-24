@@ -13,8 +13,9 @@ end
 --- Registers a new effect.
 -- @param clss Feat class.
 -- @param args Arguments.<ul>
---   <li>model: Model effect name.</li>
---   <li>sound: Sound effect name.</li></ul>
+--   <li>model: Model to show.</li>
+--   <li>name: Name of the effect.</li>
+--   <li>sound: Sound effect to play.</li></ul>
 -- @return New effect.
 Effect.new = function(clss, args)
 	local self = Class.new(clss, args)

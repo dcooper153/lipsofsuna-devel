@@ -10,7 +10,7 @@ Obstaclespec.dict_name = {}
 --   <li>collision_group: Collision group.</li>
 --   <li>collision_mask: Collision mask.</li>
 --   <li>categories: List of categories to which the obstacle belongs.</li>
---   <li>harvest_behavior: Harvest behavior. ("keep"/"destroy")</li>
+--   <li>harvest_behavior: Harvest behavior: "keep"/"destroy".</li>
 --   <li>harvest_effect: Effect to play when harvested.</li>
 --   <li>harvest_materials: Dictionary of harvestable materials.</li>
 --   <li>destroy_actions: List of actions to perform when the obstacle is destroyed.</li>
@@ -18,8 +18,8 @@ Obstaclespec.dict_name = {}
 --   <li>health: Number of hit points the obstacle has.</li>
 --   <li>interactive: False to make the object not appear interactive.</li>
 --   <li>mass: Mass in kilograms.</li>
---   <li>model: Model to use for the obstacle. (required)</li>
---   <li>name: Name of the obstacle type. (required)</li>
+--   <li>model: Model to use for the obstacle.</li>
+--   <li>name: Name of the obstacle type.</li>
 --   <li>physics: Physics mode.</li></ul>
 -- @return New item specification.
 Obstaclespec.new = function(clss, args)

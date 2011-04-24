@@ -9,12 +9,12 @@ Species.dict_name = {}
 --- Registers a new species.
 -- @param clss Species class.
 -- @param args Arguments.<ul>
---   <li>ai_distance_hint
---   <li>ai_enable_attack False to prohibit attacking.</li>
---   <li>ai_enable_combat False to prohibit combat.</li>
---   <li>ai_enable_defend False to prohibit defending.</li>
---   <li>ai_enable_strafe False to prohibit strafing.</li>
---   <li>ai_enable_wander False to prohibit wandering.</li>
+--   <li>ai_distance_hint: Tells the AI how big the object is horizontally.</li>
+--   <li>ai_enable_attack: False to prohibit attacking.</li>
+--   <li>ai_enable_combat: False to prohibit combat.</li>
+--   <li>ai_enable_defend: False to prohibit defending.</li>
+--   <li>ai_enable_strafe: False to prohibit strafing.</li>
+--   <li>ai_enable_wander: False to prohibit wandering.</li>
 --   <li>ai_enable_walk: False to prohibit walking.</li>
 --   <li>ai_enabled: False to disable AI for the species.</li>
 --   <li>ai_search_time: Time in seconds how long the AI will search for hidden foes.</li>
