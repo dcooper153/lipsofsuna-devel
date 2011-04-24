@@ -350,12 +350,16 @@ int livox_manager_intersect_ray (
 	LIMatVector*       result_tile)
 {
 #define STEP_SIZE 0.05
+	int p[3];
+	int max;
 	float i;
 	float len;
 	LIMatVector dir;
 	LIMatVector pos;
 	LIVoxVoxel voxel;
 	LIVoxMaterial* material;
+
+	max = self->tiles_per_line * self->sectors->count;
 
 	/* Calculate step size. */
 	dir = limat_vector_subtract (*ray1, *ray0);
@@ -368,7 +372,12 @@ int livox_manager_intersect_ray (
 	for (i = 0.0f ; i <= len + 0.5f * STEP_SIZE ; i += STEP_SIZE)
 	{
 		pos = limat_vector_add (*ray0, limat_vector_multiply (dir, i));
-		livox_manager_get_voxel (self, (int) pos.x, (int) pos.y, (int) pos.z, &voxel);
+		p[0] = (int) pos.x;
+		p[1] = (int) pos.y;
+		p[2] = (int) pos.z;
+		if (p[0] < 0 || p[1] < 0 || p[2] < 0 || p[0] >= max || p[1] >= max || p[2] >= max)
+			continue;
+		livox_manager_get_voxel (self, p[0], p[1], p[2], &voxel);
 		if (!voxel.type)
 			continue;
 		material = livox_manager_find_material (self, voxel.type);
