@@ -26,7 +26,7 @@ Object:add_setters{
 		local inventory = Inventory:find{object = s}
 		if inventory then
 			for k,v in pairs(inventory.slots) do
-				if v == self then
+				if v == s then
 					inventory:update_slot{slot = k}
 					break
 				end
