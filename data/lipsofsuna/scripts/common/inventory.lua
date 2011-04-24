@@ -5,6 +5,7 @@
 -- @name Inventory
 -- @class table
 Inventory = Class()
+Inventory.class_name = "Inventory"
 Inventory.dict_object = {}
 Inventory.dict_owner = {}
 setmetatable(Inventory.dict_object, {__mode = "kv"})
