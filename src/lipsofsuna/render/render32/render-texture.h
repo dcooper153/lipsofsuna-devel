@@ -15,37 +15,37 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_TEXTURE_H__
-#define __RENDER_TEXTURE_H__
+#ifndef __RENDER32_TEXTURE_H__
+#define __RENDER32_TEXTURE_H__
 
 #include <lipsofsuna/image.h>
 #include <lipsofsuna/model.h>
-#include "../render.h"
-#include "../render-types.h"
+#include "render.h"
+#include "render-types.h"
 
-struct _LIRenTexture
+struct _LIRenTexture32
 {
 	int id;
 	int width;
 	int height;
 	LIMdlTextureType type;
-	LIRenImage* image;
+	LIRenImage32* image;
 };
 
-LIAPICALL (void, liren_texture_init, (
-	LIRenTexture* self));
+LIAPICALL (void, liren_texture32_init, (
+	LIRenTexture32* self));
 
-LIAPICALL (void, liren_texture_free, (
-	LIRenTexture* self));
+LIAPICALL (void, liren_texture32_free, (
+	LIRenTexture32* self));
 
-LIAPICALL (void, liren_texture_set_image, (
-	LIRenTexture* self,
-	LIRenImage*   value));
+LIAPICALL (void, liren_texture32_set_image, (
+	LIRenTexture32* self,
+	LIRenImage32*   value));
 
-LIAPICALL (GLenum, liren_texture_get_target, (
-	const LIRenTexture* self));
+LIAPICALL (GLenum, liren_texture32_get_target, (
+	const LIRenTexture32* self));
 
-LIAPICALL (GLuint, liren_texture_get_texture, (
-	const LIRenTexture* self));
+LIAPICALL (GLuint, liren_texture32_get_texture, (
+	const LIRenTexture32* self));
 
 #endif

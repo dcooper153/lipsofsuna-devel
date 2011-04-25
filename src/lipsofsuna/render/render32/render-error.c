@@ -24,7 +24,7 @@
 
 #include "render-error.h"
 
-int liren_error_get ()
+int liren_error32_get ()
 {
 	switch (glGetError ())
 	{
@@ -57,9 +57,9 @@ int liren_error_get ()
 }
 
 #ifndef NDEBUG
-void liren_error_check ()
+void liren_error32_check ()
 {
-	if (liren_error_get ())
+	if (liren_error32_get ())
 	{
 		lisys_error_report ();
 		lisys_assert (0);

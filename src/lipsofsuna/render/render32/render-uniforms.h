@@ -15,8 +15,8 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_UNIFORMS_H__
-#define __RENDER_UNIFORMS_H__
+#ifndef __RENDER32_UNIFORMS_H__
+#define __RENDER32_UNIFORMS_H__
 
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/video.h"
@@ -24,8 +24,8 @@
 
 #define LIREN_UNIFORM_BUFFER_SIZE 2048
 
-typedef struct _LIRenUniforms LIRenUniforms;
-struct _LIRenUniforms
+typedef struct _LIRenUniforms32 LIRenUniforms32;
+struct _LIRenUniforms32
 {
 	int ready;
 	char data[LIREN_UNIFORM_BUFFER_SIZE];
@@ -39,41 +39,41 @@ struct _LIRenUniforms
 	int uniform_changed[LIREN_UNIFORM_COUNT];
 };
 
-LIAPICALL (void, liren_uniforms_init, (
-	LIRenUniforms* self));
+LIAPICALL (void, liren_uniforms32_init, (
+	LIRenUniforms32* self));
 
-LIAPICALL (void, liren_uniforms_clear, (
-	LIRenUniforms* self));
+LIAPICALL (void, liren_uniforms32_clear, (
+	LIRenUniforms32* self));
 
-LIAPICALL (void, liren_uniforms_commit, (
-	LIRenUniforms* self));
+LIAPICALL (void, liren_uniforms32_commit, (
+	LIRenUniforms32* self));
 
-LIAPICALL (void, liren_uniforms_setup, (
-	LIRenUniforms* self,
+LIAPICALL (void, liren_uniforms32_setup, (
+	LIRenUniforms32* self,
 	GLuint         program));
 
-LIAPICALL (void, liren_uniforms_set_float, (
-	LIRenUniforms* self,
+LIAPICALL (void, liren_uniforms32_set_float, (
+	LIRenUniforms32* self,
 	int            uniform,
 	float          value));
 
-LIAPICALL (void, liren_uniforms_set_vec3, (
-	LIRenUniforms* self,
+LIAPICALL (void, liren_uniforms32_set_vec3, (
+	LIRenUniforms32* self,
 	int            uniform,
 	const float*   value));
 
-LIAPICALL (void, liren_uniforms_set_vec4, (
-	LIRenUniforms* self,
+LIAPICALL (void, liren_uniforms32_set_vec4, (
+	LIRenUniforms32* self,
 	int            uniform,
 	const float*   value));
 
-LIAPICALL (void, liren_uniforms_set_mat3, (
-	LIRenUniforms* self,
+LIAPICALL (void, liren_uniforms32_set_mat3, (
+	LIRenUniforms32* self,
 	int            uniform,
 	const float*   value));
 
-LIAPICALL (void, liren_uniforms_set_mat4, (
-	LIRenUniforms* self,
+LIAPICALL (void, liren_uniforms32_set_mat4, (
+	LIRenUniforms32* self,
 	int            uniform,
 	const float*   value));
 

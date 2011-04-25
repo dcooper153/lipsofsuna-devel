@@ -24,9 +24,6 @@
 #include "render.h"
 #include "render-types.h"
 
-/* FIXME: Should be configurable. */
-#define SHADOWMAPSIZE 512
-
 LIAPICALL (LIRenLight*, liren_light_new, (
 	LIRenScene*  scene,
 	const float* ambient,
@@ -37,31 +34,7 @@ LIAPICALL (LIRenLight*, liren_light_new, (
 	float        exponent,
 	int          shadow));
 
-LIAPICALL (LIRenLight*, liren_light_new_directional, (
-	LIRenScene*  scene,
-	const float* ambient,
-	const float* diffuse,
-	const float* specular));
-
-LIAPICALL (LIRenLight*, liren_light_new_from_model, (
-	LIRenScene*      scene,
-	const LIMdlNode* light));
-
 LIAPICALL (void, liren_light_free, (
-	LIRenLight* self));
-
-LIAPICALL (int, liren_light_compare, (
-	const LIRenLight* self,
-	const LIRenLight* light));
-
-LIAPICALL (void, liren_light_update, (
-	LIRenLight* self));
-
-LIAPICALL (void, liren_light_update_cache, (
-	LIRenLight*   self,
-	LIRenContext* context));
-
-LIAPICALL (void, liren_light_update_projection, (
 	LIRenLight* self));
 
 LIAPICALL (void, liren_light_get_ambient, (
@@ -72,10 +45,6 @@ LIAPICALL (void, liren_light_set_ambient, (
 	LIRenLight*  self,
 	const float* value));
 
-LIAPICALL (int, liren_light_get_bounds, (
-	const LIRenLight* self,
-	LIMatAabb*        result));
-
 LIAPICALL (void, liren_light_get_diffuse, (
 	LIRenLight* self,
 	float*      value));
@@ -83,18 +52,6 @@ LIAPICALL (void, liren_light_get_diffuse, (
 LIAPICALL (void, liren_light_set_diffuse, (
 	LIRenLight*  self,
 	const float* value));
-
-LIAPICALL (void, liren_light_get_direction, (
-	const LIRenLight* self,
-	LIMatVector*      value));
-
-LIAPICALL (void, liren_light_set_direction, (
-	LIRenLight*        self,
-	const LIMatVector* value));
-
-LIAPICALL (void, liren_light_set_directional, (
-	LIRenLight* self,
-	int         value));
 
 LIAPICALL (int, liren_light_get_enabled, (
 	const LIRenLight* self));
@@ -107,10 +64,6 @@ LIAPICALL (void, liren_light_set_equation, (
 	LIRenLight*  self,
 	const float* value));
 
-LIAPICALL (void, liren_light_get_modelview, (
-	const LIRenLight* self,
-	LIMatMatrix*      value));
-
 LIAPICALL (void, liren_light_get_position, (
 	const LIRenLight* self,
 	GLfloat*          value));
@@ -121,14 +74,6 @@ LIAPICALL (float, liren_light_get_priority, (
 LIAPICALL (void, liren_light_set_priority, (
 	LIRenLight* self,
 	float       value));
-
-LIAPICALL (void, liren_light_get_projection, (
-	const LIRenLight* self,
-	LIMatMatrix*      value));
-
-LIAPICALL (void, liren_light_set_projection, (
-	LIRenLight*        self,
-	const LIMatMatrix* value));
 
 LIAPICALL (LIRenScene*, liren_light_get_scene, (
 	const LIRenLight* self));
@@ -182,9 +127,6 @@ LIAPICALL (void, liren_light_get_transform, (
 
 LIAPICALL (void, liren_light_set_transform, (
 	LIRenLight*           self,
-	const LIMatTransform* transform));
-
-LIAPICALL (int, liren_light_get_type, (
-	const LIRenLight* self));
+	const LIMatTransform* value));
 
 #endif

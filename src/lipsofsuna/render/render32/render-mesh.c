@@ -15,7 +15,7 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "../render.h"
+#include "render.h"
 #include "render-attribute.h"
 #include "render-mesh.h"
 
@@ -26,8 +26,8 @@
  * @{
  */
 
-int liren_mesh_init (
-	LIRenMesh* self,
+int liren_mesh32_init (
+	LIRenMesh32* self,
 	void*      index_data,
 	int        index_count,
 	void*      vertex_data,
@@ -47,7 +47,7 @@ int liren_mesh_init (
 	const int vertex_bo2_offset = 16 * sizeof (float) + 4 * sizeof (char);
 
 	/* Allocate objects. */
-	memset (self, 0, sizeof (LIRenMesh));
+	memset (self, 0, sizeof (LIRenMesh32));
 	if (!index_count || !vertex_count)
 		return 1;
 	glGenBuffers (3, self->buffers);
@@ -121,18 +121,18 @@ int liren_mesh_init (
 	return 1;
 }
 
-void liren_mesh_clear (
-	LIRenMesh* self)
+void liren_mesh32_clear (
+	LIRenMesh32* self)
 {
 	glDeleteVertexArrays (2, self->arrays);
 	glDeleteBuffers (3, self->buffers);
 	lisys_free (self->reload_index_data);
 	lisys_free (self->reload_vertex_data);
-	memset (self, 0, sizeof (LIRenMesh));
+	memset (self, 0, sizeof (LIRenMesh32));
 }
 
-void liren_mesh_deform (
-	LIRenMesh* self)
+void liren_mesh32_deform (
+	LIRenMesh32* self)
 {
 	GLint restore;
 
@@ -154,8 +154,8 @@ void liren_mesh_deform (
  * \param self Mesh.
  * \return Pointer to the locked array, or NULL.
  */
-void* liren_mesh_lock_vertices (
-	const LIRenMesh* self,
+void* liren_mesh32_lock_vertices (
+	const LIRenMesh32* self,
 	int              start,
 	int              count)
 {
@@ -165,7 +165,7 @@ void* liren_mesh_lock_vertices (
 
 	if (self->buffers[2])
 	{
-		liren_mesh_get_format (self, &format);
+		liren_mesh32_get_format (self, &format);
 		glGetIntegerv (GL_VERTEX_ARRAY_BINDING, &restore);
 		glBindVertexArray (0);
 		glBindBuffer (GL_ARRAY_BUFFER, self->buffers[2]);
@@ -185,21 +185,21 @@ void* liren_mesh_lock_vertices (
  *
  * \param self Mesh.
  */
-void liren_mesh_reload (
-	LIRenMesh* self)
+void liren_mesh32_reload (
+	LIRenMesh32* self)
 {
-	LIRenMesh tmp;
+	LIRenMesh32 tmp;
 
-	if (liren_mesh_init (&tmp, self->reload_index_data, self->reload_index_count,
+	if (liren_mesh32_init (&tmp, self->reload_index_data, self->reload_index_count,
 	    self->reload_vertex_data, self->reload_vertex_count))
 	{
-		liren_mesh_clear (self);
+		liren_mesh32_clear (self);
 		*self = tmp;
 	}
 }
 
-void liren_mesh_unlock_vertices (
-	const LIRenMesh* self)
+void liren_mesh32_unlock_vertices (
+	const LIRenMesh32* self)
 {
 	GLint restore;
 
@@ -213,8 +213,8 @@ void liren_mesh_unlock_vertices (
 	}
 }
 
-void liren_mesh_get_format (
-	const LIRenMesh* self,
+void liren_mesh32_get_format (
+	const LIRenMesh32* self,
 	LIRenFormat*     value)
 {
 	const LIRenFormat format =

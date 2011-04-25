@@ -23,7 +23,6 @@
 #include <lipsofsuna/system.h>
 #include "render.h"
 #include "render-buffer.h"
-#include "render-material.h"
 #include "render-model.h"
 #include "render-types.h"
 
@@ -42,18 +41,6 @@ LIAPICALL (void, liren_object_particle_animation, (
 	float        start,
 	int          loop));
 
-LIAPICALL (void, liren_object_update, (
-	LIRenObject* self,
-	float        secs));
-
-LIAPICALL (void, liren_object_get_bounds, (
-	const LIRenObject* self,
-	LIMatAabb*         result));
-
-LIAPICALL (void, liren_object_get_center, (
-	const LIRenObject* self,
-	LIMatVector*       center));
-
 LIAPICALL (LIRenModel*, liren_object_get_model, (
 	LIRenObject* self));
 
@@ -65,26 +52,12 @@ LIAPICALL (int, liren_object_set_pose, (
 	LIRenObject* self,
 	LIMdlPose*   pose));
 
-LIAPICALL (int, liren_object_get_realized, (
-	const LIRenObject* self));
-
 LIAPICALL (int, liren_object_set_realized, (
 	LIRenObject* self,
 	int          value));
 
-LIAPICALL (void, liren_object_get_transform, (
-	LIRenObject*    self,
-	LIMatTransform* value));
-
 LIAPICALL (void, liren_object_set_transform, (
 	LIRenObject*          self,
 	const LIMatTransform* value));
-
-LIAPICALL (void*, liren_object_get_userdata, (
-	const LIRenObject* self));
-
-LIAPICALL (void, liren_object_set_userdata, (
-	LIRenObject* self,
-	void*        value));
 
 #endif

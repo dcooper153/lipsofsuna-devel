@@ -15,33 +15,45 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_MODEL_H__
-#define __RENDER_MODEL_H__
+#ifndef __RENDER32_MODEL_H__
+#define __RENDER32_MODEL_H__
 
 #include "lipsofsuna/image.h"
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "render.h"
+#include "render-material.h"
 #include "render-types.h"
 
-LIAPICALL (LIRenModel*, liren_model_new, (
-	LIRenRender* render,
-	LIMdlModel*  model,
-	int          id));
+LIAPICALL (LIRenModel32*, liren_model32_new, (
+	LIRenRender32* render,
+	LIMdlModel*    model,
+	int            id));
 
-LIAPICALL (void, liren_model_free, (
-	LIRenModel* self));
+LIAPICALL (void, liren_model32_free, (
+	LIRenModel32* self));
 
-LIAPICALL (int, liren_model_deform, (
-	LIRenModel*      self,
+LIAPICALL (int, liren_model32_deform, (
+	LIRenModel32*    self,
 	const char*      shader,
 	const LIMdlPose* pose));
 
-LIAPICALL (void, liren_model_update_transparency, (
-	LIRenModel* self));
+LIAPICALL (void, liren_model32_reload, (
+	LIRenModel32* self));
 
-LIAPICALL (int, liren_model_set_model, (
-	LIRenModel* self,
-	LIMdlModel* model));
+LIAPICALL (void, liren_model32_replace_image, (
+	LIRenModel32* self,
+	LIRenImage32* image));
+
+LIAPICALL (void, liren_model32_update_transparency, (
+	LIRenModel32* self));
+
+LIAPICALL (void, liren_model32_get_bounds, (
+	LIRenModel32* self,
+	LIMatAabb*    aabb));
+
+LIAPICALL (int, liren_model32_set_model, (
+	LIRenModel32* self,
+	LIMdlModel*   model));
 
 #endif

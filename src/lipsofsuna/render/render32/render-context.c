@@ -22,18 +22,18 @@
  * @{
  */
 
-#include "../render-private.h"
 #include "render-context.h"
+#include "render-private.h"
 
-void liren_context_init (
-	LIRenContext* self)
+void liren_context32_init (
+	LIRenContext32* self)
 {
-	LIRenRender* render;
-	LIRenUniforms uniforms;
+	LIRenRender32* render;
+	LIRenUniforms32 uniforms;
 
 	render = self->render;
 	uniforms = self->uniforms;
-	memset (self, 0, sizeof (LIRenContext));
+	memset (self, 0, sizeof (LIRenContext32));
 	self->render = render;
 	self->scene = NULL;
 	self->light = NULL;
@@ -62,8 +62,8 @@ void liren_context_init (
 	self->uniforms = uniforms;
 }
 
-void liren_context_bind (
-	LIRenContext* self)
+void liren_context32_bind (
+	LIRenContext32* self)
 {
 	/* Bind shader. */
 	if (self->changed.shader)
@@ -121,7 +121,7 @@ void liren_context_bind (
 	}
 
 	/* Update uniforms. */
-	liren_uniforms_commit (&self->uniforms);
+	liren_uniforms32_commit (&self->uniforms);
 
 	/* All state changes were applied. */
 	self->changed.blend = 0;
@@ -138,8 +138,8 @@ void liren_context_bind (
  * \param start Starting vertex.
  * \param count Number of vertices to draw.
  */
-void liren_context_render_array (
-	LIRenContext* self,
+void liren_context32_render_array (
+	LIRenContext32* self,
 	GLenum        type,
 	int           start,
 	int           count)
@@ -159,14 +159,14 @@ void liren_context_render_array (
  * \param vertices Array of vertices.
  * \param count Number of vertices.
  */
-int liren_context_render_immediate (
-	LIRenContext*      self,
+int liren_context32_render_immediate (
+	LIRenContext32*      self,
 	GLenum             type,
 	const LIRenVertex* vertices,
 	int                count)
 {
 	int* offset;
-	LIRenBuffer* buffer;
+	LIRenBuffer32* buffer;
 
 	offset = &self->render->immediate.offset;
 	buffer = self->render->immediate.buffer;
@@ -176,19 +176,19 @@ int liren_context_render_immediate (
 	/* Make sure the right buffer is bound. */
 	if (self->array != buffer->vertex_array)
 	{
-		liren_context_set_buffer (self, buffer);
-		liren_context_bind (self);
+		liren_context32_set_buffer (self, buffer);
+		liren_context32_bind (self);
 	}
 
 	/* Upload the data to the vertex buffer. */
 	/* The array buffer is bound here because upload_vertices unbound it. */
 	if (*offset > buffer->vertices.count - count)
 		*offset = 0;
-	liren_buffer_upload_vertices (buffer, *offset, count, vertices);
+	liren_buffer32_upload_vertices (buffer, *offset, count, vertices);
 	glBindBuffer (GL_ARRAY_BUFFER, buffer->vertex_buffer);
 
 	/* Render the primitive array. */
-	liren_context_render_array (self, type, *offset, count);
+	liren_context32_render_array (self, type, *offset, count);
 	*offset += count;
 
 	return 1;
@@ -200,8 +200,8 @@ int liren_context_render_immediate (
  * \param start Starting index.
  * \param count Number of indices to draw.
  */
-void liren_context_render_indexed (
-	LIRenContext* self,
+void liren_context32_render_indexed (
+	LIRenContext32* self,
 	int           start,
 	int           count)
 {
@@ -219,8 +219,8 @@ void liren_context_render_indexed (
 #endif
 }
 
-void liren_context_set_alpha_to_coverage (
-	LIRenContext* self,
+void liren_context32_set_alpha_to_coverage (
+	LIRenContext32* self,
 	int           value)
 {
 	if (self->alpha_to_coverage != value)
@@ -233,8 +233,8 @@ void liren_context_set_alpha_to_coverage (
 	}
 }
 
-void liren_context_set_blend (
-	LIRenContext* self,
+void liren_context32_set_blend (
+	LIRenContext32* self,
 	int           enable,
 	GLenum        blend_src,
 	GLenum        blend_dst)
@@ -250,9 +250,9 @@ void liren_context_set_blend (
 	}
 }
 
-void liren_context_set_buffer (
-	LIRenContext* self,
-	LIRenBuffer*  buffer)
+void liren_context32_set_buffer (
+	LIRenContext32* self,
+	LIRenBuffer32*  buffer)
 {
 	GLuint array;
 
@@ -264,8 +264,8 @@ void liren_context_set_buffer (
 	}
 }
 
-void liren_context_set_cull (
-	LIRenContext* self,
+void liren_context32_set_cull (
+	LIRenContext32* self,
 	int           enable,
 	int           front_face)
 {
@@ -278,14 +278,14 @@ void liren_context_set_cull (
 	}
 }
 
-int liren_context_get_deferred (
-	LIRenContext* self)
+int liren_context32_get_deferred (
+	LIRenContext32* self)
 {
 	return self->deferred;
 }
 
-void liren_context_set_deferred (
-	LIRenContext* self,
+void liren_context32_set_deferred (
+	LIRenContext32* self,
 	int           value)
 {
 	if (self->deferred != value)
@@ -296,8 +296,8 @@ void liren_context_set_deferred (
 	}
 }
 
-void liren_context_set_color_write (
-	LIRenContext* self,
+void liren_context32_set_color_write (
+	LIRenContext32* self,
 	int           value)
 {
 	if (self->color_write != value)
@@ -309,8 +309,8 @@ void liren_context_set_color_write (
 	}
 }
 
-void liren_context_set_depth (
-	LIRenContext* self,
+void liren_context32_set_depth (
+	LIRenContext32* self,
 	int           enable_test,
 	int           enable_write,
 	GLenum        depth_func)
@@ -326,15 +326,15 @@ void liren_context_set_depth (
 	}
 }
 
-void liren_context_set_diffuse (
-	LIRenContext* self,
+void liren_context32_set_diffuse (
+	LIRenContext32* self,
 	const float*  value)
 {
-	liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_MATERIAL_DIFFUSE, value);
+	liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_MATERIAL_DIFFUSE, value);
 }
 
-void liren_context_set_flags (
-	LIRenContext* self,
+void liren_context32_set_flags (
+	LIRenContext32* self,
 	int           value)
 {
 /*	self->lighting = ((value & LIREN_FLAG_LIGHTING) != 0);
@@ -342,17 +342,17 @@ void liren_context_set_flags (
 	self->shadows = ((value & LIREN_FLAG_SHADOW1) != 0);
 }
 
-void liren_context_set_frustum (
-	LIRenContext*       self,
+void liren_context32_set_frustum (
+	LIRenContext32*       self,
 	const LIMatFrustum* frustum)
 {
 	self->frustum = *frustum;
 }
 
-void liren_context_set_light (
-	LIRenContext* self,
+void liren_context32_set_light (
+	LIRenContext32* self,
 	int           index,
-	LIRenLight*   value)
+	LIRenLight32*   value)
 {
 	const float black[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	const float infinite[3] = { 999999.0f, 999999.0f, 999999.0f };
@@ -360,46 +360,46 @@ void liren_context_set_light (
 	if (value != NULL)
 	{
 		self->light = value;
-		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_AMBIENT + index, value->ambient);
-		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_DIFFUSE + index, value->diffuse);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_EQUATION + index, value->equation);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION + index, value->cache.pos_world);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION_PREMULT + index, value->cache.pos_view);
-		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_SPECULAR + index, value->specular);
+		liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_AMBIENT + index, value->ambient);
+		liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_DIFFUSE + index, value->diffuse);
+		liren_uniforms32_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_EQUATION + index, value->equation);
+		liren_uniforms32_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION + index, value->cache.pos_world);
+		liren_uniforms32_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION_PREMULT + index, value->cache.pos_view);
+		liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_SPECULAR + index, value->specular);
 	}
 	else
 	{
-		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_AMBIENT + index, black);
-		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_DIFFUSE + index, black);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_EQUATION + index, infinite);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION + index, infinite);
-		liren_uniforms_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION_PREMULT + index, infinite);
-		liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_SPECULAR + index, black);
+		liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_AMBIENT + index, black);
+		liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_DIFFUSE + index, black);
+		liren_uniforms32_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_EQUATION + index, infinite);
+		liren_uniforms32_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION + index, infinite);
+		liren_uniforms32_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_POSITION_PREMULT + index, infinite);
+		liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_SPECULAR + index, black);
 	}
 }
 
-void liren_context_set_material (
-	LIRenContext*        self,
-	const LIRenMaterial* value)
+void liren_context32_set_material (
+	LIRenContext32*        self,
+	const LIRenMaterial32* value)
 {
 	lisys_assert (value->shininess > 0.0f);
 	lisys_assert (value->shininess <= 127.0f);
 
-	liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_MATERIAL_DIFFUSE, value->diffuse);
-	liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_MATERIAL_PARAM0, value->parameters);
-	liren_uniforms_set_float (&self->uniforms, LIREN_UNIFORM_MATERIAL_SHININESS, value->shininess);
-	liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_MATERIAL_SPECULAR, value->specular);
+	liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_MATERIAL_DIFFUSE, value->diffuse);
+	liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_MATERIAL_PARAM0, value->parameters);
+	liren_uniforms32_set_float (&self->uniforms, LIREN_UNIFORM_MATERIAL_SHININESS, value->shininess);
+	liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_MATERIAL_SPECULAR, value->specular);
 
 	/* Set material flags. */
 	if (value->flags & LIREN_MATERIAL_FLAG_CULLFACE)
-		liren_context_set_cull (self, 1, GL_CCW);
+		liren_context32_set_cull (self, 1, GL_CCW);
 	else
-		liren_context_set_cull (self, 0, GL_CCW);
+		liren_context32_set_cull (self, 0, GL_CCW);
 }
 
-void liren_context_set_mesh (
-	LIRenContext* self,
-	LIRenMesh*    mesh)
+void liren_context32_set_mesh (
+	LIRenContext32* self,
+	LIRenMesh32*    mesh)
 {
 	if (self->array != mesh->arrays[1])
 	{
@@ -408,8 +408,8 @@ void liren_context_set_mesh (
 	}
 }
 
-void liren_context_set_modelmatrix (
-	LIRenContext*      self,
+void liren_context32_set_modelmatrix (
+	LIRenContext32*      self,
 	const LIMatMatrix* value)
 {
 	if (memcmp (&self->matrix.model, value, sizeof (LIMatMatrix)))
@@ -417,21 +417,21 @@ void liren_context_set_modelmatrix (
 		self->matrix.model = *value;
 		self->matrix.modelview = limat_matrix_multiply (self->matrix.view, self->matrix.model);
 		self->matrix.modelviewinverse = limat_matrix_invert (self->matrix.modelview);
-		liren_uniforms_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_MODELVIEW, self->matrix.modelview.m);
-		liren_uniforms_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_MODELVIEW_INVERSE, self->matrix.modelviewinverse.m);
-		liren_uniforms_set_mat3 (&self->uniforms, LIREN_UNIFORM_MATRIX_NORMAL, self->matrix.modelview.m);
+		liren_uniforms32_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_MODELVIEW, self->matrix.modelview.m);
+		liren_uniforms32_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_MODELVIEW_INVERSE, self->matrix.modelviewinverse.m);
+		liren_uniforms32_set_mat3 (&self->uniforms, LIREN_UNIFORM_MATRIX_NORMAL, self->matrix.modelview.m);
 	}
 }
 
-void liren_context_set_param (
-	LIRenContext* self,
+void liren_context32_set_param (
+	LIRenContext32* self,
 	const float*  value)
 {
-	liren_uniforms_set_vec4 (&self->uniforms, LIREN_UNIFORM_MATERIAL_PARAM0, value);
+	liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_MATERIAL_PARAM0, value);
 }
 
-void liren_context_set_viewmatrix (
-	LIRenContext*      self,
+void liren_context32_set_viewmatrix (
+	LIRenContext32*      self,
 	const LIMatMatrix* value)
 {
 	if (memcmp (&self->matrix.view, value, sizeof (LIMatMatrix)))
@@ -439,28 +439,28 @@ void liren_context_set_viewmatrix (
 		self->matrix.view = *value;
 		self->matrix.modelview = limat_matrix_multiply (self->matrix.view, self->matrix.model);
 		self->matrix.modelviewinverse = limat_matrix_invert (self->matrix.modelview);
-		liren_uniforms_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_MODELVIEW, self->matrix.modelview.m);
-		liren_uniforms_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_MODELVIEW_INVERSE, self->matrix.modelviewinverse.m);
-		liren_uniforms_set_mat3 (&self->uniforms, LIREN_UNIFORM_MATRIX_NORMAL, self->matrix.modelview.m);
+		liren_uniforms32_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_MODELVIEW, self->matrix.modelview.m);
+		liren_uniforms32_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_MODELVIEW_INVERSE, self->matrix.modelviewinverse.m);
+		liren_uniforms32_set_mat3 (&self->uniforms, LIREN_UNIFORM_MATRIX_NORMAL, self->matrix.modelview.m);
 	}
 }
 
-void liren_context_set_projection (
-	LIRenContext*      self,
+void liren_context32_set_projection (
+	LIRenContext32*      self,
 	const LIMatMatrix* value)
 {
 	if (memcmp (&self->matrix.projection, value, sizeof (LIMatMatrix)))
 	{
 		self->matrix.projection = *value;
 		self->matrix.projectioninverse = limat_matrix_invert (self->matrix.projection);
-		liren_uniforms_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_PROJECTION, self->matrix.projection.m);
-		liren_uniforms_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_PROJECTION_INVERSE, self->matrix.projectioninverse.m);
+		liren_uniforms32_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_PROJECTION, self->matrix.projection.m);
+		liren_uniforms32_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_PROJECTION_INVERSE, self->matrix.projectioninverse.m);
 	}
 }
 
-void liren_context_set_scene (
-	LIRenContext* self,
-	LIRenScene*   scene)
+void liren_context32_set_scene (
+	LIRenContext32* self,
+	LIRenScene32*   scene)
 {
 	self->scene = scene;
 	/* FIXME */
@@ -468,8 +468,8 @@ void liren_context_set_scene (
 	self->light = NULL;
 }
 
-int liren_context_get_scissor (
-	LIRenContext* self,
+int liren_context32_get_scissor (
+	LIRenContext32* self,
 	int*          x,
 	int*          y,
 	int*          w,
@@ -482,8 +482,8 @@ int liren_context_get_scissor (
 	return self->scissor.enabled;
 }
 
-void liren_context_set_scissor (
-	LIRenContext* self,
+void liren_context32_set_scissor (
+	LIRenContext32* self,
 	int           enabled,
 	int           x,
 	int           y,
@@ -511,10 +511,10 @@ void liren_context_set_scissor (
 	}
 }
 
-void liren_context_set_shader (
-	LIRenContext* self,
+void liren_context32_set_shader (
+	LIRenContext32* self,
 	int           pass,
-	LIRenShader*  value)
+	LIRenShader32*  value)
 {
 	if (pass != self->shader_pass || value != self->shader)
 	{
@@ -524,32 +524,32 @@ void liren_context_set_shader (
 	}
 	if (value != NULL)
 	{
-		liren_context_set_alpha_to_coverage (self, value->passes[pass].alpha_to_coverage);
-		liren_context_set_blend (self, value->passes[pass].blend_enable,
+		liren_context32_set_alpha_to_coverage (self, value->passes[pass].alpha_to_coverage);
+		liren_context32_set_blend (self, value->passes[pass].blend_enable,
 			value->passes[pass].blend_src, value->passes[pass].blend_dst);
-		liren_context_set_color_write (self, value->passes[pass].color_write);
-		liren_context_set_depth (self, value->passes[pass].depth_test,
+		liren_context32_set_color_write (self, value->passes[pass].color_write);
+		liren_context32_set_depth (self, value->passes[pass].depth_test,
 			value->passes[pass].depth_write, value->passes[pass].depth_func);
 	}
 }
 
-void liren_context_set_textures (
-	LIRenContext* self,
-	LIRenTexture* value,
+void liren_context32_set_textures (
+	LIRenContext32* self,
+	LIRenTexture32* value,
 	int           count)
 {
 	int c;
 	int i;
 	GLenum gltarget;
 	GLuint gltexture;
-	LIRenContextTexture* texture;
+	LIRenContextTexture32* texture;
 
 	c = LIMAT_MIN (count, 4);
 	for (i = 0 ; i < c ; i++)
 	{
 		texture = self->textures.array + i;
-		gltarget = liren_texture_get_target (value + i);
-		gltexture = liren_texture_get_texture (value + i);
+		gltarget = liren_texture32_get_target (value + i);
+		gltexture = liren_texture32_get_texture (value + i);
 		/* Bind cube maps. */
 		/* Only one cube map is supported at a time and it's bound to a
 		   special sampler. The 2D sampler whose index contained a cube map
@@ -587,14 +587,14 @@ void liren_context_set_textures (
 	}
 }
 
-void liren_context_set_textures_raw (
-	LIRenContext* self,
+void liren_context32_set_textures_raw (
+	LIRenContext32* self,
 	GLuint*       value,
 	int           count)
 {
 	int c;
 	int i;
-	LIRenContextTexture* texture;
+	LIRenContextTexture32* texture;
 
 	c = LIMAT_MIN (count, 4);
 	for (i = 0 ; i < c ; i++)
@@ -619,11 +619,11 @@ void liren_context_set_textures_raw (
 	}
 }
 
-void liren_context_set_time (
-	LIRenContext* self,
+void liren_context32_set_time (
+	LIRenContext32* self,
 	float         time)
 {
-	liren_uniforms_set_float (&self->uniforms, LIREN_UNIFORM_TIME, time);
+	liren_uniforms32_set_float (&self->uniforms, LIREN_UNIFORM_TIME, time);
 }
 
 /** @} */

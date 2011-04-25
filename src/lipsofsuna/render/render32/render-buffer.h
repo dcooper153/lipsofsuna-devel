@@ -15,15 +15,16 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_BUFFER_H__
-#define __RENDER_BUFFER_H__
+#ifndef __RENDER32_BUFFER_H__
+#define __RENDER32_BUFFER_H__
 
-#include "lipsofsuna/model.h"
-#include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
+#include <lipsofsuna/model.h>
+#include <lipsofsuna/system.h>
+#include <lipsofsuna/video.h>
+#include "render-material.h"
 #include "render-types.h"
 
-LIAPICALL (LIRenBuffer*, liren_buffer_new, (
+LIAPICALL (LIRenBuffer32*, liren_buffer32_new, (
 	const void*        index_data,
 	int                index_count,
 	const LIRenFormat* vertex_format,
@@ -31,7 +32,32 @@ LIAPICALL (LIRenBuffer*, liren_buffer_new, (
 	int                vertex_count,
 	int                type));
 
-LIAPICALL (void, liren_buffer_free, (
-	LIRenBuffer* self));
+LIAPICALL (void, liren_buffer32_free, (
+	LIRenBuffer32* self));
+
+LIAPICALL (void*, liren_buffer32_lock_indices, (
+	LIRenBuffer32* self,
+	int            write));
+
+LIAPICALL (void*, liren_buffer32_lock_vertices, (
+	LIRenBuffer32* self,
+	int            write));
+
+LIAPICALL (void, liren_buffer32_unlock_indices, (
+	LIRenBuffer32* self,
+	void*          data));
+
+LIAPICALL (void, liren_buffer32_unlock_vertices, (
+	LIRenBuffer32* self,
+	void*          data));
+
+LIAPICALL (void, liren_buffer32_upload_vertices, (
+	LIRenBuffer32* self,
+	int            start,
+	int            count,
+	const void*    data));
+
+LIAPICALL (int, liren_buffer32_get_size, (
+	LIRenBuffer32* self));
 
 #endif

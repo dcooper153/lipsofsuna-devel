@@ -25,102 +25,50 @@
 #include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-private.h"
+#include "render-scene.h"
 
-#define LIREN_LIGHT_MAXIMUM_RATING 100.0f
-#define LIREN_PARTICLE_MAXIMUM_COUNT 1000
-
-static int private_init (
-	LIRenScene* self);
-
-static void private_render_pass (
-	LIRenScene*   self,
-	LIRenContext* context,
-	int           pass,
-	int           sorting);
-
-static int private_render_postproc (
-	LIRenScene*       self,
-	LIRenContext*     context,
-	LIRenFramebuffer* framebuffer,
-	int               pass,
-	const char*       name,
-	int               mipmaps);
-
-static int private_sort_scene (
-	LIRenScene*   self,
-	LIRenContext* context);
-
-/*****************************************************************************/
-
-LIRenScene*
-liren_scene_new (LIRenRender* render)
+LIRenScene* liren_scene_new (
+	LIRenRender* render)
 {
 	LIRenScene* self;
 
-	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIRenScene));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
 
-	/* Register self. */
-	if (!lialg_ptrdic_insert (render->scenes, self, self))
-		goto error;
-
-	/* Allocate object list. */
+	/* Allocate the object list. */
 	self->objects = lialg_u32dic_new ();
 	if (self->objects == NULL)
-		goto error;
-	self->groups = lialg_ptrdic_new ();
-	if (self->groups == NULL)
-		goto error;
+	{
+		liren_scene_free (self);
+		return NULL;
+	}
 
-	/* Initialize subsystems. */
-	if (!private_init (self))
-		goto error;
+	/* Initialize the backend. */
+	self->v32 = liren_scene32_new (self, render->v32);
+	if (self->v32 == NULL)
+	{
+		liren_scene_free (self);
+		return NULL;
+	}
 
 	return self;
-
-error:
-	liren_scene_free (self);
-	return NULL;
 }
 
-void
-liren_scene_free (LIRenScene* self)
+void liren_scene_free (
+	LIRenScene* self)
 {
-	/* Free sky. */
-	if (self->sky.model != NULL)
-		liren_object_free (self->sky.model);
-
-	/* Free lights. */
-	if (self->lighting != NULL)
-		liren_lighting_free (self->lighting);
-
-	if (self->sort != NULL)
-		liren_sort_free (self->sort);
-
-	/* Free objects. */
-	if (self->groups != NULL)
-	{
-		lisys_assert (self->groups->size == 0);
-		lialg_ptrdic_free (self->groups);
-	}
 	if (self->objects != NULL)
-	{
-		//lisys_assert (self->objects->size == 0);
 		lialg_u32dic_free (self->objects);
-	}
-
-	/* Unregister self. */
-	lialg_ptrdic_remove (self->render->scenes, self);
-
+	if (self->v32 != NULL)
+		liren_scene32_free (self->v32);
 	lisys_free (self);
 }
 
-LIRenObject*
-liren_scene_find_object (LIRenScene* self,
-                         int         id)
+LIRenObject* liren_scene_find_object (
+	LIRenScene* self,
+	int         id)
 {
 	return lialg_u32dic_find (self->objects, id);
 }
@@ -129,29 +77,21 @@ void liren_scene_insert_light (
 	LIRenScene* self,
 	LIRenLight* light)
 {
-	liren_lighting_insert_light (self->lighting, light);
+	liren_scene32_insert_light (self->v32, light->v32);
 }
 
 void liren_scene_remove_light (
 	LIRenScene* self,
 	LIRenLight* light)
 {
-	liren_lighting_remove_light (self->lighting, light);
+	liren_scene32_remove_light (self->v32, light->v32);
 }
 
 void liren_scene_remove_model (
 	LIRenScene* self,
 	LIRenModel* model)
 {
-	LIAlgU32dicIter iter;
-	LIRenObject* object;
-
-	LIALG_U32DIC_FOREACH (iter, self->objects)
-	{
-		object = iter.value;
-		if (object->model == model)
-			liren_object_set_model (object, NULL);
-	}
+	return liren_scene32_remove_model (self->v32, model->v32);
 }
 
 /**
@@ -179,92 +119,9 @@ void liren_scene_render (
 	LIRenPassPostproc* postproc_passes,
 	int                postproc_passes_num)
 {
-	int i;
-	int postproc_passes_done;
-	float tmp[3];
-	GLint orig_viewport[4];
-	LIMatMatrix inv;
-	LIMatVector eye;
-	LIRenContext* context;
-
-	lisys_assert (modelview != NULL);
-	lisys_assert (projection != NULL);
-	lisys_assert (frustum != NULL);
-	lisys_assert (framebuffer != NULL);
-	lisys_assert (viewport[2] == framebuffer->width);
-	lisys_assert (viewport[3] == framebuffer->height);
-	glGetIntegerv (GL_VIEWPORT, orig_viewport);
-
-	/* Initialize the context. */
-	context = liren_render_get_context (self->render);
-	liren_context_init (context);
-	liren_context_set_scene (context, self);
-	liren_context_set_frustum (context, frustum);
-	liren_context_set_projection (context, projection);
-	liren_context_set_viewmatrix (context, modelview);
-	liren_context_set_time (context, self->time);
-
-	/* Calculate camera position. */
-	inv = limat_matrix_invert (*modelview);
-	eye = limat_matrix_transform (inv, limat_vector_init (0.0f, 0.0f, 0.0f));
-	tmp[0] = eye.x;
-	tmp[1] = eye.y;
-	tmp[2] = eye.z;
-	liren_uniforms_set_vec3 (&context->uniforms, LIREN_UNIFORM_CAMERA_POSITION, tmp);
-
-	/* Depth sort scene. */
-	if (!private_sort_scene (self, context))
-		return;
-
-	/* Upload light settings. */
-	liren_lighting_upload (self->lighting, context);
-
-	/* Reset profiling. */
-#ifdef LIREN_ENABLE_PROFILING
-	self->render->profiling.objects = 0;
-	self->render->profiling.materials = 0;
-	self->render->profiling.faces = 0;
-	self->render->profiling.vertices = 0;
-#endif
-
-	/* Enable backbuffer viewport. */
-	glBindFramebuffer (GL_FRAMEBUFFER, framebuffer->render_framebuffer);
-	glViewport (0, 0, viewport[2], viewport[3]);
-	glClear (GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-
-	/* Render scene passes. */
-	for (i = 0 ; i < render_passes_num ; i++)
-		private_render_pass (self, context, render_passes[i].pass, render_passes[i].sort);
-
-	/* Render post-processing effects. */
-	postproc_passes_done = 0;
-	for (i = 0 ; i < postproc_passes_num ; i++)
-	{
-		postproc_passes_done += private_render_postproc (self, context, framebuffer,
-			postproc_passes_done, postproc_passes[i].shader, postproc_passes[i].mipmap);
-	}
-
-	/* Blit to the screen. */
-	/* If no post-processing steps were done, we blit directly from the render
-	   buffer. Otherwise, the final image is in the first post-processing
-	   buffer and we need to blit from there. */
-	if (postproc_passes_done)
-		glBindFramebuffer (GL_READ_FRAMEBUFFER, framebuffer->postproc_framebuffers[0]);
-	else
-		glBindFramebuffer (GL_READ_FRAMEBUFFER, framebuffer->render_framebuffer);
-	glBindFramebuffer (GL_DRAW_FRAMEBUFFER, 0);
-	glBlitFramebuffer (0, 0, viewport[2], viewport[3], viewport[0], viewport[1],
-		viewport[0] + viewport[2], viewport[1] + viewport[3], GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-	/* Restore the original viewport. */
-	glViewport (orig_viewport[0], orig_viewport[1], orig_viewport[2], orig_viewport[3]);
-
-	/* Profiling report. */
-#ifdef LIREN_ENABLE_PROFILING
-	printf ("RENDER PROFILING: objects=%d materials=%d polys=%d verts=%d\n",
-		self->render->profiling.objects, self->render->profiling.materials,
-		self->render->profiling.faces, self->render->profiling.vertices);
-#endif
+	return liren_scene32_render (self->v32, framebuffer->v32, viewport,
+		modelview, projection, frustum, render_passes, render_passes_num,
+		postproc_passes, postproc_passes_num);
 }
 
 /**
@@ -276,215 +133,7 @@ void liren_scene_update (
 	LIRenScene* self,
 	float       secs)
 {
-	LIAlgU32dicIter iter;
-	LIRenObject* object;
-
-	/* Update the effect timer. */
-	self->time += secs;
-
-	/* Update objects. */
-	LIALG_U32DIC_FOREACH (iter, self->objects)
-	{
-		object = iter.value;
-		liren_object_update (object, secs);
-	}
-
-	/* Update lights. */
-	liren_lighting_update (self->lighting);
-}
-
-/*****************************************************************************/
-
-static int private_init (
-	LIRenScene* self)
-{
-	self->lighting = liren_lighting_new (self->render);
-	if (self->lighting == NULL)
-		return 0;
-	self->sort = liren_sort_new (self->render);
-	if (self->sort == NULL)
-		return 0;
-	return 1;
-}
-
-static void private_render_pass (
-	LIRenScene*   self,
-	LIRenContext* context,
-	int           pass,
-	int           sorting)
-{
-	int i;
-	LIMatMatrix identity;
-	LIMatVector position;
-	LIRenSortface* face;
-	LIRenSortgroup* group;
-
-	/* Initialize pass. */
-	identity = limat_matrix_identity ();
-
-	/* Render each group. */
-	if (!sorting)
-	{
-		/* Render unsorted groups. */
-		for (i = 0 ; i < self->sort->groups.count ; i++)
-		{
-			group = self->sort->groups.array + i;
-			if (!group->material->shader->passes[pass].program)
-				continue;
-			liren_context_set_material (context, group->material);
-			liren_context_set_modelmatrix (context, &group->matrix);
-			liren_context_set_shader (context, pass, group->material->shader);
-			liren_context_set_textures (context, group->material->textures.array, group->material->textures.count);
-			liren_context_set_mesh (context, group->mesh);
-			liren_context_bind (context);
-			liren_context_render_array (context, GL_TRIANGLES, group->index, group->count);
-		}
-	}
-	else
-	{
-		/* Render sorted groups. */
-		for (i = self->sort->buckets.count - 1 ; i >= 0 ; i--)
-		{
-			for (face = self->sort->buckets.array[i] ; face != NULL ; face = face->next)
-			{
-				if (face->type == LIREN_SORT_TYPE_FACE)
-				{
-					/* Render a single transparent triangle. */
-					if (!face->face.material->shader->passes[pass].program)
-						continue;
-					liren_context_set_material (context, face->face.material);
-					liren_context_set_modelmatrix (context, &face->face.matrix);
-					liren_context_set_shader (context, pass, face->face.material->shader);
-					liren_context_set_textures (context, face->face.material->textures.array, face->face.material->textures.count);
-					liren_context_set_mesh (context, face->face.mesh);
-					liren_context_bind (context);
-					liren_context_render_array (context, GL_TRIANGLES, face->face.index, 3);
-				}
-				else if (face->type == LIREN_SORT_TYPE_GROUP)
-				{
-					/* Render a group of transparent triangles. */
-					if (!face->group.material->shader->passes[pass].program)
-						continue;
-					liren_context_set_material (context, face->group.material);
-					liren_context_set_modelmatrix (context, &face->group.matrix);
-					liren_context_set_shader (context, pass, face->group.material->shader);
-					liren_context_set_textures (context, face->group.material->textures.array, face->group.material->textures.count);
-					liren_context_set_mesh (context, face->group.mesh);
-					liren_context_bind (context);
-					liren_context_render_array (context, GL_TRIANGLES, face->group.index, face->group.count);
-				}
-				else if (face->type == LIREN_SORT_TYPE_PARTICLE)
-				{
-					/* Render a particle. */
-					if (!face->particle.shader->passes[pass].program)
-						continue;
-					liren_context_set_modelmatrix (context, &identity);
-					liren_context_set_shader (context, pass, face->particle.shader);
-					liren_context_set_textures_raw (context, &face->particle.image->texture->texture, 1);
-					liren_context_bind (context);
-					glBegin (GL_TRIANGLES);
-					glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, face->particle.diffuse[3], face->particle.size);
-					position = face->particle.position;
-					glVertexAttrib3fv (LIREN_ATTRIBUTE_NORMAL, face->particle.diffuse);
-					glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
-					glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
-					glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
-					glEnd ();
-				}
-			}
-		}
-	}
-}
-
-static int private_render_postproc (
-	LIRenScene*       self,
-	LIRenContext*     context,
-	LIRenFramebuffer* framebuffer,
-	int               pass,
-	const char*       name,
-	int               mipmaps)
-{
-	GLuint tmp;
-	float param[4];
-	LIRenShader* shader;
-
-	/* Find the shader. */
-	shader = liren_render_find_shader (self->render, name);
-	if (shader == NULL)
-		return 0;
-
-	/* Blit to the post-processing buffer. */
-	/* This is needed because the render buffer is multisampled but the
-	   post-processing buffer isn't due to fragment shader performance.
-	   Multisamples needs to be resolved before post-processing. */
-	if (!pass)
-	{
-		glBindFramebuffer (GL_READ_FRAMEBUFFER, framebuffer->render_framebuffer);
-		glBindFramebuffer (GL_DRAW_FRAMEBUFFER, framebuffer->postproc_framebuffers[0]);
-		glBlitFramebuffer (0, 0, framebuffer->width, framebuffer->height, 0, 0,
-			framebuffer->width, framebuffer->height, GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-	}
-
-	/* Calculate the pixel size in texture units. */
-	param[0] = 1.0f / framebuffer->width;
-	param[1] = 1.0f / framebuffer->height;
-	param[2] = 0.0;
-	param[3] = 0.0;
-
-	/* Render from the first buffer to the second. */
-	glBindFramebuffer (GL_FRAMEBUFFER, framebuffer->postproc_framebuffers[1]);
-	liren_context_set_buffer (context, self->render->helpers.unit_quad);
-	liren_context_set_blend (context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	liren_context_set_cull (context, 0, GL_CCW);
-	liren_context_set_param (context, param);
-	liren_context_set_shader (context, 0, shader);
-	liren_context_set_textures_raw (context, framebuffer->postproc_textures, 1);
-	if (mipmaps)
-	{
-		liren_context_bind (context);
-		glGenerateMipmap (GL_TEXTURE_2D);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		liren_context_render_indexed (context, 0, 6);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	}
-	else
-	{
-		liren_context_bind (context);
-		liren_context_render_indexed (context, 0, 6);
-	}
-
-	/* Swap the buffers so that we can chain passes. */
-	tmp = framebuffer->postproc_framebuffers[0];
-	framebuffer->postproc_framebuffers[0] = framebuffer->postproc_framebuffers[1];
-	framebuffer->postproc_framebuffers[1] = tmp;
-	tmp = framebuffer->postproc_textures[0];
-	framebuffer->postproc_textures[0] = framebuffer->postproc_textures[1];
-	framebuffer->postproc_textures[1] = tmp;
-
-	return 1;
-}
-
-static int private_sort_scene (
-	LIRenScene*   self,
-	LIRenContext* context)
-{
-	LIAlgU32dicIter iter;
-	LIRenObject* rndobj;
-
-	/* Initialize sorting. */
-	liren_sort_clear (self->sort, &context->matrix.view, &context->matrix.projection);
-	liren_context_bind (context);
-
-	/* Collect scene objects. */
-	LIALG_U32DIC_FOREACH (iter, self->objects)
-	{
-		rndobj = iter.value;
-		if (!liren_object_get_realized (rndobj))
-			continue;
-		liren_sort_add_object (self->sort, rndobj);
-	}
-
-	return 1;
+	return liren_scene32_update (self->v32, secs);
 }
 
 /** @} */

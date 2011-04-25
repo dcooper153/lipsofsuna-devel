@@ -15,41 +15,27 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER32_LIGHTING_H__
-#define __RENDER32_LIGHTING_H__
+#ifndef __RENDER32_FRAMEBUFFER_H__
+#define __RENDER32_FRAMEBUFFER_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/system.h>
-#include <lipsofsuna/video.h>
 #include "render.h"
-#include "render-light.h"
 #include "render-types.h"
 
-struct _LIRenLighting32
-{
-	LIAlgPtrdic* lights;
-	LIRenRender32* render;
-};
+LIAPICALL (LIRenFramebuffer32*, liren_framebuffer32_new, (
+	LIRenRender32* render,
+	int            width,
+	int            height,
+	int            samples,
+	int            hdr));
 
-LIAPICALL (LIRenLighting32*, liren_lighting32_new, (
-	LIRenRender32* render));
+LIAPICALL (void, liren_framebuffer32_free, (
+	LIRenFramebuffer32* self));
 
-LIAPICALL (void, liren_lighting32_free, (
-	LIRenLighting32* self));
-
-LIAPICALL (int, liren_lighting32_insert_light, (
-	LIRenLighting32* self,
-	LIRenLight32*    light));
-
-LIAPICALL (void, liren_lighting32_remove_light, (
-	LIRenLighting32* self,
-	LIRenLight32*    light));
-
-LIAPICALL (void, liren_lighting32_update, (
-	LIRenLighting32* self));
-
-LIAPICALL (void, liren_lighting32_upload, (
-	LIRenLighting32* self,
-	LIRenContext32*  context));
+LIAPICALL (int, liren_framebuffer32_resize, (
+	LIRenFramebuffer32* self,
+	int                 width,
+	int                 height,
+	int                 samples,
+	int                 hdr));
 
 #endif

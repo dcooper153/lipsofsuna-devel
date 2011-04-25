@@ -15,8 +15,8 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_ATTRIBUTE_H__
-#define __RENDER_ATTRIBUTE_H__
+#ifndef __RENDER32_ATTRIBUTE_H__
+#define __RENDER32_ATTRIBUTE_H__
 
 enum
 {

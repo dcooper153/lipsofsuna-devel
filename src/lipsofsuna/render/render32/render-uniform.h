@@ -15,11 +15,11 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_UNIFORM_H__
-#define __RENDER_UNIFORM_H__
+#ifndef __RENDER32_UNIFORM_H__
+#define __RENDER32_UNIFORM_H__
 
 #include <lipsofsuna/video.h>
-#include "../render-types.h"
+#include "render-types.h"
 
 enum
 {

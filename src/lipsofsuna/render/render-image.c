@@ -25,18 +25,8 @@
 #include "render.h"
 #include "render-image.h"
 #include "render-private.h"
-
-static const uint8_t missing_image[16] =
-{
-	255, 255, 255, 255, 255, 255, 255, 255,
-	255, 255, 255, 255, 255, 255, 255, 255
-};
-
-static int private_init (
-	LIRenImage* self,
-	const char* name);
-
-/*****************************************************************************/
+#include "render32/render-image.h"
+#include "render32/render-private.h"
 
 /**
  * \brief Creates an empty image.
@@ -50,60 +40,23 @@ LIRenImage* liren_image_new (
 {
 	LIRenImage* self;
 
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIRenImage));
-	if (self == NULL)
-		return NULL;
-	self->render = render;
-	self->empty = 1;
-
-	/* Set name and path. */
-	if (!private_init (self, name))
-	{
-		liren_image_free (self);
-		return NULL;
-	}
-
-	/* Load texture. */
-	if (!liren_image_reload (self))
-	{
-		liren_image_free (self);
-		return NULL;
-	}
-
-	return self;
-}
-
-/**
- * \brief Creates an image from a file.
- * \param render Renderer.
- * \param name Image name.
- * \return Image or NULL.
- */
-LIRenImage* liren_image_new_from_file (
-	LIRenRender* render,
-	const char*  name)
-{
-	LIRenImage* self;
-
-	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIRenImage));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
 
-	/* Set name and path. */
-	if (!private_init (self, name))
+	self->v32 = liren_image32_new_from_file (render->v32, name);
+	if (self->v32 == NULL)
 	{
-		liren_image_free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
-	/* Load texture. */
-	if (!liren_image_reload (self))
+	/* Add to dictionary. */
+	if (!lialg_strdic_insert (self->render->images, name, self))
 	{
 		liren_image_free (self);
-		return NULL;
+		return 0;
 	}
 
 	return self;
@@ -116,99 +69,28 @@ LIRenImage* liren_image_new_from_file (
 void liren_image_free (
 	LIRenImage* self)
 {
-	/* Remove from dictionary. */
-	if (self->added)
-		lialg_strdic_remove (self->render->images, self->name);
-
-	if (self->texture != NULL)
-		liimg_texture_free (self->texture);
-	lisys_free (self->name);
-	lisys_free (self->path);
+	if (self->v32->added)
+		lialg_strdic_remove (self->render->images, self->v32->name);
+	liren_image32_free (self->v32);
 	lisys_free (self);
-}
-
-/**
- * \brief Loads or reloads the image.
- * \param self Image.
- * \return Nonzero on success.
- */
-int liren_image_reload (
-	LIRenImage* self)
-{
-	LIImgTexture* texture;
-
-	/* Load to a temporary texture. */
-	if (self->empty)
-		texture = liimg_texture_new_from_rgba (2, 2, missing_image);
-	else
-		texture = liimg_texture_new_from_file (self->path);
-	if (texture == NULL)
-		return 0;
-
-	/* Use the loaded texture on success. */
-	if (self->texture != NULL)
-		liimg_texture_free (self->texture);
-	self->texture = texture;
-
-	return 1;
 }
 
 GLuint liren_image_get_handle (
 	const LIRenImage* self)
 {
-	return self->texture->texture;
+	return liren_image32_get_handle (self->v32);
 }
 
 int liren_image_get_height (
 	const LIRenImage* self)
 {
-	return self->texture->height;
+	return liren_image32_get_height (self->v32);
 }
 
 int liren_image_get_width (
 	const LIRenImage* self)
 {
-	return self->texture->width;
-}
-
-/*****************************************************************************/
-
-static int private_init (
-	LIRenImage* self,
-	const char* name)
-{
-	char* file;
-	LIAlgStrdicNode* node;
-
-	/* Allocate name. */
-	self->name = listr_dup (name);
-	if (self->name == NULL)
-		return 0;
-
-	/* Allocate path. */
-	file = listr_concat (name, ".dds");
-	if (file == NULL)
-		return 0;
-	self->path = lipth_paths_get_graphics (self->render->paths, file);
-	free (file);
-	if (self->path == NULL)
-		return 0;
-
-	/* Add to dictionary. */
-	node = lialg_strdic_find_node (self->render->images, name);
-	if (node == NULL)
-	{
-		if (!lialg_strdic_insert (self->render->images, name, self))
-			return 0;
-	}
-	else
-	{
-		((LIRenImage*) node->value)->added = 0;
-		node->value = self;
-	}
-	self->added = 1;
-
-	return 1;
+	return liren_image32_get_width (self->v32);
 }
 
 /** @} */

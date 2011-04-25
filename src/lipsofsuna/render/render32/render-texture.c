@@ -22,37 +22,37 @@
  * @{
  */
 
-#include "../render-private.h"
+#include "render-private.h"
 #include "render-texture.h"
 
-void liren_texture_init (
-	LIRenTexture* self)
+void liren_texture32_init (
+	LIRenTexture32* self)
 {
-	memset (self, 0, sizeof (LIRenTexture));
+	memset (self, 0, sizeof (LIRenTexture32));
 }
 
-void liren_texture_free (
-	LIRenTexture* self)
+void liren_texture32_free (
+	LIRenTexture32* self)
 {
 }
 
-void liren_texture_set_image (
-	LIRenTexture* self,
-	LIRenImage*   value)
+void liren_texture32_set_image (
+	LIRenTexture32* self,
+	LIRenImage32*   value)
 {
 	self->image = value;
 }
 
-GLenum liren_texture_get_target (
-	const LIRenTexture* self)
+GLenum liren_texture32_get_target (
+	const LIRenTexture32* self)
 {
 	if (self->image != NULL && self->image->texture != NULL)
 		return self->image->texture->target;
 	return GL_TEXTURE_2D;
 }
 
-GLuint liren_texture_get_texture (
-	const LIRenTexture* self)
+GLuint liren_texture32_get_texture (
+	const LIRenTexture32* self)
 {
 	if (self->image != NULL && self->image->texture != NULL)
 		return self->image->texture->texture;

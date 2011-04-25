@@ -25,24 +25,24 @@
 #include "render-uniforms.h"
 
 static void private_queue_mat (
-	LIRenUniforms* self,
-	int            uniform,
-	const float*   value,
-	int            size);
+	LIRenUniforms32* self,
+	int              uniform,
+	const float*     value,
+	int              size);
 
 static void private_queue_vec (
-	LIRenUniforms* self,
-	int            uniform,
-	const float*   value,
-	int            size);
+	LIRenUniforms32* self,
+	int              uniform,
+	const float*     value,
+	int              size);
 
 /****************************************************************************/
 
-void liren_uniforms_init (
-	LIRenUniforms* self)
+void liren_uniforms32_init (
+	LIRenUniforms32* self)
 {
 	/* Initialize self. */
-	memset (self, 0, sizeof (LIRenUniforms));
+	memset (self, 0, sizeof (LIRenUniforms32));
 	self->flush_range_start = 0;
 	self->flush_range_end = 0;
 
@@ -52,16 +52,16 @@ void liren_uniforms_init (
 	glBufferData (GL_UNIFORM_BUFFER, LIREN_UNIFORM_BUFFER_SIZE, self->data, GL_DYNAMIC_DRAW);
 }
 
-void liren_uniforms_clear (
-	LIRenUniforms* self)
+void liren_uniforms32_clear (
+	LIRenUniforms32* self)
 {
 	glDeleteBuffers (1, &self->uniform_buffer);
-	memset (self, 0, sizeof (LIRenUniforms));
+	memset (self, 0, sizeof (LIRenUniforms32));
 }
 
-void liren_uniforms_setup (
-	LIRenUniforms* self,
-	GLuint         program)
+void liren_uniforms32_setup (
+	LIRenUniforms32* self,
+	GLuint           program)
 {
 	int i;
 	const char* uniform_names[LIREN_UNIFORM_COUNT] = {
@@ -138,8 +138,8 @@ void liren_uniforms_setup (
 	}
 }
 
-void liren_uniforms_commit (
-	LIRenUniforms* self)
+void liren_uniforms32_commit (
+	LIRenUniforms32* self)
 {
 	int start;
 	int end;
@@ -155,42 +155,42 @@ void liren_uniforms_commit (
 	self->flush_range_end = 0;
 }
 
-void liren_uniforms_set_float (
-	LIRenUniforms* self,
-	int            uniform,
-	float          value)
+void liren_uniforms32_set_float (
+	LIRenUniforms32* self,
+	int              uniform,
+	float            value)
 {
 	private_queue_vec (self, uniform, &value, 1);
 }
 
-void liren_uniforms_set_vec3 (
-	LIRenUniforms* self,
-	int            uniform,
-	const float*   value)
+void liren_uniforms32_set_vec3 (
+	LIRenUniforms32* self,
+	int              uniform,
+	const float*     value)
 {
 	private_queue_vec (self, uniform, value, 3);
 }
 
-void liren_uniforms_set_vec4 (
-	LIRenUniforms* self,
-	int            uniform,
-	const float*   value)
+void liren_uniforms32_set_vec4 (
+	LIRenUniforms32* self,
+	int              uniform,
+	const float*     value)
 {
 	private_queue_vec (self, uniform, value, 4);
 }
 
-void liren_uniforms_set_mat3 (
-	LIRenUniforms* self,
-	int            uniform,
-	const float*   value)
+void liren_uniforms32_set_mat3 (
+	LIRenUniforms32* self,
+	int              uniform,
+	const float*     value)
 {
 	private_queue_mat (self, uniform, value, 3);
 }
 
-void liren_uniforms_set_mat4 (
-	LIRenUniforms* self,
-	int            uniform,
-	const float*   value)
+void liren_uniforms32_set_mat4 (
+	LIRenUniforms32* self,
+	int              uniform,
+	const float*     value)
 {
 	private_queue_mat (self, uniform, value, 4);
 }
@@ -198,10 +198,10 @@ void liren_uniforms_set_mat4 (
 /****************************************************************************/
 
 static void private_queue_mat (
-	LIRenUniforms* self,
-	int            uniform,
-	const float*   value,
-	int            size)
+	LIRenUniforms32* self,
+	int              uniform,
+	const float*     value,
+	int              size)
 {
 	int i;
 	int offset;
@@ -223,10 +223,10 @@ static void private_queue_mat (
 }
 
 static void private_queue_vec (
-	LIRenUniforms* self,
-	int            uniform,
-	const float*   value,
-	int            size)
+	LIRenUniforms32* self,
+	int              uniform,
+	const float*     value,
+	int              size)
 {
 	int offset;
 

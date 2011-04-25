@@ -23,29 +23,30 @@
  */
 
 #include "lipsofsuna/system.h"
-#include "../render.h"
-#include "../render-private.h"
+#include "render.h"
+#include "render-context.h"
+#include "render-private.h"
 #include "render-program.h"
 #include "render-uniforms.h"
 
 static int private_compile (
-	LIRenProgram* self,
-	const char*   name,
-	const char*   vertex,
-	const char*   geometry,
-	const char*   fragment,
-	int           feedback);
+	LIRenProgram32* self,
+	const char*     name,
+	const char*     vertex,
+	const char*     geometry,
+	const char*     fragment,
+	int             feedback);
 
 static int private_check_compile (
-	LIRenProgram* self,
-	const char*   name,
-	GLint         shader,
-	const char*   code);
+	LIRenProgram32* self,
+	const char*     name,
+	GLint           shader,
+	const char*     code);
 
 static int private_check_link (
-	LIRenProgram* self,
-	const char*   name,
-	GLint         program);
+	LIRenProgram32* self,
+	const char*     name,
+	GLint           program);
 
 /****************************************************************************/
 
@@ -55,11 +56,11 @@ static int private_check_link (
  * \param render Renderer.
  * \return Nonzero on success.
  */
-int liren_program_init (
-	LIRenProgram* self,
-	LIRenRender*  render)
+int liren_program32_init (
+	LIRenProgram32* self,
+	LIRenRender32*  render)
 {
-	memset (self, 0, sizeof (LIRenProgram));
+	memset (self, 0, sizeof (LIRenProgram32));
 	self->render = render;
 	self->depth_write = 1;
 	self->depth_test = 1;
@@ -76,8 +77,8 @@ int liren_program_init (
  * \brief Clears the shader program.
  * \param self Program.
  */
-void liren_program_clear (
-	LIRenProgram* self)
+void liren_program32_clear (
+	LIRenProgram32* self)
 {
 	lisys_free (self->reload_name);
 	lisys_free (self->reload_vertex);
@@ -87,7 +88,7 @@ void liren_program_clear (
 	glDeleteShader (self->vertex);
 	glDeleteShader (self->geometry);
 	glDeleteShader (self->fragment);
-	memset (self, 0, sizeof (LIRenProgram));
+	memset (self, 0, sizeof (LIRenProgram32));
 }
 
 /**
@@ -100,21 +101,21 @@ void liren_program_clear (
  * \param feedback Nonzero to enable transform feedback.
  * \return Nonzero on success.
  */
-int liren_program_compile (
-	LIRenProgram* self,
-	const char*   name,
-	const char*   vertex,
-	const char*   geometry,
-	const char*   fragment,
-	int           feedback)
+int liren_program32_compile (
+	LIRenProgram32* self,
+	const char*     name,
+	const char*     vertex,
+	const char*     geometry,
+	const char*     fragment,
+	int             feedback)
 {
-	LIRenProgram tmp;
+	LIRenProgram32 tmp;
 
 	/* Test with a temporary program. */
-	liren_program_init (&tmp, self->render);
+	liren_program32_init (&tmp, self->render);
 	if (!private_compile (&tmp, name, vertex, geometry, fragment, feedback))
 	{
-		liren_program_clear (&tmp);
+		liren_program32_clear (&tmp);
 		return 0;
 	}
 
@@ -169,14 +170,14 @@ int liren_program_compile (
  *
  * \param self Shader program.
  */
-void liren_program_reload (
-	LIRenProgram* self)
+void liren_program32_reload (
+	LIRenProgram32* self)
 {
 	if (self->reload_vertex != NULL)
 	{
 		lisys_assert (self->reload_name != NULL);
 		lisys_assert (self->reload_fragment != NULL);
-		liren_program_compile (self,
+		liren_program32_compile (self,
 			self->reload_name,
 			self->reload_vertex,
 			self->reload_geometry,
@@ -185,36 +186,36 @@ void liren_program_reload (
 	}
 }
 
-void liren_program_set_alpha_to_coverage (
-	LIRenProgram* self,
-	int           value)
+void liren_program32_set_alpha_to_coverage (
+	LIRenProgram32* self,
+	int             value)
 {
 	self->alpha_to_coverage = value;
 }
 
-void liren_program_set_blend (
-	LIRenProgram* self,
-	int           blend_enable,
-	GLenum        blend_src,
-	GLenum        blend_dst)
+void liren_program32_set_blend (
+	LIRenProgram32* self,
+	int             blend_enable,
+	GLenum          blend_src,
+	GLenum          blend_dst)
 {
 	self->blend_enable = blend_enable;
 	self->blend_src = blend_src;
 	self->blend_dst = blend_dst;
 }
 
-void liren_program_set_color (
-	LIRenProgram* self,
-	int           color_write)
+void liren_program32_set_color (
+	LIRenProgram32* self,
+	int             color_write)
 {
 	self->color_write = color_write;
 }
 
-void liren_program_set_depth (
-	LIRenProgram* self,
-	int           depth_test,
-	int           depth_write,
-	GLenum        depth_func)
+void liren_program32_set_depth (
+	LIRenProgram32* self,
+	int             depth_test,
+	int             depth_write,
+	GLenum          depth_func)
 {
 	self->depth_test = depth_test;
 	self->depth_write = depth_write;
@@ -224,12 +225,12 @@ void liren_program_set_depth (
 /****************************************************************************/
 
 static int private_compile (
-	LIRenProgram* self,
-	const char*   name,
-	const char*   vertex,
-	const char*   geometry,
-	const char*   fragment,
-	int           feedback)
+	LIRenProgram32* self,
+	const char*     name,
+	const char*     vertex,
+	const char*     geometry,
+	const char*     fragment,
+	int             feedback)
 {
 	int i;
 	GLint restore;
@@ -404,7 +405,7 @@ static int private_compile (
 	if (uniforms != GL_INVALID_INDEX)
 	{
 		glUniformBlockBinding (self->program, uniforms, 0);
-		liren_uniforms_setup (&self->render->context->uniforms, self->program);
+		liren_uniforms32_setup (&self->render->context->uniforms, self->program);
 	}
 
 	/* Bind samplers to standard indices. */
@@ -424,10 +425,10 @@ static int private_compile (
 }
 
 static int private_check_compile (
-	LIRenProgram* self,
-	const char*   name,
-	GLint         shader,
-	const char*   code)
+	LIRenProgram32* self,
+	const char*     name,
+	GLint           shader,
+	const char*     code)
 {
 	char* text;
 	const char* type;
@@ -467,9 +468,9 @@ static int private_check_compile (
 }
 
 static int private_check_link (
-	LIRenProgram* self,
-	const char*   name,
-	GLint         program)
+	LIRenProgram32* self,
+	const char*     name,
+	GLint           program)
 {
 	char* text;
 	GLint status;

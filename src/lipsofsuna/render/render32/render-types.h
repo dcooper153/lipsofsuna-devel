@@ -15,21 +15,27 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_TYPES_H__
-#define __RENDER_TYPES_H__
+#ifndef __RENDER32_TYPES_H__
+#define __RENDER32_TYPES_H__
 
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/video.h>
-#include "render-types-common.h"
+#include "../render-types-common.h"
 
-typedef struct _LIRenBuffer LIRenBuffer;
-typedef struct _LIRenFramebuffer LIRenFramebuffer;
-typedef struct _LIRenLight LIRenLight;
-typedef struct _LIRenMaterial LIRenMaterial;
-typedef struct _LIRenModel LIRenModel;
-typedef struct _LIRenObject LIRenObject;
-typedef struct _LIRenRender LIRenRender;
-typedef struct _LIRenScene LIRenScene;
-typedef struct _LIRenShader LIRenShader;
+typedef struct _LIRenBuffer32 LIRenBuffer32;
+typedef struct _LIRenContext32 LIRenContext32;
+typedef struct _LIRenFramebuffer32 LIRenFramebuffer32;
+typedef struct _LIRenLight32 LIRenLight32;
+typedef struct _LIRenLighting32 LIRenLighting32;
+typedef struct _LIRenMaterial32 LIRenMaterial32;
+typedef struct _LIRenModel32 LIRenModel32;
+typedef struct _LIRenObject32 LIRenObject32;
+typedef struct _LIRenRender32 LIRenRender32;
+typedef struct _LIRenScene32 LIRenScene32;
+typedef struct _LIRenShader32 LIRenShader32;
+typedef struct _LIRenSort32 LIRenSort32;
+typedef struct _LIRenSortgroup32 LIRenSortgroup32;
+typedef struct _LIRenSortface32 LIRenSortface32;
+typedef struct _LIRenTexture32 LIRenTexture32;
 
 #endif

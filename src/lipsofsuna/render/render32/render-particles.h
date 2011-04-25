@@ -15,16 +15,16 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_PARTICLES_H__
-#define __RENDER_PARTICLES_H__
+#ifndef __RENDER32_PARTICLES_H__
+#define __RENDER32_PARTICLES_H__
 
 #include "lipsofsuna/math.h"
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
-#include "../render-image.h"
+#include "render-image.h"
 
-typedef struct _LIRenParticle LIRenParticle;
-struct _LIRenParticle
+typedef struct _LIRenParticle32 LIRenParticle32;
+struct _LIRenParticle32
 {
 	int buffer_start;
 	int buffer_end;
@@ -32,14 +32,14 @@ struct _LIRenParticle
 	int frame_end;
 };
 
-typedef struct _LIRenParticleFrame LIRenParticleFrame;
-struct _LIRenParticleFrame
+typedef struct _LIRenParticleFrame32 LIRenParticleFrame32;
+struct _LIRenParticleFrame32
 {
 	LIMatVector coord;
 };
 
-typedef struct _LIRenParticleSystem LIRenParticleSystem;
-struct _LIRenParticleSystem
+typedef struct _LIRenParticleSystem32 LIRenParticleSystem32;
+struct _LIRenParticleSystem32
 {
 	int frame_start;
 	int frame_end;
@@ -50,40 +50,40 @@ struct _LIRenParticleSystem
 	int particle_end;
 	float particle_size;
 	char* shader;
-	LIRenImage* image;
+	LIRenImage32* image;
 };
 
-typedef struct _LIRenParticles LIRenParticles;
-struct _LIRenParticles
+typedef struct _LIRenParticles32 LIRenParticles32;
+struct _LIRenParticles32
 {
 	LIMatAabb bounds;
 	struct
 	{
 		int count;
-		LIRenParticleFrame* array;
+		LIRenParticleFrame32* array;
 	} frames;
 	struct
 	{
 		int count;
-		LIRenParticle* array;
+		LIRenParticle32* array;
 	} particles;
 	struct
 	{
 		int count;
-		LIRenParticleSystem* array;
+		LIRenParticleSystem32* array;
 	} systems;
 };
 
-LIAPICALL (int, liren_particles_init, (
-	LIRenParticles* self,
-	LIRenRender*    render,
+LIAPICALL (int, liren_particles32_init, (
+	LIRenParticles32* self,
+	LIRenRender32*    render,
 	LIMdlModel*     model));
 
-LIAPICALL (void, liren_particles_clear, (
-	LIRenParticles* self));
+LIAPICALL (void, liren_particles32_clear, (
+	LIRenParticles32* self));
 
-LIAPICALL (int, liren_particles_evaluate_particle, (
-	LIRenParticles* self,
+LIAPICALL (int, liren_particles32_evaluate_particle, (
+	LIRenParticles32* self,
 	int             system,
 	int             particle,
 	float           time,
@@ -91,11 +91,11 @@ LIAPICALL (int, liren_particles_evaluate_particle, (
 	LIMatVector*    position,
 	float*          color));
 
-LIAPICALL (void, liren_particles_sort, (
-	LIRenParticles*       self,
+LIAPICALL (void, liren_particles32_sort, (
+	LIRenParticles32*       self,
 	float                 time,
 	int                   loop,
 	const LIMatTransform* transform,
-	LIRenSort*            sort));
+	LIRenSort32*            sort));
 
 #endif

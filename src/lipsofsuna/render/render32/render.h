@@ -15,36 +15,38 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_H__
-#define __RENDER_H__
+#ifndef __RENDER32_H__
+#define __RENDER32_H__
 
 #include "lipsofsuna/paths.h"
 #include "lipsofsuna/system.h"
 #include "render-buffer.h"
 #include "render-image.h"
 #include "render-light.h"
+#include "render-material.h"
 #include "render-object.h"
 #include "render-shader.h"
 #include "render-types.h"
 
-LIAPICALL (LIRenRender*, liren_render_new, (
+LIAPICALL (LIRenRender32*, liren_render32_new, (
+	void*       render,
 	LIPthPaths* paths));
 
-LIAPICALL (void, liren_render_free, (
-	LIRenRender* self));
+LIAPICALL (void, liren_render32_free, (
+	LIRenRender32* self));
 
-LIAPICALL (void, liren_render_draw_clipped_buffer, (
-	LIRenRender* self,
-	LIRenShader* shader,
+LIAPICALL (void, liren_render32_draw_clipped_buffer, (
+	LIRenRender32* self,
+	LIRenShader32* shader,
 	LIMatMatrix* projection,
 	GLuint       texture,
 	const float* diffuse,
 	const int*   scissor,
-	LIRenBuffer* buffer));
+	LIRenBuffer32* buffer));
 
-LIAPICALL (void, liren_render_draw_indexed_triangles_T2V3, (
-	LIRenRender*    self,
-	LIRenShader*    shader,
+LIAPICALL (void, liren_render32_draw_indexed_triangles_T2V3, (
+	LIRenRender32*    self,
+	LIRenShader32*    shader,
 	LIMatMatrix*    matrix,
 	GLuint          texture,
 	const float*    diffuse,
@@ -52,34 +54,41 @@ LIAPICALL (void, liren_render_draw_indexed_triangles_T2V3, (
 	const uint32_t* index_data,
 	int             index_count));
 
-LIAPICALL (LIRenShader*, liren_render_find_shader, (
-	LIRenRender* self,
+LIAPICALL (LIRenShader32*, liren_render32_find_shader, (
+	LIRenRender32* self,
 	const char*  name));
 
-LIAPICALL (LIRenImage*, liren_render_find_image, (
-	LIRenRender* self,
+LIAPICALL (LIRenImage32*, liren_render32_find_image, (
+	LIRenRender32* self,
 	const char*  name));
 
-LIAPICALL (LIRenModel*, liren_render_find_model, (
-	LIRenRender* self,
+LIAPICALL (LIRenModel32*, liren_render32_find_model, (
+	LIRenRender32* self,
 	int          id));
 
-LIAPICALL (int, liren_render_load_image, (
-	LIRenRender* self,
-	const char*  name));
+LIAPICALL (LIRenImage32*, liren_render32_load_image, (
+	LIRenRender32* self,
+	const char*    name));
 
-LIAPICALL (void, liren_render_reload, (
-	LIRenRender* self));
+LIAPICALL (void, liren_render32_reload, (
+	LIRenRender32* self));
 
-LIAPICALL (void, liren_render_update, (
-	LIRenRender* self,
+LIAPICALL (int, liren_render32_reload_image, (
+	LIRenRender32* self,
+	LIRenImage32*  image));
+
+LIAPICALL (void, liren_render32_update, (
+	LIRenRender32* self,
 	float        secs));
 
-LIAPICALL (int, liren_render_get_anisotropy, (
-	const LIRenRender* self));
+LIAPICALL (int, liren_render32_get_anisotropy, (
+	const LIRenRender32* self));
 
-LIAPICALL (void, liren_render_set_anisotropy, (
-	LIRenRender* self,
+LIAPICALL (void, liren_render32_set_anisotropy, (
+	LIRenRender32* self,
 	int          value));
+
+LIAPICALL (LIRenContext32*, liren_render32_get_context, (
+	LIRenRender32* self));
 
 #endif

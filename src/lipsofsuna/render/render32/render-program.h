@@ -15,18 +15,18 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_PROGRAM_H__
-#define __RENDER_PROGRAM_H__
+#ifndef __RENDER32_PROGRAM_H__
+#define __RENDER32_PROGRAM_H__
 
 #include <lipsofsuna/system.h>
-#include "../render-types.h"
+#include "render-types.h"
 #include "render-attribute.h"
 #include "render-uniform.h"
 
-typedef struct _LIRenProgram LIRenProgram;
-struct _LIRenProgram
+typedef struct _LIRenProgram32 LIRenProgram32;
+struct _LIRenProgram32
 {
-	LIRenRender* render;
+	LIRenRender32* render;
 	int alpha_to_coverage;
 	int depth_test;
 	int depth_write;
@@ -46,40 +46,40 @@ struct _LIRenProgram
 	int reload_feedback;
 };
 
-LIAPICALL (int, liren_program_init, (
-	LIRenProgram* self,
-	LIRenRender*  render));
+LIAPICALL (int, liren_program32_init, (
+	LIRenProgram32* self,
+	LIRenRender32*  render));
 
-LIAPICALL (void, liren_program_clear, (
-	LIRenProgram* self));
+LIAPICALL (void, liren_program32_clear, (
+	LIRenProgram32* self));
 
-LIAPICALL (int, liren_program_compile, (
-	LIRenProgram* self,
+LIAPICALL (int, liren_program32_compile, (
+	LIRenProgram32* self,
 	const char*   name,
 	const char*   vertex,
 	const char*   geometry,
 	const char*   fragment,
 	int           feedback));
 
-LIAPICALL (void, liren_program_reload, (
-	LIRenProgram* self));
+LIAPICALL (void, liren_program32_reload, (
+	LIRenProgram32* self));
 
-LIAPICALL (void, liren_program_set_alpha_to_coverage, (
-	LIRenProgram* self,
+LIAPICALL (void, liren_program32_set_alpha_to_coverage, (
+	LIRenProgram32* self,
 	int           value));
 
-LIAPICALL (void, liren_program_set_blend, (
-	LIRenProgram* self,
+LIAPICALL (void, liren_program32_set_blend, (
+	LIRenProgram32* self,
 	int           blend_enabled,
 	GLenum        blend_src,
 	GLenum        blend_dst));
 
-LIAPICALL (void, liren_program_set_color, (
-	LIRenProgram* self,
+LIAPICALL (void, liren_program32_set_color, (
+	LIRenProgram32* self,
 	int           color_write));
 
-LIAPICALL (void, liren_program_set_depth, (
-	LIRenProgram* self,
+LIAPICALL (void, liren_program32_set_depth, (
+	LIRenProgram32* self,
 	int           depth_test,
 	int           depth_write,
 	GLenum        depth_func));

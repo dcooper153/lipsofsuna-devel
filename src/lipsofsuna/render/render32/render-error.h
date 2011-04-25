@@ -15,18 +15,18 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_ERROR_H__
-#define __RENDER_ERROR_H__
+#ifndef __RENDER32_ERROR_H__
+#define __RENDER32_ERROR_H__
 
 #include <lipsofsuna/system.h>
 #include <lipsofsuna/video.h>
 
-LIAPICALL (int, liren_error_get, ());
+LIAPICALL (int, liren_error32_get, ());
 
 #ifndef NDEBUG
-LIAPICALL (void, liren_error_check, ());
+LIAPICALL (void, liren_error32_check, ());
 #else
-#define liren_error_check()
+#define liren_error32_check()
 #endif
 
 #endif

@@ -24,14 +24,14 @@
 
 #include "render-buffer-texture.h"
 
-void liren_buffer_texture_init (
-	LIRenBufferTexture* self,
-	void*               data,
-	int                 size)
+void liren_buffer_texture32_init (
+	LIRenBufferTexture32* self,
+	void*                 data,
+	int                   size)
 {
 	GLint restore;
 
-	memset (self, 0, sizeof (LIRenBufferTexture));
+	memset (self, 0, sizeof (LIRenBufferTexture32));
 	self->size = size;
 	glGenBuffers (1, &self->buffer);
 	glGenTextures (1, &self->texture);
@@ -48,18 +48,18 @@ void liren_buffer_texture_init (
 	glBindTexture (GL_TEXTURE_BUFFER, restore);
 }
 
-void liren_buffer_texture_clear (
-	LIRenBufferTexture* self)
+void liren_buffer_texture32_clear (
+	LIRenBufferTexture32* self)
 {
 	glDeleteBuffers (1, &self->buffer);
 	glDeleteTextures (1, &self->texture);
-	memset (self, 0 , sizeof (LIRenBufferTexture));
+	memset (self, 0 , sizeof (LIRenBufferTexture32));
 }
 
-void liren_buffer_texture_upload (
-	LIRenBufferTexture* self,
-	int                 size,
-	void*               data)
+void liren_buffer_texture32_upload (
+	LIRenBufferTexture32* self,
+	int                   size,
+	void*                 data)
 {
 	GLint restore;
 

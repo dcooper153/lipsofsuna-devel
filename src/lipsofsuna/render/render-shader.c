@@ -26,6 +26,7 @@
 #include "lipsofsuna/system.h"
 #include "render-shader.h"
 #include "render-private.h"
+#include "render32/render-private.h"
 
 /**
  * \brief Creates a new shader program.
@@ -37,24 +38,19 @@ LIRenShader* liren_shader_new (
 	LIRenRender* render,
 	const char*  name)
 {
-	int i;
 	LIRenShader* self;
 
-	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIRenShader));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
-	self->name = listr_dup (name);
-	if (self->name == NULL)
+
+	self->v32 = liren_shader32_new (render->v32, name);
+	if (self->v32 == NULL)
 	{
-		liren_shader_free (self);
+		lisys_free (self);
 		return NULL;
 	}
-
-	/* Initialize passes. */
-	for (i = 0 ; i < LIREN_SHADER_PASS_COUNT ; i++)
-		liren_program_init (self->passes + i, render);
 
 	/* Insert to dictionary. */
 	if (!lialg_strdic_insert (render->shaders, name, self))
@@ -73,13 +69,9 @@ LIRenShader* liren_shader_new (
 void liren_shader_free (
 	LIRenShader* self)
 {
-	int i;
-
-	if (self->name != NULL)
-		lialg_strdic_remove (self->render->shaders, self->name);
-	for (i = 0 ; i < LIREN_SHADER_PASS_COUNT ; i++)
-		liren_program_clear (self->passes + i);
-	lisys_free (self->name);
+	if (self->v32->name != NULL)
+		lialg_strdic_remove (self->render->shaders, self->v32->name);
+	liren_shader32_free (self->v32);
 	lisys_free (self);
 }
 
@@ -92,8 +84,7 @@ void liren_shader_clear_pass (
 	LIRenShader* self,
 	int          pass)
 {
-	liren_program_clear (self->passes + pass);
-	liren_program_init (self->passes + pass, self->render);
+	liren_shader32_clear_pass (self->v32, pass);
 }
 
 /**
@@ -129,51 +120,16 @@ int liren_shader_compile (
 	int          depth_write,
 	GLenum       depth_func)
 {
-	int ret;
-	char* name;
-
-	name = listr_format ("%s[%d]", self->name, pass);
-	if (name == NULL)
-		return 0;
-	liren_program_set_alpha_to_coverage (self->passes + pass, alpha_to_coverage);
-	liren_program_set_blend (self->passes + pass, blend_enable, blend_src, blend_dst);
-	liren_program_set_color (self->passes + pass, color_write);
-	liren_program_set_depth (self->passes + pass, depth_test, depth_write, depth_func);
-	ret = liren_program_compile (self->passes + pass, name,
-		vertex, geometry, fragment, feedback);
-	lisys_free (name);
-
-	return ret;
-}
-
-/**
- * \brief Reloads the shader.
- *
- * This function is called when the video mode changes in Windows. It
- * reloads the shader that was lost when the context was erased.
- *
- * \param self Shader.
- */
-void liren_shader_reload (
-	LIRenShader* self)
-{
-	int i;
-
-	for (i = 0 ; i < LIREN_SHADER_PASS_COUNT ; i++)
-		liren_program_reload (self->passes + i);
-}
-
-int liren_shader_get_sort (
-	LIRenShader* self)
-{
-	return self->sort;
+	return liren_shader32_compile (self->v32, pass, vertex, geometry, fragment,
+		feedback, alpha_to_coverage, blend_enable, blend_src, blend_dst,
+		color_write, depth_test, depth_write, depth_func);
 }
 
 void liren_shader_set_sort (
 	LIRenShader* self,
 	int          value)
 {
-	self->sort = value;
+	liren_shader32_set_sort (self->v32, value);
 }
 
 /** @} */

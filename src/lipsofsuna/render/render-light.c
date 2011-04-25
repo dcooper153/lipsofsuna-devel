@@ -26,16 +26,6 @@
 #include "render-light.h"
 #include "render-private.h"
 
-#define LIGHT_CONTRIBUTION_EPSILON 0.001f
-
-static void private_update_bounds (
-	LIRenLight* self);
-
-static void private_update_shadow (
-	LIRenLight* self);
-
-/*****************************************************************************/
-
 /**
  * \brief Creates a new light source.
  * \param scene Scene.
@@ -60,96 +50,18 @@ LIRenLight* liren_light_new (
 {
 	LIRenLight* self;
 
-	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIRenLight));
 	if (self == NULL)
 		return NULL;
 	self->scene = scene;
-	self->ambient[0] = ambient[0];
-	self->ambient[1] = ambient[1];
-	self->ambient[2] = ambient[2];
-	self->ambient[3] = 1.0f;
-	self->diffuse[0] = diffuse[0];
-	self->diffuse[1] = diffuse[1];
-	self->diffuse[2] = diffuse[2];
-	self->diffuse[3] = 1.0f;
-	self->specular[0] = specular[0];
-	self->specular[1] = specular[1];
-	self->specular[2] = specular[2];
-	self->specular[3] = 1.0f;
-	self->equation[0] = equation[0];
-	self->equation[1] = equation[1];
-	self->equation[2] = equation[2];
-	self->cutoff = cutoff;
-	self->exponent = exponent;
-	self->shadow_far = 50.0f;
-	self->shadow_near = 0.1f;
-	self->projection = limat_matrix_identity ();
-	self->modelview = limat_matrix_identity ();
-	self->modelview_inverse = limat_matrix_identity ();
-	self->transform = limat_transform_identity ();
-	liren_light_update_projection (self);
-	liren_light_set_shadow (self, shadows);
 
-	return self;
-}
-
-/**
- * \brief Creates a new directional light source.
- * \param scene Scene.
- * \param ambient Ambient color, array of 4 floats.
- * \param diffuse Diffuse color, array of 4 floats.
- * \param specular Specular color, array of 4 floats.
- * \return New light source or NULL.
- */
-LIRenLight* liren_light_new_directional (
-	LIRenScene*  scene,
-	const float* ambient,
-	const float* diffuse,
-	const float* specular)
-{
-	const float equation[3] = { 1.0f, 0.0f, 0.0f };
-	const LIMatVector direction = { 0.0f, 0.0f, -1.0f };
-	LIRenLight* self;
-
-	/* Create the sun.  */
-	self = liren_light_new (scene, ambient, diffuse, specular, equation, M_PI, 0.0f, 0);
-	if (self == NULL)
+	self->v32 = liren_light32_new (scene->v32, ambient, diffuse,
+		specular, equation, cutoff, exponent, shadows);
+	if (self->v32 == NULL)
+	{
+		lisys_free (self);
 		return NULL;
-	liren_light_set_direction (self, &direction);
-
-	return self;
-}
-
-/**
- * \brief Creates a new light from a model light.
- * \param scene Scene.
- * \param light Model light.
- * \return New light or NULL.
- */
-LIRenLight* liren_light_new_from_model (
-	LIRenScene*      scene,
-	const LIMdlNode* light)
-{
-	float scale;
-	LIMatMatrix projection;
-	LIMatTransform transform;
-	LIRenLight* self;
-
-	/* Allocate self. */
-	self = liren_light_new (scene, light->light.ambient,
-		light->light.diffuse, light->light.specular, light->light.equation,
-		light->light.spot.cutoff, light->light.spot.exponent,
-		light->light.flags & LIMDL_LIGHT_FLAG_SHADOW);
-	if (self == NULL)
-		return NULL;
-
-	/* Set transform. */
-	self->node = light;
-	limdl_node_get_world_transform (light, &scale, &transform);
-	liren_light_set_transform (self, &transform);
-	limdl_light_get_projection (light, &projection);
-	liren_light_set_projection (self, &projection);
+	}
 
 	return self;
 }
@@ -161,212 +73,36 @@ LIRenLight* liren_light_new_from_model (
 void liren_light_free (
 	LIRenLight* self)
 {
-	liren_light_set_shadow (self, 0);
-	liren_lighting_remove_light (self->scene->lighting, self);
+	liren_light32_free (self->v32);
 	lisys_free (self);
-}
-
-/**
- * \brief Compares the priorities of two lights.
- * \param self Light source.
- * \param light Light source.
- * \return Integer indicating which light contributes more.
- */
-int liren_light_compare (
-	const LIRenLight* self,
-	const LIRenLight* light)
-{
-	/* Sorting is done primarily by priority. */
-	/* This allows the user to decide what lights are the most important
-	   ones. If there's an ambient light in the scene, for example, the
-	   user may want to give that higher priority than other lights. */
-	if (self->priority < light->priority)
-		return -1;
-	if (self->priority > light->priority)
-		return 1;
-
-	/* Secondary sorting by pointer. */
-	/* This ensures that the choice is consistent across frames
-	   when there are multiple lights with the same priority. */
-	if (self < light)
-		return -1;
-	return 1;
-}
-
-void liren_light_update (
-	LIRenLight* self)
-{
-	if (self->shadow.map)
-		private_update_shadow (self);
-}
-
-/**
- * \brief Caches the lighting values needed by shaders for fast access.
- * \param self Light.
- * \param context Context.
- */
-void liren_light_update_cache (
-	LIRenLight*   self,
-	LIRenContext* context)
-{
-	LIMatMatrix matrix;
-	LIMatVector vector;
-	LIMatMatrix bias =
-	{{
-		0.5f, 0.0f, 0.0f, 0.0f,
-		0.0f, 0.5f, 0.0f, 0.0f,
-		0.0f, 0.0f, 0.5f, 0.0f,
-		0.5f, 0.5f, 0.5f, 1.0f
-	}};
-
-	/* Calculate position vectors. */
-	vector = self->transform.position;
-	self->cache.pos_world[0] = vector.x;
-	self->cache.pos_world[1] = vector.y;
-	self->cache.pos_world[2] = vector.z;
-	vector = limat_matrix_transform (context->matrix.modelview, vector);
-	self->cache.pos_view[0] = vector.x;
-	self->cache.pos_view[1] = vector.y;
-	self->cache.pos_view[2] = vector.z;
-
-	/* Calculate direction vectors. */
-	liren_light_get_direction (self, &vector);
-	self->cache.dir_world[0] = vector.x;
-	self->cache.dir_world[1] = vector.y;
-	self->cache.dir_world[2] = vector.z;
-	matrix = limat_matrix_get_rotation (context->matrix.modelview);
-	vector = limat_matrix_transform (matrix, vector);
-	self->cache.dir_view[0] = vector.x;
-	self->cache.dir_view[1] = vector.y;
-	self->cache.dir_view[2] = vector.z;
-
-	/* Calculate shadow buffer matrix. */
-	matrix = limat_matrix_multiply (bias, context->matrix.projection);
-	matrix = limat_matrix_multiply (matrix, context->matrix.view);
-	matrix = limat_matrix_multiply (matrix, context->matrix.modelviewinverse);
-	self->cache.matrix = matrix;
-
-	/* Calculate spot light settings. */
-	self->cache.spot[0] = self->cutoff;
-	self->cache.spot[1] = cos (self->cutoff);
-	self->cache.spot[2] = self->exponent;
-}
-
-void liren_light_update_projection (
-	LIRenLight* self)
-{
-	self->projection = limat_matrix_perspective (2.0f * self->cutoff * M_PI,
-		1.0f, self->shadow_near, self->shadow_far);
 }
 
 void liren_light_get_ambient (
 	LIRenLight* self,
 	float*      value)
 {
-	memcpy (value, self->ambient, 4 * sizeof (float));
+	liren_light32_get_ambient (self->v32, value);
 }
 
 void liren_light_set_ambient (
 	LIRenLight*  self,
 	const float* value)
 {
-	memcpy (self->ambient, value, 4 * sizeof (float));
-}
-
-/**
- * \brief Gets the area of effect of the light source.
- * \param self Light source.
- * \param result Return location for a bounding box.
- * \return Nonzero if has bounds.
- */
-int liren_light_get_bounds (
-	const LIRenLight* self,
-	LIMatAabb*        result)
-{
-	*result = self->bounds;
-
-	return 1;
+	liren_light32_set_ambient (self->v32, value);
 }
 
 void liren_light_get_diffuse (
 	LIRenLight* self,
 	float*      value)
 {
-	memcpy (value, self->diffuse, 4 * sizeof (float));
+	liren_light32_get_diffuse (self->v32, value);
 }
 
 void liren_light_set_diffuse (
 	LIRenLight*  self,
 	const float* value)
 {
-	memcpy (self->diffuse, value, 4 * sizeof (float));
-}
-
-/**
- * \brief Gets the forwards direction of the light.
- *
- * The direction is derived from the transformation of the light.
- *
- * \param self Light source.
- * \param value Return location for the direction.
- */
-void liren_light_get_direction (
-	const LIRenLight* self,
-	LIMatVector*      value)
-{
-	*value = limat_vector_init (0.0f, 0.0f, -1.0f);
-	*value = limat_quaternion_transform (self->transform.rotation, *value);
-}
-
-/**
- * \brief Makes the light directional and sets it direction.
- * \param self Light source.
- * \param value Light direction.
- */
-void liren_light_set_direction (
-	LIRenLight*        self,
-	const LIMatVector* value)
-{
-	float a;
-	float b;
-	LIMatMatrix projection;
-	LIMatQuaternion rotation;
-	LIMatTransform transform;
-	LIMatVector direction;
-	LIMatVector position;
-
-	/* Calculate temporary position. */
-	/* FIXME: Temporary position not supported. */
-	direction = *value;
-	position = limat_vector_init (0.0f, 0.0f, 0.0f);
-
-	/* Calculate light rotation. */
-	a = limat_vector_dot (direction, limat_vector_init (0.0f, 1.0f, 0.0f));
-	b = limat_vector_dot (direction, limat_vector_init (0.0f, 0.0f, 1.0f));
-	if (LIMAT_ABS (a) >= LIMAT_ABS (b))
-		rotation = limat_quaternion_look (direction, limat_vector_init (0.0f, 1.0f, 0.0f));
-	else
-		rotation = limat_quaternion_look (direction, limat_vector_init (0.0f, 0.0f, 1.0f));
-
-	/* Set light transformation. */
-	transform = limat_transform_init (position, rotation);
-	liren_light_set_transform (self, &transform);
-	projection = limat_matrix_ortho (200, -200, 200, -200, -1000, 1000);
-	liren_light_set_projection (self, &projection);
-	self->directional = 1;
-	private_update_bounds (self);
-}
-
-/**
- * \brief Enables or disables directional mode.
- * \param self Light source.
- * \param value Nonzero if the light is directional.
- */
-void liren_light_set_directional (
-	LIRenLight* self,
-	int         value)
-{
-	self->directional = (value != 0);
+	liren_light32_set_diffuse (self->v32, value);
 }
 
 /**
@@ -377,33 +113,21 @@ void liren_light_set_directional (
 int liren_light_get_enabled (
 	const LIRenLight* self)
 {
-	return self->enabled;
+	return liren_light32_get_enabled (self->v32);
 }
 
 void liren_light_get_equation (
 	LIRenLight* self,
 	float*      value)
 {
-	memcpy (value, self->equation, 3 * sizeof (float));
+	liren_light32_get_equation (self->v32, value);
 }
 
 void liren_light_set_equation (
 	LIRenLight*  self,
 	const float* value)
 {
-	memcpy (self->equation, value, 3 * sizeof (float));
-}
-
-/**
- * \brief Gets the modelview matrix of the light.
- * \param self Light source.
- * \param value Return location for the matrix.
- */
-void liren_light_get_modelview (
-	const LIRenLight* self,
-	LIMatMatrix*         value)
-{
-	*value = self->modelview;
+	liren_light32_set_equation (self->v32, value);
 }
 
 /**
@@ -415,23 +139,7 @@ void liren_light_get_position (
 	const LIRenLight* self,
 	GLfloat*          value)
 {
-	LIMatVector tmp;
-
-	if (self->directional)
-	{
-		liren_light_get_direction (self, &tmp);
-		value[0] = -tmp.x;
-		value[1] = -tmp.y;
-		value[2] = -tmp.z;
-		value[3] = 0.0f;
-	}
-	else
-	{
-		value[0] = self->transform.position.x;
-		value[1] = self->transform.position.y;
-		value[2] = self->transform.position.z;
-		value[3] = 1.0f;
-	}
+	liren_light32_get_position (self->v32, value);
 }
 
 /**
@@ -442,7 +150,7 @@ void liren_light_get_position (
 float liren_light_get_priority (
 	LIRenLight* self)
 {
-	return self->priority;
+	return liren_light32_get_priority (self->v32);
 }
 
 /**
@@ -454,32 +162,7 @@ void liren_light_set_priority (
 	LIRenLight* self,
 	float       value)
 {
-	self->priority = value;
-}
-
-/**
- * \brief Gets the projection matrix of the light.
- * \param self Light source.
- * \param value Return location for the matrix.
- */
-void liren_light_get_projection (
-	const LIRenLight* self,
-	LIMatMatrix*      value)
-{
-	*value = self->projection;
-}
-
-/**
- * \brief Sets the projection matrix of the light.
- * \param self Light source.
- * \param value Matrix to set.
- */
-void liren_light_set_projection (
-	LIRenLight*        self,
-	const LIMatMatrix* value)
-{
-	self->projection = *value;
-	private_update_bounds (self);
+	liren_light32_set_priority (self->v32, value);
 }
 
 LIRenScene* liren_light_get_scene (
@@ -496,35 +179,7 @@ LIRenScene* liren_light_get_scene (
 int liren_light_get_shadow (
 	const LIRenLight* self)
 {
-	return self->shadow.fbo != 0;
-}
-
-float liren_light_get_shadow_far (
-	const LIRenLight* self)
-{
-	return self->shadow_far;
-}
-
-void liren_light_set_shadow_far (
-	LIRenLight* self,
-	float       value)
-{
-	self->shadow_far = value;
-	liren_light_update_projection (self);
-}
-
-float liren_light_get_shadow_near (
-	const LIRenLight* self)
-{
-	return self->shadow_near;
-}
-
-void liren_light_set_shadow_near (
-	LIRenLight* self,
-	float       value)
-{
-	self->shadow_near = value;
-	liren_light_update_projection (self);
+	return liren_light32_get_shadow (self->v32);
 }
 
 /**
@@ -536,92 +191,73 @@ void liren_light_set_shadow (
 	LIRenLight* self,
 	int         value)
 {
-	float border[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	liren_light32_set_shadow (self->v32, value);
+}
 
-	if ((value != 0) == (self->shadow.fbo != 0))
-		return;
-	if (value)
-	{
-		/* Create shadow texture. */
-		glGenTextures (1, &self->shadow.map);
-		glBindTexture (GL_TEXTURE_2D, self->shadow.map);
-		glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, SHADOWMAPSIZE, SHADOWMAPSIZE,
-			0, GL_DEPTH_COMPONENT, GL_UNSIGNED_BYTE, NULL);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-		glTexParameterfv (GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, border);
+float liren_light_get_shadow_far (
+	const LIRenLight* self)
+{
+	return liren_light32_get_shadow_far (self->v32);
+}
 
-		/* Create framebuffer object. */
-		glGenFramebuffers (1, &self->shadow.fbo);
-		glBindFramebuffer (GL_FRAMEBUFFER, self->shadow.fbo);
-		glFramebufferTexture2D (GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, self->shadow.map, 0);
-		glDrawBuffer (GL_NONE);
-		glReadBuffer (GL_NONE);
-		switch (glCheckFramebufferStatus (GL_FRAMEBUFFER))
-		{
-			case GL_FRAMEBUFFER_COMPLETE:
-				break;
-			default:
-				lisys_error_set (ENOTSUP, "cannot create framebuffer object");
-				glDeleteFramebuffers (1, &self->shadow.fbo);
-				glDeleteTextures (1, &self->shadow.map);
-				self->shadow.fbo = 0;
-				self->shadow.map = 0;
-				break;
-		}
-		glBindFramebuffer (GL_FRAMEBUFFER, 0);
-	}
-	else
-	{
-		/* Delete the shadow map. */
-		glDeleteFramebuffers (1, &self->shadow.fbo);
-		glDeleteTextures (1, &self->shadow.map);
-		self->shadow.fbo = 0;
-		self->shadow.map = 0;
-	}
+void liren_light_set_shadow_far (
+	LIRenLight* self,
+	float       value)
+{
+	liren_light32_set_shadow_far (self->v32, value);
+}
+
+float liren_light_get_shadow_near (
+	const LIRenLight* self)
+{
+	return liren_light32_get_shadow_near (self->v32);
+}
+
+void liren_light_set_shadow_near (
+	LIRenLight* self,
+	float       value)
+{
+	liren_light32_set_shadow_near (self->v32, value);
 }
 
 void liren_light_get_specular (
 	LIRenLight* self,
 	float*      value)
 {
-	memcpy (value, self->specular, 4 * sizeof (float));
+	liren_light32_get_specular (self->v32, value);
 }
 
 void liren_light_set_specular (
 	LIRenLight*  self,
 	const float* value)
 {
-	memcpy (self->specular, value, 4 * sizeof (float));
+	liren_light32_set_specular (self->v32, value);
 }
 
 float liren_light_get_spot_cutoff (
 	const LIRenLight* self)
 {
-	return self->cutoff;
+	return liren_light32_get_spot_cutoff (self->v32);
 }
 
 void liren_light_set_spot_cutoff (
 	LIRenLight* self,
 	float       value)
 {
-	self->cutoff = value;
-	liren_light_update_projection (self);
+	liren_light32_set_spot_cutoff (self->v32, value);
 }
 
 float liren_light_get_spot_exponent (
 	const LIRenLight* self)
 {
-	return self->exponent;
+	return liren_light32_get_spot_exponent (self->v32);
 }
 
 void liren_light_set_spot_exponent (
 	LIRenLight* self,
 	float       value)
 {
-	self->exponent = value;
+	liren_light32_set_spot_exponent (self->v32, value);
 }
 
 /**
@@ -633,7 +269,7 @@ void liren_light_get_transform (
 	LIRenLight*     self,
 	LIMatTransform* value)
 {
-	*value = self->transform;
+	liren_light32_get_transform (self->v32, value);
 }
 
 /**
@@ -646,122 +282,9 @@ void liren_light_get_transform (
  */
 void liren_light_set_transform (
 	LIRenLight*           self,
-	const LIMatTransform* transform)
+	const LIMatTransform* value)
 {
-	LIMatVector dir;
-	LIMatVector pos;
-	LIMatVector up;
-
-	pos = transform->position;
-	dir = limat_quaternion_transform (transform->rotation, limat_vector_init (0.0f, 0.0f, -1.0f));
-	up = limat_quaternion_transform (transform->rotation, limat_vector_init (0.0f, 1.0f, 0.0f));
-	self->transform = *transform;
-	self->modelview = limat_matrix_look (pos.x, pos.y, pos.z, dir.x, dir.y, dir.z, up.x, up.y, up.z);
-	self->modelview_inverse = limat_matrix_invert (self->modelview);
-	private_update_bounds (self);
-}
-
-int liren_light_get_type (
-	const LIRenLight* self)
-{
-	if (self->directional)
-		return LIREN_LIGHTTYPE_DIRECTIONAL;
-	else if (LIMAT_ABS (self->cutoff - M_PI) < 0.001)
-		return LIREN_LIGHTTYPE_POINT;
-	else if (self->shadow.map)
-		return LIREN_LIGHTTYPE_SPOTSHADOW;
-	else
-		return LIREN_LIGHTTYPE_SPOT;
-}
-
-/*****************************************************************************/
-
-static void private_update_bounds (
-	LIRenLight* self)
-{
-	double a;
-	double b;
-	double c;
-	double r;
-	double det;
-	double eps;
-
-	/* Choose epsilon. */
-	eps = LIMAT_MAX (LIMAT_MAX (self->diffuse[0], self->diffuse[1]), self->diffuse[2]);
-	eps /= 256.0;
-	if (eps < LIGHT_CONTRIBUTION_EPSILON)
-		eps = LIGHT_CONTRIBUTION_EPSILON;
-
-	/* Solve radius. */
-	/* 1 / (A * r^2 + B * r + C) = E */
-	/* (EA) * r^2 + (EB) * r + (Ec-1) = 0 */
-	a = eps * self->equation[2];
-	b = eps * self->equation[1];
-	c = eps * self->equation[0] - 1.0;
-	det = b * b - 4 * a * c;
-	if (det < 0.0)
-	{
-		self->bounds.min = self->transform.position;
-		self->bounds.max = self->transform.position;
-		return;
-	}
-	r = (-b + sqrt (det)) / (2.0 * a);
-
-	/* Create bounding box. */
-	self->bounds.min = limat_vector_subtract (self->transform.position, limat_vector_init (r, r, r));
-	self->bounds.max = limat_vector_add (self->transform.position, limat_vector_init (r, r, r));
-}
-
-static void private_update_shadow (
-	LIRenLight* self)
-{
-	LIAlgU32dicIter iter1;
-	LIMatAabb aabb;
-	LIMatFrustum frustum;
-	LIRenContext* context;
-	LIRenObject* object;
-	LIRenShader* shader;
-
-	/* Find the shader. */
-	shader = liren_render_find_shader (self->scene->render, "shadowmap");
-	if (shader == NULL)
-		return;
-
-	/* Enable depth rendering mode. */
-	glPushAttrib (GL_VIEWPORT_BIT | GL_SCISSOR_BIT);
-	glBindFramebuffer (GL_FRAMEBUFFER, self->shadow.fbo);
-	glViewport (0, 0, SHADOWMAPSIZE, SHADOWMAPSIZE);
-	glDisable (GL_SCISSOR_TEST);
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	limat_frustum_init (&frustum, &self->modelview, &self->projection);
-	context = liren_render_get_context (self->scene->render);
-	liren_context_init (context);
-	liren_context_set_scene (context, self->scene);
-	liren_context_set_cull (context, 1, GL_CCW);
-	liren_context_set_depth (context, 1, 1, GL_LEQUAL);
-	liren_context_set_frustum (context, &frustum);
-	liren_context_set_projection (context, &self->projection);
-	liren_context_set_shader (context, 0, shader);
-	liren_context_set_viewmatrix (context, &self->modelview);
-
-	/* Render objects to the depth texture. */
-	LIALG_U32DIC_FOREACH (iter1, self->scene->objects)
-	{
-		object = iter1.value;
-		if (!liren_object_get_realized (object))
-			continue;
-		liren_object_get_bounds (object, &aabb);
-		if (limat_frustum_cull_aabb (&frustum, &aabb))
-			continue;
-		liren_context_set_modelmatrix (context, &object->orientation.matrix);
-		liren_context_set_mesh (context, &object->model->mesh);
-		liren_context_bind (context);
-		liren_context_render_array (context, GL_TRIANGLES, 0, object->model->mesh.counts[2]);
-	}
-
-	/* Disable depth rendering mode. */
-	glBindFramebuffer (GL_FRAMEBUFFER, 0);
-	glPopAttrib ();
+	liren_light32_set_transform (self->v32, value);
 }
 
 /** @} */

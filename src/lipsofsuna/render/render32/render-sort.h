@@ -15,15 +15,15 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_SORT_H__
-#define __RENDER_SORT_H__
+#ifndef __RENDER32_SORT_H__
+#define __RENDER32_SORT_H__
 
 #include <lipsofsuna/model.h>
 #include <lipsofsuna/system.h>
-#include "../render.h"
-#include "../render-buffer.h"
-#include "../render-material.h"
-#include "../render-types.h"
+#include "render.h"
+#include "render-buffer.h"
+#include "render-material.h"
+#include "render-types.h"
 #include "render-mesh.h"
 
 enum
@@ -33,21 +33,21 @@ enum
 	LIREN_SORT_TYPE_PARTICLE
 };
 
-struct _LIRenSortgroup
+struct _LIRenSortgroup32
 {
 	int index;
 	int count;
 	int transparent;
 	LIMatAabb bounds;
 	LIMatMatrix matrix;
-	LIRenMesh* mesh;
-	LIRenMaterial* material;
+	LIRenMesh32* mesh;
+	LIRenMaterial32* material;
 };
 
-struct _LIRenSortface
+struct _LIRenSortface32
 {
 	int type;
-	LIRenSortface* next;
+	LIRenSortface32* next;
 	union
 	{
 		struct
@@ -55,8 +55,8 @@ struct _LIRenSortface
 			int index;
 			LIMatAabb bounds;
 			LIMatMatrix matrix;
-			LIRenMesh* mesh;
-			LIRenMaterial* material;
+			LIRenMesh32* mesh;
+			LIRenMaterial32* material;
 		} face;
 		struct
 		{
@@ -64,91 +64,91 @@ struct _LIRenSortface
 			int count;
 			LIMatAabb bounds;
 			LIMatMatrix matrix;
-			LIRenMesh* mesh;
-			LIRenMaterial* material;
+			LIRenMesh32* mesh;
+			LIRenMaterial32* material;
 		} group;
 		struct
 		{
 			float size;
 			float diffuse[4];
 			LIMatVector position;
-			LIRenImage* image;
-			LIRenShader* shader;
+			LIRenImage32* image;
+			LIRenShader32* shader;
 		} particle;
 	};
 };
 
-struct _LIRenSort
+struct _LIRenSort32
 {
 	LIMatFrustum frustum;
 	LIMatMatrix modelview;
 	LIMatMatrix projection;
-	LIRenRender* render;
+	LIRenRender32* render;
 	struct
 	{
 		int count;
-		LIRenSortface** array;
+		LIRenSortface32** array;
 	} buckets;
 	struct
 	{
 		int count;
 		int capacity;
-		LIRenSortface* array;
+		LIRenSortface32* array;
 	} faces;
 	struct
 	{
 		int count;
 		int capacity;
-		LIRenSortgroup* array;
+		LIRenSortgroup32* array;
 	} groups;
 };
 
-LIAPICALL (LIRenSort*, liren_sort_new, (
-	LIRenRender* render));
+LIAPICALL (LIRenSort32*, liren_sort32_new, (
+	LIRenRender32* render));
 
-LIAPICALL (void, liren_sort_free, (
-	LIRenSort* self));
+LIAPICALL (void, liren_sort32_free, (
+	LIRenSort32* self));
 
-LIAPICALL (int, liren_sort_add_group, (
-	LIRenSort*     self,
-	LIMatAabb*     bounds,
-	LIMatMatrix*   matrix,
-	int            index,
-	int            count,
-	LIRenMesh*     mesh,
-	LIRenMaterial* material,
-	LIMatVector*   center));
+LIAPICALL (int, liren_sort32_add_group, (
+	LIRenSort32*     self,
+	LIMatAabb*       bounds,
+	LIMatMatrix*     matrix,
+	int              index,
+	int              count,
+	LIRenMesh32*     mesh,
+	LIRenMaterial32* material,
+	LIMatVector*     center));
 
-LIAPICALL (int, liren_sort_add_faces, (
-	LIRenSort*     self,
-	LIMatAabb*     bounds,
-	LIMatMatrix*   matrix,
-	int            index,
-	int            count,
-	LIRenMesh*     mesh,
-	LIRenMaterial* material,
-	LIMatVector*   center));
+LIAPICALL (int, liren_sort32_add_faces, (
+	LIRenSort32*     self,
+	LIMatAabb*       bounds,
+	LIMatMatrix*     matrix,
+	int              index,
+	int              count,
+	LIRenMesh32*     mesh,
+	LIRenMaterial32* material,
+	LIMatVector*     center));
 
-LIAPICALL (int, liren_sort_add_model, (
-	LIRenSort*   self,
-	LIMatAabb*   bounds,
-	LIMatMatrix* matrix,
-	LIRenModel*  model));
+LIAPICALL (int, liren_sort32_add_model, (
+	LIRenSort32*  self,
+	LIMatAabb*    bounds,
+	LIMatMatrix*  matrix,
+	LIRenModel32* model));
 
-LIAPICALL (int, liren_sort_add_object, (
-	LIRenSort*   self,
-	LIRenObject* object));
+LIAPICALL (int, liren_sort32_add_object, (
+	LIRenSort32*   self,
+	LIRenObject32* object));
 
-int liren_sort_add_particle (
-	LIRenSort*         self,
+int liren_sort32_add_particle (
+	LIRenSort32*       self,
 	const LIMatVector* position,
 	float              size,
 	const float*       diffuse,
-	LIRenImage*        image,
-	LIRenShader*       shader);
+	LIRenImage32*      image,
+	LIRenShader32*     shader);
 
-LIAPICALL (void, liren_sort_clear, (
-	LIRenSort*         self,
+LIAPICALL (void, liren_sort32_clear, (
+	LIRenSort32*       self,
 	const LIMatMatrix* modelview,
 	const LIMatMatrix* projection));
 

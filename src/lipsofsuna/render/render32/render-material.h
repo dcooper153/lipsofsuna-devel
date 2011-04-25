@@ -15,8 +15,8 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_MATERIAL_H__
-#define __RENDER_MATERIAL_H__
+#ifndef __RENDER32_MATERIAL_H__
+#define __RENDER32_MATERIAL_H__
 
 #include "lipsofsuna/image.h"
 #include "lipsofsuna/model.h"
@@ -24,47 +24,39 @@
 #include "render-shader.h"
 #include "render-types.h"
 
-enum
-{
-	LIREN_MATERIAL_FLAG_BILLBOARD = 0x010000,
-	LIREN_MATERIAL_FLAG_CULLFACE = 0x020000,
-	LIREN_MATERIAL_FLAG_TRANSPARENCY = 0x040000,
-	LIREN_MATERIAL_FLAG_SORTFACES = 0x080000
-};
+LIAPICALL (LIRenMaterial32*, liren_material32_new, ());
 
-LIAPICALL (LIRenMaterial*, liren_material_new, ());
-
-LIAPICALL (LIRenMaterial*, liren_material_new_from_model, (
-	LIRenRender*         render,
+LIAPICALL (LIRenMaterial32*, liren_material32_new_from_model, (
+	LIRenRender32*         render,
 	const LIMdlMaterial* material));
 
-LIAPICALL (void, liren_material_free, (
-	LIRenMaterial* self));
+LIAPICALL (void, liren_material32_free, (
+	LIRenMaterial32* self));
 
-LIAPICALL (void, liren_material_set_diffuse, (
-	LIRenMaterial* self,
+LIAPICALL (void, liren_material32_set_diffuse, (
+	LIRenMaterial32* self,
 	const float*   value));
 
-LIAPICALL (void, liren_material_set_flags, (
-	LIRenMaterial* self,
+LIAPICALL (void, liren_material32_set_flags, (
+	LIRenMaterial32* self,
 	int            flags));
 
-LIAPICALL (int, liren_material_set_shader, (
-	LIRenMaterial* self,
-	LIRenShader*   value));
+LIAPICALL (int, liren_material32_set_shader, (
+	LIRenMaterial32* self,
+	LIRenShader32*   value));
 
-LIAPICALL (void, liren_material_set_specular, (
-	LIRenMaterial* self,
+LIAPICALL (void, liren_material32_set_specular, (
+	LIRenMaterial32* self,
 	const float*   value));
 
-LIAPICALL (void, liren_material_set_texture, (
-	LIRenMaterial* self,
+LIAPICALL (void, liren_material32_set_texture, (
+	LIRenMaterial32* self,
 	int            index,
 	LIMdlTexture*  texture,
-	LIRenImage*    image));
+	LIRenImage32*    image));
 
-LIAPICALL (int, liren_material_set_texture_count, (
-	LIRenMaterial* self,
+LIAPICALL (int, liren_material32_set_texture_count, (
+	LIRenMaterial32* self,
 	int            value));
 
 #endif

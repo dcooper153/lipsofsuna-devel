@@ -15,15 +15,15 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_MESH_H__
-#define __RENDER_MESH_H__
+#ifndef __RENDER32_MESH_H__
+#define __RENDER32_MESH_H__
 
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/video.h"
-#include "../render-types.h"
+#include "render-types.h"
 
-typedef struct _LIRenMesh LIRenMesh;
-struct _LIRenMesh
+typedef struct _LIRenMesh32 LIRenMesh32;
+struct _LIRenMesh32
 {
 	int sizes[3];
 	int counts[3];
@@ -35,32 +35,32 @@ struct _LIRenMesh
 	void* reload_vertex_data;
 };
 
-LIAPICALL (int, liren_mesh_init, (
-	LIRenMesh* self,
+LIAPICALL (int, liren_mesh32_init, (
+	LIRenMesh32* self,
 	void*      index_data,
 	int        index_count,
 	void*      vertex_data,
 	int        vertex_count));
 
-LIAPICALL (void, liren_mesh_clear, (
-	LIRenMesh* self));
+LIAPICALL (void, liren_mesh32_clear, (
+	LIRenMesh32* self));
 
-LIAPICALL (void, liren_mesh_deform, (
-	LIRenMesh* self));
+LIAPICALL (void, liren_mesh32_deform, (
+	LIRenMesh32* self));
 
-LIAPICALL (void*, liren_mesh_lock_vertices, (
-	const LIRenMesh* self,
+LIAPICALL (void*, liren_mesh32_lock_vertices, (
+	const LIRenMesh32* self,
 	int              start,
 	int              count));
 
-LIAPICALL (void, liren_mesh_reload, (
-	LIRenMesh* self));
+LIAPICALL (void, liren_mesh32_reload, (
+	LIRenMesh32* self));
 
-LIAPICALL (void, liren_mesh_unlock_vertices, (
-	const LIRenMesh* self));
+LIAPICALL (void, liren_mesh32_unlock_vertices, (
+	const LIRenMesh32* self));
 
-LIAPICALL (void, liren_mesh_get_format, (
-	const LIRenMesh* self,
+LIAPICALL (void, liren_mesh32_get_format, (
+	const LIRenMesh32* self,
 	LIRenFormat*     value));
 
 #endif

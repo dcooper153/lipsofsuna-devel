@@ -23,7 +23,7 @@
  */
 
 #include <lipsofsuna/system.h>
-#include "../render-private.h"
+#include "render-private.h"
 #include "render-context.h"
 #include "render-lighting.h"
 
@@ -32,13 +32,13 @@
  * \param render Renderer.
  * \return New light manager or NULL.
  */
-LIRenLighting* liren_lighting_new (
-	LIRenRender* render)
+LIRenLighting32* liren_lighting32_new (
+	LIRenRender32* render)
 {
-	LIRenLighting* self;
+	LIRenLighting32* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIRenLighting));
+	self = lisys_calloc (1, sizeof (LIRenLighting32));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
@@ -51,7 +51,7 @@ LIRenLighting* liren_lighting_new (
 	return self;
 
 error:
-	liren_lighting_free (self);
+	liren_lighting32_free (self);
 	return NULL;
 }
 
@@ -59,8 +59,8 @@ error:
  * \brief Frees the light manager.
  * \param self Light manager.
  */
-void liren_lighting_free (
-	LIRenLighting* self)
+void liren_lighting32_free (
+	LIRenLighting32* self)
 {
 	if (self->lights != NULL)
 	{
@@ -76,9 +76,9 @@ void liren_lighting_free (
  * \param light Light source.
  * \return Nonzero on success.
  */
-int liren_lighting_insert_light (
-	LIRenLighting* self,
-	LIRenLight*    light)
+int liren_lighting32_insert_light (
+	LIRenLighting32* self,
+	LIRenLight32*    light)
 {
 	if (!lialg_ptrdic_insert (self->lights, light, light))
 		return 0;
@@ -91,9 +91,9 @@ int liren_lighting_insert_light (
  * \param self Light manager.
  * \param light Light source.
  */
-void liren_lighting_remove_light (
-	LIRenLighting* self,
-	LIRenLight*    light)
+void liren_lighting32_remove_light (
+	LIRenLighting32* self,
+	LIRenLight32*    light)
 {
 	lialg_ptrdic_remove (self->lights, light);
 	light->enabled = 0;
@@ -103,16 +103,16 @@ void liren_lighting_remove_light (
  * \brief Updates the status of all registered light sources.
  * \param self Light manager.
  */
-void liren_lighting_update (
-	LIRenLighting* self)
+void liren_lighting32_update (
+	LIRenLighting32* self)
 {
 	LIAlgPtrdicIter iter;
-	LIRenLight* light;
+	LIRenLight32* light;
 
 	LIALG_PTRDIC_FOREACH (iter, self->lights)
 	{
 		light = iter.value;
-		liren_light_update (light);
+		liren_light32_update (light);
 	}
 }
 
@@ -121,15 +121,15 @@ void liren_lighting_update (
  * \param self Lighting.
  * \param context Context.
  */
-void liren_lighting_upload (
-	LIRenLighting* self,
-	LIRenContext*  context)
+void liren_lighting32_upload (
+	LIRenLighting32* self,
+	LIRenContext32*  context)
 {
 	int i;
 	int count;
 	LIAlgPtrdicIter iter;
-	LIRenLight* light;
-	LIRenLight* lights[LIREN_CONTEXT_MAX_LIGHTS + 1];
+	LIRenLight32* light;
+	LIRenLight32* lights[LIREN_CONTEXT_MAX_LIGHTS + 1];
 
 	/* Clear the light list. */
 	for (i = 0 ; i < LIREN_CONTEXT_MAX_LIGHTS ; i++)
@@ -145,7 +145,7 @@ void liren_lighting_upload (
 		light = iter.value;
 		for (i = count ; i > 0 ; i--)
 		{
-			if (liren_light_compare (light, lights[i - 1]) < 0)
+			if (liren_light32_compare (light, lights[i - 1]) < 0)
 				break;
 			lights[i] = lights[i - 1];
 		}
@@ -158,8 +158,8 @@ void liren_lighting_upload (
 	{
 		light = lights[i];
 		if (light != NULL)
-			liren_light_update_cache (light, context);
-		liren_context_set_light (context, i, light);
+			liren_light32_update_cache (light, context);
+		liren_context32_set_light (context, i, light);
 	}
 }
 

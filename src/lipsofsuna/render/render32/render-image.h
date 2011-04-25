@@ -15,30 +15,36 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER32_BUFFER_TEXTURE_H__
-#define __RENDER32_BUFFER_TEXTURE_H__
+#ifndef __RENDER32_IMAGE_H__
+#define __RENDER32_IMAGE_H__
 
-#include "lipsofsuna/video.h"
+#include "lipsofsuna/image.h"
+#include "lipsofsuna/system.h"
+#include "render-types.h"
 
-typedef struct _LIRenBufferTexture32 LIRenBufferTexture32;
-struct _LIRenBufferTexture32
-{
-	int size;
-	GLuint buffer;
-	GLuint texture;
-};
+typedef struct _LIRenImage32 LIRenImage32;
 
-LIAPICALL (void, liren_buffer_texture32_init, (
-	LIRenBufferTexture32* self,
-	void*                 data,
-	int                   size));
+LIAPICALL (LIRenImage32*, liren_image32_new, (
+	LIRenRender32* render,
+	const char*    name));
 
-LIAPICALL (void, liren_buffer_texture32_clear, (
-	LIRenBufferTexture32* self));
+LIAPICALL (LIRenImage32*, liren_image32_new_from_file, (
+	LIRenRender32* render,
+	const char*    name));
 
-LIAPICALL (void, liren_buffer_texture32_upload, (
-	LIRenBufferTexture32* self,
-	int                   size,
-	void*                 data));
+LIAPICALL (void, liren_image32_free, (
+	LIRenImage32* self));
+
+LIAPICALL (int, liren_image32_reload, (
+	LIRenImage32* self));
+
+LIAPICALL (GLuint, liren_image32_get_handle, (
+	const LIRenImage32* self));
+
+LIAPICALL (int, liren_image32_get_height, (
+	const LIRenImage32* self));
+
+LIAPICALL (int, liren_image32_get_width, (
+	const LIRenImage32* self));
 
 #endif

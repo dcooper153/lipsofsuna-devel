@@ -28,14 +28,7 @@ LIAPICALL (LIRenImage*, liren_image_new, (
 	LIRenRender* render,
 	const char*  name));
 
-LIAPICALL (LIRenImage*, liren_image_new_from_file, (
-	LIRenRender* render,
-	const char*  name));
-
 LIAPICALL (void, liren_image_free, (
-	LIRenImage* self));
-
-LIAPICALL (int, liren_image_reload, (
 	LIRenImage* self));
 
 LIAPICALL (GLuint, liren_image_get_handle, (

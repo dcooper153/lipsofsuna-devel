@@ -24,25 +24,28 @@
 
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
+#include "render.h"
+#include "render-private.h"
+#include "render-particles.h"
+#include "render-sort.h"
 #include "../render.h"
 #include "../render-private.h"
-#include "render-particles.h"
 
 #define TIMESCALE 0.02f
 
 static int private_evaluate_frame (
-	LIRenParticles* self,
-	int             system,
-	int             particle,
-	int             frame,
-	int             loop);
+	LIRenParticles32* self,
+	int               system,
+	int               particle,
+	int               frame,
+	int               loop);
 
 /*****************************************************************************/
 
-int liren_particles_init (
-	LIRenParticles* self,
-	LIRenRender*    render,
-	LIMdlModel*     model)
+int liren_particles32_init (
+	LIRenParticles32* self,
+	LIRenRender32*    render,
+	LIMdlModel*       model)
 {
 	int i;
 	int j;
@@ -51,21 +54,21 @@ int liren_particles_init (
 	LIMdlParticle* srcparticle;
 	LIMdlParticleFrame* srcframe;
 	LIMdlParticleSystem* srcsystem;
-	LIRenParticle* dstparticle;
-	LIRenParticleFrame* dstframe;
-	LIRenParticleSystem* dstsystem;
+	LIRenParticle32* dstparticle;
+	LIRenParticleFrame32* dstframe;
+	LIRenParticleSystem32* dstsystem;
 
-	memset (self, 0, sizeof (LIRenParticles));
+	memset (self, 0, sizeof (LIRenParticles32));
 
 	/* Create particle systems and count particles. */
 	if (model->particlesystems.count)
 	{
 		/* Allocate particle system information. */
 		self->systems.count = model->particlesystems.count;
-		self->systems.array = lisys_calloc (self->systems.count, sizeof (LIRenParticleSystem));
+		self->systems.array = lisys_calloc (self->systems.count, sizeof (LIRenParticleSystem32));
 		if (self->systems.array == NULL)
 		{
-			liren_particles_clear (self);
+			liren_particles32_clear (self);
 			return 0;
 		}
 
@@ -82,15 +85,12 @@ int liren_particles_init (
 			dstsystem->shader = listr_dup (srcsystem->shader);
 			if (dstsystem->shader == NULL)
 			{
-				liren_particles_clear (self);
+				liren_particles32_clear (self);
 				return 0;
 			}
-			dstsystem->image = liren_render_find_image (render, srcsystem->texture);
+			dstsystem->image = liren_render32_find_image (render, srcsystem->texture);
 			if (dstsystem->image == NULL)
-			{
-				liren_render_load_image (render, srcsystem->texture);
-				dstsystem->image = liren_render_find_image (render, srcsystem->texture);
-			}
+				dstsystem->image = liren_render32_load_image (render, srcsystem->texture);
 			self->particles.count += srcsystem->particles.count;
 			dstsystem->particle_end = self->particles.count;
 		}
@@ -100,10 +100,10 @@ int liren_particles_init (
 	if (self->particles.count)
 	{
 		/* Allocate particle information. */
-		self->particles.array = lisys_calloc (self->particles.count, sizeof (LIRenParticle));
+		self->particles.array = lisys_calloc (self->particles.count, sizeof (LIRenParticle32));
 		if (self->particles.array == NULL)
 		{
-			liren_particles_clear (self);
+			liren_particles32_clear (self);
 			return 0;
 		}
 
@@ -131,10 +131,10 @@ int liren_particles_init (
 	if (self->frames.count)
 	{
 		/* Allocate particle information. */
-		self->frames.array = lisys_calloc (self->frames.count, sizeof (LIRenParticleFrame));
+		self->frames.array = lisys_calloc (self->frames.count, sizeof (LIRenParticleFrame32));
 		if (self->frames.array == NULL)
 		{
-			liren_particles_clear (self);
+			liren_particles32_clear (self);
 			return 0;
 		}
 
@@ -182,8 +182,8 @@ int liren_particles_init (
 	return 1;
 }
 
-void liren_particles_clear (
-	LIRenParticles* self)
+void liren_particles32_clear (
+	LIRenParticles32* self)
 {
 	int i;
 
@@ -192,25 +192,25 @@ void liren_particles_clear (
 	lisys_free (self->particles.array);
 	lisys_free (self->frames.array);
 	lisys_free (self->systems.array);
-	memset (self, 0, sizeof (LIRenParticles));
+	memset (self, 0, sizeof (LIRenParticles32));
 }
 
-int liren_particles_evaluate_particle (
-	LIRenParticles* self,
-	int             system,
-	int             particle,
-	float           time,
-	int             loop,
-	LIMatVector*    position,
-	float*          color)
+int liren_particles32_evaluate_particle (
+	LIRenParticles32* self,
+	int               system,
+	int               particle,
+	float             time,
+	int               loop,
+	LIMatVector*      position,
+	float*            color)
 {
 	int index0;
 	int index1;
 	float frame;
-	LIRenParticle* p;
-	LIRenParticleFrame* frame0;
-	LIRenParticleFrame* frame1;
-	LIRenParticleSystem* s;
+	LIRenParticle32* p;
+	LIRenParticleFrame32* frame0;
+	LIRenParticleFrame32* frame1;
+	LIRenParticleSystem32* s;
 
 	/* Calculate the offset into the whole particle animation. */
 	s = self->systems.array + system;
@@ -249,34 +249,34 @@ int liren_particles_evaluate_particle (
 	return 1;
 }
 
-void liren_particles_sort (
-	LIRenParticles*       self,
+void liren_particles32_sort (
+	LIRenParticles32*     self,
 	float                 time,
 	int                   loop,
 	const LIMatTransform* transform,
-	LIRenSort*            sort)
+	LIRenSort32*          sort)
 {
 	int i;
 	int j;
 	float color[4];
 	LIMatVector coord;
-	LIRenParticleSystem* system;
-	LIRenShader* shader;
+	LIRenParticleSystem32* system;
+	LIRenShader32* shader;
 
 	for (i = 0 ; i < self->systems.count ; i++)
 	{
 		system = self->systems.array + i;
 		if (system->image == NULL)
 			continue;
-		shader = liren_render_find_shader (sort->render, system->shader);
+		shader = liren_render32_find_shader (sort->render, system->shader);
 		if (shader == NULL)
 			continue;
 		for (j = system->particle_start ; j < system->particle_end ; j++)
 		{
-			if (liren_particles_evaluate_particle (self, i, j, time, loop, &coord, color))
+			if (liren_particles32_evaluate_particle (self, i, j, time, loop, &coord, color))
 			{
 				coord = limat_transform_transform (*transform, coord);
-				liren_sort_add_particle (sort, &coord, system->particle_size, color, system->image, shader);
+				liren_sort32_add_particle (sort, &coord, system->particle_size, color, system->image, shader);
 			}
 		}
 	}
@@ -285,14 +285,14 @@ void liren_particles_sort (
 /*****************************************************************************/
 
 static int private_evaluate_frame (
-	LIRenParticles* self,
-	int             system,
-	int             particle,
-	int             frame,
-	int             loop)
+	LIRenParticles32* self,
+	int               system,
+	int               particle,
+	int               frame,
+	int               loop)
 {
-	LIRenParticle* p;
-	LIRenParticleSystem* s;
+	LIRenParticle32* p;
+	LIRenParticleSystem32* s;
 
 	/* Get the particle. */
 	s = self->systems.array + system;
