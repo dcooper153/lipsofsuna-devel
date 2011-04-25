@@ -159,7 +159,7 @@ void liwdg_widget_canvas_compile (
 	LIWdgElement* elem;
 
 	for (elem = self->elements ; elem != NULL ; elem = elem->next)
-		liwdg_element_update (elem, &self->allocation);
+		liwdg_element_update (elem, self->manager, &self->allocation);
 }
 
 int liwdg_widget_canvas_insert (

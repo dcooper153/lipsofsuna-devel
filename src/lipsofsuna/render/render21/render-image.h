@@ -15,24 +15,30 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_BUFFER_H__
-#define __RENDER_BUFFER_H__
+#ifndef __RENDER21_IMAGE_H__
+#define __RENDER21_IMAGE_H__
 
-#include "lipsofsuna/model.h"
+#include "lipsofsuna/image.h"
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
 #include "render-types.h"
 
-LIAPICALL (LIRenBuffer*, liren_buffer_new, (
-	LIRenRender*       render,
-	const void*        index_data,
-	int                index_count,
-	const LIRenFormat* vertex_format,
-	const void*        vertex_data,
-	int                vertex_count,
-	int                type));
+LIAPICALL (LIRenImage21*, liren_image21_new_from_file, (
+	LIRenRender21* render,
+	const char*    name));
 
-LIAPICALL (void, liren_buffer_free, (
-	LIRenBuffer* self));
+LIAPICALL (void, liren_image21_free, (
+	LIRenImage21* self));
+
+LIAPICALL (int, liren_image21_reload, (
+	LIRenImage21* self));
+
+LIAPICALL (GLuint, liren_image21_get_handle, (
+	const LIRenImage21* self));
+
+LIAPICALL (int, liren_image21_get_height, (
+	const LIRenImage21* self));
+
+LIAPICALL (int, liren_image21_get_width, (
+	const LIRenImage21* self));
 
 #endif

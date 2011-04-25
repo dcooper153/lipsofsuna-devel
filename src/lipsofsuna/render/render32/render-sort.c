@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenSort Sort
+ * \addtogroup LIRenSort32 Sort32
  * @{
  */
 

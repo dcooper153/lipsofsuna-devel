@@ -15,24 +15,44 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_BUFFER_H__
-#define __RENDER_BUFFER_H__
+#ifndef __RENDER21_MODEL_H__
+#define __RENDER21_MODEL_H__
 
+#include "lipsofsuna/image.h"
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
+#include "render.h"
 #include "render-types.h"
 
-LIAPICALL (LIRenBuffer*, liren_buffer_new, (
-	LIRenRender*       render,
-	const void*        index_data,
-	int                index_count,
-	const LIRenFormat* vertex_format,
-	const void*        vertex_data,
-	int                vertex_count,
-	int                type));
+LIAPICALL (LIRenModel21*, liren_model21_new, (
+	LIRenRender21* render,
+	LIMdlModel*    model,
+	int            id));
 
-LIAPICALL (void, liren_buffer_free, (
-	LIRenBuffer* self));
+LIAPICALL (void, liren_model21_free, (
+	LIRenModel21* self));
+
+LIAPICALL (int, liren_model21_deform, (
+	LIRenModel21*    self,
+	const char*      shader,
+	const LIMdlPose* pose));
+
+LIAPICALL (void, liren_model21_reload, (
+	LIRenModel21* self));
+
+LIAPICALL (void, liren_model21_replace_image, (
+	LIRenModel21* self,
+	LIRenImage21* image));
+
+LIAPICALL (void, liren_model21_update_transparency, (
+	LIRenModel21* self));
+
+LIAPICALL (void, liren_model21_get_bounds, (
+	LIRenModel21* self,
+	LIMatAabb*    aabb));
+
+LIAPICALL (int, liren_model21_set_model, (
+	LIRenModel21* self,
+	LIMdlModel*   model));
 
 #endif

@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenBufferTexture BufferTexture
+ * \addtogroup LIRenBufferTexture32 BufferTexture32
  * @{
  */
 

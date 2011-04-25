@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenRender32 Render
+ * \addtogroup LIRenRender32 Render32
  * @{
  */
 
@@ -91,10 +91,10 @@ void liren_render32_free (
 void liren_render32_draw_clipped_buffer (
 	LIRenRender32* self,
 	LIRenShader32* shader,
-	LIMatMatrix* projection,
-	GLuint       texture,
-	const float* diffuse,
-	const int*   scissor,
+	LIMatMatrix*   projection,
+	GLuint         texture,
+	const float*   diffuse,
+	const int*     scissor,
 	LIRenBuffer32* buffer)
 {
 	int scissor1[5];
@@ -121,8 +121,8 @@ void liren_render32_draw_clipped_buffer (
 }
 
 void liren_render32_draw_indexed_triangles_T2V3 (
-	LIRenRender32*    self,
-	LIRenShader32*    shader,
+	LIRenRender32*  self,
+	LIRenShader32*  shader,
 	LIMatMatrix*    matrix,
 	GLuint          texture,
 	const float*    diffuse,
@@ -201,7 +201,7 @@ LIRenImage32* liren_render32_find_image (
  */
 LIRenModel32* liren_render32_find_model (
 	LIRenRender32* self,
-	int          id)
+	int            id)
 {
 	LIRenModel* model;
 
@@ -216,9 +216,15 @@ LIRenImage32* liren_render32_load_image (
 	LIRenRender32* self,
 	const char*    name)
 {
-	liren_render_load_image (self->render, name);
+	LIRenImage32* image;
 
-	return liren_render32_find_image (self, name);
+	image = liren_render32_find_image (self, name);
+	if (image != NULL)
+		return image;
+	liren_render_load_image (self->render, name);
+	image = liren_render32_find_image (self, name);
+
+	return image;
 }
 
 /**
@@ -285,7 +291,7 @@ int liren_render32_reload_image (
  */
 void liren_render32_update (
 	LIRenRender32* self,
-	float        secs)
+	float          secs)
 {
 	/* Update time. */
 	self->helpers.time += secs;
@@ -299,7 +305,7 @@ int liren_render32_get_anisotropy (
 
 void liren_render32_set_anisotropy (
 	LIRenRender32* self,
-	int          value)
+	int            value)
 {
 	int binding;
 	LIAlgStrdicIter iter;

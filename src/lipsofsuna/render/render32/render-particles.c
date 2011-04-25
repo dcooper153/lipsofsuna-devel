@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenParticles Particles
+ * \addtogroup LIRenParticles32 Particles32
  * @{
  */
 

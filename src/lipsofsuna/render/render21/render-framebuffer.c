@@ -18,15 +18,13 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenFramebuffer Framebuffer
+ * \addtogroup LIRenFramebuffer21 Framebuffer21
  * @{
  */
 
 #include "lipsofsuna/system.h"
 #include "render-framebuffer.h"
 #include "render-private.h"
-#include "render21/render-framebuffer.h"
-#include "render32/render-framebuffer.h"
 
 /**
  * \brief Creates a rendering framebuffer.
@@ -37,38 +35,24 @@
  * \param hdr Nonzero to use floating point framebuffer to enable HDR.
  * \return New deferred framebuffer or NULL.
  */
-LIRenFramebuffer* liren_framebuffer_new (
-	LIRenRender* render,
-	int          width,
-	int          height,
-	int          samples,
-	int          hdr)
+LIRenFramebuffer21* liren_framebuffer21_new (
+	LIRenRender21* render,
+	int            width,
+	int            height,
+	int            samples,
+	int            hdr)
 {
-	LIRenFramebuffer* self;
+	LIRenFramebuffer21* self;
 
-	self = lisys_calloc (1, sizeof (LIRenFramebuffer));
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (LIRenFramebuffer21));
 	if (self == NULL)
 		return NULL;
+	self->render = render;
+	self->width = width;
+	self->height = height;
 
-	/* Initialize the backend. */
-	if (render->v32 != NULL)
-	{
-		self->v32 = liren_framebuffer32_new (render->v32, width, height, samples, hdr);
-		if (self->v32 == NULL)
-		{
-			lisys_free (self);
-			return NULL;
-		}
-	}
-	else
-	{
-		self->v21 = liren_framebuffer21_new (render->v21, width, height, samples, hdr);
-		if (self->v21 == NULL)
-		{
-			lisys_free (self);
-			return NULL;
-		}
-	}
+	/* TODO */
 
 	return self;
 }
@@ -77,13 +61,10 @@ LIRenFramebuffer* liren_framebuffer_new (
  * \brief Frees the framebuffer.
  * \param self Framebuffer.
  */
-void liren_framebuffer_free (
-	LIRenFramebuffer* self)
+void liren_framebuffer21_free (
+	LIRenFramebuffer21* self)
 {
-	if (self->v32 != NULL)
-		liren_framebuffer32_free (self->v32);
-	if (self->v21 != NULL)
-		liren_framebuffer21_free (self->v21);
+	/* TODO */
 	lisys_free (self);
 }
 
@@ -96,17 +77,19 @@ void liren_framebuffer_free (
  * \param hdr Nonzero to use floating point framebuffer to enable HDR.
  * \return Nonzero on success.
  */
-int liren_framebuffer_resize (
-	LIRenFramebuffer* self,
-	int               width,
-	int               height,
-	int               samples,
-	int               hdr)
+int liren_framebuffer21_resize (
+	LIRenFramebuffer21* self,
+	int                 width,
+	int                 height,
+	int                 samples,
+	int                 hdr)
 {
-	if (self->v32 != NULL)
-		return liren_framebuffer32_resize (self->v32, width, height, samples, hdr);
-	else
-		return liren_framebuffer21_resize (self->v21, width, height, samples, hdr);
+	/* TODO */
+	self->width = width;
+	self->height = height;
+	self->samples = samples;
+
+	return 1;
 }
 
 /** @} */

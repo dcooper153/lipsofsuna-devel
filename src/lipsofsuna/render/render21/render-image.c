@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenImage32 Image32
+ * \addtogroup LIRenImage21 Image21
  * @{
  */
 
@@ -33,46 +33,10 @@ static const uint8_t missing_image[16] =
 };
 
 static int private_init (
-	LIRenImage32* self,
+	LIRenImage21* self,
 	const char*   name);
 
 /*****************************************************************************/
-
-/**
- * \brief Creates an empty image.
- * \param render Renderer.
- * \param name Image name.
- * \return Image or NULL.
- */
-LIRenImage32* liren_image32_new (
-	LIRenRender32* render,
-	const char*    name)
-{
-	LIRenImage32* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIRenImage32));
-	if (self == NULL)
-		return NULL;
-	self->render = render;
-	self->empty = 1;
-
-	/* Set name and path. */
-	if (!private_init (self, name))
-	{
-		liren_image32_free (self);
-		return NULL;
-	}
-
-	/* Load texture. */
-	if (!liren_image32_reload (self))
-	{
-		liren_image32_free (self);
-		return NULL;
-	}
-
-	return self;
-}
 
 /**
  * \brief Creates an image from a file.
@@ -80,14 +44,14 @@ LIRenImage32* liren_image32_new (
  * \param name Image name.
  * \return Image or NULL.
  */
-LIRenImage32* liren_image32_new_from_file (
-	LIRenRender32* render,
+LIRenImage21* liren_image21_new_from_file (
+	LIRenRender21* render,
 	const char*    name)
 {
-	LIRenImage32* self;
+	LIRenImage21* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIRenImage32));
+	self = lisys_calloc (1, sizeof (LIRenImage21));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
@@ -95,14 +59,14 @@ LIRenImage32* liren_image32_new_from_file (
 	/* Set name and path. */
 	if (!private_init (self, name))
 	{
-		liren_image32_free (self);
+		liren_image21_free (self);
 		return NULL;
 	}
 
 	/* Load texture. */
-	if (!liren_image32_reload (self))
+	if (!liren_image21_reload (self))
 	{
-		liren_image32_free (self);
+		liren_image21_free (self);
 		return NULL;
 	}
 
@@ -113,8 +77,8 @@ LIRenImage32* liren_image32_new_from_file (
  * \brief Frees the image.
  * \param self Image.
  */
-void liren_image32_free (
-	LIRenImage32* self)
+void liren_image21_free (
+	LIRenImage21* self)
 {
 	if (self->texture != NULL)
 		liimg_texture_free (self->texture);
@@ -128,8 +92,8 @@ void liren_image32_free (
  * \param self Image.
  * \return Nonzero on success.
  */
-int liren_image32_reload (
-	LIRenImage32* self)
+int liren_image21_reload (
+	LIRenImage21* self)
 {
 	LIImgTexture* texture;
 
@@ -149,20 +113,20 @@ int liren_image32_reload (
 	return 1;
 }
 
-GLuint liren_image32_get_handle (
-	const LIRenImage32* self)
+GLuint liren_image21_get_handle (
+	const LIRenImage21* self)
 {
 	return self->texture->texture;
 }
 
-int liren_image32_get_height (
-	const LIRenImage32* self)
+int liren_image21_get_height (
+	const LIRenImage21* self)
 {
 	return self->texture->height;
 }
 
-int liren_image32_get_width (
-	const LIRenImage32* self)
+int liren_image21_get_width (
+	const LIRenImage21* self)
 {
 	return self->texture->width;
 }
@@ -170,7 +134,7 @@ int liren_image32_get_width (
 /*****************************************************************************/
 
 static int private_init (
-	LIRenImage32* self,
+	LIRenImage21* self,
 	const char*   name)
 {
 	char* file;

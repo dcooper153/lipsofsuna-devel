@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenBuffer32 Buffer
+ * \addtogroup LIRenBuffer32 Buffer32
  * @{
  */
 

@@ -55,12 +55,26 @@ LIRenLight* liren_light_new (
 		return NULL;
 	self->scene = scene;
 
-	self->v32 = liren_light32_new (scene->v32, ambient, diffuse,
-		specular, equation, cutoff, exponent, shadows);
-	if (self->v32 == NULL)
+	/* Initialize the backend. */
+	if (scene->v32 != NULL)
 	{
-		lisys_free (self);
-		return NULL;
+		self->v32 = liren_light32_new (scene->v32, ambient, diffuse,
+			specular, equation, cutoff, exponent, shadows);
+		if (self->v32 == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
+	}
+	else
+	{
+		self->v21 = liren_light21_new (scene->v21, ambient, diffuse,
+			specular, equation, cutoff, exponent, shadows);
+		if (self->v21 == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
 	}
 
 	return self;
@@ -73,7 +87,10 @@ LIRenLight* liren_light_new (
 void liren_light_free (
 	LIRenLight* self)
 {
-	liren_light32_free (self->v32);
+	if (self->v32 != NULL)
+		liren_light32_free (self->v32);
+	if (self->v21 != NULL)
+		liren_light21_free (self->v21);
 	lisys_free (self);
 }
 
@@ -81,28 +98,40 @@ void liren_light_get_ambient (
 	LIRenLight* self,
 	float*      value)
 {
-	liren_light32_get_ambient (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_get_ambient (self->v32, value);
+	else
+		liren_light21_get_ambient (self->v21, value);
 }
 
 void liren_light_set_ambient (
 	LIRenLight*  self,
 	const float* value)
 {
-	liren_light32_set_ambient (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_set_ambient (self->v32, value);
+	else
+		liren_light21_set_ambient (self->v21, value);
 }
 
 void liren_light_get_diffuse (
 	LIRenLight* self,
 	float*      value)
 {
-	liren_light32_get_diffuse (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_get_diffuse (self->v32, value);
+	else
+		liren_light21_get_diffuse (self->v21, value);
 }
 
 void liren_light_set_diffuse (
 	LIRenLight*  self,
 	const float* value)
 {
-	liren_light32_set_diffuse (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_set_diffuse (self->v32, value);
+	else
+		liren_light21_set_diffuse (self->v21, value);
 }
 
 /**
@@ -113,21 +142,30 @@ void liren_light_set_diffuse (
 int liren_light_get_enabled (
 	const LIRenLight* self)
 {
-	return liren_light32_get_enabled (self->v32);
+	if (self->v32 != NULL)
+		return liren_light32_get_enabled (self->v32);
+	else
+		return liren_light21_get_enabled (self->v21);
 }
 
 void liren_light_get_equation (
 	LIRenLight* self,
 	float*      value)
 {
-	liren_light32_get_equation (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_get_equation (self->v32, value);
+	else
+		liren_light21_get_equation (self->v21, value);
 }
 
 void liren_light_set_equation (
 	LIRenLight*  self,
 	const float* value)
 {
-	liren_light32_set_equation (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_set_equation (self->v32, value);
+	else
+		liren_light21_set_equation (self->v21, value);
 }
 
 /**
@@ -139,7 +177,10 @@ void liren_light_get_position (
 	const LIRenLight* self,
 	GLfloat*          value)
 {
-	liren_light32_get_position (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_get_position (self->v32, value);
+	else
+		liren_light21_get_position (self->v21, value);
 }
 
 /**
@@ -150,7 +191,10 @@ void liren_light_get_position (
 float liren_light_get_priority (
 	LIRenLight* self)
 {
-	return liren_light32_get_priority (self->v32);
+	if (self->v32 != NULL)
+		return liren_light32_get_priority (self->v32);
+	else
+		return liren_light21_get_priority (self->v21);
 }
 
 /**
@@ -162,7 +206,10 @@ void liren_light_set_priority (
 	LIRenLight* self,
 	float       value)
 {
-	liren_light32_set_priority (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_set_priority (self->v32, value);
+	else
+		liren_light21_set_priority (self->v21, value);
 }
 
 LIRenScene* liren_light_get_scene (
@@ -179,7 +226,10 @@ LIRenScene* liren_light_get_scene (
 int liren_light_get_shadow (
 	const LIRenLight* self)
 {
-	return liren_light32_get_shadow (self->v32);
+	if (self->v32 != NULL)
+		return liren_light32_get_shadow (self->v32);
+	else
+		return liren_light21_get_shadow (self->v21);
 }
 
 /**
@@ -191,73 +241,106 @@ void liren_light_set_shadow (
 	LIRenLight* self,
 	int         value)
 {
-	liren_light32_set_shadow (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_set_shadow (self->v32, value);
+	else
+		liren_light21_set_shadow (self->v21, value);
 }
 
 float liren_light_get_shadow_far (
 	const LIRenLight* self)
 {
-	return liren_light32_get_shadow_far (self->v32);
+	if (self->v32 != NULL)
+		return liren_light32_get_shadow_far (self->v32);
+	else
+		return liren_light21_get_shadow_far (self->v21);
 }
 
 void liren_light_set_shadow_far (
 	LIRenLight* self,
 	float       value)
 {
-	liren_light32_set_shadow_far (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_set_shadow_far (self->v32, value);
+	else
+		liren_light21_set_shadow_far (self->v21, value);
 }
 
 float liren_light_get_shadow_near (
 	const LIRenLight* self)
 {
-	return liren_light32_get_shadow_near (self->v32);
+	if (self->v32 != NULL)
+		return liren_light32_get_shadow_near (self->v32);
+	else
+		return liren_light21_get_shadow_near (self->v21);
 }
 
 void liren_light_set_shadow_near (
 	LIRenLight* self,
 	float       value)
 {
-	liren_light32_set_shadow_near (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_set_shadow_near (self->v32, value);
+	else
+		liren_light21_set_shadow_near (self->v21, value);
 }
 
 void liren_light_get_specular (
 	LIRenLight* self,
 	float*      value)
 {
-	liren_light32_get_specular (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_get_specular (self->v32, value);
+	else
+		liren_light21_get_specular (self->v21, value);
 }
 
 void liren_light_set_specular (
 	LIRenLight*  self,
 	const float* value)
 {
-	liren_light32_set_specular (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_set_specular (self->v32, value);
+	else
+		liren_light21_set_specular (self->v21, value);
 }
 
 float liren_light_get_spot_cutoff (
 	const LIRenLight* self)
 {
-	return liren_light32_get_spot_cutoff (self->v32);
+	if (self->v32 != NULL)
+		return liren_light32_get_spot_cutoff (self->v32);
+	else
+		return liren_light21_get_spot_cutoff (self->v21);
 }
 
 void liren_light_set_spot_cutoff (
 	LIRenLight* self,
 	float       value)
 {
-	liren_light32_set_spot_cutoff (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_set_spot_cutoff (self->v32, value);
+	else
+		liren_light21_set_spot_cutoff (self->v21, value);
 }
 
 float liren_light_get_spot_exponent (
 	const LIRenLight* self)
 {
-	return liren_light32_get_spot_exponent (self->v32);
+	if (self->v32 != NULL)
+		return liren_light32_get_spot_exponent (self->v32);
+	else
+		return liren_light21_get_spot_exponent (self->v21);
 }
 
 void liren_light_set_spot_exponent (
 	LIRenLight* self,
 	float       value)
 {
-	liren_light32_set_spot_exponent (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_set_spot_exponent (self->v32, value);
+	else
+		liren_light21_set_spot_exponent (self->v21, value);
 }
 
 /**
@@ -269,14 +352,14 @@ void liren_light_get_transform (
 	LIRenLight*     self,
 	LIMatTransform* value)
 {
-	liren_light32_get_transform (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_get_transform (self->v32, value);
+	else
+		liren_light21_get_transform (self->v21, value);
 }
 
 /**
  * \brief Sets the transformation of the light.
- *
- * This modifies the modelview matrix.
- *
  * \param self Light source.
  * \param transform Transformation.
  */
@@ -284,7 +367,10 @@ void liren_light_set_transform (
 	LIRenLight*           self,
 	const LIMatTransform* value)
 {
-	liren_light32_set_transform (self->v32, value);
+	if (self->v32 != NULL)
+		liren_light32_set_transform (self->v32, value);
+	else
+		liren_light21_set_transform (self->v21, value);
 }
 
 /** @} */

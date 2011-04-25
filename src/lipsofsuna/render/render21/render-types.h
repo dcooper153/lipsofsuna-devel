@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,24 +15,22 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_BUFFER_H__
-#define __RENDER_BUFFER_H__
+#ifndef __RENDER21_TYPES_H__
+#define __RENDER21_TYPES_H__
 
-#include "lipsofsuna/model.h"
-#include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
-#include "render-types.h"
+#include <lipsofsuna/math.h>
+#include <lipsofsuna/video.h>
+#include "../render-types-common.h"
 
-LIAPICALL (LIRenBuffer*, liren_buffer_new, (
-	LIRenRender*       render,
-	const void*        index_data,
-	int                index_count,
-	const LIRenFormat* vertex_format,
-	const void*        vertex_data,
-	int                vertex_count,
-	int                type));
-
-LIAPICALL (void, liren_buffer_free, (
-	LIRenBuffer* self));
+typedef struct _LIRenBuffer21 LIRenBuffer21;
+typedef struct _LIRenFramebuffer21 LIRenFramebuffer21;
+typedef struct _LIRenImage21 LIRenImage21;
+typedef struct _LIRenLight21 LIRenLight21;
+typedef struct _LIRenMaterial21 LIRenMaterial21;
+typedef struct _LIRenModel21 LIRenModel21;
+typedef struct _LIRenObject21 LIRenObject21;
+typedef struct _LIRenRender21 LIRenRender21;
+typedef struct _LIRenScene21 LIRenScene21;
+typedef struct _LIRenShader21 LIRenShader21;
 
 #endif

@@ -67,11 +67,23 @@ LIRenRender* liren_render_new (
 	}
 
 	/* Initialize the backend. */
-	self->v32 = liren_render32_new (self, paths);
-	if (self->v32 == NULL)
+	if (GLEW_VERSION_3_2 && getenv ("LOS_OPENGL21") == NULL)
 	{
-		lisys_free (self);
-		return NULL;
+		self->v32 = liren_render32_new (self, paths);
+		if (self->v32 == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
+	}
+	else
+	{
+		self->v21 = liren_render21_new (self, paths);
+		if (self->v21 == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
 	}
 
 	return self;
@@ -110,6 +122,8 @@ void liren_render_free (
 	}
 
 	/* Free the backend. */
+	if (self->v21 != NULL)
+		liren_render21_free (self->v21);
 	if (self->v32 != NULL)
 		liren_render32_free (self->v32);
 	lisys_free (self);
@@ -124,8 +138,16 @@ void liren_render_draw_clipped_buffer (
 	const int*   scissor,
 	LIRenBuffer* buffer)
 {
-	liren_render32_draw_clipped_buffer (self->v32, shader->v32, projection,
-		texture, diffuse, scissor, buffer->v32);
+	if (self->v32 != NULL)
+	{
+		liren_render32_draw_clipped_buffer (self->v32, shader->v32, projection,
+			texture, diffuse, scissor, buffer->v32);
+	}
+	else
+	{
+		liren_render21_draw_clipped_buffer (self->v21, shader->v21, projection,
+			texture, diffuse, scissor, buffer->v21);
+	}
 }
 
 void liren_render_draw_indexed_triangles_T2V3 (
@@ -138,8 +160,16 @@ void liren_render_draw_indexed_triangles_T2V3 (
 	const uint32_t* index_data,
 	int             index_count)
 {
-	liren_render32_draw_indexed_triangles_T2V3 (self->v32, shader->v32, matrix,
-		texture, diffuse, vertex_data, index_data, index_count);
+	if (self->v32 != NULL)
+	{
+		liren_render32_draw_indexed_triangles_T2V3 (self->v32, shader->v32, matrix,
+			texture, diffuse, vertex_data, index_data, index_count);
+	}
+	else
+	{
+		liren_render21_draw_indexed_triangles_T2V3 (self->v21, shader->v21, matrix,
+			texture, diffuse, vertex_data, index_data, index_count);
+	}
 }
 
 /**
@@ -202,12 +232,24 @@ int liren_render_load_image (
 {
 	LIRenImage* image;
 
-	image = liren_render_find_image (self, name);
-	if (image != NULL)
-		return liren_render32_reload_image (self->v32, image->v32);
-	image = liren_image_new (self, name);
-	if (image == NULL)
-		return 0;
+	if (self->v32 != NULL)
+	{
+		image = liren_render_find_image (self, name);
+		if (image != NULL)
+			return liren_render32_reload_image (self->v32, image->v32);
+		image = liren_image_new (self, name);
+		if (image == NULL)
+			return 0;
+	}
+	else
+	{
+		image = liren_render_find_image (self, name);
+		if (image != NULL)
+			return liren_render21_reload_image (self->v21, image->v21);
+		image = liren_image_new (self, name);
+		if (image == NULL)
+			return 0;
+	}
 
 	return 1;
 }
@@ -223,7 +265,10 @@ int liren_render_load_image (
 void liren_render_reload (
 	LIRenRender* self)
 {
-	liren_render32_reload (self->v32);
+	if (self->v32 != NULL)
+		liren_render32_reload (self->v32);
+	else
+		liren_render21_reload (self->v21);
 }
 
 /**
@@ -235,20 +280,29 @@ void liren_render_update (
 	LIRenRender* self,
 	float        secs)
 {
-	liren_render32_update (self->v32, secs);
+	if (self->v32 != NULL)
+		liren_render32_update (self->v32, secs);
+	else
+		liren_render21_update (self->v21, secs);
 }
 
 int liren_render_get_anisotropy (
 	const LIRenRender* self)
 {
-	return liren_render32_get_anisotropy (self->v32);
+	if (self->v32 != NULL)
+		return liren_render32_get_anisotropy (self->v32);
+	else
+		return liren_render21_get_anisotropy (self->v21);
 }
 
 void liren_render_set_anisotropy (
 	LIRenRender* self,
 	int          value)
 {
-	liren_render32_set_anisotropy (self->v32, value);
+	if (self->v32 != NULL)
+		liren_render32_set_anisotropy (self->v32, value);
+	else
+		liren_render21_set_anisotropy (self->v21, value);
 }
 
 /** @} */

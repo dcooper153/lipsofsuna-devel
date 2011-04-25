@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenMaterial32 Material
+ * \addtogroup LIRenMaterial32 Material32
  * @{
  */
 

@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenUniforms Uniforms
+ * \addtogroup LIRenUniforms32 Uniforms32
  * @{
  */
 

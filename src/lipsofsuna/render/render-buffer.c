@@ -36,6 +36,7 @@
  * \return Vertex buffer or NULL.
  */
 LIRenBuffer* liren_buffer_new (
+	LIRenRender*       render,
 	const void*        index_data,
 	int                index_count,
 	const LIRenFormat* vertex_format,
@@ -45,16 +46,32 @@ LIRenBuffer* liren_buffer_new (
 {
 	LIRenBuffer* self;
 
+	lisys_assert (vertex_format->vtx_format);
+
 	self = calloc (1, sizeof (LIRenBuffer));
 	if (self == NULL)
 		return NULL;
 
-	self->v32 = liren_buffer32_new (index_data, index_count,
-		vertex_format, vertex_data, vertex_count, type);
-	if (self->v32 == NULL)
+	/* Initialize the backed. */
+	if (render->v32 != NULL)
 	{
-		lisys_free (self);
-		return NULL;
+		self->v32 = liren_buffer32_new (index_data, index_count,
+			vertex_format, vertex_data, vertex_count, type);
+		if (self->v32 == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
+	}
+	else
+	{
+		self->v21 = liren_buffer21_new (index_data, index_count,
+			vertex_format, vertex_data, vertex_count, type);
+		if (self->v21 == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
 	}
 
 	return self;
@@ -68,7 +85,9 @@ void liren_buffer_free (
 	LIRenBuffer* self)
 {
 	if (self->v32 != NULL)
-		lisys_free (self->v32);
+		liren_buffer32_free (self->v32);
+	if (self->v21 != NULL)
+		liren_buffer21_free (self->v21);
 	lisys_free (self);
 }
 

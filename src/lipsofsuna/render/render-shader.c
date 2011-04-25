@@ -26,6 +26,7 @@
 #include "lipsofsuna/system.h"
 #include "render-shader.h"
 #include "render-private.h"
+#include "render21/render-private.h"
 #include "render32/render-private.h"
 
 /**
@@ -45,11 +46,24 @@ LIRenShader* liren_shader_new (
 		return NULL;
 	self->render = render;
 
-	self->v32 = liren_shader32_new (render->v32, name);
-	if (self->v32 == NULL)
+	/* Initialize the backend. */
+	if (render->v32 != NULL)
 	{
-		lisys_free (self);
-		return NULL;
+		self->v32 = liren_shader32_new (render->v32, name);
+		if (self->v32 == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
+	}
+	else
+	{
+		self->v21 = liren_shader21_new (render->v21, name);
+		if (self->v21 == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
 	}
 
 	/* Insert to dictionary. */
@@ -69,9 +83,16 @@ LIRenShader* liren_shader_new (
 void liren_shader_free (
 	LIRenShader* self)
 {
-	if (self->v32->name != NULL)
+	if (self->v32 != NULL)
+	{
 		lialg_strdic_remove (self->render->shaders, self->v32->name);
-	liren_shader32_free (self->v32);
+		liren_shader32_free (self->v32);
+	}
+	if (self->v21 != NULL)
+	{
+		lialg_strdic_remove (self->render->shaders, self->v21->name);
+		liren_shader21_free (self->v21);
+	}
 	lisys_free (self);
 }
 
@@ -84,7 +105,10 @@ void liren_shader_clear_pass (
 	LIRenShader* self,
 	int          pass)
 {
-	liren_shader32_clear_pass (self->v32, pass);
+	if (self->v32 != NULL)
+		liren_shader32_clear_pass (self->v32, pass);
+	else
+		liren_shader21_clear_pass (self->v21, pass);
 }
 
 /**
@@ -120,16 +144,28 @@ int liren_shader_compile (
 	int          depth_write,
 	GLenum       depth_func)
 {
-	return liren_shader32_compile (self->v32, pass, vertex, geometry, fragment,
-		feedback, alpha_to_coverage, blend_enable, blend_src, blend_dst,
-		color_write, depth_test, depth_write, depth_func);
+	if (self->v32 != NULL)
+	{
+		return liren_shader32_compile (self->v32, pass, vertex, geometry, fragment,
+			feedback, alpha_to_coverage, blend_enable, blend_src, blend_dst,
+			color_write, depth_test, depth_write, depth_func);
+	}
+	else
+	{
+		return liren_shader21_compile (self->v21, pass, vertex, geometry, fragment,
+			feedback, alpha_to_coverage, blend_enable, blend_src, blend_dst,
+			color_write, depth_test, depth_write, depth_func);
+	}
 }
 
 void liren_shader_set_sort (
 	LIRenShader* self,
 	int          value)
 {
-	liren_shader32_set_sort (self->v32, value);
+	if (self->v32 != NULL)
+		liren_shader32_set_sort (self->v32, value);
+	else
+		liren_shader21_set_sort (self->v21, value);
 }
 
 /** @} */

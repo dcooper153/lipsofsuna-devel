@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenContext Context
+ * \addtogroup LIRenContext32 Context32
  * @{
  */
 

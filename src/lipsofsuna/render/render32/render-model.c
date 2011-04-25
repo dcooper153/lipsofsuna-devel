@@ -113,8 +113,8 @@ int liren_model32_deform (
 		return 0;
 
 	/* Collect pose data. */
-	/* The first transformation in the list is the fallback indentity transform
-	   referred to by the vertices that don't have all four weights. */
+	/* The first transformation in the list is the fallback identity
+	   transformation used by vertices that don't have all four weights. */
 	count = 12 * (pose->groups.count + 1);
 	data = lisys_calloc (count, sizeof (GLfloat));
 	if (data == NULL)

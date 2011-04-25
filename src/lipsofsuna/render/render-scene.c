@@ -26,6 +26,10 @@
 #include "render.h"
 #include "render-private.h"
 #include "render-scene.h"
+#include "render21/render-private.h"
+#include "render21/render-scene.h"
+#include "render32/render-private.h"
+#include "render32/render-scene.h"
 
 LIRenScene* liren_scene_new (
 	LIRenRender* render)
@@ -46,11 +50,23 @@ LIRenScene* liren_scene_new (
 	}
 
 	/* Initialize the backend. */
-	self->v32 = liren_scene32_new (self, render->v32);
-	if (self->v32 == NULL)
+	if (render->v32 != NULL)
 	{
-		liren_scene_free (self);
-		return NULL;
+		self->v32 = liren_scene32_new (self, render->v32);
+		if (self->v32 == NULL)
+		{
+			liren_scene_free (self);
+			return NULL;
+		}
+	}
+	else
+	{
+		self->v21 = liren_scene21_new (self, render->v21);
+		if (self->v21 == NULL)
+		{
+			liren_scene_free (self);
+			return NULL;
+		}
 	}
 
 	return self;
@@ -63,6 +79,8 @@ void liren_scene_free (
 		lialg_u32dic_free (self->objects);
 	if (self->v32 != NULL)
 		liren_scene32_free (self->v32);
+	if (self->v21 != NULL)
+		liren_scene21_free (self->v21);
 	lisys_free (self);
 }
 
@@ -77,21 +95,30 @@ void liren_scene_insert_light (
 	LIRenScene* self,
 	LIRenLight* light)
 {
-	liren_scene32_insert_light (self->v32, light->v32);
+	if (self->v32 != NULL)
+		liren_scene32_insert_light (self->v32, light->v32);
+	else
+		liren_scene21_insert_light (self->v21, light->v21);
 }
 
 void liren_scene_remove_light (
 	LIRenScene* self,
 	LIRenLight* light)
 {
-	liren_scene32_remove_light (self->v32, light->v32);
+	if (self->v32 != NULL)
+		liren_scene32_remove_light (self->v32, light->v32);
+	else
+		liren_scene21_remove_light (self->v21, light->v21);
 }
 
 void liren_scene_remove_model (
 	LIRenScene* self,
 	LIRenModel* model)
 {
-	return liren_scene32_remove_model (self->v32, model->v32);
+	if (self->v32 != NULL)
+		return liren_scene32_remove_model (self->v32, model->v32);
+	else
+		return liren_scene21_remove_model (self->v21, model->v21);
 }
 
 /**
@@ -119,9 +146,18 @@ void liren_scene_render (
 	LIRenPassPostproc* postproc_passes,
 	int                postproc_passes_num)
 {
-	return liren_scene32_render (self->v32, framebuffer->v32, viewport,
-		modelview, projection, frustum, render_passes, render_passes_num,
-		postproc_passes, postproc_passes_num);
+	if (self->v32 != NULL)
+	{
+		return liren_scene32_render (self->v32, framebuffer->v32, viewport,
+			modelview, projection, frustum, render_passes, render_passes_num,
+			postproc_passes, postproc_passes_num);
+	}
+	else
+	{
+		return liren_scene21_render (self->v21, framebuffer->v21, viewport,
+			modelview, projection, frustum, render_passes, render_passes_num,
+			postproc_passes, postproc_passes_num);
+	}
 }
 
 /**
@@ -133,7 +169,10 @@ void liren_scene_update (
 	LIRenScene* self,
 	float       secs)
 {
-	return liren_scene32_update (self->v32, secs);
+	if (self->v32 != NULL)
+		return liren_scene32_update (self->v32, secs);
+	else
+		return liren_scene21_update (self->v21, secs);
 }
 
 /** @} */

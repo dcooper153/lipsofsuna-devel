@@ -53,14 +53,14 @@ static void private_update_shadow (
  * \return New light source or NULL.
  */
 LIRenLight32* liren_light32_new (
-	LIRenScene32*  scene,
-	const float* ambient,
-	const float* diffuse,
-	const float* specular,
-	const float* equation,
-	float        cutoff,
-	float        exponent,
-	int          shadows)
+	LIRenScene32* scene,
+	const float*  ambient,
+	const float*  diffuse,
+	const float*  specular,
+	const float*  equation,
+	float         cutoff,
+	float         exponent,
+	int           shadows)
 {
 	LIRenLight32* self;
 
@@ -107,10 +107,10 @@ LIRenLight32* liren_light32_new (
  * \return New light source or NULL.
  */
 LIRenLight32* liren_light32_new_directional (
-	LIRenScene32*  scene,
-	const float* ambient,
-	const float* diffuse,
-	const float* specular)
+	LIRenScene32* scene,
+	const float*  ambient,
+	const float*  diffuse,
+	const float*  specular)
 {
 	const float equation[3] = { 1.0f, 0.0f, 0.0f };
 	const LIMatVector direction = { 0.0f, 0.0f, -1.0f };
@@ -132,7 +132,7 @@ LIRenLight32* liren_light32_new_directional (
  * \return New light or NULL.
  */
 LIRenLight32* liren_light32_new_from_model (
-	LIRenScene32*      scene,
+	LIRenScene32*    scene,
 	const LIMdlNode* light)
 {
 	float scale;
@@ -265,14 +265,14 @@ void liren_light32_update_projection (
 
 void liren_light32_get_ambient (
 	LIRenLight32* self,
-	float*      value)
+	float*        value)
 {
 	memcpy (value, self->ambient, 4 * sizeof (float));
 }
 
 void liren_light32_set_ambient (
-	LIRenLight32*  self,
-	const float* value)
+	LIRenLight32* self,
+	const float*  value)
 {
 	memcpy (self->ambient, value, 4 * sizeof (float));
 }
@@ -285,7 +285,7 @@ void liren_light32_set_ambient (
  */
 int liren_light32_get_bounds (
 	const LIRenLight32* self,
-	LIMatAabb*        result)
+	LIMatAabb*          result)
 {
 	*result = self->bounds;
 
@@ -294,14 +294,14 @@ int liren_light32_get_bounds (
 
 void liren_light32_get_diffuse (
 	LIRenLight32* self,
-	float*      value)
+	float*        value)
 {
 	memcpy (value, self->diffuse, 4 * sizeof (float));
 }
 
 void liren_light32_set_diffuse (
-	LIRenLight32*  self,
-	const float* value)
+	LIRenLight32* self,
+	const float*  value)
 {
 	memcpy (self->diffuse, value, 4 * sizeof (float));
 }
@@ -316,7 +316,7 @@ void liren_light32_set_diffuse (
  */
 void liren_light32_get_direction (
 	const LIRenLight32* self,
-	LIMatVector*      value)
+	LIMatVector*        value)
 {
 	*value = limat_vector_init (0.0f, 0.0f, -1.0f);
 	*value = limat_quaternion_transform (self->transform.rotation, *value);
@@ -328,7 +328,7 @@ void liren_light32_get_direction (
  * \param value Light direction.
  */
 void liren_light32_set_direction (
-	LIRenLight32*        self,
+	LIRenLight32*      self,
 	const LIMatVector* value)
 {
 	float a;
@@ -368,7 +368,7 @@ void liren_light32_set_direction (
  */
 void liren_light32_set_directional (
 	LIRenLight32* self,
-	int         value)
+	int           value)
 {
 	self->directional = (value != 0);
 }
@@ -386,14 +386,14 @@ int liren_light32_get_enabled (
 
 void liren_light32_get_equation (
 	LIRenLight32* self,
-	float*      value)
+	float*        value)
 {
 	memcpy (value, self->equation, 3 * sizeof (float));
 }
 
 void liren_light32_set_equation (
-	LIRenLight32*  self,
-	const float* value)
+	LIRenLight32* self,
+	const float*  value)
 {
 	memcpy (self->equation, value, 3 * sizeof (float));
 }
@@ -405,7 +405,7 @@ void liren_light32_set_equation (
  */
 void liren_light32_get_modelview (
 	const LIRenLight32* self,
-	LIMatMatrix*         value)
+	LIMatMatrix*        value)
 {
 	*value = self->modelview;
 }
@@ -417,7 +417,7 @@ void liren_light32_get_modelview (
  */
 void liren_light32_get_position (
 	const LIRenLight32* self,
-	GLfloat*          value)
+	GLfloat*            value)
 {
 	LIMatVector tmp;
 
@@ -456,7 +456,7 @@ float liren_light32_get_priority (
  */
 void liren_light32_set_priority (
 	LIRenLight32* self,
-	float       value)
+	float         value)
 {
 	self->priority = value;
 }
@@ -468,7 +468,7 @@ void liren_light32_set_priority (
  */
 void liren_light32_get_projection (
 	const LIRenLight32* self,
-	LIMatMatrix*      value)
+	LIMatMatrix*        value)
 {
 	*value = self->projection;
 }
@@ -479,7 +479,7 @@ void liren_light32_get_projection (
  * \param value Matrix to set.
  */
 void liren_light32_set_projection (
-	LIRenLight32*        self,
+	LIRenLight32*      self,
 	const LIMatMatrix* value)
 {
 	self->projection = *value;
@@ -511,7 +511,7 @@ float liren_light32_get_shadow_far (
 
 void liren_light32_set_shadow_far (
 	LIRenLight32* self,
-	float       value)
+	float         value)
 {
 	self->shadow_far = value;
 	liren_light32_update_projection (self);
@@ -525,7 +525,7 @@ float liren_light32_get_shadow_near (
 
 void liren_light32_set_shadow_near (
 	LIRenLight32* self,
-	float       value)
+	float         value)
 {
 	self->shadow_near = value;
 	liren_light32_update_projection (self);
@@ -538,7 +538,7 @@ void liren_light32_set_shadow_near (
  */
 void liren_light32_set_shadow (
 	LIRenLight32* self,
-	int         value)
+	int           value)
 {
 	float border[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
 
@@ -589,14 +589,14 @@ void liren_light32_set_shadow (
 
 void liren_light32_get_specular (
 	LIRenLight32* self,
-	float*      value)
+	float*        value)
 {
 	memcpy (value, self->specular, 4 * sizeof (float));
 }
 
 void liren_light32_set_specular (
-	LIRenLight32*  self,
-	const float* value)
+	LIRenLight32* self,
+	const float*  value)
 {
 	memcpy (self->specular, value, 4 * sizeof (float));
 }
@@ -609,7 +609,7 @@ float liren_light32_get_spot_cutoff (
 
 void liren_light32_set_spot_cutoff (
 	LIRenLight32* self,
-	float       value)
+	float         value)
 {
 	self->cutoff = value;
 	liren_light32_update_projection (self);
@@ -623,7 +623,7 @@ float liren_light32_get_spot_exponent (
 
 void liren_light32_set_spot_exponent (
 	LIRenLight32* self,
-	float       value)
+	float         value)
 {
 	self->exponent = value;
 }
@@ -634,7 +634,7 @@ void liren_light32_set_spot_exponent (
  * \param value Return value for the transformation.
  */
 void liren_light32_get_transform (
-	LIRenLight32*     self,
+	LIRenLight32*   self,
 	LIMatTransform* value)
 {
 	*value = self->transform;
@@ -649,7 +649,7 @@ void liren_light32_get_transform (
  * \param transform Transformation.
  */
 void liren_light32_set_transform (
-	LIRenLight32*           self,
+	LIRenLight32*         self,
 	const LIMatTransform* transform)
 {
 	LIMatVector dir;

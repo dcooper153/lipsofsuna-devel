@@ -22,9 +22,8 @@
 #include <SDL_main.h>
 #include <SDL_ttf.h>
 #include <GL/glew.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 
 LIAPICALL (int, livid_video_init, ());
-LIAPICALL (int, livid_video_get_max_samples, ());
 
 #endif

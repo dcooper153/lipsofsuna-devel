@@ -22,7 +22,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenMesh Mesh
+ * \addtogroup LIRenMesh32 Mesh32
  * @{
  */
 

@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenObject32 Object
+ * \addtogroup LIRenObject32 Object32
  * @{
  */
 

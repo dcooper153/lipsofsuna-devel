@@ -20,6 +20,7 @@
 
 #include "lipsofsuna/algorithm.h"
 #include "render-types.h"
+#include "render21/render.h"
 #include "render32/render.h"
 #include "render32/render-buffer.h"
 #include "render32/render-framebuffer.h"
@@ -35,35 +36,35 @@
 
 struct _LIRenBuffer
 {
+	LIRenBuffer21* v21;
 	LIRenBuffer32* v32;
 };
 
 struct _LIRenFramebuffer
 {
+	LIRenFramebuffer21* v21;
 	LIRenFramebuffer32* v32;
 };
 
 struct _LIRenImage
 {
 	LIRenRender* render;
+	LIRenImage21* v21;
 	LIRenImage32* v32;
 };
 
 struct _LIRenLight
 {
 	LIRenScene* scene;
+	LIRenLight21* v21;
 	LIRenLight32* v32;
-};
-
-struct _LIRenMaterial
-{
-	LIRenMaterial32* v32;
 };
 
 struct _LIRenModel
 {
 	int id;
 	LIRenRender* render;
+	LIRenModel21* v21;
 	LIRenModel32* v32;
 };
 
@@ -72,6 +73,7 @@ struct _LIRenObject
 	int id;
 	LIRenModel* model;
 	LIRenScene* scene;
+	LIRenObject21* v21;
 	LIRenObject32* v32;
 };
 
@@ -82,6 +84,7 @@ struct _LIRenRender
 	LIAlgStrdic* shaders;
 	LIAlgU32dic* models;
 	LIAlgPtrdic* models_ptr;
+	LIRenRender21* v21;
 	LIRenRender32* v32;
 };
 
@@ -89,12 +92,14 @@ struct _LIRenScene
 {
 	LIAlgU32dic* objects;
 	LIRenRender* render;
+	LIRenScene21* v21;
 	LIRenScene32* v32;
 };
 
 struct _LIRenShader
 {
 	LIRenRender* render;
+	LIRenShader21* v21;
 	LIRenShader32* v32;
 };
 

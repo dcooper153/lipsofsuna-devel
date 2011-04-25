@@ -79,6 +79,7 @@ LIAPICALL (void, liwdg_element_paint, (
 
 LIAPICALL (void, liwdg_element_update, (
 	LIWdgElement*    self,
+	LIWdgManager*    manager,
 	const LIWdgRect* rect));
 
 #endif

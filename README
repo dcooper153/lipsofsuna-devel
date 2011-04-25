@@ -11,8 +11,12 @@ Wiki: http://sourceforge.net/apps/trac/lipsofsuna/wiki/
 System requirements
 ===================
 
-To be able to play the game at all, you need a PC with a graphics card that
-supports OpenGL 3.2 or later.
+ * Recommended: Video card that supports OpenGL 3.2 or newer.
+ * Minimum: Video card that supports OpenGL 2.1.
+
+To play the game in the quality graphics mode, your video card needs to
+support OpenGL 3.2 or newer. To play in the limited graphics mode, at least
+OpenGL 2.1 needs to be supported.
 
 
 Dependencies
@@ -26,7 +30,7 @@ Dependencies
  * SDL     >= 1.2    http://libsdl.org/
  * SDL_ttf >= 2.0    http://www.libsdl.org/projects/SDL_ttf
  * GLEW    >= 1.5.5  http://glew.sourceforge.net/
- * OpenGL  >= 3.2    http://www.opengl.org/
+ * OpenGL  >= 2.1    http://www.opengl.org/
  * OpenAL            http://www.openal.org/
  * libogg            http://xiph.org/downloads/
  * libvorbis         http://xiph.org/downloads/

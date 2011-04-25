@@ -193,6 +193,7 @@ void liwdg_element_paint (
 
 void liwdg_element_update (
 	LIWdgElement*    self,
+	LIWdgManager*    manager,
 	const LIWdgRect* rect)
 {
 	const LIRenFormat format = { 32, GL_FLOAT, 24, GL_FLOAT, 12, GL_FLOAT, 0 };
@@ -222,7 +223,7 @@ void liwdg_element_update (
 	/* Create vertex buffer. */
 	if (self->vertices.count)
 	{
-		self->buffer = liren_buffer_new (NULL, 0, &format,
+		self->buffer = liren_buffer_new (manager->render, NULL, 0, &format,
 			 self->vertices.array, self->vertices.count, LIREN_BUFFER_TYPE_STATIC);
 		if (self->buffer == NULL)
 			return;

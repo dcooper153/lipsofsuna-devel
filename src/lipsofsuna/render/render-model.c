@@ -51,14 +51,27 @@ LIRenModel* liren_model_new (
 	self->id = id;
 	self->render = render;
 
-	self->v32 = liren_model32_new (render->v32, model, id);
-	if (self->v32 == NULL)
+	/* Initialize the backend. */
+	if (render->v32 != NULL)
 	{
-		lisys_free (self);
-		return NULL;
+		self->v32 = liren_model32_new (render->v32, model, id);
+		if (self->v32 == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
+	}
+	else
+	{
+		self->v21 = liren_model21_new (render->v21, model, id);
+		if (self->v21 == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
 	}
 
-	/* Add to dictionary. */
+	/* Add to the dictionary. */
 	if (id)
 	{
 		if (!lialg_u32dic_insert (render->models, id, self))
@@ -80,7 +93,10 @@ void liren_model_free (
 {
 	if (self->id)
 		lialg_u32dic_remove (self->render->models, self->id);
-	liren_model32_free (self->v32);
+	if (self->v32 != NULL)
+		liren_model32_free (self->v32);
+	if (self->v21 != NULL)
+		liren_model21_free (self->v21);
 	lisys_free (self);
 }
 
@@ -91,14 +107,20 @@ void liren_model_free (
 void liren_model_update_transparency (
 	LIRenModel* self)
 {
-	return liren_model32_update_transparency (self->v32);
+	if (self->v32 != NULL)
+		return liren_model32_update_transparency (self->v32);
+	else
+		return liren_model21_update_transparency (self->v21);
 }
 
 int liren_model_set_model (
 	LIRenModel* self,
 	LIMdlModel* model)
 {
-	return liren_model32_set_model (self->v32, model);
+	if (self->v32 != NULL)
+		return liren_model32_set_model (self->v32, model);
+	else
+		return liren_model21_set_model (self->v21, model);
 }
 
 /** @} */

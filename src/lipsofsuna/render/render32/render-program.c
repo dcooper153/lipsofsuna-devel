@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenProgram Program
+ * \addtogroup LIRenProgram32 Program32
  * @{
  */
 
