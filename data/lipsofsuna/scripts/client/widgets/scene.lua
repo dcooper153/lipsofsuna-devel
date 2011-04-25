@@ -17,20 +17,20 @@ Widgets.Scene.pressed = function(self)
 end
 
 Widgets.Scene.render = function(self)
+	local postproc_enabled = Views and Views.Options.inst.bloom_enabled
+	local render_passes = {
+		{pass = 1}, -- Depth pass
+		{pass = 4}, -- Opaque pass
+		{pass = 6, sorting = true}} -- Transparent pass
 	self.camera.viewport = {self.x, self.y, self.width, self.height}
-	self.scene:draw_begin{
+	self.scene:render{
 		hdr = Views and Views.Options.inst.bloom_enabled,
 		modelview = self.camera.modelview,
 		multisamples = Views and Views.Options.inst.multisamples,
 		projection = self.camera.projection,
-		viewport = self.camera.viewport}
-	self.scene:draw_pass{pass = 1} -- Depth pass
-	self.scene:draw_pass{pass = 4} -- Opaque pass
-	self.scene:draw_pass{pass = 6, sorting = true} -- Transparent pass
-	if Views and Views.Options.inst.bloom_enabled then
-		self.scene:draw_post_process{mipmaps = true, shader = "postprocess-hdr"}
-	end
-	self.scene:draw_end()
+		viewport = self.camera.viewport,
+		render_passes = render_passes,
+		postproc_passes = postproc_enabled and {{mipmaps = true, shader = "postprocess-hdr"}}}
 	Speech:draw{
 		modelview = self.camera.modelview,
 		projection = self.camera.projection,

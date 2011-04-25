@@ -48,15 +48,24 @@ static void Scene_new (LIScrArgs* args)
 	liscr_data_unref (data);
 }
 
-static void Scene_draw_begin (LIScrArgs* args)
+static void Scene_render (LIScrArgs* args)
 {
+	int i;
+	int pass;
+	int sort;
+	int mipmap;
 	int hdr = 0;
 	int multisamples = 1;
+	int postproc_passes_num = 0;
+	int render_passes_num = 0;
+	char* shader;
 	GLint viewport[4];
 	LIExtModule* module;
 	LIMatFrustum frustum;
 	LIMatMatrix modelview;
 	LIMatMatrix projection;
+	LIRenPassPostproc postproc_passes[10];
+	LIRenPassRender render_passes[10];
 	LIRenScene* scene;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SCENE);
@@ -81,55 +90,94 @@ static void Scene_draw_begin (LIScrArgs* args)
 	viewport[2] = LIMAT_MAX (2, viewport[2]);
 	viewport[3] = LIMAT_MAX (2, viewport[3]);
 
-	/* Initialize rendering mode. */
-	glPushAttrib (GL_VIEWPORT_BIT);
-	glViewport (viewport[0], viewport[1], viewport[2], viewport[3]);
+	/* Collect render passes. */
+	if (liscr_args_gets_table (args, "render_passes"))
+	{
+		for (i = 1 ; i < 10 ; i++)
+		{
+			/* Get the pass table. */
+			lua_pushnumber (args->lua, i);
+			lua_gettable (args->lua, -2);
+			if (lua_type (args->lua, -1) != LUA_TTABLE)
+			{
+				lua_pop (args->lua, 1);
+				break;
+			}
+
+			/* Get shader pass. */
+			lua_getfield (args->lua, -1, "pass");
+			if (lua_type (args->lua, -1) != LUA_TNUMBER)
+			{
+				lua_pop (args->lua, 2);
+				continue;
+			}
+			pass = lua_tointeger (args->lua, -1);
+			if (pass < 1 || pass > LIREN_SHADER_PASS_COUNT)
+			{
+				lua_pop (args->lua, 2);
+				continue;
+			}
+			lua_pop (args->lua, 1);
+
+			/* Get sorting. */
+			lua_getfield (args->lua, -1, "sorting");
+			sort = lua_toboolean (args->lua, -1);
+			lua_pop (args->lua, 2);
+
+			/* Add the pass. */
+			render_passes[render_passes_num].pass = pass - 1;
+			render_passes[render_passes_num].sort = sort;
+			render_passes_num++;
+		}
+		lua_pop (args->lua, 1);
+	}
+
+	/* Collect post-processing passes. */
+	if (liscr_args_gets_table (args, "postproc_passes"))
+	{
+		for (i = 1 ; i < 10 ; i++)
+		{
+			/* Get the pass table. */
+			lua_pushnumber (args->lua, i);
+			lua_gettable (args->lua, -2);
+			if (lua_type (args->lua, -1) != LUA_TTABLE)
+			{
+				lua_pop (args->lua, 1);
+				break;
+			}
+
+			/* Get shader name. */
+			lua_getfield (args->lua, -1, "shader");
+			if (lua_type (args->lua, -1) != LUA_TSTRING)
+			{
+				lua_pop (args->lua, 2);
+				continue;
+			}
+			shader = listr_dup (lua_tostring (args->lua, -1));
+			lua_pop (args->lua, 1);
+
+			/* Get mipmapping. */
+			lua_getfield (args->lua, -1, "mipmaps");
+			mipmap = lua_toboolean (args->lua, -1);
+			lua_pop (args->lua, 2);
+
+			/* Add the pass. */
+			postproc_passes[postproc_passes_num].shader = shader;
+			postproc_passes[postproc_passes_num].mipmap = mipmap;
+			postproc_passes_num++;
+		}
+		lua_pop (args->lua, 1);
+	}
+
+	/* Render the scene. */
 	limat_frustum_init (&frustum, &modelview, &projection);
 	liren_framebuffer_resize (args->self, viewport[2], viewport[3], multisamples, hdr);
-	liren_scene_render_begin (scene, args->self, &modelview, &projection, &frustum);
-}
+	liren_scene_render (scene, args->self, viewport, &modelview, &projection, &frustum, 
+		render_passes, render_passes_num, postproc_passes, postproc_passes_num);
 
-static void Scene_draw_end (LIScrArgs* args)
-{
-	LIExtModule* module;
-	LIRenScene* scene;
-
-	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SCENE);
-	scene = module->client->scene;
-	liren_scene_render_end (scene);
-	glPopAttrib ();
-}
-
-static void Scene_draw_pass (LIScrArgs* args)
-{
-	int pass = 1;
-	int sorting = 0;
-	LIExtModule* module;
-	LIRenScene* scene;
-
-	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SCENE);
-	scene = module->client->scene;
-	liscr_args_gets_int (args, "pass", &pass);
-	liscr_args_gets_bool (args, "sorting", &sorting);
-	if (pass < 1 || pass > LIREN_SHADER_PASS_COUNT)
-		return;
-
-	liren_scene_render_pass (scene, pass - 1, sorting);
-}
-
-static void Scene_draw_post_process (LIScrArgs* args)
-{
-	int mipmaps = 0;
-	const char* shader = "postprocess0";
-	LIExtModule* module;
-	LIRenScene* scene;
-
-	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SCENE);
-	scene = module->client->scene;
-	liscr_args_gets_bool (args, "mipmaps", &mipmaps);
-	liscr_args_gets_string (args, "shader", &shader);
-
-	liren_scene_render_postproc (scene, shader, mipmaps);
+	/* Free the shader names we allocated. */
+	for (i = 0 ; i < postproc_passes_num ; i++)
+		lisys_free ((char*) postproc_passes[i].shader);
 }
 
 /*****************************************************************************/
@@ -138,10 +186,7 @@ void liext_script_scene (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SCENE, "scene_new", Scene_new);
-	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SCENE, "scene_draw_begin", Scene_draw_begin);
-	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SCENE, "scene_draw_end", Scene_draw_end);
-	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SCENE, "scene_draw_pass", Scene_draw_pass);
-	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SCENE, "scene_draw_post_process", Scene_draw_post_process);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_SCENE, "scene_render", Scene_render);
 }
 
 /** @} */

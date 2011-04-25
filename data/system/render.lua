@@ -158,40 +158,22 @@ Scene.new = function(clss, args)
 	return self
 end
 
---- Begins scene rendering.
+--- Renders the scene.
 -- @param self Scene.
 -- @param args Arguments.<ul>
 --   <li>hdr: True to enable HDR.</li>
 --   <li>modelview: Modelview matrix.</li>
---   <li>multisamples: Number of multisamples.</li>
+--   <li>multisamples: Number of multisamples. Pass arguments:</li>
+--   <li>postproc_passes: Array of post-processing passes.<ul>
+--     <li>mipmaps: True to generate mipmaps.</li>
+--     <li>shader: Post-processing shader name.</li></ul></li>
 --   <li>projection: Projection matrix.</li>
+--   <li>render_passes: Array of render passes. Pass arguments:<ul>
+--     <li>pass: Pass number.</li>
+--     <li>sorting: True to enable sorting.</li></ul></li>
 --   <li>viewport: Viewport array.</li></ul>
-Scene.draw_begin = function(self, args)
-	Los.scene_draw_begin(self.handle, args)
-end
-
---- Ends scene rendering and draws the output to the framebuffer.
--- @param self Scene.
-Scene.draw_end = function(self)
-	Los.scene_draw_end(self.handle, args)
-end
-
---- Renders a scene pass.
--- @param self Scene.
--- @param args Arguments.<ul>
---   <li>pass: Pass number.</li>
---   <li>sorting: True to enable sorting.</li></ul>
-Scene.draw_pass = function(self, args)
-	Los.scene_draw_pass(self.handle, args)
-end
-
---- Applies post-processing shaders to the output buffer.
--- @param self Scene.
--- @param args Arguments.<ul>
---   <li>mipmaps: True to generate mipmaps.</li>
---   <li>shader: Post-processing shader name.</li></ul>
-Scene.draw_post_process = function(self, args)
-	Los.scene_draw_post_process(self.handle, args)
+Scene.render = function(self, args)
+	Los.scene_render(self.handle, args)
 end
 
 ------------------------------------------------------------------------------

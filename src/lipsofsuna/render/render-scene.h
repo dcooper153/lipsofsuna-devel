@@ -47,25 +47,17 @@ LIAPICALL (void, liren_scene_remove_model, (
 	LIRenScene* self,
 	LIRenModel* model));
 
-LIAPICALL (int, liren_scene_render_begin, (
-	LIRenScene*       self,
-	LIRenFramebuffer* framebuffer,
-	LIMatMatrix*      modelview,
-	LIMatMatrix*      projection,
-	LIMatFrustum*     frustum));
-
-LIAPICALL (void, liren_scene_render_end, (
-	LIRenScene* self));
-
-LIAPICALL (void, liren_scene_render_pass, (
-	LIRenScene* self,
-	int         pass,
-	int         sorting));
-
-LIAPICALL (void, liren_scene_render_postproc, (
-	LIRenScene* self,
-	const char* name,
-	int         mipmaps));
+LIAPICALL (void, liren_scene_render, (
+	LIRenScene*        self,
+	LIRenFramebuffer*  framebuffer,
+	const GLint*       viewport,
+	LIMatMatrix*       modelview,
+	LIMatMatrix*       projection,
+	LIMatFrustum*      frustum,
+	LIRenPassRender*   render_passes,
+	int                render_passes_num,
+	LIRenPassPostproc* postproc_passes,
+	int                postproc_passes_num));
 
 LIAPICALL (void, liren_scene_update, (
 	LIRenScene* self,

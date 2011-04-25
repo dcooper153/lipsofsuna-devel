@@ -46,6 +46,8 @@ typedef struct _LIRenLighting LIRenLighting;
 typedef struct _LIRenMaterial LIRenMaterial;
 typedef struct _LIRenModel LIRenModel;
 typedef struct _LIRenObject LIRenObject;
+typedef struct _LIRenPassRender LIRenPassRender;
+typedef struct _LIRenPassPostproc LIRenPassPostproc;
 typedef struct _LIRenRender LIRenRender;
 typedef struct _LIRenResources LIRenResources;
 typedef struct _LIRenScene LIRenScene;
@@ -68,6 +70,18 @@ struct _LIRenFormat
 	int nml_offset;
 	int vtx_format;
 	int vtx_offset;
+};
+
+struct _LIRenPassRender
+{
+	int pass;
+	int sort;
+};
+
+struct _LIRenPassPostproc
+{
+	int mipmap;
+	char* shader;
 };
 
 struct _LIRenSelection

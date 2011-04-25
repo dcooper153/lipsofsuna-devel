@@ -235,14 +235,6 @@ struct _LIRenScene
 	LIRenLighting* lighting;
 	struct
 	{
-		int postproc_passes;
-		int rendering;
-		GLint original_viewport[4];
-		LIRenContext* context;
-		LIRenFramebuffer* framebuffer;
-	} state;
-	struct
-	{
 		LIRenObject* model;
 	} sky;
 };

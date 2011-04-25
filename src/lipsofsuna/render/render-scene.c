@@ -32,6 +32,20 @@
 static int private_init (
 	LIRenScene* self);
 
+static void private_render_pass (
+	LIRenScene*   self,
+	LIRenContext* context,
+	int           pass,
+	int           sorting);
+
+static int private_render_postproc (
+	LIRenScene*       self,
+	LIRenContext*     context,
+	LIRenFramebuffer* framebuffer,
+	int               pass,
+	const char*       name,
+	int               mipmaps);
+
 static int private_sort_scene (
 	LIRenScene*   self,
 	LIRenContext* context);
@@ -141,27 +155,34 @@ void liren_scene_remove_model (
 }
 
 /**
- * \brief Initializes rendering.
- *
- * Stores the passed parameters for future use and formats the rendering
- * state. Sets the rendering bits so that other rendering calls know they
- * have a valid render state.
- *
+ * \brief Renders the scene.
  * \param self Scene.
- * \param framebuffer Deferred and post-processing framebuffers.
+ * \param framebuffer Render target framebuffer.
+ * \param viewport Viewport array.
  * \param modelview Modelview matrix of the camera.
- * \param projection Projection matrix of the camera.
- * \param frustum Frustum to use for frustum culling.
- * \return Nonzero on success.
+ * \param projection Projeciton matrix of the camera.
+ * \param frustum Frustum of the camera.
+ * \param render_passes Array of render passes.
+ * \param render_passes_num Number of render passes.
+ * \param postproc_passes Array of post-processing passes.
+ * \param postproc_passes_num Number of post-processing passes.
  */
-int liren_scene_render_begin (
-	LIRenScene*       self,
-	LIRenFramebuffer* framebuffer,
-	LIMatMatrix*      modelview,
-	LIMatMatrix*      projection,
-	LIMatFrustum*     frustum)
+void liren_scene_render (
+	LIRenScene*        self,
+	LIRenFramebuffer*  framebuffer,
+	const GLint*       viewport,
+	LIMatMatrix*       modelview,
+	LIMatMatrix*       projection,
+	LIMatFrustum*      frustum,
+	LIRenPassRender*   render_passes,
+	int                render_passes_num,
+	LIRenPassPostproc* postproc_passes,
+	int                postproc_passes_num)
 {
+	int i;
+	int postproc_passes_done;
 	float tmp[3];
+	GLint orig_viewport[4];
 	LIMatMatrix inv;
 	LIMatVector eye;
 	LIRenContext* context;
@@ -169,10 +190,12 @@ int liren_scene_render_begin (
 	lisys_assert (modelview != NULL);
 	lisys_assert (projection != NULL);
 	lisys_assert (frustum != NULL);
-	if (framebuffer == NULL)
-		return 0;
+	lisys_assert (framebuffer != NULL);
+	lisys_assert (viewport[2] == framebuffer->width);
+	lisys_assert (viewport[3] == framebuffer->height);
+	glGetIntegerv (GL_VIEWPORT, orig_viewport);
 
-	/* Initialize context. */
+	/* Initialize the context. */
 	context = liren_render_get_context (self->render);
 	liren_context_init (context);
 	liren_context_set_scene (context, self);
@@ -191,7 +214,7 @@ int liren_scene_render_begin (
 
 	/* Depth sort scene. */
 	if (!private_sort_scene (self, context))
-		return 0;
+		return;
 
 	/* Upload light settings. */
 	liren_lighting_upload (self->lighting, context);
@@ -204,53 +227,37 @@ int liren_scene_render_begin (
 	self->render->profiling.vertices = 0;
 #endif
 
-	/* Update state. */
-	self->state.rendering = 1;
-	self->state.postproc_passes = 0;
-	self->state.context = context;
-	self->state.framebuffer = framebuffer;
-	glGetIntegerv (GL_VIEWPORT, self->state.original_viewport);
-
 	/* Enable backbuffer viewport. */
 	glBindFramebuffer (GL_FRAMEBUFFER, framebuffer->render_framebuffer);
-	glViewport (0, 0, framebuffer->width, framebuffer->height);
+	glViewport (0, 0, viewport[2], viewport[3]);
 	glClear (GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	return 1;
-}
+	/* Render scene passes. */
+	for (i = 0 ; i < render_passes_num ; i++)
+		private_render_pass (self, context, render_passes[i].pass, render_passes[i].sort);
 
-/**
- * \brief Finishes rendering.
- *
- * Draws the contents of the post-processing buffer to the framebuffer and
- * resets rendering state and rendering bits.
- *
- * \param self Scene.
- */
-void liren_scene_render_end (
-	LIRenScene* self)
-{
-	GLint* viewport;
-
-	/* Validate state. */
-	if (!self->state.rendering)
-		return;
-
-	/* Disable backbuffer viewport. */
-	viewport = self->state.original_viewport;
-	glViewport (viewport[0], viewport[1], viewport[1], viewport[2]);
+	/* Render post-processing effects. */
+	postproc_passes_done = 0;
+	for (i = 0 ; i < postproc_passes_num ; i++)
+	{
+		postproc_passes_done += private_render_postproc (self, context, framebuffer,
+			postproc_passes_done, postproc_passes[i].shader, postproc_passes[i].mipmap);
+	}
 
 	/* Blit to the screen. */
 	/* If no post-processing steps were done, we blit directly from the render
 	   buffer. Otherwise, the final image is in the first post-processing
 	   buffer and we need to blit from there. */
-	if (self->state.postproc_passes)
-		glBindFramebuffer (GL_READ_FRAMEBUFFER, self->state.framebuffer->postproc_framebuffers[0]);
+	if (postproc_passes_done)
+		glBindFramebuffer (GL_READ_FRAMEBUFFER, framebuffer->postproc_framebuffers[0]);
 	else
-		glBindFramebuffer (GL_READ_FRAMEBUFFER, self->state.framebuffer->render_framebuffer);
+		glBindFramebuffer (GL_READ_FRAMEBUFFER, framebuffer->render_framebuffer);
 	glBindFramebuffer (GL_DRAW_FRAMEBUFFER, 0);
 	glBlitFramebuffer (0, 0, viewport[2], viewport[3], viewport[0], viewport[1],
 		viewport[0] + viewport[2], viewport[1] + viewport[3], GL_COLOR_BUFFER_BIT, GL_NEAREST);
+
+	/* Restore the original viewport. */
+	glViewport (orig_viewport[0], orig_viewport[1], orig_viewport[2], orig_viewport[3]);
 
 	/* Profiling report. */
 #ifdef LIREN_ENABLE_PROFILING
@@ -261,35 +268,59 @@ void liren_scene_render_end (
 }
 
 /**
- * \brief Renders a pass.
- *
- * Renders materials whose shaders implement the selected pass. Each pass
- * can be rendered either with or without lighting and sorting and the
- * output can be written either to the deferred of forward targets.
- *
+ * \brief Updates the scene.
  * \param self Scene.
- * \param pass Pass number.
- * \param sorting Nonzero to enable sorting.
+ * \param secs Number of seconds since the last update.
  */
-void liren_scene_render_pass (
+void liren_scene_update (
 	LIRenScene* self,
-	int         pass,
-	int         sorting)
+	float       secs)
+{
+	LIAlgU32dicIter iter;
+	LIRenObject* object;
+
+	/* Update the effect timer. */
+	self->time += secs;
+
+	/* Update objects. */
+	LIALG_U32DIC_FOREACH (iter, self->objects)
+	{
+		object = iter.value;
+		liren_object_update (object, secs);
+	}
+
+	/* Update lights. */
+	liren_lighting_update (self->lighting);
+}
+
+/*****************************************************************************/
+
+static int private_init (
+	LIRenScene* self)
+{
+	self->lighting = liren_lighting_new (self->render);
+	if (self->lighting == NULL)
+		return 0;
+	self->sort = liren_sort_new (self->render);
+	if (self->sort == NULL)
+		return 0;
+	return 1;
+}
+
+static void private_render_pass (
+	LIRenScene*   self,
+	LIRenContext* context,
+	int           pass,
+	int           sorting)
 {
 	int i;
 	LIMatMatrix identity;
 	LIMatVector position;
-	LIRenContext* context;
 	LIRenSortface* face;
 	LIRenSortgroup* group;
 
-	/* Validate state. */
-	if (!self->state.rendering)
-		return;
-
 	/* Initialize pass. */
 	identity = limat_matrix_identity ();
-	context = self->state.context;
 
 	/* Render each group. */
 	if (!sorting)
@@ -347,10 +378,10 @@ void liren_scene_render_pass (
 					/* Render a particle. */
 					if (!face->particle.shader->passes[pass].program)
 						continue;
-					liren_context_set_modelmatrix (self->state.context, &identity);
-					liren_context_set_shader (self->state.context, pass, face->particle.shader);
-					liren_context_set_textures_raw (self->state.context, &face->particle.image->texture->texture, 1);
-					liren_context_bind (self->state.context);
+					liren_context_set_modelmatrix (context, &identity);
+					liren_context_set_shader (context, pass, face->particle.shader);
+					liren_context_set_textures_raw (context, &face->particle.image->texture->texture, 1);
+					liren_context_bind (context);
 					glBegin (GL_TRIANGLES);
 					glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, face->particle.diffuse[3], face->particle.size);
 					position = face->particle.position;
@@ -365,42 +396,28 @@ void liren_scene_render_pass (
 	}
 }
 
-/**
- * \brief Performs post-processing for the post-processing buffer.
- *
- * Executes zero or more post-processing passes. Each pass takes the post-processing
- * buffer as an input, renders to a temporary buffer, and makes the temporary buffer
- * the input of the next operation.
- *
- * \param self Scene.
- * \param name Shader name.
- * \param mipmaps Nonzero to create mipmaps.
- */
-void liren_scene_render_postproc (
-	LIRenScene* self,
-	const char* name,
-	int         mipmaps)
+static int private_render_postproc (
+	LIRenScene*       self,
+	LIRenContext*     context,
+	LIRenFramebuffer* framebuffer,
+	int               pass,
+	const char*       name,
+	int               mipmaps)
 {
-	float param[4];
 	GLuint tmp;
-	LIRenFramebuffer* framebuffer;
+	float param[4];
 	LIRenShader* shader;
-
-	/* Validate state. */
-	if (!self->state.rendering)
-		return;
 
 	/* Find the shader. */
 	shader = liren_render_find_shader (self->render, name);
 	if (shader == NULL)
-		return;
-	framebuffer = self->state.framebuffer;
+		return 0;
 
 	/* Blit to the post-processing buffer. */
 	/* This is needed because the render buffer is multisampled but the
 	   post-processing buffer isn't due to fragment shader performance.
 	   Multisamples needs to be resolved before post-processing. */
-	if (!self->state.postproc_passes)
+	if (!pass)
 	{
 		glBindFramebuffer (GL_READ_FRAMEBUFFER, framebuffer->render_framebuffer);
 		glBindFramebuffer (GL_DRAW_FRAMEBUFFER, framebuffer->postproc_framebuffers[0]);
@@ -416,26 +433,25 @@ void liren_scene_render_postproc (
 
 	/* Render from the first buffer to the second. */
 	glBindFramebuffer (GL_FRAMEBUFFER, framebuffer->postproc_framebuffers[1]);
-	liren_context_set_buffer (self->state.context, self->render->helpers.unit_quad);
-	liren_context_set_blend (self->state.context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	liren_context_set_cull (self->state.context, 0, GL_CCW);
-	liren_context_set_param (self->state.context, param);
-	liren_context_set_shader (self->state.context, 0, shader);
-	liren_context_set_textures_raw (self->state.context, framebuffer->postproc_textures, 1);
+	liren_context_set_buffer (context, self->render->helpers.unit_quad);
+	liren_context_set_blend (context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	liren_context_set_cull (context, 0, GL_CCW);
+	liren_context_set_param (context, param);
+	liren_context_set_shader (context, 0, shader);
+	liren_context_set_textures_raw (context, framebuffer->postproc_textures, 1);
 	if (mipmaps)
 	{
-		liren_context_bind (self->state.context);
+		liren_context_bind (context);
 		glGenerateMipmap (GL_TEXTURE_2D);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		liren_context_render_indexed (self->state.context, 0, 6);
+		liren_context_render_indexed (context, 0, 6);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	}
 	else
 	{
-		liren_context_bind (self->state.context);
-		liren_context_render_indexed (self->state.context, 0, 6);
+		liren_context_bind (context);
+		liren_context_render_indexed (context, 0, 6);
 	}
-	self->state.postproc_passes++;
 
 	/* Swap the buffers so that we can chain passes. */
 	tmp = framebuffer->postproc_framebuffers[0];
@@ -444,45 +460,7 @@ void liren_scene_render_postproc (
 	tmp = framebuffer->postproc_textures[0];
 	framebuffer->postproc_textures[0] = framebuffer->postproc_textures[1];
 	framebuffer->postproc_textures[1] = tmp;
-}
 
-/**
- * \brief Updates the scene.
- * \param self Scene.
- * \param secs Number of seconds since the last update.
- */
-void liren_scene_update (
-	LIRenScene* self,
-	float       secs)
-{
-	LIAlgU32dicIter iter;
-	LIRenObject* object;
-
-	/* Update the effect timer. */
-	self->time += secs;
-
-	/* Update objects. */
-	LIALG_U32DIC_FOREACH (iter, self->objects)
-	{
-		object = iter.value;
-		liren_object_update (object, secs);
-	}
-
-	/* Update lights. */
-	liren_lighting_update (self->lighting);
-}
-
-/*****************************************************************************/
-
-static int private_init (
-	LIRenScene* self)
-{
-	self->lighting = liren_lighting_new (self->render);
-	if (self->lighting == NULL)
-		return 0;
-	self->sort = liren_sort_new (self->render);
-	if (self->sort == NULL)
-		return 0;
 	return 1;
 }
 
