@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -19,8 +19,8 @@
 #define __RENDER_PROGRAM_H__
 
 #include <lipsofsuna/system.h>
+#include "../render-types.h"
 #include "render-attribute.h"
-#include "render-types.h"
 #include "render-uniform.h"
 
 typedef struct _LIRenProgram LIRenProgram;

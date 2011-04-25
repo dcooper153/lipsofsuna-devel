@@ -106,7 +106,6 @@ void liext_speeches_render (
 	const int*         viewport)
 {
 	int i;
-	int j;
 	int x;
 	int y;
 	int w;
@@ -129,12 +128,6 @@ void liext_speeches_render (
 	if (shader == NULL)
 		return;
 	matrix = limat_matrix_ortho (0, viewport[2], 0, viewport[3], -100.0f, 100.0f);
-	liren_context_set_shader (render->context, 0, shader);
-	liren_context_set_blend (render->context, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	liren_context_set_buffer (render->context, NULL);
-	liren_context_set_cull (render->context, 0, GL_CCW);
-	liren_context_set_depth (render->context, 0, 0, GL_LEQUAL);
-	liren_context_set_projection (render->context, &matrix);
 	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		object = iter.value;
@@ -153,7 +146,6 @@ void liext_speeches_render (
 			text = speech->text;
 			win.y += lifnt_layout_get_height (text);
 			width = lifnt_layout_get_width (text) / 2;
-			liren_context_set_diffuse (render->context, speech->diffuse);
 
 			/* Get vertex data. */
 			if (!text->n_glyphs)
@@ -178,15 +170,8 @@ void liext_speeches_render (
 			for (i = 0 ; i < text->n_glyphs ; i++)
 			{
 				glyph = text->glyphs + i;
-				liren_context_set_textures_raw (render->context, &glyph->font->texture, 1);
-				liren_context_bind (render->context);
-				glBegin (GL_TRIANGLES);
-				for (j = 0 ; j < 6 ; j++)
-				{
-					glVertexAttrib2fv (LIREN_ATTRIBUTE_TEXCOORD, vertex_data + 5 * index_data[6 * i + j] + 0);
-					glVertexAttrib2fv (LIREN_ATTRIBUTE_COORD, vertex_data + 5 * index_data[6 * i + j] + 2);
-				}
-				glEnd ();
+				liren_render_draw_indexed_triangles_T2V3 (render, shader, &matrix,
+					glyph->font->texture, speech->diffuse, vertex_data, index_data + 6 * i, 6);
 			}
 
 			lisys_free (index_data);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,24 +22,25 @@
  * @{
  */
 
-#include <lipsofsuna/system.h>
-#include "render-deferred.h"
-#include "render-error.h"
+#include "lipsofsuna/system.h"
+#include "render-framebuffer.h"
+#include "render-private.h"
+#include "render32/render-error.h"
 
 static int private_check (
-	LIRenDeferred* self);
+	LIRenFramebuffer* self);
 
 static int private_rebuild (
-	LIRenDeferred* self,
-	int            width,
-	int            height,
-	int            samples,
-	int            hdr);
+	LIRenFramebuffer* self,
+	int               width,
+	int               height,
+	int               samples,
+	int               hdr);
 
 /*****************************************************************************/
 
 /**
- * \brief Creates a deferred rendering framebuffer.
+ * \brief Creates a rendering framebuffer.
  * \param render Renderer.
  * \param width Framebuffer width.
  * \param height Framebuffer height.
@@ -47,17 +48,17 @@ static int private_rebuild (
  * \param hdr Nonzero to use floating point framebuffer to enable HDR.
  * \return New deferred framebuffer or NULL.
  */
-LIRenDeferred* liren_deferred_new (
+LIRenFramebuffer* liren_framebuffer_new (
 	LIRenRender* render,
 	int          width,
 	int          height,
 	int          samples,
 	int          hdr)
 {
-	LIRenDeferred* self;
+	LIRenFramebuffer* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIRenDeferred));
+	self = lisys_calloc (1, sizeof (LIRenFramebuffer));
 	if (self == NULL)
 		return NULL;
 	self->render = render;
@@ -67,14 +68,14 @@ LIRenDeferred* liren_deferred_new (
 	/* Create frame buffer object. */
 	for ( ; samples > 0 ; samples--)
 	{
-		if (!liren_deferred_resize (self, width, height, samples, hdr))
+		if (!liren_framebuffer_resize (self, width, height, samples, hdr))
 			lisys_error_report ();
 		else
 			break;
 	}
 	if (samples == 0)
 	{
-		liren_deferred_free (self);
+		liren_framebuffer_free (self);
 		return NULL;
 	}
 
@@ -82,11 +83,11 @@ LIRenDeferred* liren_deferred_new (
 }
 
 /**
- * \brief Frees the deferred framebuffer.
- * \param self Deferred framebuffer.
+ * \brief Frees the framebuffer.
+ * \param self Framebuffer.
  */
-void liren_deferred_free (
-	LIRenDeferred* self)
+void liren_framebuffer_free (
+	LIRenFramebuffer* self)
 {
 	glDeleteFramebuffers (1, &self->render_framebuffer);
 	glDeleteFramebuffers (2, self->postproc_framebuffers);
@@ -96,20 +97,20 @@ void liren_deferred_free (
 }
 
 /**
- * \brief Resizes the deferred framebuffer.
- * \param self Deferred framebuffer.
+ * \brief Resizes the framebuffer.
+ * \param self Framebuffer.
  * \param width New width.
  * \param height New height.
  * \param samples Number of multisamples.
  * \param hdr Nonzero to use floating point framebuffer to enable HDR.
  * \return Nonzero on success.
  */
-int liren_deferred_resize (
-	LIRenDeferred* self,
-	int            width,
-	int            height,
-	int            samples,
-	int            hdr)
+int liren_framebuffer_resize (
+	LIRenFramebuffer* self,
+	int               width,
+	int               height,
+	int               samples,
+	int               hdr)
 {
 	int max;
 	int request;
@@ -145,7 +146,7 @@ int liren_deferred_resize (
 /*****************************************************************************/
 
 static int private_check (
-	LIRenDeferred* self)
+	LIRenFramebuffer* self)
 {
 	int ret;
 
@@ -189,11 +190,11 @@ static int private_check (
 }
 
 static int private_rebuild (
-	LIRenDeferred* self,
-	int            width,
-	int            height,
-	int            samples,
-	int            hdr)
+	LIRenFramebuffer* self,
+	int               width,
+	int               height,
+	int               samples,
+	int               hdr)
 {
 	int i;
 	GLenum fmt;

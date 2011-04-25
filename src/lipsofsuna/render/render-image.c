@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,6 +24,7 @@
 
 #include "render.h"
 #include "render-image.h"
+#include "render-private.h"
 
 static const uint8_t missing_image[16] =
 {
@@ -150,6 +151,24 @@ int liren_image_reload (
 	self->texture = texture;
 
 	return 1;
+}
+
+GLuint liren_image_get_handle (
+	const LIRenImage* self)
+{
+	return self->texture->texture;
+}
+
+int liren_image_get_height (
+	const LIRenImage* self)
+{
+	return self->texture->height;
+}
+
+int liren_image_get_width (
+	const LIRenImage* self)
+{
+	return self->texture->width;
 }
 
 /*****************************************************************************/

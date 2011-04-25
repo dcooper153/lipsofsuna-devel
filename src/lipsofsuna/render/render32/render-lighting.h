@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,9 +21,9 @@
 #include <lipsofsuna/algorithm.h>
 #include <lipsofsuna/system.h>
 #include <lipsofsuna/video.h>
-#include "render.h"
-#include "render-light.h"
-#include "render-types.h"
+#include "../render.h"
+#include "../render-light.h"
+#include "../render-types.h"
 
 struct _LIRenLighting
 {

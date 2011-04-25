@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -31,25 +31,16 @@ enum
 	LIREN_BUFFER_TYPE_STREAM
 };
 
-struct _LIRenBuffer
-{
-	int type;
-	GLuint index_buffer;
-	GLuint vertex_array;
-	GLuint vertex_buffer;
-	LIRenFormat vertex_format;
-	struct
-	{
-		int count;
-	} indices;
-	struct
-	{
-		int count;
-	} vertices;
-};
-
 LIAPICALL (int, liren_buffer_init, (
 	LIRenBuffer*       self,
+	const void*        index_data,
+	int                index_count,
+	const LIRenFormat* vertex_format,
+	const void*        vertex_data,
+	int                vertex_count,
+	int                type));
+
+LIAPICALL (LIRenBuffer*, liren_buffer_new, (
 	const void*        index_data,
 	int                index_count,
 	const LIRenFormat* vertex_format,

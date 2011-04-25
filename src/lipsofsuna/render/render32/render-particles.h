@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,7 +21,7 @@
 #include "lipsofsuna/math.h"
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
-#include "render-image.h"
+#include "../render-image.h"
 
 typedef struct _LIRenParticle LIRenParticle;
 struct _LIRenParticle

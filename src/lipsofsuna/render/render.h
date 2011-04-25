@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,62 +18,40 @@
 #ifndef __RENDER_H__
 #define __RENDER_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/image.h>
-#include <lipsofsuna/paths.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/paths.h"
+#include "lipsofsuna/system.h"
 #include "render-buffer.h"
-#include "render-context.h"
 #include "render-image.h"
 #include "render-light.h"
-#include "render-lighting.h"
 #include "render-material.h"
 #include "render-object.h"
 #include "render-shader.h"
 #include "render-types.h"
-
-/* #define LIREN_ENABLE_PROFILING */
-
-struct _LIRenRender
-{
-	int anisotrophy;
-	LIAlgPtrdic* scenes;
-	LIAlgRandom random;
-	LIAlgStrdic* shaders;
-	LIAlgStrdic* images;
-	LIAlgU32dic* models;
-	LIAlgPtrdic* models_ptr;
-	LIPthPaths* paths;
-	LIRenContext* context;
-	struct
-	{
-		float time;
-		GLuint noise;
-		GLuint depth_texture_max;
-		LIRenBuffer* unit_quad;
-		LIRenImage* empty_image;
-	} helpers;
-	struct
-	{
-		int offset;
-		LIRenBuffer* buffer;
-	} immediate;
-#ifdef LIREN_ENABLE_PROFILING
-	struct
-	{
-		int objects;
-		int materials;
-		int faces;
-		int vertices;
-	} profiling;
-#endif
-};
 
 LIAPICALL (LIRenRender*, liren_render_new, (
 	LIPthPaths* paths));
 
 LIAPICALL (void, liren_render_free, (
 	LIRenRender* self));
+
+LIAPICALL (void, liren_render_draw_clipped_buffer, (
+	LIRenRender* self,
+	LIRenShader* shader,
+	LIMatMatrix* projection,
+	GLuint       texture,
+	const float* diffuse,
+	const int*   scissor,
+	LIRenBuffer* buffer));
+
+LIAPICALL (void, liren_render_draw_indexed_triangles_T2V3, (
+	LIRenRender*    self,
+	LIRenShader*    shader,
+	LIMatMatrix*    matrix,
+	GLuint          texture,
+	const float*    diffuse,
+	const float*    vertex_data,
+	const uint32_t* index_data,
+	int             index_count));
 
 LIAPICALL (LIRenShader*, liren_render_find_shader, (
 	LIRenRender* self,

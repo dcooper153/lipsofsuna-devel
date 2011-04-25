@@ -38,9 +38,9 @@ enum _LIRenSelect
 
 typedef struct _LIRenBuffer LIRenBuffer;
 typedef struct _LIRenContext LIRenContext;
-typedef struct _LIRenDeferred LIRenDeferred;
 typedef enum _LIRenFlags LIRenFlags;
 typedef struct _LIRenFormat LIRenFormat;
+typedef struct _LIRenFramebuffer LIRenFramebuffer;
 typedef struct _LIRenLight LIRenLight;
 typedef struct _LIRenLighting LIRenLighting;
 typedef struct _LIRenMaterial LIRenMaterial;

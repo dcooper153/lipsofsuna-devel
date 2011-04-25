@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -23,46 +23,9 @@
 #include <lipsofsuna/system.h>
 #include "render.h"
 #include "render-buffer.h"
-#include "render-context.h"
 #include "render-material.h"
 #include "render-model.h"
 #include "render-types.h"
-
-struct _LIRenObject
-{
-	int id;
-	int realized;
-	float sort;
-	void* userdata;
-	LIMatAabb bounds;
-	LIMatTransform transform;
-	LIMdlPose* pose;
-	LIRenScene* scene;
-	LIRenModel* model;
-	struct
-	{
-		int width;
-		int height;
-		GLuint depth;
-		GLuint map;
-		GLuint fbo[6];
-	} cubemap;
-	struct
-	{
-		int count;
-		LIRenLight** array;
-	} lights;
-	struct
-	{
-		LIMatVector center;
-		LIMatMatrix matrix;
-	} orientation;
-	struct
-	{
-		int loop;
-		float time;
-	} particle;
-};
 
 LIAPICALL (LIRenObject*, liren_object_new, (
 	LIRenScene* scene,
@@ -90,6 +53,9 @@ LIAPICALL (void, liren_object_get_bounds, (
 LIAPICALL (void, liren_object_get_center, (
 	const LIRenObject* self,
 	LIMatVector*       center));
+
+LIAPICALL (LIRenModel*, liren_object_get_model, (
+	LIRenObject* self));
 
 LIAPICALL (int, liren_object_set_model, (
 	LIRenObject* self,

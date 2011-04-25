@@ -169,9 +169,7 @@ static int private_model_free (
 	LIExtModule* self,
 	LIEngModel*  model)
 {
-	LIAlgU32dicIter iter;
 	LIRenModel* model_;
-	LIRenObject* object;
 
 	/* Find the model. */
 	lisys_assert (model != NULL);
@@ -183,12 +181,7 @@ static int private_model_free (
 	/* Keeping the model alive when it's assigned to objects is the job of scripts.
 	   If they don't reference the model, we'll remove it even if it's in use. We
 	   prevent crashing by removing it from objects in such a case. */
-	LIALG_U32DIC_FOREACH (iter, self->scene->objects)
-	{
-		object = iter.value;
-		if (object->model == model_)
-			liren_object_set_model (object, NULL);
-	}
+	liren_scene_remove_model (self->scene, model_);
 
 	liren_model_free (model_);
 

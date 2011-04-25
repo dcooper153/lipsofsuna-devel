@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,10 +22,10 @@
  * @{
  */
 
-#include <lipsofsuna/network.h>
-#include <lipsofsuna/system.h>
-#include "render-draw.h"
+#include "lipsofsuna/network.h"
+#include "lipsofsuna/system.h"
 #include "render-object.h"
+#include "render-private.h"
 
 static void private_bounds_update (
 	LIRenObject* self);
@@ -180,6 +180,17 @@ liren_object_get_center (const LIRenObject* self,
                          LIMatVector*       center)
 {
 	*center = self->orientation.center;
+}
+
+/**
+ * \brief Gets the model of the object.
+ * \param self Object.
+ * \return Model or NULL.
+ */
+LIRenModel* liren_object_get_model (
+	LIRenObject* self)
+{
+	return self->model;
 }
 
 /**

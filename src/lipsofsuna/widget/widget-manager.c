@@ -87,7 +87,6 @@ LIWdgManager* liwdg_manager_new (
 	self->width = 640;
 	self->height = 480;
 	self->render = render;
-	self->context = liren_render_get_context (render);
 	self->projection = limat_matrix_identity ();
 
 	/* Load config and resources. */
@@ -312,20 +311,12 @@ int liwdg_manager_remove_window (
 void liwdg_manager_render (
 	LIWdgManager* self)
 {
-	LIMatMatrix matrix;
 	LIWdgWidget* widget;
 
 	/* Find the widget shader. */
 	self->shader = liren_render_find_shader (self->render, "widget");
 	if (self->shader == NULL)
 		return;
-
-	/* Initialize render mode. */
-	matrix = limat_matrix_ortho (0.0f, self->width, self->height, 0.0f, -100.0f, 100.0f);
-	liren_context_init (self->context);
-	liren_context_set_cull (self->context, 0, GL_CCW);
-	liren_context_set_shader (self->context, 0, self->shader);
-	liren_context_bind (self->context);
 
 	/* Setup viewport. */
 	glViewport (0, 0, self->width, self->height);

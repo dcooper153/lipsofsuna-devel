@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,11 +20,11 @@
 
 #include <lipsofsuna/model.h>
 #include <lipsofsuna/system.h>
-#include "render.h"
-#include "render-buffer.h"
-#include "render-material.h"
+#include "../render.h"
+#include "../render-buffer.h"
+#include "../render-material.h"
+#include "../render-types.h"
 #include "render-mesh.h"
-#include "render-types.h"
 
 enum
 {

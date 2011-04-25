@@ -28,20 +28,20 @@
 static void Scene_new (LIScrArgs* args)
 {
 	LIExtModule* module;
-	LIRenDeferred* self;
+	LIRenFramebuffer* self;
 	LIScrData* data;
 
 	/* Allocate self. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SCENE);
-	self = liren_deferred_new (module->client->render, 32, 32, 1, 0);
+	self = liren_framebuffer_new (module->client->render, 32, 32, 1, 0);
 	if (self == NULL)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SCENE, liren_deferred_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SCENE, liren_framebuffer_free);
 	if (data == NULL)
 	{
-		liren_deferred_free (self);
+		liren_framebuffer_free (self);
 		return;
 	}
 	liscr_args_seti_data (args, data);
@@ -85,7 +85,7 @@ static void Scene_draw_begin (LIScrArgs* args)
 	glPushAttrib (GL_VIEWPORT_BIT);
 	glViewport (viewport[0], viewport[1], viewport[2], viewport[3]);
 	limat_frustum_init (&frustum, &modelview, &projection);
-	liren_deferred_resize (args->self, viewport[2], viewport[3], multisamples, hdr);
+	liren_framebuffer_resize (args->self, viewport[2], viewport[3], multisamples, hdr);
 	liren_scene_render_begin (scene, args->self, &modelview, &projection, &frustum);
 }
 

@@ -52,14 +52,16 @@ static void Light_new (LIScrArgs* args)
 
 static void Light_get_ambient (LIScrArgs* args)
 {
+	float value[4];
 	LIRenLight* light;
 
 	light = args->self;
+	liren_light_get_ambient (light, value);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
-	liscr_args_seti_float (args, light->ambient[0]);
-	liscr_args_seti_float (args, light->ambient[1]);
-	liscr_args_seti_float (args, light->ambient[2]);
-	liscr_args_seti_float (args, light->ambient[3]);
+	liscr_args_seti_float (args, value[0]);
+	liscr_args_seti_float (args, value[1]);
+	liscr_args_seti_float (args, value[2]);
+	liscr_args_seti_float (args, value[3]);
 }
 static void Light_set_ambient (LIScrArgs* args)
 {
@@ -70,19 +72,21 @@ static void Light_set_ambient (LIScrArgs* args)
 	light = args->self;
 	for (i = 0 ; i < 4 ; i++)
 		liscr_args_geti_float (args, i, value + i);
-	memcpy (light->ambient, value, 4 * sizeof (float));
+	liren_light_set_ambient (light, value);
 }
 
 static void Light_get_diffuse (LIScrArgs* args)
 {
+	float value[4];
 	LIRenLight* light;
 
 	light = args->self;
+	liren_light_get_diffuse (light, value);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
-	liscr_args_seti_float (args, light->diffuse[0]);
-	liscr_args_seti_float (args, light->diffuse[1]);
-	liscr_args_seti_float (args, light->diffuse[2]);
-	liscr_args_seti_float (args, light->diffuse[3]);
+	liscr_args_seti_float (args, value[0]);
+	liscr_args_seti_float (args, value[1]);
+	liscr_args_seti_float (args, value[2]);
+	liscr_args_seti_float (args, value[3]);
 }
 static void Light_set_diffuse (LIScrArgs* args)
 {
@@ -93,7 +97,7 @@ static void Light_set_diffuse (LIScrArgs* args)
 	light = args->self;
 	for (i = 0 ; i < 4 ; i++)
 		liscr_args_geti_float (args, i, value + i);
-	memcpy (light->diffuse, value, 4 * sizeof (float));
+	liren_light_set_diffuse (light, value);
 }
 
 static void Light_get_enabled (LIScrArgs* args)
@@ -104,26 +108,30 @@ static void Light_set_enabled (LIScrArgs* args)
 {
 	int value;
 	LIRenLight* light;
+	LIRenScene* scene;
 
 	light = args->self;
+	scene = liren_light_get_scene (light);
 	if (liscr_args_geti_bool (args, 0, &value) && value != liren_light_get_enabled (light))
 	{
 		if (value)
-			liren_lighting_insert_light (light->scene->lighting, light);
+			liren_scene_insert_light (scene, light);
 		else
-			liren_lighting_remove_light (light->scene->lighting, light);
+			liren_scene_remove_light (scene, light);
 	}
 }
 
 static void Light_get_equation (LIScrArgs* args)
 {
+	float value[3];
 	LIRenLight* light;
 
 	light = args->self;
+	liren_light_get_equation (light, value);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
-	liscr_args_seti_float (args, light->equation[0]);
-	liscr_args_seti_float (args, light->equation[1]);
-	liscr_args_seti_float (args, light->equation[2]);
+	liscr_args_seti_float (args, value[0]);
+	liscr_args_seti_float (args, value[1]);
+	liscr_args_seti_float (args, value[2]);
 }
 static void Light_set_equation (LIScrArgs* args)
 {
@@ -134,7 +142,7 @@ static void Light_set_equation (LIScrArgs* args)
 	light = args->self;
 	for (i = 0 ; i < 3 ; i++)
 		liscr_args_geti_float (args, i, value + i);
-	memcpy (light->equation, value, 3 * sizeof (float));
+	liren_light_set_equation (light, value);
 }
 
 static void Light_get_position (LIScrArgs* args)
@@ -205,7 +213,7 @@ static void Light_get_shadow_far (LIScrArgs* args)
 {
 	LIRenLight* self = args->self;
 
-	liscr_args_seti_float (args, self->shadow_far);
+	liscr_args_seti_float (args, liren_light_get_shadow_far (self));
 }
 static void Light_set_shadow_far (LIScrArgs* args)
 {
@@ -213,17 +221,14 @@ static void Light_set_shadow_far (LIScrArgs* args)
 	LIRenLight* self = args->self;
 
 	if (liscr_args_geti_float (args, 0, &value))
-	{
-		self->shadow_far = LIMAT_MAX (value, LIMAT_EPSILON);
-		liren_light_update_projection (self);
-	}
+		liren_light_set_shadow_far (self, LIMAT_MAX (value, LIMAT_EPSILON));
 }
 
 static void Light_get_shadow_near (LIScrArgs* args)
 {
 	LIRenLight* self = args->self;
 
-	liscr_args_seti_float (args, self->shadow_near);
+	liscr_args_seti_float (args, liren_light_get_shadow_near (self));
 }
 static void Light_set_shadow_near (LIScrArgs* args)
 {
@@ -231,22 +236,21 @@ static void Light_set_shadow_near (LIScrArgs* args)
 	LIRenLight* self = args->self;
 
 	if (liscr_args_geti_float (args, 0, &value))
-	{
-		self->shadow_near = LIMAT_MAX (value, LIMAT_EPSILON);
-		liren_light_update_projection (self);
-	}
+		liren_light_set_shadow_near (self, LIMAT_MAX (value, LIMAT_EPSILON));
 }
 
 static void Light_get_specular (LIScrArgs* args)
 {
+	float value[4];
 	LIRenLight* light;
 
 	light = args->self;
+	liren_light_get_specular (light, value);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
-	liscr_args_seti_float (args, light->specular[0]);
-	liscr_args_seti_float (args, light->specular[1]);
-	liscr_args_seti_float (args, light->specular[2]);
-	liscr_args_seti_float (args, light->specular[3]);
+	liscr_args_seti_float (args, value[0]);
+	liscr_args_seti_float (args, value[1]);
+	liscr_args_seti_float (args, value[2]);
+	liscr_args_seti_float (args, value[3]);
 }
 static void Light_set_specular (LIScrArgs* args)
 {
@@ -257,14 +261,14 @@ static void Light_set_specular (LIScrArgs* args)
 	light = args->self;
 	for (i = 0 ; i < 4 ; i++)
 		liscr_args_geti_float (args, i, value + i);
-	memcpy (light->specular, value, 4 * sizeof (float));
+	liren_light_set_specular (light, value);
 }
 
 static void Light_get_spot_cutoff (LIScrArgs* args)
 {
 	LIRenLight* self = args->self;
 
-	liscr_args_seti_float (args, self->cutoff);
+	liscr_args_seti_float (args, liren_light_get_spot_cutoff (self));
 }
 static void Light_set_spot_cutoff (LIScrArgs* args)
 {
@@ -272,17 +276,14 @@ static void Light_set_spot_cutoff (LIScrArgs* args)
 	LIRenLight* self = args->self;
 
 	if (liscr_args_geti_float (args, 0, &value))
-	{
-		self->cutoff = LIMAT_CLAMP (value, 0.0f, M_PI);
-		liren_light_update_projection (self);
-	}
+		liren_light_set_spot_cutoff (self, LIMAT_CLAMP (value, 0.0f, M_PI));
 }
 
 static void Light_get_spot_exponent (LIScrArgs* args)
 {
 	LIRenLight* self = args->self;
 
-	liscr_args_seti_float (args, self->exponent);
+	liscr_args_seti_float (args, liren_light_get_spot_exponent (self));
 }
 static void Light_set_spot_exponent (LIScrArgs* args)
 {
@@ -290,7 +291,7 @@ static void Light_set_spot_exponent (LIScrArgs* args)
 	LIRenLight* self = args->self;
 
 	if (liscr_args_geti_float (args, 0, &value))
-		self->exponent = LIMAT_CLAMP (value, 0.0f, 127.0f);
+		liren_light_set_spot_exponent (self, LIMAT_CLAMP (value, 0.0f, 127.0f));
 }
 
 /*****************************************************************************/

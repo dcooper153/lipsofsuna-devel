@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -23,20 +23,19 @@
  */
 
 #include "render-buffer.h"
+#include "render-private.h"
 
 /**
- * \brief Initializes a vertex buffer.
- * \param self Buffer.
+ * \brief Allocates a vertex buffer.
  * \param index_data Pointer to an array of 32-bit unsigned indices, or NULL.
  * \param index_count Number of indices to allocate.
  * \param vertex_format Vertex format.
  * \param vertex_data Pointer to vertex format specific array of vertices, or NULL.
  * \param vertex_count Number of vertices to allocate.
  * \param type Usage type.
- * \return Nonzero on success.
+ * \return Vertex buffer or NULL.
  */
-int liren_buffer_init (
-	LIRenBuffer*       self,
+LIRenBuffer* liren_buffer_new (
 	const void*        index_data,
 	int                index_count,
 	const LIRenFormat* vertex_format,
@@ -45,6 +44,11 @@ int liren_buffer_init (
 	int                type)
 {
 	int size;
+	LIRenBuffer* self;
+
+	self = calloc (1, sizeof (LIRenBuffer));
+	if (self == NULL)
+		return NULL;
 
 	lisys_assert (vertex_format->vtx_format);
 
@@ -115,7 +119,7 @@ int liren_buffer_init (
 		}
 	}
 
-	return 1;
+	return self;
 }
 
 /**
@@ -131,6 +135,7 @@ void liren_buffer_free (
 		glDeleteBuffers (1, &self->index_buffer);
 	if (self->vertex_buffer)
 		glDeleteBuffers (1, &self->vertex_buffer);
+	free (self);
 }
 
 /**

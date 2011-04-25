@@ -151,7 +151,7 @@ static void Shader_new (LIScrArgs* args)
 	liscr_args_gets_string (args, "name", &name);
 
 	/* Avoid duplicate names. */
-	shader = lialg_strdic_find (module->client->render->shaders, name);
+	shader = liren_render_find_shader (module->client->render, name);
 	if (shader != NULL)
 		return;
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,42 +18,12 @@
 #ifndef __RENDER_MODEL_H__
 #define __RENDER_MODEL_H__
 
-#include <lipsofsuna/image.h>
-#include <lipsofsuna/model.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/image.h"
+#include "lipsofsuna/model.h"
+#include "lipsofsuna/system.h"
 #include "render.h"
-#include "render-buffer-texture.h"
 #include "render-material.h"
-#include "render-mesh.h"
-#include "render-particles.h"
 #include "render-types.h"
-
-typedef struct _LIRenModelGroup LIRenModelGroup;
-struct _LIRenModelGroup
-{
-	int start;
-	int count;
-	LIMatVector center;
-};
-
-struct _LIRenModel
-{
-	int id;
-	LIMatAabb bounds;
-	LIRenMesh mesh;
-	LIRenParticles particles;
-	LIRenRender* render;
-	struct
-	{
-		int count;
-		LIRenModelGroup* array;
-	} groups;
-	struct
-	{
-		int count;
-		LIRenMaterial** array;
-	} materials;
-};
 
 LIAPICALL (LIRenModel*, liren_model_new, (
 	LIRenRender* render,

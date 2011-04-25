@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,24 +18,10 @@
 #ifndef __RENDER_SHADER_H__
 #define __RENDER_SHADER_H__
 
-#include <lipsofsuna/image.h>
-#include <lipsofsuna/model.h>
-#include <lipsofsuna/system.h>
-#include "render-attribute.h"
-#include "render-light.h"
+#include "lipsofsuna/system.h"
 #include "render-types.h"
-#include "render-program.h"
-#include "render-uniform.h"
 
 #define LIREN_SHADER_PASS_COUNT 10
-
-struct _LIRenShader
-{
-	int sort;
-	char* name;
-	LIRenRender* render;
-	LIRenProgram passes[LIREN_SHADER_PASS_COUNT];
-};
 
 LIAPICALL (LIRenShader*, liren_shader_new, (
 	LIRenRender* render,

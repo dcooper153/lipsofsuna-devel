@@ -18,6 +18,8 @@
 #ifndef __PATHS_H__
 #define __PATHS_H__
 
+#include "lipsofsuna/system.h"
+
 typedef struct _LIPthPaths LIPthPaths;
 struct _LIPthPaths
 {

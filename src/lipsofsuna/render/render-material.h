@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,8 @@
 #ifndef __RENDER_MATERIAL_H__
 #define __RENDER_MATERIAL_H__
 
-#include <lipsofsuna/image.h>
+#include "lipsofsuna/image.h"
+#include "lipsofsuna/model.h"
 #include "render-image.h"
 #include "render-shader.h"
 #include "render-types.h"
@@ -29,24 +30,6 @@ enum
 	LIREN_MATERIAL_FLAG_CULLFACE = 0x020000,
 	LIREN_MATERIAL_FLAG_TRANSPARENCY = 0x040000,
 	LIREN_MATERIAL_FLAG_SORTFACES = 0x080000
-};
-
-struct _LIRenMaterial
-{
-	int flags;
-	float parameters[4];
-	float shininess;
-	float diffuse[4];
-	float specular[4];
-	float strand_start;
-	float strand_end;
-	float strand_shape;
-	LIRenShader* shader;
-	struct
-	{
-		int count;
-		LIRenTexture* array;
-	} textures;
 };
 
 LIAPICALL (LIRenMaterial*, liren_material_new, ());

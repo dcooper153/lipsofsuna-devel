@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,9 +22,9 @@
  * @{
  */
 
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "render.h"
-#include "render-draw.h"
+#include "render-private.h"
 
 #define LIREN_LIGHT_MAXIMUM_RATING 100.0f
 #define LIREN_PARTICLE_MAXIMUM_COUNT 1000
@@ -111,6 +111,35 @@ liren_scene_find_object (LIRenScene* self,
 	return lialg_u32dic_find (self->objects, id);
 }
 
+void liren_scene_insert_light (
+	LIRenScene* self,
+	LIRenLight* light)
+{
+	liren_lighting_insert_light (self->lighting, light);
+}
+
+void liren_scene_remove_light (
+	LIRenScene* self,
+	LIRenLight* light)
+{
+	liren_lighting_remove_light (self->lighting, light);
+}
+
+void liren_scene_remove_model (
+	LIRenScene* self,
+	LIRenModel* model)
+{
+	LIAlgU32dicIter iter;
+	LIRenObject* object;
+
+	LIALG_U32DIC_FOREACH (iter, self->objects)
+	{
+		object = iter.value;
+		if (object->model == model)
+			liren_object_set_model (object, NULL);
+	}
+}
+
 /**
  * \brief Initializes rendering.
  *
@@ -126,11 +155,11 @@ liren_scene_find_object (LIRenScene* self,
  * \return Nonzero on success.
  */
 int liren_scene_render_begin (
-	LIRenScene*    self,
-	LIRenDeferred* framebuffer,
-	LIMatMatrix*   modelview,
-	LIMatMatrix*   projection,
-	LIMatFrustum*  frustum)
+	LIRenScene*       self,
+	LIRenFramebuffer* framebuffer,
+	LIMatMatrix*      modelview,
+	LIMatMatrix*      projection,
+	LIMatFrustum*     frustum)
 {
 	float tmp[3];
 	LIMatMatrix inv;
@@ -354,7 +383,7 @@ void liren_scene_render_postproc (
 {
 	float param[4];
 	GLuint tmp;
-	LIRenDeferred* framebuffer;
+	LIRenFramebuffer* framebuffer;
 	LIRenShader* shader;
 
 	/* Validate state. */

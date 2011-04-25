@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -26,42 +26,6 @@
 
 /* FIXME: Should be configurable. */
 #define SHADOWMAPSIZE 512
-
-struct _LIRenLight
-{
-	int directional;
-	int enabled;
-	float priority;
-	float cutoff;
-	float exponent;
-	float shadow_far;
-	float shadow_near;
-	float ambient[4];
-	float diffuse[4];
-	float specular[4];
-	float equation[3];
-	LIMatAabb bounds;
-	LIMatMatrix projection;
-	LIMatMatrix modelview;
-	LIMatMatrix modelview_inverse;
-	LIMatTransform transform;
-	const LIMdlNode* node;
-	LIRenScene* scene;
-	struct
-	{
-		float pos_world[3];
-		float pos_view[3];
-		float dir_world[3];
-		float dir_view[3];
-		float spot[3];
-		LIMatMatrix matrix;
-	} cache;
-	struct
-	{
-		GLuint fbo;
-		GLuint map;
-	} shadow;
-};
 
 LIAPICALL (LIRenLight*, liren_light_new, (
 	LIRenScene*  scene,
@@ -100,6 +64,10 @@ LIAPICALL (void, liren_light_update_cache, (
 LIAPICALL (void, liren_light_update_projection, (
 	LIRenLight* self));
 
+LIAPICALL (void, liren_light_get_ambient, (
+	LIRenLight* self,
+	float*      value));
+
 LIAPICALL (void, liren_light_set_ambient, (
 	LIRenLight*  self,
 	const float* value));
@@ -107,6 +75,14 @@ LIAPICALL (void, liren_light_set_ambient, (
 LIAPICALL (int, liren_light_get_bounds, (
 	const LIRenLight* self,
 	LIMatAabb*        result));
+
+LIAPICALL (void, liren_light_get_diffuse, (
+	LIRenLight* self,
+	float*      value));
+
+LIAPICALL (void, liren_light_set_diffuse, (
+	LIRenLight*  self,
+	const float* value));
 
 LIAPICALL (void, liren_light_get_direction, (
 	const LIRenLight* self,
@@ -122,6 +98,14 @@ LIAPICALL (void, liren_light_set_directional, (
 
 LIAPICALL (int, liren_light_get_enabled, (
 	const LIRenLight* self));
+
+LIAPICALL (void, liren_light_get_equation, (
+	LIRenLight* self,
+	float*      value));
+
+LIAPICALL (void, liren_light_set_equation, (
+	LIRenLight*  self,
+	const float* value));
 
 LIAPICALL (void, liren_light_get_modelview, (
 	const LIRenLight* self,
@@ -146,12 +130,51 @@ LIAPICALL (void, liren_light_set_projection, (
 	LIRenLight*        self,
 	const LIMatMatrix* value));
 
+LIAPICALL (LIRenScene*, liren_light_get_scene, (
+	const LIRenLight* self));
+
 LIAPICALL (int, liren_light_get_shadow, (
 	const LIRenLight* self));
 
 LIAPICALL (void, liren_light_set_shadow, (
 	LIRenLight* self,
 	int         value));
+
+LIAPICALL (float, liren_light_get_shadow_far, (
+	const LIRenLight* self));
+
+LIAPICALL (void, liren_light_set_shadow_far, (
+	LIRenLight* self,
+	float       value));
+
+LIAPICALL (float, liren_light_get_shadow_near, (
+	const LIRenLight* self));
+
+LIAPICALL (void, liren_light_set_shadow_near, (
+	LIRenLight* self,
+	float       value));
+
+LIAPICALL (void, liren_light_get_specular, (
+	LIRenLight* self,
+	float*      value));
+
+LIAPICALL (void, liren_light_set_specular, (
+	LIRenLight*  self,
+	const float* value));
+
+LIAPICALL (float, liren_light_get_spot_cutoff, (
+	const LIRenLight* self));
+
+LIAPICALL (void, liren_light_set_spot_cutoff, (
+	LIRenLight* self,
+	float       value));
+
+LIAPICALL (float, liren_light_get_spot_exponent, (
+	const LIRenLight* self));
+
+LIAPICALL (void, liren_light_set_spot_exponent, (
+	LIRenLight* self,
+	float       value));
 
 LIAPICALL (void, liren_light_get_transform, (
 	LIRenLight*     self,

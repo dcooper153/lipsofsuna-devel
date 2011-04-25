@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,12 +20,13 @@
 
 #include <lipsofsuna/image.h>
 #include <lipsofsuna/model.h>
-#include "render-buffer.h"
-#include "render-light.h"
-#include "render-material.h"
-#include "render-scene.h"
+#include "../render-buffer.h"
+#include "../render-light.h"
+#include "../render-material.h"
+#include "../render-scene.h"
+#include "../render-types.h"
+#include "render-mesh.h"
 #include "render-texture.h"
-#include "render-types.h"
 #include "render-uniforms.h"
 
 /* If you changed this, also remember change LOS_LIGHT_MAX in shader program

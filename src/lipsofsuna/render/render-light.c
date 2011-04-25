@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,8 +22,9 @@
  * @{
  */
 
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "render-light.h"
+#include "render-private.h"
 
 #define LIGHT_CONTRIBUTION_EPSILON 0.001f
 
@@ -258,6 +259,13 @@ void liren_light_update_projection (
 		1.0f, self->shadow_near, self->shadow_far);
 }
 
+void liren_light_get_ambient (
+	LIRenLight* self,
+	float*      value)
+{
+	memcpy (value, self->ambient, 4 * sizeof (float));
+}
+
 void liren_light_set_ambient (
 	LIRenLight*  self,
 	const float* value)
@@ -278,6 +286,20 @@ int liren_light_get_bounds (
 	*result = self->bounds;
 
 	return 1;
+}
+
+void liren_light_get_diffuse (
+	LIRenLight* self,
+	float*      value)
+{
+	memcpy (value, self->diffuse, 4 * sizeof (float));
+}
+
+void liren_light_set_diffuse (
+	LIRenLight*  self,
+	const float* value)
+{
+	memcpy (self->diffuse, value, 4 * sizeof (float));
 }
 
 /**
@@ -356,6 +378,20 @@ int liren_light_get_enabled (
 	const LIRenLight* self)
 {
 	return self->enabled;
+}
+
+void liren_light_get_equation (
+	LIRenLight* self,
+	float*      value)
+{
+	memcpy (value, self->equation, 3 * sizeof (float));
+}
+
+void liren_light_set_equation (
+	LIRenLight*  self,
+	const float* value)
+{
+	memcpy (self->equation, value, 3 * sizeof (float));
 }
 
 /**
@@ -446,6 +482,12 @@ void liren_light_set_projection (
 	private_update_bounds (self);
 }
 
+LIRenScene* liren_light_get_scene (
+	const LIRenLight* self)
+{
+	return self->scene;
+}
+
 /**
  * \brief Gets the shadow casting mode of the light.
  * \param self Light source.
@@ -455,6 +497,34 @@ int liren_light_get_shadow (
 	const LIRenLight* self)
 {
 	return self->shadow.fbo != 0;
+}
+
+float liren_light_get_shadow_far (
+	const LIRenLight* self)
+{
+	return self->shadow_far;
+}
+
+void liren_light_set_shadow_far (
+	LIRenLight* self,
+	float       value)
+{
+	self->shadow_far = value;
+	liren_light_update_projection (self);
+}
+
+float liren_light_get_shadow_near (
+	const LIRenLight* self)
+{
+	return self->shadow_near;
+}
+
+void liren_light_set_shadow_near (
+	LIRenLight* self,
+	float       value)
+{
+	self->shadow_near = value;
+	liren_light_update_projection (self);
 }
 
 /**
@@ -511,6 +581,47 @@ void liren_light_set_shadow (
 		self->shadow.fbo = 0;
 		self->shadow.map = 0;
 	}
+}
+
+void liren_light_get_specular (
+	LIRenLight* self,
+	float*      value)
+{
+	memcpy (value, self->specular, 4 * sizeof (float));
+}
+
+void liren_light_set_specular (
+	LIRenLight*  self,
+	const float* value)
+{
+	memcpy (self->specular, value, 4 * sizeof (float));
+}
+
+float liren_light_get_spot_cutoff (
+	const LIRenLight* self)
+{
+	return self->cutoff;
+}
+
+void liren_light_set_spot_cutoff (
+	LIRenLight* self,
+	float       value)
+{
+	self->cutoff = value;
+	liren_light_update_projection (self);
+}
+
+float liren_light_get_spot_exponent (
+	const LIRenLight* self)
+{
+	return self->exponent;
+}
+
+void liren_light_set_spot_exponent (
+	LIRenLight* self,
+	float       value)
+{
+	self->exponent = value;
 }
 
 /**

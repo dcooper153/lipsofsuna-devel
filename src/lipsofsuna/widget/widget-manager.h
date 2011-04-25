@@ -37,7 +37,6 @@ struct _LIWdgManager
 	LICalCallbacks* callbacks;
 	LIMatMatrix projection;
 	LIPthPaths* paths;
-	LIRenContext* context;
 	LIRenRender* render;
 	LIRenShader* shader;
 	struct

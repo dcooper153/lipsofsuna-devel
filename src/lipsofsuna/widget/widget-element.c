@@ -96,8 +96,8 @@ LIWdgElement* liwdg_element_new_image (
 	}
 	else
 	{
-		self->src_tiling[1] = self->image->texture->width;
-		self->src_tiling[4] = self->image->texture->height;
+		self->src_tiling[1] = liren_image_get_width (self->image);
+		self->src_tiling[4] = liren_image_get_height (self->image);
 	}
 	self->rotation = rotation_angle;
 	if (rotation_center != NULL)
@@ -153,10 +153,7 @@ void liwdg_element_free (
 	LIWdgElement* self)
 {
 	if (self->buffer != NULL)
-	{
 		liren_buffer_free (self->buffer);
-		lisys_free (self->buffer);
-	}
 	lisys_free (self->vertices.array);
 	lisys_free (self->text);
 	lisys_free (self);
@@ -167,37 +164,30 @@ void liwdg_element_paint (
 	LIWdgManager* manager)
 {
 	int scissor[5];
+	GLuint texture;
 
 	if (self->buffer != NULL)
 	{
-		/* Enable clipping. */
 		if (self->dst_clip_enabled)
 		{
-			scissor[4] = liren_context_get_scissor (manager->context,
-				scissor + 0, scissor + 1, scissor + 2, scissor + 3);
-			liren_context_set_scissor (manager->context, 1,
-				self->dst_clip_screen[0], manager->height - self->dst_clip_screen[1] -
-				self->dst_clip_screen[3], self->dst_clip_screen[2], self->dst_clip_screen[3]);
+			scissor[0] = self->dst_clip_screen[0];
+			scissor[1] = manager->height - self->dst_clip_screen[1] - self->dst_clip_screen[3];
+			scissor[2] = self->dst_clip_screen[2];
+			scissor[3] = self->dst_clip_screen[3];
 		}
-
-		/* Render the vertex buffer. */
-		liren_context_set_buffer (manager->context, self->buffer);
-		liren_context_set_projection (manager->context, &manager->projection);
-		liren_context_set_shader (manager->context, 0, manager->shader);
-		liren_context_set_diffuse (manager->context, self->text_color);
-		if (self->image != NULL)
-			liren_context_set_textures_raw (manager->context, &self->image->texture->texture, 1);
 		else
-			liren_context_set_textures_raw (manager->context, &self->font->texture, 1);
-		liren_context_bind (manager->context);
-		liren_context_render_array (manager->context, GL_TRIANGLES, 0, self->vertices.count);
-
-		/* Disable clipping. */
-		if (self->dst_clip_enabled)
 		{
-			liren_context_set_scissor (manager->context, scissor[4],
-				scissor[0], scissor[1], scissor[2], scissor[3]);
+			scissor[0] = 0;
+			scissor[1] = 0;
+			scissor[2] = manager->width;
+			scissor[3] = manager->height;
 		}
+		if (self->image != NULL)
+			texture = liren_image_get_handle (self->image);
+		else
+			texture = self->font->texture;
+		liren_render_draw_clipped_buffer (manager->render, manager->shader,
+			&manager->projection, texture, self->text_color, scissor, self->buffer);
 	}
 }
 
@@ -211,7 +201,6 @@ void liwdg_element_update (
 	if (self->buffer != NULL)
 	{
 		liren_buffer_free (self->buffer);
-		lisys_free (self->buffer);
 		self->buffer = NULL;
 	}
 	lisys_free (self->vertices.array);
@@ -233,16 +222,10 @@ void liwdg_element_update (
 	/* Create vertex buffer. */
 	if (self->vertices.count)
 	{
-		self->buffer = lisys_calloc (1, sizeof (LIRenBuffer));
+		self->buffer = liren_buffer_new (NULL, 0, &format,
+			 self->vertices.array, self->vertices.count, LIREN_BUFFER_TYPE_STATIC);
 		if (self->buffer == NULL)
 			return;
-		if (!liren_buffer_init (self->buffer, NULL, 0, &format,
-			 self->vertices.array, self->vertices.count, LIREN_BUFFER_TYPE_STATIC))
-		{
-			lisys_free (self->buffer);
-			self->buffer = NULL;
-			return;
-		}
 	}
 
 	/* Update scissor rectangle. */
@@ -290,10 +273,10 @@ static void private_pack_scaled (
 	float ty[2];
 
 	/* Calculate texture coordinates. */
-	tx[0] = (float)(self->src_pos[0]) / self->image->texture->width;
-	tx[1] = (float)(self->src_pos[0] + self->src_tiling[1]) / self->image->texture->width;
-	ty[0] = (float)(self->src_pos[1]) / self->image->texture->width;
-	ty[1] = (float)(self->src_pos[1] + self->src_tiling[4]) / self->image->texture->height;
+	tx[0] = (float)(self->src_pos[0]) / liren_image_get_width (self->image);
+	tx[1] = (float)(self->src_pos[0] + self->src_tiling[1]) / liren_image_get_width (self->image);
+	ty[0] = (float)(self->src_pos[1]) / liren_image_get_height (self->image);
+	ty[1] = (float)(self->src_pos[1] + self->src_tiling[4]) / liren_image_get_height (self->image);
 
 	/* Calculate pixels per texture unit. */
 	xs = tx[1] - tx[0];
@@ -394,6 +377,8 @@ static void private_pack_tiled (
 {
 	int px;
 	int py;
+	int iw;
+	int ih;
 	float fw;
 	float fh;
 	float fu;
@@ -419,14 +404,16 @@ static void private_pack_tiled (
 	h[2] = self->src_tiling[5];
 
 	/* Calculate texture coordinates. */
-	tx[0] = (float)(self->src_pos[0]) / self->image->texture->width;
-	tx[1] = (float)(self->src_pos[0] + self->src_tiling[0]) / self->image->texture->width;
-	tx[2] = (float)(self->src_pos[0] + self->src_tiling[0] + self->src_tiling[1]) / self->image->texture->width;
-	tx[3] = (float)(self->src_pos[0] + self->src_tiling[0] + self->src_tiling[1] + self->src_tiling[2]) / self->image->texture->width;
-	ty[0] = (float)(self->src_pos[1]) / self->image->texture->height;
-	ty[1] = (float)(self->src_pos[1] + self->src_tiling[3]) / self->image->texture->height;
-	ty[2] = (float)(self->src_pos[1] + self->src_tiling[3] + self->src_tiling[4]) / self->image->texture->height;
-	ty[3] = (float)(self->src_pos[1] + self->src_tiling[3] + self->src_tiling[4] + self->src_tiling[5]) / self->image->texture->height;
+	iw = liren_image_get_width (self->image);
+	ih = liren_image_get_height (self->image);
+	tx[0] = (float)(self->src_pos[0]) / iw;
+	tx[1] = (float)(self->src_pos[0] + self->src_tiling[0]) / iw;
+	tx[2] = (float)(self->src_pos[0] + self->src_tiling[0] + self->src_tiling[1]) / iw;
+	tx[3] = (float)(self->src_pos[0] + self->src_tiling[0] + self->src_tiling[1] + self->src_tiling[2]) / iw;
+	ty[0] = (float)(self->src_pos[1]) / ih;
+	ty[1] = (float)(self->src_pos[1] + self->src_tiling[3]) / ih;
+	ty[2] = (float)(self->src_pos[1] + self->src_tiling[3] + self->src_tiling[4]) / ih;
+	ty[3] = (float)(self->src_pos[1] + self->src_tiling[3] + self->src_tiling[4] + self->src_tiling[5]) / ih;
 
 	/* Pack corners. */
 	px = r.x;

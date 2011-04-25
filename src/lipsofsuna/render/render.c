@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,10 +22,10 @@
  * @{
  */
 
-#include <lipsofsuna/system.h>
-#include <lipsofsuna/video.h>
+#include "lipsofsuna/system.h"
+#include "lipsofsuna/video.h"
 #include "render.h"
-#include "render-draw.h"
+#include "render-private.h"
 
 static void private_free_helpers (
 	LIRenRender* self);
@@ -127,6 +127,68 @@ void liren_render_free (
 	}
 
 	lisys_free (self);
+}
+
+void liren_render_draw_clipped_buffer (
+	LIRenRender* self,
+	LIRenShader* shader,
+	LIMatMatrix* projection,
+	GLuint       texture,
+	const float* diffuse,
+	const int*   scissor,
+	LIRenBuffer* buffer)
+{
+	int scissor1[5];
+
+	/* Enable clipping. */
+	scissor1[4] = liren_context_get_scissor (self->context,
+		scissor1 + 0, scissor1 + 1, scissor1 + 2, scissor1 + 3);
+	liren_context_set_scissor (self->context, 1,
+		scissor[0], scissor[1], scissor[2], scissor[3]);
+
+	/* Render the vertex buffer. */
+	liren_context_set_buffer (self->context, buffer);
+	liren_context_set_cull (self->context, 0, GL_CCW);
+	liren_context_set_projection (self->context, projection);
+	liren_context_set_shader (self->context, 0, shader);
+	liren_context_set_diffuse (self->context, diffuse);
+	liren_context_set_textures_raw (self->context, &texture, 1);
+	liren_context_bind (self->context);
+	liren_context_render_array (self->context, GL_TRIANGLES, 0, buffer->vertices.count);
+
+	/* Disable clipping. */
+	liren_context_set_scissor (self->context, scissor1[4],
+		scissor1[0], scissor1[1], scissor1[2], scissor1[3]);
+}
+
+void liren_render_draw_indexed_triangles_T2V3 (
+	LIRenRender*    self,
+	LIRenShader*    shader,
+	LIMatMatrix*    matrix,
+	GLuint          texture,
+	const float*    diffuse,
+	const float*    vertex_data,
+	const uint32_t* index_data,
+	int             index_count)
+{
+	int j;
+
+	liren_context_set_shader (self->context, 0, shader);
+	liren_context_set_blend (self->context, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	liren_context_set_buffer (self->context, NULL);
+	liren_context_set_cull (self->context, 0, GL_CCW);
+	liren_context_set_diffuse (self->context, diffuse);
+	liren_context_set_depth (self->context, 0, 0, GL_LEQUAL);
+	liren_context_set_projection (self->context, matrix);
+	liren_context_set_textures_raw (self->context, &texture, 1);
+	liren_context_bind (self->context);
+	glBegin (GL_TRIANGLES);
+	for (j = 0 ; j < index_count ; j++)
+	{
+		glVertexAttrib2fv (LIREN_ATTRIBUTE_TEXCOORD, vertex_data + 5 * index_data[j] + 0);
+		glVertexAttrib2fv (LIREN_ATTRIBUTE_COORD, vertex_data + 5 * index_data[j] + 2);
+	}
+	glEnd ();
 }
 
 /**
@@ -318,15 +380,9 @@ static void private_free_helpers (
 	if (self->helpers.empty_image != NULL)
 		liren_image_free (self->helpers.empty_image);
 	if (self->helpers.unit_quad != NULL)
-	{
 		liren_buffer_free (self->helpers.unit_quad);
-		lisys_free (self->helpers.unit_quad);
-	}
 	if (self->immediate.buffer != NULL)
-	{
 		liren_buffer_free (self->immediate.buffer);
-		lisys_free (self->immediate.buffer);
-	}
 }
 
 static int private_init_helpers (
@@ -413,19 +469,15 @@ static int private_init_helpers (
 	lisys_free (pixels);
 
 	/* Initialize unit quad buffer. */
-	self->helpers.unit_quad = lisys_calloc (1, sizeof (LIRenBuffer));
+	self->helpers.unit_quad = liren_buffer_new (quad_index_data, 6,
+		&quad_vertex_format, &quad_vertex_data, 4, LIREN_BUFFER_TYPE_STATIC);
 	if (self->helpers.unit_quad == NULL)
-		return 0;
-	if (!liren_buffer_init (self->helpers.unit_quad, quad_index_data, 6,
-	     &quad_vertex_format, &quad_vertex_data, 4, LIREN_BUFFER_TYPE_STATIC))
 		return 0;
 
 	/* Initialize immediate mode style vertex buffer. */
-	self->immediate.buffer = lisys_calloc (1, sizeof (LIRenBuffer));
+	self->immediate.buffer = liren_buffer_new (NULL, 0,
+		&immediate_vertex_format, NULL, 300000, LIREN_BUFFER_TYPE_STREAM);
 	if (self->immediate.buffer == NULL)
-		return 0;
-	if (!liren_buffer_init (self->immediate.buffer, NULL, 0,
-	     &immediate_vertex_format, NULL, 300000, LIREN_BUFFER_TYPE_STREAM))
 		return 0;
 
 	return 1;

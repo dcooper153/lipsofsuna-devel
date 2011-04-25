@@ -20,22 +20,14 @@
 
 #include "render/render.h"
 #include "render/render-buffer.h"
-#include "render/render-buffer-texture.h"
-#include "render/render-context.h"
-#include "render/render-deferred.h"
-#include "render/render-draw.h"
-#include "render/render-error.h"
+#include "render/render-framebuffer.h"
 #include "render/render-image.h"
 #include "render/render-light.h"
-#include "render/render-lighting.h"
 #include "render/render-material.h"
-#include "render/render-mesh.h"
 #include "render/render-model.h"
 #include "render/render-object.h"
 #include "render/render-scene.h"
 #include "render/render-shader.h"
-#include "render/render-sort.h"
-#include "render/render-texture.h"
 #include "render/render-types.h"
 
 #endif

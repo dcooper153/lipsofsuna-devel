@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,22 +15,30 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_ATTRIBUTE_H__
-#define __RENDER_ATTRIBUTE_H__
+#ifndef __RENDER_BUFFER_TEXTURE_H__
+#define __RENDER_BUFFER_TEXTURE_H__
 
-#include <lipsofsuna/video.h>
-#include "render-types.h"
+#include "lipsofsuna/video.h"
 
-enum
+typedef struct _LIRenBufferTexture LIRenBufferTexture;
+struct _LIRenBufferTexture
 {
-	LIREN_ATTRIBUTE_COORD,
-	LIREN_ATTRIBUTE_NORMAL,
-	LIREN_ATTRIBUTE_TEXCOORD,
-	LIREN_ATTRIBUTE_TANGENT,
-	LIREN_ATTRIBUTE_WEIGHTS1,
-	LIREN_ATTRIBUTE_WEIGHTS2,
-	LIREN_ATTRIBUTE_BONES1,
-	LIREN_ATTRIBUTE_BONES2
+	int size;
+	GLuint buffer;
+	GLuint texture;
 };
+
+LIAPICALL (void, liren_buffer_texture_init, (
+	LIRenBufferTexture* self,
+	void*               data,
+	int                 size));
+
+LIAPICALL (void, liren_buffer_texture_clear, (
+	LIRenBufferTexture* self));
+
+LIAPICALL (void, liren_buffer_texture_upload, (
+	LIRenBufferTexture* self,
+	int                 size,
+	void*               data));
 
 #endif

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -23,15 +23,6 @@
 #include "render-types.h"
 
 typedef struct _LIRenImage LIRenImage;
-struct _LIRenImage
-{
-	int added;
-	int empty;
-	char* name;
-	char* path;
-	LIImgTexture* texture;
-	LIRenRender* render;
-};
 
 LIAPICALL (LIRenImage*, liren_image_new, (
 	LIRenRender* render,
@@ -46,5 +37,14 @@ LIAPICALL (void, liren_image_free, (
 
 LIAPICALL (int, liren_image_reload, (
 	LIRenImage* self));
+
+LIAPICALL (GLuint, liren_image_get_handle, (
+	const LIRenImage* self));
+
+LIAPICALL (int, liren_image_get_height, (
+	const LIRenImage* self));
+
+LIAPICALL (int, liren_image_get_width, (
+	const LIRenImage* self));
 
 #endif

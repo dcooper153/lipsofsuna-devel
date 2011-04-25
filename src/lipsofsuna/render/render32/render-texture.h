@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,30 +15,37 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_BUFFER_TEXTURE_H__
-#define __RENDER_BUFFER_TEXTURE_H__
+#ifndef __RENDER_TEXTURE_H__
+#define __RENDER_TEXTURE_H__
 
-#include "lipsofsuna/video.h"
+#include <lipsofsuna/image.h>
+#include <lipsofsuna/model.h>
+#include "../render.h"
+#include "../render-types.h"
 
-typedef struct _LIRenBufferTexture LIRenBufferTexture;
-struct _LIRenBufferTexture
+struct _LIRenTexture
 {
-	int size;
-	GLuint buffer;
-	GLuint texture;
+	int id;
+	int width;
+	int height;
+	LIMdlTextureType type;
+	LIRenImage* image;
 };
 
-LIAPICALL (void, liren_buffer_texture_init, (
-	LIRenBufferTexture* self,
-	void*               data,
-	int                 size));
+LIAPICALL (void, liren_texture_init, (
+	LIRenTexture* self));
 
-LIAPICALL (void, liren_buffer_texture_clear, (
-	LIRenBufferTexture* self));
+LIAPICALL (void, liren_texture_free, (
+	LIRenTexture* self));
 
-LIAPICALL (void, liren_buffer_texture_upload, (
-	LIRenBufferTexture* self,
-	int                 size,
-	void*               data));
+LIAPICALL (void, liren_texture_set_image, (
+	LIRenTexture* self,
+	LIRenImage*   value));
+
+LIAPICALL (GLenum, liren_texture_get_target, (
+	const LIRenTexture* self));
+
+LIAPICALL (GLuint, liren_texture_get_texture, (
+	const LIRenTexture* self));
 
 #endif

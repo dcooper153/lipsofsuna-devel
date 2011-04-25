@@ -68,6 +68,7 @@ static void Object_update_transparency (LIScrArgs* args)
 {
 	LIExtModule* module;
 	LIEngObject* engobj;
+	LIRenModel* model;
 	LIRenObject* object;
 
 	/* Get render object. */
@@ -78,8 +79,9 @@ static void Object_update_transparency (LIScrArgs* args)
 		return;
 
 	/* Deform the mesh. */
-	if (object->model != NULL)
-		liren_model_update_transparency (object->model);
+	model = liren_object_get_model (object);
+	if (model != NULL)
+		liren_model_update_transparency (model);
 }
 
 /*****************************************************************************/
