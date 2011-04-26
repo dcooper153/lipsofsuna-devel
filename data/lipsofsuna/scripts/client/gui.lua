@@ -7,6 +7,7 @@ Gui.init = function(clss)
 	Gui.skills = Views.Skills{main = true, sync = true}
 	-- Admin menu.
 	Gui.menu_widget_admin = Widgets.Menu{text = "Admin",
+		{"Stats", function() clss:set_mode("admin", 2) end, arrow = true},
 		{"Editor", Editing.dialog},
 		{"Save", function() Network:send{packet = Packet(packets.ADMIN_SAVE)} end},
 		{"Shutdown", function() Network:send{packet = Packet(packets.ADMIN_SHUTDOWN)} end}}
@@ -120,7 +121,10 @@ Gui.set_mode = function(self, mode, level)
 	end
 	-- Set the detailed view mode.
 	self.mode = mode
-	if mode == "chargen" then
+	if mode == "admin" then
+		Gui.menus:open{level = level or 1, widget = Views.Admin.inst}
+		self.view = Views.Admin.inst
+	elseif mode == "chargen" then
 		self.view = Views.Chargen.inst
 	elseif mode == "dialog" then
 		Gui.menus:open{level = level or 1, widget = Views.Dialog.inst}

@@ -89,12 +89,13 @@ Object:add_setters{
 	position = function(s, v) Los.object_set_position(s.handle, v.handle) end,
 	rotation = function(s, v) Los.object_set_rotation(s.handle, v.handle) end,
 	realized = function(s, v)
-		if Los.object_get_realized(s.handle) == v then return end
 		if v then
+			if __objects_realized[s] then return end
 			__objects_realized[s] = true
 			Los.object_set_realized(s.handle, true)
 			Program:push_event{type = "object-visibility", visible = true}
 		else
+			if not __objects_realized[s] then return end
 			__objects_realized[s] = nil
 			Los.object_set_realized(s.handle, false)
 			Program:push_event{type = "object-visibility", visible = false}

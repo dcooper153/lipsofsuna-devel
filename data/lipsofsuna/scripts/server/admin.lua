@@ -94,3 +94,80 @@ Protocol:add_handler{type = "ADMIN_SPAWN", func = function(args)
 		end
 	end
 end}
+
+Protocol:add_handler{type = "ADMIN_STATS", func = function(args)
+	-- Check for permissions.
+	local player = Player:find{client = args.client}
+	if not player.admin then return player:send("You have no permission to do that.") end
+	-- Count objects.
+	local num_players_miss = 0
+	local num_players_real = 0
+	local num_creatures_miss = 0
+	local num_creatures_real = 0
+	local num_items_miss = 0
+	local num_items_inv = 0
+	local num_items_real = 0
+	local num_obstacles_miss = 0
+	local num_obstacles_real = 0
+	local num_objects_miss = 0
+	local num_objects_real = 0
+	local num_vision_miss = 0
+	local num_vision_real = 0
+	for k,v in pairs(Object.objects) do
+		if v.class_name == "Player" then
+			if v.realized then
+				num_players_real = num_players_real + 1
+			else
+				num_players_miss = num_players_miss + 1
+			end
+			for k1,v1 in pairs(v.vision.objects) do
+				if k1.realized then
+					num_vision_real = num_vision_real + 1
+				else
+					num_vision_miss = num_vision_miss + 1
+				end
+			end
+		elseif v.class_name == "Creature" then
+			if v.realized then
+				num_creatures_real = num_creatures_real + 1
+			else
+				num_creatures_miss = num_creatures_miss + 1
+			end
+		elseif v.class_name == "Item" then
+			if v.realized then
+				num_items_real = num_items_real + 1
+			elseif Inventory:find{object = v} then
+				num_items_inv = num_items_inv + 1
+			else
+				num_items_miss = num_items_miss + 1
+			end
+		elseif v.class_name == "Obstacle" then
+			if v.realized then
+				num_obstacles_real = num_obstacles_real + 1
+			else
+				num_obstacles_miss = num_obstacles_miss + 1
+			end
+		else
+			if v.realized then
+				num_objects_real = num_objects_real + 1
+			else
+				num_objects_miss = num_objects_miss + 1
+			end
+		end
+	end
+	-- Count sectors.
+	local num_sectors = 0
+	for k,v in pairs(Serialize.sectors.sectors) do
+		num_sectors = num_sectors + 1
+	end
+	-- Send stats.
+	player:send{packet = Packet(packets.ADMIN_STATS, "string", string.format(
+		"Players: %d+%d\nCreatures: %d+%d\nItems: %d+%d+%d\nObstacles: %d+%d\nOthers: %d+%d\nVision: %d+%d\nSectors: %d",
+		num_players_real, num_players_miss,
+		num_creatures_real, num_creatures_miss,
+		num_items_real, num_items_inv, num_items_miss,
+		num_obstacles_real, num_obstacles_miss,
+		num_objects_real, num_objects_miss,
+		num_vision_real, num_vision_miss,
+		num_sectors))}
+end}

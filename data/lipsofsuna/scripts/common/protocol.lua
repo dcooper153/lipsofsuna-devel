@@ -104,6 +104,7 @@ do
 	add("WORLD_EFFECT")
 	add("ADMIN_PRIVILEGE")
 	add("AUTHENTICATE_REJECT")
+	add("ADMIN_STATS")
 end
 
 effects = {}
