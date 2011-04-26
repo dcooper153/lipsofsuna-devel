@@ -29,7 +29,7 @@ end
 -- @param clss Client class.
 -- @return Screenshot filename.
 Client.screenshot = function(clss)
-	Los.client_screenshot()
+	return Los.client_screenshot()
 end
 
 --- Sets the current video mode.
