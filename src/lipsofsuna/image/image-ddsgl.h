@@ -104,6 +104,7 @@ static inline int liimg_ddsgl_load_levels (
 	GLuint            texture)
 {
 	int level;
+	uint8_t* data;
 	LIImgDDSLevel lvl;
 
 	for (level = 0 ; !level || level < (int) dds->header.mipmaps ; level++)
@@ -117,13 +118,26 @@ static inline int liimg_ddsgl_load_levels (
 				lvl.height, 0, format->format, format->type, lvl.data);
 			lisys_free (lvl.data);
 		}
-		else
+		else if (GLEW_EXT_texture_compression_s3tc)
 		{
 			/* Compressed format. */
 			if (!liimg_dds_read_level (dds, file, level, &lvl))
 				return 0;
 			glCompressedTexImage2DARB (target, level, format->format,
 				lvl.width, lvl.height, 0, lvl.size, lvl.data);
+			lisys_free (lvl.data);
+		}
+		else
+		{
+			/* Compressed format, software decompression. */
+			if (!liimg_dds_read_level (dds, file, level, &lvl))
+				return 0;
+			data = lisys_calloc (lvl.width * lvl.height * 4, sizeof (uint8_t));
+			if (data != NULL)
+				liimg_dds_decompress (lvl.data, data, lvl.width, lvl.height, dds->format.compress);
+			glTexImage2D (target, level, GL_RGBA, lvl.width,
+				lvl.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+			lisys_free (data);
 			lisys_free (lvl.data);
 		}
 	}
@@ -151,11 +165,6 @@ static inline GLuint liimg_ddsgl_load_texture (
 	if (!liimg_dds_read_header (&dds, file) ||
 	    !liimg_ddsgl_get_format (&dds, &fmt))
 		return 0;
-	if (fmt.compressed)
-	{
-		if (!GLEW_EXT_texture_compression_s3tc)
-			return 0;
-	}
 	if (info != NULL)
 		*info = dds;
 

@@ -228,6 +228,13 @@ static inline void liimg_dds_byteswap (
 	}
 }
 
+int liimg_dds_decompress (
+	const void* input,
+	void*       output,
+	int         width,
+	int         height,
+	int         format);
+
 /**
  * \brief Reads the DDS file header.
  * \param self DDS.
