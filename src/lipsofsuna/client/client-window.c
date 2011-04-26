@@ -175,7 +175,7 @@ static int private_resize (
 
 	/* Recreate surface. */
 	/* This destroys all graphics data in Windows. */
-	SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 0);
+	SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 24);
 	SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 0);
 	if (sync)
 		SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
