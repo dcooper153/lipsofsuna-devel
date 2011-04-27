@@ -178,17 +178,27 @@ end
 --   <li>row: Row index.</li></ul>
 Widget.remove = function(self, args)
 	if args.col then
-		local x = args.col
-		local h = self.rows
+		local w,h = self.cols,self.rows
+		for x = args.col,w do
+			for y = 1,h do
+				local c = self.__children[(x + 1) + y * 1000]
+				self.__children[x + y * 1000] = c
+			end
+		end
 		for y = 1,h do
-			self.__children[x + y * 1000] = nil
+			self.__children[w + y * 1000] = nil
 		end
 	end
 	if args.row then
-		local y = args.row
-		local w = self.cols
+		local w,h = self.cols,self.rows
 		for x = 1,w do
-			self.__children[x + y * 1000] = nil
+			for y = args.row,h do
+				local c = self.__children[x + (y + 1) * 1000]
+				self.__children[x + y * 1000] = c
+			end
+		end
+		for x = 1,w do
+			self.__children[x + h * 1000] = nil
 		end
 	end
 	Los.widget_remove(self.handle, args)
@@ -366,6 +376,17 @@ Widget.unittest = function()
 	assert(w:get_child(2, 1) == c1)
 	assert(w:get_child(1, 2) == c2)
 	assert(w:get_child(2, 2) == c3)
+	-- Row and column removal.
+	w:remove{col = 1}
+	assert(w.cols == 1)
+	assert(w:get_child(1, 1) == c1)
+	assert(w:get_child(1, 2) == c3)
+	w:remove{col = 1}
+	assert(w.cols == 0)
+	w:remove{row = 1}
+	assert(w.rows == 1)
+	w:remove{row = 1}
+	assert(w.rows == 0)
 	-- Shrinking.
 	do
 		local w1 = Widget{cols = 2, rows = 2}
@@ -399,6 +420,7 @@ Widget.unittest = function()
 		assert(weak[1])
 		assert(weak[2] == nil)
 		w1:remove{col = 1}
+		assert(w1.cols == 0)
 		assert(w1:get_child(1, 1) == nil)
 		collectgarbage()
 		assert(weak[1] == nil)

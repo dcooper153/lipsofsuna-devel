@@ -60,7 +60,7 @@ Views.Inventory.remove_container = function(self, widget)
 	end
 	-- Remove looted containers.
 	for i = 1,self.containers.cols do
-		local w = self.containers:get_child{col = i, row = 3}
+		local w = self.containers:get_child(i, 3)
 		if w == widget then
 			self.containers:remove{col = i}
 			break
@@ -76,9 +76,9 @@ end
 -- @param self Inventory view.
 Views.Inventory.close = function(self)
 	-- Close containers.
-	for i = 1,self.containers.cols do
-		local w = self.containers:get_child{col = i, row = 3}
-		if w then w:close() end
+	for i = self.containers.cols,1,-1 do
+		local w = self.containers:get_child(i, 3)
+		w:close()
 	end
 end
 

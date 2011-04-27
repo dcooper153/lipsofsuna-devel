@@ -36,12 +36,12 @@ Widgets.ComboBox.activate = function(self, args)
 	local widget = nil
 	local index = nil
 	if args.index then
-		widget = self.menu:get_child{col = 1, row = args.index}
+		widget = self.menu:get_child(1, args.index)
 		index = args.index
 	elseif args.text then
 		index = 1
 		for index = 1,self.menu.rows do
-			local tmp = self.menu:get_child{col = 1, row = index}
+			local tmp = self.menu:get_child(1, index)
 			if not tmp then return end
 			if tmp.text == args.text then
 				widget = tmp
