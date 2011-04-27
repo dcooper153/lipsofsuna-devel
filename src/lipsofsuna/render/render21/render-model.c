@@ -391,7 +391,7 @@ static inline void private_vert_xform (
 	LIMatVector nml = { 0.0f, 0.0f, 0.0f };
 	LIMatVector vtx = { 0.0f, 0.0f, 0.0f };
 
-	for (i = 0 ; i < 8 && in->bones[i] ; i++)
+	for (i = 0 ; i < 8 && (i < 1 || in->bones[i]) ; i++)
 	{
 		offset = 12 * in->bones[i];
 		poserot = limat_quaternion_init (buf[offset + 8], buf[offset + 9], buf[offset + 10], buf[offset + 11]);
