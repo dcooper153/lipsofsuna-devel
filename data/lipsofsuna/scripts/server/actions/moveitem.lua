@@ -10,22 +10,24 @@
 Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstslot, count)
 	-- Find inventories.
 	local srcinv = Inventory:find{id = srcid}
-	if not srcinv or not srcinv:subscribed{object = user} then return end
+	local srcown = Object:find{id = srcid}
+	if not srcinv or not srcown or not srcinv:subscribed{object = user} then return end
 	local dstinv = Inventory:find{id = dstid}
-	if not dstinv or not dstinv:subscribed{object = user} then return end
+	local dstown = Object:find{id = dstid}
+	if not dstinv or not dstown or not dstinv:subscribed{object = user} then return end
 	if srcinv == dstinv and srcslot == dstslot then return end
 	local srcobj = srcinv:get_object{slot = srcslot}
 	if not srcobj then return end
 	-- Validate slots.
 	if type(srcslot) == "string" then
-		if not srcinv.owner.spec.equipment_slots then return end
-		if not srcinv.owner.spec.equipment_slots[srcslot] then return end
+		if not srcown.spec.equipment_slots then return end
+		if not srcown.spec.equipment_slots[srcslot] then return end
 	elseif srcslot < 1 or srcinv.size < srcslot then
 		return
 	end
 	if type(dstslot) == "string" then
-		if not dstinv.owner.spec.equipment_slots then return end
-		if not dstinv.owner.spec.equipment_slots[dstslot] then return end
+		if not dstown.spec.equipment_slots then return end
+		if not dstown.spec.equipment_slots[dstslot] then return end
 		if not srcobj.spec.equipment_slot then return end
 		dstslot = srcobj.spec.equipment_slot
 	elseif dstslot < 1 then
@@ -34,7 +36,7 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 		return
 	end
 	-- Validate container.
-	if srcobj:contains_item(dstinv.owner) then
+	if srcobj:contains_item(dstown) then
 		user:send{packet = Packet(packets.MESSAGE, "string", "Can't place it inside itself.")}
 		return
 	end
@@ -62,7 +64,7 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 		-- slots. When such an item is equiped or replaced, multiple slots may
 		-- require changes.
 		if type(dstslot) == "string" then
-			if not dstinv.owner:equip_item{object = srcobj} then
+			if not dstown:equip_item{object = srcobj} then
 				return undo()
 			end
 			return true
@@ -122,11 +124,12 @@ end
 Actions.move_from_world_to_inv = function(clss, user, srcid, dstid, dstslot)
 	-- Find the inventory.
 	local dstinv = Inventory:find{id = dstid}
-	if not dstinv or not dstinv:subscribed{object = user} then return end
+	local dstown = Object:find{id = dstid}
+	if not dstinv or not dstown or not dstinv:subscribed{object = user} then return end
 	-- Validate slots.
 	if type(dstslot) == "string" then
-		if not dstinv.owner.spec.equipment_slots then return end
-		if not dstinv.owner.spec.equipment_slots[dstslot] then return end
+		if not dstown.spec.equipment_slots then return end
+		if not dstown.spec.equipment_slots[dstslot] then return end
 	elseif dstslot < 1 then
 		dstslot = nil
 	elseif dstslot > dstinv.size then

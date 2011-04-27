@@ -129,14 +129,34 @@ Object.create_character_model = function(self, args)
 end
 
 Object.update = function(self, secs)
-	if not self.realized then return end
+	-- Update slots.
+	if self.slots then
+		local species = Species:find{name = self.race}
+		for slot,object in pairs(self.slots.slots) do
+			local slot = species and species.equipment_slots[slot]
+			if slot and slot.node and self.realized then
+				-- Show slot.
+				local p,r = self:find_node{name = slot.node, space = "world"}
+				local h = object:find_node{name = "#handle"}
+				if h then p = p - r * h end
+				object.position = p
+				object.rotation = r
+				object.realized = true
+			else
+				-- Hide slot.
+				object:detach()
+			end
+		end
+	end
 	-- Update special effects.
-	if self.special_effects then
-		local p = self.position
-		for k,v in pairs(self.special_effects) do
-			local n = self:find_node{name = v.slot}
-			if n then p = p + self.rotation * n end
-			v.position = p
+	if self.realized then
+		if self.special_effects then
+			local p = self.position
+			for k,v in pairs(self.special_effects) do
+				local n = self:find_node{name = v.slot}
+				if n then p = p + self.rotation * n end
+				v.position = p
+			end
 		end
 	end
 end

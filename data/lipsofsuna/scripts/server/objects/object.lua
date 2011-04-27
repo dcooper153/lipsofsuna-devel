@@ -385,7 +385,7 @@ end
 --   <li>name: Item name.</li></ul>
 -- @return Object or nil.
 Object.split_items = function(self, args)
-	local inv = Inventory:find{owner = self}
+	local inv = self.inventory
 	if not inv then return end
 	local obj = inv:find_object{name = args.name}
 	if not obj then return end
@@ -432,7 +432,7 @@ end
 --   <li>type: Type to match.</li></ul>
 -- @return True if succeeded.
 Object.subtract_items = function(self, args)
-	local inv = Inventory:find{owner = self}
+	local inv = self.inventory
 	if not inv then return end
 	local obj = inv:find_object(args)
 	if not obj then return end

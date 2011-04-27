@@ -92,7 +92,7 @@ Player.respawn = function(self)
 end
 
 Player.inventory_cb = function(self, args)
-	local id = args.inventory.owner.id
+	local id = args.inventory.id
 	local funs =
 	{
 		["inventory-changed"] = function()
@@ -108,10 +108,11 @@ Player.inventory_cb = function(self, args)
 			end
 		end,
 		["inventory-subscribed"] = function()
-			local spec = args.inventory.owner.spec
+			local owner = Object:find{id = id}
+			local spec = owner.spec
 			self:send{packet = Packet(packets.INVENTORY_CREATED, "uint32", id,
 				"string", spec.type, "string", spec.name,
-				"uint8", args.inventory.size, "bool", args.inventory.owner == self)}
+				"uint8", args.inventory.size, "bool", id == self.id)}
 		end,
 		["inventory-unsubscribed"] = function()
 			self:send{packet = Packet(packets.INVENTORY_CLOSED, "uint32", id)}
@@ -147,13 +148,13 @@ Player.vision_cb = function(self, args)
 		if o.inventory then
 			for k,v in pairs(o.inventory.slots) do
 				if type(k) == "string" then
-					funs["slot-changed"]({object = o, slot = k})
+					funs["slot-changed"]({object = o, item = o.inventory:get_object{slot = k}, slot = k})
 				end
 			end
 		end
 		if o.skills then
 			for k,v in pairs(o.skills.skills) do
-				funs["skill-changed"]({object = o, skill = k})
+				funs["skill-changed"]({id = o.id, object = o, skill = k})
 			end
 		end
 	end
@@ -254,7 +255,7 @@ Player.vision_cb = function(self, args)
 		end,
 		["skill-changed"] = function(args)
 			local o = args.object
-			local s = Skills:find{owner = o}
+			local s = o.skills
 			if not s then return end
 			local v = s:get_skill{skill = args.skill}
 			if not v then return end
@@ -264,13 +265,12 @@ Player.vision_cb = function(self, args)
 			end
 		end,
 		["slot-changed"] = function(args)
-			local o = args.object
-			local item = o:get_item{slot = args.slot}
+			local item = args.item
 			local spec = item and item.spec.name
 			local model = item and item.model_name or ""
 			local count = item and item.count or 1
 			self:send{packet = Packet(packets.OBJECT_SLOT,
-				"uint32", o.id, "uint32", count,
+				"uint32", args.object.id, "uint32", count,
 				"string", spec, "string", args.slot)}
 		end,
 		["voxel-block-changed"] = function(args)

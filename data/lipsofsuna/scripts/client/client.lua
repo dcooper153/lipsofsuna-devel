@@ -266,7 +266,8 @@ Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
 	if ok then
 		local o = Object:find{id = i}
 		if not o then return end
-		local slots = Slots:find{owner = o} or Slots:new{owner = o}
+		if not o.slots then o.slots = Slots() end
+		local slots = o.slots
 		spec = Itemspec:find{name = spec}
 		-- Update the model.
 		if not spec then

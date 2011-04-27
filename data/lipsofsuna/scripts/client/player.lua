@@ -119,7 +119,7 @@ end
 
 Player.get_ignored_objects = function(clss)
 	local ignore = {clss.crosshair, clss.object}
-	local slots = Slots:find{owner = clss.object}
+	local slots = clss.object.slots
 	if slots then
 		for k,v in pairs(slots.slots) do
 			table.insert(ignore, v)

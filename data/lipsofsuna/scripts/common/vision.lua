@@ -86,6 +86,7 @@ Vision.rescan_objects = function(self)
 end
 
 Vision.event = function(clss, args)
+	if args.id then args.object = Object:find{id = args.id} end
 	if not args.point and not args.object then return end
 	-- Update each listener.
 	for k,v in pairs(clss.listeners) do

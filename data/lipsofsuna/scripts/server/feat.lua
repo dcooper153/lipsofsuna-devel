@@ -304,7 +304,7 @@ Feat.perform = function(self, args)
 			args.user:subtract_items{name = k, count = v}
 		end
 		local w = info.required_skills["willpower"]
-		if w then Skills:subtract{owner = args.user, skill = "willpower", value = w} end
+		if w then args.user.skills:subtract{skill = "willpower", value = w} end
 		if info.cooldown > 0 then
 			args.user.cooldown = info.cooldown
 		end
@@ -469,14 +469,14 @@ Feat.usable = function(self, args)
 	-- Get feat information.
 	local info = self:get_info()
 	-- Check for skills.
-	local skills = args.skills or Skills:find{owner = args.user}
+	local skills = args.skills or args.user.skills
 	for k,v in pairs(info.required_skills) do
 		if not skills then return end
 		local val = skills:get_value{skill = k}
 		if not val or val < v then return end
 	end
 	-- Check for reagents.
-	local inventory = args.inventory or Inventory:find{owner = args.user}
+	local inventory = args.inventory or args.user.inventory
 	for k,v in pairs(info.required_reagents) do
 		if not inventory then return end
 		local item = inventory:find_object{name = k}

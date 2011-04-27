@@ -7,25 +7,20 @@
 Inventory = Class()
 Inventory.class_name = "Inventory"
 Inventory.dict_object = {}
-Inventory.dict_owner = {}
 setmetatable(Inventory.dict_object, {__mode = "kv"})
-setmetatable(Inventory.dict_owner, {__mode = "k"})
 
 --- Finds an inventory by owner or stored object.
 -- @param clss Inventory class.
 -- @param args Arguments.<ul>
 --   <li>id: Inventory ID.</li>
---   <li>object: Stored object.</li>
---   <li>owner: Owner object.</li></ul>
+--   <li>object: Stored object.</li></ul>
 -- @return Inventory or nil.
 Inventory.find = function(clss, args)
 	if args.id then
 		local owner = Object:find{id = args.id}
-		return owner and clss.dict_owner[owner]
-	elseif args.owner then
-		return clss.dict_owner[args.owner]
+		return owner and owner.inventory
 	elseif args.object then
-		return clss.dict_object[args.object]
+		return clss.dict_object[args.object.id]
 	end
 end
 
@@ -34,16 +29,11 @@ end
 -- @param args Arguments.
 -- @return New inventory.
 Inventory.new = function(clss, args)
-	local s = Class.new(clss, args)
-	s.size = args.size or 10
-	s.slots = {}
-	s.listeners = {}
-	setmetatable(s.listeners, {__mode = "k"})
-	if s.owner then
-		if clss.dict_owner[s.owner] then error("object already has inventory") end
-		clss.dict_owner[s.owner] = s
-	end
-	return s
+	local self = Class.new(clss, args)
+	self.size = args and args.size or 10
+	self.slots = {}
+	self.listeners = setmetatable({}, {__mode = "k"})
+	return self
 end
 
 --- Finds an object in the inventory.
@@ -210,10 +200,12 @@ Inventory.set_object = function(self, args)
 	local oldobj = self.slots[args.slot]
 	if oldobj == args.object then return end
 	-- Maintain dictionaries.
-	if oldobj then Inventory.dict_object[oldobj] = nil end
+	if oldobj then
+		Inventory.dict_object[oldobj.id] = nil
+	end
 	if type(args.object) == "table" then
 		args.object:detach()
-		Inventory.dict_object[args.object] = self
+		Inventory.dict_object[args.object.id] = self
 	end
 	-- Add to slot.
 	self.slots[args.slot] = args.object
@@ -238,6 +230,7 @@ Inventory.update_slot = function(self, args)
 	end
 	-- Only send public slot change events when an equipment slot changed.
 	if type(args.slot) == "string" and Vision then
-		Vision:event{type = "slot-changed", object = self.owner, slot = args.slot}
+		local owner = Object:find{id = self.id}
+		Vision:event{type = "slot-changed", item = o, id = self.id, slot = args.slot}
 	end
 end

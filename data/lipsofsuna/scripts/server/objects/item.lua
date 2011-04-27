@@ -15,7 +15,7 @@ Item:add_setters{
 		self.gravity_liquid = spec.water_gravity
 		-- Create the inventory.
 		if spec.inventory_size and not self.inventory then
-			self.inventory = Inventory{owner = self, size = spec.inventory_size}
+			self.inventory = Inventory{id = self.id, size = spec.inventory_size}
 			for k,v in pairs(spec.inventory_items) do
 				self:add_item{object = Item{spec = Itemspec:find{name = v}}}
 			end
@@ -246,8 +246,8 @@ Item.use_cb = function(self, user)
 		return user:pick_up(self.id, user.id, 0)
 	end
 	local _,slot = inv:find_object{object = self}
-	if inv.owner ~= user then
-		return Actions:move_from_inv_to_inv(user, inv.owner.id, slot, user.id, 0)
+	if inv.id ~= user.id then
+		return Actions:move_from_inv_to_inv(user, inv.id, slot, user.id, 0)
 	end
 	-- Perform a type specific action.
 	-- These are actions that can only be performed to inventory items.
@@ -272,10 +272,10 @@ Item.use_cb = function(self, user)
 			-- Unequip items in equipment slots.
 			local dstslot = user.inventory:get_empty_slot()
 			if not dstslot then return end
-			Actions:move_from_inv_to_inv(user, inv.owner.id, slot, user.id, dstslot)
+			Actions:move_from_inv_to_inv(user, inv.id, slot, user.id, dstslot)
 		else
 			-- Equip items in inventory slots.
-			Actions:move_from_inv_to_inv(user, inv.owner.id, slot, user.id, self.spec.equipment_slot)
+			Actions:move_from_inv_to_inv(user, inv.id, slot, user.id, self.spec.equipment_slot)
 		end
 	end
 end

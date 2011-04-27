@@ -69,14 +69,6 @@ Eventhandler{type = "tick", func = function(self, args)
 		end
 		ipolt = ipolt - 1/60
 	end
-	-- Update equipment positions.
-	for k,v in pairs(Slots.dict_owner) do
-		v:update()
-	end
-	-- Update special effects.
-	for k,v in pairs(Object.objects) do
-		v:update(args.secs)
-	end
 	-- Update player state.
 	if Player.object then
 		Player:update_pose(args.secs)
@@ -91,5 +83,9 @@ Eventhandler{type = "tick", func = function(self, args)
 		Sound.listener_velocity = Player.object.velocity
 		-- Refresh the active portion of the map.
 		Player.object:refresh()
+	end
+	-- Update slots and special effects of objects.
+	for k,v in pairs(Object.objects) do
+		v:update(args.secs)
 	end
 end}

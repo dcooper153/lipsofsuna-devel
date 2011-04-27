@@ -47,7 +47,7 @@ Creature:add_setters{
 			end
 		end
 		-- Create skills.
-		s.skills = s.skills or Skills{owner = s}
+		s.skills = s.skills or Skills{id = s.id}
 		s.skills:clear()
 		for k,v in pairs(spec.skills) do
 			local prot = v.name == "health" and "public" or "private"
@@ -62,7 +62,7 @@ Creature:add_setters{
 		-- When the map generator or an admin command creates an object, the
 		-- random field is set to indicate that items should be generated.
 		-- The field isn't saved so items are only created once as expected.
-		s.inventory = s.inventory or Inventory{owner = s, size = spec.inventory_size} -- FIXME: Resizing not supported.
+		s.inventory = s.inventory or Inventory{id = s.id, size = spec.inventory_size} -- FIXME: Resizing not supported.
 		if s.random then
 			for k,v in pairs(spec.inventory_items) do
 				local itemspec = Itemspec:find{name = v}
@@ -715,6 +715,7 @@ end
 -- @param secs Seconds since the last update.
 Creature.update = function(self, secs)
 	if self.modifiers then Modifier:update(self, secs) end
+	self.skills:update(secs)
 	self:update_actions(secs)
 	self:update_burdening(secs)
 	self:update_environment(secs)
