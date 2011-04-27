@@ -93,12 +93,12 @@ Object:add_setters{
 			if __objects_realized[s] then return end
 			__objects_realized[s] = true
 			Los.object_set_realized(s.handle, true)
-			Program:push_event{type = "object-visibility", visible = true}
+			Program:push_event{type = "object-visibility", object = s, visible = true}
 		else
 			if not __objects_realized[s] then return end
 			__objects_realized[s] = nil
 			Los.object_set_realized(s.handle, false)
-			Program:push_event{type = "object-visibility", visible = false}
+			Program:push_event{type = "object-visibility", object = s, visible = false}
 		end
 	end}
 
