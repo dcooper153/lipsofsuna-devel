@@ -32,12 +32,12 @@ Regionspec{
 	random_resources = false}
 
 Regionspec{
-	name = "Lost Adventurer",
+	name = "Noemi",
 	categories = {"special"},
 	depth = {2930,2950},
 	distance = {"Chara's Root Grove",10,40},
 	links = {"Chara's Root Grove"},
-	pattern_name = "lostadventurer1"}
+	pattern_name = "noemi1"}
 
 Regionspec{
 	name = "Midguard",
