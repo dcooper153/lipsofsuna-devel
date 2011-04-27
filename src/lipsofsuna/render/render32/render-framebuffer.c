@@ -137,6 +137,7 @@ int liren_framebuffer32_resize (
 		self->width = width;
 		self->height = height;
 		self->samples = samples;
+		self->hdr = hdr;
 		return 1;
 	}
 

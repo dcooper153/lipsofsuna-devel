@@ -413,19 +413,17 @@ static int private_render_postproc (
 	liren_context32_set_param (context, param);
 	liren_context32_set_shader (context, 0, shader);
 	liren_context32_set_textures_raw (context, framebuffer->postproc_textures, 1);
+	liren_context32_bind (context);
 	if (mipmaps)
 	{
-		liren_context32_bind (context);
+		glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_DIFFUSE_TEXTURE_0);
 		glGenerateMipmap (GL_TEXTURE_2D);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 		liren_context32_render_indexed (context, 0, 6);
 		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	}
 	else
-	{
-		liren_context32_bind (context);
 		liren_context32_render_indexed (context, 0, 6);
-	}
 
 	/* Swap the buffers so that we can chain passes. */
 	tmp = framebuffer->postproc_framebuffers[0];
