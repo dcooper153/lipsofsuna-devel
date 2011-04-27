@@ -148,6 +148,7 @@ Creature.new = function(clss, args)
 	copy("carried_weight", 0)
 	copy("spec")
 	self.anim_timer = 0
+	self.update_timer = 0.1 * math.random()
 	self.enemies = {}
 	setmetatable(self.enemies, {__mode = "kv"})
 	self:calculate_speed()
@@ -685,7 +686,7 @@ Creature.set_state = function(self, args)
 	self.state = s
 	self.target = args.target
 	self.state_timer = 0
-	self.update_timer = math.random()
+	self.ai_timer = math.random()
 	self.action_timer = 0
 	self.action_state = nil
 end
@@ -714,25 +715,31 @@ end
 -- @param self Object.
 -- @param secs Seconds since the last update.
 Creature.update = function(self, secs)
-	if self.modifiers then Modifier:update(self, secs) end
-	self.skills:update(secs)
-	self:update_actions(secs)
-	self:update_burdening(secs)
-	self:update_environment(secs)
+	-- Avoid excessive updates.
+	self.update_timer = self.update_timer + secs
+	if self.update_timer < 0.1 then return end
+	local tick = self.update_timer
+	self.update_timer = 0
+	-- Update state.
+	if self.modifiers then Modifier:update(self, tick) end
+	self.skills:update(tick)
+	self:update_actions(tick)
+	self:update_burdening(tick)
+	self:update_environment(tick)
 	-- Skip all controls if we are dead.
 	if self.dead then return end
 	-- Skip the rest if AI is disabled.
 	if not self.spec.ai_enabled then return end
 	-- Maintain timers.
-	self.state_timer = self.state_timer + secs
-	self.update_timer = self.update_timer + secs
-	self.action_timer = self.action_timer - secs
+	self.state_timer = self.state_timer + tick
+	self.ai_timer = self.ai_timer + tick
+	self.action_timer = self.action_timer - tick
 	-- Let the current state manipulate the position and other attributes
 	-- of the character and trigger state dependent actions such as attacking.
 	local func = self.state_updaters[self.state]
-	func(self, secs)
+	func(self, tick)
 	-- Only consider state changes every couple of seconds.
-	if self.update_timer < self.spec.ai_update_delay then return end
+	if self.ai_timer < self.spec.ai_update_delay then return end
 	self:update_ai_state()
 end
 
@@ -789,7 +796,7 @@ end
 -- the next AI update cycle.
 -- @param self Object.
 Creature.update_ai_state = function(self)
-	self.update_timer = 0
+	self.ai_timer = 0
 	-- Update our combat ratings so that we can correctly estimate our
 	-- chances to stand against our enemies.
 	self:calculate_combat_ratings()
