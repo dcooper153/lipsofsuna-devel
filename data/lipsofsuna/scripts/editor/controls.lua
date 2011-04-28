@@ -63,10 +63,12 @@ Action{name = "translatez", mode = "analog", key1 = Keysym.KP2, key2 = Keysym.KP
 end}
 
 Action{name = "select", mode = "press", key1 = "mouse1", func = function(v)
-	if not Action.dict_press[Keysym.LSHIFT] and not Action.dict_press[Keysym.RSHIFT] then
-		Editor.inst:deselect()
-	end
-	Editor.inst:select()
+	local add = Action.dict_press[Keysym.LSHIFT] or Action.dict_press[Keysym.RSHIFT]
+	Editor.inst:select(add)
+end}
+
+Action{name = "rectselect", mode = "toggle", key1 = Keysym.LCTRL, func = function(v)
+	Editor.inst:set_rect_select(v)
 end}
 
 Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)

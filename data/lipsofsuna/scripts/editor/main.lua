@@ -168,15 +168,6 @@ Editor.new = function(clss)
 	return self
 end
 
---- Deselects everything.
--- @param self Editor.
-Editor.deselect = function(self)
-	for k,v in pairs(self.selection) do
-		v:detach()
-		self.selection[k] = nil
-	end
-end
-
 --- Extrudes the selected tiles.
 -- @param self Editor.
 -- @param rev True to extrude in reverse.
@@ -215,6 +206,8 @@ Editor.extrude = function(self, reverse)
 		if s then s:detach() end
 		self.selection[v.key] = v
 	end
+	self.selection_prev = nil
+	self:update_rect_select()
 end
 
 Editor.fill = function(self, p1, p2, erase)
@@ -438,24 +431,67 @@ end
 
 --- Toggles the selection of the highlighted tile or object.
 -- @param self Editor.
-Editor.select = function(self)
+-- @param add True to add to the selection instead of replacing it.
+Editor.select = function(self, add)
 	local h = self.highlight
 	if not h then return end
 	if self.selection[h.key] then
+		-- Unselect.
 		self.selection[h.key] = nil
+		self.selection_prev = nil
+		self:update_rect_select()
 	else
+		-- Deselect.
+		if not add and not self.selection_rect then
+			for k,v in pairs(self.selection) do
+				v:detach()
+				self.selection[k] = nil
+			end
+		end
+		-- Select.
 		self.selection[h.key] = h
+		self.selection_prev = h
+		-- Select rectangle.
+		if self.selection_rect then
+			for k,v in pairs(self.selection_rect) do
+				self.selection[k] = v
+				self.selection_rect[k] = nil
+			end
+			self:update_rect_select()
+		end
 	end
 end
 
-Editor.update = function(self, secs)
-	-- Update highlight.
+--- Enables or disables the rectangle selection mode.
+-- @param self Editor.
+-- @param value True to enable, false to disable.
+Editor.set_rect_select = function(self, value)
+	if not value == not self.selection_rect then return end
+	if not value then
+		for k,v in pairs(self.selection_rect) do
+			v:detach()
+			self.selection_rect[k] = nil
+		end
+		self.selection_rect = nil
+	else
+		self.selection_rect = {}
+		self:update(0, true)
+	end
+end
+
+--- Updates the editor state.
+-- @param self Editor.
+-- @param secs Seconds since the last update.
+-- @param force True to force update.
+Editor.update = function(self, secs, force)
 	local h = self.highlight
 	local s = self:pick()
-	if s ~= h then
-		if h and not self.selection[h.key] then h:detach() end
-		if s then self.highlight = s end
-	end
+	if h == s and not force then return end
+	-- Update highlight.
+	if h and not self.selection[h.key] then h:detach() end
+	if s then self.highlight = s end
+	-- Update the rectangle selection.
+	self:update_rect_select()
 end
 
 Editor.update_corners = function(self)
@@ -464,6 +500,68 @@ Editor.update_corners = function(self)
 		Vector(0,0,s.z), Vector(s.x,0,s.z), Vector(0,s.y,s.z), Vector(s.x,s.y,s.z)}
 	for i=1,8 do
 		self.corners[i].position = (self.origin + p[i]) * Voxel.tile_size
+	end
+end
+
+Editor.update_rect_select = function(self)
+	if not self.selection_rect then return end
+	-- Clear the selection.
+	for k,v in pairs(self.selection_rect) do
+		v:detach()
+		self.selection_rect[k] = nil
+	end
+	-- Check for validity.
+	local s = self.highlight
+	local p = self.selection_prev
+	if not s or not s.tile then return end
+	if not p or not p.tile then return end
+	if p.face ~= s.face then return end
+	-- Create the new selection.
+	local ord = function(a, b)
+		return math.floor(math.min(a, b) + 0.5), math.floor(math.max(a, b) + 0.5)
+	end
+	local add = function(tile, face)
+		-- Check for validity.
+		local dir = Selection.face_dir[face]
+		if Voxel:get_tile(tile) == 0 then return end
+		if Voxel:get_tile(tile + dir) ~= 0 then return end
+		-- Check if selected.
+		local key = Selection:get_tile_key(tile, face)
+		if self.selection[key] then return end
+		-- Add a new selection.
+		local s = Selection(tile, face)
+		self.selection_rect[key] = s
+	end
+	if p.face == 1 or p.face == 2 then
+		if p.tile.x == s.tile.x then
+			local y1,y2 = ord(p.tile.y, s.tile.y)
+			local z1,z2 = ord(p.tile.z, s.tile.z)
+			for y=y1,y2 do
+				for z=z1,z2 do
+					add(Vector(p.tile.x, y, z), p.face)
+				end
+			end
+		end
+	elseif p.face == 3 or p.face == 4 then
+		if p.tile.y == s.tile.y then
+			local x1,x2 = ord(p.tile.x, s.tile.x)
+			local z1,z2 = ord(p.tile.z, s.tile.z)
+			for x=x1,x2 do
+				for z=z1,z2 do
+					add(Vector(x, p.tile.y, z), p.face)
+				end
+			end
+		end
+	else
+		if p.tile.z == s.tile.z then
+			local x1,x2 = ord(p.tile.x, s.tile.x)
+			local y1,y2 = ord(p.tile.y, s.tile.y)
+			for x=x1,x2 do
+				for y=y1,y2 do
+					add(Vector(x, y, p.tile.z), p.face)
+				end
+			end
+		end
 	end
 end
 
