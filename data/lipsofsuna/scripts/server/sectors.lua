@@ -72,23 +72,30 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 		end
 	end
 	-- Spawn monsters.
+	-- This is done in a thread to reduce pauses when lots of sectors are
+	-- being loaded. It's useful since sectors are often loaded in clusters.
 	local org = self:get_sector_offset(sector)
 	local spawn = Config.spawn * Voxel.tile_scale
-	for i = 1,monsters do
-		for j = 1,30 do
-			local c = Vector()
-			c.x = org.x + 5 + math.random(0, Voxel.tiles_per_line - 10)
-			c.y = org.y + 5 + math.random(0, Voxel.tiles_per_line - 10)
-			c.z = org.z + 5 + math.random(0, Voxel.tiles_per_line - 10)
-			if (c - spawn).length < 50 then break end
-			local t,p = Voxel:find_tile{match = "empty", point = c * Config.tilewidth, radius = 3 * Config.tilewidth}
-			if t and Voxel:get_tile(p + Vector(0, 1, 0)) == 0 then
-				p = p + Vector(0.5, 0.5, 0.5)
-				Voxel:place_creature{point = p, category = "enemy"}
-				break
+	Thread(function(thread)
+		for i = 1,monsters do
+			for j = 1,30 do
+				local c = Vector()
+				c.x = org.x + 5 + math.random(0, Voxel.tiles_per_line - 10)
+				c.y = org.y + 5 + math.random(0, Voxel.tiles_per_line - 10)
+				c.z = org.z + 5 + math.random(0, Voxel.tiles_per_line - 10)
+				if (c - spawn).length < 50 then break end
+				local t,p = Voxel:find_tile{match = "empty", point = c * Config.tilewidth, radius = 3 * Config.tilewidth}
+				if t and Voxel:get_tile(p + Vector(0, 1, 0)) == 0 then
+					p = p + Vector(0.5, 0.5, 0.5)
+					local d = math.min(1, (p - spawn).length / 500)
+					Voxel:place_creature{point = p, category = "enemy", difficulty = d}
+					break
+				end
+				coroutine.yield()
 			end
+			coroutine.yield()
 		end
-	end
+	end)
 end
 
 --- Called when an empty sector is created by the generator.

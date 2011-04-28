@@ -377,6 +377,7 @@ Species{
 	name = "brigand",
 	base = "aer",
 	categories = {"enemy"},
+	difficulty = 0.5,
 	factions = {"evil"},
 	eye_style = "random",
 	hair_style = "random",
@@ -388,6 +389,7 @@ Species{
 	name = "brigandmale",
 	base = "aermale",
 	categories = {"enemy"},
+	difficulty = 0.5,
 	factions = {"evil"},
 	eye_style = "random",
 	hair_style = "random",
@@ -411,6 +413,7 @@ Species{
 		["hold sword"] = {animation = "hold-right", channel = 3, permanent = true, repeat_start = 10, weight = 5},
 		["hold torch"] = {animation = "hold-left", channel = 4, permanent = true, repeat_start = 10, weight = 5}},
 	categories = {"enemy"},
+	difficulty = 0.25,
 	eye_style = "random",
 	hair_style = "random",
 	factions = {"evil"},
@@ -427,7 +430,7 @@ Species{
 		upper = "trogfemuppernude1"},
 	skills = {
 		{name = "dexterity", max = 15, val = 15},
-		{name = "health", max = 50, val = 50},
+		{name = "health", max = 30, val = 30},
 		{name = "perception", max = 30, val = 30},
 		{name = "strength", max = 15, val = 15}},
 	hair_styles = {	
@@ -444,6 +447,7 @@ Species{
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"enemy"},
+	difficulty = 0,
 	factions = {"evil"},
 	feat_anims = {"bite"},
 	inventory_size = 3,
@@ -466,6 +470,7 @@ Species{
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30},
 		["attack left claw"] = {animation = "claw-left", channel = 2, weight = 30},
 		["attack right claw"] = {animation = "claw-right", channel = 2, weight = 30}},
+	difficulty = 1,
 	factions = {"evil"},
 	feat_anims = {"dragon bite", "left claw", "right claw"},
 	feat_effects = {"fire damage", "strength to physical damage"},
@@ -483,6 +488,7 @@ Species{
 	name = "feral devora",
 	base = "devora",
 	categories = {"enemy"},
+	difficulty = 0.5,
 	factions = {"evil"},
 	eye_style = "random",
 	hair_style = "random",
@@ -499,6 +505,7 @@ Species{
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"enemy"},
+	difficulty = 0.3,
 	factions = {"evil"},
 	feat_anims = {"right hand","bite"},
 	feat_effects = {"strength to physical damage"},
@@ -513,7 +520,7 @@ Species{
 		{name = "hand.R", node = "#hand.R"}},
 	skills = {
 		{name = "dexterity", max = 5, val = 5},
-		{name = "health", max = 50, val = 50},
+		{name = "health", max = 30, val = 30},
 		{name = "strength", max = 15, val = 15}}}
 
 Species{
@@ -524,6 +531,7 @@ Species{
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"enemy"},
+	difficulty = 0,
 	factions = {"evil"},
 	feat_anims = {"bite"},
 	feat_effects = {"strength to physical damage"},
@@ -544,6 +552,7 @@ Species{
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"plague"},
+	difficulty = 0.7,
 	factions = {"evil"},
 	feat_anims = {"bite"},
 	feat_effects = {"strength to physical damage"},
@@ -563,13 +572,14 @@ Species{
 	ai_enable_defend = false,
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
-	categories = {"plague"},
+	categories = {"random"},
+	difficulty = 0,
 	factions = {"evil"},
 	feat_anims = {"bite"},
 	feat_effects = {"strength to physical damage"},
 	inventory_size = 0,
 	jump_force = 4,
-	model = "slime2", -- FIXME
+	model = "slime2",
 	speed_walk = 2,
 	skills = {
 		{name = "health", max = 10, val = 10}},
@@ -583,6 +593,7 @@ Species{
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"plague"},
+	difficulty = 0.7,
 	factions = {"evil"},
 	feat_anims = {"bite"},
 	feat_effects = {"strength to physical damage"},
@@ -601,14 +612,15 @@ Species{
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	ai_enable_defend = false,
 	categories = {"enemy", "mining"},
+	difficulty = 0,
 	factions = {"evil"},
 	feat_anims = {"bite"},
 	feat_effects = {"strength to physical damage"},
-	inventory_size = 2,
 	equipment_slots = {
 		{name = "hand.R", node = "#hand.R"},
 		{name = "hand.L", node = "#hand.L"}},
 	inventory_items = {"impstone"},
+	inventory_size = 2,
 	jump_force = 4,
 	model = "stoneimp2",
 	speed_walk = 1,
@@ -624,17 +636,18 @@ Species{
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	ai_enable_defend = false,
 	categories = {"enemy", "mining"},
+	difficulty = 0.2,
+	equipment_slots = {
+		{name = "hand.R", node = "#hand.R"},
+		{name = "hand.L", node = "#hand.L"}},
 	factions = {"evil"},
 	feat_anims = {"bite", "explode"},
 	feat_effects = {"fire damage", "strength to physical damage"},
 	jump_force = 4,
 	model = "stoneimp2",
 	speed_walk = 1,
-	inventory_size = 2,
-	equipment_slots = {
-		{name = "hand.R", node = "#hand.R"},
-		{name = "hand.L", node = "#hand.L"}},
 	inventory_items = {"firestone"},
+	inventory_size = 2,
 	skills = {
 		{name = "health", max = 20, val = 20},
 		{name = "strength", max = 10, val = 10}},

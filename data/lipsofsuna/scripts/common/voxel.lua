@@ -39,12 +39,37 @@ end
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
 --   <li>category: Species category.</li>
+--   <li>diffuculty: Maximum difficulty of the creature.</li>
 --   <li>name: Species name.</li>
 --   <li>point: Position vector, in tiles.</li>
 --   <li>rotation: Rotation around Y axis.</li></ul>
 Voxel.place_creature = function(clss, args)
-	local spec = Species:random(args)
-	if not spec then return end
+	-- Choose the species.
+	-- The species can by explicitly named or randomly selected from a specific
+	-- category. Selection from a category can also optionally be limited by the
+	-- maximum difficulty of the creature.
+	local spec
+	if args.category and args.difficulty then
+		local cat = Species:find(args)
+		if not cat then return end
+		local num = 0
+		local opt = {}
+		local dif = args.difficulty
+		for k,v in pairs(cat) do
+			if v.difficulty <= dif then
+				num = num + 1
+				opt[num] = v
+			end
+		end
+		if num == 0 then return end
+		spec = opt[math.random(1, num)]
+	else
+		spec = Species:random(args)
+		if not spec then return end
+	end
+	-- Spawn the creature.
+	-- This needs to support both the client and the server so the class
+	-- used varies depending on what's available.
 	local clss_ = Creature or Object
 	clss_.new(clss_, {
 		spec = spec,

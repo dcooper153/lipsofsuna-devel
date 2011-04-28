@@ -31,6 +31,7 @@ Species.dict_name = {}
 --   <li>damage_from_magma: Points of damage from magma per second.</li>
 --   <li>damage_from_water: Points of damage from water per second.</li>
 --   <li>dead: True if the creature should spawn as dead.</li>
+--   <li>difficulty: The approximate difficulty of the creature in the range of [0,1].</li>
 --   <li>effect_falling_damage: Name of the effect played when the creature takes falling damage.</li>
 --   <li>effect_landing: Name of the effect played when the creature lands after jumping.</li>
 --   <li>equipment_slots: List of equipment slots.</li>
@@ -171,6 +172,7 @@ Species.new = function(clss, args)
 	copy("damage_from_magma", 6)
 	copy("damage_from_water", 0)
 	copy("dead")
+	copy("difficulty", 0)
 	copy("falling_damage_rate", 3)
 	copy("falling_damage_speed", 12)
 	copy("gravity", Vector(0, -15, 0))
