@@ -20,9 +20,13 @@ Action{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = 
 end}
 
 Action{name = "rotate", mode = "analog", key1 = "mouse4", key2 = "mouse5", func = function(v)
-	local point,object,tile = Target:pick_ray{camera = Editor.inst.camera}
-	if not object then return end
-	object:rotate(v, 4)
+	if Client.moving then
+		Editor.inst:extrude(v > 0)
+	else
+		local point,object,tile = Target:pick_ray{camera = Editor.inst.camera}
+		if not object then return end
+		object:rotate(v, 4)
+	end
 end}
 
 Action{name = "snap", mode = "press", key1 = Keysym.KP0, func = function(v)
@@ -56,6 +60,13 @@ Action{name = "translatez", mode = "analog", key1 = Keysym.KP2, key2 = Keysym.KP
 	local point,object,tile = Target:pick_ray{camera = Editor.inst.camera}
 	if not object then return end
 	object:move(Vector(0,0,v), 0.25 * Voxel.tile_size)
+end}
+
+Action{name = "select", mode = "press", key1 = "mouse1", func = function(v)
+	if not Action.dict_press[Keysym.LSHIFT] and not Action.dict_press[Keysym.RSHIFT] then
+		Editor.inst:deselect()
+	end
+	Editor.inst:select()
 end}
 
 Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)

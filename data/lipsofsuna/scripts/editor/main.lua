@@ -26,6 +26,7 @@ require "client/widgets/background"
 require "client/widgets/scene"
 require "editor/controls"
 require "editor/events"
+require "editor/selection"
 
 Object:add_getters{
 	spec = function(s) return rawget(s, "__spec") end}
@@ -87,6 +88,7 @@ Editor.new = function(clss)
 	local self = Class.new(clss)
 	self.prev_tiles = {}
 	self.mouse_sensitivity = 0.01
+	self.selection = {}
 	-- Load the pattern.
 	self.pattern = pattern
 	self.origin = Vector(100,100,100)
@@ -164,6 +166,55 @@ Editor.new = function(clss)
 	end
 	self:update_corners()
 	return self
+end
+
+--- Deselects everything.
+-- @param self Editor.
+Editor.deselect = function(self)
+	for k,v in pairs(self.selection) do
+		v:detach()
+		self.selection[k] = nil
+	end
+end
+
+--- Extrudes the selected tiles.
+-- @param self Editor.
+-- @param rev True to extrude in reverse.
+Editor.extrude = function(self, reverse)
+	local del = {}
+	local add = {}
+	for k,v in pairs(self.selection) do
+		if v.tile then
+			if reverse then
+				-- Removal.
+				local d = Selection.face_dir[v.face]
+				local p = v.tile - d
+				Voxel:set_tile(v.tile, 0)
+				table.insert(del, v)
+				if Voxel:get_tile(p) ~= 0 then
+					table.insert(add, Selection(p, v.face))
+				end
+			else
+				-- Creation.
+				local d = Selection.face_dir[v.face]
+				local p = v.tile + d
+				Voxel:set_tile(p, Voxel:get_tile(v.tile))
+				table.insert(del, v)
+				if Voxel:get_tile(p + d) == 0 then
+					table.insert(add, Selection(p, v.face))
+				end
+			end
+		end
+	end
+	for k,v in pairs(del) do
+		self.selection[v.key] = nil
+		v:detach()
+	end
+	for k,v in pairs(add) do
+		local s = self.selection[v.key]
+		if s then s:detach() end
+		self.selection[v.key] = v
+	end
 end
 
 Editor.fill = function(self, p1, p2, erase)
@@ -346,6 +397,65 @@ Editor.save = function(self)
 	t = t .. "}\n"
 	-- Print to the console.
 	print(t)
+end
+
+Editor.pick = function(self)
+	-- Pick from the scene.
+	local hl = self.highlight and self.highlight.visual
+	local mode = Client.video_mode
+	local r1,r2 = self.camera:picking_ray{cursor = Vector(mode[1]/2, mode[2]/2), far = 20, near = 0.1}
+	local ret = Physics:cast_ray{src = r1, dst = r2}
+	if not ret then return end
+	local point,object,tile = ret.point, ret.object, ret.tile
+	-- Find or create a selection.
+	if object then
+		if object.selection then return object.selection end
+		local i = object
+		local s = self.selection[i]
+		if s then return s end
+		return Selection(object)
+	elseif tile then
+		-- Determine the face.
+		local r = point * Voxel.tile_scale - (tile + Vector(0.5,0.5,0.5))
+		local rx = math.abs(r.x)
+		local ry = math.abs(r.y)
+		local rz = math.abs(r.z)
+		local face
+		if rx > ry and rx > rz then
+			face = r.x < 0 and 1 or 2
+		elseif ry > rz then
+			face = r.y < 0 and 3 or 4
+		else
+			face = r.z < 0 and 5 or 6
+		end
+		-- Find or create the tile.
+		local i = Selection:get_tile_key(tile, face)
+		local s = self.selection[i]
+		if s then return s end
+		return Selection(tile, face)
+	end
+end
+
+--- Toggles the selection of the highlighted tile or object.
+-- @param self Editor.
+Editor.select = function(self)
+	local h = self.highlight
+	if not h then return end
+	if self.selection[h.key] then
+		self.selection[h.key] = nil
+	else
+		self.selection[h.key] = h
+	end
+end
+
+Editor.update = function(self, secs)
+	-- Update highlight.
+	local h = self.highlight
+	local s = self:pick()
+	if s ~= h then
+		if h and not self.selection[h.key] then h:detach() end
+		if s then self.highlight = s end
+	end
 end
 
 Editor.update_corners = function(self)
