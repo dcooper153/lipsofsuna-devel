@@ -20,16 +20,9 @@ Views.Chargen.new = function(clss)
 	local self = Widgets.Scene.new(clss, {rows = 1, behind = true, fullscreen = true, camera = camera, spacings = {0,0}})
 	self.offset = Vector(0, 1.8, -2)
 	self.margins = {5,5,5,5}
-	self.skills_text = Widgets.Text()
-	self.skills = Widgets.Skills()
-	self.skills.changed = function(widget, skill)
+	self.skills = Widgets.Skills{changed = function(widget, skill)
 		skill.value = skill.cap
-	end
-	self.skills.shown = function(widget, skill)
-		local species = self:get_race()
-		local spec = species and species.skills[skill.id]
-		self.skills_text.text = {{skill.name, "medium"}, {skill.desc}}
-	end
+	end}
 	self.object = Object{position = Vector(1, 1, 1), type = "character"}
 	self.light = Light{ambient = {1.0,1.0,1.0,1.0}, diffuse = {1.0,1.0,1.0,1.0}, equation = {2,0.3,0.03}}
 	self.timer = Timer{enabled = false, func = function(timer, secs) self:update(secs) end}
@@ -142,7 +135,6 @@ Views.Chargen.new = function(clss)
 	self.group_left = Widget{cols = 1, spacings = {0,0}}
 	self.group_left:append_row(Widgets.Frame{style = "title", text = "Character"})
 	self.group_left:append_row(self.group_race1)
-	self.group_left:append_row(self.skills_text)
 	self.group_left:append_row(self.group_buttons)
 	self.group_left:set_expand{col = 1}
 	self.group_right = Widget{cols = 1, spacings = {0,0}}
@@ -243,7 +235,6 @@ end
 Views.Chargen.random = function(self)
 	self:set_race(math.random(1, #self.list_races))
 	self.update_needed = true
-	self.skills:show(1)
 end
 
 --- Rotates the character.

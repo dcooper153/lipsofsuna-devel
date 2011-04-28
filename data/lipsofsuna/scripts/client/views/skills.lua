@@ -4,24 +4,18 @@ Views.Skills = Class(Widget)
 -- @param clss skills class.
 -- @return Skills widget.
 Views.Skills.new = function(clss)
-	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0,0}})
+	local self = Widget.new(clss, {cols = 1, rows = 2, spacings = {0,0}})
 	-- Create widgets.
 	self.title = Widgets.Frame{style = "title", text = "Skills"}
-	self.desc_text = Widgets.Text()
 	self.skills = Widgets.Skills()
 	self.skills.changed = function(widget, skill)
 		Network:send{packet = Packet(packets.SKILLS, "string", skill.id, "float", skill.cap)}
-	end
-	self.skills.shown = function(widget, skill)
-		self.desc_text.text = {{skill.name, "medium"}, {skill.desc}}
 	end
 	self.group = Widgets.Frame{cols = 1, rows = 1}
 	self.group:set_expand{col = 1, row = 1}
 	self.group:set_child{col = 1, row = 1, widget = self.skills}
 	self:set_child{col = 1, row = 1, widget = self.title}
 	self:set_child{col = 1, row = 2, widget = self.group}
-	self:set_child{col = 1, row = 3, widget = self.desc_text}
-	self.skills:show(1)
 	return self
 end
 

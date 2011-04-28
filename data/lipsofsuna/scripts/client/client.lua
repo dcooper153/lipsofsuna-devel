@@ -148,6 +148,7 @@ Protocol:add_handler{type = "OBJECT_SELF", func = function(event)
 			o.collision_group = Physics.GROUP_PLAYER
 			Player.species = o.race or "aer"
 			Camera.mode = "third-person"
+			Gui.skills:set_species(o.spec)
 			Views.Feats.inst:set_race(Player.species)
 			Views.Feats.inst:show(1)
 		end

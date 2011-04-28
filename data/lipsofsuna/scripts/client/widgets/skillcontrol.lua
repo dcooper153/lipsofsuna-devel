@@ -7,6 +7,9 @@ Widgets.SkillControl.new = function(clss, args)
 	self.text = self.text or ""
 	self.value = self.value or 0
 	self.init = true
+	if args.name then
+		self.tooltip = Widgets.Skilltooltip{desc = args.desc, name = args.name}
+	end
 	return self
 end
 
