@@ -26,53 +26,11 @@
 #include "render-image.h"
 #include "render-private.h"
 
-static const uint8_t missing_image[16] =
-{
-	255, 255, 255, 255, 255, 255, 255, 255,
-	255, 255, 255, 255, 255, 255, 255, 255
-};
-
 static int private_init (
 	LIRenImage32* self,
 	const char*   name);
 
 /*****************************************************************************/
-
-/**
- * \brief Creates an empty image.
- * \param render Renderer.
- * \param name Image name.
- * \return Image or NULL.
- */
-LIRenImage32* liren_image32_new (
-	LIRenRender32* render,
-	const char*    name)
-{
-	LIRenImage32* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIRenImage32));
-	if (self == NULL)
-		return NULL;
-	self->render = render;
-	self->empty = 1;
-
-	/* Set name and path. */
-	if (!private_init (self, name))
-	{
-		liren_image32_free (self);
-		return NULL;
-	}
-
-	/* Load texture. */
-	if (!liren_image32_reload (self))
-	{
-		liren_image32_free (self);
-		return NULL;
-	}
-
-	return self;
-}
 
 /**
  * \brief Creates an image from a file.
@@ -134,10 +92,7 @@ int liren_image32_reload (
 	LIImgTexture* texture;
 
 	/* Load to a temporary texture. */
-	if (self->empty)
-		texture = liimg_texture_new_from_rgba (2, 2, missing_image);
-	else
-		texture = liimg_texture_new_from_file (self->path);
+	texture = liimg_texture_new_from_file (self->path);
 	if (texture == NULL)
 		return 0;
 

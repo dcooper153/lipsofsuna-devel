@@ -28,7 +28,6 @@
 #include "render-object.h"
 #include "render-private.h"
 #include "render-scene.h"
-#include "render-texture.h"
 
 static void private_bounds_update (
 	LIRenObject32* self);
@@ -343,6 +342,8 @@ static void private_envmap_clear (
 static int private_envmap_create (
 	LIRenObject32* self)
 {
+#warning Envmaps are disabled.
+#if 0
 	int i;
 	int j;
 	int width = 0;
@@ -456,6 +457,7 @@ error:
 	memset (self->cubemap.fbo, 0, 6 * sizeof (GLuint));
 	self->cubemap.depth = 0;
 	self->cubemap.map = 0;
+#endif
 
 	return 1;
 }
@@ -463,7 +465,6 @@ error:
 static void private_envmap_update (
 	LIRenObject32* self)
 {
-#warning Envmaps are disabled.
 #if 0
 	int i;
 	LIAlgU32dicIter iter;

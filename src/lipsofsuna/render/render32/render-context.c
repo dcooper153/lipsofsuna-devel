@@ -535,21 +535,33 @@ void liren_context32_set_shader (
 
 void liren_context32_set_textures (
 	LIRenContext32* self,
-	LIRenTexture32* value,
-	int           count)
+	LIRenImage32**  value,
+	int             count)
 {
 	int c;
 	int i;
 	GLenum gltarget;
 	GLuint gltexture;
 	LIRenContextTexture32* texture;
+	LIRenImage32* image;
 
 	c = LIMAT_MIN (count, 4);
 	for (i = 0 ; i < c ; i++)
 	{
+		/* Get the texture handle. */
 		texture = self->textures.array + i;
-		gltarget = liren_texture32_get_target (value + i);
-		gltexture = liren_texture32_get_texture (value + i);
+		image = value[i];
+		if (image != NULL)
+		{
+			gltarget = image->texture->target;
+			gltexture = image->texture->texture;
+		}
+		else
+		{
+			gltarget = GL_TEXTURE_2D;
+			gltexture = self->render->helpers.empty_texture;
+		}
+
 		/* Bind cube maps. */
 		/* Only one cube map is supported at a time and it's bound to a
 		   special sampler. The 2D sampler whose index contained a cube map
@@ -563,8 +575,9 @@ void liren_context32_set_textures (
 				glBindTexture (gltarget, gltexture);
 			}
 			gltarget = GL_TEXTURE_2D;
-			gltexture = self->render->helpers.empty_image->texture->texture;
+			gltexture = self->render->helpers.empty_texture;
 		}
+
 		/* Bind 2D textures. */
 		if (texture->texture != gltexture)
 		{
@@ -577,7 +590,7 @@ void liren_context32_set_textures (
 	{
 		texture = self->textures.array + i;
 		gltarget = GL_TEXTURE_2D;
-		gltexture = self->render->helpers.empty_image->texture->texture;
+		gltexture = self->render->helpers.empty_texture;
 		if (texture->texture != gltexture)
 		{
 			texture->texture = gltexture;
@@ -610,9 +623,9 @@ void liren_context32_set_textures_raw (
 	for ( ; i < 4 ; i++)
 	{
 		texture = self->textures.array + i;
-		if (texture->texture != self->render->helpers.empty_image->texture->texture)
+		if (texture->texture != self->render->helpers.empty_texture)
 		{
-			texture->texture = self->render->helpers.empty_image->texture->texture;
+			texture->texture = self->render->helpers.empty_texture;
 			glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_DIFFUSE_TEXTURE_0 + i);
 			glBindTexture (GL_TEXTURE_2D, texture->texture);
 		}

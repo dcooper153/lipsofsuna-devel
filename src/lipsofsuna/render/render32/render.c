@@ -350,11 +350,11 @@ static void private_free_helpers (
 {
 	glDeleteTextures (1, &self->helpers.noise);
 	glDeleteTextures (1, &self->helpers.depth_texture_max);
+	glDeleteTextures (1, &self->helpers.empty_texture);
 	self->helpers.noise = 0;
 	self->helpers.depth_texture_max = 0;
+	self->helpers.empty_texture = 0;
 
-	if (self->helpers.empty_image != NULL)
-		liren_image32_free (self->helpers.empty_image);
 	if (self->helpers.unit_quad != NULL)
 		liren_buffer32_free (self->helpers.unit_quad);
 	if (self->immediate.buffer != NULL)
@@ -370,6 +370,7 @@ static int private_init_helpers (
 	unsigned char* pixel;
 	unsigned char* pixels;
 	const float depth_texture[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	const uint8_t empty_texture[16] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 };
 	uint32_t quad_index_data[] = { 0, 1, 2, 1, 2, 3 };
 	LIRenFormat immediate_vertex_format = { 32, GL_FLOAT, 24, GL_FLOAT, 12, GL_FLOAT, 0 };
 	LIRenFormat quad_vertex_format = { 20, GL_FLOAT, 12, 0, 0, GL_FLOAT, 0 };
@@ -404,12 +405,17 @@ static int private_init_helpers (
 		236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
 	};
 
-	/* Initialize empty image. */
-	self->helpers.empty_image = liren_image32_new (self, "empty");
-	if (self->helpers.empty_image == NULL)
-		return 0;
+	/* Initialize the empty texture. */
+	glGenTextures (1, &self->helpers.empty_texture);
+	glBindTexture (GL_TEXTURE_2D, self->helpers.empty_texture);
+	glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB, 2, 2, 0, GL_RGBA, GL_UNSIGNED_BYTE, empty_texture);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glGenerateMipmap (GL_TEXTURE_2D);
 
-	/* Initialize default depth texture. */
+	/* Initialize the empty depth texture. */
 	glGenTextures (1, &self->helpers.depth_texture_max);
 	glBindTexture (GL_TEXTURE_2D, self->helpers.depth_texture_max);
 	glTexImage2D (GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, 2, 2, 0, GL_DEPTH_COMPONENT, GL_FLOAT, depth_texture);
@@ -418,7 +424,7 @@ static int private_init_helpers (
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 	glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
-	/* Initialize noise texture. */
+	/* Initialize the noise texture. */
 	pixels = lisys_malloc (4 * 256 * 256);
 	pixel = pixels;
 	if (pixels == NULL)

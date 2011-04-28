@@ -36,6 +36,5 @@ typedef struct _LIRenShader32 LIRenShader32;
 typedef struct _LIRenSort32 LIRenSort32;
 typedef struct _LIRenSortgroup32 LIRenSortgroup32;
 typedef struct _LIRenSortface32 LIRenSortface32;
-typedef struct _LIRenTexture32 LIRenTexture32;
 
 #endif

@@ -63,8 +63,6 @@ struct _LIRenFramebuffer32
 
 struct _LIRenImage32
 {
-	int added;
-	int empty;
 	char* name;
 	char* path;
 	LIImgTexture* texture;
@@ -121,7 +119,7 @@ struct _LIRenMaterial32
 	struct
 	{
 		int count;
-		LIRenTexture32* array;
+		LIRenImage32** array;
 	} textures;
 };
 
@@ -197,8 +195,8 @@ struct _LIRenRender32
 		float time;
 		GLuint noise;
 		GLuint depth_texture_max;
+		GLuint empty_texture;
 		LIRenBuffer32* unit_quad;
-		LIRenImage32* empty_image;
 	} helpers;
 	struct
 	{

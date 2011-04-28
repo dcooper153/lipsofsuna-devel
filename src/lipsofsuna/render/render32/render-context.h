@@ -26,7 +26,6 @@
 #include "render-scene.h"
 #include "render-types.h"
 #include "render-mesh.h"
-#include "render-texture.h"
 #include "render-uniforms.h"
 
 /* If you changed this, also remember change LOS_LIGHT_MAX in shader program
@@ -110,30 +109,30 @@ LIAPICALL (void, liren_context32_bind, (
 
 LIAPICALL (void, liren_context32_render_array, (
 	LIRenContext32* self,
-	GLenum        type,
-	int           start,
-	int           count));
+	GLenum          type,
+	int             start,
+	int             count));
 
 LIAPICALL (int, liren_context32_render_immediate, (
-	LIRenContext32*      self,
+	LIRenContext32*    self,
 	GLenum             type,
 	const LIRenVertex* vertices,
 	int                count));
 
 LIAPICALL (void, liren_context32_render_indexed, (
 	LIRenContext32* self,
-	int           start,
-	int           count));
+	int             start,
+	int             count));
 
 LIAPICALL (void, liren_context32_set_alpha_to_coverage, (
 	LIRenContext32* self,
-	int           value));
+	int             value));
 
 LIAPICALL (void, liren_context32_set_blend, (
 	LIRenContext32* self,
-	int           enable,
-	GLenum        blend_src,
-	GLenum        blend_dst));
+	int             enable,
+	GLenum          blend_src,
+	GLenum          blend_dst));
 
 LIAPICALL (void, liren_context32_set_buffer, (
 	LIRenContext32* self,
@@ -141,33 +140,33 @@ LIAPICALL (void, liren_context32_set_buffer, (
 
 LIAPICALL (void, liren_context32_set_color_write, (
 	LIRenContext32* self,
-	int           value));
+	int             value));
 
 LIAPICALL (void, liren_context32_set_cull, (
 	LIRenContext32* self,
-	int           enable,
-	int           front_face));
+	int             enable,
+	int             front_face));
 
 LIAPICALL (int, liren_context32_get_deferred, (
 	LIRenContext32* self));
 
 LIAPICALL (void, liren_context32_set_deferred, (
 	LIRenContext32* self,
-	int           value));
+	int             value));
 
 LIAPICALL (void, liren_context32_set_depth, (
 	LIRenContext32* self,
-	int           enable_test,
-	int           enable_write,
-	GLenum        depth_func));
+	int             enable_test,
+	int             enable_write,
+	GLenum          depth_func));
 
 LIAPICALL (void, liren_context32_set_diffuse, (
 	LIRenContext32* self,
-	const float*  value));
+	const float*    value));
 
 LIAPICALL (void, liren_context32_set_flags, (
 	LIRenContext32* self,
-	int           value));
+	int             value));
 
 LIAPICALL (void, liren_context32_set_frustum, (
 	LIRenContext32*       self,
@@ -175,7 +174,7 @@ LIAPICALL (void, liren_context32_set_frustum, (
 
 LIAPICALL (void, liren_context32_set_light, (
 	LIRenContext32* self,
-	int           index,
+	int             index,
 	LIRenLight32*   value));
 
 LIAPICALL (void, liren_context32_set_material, (
@@ -187,19 +186,19 @@ LIAPICALL (void, liren_context32_set_mesh, (
 	LIRenMesh32*    mesh));
 
 LIAPICALL (void, liren_context32_set_modelmatrix, (
-	LIRenContext32*      self,
+	LIRenContext32*    self,
 	const LIMatMatrix* value));
 
 LIAPICALL (void, liren_context32_set_param, (
 	LIRenContext32* self,
-	const float*  value));
+	const float*    value));
 
 LIAPICALL (void, liren_context32_set_viewmatrix, (
-	LIRenContext32*      self,
+	LIRenContext32*    self,
 	const LIMatMatrix* value));
 
 LIAPICALL (void, liren_context32_set_projection, (
-	LIRenContext32*      self,
+	LIRenContext32*    self,
 	const LIMatMatrix* value));
 
 LIAPICALL (void, liren_context32_set_scene, (
@@ -208,36 +207,36 @@ LIAPICALL (void, liren_context32_set_scene, (
 
 LIAPICALL (int, liren_context32_get_scissor, (
 	LIRenContext32* self,
-	int*          x,
-	int*          y,
-	int*          w,
-	int*          h));
+	int*            x,
+	int*            y,
+	int*            w,
+	int*            h));
 
 LIAPICALL (void, liren_context32_set_scissor, (
 	LIRenContext32* self,
-	int           enabled,
-	int           x,
-	int           y,
-	int           w,
-	int           h));
+	int             enabled,
+	int             x,
+	int             y,
+	int             w,
+	int             h));
 
 LIAPICALL (void, liren_context32_set_shader, (
 	LIRenContext32* self,
-	int           pass,
+	int             pass,
 	LIRenShader32*  value));
 
 LIAPICALL (void, liren_context32_set_textures, (
 	LIRenContext32* self,
-	LIRenTexture32* value,
-	int           count));
+	LIRenImage32**  value,
+	int             count));
 
 LIAPICALL (void, liren_context32_set_textures_raw, (
 	LIRenContext32* self,
-	GLuint*       value,
-	int           count));
+	GLuint*         value,
+	int             count));
 
 LIAPICALL (void, liren_context32_set_time, (
 	LIRenContext32* self,
-	float         time));
+	float           time));
 
 #endif

@@ -26,7 +26,6 @@
 #include "render.h"
 #include "render-material.h"
 #include "render-private.h"
-#include "render-texture.h"
 
 /**
  * \brief Creates a new material.
@@ -101,11 +100,9 @@ LIRenMaterial32* liren_material32_new_from_model (
 			image = liren_render32_find_image (render, texture->string);
 			if (image == NULL)
 				image = liren_render32_load_image (render, texture->string);
-			if (image == NULL)
-				image = render->helpers.empty_image;
 		}
 		else
-			image = render->helpers.empty_image;
+			image = NULL;
 
 		/* Set texture. */
 		liren_material32_set_texture (self, j, texture, image);
@@ -121,10 +118,6 @@ LIRenMaterial32* liren_material32_new_from_model (
 void liren_material32_free (
 	LIRenMaterial32* self)
 {
-	int i;
-
-	for (i = 0 ; i < self->textures.count ; i++)
-		liren_texture32_free (self->textures.array + i);
 	lisys_free (self->textures.array);
 	lisys_free (self);
 }
@@ -200,14 +193,11 @@ void liren_material32_set_texture (
 	LIRenMaterial32* self,
 	int            index,
 	LIMdlTexture*  texture,
-	LIRenImage32*    image)
+	LIRenImage32*  image)
 {
 	if (index < 0 || index >= self->textures.count)
 		return;
-	self->textures.array[index].type = texture->type;
-	self->textures.array[index].width = texture->width;
-	self->textures.array[index].height = texture->height;
-	liren_texture32_set_image (self->textures.array + index, image);
+	self->textures.array[index] = image;
 }
 
 int liren_material32_set_texture_count (
@@ -215,27 +205,23 @@ int liren_material32_set_texture_count (
 	int            value)
 {
 	int i;
-	int num;
-	LIRenTexture32* tmp;
+	LIRenImage32** tmp;
 
 	if (value)
 	{
 		if (value > self->textures.count)
 		{
-			num = value - self->textures.count;
-			tmp = lisys_realloc (self->textures.array, value * sizeof (LIRenTexture32));
+			tmp = lisys_realloc (self->textures.array, value * sizeof (LIRenImage32*));
 			if (tmp == NULL)
 				return 0;
 			for (i = self->textures.count ; i < value ; i++)
-				liren_texture32_init (tmp + i);
+				tmp[i] = NULL;
 			self->textures.array = tmp;
 			self->textures.count = value;
 		}
 		else
 		{
-			for (i = value ; i < self->textures.count ; i++)
-				liren_texture32_free (self->textures.array + i);
-			tmp = lisys_realloc (self->textures.array, value * sizeof (LIRenTexture32));
+			tmp = lisys_realloc (self->textures.array, value * sizeof (LIRenImage32*));
 			if (tmp != NULL)
 				self->textures.array = tmp;
 			self->textures.count = value;
@@ -243,8 +229,6 @@ int liren_material32_set_texture_count (
 	}
 	else
 	{
-		for (i = 0 ; i < self->textures.count ; i++)
-			liren_texture32_free (self->textures.array + i);
 		lisys_free (self->textures.array);
 		self->textures.array = NULL;
 		self->textures.count = 0;

@@ -193,21 +193,6 @@ void liren_model32_replace_image (
 	LIRenModel32* self,
 	LIRenImage32* image)
 {
-	int i;
-	int j;
-	LIRenMaterial32* material;
-	LIRenTexture32* texture;
-
-	for (i = 0 ; i < self->materials.count ; i++)
-	{
-		material = self->materials.array[i];
-		for (j = 0 ; j < material->textures.count ; j++)
-		{
-			texture = material->textures.array + j;
-			if (texture->image == image)
-				liren_texture32_set_image (texture, image);
-		}
-	}
 }
 
 /**

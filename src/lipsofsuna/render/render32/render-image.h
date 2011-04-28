@@ -24,10 +24,6 @@
 
 typedef struct _LIRenImage32 LIRenImage32;
 
-LIAPICALL (LIRenImage32*, liren_image32_new, (
-	LIRenRender32* render,
-	const char*    name));
-
 LIAPICALL (LIRenImage32*, liren_image32_new_from_file, (
 	LIRenRender32* render,
 	const char*    name));
