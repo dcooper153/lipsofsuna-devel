@@ -534,7 +534,7 @@ Species{
 	speed_walk = 4,
 	skills = {
 		{name = "strength", max = 5, val = 5},
-		{name = "health", max = 30, val = 30}}}
+		{name = "health", max = 10, val = 10}}}
 
 Species{
 	name = "plague rat",
@@ -572,7 +572,7 @@ Species{
 	model = "slime2", -- FIXME
 	speed_walk = 2,
 	skills = {
-		{name = "health", max = 30, val = 30}},
+		{name = "health", max = 10, val = 10}},
 	vulnerabilities = {cold = 1.5, fire = 1.5, physical = 0.6}}
 
 Species{
