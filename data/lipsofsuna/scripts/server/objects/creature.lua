@@ -179,9 +179,9 @@ Creature.add_enemy = function(self, object)
 	if not self.ai then return end
 	local enemy = self.ai.enemies[object]
 	if enemy then
-		enemy[2] = Program.time
+		enemy[2] = Program.time + 30
 	else
-		self.ai.enemies[object] = {object, Program.time}
+		self.ai.enemies[object] = {object, Program.time + 30}
 	end
 end
 
@@ -596,19 +596,21 @@ end
 -- @param self Object.
 -- @param secs Seconds since the last update.
 Creature.update = function(self, secs)
-	-- Avoid excessive updates.
+	-- Update the state.
 	self.update_timer = self.update_timer + secs
-	if self.update_timer < 0.1 then return end
-	local tick = self.update_timer
-	self.update_timer = 0
-	-- Update state.
-	if self.modifiers then Modifier:update(self, tick) end
-	self.skills:update(tick)
-	self:update_actions(tick)
-	self:update_burdening(tick)
-	self:update_environment(tick)
+	if self.update_timer > 0.3 then
+		local tick = self.update_timer
+		if self.modifiers then Modifier:update(self, tick) end
+		self.skills:update(tick)
+		self:update_actions(tick)
+		self:update_burdening(tick)
+		self:update_environment(tick)
+		self.update_timer = 0
+	end
 	-- Update the AI.
-	if self.ai and not self.dead then self.ai:update(tick) end
+	if self.ai and not self.dead then
+		self.ai:update(secs)
+	end
 end
 
 Creature.update_actions = function(self, secs)

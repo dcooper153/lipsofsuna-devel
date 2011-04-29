@@ -11,12 +11,15 @@ Species.dict_name = {}
 -- @param args Arguments.<ul>
 --   <li>ai_distance_hint: Tells the AI how big the object is horizontally.</li>
 --   <li>ai_enable_attack: False to prohibit attacking.</li>
+--   <li>ai_enable_backstep: False to prohibit backstep.</li>
+--   <li>ai_enable_block: False to prohibit blocking.</li>
 --   <li>ai_enable_combat: False to prohibit combat.</li>
---   <li>ai_enable_defend: False to prohibit defending.</li>
+--   <li>ai_enable_jump: False to prohibit jumping.</li>
 --   <li>ai_enable_strafe: False to prohibit strafing.</li>
 --   <li>ai_enable_wander: False to prohibit wandering.</li>
 --   <li>ai_enable_walk: False to prohibit walking.</li>
 --   <li>ai_enabled: False to disable AI for the species.</li>
+--   <li>ai_offense_factor: How much the creature prefers offense over defense, in the range of [0,1].</li>
 --   <li>ai_search_time: Time in seconds how long the AI will search for hidden foes.</li>
 --   <li>ai_update_delay: Number of seconds between AI state updates.</li>
 --   <li>ai_wait_allowed: False to prohibit waiting.</li>
@@ -153,12 +156,15 @@ Species.new = function(clss, args)
 	local copy = function(f, d) if self[f] == nil then self[f] = d end end
 	copy("ai_distance_hint", 1)
 	copy("ai_enable_attack", true)
+	copy("ai_enable_backstep", true)
+	copy("ai_enable_block", true)
 	copy("ai_enable_combat", true)
-	copy("ai_enable_defend", true)
+	copy("ai_enable_jump", true)
 	copy("ai_enable_strafe", true)
 	copy("ai_enable_wander", true)
 	copy("ai_enable_walk", true)
 	copy("ai_enabled", true)
+	copy("ai_offense_factor", 0.75)
 	copy("ai_search_time", 20)
 	copy("ai_update_delay", 2)
 	copy("ai_wait_allowed", true)

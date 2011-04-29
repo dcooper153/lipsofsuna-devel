@@ -400,6 +400,7 @@ Species{
 Species{
 	name = "troglodyte female",
 	base = "race",
+	ai_offense_factor = 0.9,
 	animations = {
 		["attack axe"] = {animation = "punch", channel = 2, fade_in = 0.1, weight = 100},
 		["attack blunt"] = {animation = "punch", channel = 2, fade_in = 0.1, weight = 100},
@@ -443,7 +444,9 @@ Species{
 	name = "bloodworm",
 	base = "base",
 	ai_enable_strafe = false,
-	ai_enable_defend = false,
+	ai_enable_block = false,
+	ai_enable_jump = false,
+	ai_offense_factor = 1,
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"enemy"},
@@ -465,7 +468,8 @@ Species{
 	model = "dragon1",
 	ai_distance_hint = 2.5,
 	ai_enable_strafe = false,
-	ai_enable_defend = false,
+	ai_enable_block = false,
+	ai_offense_factor = 1,
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30},
 		["attack left claw"] = {animation = "claw-left", channel = 2, weight = 30},
@@ -487,6 +491,7 @@ Species{
 Species{
 	name = "feral devora",
 	base = "devora",
+	ai_offense_factor = 0.8,
 	categories = {"enemy"},
 	difficulty = 0.5,
 	factions = {"evil"},
@@ -501,7 +506,8 @@ Species{
 	base = "base",
 	model = "lizardman2",
 	ai_distance_hint = 1.0,
-	ai_enable_defend = false,
+	ai_enable_block = false,
+	ai_offense_factor = 0.9,
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"enemy"},
@@ -527,7 +533,8 @@ Species{
 	name = "rat",
 	base = "base",
 	ai_enable_strafe = false,
-	ai_enable_defend = false,
+	ai_enable_block = false,
+	ai_offense_factor = 1,
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"enemy"},
@@ -548,7 +555,8 @@ Species{
 	name = "plague rat",
 	base = "base",
 	ai_enable_strafe = false,
-	ai_enable_defend = false,
+	ai_enable_block = false,
+	ai_offense_factor = 1,
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"plague"},
@@ -568,8 +576,8 @@ Species{
 Species{
 	name = "slime",
 	base = "base",
-	ai_enable_strafe = false,
-	ai_enable_defend = false,
+	ai_enable_block = false,
+	ai_offense_factor = 0.5,
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"random"},
@@ -589,7 +597,8 @@ Species{
 	name = "plague slime",
 	base = "base",
 	ai_enable_strafe = false,
-	ai_enable_defend = false,
+	ai_enable_block = false,
+	ai_offense_factor = 1,
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	categories = {"plague"},
@@ -610,7 +619,8 @@ Species{
 	base = "base",
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
-	ai_enable_defend = false,
+	ai_enable_block = false,
+	ai_offense_factor = 0.8,
 	categories = {"enemy", "mining"},
 	difficulty = 0,
 	factions = {"evil"},
@@ -634,7 +644,8 @@ Species{
 	base = "base",
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
-	ai_enable_defend = false,
+	ai_enable_block = false,
+	ai_offense_factor = 0.8,
 	categories = {"enemy", "mining"},
 	difficulty = 0.2,
 	equipment_slots = {
