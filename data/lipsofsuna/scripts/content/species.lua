@@ -419,6 +419,70 @@ Species{
 	loot_count = {2, 4}}
 
 Species{
+	name = "novice brigand archer",
+	base = "aer",
+	categories = {"enemy"},
+	difficulty = 0.3,
+	factions = {"evil"},
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"wooden crossbow", "leather top", "leather pants", "leather leggings",
+		"arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow",
+		"arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow"},
+	loot_categories = {"armor", "potion", "weapon"},
+	loot_count = {2, 4},
+	skills = {
+		{name = "dexterity", max = 80, val = 30},
+		{name = "health", max = 100, val = 30},
+		{name = "intelligence", max = 100, val = 5},
+		{name = "perception", max = 60, val = 30},
+		{name = "strength", max = 40, val = 5},
+		{name = "willpower", max = 80, val = 5}}}
+
+Species{
+	name = "master brigand archer",
+	base = "aer",
+	categories = {"enemy"},
+	difficulty = 0.7,
+	factions = {"evil"},
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"iron crossbow", "iron breastplate", "iron greaves", "iron gauntlets",
+		"arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow",
+		"arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow"},
+	loot_categories = {"armor", "potion", "weapon"},
+	loot_count = {2, 4},
+	skills = {
+		{name = "dexterity", max = 80, val = 80},
+		{name = "health", max = 100, val = 60},
+		{name = "intelligence", max = 100, val = 5},
+		{name = "perception", max = 60, val = 40},
+		{name = "strength", max = 40, val = 5},
+		{name = "willpower", max = 80, val = 5}}}
+
+Species{
+	name = "suicide bomber",
+	base = "aer",
+	categories = {"enemy"},
+	difficulty = 0.5,
+	factions = {"evil"},
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"leather top", "leather pants",
+		"crimson grenade", "crimson grenade", "crimson grenade", "crimson grenade", "crimson grenade",
+		"crimson grenade", "crimson grenade", "crimson grenade", "crimson grenade", "crimson grenade",
+		"crimson grenade", "crimson grenade", "crimson grenade", "crimson grenade", "crimson grenade"},
+	loot_categories = {"armor", "potion", "weapon"},
+	loot_count = {2, 4},
+	skills = {
+		{name = "dexterity", max = 80, val = 5},
+		{name = "health", max = 100, val = 100},
+		{name = "intelligence", max = 100, val = 40},
+		{name = "perception", max = 60, val = 40},
+		{name = "strength", max = 40, val = 5},
+		{name = "willpower", max = 80, val = 5}}}
+
+Species{
 	name = "brigandmale",
 	base = "aermale",
 	categories = {"enemy"},
