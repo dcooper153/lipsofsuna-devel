@@ -186,14 +186,14 @@ end
 -- @return Feat info table.
 Feat.get_info = function(self, args)
 	-- Get the feat specific requirements and influences.
+	local anim = Featanimspec:find{name = self.animation}
 	local info = oldinfo(self)
 	local health_influences = {cold = 1, fire = 1, physical = 1, poison = 1}
 	-- Add weapon specific influences.
 	-- In addition to the base influences, weapons may grant bonuses for
 	-- having points in certain skills. The skill bonuses are multiplicative
 	-- since the system is easier to balance that way.
-	if args and args.weapon then
-		if args.weapon.spec.influences_base then
+	if args and args.weapon and anim.bonuses_weapon and args.weapon.spec.influences_base then
 			local mult = 1
 			local bonuses = args.weapon.spec.influences_bonus
 			if bonuses and args.attacker.skills then
@@ -210,7 +210,7 @@ Feat.get_info = function(self, args)
 	-- Add bare-handed specific influences.
 	-- Works like the weapon variant but uses hardcoded influences.
 	-- Bare-handed influence bonuses only apply to melee feats.
-	elseif args and info.animation.categories["melee"] then
+	if args and not args.weapon and anim.bonuses_barehanded then
 		local mult = 1
 		local bonuses = {dexterity = 0.02, strength = 0.01, willpower = 0.02}
 		if args.attacker.skills then
@@ -227,7 +227,7 @@ Feat.get_info = function(self, args)
 	end
 	-- Add projectile specific influences.
 	-- Works like the weapon variant but uses the projectile as the item.
-	if args and args.projectile and args.projectile.spec.influences_base then
+	if args and args.projectile and anim.bonuses_projectile and args.projectile.spec.influences_base then
 		local mult = 1
 		local bonuses = args.projectile.spec.influences_bonus
 		if bonuses then

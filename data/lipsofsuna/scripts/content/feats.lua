@@ -4,27 +4,34 @@ Featanimspec{
 	categories = {"build"},
 	cooldown = 0.5,
 	effect = "swing1",
+	effects = {},
 	required_weapon = "build",
 	slot = "hand.R"}
 
 Featanimspec{
 	name = "right hand",
 	animation = "attack fist",
+	bonuses_barehanded = true,
+	bonuses_weapon = true,
 	categories = {"melee"},
 	description = "Hit with your right hand",
 	cooldown = 1,
 	effect = "swing1",
 	effect_impact = "impact1",
+	effects = {"physical damage", "fire damage"},
 	required_weapon = "melee",
 	slot = "hand.R"}
 
 Featanimspec{
 	name = "ranged",
 	animation = "attack bow",
+	bonuses_projectile = true,
+	bonuses_weapon = true,
 	categories = {"ranged"},
 	cooldown = 1,
 	description = "Fire a ranged weapon",
 	effect_impact = "impact1",
+	effects = {"physical damage", "fire damage"},
 	required_ammo = {arrow = 1},
 	required_weapon = "ranged",
 	slot = "hand.R"}
@@ -35,7 +42,8 @@ Featanimspec{
 	categories = {"ranged", "spell"},
 	cooldown = 2,
 	description = "Cast a magical projectile",
-	effect = "spell1"}
+	effect = "spell1",
+	effects = {"black haze", "fire damage"}}
 
 Featanimspec{
 	name = "spell on self",
@@ -43,7 +51,8 @@ Featanimspec{
 	categories = {"self", "spell"},
 	cooldown = 2,
 	description = "Cast a spell on yourself",
-	effect = "spell1"}
+	effect = "spell1",
+	effects = {"fire damage", "restore health", "sanctuary", "wilderness"}}
 
 Featanimspec{
 	name = "spell on touch",
@@ -51,15 +60,18 @@ Featanimspec{
 	categories = {"spell", "touch"},
 	cooldown = 2,
 	description = "Cast a short range touch spell",
-	effect = "spell1"}
+	effect = "spell1",
+	effects = {"fire damage", "restore health", "sanctuary"}}
 
 Featanimspec{
 	name = "throw",
 	animation = "throw",
+	bonuses_weapon = true,
 	categories = {"throw"},
 	cooldown = 1,
 	effect = "swing1",
 	effect_impact = "impact1",
+	effects = {},
 	required_weapon = "throwable",
 	slot = "hand.R"}
 

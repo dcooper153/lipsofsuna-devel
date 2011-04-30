@@ -348,6 +348,39 @@ Species{
 -- Friendly creatures.
 
 Species{
+	name = "Lips guard archer",
+	base = "aer",
+	dialog = "lips citizen",
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson crossbow",
+		"arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow",
+		"arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow",
+		"arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow"},
+	skills = {
+		{name = "dexterity", max = 80, val = 80},
+		{name = "health", max = 100, val = 70},
+		{name = "intelligence", max = 100, val = 0},
+		{name = "perception", max = 60, val = 20},
+		{name = "strength", max = 40, val = 20},
+		{name = "willpower", max = 80, val = 0}}}
+
+Species{
+	name = "Lips guard knight",
+	base = "aer",
+	dialog = "lips citizen",
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson sword", "round shield"},
+	skills = {
+		{name = "dexterity", max = 80, val = 60},
+		{name = "health", max = 100, val = 70},
+		{name = "intelligence", max = 100, val = 0},
+		{name = "perception", max = 60, val = 20},
+		{name = "strength", max = 40, val = 40},
+		{name = "willpower", max = 80, val = 0}}}
+
+Species{
 	name = "lipscitizen",
 	base = "aer",
 	dialog = "lips citizen",

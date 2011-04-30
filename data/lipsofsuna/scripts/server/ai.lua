@@ -15,6 +15,115 @@ Ai.new = function(clss, object)
 	return self
 end
 
+--- Updates the combat ratings of the creature.
+-- @param self AI.
+Ai.calculate_combat_ratings = function(self)
+	self.melee_rating = 0
+	self.ranged_rating = 0
+	self.throw_rating = 0
+	self.best_melee_weapon = nil
+	self.best_ranged_weapon = nil
+	self.best_throw_weapon = nil
+	if self.object.spec.can_melee then self.melee_rating = 1 end
+	for k,v in pairs(self.object.inventory.slots) do
+		local score,melee,ranged,throw = self:calculate_weapon_ratings(v)
+		if melee >= self.melee_rating then
+			self.melee_rating = melee
+			self.best_melee_weapon = v
+		end
+		if ranged >= self.ranged_rating then
+			self.ranged_rating = ranged
+			self.best_ranged_weapon = v
+		end
+		if throw >= self.throw_rating then
+			self.throw_rating = throw
+			self.best_throw_weapon = v
+		end
+	end
+end
+
+--- Calculates how desirable it is to attack the given enemy.
+-- @param self Ai.
+-- @param enemy Enemy object.
+Ai.calculate_enemy_rating = function(self, enemy)
+	-- TODO: Should take enemy weakness into account.
+	-- TODO: Should probably take terrain into account by solving paths.
+	return 1 / ((self.object.position - enemy.position).length + 1)
+end
+
+--- Calculates the tilt value for ranged attacks.
+-- @param self Ai.
+-- @return Tilt angle in radians.
+Ai.calculate_ranged_tilt = function(self)
+	-- Get the ammo type.
+	local weapon = self.object:get_item{slot = "hand.R"}
+	if not weapon or not weapon.spec.ammo_type then return Quaternion() end
+	local spec = Itemspec:find{name = weapon.spec.ammo_type}
+	if not spec then return Quaternion() end
+	-- Calculate distance to the target.
+	local diff = self.target.position - self.object.position
+	local dist = Vector(diff.x, 0, diff.z).length
+	-- Solve the tilt angle with brute force.
+	local speed = 20
+	local solve = function(angle)
+		local a = spec.gravity
+		local v = Quaternion{euler = {0,0,angle}} * Vector(0, 0, -speed)
+		local t_hit = dist / Vector(v.x,0,v.z).length
+		local y_hit = v.y * t_hit + 0.5 * a.y * t_hit^2
+		return y_hit
+	end
+	local best = 0
+	local best_error = 1000
+	for angle = 0,1.2,0.05 do
+		local e = math.abs(solve(angle) - diff.y)
+		if e < best_error then
+			best = angle
+			best_error = e
+		end
+	end
+	return Quaternion{euler = {0,0,best}}
+end
+
+-- Calculates the combat ratings of a weapon.
+-- @param self Ai.
+-- @param weapon Item.
+-- @return Best rating, melee rating, ranged rating, throw rating.
+Ai.calculate_weapon_ratings = function(self, weapon)
+	local spec = self.object.spec
+	-- Calculate total damage.
+	local score = 0
+	for k,v in pairs(weapon:get_weapon_influences(self)) do
+		if k ~= "hatchet" then
+			score = score + v
+		end
+	end
+	score = math.max(0, -score)
+	-- Melee rating.
+	local a = 0
+	if spec.can_melee and weapon.spec.categories["melee"] then
+		a = score
+	end
+	-- Ranged rating.
+	local b = 0
+	if spec.can_ranged and weapon.spec.categories["ranged"] then
+		local has_ammo
+		if weapon.spec.ammo_type then
+			has_ammo = self.object:get_item{name = weapon.spec.ammo_type}
+		else
+			has_ammo = true
+		end
+		if has_ammo then
+			b = score
+		end
+	end
+	-- Throw rating.
+	local c = 0
+	if spec.can_throw and weapon.spec.categories["throwable"] then
+		c = score
+	end
+	return math.max(a,b,c), a, b, c
+end
+
 --- Chooses the combat action of the creature.
 -- @param self AI.
 Ai.choose_combat_action = function(self)
@@ -93,21 +202,38 @@ Ai.choose_combat_action = function(self)
 			end
 		end
 	end
-	-- Calculate the melee attack probability.
-	-- The creature needs to be able to attack and the cooldown should be over.
-	-- It also needs to be close enough to the target, face towards it and
-	-- know at least one melee attack feat.
-	-- Offensive, magnitude is 0 or 4.
+	-- Prepare attack calculation data.
+	-- For any type of attack to be possible, the AI must have attacks enabled
+	-- and the cooldown should be over. The weapon and the aim correctness are
+	-- also used by all the checks so they're determined here.
 	local feat
-	local p_attack = 0
-	if spec.ai_enable_attack and not self.cooldown and dist < hint * 3 and (allow_forward or allow_forward_jump or not spec.ai_enable_walk) then
-		local look = self.object.rotation * Vector(0,0,-1)
-		look = Vector(look.x, 0, look.z):normalize()
-		if dir:dot(look) > 0.8 then
-			local w = self.object:get_item{slot = "hand.R"}
-			feat = self:find_best_feat{category = "melee", target = self.target, weapon = w}
-			if feat then p_attack = 4 end
-		end
+	local attack = spec.ai_enable_attack and not self.cooldown and (allow_forward or allow_forward_jump or not spec.ai_enable_walk)
+	local weapon = self.object:get_item{slot = "hand.R"}
+	local look = self.object.rotation * Vector(0,0,-1)
+	local aim = dir:dot(Vector(look.x, 0, look.z):normalize())
+	-- Calculate the melee attack probability.
+	-- The creature must be bare-handed or wield a melee weapon.
+	-- Offensive, magnitude is 0 or 4.
+	local p_melee = 0
+	if attack and spec.can_melee and dist < hint * 3 and (not weapon or weapon.spec.categories["melee"]) and aim > 0.8 then
+		feat = self:find_best_feat{category = "melee", target = self.target, weapon = weapon}
+		if feat then p_melee = 4 end
+	end
+	-- Calculate ranged attack probability.
+	-- The creature must wield a ranged weapon.
+	-- Offensive, magnitude is 0 or 4.
+	local p_ranged = 0
+	if attack and spec.can_ranged and weapon and weapon.spec.categories["ranged"] and aim > 0.8 then
+		feat = self:find_best_feat{category = "ranged", target = self.target, weapon = weapon}
+		if feat then p_ranged = 4 end
+	end
+	-- Calculate throw attack probability.
+	-- The creature must wield a throwable weapon.
+	-- Offensive, magnitude is 0 or 4.
+	local p_throw = 0
+	if attack and spec.can_throw and weapon and weapon.spec.categories["throwable"] and aim > 0.8 then
+		feat = self:find_best_feat{category = "throw", target = self.target, weapon = weapon}
+		if feat then p_ranged = 4 end
 	end
 	-- Calculate the forward walking probability.
 	-- Walking forward if preferred if the creature is far away from the target.
@@ -115,6 +241,16 @@ Ai.choose_combat_action = function(self)
 	local p_forward = 0
 	if (allow_forward or allow_forward_jump) and dist > hint * 3 then
 		p_forward = 1
+	end
+	-- Calculate the weapon switch probability.
+	-- The weapon is switched if it's much worse than the best possible weapon.
+	-- Offensive, magnitude is 0 or 3.
+	local curr,melee,ranged,throw = 1,1,0,0
+	if weapon then curr,melee,ranged,throw = self:calculate_weapon_ratings(weapon) end
+	local best = math.max(self.melee_rating, self.ranged_rating, self.throw_rating)
+	local p_weapon = 0
+	if (curr + 5 < best) or (curr == 0 and best > 0) then
+		p_weapon = 3
 	end
 	-- Calculate the backstep probability.
 	-- Backstepping is preferred if the creature is too close to the target.
@@ -141,11 +277,12 @@ Ai.choose_combat_action = function(self)
 		p_strafe = 1
 	end
 	-- Normalize the probabilities and scale them so that we get the right offense probability.
-	local p_offense = p_attack + p_forward
+	local p_offense = p_melee + p_ranged + p_throw + p_forward + p_weapon
 	local p_defense = p_backward + p_strafe + p_block
 	if p_offense > 0 then
-		p_attack = p_attack / p_offense * spec.ai_offense_factor
+		p_melee = p_melee / p_offense * spec.ai_offense_factor
 		p_forward = p_forward / p_offense * spec.ai_offense_factor
+		p_weapon = p_weapon / p_offense * spec.ai_offense_factor
 	end
 	if p_defense > 0 then
 		p_backward = p_backward / p_defense * (1 - spec.ai_offense_factor)
@@ -154,36 +291,65 @@ Ai.choose_combat_action = function(self)
 	end
 	-- Select the action based on the calculated probabilities.
 	local choice = math.random()
-	if choice < p_attack then
+	if choice < p_melee then
 		if diff.y > 1 and spec.allow_jump then self.object:jump() end
 		self.object:set_block(false)
-		if dist < hint then
+		if spec.ai_enable_backstep and dist < hint then
 			self.object:set_movement(-1)
-		elseif dist > 2 * hint then
+		elseif spec.ai_enable_walk and dist > 2 * hint then
 			self.object:set_movement(1)
 		else
 			self.object:set_movement(0)
 		end
+		self.object.tilt = nil
 		self.object:set_strafing(0)
 		feat:perform{user = self.object}
 		self.action_timer = 0.5
-	elseif choice < p_attack + p_forward then
+	elseif choice < p_melee + p_ranged then
+		self.object:set_block(false)
+		self.object:set_movement(0)
+		self.object:set_strafing(0)
+		self.object.tilt = self:calculate_ranged_tilt()
+		feat:perform{user = self.object}
+		-- FIXME: Tilt needs to be reset somewhere else since firing is delayed.
+		self.action_timer = 1
+	elseif choice < p_melee + p_ranged + p_throw then
+		self.object:set_block(false)
+		self.object:set_movement(0)
+		self.object:set_strafing(0)
+		self.object.tilt = self:calculate_ranged_tilt()
+		feat:perform{user = self.object}
+		self.action_timer = 1
+	elseif choice < p_melee + p_ranged + p_throw + p_forward then
 		if allow_forward_jump then self.object:jump() end
 		self.object:set_block(false)
 		self.object:set_movement(1)
 		self.object:set_strafing(0)
 		self.action_timer = math.random(1, 3)
-	elseif choice < p_attack + p_forward + p_backward then
+	elseif choice < p_melee + p_ranged + p_throw + p_forward + p_weapon then
+		if self.melee_rating > self.ranged_rating and self.melee_rating > self.throw_rating then
+			if self.best_melee_weapon then
+				self.object:equip_item{object = self.best_melee_weapon}
+			else
+				self.object:unequip_item{slot = "hand.R"}
+			end
+		elseif self.ranged_rating > self.throw_rating then
+			self.object:equip_item{object = self.best_ranged_weapon}
+		else
+			self.object:equip_item{object = self.best_throw_weapon}
+		end
+		self.action_timer = 1
+	elseif choice < p_melee + p_ranged + p_throw + p_forward + p_weapon + p_backward then
 		self.object:set_block(false)
 		self.object:set_movement(-0.5)
 		self.object:set_strafing(0)
 		self.action_timer = math.random(2, 4)
-	elseif choice < p_attack + p_forward + p_backward + p_block then
+	elseif choice < p_melee + p_ranged + p_throw + p_forward + p_weapon + p_backward + p_block then
 		self.object:set_block(true)
 		self.object:set_movement(0)
 		self.object:set_strafing(0)
 		self.action_timer = math.random(4, 8)
-	elseif choice < p_attack + p_forward + p_backward + p_block + p_strafe then
+	elseif choice < p_melee + p_ranged + p_throw + p_forward + p_weapon + p_backward + p_block + p_strafe then
 		local strafe_left = function()
 			if allow_strafe_left or allow_strafe_left_jump then
 				if allow_strafe_left_jump then self.object:jump() end
@@ -248,23 +414,6 @@ Ai.choose_wander_target = function(self)
 	self.target = self.object.position + rot * Vector(0, 0, 10)
 end
 
---- Updates the combat ratings of the creature.
--- @param self AI.
-Ai.calculate_combat_ratings = function(self)
-	-- TODO
-	self.melee_rating = 1
-	self.ranged_rating = 0
-end
-
---- Calculates how desirable it is to attack the given enemy.
--- @param self Object.
--- @param enemy Enemy object.
-Ai.calculate_enemy_rating = function(self, enemy)
-	-- TODO: Should take enemy weakness into account.
-	-- TODO: Should probably take terrain into account by solving paths.
-	return 1 / ((self.object.position - enemy.position).length + 1)
-end
-
 --- Finds the best feat to use in combat.
 -- @param self Object.
 -- @param args Arguments.<ul>
@@ -298,16 +447,18 @@ Ai.find_best_feat = function(self, args)
 		if not feat:usable{user = self.object} then return end
 		-- Add usable feat effects.
 		for name in pairs(self.object.spec.feat_effects) do
-			local effect = Feateffectspec:find{name = name}
-			if effect then
-				local value = solve_effect_value(feat, effect)
-				if value >= 1 then feat.effects[#feat.effects + 1] = {name, value} end
+			if anim.effects[name] then
+				local effect = Feateffectspec:find{name = name}
+				if effect then
+					local value = solve_effect_value(feat, effect)
+					if value >= 1 then feat.effects[#feat.effects + 1] = {name, value} end
+				end
 			end
 		end
 		-- Calculate the score.
 		local info = feat:get_info{attacker = self.object, target = args.target, weapon = args.weapon}
 		local score = -(info.influences.health or 0)
-		if not score or score < 0 then return end
+		if score < 1 then return end
 		score = score + 100 * math.random()
 		-- Maintain the best feat.
 		if score <= best_score then return end
@@ -403,9 +554,6 @@ end
 -- @param self AI.
 Ai.update_state = function(self)
 	self.ai_timer = 0
-	-- Update our combat ratings so that we can correctly estimate our
-	-- chances to stand against our enemies.
-	self:calculate_combat_ratings()
 	-- TODO: Flee if about to die.
 	-- Find the best enemy to attack.
 	self:scan_enemies()
@@ -422,6 +570,7 @@ Ai.update_state = function(self)
 	end
 	-- Enter combat mode if an enemy was found.
 	if best_enemy then
+		self:calculate_combat_ratings()
 		self:set_state{state = "combat", target = best_enemy}
 		return
 	end

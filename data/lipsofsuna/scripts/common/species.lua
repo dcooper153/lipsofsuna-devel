@@ -207,6 +207,16 @@ Species.new = function(clss, args)
 	copy("view_cone", 0.8 * math.pi)
 	copy("water_friction", 0.8)
 	copy("water_gravity", Vector(0,-1,0))
+	-- Precalculate combat abilities.
+	self.can_melee = false
+	self.can_ranged = false
+	self.can_throw = false
+	for k,v in pairs(self.feat_anims) do
+		local feat = Featanimspec:find{name = k}
+		if feat.categories["melee"] then self.can_melee = true end
+		if feat.categories["ranged"] then self.can_ranged = true end
+		if feat.categories["throw"] then self.can_throw = true end
+	end
 	return self
 end
 

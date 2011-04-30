@@ -10,10 +10,14 @@ Featanimspec.dict_name = {}
 -- @param clss Featanimspec class.
 -- @param args Arguments.<ul>
 --   <li>action_frames: Blender frame range of the action portion.</li>
+--   <li>bonuses_barehanded: Bonuses from being bare-handed are added to damage.</li>
+--   <li>bonuses_projectile: Bonuses from the projectile are added to damage.</li>
+--   <li>bonuses_weapon: Bonuses from the weapon are added to damage.</li>
 --   <li>categories: List of categories.</li>
 --   <li>cooldown: Cooldown time in seconds.</li>
 --   <li>effect_animation: Animation name.</li>
 --   <li>effect_sound: Sound effect name.</li>
+--   <li>effects: List of effect spec names compatible with the animation.</li>
 --   <li>icon: Icon name.</li>
 --   <li>influences: List of {type, base} influences.</li>
 --   <li>name: Feat animation name.</li>
@@ -24,10 +28,20 @@ Featanimspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.cooldown = self.cooldown or 0
 	self.action_frames = self.action_frames or {2, 10}
+	self.bonuses_barehanded = self.bonuses_barehanded or false
+	self.bonuses_projectile = self.bonuses_projectile or false
+	self.bonuses_weapon = self.bonuses_weapon or false
 	self.icon = self.icon or "skill-todo"
 	self.influences = self.influences or {}
 	self.required_ammo = self.required_ammo or {}
 	self.toggle = self.toggle or false
+	-- Effects.
+	self.effects = {}
+	if args.effects then
+		for k,v in pairs(args.effects) do
+			self.effects[v] = true
+		end
+	end
 	return self
 end
 

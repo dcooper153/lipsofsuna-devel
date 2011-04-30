@@ -385,10 +385,19 @@ Creature.equip_best_items = function(self, args)
 	for name in pairs(self.spec.equipment_slots) do
 		-- Find the best item to place to the slot.
 		local best = self:get_item{slot = name}
+		local best_score = -1
 		for index,item in pairs(self.inventory.slots) do
 			if item.spec.equipment_slot == name then
-				-- TODO: Actually check for armor class etc.
-				if not best then best = item end
+				local score = 50 * item:get_armor_class(self)
+				for k,v in pairs(item:get_weapon_influences(self)) do
+					if k ~= "hatchet" then
+						score = score + v
+					end
+				end
+				if not best or score < best_score then
+					best = item
+					best_score = score
+				end
 			end
 		end
 		-- Place the best item to the slot.

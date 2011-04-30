@@ -123,6 +123,37 @@ Item.contact_cb = function(self, result)
 	end
 end
 
+--- Gets the armor class of the item.
+-- @param self Object.
+-- @param user Creature.
+-- @return Armor rating.
+Item.get_armor_class = function(self, user)
+	return self.spec.armor_class
+end
+
+--- Gets the weapon damage types of the item.
+-- @param self Object.
+-- @param user Creature.
+-- @return Array of influences.
+Item.get_weapon_influences = function(self, user)
+	if not self.spec.influences_base then return {} end
+	-- Calculate the damage multiplier.
+	local mult = 1
+	local bonuses = self.spec.influences_bonus
+	if bonuses and user.skills then
+		for k,v in pairs(bonuses) do
+			local s = user.skills:get_value{skill = k}
+			if s then mult = mult * (1 + v * s) end
+		end
+	end
+	-- Calculate influences.
+	local influences = {}
+	for k,v in pairs(self.spec.influences_base) do
+		influences[k] = mult * v
+	end
+	return influences
+end
+
 --- Causes the item to take damage.
 -- @param self Object.
 -- @param amount Amount of damage.
