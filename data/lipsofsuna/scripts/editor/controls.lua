@@ -21,7 +21,7 @@ end}
 
 Action{name = "rotate", mode = "analog", key1 = "mouse4", key2 = "mouse5", func = function(v)
 	if Client.moving then
-		Editor.inst:extrude(v > 0)
+		Editor.inst:extrude(v < 0)
 	else
 		local point,object,tile = Target:pick_ray{camera = Editor.inst.camera}
 		if not object then return end
