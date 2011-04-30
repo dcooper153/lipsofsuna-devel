@@ -1,5 +1,41 @@
 local oldinfo = Feat.get_info
 
+--- Adds the best possible effects to the feat.
+-- @param self Feat.
+-- @param args Arguments.<ul>
+--   <li>user: Object whose skills and inventory to use.</li></ul>
+Feat.add_best_effects = function(self, args)
+	-- Solves the maximum value the effect can have without the feat
+	-- becoming unusable. The solution is found by bisecting.
+	local solve_effect_value = function(feat, effect)
+		local i = #feat.effects + 1
+		local e = {effect.name, 0}
+		local step = 50
+		feat.effects[i] = e
+		repeat
+			e[2] = e[2] + step
+			if not feat:usable{user = args.user} then
+				e[2] = e[2] - step
+			end
+			step = step / 2
+		until step < 1
+		feat.effects[i] = nil
+		return e[2]
+	end
+	-- Add usable feat effects.
+	-- TODO: Reject effects if this will be used for animations that can have too many.
+	local anim = Featanimspec:find{name = self.animation}
+	for name in pairs(args.user.spec.feat_effects) do
+		if anim.effects[name] then
+			local effect = Feateffectspec:find{name = name}
+			if effect then
+				local value = solve_effect_value(self, effect)
+				if value >= 1 then self.effects[#self.effects + 1] = {name, value} end
+			end
+		end
+	end
+end
+
 --- Applies the feat.
 -- @param self Feat.
 -- @param args Arguments.<ul>

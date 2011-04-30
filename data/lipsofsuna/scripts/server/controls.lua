@@ -303,6 +303,7 @@ Protocol:add_handler{type = "SHOOT", func = function(args)
 		end
 		if anim then
 			local feat = Feat{animation = anim}
+			feat:add_best_effects{user = player}
 			feat:perform{stop = args.stop, user = player}
 		end
 	else

@@ -14,11 +14,10 @@ Featanimspec{
 	bonuses_barehanded = true,
 	bonuses_weapon = true,
 	categories = {"melee"},
-	description = "Hit with your right hand",
 	cooldown = 1,
 	effect = "swing1",
 	effect_impact = "impact1",
-	effects = {"physical damage", "fire damage"},
+	effects = {"physical damage"},
 	required_weapon = "melee",
 	slot = "hand.R"}
 
@@ -29,9 +28,8 @@ Featanimspec{
 	bonuses_weapon = true,
 	categories = {"ranged"},
 	cooldown = 1,
-	description = "Fire a ranged weapon",
 	effect_impact = "impact1",
-	effects = {"physical damage", "fire damage"},
+	effects = {"physical damage"},
 	required_ammo = {arrow = 1},
 	required_weapon = "ranged",
 	slot = "hand.R"}
@@ -106,7 +104,7 @@ Feateffectspec{
 Feateffectspec{
 	name = "physical damage",
 	categories = {"melee", "physical"},
-	description = "Inflict physical or telekinetic damage",
+	description = "Inflict physical damage",
 	effect = "impact1",
 	icon = "modifier-physical",
 	influences = {{"physical", -1, -0.2}},

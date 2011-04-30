@@ -424,37 +424,12 @@ end
 Ai.find_best_feat = function(self, args)
 	local best_feat = nil
 	local best_score = -1
-	local solve_effect_value = function(feat, effect)
-		-- Solves the maximum value the effect can have without the feat
-		-- becoming unusable. The solution is found by bisecting.
-		local i = #feat.effects + 1
-		local e = {effect.name, 0}
-		local step = 50
-		feat.effects[i] = e
-		repeat
-			e[2] = e[2] + step
-			if not feat:usable{user = self.object} then
-				e[2] = e[2] - step
-			end
-			step = step / 2
-		until step < 1
-		feat.effects[i] = nil
-		return e[2]
-	end
 	local process_anim = function(anim)
 		-- Check if the feat animation is usable.
 		local feat = Feat{animation = anim.name}
 		if not feat:usable{user = self.object} then return end
-		-- Add usable feat effects.
-		for name in pairs(self.object.spec.feat_effects) do
-			if anim.effects[name] then
-				local effect = Feateffectspec:find{name = name}
-				if effect then
-					local value = solve_effect_value(feat, effect)
-					if value >= 1 then feat.effects[#feat.effects + 1] = {name, value} end
-				end
-			end
-		end
+		-- Add best feat effects.
+		feat:add_best_effects{user = self.object}
 		-- Calculate the score.
 		local info = feat:get_info{attacker = self.object, target = args.target, weapon = args.weapon}
 		local score = -(info.influences.health or 0)
@@ -462,7 +437,7 @@ Ai.find_best_feat = function(self, args)
 		score = score + 100 * math.random()
 		-- Maintain the best feat.
 		if score <= best_score then return end
-		best_feat = feat:copy()
+		best_feat = feat
 		best_score = score
 	end
 	-- Score each feat animation and choose the best one.
