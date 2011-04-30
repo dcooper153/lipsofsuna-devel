@@ -9,7 +9,7 @@ Views.Feats.mode = "chargen"
 Views.Feats.new = function(clss)
 	local self = Widget.new(clss, {cols = 1, spacings = {0,0,0,0}})
 	-- Title.
-	self.title = Widgets.Frame{style = "title", text = "Feats"}
+	self.title = Widgets.Frame{style = "title", text = "Spells"}
 	-- Animation selector.
 	local label = Widgets.Label{text = "Type"}
 	label:set_request{width = 46}
