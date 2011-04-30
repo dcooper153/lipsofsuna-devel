@@ -13,7 +13,7 @@ Views.Feats.new = function(clss)
 	-- Animation selector.
 	local label = Widgets.Label{text = "Type"}
 	label:set_request{width = 46}
-	self.combo_anim = Widgets.ComboBox()
+	self.combo_anim = Widgets.ComboBox{activated = function(w) self:set_anim(w.text) end}
 	self.group_anim = Widget{cols = 2, rows = 1}
 	self.group_anim:set_expand{col = 2}
 	self.group_anim:set_child{col = 1, row = 1, widget = label}
@@ -163,11 +163,37 @@ Views.Feats.changed = function(self)
 	self.label_description.text = desc
 end
 
+--- Sets the feat animation.
+-- @param self Feats.
+-- @param name Animation name.
+Views.Feats.set_anim = function(self, name)
+	local spec = self.spec
+	local anim = Featanimspec:find{name = name}
+	-- Create the list of applicable effects.
+	self.dict_effects_id = {{"", nil}}
+	if spec and anim then
+		for k in pairs(spec.feat_effects) do
+			if anim.effects[k] then
+				table.insert(self.dict_effects_id, {k, function() self:changed() end})
+			end
+		end
+		table.sort(self.dict_effects_id, function(a, b) return a[1]<b[1] end)
+	end
+	-- Update the effect combo boxes.
+	for i = 1,3 do
+		self.combo_effect[i]:clear()
+		for k,v in ipairs(self.dict_effects_id) do
+			self.combo_effect[i]:append{text = v[1], pressed = v[2]}
+		end
+	end
+end
+
 --- Sets the race of the character using the feat editor.
 -- @param self Feats.
 -- @param name Race name.
 Views.Feats.set_race = function(self, name)
 	local spec = Species:find{name = name}
+	self.spec = spec
 	if not spec then return end
 	-- Rebuild the feat animation list.
 	self.dict_anims_id = {{"", nil}}
@@ -183,17 +209,7 @@ Views.Feats.set_race = function(self, name)
 		self.combo_anim:append{text = v[1], pressed = v[2]}
 	end
 	-- Rebuild the feat effect list.
-	self.dict_effects_id = {{"", nil}}
-	for k in pairs(spec.feat_effects) do
-		table.insert(self.dict_effects_id, {k, function() self:changed() end})
-	end
-	table.sort(self.dict_effects_id, function(a, b) return a[1]<b[1] end)
-	for i = 1,3 do
-		self.combo_effect[i]:clear()
-		for k,v in ipairs(self.dict_effects_id) do
-			self.combo_effect[i]:append{text = v[1], pressed = v[2]}
-		end
-	end
+	self:set_anim(self.combo_anim.text)
 end
 
 --- Shows the feat for the given quickslot.
