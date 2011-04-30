@@ -57,7 +57,14 @@ Widgets.ComboBox.activate = function(self, args)
 	else
 		self.text = widget.text
 	end
+	-- Allow a user callback.
+	self:activated()
 	return true
+end
+
+--- Called when a row of the combo box menu is activated.
+-- @param self Combo box.
+Widgets.ComboBox.activated = function(self)
 end
 
 --- Appends a new item to the combo box.
@@ -72,6 +79,7 @@ Widgets.ComboBox.append = function(self, args)
 		self.value = row
 		self.menu.visible = false
 		if args.pressed then args.pressed(self, row) end
+		self:activated()
 	end}
 	self.menu:append_row(widget)
 end
