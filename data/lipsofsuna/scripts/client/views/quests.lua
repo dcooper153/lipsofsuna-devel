@@ -3,6 +3,7 @@ Views.Quests = Class(Widget)
 Views.Quests.new = function(clss)
 	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0, 0}})
 	self.dict_name = {}
+	self.sound_play_time = Program.time
 	self.list = Widgets.List()
 	self.list.pressed = function(view, row) self:show(row) end
 	self.quest_info = Widgets.QuestInfo()
@@ -86,6 +87,7 @@ end}
 Protocol:add_handler{type = "QUEST_STATUS", func = function(event)
 	local ok,id,c,t = event.packet:read("uint32", "uint8", "string")
 	if ok then
+		-- Update the quest.
 		local quest = Quest:find{id = id}
 		if not quest then return end
 		if quest.status == "inactive" and c == 0 then
@@ -103,6 +105,10 @@ Protocol:add_handler{type = "QUEST_STATUS", func = function(event)
 			quest.text = t
 			Views.Quests.inst:update(quest)
 		end
-		Effect:play("quest1")
+		-- Play a sound effect unless not played too recently.
+		if Program.time - Views.Quests.inst.sound_play_time > 2 then
+			View.Quests.inst.sound_play_time = Program.time
+			Effect:play("quest1")
+		end
 	end
 end}
