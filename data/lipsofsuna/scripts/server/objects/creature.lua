@@ -362,8 +362,8 @@ Creature.equip_item = function(self, args)
 				if v.spec.equipment_slots_reserved[slot] then
 					conflict = true
 				elseif spec.equipment_slots_reserved then
-					for k1 in pairs(args.object.spec_equipment_slots_reserved) do
-						if v.equipment_slots_reserved[k1] then conflict = true end
+					for k1 in pairs(spec.equipment_slots_reserved) do
+						if v.spec.equipment_slots_reserved[k1] then conflict = true end
 					end
 				end
 			end
