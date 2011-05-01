@@ -101,9 +101,9 @@ char* lisys_system_get_path_data_home ()
 #ifdef __WIN32__
 	char tmp[MAX_PATH];
 
-	if (!SHGetSpecialFolderPath (NULL, tmp, CSIDL_APPDATA, TRUE))
+	if (!SHGetSpecialFolderPath (NULL, tmp, CSIDL_PERSONAL, TRUE))
 		return NULL;
-	return strdup (tmp);
+	return lisys_path_concat (tmp, "My Games", NULL);
 #else
 	char* ret;
 	char* tmp;
