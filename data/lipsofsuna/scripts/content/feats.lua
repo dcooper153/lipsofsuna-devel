@@ -104,7 +104,6 @@ Feateffectspec{
 Feateffectspec{
 	name = "physical damage",
 	categories = {"melee", "physical"},
-	description = "Inflict physical damage",
 	effect = "impact1",
 	icon = "modifier-physical",
 	influences = {{"physical", -1, -0.2}},

@@ -1,4 +1,5 @@
 require "client/quickslots"
+require "client/widgets/spelleffect"
 
 Views.Feats = Class(Widget)
 Views.Feats.mode = "chargen"
@@ -7,9 +8,9 @@ Views.Feats.mode = "chargen"
 -- @param clss Feats class.
 -- @return Feats.
 Views.Feats.new = function(clss)
-	local self = Widget.new(clss, {cols = 1, spacings = {0,0,0,0}})
+	local self = Widget.new(clss, {cols = 2, rows = 1, spacings = {0,0}})
 	-- Title.
-	self.title = Widgets.Frame{style = "title", text = "Spells"}
+	self.title = Widgets.Frame{style = "title", text = "Spell"}
 	-- Animation selector.
 	local label = Widgets.Label{text = "Type"}
 	label:set_request{width = 46}
@@ -44,8 +45,6 @@ Views.Feats.new = function(clss)
 	-- Information display.
 	self.label_skills = Widgets.Label{valign = 0, color = {0,0,0,1}}
 	self.label_reagents = Widgets.Label{valign = 0, color = {0,0,0,1}}
-	self.label_description = Widgets.Label{valign = 0, color = {0,0,0,1}}
-	self.label_description:set_request{height = 80, width = 270}
 	self.group_req = Widget{rows = 2, cols = 2}
 	self.group_req:set_expand{col = 1, row = 2}
 	self.group_req:set_expand{col = 2}
@@ -54,11 +53,9 @@ Views.Feats.new = function(clss)
 	self.group_req:set_child{row = 2, col = 1, widget = self.label_skills}
 	self.group_req:set_child{row = 2, col = 2, widget = self.label_reagents}
 	self.group_info = Widgets.Frame{rows = 3, cols = 1, style = "paper"}
-	self.group_info:set_request{height = 310}
-	self.group_info:set_expand{col = 1, row = 3}
-	self.group_info:set_child{row = 1, col = 1, widget = Widgets.Label{font = "medium", text = "Description", color = {0,0,0,1}}}
-	self.group_info:set_child{row = 2, col = 1, widget = self.label_description}
-	self.group_info:set_child{row = 3, col = 1, widget = self.group_req}
+	self.group_info:set_request{height = 210}
+	self.group_info:set_expand{col = 1, row = 1}
+	self.group_info:set_child{row = 1, col = 1, widget = self.group_req}
 	-- Quickslot selector.
 	self.combo_slot = Widgets.ComboBox()
 	for i = 1,12 do
@@ -73,18 +70,42 @@ Views.Feats.new = function(clss)
 	-- Assign button.
 	self.button_assign = Widgets.Button{text = "Assign to the quickslot"}
 	self.button_assign.pressed = function() self:assign() end
-	-- Packing for the dialog.
+	-- Packing the spell pane.
 	self.group = Widgets.Frame{cols = 1}
 	self.group:append_row(self.group_slot)
 	self.group:append_row(self.group_anim)
 	self.group:append_row(self.group_effect)
 	self.group:append_row(self.button_assign)
-	self:append_row(self.title)
-	self:append_row(self.group)
-	self:append_row(self.group_info)
+	self.group_spells = Widget{cols = 1, rows = 3, spacings = {0,0}}
+	self.group_spells:set_child(1, 1, self.title)
+	self.group_spells:set_child(1, 2, self.group)
+	self.group_spells:set_child(1, 3, self.group_info)
+	-- Effect pane.
+	self.list_effects = Widgets.List{page_size = 10}
+	self.title_effects = Widgets.Frame{style = "title", text = "Effects"}
+	self.frame_effects = Widgets.Frame{style = "default", cols = 1, rows = 1}
+	self.frame_effects:set_child(1, 1, self.list_effects)
+	self.frame_effects:set_expand{col = 1, row = 1}
+	self.group_effects = Widget{cols = 1, rows = 2, spacings = {0,0}}
+	self.group_effects:set_expand{col = 1, row = 2}
+	self.group_effects:set_child(1, 1, self.title_effects)
+	self.group_effects:set_child(1, 2, self.frame_effects)
+	-- Packing the dialog.
+	self:set_child(1, 1, self.group_spells)
+	self:set_child(2, 1, self.group_effects)
 	-- Show the first feat.
 	self:show(1)
 	return self
+end
+
+Views.Feats.add_effect = function(self, effect)
+	for j = 1,3 do
+		local w = self.combo_effect[j]
+		if not w.text or w.text == "" then
+			w:activate{text = effect.name}
+			return
+		end
+	end
 end
 
 Views.Feats.assign = function(self)
@@ -147,20 +168,6 @@ Views.Feats.changed = function(self)
 		reagent_str = reagent_str .. (reagent_str ~= "" and "\n" or "") .. v
 	end
 	self.label_reagents.text = reagent_str
-	-- Display Description.
-	local desc = ""
-	local anim = Featanimspec:find{name = self.combo_anim.text}
-	if anim then
-		desc = " - " .. anim.description
-		for i = 1,3 do
-			local name = effects[i] or ""
-			local effect = Feateffectspec:find{name = name}
-			if effect and effect.description then
-				desc = string.format("%s\n - %s", desc, effect.description)
-			end
-		end
-	end
-	self.label_description.text = desc
 end
 
 --- Sets the feat animation.
@@ -185,6 +192,27 @@ Views.Feats.set_anim = function(self, name)
 		for k,v in ipairs(self.dict_effects_id) do
 			self.combo_effect[i]:append{text = v[1], pressed = v[2]}
 		end
+	end
+
+	-- Create the list of effects.
+	local effects = {}
+	if spec then
+		for k in pairs(spec.feat_effects) do
+			local e = Feateffectspec:find{name = k}
+			if e and e.description then
+				table.insert(effects, k)
+			end
+		end
+		table.sort(effects)
+	end
+	-- Update the effect list.
+	self.list_effects:clear()
+	for k,v in ipairs(effects) do
+		local w = Widgets.Spelleffect{
+			active = anim and anim.effects[v],
+			effect = Feateffectspec:find{name = v},
+			pressed = function(w) self:add_effect(w.effect) end}
+		self.list_effects:append{widget = w}
 	end
 end
 
