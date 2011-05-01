@@ -107,7 +107,7 @@ Protocol:add_handler{type = "QUEST_STATUS", func = function(event)
 		end
 		-- Play a sound effect unless not played too recently.
 		if Program.time - Views.Quests.inst.sound_play_time > 2 then
-			View.Quests.inst.sound_play_time = Program.time
+			Views.Quests.inst.sound_play_time = Program.time
 			Effect:play("quest1")
 		end
 	end
