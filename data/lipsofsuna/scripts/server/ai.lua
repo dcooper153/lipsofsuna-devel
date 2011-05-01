@@ -245,12 +245,14 @@ Ai.choose_combat_action = function(self)
 	-- Calculate the weapon switch probability.
 	-- The weapon is switched if it's much worse than the best possible weapon.
 	-- Offensive, magnitude is 0 or 3.
-	local curr,melee,ranged,throw = 1,1,0,0
-	if weapon then curr,melee,ranged,throw = self:calculate_weapon_ratings(weapon) end
-	local best = math.max(self.melee_rating, self.ranged_rating, self.throw_rating)
 	local p_weapon = 0
-	if (curr + 5 < best) or (curr == 0 and best > 0) then
-		p_weapon = 3
+	if spec.ai_enable_weapon_switch then
+		local curr,melee,ranged,throw = 1,1,0,0
+		if weapon then curr,melee,ranged,throw = self:calculate_weapon_ratings(weapon) end
+		local best = math.max(self.melee_rating, self.ranged_rating, self.throw_rating)
+		if (curr + 5 < best) or (curr == 0 and best > 0) then
+			p_weapon = 3
+		end
 	end
 	-- Calculate the backstep probability.
 	-- Backstepping is preferred if the creature is too close to the target.

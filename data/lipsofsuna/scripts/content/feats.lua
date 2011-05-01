@@ -153,6 +153,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "growl1",
 	effect_impact = "impact1",
+	effects = {"strength to physical damage"},
 	influences = {{"physical", -1}},
 	slot = "mouth"}
 
@@ -163,6 +164,7 @@ Featanimspec{
 	categories = {"melee"},
 	cooldown = 4,
 	effect_impact = "impact1",
+	effects = {"strength to physical damage"},
 	influences = {{"physical", -50}},
 	slot = "mouth"}
 
@@ -171,6 +173,7 @@ Featanimspec{
 	animation = "explode",
 	categories = {"explode", "melee"},
 	cooldown = 2,
+	effects = {"strength to physical damage"},
 	influences = {{"physical", -1}},
 	effect = "swing1"}
 
@@ -182,6 +185,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
+	effects = {"strength to physical damage"},
 	influences = {{"physical", -30}},
 	slot = "hand.L"}
 
@@ -193,6 +197,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
+	effects = {"strength to physical damage"},
 	influences = {{"physical", -30}},
 	slot = "hand.R"}
 

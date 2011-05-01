@@ -550,6 +550,7 @@ Species{
 	difficulty = 0,
 	factions = {"evil"},
 	feat_anims = {"bite"},
+	feat_effects = {"strength to physical damage"},
 	inventory_size = 3,
 	inventory_items = {"hide", "hide"},
 	jump_force = 3,
@@ -717,6 +718,8 @@ Species{
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	ai_enable_block = false,
+	ai_enable_strafe = false,
+	ai_enable_weapon_switch = false,
 	ai_offense_factor = 0.8,
 	categories = {"enemy", "mining"},
 	difficulty = 0,
@@ -742,6 +745,8 @@ Species{
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
 	ai_enable_block = false,
+	ai_enable_strafe = false,
+	ai_enable_weapon_switch = false,
 	ai_offense_factor = 0.8,
 	categories = {"enemy", "mining"},
 	difficulty = 0.2,

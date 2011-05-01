@@ -18,6 +18,7 @@ Species.dict_name = {}
 --   <li>ai_enable_strafe: False to prohibit strafing.</li>
 --   <li>ai_enable_wander: False to prohibit wandering.</li>
 --   <li>ai_enable_walk: False to prohibit walking.</li>
+--   <li>ai_enable_weapon_switch: False to prohibit weapon switching.</li>
 --   <li>ai_enabled: False to disable AI for the species.</li>
 --   <li>ai_offense_factor: How much the creature prefers offense over defense, in the range of [0,1].</li>
 --   <li>ai_search_time: Time in seconds how long the AI will search for hidden foes.</li>
@@ -163,6 +164,7 @@ Species.new = function(clss, args)
 	copy("ai_enable_strafe", true)
 	copy("ai_enable_wander", true)
 	copy("ai_enable_walk", true)
+	copy("ai_enable_weapon_switch", true)
 	copy("ai_enabled", true)
 	copy("ai_offense_factor", 0.75)
 	copy("ai_search_time", 20)
