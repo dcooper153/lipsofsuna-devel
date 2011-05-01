@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -21,25 +21,17 @@
 #include <stdarg.h>
 #include <lipsofsuna/system.h>
 
-typedef int (*licalMarshal)(void*, void*, va_list);
+typedef void (*LICalMarshal)(void*, void*, va_list);
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
-LIAPICALL (int, lical_marshal_DATA, (void* call, void* data, va_list args));
-LIAPICALL (int, lical_marshal_DATA_FLT, (void* call, void* data, va_list args));
-LIAPICALL (int, lical_marshal_DATA_INT, (void* call, void* data, va_list args));
-LIAPICALL (int, lical_marshal_DATA_INT_INT, (void* call, void* data, va_list args));
-LIAPICALL (int, lical_marshal_DATA_INT_PTR, (void* call, void* data, va_list args));
-LIAPICALL (int, lical_marshal_DATA_PTR, (void* call, void* data, va_list args));
-LIAPICALL (int, lical_marshal_DATA_PTR_INT, (void* call, void* data, va_list args));
-LIAPICALL (int, lical_marshal_DATA_PTR_PTR, (void* call, void* data, va_list args));
-LIAPICALL (int, lical_marshal_DATA_PTR_PTR_INT, (void* call, void* data, va_list args));
-LIAPICALL (int, lical_marshal_DATA_PTR_PTR_PTR, (void* call, void* data, va_list args));
-
-#ifdef __cplusplus
-}
-#endif
+LIAPICALL (void, lical_marshal_DATA, (void* call, void* data, va_list args));
+LIAPICALL (void, lical_marshal_DATA_FLT, (void* call, void* data, va_list args));
+LIAPICALL (void, lical_marshal_DATA_INT, (void* call, void* data, va_list args));
+LIAPICALL (void, lical_marshal_DATA_INT_INT, (void* call, void* data, va_list args));
+LIAPICALL (void, lical_marshal_DATA_INT_PTR, (void* call, void* data, va_list args));
+LIAPICALL (void, lical_marshal_DATA_PTR, (void* call, void* data, va_list args));
+LIAPICALL (void, lical_marshal_DATA_PTR_INT, (void* call, void* data, va_list args));
+LIAPICALL (void, lical_marshal_DATA_PTR_PTR, (void* call, void* data, va_list args));
+LIAPICALL (void, lical_marshal_DATA_PTR_PTR_INT, (void* call, void* data, va_list args));
+LIAPICALL (void, lical_marshal_DATA_PTR_PTR_PTR, (void* call, void* data, va_list args));
 
 #endif

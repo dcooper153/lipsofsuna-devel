@@ -136,20 +136,6 @@ LIAPICALL (void, liwdg_widget_foreach_child, (
 	void       (*call)(),
 	void*        data));
 
-LIAPICALL (int, liwdg_widget_insert_callback, (
-	LIWdgWidget* self,
-	const char*  type,
-	void*        func,
-	void*        data));
-
-LIAPICALL (int, liwdg_widget_insert_callback_full, (
-	LIWdgWidget* self,
-	const char*  type,
-	int          priority,
-	void*        func,
-	void*        data,
-	LICalHandle* handle));
-
 LIAPICALL (int, liwdg_widget_insert_col, (
 	LIWdgWidget* self,
 	int          index));

@@ -86,7 +86,7 @@ liser_server_free (LISerServer* self)
 {
 	/* Invoke callbacks. */
 	if (self->callbacks != NULL)
-		lical_callbacks_call (self->callbacks, self, "server-free", lical_marshal_DATA);
+		lical_callbacks_call (self->callbacks, "server-free", lical_marshal_DATA);
 
 	/* Free program. */
 	if (self->program != NULL)

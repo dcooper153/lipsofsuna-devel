@@ -44,7 +44,6 @@ static void Widget_new (LIScrArgs* args)
 		return;
 	}
 	liwdg_widget_set_script (self, data);
-	liwdg_widget_insert_callback (self, "paint", liext_widgets_callback_paint, data);
 	liscr_args_seti_data (args, data);
 }
 

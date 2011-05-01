@@ -67,7 +67,7 @@ LIExtModule* liext_speeches_new (
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "tick", 1, private_tick, self, self->calls + 0))
+	if (!lical_callbacks_insert (program->callbacks, "tick", 1, private_tick, self, self->calls + 0))
 	{
 		liext_speeches_free (self);
 		return NULL;

@@ -66,7 +66,7 @@ LIExtModule* liext_tiles_new (
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_tick, self, self->calls + 0))
+	if (!lical_callbacks_insert (program->callbacks, "tick", 0, private_tick, self, self->calls + 0))
 	{
 		liext_tiles_free (self);
 		return NULL;

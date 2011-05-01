@@ -80,10 +80,10 @@ LIExtModule* liext_physics_new (
 	liext_script_physics (program->script);
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "model-changed", 1, private_model_changed, self, self->calls + 0) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "model-free", 1, private_model_free, self, self->calls + 1) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "model-new", 1, private_model_new, self, self->calls + 2) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", -65535, private_tick, self, self->calls + 3))
+	if (!lical_callbacks_insert (program->callbacks, "model-changed", 1, private_model_changed, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, "model-free", 1, private_model_free, self, self->calls + 1) ||
+	    !lical_callbacks_insert (program->callbacks, "model-new", 1, private_model_new, self, self->calls + 2) ||
+	    !lical_callbacks_insert (program->callbacks, "tick", -65535, private_tick, self, self->calls + 3))
 	{
 		liext_physics_free (self);
 		return NULL;

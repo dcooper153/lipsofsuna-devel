@@ -98,7 +98,7 @@ void limai_program_free (
 
 	/* Invoke callbacks. */
 	if (self->callbacks != NULL)
-		lical_callbacks_call (self->callbacks, self, "program-shutdown", lical_marshal_DATA);
+		lical_callbacks_call (self->callbacks, "program-shutdown", lical_marshal_DATA);
 
 	/* Clear all sector data. */
 	if (self->sectors != NULL)
@@ -134,7 +134,7 @@ void limai_program_free (
 
 	/* Invoke callbacks. */
 	if (self->callbacks != NULL)
-		lical_callbacks_call (self->callbacks, self, "program-free", lical_marshal_DATA);
+		lical_callbacks_call (self->callbacks, "program-free", lical_marshal_DATA);
 
 	/* Free callbacks. */
 	if (self->callbacks != NULL)
@@ -520,7 +520,7 @@ int limai_program_update (
 	lialg_sectors_update (self->sectors, secs);
 	liscr_script_update (self->script, secs);
 	lieng_engine_update (self->engine, secs);
-	lical_callbacks_call (self->callbacks, self->engine, "tick", lical_marshal_DATA_FLT, secs);
+	lical_callbacks_call (self->callbacks, "tick", lical_marshal_DATA_FLT, secs);
 	liscr_script_set_gc (self->script, 1);
 
 	/* Sleep until end of frame. */
@@ -608,10 +608,10 @@ static int private_init (
 	liscr_script_vector (self->script);
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (self->callbacks, self->engine, "object-motion", 63353, private_object_motion, self, self->calls + 0) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "sector-free", 65535, private_sector_free, self, self->calls + 1) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "sector-load", 65535, private_sector_load, self, self->calls + 2) ||
-	    !lical_callbacks_insert (self->callbacks, self->engine, "tick", 2, private_tick, self, self->calls + 3))
+	if (!lical_callbacks_insert (self->callbacks, "object-motion", 63353, private_object_motion, self, self->calls + 0) ||
+	    !lical_callbacks_insert (self->callbacks, "sector-free", 65535, private_sector_free, self, self->calls + 1) ||
+	    !lical_callbacks_insert (self->callbacks, "sector-load", 65535, private_sector_load, self, self->calls + 2) ||
+	    !lical_callbacks_insert (self->callbacks, "tick", 2, private_tick, self, self->calls + 3))
 		return 0;
 
 	lialg_random_init (&self->random, lisys_time (NULL));

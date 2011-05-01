@@ -76,7 +76,7 @@ LIEngObject* lieng_object_new (
 		goto error;
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, self->engine, "object-new", lical_marshal_DATA_PTR, self);
+	lical_callbacks_call (self->engine->callbacks, "object-new", lical_marshal_DATA_PTR, self);
 
 	return self;
 
@@ -104,7 +104,7 @@ void lieng_object_free (
 		lieng_object_set_realized (self, 0);
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, self->engine, "object-free", lical_marshal_DATA_PTR, self);
+	lical_callbacks_call (self->engine->callbacks, "object-free", lical_marshal_DATA_PTR, self);
 
 	/* Remove from engine. */
 	lialg_u32dic_remove (self->engine->objects, self->id);
@@ -264,7 +264,7 @@ lieng_object_moved (LIEngObject* self)
 	}
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, self->engine, "object-motion", lical_marshal_DATA_PTR, self);
+	lical_callbacks_call (self->engine->callbacks, "object-motion", lical_marshal_DATA_PTR, self);
 
 	return 1;
 }
@@ -390,7 +390,7 @@ int lieng_object_set_model (
 	self->model = model;
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, self->engine, "object-model", lical_marshal_DATA_PTR_PTR, self, model);
+	lical_callbacks_call (self->engine->callbacks, "object-model", lical_marshal_DATA_PTR_PTR, self, model);
 
 	return 1;
 }
@@ -442,12 +442,12 @@ lieng_object_set_realized (LIEngObject* self,
 			return 0;
 
 		/* Invoke callbacks. */
-		lical_callbacks_call (self->engine->callbacks, self->engine, "object-visibility", lical_marshal_DATA_PTR_INT, self, 1);
+		lical_callbacks_call (self->engine->callbacks, "object-visibility", lical_marshal_DATA_PTR_INT, self, 1);
 	}
 	else
 	{
 		/* Invoke callbacks. */
-		lical_callbacks_call (self->engine->callbacks, self->engine, "object-visibility", lical_marshal_DATA_PTR_INT, self, 0);
+		lical_callbacks_call (self->engine->callbacks, "object-visibility", lical_marshal_DATA_PTR_INT, self, 0);
 
 		/* Remove from map. */
 		lieng_sector_remove_object (self->sector, self);
@@ -457,8 +457,8 @@ lieng_object_set_realized (LIEngObject* self,
 	return 1;
 }
 
-LIEngSector*
-lieng_object_get_sector (LIEngObject* self)
+LIEngSector* lieng_object_get_sector (
+	LIEngObject* self)
 {
 	return self->sector;
 }
@@ -498,20 +498,20 @@ lieng_object_set_transform (LIEngObject*          self,
 	self->transform = *value;
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, self->engine, "object-transform", lical_marshal_DATA_PTR_PTR, self, value);
+	lical_callbacks_call (self->engine->callbacks, "object-transform", lical_marshal_DATA_PTR_PTR, self, value);
 
 	return 1;
 }
 
-void*
-lieng_object_get_userdata (LIEngObject* self)
+void* lieng_object_get_userdata (
+	LIEngObject* self)
 {
 	return self->userdata;
 }
 
-void
-lieng_object_set_userdata (LIEngObject* self,
-                           void*        data)
+void lieng_object_set_userdata (
+	LIEngObject* self,
+	void*        data)
 {
 	self->userdata = data;
 }

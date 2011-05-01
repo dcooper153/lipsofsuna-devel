@@ -63,7 +63,7 @@ LIExtReload* liext_reload_new (
 	lirel_reload_set_model_callback (self->reload, private_reload_model, self);
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_callback_tick, self, self->calls + 0))
+	if (!lical_callbacks_insert (program->callbacks, "tick", 0, private_callback_tick, self, self->calls + 0))
 	{
 		liext_reload_free (self);
 		return NULL;

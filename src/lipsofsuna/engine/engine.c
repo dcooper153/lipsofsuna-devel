@@ -99,7 +99,7 @@ lieng_engine_free (LIEngEngine* self)
 	}
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->callbacks, self, "free", lical_marshal_DATA_PTR, self);
+	lical_callbacks_call (self->callbacks, "free", lical_marshal_DATA_PTR, self);
 
 	/* Clear sector data. */
 	if (self->sectors != NULL)
@@ -236,7 +236,7 @@ static void private_sector_free (
 	LIEngEngine* engine = self;
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (engine->callbacks, self, "sector-free", lical_marshal_DATA_INT, sector->index);
+	lical_callbacks_call (engine->callbacks, "sector-free", lical_marshal_DATA_INT, sector->index);
 }
 
 static void private_sector_load (
@@ -246,7 +246,7 @@ static void private_sector_load (
 	LIEngEngine* engine = self;
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (engine->callbacks, self, "sector-load", lical_marshal_DATA_INT, sector->index);
+	lical_callbacks_call (engine->callbacks, "sector-load", lical_marshal_DATA_INT, sector->index);
 }
 
 /** @} */

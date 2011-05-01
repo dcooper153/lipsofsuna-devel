@@ -28,7 +28,7 @@
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
-	LICalHandle calls[3];
+	LICalHandle calls[4];
 	LICliClient* client;
 	LIMaiProgram* program;
 	LIWdgManager* widgets;
@@ -39,9 +39,6 @@ LIExtModule* liext_widgets_new (
 
 void liext_widgets_free (
 	LIExtModule* self);
-
-void liext_widgets_callback_paint (
-	LIScrData* data);
 
 /*****************************************************************************/
 

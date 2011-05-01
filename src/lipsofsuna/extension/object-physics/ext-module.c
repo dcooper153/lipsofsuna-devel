@@ -102,16 +102,16 @@ LIExtModule* liext_object_physics_new (
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program->engine, "model-changed", -65535, private_model_changed, self, self->calls + 0) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "model-free", -65535, private_model_free, self, self->calls + 1) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "model-new", -65535, private_model_new, self, self->calls + 2) ||
-	    !lical_callbacks_insert (program->callbacks, self->physics, "object-contact", -65535, private_object_contact, self, self->calls + 3) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-free", -65535, private_object_free, self, self->calls + 4) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-model", -65535, private_object_model, self, self->calls + 5) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-new", -65535, private_object_new, self, self->calls + 6) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-transform", -65535, private_object_transform, self, self->calls + 7) ||
-	    !lical_callbacks_insert (program->callbacks, self->physics, "object-transform", -65535, private_physics_transform, self, self->calls + 8) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "object-visibility", -65535, private_object_visibility, self, self->calls + 9))
+	if (!lical_callbacks_insert (program->callbacks, "model-changed", -65535, private_model_changed, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, "model-free", -65535, private_model_free, self, self->calls + 1) ||
+	    !lical_callbacks_insert (program->callbacks, "model-new", -65535, private_model_new, self, self->calls + 2) ||
+	    !lical_callbacks_insert (program->callbacks, "object-contact", -65535, private_object_contact, self, self->calls + 3) ||
+	    !lical_callbacks_insert (program->callbacks, "object-free", -65535, private_object_free, self, self->calls + 4) ||
+	    !lical_callbacks_insert (program->callbacks, "object-model", -65535, private_object_model, self, self->calls + 5) ||
+	    !lical_callbacks_insert (program->callbacks, "object-new", -65535, private_object_new, self, self->calls + 6) ||
+	    !lical_callbacks_insert (program->callbacks, "object-transform", -65535, private_object_transform, self, self->calls + 7) ||
+	    !lical_callbacks_insert (program->callbacks, "object-visibility", -65535, private_object_visibility, self, self->calls + 8) ||
+	    !lical_callbacks_insert (program->callbacks, "physics-transform", -65535, private_physics_transform, self, self->calls + 9))
 	{
 		liext_object_physics_free (self);
 		return NULL;

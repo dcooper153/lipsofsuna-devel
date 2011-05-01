@@ -116,7 +116,7 @@ livox_sector_free (LIVoxSector* self)
 			event.block[0] = x;
 			event.block[1] = y;
 			event.block[2] = z;
-			lical_callbacks_call (self->manager->callbacks, self->manager, "block-free", lical_marshal_DATA_PTR, &event);
+			lical_callbacks_call (self->manager->callbacks, "block-free", lical_marshal_DATA_PTR, &event);
 		}
 	}
 
@@ -431,7 +431,7 @@ private_build_block (LIVoxSector* self,
 	event.block[0] = x;
 	event.block[1] = y;
 	event.block[2] = z;
-	lical_callbacks_call (self->manager->callbacks, self->manager, "block-load", lical_marshal_DATA_PTR, &event);
+	lical_callbacks_call (self->manager->callbacks, "block-load", lical_marshal_DATA_PTR, &event);
 
 	return 1;
 }

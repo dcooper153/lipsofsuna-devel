@@ -428,7 +428,7 @@ void liwdg_widget_draw (
 	LIWdgElement* elem;
 
 	/* Paint custom. */
-	lical_callbacks_call (self->manager->callbacks, self, "paint", lical_marshal_DATA_PTR, self);
+	lical_callbacks_call (self->manager->callbacks, "widget-paint", lical_marshal_DATA_PTR, self);
 
 	/* Paint canvas. */
 	for (elem = self->elements ; elem != NULL ; elem = elem->next)
@@ -470,26 +470,6 @@ void liwdg_widget_foreach_child (
 				call (data, cell->child);
 		}
 	}
-}
-
-int
-liwdg_widget_insert_callback (LIWdgWidget* self,
-                              const char*  type,
-                              void*        func,
-                              void*        data)
-{
-	return lical_callbacks_insert (self->manager->callbacks, self, type, 0, func, data, NULL);
-}
-
-int
-liwdg_widget_insert_callback_full (LIWdgWidget* self,
-                                   const char*  type,
-                                   int          priority,
-                                   void*        func,
-                                   void*        data,
-                                   LICalHandle* handle)
-{
-	return lical_callbacks_insert (self->manager->callbacks, self, type, priority, func, data, handle);
 }
 
 /**
@@ -691,7 +671,7 @@ void liwdg_widget_set_allocation (
 		self->allocation.width = w;
 		self->allocation.height = h;
 		private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
-		lical_callbacks_call (self->manager->callbacks, self->manager, "widget-allocation", lical_marshal_DATA_PTR, self);
+		lical_callbacks_call (self->manager->callbacks, "widget-allocation", lical_marshal_DATA_PTR, self);
 	}
 }
 

@@ -43,20 +43,12 @@ void LIPhyMotionState::getWorldTransform (
 void LIPhyMotionState::setWorldTransform (
 	const btTransform& transform)
 {
-	lisys_assert (!isnan (transform.getOrigin ()[0]));
-	lisys_assert (!isnan (transform.getOrigin ()[1]));
-	lisys_assert (!isnan (transform.getOrigin ()[2]));
-	lisys_assert (!isnan (transform.getRotation ()[0]));
-	lisys_assert (!isnan (transform.getRotation ()[1]));
-	lisys_assert (!isnan (transform.getRotation ()[2]));
-	lisys_assert (!isnan (transform.getRotation ()[3]));
-
 	this->current = transform;
 	if (this->object->control != NULL)
 	{
 		this->previous = this->current;
 		this->object->control->update ();
-		lical_callbacks_call (this->object->physics->callbacks, this->object->physics, "object-transform", lical_marshal_DATA_PTR, this->object);
+		lical_callbacks_call (this->object->physics->callbacks, "physics-transform", lical_marshal_DATA_PTR, this->object);
 	}
 }
 

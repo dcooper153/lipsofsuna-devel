@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,81 +24,81 @@
 
 #include "cal-marshal.h"
 
-int lical_marshal_DATA (void* call, void* data, va_list args)
+void lical_marshal_DATA (void* call, void* data, va_list args)
 {
 	int (*func)(void*) = call;
-	return func(data);
+	func(data);
 }
 
-int lical_marshal_DATA_FLT (void* call, void* data, va_list args)
+void lical_marshal_DATA_FLT (void* call, void* data, va_list args)
 {
 	int (*func)(void*, float) = call;
 	double arg0 = va_arg (args, double);
-	return func(data, arg0);
+	func(data, arg0);
 }
 
-int lical_marshal_DATA_INT (void* call, void* data, va_list args)
+void lical_marshal_DATA_INT (void* call, void* data, va_list args)
 {
 	int (*func)(void*, int) = call;
 	int arg0 = va_arg (args, int);
-	return func(data, arg0);
+	func(data, arg0);
 }
 
-int lical_marshal_DATA_INT_INT (void* call, void* data, va_list args)
+void lical_marshal_DATA_INT_INT (void* call, void* data, va_list args)
 {
 	int (*func)(void*, int, int) = call;
 	int arg0 = va_arg (args, int);
 	int arg1 = va_arg (args, int);
-	return func(data, arg0, arg1);
+	func(data, arg0, arg1);
 }
 
-int lical_marshal_DATA_INT_PTR (void* call, void* data, va_list args)
+void lical_marshal_DATA_INT_PTR (void* call, void* data, va_list args)
 {
 	int (*func)(void*, int, void*) = call;
 	int arg0 = va_arg (args, int);
 	void* arg1 = va_arg (args, void*);
-	return func(data, arg0, arg1);
+	func(data, arg0, arg1);
 }
 
-int lical_marshal_DATA_PTR (void* call, void* data, va_list args)
+void lical_marshal_DATA_PTR (void* call, void* data, va_list args)
 {
 	int (*func)(void*, void*) = call;
 	void* arg0 = va_arg (args, void*);
-	return func(data, arg0);
+	func(data, arg0);
 }
 
-int lical_marshal_DATA_PTR_INT (void* call, void* data, va_list args)
+void lical_marshal_DATA_PTR_INT (void* call, void* data, va_list args)
 {
 	int (*func)(void*, void*, int) = call;
 	void* arg0 = va_arg (args, void*);
 	int arg1 = va_arg (args, int);
-	return func(data, arg0, arg1);
+	func(data, arg0, arg1);
 }
 
-int lical_marshal_DATA_PTR_PTR (void* call, void* data, va_list args)
+void lical_marshal_DATA_PTR_PTR (void* call, void* data, va_list args)
 {
 	int (*func)(void*, void*, void*) = call;
 	void* arg0 = va_arg (args, void*);
 	void* arg1 = va_arg (args, void*);
-	return func(data, arg0, arg1);
+	func(data, arg0, arg1);
 }
 
-int lical_marshal_DATA_PTR_PTR_INT (void* call, void* data, va_list args)
+void lical_marshal_DATA_PTR_PTR_INT (void* call, void* data, va_list args)
 {
 	int (*func)(void*, void*, void*, int) = call;
 	void* arg0 = va_arg (args, void*);
 	void* arg1 = va_arg (args, void*);
 	int arg2 = va_arg (args, int);
-	return func(data, arg0, arg1, arg2);
+	func(data, arg0, arg1, arg2);
 }
 
-int lical_marshal_DATA_PTR_PTR_PTR (void* call, void* data, va_list args)
+void lical_marshal_DATA_PTR_PTR_PTR (void* call, void* data, va_list args)
 {
 	int (*func)(void*, void*, void*, void*) = call;
 	void* arg0 = va_arg (args, void*);
 	void* arg1 = va_arg (args, void*);
 	void* arg2 = va_arg (args, void*);
-	return func(data, arg0, arg1, arg2);
+	func(data, arg0, arg1, arg2);
 }
 
 /** @} */

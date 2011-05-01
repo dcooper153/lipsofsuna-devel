@@ -72,8 +72,8 @@ LIExtModule* liext_network_new (
 	self->program = program;
 
 	/* Connect callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, program, "program-shutdown", 0, private_shutdown, self, self->calls + 0) ||
-	    !lical_callbacks_insert (program->callbacks, program->engine, "tick", 0, private_update, self, self->calls + 1))
+	if (!lical_callbacks_insert (program->callbacks, "program-shutdown", 0, private_shutdown, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, "tick", 0, private_update, self, self->calls + 1))
 	{
 		liext_network_free (self);
 		return NULL;

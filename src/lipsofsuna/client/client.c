@@ -104,7 +104,7 @@ void licli_client_free (
 	LICliClient* self)
 {
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->program->callbacks, self, "client-free", lical_marshal_DATA);
+	lical_callbacks_call (self->program->callbacks, "client-free", lical_marshal_DATA);
 
 	/* Remove component. */
 	if (self->program != NULL)
@@ -235,8 +235,8 @@ static int private_init (
 	licli_script_client (program->script);
 
 	/* Register callbacks. */
-	lical_callbacks_insert (program->callbacks, program->engine, "event", -5, private_event, self, NULL);
-	lical_callbacks_insert (program->callbacks, program->engine, "tick", -1000, private_tick, self, NULL);
+	lical_callbacks_insert (program->callbacks, "event", -5, private_event, self, NULL);
+	lical_callbacks_insert (program->callbacks, "tick", -1000, private_tick, self, NULL);
 
 	return 1;
 }
@@ -268,8 +268,8 @@ static int private_event (
 			   (event->key.keysym.mod & KMOD_CTRL) &&
 			   (event->key.keysym.mod & KMOD_SHIFT))
 			{
-				lical_callbacks_call (self->program->callbacks, self->program, "context-lost", lical_marshal_DATA_INT, 0);
-				lical_callbacks_call (self->program->callbacks, self->program, "context-lost", lical_marshal_DATA_INT, 1);
+				lical_callbacks_call (self->program->callbacks, "context-lost", lical_marshal_DATA_INT, 0);
+				lical_callbacks_call (self->program->callbacks, "context-lost", lical_marshal_DATA_INT, 1);
 			}
 			/* Fall through */
 		case SDL_KEYUP:
@@ -365,7 +365,7 @@ static int private_tick (
 
 	/* Invoke input callbacks. */
 	while (SDL_PollEvent (&event))
-		lical_callbacks_call (self->program->callbacks, self->program->engine, "event", lical_marshal_DATA_PTR, &event);
+		lical_callbacks_call (self->program->callbacks, "event", lical_marshal_DATA_PTR, &event);
 
 	/* Pointer warping in movement mode. */
 #ifndef ENABLE_GRABS

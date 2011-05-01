@@ -108,7 +108,7 @@ liai_manager_new (LICalCallbacks* callbacks,
 
 	/* Register callbacks. */
 	if (self->voxels != NULL)
-		lical_callbacks_insert (self->voxels->callbacks, self->voxels, "load-block", 1, private_block_load, self, self->calls + 0);
+		lical_callbacks_insert (self->voxels->callbacks, "load-block", 1, private_block_load, self, self->calls + 0);
 
 	return self;
 }

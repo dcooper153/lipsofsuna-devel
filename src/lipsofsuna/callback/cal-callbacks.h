@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,8 +18,8 @@
 #ifndef __CAL_CALLBACKS_H__
 #define __CAL_CALLBACKS_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/algorithm.h"
+#include "lipsofsuna/system.h"
 #include "cal-handle.h"
 #include "cal-marshal.h"
 
@@ -35,36 +35,23 @@ struct _LICalCallfunc
 
 struct _LICalCallbacks
 {
-	LIAlgMemdic* types;
+	LIAlgStrdic* types;
 	LICalCallfunc* removed;
 };
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 LIAPICALL (LICalCallbacks*, lical_callbacks_new, ());
 
 LIAPICALL (void, lical_callbacks_free, (
 	LICalCallbacks* self));
 
-LIAPICALL (int, lical_callbacks_call, (
+LIAPICALL (void, lical_callbacks_call, (
 	LICalCallbacks* self,
-	void*           object,
 	const char*     type,
-	licalMarshal    marshal,
+	LICalMarshal    marshal,
 	                ...));
-
-LIAPICALL (int, lical_callbacks_callva, (
-	LICalCallbacks* self,
-	void*           object,
-	const char*     type,
-	licalMarshal    marshal,
-	va_list         args));
 
 LIAPICALL (int, lical_callbacks_insert, (
 	LICalCallbacks* self,
-	void*           object,
 	const char*     type,
 	int             priority,
 	void*           call,
@@ -73,9 +60,5 @@ LIAPICALL (int, lical_callbacks_insert, (
 
 LIAPICALL (void, lical_callbacks_update, (
 	LICalCallbacks* self));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

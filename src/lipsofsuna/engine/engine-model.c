@@ -64,7 +64,7 @@ LIEngModel* lieng_model_new (
 	}
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, self->engine, "model-new", lical_marshal_DATA_PTR, self);
+	lical_callbacks_call (self->engine->callbacks, "model-new", lical_marshal_DATA_PTR, self);
 
 	return self;
 }
@@ -104,7 +104,7 @@ LIEngModel* lieng_model_new_copy (
 	}
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, self->engine, "model-new", lical_marshal_DATA_PTR_PTR, self, model);
+	lical_callbacks_call (self->engine->callbacks, "model-new", lical_marshal_DATA_PTR_PTR, self, model);
 
 	return self;
 }
@@ -118,7 +118,7 @@ void lieng_model_free (
 	lialg_u32dic_remove (self->engine->models, self->id);
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, self->engine, "model-free", lical_marshal_DATA_PTR, self);
+	lical_callbacks_call (self->engine->callbacks, "model-free", lical_marshal_DATA_PTR, self);
 
 	/* Remove from objects. */
 	/* Keeping the model alive when it's assigned to objects is the job of scripts.
@@ -287,7 +287,7 @@ static void private_changed (
 	}
 
 	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, self->engine, "model-changed", lical_marshal_DATA_PTR, self);
+	lical_callbacks_call (self->engine->callbacks, "model-changed", lical_marshal_DATA_PTR, self);
 }
 
 /** @} */

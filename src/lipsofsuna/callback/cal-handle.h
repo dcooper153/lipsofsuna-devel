@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,14 +27,9 @@ typedef struct _LICalHandle LICalHandle;
 struct _LICalHandle
 {
 	LICalCallbacks* calls;
-	void* object;
 	char type[32];
 	LICalCallfunc* func;
 };
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 LIAPICALL (void, lical_handle_release, (
 	LICalHandle* self));
@@ -42,9 +37,5 @@ LIAPICALL (void, lical_handle_release, (
 LIAPICALL (void, lical_handle_releasev, (
 	LICalHandle* self,
 	int          count));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

@@ -523,13 +523,13 @@ static bool private_contact_processed (
 
 	/* Invoke callbacks. */
 	if (contact.object0 != NULL && contact.object0->config.contact_events)
-		lical_callbacks_call (physics->callbacks, physics, "object-contact", lical_marshal_DATA_PTR, &contact);
+		lical_callbacks_call (physics->callbacks, "object-contact", lical_marshal_DATA_PTR, &contact);
 	if (contact.object1 != NULL && contact.object1->config.contact_events)
 	{
 		object = contact.object0;
 		contact.object0 = contact.object1;
 		contact.object1 = object;
-		lical_callbacks_call (physics->callbacks, physics, "object-contact", lical_marshal_DATA_PTR, &contact);
+		lical_callbacks_call (physics->callbacks, "object-contact", lical_marshal_DATA_PTR, &contact);
 	}
 
 	return false;

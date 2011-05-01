@@ -38,7 +38,7 @@ static int private_object_free (
 int liser_server_init_callbacks_client (
 	LISerServer* server)
 {
-	lical_callbacks_insert (server->callbacks, server->engine, "object-free", 65535, private_object_free, server, NULL);
+	lical_callbacks_insert (server->callbacks, "object-free", 65535, private_object_free, server, NULL);
 	return 1;
 }
 
