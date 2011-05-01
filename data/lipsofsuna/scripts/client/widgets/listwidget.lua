@@ -12,6 +12,7 @@ Widgets.List.new = function(clss, args)
 	self.list:set_expand{col = 1}
 	self.scroll = Widgets.Scrollbar{changed = function(w, p) self:set_offset(p) end}
 	self.scroll:set_range(0, 1, 3)
+	if args and args.page_size then self.page_size = args.page_size end
 	self:set_child{col = 1, row = 1, widget = self.list}
 	self:set_child{col = 2, row = 1, widget = self.scroll}
 	self:set_expand{col = 1, row = 1}
@@ -73,3 +74,11 @@ Widgets.List.set_offset = function(self, offset)
 		self.list:set_child{col = 1, row = i, widget = self.table[offset + i]}
 	end
 end
+
+Widgets.List:add_getters{
+	page_size = function(self) return self.scroll.page end}
+
+Widgets.List:add_setters{
+	page_size = function(self, value)
+		self.scroll:set_range(#self.table, nil, value)
+	end}
