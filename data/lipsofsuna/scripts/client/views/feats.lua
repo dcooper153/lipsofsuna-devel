@@ -20,28 +20,33 @@ Views.Feats.new = function(clss)
 	self.group_anim:set_child{col = 1, row = 1, widget = label}
 	self.group_anim:set_child{col = 2, row = 1, widget = self.combo_anim}
 	-- Effect selectors.
-	self.combo_effect = {}
+	self.spell_effect = {}
 	self.scroll_effect = {}
 	for i = 1,3 do
-		self.combo_effect[i] = Widgets.ComboBox()
-		self.combo_effect[i]:set_request{width = 150}
-		self.scroll_effect[i] = Widgets.Progress{min = 0, max = 100, value = 0, pressed = function(w)
+		self.spell_effect[i] = Widgets.Spelleffect{active = true, visible = false, compact = true,
+			tooltip = Widgets.Tooltip{text = "Click to remove from the spell"}, pressed = function()
+			self.spell_effect[i].effect = nil
+			self.spell_effect[i].visible = false
+			self.scroll_effect[i].visible = false
+			self:changed()
+		end}
+		self.spell_effect[i]:set_request{width = 150}
+		self.scroll_effect[i] = Widgets.Progress{min = 0, max = 100, visible = false, value = 0, pressed = function(w)
 			w.value = w:get_value_at(Client.cursor_pos)
 			self:changed()
 		end}
-		self.scroll_effect[i]:set_request{width = 100}
+		self.scroll_effect[i]:set_request{width = 150}
 	end
-	self.group_effect = Widget{cols = 3, rows = 3}
-	self.group_effect:set_expand{col = 3}
-	self.group_effect:set_child{col = 1, row = 1, widget = Widgets.Label{text = "Effect 1"}}
-	self.group_effect:set_child{col = 1, row = 2, widget = Widgets.Label{text = "Effect 2"}}
-	self.group_effect:set_child{col = 1, row = 3, widget = Widgets.Label{text = "Effect 3"}}
-	self.group_effect:set_child{col = 2, row = 1, widget = self.combo_effect[1]}
-	self.group_effect:set_child{col = 2, row = 2, widget = self.combo_effect[2]}
-	self.group_effect:set_child{col = 2, row = 3, widget = self.combo_effect[3]}
-	self.group_effect:set_child{col = 3, row = 1, widget = self.scroll_effect[1]}
-	self.group_effect:set_child{col = 3, row = 2, widget = self.scroll_effect[2]}
-	self.group_effect:set_child{col = 3, row = 3, widget = self.scroll_effect[3]}
+	self.group_effect = Widget{cols = 2, rows = 3}
+	self.group_effect:set_request{width = 310, height = 36 * 3 + 10}
+	self.group_effect:set_expand{col = 1}
+	self.group_effect:set_expand{col = 2}
+	self.group_effect:set_child{col = 1, row = 1, widget = self.spell_effect[1]}
+	self.group_effect:set_child{col = 1, row = 2, widget = self.spell_effect[2]}
+	self.group_effect:set_child{col = 1, row = 3, widget = self.spell_effect[3]}
+	self.group_effect:set_child{col = 2, row = 1, widget = self.scroll_effect[1]}
+	self.group_effect:set_child{col = 2, row = 2, widget = self.scroll_effect[2]}
+	self.group_effect:set_child{col = 2, row = 3, widget = self.scroll_effect[3]}
 	-- Information display.
 	self.label_skills = Widgets.Label{valign = 0, color = {0,0,0,1}}
 	self.label_reagents = Widgets.Label{valign = 0, color = {0,0,0,1}}
@@ -100,9 +105,12 @@ end
 
 Views.Feats.add_effect = function(self, effect)
 	for j = 1,3 do
-		local w = self.combo_effect[j]
-		if not w.text or w.text == "" then
-			w:activate{text = effect.name}
+		local w = self.spell_effect[j]
+		if not w.effect then
+			w.effect = effect
+			w.visible = true
+			self.scroll_effect[j].visible = true
+			self:changed()
 			return
 		end
 	end
@@ -113,8 +121,11 @@ Views.Feats.assign = function(self)
 	local effects = {}
 	local values = {}
 	for i = 1,3 do
-		table.insert(effects, self.combo_effect[i].text)
-		table.insert(values, self.scroll_effect[i].value)
+		local e = self.spell_effect[i].effect
+		if e then
+			table.insert(effects, e.name)
+			table.insert(values, self.scroll_effect[i].value)
+		end
 	end
 	-- Create a feat from the animation and the effects.
 	local feat = Feat{animation = self.combo_anim.text ~= "" and self.combo_anim.text, effects = {}}
@@ -137,9 +148,12 @@ Views.Feats.changed = function(self)
 	local values = {}
 	local both = {}
 	for i = 1,3 do
-		table.insert(effects, self.combo_effect[i].text)
-		table.insert(values, self.scroll_effect[i].value)
-		table.insert(both, {self.combo_effect[i].text, self.scroll_effect[i].value})
+		local e = self.spell_effect[i].effect
+		if e then
+			table.insert(effects, e.name)
+			table.insert(values, self.scroll_effect[i].value)
+			table.insert(both, {e.name, self.scroll_effect[i].value})
+		end
 	end
 	-- Calculate skill and reagent requirements.
 	local feat = Feat{animation = self.combo_anim.text, effects = both}
@@ -176,24 +190,12 @@ end
 Views.Feats.set_anim = function(self, name)
 	local spec = self.spec
 	local anim = Featanimspec:find{name = name}
-	-- Create the list of applicable effects.
-	self.dict_effects_id = {{"", nil}}
-	if spec and anim then
-		for k in pairs(spec.feat_effects) do
-			if anim.effects[k] then
-				table.insert(self.dict_effects_id, {k, function() self:changed() end})
-			end
-		end
-		table.sort(self.dict_effects_id, function(a, b) return a[1]<b[1] end)
-	end
-	-- Update the effect combo boxes.
+	-- Clear the effect slots.
 	for i = 1,3 do
-		self.combo_effect[i]:clear()
-		for k,v in ipairs(self.dict_effects_id) do
-			self.combo_effect[i]:append{text = v[1], pressed = v[2]}
-		end
+		self.spell_effect[i].effect = nil
+		self.spell_effect[i].visible = false
+		self.scroll_effect[i].visible = false
 	end
-
 	-- Create the list of effects.
 	local effects = {}
 	if spec then
@@ -208,9 +210,11 @@ Views.Feats.set_anim = function(self, name)
 	-- Update the effect list.
 	self.list_effects:clear()
 	for k,v in ipairs(effects) do
+		local a = anim and anim.effects[v]
 		local w = Widgets.Spelleffect{
-			active = anim and anim.effects[v],
+			active = a,
 			effect = Feateffectspec:find{name = v},
+			tooltip = a and Widgets.Tooltip{text = "Click to add to the spell"}, 
 			pressed = function(w) self:add_effect(w.effect) end}
 		self.list_effects:append{widget = w}
 	end
@@ -250,8 +254,11 @@ Views.Feats.show = function(self, index)
 	self.combo_anim:activate{text = feat.animation or ""}
 	for j = 1,3 do
 		local e = feat.effects[j]
-		self.combo_effect[j]:activate{text = e and e[1] or ""}
-		self.scroll_effect[j].value = e and e[2] or 0
+		local s = e and Feateffectspec:find{name = e[1]}
+		self.spell_effect[j].effect = s
+		self.spell_effect[j].visible = s and true or false
+		self.scroll_effect[j].value = s and e[2] or 0
+		self.scroll_effect[j].visible = s and true or false
 	end
 	self.protect = nil
 	self.active_slot = index

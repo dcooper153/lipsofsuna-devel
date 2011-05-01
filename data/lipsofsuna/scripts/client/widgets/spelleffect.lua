@@ -34,18 +34,18 @@ Widgets.Spelleffect.reshaped = function(self)
 	if self.effect then
 		local cap = string.gsub(self.effect.name, "(.)(.*)", function(a,b) return string.upper(a) .. b end)
 		self:canvas_text{
-			dest_position = {36,0},
-			dest_size = {w-36,h},
+			dest_position = {40,0},
+			dest_size = {w-40,h},
 			text = cap,
-			text_alignment = {0,0},
+			text_alignment = {0,self.compact and 0.5 or 0},
 			text_color = f and {1,1,0,1} or {a,a,a,1},
 			text_font = "bigger"}
 	end
 	-- Description.
 	if self.effect and not self.compact then
 		self:canvas_text{
-			dest_position = {36,18},
-			dest_size = {w-36,h},
+			dest_position = {40,18},
+			dest_size = {w-40,h},
 			text = self.effect.description,
 			text_alignment = {0,0},
 			text_color = f and {1,1,0,1} or {a,a,a,1},

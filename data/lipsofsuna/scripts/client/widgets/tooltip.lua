@@ -5,6 +5,10 @@ Widgets.Tooltip.new = function(clss, args)
 	self.spacings = {0,0}
 	self.style = "tooltip"
 	self.cols = 1
+	if self.text then
+		self:append(self.text)
+		self.text = nil
+	end
 	return self
 end
 
