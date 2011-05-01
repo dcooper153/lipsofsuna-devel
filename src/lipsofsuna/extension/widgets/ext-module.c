@@ -25,7 +25,8 @@
 #include "ext-module.h"
 
 static void private_context_lost (
-	LIExtModule* self);
+	LIExtModule* self,
+	int          pass);
 
 static void private_widget_allocation (
 	LIExtModule* module,
@@ -139,9 +140,10 @@ void liext_widgets_callback_paint (
 /*****************************************************************************/
 
 static void private_context_lost (
-	LIExtModule* self)
+	LIExtModule* self,
+	int          pass)
 {
-	liwdg_manager_reload (self->widgets);
+	liwdg_manager_reload (self->widgets, pass);
 }
 
 static void private_widget_allocation (

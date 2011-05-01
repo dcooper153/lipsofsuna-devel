@@ -28,10 +28,10 @@
 
 int liren_mesh32_init (
 	LIRenMesh32* self,
-	void*      index_data,
-	int        index_count,
-	void*      vertex_data,
-	int        vertex_count)
+	void*        index_data,
+	int          index_count,
+	void*        vertex_data,
+	int          vertex_count)
 {
 	GLint restore;
 	const int vertex_size[2] = {
@@ -112,10 +112,10 @@ int liren_mesh32_init (
 
 	/* Store values needed by the Windows context rebuild. */
 	self->reload_index_count = index_count;
-	self->reload_index_data = lisys_calloc (1, self->sizes[0]);
+	self->reload_index_data = lisys_calloc (self->sizes[0], 1);
 	memcpy (self->reload_index_data, index_data, self->sizes[0]);
 	self->reload_vertex_count = vertex_count;
-	self->reload_vertex_data = lisys_calloc (1, self->sizes[1]);
+	self->reload_vertex_data = lisys_calloc (self->sizes[1], 1);
 	memcpy (self->reload_vertex_data, vertex_data, self->sizes[1]);
 
 	return 1;
@@ -156,8 +156,8 @@ void liren_mesh32_deform (
  */
 void* liren_mesh32_lock_vertices (
 	const LIRenMesh32* self,
-	int              start,
-	int              count)
+	int                start,
+	int                count)
 {
 	void* ret;
 	GLint restore;
@@ -186,15 +186,24 @@ void* liren_mesh32_lock_vertices (
  * \param self Mesh.
  */
 void liren_mesh32_reload (
-	LIRenMesh32* self)
+	LIRenMesh32* self,
+	int          pass)
 {
-	LIRenMesh32 tmp;
+	void* tmp1;
+	void* tmp2;
 
-	if (liren_mesh32_init (&tmp, self->reload_index_data, self->reload_index_count,
-	    self->reload_vertex_data, self->reload_vertex_count))
+	if (!pass)
 	{
-		liren_mesh32_clear (self);
-		*self = tmp;
+		glDeleteVertexArrays (2, self->arrays);
+		glDeleteBuffers (3, self->buffers);
+	}
+	else
+	{
+		tmp1 = self->reload_index_data;
+		tmp2 = self->reload_vertex_data;
+		liren_mesh32_init (self, tmp1, self->reload_index_count, tmp2, self->reload_vertex_count);
+		lisys_free (tmp1);
+		lisys_free (tmp2);
 	}
 }
 
@@ -215,7 +224,7 @@ void liren_mesh32_unlock_vertices (
 
 void liren_mesh32_get_format (
 	const LIRenMesh32* self,
-	LIRenFormat*     value)
+	LIRenFormat*       value)
 {
 	const LIRenFormat format =
 	{

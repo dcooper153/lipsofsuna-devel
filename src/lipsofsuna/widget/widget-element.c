@@ -26,6 +26,8 @@
 #include "widget.h"
 #include "widget-element.h"
 
+static const LIRenFormat private_format = { 32, GL_FLOAT, 24, GL_FLOAT, 12, GL_FLOAT, 0 };
+
 static void private_pack_quad (
 	LIWdgElement* self,
 	float         u0,
@@ -191,13 +193,31 @@ void liwdg_element_paint (
 	}
 }
 
+void liwdg_element_reload (
+	LIWdgElement* self,
+	LIWdgManager* manager,
+	int           pass)
+{
+	if (!pass)
+	{
+		if (self->buffer != NULL)
+		{
+			liren_buffer_free (self->buffer);
+			self->buffer = NULL;
+		}
+	}
+	else if (self->vertices.count)
+	{
+		self->buffer = liren_buffer_new (manager->render, NULL, 0, &private_format,
+			 self->vertices.array, self->vertices.count, LIREN_BUFFER_TYPE_STATIC);
+	}
+}
+
 void liwdg_element_update (
 	LIWdgElement*    self,
 	LIWdgManager*    manager,
 	const LIWdgRect* rect)
 {
-	const LIRenFormat format = { 32, GL_FLOAT, 24, GL_FLOAT, 12, GL_FLOAT, 0 };
-
 	/* Free old vertices. */
 	if (self->buffer != NULL)
 	{
@@ -223,7 +243,7 @@ void liwdg_element_update (
 	/* Create vertex buffer. */
 	if (self->vertices.count)
 	{
-		self->buffer = liren_buffer_new (manager->render, NULL, 0, &format,
+		self->buffer = liren_buffer_new (manager->render, NULL, 0, &private_format,
 			 self->vertices.array, self->vertices.count, LIREN_BUFFER_TYPE_STATIC);
 		if (self->buffer == NULL)
 			return;

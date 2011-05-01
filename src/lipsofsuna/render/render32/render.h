@@ -71,7 +71,8 @@ LIAPICALL (LIRenImage32*, liren_render32_load_image, (
 	const char*    name));
 
 LIAPICALL (void, liren_render32_reload, (
-	LIRenRender32* self));
+	LIRenRender32* self,
+	int            pass));
 
 LIAPICALL (int, liren_render32_reload_image, (
 	LIRenRender32* self,

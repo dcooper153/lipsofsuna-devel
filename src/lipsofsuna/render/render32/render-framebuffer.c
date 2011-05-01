@@ -35,7 +35,7 @@ static int private_rebuild (
 	int                 width,
 	int                 height,
 	int                 samples,
-	int                hdr);
+	int                 hdr);
 
 /*****************************************************************************/
 
@@ -64,6 +64,7 @@ LIRenFramebuffer32* liren_framebuffer32_new (
 	self->render = render;
 	self->width = width;
 	self->height = height;
+	self->reload_counter = render->reload_counter;
 
 	/* Create frame buffer object. */
 	for ( ; samples > 0 ; samples--)
@@ -128,7 +129,8 @@ int liren_framebuffer32_resize (
 	samples = LIMAT_MIN (samples, max);
 
 	/* Check if a resize is actually needed. */
-	if (self->hdr == hdr && self->width == width && self->height == height && self->samples == samples)
+	if (self->hdr == hdr && self->width == width && self->height == height && self->samples == samples &&
+	    self->reload_counter == self->render->reload_counter)
 		return 1;
 
 	/* Recreate the framebuffer objects. */
@@ -138,6 +140,7 @@ int liren_framebuffer32_resize (
 		self->height = height;
 		self->samples = samples;
 		self->hdr = hdr;
+		self->reload_counter = self->render->reload_counter;
 		return 1;
 	}
 

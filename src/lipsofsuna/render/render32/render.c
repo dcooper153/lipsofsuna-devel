@@ -234,22 +234,32 @@ LIRenImage32* liren_render32_load_image (
  * reloads all data that was lost when the context was erased.
  *
  * \param self Renderer.
+ * \param pass Reload pass.
  */
 void liren_render32_reload (
-	LIRenRender32* self)
+	LIRenRender32* self,
+	int            pass)
 {
 	LIAlgStrdicIter iter;
 	LIAlgPtrdicIter iter1;
 
-	private_free_helpers (self);
-	private_init_helpers (self);
+	if (!pass)
+	{
+		private_free_helpers (self);
+	}
+	else
+	{
+		self->reload_counter++;
+		private_init_helpers (self);
+		liren_uniforms32_reload (&self->context->uniforms, pass);
+	}
 
 	LIALG_STRDIC_FOREACH (iter, self->render->shaders)
-		liren_shader32_reload (((LIRenShader*) iter.value)->v32);
+		liren_shader32_reload (((LIRenShader*) iter.value)->v32, pass);
 	LIALG_STRDIC_FOREACH (iter, self->render->images)
-		liren_image32_reload (((LIRenImage*) iter.value)->v32);
+		liren_image32_reload (((LIRenImage*) iter.value)->v32, pass);
 	LIALG_PTRDIC_FOREACH (iter1, self->render->models_ptr)
-		liren_model32_reload (((LIRenModel*) iter1.value)->v32);
+		liren_model32_reload (((LIRenModel*) iter1.value)->v32, pass);
 }
 
 /**
@@ -271,7 +281,7 @@ int liren_render32_reload_image (
 	LIRenModel* model;
 
 	/* Reload the image. */
-	if (!liren_image32_reload (image))
+	if (!liren_image32_load (image))
 		return 0;
 
 	/* Replace in all models. */

@@ -77,6 +77,11 @@ LIAPICALL (void, liwdg_element_paint, (
 	LIWdgElement* self,
 	LIWdgManager* manager));
 
+LIAPICALL (void, liwdg_element_reload, (
+	LIWdgElement* self,
+	LIWdgManager* manager,
+	int           pass));
+
 LIAPICALL (void, liwdg_element_update, (
 	LIWdgElement*    self,
 	LIWdgManager*    manager,

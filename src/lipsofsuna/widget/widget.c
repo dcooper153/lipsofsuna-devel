@@ -72,7 +72,7 @@ LIWdgWidget* liwdg_widget_new (
 
 	self = lisys_calloc (1, sizeof (LIWdgWidget));
 	if (self == NULL)
-		return 0;
+		return NULL;
 	self->manager = manager;
 	self->request[1].width = -1;
 	self->request[1].height = -1;
@@ -92,6 +92,14 @@ LIWdgWidget* liwdg_widget_new (
 	self->margin_right = 0;
 	self->margin_top = 0;
 	self->margin_bottom = 0;
+
+	/* Add to dictionary. */
+	if (!lialg_ptrdic_insert (manager->widgets.all, self, self))
+	{
+		lisys_free (self);
+		return NULL;
+	}
+
 	private_rebuild (self, PRIVATE_REBUILD_REQUEST);
 
 	return self;
@@ -114,6 +122,7 @@ void liwdg_widget_free (LIWdgWidget* self)
 	lisys_free (self->cols);
 	lisys_free (self->rows);
 	lisys_free (self->cells);
+	lialg_ptrdic_remove (self->manager->widgets.all, self);
 	lisys_free (self);
 }
 
@@ -561,14 +570,25 @@ int liwdg_widget_insert_row (
 	return 1;
 }
 
-void
-liwdg_widget_move (LIWdgWidget* self,
-                   int          x,
-                   int          y)
+void liwdg_widget_move (
+	LIWdgWidget* self,
+	int          x,
+	int          y)
 {
 	liwdg_widget_set_allocation (self, x, y,
 		self->allocation.width,
 		self->allocation.height);
+}
+
+void liwdg_widget_reload (
+	LIWdgWidget* self,
+	int          pass)
+{
+	LIWdgElement* elem;
+
+	/* Reload canvas. */
+	for (elem = self->elements ; elem != NULL ; elem = elem->next)
+		liwdg_element_reload (elem, self->manager, pass);
 }
 
 /**

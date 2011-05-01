@@ -167,6 +167,10 @@ LIAPICALL (void, liwdg_widget_paint, (
 	LIWdgWidget* self,
 	LIWdgRect*   rect));
 
+LIAPICALL (void, liwdg_widget_reload, (
+	LIWdgWidget* self,
+	int          pass));
+
 LIAPICALL (void, liwdg_widget_remove_col, (
 	LIWdgWidget* self,
 	int          index));

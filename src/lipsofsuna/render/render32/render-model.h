@@ -39,7 +39,8 @@ LIAPICALL (int, liren_model32_deform, (
 	const LIMdlPose* pose));
 
 LIAPICALL (void, liren_model32_reload, (
-	LIRenModel32* self));
+	LIRenModel32* self,
+	int           pass));
 
 LIAPICALL (void, liren_model32_replace_image, (
 	LIRenModel32* self,

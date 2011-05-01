@@ -169,11 +169,24 @@ int liren_program32_compile (
  * reloads the shader program that was lost when the context was erased.
  *
  * \param self Shader program.
+ * \param pass Reload pass.
  */
 void liren_program32_reload (
-	LIRenProgram32* self)
+	LIRenProgram32* self,
+	int             pass)
 {
-	if (self->reload_vertex != NULL)
+	if (!pass)
+	{
+		glDeleteProgram (self->program);
+		glDeleteShader (self->vertex);
+		glDeleteShader (self->geometry);
+		glDeleteShader (self->fragment);
+		self->program = 0;
+		self->vertex = 0;
+		self->geometry = 0;
+		self->fragment = 0;
+	}
+	else if (self->reload_vertex != NULL)
 	{
 		lisys_assert (self->reload_name != NULL);
 		lisys_assert (self->reload_fragment != NULL);

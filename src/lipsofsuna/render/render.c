@@ -261,12 +261,14 @@ int liren_render_load_image (
  * reloads all data that was lost when the context was erased.
  *
  * \param self Renderer.
+ * \param pass Reload pass.
  */
 void liren_render_reload (
-	LIRenRender* self)
+	LIRenRender* self,
+	int          pass)
 {
 	if (self->v32 != NULL)
-		liren_render32_reload (self->v32);
+		liren_render32_reload (self->v32, pass);
 	else
 		liren_render21_reload (self->v21);
 }

@@ -46,6 +46,7 @@ struct _LIWdgManager
 	} dialogs;
 	struct
 	{
+		LIAlgPtrdic* all;
 		LIWdgWidget* iter;
 		LIWdgWidget* grab;
 	} widgets;
@@ -86,7 +87,8 @@ LIAPICALL (int, liwdg_manager_insert_window, (
 	LIWdgWidget*  widget));
 
 LIAPICALL (void, liwdg_manager_reload, (
-	LIWdgManager* self));
+	LIWdgManager* self,
+	int           pass));
 
 LIAPICALL (int, liwdg_manager_remove_window, (
 	LIWdgManager* self,

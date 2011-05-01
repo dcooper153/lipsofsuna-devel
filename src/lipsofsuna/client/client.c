@@ -261,6 +261,17 @@ static int private_event (
 			limai_program_event (self->program, (event->type == SDL_MOUSEBUTTONDOWN)? "mousepress" : "mouserelease", "button", LISCR_TYPE_INT, event->button.button, "x", LISCR_TYPE_INT, event->button.x, "y", LISCR_TYPE_INT, event->button.y, NULL);
 			return 0;
 		case SDL_KEYDOWN:
+			if (event->key.keysym.sym == SDLK_F4 &&
+			   (event->key.keysym.mod & KMOD_ALT))
+				self->program->quit = 1;
+			if (event->key.keysym.sym == SDLK_F5 &&
+			   (event->key.keysym.mod & KMOD_CTRL) &&
+			   (event->key.keysym.mod & KMOD_SHIFT))
+			{
+				lical_callbacks_call (self->program->callbacks, self->program, "context-lost", lical_marshal_DATA_INT, 0);
+				lical_callbacks_call (self->program->callbacks, self->program, "context-lost", lical_marshal_DATA_INT, 1);
+			}
+			/* Fall through */
 		case SDL_KEYUP:
 			if (event->key.keysym.unicode != 0)
 				str = listr_wchar_to_utf8 (event->key.keysym.unicode);
@@ -273,9 +284,6 @@ static int private_event (
 			{
 				limai_program_event (self->program, (event->type == SDL_KEYDOWN)? "keypress" : "keyrelease", "code", LISCR_TYPE_INT, event->key.keysym.sym, "mods", LISCR_TYPE_INT, event->key.keysym.mod, NULL);
 			}
-			if (event->key.keysym.sym == SDLK_F4 &&
-			   (event->key.keysym.mod & KMOD_ALT))
-				self->program->quit = 1;
 			return 0;
 		case SDL_MOUSEMOTION:
 			limai_program_event (self->program, "mousemotion", "x", LISCR_TYPE_INT, event->motion.x, "y", LISCR_TYPE_INT, event->motion.y, "dx", LISCR_TYPE_INT, event->motion.xrel, "dy", LISCR_TYPE_INT, event->motion.yrel, NULL);

@@ -57,6 +57,7 @@ struct _LIFntFont
 	LIAlgU32dic* index;
 	LIFntFontGlyph** table;
 	TTF_Font* font;
+	uint8_t reload_pixels[LIFNT_CACHE_WIDTH * LIFNT_CACHE_HEIGHT];
 };
 
 LIAPICALL (LIFntFont*, lifnt_font_new, (
@@ -67,7 +68,8 @@ LIAPICALL (void, lifnt_font_free, (
 	LIFntFont* self));
 
 LIAPICALL (void, lifnt_font_reload, (
-	LIFntFont* self));
+	LIFntFont* self,
+	int        pass));
 
 LIAPICALL (int, lifnt_font_get_advance, (
 	LIFntFont* self,

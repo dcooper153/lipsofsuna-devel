@@ -130,23 +130,31 @@ void lifnt_font_free (
  * \brief Reloads the font.
  *
  * This function is called when the video mode changes in Windows. It
- * forces a reload of the cached glyphs.
+ * recreates the glyph texture.
  *
  * \param self Font.
+ * \param pass Reload pass.
  */
 void lifnt_font_reload (
-	LIFntFont* self)
+	LIFntFont* self,
+	int        pass)
 {
-	LIAlgU32dicIter iter;
-
-	LIALG_U32DIC_FOREACH (iter, self->index)
-		lisys_free (iter.value);
-	lialg_u32dic_clear (self->index);
+	if (!pass)
+	{
+		glDeleteTextures (1, &self->texture);
+	}
+	else
+	{
+		glGenTextures (1, &self->texture);
+		glBindTexture (GL_TEXTURE_2D, self->texture);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexImage2D (GL_TEXTURE_2D, 0, GL_RGBA, LIFNT_CACHE_WIDTH, LIFNT_CACHE_HEIGHT, 0, GL_RGBA, GL_UNSIGNED_BYTE, self->reload_pixels);
+	}
 }
 
 /**
  * \brief Gets the horizontal advance of the glyph.
- *
  * \param self A font.
  * \param glyph A wide character.
  * \return The advance in pixels.
@@ -235,6 +243,9 @@ static LIFntFontGlyph* private_cache_glyph (
 	LIFntFont* self,
 	wchar_t    glyph)
 {
+	int x;
+	int y;
+	int y1;
 	int index;
 	int advance;
 	int bearing_x;
@@ -294,11 +305,15 @@ static LIFntFontGlyph* private_cache_glyph (
 	/* Upload to the tile. */
 	if (image->w > 0 && image->h > 0)
 	{
+		x = self->table_glyph_width * cached->table_x;
+		y = self->table_glyph_height * cached->table_y;
+		for (y1 = 0 ; y1 < image->h ; y1++)
+		{
+			memcpy (self->reload_pixels + 4 * (x + (y + y1) * LIFNT_CACHE_WIDTH),
+				image->pixels + 4 * y1 * image->w, 4 * image->w);
+		}
 		glBindTexture (GL_TEXTURE_2D, self->texture);
-		glTexSubImage2D (GL_TEXTURE_2D, 0,
-			self->table_glyph_width * cached->table_x,
-			self->table_glyph_height * cached->table_y,
-			image->w, image->h,
+		glTexSubImage2D (GL_TEXTURE_2D, 0, x, y, image->w, image->h,
 			GL_RGBA, GL_UNSIGNED_BYTE, image->pixels);
 	}
 	SDL_FreeSurface (image);

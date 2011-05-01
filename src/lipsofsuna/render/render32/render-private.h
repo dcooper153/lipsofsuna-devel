@@ -54,6 +54,7 @@ struct _LIRenFramebuffer32
 	int width;
 	int height;
 	int samples;
+	int reload_counter;
 	GLuint render_framebuffer;
 	GLuint render_textures[2];
 	GLuint postproc_framebuffers[2];
@@ -186,6 +187,7 @@ struct _LIRenObject32
 struct _LIRenRender32
 {
 	int anisotrophy;
+	int reload_counter;
 	LIAlgPtrdic* scenes;
 	LIPthPaths* paths;
 	LIRenContext32* context;

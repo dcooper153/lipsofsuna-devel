@@ -144,14 +144,16 @@ int liren_shader32_compile (
  * reloads the shader that was lost when the context was erased.
  *
  * \param self Shader.
+ * \param pass Reload stage, not shader pass.
  */
 void liren_shader32_reload (
-	LIRenShader32* self)
+	LIRenShader32* self,
+	int            pass)
 {
 	int i;
 
 	for (i = 0 ; i < LIREN_SHADER_PASS_COUNT ; i++)
-		liren_program32_reload (self->passes + i);
+		liren_program32_reload (self->passes + i, pass);
 }
 
 int liren_shader32_get_sort (

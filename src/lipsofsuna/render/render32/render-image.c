@@ -58,7 +58,7 @@ LIRenImage32* liren_image32_new_from_file (
 	}
 
 	/* Load texture. */
-	if (!liren_image32_reload (self))
+	if (!liren_image32_load (self))
 	{
 		liren_image32_free (self);
 		return NULL;
@@ -86,7 +86,7 @@ void liren_image32_free (
  * \param self Image.
  * \return Nonzero on success.
  */
-int liren_image32_reload (
+int liren_image32_load (
 	LIRenImage32* self)
 {
 	LIImgTexture* texture;
@@ -102,6 +102,28 @@ int liren_image32_reload (
 	self->texture = texture;
 
 	return 1;
+}
+
+/**
+ * \brief Reloads the image.
+ * \param self Image.
+ * \param pass Reload pass
+ * \return Nonzero on success.
+ */
+void liren_image32_reload (
+	LIRenImage32* self,
+	int           pass)
+{
+	if (!pass)
+	{
+		if (self->texture != NULL)
+		{
+			liimg_texture_free (self->texture);
+			self->texture = NULL;
+		}
+	}
+	else
+		self->texture = liimg_texture_new_from_file (self->path);
 }
 
 GLuint liren_image32_get_handle (

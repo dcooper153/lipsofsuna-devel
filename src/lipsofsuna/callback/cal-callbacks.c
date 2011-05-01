@@ -153,8 +153,8 @@ lical_callbacks_callva (LICalCallbacks* self,
 		va_copy (copy, args);
 		ret = marshal (func->call, func->data, copy);
 		va_end (copy);
-		if (!ret)
-			return 0;
+		//if (!ret)
+		//	return 0;
 	}
 
 	return 1;

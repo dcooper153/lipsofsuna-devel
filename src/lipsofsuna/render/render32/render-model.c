@@ -171,21 +171,26 @@ int liren_model32_deform (
  * reloads the model data that was lost when the context was erased.
  *
  * \param self Model.
+ * \param passes Reload pass.
  */
 void liren_model32_reload (
-	LIRenModel32* self)
+	LIRenModel32* self,
+	int           pass)
 {
 	LIMdlPose* pose;
 
 	/* Reload vertex buffers. */
-	liren_mesh32_reload (&self->mesh);
+	liren_mesh32_reload (&self->mesh, pass);
 
 	/* Reset the pose. */
-	pose = limdl_pose_new ();
-	if (pose != NULL)
+	if (pass)
 	{
-		liren_model32_deform (self, "skeletal", pose);
-		limdl_pose_free (pose);
+		pose = limdl_pose_new ();
+		if (pose != NULL)
+		{
+			liren_model32_deform (self, "skeletal", pose);
+			limdl_pose_free (pose);
+		}
 	}
 }
 

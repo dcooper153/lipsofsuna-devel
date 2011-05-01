@@ -59,6 +59,25 @@ void liren_uniforms32_clear (
 	memset (self, 0, sizeof (LIRenUniforms32));
 }
 
+void liren_uniforms32_reload (
+	LIRenUniforms32* self,
+	int              pass)
+{
+	if (!pass)
+	{
+		glDeleteBuffers (1, &self->uniform_buffer);
+	}
+	else
+	{
+		glGenBuffers (1, &self->uniform_buffer);
+		glBindBuffer (GL_UNIFORM_BUFFER, self->uniform_buffer);
+		glBufferData (GL_UNIFORM_BUFFER, LIREN_UNIFORM_BUFFER_SIZE, self->data, GL_DYNAMIC_DRAW);
+		self->flush_range_start = 0;
+		self->flush_range_end = LIREN_UNIFORM_BUFFER_SIZE;
+		self->ready = 0;
+	}
+}
+
 void liren_uniforms32_setup (
 	LIRenUniforms32* self,
 	GLuint           program)

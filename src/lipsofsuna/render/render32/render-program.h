@@ -62,7 +62,8 @@ LIAPICALL (int, liren_program32_compile, (
 	int           feedback));
 
 LIAPICALL (void, liren_program32_reload, (
-	LIRenProgram32* self));
+	LIRenProgram32* self,
+	int             pass));
 
 LIAPICALL (void, liren_program32_set_alpha_to_coverage, (
 	LIRenProgram32* self,

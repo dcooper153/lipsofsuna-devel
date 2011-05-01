@@ -48,6 +48,10 @@ LIAPICALL (void, liren_uniforms32_clear, (
 LIAPICALL (void, liren_uniforms32_commit, (
 	LIRenUniforms32* self));
 
+LIAPICALL (void, liren_uniforms32_reload, (
+	LIRenUniforms32* self,
+	int              pass));
+
 LIAPICALL (void, liren_uniforms32_setup, (
 	LIRenUniforms32* self,
 	GLuint         program));

@@ -37,10 +37,10 @@ struct _LIRenMesh32
 
 LIAPICALL (int, liren_mesh32_init, (
 	LIRenMesh32* self,
-	void*      index_data,
-	int        index_count,
-	void*      vertex_data,
-	int        vertex_count));
+	void*        index_data,
+	int          index_count,
+	void*        vertex_data,
+	int          vertex_count));
 
 LIAPICALL (void, liren_mesh32_clear, (
 	LIRenMesh32* self));
@@ -50,18 +50,19 @@ LIAPICALL (void, liren_mesh32_deform, (
 
 LIAPICALL (void*, liren_mesh32_lock_vertices, (
 	const LIRenMesh32* self,
-	int              start,
-	int              count));
+	int                start,
+	int                count));
 
 LIAPICALL (void, liren_mesh32_reload, (
-	LIRenMesh32* self));
+	LIRenMesh32* self,
+	int          pass));
 
 LIAPICALL (void, liren_mesh32_unlock_vertices, (
 	const LIRenMesh32* self));
 
 LIAPICALL (void, liren_mesh32_get_format, (
 	const LIRenMesh32* self,
-	LIRenFormat*     value));
+	LIRenFormat*       value));
 
 #endif
 

@@ -25,7 +25,8 @@
 #include "ext-module.h"
 
 static void private_context_lost (
-	LIExtModule* self);
+	LIExtModule* self,
+	int          pass);
 
 /*****************************************************************************/
 
@@ -79,9 +80,10 @@ void liext_graphics_free (
 /*****************************************************************************/
 
 static void private_context_lost (
-	LIExtModule* self)
+	LIExtModule* self,
+	int          pass)
 {
-	liren_render_reload (self->client->render);
+	liren_render_reload (self->client->render, pass);
 }
 
 /** @} */

@@ -80,6 +80,11 @@ LIRenModel* liren_model_new (
 			return NULL;
 		}
 	}
+	if (!lialg_ptrdic_insert (render->models_ptr, self, self))
+	{
+		liren_model_free (self);
+		return NULL;
+	}
 
 	return self;
 }
@@ -91,6 +96,7 @@ LIRenModel* liren_model_new (
 void liren_model_free (
 	LIRenModel* self)
 {
+	lialg_ptrdic_remove (self->render->models_ptr, self);
 	if (self->id)
 		lialg_u32dic_remove (self->render->models, self->id);
 	if (self->v32 != NULL)

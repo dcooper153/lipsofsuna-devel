@@ -173,6 +173,14 @@ static int private_resize (
 	else
 		flags = SDL_OPENGL | SDL_RESIZABLE;
 
+	/* Unload all graphics. */
+	/* Since changing the video mode erases the OpenGL context in Windows,
+	   we have to unload all textures, shaders, vertex buffers, etc. */
+#ifdef WIN32
+	if (self->client->render != NULL)
+		lical_callbacks_call (self->client->program->callbacks, self->client->program, "context-lost", lical_marshal_DATA_INT, 0);
+#endif
+
 	/* Recreate surface. */
 	/* This destroys all graphics data in Windows. */
 	SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 24);
@@ -202,7 +210,7 @@ static int private_resize (
 	   we have to reload all textures, shaders, vertex buffers, etc. */
 #ifdef WIN32
 	if (self->client->render != NULL)
-		lical_callbacks_call (self->client->program->callbacks, self->client->program, "context-lost", lical_marshal_DATA);
+		lical_callbacks_call (self->client->program->callbacks, self->client->program, "context-lost", lical_marshal_DATA_INT, 1);
 #endif
 
 	return 1;

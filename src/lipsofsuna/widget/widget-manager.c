@@ -89,6 +89,14 @@ LIWdgManager* liwdg_manager_new (
 	self->render = render;
 	self->projection = limat_matrix_identity ();
 
+	/* Initialize widget dictionary. */
+	self->widgets.all = lialg_ptrdic_new ();
+	if (self->widgets.all == NULL)
+	{
+		liwdg_manager_free (self);
+		return NULL;
+	}
+
 	/* Load config and resources. */
 	if (!private_load_config (self, paths))
 	{
@@ -109,6 +117,8 @@ void liwdg_manager_free (
 	lisys_assert (self->dialogs.bottom == NULL);
 	lisys_assert (self->dialogs.top == NULL);
 
+	if (self->widgets.all != NULL)
+		lialg_ptrdic_free (self->widgets.all);
 	if (self->styles != NULL)
 		liwdg_styles_free (self->styles);
 	lisys_free (self);
@@ -279,14 +289,19 @@ int liwdg_manager_insert_window (
  * reloads all fonts that were lost when the context was erased.
  *
  * \param self Renderer.
+ * \param pass Reload pass.
  */
 void liwdg_manager_reload (
-	LIWdgManager* self)
+	LIWdgManager* self,
+	int           pass)
 {
 	LIAlgStrdicIter iter;
+	LIAlgPtrdicIter iter1;
 
 	LIALG_STRDIC_FOREACH (iter, self->styles->fonts)
-		lifnt_font_reload (iter.value);
+		lifnt_font_reload (iter.value, pass);
+	LIALG_PTRDIC_FOREACH (iter1, self->widgets.all)
+		liwdg_widget_reload (iter1.value, pass);
 }
 
 int liwdg_manager_remove_window (
