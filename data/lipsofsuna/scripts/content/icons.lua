@@ -514,5 +514,5 @@ Iconspec{
 Iconspec{
 	name = "cursor1",
 	image = "icons1",
-	offset = {224,224},
+	offset = {222,222},
 	size = {32,32}}
