@@ -20,6 +20,7 @@ Commands.pickup = function(self)
 		if where == "obj" and cont then
 			Network:send{packet = Packet(packets.MOVE_ITEM,
 				"uint8", moveitem.WORLD, "uint8", moveitem.INVENTORY,
+				"uint32", 0,
 				"uint32", id, "uint32", cont.id, "uint32", 0)}
 		end
 	end)
