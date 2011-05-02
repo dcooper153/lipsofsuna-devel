@@ -41,7 +41,9 @@ end
 --   <li>rotation: Rotation change relative to rest pose.</li>
 --   <li>scale: Scale factor.</li></ul>
 Object.edit_pose = function(self, args)
-	return Los.object_edit_pose(self.handle, args)
+	local p = args.position and args.position.handle
+	local r = args.rotation and args.rotation.handle
+	return Los.object_edit_pose(self.handle, {channel = args.channel, frame = args.frame, node = args.node, position = p, rotation = r, scale = args.scale})
 end
 
 --- Finds a bone or an anchor by name.
