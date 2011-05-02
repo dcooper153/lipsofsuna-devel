@@ -123,18 +123,20 @@ Action{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func 
 end}
 
 Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
+	local scale = 0.01 * Views.Options.inst.mouse_sensitivity
 	if Action.dict_press[Keysym.LCTRL] then
-		Player.camera_turn = v * Views.Options.inst.mouse_sensitivity
+		Player.camera_turn_state = Player.camera_turn_state + v * scale
 	else
-		Player.turn = -v * Views.Options.inst.mouse_sensitivity
+		Player.turn_state = Player.turn_state - v * scale
 	end
 end}
 
 Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
+	local scale = 0.01 * Views.Options.inst.mouse_sensitivity
 	if Action.dict_press[Keysym.LCTRL] then
-		Player.camera_tilt = v * Views.Options.inst.mouse_sensitivity
+		Player.camera_tilt_state = Player.camera_tilt_state - v * scale
 	else
-		Player.tilt = v * Views.Options.inst.mouse_sensitivity
+		Player.tilt_state = Player.tilt_state + v * scale
 	end
 end}
 

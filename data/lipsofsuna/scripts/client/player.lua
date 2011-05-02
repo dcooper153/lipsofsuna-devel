@@ -3,13 +3,14 @@ Player.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equ
 Player.species = "aer" -- FIXME
 
 local radian_wrap = function(x)
-	if x < -math.pi then
-		return x + 2 * math.pi
-	elseif x > math.pi then
-		return x - 2 * math.pi
-	else
-		return x
+	local y = x
+	while y < -math.pi do
+		y = y + 2 * math.pi
 	end
+	while y > math.pi do
+		y = y - 2 * math.pi
+	end
+	return y
 end
 
 --- Applies a world space quake.
