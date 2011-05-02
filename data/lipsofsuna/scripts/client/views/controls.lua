@@ -12,7 +12,7 @@ Views.Controls.new = function(clss)
 	-- Load the bindings.
 	self.config = ConfigFile{name = "controls.cfg"}
 	self:load()
-	--self:save()
+	self:save()
 	return self
 end
 
