@@ -342,16 +342,12 @@ static int DdsDecompress(ILuint CompFormat, ILimage *lImage, ILubyte *lCompData)
 	switch (CompFormat)
 	{
 		case DDS_COMPRESS_DXT1:
-			printf ("A\n");
 			return DecompressDXT1(lImage, lCompData);
 		case DDS_COMPRESS_DXT3:
-			printf ("B\n");
 			return DecompressDXT3(lImage, lCompData);
 		case DDS_COMPRESS_DXT5:
-			printf ("C\n");
 			return DecompressDXT5(lImage, lCompData);
 	}
-	printf ("XXX %d\n", CompFormat);
 	return 0;
 }
 
@@ -365,6 +361,7 @@ int liimg_dds_decompress (
 	ILimage image;
 
 	image.Data = output;
+	image.Depth = 1;
 	image.Width = width;
 	image.Height = height;
 	image.Bpp = 4;
