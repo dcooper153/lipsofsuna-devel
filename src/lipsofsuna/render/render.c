@@ -270,7 +270,7 @@ void liren_render_reload (
 	if (self->v32 != NULL)
 		liren_render32_reload (self->v32, pass);
 	else
-		liren_render21_reload (self->v21);
+		liren_render21_reload (self->v21, pass);
 }
 
 /**

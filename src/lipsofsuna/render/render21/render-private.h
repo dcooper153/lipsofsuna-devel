@@ -51,8 +51,6 @@ struct _LIRenFramebuffer21
 
 struct _LIRenImage21
 {
-	int added;
-	int empty;
 	char* name;
 	char* path;
 	LIImgTexture* texture;
@@ -100,6 +98,11 @@ struct _LIRenModel21
 		int count;
 		LIRenModelGroup21* array;
 	} groups;
+	struct
+	{
+		int count;
+		uint32_t* array;
+	} indices;
 	struct
 	{
 		int count;

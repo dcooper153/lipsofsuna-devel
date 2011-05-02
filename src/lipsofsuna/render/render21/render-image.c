@@ -26,12 +26,6 @@
 #include "render-image.h"
 #include "render-private.h"
 
-static const uint8_t missing_image[16] =
-{
-	255, 255, 255, 255, 255, 255, 255, 255,
-	255, 255, 255, 255, 255, 255, 255, 255
-};
-
 static int private_init (
 	LIRenImage21* self,
 	const char*   name);
@@ -64,7 +58,7 @@ LIRenImage21* liren_image21_new_from_file (
 	}
 
 	/* Load texture. */
-	if (!liren_image21_reload (self))
+	if (!liren_image21_load (self))
 	{
 		liren_image21_free (self);
 		return NULL;
@@ -92,16 +86,13 @@ void liren_image21_free (
  * \param self Image.
  * \return Nonzero on success.
  */
-int liren_image21_reload (
+int liren_image21_load (
 	LIRenImage21* self)
 {
 	LIImgTexture* texture;
 
 	/* Load to a temporary texture. */
-	if (self->empty)
-		texture = liimg_texture_new_from_rgba (2, 2, missing_image);
-	else
-		texture = liimg_texture_new_from_file (self->path);
+	texture = liimg_texture_new_from_file (self->path);
 	if (texture == NULL)
 		return 0;
 
@@ -111,6 +102,28 @@ int liren_image21_reload (
 	self->texture = texture;
 
 	return 1;
+}
+
+/**
+ * \brief Reloads the image.
+ * \param self Image.
+ * \param pass Reload pass
+ * \return Nonzero on success.
+ */
+void liren_image21_reload (
+	LIRenImage21* self,
+	int           pass)
+{
+	if (!pass)
+	{
+		if (self->texture != NULL)
+		{
+			liimg_texture_free (self->texture);
+			self->texture = NULL;
+		}
+	}
+	else
+		self->texture = liimg_texture_new_from_file (self->path);
 }
 
 GLuint liren_image21_get_handle (

@@ -246,19 +246,24 @@ LIRenImage21* liren_render21_load_image (
  * reloads all data that was lost when the context was erased.
  *
  * \param self Renderer.
+ * \param pass Reload pass.
  */
 void liren_render21_reload (
-	LIRenRender21* self)
+	LIRenRender21* self,
+	int            pass)
 {
 	LIAlgStrdicIter iter;
 	LIAlgPtrdicIter iter1;
 
+	if (pass)
+		glEnable (GL_TEXTURE_2D);
+
 	LIALG_STRDIC_FOREACH (iter, self->render->shaders)
 		liren_shader21_reload (((LIRenShader*) iter.value)->v21);
 	LIALG_STRDIC_FOREACH (iter, self->render->images)
-		liren_image21_reload (((LIRenImage*) iter.value)->v21);
+		liren_image21_reload (((LIRenImage*) iter.value)->v21, pass);
 	LIALG_PTRDIC_FOREACH (iter1, self->render->models_ptr)
-		liren_model21_reload (((LIRenModel*) iter1.value)->v21);
+		liren_model21_reload (((LIRenModel*) iter1.value)->v21, pass);
 }
 
 /**
@@ -280,7 +285,7 @@ int liren_render21_reload_image (
 	LIRenModel* model;
 
 	/* Reload the image. */
-	if (!liren_image21_reload (image))
+	if (!liren_image21_load (image))
 		return 0;
 
 	/* Replace in all models. */

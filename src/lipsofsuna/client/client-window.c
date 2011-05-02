@@ -178,7 +178,7 @@ static int private_resize (
 	   we have to unload all textures, shaders, vertex buffers, etc. */
 #ifdef WIN32
 	if (self->client->render != NULL)
-		lical_callbacks_call (self->client->program->callbacks, self->client->program, "context-lost", lical_marshal_DATA_INT, 0);
+		lical_callbacks_call (self->client->program->callbacks, "context-lost", lical_marshal_DATA_INT, 0);
 #endif
 
 	/* Recreate surface. */
@@ -210,7 +210,7 @@ static int private_resize (
 	   we have to reload all textures, shaders, vertex buffers, etc. */
 #ifdef WIN32
 	if (self->client->render != NULL)
-		lical_callbacks_call (self->client->program->callbacks, self->client->program, "context-lost", lical_marshal_DATA_INT, 1);
+		lical_callbacks_call (self->client->program->callbacks, "context-lost", lical_marshal_DATA_INT, 1);
 #endif
 
 	return 1;

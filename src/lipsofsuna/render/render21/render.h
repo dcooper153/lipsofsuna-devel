@@ -70,7 +70,8 @@ LIAPICALL (LIRenImage21*, liren_render21_load_image, (
 	const char*    name));
 
 LIAPICALL (void, liren_render21_reload, (
-	LIRenRender21* self));
+	LIRenRender21* self,
+	int            pass));
 
 LIAPICALL (int, liren_render21_reload_image, (
 	LIRenRender21* self,

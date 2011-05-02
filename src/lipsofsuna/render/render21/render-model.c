@@ -28,6 +28,14 @@
 #include "../render-private.h"
 #include "../render-scene.h"
 
+static const LIRenFormat private_vertex_format =
+{
+	16 * sizeof (float) + 8 * sizeof (char),
+	GL_FLOAT, 0 * sizeof (float),
+	GL_FLOAT, 2 * sizeof (float),
+	GL_FLOAT, 5 * sizeof (float)
+};
+
 static inline void private_quat_xform (
 	const LIMatQuaternion q,
 	const LIMatVector     v,
@@ -85,6 +93,7 @@ void liren_model21_free (
 		liren_buffer21_free (self->buffer);
 	lisys_free (self->materials.array);
 	lisys_free (self->groups.array);
+	lisys_free (self->indices.array);
 	lisys_free (self->vertices.array);
 	lisys_free (self);
 }
@@ -168,20 +177,35 @@ int liren_model21_deform (
  * reloads the model data that was lost when the context was erased.
  *
  * \param self Model.
+ * \param pass Reload pass.
  */
 void liren_model21_reload (
-	LIRenModel21* self)
+	LIRenModel21* self,
+	int           pass)
 {
 	LIMdlPose* pose;
 
-	/* TODO */
-
-	/* Reset the pose. */
-	pose = limdl_pose_new ();
-	if (pose != NULL)
+	if (!pass)
 	{
-		liren_model21_deform (self, "skeletal", pose);
-		limdl_pose_free (pose);
+		if (self->buffer != NULL)
+		{
+			liren_buffer21_free (self->buffer);
+			self->buffer = NULL;
+		}
+	}
+	else if (self->indices.count)
+	{
+		/* Recreate the vertex buffer. */
+		self->buffer = liren_buffer21_new (self->indices.array, self->indices.count, &private_vertex_format,
+			self->vertices.array, self->vertices.count, LIREN_BUFFER_TYPE_STATIC);
+
+		/* Reset the pose. */
+		pose = limdl_pose_new ();
+		if (pose != NULL)
+		{
+			liren_model21_deform (self, "skeletal", pose);
+			limdl_pose_free (pose);
+		}
 	}
 }
 
@@ -225,13 +249,6 @@ int liren_model21_set_model (
 	LIRenModelGroup21* groups;
 	LIRenObject21* object;
 	LIRenScene21* scene;
-	LIRenFormat vertex_format =
-	{
-		16 * sizeof (float) + 8 * sizeof (char),
-		GL_FLOAT, 0 * sizeof (float),
-		GL_FLOAT, 2 * sizeof (float),
-		GL_FLOAT, 5 * sizeof (float)
-	};
 
 	/* Create face groups. */
 	if (model->facegroups.count)
@@ -324,9 +341,8 @@ int liren_model21_set_model (
 		liren_buffer21_free (self->buffer);
 	if (indices != NULL)
 	{
-		self->buffer = liren_buffer21_new (indices, index_count, &vertex_format,
+		self->buffer = liren_buffer21_new (indices, index_count, &private_vertex_format,
 			model->vertices.array, model->vertices.count, LIREN_BUFFER_TYPE_STATIC);
-		lisys_free (indices);
 	}
 
 	/* Replace materials. */
@@ -336,6 +352,9 @@ int liren_model21_set_model (
 	lisys_free (self->groups.array);
 	self->groups.array = groups;
 	self->groups.count = model->facegroups.count;
+	lisys_free (self->indices.array);
+	self->indices.array = indices;
+	self->indices.count = index_count;
 	lisys_free (self->vertices.array);
 	self->vertices.array = vertices;
 	self->vertices.count = model->vertices.count;
