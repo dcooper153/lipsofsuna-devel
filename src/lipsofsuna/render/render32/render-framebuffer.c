@@ -64,7 +64,6 @@ LIRenFramebuffer32* liren_framebuffer32_new (
 	self->render = render;
 	self->width = width;
 	self->height = height;
-	self->reload_counter = render->reload_counter;
 
 	/* Create frame buffer object. */
 	for ( ; samples > 0 ; samples--)
@@ -80,6 +79,13 @@ LIRenFramebuffer32* liren_framebuffer32_new (
 		return NULL;
 	}
 
+	/* Add to dictionary. */
+	if (!lialg_ptrdic_insert (render->framebuffers, self, self))
+	{
+		liren_framebuffer32_free (self);
+		return NULL;
+	}
+
 	return self;
 }
 
@@ -90,11 +96,40 @@ LIRenFramebuffer32* liren_framebuffer32_new (
 void liren_framebuffer32_free (
 	LIRenFramebuffer32* self)
 {
+	lialg_ptrdic_remove (self->render->framebuffers, self);
 	glDeleteFramebuffers (1, &self->render_framebuffer);
 	glDeleteFramebuffers (2, self->postproc_framebuffers);
 	glDeleteTextures (2, self->render_textures);
 	glDeleteTextures (3, self->postproc_textures);
 	lisys_free (self);
+}
+
+/**
+ * \brief Reloads the framebuffer.
+ * \param self Framebuffer.
+ * \param pass Reload pass.
+ */
+void liren_framebuffer32_reload (
+	LIRenFramebuffer32* self,
+	int                 pass)
+{
+	if (!pass)
+	{
+		glDeleteFramebuffers (1, &self->render_framebuffer);
+		glDeleteFramebuffers (2, self->postproc_framebuffers);
+		glDeleteTextures (2, self->render_textures);
+		glDeleteTextures (3, self->postproc_textures);
+		self->render_framebuffer = 0;
+		self->postproc_framebuffers[0] = 0;
+		self->postproc_framebuffers[1] = 0;
+		self->render_textures[0] = 0;
+		self->render_textures[1] = 0;
+		self->postproc_textures[0] = 0;
+		self->postproc_textures[1] = 0;
+		self->postproc_textures[2] = 0;
+	}
+	else
+		private_rebuild (self, self->width, self->height, self->samples, self->hdr);
 }
 
 /**
@@ -129,8 +164,7 @@ int liren_framebuffer32_resize (
 	samples = LIMAT_MIN (samples, max);
 
 	/* Check if a resize is actually needed. */
-	if (self->hdr == hdr && self->width == width && self->height == height && self->samples == samples &&
-	    self->reload_counter == self->render->reload_counter)
+	if (self->hdr == hdr && self->width == width && self->height == height && self->samples == samples)
 		return 1;
 
 	/* Recreate the framebuffer objects. */
@@ -140,7 +174,6 @@ int liren_framebuffer32_resize (
 		self->height = height;
 		self->samples = samples;
 		self->hdr = hdr;
-		self->reload_counter = self->render->reload_counter;
 		return 1;
 	}
 

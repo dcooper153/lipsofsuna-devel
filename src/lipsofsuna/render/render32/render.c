@@ -58,17 +58,27 @@ LIRenRender32* liren_render32_new (
 	/* Allocate scene list. */
 	self->scenes = lialg_ptrdic_new ();
 	if (self->scenes == NULL)
-		goto error;
+	{
+		liren_render32_free (self);
+		return NULL;
+	}
+
+	/* Allocate framebuffer list. */
+	self->framebuffers = lialg_ptrdic_new ();
+	if (self->framebuffers == NULL)
+	{
+		liren_render32_free (self);
+		return NULL;
+	}
 
 	/* Load data. */
 	if (!private_init_resources (self))
-		goto error;
+	{
+		liren_render32_free (self);
+		return NULL;
+	}
 
 	return self;
-
-error:
-	liren_render32_free (self);
-	return NULL;
 }
 
 void liren_render32_free (
@@ -79,6 +89,11 @@ void liren_render32_free (
 	{
 		lisys_assert (self->scenes->size == 0);
 		lialg_ptrdic_free (self->scenes);
+	}
+	if (self->framebuffers != NULL)
+	{
+		lisys_assert (self->framebuffers->size == 0);
+		lialg_ptrdic_free (self->framebuffers);
 	}
 	if (self->context != NULL)
 	{
@@ -249,7 +264,6 @@ void liren_render32_reload (
 	}
 	else
 	{
-		self->reload_counter++;
 		private_init_helpers (self);
 		liren_uniforms32_reload (&self->context->uniforms, pass);
 	}
@@ -260,6 +274,8 @@ void liren_render32_reload (
 		liren_image32_reload (((LIRenImage*) iter.value)->v32, pass);
 	LIALG_PTRDIC_FOREACH (iter1, self->render->models_ptr)
 		liren_model32_reload (((LIRenModel*) iter1.value)->v32, pass);
+	LIALG_PTRDIC_FOREACH (iter1, self->framebuffers)
+		liren_framebuffer32_reload (iter1.value, pass);
 }
 
 /**

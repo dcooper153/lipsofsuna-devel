@@ -31,6 +31,10 @@ LIAPICALL (LIRenFramebuffer32*, liren_framebuffer32_new, (
 LIAPICALL (void, liren_framebuffer32_free, (
 	LIRenFramebuffer32* self));
 
+LIAPICALL (void, liren_framebuffer32_reload, (
+	LIRenFramebuffer32* self,
+	int                 pass));
+
 LIAPICALL (int, liren_framebuffer32_resize, (
 	LIRenFramebuffer32* self,
 	int                 width,
