@@ -199,24 +199,16 @@ Object.update_model = function(self)
 	end
 end
 
---- Updates the rotation of the object.<br/>
--- This function differs from setting the rotation directly in that if the
--- object is a creature with bone tilting specified in the spec, the tilting
--- component of the rotation is applied to the bone instead of to the whole
--- object.
+--- Updates the rotation and tilt of the object.
 -- @param self Object.
--- @param quat Quaternion.
-Object.update_rotation = function(self, quat)
-	local spec = Species:find{name = self.race}
-	self.rotation_real = quat
+-- @param quat Rotation quaternion.
+-- @param tilt Tilt angle in radians.
+Object.update_rotation = function(self, quat, tilt)
+	self.rotation = quat
+	self.tilt = tilt
+	local spec = self.spec
 	if not self.dead and spec and spec.tilt_bone then
-		local euler = quat.euler
-		local bodyq = Quaternion{euler = {euler[1], euler[2], 0}}
-		local boneq = Quaternion{axis = Vector(1,0,0), angle = -euler[3]}
-		self:edit_pose{channel = Animation.CHANNEL_TILT, node = spec.tilt_bone, rotation = boneq}
-		self.rotation = bodyq
-	else
-		self.rotation = quat
+		self:edit_pose{channel = Animation.CHANNEL_TILT, node = spec.tilt_bone, rotation = Quaternion{axis = Vector(1,0,0), angle = -tilt}}
 	end
 end
 
@@ -234,7 +226,7 @@ Object.update_motion_state = function(self, tick)
 	self.correction = self.correction * 0.93
 end
 
-Object.set_motion_state = function(self, pos, rot, vel)
+Object.set_motion_state = function(self, pos, rot, vel, tilt)
 	-- Store the prediction error so that it can be corrected over time.
 	if (pos - self.position).length < 5 then
 		self.correction = pos - self.position
@@ -247,6 +239,6 @@ Object.set_motion_state = function(self, pos, rot, vel)
 	self.interpolation = 0
 	-- Set rotation unless controlled by the local player.
 	if self ~= Player.object then
-		self:update_rotation(rot)
+		self:update_rotation(rot, tilt)
 	end
 end

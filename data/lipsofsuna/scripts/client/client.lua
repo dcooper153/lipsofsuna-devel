@@ -126,7 +126,7 @@ Protocol:add_handler{type = "OBJECT_HIDDEN", func = function(event)
 end}
 
 Protocol:add_handler{type = "OBJECT_MOVED", func = function(event)
-	local ok,i,x,y,z,rx,ry,rz,rw,vx,vy,vz = event.packet:read("uint32", "float", "float", "float", "float", "float", "float", "float", "float", "float", "float")
+	local ok,i,x,y,z,tilt,rx,ry,rz,rw,vx,vy,vz = event.packet:read("uint32", "float", "float", "float", "float", "float", "float", "float", "float", "float", "float", "float")
 	if ok then
 		local o = Object:find{id = i}
 		if not o then return end
@@ -136,7 +136,7 @@ Protocol:add_handler{type = "OBJECT_MOVED", func = function(event)
 		local p = Vector(x, y, z)
 		if o.type == "item" or o.type == "species" then p = p + Object.physics_position_correction end
 		-- Set the target interpolation position.
-		o:set_motion_state(p, Quaternion(rx, ry, rz, rw), Vector(vx, vy, vz))
+		o:set_motion_state(p, Quaternion(rx, ry, rz, rw), Vector(vx, vy, vz), tilt)
 	end
 end}
 
@@ -157,7 +157,7 @@ Protocol:add_handler{type = "OBJECT_SELF", func = function(event)
 end}
 
 Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
-	local ok,i,t,s,m,n,x,y,z,rx,ry,rz,rw = event.packet:read("uint32", "string", "string", "string", "string", "float", "float", "float", "float", "float", "float", "float")
+	local ok,i,t,s,m,n,x,y,z,tilt,rx,ry,rz,rw = event.packet:read("uint32", "string", "string", "string", "string", "float", "float", "float", "float", "float", "float", "float", "float")
 	if not ok then return end
 	-- Get the object specification.
 	local spec
@@ -207,7 +207,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	end
 	-- Rebuild the model.
 	o:update_model()
-	o:update_rotation(Quaternion(rx, ry, rz, rw))
+	o:update_rotation(Quaternion(rx, ry, rz, rw), tilt)
 	o.realized = true
 end}
 

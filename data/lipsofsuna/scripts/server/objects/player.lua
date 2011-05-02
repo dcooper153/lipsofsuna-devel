@@ -192,8 +192,9 @@ Player.vision_cb = function(self, args)
 		end,
 		["object-moved"] = function(args)
 			local o = args.object
+			local tilt = (o.tilt and o.tilt.euler[3]) or 0
 			local p = Packet(packets.OBJECT_MOVED, "uint32", o.id,
-				"float", o.position.x, "float", o.position.y, "float", o.position.z,
+				"float", o.position.x, "float", o.position.y, "float", o.position.z, "float", tilt,
 				"float", o.rotation.x, "float", o.rotation.y, "float", o.rotation.z, "float", o.rotation.w,
 				"float", o.velocity.x, "float", o.velocity.y, "float", o.velocity.z)
 			self:send{packet = p, reliable = false}
@@ -205,10 +206,11 @@ Player.vision_cb = function(self, args)
 		["object-shown"] = function(args)
 			local o = args.object
 			-- Append basic data.
+			local tilt = (o.tilt and o.tilt.euler[3]) or 0
 			local p = Packet(packets.OBJECT_SHOWN, "uint32", o.id,
 				"string", o.spec.type, "string", o.spec.name or "",
 				"string", o.model_name, "string", o.name or "",
-				"float", o.position.x, "float", o.position.y, "float", o.position.z,
+				"float", o.position.x, "float", o.position.y, "float", o.position.z, "float", tilt,
 				"float", o.rotation.x, "float", o.rotation.y, "float", o.rotation.z, "float", o.rotation.w)
 			-- Append optional customizations.
 			if o.spec.type == "species" and o.spec.models then

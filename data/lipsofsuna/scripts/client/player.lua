@@ -215,15 +215,15 @@ Player.update_rotation = function(clss, secs)
 	end
 	clss.tilt = 0
 	-- Update rotation.
-	local r = Quaternion{euler = {clss.turn_state, 0, -clss.tilt_state}}
-	clss.object:update_rotation(r)
-	clss.rotation_curr = r
+	local rot = Quaternion{euler = {clss.turn_state, 0, 0}}
+	clss.object:update_rotation(rot, -clss.tilt_state)
 	-- Sync rotation with the server.
 	-- Rotation takes at most 0.25 seconds to fully synchronize. Large changes
 	-- are sent immediately whereas smaller changes are grouped together to
 	-- reduce useless network traffic.
+	clss.rotation_curr = Quaternion{euler = {clss.turn_state, 0, -clss.tilt_state}}
 	clss.rotation_sync_timer = clss.rotation_sync_timer + secs
-	if (clss.rotation_prev - r).length > math.max(0, 0.1 - 0.4 * clss.rotation_sync_timer) then
+	if (clss.rotation_prev - clss.rotation_curr).length > math.max(0, 0.1 - 0.4 * clss.rotation_sync_timer) then
 		clss:send_rotation()
 	end
 	-- Update compass rotation.

@@ -259,6 +259,7 @@ Protocol:add_handler{type = "PLAYER_TURN", func = function(args)
 			e[3] = math.max(-player.spec.tilt_limit, e[3])
 			player.tilt = Quaternion{euler = {0, 0, e[3]}}
 			player.rotation = Quaternion{euler = {e[1], e[2], 0}}
+			Vision:event{type = "object-moved", object = o}
 		end
 	end
 end}
