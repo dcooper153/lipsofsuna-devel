@@ -1,3 +1,28 @@
+0.3.1
+
+  * Tooltips for items, feats and skills.
+  * Item stack splitting with mouse wheel.
+  * Difficult monsters don't spawn close to the starting area.
+  * New map objects: wooden door, wooden stairs, wooden mine supports, wooden fence.
+  * New enemies: novice brigand archer, master brigand archer, suicide bomber.
+  * New NPCs: Lips guard knight, Lips guard archer, various incomplete quest characters.
+  * AI takes terrain into account when wandering or in combat.
+  * AI can use ranged weapons and grenades.
+  * Simplified skill and spell customization.
+  * Basic character face customization.
+  * Fixed the boomerang.
+  * Fixed multiplayer bugs.
+  * Fixed some memory leaks and server performance issues.
+  * Made quest scripting easier.
+  * Map editor improvements.
+  * Account permissions to prevent abuse of admin commands.
+  * Human-readable configuration files for options and controls.
+  * Basic OpenGL 2.1 fallback renderer.
+  * Fixed severe resolution switching bugs in Windows.
+  * Windows build saves options and save games to My Documents\My Games.
+  * Improved bloom performance.
+  * Support for cubemap textures.
+
 0.3.0
 
   * Less blocky cave walls.
