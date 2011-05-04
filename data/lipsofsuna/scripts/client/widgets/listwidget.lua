@@ -13,8 +13,8 @@ Widgets.List.new = function(clss, args)
 	self.scroll = Widgets.Scrollbar{changed = function(w, p) self:set_offset(p) end}
 	self.scroll:set_range(0, 1, 3)
 	if args and args.page_size then self.page_size = args.page_size end
-	self:set_child{col = 1, row = 1, widget = self.list}
-	self:set_child{col = 2, row = 1, widget = self.scroll}
+	self:set_child(1, 1, self.list)
+	self:set_child(2, 1, self.scroll)
 	self:set_expand{col = 1, row = 1}
 	return self
 end
@@ -71,7 +71,7 @@ Widgets.List.set_offset = function(self, offset)
 	self.scroll:set_range(#self.table, offset)
 	-- Repack the children.
 	for i = 1,self.scroll.max do
-		self.list:set_child{col = 1, row = i, widget = self.table[offset + i]}
+		self.list:set_child(1, i, self.table[offset + i])
 	end
 end
 
