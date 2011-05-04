@@ -93,11 +93,11 @@ Join.refresh = function(self)
 	-- Download servers.
 	Lobby.master = "http://lipsofsuna.org"
 	local servers = Lobby:download_server_list()
-	table.insert(servers, 1,  {ip = "localhost", port = 10101, name = "Localhost",
-		desc = "Connect to a locally hosted server"})
 	-- Rebuild the list.
 	self.list_servers:clear()
 	if servers then
+		table.insert(servers, 1,  {ip = "localhost", port = 10101, name = "Localhost",
+			desc = "Connect to a locally hosted server"})
 		for k,v in pairs(servers) do
 			local w = Widgets.Serverinfo(v)
 			w.pressed = function(s)
