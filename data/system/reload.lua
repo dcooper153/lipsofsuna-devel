@@ -6,7 +6,7 @@ Reload = Class()
 Reload.class_name = "Reload"
 
 Reload:add_getters{
-	function(s) return Los.reload_get_enabled() end}
+	enabled = function(s) return Los.reload_get_enabled() end}
 
 Reload:add_setters{
-	function(s, v) Los.reload_set_enabled(v) end}
+	enabled = function(s, v) Los.reload_set_enabled(v) end}
