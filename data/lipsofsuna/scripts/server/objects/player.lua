@@ -318,7 +318,10 @@ end
 
 Eventhandler{type = "login", func = function(self, event)
 	print("Client login")
+	-- Tell the client to authenticate.
 	Network:send{client = event.client, packet = Packet(packets.CLIENT_AUTHENTICATE)}
+	-- Update lobby.
+	Lobby.players = Lobby.players + 1
 end}
 Eventhandler{type = "logout", func = function(self, event)
 	print("Client logout")
@@ -335,4 +338,6 @@ Eventhandler{type = "logout", func = function(self, event)
 		account.client = nil
 		Account.dict_client[event.client] = nil
 	end
+	-- Update lobby.
+	Lobby.players = Lobby.players - 1
 end}

@@ -30,7 +30,7 @@ require "server/generator"
 
 local m = Material:find{name = "granite1"}
 Voxel.fill = m.id
-Network:host{port = 10101}
+Network:host{port = Config.inst.server_port}
 if Settings.generate or
    Serialize:get_value("map_version") ~= Generator.map_version or
    Serialize:get_value("data_version") ~= Serialize.data_version then

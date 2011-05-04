@@ -10,7 +10,7 @@ top = '.'
 out = '.build'
 
 CORE_DIRS = 'ai algorithm archive binding callback client engine extension font generator image main math model network particle paths physics reload render render/render21 render/render32 script server sound string system thread video voxel widget'
-EXTS_DIRS = 'animation camera config-file database graphics network noise object-physics object-render physics reload render skeleton sound speech tiles tiles-physics tiles-render widgets'
+EXTS_DIRS = 'animation camera config-file database graphics lobby network noise object-physics object-render physics reload render skeleton sound speech tiles tiles-physics tiles-render widgets'
 CORE_EXCL = 'src/lipsofsuna/math/unittest.c'
 
 def options(ctx):
@@ -151,6 +151,17 @@ def configure(ctx):
 			ctx.check_cc(header_name='stream_decoder.h', mandatory=True, uselib='CORE TEST', uselib_store='FLAC')
 			ctx.check_cc(lib='FLAC', mandatory=True, uselib='CORE TEST', uselib_store='FLAC')
 
+	# CURL
+	found_curl = False
+	if ctx.check_cc(lib='curl', mandatory=False, uselib='CORE TEST', uselib_store='CURL'):
+		found_curl = True
+	else:
+		if ctx.check_cc(header_name='curl/curl.h', lib='curl', mandatory=False, uselib='CORE TEST', uselib_store='CURL'):
+			ctx.check_cc(lib='curl', mandatory=True, uselib='CORE TEST', uselib_store='CURL')
+			found_curl = True
+	if found_curl:
+		ctx.define('HAVE_CURL', 1)
+
 	# Paths and defines
 	ctx.define('LI_ENABLE_ERROR', 1)
 	if not ctx.env.SOUND:
@@ -205,7 +216,7 @@ def build(ctx):
 	ctx.add_group("install")
 	ctx.set_group("build")
 	objs = ''
-	libs = 'CORE LUA SQLITE BULLET ENET SDL SDL_TTF ZLIB GLEW THREAD AL VORBIS OGG FLAC'
+	libs = 'CORE LUA SQLITE BULLET ENET SDL SDL_TTF ZLIB GLEW THREAD AL VORBIS OGG FLAC CURL'
 
 	# Core objects.
 	for dir in CORE_DIRS.split(' '):

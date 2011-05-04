@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -30,6 +30,7 @@ extern LIMaiExtensionInfo liext_camera_info;
 extern LIMaiExtensionInfo liext_config_file_info;
 extern LIMaiExtensionInfo liext_database_info;
 extern LIMaiExtensionInfo liext_graphics_info;
+extern LIMaiExtensionInfo liext_lobby_info;
 extern LIMaiExtensionInfo liext_network_info;
 extern LIMaiExtensionInfo liext_noise_info;
 extern LIMaiExtensionInfo liext_object_physics_info;
@@ -65,6 +66,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "config-file", &liext_config_file_info },
 		{ "database", &liext_database_info },
 		{ "graphics", &liext_graphics_info },
+		{ "lobby", &liext_lobby_info },
 		{ "network", &liext_network_info },
 		{ "noise", &liext_noise_info },
 		{ "object-physics", &liext_object_physics_info },
