@@ -23,8 +23,8 @@
 #include <lipsofsuna/system.h>
 #include <lipsofsuna/video.h>
 
-#define LIFNT_CACHE_WIDTH 512
-#define LIFNT_CACHE_HEIGHT 512
+#define LIFNT_CACHE_WIDTH 1024
+#define LIFNT_CACHE_HEIGHT 1024
 
 typedef struct _LIFntFontGlyph LIFntFontGlyph;
 struct _LIFntFontGlyph
