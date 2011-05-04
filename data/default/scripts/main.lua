@@ -1,7 +1,9 @@
+require "system/config-file"
 require "system/core"
 require "system/database"
 require "system/eventhandler"
 require "system/graphics"
+require "system/lobby"
 require "system/math"
 require "system/render"
 require "system/sound"
@@ -17,7 +19,7 @@ if Program.args == "--help" or Program.args == "-h" then
 	return
 end
 
-require "launcher"
+require "config"
 require "theme"
 require "widget"
 require "startup"

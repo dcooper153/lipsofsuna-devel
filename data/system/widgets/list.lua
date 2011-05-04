@@ -1,4 +1,4 @@
-require "client/widgets/scrollbar"
+require "system/widgets/scrollbar"
 
 Widgets.List = Class(Widgets.Frame)
 
