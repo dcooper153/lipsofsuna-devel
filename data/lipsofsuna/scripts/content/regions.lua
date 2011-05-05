@@ -7,6 +7,14 @@ Regionspec{
 	position = {1536,1536}}
 
 Regionspec{
+	name = "Brigand HQ",
+	categories = {"special"},
+	depth = {2970,2970},
+	distance = {"Lips",30,30},
+	pattern_name = "brigandhq1",
+	random_resources = false}
+
+Regionspec{
 	name = "Portal of Lips",
 	categories = {"special"},
 	depth = {2970,3000},
