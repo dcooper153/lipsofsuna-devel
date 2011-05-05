@@ -419,6 +419,26 @@ Species{
 	loot_count = {2, 4}}
 
 Species{
+	name = "brigand king",
+	base = "aer",
+	categories = {"special"},
+	difficulty = 1,
+	factions = {"evil"},
+	eye_style = "random",
+	hair_style = "random",
+	marker = "brigandking",
+	inventory_items = {"adamantium sword", "iron breastplate", "iron greaves", "iron gauntlets"},
+	loot_categories = {"armor", "shield", "weapon"},
+	loot_count = {5, 10},
+	skills = {
+		{name = "dexterity", max = 80, val = 30},
+		{name = "health", max = 100, val = 100},
+		{name = "intelligence", max = 100, val = 0},
+		{name = "perception", max = 60, val = 20},
+		{name = "strength", max = 40, val = 40},
+		{name = "willpower", max = 80, val = 0}}}
+
+Species{
 	name = "novice brigand archer",
 	base = "aer",
 	categories = {"enemy"},
