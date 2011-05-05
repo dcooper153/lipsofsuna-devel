@@ -53,6 +53,11 @@ Effect{
 	sound = "spell-000"}
 
 Effect{
+	name = "selfdestruct1",
+	model = "particle1",
+	sound = "spell-000"}
+
+Effect{
 	name = "swing1",
 	sound = "swing-000"}
 

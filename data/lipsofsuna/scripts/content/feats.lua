@@ -175,7 +175,7 @@ Featanimspec{
 	cooldown = 2,
 	effects = {"strength to physical damage"},
 	influences = {{"physical", -1}},
-	effect = "swing1"}
+	effect = "selfdestruct1"}
 
 Featanimspec{
 	name = "left claw",
