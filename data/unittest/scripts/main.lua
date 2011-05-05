@@ -19,6 +19,9 @@ catch(function() Class.unittest() end)
 require "system/core"
 catch(function() Program.unittest() end)
 
+require "system/file"
+catch(function() File.unittest() end)
+
 require "system/math"
 catch(function() Vector.unittest() end)
 catch(function() Quaternion.unittest() end)

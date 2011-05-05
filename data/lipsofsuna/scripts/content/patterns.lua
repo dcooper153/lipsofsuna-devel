@@ -1,22 +1,6 @@
-require "content/patterns/charasgrove1"
-require "content/patterns/charasillusion1"
-require "content/patterns/dungeon1"
-require "content/patterns/dungeon2"
-require "content/patterns/dungeon3"
-require "content/patterns/dungeon4"
-require "content/patterns/erinyeslair1"
-require "content/patterns/erinyesportal1"
-require "content/patterns/lips1"
-require "content/patterns/midguard1"
-require "content/patterns/nature1"
-require "content/patterns/nature2"
-require "content/patterns/noemi1"
-require "content/patterns/ocean1"
-require "content/patterns/portaloflips1"
-require "content/patterns/portalofmidguard1"
-require "content/patterns/sanctuary1"
-require "content/patterns/silverspring1"
-require "content/patterns/volcano1"
+for k,v in pairs(File:scan_directory("scripts/content/patterns")) do
+	require("content/patterns/" .. string.gsub(v, "([^.]*).*", "%1"))
+end
 
 Pattern{
 	name = "corridor1",
@@ -49,4 +33,3 @@ Pattern{
 		{-1,-2,0,nil,2,0,0},
 		{-2,-1,0,nil,5,2,0},
 		{-1,2,0,nil,2,0,0}}}
-require "content/patterns/brigandhq1"
