@@ -20,6 +20,10 @@ Action{name = "camera", mode = "press", key1 = Keysym.y, func = function()
 	Player.camera:reset()
 end}
 
+Action{name = "chat", mode = "press", key1 = Keysym.t, func = function()
+	Gui.chat_active = not Gui.chat_active
+end}
+
 Action{name = "feats", mode = "press", key1 = Keysym.f, func = function()
 	Gui:set_mode("feats")
 end}

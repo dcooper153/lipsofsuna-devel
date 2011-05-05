@@ -22,9 +22,16 @@ Gui.init = function(clss)
 		{"Help", function() clss:set_mode("help", 2) end, arrow = true},
 		{"Quit", function() Program.quit = true end}}
 	Gui.menus = Widgets.Menus()
-	-- Bottom HUD.
 	Gui.chat_history = Widgets.Log()
-	Gui.chat_entry = Widgets.Entry{transparent = true}
+	-- Skill group.
+	Gui.skill_health = Widgets.SkillControl{compact = true}
+	Gui.skill_mana = Widgets.SkillControl{compact = true}
+	local skillgrp = Widget{cols = 1, spacings = {0,0}}
+	skillgrp:append_row(Gui.skill_health)
+	skillgrp:append_row(Gui.skill_mana)
+	-- Chat entry.
+	Gui.chat_label = Widgets.Label{text = " "}
+	Gui.chat_entry = Widgets.Entry{transparent = true, visible = false}
 	Gui.chat_entry.pressed = function(self)
 		Network:send{packet = Packet(packets.CHAT, "string", self.text)}
 		self:clear()
@@ -32,24 +39,18 @@ Gui.init = function(clss)
 	Gui.chat_group = Widget{cols = 1, spacings = {0,0}}
 	Gui.chat_group:append_row(Gui.chat_history)
 	Gui.chat_group:set_expand{col = 1, row = 1}
-	-- Skill group.
-	Gui.skill_health = Widgets.SkillControl{compact = true}
-	Gui.skill_mana = Widgets.SkillControl{compact = true}
-	local skillgrp = Widget{cols = 1, spacings = {0,0}}
-	skillgrp:append_row(Gui.skill_health)
-	skillgrp:append_row(Gui.skill_mana)
+	Gui.chat_group = Widget{cols = 2, rows = 1, spacings = {0, 0}}
+	Gui.chat_group:set_child(1, 1, Gui.chat_label)
+	Gui.chat_group:set_child(2, 1, Gui.chat_entry)
+	Gui.chat_group:set_expand{col = 2}
 	-- Skills group.
 	local pad = Widget()
-	local grp = Widget{cols = 2, rows = 1, spacings = {0, 0}}
 	pad:set_request{width = 64}
-	grp:set_child{col = 1, row = 1, widget = Widgets.Label{text = ">"}}
-	grp:set_child{col = 2, row = 1, widget = Gui.chat_entry}
-	grp:set_expand{col = 2}
 	Gui.fps_label = Widgets.Label{valign = 1}
 	Gui.skills_group = Widgets.Frame{cols = 4, rows = 2, style = "quickbar"}
 	Gui.skills_group:set_child{col = 1, row = 2, widget = skillgrp}
 	Gui.skills_group:set_child{col = 2, row = 2, widget = pad}
-	Gui.skills_group:set_child{col = 3, row = 1, widget = grp}
+	Gui.skills_group:set_child{col = 3, row = 1, widget = Gui.chat_group}
 	Gui.skills_group:set_child{col = 3, row = 2, widget = Quickslots.group}
 	Gui.skills_group:set_child{col = 4, row = 2, widget = Gui.fps_label}
 	Gui.skills_group:set_expand{col = 3}
@@ -57,7 +58,7 @@ Gui.init = function(clss)
 	Gui.modifiers = Widgets.Modifiers()
 	-- Packing.
 	Gui.top_group = Widget{rows = 1}
-	Gui.top_group:append_col(Gui.chat_group)
+	Gui.top_group:append_col(Gui.chat_history)
 	Gui.top_group:append_col(Gui.modifiers)
 	Gui.top_group:set_expand{col = 1}
 	Gui.center_group = Widget{cols = 1, spacings = {0,0}}
@@ -158,6 +159,16 @@ Gui.set_mode = function(self, mode, level)
 	end
 	if self.view and self.view.enter then self.view:enter() end
 end
+
+Gui.class_getters = {
+	chat_active = function(s) return s.chat_entry.visible end}
+
+Gui.class_setters = {
+	chat_active = function(s, v)
+		s.chat_entry.visible = v
+		s.chat_label.text = v and "TALK: " or " "
+		Gui:set_mode("game")
+	end}
 
 --- Sets or unsets the text of the action label.
 -- @param clss Gui class.

@@ -1,7 +1,20 @@
 Eventhandler{type = "keypress", func = function(self, args)
 	if Gui.mode ~= "game" and Widgets:handle_event(args) then
+		-- Widget input.
+		Action:event(args, {})
+	elseif Gui.chat_active then
+		-- Chat input.
+		if args.code == Keysym.ESCAPE then
+			Gui.chat_active = false
+		else
+			Gui.chat_entry:event(args)
+			if args.code == Keysym.RETURN then
+				Gui.chat_active = false
+			end
+		end
 		Action:event(args, {})
 	else
+		-- Game controls.
 		Action:event(args)
 	end
 end}
