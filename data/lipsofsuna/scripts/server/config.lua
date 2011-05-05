@@ -26,11 +26,11 @@ Config.new = function(clss)
 	self:load()
 	self:save()
 	-- Setup lobby.
+	Lobby.players = 0
 	if self.server_announce then
 		Lobby.desc = self.server_desc
 		Lobby.name = self.server_name
 		Lobby.master = self.server_master
-		Lobby.players = 0
 		Lobby.port = self.server_port
 	end
 	return self
