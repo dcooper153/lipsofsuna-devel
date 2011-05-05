@@ -108,6 +108,7 @@ require "content/dialogs/puppy"
 require "content/dialogs/roland"
 require "content/dialogs/sanctuary"
 require "content/dialogs/thehoarder"
+require "content/dialogs/mentor"
 
 if Settings.quit then Program.quit = true end
 if Settings.server then
