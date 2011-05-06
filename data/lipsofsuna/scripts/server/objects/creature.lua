@@ -225,6 +225,34 @@ Creature.calculate_speed = function(self)
 	end
 end
 
+--- Checks if the creature could climb over a low wall.
+-- @param self Creature.
+-- @return True if could climb.
+Creature.can_climb_low = function(self)
+	if self.movement < 0.5 then return end
+	local ctr = self.position * Voxel.tile_scale + Vector(0,0.5,0)
+	local dir = self.rotation * Vector(0,0,-1)
+	local dst = (ctr + dir):floor()
+	local f1 = Voxel:get_tile(dst)
+	local f2 = Voxel:get_tile(dst + Vector(0,1,0))
+	local f3 = Voxel:get_tile(dst + Vector(0,2,0))
+	return f1 ~= 0 and f2 == 0 and f3 == 0
+end
+
+--- Checks if the creature could climb over a high wall.
+-- @param self Creature.
+-- @return True if could climb.
+Creature.can_climb_high = function(self)
+	if self.movement < 0.5 then return end
+	local ctr = self.position * Voxel.tile_scale + Vector(0,0.5,0)
+	local dir = self.rotation * Vector(0,0,-1)
+	local dst = (ctr + dir):floor()
+	local f1 = Voxel:get_tile(dst + Vector(0,1,0))
+	local f2 = Voxel:get_tile(dst + Vector(0,2,0))
+	local f3 = Voxel:get_tile(dst + Vector(0,3,0))
+	return f1 ~= 0 and f2 == 0 and f3 == 0
+end
+
 --- Checks line of sight to the target point or object.
 -- @param self Object.
 -- @param args Arguments.<ul>
@@ -652,7 +680,57 @@ Creature.update_actions = function(self, secs)
 		self.velocity_prev = self.velocity
 	end
 	-- Play the landing animation after jumping.
+	-- Initiate climbing when applicable.
 	if self.jumping then
+		-- Climbing.
+		if self:can_climb_high() then
+			self.jumping = nil
+			self:animate("climb high")
+			Thread(function()
+				-- Rise.
+				local t = 0
+				local p = self.position
+				local r = self.rotation
+				repeat
+					local d = coroutine.yield()
+					t = t + d
+					self.position = p + Vector(0,2*t,0)
+					self.velocity = Vector()
+				until t > 0.8 * Voxel.tile_size
+				-- Slide.
+				t = 0
+				p = self.position
+				repeat
+					local d = coroutine.yield()
+					t = t + d
+					self.position = p + r * Vector(0,0.3,-0.8) * t
+				until t > 1
+			end)
+		elseif self:can_climb_low() then
+			self.jumping = nil
+			self:animate("climb low")
+			Thread(function()
+				-- Rise.
+				local t = 0
+				local p = self.position
+				local r = self.rotation
+				repeat
+					local d = coroutine.yield()
+					t = t + d
+					self.position = p + Vector(0,4*t,0)
+					self.velocity = Vector()
+				until t > 0.2 * Voxel.tile_size
+				-- Slide.
+				t = 0
+				p = self.position
+				repeat
+					local d = coroutine.yield()
+					t = t + d
+					self.position = p + r * Vector(0,0.3,-1) * 2 * t
+				until t > 0.5
+			end)
+		end
+		-- Landing.
 		self.jump_timer = (self.jump_timer or 0) + secs
 		if self.jump_timer > 0.2 and Program.time - self.jumped > 0.8 and self.ground then
 			if not self.submerged or self.submerged < 0.3 then
