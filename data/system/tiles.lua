@@ -219,6 +219,13 @@ Voxel.paste_region = function(self, args)
 	Los.voxel_paste_region{packet = args.packet.handle, point = args.point and args.point.handle, sector = args.sector}
 end
 
+--- Update the voxel terrain state.
+-- @param self Voxel class.
+-- @param secs Seconds since the last update.
+Voxel.update = function(self, secs)
+	Los.voxel_update(secs)
+end
+
 --- Sets the contents of a block of voxels.
 -- @param self Voxel class.
 -- @param args Arguments.<ul>

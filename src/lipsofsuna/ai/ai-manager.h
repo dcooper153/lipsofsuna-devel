@@ -30,7 +30,6 @@ struct _LIAiManager
 	LIAlgAstar* astar;
 	LIAlgSectors* sectors;
 	LICalCallbacks* callbacks;
-	LICalHandle calls[1];
 	LIVoxManager* voxels;
 };
 
@@ -56,5 +55,14 @@ LIAPICALL (LIAiPath*, liai_manager_solve_path, (
 	LIAiManager*       self,
 	const LIMatVector* start,
 	const LIMatVector* end));
+
+LIAPICALL (int, liai_manager_update_block, (
+	LIAiManager* self,
+	int          x,
+	int          y,
+	int          z,
+	int          sx,
+	int          sy,
+	int          sz));
 
 #endif

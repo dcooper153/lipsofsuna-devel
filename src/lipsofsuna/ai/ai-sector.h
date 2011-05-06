@@ -28,7 +28,7 @@
 struct _LIAiSector
 {
 	LIAiManager* manager;
-	LIAiWaypoint points[LIAI_WAYPOINTS_PER_SECTOR];
+	LIAiWaypoint* points;
 	LIAlgSector* sector;
 };
 
@@ -51,6 +51,14 @@ LIAPICALL (void, liai_sector_build_area, (
 	int          xs,
 	int          ys,
 	int          zs));
+
+LIAPICALL (void, liai_sector_build_border, (
+	LIAiSector* self,
+	LIAiSector* above,
+	int         x,
+	int         z,
+	int         xs,
+	int         zs));
 
 LIAPICALL (LIAiWaypoint*, liai_sector_get_waypoint, (
 	LIAiSector* self,

@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liai Ai
+ * \addtogroup LIAi Ai
  * @{
  * \addtogroup LIAiManager Manager
  * @{
@@ -26,53 +26,48 @@
 #include "ai-manager.h"
 #include "ai-sector.h"
 
-static float
-private_astar_cost (LIAiManager*  self,
-                    void*         object,
-                    LIAiWaypoint* start,
-                    LIAiWaypoint* end);
+static float private_astar_cost (
+	LIAiManager*  self,
+	void*         object,
+	LIAiWaypoint* start,
+	LIAiWaypoint* end);
 
-static float
-private_astar_heuristic (LIAiManager*  self,
-                         void*         object,
-                         LIAiWaypoint* start,
-                         LIAiWaypoint* end);
+static float private_astar_heuristic (
+	LIAiManager*  self,
+	void*         object,
+	LIAiWaypoint* start,
+	LIAiWaypoint* end);
 
-static int
-private_astar_passable (LIAiManager*  self,
-                        void*         object,
-                        LIAiWaypoint* start,
-                        LIAiWaypoint* end);
+static int private_astar_passable (
+	LIAiManager*  self,
+	void*         object,
+	LIAiWaypoint* start,
+	LIAiWaypoint* end);
 
-static void*
-private_astar_successor (LIAiManager*  self,
-                         void*         object,
-                         LIAiWaypoint* node,
-                         int           index);
+static void* private_astar_successor (
+	LIAiManager*  self,
+	void*         object,
+	LIAiWaypoint* node,
+	int           index);
 
-static int
-private_block_load (LIAiManager*      self,
-                    LIVoxUpdateEvent* event);
-
-static LIAiPath*
-private_solve_path (LIAiManager*  self,
-                    LIAiWaypoint* start,
-                    LIAiWaypoint* end);
+static LIAiPath* private_solve_path (
+	LIAiManager*  self,
+	LIAiWaypoint* start,
+	LIAiWaypoint* end);
 
 /*****************************************************************************/
 
 /**
  * \brief Creates a new AI manager.
- *
  * \param callbacks Callbacks.
  * \param sectors Sector manager.
  * \param voxels Voxel manager or NULL.
  * \return New AI manager or NULL.
  */
-LIAiManager*
-liai_manager_new (LICalCallbacks* callbacks,
-                  LIAlgSectors*   sectors,
-                  LIVoxManager*   voxels)
+LIAiManager* liai_manager_new (
+	LICalCallbacks* callbacks,
+	LIAlgSectors*   sectors,
+	LIVoxManager*   voxels)
 {
 	LIAiManager* self;
 
@@ -106,25 +101,17 @@ liai_manager_new (LICalCallbacks* callbacks,
 		return NULL;
 	}
 
-	/* Register callbacks. */
-	if (self->voxels != NULL)
-		lical_callbacks_insert (self->voxels->callbacks, "load-block", 1, private_block_load, self, self->calls + 0);
-
 	return self;
 }
 
 /**
  * \brief Frees the AI manager.
- *
  * \param self AI manager.
  */
-void
-liai_manager_free (LIAiManager* self)
+void liai_manager_free (
+	LIAiManager* self)
 {
-	/* Unregister callbacks. */
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
-
-	/* unregister sector content. */
+	/* Unregister sector content. */
 	if (self->sectors != NULL)
 		lialg_sectors_remove_content (self->sectors, "ai");
 
@@ -135,9 +122,15 @@ liai_manager_free (LIAiManager* self)
 	lisys_free (self);
 }
 
-LIAiWaypoint*
-liai_manager_find_waypoint (LIAiManager*       self,
-                            const LIMatVector* point)
+/**
+ * \brief Finds a waypoint.
+ * \param self AI manager.
+ * \param point Point in tiles.
+ * \return Waypoint or NULL.
+ */
+LIAiWaypoint* liai_manager_find_waypoint (
+	LIAiManager*       self,
+	const LIMatVector* point)
 {
 	int x;
 	int y;
@@ -147,15 +140,15 @@ liai_manager_find_waypoint (LIAiManager*       self,
 	int sz;
 	LIAiSector* sector;
 
-	x = point->x / LIAI_WAYPOINT_WIDTH;
-	y = point->y / LIAI_WAYPOINT_WIDTH;
-	z = point->z / LIAI_WAYPOINT_WIDTH;
-	sx = x / LIAI_WAYPOINTS_PER_LINE;
-	sy = y / LIAI_WAYPOINTS_PER_LINE;
-	sz = z / LIAI_WAYPOINTS_PER_LINE;
-	x %= LIAI_WAYPOINTS_PER_LINE;
-	y %= LIAI_WAYPOINTS_PER_LINE;
-	z %= LIAI_WAYPOINTS_PER_LINE;
+	x = (int)(point->x + 0.5);
+	y = (int)(point->y + 0.5);
+	z = (int)(point->z + 0.5);
+	sx = x / self->voxels->tiles_per_line;
+	sy = y / self->voxels->tiles_per_line;
+	sz = z / self->voxels->tiles_per_line;
+	x %= self->voxels->tiles_per_line;
+	y %= self->voxels->tiles_per_line;
+	z %= self->voxels->tiles_per_line;
 
 	sector = lialg_sectors_data_offset (self->sectors, "ai", sx, sy, sz, 0);
 	if (sector == NULL)
@@ -166,16 +159,15 @@ liai_manager_find_waypoint (LIAiManager*       self,
 
 /**
  * \brief Solves path from the starting point to the end point.
- *
  * \param self AI manager.
  * \param start Start position.
  * \param end Target position.
  * \return New path or NULL.
  */
-LIAiPath*
-liai_manager_solve_path (LIAiManager*       self,
-                         const LIMatVector* start,
-                         const LIMatVector* end)
+LIAiPath* liai_manager_solve_path (
+	LIAiManager*       self,
+	const LIMatVector* start,
+	const LIMatVector* end)
 {
 	LIAiWaypoint* wp0;
 	LIAiWaypoint* wp1;
@@ -188,13 +180,76 @@ liai_manager_solve_path (LIAiManager*       self,
 	return private_solve_path (self, wp0, wp1);
 }
 
+int liai_manager_update_block (
+	LIAiManager* self,
+	int          x,
+	int          y,
+	int          z,
+	int          sx,
+	int          sy,
+	int          sz)
+{
+	int ssize;
+	int boff[3];
+	int soff[3];
+	LIAiSector* ai;
+	LIAiSector* ai1;
+	LIAlgSector* sector;
+	LIVoxSector* voxel;
+
+	/* Calculate the block size and offset. */
+	ssize = self->voxels->tiles_per_line;
+	soff[0] = x / ssize;
+	soff[1] = y / ssize;
+	soff[2] = z / ssize;
+	boff[0] = x - soff[0] * ssize;
+	boff[1] = y - soff[1] * ssize;
+	boff[2] = z - soff[2] * ssize;
+
+	/* Find or create sector. */
+	sector = lialg_sectors_sector_offset (self->sectors, soff[0], soff[1], soff[2], 1);
+	if (sector == NULL)
+		return 1;
+	ai = lialg_strdic_find (sector->content, "ai");
+	voxel = lialg_strdic_find (sector->content, "voxel");
+	if (ai == NULL || voxel == NULL)
+		return 1;
+
+	/* Build waypoints. */
+	liai_sector_build_area (ai, voxel, boff[0], boff[1], boff[2], sx, sy, sz);
+
+	/* Update walkability flags at sector borders. */
+	if (!boff[1] && soff[1])
+	{
+		sector = lialg_sectors_sector_offset (self->sectors, soff[0], soff[1] - 1, soff[2], 0);
+		if (sector != NULL)
+		{
+			ai1 = lialg_strdic_find (sector->content, "ai");
+			if (ai1 != NULL)
+				liai_sector_build_border (ai, ai1, boff[0], boff[2], sx, sz);
+		}
+	}
+	else if (boff[1] == self->voxels->tiles_per_line - sy)
+	{
+		sector = lialg_sectors_sector_offset (self->sectors, soff[0], soff[1] + 1, soff[2], 0);
+		if (sector != NULL)
+		{
+			ai1 = lialg_strdic_find (sector->content, "ai");
+			if (ai1 != NULL)
+				liai_sector_build_border (ai1, ai, boff[0], boff[2], sx, sz);
+		}
+	}
+
+	return 1;
+}
+
 /*****************************************************************************/
 
-static float
-private_astar_cost (LIAiManager*  self,
-                    void*         object,
-                    LIAiWaypoint* start,
-                    LIAiWaypoint* end)
+static float private_astar_cost (
+	LIAiManager*  self,
+	void*         object,
+	LIAiWaypoint* start,
+	LIAiWaypoint* end)
 {
 	LIMatVector diff;
 
@@ -204,32 +259,32 @@ private_astar_cost (LIAiManager*  self,
 	return limat_vector_get_length (diff) + 50.0f * LIMAT_MAX (0, diff.y);
 }
 
-static float
-private_astar_heuristic (LIAiManager*  self,
-                         void*         object,
-                         LIAiWaypoint* start,
-                         LIAiWaypoint* end)
+static float private_astar_heuristic (
+	LIAiManager*  self,
+	void*         object,
+	LIAiWaypoint* start,
+	LIAiWaypoint* end)
 {
 	return LIMAT_ABS (start->position.x - end->position.x) +
 	       LIMAT_ABS (start->position.y - end->position.y) +
 	       LIMAT_ABS (start->position.z - end->position.z);
 }
 
-static int
-private_astar_passable (LIAiManager*  self,
-                        void*         object,
-                        LIAiWaypoint* start,
-                        LIAiWaypoint* end)
+static int private_astar_passable (
+	LIAiManager*  self,
+	void*         object,
+	LIAiWaypoint* start,
+	LIAiWaypoint* end)
 {
 	/* FIXME: Check for object size. */
 	return 1;
 }
 
-static void*
-private_astar_successor (LIAiManager*  self,
-                         void*         object,
-                         LIAiWaypoint* node,
-                         int           index)
+static void* private_astar_successor (
+	LIAiManager*  self,
+	void*         object,
+	LIAiWaypoint* node,
+	int           index)
 {
 	int i;
 	int x;
@@ -280,12 +335,12 @@ private_astar_successor (LIAiManager*  self,
 		sx = node->sector->sector->x;
 		sy = node->sector->sector->y;
 		sz = node->sector->sector->z;
-		if (x < 0) { x += LIAI_WAYPOINTS_PER_LINE; sx--; }
-		if (y < 0) { y += LIAI_WAYPOINTS_PER_LINE; sy--; }
-		if (z < 0) { z += LIAI_WAYPOINTS_PER_LINE; sz--; }
-		if (x >= LIAI_WAYPOINTS_PER_LINE) { x -= LIAI_WAYPOINTS_PER_LINE; sx++; }
-		if (y >= LIAI_WAYPOINTS_PER_LINE) { y -= LIAI_WAYPOINTS_PER_LINE; sy++; }
-		if (z >= LIAI_WAYPOINTS_PER_LINE) { z -= LIAI_WAYPOINTS_PER_LINE; sz++; }
+		if (x < 0) { x += self->voxels->tiles_per_line; sx--; }
+		if (y < 0) { y += self->voxels->tiles_per_line; sy--; }
+		if (z < 0) { z += self->voxels->tiles_per_line; sz--; }
+		if (x >= self->voxels->tiles_per_line) { x -= self->voxels->tiles_per_line; sx++; }
+		if (y >= self->voxels->tiles_per_line) { y -= self->voxels->tiles_per_line; sy++; }
+		if (z >= self->voxels->tiles_per_line) { z -= self->voxels->tiles_per_line; sz++; }
 
 		/* Find next sector. */
 		sector = node->sector;
@@ -298,11 +353,9 @@ private_astar_successor (LIAiManager*  self,
 
 		/* Get next node. */
 		/* FIXME: No support for flying monsters. */
+		/* FIXME: No support for larger monsters. */
 		wp = liai_sector_get_waypoint (sector, x, y, z);
-#warning Walkability flags are broken so path solving assumes all monsters can fly.
-		if (wp->flags & LIAI_WAYPOINT_FLAG_FLYABLE)
-/*		if ((wp->flags & LIAI_WAYPOINT_FLAG_WALKABLE) ||
-		   ((wp->flags & LIAI_WAYPOINT_FLAG_FLYABLE) && y < 0))*/
+		if (wp->flags & LIAI_WAYPOINT_FLAG_WALKABLE)
 		{
 			if (pos++ == index)
 				return wp;
@@ -312,42 +365,17 @@ private_astar_successor (LIAiManager*  self,
 	return NULL;
 }
 
-static int
-private_block_load (LIAiManager*      self,
-                    LIVoxUpdateEvent* event)
-{
-	LIAiSector* ai;
-	LIAlgSector* sector;
-	LIVoxSector* voxel;
-
-	/* Find or create sector. */
-	sector = lialg_sectors_sector_offset (self->sectors, event->sector[0], event->sector[1], event->sector[2], 1);
-	if (sector == NULL)
-		return 1;
-	ai = lialg_strdic_find (sector->content, "ai");
-	voxel = lialg_strdic_find (sector->content, "voxel");
-	if (ai == NULL || voxel == NULL)
-		return 1;
-
-	/* Build waypoints. */
-	liai_sector_build_area (ai, voxel, event->block[0], event->block[1], event->block[2],
-		LIAI_WAYPOINTS_PER_LINE, LIAI_WAYPOINTS_PER_LINE, LIAI_WAYPOINTS_PER_LINE);
-
-	return 1;
-}
-
 /**
  * \brief Solves path from the starting point to the end point.
- *
  * \param self AI manager.
  * \param start Start waypoint.
  * \param end Target waypoint.
  * \return New path or NULL.
  */
-static LIAiPath*
-private_solve_path (LIAiManager*  self,
-                    LIAiWaypoint* start,
-                    LIAiWaypoint* end)
+static LIAiPath* private_solve_path (
+	LIAiManager*  self,
+	LIAiWaypoint* start,
+	LIAiWaypoint* end)
 {
 	int i;
 	LIAiPath* path;

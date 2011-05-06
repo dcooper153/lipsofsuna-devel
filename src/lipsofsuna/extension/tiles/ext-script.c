@@ -476,6 +476,17 @@ static void Voxel_paste_region (LIScrArgs* args)
 	lisys_free (voxels);
 }
 
+static void Voxel_update (LIScrArgs* args)
+{
+	float secs = 3.0f;
+	LIExtModule* module;
+
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
+	liscr_args_gets_float (args, "secs", &secs);
+
+	livox_manager_update (module->voxels, secs);
+}
+
 static void Voxel_set_block (LIScrArgs* args)
 {
 	uint8_t skip;
@@ -681,6 +692,7 @@ void liext_script_voxel (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_get_tile", Voxel_get_tile);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_intersect_ray", Voxel_intersect_ray);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_paste_region", Voxel_paste_region);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_update", Voxel_update);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_set_block", Voxel_set_block);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_set_tile", Voxel_set_tile);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_set_tiles", Voxel_set_tiles);

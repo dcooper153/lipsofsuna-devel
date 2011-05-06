@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,17 +15,33 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __AI_TYPES_H__
-#define __AI_TYPES_H__
+#ifndef __EXT_MODULE_H__
+#define __EXT_MODULE_H__
 
-enum
+#include "lipsofsuna/extension.h"
+#include "lipsofsuna/ai.h"
+#include "lipsofsuna/voxel.h"
+
+#define LIEXT_SCRIPT_AI "Ai"
+
+typedef struct _LIExtModule LIExtModule;
+struct _LIExtModule
 {
-	LIAI_WAYPOINT_FLAG_FLYABLE  = 0x01,
-	LIAI_WAYPOINT_FLAG_WALKABLE = 0x02
+	LIMaiProgram* program;
+	LIAiManager* ai;
+	LICalHandle calls[2];
+	LIVoxManager* voxels;
 };
 
-typedef struct _LIAiManager LIAiManager;
-typedef struct _LIAiSector LIAiSector;
-typedef struct _LIAiWaypoint LIAiWaypoint;
+LIExtModule* liext_ai_new (
+	LIMaiProgram* program);
+
+void liext_ai_free (
+	LIExtModule* self);
+
+/*****************************************************************************/
+
+void liext_script_ai (
+	LIScrScript* self);
 
 #endif

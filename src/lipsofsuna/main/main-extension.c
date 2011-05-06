@@ -25,6 +25,7 @@
 #include <string.h>
 #include "main-extension.h"
 
+extern LIMaiExtensionInfo liext_ai_info;
 extern LIMaiExtensionInfo liext_animation_info;
 extern LIMaiExtensionInfo liext_camera_info;
 extern LIMaiExtensionInfo liext_config_file_info;
@@ -62,6 +63,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 	}
 	info[] =
 	{
+		{ "ai", &liext_ai_info },
 		{ "animation", &liext_animation_info },
 		{ "camera", &liext_camera_info },
 		{ "config-file", &liext_config_file_info },

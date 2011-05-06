@@ -35,13 +35,13 @@ Physics.enable_simulation = true
 catch(function() Object.unittest() end)
 
 require "system/tiles"
+require "system/ai"
 catch(function() Material.unittest() end)
+catch(function() Voxel.unittest() end)
+catch(function() Ai.unittest() end)
 
 require "system/database"
 catch(function() Database.unittest() end)
-
-require "system/tiles"
-catch(function() Voxel.unittest() end)
 
 require "system/graphics"
 -- TODO

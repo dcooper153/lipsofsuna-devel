@@ -16,7 +16,7 @@
  */
 
 /**
- * \addtogroup liai Ai
+ * \addtogroup LIAi Ai
  * @{
  * \addtogroup LIAiPath Path
  * @{
