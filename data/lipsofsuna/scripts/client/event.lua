@@ -87,9 +87,7 @@ Eventhandler{type = "tick", func = function(self, args)
 		Player:update_pose(args.secs)
 		Player:update_rotation(args.secs)
 		Player:update_camera(args.secs)
-		-- Update the light ball.
-		Player.light.position = Player.object.position + Player.object.rotation * Vector(0, 2, -3)
-		Player.light.enabled = true
+		Player:update_light(args.secs)
 		-- Sound playback.
 		Sound.listener_position = Player.object.position
 		Sound.listener_rotation = Player.object.rotation

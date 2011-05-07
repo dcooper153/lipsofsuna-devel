@@ -471,7 +471,7 @@ Iconspec{
 	size = {34,34}}
 
 Iconspec{
-	name = "modifier-spark",
+	name = "modifier-light",
 	image = "icons2",
 	offset = {0,102},
 	size = {34,34}}

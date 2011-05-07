@@ -104,6 +104,7 @@ Quickslots.load = function(clss)
 	-- First set defaults.
 	clss:assign_feat(1, Feat{animation = "spell on self", effects = {{"restore health", 10}}})
 	clss:assign_feat(2, Feat{animation = "ranged spell", effects = {{"fire damage", 10}}})
+	clss:assign_feat(3, Feat{animation = "spell on self", effects = {{"light", 1}}})
 	-- Load from the database.
 	local rows = clss.db:query("SELECT slot,item,feat FROM quickslots;")
 	for k,v in ipairs(rows) do

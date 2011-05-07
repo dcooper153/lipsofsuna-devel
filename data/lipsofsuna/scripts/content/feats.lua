@@ -50,7 +50,7 @@ Featanimspec{
 	cooldown = 2,
 	description = "Cast a spell on yourself",
 	effect = "spell1",
-	effects = {"fire damage", "restore health", "sanctuary", "wilderness"}}
+	effects = {"fire damage", "light", "restore health", "sanctuary", "wilderness"}}
 
 Featanimspec{
 	name = "spell on touch",
@@ -100,6 +100,18 @@ Feateffectspec{
 	skill_mult = {intelligence = 1, willpower = 1},
 	reagent_base = {["milky powder"] = 1},
 	reagent_mult = {["milky powder"] = 0.1}}
+
+Feateffectspec{
+	name = "light",
+	categories = {"light", "spell"},
+	description = "Illuminate your surroundings",
+	effect = "spell1",
+	icon = "modifier-light",
+	influences = {{"light", 30, 2}},
+	skill_base = {willpower = 5},
+	skill_mult = {willpower = 0.1},
+	reagent_base = {["milky powder"] = 0.5},
+	reagent_mult = {["milky powder"] = 0.02}}
 
 Feateffectspec{
 	name = "physical damage",

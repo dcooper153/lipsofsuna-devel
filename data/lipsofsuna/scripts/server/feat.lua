@@ -102,6 +102,11 @@ Feat.apply = function(self, args)
 					args.target:add_enemy(args.attacker)
 				end
 			end
+		elseif k == "light" then
+			-- Increase light duration.
+			if args.target then
+				args.target:inflict_modifier("light", v)
+			end
 		elseif k == "plague" then
 			-- Summon plagued beasts.
 			for i = 1,math.random(1, math.ceil(v + 0.01)) do

@@ -1,5 +1,6 @@
 Player = Class()
-Player.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equation={1.5,0.3,0.04}, priority = 2}
+Player.light = Light{ambient = {0.3,0.3,0.4,1.0}, diffuse={0.6,0.6,0.7,1.0}, equation={1.5,0.2,0.1}, priority = 2}
+Player.light_spell = Light{ambient = {0.1,0.1,0.1,1}, diffuse={1,1,1,1}, equation={1.5,0,0.05}, priority = 2}
 Player.species = "aer" -- FIXME
 
 local radian_wrap = function(x)
@@ -237,7 +238,21 @@ Player.send_rotation = function(clss)
 	Network:send{packet = Packet(packets.PLAYER_TURN, "float", r.x, "float", r.y, "float", r.z, "float", r.w)}
 end
 
+Player.update_light = function(clss, secs)
+	local p = clss.object.position
+	local r = clss.object.rotation
+	-- Update the light ball.
+	clss.light.position = p + r * Vector(0, 2, -3)
+	clss.light.enabled = true
+	-- Update the light spell.
+	clss.light_spell.position = p + r * Vector(0,2,-1.5)
+end
+
 Player.update_pose = function(clss, secs)
+end
+
+Player.set_light = function(clss, value)
+	clss.light_spell.enabled = value
 end
 
 -- Periodically check if there's an object in front of the player.

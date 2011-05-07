@@ -21,12 +21,12 @@ require "server/npcs/lastboss"
 require "server/admin"
 require "server/quest"
 require "server/modifier"
-require "server/modifiers/bleeding"
-require "server/modifiers/plague"
-require "server/modifiers/sanctuary"
 require "server/editing"
 require "server/particles"
 require "server/generator"
+for k,v in pairs(File:scan_directory("scripts/server/modifiers")) do
+	require("server/modifiers/" .. string.gsub(v, "([^.]*).*", "%1"))
+end
 
 local m = Material:find{name = "granite1"}
 Voxel.fill = m.id

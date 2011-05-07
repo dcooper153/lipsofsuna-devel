@@ -28,6 +28,8 @@ Widgets.Modifiers.add = function(self, name, time)
 		self.dict_name[name] = icon
 		self:append_col(icon)
 	end
+	-- Special handling for light.
+	if name == "light" then Player:set_light(true) end
 end
 
 --- Removes a modifier.
@@ -44,6 +46,8 @@ Widgets.Modifiers.remove = function(self, name)
 	for id = icon.id,#self.dict_id do
 		self.dict_id[id].id = id
 	end
+	-- Special handling for light.
+	if name == "light" then Player:set_light(false) end
 end
 
 --- Updates the modifiers.
