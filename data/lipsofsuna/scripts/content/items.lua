@@ -141,7 +141,7 @@ Itemspec{
 	name = "log",
 	model = "log1",
 	icon = "log1",
-	categories = {"build", "material","throwable"},
+	categories = {"build", "material"},
 	animation_hold = "hold bulky",
 	animation_attack = "throw bulky",
 	construct_tile = "wood1",
@@ -291,6 +291,8 @@ Itemspec{
 	animation_hold = "hold torch",
 	categories = {"misc"},
 	crafting_materials = {["log"] = 1},
+	effect_equip = "torch1",
+	effect_unequip = "torch1",
 	equipment_slot = "hand.L",
 	icon = "torch1",
 	mass = 3,
@@ -342,6 +344,7 @@ Itemspec{
 		["looted"] = {animation = "open", channel = 1, permanent = true, repeat_start = 10, time = 10}},
 	categories = {"container", "generate"},
 	crafting_materials = {log = 10},
+	effect_craft = "craftwood1",
 	inventory_size = 8,
 	inventory_type = "chest",
 	loot_categories = {"armor", "book", "material", "misc", "potion", "shield", "weapon"},
@@ -372,6 +375,7 @@ Itemspec{
 	categories = {"container", "workbench"},
 	crafting_materials = {log = 7},
 	description = "Right click and drag materials inside to craft.",
+	effect_craft = "craftwood1",
 	inventory_size = 4,
 	inventory_type = "workbench",
 	stacking = false,
@@ -387,6 +391,7 @@ Itemspec{
 	mass = 10,
 	categories = {"furniture"},
 	crafting_materials = {log = 5},
+	effect_craft = "craftwood1",
 	health = 30,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
@@ -398,6 +403,7 @@ Itemspec{
 	mass = 10,
 	categories = {"furniture"},
 	crafting_materials = {log = 5},
+	effect_craft = "craftwood1",
 	health = 30,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
@@ -409,6 +415,7 @@ Itemspec{
 	mass = 15,
 	categories = {"furniture"},
 	crafting_materials = {log = 6},
+	effect_craft = "craftwood1",
 	health = 30,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
@@ -420,6 +427,7 @@ Itemspec{
 	mass = 20,
 	categories = {"furniture"},
 	crafting_materials = {log = 7},
+	effect_craft = "craftwood1",
 	health = 30,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
@@ -434,6 +442,7 @@ Itemspec{
 	categories = {"explosive"},
 	crafting_materials = {log = 1},
 	destroy_actions = {"explode"},
+	effect_craft = "craftmetal1",
 	health = 1,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
@@ -454,6 +463,8 @@ Itemspec{
 	crafting_materials = {["empty bottle"] = 1, ["milky powder"] = 1},
 	crafting_skills = {intelligence = 50},
 	description = "Right click to heal yourself.",
+	effect_craft = "craftpotion1",
+	effect_use = "potiondrink1",
 	stacking = true,
 	icon = "potion1",
 	water_gravity = Vector(0,6,0)}
@@ -466,6 +477,8 @@ Itemspec{
 	crafting_materials = {["empty bottle"] = 1, ["milky powder"] = 3},
 	crafting_skills = {intelligence = 50},
 	description = "Right click to replenish your willpower.",
+	effect_craft = "craftpotion1",
+	effect_use = "potiondrink1",
 	stacking = true,
 	icon = "potion2",
 	water_gravity = Vector(0,6,0)}

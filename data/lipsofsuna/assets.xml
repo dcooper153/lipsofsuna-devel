@@ -49,6 +49,9 @@
     <url>http://opengameart.org/user/99</url>
   </author-info>
   <author-info>
+    <name>Kabraxis</name>
+  </author-info>
+  <author-info>
     <name>Lauris Kaplinski</name>
     <url>http://khayyam.kaplinski.com/</url>
   </author-info>
@@ -2541,6 +2544,116 @@
     <status>FIXME</status>
     <type>sound effect</type>
   </asset>
+
+  <asset>
+    <file>sounds/builtrock1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/builtwood1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/craftmetal1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/craftpotion1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/craftsewing1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/craftwood1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/destroyrock1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/diseasecontact1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/portal1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/potiondrink1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/selfdestructcountdown1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/spellberserk1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/spellhealing1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/spelllight1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/spellsanctuary1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/torchlit1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/weaponcrossbow1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+  <asset>
+    <file>sounds/weaponmusket1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>sound effect</type>
+  </asset>
+
  <asset>
     <file>graphics/plaguerat1.lmdl</file>
     <author>Francisco "FreeLikeGNU" Athens</author>

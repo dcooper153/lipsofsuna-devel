@@ -1,4 +1,5 @@
 Material{
+	effect_build = "builtrock1",
 	mining_materials = {["adamantium"] = 1},
 	name = "adamantium1",
 	shader = "adamantium",
@@ -8,6 +9,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_build = "builtrock1",
 	mining_materials = {["aquanite stone"] = 1},
 	name = "aquanite1",
 	shader = "terrain",
@@ -17,6 +19,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_build = "builtrock1",
 	mining_materials = {["basalt stone"] = 1},
 	name = "basalt1",
 	shader = "terrain",
@@ -25,6 +28,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_build = "builtrock1",
 	effect_collapse = "collapse1",
 	name = "brick1",
 	shader = "terrain",
@@ -34,6 +38,7 @@ Material{
 	type = "cube"}
 
 Material{
+	effect_build = "builtrock1",
 	effect_collapse = "collapse1",
 	name = "brittlerock1",
 	shader = "terrain",
@@ -43,6 +48,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_build = "builtrock1",
 	effect_collapse = "collapse1",
 	name = "cobbles1",
 	shader = "terrain",
@@ -52,6 +58,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_build = "builtrock1",
 	effect_collapse = "collapse1",
 	mining_materials = {["granite stone"] = 1},
 	name = "concrete1",
@@ -62,6 +69,7 @@ Material{
 	type = "cube"}
 
 Material{
+	effect_build = "builtrock1",
 	mining_materials = {["crimson stone"] = 1},
 	name = "crimson1",
 	shader = "terrain",
@@ -71,6 +79,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_build = "builtrock1",
 	effect_collapse = "collapse2",
 	mining_materials = {["ferrostone"] = 1},
 	name = "ferrostone1",
@@ -81,6 +90,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_build = "builtrock1",
 	effect_collapse = "collapse1",
 	mining_materials = {["granite stone"] = 1},
 	name = "granite1",
@@ -91,6 +101,7 @@ Material{
 	type = "rounded fractal"}
 
 Material{
+	effect_build = "builtrock1",
 	effect_collapse = "collapse2",
 	mining_transform = "soil1",
 	name = "grass1",
@@ -131,6 +142,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_build = "builtrock1",
 	effect_collapse = "collapse2",
 	mining_materials = {["sand chunk"] = 1},
 	name = "sand1",
@@ -141,6 +153,7 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_build = "builtrock1",
 	effect_collapse = "collapse2",
 	mining_materials = {["soil chunk"] = 1},
 	name = "soil1",
@@ -159,6 +172,7 @@ Material{
 	type = "liquid"}
 
 Material{
+	effect_build = "builtwood1",
 	effect_collapse = "collapse2",
 	mining_materials = {["log"] = 1},
 	name = "wood1",

@@ -5,6 +5,7 @@ Itemspec{
 	armor_class = 0.02,
 	categories = {"armor"},
 	crafting_materials = {log = 1},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {upper1 = "aerchinadress1", panties = "panties2"},
 		["android"] = {upper1 = "androidchinadress1"},
@@ -20,6 +21,7 @@ Itemspec{
 	armor_class = 0.02,
 	categories = {"armor"},
 	crafting_materials = {hide = 2},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {hat = "aerfedora1"},
 		["devora"] = {hat = "devorafedora1"}},
@@ -34,6 +36,7 @@ Itemspec{
 	armor_class = 0.02,
 	categories = {"armor"},
 	crafting_materials = {log = 1},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["troglodyte female"] = {upper1 = "trogfemrags1"}},
 	equipment_slot = "upperbody",
@@ -47,6 +50,7 @@ Itemspec{
 	armor_class = 0.08,
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 3},
+	effect_craft = "craftmetal1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {feet = false, legs = "aerlegplate1"},
 		["android"] = {feet = false, legs = "androidlegplate1"}},
@@ -60,6 +64,7 @@ Itemspec{
 	armor_class = 0.08,
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 2},
+	effect_craft = "craftmetal1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {arms = "aerarmplate1", hands = false},
 		["android"] = {arms = "androidarmplate1", hands = false}},
@@ -73,6 +78,7 @@ Itemspec{
 	armor_class = 0.18,
 	categories = {"armor"},
 	crafting_materials = {["iron ingot"] = 5},
+	effect_craft = "craftmetal1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {upper = "aerupperplate1", lower = "aerlowerplate1"},
 		["android"] = {upper = "androidupperplate1", lower = "androidlowerplate1"}},
@@ -86,6 +92,7 @@ Itemspec{
 	armor_class = 0.02,
 	categories = {"armor"},
 	crafting_materials = {hide = 2},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {headband = "aerheadband1"},
 		["devora"] = {headband = "devoraheadband1"}},
@@ -100,6 +107,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 2},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aermale"] = {hair = "aermale1leatherhead2"}},
 	equipment_slot = "head",
@@ -113,6 +121,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {feet = false, legs = "aerleggings1"},
 		["android"] = {feet = false, legs = "androidleggings1"},
@@ -128,6 +137,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {["hide"] = 2},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aermale"] = {hands = "aermale1leatherarms2"}},
 	equipment_slot = "arms",
@@ -141,6 +151,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {legs = "aerlegarmor2", legs1 = "boots1"},["aermale"] = {feet = "aermale1boots1"}},
 	equipment_slot = "feet",
@@ -154,6 +165,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},["aermale"] = {legs = "aermale1leatherlegs2"}},
 	equipment_slot = "lowerbody",
@@ -167,6 +179,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},["aermale"] = {legs = "aermale1leatherlegs1"}},
 	equipment_slot = "lowerbody",
@@ -180,6 +193,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {upper1 = "bra1"}},
 	equipment_slot = "upperbody",
@@ -193,6 +207,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {skirt = "aerleatherskirt1", panties = "panties2"}},
 	equipment_slot = "lowerbody",
@@ -204,6 +219,7 @@ Itemspec{
 	armor_class = 0.05,
 	categories = {"armor"},
 	crafting_materials = {["lizard scale"] = 4},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {feet = "aerlizardboots1"}},
 	equipment_slot = "feet",
@@ -217,6 +233,7 @@ Itemspec{
 	armor_class = 0.1,
 	categories = {"armor"},
 	crafting_materials = {["lizard scale"] = 6},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {dress1 = "aerlizarddress1", panties = "panties2"}},
 	equipment_slot = "upperbody",
@@ -230,6 +247,7 @@ Itemspec{
 	armor_class = 0.05,
 	categories = {"armor"},
 	crafting_materials = {["lizard scale"] = 4},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/android/kraken/wyrm"] = {hands = "aerlizardgloves1"}},
 	equipment_slot = "arms",
@@ -245,6 +263,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest2"}},
 	equipment_slot = "upperbody",
@@ -258,6 +277,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 4},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {upper1 = "aerleatherchest1"},["aermale"] = {upper = "aermale1leatherchest1"}},
 	equipment_slot = "upperbody",
@@ -294,6 +314,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 1},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aermale"] = {upper = "aermale1shirt1"}},
 	equipment_slot = "upperbody",
@@ -307,6 +328,7 @@ Itemspec{
 	armor_class = 0.04,
 	categories = {"armor"},
 	crafting_materials = {hide = 1},
+	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aermale"] = {legs = "aermale1pants1"}},
 	equipment_slot = "lowerbody",

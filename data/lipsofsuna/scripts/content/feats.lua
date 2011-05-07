@@ -118,7 +118,7 @@ Feateffectspec{
 	name = "light",
 	categories = {"light", "spell"},
 	description = "Illuminate your surroundings",
-	effect = "spell1",
+	effect = "light1",
 	icon = "modifier-light",
 	influences = {{"light", 30, 2}},
 	skill_base = {willpower = 5},
