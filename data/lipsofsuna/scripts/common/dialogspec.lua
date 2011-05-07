@@ -48,6 +48,12 @@ Dialogspec.validate = function(self, args)
 			validate_arguments(c, {cond = true, cond_not = true})
 			validate_branch(c, 3)
 		end,
+		effect = function(c)
+			assert(type(c[2]) == "nil" or type(c[2]) == "string", "argument #2 of \"effect\" must be the effect name string")
+		end,
+		["effect player"] = function(c)
+			assert(type(c[2]) == "nil" or type(c[2]) == "string", "argument #2 of \"effect player\" must be the effect name string")
+		end,
 		exit = function(c)
 			assert(type(c[2]) == "nil", "too many arguments to \"exit\" command")
 			validate_arguments(c, {})

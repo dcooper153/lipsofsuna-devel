@@ -4,6 +4,7 @@ Effect.play = function(clss, name)
 	EffectObject{
 		object = Player.object,
 		sound = e.sound,
+		sound_delay = e.sound_delay,
 		sound_pitch = e.sound_pitch,
 		realized = true}
 end
@@ -13,16 +14,17 @@ EffectObject = Class(Object)
 --- Creates a new effect.
 -- @param clss EffectObject class.
 -- @param args Arguments.<ul>
---   <li>font: Font name or nil.</li>
---   <li>font_color: Font color table or nil.</li>
---   <li>life: Life time in seconds or nil.</li>
---   <li>model: Particle effect name or nil.</li>
+--   <li>font: Font name.</li>
+--   <li>font_color: Font color table.</li>
+--   <li>life: Life time in seconds.</li>
+--   <li>model: Particle effect name.</li>
 --   <li>object: Parent object or nil.</li>
---   <li>position: Position in world space or nil.</li>
---   <li>sound: Sound effect name or nil.</li>
---   <li>sound_pitch: Sound effect pitch range or nil.</li>
---   <li>text: Text effect string or nil.</li>
---   <li>velocity: Velocity vector or nil.</li></ul>
+--   <li>position: Position in world space.</li>
+--   <li>sound: Sound effect name.</li>
+--   <li>sound_delay: Sound delay in seconds.</li>
+--   <li>sound_pitch: Sound effect pitch range.</li>
+--   <li>text: Text effect string.</li>
+--   <li>velocity: Velocity vector.</li></ul>
 -- @return Object.
 EffectObject.new = function(clss, args)
 	local life = args.life or 10
@@ -34,11 +36,21 @@ EffectObject.new = function(clss, args)
 	-- Attach a sound effect.
 	if args.sound then
 		local volume = (args.sound_volume or 1) * Views.Options.inst.sound_volume
-		if args.sound_pitch then
-			Sound:effect{object = self, effect = args.sound, volume = volume,
-				pitch = 1 + args.sound_pitch * (math.random() - 0.5)}
+		local play = function()
+			if args.sound_pitch then
+				Sound:effect{object = self, effect = args.sound, volume = volume,
+					pitch = 1 + args.sound_pitch * (math.random() - 0.5)}
+			else
+				Sound:effect{object = self, effect = args.sound, volume = volume}
+			end
+		end
+		if args.sound_delay then
+			Timer{delay = args.sound_delay, func = function(t)
+				play()
+				t:disable()
+			end}
 		else
-			Sound:effect{object = self, effect = args.sound, volume = volume}
+			play()
 		end
 	end
 	-- Attach a text effect.

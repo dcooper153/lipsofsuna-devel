@@ -16,6 +16,10 @@ Crafting.craft = function(clss, args)
 	for name,req in pairs(spec.crafting_materials) do
 		args.workbench:subtract_items{name = name, count = req}
 	end
+	-- Play the crafting effect.
+	if spec.effect_craft then
+		Effect:play{effect = spec.effect_craft, object = args.user}
+	end
 	-- Create item.
 	return Item{count = spec.crafting_count, spec = spec}
 end

@@ -87,6 +87,14 @@ Dialog.execute = function(self)
 		exit = function(vm, c)
 			for i = #vm,1,-1 do vm[i] = nil end
 		end,
+		effect = function(vm, c)
+			Effect:play{effect = c[2], object = self.object}
+			vm[1].pos = vm[1].pos + 1
+		end,
+		["effect player"] = function(vm, c)
+			Effect:play{effect = c[2], object = self.user}
+			vm[1].pos = vm[1].pos + 1
+		end,
 		feat = function(vm, c)
 			Feat:unlock(c)
 			vm[1].pos = vm[1].pos + 1

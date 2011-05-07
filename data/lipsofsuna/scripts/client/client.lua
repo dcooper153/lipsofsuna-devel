@@ -110,6 +110,7 @@ Protocol:add_handler{type = "OBJECT_EFFECT", func = function(event)
 			model = effect.model,
 			object = obj,
 			sound = effect.sound,
+			sound_delay = effect.sound_delay,
 			sound_pitch = effect.sound_pitch,
 			realized = true}
 		-- Quake the camera.
@@ -335,6 +336,7 @@ Protocol:add_handler{type = "WORLD_EFFECT", func = function(event)
 			model = effect.model,
 			position = Vector(x,y,z),
 			sound = effect.sound,
+			sound_delay = effect.sound_delay,
 			sound_pitch = effect.sound_pitch,
 			realized = true}
 		-- Quake the camera.

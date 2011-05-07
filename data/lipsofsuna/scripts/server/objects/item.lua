@@ -295,7 +295,6 @@ Item.use_cb = function(self, user)
 		local value = skills:get_value{skill = type.skill}
 		if not value then return end
 		skills:set_value{skill = type.skill, value = value + type.value}
-		Effect:play{effect = "impact1", object = user}
 		self:subtract{count = 1}
 		user:add_item{object = Item{spec = Itemspec:find{name = "empty bottle"}}}
 	elseif self.spec.equipment_slot then
@@ -308,6 +307,10 @@ Item.use_cb = function(self, user)
 			-- Equip items in inventory slots.
 			Actions:move_from_inv_to_inv(user, inv.id, slot, user.id, self.spec.equipment_slot)
 		end
+	end
+	-- Play the use sound.
+	if self.spec.effect_use then
+		Effect:play{effect = self.spec.effect_use, object = user}
 	end
 end
 

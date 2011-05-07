@@ -214,6 +214,9 @@ Feat.apply = function(self, args)
 						local o = args.weapon:split{count = need}
 						o:detach()
 						Voxel:set_tile(p, m.id)
+						if m.effect_build then
+							Effect:play{effect = m.effect_build, point = p * Config.tilewidth}
+						end
 					end
 				end
 			end
@@ -342,6 +345,8 @@ Feat.perform = function(self, args)
 	local feat = self
 	local anim = Featanimspec:find{name = feat.animation}
 	local info = anim and feat:get_info()
+	local slot = anim and anim.slot
+	local weapon = slot and args.user:get_item{slot = slot}
 	-- Check for cooldown and requirements.
 	if info and not args.stop then
 		if args.user.cooldown then return end
@@ -360,13 +365,14 @@ Feat.perform = function(self, args)
 		if anim.effect then
 			Effect:play{effect = anim.effect, object = args.user}
 		end
+		if weapon and weapon.spec.effect_attack then
+			Effect:play{effect = weapon.spec.effect_attack, object = args.user}
+		end
 		Vision:event{type = "object-feat", object = args.user, anim = anim}
 	end
 	-- Call the feat function.
 	if not info or anim.toggle or not args.stop then
 		if anim then
-			local slot = anim.slot
-			local weapon = args.user:get_item{slot = slot}
 			if anim.categories["build"] then
 				-- Build terrain or machines.
 				-- While the attack animation is played, an attack ray is cast.

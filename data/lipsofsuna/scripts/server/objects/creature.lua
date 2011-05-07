@@ -402,6 +402,10 @@ Creature.equip_item = function(self, args)
 	end
 	-- Equip the item.
 	self.inventory:set_object{object = args.object, slot = slot}
+	-- Play the equip effect.
+	if args.object and args.object.spec.effect_equip then
+		Effect:play{effect = args.object.spec.effect_equip, object = self}
+	end
 	return true
 end
 
@@ -626,6 +630,10 @@ Creature.unequip_item = function(self, args)
 	local item = self.inventory:get_object{slot = args.slot}
 	if not item then return true end
 	if not self:add_item{object = item} then return end
+	-- Play the unequip effect.
+	if args.object and args.object.spec.effect_unequip then
+		Effect:play{effect = args.object.spec.effect_unequip, object = self}
+	end
 	return true
 end
 

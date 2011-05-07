@@ -18,6 +18,10 @@ end
 -- @param name Modifier name.
 -- @param time Modifier duration.
 Widgets.Modifiers.add = function(self, name, time)
+	-- Special handling for light and plague.
+	if name == "light" then Player:set_light(true) end
+	if name == "plague" and not self.dict_name[name] then Effect:play("disease1") end
+	-- Add the icon.
 	local icon = self.dict_name[name]
 	if icon then
 		icon.time = time
@@ -28,8 +32,6 @@ Widgets.Modifiers.add = function(self, name, time)
 		self.dict_name[name] = icon
 		self:append_col(icon)
 	end
-	-- Special handling for light.
-	if name == "light" then Player:set_light(true) end
 end
 
 --- Removes a modifier.

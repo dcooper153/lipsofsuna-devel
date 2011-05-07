@@ -24,6 +24,11 @@ Itemspec.dict_name = {}
 --   <li>influences_bonus: Dictionary of skill names and influence multipliers.</li>
 --   <li>destroy_actions: List of actions to perform when the item is destroyed.</li>
 --   <li>destroy_timer: Time in seconds after which to destruct when thrown.</li>
+--   <li>effect_attack: Name of the effect to play when the item is used for attacking.</li>
+--   <li>effect_craft: Name of the effect to play when the item is crafted.</li>
+--   <li>effect_equip: Name of the effect to play when the item is equiped.</li>
+--   <li>effect_unequip: Name of the effect to play when the item is unequiped.</li>
+--   <li>effect_use: Name of the effect to play when the item is used.</li>
 --   <li>equipment_models: Dictionary of equipment models.</li>
 --   <li>equipment_slot: Equipment slot into which the item can be placed.</li>
 --   <li>equipment_slots_reserved: List of equipment slots that the item reserves in addition to the main slot.</li>
@@ -70,6 +75,11 @@ Itemspec.new = function(clss, args)
 	copy("crafting_materials", {})
 	copy("crafting_skills", {})
 	copy("destroy_actions", {})
+	copy("effect_attack")
+	copy("effect_craft")
+	copy("effect_equip")
+	copy("effect_unequip")
+	copy("effect_use")
 	copy("gravity", Vector(0,-15,0))
 	copy("interactive", true)
 	copy("inventory_items", {})
