@@ -24,6 +24,46 @@
 
 #include "ext-module.h"
 
+static void File_read (LIScrArgs* args)
+{
+	int i;
+	int len;
+	char* buf;
+	char* path_abs;
+	const char* path;
+	LIArcReader* reader;
+	LIExtModule* module;
+
+	/* Construct the path. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_FILE);
+	if (!liscr_args_geti_string (args, 0, &path))
+		return;
+	for (i = 0 ; i < strlen (path) ; i++)
+	{
+		if ((path[i] < 'a' || path[i] > 'z') && (path[i] != '/'))
+			return;
+	}
+	path_abs = lisys_path_concat (module->program->paths->module_data, path, NULL);
+
+	/* Open the file. */
+	/* TODO: Also support additions in the home directory. */
+	reader = liarc_reader_new_from_file (path_abs);
+	lisys_free (path_abs);
+	if (reader == NULL)
+		return;
+
+	/* Return the file contents. */
+	len = reader->length;
+	buf = lisys_calloc (len, sizeof (char));
+	if (buf != NULL)
+	{
+		lua_pushlstring (args->lua, buf, len);
+		liscr_args_seti_stack (args);
+		lisys_free (buf);
+	}
+	liarc_reader_free (reader);
+}
+
 static void File_scan_directory (LIScrArgs* args)
 {
 	int i;
@@ -40,7 +80,8 @@ static void File_scan_directory (LIScrArgs* args)
 		return;
 	for (i = 0 ; i < strlen (path) ; i++)
 	{
-		if ((path[i] < 'a' || path[i] > 'z') && (path[i] != '/'))
+		if ((path[i] < 'a' || path[i] > 'z') && (path[i] < '0' || path[i] > '9') && 
+		    (path[i] != '/' && path[i] != '.' && path[i] != '-' && path[i] != '_'))
 			return;
 	}
 	path_abs = lisys_path_concat (module->program->paths->module_data, path, NULL);
@@ -70,12 +111,49 @@ static void File_scan_directory (LIScrArgs* args)
 	lisys_dir_free (dir);
 }
 
+static void File_write (LIScrArgs* args)
+{
+	int i;
+	char* path_abs;
+	const char* path;
+	const char* data;
+	LIArcWriter* writer;
+	LIExtModule* module;
+
+	/* Construct the path. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_FILE);
+	if (!liscr_args_geti_string (args, 0, &path) ||
+	    !liscr_args_geti_string (args, 1, &data))
+		return;
+	for (i = 0 ; i < strlen (path) ; i++)
+	{
+		if ((path[i] < 'a' || path[i] > 'z') && (path[i] < '0' || path[i] > '9') && 
+		    (path[i] != '/' && path[i] != '.' && path[i] != '-' && path[i] != '_'))
+			return;
+	}
+	path_abs = lisys_path_concat (module->program->paths->module_data, path, NULL);
+
+	/* Open the file. */
+	/* TODO: Also support additions in the home directory. */
+	writer = liarc_writer_new_file (path_abs);
+	lisys_free (path_abs);
+	if (writer == NULL)
+		return;
+
+	/* Write the file contents. */
+	if (liarc_writer_append_string (writer, data))
+		liscr_args_seti_bool (args, 1);
+	liarc_writer_free (writer);
+}
+
 /*****************************************************************************/
 
 void liext_script_file (
 	LIScrScript* self)
 {
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_FILE, "file_read", File_read);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_FILE, "file_scan_directory", File_scan_directory);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_FILE, "file_write", File_write);
 }
 
 /** @} */

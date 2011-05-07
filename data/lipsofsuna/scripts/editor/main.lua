@@ -389,8 +389,11 @@ Editor.save = function(self)
 		t = t .. "}"
 	end
 	t = t .. "}\n"
-	-- Print to the console.
-	print(t)
+	-- Write to the file.
+	local name = string.format("scripts/content/patterns/%s.lua", self.pattern.name)
+	if not File:write(name, t) then
+		print(string.format("ERROR: Could not save `%s'.", name))
+	end
 end
 
 Editor.pick = function(self)
