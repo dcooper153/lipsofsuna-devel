@@ -83,7 +83,12 @@ Feat.apply = function(self, args)
 	-- Influences.
 	local info = self:get_info(args)
 	for k,v in pairs(info.influences) do
-		if k == "health" then
+		if k == "dig" then
+			-- Dig terrain.
+			if args.tile then
+				Voxel:damage(args.attacker, args.tile)
+			end
+		elseif k == "health" then
 			-- Increase or decrease health.
 			if args.target then
 				-- Randomize the amount.
@@ -428,7 +433,15 @@ Feat.perform = function(self, args)
 						if effect and effect.projectile then
 							local ammo = Object{model = effect.projectile, physics = "rigid"}
 							ammo.gravity = Vector()
-							ammo:fire{collision = true, feat = feat, owner = args.user, weapon = weapon}
+							if effect.name == "dig" then
+								ammo:fire{collision = true, feat = feat, owner = args.user, timer = 10}
+								ammo.orig_rotation = ammo.rotation
+								ammo.orig_velocity = ammo.velocity
+								ammo.effect = "dig"
+								ammo.power = 1 + 0.1 * data[2]
+							else
+								ammo:fire{collision = true, feat = feat, owner = args.user, weapon = weapon}
+							end
 							return
 						end
 					end

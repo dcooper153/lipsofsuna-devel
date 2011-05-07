@@ -41,7 +41,7 @@ Featanimspec{
 	cooldown = 2,
 	description = "Cast a magical projectile",
 	effect = "spell1",
-	effects = {"black haze", "fire damage"}}
+	effects = {"black haze", "dig", "fire damage"}}
 
 Featanimspec{
 	name = "spell on self",
@@ -88,6 +88,19 @@ Feateffectspec{
 	skill_mult = {willpower = 0.2},
 	reagent_base = {mushroom = 0.5},
 	reagent_mult = {mushroom = 0.02}}
+
+Feateffectspec{
+	name = "dig",
+	categories = {"dig", "spell"},
+	description = "Fire a digging ray",
+	effect = "spell1",
+	icon = "modifier-dig",
+	influences = {{"dig", 1, 1}},
+	projectile = "fireball1", -- FIXME
+	skill_base = {willpower = 3},
+	skill_mult = {willpower = 0.3},
+	reagent_base = {["milky powder"] = 0.5},
+	reagent_mult = {["milky powder"] = 0.02}}
 
 Feateffectspec{
 	name = "fire damage",
