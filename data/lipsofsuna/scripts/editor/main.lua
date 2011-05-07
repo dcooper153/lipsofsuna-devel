@@ -286,9 +286,9 @@ Editor.save = function(self)
 	-- Predictable order leads to cleaner patches.
 	local roundvec = function(v)
 		local p = v * Voxel.tile_scale - self.origin
-		return {math.floor(p.x * 100) * 0.01,
-		        math.floor(p.y * 100) * 0.01,
-		        math.floor(p.z * 100) * 0.01}
+		return {math.floor(p.x * 100 + 0.5) * 0.01,
+		        math.floor(p.y * 100 + 0.5) * 0.01,
+		        math.floor(p.z * 100 + 0.5) * 0.01}
 	end
 	local sortobj = function(a, b)
 		local ap = roundvec(a.position)
@@ -327,9 +327,10 @@ Editor.save = function(self)
 		local p = roundvec(v.position)
 		local r = v.rotation.euler
 		if r[1] ~= 0 then
+			local e = math.floor(100 * r[1] / (2 * math.pi) + 0.5) / 100
+			if e == -0.5 then e = 0.5 end
 			return string.format("%s%s\t\t{%f,%f,%f,%q,%.2f}",
-				t, k > 1 and ",\n" or "", p[1], p[2], p[3], v.spec.name,
-				math.floor(100 * r[1] / (2 * math.pi) + 0.5) / 100)
+				t, k > 1 and ",\n" or "", p[1], p[2], p[3], v.spec.name, e)
 		else
 			return string.format("%s%s\t\t{%f,%f,%f,%q}",
 				t, k > 1 and ",\n" or "", p[1], p[2], p[3], v.spec.name)
