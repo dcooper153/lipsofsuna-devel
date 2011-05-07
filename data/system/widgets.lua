@@ -333,7 +333,10 @@ Widget:add_setters{
 	end,
 	expand_col = function(s, v) Los.widget_set_expand(s.handle, v) end,
 	expand_row = function(s, v) Los.widget_set_expand(s.handle, nil, v) end,
-	floating = function(s, v) Los.widget_set_floating(s.handle, v) end,
+	floating = function(s, v)
+		Los.widget_set_floating(s.handle, v)
+		if not v and s == Widgets.popup then Widgets.popup = nil end
+	end,
 	fullscreen = function(s, v) Los.widget_set_fullscreen(s.handle, v) end,
 	margins = function(s, v) Los.widget_set_margins(s.handle, v) end,
 	request = function(s, v) Los.widget_set_request(s.handle, v) end,
@@ -349,7 +352,10 @@ Widget:add_setters{
 		Los.widget_set_rows(s.handle, v)
 	end,
 	spacings = function(s, v) Los.widget_set_spacings(s.handle, v) end,
-	visible = function(s, v) Los.widget_set_visible(s.handle, v) end,
+	visible = function(s, v)
+		Los.widget_set_visible(s.handle, v)
+		if not v and s == Widgets.popup then Widgets.popup = nil end
+	end,
 	x = function(s, v) Los.widget_set_x(s.handle, v) end,
 	y = function(s, v) Los.widget_set_y(s.handle, v) end}
 
