@@ -41,7 +41,13 @@ Eventhandler.event = function(clss, args)
 	end
 	for k,v in pairs(args) do
 		if type(v) == "userdata" then
-			args[k] = __userdata_lookup[v]
+			-- TODO: Update this if some events can create other kinds of userdata.
+			local d = __userdata_lookup[v]
+			if d then
+				args[k] = d
+			else
+				args[k] = Class.new(Vector, {handle = v})
+			end
 		end
 	end
 	-- Invoke event handlers.

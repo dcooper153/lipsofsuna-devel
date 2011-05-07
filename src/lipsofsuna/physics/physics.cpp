@@ -478,7 +478,7 @@ static bool private_contact_processed (
 	else
 	{
 		contact.terrain = (LIPhyTerrain*) pointer0->pointer;
-		memcpy (contact.terrain_tile, pointer1->tile, 3 * sizeof (int));
+		memcpy (contact.terrain_tile, pointer0->tile, 3 * sizeof (int));
 	}
 	if (pointer1->object)
 	{
