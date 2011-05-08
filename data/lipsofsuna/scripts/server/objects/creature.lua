@@ -155,8 +155,8 @@ Creature.new = function(clss, args)
 	copy("spec")
 	self.update_timer = 0.1 * math.random()
 	self:calculate_speed()
-	if self.dead then self:animate("dead") end
 	copy("realized")
+	if self.dead then self:set_dead_state() end
 
 	Thread(function()
 		while true do
@@ -317,6 +317,37 @@ Creature.damaged = function(self, amount)
 	end
 end
 
+Creature.set_dead_state = function(self, drop)
+	-- Disable controls.
+	self.dead = true
+	self.physics = "rigid"
+	self.shape = "dead"
+	self:set_movement(0)
+	self:set_strafing(0)
+	-- Disable skills.
+	self.skills.enabled = false
+	self.skills:set_value{skill = "health", value = 0}
+	-- Playback animation.
+	self:animate("death")
+	-- Drop held items.
+	if drop then
+		local o = self:get_item{slot = "hand.L"}
+		if o then
+			o:detach()
+			o.position = self.position
+			o.realized = true
+		end
+		o = self:get_item{slot = "hand.R"}
+		if o then
+			o:detach()
+			o.position = self.position
+			o.realized = true
+		end
+	end
+	-- Emit a vision event.
+	Vision:event{type = "object-dead", object = self, dead = true}
+end
+
 --- Causes the creature to die.
 -- @param self Object.
 -- @return True if killed, false if saved by Sanctuary.
@@ -332,32 +363,8 @@ Creature.die = function(self)
 	if self.spec.dialog then
 		Dialog:start{object = self, name = self.spec.dialog .. " death"}
 	end
-	-- Disable controls.
-	self.dead = true
-	self.physics = "rigid"
-	self.shape = "dead"
-	self:set_movement(0)
-	self:set_strafing(0)
-	-- Disable skills.
-	self.skills.enabled = false
-	-- Playback animation.
-	self:animate("death")
-	-- Drop held items.
-	local o = self:get_item{slot = "hand.L"}
-	if o then
-		o:detach()
-		o.position = self.position
-		o.realized = true
-	end
-	o = self:get_item{slot = "hand.R"}
-	if o then
-		o:detach()
-		o.position = self.position
-		o.realized = true
-	end
-	-- Emit a vision event.
-	Vision:event{type = "object-dead", object = self, dead = true}
-	--Object.die(self)
+	-- Disable controls etc.
+	self:set_dead_state(true)
 	return true
 end
 

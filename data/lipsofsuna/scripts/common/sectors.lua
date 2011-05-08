@@ -91,7 +91,7 @@ Sectors.save_sector = function(self, sector)
 		self.database:query("DELETE FROM objects WHERE sector=?;", {sector})
 		local objs = Object:find{sector = sector}
 		for k,v in pairs(objs) do
-			if v.class ~= Player then
+			if v.class ~= Player or v.dead then
 				v:save()
 			end
 		end

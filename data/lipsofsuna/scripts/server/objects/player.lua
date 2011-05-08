@@ -59,14 +59,18 @@ Player.die = function(self)
 	end
 end
 
-Player.detach = function(self, keep)
+Player.disable = function(self)
 	self.player_timer:disable()
 	self.vision:disable()
-	self.realized = false
 	if not keep then
 		self:send{packet = Packet(packets.CHARACTER_CREATE)}
 		Player.clients[self.client] = nil
 	end
+end
+
+Player.detach = function(self, keep)
+	self:disable()
+	self.realized = false
 end
 
 --- Inflicts a modifier on the object.
@@ -87,7 +91,7 @@ Player.removed_modifier = function(self, name)
 end
 
 Player.respawn = function(self)
-	self:detach()
+	self:disable()
 	Serialize:save_account(self.account)
 end
 
@@ -302,6 +306,7 @@ Player.write = function(self)
 		eye_style = self.eye_style,
 		face_style = self.face_style,
 		hair_style = self.hair_style,
+		id = self.dead and self.id,
 		name = self.name,
 		nose_scale = self.nose_scale,
 		physics = self.dead and "rigid" or "kinematic",
