@@ -41,7 +41,7 @@ Featanimspec{
 	cooldown = 2,
 	description = "Cast a magical projectile",
 	effect = "spell1",
-	effects = {"black haze", "dig", "fire damage"}}
+	effects = {"black haze", "dig", "fire damage", "firewall"}}
 
 Featanimspec{
 	name = "spell on self",
@@ -122,6 +122,18 @@ Feateffectspec{
 	icon = "modifier-fireball",
 	influences = {{"fire", -5, -0.95}},
 	projectile = "fireball1",
+	skill_mult = {intelligence = 1, willpower = 1},
+	reagent_base = {["milky powder"] = 1},
+	reagent_mult = {["milky powder"] = 0.1}}
+
+Feateffectspec{
+	name = "firewall",
+	categories = {"fire", "spell"},
+	description = "Conjure a wall of fire",
+	effect = "firewall1",
+	icon = "modifier-firewall",
+	influences = {{"firewall", 5, 0.25}},
+	projectile = "fireball1", -- FIXME
 	skill_mult = {intelligence = 1, willpower = 1},
 	reagent_base = {["milky powder"] = 1},
 	reagent_mult = {["milky powder"] = 0.1}}

@@ -952,6 +952,14 @@
   </asset>
 
   <asset>
+    <file>import/firewall1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
     <file>import/flowerpot-000.blend</file>
     <author>Scopia Visual Interfaces Systems, s.l.</author>
     <license>Creative Commons BY 3.0</license>

@@ -5,6 +5,10 @@ Actions.register = function(self, args)
 	self[args.name] = args.func
 end
 
+Vector.abs = function(self)
+	return Vector(math.abs(self.x), math.abs(self.y), math.abs(self.z))
+end
+
 Vector.ceil = function(self)
 	return Vector(math.ceil(self.x), math.ceil(self.y), math.ceil(self.z))
 end
@@ -72,6 +76,19 @@ Utils.check_room = function(clss, point, model)
 	return true
 end
 
+--- Finds empty ground below the given point.
+-- @param clss Utils class.
+-- @param point Point in world space.
+Utils.find_empty_ground = function(clss, point)
+	local t,c = Voxel:find_tile{match = "empty", point = point}
+	if not t then return end
+	for i=1,5 do
+		if Voxel:get_tile(c + Vector(0,-i)) ~= 0 then
+			return (c + Vector(0.5,1-i,0.5)) * Voxel.tile_size
+		end
+	end
+end
+
 --- Creates an explosion.
 -- @param clss Utils class.
 -- @param point Point in world space.
@@ -111,7 +128,7 @@ end
 Voxel.player_contact = function(self, player, point)
 	local resist = 30
 	while true do
-		local t,c = Voxel:find_voxel{point = point, match = "full"}
+		local t,c = Voxel:find_tile{match = "full", point = point}
 		if not c or (c - point).length > 3 then break end
 		local m = Material:find{id = t.terrain}
 		if not m then break end

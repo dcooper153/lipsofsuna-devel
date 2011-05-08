@@ -482,6 +482,11 @@ Iconspec{
 	offset = {0,136},
 	size = {34,34}}
 
+Iconspec{
+	name = "modifier-burning", -- FIXME: fireball
+	image = "icons2",
+	offset = {0,136},
+	size = {34,34}}
 
 Iconspec{
 	name = "modifier-plague",
