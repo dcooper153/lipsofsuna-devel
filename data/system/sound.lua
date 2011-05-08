@@ -43,6 +43,10 @@ end
 -- @name Sound.music_fading
 -- @class table
 
+--- Music offset in seconds.
+-- @name Sound.music_offset
+-- @class table
+
 --- Music volume.
 -- @name Sound.music_volume
 -- @class table
@@ -50,7 +54,8 @@ end
 Sound.class_getters = {
 	listener_position = function(s) return Class.new(Vector, {handle = Los.sound_get_listener_position()}) end,
 	listener_rotation = function(s) return Class.new(Vector, {handle = Los.sound_get_listener_rotation()}) end,
-	listener_velocity = function(s) return Class.new(Vector, {handle = Los.sound_get_listener_velocity()}) end}
+	listener_velocity = function(s) return Class.new(Vector, {handle = Los.sound_get_listener_velocity()}) end,
+	music_offset = function(s) return Los.sound_get_music_offset() end}
 
 Sound.class_setters = {
 	listener_position = function(s, v) return Los.sound_set_listener_position(v.handle) end,
@@ -58,4 +63,5 @@ Sound.class_setters = {
 	listener_velocity = function(s, v) return Los.sound_set_listener_velocity(v.handle) end,
 	music = function(s, v) Los.sound_set_music(v) end,
 	music_fading = function(s, v) Los.sound_set_music_fading(v) end,
+	music_offset = function(s, v) Los.sound_set_music_offset(v) end,
 	music_volume = function(s, v) Los.sound_set_music_volume(v) end}

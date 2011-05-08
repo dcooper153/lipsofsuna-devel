@@ -144,6 +144,36 @@ static void Sound_set_music_fading (LIScrArgs* args)
 #endif
 }
 
+static void Sound_get_music_offset (LIScrArgs* args)
+{
+#ifndef LI_DISABLE_SOUND
+	LIExtModule* module;
+
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SOUND);
+	if (module->music != NULL)
+		liscr_args_seti_float (args, lisnd_source_get_offset (module->music));
+	else
+		liscr_args_seti_float (args, 0.0f);
+#else
+	liscr_args_seti_float (args, 0.0f);
+#endif
+}
+
+static void Sound_set_music_offset (LIScrArgs* args)
+{
+#ifndef LI_DISABLE_SOUND
+	float value;
+	LIExtModule* module;
+
+	if (liscr_args_geti_float (args, 0, &value))
+	{
+		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SOUND);
+		if (module->music != NULL)
+			lisnd_source_set_offset (module->music, value);
+	}
+#endif
+}
+
 static void Sound_set_music_volume (LIScrArgs* args)
 {
 #ifndef LI_DISABLE_SOUND
@@ -172,6 +202,8 @@ void liext_script_sound (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SOUND, "sound_set_listener_velocity", Sound_set_listener_velocity);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SOUND, "sound_set_music", Sound_set_music);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SOUND, "sound_set_music_fading", Sound_set_music_fading);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SOUND, "sound_get_music_offset", Sound_get_music_offset);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SOUND, "sound_set_music_offset", Sound_set_music_offset);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SOUND, "sound_set_music_volume", Sound_set_music_volume);
 }
 

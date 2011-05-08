@@ -220,6 +220,33 @@ void lisnd_source_set_looping (
 }
 
 /**
+ * \brief Gets the playback offset of the source.
+ * \param self Sond source.
+ * \return Offset in seconds.
+ */
+float lisnd_source_get_offset (
+	LISndSource* self)
+{
+	float sec;
+
+	alGetSourcef (self->source, AL_SEC_OFFSET, &sec);
+
+	return sec;
+}
+
+/**
+ * \brief Sets the playback offset of the source.
+ * \param self Sond source.
+ * \param secs Offset in seconds.
+ */
+void lisnd_source_set_offset (
+	LISndSource* self,
+	float        secs)
+{
+	alSourcef (self->source, AL_SEC_OFFSET, secs);
+}
+
+/**
  * \brief Sets the pitch multiplier of the source.
  * \param self Sound source.
  * \param value Pitch multiplier.

@@ -76,6 +76,13 @@ LIAPICALL (void, lisnd_source_set_playing, (
 	LISndSource* self,
 	int          playing));
 
+LIAPICALL (float, lisnd_source_get_offset, (
+	LISndSource* self));
+
+LIAPICALL (void, lisnd_source_set_offset, (
+	LISndSource* self,
+	float        secs));
+
 LIAPICALL (void, lisnd_source_set_position, (
 	LISndSource*       self,
 	const LIMatVector* value));
