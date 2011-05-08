@@ -2,9 +2,9 @@ Effect{
 	name = "aerhurt1",
 	sound = "thud-000"}
 
--- TODO: Use
 Effect{
 	name = "berserk1",
+	-- TODO: model
 	sound = "spellberserk1"}
 
 Effect{

@@ -83,7 +83,12 @@ Feat.apply = function(self, args)
 	-- Influences.
 	local info = self:get_info(args)
 	for k,v in pairs(info.influences) do
-		if k == "dig" then
+		if k == "berserk" then
+			-- Increase berserk duration.
+			if args.target then
+				args.target:inflict_modifier("berserk", v)
+			end
+		elseif k == "dig" then
 			-- Dig terrain.
 			if args.tile then
 				Voxel:damage(args.attacker, args.tile)
@@ -288,6 +293,17 @@ Feat.get_info = function(self, args)
 		for k,v in pairs(args.projectile.spec.influences_base) do
 			local prev = info.influences[k]
 			info.influences[k] = (prev or 0) + mult * v
+		end
+	end
+	-- Add berserk bonus.
+	-- The bonus increases physical damage if the health of the attacker is
+	-- lower than 25 points. If the health is 1 point, the damage is tripled.
+	if args and args.attacker:get_modifier("berserk") then
+		local p = info.influences["physical"]
+		if anim.categories["melee"] and p and p < 0 then
+			local h = args.attacker.skills:get_value{skill = "health"}
+			local f = 3 - 2 * math.min(h, 25) / 25
+			info.influences["physical"] = p * f
 		end
 	end
 	-- Apply target armor and blocking.

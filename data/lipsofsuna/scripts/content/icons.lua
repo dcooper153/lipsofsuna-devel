@@ -453,7 +453,7 @@ Iconspec{
 	size = {34,34}}
 
 Iconspec{
-	name = "modifier-physical",
+	name = "modifier-berserk",
 	image = "icons2",
 	offset = {34,34},
 	size = {34,34}}

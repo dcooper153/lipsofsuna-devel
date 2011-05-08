@@ -493,6 +493,14 @@ Creature.get_burdened = function(self)
 	return self.carried_weight > self:get_burden_limit()
 end
 
+--- Gets a modifier by name.
+-- @param self Object.
+-- @param name Modifer name.
+Creature.get_modifier = function(self, name)
+	if not self.modifiers then return end
+	return self.modifiers[name]
+end
+
 --- Inflicts a modifier on the object.
 -- @param self Object.
 -- @param name Modifier name.

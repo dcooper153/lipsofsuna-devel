@@ -50,7 +50,7 @@ Featanimspec{
 	cooldown = 2,
 	description = "Cast a spell on yourself",
 	effect = "spell1",
-	effects = {"fire damage", "light", "restore health", "sanctuary", "wilderness"}}
+	effects = {"berserk", "fire damage", "light", "restore health", "sanctuary", "wilderness"}}
 
 Featanimspec{
 	name = "spell on touch",
@@ -59,7 +59,7 @@ Featanimspec{
 	cooldown = 2,
 	description = "Cast a short range touch spell",
 	effect = "spell1",
-	effects = {"fire damage", "restore health", "sanctuary"}}
+	effects = {"berserk", "fire damage", "restore health", "sanctuary"}}
 
 Featanimspec{
 	name = "throw",
@@ -75,6 +75,18 @@ Featanimspec{
 
 ---------------------------------------------------------------------
 -- Effects usable to players.
+
+Feateffectspec{
+	name = "berserk",
+	categories = {"berserk", "spell"},
+	description = "Inflict additional damage when in low health",
+	effect = "berserk1",
+	icon = "modifier-berserk",
+	influences = {{"berserk", 30, 2}},
+	skill_base = {willpower = 5},
+	skill_mult = {willpower = 0.1},
+	reagent_base = {["milky powder"] = 0.5},
+	reagent_mult = {["milky powder"] = 0.02}}
 
 Feateffectspec{
 	name = "black haze",
