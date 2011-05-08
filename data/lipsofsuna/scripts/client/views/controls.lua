@@ -1,14 +1,20 @@
+require "client/widgets/binding"
+
 Views.Controls = Class(Widget)
+Views.Controls.mode = "controls"
 
 Views.Controls.new = function(clss)
 	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0, 0}})
-	self.list = Widgets.List()
-	self.list.pressed = function(view, row) self:show(row) end
-	self.list:set_request{width = 100, height = 100}
+	self.list = Widgets.List{page_size = 15}
+	--self.list.pressed = function(view, row) self:show(row) end
+	self.list:set_request{width = 100, height = 300}
+	self.frame = Widgets.Frame{style = "default", cols = 1, rows = 1}
+	self.frame:set_expand{col = 1, row = 1}
+	self.frame:set_child(1, 1, self.list)
 	self.title = Widgets.Frame{style = "title", text = "Controls"}
 	self:set_expand{col = 1, row = 2}
-	self:set_child{col = 1, row = 1, widget = self.title}
-	self:set_child{col = 1, row = 2, widget = self.list}
+	self:set_child(1, 1, self.title)
+	self:set_child(1, 2, self.frame)
 	-- Load the bindings.
 	self.config = ConfigFile{name = "controls.cfg"}
 	self:load()
@@ -35,6 +41,15 @@ Views.Controls.load = function(self)
 			if key1 then v.key1 = key1 end
 			if key2 then v.key2 = key2 end
 		end
+	end
+	-- Add a widget for each action.
+	local widgets = {}
+	for k,v in pairs(Action.dict_name) do
+		table.insert(widgets, Widgets.Binding{action = v})
+	end
+	table.sort(widgets, function(a,b) return a.action.name < b.action.name end)
+	for k,v in pairs(widgets) do
+		self.list:append{widget = v}
 	end
 end
 

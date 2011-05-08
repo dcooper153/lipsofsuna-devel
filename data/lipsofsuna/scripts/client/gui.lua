@@ -17,6 +17,7 @@ Gui.init = function(clss)
 		{"Skills", function() clss:set_mode("skills", 2) end, arrow = true},
 		{"Spells", function() clss:set_mode("feats", 2) end, arrow = true},
 		{"-----", function() end},
+		{"Controls", function() clss:set_mode("controls", 2) end, arrow = true},
 		{"Options", function() clss:set_mode("options", 2) end, arrow = true},
 		{"Admin", Gui.menu_widget_admin},
 		{"Help", function() clss:set_mode("help", 2) end, arrow = true},
@@ -127,6 +128,9 @@ Gui.set_mode = function(self, mode, level)
 		self.view = Views.Admin.inst
 	elseif mode == "chargen" then
 		self.view = Views.Chargen.inst
+	elseif mode == "controls" then
+		Gui.menus:open{level = level or 1, widget = Views.Controls.inst}
+		self.view = Views.Controls.inst
 	elseif mode == "dialog" then
 		Gui.menus:open{level = level or 1, widget = Views.Dialog.inst}
 		self.view = Views.Dialog.inst
