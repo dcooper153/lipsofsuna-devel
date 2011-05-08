@@ -21,12 +21,10 @@ Widgets.Binding.reshaped = function(self)
 	self:canvas_clear()
 	-- Name.
 	if self.action then
-		local name = string.gsub(self.action.name, "_", " ")
-		name = string.gsub(name, "(.)(.*)", function(a,b) return string.upper(a) .. b end)
 		self:canvas_text{
 			dest_position = {10,0},
 			dest_size = {w-10,h},
-			text = name,
+			text = self.name,
 			text_alignment = {0,0},
 			text_color = f and {1,1,0,1} or {a,a,a,1},
 			text_font = "bigger"}
@@ -36,7 +34,7 @@ Widgets.Binding.reshaped = function(self)
 	self:canvas_text{
 		dest_position = {150,0},
 		dest_size = {w-150,h},
-		text = Keycode[key1] or tostring(key1),
+		text = Keycode[key1] or (key1 and tostring(key1) or "----"),
 		text_alignment = {0,0},
 		text_color = f and {1,1,0,1} or {a,a,a,1},
 		text_font = "bigger"}
@@ -46,7 +44,7 @@ Widgets.Binding.reshaped = function(self)
 		self:canvas_text{
 			dest_position = {250,0},
 			dest_size = {w-250,h},
-			text = Keycode[key2] or (key2 and tostring(key2) or "---"),
+			text = Keycode[key2] or (key2 and tostring(key2) or "----"),
 			text_alignment = {0,0},
 			text_color = f and {1,1,0,1} or {a,a,a,1},
 			text_font = "bigger"}
@@ -56,24 +54,16 @@ end
 
 Widgets.Binding:add_getters{
 	action = function(s) return rawget(s, "__action") end,
-	key1 = function(s) return rawget(s, "__key1") end,
-	key2 = function(s) return rawget(s, "__key2") end,
-	focused = function(s) return rawget(s, "__focused") end}
+	focused = function(s) return rawget(s, "__focused") end,
+	name = function(s)
+		local tmp = string.gsub(s.action.name, "_", " ")
+		return string.gsub(tmp, "(.)(.*)", function(a,b) return string.upper(a) .. b end)
+	end}
 
 Widgets.Binding:add_setters{
 	action = function(s, v)
 		if s.active == v then return end
 		rawset(s, "__action", v)
-		s:reshaped()
-	end,
-	key1 = function(s, v)
-		if s.key1 == v then return end
-		rawset(s, "__key1", v)
-		s:reshaped()
-	end,
-	key2 = function(s, v)
-		if s.key2 == v then return end
-		rawset(s, "__key2", v)
 		s:reshaped()
 	end,
 	focused = function(s, v)

@@ -1,4 +1,9 @@
 Eventhandler{type = "keypress", func = function(self, args)
+	if Views.Controls.inst.editing_binding then
+		Views.Controls.inst:input(args)
+		Action:event(args, {})
+		return
+	end
 	if Gui.mode ~= "game" and Widgets:handle_event(args) then
 		-- Widget input.
 		Action:event(args, {})
@@ -20,10 +25,20 @@ Eventhandler{type = "keypress", func = function(self, args)
 end}
 
 Eventhandler{type = "keyrelease", func = function(self, args)
+	if Views.Controls.inst.editing_binding then
+		Views.Controls.inst:input(args)
+		Action:event(args, {})
+		return
+	end
 	Action:event(args)
 end}
 
 Eventhandler{type = "mousepress", func = function(self, args)
+	if Views.Controls.inst.editing_binding then
+		Views.Controls.inst:input(args)
+		Action:event(args, {})
+		return
+	end
 	if args.button == 4 and Drag.drag then
 		Drag:change_count(1)
 	elseif args.button == 5 and Drag.drag then
@@ -37,6 +52,11 @@ Eventhandler{type = "mousepress", func = function(self, args)
 end}
 
 Eventhandler{type = "mouserelease", func = function(self, args)
+	if Views.Controls.inst.editing_binding then
+		Views.Controls.inst:input(args)
+		Action:event(args, {})
+		return
+	end
 	if Gui.mode ~= "game" then
 		Widgets:handle_event(args)
 		Action:event(args, {})
@@ -46,6 +66,11 @@ Eventhandler{type = "mouserelease", func = function(self, args)
 end}
 
 Eventhandler{type = "mousemotion", func = function(self, args)
+	if Views.Controls.inst.editing_binding then
+		Views.Controls.inst:input(args)
+		Action:event(args, {})
+		return
+	end
 	if Gui.mode ~= "game" then
 		Widgets:handle_event(args)
 		Action:event(args, {})
