@@ -28,15 +28,4 @@
 #define LINET_RANGE_RENDER_START 0x40000000
 #define LINET_RANGE_RENDER_END   0x6FFFFFFF
 
-/****************************************************************************/
-/* Effect flags. */
-/* FIXME */
-
-enum
-{
-	LINET_EFFECT_REPEAT = 0x01,
-
-	LINET_EFFECT_DEFAULT = 0x00,
-};
-
 #endif

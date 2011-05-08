@@ -17,7 +17,8 @@ end
 --   <li>name: Name of the effect.</li>
 --   <li>sound: Sound effect to play.</li>
 --   <li>sound_delay: Delay of the sound start, in seconds.</li>
---   <li>sound_pitch: Pitch range of the sound effect.</li></ul>
+--   <li>sound_pitch: Pitch range of the sound effect.</li>
+--   <li>sound_positional: False to make the sound non-positional.</li></ul>
 -- @return New effect.
 Effect.new = function(clss, args)
 	local self = Class.new(clss, args)

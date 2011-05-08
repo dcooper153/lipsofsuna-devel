@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,19 +27,21 @@
 #include <lipsofsuna/system.h>
 #include "sound-source.h"
 
-static int
-private_init_source (LISndSource* self,
-                     ALuint*      result);
+static int private_init_source (
+	LISndSource* self,
+	ALuint*      result);
 
 /*****************************************************************************/
 
 /**
  * \brief Creates an empty sound source.
  * \param system Sound system.
+ * \param stereo Nonzero to allow stereo.
  * \return New sound source or NULL.
  */
 LISndSource* lisnd_source_new (
-	LISndSystem* system)
+	LISndSystem* system,
+	int          stereo)
 {
 	LISndSource* self;
 
@@ -49,6 +51,7 @@ LISndSource* lisnd_source_new (
 		return NULL;
 	self->volume = 1.0f;
 	self->fade_value = 1.0;
+	self->stereo = stereo;
 
 	/* Allocate a source. */
 	if (!private_init_source (self, &self->source))
@@ -64,11 +67,13 @@ LISndSource* lisnd_source_new (
  * \brief Creates an sound source and queues a sample.
  * \param system Sound system.
  * \param sample Sample to be queued.
+ * \param stereo Nonzero to allow stereo.
  * \return New sound source or NULL.
  */
 LISndSource* lisnd_source_new_with_sample (
 	LISndSystem* system,
-	LISndSample* sample)
+	LISndSample* sample,
+	int          stereo)
 {
 	LISndSource* self;
 
@@ -78,6 +83,7 @@ LISndSource* lisnd_source_new_with_sample (
 		return NULL;
 	self->volume = 1.0f;
 	self->fade_value = 1.0f;
+	self->stereo = stereo;
 
 	/* Allocate a source. */
 	if (!private_init_source (self, &self->source))
@@ -174,7 +180,10 @@ void lisnd_source_queue_sample (
 {
 	if (sample->loaded)
 	{
-		alSourceQueueBuffers (self->source, 1, &sample->buffer);
+		if (self->stereo && sample->stereo)
+			alSourceQueueBuffers (self->source, 1, sample->buffers + 1);
+		else
+			alSourceQueueBuffers (self->source, 1, sample->buffers);
 		self->blocked_sample = NULL;
 		self->queued++;
 	}

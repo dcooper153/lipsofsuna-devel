@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -220,7 +220,7 @@ LISndSource* liext_sound_set_effect (
 	}
 
 	/* Allocate new source. */
-	source = lisnd_source_new_with_sample (self->system, sample);
+	source = lisnd_source_new_with_sample (self->system, sample, flags & LIEXT_SOUND_FLAG_NONPOSITIONAL);
 	if (source == NULL)
 	{
 		if (create)
@@ -244,7 +244,7 @@ LISndSource* liext_sound_set_effect (
 	/* Set properties. */
 	lieng_object_get_transform (engobj, &transform);
 	lisnd_source_set_position (source, &transform.position);
-	if (flags & LINET_EFFECT_REPEAT)
+	if (flags & LIEXT_SOUND_FLAG_REPEAT)
 		lisnd_source_set_looping (source, 1);
 	lisnd_source_set_playing (source, 1);
 
@@ -266,7 +266,7 @@ int liext_sound_set_music (
 		return 0;
 
 	/* Fade in a new music track. */
-	music = lisnd_source_new (self->system);
+	music = lisnd_source_new (self->system, 1);
 	if (music == NULL)
 		return 0;
 	lisnd_source_queue_sample (music, sample);
@@ -342,6 +342,43 @@ void liext_object_free (
 	lialg_list_free (self->sounds);
 	lisys_free (self);
 }
+
+int liext_object_update (
+	LIExtObject* self,
+	LIEngObject* object,
+	LIExtModule* module,
+	float        secs)
+{
+	LIAlgList* ptr;
+	LIAlgList* next;
+	LIMatTransform transform;
+	LISndSource* source;
+
+	for (ptr = self->sounds ; ptr != NULL ; ptr = next)
+	{
+		next = ptr->next;
+		source = ptr->data;
+		if (source->stereo)
+		{
+			lisnd_source_set_position (source, &module->listener_position);
+		}
+		else if (object != NULL)
+		{
+			lieng_object_get_transform (object, &transform);
+			lisnd_source_set_position (source, &transform.position);
+		}
+		// TODO: Use the physics component to get the velocity.
+		//lieng_object_get_velocity (engobj, &vector);
+		//lisnd_source_set_velocity (source, &vector);
+		if (!lisnd_source_update (source, secs))
+		{
+			lisnd_source_free (source);
+			lialg_list_remove (&self->sounds, ptr);
+		}
+	}
+
+	return self->sounds != NULL;
+}
 #endif
 
 /*****************************************************************************/
@@ -352,15 +389,11 @@ static int private_tick (
 	float        secs)
 {
 	LIAlgU32dicIter iter;
-	LIAlgList* ptr;
-	LIAlgList* next;
 	LIEngObject* engobj;
 	LIExtObject* extobj;
-	LIMatTransform transform;
 	LIMatVector direction;
 	LIMatVector velocity;
 	LIMatVector up;
-	LISndSource* source;
 
 	/* Update listener position. */
 	velocity = self->listener_velocity;
@@ -380,6 +413,7 @@ static int private_tick (
 	}
 	if (self->music != NULL)
 	{
+		lisnd_source_set_position (self->music, &self->listener_position);
 		if (!lisnd_source_update (self->music, secs))
 		{
 			limai_program_event (self->program, "music-ended", NULL);
@@ -393,25 +427,7 @@ static int private_tick (
 	{
 		extobj = iter.value;
 		engobj = lieng_engine_find_object (self->program->engine, iter.key);
-		if (engobj != NULL)
-		{
-			for (ptr = extobj->sounds ; ptr != NULL ; ptr = next)
-			{
-				next = ptr->next;
-				source = ptr->data;
-				lieng_object_get_transform (engobj, &transform);
-				lisnd_source_set_position (source, &transform.position);
-				// TODO: Use the physics component to get the velocity.
-				//lieng_object_get_velocity (engobj, &vector);
-				//lisnd_source_set_velocity (source, &vector);
-				if (!lisnd_source_update (source, secs))
-				{
-					lisnd_source_free (source);
-					lialg_list_remove (&extobj->sounds, ptr);
-				}
-			}
-		}
-		if (engobj == NULL || extobj->sounds == NULL)
+		if (!liext_object_update (extobj, engobj, self, secs))
 		{
 			lialg_u32dic_remove (self->objects, iter.key);
 			liext_object_free (extobj);

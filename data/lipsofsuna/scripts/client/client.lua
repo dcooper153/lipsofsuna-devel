@@ -112,6 +112,7 @@ Protocol:add_handler{type = "OBJECT_EFFECT", func = function(event)
 			sound = effect.sound,
 			sound_delay = effect.sound_delay,
 			sound_pitch = effect.sound_pitch,
+			sound_positional = effect.sound_positional,
 			realized = true}
 		-- Quake the camera.
 		Player:apply_quake(obj.position, effect.quake)
@@ -338,6 +339,7 @@ Protocol:add_handler{type = "WORLD_EFFECT", func = function(event)
 			sound = effect.sound,
 			sound_delay = effect.sound_delay,
 			sound_pitch = effect.sound_pitch,
+			sound_positional = effect.sound_positional,
 			realized = true}
 		-- Quake the camera.
 		Player:apply_quake(Vector(x,y,z), effect.quake)

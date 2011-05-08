@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -28,12 +28,11 @@
 
 /**
  * \brief Creates a new sample database.
- *
  * \param system Sound system.
  * \return New sound manager or NULL.
  */
-LISndManager*
-lisnd_manager_new (LISndSystem* system)
+LISndManager* lisnd_manager_new (
+	LISndSystem* system)
 {
 	LISndManager* self;
 
@@ -54,11 +53,10 @@ lisnd_manager_new (LISndSystem* system)
 
 /**
  * \brief Frees the sound manager.
- *
  * \param self Sound manager.
  */
-void
-lisnd_manager_free (LISndManager* self)
+void lisnd_manager_free (
+	LISndManager* self)
 {
 	LIAlgStrdicIter iter;
 
@@ -73,11 +71,10 @@ lisnd_manager_free (LISndManager* self)
 
 /**
  * \brief Clears all the loaded samples.
- *
  * \param self Sound manager.
  */
-void
-lisnd_manager_clear (LISndManager* self)
+void lisnd_manager_clear (
+	LISndManager* self)
 {
 	LIAlgStrdicIter iter;
 
@@ -88,30 +85,28 @@ lisnd_manager_clear (LISndManager* self)
 
 /**
  * \brief Gets a sample by name.
- *
  * \param self Sound manager.
  * \param name Sample name.
  * \return Sample or NULL.
  */
-LISndSample*
-lisnd_manager_get_sample (LISndManager* self,
-                          const char*   name)
+LISndSample* lisnd_manager_get_sample (
+	LISndManager* self,
+	const char*   name)
 {
 	return lialg_strdic_find (self->samples, name);
 }
 
 /**
  * \brief Assigns a file to a sample name.
- *
  * \param self Sound manager.
  * \param name Sample name.
  * \param path Path to the sample.
  * \return Nonzero if the sample was loaded successfully.
  */
-int
-lisnd_manager_set_sample (LISndManager* self,
-                          const char*   name,
-                          const char*   path)
+int lisnd_manager_set_sample (
+	LISndManager* self,
+	const char*   name,
+	const char*   path)
 {
 	LISndSample* sample;
 

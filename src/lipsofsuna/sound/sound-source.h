@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,6 +27,7 @@ typedef struct _LISndSource LISndSource;
 struct _LISndSource
 {
 	int blocked_playing;
+	int stereo;
 	float volume;
 	float fade_factor;
 	float fade_value;
@@ -36,11 +37,13 @@ struct _LISndSource
 };
 
 LIAPICALL (LISndSource*, lisnd_source_new, (
-	LISndSystem* system));
+	LISndSystem* system,
+	int          stereo));
 
 LIAPICALL (LISndSource*, lisnd_source_new_with_sample, (
 	LISndSystem* system,
-	LISndSample* sample));
+	LISndSample* sample,
+	int          stereo));
 
 LIAPICALL (void, lisnd_source_free, (
 	LISndSource* self));

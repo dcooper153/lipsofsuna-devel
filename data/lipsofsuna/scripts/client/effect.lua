@@ -6,6 +6,7 @@ Effect.play = function(clss, name)
 		sound = e.sound,
 		sound_delay = e.sound_delay,
 		sound_pitch = e.sound_pitch,
+		sound_positional = e.sound_positional,
 		realized = true}
 end
 
@@ -23,6 +24,7 @@ EffectObject = Class(Object)
 --   <li>sound: Sound effect name.</li>
 --   <li>sound_delay: Sound delay in seconds.</li>
 --   <li>sound_pitch: Sound effect pitch range.</li>
+--   <li>sound_positional: False to make the sound non-positional.</li>
 --   <li>text: Text effect string.</li>
 --   <li>velocity: Velocity vector.</li></ul>
 -- @return Object.
@@ -39,9 +41,11 @@ EffectObject.new = function(clss, args)
 		local play = function()
 			if args.sound_pitch then
 				Sound:effect{object = self, effect = args.sound, volume = volume,
+					positional = args.sound_positional,
 					pitch = 1 + args.sound_pitch * (math.random() - 0.5)}
 			else
-				Sound:effect{object = self, effect = args.sound, volume = volume}
+				Sound:effect{object = self, effect = args.sound,
+					positional = args.sound_positional, volume = volume}
 			end
 		end
 		if args.sound_delay then

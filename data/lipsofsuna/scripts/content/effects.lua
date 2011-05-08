@@ -105,7 +105,8 @@ Effect{
 
 Effect{
 	name = "quest1",
-	sound = "quest1"}
+	sound = "quest1",
+	sound_positional = false}
 
 Effect{
 	name = "sanctuary1",

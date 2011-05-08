@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -51,6 +51,13 @@ static int private_load_vorbis (
 	LISndSample* self,
 	const char*  file);
 
+static void private_load_raw (
+	LISndSample* self,
+	ALuint       format,
+	void*        buffer,
+	int          len,
+	int          freq);
+
 static void private_worker_thread (
 	LIThrAsyncCall* call,
 	void*           data);
@@ -86,7 +93,7 @@ LISndSample* lisnd_sample_new (
 	}
 
 	/* Allocate a buffer. */
-	alGenBuffers (1, &self->buffer);
+	alGenBuffers (2, self->buffers);
 	if (alGetError() != AL_NO_ERROR)
 	{
 		lisnd_sample_free (self);
@@ -118,7 +125,7 @@ void lisnd_sample_free (
 		lithr_async_call_free (self->worker);
 	}
 
-	alDeleteBuffers (1, &self->buffer);
+	alDeleteBuffers (2, self->buffers);
 	lisys_free (self->file);
 	lisys_free (self);
 }
@@ -172,6 +179,7 @@ static int private_load_flac (
 	LISndSample* self,
 	const char*  file)
 {
+	void* buffer;
 	ALenum format;
 	FLAC__uint32 bps;
 	FLAC__uint32 channels;
@@ -241,7 +249,13 @@ static int private_load_flac (
 	}
 
 	/* Upload to OpenAL. */
-	alBufferData (self->buffer, format, liarc_writer_get_buffer (writer), length, rate);
+	buffer = calloc (length, sizeof (uint8_t));
+	if (buffer != NULL)
+	{
+		memcpy (buffer, liarc_writer_get_buffer (writer), length);
+		private_load_raw (self, format, buffer, length, rate);
+		lisys_free (buffer);
+	}
 
 	/* Finish reading. */
 	liarc_writer_free (writer);
@@ -300,13 +314,65 @@ static int private_load_vorbis (
 
 	/* Upload to OpenAL. */
 	if (info->channels == 1)
-		alBufferData (self->buffer, AL_FORMAT_MONO16, buffer, len, freq);
+		private_load_raw (self, AL_FORMAT_MONO16, buffer, len, freq);
 	else
-		alBufferData (self->buffer, AL_FORMAT_STEREO16, buffer, len, freq);
+		private_load_raw (self, AL_FORMAT_STEREO16, buffer, len, freq);
 	ov_clear (&vorbis);
 	lisys_free (buffer);
 
 	return 1;
+}
+
+static void private_load_raw (
+	LISndSample* self,
+	ALuint       format,
+	void*        buffer,
+	int          len,
+	int          freq)
+{
+	int i;
+	uint8_t* src8;
+	uint8_t* dst8;
+	uint16_t* src16;
+	uint16_t* dst16;
+
+	/* Upload stereo data. */
+	if (format == AL_FORMAT_STEREO8 || AL_FORMAT_STEREO16)
+	{
+		self->stereo = 1;
+		alBufferData (self->buffers[1], format, buffer, len, freq);
+	}
+
+	/* Convert to mono. */
+	if (format == AL_FORMAT_STEREO8)
+	{
+		src8 = buffer;
+		dst8 = buffer;
+		for (i = 0 ; i < len ; i += 2)
+		{
+			*dst8 = src8[(i % 4) != 0];
+			dst8++;
+			src8 += 2;
+		}
+		len /= 2;
+		format = AL_FORMAT_MONO8;
+	}
+	else if (format == AL_FORMAT_STEREO16)
+	{
+		src16 = buffer;
+		dst16 = buffer;
+		for (i = 0 ; i < len ; i += 4)
+		{
+			*dst16 = src16[(i % 8) != 0];
+			dst16++;
+			src16 += 2;
+		}
+		len /= 2;
+		format = AL_FORMAT_MONO16;
+	}
+
+	/* Upload mono data. */
+	alBufferData (self->buffers[0], format, buffer, len, freq);
 }
 
 static void private_worker_thread (

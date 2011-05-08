@@ -16,9 +16,11 @@ Sound.class_name = "Sound"
 --   <li>effect: Sample string.</li>
 --   <li>object: Object.</li>
 --   <li>pitch: Pitch shift multiplier.</li>
+--   <li>positional: False to make the sound non-positional.</li>
+--   <li>repeating: True to make the sound repeat.</li>
 --   <li>volume: Volume multiplier.</li></ul>
 Sound.effect = function(clss, args)
-	Los.sound_effect{effect = args.effect, object = args.object.handle, pitch = args.pitch, volume = args.volume}
+	Los.sound_effect{effect = args.effect, object = args.object.handle, pitch = args.pitch, positional = args.positional, repeating = args.repeating, volume = args.volume}
 end
 
 --- Position of the listener.

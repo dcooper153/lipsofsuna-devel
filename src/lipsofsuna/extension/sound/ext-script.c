@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -27,6 +27,7 @@
 static void Sound_effect (LIScrArgs* args)
 {
 #ifndef LI_DISABLE_SOUND
+	int tmp;
 	int flags = 0;
 	float pitch;
 	float volume;
@@ -39,6 +40,10 @@ static void Sound_effect (LIScrArgs* args)
 	if (liscr_args_gets_string (args, "effect", &effect) &&
 	    liscr_args_gets_data (args, "object", LISCR_SCRIPT_OBJECT, &data))
 	{
+		if (liscr_args_gets_bool (args, "positional", &tmp) && !tmp)
+			flags |= LIEXT_SOUND_FLAG_NONPOSITIONAL;
+		if (liscr_args_gets_bool (args, "repeating", &tmp) && tmp)
+			flags |= LIEXT_SOUND_FLAG_REPEAT;
 		object = liscr_data_get_data (data);
 		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SOUND);
 		source = liext_sound_set_effect (module, object->id, effect, flags);
