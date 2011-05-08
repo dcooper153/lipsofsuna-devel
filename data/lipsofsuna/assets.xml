@@ -2594,6 +2594,12 @@
     <type>sound effect</type>
   </asset>
   <asset>
+    <file>sounds/menu1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>music</type>
+  </asset>
+  <asset>
     <file>sounds/portal1.ogg</file>
     <author>Kabraxis</author>
     <license>Creative Commons BY-SA 3.0</license>

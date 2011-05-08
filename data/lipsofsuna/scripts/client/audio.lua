@@ -6,10 +6,10 @@ Sound.music_mode = "menu"
 Sound.switch_music_track = function(clss, mode)
 	local modes = {
 		boss = {"fairytale7", "fairytale9"},
-		char = {"fairytale2", "fairytale10"},
+		char = {"fairytale2", "fairytale10", "fairytale8"},
 		game = {"fairytale1", "fairytale3", "fairytale4", "fairytale5",
 		        "fairytale6", "fairytale11", "fairytale12", "fairytale13"},
-		menu = {"fairytale8"}};
+		menu = {"menu1"}};
 	if mode then clss.music_mode = mode end
 	local tracks = modes[clss.music_mode];
 	clss.music_fading = 2.0

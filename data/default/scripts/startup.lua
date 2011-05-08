@@ -28,7 +28,7 @@ Startup.new = function(clss)
 	self.group.floating = true
 	Sound.music_fading = 5.0
 	Sound.music_volume = 0.2
-	Sound.music = "fairytale8"
+	Sound.music = "menu1"
 	return self
 end
 
@@ -47,3 +47,7 @@ Startup.set_mode = function(self, mode)
 end
 
 Startup.inst = Startup()
+
+Eventhandler{type = "music-ended", func = function(self, args)
+	Sound.music = "menu1"
+end}
