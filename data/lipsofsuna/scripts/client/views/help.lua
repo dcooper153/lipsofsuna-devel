@@ -16,22 +16,6 @@ and to contact the developers. The wiki is definitely worth
 checking out since it has lots of information on the project.
 Although the forums are a bit quiet, you'll certainly get an answer
 if you post there.]])}
-	-- Controls.
-	local label_controls = Widgets.Text{text =
-[[* Escape: Open or close the menu
-* W: Walk forward
-* A: Sidestep left
-* S: Walk backward
-* D: Sidestep right
-* C: Jump
-* Y: Toggle camera mode
-* Space: Activate (use/read/loot/chat)
-* Comma: Pick up
-* Shift: Run
-* Left mouse button: Attack
-* Right mouse button: Block / use item
-* Mouse wheel: Zoom camera
-* Left control: Camera rotation mode]]}
 	-- Hints.
 	local label_hints = Widgets.Text{text = fmt(
 [[You can activate NPCs, obstacles, and items by looking them and pressing
@@ -57,7 +41,6 @@ work isn't an obstacle at least.]])}
 	-- Main.
 	local self = Widgets.Menu.new(clss, {text = "Help",
 		{"About", label_about},
-		{"Controls", label_controls},
 		{"Hints", label_hints},
 		{"Contributing", label_contributing}})
 	return self
