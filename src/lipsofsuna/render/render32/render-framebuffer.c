@@ -168,7 +168,10 @@ int liren_framebuffer32_resize (
 		return 1;
 
 	/* Recreate the framebuffer objects. */
-	if (private_rebuild (self, width, height, samples, hdr))
+	/* If the driver fails to create an HDR framebuffer, we fall back to a non-HDR
+	   one. To avoid retrying in the next frame, the HDR flag is set regardless. */
+	if (private_rebuild (self, width, height, samples, hdr) ||
+	    private_rebuild (self, width, height, samples, 0))
 	{
 		self->width = width;
 		self->height = height;
