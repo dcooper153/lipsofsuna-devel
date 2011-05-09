@@ -133,6 +133,11 @@ Iconspec{
 Iconspec{
 	name = "musket1",
 	image = "icons1",
+	offset = {200,40}, -- FIXME: revolver
+	size = {20,20}}
+Iconspec{
+	name = "revolver1",
+	image = "icons1",
 	offset = {200,40},
 	size = {20,20}}
 Iconspec{

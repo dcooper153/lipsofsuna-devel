@@ -109,6 +109,11 @@ Effect{
 	sound_positional = false}
 
 Effect{
+	name = "revolver1",
+	sound = "weaponmusket1", -- TODO: Separate sound?
+	sound_delay = 0.5}
+
+Effect{
 	name = "sanctuary1",
 	model = "sanctuary1",
 	sound = "spellsanctuary1"}

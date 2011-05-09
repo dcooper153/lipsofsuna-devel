@@ -1,18 +1,19 @@
 -- (materials sorted by durability)
--- weapon \ material	W  S  Q  I  C  A
+-- weapon\matrl W  S  Q  I  C  A
 -- ======================================
--- mattock		+  +  +  +  +  +
--- staff		+  -  -  -  -  -
+-- mattock      +  +  +  +  +  +
+-- staff        +  -  -  -  -  -
 --
--- dagger		+  +  +  +  +  +
--- hatchet		+  +  +  +  +  +
--- sword		+  +  +  +  +  +
--- club 		+  -  -  -  -  -
+-- dagger       +  +  +  +  +  +
+-- hatchet      +  +  +  +  +  +
+-- sword        +  +  +  +  +  +
+-- club         +  -  -  -  -  -
 --
--- grenade		-  -  +  -  +  -
+-- grenade      -  -  +  -  +  -
 --
--- crossbow		+  -  +  +  +  +
--- musket		-  -  +  +  +  +
+-- crossbow     +  -  +  +  +  +
+-- musket       -  -  +  +  +  +
+-- revolver     -  -  +  +  +  +
 
 Itemspec{
 	name = "adamantium crossbow",
@@ -72,8 +73,8 @@ Itemspec{
 	name = "adamantium musket",
 	model = "bow1", -- FIXME
 	icon = "musket1",
-	animation_hold = "hold crossbow",
-	animation_attack = "attack crossbow",
+	animation_hold = "hold musket",
+	animation_attack = "attack musket",
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["adamantium"] = 15, ["log"] = 2},
@@ -83,6 +84,21 @@ Itemspec{
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	mass = 15}
+
+Itemspec{
+	name = "adamantium revolver",
+	model = "revolver1",
+	icon = "revolver1",
+	animation_hold = "hold revolver",
+	animation_attack = "attack revolver",
+	ammo_type = "bullet",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["adamantium"] = 10, ["log"] = 1},
+	effect_attack = "revolver1",
+	influences_base = {physical = -18},
+	influences_bonus = {intelligence = 0.005, perception = 0.005},
+	equipment_slot = "hand.R",
+	mass = 8}
 
 Itemspec{
 	name = "adamantium sword",
@@ -181,14 +197,29 @@ Itemspec{
 	mass = 15}
 
 Itemspec{
+	name = "aquanite revolver",
+	model = "revolver1",
+	icon = "revolver1",
+	animation_hold = "hold revolver",
+	animation_attack = "attack revolver",
+	ammo_type = "bullet",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["aquanite stone"] = 10, ["log"] = 1},
+	effect_attack = "revolver1",
+	influences_base = {cold = -7, physical = -7},
+	influences_bonus = {intelligence = 0.005, perception = 0.005},
+	equipment_slot = "hand.R",
+	mass = 8}
+
+Itemspec{
 	name = "aquanite musket",
 	model = "bow1", -- FIXME
 	icon = "musket1",
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["aquanite stone"] = 15, ["log"] = 2},
-	animation_hold = "hold crossbow",
-	animation_attack = "attack crossbow",
+	animation_hold = "hold musket",
+	animation_attack = "attack musket",
 	effect_attack = "musket1",
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
@@ -317,17 +348,32 @@ Itemspec{
 	model = "bow1", -- FIXME
 	icon = "musket1",
 	ammo_type = "bullet",
+	animation_hold = "hold musket",
+	animation_attack = "attack musket",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["crimson stone"] = 15, ["log"] = 2},
 	effect_attack = "musket1",
 	effect_craft = "craftmetal1",
 	influences_base = {fire = -8, physical = -8},
 	influences_bonus = {intelligence = 0.005, perception = 0.005},
-	animation_hold = "hold crossbow",
-	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	mass = 15}
+
+Itemspec{
+	name = "crimson revolver",
+	model = "revolver1",
+	icon = "revolver1",
+	animation_hold = "hold revolver",
+	animation_attack = "attack revolver",
+	ammo_type = "bullet",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["crimson stone"] = 10, ["log"] = 1},
+	effect_attack = "revolver1",
+	influences_base = {fire = -7, physical = -7},
+	influences_bonus = {intelligence = 0.005, perception = 0.005},
+	equipment_slot = "hand.R",
+	mass = 8}
 
 Itemspec{
 	name = "crimson sword",
@@ -413,10 +459,10 @@ Itemspec{
 	model = "bow1", -- FIXME
 	icon = "musket1",
 	ammo_type = "bullet",
+	animation_hold = "hold musket",
+	animation_attack = "attack musket",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["iron ingot"] = 5, ["log"] = 2},
-	animation_hold = "hold crossbow",
-	animation_attack = "attack crossbow",
 	effect_attack = "musket1",
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
@@ -424,6 +470,21 @@ Itemspec{
 	influences_base = {physical = -13},
 	influences_bonus = {intelligence = 0.005, perception = 0.005},
 	mass = 20}
+
+Itemspec{
+	name = "iron revolver",
+	model = "revolver1",
+	icon = "revolver1",
+	animation_hold = "hold revolver",
+	animation_attack = "attack revolver",
+	ammo_type = "bullet",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["iron ingot"] = 10, ["log"] = 1},
+	effect_attack = "revolver1",
+	influences_base = {physical = -10},
+	influences_bonus = {intelligence = 0.005, perception = 0.005},
+	equipment_slot = "hand.R",
+	mass = 8}
 
 Itemspec{
 	name = "iron sword",

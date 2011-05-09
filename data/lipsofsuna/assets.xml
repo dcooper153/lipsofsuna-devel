@@ -1602,6 +1602,24 @@
   </asset>
 
   <asset>
+    <file>import/revolver1.blend</file>
+    <author>johndh</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/revolver1.png</dep>
+    <source>http://opengameart.org/content/steampunk-multi-barrel-revolver</source>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/revolver1.png</file>
+    <author>johndh</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/steampunk-multi-barrel-revolver</source>
+    <type>texture</type>
+    <comment>Baked from the procedural textures.</comment>
+  </asset>
+
+  <asset>
     <file>import/roof1.png</file>
     <author>WeaponGuy</author>
     <license>Creative Commons BY 3.0</license>
