@@ -30,7 +30,7 @@ Featanimspec{
 	cooldown = 1,
 	effect_impact = "impact1",
 	effects = {"physical damage"},
-	required_ammo = {arrow = 1},
+	required_ammo = true,
 	required_weapon = "ranged",
 	slot = "hand.R"}
 

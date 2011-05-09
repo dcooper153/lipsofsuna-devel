@@ -158,6 +158,11 @@ Views.Feats.changed = function(self)
 	-- Calculate skill and reagent requirements.
 	local feat = Feat{animation = self.combo_anim.text, effects = both}
 	local info = feat:get_info()
+	if not info then
+		self.label_skills.text = ""
+		self.label_reagents.text = ""
+		return
+	end
 	local reagents = info.required_reagents
 	local skills = info.required_skills
 	-- Display skill requirements.
