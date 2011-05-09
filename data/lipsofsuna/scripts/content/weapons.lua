@@ -17,7 +17,7 @@
 
 Itemspec{
 	name = "adamantium crossbow",
-	model = "bow1", -- FIXME
+	model = "crossbow1",
 	icon = "crossbow2",
 	animation_hold = "hold crossbow",
 	animation_attack = "attack crossbow",
@@ -115,17 +115,17 @@ Itemspec{
 
 Itemspec{
 	name = "aquanite crossbow",
-	model = "bow1", -- FIXME
+	model = "crossbow1",
 	icon = "crossbow1",
 	ammo_type = "arrow",
+	animation_hold = "hold crossbow",
+	animation_attack = "attack crossbow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["aquanite stone"] = 9},
 	effect_attack = "crossbow1",
 	effect_craft = "craftmetal1",
 	influences_base = {cold = -6, physical = -6},
 	influences_bonus = {dexterity = 0.01},
-	animation_hold = "hold crossbow",
-	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	mass = 15}
@@ -263,13 +263,13 @@ Itemspec{
 
 Itemspec{
 	name = "crimson crossbow",
-	model = "bow1", -- FIXME
+	model = "crossbow1",
 	icon = "crossbow1",
 	ammo_type = "arrow",
-	categories = {"ranged", "weapon"},
-	crafting_materials = {["crimson stone"] = 9},
 	animation_hold = "hold crossbow",
 	animation_attack = "attack crossbow",
+	categories = {"ranged", "weapon"},
+	crafting_materials = {["crimson stone"] = 9},
 	effect_attack = "crossbow1",
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
@@ -393,17 +393,17 @@ Itemspec{
 
 Itemspec{
 	name = "iron crossbow",
-	model = "bow1", -- FIXME
+	model = "crossbow1",
 	icon = "crossbow1",
 	ammo_type = "arrow",
+	animation_hold = "hold crossbow",
+	animation_attack = "attack crossbow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["iron ingot"] = 3},
 	effect_attack = "crossbow1",
 	effect_craft = "craftmetal1",
 	influences_base = {physical = -8},
 	influences_bonus = {dexterity = 0.005},
-	animation_hold = "hold crossbow",
-	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	mass = 15}
@@ -562,7 +562,7 @@ Itemspec{
 
 Itemspec{
 	name = "wooden bow",
-	model = "bow1", -- FIXME
+	model = "bow1",
 	icon = "bow1",
 	ammo_type = "arrow",
 	categories = {"ranged", "weapon"},
@@ -613,17 +613,17 @@ Itemspec{
 
 Itemspec{
 	name = "wooden crossbow",
-	model = "bow1", -- FIXME
+	model = "crossbow1",
 	icon = "bow1",
 	ammo_type = "arrow",
+	animation_hold = "hold crossbow",
+	animation_attack = "attack crossbow",
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["log"] = 5},
 	effect_attack = "crossbow1",
 	effect_craft = "craftwood1",
 	influences_base = {physical = -4},
 	influences_bonus = {dexterity = 0.01},
-	animation_hold = "hold crossbow",
-	animation_attack = "attack crossbow",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	water_gravity = Vector(0,6,0),

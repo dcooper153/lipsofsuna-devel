@@ -56,6 +56,10 @@
     <name>Kabraxis</name>
   </author-info>
   <author-info>
+    <name>Lamoot</name>
+    <url>http://opengameart.org/user/209</url>
+  </author-info>
+  <author-info>
     <name>Lauris Kaplinski</name>
     <url>http://khayyam.kaplinski.com/</url>
   </author-info>
@@ -739,6 +743,24 @@
     <source>http://opengameart.org/content/29-grounds-and-walls-and-water-1024x1024</source>
     <status>complete</status>
     <type>normalmap</type>
+  </asset>
+
+  <asset>
+    <file>import/crossbow1.blend</file>
+    <author>Lamoot</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/low-poly-crossbow</source>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/crowssbow1.png</file>
+    <author>Lamoot</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/low-poly-crossbow</source>
+    <status>usable</status>
+    <type>texture</type>
   </asset>
 
   <asset>
