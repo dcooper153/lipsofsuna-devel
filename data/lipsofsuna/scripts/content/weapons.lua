@@ -71,7 +71,7 @@ Itemspec{
 
 Itemspec{
 	name = "adamantium musket",
-	model = "bow1", -- FIXME
+	model = "musket1",
 	icon = "musket1",
 	animation_hold = "hold musket",
 	animation_attack = "attack musket",
@@ -213,7 +213,7 @@ Itemspec{
 
 Itemspec{
 	name = "aquanite musket",
-	model = "bow1", -- FIXME
+	model = "musket1",
 	icon = "musket1",
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
@@ -345,7 +345,7 @@ Itemspec{
 
 Itemspec{
 	name = "crimson musket",
-	model = "bow1", -- FIXME
+	model = "musket1",
 	icon = "musket1",
 	ammo_type = "bullet",
 	animation_hold = "hold musket",
@@ -456,7 +456,7 @@ Itemspec{
 
 Itemspec{
 	name = "iron musket",
-	model = "bow1", -- FIXME
+	model = "musket1",
 	icon = "musket1",
 	ammo_type = "bullet",
 	animation_hold = "hold musket",

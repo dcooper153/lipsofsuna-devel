@@ -6,6 +6,10 @@
     <url>http://www.katorlegaz.com/3d_models/</url>
   </author-info>
   <author-info>
+    <name>Antique Military Rifles</name>
+    <url>http://www.flickr.com/photos/36224933@N07/</url>
+  </author-info>
+  <author-info>
     <name>Ari Mustonen</name>
     <email>amuzen@users.sourceforge.net</email>
     <url>http://lipsofsuna.org/</url>
@@ -1432,6 +1436,24 @@
     <source>http://opengameart.org/content/low-poly-mushrooms</source>
     <status>usable</status>
     <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/musket1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/musket1.png</dep>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/musket1.png</file>
+    <author>Antique Military Rifles</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.flickr.com/photos/36224933@N07/3344703041/</source>
+    <type>texture</type>
+    <comment>Projected from the original and modified with texture paint.</comment>
   </asset>
 
   <asset>
