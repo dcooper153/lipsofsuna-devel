@@ -331,7 +331,7 @@ class LICollision:
 			bpy.data.meshes.remove(oldmesh)
 			# Fix the coordinate system.
 			icohull.matrix_local = LIFormat.matrix * icohull.matrix_local
-			bpy.ops.object.rotation_apply()
+			bpy.ops.object.transform_apply(rotation=True)
 			# Collect the resulting vertices.
 			shape = LIShape('default')
 			shape.add_mesh(icohull, center)
@@ -1339,9 +1339,9 @@ class LIFile:
 				# Apply transformation.
 				bpy.context.scene.objects.active = obj
 				bpy.ops.object.location_clear()
-				bpy.ops.object.scale_apply()
+				bpy.ops.object.transform_apply(scale=True)
 				obj.matrix_local = LIFormat.matrix * obj.matrix_local
-				bpy.ops.object.rotation_apply()
+				bpy.ops.object.transform_apply(rotation=True)
 				# Triangulate.
 				if obj.mode != 'EDIT':
 					bpy.ops.object.editmode_toggle()
