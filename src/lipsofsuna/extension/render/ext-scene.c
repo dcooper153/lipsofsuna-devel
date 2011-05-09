@@ -171,9 +171,13 @@ static void Scene_render (LIScrArgs* args)
 
 	/* Render the scene. */
 	limat_frustum_init (&frustum, &modelview, &projection);
-	liren_framebuffer_resize (args->self, viewport[2], viewport[3], multisamples, hdr);
-	liren_scene_render (scene, args->self, viewport, &modelview, &projection, &frustum, 
-		render_passes, render_passes_num, postproc_passes, postproc_passes_num);
+	if (liren_framebuffer_resize (args->self, viewport[2], viewport[3], multisamples, hdr))
+	{
+		liren_scene_render (scene, args->self, viewport, &modelview, &projection, &frustum,
+			render_passes, render_passes_num, postproc_passes, postproc_passes_num);
+	}
+	else
+		lisys_error_report ();
 
 	/* Free the shader names we allocated. */
 	for (i = 0 ; i < postproc_passes_num ; i++)
