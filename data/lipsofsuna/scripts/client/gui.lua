@@ -81,7 +81,7 @@ end
 
 Gui.set_admin = function(self, admin)
 	if admin == self.admin then return end
-	Gui.menu_widget_main:replace(7, admin and {"Admin", Gui.menu_widget_admin})
+	Gui.menu_widget_main:replace(8, admin and {"Admin", Gui.menu_widget_admin})
 end
 
 Gui.set_mode = function(self, mode, level)
