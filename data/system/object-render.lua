@@ -22,9 +22,15 @@ end
 -- @param self Object.
 -- @param ... Arguments.<ul>
 --   <li>1,shape: Shape key name.</li>
---   <li>2,value: Shape influence name to match or nil.</li></ul>
+--   <li>2,value: Shape influence multiplier.</li>
+--   <li>3,ref: Reference model for relative morphing, or nil.</ul>
 Model.morph = function(self, ...)
-	Los.model_morph(self.handle, ...)
+	local a,b,c = ...
+	if type(a) == "table" then
+		Los.model_morph(self.handle, a.shape, a.value, a.ref and a.ref.handle)
+	else
+		Los.model_morph(self.handle, a, b, c and c.handle)
+	end
 end
 
 ------------------------------------------------------------------------------

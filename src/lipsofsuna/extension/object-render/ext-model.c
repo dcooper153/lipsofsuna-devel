@@ -58,6 +58,8 @@ static void Model_morph (LIScrArgs* args)
 	float value = 0.5f;
 	const char* shape;
 	LIEngModel* model;
+	LIEngModel* ref = NULL;
+	LIScrData* data;
 
 	model = args->self;
 	if (!liscr_args_geti_string (args, 0, &shape) &&
@@ -65,8 +67,13 @@ static void Model_morph (LIScrArgs* args)
 		return;
 	if (!liscr_args_geti_float (args, 1, &value))
 		liscr_args_gets_float (args, "value", &value);
+	if (!liscr_args_geti_data (args, 2, LISCR_SCRIPT_MODEL, &data))
+		liscr_args_gets_data (args, "ref", LISCR_SCRIPT_MODEL, &data);
+	if (data != NULL)
+		ref = liscr_data_get_data (data);
 
-	liscr_args_seti_bool (args, limdl_model_morph (model->model, shape, value));
+	liscr_args_seti_bool (args, limdl_model_morph (model->model,
+		(ref != NULL)? ref->model : NULL, shape, value));
 }
 
 /*****************************************************************************/

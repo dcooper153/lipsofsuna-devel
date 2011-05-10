@@ -129,6 +129,7 @@ LIAPICALL (int, limdl_model_merge, (
 
 LIAPICALL (int, limdl_model_morph, (
 	LIMdlModel* self,
+	LIMdlModel* ref,
 	const char* shape,
 	float       value));
 

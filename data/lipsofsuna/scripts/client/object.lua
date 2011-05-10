@@ -92,12 +92,12 @@ Object.create_character_model = function(self, args)
 	for k,v in pairs(meshes) do
 		if k ~= "skeleton" then
 			if string.match(k, ".*head.*") then
-				local tmp = Model:load{file = v}
-				tmp = tmp:copy()
+				local ref = Model:load{file = v}
+				local tmp = ref:copy()
 				if args.face_style then
-					if args.face_style[1] then tmp:morph("face round", args.face_style[1]) end
-					if args.face_style[2] then tmp:morph("face rough", args.face_style[2]) end
-					if args.face_style[3] then tmp:morph("face frown", args.face_style[3]) end
+					if args.face_style[1] then tmp:morph("face round", args.face_style[1], ref) end
+					if args.face_style[2] then tmp:morph("face rough", args.face_style[2], ref) end
+					if args.face_style[3] then tmp:morph("face frown", args.face_style[3], ref) end
 				end
 				m:merge(tmp)
 			else

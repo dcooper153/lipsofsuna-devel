@@ -702,28 +702,53 @@ error:
 /**
  * \brief Morphs the vertices of the model and one of its shape keys.
  * \param self Model.
+ * \param ref Reference model for relative morphing.
  * \param shape Shape key name.
  * \param value Shape key influence.
  * \return Nonzero on success.
  */
 int limdl_model_morph (
 	LIMdlModel* self,
+	LIMdlModel* ref,
 	const char* shape,
 	float       value)
 {
 	int i;
 	LIMdlShapeKey* key;
+	LIMdlShapeKeyVertex* k;
+	LIMdlVertex* r;
+	LIMdlVertex* v;
 
 	key = limdl_model_find_shape_key (self, shape);
 	if (key == NULL)
 		return 0;
 
-	for (i = 0 ; i < key->vertices.count && i < self->vertices.count ; i++)
+	if (ref != NULL && ref->vertices.count == self->vertices.count)
 	{
-		self->vertices.array[i].coord = limat_vector_lerp (
-			key->vertices.array[i].coord, self->vertices.array[i].coord, value);
-		self->vertices.array[i].normal = limat_vector_normalize (limat_vector_lerp (
-			key->vertices.array[i].normal, self->vertices.array[i].normal, value));
+		/* Relative morphing. */
+		for (i = 0 ; i < key->vertices.count && i < self->vertices.count ; i++)
+		{
+			k = key->vertices.array + i;
+			r = ref->vertices.array + i;
+			v = self->vertices.array + i;
+			v->coord = limat_vector_add (v->coord, limat_vector_multiply (
+				limat_vector_subtract (k->coord, r->coord), value));
+			v->normal = limat_vector_normalize (
+				limat_vector_add (v->normal, limat_vector_multiply (
+				limat_vector_subtract (k->normal, r->normal), value)));
+		}
+	}
+	else
+	{
+		/* Absolute morphing. */
+		for (i = 0 ; i < key->vertices.count && i < self->vertices.count ; i++)
+		{
+			k = key->vertices.array + i;
+			v = self->vertices.array + i;
+			v->coord = limat_vector_lerp (k->coord, v->coord, value);
+			v->normal = limat_vector_normalize (limat_vector_lerp (
+				k->normal, v->normal, value));
+		}
 	}
 
 	return 1;
