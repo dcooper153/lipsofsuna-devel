@@ -251,15 +251,14 @@ end
 --   <li>user: Object using the feat. (required)</li>
 --   <li>stop: True if stopped performing, false if started.</li></ul>
 Feat.perform = function(self, args)
-	local feat = self
-	local anim = Featanimspec:find{name = feat.animation}
+	local anim = Featanimspec:find{name = self.animation}
 	local slot = anim and anim.slot
 	local weapon = slot and args.user:get_item{slot = slot}
-	local info = anim and feat:get_info{attacker = args.user, weapon = weapon}
+	local info = anim and self:get_info{attacker = args.user, weapon = weapon}
 	-- Check for cooldown and requirements.
 	if info and not args.stop then
 		if args.user.cooldown then return end
-		if not feat:usable(args) then return end
+		if not self:usable(args) then return end
 		for k,v in pairs(info.required_reagents) do
 			args.user:subtract_items{name = k, count = v}
 		end
@@ -269,15 +268,15 @@ Feat.perform = function(self, args)
 			args.user.cooldown = info.cooldown
 		end
 	end
-	-- Playback effects.
-	if info and not args.stop then
+	-- Animate the feat.
+	Vision:event{type = "object-feat", object = args.user, anim = anim}
+	local play_effects = function(self)
 		if anim.effect then
 			Effect:play{effect = anim.effect, object = args.user}
 		end
 		if weapon and weapon.spec.effect_attack then
 			Effect:play{effect = weapon.spec.effect_attack, object = args.user}
 		end
-		Vision:event{type = "object-feat", object = args.user, anim = anim}
 	end
 	-- Call the feat function.
 	if not info or anim.toggle or not args.stop then
@@ -286,12 +285,13 @@ Feat.perform = function(self, args)
 				-- Build terrain or machines.
 				-- While the attack animation is played, an attack ray is cast.
 				-- If a tile collides with the ray, a new tile is attached to it.
-				Thread(function(self)
+				Thread(function(t)
+					play_effects()
 					Thread:sleep(args.user.spec.timing_build * 0.05)
 					local src,dst = args.user:get_attack_ray(args)
 					local r = Physics:cast_ray{src = src, dst = dst}
 					if not r or not r.tile then return end
-					feat:apply{
+					self:apply{
 						attacker = args.user,
 						point = r.point,
 						target = r.object,
@@ -303,12 +303,13 @@ Feat.perform = function(self, args)
 				-- Melee attack.
 				-- While the attack animation is played, an attack ray is cast.
 				-- The first object or tile that collides with the ray is damaged.
-				Thread(function(self)
+				Thread(function(t)
+					play_effects()
 					Thread:sleep(args.user.spec.timing_attack_blunt * 0.05)
 					local src,dst = args.user:get_attack_ray(args)
 					local r = Physics:cast_ray{src = src, dst = dst}
 					if not r then return end
-					feat:apply{
+					self:apply{
 						attacker = args.user,
 						point = r.point,
 						target = r.object,
@@ -319,7 +320,8 @@ Feat.perform = function(self, args)
 			if anim.categories["explode"] then
 				-- Self-destruction.
 				-- The creature explodes after the animation has played.
-				Thread(function(self)
+				Thread(function(t)
+					play_effects()
 					Thread:sleep(args.user.spec.timing_attack_explode * 0.05)
 					args.user:die()
 					Utils:explosion(args.user.position)
@@ -330,32 +332,39 @@ Feat.perform = function(self, args)
 				-- A projectile is fired at the specific time into the attack
 				-- animation. The collision callback of the projectile takes
 				-- care of damaging the hit object or tile.
-				Thread(function(self)
+				Thread(function(t)
 					if anim.categories["spell"] then
 						Thread:sleep(args.user.spec.timing_spell_ranged * 0.05)
-					else
-						Thread:sleep(args.user.spec.timing_attack_ranged * 0.05)
+					elseif weapon and weapon.spec.animation_attack == "attack bow" then
+						Thread:sleep(args.user.spec.timing_attack_bow * 0.05)
+					elseif weapon and weapon.spec.animation_attack == "attack crossbow" then
+						Thread:sleep(args.user.spec.timing_attack_crossbow * 0.05)
+					elseif weapon and weapon.spec.animation_attack == "attack musket" then
+						Thread:sleep(args.user.spec.timing_attack_musket * 0.05)
+					elseif weapon and weapon.spec.animation_attack == "attack revolver" then
+						Thread:sleep(args.user.spec.timing_attack_revolver * 0.05)
 					end
+					play_effects()
 					for name,count in pairs(info.required_ammo) do
 						local ammo = args.user:split_items{name = name, count = count}
 						if ammo then
-							ammo:fire{collision = true, feat = feat, owner = args.user, weapon = weapon}
+							ammo:fire{collision = true, feat = self, owner = args.user, weapon = weapon}
 							return
 						end
 					end
-					for index,data in ipairs(feat.effects) do
+					for index,data in ipairs(self.effects) do
 						local effect = Feateffectspec:find{name = data[1]}
 						if effect and effect.projectile then
 							local ammo = Object{model = effect.projectile, physics = "rigid"}
 							ammo.gravity = Vector()
 							if effect.name == "dig" then
-								ammo:fire{collision = true, feat = feat, owner = args.user, timer = 10}
+								ammo:fire{collision = true, feat = self, owner = args.user, timer = 10}
 								ammo.orig_rotation = ammo.rotation
 								ammo.orig_velocity = ammo.velocity
 								ammo.effect = "dig"
 								ammo.power = 1 + 0.1 * data[2]
 							else
-								ammo:fire{collision = true, feat = feat, owner = args.user, weapon = weapon}
+								ammo:fire{collision = true, feat = self, owner = args.user, weapon = weapon}
 							end
 							return
 						end
@@ -366,9 +375,10 @@ Feat.perform = function(self, args)
 				-- Target self.
 				-- At the specific time into the attack animation, the effects of the
 				-- feat are applied to the attacker herself.
-				Thread(function(self)
+				Thread(function(t)
+					play_effects()
 					Thread:sleep(args.user.spec.timing_spell_self * 0.05)
-					feat:apply{
+					self:apply{
 						attacker = args.user,
 						point = args.user.position,
 						target = args.user,
@@ -380,11 +390,12 @@ Feat.perform = function(self, args)
 				-- The weapon is fired at the specific time into the attack
 				-- animation. The collision callback of the projectile takes
 				-- care of damaging the hit object or tile.
-				Thread(function(self)
+				Thread(function(t)
+					play_effects()
 					Thread:sleep(args.user.spec.timing_attack_throw * 0.05)
 					local proj = weapon:fire{
 						collision = not weapon.spec.destroy_timer,
-						feat = feat,
+						feat = self,
 						owner = args.user,
 						speed = 10,
 						timer = weapon.spec.destroy_timer}
@@ -394,12 +405,13 @@ Feat.perform = function(self, args)
 				-- Touch spell.
 				-- While the attack animation is played, an attack ray is cast.
 				-- The first object or tile that collides with the ray is damaged.
-				Thread(function(self)
+				Thread(function(t)
+					play_effects()
 					Thread:sleep(args.user.spec.timing_spell_touch * 0.05)
 					local src,dst = args.user:get_attack_ray(args)
 					local r = Physics:cast_ray{src = src, dst = dst}
 					if not r then return end
-					feat:apply{
+					self:apply{
 						attacker = args.user,
 						point = r.point,
 						target = r.object,
@@ -408,7 +420,7 @@ Feat.perform = function(self, args)
 				end)
 			end
 		end
-		if feat.func then feat:func(args) end
+		if self.func then self:func(args) end
 	end
 end
 

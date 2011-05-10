@@ -61,9 +61,12 @@ Species.dict_name = {}
 --   <li>swim_force: Mass-independent upward swim force of the creature.</li>
 --   <li>tilt_bone: Name of the tilt bone of the creature.</li>
 --   <li>tilt_limit: Tilt limit in radians of the tilting bone.</li>
+--   <li>timing_attack_bow: Timing of bow firing, in frames.</li>
 --   <li>timing_attack_blunt: Timing of blunt attack impact, in frames.</li>
+--   <li>timing_attack_crossbow: Timing of crossbow firing, in frames.</li>
 --   <li>timing_attack_explode: Timing of explosion attack, in frames.</li>
---   <li>timing_attack_ranged: Timing of ranged attack firing, in frames.</li>
+--   <li>timing_attack_musket: Timing of musket firing, in frames.</li>
+--   <li>timing_attack_revolver: Timing of revolver firing, in frames.</li>
 --   <li>timing_attack_throw: Timing of releasing the thrown item, in frames.</li>
 --   <li>timing_build: Timing of releasing the thrown item, in frames.</li>
 --   <li>timing_drop: Timing of dropping an item, in frames.</li>
@@ -195,9 +198,12 @@ Species.new = function(clss, args)
 	copy("speed_run", 6)
 	copy("swim_force", 3.5)
 	copy("tilt_limit", math.pi)
+	copy("timing_attack_bow", 10)
 	copy("timing_attack_blunt", 10)
+	copy("timing_attack_crossbow", 15)
 	copy("timing_attack_explode", 60)
-	copy("timing_attack_ranged", 10)
+	copy("timing_attack_musket", 30)
+	copy("timing_attack_revolver", 20)
 	copy("timing_attack_throw", 10)
 	copy("timing_build", 10)
 	copy("timing_drop", 5)

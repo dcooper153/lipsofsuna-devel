@@ -9,8 +9,7 @@ Effect{
 
 Effect{
 	name = "crossbow1",
-	sound = "weaponcrossbow1",
-	sound_delay = 0.5}
+	sound = "weaponcrossbow1"}
 
 Effect{
 	name = "builtrock1",
@@ -92,8 +91,7 @@ Effect{
 
 Effect{
 	name = "musket1",
-	sound = "weaponmusket1",
-	sound_delay = 0.5}
+	sound = "weaponmusket1"}
 
 Effect{
 	name = "portal1",
@@ -110,8 +108,7 @@ Effect{
 
 Effect{
 	name = "revolver1",
-	sound = "weaponmusket1", -- TODO: Separate sound?
-	sound_delay = 0.5}
+	sound = "weaponmusket1"} -- TODO: Separate sound?
 
 Effect{
 	name = "sanctuary1",
