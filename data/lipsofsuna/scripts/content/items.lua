@@ -229,7 +229,7 @@ Itemspec{
 	crafting_count = 10,
 	crafting_materials = {["log"] = 1},
 	icon = "arrow1",
-	mass = 1,
+	mass = 0.2,
 	stacking = true,
 	water_gravity = Vector(0,6,0)}
 
@@ -264,11 +264,11 @@ Itemspec{
 Itemspec{
 	name = "bullet",
 	model = "arrow-000", -- FIXME
-	mass = 3,
+	mass = 0.2,
 	categories = {"bullet"},
-	influences_base = {physical = -5},
+	influences_base = {physical = -1},
 	crafting_count = 10,
-	crafting_materials = {["iron ingot"] = 1, ["crimson stone"] = 3},
+	crafting_materials = {["iron ingot"] = 1, ["crimson stone"] = 1},
 	icon = "arrow1",
 	stacking = true}
 
