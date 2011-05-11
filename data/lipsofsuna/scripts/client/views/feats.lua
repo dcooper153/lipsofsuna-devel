@@ -220,7 +220,9 @@ Views.Feats.set_anim = function(self, name)
 			active = a,
 			effect = Feateffectspec:find{name = v},
 			tooltip = a and Widgets.Tooltip{text = "Click to add to the spell"}, 
-			pressed = function(w) self:add_effect(w.effect) end}
+			pressed = function(w)
+				if w.active then self:add_effect(w.effect) end
+			end}
 		self.list_effects:append{widget = w}
 	end
 end
