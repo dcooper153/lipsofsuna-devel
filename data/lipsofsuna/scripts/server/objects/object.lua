@@ -226,6 +226,7 @@ end
 --   <li>feat: Feat.</li>
 --   <li>owner: Object firing the projectile.</li>
 --   <li>speed: Initial speed.</li>
+--   <li>speedline: True if the object should have a speed line effect.</li>
 --   <li>timer: Trigger at timeout.</li>
 --   <li>weapon: Used weapon.</ul>
 -- @return True on success.
@@ -242,6 +243,10 @@ Object.fire = function(self, args)
 			self:die()
 			timer:disable()
 		end}
+	end
+	-- Initialize speed lines.
+	if args.speedline then
+		self.flags = Bitwise:bor(self.flags or 0, Protocol.object_flags.SPEEDLINE)
 	end
 	-- Add the projectile to the world.
 	local src,dst = args.owner:get_attack_ray()

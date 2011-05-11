@@ -348,7 +348,7 @@ Feat.perform = function(self, args)
 					for name,count in pairs(info.required_ammo) do
 						local ammo = args.user:split_items{name = name, count = count}
 						if ammo then
-							ammo:fire{collision = true, feat = self, owner = args.user, weapon = weapon}
+							ammo:fire{collision = true, feat = self, owner = args.user, speedline = true, weapon = weapon}
 							return
 						end
 					end

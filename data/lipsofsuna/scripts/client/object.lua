@@ -1,3 +1,5 @@
+require "client/speedline"
+
 Object.physics_position_correction = Vector(0, 0, 0)
 
 local oldanimate = Object.animate
@@ -158,6 +160,10 @@ Object.update = function(self, secs)
 				v.position = p
 			end
 		end
+	end
+	-- Update speed lines.
+	if self.speedline then
+		self.speedline:update(secs)
 	end
 end
 

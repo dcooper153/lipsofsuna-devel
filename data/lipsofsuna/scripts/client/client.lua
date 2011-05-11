@@ -159,7 +159,7 @@ Protocol:add_handler{type = "OBJECT_SELF", func = function(event)
 end}
 
 Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
-	local ok,i,t,s,m,n,x,y,z,tilt,rx,ry,rz,rw = event.packet:read("uint32", "string", "string", "string", "string", "float", "float", "float", "float", "float", "float", "float", "float")
+	local ok,i,f,t,s,m,n,x,y,z,tilt,rx,ry,rz,rw = event.packet:read("uint32", "uint8", "string", "string", "string", "string", "float", "float", "float", "float", "float", "float", "float", "float")
 	if not ok then return end
 	-- Get the object specification.
 	local spec
@@ -211,6 +211,10 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	o:update_model()
 	o:update_rotation(Quaternion(rx, ry, rz, rw), tilt)
 	o.realized = true
+	-- Initialize speed lines.
+	if Bitwise:band(f, Protocol.object_flags.SPEEDLINE) ~= 0 then
+		o.speedline = Speedline(o)
+	end
 end}
 
 Protocol:add_handler{type = "OBJECT_SKILL", func = function(event)

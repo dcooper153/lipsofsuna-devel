@@ -107,6 +107,9 @@ do
 	add("ADMIN_STATS")
 end
 
+Protocol.object_flags = {
+	SPEEDLINE = 0x1}
+
 effects = {}
 do
 	local index = 0

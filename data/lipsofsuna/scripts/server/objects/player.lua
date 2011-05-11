@@ -211,7 +211,7 @@ Player.vision_cb = function(self, args)
 			local o = args.object
 			-- Append basic data.
 			local tilt = (o.tilt and o.tilt.euler[3]) or 0
-			local p = Packet(packets.OBJECT_SHOWN, "uint32", o.id,
+			local p = Packet(packets.OBJECT_SHOWN, "uint32", o.id, "uint8", o.flags or 0,
 				"string", o.spec.type, "string", o.spec.name or "",
 				"string", o.model_name, "string", o.name or "",
 				"float", o.position.x, "float", o.position.y, "float", o.position.z, "float", tilt,
