@@ -7,6 +7,7 @@ Widgets.Feattooltip.new = function(clss, args)
 	local feat = args.feat
 	if not feat then return self end
 	local info = feat:get_info()
+	if not info then return self end
 	-- Icon and name.
 	local title = Widget{cols = 2, rows = 1, spacings = {5,0}}
 	local icon = feat:get_icon()

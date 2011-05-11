@@ -128,11 +128,16 @@ Views.Feats.assign = function(self)
 		end
 	end
 	-- Create a feat from the animation and the effects.
-	local feat = Feat{animation = self.combo_anim.text ~= "" and self.combo_anim.text, effects = {}}
-	for i = 1,3 do
-		feat.effects[i] = {effects[i], values[i]}
+	local anim = self.combo_anim.text ~= "" and self.combo_anim.text
+	if anim and #effects > 0 then
+		local feat = Feat{animation = anim, effects = {}}
+		for i = 1,3 do
+			feat.effects[i] = {effects[i], values[i]}
+		end
+		Quickslots:assign_feat(self.active_slot, feat)
+	else
+		Quickslots:assign_none(self.active_slot)
 	end
-	Quickslots:assign_feat(self.active_slot, feat)
 end
 
 Views.Feats.back = function(self)
