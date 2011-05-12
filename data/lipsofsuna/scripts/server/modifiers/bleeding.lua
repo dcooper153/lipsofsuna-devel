@@ -6,7 +6,7 @@ Modifier{name = "bleeding", func = function(self, object, timer, secs)
 	end
 	-- Damage every five second.
 	if object.plague_timer and timer - object.plague_timer > 1 then
-		object:damaged(5)
+		object:damaged{amount = 5, type = "bleeding"}
 		object.plague_timer = timer
 	end
 	return timer - secs

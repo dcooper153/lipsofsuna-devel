@@ -117,7 +117,7 @@ Utils.explosion = function(clss, point, radius)
 		local mult = 10 * math.min(100, v1.mass)
 		local impulse = diff:normalize() * (mult * (1 - frac))
 		v1:impulse{impulse = impulse, point = Vector()}
-		v1:damaged(40 * (1 - frac))
+		v1:damaged{amount = 40 * (1 - frac), type = "explosion"}
 	end
 end
 

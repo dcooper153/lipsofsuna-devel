@@ -301,19 +301,30 @@ end
 
 --- Causes the object to take damage.
 -- @param self Object.
--- @param amount Amount of damage.
-Creature.damaged = function(self, amount)
+-- @param args Arguments.<ul>
+--   <li>amount: Amount of damage.</li>
+--   <li>point: Damage point.</li>
+--   <li>type: Damage type.</li></ul>
+Creature.damaged = function(self, args)
+	-- Check for invulnerability.
 	if not self.realized then return end
 	local health = self.skills:get_value{skill = "health"}
 	if not health then return end
-	if amount < 0 then
+	-- Reduce health.
+	if args.amount < 0 then
 		local max = self.skills:get_maximum{skill = "health"}
-		self.skills:set_value{skill = "health", value = math.min(health - amount, max)}
-	elseif health - amount > 0 then
-		self.skills:set_value{skill = "health", value = health - amount}
+		self.skills:set_value{skill = "health", value = math.min(health - args.amount, max)}
+	elseif health - args.amount > 0 then
+		self.skills:set_value{skill = "health", value = health - args.amount}
 	else
 		self.skills:set_value{skill = "health", value = 0}
 		self:die()
+	end
+	-- Play the damage effect.
+	-- TODO: Should depend on the attack type.
+	-- TODO: Should depend on the damage magnitude.
+	if args.type == "physical" and self.spec.effect_physical_damage then
+		Effect:play{effect = self.spec.effect_physical_damage, object = not args.point and self, point = args.point}
 	end
 end
 
@@ -693,7 +704,7 @@ Creature.update_actions = function(self, secs)
 			if prevy < -limity and diffy > limity then
 				local damage = (diffy - limity) * self.spec.falling_damage_rate
 				if damage > 2 then
-					self:damaged(damage)
+					self:damaged{amount = damage, type = "falling"}
 					if self.spec.effect_falling_damage then
 						Effect:play{effect = self.spec.effect_falling_damage, object = self}
 					end
@@ -838,10 +849,10 @@ Creature.update_environment = function(self, secs)
 		local magma = self.submerged_in_magma or 0
 		local water = self.submerged - magma
 		if magma > 0 and self.damage_from_magma ~= 0 then
-			self:damaged(self.spec.damage_from_magma * magma * tick)
+			self:damaged{amount = self.spec.damage_from_magma * magma * tick, type = "liquid"}
 		end
 		if water > 0 and self.damage_from_water ~= 0 then
-			self:damaged(self.spec.damage_from_water * water * tick)
+			self:damaged{amount = self.spec.damage_from_water * water * tick, type = "liquid"}
 		end
 	end
 	return true, res

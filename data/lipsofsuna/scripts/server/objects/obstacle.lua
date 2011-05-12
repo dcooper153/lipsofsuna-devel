@@ -48,15 +48,18 @@ Obstacle.new = function(clss, args)
 	return self
 end
 
---- Causes the obstacle to take damage.
+--- Causes the object to take damage.
 -- @param self Object.
--- @param amount Amount of damage.
-Obstacle.damaged = function(self, amount)
+-- @param args Arguments.<ul>
+--   <li>amount: Amount of damage.</li>
+--   <li>point: Damage point.</li>
+--   <li>type: Damage type.</li></ul>
+Obstacle.damaged = function(self, args)
 	-- Obstacles whose spec has no health are indestructible.
 	if not self.spec.health then return end
 	-- Subtract health.
 	local h = self.health or self.spec.health
-	self.health = math.max(0, h - amount)
+	self.health = math.max(0, h - args.amount)
 	-- Destroy when out of health.
 	if self.health == 0 then
 		self:die()

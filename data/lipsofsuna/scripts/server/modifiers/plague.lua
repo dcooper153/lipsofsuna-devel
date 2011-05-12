@@ -7,7 +7,7 @@ Modifier{name = "plague", func = function(self, object, timer, secs)
 	-- Damage and infect every five second.
 	if object.plague_timer and timer - object.plague_timer > 5 then
 		-- Damage.
-		object:damaged(5)
+		object:damaged{amount = 5, type = "disease"}
 		object.plague_timer = timer
 		-- Infect.
 		local near = Object:find{point = object.position, radius = 5}

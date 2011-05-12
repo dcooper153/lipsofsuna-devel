@@ -121,7 +121,7 @@ Feat.apply = function(self, args)
 				end
 				-- Apply unless friendly fire.
 				if val > 0 or not args.attacker.client or not args.target.client then
-					args.target:damaged(-val)
+					args.target:damaged{amount = -val, point = args.point, type = "physical"}
 				end
 				-- Anger hurt creatures.
 				if info.influences.health < 0 then
@@ -214,7 +214,7 @@ Feat.apply = function(self, args)
 		end
 		-- Damage the weapon.
 		if args.weapon and args.weapon.spec.damage_mining then
-			if not args.weapon:damaged(2 * args.weapon.spec.damage_mining * math.random()) then
+			if not args.weapon:damaged{amount = 2 * args.weapon.spec.damage_mining * math.random(), type = "mining"} then
 				args.attacker:send{packet = Packet(packets.MESSAGE, "string",
 					"The " .. args.weapon.spec.name .. " broke!")}
 			end

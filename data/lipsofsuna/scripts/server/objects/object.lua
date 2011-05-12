@@ -168,8 +168,11 @@ end
 
 --- Causes the object to take damage.
 -- @param self Object.
--- @param amount Amount of damage.
-Object.damaged = function(self, amount)
+-- @param args Arguments.<ul>
+--   <li>amount: Amount of damage.</li>
+--   <li>point: Damage point.</li>
+--   <li>type: Damage type.</li></ul>
+Object.damaged = function(self, args)
 end
 
 --- Detaches the object from the world or any container.
