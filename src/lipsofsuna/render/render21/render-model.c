@@ -338,7 +338,10 @@ int liren_model21_set_model (
 
 	/* Initialize the vertex buffer. */
 	if (self->buffer != NULL)
+	{
 		liren_buffer21_free (self->buffer);
+		self->buffer = NULL;
+	}
 	if (indices != NULL)
 	{
 		self->buffer = liren_buffer21_new (indices, index_count, &private_vertex_format,
