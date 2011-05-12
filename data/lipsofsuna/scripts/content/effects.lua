@@ -48,6 +48,11 @@ Effect{
 	sound = "explosion1"}
 
 Effect{
+	name = "fleshimpact1",
+	model = "blood1",
+	sound = "thud-000"}
+
+Effect{
 	name = "fireball1",
 	sound = "fire-000"}
 

@@ -38,6 +38,7 @@ Species.dict_name = {}
 --   <li>difficulty: The approximate difficulty of the creature in the range of [0,1].</li>
 --   <li>effect_falling_damage: Name of the effect played when the creature takes falling damage.</li>
 --   <li>effect_landing: Name of the effect played when the creature lands after jumping.</li>
+--   <li>effect_physical_damage: Name of the effect played when the creature is hurt physically.</li>
 --   <li>equipment_slots: List of equipment slots.</li>
 --   <li>factions: List of factions.</li>
 --   <li>falling_damage_rate: Number of points of damage per every meters per second exceeding the falling damage speed.</li>
@@ -184,6 +185,9 @@ Species.new = function(clss, args)
 	copy("damage_from_water", 0)
 	copy("dead")
 	copy("difficulty", 0)
+	copy("effect_falling_damage")
+	copy("effect_landing")
+	copy("effect_physical_damage")
 	copy("falling_damage_rate", 3)
 	copy("falling_damage_speed", 12)
 	copy("gravity", Vector(0, -15, 0))

@@ -390,6 +390,20 @@
   </asset>
 
   <asset>
+    <file>import/blood1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/blood1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <type>texture</type>
+  </asset>
+
+  <asset>
     <file>import/book-000.blend</file>
     <author>Peragro Tempus Project</author>
     <license>Creative Commons BY-SA 3.0</license>
