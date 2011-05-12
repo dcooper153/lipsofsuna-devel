@@ -80,6 +80,12 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
 		Network:disconnect(args.client)
 		return
 	end
+	-- Make sure not logging in twice.
+	account = Account.dict_name[login]
+	if account then
+		Network:send{client = args.client, packet = Packet(packets.AUTHENTICATE_REJECT, "string", "The account is already in use.")}
+		return
+	end
 	-- Load or create the account.
 	-- The password is also checked in case of an existing account. If the
 	-- check fails, Account() returns nil and we disconnect the client.
