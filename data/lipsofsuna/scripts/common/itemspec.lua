@@ -25,6 +25,7 @@ Itemspec.dict_name = {}
 --   <li>destroy_actions: List of actions to perform when the item is destroyed.</li>
 --   <li>destroy_timer: Time in seconds after which to destruct when thrown.</li>
 --   <li>effect_attack: Name of the effect to play when the item is used for attacking.</li>
+--   <li>effect_attack_speedline: True to enable the speed line effect for attacks.</li>
 --   <li>effect_craft: Name of the effect to play when the item is crafted.</li>
 --   <li>effect_equip: Name of the effect to play when the item is equiped.</li>
 --   <li>effect_unequip: Name of the effect to play when the item is unequiped.</li>
@@ -76,6 +77,7 @@ Itemspec.new = function(clss, args)
 	copy("crafting_skills", {})
 	copy("destroy_actions", {})
 	copy("effect_attack")
+	copy("effect_attack_speedline")
 	copy("effect_craft")
 	copy("effect_equip")
 	copy("effect_unequip")

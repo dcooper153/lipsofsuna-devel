@@ -91,6 +91,10 @@ Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
 		if weapon and weapon.animation_attack then
 			animation = weapon.animation_attack
 		end
+		if weapon and weapon.effect_attack_speedline then
+			local w = obj.slots:get_object{slot = anim.slot}
+			if w then w.speedline = Speedline{delay = 0.5, duration = 1.5, object = w} end
+		end
 	end
 	-- Play the animation.
 	obj:animate_spec(animation)
@@ -213,7 +217,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	o.realized = true
 	-- Initialize speed lines.
 	if Bitwise:band(f, Protocol.object_flags.SPEEDLINE) ~= 0 then
-		o.speedline = Speedline(o)
+		o.speedline = Speedline{object = o}
 	end
 end}
 

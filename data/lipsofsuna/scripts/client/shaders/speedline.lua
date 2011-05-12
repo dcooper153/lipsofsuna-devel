@@ -16,7 +16,7 @@ out fragvar
 void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
-	OUT.alpha = LOS_normal.x;
+	OUT.alpha = 0.5*LOS_normal.x;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass6_fragment = [[

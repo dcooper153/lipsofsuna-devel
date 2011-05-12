@@ -39,6 +39,10 @@ Object.detach = function(self)
 			v.realized = false
 		end
 	end
+	-- Hide speed lines.
+	if self.speedline then
+		self.speedline.realized = false
+	end
 	-- Hide self.
 	self.realized = false
 end
@@ -134,8 +138,8 @@ Object.update = function(self, secs)
 	-- Update slots.
 	if self.slots then
 		local species = Species:find{name = self.race}
-		for slot,object in pairs(self.slots.slots) do
-			local slot = species and species.equipment_slots[slot]
+		for name,object in pairs(self.slots.slots) do
+			local slot = species and species.equipment_slots[name]
 			if slot and slot.node and self.realized then
 				-- Show slot.
 				local p,r = self:find_node{name = slot.node, space = "world"}
@@ -144,6 +148,7 @@ Object.update = function(self, secs)
 				object.position = p
 				object.rotation = r
 				object.realized = true
+				object:update(secs)
 			else
 				-- Hide slot.
 				object:detach()
