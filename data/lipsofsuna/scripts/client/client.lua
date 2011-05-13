@@ -93,7 +93,7 @@ Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
 		end
 		if weapon and weapon.effect_attack_speedline then
 			local w = obj.slots:get_object{slot = anim.slot}
-			if w then w.speedline = Speedline{delay = 0.5, duration = 1.5, object = w} end
+			if w then w.speedline = Speedline{delay = 0.3, duration = 0.8, object = w} end
 		end
 	end
 	-- Play the animation.
