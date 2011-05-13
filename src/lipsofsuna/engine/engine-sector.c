@@ -41,7 +41,7 @@ lieng_sector_new (LIAlgSector* sector)
 	self = lisys_calloc (1, sizeof (LIEngSector));
 	if (self == NULL)
 		return NULL;
-	self->engine = lialg_sectors_get_userdata (sector->manager, "engine");
+	self->engine = lialg_sectors_get_userdata (sector->manager, LIALG_SECTORS_CONTENT_ENGINE);
 	self->sector = sector;
 
 	/* Allocate tree. */

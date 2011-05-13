@@ -50,7 +50,7 @@ lieng_object_iter_first (LIEngObjectIter*   self,
 	/* Find first object. */
 	while (self->sectors.sector != NULL)
 	{
-		sector = lialg_strdic_find (self->sectors.sector->content, "engine");
+		sector = self->sectors.sector->content[LIALG_SECTORS_CONTENT_ENGINE];
 		if (sector != NULL)
 		{
 			lialg_u32dic_iter_start (&self->objects, sector->objects);
@@ -87,7 +87,7 @@ lieng_object_iter_next (LIEngObjectIter* self)
 	/* Find next object in another sector. */
 	while (lialg_sectors_iter_next (&self->sectors))
 	{
-		sector = lialg_strdic_find (self->sectors.sector->content, "engine");
+		sector = self->sectors.sector->content[LIALG_SECTORS_CONTENT_ENGINE];
 		if (sector != NULL)
 		{
 			lialg_u32dic_iter_start (&self->objects, sector->objects);

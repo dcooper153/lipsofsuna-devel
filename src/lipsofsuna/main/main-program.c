@@ -144,10 +144,7 @@ void limai_program_free (
 	}
 
 	if (self->sectors != NULL)
-	{
-		lisys_assert (self->sectors->content->size == 0);
 		lialg_sectors_free (self->sectors);
-	}
 	if (self->paths != NULL)
 		lipth_paths_free (self->paths);
 

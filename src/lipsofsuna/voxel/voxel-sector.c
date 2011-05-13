@@ -62,7 +62,7 @@ livox_sector_new (LIAlgSector* sector)
 	self = lisys_calloc (1, sizeof (LIVoxSector));
 	if (self == NULL)
 		return NULL;
-	self->manager = lialg_sectors_get_userdata (sector->manager, "voxel");
+	self->manager = lialg_sectors_get_userdata (sector->manager, LIALG_SECTORS_CONTENT_VOXEL);
 	self->sector = sector;
 
 	/* Allocate tiles. */

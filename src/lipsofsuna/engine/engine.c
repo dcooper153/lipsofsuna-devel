@@ -104,7 +104,7 @@ lieng_engine_free (LIEngEngine* self)
 	/* Clear sector data. */
 	if (self->sectors != NULL)
 	{
-		lialg_sectors_remove_content (self->sectors, "engine");
+		lialg_sectors_remove_content (self->sectors, LIALG_SECTORS_CONTENT_ENGINE);
 		self->sectors->sector_free_callback.callback = NULL;
 		self->sectors->sector_free_callback.userdata = NULL;
 		self->sectors->sector_load_callback.callback = NULL;
@@ -151,7 +151,7 @@ lieng_engine_update (LIEngEngine* self,
 	/* Update sectors. */
 	LIALG_SECTORS_FOREACH (siter, self->sectors)
 	{
-		sector = lialg_strdic_find (siter.sector->content, "engine");
+		sector = siter.sector->content[LIALG_SECTORS_CONTENT_ENGINE];
 		if (sector != NULL)
 			lieng_sector_update (sector, secs);
 	}
@@ -221,9 +221,9 @@ private_init (LIEngEngine* self)
 		return 0;
 
 	/* Sectors. */
-	if (!lialg_sectors_insert_content (self->sectors, "engine", self,
-	     	(LIAlgSectorFreeFunc) lieng_sector_free,
-	     	(LIAlgSectorLoadFunc) lieng_sector_new))
+	if (!lialg_sectors_insert_content (self->sectors, LIALG_SECTORS_CONTENT_ENGINE, self,
+	     (LIAlgSectorFreeFunc) lieng_sector_free,
+	     (LIAlgSectorLoadFunc) lieng_sector_new))
 		return 0;
 
 	return 1;

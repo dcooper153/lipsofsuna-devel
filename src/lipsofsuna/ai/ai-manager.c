@@ -80,7 +80,7 @@ LIAiManager* liai_manager_new (
 	self->voxels = voxels;
 
 	/* Register sector content. */
-	if (!lialg_sectors_insert_content (self->sectors, "ai", self,
+	if (!lialg_sectors_insert_content (self->sectors, LIALG_SECTORS_CONTENT_AI, self,
 		(LIAlgSectorFreeFunc) liai_sector_free,
 		(LIAlgSectorLoadFunc) liai_sector_new))
 	{
@@ -96,7 +96,7 @@ LIAiManager* liai_manager_new (
 		(LIAlgAstarSuccessor) private_astar_successor);
 	if (self->astar == NULL)
 	{
-		lialg_sectors_remove_content (self->sectors, "ai");
+		lialg_sectors_remove_content (self->sectors, LIALG_SECTORS_CONTENT_AI);
 		lisys_free (self);
 		return NULL;
 	}
@@ -113,7 +113,7 @@ void liai_manager_free (
 {
 	/* Unregister sector content. */
 	if (self->sectors != NULL)
-		lialg_sectors_remove_content (self->sectors, "ai");
+		lialg_sectors_remove_content (self->sectors, LIALG_SECTORS_CONTENT_AI);
 
 	/* Free path solver. */
 	if (self->astar != NULL)
@@ -150,7 +150,7 @@ LIAiWaypoint* liai_manager_find_waypoint (
 	y %= self->voxels->tiles_per_line;
 	z %= self->voxels->tiles_per_line;
 
-	sector = lialg_sectors_data_offset (self->sectors, "ai", sx, sy, sz, 0);
+	sector = lialg_sectors_data_offset (self->sectors, LIALG_SECTORS_CONTENT_AI, sx, sy, sz, 0);
 	if (sector == NULL)
 		return NULL;
 
@@ -210,8 +210,8 @@ int liai_manager_update_block (
 	sector = lialg_sectors_sector_offset (self->sectors, soff[0], soff[1], soff[2], 1);
 	if (sector == NULL)
 		return 1;
-	ai = lialg_strdic_find (sector->content, "ai");
-	voxel = lialg_strdic_find (sector->content, "voxel");
+	ai = sector->content[LIALG_SECTORS_CONTENT_AI];
+	voxel = sector->content[LIALG_SECTORS_CONTENT_VOXEL];
 	if (ai == NULL || voxel == NULL)
 		return 1;
 
@@ -224,7 +224,7 @@ int liai_manager_update_block (
 		sector = lialg_sectors_sector_offset (self->sectors, soff[0], soff[1] - 1, soff[2], 0);
 		if (sector != NULL)
 		{
-			ai1 = lialg_strdic_find (sector->content, "ai");
+			ai1 = sector->content[LIALG_SECTORS_CONTENT_AI];
 			if (ai1 != NULL)
 				liai_sector_build_border (ai, ai1, boff[0], boff[2], sx, sz);
 		}
@@ -234,7 +234,7 @@ int liai_manager_update_block (
 		sector = lialg_sectors_sector_offset (self->sectors, soff[0], soff[1] + 1, soff[2], 0);
 		if (sector != NULL)
 		{
-			ai1 = lialg_strdic_find (sector->content, "ai");
+			ai1 = sector->content[LIALG_SECTORS_CONTENT_AI];
 			if (ai1 != NULL)
 				liai_sector_build_border (ai1, ai, boff[0], boff[2], sx, sz);
 		}
@@ -346,7 +346,7 @@ static void* private_astar_successor (
 		sector = node->sector;
 		if (sx != sector->sector->x || sy != sector->sector->y || sz != sector->sector->z)
 		{
-			sector = lialg_sectors_data_offset (sector->sector->manager, "ai", sx, sy, sz, 0);
+			sector = lialg_sectors_data_offset (sector->sector->manager, LIALG_SECTORS_CONTENT_AI, sx, sy, sz, 0);
 			if (sector == NULL)
 				continue;
 		}

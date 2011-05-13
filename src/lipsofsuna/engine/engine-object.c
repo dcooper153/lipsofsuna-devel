@@ -251,7 +251,7 @@ lieng_object_moved (LIEngObject* self)
 	/* Move between sectors. */
 	lieng_object_get_transform (self, &transform);
 	src = self->sector;
-	dst = lialg_sectors_data_point (self->engine->sectors, "engine", &transform.position, 1);
+	dst = lialg_sectors_data_point (self->engine->sectors, LIALG_SECTORS_CONTENT_ENGINE, &transform.position, 1);
 	if (dst == NULL)
 		return 0;
 	if (src != dst)
@@ -527,7 +527,7 @@ private_warp (LIEngObject*       self,
 
 	/* Move between sectors. */
 	src = self->sector;
-	dst = lialg_sectors_data_point (self->engine->sectors, "engine", position, 1);
+	dst = lialg_sectors_data_point (self->engine->sectors, LIALG_SECTORS_CONTENT_ENGINE, position, 1);
 	if (dst == NULL)
 		return 0;
 	if (src != dst)

@@ -179,7 +179,7 @@ static void Voxel_find_blocks (LIScrArgs* args)
 	LIALG_RANGE_FOREACH (iter0, sectors)
 	{
 		/* Get voxel sector. */
-		sector = lialg_sectors_data_index (module->voxels->sectors, "voxel", iter0.index, 0);
+		sector = lialg_sectors_data_index (module->voxels->sectors, LIALG_SECTORS_CONTENT_VOXEL, iter0.index, 0);
 		if (sector == NULL)
 			continue;
 
@@ -299,7 +299,7 @@ static void Voxel_get_block (LIScrArgs* args)
 	addr.sector[2] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
 
 	/* Get block. */
-	sector = lialg_sectors_data_offset (module->program->sectors, "voxel",
+	sector = lialg_sectors_data_offset (module->program->sectors, LIALG_SECTORS_CONTENT_VOXEL,
 		addr.sector[0], addr.sector[1], addr.sector[2], 0);
 	if (sector == NULL)
 		return;
@@ -524,7 +524,7 @@ static void Voxel_set_block (LIScrArgs* args)
 	addr.sector[2] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
 
 	/* Find or create sector. */
-	sector = lialg_sectors_data_offset (module->voxels->sectors, "voxel",
+	sector = lialg_sectors_data_offset (module->voxels->sectors, LIALG_SECTORS_CONTENT_VOXEL,
 		addr.sector[0], addr.sector[1], addr.sector[2], 1);
 	if (sector == NULL)
 		return;

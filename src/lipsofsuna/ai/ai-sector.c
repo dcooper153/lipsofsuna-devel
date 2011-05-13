@@ -47,7 +47,7 @@ LIAiSector* liai_sector_new (
 	self = lisys_calloc (1, sizeof (LIAiSector));
 	if (self == NULL)
 		return NULL;
-	self->manager = lialg_sectors_get_userdata (sector->manager, "ai");
+	self->manager = lialg_sectors_get_userdata (sector->manager, LIALG_SECTORS_CONTENT_AI);
 	self->sector = sector;
 
 	/* Allocate tiles. */

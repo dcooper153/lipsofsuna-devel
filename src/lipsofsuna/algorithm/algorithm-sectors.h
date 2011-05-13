@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -28,6 +28,14 @@ typedef struct _LIAlgSectorsCallback LIAlgSectorsCallback;
 typedef void (*LIAlgSectorFreeFunc)(void*);
 typedef void* (*LIAlgSectorLoadFunc)(LIAlgSector*);
 
+enum
+{
+	LIALG_SECTORS_CONTENT_AI,
+	LIALG_SECTORS_CONTENT_ENGINE,
+	LIALG_SECTORS_CONTENT_VOXEL,
+	LIALG_SECTORS_CONTENT_MAX
+};
+
 struct _LIAlgSectorsCallback
 {
 	void (*callback)(void*, LIAlgSector*);
@@ -41,9 +49,9 @@ struct _LIAlgSector
 	int x;
 	int y;
 	int z;
-	LIMatVector position;
+	void* content[LIALG_SECTORS_CONTENT_MAX];
 	LIAlgSectors* manager;
-	LIAlgStrdic* content;
+	LIMatVector position;
 };
 
 struct _LIAlgSectors
@@ -51,15 +59,11 @@ struct _LIAlgSectors
 	int count;
 	int loading;
 	float width;
+	void* content[LIALG_SECTORS_CONTENT_MAX];
 	LIAlgU32dic* sectors;
-	LIAlgStrdic* content;
 	LIAlgSectorsCallback sector_free_callback;
 	LIAlgSectorsCallback sector_load_callback;
 };
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 LIAPICALL (LIAlgSectors*, lialg_sectors_new, (
 	int   count,
@@ -73,13 +77,13 @@ LIAPICALL (void, lialg_sectors_clear, (
 
 LIAPICALL (void*, lialg_sectors_data_index, (
 	LIAlgSectors* self,
-	const char*   name,
+	int           name,
 	int           index,
 	int           create));
 
 LIAPICALL (void*, lialg_sectors_data_offset, (
 	LIAlgSectors* self,
-	const char*   name,
+	int           name,
 	int           x,
 	int           y,
 	int           z,
@@ -87,7 +91,7 @@ LIAPICALL (void*, lialg_sectors_data_offset, (
 
 LIAPICALL (void*, lialg_sectors_data_point, (
 	LIAlgSectors*      self,
-	const char*        name,
+	int                name,
 	const LIMatVector* point,
 	int                create));
 
@@ -124,7 +128,7 @@ LIAPICALL (void, lialg_sectors_index_to_offset_static, (
 
 LIAPICALL (int, lialg_sectors_insert_content, (
 	LIAlgSectors*       self,
-	const char*         name,
+	int                 name,
 	void*               data,
 	LIAlgSectorFreeFunc free,
 	LIAlgSectorLoadFunc load));
@@ -161,7 +165,7 @@ LIAPICALL (void, lialg_sectors_remove, (
 
 LIAPICALL (void, lialg_sectors_remove_content, (
 	LIAlgSectors* self,
-	const char*   name));
+	int           name));
 
 LIAPICALL (void, lialg_sectors_update, (
 	LIAlgSectors* self,
@@ -169,10 +173,6 @@ LIAPICALL (void, lialg_sectors_update, (
 
 LIAPICALL (void*, lialg_sectors_get_userdata, (
 	LIAlgSectors* self,
-	const char*   name));
-
-#ifdef __cplusplus
-}
-#endif
+	int           name));
 
 #endif

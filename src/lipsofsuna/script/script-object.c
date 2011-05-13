@@ -58,7 +58,7 @@ static void Object_find (LIScrArgs* args)
 	/* Sector find mode. */
 	else if (liscr_args_gets_int (args, "sector", &id))
 	{
-		sector = lialg_sectors_data_index (program->sectors, "engine", id, 0);
+		sector = lialg_sectors_data_index (program->sectors, LIALG_SECTORS_CONTENT_ENGINE, id, 0);
 		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 		if (sector != NULL)
 		{

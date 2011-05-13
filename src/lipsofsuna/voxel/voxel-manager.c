@@ -47,9 +47,15 @@ static void private_configure (
 
 /*****************************************************************************/
 
-LIVoxManager*
-livox_manager_new (LICalCallbacks* callbacks,
-                   LIAlgSectors*   sectors)
+/**
+ * \brief Creates a new voxel manager.
+ * \param callbacks Callback manager.
+ * \param sectors Sector manager.
+ * \return Voxel manager.
+ */
+LIVoxManager* livox_manager_new (
+	LICalCallbacks* callbacks,
+	LIAlgSectors*   sectors)
 {
 	LIVoxManager* self;
 
@@ -70,9 +76,9 @@ livox_manager_new (LICalCallbacks* callbacks,
 	}
 
 	/* Allocate sector data. */
-	if (!lialg_sectors_insert_content (self->sectors, "voxel", self,
-	     	(LIAlgSectorFreeFunc) livox_sector_free,
-	     	(LIAlgSectorLoadFunc) livox_sector_new))
+	if (!lialg_sectors_insert_content (self->sectors, LIALG_SECTORS_CONTENT_VOXEL, self,
+	     (LIAlgSectorFreeFunc) livox_sector_free,
+	     (LIAlgSectorLoadFunc) livox_sector_new))
 	{
 		livox_manager_free (self);
 		return NULL;
@@ -81,8 +87,12 @@ livox_manager_new (LICalCallbacks* callbacks,
 	return self;
 }
 
-void
-livox_manager_free (LIVoxManager* self)
+/**
+ * \brief Frees the voxel manager.
+ * \param self Voxel manager.
+ */
+void livox_manager_free (
+	LIVoxManager* self)
 {
 	/* Free materials. */
 	if (self->materials != NULL)
@@ -93,21 +103,20 @@ livox_manager_free (LIVoxManager* self)
 
 	/* Free sector data. */
 	if (self->sectors != NULL)
-		lialg_sectors_remove_content (self->sectors, "voxel");
+		lialg_sectors_remove_content (self->sectors, LIALG_SECTORS_CONTENT_VOXEL);
 
 	lisys_free (self);
 }
 
 /**
  * \brief Checks if the voxel is an occluder.
- *
  * \param self Voxel manager.
  * \param voxel Voxel.
  * \return Nonzero if occluder.
  */
-int
-livox_manager_check_occluder (const LIVoxManager* self,
-                              const LIVoxVoxel*   voxel)
+int livox_manager_check_occluder (
+	const LIVoxManager* self,
+	const LIVoxVoxel*   voxel)
 {
 	LIVoxMaterial* material;
 
@@ -125,18 +134,16 @@ livox_manager_check_occluder (const LIVoxManager* self,
 
 /**
  * \brief Removes all the materials.
- *
  * \param self Voxel manager.
  */
-void
-livox_manager_clear_materials (LIVoxManager* self)
+void livox_manager_clear_materials (
+	LIVoxManager* self)
 {
 	private_clear_materials (self);
 }
 
 /**
  * \brief Reconfigures the block and tile counts of the map.
- *
  * \param self Voxel manager.
  * \param blocks_per_line Number of blocks per sector edge.
  * \param tiles_per_line Number of tiles per sector edge.
@@ -159,7 +166,6 @@ int livox_manager_configure (
 
 /**
  * \brief Copies a box of voxels from the currently loaded scene.
- *
  * \param self Voxel manager.
  * \param xstart Start voxel in voxels in world space.
  * \param ystart Start voxel in voxels in world space.
@@ -169,57 +175,73 @@ int livox_manager_configure (
  * \param zsize Number of voxels to copy.
  * \param result Buffer with room for xsize*ysize*zsize voxels.
  */
-void
-livox_manager_copy_voxels (LIVoxManager* self,
-                           int           xstart,
-                           int           ystart,
-                           int           zstart,
-                           int           xsize,
-                           int           ysize,
-                           int           zsize,
-                           LIVoxVoxel*   result)
+void livox_manager_copy_voxels (
+	LIVoxManager* self,
+	int           xstart,
+	int           ystart,
+	int           zstart,
+	int           xsize,
+	int           ysize,
+	int           zsize,
+	LIVoxVoxel*   result)
 {
 	int i;
-	int x;
-	int y;
-	int z;
-	int sx;
-	int sy;
-	int sz;
-	int tx;
-	int ty;
-	int tz;
-	LIVoxSector* sec;
+	int min[3];
+	int max[3];
+	int off[3];
+	int sec[3];
+	int src[3];
+	int dst[3];
+	LIVoxSector* sector;
 
-	/* FIXME: Avoid excessive sector lookups. */
-	for (i = 0, z = zstart ; z < zstart + zsize ; z++)
-	for (y = ystart ; y < ystart + ysize ; y++)
-	for (x = xstart ; x < xstart + xsize ; x++, i++)
+	/* Initialize the buffer. */
+	memset (result, 0, xsize * ysize * zsize * sizeof (LIVoxVoxel));
+
+	/* Determine affected sectors. */
+	min[0] = xstart / self->tiles_per_line;
+	min[1] = ystart / self->tiles_per_line;
+	min[2] = zstart / self->tiles_per_line;
+	max[0] = (xstart + xsize - 1) / self->tiles_per_line;
+	max[1] = (ystart + ysize - 1) / self->tiles_per_line;
+	max[2] = (zstart + zsize - 1) / self->tiles_per_line;
+
+	/* Loop through affected sectors. */
+	for (sec[2] = min[2] ; sec[2] <= max[2] ; sec[2]++)
+	for (sec[1] = min[1] ; sec[1] <= max[1] ; sec[1]++)
+	for (sec[0] = min[0] ; sec[0] <= max[0] ; sec[0]++)
 	{
-		sx = x / self->tiles_per_line;
-		sy = y / self->tiles_per_line;
-		sz = z / self->tiles_per_line;
-		tx = x - sx * self->tiles_per_line;
-		ty = y - sy * self->tiles_per_line;
-		tz = z - sz * self->tiles_per_line;
-		if (sx < 0 || sx >= self->sectors->count || tx < 0 ||
-		    sy < 0 || sy >= self->sectors->count || ty < 0 ||
-		    sz < 0 || sz >= self->sectors->count || tz < 0)
-		{
-			livox_voxel_init (result + i, 1);
+		/* Find the sector. */
+		sector = lialg_sectors_data_offset (self->sectors, LIALG_SECTORS_CONTENT_VOXEL, sec[0], sec[1], sec[2], 0);
+		if (sector == NULL)
 			continue;
+
+		/* Calculate copy offset. */
+		off[0] = xstart - sec[0] * self->tiles_per_line;
+		off[1] = ystart - sec[1] * self->tiles_per_line;
+		off[2] = zstart - sec[2] * self->tiles_per_line;
+
+		/* Copy sector voxels to the selection. */
+		for (dst[2] = 0, src[2] = off[2], i = 0 ; dst[2] < zsize ; dst[2]++, src[2]++)
+		for (dst[1] = 0, src[1] = off[1] ; dst[1] < ysize ; dst[1]++, src[1]++)
+		for (dst[0] = 0, src[0] = off[0] ; dst[0] < xsize ; dst[0]++, src[0]++, i++)
+		{
+			if (0 <= src[0] && src[0] < self->tiles_per_line &&
+			    0 <= src[1] && src[1] < self->tiles_per_line &&
+			    0 <= src[2] && src[2] < self->tiles_per_line)
+				result[i] = *livox_sector_get_voxel (sector, src[0], src[1], src[2]);
 		}
-		sec = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 0);
-		if (sec != NULL)
-			result[i] = *livox_sector_get_voxel (sec, tx, ty, tz);
-		else
-			livox_voxel_init (result + i, 1);
 	}
 }
 
-LIVoxMaterial*
-livox_manager_find_material (LIVoxManager* self,
-                             uint32_t      id)
+/**
+ * \brief Finds a material by ID.
+ * \param self Voxel manager.
+ * \param id Material ID.
+ * \return Material or NULL.
+ */
+LIVoxMaterial* livox_manager_find_material (
+	LIVoxManager* self,
+	uint32_t      id)
 {
 	return lialg_u32dic_find (self->materials, id);
 }
@@ -316,9 +338,9 @@ LIVoxVoxel* livox_manager_find_voxel (
  * \param material Material.
  * \return Nonzeron on success.
  */
-int
-livox_manager_insert_material (LIVoxManager*  self,
-                               LIVoxMaterial* material)
+int livox_manager_insert_material (
+	LIVoxManager*  self,
+	LIVoxMaterial* material)
 {
 	LIVoxMaterial* tmp;
 
@@ -395,8 +417,12 @@ int livox_manager_intersect_ray (
 #undef STEP_SIZE
 }
 
-void
-livox_manager_mark_updates (LIVoxManager* self)
+/**
+ * \brief Marks neighbors of dirty sectors for update.
+ * \param self Voxel manager.
+ */
+void livox_manager_mark_updates (
+	LIVoxManager* self)
 {
 	int i;
 	int j;
@@ -445,7 +471,7 @@ livox_manager_mark_updates (LIVoxManager* self)
 	/* Update block boundaries. */
 	LIALG_SECTORS_FOREACH (iter, self->sectors)
 	{
-		sector = lialg_strdic_find (iter.sector->content, "voxel");
+		sector = iter.sector->content[LIALG_SECTORS_CONTENT_VOXEL];
 		if (sector == NULL || !sector->dirty)
 			continue;
 		for (i = z = 0 ; z < self->blocks_per_line ; z++)
@@ -469,7 +495,6 @@ livox_manager_mark_updates (LIVoxManager* self)
 
 /**
  * \brief Pastes a box of voxels from the scene.
- *
  * \param self Voxel manager.
  * \param xstart Start voxel in voxels in world space.
  * \param ystart Start voxel in voxels in world space.
@@ -513,7 +538,7 @@ int livox_manager_paste_voxels (
 	for (sec[0] = min[0] ; sec[0] <= max[0] ; sec[0]++)
 	{
 		/* Find or create sector. */
-		sector = lialg_sectors_data_offset (self->sectors, "voxel", sec[0], sec[1], sec[2], 1);
+		sector = lialg_sectors_data_offset (self->sectors, LIALG_SECTORS_CONTENT_VOXEL, sec[0], sec[1], sec[2], 1);
 		if (sector == NULL)
 			return 0;
 
@@ -537,9 +562,14 @@ int livox_manager_paste_voxels (
 	return 1;
 }
 
-void
-livox_manager_remove_material (LIVoxManager* self,
-                               int           id)
+/**
+ * \brief Removes a material.
+ * \param self Voxel manager.
+ * \param id Material ID to remove.
+ */
+void livox_manager_remove_material (
+	LIVoxManager* self,
+	int           id)
 {
 	LIVoxMaterial* material;
 
@@ -551,16 +581,25 @@ livox_manager_remove_material (LIVoxManager* self,
 	}
 }
 
-void
-livox_manager_update (LIVoxManager* self,
-                      float         secs)
+/**
+ * \brief Updates dirty sectors and their neighbors.
+ * \param self Voxel manager.
+ * \param secs Seconds since the last update.
+ */
+void livox_manager_update (
+	LIVoxManager* self,
+	float         secs)
 {
 	livox_manager_mark_updates (self);
 	livox_manager_update_marked (self);
 }
 
-void
-livox_manager_update_marked (LIVoxManager* self)
+/**
+ * \brief Updates marked dirty sectors.
+ * \param self Voxel manager.
+ */
+void livox_manager_update_marked (
+	LIVoxManager* self)
 {
 	int i;
 	int x;
@@ -572,7 +611,7 @@ livox_manager_update_marked (LIVoxManager* self)
 	/* Rebuild modified terrain. */
 	LIALG_SECTORS_FOREACH (iter, self->sectors)
 	{
-		sector = lialg_strdic_find (iter.sector->content, "voxel");
+		sector = iter.sector->content[LIALG_SECTORS_CONTENT_VOXEL];
 		if (sector == NULL || !sector->dirty)
 			continue;
 		for (i = z = 0 ; z < self->blocks_per_line ; z++)
@@ -590,23 +629,30 @@ livox_manager_update_marked (LIVoxManager* self)
 
 /**
  * \brief Sets the default fill tile type for empty sectors.
- *
  * \param self Voxel manager.
  * \param type Terrain type, zero for empty.
  */
-void
-livox_manager_set_fill (LIVoxManager* self,
-                        int           type)
+void livox_manager_set_fill (
+	LIVoxManager* self,
+	int           type)
 {
 	self->fill = type;
 }
 
-void
-livox_manager_get_voxel (LIVoxManager* self,
-                         int           x,
-                         int           y,
-                         int           z,
-                         LIVoxVoxel*   value)
+/**
+ * \brief Gets a voxel by position.
+ * \param self Voxel manager.
+ * \param x Tile position.
+ * \param y Tile position.
+ * \param z Tile position.
+ * \param value Return location for the voxel.
+ */
+void livox_manager_get_voxel (
+	LIVoxManager* self,
+	int           x,
+	int           y,
+	int           z,
+	LIVoxVoxel*   value)
 {
 	int sx;
 	int sy;
@@ -616,7 +662,7 @@ livox_manager_get_voxel (LIVoxManager* self,
 	sx = x / self->tiles_per_line;
 	sy = y / self->tiles_per_line;
 	sz = z / self->tiles_per_line;
-	sector = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 1);
+	sector = lialg_sectors_data_offset (self->sectors, LIALG_SECTORS_CONTENT_VOXEL, sx, sy, sz, 1);
 	if (sector == NULL)
 	{
 		livox_voxel_init (value, 0);
@@ -628,12 +674,20 @@ livox_manager_get_voxel (LIVoxManager* self,
 	*value = *livox_sector_get_voxel (sector, sx, sy, sz);
 }
 
-int
-livox_manager_set_voxel (LIVoxManager*     self,
-                         int               x,
-                         int               y,
-                         int               z,
-                         const LIVoxVoxel* value)
+/**
+ * \brief Sets a voxel by position.
+ * \param self Voxel manager.
+ * \param x Tile position.
+ * \param y Tile position.
+ * \param z Tile position.
+ * \param value Voxel.
+ */
+int livox_manager_set_voxel (
+	LIVoxManager*     self,
+	int               x,
+	int               y,
+	int               z,
+	const LIVoxVoxel* value)
 {
 	int sx;
 	int sy;
@@ -643,7 +697,7 @@ livox_manager_set_voxel (LIVoxManager*     self,
 	sx = x / self->tiles_per_line;
 	sy = y / self->tiles_per_line;
 	sz = z / self->tiles_per_line;
-	sector = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 1);
+	sector = lialg_sectors_data_offset (self->sectors, LIALG_SECTORS_CONTENT_VOXEL, sx, sy, sz, 1);
 	if (sector == NULL)
 		return 0;
 	sx = x % self->tiles_per_line;
@@ -730,7 +784,7 @@ static void private_mark_block (
 	}
 
 	/* Mark block as dirty. */
-	sector1 = lialg_sectors_data_offset (self->sectors, "voxel", sx, sy, sz, 0);
+	sector1 = lialg_sectors_data_offset (self->sectors, LIALG_SECTORS_CONTENT_VOXEL, sx, sy, sz, 0);
 	if (sector1 == NULL)
 		return;
 	block = livox_sector_get_block (sector1, x, y, z);
