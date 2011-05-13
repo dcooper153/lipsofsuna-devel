@@ -103,6 +103,7 @@ Item.contact_cb = function(self, result)
 			-- Damage target.
 			self.contact_args.feat:apply{
 				attacker = self.contact_args.owner,
+				charge = self.contact_args.charge,
 				point = result.point,
 				projectile = self,
 				target = result.object,

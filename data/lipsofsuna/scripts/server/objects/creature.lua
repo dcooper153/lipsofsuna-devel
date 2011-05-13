@@ -323,7 +323,7 @@ Creature.damaged = function(self, args)
 	-- Play the damage effect.
 	-- TODO: Should depend on the attack type.
 	-- TODO: Should depend on the damage magnitude.
-	if args.type == "physical" and self.spec.effect_physical_damage then
+	if args.type == "physical" and self.spec.effect_physical_damage and args.amount > 0 then
 		Effect:play{effect = self.spec.effect_physical_damage, object = not args.point and self, point = args.point}
 	end
 end
@@ -546,7 +546,7 @@ Creature.jump = function(self)
 		Effect:play{effect = "jump1", object = self}
 		self:animate("jump")
 		Thread(function(thread)
-			Thread:sleep(self.spec.timing_jump * 0.05)
+			Thread:sleep(self.spec.timing_jump * 0.02)
 			if not self.realized then return end
 			local v = self.velocity
 			Object.jump(self, {impulse = Vector(v.x, self.spec.jump_force * self.spec.mass, v.z)})
@@ -570,8 +570,8 @@ end
 Creature.pick_up = function(self, src_id, dst_id, dst_slot)
 	if self.cooldown then return end
 	self:animate("pick up")
-	self.cooldown = self.spec.timing_pickup * 0.05 + 0.2
-	Timer{delay = self.spec.timing_pickup * 0.05, func = function(timer)
+	self.cooldown = self.spec.timing_pickup * 0.02 + 0.2
+	Timer{delay = self.spec.timing_pickup * 0.02, func = function(timer)
 		Actions:move_from_world_to_inv(self, src_id, dst_id, dst_slot)
 		timer:disable()
 	end}

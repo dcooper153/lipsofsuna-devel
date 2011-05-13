@@ -1,5 +1,5 @@
-Action{name = "attack", mode = "press", key1 = "mouse1", func = function()
-	Network:send{packet = Packet(packets.SHOOT)}
+Action{name = "attack", mode = "toggle", key1 = "mouse1", func = function(v)
+	Network:send{packet = Packet(packets.SHOOT, "bool", v)}
 end}
 
 Action{name = "block", mode = "toggle", key1 = "mouse3", func = function(v)

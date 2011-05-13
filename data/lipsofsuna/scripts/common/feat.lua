@@ -129,6 +129,7 @@ end
 -- @param self Feat.
 -- @param args Arguments.<ul>
 --   <li>attacker: Attacking creature.</li>
+--   <li>charge: Charge time of the attack.</li>
 --   <li>point: Hit point in world space.</li>
 --   <li>projectile: Fired object.</li>
 --   <li>target: Attacked creature.</li>
@@ -263,8 +264,18 @@ Feat.get_info = function(self, args)
 			influences["physical"] = p * f
 		end
 	end
+	-- Add charge bonus.
+	-- Holding the attack button allows a power attack of a kind. The damage
+	-- is doubled if charged to the maximum of 2 seconds.
+	if args and args.charge then
+		local p = influences["physical"]
+		if (anim.categories["melee"] or anim.categories["ranged"]) and p and p < 0 then
+			local f = 1 + math.min(1, args.charge / 2)
+			influences["physical"] = p * f
+		end
+	end
 	-- Apply target armor and blocking.
-	-- Only a limited number of influence types is affects by this.
+	-- Only a limited number of influence types is affected by this.
 	-- Positive influences that would increase stats are never blocked.
 	if args and args.target then
 		local reduce = {cold = true, fire = true, physical = true}

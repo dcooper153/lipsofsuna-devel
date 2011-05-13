@@ -220,7 +220,7 @@ Protocol:add_handler{type = "MOVE_ITEM", func = function(args)
 		player:pick_up(srcid, dstid, dstslot)
 	elseif dst == moveitem.WORLD then
 		player:animate("drop")
-		Timer{delay = player.spec.timing_drop * 0.05, func = function(timer)
+		Timer{delay = player.spec.timing_drop * 0.02, func = function(timer)
 			Actions:move_from_inv_to_world(player, srcid, srcslot, count)
 			timer:disable()
 		end}
@@ -296,7 +296,13 @@ end}
 Protocol:add_handler{type = "SHOOT", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
+	if player.dead then return end
+	local ok,v = args.packet:read("bool")
+	if not ok then return end
 	if not player.dead then
+		if v and player.attack_charge then return end
+		if not v and not player.attack_charge then return end
+		-- Get the feat animation.
 		local anim = nil
 		local weapon = player:get_item{slot = "hand.R"}
 		if not weapon or weapon.spec.categories["melee"] then
@@ -308,10 +314,26 @@ Protocol:add_handler{type = "SHOOT", func = function(args)
 		elseif weapon.spec.categories["build"] then
 			anim = "build"
 		end
+		-- Handle attacks.
 		if anim then
-			local feat = Feat{animation = anim}
-			feat:add_best_effects{user = player}
-			feat:perform{stop = args.stop, user = player}
+			if v then
+				-- Begin charge.
+				if player.cooldown then return end
+				if weapon and weapon.spec.animation_charge then
+					player:animate(weapon.spec.animation_charge, true)
+				else
+					player:animate("charge punch", true)
+				end
+				player.attack_charge = Program.time
+			else
+				-- Release charge.
+				local feat = Feat{animation = anim}
+				feat:add_best_effects{user = player}
+				if not feat:perform{stop = args.stop, user = player} then
+					player:animate("charge cancel")
+				end
+				player.attack_charge = nil
+			end
 		end
 	else
 		player:respawn()

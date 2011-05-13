@@ -49,6 +49,7 @@ Object.contact_cb = function(self, result)
 	if result.object == self.contact_args.owner then return end
 	self.contact_args.feat:apply{
 		attacker = self.contact_args.owner,
+		charge = self.contact_args.charge,
 		point = result.point,
 		projectile = self,
 		target = result.object,
@@ -108,15 +109,16 @@ end
 --- Plays an animation.
 -- @param self Object.
 -- @param name Animation name.
+-- @param force_temporary Forces the animation to be temporary in the server side.
 -- @return True if started a new animation.
-Object.animate = function(self, name)
+Object.animate = function(self, name, force_temporary)
 	-- Maintain channels.
 	-- When objects enter the vision of a player, the player class enumerates
 	-- through the persistent animations and sends them to the client. We need
 	-- to store them so that newly seen objects don't appear unanimated.
 	local anim = self.spec.animations[name]
 	if anim and anim.channel then
-		if anim.permanent then
+		if anim.permanent and not force_temporary then
 			if not self.animations then self.animations = {} end
 			local prev = self.animations[anim.channel]
 			if prev and prev[1] == name then return end
@@ -225,6 +227,7 @@ end
 --- Fires or throws the object.
 -- @param self Object.
 -- @param args Arguments.<ul>
+--   <li>charge: Charge time of the attack.</li>
 --   <li>collision: Trigger at collision.</li>
 --   <li>feat: Feat.</li>
 --   <li>owner: Object firing the projectile.</li>
@@ -251,6 +254,8 @@ Object.fire = function(self, args)
 	if args.speedline then
 		self.flags = Bitwise:bor(self.flags or 0, Protocol.object_flags.SPEEDLINE)
 	end
+	-- Store attack charge.
+	self.charge = args.charge
 	-- Add the projectile to the world.
 	local src,dst = args.owner:get_attack_ray()
 	self:detach()

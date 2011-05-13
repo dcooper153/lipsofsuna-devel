@@ -250,6 +250,7 @@ end
 -- @param args Arguments.<ul>
 --   <li>user: Object using the feat. (required)</li>
 --   <li>stop: True if stopped performing, false if started.</li></ul>
+-- @return True if performed successfully.
 Feat.perform = function(self, args)
 	local anim = Featanimspec:find{name = self.animation}
 	local slot = anim and anim.slot
@@ -267,6 +268,11 @@ Feat.perform = function(self, args)
 		if info.cooldown > 0 then
 			args.user.cooldown = info.cooldown
 		end
+	end
+	-- Calculate the charge time.
+	local charge
+	if args.user.attack_charge then
+		charge = Program.time - args.user.attack_charge
 	end
 	-- Animate the feat.
 	Vision:event{type = "object-feat", object = args.user, anim = anim}
@@ -287,12 +293,13 @@ Feat.perform = function(self, args)
 				-- If a tile collides with the ray, a new tile is attached to it.
 				Thread(function(t)
 					play_effects()
-					Thread:sleep(args.user.spec.timing_build * 0.05)
+					Thread:sleep(args.user.spec.timing_build * 0.02)
 					local src,dst = args.user:get_attack_ray(args)
 					local r = Physics:cast_ray{src = src, dst = dst}
 					if not r or not r.tile then return end
 					self:apply{
 						attacker = args.user,
+						charge = charge,
 						point = r.point,
 						target = r.object,
 						tile = r.tile,
@@ -305,12 +312,13 @@ Feat.perform = function(self, args)
 				-- The first object or tile that collides with the ray is damaged.
 				Thread(function(t)
 					play_effects()
-					Thread:sleep(args.user.spec.timing_attack_blunt * 0.05)
+					Thread:sleep(args.user.spec.timing_attack_blunt * 0.02)
 					local src,dst = args.user:get_attack_ray(args)
 					local r = Physics:cast_ray{src = src, dst = dst}
 					if not r then return end
 					self:apply{
 						attacker = args.user,
+						charge = charge,
 						point = r.point,
 						target = r.object,
 						tile = r.tile,
@@ -322,7 +330,7 @@ Feat.perform = function(self, args)
 				-- The creature explodes after the animation has played.
 				Thread(function(t)
 					play_effects()
-					Thread:sleep(args.user.spec.timing_attack_explode * 0.05)
+					Thread:sleep(args.user.spec.timing_attack_explode * 0.02)
 					args.user:die()
 					Utils:explosion(args.user.position)
 				end)
@@ -334,21 +342,21 @@ Feat.perform = function(self, args)
 				-- care of damaging the hit object or tile.
 				Thread(function(t)
 					if anim.categories["spell"] then
-						Thread:sleep(args.user.spec.timing_spell_ranged * 0.05)
+						Thread:sleep(args.user.spec.timing_spell_ranged * 0.02)
 					elseif weapon and weapon.spec.animation_attack == "attack bow" then
-						Thread:sleep(args.user.spec.timing_attack_bow * 0.05)
+						Thread:sleep(args.user.spec.timing_attack_bow * 0.02)
 					elseif weapon and weapon.spec.animation_attack == "attack crossbow" then
-						Thread:sleep(args.user.spec.timing_attack_crossbow * 0.05)
+						Thread:sleep(args.user.spec.timing_attack_crossbow * 0.02)
 					elseif weapon and weapon.spec.animation_attack == "attack musket" then
-						Thread:sleep(args.user.spec.timing_attack_musket * 0.05)
+						Thread:sleep(args.user.spec.timing_attack_musket * 0.02)
 					elseif weapon and weapon.spec.animation_attack == "attack revolver" then
-						Thread:sleep(args.user.spec.timing_attack_revolver * 0.05)
+						Thread:sleep(args.user.spec.timing_attack_revolver * 0.02)
 					end
 					play_effects()
 					for name,count in pairs(info.required_ammo) do
 						local ammo = args.user:split_items{name = name, count = count}
 						if ammo then
-							ammo:fire{collision = true, feat = self, owner = args.user, speedline = true, weapon = weapon}
+							ammo:fire{charge = charge, collision = true, feat = self, owner = args.user, speedline = true, weapon = weapon}
 							return
 						end
 					end
@@ -358,13 +366,13 @@ Feat.perform = function(self, args)
 							local ammo = Object{model = effect.projectile, physics = "rigid"}
 							ammo.gravity = Vector()
 							if effect.name == "dig" then
-								ammo:fire{collision = true, feat = self, owner = args.user, timer = 10}
+								ammo:fire{charge = charge, collision = true, feat = self, owner = args.user, timer = 10}
 								ammo.orig_rotation = ammo.rotation
 								ammo.orig_velocity = ammo.velocity
 								ammo.effect = "dig"
 								ammo.power = 1 + 0.1 * data[2]
 							else
-								ammo:fire{collision = true, feat = self, owner = args.user, weapon = weapon}
+								ammo:fire{charge = charge, collision = true, feat = self, owner = args.user, weapon = weapon}
 							end
 							return
 						end
@@ -377,9 +385,10 @@ Feat.perform = function(self, args)
 				-- feat are applied to the attacker herself.
 				Thread(function(t)
 					play_effects()
-					Thread:sleep(args.user.spec.timing_spell_self * 0.05)
+					Thread:sleep(args.user.spec.timing_spell_self * 0.02)
 					self:apply{
 						attacker = args.user,
+						charge = charge,
 						point = args.user.position,
 						target = args.user,
 						weapon = weapon}
@@ -392,8 +401,9 @@ Feat.perform = function(self, args)
 				-- care of damaging the hit object or tile.
 				Thread(function(t)
 					play_effects()
-					Thread:sleep(args.user.spec.timing_attack_throw * 0.05)
+					Thread:sleep(args.user.spec.timing_attack_throw * 0.02)
 					local proj = weapon:fire{
+						charge = charge,
 						collision = not weapon.spec.destroy_timer,
 						feat = self,
 						owner = args.user,
@@ -407,12 +417,13 @@ Feat.perform = function(self, args)
 				-- The first object or tile that collides with the ray is damaged.
 				Thread(function(t)
 					play_effects()
-					Thread:sleep(args.user.spec.timing_spell_touch * 0.05)
+					Thread:sleep(args.user.spec.timing_spell_touch * 0.02)
 					local src,dst = args.user:get_attack_ray(args)
 					local r = Physics:cast_ray{src = src, dst = dst}
 					if not r then return end
 					self:apply{
 						attacker = args.user,
+						charge = charge,
 						point = r.point,
 						target = r.object,
 						tile = r.tile,
@@ -422,6 +433,7 @@ Feat.perform = function(self, args)
 		end
 		if self.func then self:func(args) end
 	end
+	return true
 end
 
 --- Unlocks a random feat to the player base.

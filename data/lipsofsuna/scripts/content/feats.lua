@@ -10,11 +10,11 @@ Featanimspec{
 
 Featanimspec{
 	name = "right hand",
-	animation = "attack fist",
+	animation = "attack punch",
 	bonuses_barehanded = true,
 	bonuses_weapon = true,
 	categories = {"melee"},
-	cooldown = 1,
+	cooldown = 0.5,
 	effect = "swing1",
 	effect_impact = "impact1",
 	effects = {"physical damage"},
@@ -27,7 +27,7 @@ Featanimspec{
 	bonuses_projectile = true,
 	bonuses_weapon = true,
 	categories = {"ranged"},
-	cooldown = 1,
+	cooldown = 0.5,
 	effect_impact = "impact1",
 	effects = {"physical damage"},
 	required_ammo = true,

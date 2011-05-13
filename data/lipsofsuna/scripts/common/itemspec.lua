@@ -11,6 +11,7 @@ Itemspec.dict_name = {}
 -- @param args Arguments.<ul>
 --   <li>ammo_type: Name of the ammunition item type.</li>
 --   <li>animation_attack: Attack animation name for creatures wielding the item.</li>
+--   <li>animation_charge: Charge animation name for creatures wielding the item.</li>
 --   <li>animation_hold: Hold animation name for creatures wielding the item.</li>
 --   <li>animations: Dictionary of animation playback rules.</li>
 --   <li>armor_class: How much protection the item offers when equipped.</li>
@@ -70,6 +71,9 @@ Itemspec.new = function(clss, args)
 	end
 	-- Default values.
 	local copy = function(f, d) if self[f] == nil then self[f] = d end end
+	copy("animation_attack")
+	copy("animation_charge")
+	copy("animation_hold")
 	copy("animations", {})
 	copy("armor_class", 0)
 	copy("crafting_count", 1)
