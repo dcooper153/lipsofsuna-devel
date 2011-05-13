@@ -399,6 +399,7 @@ Feat.perform = function(self, args)
 				-- The weapon is fired at the specific time into the attack
 				-- animation. The collision callback of the projectile takes
 				-- care of damaging the hit object or tile.
+				local charge = 1 + 2 * math.min(1, (charge or 0) / 2)
 				Thread(function(t)
 					play_effects()
 					Thread:sleep(args.user.spec.timing_attack_throw * 0.02)
@@ -407,7 +408,7 @@ Feat.perform = function(self, args)
 						collision = not weapon.spec.destroy_timer,
 						feat = self,
 						owner = args.user,
-						speed = 10,
+						speed = 10 * charge,
 						timer = weapon.spec.destroy_timer}
 				end)
 			end
