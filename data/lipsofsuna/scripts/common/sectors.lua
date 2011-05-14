@@ -72,9 +72,13 @@ Sectors.load_sector = function(self, sector)
 		for k,v in ipairs(rows) do
 			local func = assert(loadstring("return function()\n" .. v[3] .. "\nend"))()
 			if func then
-				local object = func()
-				if object then object.realized = true end
-				table.insert(objects, object)
+				local ok,ret = pcall(func)
+				if not ok then
+					print(ret)
+				elseif ret then
+					ret.realized = true
+					table.insert(objects, ret)
+				end
 			end
 		end
 		self:created_sector(sector, terrain, objects)
