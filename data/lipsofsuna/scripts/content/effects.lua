@@ -3,6 +3,11 @@ Effect{
 	sound = "thud-000"}
 
 Effect{
+	name = "behead1",
+	model = "blood2",
+	sound = "squish-000"}
+
+Effect{
 	name = "berserk1",
 	-- TODO: model
 	sound = "spellberserk1"}

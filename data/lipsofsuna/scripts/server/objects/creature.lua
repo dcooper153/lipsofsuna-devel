@@ -11,9 +11,16 @@ Creature:add_getters{
 			value = value + (i and i.spec.armor_class or 0)
 		end
 		return value
+	end,
+	beheaded = function(s)
+		return Bitwise:band(s.flags or 0, Protocol.object_flags.BEHEADED) ~= 0
 	end}
 
 Creature:add_setters{
+	beheaded = function(s, v)
+		s.flags = Bitwise:bor(s.flags or 0, Protocol.object_flags.BEHEADED)
+		Vision:event{type = "object-beheaded", object = s}
+	end,
 	spec = function(s, v)
 		local spec = type(v) == "string" and Species:find{name = v} or v
 		if s.spec == spec then return end
@@ -317,6 +324,16 @@ Creature.damaged = function(self, args)
 	elseif health - args.amount > 0 then
 		self.skills:set_value{skill = "health", value = health - args.amount}
 	else
+		-- Behead if the blow was strong.
+		-- Players can't be beheaded with first hit.
+		if not self.beheaded then
+			if self.dead then
+				if args.amount > 15 then self.beheaded = true end
+			elseif not self.client then
+				if args.amount > 30 then self.beheaded = true end
+			end
+		end
+		-- Kill if not killed already.
 		self.skills:set_value{skill = "health", value = 0}
 		self:die()
 	end
@@ -365,7 +382,7 @@ end
 Creature.die = function(self)
 	if self.dead then return end
 	-- Sanctuary save.
-	if self.modifiers and self.modifiers.sanctuary then
+	if self.modifiers and self.modifiers.sanctuary and not self.beheaded then
 		self:remove_modifier("sanctuary")
 		self:teleport{marker = "sanctuary"}
 		return

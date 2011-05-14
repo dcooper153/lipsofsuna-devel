@@ -178,6 +178,10 @@ Player.vision_cb = function(self, args)
 			self:send{packet = Packet(packets.OBJECT_ANIMATED, "uint32", o.id,
 				"string", args.animation or "", "float", args.time or 0.0)}
 		end,
+		["object-beheaded"] = function(args)
+			local o = args.object
+			self:send{packet = Packet(packets.OBJECT_BEHEADED, "uint32", o.id)}
+		end,
 		["object-dead"] = function(args)
 			local o = args.object
 			self:send{packet = Packet(packets.OBJECT_DEAD, "uint32", o.id, "bool", args.dead)}

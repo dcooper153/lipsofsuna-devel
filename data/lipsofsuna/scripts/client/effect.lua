@@ -19,6 +19,7 @@ EffectObject = Class(Object)
 --   <li>font_color: Font color table.</li>
 --   <li>life: Life time in seconds.</li>
 --   <li>model: Particle effect name.</li>
+--   <li>node: Parent node or nil.</li>
 --   <li>object: Parent object or nil.</li>
 --   <li>position: Position in world space.</li>
 --   <li>sound: Sound effect name.</li>
@@ -31,6 +32,7 @@ EffectObject = Class(Object)
 EffectObject.new = function(clss, args)
 	local life = args.life or 10
 	local parent = args.object
+	local node = args.node
 	local velocity = args.velocity or Vector()
 	-- Attach a model effect.
 	local self = Object.new(clss, args)
@@ -64,8 +66,14 @@ EffectObject.new = function(clss, args)
 	end
 	-- Copy parent transformation.
 	if parent then
-		self.position = parent.position + self.position
-		self.rotation = parent.rotation * self.rotation
+		local p = node and parent:find_node{name = node}
+		if p then
+			self.position = parent.position + parent.rotation * p
+			self.rotation = parent.rotation
+		else
+			self.position = parent.position + self.position
+			self.rotation = parent.rotation
+		end
 	end
 	-- Update in a thread until the effect ends.
 	Thread(function()
@@ -75,8 +83,14 @@ EffectObject.new = function(clss, args)
 			local secs = coroutine.yield()
 			moved = moved + velocity * secs
 			if parent then
-				self.position = parent.position + moved
-				self.rotation = parent.rotation
+				local p = node and parent:find_node{name = node}
+				if p then
+					self.position = parent.position + parent.rotation * p
+					self.rotation = parent.rotation
+				else
+					self.position = parent.position + moved
+					self.rotation = parent.rotation
+				end
 			elseif args.velocity then
 				self.position = moved
 			end

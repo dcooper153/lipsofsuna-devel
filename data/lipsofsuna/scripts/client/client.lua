@@ -54,6 +54,30 @@ Protocol:add_handler{type = "OBJECT_ANIMATED", func = function(event)
 	o:animate(args)
 end}
 
+Protocol:add_handler{type = "OBJECT_BEHEADED", func = function(event)
+	local ok,i,a,t = event.packet:read("uint32")
+	if not ok then return end
+	local o = Object:find{id = i}
+	if not o then return end
+	-- Remove the head.
+	o.flags = Bitwise:bor(o.flags, Protocol.object_flags.BEHEADED)
+	o:update_model()
+	-- Play a particle effect.
+	local p = o:find_node{name = "#neck"}
+	local effect = Effect:find{name = "behead1"}
+	if p and effect then
+		EffectObject{
+			model = effect.model,
+			object = o,
+			node = "#neck",
+			sound = effect.sound,
+			sound_delay = effect.sound_delay,
+			sound_pitch = effect.sound_pitch,
+			sound_positional = effect.sound_positional,
+			realized = true}
+	end
+end}
+
 Protocol:add_handler{type = "OBJECT_DAMAGE", func = function(args)
 end}
 
@@ -177,8 +201,8 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	local p = Vector(x, y, z)
 	if t == "item" or t == "species" then p = p + Object.physics_position_correction end
 	-- Create the object.
-	local o = Object{id = i, model = m, name = n, position = p, spec = spec, type = t,
-		collision_group = Physics.GROUP_OBJECT}
+	local o = Object{flags = f, id = i, model = m, name = n, position = p,
+		spec = spec, type = t, collision_group = Physics.GROUP_OBJECT}
 	if t == "species" then o.race = s end
 	-- Apply optional customizations.
 	local ok,de,bo,no,bu,eye,eyer,eyeg,eyeb,face1,face2,face3,face4,face5,hair,hairr,hairg,hairb,skin,skinr,sking,skinb = event.packet:resume(

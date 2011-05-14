@@ -105,10 +105,12 @@ do
 	add("ADMIN_PRIVILEGE")
 	add("AUTHENTICATE_REJECT")
 	add("ADMIN_STATS")
+	add("OBJECT_BEHEADED")
 end
 
 Protocol.object_flags = {
-	SPEEDLINE = 0x1}
+	SPEEDLINE = 0x1,
+	BEHEADED = 0x2}
 
 effects = {}
 do
