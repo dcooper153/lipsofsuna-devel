@@ -95,7 +95,7 @@ Object.create_character_model = function(self, args)
 	local m = Model:load{file = meshes.skeleton}
 	m = m:copy()
 	-- Add other meshes.
-	local has_head = not Bitwise:bchk(self.flags, Protocol.object_flags.BEHEADED)
+	local has_head = not Bitwise:bchk(self.flags or 0, Protocol.object_flags.BEHEADED)
 	local mesh_head = {eyes = true, head = true, hair = true}
 	for k,v in pairs(meshes) do
 		if k ~= "skeleton" and (has_head or not mesh_head[k]) then
