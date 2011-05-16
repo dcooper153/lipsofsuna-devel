@@ -143,6 +143,14 @@ static void Program_get_sectors (LIScrArgs* args)
 	}
 }
 
+static void Program_get_sector_size (LIScrArgs* args)
+{
+	LIMaiProgram* program;
+
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	liscr_args_seti_float (args, program->sectors->width);
+}
+
 static void Program_get_sleep (LIScrArgs* args)
 {
 	LIMaiProgram* program;
@@ -191,6 +199,7 @@ void liscr_script_program (
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_quit", Program_get_quit);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_set_quit", Program_set_quit);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_sectors", Program_get_sectors);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_sector_size", Program_get_sector_size);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_sleep", Program_get_sleep);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_set_sleep", Program_set_sleep);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_tick", Program_get_tick);

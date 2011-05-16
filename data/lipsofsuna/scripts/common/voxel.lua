@@ -1,4 +1,4 @@
-Voxel.tile_size = 32 / Voxel.tiles_per_line
+Voxel.tile_size = Program.sector_size / Voxel.tiles_per_line
 Voxel.tile_scale = 1 / Voxel.tile_size
 
 --- Checks what kind of tiles are within the range.

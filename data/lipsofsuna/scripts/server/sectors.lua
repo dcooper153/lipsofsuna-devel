@@ -84,7 +84,7 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 				c.y = org.y + 5 + math.random(0, Voxel.tiles_per_line - 10)
 				c.z = org.z + 5 + math.random(0, Voxel.tiles_per_line - 10)
 				if (c - spawn).length < 50 then break end
-				local t,p = Voxel:find_tile{match = "empty", point = c * Config.tilewidth, radius = 3 * Config.tilewidth}
+				local t,p = Voxel:find_tile{match = "empty", point = c * Voxel.tile_size, radius = 3 * Voxel.tile_size}
 				if t and Voxel:get_tile(p + Vector(0, 1, 0)) == 0 then
 					p = p + Vector(0.5, 0.5, 0.5)
 					local d = math.min(1, (p - spawn).length / 500)

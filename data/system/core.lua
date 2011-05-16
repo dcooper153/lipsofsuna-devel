@@ -75,6 +75,10 @@ end
 -- @name Program.sectors
 -- @class table
 
+--- Sector size in world units.
+-- @name Program.sector_size
+-- @class table
+
 --- Sleep time between ticks, in seconds.
 -- @name Program.quit
 -- @class table
@@ -91,6 +95,7 @@ Program.class_getters = {
 	args = function(s) return Los.program_get_args() end,
 	quit = function(s) return Los.program_get_quit() end,
 	sectors = function(s) return Los.program_get_sectors() end,
+	sector_size = function(s) return Los.program_get_sector_size() end,
 	sleep = function(s) return Los.program_get_sleep() end,
 	tick = function(s) return Los.program_get_tick() end,
 	time = function(s) return Los.program_get_time() end}

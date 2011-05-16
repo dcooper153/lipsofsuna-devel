@@ -426,10 +426,10 @@ Object.stuck_fix = function(self)
 	local src = self:get_tile_range()
 	-- Find the closest empty tile.
 	-- FIXME: The object doesn't necessarily fit inside one tile.
-	local t,p = Voxel:find_tile{match = "empty", point = src * Config.tilewidth, radius = 5 * Config.tilewidth}
+	local t,p = Voxel:find_tile{match = "empty", point = src * Voxel.tile_size, radius = 5 * Voxel.tile_size}
 	if not t then return end
 	-- Move the object to the empty tile.
-	self.position = (p + Vector(0.5, 0.2, 0.5)) * Config.tilewidth
+	self.position = (p + Vector(0.5, 0.2, 0.5)) * Voxel.tile_size
 	return true
 end
 
