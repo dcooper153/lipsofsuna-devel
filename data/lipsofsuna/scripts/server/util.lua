@@ -79,12 +79,38 @@ end
 --- Finds empty ground below the given point.
 -- @param clss Utils class.
 -- @param point Point in world space.
+-- @return Point in world units, or nil.
 Utils.find_empty_ground = function(clss, point)
 	local t,c = Voxel:find_tile{match = "empty", point = point}
 	if not t then return end
 	for i=1,5 do
 		if Voxel:get_tile(c + Vector(0,-i)) ~= 0 then
 			return (c + Vector(0.5,1-i,0.5)) * Voxel.tile_size
+		end
+	end
+end
+
+--- Finds a spawn point suitable for creatures.
+-- @param clss Utils class.
+-- @param point Point in world space.
+-- @return Point in world units, or nil.
+Utils.find_spawn_point = function(clss, point)
+	-- Find an empty tile.
+	local t,c = Voxel:find_tile{match = "empty", point = point, radius = Voxel.tile_size}
+	if not t then return end
+	-- Find the floor.
+	for i=1,3 do
+		if Voxel:get_tile(c + Vector(0,-i)) ~= 0 then
+			local p = c + Vector(0,1-i)
+			-- Check for horizontal space.
+			if i == 1 and Voxel:get_tile(c + Vector(0,1)) ~= 0 then return end
+			-- Check for nearby ground.
+			if Voxel:get_tile(p - Vector(1,0,0)) ~= 0 and
+			   Voxel:get_tile(p + Vector(1,0,0)) ~= 0 and
+			   Voxel:get_tile(p - Vector(0,0,1)) ~= 0 and
+			   Voxel:get_tile(p + Vector(0,0,1)) ~= 0 then
+				return (p + Vector(0.5,0.5,0.5)) * Voxel.tile_size
+			end
 		end
 	end
 end

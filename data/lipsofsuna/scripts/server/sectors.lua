@@ -80,15 +80,14 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 		for i = 1,monsters do
 			for j = 1,30 do
 				local c = Vector()
-				c.x = org.x + 5 + math.random(0, Voxel.tiles_per_line - 10)
-				c.y = org.y + 5 + math.random(0, Voxel.tiles_per_line - 10)
-				c.z = org.z + 5 + math.random(0, Voxel.tiles_per_line - 10)
+				c.x = org.x + math.random(4, Voxel.tiles_per_line - 4)
+				c.y = org.y + math.random(4, Voxel.tiles_per_line - 4)
+				c.z = org.z + math.random(4, Voxel.tiles_per_line - 4)
 				if (c - spawn).length < 50 then break end
-				local t,p = Voxel:find_tile{match = "empty", point = c * Voxel.tile_size, radius = 3 * Voxel.tile_size}
-				if t and Voxel:get_tile(p + Vector(0, 1, 0)) == 0 then
-					p = p + Vector(0.5, 0.5, 0.5)
+				local p = Utils:find_spawn_point(c * Voxel.tile_size)
+				if p then
 					local d = math.min(1, (p - spawn).length / 500)
-					Voxel:place_creature{point = p, category = "enemy", difficulty = d}
+					Voxel:place_creature{point = p * Voxel.tile_scale, category = "enemy", difficulty = d}
 					break
 				end
 				coroutine.yield()
@@ -175,7 +174,7 @@ Sectors.format_generated_sector = function(self, sector)
 	end
 	-- Generate resources.
 	local p = Vector()
-	for i=1,50 do
+	for i=1,20 do
 		p.x = org.x + math.random(1, Voxel.tiles_per_line - 1)
 		p.y = org.y + math.random(1, Voxel.tiles_per_line - 1)
 		p.z = org.z + math.random(1, Voxel.tiles_per_line - 1)

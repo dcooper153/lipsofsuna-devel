@@ -1,4 +1,5 @@
-require "content/species.lua"
+require "content/feats"
+require "content/species"
 
 Species{
 	name = "brigand",

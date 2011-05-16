@@ -81,8 +81,8 @@ Sectors.load_sector = function(self, sector)
 				end
 			end
 		end
-		self:created_sector(sector, terrain, objects)
 	end
+	-- Load custom content.
 	self:created_sector(sector, terrain, objects)
 end
 

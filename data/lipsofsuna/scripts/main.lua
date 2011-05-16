@@ -80,6 +80,7 @@ end
 
 require "content/armor"
 require "content/effects"
+require "content/enemies"
 require "content/factions"
 require "content/feats"
 require "content/icons"
