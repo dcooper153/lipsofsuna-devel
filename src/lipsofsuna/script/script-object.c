@@ -81,7 +81,7 @@ static void Object_new (LIScrArgs* args)
 	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
 
 	/* Allocate object. */
-	self = lieng_object_new (program->engine, 0);
+	self = lieng_object_new (program->engine);
 	if (self == NULL)
 		return;
 

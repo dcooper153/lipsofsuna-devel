@@ -46,8 +46,7 @@ struct _LIEngObject
 };
 
 LIAPICALL (LIEngObject*, lieng_object_new, (
-	LIEngEngine* engine,
-	uint32_t     id));
+	LIEngEngine* engine));
 
 LIAPICALL (void, lieng_object_free, (
 	LIEngObject* self));

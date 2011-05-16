@@ -38,12 +38,10 @@ static int private_warp (
 /**
  * \brief Creates a new engine object.
  * \param engine Engine.
- * \param id Object ID or 0 for unique.
  * \return Engine object or NULL.
  */
 LIEngObject* lieng_object_new (
-	LIEngEngine* engine,
-	uint32_t     id)
+	LIEngEngine* engine)
 {
 	LIEngObject* self;
 
@@ -51,16 +49,16 @@ LIEngObject* lieng_object_new (
 	self = lisys_calloc (1, sizeof (LIEngObject));
 	if (self == NULL)
 		return NULL;
-	self->id = id;
 	self->engine = engine;
 	self->transform = limat_transform_identity ();
 
 	/* Choose object number. */
+	self->id = 0;
 	while (!self->id)
 	{
 		self->id = lialg_random_range (&engine->random, LINET_RANGE_ENGINE_START, LINET_RANGE_ENGINE_END);
 		if (lieng_engine_find_object (engine, self->id))
-			id = 0;
+			self->id = 0;
 	}
 
 	/* Insert to object list. */
@@ -73,19 +71,15 @@ LIEngObject* lieng_object_new (
 	/* Allocate pose buffer. */
 	self->pose = limdl_pose_new ();
 	if (self->pose == NULL)
-		goto error;
+	{
+		lialg_u32dic_remove (engine->objects, self->id);
+		lisys_free (self);
+	}
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, "object-new", lical_marshal_DATA_PTR, self);
 
 	return self;
-
-error:
-	if (self->pose != NULL)
-		limdl_pose_free (self->pose);
-	lialg_u32dic_remove (engine->objects, self->id);
-	lisys_free (self);
-	return NULL;
 }
 
 /**
