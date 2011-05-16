@@ -1,24 +1,24 @@
 Regionspec{
 	name = "Lips",
 	categories = {"special"},
-	depth = {3000,3000},
+	depth = {1000,1000},
 	links = {"Portal of Lips", "Sanctuary", "Chara's Root Grove"},
 	pattern_name = "lips1",
-	position = {1536,1536}}
+	position = {700,700}}
 
 Regionspec{
 	name = "Brigand HQ",
 	categories = {"special"},
-	depth = {2970,2970},
-	distance = {"Lips",30,30},
+	depth = {930,930},
+	distance = {"Lips",10,20},
 	pattern_name = "brigandhq1",
 	random_resources = false}
 
 Regionspec{
 	name = "Portal of Lips",
 	categories = {"special"},
-	depth = {2970,3000},
-	distance = {"Lips",40,70},
+	depth = {930,1000},
+	distance = {"Lips",20,40},
 	links = {"Sanctuary", "Chara's Root Grove"},
 	pattern_name = "portaloflips1",
 	random_resources = false}
@@ -26,15 +26,15 @@ Regionspec{
 Regionspec{
 	name = "Sanctuary",
 	categories = {"special"},
-	depth = {2970,3000},
-	distance = {"Lips",60,110},
+	depth = {930,1000},
+	distance = {"Lips",30,60},
 	pattern_name = "sanctuary1"}
 
 Regionspec{
 	name = "Chara's Root Grove",
 	categories = {"special"},
-	depth = {2930,2950},
-	distance = {"Lips",80,120},
+	depth = {950,970},
+	distance = {"Lips",40,60},
 	links = {"Midguard"},
 	pattern_name = "charasgrove1",
 	random_resources = false}
@@ -42,7 +42,7 @@ Regionspec{
 Regionspec{
 	name = "Noemi",
 	categories = {"special"},
-	depth = {2930,2950},
+	depth = {950,970},
 	distance = {"Chara's Root Grove",10,40},
 	links = {"Chara's Root Grove"},
 	pattern_name = "noemi1"}
@@ -50,21 +50,21 @@ Regionspec{
 Regionspec{
 	name = "Midguard",
 	categories = {"special"},
-	depth = {2700,2800},
+	depth = {800,900},
 	links = {"Portal of Midguard", "Erinyes' Lair"},
 	pattern_name = "midguard1"}
 
 Regionspec{
 	name = "Portal of Midguard",
 	categories = {"special"},
-	depth = {2700,2800},
-	distance = {"Midguard",100,300},
+	depth = {800,900},
+	distance = {"Midguard",50,150},
 	pattern_name = "portalofmidguard1"}
 
 Regionspec{
 	name = "Erinyes' Portal",
 	categories = {"special"},
-	depth = {2500,2600},
+	depth = {500,600},
 	pattern_name = "erinyesportal1"}
 
 Regionspec{
@@ -84,13 +84,13 @@ Regionspec{
 Regionspec{
 	name = "Random",
 	categories = {"random"},
-	depth = {2500, 3000},
+	depth = {500, 1000},
 	pattern_category = "random"}
 
 Regionspec{
 	name = "Silverspring",
 	categories = {"special"},
-	depth = {2900, 3000},
+	depth = {900, 1000},
 	distance = {"Lips",30,60},
 	links = {"Chara's Root Grove", "Portal of Lips", "Sanctuary"},
 	pattern_name = "silverspring1"}

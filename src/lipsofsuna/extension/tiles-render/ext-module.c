@@ -249,11 +249,22 @@ static int private_process_result (
 	block = lialg_memdic_find (self->blocks, &task->addr, sizeof (LIVoxBlockAddr));
 	if (block == NULL)
 	{
+		if (task->model == NULL)
+			return 0;
 		block = liext_tiles_render_block_new (self);
 		if (block == NULL)
 			return 0;
 		if (!lialg_memdic_insert (self->blocks, &task->addr, sizeof (LIVoxBlockAddr), block))
 		{
+			liext_tiles_render_block_free (block);
+			return 0;
+		}
+	}
+	else
+	{
+		if (task->model == NULL)
+		{
+			lialg_memdic_remove (self->blocks, &task->addr, sizeof (LIVoxBlockAddr));
 			liext_tiles_render_block_free (block);
 			return 0;
 		}

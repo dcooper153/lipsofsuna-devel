@@ -575,7 +575,7 @@ static int private_init (
 
 	/* Initialize sectors. */
 #warning Hardcoded sector size
-	self->sectors = lialg_sectors_new (128, 32.0f);
+	self->sectors = lialg_sectors_new (128, 16.0f);
 	if (self->sectors == NULL)
 		return 0;
 

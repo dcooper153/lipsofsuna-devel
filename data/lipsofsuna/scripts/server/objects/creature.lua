@@ -848,7 +848,7 @@ Creature.update_environment = function(self, secs)
 	local tick = self.env_timer
 	self.env_timer = 0
 	-- Prevent sectors from unloading if a player is present.
-	if self.client then self:refresh() end
+	if self.client then self:refresh{radius = 13} end
 	-- Environment scan and stuck handling.
 	local ret,env = Object.update_environment(self, secs)
 	if not ret or not env then return ret, env end

@@ -29,8 +29,8 @@ if not Settings:parse_command_line() then
 	return
 end
 
-Voxel.blocks_per_line = 4
-Voxel.tiles_per_line = 24
+Voxel.blocks_per_line = 2
+Voxel.tiles_per_line = 12
 require "common/bitwise"
 require "common/color"
 require "common/crafting"

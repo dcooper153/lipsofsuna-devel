@@ -42,9 +42,9 @@ end
 ------------------------------------------------------------------------------
 
 Generator = Class()
-Generator.map_size = Vector(500, 500, 500)
-Generator.map_start = Vector(1500, 2750, 1500) - Generator.map_size * 0.5
-Generator.map_end = Vector(1500, 2750, 1500) + Generator.map_size * 0.5
+Generator.map_size = Vector(1000, 1000, 1000)
+Generator.map_start = Vector(600, 600, 600) - Generator.map_size * 0.5
+Generator.map_end = Vector(600, 600, 600) + Generator.map_size * 0.5
 Generator.map_version = "5"
 Generator.layer_offset = 2500
 Generator.layer_count = 20
