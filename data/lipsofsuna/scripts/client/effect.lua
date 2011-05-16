@@ -36,7 +36,9 @@ EffectObject.new = function(clss, args)
 	local velocity = args.velocity or Vector()
 	-- Attach a model effect.
 	local self = Object.new(clss, args)
-	self:particle_animation{loop = false}
+	if Object.particle_animation then
+		self:particle_animation{loop = false}
+	end
 	-- Attach a sound effect.
 	if args.sound then
 		local volume = (args.sound_volume or 1) * Views.Options.inst.sound_volume

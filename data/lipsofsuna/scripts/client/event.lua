@@ -89,15 +89,17 @@ Eventhandler{type = "tick", func = function(self, args)
 	-- Update the cursor.
 	Widgets.Cursor.inst:update()
 	-- Update animations.
-	animt = animt + args.secs
-	if animt > 0.2 * (1 - Views.Options.inst.animation_quality) then
-		for k,v in pairs(Object.objects) do
-			if v.animated then
-				v:update_animations{secs = animt}
-				v:deform_mesh()
+	if Object.deform_mesh then
+		animt = animt + args.secs
+		if animt > 0.2 * (1 - Views.Options.inst.animation_quality) then
+			for k,v in pairs(Object.objects) do
+				if v.animated then
+					v:update_animations{secs = animt}
+					v:deform_mesh()
+				end
 			end
+			animt = 0
 		end
-		animt = 0
 	end
 	-- Interpolate objects.
 	ipolt = math.min(ipolt + args.secs, 1)
@@ -116,7 +118,8 @@ Eventhandler{type = "tick", func = function(self, args)
 		-- Sound playback.
 		Sound.listener_position = Player.object.position
 		Sound.listener_rotation = Player.object.rotation
-		Sound.listener_velocity = Player.object.velocity
+		local vel = Player.object.velocity
+		if vel then Sound.listener_velocity = vel end
 		-- Refresh the active portion of the map.
 		Player.object:refresh()
 	end

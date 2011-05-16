@@ -175,6 +175,7 @@ Object.update = function(self, secs)
 end
 
 Object.update_model = function(self)
+	if not Model.morph then return end
 	-- Instantiate the model for creatures.
 	if self.type == "creature" and self.model and self.model.name then
 		self.model = self.model:copy()
