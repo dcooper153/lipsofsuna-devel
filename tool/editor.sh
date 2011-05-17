@@ -13,12 +13,5 @@ if [ -e ./data/lipsofsuna/scripts/content/patterns/$@.lua ]; then
   echo "require \"content/patterns/$@\"" >> ./data/lipsofsuna/scripts/content/patterns.lua
 fi
 
-while [ -e ./data/lipsofsuna/scripts/content/patterns/$@mod$NUM.lua ] ; do
-
-  echo " $NUM file exists, incrementing "
-  NUM=$(($NUM+1)) 
-
-done
-
-./lipsofsuna lipsofsuna -E $@ > ./data/lipsofsuna/scripts/content/patterns/$@mod$NUM.lua
+./lipsofsuna lipsofsuna -E $@ 
      
