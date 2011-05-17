@@ -83,8 +83,19 @@ end
 Editor = Class()
 
 Editor.new = function(clss)
+	-- Find or create the pattern.
 	local pattern = Pattern:find{name = Settings.pattern}
-	if not pattern then return end
+	if not pattern then
+		pattern = Pattern{name = Settings.pattern, size = Vector(32,8,32)}
+		local i = 1
+		for x=0,31 do
+			for z=0,31 do
+				pattern.tiles[i] = {x,0,z,"granite1"}
+				i = i + 1
+			end
+		end
+	end
+	-- Initialize self.
 	local self = Class.new(clss)
 	self.prev_tiles = {}
 	self.mouse_sensitivity = 0.01
