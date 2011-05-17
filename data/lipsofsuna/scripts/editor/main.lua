@@ -19,6 +19,7 @@ require "client/shaders/partblend"
 require "client/shaders/particle"
 require "client/shaders/postprocess"
 require "client/shaders/skin"
+require "client/shaders/speedline"
 require "client/shaders/terrain"
 require "client/shaders/water"
 require "client/shaders/widget"
@@ -107,7 +108,7 @@ Editor.new = function(clss)
 	Voxel:place_pattern{point = self.origin, name = Settings.pattern}
 	-- Camera and lighting.
 	self.camera = FirstPersonCamera()
-	self.camera:warp((self.origin + Vector(0,2,-5)) * Voxel.tile_size, Quaternion(0, 1, 0, 0))
+	self.camera:warp((self.origin + self.size * 0.5) * Voxel.tile_size, Quaternion(0, 1, 0, 0))
 	self.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equation={1.0,0.0,0.01}, priority = 2}
 	self.light.enabled = true
 	-- Item selector.
@@ -171,10 +172,9 @@ Editor.new = function(clss)
 	self.scene:set_expand{col = 2, row = 2}
 	self.scene:set_child{col = 1, row = 1, widget = self.group}
 	-- Corner markers.
-	self.corners = {}
-	for i=1,8 do
-		self.corners[i] = Object{model = "tree1", realized = true}
-	end
+	self.corners = Object{position = self.origin * Voxel.tile_size, realized = true}
+	self.corners.model = Model()
+	self.corners.model:add_material{cull = false, shader = "default"}
 	self:update_corners()
 	return self
 end
@@ -510,12 +510,35 @@ Editor.update = function(self, secs, force)
 end
 
 Editor.update_corners = function(self)
-	local s = self.size
-	local p = {Vector(0,0,0), Vector(s.x,0,0), Vector(0,s.y,0), Vector(s.x,s.y,s.z),
-		Vector(0,0,s.z), Vector(s.x,0,s.z), Vector(0,s.y,s.z), Vector(s.x,s.y,s.z)}
-	for i=1,8 do
-		self.corners[i].position = (self.origin + p[i]) * Voxel.tile_size
+	local i = 1
+	local v = {}
+	local face = function(a,b,c,d,n)
+		v[i] = {a[1],a[2],a[3],n[1],n[2],n[3]}
+		v[i+1] = {b[1],b[2],b[3],n[1],n[2],n[3]}
+		v[i+2] = {d[1],d[2],d[3],n[1],n[2],n[3]}
+		v[i+3] = v[i]
+		v[i+4] = v[i+2]
+		v[i+5] = {c[1],c[2],c[3],n[1],n[2],n[3]}
+		i = i + 6
 	end
+	local o = -0.2
+	local s = self.size * Voxel.tile_size - Vector(o,o,o)*2
+	local p = {
+		{o,o,o,1}, {s.x,o,o,1}, {o,s.y,o,1}, {s.x,s.y,o,1},
+		{o,o,s.z,1}, {s.x,o,s.z,1}, {o,s.y,s.z,1}, {s.x,s.y,s.z,1}}
+	-- Front and back.
+	face(p[1], p[2], p[3], p[4], {0,0,-1})
+	face(p[5], p[6], p[7], p[8], {0,0,1})
+	-- Bottom and top.
+	face(p[1], p[2], p[5], p[6], {0,-1,0})
+	face(p[3], p[4], p[7], p[8], {0,1,0})
+	-- Left and right.
+	face(p[1], p[3], p[5], p[7], {-1,0,0})
+	face(p[2], p[4], p[6], p[8], {1,0,0})
+	-- Create the cube.
+	self.corners.model:remove_vertices()
+	self.corners.model:add_triangles{material = 1, vertices = v}
+	self.corners.model:changed()
 end
 
 Editor.update_rect_select = function(self)
