@@ -316,91 +316,47 @@ Editor.save = function(self)
 	table.sort(items, sortobj)
 	table.sort(obstacles, sortobj)
 	table.sort(species, sortobj)
-	-- Format categories.
-	local t = "Pattern{\n\tname = \"" .. self.pattern.name .. "\",\n\tsize = " .. tostring(self.size) .. ",\n"
-	if self.pattern.categories then
-		local categories = {}
-		for k,v in pairs(self.pattern.categories) do
-			table.insert(categories, k)
-		end
-		table.sort(categories)
-		t = t .. "\tcategories = {"
-		local comma
-		for k,v in ipairs(categories) do
-			if comma then t = t .. "," end
-			t = t .. "\"" .. v .. "\""
-			comma = true
-		end
-		t = t .. "},\n"
-	end
-	-- Format objects.
-	local addobj = function(t, k, v)
+	-- Update the pattern.
+	local makeobj = function(v)
 		local p = roundvec(v.position)
 		local r = v.rotation.euler
+		local e
 		if r[1] ~= 0 then
-			local e = math.floor(100 * r[1] / (2 * math.pi) + 0.5) / 100
+			e = math.floor(100 * r[1] / (2 * math.pi) + 0.5) / 100
 			if e == -0.5 then e = 0.5 end
-			return string.format("%s%s\t\t{%f,%f,%f,%q,%.2f}",
-				t, k > 1 and ",\n" or "", p[1], p[2], p[3], v.spec.name, e)
-		else
-			return string.format("%s%s\t\t{%f,%f,%f,%q}",
-				t, k > 1 and ",\n" or "", p[1], p[2], p[3], v.spec.name)
 		end
+		return {p[1], p[2], p[3], v.spec.name, e}
 	end
-	local comma
-	if #items > 0 then
-		t = t .. "\titems = {\n"
-		for k,v in ipairs(items) do t = addobj(t, k, v) end
-		t = t .. "}"
-		comma = true
+	self.pattern.items = {}
+	for k,v in pairs(items) do
+		self.pattern.items[k] = makeobj(v)
 	end
-	if #obstacles > 0 then
-		if comma then t = t .. ",\n" end
-		t = t .. "\tobstacles = {\n"
-		for k,v in ipairs(obstacles) do t = addobj(t, k, v) end
-		t = t .. "}"
-		comma = true
+	self.pattern.obstacles = {}
+	for k,v in pairs(obstacles) do
+		self.pattern.obstacles[k] = makeobj(v)
 	end
-	if #species > 0 then
-		if comma then t = t .. ",\n" end
-		t = t .. "\tcreatures = {\n"
-		for k,v in ipairs(species) do t = addobj(t, k, v) end
-		t = t .. "}"
-		comma = true
+	self.pattern.creatures = {}
+	for k,v in pairs(species) do
+		self.pattern.creatures[k] = makeobj(v)
 	end
-	-- Format tiles.
-	local newline
-	local first = true
+	local i = 1
+	self.pattern.tiles = {}
 	for z = 0,self.size.z-1 do
 		for y = 0,self.size.y-1 do
-			newline = true
 			for x = 0,self.size.x-1 do
 				local v = Voxel:get_tile(self.origin + Vector(x, y, z))
 				if v ~= 0 then
 					local mat = Material:find{id = v}
 					if mat then
-						if first then
-							if comma then t = t .. ",\n" end
-							t = t .. "\ttiles = {\n\t\t"
-							first = nil
-							newline = nil
-						elseif newline then
-							t = t .. ",\n\t\t"
-							newline = nil
-						else
-							t = t .. ", "
-						end
-						t = t .. "{" .. x .. "," .. y .. "," .. z .. ",\"" .. mat.name .. "\"}"
+						self.pattern.tiles[i] = {x, y, z, mat.name}
+						i = i + 1
 					end
 				end
 			end
 		end
 	end
-	if not first then
-		t = t .. "}"
-	end
-	t = t .. "}\n"
 	-- Write to the file.
+	local t = self.pattern:write()
 	local name = string.format("scripts/content/patterns/%s.lua", self.pattern.name)
 	if not File:write(name, t) then
 		print(string.format("ERROR: Could not save `%s'.", name))
