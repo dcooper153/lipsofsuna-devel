@@ -1,5 +1,5 @@
 Serialize = Class()
-Serialize.data_version = "6"
+Serialize.data_version = "7"
 
 --- Initializes the serializer.
 -- @param clss Serialize class.
@@ -15,6 +15,8 @@ Serialize.init = function(clss)
 		clss.db:query("DROP TABLE IF EXISTS quests;")
 	end
 	clss.db:query("CREATE TABLE IF NOT EXISTS dialog_flags (name TEXT PRIMARY KEY,value TEXT);")
+	clss.db:query("CREATE TABLE IF NOT EXISTS generator_sectors (id INTEGER PRIMARY KEY,value TEXT);")
+	clss.db:query("CREATE TABLE IF NOT EXISTS generator_settings (key TEXT PRIMARY KEY,value TEXT);")
 	clss.db:query("CREATE TABLE IF NOT EXISTS markers (name TEXT PRIMARY KEY,id INTEGER,x FLOAT,y FLOAT,z FLOAT);")
 	clss.db:query("CREATE TABLE IF NOT EXISTS quests (name TEXT PRIMARY KEY,status TEXT,desc TEXT,marker TEXT);")
 	Sectors.instance = clss.sectors
@@ -65,6 +67,7 @@ end
 --- Loads everything except map data.
 -- @param clss Serialize class.
 Serialize.load = function(clss)
+	clss:load_generator()
 	clss:load_markers()
 	clss:load_quests()
 end
@@ -77,6 +80,26 @@ Serialize.load_account = function(clss, login)
 	local r = clss.accounts:query("SELECT login,password,permissions,character FROM accounts WHERE login=?;", {login})
 	for k,v in ipairs(r) do
 		return v
+	end
+end
+
+--- Loads map generator data from the database.
+-- @param clss Serialize class.
+Serialize.load_generator = function(clss)
+	-- Load settings.
+	local r1 = clss.db:query("SELECT key,value FROM generator_settings;")
+	local f1 = {
+		seed1 = function(v) Generator.inst.seed1 = tonumber(v) end,
+		seed2 = function(v) Generator.inst.seed2 = tonumber(v) end,
+		seed3 = function(v) Generator.inst.seed3 = tonumber(v) end}
+	for k,v in ipairs(r1) do
+		local f = f1[v[1]]
+		if f then f(v[2]) end
+	end
+	-- Load special sectors.
+	local r2 = clss.db:query("SELECT id,value FROM generator_sectors;")
+	for k,v in ipairs(r2) do
+		Generator.inst.sectors[v[1]] = v[2]
 	end
 end
 
@@ -110,6 +133,7 @@ end
 -- @param erase True to erase existing database entries first.
 Serialize.save = function(clss, erase)
 	clss.sectors:save_world(erase)
+	clss:save_generator(erase)
 	clss:save_markers(erase)
 	clss:save_quests(erase)
 	clss:save_accounts(erase)
@@ -140,6 +164,24 @@ Serialize.save_accounts = function(clss, erase)
 	for k,v in pairs(Player.clients) do
 		clss:save_account(v.account, v)
 	end
+end
+
+--- Saves the map generator state.
+-- @param clss Serialize class.
+-- @param erase True to erase existing database entries first.
+Serialize.save_generator = function(clss, erase)
+	clss.db:query("BEGIN TRANSACTION;")
+	if erase then
+		clss.db:query("DELETE FROM generator_settings;")
+		clss.db:query("DELETE FROM generator_sectors;")
+	end
+	clss.db:query("REPLACE INTO generator_settings (key,value) VALUES (?,?);", {"seed1", tostring(Generator.inst.seed1)})
+	clss.db:query("REPLACE INTO generator_settings (key,value) VALUES (?,?);", {"seed2", tostring(Generator.inst.seed2)})
+	clss.db:query("REPLACE INTO generator_settings (key,value) VALUES (?,?);", {"seed3", tostring(Generator.inst.seed3)})
+	for k,v in pairs(Generator.inst.sectors) do
+		clss.db:query("REPLACE INTO generator_sectors (id,value) VALUES (?,?);", {k, v})
+	end
+	clss.db:query("END TRANSACTION;")
 end
 
 --- Saves a map marker.

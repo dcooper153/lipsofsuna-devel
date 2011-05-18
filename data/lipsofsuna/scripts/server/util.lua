@@ -9,12 +9,20 @@ Vector.abs = function(self)
 	return Vector(math.abs(self.x), math.abs(self.y), math.abs(self.z))
 end
 
+Vector.copy = function(self)
+	return Vector(self.x, self.y, self.z)
+end
+
 Vector.ceil = function(self)
 	return Vector(math.ceil(self.x), math.ceil(self.y), math.ceil(self.z))
 end
 
 Vector.floor = function(self)
 	return Vector(math.floor(self.x), math.floor(self.y), math.floor(self.z))
+end
+
+Vector.round = function(self)
+	return Vector(math.ceil(self.x + 0.5), math.ceil(self.y + 0.5), math.ceil(self.z + 0.5))
 end
 
 Aabb = Class()
@@ -125,6 +133,31 @@ Utils.find_spawn_point = function(clss, point)
 			end
 		end
 	end
+end
+
+--- Spawns a plant or an item.
+-- @param clss Utils class.
+-- @param point Point in tiles.
+-- @return True if succeeded.
+Utils.spawn_plant_or_item = function(clss, point)
+	-- Find a spawn point.
+	if Voxel:get_tile(point) ~= 0 then return end
+	if Voxel:get_tile(point - Vector(0,1)) == 0 then return end
+	local p = point + Vector(0.5,0,0.5)
+	-- Spawn items.
+	if math.random() < 0.02 then
+		Voxel:place_item{point = p, category = "generate"}
+		return true
+	end
+	-- Spawn plants.
+	local src = p + Vector(-1,1,-1)
+	local dst = p + Vector(1,3,1)
+	if math.random() < 0.6 and Voxel:check_range(src, dst).solid == 0 then
+		Voxel:place_obstacle{point = p, category = "tree"}
+	else
+		Voxel:place_obstacle{point = p, category = "small-plant"}
+	end
+	return true
 end
 
 --- Creates an explosion.

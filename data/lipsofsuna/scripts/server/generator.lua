@@ -1,94 +1,283 @@
-Region = Class()
-
-Region.new = function(clss, args)
-	local self = Class.new(clss, args)
-	self.links = {}
-	self.linked_regions = {}
-	return self
-end
-
-Region.create_link = function(self, region)
-	local link = {self, region}
-	table.insert(self.links, link)
-	table.insert(region.links, link)
-	self.linked_regions[region] = true
-	return link
-end
-
---- Gets the depth layer range of the region.
--- @param self Region.
--- @return First layer, last layer.
-Region.get_layer_range = function(self)
-	local layer = (self.point.y - Generator.layer_offset) / Generator.layer_size
-	local min = math.max(1, layer)
-	local max = math.max(0, math.min(Generator.layer_count, layer + 2))
-	return math.floor(min), math.ceil(max) 
-end
-
-Region.get_link_point = function(self, dst)
-	local ctr = self.point + self.size * 0.5
-	local dir = (dst - ctr):normalize()
-	if math.abs(dir.x) < math.abs(dir.z) then
-		dir.y = -1
-		dir.z = dir.z < 0 and -1 or 1
-	else
-		dir.x = dir.x < 0 and -1 or 1
-		dir.y = -1
-	end
-	local pt = ctr + Vector(dir.x * self.size.x, dir.y * self.size.y, dir.z * self.size.z) * 0.5 + Vector(0,3)
-	return pt:floor()
-end
-
-------------------------------------------------------------------------------
+require "server/region"
 
 Generator = Class()
+Generator.class_name = "Generator"
 Generator.map_size = Vector(1000, 1000, 1000)
 Generator.map_start = Vector(600, 600, 600) - Generator.map_size * 0.5
 Generator.map_end = Vector(600, 600, 600) + Generator.map_size * 0.5
 Generator.map_version = "5"
-Generator.layer_offset = 2500
+Generator.layer_offset = 1600
 Generator.layer_count = 20
 Generator.layer_size = Generator.map_size.y / Generator.layer_count
 Generator.bin_size = 6
 Generator.bin_stride = 512
 Generator.bin_stride2 = 512*512
 
-Generator.add_region = function(clss, region)
+--- Creates a new map generator.
+-- @param clss Generator class.
+-- @return Generator.
+Generator.new = function(clss)
+	local self = Class.new(Generator)
+	self.seed1 = math.random(10000, 60000)
+	self.seed2 = math.random(10000, 60000)
+	self.seed3 = math.random(10000, 60000)
+	self:reset()
+	return self
+end
+
+Generator.add_region = function(self, region)
 	-- Store by name.
-	table.insert(clss.regions_dict_id, region)
-	clss.regions_dict_name[region.spec.name] = region
+	table.insert(self.regions_dict_id, region)
+	self.regions_dict_name[region.spec.name] = region
 	-- Store by layers.
 	local min,max = region:get_layer_range()
 	for i=min,max do
-		local dict = clss.regions_dict_layer[i]
+		local dict = self.regions_dict_layer[i]
 		table.insert(dict, region)
 	end
 	-- Add to the space partitioning table.
-	clss:for_each_bin(region.point, region.size, function(i)
-		clss.bins[i] = true
+	self:for_each_bin(region.point, region.size, function(i)
+		self.bins[i] = true
 	end)
 end
 
-Generator.for_each_bin = function(clss, point, size, func)
-	local p = (point * (1 / clss.bin_size)):floor()
-	local s = (size * (1 / clss.bin_size)):ceil()
+Generator.for_each_bin = function(self, point, size, func)
+	local p = (point * (1 / self.bin_size)):floor()
+	local s = (size * (1 / self.bin_size)):ceil()
 	for x = p.x,p.x+s.x do
 		for y = p.y,p.y+s.y do
 			for z = p.z,p.z+s.z do
-				func(x + clss.bin_stride * y + clss.bin_stride2 * z)
+				func(x + self.bin_stride * y + self.bin_stride2 * z)
 			end
 		end
 	end
 end
 
+--- Generates the world map.
+-- @param self Generator.
+-- @param args Arguments.
+Generator.generate = function(self, args)
+	local place_regions = function()
+		local special = Regionspec:find{category = "special"}
+		while true do
+			local placed = 0
+			local skipped = 0
+			-- Try to place one or more regions.
+			-- Regions are often placed relative to each other so we need to
+			-- add them iteratively in the other of least dependencies.
+			for name,reg in pairs(special) do
+				if not self.regions_dict_name[reg.name] then
+					local pat = Pattern:random{category = reg.pattern_category, name = reg.pattern_name}
+					if not self:place_region(reg, pat) then
+						skipped = skipped + 1
+					else
+						placed = placed + 1
+					end
+				end
+			end
+			-- The generator may sometimes run into a dead end where a region
+			-- can't be placed without violating the constraints. In such a
+			-- case, nil is returned and generation is restarted from scratch.
+			if placed == 0 then return end
+			if skipped == 0 then break end
+		end
+		return true
+	end
+	-- Remove all player characters.
+	for k,v in pairs(Player.clients) do
+		v:detach(true)
+	end
+	Player.clients = {}
+	-- Reset the world.
+	self:update_status(0, "Resetting world")
+	Marker:reset()
+	Sectors.instance:unload_world()
+	-- Place special areas.
+	-- Regions have dependencies so we need to place them in several passes.
+	-- The region tables are filled but the map is all empty after this.
+	repeat
+		self:reset()
+		self:update_status(0, "Placing regions")
+	until place_regions()
+	-- Mark roads.
+	--[[self:update_status(0, "Creating roads")
+	local linkn = 0
+	for _,reg1 in pairs(self.regions_dict_name) do
+		for _,name in ipairs(reg1.spec.links) do
+			local reg2 = self.regions_dict_name[name]
+			local link = reg1:create_link(reg2)
+			linkn = linkn + 1
+			self.links[linkn] = link
+		end
+	end
+	for i,link in ipairs(self.links) do
+		local src = link[1]:get_link_point(link[2].point)
+		local dst = link[2]:get_link_point(link[1].point)
+		self:mark_road(src, dst)
+		self:update_status(i / linkn)
+	end]]
+	-- Format regions.
+	-- This creates the sectors that contain special areas.
+	self:update_status(0, "Formatting regions")
+	for _,reg in pairs(self.regions_dict_id) do
+		Voxel:fill_region{point = reg.point, size = reg.pattern.size}
+	end
+	-- Find used sectors.
+	self:update_status(0, "Counting sectors")
+	local sectorn = 0
+	local sectors = Program.sectors
+	for k in pairs(sectors) do
+		sectorn = sectorn + 1
+	end
+	-- Create fractal terrain.
+	self:update_status(0, "Randomizing terrain")
+	local index = 0
+	for k in pairs(sectors) do
+		Generator.Main:generate(k)
+		self:update_status(index / sectorn)
+		index = index + 1
+	end
+	-- Paint regions.
+	self:update_status(0, "Creating regions")
+	for _,reg in pairs(self.regions_dict_id) do
+		Voxel:fill_region{point = reg.point, size = reg.pattern.size}
+		Voxel:place_pattern{point = reg.point, name = reg.pattern.name}
+	end
+	-- Save the map.
+	self:update_status(0, "Saving the map")
+	Sectors.instance:save_world(true, function(p) self:update_status(p) end)
+	Sectors.instance:unload_world()
+	Serialize:set_value("map_version", Generator.map_version)
+	-- Save map markers.
+	self:update_status(0, "Saving quests")
+	Serialize:save_generator(true)
+	Serialize:save_markers(true)
+	Serialize:save_quests(true)
+	Serialize:save_accounts(true)
+	-- Discard events emitted during map generation so that they
+	-- don't trigger when the game starts.
+	self:update_status(0, "Finishing")
+	Program:update()
+	repeat until not Program:pop_event()
+	Program:update()
+	repeat until not Program:pop_event()
+	-- Inform players of the generation being complete.
+	-- All accounts were erased so clients need to re-authenticate.
+	local status = Packet(packets.CLIENT_AUTHENTICATE)
+	for k,v in pairs(Network.clients) do
+		Network:send{client = v, packet = status}
+	end
+end
+
+--- Creates ore deposits and places plants.
+-- @param self Sectors.
+-- @param pos Position in tiles.
+-- @param size Size in tiles.
+-- @param amount How many resources to create at most.
+Generator.generate_resources = function(self, pos, size, amount)
+	-- /FIXME
+	local mats = {
+		Material:find{name = "adamantium1"},
+		Material:find{name = "aquanite1"},
+		Material:find{name = "basalt1"},
+		Material:find{name = "brittlerock1"},
+		Material:find{name = "crimson1"},
+		Material:find{name = "ferrostone1"},
+		Material:find{name = "sand1"},
+		Material:find{name = "soil1"}}
+	--[[Material:find{name = "grass1"},
+		Material:find{name = "ice1"},
+		Material:find{name = "iron1"},
+		Material:find{name = "magma1"},
+		Material:find{name = "pipe1"},
+		Material:find{name = "water1"},
+		Material:find{name = "wood1"}]]
+	local points = {
+		Vector(-1,-1,-1), Vector(0,-1,-1), Vector(1,-1,-1),
+		Vector(-1,0,-1), Vector(0,0,-1), Vector(1,0,-1),
+		Vector(-1,1,-1), Vector(0,1,-1), Vector(1,1,-1),
+		Vector(-1,-1,0), Vector(0,-1,0), Vector(1,-1,0),
+		Vector(-1,0,0), Vector(0,0,0), Vector(1,0,0),
+		Vector(-1,1,0), Vector(0,1,0), Vector(1,1,0),
+		Vector(-1,-1,1), Vector(0,-1,1), Vector(1,-1,1),
+		Vector(-1,0,1), Vector(0,0,1), Vector(1,0,1),
+		Vector(-1,1,1), Vector(0,1,1), Vector(1,1,1)}
+	local create_plant_or_item = function(ctr)
+		local i = 0
+		repeat
+			i = i + 1
+			ctr.y = ctr.y - 1
+			if i > 10 then return end
+		until Voxel:get_tile(ctr) ~= 0
+		ctr.y = ctr.y + 1
+		local src = ctr + Vector(-1,1,-1)
+		local dst = ctr + Vector(1,3,1)
+		ctr = ctr + Vector (0.5, 0, 0.5)
+		if math.random() < 0.1 then
+			Voxel:place_item{point = ctr, category = "generate"}
+		elseif math.random() < 0.4 and Voxel:check_range(src, dst).solid == 0 then
+			Voxel:place_obstacle{point = ctr, category = "tree"}
+		else
+			Voxel:place_obstacle{point = ctr, category = "small-plant"}
+		end
+	end
+	local create_vein = function(ctr, mat)
+		for k,v in pairs(points) do
+			if math.random() < 0.3 then
+				local t = Voxel:get_tile(ctr + v)
+				if t ~= 0 then
+					Voxel:set_tile(ctr + v, mat)
+				end
+			end
+		end
+	end
+	-- Generate resources.
+	local p = Vector()
+	local n = amount or 10
+	for i=1,n do
+		p.x = pos.x + math.random(1, size.x - 2)
+		p.y = pos.y + math.random(1, size.y - 2)
+		p.z = pos.z + math.random(1, size.z - 2)
+		local t = Voxel:get_tile(p)
+		if t ~= 0 then
+			local m = mats[math.random(1,#mats)]
+			if m then create_vein(p, m.id, 1) end
+		else
+			create_plant_or_item(p)
+		end
+	end
+end
+
+--- Gets the ID of the sector.
+-- @param self Generator.
+-- @param sector Sector offset in tiles.
+-- @return Vector.
+Generator.get_sector_id = function(self, tile)
+	local w = 128
+	local s = (tile:round() * (1 / Voxel.tiles_per_line)):floor()
+	return s.x + s.y * w + s.z * w^2
+end
+
+--- Gets the offset of the sector in tiles.
+-- @param self Generator.
+-- @param sector Sector index.
+-- @return Vector.
+Generator.get_sector_offset = function(self, sector)
+	local w = 128
+	local sx = sector % w
+	local sy = math.floor(sector / w) % w
+	local sz = math.floor(sector / w / w) % w
+	return Vector(sx, sy, sz) * Voxel.tiles_per_line
+end
+
 --- Informs clients of the generator status.
--- @param clss Generator class.
+-- @param self Generator.
 -- @param client Specific client to inform or nil to inform all.
 -- @return Network packet.
-Generator.inform_clients = function(clss, client)
+Generator.inform_clients = function(self, client)
 	local p = Packet(packets.GENERATOR_STATUS,
-		"string", clss.prev_message or "",
-		"float", clss.prev_fraction or 0)
+		"string", self.prev_message or "",
+		"float", self.prev_fraction or 0)
 	if client then
 		Network:send{client = client, packet = p}
 	else
@@ -98,11 +287,53 @@ Generator.inform_clients = function(clss, client)
 	end
 end
 
---- Draws a corridor in the map.
--- @param clss Generator class.
+--- Marks road sectors.
+-- @param self Generator.
 -- @param src Source point in tiles.
 -- @param dst Destination point in tiles.
-Generator.paint_corridor = function(clss, src, dst)
+Generator.mark_road = function(self, src, dst)
+	local dist
+	local ssec = (src * (1/Voxel.tiles_per_line)):round()
+	local dsec = (dst * (1/Voxel.tiles_per_line)):round()
+	local psec = ssec:copy()
+	repeat
+		-- Mark as road.
+		local sec = self:get_sector_id(psec * Voxel.tiles_per_line)
+		self.sectors[sec] = "Road"
+		dist = (dsec - psec):round()
+		if dist.length < 1 then break end
+		-- Move horizontally.
+		if math.abs(dist.x) > math.abs(dist.z) then
+			if dist.x > 0 then
+				psec.x = psec.x + 1
+			else
+				psec.x = psec.x - 1
+			end
+		else
+			if dist.z > 0 then
+				psec.z = psec.z + 1
+			else
+				psec.z = psec.z - 1
+			end
+		end
+		-- Move vertically.
+		-- FIXME: All in the beginning.
+		if dist.y < -0.5 then
+			psec.y = psec.y - 1
+		elseif dist.y > 0.5 then
+			psec.y = psec.y + 1
+		end
+	until false
+	-- Mark the endpoints.
+	self.sectors[self:get_sector_id(src)] = "Road"
+	self.sectors[self:get_sector_id(dst)] = "Road"
+end
+
+--- Draws a corridor in the map.
+-- @param self Generator.
+-- @param src Source point in tiles.
+-- @param dst Destination point in tiles.
+Generator.paint_corridor = function(self, src, dst)
 	local vec = dst - src
 	local abs = Vector(math.abs(vec.x), math.abs(vec.y), math.abs(vec.z))
 	-- Draw the tunnel line.
@@ -131,11 +362,11 @@ Generator.paint_corridor = function(clss, src, dst)
 end
 
 --- Places a region to the map.
--- @param clss Generator class.
+-- @param self Generator.
 -- @param reg Region spec.
 -- @param pat Pattern spec.
 -- @return Region or nil.
-Generator.place_region = function(clss, reg, pat)
+Generator.place_region = function(self, reg, pat)
 	if not pat then
 		error(string.format("ERROR: No pattern was found for region `%s'.", reg.name))
 	end
@@ -148,10 +379,10 @@ Generator.place_region = function(clss, reg, pat)
 	if reg.position then
 		rel = Vector(reg.position[1], 0, reg.position[2])
 	elseif not reg.distance then
-		rel = Vector(math.random(clss.map_start.x, clss.map_end.x), 0, math.random(clss.map_start.z, clss.map_end.z))
-		dist = {nil, 0.1 * clss.map_size.x, 0.1 * clss.map_size.x}
-	elseif clss.regions_dict_name[reg.distance[1]] then
-		rel = clss.regions_dict_name[reg.distance[1]].point
+		rel = Vector(math.random(self.map_start.x, self.map_end.x), 0, math.random(self.map_start.z, self.map_end.z))
+		dist = {nil, 0.1 * self.map_size.x, 0.1 * self.map_size.x}
+	elseif self.regions_dict_name[reg.distance[1]] then
+		rel = self.regions_dict_name[reg.distance[1]].point
 		rel = Vector(rel.x, 0, rel.z)
 		dist = reg.distance
 	else return end
@@ -171,7 +402,7 @@ Generator.place_region = function(clss, reg, pat)
 			if math.random(0, 1) == 1 then pos.z = -pos.z end
 			pos = pos + rel
 			aabb.point = pos - Vector(1,1,1)
-			if clss:validate_region_position(aabb) then
+			if self:validate_region_position(aabb) then
 				success = true
 				break
 			end
@@ -185,292 +416,76 @@ Generator.place_region = function(clss, reg, pat)
 	end
 	-- Create the region.
 	local region = Region{aabb = aabb, pattern = pat, point = pos, size = size, spec = reg}
-	clss:add_region(region)
+	self:add_region(region)
 	return region
 end
 
---- Checks if a region can be placed in the given position.
--- @param clss Generator class.
--- @param aabb Position of the region.
--- @return True if the position is valid.
-Generator.validate_region_position = function(clss, aabb)
-	if aabb.point.x < clss.map_start.x then return end
-	if aabb.point.y < clss.map_start.y then return end
-	if aabb.point.z < clss.map_start.z then return end
-	if aabb.point.x + aabb.size.x > clss.map_end.x then return end
-	if aabb.point.y + aabb.size.y > clss.map_end.y then return end
-	if aabb.point.z + aabb.size.z > clss.map_end.z then return end
-	local hit
-	clss:for_each_bin(aabb.point, aabb.size, function(i)
-		hit = hit or clss.bins[i]
-	end)
-	return not hit
-end
-
---- Generates the world map.
--- @param clss Generator class.
--- @param args Arguments.
-Generator.generate = function(clss, args)
-	local reset_state = function()
-		-- Initialize state.
-		clss.bins = {}
-		clss.links = {}
-		clss.regions_dict_id = {}
-		clss.regions_dict_name = {}
-		clss.regions_dict_layer = {}
-		for i=1,clss.layer_count do
-			clss.regions_dict_layer[i] = {}
-		end
+Generator.reset = function(self)
+	self.bins = {}
+	self.links = {}
+	self.regions_dict_id = {}
+	self.regions_dict_name = {}
+	self.regions_dict_layer = {}
+	for i=1,self.layer_count do
+		self.regions_dict_layer[i] = {}
 	end
-	local place_regions = function()
-		local special = Regionspec:find{category = "special"}
-		while true do
-			local placed = 0
-			local skipped = 0
-			-- Try to place one or more regions.
-			-- Regions are often placed relative to each other so we need to
-			-- add them iteratively in the other of least dependencies.
-			for name,reg in pairs(special) do
-				if not clss.regions_dict_name[reg.name] then
-					local pat = Pattern:random{category = reg.pattern_category, name = reg.pattern_name}
-					if not clss:place_region(reg, pat) then
-						skipped = skipped + 1
-					else
-						placed = placed + 1
-					end
-				end
-			end
-			-- The generator may sometimes run into a dead end where a region
-			-- can't be placed without violating the constraints. In such a
-			-- case, nil is returned and generation is restarted from scratch.
-			if placed == 0 then return end
-			if skipped == 0 then break end
-		end
-		return true
-	end
-	-- Remove all player characters.
-	for k,v in pairs(Player.clients) do
-		v:detach(true)
-	end
-	Player.clients = {}
-	-- Reset the world.
-	clss:update_status(0, "Resetting world")
-	Marker:reset()
-	Sectors.instance:unload_world()
-	-- Place special areas.
-	-- Regions have dependencies so we need to place them in several passes.
-	-- The region tables are filled but the map is all empty after this.
-	repeat
-		reset_state()
-		clss:update_status(0, "Placing regions")
-	until place_regions()
-	-- Initialize connectivity.
-	-- A cyclic graph is created out of the special areas by creating links
-	-- between them according to the rules in the region specs.
-	clss:update_status(0, "Placing primary paths")
-	local linkn = 0
-	for _,reg1 in pairs(clss.regions_dict_name) do
-		for _,name in ipairs(reg1.spec.links) do
-			local reg2 = clss.regions_dict_name[name]
-			local link = reg1:create_link(reg2)
-			linkn = linkn + 1
-			clss.links[linkn] = link
-		end
-	end
-	-- Randomize connectivity.
-	-- Links between regions are subdivided and random regions are created.
-	clss:update_status(0, "Randomizing primary paths")
-	for i = 1,linkn do
-		local link = clss.links[i]
-		clss:subdivide_link(link)
-		clss:update_status(i / linkn)
-	end
-	linkn = #clss.links
-	-- Connect random rooms together.
-	-- We try to make the maze less linear by taking some rooms with roughly
-	-- the same Y offset and connecting them with a new random path.
-	clss:update_status(0, "Placing secondary paths")
-	local mapsize = clss.map_size.y
-	local regionn = #clss.regions_dict_id
-	local reglink = function(reg1, reg2)
-		if reg1 == reg2 then return end
-		if reg1.linked_regions[reg2] then return end
-		if (reg1.point - reg2.point).length > 0.5 * mapsize then return end
-		if #reg1.links > 7 then return end
-		if #reg2.links > 7 then return end
-		local link = reg1:create_link(reg2)
-		linkn = linkn + 1
-		clss.links[linkn] = link
-		clss:subdivide_link(link)
-		return true
-	end
-	for layer = 1,clss.layer_count do
-		local dict = clss.regions_dict_layer[layer]
-		local count = #dict
-		if count > 1 then
-			local retry = 0
-			local created = 0
-			while retry < 2 and created < 4 do
-				local reg1 = dict[math.random(1, count)]
-				local reg2 = dict[math.random(1, count)]
-				if reglink(reg1, reg2) then
-					created = created + 1
-				else
-					retry = retry + 1
-				end
-			end
-		end
-		clss:update_status(layer / clss.layer_count)
-	end
-	linkn = #clss.links
-	-- Paint regions.
-	clss:update_status(0, "Creating regions")
-	for _,reg in pairs(clss.regions_dict_id) do
-		Voxel:fill_region{point = reg.point, size = reg.pattern.size}
-		Voxel:place_pattern{point = reg.point, name = reg.pattern.name}
-	end
-	-- Paint corridors.
-	clss:update_status(0, "Creating corridors")
-	for i,link in ipairs(clss.links) do
-		local src = link[1]:get_link_point(link[2].point)
-		local dst = link[2]:get_link_point(link[1].point)
-		clss:paint_corridor(src, dst)
-		clss:update_status(i / linkn)
-	end
-	-- Find used sectors.
-	clss:update_status(0, "Counting sectors")
-	local sectorn = 0
-	local sectors = Program.sectors
-	for k in pairs(sectors) do
-		sectorn = sectorn + 1
-	end
-	-- Create fractal terrain.
-	clss:update_status(0, "Randomizing terrain")
-	local index = 0
-	for k in pairs(sectors) do
-		Sectors.instance:create_fractal_regions(k,
-			function(aabb) return clss:validate_region_position(aabb) end)
-		clss:update_status(index / sectorn)
-		index = index + 1
-	end
-	-- Randomize tiles.
-	clss:update_status(0, "Creating resource deposits")
-	index = 0
-	for k in pairs(sectors) do
-		Sectors:format_generated_sector(k)
-		clss:update_status(index / sectorn)
-		index = index + 1
-	end
-	-- Save the map.
-	clss:update_status(0, "Saving the map")
-	Sectors.instance:save_world(true, function(p) clss:update_status(p) end)
-	Sectors.instance:unload_world()
-	Serialize:set_value("map_version", Generator.map_version)
-	-- Save map markers.
-	clss:update_status(0, "Saving quests")
-	Serialize:save_markers(true)
-	Serialize:save_quests(true)
-	Serialize:save_accounts(true)
-	-- Discard events emitted during map generation so that they
-	-- don't trigger when the game starts.
-	clss:update_status(0, "Finishing")
-	Program:update()
-	repeat until not Program:pop_event()
-	Program:update()
-	repeat until not Program:pop_event()
-	-- Inform players of the generation being complete.
-	-- All accounts were erased so clients need to re-authenticate.
-	local status = Packet(packets.CLIENT_AUTHENTICATE)
-	for k,v in pairs(Network.clients) do
-		Network:send{client = v, packet = status}
-	end
-end
-
---- Subdivides the link between the region and another region.
--- @param self Generator class.
--- @param link Link to subdivide.
--- @return Link or nil.
-Generator.subdivide_link = function(clss, link)
-	-- Check if the path is long enough.
-	local src = link[1].point + link[1].size * 0.5
-	local dst = link[2].point + link[2].size * 0.5
-	local len = (src - dst).length - (link[1].size.length + link[2].size.length) / 2
-	if len < 50 then return end
-	-- Try to subdivide the link.
-	for i = 1,20 do
-		-- Select the type for the new region.
-		local spec = Regionspec:random{category = "random"}
-		if not spec then return end
-		local pattern = Pattern:random{category = spec.pattern_category, name = spec.pattern_name}
-		if not pattern then return end
-		-- Check if the pattern fits.
-		local region = clss:subdivide_link_test(link, spec, pattern)
-		if region then
-			-- Link the new region to the path.
-			clss:add_region(region)
-			local link1 = region:create_link(link[2])
-			link[2] = region
-			table.insert(clss.links, link1)
-			-- Recursively subdivide the new paths.
-			clss:subdivide_link(link)
-			clss:subdivide_link(link1)
-			return link1
-		end
-	end
-end
-
-Generator.subdivide_link_test = function(clss, link, spec, pattern)
-	-- Calculate the subdivision center.
-	local src = link[1].point
-	local dst = link[2].point
-	local rel = src + (dst - src) * (0.3 + 0.4 * math.random())
-	-- Calculate the direction vector.
-	local forward = (dst - src):normalize()
-	local side = forward:cross(Vector(0,1)):normalize()
-	-- Find the position for the new region.
-	local ok = nil
-	local pos = Vector()
-	local size = pattern.size
-	local aabb = Aabb{point = pos, size = size}
-	local dist = math.ceil((dst - src).length)
-	for i = 1,10 do
-		pos = side * 0.5 * math.random(-dist, dist)
-		pos = (pos + rel):floor()
-		aabb.point = pos
-		if clss:validate_region_position(aabb) then
-			return Region{aabb = aabb, pattern = pattern, point = pos, size = size, spec = spec}
-		end
-	end
+	self.sectors = {}
 end
 
 --- Updates the network status while the generator is active.
--- @param clss Generator class.
-Generator.update_network = function(clss)
+-- @param self Generator.
+Generator.update_network = function(self)
 	Network:update()
 	while true do
 		local event = Program:pop_event()
 		if not event then break end
 		if event.type == "login" then
-			Generator:inform_clients(event.client)
+			self:inform_clients(event.client)
 		end
 	end
 end
 
 --- Updates the status message of the generator.
--- @param clss Generator class.
+-- @param self Generator.
 -- @param frac Fraction of the task completed.
 -- @param msg Message string.
-Generator.update_status = function(clss, frac, msg)
+Generator.update_status = function(self, frac, msg)
 	if msg then
 		print(math.ceil(frac * 100) .. "% " .. msg)
-		clss.prev_message = msg
-		clss.prev_fraction = frac
-		clss:inform_clients()
-		clss:update_network()
-	elseif frac == 1 or frac > clss.prev_fraction + 0.05 then
-		print(math.ceil(frac * 100) .. "% " .. clss.prev_message)
-		clss.prev_fraction = frac
-		clss:inform_clients()
-		clss:update_network()
+		self.prev_message = msg
+		self.prev_fraction = frac
+		self:inform_clients()
+		self:update_network()
+	elseif frac == 1 or frac > self.prev_fraction + 0.05 then
+		print(math.ceil(frac * 100) .. "% " .. self.prev_message)
+		self.prev_fraction = frac
+		self:inform_clients()
+		self:update_network()
 	end
 end
+
+Generator.validate_rect = function(self, pos, size)
+	if pos.x < self.map_start.x then return end
+	if pos.y < self.map_start.y then return end
+	if pos.z < self.map_start.z then return end
+	if pos.x + size.x > self.map_end.x then return end
+	if pos.y + size.y > self.map_end.y then return end
+	if pos.z + size.z > self.map_end.z then return end
+	local hit
+	self:for_each_bin(pos, size, function(i)
+		hit = hit or self.bins[i]
+	end)
+	return not hit
+end
+
+--- Checks if a region can be placed in the given position.
+-- @param self Generator.
+-- @param aabb Position of the region.
+-- @return True if the position is valid.
+Generator.validate_region_position = function(self, aabb)
+	return self:validate_rect(aabb.point, aabb.size)
+end
+
+------------------------------------------------------------------------------
+
+Generator.inst = Generator()

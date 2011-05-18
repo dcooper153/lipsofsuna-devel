@@ -25,6 +25,7 @@ require "server/modifier"
 require "server/editing"
 require "server/particles"
 require "server/generator"
+require "server/generator/main"
 for k,v in pairs(File:scan_directory("scripts/server/influences")) do
 	require("server/influences/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
@@ -38,7 +39,7 @@ Network:host{port = Config.inst.server_port}
 if Settings.generate or
    Serialize:get_value("map_version") ~= Generator.map_version or
    Serialize:get_value("data_version") ~= Serialize.data_version then
-	Generator:generate()
+	Generator.inst:generate()
 	Serialize:set_value("data_version", Serialize.data_version)
 else
 	Serialize:load()

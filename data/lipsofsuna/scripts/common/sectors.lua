@@ -152,7 +152,7 @@ end
 Sectors.update = function(self)
 	local written = 0
 	for k,d in pairs(Program.sectors) do
-		if d > self.unload_time and written < 20 then
+		if d > self.unload_time and written < 40 then
 			-- Group into a single transaction.
 			if written == 0 then self.database:query("BEGIN TRANSACTION;") end
 			written = written + 1

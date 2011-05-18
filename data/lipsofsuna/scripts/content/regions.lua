@@ -70,22 +70,16 @@ Regionspec{
 Regionspec{
 	name = "Erinyes' Lair",
 	categories = {"special"},
-	depth = {32,32},
+	depth = {128,128},
 	pattern_name = "erinyeslair1",
-	position = {32,512}}
+	position = {128,512}}
 
 Regionspec{
 	name = "Chara's Illusion",
 	categories = {"special"},
-	depth = {32,32},
+	depth = {128,128},
 	pattern_name = "charasillusion1",
-	position = {32,32}}
-
-Regionspec{
-	name = "Random",
-	categories = {"random"},
-	depth = {500, 1000},
-	pattern_category = "random"}
+	position = {128,128}}
 
 Regionspec{
 	name = "Silverspring",

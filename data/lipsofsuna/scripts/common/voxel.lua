@@ -119,10 +119,22 @@ end
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
 --   <li>name: Pattern name.</li>
---   <li>point: Position vector, in tiles.</li></ul>
+--   <li>point: Position vector, in tiles.</li>
+--   <li>rotation: Counter-clockwise rotation in 90 degree steps.</li></ul>
 Voxel.place_pattern = function(clss, args)
 	local pat = Pattern:random(args)
 	if not pat then return end
+	-- Initialize rotation
+	local coord
+	if args.rotation == 1 then
+		coord = function(x,y,z) return Vector(z,y,x) end
+	elseif args.rotation == 2 then
+		coord = function(x,y,z) return Vector(pat.size.x-1-x,y,pat.size.z-1-z) end
+	elseif args.rotation == 3 then
+		coord = function(x,y,z) return Vector(pat.size.z-1-z,y,pat.size.x-1-x) end
+	else
+		coord = function(x,y,z) return Vector(x,y,z) end
+	end
 	-- Create tiles.
 	for k,v in pairs(pat.tiles) do
 		-- Get tile type.
@@ -136,28 +148,28 @@ Voxel.place_pattern = function(clss, args)
 			for x = v[1],v[1]+v[5] do
 				for y = v[2],v[2]+v[6] do
 					for z = v[3],v[3]+v[7] do
-						Voxel:set_tile(args.point + Vector(x, y, z), tile)
+						Voxel:set_tile(args.point + coord(x, y, z), tile)
 					end
 				end
 			end
 		else
 			-- Fill individual tile.
-			Voxel:set_tile(args.point + Vector(v[1], v[2], v[3]), tile)
+			Voxel:set_tile(args.point + coord(v[1], v[2], v[3]), tile)
 		end
 	end
 	-- Create obstacles.
 	for k,v in pairs(pat.obstacles) do
-		local point = args.point + Vector(v[1], v[2], v[3])
+		local point = args.point + coord(v[1], v[2], v[3])
 		clss:place_obstacle{name = v[4], point = point, rotation = v[5]}
 	end
 	-- Create items.
 	for k,v in pairs(pat.items) do
-		local point = args.point + Vector(v[1], v[2], v[3])
+		local point = args.point + coord(v[1], v[2], v[3])
 		clss:place_item{name = v[4], point = point, rotation = v[5]}
 	end
 	-- Create creatures.
 	for k,v in pairs(pat.creatures) do
-		local point = args.point + Vector(v[1], v[2], v[3])
+		local point = args.point + coord(v[1], v[2], v[3])
 		clss:place_creature{name = v[4], point = point, rotation = v[5]}
 	end
 end
