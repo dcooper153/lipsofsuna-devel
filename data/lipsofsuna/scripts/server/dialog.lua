@@ -130,6 +130,25 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 			table.insert(vm, 1, {exe = c, off = o - 1, pos = 1, len = 1})
 		end,
+		["remove player item"] = function(vm, c)
+			vm[1].pos = vm[1].pos + 1
+			local o = self.user:get_item{name = c[2]}
+			if o then
+				o:detach()
+				table.insert(vm, 1, {exe = c, off = 2, pos = 1, len = 1})
+			elseif #c >= 3 then
+				table.insert(vm, 1, {exe = c, off = 3, pos = 1, len = 1})
+			end
+		end,
+		["require player item"] = function(vm, c)
+			vm[1].pos = vm[1].pos + 1
+			local o = self.user:get_item{name = c[2]}
+			if o then
+				table.insert(vm, 1, {exe = c, off = 2, pos = 1, len = 1})
+			elseif #c >= 3 then
+				table.insert(vm, 1, {exe = c, off = 3, pos = 1, len = 1})
+			end
+		end,
 		say = function(vm, c)
 			self:line(string.format("%s: %s", c[2], c[3]))
 			vm[1].pos = vm[1].pos + 1
