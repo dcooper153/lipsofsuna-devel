@@ -128,7 +128,9 @@ Species.new = function(clss, args)
 	self.factions = {}
 	if args.factions then
 		for k,v in pairs(args.factions) do
-			self.factions[v] = Faction:find{name = v}
+			local f = Faction:find{name = v}
+			assert(f, string.format("species %q references a missing faction %q", self.name, v))
+			self.factions[v] = f
 		end
 	end
 	-- Feats.

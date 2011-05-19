@@ -9,3 +9,8 @@ Faction{
 Faction{
 	name = "evil",
 	enemies = {"good"}}
+
+Faction{name = "peculiar pet"}
+Faction{name = "seirei"}
+Faction{name = "silverspring"}
+Faction{name = "the hoarder"}
