@@ -81,6 +81,17 @@ Species{
 	inventory_items = {"shirt", "pants", "leather boots"}}
 
 Species{
+	name = "Col",
+	base = "aermale",
+	dialog = "col",
+	marker = "col",
+	ai_enable_combat = false,
+	ai_enable_wander = false,
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"shirt", "pants", "leather boots"}}
+
+Species{
 	name = "Noemi",
 	base = "aer",
 	dialog = "noemi",
