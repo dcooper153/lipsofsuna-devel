@@ -9,5 +9,6 @@ Quest{name = "Portal of Midguard"}
 Quest{name = "Roots of World"}
 Quest{name = "Sanctuary"}
 Quest{name = "The Hoarder"}
+Quest{name = "Brigands"}
 Quest{name = "Sword on the Stone"}
 Quest{name = "Mining Guild"}
