@@ -184,6 +184,7 @@ end
 -- @param object Object to add to the list of enemies.
 Creature.add_enemy = function(self, object)
 	if not self.ai then return end
+	if object.god then return end
 	local enemy = self.ai.enemies[object]
 	if enemy then
 		enemy[2] = Program.time + 30
@@ -303,6 +304,7 @@ end
 Creature.check_enemy = function(self, object)
 	if object == self then return end
 	if object.dead then return end
+	if object.god then return end
 	return self.spec:check_enemy(object)
 end
 
@@ -315,6 +317,7 @@ end
 Creature.damaged = function(self, args)
 	-- Check for invulnerability.
 	if not self.realized then return end
+	if self.god then return end
 	local health = self.skills:get_value{skill = "health"}
 	if not health then return end
 	-- Reduce health.

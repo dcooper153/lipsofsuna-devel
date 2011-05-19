@@ -15,6 +15,17 @@ ChatCommand.new = function(clss, args)
 	return self
 end
 
+-- God mode.
+ChatCommand{pattern = "^/god$", permission = "admin", func = function(player, matches)
+	if player.god then
+		player:send("/god mode off.")
+		player.god = nil
+	else
+		player:send("/god mode on.")
+		player.god = true
+	end
+end}
+
 -- Grant admin privileges.
 ChatCommand{pattern = "^/grant admin ([a-zA-Z0-9]*)$", permission = "admin", func = function(player, matches)
 	if not Config.inst.admins[matches] then
