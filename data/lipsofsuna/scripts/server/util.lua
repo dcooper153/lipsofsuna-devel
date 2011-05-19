@@ -90,6 +90,18 @@ Utils.find_empty_ground = function(clss, point)
 	end
 end
 
+--- Finds a drop point suitable for an item.
+-- @param clss Utils class.
+-- @param point Point in world space.
+-- @return Point in world units, or nil.
+Utils.find_drop_point = function(clss, point)
+	-- Find an empty tile.
+	local t,c = Voxel:find_tile{match = "empty", point = point, radius = Voxel.tile_size}
+	if not t then return end
+	-- TODO: Try to avoid other objects.
+	return (c + Vector(0.5,0.5,0.5)) * Voxel.tile_size
+end
+
 --- Finds a spawn point suitable for creatures.
 -- @param clss Utils class.
 -- @param point Point in world space.

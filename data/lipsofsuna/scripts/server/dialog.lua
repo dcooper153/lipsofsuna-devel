@@ -109,6 +109,20 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 			f(self)
 		end,
+		["give player item"] = function(vm, c)
+			vm[1].pos = vm[1].pos + 1
+			local s = Itemspec:find{name = c[2]}
+			if not s then return end
+			local o = Item{spec = s}
+			if self.user:add_item{object = o} then
+				self.user:send("Received " .. c[2])
+			else
+				local p = Utils:find_drop_point{point = self.user.position}
+				o.position = p or self.user.position
+				o.realized = true
+				self.user:send("Received " .. c[2] .. " but couldn't carry it")
+			end
+		end,
 		info = function(vm, c)
 			self:line(string.format("(%s)", c[2]))
 			vm[1].pos = vm[1].pos + 1
@@ -134,6 +148,7 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 			local o = self.user:get_item{name = c[2]}
 			if o then
+				self.user:send("Lost " .. c[2])
 				o:detach()
 				table.insert(vm, 1, {exe = c, off = 2, pos = 1, len = 1})
 			elseif #c >= 3 then

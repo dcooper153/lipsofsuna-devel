@@ -73,6 +73,11 @@ Dialogspec.validate = function(self, args)
 			assert(type(c[3]) == "nil", "too many arguments to \"func\" command")
 			validate_arguments(c, {})
 		end,
+		["give player item"] = function(c)
+			assert(type(c[2]) == "string", "argument #2 of \"give player item\" must be the item name string")
+			assert(type(c[3]) == "nil", "command \"give player item\" only takes 1 argument")
+			validate_arguments(c, {})
+		end,
 		info = function(c)
 			assert(type(c[2]) == "string", "argument #2 of \"info\" must be the info string")
 			assert(type(c[3]) == "nil", "too many arguments to \"info\" command")
