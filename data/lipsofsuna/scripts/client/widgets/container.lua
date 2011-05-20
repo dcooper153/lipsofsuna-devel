@@ -1,3 +1,5 @@
+require "client/widgets/trading"
+
 Widgets.Container = Class(Widget)
 Widgets.Container.dict_id = {}
 

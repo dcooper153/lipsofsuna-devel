@@ -207,6 +207,17 @@ Object.effect = function(self, args)
 	end
 end
 
+--- Finds an open inventory.
+-- @param self Object.
+-- @param id Inventory ID.
+-- @return Inventory or nil.
+Object.find_open_inventory = function(self, id)
+	local inv = Inventory:find{id = id}
+	if not inv then return end
+	if not inv:subscribed{object = self} then return end
+	return inv
+end
+
 --- Finds a targeted object.
 -- @param self Object.
 -- @param where Inventory number or zero for world.
@@ -322,6 +333,17 @@ Object.get_tile_range = function(self)
 	return src, src + size - Vector(1,1,1)
 end
 
+--- Gives the item to the object or drops it to the floor if failed.
+-- @param self Object.
+-- @param object Object to give.
+-- @return True if added to inventory, nil if dropped.
+Object.give_item = function(self, object)
+	if self:add_item{object = object} then return true end
+	local p = Utils:find_drop_point{point = self.position}
+	object.position = p or self.position
+	object.realized = true
+end
+
 --- Inflicts a modifier on the object.
 -- @param self Object.
 -- @param name Modifier name.
@@ -384,6 +406,8 @@ Object.send = function(self, args)
 		if type(args) == "string" then
 			local packet = Packet(packets.MESSAGE, "string", args)
 			Network:send{client = self.client, packet = packet, reliable = true}
+		elseif args.class_name == "Packet" then
+			Network:send{client = self.client, packet = args, reliable = true}
 		else
 			Network:send{client = self.client, packet = args.packet, reliable = args.reliable}
 		end

@@ -92,6 +92,28 @@ Drag.clicked_quickslot = function(self, index)
 	return true
 end
 
+--- Called when the sell list of trading widget is clicked with the purpose of stopping a drag.
+-- @param self Drag.
+-- @param index Trading slot index number.
+-- @return True if the click was handled by the drag and drop system.
+Drag.clicked_trading = function(self, slot)
+	-- Handle existing drags.
+	-- If there's an item drag in progress, the item is dropped to the
+	-- slot. Otherwise, the incompatible drag is cancelled.
+	if self.drag then
+		if self.drag[1] == "equ" then
+			Network:send{packet = Packet(packets.TRADING_ADD_SELL, "uint32", self.drag[2], "string", self.drag[3], "uint8", slot - 1, "uint32", self.drag[5])}
+			self:clear()
+		elseif self.drag[1] == "inv" then
+			Network:send{packet = Packet(packets.TRADING_ADD_SELL, "uint32", self.drag[2], "string", tostring(self.drag[3] - 1), "uint8", slot - 1, "uint32", self.drag[5])}
+			self:clear()
+		else
+			self:cancel()
+		end
+		return true
+	end
+end
+
 --- Called when the scene is clicked with the purpose of stopping a drag.
 -- @param self Drag.
 -- @return True if the click was handled by the drag and drop system.

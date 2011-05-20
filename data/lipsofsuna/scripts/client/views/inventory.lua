@@ -6,15 +6,18 @@ Views.Inventory.mode = "inventory"
 -- @return Inventory view.
 Views.Inventory.new = function(clss)
 	local self = Widget.new(clss, {cols = 3, rows = 1, spacings = {0, 0}})
-	self:set_request{width = 100}
+	-- Frame.
 	self.title = Widgets.Frame{style = "title", text = "Inventory"}
-	self.group = Widget{cols = 1, rows = 3, spacings = {0, 0}}
-	self.group:set_child{col = 1, row = 2, widget = self.title}
+	self.group = Widget{cols = 1, rows = 4, spacings = {0, 0}}
+	self.group:set_child(1, 3, self.title)
 	self.group:set_expand{col = 1, row = 1}
+	-- Trading widget.
+	self.trading = Widgets.Trading()
+	self.trading.visible = false
+	self.group:set_child(1, 2, self.trading)
+	-- Container list.
 	self.containers = Widget{rows = 3, spacings = {0, 0}}
 	self.containers:set_expand{row = 1}
-	self:set_child{col = 1, row = 1, widget = self.group}
-	self:set_child{col = 2, row = 1, widget = self.containers}
 	-- Weight widget.
 	-- This is injected to the owned inventory widget.
 	self.group_weight = Widget{rows = 1, cols = 4, spacings = {0,0}, margins={5,0,0,0}}
@@ -22,10 +25,14 @@ Views.Inventory.new = function(clss)
 	self.label_weight2 = Widgets.Label()
 	self.label_weight3 = Widgets.Label{text = "/"}
 	self.label_weight4 = Widgets.Label()
-	self.group_weight:set_child{col = 1, row = 1, widget = self.label_weight1}
-	self.group_weight:set_child{col = 2, row = 1, widget = self.label_weight2}
-	self.group_weight:set_child{col = 3, row = 1, widget = self.label_weight3}
-	self.group_weight:set_child{col = 4, row = 1, widget = self.label_weight4}
+	self.group_weight:set_child(1, 1, self.label_weight1)
+	self.group_weight:set_child(2, 1, self.label_weight2)
+	self.group_weight:set_child(3, 1, self.label_weight3)
+	self.group_weight:set_child(4, 1, self.label_weight4)
+	-- Packing.
+	self:set_request{width = 100}
+	self:set_child(1, 1, self.group)
+	self:set_child(2, 1, self.containers)
 	return self
 end
 
@@ -38,7 +45,7 @@ Views.Inventory.add_container = function(self, widget, own)
 	if own then
 		widget.button_close.visible = false
 		self.container = widget
-		self.group:set_child{col = 1, row = 3, widget = widget}
+		self.group:set_child{col = 1, row = 4, widget = widget}
 		widget:set_extra_widget(self.group_weight)
 	else
 		local text = widget.crafting and "Workbench" or "Loot"
@@ -80,6 +87,11 @@ Views.Inventory.close = function(self)
 		local w = self.containers:get_child(i, 3)
 		w:close()
 	end
+	-- Close trading.
+	if self.trading.visible then
+		self:set_trading()
+		self.trading:close()
+	end
 end
 
 --- Enters the inventory view.
@@ -112,6 +124,14 @@ Views.Inventory.set_item = function(self, slot, name, count)
 		widget.icon = spec and spec.icon
 		widget.count = count or 1
 	end
+end
+
+--- Enables or disables trading.
+-- @param self Inventory view.
+-- @param value True to enable.
+Views.Inventory.set_trading = function(self, value)
+	self.trading.visible = value or false
+	self.trading:clear()
 end
 
 --- Sets the displayed weight and burdening limit.

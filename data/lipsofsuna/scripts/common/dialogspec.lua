@@ -130,6 +130,10 @@ Dialogspec.validate = function(self, args)
 			assert(type(c[2]) == "nil", "too many arguments to \"teleport\" command")
 			assert(type(c.marker) == "string", "argument \"marker\" of \"teleport\" must be the name of the map marker")
 			validate_arguments(c, {marker = true})
+		end,
+		trade = function(c)
+			assert(type(c[2]) == "nil", "too many arguments to \"trade\" command")
+			validate_arguments(c, {})
 		end}
 	validate_arguments = function(cmd, allow)
 		for k,v in pairs(cmd) do

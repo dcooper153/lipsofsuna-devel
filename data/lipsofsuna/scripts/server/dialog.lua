@@ -1,3 +1,5 @@
+require "server/trading"
+
 Dialog = Class()
 Dialog.dict_id = {}
 Dialog.dict_name = {}
@@ -114,12 +116,9 @@ Dialog.execute = function(self)
 			local s = Itemspec:find{name = c[2]}
 			if not s then return end
 			local o = Item{spec = s}
-			if self.user:add_item{object = o} then
+			if self.user:give_item(o) then
 				self.user:send("Received " .. c[2])
 			else
-				local p = Utils:find_drop_point{point = self.user.position}
-				o.position = p or self.user.position
-				o.realized = true
 				self.user:send("Received " .. c[2] .. " but couldn't carry it")
 			end
 		end,
@@ -171,6 +170,10 @@ Dialog.execute = function(self)
 		teleport = function(vm, c)
 			self.user:teleport(c)
 			vm[1].pos = vm[1].pos + 1
+		end,
+		trade = function(vm, c)
+			Trading:start(self.user, self.object)
+			for i = #vm,1,-1 do vm[i] = nil end
 		end}
 	-- Initialize the virtual machine stack.
 	local vm = {{exe = self.spec.commands, off = 0, pos = 1, len = #self.spec.commands}}

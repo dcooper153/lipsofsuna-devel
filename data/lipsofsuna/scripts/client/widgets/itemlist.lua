@@ -1,11 +1,20 @@
 Widgets.ItemList = Class(Widget)
 
+--- Creates an item list widget.
+-- @param clss ItemList class.
+-- @param args Arguments.<ul>
+--   <li>activated: Activation callback.</li>
+--   <li>cols: Number of colums.</li>
+--   <li>size: Total number of slots.</li></ul>
+-- @return Item list widget.
 Widgets.ItemList.new = function(clss, args)
 	local self = Widget.new(clss)
-	self.cols = 1
+	local copy = function(f, d) self[f] = (args and args[f] ~= nil) and args[f] or d end
 	self.rows = 0
 	self.spacings = {0, 0}
-	for k,v in pairs(args) do self[k] = v end
+	copy("activated")
+	copy("cols", 5)
+	copy("size", 10)
 	return self
 end
 
@@ -33,8 +42,7 @@ Widgets.ItemList:add_getters{
 Widgets.ItemList:add_setters{
 	size = function(s, v)
 		rawset(s, "__size", v)
-		local rows = math.ceil(v / 5)
-		s.cols = 5
+		local rows = math.ceil(v / s.cols)
 		s.rows = rows
 		s.buttons = {}
 		for i = 1,v do

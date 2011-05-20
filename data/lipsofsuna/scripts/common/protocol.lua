@@ -106,6 +106,13 @@ do
 	add("AUTHENTICATE_REJECT")
 	add("ADMIN_STATS")
 	add("OBJECT_BEHEADED")
+	add("TRADING_ACCEPT")
+	add("TRADING_ADD_BUY")
+	add("TRADING_ADD_SELL")
+	add("TRADING_CANCEL")
+	add("TRADING_REMOVE_BUY")
+	add("TRADING_REMOVE_SELL")
+	add("TRADING_START")
 end
 
 Protocol.object_flags = {
