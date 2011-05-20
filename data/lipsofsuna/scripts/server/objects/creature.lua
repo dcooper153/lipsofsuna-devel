@@ -31,7 +31,8 @@ Creature:add_setters{
 		s.gravity = spec.gravity
 		s.gravity_liquid = spec.water_gravity
 		-- Set appearance.
-		if spec.eye_style then
+		-- Only set once when spawned by the map generator or an admin.
+		if s.random and spec.eye_style then
 			if spec.eye_style == "random" then
 				local s = spec.hair_styles[math.random(1, #spec.eye_styles)]
 				local rgb = Color:hsv_to_rgb{math.random(), 0.2 + 0.8 * math.random(), math.random()}
@@ -44,13 +45,13 @@ Creature:add_setters{
 				s.eye_style = spec.eye_style
 			end
 		end
-		if spec.hair_style then
+		if s.random and spec.hair_style then
 			if spec.hair_style == "random" then
-				local s = spec.hair_styles[math.random(1, #spec.hair_styles)]
+				local h = spec.hair_styles[math.random(1, #spec.hair_styles)]
 				local r = math.random(0, 255)
 				local g = math.random(0, 255)
 				local b = math.random(0, 255)
-				s.hair_style = {s[2], r, g, b}
+				s.hair_style = {h[2], r, g, b}
 			else
 				s.hair_style = spec.hair_style
 			end
@@ -885,6 +886,9 @@ Creature.write = function(self)
 	return string.format("local self=Creature%s\n%s%s%s", serialize{
 		angular = self.angular,
 		dead = self.dead,
+		eye_style = self.eye_style,
+		face_style = self.face_style,
+		hair_style = self.hair_style,
 		id = self.id,
 		physics = self.physics,
 		position = self.position,
