@@ -3,8 +3,8 @@ Crafting = Class()
 --- Checks if a specific item can be crafted by the user.
 -- @param clss Crafting class.
 -- @param args Arguments.<ul>
---   <li>get_item: Function used to check if the user has enough materials.
---   <li>get_skill: Function used to check if the user has enough skills.
+--   <li>get_item: Function used to check if the user has enough materials.</li>
+--   <li>get_skill: Function used to check if the user has enough skills.</li>
 --   <li>spec: Item specification.</li></ul>
 -- @return True if can craft.
 Crafting.can_craft = function(clss, args)
@@ -26,8 +26,8 @@ end
 --- Gets the names of all craftable items.
 -- @param clss Crafting class.
 -- @param args Arguments.<ul>
---   <li>get_item: Function used to check if the user has enough materials.
---   <li>get_skill: Function used to check if the user has enough skills.</ul>
+--   <li>get_item: Function used to check if the user has enough materials.</li>
+--   <li>get_skill: Function used to check if the user has enough skills.</li></ul>
 -- @return Table of item names.
 Crafting.get_craftable = function(clss, args)
 	local items = {}
@@ -37,6 +37,20 @@ Crafting.get_craftable = function(clss, args)
 		a.spec = spec
 		if clss:can_craft(a) then
 			table.insert(items, name)
+		end
+	end
+	return items
+end
+
+--- Gets the names of items that require the required itemspec for crafting.
+-- @param clss Crafting class.
+-- @param spec Itemspec.
+-- @return Table of item names.
+Crafting.get_requiring_items = function(clss, spec)
+	local items = {}
+	for k,v in pairs(Itemspec.dict_name) do
+		if v.crafting_materials[spec.name] then
+			table.insert(items, k)
 		end
 	end
 	return items

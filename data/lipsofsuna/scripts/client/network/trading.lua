@@ -1,5 +1,9 @@
 Protocol:add_handler{type = "TRADING_ACCEPT", func = function(event)
-	-- TODO
+	-- Read deal status.
+	local ok,deal = event.packet:read("bool")
+	if not ok then return end
+	-- Change accept button state.
+	Views.Inventory.inst.trading.accepted = deal
 end}
 
 Protocol:add_handler{type = "TRADING_ADD_BUY", func = function(event)

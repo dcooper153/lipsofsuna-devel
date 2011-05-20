@@ -25,8 +25,22 @@ Trading.cancel = function(clss, player)
 end
 
 Trading.deal = function(clss, player)
-	-- TODO
-	return true
+	-- Calculate the value of the items sold by the player.
+	local sell = 0
+	for k,v in pairs(player.trading.sell) do
+		local spec = v.spec
+		if spec then sell = sell + spec:get_trading_value() * v.count end
+	end
+	-- Calculate the value of the items bought by the player.
+	local buy = 0
+	for k,v in pairs(player.trading.buy) do
+		local spec = Itemspec:find{name = v[1]}
+		if spec then buy = buy + spec:get_trading_value() * v[2] end
+	end
+	-- Accept if the merchant profits.
+	-- TODO: Should merchants be more favorable to the same race?
+	-- TODO: Should there be other discriminative conditions?
+	return 1.5 * sell >= buy
 end
 
 Trading.start = function(clss, player, merchant)
@@ -45,6 +59,10 @@ Trading.start = function(clss, player, merchant)
 	end
 	-- Send the trading start packet.
 	player:send(Packet(packets.TRADING_START, "uint8", count, unpack(data)))
+end
+
+Trading.update = function(clss, player)
+	player:send(Packet(packets.TRADING_ACCEPT, "bool", clss:deal(player)))
 end
 
 Protocol:add_handler{type = "TRADING_ACCEPT", func = function(args)
@@ -81,6 +99,8 @@ Protocol:add_handler{type = "TRADING_ADD_BUY", func = function(args)
 	-- Add to the buy list.
 	player.trading.buy[dst] = {name, 1}
 	player:send(Packet(packets.TRADING_ADD_BUY, "uint8", dst - 1, "string", name, "uint32", 1))
+	-- Update deal status.
+	Trading:update(player)
 end}
 
 Protocol:add_handler{type = "TRADING_ADD_SELL", func = function(args)
@@ -113,6 +133,8 @@ Protocol:add_handler{type = "TRADING_ADD_SELL", func = function(args)
 		player.trading.sell[dst + 1] = srcobj
 	end
 	player:send(Packet(packets.TRADING_ADD_SELL, "uint8", dst, "string", srcobj.spec.name, "uint32", count))
+	-- Update deal status.
+	Trading:update(player)
 end}
 
 Protocol:add_handler{type = "TRADING_CANCEL", func = function(args)
@@ -138,6 +160,8 @@ Protocol:add_handler{type = "TRADING_REMOVE_BUY", func = function(args)
 	-- Remove from the buy list.
 	player.trading.buy[slot + 1] = nil
 	player:send(Packet(packets.TRADING_REMOVE_BUY, "uint8", slot))
+	-- Update deal status.
+	Trading:update(player)
 end}
 
 Protocol:add_handler{type = "TRADING_REMOVE_SELL", func = function(args)
@@ -156,4 +180,6 @@ Protocol:add_handler{type = "TRADING_REMOVE_SELL", func = function(args)
 	player:give_item(srcobj)
 	player.trading.sell[src + 1] = nil
 	player:send(Packet(packets.TRADING_REMOVE_SELL, "uint8", src))
+	-- Update deal status.
+	Trading:update(player)
 end}

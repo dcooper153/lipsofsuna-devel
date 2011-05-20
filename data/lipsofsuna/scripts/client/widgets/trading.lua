@@ -19,6 +19,7 @@ Widgets.Trading.new = function(clss)
 	self.group:set_child(3, 1, Widgets.Label{text = "Shop"})
 	self.group:set_child(3, 2, self.shop_list)
 	-- Buttons.
+	self.label_decline = Widgets.Label{color = {1,0,0,1}, halign = 0.5, text = "Pay more!"}
 	self.button_accept = Widgets.Button{text = "Accept", pressed = function() self:accept() end}
 	self.button_close = Widgets.Button{text = "Close", pressed = function() self:close() end}
 	self.group_buttons = Widget{cols = 2, rows = 1, homogeneous = true}
@@ -32,6 +33,7 @@ Widgets.Trading.new = function(clss)
 	self:set_expand{col = 1, row = 1}
 	self:append_row(self.title)
 	self:append_row(self.group)
+	self.accepted = true
 	return self
 end
 
@@ -79,6 +81,7 @@ Widgets.Trading.clear = function(self)
 		w.count = nil
 		w.icon = nil
 	end
+	self.accepted = true
 end
 
 --- Closes the trading widget.
@@ -86,3 +89,16 @@ end
 Widgets.Trading.close = function(self)
 	Network:send{packet = Packet(packets.TRADING_CANCEL)}
 end
+
+Widgets.Trading:add_getters{
+	accepted = function(s) return rawget(s, "__accepted") end}
+
+Widgets.Trading:add_setters{
+	accepted = function(s, v)
+		rawset(s, "__accepted", v)
+		if v then
+			s.group_buttons:set_child(2, 1, s.button_accept)
+		else
+			s.group_buttons:set_child(2, 1, s.label_decline)
+		end
+	end}

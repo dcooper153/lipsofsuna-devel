@@ -111,3 +111,40 @@ Itemspec.get_equipment_models = function(self, name, lod)
 	-- Find the equipment models for the race.
 	return models and models[name]
 end
+
+--- Gets the base trading value of the item.
+-- @param self Itemspec.
+-- @return Number.
+Itemspec.get_trading_value = function(self)
+	-- Return if cached.
+	if self.value then return self.value end
+	-- Calculate the value.
+	local value = 0.2
+	if self.armor_class then
+		value = value + 50 * self.armor_class
+	end
+	if self.influences_base then
+		for k,v in pairs(self.influences_base) do
+			value = value + math.max(0, math.abs(v) - 3)
+		end
+	end
+	if self.influences_bonus then
+		for k,v in pairs(self.influences_bonus) do
+			value = value + 500 * math.max(0, math.abs(v) - 0.003)
+		end
+	end
+	local req = Crafting:get_requiring_items(self)
+	if #req > 0 then
+		self.value = value
+		local awg = 0
+		for k,v in pairs(req) do
+			local spec = Itemspec:find{name = v}
+			if spec then awg = awg + spec:get_trading_value() end
+		end
+		awg = awg / #req
+		value = value + 0.05 * awg
+	end
+	-- Cache the value.
+	self.value = value
+	return value
+end
