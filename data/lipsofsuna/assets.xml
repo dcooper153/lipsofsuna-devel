@@ -1011,6 +1011,23 @@
   </asset>
 
   <asset>
+    <file>import/food1.blend</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/fruit1.png</dep>
+    <source>http://opengameart.org/content/food-pack</source>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/fruit1.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/food-pack</source>
+    <type>texture</type>
+  </asset>
+
+  <asset>
     <file>import/fur1.png</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>

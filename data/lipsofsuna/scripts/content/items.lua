@@ -74,7 +74,7 @@ Itemspec{
 
 Itemspec{
 	name = "fruit",
-	model = "book-000", -- FIXME
+	model = "fruit1",
 	mass = 1,
 	categories = {"material"},
 	stacking = true}
