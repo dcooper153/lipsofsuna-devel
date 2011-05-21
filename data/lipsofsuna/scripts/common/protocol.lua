@@ -113,6 +113,7 @@ do
 	add("TRADING_REMOVE_BUY")
 	add("TRADING_REMOVE_SELL")
 	add("TRADING_START")
+	add("PLAYER_CLIMB")
 end
 
 Protocol.object_flags = {

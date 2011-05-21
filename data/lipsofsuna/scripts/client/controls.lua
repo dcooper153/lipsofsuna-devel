@@ -24,6 +24,10 @@ Action{name = "chat", mode = "press", key1 = Keysym.t, func = function()
 	Gui.chat_active = not Gui.chat_active
 end}
 
+Action{name = "climb", mode = "press", key1 = Keysym.c, func = function()
+	Network:send{packet = Packet(packets.PLAYER_CLIMB)}
+end}
+
 Action{name = "feats", mode = "press", key1 = Keysym.f, func = function()
 	Gui:set_mode("feats")
 end}
@@ -32,7 +36,7 @@ Action{name = "inventory", mode = "press", key1 = Keysym.i, func = function()
 	Gui:set_mode("inventory")
 end}
 
-Action{name = "jump", mode = "press", key1 = Keysym.c, func = function()
+Action{name = "jump", mode = "press", key1 = Keysym.e, func = function()
 	Network:send{packet = Packet(packets.JUMP)}
 end}
 

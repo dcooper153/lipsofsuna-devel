@@ -237,6 +237,14 @@ Protocol:add_handler{type = "PLAYER_BLOCK", func = function(args)
 	if ok then player:set_block(v) end
 end}
 
+Protocol:add_handler{type = "PLAYER_CLIMB", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if not player.dead then
+		player:climb()
+	end
+end}
+
 Protocol:add_handler{type = "PLAYER_MOVE", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end

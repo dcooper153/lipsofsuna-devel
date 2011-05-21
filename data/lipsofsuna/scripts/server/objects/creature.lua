@@ -238,7 +238,7 @@ end
 -- @param self Creature.
 -- @return True if could climb.
 Creature.can_climb_low = function(self)
-	if self.movement < 0.5 then return end
+	if self.movement < 0 then return end
 	local ctr = self.position * Voxel.tile_scale + Vector(0,0.5,0)
 	local dir = self.rotation * Vector(0,0,-1)
 	local dst = (ctr + dir):floor()
@@ -252,7 +252,7 @@ end
 -- @param self Creature.
 -- @return True if could climb.
 Creature.can_climb_high = function(self)
-	if self.movement < 0.5 then return end
+	if self.movement < 0 then return end
 	local ctr = self.position * Voxel.tile_scale + Vector(0,0.5,0)
 	local dir = self.rotation * Vector(0,0,-1)
 	local dst = (ctr + dir):floor()
@@ -378,6 +378,62 @@ Creature.set_dead_state = function(self, drop)
 	end
 	-- Emit a vision event.
 	Vision:event{type = "object-dead", object = self, dead = true}
+end
+
+Creature.climb = function(self)
+	if self.blocking then return end
+	if self.climbing then return end
+	if self:can_climb_high() then
+		self.jumping = nil
+		self.climbing = true
+		self:animate("climb high")
+		Thread(function()
+			-- Rise.
+			local t = 0
+			local p = self.position
+			local r = self.rotation
+			repeat
+				local d = coroutine.yield()
+				t = t + d
+				self.position = p + Vector(0,2*t,0)
+				self.velocity = Vector()
+			until t > 0.8 * Voxel.tile_size
+			-- Slide.
+			t = 0
+			p = self.position
+			repeat
+				local d = coroutine.yield()
+				t = t + d
+				self.position = p + r * Vector(0,0.3,-0.8) * t
+			until t > 1
+			self.climbing = nil
+		end)
+	elseif self:can_climb_low() then
+		self.jumping = nil
+		self.climbing = true
+		self:animate("climb low")
+		Thread(function()
+			-- Rise.
+			local t = 0
+			local p = self.position
+			local r = self.rotation
+			repeat
+				local d = coroutine.yield()
+				t = t + d
+				self.position = p + Vector(0,4*t,0)
+				self.velocity = Vector()
+			until t > 0.2 * Voxel.tile_size
+			-- Slide.
+			t = 0
+			p = self.position
+			repeat
+				local d = coroutine.yield()
+				t = t + d
+				self.position = p + r * Vector(0,0.3,-1) * 2 * t
+			until t > 0.5
+			self.climbing = nil
+		end)
+	end
 end
 
 --- Causes the creature to die.
@@ -547,6 +603,7 @@ end
 Creature.jump = function(self)
 	-- Check for preconditions.
 	if self.blocking then return end
+	if self.climbing then return end
 	local t = Program.time
 	if t - self.jumped < 0.5 then return end
 	-- Jump or swim.
@@ -738,52 +795,9 @@ Creature.update_actions = function(self, secs)
 	-- Initiate climbing when applicable.
 	if self.jumping then
 		-- Climbing.
-		if self:can_climb_high() then
-			self.jumping = nil
-			self:animate("climb high")
-			Thread(function()
-				-- Rise.
-				local t = 0
-				local p = self.position
-				local r = self.rotation
-				repeat
-					local d = coroutine.yield()
-					t = t + d
-					self.position = p + Vector(0,2*t,0)
-					self.velocity = Vector()
-				until t > 0.8 * Voxel.tile_size
-				-- Slide.
-				t = 0
-				p = self.position
-				repeat
-					local d = coroutine.yield()
-					t = t + d
-					self.position = p + r * Vector(0,0.3,-0.8) * t
-				until t > 1
-			end)
-		elseif self:can_climb_low() then
-			self.jumping = nil
-			self:animate("climb low")
-			Thread(function()
-				-- Rise.
-				local t = 0
-				local p = self.position
-				local r = self.rotation
-				repeat
-					local d = coroutine.yield()
-					t = t + d
-					self.position = p + Vector(0,4*t,0)
-					self.velocity = Vector()
-				until t > 0.2 * Voxel.tile_size
-				-- Slide.
-				t = 0
-				p = self.position
-				repeat
-					local d = coroutine.yield()
-					t = t + d
-					self.position = p + r * Vector(0,0.3,-1) * 2 * t
-				until t > 0.5
-			end)
+		-- Player have an explicit climb command so auto-climb is only used by NPCs.
+		if not self.client then
+			self:climb()
 		end
 		-- Landing.
 		self.jump_timer = (self.jump_timer or 0) + secs
