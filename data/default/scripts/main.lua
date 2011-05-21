@@ -1,5 +1,20 @@
-require "system/config-file"
 require "system/core"
+
+if Program.args == "--help" or Program.args == "-h" then
+	print("Usage: lipsofsuna [modname] [options]\n")
+	print("Options:")
+	print("  -h --help                       Show this help message and exit.\n")
+	print("Examples:")
+	print("  lipsofsuna lipsofsuna --help    Show help for mod lipsofsuna")
+	print("  lipsofsuna lipsofsuna --server  Run mod lipsofsuna as a dedicated server")
+	return
+elseif #Program.args > 0 then
+	Program:launch_mod{name = "lipsofsuna", args = Program.args}
+	Program.quit = true
+	return
+end
+
+require "system/config-file"
 require "system/database"
 require "system/eventhandler"
 require "system/graphics"
@@ -8,17 +23,6 @@ require "system/math"
 require "system/render"
 require "system/sound"
 require "system/widgets"
-
-if Program.args == "--help" or Program.args == "-h" then
-	print("Usage: lipsofsuna [modname] [options]\n")
-	print("Options:")
-	print("  --help                          Show this help message and exit.\n")
-	print("Examples:")
-	print("  lipsofsuna lipsofsuna --help    Show help for mod lipsofsuna")
-	print("  lipsofsuna lipsofsuna --server  Run mod lipsofsuna as a dedicated server")
-	return
-end
-
 require "config"
 require "theme"
 require "widget"
