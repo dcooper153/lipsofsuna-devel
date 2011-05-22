@@ -1849,11 +1849,18 @@
   </asset>
 
   <asset>
-    <file>import/soil1n.png</file>
-    <author>Dim</author>
+    <file>import/soil1n.blend</file>
+    <author>Ari Mustonen</author>
     <license>Creative Commons BY 3.0</license>
-    <source>http://opengameart.org/content/dims-enviromental-and-architectural-textures</source>
-    <status>complete</status>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/soil1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <status>usable</status>
     <type>normalmap</type>
   </asset>
 
