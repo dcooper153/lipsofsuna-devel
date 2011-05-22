@@ -1062,12 +1062,19 @@
   </asset>
 
   <asset>
-    <file>import/granite1n.png</file>
-    <author>Mysteryem</author>
+    <file>import/granite1n.blend</file>
+    <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>
-    <source>http://opengameart.org/content/29-grounds-and-walls-and-water-1024x1024</source>
-    <status>complete</status>
-    <type>texture</type>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/granite1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>usable</status>
+    <type>normalmap</type>
   </asset>
 
   <asset>

@@ -64,7 +64,7 @@ Material{
 	name = "concrete1",
 	shader = "terrain",
 	specular = {0.5,0.5,0.5,0.5},
-	texture = {"granite1", "granite1n", "stone-001"},
+	texture = {"granite1", "concrete1n", "stone-001"},
 	texture_scale = 0.11,
 	type = "cube"}
 
