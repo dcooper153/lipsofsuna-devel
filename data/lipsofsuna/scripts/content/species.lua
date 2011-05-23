@@ -102,7 +102,8 @@ Species{
 		{"Pigtails long", "hair3"},
 		{"Long", "hair2"},
 		--{"Short", "aershorthair1"} -- TODO: Adapt to head mesh changes
-		{"Drill", "hair4"}},
+		{"Drill", "hair4"},
+		{"Short", "hair5"}},
 	skin_styles = {
 		{"Default", ""}}}
 
