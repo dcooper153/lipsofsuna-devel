@@ -2305,12 +2305,16 @@
   </asset>
 
   <asset>
-    <file>import/wood1n.png</file>
-    <author>WeaponGuy</author>
+    <file>import/wood1n.blend</file>
     <author>Ari Mustonen</author>
-    <license>Creative Commons BY 3.0</license>
-    <source>http://opengameart.org/content/cottage</source>
-    <status>usable</status>
+    <license>Creative Commons BY-SA 3.0</license>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/wood1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
     <type>normalmap</type>
   </asset>
 
