@@ -122,6 +122,8 @@ Eventhandler{type = "tick", func = function(self, args)
 		if vel then Sound.listener_velocity = vel end
 		-- Refresh the active portion of the map.
 		Player.object:refresh()
+		-- Maintain the respawn widget.
+		Gui:set_dead(Player.object.dead)
 	end
 	-- Update slots and special effects of objects.
 	for k,v in pairs(Object.objects) do

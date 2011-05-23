@@ -262,6 +262,13 @@ Protocol:add_handler{type = "PLAYER_MOVE", func = function(args)
 	end
 end}
 
+Protocol:add_handler{type = "PLAYER_RESPAWN", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if not player.dead then return end
+	player:respawn()
+end}
+
 Protocol:add_handler{type = "PLAYER_TURN", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
@@ -304,47 +311,43 @@ end}
 Protocol:add_handler{type = "SHOOT", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
-	if player.dead then return end
 	local ok,v = args.packet:read("bool")
 	if not ok then return end
-	if not player.dead then
-		if v and player.attack_charge then return end
-		if not v and not player.attack_charge then return end
-		-- Get the feat animation.
-		local anim = nil
-		local weapon = player:get_item{slot = "hand.R"}
-		if not weapon or weapon.spec.categories["melee"] then
-			anim = "right hand"
-		elseif weapon.spec.categories["ranged"] then
-			anim = "ranged"
-		elseif weapon.spec.categories["throwable"] then
-			anim = "throw"
-		elseif weapon.spec.categories["build"] then
-			anim = "build"
-		end
-		-- Handle attacks.
-		if anim then
-			if v then
-				-- Begin charge.
-				if player.cooldown then return end
-				if weapon and weapon.spec.animation_charge then
-					player:animate(weapon.spec.animation_charge, true)
-				else
-					player:animate("charge punch", true)
-				end
-				player.attack_charge = Program.time
+	if player.dead then return end
+	if v and player.attack_charge then return end
+	if not v and not player.attack_charge then return end
+	-- Get the feat animation.
+	local anim = nil
+	local weapon = player:get_item{slot = "hand.R"}
+	if not weapon or weapon.spec.categories["melee"] then
+		anim = "right hand"
+	elseif weapon.spec.categories["ranged"] then
+		anim = "ranged"
+	elseif weapon.spec.categories["throwable"] then
+		anim = "throw"
+	elseif weapon.spec.categories["build"] then
+		anim = "build"
+	end
+	-- Handle attacks.
+	if anim then
+		if v then
+			-- Begin charge.
+			if player.cooldown then return end
+			if weapon and weapon.spec.animation_charge then
+				player:animate(weapon.spec.animation_charge, true)
 			else
-				-- Release charge.
-				local feat = Feat{animation = anim}
-				feat:add_best_effects{user = player}
-				if not feat:perform{stop = args.stop, user = player} then
-					player:animate("charge cancel")
-				end
-				player.attack_charge = nil
+				player:animate("charge punch", true)
 			end
+			player.attack_charge = Program.time
+		else
+			-- Release charge.
+			local feat = Feat{animation = anim}
+			feat:add_best_effects{user = player}
+			if not feat:perform{stop = args.stop, user = player} then
+				player:animate("charge cancel")
+			end
+			player.attack_charge = nil
 		end
-	else
-		player:respawn()
 	end
 end}
 

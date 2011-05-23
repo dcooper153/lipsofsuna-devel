@@ -57,10 +57,19 @@ Gui.init = function(clss)
 	Gui.skills_group:set_expand{col = 3}
 	-- Modifiers.
 	Gui.modifiers = Widgets.Modifiers()
+	-- Respawning.
+	Gui.button_respawn = Widgets.Button{font = "medium", text = "Create a new character",
+		pressed = function() Network:send{packet = Packet(packets.PLAYER_RESPAWN)} end}
+	Gui.group_respawn = Widget{cols = 1, rows = 3, margins = {0,0,5,0}, visible = false}
+	Gui.group_respawn:set_expand{col = 1, row = 1}
+	Gui.group_respawn:set_expand{row = 3}
+	Gui.group_respawn:set_child(1, 1, Gui.button_respawn)
+	Gui.group_respawn:set_child(1, 2, Gui.button_respawn)
 	-- Packing.
 	Gui.top_group = Widget{rows = 1}
 	Gui.top_group:append_col(Gui.chat_history)
 	Gui.top_group:append_col(Gui.modifiers)
+	Gui.top_group:append_col(Gui.group_respawn)
 	Gui.top_group:set_expand{col = 1}
 	Gui.center_group = Widget{cols = 1, spacings = {0,0}}
 	Gui.center_group:append_row(Gui.top_group)
@@ -82,6 +91,17 @@ end
 Gui.set_admin = function(self, admin)
 	if admin == self.admin then return end
 	Gui.menu_widget_main:replace(8, admin and {"Admin", Gui.menu_widget_admin})
+end
+
+Gui.set_dead = function(self, value)
+	if self.group_respawn.visible == value then return end
+	if value then
+		self.modifiers.visible = false
+		self.group_respawn.visible = true
+	else
+		self.group_respawn.visible = false
+		self.modifiers.visible = true
+	end
 end
 
 Gui.set_mode = function(self, mode, level)
