@@ -366,6 +366,19 @@ Itemspec{
 	stacking = false}
 
 Itemspec{
+	name = "barrel",
+	model = "barrel1",
+	icon = "potion3", -- FIXME
+	mass = 9,
+	categories = {"container", "generate"},
+	crafting_materials = {log = 7},
+	inventory_size = 6,
+	inventory_type = "chest",
+	loot_categories = {"material", "misc", "potion"},
+	loot_count = {1, 6},
+	stacking = false}
+
+Itemspec{
 	name = "workbench",
 	model = "workbench1",
 	icon = "workbench1",

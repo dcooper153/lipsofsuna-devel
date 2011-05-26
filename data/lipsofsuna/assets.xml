@@ -128,6 +128,10 @@
     <name>titus tscharntk</name>
   </author-info>
   <author-info>
+    <name>yughues</name>
+    <url>http://opengameart.org/user/1170</url>
+  </author-info>
+  <author-info>
     <name>zero-project</name>
     <url>http://www.zero-project.gr/</url>
   </author-info>
@@ -350,6 +354,32 @@
     <license>CC0</license>
     <status>usable</status>
     <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/barrel1.blend</file>
+    <author>yughues</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/wood-barrels-pack</source>
+    <dep>import/barrel1.png</dep>
+    <dep>import/barrel1n.png</dep>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/barrel1.png</file>
+    <author>yughues</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/wood-barrels-pack</source>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/barrel1s.png</file>
+    <author>yughues</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/wood-barrels-pack</source>
+    <type>specularmap</type>
   </asset>
 
   <asset>
