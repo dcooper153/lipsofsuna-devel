@@ -55,6 +55,14 @@ Itemspec{
 	stacking = true}
 
 Itemspec{
+	name = "dewspring leaf",
+	model = "dewspringleaf1",
+	icon = "mushroom1", -- FIXME
+	categories = {"material"},
+	mass = 0.5,
+	stacking = true}
+
+Itemspec{
 	name = "ferrostone",
 	model = "ferrostone1",
 	icon = "stone2",

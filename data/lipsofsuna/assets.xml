@@ -828,6 +828,36 @@
   </asset>
 
   <asset>
+    <file>import/dewspring1.blend</file>
+    <author>yughues</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/tropical-plant-01-pack</source>
+    <dep>import/dewspring1.png</dep>
+    <dep>import/dewspring1n.png</dep>
+  </asset>
+
+  <asset>
+    <file>import/dewspring1.png</file>
+    <author>yughues</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/tropical-plant-01-pack</source>
+  </asset>
+
+  <asset>
+    <file>import/dewspring1n.png</file>
+    <author>yughues</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/tropical-plant-01-pack</source>
+  </asset>
+
+  <asset>
+    <file>import/dewspring1s.png</file>
+    <author>yughues</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/wood-barrels-pack</source>
+  </asset>
+
+  <asset>
     <file>import/door1n.png</file>
     <author>Georges Grondin</author>
     <author>Ari Mustonen</author>

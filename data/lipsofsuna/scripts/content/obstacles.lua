@@ -36,6 +36,15 @@ Obstaclespec{
 	harvest_effect = "harvest1",
 	harvest_materials = { mushroom = 1 }}
 
+Obstaclespec{
+	name = "dewspring",
+	model = "dewspring1",
+	categories = {"small-plant", "reagent"},
+	health = 10,
+	harvest_behavior = "destroy",
+	harvest_effect = "harvest1",
+	harvest_materials = {["dewspring leaf"] = 1}}
+
 ------------------------------------------------------------------------------
 -- Portals
 
