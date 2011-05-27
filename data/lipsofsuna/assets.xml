@@ -818,6 +818,32 @@
   </asset>
 
   <asset>
+    <file>import/dagger1.blend</file>
+    <author>Clint Bellanger</author>
+    <author>p0ss</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.opengameart.org/content/undead-weapon-set-and-weapon-rack</source>
+    <dep>import/dagger1.png</dep>
+    <dep>import/dagger1n.png</dep>
+  </asset>
+
+  <asset>
+    <file>import/dagger1.png</file>
+    <author>Clint Bellanger</author>
+    <author>p0ss</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.opengameart.org/content/undead-weapon-set-and-weapon-rack</source>
+  </asset>
+
+  <asset>
+    <file>import/dagger1n.png</file>
+    <author>Clint Bellanger</author>
+    <author>p0ss</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.opengameart.org/content/undead-weapon-set-and-weapon-rack</source>
+  </asset>
+
+  <asset>
     <file>import/devora1.blend</file>
     <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>
@@ -2159,6 +2185,21 @@
   </asset>
 
   <asset>
+    <file>import/sword6.blend</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://www.opengameart.org/content/seraphim-sword</source>
+    <dep>import/sword6.png</dep>
+  </asset>
+
+  <asset>
+    <file>import/sword6.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://www.opengameart.org/content/seraphim-sword</source>
+  </asset>
+
+  <asset>
     <file>import/sword5.png</file>
     <author>adrix89</author>
     <license>Creative Commons BY-SA 3.0</license>
@@ -2436,6 +2477,32 @@
     <tag>prop</tag>
     <tag>wood</tag>
     <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/woodweapons1.blend</file>
+    <author>Clint Bellanger</author>
+    <author>p0ss</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.opengameart.org/content/wooden-weapon-training-set</source>
+    <dep>import/weaponwood.png</dep>
+    <dep>import/weaponwoodn.png</dep>
+  </asset>
+
+  <asset>
+    <file>import/weaponwood.png</file>
+    <author>Clint Bellanger</author>
+    <author>p0ss</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.opengameart.org/content/wooden-weapon-training-set</source>
+  </asset>
+
+  <asset>
+    <file>import/weaponwoodn.png</file>
+    <author>Clint Bellanger</author>
+    <author>p0ss</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.opengameart.org/content/wooden-weapon-training-set</source>
   </asset>
 
   <asset>

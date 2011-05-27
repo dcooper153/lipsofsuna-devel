@@ -34,10 +34,11 @@ Itemspec{
 
 Itemspec{
 	name = "adamantium dagger",
-	model = "sword1", -- FIXME
+	model = "dagger1", -- FIXME
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
+	effect_attack_speedline = true,
 	influences_base = {physical = -10},
 	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",
@@ -107,7 +108,7 @@ Itemspec{
 
 Itemspec{
 	name = "adamantium sword",
-	model = "sword1",
+	model = "sword6",
 	icon = "sword3",
 	animation_attack = "attack sword",
 	animation_charge = "charge sword",
@@ -140,11 +141,12 @@ Itemspec{
 
 Itemspec{
 	name = "aquanite dagger",
-	model = "sword1", -- FIXME
+	model = "dagger1", -- FIXME
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["aquanite stone"] = 3},
 	damage_mining = 1,
+	effect_attack_speedline = true,
 	effect_craft = "craftmetal1",
 	influences_base = {cold = -4, physical = -4},
 	influences_bonus = {dexterity = 0.01},
@@ -296,11 +298,12 @@ Itemspec{
 
 Itemspec{
 	name = "crimson dagger",
-	model = "sword1", -- FIXME
+	model = "dagger1", -- FIXME
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["crimson stone"] = 3},
 	damage_mining = 1,
+	effect_attack_speedline = true,
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	health = 500,
@@ -398,7 +401,7 @@ Itemspec{
 
 Itemspec{
 	name = "crimson sword",
-	model = "sword1",
+	model = "sword5",
 	icon = "sword2",
 	animation_attack = "attack sword",
 	animation_charge = "charge sword",
@@ -434,11 +437,12 @@ Itemspec{
 
 Itemspec{
 	name = "iron dagger",
-	model = "sword1", -- FIXME
+	model = "dagger1", -- FIXME
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["iron ingot"] = 1},
 	damage_mining = 1,
+	effect_attack_speedline = true,
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	health = 220,
@@ -534,11 +538,12 @@ Itemspec{
 
 Itemspec{
 	name = "stone dagger",
-	model = "sword1", -- FIXME
+	model = "dagger1", -- FIXME
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["granite stone"] = 2},
 	damage_mining = 1,
+	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
 	influences_base = {physical = -3},
 	influences_bonus = {dexterity = 0.005},
@@ -596,7 +601,7 @@ Itemspec{
 
 Itemspec{
 	name = "stone's sword",
-	model = "sword1",
+	model = "sword5",
 	icon = "sword1",
 	animation_attack = "attack sword",
 	animation_charge = "charge sword",
@@ -685,11 +690,12 @@ Itemspec{
 
 Itemspec{
 	name = "wooden dagger",
-	model = "sword1", -- FIXME
+	model = "woodshortsword", -- FIXME
 	icon = "dagger1",
 	categories = {"melee", "weapon"},
 	crafting_materials = {["log"] = 2},
 	damage_mining = 1,
+	effect_attack_speedline = true,
 	effect_craft = "craftwood1",
 	equipment_slot = "hand.R",
 	health = 100,
@@ -700,7 +706,7 @@ Itemspec{
 
 Itemspec{
 	name = "wooden hatchet",
-	model = "axe1",
+	model = "woodhatchet",
 	icon = "axe1",
 	animation_attack = "attack axe",
 	animation_charge = "charge axe",
@@ -708,6 +714,7 @@ Itemspec{
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["log"] = 3},
 	damage_mining = 1,
+	effect_attack_speedline = true,
 	effect_craft = "craftwood1",
 	equipment_slot = "hand.R",
 	health = 100,
@@ -736,7 +743,7 @@ Itemspec{
 
 Itemspec{
 	name = "wooden sword",
-	model = "sword1",
+	model = "woodsword",
 	icon = "sword1",
 	animation_attack = "attack sword",
 	animation_charge = "charge sword",
