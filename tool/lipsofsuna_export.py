@@ -11,7 +11,7 @@ bl_info = {
 	"tracker_url": "http://sourceforge.net/apps/trac/lipsofsuna/wiki",
 	"category": "Import-Export"}
 
-import array, math, os, struct, sys, bpy, mathutils
+import array, math, os, re, struct, sys, bpy, mathutils
 
 class LIEnum:
 	def __init__(self):
@@ -755,8 +755,10 @@ class LINode:
 		self.object = object
 		self.parent = parent
 		self.hierarchy = self.parent.hierarchy
-		self.name = '#' + object.name
 		self.loc,self.rot = self.get_rest_transform()
+		# Remove the number part so that it's possible to have multiple
+		# objects that have anchors with the same names.
+		self.name = '#' + re.sub("\\.[0-9]*", "", object.name)
 
 	def add_object(self, object):
 		if object_check_export(object, self.hierarchy.file, 'NODE'):
