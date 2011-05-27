@@ -69,12 +69,16 @@ static void Database_new (LIScrArgs* args)
 	/* Format path. */
 	path = lipth_paths_get_sql (module->program->paths, name);
 	if (path == NULL)
+	{
+		lisys_error_report ();
 		return;
+	}
 
 	/* Open database. */
 	if (sqlite3_open_v2 (path, &sql, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL) != SQLITE_OK)
 	{
 		lisys_error_set (EINVAL, "sqlite: %s", sqlite3_errmsg (sql));
+		lisys_error_report ();
 		lisys_free (path);
 		lisys_free (sql);
 		return;

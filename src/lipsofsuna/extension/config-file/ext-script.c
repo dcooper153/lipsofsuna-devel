@@ -49,6 +49,7 @@ static LIExtConfigFile* private_new_config (
 	self->path = lipth_paths_get_sql (module->program->paths, name);
 	if (self->path == NULL)
 	{
+		lisys_error_report ();
 		lisys_free (self);
 		return NULL;
 	}
