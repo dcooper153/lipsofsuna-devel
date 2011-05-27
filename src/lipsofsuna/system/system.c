@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -73,10 +73,16 @@ time_t lisys_time (
 char* lisys_system_get_path_home ()
 {
 #ifdef __WIN32__
+	int i;
 	char tmp[MAX_PATH];
 
 	if (!SHGetSpecialFolderPath (NULL, tmp, CSIDL_PROFILE, TRUE))
 		return NULL;
+	for (i = 0 ; tmp[i] != '\0' ; i++)
+	{
+		if (tmp[i] == '\\')
+			tmp[i] = '/';
+	}
 	return strdup (tmp);
 #else
 	char* home;
@@ -99,10 +105,16 @@ char* lisys_system_get_path_home ()
 char* lisys_system_get_path_data_home ()
 {
 #ifdef __WIN32__
+	int i;
 	char tmp[MAX_PATH];
 
 	if (!SHGetSpecialFolderPath (NULL, tmp, CSIDL_PERSONAL, TRUE))
 		return NULL;
+	for (i = 0 ; tmp[i] != '\0' ; i++)
+	{
+		if (tmp[i] == '\\')
+			tmp[i] = '/';
+	}
 	return lisys_path_concat (tmp, "My Games", NULL);
 #else
 	char* ret;
