@@ -28,7 +28,7 @@
 /**
  * \brief Reads the light node from a stream.
  * \param self Light.
- * \param writer Stream reader.
+ * \param reader Stream reader.
  * \return Nonzero on success.
  */
 int limdl_light_read (

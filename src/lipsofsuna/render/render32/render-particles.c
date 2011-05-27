@@ -315,3 +315,6 @@ static int private_evaluate_frame (
 
 	return frame;
 }
+
+/** @} */
+/** @} */

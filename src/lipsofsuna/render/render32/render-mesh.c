@@ -152,6 +152,8 @@ void liren_mesh32_deform (
 /**
  * \brief Locks the deformed vertex array for reading.
  * \param self Mesh.
+ * \param start Start vertex.
+ * \param count Count of locked vertices.
  * \return Pointer to the locked array, or NULL.
  */
 void* liren_mesh32_lock_vertices (
@@ -184,6 +186,7 @@ void* liren_mesh32_lock_vertices (
  * reloads the mesh that was lost when the context was erased.
  *
  * \param self Mesh.
+ * \param pass Reload pass.
  */
 void liren_mesh32_reload (
 	LIRenMesh32* self,

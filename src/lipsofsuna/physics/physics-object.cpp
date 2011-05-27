@@ -187,7 +187,6 @@ int liphy_object_cast_ray (
 	LIPhyObject*       self,
 	const LIMatVector* relsrc,
 	const LIMatVector* reldst,
-	float              radius,
 	LIPhyCollision*    result)
 {
 	LIMatTransform transform;
@@ -434,7 +433,7 @@ void liphy_object_set_collision_mask (
 /**
  * \brief Gets the contact event generation status of the object.
  * \param self Object.
- * \param value Contact callback.
+ * \return Nonzero if enabled, zero if disabled.
  */
 int liphy_object_get_contact_events (
 	LIPhyObject* self)

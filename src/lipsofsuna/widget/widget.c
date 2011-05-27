@@ -994,7 +994,6 @@ void liwdg_widget_set_margins (
  * style paddings of the widget.
  *
  * \param self Widget.
- * \param level Request level.
  * \param request Return location for the size.
  */
 void liwdg_widget_get_request (

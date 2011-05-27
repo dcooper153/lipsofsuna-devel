@@ -149,6 +149,7 @@ int liphy_terrain_cast_sphere (
 /**
  * \brief Realizes or unrealizes the terrain.
  * \param self Terrain.
+ * \param value Nonzero to realize, zero to unrealize.
  */
 void liphy_terrain_set_realized (
 	LIPhyTerrain* self,

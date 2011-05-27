@@ -119,6 +119,7 @@ void liren_shader_clear_pass (
  * \param geometry Geometry shader code or NULL.
  * \param fragment Fragment shader code.
  * \param feedback Nonzero to enable transform feedback.
+ * \param alpha_to_coverage Nonzero to enable alpha to coverage.
  * \param blend_enable Nonzero to enable blending.
  * \param blend_src Source blend function.
  * \param blend_dst Destination blend function.

@@ -159,7 +159,7 @@ int limdl_builder_insert_facegroup (
 /**
  * \brief Inserts indices to the model.
  * \param self Model builder.
- * \param group Face group index.
+ * \param groupidx Face group index.
  * \param indices Array of indices.
  * \param count Number of indices.
  * \return Nonzero on success.
@@ -243,7 +243,7 @@ int limdl_builder_insert_node (
 /**
  * \brief Inserts vertices to the model.
  * \param self Model builder.
- * \param vertex Array of vertex.
+ * \param vertices Array of vertex.
  * \param count Number of vertices.
  * \param bone_mapping Bone index mapping array or NULL.
  * \return Nonzero on success.
@@ -348,3 +348,6 @@ static int private_realloc_array (
 
 	return 1;
 }
+
+/** @} */
+/** @} */

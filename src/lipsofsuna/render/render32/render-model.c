@@ -171,7 +171,7 @@ int liren_model32_deform (
  * reloads the model data that was lost when the context was erased.
  *
  * \param self Model.
- * \param passes Reload pass.
+ * \param pass Reload pass.
  */
 void liren_model32_reload (
 	LIRenModel32* self,

@@ -31,8 +31,8 @@
 
 /**
  * \brief Creates a new server instance.
- *
- * \param paths Path information.
+ * \param path Data directory root.
+ * \param name Mod name.
  * \param args Arguments passed to the program.
  * \return New server or NULL.
  */

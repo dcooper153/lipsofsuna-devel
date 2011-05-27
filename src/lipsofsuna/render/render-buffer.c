@@ -27,6 +27,7 @@
 
 /**
  * \brief Allocates a vertex buffer.
+ * \param render Renderer.
  * \param index_data Pointer to an array of 32-bit unsigned indices, or NULL.
  * \param index_count Number of indices to allocate.
  * \param vertex_format Vertex format.

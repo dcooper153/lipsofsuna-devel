@@ -108,7 +108,6 @@ void liai_sector_build (
 /**
  * \brief Rebuilds the waypoints for the given area.
  * \param self Sector.
- * \param border_sector AI sector whose border waypoints to update.
  * \param voxels Voxel sector or NULL.
  * \param x Start waypoint.
  * \param y Start waypoint.

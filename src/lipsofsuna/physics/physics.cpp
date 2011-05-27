@@ -148,8 +148,11 @@ void liphy_physics_free (
  * \param self Physics simulation.
  * \param start Ray start point.
  * \param end Ray end point.
- * \param result Return location for collision point or NULL.
- * \param normal Return location for collision surface normal or NULL.
+ * \param group Collision group.
+ * \param mask Collision mask.
+ * \param ignore_array Array of ignored objects.
+ * \param ignore_count Number of ignored objects.
+ * \param result Return location for collision data or NULL.
  * \return Nonzero if a collision occurred.
  */
 int liphy_physics_cast_ray (

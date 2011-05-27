@@ -361,7 +361,7 @@ void liren_light_get_transform (
 /**
  * \brief Sets the transformation of the light.
  * \param self Light source.
- * \param transform Transformation.
+ * \param value Transformation.
  */
 void liren_light_set_transform (
 	LIRenLight*           self,
