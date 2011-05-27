@@ -22,7 +22,6 @@
  * @{
  */
 
-#include "ext-module.h"
 #include "ext-reload.h"
 
 static void Reload_get_enabled (LIScrArgs* args)

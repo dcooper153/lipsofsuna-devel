@@ -5,8 +5,8 @@ end
 Reload = Class()
 Reload.class_name = "Reload"
 
-Reload:add_getters{
+Reload.class_getters = {
 	enabled = function(s) return Los.reload_get_enabled() end}
 
-Reload:add_setters{
+Reload.class_setters = {
 	enabled = function(s, v) Los.reload_set_enabled(v) end}

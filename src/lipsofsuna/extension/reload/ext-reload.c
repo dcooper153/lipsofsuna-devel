@@ -22,8 +22,6 @@
  * @{
  */
 
-#include <sys/stat.h>
-#include "ext-module.h"
 #include "ext-reload.h"
 
 static int private_callback_tick (
@@ -40,6 +38,13 @@ static void private_reload_model (
 
 /*****************************************************************************/
 
+LIMaiExtensionInfo liext_reload_info =
+{
+	LIMAI_EXTENSION_VERSION, "Reload",
+	liext_reload_new,
+	liext_reload_free
+};
+
 LIExtReload* liext_reload_new (
 	LIMaiProgram* program)
 {
@@ -50,17 +55,8 @@ LIExtReload* liext_reload_new (
 	if (self == NULL)
 		return NULL;
 	self->program = program;
+	self->paths = program->paths;
 	self->client = limai_program_find_component (program, "client");
-
-	/* Allocate reloader. */
-	self->reload = lirel_reload_new (program->paths);
-	if (self->reload == NULL)
-	{
-		liext_reload_free (self);
-		return NULL;
-	}
-	lirel_reload_set_image_callback (self->reload, private_reload_image, self);
-	lirel_reload_set_model_callback (self->reload, private_reload_model, self);
 
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (program->callbacks, "tick", 0, private_callback_tick, self, self->calls + 0))
@@ -79,35 +75,95 @@ LIExtReload* liext_reload_new (
 void liext_reload_free (
 	LIExtReload* self)
 {
-	if (self->reload != NULL)
-		lirel_reload_free (self->reload);
+	liext_reload_set_enabled (self, 0);
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
 /**
  * \brief Updates the status of the reloader.
- *
  * \param self Reload.
  */
 void liext_reload_update (
 	LIExtReload* self)
 {
-	/* Update reloader state. */
-	lirel_reload_update (self->reload);
+	char* name;
+	LISysNotifyEvent* event;
+
+	/* Check for monitor events. */
+	if (self->notify == NULL)
+		return;
+	event = lisys_notify_poll (self->notify);
+	if (event == NULL)
+		return;
+	if (!(event->flags & LISYS_NOTIFY_CLOSEW))
+		return;
+
+	/* Reload changed models. */
+	if (lisys_path_check_ext (event->name, "lmdl"))
+	{
+		name = lisys_path_format (LISYS_PATH_BASENAME, event->name, LISYS_PATH_STRIPEXTS, NULL);
+		if (name != NULL)
+		{
+			private_reload_model (self, name);
+			lisys_free (name);
+		}
+	}
+
+	/* Reload changed DDS textures. */
+	if (lisys_path_check_ext (event->name, "dds"))
+	{
+		name = lisys_path_format (LISYS_PATH_BASENAME,
+			event->name, LISYS_PATH_STRIPEXTS, NULL);
+		if (name != NULL)
+		{
+			private_reload_image (self, name);
+			lisys_free (name);
+		}
+	}
 }
 
 int liext_reload_get_enabled (
 	const LIExtReload* self)
 {
-	return lirel_reload_get_enabled (self->reload);
+	return (self->notify != NULL);
 }
 
 int liext_reload_set_enabled (
 	LIExtReload* self,
 	int          value)
 {
-	return lirel_reload_set_enabled (self->reload, value);
+	char* dstdir;
+
+	if ((value != 0) == (self->notify != NULL))
+		return 1;
+	if (value)
+	{
+		self->notify = lisys_notify_new ();
+		if (self->notify == NULL)
+			return 0;
+		dstdir = lisys_path_concat (self->paths->module_data, "graphics", NULL);
+		if (dstdir == NULL)
+		{
+			lisys_notify_free (self->notify);
+			self->notify = NULL;
+			return 0;
+		}
+		if (!lisys_notify_add (self->notify, dstdir, LISYS_NOTIFY_CLOSEW))
+		{
+			lisys_notify_free (self->notify);
+			self->notify = NULL;
+			lisys_free (dstdir);
+		}
+		lisys_free (dstdir);
+	}
+	else
+	{
+		lisys_notify_free (self->notify);
+		self->notify = NULL;
+	}
+
+	return 1;
 }
 
 /*****************************************************************************/
