@@ -168,9 +168,6 @@ Player.vision_cb = function(self, args)
 			funs["voxel-block-changed"]({index = k, stamp = v})
 		end
 	end
-	local sendself = function()
-		self:send{packet = Packet(packets.OBJECT_SELF, "uint32", self.id)}
-	end
 	funs =
 	{
 		["object-animated"] = function(args)
@@ -213,16 +210,117 @@ Player.vision_cb = function(self, args)
 		end,
 		["object-shown"] = function(args)
 			local o = args.object
-			-- Append basic data.
-			local tilt = (o.tilt and o.tilt.euler[3]) or 0
-			local p = Packet(packets.OBJECT_SHOWN, "uint32", o.id, "uint8", o.flags or 0,
-				"string", o.spec.type, "string", o.spec.name or "",
-				"string", o.model_name, "string", o.name or "",
-				"float", o.position.x, "float", o.position.y, "float", o.position.z, "float", tilt,
-				"float", o.rotation.x, "float", o.rotation.y, "float", o.rotation.z, "float", o.rotation.w)
-			-- Append optional customizations.
-			if o.spec.type == "species" and o.spec.models then
-				p:write("bool", o.dead or false,
+			local flags = 0
+			-- Spec.
+			local data_spec = {}
+			if o.spec.name then
+				data_spec = {
+					"string", o.spec.type,
+					"string", o.spec.name}
+				flags = flags + Protocol.object_show_flags.SPEC
+			else
+				data_spec = {
+					"string", o.model_name or ""}
+			end
+			-- Species.
+			local data_species = {}
+			if o.spec.type == "species" then
+				data_species = {
+					"bool", o.dead or false,
+					"float", (o.tilt and o.tilt.euler[3]) or 0}
+				flags = flags + Protocol.object_show_flags.SPECIES
+			end
+			-- Position.
+			local data_pos = {}
+			if o.position.x > 1 and o.position.y > 1 and o.position.z > 1 then
+				data_pos = {
+					"float", o.position.x,
+					"float", o.position.y,
+					"float", o.position.z}
+				flags = flags + Protocol.object_show_flags.POSITION
+			end
+			-- Rotation.
+			local data_rot = {}
+			if math.abs(o.rotation.w) < 0.99 then
+				data_rot = {
+					"float", o.rotation.x,
+					"float", o.rotation.y,
+					"float", o.rotation.z,
+					"float", o.rotation.w}
+				flags = flags + Protocol.object_show_flags.ROTATION
+			end
+			-- Name.
+			local data_name = {}
+			if o.name then
+				data_name = {
+					"string", o.name}
+				flags = flags + Protocol.object_show_flags.NAME
+			end
+			-- Animations.
+			local data_anims = {}
+			if o.animations then
+				local num = 0
+				for k,v in pairs(o.animations) do
+					if v[1] then
+						table.insert(data_anims, "string")
+						table.insert(data_anims, v[1])
+						table.insert(data_anims, "float")
+						table.insert(data_anims, Program.time - v[2])
+						num = num + 1
+					end
+				end
+				if num > 0 then
+					table.insert(data_anims, 1, "uint8")
+					table.insert(data_anims, 2, num)
+					flags = flags + Protocol.object_show_flags.ANIMS
+				end
+			end
+			-- Slots.
+			local data_slots = {}
+			if o.inventory then
+				local num = 0
+				for slot,item in pairs(o.inventory.slots) do
+					if item and type(slot) == "string" then
+						table.insert(data_slots, "uint32")
+						table.insert(data_slots, item.count or 1)
+						table.insert(data_slots, "string")
+						table.insert(data_slots, item.spec.name)
+						table.insert(data_slots, "string")
+						table.insert(data_slots, slot)
+						num = num + 1
+					end
+				end
+				if num > 0 then
+					table.insert(data_slots, 1, "uint8")
+					table.insert(data_slots, 2, num)
+					flags = flags + Protocol.object_show_flags.SLOTS
+				end
+			end
+			-- Skills.
+			local data_skills = {}
+			if o.skills then
+				local num = 0
+				for name,skill in pairs(o.skills.skills) do
+					if skill.prot == "public" or self == o then
+						table.insert(data_skills, "string")
+						table.insert(data_skills, name)
+						table.insert(data_skills, "int32")
+						table.insert(data_skills, math.ceil(skill.value))
+						table.insert(data_skills, "int32")
+						table.insert(data_skills, math.ceil(skill.maximum))
+						num = num + 1
+					end
+				end
+				if num > 0 then
+					table.insert(data_skills, 1, "uint8")
+					table.insert(data_skills, 2, num)
+					flags = flags + Protocol.object_show_flags.SKILLS
+				end
+			end
+			-- Appearance.
+			local data_appear = {}
+			if o.body_scale then
+				data_appear = {
 					"float", o.body_scale or 1,
 					"float", o.nose_scale or 1,
 					"float", o.bust_scale or 1,
@@ -242,23 +340,30 @@ Player.vision_cb = function(self, args)
 					"string", o.skin_style and o.skin_style[1] or "",
 					"uint8", o.skin_style and o.skin_style[2] or 255,
 					"uint8", o.skin_style and o.skin_style[3] or 255,
-					"uint8", o.skin_style and o.skin_style[4] or 255)
+					"uint8", o.skin_style and o.skin_style[4] or 255}
+				flags = flags + Protocol.object_show_flags.APPEARANCE
+			end
+			-- Self.
+			if o == self then
+				flags = flags + Protocol.object_show_flags.SELF
 			end
 			-- Send to the player.
-			self:send{packet = p}
-			if o == self then sendself() end
-			sendinfo(o)
-			sendmap()
+			local p = Packet(packets.OBJECT_SHOWN, "uint32", o.id, "uint32", (o.flags or 0) + flags)
+			p:write(data_spec)
+			p:write(data_species)
+			p:write(data_pos)
+			p:write(data_rot)
+			p:write(data_name)
+			p:write(data_anims)
+			p:write(data_slots)
+			p:write(data_skills)
+			p:write(data_appear)
+			self:send(p)
+			if o == self then sendmap() end
 		end,
 		["object-speech"] = function(args)
 			local o = args.object
 			self:send{packet = Packet(packets.OBJECT_SPEECH, "uint32", o.id, "string", args.message)}
-		end,
-		["particle-ray"] = function(args)
-			self:send{packet = Packet(packets.PARTICLE_RAY,
-				"float", args.src.x, "float", args.src.y, "float", args.src.z,
-				"float", args.dst.x, "float", args.dst.y, "float", args.dst.z,
-				"float", args.life)}
 		end,
 		["player-tick"] = function(args)
 			sendmap()

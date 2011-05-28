@@ -40,72 +40,77 @@ do
 		index = index + 1
 	end
 	add("ADMIN_DELETE")
-	add("ADMIN_DUPLICATE")
 	add("ADMIN_SAVE")
 	add("ADMIN_SHUTDOWN")
 	add("ADMIN_SPAWN")
-	add("APPLY")
+	add("ADMIN_PRIVILEGE")
+	add("ADMIN_STATS")
+	add("EDIT_TILE") -- FIXME: ADMIN_TILE
+
+	add("AUTHENTICATE_REJECT")
+
 	add("BOOK")
 	add("CHARACTER_ACCEPT")
 	add("CHARACTER_CREATE")
-	add("CHAT")
 	add("CLIENT_AUTHENTICATE")
+
 	add("CRAFTING")
-	add("CROUCH")
+
 	add("DIALOG_ANSWER")
 	add("DIALOG_CHOICE")
 	add("DIALOG_CLOSE")
 	add("DIALOG_LINE")
+
 	add("EFFECT")
-	add("EDIT_OBJECT_CREATE")
-	add("EDIT_REGION_ENABLE")
-	add("EDIT_REGION_DELETE")
-	add("EDIT_REGION_DISABLE")
-	add("EDIT_REGION_SAVE")
-	add("EDIT_TILE")
-	add("EXAMINE")
+	add("WORLD_EFFECT") -- FIXME: EFFECT_WORLD
+
 	add("FEAT")
 	add("FEAT_UNLOCK")
+
 	add("GENERATOR_STATUS")
+
 	add("INVENTORY_CREATED")
 	add("INVENTORY_CLOSED")
 	add("INVENTORY_ITEM_ADDED")
 	add("INVENTORY_ITEM_REMOVED")
-	add("JUMP")
+
 	add("MESSAGE")
+
 	add("MODIFIER_ADD")
 	add("MODIFIER_REMOVE")
-	add("MOVE_ITEM")
+
+	add("MOVE_ITEM") -- FIXME: Ugly
+
 	add("OBJECT_ANIMATED")
+	add("OBJECT_BEHEADED")
 	add("OBJECT_DEAD")
 	add("OBJECT_EFFECT")
 	add("OBJECT_FEAT")
 	add("OBJECT_HIDDEN")
 	add("OBJECT_MOVED")
-	add("OBJECT_SELF")
 	add("OBJECT_SHOWN")
 	add("OBJECT_SKILL")
 	add("OBJECT_SLOT")
 	add("OBJECT_SPEECH")
-	add("PARTICLE_RAY")
-	add("PLAYER_BLOCK")
-	add("PLAYER_MOVE")
-	add("PLAYER_TURN")
-	add("PLAYER_WEIGHT")
+
 	add("QUEST_MARKER")
 	add("QUEST_STATUS")
-	add("RUN")
-	add("SHOOT")
-	add("SKILLS")
-	add("STRAFE")
-	add("TARGET")
-	add("USE")
-	add("VOXEL_DIFF")
-	add("WORLD_EFFECT")
-	add("ADMIN_PRIVILEGE")
-	add("AUTHENTICATE_REJECT")
-	add("ADMIN_STATS")
-	add("OBJECT_BEHEADED")
+
+	add("PLAYER_BLOCK")
+	add("CHAT") -- FIXME: PLAYER_CHAT
+	add("PLAYER_CLIMB")
+	add("EXAMINE") -- FIXME: PLAYER_EXAMINE
+	add("JUMP") -- FIXME: PLAYER_JUMP
+	add("PLAYER_MOVE")
+	add("PLAYER_RESPAWN")
+	add("RUN") -- FIXME: PLAYER_RUN
+	add("SHOOT") -- FIXME: PLAYER_SHOOT
+	add("SKILLS") -- FIXME: PLAYER_SKILLS
+	add("STRAFE") -- FIXME: PLAYER_STRAFE
+	add("PLAYER_TURN")
+	add("USE") -- FIXME: PLAYER_TARGET
+	add("PLAYER_WEIGHT")
+
 	add("TRADING_ACCEPT")
 	add("TRADING_ADD_BUY")
 	add("TRADING_ADD_SELL")
@@ -113,13 +118,25 @@ do
 	add("TRADING_REMOVE_BUY")
 	add("TRADING_REMOVE_SELL")
 	add("TRADING_START")
-	add("PLAYER_CLIMB")
-	add("PLAYER_RESPAWN")
+
+	add("VOXEL_DIFF")
 end
 
 Protocol.object_flags = {
 	SPEEDLINE = 0x1,
 	BEHEADED = 0x2}
+
+Protocol.object_show_flags = {
+	ANIMS = 0x000100,
+	APPEARANCE = 0x000200,
+	NAME = 0x000400,
+	POSITION = 0x000800,
+	ROTATION = 0x001000,
+	SELF = 0x002000,
+	SKILLS = 0x004000,
+	SLOTS = 0x008000,
+	SPEC = 0x010000,
+	SPECIES = 0x020000}
 
 effects = {}
 do

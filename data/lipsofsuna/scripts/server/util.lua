@@ -135,7 +135,7 @@ end
 Utils.explosion = function(clss, point, radius)
 	local r1 = radius or 1
 	local r2 = (r1 + 3) * Voxel.tile_size
-	Particles:create(point, "explosion1")
+	Effect:play{effect = "explosion1", point = point}
 	-- Damage nearby tiles.
 	local _,ctr = Voxel:find_tile{point = point}
 	for x=-r1,r1 do

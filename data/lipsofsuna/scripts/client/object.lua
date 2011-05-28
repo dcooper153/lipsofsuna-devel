@@ -136,10 +136,104 @@ Object.create_character_model = function(self, args)
 	self:deform_mesh()
 end
 
+Object.set_anim = function(self, name, time)
+	local args = {animation = name, fade_in = 0.3, fade_out = 0.3, time = t}
+	local anim = self.spec and self.spec.animations[name]
+	if anim then
+		for k,v in pairs(anim) do args[k] = v end
+	end
+	self:animate(args)
+end
+
+Object.set_skill = function(self, s, v, m)
+	-- Update player skills.
+	if self == Player.object then
+		Gui.skills:update(s, v, m)
+	end
+	-- Display health changes.
+	if s == "health" then
+		if self.health then
+			-- Show a health change text.
+			local diff = v - self.health
+			if math.abs(diff) > 2 then
+				local code = (diff > 0 and 0x01 or 0x00) + (self == Player.object and 0x10 or 0x00)
+				local colors = {
+					[0x00] = {1,1,0,1},
+					[0x01] = {0,1,1,1},
+					[0x10] = {1,0,0,1},
+					[0x11] = {0,1,0,1}}
+				EffectObject{
+					life = 3,
+					object = self,
+					position = Vector(0,2,0),
+					realized = true,
+					text = tostring(diff),
+					text_color = colors[code],
+					text_fade_time = 1,
+					text_font = "medium",
+					velocity = Vector(0,0.5,0)}
+			end
+			-- Quake the camera if the player was hurt.
+			if self == Player.object and diff < -5 then
+				Player:apply_quake(self.position, 0.01 * (5 - diff))
+			end
+		end
+		self.health = v
+		-- Set the correct collision shape.
+		-- Dead creatures have a different collision shape. We switch between
+		-- the two when the health changes between zero and non-zero.
+		if self.health == 0 and self.animated then
+			self.shape = "dead"
+		else
+			self.shape = "default"
+		end
+	end
+end
+
+Object.set_slot = function(self, slot, spec, count)
+	if not self.slots then self.slots = Slots() end
+	local slots = self.slots
+	spec = Itemspec:find{name = spec}
+	-- Update the model.
+	if not spec then
+		-- Missing spec.
+		slots:set_object{slot = slot}
+		if self.equipment and self.equipment[slot] then
+			self.equipment[slot] = nil
+			if self.realized then self:update_model() end
+		end
+	elseif spec.equipment_models then
+		-- Replacer equipment.
+		slots:set_object{slot = slot}
+		self.equipment = self.equipment or {}
+		self.equipment[slot] = spec.name
+		if self.realized then self:update_model() end
+	else
+		-- Add-on equipment.
+		slots:set_object{slot = slot, model = spec.model, spec = spec}
+		self.equipment = self.equipment or {}
+		self.equipment[slot] = spec.name
+		if self.realized then self:update_model() end
+	end
+	-- Equip animations.
+	local a
+	if spec then
+		a = self:animate_spec(spec.animation_hold)
+	end
+	if self.equipment_animations then
+		if not a and self.equipment_animations[slot] then
+			self:animate{channel = self.equipment_animations[slot].channel}
+		end
+		self.equipment_animations[slot] = a
+	else
+		self.equipment_animations = {[slot] = a}
+	end
+end
+
 Object.update = function(self, secs)
 	-- Update slots.
 	if self.slots then
-		local species = Species:find{name = self.race}
+		local species = self.spec
 		for name,object in pairs(self.slots.slots) do
 			local slot = species and species.equipment_slots[name]
 			if slot and slot.node and self.realized then
@@ -192,7 +286,7 @@ Object.update_model = function(self)
 			hair_color = self.hair_color,
 			hair_style = self.hair_style,
 			nose_scale = self.nose_scale,
-			race = self.race,
+			race = self.spec.name,
 			skin_color = self.skin_color,
 			skin_style = self.skin_style}
 	end

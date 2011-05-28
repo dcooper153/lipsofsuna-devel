@@ -144,6 +144,8 @@ Player.pick_look = function(clss)
 	if o and o.spec and o.spec.interactive then
 		if o.name and o.name ~= "" then
 			Gui:set_target_text("Interact with " .. o.name)
+		elseif o.spec.name then
+			Gui:set_target_text("Interact with " .. o.spec.name)
 		else
 			Gui:set_target_text("Interact")
 		end
@@ -203,7 +205,7 @@ Player.rotation_prev = Quaternion()
 Player.rotation_sync_timer = 0
 Player.update_rotation = function(clss, secs)
 	if clss.object.dead then return end
-	local spec = Species:find{name = Player.object.race}
+	local spec = Player.object.spec
 	-- Update turning.
 	clss.turn_state = clss.turn_state + clss.turn * secs
 	clss.turn_state = radian_wrap(clss.turn_state)
