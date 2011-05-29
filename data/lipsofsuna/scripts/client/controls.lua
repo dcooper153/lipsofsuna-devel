@@ -118,7 +118,7 @@ Action{name = "quickslot_12", mode = "press", key1 = Keysym.F12, func = function
 end}
 
 Action{name = "run", mode = "toggle", key1 = Keysym.LSHIFT, func = function(v)
-	Network:send{packet = Packet(packets.RUN, "bool", v)}
+	Network:send{packet = Packet(packets.RUN, "bool", not v)}
 end}
 
 Action{name = "screenshot", mode = "press", key1 = Keysym.PRINT, func = function()

@@ -33,6 +33,7 @@ end
 Player.new = function(clss, args)
 	local self = Creature.new(clss, args)
 	self.account = args.account
+	self.running = true
 	if args.client then self:set_client(args.client) end
 	return self
 end
