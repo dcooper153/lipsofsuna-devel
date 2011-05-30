@@ -50,5 +50,6 @@ Views.Skills.update = function(self, id, value, cap)
 			Gui.skill_mana.cap = cap
 			Gui.skill_mana.value = value
 		end
+		self.skills:update_points()
 	end
 end

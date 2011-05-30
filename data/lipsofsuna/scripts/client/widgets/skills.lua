@@ -30,9 +30,7 @@ Widgets.Skills.add = function(self, id, name, desc)
 	local skill = Widgets.SkillControl{
 		cap = 0, desc = desc, id = id, name = name,
 		index = index, max = 100, text = name, value = 0,
-		pressed = function(w)
-			local v = w:get_value_at(Client.cursor_pos)
-			if not v then return end
+		changed = function(w, v)
 			if self.species then v = math.min(v, self.species.skill_quota + w.value - self.total) end
 			w.cap = v
 			self:update_points()
@@ -81,8 +79,10 @@ Widgets.Skills.update_points = function(self, value)
 		local q = math.ceil(self.species.skill_quota)
 		if t < q then
 			self.quota_text.text = string.format(" Points assigned: %d/%d (%+d)", t, q, q - t)
+			for k,v in pairs(self.dict_id) do v.allowance = q - t end
 		else
 			self.quota_text.text = string.format(" Points assigned: %d/%d", t, q)
+			for k,v in pairs(self.dict_id) do v.allowance = 0 end
 		end
 	end
 end
