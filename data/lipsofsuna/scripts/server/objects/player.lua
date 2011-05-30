@@ -452,6 +452,7 @@ Eventhandler{type = "logout", func = function(self, event)
 		Serialize:save_account(account, object)
 		account.client = nil
 		Account.dict_client[event.client] = nil
+		Account.dict_name[account.login] = nil
 	end
 	-- Update lobby.
 	Lobby.players = Lobby.players - 1
