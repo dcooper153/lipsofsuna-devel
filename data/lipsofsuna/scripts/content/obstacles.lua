@@ -100,30 +100,36 @@ Obstaclespec{
 	name = "wooden fence",
 	model = "fence1",
 	categories = {"prop"},
+	destroy_items = {{"broken wooden fence",Vector(0,0,0)}},
+	health = 50,
 	interactive = false}
 
 Obstaclespec{
 	name = "wooden mine support (forked)",
 	model = "minesupport1",
 	categories = {"prop"},
+	health = 100,
 	interactive = false}
 
 Obstaclespec{
 	name = "wooden mine support (wall)",
 	model = "minesupport2",
 	categories = {"prop"},
+	health = 100,
 	interactive = false}
 
 Obstaclespec{
 	name = "wooden mine support (simple)",
 	model = "minesupport3",
 	categories = {"prop"},
+	health = 100,
 	interactive = false}
 
 Obstaclespec{
 	name = "wooden stairs",
 	model = "stairs1",
 	categories = {"prop"},
+	health = 50,
 	interactive = false}
 
 Obstaclespec{
@@ -132,5 +138,7 @@ Obstaclespec{
 	categories = {"prop"},
 	collision_mask = 0xFFFF,
 	constraints = {{"hinge",Vector(0,1.333,0)}},
+	destroy_items = {{"broken door",Vector(0,0,0)}},
+	health = 100,
 	interactive = false,
 	physics = "rigid"}

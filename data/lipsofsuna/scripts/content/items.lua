@@ -465,6 +465,18 @@ Itemspec{
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
 
+Itemspec{
+	name = "broken wooden fence",
+	model = "fence1",
+	icon = "chest1", -- FIXME
+	mass = 10,
+	categories = {"furniture"},
+	crafting_materials = {log = 7},
+	effect_craft = "craftwood1",
+	health = 50,
+	stacking = false,
+	water_gravity = Vector(0,6,0)}
+
 ------------------------------------------------------------------------------
 -- FIXME
 
