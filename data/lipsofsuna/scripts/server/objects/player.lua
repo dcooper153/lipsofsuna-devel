@@ -38,6 +38,40 @@ Player.new = function(clss, args)
 	return self
 end
 
+Player.attack_charge_start = function(self)
+	if self.cooldown then return end
+	local weapon = self:get_item{slot = "hand.R"}
+	if weapon and weapon.spec.animation_charge then
+		self:animate(weapon.spec.animation_charge, true)
+	else
+		self:animate("charge punch", true)
+	end
+	self.attack_charge = Program.time
+end
+
+Player.attack_charge_end = function(self, args)
+	-- Get the feat animation.
+	local anim = nil
+	local weapon = self:get_item{slot = "hand.R"}
+	if not weapon or weapon.spec.categories["melee"] then
+		anim = "right hand"
+	elseif weapon.spec.categories["ranged"] then
+		anim = "ranged"
+	elseif weapon.spec.categories["throwable"] then
+		anim = "throw"
+	elseif weapon.spec.categories["build"] then
+		anim = "build"
+	end
+	-- Initialize the feat.
+	local feat = Feat{animation = anim}
+	feat:add_best_effects{user = self}
+	-- Perform the feat.
+	if not feat:perform{stop = false, user = self} then
+		self:animate("charge cancel")
+	end
+	self.attack_charge = nil
+end
+
 Player.set_client = function(self, client)
 	self.client = client
 	self.vision = Vision{object = self, radius = 10, callback = function(args) self:vision_cb(args) end}

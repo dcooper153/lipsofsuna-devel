@@ -771,6 +771,11 @@ Creature.update_actions = function(self, secs)
 			self.cooldown = nil
 		end
 	end
+	-- Update auto-attack.
+	if self.auto_attack and not self.cooldown and not self.attack_charge then
+		self:attack_charge_start()
+		self:attack_charge_end()
+	end
 	-- Check for falling damage.
 	-- Don't update every frame.
 	self.fall_timer = (self.fall_timer or 0) + secs

@@ -309,45 +309,26 @@ Protocol:add_handler{type = "SKILLS", func = function(args)
 end}
 
 Protocol:add_handler{type = "SHOOT", func = function(args)
+	-- Find the player.
 	local player = Player:find{client = args.client}
 	if not player then return end
+	if player.dead then return end
+	-- Read the packet.
 	local ok,v = args.packet:read("bool")
 	if not ok then return end
-	if player.dead then return end
-	if v and player.attack_charge then return end
-	if not v and not player.attack_charge then return end
-	-- Get the feat animation.
-	local anim = nil
-	local weapon = player:get_item{slot = "hand.R"}
-	if not weapon or weapon.spec.categories["melee"] then
-		anim = "right hand"
-	elseif weapon.spec.categories["ranged"] then
-		anim = "ranged"
-	elseif weapon.spec.categories["throwable"] then
-		anim = "throw"
-	elseif weapon.spec.categories["build"] then
-		anim = "build"
+	-- Handle auto-attack.
+	if v then
+		player.auto_attack = true
+	else
+		player.auto_attack = nil
 	end
 	-- Handle attacks.
-	if anim then
-		if v then
-			-- Begin charge.
-			if player.cooldown then return end
-			if weapon and weapon.spec.animation_charge then
-				player:animate(weapon.spec.animation_charge, true)
-			else
-				player:animate("charge punch", true)
-			end
-			player.attack_charge = Program.time
-		else
-			-- Release charge.
-			local feat = Feat{animation = anim}
-			feat:add_best_effects{user = player}
-			if not feat:perform{stop = args.stop, user = player} then
-				player:animate("charge cancel")
-			end
-			player.attack_charge = nil
-		end
+	if v and player.attack_charge then return end
+	if not v and not player.attack_charge then return end
+	if v then
+		player:attack_charge_start()
+	else
+		player:attack_charge_end(args)
 	end
 end}
 
