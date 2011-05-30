@@ -393,7 +393,7 @@ Views.Chargen.update_model = function(self)
 		nose_scale = self.scroll_nose_scale.value,
 		race = self.race,
 		skin_color = {self.color_skin.red, self.color_skin.green, self.color_skin.blue}}
-	self.object:animate{animation = "walk", channel = 1, permanent = true}
+	self.object:animate{animation = "idle", channel = 1, permanent = true}
 	self.object:update_animations{secs = 1}
 	self.object:deform_mesh()
 end
