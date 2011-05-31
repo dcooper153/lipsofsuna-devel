@@ -361,6 +361,21 @@ Itemspec{
 	water_gravity = Vector(0,6,0)}
 
 Itemspec{
+	name = "bookcase",
+	model = "bookcase1",
+	icon = "chest1",
+	mass = 30,
+	categories = {"container", "generate"},
+	crafting_materials = {log = 10},
+	effect_craft = "craftwood1",
+	inventory_size = 8,
+	inventory_type = "chest",
+	loot_categories = {"book", "material", "misc", "potion"},
+	loot_count = {2, 4},
+	stacking = false,
+	water_gravity = Vector(0,6,0)}
+
+Itemspec{
 	name = "jar",
 	model = "jar1",
 	icon = "potion3", -- FIXME

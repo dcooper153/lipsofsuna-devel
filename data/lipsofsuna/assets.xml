@@ -38,6 +38,10 @@
     <name>Dim</name>
   </author-info>
   <author-info>
+    <name>Dm3d</name>
+    <url>http://opengameart.org/user/933</url>
+  </author-info>
+  <author-info>
     <name>Georges Grondin</name>
   </author-info>
   <author-info>
@@ -449,6 +453,21 @@
     <license>Creative Commons BY-SA 3.0</license>
     <status>complete</status>
     <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/bookcase1.blend</file>
+    <author>Dm3d</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/bookshelf</source>
+    <dep>import/bookcase1.png</dep>
+  </asset>
+
+  <asset>
+    <file>import/bookcase1.png</file>
+    <author>Dm3d</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/bookshelf</source>
   </asset>
 
   <asset>
