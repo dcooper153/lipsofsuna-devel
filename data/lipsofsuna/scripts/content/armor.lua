@@ -45,7 +45,7 @@ Itemspec{
 
 Itemspec{
 	name = "iron greaves",
-	model = "book-000",
+	model = "legplate1",
 	icon = "metalboot1",
 	armor_class = 0.08,
 	categories = {"armor"},
@@ -59,7 +59,7 @@ Itemspec{
 
 Itemspec{
 	name = "iron gauntlets",
-	model = "book-000",
+	model = "armplate1",
 	icon = "metalglove1",
 	armor_class = 0.08,
 	categories = {"armor"},
@@ -73,7 +73,7 @@ Itemspec{
 
 Itemspec{
 	name = "iron breastplate",
-	model = "book-000",
+	model = "upperplate1",
 	icon = "metalarmor1",
 	armor_class = 0.18,
 	categories = {"armor"},
