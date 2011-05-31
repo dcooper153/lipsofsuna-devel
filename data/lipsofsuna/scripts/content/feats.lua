@@ -14,7 +14,7 @@ Featanimspec{
 	bonuses_barehanded = true,
 	bonuses_weapon = true,
 	categories = {"melee"},
-	cooldown = 0.5,
+	cooldown = 0.1,
 	effect = "swing1",
 	effect_impact = "impact1",
 	effects = {"physical damage"},
