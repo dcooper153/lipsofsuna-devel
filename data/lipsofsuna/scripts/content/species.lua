@@ -213,9 +213,6 @@ Species{
 	name = "devora",
 	base = "race",
 	aim_ray_center = Vector(0, 1, 0),
-	animations = {
-		["attack staff"] = {animation = "attack-slash", channel = 2, weight = 100},
-		["attack sword"] = {animation = "attack-slash", channel = 2, fade_in = 0.1, weight = 100}},
 	camera_center = Vector(0, 1, 0),
 	damage_from_magma = 9,
 	equipment_class = "devora",
