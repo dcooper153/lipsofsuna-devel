@@ -758,7 +758,7 @@ class LINode:
 		self.loc,self.rot = self.get_rest_transform()
 		# Remove the number part so that it's possible to have multiple
 		# objects that have anchors with the same names.
-		self.name = '#' + re.sub("\\.[0-9]*", "", object.name)
+		self.name = '#' + re.sub("\\.[0-9]+", "", object.name)
 
 	def add_object(self, object):
 		if object_check_export(object, self.hierarchy.file, 'NODE'):
