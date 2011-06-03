@@ -34,6 +34,7 @@ Player.new = function(clss, args)
 	local self = Creature.new(clss, args)
 	self.account = args.account
 	self.running = true
+	self:calculate_speed()
 	if args.client then self:set_client(args.client) end
 	return self
 end
