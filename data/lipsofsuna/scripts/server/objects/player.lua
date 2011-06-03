@@ -355,7 +355,8 @@ Player.vision_cb = function(self, args)
 			end
 			-- Appearance.
 			local data_appear = {}
-			if o.body_scale then
+			if o.body_scale or o.nose_scale or o.bust_scale or
+			   o.eye_style or o.face_style or o.hair_style or o.skin_style then
 				data_appear = {
 					"float", o.body_scale or 1,
 					"float", o.nose_scale or 1,
