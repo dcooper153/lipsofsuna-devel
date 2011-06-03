@@ -245,17 +245,17 @@ Species{
 	damage_from_magma = 9,
 	damage_from_water = -2,
 	equipment_class = "kraken",
-	model = "aer1",
+	model = "kraken1",
 	models = {
-		skeleton = "aer1",
-		arms = "aerarm1",
-		eyes = "aereye1",
-		head = "aerhead1",
-		hands = "aerhand1",
-		feet = "aerfoot1",
-		legs = "aerleg1",
-		lower = "aerlower1",
-		upper = "aerupper1"},
+		skeleton = "kraken1",
+		arms = "krakenarm1",
+		eyes = "krakeneye1",
+		head = "krakenhead1",
+		hands = "krakenhand1",
+		feet = "krakenfoot1",
+		legs = "krakenleg1",
+		lower = "krakenlower1",
+		upper = "krakenupper1"},
 	skills = {
 		{name = "dexterity", max = 80, val = 30},
 		{name = "health", max = 100, val = 50},
@@ -346,7 +346,7 @@ Species{
 	name = "kraken-player",
 	base = "kraken",
 	ai_enabled = false,
-	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
+	inventory_items = {"torch", "workbench", "dress"}}
 
 Species{
 	name = "wyrm-player",

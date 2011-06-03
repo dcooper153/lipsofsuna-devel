@@ -113,6 +113,14 @@ def object_files(object):
 	# No files for explicitly disabled objects.
 	if getprop(object, 'export') == 'false':
 		return []
+	# Don't export links or proxies.
+	try:
+		if object.proxy or object.library:
+			return []
+		if object.data.library:
+			return []
+	except:
+		pass
 	# Otherwise get the list from the file property.
 	files = getprop(object, 'file').split(',')
 	if getprop(object, 'lod') == 'true':
@@ -126,6 +134,14 @@ def object_check_export(object, file, type='NODE'):
 			return object[prop]
 		except:
 			return ""
+	# Don't export links or proxies.
+	try:
+		if object.proxy or object.library:
+			return False
+		if object.data.library:
+			return False
+	except:
+		pass
 	# Make sure that the filename matches.
 	if file not in object_files(object):
 		return False

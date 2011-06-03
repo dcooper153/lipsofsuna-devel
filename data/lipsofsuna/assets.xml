@@ -1408,14 +1408,16 @@
   </asset>
 
   <asset>
-    <file>import/kraken-000.blend</file>
-    <author>tidbit (Joseph)</author>
-    <license>Creative Commons BY 3.0</license>
-    <comment>Needs texturing and animations</comment>
-    <status>rigged</status>
-    <tag>character</tag>
-    <tag>kraken</tag>
-    <type>model</type>
+    <file>import/kraken1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/kraken1.png</tag>
+  </asset>
+
+  <asset>
+    <file>import/kraken1.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
   </asset>
 
   <asset>

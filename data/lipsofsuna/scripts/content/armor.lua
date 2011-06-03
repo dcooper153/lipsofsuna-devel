@@ -7,8 +7,9 @@ Itemspec{
 	crafting_materials = {log = 1},
 	effect_craft = "craftsewing1",
 	equipment_models = {
-		["aer/kraken/wyrm"] = {upper1 = "aerchinadress1", panties = "panties2"},
+		["aer/wyrm"] = {upper1 = "aerchinadress1", panties = "panties2"},
 		["android"] = {upper1 = "androidchinadress1"},
+		["kraken"] = {upper1 = "krakenchinadress1"},
 		["devora"] = {upper1 = "devorachinadress1"}},
 	equipment_slot = "upperbody",
 	mass = 1,
@@ -81,7 +82,8 @@ Itemspec{
 	effect_craft = "craftmetal1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {upper = "aerupperplate1", lower = "aerlowerplate1"},
-		["android"] = {upper = "androidupperplate1", lower = "androidlowerplate1"}},
+		["android"] = {upper = "androidupperplate1", lower = "androidlowerplate1"},
+		["kraken"] = {upper = "aerupperplate1"}},
 	equipment_slot = "upperbody",
 	equipment_slots_reserved = {"lowerbody"},
 	mass = 25}
