@@ -573,7 +573,7 @@ end
 -- @return Burdening limit in kilograms
 Creature.get_burden_limit = function(self)
 	local str = self.skills:get_value{skill = "strength"} or 10
-	return 100 + 2 * str
+	return 100 + 4 * str
 end
 
 --- Returns true if the creature is burdened.
