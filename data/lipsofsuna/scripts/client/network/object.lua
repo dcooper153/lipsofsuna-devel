@@ -115,6 +115,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		elseif type == "obstacle" then spec = Obstaclespec:find{name = name}
 		elseif type == "species" then spec = Species:find{name = name} end
 		debug("  SPEC %s %s", type, name)
+		if not spec then return end
 		model = spec.model
 	else
 		local ok,m = event.packet:resume("string")
