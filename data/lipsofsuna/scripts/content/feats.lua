@@ -50,7 +50,7 @@ Featanimspec{
 	cooldown = 2,
 	description = "Cast a spell on yourself",
 	effect = "spell1",
-	effects = {"berserk", "fire damage", "light", "restore health", "sanctuary", "wilderness"}}
+	effects = {"berserk", "fire damage", "light", "restore health", "sanctuary", "travel", "wilderness"}}
 
 Featanimspec{
 	name = "spell on touch",
@@ -179,6 +179,16 @@ Feateffectspec{
 	influences = {{"sanctuary", 30, 2}},
 	reagent_base = {["milky powder"] = 3},
 	skill_base = {intelligence = 20, willpower = 20}}
+
+Feateffectspec{
+	name = "travel",
+	categories = {"spell"},
+	description = "Fast travel to Lips",
+	effect = "sanctuary1", -- FIXME
+	icon = "modifier-sanctuary", -- FIXME
+	influences = {{"travel", 30, 2}},
+	reagent_base = {["dewspring leaf"] = 1},
+	skill_base = {intelligence = 10, willpower = 10}}
 
 Feateffectspec{
 	name = "wilderness",
