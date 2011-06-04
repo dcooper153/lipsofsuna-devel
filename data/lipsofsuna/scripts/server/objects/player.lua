@@ -246,7 +246,7 @@ Player.vision_cb = function(self, args)
 		end,
 		["object-shown"] = function(args)
 			local o = args.object
-			local flags = 0
+			local flags = o.flags or 0
 			-- Spec.
 			local data_spec = {}
 			if o.spec.name then
@@ -385,7 +385,7 @@ Player.vision_cb = function(self, args)
 				flags = flags + Protocol.object_show_flags.SELF
 			end
 			-- Send to the player.
-			local p = Packet(packets.OBJECT_SHOWN, "uint32", o.id, "uint32", (o.flags or 0) + flags)
+			local p = Packet(packets.OBJECT_SHOWN, "uint32", o.id, "uint32", flags)
 			p:write(data_spec)
 			p:write(data_species)
 			p:write(data_pos)

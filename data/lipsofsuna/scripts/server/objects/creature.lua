@@ -122,6 +122,7 @@ Creature:add_setters{
 -- @param clss Creature class.
 -- @param args Arguments.<ul>
 --   <li>angular: Angular velocity.</li>
+--   <li>beheaded: True to spawn without a head.</li>
 --   <li>body_scale: Scale factor of the body.</li>
 --   <li>bust_scale: Scale factor of the bust.</li>
 --   <li>dead: True for a dead creature.</li>
@@ -145,6 +146,7 @@ Creature.new = function(clss, args)
 		end
 	end
 	copy("angular")
+	copy("beheaded")
 	copy("body_scale")
 	copy("bust_scale")
 	copy("dead")
@@ -163,8 +165,8 @@ Creature.new = function(clss, args)
 	copy("spec")
 	self.update_timer = 0.1 * math.random()
 	self:calculate_speed()
-	copy("realized")
 	if self.dead then self:set_dead_state() end
+	copy("realized")
 
 	Thread(function()
 		while true do
@@ -904,6 +906,7 @@ end
 Creature.write = function(self)
 	return string.format("local self=Creature%s\n%s%s%s", serialize{
 		angular = self.angular,
+		beheaded = self.beheaded or nil,
 		dead = self.dead,
 		eye_style = self.eye_style,
 		face_style = self.face_style,

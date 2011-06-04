@@ -267,6 +267,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	end
 	-- Rebuild the model.
 	debug("  OK")
+	o.flags = Bitwise:band(flags, 0xFF)
 	o:update_model()
 	o:update_rotation(o.rotation, o.tilt)
 	o.realized = true
