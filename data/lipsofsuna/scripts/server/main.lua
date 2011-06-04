@@ -25,6 +25,9 @@ require "server/modifier"
 require "server/editing"
 require "server/particles"
 require "server/generator"
+for k,v in pairs(File:scan_directory("scripts/server/influences")) do
+	require("server/influences/" .. string.gsub(v, "([^.]*).*", "%1"))
+end
 for k,v in pairs(File:scan_directory("scripts/server/modifiers")) do
 	require("server/modifiers/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
