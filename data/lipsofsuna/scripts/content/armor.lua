@@ -81,7 +81,7 @@ Itemspec{
 	crafting_materials = {["iron ingot"] = 5},
 	effect_craft = "craftmetal1",
 	equipment_models = {
-		["aer/kraken/wyrm"] = {upper = "aerupperplate1", lower = "aerlowerplate1"},
+		["aer/wyrm"] = {upper = "aerupperplate1", lower = "aerlowerplate1"},
 		["android"] = {upper = "androidupperplate1", lower = "androidlowerplate1"},
 		["kraken"] = {upper = "aerupperplate1"}},
 	equipment_slot = "upperbody",
@@ -169,7 +169,9 @@ Itemspec{
 	crafting_materials = {hide = 4},
 	effect_craft = "craftsewing1",
 	equipment_models = {
-		["aer/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},["aermale"] = {legs = "aermale1leatherlegs2"}},
+		["aer/kraken/wyrm"] = {skirt = "aerskirt1", panties = "panties2"},
+		["aermale"] = {legs = "aermale1leatherlegs2"},
+		["devora"] = {skirt = "devoraskirt1"}},
 	equipment_slot = "lowerbody",
 	mass = 5,
 	water_gravity = Vector(0,6,0)}
@@ -197,7 +199,8 @@ Itemspec{
 	crafting_materials = {hide = 4},
 	effect_craft = "craftsewing1",
 	equipment_models = {
-		["aer/kraken/wyrm"] = {upper1 = "bra1"}},
+		["aer/kraken/wyrm"] = {upper1 = "aerbra1"},
+		["devora"] = {upper1 = "devorabra1"}},
 	equipment_slot = "upperbody",
 	mass = 5,
 	water_gravity = Vector(0,6,0)}
