@@ -35,7 +35,7 @@ Effect.play_world = function(clss, name, position)
 	-- Create the effect object.
 	EffectObject{
 		model = effect.model,
-		position = Vector(x,y,z),
+		position = position,
 		sound = effect.sound,
 		sound_delay = effect.sound_delay,
 		sound_pitch = effect.sound_pitch,
