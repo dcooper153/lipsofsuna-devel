@@ -1,13 +1,48 @@
 Effect.play = function(clss, name)
-	local e = Effect:find{name = name}
-	if not e then return end
+	if not Player.object then return end
+	clss:play_object(Player.object, name)
+end
+
+Effect.play_object = function(clss, name, object, node)
+	-- Find the effect.
+	local effect = Effect:find{name = name}
+	if not effect then return end
+	-- Find the node.
+	local p
+	if node then
+		p = object:find_node{name = node}
+		if not p then return end
+	end
+	-- Create the effect object.
 	EffectObject{
-		object = Player.object,
-		sound = e.sound,
-		sound_delay = e.sound_delay,
-		sound_pitch = e.sound_pitch,
-		sound_positional = e.sound_positional,
+		model = effect.model,
+		object = object,
+		node = node,
+		rotation_inherit = (effect.rotation ~= false),
+		sound = effect.sound,
+		sound_delay = effect.sound_delay,
+		sound_pitch = effect.sound_pitch,
+		sound_positional = effect.sound_positional,
 		realized = true}
+	-- Quake the camera.
+	Player:apply_quake(object.position, effect.quake)
+end
+
+Effect.play_world = function(clss, name, position)
+	-- Find the effect.
+	local effect = Effect:find{name = name}
+	if not effect then return end
+	-- Create the effect object.
+	EffectObject{
+		model = effect.model,
+		position = Vector(x,y,z),
+		sound = effect.sound,
+		sound_delay = effect.sound_delay,
+		sound_pitch = effect.sound_pitch,
+		sound_positional = effect.sound_positional,
+		realized = true}
+	-- Quake the camera.
+	Player:apply_quake(Vector(x,y,z), effect.quake)
 end
 
 EffectObject = Class(Object)
@@ -22,6 +57,7 @@ EffectObject = Class(Object)
 --   <li>node: Parent node or nil.</li>
 --   <li>object: Parent object or nil.</li>
 --   <li>position: Position in world space.</li>
+--   <li>rotation_inherit: True to inherit rotation from the parent object.</li>
 --   <li>sound: Sound effect name.</li>
 --   <li>sound_delay: Sound delay in seconds.</li>
 --   <li>sound_pitch: Sound effect pitch range.</li>
@@ -34,6 +70,7 @@ EffectObject.new = function(clss, args)
 	local parent = args.object
 	local node = args.node
 	local velocity = args.velocity or Vector()
+	local rotate = args.rotation_inherit
 	-- Attach a model effect.
 	local self = Object.new(clss, args)
 	if Object.particle_animation then
@@ -71,10 +108,10 @@ EffectObject.new = function(clss, args)
 		local p = node and parent:find_node{name = node}
 		if p then
 			self.position = parent.position + parent.rotation * p
-			self.rotation = parent.rotation
+			if rotate then self.rotation = parent.rotation end
 		else
 			self.position = parent.position + self.position
-			self.rotation = parent.rotation
+			if rotate then self.rotation = parent.rotation end
 		end
 	end
 	-- Update in a thread until the effect ends.
@@ -88,10 +125,10 @@ EffectObject.new = function(clss, args)
 				local p = node and parent:find_node{name = node}
 				if p then
 					self.position = parent.position + parent.rotation * p
-					self.rotation = parent.rotation
+					if rotate then self.rotation = parent.rotation end
 				else
 					self.position = parent.position + moved
-					self.rotation = parent.rotation
+					if rotate then self.rotation = parent.rotation end
 				end
 			elseif args.velocity then
 				self.position = moved

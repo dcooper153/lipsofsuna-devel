@@ -15,6 +15,7 @@ end
 -- @param args Arguments.<ul>
 --   <li>model: Model to show.</li>
 --   <li>name: Name of the effect.</li>
+--   <li>rotation: False to not inherit rotation from the parent object.</li>
 --   <li>sound: Sound effect to play.</li>
 --   <li>sound_delay: Delay of the sound start, in seconds.</li>
 --   <li>sound_pitch: Pitch range of the sound effect.</li>

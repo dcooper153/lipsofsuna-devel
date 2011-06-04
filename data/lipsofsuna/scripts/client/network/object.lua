@@ -15,19 +15,7 @@ Protocol:add_handler{type = "OBJECT_BEHEADED", func = function(event)
 	o.flags = Bitwise:bor(o.flags, Protocol.object_flags.BEHEADED)
 	o:update_model()
 	-- Play a particle effect.
-	local p = o:find_node{name = "#neck"}
-	local effect = Effect:find{name = "behead1"}
-	if p and effect then
-		EffectObject{
-			model = effect.model,
-			object = o,
-			node = "#neck",
-			sound = effect.sound,
-			sound_delay = effect.sound_delay,
-			sound_pitch = effect.sound_pitch,
-			sound_positional = effect.sound_positional,
-			realized = true}
-	end
+	Effect:play_object("behead1", o, "#neck")
 end}
 
 Protocol:add_handler{type = "OBJECT_DAMAGE", func = function(args)
@@ -82,20 +70,8 @@ Protocol:add_handler{type = "OBJECT_EFFECT", func = function(event)
 		-- Find the object.
 		local obj = Object:find{id = i}
 		if not obj then return end
-		-- Find the effect.
-		local effect = Effect:find{name = e}
-		if not effect then return end
-		-- Create an effect object.
-		EffectObject{
-			model = effect.model,
-			object = obj,
-			sound = effect.sound,
-			sound_delay = effect.sound_delay,
-			sound_pitch = effect.sound_pitch,
-			sound_positional = effect.sound_positional,
-			realized = true}
-		-- Quake the camera.
-		Player:apply_quake(obj.position, effect.quake)
+		-- Play the effect.
+		Effect:play_object(e, obj)
 	end
 end}
 

@@ -5,6 +5,7 @@ Effect{
 Effect{
 	name = "behead1",
 	model = "blood2",
+	rotation = false,
 	sound = "squish-000"}
 
 Effect{

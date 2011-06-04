@@ -39,19 +39,6 @@ end}
 Protocol:add_handler{type = "WORLD_EFFECT", func = function(event)
 	local ok,t,x,y,z = event.packet:read("string", "float", "float", "float")
 	if ok then
-		-- Find the effect.
-		local effect = Effect:find{name = t}
-		if not effect then return end
-		-- Create the effect object.
-		EffectObject{
-			model = effect.model,
-			position = Vector(x,y,z),
-			sound = effect.sound,
-			sound_delay = effect.sound_delay,
-			sound_pitch = effect.sound_pitch,
-			sound_positional = effect.sound_positional,
-			realized = true}
-		-- Quake the camera.
-		Player:apply_quake(Vector(x,y,z), effect.quake)
+		Effect:play_world(t, Vector(x,y,z))
 	end
 end}
