@@ -42,14 +42,13 @@ Widgets.ItemList:add_getters{
 Widgets.ItemList:add_setters{
 	size = function(s, v)
 		rawset(s, "__size", v)
-		local rows = math.ceil(v / s.cols)
-		s.rows = rows
+		s.rows = math.ceil(v / s.cols)
 		s.buttons = {}
 		for i = 1,v do
 			s.buttons[i] = Widgets.ItemButton{pressed = function(w, a) s:activated(i, a) end}
 			s:set_child(
-				1 + math.floor((i - 1) / rows),
-				1 + (i - 1) % rows,
+				1 + (i - 1) % s.cols,
+				1 + math.floor((i - 1) / s.cols),
 				s.buttons[i])
 		end
 	end}
