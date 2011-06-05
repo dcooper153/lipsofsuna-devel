@@ -50,6 +50,13 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 	LIVoxVoxel* tile;
 	LIVoxVoxel* tiles;
 
+	/* Filter collisions. */
+	btBroadphaseProxy* proxy0 = body0->getBroadphaseHandle ();
+	btBroadphaseProxy* proxy1 = body1->getBroadphaseHandle ();
+	if (!(proxy0->m_collisionFilterGroup & proxy1->m_collisionFilterMask) ||
+	    !(proxy1->m_collisionFilterGroup & proxy0->m_collisionFilterMask))
+		return;
+
 	/* Identify the bodies. */
 	if (body0->getCollisionShape ()->getShapeType () == CUSTOM_CONVEX_SHAPE_TYPE)
 	{
