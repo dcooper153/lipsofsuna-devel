@@ -222,9 +222,9 @@ Creature.calculate_speed = function(self)
 	-- Base speed.
 	local s = (self.running and not self.blocking) and self.spec.speed_run or self.spec.speed_walk
 	-- Skill bonuses.
-	local str = self.skills:get_value{skill = "strength"} or 0
-	local agi = self.skills:get_value{skill = "agility"} or 0
-	s = s * (1 + agi / 100 + str / 150)
+	local str = self.skills:get_value{skill = "strength"} or 20
+	local dex = self.skills:get_value{skill = "dexterity"} or 20
+	s = s * (0.5 + dex / 100 + str / 200)
 	-- Burdening penalty.
 	if self:get_burdened() then
 		s = math.max(1, s * 0.3)
@@ -867,13 +867,16 @@ Creature.update_burdening = function(self, secs)
 	end
 	local curr_burden = self:get_burdened()
 	if prev_burden ~= curr_burden then
-		self:calculate_speed()
 		if curr_burden then
 			self:send{packet = Packet{packets.MESSAGE, "string", "You're now burdened."}}
 		else
 			self:send{packet = Packet{packets.MESSAGE, "string", "You're no longer burdened."}}
 		end
 	end
+	-- Update speed.
+	-- Skill regeneration affects speed too so this needs to be recalculated
+	-- every now and then regardless of burdening.
+	self:calculate_speed()
 end
 
 --- Updates the environment of the object and tries to fix it if necessary.
