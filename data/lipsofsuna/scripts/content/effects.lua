@@ -10,7 +10,7 @@ Effect{
 
 Effect{
 	name = "berserk1",
-	-- TODO: model
+	model = "spell1",
 	sound = "spellberserk1"}
 
 Effect{

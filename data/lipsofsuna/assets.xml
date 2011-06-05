@@ -1318,8 +1318,6 @@
     <file>import/heal1.blend</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>
-    <status>placeholder</status>
-    <type>model</type>
   </asset>
 
   <asset>
@@ -1636,18 +1634,24 @@
     <file>import/particle1.png</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>
-    <status>usable</status>
-    <tag>particle</tag>
-    <type>texture</type>
   </asset>
 
   <asset>
     <file>import/particle2.png</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>
-    <status>usable</status>
-    <tag>particle</tag>
-    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/particle5.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>import/particle6.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
   </asset>
 
   <asset>
@@ -1980,6 +1984,14 @@
     <tag>spear</tag>
     <tag>weapon</tag>
     <type>model</type>
+  </asset>
+
+  <asset>
+    <file>import/spell1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <dep>import/particle5.png</dep>
+    <dep>import/particle6.png</dep>
   </asset>
 
   <asset>
