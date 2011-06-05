@@ -765,6 +765,20 @@ Creature.update = function(self, secs)
 end
 
 Creature.update_actions = function(self, secs)
+	-- Update flying.
+	if self.flying and self.tilt then
+		local v = self.velocity
+		if math.abs(self.movement) > 0.5 then
+			local e = self.tilt.euler[3]
+			if e > 0 then
+				self.velocity = Vector(v.x, math.max(v.y, 5*math.sin(e)), v.z)
+			else
+				self.velocity = Vector(v.x, math.min(v.y, 5*math.sin(e)), v.z)
+			end
+		else
+			self.velocity = Vector()
+		end
+	end
 	-- Update feat cooldown.
 	if self.blocking then self.cooldown = self.spec.blocking_cooldown end
 	if self.cooldown then

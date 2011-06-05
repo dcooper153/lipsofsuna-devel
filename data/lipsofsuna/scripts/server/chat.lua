@@ -41,6 +41,27 @@ ChatCommand{pattern = "^/grant admin ([a-zA-Z0-9]*)$", permission = "admin", fun
 	end
 end}
 
+-- No clip mode.
+ChatCommand{pattern = "^/noclip$", permission = "admin", func = function(player, matches)
+	if player.noclip then
+		player:send("/noclip mode off.")
+		player.noclip = nil
+		player.flying = player.spec.flying or false
+		player.collision_mask = 0xFFFF
+		player.collision_group = 0x0001
+		player.gravity = player.spec.gravity
+		player.gravity_liquid = player.spec.water_gravity
+	else
+		player:send("/noclip mode on.")
+		player.noclip = true
+		player.flying = true
+		player.collision_mask = 0
+		player.collision_group = 0
+		player.gravity = Vector()
+		player.gravity_liquid = Vector()
+	end
+end}
+
 -- Revoke admin privileges.
 ChatCommand{pattern = "^/revoke admin ([a-zA-Z0-9]*)$", permission = "admin", func = function(player, matches)
 	if Config.inst.admins[matches] then
