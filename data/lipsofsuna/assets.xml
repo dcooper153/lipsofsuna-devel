@@ -1995,6 +1995,13 @@
   </asset>
 
   <asset>
+    <file>import/spell2.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <dep>import/particle2.png</dep>
+  </asset>
+
+  <asset>
     <file>import/spotlight-000.blend</file>
     <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>

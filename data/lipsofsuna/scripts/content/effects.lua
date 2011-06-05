@@ -83,7 +83,8 @@ Effect{
 
 Effect{
 	name = "light1",
-	-- TODO: model
+	model = "spell2",
+	rotation = false,
 	sound = "spelllight1"}
 
 Effect{
