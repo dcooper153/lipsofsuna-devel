@@ -87,7 +87,7 @@ Species{
 	inventory_size = 20,
 	skill_quota = 200,
 	speed_walk = 2,
-	speed_run = 4,
+	speed_run = 6,
 	tilt_bone = "backtilt",
 	tilt_limit = 1.25,
 	-- Customization.
