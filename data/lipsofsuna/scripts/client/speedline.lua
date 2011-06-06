@@ -14,7 +14,7 @@ Speedline.new = function(clss, args)
 	self.path = {}
 	self.verts = {}
 	self.timer = 0
-	self.length = args.length or 10
+	self.length = args.length or 15
 	self.delay = args.delay or 0
 	self.duration = args.duration or 10000
 	self.model = Model()
@@ -28,7 +28,7 @@ end
 Speedline.update = function(self, secs)
 	-- Limit the refresh rate.
 	self.timer = self.timer + secs
-	if self.timer < 0.03 then return end
+	if self.timer < 0.02 then return end
 	local tick = self.timer
 	self.timer = 0
 	-- Update the delay timer.
