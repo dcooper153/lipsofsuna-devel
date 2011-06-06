@@ -116,7 +116,7 @@ Item.contact_cb = function(self, result)
 		end
 		self.contact_events = false
 		self.contact_args = nil
-		self.gravity = Config.gravity
+		self.gravity = self.spec.gravity
 		self:animate("fly stop")
 	else
 		-- Projectile mode.

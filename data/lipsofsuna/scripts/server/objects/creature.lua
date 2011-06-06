@@ -66,7 +66,7 @@ Creature:add_setters{
 				name = v.name,
 				maximum = v.val,
 				value = v.val,
-				regen = Config.skillregen}
+				regen = spec.skill_regen}
 		end
 		-- Create inventory.
 		-- When the map generator or an admin command creates an object, the

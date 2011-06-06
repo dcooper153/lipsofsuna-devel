@@ -34,6 +34,7 @@ Itemspec.dict_name = {}
 --   <li>equipment_models: Dictionary of equipment models.</li>
 --   <li>equipment_slot: Equipment slot into which the item can be placed.</li>
 --   <li>equipment_slots_reserved: List of equipment slots that the item reserves in addition to the main slot.</li>
+--   <li>gravity: Gravity vector.</li>
 --   <li>health: Number of hit points the item has.</li>
 --   <li>icon: Icon name.</li>
 --   <li>interactive: False to make the object not appear interactive.</li>
