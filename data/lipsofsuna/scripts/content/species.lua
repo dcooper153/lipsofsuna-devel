@@ -366,7 +366,7 @@ Species{
 Species{
 	name = "Lips guard archer",
 	base = "aer",
-	dialog = "lips citizen",
+	dialog = "lips guard",
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson crossbow",
@@ -384,7 +384,7 @@ Species{
 Species{
 	name = "Lips guard knight",
 	base = "aer",
-	dialog = "lips citizen",
+	dialog = "lips guard",
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson sword", "round shield"},
