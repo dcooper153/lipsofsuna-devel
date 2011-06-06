@@ -42,7 +42,7 @@ Species.dict_name = {}
 --   <li>equipment_slots: List of equipment slots.</li>
 --   <li>factions: List of factions.</li>
 --   <li>falling_damage_rate: Number of points of damage per every meters per second exceeding the falling damage speed.</li>
---   <li>falling_damage_speed: Speed in meters of seconds after which the creature starts taking falling damage.</li>
+--   <li>falling_damage_speed: Speed in meters per seconds after which the creature starts taking falling damage.</li>
 --   <li>feat_animations: List of know feat types.</li>
 --   <li>feat_effects: List of know feat effects.</li>
 --   <li>gravity: Gravity vector.</li>
@@ -54,6 +54,7 @@ Species.dict_name = {}
 --   <li>loot_count: Minimum and maximum number of random loot items this creature can have.</li>
 --   <li>mass: Mass in kilograms.</li>
 --   <li>model: Model name.</li>
+--   <li>skill_regen: Skill regeneration speed in units per second.</li>
 --   <li>skill_quota: Number of skill points the creature can distribute over skills.</li>
 --   <li>skills: List of skills.</li>
 --   <li>special_effects: List of special effects to render.</li>
@@ -190,14 +191,15 @@ Species.new = function(clss, args)
 	copy("effect_falling_damage")
 	copy("effect_landing")
 	copy("effect_physical_damage")
-	copy("falling_damage_rate", 3)
-	copy("falling_damage_speed", 12)
-	copy("gravity", Vector(0, -15, 0))
+	copy("falling_damage_rate", 10)
+	copy("falling_damage_speed", 10)
+	copy("gravity", Vector(0,-15,0))
 	copy("interactive", true)
 	copy("inventory_items", {})
 	copy("inventory_size", 0)
 	copy("jump_force", 8)
 	copy("mass", 50)
+	copy("skill_regen", 0.5)
 	copy("skill_quota", 200)
 	copy("special_effects", {})
 	copy("speed_walk", 3)
