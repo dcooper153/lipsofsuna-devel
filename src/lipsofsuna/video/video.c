@@ -31,7 +31,9 @@
  */
 int livid_video_init ()
 {
+	int ver[3];
 	GLenum error;
+	const GLubyte* tmp;
 
 	/* Initialize GLEW. */
 	error = glewInit ();
@@ -41,14 +43,28 @@ int livid_video_init ()
 		return 0;
 	}
 
-	/* Get capabilities. */
+	/* Check for OpenGL 3.2 capabilities. */
+	/* GLEW versions up to 1.5.3 had a bug that completely broke OpenGL 3.2
+	   support. We try to detect it and warn the user of the problem. */
 	if (GLEW_VERSION_3_2)
 		return 1;
-	lisys_error_set (EINVAL, "OpenGL 3.2 isn't supported by your graphics card");
-	lisys_error_report ();
+	tmp = glewGetString (GLEW_VERSION);
+	if (sscanf ((const char*) tmp, "%d.%d.%d", ver, ver + 1, ver + 2) == 3 &&
+	   (ver[0] < 1 || ver[1] < 5 || ver[2] <= 3))
+	{
+		lisys_error_set (EINVAL, "OpenGL 3.2 isn't supported because it requires GLEW 1.5.4 or newer while you have %s", tmp);
+		lisys_error_report ();
+	}
+	else
+	{
+		lisys_error_set (EINVAL, "OpenGL 3.2 isn't supported by your graphics card or drivers");
+		lisys_error_report ();
+	}
+
+	/* Check for OpenGL 2.1 capabilities. */
 	if (GLEW_VERSION_2_1)
 		return 1;
-	lisys_error_set (EINVAL, "OpenGL 2.1 isn't supported by your graphics card");
+	lisys_error_set (EINVAL, "OpenGL 2.1 isn't supported by your graphics card or drivers");
 
 	return 0;
 }
