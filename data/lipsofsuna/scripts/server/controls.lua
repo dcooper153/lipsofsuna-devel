@@ -3,7 +3,7 @@ local spawn_player = function(object, client)
 	Network:send{client = client, packet = Packet(packets.CHARACTER_ACCEPT)}
 	-- Add to the map.
 	Player.clients[client] = object
-	object:teleport{position = Config.spawn}
+	object:teleport{position = Config.inst.spawn_point}
 	object.realized = true
 	-- Transmit active and completed quests.
 	for k,q in pairs(Quest.dict_name) do

@@ -75,7 +75,7 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 	-- This is done in a thread to reduce pauses when lots of sectors are
 	-- being loaded. It's useful since sectors are often loaded in clusters.
 	local org = self:get_sector_offset(sector)
-	local spawn = Config.spawn * Voxel.tile_scale
+	local spawn = Config.inst.spawn_point * Voxel.tile_scale
 	Thread(function(thread)
 		for i = 1,monsters do
 			for j = 1,30 do

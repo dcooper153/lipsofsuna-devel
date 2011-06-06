@@ -1,10 +1,5 @@
 Config = Class()
 
--- FIXME
-local reg = Regionspec:find{name = "Lips"}
-Config.center = Vector(reg.position[1], reg.depth[1], reg.position[2]) * Voxel.tile_size
-Config.spawn = Config.center + Vector(17, 7, 17)
-
 --- Creates a new server configuration instance.
 -- @param clss Config class.
 -- @return Config.
@@ -17,6 +12,10 @@ Config.new = function(clss)
 	self.server_name = "Unnamed server"
 	self.server_master = "http://lipsofsuna.org"
 	self.server_port = 10101
+	-- Calculate the spawn point.
+	local reg = Regionspec:find{name = "Lips"}
+	local ctr = Vector(reg.position[1], reg.depth[1], reg.position[2])
+	Config.spawn_point = ctr * Voxel.tile_size + Vector(17, 7, 17)
 	-- Load configuration.
 	self.config = ConfigFile{name = "server.cfg"}
 	self:load()
