@@ -40,6 +40,19 @@ Views.Quests.get_compass_direction = function(self)
 	end
 end
 
+--- Gets the compass height offset for the currently shown quest.
+-- @param self Quest class.
+-- @return Compass height offset or nil.
+Views.Quests.get_compass_height = function(self)
+	if self.shown_quest then
+		local quest = Quest:find{name = self.shown_quest}
+		if not quest or not quest.marker then return end
+		if not Player.object then return end
+		local diff = quest.marker - Player.object.position
+		return diff.y
+	end
+end
+
 --- Shows a quest.
 -- @param self Quests class.
 -- @param name Quest name.

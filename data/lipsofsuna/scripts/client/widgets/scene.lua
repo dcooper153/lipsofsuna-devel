@@ -60,6 +60,15 @@ Widgets.Scene.reshaped = function(self)
 				source_position = {0,0},
 				source_tiling = {0,12,0,0,50,0}}
 		end
+		if self.compass_quest_height then
+			self:canvas_text{
+				dest_position = {6,h-77},
+				dest_size = {74,74},
+				text = string.format("%+d", self.compass_quest_height),
+				text_alignment = {0.5,0.5},
+				text_color = {1,1,1,1},
+				text_font = "tiny"}
+		end
 	end
 	if self.action then
 		local o = 20
