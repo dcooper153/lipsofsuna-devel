@@ -2,16 +2,21 @@ Widgets.Label = Class(Widget)
 Widgets.Label.class_name = "Widgets.Label"
 
 Widgets.Label.new = function(clss, args)
-	local self = Widget.new(clss, args)
-	self.font = self.font or "default"
-	self.text = self.text or ""
-	self.halign = self.halign or 0
-	self.valign = self.valign or 0.5
+	local self = Widget.new(clss)
+	local copy = function(f, d) self[f] = (args and args[f] ~= nil) and args[f] or d end
+	copy("width_request")
+	copy("font", "default")
+	copy("halign", 0)
+	copy("valign", 0.5)
+	copy("text", "")
+	if args then
+		for k,v in pairs(args) do self[k] = v end
+	end
 	return self
 end
 
 Widgets.Label.reshaped = function(self)
-	local wrap = self:get_request()
+	local wrap = self.width_request
 	self:set_request{
 		font = self.font,
 		internal = true,

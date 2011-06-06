@@ -305,16 +305,28 @@ Widget:add_getters{
 	floating = function(s) return Los.widget_get_floating(s.handle) end,
 	fullscreen = function(s) return Los.widget_get_fullscreen(s.handle) end,
 	height = function(s) return Los.widget_get_height(s.handle) end,
+	height_request = function(s)
+		local a,b = Los.widget_get_request(s.handle)
+		return b
+	end,
 	margins = function(s) return Los.widget_get_margins(s.handle) end,
 	parent = function(s)
 		local handle = Los.widget_get_parent(s.handle)
 		if not handle then return end
 		return __userdata_lookup[handle]
 	end,
+	request = function(s)
+		local a,b = Los.widget_get_request(s.handle)
+		return {a, b}
+	end,
 	rows = function(s) return Los.widget_get_rows(s.handle) end,
 	spacings = function(s) return Los.widget_get_spacings(s.handle) end,
 	visible = function(s) return Los.widget_get_visible(s.handle) end,
 	width = function(s) return Los.widget_get_width(s.handle) end,
+	width_request = function(s)
+		local a,b = Los.widget_get_request(s.handle)
+		return a
+	end,
 	x = function(s) return Los.widget_get_x(s.handle) end,
 	y = function(s) return Los.widget_get_y(s.handle) end}
 
@@ -338,6 +350,7 @@ Widget:add_setters{
 		if not v and s == Widgets.popup then Widgets.popup = nil end
 	end,
 	fullscreen = function(s, v) Los.widget_set_fullscreen(s.handle, v) end,
+	height_request = function(s, v) Los.widget_set_request(s.handle, s.width_request, v) end,
 	margins = function(s, v) Los.widget_set_margins(s.handle, v) end,
 	request = function(s, v) Los.widget_set_request(s.handle, v) end,
 	rows = function(s, v)
@@ -356,6 +369,7 @@ Widget:add_setters{
 		Los.widget_set_visible(s.handle, v)
 		if not v and s == Widgets.popup then Widgets.popup = nil end
 	end,
+	width_request = function(s, v) Los.widget_set_request(s.handle, v, s.height_request) end,
 	x = function(s, v) Los.widget_set_x(s.handle, v) end,
 	y = function(s, v) Los.widget_set_y(s.handle, v) end}
 

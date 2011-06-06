@@ -421,8 +421,10 @@ static void Widget_set_request (LIScrArgs* args)
 
 	widget = args->self;
 	liscr_args_gets_bool (args, "internal", &internal);
-	liscr_args_gets_int (args, "width", &size.width);
-	liscr_args_gets_int (args, "height", &size.height);
+	if (!liscr_args_geti_int (args, 0, &size.width))
+		liscr_args_gets_int (args, "width", &size.width);
+	if (!liscr_args_geti_int (args, 1, &size.width))
+		liscr_args_gets_int (args, "height", &size.height);
 
 	/* Calculate from text if given. */
 	if (liscr_args_gets_string (args, "font", &font_name) &&

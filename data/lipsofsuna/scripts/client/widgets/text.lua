@@ -9,6 +9,7 @@ Widgets.Text.new = function(clss, args)
 	self.halign = arg("halign", 0)
 	self.valign = arg("valign", 0.5)
 	self.text = arg("text", {})
+	self:build()
 	return self
 end
 
@@ -23,8 +24,8 @@ Widgets.Text.build = function(self)
 			color = self.color,
 			font = v[2] or self.font,
 			text = v[1],
-			valign = self.valign}
-		w:set_request{width = 270}
+			valign = self.valign,
+			width_request = 270}
 		self:append_row(w)
 	end
 	if self.valign < 1 then
@@ -55,6 +56,4 @@ Widgets.Text:add_setters{
 		else
 			rawset(s, "__text", v)
 		end
-		s:build()
-		s:reshaped()
 	end}
