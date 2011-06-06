@@ -885,16 +885,18 @@ end
 -- @return Boolean and environment statistics. The boolean is true if the object isn't permanently stuck.
 Creature.update_environment = function(self, secs)
 	-- Don't update every frame.
+	if not self.realized then return true end
 	self.env_timer = (self.env_timer or 0) + secs
-	if self.env_timer < 1.2 then return end
+	if self.env_timer < 1.2 then return true end
 	local tick = self.env_timer
 	self.env_timer = 0
 	-- Prevent sectors from unloading if a player is present.
 	if self.client then self:refresh{radius = 13} end
-	-- Environment scan and stuck handling.
-	local ret,env = Object.update_environment(self, secs)
-	if not ret or not env then return ret, env end
-	-- Liquid physics.
+	-- Count tiles affecting us.
+	local src,dst = self:get_tile_range()
+	local env = Voxel:check_range(src, dst)
+	if not env then return true end
+	-- Count liquid tiles.
 	local liquid = env.liquid / env.total
 	local magma = env.magma / env.total
 	if liquid ~= (self.submerged or 0) then
@@ -914,7 +916,7 @@ Creature.update_environment = function(self, secs)
 			self:damaged{amount = self.spec.damage_from_water * water * tick, type = "liquid"}
 		end
 	end
-	return true, res
+	return true, env
 end
 
 --- Serializes the object to a string.
