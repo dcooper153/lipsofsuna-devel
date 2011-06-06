@@ -112,6 +112,9 @@ end
 -- @param force_temporary Forces the animation to be temporary in the server side.
 -- @return True if started a new animation.
 Object.animate = function(self, name, force_temporary)
+	-- Prevent animation when dead.
+	-- This is a simple way to ensure that dead creatures look like dead.
+	if self.dead then return end
 	-- Maintain channels.
 	-- When objects enter the vision of a player, the player class enumerates
 	-- through the persistent animations and sends them to the client. We need

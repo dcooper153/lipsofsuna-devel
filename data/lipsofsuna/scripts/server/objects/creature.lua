@@ -149,7 +149,6 @@ Creature.new = function(clss, args)
 	copy("beheaded")
 	copy("body_scale")
 	copy("bust_scale")
-	copy("dead")
 	copy("eye_style")
 	copy("face_style")
 	copy("hair_style")
@@ -165,7 +164,7 @@ Creature.new = function(clss, args)
 	copy("spec")
 	self.update_timer = 0.1 * math.random()
 	self:calculate_speed()
-	if self.dead then self:set_dead_state() end
+	if args and args.dead then self:set_dead_state() end
 	copy("realized")
 
 	Thread(function()
@@ -352,6 +351,10 @@ Creature.damaged = function(self, args)
 end
 
 Creature.set_dead_state = function(self, drop)
+	-- Playback animation.
+	-- This needs to be done first because setting the 'dead' member will
+	-- prevent any future animation changes.
+	self:animate("death")
 	-- Disable controls.
 	self.dead = true
 	self.physics = "rigid"
@@ -361,8 +364,6 @@ Creature.set_dead_state = function(self, drop)
 	-- Disable skills.
 	self.skills.enabled = false
 	self.skills:set_value{skill = "health", value = 0}
-	-- Playback animation.
-	self:animate("death")
 	-- Drop held items.
 	if drop then
 		local o = self:get_item{slot = "hand.L"}
