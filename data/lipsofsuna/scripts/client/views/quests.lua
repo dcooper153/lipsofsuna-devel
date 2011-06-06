@@ -4,7 +4,7 @@ Views.Quests.new = function(clss)
 	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0, 0}})
 	self.dict_name = {}
 	self.sound_play_time = Program.time
-	self.list = Widgets.List()
+	self.list = Widgets.List{page_size = 5}
 	self.list.pressed = function(view, row) self:show(row) end
 	self.quest_info = Widgets.QuestInfo()
 	self.title = Widgets.Frame{style = "title", text = "Quest"}
