@@ -1,6 +1,6 @@
 Effect.play = function(clss, name)
 	if not Player.object then return end
-	clss:play_object(Player.object, name)
+	clss:play_object(name, Player.object)
 end
 
 Effect.play_object = function(clss, name, object, node)
