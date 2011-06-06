@@ -672,7 +672,7 @@ Itemspec{
 Itemspec{
 	name = "wooden crossbow",
 	model = "crossbow1",
-	icon = "bow1",
+	icon = "crossbow1",
 	ammo_type = "arrow",
 	animation_attack = "attack crossbow",
 	animation_charge = "charge crossbow",
