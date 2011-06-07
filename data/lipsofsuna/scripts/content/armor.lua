@@ -54,7 +54,8 @@ Itemspec{
 	effect_craft = "craftmetal1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {feet = false, legs = "aerlegplate1"},
-		["android"] = {feet = false, legs = "androidlegplate1"}},
+		["android"] = {feet = false, legs = "androidlegplate1"},
+		["devora"] = {feet = false, legs = "devoralegplate1"}},
 	equipment_slot = "feet",
 	mass = 15}
 
@@ -68,7 +69,8 @@ Itemspec{
 	effect_craft = "craftmetal1",
 	equipment_models = {
 		["aer/kraken/wyrm"] = {arms = "aerarmplate1", hands = false},
-		["android"] = {arms = "androidarmplate1", hands = false}},
+		["android"] = {arms = "androidarmplate1", hands = false},
+		["devora"] = {arms = "devoraarmplate1", hands = false}},
 	equipment_slot = "arms",
 	mass = 10}
 
@@ -83,6 +85,7 @@ Itemspec{
 	equipment_models = {
 		["aer/wyrm"] = {upper = "aerupperplate1", lower = "aerlowerplate1"},
 		["android"] = {upper = "androidupperplate1", lower = "androidlowerplate1"},
+		["devora"] = {upper = "devoraupperplate1"},
 		["kraken"] = {upper = "aerupperplate1"}},
 	equipment_slot = "upperbody",
 	equipment_slots_reserved = {"lowerbody"},
