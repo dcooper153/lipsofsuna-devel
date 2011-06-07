@@ -20,6 +20,14 @@ Creature:add_setters{
 	beheaded = function(s, v)
 		s.flags = Bitwise:bor(s.flags or 0, Protocol.object_flags.BEHEADED)
 		Vision:event{type = "object-beheaded", object = s}
+		local hat = s.inventory:get_object{slot = "head"}
+		if hat then
+			local p = s.position
+			hat:detach()
+			hat.position = p + s.rotation * (s.dead and Vector(0,0.5,2) or Vector(0,2,0))
+			hat.velocity = Vector(math.random(), math.random(), math.random())
+			hat.realized = true
+		end
 	end,
 	spec = function(s, v)
 		local spec = type(v) == "string" and Species:find{name = v} or v
