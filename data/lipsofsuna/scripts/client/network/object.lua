@@ -176,7 +176,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		debug("    %q", name)
 	end
 	-- Animations.
-	if Bitwise:band(flags, Protocol.object_show_flags.SLOTS) ~= 0 then
+	if Bitwise:band(flags, Protocol.object_show_flags.ANIMS) ~= 0 then
 		debug("  ANIMATIONS")
 		local ok,num = event.packet:resume("uint8")
 		if not ok then return end
