@@ -105,9 +105,9 @@ Item.contact_cb = function(self, result)
 				attacker = self.contact_args.owner,
 				charge = self.contact_args.charge,
 				point = result.point,
-				projectile = self,
 				target = result.object,
-				tile = result.tile}
+				tile = result.tile,
+				weapon = self}
 		end
 		-- Disable boomerang mode.
 		if self.timer then
