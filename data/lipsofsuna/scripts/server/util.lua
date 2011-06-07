@@ -184,9 +184,9 @@ Utils.explosion = function(clss, point, radius)
 	-- Damage nearby objects.
 	for k1,v1 in pairs(Object:find{point = point, radius = r2}) do
 		local diff = v1.position - point
-		local frac = 0.3 * diff.length / r2
+		local frac = diff.length / r2
 		local mult = 10 * math.min(100, v1.mass)
-		local impulse = diff:normalize() * (mult * (1 - frac))
+		local impulse = diff:normalize() * (mult * (1 - 0.3 * frac))
 		v1:impulse{impulse = impulse, point = Vector()}
 		v1:damaged{amount = 40 * (1 - frac), type = "explosion"}
 	end
