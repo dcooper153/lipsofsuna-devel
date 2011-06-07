@@ -43,18 +43,29 @@ Vision.handle_event = function(self, args)
 	-- Maintain the list of seen objects.
 	if args.object then
 		if args.type == "object-shown" then
+			-- Add explicitly shown objects.
 			if self.objects[args.object] then return end
 			self.objects[args.object] = true
 		elseif args.type == "object-hidden" then
+			-- Remove explicitly hidden objects.
 			if not self.objects[args.object] then return end
 			self.objects[args.object] = nil
 		elseif args.type == "object-moved" then
+			-- Add objects that move inside the vision radius.
+			-- Remove objects that move outside of the vision radius.
 			if d < r and not self.objects[args.object] then
 				self.objects[args.object] = true
 				self.callback{type = "object-shown", object = args.object}
 			elseif d >= r and self.objects[args.object] then
 				self.objects[args.object] = nil
 				self.callback{type = "object-hidden", object = args.object}
+			end
+		elseif d <= r then
+			-- Add objects that emitted a vision event before we had a
+			-- chance to detect their appearance in a rescan.
+			if not self.objects[args.object] then
+				self.objects[args.object] = true
+				self.callback{type = "object-shown", object = args.object}
 			end
 		end
 	end

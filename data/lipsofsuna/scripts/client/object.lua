@@ -43,6 +43,12 @@ Object.detach = function(self)
 	if self.speedline then
 		self.speedline.realized = false
 	end
+	-- Hide equipment.
+	if self.slots then
+		for k,v in pairs(self.slots.slots) do
+			v:detach()
+		end
+	end
 	-- Hide self.
 	self.realized = false
 end

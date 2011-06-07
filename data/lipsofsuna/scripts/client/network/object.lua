@@ -105,6 +105,9 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	local ok,id,flags = event.packet:read("uint32", "uint32")
 	if not ok then return end
 	debug("SHOWOBJ %d %d", id, flags)
+	-- Hide old objects.
+	local old = Object:find{id = id}
+	if old then old:detach() end
 	-- Spec.
 	local spec,model,type
 	if Bitwise:band(flags, Protocol.object_show_flags.SPEC) ~= 0 then

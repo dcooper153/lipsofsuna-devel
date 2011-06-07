@@ -179,25 +179,6 @@ end
 
 Player.vision_cb = function(self, args)
 	local funs
-	local sendinfo = function(o)
-		if o.animations then
-			for k,v in pairs(o.animations) do
-				funs["object-animated"]({animation = v[1], object = o, time = Program.time - v[2]})
-			end
-		end
-		if o.inventory then
-			for k,v in pairs(o.inventory.slots) do
-				if type(k) == "string" then
-					funs["slot-changed"]({object = o, item = o.inventory:get_object{slot = k}, slot = k})
-				end
-			end
-		end
-		if o.skills then
-			for k,v in pairs(o.skills.skills) do
-				funs["skill-changed"]({id = o.id, object = o, skill = k})
-			end
-		end
-	end
 	local sendmap = function()
 		local b = Voxel:find_blocks{point = self.position, radius = self.vision.radius}
 		for k,v in pairs(b) do
