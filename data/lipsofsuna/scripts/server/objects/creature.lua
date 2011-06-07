@@ -20,7 +20,7 @@ Creature:add_setters{
 	beheaded = function(s, v)
 		s.flags = Bitwise:bor(s.flags or 0, Protocol.object_flags.BEHEADED)
 		Vision:event{type = "object-beheaded", object = s}
-		local hat = s.inventory:get_object{slot = "head"}
+		local hat = s:get_item{slot = "head"}
 		if hat then
 			local p = s.position
 			hat:detach()
