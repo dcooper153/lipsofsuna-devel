@@ -28,6 +28,7 @@
 void liren_context32_init (
 	LIRenContext32* self)
 {
+	int i;
 	LIRenRender32* render;
 	LIRenUniforms32 uniforms;
 
@@ -60,6 +61,12 @@ void liren_context32_init (
 	self->matrix.view = limat_matrix_identity ();
 	self->textures.count = 0;
 	self->uniforms = uniforms;
+
+	/* Initialize light attentuation to infinity. */
+	/* Clearing the with memset will set light attenuation to zero so we
+	   need to explicitly change it to avoid divide by zero in shaders. */
+	for (i = 0 ; i < LIREN_CONTEXT_MAX_LIGHTS ; i++)
+		liren_context32_set_light (self, i, NULL);
 }
 
 void liren_context32_bind (
