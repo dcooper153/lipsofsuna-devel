@@ -152,15 +152,14 @@ def configure(ctx):
 			ctx.check_cc(lib='FLAC', mandatory=True, uselib='CORE TEST', uselib_store='FLAC')
 
 	# CURL
-	found_curl = False
-	if ctx.check_cc(lib='curl', mandatory=False, uselib='CORE TEST', uselib_store='CURL'):
-		found_curl = True
-	else:
-		if ctx.check_cc(header_name='curl/curl.h', lib='curl', mandatory=False, uselib='CORE TEST', uselib_store='CURL'):
-			ctx.check_cc(lib='curl', mandatory=True, uselib='CORE TEST', uselib_store='CURL')
-			found_curl = True
-	if found_curl:
-		ctx.define('HAVE_CURL', 1)
+	if not ctx.check_cfg(package='libcurl', args='--cflags --libs', uselib_store="CURL", mandatory=False):
+		if not ctx.check_cfg(package='curl', args='--cflags --libs', uselib_store="CURL", mandatory=False):
+			found_curl = False
+			if ctx.check_cc(lib='curl', mandatory=False, uselib='CORE TEST', uselib_store='CURL'):
+				if ctx.check_cc(header_name='curl/curl.h', lib='curl', mandatory=False, uselib='CORE TEST', uselib_store='CURL'):
+					found_curl = True
+			if found_curl:
+				ctx.define('HAVE_CURL', 1)
 
 	# Paths and defines
 	ctx.define('LI_ENABLE_ERROR', 1)
@@ -216,7 +215,7 @@ def build(ctx):
 	ctx.add_group("install")
 	ctx.set_group("build")
 	objs = ''
-	libs = 'CORE LUA SQLITE BULLET ENET SDL SDL_TTF ZLIB GLEW THREAD AL VORBIS OGG FLAC CURL'
+	libs = 'CORE LUA SQLITE BULLET ENET SDL SDL_TTF GLEW THREAD AL VORBIS OGG FLAC CURL ZLIB'
 
 	# Core objects.
 	for dir in CORE_DIRS.split(' '):
@@ -244,7 +243,7 @@ def build(ctx):
 			features = 'c',
 			source = ctx.path.ant_glob('src/lipsofsuna/extension/%s/*.c' % dir),
 			target = dir + '_ext_objs',
-			use = 'EXTENSION LUA SQLITE ENET SDL SDL_TTF ZLIB GLEW THREAD AL VORBIS OGG FLAC')
+			use = 'EXTENSION LUA SQLITE ENET SDL SDL_TTF GLEW THREAD AL VORBIS OGG FLAC CURL ZLIB')
 
 	# Target executable.
 	ctx.new_task_gen(
