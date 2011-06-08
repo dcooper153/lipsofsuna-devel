@@ -341,7 +341,8 @@ Views.Chargen.set_race = function(self, index)
 	self:set_hair_color(math.random(), math.random(), math.random())
 	self:set_skin_style(math.random(1, #self.list_skin_styles))
 	self:set_height(spec.body_scale[1] + math.random() * (spec.body_scale[2] - spec.body_scale[1]))
-	self:set_bust_scale(spec.bust_scale[1] + math.random() * (spec.bust_scale[2] - spec.bust_scale[1]))
+	local bust = 0.3 + 0.3 * math.random()
+	self:set_bust_scale(spec.bust_scale[1] * bust + spec.bust_scale[2] * (1 - bust))
 	self:set_nose_scale(spec.nose_scale[1] + math.random() * (spec.nose_scale[2] - spec.nose_scale[1]))
 	self.update_needed = true
 	-- Randomize the name.
