@@ -1,3 +1,19 @@
+0.4.0
+
+  * Lots of sound effects.
+  * Master server and server browser.
+  * Climbing over obstacles.
+  * Merchants and trading.
+  * Attacks can be charged by holding the attack button.
+  * Projectiles and sword swings have speed lines.
+  * Controls can be customized in-game.
+  * Basic blood effects and beheading.
+  * More flexible map generation algorithm.
+  * Improved aer female, android female and kraken models.
+  * New items: crossbow, musket, revolver, barrel, bookcase, dewspring leaf, fruit.
+  * New spells: berserk, dig, firewall, light, travel.
+  * New quests: Brigands, Mining Guild, Sword on the Stone.
+
 0.3.1
 
   * Tooltips for items, feats and skills.
