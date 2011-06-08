@@ -177,6 +177,7 @@ Species{
 	models = {
 		skeleton = "android1",
 		arms = "androidarm1",
+		eyes = "androideye1",
 		feet = "androidfoot1",
 		hands = "androidhand1",
 		head = "androidhead1",

@@ -290,27 +290,18 @@
     <license>Creative Commons BY-SA 3.0</license>
     <dep>import/android1.png</dep>
     <dep>import/android1n.png</dep>
-    <status>usable</status>
-    <type>model</type>
   </asset>
 
   <asset>
     <file>import/android1.png</file>
-    <author>SenshiStock</author>
     <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>
-    <source>http://opengameart.org/content/senshistock-female-human-reference-packs</source>
-    <status>incomplete</status>
-    <type>texture</type>
-    <comment>Projection painted from the original.</comment>
   </asset>
 
   <asset>
     <file>import/android1n.png</file>
     <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>
-    <status>incomplete</status>
-    <type>normalmap</type>
   </asset>
 
   <asset>
