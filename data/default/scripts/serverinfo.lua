@@ -45,7 +45,16 @@ Widgets.Serverinfo.reshaped = function(self)
 			text_color = f and {1,1,0,1} or {a,a,a,1},
 			text_font = "default"}
 	end
-	-- TODO: Players
+	-- Players
+	if self.players and not self.compact then
+		self:canvas_text{
+			dest_position = {0,3},
+			dest_size = {w-5,h},
+			text = tostring(self.players),
+			text_alignment = {1,0},
+			text_color = f and {1,1,0,1} or {a,a,a,1},
+			text_font = "default"}
+	end
 	self:canvas_compile()
 end
 
