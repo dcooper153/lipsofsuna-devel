@@ -18,24 +18,18 @@ void main()
 pass4_depth_func = "equal",
 pass4_depth_write = false,
 pass4_vertex = [[
-out fragvar
-{
-	vec2 texcoord;
-} OUT;
+out vec2 F_texcoord;
 void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
-	OUT.texcoord = LOS_texcoord;
+	F_texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass4_fragment = [[
-in fragvar
-{
-	vec2 texcoord;
-} IN;
+in vec2 F_texcoord;
 void main()
 {
-	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
+	vec4 diffuse = texture(LOS_diffuse_texture_0, F_texcoord);
 	LOS_output_0 = LOS_material_diffuse * diffuse;
 }]]},
 
@@ -57,33 +51,27 @@ void main()
 pass4_depth_func = "equal",
 pass4_depth_write = false,
 pass4_vertex = [[
-out fragvar
-{
-	vec4 light;
-	vec2 texcoord;
-} OUT;
+out vec4 F_light;
+out vec2 F_texcoord;
 void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
 	vec3 normal = LOS_matrix_normal * LOS_normal;
-	OUT.texcoord = LOS_texcoord;
+	F_texcoord = LOS_texcoord;
 	vec3 halfvector[LOS_LIGHT_MAX];
 	vec3 lightvector[LOS_LIGHT_MAX];
 	]] .. Shader.los_lighting_vectors("lightvector", "halfvector", "tmp.xyz") .. [[
 	]] .. Shader.los_lighting_default("tmp.xyz", "normal", "lightvector", "halfvector") .. [[
-	OUT.light = lighting;
+	F_light = lighting;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass4_fragment = [[
-in fragvar
-{
-	vec4 light;
-	vec2 texcoord;
-} IN;
+in vec4 F_light;
+in vec2 F_texcoord;
 void main()
 {
-	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
-	LOS_output_0 = LOS_material_diffuse * diffuse * IN.light;
+	vec4 diffuse = texture(LOS_diffuse_texture_0, F_texcoord);
+	LOS_output_0 = LOS_material_diffuse * diffuse * F_light;
 }]]},
 
 -- High quality program.
@@ -106,61 +94,52 @@ pass6_blend = true,
 pass6_depth_func = "lequal",
 pass6_depth_write = false,
 pass6_vertex = [[
-out geovar
-{
-	vec3 coord;
-	vec4 light;
-	vec3 normal;
-	vec3 tangent;
-	vec2 texcoord;
-} OUT;
+out vec3 G_coord;
+out vec4 G_light;
+out vec3 G_normal;
+out vec3 G_tangent;
+out vec2 G_texcoord;
 void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
-	OUT.coord = tmp.xyz;
-	OUT.normal = LOS_matrix_normal * LOS_normal;
-	OUT.texcoord = LOS_texcoord;
+	G_coord = tmp.xyz;
+	G_normal = LOS_matrix_normal * LOS_normal;
+	G_texcoord = LOS_texcoord;
 	vec3 halfvector[LOS_LIGHT_MAX];
 	vec3 lightvector[LOS_LIGHT_MAX];
 	]] .. Shader.los_lighting_vectors("lightvector", "halfvector", "tmp.xyz") .. [[
-	]] .. Shader.los_lighting_default("tmp.xyz", "OUT.normal", "lightvector", "halfvector") .. [[
-	OUT.light = lighting;
+	]] .. Shader.los_lighting_default("tmp.xyz", "G_normal", "lightvector", "halfvector") .. [[
+	G_light = lighting;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass6_geometry = [[
 layout(triangles) in;
 layout(triangle_strip, max_vertices=30) out;
-in geovar
-{
-	vec3 coord;
-	vec4 light;
-	vec3 normal;
-	vec3 tangent;
-	vec2 texcoord;
-} IN[3];
-out fragvar
-{
-	float layer;
-	vec4 color;
-	vec4 light;
-	vec2 texcoord;
-	vec2 texcoord2;
-} OUT;
+in vec3 G_coord[3];
+in vec4 G_light[3];
+in vec3 G_normal[3];
+in vec3 G_tangent[3];
+in vec2 G_texcoord[3];
+out float F_layer;
+out vec4 F_color;
+out vec4 F_light;
+out vec2 F_texcoord;
+out vec2 F_texcoord2;
 void main()
 {
 	int i;
 	int j;
 	for(j = 0 ; j < 10 ; j++)
 	{
-		OUT.layer = float(j) / 10.0;
-		vec4 color = vec4(1.0, 1.0, 1.0, 1.0 - OUT.layer);
+		F_layer = float(j) / 10.0;
+		vec4 color = vec4(1.0, 1.0, 1.0, 1.0 - F_layer);
 		for(i = 0 ; i < gl_VerticesIn ; i++)
 		{
-			OUT.color = color;
-			OUT.light = IN[i].light;
-			OUT.texcoord = IN[i].texcoord;
-			OUT.texcoord2 = IN[i].texcoord + 0.1 * vec2(sin(OUT.layer), cos(OUT.layer));
-			vec3 coord = IN[i].coord + IN[i].normal * OUT.layer * 0.03;
+			F_color = color;
+			F_light = G_light[i];
+			F_texcoord = G_texcoord[i];
+			F_texcoord2 = G_texcoord[i] + 0.1 * vec2(sin(F_layer), cos(F_layer));
+			vec3 coord = G_coord[i] + G_normal[i] * F_layer * 0.03;
 			gl_Position = LOS_matrix_projection * vec4(coord, 1.0);
 			EmitVertex();
 		}
@@ -168,20 +147,17 @@ void main()
 	}
 }]],
 pass6_fragment = [[
-in fragvar
-{
-	float layer;
-	vec4 color;
-	vec4 light;
-	vec2 texcoord;
-	vec2 texcoord2;
-} IN;
+in float F_layer;
+in vec4 F_color;
+in vec4 F_light;
+in vec2 F_texcoord;
+in vec2 F_texcoord2;
 void main()
 {
-	vec4 diffuse = texture(LOS_diffuse_texture_0, IN.texcoord);
-	vec4 mask = texture(LOS_diffuse_texture_1, IN.texcoord2);
-	if(IN.layer <= 0.0001)
-		LOS_output_0 = LOS_material_diffuse * diffuse * IN.light;
+	vec4 diffuse = texture(LOS_diffuse_texture_0, F_texcoord);
+	vec4 mask = texture(LOS_diffuse_texture_1, F_texcoord2);
+	if(F_layer <= 0.0001)
+		LOS_output_0 = LOS_material_diffuse * diffuse * F_light;
 	else
-		LOS_output_0 = LOS_material_diffuse * diffuse * IN.color * mask * IN.light;
+		LOS_output_0 = LOS_material_diffuse * diffuse * F_color * mask * F_light;
 }]]}}

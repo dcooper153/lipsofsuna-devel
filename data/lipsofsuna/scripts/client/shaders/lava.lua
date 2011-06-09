@@ -18,32 +18,26 @@ void main()
 pass4_depth_func = "equal",
 pass4_depth_write = false,
 pass4_vertex = [[
-out fragvar
-{
-	vec3 coord;
-	vec3 halfvector[LOS_LIGHT_MAX];
-	vec3 lightvector[LOS_LIGHT_MAX];
-	vec3 normal;
-	vec2 texcoord;
-} OUT;
+out vec3 F_coord;
+out vec3 F_halfvector[LOS_LIGHT_MAX];
+out vec3 F_lightvector[LOS_LIGHT_MAX];
+out vec3 F_normal;
+out vec2 F_texcoord;
 void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
-	]] .. Shader.los_lighting_vectors("OUT.lightvector", "OUT.halfvector", "tmp.xyz") .. [[
-	OUT.coord = LOS_coord.xyz;
-	OUT.normal = LOS_matrix_normal * LOS_normal;
-	OUT.texcoord = LOS_texcoord;
+	]] .. Shader.los_lighting_vectors("F_lightvector", "F_halfvector", "tmp.xyz") .. [[
+	F_coord = LOS_coord.xyz;
+	F_normal = LOS_matrix_normal * LOS_normal;
+	F_texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass4_fragment = [[
-in fragvar
-{
-	vec3 coord;
-	vec3 halfvector[LOS_LIGHT_MAX];
-	vec3 lightvector[LOS_LIGHT_MAX];
-	vec3 normal;
-	vec2 texcoord;
-} IN;
+in vec3 F_coord;
+in vec3 F_halfvector[LOS_LIGHT_MAX];
+in vec3 F_lightvector[LOS_LIGHT_MAX];
+in vec3 F_normal;
+in vec2 F_texcoord;
 float swirlynoise(in vec3 p)
 {
 	vec4 x = vec4(0.1,0.2,0.3,0.4);
@@ -63,17 +57,17 @@ float swirlynoise(in vec3 p)
 }
 void main()
 {
-	vec3 normal = normalize(IN.normal);
-	vec3 x = 1.5*IN.coord.xyz + vec3(0.0, 0.05*LOS_time, 0.0);
-	vec3 y = 1.5*IN.coord.yzx + vec3(0.0, -0.15*LOS_time, 0.0);
+	vec3 normal = normalize(F_normal);
+	vec3 x = 1.5*F_coord.xyz + vec3(0.0, 0.05*LOS_time, 0.0);
+	vec3 y = 1.5*F_coord.yzx + vec3(0.0, -0.15*LOS_time, 0.0);
 	float a = swirlynoise(1.0 * x) + swirlynoise(2.0 * y);
 	a = pow(2.7, a);
-	x = IN.coord.xyz + vec3(0.0, -0.15*LOS_time, -0.15*LOS_time);
-	y = IN.coord.yzx + vec3(0.0, -0.15*LOS_time, -0.15*LOS_time);
+	x = F_coord.xyz + vec3(0.0, -0.15*LOS_time, -0.15*LOS_time);
+	y = F_coord.yzx + vec3(0.0, -0.15*LOS_time, -0.15*LOS_time);
 	float b = swirlynoise(2.5 * vec3(x.x, 0.8*x.y, x.z)) + swirlynoise(2.5 * vec3(x.x+0.05, 0.8*x.y, x.z+0.05));
 	b = pow(4.0, b);
 	vec4 diffuse = vec4(0.1+0.7*a,0.1+0.3*a,0.2*a,1.0) * vec4(0.1+b,0.7*b,0.7*b,1.0);
-	]] .. Shader.los_lighting_default("IN.coord", "normal", "IN.lightvector", "IN.halfvector") .. [[
+	]] .. Shader.los_lighting_default("F_coord", "normal", "F_lightvector", "F_halfvector") .. [[
 	lighting = vec4(0.1) + lighting * 0.9;
 	LOS_output_0 = LOS_material_diffuse * diffuse * lighting * vec4(1.0,1.0,1.0,1.0);
 }]]}}

@@ -11,7 +11,6 @@ void main()
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass1_fragment = [[
-in vec2 var_texcoord;
 void main()
 {
 }]],
