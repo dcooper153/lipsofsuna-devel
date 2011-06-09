@@ -22,7 +22,7 @@
 #include "lipsofsuna/video.h"
 #include "render-uniform.h"
 
-#define LIREN_UNIFORM_BUFFER_SIZE 2048
+#define LIREN_UNIFORM_BUFFER_SIZE 1600
 
 typedef struct _LIRenUniforms32 LIRenUniforms32;
 struct _LIRenUniforms32

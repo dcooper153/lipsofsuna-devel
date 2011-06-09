@@ -44,7 +44,6 @@ struct _LIRenContext32
 	int incomplete;
 	int shadows;
 	GLuint array;
-	LIRenLight32* light;
 	LIRenRender32* render;
 	LIRenScene32* scene;
 	LIRenShader32* shader;

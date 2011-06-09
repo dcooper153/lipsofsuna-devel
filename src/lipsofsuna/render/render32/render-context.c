@@ -37,7 +37,6 @@ void liren_context32_init (
 	memset (self, 0, sizeof (LIRenContext32));
 	self->render = render;
 	self->scene = NULL;
-	self->light = NULL;
 	self->array = 0;
 	self->incomplete = 1;
 	self->blend.enable = 0;
@@ -366,7 +365,6 @@ void liren_context32_set_light (
 
 	if (value != NULL)
 	{
-		self->light = value;
 		liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_AMBIENT + index, value->ambient);
 		liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_LIGHT0_DIFFUSE + index, value->diffuse);
 		liren_uniforms32_set_vec3 (&self->uniforms, LIREN_UNIFORM_LIGHT0_EQUATION + index, value->equation);
@@ -472,7 +470,6 @@ void liren_context32_set_scene (
 	self->scene = scene;
 	/* FIXME */
 	self->textures.count = 0;
-	self->light = NULL;
 }
 
 int liren_context32_get_scissor (
