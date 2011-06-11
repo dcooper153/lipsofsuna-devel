@@ -77,7 +77,7 @@ Feat.apply = function(self, args)
 	-- if the target was blocking in order to penalize rampant swinging.
 	if anim.categories["melee"] and args.attacker and args.target and args.target.blocking then
 		if Program.time - args.target.blocking > args.target.spec.blocking_delay then
-			args.attacker.cooldown = args.attacker.cooldown * 2
+			args.attacker.cooldown = (args.attacker.cooldown or 0) * 2
 		end
 	end
 	-- Influences.
