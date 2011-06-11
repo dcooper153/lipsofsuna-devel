@@ -383,10 +383,14 @@ end
 
 Views.Chargen.update_model = function(self)
 	local spec = Species:find{name = self.race .. "-player"}
+	local items = {}
+	for k,v in pairs(spec.inventory_items) do
+		table.insert(items, k)
+	end
 	self.object:create_character_model{
 		body_scale = self.scroll_height.value,
 		bust_scale = self.scroll_bust_scale.value,
-		equipment = spec and spec.inventory_items,
+		equipment = items,
 		eye_color = {self.color_eye.red, self.color_eye.green, self.color_eye.blue},
 		face_style = {self.scroll_face[1].value, self.scroll_face[2].value, self.scroll_face[3].value},
 		hair_color = {self.color_hair.red, self.color_hair.green, self.color_hair.blue},
