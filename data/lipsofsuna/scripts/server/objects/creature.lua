@@ -83,11 +83,11 @@ Creature:add_setters{
 		s.inventory = s.inventory or Inventory{id = s.id, size = spec.inventory_size} -- FIXME: Resizing not supported.
 		if s.random then
 			for k,v in pairs(spec.inventory_items) do
-				local itemspec = Itemspec:find{name = v}
+				local itemspec = Itemspec:find{name = k}
 				if itemspec then
-					s:add_item{object = Item{spec = itemspec}}
+					s:add_item{object = Item{spec = itemspec, count = v}}
 				else
-					print(string.format("WARNING: Creature '%s' uses an invalid inventory item name '%s'", s.spec.name, v))
+					print(string.format("WARNING: Creature '%s' uses an invalid inventory item name '%s'", s.spec.name, k))
 				end
 			end
 			s:equip_best_items()

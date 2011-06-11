@@ -149,6 +149,19 @@ Species.new = function(clss, args)
 			self.feat_effects[v] = true
 		end
 	end
+	-- Inventory items.
+	-- Some items are in a list form and others have the name as the key and
+	-- the count as a value. All are converted to the latter form.
+	self.inventory_items = {}
+	if args.inventory_items then
+		for k,v in pairs(args.inventory_items) do
+			if type(k) == "string" then
+				self.inventory_items[k] = v
+			else
+				self.inventory_items[v] = 1
+			end
+		end
+	end
 	-- Skills.
 	-- Converted from a list to a dictionary to make searching easier.
 	self.skills = {}
@@ -195,7 +208,6 @@ Species.new = function(clss, args)
 	copy("falling_damage_speed", 10)
 	copy("gravity", Vector(0,-15,0))
 	copy("interactive", true)
-	copy("inventory_items", {})
 	copy("inventory_size", 0)
 	copy("jump_force", 8)
 	copy("mass", 50)

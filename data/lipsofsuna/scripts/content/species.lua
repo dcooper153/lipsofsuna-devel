@@ -370,10 +370,7 @@ Species{
 	dialog = "lips guard",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson crossbow",
-		"arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow",
-		"arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow",
-		"arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow", "arrow"},
+	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson crossbow", ["arrow"] = 100},
 	skills = {
 		{name = "dexterity", max = 80, val = 80},
 		{name = "health", max = 100, val = 70},
