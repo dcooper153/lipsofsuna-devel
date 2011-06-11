@@ -395,6 +395,21 @@ Species{
 		{name = "willpower", max = 80, val = 0}}}
 
 Species{
+	name = "Lips guard mage",
+	base = "kraken",
+	dialog = "lips guard",
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"lizard dress", "lizard gloves", ["milky powder"] = 100},
+	skills = {
+		{name = "dexterity", max = 80, val = 5},
+		{name = "health", max = 100, val = 50},
+		{name = "intelligence", max = 60, val = 40},
+		{name = "perception", max = 40, val = 20},
+		{name = "strength", max = 80, val = 5},
+		{name = "willpower", max = 100, val = 80}}}
+
+Species{
 	name = "lipscitizen",
 	base = "aer",
 	dialog = "lips citizen",
