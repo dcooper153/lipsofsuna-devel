@@ -15,6 +15,7 @@ Species.dict_name = {}
 --   <li>ai_enable_block: False to prohibit blocking.</li>
 --   <li>ai_enable_combat: False to prohibit combat.</li>
 --   <li>ai_enable_jump: False to prohibit jumping.</li>
+--   <li>ai_enable_spells: False to prohibit spell casting.</li>
 --   <li>ai_enable_strafe: False to prohibit strafing.</li>
 --   <li>ai_enable_wander: False to prohibit wandering.</li>
 --   <li>ai_enable_walk: False to prohibit walking.</li>
@@ -181,6 +182,7 @@ Species.new = function(clss, args)
 	copy("ai_enable_block", true)
 	copy("ai_enable_combat", true)
 	copy("ai_enable_jump", true)
+	copy("ai_enable_spells", true)
 	copy("ai_enable_strafe", true)
 	copy("ai_enable_wander", true)
 	copy("ai_enable_walk", true)
@@ -239,11 +241,21 @@ Species.new = function(clss, args)
 	self.can_melee = false
 	self.can_ranged = false
 	self.can_throw = false
+	self.can_cast_ranged = false
+	self.can_cast_self = false
+	self.can_cast_touch = false
 	for k,v in pairs(self.feat_anims) do
 		local feat = Featanimspec:find{name = k}
-		if feat.categories["melee"] then self.can_melee = true end
-		if feat.categories["ranged"] then self.can_ranged = true end
-		if feat.categories["throw"] then self.can_throw = true end
+		if self.ai_enable_attack then
+			if feat.categories["melee"] then self.can_melee = true end
+			if feat.categories["ranged"] then self.can_ranged = true end
+			if feat.categories["throw"] then self.can_throw = true end
+		end
+		if self.ai_enable_spells then
+			if feat.categories["ranged spell"] then self.can_cast_ranged = true end
+			if feat.categories["spell on self"] then self.can_cast_self = true end
+			if feat.categories["spell on touch"] then self.can_cast_touch = true end
+		end
 	end
 	return self
 end

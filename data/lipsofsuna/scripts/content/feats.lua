@@ -37,7 +37,7 @@ Featanimspec{
 Featanimspec{
 	name = "ranged spell",
 	animation = "spell ranged",
-	categories = {"ranged", "spell"},
+	categories = {"ranged spell"},
 	cooldown = 2,
 	description = "Cast a magical projectile",
 	effect = "spell1",
@@ -46,7 +46,7 @@ Featanimspec{
 Featanimspec{
 	name = "spell on self",
 	animation = "spell self",
-	categories = {"self", "spell"},
+	categories = {"spell on self"},
 	cooldown = 2,
 	description = "Cast a spell on yourself",
 	effect = "spell1",
@@ -55,7 +55,7 @@ Featanimspec{
 Featanimspec{
 	name = "spell on touch",
 	animation = "spell touch",
-	categories = {"spell", "touch"},
+	categories = {"spell on touch"},
 	cooldown = 2,
 	description = "Cast a short range touch spell",
 	effect = "spell1",
@@ -78,7 +78,7 @@ Featanimspec{
 
 Feateffectspec{
 	name = "berserk",
-	categories = {"berserk", "spell"},
+	categories = {"beneficial", "berserk", "spell"},
 	description = "Inflict additional damage when in low health",
 	effect = "berserk1",
 	icon = "modifier-berserk",
@@ -90,7 +90,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "black haze",
-	categories = {"plague", "spell"},
+	categories = {"harmful", "plague", "spell"},
 	description = "Conjure infectious plagued monsters",
 	effect = "spell1",
 	icon = "modifier-plague",
@@ -116,7 +116,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "fire damage",
-	categories = {"fire", "melee", "spell"},
+	categories = {"fire", "harmful", "melee", "spell"},
 	description = "Inflict fire damage",
 	effect = "explosion1",
 	icon = "modifier-fireball",
@@ -128,7 +128,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "firewall",
-	categories = {"fire", "spell"},
+	categories = {"fire", "harmful", "spell"},
 	description = "Conjure a wall of fire",
 	effect = "firewall1",
 	icon = "modifier-firewall",
@@ -140,7 +140,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "light",
-	categories = {"light", "spell"},
+	categories = {"beneficial", "light", "spell"},
 	description = "Illuminate your surroundings",
 	effect = "light1",
 	icon = "modifier-light",
@@ -152,7 +152,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "physical damage",
-	categories = {"melee", "physical"},
+	categories = {"harmful", "melee", "physical"},
 	effect = "impact1",
 	icon = "modifier-physical",
 	influences = {{"physical", -1, -0.2}},
@@ -160,7 +160,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "restore health",
-	categories = {"heal", "spell"},
+	categories = {"beneficial", "heal", "spell"},
 	description = "Restore health",
 	effect = "heal1",
 	icon = "modifier-heal",
@@ -172,7 +172,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "sanctuary",
-	categories = {"spell"},
+	categories = {"beneficial", "spell"},
 	description = "Protect from death",
 	effect = "sanctuary1",
 	icon = "modifier-sanctuary",
@@ -262,7 +262,7 @@ Featanimspec{
 
 Feateffectspec{
 	name = "dexterity to physical damage",
-	categories = {"melee", "physical"},
+	categories = {"harmful", "melee", "physical"},
 	effect = "impact1",
 	icon = "modifier-physical",
 	influences = {{"physical", -1, -0.2}},
@@ -270,7 +270,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "strength to physical damage",
-	categories = {"melee", "physical"},
+	categories = {"harmful", "melee", "physical"},
 	effect = "impact1",
 	icon = "modifier-physical",
 	influences = {{"physical", -1, -0.2}},

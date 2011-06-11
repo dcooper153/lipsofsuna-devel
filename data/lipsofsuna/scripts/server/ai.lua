@@ -51,6 +51,20 @@ Ai.calculate_enemy_rating = function(self, enemy)
 	return 1 / ((self.object.position - enemy.position).length + 1)
 end
 
+--- Calculates the tilt value for melee attacks.
+-- @param self Ai.
+-- @return Tilt angle in radians.
+Ai.calculate_melee_tilt = function(self)
+	-- Calculate distance to the target.
+	local diff = self.target.position - self.object.position
+	local dist = Vector(diff.x, 0, diff.z).length
+	-- Solve the tilt angle analytically.
+	local angle = math.atan2(diff.y, dist)
+	local limit = self.object.spec.tilt_limit
+	angle = math.min(math.max(angle, -limit), limit)
+	return Quaternion{euler = {0,0,angle}}
+end
+
 --- Calculates the tilt value for ranged attacks.
 -- @param self Ai.
 -- @return Tilt angle in radians.
@@ -227,13 +241,60 @@ Ai.choose_combat_action = function(self)
 		feat = self:find_best_feat{category = "ranged", target = self.target, weapon = weapon}
 		if feat then p_ranged = 4 end
 	end
+	-- Calculate ranged spell probability.
+	-- The creature must be able to cast a useful ranged spell.
+	-- Offensive, magnitude is 0, 2 or 4.
+	local feat_spell_ranged
+	local p_spell_ranged = 0
+	if spec.can_cast_ranged and aim > 0.8 then
+		feat_spell_ranged = self:find_best_feat{category = "ranged spell", target = self.target}
+		if feat_spell_ranged then
+			p_spell_ranged = (dist > hint * 3) and 4 or 2
+			for k,v in pairs(feat_spell_ranged.effects) do
+				v[2] = v[2] * spec.ai_offense_factor
+			end
+		end
+	end
+	-- Calculate cast on self spell probability.
+	-- The creature must be able to cast a useful spell on self.
+	-- Offensive, magnitude is 0 or 4.
+	local feat_spell_self
+	local p_spell_self = 0
+	if spec.can_cast_self and dist > hint * 6 then
+		feat_spell_self = self:find_best_feat{category = "spell on self", target = self.object}
+		if feat_spell_self then
+			p_spell_self = 4
+			for k,v in pairs(feat_spell_self.effects) do
+				v[2] = v[2] * (1 - spec.ai_offense_factor)
+			end
+		end
+	end
+	-- Calculate touch spell probability.
+	-- The creature must be able to cast a useful touch spell.
+	-- Offensive, magnitude is 0 or 4.
+	local feat_spell_touch
+	local p_spell_touch = 0
+	if spec.can_cast_touch and dist < hint * 3 and aim > 0.8 then
+		feat_spell_touch = self:find_best_feat{category = "spell on touch", target = self.target}
+		if feat_spell_touch then
+			p_spell_touch = 4
+			for k,v in pairs(feat_spell_touch.effects) do
+				v[2] = v[2] * spec.ai_offense_factor
+			end
+		end
+	end
 	-- Calculate throw attack probability.
 	-- The creature must wield a throwable weapon.
 	-- Offensive, magnitude is 0 or 4.
 	local p_throw = 0
 	if attack and spec.can_throw and weapon and weapon.spec.categories["throwable"] and aim > 0.8 then
 		feat = self:find_best_feat{category = "throw", target = self.target, weapon = weapon}
-		if feat then p_ranged = 4 end
+		if feat then
+			p_ranged = 4
+			for k,v in pairs(feat.effects) do
+				feat.effects[k] = v * spec.ai_offense_factor
+			end
+		end
 	end
 	-- Calculate the forward walking probability.
 	-- Walking forward if preferred if the creature is far away from the target.
@@ -279,21 +340,25 @@ Ai.choose_combat_action = function(self)
 		p_strafe = 1
 	end
 	-- Normalize the probabilities and scale them so that we get the right offense probability.
-	local p_offense = p_melee + p_ranged + p_throw + p_forward + p_weapon
-	local p_defense = p_backward + p_strafe + p_block
+	local p_offense = p_melee + p_ranged + p_throw + p_forward + p_weapon + p_spell_ranged + p_spell_touch
+	local p_defense = p_backward + p_strafe + p_block + p_spell_self
 	if p_offense > 0 then
 		p_melee = p_melee / p_offense * spec.ai_offense_factor
 		p_forward = p_forward / p_offense * spec.ai_offense_factor
 		p_weapon = p_weapon / p_offense * spec.ai_offense_factor
+		p_spell_ranged = p_spell_ranged / p_offense * spec.ai_offense_factor
+		p_spell_touch = p_spell_touch / p_offense * spec.ai_offense_factor
 	end
 	if p_defense > 0 then
 		p_backward = p_backward / p_defense * (1 - spec.ai_offense_factor)
 		p_block = p_block / p_defense * (1 - spec.ai_offense_factor)
 		p_strafe = p_strafe / p_defense * (1 - spec.ai_offense_factor)
+		p_spell_self = p_spell_self / p_offense * spec.ai_offense_factor
 	end
 	-- Select the action based on the calculated probabilities.
 	local choice = math.random()
 	if choice < p_melee then
+		-- Melee.
 		if diff.y > 1 and spec.allow_jump then self.object:jump() end
 		self.object:set_block(false)
 		if spec.ai_enable_backstep and dist < hint then
@@ -303,19 +368,20 @@ Ai.choose_combat_action = function(self)
 		else
 			self.object:set_movement(0)
 		end
-		self.object.tilt = nil
+		self.object.tilt = self:calculate_melee_tilt()
 		self.object:set_strafing(0)
 		feat:perform{user = self.object}
 		self.action_timer = 0.5
 	elseif choice < p_melee + p_ranged then
+		-- Ranged.
 		self.object:set_block(false)
 		self.object:set_movement(0)
 		self.object:set_strafing(0)
 		self.object.tilt = self:calculate_ranged_tilt()
 		feat:perform{user = self.object}
-		-- FIXME: Tilt needs to be reset somewhere else since firing is delayed.
 		self.action_timer = 1
 	elseif choice < p_melee + p_ranged + p_throw then
+		-- Throw.
 		self.object:set_block(false)
 		self.object:set_movement(0)
 		self.object:set_strafing(0)
@@ -323,12 +389,14 @@ Ai.choose_combat_action = function(self)
 		feat:perform{user = self.object}
 		self.action_timer = 1
 	elseif choice < p_melee + p_ranged + p_throw + p_forward then
+		-- Move forward.
 		if allow_forward_jump then self.object:jump() end
 		self.object:set_block(false)
 		self.object:set_movement(1)
 		self.object:set_strafing(0)
 		self.action_timer = math.random(1, 3)
 	elseif choice < p_melee + p_ranged + p_throw + p_forward + p_weapon then
+		-- Weapon switch.
 		if self.melee_rating > self.ranged_rating and self.melee_rating > self.throw_rating then
 			if self.best_melee_weapon then
 				self.object:equip_item{object = self.best_melee_weapon}
@@ -342,16 +410,20 @@ Ai.choose_combat_action = function(self)
 		end
 		self.action_timer = 1
 	elseif choice < p_melee + p_ranged + p_throw + p_forward + p_weapon + p_backward then
+		-- Move backward.
 		self.object:set_block(false)
 		self.object:set_movement(-0.5)
 		self.object:set_strafing(0)
 		self.action_timer = math.random(2, 4)
 	elseif choice < p_melee + p_ranged + p_throw + p_forward + p_weapon + p_backward + p_block then
+		-- Block.
 		self.object:set_block(true)
 		self.object:set_movement(0)
 		self.object:set_strafing(0)
+		self.object.tilt = self:calculate_melee_tilt()
 		self.action_timer = math.random(4, 8)
 	elseif choice < p_melee + p_ranged + p_throw + p_forward + p_weapon + p_backward + p_block + p_strafe then
+		-- Strafe.
 		local strafe_left = function()
 			if allow_strafe_left or allow_strafe_left_jump then
 				if allow_strafe_left_jump then self.object:jump() end
@@ -377,6 +449,30 @@ Ai.choose_combat_action = function(self)
 		else
 			local r = strafe_right() or strafe_left()
 		end
+	elseif choice < p_melee + p_ranged + p_throw + p_forward + p_weapon + p_backward + p_block + p_strafe + p_spell_ranged then
+		-- Cast ranged.
+		self.object:set_block(false)
+		self.object:set_movement(0)
+		self.object:set_strafing(0)
+		self.object.tilt = self:calculate_ranged_tilt()
+		feat_spell_ranged:perform{user = self.object}
+		self.action_timer = 1
+	elseif choice < p_melee + p_ranged + p_throw + p_forward + p_weapon + p_backward + p_block + p_strafe + p_spell_ranged + p_spell_self then
+		-- Cast self.
+		self.object:set_block(false)
+		self.object:set_movement(0)
+		self.object:set_strafing(0)
+		self.object.tilt = Quaternion()
+		feat_spell_self:perform{user = self.object}
+		self.action_timer = 1
+	elseif choice < p_melee + p_ranged + p_throw + p_forward + p_weapon + p_backward + p_block + p_strafe + p_spell_ranged + p_spell_self + p_spell_touch then
+		-- Cast touch.
+		self.object:set_block(false)
+		self.object:set_movement(0)
+		self.object:set_strafing(0)
+		self.object.tilt = self:calculate_melee_tilt()
+		feat_spell_touch:perform{user = self.object}
+		self.action_timer = 1
 	else
 		self.object:set_movement(0)
 		self.object:set_strafing(0)
@@ -424,6 +520,7 @@ end
 --   <li>weapon: Weapon to be used.</li></ul>
 -- @return New feat.
 Ai.find_best_feat = function(self, args)
+	local effect = (self.object == args.target and "beneficial" or "harmful")
 	local best_feat = nil
 	local best_score = -1
 	local process_anim = function(anim)
@@ -431,10 +528,12 @@ Ai.find_best_feat = function(self, args)
 		local feat = Feat{animation = anim.name}
 		if not feat:usable{user = self.object} then return end
 		-- Add best feat effects.
-		feat:add_best_effects{user = self.object}
+		feat:add_best_effects{category = effect, user = self.object}
 		-- Calculate the score.
+		-- TODO: Support influences other than health.
 		local info = feat:get_info{attacker = self.object, target = args.target, weapon = args.weapon}
-		local score = -(info.influences.health or 0)
+		local score = (info.influences.health or 0)
+		if args.target ~= self then score = -score end
 		if score < 1 then return end
 		score = score + 100 * math.random()
 		-- Maintain the best feat.

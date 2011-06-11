@@ -3,6 +3,7 @@ local oldinfo = Feat.get_info
 --- Adds the best possible effects to the feat.
 -- @param self Feat.
 -- @param args Arguments.<ul>
+--   <li>category: Category from which to pick effects.</li>
 --   <li>user: Object whose skills and inventory to use.</li></ul>
 Feat.add_best_effects = function(self, args)
 	-- Solves the maximum value the effect can have without the feat
@@ -28,7 +29,7 @@ Feat.add_best_effects = function(self, args)
 	for name in pairs(args.user.spec.feat_effects) do
 		if anim.effects[name] then
 			local effect = Feateffectspec:find{name = name}
-			if effect then
+			if effect and (not args.category or effect.categories[args.category]) then
 				local value = solve_effect_value(self, effect)
 				if value >= 1 then self.effects[#self.effects + 1] = {name, value} end
 			end
@@ -221,9 +222,7 @@ Feat.perform = function(self, args)
 				-- animation. The collision callback of the projectile takes
 				-- care of damaging the hit object or tile.
 				Thread(function(t)
-					if anim.categories["spell"] then
-						Thread:sleep(args.user.spec.timing_spell_ranged * 0.02)
-					elseif weapon and weapon.spec.animation_attack == "attack bow" then
+					if weapon and weapon.spec.animation_attack == "attack bow" then
 						Thread:sleep(args.user.spec.timing_attack_bow * 0.02)
 					elseif weapon and weapon.spec.animation_attack == "attack crossbow" then
 						Thread:sleep(args.user.spec.timing_attack_crossbow * 0.02)
@@ -240,6 +239,16 @@ Feat.perform = function(self, args)
 							return
 						end
 					end
+				end)
+			end
+			if anim.categories["ranged spell"] then
+				-- Ranged spell.
+				-- A magical projectile is fired at the specific time into the attack
+				-- animation. The collision callback of the projectile takes
+				-- care of damaging the hit object or tile.
+				Thread(function(t)
+					Thread:sleep(args.user.spec.timing_spell_ranged * 0.02)
+					play_effects()
 					for index,data in ipairs(self.effects) do
 						local effect = Feateffectspec:find{name = data[1]}
 						if effect and effect.projectile then
@@ -259,8 +268,8 @@ Feat.perform = function(self, args)
 					end
 				end)
 			end
-			if anim.categories["self"] then
-				-- Target self.
+			if anim.categories["spell on self"] then
+				-- Spell on self.
 				-- At the specific time into the attack animation, the effects of the
 				-- feat are applied to the attacker herself.
 				Thread(function(t)
@@ -271,6 +280,25 @@ Feat.perform = function(self, args)
 						charge = charge,
 						point = args.user.position,
 						target = args.user,
+						weapon = weapon}
+				end)
+			end
+			if anim.categories["spell on touch"] then
+				-- Spell on touch.
+				-- While the attack animation is played, an attack ray is cast.
+				-- The first object or tile that collides with the ray is damaged.
+				Thread(function(t)
+					play_effects()
+					Thread:sleep(args.user.spec.timing_spell_touch * 0.02)
+					local src,dst = args.user:get_attack_ray(args)
+					local r = Physics:cast_ray{src = src, dst = dst}
+					if not r then return end
+					self:apply{
+						attacker = args.user,
+						charge = charge,
+						point = r.point,
+						target = r.object,
+						tile = r.tile,
 						weapon = weapon}
 				end)
 			end
@@ -290,25 +318,6 @@ Feat.perform = function(self, args)
 						owner = args.user,
 						speed = 10 * charge,
 						timer = weapon.spec.destroy_timer}
-				end)
-			end
-			if anim.categories["touch"] then
-				-- Touch spell.
-				-- While the attack animation is played, an attack ray is cast.
-				-- The first object or tile that collides with the ray is damaged.
-				Thread(function(t)
-					play_effects()
-					Thread:sleep(args.user.spec.timing_spell_touch * 0.02)
-					local src,dst = args.user:get_attack_ray(args)
-					local r = Physics:cast_ray{src = src, dst = dst}
-					if not r then return end
-					self:apply{
-						attacker = args.user,
-						charge = charge,
-						point = r.point,
-						target = r.object,
-						tile = r.tile,
-						weapon = weapon}
 				end)
 			end
 		end
