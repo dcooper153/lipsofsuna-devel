@@ -64,24 +64,26 @@ Views.Chargen.new = function(clss)
 		Widgets.ColorSelector.pressed(widget, point)
 		self:update_model()
 	end}
-	-- Body proportion sliders.
+	-- Body style sliders.
 	self.label_height = Widgets.Label{text = "Height:"}
 	self.scroll_height = Widgets.Progress{min = 0, max = 1, value = 1,
 		pressed = function(widget) self:set_height(widget:get_value_at(Client.cursor_pos)) end}
-	self.label_nose_scale = Widgets.Label{text = "Nose:"}
-	self.scroll_nose_scale = Widgets.Progress{min = 0, max = 1, value = 1,
-		pressed = function(widget) self:set_nose_scale(widget:get_value_at(Client.cursor_pos)) end}
-	self.label_bust_scale = Widgets.Label{text = "Bust:"}
-	self.scroll_bust_scale = Widgets.Progress{min = 0, max = 1, value = 1,
-		pressed = function(widget) self:set_bust_scale(widget:get_value_at(Client.cursor_pos)) end}
+	self.label_body = {}
+	self.scroll_body = {}
+	local body_slider_names = {"Hips width", "Limb muscularity", "Bust size", "Torso width", "Waist width"}
+	for i = 1,5 do
+		self.label_body[i] = Widgets.Label{text = body_slider_names[i]}
+		self.scroll_body[i] = Widgets.Progress{min = 0, max = 1, value = 0,
+			pressed = function(widget) self:set_body(i, widget:get_value_at(Client.cursor_pos)) end}
+	end
 	-- Face style sliders.
 	self.label_face = {}
 	self.scroll_face = {}
-	local face_slider_names = {"Face 1", "Face 2", "Face 3"}
-	for i = 1,3 do
-		self.label_face[i] = Widgets.Label{text = face_slider_names[i]}
-		self.scroll_face[i] = Widgets.Progress{min = 0, max = 1, value = 0,
-			pressed = function(widget) self:set_face(i, widget:get_value_at(Client.cursor_pos)) end}
+	local face_slider_names = {"Cheekbone size", "Cheek size", "Chin squareness", "Chin roundness", "Chin size", "Eye inner", "Eye outer", "Eye size", "Face width", "Face roughness", "Jaw width", "Nose pointedness"}
+	for k,v in ipairs(face_slider_names) do
+		self.label_face[k] = Widgets.Label{text = v}
+		self.scroll_face[k] = Widgets.Progress{min = 0, max = 1, value = 0,
+			pressed = function(widget) self:set_face(k, widget:get_value_at(Client.cursor_pos)) end}
 	end
 	-- Apply and quit buttons.
 	self.button_create = Widgets.Button{text = "Create", pressed = function() self:apply() end}
@@ -102,7 +104,7 @@ Views.Chargen.new = function(clss)
 	self.group_race1 = Widgets.Frame{rows = 2, cols = 1}
 	self.group_race1:set_child{row = 1, col = 1, widget = self.group_race}
 	self.group_race1:set_child{row = 2, col = 1, widget = self.skills}
-	self.group_appearance = Widgets.Frame{rows = 12, cols = 2, spacings = {0,2}}
+	self.group_appearance = Widgets.Frame{rows = 7 + #body_slider_names + #face_slider_names, cols = 2, spacings = {0,2}}
 	self.group_appearance:set_child{row = 1, col = 1, widget = self.label_eye_style}
 	self.group_appearance:set_child{row = 1, col = 2, widget = self.combo_eye_style}
 	self.group_appearance:set_child{row = 2, col = 1, widget = self.label_eye_color}
@@ -117,16 +119,17 @@ Views.Chargen.new = function(clss)
 	self.group_appearance:set_child{row = 6, col = 2, widget = self.color_skin}
 	self.group_appearance:set_child{row = 7, col = 1, widget = self.label_height}
 	self.group_appearance:set_child{row = 7, col = 2, widget = self.scroll_height}
-	self.group_appearance:set_child{row = 8, col = 1, widget = self.label_nose_scale}
-	self.group_appearance:set_child{row = 8, col = 2, widget = self.scroll_nose_scale}
-	self.group_appearance:set_child{row = 9, col = 1, widget = self.label_bust_scale}
-	self.group_appearance:set_child{row = 9, col = 2, widget = self.scroll_bust_scale}
-	self.group_appearance:set_child{row = 10, col = 1, widget = self.label_face[1]}
-	self.group_appearance:set_child{row = 10, col = 2, widget = self.scroll_face[1]}
-	self.group_appearance:set_child{row = 11, col = 1, widget = self.label_face[2]}
-	self.group_appearance:set_child{row = 11, col = 2, widget = self.scroll_face[2]}
-	self.group_appearance:set_child{row = 12, col = 1, widget = self.label_face[3]}
-	self.group_appearance:set_child{row = 12, col = 2, widget = self.scroll_face[3]}
+	local row = 8
+	for i = 1,#body_slider_names do
+		self.group_appearance:set_child{row = row, col = 1, widget = self.label_body[i]}
+		self.group_appearance:set_child{row = row, col = 2, widget = self.scroll_body[i]}
+		row = row + 1
+	end
+	for i = 1,#face_slider_names do
+		self.group_appearance:set_child{row = row, col = 1, widget = self.label_face[i]}
+		self.group_appearance:set_child{row = row, col = 2, widget = self.scroll_face[i]}
+		row = row + 1
+	end
 	self.group_appearance:set_expand{col = 2}
 	self.group_buttons = Widget{rows = 2, cols = 1, margins = {0,0,5,5}}
 	self.group_buttons:set_child{row = 1, col = 1, widget = self.button_create}
@@ -160,9 +163,12 @@ Views.Chargen.apply = function(self)
 		"uint8", self.skills:get_value("strength"),
 		"uint8", self.skills:get_value("willpower"),
 		-- Body style.
-		"float", self.scroll_height.value,
-		"float", self.scroll_nose_scale.value,
-		"float", self.scroll_bust_scale.value,
+		"uint8", 255 * self.scroll_height.value,
+		"uint8", 255 * self.scroll_body[1].value,
+		"uint8", 255 * self.scroll_body[2].value,
+		"uint8", 255 * self.scroll_body[3].value,
+		"uint8", 255 * self.scroll_body[4].value,
+		"uint8", 255 * self.scroll_body[5].value,
 		-- Eye style.
 		"string", "default",
 		"uint8", 255 * self.color_eye.red,
@@ -245,8 +251,8 @@ Views.Chargen.rotate = function(self, rad)
 	self.object.rotation = self.object.rotation * rot
 end
 
-Views.Chargen.set_bust_scale = function(self, value)
-	self.scroll_bust_scale.value = value
+Views.Chargen.set_body = function(self, slider, value)
+	self.scroll_body[slider].value = value
 	self.update_needed = true
 end
 
@@ -288,11 +294,6 @@ Views.Chargen.set_height = function(self, value)
 	self.update_needed = true
 end
 
-Views.Chargen.set_nose_scale = function(self, value)
-	self.scroll_nose_scale.value = value
-	self.update_needed = true
-end
-
 Views.Chargen.get_race = function(self)
 	return Species:find{name = self.list_races[self.combo_race.value][2]}
 end
@@ -325,25 +326,20 @@ Views.Chargen.set_race = function(self, index)
 		self.combo_skin_style:append{text = v[1], pressed = function() self:set_skin_style(k) end}
 	end
 	-- Reconfigure the body proportion sliders.
-	self.scroll_height.value = 1
-	self.scroll_height.min = spec.body_scale[1]
-	self.scroll_height.max = spec.body_scale[2]
-	self.scroll_nose_scale.value = 1
-	self.scroll_nose_scale.min = spec.nose_scale[1]
-	self.scroll_nose_scale.max = spec.nose_scale[2]
-	self.scroll_bust_scale.value = 1
-	self.scroll_bust_scale.min = spec.bust_scale[1]
-	self.scroll_bust_scale.max = spec.bust_scale[2]
+	self:set_height(spec.body_scale[1] + math.random() * (spec.body_scale[2] - spec.body_scale[1]))
+	for i = 1,#self.scroll_body do
+		self.scroll_body[i].value = math.random()
+	end
+	-- Reconfigure the face sliders.
+	for i = 1,#self.scroll_face do
+		self.scroll_face[i].value = math.random()
+	end
 	-- Randomize the affected fields.
 	self:set_eye_style(math.random(1, #self.list_eye_styles))
 	self:set_eye_color(math.random(), math.random(), math.random())
 	self:set_hair_style(math.random(1, #self.list_hair_styles))
 	self:set_hair_color(math.random(), math.random(), math.random())
 	self:set_skin_style(math.random(1, #self.list_skin_styles))
-	self:set_height(spec.body_scale[1] + math.random() * (spec.body_scale[2] - spec.body_scale[1]))
-	local bust = 0.3 + 0.3 * math.random()
-	self:set_bust_scale(spec.bust_scale[1] * bust + spec.bust_scale[2] * (1 - bust))
-	self:set_nose_scale(spec.nose_scale[1] + math.random() * (spec.nose_scale[2] - spec.nose_scale[1]))
 	self.update_needed = true
 	-- Randomize the name.
 	self.entry_name.text = Names:random{race = self.list_races[self.combo_race.value][2], gender = "female"}
@@ -387,15 +383,22 @@ Views.Chargen.update_model = function(self)
 	for k,v in pairs(spec.inventory_items) do
 		table.insert(items, k)
 	end
+	local body = {}
+	for k,v in pairs(self.scroll_body) do
+		body[k] = v.value
+	end
+	local face = {}
+	for k,v in pairs(self.scroll_face) do
+		face[k] = v.value
+	end
 	self.object:create_character_model{
 		body_scale = self.scroll_height.value,
-		bust_scale = self.scroll_bust_scale.value,
+		body_style = body,
 		equipment = items,
 		eye_color = {self.color_eye.red, self.color_eye.green, self.color_eye.blue},
-		face_style = {self.scroll_face[1].value, self.scroll_face[2].value, self.scroll_face[3].value},
+		face_style = face,
 		hair_color = {self.color_hair.red, self.color_hair.green, self.color_hair.blue},
 		hair_style = self.hair_style,
-		nose_scale = self.scroll_nose_scale.value,
 		race = self.race,
 		skin_color = {self.color_skin.red, self.color_skin.green, self.color_skin.blue}}
 	self.object:animate{animation = "idle", channel = 1, permanent = true}

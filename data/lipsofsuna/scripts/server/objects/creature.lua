@@ -132,14 +132,13 @@ Creature:add_setters{
 --   <li>angular: Angular velocity.</li>
 --   <li>beheaded: True to spawn without a head.</li>
 --   <li>body_scale: Scale factor of the body.</li>
---   <li>bust_scale: Scale factor of the bust.</li>
+--   <li>body_style: Body style defined by an array of scalars.</li>
 --   <li>dead: True for a dead creature.</li>
 --   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
 --   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
 --   <li>id: Unique object ID or nil for a random free one.</li>
 --   <li>jumped: Jump timer.</li>
 --   <li>name: Name of the creature.</li>
---   <li>nose_scale: Scale factor of the nose.</li>
 --   <li>physics: Physics mode.</li>
 --   <li>position: Position vector of the creature.</li>
 --   <li>rotation: Rotation quaternion of the creature.</li>
@@ -156,13 +155,12 @@ Creature.new = function(clss, args)
 	copy("angular")
 	copy("beheaded")
 	copy("body_scale")
-	copy("bust_scale")
+	copy("body_style")
 	copy("eye_style")
 	copy("face_style")
 	copy("hair_style")
 	copy("jumped", 0)
 	copy("name")
-	copy("nose_style")
 	copy("physics", "kinematic")
 	copy("random")
 	copy("rotation")

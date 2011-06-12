@@ -92,8 +92,6 @@ Species{
 	tilt_limit = 1.25,
 	-- Customization.
 	body_scale = {0.9, 1.05},
-	bust_scale = {0.3, 1.3},
-	nose_scale = {0.5, 2.0},
 	eye_styles = {
 		{"Default", ""}},
 	hair_styles = {

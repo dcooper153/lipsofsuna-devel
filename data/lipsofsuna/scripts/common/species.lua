@@ -33,6 +33,7 @@ Species.dict_name = {}
 --   <li>blocking_armor: How much armor class blocking offsers.</li>
 --   <li>blocking_cooldown: Time in seconds how long it takes to leave the blocking stance.</li>
 --   <li>blocking_delay: Time in seconds how long it takes to enter the blocking stance.</li>
+--   <li>body_scale: Body scale range.</li>
 --   <li>damage_from_magma: Points of damage from magma per second.</li>
 --   <li>damage_from_water: Points of damage from water per second.</li>
 --   <li>dead: True if the creature should spawn as dead.</li>
@@ -199,6 +200,7 @@ Species.new = function(clss, args)
 	copy("blocking_armor", 0.5)
 	copy("blocking_cooldown", 0.4)
 	copy("blocking_delay", 0.4)
+	copy("body_scale", {0.9, 1.1})
 	copy("damage_from_magma", 6)
 	copy("damage_from_water", 0)
 	copy("dead")

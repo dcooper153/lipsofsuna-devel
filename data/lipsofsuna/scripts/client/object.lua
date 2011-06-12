@@ -59,12 +59,11 @@ end
 -- @param self Object.
 -- @param args Arguments.<ul>
 --   <li>body_scale: Scale factor.</li>
---   <li>bust_scale: Bust scale factor.</li>
+--   <li>body_style: Body style array.</li>
 --   <li>equipment: List of equipment.</li>
 --   <li>face_style: Array of face morphing weights.</li>
---   <li>hair_color: Hair color string.</li>
+--   <li>hair_color: Hair color array.</li>
 --   <li>hair_style: Hair style string.</li>
---   <li>nose_scale: Nose scale factor.</li>
 --   <li>race: Race string.</li></ul>
 Object.create_character_model = function(self, args)
 	local lod = (Views.Options.inst.model_quality == 0)
@@ -105,18 +104,47 @@ Object.create_character_model = function(self, args)
 	local mesh_head = {eyes = true, head = true, hair = true}
 	for k,v in pairs(meshes) do
 		if k ~= "skeleton" and (has_head or not mesh_head[k]) then
-			if string.match(k, ".*head.*") then
-				local ref = Model:load{file = v}
-				local tmp = ref:copy()
-				if args.face_style then
-					if args.face_style[1] then tmp:morph("face round", args.face_style[1], ref) end
-					if args.face_style[2] then tmp:morph("face rough", args.face_style[2], ref) end
-					if args.face_style[3] then tmp:morph("face frown", args.face_style[3], ref) end
+			local tmp
+			local ref = Model:load{file = v}
+			-- Face customization.
+			if args.face_style and (string.match(k, ".*head.*") or string.match(k, ".*eye.*")) then
+				tmp = ref:copy()
+				if args.face_style[1] then
+					if args.face_style[1] < 0.5 then
+						tmp:morph("cheekbone small", 1 - 2 * args.face_style[1], ref)
+					elseif args.face_style[1] > 0.5 then
+						tmp:morph("cheekbone big", 2 * args.face_style[1] - 1, ref)
+					end
 				end
-				m:merge(tmp)
-			else
-				m:merge(Model:load{file = v})
+				if args.face_style[2] then tmp:morph("cheek small", 1 - args.face_style[2], ref) end
+				if args.face_style[3] then tmp:morph("chin rough", args.face_style[3], ref) end
+				if args.face_style[4] then tmp:morph("chin round", args.face_style[4], ref) end
+				if args.face_style[5] then tmp:morph("chin small", 1 - args.face_style[5], ref) end
+				if args.face_style[6] then tmp:morph("eye inner", args.face_style[6], ref) end
+				if args.face_style[7] then tmp:morph("eye outer", args.face_style[7], ref) end
+				if args.face_style[8] then tmp:morph("eye small", 1 - args.face_style[8], ref) end
+				if args.face_style[9] then tmp:morph("face thin", 1 - args.face_style[9], ref) end
+				if args.face_style[10] then tmp:morph("face wrinkle", args.face_style[10], ref) end
+				if args.face_style[11] then tmp:morph("jaw wide", args.face_style[11], ref) end
+				if args.face_style[12] then tmp:morph("nose dull", 1 - args.face_style[12], ref) end
 			end
+			-- Body customization.
+			if args.body_style then
+				if not tmp then tmp = ref:copy() end
+				if args.body_style[1] then tmp:morph("hips wide", args.body_style[1], ref) end
+				if args.body_style[2] then tmp:morph("limbs muscular", args.body_style[2], ref) end
+				if args.body_style[3] then
+					if args.body_style[3] < 0.5 then
+						tmp:morph("torso small", 1 - 2 * args.body_style[3], ref)
+					elseif args.body_style[3] > 0.5 then
+						tmp:morph("torso big", 2 * args.body_style[3] - 1, ref)
+					end
+				end
+				if args.body_style[4] then tmp:morph("torso thick", args.body_style[4], ref) end
+				if args.body_style[5] then tmp:morph("waist thick", args.body_style[5], ref) end
+			end
+			-- Merge to the character model.
+			m:merge(tmp or ref)
 		end
 	end
 	-- Colorize materials.
@@ -127,16 +155,13 @@ Object.create_character_model = function(self, args)
 	m:calculate_bounds()
 	m:changed()
 	self.model = m
-	-- Apply custom deformations.
+	-- Apply body scale.
+	local factor = args.body_scale or 0.5
+	local scale = species.body_scale[1] * (1 - factor) + species.body_scale[2] * factor
 	self.animated = true
 	self:animate{animation = "empty", channel = Animation.CHANNEL_CUSTOMIZE,
 		weight = 0, weight_scale = 1, permanent = true}
-	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "mover", scale = args.body_scale or 1}
-	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "nose", scale = args.nose_scale or 1}
-	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "breast.L", scale = args.bust_scale or 1}
-	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "breast.R", scale = args.bust_scale or 1}
-	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "breastspikiness.L", scale = args.bust_scale or 1}
-	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "breastspikiness.R", scale = args.bust_scale or 1}
+	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "mover", scale = scale}
 	-- Apply initial deformation.
 	self:update_animations{secs = 0}
 	self:deform_mesh()
@@ -284,14 +309,13 @@ Object.update_model = function(self)
 	if self.spec and self.spec.models then
 		self:create_character_model{
 			body_scale = self.body_scale,
-			bust_scale = self.bust_scale,
+			body_style = self.body_style,
 			equipment = self.equipment,
 			eye_color = self.eye_color,
 			eye_style = self.eye_style,
 			face_style = self.face_style,
 			hair_color = self.hair_color,
 			hair_style = self.hair_style,
-			nose_scale = self.nose_scale,
 			race = self.spec.name,
 			skin_color = self.skin_color,
 			skin_style = self.skin_style}

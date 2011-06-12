@@ -20,13 +20,13 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	local player = Player:find{client = args.client}
 	if player then return end
 	-- Get character flags.
-	local ok,na,ra,s1,s2,s3,s4,s5,s6,bo,no,bu,eye,eyer,eyeg,eyeb,f1,f2,f3,f4,f5,
+	local ok,na,ra,s1,s2,s3,s4,s5,s6,b1,b2,b3,b4,b5,b6,eye,eyer,eyeg,eyeb,f1,f2,f3,f4,f5,
 	hair,hairr,hairg,hairb,skin,skinr,sking,skinb = args.packet:read(
 		"string", "string",
 		-- Skills.
 		"uint8", "uint8", "uint8", "uint8", "uint8", "uint8",
 		-- Body style.
-		"float", "float", "float",
+		"uint8", "uint8", "uint8", "uint8", "uint8", "uint8",
 		-- Eye style.
 		"string", "uint8", "uint8", "uint8",
 		-- Face style.
@@ -44,14 +44,13 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	-- the object for a short while.
 	local o = Player{
 		account = account,
-		body_scale = bo,
-		bust_scale = bu,
+		body_scale = b1,
+		body_style = {b2, b3, b4, b5, b6},
 		client = args.client,
 		eye_style = {eye, eyer, eyeg, eyeb},
 		face_style = {f1, f2, f3, f4, f5},
 		hair_style = {hair, hairr, hairg, hairb},
 		name = (na ~= "" and na or "Player"),
-		nose_scale = no,
 		random = true,
 		skin_style = {skin, skinr, sking, skinb},
 		spec = spec}

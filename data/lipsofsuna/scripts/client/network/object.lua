@@ -214,36 +214,50 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 			o:set_skill(skill, value, max)
 		end
 	end
-	-- Appearance.
-	local defaults
-	if Bitwise:band(flags, Protocol.object_show_flags.APPEARANCE) ~= 0 then
-		debug("  APPEARANCE")
+	-- Body style.
+	if Bitwise:band(flags, Protocol.object_show_flags.BODY_STYLE) ~= 0 then
+		debug("  BODY STYLE")
 		local ok,a,b,c,d,e
-		-- Body.
-		ok,a,b,c = event.packet:resume("float", "float", "float")
+		-- Scale.
+		ok,a = event.packet:resume("uint8")
 		if not ok then return end
-		o.body_scale = a
-		o.bust_scale = b
-		o.nose_scale = c
-		-- Eyes.
-		ok,a,b,c,d = event.packet:resume("string", "uint8", "uint8", "uint8")
-		if not ok then return end
-		o.eye_style = a
-		o.eye_color = {b / 255, c / 255, d / 255}
-		-- Face.
+		o.body_scale = a / 255
+		debug("    SCALE %d", a)
+		-- Style.
 		ok,a,b,c,d,e = event.packet:resume("uint8", "uint8", "uint8", "uint8", "uint8")
 		if not ok then return end
-		o.face_style = {a / 255, b / 255, c / 255, d / 255, e / 255}
-		-- Hair.
-		ok,a,b,c,d = event.packet:resume("string", "uint8", "uint8", "uint8")
-		if not ok then return end
-		o.hair_style = a
-		o.hair_color = {b / 255, c / 255, d / 255}
+		o.body_style = {a / 255, b / 255, c / 255, d / 255, e / 255}
+		debug("    STYLE %d %d %d %d %d", a, b, c, d, e)
 		-- Skin.
 		ok,a,b,c,d = event.packet:resume("string", "uint8", "uint8", "uint8")
 		if not ok then return end
 		o.skin_style = a
 		o.skin_color = {b / 255, c / 255, d / 255}
+		debug("    SKIN %s %d %d %d", a, b, c, d)
+	end
+	-- Head style.
+	if Bitwise:band(flags, Protocol.object_show_flags.HEAD_STYLE) ~= 0 then
+		debug("  HEAD STYLE")
+		local ok,a,b,c,d,e,f,g,h,i,j,k,l
+		-- Eyes.
+		ok,a,b,c,d = event.packet:resume("string", "uint8", "uint8", "uint8")
+		if not ok then return end
+		o.eye_style = a
+		o.eye_color = {b / 255, c / 255, d / 255}
+		debug("    EYE %s %d %d %d", a, b, c, d)
+		-- Face.
+		ok,a,b,c,d,e,f,g,h,i,j,k,l = event.packet:resume("uint8", "uint8", "uint8", "uint8", "uint8",
+			"uint8", "uint8", "uint8", "uint8", "uint8", "uint8", "uint8")
+		if not ok then return end
+		o.face_style = {a / 255, b / 255, c / 255, d / 255, e / 255, f / 255, g / 255,
+			h / 255, i / 255, j / 255, k / 255, l / 255}
+		debug("    FACE %d %d %d %d %d %d %d %d %d %d %d %d", a, b, c, d, e, f, g, h, i, j, k, l)
+		-- Hair.
+		ok,a,b,c,d = event.packet:resume("string", "uint8", "uint8", "uint8")
+		if not ok then return end
+		o.hair_style = a
+		o.hair_color = {b / 255, c / 255, d / 255}
+		debug("    HAIR %s %d %d %d", a, b, c, d)
 	end
 	-- Rebuild the model.
 	debug("  OK")

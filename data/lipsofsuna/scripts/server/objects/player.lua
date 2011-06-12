@@ -15,14 +15,13 @@ end
 --   <li>account: Account data.</li>
 --   <li>angular: Angular velocity.</li>
 --   <li>body_scale: Scale factor of the body.</li>
---   <li>bust_scale: Scale factor of the bust.</li>
+--   <li>body_style: Body style defined by an array of scalars.</li>
 --   <li>client: Client controlling the character.</li>
 --   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
 --   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
 --   <li>id: Unique object ID or nil for a random free one.</li>
 --   <li>jumped: Jump timer.</li>
 --   <li>name: Name of the creature.</li>
---   <li>nose_scale: Scale factor of the nose.</li>
 --   <li>physics: Physics mode.</li>
 --   <li>position: Position vector of the creature.</li>
 --   <li>rotation: Rotation quaternion of the creature.</li>
@@ -334,32 +333,47 @@ Player.vision_cb = function(self, args)
 					flags = flags + Protocol.object_show_flags.SKILLS
 				end
 			end
-			-- Appearance.
-			local data_appear = {}
-			if o.body_scale or o.nose_scale or o.bust_scale or
-			   o.eye_style or o.face_style or o.hair_style or o.skin_style then
-				data_appear = {
-					"float", o.body_scale or 1,
-					"float", o.nose_scale or 1,
-					"float", o.bust_scale or 1,
-					"string", o.eye_style and o.eye_style[1] or "",
-					"uint8", o.eye_style and o.eye_style[2] or 255,
-					"uint8", o.eye_style and o.eye_style[3] or 255,
-					"uint8", o.eye_style and o.eye_style[4] or 255,
-					"uint8", o.face_style and o.face_style[1] or 0,
-					"uint8", o.face_style and o.face_style[2] or 0,
-					"uint8", o.face_style and o.face_style[3] or 0,
-					"uint8", o.face_style and o.face_style[4] or 0,
-					"uint8", o.face_style and o.face_style[5] or 0,
-					"string", o.hair_style and o.hair_style[1] or "",
-					"uint8", o.hair_style and o.hair_style[2] or 255,
-					"uint8", o.hair_style and o.hair_style[3] or 255,
-					"uint8", o.hair_style and o.hair_style[4] or 255,
+			-- Body style.
+			local data_body = {}
+			if o.body_scale or o.body_style or o.skin_style then
+				data_body = {
+					"uint8", o.body_scale or 128,
+					"uint8", o.body_style and o.body_style[1] or 0,
+					"uint8", o.body_style and o.body_style[2] or 0,
+					"uint8", o.body_style and o.body_style[3] or 0,
+					"uint8", o.body_style and o.body_style[4] or 0,
+					"uint8", o.body_style and o.body_style[5] or 0,
 					"string", o.skin_style and o.skin_style[1] or "",
 					"uint8", o.skin_style and o.skin_style[2] or 255,
 					"uint8", o.skin_style and o.skin_style[3] or 255,
 					"uint8", o.skin_style and o.skin_style[4] or 255}
-				flags = flags + Protocol.object_show_flags.APPEARANCE
+				flags = flags + Protocol.object_show_flags.BODY_STYLE
+			end
+			-- Head style.
+			local data_head = {}
+			if o.eye_style or o.face_style or o.hair_style then
+				data_head = {
+					"string", o.eye_style and o.eye_style[1] or "",
+					"uint8", o.eye_style and o.eye_style[2] or 255,
+					"uint8", o.eye_style and o.eye_style[3] or 255,
+					"uint8", o.eye_style and o.eye_style[4] or 255,
+					"uint8", o.face_style and o.face_style[1] or 127,
+					"uint8", o.face_style and o.face_style[2] or 255,
+					"uint8", o.face_style and o.face_style[3] or 0,
+					"uint8", o.face_style and o.face_style[4] or 0,
+					"uint8", o.face_style and o.face_style[5] or 255,
+					"uint8", o.face_style and o.face_style[6] or 0,
+					"uint8", o.face_style and o.face_style[7] or 255,
+					"uint8", o.face_style and o.face_style[8] or 255,
+					"uint8", o.face_style and o.face_style[9] or 255,
+					"uint8", o.face_style and o.face_style[10] or 0,
+					"uint8", o.face_style and o.face_style[11] or 0,
+					"uint8", o.face_style and o.face_style[12] or 255,
+					"string", o.hair_style and o.hair_style[1] or "",
+					"uint8", o.hair_style and o.hair_style[2] or 255,
+					"uint8", o.hair_style and o.hair_style[3] or 255,
+					"uint8", o.hair_style and o.hair_style[4] or 255}
+				flags = flags + Protocol.object_show_flags.HEAD_STYLE
 			end
 			-- Self.
 			if o == self then
@@ -375,7 +389,8 @@ Player.vision_cb = function(self, args)
 			p:write(data_anims)
 			p:write(data_slots)
 			p:write(data_skills)
-			p:write(data_appear)
+			p:write(data_body)
+			p:write(data_head)
 			self:send(p)
 			if o == self then sendmap() end
 		end,
@@ -428,14 +443,13 @@ Player.write = function(self)
 	return string.format("local self=Player%s\n%s%s%s", serialize{
 		angular = self.angular,
 		body_scale = self.body_scale,
-		bust_scale = self.bust_scale,
+		body_style = self.body_style,
 		dead = self.dead,
 		eye_style = self.eye_style,
 		face_style = self.face_style,
 		hair_style = self.hair_style,
 		id = self.dead and self.id,
 		name = self.name,
-		nose_scale = self.nose_scale,
 		physics = self.dead and "rigid" or "kinematic",
 		position = self.position,
 		rotation = self.rotation,
