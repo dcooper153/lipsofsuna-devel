@@ -17,7 +17,7 @@ Action{name = "fill", mode = "press", key1 = Keysym.f, func = function()
 end}
 
 Action{name = "grab", mode = "press", key1 = Keysym.g, func = function(v)
-	if Editor.inst.mode then
+	if Editor.inst.mode == "grab" then
 		Editor.inst.mode = nil
 	else
 		Editor.inst.mode = "grab"
@@ -29,12 +29,18 @@ Action{name = "menu", mode = "press", key1 = Keysym.ESCAPE, func = function()
 end}
 
 Action{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = function(v)
-	local vel = Editor.inst.camera:get_velocity()
-	Editor.inst.camera:set_velocity(Vector(vel.x, vel.y, 10 * v))
+	local mult = Action.dict_press[Keysym.LCTRL] and 1 or 10
+	if Action.dict_press[Keysym.LSHIFT] then
+		Editor.inst.camera.lifting = -mult * v
+		Editor.inst.camera.movement = nil
+	else
+		Editor.inst.camera.movement = -mult * v
+		Editor.inst.camera.lifting = nil
+	end
 end}
 
 Action{name = "rotate", mode = "press", key1 = Keysym.r, func = function(v)
-	if Editor.inst.mode then
+	if Editor.inst.mode == "rotate" then
 		Editor.inst.mode = nil
 	else
 		Editor.inst.mode = "rotate"
@@ -42,7 +48,7 @@ Action{name = "rotate", mode = "press", key1 = Keysym.r, func = function(v)
 end}
 
 Action{name = "snap", mode = "press", key1 = Keysym.TAB, func = function(v)
-	local mult = Action.dict_press[Keysym.LSHIFT] and 0.25 or 0.5
+	local mult = Action.dict_press[Keysym.LCTRL] and 0.25 or 0.5
 	for k,v in pairs(Editor.inst.selection) do
 		if v.object then
 			v.object:snap(mult * Voxel.tile_size, mult * math.pi)
@@ -52,8 +58,8 @@ Action{name = "snap", mode = "press", key1 = Keysym.TAB, func = function(v)
 end}
 
 Action{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func = function(v)
-	local vel = Editor.inst.camera:get_velocity()
-	Editor.inst.camera:set_velocity(Vector(10 * v, vel.y, vel.z))
+	local mult = Action.dict_press[Keysym.LCTRL] and 1 or 10
+	Editor.inst.camera.strafing = mult * v
 end}
 
 Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
@@ -65,7 +71,7 @@ Action{name = "select", mode = "press", key1 = "mouse1", func = function(v)
 		Editor.inst.mode = nil
 		return
 	end
-	local add = Action.dict_press[Keysym.LSHIFT] or Action.dict_press[Keysym.RSHIFT]
+	local add = Action.dict_press[Keysym.LSHIFT]
 	Editor.inst:select(add)
 end}
 
@@ -79,11 +85,11 @@ Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
 		Editor.inst.camera:rotate(-v * Editor.inst.mouse_sensitivity, 0)
 	else
 		-- Rotate the selected objects.
-		-- If left shift is pressed, rotation is 10x slower.
-		local mult = Action.dict_press[Keysym.LSHIFT] and 0.1 or 1
+		-- If left control is pressed, rotation is 10x slower.
+		local mult = Action.dict_press[Keysym.LCTRL] and 0.1 or 1
 		local drot = Quaternion{euler = {-v * mult * Editor.inst.mouse_sensitivity, 0, 0}}
 		for k,v in pairs(Editor.inst.selection) do
-			v:transform(nil, nil, drot)
+			v:rotate(drot)
 		end
 	end
 end}

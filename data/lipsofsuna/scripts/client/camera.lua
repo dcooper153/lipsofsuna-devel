@@ -71,7 +71,11 @@ end
 -- @param secs Seconds since the last update.
 FirstPersonCamera.update = function(self, secs)
 	-- Update position.
-	self:translate(self.own_vel * secs)
+	local vel = self.own_vel
+	if self.lifting then vel = vel + Vector(0, self.lifting, 0) end
+	if self.movement then vel = vel + self.own_rot * Vector(0, 0, -self.movement) end
+	if self.strafing then vel = vel + self.own_rot * Vector(self.strafing, 0, 0) end
+	self.own_pos = self.own_pos + vel * secs
 	-- Update turning and tilting.
 	-- If ctrl is pressed, add mouse movement to rotation.
 	-- If not, interpolate towards the default rotation.

@@ -460,17 +460,11 @@ end
 -- @param force True to force update.
 Editor.update = function(self, secs, force)
 	-- Update the camera.
-	-- If left shift is pressed, the camera is moved 10x faster to allow
-	-- more precise movement. This is useful when placing grabbed objects.
-	local slow = Action.dict_press[Keysym.LSHIFT]
-	local vel = self.camera:get_velocity()
-	if slow then self.camera:set_velocity(vel * 0.1) end
 	local cp0 = self.camera.target_position
 	local cr0 = self.camera.rotation
 	self.camera:update(secs)
 	local cp1 = self.camera.target_position
 	local cr1 = self.camera.rotation
-	if slow then self.camera:set_velocity(vel) end
 	-- Update the light source.
 	self.light.position = cp1 + cr1 * Vector(0,0,-5)
 	-- Move the selection.

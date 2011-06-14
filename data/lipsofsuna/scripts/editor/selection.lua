@@ -43,13 +43,14 @@ Selection.refresh = function(self)
 	self.visual.rotation = self.object.rotation
 end
 
+Selection.rotate = function(self, drot)
+	if not self.object then return end
+	self.object.rotation = drot * self.object.rotation
+	self:refresh()
+end
+
 Selection.transform = function(self, center, dpos, drot)
 	if not self.object then return end
-	if center then
-		self.object.position = drot * (self.object.position + dpos - center) + center
-		self.object.rotation = drot * self.object.rotation
-	else
-		self.object.rotation = drot * self.object.rotation
-	end
+	self.object.position = drot * (self.object.position + dpos - center) + center
 	self:refresh()
 end
