@@ -33,10 +33,20 @@ Action{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = 
 	Editor.inst.camera:set_velocity(Vector(vel.x, vel.y, 10 * v))
 end}
 
-Action{name = "snap", mode = "press", key1 = Keysym.x, func = function(v)
+Action{name = "rotate", mode = "press", key1 = Keysym.r, func = function(v)
+	if Editor.inst.mode then
+		Editor.inst.mode = nil
+	else
+		Editor.inst.mode = "rotate"
+	end
+end}
+
+Action{name = "snap", mode = "press", key1 = Keysym.TAB, func = function(v)
+	local mult = Action.dict_press[Keysym.LSHIFT] and 0.25 or 0.5
 	for k,v in pairs(Editor.inst.selection) do
 		if v.object then
-			v.object:snap(0.25 * Voxel.tile_size)
+			v.object:snap(mult * Voxel.tile_size, mult * math.pi)
+			v:refresh()
 		end
 	end
 end}
@@ -48,14 +58,6 @@ end}
 
 Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 	Editor.inst.camera:rotate(0, v * Editor.inst.mouse_sensitivity)
-end}
-
-Action{name = "rotate", mode = "press", key1 = Keysym.r, func = function(v)
-	if Editor.inst.mode then
-		Editor.inst.mode = nil
-	else
-		Editor.inst.mode = "rotate"
-	end
 end}
 
 Action{name = "select", mode = "press", key1 = "mouse1", func = function(v)

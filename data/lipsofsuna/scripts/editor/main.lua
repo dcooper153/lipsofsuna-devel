@@ -58,12 +58,16 @@ Object.move = function(self, value, step)
 	self.position = self.position + value * step
 end
 
-Object.snap = function(self, step)
-	local v = self.position + Vector(step,step,step) * 0.5
-	v.x = v.x - v.x % step
-	v.y = v.y - v.y % step
-	v.z = v.z - v.z % step
+Object.snap = function(self, pstep, rstep)
+	-- Position.
+	local v = self.position + Vector(pstep,pstep,pstep) * 0.5
+	v.x = v.x - v.x % pstep
+	v.y = v.y - v.y % pstep
+	v.z = v.z - v.z % pstep
 	self.position = v
+	-- Rotation.
+	local r = self.rotation.euler[1] + 0.5 * rstep
+	self.rotation = Quaternion{euler = {r - r % rstep, 0, 0}}
 end
 
 --- Rotates the object with step snapping.
