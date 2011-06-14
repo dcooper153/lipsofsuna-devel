@@ -42,9 +42,7 @@ Eventhandler{type = "quit", func = function(self, args)
 end}
 
 Eventhandler{type = "tick", func = function(self, args)
-	Editor.inst.camera:update(args.secs)
-	Editor.inst.light.position = Editor.inst.camera.target_position +
-		Editor.inst.camera.rotation * Vector(0,0,-5)
+	-- Update the editor.
 	Editor.inst:update(args.secs)
 	-- Update the cursor.
 	Widgets.Cursor.inst:update()

@@ -4,9 +4,23 @@ Action{name = "erase", mode = "press", key1 = Keysym.k, func = function()
 	end
 end}
 
+Action{name = "extrude", mode = "analog", key1 = "mouse4", key2 = "mouse5", func = function(v)
+	if Client.moving then
+		Editor.inst:extrude(v < 0)
+	end
+end}
+
 Action{name = "fill", mode = "press", key1 = Keysym.f, func = function()
 	if Editor.inst.prev_tiles[1] and Editor.inst.prev_tiles[2] then
 		Editor.inst:fill(Editor.inst.prev_tiles[1], Editor.inst.prev_tiles[2])
+	end
+end}
+
+Action{name = "grab", mode = "press", key1 = Keysym.g, func = function(v)
+	if Editor.inst.mode then
+		Editor.inst.mode = nil
+	else
+		Editor.inst.mode = "grab"
 	end
 end}
 
@@ -19,20 +33,12 @@ Action{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = 
 	Editor.inst.camera:set_velocity(Vector(vel.x, vel.y, 10 * v))
 end}
 
-Action{name = "rotate", mode = "analog", key1 = "mouse4", key2 = "mouse5", func = function(v)
-	if Client.moving then
-		Editor.inst:extrude(v < 0)
-	else
-		local point,object,tile = Target:pick_ray{camera = Editor.inst.camera}
-		if not object then return end
-		object:rotate(v, 4)
+Action{name = "snap", mode = "press", key1 = Keysym.x, func = function(v)
+	for k,v in pairs(Editor.inst.selection) do
+		if v.object then
+			v.object:snap(0.25 * Voxel.tile_size)
+		end
 	end
-end}
-
-Action{name = "snap", mode = "press", key1 = Keysym.KP0, func = function(v)
-	local point,object,tile = Target:pick_ray{camera = Editor.inst.camera}
-	if not object then return end
-	object:snap(0.25 * Voxel.tile_size)
 end}
 
 Action{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func = function(v)
@@ -44,25 +50,19 @@ Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 	Editor.inst.camera:rotate(0, v * Editor.inst.mouse_sensitivity)
 end}
 
-Action{name = "translatex", mode = "analog", key1 = Keysym.KP4, key2 = Keysym.KP6, func = function(v)
-	local point,object,tile = Target:pick_ray{camera = Editor.inst.camera}
-	if not object then return end
-	object:move(Vector(-v,0,0), 0.25 * Voxel.tile_size)
-end}
-
-Action{name = "translatey", mode = "analog", key1 = Keysym.KP1, key2 = Keysym.KP7, func = function(v)
-	local point,object,tile = Target:pick_ray{camera = Editor.inst.camera}
-	if not object then return end
-	object:move(Vector(0,v,0), 0.25 * Voxel.tile_size)
-end}
-
-Action{name = "translatez", mode = "analog", key1 = Keysym.KP2, key2 = Keysym.KP8, func = function(v)
-	local point,object,tile = Target:pick_ray{camera = Editor.inst.camera}
-	if not object then return end
-	object:move(Vector(0,0,v), 0.25 * Voxel.tile_size)
+Action{name = "rotate", mode = "press", key1 = Keysym.r, func = function(v)
+	if Editor.inst.mode then
+		Editor.inst.mode = nil
+	else
+		Editor.inst.mode = "rotate"
+	end
 end}
 
 Action{name = "select", mode = "press", key1 = "mouse1", func = function(v)
+	if Editor.inst.mode then
+		Editor.inst.mode = nil
+		return
+	end
 	local add = Action.dict_press[Keysym.LSHIFT] or Action.dict_press[Keysym.RSHIFT]
 	Editor.inst:select(add)
 end}
@@ -72,7 +72,18 @@ Action{name = "rectselect", mode = "toggle", key1 = Keysym.LCTRL, func = functio
 end}
 
 Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
-	Editor.inst.camera:rotate(-v * Editor.inst.mouse_sensitivity, 0)
+	if Editor.inst.mode ~= "rotate" then
+		-- Rotate the camera.
+		Editor.inst.camera:rotate(-v * Editor.inst.mouse_sensitivity, 0)
+	else
+		-- Rotate the selected objects.
+		-- If left shift is pressed, rotation is 10x slower.
+		local mult = Action.dict_press[Keysym.LSHIFT] and 0.1 or 1
+		local drot = Quaternion{euler = {-v * mult * Editor.inst.mouse_sensitivity, 0, 0}}
+		for k,v in pairs(Editor.inst.selection) do
+			v:transform(nil, nil, drot)
+		end
+	end
 end}
 
 Action{name = "screenshot", mode = "press", key1 = Keysym.PRINT, func = function()

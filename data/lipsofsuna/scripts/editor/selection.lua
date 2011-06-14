@@ -36,3 +36,20 @@ end
 Selection.detach = function(self)
 	self.visual.realized = false
 end
+
+Selection.refresh = function(self)
+	if not self.object then return end
+	self.visual.position = self.object.position
+	self.visual.rotation = self.object.rotation
+end
+
+Selection.transform = function(self, center, dpos, drot)
+	if not self.object then return end
+	if center then
+		self.object.position = drot * (self.object.position + dpos - center) + center
+		self.object.rotation = drot * self.object.rotation
+	else
+		self.object.rotation = drot * self.object.rotation
+	end
+	self:refresh()
+end
