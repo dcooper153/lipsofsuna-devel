@@ -134,7 +134,7 @@ end
 -- @class table
 
 Quaternion:add_getters{
-	conjugate = function(s) return Los.quaternion_get_conjugate(s.handle) end,
+	conjugate = function(s) return Class.new(Quaternion, {handle = Los.quaternion_get_conjugate(s.handle)}) end,
 	euler = function(s) return Los.quaternion_get_euler(s.handle) end,
 	length = function(s) return Los.quaternion_get_length(s.handle) end,
 	w = function(s) return Los.quaternion_get_w(s.handle) end,
