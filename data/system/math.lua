@@ -1,3 +1,48 @@
+Aabb = Class()
+Aabb.class_name = "Aabb"
+
+--- Creates a new axis-aligned bounding box.
+-- @param clss Aabb class.
+-- @param args Arguments.<ul>
+--   <li>point: Minimum point vector.</li>
+--   <li>size: Size vector.</li></ul>
+-- @return Aabb.
+Aabb.new = function(clss, args)
+	local self = Class.new(clss, args)
+	self.point = self.point or Vector()
+	self.size = self.size or Vector()
+	return self
+end
+
+--- Return true if the AABB intersects with another AABB.
+-- @param self Aabb.
+-- @param aabb Aabb.
+-- @return True if intersects.
+Aabb.intersects = function(self, aabb)
+	if self.point.x + self.size.x <= aabb.point.x then return end
+	if self.point.y + self.size.y <= aabb.point.y then return end
+	if self.point.z + self.size.z <= aabb.point.z then return end
+	if self.point.x >= aabb.point.x + aabb.size.x then return end
+	if self.point.y >= aabb.point.y + aabb.size.y then return end
+	if self.point.z >= aabb.point.z + aabb.size.z then return end
+	return true
+end
+
+--- Return true if the AABB intersects with a point.
+-- @param self Aabb.
+-- @param point Position vector.
+-- @return True if intersects.
+Aabb.intersects_point = function(self, point)
+	if point.x < self.point.x then return end
+	if point.y < self.point.y then return end
+	if point.z < self.point.z then return end
+	if point.x > self.point.x + self.size.x then return end
+	if point.y > self.point.y + self.size.x then return end
+	if point.z > self.point.z + self.size.x then return end
+	return true
+end
+
+------------------------------------------------------------------------------
 
 Quaternion = Class()
 Quaternion.class_name = "Vector"
@@ -196,6 +241,30 @@ Vector.new = function(clss, x, y, z)
 	return self
 end
 
+--- Calculates the absolute of the vector.
+-- @param self Vector.
+Vector.abs = function(self)
+	return Vector(math.abs(self.x), math.abs(self.y), math.abs(self.z))
+end
+
+--- Calculates the ceil of the vector.
+-- @param self Vector.
+Vector.ceil = function(self)
+	return Vector(math.ceil(self.x), math.ceil(self.y), math.ceil(self.z))
+end
+
+--- Returns a copy of the vector.
+-- @param self Vector.
+Vector.copy = function(self)
+	return Vector(self.x, self.y, self.z)
+end
+
+--- Calculates the floor of the vector.
+-- @param self Vector.
+Vector.floor = function(self)
+	return Vector(math.floor(self.x), math.floor(self.y), math.floor(self.z))
+end
+
 --- Calculates the cross product of two vectors.
 -- @param self Vector.
 -- @param v Vector.
@@ -219,6 +288,12 @@ end
 Vector.normalize = function(self)
 	local handle = Los.vector_normalize(self.handle)
 	return Class.new(Vector, {handle = handle})
+end
+
+--- Calculates the vector rounded to the nearest integers.
+-- @param self Vector.
+Vector.round = function(self)
+	return Vector(math.ceil(self.x + 0.5), math.ceil(self.y + 0.5), math.ceil(self.z + 0.5))
 end
 
 --- Calculates the sum of two vectors.

@@ -5,55 +5,6 @@ Actions.register = function(self, args)
 	self[args.name] = args.func
 end
 
-Vector.abs = function(self)
-	return Vector(math.abs(self.x), math.abs(self.y), math.abs(self.z))
-end
-
-Vector.copy = function(self)
-	return Vector(self.x, self.y, self.z)
-end
-
-Vector.ceil = function(self)
-	return Vector(math.ceil(self.x), math.ceil(self.y), math.ceil(self.z))
-end
-
-Vector.floor = function(self)
-	return Vector(math.floor(self.x), math.floor(self.y), math.floor(self.z))
-end
-
-Vector.round = function(self)
-	return Vector(math.ceil(self.x + 0.5), math.ceil(self.y + 0.5), math.ceil(self.z + 0.5))
-end
-
-Aabb = Class()
-
-Aabb.new = function(clss, args)
-	local self = Class.new(clss, args)
-	self.point = self.point or Vector()
-	self.size = self.size or Vector()
-	return self
-end
-
-Aabb.intersects = function(self, aabb)
-	if self.point.x + self.size.x <= aabb.point.x then return end
-	if self.point.y + self.size.y <= aabb.point.y then return end
-	if self.point.z + self.size.z <= aabb.point.z then return end
-	if self.point.x >= aabb.point.x + aabb.size.x then return end
-	if self.point.y >= aabb.point.y + aabb.size.y then return end
-	if self.point.z >= aabb.point.z + aabb.size.z then return end
-	return true
-end
-
-Aabb.intersects_point = function(self, point)
-	if point.x < self.point.x then return end
-	if point.y < self.point.y then return end
-	if point.z < self.point.z then return end
-	if point.x > self.point.x + self.size.x then return end
-	if point.y > self.point.y + self.size.x then return end
-	if point.z > self.point.z + self.size.x then return end
-	return true
-end
-
 Skills.get_total = function(self)
 	local n = self:get_names()
 	local t = 0
