@@ -90,6 +90,7 @@ Species{
 	speed_run = 6,
 	tilt_bone = "backtilt",
 	tilt_limit = 1.25,
+	timing_build = 0.2,
 	timing_pickup = 0.2,
 	-- Customization.
 	body_scale = {0.9, 1.05},
