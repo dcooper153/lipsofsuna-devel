@@ -40,8 +40,9 @@ end
 Widgets.Quickpage.assign_none = function(self, index)
 	if index >= #self.buttons then return end
 	self.buttons[index].feat = nil
-	self.buttons[index].item = nil
 	self.buttons[index].icon = nil
+	self.buttons[index].item = nil
+	self.buttons[index].text = nil
 	self.buttons[index].tooltip = nil
 	self:save()
 end
@@ -54,8 +55,9 @@ Widgets.Quickpage.assign_feat = function(self, index, feat)
 	if index >= #self.buttons then return end
 	local icon = feat:get_icon()
 	self.buttons[index].feat = feat
-	self.buttons[index].item = nil
 	self.buttons[index].icon = icon
+	self.buttons[index].item = nil
+	self.buttons[index].text = nil
 	self.buttons[index].tooltip = Widgets.Feattooltip{feat = feat}
 	self:save()
 end
@@ -63,18 +65,17 @@ end
 --- Assigns an item to a quickslot.
 -- @param self Quickpage class.
 -- @param index Quickslot index number.
--- @param name Name of the item spec to be assigned.
-Widgets.Quickpage.assign_item = function(self, index, name)
+-- @param item Item to assign.
+Widgets.Quickpage.assign_item = function(self, index, item)
 	if index >= #self.buttons then return end
 	-- Find the icon.
-	local icon
-	local spec = Itemspec:find{name = name}
-	if spec then icon = Iconspec:find{name = spec.icon} end
-	if not icon then icon = Iconspec:find{name = "missing1"} end
+	local spec = Itemspec:find{name = item.name}
+	local icon = Iconspec:find{name = item.icon} or Iconspec:find{name = "missing1"}
 	-- Assign the item.
 	self.buttons[index].feat = nil
-	self.buttons[index].item = name
 	self.buttons[index].icon = icon
+	self.buttons[index].item = item.name
+	self.buttons[index].text = item.count and item.count > 1 and tostring(item.count)
 	self.buttons[index].tooltip = Widgets.Itemtooltip{spec = spec}
 	self:save()
 end

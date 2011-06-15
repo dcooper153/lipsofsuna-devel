@@ -22,10 +22,10 @@ end
 --- Assigns an item to a quickslot.
 -- @param clss Quickslots class.
 -- @param index Quickslot index number.
--- @param name Name of the item spec to be assigned.
-Quickslots.assign_item = function(clss, index, name)
-	if name then
-		clss.items:assign_item(index, name)
+-- @param item Item to assign or nil.
+Quickslots.assign_item = function(clss, index, item)
+	if item then
+		clss.items:assign_item(index, item)
 	else
 		clss.items:assign_none(index)
 	end

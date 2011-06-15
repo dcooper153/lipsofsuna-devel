@@ -45,7 +45,7 @@ Protocol:add_handler{type = "INVENTORY_ITEM_ADDED", func = function(event)
 	cont:set_item{slot = (sslot ~= "" and sslot or islot), icon = icon, name = name, count = count}
 	-- Update quickslots.
 	if cont == Views.Inventory.inst.container and sslot == "" then
-		Quickslots:assign_item(islot, name, count)
+		Quickslots:assign_item(islot, {icon = icon, name = name, count = count})
 	end
 	-- Clear interrupted item drags.
 	-- When multiple players try to drag the same item, the fastest drag

@@ -31,6 +31,16 @@ Widgets.Quickslot.reshaped = function(self)
 			source_position = icon.offset,
 			source_tiling = {0,icon.size[1],0,0,icon.size[1],0}}
 	end
+	-- Text.
+	if self.text then
+		self:canvas_text{
+			dest_position = {6,0},
+			dest_size = {28,28},
+			text = self.text,
+			text_alignment = {0,1},
+			text_color = {1,1,1,1},
+			text_font = "tiny"}
+	end
 	-- Glass.
 	if not self.focused then
 		self:canvas_image{
@@ -48,7 +58,8 @@ end
 
 Widgets.Quickslot:add_getters{
 	focused = function(self) return rawget(self, "__focused") end,
-	icon = function(self) return rawget(self, "__icon") end}
+	icon = function(self) return rawget(self, "__icon") end,
+	text = function(self) return rawget(self, "__text") end}
 
 Widgets.Quickslot:add_setters{
 	focused = function(self, value)
@@ -59,5 +70,10 @@ Widgets.Quickslot:add_setters{
 	icon = function(self, value)
 		if self.icon == value then return end
 		rawset(self, "__icon", value)
+		self:reshaped()
+	end,
+	text = function(self, value)
+		if self.text == value then return end
+		rawset(self, "__text", value)
 		self:reshaped()
 	end}
