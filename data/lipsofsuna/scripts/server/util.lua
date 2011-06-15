@@ -27,6 +27,51 @@ Utils.check_room = function(clss, point, model)
 	return true
 end
 
+--- Finds a buildable point near the given point.
+-- @param clss Utils class.
+-- @param point Point in world space.
+-- @param user Builder creature used for resolving conflicts.
+-- @return Point in tiles and point in world space, or nil.
+Utils.find_build_point = function(clss, point, user)
+	-- Find an empty tile.
+	local t,p = Voxel:find_tile{match = "empty", point = point}
+	if not t then return end
+	-- Return it if the character doesn't intersect with it.
+	-- TODO: Should check for other objects as well.
+	local tile = Aabb{point = p * Voxel.tile_size, size = Vector(1, 1, 1) * Voxel.tile_size}
+	local char = Aabb{point = user.position - Vector(0.5, 0, 0.5), size = Vector(1.5, 2, 1.5)}
+	if not tile:intersects(char) then return t,p end
+	-- Try to resolve a better position.
+	-- If the player is standing on the tile, look for an empty tile in the
+	-- direction where she's facing. This makes building bridges easier.
+	local above = Voxel:get_tile(p + Vector(0,1))
+	local below = Voxel:get_tile(p - Vector(0,1))
+	if above ~= 0 then
+		p.y = p.y + 1
+	elseif below ~= 0 then
+		p.y = p.y - 1
+	else
+		return
+	end
+	local dir = user.rotation * Vector(0,0,-1)
+	if math.abs(dir.x) > math.abs(dir.z) then
+		if dir.x < 0 then
+			p.x = p.x - 1
+		else
+			p.x = p.x + 1
+		end
+	else
+		if dir.z < 0 then
+			p.z = p.z - 1
+		else
+			p.z = p.z + 1
+		end
+	end
+	t = Voxel:get_tile(p)
+	if t ~= 0 then return end
+	return t,p
+end
+
 --- Finds empty ground below the given point.
 -- @param clss Utils class.
 -- @param point Point in world space.

@@ -108,17 +108,13 @@ Feat.apply = function(self, args)
 			local need = args.weapon.spec.construct_tile_count or 1
 			local have = args.weapon.count
 			if m and need <= have then
-				local t,p = Voxel:find_tile{match = "empty", point = args.point}
+				local t,p = Utils:find_build_point(args.point, args.attacker)
 				if t then
-					local tile = Aabb{point = p * Voxel.tile_size, size = Vector(1, 1, 1) * Voxel.tile_size}
-					local char = Aabb{point = args.attacker.position - Vector(0.5, 0, 0.5), size = Vector(1.5, 2, 1.5)}
-					if not tile:intersects(char) then
-						local o = args.weapon:split{count = need}
-						o:detach()
-						Voxel:set_tile(p, m.id)
-						if m.effect_build then
-							Effect:play{effect = m.effect_build, point = p * Voxel.tile_size}
-						end
+					local o = args.weapon:split{count = need}
+					o:detach()
+					Voxel:set_tile(p, m.id)
+					if m.effect_build then
+						Effect:play{effect = m.effect_build, point = p * Voxel.tile_size}
 					end
 				end
 			end
