@@ -91,6 +91,17 @@ Species{
 	inventory_items = {"dress"}}
 
 Species{
+	name = "Foreman",
+	base = "aer",
+	ai_enable_combat = false,
+	ai_enable_wander = false,
+	dialog = "merchant",
+	marker = "foreman",
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"dress"}}
+
+Species{
 	name = "Col",
 	base = "aermale",
 	dialog = "col",

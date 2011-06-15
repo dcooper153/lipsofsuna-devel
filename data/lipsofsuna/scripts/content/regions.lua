@@ -7,6 +7,13 @@ Regionspec{
 	position = {700,700}}
 
 Regionspec{
+	name = "Giant Shaft",
+	categories = {"special"},
+	depth = {930,1000},
+	links = {"Lips", "Sanctuary"},
+	pattern_name = "giantshaft"}
+
+Regionspec{
 	name = "Brigand HQ",
 	categories = {"special"},
 	depth = {930,930},
