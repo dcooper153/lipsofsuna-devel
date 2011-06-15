@@ -12,3 +12,4 @@ Quest{name = "The Hoarder"}
 Quest{name = "Brigands"}
 Quest{name = "Sword on the Stone"}
 Quest{name = "Mining Guild"}
+Quest{name = "Bridge Building"}
