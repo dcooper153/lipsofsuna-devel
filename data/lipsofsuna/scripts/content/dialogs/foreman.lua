@@ -8,7 +8,7 @@ Dialogspec{name = "foreman",
 					{"flag","building bridge"},
 					{"quest", "Bridge Building", status = "active", marker = "foreman", text = "A foreman by a huge chasm asked you to fix a bridge. He also said that the mining guild won't allow him to pay you"},
 					{"say","Foreman","You're a saint! I would give you some logs, but the guild wouldn't be happy with that. If you find some materials however, you can equip them and use them to build a path across the gap."}},
-				{"choice","Eh, there's nothing in this for me, looks like you're screwed"
+				{"choice","Eh, there's nothing in this for me, looks like you're screwed",
 					{"say","Foreman","Yes, yes I am"}}},
 		{"branch", cond = "bridge builder requested",
 			{"choice", "Yes, the guildmaster said you need help",

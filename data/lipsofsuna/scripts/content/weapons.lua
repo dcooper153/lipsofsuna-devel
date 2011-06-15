@@ -45,6 +45,18 @@ Itemspec{
 	mass = 15}
 
 Itemspec{
+	name = "iron halberd",
+	model = "halberd1", -- FIXME
+	icon = "dagger1",
+	categories = {"melee", "weapon"},
+	crafting_materials = {["iron"] = 3},
+	effect_attack_speedline = true,
+	influences_base = {physical = -10},
+	influences_bonus = {dexterity = 0.01},
+	equipment_slot = "hand.R",
+	mass = 15}
+
+Itemspec{
 	name = "adamantium hatchet",
 	model = "axe1",
 	icon = "axe3",
