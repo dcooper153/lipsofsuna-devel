@@ -69,6 +69,14 @@ Action{name = "skills", mode = "press", key1 = Keysym.k, func = function()
 	Gui:set_mode("skills")
 end}
 
+Action{name = "quickslot_mode", mode = "press", key1 = Keysym.TAB, func = function()
+	if Quickslots.mode == "feats" then
+		Quickslots.mode = "items"
+	else
+		Quickslots.mode = "feats"
+	end
+end}
+
 Action{name = "quickslot_1", mode = "press", key1 = Keysym.F1, func = function()
 	Quickslots:activate(1)
 end}

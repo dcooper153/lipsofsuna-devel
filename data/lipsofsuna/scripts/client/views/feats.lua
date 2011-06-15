@@ -194,6 +194,12 @@ Views.Feats.changed = function(self)
 	self.label_reagents.text = reagent_str
 end
 
+--- Executes the feat editor.
+-- @param self Chargen.
+Views.Feats.enter = function(self)
+	Quickslots.mode = "feats"
+end
+
 --- Sets the feat animation.
 -- @param self Feats.
 -- @param name Animation name.
@@ -260,7 +266,7 @@ end
 -- @param self Feats.
 -- @param index Quickslot index.
 Views.Feats.show = function(self, index)
-	local feat = Quickslots.buttons[index].feat or Feat()
+	local feat = Quickslots.feats.buttons[index].feat or Feat()
 	self.protect = true
 	self.combo_slot:activate{index = index, press = false}
 	self.combo_anim:activate{text = feat.animation or ""}

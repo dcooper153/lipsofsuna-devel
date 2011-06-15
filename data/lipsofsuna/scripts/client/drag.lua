@@ -77,21 +77,6 @@ Drag.clicked_container = function(self, inv, slot)
 	item.drag = true
 end
 
---- Called when a quickslot is clicked with the purpose of stopping a drag.
--- @param self Drag.
--- @param index Quickslot index number.
--- @return True if the click was handled by the drag and drop system.
-Drag.clicked_quickslot = function(self, index)
-	if not self.drag then return end
-	if self.drag[1] == "equ" or self.drag[1] == "inv" then
-		Quickslots:assign_item(index, self.drag[4])
-		self:clear()
-	else
-		self:cancel()
-	end
-	return true
-end
-
 --- Called when the sell list of trading widget is clicked with the purpose of stopping a drag.
 -- @param self Drag.
 -- @param index Trading slot index number.

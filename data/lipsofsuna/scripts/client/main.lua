@@ -33,6 +33,7 @@ require "client/widgets/modifier"
 require "client/widgets/modifiers"
 require "client/widgets/progress"
 require "client/widgets/questinfo"
+require "client/widgets/quickpage"
 require "client/widgets/quickslot"
 require "client/widgets/scene"
 require "client/widgets/skills"
@@ -56,8 +57,9 @@ require "client/object"
 require "client/player"
 require "client/slots"
 require "client/target"
-require "client/network/object"
-require "client/network/trading"
+for k,v in pairs(File:scan_directory("scripts/client/network")) do
+	require("client/network/" .. string.gsub(v, "([^.]*).*", "%1"))
+end
 for k,v in pairs(File:scan_directory("scripts/client/shaders")) do
 	require("client/shaders/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
