@@ -46,10 +46,25 @@ Itemspec{
 
 Itemspec{
 	name = "iron halberd",
-	model = "halberd1", -- FIXME
-	icon = "dagger1",
+	model = "halberd1",
+	icon = "dagger1", --FIXME
+	animation_attack = "attack staff",
+	animation_charge = "charge staff",
+	animation_hold = "hold staff",
 	categories = {"melee", "weapon"},
-	crafting_materials = {["iron"] = 3},
+	crafting_materials = {["iron"] = 4},
+	effect_attack_speedline = true,
+	influences_base = {physical = -10},
+	influences_bonus = {dexterity = 0.01},
+	equipment_slot = "hand.R",
+	mass = 15}
+
+Itemspec{
+	name = "iron spear",
+	model = "spear1",
+	icon = "dagger1", --FIXME
+	categories = {"melee", "weapon"},
+	crafting_materials = {["iron"] = 4},
 	effect_attack_speedline = true,
 	influences_base = {physical = -10},
 	influences_bonus = {dexterity = 0.01},
