@@ -11,27 +11,22 @@ require "server/dialog"
 require "server/actions/moveitem"
 require "server/feat"
 require "server/sectors"
-require "server/objects/object"
-require "server/objects/creature"
-require "server/objects/door"
-require "server/objects/item"
-require "server/objects/obstacle"
-require "server/objects/player"
-require "server/objects/spell"
-require "server/npcs/lastboss"
 require "server/admin"
 require "server/quest"
 require "server/modifier"
 require "server/editing"
 require "server/particles"
-require "server/generator"
-require "server/generator/main"
+for k,v in pairs(File:scan_directory("scripts/server/objects")) do
+	require("server/objects/" .. string.gsub(v, "([^.]*).*", "%1"))
+end
 for k,v in pairs(File:scan_directory("scripts/server/influences")) do
 	require("server/influences/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
 for k,v in pairs(File:scan_directory("scripts/server/modifiers")) do
 	require("server/modifiers/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
+require "server/generator"
+require "server/generator/main"
 
 local m = Material:find{name = "granite1"}
 Voxel.fill = m.id

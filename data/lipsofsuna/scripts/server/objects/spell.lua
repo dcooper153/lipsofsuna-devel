@@ -1,3 +1,5 @@
+require "server/objects/object"
+
 Spell = Class(Object)
 
 --- Creates a new spell.
@@ -74,8 +76,6 @@ Spell.contact_cb = function(self, result)
 		-- Firewall.
 		-- Inflict the burning modifier until the wall times out.
 		if result.object then
-			print("FIREWALL CB", result.object.spec.name)
-			print("FIREWALL MASK GRP", result.object.collision_mask, result.object.collision_group)
 			result.object:inflict_modifier("burning", 3)
 		end
 	end

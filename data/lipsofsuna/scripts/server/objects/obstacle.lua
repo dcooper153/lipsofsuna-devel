@@ -1,3 +1,5 @@
+require "server/objects/object"
+
 Obstacle = Class(Object)
 Obstacle.class_name = "Obstacle"
 

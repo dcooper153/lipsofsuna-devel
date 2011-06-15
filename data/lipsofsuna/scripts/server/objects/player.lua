@@ -1,3 +1,5 @@
+require "server/objects/creature"
+
 Player = Class(Creature)
 Player.class_name = "Player"
 Player.clients = {}

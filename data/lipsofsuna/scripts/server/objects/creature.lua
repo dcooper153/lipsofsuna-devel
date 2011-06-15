@@ -1,4 +1,5 @@
 require "server/ai"
+require "server/objects/object"
 
 Creature = Class(Object)
 Creature.class_name = "Creature"

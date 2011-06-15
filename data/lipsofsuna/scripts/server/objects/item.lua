@@ -1,3 +1,5 @@
+require "server/objects/object"
+
 Item = Class(Object)
 Item.class_name = "Item"
 Item.pickable = true

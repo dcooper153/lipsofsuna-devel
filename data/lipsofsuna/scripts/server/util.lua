@@ -1,9 +1,6 @@
 -- FIXME: These need to be cleaned up.
 
 Actions = Class()
-Actions.register = function(self, args)
-	self[args.name] = args.func
-end
 
 Skills.get_total = function(self)
 	local n = self:get_names()
@@ -12,11 +9,6 @@ Skills.get_total = function(self)
 		t = t + self:get_maximum{skill = v}
 	end
 	return t
-end
-
-Damage = {}
-Damage.impulse = function(self, value)
-	return 0.03 * value
 end
 
 Utils = Class()
