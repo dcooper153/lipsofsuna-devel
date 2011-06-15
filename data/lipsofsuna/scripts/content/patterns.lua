@@ -33,3 +33,4 @@ Pattern{
 		{-1,-2,0,nil,2,0,0},
 		{-2,-1,0,nil,5,2,0},
 		{-1,2,0,nil,2,0,0}}}
+require "content/patterns/chasm1"

@@ -14,6 +14,13 @@ Regionspec{
 	pattern_name = "giantshaft"}
 
 Regionspec{
+	name = "Chasm",
+	categories = {"special"},
+	depth = {930,1000},
+	links = {"Giant Shaft"},
+	pattern_name = "chasm1"}
+
+Regionspec{
 	name = "Brigand HQ",
 	categories = {"special"},
 	depth = {930,930},
