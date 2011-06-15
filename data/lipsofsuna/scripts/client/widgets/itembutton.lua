@@ -2,7 +2,7 @@ Widgets.ItemButton = Class(Widget)
 
 Widgets.ItemButton.new = function(clss, args)
 	local self = Widget.new(clss, args)
-	self.font = self.font or "default"
+	self.font = self.font or "tiny"
 	self.icon = self.icon or ""
 	self.text = self.text or ""
 	return self
@@ -42,7 +42,7 @@ Widgets.ItemButton.reshaped = function(self)
 	if self.count and self.count > 1 then
 		self:canvas_text{
 			dest_position = {4,0},
-			dest_size = {w-4,h},
+			dest_size = {w-4,h-2},
 			text = tostring(self.count),
 			text_alignment = {0,1},
 			text_color = self.drag and {1,1,1,a} or self.focused and {1,1,0,a} or {1,1,1,a},
