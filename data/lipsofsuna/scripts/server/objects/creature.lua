@@ -655,9 +655,7 @@ end
 -- @param dst_id ID of the inventory where to place the object.
 -- @param dst_slot Name of the inventory slot where to place the object.
 Creature.pick_up = function(self, src_id, dst_id, dst_slot)
-	if self.cooldown then return end
 	self:animate("pick up")
-	self.cooldown = self.spec.timing_pickup * 0.02 + 0.2
 	Timer{delay = self.spec.timing_pickup * 0.02, func = function(timer)
 		Actions:move_from_world_to_inv(self, src_id, dst_id, dst_slot)
 		timer:disable()
