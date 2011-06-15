@@ -14,14 +14,17 @@ Host.new = function(clss)
 	-- Account settings.
 	self.entry_account = Widgets.Entry{text = Config.inst.host_account}
 	self.entry_password = Widgets.Entry{password = true}
-	self.group_account = Widgets.Frame{style = "default", cols = 2, rows = 3}
-	self.group_account:set_expand{col = 2}
+	self.toggle_restart = Widgets.Toggle()
+	self.group_account = Widgets.Frame{style = "default", cols = 2, rows = 5}
+	self.group_account:set_expand{col = 2, row = 4}
 	self.group_account:set_child{col = 1, row = 1, widget = Widgets.Label{text = "Savefile:"}}
 	self.group_account:set_child{col = 2, row = 1, widget = self.combo_file}
 	self.group_account:set_child{col = 1, row = 2, widget = Widgets.Label{text = "Account:"}}
 	self.group_account:set_child{col = 2, row = 2, widget = self.entry_account}
 	self.group_account:set_child{col = 1, row = 3, widget = Widgets.Label{text = "Password:"}}
 	self.group_account:set_child{col = 2, row = 3, widget = self.entry_password}
+	self.group_account:set_child{col = 1, row = 5, widget = Widgets.Label{text = "Restart:"}}
+	self.group_account:set_child{col = 2, row = 5, widget = self.toggle_restart}
 	-- Menu labels.
 	self.button_play = Widgets.Label{font = "mainmenu", text = "Host!", pressed = function() self:play() end}
 	self.button_back = Widgets.Label{font = "mainmenu", text = "Back", pressed = function() self:back() end}
@@ -60,6 +63,9 @@ Host.play = function(self)
 	end
 	if password and #password > 0 then
 		args = string.format("%s --password %s", args, password)
+	end
+	if self.toggle_restart.active then
+		args = args .. " -g"
 	end
 	Program:launch_mod{name = "lipsofsuna", args = args}
 	Program.quit = true
