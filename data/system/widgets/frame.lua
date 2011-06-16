@@ -25,7 +25,15 @@ Widgets.Frame.reshaped = function(self)
 	local w = self.width
 	local h = self.height
 	self:canvas_clear()
-	if self.style == "default" then
+	if type(self.style) == "table" then
+		self:set_request{internal = true, width = self.style.width, height = self.style.height}
+		self:canvas_image{
+			dest_position = {0,0},
+			dest_size = {w,h},
+			source_image = self.style.source_image or "widgets1",
+			source_position = self.style.source_position or {0,0},
+			source_tiling = self.style.source_tiling}
+	elseif self.style == "default" then
 		self:set_request{internal = true, width = 333, height = 150}
 		self:canvas_image{
 			dest_position = {0,0},
@@ -103,7 +111,10 @@ Widgets.Frame:add_setters{
 	style = function(s, v)
 		if s.style == v then return end
 		rawset(s, "__style", v)
-		if v == "default" then
+		if type(v) == "table" then
+			s.spacings = v.spacings or {0,0}
+			s.margins = v.margins or {0,0,0,0}
+		elseif v == "default" then
 			s.margins = {10,7,10,20}
 		elseif v == "equipment" then
 			s.spacings = {0,0}
