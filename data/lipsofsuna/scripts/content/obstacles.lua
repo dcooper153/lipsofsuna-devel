@@ -93,6 +93,13 @@ Obstaclespec{
 	dialog = "sanctuary",
 	marker = "sanctuary"}
 
+Obstaclespec{
+	name = "bridge chest",
+	model = "chest1",
+	categories = {"special"},
+	dialog = "bridgechest",
+	marker = "bridgechest"}
+
 ------------------------------------------------------------------------------
 -- Map objects
 

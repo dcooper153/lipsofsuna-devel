@@ -2,6 +2,8 @@ Pattern{
 	name = "chasm1",
 	size = Vector(48,64,32),
 	categories = {},
+	obstacles = {
+		{18.490000,20.990000,27.700000,"bridge chest"}},
 	creatures = {
 		{19.800000,20.980000,9.890000,"Foreman"}},
 	tiles = {

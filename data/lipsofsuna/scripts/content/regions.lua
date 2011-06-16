@@ -17,14 +17,14 @@ Regionspec{
 	name = "Chasm",
 	categories = {"special"},
 	depth = {930,1000},
-	links = {"Giant Shaft"},
+	distance = {"Lips",20,30},
+	links = {"Lips","Sanctuary"},
 	pattern_name = "chasm1"}
 
 Regionspec{
 	name = "Brigand HQ",
 	categories = {"special"},
-	depth = {930,930},
-	distance = {"Lips",10,20},
+	depth = {930,1000},
 	pattern_name = "brigandhq1",
 	random_resources = false}
 
