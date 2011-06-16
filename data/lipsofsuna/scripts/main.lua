@@ -94,6 +94,9 @@ require "content/quests"
 require "content/regions"
 require "content/species"
 require "content/weapons"
+for k,v in pairs(File:scan_directory("scripts/content/books")) do
+	require("content/books/" .. string.gsub(v, "([^.]*).*", "%1"))
+end
 for k,v in pairs(File:scan_directory("scripts/content/dialogs")) do
 	require("content/dialogs/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
