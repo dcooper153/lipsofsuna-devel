@@ -146,6 +146,9 @@ Gui.set_mode = function(self, mode, level)
 	if mode == "admin" then
 		Gui.menus:open{level = level or 1, widget = Views.Admin.inst}
 		self.view = Views.Admin.inst
+	elseif mode == "book" then
+		Gui.menus:open{level = level or 1, widget = Views.Book.inst}
+		self.view = Views.Book.inst
 	elseif mode == "chargen" then
 		self.view = Views.Chargen.inst
 	elseif mode == "controls" then

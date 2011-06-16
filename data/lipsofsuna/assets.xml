@@ -123,6 +123,10 @@
     <url>http://opengameart.org/users/solvalou</url>
   </author-info>
   <author-info>
+    <name>sunburn</name>
+    <url>http://opengameart.org/user/394</url>
+  </author-info>
+  <author-info>
     <name>thecubber</name>
   </author-info>
   <author-info>
@@ -444,6 +448,13 @@
     <license>Creative Commons BY-SA 3.0</license>
     <status>complete</status>
     <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/book1.png</file>
+    <author>sunburn</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/open-book</source>
   </asset>
 
   <asset>
