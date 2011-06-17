@@ -29,7 +29,6 @@ Quickslots.assign_item = function(clss, index, item)
 	else
 		clss.items:assign_none(index)
 	end
-	clss.mode = "items"
 end
 
 --- Called when the quickslot is clicked or accessed by a hotkey.
