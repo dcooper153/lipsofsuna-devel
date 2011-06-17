@@ -31,12 +31,22 @@ end
 -- @return Table of item names.
 Crafting.get_craftable = function(clss, args)
 	local items = {}
-	local a = {}
-	for k,v in pairs(args) do a[k] = v end
-	for name,spec in pairs(Itemspec.dict_name) do
-		a.spec = spec
-		if clss:can_craft(a) then
-			table.insert(items, name)
+	if args and args.get_item and args.get_skill then
+		-- Check if the player has the materials and skills.
+		local a = {}
+		for k,v in pairs(args) do a[k] = v end
+		for name,spec in pairs(Itemspec.dict_name) do
+			a.spec = spec
+			if clss:can_craft(a) then
+				table.insert(items, name)
+			end
+		end
+	else
+		-- Return any craftable items regardless of the player status.
+		for name,spec in pairs(Itemspec.dict_name) do
+			if spec.crafting_enabled then
+				table.insert(items, name)
+			end
 		end
 	end
 	return items

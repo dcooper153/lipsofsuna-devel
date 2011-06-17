@@ -45,9 +45,44 @@ Widgets.Container.new = function(clss, args)
 	end
 	-- Crafting list.
 	if args.spec and args.spec.inventory_type == "workbench" then
+		-- Crafting actions.
+		local pressed = function(w)
+			if not w.enabled then return end
+			Network:send{packet = Packet(packets.CRAFTING, "uint32", w.id, "string", w.text)}
+		end
+		local scrolled = function(w, args)
+			self.crafting:scrolled(args)
+		end
+		-- Build the crafting item buttons.
+		local craftable = Crafting:get_craftable()
+		table.sort(craftable)
+		self.craftable = {}
+		for k,v in ipairs(craftable) do
+			local spec = Itemspec:find{name = v}
+			local widget = Widgets.ItemButton{enabled = false, id = self.id,
+				index = k, icon = spec and spec.icon, spec = spec, text = v,
+				pressed = pressed, scrolled = scrolled}
+			table.insert(self.craftable, widget)
+		end
+		-- Pack the crafting list.
 		self.crafting = Widgets.List()
-		--self.crafting:set_request{height = 32}
-		self.group:set_child{col = 1, row = 2, widget = self.crafting}
+		local col = 1
+		local row = Widget{cols = 8, rows = 1, spacings = {0,0}}
+		for k,v in ipairs(self.craftable) do
+			row:set_child(col, 1, v)
+			if col == row.cols then
+				self.crafting:append{widget = row}
+				row = Widget{cols = row.cols, rows = 1, spacings = {0,0}}
+				col = 1
+			else
+				col = col + 1
+			end
+		end
+		if row.cols > 0 then
+			self.crafting:append{widget = row}
+		end
+		-- Add the list to the container widget.
+		self.group:set_child(1, 2, self.crafting)
 	end
 	-- Close button.
 	self.closed = args.closed
@@ -168,38 +203,12 @@ Widgets.Container.update = function(self)
 			items[item.text] = item.count
 		end
 	end
-	-- Calculate craftable items.
-	local get_item = function(name)
-		return items[name]
+	-- Update craftability flags.
+	local args = {
+		get_item = function(name) return items[name] end,
+		get_skill = function(name) return Gui.skills.skills:get_value(name) end}
+	for k,v in pairs(self.craftable) do
+		args.spec = v.spec
+		v.enabled = Crafting:can_craft(args)
 	end
-	local get_skill = function(name)
-		return Gui.skills.skills:get_value(name)
-	end
-	craftable = Crafting:get_craftable{get_item = get_item, get_skill = get_skill}
-	table.sort(craftable)
-	-- Rebuild the crafting list.
-	local row = Widget{rows = 1, spacings = {0,0}}
-	local index = 1
-	local offset = self.crafting:get_offset()
-	self.crafting:clear()
-	for k,v in pairs(craftable) do
-		local spec = Itemspec:find{name = v}
-		local widget = Widgets.ItemButton{index = index, icon = spec and spec.icon, text = v,
-			pressed = function(w)
-				Network:send{packet = Packet(packets.CRAFTING, "uint32", self.id, "string", w.text)}
-			end,
-			scrolled = function(w, args)
-				self.crafting:scrolled(args)
-			end}
-		row:append_col(widget)
-		if row.cols == 8 then
-			self.crafting:append{widget = row}
-			row = Widget{rows = 1, spacings = {0,0}}
-		end
-		index = index + 1
-	end
-	if row.cols > 0 then
-		self.crafting:append{widget = row}
-	end
-	self.crafting:set_offset(offset)
 end

@@ -1,10 +1,14 @@
 Widgets.ItemButton = Class(Widget)
 
 Widgets.ItemButton.new = function(clss, args)
-	local self = Widget.new(clss, args)
-	self.font = self.font or "tiny"
-	self.icon = self.icon or ""
-	self.text = self.text or ""
+	local self = Widget.new(clss)
+	self.init = true
+	for k,v in pairs(args) do self[k] = v end
+	if self.enabled == nil then self.enabled = true end
+	if self.font == nil then self.font = "tiny" end
+	if self.icon == nil then self.icon = "" end
+	if self.text == nil then self.text = "" end
+	self.init = nil
 	return self
 end
 
@@ -12,13 +16,14 @@ Widgets.ItemButton.pressed = function(self, args)
 end
 
 Widgets.ItemButton.reshaped = function(self)
+	if self.init then return end
 	self:set_request{
 		internal = true,
 		height = 34,
 		width = 34}
 	local w = self.width
 	local h = self.height
-	local a = self.drag and 0.2 or 1
+	local a = (self.drag or not self.enabled) and 0.2 or 1
 	-- Background.
 	self:canvas_clear()
 	self:canvas_image{
@@ -63,6 +68,7 @@ end
 Widgets.ItemButton:add_getters{
 	count = function(self) return rawget(self, "__count") end,
 	drag = function(self) return rawget(self, "__drag") end,
+	enabled = function(self) return rawget(self, "__enabled") end,
 	focused = function(self) return rawget(self, "__focused") end,
 	font = function(self) return rawget(self, "__font") end,
 	icon = function(self) return rawget(self, "__icon") end,
@@ -78,6 +84,11 @@ Widgets.ItemButton:add_setters{
 	drag = function(self, value)
 		if self.drag == value then return end
 		rawset(self, "__drag", value)
+		self:reshaped()
+	end,
+	enabled = function(self, value)
+		if self.enabled == value then return end
+		rawset(self, "__enabled", value)
 		self:reshaped()
 	end,
 	focused = function(self, value)
