@@ -5,9 +5,9 @@ Commands = {}
 Commands.examine = function(self)
 	Target:start("What would you like to examine?", function(where, id, slot)
 		if where == "inv" then
-			Network:send{packet = Packet(packets.EXAMINE, "uint32", id, "uint32", slot)}
+			Network:send{packet = Packet(packets.PLAYER_EXAMINE, "uint32", id, "uint32", slot)}
 		elseif where == "obj" then
-			Network:send{packet = Packet(packets.EXAMINE, "uint32", 0, "uint32", id)}
+			Network:send{packet = Packet(packets.PLAYER_EXAMINE, "uint32", 0, "uint32", id)}
 		end
 	end)
 end
@@ -53,9 +53,9 @@ Commands.use = function(self, inv, slot)
 	else
 		-- Target known so use.
 		if type(slot) == "number" then
-			Network:send{packet = Packet(packets.USE, "uint32", inv, "uint8", 0, "uint32", slot)}
+			Network:send{packet = Packet(packets.PLAYER_USE, "uint32", inv, "uint8", 0, "uint32", slot)}
 		else
-			Network:send{packet = Packet(packets.USE, "uint32", inv, "uint8", 1, "string", slot)}
+			Network:send{packet = Packet(packets.PLAYER_USE, "uint32", inv, "uint8", 1, "string", slot)}
 		end
 	end
 end

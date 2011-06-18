@@ -1,5 +1,5 @@
 Action{name = "attack", mode = "toggle", key1 = "mouse1", func = function(v)
-	Network:send{packet = Packet(packets.SHOOT, "bool", v)}
+	Network:send{packet = Packet(packets.PLAYER_ATTACK, "bool", v)}
 end}
 
 Action{name = "block", mode = "toggle", key1 = "mouse3", func = function(v)
@@ -37,7 +37,7 @@ Action{name = "inventory", mode = "press", key1 = Keysym.i, func = function()
 end}
 
 Action{name = "jump", mode = "press", key1 = Keysym.SPACE, func = function()
-	Network:send{packet = Packet(packets.JUMP)}
+	Network:send{packet = Packet(packets.PLAYER_JUMP)}
 end}
 
 Action{name = "menu", mode = "press", key1 = Keysym.ESCAPE, func = function()
@@ -126,7 +126,7 @@ Action{name = "quickslot_12", mode = "press", key1 = Keysym.F12, func = function
 end}
 
 Action{name = "run", mode = "toggle", key1 = Keysym.LSHIFT, func = function(v)
-	Network:send{packet = Packet(packets.RUN, "bool", not v)}
+	Network:send{packet = Packet(packets.PLAYER_RUN, "bool", not v)}
 end}
 
 Action{name = "screenshot", mode = "press", key1 = Keysym.PRINT, func = function()
@@ -135,7 +135,7 @@ Action{name = "screenshot", mode = "press", key1 = Keysym.PRINT, func = function
 end}
 
 Action{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func = function(v)
-	Network:send{packet = Packet(packets.STRAFE, "int8", v * 127)}
+	Network:send{packet = Packet(packets.PLAYER_STRAFE, "int8", v * 127)}
 end}
 
 Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)

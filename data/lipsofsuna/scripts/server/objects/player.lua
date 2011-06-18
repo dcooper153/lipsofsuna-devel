@@ -430,7 +430,7 @@ Player.vision_cb = function(self, args)
 			end
 		end,
 		["world-effect"] = function(args)
-			self:send{packet = Packet(packets.WORLD_EFFECT, "string", args.effect,
+			self:send{packet = Packet(packets.EFFECT_WORLD, "string", args.effect,
 				"float", args.point.x, "float", args.point.y, "float", args.point.z)}
 		end
 	}

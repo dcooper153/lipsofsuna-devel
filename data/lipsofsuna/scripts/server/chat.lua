@@ -133,7 +133,7 @@ ChatCommand{pattern = ".*", permission = "player", func = function(player, match
 	player:say(matches[1])
 end}
 
-Protocol:add_handler{type = "CHAT", func = function(args)
+Protocol:add_handler{type = "PLAYER_CHAT", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
 	local ok,msg = args.packet:read("string")

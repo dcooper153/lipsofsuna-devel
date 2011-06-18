@@ -869,7 +869,7 @@ Creature.update_burdening = function(self, secs)
 	if curr_weight ~= self.carried_weight or prev_limit ~= curr_limit then
 		self.carried_weight = curr_weight
 		self.burden_limit = curr_limit
-		self:send{packet = Packet{packets.PLAYER_WEIGHT, "uint16", curr_weight, "uint16", curr_limit}}
+		self:send{packet = Packet{packets.INVENTORY_WEIGHT, "uint16", curr_weight, "uint16", curr_limit}}
 	end
 	local curr_burden = self:get_burdened()
 	if prev_burden ~= curr_burden then

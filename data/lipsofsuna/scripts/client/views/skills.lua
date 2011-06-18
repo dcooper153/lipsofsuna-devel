@@ -9,7 +9,7 @@ Views.Skills.new = function(clss)
 	self.title = Widgets.Frame{style = "title", text = "Skills"}
 	self.skills = Widgets.Skills()
 	self.skills.changed = function(widget, skill)
-		Network:send{packet = Packet(packets.SKILLS, "string", skill.id, "float", skill.cap)}
+		Network:send{packet = Packet(packets.PLAYER_SKILLS, "string", skill.id, "float", skill.cap)}
 	end
 	self.group = Widgets.Frame{cols = 1, rows = 1}
 	self.group:set_expand{col = 1, row = 1}

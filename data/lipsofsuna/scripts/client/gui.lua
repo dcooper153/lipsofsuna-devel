@@ -34,7 +34,7 @@ Gui.init = function(clss)
 	Gui.chat_label = Widgets.Label{text = " "}
 	Gui.chat_entry = Widgets.Entry{transparent = true, visible = false}
 	Gui.chat_entry.pressed = function(self)
-		Network:send{packet = Packet(packets.CHAT, "string", self.text)}
+		Network:send{packet = Packet(packets.PLAYER_CHAT, "string", self.text)}
 		self:clear()
 	end
 	Gui.chat_group = Widget{cols = 1, spacings = {0,0}}

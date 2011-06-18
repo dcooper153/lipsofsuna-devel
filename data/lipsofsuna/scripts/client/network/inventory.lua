@@ -80,7 +80,7 @@ Protocol:add_handler{type = "INVENTORY_ITEM_REMOVED", func = function(event)
 end}
 
 -- Updates the weight and burdening limit of the player.
-Protocol:add_handler{type = "PLAYER_WEIGHT", func = function(event)
+Protocol:add_handler{type = "INVENTORY_WEIGHT", func = function(event)
 	-- Parse the packet.
 	local ok,w,l = event.packet:read("uint16", "uint16")
 	if not ok then return end

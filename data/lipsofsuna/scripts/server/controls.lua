@@ -120,7 +120,7 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
 	end
 end}
 
-Protocol:add_handler{type = "EXAMINE", func = function(args)
+Protocol:add_handler{type = "PLAYER_EXAMINE", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
 	if not player.dead then
@@ -174,7 +174,7 @@ Protocol:add_handler{type = "INVENTORY_CLOSED", func = function(args)
 	end
 end}
 
-Protocol:add_handler{type = "JUMP", func = function(args)
+Protocol:add_handler{type = "PLAYER_JUMP", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
 	if not player.dead then
@@ -284,7 +284,7 @@ Protocol:add_handler{type = "PLAYER_TURN", func = function(args)
 	end
 end}
 
-Protocol:add_handler{type = "RUN", func = function(args)
+Protocol:add_handler{type = "PLAYER_RUN", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
 	if not player.dead then
@@ -296,7 +296,7 @@ Protocol:add_handler{type = "RUN", func = function(args)
 	end
 end}
 
-Protocol:add_handler{type = "SKILLS", func = function(args)
+Protocol:add_handler{type = "PLAYER_SKILLS", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
 	if not player.dead then
@@ -307,7 +307,7 @@ Protocol:add_handler{type = "SKILLS", func = function(args)
 	end
 end}
 
-Protocol:add_handler{type = "SHOOT", func = function(args)
+Protocol:add_handler{type = "PLAYER_ATTACK", func = function(args)
 	-- Find the player.
 	local player = Player:find{client = args.client}
 	if not player then return end
@@ -331,7 +331,7 @@ Protocol:add_handler{type = "SHOOT", func = function(args)
 	end
 end}
 
-Protocol:add_handler{type = "STRAFE", func = function(args)
+Protocol:add_handler{type = "PLAYER_STRAFE", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
 	if not player.dead then
@@ -351,7 +351,7 @@ Protocol:add_handler{type = "THROW", func = function(args)
 	end
 end}
 
-Protocol:add_handler{type = "USE", func = function(args)
+Protocol:add_handler{type = "PLAYER_USE", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
 	if player.dead then return end
