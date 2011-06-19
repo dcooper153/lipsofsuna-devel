@@ -36,7 +36,7 @@ Action{name = "inventory", mode = "press", key1 = Keysym.i, func = function()
 	Gui:set_mode("inventory")
 end}
 
-Action{name = "jump", mode = "press", key1 = Keysym.e, func = function()
+Action{name = "jump", mode = "press", key1 = Keysym.SPACE, func = function()
 	Network:send{packet = Packet(packets.JUMP)}
 end}
 
@@ -77,43 +77,43 @@ Action{name = "quickslot_mode", mode = "press", key1 = Keysym.TAB, func = functi
 	end
 end}
 
-Action{name = "quickslot_1", mode = "press", key1 = Keysym.F1, func = function()
+Action{name = "quickslot_1", mode = "press", key1 = Keysym.NUM1, func = function()
 	Quickslots:activate(1)
 end}
 
-Action{name = "quickslot_2", mode = "press", key1 = Keysym.F2, func = function()
+Action{name = "quickslot_2", mode = "press", key1 = Keysym.NUM2, func = function()
 	Quickslots:activate(2)
 end}
 
-Action{name = "quickslot_3", mode = "press", key1 = Keysym.F3, func = function()
+Action{name = "quickslot_3", mode = "press", key1 = Keysym.NUM3, func = function()
 	Quickslots:activate(3)
 end}
 
-Action{name = "quickslot_4", mode = "press", key1 = Keysym.F4, func = function()
+Action{name = "quickslot_4", mode = "press", key1 = Keysym.NUM4, func = function()
 	Quickslots:activate(4)
 end}
 
-Action{name = "quickslot_5", mode = "press", key1 = Keysym.F5, func = function()
+Action{name = "quickslot_5", mode = "press", key1 = Keysym.NUM5, func = function()
 	Quickslots:activate(5)
 end}
 
-Action{name = "quickslot_6", mode = "press", key1 = Keysym.F6, func = function()
+Action{name = "quickslot_6", mode = "press", key1 = Keysym.NUM6, func = function()
 	Quickslots:activate(6)
 end}
 
-Action{name = "quickslot_7", mode = "press", key1 = Keysym.F7, func = function()
+Action{name = "quickslot_7", mode = "press", key1 = Keysym.NUM7, func = function()
 	Quickslots:activate(7)
 end}
 
-Action{name = "quickslot_8", mode = "press", key1 = Keysym.F8, func = function()
+Action{name = "quickslot_8", mode = "press", key1 = Keysym.NUM8, func = function()
 	Quickslots:activate(8)
 end}
 
-Action{name = "quickslot_9", mode = "press", key1 = Keysym.F9, func = function()
+Action{name = "quickslot_9", mode = "press", key1 = Keysym.NUM9, func = function()
 	Quickslots:activate(9)
 end}
 
-Action{name = "quickslot_10", mode = "press", key1 = Keysym.F10, func = function()
+Action{name = "quickslot_10", mode = "press", key1 = Keysym.NUM0, func = function()
 	Quickslots:activate(10)
 end}
 
@@ -156,7 +156,7 @@ Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 	end
 end}
 
-Action{name = "use", mode = "press", key1 = Keysym.SPACE, func = function()
+Action{name = "use", mode = "press", key1 = Keysym.e, func = function()
 	Commands:use()
 end}
 
