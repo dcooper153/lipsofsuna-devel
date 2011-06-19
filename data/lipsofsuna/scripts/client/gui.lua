@@ -187,21 +187,39 @@ Gui.set_mode = function(self, mode, level)
 	if self.view and self.view.enter then self.view:enter() end
 end
 
-Gui.class_getters = {
-	chat_active = function(s) return s.chat_entry.visible end}
-
-Gui.class_setters = {
-	chat_active = function(s, v)
-		s.chat_entry.visible = v
-		s.chat_label.text = v and "TALK: " or " "
-		Gui:set_mode("game")
-	end}
-
 --- Sets or unsets the text of the action label.
 -- @param clss Gui class.
 -- @param text String or nil.
 Gui.set_action_text = function(clss, text)
 	clss.scene.action = text
+end
+
+--- Sets the ID of the object whose dialog is shown.
+-- @param self Gui class.
+-- @param id Object ID.
+Gui.set_dialog = function(clss, id)
+	-- Find the dialog.
+	clss.active_dialog = id
+	local obj = Object:find{id = id}
+	local dlg = obj and obj.dialog
+	-- Update the dialog UI.
+	if not dlg then
+		-- Hide the dialog UI.
+		if clss.mode == "dialog" then
+			Views.Dialog.inst.id = nil
+			Gui:set_mode("game")
+		end
+	elseif dlg.type == "choice" then
+		-- Show a dialog choice.
+		if clss.mode == "game" or clss.mode == "dialog" then
+			Views.Dialog.inst:show(id, nil, dlg.choices)
+		end
+	else
+		-- Show a dialog line.
+		if clss.mode == "game" or clss.mode == "dialog" then
+			Views.Dialog.inst:show(id, dlg.message, nil)
+		end
+	end
 end
 
 --- Sets or unsets the active target.
@@ -216,3 +234,13 @@ Eventhandler{type = "tick", func = function(self, args)
 		Gui.fps_label.text = "FPS: " .. math.floor(Client.fps + 0.5)
 	end
 end}
+
+Gui.class_getters = {
+	chat_active = function(s) return s.chat_entry.visible end}
+
+Gui.class_setters = {
+	chat_active = function(s, v)
+		s.chat_entry.visible = v
+		s.chat_label.text = v and "TALK: " or " "
+		Gui:set_mode("game")
+	end}
