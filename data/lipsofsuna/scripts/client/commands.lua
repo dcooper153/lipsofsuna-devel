@@ -53,7 +53,12 @@ Commands.use = function(self, inv, slot)
 	else
 		-- Target known so use.
 		if type(slot) == "number" then
-			Network:send{packet = Packet(packets.PLAYER_USE, "uint32", inv, "uint8", 0, "uint32", slot)}
+			local obj = (inv == 0) and Object:find{id = slot}
+			if obj and obj.dialog then
+				Views.Dialog.inst:show(obj.id, obj.dialog.message, obj.dialog.choices)
+			else
+				Network:send{packet = Packet(packets.PLAYER_USE, "uint32", inv, "uint8", 0, "uint32", slot)}
+			end
 		else
 			Network:send{packet = Packet(packets.PLAYER_USE, "uint32", inv, "uint8", 1, "string", slot)}
 		end

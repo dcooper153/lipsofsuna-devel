@@ -35,6 +35,45 @@ Protocol:add_handler{type = "OBJECT_DEAD", func = function(args)
 	end
 end}
 
+Protocol:add_handler{type = "OBJECT_DIALOG_CHOICE", func = function(args)
+	-- Parse the packet.
+	local ok,i,n = args.packet:read("uint32", "uint8")
+	if not ok then return end
+	local choices = {}
+	for i = 1,n do
+		local ok,m = args.packet:resume("string")
+		if not ok then return end
+		table.insert(choices, m)
+	end
+	-- Find the object.
+	local obj = Object:find{id = i}
+	if not obj then return end
+	-- Update the dialog.
+	obj:set_dialog("choice", choices)
+end}
+
+Protocol:add_handler{type = "OBJECT_DIALOG_MESSAGE", func = function(args)
+	-- Parse the packet.
+	local ok,i,m = args.packet:read("uint32", "string")
+	if not ok then return end
+	-- Find the object.
+	local obj = Object:find{id = i}
+	if not obj then return end
+	-- Update the dialog.
+	obj:set_dialog("message", m)
+end}
+
+Protocol:add_handler{type = "OBJECT_DIALOG_NONE", func = function(args)
+	-- Parse the packet.
+	local ok,i = args.packet:read("uint32")
+	if not ok then return end
+	-- Find the object.
+	local obj = Object:find{id = i}
+	if not obj then return end
+	-- Update the dialog.
+	obj:set_dialog("none")
+end}
+
 Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
 	local ok,i,a = event.packet:read("uint32", "string")
 	if not ok then return end
@@ -258,6 +297,38 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		o.hair_style = a
 		o.hair_color = {b / 255, c / 255, d / 255}
 		debug("    HAIR %s %d %d %d", a, b, c, d)
+	end
+	-- Dialog.
+	if Bitwise:band(flags, Protocol.object_show_flags.DIALOG) ~= 0 then
+		debug("  DIALOG")
+		local ok,a
+		ok,a = event.packet:resume("uint8")
+		if not ok then return end
+		if a == 0 then
+			-- Choices.
+			local choices = {}
+			ok,a = event.packet:resume("uint8")
+			debug("    CHOICES %d", a)
+			if not ok then return end
+			for i = 1,a do
+				ok,a = event.packet:resume("string")
+				if not ok then return end
+				debug("      %s", a)
+				table.insert(choices, a)
+			end
+			o:set_dialog("choice", choices)
+		elseif a == 1 then
+			-- Line.
+			debug("    MESSAGE", a)
+			ok,a = event.packet:resume("string")
+			if not ok then return end
+			o:set_dialog("message", a)
+			debug("      %s", a)
+		else
+			-- None.
+			debug("    NONE", a)
+			o:set_dialog("none")
+		end
 	end
 	-- Rebuild the model.
 	debug("  OK")

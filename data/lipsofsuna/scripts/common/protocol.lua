@@ -85,6 +85,9 @@ do
 	add("OBJECT_ANIMATED")
 	add("OBJECT_BEHEADED")
 	add("OBJECT_DEAD")
+	add("OBJECT_DIALOG_CHOICE")
+	add("OBJECT_DIALOG_MESSAGE")
+	add("OBJECT_DIALOG_NONE")
 	add("OBJECT_EFFECT")
 	add("OBJECT_FEAT")
 	add("OBJECT_HIDDEN")
@@ -137,7 +140,8 @@ Protocol.object_show_flags = {
 	SKILLS = 0x008000,
 	SLOTS = 0x010000,
 	SPEC = 0x020000,
-	SPECIES = 0x040000}
+	SPECIES = 0x040000,
+	DIALOG = 0x080000}
 
 effects = {}
 do

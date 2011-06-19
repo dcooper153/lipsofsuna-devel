@@ -176,6 +176,26 @@ Object.set_anim = function(self, name, time)
 	self:animate(args)
 end
 
+Object.set_dialog = function(self, type, args)
+	if type == "choice" then
+		self.dialog = {type = type, choices = args}
+		if Views.Dialog.inst.id == self.id then
+			Views.Dialog.inst:show(self.id, nil, args)
+		end
+	elseif type == "message" then
+		self.dialog = {type = type, message = args}
+		if Views.Dialog.inst.id == self.id then
+			Views.Dialog.inst:show(self.id, args, nil)
+		end
+	else
+		self.dialog = nil
+		if Views.Dialog.inst.id == self.id then
+			Views.Dialog.inst.id = nil
+			Gui:set_mode("game")
+		end
+	end
+end
+
 Object.set_skill = function(self, s, v, m)
 	-- Update player skills.
 	if self == Player.object then

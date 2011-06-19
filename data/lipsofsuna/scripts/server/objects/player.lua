@@ -201,6 +201,24 @@ Player.vision_cb = function(self, args)
 			local o = args.object
 			self:send{packet = Packet(packets.OBJECT_DEAD, "uint32", o.id, "bool", args.dead)}
 		end,
+		["object-dialog"] = function(args)
+			local o = args.object
+			if args.choices then
+				-- Choice.
+				local p = {}
+				for k,v in ipairs(args.choices) do
+					table.insert(p, "string")
+					table.insert(p, v)
+				end
+				self:send{packet = Packet(packets.OBJECT_DIALOG_CHOICE, "uint32", o.id, "uint8", #args.choices, unpack(p))}
+			elseif args.message then
+				-- Message.
+				self:send{packet = Packet(packets.OBJECT_DIALOG_MESSAGE, "uint32", o.id, "string", args.message)}
+			else
+				-- None.
+				self:send{packet = Packet(packets.OBJECT_DIALOG_NONE, "uint32", o.id)}
+			end
+		end,
 		["object-effect"] = function(args)
 			local o = args.object
 			self:send{packet = Packet(packets.OBJECT_EFFECT, "uint32", o.id, "string", args.effect)}
@@ -377,6 +395,27 @@ Player.vision_cb = function(self, args)
 					"uint8", o.hair_style and o.hair_style[4] or 255}
 				flags = flags + Protocol.object_show_flags.HEAD_STYLE
 			end
+			-- Dialog.
+			local data_dialog = {}
+			if o.dialog and o.dialog.event then
+				flags = flags + Protocol.object_show_flags.DIALOG
+				local e = o.dialog.event
+				if e.choices then
+					table.insert(data_dialog, "uint8")
+					table.insert(data_dialog, 0)
+					table.insert(data_dialog, "uint8")
+					table.insert(data_dialog, #e.choices)
+					for k,v in ipairs(e.choices) do
+						table.insert(data_dialog, "string")
+						table.insert(data_dialog, v)
+					end
+				else
+					table.insert(data_dialog, "uint8")
+					table.insert(data_dialog, 1)
+					table.insert(data_dialog, "string")
+					table.insert(data_dialog, e.message)
+				end
+			end
 			-- Self.
 			if o == self then
 				flags = flags + Protocol.object_show_flags.SELF
@@ -393,6 +432,7 @@ Player.vision_cb = function(self, args)
 			p:write(data_skills)
 			p:write(data_body)
 			p:write(data_head)
+			p:write(data_dialog)
 			self:send(p)
 			if o == self then sendmap() end
 		end,

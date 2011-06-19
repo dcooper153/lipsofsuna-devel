@@ -459,7 +459,12 @@ Creature.die = function(self)
 	end
 	-- Death dialog.
 	if self.spec.dialog then
-		Dialog:start{object = self, name = self.spec.dialog .. " death"}
+		local dialog = Dialog{object = self, name = self.spec.dialog .. " death"}
+		if dialog then
+			self.dialog = dialog
+			self.dialog:execute()
+			self.dialog = nil
+		end
 	end
 	-- Disable controls etc.
 	self:set_dead_state(true)

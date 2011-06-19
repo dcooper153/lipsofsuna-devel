@@ -545,9 +545,16 @@ end
 -- @param self Object.
 -- @param user User.
 Object.use_cb = function(self, user)
-	if not Dialog:start{object = self, user = user} then
-		self:loot(user)
+	-- Try to start a dialog.
+	if self.dialog then return end
+	local dialog = Dialog{object = self, user = user}
+	if dialog then
+		self.dialog = dialog
+		self.dialog:execute()
+		return
 	end
+	-- Try to loot if no dialog.
+	self:loot(user)
 end
 
 --- Serializes the object to a string.
