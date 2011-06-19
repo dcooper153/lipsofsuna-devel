@@ -162,9 +162,6 @@ Gui.set_mode = function(self, mode, level)
 	elseif mode == "controls" then
 		Gui.menus:open{level = level or 1, widget = Views.Controls.inst}
 		self.view = Views.Controls.inst
-	elseif mode == "dialog" then
-		Gui.menus:open{level = level or 1, widget = Views.Dialog.inst}
-		self.view = Views.Dialog.inst
 	elseif mode == "feats" then
 		Gui.menus:open{level = level or 1, widget = Views.Feats.inst}
 		self.view = Views.Feats.inst
