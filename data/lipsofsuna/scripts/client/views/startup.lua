@@ -9,13 +9,15 @@ Startup.init = function(clss)
 	clss.text = Widgets.Label()
 	clss.button_back = Widgets.Label{font = "mainmenu", text = "Back", pressed = function() clss:back() end}
 	clss.button_quit = Widgets.Label{font = "mainmenu", text = "Quit", pressed = function() Program:shutdown() end}
+	clss.label_hint = Widgets.Label{halign = 0.1, valign = 0.1, font = "medium"}
 	clss.group2 = Widget{cols = 4, rows = 1, margins = {bottom=30}, spacings = {horz=40}}
 	clss.group2:set_child{col = 2, row = 1, widget = clss.button_back}
 	clss.group2:set_child{col = 3, row = 1, widget = clss.button_quit}
 	clss.group2:set_expand{col = 1}
 	clss.group2:set_expand{col = 4}
-	clss.group:set_child{col = 2, row = 2, widget = clss.text}
-	clss.group:set_child{col = 2, row = 3, widget = clss.group2}
+	clss.group:set_child(1, 1, clss.label_hint)
+	clss.group:set_child(2, 2, clss.text)
+	clss.group:set_child(2, 3, clss.group2)
 end
 
 --- Returns to the launcher.
@@ -38,6 +40,10 @@ end
 Startup.enter = function(clss)
 	clss.group.floating = true
 	clss:retry()
+	-- Show controls.
+	clss.label_hint.text = [[Key map:
+TODO
+TODO]]
 end
 
 --- Retries hosting or joining.
