@@ -119,6 +119,7 @@ Protocol:add_handler{type = "OBJECT_HIDDEN", func = function(event)
 	if ok then
 		local o = Object:find{id = i}
 		if o then o:detach() end
+		if i == Gui.active_dialog then Gui:set_dialog() end
 	end
 end}
 

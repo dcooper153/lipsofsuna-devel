@@ -3,27 +3,45 @@ Widgets.DialogLabel = Class(Widgets.Label)
 Widgets.DialogLabel.new = function(clss, args)
 	local self = Widgets.Label.new(clss, args)
 	self.font = "bigger"
-	self:set_request{width = 400}
+	self:set_request{width = 500}
 	return self
 end
 
 Widgets.DialogLabel.reshaped = function(self)
-	local wrap = self:get_request() or 400
+	-- Format the text.
+	local color
+	local text
+	if self.index and self.text then
+		local action = Action.dict_name[string.format("choice_%d", self.index)]
+		local key = action and action.key1 and Keycode[action.key1] or "--"
+		if self.choice then
+			color = self.focused and {0.7,0.3,0.3,1} or {0,0.7,0,1}
+			text = string.format("<%s> %s", key, self.text)
+		else
+			color = self.focused and {0.7,0.3,0.3,1} or {1,1,1,1}
+			text = string.format("<%s> %s", key, self.text)
+		end
+	end
+	-- Calculate the size.
+	local wrap = self:get_request() or 500
 	self:set_request{
 		font = self.font,
 		internal = true,
 		paddings = {2,2,2,2},
-		text = self.text,
+		text = text,
 		width = wrap - 4}
 	local w = self.width
 	local h = self.height
+	-- Populate the canvas.
 	self:canvas_clear()
-	self:canvas_text{
-		dest_position = {0,0},
-		dest_size = {w,h},
-		text = self.text,
-		text_alignment = {self.halign,self.valign},
-		text_color = self.focused and {0.7,0.3,0.3,1} or {0,0,0,1},
-		text_font = self.font}
+	if self.index and self.text then
+		self:canvas_text{
+			dest_position = {0,0},
+			dest_size = {w,h},
+			text = text,
+			text_alignment = {self.halign,self.valign},
+			text_color = color,
+			text_font = self.font}
+	end
 	self:canvas_compile()
 end
