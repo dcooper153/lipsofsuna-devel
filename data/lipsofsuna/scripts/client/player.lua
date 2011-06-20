@@ -158,6 +158,13 @@ Player.pick_look = function(clss)
 	clss.crosshair.realized = true
 end
 
+Player.update_compass = function(clss)
+	Gui.scene.compass = math.pi - clss.rotation_curr.euler[1]
+	Gui.scene.compass_quest_direction = Views.Quests.inst:get_compass_direction()
+	Gui.scene.compass_quest_distance = Views.Quests.inst:get_compass_distance()
+	Gui.scene.compass_quest_height = Views.Quests.inst:get_compass_height()
+end
+
 Player.camera = Camera{collision_mask = Physics.MASK_CAMERA, far = 40.0, fov = 1.1, mode = "third-person", near = 0.01, position_smoothing = 0.15, rotation_smoothing = 0.15}
 Player.camera_tilt = 0
 Player.camera_tilt_state = 0
@@ -229,10 +236,8 @@ Player.update_rotation = function(clss, secs)
 	if (clss.rotation_prev - clss.rotation_curr).length > math.max(0, 0.1 - 0.4 * clss.rotation_sync_timer) then
 		clss:send_rotation()
 	end
-	-- Update compass rotation.
-	Gui.scene.compass = math.pi - clss.rotation_curr.euler[1]
-	Gui.scene.compass_quest = Views.Quests.inst:get_compass_direction()
-	Gui.scene.compass_quest_height = Views.Quests.inst:get_compass_height()
+	-- Provide smooth compass rotation.
+	clss:update_compass()
 end
 
 Player.send_rotation = function(clss)
@@ -258,11 +263,13 @@ Player.set_light = function(clss, value)
 	clss.light_spell.enabled = value
 end
 
--- Periodically check if there's an object in front of the player.
-Timer{delay = 0.05, func = function()
+Timer{delay = 0.1, func = function()
+	-- Periodically check if there's an object in front of the player.
 	if Player.object and Client.moving then
 		Player:pick_look()
 	else
 		Target.target_object = nil
 	end
+	-- Periodically update the compass.
+	Player:update_compass()
 end}

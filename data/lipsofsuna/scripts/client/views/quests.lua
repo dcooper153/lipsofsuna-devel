@@ -40,6 +40,20 @@ Views.Quests.get_compass_direction = function(self)
 	end
 end
 
+--- Gets the distance to the shown quest marker in the X-Z plane.
+-- @param self Quest class.
+-- @return Compass distance or nil.
+Views.Quests.get_compass_distance = function(self)
+	if self.shown_quest then
+		local quest = Quest:find{name = self.shown_quest}
+		if not quest or not quest.marker then return end
+		if not Player.object then return end
+		local diff = quest.marker - Player.object.position
+		diff.y = 0
+		return diff.length
+	end
+end
+
 --- Gets the compass height offset for the currently shown quest.
 -- @param self Quest class.
 -- @return Compass height offset or nil.

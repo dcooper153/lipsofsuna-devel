@@ -50,11 +50,12 @@ Widgets.Scene.reshaped = function(self)
 			source_image = "compass1",
 			source_position = {42,2},
 			source_tiling = {0,74,0,0,74,0}}
-		if self.compass_quest then
+		if self.compass_quest_direction then
+			local frac = 0.6 + 0.4 * math.min(1,self.compass_quest_distance/(50*Voxel.tile_size))
 			self:canvas_image{
-				dest_position = {38,h-77},
+				dest_position = {38,h-44-33*frac},
 				dest_size = {12,50},
-				rotation = self.compass_quest + self.compass + math.pi,
+				rotation = self.compass_quest_direction + self.compass + math.pi,
 				rotation_center = Vector(44,h-40),
 				source_image = "compass1",
 				source_position = {0,0},
