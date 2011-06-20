@@ -43,7 +43,8 @@ Itemspec.dict_name = {}
 --   <li>inventory_type: Inventory type string.</li>
 --   <li>loot_categories: List of item categories this container can have as random loot.</li>
 --   <li>loot_count: Minimum and maximum number of random loot items this container can have.</li>
---   <li>mass: Mass in kilograms.</li>
+--   <li>mass: Mass in the physics simulation, in kilograms.</li>
+--   <li>mass_inventory: Mass in the inventory, in kilograms.</li>
 --   <li>model: Model to use for the item.</li>
 --   <li>name: Name of the item type.</li>
 --   <li>special_effects: List of special effects to render.</li>
@@ -91,6 +92,7 @@ Itemspec.new = function(clss, args)
 	copy("interactive", true)
 	copy("inventory_items", {})
 	copy("mass", 10)
+	copy("mass_inventory", self.mass)
 	copy("special_effects", {})
 	copy("water_friction", 0.9)
 	copy("water_gravity", Vector(0,-3,0))

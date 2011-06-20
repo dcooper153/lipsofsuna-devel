@@ -142,7 +142,7 @@ Object.calculate_carried_weight = function(self)
 	if not self.inventory then return 0 end
 	local w = 0
 	for k,v in pairs(self.inventory.slots) do
-		w = w + v.mass * v.count + v:calculate_carried_weight()
+		w = w + v.spec.mass_inventory * v.count + v:calculate_carried_weight()
 	end
 	return w
 end

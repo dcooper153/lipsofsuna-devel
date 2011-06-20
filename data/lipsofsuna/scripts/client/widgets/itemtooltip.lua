@@ -52,7 +52,7 @@ Widgets.Itemtooltip.new = function(clss, args)
 		end
 	end
 	-- Weight.
-	self:append("Weight: " .. tostring(spec.mass * count))
+	self:append("Weight: " .. tostring(spec.mass_inventory * count))
 	-- Description.
 	if spec.description then
 		self:append(spec.description)

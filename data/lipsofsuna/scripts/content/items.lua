@@ -59,7 +59,8 @@ Itemspec{
 	model = "dewspringleaf1",
 	icon = "mushroom1", -- FIXME
 	categories = {"material"},
-	mass = 0.5,
+	mass = 1,
+	mass_inventory = 0.1,
 	stacking = true}
 
 Itemspec{
@@ -184,7 +185,8 @@ Itemspec{
 	categories = {"material"},
 	crafting_count = 20,
 	crafting_materials = {["mushroom"] = 1},
-	mass = 0.05,
+	mass = 1,
+	mass_inventory = 0.05,
 	stacking = true}
 
 Itemspec{
@@ -237,7 +239,8 @@ Itemspec{
 	crafting_count = 10,
 	crafting_materials = {["log"] = 1},
 	icon = "arrow1",
-	mass = 0.2,
+	mass = 1,
+	mass_inventory = 0.1,
 	stacking = true,
 	water_gravity = Vector(0,6,0)}
 
@@ -250,6 +253,7 @@ Itemspec{
 	crafting_materials = {["log"] = 1},
 	icon = "arrow1",
 	mass = 1,
+	mass_inventory = 0.1,
 	stacking = true,
 	special_effects = {
 		{slot = "root", model = "torchfx1"}},
@@ -266,18 +270,20 @@ Itemspec{
 	destroy_actions = {"explode"},
 	icon = "arrow1",
 	mass = 1,
+	mass_inventory = 0.1,
 	stacking = true,
 	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "bullet",
 	model = "arrow-000", -- FIXME
-	mass = 0.2,
 	categories = {"bullet"},
 	influences_base = {physical = -1},
 	crafting_count = 10,
 	crafting_materials = {["iron ingot"] = 1, ["crimson stone"] = 1},
 	icon = "arrow1",
+	mass = 1,
+	mass_inventory = 0.1,
 	stacking = true}
 
 ------------------------------------------------------------------------------
