@@ -24,6 +24,54 @@ Action{name = "chat", mode = "press", key1 = Keysym.t, func = function()
 	Gui.chat_active = not Gui.chat_active
 end}
 
+Action{name = "choice_1", mode = "press", key1 = Keysym.F1, func = function()
+	local w = Gui.dialog_choices and Gui.dialog_choices[1]
+	if not w then return end
+	w:pressed()
+end}
+
+Action{name = "choice_2", mode = "press", key1 = Keysym.F2, func = function()
+	local w = Gui.dialog_choices and Gui.dialog_choices[2]
+	if not w then return end
+	w:pressed()
+end}
+
+Action{name = "choice_3", mode = "press", key1 = Keysym.F3, func = function()
+	local w = Gui.dialog_choices and Gui.dialog_choices[3]
+	if not w then return end
+	w:pressed()
+end}
+
+Action{name = "choice_4", mode = "press", key1 = Keysym.F4, func = function()
+	local w = Gui.dialog_choices and Gui.dialog_choices[4]
+	if not w then return end
+	w:pressed()
+end}
+
+Action{name = "choice_5", mode = "press", key1 = Keysym.F5, func = function()
+	local w = Gui.dialog_choices and Gui.dialog_choices[5]
+	if not w then return end
+	w:pressed()
+end}
+
+Action{name = "choice_6", mode = "press", key1 = Keysym.F6, func = function()
+	local w = Gui.dialog_choices and Gui.dialog_choices[6]
+	if not w then return end
+	w:pressed()
+end}
+
+Action{name = "choice_7", mode = "press", key1 = Keysym.F7, func = function()
+	local w = Gui.dialog_choices and Gui.dialog_choices[7]
+	if not w then return end
+	w:pressed()
+end}
+
+Action{name = "choice_8", mode = "press", key1 = Keysym.F8, func = function()
+	local w = Gui.dialog_choices and Gui.dialog_choices[8]
+	if not w then return end
+	w:pressed()
+end}
+
 Action{name = "climb", mode = "press", key1 = Keysym.c, func = function()
 	Network:send{packet = Packet(packets.PLAYER_CLIMB)}
 end}

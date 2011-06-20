@@ -50,8 +50,8 @@ Dialog.answer = function(self, user, answer)
 		self.choices = nil
 		table.insert(self.vm, 1, {exe = sel, off = 2, pos = 1, len = #sel - 2})
 		self:execute()
-	elseif self.choices == "line" then
-		-- Say.
+	elseif self.choices == "info" or self.choices == "line" then
+		-- Info or say.
 		self.vm[1].pos = self.vm[1].pos + 1
 		self.user = user
 		self.choices = nil
@@ -143,8 +143,13 @@ Dialog.execute = function(self)
 			end
 		end,
 		info = function(vm, c)
-			self:line(string.format("(%s)", c[2]))
-			vm[1].pos = vm[1].pos + 1
+			-- Publish the info.
+			self.event = {type = "object-dialog", object = self.object, message = string.format("(%s)", c[2])}
+			Vision:event(self.event)
+			-- Break until answered.
+			self.choices = "info"
+			self.user = nil
+			return true
 		end,
 		loop = function(vm, c)
 			vm[1].pos = 1

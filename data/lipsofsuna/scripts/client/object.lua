@@ -285,12 +285,16 @@ Object.update = function(self, secs)
 			if slot and slot.node and self.realized then
 				-- Show slot.
 				local p,r = self:find_node{name = slot.node, space = "world"}
-				local h = object:find_node{name = "#handle"}
-				if h then p = p - r * h end
-				object.position = p
-				object.rotation = r
-				object.realized = true
-				object:update(secs)
+				if p then
+					local h = object:find_node{name = "#handle"}
+					if h then p = p - r * h end
+					object.position = p
+					object.rotation = r
+					object.realized = true
+					object:update(secs)
+				else
+					object:detach()
+				end
 			else
 				-- Hide slot.
 				object:detach()

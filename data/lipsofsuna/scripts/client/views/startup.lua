@@ -41,9 +41,15 @@ Startup.enter = function(clss)
 	clss.group.floating = true
 	clss:retry()
 	-- Show controls.
-	clss.label_hint.text = [[Key map:
-TODO
-TODO]]
+	clss.label_hint.text = [[Default Key map:
+e = interact
+space = jump
+c = climb
+y = swap between first and third person
+tab = swap quickbar mode
+esc = game menu
+You can reconfigure controls in the game menu
+]]
 end
 
 --- Retries hosting or joining.

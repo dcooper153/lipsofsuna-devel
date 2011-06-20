@@ -1270,10 +1270,14 @@ class LIFile:
 		self.object = None
 		self.state = 0
 		# Determine the file name.
+		# Try to save to ../graphics/ if it exists and fallback to ./ otherwise.
 		self.filename = file
-		path = os.path.split(bpy.data.filepath)[0]
-		path = os.path.join(os.path.split(path)[0], "graphics")
-		self.filepath = os.path.join(path, file)
+		path1 = os.path.split(bpy.data.filepath)[0]
+		path2 = os.path.join(os.path.split(path1)[0], "graphics")
+		if os.path.exists(path2):
+			self.filepath = os.path.join(path2, file)
+		else:
+			self.filepath = os.path.join(path1, file)
 
 	def get_finish_info(self):
 		info = [0, 0, 0, 0]

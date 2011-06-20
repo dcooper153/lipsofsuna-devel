@@ -65,26 +65,27 @@ Gui.init = function(clss)
 	Gui.group_respawn:set_expand{row = 3}
 	Gui.group_respawn:set_child(1, 1, Gui.button_respawn)
 	Gui.group_respawn:set_child(1, 2, Gui.button_respawn)
+	-- Dialog.
+	Gui.group_dialog = Widget{cols = 1, rows = 3}
+	Gui.group_dialog:set_expand{row = 1}
+	Gui.group_dialog:set_child(1, 2, Widgets.Label())
 	-- Packing.
-	Gui.top_group = Widget{rows = 1}
-	Gui.top_group:append_col(Gui.chat_history)
-	Gui.top_group:append_col(Gui.modifiers)
-	Gui.top_group:append_col(Gui.group_respawn)
-	Gui.top_group:set_expand{col = 1}
-	Gui.center_group = Widget{cols = 1, spacings = {0,0}}
-	Gui.center_group:append_row(Gui.top_group)
-	Gui.center_group:append_row(Gui.menus)
-	Gui.center_group:append_row(Gui.skills_group)
-	Gui.center_group:set_expand{col = 1, row = 1}
-	Gui.scene = Widgets.Scene{rows = 1, camera = Player.camera, margins = {5,5,0,0}}
-	Gui.scene:append_col(Gui.center_group)
+	Gui.group_top = Widget{cols = 3, rows = 1}
+	Gui.group_top:set_expand{col = 1}
+	Gui.group_top:set_child(1, 1, Gui.chat_history)
+	Gui.group_top:set_child(2, 1, Gui.modifiers)
+	Gui.group_top:set_child(3, 1, Gui.group_respawn)
+	Gui.group_middle = Widget{cols = 2, rows = 1}
+	Gui.group_middle:set_expand{col = 1, row = 1}
+	Gui.group_middle:set_child(1, 1, Gui.menus)
+	Gui.group_middle:set_child(2, 1, Gui.group_dialog)
+	Gui.scene = Widgets.Scene{cols = 1, rows = 3, camera = Player.camera, margins = {5,5,0,0}, spacings = {0,0}}
 	Gui.scene:set_expand{col = 1, row = 1}
-	Gui.bottom = Widget{rows = 1}
-	Gui.bottom:append_col(Gui.scene)
-	Gui.bottom:append_col(nil)
-	Gui.bottom:set_expand{col = 1, row = 1}
+	Gui.scene:set_child(1, 1, Gui.group_top)
+	Gui.scene:set_child(1, 2, Gui.group_middle)
+	Gui.scene:set_child(1, 3, Gui.skills_group)
 	Gui.main = Widget{cols = 1, behind = true, fullscreen = true}
-	Gui.main:append_row(Gui.bottom)
+	Gui.main:append_row(Gui.scene)
 	Gui.main:set_expand{col = 1, row = 1}
 end
 
@@ -141,6 +142,13 @@ Gui.set_mode = function(self, mode, level)
 			Sound:switch_music_track("game")
 		end
 	end
+	-- Maintain dialog visibility.
+	-- Dialogs don't fit most of the time so only show them in game and menu modes.
+	if mode == "game" or mode == "menu" then
+		self.group_dialog.visible = true
+	else
+		self.group_dialog.visible = false
+	end
 	-- Set the detailed view mode.
 	self.mode = mode
 	if mode == "admin" then
@@ -154,9 +162,6 @@ Gui.set_mode = function(self, mode, level)
 	elseif mode == "controls" then
 		Gui.menus:open{level = level or 1, widget = Views.Controls.inst}
 		self.view = Views.Controls.inst
-	elseif mode == "dialog" then
-		Gui.menus:open{level = level or 1, widget = Views.Dialog.inst}
-		self.view = Views.Dialog.inst
 	elseif mode == "feats" then
 		Gui.menus:open{level = level or 1, widget = Views.Feats.inst}
 		self.view = Views.Feats.inst
@@ -200,25 +205,35 @@ end
 Gui.set_dialog = function(clss, id)
 	-- Find the dialog.
 	clss.active_dialog = id
-	local obj = Object:find{id = id}
+	local obj = id and Object:find{id = id}
 	local dlg = obj and obj.dialog
 	-- Update the dialog UI.
 	if not dlg then
 		-- Hide the dialog UI.
-		if clss.mode == "dialog" then
-			Views.Dialog.inst.id = nil
-			Gui:set_mode("game")
-		end
+		clss.dialog_choices = nil
+		clss.group_dialog.rows = 1
+		clss.group_dialog.visible = false
 	elseif dlg.type == "choice" then
 		-- Show a dialog choice.
-		if clss.mode == "game" or clss.mode == "dialog" then
-			Views.Dialog.inst:show(id, nil, dlg.choices)
+		clss.dialog_choices = {}
+		clss.group_dialog.rows = 1
+		for k,v in ipairs(dlg.choices) do
+			local widget = Widgets.DialogLabel{choice = true, index = k, text = v, pressed = function()
+				Network:send{packet = Packet(packets.DIALOG_ANSWER, "uint32", id, "string", v)}
+			end}
+			table.insert(clss.dialog_choices, widget)
+			clss.group_dialog:append_row(widget)
 		end
+		clss.group_dialog.visible = true
 	else
 		-- Show a dialog line.
-		if clss.mode == "game" or clss.mode == "dialog" then
-			Views.Dialog.inst:show(id, dlg.message, nil)
-		end
+		local widget = Widgets.DialogLabel{index = 1, text = dlg.message, pressed = function()
+			Network:send{packet = Packet(packets.DIALOG_ANSWER, "uint32", id, "string", "")}
+		end}
+		clss.dialog_choices = {widget}
+		clss.group_dialog.rows = 1
+		clss.group_dialog:append_row(widget)
+		clss.group_dialog.visible = true
 	end
 end
 

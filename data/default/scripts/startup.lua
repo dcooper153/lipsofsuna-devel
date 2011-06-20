@@ -8,6 +8,19 @@ Startup = Class()
 -- @return Startup.
 Startup.new = function(clss)
 	self = Class.new(clss)
+	
+	self.label_hint = Widgets.Label{halign = 0.01, valign = 0.01, font = "medium"}
+	self.label_hint.text = [[Default Key map:
+e = interact
+space = jump
+c = climb
+y = swap between 
+first and third person
+tab = swap quickbar mode
+esc = game menu
+You can reconfigure 
+controls in the game menu
+]]	
 	self.text = Widgets.Label()
 	self.group_host = Host()
 	self.group_join = Join()
@@ -25,6 +38,7 @@ Startup.new = function(clss)
 	self.group = Widgets.Background{cols = 1, rows = 2, behind = true, fullscreen = true, image = "mainmenu1"}
 	self.group:set_expand{col = 1, row = 1}
 	self.group:set_child(1, 2, self.group_buttons)
+	self.group:set_child(1, 1, self.label_hint)
 	self.group.floating = true
 	Sound.music_fading = 5.0
 	Sound.music_volume = 0.2
