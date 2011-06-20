@@ -3037,4 +3037,20 @@
     <tag>character</tag>
     <type>model</type>
   </asset>
+ <asset>
+    <file>graphics/smallrat1.lmdl</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>enemy</tag>
+    <type>model</type>
+  </asset>
+ <asset>
+    <file>import/smallrat1.blend</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>enemy</tag>
+    <type>model</type>
+  </asset>
 </assets>

@@ -247,6 +247,28 @@ Species{
 		{name = "strength", max = 15, val = 15}}}
 
 Species{
+	name = "small rat",
+	base = "base",
+	ai_enable_strafe = false,
+	ai_enable_block = false,
+	ai_offense_factor = .1,
+	animations = {
+		["attack bite"] = {animation = "bite", channel = 2, weight = 30}},
+	-- categories = {"enemy"},
+	difficulty = 0,
+	effect_physical_damage = "fleshimpact1",
+	factions = {"evil"},
+	feat_anims = {"bite"},
+	feat_effects = {"strength to physical damage"},
+	inventory_size = 3,
+	inventory_items = {"hide", "hide"},
+	jump_force = 6,
+	model = "smallrat1",
+	speed_walk = 4,
+	skills = {
+		{name = "strength", max = 1, val = 1},
+		{name = "health", max = 5, val = 5}}}
+Species{
 	name = "rat",
 	base = "base",
 	ai_enable_strafe = false,
