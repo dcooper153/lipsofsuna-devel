@@ -248,17 +248,7 @@ Feat.perform = function(self, args)
 					for index,data in ipairs(self.effects) do
 						local effect = Feateffectspec:find{name = data[1]}
 						if effect and effect.projectile then
-							local ammo = Object{model = effect.projectile, physics = "rigid"}
-							ammo.gravity = Vector()
-							if effect.name == "dig" then
-								ammo:fire{charge = charge, collision = true, feat = self, owner = args.user, timer = 10}
-								ammo.orig_rotation = ammo.rotation
-								ammo.orig_velocity = ammo.velocity
-								ammo.effect = "dig"
-								ammo.power = 1 + 0.1 * data[2]
-							else
-								ammo:fire{charge = charge, collision = true, feat = self, owner = args.user, weapon = weapon}
-							end
+							Spell{effect = effect.name, feat = self, model = effect.projectile, owner = args.user, power = data[2]}
 							return
 						end
 					end

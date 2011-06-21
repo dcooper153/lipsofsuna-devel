@@ -55,16 +55,6 @@ Object.contact_cb = function(self, result)
 		target = result.object,
 		tile = result.tile,
 		weapon = self.contact_args.weapon}
-	if self.effect == "dig" then
-		if not result.tile then
-			self.power = 0
-		else
-			self.power = self.power - 1
-		end
-		self.rotation = self.orig_rotation
-		self.velocity = self.orig_velocity
-		if self.power >= 1 then return end
-	end
 	self.contact_args = nil
 	self.contact_events = false
 	self.realized = false
