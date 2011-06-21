@@ -4,7 +4,6 @@ Featanimspec{
 	categories = {"build"},
 	cooldown = 0.5,
 	effect = "swing1",
-	effects = {},
 	required_weapon = "build",
 	slot = "hand.R"}
 
@@ -17,7 +16,6 @@ Featanimspec{
 	cooldown = 0.1,
 	effect = "swing1",
 	effect_impact = "impact1",
-	effects = {"physical damage"},
 	required_weapon = "melee",
 	slot = "hand.R"}
 
@@ -29,7 +27,6 @@ Featanimspec{
 	categories = {"ranged"},
 	cooldown = 0.5,
 	effect_impact = "impact1",
-	effects = {"physical damage"},
 	required_ammo = true,
 	required_weapon = "ranged",
 	slot = "hand.R"}
@@ -40,8 +37,7 @@ Featanimspec{
 	categories = {"ranged spell"},
 	cooldown = 2,
 	description = "Cast a magical projectile",
-	effect = "spell1",
-	effects = {"black haze", "dig", "fire damage", "firewall"}}
+	effect = "spell1"}
 
 Featanimspec{
 	name = "spell on self",
@@ -49,8 +45,7 @@ Featanimspec{
 	categories = {"spell on self"},
 	cooldown = 2,
 	description = "Cast a spell on yourself",
-	effect = "spell1",
-	effects = {"berserk", "fire damage", "light", "restore health", "sanctuary", "travel", "wilderness"}}
+	effect = "spell1"}
 
 Featanimspec{
 	name = "spell on touch",
@@ -58,8 +53,7 @@ Featanimspec{
 	categories = {"spell on touch"},
 	cooldown = 2,
 	description = "Cast a short range touch spell",
-	effect = "spell1",
-	effects = {"berserk", "fire damage", "restore health", "sanctuary"}}
+	effect = "spell1"}
 
 Featanimspec{
 	name = "throw",
@@ -69,7 +63,6 @@ Featanimspec{
 	cooldown = 1,
 	effect = "swing1",
 	effect_impact = "impact1",
-	effects = {},
 	required_weapon = "throwable",
 	slot = "hand.R"}
 
@@ -78,6 +71,7 @@ Featanimspec{
 
 Feateffectspec{
 	name = "berserk",
+	animations = {"spell on self", "spell on touch"},
 	categories = {"beneficial", "berserk", "spell"},
 	description = "Inflict additional damage when in low health",
 	effect = "berserk1",
@@ -90,6 +84,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "black haze",
+	animations = {"ranged spell"},
 	categories = {"harmful", "plague", "spell"},
 	description = "Conjure infectious plagued monsters",
 	effect = "spell1",
@@ -103,6 +98,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "dig",
+	animations = {"ranged spell"},
 	categories = {"dig", "spell"},
 	description = "Fire a digging ray",
 	effect = "spell1",
@@ -116,6 +112,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "fire damage",
+	animations = {"ranged spell", "spell on self", "spell on touch"},
 	categories = {"fire", "harmful", "melee", "spell"},
 	description = "Inflict fire damage",
 	effect = "explosion1",
@@ -128,6 +125,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "firewall",
+	animations = {"ranged spell"},
 	categories = {"fire", "harmful", "spell"},
 	description = "Conjure a wall of fire",
 	effect = "firewall1",
@@ -140,6 +138,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "light",
+	animations = {"spell on self"},
 	categories = {"beneficial", "light", "spell"},
 	description = "Illuminate your surroundings",
 	effect = "light1",
@@ -152,6 +151,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "physical damage",
+	animations = {"ranged", "right hand"},
 	categories = {"harmful", "melee", "physical"},
 	effect = "impact1",
 	icon = "modifier-physical",
@@ -160,6 +160,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "restore health",
+	animations = {"spell on self", "spell on touch"},
 	categories = {"beneficial", "heal", "spell"},
 	description = "Restore health",
 	effect = "heal1",
@@ -172,6 +173,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "sanctuary",
+	animations = {"spell on self", "spell on touch"},
 	categories = {"beneficial", "spell"},
 	description = "Protect from death",
 	effect = "sanctuary1",
@@ -182,6 +184,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "travel",
+	animations = {"spell on self"},
 	categories = {"spell"},
 	description = "Fast travel to Lips",
 	effect = "sanctuary1", -- FIXME
@@ -192,6 +195,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "wilderness",
+	animations = {"spell on self"},
 	categories = {"spell"},
 	description = "Grow plants from soil",
 	effect = "wilderness1",
@@ -212,7 +216,6 @@ Featanimspec{
 	cooldown = 2,
 	effect = "growl1",
 	effect_impact = "impact1",
-	effects = {"strength to physical damage"},
 	influences = {{"physical", -1}},
 	slot = "mouth"}
 
@@ -223,7 +226,6 @@ Featanimspec{
 	categories = {"melee"},
 	cooldown = 4,
 	effect_impact = "impact1",
-	effects = {"strength to physical damage"},
 	influences = {{"physical", -50}},
 	slot = "mouth"}
 
@@ -232,7 +234,6 @@ Featanimspec{
 	animation = "explode",
 	categories = {"explode", "melee"},
 	cooldown = 2,
-	effects = {"strength to physical damage"},
 	influences = {{"physical", -1}},
 	effect = "selfdestruct1"}
 
@@ -244,7 +245,6 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
-	effects = {"strength to physical damage"},
 	influences = {{"physical", -30}},
 	slot = "hand.L"}
 
@@ -256,7 +256,6 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
-	effects = {"strength to physical damage"},
 	influences = {{"physical", -30}},
 	slot = "hand.R"}
 
@@ -270,6 +269,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "strength to physical damage",
+	animations = {"bite", "dragon bite", "explode", "left claw", "right claw"},
 	categories = {"harmful", "melee", "physical"},
 	effect = "impact1",
 	icon = "modifier-physical",

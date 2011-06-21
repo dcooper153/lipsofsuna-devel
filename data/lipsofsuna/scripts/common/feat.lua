@@ -31,17 +31,11 @@ Featanimspec.new = function(clss, args)
 	self.bonuses_barehanded = self.bonuses_barehanded or false
 	self.bonuses_projectile = self.bonuses_projectile or false
 	self.bonuses_weapon = self.bonuses_weapon or false
+	self.effects = {}
 	self.icon = self.icon or "skill-todo"
 	self.influences = self.influences or {}
 	self.required_ammo = self.required_ammo or {}
 	self.toggle = self.toggle or false
-	-- Effects.
-	self.effects = {}
-	if args.effects then
-		for k,v in pairs(args.effects) do
-			self.effects[v] = true
-		end
-	end
 	return self
 end
 
@@ -83,6 +77,17 @@ Feateffectspec.new = function(clss, args)
 	self.reagent_mult = self.reagent_mult or {}
 	self.skill_base = self.skill_base or {}
 	self.skill_mult = self.skill_mult or {}
+	-- Compatible animations.
+	if args.animations then
+		for k,v in pairs(args.animations) do
+			local a = Featanimspec:find{name = v}
+			if a then
+				a.effects[self.name] = self
+			else
+				error(string.format("Feateffectspec '%s' refers to a missing Featanimspec '%s'", self.name, v))
+			end
+		end
+	end
 	return self
 end
 
