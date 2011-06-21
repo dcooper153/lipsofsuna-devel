@@ -244,12 +244,6 @@ Gui.set_target_text = function(clss, text)
 	clss.scene.action = text
 end
 
-Eventhandler{type = "tick", func = function(self, args)
-	if Gui.fps_label then
-		Gui.fps_label.text = "FPS: " .. math.floor(Client.fps + 0.5)
-	end
-end}
-
 Gui.class_getters = {
 	chat_active = function(s) return s.chat_entry.visible end}
 

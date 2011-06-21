@@ -85,6 +85,7 @@ end}
 
 local animt = 0
 local ipolt = 0
+local fpst = 0
 Eventhandler{type = "tick", func = function(self, args)
 	-- Update the cursor.
 	Widgets.Cursor.inst:update()
@@ -128,5 +129,13 @@ Eventhandler{type = "tick", func = function(self, args)
 	-- Update slots and special effects of objects.
 	for k,v in pairs(Object.objects) do
 		v:update(args.secs)
+	end
+	-- Update the FPS label.
+	if Gui.fps_label then
+		fpst = fpst + args.secs
+		if fpst > 0.1 then
+			Gui.fps_label.text = "FPS: " .. math.floor(Client.fps + 0.5)
+			fpst = 0
+		end
 	end
 end}
