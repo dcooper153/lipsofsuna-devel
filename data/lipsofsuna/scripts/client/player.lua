@@ -140,7 +140,17 @@ Player.pick_look = function(clss)
 	-- Ray pick an object in front of the player.
 	local r1,r2 = clss:get_picking_ray_1st()
 	local p,o = Target:pick_ray{ray1 = r1, ray2 = r2}
+	-- Update highlighting.
+	if o ~= Target.target_object then
+		if Target.target_object then
+			Target.target_object:set_effect()
+		end
+		if o then
+			o:set_effect{shader = "highlight"}
+		end
+	end
 	Target.target_object = o
+	-- Update the interaction text.
 	if o and o.spec and o.spec.interactive then
 		if o.name and o.name ~= "" then
 			Gui:set_target_text("Interact with " .. o.name)
