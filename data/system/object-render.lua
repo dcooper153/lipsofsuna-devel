@@ -74,6 +74,15 @@ Object.particle_animation = function(self, args)
 	return Los.object_particle_animation(self.handle, args)
 end
 
+--- Set or clears the additional effect layer of the object.
+-- @param self Object.
+-- @param ... Arguments.<ul>
+--   <li>params: Array numbers to be passed to the shader.</li>
+--   <li>shader: Shader name.</li></ul>
+Object.set_effect = function(self, ...)
+	Los.object_set_effect(self.handle, ...)
+end
+
 --- Recalculates the positions of transparent faces for correct depth sorting.
 -- @param self Object.
 Object.update_transparency = function(self)

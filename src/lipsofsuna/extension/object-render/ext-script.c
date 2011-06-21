@@ -64,6 +64,30 @@ static void Object_particle_animation (LIScrArgs* args)
 	liren_object_particle_animation (object, start, loop);
 }
 
+static void Object_set_effect (LIScrArgs* args)
+{
+	float params[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+	const char* shader = NULL;
+	LIExtModule* module;
+	LIEngObject* engobj;
+	LIRenObject* object;
+
+	/* Get render object. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
+	engobj = args->self;
+	object = liren_scene_find_object (module->scene, engobj->id);
+	if (object == NULL)
+		return;
+
+	/* Get arguments. */
+	if (!liscr_args_geti_string (args, 0, &shader))
+		liscr_args_gets_string (args, "shader", &shader);
+	liscr_args_gets_floatv (args, "params", 4, params);
+
+	/* Deform the mesh. */
+	liren_object_set_effect (object, shader, params);
+}
+
 static void Object_update_transparency (LIScrArgs* args)
 {
 	LIExtModule* module;
@@ -91,6 +115,7 @@ void liext_script_render_object (
 {
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_deform_mesh", Object_deform_mesh);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_particle_animation", Object_particle_animation);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_effect", Object_set_effect);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_update_transparency", Object_update_transparency);
 }
 

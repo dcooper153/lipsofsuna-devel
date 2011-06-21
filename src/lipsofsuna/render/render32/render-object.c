@@ -86,6 +86,8 @@ LIRenObject32* liren_object32_new (
 void liren_object32_free (
 	LIRenObject32* self)
 {
+	if (self->effect.material != NULL)
+		liren_material32_free (self->effect.material);
 	private_envmap_clear (self);
 	private_lights_clear (self);
 	lisys_free (self);
@@ -161,6 +163,46 @@ void liren_object32_get_center (
 	LIMatVector*         center)
 {
 	*center = self->orientation.center;
+}
+
+/**
+ * \brief Sets the effect layer of the object.
+ * \param self Object.
+ * \param shader Shader name or NULL to disable the effect.
+ * \param params Effect parameters or NULL.
+ * \return Nonzero on success.
+ */
+int liren_object32_set_effect (
+	LIRenObject32* self,
+	const char*    shader,
+	const float*   params)
+{
+	LIRenShader32* shader_;
+
+	/* Free the old effect. */
+	if (self->effect.material != NULL)
+	{
+		liren_material32_free (self->effect.material);
+		self->effect.material = NULL;
+	}
+
+	/* Find the effect shader. */
+	if (shader != NULL)
+		shader_ = liren_render32_find_shader (self->scene->render, shader);
+	else
+		shader_ = NULL;
+
+	/* Create the effect material. */
+	if (shader_ != NULL)
+	{
+		self->effect.material = liren_material32_new ();
+		if (self->effect.material == NULL)
+			return 0;
+		liren_material32_set_shader (self->effect.material, shader_);
+		liren_material32_set_params (self->effect.material, params);
+	}
+
+	return 1;
 }
 
 /**

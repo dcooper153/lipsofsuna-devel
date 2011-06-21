@@ -41,6 +41,11 @@ LIAPICALL (void, liren_object_particle_animation, (
 	float        start,
 	int          loop));
 
+LIAPICALL (int, liren_object_set_effect, (
+	LIRenObject* self,
+	const char*  shader,
+	const float* params));
+
 LIAPICALL (LIRenModel*, liren_object_get_model, (
 	LIRenObject* self));
 

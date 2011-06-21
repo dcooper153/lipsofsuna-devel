@@ -130,6 +130,27 @@ void liren_object_particle_animation (
 }
 
 /**
+ * \brief Sets the effect layer of the object.
+ * \param self Object.
+ * \param shader Shader name or NULL to disable the effect.
+ * \param params Effect parameters or NULL.
+ * \return Nonzero on success.
+ */
+int liren_object_set_effect (
+	LIRenObject* self,
+	const char*  shader,
+	const float* params)
+{
+	if (self->v32 != NULL)
+	{
+		if (!liren_object32_set_effect (self->v32, shader, params))
+			return 0;
+	}
+
+	return 1;
+}
+
+/**
  * \brief Gets the model of the object.
  * \param self Object.
  * \return Model or NULL.

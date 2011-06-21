@@ -27,7 +27,7 @@
 LIAPICALL (LIRenMaterial32*, liren_material32_new, ());
 
 LIAPICALL (LIRenMaterial32*, liren_material32_new_from_model, (
-	LIRenRender32*         render,
+	LIRenRender32*       render,
 	const LIMdlMaterial* material));
 
 LIAPICALL (void, liren_material32_free, (
@@ -35,11 +35,15 @@ LIAPICALL (void, liren_material32_free, (
 
 LIAPICALL (void, liren_material32_set_diffuse, (
 	LIRenMaterial32* self,
-	const float*   value));
+	const float*     value));
 
 LIAPICALL (void, liren_material32_set_flags, (
 	LIRenMaterial32* self,
-	int            flags));
+	int              flags));
+
+LIAPICALL (void, liren_material32_set_params, (
+	LIRenMaterial32* self,
+	const float*     value));
 
 LIAPICALL (int, liren_material32_set_shader, (
 	LIRenMaterial32* self,
@@ -47,16 +51,16 @@ LIAPICALL (int, liren_material32_set_shader, (
 
 LIAPICALL (void, liren_material32_set_specular, (
 	LIRenMaterial32* self,
-	const float*   value));
+	const float*     value));
 
 LIAPICALL (void, liren_material32_set_texture, (
 	LIRenMaterial32* self,
-	int            index,
-	LIMdlTexture*  texture,
+	int              index,
+	LIMdlTexture*    texture,
 	LIRenImage32*    image));
 
 LIAPICALL (int, liren_material32_set_texture_count, (
 	LIRenMaterial32* self,
-	int            value));
+	int              value));
 
 #endif

@@ -28,7 +28,6 @@
 void liren_context32_init (
 	LIRenContext32* self)
 {
-	int i;
 	LIRenRender32* render;
 	LIRenUniforms32 uniforms;
 

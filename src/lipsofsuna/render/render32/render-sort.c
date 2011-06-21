@@ -82,52 +82,6 @@ void liren_sort32_free (
 	lisys_free (self);
 }
 
-int liren_sort32_add_group (
-	LIRenSort32*     self,
-	LIMatAabb*       bounds,
-	LIMatMatrix*     matrix,
-	int              index,
-	int              count,
-	LIRenMesh32*     mesh,
-	LIRenMaterial32* material,
-	LIMatVector*     center)
-{
-	int num;
-	LIRenSortgroup32* tmp;
-
-	/* Don't add groups with no valid shader. */
-	if (material->shader == NULL)
-		return 1;
-
-	/* Resize the buffer if necessary. */
-	if (self->groups.capacity == self->groups.count)
-	{
-		num = self->groups.capacity << 1; 
-		tmp = lisys_realloc (self->groups.array, num * sizeof (LIRenSortgroup32));
-		if (tmp == NULL)
-			return 0;
-		self->groups.array = tmp;
-		self->groups.capacity = num;
-	}
-
-	/* Append the group to the buffer or the sorting buckets. */
-	if (!material->shader->sort)
-	{
-		num = self->groups.count;
-		self->groups.array[num].index = index;
-		self->groups.array[num].count = count;
-		self->groups.array[num].transparent = 0;
-		self->groups.array[num].bounds = *bounds;
-		self->groups.array[num].matrix = *matrix;
-		self->groups.array[num].mesh = mesh;
-		self->groups.array[num].material = material;
-		self->groups.count++;
-		return 1;
-	}
-	else
-		return liren_sort32_add_faces (self, bounds, matrix, index, count, mesh, material, center);
-}
-
 int liren_sort32_add_faces (
 	LIRenSort32*     self,
 	LIMatAabb*       bounds,
@@ -181,11 +135,57 @@ int liren_sort32_add_faces (
 	return 1;
 }
 
+int liren_sort32_add_group (
+	LIRenSort32*     self,
+	LIMatAabb*       bounds,
+	LIMatMatrix*     matrix,
+	int              index,
+	int              count,
+	LIRenMesh32*     mesh,
+	LIRenMaterial32* material,
+	LIMatVector*     center)
+{
+	int num;
+	LIRenSortgroup32* tmp;
+
+	/* Don't add groups with no valid shader. */
+	if (material->shader == NULL)
+		return 1;
+
+	/* Resize the buffer if necessary. */
+	if (self->groups.capacity == self->groups.count)
+	{
+		num = self->groups.capacity << 1; 
+		tmp = lisys_realloc (self->groups.array, num * sizeof (LIRenSortgroup32));
+		if (tmp == NULL)
+			return 0;
+		self->groups.array = tmp;
+		self->groups.capacity = num;
+	}
+
+	/* Append the group to the buffer or the sorting buckets. */
+	if (!material->shader->sort)
+	{
+		num = self->groups.count;
+		self->groups.array[num].index = index;
+		self->groups.array[num].count = count;
+		self->groups.array[num].transparent = 0;
+		self->groups.array[num].bounds = *bounds;
+		self->groups.array[num].matrix = *matrix;
+		self->groups.array[num].mesh = mesh;
+		self->groups.array[num].material = material;
+		self->groups.count++;
+		return 1;
+	}
+	else
+		return liren_sort32_add_faces (self, bounds, matrix, index, count, mesh, material, center);
+}
+
 int liren_sort32_add_model (
-	LIRenSort32*   self,
-	LIMatAabb*   bounds,
-	LIMatMatrix* matrix,
-	LIRenModel32*  model)
+	LIRenSort32*  self,
+	LIMatAabb*    bounds,
+	LIMatMatrix*  matrix,
+	LIRenModel32* model)
 {
 	int i;
 	int ret = 1;
@@ -218,6 +218,13 @@ int liren_sort32_add_object (
 	if (!liren_sort32_add_model (self, &bounds, &object->orientation.matrix, object->model))
 		return 0;
 
+	/* Add effect layers. */
+	if (object->effect.material != NULL)
+	{
+		if (!liren_sort32_add_object_effect (self, &bounds, &object->orientation.matrix, object))
+			return 0;
+	}
+
 	/* Add particle systems of the object. */
 	liren_particles32_sort (
 		&object->model->particles,
@@ -228,13 +235,39 @@ int liren_sort32_add_object (
 	return 1;
 }
 
+int liren_sort32_add_object_effect (
+	LIRenSort32*     self,
+	LIMatAabb*       bounds,
+	LIMatMatrix*     matrix,
+	LIRenObject32*   object)
+{
+	int ret;
+	int start;
+	int count;
+
+	if (!object->model->groups.count)
+		return 1;
+
+	/* Frustum culling. */
+	if (limat_frustum_cull_aabb (&self->frustum, bounds))
+		return 1;
+
+	/* Add the whole model. */
+	start = object->model->groups.array[object->model->groups.count - 1].start;
+	count = object->model->groups.array[object->model->groups.count - 1].count;
+	ret = liren_sort32_add_group (self, bounds, matrix, 0, start + count,
+		&object->model->mesh, object->effect.material, &object->model->groups.array[0].center);
+
+	return ret;
+}
+
 int liren_sort32_add_particle (
-	LIRenSort32*         self,
+	LIRenSort32*       self,
 	const LIMatVector* position,
 	float              size,
 	const float*       diffuse,
-	LIRenImage32*        image,
-	LIRenShader32*       shader)
+	LIRenImage32*      image,
+	LIRenShader32*     shader)
 {
 	int num;
 	int bucket;

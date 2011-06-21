@@ -54,6 +54,11 @@ LIAPICALL (void, liren_object32_get_center, (
 	const LIRenObject32* self,
 	LIMatVector*         center));
 
+LIAPICALL (int, liren_object32_set_effect, (
+	LIRenObject32* self,
+	const char*    shader,
+	const float*   params));
+
 LIAPICALL (LIRenModel32*, liren_object32_get_model, (
 	LIRenObject32* self));
 

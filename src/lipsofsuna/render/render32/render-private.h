@@ -168,6 +168,10 @@ struct _LIRenObject32
 	} cubemap;
 	struct
 	{
+		LIRenMaterial32* material;
+	} effect;
+	struct
+	{
 		int count;
 		LIRenLight32** array;
 	} lights;

@@ -136,7 +136,6 @@ void liren_material32_set_diffuse (
 
 /**
  * \brief Sets the rendering flags of the material.
- *
  * \param self Material.
  * \param flags Flags.
  */
@@ -145,6 +144,18 @@ void liren_material32_set_flags (
 	int            flags)
 {
 	self->flags = flags;
+}
+
+/**
+ * \brief Sets the custom shader parameters of the material.
+ * \param self Material.
+ * \param value Array of 4 floats.
+ */
+void liren_material32_set_params (
+	LIRenMaterial32* self,
+	const float*     value)
+{
+	memcpy (self->parameters, value, 4 * sizeof (float));
 }
 
 /**

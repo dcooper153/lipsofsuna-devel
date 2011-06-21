@@ -139,6 +139,12 @@ LIAPICALL (int, liren_sort32_add_object, (
 	LIRenSort32*   self,
 	LIRenObject32* object));
 
+LIAPICALL (int, liren_sort32_add_object_effect, (
+	LIRenSort32*     self,
+	LIMatAabb*       bounds,
+	LIMatMatrix*     matrix,
+	LIRenObject32*   object));
+
 int liren_sort32_add_particle (
 	LIRenSort32*       self,
 	const LIMatVector* position,
