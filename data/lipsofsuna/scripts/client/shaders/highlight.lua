@@ -20,6 +20,6 @@ in vec3 F_normal;
 void main()
 {
 	float a = pow(1.0 - abs(normalize(F_normal).z), 1.5);
-	LOS_output_0 = vec4(4.0 * a, 4.0 * a, 4.0 * a, 0.1 + 0.5 * a);
+	LOS_output_0 = vec4(2.1 * a, 2.1 * a, 1.1 * a, 0.1 + 0.2 * a);
 }]]}}
 
