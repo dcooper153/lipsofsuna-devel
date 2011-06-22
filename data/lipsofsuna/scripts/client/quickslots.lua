@@ -13,10 +13,21 @@ end
 --- Assigns a feat to a quickslot.
 -- @param self Quickslots class.
 -- @param index Quickslot index number.
--- @param feat Feat to assign.
+-- @param feat Feat to assign or nil.
 Quickslots.assign_feat = function(clss, index, feat)
-	clss.feats:assign_item(index, feat)
+	if feat then
+		clss.feats:assign_feat(index, feat)
+	else
+		clss.feats:assign_none(index)
+	end
 	clss.mode = "feats"
+end
+
+--- Clears the assignment of the quickslot.
+-- @param clss Quickslots class.
+-- @param index Quickslot index number.
+Quickslots.assign_none = function(clss, index)
+	clss.items:assign_none(index)
 end
 
 --- Assigns an item to a quickslot.
