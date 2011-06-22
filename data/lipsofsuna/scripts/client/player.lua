@@ -152,12 +152,14 @@ Player.pick_look = function(clss)
 	Target.target_object = o
 	-- Update the interaction text.
 	if o and o.spec and o.spec.interactive then
+		local action = Action.dict_name["use"]
+		local key = action and action.key1 and Keycode[action.key1] or "--"
 		if o.name and o.name ~= "" then
-			Gui:set_target_text("Interact with " .. o.name)
+			Gui:set_target_text(string.format("[%s] Interact with %s", key, o.name))
 		elseif o.spec.name then
-			Gui:set_target_text("Interact with " .. o.spec.name)
+			Gui:set_target_text(string.format("[%s] Interact with %s", key, o.spec.name))
 		else
-			Gui:set_target_text("Interact")
+			Gui:set_target_text(string.format("[%s] Interact", key))
 		end
 		set = true
 	else
