@@ -101,7 +101,7 @@ Spell.contact_cb = function(self, result)
 		if result.object then
 			result.object:inflict_modifier("burning", 3)
 		end
-	elseif self.effect == "magic missible" then
+	elseif self.effect == "magic missile" then
 		-- Magic missile.
 		-- Stop the timer, apply damage and vanish.
 		self.timer:disable()
