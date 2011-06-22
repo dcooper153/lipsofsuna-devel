@@ -1501,6 +1501,13 @@
   </asset>
 
   <asset>
+    <file>import/magicmissile1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <dep>import/particle6.png</dep>
+  </asset>
+
+  <asset>
     <file>import/mainmenu1.png</file>
     <author>Ari Mustonen</author>
     <license>CC0</license>

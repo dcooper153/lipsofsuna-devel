@@ -150,6 +150,19 @@ Feateffectspec{
 	reagent_mult = {["milky powder"] = 0.02}}
 
 Feateffectspec{
+	name = "magic missile",
+	animations = {"ranged spell"},
+	categories = {"harmful", "spell"},
+	description = "Cast a controllable magic missile",
+	effect = "explosion1", -- FIXME
+	icon = "modifier-fireball", -- FIXME
+	influences = {{"fire", -5, -0.95}}, -- FIXME
+	projectile = "magicmissile1",
+	skill_mult = {intelligence = 1, willpower = 1},
+	reagent_base = {["milky powder"] = 1},
+	reagent_mult = {["milky powder"] = 0.1}}
+
+Feateffectspec{
 	name = "physical damage",
 	animations = {"ranged", "right hand"},
 	categories = {"harmful", "melee", "physical"},

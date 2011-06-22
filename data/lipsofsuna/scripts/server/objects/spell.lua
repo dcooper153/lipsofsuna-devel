@@ -13,7 +13,7 @@ Spell = Class(Object)
 --   <li>power: Effect power</li></ul>
 -- @return Spell.
 Spell.new = function(clss, args)
-	local self = Object.new(clss, {effect = args.effect, feat = args.feat, power = args.power})
+	local self = Object.new(clss, {effect = args.effect, feat = args.feat, owner = args.owner, power = args.power})
 	if args.effect == "dig" then
 		-- Create a digger projectile.
 		self.gravity = Vector()
@@ -46,9 +46,15 @@ Spell.new = function(clss, args)
 		self.gravity = Vector()
 		self.model = args.model
 		self.physics = "rigid"
-		self:fire{collision = true, feat = args.feat, owner = args.owner}
+		self.speed = 3
+		self:fire{collision = true, feat = args.feat, owner = args.owner, speed = self.speed}
 		self.timer = Timer{delay = 0, func = function(t, secs)
-			-- TODO
+			-- Adjust rotation.
+			-- Controlling is done by copying the rotation from the caster.
+			self.rotation = self.owner.rotation * self.owner.tilt
+			-- Adjust velocity.
+			-- Velocity is smoothed but approaches the target value quickly.
+			self.velocity = (self.velocity + self.rotation * Vector(0,0,-self.speed)) * 0.5
 		end}
 	else
 		-- Create a normal projectile.
