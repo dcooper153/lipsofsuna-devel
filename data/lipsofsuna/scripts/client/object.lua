@@ -28,6 +28,7 @@ Object.animate_spec = function(self, name)
 		fade_out = a.fade_out or 0.5,
 		permanent = a.permanent,
 		repeat_start = a.repeat_start,
+		time_scale = a.time_scale,
 		weight = a.weight or 2}
 	return a
 end

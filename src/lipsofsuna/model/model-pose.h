@@ -41,6 +41,7 @@ struct _LIMdlPoseChannel
 	int repeats;
 	int repeat_start;
 	float time;
+	float time_scale;
 	float priority_scale;
 	float priority_transform;
 	float fade_in;
@@ -139,10 +140,18 @@ LIAPICALL (void, limdl_pose_set_channel_repeat_start, (
 	int        channel,
 	int        value));
 
+LIAPICALL (float, limdl_pose_get_channel_fade_in, (
+	LIMdlPose* self,
+	int        channel));
+
 LIAPICALL (void, limdl_pose_set_channel_fade_in, (
 	LIMdlPose* self,
 	int        channel,
 	float      value));
+
+LIAPICALL (float, limdl_pose_get_channel_fade_out, (
+	LIMdlPose* self,
+	int        channel));
 
 LIAPICALL (void, limdl_pose_set_channel_fade_out, (
 	LIMdlPose* self,
@@ -197,6 +206,15 @@ LIAPICALL (void, limdl_pose_set_channel_state, (
 	LIMdlPose*            self,
 	int                   channel,
 	LIMdlPoseChannelState value));
+
+LIAPICALL (float, limdl_pose_get_channel_time_scale, (
+	const LIMdlPose* self,
+	int              channel));
+
+LIAPICALL (void, limdl_pose_set_channel_time_scale, (
+	LIMdlPose* self,
+	int        channel,
+	float      value));
 
 LIAPICALL (int, limdl_pose_set_channel_transform, (
 	LIMdlPose*            self,

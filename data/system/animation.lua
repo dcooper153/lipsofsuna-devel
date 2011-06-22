@@ -15,6 +15,7 @@ end
 --   <li>fade_out: Fade out duration in seconds.</li>
 --   <li>weight: Blending weight.</li>
 --   <li>time: Starting time.</li>
+--   <li>time_scale: Time scaling factor.</li>
 --   <li>permanent: True if should keep repeating.</li></ul>
 --   <li>repeat_start: Starting time when repeating.</li>
 -- @return True if started a new animation.

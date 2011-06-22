@@ -409,6 +409,18 @@ void limdl_pose_set_channel_repeat_start (
 	chan->repeat_start = value;
 }
 
+float limdl_pose_get_channel_fade_in (
+	LIMdlPose* self,
+	int        channel)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_find_channel (self, channel);
+	if (chan == NULL)
+		return 0.0f;
+	return chan->fade_in;
+}
+
 void limdl_pose_set_channel_fade_in (
 	LIMdlPose* self,
 	int        channel,
@@ -419,6 +431,18 @@ void limdl_pose_set_channel_fade_in (
 	chan = private_find_channel (self, channel);
 	if (chan != NULL)
 		chan->fade_in = value;
+}
+
+float limdl_pose_get_channel_fade_out (
+	LIMdlPose* self,
+	int        channel)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_find_channel (self, channel);
+	if (chan == NULL)
+		return 0.0f;
+	return chan->fade_out;
 }
 
 void limdl_pose_set_channel_fade_out (
@@ -595,6 +619,31 @@ void limdl_pose_set_channel_state (
 			lisys_assert (0);
 			break;
 	}
+}
+
+float limdl_pose_get_channel_time_scale (
+	const LIMdlPose* self,
+	int              channel)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_find_channel (self, channel);
+	if (chan == NULL)
+		return 0;
+	return chan->time_scale;
+}
+
+void limdl_pose_set_channel_time_scale (
+	LIMdlPose* self,
+	int        channel,
+	float      value)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_create_channel (self, channel);
+	if (chan == NULL)
+		return;
+	chan->time_scale = value;
 }
 
 /**
@@ -827,6 +876,7 @@ static LIMdlPoseChannel* private_create_channel (
 	chan->animation = anim;
 	chan->priority_scale = 0.0f;
 	chan->priority_transform = 1.0f;
+	chan->time_scale = 1.0f;
 
 	/* Register the channel. */
 	if (!lialg_u32dic_insert (self->channels, channel, chan))
@@ -936,7 +986,7 @@ static int private_play_channel (
 	}
 
 	/* Advance time. */
-	channel->time += secs;
+	channel->time += channel->time_scale * secs;
 
 	/* Handle looping. */
 	if (channel->time > duration)

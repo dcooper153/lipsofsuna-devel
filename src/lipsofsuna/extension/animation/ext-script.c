@@ -26,7 +26,6 @@
 
 static void Object_animate (LIScrArgs* args)
 {
-	int ret;
 	int repeat = 0;
 	int repeat_start = 0;
 	int channel = -1;
@@ -35,24 +34,78 @@ static void Object_animate (LIScrArgs* args)
 	float weight = 1.0f;
 	float weight_scale = 0.0f;
 	float time = 0.0f;
+	float time_scale = 1.0f;
 	const char* animation = NULL;
+	const char* name;
+	LIEngObject* self = args->self;
 
+	/* Hangle arguments. */
 	liscr_args_gets_string (args, "animation", &animation);
 	liscr_args_gets_int (args, "channel", &channel);
 	liscr_args_gets_float (args, "fade_in", &fade_in);
 	liscr_args_gets_float (args, "fade_out", &fade_out);
-	liscr_args_gets_float (args, "weight", &weight);
-	liscr_args_gets_float (args, "weight_scale", &weight_scale);
-	liscr_args_gets_float (args, "time", &time);
 	liscr_args_gets_bool (args, "permanent", &repeat);
 	liscr_args_gets_int (args, "repeat_start", &repeat_start);
+	liscr_args_gets_float (args, "time", &time);
+	liscr_args_gets_float (args, "time_scale", &time_scale);
+	liscr_args_gets_float (args, "weight", &weight);
+	liscr_args_gets_float (args, "weight_scale", &weight_scale);
 	if (channel < 1 || channel > 255)
 		channel = -1;
 	else
 		channel--;
 	repeat_start = LIMAT_MAX (0, repeat_start);
-	ret = lieng_object_animate (args->self, channel, animation, repeat, repeat_start, weight_scale, weight, time, fade_in, fade_out);
-	liscr_args_seti_bool (args, ret);
+	time_scale = LIMAT_MAX (0.0f, time_scale);
+
+	/* Avoid restarts in simple cases. */
+	/* The position is kept if the animation is repeating and being replaced with
+	   the same one but parameters such as fading and weights still need to be reset. */
+	if (repeat && channel != -1 && animation != NULL)
+	{
+		if (limdl_pose_get_channel_state (self->pose, channel) == LIMDL_POSE_CHANNEL_STATE_PLAYING &&
+		    limdl_pose_get_channel_repeats (self->pose, channel) == -1)
+		{
+			name = limdl_pose_get_channel_name (self->pose, channel);
+			if (!strcmp (name, animation))
+			{
+				limdl_pose_set_channel_repeat_start (self->pose, channel, repeat_start);
+				limdl_pose_set_channel_priority_scale (self->pose, channel, weight_scale);
+				limdl_pose_set_channel_priority_transform (self->pose, channel, weight);
+				limdl_pose_set_channel_time_scale (self->pose, channel, time_scale);
+				limdl_pose_set_channel_fade_in (self->pose, channel, fade_in);
+				limdl_pose_set_channel_fade_out (self->pose, channel, fade_out);
+				return;
+			}
+		}
+	}
+
+	/* Automatic channel assignment. */
+	if (channel == -1)
+	{
+		for (channel = 254 ; channel > 0 ; channel--)
+		{
+			if (limdl_pose_get_channel_state (self->pose, channel) == LIMDL_POSE_CHANNEL_STATE_INVALID)
+				break;
+		}
+	}
+
+	/* Clear and set the channel. */
+	limdl_pose_fade_channel (self->pose, channel, LIMDL_POSE_FADE_AUTOMATIC);
+	if (animation != NULL)
+	{
+		limdl_pose_set_channel_animation (self->pose, channel, animation);
+		limdl_pose_set_channel_repeats (self->pose, channel, repeat? -1 : 1);
+		limdl_pose_set_channel_repeat_start (self->pose, channel, repeat_start);
+		limdl_pose_set_channel_priority_scale (self->pose, channel, weight_scale);
+		limdl_pose_set_channel_priority_transform (self->pose, channel, weight);
+		limdl_pose_set_channel_position (self->pose, channel, time);
+		limdl_pose_set_channel_state (self->pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
+		limdl_pose_set_channel_time_scale (self->pose, channel, time_scale);
+		limdl_pose_set_channel_fade_in (self->pose, channel, fade_in);
+		limdl_pose_set_channel_fade_out (self->pose, channel, fade_out);
+	}
+
+	liscr_args_seti_bool (args, 1);
 }
 
 static void Object_animate_fade (LIScrArgs* args)
@@ -157,8 +210,13 @@ static void Object_get_animation (LIScrArgs* args)
 		return;
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
 	liscr_args_sets_string (args, "animation", anim->name);
-	liscr_args_sets_bool (args, "repeat_start", limdl_pose_get_channel_repeat_start (object->pose, chan));
+	liscr_args_sets_int (args, "channel", chan + 1);
+	liscr_args_sets_float (args, "fade_in", limdl_pose_get_channel_fade_in (object->pose, chan));
+	liscr_args_sets_float (args, "fade_out", limdl_pose_get_channel_fade_out (object->pose, chan));
+	liscr_args_sets_bool (args, "permanent", limdl_pose_get_channel_repeats (object->pose, chan) == -1);
+	liscr_args_sets_float (args, "repeat_start", limdl_pose_get_channel_repeat_start (object->pose, chan));
 	liscr_args_sets_float (args, "time", limdl_pose_get_channel_position (object->pose, chan));
+	liscr_args_sets_float (args, "time_scale", limdl_pose_get_channel_time_scale (object->pose, chan));
 	liscr_args_sets_float (args, "weight", limdl_pose_get_channel_priority_transform (object->pose, chan));
 	liscr_args_sets_float (args, "weight_scale", limdl_pose_get_channel_priority_scale (object->pose, chan));
 }
