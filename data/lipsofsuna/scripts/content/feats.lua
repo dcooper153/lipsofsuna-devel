@@ -136,6 +136,7 @@ Feateffectspec{
 	reagent_base = {["milky powder"] = 1},
 	reagent_mult = {["milky powder"] = 0.1}}
 
+
 Feateffectspec{
 	name = "light",
 	animations = {"spell on self"},
@@ -161,6 +162,21 @@ Feateffectspec{
 	skill_mult = {intelligence = 1, willpower = 1},
 	reagent_base = {["milky powder"] = 1},
 	reagent_mult = {["milky powder"] = 0.1}}
+
+Feateffectspec{
+	name = "mindless march",
+	animations = {"ranged spell","spell on self","spell on touch"},
+	categories = {"harmful", "push", "spell"},
+	description = "Forces the target to march forward",
+	effect = "light1",
+	icon = "modifier-light",
+	influences = {{"push", 30,10}},
+	skill_base = {willpower = 5},
+	skill_mult = {willpower = 0.1},
+	projectile = "magicmissile1",
+	reagent_base = {["milky powder"] = 0.5},
+	reagent_mult = {["milky powder"] = 0.02}}
+
 
 Feateffectspec{
 	name = "physical damage",
