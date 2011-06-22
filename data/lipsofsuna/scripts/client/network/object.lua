@@ -135,6 +135,34 @@ Protocol:add_handler{type = "OBJECT_MOVED", func = function(event)
 		if o.type == "item" or o.type == "species" then p = p + Object.physics_position_correction end
 		-- Set the target interpolation position.
 		o:set_motion_state(p, Quaternion(rx, ry, rz, rw), Vector(vx, vy, vz), tilt)
+		-- Adjust time scaling of movement animations.
+		if o.spec and o.spec.speed_walk then
+			local a = o:get_animation{channel = 1}
+			if a then
+				local ref
+				local map = {
+					["run"] = o.spec.speed_run,
+					["run left"] = o.spec.speed_run,
+					["run right"] = o.spec.speed_run,
+					["strafe left"] = o.spec.speed_run,
+					["strafe right"] = o.spec.speed_run,
+					["walk"] = o.spec.speed_walk,
+					["walk back"] = o.spec.speed_walk}
+				for k,v in pairs(o.spec.animations) do
+					if v.animation == a.animation and map[k] then
+						ref = map[k]
+						break
+					end
+				end
+				if ref then
+					local fract = 0.3
+					local speed = Vector(vx, vy, vz).length
+					local scale = speed / math.max(0.1, ref)
+					a.time_scale = a.time_scale * (1 - fract) + scale * fract
+					o:animate(a)
+				end
+			end
+		end
 	end
 end}
 
