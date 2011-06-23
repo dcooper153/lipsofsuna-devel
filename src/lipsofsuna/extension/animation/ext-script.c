@@ -29,6 +29,7 @@ static void Object_animate (LIScrArgs* args)
 	int repeat = 0;
 	int repeat_start = 0;
 	int channel = -1;
+	int keep = 0;
 	float fade_in = 0.0f;
 	float fade_out = 0.0f;
 	float weight = 1.0f;
@@ -39,7 +40,7 @@ static void Object_animate (LIScrArgs* args)
 	const char* name;
 	LIEngObject* self = args->self;
 
-	/* Hangle arguments. */
+	/* Handle arguments. */
 	liscr_args_gets_string (args, "animation", &animation);
 	liscr_args_gets_int (args, "channel", &channel);
 	liscr_args_gets_float (args, "fade_in", &fade_in);
@@ -67,15 +68,7 @@ static void Object_animate (LIScrArgs* args)
 		{
 			name = limdl_pose_get_channel_name (self->pose, channel);
 			if (!strcmp (name, animation))
-			{
-				limdl_pose_set_channel_repeat_start (self->pose, channel, repeat_start);
-				limdl_pose_set_channel_priority_scale (self->pose, channel, weight_scale);
-				limdl_pose_set_channel_priority_transform (self->pose, channel, weight);
-				limdl_pose_set_channel_time_scale (self->pose, channel, time_scale);
-				limdl_pose_set_channel_fade_in (self->pose, channel, fade_in);
-				limdl_pose_set_channel_fade_out (self->pose, channel, fade_out);
-				return;
-			}
+				keep = 1;
 		}
 	}
 
@@ -89,20 +82,48 @@ static void Object_animate (LIScrArgs* args)
 		}
 	}
 
-	/* Clear and set the channel. */
-	limdl_pose_fade_channel (self->pose, channel, LIMDL_POSE_FADE_AUTOMATIC);
+	/* Update or initialize the channel. */
+	if (!keep)
+	{
+		limdl_pose_fade_channel (self->pose, channel, LIMDL_POSE_FADE_AUTOMATIC);
+		if (animation != NULL)
+		{
+			limdl_pose_set_channel_animation (self->pose, channel, animation);
+			limdl_pose_set_channel_repeats (self->pose, channel, repeat? -1 : 1);
+			limdl_pose_set_channel_position (self->pose, channel, time);
+			limdl_pose_set_channel_state (self->pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
+		}
+	}
+	limdl_pose_set_channel_repeat_start (self->pose, channel, repeat_start);
+	limdl_pose_set_channel_priority_scale (self->pose, channel, weight_scale);
+	limdl_pose_set_channel_priority_transform (self->pose, channel, weight);
+	limdl_pose_set_channel_time_scale (self->pose, channel, time_scale);
+	limdl_pose_set_channel_fade_in (self->pose, channel, fade_in);
+	limdl_pose_set_channel_fade_out (self->pose, channel, fade_out);
+
+	/* Handle optional per-node weights. */
 	if (animation != NULL)
 	{
-		limdl_pose_set_channel_animation (self->pose, channel, animation);
-		limdl_pose_set_channel_repeats (self->pose, channel, repeat? -1 : 1);
-		limdl_pose_set_channel_repeat_start (self->pose, channel, repeat_start);
-		limdl_pose_set_channel_priority_scale (self->pose, channel, weight_scale);
-		limdl_pose_set_channel_priority_transform (self->pose, channel, weight);
-		limdl_pose_set_channel_position (self->pose, channel, time);
-		limdl_pose_set_channel_state (self->pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
-		limdl_pose_set_channel_time_scale (self->pose, channel, time_scale);
-		limdl_pose_set_channel_fade_in (self->pose, channel, fade_in);
-		limdl_pose_set_channel_fade_out (self->pose, channel, fade_out);
+		limdl_pose_clear_channel_node_priorities (self->pose, channel);
+		if (liscr_args_gets_table (args, "node_weights"))
+		{
+			lua_pushnil (args->lua);
+			while (lua_next (args->lua, -2) != 0)
+			{
+				if (lua_type (args->lua, -2) == LUA_TSTRING &&
+				    lua_type (args->lua, -1) == LUA_TNUMBER)
+				{
+					printf("setchanweight %s=%f\n",
+						lua_tostring (args->lua, -2),
+						lua_tonumber (args->lua, -1));
+					limdl_pose_set_channel_priority_node (self->pose, channel,
+						lua_tostring (args->lua, -2),
+						lua_tonumber (args->lua, -1));
+				}
+				lua_pop (args->lua, 1);
+			}
+			lua_pop (args->lua, 1);
+		}
 	}
 
 	liscr_args_seti_bool (args, 1);
@@ -197,6 +218,8 @@ static void Object_find_node (LIScrArgs* args)
 static void Object_get_animation (LIScrArgs* args)
 {
 	int chan;
+	LIAlgStrdic* weights;
+	LIAlgStrdicIter iter;
 	LIEngObject* object;
 	LIMdlAnimation* anim;
 
@@ -208,6 +231,8 @@ static void Object_get_animation (LIScrArgs* args)
 	anim = limdl_pose_get_channel_animation (object->pose, chan);
 	if (anim == NULL)
 		return;
+
+	/* Set animation info. */
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
 	liscr_args_sets_string (args, "animation", anim->name);
 	liscr_args_sets_int (args, "channel", chan + 1);
@@ -219,6 +244,19 @@ static void Object_get_animation (LIScrArgs* args)
 	liscr_args_sets_float (args, "time_scale", limdl_pose_get_channel_time_scale (object->pose, chan));
 	liscr_args_sets_float (args, "weight", limdl_pose_get_channel_priority_transform (object->pose, chan));
 	liscr_args_sets_float (args, "weight_scale", limdl_pose_get_channel_priority_scale (object->pose, chan));
+
+	/* Set node weight info. */
+	weights = limdl_pose_get_channel_priority_nodes (object->pose, chan);
+	if (weights != NULL)
+	{
+		lua_newtable (args->lua);
+		LIALG_STRDIC_FOREACH (iter, weights)
+		{
+			lua_pushnumber (args->lua, *((float*) iter.value));
+			lua_setfield (args->lua, -2, iter.key);
+		}
+		liscr_args_sets_stack (args, "node_weights");
+	}
 }
 
 static void Object_get_animations (LIScrArgs* args)

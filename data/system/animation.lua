@@ -13,6 +13,7 @@ end
 --   <li>channel: Channel number.</li>
 --   <li>fade_in: Fade in duration in seconds.</li>
 --   <li>fade_out: Fade out duration in seconds.</li>
+--   <li>node_weight: Sets blending weight multipliers for individual nodes.</li>
 --   <li>weight: Blending weight.</li>
 --   <li>time: Starting time.</li>
 --   <li>time_scale: Time scaling factor.</li>

@@ -46,6 +46,7 @@ struct _LIMdlPoseChannel
 	float priority_transform;
 	float fade_in;
 	float fade_out;
+	LIAlgStrdic* weights;
 	LIMdlAnimation* animation;
 };
 
@@ -104,6 +105,10 @@ LIAPICALL (LIMdlPose*, limdl_pose_new, ());
 
 LIAPICALL (void, limdl_pose_free, (
 	LIMdlPose* self));
+
+LIAPICALL (void, limdl_pose_clear_channel_node_priorities, (
+	LIMdlPose*  self,
+	int         channel));
 
 LIAPICALL (void, limdl_pose_destroy_channel, (
 	LIMdlPose* self,
@@ -170,6 +175,21 @@ LIAPICALL (void, limdl_pose_set_channel_position, (
 	LIMdlPose* self,
 	int        channel,
 	float      value));
+
+LIAPICALL (float*, limdl_pose_get_channel_priority_node, (
+	const LIMdlPose* self,
+	int              channel,
+	const char*      node));
+
+LIAPICALL (int, limdl_pose_set_channel_priority_node, (
+	LIMdlPose*  self,
+	int         channel,
+	const char* node,
+	float       value));
+
+LIAPICALL (LIAlgStrdic*, limdl_pose_get_channel_priority_nodes, (
+	const LIMdlPose* self,
+	int              channel));
 
 LIAPICALL (float, limdl_pose_get_channel_priority_scale, (
 	const LIMdlPose* self,
