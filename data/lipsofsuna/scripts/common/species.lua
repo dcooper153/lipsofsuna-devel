@@ -113,8 +113,37 @@ Species.new = function(clss, args)
 		end
 	end
 	if args.animations then
+		-- We provide some helper node weights here since listing all of these
+		-- in the specs would be way too verbose and inflexible. If one of the
+		-- recognized uppercase node names is seen in the node weight list,
+		-- it's replaced with the list of nodes in the mapping table.
+		local translate_node_weights = function(args)
+			local mapping = {
+				LOWER = {"back1", "pelvis", "leg1.L", "leg2.L", "foot.L", "leg1.R", "leg2.R", "foot.R", "pelvis1", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6"},
+				LEGS = {"leg1.L", "leg2.L", "foot.L", "leg1.R", "leg2.R", "foot.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6"},
+				ARMS = {"arm1.L", "arm2.L", "wrist.L", "palm.L", "arm1.R", "arm2.R", "wrist.R", "palm.R"},
+				ARML = {"arm1.L", "arm2.L", "wrist.L", "palm.L"},
+				ARMR = {"arm1.R", "arm2.R", "wrist.R", "palm.R"},
+				BACK = {"back", "back1"}}
+			local w = {}
+			for k,v in pairs(args) do
+				local replace = mapping[k]
+				if replace then
+					for k1,v1 in ipairs(replace) do w[v1] = v end
+				else
+					w[k] = v
+				end
+			end
+			return w
+		end
+		-- Add animations.
+		-- Each animation in arguments is added to the animation list as is,
+		-- apart from the node_weights array that has some translation rules.
 		for k,v in pairs(args.animations) do
 			self.animations[k] = v
+			if v.node_weights then
+				v.node_weights = translate_node_weights(v.node_weights)
+			end
 		end
 	end
 	-- Equipment slots.
