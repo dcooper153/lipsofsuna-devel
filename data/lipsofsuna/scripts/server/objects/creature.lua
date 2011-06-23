@@ -551,17 +551,22 @@ end
 -- @param self Object.
 -- @param args Arguments.<ul>
 --   <li>point: Position vector.</li>
---   <li>secs: Tick length.</li></ul>
+--   <li>secs: Tick length or nil for instant rotation.</li></ul>
 -- @return The dot product of the current direction and the target direction.
 Creature.face_point = function(self, args)
 	local sdir = self.rotation * Vector(0, 0, -1)
 	local edir = (args.point - self.position):normalize()
-	-- Interpolate rotation towards target point.
-	-- TODO: Should use args.secs here somehow.
 	local quat = Quaternion{dir = Vector(edir.x, 0, edir.z), up = Vector(0, 1, 0)}
-	self.rotation = self.rotation:nlerp(quat, 0.9)
-	-- Check if facing the target point.
-	return sdir:dot(edir)
+	if args.secs then
+		-- Interpolate rotation towards target point.
+		-- TODO: Should use args.secs here somehow.
+		self.rotation = self.rotation:nlerp(quat, 0.9)
+		return sdir:dot(edir)
+	else
+		-- Instantly set the target rotation.
+		self.rotation = quat
+		return 1.0
+	end
 end
 
 --- Gets the attack ray of the creature.
