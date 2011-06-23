@@ -566,17 +566,21 @@ end
 
 --- Gets the attack ray of the creature.
 -- @param self Object.
+-- @param rel Destination shift vector or nil.
 -- @return Ray start point and ray end point relative to the object.
-Creature.get_attack_ray = function(self)
+Creature.get_attack_ray = function(self, rel)
 	local ctr = self.spec.aim_ray_center
+	local ray1 = Vector(0, 0, -self.spec.aim_ray_start)
+	local ray2 = Vector(0, 0, -self.spec.aim_ray_end)
+	if rel then ray2 = ray2 + rel * self.spec.aim_ray_end end
 	if self.tilt then
 		local rot = Quaternion{euler = self.tilt.euler}
-		local src = self.position + self.rotation * (ctr + rot * Vector(0, 0, -self.spec.aim_ray_start))
-		local dst = self.position + self.rotation * (ctr + rot * Vector(0, 0, -self.spec.aim_ray_end))
+		local src = self.position + self.rotation * (ctr + rot * ray1)
+		local dst = self.position + self.rotation * (ctr + rot * ray2)
 		return src, dst
 	else
-		local src = self.position + self.rotation * (ctr + Vector(0, 0, -self.spec.aim_ray_start))
-		local dst = self.position + self.rotation * (ctr + Vector(0, 0, -self.spec.aim_ray_end))
+		local src = self.position + self.rotation * (ctr + ray1)
+		local dst = self.position + self.rotation * (ctr + ray2)
 		return src, dst
 	end
 end

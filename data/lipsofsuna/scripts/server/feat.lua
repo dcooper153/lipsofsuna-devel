@@ -171,7 +171,7 @@ Feat.perform = function(self, args)
 				Thread(function(t)
 					play_effects()
 					Thread:sleep(args.user.spec.timing_build * 0.02)
-					local src,dst = args.user:get_attack_ray(args)
+					local src,dst = args.user:get_attack_ray()
 					local r = Physics:cast_ray{src = src, dst = dst}
 					if not r or not r.tile then return end
 					self:apply{
@@ -188,18 +188,46 @@ Feat.perform = function(self, args)
 				-- While the attack animation is played, an attack ray is cast.
 				-- The first object or tile that collides with the ray is damaged.
 				Thread(function(t)
+					local apply = function(r)
+						self:apply{
+							attacker = args.user,
+							charge = charge,
+							point = r.point,
+							target = r.object,
+							tile = r.tile,
+							weapon = weapon}
+						return true
+					end
+					local prev
+					local cast = function(rel)
+						-- Get the attack ray.
+						local src,dst = args.user:get_attack_ray(rel)
+						-- Cast from the previous point.
+						local r = prev and Physics:cast_ray{src = prev, dst = dst}
+						if r then return apply(r) end
+						-- Cast from the center point.
+						local r = Physics:cast_ray{src = src, dst = dst}
+						if r then return apply(r) end
+						prev = dst
+					end
+					-- Choose the blade path.
+					local path_n = {Vector(0.1, 0, 0.75), Vector(-0.1, 0, 0.5), Vector(0.05, 0, 0.25), Vector(-0.05, 0, 0)}
+					local path_l = {Vector(0.5, 0.1, 1), Vector(0.25, 0.05, 0.7), Vector(0, 0, 0.5), Vector(-0.25, 0, 0.7)}
+					local path_r = {Vector(0.5, 0.1, 0.7), Vector(0.1, 0.05, 0.5), Vector(-0.2, 0, 0.6), Vector(-0.5, 0, 1)}
+					local path_b = {Vector(0.1, 0.2, 1), Vector(0.05, 0.2, 0.75), Vector(0, 0.1, 0.5), Vector(0, -0.1, 0.25)}
+					local path_f = {Vector(0.3, -0.1, 0.8), Vector(0.2, -0.1, 0.55), Vector(0.1, -0.05, 0.3), Vector(0, 0.05, 0.15)}
+					local path
+					if args.user.strafing < -0.2 then path = path_l
+					elseif args.user.strafing > 0.2 then path = path_r
+					elseif args.user.movement < -0.2 then path = path_b
+					elseif args.user.movement > 0.2 then path = path_f
+					else path = path_n end
+					-- Cast attack rays.
 					play_effects()
-					Thread:sleep(args.user.spec.timing_attack_blunt * 0.02)
-					local src,dst = args.user:get_attack_ray(args)
-					local r = Physics:cast_ray{src = src, dst = dst}
-					if not r then return end
-					self:apply{
-						attacker = args.user,
-						charge = charge,
-						point = r.point,
-						target = r.object,
-						tile = r.tile,
-						weapon = weapon}
+					for i = 1,4 do
+						Thread:sleep(args.user.spec.timing_attack_blunt * 0.02 / 4)
+						if cast(path[i]) then return end
+					end
 				end)
 			end
 			if anim.categories["explode"] then
@@ -276,7 +304,7 @@ Feat.perform = function(self, args)
 				Thread(function(t)
 					play_effects()
 					Thread:sleep(args.user.spec.timing_spell_touch * 0.02)
-					local src,dst = args.user:get_attack_ray(args)
+					local src,dst = args.user:get_attack_ray()
 					local r = Physics:cast_ray{src = src, dst = dst}
 					if not r then return end
 					self:apply{
