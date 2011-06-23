@@ -113,9 +113,6 @@ static void Object_animate (LIScrArgs* args)
 				if (lua_type (args->lua, -2) == LUA_TSTRING &&
 				    lua_type (args->lua, -1) == LUA_TNUMBER)
 				{
-					printf("setchanweight %s=%f\n",
-						lua_tostring (args->lua, -2),
-						lua_tonumber (args->lua, -1));
 					limdl_pose_set_channel_priority_node (self->pose, channel,
 						lua_tostring (args->lua, -2),
 						lua_tonumber (args->lua, -1));
