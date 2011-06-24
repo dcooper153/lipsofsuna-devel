@@ -189,7 +189,10 @@ static void Model_add_triangles (LIScrArgs* args)
 static void Model_edit_material (LIScrArgs* args)
 {
 	int i;
+	int j;
+	int n;
 	float color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	const char* str;
 	const char* shader = NULL;
 	const char* texture = NULL;
 	LIExtModule* module;
@@ -212,6 +215,41 @@ static void Model_edit_material (LIScrArgs* args)
 			limdl_material_set_diffuse (material, color);
 		if (liscr_args_gets_floatv (args, "specular", 4, color))
 			limdl_material_set_specular (material, color);
+		if (liscr_args_gets_string (args, "shader", &str))
+			limdl_material_set_shader (material, str);
+		if (liscr_args_gets_table (args, "textures"))
+		{
+			/* Count textures. */
+			for (n = 0 ; n < 4 ; n++)
+			{
+				lua_pushnumber (args->lua, n + 1);
+				lua_gettable (args->lua, -2);
+				j = lua_type (args->lua, -1);
+				lua_pop (args->lua, 1);
+				if (j != LUA_TSTRING)
+					break;
+			}
+			/* Allocate textures. */
+			if (material->textures.count != n)
+			{
+				if (!limdl_material_realloc_textures (material, n))
+				{
+					lua_pop (args->lua, 1);
+					continue;
+				}
+			}
+			/* Set textures. */
+			for (j = 0 ; j < n ; j++)
+			{
+				lua_pushnumber (args->lua, j + 1);
+				lua_gettable (args->lua, -2);
+				limdl_material_set_texture (material, j, LIMDL_TEXTURE_TYPE_IMAGE,
+					LIMDL_TEXTURE_FLAG_BILINEAR | LIMDL_TEXTURE_FLAG_MIPMAP |
+					LIMDL_TEXTURE_FLAG_REPEAT, lua_tostring (args->lua, -1));
+				lua_pop (args->lua, 1);
+			}
+			lua_pop (args->lua, 1);
+		}
 	}
 }
 

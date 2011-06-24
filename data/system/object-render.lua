@@ -31,7 +31,9 @@ end
 --   <li>diffuse: Diffuse color to set or nil.</li>
 --   <li>match_shader: Shader name to match or nil.</li>
 --   <li>match_texture: Texture name to match or nil.</li>
---   <li>specular: Specular color to set or nil.</li></ul>
+--   <li>specular: Specular color to set or nil.</li>
+--   <li>shader: Specular to set or nil.</li>
+--   <li>textures: Array of texture to set or nil.</li></ul>
 Model.edit_material = function(self, args)
 	Los.model_edit_material(self.handle, args)
 end
