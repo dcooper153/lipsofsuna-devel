@@ -16,31 +16,9 @@ Physics.GROUP_TILES = 0x8000
 Physics.MASK_CAMERA = 0xF001
 Physics.MASK_PICK = 0xF001
 
-require "client/widgets/background"
-require "client/widgets/colorselector"
-require "client/widgets/container"
-require "client/widgets/dialoglabel"
-require "client/widgets/equipment"
-require "client/widgets/feattooltip"
-require "client/widgets/icon"
-require "client/widgets/itembutton"
-require "client/widgets/itemlist"
-require "client/widgets/itemtooltip"
-require "client/widgets/log"
-require "client/widgets/menu"
-require "client/widgets/menus"
-require "client/widgets/modifier"
-require "client/widgets/modifiers"
-require "client/widgets/progress"
-require "client/widgets/questinfo"
-require "client/widgets/quickpage"
-require "client/widgets/quickslot"
-require "client/widgets/scene"
-require "client/widgets/skills"
-require "client/widgets/skillcontrol"
-require "client/widgets/skilltooltip"
-require "client/widgets/text"
-require "client/widgets/tooltip"
+for k,v in pairs(File:scan_directory("scripts/client/widgets")) do
+	require("client/widgets/" .. string.gsub(v, "([^.]*).*", "%1"))
+end
 require "client/action"
 require "client/audio"
 require "client/event"
@@ -63,19 +41,9 @@ end
 for k,v in pairs(File:scan_directory("scripts/client/shaders")) do
 	require("client/shaders/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
-require "client/views/admin"
-require "client/views/book"
-require "client/views/chargen"
-require "client/views/controls"
-require "client/views/editing"
-require "client/views/feats"
-require "client/views/game"
-require "client/views/help"
-require "client/views/inventory"
-require "client/views/options"
-require "client/views/quests"
-require "client/views/skills"
-require "client/views/startup"
+for k,v in pairs(File:scan_directory("scripts/client/views")) do
+	require("client/views/" .. string.gsub(v, "([^.]*).*", "%1"))
+end
 
 Player.crosshair = Object{model = "crosshair1", collision_group = Physics.GROUP_CROSSHAIR}
 
