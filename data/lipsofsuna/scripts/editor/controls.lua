@@ -5,7 +5,7 @@ Action{name = "erase", mode = "press", key1 = Keysym.k, func = function()
 end}
 
 Action{name = "extrude", mode = "analog", key1 = "mouse4", key2 = "mouse5", func = function(v)
-	if Client.moving then
+	if Program.cursor_grabbed then
 		Editor.inst:extrude(v < 0)
 	end
 end}
@@ -25,7 +25,7 @@ Action{name = "grab", mode = "press", key1 = Keysym.g, func = function(v)
 end}
 
 Action{name = "menu", mode = "press", key1 = Keysym.ESCAPE, func = function()
-	Client.moving = not Client.moving
+	Program.cursor_grabbed = not Program.cursor_grabbed
 end}
 
 Action{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = function(v)
@@ -95,5 +95,5 @@ Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
 end}
 
 Action{name = "screenshot", mode = "press", key1 = Keysym.PRINT, func = function()
-	Client:screenshot()
+	Program:capture_screen()
 end}

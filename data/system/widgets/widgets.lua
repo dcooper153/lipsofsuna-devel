@@ -7,7 +7,7 @@ Widgets.find_handler_widget = function(clss, handler, args)
 end
 
 Widgets.handle_event = function(clss, args)
-	if Client.moving then return end
+	if Program.cursor_grabbed then return end
 	local generic = {keypress = true, keyrelease = true, mousemotion = true, mouserelease = true}
 	if args.type == "mousepress" then
 		-- Mouse button pressed or wheel scrolled.
@@ -44,7 +44,7 @@ end
 
 Widgets.update = function(clss)
 	local w
-	if not Client.moving then
+	if not Program.cursor_grabbed then
 		w = clss.focused_widget
 	end
 	local o = clss.focused_widget_prev

@@ -118,7 +118,7 @@ end
 -- @param args Event arguments.
 Widgets.ComboBox.pressed = function(self, args)
 	if self.menu.rows == 0 then return end
-	local p = Client.cursor_pos
+	local p = Program.cursor_position
 	if p.x - self.x < 15 then
 		-- Previous item.
 		if self.value > 1 then

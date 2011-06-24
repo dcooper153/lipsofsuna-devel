@@ -38,7 +38,7 @@ Widgets.SkillControl.get_value_at = function(self, point)
 end
 
 Widgets.SkillControl.pressed = function(self)
-	local v = self:get_value_at(Client.cursor_pos)
+	local v = self:get_value_at(Program.cursor_position)
 	if not v then return end
 	self:changed(v)
 end

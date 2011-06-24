@@ -18,7 +18,7 @@ Widgets.ColorSelector.get_value_at = function(self, point)
 end
 
 Widgets.ColorSelector.pressed = function(self)
-	local c,v = self:get_value_at(Client.cursor_pos)
+	local c,v = self:get_value_at(Program.cursor_position)
 	self[c] = v
 	return c,v
 end

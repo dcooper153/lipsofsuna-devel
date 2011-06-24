@@ -277,7 +277,7 @@ end
 
 Timer{delay = 0.1, func = function()
 	-- Periodically check if there's an object in front of the player.
-	if Player.object and Client.moving then
+	if Player.object and Program.cursor_grabbed then
 		Player:pick_look()
 	else
 		Target.target_object = nil

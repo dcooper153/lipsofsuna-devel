@@ -67,14 +67,14 @@ Views.Chargen.new = function(clss)
 	-- Body style sliders.
 	self.label_height = Widgets.Label{text = "Height:"}
 	self.scroll_height = Widgets.Progress{min = 0, max = 1, value = 1,
-		pressed = function(widget) self:set_height(widget:get_value_at(Client.cursor_pos)) end}
+		pressed = function(widget) self:set_height(widget:get_value_at(Program.cursor_position)) end}
 	self.label_body = {}
 	self.scroll_body = {}
 	local body_slider_names = {"Hips width", "Limb muscularity", "Bust size", "Torso width", "Waist width"}
 	for i = 1,5 do
 		self.label_body[i] = Widgets.Label{text = body_slider_names[i]}
 		self.scroll_body[i] = Widgets.Progress{min = 0, max = 1, value = 0,
-			pressed = function(widget) self:set_body(i, widget:get_value_at(Client.cursor_pos)) end}
+			pressed = function(widget) self:set_body(i, widget:get_value_at(Program.cursor_position)) end}
 	end
 	-- Face style sliders.
 	self.label_face = {}
@@ -83,7 +83,7 @@ Views.Chargen.new = function(clss)
 	for k,v in ipairs(face_slider_names) do
 		self.label_face[k] = Widgets.Label{text = v}
 		self.scroll_face[k] = Widgets.Progress{min = 0, max = 1, value = 0,
-			pressed = function(widget) self:set_face(k, widget:get_value_at(Client.cursor_pos)) end}
+			pressed = function(widget) self:set_face(k, widget:get_value_at(Program.cursor_position)) end}
 	end
 	-- Apply and quit buttons.
 	self.button_create = Widgets.Button{text = "Create", pressed = function() self:apply() end}

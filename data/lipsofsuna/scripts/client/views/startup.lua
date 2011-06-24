@@ -64,7 +64,7 @@ Startup.retry = function(clss)
 		local opts = string.format("--file %s --server %s %d", Settings.file, Settings.address, Settings.port)
 		if Settings.generate then opts = opts .. " -g" end
 		Program:unload_world()
-		Client:host(opts)
+		Program:launch_server(opts)
 		clss:set_state("Starting the server on port " .. Settings.port .. "...")
 		clss.host_wait_timer = Timer{delay = 2, func = function(timer)
 			if Network:join{host = "localhost", Settings.port} then

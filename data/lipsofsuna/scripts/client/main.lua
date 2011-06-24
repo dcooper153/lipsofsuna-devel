@@ -1,5 +1,6 @@
 print "INFO: Loading client scripts."
 
+Client = Class()
 Client.db = Database{name = "client.sqlite"}
 Client.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
 Sectors.instance = Sectors{database = Client.db, save_objects = false}
@@ -94,9 +95,9 @@ while not Program.quit do
 		event = Program:pop_event()
 	end
 	-- Render the scene.
-	Client:clear_buffer()
+	Program:clear_buffer()
 	Widgets:draw()
-	Client:swap_buffers()
+	Program:swap_buffers()
 	-- Focus widgets.
 	Widgets:update()
 end

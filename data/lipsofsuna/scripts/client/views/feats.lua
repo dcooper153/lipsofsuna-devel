@@ -32,7 +32,7 @@ Views.Feats.new = function(clss)
 		end}
 		self.spell_effect[i]:set_request{width = 150}
 		self.scroll_effect[i] = Widgets.Progress{min = 0, max = 100, visible = false, value = 0, pressed = function(w)
-			w.value = w:get_value_at(Client.cursor_pos)
+			w.value = w:get_value_at(Program.cursor_position)
 			self:changed()
 		end}
 		self.scroll_effect[i]:set_request{width = 150}

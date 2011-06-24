@@ -8,8 +8,8 @@ end
 
 Widgets.Cursor.update = function(self)
 	-- Update position.
-	local c = Client.cursor_pos
-	self.floating = not Client.moving
+	local c = Program.cursor_position
+	self.floating = not Program.cursor_grabbed
 	self.x = c.x + 1
 	self.y = c.y + 1
 	-- Show tooltips.

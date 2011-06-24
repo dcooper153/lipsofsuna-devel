@@ -2,7 +2,7 @@ local gui_actions = {menu = true, rotate = true, screenshot = true,
 	snap = true, translatex = true, translatey = true, translatez = true}
 
 Eventhandler{type = "keypress", func = function(self, args)
-	if not Client.moving then
+	if not Program.cursor_grabbed then
 		Widgets:handle_event(args)
 		Action:event(args, gui_actions)
 	else
@@ -11,7 +11,7 @@ Eventhandler{type = "keypress", func = function(self, args)
 end}
 
 Eventhandler{type = "keyrelease", func = function(self, args)
-	if not Client.moving then
+	if not Program.cursor_grabbed then
 		Widgets:handle_event(args)
 		Action:event(args, gui_actions)
 	else
@@ -20,7 +20,7 @@ Eventhandler{type = "keyrelease", func = function(self, args)
 end}
 
 Eventhandler{type = "mousepress", func = function(self, args)
-	if not Client.moving then
+	if not Program.cursor_grabbed then
 		Widgets:handle_event(args)
 		Action:event(args, gui_actions)
 	else
@@ -29,7 +29,7 @@ Eventhandler{type = "mousepress", func = function(self, args)
 end}
 
 Eventhandler{type = "mousemotion", func = function(self, args)
-	if not Client.moving then
+	if not Program.cursor_grabbed then
 		Widgets:handle_event(args)
 		Action:event(args, gui_actions)
 	else

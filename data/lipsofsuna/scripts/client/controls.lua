@@ -178,7 +178,7 @@ Action{name = "run", mode = "toggle", key1 = Keysym.LSHIFT, func = function(v)
 end}
 
 Action{name = "screenshot", mode = "press", key1 = Keysym.PRINT, func = function()
-	local n = Client:screenshot()
+	local n = Program:capture_screen()
 	Gui.chat_history:append{text = "Screenshot: " .. n}
 end}
 

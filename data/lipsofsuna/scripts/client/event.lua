@@ -134,7 +134,7 @@ Eventhandler{type = "tick", func = function(self, args)
 	if Gui.fps_label then
 		fpst = fpst + args.secs
 		if fpst > 0.1 then
-			Gui.fps_label.text = "FPS: " .. math.floor(Client.fps + 0.5)
+			Gui.fps_label.text = "FPS: " .. math.floor(Program.fps + 0.5)
 			fpst = 0
 		end
 	end

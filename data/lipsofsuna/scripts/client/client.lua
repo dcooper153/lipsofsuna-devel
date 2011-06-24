@@ -1,4 +1,4 @@
-Client.title = "Lips of Suna"
+Program.window_title = "Lips of Suna"
 Reload.enabled = true
 
 Eventhandler{type = "select", func = function(self, args)

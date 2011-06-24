@@ -20,7 +20,7 @@ end
 
 Widgets.Scrollbar.pressed = function(self)
 	if self.max <= self.page then return end
-	local cursor = Client.cursor_pos
+	local cursor = Program.cursor_position
 	local c = cursor - Vector(self.x, self.y)
 	if c.y < 21 then
 		-- Scroll up.

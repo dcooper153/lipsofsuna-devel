@@ -104,6 +104,24 @@ Class.new = function(clss, base)
 	end
 end
 
+Class.add_class_getters = function(clss, args)
+	local s = {}
+	if clss.class_getters then
+		for k,v in pairs(clss.class_getters) do s[k] = v end
+	end
+	for k,v in pairs(args) do s[k] = v end
+	clss.class_getters = s
+end
+
+Class.add_class_setters = function(clss, args)
+	local s = {}
+	if clss.class_setters then
+		for k,v in pairs(clss.class_setters) do s[k] = v end
+	end
+	for k,v in pairs(args) do s[k] = v end
+	clss.class_setters = s
+end
+
 Class.add_getters = function(clss, args)
 	local s = {}
 	if clss.getters then

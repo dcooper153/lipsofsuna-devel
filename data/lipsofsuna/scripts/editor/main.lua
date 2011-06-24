@@ -370,7 +370,7 @@ end
 Editor.pick = function(self)
 	-- Pick from the scene.
 	local hl = self.highlight and self.highlight.visual
-	local mode = Client.video_mode
+	local mode = Program.video_mode
 	local r1,r2 = self.camera:picking_ray{cursor = Vector(mode[1]/2, mode[2]/2), far = 20, near = 0.1}
 	local ret = Physics:cast_ray{src = r1, dst = r2}
 	if not ret then return end
@@ -600,9 +600,9 @@ while not Program.quit do
 		event = Program:pop_event()
 	end
 	-- Render the scene.
-	Client:clear_buffer()
+	Program:clear_buffer()
 	Widgets:draw()
-	Client:swap_buffers()
+	Program:swap_buffers()
 	-- Focus widgets.
 	Widgets:update()
 end

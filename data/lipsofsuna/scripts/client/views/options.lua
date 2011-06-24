@@ -21,7 +21,7 @@ Views.Options.new = function(clss)
 	-- Some of the views don't fit in the screen unless the height is at least
 	-- 720 pixels so we filter out any modes smaller than that.
 	self.video_modes = {}
-	for k,v in ipairs(Client.video_modes) do
+	for k,v in ipairs(Program.video_modes) do
 		if v[2] >= 720 then
 			table.insert(self.video_modes, {"" .. v[1] .. "x" .. v[2], function()
 				self:set_video_mode(v[1], v[2], true)
@@ -35,7 +35,7 @@ Views.Options.new = function(clss)
 		return false
 	end)
 	table.insert(self.video_modes, 1, {"Windowed", function()
-		local s = Client.video_mode
+		local s = Program.video_mode
 		self:set_video_mode(s[1], s[2], false)
 	end})
 	-- Video mode.
@@ -46,14 +46,14 @@ Views.Options.new = function(clss)
 	self.scroll_multisamples = Widgets.Progress{min = 0, max = 4, text = tostring(self.multisamples) .. "x", value = samples}
 	self.scroll_multisamples:set_request{width = 100}
 	self.scroll_multisamples.pressed = function(widget)
-		local v = widget:get_value_at(Client.cursor_pos)
+		local v = widget:get_value_at(Program.cursor_position)
 		self:set_multisamples(2 ^ math.floor(v + 0.5))
 	end
 	-- Anisotrophy quality.
 	self.scroll_anisotrophy = Widgets.Progress{min = 0, max = 16, text = tostring(self.anisotrophic_filter) .. "x", value = self.anisotrophic_filter}
 	self.scroll_anisotrophy:set_request{width = 100}
 	self.scroll_anisotrophy.pressed = function(widget)
-		local v = widget:get_value_at(Client.cursor_pos)
+		local v = widget:get_value_at(Program.cursor_position)
 		self:set_anisotrophic_filter(math.floor(v + 0.5))
 	end
 	-- Model quality adjustment.
@@ -79,14 +79,14 @@ Views.Options.new = function(clss)
 	self.scroll_animation = Widgets.Progress{min = 0, max = 1, value = self.animation_quality}
 	self.scroll_animation:set_request{width = 100}
 	self.scroll_animation.pressed = function(widget)
-		local v = widget:get_value_at(Client.cursor_pos)
+		local v = widget:get_value_at(Program.cursor_position)
 		self:set_animation_quality(v)
 	end
 	-- Transparency quality adjustment.
 	self.scroll_transparency = Widgets.Progress{min = 0, max = 1, value = self.transparency_quality}
 	self.scroll_transparency:set_request{width = 100}
 	self.scroll_transparency.pressed = function(widget)
-		local v = widget:get_value_at(Client.cursor_pos)
+		local v = widget:get_value_at(Program.cursor_position)
 		self:set_transparency_quality(v)
 	end
 	-- Bloom toggle.
@@ -98,34 +98,34 @@ Views.Options.new = function(clss)
 	self.scroll_luminance = Widgets.Progress{min = 0, max = 1, value = 0}
 	self.scroll_luminance:set_request{width = 100}
 	self.scroll_luminance.pressed = function(widget)
-		local v = widget:get_value_at(Client.cursor_pos)
+		local v = widget:get_value_at(Program.cursor_position)
 		self:set_bloom_luminance(1 - v)
 	end
 	-- Exposure adjustment.
 	self.scroll_exposure = Widgets.Progress{min = 1, max = 10, value = 1.5}
 	self.scroll_exposure:set_request{width = 100}
 	self.scroll_exposure.pressed = function(widget)
-		local v = widget:get_value_at(Client.cursor_pos)
+		local v = widget:get_value_at(Program.cursor_position)
 		self:set_bloom_exposure(v)
 	end
 	-- Mouse sensitivity.
 	self.scroll_mouse = Widgets.Progress{min = 0, max = 2, value = self.mouse_sensitivity}
 	self.scroll_mouse:set_request{width = 100}
 	self.scroll_mouse.pressed = function(widget)
-		local v = widget:get_value_at(Client.cursor_pos)
+		local v = widget:get_value_at(Program.cursor_position)
 		self:set_mouse_sensitivity(v)
 	end
 	-- Sound settings.
 	self.scroll_music = Widgets.Progress{min = 0, max = 0.5, value = self.music_volume}
 	self.scroll_music:set_request{width = 100}
 	self.scroll_music.pressed = function(widget)
-		local v = widget:get_value_at(Client.cursor_pos) 
+		local v = widget:get_value_at(Program.cursor_position) 
 		self:set_music_volume(v)
 	end
 	self.scroll_sound = Widgets.Progress{min = 0, max = 1, value = self.sound_volume}
 	self.scroll_sound:set_request{width = 100}
 	self.scroll_sound.pressed = function(widget)
-		local v = widget:get_value_at(Client.cursor_pos)
+		local v = widget:get_value_at(Program.cursor_position)
 		self:set_sound_volume(v)
 	end
 	-- Packing.
@@ -343,8 +343,8 @@ Views.Options.set_transparency_quality = function(self, v)
 end
 
 Views.Options.set_video_mode = function(self, w, h, f)
-	Client:set_video_mode(w, h, f, self.vsync)
-	local mode = Client.video_mode
+	Program:set_video_mode(w, h, f, self.vsync)
+	local mode = Program.video_mode
 	self.window_width = mode[1]
 	self.window_height = mode[2]
 	self.fullscreen = mode[3]
@@ -353,7 +353,7 @@ Views.Options.set_video_mode = function(self, w, h, f)
 end
 
 Views.Options.set_vsync = function(self, v)
-	local mode = Client.video_mode
+	local mode = Program.video_mode
 	self.window_width = mode[1]
 	self.window_height = mode[2]
 	self.fullscreen = mode[3]

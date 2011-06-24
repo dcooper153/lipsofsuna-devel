@@ -16,13 +16,13 @@ end
 --- Enters the game view.
 -- @param self Game view.
 Views.Game.enter = function(self)
-	Client.moving = true
+	Program.cursor_grabbed = true
 end
 
 --- Closes the game view.
 -- @param self Game view.
 Views.Game.close = function(self)
-	Client.moving = false
+	Program.cursor_grabbed = false
 end
 
 Views.Game.inst = Views.Game()

@@ -59,9 +59,9 @@ while not Program.quit do
 	-- Update the cursor.
 	Widgets.Cursor.inst:update()
 	-- Render the scene.
-	Client:clear_buffer()
+	Program:clear_buffer()
 	Widgets:draw()
-	Client:swap_buffers()
+	Program:swap_buffers()
 	-- Focus widgets.
 	Widgets:update()
 end
