@@ -28,7 +28,7 @@ Views.Controls.new = function(clss)
 end
 
 Views.Controls.back = function(self)
-	Gui:set_mode("menu")
+	Client:set_mode("menu")
 end
 
 --- Closes the contorls view.
@@ -49,7 +49,7 @@ end
 
 --- Hijacks all input events when editing a binding.<br/>
 -- Hijacking is implemented in event.lua by hardcoding the event handlers
--- to call this function when Views.Controls.inst.editing_binding is true.
+-- to call this function when Client.views.controls.editing_binding is true.
 -- @param self Controls view.
 -- @param args Event arguments.
 Views.Controls.input = function(self, args)
@@ -139,7 +139,3 @@ Views.Controls.update = function(self)
 		v:reshaped()
 	end
 end
-
-------------------------------------------------------------------------------
-
-Views.Controls.inst = Views.Controls()

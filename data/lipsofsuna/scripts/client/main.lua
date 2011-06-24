@@ -1,10 +1,9 @@
 print "INFO: Loading client scripts."
 
-Client = Class()
-Client.db = Database{name = "client.sqlite"}
-Client.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
-Sectors.instance = Sectors{database = Client.db, save_objects = false}
-Sectors.instance:erase_world()
+Program.window_title = "Lips of Suna"
+Reload.enabled = true
+
+require "client/client"
 
 Views = {}
 Physics.GROUP_OBJECT = 0x0001
@@ -23,7 +22,6 @@ require "client/action"
 require "client/audio"
 require "client/event"
 require "client/theme"
-require "client/client"
 require "client/drag"
 require "client/commands"
 require "client/controls"
@@ -45,12 +43,12 @@ for k,v in pairs(File:scan_directory("scripts/client/views")) do
 	require("client/views/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
 
-Player.crosshair = Object{model = "crosshair1", collision_group = Physics.GROUP_CROSSHAIR}
-
 -- Initialize the UI state.
 Widgets.Cursor.inst = Widgets.Cursor(Iconspec:find{name = "cursor1"})
 Gui:init()
-Gui:set_mode("startup")
+Client:init()
+Player.crosshair = Object{model = "crosshair1", collision_group = Physics.GROUP_CROSSHAIR}
+Client:set_mode("startup")
 
 -- Main loop.
 while not Program.quit do

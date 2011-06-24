@@ -11,7 +11,7 @@ end
 -- @param delta Size of change.
 Drag.change_count = function(self, delta)
 	-- Make sure that the dragged item exists.
-	local item = Views.Inventory.inst:get_item{id = self.drag[2], slot = self.drag[3]}
+	local item = Client.views.inventory:get_item{id = self.drag[2], slot = self.drag[3]}
 	if not item then return end
 	-- Update the drag count.
 	local new = self.drag[5] + delta
@@ -31,7 +31,7 @@ Drag.clear = function(self)
 	-- Restore items slots back to normal.
 	if not self.drag then return end
 	if self.drag[1] == "equ" or self.drag[1] == "inv" then
-		local item = Views.Inventory.inst:get_item{id = self.drag[2], slot = self.drag[3]}
+		local item = Client.views.inventory:get_item{id = self.drag[2], slot = self.drag[3]}
 		if item then item.drag = nil end
 	end
 	-- Reset the cursor.
@@ -62,7 +62,7 @@ Drag.clicked_container = function(self, inv, slot)
 		return
 	end
 	-- Make sure that the dragged item exists.
-	local item = Views.Inventory.inst:get_item{id = inv, slot = slot}
+	local item = Client.views.inventory:get_item{id = inv, slot = slot}
 	if not item then return end
 	-- Update the cursor.
 	if type(slot) == "number" then

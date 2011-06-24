@@ -172,9 +172,9 @@ end
 
 Player.update_compass = function(clss)
 	Gui.scene.compass = math.pi - clss.rotation_curr.euler[1]
-	Gui.scene.compass_quest_direction = Views.Quests.inst:get_compass_direction()
-	Gui.scene.compass_quest_distance = Views.Quests.inst:get_compass_distance()
-	Gui.scene.compass_quest_height = Views.Quests.inst:get_compass_height()
+	Gui.scene.compass_quest_direction = Client.views.quests:get_compass_direction()
+	Gui.scene.compass_quest_distance = Client.views.quests:get_compass_distance()
+	Gui.scene.compass_quest_height = Client.views.quests:get_compass_height()
 end
 
 Player.camera = Camera{collision_mask = Physics.MASK_CAMERA, far = 40.0, fov = 1.1, mode = "third-person", near = 0.01, position_smoothing = 0.15, rotation_smoothing = 0.15}

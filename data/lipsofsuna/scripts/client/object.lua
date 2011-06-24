@@ -67,7 +67,7 @@ end
 --   <li>hair_style: Hair style string.</li>
 --   <li>race: Race string.</li></ul>
 Object.create_character_model = function(self, args)
-	local lod = (Views.Options.inst.model_quality == 0)
+	local lod = (Client.views.options.model_quality == 0)
 	-- Get the species.
 	local name = args.race
 	local species = Species:find{name = name}
@@ -196,7 +196,7 @@ end
 Object.set_skill = function(self, s, v, m)
 	-- Update player skills.
 	if self == Player.object then
-		Gui.skills:update(s, v, m)
+		Client.views.skills:update(s, v, m)
 	end
 	-- Display health changes.
 	if s == "health" then

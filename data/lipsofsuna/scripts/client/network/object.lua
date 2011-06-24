@@ -213,12 +213,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	if Bitwise:band(flags, Protocol.object_show_flags.SELF) ~= 0 then
 		debug("  SELF")
 		o.collision_group = Physics.GROUP_PLAYER
-		Player.species = spec.name
-		Camera.mode = "third-person"
-		Gui.skills:set_species(o.spec)
-		Views.Feats.inst:set_race(spec.name)
-		Views.Feats.inst:show(1)
-		Player.object = o
+		Client.player_object = o
 	end
 	-- Species.
 	if Bitwise:band(flags, Protocol.object_show_flags.SPECIES) ~= 0 then

@@ -41,12 +41,7 @@ end
 --- Closes the book view.
 -- @param self Book view.
 Views.Book.back = function(self)
-	Gui:set_mode("game")
-end
-
---- Closes the book view.
--- @param self book view.
-Views.Book.close = function(self)
+	Client:set_mode("game")
 end
 
 --- Shows the book UI.
@@ -96,15 +91,3 @@ Views.Book.show_page = function(self, page)
 	self.label_page1.text = string.format("%d/%d", self.page, n)
 	self.label_page2.text = string.format("%d/%d", self.page + 1, n)
 end
-
-------------------------------------------------------------------------------
-
-Views.Book.inst = Views.Book()
-
-Protocol:add_handler{type = "BOOK", func = function(event)
-	local ok,title,text = event.packet:read("string", "string")
-	if ok then
-		Views.Book.inst:show{title = title, text = text}
-		Gui:set_mode("book")
-	end
-end}

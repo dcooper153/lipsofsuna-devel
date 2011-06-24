@@ -12,7 +12,7 @@ Protocol:add_handler{type = "INVENTORY_CREATED", func = function(event)
 	local spec = func and func()
 	-- Create the container.
 	local cont = Widgets.Container{id = id, size = size, spec = spec}
-	Views.Inventory.inst:add_container(cont, own)
+	Client.views.inventory:add_container(cont, own)
 end}
 
 -- Closes a container.
@@ -44,7 +44,7 @@ Protocol:add_handler{type = "INVENTORY_ITEM_ADDED", func = function(event)
 	local icon = spec and spec.icon
 	cont:set_item{slot = (sslot ~= "" and sslot or islot), icon = icon, name = name, count = count}
 	-- Update quickslots.
-	if cont == Views.Inventory.inst.container and sslot == "" then
+	if cont == Client.views.inventory.container and sslot == "" then
 		Quickslots:assign_item(islot, {icon = icon, name = name, count = count})
 	end
 	-- Clear interrupted item drags.
@@ -85,5 +85,5 @@ Protocol:add_handler{type = "INVENTORY_WEIGHT", func = function(event)
 	local ok,w,l = event.packet:read("uint16", "uint16")
 	if not ok then return end
 	-- Update the inventory view.
-	Views.Inventory.inst:set_weight(w, l)
+	Client.views.inventory:set_weight(w, l)
 end}

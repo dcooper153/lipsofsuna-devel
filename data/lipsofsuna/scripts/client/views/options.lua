@@ -164,7 +164,7 @@ Views.Options.new = function(clss)
 end
 
 Views.Options.back = function(self)
-	Gui:set_mode("menu")
+	Client:set_mode("menu")
 end
 
 --- Saves the options after a delay.<br/>
@@ -367,5 +367,3 @@ Views.Options:add_getters{
 
 Views.Options:add_setters{
 	fullscreen = function(self, value) rawset(self, "__fullscreen", value) end}
-
-Views.Options.inst = Views.Options()

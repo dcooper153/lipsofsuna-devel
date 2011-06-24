@@ -1,10 +1,10 @@
 Eventhandler{type = "keypress", func = function(self, args)
-	if Views.Controls.inst.editing_binding then
-		Views.Controls.inst:input(args)
+	if Client.views.controls.editing_binding then
+		Client.views.controls:input(args)
 		Action:event(args, {})
 		return
 	end
-	if Gui.mode ~= "game" and Widgets:handle_event(args) then
+	if Client.mode ~= "game" and Widgets:handle_event(args) then
 		-- Widget input.
 		Action:event(args, {})
 	elseif Gui.chat_active then
@@ -25,8 +25,8 @@ Eventhandler{type = "keypress", func = function(self, args)
 end}
 
 Eventhandler{type = "keyrelease", func = function(self, args)
-	if Views.Controls.inst.editing_binding then
-		Views.Controls.inst:input(args)
+	if Client.views.controls.editing_binding then
+		Client.views.controls:input(args)
 		Action:event(args, {})
 		return
 	end
@@ -34,8 +34,8 @@ Eventhandler{type = "keyrelease", func = function(self, args)
 end}
 
 Eventhandler{type = "mousepress", func = function(self, args)
-	if Views.Controls.inst.editing_binding then
-		Views.Controls.inst:input(args)
+	if Client.views.controls.editing_binding then
+		Client.views.controls:input(args)
 		Action:event(args, {})
 		return
 	end
@@ -43,7 +43,7 @@ Eventhandler{type = "mousepress", func = function(self, args)
 		Drag:change_count(1)
 	elseif args.button == 5 and Drag.drag then
 		Drag:change_count(-1)
-	elseif Gui.mode ~= "game" then
+	elseif Client.mode ~= "game" then
 		Widgets:handle_event(args)
 		Action:event(args, {})
 	else
@@ -52,12 +52,12 @@ Eventhandler{type = "mousepress", func = function(self, args)
 end}
 
 Eventhandler{type = "mouserelease", func = function(self, args)
-	if Views.Controls.inst.editing_binding then
-		Views.Controls.inst:input(args)
+	if Client.views.controls.editing_binding then
+		Client.views.controls:input(args)
 		Action:event(args, {})
 		return
 	end
-	if Gui.mode ~= "game" then
+	if Client.mode ~= "game" then
 		Widgets:handle_event(args)
 		Action:event(args, {})
 	else
@@ -66,12 +66,12 @@ Eventhandler{type = "mouserelease", func = function(self, args)
 end}
 
 Eventhandler{type = "mousemotion", func = function(self, args)
-	if Views.Controls.inst.editing_binding then
-		Views.Controls.inst:input(args)
+	if Client.views.controls.editing_binding then
+		Client.views.controls:input(args)
 		Action:event(args, {})
 		return
 	end
-	if Gui.mode ~= "game" then
+	if Client.mode ~= "game" then
 		Widgets:handle_event(args)
 		Action:event(args, {})
 	else
@@ -87,12 +87,17 @@ local animt = 0
 local ipolt = 0
 local fpst = 0
 Eventhandler{type = "tick", func = function(self, args)
+	-- Update the connection status.
+	if Client.views.startup.joined and not Network.connected then
+		Client:set_mode("startup")
+		Client.views.startup:set_state("Lost connection to the server!")
+	end
 	-- Update the cursor.
 	Widgets.Cursor.inst:update()
 	-- Update animations.
 	if Object.deform_mesh then
 		animt = animt + args.secs
-		if animt > 0.2 * (1 - Views.Options.inst.animation_quality) then
+		if animt > 0.2 * (1 - Client.views.options.animation_quality) then
 			for k,v in pairs(Object.objects) do
 				if v.animated then
 					v:update_animations{secs = animt}

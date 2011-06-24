@@ -206,7 +206,7 @@ Widgets.Container.update = function(self)
 	-- Update craftability flags.
 	local args = {
 		get_item = function(name) return items[name] end,
-		get_skill = function(name) return Gui.skills.skills:get_value(name) end}
+		get_skill = function(name) return Client.views.skills.skills:get_value(name) end}
 	for k,v in pairs(self.craftable) do
 		args.spec = v.spec
 		v.enabled = Crafting:can_craft(args)

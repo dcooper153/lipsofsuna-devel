@@ -110,7 +110,7 @@ Widgets.Quickpage.activate = function(self, index)
 			"bool", false)}
 	elseif item then
 		-- Use an item.
-		local cont = Views.Inventory.inst.container
+		local cont = Client.views.inventory.container
 		if not cont then return end
 		local slot = cont:find_item{name = item}
 		if not slot then return end

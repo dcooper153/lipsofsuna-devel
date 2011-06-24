@@ -141,7 +141,7 @@ Views.Feats.assign = function(self)
 end
 
 Views.Feats.back = function(self)
-	Gui:set_mode("menu")
+	Client:set_mode("menu")
 end
 
 --- Recalculates the skill and reagent requirements of the currently shown feat.
@@ -282,5 +282,3 @@ Views.Feats.show = function(self, index)
 	self.active_slot = index
 	self:changed()
 end
-
-Views.Feats.inst = Views.Feats()

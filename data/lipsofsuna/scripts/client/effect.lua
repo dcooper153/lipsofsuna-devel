@@ -78,7 +78,7 @@ EffectObject.new = function(clss, args)
 	end
 	-- Attach a sound effect.
 	if args.sound then
-		local volume = (args.sound_volume or 1) * Views.Options.inst.sound_volume
+		local volume = (args.sound_volume or 1) * Client.views.options.sound_volume
 		local play = function()
 			if args.sound_pitch then
 				Sound:effect{object = self, effect = args.sound, volume = volume,

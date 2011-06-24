@@ -202,7 +202,14 @@ end
 
 --- Executes the character generator.
 -- @param self Chargen.
-Views.Chargen.enter = function(self)
+-- @param from Name of the previous mode.
+Views.Chargen.enter = function(self, from)
+	-- Cleanup if disconnected.
+	if from ~= "startup" then
+		for k,v in pairs(Object.objects) do v:detach() end
+		Player.object = nil
+	end
+	-- Show the UI.
 	self.floating = true
 	self.object.realized = true
 	self.timer.enabled = true
@@ -210,6 +217,7 @@ Views.Chargen.enter = function(self)
 	self:random()
 	self:update(0.0)
 	self.camera:warp()
+	Sound:switch_music_track("char")
 end
 
 Views.Chargen.pressed = function(self, args)
@@ -405,14 +413,3 @@ Views.Chargen.update_model = function(self)
 	self.object:update_animations{secs = 1}
 	self.object:deform_mesh()
 end
-
-------------------------------------------------------------------------------
-
-Views.Chargen.inst = Views.Chargen()
-
-Protocol:add_handler{type = "CHARACTER_ACCEPT", func = function(event)
-	Gui:set_mode("game")
-end}
-Protocol:add_handler{type = "CHARACTER_CREATE", func = function(event)
-	Gui:set_mode("chargen")
-end}

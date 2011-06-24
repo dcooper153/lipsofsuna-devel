@@ -60,7 +60,7 @@ Widgets.Menus.close = function(self, args)
 	end
 	-- Return to the game mode when the menu is closed.
 	if h and not self.visible then
-		Gui:set_mode("game")
+		Client:set_mode("game")
 	end
 end
 

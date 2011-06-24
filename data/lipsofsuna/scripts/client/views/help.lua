@@ -47,7 +47,5 @@ work isn't an obstacle at least.]])}
 end
 
 Views.Help.back = function(self)
-	Gui:set_mode("menu")
+	Client:set_mode("menu")
 end
-
-Views.Help.inst = Views.Help()

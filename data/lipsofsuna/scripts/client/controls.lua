@@ -77,11 +77,11 @@ Action{name = "climb", mode = "press", key1 = Keysym.c, func = function()
 end}
 
 Action{name = "feats", mode = "press", key1 = Keysym.f, func = function()
-	Gui:set_mode("feats")
+	Client:set_mode("feats")
 end}
 
 Action{name = "inventory", mode = "press", key1 = Keysym.i, func = function()
-	Gui:set_mode("inventory")
+	Client:set_mode("inventory")
 end}
 
 Action{name = "jump", mode = "press", key1 = Keysym.SPACE, func = function()
@@ -89,10 +89,10 @@ Action{name = "jump", mode = "press", key1 = Keysym.SPACE, func = function()
 end}
 
 Action{name = "menu", mode = "press", key1 = Keysym.ESCAPE, func = function()
-	if Gui.mode ~= "game" then
-		Gui:set_mode("game")
+	if Client.mode ~= "game" then
+		Client:set_mode("game")
 	else
-		Gui:set_mode("menu")
+		Client:set_mode("menu")
 	end
 end}
 
@@ -102,7 +102,7 @@ Action{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = 
 end}
 
 Action{name = "options", mode = "press", key1 = Keysym.o, func = function()
-	Gui:set_mode("options")
+	Client:set_mode("options")
 end}
 
 Action{name = "pick_up", mode = "press", key1 = Keysym.COMMA, func = function()
@@ -110,11 +110,11 @@ Action{name = "pick_up", mode = "press", key1 = Keysym.COMMA, func = function()
 end}
 
 Action{name = "quests", mode = "press", key1 = Keysym.q, func = function()
-	Gui:set_mode("quests")
+	Client:set_mode("quests")
 end}
 
 Action{name = "skills", mode = "press", key1 = Keysym.k, func = function()
-	Gui:set_mode("skills")
+	Client:set_mode("skills")
 end}
 
 Action{name = "quickslot_mode", mode = "press", key1 = Keysym.TAB, func = function()
@@ -187,7 +187,7 @@ Action{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func 
 end}
 
 Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
-	local scale = 0.01 * Views.Options.inst.mouse_sensitivity
+	local scale = 0.01 * Client.views.options.mouse_sensitivity
 	if Action.dict_press[Keysym.LCTRL] then
 		Player.camera_turn_state = Player.camera_turn_state + v * scale
 	else
@@ -196,7 +196,7 @@ Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
 end}
 
 Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
-	local scale = 0.01 * Views.Options.inst.mouse_sensitivity
+	local scale = 0.01 * Client.views.options.mouse_sensitivity
 	if Action.dict_press[Keysym.LCTRL] then
 		Player.camera_tilt_state = Player.camera_tilt_state - v * scale
 	else

@@ -16,7 +16,7 @@ end
 -- @param self Commands class.
 Commands.pickup = function(self)
 	Target:start("What would you like to pick up?", function(where, id, slot)
-		local cont = Views.Inventory.inst.container
+		local cont = Client.views.inventory.container
 		if where == "obj" and cont then
 			Network:send{packet = Packet(packets.MOVE_ITEM,
 				"uint8", moveitem.WORLD, "uint8", moveitem.INVENTORY,

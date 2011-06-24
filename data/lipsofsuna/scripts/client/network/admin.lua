@@ -1,7 +1,7 @@
 Protocol:add_handler{type = "ADMIN_PRIVILEGE", func = function(event)
 	local ok,b = event.packet:read("bool")
 	if not ok then return end
-	Gui:set_admin(b)
+	Client.views.menu.admin_enabled = b
 end}
 
 -- Updates the weight and burdening limit of the player.

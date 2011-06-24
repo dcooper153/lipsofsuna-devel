@@ -52,7 +52,7 @@ Views.Inventory.add_container = function(self, widget, own)
 		widget.button_close.visible = true
 		widget.closed = function(w) self:remove_container(w) end
 		self.containers:append_col(Widget(), Widgets.Frame{style = "title", text = text}, widget)
-		Gui:set_mode("inventory")
+		Client:set_mode("inventory")
 	end
 end
 
@@ -76,7 +76,7 @@ Views.Inventory.remove_container = function(self, widget)
 end
 
 Views.Inventory.back = function(self)
-	Gui:set_mode("menu")
+	Client:set_mode("menu")
 end
 
 --- Closes the inventory view.
@@ -96,7 +96,8 @@ end
 
 --- Enters the inventory view.
 -- @param self Inventory view.
-Views.Inventory.enter = function(self)
+-- @param from Name of the previous mode.
+Views.Inventory.enter = function(self, from)
 	Quickslots.mode = "items"
 end
 
@@ -148,7 +149,3 @@ Views.Inventory.set_weight = function(self, weight, limit)
 		self.label_weight2.color = {1,0,0,1}
 	end
 end
-
-------------------------------------------------------------------------------
-
-Views.Inventory.inst = Views.Inventory()

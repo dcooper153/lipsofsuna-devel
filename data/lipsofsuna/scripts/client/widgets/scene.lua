@@ -17,16 +17,16 @@ Widgets.Scene.pressed = function(self)
 end
 
 Widgets.Scene.render = function(self)
-	local postproc_enabled = Views and Views.Options.inst.bloom_enabled
+	local postproc_enabled = Views and Client.views.options.bloom_enabled
 	local render_passes = {
 		{pass = 1}, -- Depth pass
 		{pass = 4}, -- Opaque pass
 		{pass = 6, sorting = true}} -- Transparent pass
 	self.camera.viewport = {self.x, self.y, self.width, self.height}
 	self.scene:render{
-		hdr = Views and Views.Options.inst.bloom_enabled,
+		hdr = Views and Client.views.options.bloom_enabled,
 		modelview = self.camera.modelview,
-		multisamples = Views and Views.Options.inst.multisamples,
+		multisamples = Views and Client.views.options.multisamples,
 		projection = self.camera.projection,
 		viewport = self.camera.viewport,
 		render_passes = render_passes,

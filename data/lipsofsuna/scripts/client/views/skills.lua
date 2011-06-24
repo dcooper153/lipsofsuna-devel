@@ -20,7 +20,7 @@ Views.Skills.new = function(clss)
 end
 
 Views.Skills.back = function(self)
-	Gui:set_mode("menu")
+	Client:set_mode("menu")
 end
 
 --- Sets the species for which the skills are.

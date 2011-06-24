@@ -19,7 +19,7 @@ Views.Quests.new = function(clss)
 end
 
 Views.Quests.back = function(self)
-	Gui:set_mode("menu")
+	Client:set_mode("menu")
 end
 
 --- Gets the compass direction for the currently shown quest.<br/>
@@ -91,51 +91,3 @@ Views.Quests.update = function(self, quest)
 	end
 	self:show(quest.name)
 end
-
-------------------------------------------------------------------------------
-
-Views.Quests.inst = Views.Quests()
-
--- Sets to position of the quest marker.
-Protocol:add_handler{type = "QUEST_MARKER", func = function(event)
-	local ok,id,x,y,z = event.packet:read("uint32", "float", "float", "float")
-	if ok then
-		local quest = Quest:find{id = id}
-		if not quest then return end
-		if x > 0.1 and y > 0.1 and z > 0.1 then
-			quest.marker = Vector(x,y,z)
-		else
-			quest.marker = nil
-		end
-	end
-end}
-
--- Updates the quest status.
-Protocol:add_handler{type = "QUEST_STATUS", func = function(event)
-	local ok,id,c,t = event.packet:read("uint32", "uint8", "string")
-	if ok then
-		-- Update the quest.
-		local quest = Quest:find{id = id}
-		if not quest then return end
-		if quest.status == "inactive" and c == 0 then
-			Gui.chat_history:append{text = "Started quest: " .. quest.name}
-			quest.status = "active"
-			quest.text = t
-			Views.Quests.inst:update(quest)
-		elseif quest.status ~= "completed" and c == 1 then
-			Gui.chat_history:append{text = "Completed quest: " .. quest.name}
-			quest.status = "completed"
-			quest.text = t
-			Views.Quests.inst:update(quest)
-		elseif quest.text ~= t then
-			Gui.chat_history:append{text = "Updated quest: " .. quest.name}
-			quest.text = t
-			Views.Quests.inst:update(quest)
-		end
-		-- Play a sound effect unless not played too recently.
-		if Program.time - Views.Quests.inst.sound_play_time > 2 then
-			Views.Quests.inst.sound_play_time = Program.time
-			Effect:play("quest1")
-		end
-	end
-end}
