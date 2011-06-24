@@ -12,6 +12,8 @@
 -- sand chunk/../glass	-	3	-	2
 -- soil chunk		-	3	-	-
 
+-- non generating admin items: "weapons", "logs", "health jar", "magic jar"
+
 Itemspec{
 	name = "adamantium",
 	model = "adamantium1",
@@ -371,6 +373,39 @@ Itemspec{
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
 
+
+
+Itemspec{
+	name = "weapons",
+	model = "chest1",
+	icon = "chest1",
+	mass = 30,
+	animations = {
+		["loot"] = {animation = "opening", channel = 1, permanent = true, repeat_start = 10},
+		["looted"] = {animation = "open", channel = 1, permanent = true, repeat_start = 10, time = 10}},
+	categories = {"container"},
+	inventory_size = 20,
+	inventory_type = "chest",
+	inventory_items = {"wooden sword", "wooden hatchet", "wooden mattock", "wooden bow", "wooden crossbow", "wooden spear", "log", "log", "log", "iron musket", "iron revolver", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet"},
+	stacking = false,
+	water_gravity = Vector(0,6,0)}
+
+
+Itemspec{
+	name = "logs",
+	model = "chest1",
+	icon = "chest1",
+	mass = 30,
+	animations = {
+		["loot"] = {animation = "opening", channel = 1, permanent = true, repeat_start = 10},
+		["looted"] = {animation = "open", channel = 1, permanent = true, repeat_start = 10, time = 10}},
+	categories = {"container"},
+	inventory_size = 50,
+	inventory_type = "chest",
+	inventory_items = {"log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log", "log" },
+	stacking = false,
+	water_gravity = Vector(0,6,0)}
+
 Itemspec{
 	name = "bookcase",
 	model = "bookcase1",
@@ -398,6 +433,30 @@ Itemspec{
 	inventory_type = "chest",
 	loot_categories = {"material", "misc", "potion"},
 	loot_count = {0, 4},
+	stacking = false}
+
+Itemspec{
+	name = "health jar",
+	model = "jar1",
+	icon = "potion3", -- FIXME
+	mass = 5,
+	categories = {"container"},
+	description = "Small container, used for storing things",
+	inventory_size = 40,
+	inventory_type = "chest",
+        inventory_items = {"health potion", "health potion", "health potion", "health potion", "health potion", "health potion", "health potion", "health potion", "health potion", "health potion", "health potion", "health potion", "health potion", "health potion", "health potion", "health potion"},
+	stacking = false}
+
+Itemspec{
+	name = "magic jar",
+	model = "jar1",
+	icon = "potion3", -- FIXME
+	mass = 5,
+	categories = {"container"},
+	description = "Small container, used for storing things",
+	inventory_size = 40,
+	inventory_type = "chest",
+        inventory_items = {"mana potion", "mana potion", "mana potion", "mana potion", "mana potion", "mana potion", "mana potion", "mana potion", "mana potion", "mana potion", "mana potion", "mana potion", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder", "milky powder"},
 	stacking = false}
 
 Itemspec{
