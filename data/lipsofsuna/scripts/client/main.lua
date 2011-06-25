@@ -48,7 +48,11 @@ Widgets.Cursor.inst = Widgets.Cursor(Iconspec:find{name = "cursor1"})
 Gui:init()
 Client:init()
 Player.crosshair = Object{model = "crosshair1", collision_group = Physics.GROUP_CROSSHAIR}
-Client:set_mode("startup")
+if Settings.join or Settings.host then
+	Client:set_mode("startup")
+else
+	Client:set_mode("login")
+end
 
 -- Main loop.
 while not Program.quit do

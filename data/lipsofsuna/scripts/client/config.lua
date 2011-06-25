@@ -54,5 +54,3 @@ Config.save = function(self)
 	-- Flush the file.
 	self.config:save()
 end
-
-Config.inst = Config()

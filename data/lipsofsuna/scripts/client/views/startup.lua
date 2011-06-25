@@ -24,8 +24,7 @@ end
 --- Returns to the launcher.
 -- @param self Startup view.
 Views.Startup.back = function(self)
-	Program:launch_mod{name = "default"}
-	Program.quit = true
+	Client:set_mode("login")
 end
 
 --- Finishes the startup when connection has been established.

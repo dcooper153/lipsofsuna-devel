@@ -56,8 +56,8 @@ require "common/sectors"
 require "common/species"
 require "common/voxel"
 
-if Settings.server then
 require "system/lobby"
+if Settings.server then
 require "common/vision"
 require "common/inventory"
 require "common/skills"

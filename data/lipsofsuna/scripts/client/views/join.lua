@@ -1,9 +1,12 @@
-require "serverinfo"
+require "client/widgets/serverinfo"
 
-Join = Class(Widget)
+Views.Join = Class(Widgets.Background)
 
-Join.new = function(clss)
-	local self = Widget.new(clss, {cols = 1, rows = 3})
+--- Creates a new join view.
+-- @param clss Join class.
+-- @return Join view.
+Views.Join.new = function(clss)
+	local self = Widgets.Background.new(clss, {cols = 1, rows = 2, behind = true, fullscreen = true, image = "mainmenu1"})
 	self.text = Widgets.Label()
 	-- Server list.
 	self.list_servers = Widgets.List{page_size = 7}
@@ -20,15 +23,15 @@ Join.new = function(clss)
 	self.group_servers:set_child(1, 2, self.title_servers)
 	self.group_servers:set_child(1, 3, self.frame_servers)
 	-- Address settings.
-	self.entry_address = Widgets.Entry{text = Config.inst.join_address}
-	self.entry_port = Widgets.Entry{text = Config.inst.join_port}
+	self.entry_address = Widgets.Entry{text = Client.config.join_address}
+	self.entry_port = Widgets.Entry{text = Client.config.join_port}
 	self.entry_port:set_request{width = 50}
 	self.group_address = Widget{cols = 2, rows = 1}
 	self.group_address:set_expand{col = 1}
 	self.group_address:set_child(1, 1, self.entry_address)
 	self.group_address:set_child(2, 1, self.entry_port)
 	-- Account settings.
-	self.entry_account = Widgets.Entry{text = Config.inst.join_account}
+	self.entry_account = Widgets.Entry{text = Client.config.join_account}
 	self.entry_password = Widgets.Entry{password = true}
 	self.group_account = Widgets.Frame{style = "default", cols = 2, rows = 3}
 	self.group_account:set_expand{col = 2}
@@ -50,48 +53,71 @@ Join.new = function(clss)
 	self.group = Widget{cols = 3, rows = 2}
 	self.group:set_expand{col = 1, row = 1}
 	self.group:set_expand{col = 3}
-	self.group:set_child{col = 2, row = 1, widget = self.group_servers}
-	self.group:set_child{col = 2, row = 2, widget = self.group_account}
+	self.group:set_child(2, 1, self.group_servers)
+	self.group:set_child(2, 2, self.group_account)
+	self.group1 = Widget{cols = 1, rows = 3}
+	self.group1:set_expand{col = 1, row = 1}
+	self.group1:set_child(1, 1, self.text)
+	self.group1:set_child(1, 2, self.group)
+	self.group1:set_child(1, 3, self.group_buttons)
 	self:set_expand{col = 1, row = 1}
-	self:set_child{col = 1, row = 1, widget = self.text}
-	self:set_child{col = 1, row = 2, widget = self.group}
-	self:set_child{col = 1, row = 3, widget = self.group_buttons}
+	self:set_child(1, 2, self.group1)
 	return self
 end
 
---- Returns back to the main menu.
--- @param self Join.
-Join.back = function(self)
-	Startup.inst:set_mode("main")
+--- Returns back to the login screen.
+-- @param self Join view.
+Views.Join.back = function(self)
+	Client:set_mode("login")
+end
+
+--- Closes the join view.
+-- @param self Join view.
+Views.Join.close = function(self)
+	self.floating = false
+end
+
+--- Enters the join view.
+-- @param self Join view.
+Views.Join.enter = function(self)
+	self.floating = true
+	self:refresh()
 end
 
 --- Launches the selected game.
--- @param self Join.
-Join.play = function(self)
+-- @param self Join view.
+Views.Join.play = function(self)
+	-- Save settings.
 	local address = self.entry_address.text
 	local port = self.entry_port.text
 	local account = self.entry_account.text
 	local password = self.entry_password.text
-	args = string.format("--join %s %d", address, port)
+	Client.config.join_account = account
+	Client.config.join_address = address
+	Client.config.join_port = port
+	Client.config:save()
+	-- Setup joining.
+	Settings.address = address
+	Settings.host = false
+	Settings.port = port
 	if account and #account > 0 then
-		args = string.format("%s --account %s", args, account)
+		Settings.account = account
+	else
+		Settings.account = "guest"
 	end
 	if password and #password > 0 then
-		args = string.format("%s --password %s", args, password)
+		Settings.password = password
+	else
+		Settings.password = ""
 	end
-	Program:launch_mod{name = "lipsofsuna", args = args}
-	Program.quit = true
-	Config.inst.join_account = account
-	Config.inst.join_address = address
-	Config.inst.join_port = port
-	Config.inst:save()
+	Client:set_mode("startup")
 end
 
 --- Downloads the server list from the master server.
--- @param self Join.
-Join.refresh = function(self)
+-- @param self Join view.
+Views.Join.refresh = function(self)
 	-- Download servers.
-	Lobby.master = "http://lipsofsuna.org"
+	Lobby.master = Client.config.server_master
 	local servers = Lobby:download_server_list()
 	-- Rebuild the list.
 	self.list_servers:clear()

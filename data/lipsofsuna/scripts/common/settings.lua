@@ -86,7 +86,6 @@ Settings.parse_command_line = function(clss)
 	end
 	-- Host by default.
 	if not clss.client and not clss.server and not clss.editor then
-		clss.host = true
 		clss.client = true
 	end
 	-- Check for validity.
@@ -104,7 +103,7 @@ end
 -- @param clss Settings class.
 -- @return Usage string.
 Settings.usage = function(clss)
-	return [[Usage: lipsofsuna lipsofsuna [options]
+	return [[Usage: lipsofsuna [options]
 
 Options:
   -a --account <account>      Name of the player account.

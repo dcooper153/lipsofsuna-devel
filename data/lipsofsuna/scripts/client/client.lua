@@ -1,3 +1,5 @@
+require "client/config"
+
 Client = Class()
 Client.class_name = "Client"
 
@@ -7,6 +9,7 @@ Client.db = Database{name = "client.sqlite"}
 Client.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
 
 Client.init = function(self)
+	self.config = Config()
 	-- Initialize the world.
 	self.sectors = Sectors{database = Client.db, save_objects = false}
 	self.sectors:erase_world()
@@ -19,7 +22,10 @@ Client.init = function(self)
 	self.views.feats = Views.Feats()
 	self.views.game = Views.Game()
 	self.views.help = Views.Help()
+	self.views.host = Views.Host()
 	self.views.inventory = Views.Inventory()
+	self.views.join = Views.Join()
+	self.views.login = Views.Login()
 	self.views.menu = Views.Menu()
 	self.views.options = Views.Options()
 	self.views.quests = Views.Quests()
@@ -45,7 +51,7 @@ Client.set_mode = function(self, mode, level)
 	-- Open the new view.
 	local from = self.mode
 	self.mode = mode
-	if mode == "chargen" or mode == "startup" then
+	if mode == "chargen" or mode == "login" or mode == "startup" then
 		self.view = self.views[mode]
 	else
 		Gui.menus:open{level = level or 1, widget = self.views[mode]}

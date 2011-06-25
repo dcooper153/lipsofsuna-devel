@@ -1,7 +1,7 @@
-Host = Class(Widget)
+Views.Host = Class(Widgets.Background)
 
-Host.new = function(clss)
-	local self = Widget.new(clss, {cols = 1, rows = 3})
+Views.Host.new = function(clss)
+	local self = Widgets.Background.new(clss, {cols = 1, rows = 2, behind = true, fullscreen = true, image = "mainmenu1"})
 	self.text = Widgets.Label()
 	-- Save slot settings.
 	self.combo_file = Widgets.ComboBox({
@@ -10,9 +10,9 @@ Host.new = function(clss)
 		{"Save #3", function() self:set_slot(3) end},
 		{"Save #4", function() self:set_slot(4) end},
 		{"Save #5", function() self:set_slot(5) end}})
-	self.combo_file:activate{index = Config.inst.host_saveslot}
+	self.combo_file:activate{index = Client.config.host_saveslot}
 	-- Account settings.
-	self.entry_account = Widgets.Entry{text = Config.inst.host_account}
+	self.entry_account = Widgets.Entry{text = Client.config.host_account}
 	self.entry_password = Widgets.Entry{password = true}
 	self.toggle_restart = Widgets.Toggle()
 	self.group_account = Widgets.Frame{style = "default", cols = 2, rows = 5}
@@ -37,45 +37,66 @@ Host.new = function(clss)
 	self.group = Widget{cols = 3, rows = 1}
 	self.group:set_expand{col = 1, row = 1}
 	self.group:set_expand{col = 3}
-	self.group:set_child{col = 2, row = 1, widget = self.group_account}
+	self.group:set_child(2, 1, self.group_account)
+	self.group1 = Widget{cols = 1, rows = 3}
+	self.group1:set_expand{col = 1, row = 1}
+	self.group1:set_child(1, 1, self.text)
+	self.group1:set_child(1, 2, self.group)
+	self.group1:set_child(1, 3, self.group_buttons)
 	self:set_expand{col = 1, row = 1}
-	self:set_child{col = 1, row = 1, widget = self.text}
-	self:set_child{col = 1, row = 2, widget = self.group}
-	self:set_child{col = 1, row = 3, widget = self.group_buttons}
+	self:set_child(1, 2, self.group1)
 	return self
 end
 
---- Returns back to the main menu.
--- @param self Join.
-Host.back = function(self)
-	Startup.inst:set_mode("main")
+--- Returns back to the login screen.
+-- @param self Host view.
+Views.Host.back = function(self)
+	Client:set_mode("login")
 end
 
---- Launches the game.
--- @param self Join.
-Host.play = function(self)
+--- Closes the host view.
+-- @param self Host view.
+Views.Host.close = function(self)
+	self.floating = false
+end
+
+--- Enters the host view.
+-- @param self Host view.
+Views.Host.enter = function(self)
+	self.floating = true
+end
+
+--- Initiates hosting of a game.
+-- @param self Host view.
+Views.Host.play = function(self)
+	-- Save config.
 	local saveslot = self.combo_file.value or 1
 	local account = self.entry_account.text
 	local password = self.entry_password.text
-	args = string.format("--host localhost %d --file %d", 10101, saveslot)
+	Client.config.host_saveslot = saveslot
+	Client.config.host_account = account
+	Client.config:save()
+	-- Setup hosting.
+	Settings.address = "localhost"
+	Settings.file = saveslot
+	Settings.generate = self.toggle_restart.active
+	Settings.host = true
+	Settings.port = 10101
 	if account and #account > 0 then
-		args = string.format("%s --account %s", args, account)
+		Settings.account = account
+	else
+		Settings.account = "guest"
 	end
 	if password and #password > 0 then
-		args = string.format("%s --password %s", args, password)
+		Settings.password = password
+	else
+		Settings.password = ""
 	end
-	if self.toggle_restart.active then
-		args = args .. " -g"
-	end
-	Program:launch_mod{name = "lipsofsuna", args = args}
-	Program.quit = true
-	Config.inst.host_saveslot = saveslot
-	Config.inst.host_account = account
-	Config.inst:save()
+	Client:set_mode("startup")
 end
 
 ---- Sets the active saveslot.
 --- @param self Startup.
 --- @param slot Saveslot number.
-Host.set_slot = function(self, slot)
+Views.Host.set_slot = function(self, slot)
 end
