@@ -146,11 +146,25 @@ Views.Options.new = function(clss)
 	self:load()
 	-- Make sure that shaders are compiled.
 	self.shader_quality = self.shader_quality
+	-- Prepare the standalone mode.
+	self.button_back = Widgets.Label{font = "mainmenu", text = "Back", pressed = function() self:back() end}
+	self.group_buttons = Widget{cols = 3, rows = 1, margins = {bottom = 30}, spacings = {horz = 30}}
+	self.group_buttons:set_expand{col = 1}
+	self.group_buttons:set_expand{col = 3}
+	self.group_buttons:set_child(2, 1, self.button_back)
+	self.background = Widgets.Background{cols = 3, rows = 3, behind = true, fullscreen = true, image = "mainmenu1"}
+	self.background:set_expand{col = 1, row = 1}
+	self.background:set_expand{col = 3}
+	self.background:set_child(2, 3, self.group_buttons)
 	return self
 end
 
 Views.Options.back = function(self)
-	Client:set_mode("menu")
+	if self.background.floating then
+		Client:set_mode("login")
+	else
+		Client:set_mode("menu")
+	end
 end
 
 --- Saves the options after a delay.<br/>
@@ -167,6 +181,27 @@ Views.Options.changed = function(self)
 		self:save()
 		timer:disable()
 	end}
+end
+
+--- Closes the options view.
+-- @param self Options view.
+Views.Options.close = function(self)
+	-- Close standalone mode.
+	if self.background.floating then
+		self.background.floating = false
+		self.background:set_child(2, 2, nil)
+	end
+end
+
+--- Shows the options screen.
+-- @param self Options.
+-- @param from Name of the previous mode.
+Views.Options.enter = function(self, from)
+	-- Standalone mode if opened from the login screen.
+	if from == "login" then
+		self.background:set_child(2, 2, self)
+		self.background.floating = true
+	end
 end
 
 Views.Options.load = function(self)
