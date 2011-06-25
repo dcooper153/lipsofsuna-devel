@@ -10,13 +10,15 @@ Views.Login.new = function(clss)
 	-- Menu labels.
 	self.button_host = Widgets.Label{font = "mainmenu", text = "Host", pressed = function() Client:set_mode("host") end}
 	self.button_join = Widgets.Label{font = "mainmenu", text = "Join", pressed = function() Client:set_mode("join") end}
+	self.button_controls = Widgets.Label{font = "mainmenu", text = "Controls", pressed = function() Client:set_mode("controls") end}
 	self.button_quit = Widgets.Label{font = "mainmenu", text = "Quit", pressed = function() Program:shutdown() end}
-	self.group_buttons = Widget{cols = 5, rows = 1, margins = {bottom = 30}, spacings = {horz = 40}}
+	self.group_buttons = Widget{cols = 6, rows = 1, margins = {bottom = 30}, spacings = {horz = 40}}
 	self.group_buttons:set_expand{col = 1}
-	self.group_buttons:set_expand{col = 5}
+	self.group_buttons:set_expand{col = 6}
 	self.group_buttons:set_child{col = 2, row = 1, widget = self.button_host}
 	self.group_buttons:set_child{col = 3, row = 1, widget = self.button_join}
-	self.group_buttons:set_child{col = 4, row = 1, widget = self.button_quit}
+	self.group_buttons:set_child{col = 4, row = 1, widget = self.button_controls}
+	self.group_buttons:set_child{col = 5, row = 1, widget = self.button_quit}
 	-- Main.
 	self:set_expand{col = 1, row = 1}
 	self:set_child(1, 2, self.group_buttons)
@@ -46,7 +48,7 @@ Views.Login.enter = function(self, from)
 		Player.object = nil
 		Gui.main.floating = false
 	end
-	if from ~= "join" and from ~= "host" then
+	if from ~= "controls" and from ~= "join" and from ~= "host" then
 		Sound:switch_music_track("menu")
 	end
 	-- Show the UI.

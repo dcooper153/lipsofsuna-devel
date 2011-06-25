@@ -5,17 +5,27 @@ Views.Controls.mode = "controls"
 
 Views.Controls.new = function(clss)
 	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0, 0}})
+	self.title = Widgets.Frame{style = "title", text = "Controls"}
 	self.list = Widgets.List{page_size = 15}
 	self.list:set_request{width = 100, height = 300}
-	self.button = Widgets.Button{text = "Save bindings", pressed = function() self:save() end}
+	self.button_save = Widgets.Button{text = "Save bindings", pressed = function() self:save() end}
 	self.frame = Widgets.Frame{style = "default", cols = 1, rows = 2}
 	self.frame:set_expand{col = 1, row = 1}
 	self.frame:set_child(1, 1, self.list)
-	self.frame:set_child(1, 2, self.button)
-	self.title = Widgets.Frame{style = "title", text = "Controls"}
+	self.frame:set_child(1, 2, self.button_save)
 	self:set_expand{col = 1, row = 2}
 	self:set_child(1, 1, self.title)
 	self:set_child(1, 2, self.frame)
+	-- Prepare the standalone mode.
+	self.button_back = Widgets.Label{font = "mainmenu", text = "Back", pressed = function() self:back() end}
+	self.group_buttons = Widget{cols = 3, rows = 1, margins = {bottom = 30}, spacings = {horz = 30}}
+	self.group_buttons:set_expand{col = 1}
+	self.group_buttons:set_expand{col = 3}
+	self.group_buttons:set_child(2, 1, self.button_back)
+	self.background = Widgets.Background{cols = 3, rows = 3, behind = true, fullscreen = true, image = "mainmenu1"}
+	self.background:set_expand{col = 1, row = 1}
+	self.background:set_expand{col = 3}
+	self.background:set_child(2, 3, self.group_buttons)
 	-- Create the popup.
 	self.popup_label = Widgets.Label()
 	self.popup = Widgets.Frame{style = "tooltip", cols = 1, rows = 1}
@@ -28,15 +38,24 @@ Views.Controls.new = function(clss)
 end
 
 Views.Controls.back = function(self)
-	Client:set_mode("menu")
+	if self.background.floating then
+		Client:set_mode("login")
+	else
+		Client:set_mode("menu")
+	end
 end
 
---- Closes the contorls view.
+--- Closes the controls view.
 -- @param self Controls view.
 Views.Controls.close = function(self)
 	-- Cancel the control grab.
 	self.editing_binding = nil
 	self.popup.visible = false
+	-- Close standalone mode.
+	if self.background.floating then
+		self.background.floating = false
+		self.background:set_child(2, 2, nil)
+	end
 end
 
 Views.Controls.edit = function(self, widget)
@@ -45,6 +64,17 @@ Views.Controls.edit = function(self, widget)
 	self.editing_binding = widget
 	self.editing_binding_key = "key1"
 	self.editing_binding_motion = Vector()
+end
+
+--- Shows the controls screen.
+-- @param self Controls view.
+-- @param from Name of the previous mode.
+Views.Controls.enter = function(self, from)
+	-- Standalone mode if opened from the login screen.
+	if from == "login" then
+		self.background:set_child(2, 2, self)
+		self.background.floating = true
+	end
 end
 
 --- Hijacks all input events when editing a binding.<br/>
