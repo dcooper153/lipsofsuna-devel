@@ -47,7 +47,7 @@ Itemspec{
 Itemspec{
 	name = "iron halberd",
 	model = "halberd1",
-	icon = "dagger1", --FIXME
+	icon = "staff1", --FIXME
 	animation_attack = "attack staff",
 	animation_charge = "charge staff",
 	animation_hold = "hold staff",
@@ -62,7 +62,7 @@ Itemspec{
 Itemspec{
 	name = "iron spear",
 	model = "spear1",
-	icon = "dagger1", --FIXME
+	icon = "staff1", --FIXME
 	categories = {"melee", "weapon"},
 	crafting_materials = {["iron"] = 4},
 	effect_attack_speedline = true,
