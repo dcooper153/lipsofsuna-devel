@@ -133,6 +133,20 @@ Obstaclespec{
 	interactive = false}
 
 Obstaclespec{
+	name = "rooftile 1",
+	model = "rooftile1",
+	categories = {"prop"},
+	health = 100,
+	interactive = false}
+
+Obstaclespec{
+	name = "roofside 1",
+	model = "rooffill1",
+	categories = {"prop"},
+	health = 100,
+	interactive = false}
+
+Obstaclespec{
 	name = "wooden mine support (simple)",
 	model = "minesupport3",
 	categories = {"prop"},
