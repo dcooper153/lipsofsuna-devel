@@ -20,7 +20,8 @@ Obstaclespec.dict_name = {}
 --   <li>mass: Mass in kilograms.</li>
 --   <li>model: Model to use for the obstacle.</li>
 --   <li>name: Name of the obstacle type.</li>
---   <li>physics: Physics mode.</li></ul>
+--   <li>physics: Physics mode.</li>
+--   <li>special_effects: List of special effects to render. (see itemspec for details)</li></ul>
 -- @return New item specification.
 Obstaclespec.new = function(clss, args)
 	local self = Spec.new(clss, args)
@@ -37,6 +38,7 @@ Obstaclespec.new = function(clss, args)
 	copy("interactive", true)
 	copy("mass", 10)
 	copy("physics", "static")
+	copy("special_effects", {})
 	return self
 end
 

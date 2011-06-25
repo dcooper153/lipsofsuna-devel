@@ -61,7 +61,7 @@ Species.dict_name = {}
 --   <li>skills: List of skills.</li>
 --   <li>skin_shader: Skin shader name.</li>
 --   <li>skin_textures: List of skin textures.</li>
---   <li>special_effects: List of special effects to render.</li>
+--   <li>special_effects: List of special effects to render. (see itemspec for details)</li>
 --   <li>speed_run: Turning speed in meters per second.</li>
 --   <li>speed_walk: Walking speed in meters per second.</li>
 --   <li>swim_force: Mass-independent upward swim force of the creature.</li>

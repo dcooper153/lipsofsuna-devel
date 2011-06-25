@@ -47,7 +47,17 @@ Itemspec.dict_name = {}
 --   <li>mass_inventory: Mass in the inventory, in kilograms.</li>
 --   <li>model: Model to use for the item.</li>
 --   <li>name: Name of the item type.</li>
---   <li>special_effects: List of special effects to render.</li>
+--   <li>special_effects: List of special effects to render.<ul>
+--       <li>ambient: Light ambient color. (array of 4 numbers)</li>
+--       <li>diffuse: Light diffuse color. (array of 4 numbers)</li>
+--       <li>type: Effect type. ("model"/"light")</li>
+--       <li>equation: Light attunuation equation. (array of 3 numbers)</li>
+--       <li>priority: Light priority. (number)</li>
+--       <li>model: Model name. (string)</li>
+--       <li>node: Node name to which to anchor the effect. (string)</li>
+--       <li>offset: Distance from the anchor in world units. (vector)</li>
+--       <li>rotate: True to make the effect rotate with the parent. (boolean)</li>
+--   </ul></li>
 --   <li>stacking: True to allow the item to stack in the inventory.</li></ul>
 -- @return New item specification.
 Itemspec.new = function(clss, args)

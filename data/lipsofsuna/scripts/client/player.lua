@@ -1,6 +1,6 @@
 Player = Class()
-Player.light = Light{ambient = {0.3,0.3,0.4,1.0}, diffuse={0.6,0.6,0.7,1.0}, equation={1.5,0.2,0.1}, priority = 2}
-Player.light_spell = Light{ambient = {0.1,0.1,0.1,1}, diffuse={1,1,1,1}, equation={1.5,0,0.05}, priority = 2}
+Player.light = Light{ambient = {0.3,0.3,0.4,1.0}, diffuse={0.6,0.6,0.7,1.0}, equation={1.5,0.2,0.1}, priority = 10}
+Player.light_spell = Light{ambient = {0.1,0.1,0.1,1}, diffuse={1,1,1,1}, equation={1.5,0,0.05}, priority = 5}
 Player.species = "aer" -- FIXME
 
 local radian_wrap = function(x)

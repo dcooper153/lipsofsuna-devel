@@ -848,6 +848,6 @@ Itemspec{
 	influences_bonus = {perception = 0.005, willpower = 0.005},
 	mass = 7,
 	special_effects = {
-		{slot = "flame", model = "torchfx1"},
-		{slot = "flame2", model = "torchfx1"}},
+		{node = "#flame", model = "torchfx1"},
+		{node = "#flame2", model = "torchfx1"}},
 	water_gravity = Vector(0,6,0)}

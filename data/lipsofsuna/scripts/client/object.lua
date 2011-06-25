@@ -37,18 +37,25 @@ Object.detach = function(self)
 	-- Hide special effects.
 	if self.special_effects then
 		for k,v in pairs(self.special_effects) do
-			v.realized = false
+			if v.enabled then
+				v.enabled = false
+			else
+				v.realized = false
+			end
 		end
+		self.special_effects = nil
 	end
 	-- Hide speed lines.
 	if self.speedline then
 		self.speedline.realized = false
+		self.speedline = nil
 	end
 	-- Hide equipment.
 	if self.slots then
 		for k,v in pairs(self.slots.slots) do
 			v:detach()
 		end
+		self.slots = nil
 	end
 	-- Hide self.
 	self.realized = false
@@ -306,10 +313,18 @@ Object.update = function(self, secs)
 	-- Update special effects.
 	if self.realized then
 		if self.special_effects then
-			local p = self.position
 			for k,v in pairs(self.special_effects) do
-				local n = self:find_node{name = v.slot}
-				if n then p = p + self.rotation * n end
+				local p = self.position
+				local r = self.rotation
+				if v.node then
+					local np,nr = self:find_node{name = v.node}
+					if np then
+						p = p + r * np
+						r = r * nr
+					end
+				end
+				if v.offset then p = p + v.offset end
+				if v.rotate then v.rotation = r end
 				v.position = p
 			end
 		end
@@ -346,12 +361,23 @@ Object.update_model = function(self)
 		self:animate{animation = "empty", channel = Animation.CHANNEL_TILT,
 			weight = 1000, permanent = true}
 	end
-	-- Create special effects.
+	-- Detach old special effects.
+	if self.special_effects then
+		for k,v in pairs(self.special_effects) do v:detach() end
+		self.special_effects = nil
+	end
+	-- Create new special effects.
 	if self.spec and self.spec.special_effects and #self.spec.special_effects then
 		self.special_effects = {}
 		for k,v in pairs(self.spec.special_effects) do
-			local fx = Object{model = v.model, position = self.position, realized = true, slot = "#" .. v.slot}
-			table.insert(self.special_effects, fx)
+			if v.type == "light" then
+				local fx = Light{ambient = v.ambient, diffuse = v.diffuse, node = v.node,
+					equation = v.equation, position = self.position, enabled = true}
+				table.insert(self.special_effects, fx)
+			else
+				local fx = Object{model = v.model, node = v.node, position = self.position, realized = true}
+				table.insert(self.special_effects, fx)
+			end
 		end
 	else
 		self.special_effects = nil
