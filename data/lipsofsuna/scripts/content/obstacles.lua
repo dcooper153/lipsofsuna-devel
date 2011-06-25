@@ -181,3 +181,13 @@ Obstaclespec{
 	health = 100,
 	interactive = true,
 	physics = "rigid"}
+
+Obstaclespec{
+	name = "lips sun",
+	model = "torch1",
+	categories = {"prop"},
+	collision_mask = 0xFFFF,
+	special_effects = {
+	  {type = "light", diffuse = {1,0.7,0.6,1}, equation = {0.1,0.1,0.01}, node = "#root"}
+	},
+	health = 100}
