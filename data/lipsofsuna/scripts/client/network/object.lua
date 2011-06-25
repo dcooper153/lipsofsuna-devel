@@ -75,7 +75,7 @@ Protocol:add_handler{type = "OBJECT_DIALOG_NONE", func = function(args)
 end}
 
 Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
-	local ok,i,a = event.packet:read("uint32", "string")
+	local ok,i,a,move = event.packet:read("uint32", "string", "uint8")
 	if not ok then return end
 	-- Find the object.
 	local obj = Object:find{id = i}
@@ -98,6 +98,17 @@ Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
 			local w = obj.slots:get_object{slot = anim.slot}
 			if w then w.speedline = Speedline{delay = 0.3, duration = 0.8, object = w} end
 		end
+	end
+	-- Melee feats may further override the animation since controls affect
+	-- what move the player performs. This is indicated with the move variable.
+	if move ~= 0 then
+		local map = {
+			"attack stand",
+			"attack left",
+			"attack right",
+			"attack back",
+			"attack front"}
+		animation = map[move] or animation
 	end
 	-- Play the animation.
 	obj:animate_spec(animation)
@@ -147,7 +158,7 @@ Protocol:add_handler{type = "OBJECT_MOVED", func = function(event)
 					["strafe left"] = o.spec.speed_run,
 					["strafe right"] = o.spec.speed_run,
 					["walk"] = o.spec.speed_walk,
-					["walk back"] = o.spec.speed_walk}
+					["walk back"] = o.spec.speed_run}
 				for k,v in pairs(o.spec.animations) do
 					if v.animation == a.animation and map[k] then
 						ref = map[k]

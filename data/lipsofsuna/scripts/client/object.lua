@@ -150,7 +150,8 @@ Object.create_character_model = function(self, args)
 	end
 	-- Colorize materials.
 	m:edit_material{match_shader = "hair", diffuse = args.hair_color}
-	m:edit_material{match_shader = "skin", diffuse = args.skin_color}
+	m:edit_material{match_shader = "skin", diffuse = args.skin_color,
+		shader = species.skin_shader, textures = species.skin_textures}
 	m:edit_material{match_texture = "eye1", diffuse = args.eye_color}
 	-- Recalculate bounding box.
 	m:calculate_bounds()
@@ -161,7 +162,7 @@ Object.create_character_model = function(self, args)
 	local scale = species.body_scale[1] * (1 - factor) + species.body_scale[2] * factor
 	self.animated = true
 	self:animate{animation = "empty", channel = Animation.CHANNEL_CUSTOMIZE,
-		weight = 0, weight_scale = 1, permanent = true}
+		weight = 0, weight_scale = 1000, fade_in = 0, fade_out = 0, permanent = true}
 	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "mover", scale = scale}
 	-- Apply initial deformation.
 	self:update_animations{secs = 0}

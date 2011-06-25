@@ -59,6 +59,8 @@ Species.dict_name = {}
 --   <li>skill_regen: Skill regeneration speed in units per second.</li>
 --   <li>skill_quota: Number of skill points the creature can distribute over skills.</li>
 --   <li>skills: List of skills.</li>
+--   <li>skin_shader: Skin shader name.</li>
+--   <li>skin_textures: List of skin textures.</li>
 --   <li>special_effects: List of special effects to render.</li>
 --   <li>speed_run: Turning speed in meters per second.</li>
 --   <li>speed_walk: Walking speed in meters per second.</li>
@@ -246,6 +248,8 @@ Species.new = function(clss, args)
 	copy("mass", 50)
 	copy("skill_regen", 0.5)
 	copy("skill_quota", 200)
+	copy("skin_shader")
+	copy("skin_textures")
 	copy("special_effects", {})
 	copy("speed_walk", 3)
 	copy("speed_run", 6)

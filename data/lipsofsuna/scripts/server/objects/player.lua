@@ -225,7 +225,7 @@ Player.vision_cb = function(self, args)
 		end,
 		["object-feat"] = function(args)
 			local o = args.object
-			self:send{packet = Packet(packets.OBJECT_FEAT, "uint32", o.id, "string", args.anim.name)}
+			self:send{packet = Packet(packets.OBJECT_FEAT, "uint32", o.id, "string", args.anim.name, "uint8", args.move or 0)}
 		end,
 		["object-hidden"] = function(args)
 			local o = args.object
