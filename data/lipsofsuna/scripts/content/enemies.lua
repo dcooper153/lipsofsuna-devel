@@ -257,7 +257,7 @@ Species{
 	-- categories = {"enemy"},
 	difficulty = 0,
 	effect_physical_damage = "fleshimpact1",
-	factions = {"evil"},
+	factions = {"neutral"},
 	feat_anims = {"bite"},
 	feat_effects = {"strength to physical damage"},
 	inventory_size = 3,
