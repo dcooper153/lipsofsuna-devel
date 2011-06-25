@@ -352,8 +352,15 @@ int liext_object_update (
 	LIAlgList* ptr;
 	LIAlgList* next;
 	LIMatTransform transform;
+	LIMatVector vector;
+	LIPhyObject* phyobj;
+	LIPhyPhysics* physics;
 	LISndSource* source;
 
+	/* Find the optional physics manager. */
+	physics = limai_program_find_component (module->program, "physics");
+
+	/* Update each sound source. */
 	for (ptr = self->sounds ; ptr != NULL ; ptr = next)
 	{
 		next = ptr->next;
@@ -367,9 +374,15 @@ int liext_object_update (
 			lieng_object_get_transform (object, &transform);
 			lisnd_source_set_position (source, &transform.position);
 		}
-		// TODO: Use the physics component to get the velocity.
-		//lieng_object_get_velocity (engobj, &vector);
-		//lisnd_source_set_velocity (source, &vector);
+		if (physics)
+		{
+			phyobj = liphy_physics_find_object (physics, object->id);
+			if (phyobj != NULL)
+			{
+				liphy_object_get_velocity (phyobj, &vector);
+				lisnd_source_set_velocity (source, &vector);
+			}
+		}
 		if (!lisnd_source_update (source, secs))
 		{
 			lisnd_source_free (source);

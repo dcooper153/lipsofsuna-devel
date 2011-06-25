@@ -34,6 +34,7 @@ static void Sound_effect (LIScrArgs* args)
 	const char* effect;
 	LIEngObject* object;
 	LIExtModule* module;
+	LIMatVector velocity;
 	LIScrData* data;
 	LISndSource* source;
 
@@ -53,6 +54,8 @@ static void Sound_effect (LIScrArgs* args)
 				lisnd_source_set_pitch (source, pitch);
 			if (liscr_args_gets_float (args, "volume", &volume))
 				lisnd_source_set_volume (source, volume);
+			if (liscr_args_gets_vector (args, "velocity", &velocity))
+				lisnd_source_set_velocity (source, &velocity);
 		}
 	}
 #endif
