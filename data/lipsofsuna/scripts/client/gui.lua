@@ -60,7 +60,7 @@ Gui.init = function(clss)
 	Gui.group_middle:set_expand{col = 1, row = 1}
 	Gui.group_middle:set_child(1, 1, Gui.menus)
 	Gui.group_middle:set_child(2, 1, Gui.group_dialog)
-	Gui.scene = Widgets.Scene{cols = 1, rows = 3, camera = Player.camera, margins = {5,5,0,0}, spacings = {0,0}}
+	Gui.scene = Widgets.Scene{cols = 1, rows = 3, margins = {5,5,0,0}, spacings = {0,0}}
 	Gui.scene:set_expand{col = 1, row = 1}
 	Gui.scene:set_child(1, 1, Gui.group_top)
 	Gui.scene:set_child(1, 2, Gui.group_middle)

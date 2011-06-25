@@ -1,4 +1,6 @@
 require "client/config"
+require "client/firstpersoncamera"
+require "client/thirdpersoncamera"
 
 Client = Class()
 Client.class_name = "Client"
@@ -31,6 +33,24 @@ Client.init = function(self)
 	self.views.quests = Views.Quests()
 	self.views.skills = Views.Skills{main = true, sync = true}
 	self.views.startup = Views.Startup()
+	-- Initialize the camera.
+	local camcfg = {collision_mask = Physics.MASK_CAMERA, far = 40.0, fov = 1.1, near = 0.01, position_smoothing = 0.15, rotation_smoothing = 0.15}
+	self.camera1 = FirstPersonCamera(camcfg)
+	self.camera3 = ThirdPersonCamera(camcfg)
+	self.camera_mode = "third-person"
+end
+
+--- Applies a world space quake.
+-- @param self Client class.
+-- @param point Quake point in world space.
+-- @param magnitude Quake magnitude.
+Client.apply_quake = function(self, point, magnitude)
+	if point and magnitude and self.player_object then
+		local dist = (self.player_object.position - point).length
+		local quake = math.min(math.max(magnitude / (0.05 * dist * dist + 0.5), 0), 1)
+		self.camera1.quake = math.max(self.camera1.quake or 0, quake)
+		self.camera3.quake = math.max(self.camera3.quake or 0, quake)
+	end
 end
 
 Client.set_mode = function(self, mode, level)
@@ -61,9 +81,25 @@ Client.set_mode = function(self, mode, level)
 end
 
 Client:add_class_getters{
+	camera_mode = function(self)
+		if self.camera == self.camera1 then
+			return "first-person"
+		else
+			return "third-person"
+		end
+	end,
 	player_object = function(self) return Player.object end}
 
 Client:add_class_setters{
+	camera_mode = function(self, v)
+		if v == "first-person" then
+			self.camera = self.camera1
+		else
+			self.camera = self.camera3
+		end
+		self.camera:reset()
+		Gui.scene.camera = self.camera
+	end,
 	player_object = function(self, v)
 		Client.views.skills:set_species(v.spec)
 		self.views.feats:set_race(v.spec.name)

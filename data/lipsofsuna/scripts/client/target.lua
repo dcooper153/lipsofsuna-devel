@@ -62,7 +62,7 @@ Target.select_scene = function(self)
 	if self.active then
 		local func = self.func
 		self:cancel()
-		local pos,obj = self:pick_ray{camera = Player.camera}
+		local pos,obj = self:pick_ray{camera = Client.camera}
 		if obj then
 			func("obj", obj.id)
 		else

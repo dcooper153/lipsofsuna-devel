@@ -119,7 +119,10 @@ Eventhandler{type = "tick", func = function(self, args)
 	if Player.object then
 		Player:update_pose(args.secs)
 		Player:update_rotation(args.secs)
-		Player:update_camera(args.secs)
+		Client.camera1.object = Client.player_object
+		Client.camera3.object = Client.player_object
+		Client.camera1:update(args.secs)
+		Client.camera3:update(args.secs)
 		Player:update_light(args.secs)
 		-- Sound playback.
 		Sound.listener_position = Player.object.position

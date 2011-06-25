@@ -7,17 +7,16 @@ Action{name = "block", mode = "toggle", key1 = "mouse3", func = function(v)
 end}
 
 Action{name = "camera", mode = "press", key1 = Keysym.y, func = function()
-	if Player.camera.mode == "first-person" then
-		Player.camera.mode = "third-person"
+	if Client.camera_mode == "first-person" then
+		Client.camera_mode = "third-person"
 		if Player.object then
 			local e = Player.object.rotation.euler
 			e[3] = 0
 			Player.object.rotation = Quaternion{euler = e}
 		end
 	else
-		Player.camera.mode = "first-person"
+		Client.camera_mode = "first-person"
 	end
-	Player.camera:reset()
 end}
 
 Action{name = "chat", mode = "press", key1 = Keysym.t, func = function()
@@ -189,7 +188,7 @@ end}
 Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
 	local scale = 0.01 * Client.views.options.mouse_sensitivity
 	if Action.dict_press[Keysym.LCTRL] then
-		Player.camera_turn_state = Player.camera_turn_state + v * scale
+		Client.camera.turn_state = Client.camera.turn_state + v * scale
 	else
 		Player.turn_state = Player.turn_state - v * scale
 	end
@@ -198,7 +197,7 @@ end}
 Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 	local scale = 0.01 * Client.views.options.mouse_sensitivity
 	if Action.dict_press[Keysym.LCTRL] then
-		Player.camera_tilt_state = Player.camera_tilt_state - v * scale
+		Client.camera.tilt_state = Client.camera.tilt_state - v * scale
 	else
 		Player.tilt_state = Player.tilt_state + v * scale
 	end
@@ -209,5 +208,5 @@ Action{name = "use", mode = "press", key1 = Keysym.e, func = function()
 end}
 
 Action{name = "zoom", mode = "analog", key1 = "mouse4", key2 = "mouse5", func = function(v)
-	Player.camera:zoom{rate = 1 * v}
+	Client.camera:zoom{rate = 1 * v}
 end}

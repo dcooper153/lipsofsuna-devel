@@ -25,7 +25,7 @@ Effect.play_object = function(clss, name, object, node)
 		sound_positional = effect.sound_positional,
 		realized = true}
 	-- Quake the camera.
-	Player:apply_quake(object.position, effect.quake)
+	Client:apply_quake(object.position, effect.quake)
 end
 
 Effect.play_world = function(clss, name, position)
@@ -42,7 +42,7 @@ Effect.play_world = function(clss, name, position)
 		sound_positional = effect.sound_positional,
 		realized = true}
 	-- Quake the camera.
-	Player:apply_quake(Vector(x,y,z), effect.quake)
+	Client:apply_quake(Vector(x,y,z), effect.quake)
 end
 
 EffectObject = Class(Object)

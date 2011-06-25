@@ -223,7 +223,7 @@ Object.set_skill = function(self, s, v, m)
 			end
 			-- Quake the camera if the player was hurt.
 			if self == Player.object and diff < -5 then
-				Player:apply_quake(self.position, 0.01 * (5 - diff))
+				Client:apply_quake(self.position, 0.01 * (5 - diff))
 			end
 		end
 		self.health = v
