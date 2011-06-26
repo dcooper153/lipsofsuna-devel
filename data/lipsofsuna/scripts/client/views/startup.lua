@@ -70,6 +70,7 @@ Views.Startup.retry = function(self)
 	if Settings.host then
 		-- Host a game.
 		local opts = string.format("--file %s --server %s %d", Settings.file, Settings.address, Settings.port)
+		if Settings.admin then opts = opts .. " -d" end
 		if Settings.generate then opts = opts .. " -g" end
 		Program:unload_world()
 		Program:launch_server(opts)

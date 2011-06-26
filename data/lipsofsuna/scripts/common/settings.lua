@@ -39,6 +39,9 @@ Settings.parse_command_line = function(clss)
 				clss.account = a[i]
 				i = i + 1
 			end
+		elseif a[i] == "--admin" or a[i] == "-d" then
+			clss.admin = true
+			i = i + 1
 		elseif a[i] == "--editor" or a[i] == "-E" then
 			clss.editor = true
 			i = i + 1
@@ -95,6 +98,7 @@ Settings.parse_command_line = function(clss)
 	if clss.client and clss.server then return end
 	if clss.client and clss.editor then return end
 	if clss.editor and clss.server then return end
+	if clss.admin and not clss.host and not clss.server then return end
 	if not clss.host and not clss.server and clss.generate then return end
 	return true
 end
@@ -107,6 +111,7 @@ Settings.usage = function(clss)
 
 Options:
   -a --account <account>      Name of the player account.
+  -d --admin                  Play as an admin on a hosted server.
   -E --editor <pattern>       Edit a map region.
   -f --file <number>          Save file number.
   -g --generate               Generate a new map.

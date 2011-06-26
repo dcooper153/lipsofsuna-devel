@@ -111,8 +111,16 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
 			end
 		end
 	end
-	-- Inform about admin privileges.
+	-- Check for permissions.
+	-- Check if the account has admin rights in the config file.
+	-- Grant admin rights to the first client if started with --admin.
 	local admin = (Config.inst.admins[login] == true)
+	if Settings.admin then
+		Settings.admin = nil
+		Config.inst.admins[login] = true
+		admin = true
+	end
+	-- Inform about admin privileges.
 	Network:send{client = args.client, packet = Packet(packets.ADMIN_PRIVILEGE, "bool", admin)}
 	-- Enter the character creation mode.
 	if not created then

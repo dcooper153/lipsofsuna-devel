@@ -15,7 +15,8 @@ Views.Host.new = function(clss)
 	self.entry_account = Widgets.Entry{text = Client.config.host_account}
 	self.entry_password = Widgets.Entry{password = true}
 	self.toggle_restart = Widgets.Toggle()
-	self.group_account = Widgets.Frame{style = "default", cols = 2, rows = 5}
+	self.toggle_admin = Widgets.Toggle()
+	self.group_account = Widgets.Frame{style = "default", cols = 2, rows = 6}
 	self.group_account:set_expand{col = 2, row = 4}
 	self.group_account:set_child{col = 1, row = 1, widget = Widgets.Label{text = "Savefile:"}}
 	self.group_account:set_child{col = 2, row = 1, widget = self.combo_file}
@@ -23,8 +24,10 @@ Views.Host.new = function(clss)
 	self.group_account:set_child{col = 2, row = 2, widget = self.entry_account}
 	self.group_account:set_child{col = 1, row = 3, widget = Widgets.Label{text = "Password:"}}
 	self.group_account:set_child{col = 2, row = 3, widget = self.entry_password}
-	self.group_account:set_child{col = 1, row = 5, widget = Widgets.Label{text = "Restart:"}}
-	self.group_account:set_child{col = 2, row = 5, widget = self.toggle_restart}
+	self.group_account:set_child{col = 1, row = 5, widget = Widgets.Label{text = "Admin:"}}
+	self.group_account:set_child{col = 2, row = 5, widget = self.toggle_admin}
+	self.group_account:set_child{col = 1, row = 6, widget = Widgets.Label{text = "Restart:"}}
+	self.group_account:set_child{col = 2, row = 6, widget = self.toggle_restart}
 	-- Menu labels.
 	self.button_play = Widgets.Label{font = "mainmenu", text = "Host!", pressed = function() self:play() end}
 	self.button_back = Widgets.Label{font = "mainmenu", text = "Back", pressed = function() self:back() end}
@@ -79,6 +82,7 @@ Views.Host.play = function(self)
 	-- Setup hosting.
 	Settings.address = "localhost"
 	Settings.file = saveslot
+	Settings.admin = self.toggle_admin.active
 	Settings.generate = self.toggle_restart.active
 	Settings.host = true
 	Settings.port = 10101
