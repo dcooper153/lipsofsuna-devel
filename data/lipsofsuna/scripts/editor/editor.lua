@@ -14,16 +14,22 @@ Editor.new = function(clss)
 	self.camera = EditorCamera()
 	self.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equation={1.0,0.0,0.01}, priority = 2}
 	-- Map selector.
+	local maps = {}
+	for k in pairs(Pattern.dict_name) do table.insert(maps, k) end
+	self.combo_maps = Widgets.ComboBox(maps)
+	local combo_map_over = self.combo_maps.pressed
+	self.combo_maps.pressed = function() combo_map_over(self.combo_maps) self.entry_map.text = self.combo_maps.text end
 	self.entry_map = Widgets.Entry()
 	self.button_map = Widgets.Button{text = "Load", pressed = function(w)
 		if #self.entry_map.text == 0 then return end
 		self:load(self.entry_map.text)
 		Settings.pattern = self.entry_map.text
 	end}
-	self.group_map = Widget{cols = 2, rows = 1}
+	self.group_map = Widget{cols = 2, rows = 2}
 	self.group_map:set_expand{col = 1}
-	self.group_map:set_child{col = 1, row = 1, widget = self.entry_map}
-	self.group_map:set_child{col = 2, row = 1, widget = self.button_map}
+	self.group_map:set_child{col = 1, row = 1, widget = self.combo_maps}
+	self.group_map:set_child{col = 1, row = 2, widget = self.entry_map}
+	self.group_map:set_child{col = 2, row = 2, widget = self.button_map}
 	-- Item selector.
 	local items = {}
 	for k in pairs(Itemspec.dict_name) do table.insert(items, k) end
@@ -197,6 +203,7 @@ Editor.pressed = function(self, args)
 	local point,object,tile = Target:pick_ray{camera = self.camera}
 	if not point then return end
 	if args.button ~= 1 then return end
+	self.entry_map.text = self.combo_maps.text
 	if self.mode == "add item" then
 		local spec = Itemspec:find{name = self.combo_items.text}
 		EditorObject{position = point, realized = true, spec = spec}
@@ -232,12 +239,15 @@ Editor.save = function(self)
 	-- Collect objects.
 	for k,v in pairs(Object.objects) do
 		if v.realized and v.spec then
+		print(v.spec.type)
 			if v.spec.type == "item" then
 				table.insert(items, v)
 			elseif v.spec.type == "obstacle" then
 				table.insert(obstacles, v)
 			elseif v.spec.type == "species" then
 				table.insert(species, v)
+			elseif v.spec.type == "region" then
+				table.insert(maps, v)
 			end
 		end
 	end
