@@ -374,7 +374,7 @@ int liext_object_update (
 			lieng_object_get_transform (object, &transform);
 			lisnd_source_set_position (source, &transform.position);
 		}
-		if (physics)
+		if (physics != NULL && object != NULL)
 		{
 			phyobj = liphy_physics_find_object (physics, object->id);
 			if (phyobj != NULL)
