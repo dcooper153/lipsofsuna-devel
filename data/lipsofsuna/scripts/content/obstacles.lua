@@ -104,6 +104,13 @@ Obstaclespec{
 -- Map objects
 
 Obstaclespec{
+	name = "furnace",
+	model = "furnace1",
+	categories = {"prop"},
+	health = 200,
+	interactive = true}
+
+Obstaclespec{
 	name = "wooden fence",
 	model = "fence1",
 	categories = {"prop"},

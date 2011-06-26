@@ -75,6 +75,9 @@
     <url>http://apollo-music.de</url>
   </author-info>
   <author-info>
+    <name>Millz</name>
+  </author-info>
+  <author-info>
     <name>Mysteryem</name>
     <url>http://www.mysterymayhem.co.uk/</url>
   </author-info>
@@ -1141,6 +1144,24 @@
     <comment>This is a special texture used by the fur shader.</comment>
     <status>complete</status>
     <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/furnace1.blend</file>
+    <author>Millz</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>graphics/furnace1.dds</file>
+    <author>Millz</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>graphics/furnace1n.dds</file>
+    <author>Millz</author>
+    <license>Creative Commons BY-SA 3.0</license>
   </asset>
 
   <asset>
