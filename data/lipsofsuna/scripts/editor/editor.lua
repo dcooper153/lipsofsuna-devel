@@ -246,8 +246,6 @@ Editor.save = function(self)
 				table.insert(obstacles, v)
 			elseif v.spec.type == "species" then
 				table.insert(species, v)
-			elseif v.spec.type == "region" then
-				table.insert(maps, v)
 			end
 		end
 	end

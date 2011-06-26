@@ -27,7 +27,7 @@ Selection.new = function(clss, data, face)
 	else
 		self.key = data
 		self.object = data
-		self.visual = EditorObject{model = "select1", position = data.position, rotation = data.rotation, realized = true}
+		self.visual = EditorObject{model = "select2", position = data.position, rotation = data.rotation, realized = true}
 	end
 	self.visual.selection = self
 	return self
