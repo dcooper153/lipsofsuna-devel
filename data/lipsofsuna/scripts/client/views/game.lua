@@ -1,5 +1,4 @@
 Views.Game = Class(Widget)
-Views.Game.mode = "game"
 
 --- Creates a new game view.
 -- @param clss Game view class.

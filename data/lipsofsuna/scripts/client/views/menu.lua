@@ -2,7 +2,6 @@ require "client/widgets/menu"
 
 Views.Menu = Class(Widgets.Menu)
 Views.Menu.class_name = "Views.Menu"
-Views.Menu.mode = "menu"
 
 --- Creates a new menu view.
 -- @param clss Menu view class.
@@ -31,6 +30,10 @@ end
 
 Views.Menu.back = function(self)
 	Client:set_mode("game")
+end
+
+Views.Menu.enter = function(self, from, level)
+	Gui.menus:open{level = level, widget = self}
 end
 
 Views.Menu:add_getters{

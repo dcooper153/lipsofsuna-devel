@@ -136,6 +136,10 @@ function Editing.toggle(clss)
 	Gui.editor_group.visible = clss.visible
 end
 
+Editing.enter = function(self, from, level)
+	Gui.menus:open{level = level, widget = self.dialog}
+end
+
 function Editing.erase(self)
 	local function func(where, id, slot)
 		if where == "map" and slot ~= nil then

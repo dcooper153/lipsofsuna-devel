@@ -2,7 +2,6 @@ require "client/quickslots"
 require "client/widgets/spelleffect"
 
 Views.Feats = Class(Widget)
-Views.Feats.mode = "chargen"
 
 --- Creates a new feat editor.
 -- @param clss Feats class.
@@ -196,8 +195,9 @@ end
 
 --- Executes the feat editor.
 -- @param self Chargen.
-Views.Feats.enter = function(self)
+Views.Feats.enter = function(self, from, level)
 	Quickslots.mode = "feats"
+	Gui.menus:open{level = level, widget = self}
 end
 
 --- Sets the feat animation.

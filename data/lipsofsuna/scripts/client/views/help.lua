@@ -1,7 +1,6 @@
 require "client/widgets/menu"
 
 Views.Help = Class(Widgets.Menu)
-Views.Help.mode = "help"
 
 Views.Help.new = function(clss)
 	local fmt = function(t) return string.gsub(t, "([^\n])\n([^\n])", "%1 %2") end
@@ -48,4 +47,8 @@ end
 
 Views.Help.back = function(self)
 	Client:set_mode("menu")
+end
+
+Views.Help.enter = function(self, from, level)
+	Gui.menus:open{level = level, widget = self}
 end

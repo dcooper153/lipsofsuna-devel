@@ -1,5 +1,4 @@
 Views.Inventory = Class(Widget)
-Views.Inventory.mode = "inventory"
 
 --- Creates a new inventory view.
 -- @param clss Inventory view class.
@@ -97,8 +96,9 @@ end
 --- Enters the inventory view.
 -- @param self Inventory view.
 -- @param from Name of the previous mode.
-Views.Inventory.enter = function(self, from)
+Views.Inventory.enter = function(self, from, level)
 	Quickslots.mode = "items"
+	Gui.menus:open{level = level, widget = self}
 end
 
 --- Gets the contents of an inventory or an equipment slot.

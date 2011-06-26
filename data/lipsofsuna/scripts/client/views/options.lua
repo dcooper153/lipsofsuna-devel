@@ -1,5 +1,4 @@
 Views.Options = Class(Widget)
-Views.Options.mode = "options"
 
 Views.Options.new = function(clss)
 	-- Allocate self.
@@ -196,11 +195,14 @@ end
 --- Shows the options screen.
 -- @param self Options.
 -- @param from Name of the previous mode.
-Views.Options.enter = function(self, from)
-	-- Standalone mode if opened from the login screen.
+Views.Options.enter = function(self, from, level)
 	if from == "login" then
+		-- Standalone mode if opened from the login screen.
 		self.background:set_child(2, 2, self)
 		self.background.floating = true
+	else
+		-- Menu mode if opened when playing.
+		Gui.menus:open{level = level, widget = self}
 	end
 end
 

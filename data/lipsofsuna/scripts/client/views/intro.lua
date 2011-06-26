@@ -1,6 +1,5 @@
 Views.Intro = Class(Widgets.Scene)
 Views.Intro.class_name = "Views.Intro"
-Views.Intro.mode = "intro"
 
 --- Creates a new intro view.
 -- @param clss Intro class.

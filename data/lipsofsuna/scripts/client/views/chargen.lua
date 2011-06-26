@@ -1,6 +1,5 @@
 Views.Chargen = Class(Widgets.Scene)
 Views.Chargen.class_name = "Views.Chargen"
-Views.Chargen.mode = "chargen"
 Views.Chargen.list_races = {
 	{"Aer - female", "aer"},
 	{"Aer - male", "aermale"},

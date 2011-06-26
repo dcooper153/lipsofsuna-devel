@@ -22,6 +22,10 @@ Views.Quests.back = function(self)
 	Client:set_mode("menu")
 end
 
+Views.Quests.enter = function(self, from, level)
+	Gui.menus:open{level = level, widget = self}
+end
+
 --- Gets the compass direction for the currently shown quest.<br/>
 -- The returned direction is in radians. The coordinate convention is:<ul>
 --  <li>north: 0*pi rad</li>

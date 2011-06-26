@@ -1,7 +1,6 @@
 require "client/widgets/binding"
 
 Views.Controls = Class(Widget)
-Views.Controls.mode = "controls"
 
 Views.Controls.new = function(clss)
 	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0, 0}})
@@ -69,11 +68,14 @@ end
 --- Shows the controls screen.
 -- @param self Controls view.
 -- @param from Name of the previous mode.
-Views.Controls.enter = function(self, from)
-	-- Standalone mode if opened from the login screen.
+Views.Controls.enter = function(self, from, level)
 	if from == "login" then
+		-- Standalone mode if opened from the login screen.
 		self.background:set_child(2, 2, self)
 		self.background.floating = true
+	else
+		-- Menu mode if opened while playing.
+		Gui.menus:open{level = level, widget = self}
 	end
 end
 

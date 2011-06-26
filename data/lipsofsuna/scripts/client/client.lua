@@ -72,13 +72,8 @@ Client.set_mode = function(self, mode, level)
 	-- Open the new view.
 	local from = self.mode
 	self.mode = mode
-	if mode == "chargen" or mode == "login" or mode == "startup" then
-		self.view = self.views[mode]
-	else
-		Gui.menus:open{level = level or 1, widget = self.views[mode]}
-		self.view = self.views[mode]
-	end
-	if self.view and self.view.enter then self.view:enter(from) end
+	self.view = self.views[mode]
+	if self.view and self.view.enter then self.view:enter(from, level or 1) end
 end
 
 Client:add_class_getters{

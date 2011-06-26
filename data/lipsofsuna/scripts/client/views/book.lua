@@ -1,6 +1,5 @@
 Views.Book = Class(Widgets.Frame)
 Views.Book.class_name = "Views.Book"
-Views.Book.mode = "book"
 
 --- Initializes the book UI.
 -- @param self Book view class.
@@ -42,6 +41,10 @@ end
 -- @param self Book view.
 Views.Book.back = function(self)
 	Client:set_mode("game")
+end
+
+Views.Book.enter = function(self, from, level)
+	Gui.menus:open{level = level, widget = self}
 end
 
 --- Shows the book UI.

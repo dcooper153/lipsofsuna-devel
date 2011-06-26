@@ -23,6 +23,10 @@ Views.Skills.back = function(self)
 	Client:set_mode("menu")
 end
 
+Views.Skills.enter = function(self, from, level)
+	Gui.menus:open{level = level, widget = self}
+end
+
 --- Sets the species for which the skills are.
 -- @param self Skills.
 -- @param value Species.
