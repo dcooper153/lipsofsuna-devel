@@ -47,6 +47,14 @@ Object.refresh = function(self, args)
 	Los.object_refresh(self.handle, args)
 end
 
+--- The local bounding box of the object.
+-- @name Object.bounding_box
+-- @class table
+
+--- The local center offset of the bounding box of the object.
+-- @name Object.center_offset
+-- @class table
+
 --- The model of the object.
 -- @name Object.model
 -- @class table
@@ -68,6 +76,16 @@ end
 -- @class table
 
 Object:add_getters{
+	bounding_box = function(self)
+		local m = rawget(self, "__model")
+		if not m then return Aabb{point = Vector(-0.1,-0.1,-0.1), size = Vector(0.2,0.2,0.2)} end
+		return m.bounding_box
+	end,
+	center_offset = function(self)
+		local m = rawget(self, "__model")
+		if not m then return Vector() end
+		return m.center_offset
+	end,
 	model = function(s) return rawget(s, "__model") end,
 	model_name = function(s)
 		local m = rawget(s, "__model")

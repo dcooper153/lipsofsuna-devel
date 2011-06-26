@@ -87,6 +87,43 @@ static void Model_changed (LIScrArgs* args)
 	lieng_model_changed (args->self);
 }
 
+static void Model_get_bounding_box (LIScrArgs* args)
+{
+	LIEngModel* self;
+	LIMatVector min;
+	LIMatVector max;
+
+	self = args->self;
+	if (self->model != NULL)
+	{
+		min = self->model->bounds.min;
+		max = self->model->bounds.max;
+	}
+	else
+	{
+		min = limat_vector_init (-0.1f, -0.1f, -0.1f);
+		max = limat_vector_init (0.1f, 0.1f, 0.1f);
+	}
+	liscr_args_seti_vector (args, &min);
+	liscr_args_seti_vector (args, &max);
+}
+
+static void Model_get_center_offset (LIScrArgs* args)
+{
+	LIEngModel* self;
+	LIMatVector ctr;
+
+	self = args->self;
+	if (self->model != NULL)
+	{
+		ctr = limat_vector_add (self->model->bounds.min, self->model->bounds.max);
+		ctr = limat_vector_multiply (ctr, 0.5f);
+	}
+	else
+		ctr = limat_vector_init (0.0f, 0.0f, 0.0f);
+	liscr_args_seti_vector (args, &ctr);
+}
+
 static void Model_load (LIScrArgs* args)
 {
 	int mesh = 1;
@@ -127,6 +164,8 @@ void liscr_script_model (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_copy", Model_copy);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_calculate_bounds", Model_calculate_bounds);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_changed", Model_changed);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_bounding_box", Model_get_bounding_box);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_center_offset", Model_get_center_offset);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_load", Model_load);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_merge", Model_merge);
 }

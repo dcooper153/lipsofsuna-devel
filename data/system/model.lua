@@ -64,6 +64,26 @@ Model.merge = function(self, args)
 	end
 end
 
+--- The local bounding box of the model.
+-- @name Model.bounding_box
+-- @class table
+
+--- The local center offset of the bounding box of the model.
+-- @name Model.center_offset
+-- @class table
+
+Model:add_getters{
+	bounding_box = function(self)
+		local h1,h2 = Los.model_get_bounding_box(self.handle)
+		local min = Class.new(Vector, {handle = h1})
+		local max = Class.new(Vector, {handle = h2})
+		return Aabb{point = min, size = max - min}
+	end,
+	center_offset = function(self)
+		local h = Los.model_get_center_offset(self.handle)
+		return Class.new(Vector, {handle = h})
+	end}
+
 Model.unittest = function()
 	-- Creating models.
 	local m = Model()
