@@ -4,13 +4,13 @@ local radian_wrap = function(x)
 	else return x end
 end
 
-FirstPersonCamera = Class(Camera)
+EditorCamera = Class(Camera)
 
 --- Creates a new first person camera.
 -- @param clss First person camera class.
 -- @param args Arguments.
 -- @return First person camera.
-FirstPersonCamera.new = function(clss, args)
+EditorCamera.new = function(clss, args)
 	local self = Camera.new(clss, args)
 	self.collision_mask = Physics.MASK_CAMERA
 	self.far = 40.0
@@ -33,7 +33,7 @@ end
 --- Gets the picking ray of the camera.
 -- @param self First person camera.
 -- @return Picking ray.
-FirstPersonCamera.get_picking_ray = function(self)
+EditorCamera.get_picking_ray = function(self)
 	-- Calculate the rotation.
 	local euler = self.own_rot.euler
 	euler[3] = euler[3] - self.own_tilt
@@ -43,33 +43,33 @@ FirstPersonCamera.get_picking_ray = function(self)
 	return ctr,ctr + rot * Vector(0, 0, -5)
 end
 
-FirstPersonCamera.get_velocity = function(self)
+EditorCamera.get_velocity = function(self)
 	return self.own_vel
 end
 
-FirstPersonCamera.rotate = function(self, turn, tilt)
+EditorCamera.rotate = function(self, turn, tilt)
 	self.own_turn = radian_wrap(self.own_turn + turn)
 	self.own_tilt = radian_wrap(self.own_tilt - tilt)
 	self.own_rot = Quaternion{euler = {self.own_turn, 0, self.own_tilt}}
 end
 
-FirstPersonCamera.set_node_transform = function(self, pos, rot)
+EditorCamera.set_node_transform = function(self, pos, rot)
 	self.node_pos = pos
 	self.node_rot = rot
 end
 
-FirstPersonCamera.set_velocity = function(self, v)
+EditorCamera.set_velocity = function(self, v)
 	self.own_vel = v
 end
 
-FirstPersonCamera.translate = function(self, rel)
+EditorCamera.translate = function(self, rel)
 	self.own_pos = self.own_pos + self.own_rot * rel
 end
 
 --- Updates the transformation of the camera.
 -- @param self First person camera.
 -- @param secs Seconds since the last update.
-FirstPersonCamera.update = function(self, secs)
+EditorCamera.update = function(self, secs)
 	-- Update position.
 	local vel = self.own_vel
 	if self.lifting then vel = vel + Vector(0, self.lifting, 0) end
@@ -101,7 +101,7 @@ FirstPersonCamera.update = function(self, secs)
 	Camera.update(self, secs)
 end
 
-FirstPersonCamera.warp = function(self, pos, rot)
+EditorCamera.warp = function(self, pos, rot)
 	self.own_pos = pos
 	self.own_rot = rot
 	Camera.warp(self)

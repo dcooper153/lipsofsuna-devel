@@ -50,6 +50,15 @@ Client:init()
 Player.crosshair = Object{model = "crosshair1", collision_group = Physics.GROUP_CROSSHAIR}
 if Settings.join or Settings.host then
 	Client:set_mode("startup")
+elseif Settings.editor then
+	-- FIXME: Why is this needed?
+	Program:update()
+	local event = Program:pop_event()
+	while event do
+		Eventhandler:event(event)
+		event = Program:pop_event()
+	end
+	Client:set_mode("editor")
 else
 	Client:set_mode("login")
 end

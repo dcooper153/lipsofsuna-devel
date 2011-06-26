@@ -1,33 +1,29 @@
+require "editor/editorcamera"
+require "editor/editorobject"
+require "editor/selection"
+
 Editor = Class()
 
 Editor.new = function(clss)
-	-- Find or create the pattern.
-	local pattern = Pattern:find{name = Settings.pattern}
-	if not pattern then
-		pattern = Pattern{name = Settings.pattern, size = Vector(32,8,32)}
-		local i = 1
-		for x=0,31 do
-			for z=0,31 do
-				pattern.tiles[i] = {x,0,z,"granite1"}
-				i = i + 1
-			end
-		end
-	end
 	-- Initialize self.
 	local self = Class.new(clss)
 	self.prev_tiles = {}
 	self.mouse_sensitivity = 0.01
 	self.selection = {}
-	-- Load the pattern.
-	self.pattern = pattern
-	self.origin = Vector(100,100,100)
-	self.size = pattern.size or Vector(10,10,10)
-	Voxel:place_pattern{point = self.origin, name = Settings.pattern}
 	-- Camera and lighting.
-	self.camera = FirstPersonCamera()
-	self.camera:warp((self.origin + self.size * 0.5) * Voxel.tile_size, Quaternion(0, 1, 0, 0))
+	self.camera = EditorCamera()
 	self.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equation={1.0,0.0,0.01}, priority = 2}
-	self.light.enabled = true
+	-- Map selector.
+	self.entry_map = Widgets.Entry()
+	self.button_map = Widgets.Button{text = "Load", pressed = function(w)
+		if #self.entry_map.text == 0 then return end
+		self:load(self.entry_map.text)
+		Settings.pattern = self.entry_map.text
+	end}
+	self.group_map = Widget{cols = 2, rows = 1}
+	self.group_map:set_expand{col = 1}
+	self.group_map:set_child{col = 1, row = 1, widget = self.entry_map}
+	self.group_map:set_child{col = 2, row = 1, widget = self.button_map}
 	-- Item selector.
 	local items = {}
 	for k in pairs(Itemspec.dict_name) do table.insert(items, k) end
@@ -75,24 +71,22 @@ Editor.new = function(clss)
 	-- Buttons.
 	self.button_delete = Widgets.Button{text = "Delete", pressed = function() self.mode = "delete" end}
 	self.button_save = Widgets.Button{text = "Save", pressed = function() self:save() end}
+	self.button_quit = Widgets.Button{text = "Exit", pressed = function() Client.views.editor:back() end}
 	-- Packing.
-	self.group = Widgets.Frame{cols = 1, rows = 6}
+	self.group = Widgets.Frame{cols = 1, rows = 8}
 	self.group:set_expand{col = 1}
-	self.group:set_child{col = 1, row = 1, widget = self.group_items}
-	self.group:set_child{col = 1, row = 2, widget = self.group_obstacles}
-	self.group:set_child{col = 1, row = 3, widget = self.group_species}
-	self.group:set_child{col = 1, row = 4, widget = self.group_tiles}
-	self.group:set_child{col = 1, row = 5, widget = self.button_delete}
-	self.group:set_child{col = 1, row = 6, widget = self.button_save}
-	self.scene = Widgets.Scene{cols = 2, rows = 2, camera = self.camera, margins = {5,5,0,0}, behind = true, floating = true, fullscreen = true}
+	self.group:set_child{col = 1, row = 1, widget = self.group_map}
+	self.group:set_child{col = 1, row = 2, widget = self.group_items}
+	self.group:set_child{col = 1, row = 3, widget = self.group_obstacles}
+	self.group:set_child{col = 1, row = 4, widget = self.group_species}
+	self.group:set_child{col = 1, row = 5, widget = self.group_tiles}
+	self.group:set_child{col = 1, row = 6, widget = self.button_delete}
+	self.group:set_child{col = 1, row = 7, widget = self.button_save}
+	self.group:set_child{col = 1, row = 8, widget = self.button_quit}
+	self.scene = Widgets.Scene{cols = 2, rows = 2, camera = self.camera}
 	self.scene.pressed = function(w, args) self:pressed(args) end
 	self.scene:set_expand{col = 2, row = 2}
 	self.scene:set_child{col = 1, row = 1, widget = self.group}
-	-- Corner markers.
-	self.corners = EditorObject{position = self.origin * Voxel.tile_size, realized = true}
-	self.corners.model = Model()
-	self.corners.model:add_material{cull = false, shader = "default"}
-	self:update_corners()
 	return self
 end
 
@@ -160,6 +154,43 @@ Editor.fill = function(self, p1, p2, erase)
 			end
 		end
 	end
+end
+
+Editor.load = function(self, name)
+	-- Make sure the old map is erased.
+	for k,v in pairs(Object.objects) do v:detach() end
+	Client.sectors:unload_world()
+	-- Find or create the pattern.
+	local pattern = Pattern:find{name = name}
+	if not pattern then
+		pattern = Pattern{name = name, size = Vector(32,8,32)}
+		local i = 1
+		for x=0,31 do
+			for z=0,31 do
+				pattern.tiles[i] = {x,0,z,"granite1"}
+				i = i + 1
+			end
+		end
+	end
+	-- Load the pattern.
+	self.pattern = pattern
+	self.origin = Vector(100,100,100)
+	self.size = pattern.size or Vector(10,10,10)
+	local tmp = Object
+	Object = EditorObject
+	Voxel:place_pattern{point = self.origin, name = name}
+	Object = tmp
+	-- Setup the camera.
+	self.camera:warp((self.origin + self.size * 0.5) * Voxel.tile_size, Quaternion(0, 1, 0, 0))
+	-- Corner markers.
+	if not self.corners then
+		self.corners = EditorObject{position = self.origin * Voxel.tile_size, realized = true}
+	end
+	self.corners.model = Model()
+	self.corners.model:add_material{cull = false, shader = "default"}
+	self:update_corners()
+	-- Update the map name entry.
+	self.entry_map.text = name
 end
 
 Editor.pressed = function(self, args)

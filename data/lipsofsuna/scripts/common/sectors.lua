@@ -150,6 +150,7 @@ end
 --- Unloads sectors that have been inactive long enough.
 -- @param self Sectors.
 Sectors.update = function(self)
+	if not self.unload_time then return end
 	local written = 0
 	for k,d in pairs(Program.sectors) do
 		if d > self.unload_time and written < 40 then

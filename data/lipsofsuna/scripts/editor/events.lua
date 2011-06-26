@@ -1,5 +1,4 @@
-local gui_actions = {menu = true, rotate = true, screenshot = true,
-	snap = true, translatex = true, translatey = true, translatez = true}
+local gui_actions = {editor_menu = true, editor_rotate = true, editor_snap = true}
 
 Eventhandler{type = "keypress", func = function(self, args)
 	if not Program.cursor_grabbed then

@@ -1,10 +1,19 @@
+local editor_gui_actions = {menu = true, screenshot = true}
+
 Eventhandler{type = "keypress", func = function(self, args)
 	if Client.views.controls.editing_binding then
+		-- Binding input.
 		Client.views.controls:input(args)
 		Action:event(args, {})
-		return
-	end
-	if Client.mode ~= "game" and Widgets:handle_event(args) then
+	elseif Client.mode == "editor" then
+		-- Editor input.
+		if not Program.cursor_grabbed then
+			Widgets:handle_event(args)
+			Action:event(args, editor_gui_actions)
+		else
+			Action:event(args)
+		end
+	elseif Client.mode ~= "game" and Widgets:handle_event(args) then
 		-- Widget input.
 		Action:event(args, {})
 	elseif Gui.chat_active then
@@ -26,56 +35,91 @@ end}
 
 Eventhandler{type = "keyrelease", func = function(self, args)
 	if Client.views.controls.editing_binding then
+		-- Binding input.
 		Client.views.controls:input(args)
 		Action:event(args, {})
-		return
+	elseif Client.mode == "editor" then
+		-- Editor input.
+		if not Program.cursor_grabbed then
+			Widgets:handle_event(args)
+			Action:event(args, editor_gui_actions)
+		else
+			Action:event(args)
+		end
+	else
+		-- Normal input.
+		Action:event(args)
 	end
-	Action:event(args)
 end}
 
 Eventhandler{type = "mousepress", func = function(self, args)
 	if Client.views.controls.editing_binding then
+		-- Binding input.
 		Client.views.controls:input(args)
 		Action:event(args, {})
-		return
-	end
-	if args.button == 4 and Drag.drag then
-		Drag:change_count(1)
-	elseif args.button == 5 and Drag.drag then
-		Drag:change_count(-1)
-	elseif Client.mode ~= "game" then
-		Widgets:handle_event(args)
-		Action:event(args, {})
+	elseif Client.mode == "editor" then
+		-- Editor input.
+		if not Program.cursor_grabbed then
+			Widgets:handle_event(args)
+			Action:event(args, editor_gui_actions)
+		else
+			Action:event(args)
+		end
 	else
-		Action:event(args)
+		-- Normal input.
+		if args.button == 4 and Drag.drag then
+			Drag:change_count(1)
+		elseif args.button == 5 and Drag.drag then
+			Drag:change_count(-1)
+		elseif Client.mode ~= "game" then
+			Widgets:handle_event(args)
+			Action:event(args, {})
+		else
+			Action:event(args)
+		end
 	end
 end}
 
 Eventhandler{type = "mouserelease", func = function(self, args)
 	if Client.views.controls.editing_binding then
+		-- Binding input.
 		Client.views.controls:input(args)
 		Action:event(args, {})
-		return
-	end
-	if Client.mode ~= "game" then
-		Widgets:handle_event(args)
+	elseif Client.mode == "editor" then
+		-- Editor input.
 		Action:event(args, {})
 	else
-		Action:event(args)
+		-- Normal input.
+		if Client.mode ~= "game" then
+			Widgets:handle_event(args)
+			Action:event(args, {})
+		else
+			Action:event(args)
+		end
 	end
 end}
 
 Eventhandler{type = "mousemotion", func = function(self, args)
 	if Client.views.controls.editing_binding then
+		-- Binding input.
 		Client.views.controls:input(args)
 		Action:event(args, {})
-		return
-	end
-	if Client.mode ~= "game" then
-		Widgets:handle_event(args)
-		Action:event(args, {})
+	elseif Client.mode == "editor" then
+		-- Editor input.
+		if not Program.cursor_grabbed then
+			Widgets:handle_event(args)
+			Action:event(args, editor_gui_actions)
+		else
+			Action:event(args)
+		end
 	else
-		Action:event(args)
+		-- Normal input.
+		if Client.mode ~= "game" then
+			Widgets:handle_event(args)
+			Action:event(args, {})
+		else
+			Action:event(args)
+		end
 	end
 end}
 
