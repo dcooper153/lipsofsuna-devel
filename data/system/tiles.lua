@@ -150,15 +150,6 @@ Voxel.find_blocks = function(self, args)
 	return Los.voxel_find_blocks{point = args.point.handle, radius = args.radius}
 end
 
---- Finds information on a material.
--- @param self Voxel class.
--- @param args Arguments.<ul>
---   <li>id: Material ID.</li></ul>
--- @return Material or nil.
-Voxel.find_material = function(self, args)
-	return Los.voxel_find_material(args)
-end
-
 --- Finds the tile nearest to the given point.
 -- @param self Voxel class.
 -- @param args Arguments.<ul>

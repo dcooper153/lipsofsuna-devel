@@ -208,33 +208,6 @@ static void Voxel_find_blocks (LIScrArgs* args)
 	}
 }
 
-static void Voxel_find_material (LIScrArgs* args)
-{
-	int id;
-	LIExtModule* module;
-	LIScrData* data;
-	LIVoxMaterial* material;
-
-	if (liscr_args_gets_int (args, "id", &id))
-	{
-		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
-		material = livox_manager_find_material (module->voxels, id);
-		if (material == NULL)
-			return;
-		material = livox_material_new_copy (material);
-		if (material == NULL)
-			return;
-		data = liscr_data_new (args->script, material, LIEXT_SCRIPT_MATERIAL, livox_material_free);
-		if (data == NULL)
-		{
-			livox_material_free (material);
-			return;
-		}
-		liscr_args_seti_data (args, data);
-		liscr_data_unref (data);
-	}
-}
-
 static void Voxel_find_tile (LIScrArgs* args)
 {
 	int index[3];
@@ -686,7 +659,6 @@ void liext_script_voxel (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_copy_region", Voxel_copy_region);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_fill_region", Voxel_fill_region);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_find_blocks", Voxel_find_blocks);
-	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_find_material", Voxel_find_material);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_find_tile", Voxel_find_tile);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_get_block", Voxel_get_block);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_get_tile", Voxel_get_tile);
