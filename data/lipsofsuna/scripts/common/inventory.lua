@@ -101,6 +101,7 @@ Inventory.merge_object = function(self, args)
 		-- Merge or insert to a specific inventory slot.
 		local object = self:get_object{slot = args.slot}
 		if not object then
+			args.object:detach()
 			self:set_object(args)
 			return true
 		elseif object:merge{object = args.object} then
@@ -112,6 +113,7 @@ Inventory.merge_object = function(self, args)
 		-- Merge or insert to specific equipment slot.
 		local object = self:get_object{slot = args.slot}
 		if not object then
+			args.object:detach()
 			self:set_object(args)
 			return true
 		elseif object:merge{object = args.object} then

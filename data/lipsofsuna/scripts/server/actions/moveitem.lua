@@ -1,4 +1,4 @@
---- Moves an inventory item to another inventory.
+--- Moves an inventory item to another inventory slot.
 -- @param clss Actions class.
 -- @param user Object performing the action.
 -- @param srcid Source inventory ID.
@@ -55,42 +55,57 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 		end
 	end
 	-- Try to merge with other items.
-	if dstinv:merge_object{object = srcobj, slot = dstslot} then
-		return true
+	-- Merging to equipment slots is not handled here because it has special
+	-- cases due to some items being able to reserve multiple slots.
+	if type(dstslot) ~= "string" then
+		if dstinv:merge_object{object = srcobj, slot = dstslot} then
+			return true
+		end
 	end
-	if dstslot then
-		-- Try to equip the item.
-		-- Equiping needs special handling due to items that reserve multiple
-		-- slots. When such an item is equiped or replaced, multiple slots may
-		-- require changes.
-		if type(dstslot) == "string" then
-			if not dstown:equip_item{object = srcobj} then
-				return undo()
-			end
-			return true
-		end
-		-- Try to move the item.
-		local dstobj = dstinv:get_object{slot = dstslot}
-		if not dstobj then
-			srcobj:detach()
-			dstinv:set_object{slot = dstslot, object = srcobj}
-			return true
-		end
-		-- Try to displace the other item.
-		local tmpslot = dstinv:get_empty_slot()
-		if not tmpslot then return undo() end
-		dstobj:detach()
-		dstinv:set_object{slot = tmpslot, object = dstobj}
-		srcobj:detach()
-		dstinv:set_object{slot = dstslot, object = srcobj}
-		return true
-	else
-		-- Try to place into any free slot.
+	-- Try to place into any free slot.
+	-- If no destination slot was given, we can use any free slot.
+	if not dstslot then
 		dstslot = dstinv:get_empty_slot()
 		if not dstslot then return undo() end
 		dstinv:set_object{slot = dstslot, object = dstobj}
 		return true
 	end
+	-- Try to equip the item.
+	-- Multiple slots may change due to multislot items.
+	if type(dstslot) == "string" then
+		if not dstown:equip_item{object = srcobj} then
+			return undo()
+		end
+		return true
+	end
+	-- Try to move the item.
+	-- If there's no other item in the destination slot, a simple move is enough.
+	local dstobj = dstinv:get_object{slot = dstslot}
+	if not dstobj then
+		srcobj:detach()
+		dstinv:set_object{slot = dstslot, object = srcobj}
+		return true
+	end
+	-- Try to swap the items.
+	-- If the two slots are in the same inventory and not equipment slots,
+	-- we can swap their slots.
+	if srcinv == dstinv and type(srcslot) == "number" and type(dstslot) == "number" then
+		dstobj:detach()
+		srcobj:detach()
+		dstinv:set_object{slot = srcslot, object = dstobj}
+		dstinv:set_object{slot = dstslot, object = srcobj}
+		return true
+	end
+	-- Try to displace the other item.
+	-- We need to displace the existing item in the destination slot to a free
+	-- slot in the destination inventory.
+	local tmpslot = dstinv:get_empty_slot()
+	if not tmpslot then return undo() end
+	dstobj:detach()
+	srcobj:detach()
+	dstinv:set_object{slot = tmpslot, object = dstobj}
+	dstinv:set_object{slot = dstslot, object = srcobj}
+	return true
 end
 
 --- Drops an inventory item.
