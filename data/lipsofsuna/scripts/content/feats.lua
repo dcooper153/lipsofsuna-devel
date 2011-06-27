@@ -13,7 +13,7 @@ Featanimspec{
 	bonuses_barehanded = true,
 	bonuses_weapon = true,
 	categories = {"melee"},
-	cooldown = 0.1,
+	cooldown = 0.8,
 	effect = "swing1",
 	effect_impact = "impact1",
 	required_weapon = "melee",
@@ -25,7 +25,7 @@ Featanimspec{
 	bonuses_projectile = true,
 	bonuses_weapon = true,
 	categories = {"ranged"},
-	cooldown = 0.5,
+	cooldown = 1.2,
 	effect_impact = "impact1",
 	required_ammo = true,
 	required_weapon = "ranged",
@@ -35,7 +35,7 @@ Featanimspec{
 	name = "ranged spell",
 	animation = "spell ranged",
 	categories = {"ranged spell"},
-	cooldown = 2,
+	cooldown = 1,
 	description = "Cast a magical projectile",
 	effect = "spell1"}
 
@@ -43,7 +43,7 @@ Featanimspec{
 	name = "spell on self",
 	animation = "spell self",
 	categories = {"spell on self"},
-	cooldown = 2,
+	cooldown = 1,
 	description = "Cast a spell on yourself",
 	effect = "spell1"}
 
@@ -51,7 +51,7 @@ Featanimspec{
 	name = "spell on touch",
 	animation = "spell touch",
 	categories = {"spell on touch"},
-	cooldown = 2,
+	cooldown = 1,
 	description = "Cast a short range touch spell",
 	effect = "spell1"}
 

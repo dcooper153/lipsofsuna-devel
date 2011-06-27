@@ -68,7 +68,7 @@ Feateffectspec.dict_name = {}
 -- @return New feat effect.
 Feateffectspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
-	self.cooldown_base = self.cooldown_base or 1
+	self.cooldown_base = self.cooldown_base or 0
 	self.cooldown_mult = self.cooldown_mult or 0
 	self.influences = self.influences or {}
 	self.radius = self.radius or 0
