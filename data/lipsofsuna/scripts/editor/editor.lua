@@ -329,11 +329,35 @@ Editor.pick = function(self)
 	local point,object,tile = ret.point, ret.object, ret.tile
 	-- Find or create a selection.
 	if object then
+		--determine the object face
+		local osize = object.bounding_box_physics.size
+		local c = self.camera.position
+		local objs = c - object.position --Vector(osize.x/2,osize.y/2,osize.z/2))
+		local objsx = math.abs(objs.x)
+		local objsy = math.abs(objs.y)
+		local objsz = math.abs(objs.z)
+		--print(self.camera.position,objsz,objsy,objsx)
+		local face
+		if objsx > objsy and objsx > objsz then
+			face = objs.x < 0 and 1 or 2
+		elseif objsy > objsz then
+			face = objs.y < 0 and 3 or 4
+		else
+			face = objs.z < 0 and 5 or 6
+		end
+		--print(face)
+
+-- 		local c = self.camera.position
+-- 		local op = object.position
+-- 		local face
+-- 		if c.x - op.x > c.x - op.x
+-- 		if c.x > op.x then face = 2 else face = 1 end 
+		
 		if object.selection then return object.selection end
 		local i = object
-		local s = self.selection[i]
-		if s then return s end
-		return Selection(object)
+		local se = self.selection[i]
+		if se then return se end
+		return Selection(object,face)
 	elseif tile then
 		-- Determine the face.
 		local r = point * Voxel.tile_scale - (tile + Vector(0.5,0.5,0.5))
@@ -412,6 +436,7 @@ end
 -- @param force True to force update.
 Editor.update = function(self, secs, force)
 	-- Update the camera.
+	local mode = Program.video_mode
 	local cp0 = self.camera.target_position
 	local cr0 = self.camera.rotation
 	self.camera:update(secs)
@@ -421,10 +446,32 @@ Editor.update = function(self, secs, force)
 	self.light.position = cp1 + cr1 * Vector(0,0,-5)
 	-- Move the selection.
 	if self.mode == "grab" then
+		
 		local dpos = cp1 - cp0
+		print(dpos)
 		local drot = Quaternion{euler = {cr1.euler[1] - cr0.euler[1], 0, 0}}
+-- 		print(self.selection)
+-- 		local sf = self.selection[1].face
+-- 		print(sf)
+-- 		if sf == 1 or 2 then print"x" dpos.x=0 cp1.x = 0 
+-- 		elseif sf == 2 then print"x" dpos.x=0 cp1.x = 0
+-- 		elseif sf == 3 or 4 then print"z" dpos.z=0 cp1.z = 0 
+-- 		elseif sf == 4 then print"z" dpos.z=0 cp1.z = 0 
+-- 		elseif sf == 5 or 6 then print"y" dpos.y=0 cp1.y = 0 
+-- 		else print"y" dpos.y=0 cp1.y = 0 end
+		
 		for k,v in pairs(self.selection) do
-			v:transform(cp1, dpos, drot)
+			local sf = v.face
+			print(sf)
+			if sf == 1 then print"x" dpos.x=0 cp1.x = 0 
+			elseif sf == 2 then print"x" dpos.x=0 cp1.x = 0
+			elseif sf == 3 or 4 then print"z" dpos.z=0 cp1.z = 0 
+			elseif sf == 4 then print"z" dpos.z=0 cp1.z = 0 
+			elseif sf == 5 or 6 then print"y" dpos.y=0 cp1.y = 0 
+			end
+			--print(v.object.position,ret.point)
+			v.object.position = v.object.position+(dpos)
+			v:refresh()
 		end
 	end
 	-- Pick the scene.

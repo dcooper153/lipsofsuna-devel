@@ -25,9 +25,10 @@ Selection.new = function(clss, data, face)
 		self.face = face
 		self.visual = EditorObject{model = "select1", position = p, rotation = clss.face_rot[face], realized = true}
 	else
+		self.face = face
 		self.key = data
 		self.object = data
-		self.visual = EditorObject{model = "select2", position = data.position, rotation = data.rotation, realized = true}
+		self.visual = EditorObject{model = "select2", position = data.position, rotation = clss.face_rot[face], realized = true}
 	end
 	self.visual.selection = self
 	return self
