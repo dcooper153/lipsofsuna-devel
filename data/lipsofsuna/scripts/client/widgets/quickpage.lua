@@ -14,7 +14,7 @@ Widgets.Quickpage.new = function(clss, args)
 	self.type = args and args.type or "feats"
 	-- Create buttons.
 	self.buttons = {}
-	for i = 1,12 do
+	for i = 1,10 do
 		self.buttons[i] = Widgets.Quickslot{pressed = function(w, a)
 			if a.button == 3 then
 				if self.type == "feats" then self:assign_none(i) end
@@ -23,11 +23,6 @@ Widgets.Quickpage.new = function(clss, args)
 			end
 		end}
 		self:append_col(self.buttons[i])
-		if i == 4 or i == 8 then
-			local pad = Widget()
-			pad:set_request{width = 15}
-			self:append_col(pad)
-		end
 	end
 	-- Load feats from the database.
 	self:load()
