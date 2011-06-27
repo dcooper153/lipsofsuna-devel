@@ -449,7 +449,7 @@ Editor.update = function(self, secs, force)
 		
 		local dpos = cp1 - cp0
 		print(dpos)
-		local drot = Quaternion{euler = {cr1.euler[1] - cr0.euler[1], 0, 0}}
+		local drot = Quaternion{euler = {cr1.euler[1] - cr0.euler[1],0,0}}
 -- 		print(self.selection)
 -- 		local sf = self.selection[1].face
 -- 		print(sf)
@@ -462,15 +462,21 @@ Editor.update = function(self, secs, force)
 		
 		for k,v in pairs(self.selection) do
 			local sf = v.face
+			local ox = v.object.position.x
+			local oy = v.object.position.y
+			local oz = v.object.position.z
 			print(sf)
-			if sf == 1 then print"x" dpos.x=0 cp1.x = 0 
-			elseif sf == 2 then print"x" dpos.x=0 cp1.x = 0
-			elseif sf == 3 or 4 then print"z" dpos.z=0 cp1.z = 0 
-			elseif sf == 4 then print"z" dpos.z=0 cp1.z = 0 
-			elseif sf == 5 or 6 then print"y" dpos.y=0 cp1.y = 0 
+			
+			if sf == 1 then print"x" dpos.x=0 cp1.x = 0 v.object.position.x=ox
+			elseif sf == 2 then print"x" dpos.x=0 cp1.x = 0 v.object.position.x=ox 
+			elseif sf == 3 then print"y" dpos.y=0 cp1.y = 0 v.object.position.x=oz
+			elseif sf == 4 then print"y" dpos.y=0 cp1.y = 0 v.object.position.x=oz
+			elseif sf == 5 then print"z" dpos.z=0 cp1.z = 0 v.object.position.x=oy
+			else print"z" dpos.z=0 cp1.z = 0 v.object.position.x=oy
 			end
+			v:transform(cp1,dpos,drot)
 			--print(v.object.position,ret.point)
-			v.object.position = v.object.position+(dpos)
+			--v.object.position = v.object.position+(dpos)
 			v:refresh()
 		end
 	end
