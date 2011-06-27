@@ -301,6 +301,7 @@ Itemspec{
 	categories = {"boomerang", "throwable", "weapon"},
 	crafting_materials = {log = 2},
 	effect_craft = "craftwood1",
+	gravity_projectile = Vector(0,2,0),
 	influences_base = {physical = -5},
 	influences_bonus = {dexterity = 0.01},
 	equipment_slot = "hand.R",

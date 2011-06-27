@@ -80,7 +80,7 @@ Ai.calculate_ranged_tilt = function(self)
 	-- Solve the tilt angle with brute force.
 	local speed = 20
 	local solve = function(angle)
-		local a = spec.gravity
+		local a = spec.gravity_projectile
 		local v = Quaternion{euler = {0,0,angle}} * Vector(0, 0, -speed)
 		local t_hit = dist / Vector(v.x,0,v.z).length
 		local y_hit = v.y * t_hit + 0.5 * a.y * t_hit^2

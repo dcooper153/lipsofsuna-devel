@@ -40,6 +40,7 @@ Object:add_setters{
 --- Handles physics contacts.
 -- @param self Object.
 -- @param result Contact result.
+-- @return True if the hit was processed.
 Object.contact_cb = function(self, result)
 	if not self.contact_args then
 		self.contact_args = nil
@@ -58,6 +59,7 @@ Object.contact_cb = function(self, result)
 	self.contact_args = nil
 	self.contact_events = false
 	self.realized = false
+	return true
 end
 
 --- Creates a new object from a data string or database entry.

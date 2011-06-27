@@ -122,7 +122,9 @@ Item.contact_cb = function(self, result)
 		self:animate("fly stop")
 	else
 		-- Projectile mode.
-		Object.contact_cb(self, result)
+		if Object.contact_cb(self, result) then
+			self.gravity = self.spec.gravity
+		end
 	end
 end
 
@@ -224,6 +226,7 @@ Item.fire = function(self, args)
 	if not args.owner or not args.feat then return end
 	local proj = self:split()
 	Object.fire(proj, args)
+	proj.gravity = self.spec.gravity_projectile
 	-- Special handling for boomerangs.
 	if proj.spec.categories["boomerang"] then
 		-- Work around an initial collision with the user.
@@ -232,7 +235,6 @@ Item.fire = function(self, args)
 		proj.state = 0
 		proj.rotation = Quaternion{axis = Vector(0,0,1), angle = -0.5 * math.pi}
 		proj:animate("fly start")
-		proj.gravity = Vector(0,2,0)
 		proj.timer = Timer{delay = 1, func = function(timer, secs)
 			if proj.state == 0 then
 				proj.velocity = proj.velocity * -2
