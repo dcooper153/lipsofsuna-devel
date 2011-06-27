@@ -73,16 +73,19 @@ Views.Feats.new = function(clss)
 	self.group_info:set_expand{col = 1, row = 1}
 	self.group_info:set_child{row = 1, col = 1, widget = self.group_req}
 	-- Quickslot selector.
-	self.combo_slot = Widgets.ComboBox()
-	for i = 1,12 do
-		self.combo_slot:append{text = "Quickslot " .. i, pressed = function() self:show(i) end}
+	self.toggle_slot = {}
+	self.group_slots = Widget{cols = 10, rows = 1, spacings = {0,0}}
+	for i = 1,10 do
+		self.toggle_slot[i] = Widgets.Toggle{text = tostring(i), pressed = function() self.active_slot = i end}
+		self.group_slots:set_expand{col = i}
+		self.group_slots:set_child(i, 1, self.toggle_slot[i])
 	end
 	local label1 = Widgets.Label{text = "Slot"}
 	label1:set_request{width = 46}
 	self.group_slot = Widget{cols = 2, rows = 1}
 	self.group_slot:set_expand{col = 2}
-	self.group_slot:set_child{col = 1, row = 1, widget = label1}
-	self.group_slot:set_child{col = 2, row = 1, widget = self.combo_slot}
+	self.group_slot:set_child(1, 1, label1)
+	self.group_slot:set_child(2, 1, self.group_slots)
 	-- Assign button.
 	self.button_assign = Widgets.Button{text = "Assign to the quickslot"}
 	self.button_assign.pressed = function() self:assign() end
@@ -264,7 +267,7 @@ end
 Views.Feats.show = function(self, index)
 	local feat = Quickslots.feats.buttons[index].feat or Feat()
 	self.protect = true
-	self.combo_slot:activate{index = index, press = false}
+	self.active_slot = index
 	self.anim_type = feat.animation
 	for j = 1,3 do
 		local e = feat.effects[j]
@@ -275,11 +278,13 @@ Views.Feats.show = function(self, index)
 		self.scroll_effect[j].visible = s and true or false
 	end
 	self.protect = nil
-	self.active_slot = index
 	self:changed()
 end
 
 Views.Feats:add_getters{
+	active_slot = function(self)
+		return rawget(self, "_active_slot")
+	end,
 	anim_type = function(self)
 		if self.toggle_anim_self.active then
 			return "spell on self"
@@ -291,6 +296,13 @@ Views.Feats:add_getters{
 	end}
 
 Views.Feats:add_setters{
+	active_slot = function(self, v)
+		rawset(self, "_active_slot", v)
+		for i = 1,10 do
+			self.toggle_slot[i].active = (i == v)
+		end
+		if not self.protect then self:show(v) end
+	end,
 	anim_type = function(self, v)
 		self.toggle_anim_none.active = (v == nil)
 		self.toggle_anim_ranged.active = (v == "ranged spell")
