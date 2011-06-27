@@ -181,7 +181,6 @@ Species{
 	name = "dragon",
 	base = "base",
 	model = "dragon1",
-	ai_distance_hint = 2.5,
 	ai_enable_strafe = false,
 	ai_enable_block = false,
 	ai_offense_factor = 1,
@@ -221,7 +220,6 @@ Species{
 	name = "lizardman",
 	base = "base",
 	model = "lizardman2",
-	ai_distance_hint = 1.0,
 	ai_enable_block = false,
 	ai_offense_factor = 0.9,
 	animations = {

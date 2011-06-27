@@ -152,8 +152,12 @@ Ai.choose_combat_action = function(self)
 	-- Calculate the distance to the target.
 	local spec = self.object.spec
 	local diff = self.target.position - self.object.position
-	local dist = diff.length
-	local hint = spec.ai_distance_hint + self.target.spec.ai_distance_hint
+	local size1 = self.object.bounding_box.size
+	local size2 = self.target.bounding_box.size
+	size1.y = 0
+	size2.y = 0
+	local dist = diff.length - 0.5 * (size1 + size2).length
+	local hint = 0.7 * spec.aim_ray_end
 	-- Calculate the tile offset.
 	local ctr = self.object.position * Voxel.tile_scale + Vector(0,0.5,0)
 	local dir = self.target.position - self.object.position
@@ -229,7 +233,7 @@ Ai.choose_combat_action = function(self)
 	-- The creature must be bare-handed or wield a melee weapon.
 	-- Offensive, magnitude is 0 or 4.
 	local p_melee = 0
-	if attack and spec.can_melee and dist < hint * 3 and (not weapon or weapon.spec.categories["melee"]) and aim > 0.8 then
+	if attack and spec.can_melee and dist < hint and (not weapon or weapon.spec.categories["melee"]) and aim > 0.8 then
 		feat = self:find_best_feat{category = "melee", target = self.target, weapon = weapon}
 		if feat then p_melee = 4 end
 	end
@@ -249,7 +253,7 @@ Ai.choose_combat_action = function(self)
 	if spec.can_cast_ranged and aim > 0.8 then
 		feat_spell_ranged = self:find_best_feat{category = "ranged spell", target = self.target}
 		if feat_spell_ranged then
-			p_spell_ranged = (dist > hint * 3) and 4 or 2
+			p_spell_ranged = (dist > hint) and 4 or 2
 			for k,v in pairs(feat_spell_ranged.effects) do
 				v[2] = v[2] * spec.ai_offense_factor
 			end
@@ -260,7 +264,7 @@ Ai.choose_combat_action = function(self)
 	-- Offensive, magnitude is 0 or 4.
 	local feat_spell_self
 	local p_spell_self = 0
-	if spec.can_cast_self and dist > hint * 6 then
+	if spec.can_cast_self and dist > 2 * hint then
 		feat_spell_self = self:find_best_feat{category = "spell on self", target = self.object}
 		if feat_spell_self then
 			p_spell_self = 4
@@ -274,7 +278,7 @@ Ai.choose_combat_action = function(self)
 	-- Offensive, magnitude is 0 or 4.
 	local feat_spell_touch
 	local p_spell_touch = 0
-	if spec.can_cast_touch and dist < hint * 3 and aim > 0.8 then
+	if spec.can_cast_touch and dist < hint and aim > 0.8 then
 		feat_spell_touch = self:find_best_feat{category = "spell on touch", target = self.target}
 		if feat_spell_touch then
 			p_spell_touch = 4
@@ -300,7 +304,7 @@ Ai.choose_combat_action = function(self)
 	-- Walking forward if preferred if the creature is far away from the target.
 	-- Offensive, magnitude is 0 or 1.
 	local p_forward = 0
-	if (allow_forward or allow_forward_jump) and dist > hint * 3 then
+	if (allow_forward or allow_forward_jump) and dist > hint then
 		p_forward = 1
 	end
 	-- Calculate the weapon switch probability.
@@ -319,8 +323,8 @@ Ai.choose_combat_action = function(self)
 	-- Backstepping is preferred if the creature is too close to the target.
 	-- Defensive, magnitude is 0, 1 or 4.
 	local p_backward = 0
-	if (allow_backward or allow_backward_jump) and dist < 6 * hint then
-		if dist < hint then
+	if (allow_backward or allow_backward_jump) and dist < 2 * hint then
+		if dist < 0.3 * hint then
 			p_backward = 4
 		else
 			p_backward = 1
@@ -329,7 +333,7 @@ Ai.choose_combat_action = function(self)
 	-- Calculate the blocking probability.
 	-- Defensive, magnitude is 0 or 1.
 	local p_block = 0
-	if spec.ai_enable_block and dist < 3 * hint then
+	if spec.ai_enable_block and dist < hint then
 		p_block = 1
 	end
 	-- Calculate the strafe probability.
@@ -361,9 +365,9 @@ Ai.choose_combat_action = function(self)
 		-- Melee.
 		if diff.y > 1 and spec.allow_jump then self.object:jump() end
 		self.object:set_block(false)
-		if spec.ai_enable_backstep and dist < hint then
+		if spec.ai_enable_backstep and dist < 0.3 * hint then
 			self.object:set_movement(-1)
-		elseif spec.ai_enable_walk and dist > 2 * hint then
+		elseif spec.ai_enable_walk and dist > 0.6 * hint then
 			self.object:set_movement(1)
 		else
 			self.object:set_movement(0)

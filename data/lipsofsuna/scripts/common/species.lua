@@ -9,7 +9,6 @@ Species.dict_name = {}
 --- Registers a new species.
 -- @param clss Species class.
 -- @param args Arguments.<ul>
---   <li>ai_distance_hint: Tells the AI how big the object is horizontally.</li>
 --   <li>ai_enable_attack: False to prohibit attacking.</li>
 --   <li>ai_enable_backstep: False to prohibit backstep.</li>
 --   <li>ai_enable_block: False to prohibit blocking.</li>
@@ -208,7 +207,6 @@ Species.new = function(clss, args)
 	-- guaranteed to always have a value. The default values are set here
 	-- if no value is assigned to the field yet.
 	local copy = function(f, d) if self[f] == nil then self[f] = d end end
-	copy("ai_distance_hint", 1)
 	copy("ai_enable_attack", true)
 	copy("ai_enable_backstep", true)
 	copy("ai_enable_block", true)
