@@ -100,24 +100,23 @@ Inventory.merge_object = function(self, args)
 	if type(args.slot) == "number" then
 		-- Merge or insert to a specific inventory slot.
 		local object = self:get_object{slot = args.slot}
-		if type(object) ~= "table" then return end
 		if not object then
 			self:set_object(args)
 			return true
-		else
-			if object:merge{object = args.object} then
-				args.object:detach()
-				self:update_slot{slot = args.slot}
-				return true
-			end
+		elseif object:merge{object = args.object} then
+			args.object:detach()
+			self:update_slot(args.slot)
+			return true
 		end
 	elseif type(args.slot) == "string" then
 		-- Merge or insert to specific equipment slot.
 		local object = self:get_object{slot = args.slot}
-		if type(object) ~= "table" then return end
-		if object and object:merge{object = args.object} then
+		if not object then
+			self:set_object(args)
+			return true
+		elseif object:merge{object = args.object} then
 			args.object:detach()
-			self:update_slot{slot = args.slot}
+			self:update_slot(args.slot)
 			return true
 		end
 	else
@@ -128,7 +127,7 @@ Inventory.merge_object = function(self, args)
 					local object = self:get_object{slot = slot}
 					if object and object:merge{object = args.object} then
 						args.object:detach()
-						self:update_slot{slot = slot}
+						self:update_slot(slot)
 						return true
 					end
 				end
@@ -140,7 +139,7 @@ Inventory.merge_object = function(self, args)
 				local object = self:get_object{slot = slot}
 				if object and object:merge{object = args.object} then
 					args.object:detach()
-					self:update_slot{slot = slot}
+					self:update_slot(slot)
 					return true
 				end
 			end
@@ -209,7 +208,7 @@ Inventory.set_object = function(self, args)
 	end
 	-- Add to slot.
 	self.slots[args.slot] = args.object
-	self:update_slot(args)
+	self:update_slot(args.slot)
 end
 
 --- Emits a slot update event.</br>
@@ -220,17 +219,16 @@ end
 -- the function does nothing, hence making the class usable to both the
 -- client and the server.
 -- @param self Inventory.
--- @param args Arguments.<ul>
---   <li>slot: Slot number or name.</li></ul>
-Inventory.update_slot = function(self, args)
-	local o = self:get_object(args)
+-- @param slot Slot number or name.
+Inventory.update_slot = function(self, slot)
+	local o = self:get_object{slot = slot}
 	-- Always send inventory change events to subscribers.
 	for k,v in pairs(self.listeners) do
-		v{type = "inventory-changed", inventory = self, object = o, slot = args.slot}
+		v{type = "inventory-changed", inventory = self, object = o, slot = slot}
 	end
 	-- Only send public slot change events when an equipment slot changed.
-	if type(args.slot) == "string" and Vision then
+	if type(slot) == "string" and Vision then
 		local owner = Object:find{id = self.id}
-		Vision:event{type = "slot-changed", item = o, id = self.id, slot = args.slot}
+		Vision:event{type = "slot-changed", item = o, id = self.id, slot = slot}
 	end
 end

@@ -31,7 +31,7 @@ Serialize.encode_inventory = function(clss, inv)
 	local str = ""
 	for slot,obj in pairs(inv.slots) do
 		obj:save()
-		str = string.format("%sself.inventory:set_object{slot=%s,object=Object:load{id=%s}}\n",
+		str = string.format("%sself:add_item{slot=%s,object=Object:load{id=%s}}\n",
 			str, serialize(slot), serialize(obj.id))
 	end
 	return str

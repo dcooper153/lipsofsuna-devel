@@ -27,7 +27,7 @@ Object:add_setters{
 		if inventory then
 			for k,v in pairs(inventory.slots) do
 				if v == s then
-					inventory:update_slot{slot = k}
+					inventory:update_slot(k)
 					break
 				end
 			end
@@ -90,12 +90,13 @@ end
 --- Merges or adds an item to the slots or inventory of the object.
 -- @param self Object.
 -- @param args Arguments.<ul>
---   <li>object: Object to add.</li></ul>
+--   <li>object: Object to add.</li>
+--   <li>slot: Slot name.</li></ul>
 -- @return True if succeeded.
 Object.add_item = function(self, args)
 	if not args.object then return end
 	if not self.inventory then return end
-	if self.inventory:merge_object{object = args.object} then return true end
+	if self.inventory:merge_object(args) then return true end
 end
 
 --- Plays an animation.
