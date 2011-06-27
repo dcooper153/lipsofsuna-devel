@@ -132,7 +132,11 @@ Views.Options.new = function(clss)
 	local sound_group = Widgets.Frame{cols = 2}
 	sound_group:append_row(Widgets.Label{text = "Music"}, self.scroll_music)
 	sound_group:append_row(Widgets.Label{text = "Effects"}, self.scroll_sound)
-	self:set_child(1, 1, Widgets.Frame{style = "title", text = "Graphics"})
+	self.title_graphics = Widgets.Title{text = "Graphics",
+		back = function() self:back() end,
+		close = function() self:exit() end,
+		help = function() Client.views.help:show("options") end}
+	self:set_child(1, 1, self.title_graphics)
 	self:set_child(1, 2, quality_group)
 	self:set_child(1, 3, Widgets.Frame{style = "title", text = "Bloom"})
 	self:set_child(1, 4, bloom_group)
@@ -189,6 +193,14 @@ Views.Options.close = function(self)
 	if self.background.floating then
 		self.background.floating = false
 		self.background:set_child(2, 2, nil)
+	end
+end
+
+Views.Options.exit = function(self)
+	if self.background.floating then
+		Client:set_mode("login")
+	else
+		Client:set_mode("game")
 	end
 end
 

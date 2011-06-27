@@ -6,7 +6,10 @@ Views.Skills = Class(Widget)
 Views.Skills.new = function(clss)
 	local self = Widget.new(clss, {cols = 1, rows = 2, spacings = {0,0}})
 	-- Create widgets.
-	self.title = Widgets.Frame{style = "title", text = "Skills"}
+	self.title = Widgets.Title{text = "Skills",
+		back = function() self:back() end,
+		close = function() Client:set_mode("game") end,
+		help = function() Client.views.help:show("skills") end}
 	self.skills = Widgets.Skills()
 	self.skills.changed = function(widget, skill)
 		Network:send{packet = Packet(packets.PLAYER_SKILLS, "string", skill.id, "float", skill.cap)}

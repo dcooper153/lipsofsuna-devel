@@ -6,7 +6,10 @@ Views.Inventory = Class(Widget)
 Views.Inventory.new = function(clss)
 	local self = Widget.new(clss, {cols = 3, rows = 1, spacings = {0, 0}})
 	-- Frame.
-	self.title = Widgets.Frame{style = "title", text = "Inventory"}
+	self.title = Widgets.Title{text = "Inventory",
+		back = function() self:back() end,
+		close = function() Client:set_mode("game") end,
+		help = function() Client.views.help:show("inventory") end}
 	self.group = Widget{cols = 1, rows = 4, spacings = {0, 0}}
 	self.group:set_child(1, 3, self.title)
 	self.group:set_expand{col = 1, row = 1}

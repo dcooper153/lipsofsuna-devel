@@ -52,3 +52,7 @@ end
 Views.Help.enter = function(self, from, level)
 	Gui.menus:open{level = level, widget = self}
 end
+
+Views.Help.show = function(self, topic)
+	-- TODO
+end

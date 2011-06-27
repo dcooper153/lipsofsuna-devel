@@ -2,12 +2,15 @@ Views.Quests = Class(Widget)
 
 Views.Quests.new = function(clss)
 	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0, 0}})
+	self.title = Widgets.Title{text = "Quests",
+		back = function() self:back() end,
+		close = function() self:close() end,
+		help = function() Client.views.help:show("quests") end}
 	self.dict_name = {}
 	self.sound_play_time = Program.time
 	self.list = Widgets.List{page_size = 5}
 	self.list.pressed = function(view, row) self:show(row) end
 	self.quest_info = Widgets.QuestInfo()
-	self.title = Widgets.Frame{style = "title", text = "Quest"}
 	self.frame = Widgets.Frame{style = "default", cols = 1, rows = 1}
 	self.frame:set_child{col = 1, row = 1, widget = self.list}
 	self.frame:set_expand{col = 1, row = 1}

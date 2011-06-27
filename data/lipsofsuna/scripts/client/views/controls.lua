@@ -4,7 +4,10 @@ Views.Controls = Class(Widget)
 
 Views.Controls.new = function(clss)
 	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0, 0}})
-	self.title = Widgets.Frame{style = "title", text = "Controls"}
+	self.title = Widgets.Title{text = "Controls",
+		back = function() self:back() end,
+		close = function() Client:set_mode("game") end,
+		help = function() Client.views.help:show("controls") end}
 	self.list = Widgets.List{page_size = 15}
 	self.list:set_request{width = 100, height = 300}
 	self.button_save = Widgets.Button{text = "Save bindings", pressed = function() self:save() end}

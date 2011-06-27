@@ -9,7 +9,10 @@ Views.Feats = Class(Widget)
 Views.Feats.new = function(clss)
 	local self = Widget.new(clss, {cols = 2, rows = 1, spacings = {0,0}})
 	-- Title.
-	self.title = Widgets.Frame{style = "title", text = "Spell"}
+	self.title = Widgets.Title{text = "Spells",
+		back = function() self:back() end,
+		close = function() Client:set_mode("game") end,
+		help = function() Client.views.help:show("spells") end}
 	-- Animation selector.
 	local label = Widgets.Label{text = "Type"}
 	label:set_request{width = 46}

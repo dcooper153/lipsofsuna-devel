@@ -4,7 +4,10 @@ Widgets.Menu = Class(Widget)
 
 Widgets.Menu.new = function(clss, args)
 	local self = Widget.new(clss, {cols = 1, rows = 2, spacings = {0,0}})
-	self.title = Widgets.Frame{style = "title", text = args and args.text}
+	self.title = Widgets.Title{text = args and args.text,
+		back = function() Gui.menus:back() end,
+		close = function() Client:set_mode("game") end,
+		help = function() Client.views.help:show("menu") end}
 	self.frame = Widgets.Frame{style = "paper", cols = 1}
 	self:set_child{col = 1, row = 1, widget = self.title}
 	self:set_child{col = 1, row = 2, widget = self.frame}

@@ -2,14 +2,7 @@ Widgets.Menus = Class(Widget)
 
 Widgets.Menus.new = function(clss, args)
 	local self = Widget.new(clss, {rows = 3, cols = 1, stack = {}})
-	self.button_back = Widgets.MenuItem{text = "Back", pressed = function()
-		local w = self.stack[#self.stack]
-		if w.back then
-			w:back()
-		else
-			self:close{level = #self.stack}
-		end
-	end}
+	self.button_back = Widgets.MenuItem{text = "Back", pressed = function() self:back() end}
 	self.button_close = Widgets.MenuItem{text = "Close", pressed = function() self:close() end}
 	local group = Widget{rows = 1, cols = 2}
 	group:set_child{col = 1, row = 1, widget = self.button_back}
@@ -18,6 +11,15 @@ Widgets.Menus.new = function(clss, args)
 	self:set_child{col = 1, row = 3, widget = group}
 	for k,v in pairs(args or {}) do self[k] = v end
 	return self
+end
+
+Widgets.Menus.back = function(self)
+	local w = self.stack[#self.stack]
+	if w.back then
+		w:back()
+	else
+		self:close{level = #self.stack}
+	end
 end
 
 --- Opens a new menu level.
