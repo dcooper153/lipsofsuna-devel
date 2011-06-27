@@ -13,11 +13,23 @@ Views.Feats.new = function(clss)
 	-- Animation selector.
 	local label = Widgets.Label{text = "Type"}
 	label:set_request{width = 46}
-	self.combo_anim = Widgets.ComboBox{activated = function(w) self:set_anim(w.text) end}
+	self.toggle_anim_none = Widgets.Toggle{text = "None", active = true, pressed = function() self.anim_type = nil end}
+	self.toggle_anim_ranged = Widgets.Toggle{text = "Ranged", pressed = function() self.anim_type = "ranged spell" end}
+	self.toggle_anim_self = Widgets.Toggle{text = "Self", pressed = function() self.anim_type = "spell on self" end}
+	self.toggle_anim_touch = Widgets.Toggle{text = "Touch", pressed = function() self.anim_type = "spell on touch" end}
+	self.group_anim_toggles = Widget{cols = 4, rows = 1, homogeneous = true}
+	self.group_anim_toggles:set_expand{col = 1}
+	self.group_anim_toggles:set_expand{col = 2}
+	self.group_anim_toggles:set_expand{col = 3}
+	self.group_anim_toggles:set_expand{col = 4}
+	self.group_anim_toggles:set_child(1, 1, self.toggle_anim_none)
+	self.group_anim_toggles:set_child(2, 1, self.toggle_anim_ranged)
+	self.group_anim_toggles:set_child(3, 1, self.toggle_anim_self)
+	self.group_anim_toggles:set_child(4, 1, self.toggle_anim_touch)
 	self.group_anim = Widget{cols = 2, rows = 1}
 	self.group_anim:set_expand{col = 2}
-	self.group_anim:set_child{col = 1, row = 1, widget = label}
-	self.group_anim:set_child{col = 2, row = 1, widget = self.combo_anim}
+	self.group_anim:set_child(1, 1, label)
+	self.group_anim:set_child(2, 1, self.group_anim_toggles)
 	-- Effect selectors.
 	self.spell_effect = {}
 	self.scroll_effect = {}
@@ -127,7 +139,7 @@ Views.Feats.assign = function(self)
 		end
 	end
 	-- Create a feat from the animation and the effects.
-	local anim = self.combo_anim.text ~= "" and self.combo_anim.text
+	local anim = self.anim_type
 	if anim and #effects > 0 then
 		local feat = Feat{animation = anim, effects = {}}
 		for i = 1,3 do
@@ -135,7 +147,7 @@ Views.Feats.assign = function(self)
 		end
 		Quickslots:assign_feat(self.active_slot, feat)
 	else
-		Quickslots:assign_none(self.active_slot)
+		Quickslots:assign_feat(self.active_slot)
 	end
 end
 
@@ -160,7 +172,7 @@ Views.Feats.changed = function(self)
 		end
 	end
 	-- Calculate skill and reagent requirements.
-	local feat = Feat{animation = self.combo_anim.text, effects = both}
+	local feat = Feat{animation = self.anim_type, effects = both}
 	local info = feat:get_info()
 	if not info then
 		self.label_skills.text = ""
@@ -242,24 +254,8 @@ end
 -- @param self Feats.
 -- @param name Race name.
 Views.Feats.set_race = function(self, name)
-	local spec = Species:find{name = name}
-	self.spec = spec
-	if not spec then return end
-	-- Rebuild the feat animation list.
-	self.dict_anims_id = {{"", nil}}
-	for k in pairs(spec.feat_anims) do
-		local anim = Featanimspec:find{name = k}
-		if anim and anim.description then
-			table.insert(self.dict_anims_id, {k, function() self:changed() end})
-		end
-	end
-	table.sort(self.dict_anims_id, function(a, b) return a[1]<b[1] end)
-	self.combo_anim:clear()
-	for k,v in ipairs(self.dict_anims_id) do
-		self.combo_anim:append{text = v[1], pressed = v[2]}
-	end
-	-- Rebuild the feat effect list.
-	self:set_anim(self.combo_anim.text)
+	self.spec = Species:find{name = name}
+	self:set_anim(self.anim_type)
 end
 
 --- Shows the feat for the given quickslot.
@@ -269,7 +265,7 @@ Views.Feats.show = function(self, index)
 	local feat = Quickslots.feats.buttons[index].feat or Feat()
 	self.protect = true
 	self.combo_slot:activate{index = index, press = false}
-	self.combo_anim:activate{text = feat.animation or ""}
+	self.anim_type = feat.animation
 	for j = 1,3 do
 		local e = feat.effects[j]
 		local s = e and Feateffectspec:find{name = e[1]}
@@ -282,3 +278,23 @@ Views.Feats.show = function(self, index)
 	self.active_slot = index
 	self:changed()
 end
+
+Views.Feats:add_getters{
+	anim_type = function(self)
+		if self.toggle_anim_self.active then
+			return "spell on self"
+		elseif self.toggle_anim_ranged.active then
+			return "ranged spell"
+		elseif self.toggle_anim_touch.active then
+			return "spell on touch"
+		end
+	end}
+
+Views.Feats:add_setters{
+	anim_type = function(self, v)
+		self.toggle_anim_none.active = (v == nil)
+		self.toggle_anim_ranged.active = (v == "ranged spell")
+		self.toggle_anim_self.active = (v == "spell on self")
+		self.toggle_anim_touch.active = (v == "spell on touch")
+		self:set_anim(v)
+	end}
