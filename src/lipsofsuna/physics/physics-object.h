@@ -78,6 +78,10 @@ LIAPICALL (void, liphy_object_get_bounds, (
 	const LIPhyObject* self,
 	LIMatAabb*         result));
 
+LIAPICALL (void, liphy_object_get_bounds_internal, (
+	const LIPhyObject* self,
+	LIMatAabb*         result));
+
 LIAPICALL (int, liphy_object_get_collision_group, (
 	const LIPhyObject* self));
 

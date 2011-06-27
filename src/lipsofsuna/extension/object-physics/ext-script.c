@@ -137,6 +137,42 @@ static void Object_set_angular (LIScrArgs* args)
 		liphy_object_set_angular (object, &vector);
 }
 
+static void Object_get_bounding_box_physics (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIMatAabb aabb;
+	LIPhyObject* object;
+
+	/* Get physics object. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
+	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	if (object == NULL)
+		return;
+
+	liphy_object_get_bounds (object, &aabb);
+	liscr_args_seti_vector (args, &aabb.min);
+	liscr_args_seti_vector (args, &aabb.max);
+}
+
+static void Object_get_center_offset_physics (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIMatAabb aabb;
+	LIMatVector ctr;
+	LIPhyObject* object;
+
+	/* Get physics object. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
+	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	if (object == NULL)
+		return;
+
+	liphy_object_get_bounds (object, &aabb);
+	ctr = limat_vector_add (aabb.min, aabb.max);
+	ctr = limat_vector_multiply (ctr, 0.5f);
+	liscr_args_seti_vector (args, &ctr);
+}
+
 static void Object_get_collision_group (LIScrArgs* args)
 {
 	LIExtModule* module;
@@ -578,6 +614,8 @@ void liext_script_physics_object (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_jump", Object_jump);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_angular", Object_get_angular);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_angular", Object_set_angular);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_bounding_box_physics", Object_get_bounding_box_physics);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_center_offset_physics", Object_get_center_offset_physics);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_collision_group", Object_get_collision_group);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_collision_group", Object_set_collision_group);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_collision_mask", Object_get_collision_mask);

@@ -58,7 +58,7 @@ void LIPhyCharacterAction::updateAction (
 	btCollisionObject* object = this->object->control->get_object ();
 
 	/* Get the transformation of the bottom of the character. */
-	liphy_object_get_bounds (this->object, &bounds);
+	liphy_object_get_bounds_internal (this->object, &bounds);
 	transform = object->getWorldTransform ();
 	transform = btTransform (btQuaternion::getIdentity (), btVector3 (
 		0.5f * (bounds.min.x + bounds.max.x), bounds.min.y,

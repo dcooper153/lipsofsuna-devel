@@ -133,6 +133,16 @@ end
 
 Object:add_getters{
 	angular = function(s) return Class.new(Vector, {handle = Los.object_get_angular(s.handle)}) end,
+	bounding_box_physics = function(self)
+		local h1,h2 = Los.object_get_bounding_box_physics(self.handle)
+		local min = Class.new(Vector, {handle = h1})
+		local max = Class.new(Vector, {handle = h2})
+		return Aabb{point = min, size = max - min}
+	end,
+	center_offset_physics = function(self)
+		local h = Los.object_get_center_offset_physics(self.handle)
+		return Class.new(Vector, {handle = h})
+	end,
 	collision_group = function(s) return Los.object_get_collision_group(s.handle) end,
 	collision_mask = function(s) return Los.object_get_collision_mask(s.handle) end,
 	contact_events = function(s) return Los.object_get_contact_events(s.handle) end,

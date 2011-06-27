@@ -363,6 +363,25 @@ void liphy_object_get_bounds (
 	LIMatAabb*         result)
 {
 	if (self->shape != NULL)
+	{
+		*result = self->shape->bounds;
+		result->min = limat_vector_add (result->min, self->shape->center_of_mass);
+		result->max = limat_vector_add (result->max, self->shape->center_of_mass);
+	}
+	else
+		limat_aabb_init (result);
+}
+
+/**
+ * \brief Gets the local bounding box of the object without center of mass applied.
+ * \param self Object.
+ * \param result Return location for the bounding box.
+ */
+void liphy_object_get_bounds_internal (
+	const LIPhyObject* self,
+	LIMatAabb*         result)
+{
+	if (self->shape != NULL)
 		*result = self->shape->bounds;
 	else
 		limat_aabb_init (result);

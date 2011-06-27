@@ -56,7 +56,7 @@ end
 -- @return Tilt angle in radians.
 Ai.calculate_melee_tilt = function(self)
 	-- Calculate distance to the target.
-	local diff = self.target.position + self.target.center_offset - self.object.position - self.object.spec.aim_ray_center
+	local diff = self.target.position + self.target.center_offset_physics - self.object.position - self.object.spec.aim_ray_center
 	local dist = Vector(diff.x, 0, diff.z).length
 	-- Solve the tilt angle analytically.
 	local angle = math.atan2(diff.y, dist)
@@ -75,7 +75,7 @@ Ai.calculate_ranged_tilt = function(self)
 	local spec = Itemspec:find{name = weapon.spec.ammo_type}
 	if not spec then return Quaternion() end
 	-- Calculate distance to the target.
-	local diff = self.target.position + self.target.center_offset - self.object.position - self.object.spec.aim_ray_center
+	local diff = self.target.position + self.target.center_offset_physics - self.object.position - self.object.spec.aim_ray_center
 	local dist = Vector(diff.x, 0, diff.z).length
 	-- Solve the tilt angle with brute force.
 	local speed = 20
@@ -152,8 +152,8 @@ Ai.choose_combat_action = function(self)
 	-- Calculate the distance to the target.
 	local spec = self.object.spec
 	local diff = self.target.position - self.object.position
-	local size1 = self.object.bounding_box.size
-	local size2 = self.target.bounding_box.size
+	local size1 = self.object.bounding_box_physics.size
+	local size2 = self.target.bounding_box_physics.size
 	size1.y = 0
 	size2.y = 0
 	local dist = diff.length - 0.5 * (size1 + size2).length
