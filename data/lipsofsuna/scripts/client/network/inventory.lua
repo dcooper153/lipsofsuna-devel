@@ -67,7 +67,7 @@ Protocol:add_handler{type = "INVENTORY_ITEM_REMOVED", func = function(event)
 	local slot = (sslot ~= "" and sslot or islot)
 	cont:set_item{slot = slot}
 	-- Update quickslots.
-	if sslot == "" then
+	if cont == Client.views.inventory.container and sslot == "" then
 		Quickslots:assign_item(islot)
 	end
 	-- Clear interrupted item drags.
