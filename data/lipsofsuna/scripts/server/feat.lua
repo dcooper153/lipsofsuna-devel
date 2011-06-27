@@ -226,7 +226,7 @@ Feat.perform = function(self, args)
 					-- Cast attack rays.
 					play_effects()
 					for i = 1,4 do
-						Thread:sleep(args.user.spec.timing_attack_blunt * 0.02 / 4)
+						Thread:sleep(args.user.spec.timing_attack_melee * 0.02 / 4)
 						if cast(path[i]) then return end
 					end
 				end)
