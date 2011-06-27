@@ -15,7 +15,7 @@ Widgets.Quickpage.new = function(clss, args)
 	-- Create buttons.
 	self.buttons = {}
 	for i = 1,10 do
-		self.buttons[i] = Widgets.Quickslot{pressed = function(w, a)
+		self.buttons[i] = Widgets.Quickslot{index = i, pressed = function(w, a)
 			if a.button == 3 then
 				if self.type == "feats" then self:assign_none(i) end
 			else

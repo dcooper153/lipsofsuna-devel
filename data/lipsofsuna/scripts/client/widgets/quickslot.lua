@@ -31,6 +31,16 @@ Widgets.Quickslot.reshaped = function(self)
 			source_position = icon.offset,
 			source_tiling = {0,icon.size[1],0,0,icon.size[1],0}}
 	end
+	-- Number.
+	if self.index then
+		self:canvas_text{
+			dest_position = {6,-3},
+			dest_size = {28,28},
+			text = string.format("%d.", self.index),
+			text_alignment = {0,0},
+			text_color = {1,1,1,0.5},
+			text_font = "tiny"}
+	end
 	-- Text.
 	if self.text then
 		self:canvas_text{
