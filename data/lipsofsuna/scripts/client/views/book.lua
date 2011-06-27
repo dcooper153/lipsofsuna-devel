@@ -43,7 +43,14 @@ Views.Book.back = function(self)
 	Client:set_mode("game")
 end
 
+--- Closes the book view.
+-- @param self Book view.
+Views.Book.close = function(self)
+	Gui.chat_history.visible = true
+end
+
 Views.Book.enter = function(self, from, level)
+	Gui.chat_history.visible = false
 	Gui.menus:open{level = level, widget = self}
 end
 
