@@ -78,6 +78,16 @@ end
 -- @param self Quests class.
 -- @param name Quest name.
 Views.Quests.show = function(self, name)
+	-- Update toggle button statuses.
+	if self.shown_quest then
+		local w = self.dict_name[self.shown_quest]
+		if w then w.active = false end
+	end
+	if name then
+		local w = self.dict_name[name]
+		if w then w.active = true end
+	end
+	-- Show the quest info.
 	local quest = Quest:find{name = name}
 	if not quest then return end
 	self.quest_info.quest = quest
@@ -90,7 +100,7 @@ end
 Views.Quests.update = function(self, quest)
 	local button = self.dict_name[quest.name]
 	if not button then
-		button = Widgets.Button{
+		button = Widgets.Toggle{
 			pressed = function(widget) self:show(widget.text) end,
 			text = quest.name}
 		self.list:append{widget = button}
