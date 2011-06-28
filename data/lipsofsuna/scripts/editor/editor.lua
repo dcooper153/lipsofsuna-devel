@@ -239,7 +239,6 @@ Editor.save = function(self)
 	-- Collect objects.
 	for k,v in pairs(Object.objects) do
 		if v.realized and v.spec then
-		print(v.spec.type)
 			if v.spec.type == "item" then
 				table.insert(items, v)
 			elseif v.spec.type == "obstacle" then

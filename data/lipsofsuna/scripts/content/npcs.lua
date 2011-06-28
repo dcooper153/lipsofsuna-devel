@@ -113,6 +113,17 @@ Species{
 	inventory_items = {"dress"}}
 
 Species{
+	name = "Drill Sergent Spud",
+	base = "devora",
+	ai_enable_combat = false,
+	ai_enable_wander = false,
+	dialog = "spud",
+	marker = "spud",
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"dress"}}
+
+Species{
 	name = "Col",
 	base = "aermale",
 	dialog = "col",

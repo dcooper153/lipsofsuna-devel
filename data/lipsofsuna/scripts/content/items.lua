@@ -629,3 +629,21 @@ Itemspec{
 Steam technology relies on mechanical parts that are brought into motion by steam circulating in a system of pipes. The steam was initially created by conventional heating methods but more compact and efficient methods based on elemental forces such as ki were discovered very quickly.
 
 With the power of this new technology on their side, the aer society are confident that they can defeat the unknown forces behind the withering of the World Tree.]]}
+
+----------------------------------------------------------------
+--Quest
+
+Itemspec{
+	name = "dying torch",
+	model = "torch1",
+	animation_hold = "hold torch",
+	categories = {"misc"},
+	crafting_materials = {["log"] = 1},
+	effect_equip = "torch1",
+	effect_unequip = "torch1",
+	equipment_slot = "hand.L",
+	icon = "torch1",
+	mass = 3,
+	special_effects = {
+		{node = "#flame", model = "torchfx1"}},
+	water_gravity = Vector(0,6,0)}
