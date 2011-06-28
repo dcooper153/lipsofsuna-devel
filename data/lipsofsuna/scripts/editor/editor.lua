@@ -17,8 +17,8 @@ Editor.new = function(clss)
 	local maps = {}
 	for k in pairs(Pattern.dict_name) do table.insert(maps, k) end
 	self.combo_maps = Widgets.ComboBox(maps)
-	local combo_map_over = self.combo_maps.pressed
-	self.combo_maps.pressed = function() combo_map_over(self.combo_maps) self.entry_map.text = self.combo_maps.text end
+	local combo_map_over = self.combo_maps.close
+	self.combo_maps.activated = function() self.entry_map.text = self.combo_maps.text end
 	self.entry_map = Widgets.Entry()
 	self.button_map = Widgets.Button{text = "Load", pressed = function(w)
 		if #self.entry_map.text == 0 then return end

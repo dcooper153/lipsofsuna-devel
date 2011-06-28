@@ -60,7 +60,10 @@ Views.Login.enter = function(self, from)
 	-- Show the UI.
 	self.floating = true
 	-- Show controls.
-	self.label_hint.text = [[Default Key map:
+	self.label_hint.text = [[
+Start a game by clicking Host and then Host!
+
+Default Key map:
 e = interact
 space = jump
 c = climb
