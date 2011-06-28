@@ -187,12 +187,13 @@ Species{
 	animations = {
 		["attack bite"] = {animation = "bite", channel = 2, weight = 30},
 		["attack left claw"] = {animation = "claw-left", channel = 2, weight = 30},
-		["attack right claw"] = {animation = "claw-right", channel = 2, weight = 30}},
+		["attack right claw"] = {animation = "claw-right", channel = 2, weight = 30},
+		["spell ranged"] = {animation = "breathe-fire", channel = 2, weight = 30}},
 	difficulty = 1,
 	effect_physical_damage = "fleshimpact1",
 	factions = {"evil"},
-	feat_anims = {"dragon bite", "left claw", "right claw"},
-	feat_effects = {"fire damage", "strength to physical damage"},
+	feat_anims = {"dragon bite", "left claw", "right claw", "ranged spell"},
+	feat_effects = {"dragon breath", "fire damage", "strength to physical damage"},
 	inventory_size = 10,
 	inventory_items = {"dragon scale", "dragon scale", "dragon scale", "dragon scale", "dragon scale",
 		"adamantium", "adamantium", "adamantium", "adamantium", "crimson stone", "crimson stone"},
@@ -200,7 +201,8 @@ Species{
 	speed_walk = 1,
 	skills = {
 		{name = "health", max = 100, val = 100},
-		{name = "strength", max = 100, val = 100}},
+		{name = "strength", max = 100, val = 100},
+		{name = "willpower", max = 50, val = 50}},
 	vulnerabilities = {cold = 2, fire = 0.3}}
 
 Species{

@@ -297,6 +297,17 @@ Feateffectspec{
 	skill_mult = {dexterity = 1}}
 
 Feateffectspec{
+	name = "dragon breath",
+	animations = {"ranged spell"},
+	categories = {"harmful", "spell"},
+	effect = "dragonbreath1",
+	icon = "modifier-fireball",
+	influences = {{"fire", -30}},
+	projectile = "firebreath1",
+	skill_base = {willpower = 5},
+	skill_mult = {willpower = 0.1}}
+
+Feateffectspec{
 	name = "strength to physical damage",
 	animations = {"bite", "dragon bite", "explode", "left claw", "right claw"},
 	categories = {"harmful", "melee", "physical"},

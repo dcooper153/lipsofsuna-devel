@@ -188,7 +188,7 @@ Feat.get_info = function(self, args)
 			-- Influence contribution.
 			for _,influ in pairs(effect.influences) do
 				local n = influ[1]
-				local v = influ[2] + influ[3] * data[2]
+				local v = influ[2] + (influ[3] or 0) * data[2]
 				influences[n] = (influences[n] or 0) + v
 				if influences[n] == 0 then
 					influences[n] = nil
