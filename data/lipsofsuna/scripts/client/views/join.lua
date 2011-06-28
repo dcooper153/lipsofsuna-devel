@@ -118,18 +118,22 @@ end
 Views.Join.refresh = function(self)
 	-- Download servers.
 	Lobby.master = Client.config.server_master
-	local servers = Lobby:download_server_list()
+	self.servers = Lobby:download_server_list()
 	-- Rebuild the list.
 	self.list_servers:clear()
-	if servers then
-		table.insert(servers, 1,  {ip = "localhost", port = 10101, name = "Localhost",
+	if self.servers then
+		table.insert(self.servers, 1,  {ip = "localhost", port = 10101, name = "Localhost",
 			desc = "Connect to a locally hosted server"})
-		for k,v in pairs(servers) do
+		for k,v in pairs(self.servers) do
 			local w = Widgets.Serverinfo(v)
 			w.pressed = function(s)
+				for k,v in pairs(self.servers) do
+					v.widget.active = (v.widget == s)
+				end
 				self.entry_address.text = s.ip
 				self.entry_port.text = s.port
 			end
+			v.widget = w
 			self.list_servers:append{widget = w}
 		end
 	end
