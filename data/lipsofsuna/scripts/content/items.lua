@@ -637,7 +637,7 @@ Itemspec{
 	name = "dying torch",
 	model = "torch1",
 	animation_hold = "hold torch",
-	categories = {"misc"},
+	categories = {"quest"},
 	crafting_materials = {["log"] = 1},
 	effect_equip = "torch1",
 	effect_unequip = "torch1",
@@ -647,3 +647,11 @@ Itemspec{
 	special_effects = {
 		{node = "#flame", model = "torchfx1"}},
 	water_gravity = Vector(0,6,0)}
+
+Itemspec{
+	name = "combat token",
+	icon = "gem1",
+	model = "gem-000",
+	mass = 2,
+	categories = {"quest"},
+	stacking = true}
