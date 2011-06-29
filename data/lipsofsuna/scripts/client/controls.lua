@@ -342,7 +342,11 @@ Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 		end
 	elseif Client.mode == "editor" then
 		-- Editor controls.
-		Client.views.editor.editor.camera:rotate(0, v * Client.views.editor.editor.mouse_sensitivity)
+		if Client.views.editor.editor.mode == "grab" then
+			Client.views.editor.editor:grab(Vector(0, v * Client.views.editor.editor.mouse_sensitivity))
+		else
+			Client.views.editor.editor.camera:rotate(0, v * Client.views.editor.editor.mouse_sensitivity)
+		end
 	end
 end}
 
@@ -357,7 +361,10 @@ Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
 		end
 	elseif Client.mode == "editor" then
 		-- Editor controls.
-		if Client.views.editor.editor.mode ~= "rotate" then
+		if Client.views.editor.editor.mode == "grab" then
+			-- Move the selection
+			Client.views.editor.editor:grab(Vector(-v * Client.views.editor.editor.mouse_sensitivity), 0)
+		elseif Client.views.editor.editor.mode ~= "rotate" then
 			-- Rotate the camera.
 			Client.views.editor.editor.camera:rotate(-v * Client.views.editor.editor.mouse_sensitivity, 0)
 		else
