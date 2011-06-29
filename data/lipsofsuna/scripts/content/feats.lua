@@ -1,5 +1,6 @@
 Featanimspec{
 	name = "build",
+	action = "build",
 	animation = "build",
 	categories = {"build"},
 	cooldown = 0.5,
@@ -9,6 +10,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "right hand",
+	action = "melee",
 	animation = "attack punch",
 	bonuses_barehanded = true,
 	bonuses_weapon = true,
@@ -21,6 +23,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "ranged",
+	action = "ranged",
 	animation = "attack bow",
 	bonuses_projectile = true,
 	bonuses_weapon = true,
@@ -33,6 +36,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "ranged spell",
+	action = "ranged spell",
 	animation = "spell ranged",
 	categories = {"ranged spell"},
 	cooldown = 1,
@@ -41,6 +45,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "spell on self",
+	action = "spell on self",
 	animation = "spell self",
 	categories = {"spell on self"},
 	cooldown = 1,
@@ -49,6 +54,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "spell on touch",
+	action = "spell on touch",
 	animation = "spell touch",
 	categories = {"spell on touch"},
 	cooldown = 1,
@@ -57,6 +63,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "throw",
+	action = "throw",
 	animation = "throw",
 	bonuses_weapon = true,
 	categories = {"throw"},
@@ -240,6 +247,7 @@ Feateffectspec{
 
 Featanimspec{
 	name = "bite",
+	action = "melee custom",
 	animation = "attack bite",
 	categories = {"melee"},
 	cooldown = 2,
@@ -250,6 +258,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "dragon bite",
+	action = "melee custom",
 	action_frames = {0, 30},
 	animation = "attack bite",
 	categories = {"melee"},
@@ -260,6 +269,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "explode",
+	action = "melee custom",
 	animation = "explode",
 	categories = {"explode", "melee"},
 	cooldown = 2,
@@ -268,6 +278,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "left claw",
+	action = "melee custom",
 	action_frames = {0, 15},
 	animation = "attack left claw",
 	categories = {"melee"},
@@ -279,6 +290,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "right claw",
+	action = "melee custom",
 	action_frames = {0, 15},
 	animation = "attack right claw",
 	categories = {"melee"},
@@ -290,16 +302,27 @@ Featanimspec{
 
 Feateffectspec{
 	name = "dexterity to physical damage",
-	categories = {"harmful", "melee", "physical"},
+	categories = {"harmful", "melee custom", "physical"},
 	effect = "impact1",
 	icon = "modifier-physical",
 	influences = {{"physical", -1, -0.2}},
 	skill_mult = {dexterity = 1}}
 
 Feateffectspec{
+	name = "dragon breath",
+	animations = {"ranged spell"},
+	categories = {"harmful", "spell"},
+	effect = "dragonbreath1",
+	icon = "modifier-fireball",
+	influences = {{"fire", -20}},
+	projectile = "firebreath1",
+	skill_base = {willpower = 5},
+	skill_mult = {willpower = 0.1}}
+
+Feateffectspec{
 	name = "strength to physical damage",
 	animations = {"bite", "dragon bite", "explode", "left claw", "right claw"},
-	categories = {"harmful", "melee", "physical"},
+	categories = {"harmful", "melee custom", "physical"},
 	effect = "impact1",
 	icon = "modifier-physical",
 	influences = {{"physical", -1, -0.2}},

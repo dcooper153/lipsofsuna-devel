@@ -188,8 +188,10 @@ Species.new = function(clss, args)
 	if args.inventory_items then
 		for k,v in pairs(args.inventory_items) do
 			if type(k) == "string" then
+				assert(not self.inventory_items[k], string.format("species %q has a duplicate inventory item %q", self.name, k))
 				self.inventory_items[k] = v
 			else
+				assert(not self.inventory_items[v], string.format("species %q has a duplicate inventory item %q", self.name, v))
 				self.inventory_items[v] = 1
 			end
 		end

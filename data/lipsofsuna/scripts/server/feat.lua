@@ -133,15 +133,6 @@ Feat.perform = function(self, args)
 	local slot = anim and anim.slot
 	local weapon = slot and args.user:get_item{slot = slot}
 	local info = anim and self:get_info{attacker = args.user, weapon = weapon}
-	-- Helper called by individual feat animations.
-	local play_effects = function(self)
-		if anim.effect then
-			Effect:play{effect = anim.effect, object = args.user}
-		end
-		if weapon and weapon.spec.effect_attack then
-			Effect:play{effect = weapon.spec.effect_attack, object = args.user}
-		end
-	end
 	-- Check for cooldown and requirements.
 	if info and not args.stop then
 		if args.user.cooldown then return end
@@ -156,185 +147,16 @@ Feat.perform = function(self, args)
 		end
 	end
 	-- Calculate the charge time.
-	local charge
 	if args.user.attack_charge then
-		charge = Program.time - args.user.attack_charge
+		args.charge = Program.time - args.user.attack_charge
 	end
 	-- Call the feat function.
 	local move
 	if not info or anim.toggle or not args.stop then
+		args.weapon = weapon
 		if anim then
-			if anim.categories["build"] then
-				-- Build terrain or machines.
-				-- While the attack animation is played, an attack ray is cast.
-				-- If a tile collides with the ray, a new tile is attached to it.
-				Thread(function(t)
-					play_effects()
-					Thread:sleep(args.user.spec.timing_build * 0.02)
-					local src,dst = args.user:get_attack_ray()
-					local r = Physics:cast_ray{src = src, dst = dst}
-					if not r or not r.tile then return end
-					self:apply{
-						attacker = args.user,
-						charge = charge,
-						point = r.point,
-						target = r.object,
-						tile = r.tile,
-						weapon = weapon}
-				end)
-			end
-			if anim.categories["melee"] then
-				-- Melee attack.
-				-- While the attack animation is played, the blade is moved along a path.
-				-- The first object or tile that collides with the blade ray is damaged.
-				-- The shape of the blade path depends on the controls of the user.
-				local paths = {
-					--[[Stand]] {Vector(0.1, 0, 0.75), Vector(-0.1, 0, 0.5), Vector(0.05, 0, 0.25), Vector(-0.05, 0, 0)},
-					--[[Left]] {Vector(0.5, 0.1, 1), Vector(0.25, 0.05, 0.7), Vector(0, 0, 0.5), Vector(-0.25, 0, 0.7)},
-					--[[Right]] {Vector(0.5, 0.1, 0.7), Vector(0.1, 0.05, 0.5), Vector(-0.2, 0, 0.6), Vector(-0.5, 0, 1)},
-					--[[Back]] {Vector(0.1, 0.2, 1), Vector(0.05, 0.2, 0.75), Vector(0, 0.1, 0.5), Vector(0, -0.1, 0.25)},
-					--[[Forward]] {Vector(0.3, -0.1, 0.8), Vector(0.2, -0.1, 0.55), Vector(0.1, -0.05, 0.3), Vector(0, 0.05, 0.15)}}
-				if args.user.strafing < -0.2 then move = 2
-				elseif args.user.strafing > 0.2 then move = 3
-				elseif args.user.movement < -0.2 then move = 4
-				elseif args.user.movement > 0.2 then move = 5
-				else move = 1 end
-				local path = paths[move]
-				Thread(function(t)
-					local apply = function(r)
-						self:apply{
-							attacker = args.user,
-							charge = charge,
-							point = r.point,
-							target = r.object,
-							tile = r.tile,
-							weapon = weapon}
-						return true
-					end
-					local prev
-					local cast = function(rel)
-						-- Get the attack ray.
-						local src,dst = args.user:get_attack_ray(rel)
-						-- Cast from the previous point.
-						local r = prev and Physics:cast_ray{src = prev, dst = dst}
-						if r then return apply(r) end
-						-- Cast from the center point.
-						local r = Physics:cast_ray{src = src, dst = dst}
-						if r then return apply(r) end
-						prev = dst
-					end
-					-- Cast attack rays.
-					play_effects()
-					for i = 1,4 do
-						Thread:sleep(args.user.spec.timing_attack_melee * 0.02 / 4)
-						if cast(path[i]) then return end
-					end
-				end)
-			end
-			if anim.categories["explode"] then
-				-- Self-destruction.
-				-- The creature explodes after the animation has played.
-				Thread(function(t)
-					play_effects()
-					Thread:sleep(args.user.spec.timing_attack_explode * 0.02)
-					args.user:die()
-					Utils:explosion(args.user.position)
-				end)
-			end
-			if anim.categories["ranged"] then
-				-- Ranged attack.
-				-- A projectile is fired at the specific time into the attack
-				-- animation. The collision callback of the projectile takes
-				-- care of damaging the hit object or tile.
-				Thread(function(t)
-					if weapon and weapon.spec.animation_attack == "attack bow" then
-						Thread:sleep(args.user.spec.timing_attack_bow * 0.02)
-					elseif weapon and weapon.spec.animation_attack == "attack crossbow" then
-						Thread:sleep(args.user.spec.timing_attack_crossbow * 0.02)
-					elseif weapon and weapon.spec.animation_attack == "attack musket" then
-						Thread:sleep(args.user.spec.timing_attack_musket * 0.02)
-					elseif weapon and weapon.spec.animation_attack == "attack revolver" then
-						Thread:sleep(args.user.spec.timing_attack_revolver * 0.02)
-					end
-					play_effects()
-					for name,count in pairs(info.required_ammo) do
-						local ammo = args.user:split_items{name = name, count = count}
-						if ammo then
-							ammo:fire{charge = charge, collision = true, feat = self, owner = args.user, speedline = true, weapon = weapon}
-							return
-						end
-					end
-				end)
-			end
-			if anim.categories["ranged spell"] then
-				-- Ranged spell.
-				-- A magical projectile is fired at the specific time into the attack
-				-- animation. The collision callback of the projectile takes
-				-- care of damaging the hit object or tile.
-				Thread(function(t)
-					Thread:sleep(args.user.spec.timing_spell_ranged * 0.02)
-					play_effects()
-					for index,data in ipairs(self.effects) do
-						local effect = Feateffectspec:find{name = data[1]}
-						if effect and effect.projectile then
-							Spell{effect = effect.name, feat = self, model = effect.projectile, owner = args.user, power = data[2]}
-							return
-						end
-					end
-				end)
-			end
-			if anim.categories["spell on self"] then
-				-- Spell on self.
-				-- At the specific time into the attack animation, the effects of the
-				-- feat are applied to the attacker herself.
-				Thread(function(t)
-					play_effects()
-					Thread:sleep(args.user.spec.timing_spell_self * 0.02)
-					self:apply{
-						attacker = args.user,
-						charge = charge,
-						point = args.user.position,
-						target = args.user,
-						weapon = weapon}
-				end)
-			end
-			if anim.categories["spell on touch"] then
-				-- Spell on touch.
-				-- While the attack animation is played, an attack ray is cast.
-				-- The first object or tile that collides with the ray is damaged.
-				Thread(function(t)
-					play_effects()
-					Thread:sleep(args.user.spec.timing_spell_touch * 0.02)
-					local src,dst = args.user:get_attack_ray()
-					local r = Physics:cast_ray{src = src, dst = dst}
-					if not r then return end
-					self:apply{
-						attacker = args.user,
-						charge = charge,
-						point = r.point,
-						target = r.object,
-						tile = r.tile,
-						weapon = weapon}
-				end)
-			end
-			if anim.categories["throw"] then
-				-- Throw attack.
-				-- The weapon is fired at the specific time into the attack
-				-- animation. The collision callback of the projectile takes
-				-- care of damaging the hit object or tile.
-				local charge = 1 + 2 * math.min(1, (charge or 0) / 2)
-				Thread(function(t)
-					play_effects()
-					Thread:sleep(args.user.spec.timing_attack_throw * 0.02)
-					local proj = weapon:fire{
-						charge = charge,
-						collision = not weapon.spec.destroy_timer,
-						feat = self,
-						owner = args.user,
-						speed = 10 * charge,
-						timer = weapon.spec.destroy_timer}
-				end)
-			end
+			local a = Actionspec:find{name = anim.action}
+			if a then move = a.func(self, info, args) end
 		end
 		if self.func then self:func(args) end
 	end
@@ -342,6 +164,25 @@ Feat.perform = function(self, args)
 	-- The move parameter is used by melee feats to tell which attack animation was used.
 	Vision:event{type = "object-feat", object = args.user, anim = anim, move = move}
 	return true
+end
+
+--- Plays the effects of the feat.
+-- @param self Feat.
+-- @param args Arguments.<ul>
+--   <li>user: Object using the feat. (required)</li>
+--   <li>stop: True if stopped performing, false if started.</li></ul>
+Feat.play_effects = function(self, args)
+	local anim = Featanimspec:find{name = self.animation}
+	if not anim then return end
+	if anim.effect then
+		Effect:play{effect = anim.effect, object = args.user}
+	end
+	if anim.action ~= "melee" and anim.slot then
+		local weapon = args.user:get_item{slot = anim.slot}
+		if weapon and weapon.spec.effect_attack then
+			Effect:play{effect = weapon.spec.effect_attack, object = args.user}
+		end
+	end
 end
 
 --- Unlocks a random feat to the player base.

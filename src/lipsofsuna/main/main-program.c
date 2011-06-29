@@ -482,8 +482,17 @@ void limai_program_shutdown (
 }
 
 /**
+ * \brief Executes unit tests for the whole engine.
+ * \param self Program.
+ */
+void limai_program_unittest (
+	LIMaiProgram* self)
+{
+	limat_math_unittest ();
+}
+
+/**
  * \brief Updates the program state.
- *
  * \param self Program.
  * \return Nonzero if the program is still running.
  */

@@ -23,6 +23,27 @@ Spell.new = function(clss, args)
 		self.orig_rotation = self.rotation
 		self.orig_velocity = self.velocity
 		self.power = 1 + 0.1 * args.power
+	elseif args.effect == "dragon breath" then
+		-- Create a breathe of fire.
+		Effect:play{effect = "dragonbreath1", object = args.owner}
+		self.time = 3
+		self.timer = Timer{delay = 0.5, func = function(t, secs)
+			-- Damage creatures in the flame.
+			local pos = args.owner.position
+			local dir = args.owner.rotation * Vector(0,0,-1)
+			local objs = Object:find{point = pos, radius = 10}
+			for k,v in pairs(objs) do
+				if dir:dot((v.position - pos):normalize()) > 0.8 then
+					v:inflict_modifier("burning", 3)
+					v:damaged{amount = 5, type = "fire"}
+				end
+			end
+			-- Stop after the time is out.
+			self.time = self.time - secs
+			if self.time <= 0 then
+				t:disable()
+			end
+		end}
 	elseif args.effect == "firewall" then
 		-- Create a firewall in the given position.
 		self.model = "firewall1"

@@ -48,6 +48,12 @@ Effect{
 	sound = "diseasecontact1"}
 
 Effect{
+	name = "dragonbreath1",
+	model = "firebreath1",
+	node = "head",
+	sound = "squish-000"} --FIXME
+
+Effect{
 	name = "explosion1",
 	model = "explosion1",
 	quake = 1,

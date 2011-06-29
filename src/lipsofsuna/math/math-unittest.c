@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,12 +15,11 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "lips-math.h"
+#include "lipsofsuna/math.h"
 
 #define EPSILON 0.05
 
-static inline int
-check_matrix (LIMatMatrix m0, LIMatMatrix m1)
+static inline int check_matrix (LIMatMatrix m0, LIMatMatrix m1)
 {
 	int i;
 
@@ -32,8 +31,7 @@ check_matrix (LIMatMatrix m0, LIMatMatrix m1)
 	return 1;
 }
 
-static inline int
-check_quaternion (LIMatQuaternion q0, LIMatQuaternion q1)
+static inline int check_quaternion (LIMatQuaternion q0, LIMatQuaternion q1)
 {
 	if (q0.w < 0.0f ||
 	   (q0.w == 0.0f && q0.z < 0.0f) ||
@@ -53,8 +51,7 @@ check_quaternion (LIMatQuaternion q0, LIMatQuaternion q1)
 	return 1;
 }
 
-static inline int
-check_vector (LIMatVector v0, LIMatVector v1)
+static inline int check_vector (LIMatVector v0, LIMatVector v1)
 {
 	if (LIMAT_ABS (v0.x - v1.x) > EPSILON ||
 	    LIMAT_ABS (v0.y - v1.y) > EPSILON ||
@@ -63,37 +60,32 @@ check_vector (LIMatVector v0, LIMatVector v1)
 	return 1;
 }
 
-static inline int
-check_transform (LIMatTransform t0, LIMatTransform t1)
+static inline int check_transform (LIMatTransform t0, LIMatTransform t1)
 {
 	return check_vector (t0.position, t1.position) &&
 	       check_quaternion (t0.rotation, t1.rotation);
 }
 
-static inline void
-print_quaternion (const char* s, LIMatQuaternion q)
+static inline void print_quaternion (const char* s, LIMatQuaternion q)
 {
 	printf ("%s: Quaternion({%f,%f,%f,%f})\n",
 		s, q.x, q.y, q.z, q.w);
 }
 
-static inline void
-print_vector (const char* s, LIMatVector v)
+static inline void print_vector (const char* s, LIMatVector v)
 {
 	printf ("%s: Vector({%f,%f,%f})\n",
 		s, v.x, v.y, v.z);
 }
 
-static inline void
-print_transform (const char* s, LIMatTransform t)
+static inline void print_transform (const char* s, LIMatTransform t)
 {
 	printf ("%s: Transform({%f,%f,%f}, {%f,%f,%f,%f})\n",
 		s, t.position.x, t.position.y, t.position.z,
 		t.rotation.x, t.rotation.y, t.rotation.z, t.rotation.w);
 }
 
-static inline void
-print_matrix (const char* s, LIMatMatrix m)
+static inline void print_matrix (const char* s, LIMatMatrix m)
 {
 	printf ("%s: Matrix({%f,%f,%f,%f}, {%f,%f,%f,%f}, {%f,%f,%f,%f}, {%f,%f,%f,%f})\n",
 		s, m.m[0], m.m[1], m.m[2], m.m[3],
@@ -104,8 +96,7 @@ print_matrix (const char* s, LIMatMatrix m)
 
 /*****************************************************************************/
 
-void
-convert_quaternion_matrix ()
+static void convert_quaternion_matrix ()
 {
 	LIMatMatrix m0;
 	LIMatMatrix m1;
@@ -135,8 +126,7 @@ convert_quaternion_matrix ()
 	}
 }
 
-void
-convert_transform_matrix ()
+static void convert_transform_matrix ()
 {
 	LIMatMatrix m0;
 	LIMatMatrix m1;
@@ -175,8 +165,7 @@ convert_transform_matrix ()
  *
  * The reference lookat matrices were created using gluLookAt.
  */
-void
-matrix_basics ()
+static void matrix_basics ()
 {
 	LIMatMatrix m0;
 	LIMatMatrix m1 = {{ 0.877583, 0.000000, -0.479426, 0.000000, 0.000000, 1.000000, 0.000000, 0.000000, 0.479426, 0.000000, 0.877583, 0.000000, 0.000000, 0.000000, 0.000000, 1.000000 }};
@@ -207,8 +196,7 @@ matrix_basics ()
 	}
 }
 
-void
-matrix_basis ()
+static void matrix_basis ()
 {
 	LIMatVector v0;
 	LIMatVector v1;
@@ -241,8 +229,7 @@ matrix_basis ()
 	}
 }
 
-void
-matrix_look ()
+static void matrix_look ()
 {
 	LIMatMatrix m0;
 	LIMatVector v0;
@@ -291,8 +278,7 @@ matrix_look ()
 /**
  * The reference perpective matrix was created using gluPerspective.
  */
-void
-matrix_perspective ()
+static void matrix_perspective ()
 {
 	LIMatMatrix m0;
 	LIMatMatrix m1 = {{ 0.764657, 0.000000, 0.000000, 0.000000, 0.000000, 1.376382, 0.000000, 0.000000, 0.000000, 0.000000, -4.040000, -1.000000, 0.000000, 0.000000, -172.367996, 0.000000 }};
@@ -314,8 +300,7 @@ matrix_perspective ()
  * Vector by quaternion transformation was performed by first converting the
  * quaternion to a matrix and then multiplying the vector by the matrix.
  */
-void
-quaternion_basics ()
+static void quaternion_basics ()
 {
 	LIMatQuaternion q0;
 	LIMatQuaternion q1;
@@ -365,10 +350,18 @@ quaternion_basics ()
 		print_vector ("Got", v0);
 		print_vector ("Expected", v1);
 	}
+	q0 = limat_quaternion_init (0.0f, 0.0f, 0.0f, 0.0f);
+	q0 = limat_quaternion_normalize (q0);
+	q1 = limat_quaternion_init (0.0f, 0.0f, 0.0f, 0.0f);
+	if (isnan (q0.x) || isnan (q0.y) || isnan (q0.z) || isnan (q0.w))
+	{
+		printf ("6: FAILED!\n");
+		print_quaternion ("Got", q0);
+		print_quaternion ("Expected", q1);
+	}
 }
 
-void
-quaternion_multiply ()
+static void quaternion_multiply ()
 {
 	LIMatMatrix m0;
 	LIMatMatrix m1;
@@ -418,8 +411,7 @@ quaternion_multiply ()
 	}
 }
 
-void
-quaternion_rotation ()
+static void quaternion_rotation ()
 {
 	LIMatMatrix m0;
 	LIMatQuaternion q0;
@@ -449,8 +441,7 @@ quaternion_rotation ()
 	}
 }
 
-void
-quaternion_look ()
+static void quaternion_look ()
 {
 	LIMatMatrix m0;
 	LIMatQuaternion q0;
@@ -479,7 +470,7 @@ quaternion_look ()
 	}
 }
 
-void quaternion_basis ()
+static void quaternion_basis ()
 {
 	LIMatMatrix m0;
 	LIMatQuaternion q0;
@@ -550,8 +541,7 @@ void quaternion_basis ()
 	}
 }
 
-void
-transform_look ()
+static void transform_look ()
 {
 	LIMatMatrix m0;
 	LIMatTransform t0;
@@ -573,8 +563,7 @@ transform_look ()
 	}
 }
 
-void
-transform_multiply ()
+static void transform_multiply ()
 {
 	LIMatMatrix m0;
 	LIMatMatrix m1;
@@ -635,8 +624,7 @@ transform_multiply ()
 	}
 }
 
-void
-transform_invert ()
+static void transform_invert ()
 {
 	LIMatMatrix m0;
 	LIMatMatrix m1;
@@ -671,8 +659,7 @@ transform_invert ()
 	}
 }
 
-void
-transform_vector ()
+static void transform_vector ()
 {
 	LIMatMatrix m0;
 	LIMatTransform t0;
@@ -715,8 +702,7 @@ transform_vector ()
 	}
 }
 
-void
-transform_multiply_2 ()
+static void transform_multiply_2 ()
 {
 	LIMatMatrix m0;
 	LIMatMatrix m1;
@@ -774,7 +760,24 @@ transform_multiply_2 ()
 	}
 }
 
-int main ()
+static void vector_basics ()
+{
+	LIMatVector v0;
+	LIMatVector v1;
+
+	printf ("Testing vector basics...\n");
+	v0 = limat_vector_init (0.0f, 0.0f, 0.0f);
+	v0 = limat_vector_normalize (v0);
+	v1 = limat_vector_init (0.0f, 0.0f, 0.0f);
+	if (isnan (v0.x) || isnan (v0.y) || isnan (v0.z))
+	{
+		printf ("1: FAILED!\n");
+		print_vector ("Got", v0);
+		print_vector ("Expected", v1);
+	}
+}
+
+void limat_math_unittest ()
 {
 	convert_quaternion_matrix ();
 	convert_transform_matrix ();
@@ -792,6 +795,5 @@ int main ()
 	transform_invert ();
 	transform_look ();
 	transform_vector ();
-
-	return 0;
+	vector_basics ();
 }

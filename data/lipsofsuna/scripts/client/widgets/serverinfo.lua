@@ -19,11 +19,14 @@ Widgets.Serverinfo.reshaped = function(self)
 	local w = self.width
 	local h = self.height
 	self:canvas_clear()
+	-- Background.
+	local sx = 350
+	local sy = self.active and 415 or 375
 	self:canvas_image{
 		dest_position = {0,0},
 		dest_size = {w,h},
 		source_image = "widgets1",
-		source_position = self.focused and {350,415} or {350,375},
+		source_position = {sx,sy},
 		source_tiling = {12,64,12,11,14,13}}
 	-- Name.
 	if self.name then

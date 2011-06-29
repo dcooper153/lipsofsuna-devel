@@ -8,7 +8,6 @@ require "server/chat"
 require "server/config"
 require "server/crafting"
 require "server/dialog"
-require "server/actions/moveitem"
 require "server/feat"
 require "server/sectors"
 require "server/admin"
@@ -16,6 +15,9 @@ require "server/quest"
 require "server/modifier"
 require "server/editing"
 require "server/particles"
+for k,v in pairs(File:scan_directory("scripts/server/actions")) do
+	require("server/actions/" .. string.gsub(v, "([^.]*).*", "%1"))
+end
 for k,v in pairs(File:scan_directory("scripts/server/objects")) do
 	require("server/objects/" .. string.gsub(v, "([^.]*).*", "%1"))
 end

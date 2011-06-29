@@ -179,6 +179,17 @@ Obstaclespec{
 	physics = "rigid"}
 
 Obstaclespec{
+	name = "wooden shutter",
+	model = "shutter1",
+	categories = {"prop"},
+	collision_mask = 0xFFFF,
+	constraints = {{"hinge",Vector(0,1.333,0)}},
+	destroy_items = {{"broken door",Vector(0,0,0)}},
+	health = 100,
+	interactive = false,
+	physics = "rigid"}
+
+Obstaclespec{
 	name = "closable wooden door",
 	model = "door1",
 	categories = {"prop"},

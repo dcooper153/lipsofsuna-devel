@@ -383,4 +383,9 @@ Vector.unittest = function()
 	assert(math.abs(c.x) < 0.0001)
 	assert(math.abs(c.y) < 0.0001)
 	assert(math.abs(c.z - 1) < 0.0001)
+	-- Protection from nan and inf.
+	local d = Vector(0/0, -0/0, 1/0)
+	assert(d.x == 0 and d.y == 0 and d.z == 0)
+	d:normalize()
+	assert(d.x == 0 and d.y == 0 and d.z == 0)
 end

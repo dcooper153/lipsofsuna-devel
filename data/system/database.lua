@@ -17,7 +17,10 @@ Database.class_name = "Database"
 Database.new = function(clss, args)
 	local self = Class.new(clss)
 	self.handle = Los.database_new(args)
-	assert(self.handle, string.format("creating database %q failed", args[1] or args.name))
+	if not self.handle then
+		local n = (type(args) == "string") and args or args.name
+		assert(self.handle, string.format("creating database %q failed", n))
+	end
 	__userdata_lookup[self.handle] = self
 	return self
 end

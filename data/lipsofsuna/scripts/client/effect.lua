@@ -9,15 +9,13 @@ Effect.play_object = function(clss, name, object, node)
 	if not effect then return end
 	-- Find the node.
 	local p
-	if node then
-		p = object:find_node{name = node}
-		if not p then return end
-	end
+	local n = node or effect.node
+	if n then p = object:find_node{name = n} end
 	-- Create the effect object.
 	EffectObject{
 		model = effect.model,
 		object = object,
-		node = node,
+		node = p and n,
 		rotation_inherit = (effect.rotation ~= false),
 		sound = effect.sound,
 		sound_delay = effect.sound_delay,

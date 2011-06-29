@@ -61,6 +61,9 @@ end
 Sectors.created_sector = function(self, sector, terrain, objects)
 	-- Create fractal terrain for newly found sectors.
 	if not terrain then Generator.Main:generate(sector) end
+	-- Don't spawn monsters in town sectors.
+	local s = Generator.inst.sectors[sector]
+	if s == "Town" then return end
 	-- Decide how many monsters to spawn.
 	-- The sector size is quite small so we spawn 1 monster per sector most
 	-- of the time, none second often and 2 least often.
@@ -88,7 +91,6 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 				c.x = org.x + math.random(4, Voxel.tiles_per_line - 4)
 				c.y = org.y + math.random(4, Voxel.tiles_per_line - 4)
 				c.z = org.z + math.random(4, Voxel.tiles_per_line - 4)
-				if (c - spawn).length < 50 then break end
 				local p = Utils:find_spawn_point(c * Voxel.tile_size)
 				if p then
 					local d = math.min(1, (p - spawn).length / 500)
