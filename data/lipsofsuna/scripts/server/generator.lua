@@ -124,9 +124,11 @@ Generator.generate = function(self, args)
 	end
 	-- Find used sectors.
 	self:update_status(0, "Counting sectors")
+	self.sectors = {}
 	local sectorn = 0
 	local sectors = Program.sectors
 	for k in pairs(sectors) do
+		self.sectors[k] = "Town"
 		sectorn = sectorn + 1
 	end
 	-- Create fractal terrain.
