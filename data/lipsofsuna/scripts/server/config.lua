@@ -12,10 +12,9 @@ Config.new = function(clss)
 	self.server_name = "Unnamed server"
 	self.server_master = "http://lipsofsuna.org"
 	self.server_port = 10101
-	-- Calculate the spawn point.
-	local reg = Regionspec:find{name = "Lips"}
-	local ctr = Vector(reg.position[1], reg.depth[1], reg.position[2])
-	Config.spawn_point = ctr * Voxel.tile_size + Vector(17, 7, 17)
+	-- Get the spawn point.
+	local reg = Regionspec:find{name = "Giant Shaft"}
+	Config.spawn_point = reg.spawn_point_world
 	-- Load configuration.
 	self.config = ConfigFile{name = "server.cfg"}
 	self:load()

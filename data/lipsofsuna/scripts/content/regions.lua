@@ -4,14 +4,17 @@ Regionspec{
 	depth = {1000,1000},
 	links = {"Portal of Lips", "Sanctuary", "Chara's Root Grove"},
 	pattern_name = "lips1",
-	position = {700,700}}
+	position = {700,700},
+	spawn_point = {12,5,12}}
 
 Regionspec{
 	name = "Giant Shaft",
-	categories = {"special"},
-	depth = {930,1000},
+	categories = {"spawn", "special"},
+	depth = {1000,1000},
 	links = {"Lips", "Sanctuary"},
-	pattern_name = "giantshaft"}
+	pattern_name = "giantshaft",
+	position = {600,700},
+	spawn_point = {17,15,22}}
 
 Regionspec{
 	name = "Chasm",

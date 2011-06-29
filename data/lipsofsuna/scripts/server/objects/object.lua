@@ -487,7 +487,8 @@ end
 -- @param self Object.
 -- @param args Arguments.<ul>
 --   <li>marker: Map marker name.</li>
---   <li>position: World position.</li></ul>
+--   <li>position: World position.</li>
+--   <li>region: Region name.</li></ul>
 -- @return True on success.
 Object.teleport = function(self, args)
 	-- Set the position.
@@ -495,6 +496,10 @@ Object.teleport = function(self, args)
 		local marker = Marker:find{name = args.marker}
 		if not marker or not marker.position then return end
 		self.position = marker.position + Vector(0, 2, 0)
+	elseif args.region then
+		local reg = Regionspec:find{name = args.region}
+		if not reg then return end
+		self.position = reg.spawn_point_world
 	elseif args.position then
 		self.position = args.position
 	else return end
