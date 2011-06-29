@@ -1972,6 +1972,24 @@
   </asset>
 
   <asset>
+    <file>import/shutter1.blend</file>
+    <author>Millz</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>graphics/shutter1.dds</file>
+    <author>Millz</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>graphics/shutter1n.dds</file>
+    <author>Millz</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
     <file>import/skills1.svg</file>
     <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>
