@@ -138,6 +138,32 @@ Editor.extrude = function(self, reverse)
 	self:update_rect_select()
 end
 
+Editor.grab = function(self, delta)
+	-- Get the view direction of the ray.
+	local look = self.camera.rotation * Vector(0,0,-1)
+	-- Transform each selected object.
+	for k,v in pairs(self.selection) do
+		if v.object then
+			-- Project camera axes to the selection plane.
+			local normal = v.face_dir[v.face]
+			local camerax = self.camera.rotation * Vector(1, 0, 0)
+			local cameray = self.camera.rotation * Vector(0, 1, 0)
+			local movex = camerax - normal * camerax:dot(normal)
+			local movey = cameray - normal * cameray:dot(normal)
+			-- Multiply the projected axes by mouse movement factors.
+			movex = movex * (0.5 * -delta.x)
+			movey = movey * (0.5 * -delta.y)
+			-- Scale the axes by the distance between the object and the camera.
+			local scale = (self.camera.position - v.object.position).length
+			movex = movex * scale
+			movey = movey * scale
+			-- Move the selection.
+			v:transform(Vector(), movex + movey, Quaternion())
+			v:refresh()
+		end
+	end
+end
+
 Editor.fill = function(self, p1, p2, erase)
 	-- Find the fill material.
 	local mat = 0
@@ -443,42 +469,6 @@ Editor.update = function(self, secs, force)
 	local cr1 = self.camera.rotation
 	-- Update the light source.
 	self.light.position = cp1 + cr1 * Vector(0,0,-5)
-	-- Move the selection.
-	if self.mode == "grab" then
-		if self.selection.tile then return end
-		local dpos = cp1 - cp0
-		print(dpos)
-		local drot = Quaternion{euler = {cr1.euler[1] - cr0.euler[1],0,0}}
--- 		print(self.selection)
--- 		local sf = self.selection[1].face
--- 		print(sf)
--- 		if sf == 1 or 2 then print"x" dpos.x=0 cp1.x = 0 
--- 		elseif sf == 2 then print"x" dpos.x=0 cp1.x = 0
--- 		elseif sf == 3 or 4 then print"z" dpos.z=0 cp1.z = 0 
--- 		elseif sf == 4 then print"z" dpos.z=0 cp1.z = 0 
--- 		elseif sf == 5 or 6 then print"y" dpos.y=0 cp1.y = 0 
--- 		else print"y" dpos.y=0 cp1.y = 0 end
-		
-		for k,v in pairs(self.selection) do
-			if v.tile then return end
-			local sf = v.face
-			local ox = v.object.position.x
-			local oy = v.object.position.y
-			local oz = v.object.position.z
-			
-			if sf == 1 then print"x" dpos.x=0 cp1.x = 0 v.object.position.x=ox
-			elseif sf == 2 then print"x" dpos.x=0 cp1.x = 0 v.object.position.x=ox local drot = Quaternion{euler = {cr0.euler[1]-cr1.euler[1],0,0}}
-			elseif sf == 3 then print"y" dpos.y=0 cp1.y = 0 v.object.position.x=oz
-			elseif sf == 4 then print"y" dpos.y=0 cp1.y = 0 v.object.position.x=oz
-			elseif sf == 5 then print"z" dpos.z=0 cp1.z = 0 v.object.position.x=oy
-			else print"z" dpos.z=0 cp1.z = 0 v.object.position.x=oy
-			end
-			v:transform(cp1,dpos,drot)
-			--print(v.object.position,ret.point)
-			--v.object.position = v.object.position+(dpos)
-			v:refresh()
-		end
-	end
 	-- Pick the scene.
 	local h = self.highlight
 	local s = self:pick()
