@@ -445,7 +445,7 @@ Editor.update = function(self, secs, force)
 	self.light.position = cp1 + cr1 * Vector(0,0,-5)
 	-- Move the selection.
 	if self.mode == "grab" then
-		
+		if self.selection.tile then return end
 		local dpos = cp1 - cp0
 		print(dpos)
 		local drot = Quaternion{euler = {cr1.euler[1] - cr0.euler[1],0,0}}
@@ -460,14 +460,14 @@ Editor.update = function(self, secs, force)
 -- 		else print"y" dpos.y=0 cp1.y = 0 end
 		
 		for k,v in pairs(self.selection) do
+			if v.tile then return end
 			local sf = v.face
 			local ox = v.object.position.x
 			local oy = v.object.position.y
 			local oz = v.object.position.z
-			print(sf)
 			
 			if sf == 1 then print"x" dpos.x=0 cp1.x = 0 v.object.position.x=ox
-			elseif sf == 2 then print"x" dpos.x=0 cp1.x = 0 v.object.position.x=ox 
+			elseif sf == 2 then print"x" dpos.x=0 cp1.x = 0 v.object.position.x=ox local drot = Quaternion{euler = {cr0.euler[1]-cr1.euler[1],0,0}}
 			elseif sf == 3 then print"y" dpos.y=0 cp1.y = 0 v.object.position.x=oz
 			elseif sf == 4 then print"y" dpos.y=0 cp1.y = 0 v.object.position.x=oz
 			elseif sf == 5 then print"z" dpos.z=0 cp1.z = 0 v.object.position.x=oy
