@@ -3099,4 +3099,38 @@
     <tag>enemy</tag>
     <type>model</type>
   </asset>
+ <asset>
+    <file>graphics/bitingbark1.lmdl</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>enemy</tag>
+    <type>model</type>
+  </asset>
+ <asset>
+    <file>import/bitingbark1.blend</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>enemy</tag>
+    <type>model</type>
+  </asset>
+ <asset>
+    <file>import/bitingbark1.png</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>character</tag>
+    <tag>enemy</tag>
+    <type>texture</type>
+  </asset>
+ <asset>
+    <file>import/bitingbark1n.png</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>development</status>
+    <tag>character</tag>
+    <tag>enemy</tag>
+    <type>normalmap</type>
+  </asset>
 </assets>
