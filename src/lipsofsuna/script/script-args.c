@@ -148,10 +148,10 @@ liscr_args_geti_data (LIScrArgs*  self,
 	return tmp != NULL;
 }
 
-int
-liscr_args_geti_float (LIScrArgs*  self,
-                       int         index,
-                       float*      result)
+int liscr_args_geti_float (
+	LIScrArgs*  self,
+	int         index,
+	float*      result)
 {
 	int ret = 0;
 
@@ -162,6 +162,8 @@ liscr_args_geti_float (LIScrArgs*  self,
 		if (lua_isnumber (self->lua, -1))
 		{
 			*result = lua_tonumber (self->lua, -1);
+			if (isnan (*result) || isinf (*result))
+				*result = 0.0f;
 			ret = 1;
 		}
 		lua_pop (self->lua, 1);
@@ -174,6 +176,8 @@ liscr_args_geti_float (LIScrArgs*  self,
 		if (lua_isnumber (self->lua, index))
 		{
 			*result = lua_tonumber (self->lua, index);
+			if (isnan (*result) || isinf (*result))
+				*result = 0.0f;
 			ret = 1;
 		}
 	}
@@ -482,6 +486,8 @@ int liscr_args_gets_floatv (
 					break;
 				}
 				result[i] = lua_tonumber (self->lua, -1);
+				if (isnan (result[i]) || isinf (result[i]))
+					result[i] = 0.0f;
 				lua_pop (self->lua, 1);
 			}
 			ret = i;
