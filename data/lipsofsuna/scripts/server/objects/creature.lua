@@ -86,7 +86,11 @@ Creature:add_setters{
 			for k,v in pairs(spec.inventory_items) do
 				local itemspec = Itemspec:find{name = k}
 				if itemspec then
-					s:add_item{object = Item{spec = itemspec, count = v}}
+					if itemspec.stacking then
+						s:add_item{object = Item{spec = itemspec, count = v}}
+					else
+						for i = 1,v do s:add_item{object = Item{spec = itemspec}} end
+					end
 				else
 					print(string.format("WARNING: Creature '%s' uses an invalid inventory item name '%s'", s.spec.name, k))
 				end
