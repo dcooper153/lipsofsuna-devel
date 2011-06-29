@@ -67,6 +67,14 @@ static void Program_load_extension (LIScrArgs* args)
 	}
 }
 
+static void Program_unittest (LIScrArgs* args)
+{
+	LIMaiProgram* program;
+
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	limai_program_unittest (program);
+}
+
 static void Program_unload_sector (LIScrArgs* args)
 {
 	int sector;
@@ -191,6 +199,7 @@ void liscr_script_program (
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_launch_mod", Program_launch_mod);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_load_extension", Program_load_extension);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_unittest", Program_unittest);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_unload_sector", Program_unload_sector);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_unload_world", Program_unload_world);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_shutdown", Program_shutdown);

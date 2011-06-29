@@ -120,5 +120,6 @@ Options:
   -J --join <server> <port>   Join a remove server.
   -p --password <password>    Password of the player account.
   -q --quit                   Quit immediately after startup.
-  -S --server                 Run as a dedicated server.]]
+  -S --server                 Run as a dedicated server.
+  -U --unittest               Run unittests.]]
 end

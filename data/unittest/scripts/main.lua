@@ -1,17 +1,11 @@
--- TODO: object_set_position doesn't work due to userdata recognition being broken.
-
-
--- TODO: Garbage collection doesn't work for tables, needs userdata hacks.
--- * Do we need the event at all? The userdata is collected automatically
---   and scripts can easily control its lifetime by keeping it in the table.
--- * Just remember to associate models to their objects.
-
 local catch = function(f)
 	local s,e = pcall(f)
 	if not s then print(e) end
 end
 
 ------------------------------------------------------------------------------
+
+Los.program_unittest()
 
 require "system/class"
 catch(function() Class.unittest() end)

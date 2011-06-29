@@ -78,6 +78,8 @@ static void File_scan_directory (LIScrArgs* args)
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_FILE);
 	if (!liscr_args_geti_string (args, 0, &path))
 		return;
+	if (strstr (path, ".."))
+		return;
 	for (i = 0 ; i < strlen (path) ; i++)
 	{
 		if ((path[i] < 'a' || path[i] > 'z') && (path[i] < '0' || path[i] > '9') && 

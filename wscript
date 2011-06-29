@@ -11,7 +11,6 @@ out = '.build'
 
 CORE_DIRS = 'ai algorithm archive binding callback client engine extension font generator image main math model network particle paths physics render render/render21 render/render32 script server sound string system thread video voxel widget'
 EXTS_DIRS = 'ai animation camera config-file database file graphics lobby network noise object-physics object-render physics reload render skeleton sound speech tiles tiles-physics tiles-render widgets'
-CORE_EXCL = 'src/lipsofsuna/math/unittest.c'
 
 def options(ctx):
 	ctx.tool_options('compiler_cc')
@@ -219,7 +218,7 @@ def build(ctx):
 
 	# Core objects.
 	for dir in CORE_DIRS.split(' '):
-		srcs = ctx.path.ant_glob('src/lipsofsuna/%s/*.c' % dir, excl=CORE_EXCL.split(' '))
+		srcs = ctx.path.ant_glob('src/lipsofsuna/%s/*.c' % dir)
 		if srcs:
 			objs += dir + '_objs '
 			ctx.new_task_gen(
@@ -227,7 +226,7 @@ def build(ctx):
 				source = srcs,
 				target = dir + '_objs',
 				use = libs)
-		srcs = ctx.path.ant_glob('src/lipsofsuna/%s/*.cpp' % dir, excl=CORE_EXCL.split(' '))
+		srcs = ctx.path.ant_glob('src/lipsofsuna/%s/*.cpp' % dir)
 		if srcs:
 			objs += dir + '_cxx_objs '
 			ctx.new_task_gen(
