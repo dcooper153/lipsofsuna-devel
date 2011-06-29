@@ -9,6 +9,7 @@ Featanimspec.dict_name = {}
 --- Registers a feat animation.
 -- @param clss Featanimspec class.
 -- @param args Arguments.<ul>
+--   <li>action: The name of the action to perform.</li>
 --   <li>action_frames: Blender frame range of the action portion.</li>
 --   <li>bonuses_barehanded: Bonuses from being bare-handed are added to damage.</li>
 --   <li>bonuses_projectile: Bonuses from the projectile are added to damage.</li>
@@ -27,6 +28,7 @@ Featanimspec.dict_name = {}
 Featanimspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.cooldown = self.cooldown or 0
+	self.action = self.action or self.name
 	self.action_frames = self.action_frames or {2, 10}
 	self.bonuses_barehanded = self.bonuses_barehanded or false
 	self.bonuses_projectile = self.bonuses_projectile or false
