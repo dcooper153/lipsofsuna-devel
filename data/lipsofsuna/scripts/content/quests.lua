@@ -13,3 +13,4 @@ Quest{name = "Brigands"}
 Quest{name = "Sword on the Stone"}
 Quest{name = "Mining Guild"}
 Quest{name = "Bridge Building"}
+Quest{name = "Down to the Dungeons"}
