@@ -5,16 +5,15 @@ Action{name = "attack", mode = "toggle", key1 = "mouse1", func = function(v)
 	elseif Client.mode == "editor" then
 		-- Editor controls.
 		if v then
-			-- Pressed.
-			if Client.views.editor.editor.mode then
-				Client.views.editor.editor.mode = nil
-				return
-			end
+
+			Client.views.editor.editor.mode = "grab"
+
 			local add = Action.dict_press[Keysym.LSHIFT]
 			Client.views.editor.editor:select(add)
 		else
 			-- Released.
-			-- TODO
+			Client.views.editor.editor.mode = nil
+
 		end
 	end
 end}
