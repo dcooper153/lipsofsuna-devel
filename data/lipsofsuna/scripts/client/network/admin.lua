@@ -8,5 +8,6 @@ end}
 Protocol:add_handler{type = "ADMIN_STATS", func = function(event)
 	local ok,t = event.packet:read("string")
 	if not ok then return end
-	Client.views.admin.label.text = t
+	Client.views.admin.label_server.text = t
+	Client.views.admin.label_server:build()
 end}
