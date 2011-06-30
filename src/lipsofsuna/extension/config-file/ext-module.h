@@ -20,7 +20,7 @@
 
 #include <lipsofsuna/extension.h>
 
-#define LIEXT_SCRIPT_CONFIG_FILE "Database"
+#define LIEXT_SCRIPT_CONFIG_FILE "ConfigFile"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
