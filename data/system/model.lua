@@ -72,6 +72,10 @@ end
 -- @name Model.center_offset
 -- @class table
 
+--- The approximate memory used by the model, in bytes.
+-- @name Model.memory_used
+-- @class table
+
 Model:add_getters{
 	bounding_box = function(self)
 		local h1,h2 = Los.model_get_bounding_box(self.handle)
@@ -82,6 +86,9 @@ Model:add_getters{
 	center_offset = function(self)
 		local h = Los.model_get_center_offset(self.handle)
 		return Class.new(Vector, {handle = h})
+	end,
+	memory_used = function(self)
+		return Los.model_get_memory_used(self.handle)
 	end}
 
 Model.unittest = function()

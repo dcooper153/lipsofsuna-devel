@@ -631,6 +631,14 @@ static void Voxel_get_materials (LIScrArgs* args)
 	}
 }
 
+static void Voxel_get_memory_used (LIScrArgs* args)
+{
+	LIExtModule* module;
+
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
+	liscr_args_seti_int (args, livox_manager_get_memory (module->voxels));
+}
+
 static void Voxel_get_tiles_per_line (LIScrArgs* args)
 {
 	LIExtModule* module;
@@ -673,6 +681,7 @@ void liext_script_voxel (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_get_fill", Voxel_get_fill);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_set_fill", Voxel_set_fill);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_get_materials", Voxel_get_materials);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_get_memory_used", Voxel_get_memory_used);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_get_tiles_per_line", Voxel_get_tiles_per_line);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VOXEL, "voxel_set_tiles_per_line", Voxel_set_tiles_per_line);
 }

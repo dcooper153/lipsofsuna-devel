@@ -4,7 +4,7 @@ Views.Quests.new = function(clss)
 	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0, 0}})
 	self.title = Widgets.Title{text = "Quests",
 		back = function() self:back() end,
-		close = function() self:close() end,
+		close = function() Client:set_mode("game") end,
 		help = function() Client.views.help:show("quests") end}
 	self.dict_name = {}
 	self.sound_play_time = Program.time

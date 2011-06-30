@@ -124,6 +124,17 @@ static void Model_get_center_offset (LIScrArgs* args)
 	liscr_args_seti_vector (args, &ctr);
 }
 
+static void Model_get_memory_used (LIScrArgs* args)
+{
+	LIEngModel* self;
+
+	self = args->self;
+	if (self->model != NULL)
+		liscr_args_seti_int (args, limdl_model_get_memory (self->model));
+	else
+		liscr_args_seti_int (args, 0);
+}
+
 static void Model_load (LIScrArgs* args)
 {
 	int mesh = 1;
@@ -166,6 +177,7 @@ void liscr_script_model (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_changed", Model_changed);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_bounding_box", Model_get_bounding_box);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_center_offset", Model_get_center_offset);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_memory_used", Model_get_memory_used);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_load", Model_load);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_merge", Model_merge);
 }
