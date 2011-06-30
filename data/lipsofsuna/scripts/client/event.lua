@@ -87,7 +87,12 @@ Eventhandler{type = "mouserelease", func = function(self, args)
 		Action:event(args, {})
 	elseif Client.mode == "editor" then
 		-- Editor input.
-		Action:event(args, {})
+		if not Program.cursor_grabbed then
+			Widgets:handle_event(args)
+			Action:event(args, editor_gui_actions)
+		else
+			Action:event(args)
+		end
 	else
 		-- Normal input.
 		if Client.mode ~= "game" then

@@ -4,12 +4,18 @@ Action{name = "attack", mode = "toggle", key1 = "mouse1", func = function(v)
 		Network:send{packet = Packet(packets.PLAYER_ATTACK, "bool", v)}
 	elseif Client.mode == "editor" then
 		-- Editor controls.
-		if Client.views.editor.editor.mode then
-			Client.views.editor.editor.mode = nil
-			return
+		if v then
+			-- Pressed.
+			if Client.views.editor.editor.mode then
+				Client.views.editor.editor.mode = nil
+				return
+			end
+			local add = Action.dict_press[Keysym.LSHIFT]
+			Client.views.editor.editor:select(add)
+		else
+			-- Released.
+			-- TODO
 		end
-		local add = Action.dict_press[Keysym.LSHIFT]
-		Client.views.editor.editor:select(add)
 	end
 end}
 
