@@ -52,6 +52,7 @@ static void Ai_solve_path (LIScrArgs* args)
 		liai_path_get_point (path, i, &point);
 		liscr_args_seti_vector (args, &point);
 	}
+	liai_path_free (path);
 }
 
 /*****************************************************************************/
