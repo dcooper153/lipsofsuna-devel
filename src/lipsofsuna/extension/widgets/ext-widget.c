@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -493,6 +493,18 @@ static void Widget_set_cols (LIScrArgs* args)
 		liwdg_widget_set_size (args->self, cols, h);
 }
 
+static void Widget_get_fixed_size (LIScrArgs* args)
+{
+	liscr_args_seti_bool (args, liwdg_widget_get_fixed_size (args->self));
+}
+static void Widget_set_fixed_size (LIScrArgs* args)
+{
+	int value;
+
+	if (liscr_args_geti_bool (args, 0, &value))
+		liwdg_widget_set_fixed_size (args->self, value);
+}
+
 static void Widget_get_floating (LIScrArgs* args)
 {
 	liscr_args_seti_bool (args, liwdg_widget_get_floating (args->self));
@@ -677,6 +689,8 @@ void liext_script_widget (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_behind", Widget_set_behind);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_cols", Widget_get_cols);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_cols", Widget_set_cols);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_fixed_size", Widget_get_fixed_size);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_fixed_size", Widget_set_fixed_size);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_floating", Widget_get_floating);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_floating", Widget_set_floating);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_fullscreen", Widget_get_fullscreen);

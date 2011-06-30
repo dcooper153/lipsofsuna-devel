@@ -3,6 +3,7 @@ Widgets.Scene = Class(Widget)
 Widgets.Scene.new = function(clss, args)
 	local self = Widget.new(clss, args)
 	self.scene = Scene()
+	self.fixed_size = true
 	return self
 end
 

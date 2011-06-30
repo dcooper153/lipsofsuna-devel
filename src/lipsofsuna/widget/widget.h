@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -58,6 +58,7 @@ struct _LIWdgWidget
 	LIWdgWidget* next;
 	LIScrData* script;
 	unsigned int behind : 1;
+	unsigned int fixed_size : 1;
 	unsigned int floating : 1;
 	unsigned int fullscreen : 1;
 	unsigned int visible : 1;
@@ -212,6 +213,13 @@ LIAPICALL (void, liwdg_widget_set_col_expand, (
 LIAPICALL (int, liwdg_widget_get_col_size, (
 	LIWdgWidget* self,
 	int          x));
+
+LIAPICALL (int, liwdg_widget_get_fixed_size, (
+	LIWdgWidget* self));
+
+LIAPICALL (void, liwdg_widget_set_fixed_size, (
+	LIWdgWidget* self,
+	int          value));
 
 LIAPICALL (int, liwdg_widget_get_floating, (
 	LIWdgWidget* self));

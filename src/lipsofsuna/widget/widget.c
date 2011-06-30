@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -848,6 +848,19 @@ int liwdg_widget_get_col_size (
 	return self->cols[x].allocation;
 }
 
+int liwdg_widget_get_fixed_size (
+	LIWdgWidget* self)
+{
+	return self->fixed_size;
+}
+
+void liwdg_widget_set_fixed_size (
+	LIWdgWidget* self,
+	int          value)
+{
+	self->fixed_size = (value != 0);
+}
+
 int liwdg_widget_get_floating (
 	LIWdgWidget* self)
 {
@@ -1026,6 +1039,11 @@ void liwdg_widget_set_request (
 	int          w,
 	int          h)
 {
+	/* Fixed size widgets have no size request. */
+	if (self->fixed_size && !level)
+		w = h = 0;
+
+	/* Update the size request. */
 	if (self->request[level].width != w ||
 	    self->request[level].height != h)
 	{
