@@ -796,6 +796,50 @@ int limdl_model_get_index_count (
 	return c;
 }
 
+/**
+ * \brief Gets the approximate memory used by the model.
+ * \param self Model.
+ * \return Memory used, in bytes.
+ */
+int limdl_model_get_memory (
+	const LIMdlModel* self)
+{
+	int i;
+	int total;
+
+	/* TODO: Many of these have memory allocations of their own, */
+	total = sizeof (LIMdlModel);
+	for (i = 0 ; i < self->animations.count ; i++)
+		total += sizeof (LIMdlAnimation);
+	for (i = 0 ; i < self->hairs.count ; i++)
+		total += sizeof (LIMdlHairs);
+	for (i = 0 ; i < self->facegroups.count ; i++)
+	{
+		total += sizeof (LIMdlFaces);
+		total += self->facegroups.array[i].indices.count * sizeof (uint32_t);
+	}
+	for (i = 0 ; i < self->materials.count ; i++)
+		total += sizeof (LIMdlMaterial*) + sizeof (LIMdlMaterial);
+	for (i = 0 ; i < self->nodes.count ; i++)
+		total += sizeof (LIMdlNode*) + sizeof (LIMdlNode);
+	for (i = 0 ; i < self->particlesystems.count ; i++)
+		total += sizeof (LIMdlParticleSystem);
+	for (i = 0 ; i < self->shapes.count ; i++)
+		total += sizeof (LIMdlShape);
+	for (i = 0 ; i < self->shape_keys.count ; i++)
+	{
+		total += sizeof (LIMdlShapeKey);
+		total += strlen (self->shape_keys.array[i].name) + 1;
+		total += self->shape_keys.array[i].vertices.count * sizeof (LIMdlShapeKeyVertex);
+	}
+	for (i = 0 ; i < self->vertices.count ; i++)
+		total += sizeof (LIMdlVertex);
+	for (i = 0 ; i < self->weightgroups.count ; i++)
+		total += sizeof (LIMdlWeightGroup);
+
+	return total;
+}
+
 /*****************************************************************************/
 
 static void private_build (

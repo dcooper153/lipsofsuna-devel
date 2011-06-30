@@ -41,9 +41,18 @@ Views.Admin.enter = function(self, from, level)
 	end
 	self.label_client.text = t
 	self.label_client:build()
-	-- Database stats.
-	self.label_database.text = string.format("Database memory: %d kB\nScript memory: %d kB\nTerrain memory: %d kB",
-		Database.memory_used / 1024, gcinfo(), Voxel.memory_used)
+	-- Memory stats.
+	local models = 0
+	for k,v in pairs(__userdata_lookup) do
+		if v.class_name == "Model" then
+			models = models + v.memory_used
+		end
+	end
+	self.label_database.text = string.format([[
+Database memory: %d kB
+Script memory: %d kB
+Terrain memory: %d kB
+Model memory: %d kB]], Database.memory_used / 1024, gcinfo(), Voxel.memory_used / 1024, models / 1024)
 	self.label_database:build()
 end
 
