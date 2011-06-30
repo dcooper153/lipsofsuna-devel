@@ -60,15 +60,21 @@ Selection.create_face_model = function(self, face, rotation, aabb)
 		v[i+5] = {c[1],c[2],c[3],n[1],n[2],n[3]}
 		i = i + 6
 	end
+	local addbox = function(a,b,c,d,n)
+	addface(a,{a[1]-0.1,a[2]-0.1,a[3]-0.1},c,{c[1]-0.1,c[2]-0.1,c[3]-0.1},n)
+	addface(b,{b[1]-0.1,b[2]-0.1,b[3]-0.1},d,{d[1]-0.1,d[2]-0.1,d[3]-0.1},n)
+	addface(a,{a[1]-0.1,a[2]-0.1,a[3]-0.1},b,{b[1]-0.1,b[2]-0.1,b[3]-0.1},n)
+	addface(c,{c[1]-0.1,c[2]-0.1,c[3]-0.1},d,{d[1]-0.1,d[2]-0.1,d[3]-0.1},n)
+	end
 	-- Left and right.
-	if face == 1 then addface(p[1], p[3], p[5], p[7], {-1,0,0}) end
-	if face == 2 then addface(p[2], p[4], p[6], p[8], {1,0,0}) end
+	if face == 1 then addbox(p[1],p[3],p[5],p[7],{-1,0,0})end
+	if face == 2 then addbox(p[2],p[4],p[6],p[8],{-1,0,0}) end
 	-- Bottom and top.
-	if face == 3 then addface(p[1], p[2], p[5], p[6], {0,-1,0}) end
-	if face == 4 then addface(p[3], p[4], p[7], p[8], {0,1,0}) end
+	if face == 3 then addbox(p[1], p[2], p[5], p[6], {0,-1,0}) end
+	if face == 4 then addbox(p[3], p[4], p[7], p[8], {0,1,0}) end
 	-- Front and back.
-	if face == 5 then addface(p[1], p[2], p[3], p[4], {0,0,-1}) end
-	if face == 6 then addface(p[5], p[6], p[7], p[8], {0,0,1}) end
+	if face == 5 then addbox(p[1], p[2], p[3], p[4], {0,0,-1}) end
+	if face == 6 then addbox(p[5], p[6], p[7], p[8], {0,0,1}) end
 	-- Create the model.
 	local model = Model()
 	model:add_material{cull = false, shader = "default"}
