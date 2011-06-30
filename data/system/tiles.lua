@@ -254,6 +254,10 @@ end
 -- @name Voxel.fill
 -- @class table
 
+--- Approximate memory used by terrain, in bytes.
+-- @name Voxel.memory_used
+-- @class table
+
 --- List of material IDs.
 -- @name Voxel.materials
 -- @class table
@@ -266,6 +270,7 @@ Voxel.class_getters = {
 	blocks_per_line = function(s) return Los.voxel_get_blocks_per_line() end,
 	fill = function(s) return Los.voxel_get_fill() end,
 	materials = function(s) return Los.voxel_get_materials() end,
+	memory_used = function(s) return Los.voxel_get_memory_used() end,
 	tiles_per_line = function(s) return Los.voxel_get_tiles_per_line() end}
 
 Voxel.class_setters = {

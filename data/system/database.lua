@@ -58,6 +58,13 @@ Database.query = function(self, a, b)
 	return t
 end
 
+--- Approximate memory used by add databases, in bytes.
+-- @name Database.memory_used
+-- @class table
+
+Database:add_class_getters{
+	memory_used = function(self) return Los.database_get_memory_used(self) end}
+
 Database.unittest = function()
 	-- Database creation.
 	local d = Database("unittest.sqlite")

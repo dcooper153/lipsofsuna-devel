@@ -144,6 +144,9 @@ LIAPICALL (void, livox_manager_set_load, (
 	LIVoxManager* self,
 	int           value));
 
+LIAPICALL (int, livox_manager_get_memory, (
+	const LIVoxManager* self));
+
 LIAPICALL (void, livox_manager_get_voxel, (
 	LIVoxManager* self,
 	int           x,

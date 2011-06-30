@@ -79,6 +79,9 @@ LIAPICALL (void, livox_sector_set_dirty, (
 LIAPICALL (int, livox_sector_get_empty, (
 	const LIVoxSector* self));
 
+LIAPICALL (int, livox_sector_get_memory, (
+	const LIVoxSector* self));
+
 LIAPICALL (void, livox_sector_get_offset, (
 	const LIVoxSector* self,
 	int*               x,

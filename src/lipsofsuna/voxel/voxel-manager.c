@@ -640,6 +640,29 @@ void livox_manager_set_fill (
 }
 
 /**
+ * \brief Gets the approximate memory used by the voxel manager.
+ * \param self Voxel manager.
+ * \return Memory used in bytes.
+ */
+int livox_manager_get_memory (
+	const LIVoxManager* self)
+{
+	int total;
+	LIAlgSectorsIter iter;
+	LIVoxSector* sector;
+
+	total = sizeof (LIVoxManager);
+	LIALG_SECTORS_FOREACH (iter, self->sectors)
+	{
+		sector = iter.sector->content[LIALG_SECTORS_CONTENT_VOXEL];
+		if (sector != NULL)
+			total += livox_sector_get_memory (sector);
+	}
+
+	return total;
+}
+
+/**
  * \brief Gets a voxel by position.
  * \param self Voxel manager.
  * \param x Tile position.

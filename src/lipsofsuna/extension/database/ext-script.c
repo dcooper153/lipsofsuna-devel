@@ -28,10 +28,18 @@
 static void private_free_database (
 	sqlite3* self)
 {
+	/* Make sure we aren't leaking statements. */
+	lisys_assert (sqlite3_next_stmt (self, NULL) == NULL);
+
 	sqlite3_close (self);
 }
 
 /*****************************************************************************/
+
+static void Database_get_memory_used (LIScrArgs* args)
+{
+	liscr_args_seti_int (args, sqlite3_memory_used ());
+}
 
 static void Database_new (LIScrArgs* args)
 {
@@ -283,6 +291,7 @@ static void Database_query (LIScrArgs* args)
 void liext_script_database (
 	LIScrScript* self)
 {
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_DATABASE, "database_get_memory_used", Database_get_memory_used);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_DATABASE, "database_new", Database_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_DATABASE, "database_query", Database_query);
 }

@@ -22,6 +22,7 @@
  * @{
  */
 
+#include <sqlite3.h>
 #include "ext-module.h"
 
 LIMaiExtensionInfo liext_database_info =

@@ -331,6 +331,18 @@ livox_sector_get_empty (const LIVoxSector* self)
 }
 
 /**
+ * \brief Gets the memory used by the sector.
+ * \param sector Sector.
+ * \return Memory used in bytes.
+ */
+int livox_sector_get_memory (const LIVoxSector* self)
+{
+	return sizeof (LIVoxSector) +
+		self->manager->blocks_per_sector * sizeof (LIVoxBlock) +
+		self->manager->tiles_per_sector * sizeof (LIVoxVoxel);
+}
+
+/**
  * \brief Gets the offset of the sector in the world in voxels.
  *
  * \param self Sector.
