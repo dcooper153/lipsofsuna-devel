@@ -38,11 +38,16 @@
 static int private_init (
 	LIRenScene32* self);
 
-static void private_render_pass (
+static void private_render_pass_nosort (
 	LIRenScene32*   self,
 	LIRenContext32* context,
-	int             pass,
-	int             sorting);
+	LIMatFrustum*   frustum,
+	int             pass);
+
+static void private_render_pass_sort (
+	LIRenScene32*   self,
+	LIRenContext32* context,
+	int             pass);
 
 static int private_render_postproc (
 	LIRenScene32*       self,
@@ -186,7 +191,7 @@ void liren_scene32_render (
 	tmp[2] = eye.z;
 	liren_uniforms32_set_vec3 (&context->uniforms, LIREN_UNIFORM_CAMERA_POSITION, tmp);
 
-	/* Depth sort scene. */
+	/* Depth sort the scene. */
 	if (!private_sort_scene (self, context))
 		return;
 
@@ -208,7 +213,12 @@ void liren_scene32_render (
 
 	/* Render scene passes. */
 	for (i = 0 ; i < render_passes_num ; i++)
-		private_render_pass (self, context, render_passes[i].pass, render_passes[i].sort);
+	{
+		if (!render_passes[i].sort)
+			private_render_pass_nosort (self, context, frustum, render_passes[i].pass);
+		else
+			private_render_pass_sort (self, context, render_passes[i].pass);
+	}
 
 	/* Render post-processing effects. */
 	postproc_passes_done = 0;
@@ -281,90 +291,126 @@ static int private_init (
 	return 1;
 }
 
-static void private_render_pass (
+static void private_render_pass_nosort (
 	LIRenScene32*   self,
 	LIRenContext32* context,
-	int             pass,
-	int             sorting)
+	LIMatFrustum*   frustum,
+	int             pass)
+{
+	int i;
+	int start;
+	int count;
+	LIAlgU32dicIter iter;
+	LIMatAabb bounds;
+	LIRenMaterial32* material;
+	LIRenObject32* object;
+
+	LIALG_U32DIC_FOREACH (iter, self->scene->objects)
+	{
+		object = ((LIRenObject*) iter.value)->v32;
+
+		/* Check for visibility. */
+		if (!liren_object32_get_realized (object))
+			continue;
+		liren_object32_get_bounds (object, &bounds);
+		if (limat_frustum_cull_aabb (frustum, &bounds))
+			continue;
+
+		/* Bind the object data. */
+		liren_context32_set_modelmatrix (context, &object->orientation.matrix);
+		liren_context32_set_mesh (context, &object->model->mesh);
+
+		/* Render each material group that has the pass. */
+		for (i = 0 ; i < object->model->materials.count ; i++)
+		{
+			material = object->model->materials.array[i];
+			if (!material->shader->passes[pass].program)
+				continue;
+			start = object->model->groups.array[i].start;
+			count = object->model->groups.array[i].count;
+			liren_context32_set_material (context, material);
+			liren_context32_set_shader (context, pass, material->shader);
+			liren_context32_set_textures (context, material->textures.array, material->textures.count);
+			liren_context32_bind (context);
+			liren_context32_render_array (context, GL_TRIANGLES, start, count);
+		}
+
+		/* Render the effect layer. */
+		material = object->effect.material;
+		if (material != NULL && material->shader->passes[pass].program)
+		{
+			start = object->model->groups.array[object->model->groups.count - 1].start;
+			count = object->model->groups.array[object->model->groups.count - 1].count;
+			liren_context32_set_material (context, material);
+			liren_context32_set_shader (context, pass, material->shader);
+			liren_context32_set_textures (context, material->textures.array, material->textures.count);
+			liren_context32_bind (context);
+			liren_context32_render_array (context, GL_TRIANGLES, 0, start + count);
+		}
+	}
+}
+
+static void private_render_pass_sort (
+	LIRenScene32*   self,
+	LIRenContext32* context,
+	int             pass)
 {
 	int i;
 	LIMatMatrix identity;
 	LIMatVector position;
 	LIRenSortface32* face;
-	LIRenSortgroup32* group;
 
 	/* Initialize pass. */
 	identity = limat_matrix_identity ();
 
-	/* Render each group. */
-	if (!sorting)
+	/* Render sorted groups. */
+	for (i = self->sort->buckets.count - 1 ; i >= 0 ; i--)
 	{
-		/* Render unsorted groups. */
-		for (i = 0 ; i < self->sort->groups.count ; i++)
+		for (face = self->sort->buckets.array[i] ; face != NULL ; face = face->next)
 		{
-			group = self->sort->groups.array + i;
-			if (!group->material->shader->passes[pass].program)
-				continue;
-			liren_context32_set_material (context, group->material);
-			liren_context32_set_modelmatrix (context, &group->matrix);
-			liren_context32_set_shader (context, pass, group->material->shader);
-			liren_context32_set_textures (context, group->material->textures.array, group->material->textures.count);
-			liren_context32_set_mesh (context, group->mesh);
-			liren_context32_bind (context);
-			liren_context32_render_array (context, GL_TRIANGLES, group->index, group->count);
-		}
-	}
-	else
-	{
-		/* Render sorted groups. */
-		for (i = self->sort->buckets.count - 1 ; i >= 0 ; i--)
-		{
-			for (face = self->sort->buckets.array[i] ; face != NULL ; face = face->next)
+			if (face->type == LIREN_SORT_TYPE_FACE)
 			{
-				if (face->type == LIREN_SORT_TYPE_FACE)
-				{
-					/* Render a single transparent triangle. */
-					if (!face->face.material->shader->passes[pass].program)
-						continue;
-					liren_context32_set_material (context, face->face.material);
-					liren_context32_set_modelmatrix (context, &face->face.matrix);
-					liren_context32_set_shader (context, pass, face->face.material->shader);
-					liren_context32_set_textures (context, face->face.material->textures.array, face->face.material->textures.count);
-					liren_context32_set_mesh (context, face->face.mesh);
-					liren_context32_bind (context);
-					liren_context32_render_array (context, GL_TRIANGLES, face->face.index, 3);
-				}
-				else if (face->type == LIREN_SORT_TYPE_GROUP)
-				{
-					/* Render a group of transparent triangles. */
-					if (!face->group.material->shader->passes[pass].program)
-						continue;
-					liren_context32_set_material (context, face->group.material);
-					liren_context32_set_modelmatrix (context, &face->group.matrix);
-					liren_context32_set_shader (context, pass, face->group.material->shader);
-					liren_context32_set_textures (context, face->group.material->textures.array, face->group.material->textures.count);
-					liren_context32_set_mesh (context, face->group.mesh);
-					liren_context32_bind (context);
-					liren_context32_render_array (context, GL_TRIANGLES, face->group.index, face->group.count);
-				}
-				else if (face->type == LIREN_SORT_TYPE_PARTICLE)
-				{
-					/* Render a particle. */
-					if (!face->particle.shader->passes[pass].program)
-						continue;
-					liren_context32_set_modelmatrix (context, &identity);
-					liren_context32_set_shader (context, pass, face->particle.shader);
-					liren_context32_set_textures_raw (context, &face->particle.image->texture->texture, 1);
-					liren_context32_bind (context);
-					glBegin (GL_TRIANGLES);
-					glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, face->particle.diffuse[3], face->particle.size);
-					position = face->particle.position;
-					glVertexAttrib3fv (LIREN_ATTRIBUTE_NORMAL, face->particle.diffuse);
-					glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
-					glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
-					glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
-					glEnd ();
-				}
+				/* Render a single transparent triangle. */
+				if (!face->face.material->shader->passes[pass].program)
+					continue;
+				liren_context32_set_material (context, face->face.material);
+				liren_context32_set_modelmatrix (context, &face->face.matrix);
+				liren_context32_set_shader (context, pass, face->face.material->shader);
+				liren_context32_set_textures (context, face->face.material->textures.array, face->face.material->textures.count);
+				liren_context32_set_mesh (context, face->face.mesh);
+				liren_context32_bind (context);
+				liren_context32_render_array (context, GL_TRIANGLES, face->face.index, 3);
+			}
+			else if (face->type == LIREN_SORT_TYPE_GROUP)
+			{
+				/* Render a group of transparent triangles. */
+				if (!face->group.material->shader->passes[pass].program)
+					continue;
+				liren_context32_set_material (context, face->group.material);
+				liren_context32_set_modelmatrix (context, &face->group.matrix);
+				liren_context32_set_shader (context, pass, face->group.material->shader);
+				liren_context32_set_textures (context, face->group.material->textures.array, face->group.material->textures.count);
+				liren_context32_set_mesh (context, face->group.mesh);
+				liren_context32_bind (context);
+				liren_context32_render_array (context, GL_TRIANGLES, face->group.index, face->group.count);
+			}
+			else if (face->type == LIREN_SORT_TYPE_PARTICLE)
+			{
+				/* Render a particle. */
+				if (!face->particle.shader->passes[pass].program)
+					continue;
+				liren_context32_set_modelmatrix (context, &identity);
+				liren_context32_set_shader (context, pass, face->particle.shader);
+				liren_context32_set_textures_raw (context, &face->particle.image->texture->texture, 1);
+				liren_context32_bind (context);
+				glBegin (GL_TRIANGLES);
+				glVertexAttrib2f (LIREN_ATTRIBUTE_TEXCOORD, face->particle.diffuse[3], face->particle.size);
+				position = face->particle.position;
+				glVertexAttrib3fv (LIREN_ATTRIBUTE_NORMAL, face->particle.diffuse);
+				glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
+				glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
+				glVertexAttrib3f (LIREN_ATTRIBUTE_COORD, position.x, position.y, position.z);
+				glEnd ();
 			}
 		}
 	}

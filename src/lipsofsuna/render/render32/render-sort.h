@@ -95,12 +95,6 @@ struct _LIRenSort32
 		int capacity;
 		LIRenSortface32* array;
 	} faces;
-	struct
-	{
-		int count;
-		int capacity;
-		LIRenSortgroup32* array;
-	} groups;
 };
 
 LIAPICALL (LIRenSort32*, liren_sort32_new, (
