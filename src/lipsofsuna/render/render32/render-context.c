@@ -399,9 +399,9 @@ void liren_context32_set_mesh (
 	LIRenContext32* self,
 	LIRenMesh32*    mesh)
 {
-	if (self->array != mesh->arrays[1])
+	if (self->array != mesh->vao)
 	{
-		self->array = mesh->arrays[1];
+		self->array = mesh->vao;
 		self->changed.buffer = 1;
 	}
 }
@@ -426,6 +426,71 @@ void liren_context32_set_param (
 	const float*  value)
 {
 	liren_uniforms32_set_vec4 (&self->uniforms, LIREN_UNIFORM_MATERIAL_PARAM0, value);
+}
+
+int liren_context32_set_pose (
+	LIRenContext32*  self,
+	const LIMdlPose* pose)
+{
+	int i;
+	int j;
+	int count;
+	int count1;
+	GLfloat* data;
+	LIMdlPoseGroup* group;
+
+	/* Clear the old pose. */
+	if (self->buffer_texture.size)
+		liren_buffer_texture32_clear (&self->buffer_texture);
+
+	/* Collect pose data. */
+	/* The first transformation in the list is the fallback identity
+	   transformation used by vertices that don't have all four weights. */
+	if (pose != NULL)
+		count1 = pose->groups.count;
+	else
+		count1 = 0;
+	count = 12 * (count1 + 1);
+	data = lisys_calloc (count, sizeof (GLfloat));
+	if (data == NULL)
+		return 0;
+	j = 0;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 1.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 0.0f;
+	data[j++] = 1.0f;
+	for (i = 0 ; i < count1 ; i++)
+	{
+		group = pose->groups.array + i;
+		data[j++] = group->head_rest.x;
+		data[j++] = group->head_rest.y;
+		data[j++] = group->head_rest.z;
+		data[j++] = 0.0;
+		data[j++] = group->head_pose.x;
+		data[j++] = group->head_pose.y;
+		data[j++] = group->head_pose.z;
+		data[j++] = group->scale_pose;
+		data[j++] = group->rotation.x;
+		data[j++] = group->rotation.y;
+		data[j++] = group->rotation.z;
+		data[j++] = group->rotation.w;
+	}
+
+	/* Upload to the buffer texture. */
+	liren_buffer_texture32_init (&self->buffer_texture, data, count * sizeof (GLfloat));
+	lisys_free (data);
+	glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_BUFFER_TEXTURE);
+	glBindTexture (GL_TEXTURE_BUFFER, self->buffer_texture.texture);
+
+	return 1;
 }
 
 void liren_context32_set_viewmatrix (

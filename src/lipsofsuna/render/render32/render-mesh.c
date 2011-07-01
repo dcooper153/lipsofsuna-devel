@@ -34,13 +34,10 @@ int liren_mesh32_init (
 	int          vertex_count)
 {
 	GLint restore;
-	const int vertex_size[2] = {
-		16 * sizeof (float) + 8 * sizeof (char),
-		11 * sizeof (float) };
+	const int vertex_size = 16 * sizeof (float) + 8 * sizeof (char);
 	const int vertex_tex_offset = 0 * sizeof (float);
 	const int vertex_nml_offset = 2 * sizeof (float);
 	const int vertex_vtx_offset = 5 * sizeof (float);
-	const int vertex_tan_offset = 8 * sizeof (float);
 	const int vertex_we1_offset = 8 * sizeof (float);
 	const int vertex_we2_offset = 12 * sizeof (float);
 	const int vertex_bo1_offset = 16 * sizeof (float);
@@ -50,62 +47,46 @@ int liren_mesh32_init (
 	memset (self, 0, sizeof (LIRenMesh32));
 	if (!index_count || !vertex_count)
 		return 1;
-	glGenBuffers (3, self->buffers);
-	glGenVertexArrays (2, self->arrays);
+	glGenBuffers (2, self->vbos);
+	glGenVertexArrays (1, &self->vao);
 	self->counts[0] = index_count;
 	self->counts[1] = vertex_count;
-	self->counts[2] = index_count;
 	self->sizes[0] = self->counts[0] * sizeof (GLuint);
-	self->sizes[1] = self->counts[1] * vertex_size[0];
-	self->sizes[2] = self->counts[2] * vertex_size[1];
+	self->sizes[1] = self->counts[1] * vertex_size;
 
 	/* Don't break the active vertex array. */
 	glGetIntegerv (GL_VERTEX_ARRAY_BINDING, &restore);
 	glBindVertexArray (0);
 
-	/* Setup source index buffer. */
-	glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, self->buffers[0]);
+	/* Setup the index buffer. */
+	glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, self->vbos[0]);
 	glBufferData (GL_ELEMENT_ARRAY_BUFFER, self->sizes[0], index_data, GL_STATIC_DRAW);
 
-	/* Setup source vertex buffer. */
-	glBindBuffer (GL_ARRAY_BUFFER, self->buffers[1]);
+	/* Setup the vertex buffer. */
+	glBindBuffer (GL_ARRAY_BUFFER, self->vbos[1]);
 	glBufferData (GL_ARRAY_BUFFER, self->sizes[1], vertex_data, GL_STATIC_DRAW);
 
-	/* Setup destination vertex buffer. */
-	glBindBuffer (GL_ARRAY_BUFFER, self->buffers[2]);
-	glBufferData (GL_ARRAY_BUFFER, self->sizes[2], NULL, GL_STATIC_READ);
-
-	/* Setup vertex array object for transform feedback. */
-	glBindVertexArray (self->arrays[0]);
-	glBindBuffer (GL_ARRAY_BUFFER, self->buffers[1]);
-	glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, self->buffers[0]);
-	glBindBufferBase (GL_TRANSFORM_FEEDBACK_BUFFER, 0, self->buffers[2]);
-	glEnableVertexAttribArray (LIREN_ATTRIBUTE_TEXCOORD);
-	glEnableVertexAttribArray (LIREN_ATTRIBUTE_NORMAL);
-	glEnableVertexAttribArray (LIREN_ATTRIBUTE_COORD);
-	glEnableVertexAttribArray (LIREN_ATTRIBUTE_WEIGHTS1);
-	glEnableVertexAttribArray (LIREN_ATTRIBUTE_WEIGHTS2);
-	glEnableVertexAttribArray (LIREN_ATTRIBUTE_BONES1);
-	glEnableVertexAttribArray (LIREN_ATTRIBUTE_BONES2);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_TEXCOORD, 2, GL_FLOAT, GL_FALSE, vertex_size[0], NULL + vertex_tex_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_NORMAL, 3, GL_FLOAT, GL_FALSE, vertex_size[0], NULL + vertex_nml_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_COORD, 3, GL_FLOAT, GL_FALSE, vertex_size[0], NULL + vertex_vtx_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_WEIGHTS1, 4, GL_FLOAT, GL_FALSE, vertex_size[0], NULL + vertex_we1_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_WEIGHTS2, 4, GL_FLOAT, GL_FALSE, vertex_size[0], NULL + vertex_we2_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_BONES1, 4, GL_UNSIGNED_BYTE, GL_FALSE, vertex_size[0], NULL + vertex_bo1_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_BONES2, 4, GL_UNSIGNED_BYTE, GL_FALSE, vertex_size[0], NULL + vertex_bo2_offset);
-
-	/* Setup vertex array object for rendering. */
-	glBindVertexArray (self->arrays[1]);
-	glBindBuffer (GL_ARRAY_BUFFER, self->buffers[2]);
+	/* Setup vertex array object. */
+	glBindVertexArray (self->vao);
+	glBindBuffer (GL_ARRAY_BUFFER, self->vbos[1]);
+	glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, self->vbos[0]);
 	glEnableVertexAttribArray (LIREN_ATTRIBUTE_TEXCOORD);
 	glEnableVertexAttribArray (LIREN_ATTRIBUTE_NORMAL);
 	glEnableVertexAttribArray (LIREN_ATTRIBUTE_COORD);
 	glEnableVertexAttribArray (LIREN_ATTRIBUTE_TANGENT);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_TEXCOORD, 2, GL_FLOAT, GL_FALSE, vertex_size[1], NULL + vertex_tex_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_NORMAL, 3, GL_FLOAT, GL_FALSE, vertex_size[1], NULL + vertex_nml_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_COORD, 3, GL_FLOAT, GL_FALSE, vertex_size[1], NULL + vertex_vtx_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_TANGENT, 3, GL_FLOAT, GL_FALSE, vertex_size[1], NULL + vertex_tan_offset);
+	glEnableVertexAttribArray (LIREN_ATTRIBUTE_WEIGHTS1);
+	glEnableVertexAttribArray (LIREN_ATTRIBUTE_WEIGHTS2);
+	glEnableVertexAttribArray (LIREN_ATTRIBUTE_BONES1);
+	glEnableVertexAttribArray (LIREN_ATTRIBUTE_BONES2);
+	glVertexAttribPointer (LIREN_ATTRIBUTE_TEXCOORD, 2, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_tex_offset);
+	glVertexAttribPointer (LIREN_ATTRIBUTE_NORMAL, 3, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_nml_offset);
+	glVertexAttribPointer (LIREN_ATTRIBUTE_COORD, 3, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_vtx_offset);
+	glVertexAttribPointer (LIREN_ATTRIBUTE_WEIGHTS1, 4, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_we1_offset);
+	glVertexAttribPointer (LIREN_ATTRIBUTE_WEIGHTS2, 4, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_we2_offset);
+	glVertexAttribPointer (LIREN_ATTRIBUTE_BONES1, 4, GL_UNSIGNED_BYTE, GL_FALSE, vertex_size, NULL + vertex_bo1_offset);
+	glVertexAttribPointer (LIREN_ATTRIBUTE_BONES2, 4, GL_UNSIGNED_BYTE, GL_FALSE, vertex_size, NULL + vertex_bo2_offset);
+	/* FIXME: Tangent storage not supported by the model format yet so using the normal as a placeholder. */
+	glVertexAttribPointer (LIREN_ATTRIBUTE_TANGENT, 3, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_nml_offset);
 
 	/* Don't break the active vertex array. */
 	glBindVertexArray (restore);
@@ -124,8 +105,8 @@ int liren_mesh32_init (
 void liren_mesh32_clear (
 	LIRenMesh32* self)
 {
-	glDeleteVertexArrays (2, self->arrays);
-	glDeleteBuffers (3, self->buffers);
+	glDeleteVertexArrays (1, &self->vao);
+	glDeleteBuffers (2, self->vbos);
 	lisys_free (self->reload_index_data);
 	lisys_free (self->reload_vertex_data);
 	memset (self, 0, sizeof (LIRenMesh32));
@@ -134,19 +115,6 @@ void liren_mesh32_clear (
 void liren_mesh32_deform (
 	LIRenMesh32* self)
 {
-	GLint restore;
-
-	if (!self->arrays[0])
-		return;
-	glGetIntegerv (GL_VERTEX_ARRAY_BINDING, &restore);
-	glBindVertexArray (self->arrays[0]);
-	glBindBufferBase (GL_TRANSFORM_FEEDBACK_BUFFER, 0, self->buffers[2]);
-	glBeginTransformFeedback (GL_TRIANGLES);
-	glEnable (GL_RASTERIZER_DISCARD);
-	glDrawElements (GL_TRIANGLES, self->counts[0], GL_UNSIGNED_INT, NULL);
-	glDisable (GL_RASTERIZER_DISCARD);
-	glEndTransformFeedback ();
-	glBindVertexArray (restore);
 }
 
 /**
@@ -165,12 +133,12 @@ void* liren_mesh32_lock_vertices (
 	GLint restore;
 	LIRenFormat format;
 
-	if (self->buffers[2])
+	if (self->vbos[1])
 	{
 		liren_mesh32_get_format (self, &format);
 		glGetIntegerv (GL_VERTEX_ARRAY_BINDING, &restore);
 		glBindVertexArray (0);
-		glBindBuffer (GL_ARRAY_BUFFER, self->buffers[2]);
+		glBindBuffer (GL_ARRAY_BUFFER, self->vbos[1]);
 		ret = glMapBufferRange (GL_ARRAY_BUFFER, format.size * start, format.size * count, GL_MAP_READ_BIT);
 		glBindVertexArray (restore);
 		return ret;
@@ -197,8 +165,8 @@ void liren_mesh32_reload (
 
 	if (!pass)
 	{
-		glDeleteVertexArrays (2, self->arrays);
-		glDeleteBuffers (3, self->buffers);
+		glDeleteVertexArrays (1, &self->vao);
+		glDeleteBuffers (2, self->vbos);
 	}
 	else
 	{
@@ -215,11 +183,11 @@ void liren_mesh32_unlock_vertices (
 {
 	GLint restore;
 
-	if (self->buffers[2])
+	if (self->vbos[1])
 	{
 		glGetIntegerv (GL_VERTEX_ARRAY_BINDING, &restore);
 		glBindVertexArray (0);
-		glBindBuffer (GL_ARRAY_BUFFER, self->buffers[2]);
+		glBindBuffer (GL_ARRAY_BUFFER, self->vbos[1]);
 		glUnmapBuffer (GL_ARRAY_BUFFER);
 		glBindVertexArray (restore);
 	}
@@ -231,7 +199,7 @@ void liren_mesh32_get_format (
 {
 	const LIRenFormat format =
 	{
-		11 * sizeof (float),
+		16 * sizeof (float) + 8 * sizeof (char),
 		GL_FLOAT, 0 * sizeof (float),
 		GL_FLOAT, 2 * sizeof (float),
 		GL_FLOAT, 5 * sizeof (float)

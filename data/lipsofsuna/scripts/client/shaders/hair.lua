@@ -9,7 +9,8 @@ pass1_vertex = [[
 out vec2 F_texcoord;
 void main()
 {
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	]] .. Shader.los_animation_co() .. [[
+	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	F_texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
@@ -31,10 +32,11 @@ out vec3 F_tangent;
 out vec2 F_texcoord;
 void main()
 {
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	]] .. Shader.los_animation_cono() .. [[
+	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	]] .. Shader.los_lighting_vectors("F_lightvector", "F_halfvector", "tmp.xyz") .. [[
 	F_coord = tmp.xyz;
-	F_normal = LOS_matrix_normal * LOS_normal;
+	F_normal = LOS_matrix_normal * anim_normal;
 	F_tangent = LOS_matrix_normal * LOS_tangent;
 	F_texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;

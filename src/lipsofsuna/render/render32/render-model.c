@@ -98,69 +98,7 @@ int liren_model32_deform (
 	const char*      shader,
 	const LIMdlPose* pose)
 {
-	int i;
-	int j;
-	int count;
-	GLfloat* data;
-	LIMdlPoseGroup* group;
-	LIRenBufferTexture32 tmp;
-	LIRenContext32* context;
-	LIRenShader32* shader_;
-
-	/* Find the transform feedback shader. */
-	shader_ = liren_render32_find_shader (self->render, shader);
-	if (shader_ == NULL)
-		return 0;
-
-	/* Collect pose data. */
-	/* The first transformation in the list is the fallback identity
-	   transformation used by vertices that don't have all four weights. */
-	count = 12 * (pose->groups.count + 1);
-	data = lisys_calloc (count, sizeof (GLfloat));
-	if (data == NULL)
-		return 0;
-	j = 0;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 1.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 1.0f;
-	for (i = 0 ; i < pose->groups.count ; i++)
-	{
-		group = pose->groups.array + i;
-		data[j++] = group->head_rest.x;
-		data[j++] = group->head_rest.y;
-		data[j++] = group->head_rest.z;
-		data[j++] = 0.0;
-		data[j++] = group->head_pose.x;
-		data[j++] = group->head_pose.y;
-		data[j++] = group->head_pose.z;
-		data[j++] = group->scale_pose;
-		data[j++] = group->rotation.x;
-		data[j++] = group->rotation.y;
-		data[j++] = group->rotation.z;
-		data[j++] = group->rotation.w;
-	}
-
-	/* Deform the mesh. */
-	context = liren_render32_get_context (self->render);
-	liren_context32_init (context);
-	liren_context32_set_shader (context, 0, shader_);
-	liren_context32_bind (context);
-	liren_buffer_texture32_init (&tmp, data, count * sizeof (GLfloat));
-	lisys_free (data);
-	glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_BUFFER_TEXTURE);
-	glBindTexture (GL_TEXTURE_BUFFER, tmp.texture);
-	liren_mesh32_deform (&self->mesh);
-	liren_buffer_texture32_clear (&tmp);
-
+	/* The vertex shader takes care of animations. */
 	return 1;
 }
 
@@ -177,21 +115,8 @@ void liren_model32_reload (
 	LIRenModel32* self,
 	int           pass)
 {
-	LIMdlPose* pose;
-
-	/* Reload vertex buffers. */
+	/* Reload the vertex buffer. */
 	liren_mesh32_reload (&self->mesh, pass);
-
-	/* Reset the pose. */
-	if (pass)
-	{
-		pose = limdl_pose_new ();
-		if (pose != NULL)
-		{
-			liren_model32_deform (self, "skeletal", pose);
-			limdl_pose_free (pose);
-		}
-	}
 }
 
 void liren_model32_replace_image (
@@ -366,12 +291,8 @@ static int private_init_model (
 {
 	int c;
 	int i;
-	int ok;
-	void* vertices;
 	uint32_t* indices;
-	GLint restore;
 	LIMdlFaces* group;
-	LIMdlPose* pose;
 
 	/* Allocate face groups. */
 	self->groups.count = model->facegroups.count;
@@ -420,34 +341,6 @@ static int private_init_model (
 		return 0;
 	}
 	lisys_free (indices);
-
-	/* Transform the default pose. */
-	pose = limdl_pose_new ();
-	if (pose != NULL)
-	{
-		ok = limdl_pose_set_model (pose, model) &&
-		     liren_model32_deform (self, "skeletal", pose);
-		limdl_pose_free (pose);
-	}
-	else
-		ok = 0;
-
-	/* If transforming the default pose failed, our transform feedback buffer
-	   is full of random data since we never initialized it. To avoid an ugly
-	   polygon mess when the shader is missing, we zero the buffer as a fallback. */
-	if (!ok && self->mesh.sizes[2])
-	{
-		glGetIntegerv (GL_VERTEX_ARRAY_BINDING, &restore);
-		glBindVertexArray (0);
-		glBindBuffer (GL_ARRAY_BUFFER, self->mesh.buffers[2]);
-		vertices = glMapBuffer (GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-		if (vertices != NULL)
-		{
-			memset (vertices, 0, self->mesh.sizes[2]);
-			glUnmapBuffer (GL_ARRAY_BUFFER);
-		}
-		glBindVertexArray (restore);
-	}
 
 	/* Initialize face sorting for transparent material groups. */
 	liren_model32_update_transparency (self);

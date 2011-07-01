@@ -3,25 +3,14 @@ Shader{name = "skin",
 -- Low quality program.
 -- No lighting.
 low = {
-pass1_color_write = false,
-pass1_depth_func = "lequal",
-pass1_vertex = [[
-void main()
-{
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
-	gl_Position = LOS_matrix_projection * tmp;
-}]],
-pass1_fragment = [[
-void main()
-{
-}]],
-pass4_depth_func = "equal",
+pass4_depth_func = "lequal",
 pass4_depth_write = false,
 pass4_vertex = [[
 out vec2 F_texcoord;
 void main()
 {
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	]] .. Shader.los_animation_cono() .. [[
+	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	F_texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
@@ -41,7 +30,8 @@ pass1_depth_func = "lequal",
 pass1_vertex = [[
 void main()
 {
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	]] .. Shader.los_animation_co() .. [[
+	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass1_fragment = [[
@@ -56,9 +46,10 @@ out vec2 F_texcoord;
 out vec4 F_light;
 void main()
 {
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	]] .. Shader.los_animation_cono() .. [[
+	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	vec3 coord = tmp.xyz;
-	F_normal = LOS_matrix_normal * LOS_normal;
+	F_normal = LOS_matrix_normal * anim_normal;
 	F_texcoord = LOS_texcoord;
 	vec3 halfvector[LOS_LIGHT_MAX];
 	vec3 lightvector[LOS_LIGHT_MAX];
@@ -88,7 +79,8 @@ pass1_depth_func = "lequal",
 pass1_vertex = [[
 void main()
 {
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	]] .. Shader.los_animation_co() .. [[
+	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass1_fragment = [[
@@ -106,10 +98,11 @@ out vec3 F_tangent;
 out vec2 F_texcoord;
 void main()
 {
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	]] .. Shader.los_animation_cono() .. [[
+	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	]] .. Shader.los_lighting_vectors("F_lightvector", "F_halfvector", "tmp.xyz") .. [[
 	F_coord = tmp.xyz;
-	F_normal = LOS_matrix_normal * LOS_normal;
+	F_normal = LOS_matrix_normal * anim_normal;
 	F_tangent = LOS_matrix_normal * LOS_tangent;
 	F_texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;

@@ -319,6 +319,7 @@ static void private_render_pass_nosort (
 		/* Bind the object data. */
 		liren_context32_set_modelmatrix (context, &object->orientation.matrix);
 		liren_context32_set_mesh (context, &object->model->mesh);
+		liren_context32_set_pose (context, object->pose);
 
 		/* Render each material group that has the pass. */
 		for (i = 0 ; i < object->model->materials.count ; i++)
@@ -332,12 +333,12 @@ static void private_render_pass_nosort (
 			liren_context32_set_shader (context, pass, material->shader);
 			liren_context32_set_textures (context, material->textures.array, material->textures.count);
 			liren_context32_bind (context);
-			liren_context32_render_array (context, GL_TRIANGLES, start, count);
+			liren_context32_render_indexed (context, start, count);
 		}
 
 		/* Render the effect layer. */
 		material = object->effect.material;
-		if (material != NULL && material->shader->passes[pass].program)
+		if (material != NULL && object->model->groups.count && material->shader->passes[pass].program)
 		{
 			start = object->model->groups.array[object->model->groups.count - 1].start;
 			count = object->model->groups.array[object->model->groups.count - 1].count;
@@ -345,7 +346,7 @@ static void private_render_pass_nosort (
 			liren_context32_set_shader (context, pass, material->shader);
 			liren_context32_set_textures (context, material->textures.array, material->textures.count);
 			liren_context32_bind (context);
-			liren_context32_render_array (context, GL_TRIANGLES, 0, start + count);
+			liren_context32_render_indexed (context, 0, start + count);
 		}
 	}
 }
@@ -379,7 +380,7 @@ static void private_render_pass_sort (
 				liren_context32_set_textures (context, face->face.material->textures.array, face->face.material->textures.count);
 				liren_context32_set_mesh (context, face->face.mesh);
 				liren_context32_bind (context);
-				liren_context32_render_array (context, GL_TRIANGLES, face->face.index, 3);
+				liren_context32_render_indexed (context, face->face.index, 3);
 			}
 			else if (face->type == LIREN_SORT_TYPE_GROUP)
 			{
@@ -392,7 +393,7 @@ static void private_render_pass_sort (
 				liren_context32_set_textures (context, face->group.material->textures.array, face->group.material->textures.count);
 				liren_context32_set_mesh (context, face->group.mesh);
 				liren_context32_bind (context);
-				liren_context32_render_array (context, GL_TRIANGLES, face->group.index, face->group.count);
+				liren_context32_render_indexed (context, face->group.index, face->group.count);
 			}
 			else if (face->type == LIREN_SORT_TYPE_PARTICLE)
 			{

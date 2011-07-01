@@ -25,10 +25,10 @@
 typedef struct _LIRenMesh32 LIRenMesh32;
 struct _LIRenMesh32
 {
-	int sizes[3];
-	int counts[3];
-	GLuint buffers[3];
-	GLuint arrays[2];
+	int sizes[2];
+	int counts[2];
+	GLuint vbos[2];
+	GLuint vao;
 	int reload_index_count;
 	void* reload_index_data;
 	int reload_vertex_count;

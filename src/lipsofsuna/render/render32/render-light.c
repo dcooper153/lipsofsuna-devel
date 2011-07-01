@@ -760,7 +760,7 @@ static void private_update_shadow (
 		liren_context32_set_modelmatrix (context, &object->orientation.matrix);
 		liren_context32_set_mesh (context, &object->model->mesh);
 		liren_context32_bind (context);
-		liren_context32_render_array (context, GL_TRIANGLES, 0, object->model->mesh.counts[2]);
+		liren_context32_render_indexed (context, 0, object->model->mesh.counts[0]);
 	}
 
 	/* Disable depth rendering mode. */

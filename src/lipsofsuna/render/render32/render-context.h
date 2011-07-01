@@ -18,9 +18,10 @@
 #ifndef __RENDER32_CONTEXT_H__
 #define __RENDER32_CONTEXT_H__
 
-#include <lipsofsuna/image.h>
-#include <lipsofsuna/model.h>
+#include "lipsofsuna/image.h"
+#include "lipsofsuna/model.h"
 #include "render-buffer.h"
+#include "render-buffer-texture.h"
 #include "render-light.h"
 #include "render-material.h"
 #include "render-scene.h"
@@ -48,6 +49,7 @@ struct _LIRenContext32
 	LIRenScene32* scene;
 	LIRenShader32* shader;
 	LIMatFrustum frustum;
+	LIRenBufferTexture32 buffer_texture;
 	LIRenUniforms32 uniforms;
 	GLuint shadow_texture;
 	int alpha_to_coverage;
@@ -191,6 +193,10 @@ LIAPICALL (void, liren_context32_set_modelmatrix, (
 LIAPICALL (void, liren_context32_set_param, (
 	LIRenContext32* self,
 	const float*    value));
+
+LIAPICALL (int, liren_context32_set_pose, (
+	LIRenContext32*  self,
+	const LIMdlPose* pose));
 
 LIAPICALL (void, liren_context32_set_viewmatrix, (
 	LIRenContext32*    self,

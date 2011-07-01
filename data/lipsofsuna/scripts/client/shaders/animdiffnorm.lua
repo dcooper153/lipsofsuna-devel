@@ -1,4 +1,4 @@
-Shader{name = "android",
+Shader{name = "animdiffnorm",
 
 -- Low quality program.
 -- No lighting.

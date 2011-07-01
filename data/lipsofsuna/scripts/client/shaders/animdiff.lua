@@ -1,4 +1,4 @@
-Shader{name = "android",
+Shader{name = "animdiff",
 
 -- Low quality program.
 -- No lighting.
@@ -23,7 +23,7 @@ void main()
 }]]},
 
 -- Medium quality program.
--- Normal mapping.
+-- Fragment lighting.
 medium = {
 pass1_color_write = false,
 pass1_depth_func = "lequal",
@@ -45,7 +45,6 @@ out vec3 F_coord;
 out vec3 F_halfvector[LOS_LIGHT_MAX];
 out vec3 F_lightvector[LOS_LIGHT_MAX];
 out vec3 F_normal;
-out vec3 F_tangent;
 out vec2 F_texcoord;
 void main()
 {
@@ -54,21 +53,18 @@ void main()
 	]] .. Shader.los_lighting_vectors("F_lightvector", "F_halfvector", "tmp.xyz") .. [[
 	F_coord = tmp.xyz;
 	F_normal = LOS_matrix_normal * anim_normal;
-	F_tangent = LOS_matrix_normal * LOS_tangent;
 	F_texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
-pass4_fragment = Shader.los_normal_mapping .. [[
+pass4_fragment = [[
 in vec3 F_coord;
 in vec3 F_halfvector[LOS_LIGHT_MAX];
 in vec3 F_lightvector[LOS_LIGHT_MAX];
 in vec3 F_normal;
-in vec3 F_tangent;
 in vec2 F_texcoord;
 void main()
 {
-	vec3 tangent = normalize(F_tangent);
-	vec3 normal = los_normal_mapping(F_normal, tangent, F_texcoord, LOS_diffuse_texture_1);
+	vec3 normal = normalize(F_normal);
 	vec4 diffuse = texture(LOS_diffuse_texture_0, F_texcoord);
 	]] .. Shader.los_lighting_default("F_coord", "normal", "F_lightvector", "F_halfvector") .. [[
 	LOS_output_0 = LOS_material_diffuse * diffuse * lighting;
