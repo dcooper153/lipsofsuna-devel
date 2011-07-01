@@ -32,6 +32,9 @@ typedef int (*LIMdlWriteFunc)(const LIMdlModel*, LIArcWriter*);
 static void private_build (
 	LIMdlModel* self);
 
+static void private_build_tangents (
+	LIMdlModel* self);
+
 static int private_read (
 	LIMdlModel*  self,
 	LIArcReader* reader,
@@ -395,6 +398,15 @@ void limdl_model_calculate_bounds (
 		self->bounds.min = limat_vector_init (0.0f, 0.0f, 0.0f);
 		self->bounds.max = limat_vector_init (0.0f, 0.0f, 0.0f);
 	}
+}
+/**
+ * \brief Calculates the vertex tangents.
+ * \param self Model.
+ */
+void limdl_model_calculate_tangents (
+	LIMdlModel* self)
+{
+	private_build_tangents (self);
 }
 
 /**
@@ -862,6 +874,56 @@ static void private_build (
 		node = self->nodes.array[i];
 		limdl_node_rebuild (node, 1);
 	}
+
+	/* Calculate vertex tangents. */
+	private_build_tangents (self);
+}
+
+static void private_build_tangents (
+	LIMdlModel* self)
+{
+	int i;
+	int j;
+	int k;
+	float sign;
+	float uv0[2];
+	float uv1[2];
+	uint32_t* idx;
+	LIMatVector tmp;
+	LIMatVector ed0;
+	LIMatVector ed1;
+	LIMdlFaces* faces;
+	LIMdlVertex* vtx[3];
+
+	for (i = 0 ; i < self->vertices.count ; i++)
+		self->vertices.array[i].tangent = limat_vector_init (0.0f, 0.0f, 0.0f);
+	for (i = 0 ; i < self->facegroups.count ; i++)
+	{
+		faces = self->facegroups.array + i;
+		for (j = 0, idx = faces->indices.array ; j < faces->indices.count ; j += 3, idx += 3)
+		{
+			vtx[0] = self->vertices.array + idx[0];
+			vtx[1] = self->vertices.array + idx[1];
+			vtx[2] = self->vertices.array + idx[2];
+			ed0 = limat_vector_subtract (vtx[1]->coord, vtx[0]->coord);
+			ed1 = limat_vector_subtract (vtx[2]->coord, vtx[0]->coord);
+			uv0[0] = vtx[1]->texcoord[0] - vtx[0]->texcoord[0];
+			uv0[1] = vtx[1]->texcoord[1] - vtx[0]->texcoord[1];
+			uv1[0] = vtx[2]->texcoord[0] - vtx[0]->texcoord[0];
+			uv1[1] = vtx[2]->texcoord[1] - vtx[0]->texcoord[1];
+			sign = uv0[0] * uv1[1] - uv1[0] * uv0[1];
+			sign = (sign > 0.0f)? 1.0f : -1.0f;
+			tmp = limat_vector_subtract (
+				limat_vector_multiply (ed1, uv0[1]),
+				limat_vector_multiply (ed0, uv1[1]));
+			tmp = limat_vector_multiply (tmp, sign);
+			tmp = limat_vector_normalize (tmp);
+			for (k = 0 ; k < 3 ; k++)
+				vtx[k]->tangent = limat_vector_add (vtx[k]->tangent, tmp);
+		}
+	}
+	for (i = 0 ; i < self->vertices.count ; i++)
+		self->vertices.array[i].tangent = limat_vector_normalize (self->vertices.array[i].tangent);
 }
 
 static int private_read (

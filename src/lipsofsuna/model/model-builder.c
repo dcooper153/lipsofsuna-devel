@@ -88,6 +88,9 @@ void limdl_builder_finish (
 {
 	/* Calculate the bounding box. */
 	limdl_model_calculate_bounds (self->model);
+
+	/* Calculate vertex tangents. */
+	limdl_model_calculate_tangents (self->model);
 }
 
 /**

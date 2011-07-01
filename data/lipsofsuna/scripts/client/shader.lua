@@ -133,6 +133,59 @@ Shader.los_animation_cono = function()
 	anim_normal = normalize(anim_normal) * length(LOS_normal);]]
 end
 
+--- Calculates skeletal animation for the vertex shader inputs.
+Shader.los_animation_conota = function()
+	return [[int anim_i;
+	int anim_bone[8] = int[](
+		int(LOS_bones1.x), int(LOS_bones1.y), int(LOS_bones1.z), int(LOS_bones1.w),
+		int(LOS_bones2.x), int(LOS_bones2.y), int(LOS_bones2.z), int(LOS_bones2.w));
+	float anim_weight[8] = float[](
+		LOS_weights1.x, LOS_weights1.y, LOS_weights1.z, LOS_weights1.w,
+		LOS_weights2.x, LOS_weights2.y, LOS_weights2.z, LOS_weights2.w);
+	vec3 anim_coord = vec3(0.0);
+	vec3 anim_normal = vec3(0.0);
+	vec3 anim_tangent = vec3(0.0);
+	for (anim_i = 0 ; anim_i < 8 ; anim_i++)
+	{
+		int offset = 3 * anim_bone[anim_i];
+		vec3 restpos = texelFetch(LOS_buffer_texture, offset).xyz;
+		vec4 posepos = texelFetch(LOS_buffer_texture, offset + 1);
+		vec4 poserot = texelFetch(LOS_buffer_texture, offset + 2);
+		vec3 v1 = (LOS_coord - restpos) * posepos.w;
+		vec4 a1 = vec4(
+			 (poserot.w * v1.x) + (poserot.y * v1.z) - (poserot.z * v1.y),
+			 (poserot.w * v1.y) - (poserot.x * v1.z) + (poserot.z * v1.x),
+			 (poserot.w * v1.z) + (poserot.x * v1.y) - (poserot.y * v1.x),
+			-(poserot.x * v1.x) - (poserot.y * v1.y) - (poserot.z * v1.z));
+		anim_coord += anim_weight[anim_i] * (posepos.xyz + vec3(
+			(a1.w * -poserot.x) + (a1.x *  poserot.w) + (a1.y * -poserot.z) - (a1.z * -poserot.y),
+			(a1.w * -poserot.y) - (a1.x * -poserot.z) + (a1.y *  poserot.w) + (a1.z * -poserot.x),
+			(a1.w * -poserot.z) + (a1.x * -poserot.y) - (a1.y * -poserot.x) + (a1.z *  poserot.w)));
+		vec3 v2 = LOS_normal;
+		vec4 a2 = vec4(
+			 (poserot.w * v2.x) + (poserot.y * v2.z) - (poserot.z * v2.y),
+			 (poserot.w * v2.y) - (poserot.x * v2.z) + (poserot.z * v2.x),
+			 (poserot.w * v2.z) + (poserot.x * v2.y) - (poserot.y * v2.x),
+			-(poserot.x * v2.x) - (poserot.y * v2.y) - (poserot.z * v2.z));
+		anim_normal += anim_weight[anim_i] * vec3(
+			(a2.w * -poserot.x) + (a2.x *  poserot.w) + (a2.y * -poserot.z) - (a2.z * -poserot.y),
+			(a2.w * -poserot.y) - (a2.x * -poserot.z) + (a2.y *  poserot.w) + (a2.z * -poserot.x),
+			(a2.w * -poserot.z) + (a2.x * -poserot.y) - (a2.y * -poserot.x) + (a2.z *  poserot.w));
+		vec3 v3 = LOS_tangent;
+		vec4 a3 = vec4(
+			 (poserot.w * v3.x) + (poserot.y * v3.z) - (poserot.z * v3.y),
+			 (poserot.w * v3.y) - (poserot.x * v3.z) + (poserot.z * v3.x),
+			 (poserot.w * v3.z) + (poserot.x * v3.y) - (poserot.y * v3.x),
+			-(poserot.x * v3.x) - (poserot.y * v3.y) - (poserot.z * v3.z));
+		anim_tangent += anim_weight[anim_i] * vec3(
+			(a3.w * -poserot.x) + (a3.x *  poserot.w) + (a3.y * -poserot.z) - (a3.z * -poserot.y),
+			(a3.w * -poserot.y) - (a3.x * -poserot.z) + (a3.y *  poserot.w) + (a3.z * -poserot.x),
+			(a3.w * -poserot.z) + (a3.x * -poserot.y) - (a3.y * -poserot.x) + (a3.z *  poserot.w));
+	}
+	anim_normal = normalize(anim_normal) * length(LOS_normal);
+	anim_tangent = normalize(anim_tangent);]]
+end
+
 --- Calculates lighting and stores it to a variable named lighting.
 -- @param co Variable name that contains the fragment coordinate.
 -- @param no Variable name that contains the fragment normal.

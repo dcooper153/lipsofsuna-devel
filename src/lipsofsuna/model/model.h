@@ -89,6 +89,9 @@ LIAPICALL (void, limdl_model_free, (
 LIAPICALL (void, limdl_model_calculate_bounds, (
 	LIMdlModel* self));
 
+LIAPICALL (void, limdl_model_calculate_tangents, (
+	LIMdlModel* self));
+
 LIAPICALL (LIMdlAnimation*, limdl_model_find_animation, (
 	LIMdlModel* self,
 	const char* name));

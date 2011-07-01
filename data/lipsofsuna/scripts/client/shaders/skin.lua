@@ -98,12 +98,12 @@ out vec3 F_tangent;
 out vec2 F_texcoord;
 void main()
 {
-	]] .. Shader.los_animation_cono() .. [[
+	]] .. Shader.los_animation_conota() .. [[
 	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	]] .. Shader.los_lighting_vectors("F_lightvector", "F_halfvector", "tmp.xyz") .. [[
 	F_coord = tmp.xyz;
 	F_normal = LOS_matrix_normal * anim_normal;
-	F_tangent = LOS_matrix_normal * LOS_tangent;
+	F_tangent = LOS_matrix_normal * anim_tangent;
 	F_texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],

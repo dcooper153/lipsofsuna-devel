@@ -269,7 +269,7 @@ static int private_build (
 	for (x = 1 ; x < self->size[0] - 1 ; x++)
 		private_merge_voxel (self, x, y, z);
 
-	/* Calculate bounds needed by frustum culling. */
+	/* Calculate bounds and tangents. */
 	if (self->model_builder != NULL)
 		limdl_builder_finish (self->model_builder);
 
