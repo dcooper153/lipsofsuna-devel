@@ -29,6 +29,8 @@ struct _LIMdlVertex
 	float texcoord[2];
 	LIMatVector normal;
 	LIMatVector coord;
+	LIMatVector tangent;
+	float color[4];
 	float weights[LIMDL_VERTEX_WEIGHTS_MAX];
 	unsigned char bones[LIMDL_VERTEX_WEIGHTS_MAX];
 };
@@ -45,6 +47,10 @@ limdl_vertex_init (LIMdlVertex*       self,
 	self->texcoord[1] = v;
 	self->normal = *normal;
 	self->coord = *coord;
+	self->color[0] = 1.0f;
+	self->color[1] = 1.0f;
+	self->color[2] = 1.0f;
+	self->color[3] = 1.0f;
 	self->weights[0] = 1.0f;
 }
 

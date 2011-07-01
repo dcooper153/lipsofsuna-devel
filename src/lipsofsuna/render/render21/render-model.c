@@ -30,7 +30,7 @@
 
 static const LIRenFormat private_vertex_format =
 {
-	16 * sizeof (float) + 8 * sizeof (char),
+	11 * sizeof (float) + 12 * sizeof (char),
 	GL_FLOAT, 0 * sizeof (float),
 	GL_FLOAT, 2 * sizeof (float),
 	GL_FLOAT, 5 * sizeof (float)
@@ -413,7 +413,7 @@ static inline void private_vert_xform (
 	LIMatVector nml = { 0.0f, 0.0f, 0.0f };
 	LIMatVector vtx = { 0.0f, 0.0f, 0.0f };
 
-	for (i = 0 ; i < 8 && (i < 1 || in->bones[i]) ; i++)
+	for (i = 0 ; i < LIMDL_VERTEX_WEIGHTS_MAX && (i < 1 || in->bones[i]) ; i++)
 	{
 		offset = 12 * in->bones[i];
 		poserot = limat_quaternion_init (buf[offset + 8], buf[offset + 9], buf[offset + 10], buf[offset + 11]);

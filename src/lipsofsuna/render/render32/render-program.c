@@ -313,6 +313,7 @@ static int private_compile (
 		"uniform sampler2DShadow LOS_shadow_texture;\n",
 		/* Vertex */
 		"#version 150\n"
+		"in vec4 LOS_color;\n"
 		"in vec3 LOS_coord;\n"
 		"in vec2 LOS_texcoord;\n"
 		"in vec3 LOS_normal;\n"
@@ -390,6 +391,7 @@ static int private_compile (
 	glAttachShader (self->program, self->fragment);
 
 	/* Bind attributes and outputs. */
+	glBindAttribLocation (self->program, LIREN_ATTRIBUTE_COLOR, "LOS_color");
 	glBindAttribLocation (self->program, LIREN_ATTRIBUTE_COORD, "LOS_coord");
 	glBindAttribLocation (self->program, LIREN_ATTRIBUTE_TEXCOORD, "LOS_texcoord");
 	glBindAttribLocation (self->program, LIREN_ATTRIBUTE_NORMAL, "LOS_normal");
