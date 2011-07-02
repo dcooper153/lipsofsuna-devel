@@ -130,7 +130,7 @@ Shader.los_animation_cono = function()
 			(a2.w * -poserot.y) - (a2.x * -poserot.z) + (a2.y *  poserot.w) + (a2.z * -poserot.x),
 			(a2.w * -poserot.z) + (a2.x * -poserot.y) - (a2.y * -poserot.x) + (a2.z *  poserot.w));
 	}
-	anim_normal = normalize(anim_normal) * length(LOS_normal);]]
+	anim_normal = normalize(anim_normal);]]
 end
 
 --- Calculates skeletal animation for the vertex shader inputs.
@@ -182,7 +182,7 @@ Shader.los_animation_conota = function()
 			(a3.w * -poserot.y) - (a3.x * -poserot.z) + (a3.y *  poserot.w) + (a3.z * -poserot.x),
 			(a3.w * -poserot.z) + (a3.x * -poserot.y) - (a3.y * -poserot.x) + (a3.z *  poserot.w));
 	}
-	anim_normal = normalize(anim_normal) * length(LOS_normal);
+	anim_normal = normalize(anim_normal);
 	anim_tangent = normalize(anim_tangent);]]
 end
 

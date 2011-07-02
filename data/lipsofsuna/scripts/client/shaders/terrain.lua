@@ -66,7 +66,7 @@ void main()
 	F_normal = LOS_matrix_normal * LOS_normal;
 	F_tangent = LOS_matrix_normal * LOS_tangent;
 	F_texcoord = LOS_texcoord;
-	F_splatting = length(LOS_normal) - 1.0;
+	F_splatting = 1.0 - LOS_color.a;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass4_fragment = Shader.los_normal_mapping .. [[

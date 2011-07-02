@@ -354,9 +354,9 @@ static int private_merge_triangles_model (
 		/* Calculate texture coordinates and splatting. */
 		for (j = 0 ; j < 3 ; j++)
 		{
-			/* Calculate texture splatting factor. */
-			/* The factor is stored as the length of the normal. */
-			splat = 0.0f;
+			/* Calculate the texture splatting factor. */
+			/* The factor will be stored to the vertex color alpha channel. */
+			splat = 1.0f;
 			xr = LIMAT_CLAMP ((int)(coords[i + j].x / 0.34f), 0, 2);
 			yr = LIMAT_CLAMP ((int)(coords[i + j].y / 0.34f), 0, 2);
 			zr = LIMAT_CLAMP ((int)(coords[i + j].z / 0.34f), 0, 2);
@@ -366,11 +366,10 @@ static int private_merge_triangles_model (
 			{
 				if (types[x][y][z] && types[x][y][z] != types[1][1][1])
 				{
-					splat = 1.0f;
+					splat = 0.0f;
 					z = y = x = 3;
 				}
 			}
-			normal[j] = limat_vector_multiply (normal[j], 1.0f + splat);
 
 			/* Calculate texture coordinates. */
 			switch (faces[i / 3])
@@ -404,6 +403,7 @@ static int private_merge_triangles_model (
 
 			/* Initialize the vertex. */
 			limdl_vertex_init (vertices + j, coord + j, normal + j, uv[0], uv[1]);
+			vertices[j].color[3] = splat;
 		}
 
 		/* Merge vertices. */
