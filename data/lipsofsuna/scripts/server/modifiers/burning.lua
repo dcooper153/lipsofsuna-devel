@@ -1,5 +1,5 @@
 --- Burning modifier.
-Modifier{name = "burning", func = function(self, object, timer, secs)
+Modifier{name = "burning", func = function(self, object, args, secs)
 	-- Update the burning timer.
 	if not object.burning_timer then
 		object.burning_timer = secs
@@ -12,5 +12,5 @@ Modifier{name = "burning", func = function(self, object, timer, secs)
 		object.burning_timer = object.burning_timer - 1
 	end
 	-- End after a while.
-	return timer - secs
+	return {st=args.st - secs}
 end}

@@ -7,7 +7,7 @@ Influencespec{name = "firewall", func = function(feat, info, args, value)
 			local w = ctr + dir * i * Voxel.tile_size
 			local t = (w * Voxel.tile_scale + Vector(0,0.5,0)):floor()
 			if Voxel:get_tile(t) == 0 and Voxel:get_tile(t - Vector(0,1)) ~= 0 then
-				Spell{effect = "firewall", position = w, power = value}
+				Spell{effect = "firewall", position = w, power =value}
 			end
 		end
 	end

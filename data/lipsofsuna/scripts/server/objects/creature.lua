@@ -621,10 +621,11 @@ end
 -- @param self Object.
 -- @param name Modifier name.
 -- @param strength Modifier strength.
-Creature.inflict_modifier = function(self, name, strength)
+-- @param args Arguments passed to the modifier
+Creature.inflict_modifier = function(self, name, strength, args)
 	if not self.modifiers then self.modifiers = {} end
-	if not self.modifiers[name] or self.modifiers[name] < strength then
-		self.modifiers[name] = strength
+	if not self.modifiers[name] or self.modifiers[name].st < strength then
+		self.modifiers[name] = {st=strength,a=args}
 	end
 end
 

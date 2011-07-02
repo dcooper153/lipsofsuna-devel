@@ -84,7 +84,7 @@ Species{
 		{name = "upperbody"}},
 	factions = {"good"},
 	feat_anims = {"build", "right hand", "ranged", "ranged spell", "spell on self", "spell on touch", "throw"},
-	feat_effects = {"berserk", "black haze", "dig", "fire damage", "firewall", "light", "mindless march", "magic missile", "physical damage", "restore health", "sanctuary", "travel", "wilderness"},
+	feat_effects = {"follow","berserk", "black haze", "dig", "fire damage", "firewall", "light", "mindless march", "magic missile", "physical damage", "restore health", "sanctuary", "travel", "wilderness"},
 	inventory_size = 20,
 	skill_quota = 200,
 	speed_walk = 2,

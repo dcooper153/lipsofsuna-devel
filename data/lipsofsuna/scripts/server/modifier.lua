@@ -18,7 +18,8 @@ end
 -- @param clss Modifier class.
 -- @param object Object whose modifiers to update.
 -- @param secs Seconds since the last update.
-Modifier.update = function(clss, object, secs)
+-- @param args Arguments sent to the modifier
+Modifier.update = function(clss, object, secs, args)
 	local num = 0
 	local keep = {}
 	-- Update each modifier.
@@ -26,12 +27,12 @@ Modifier.update = function(clss, object, secs)
 		-- Update the modifier.
 		local m = Modifier:find{name = k}
 		if m and m.func then
-			v = m:func(object, v, secs)
+			v = m:func(object, v, secs, "b")
 		else
-			v = 0
+			v.st = 0
 		end
 		-- Handle removal.
-		if v > 0 then
+		if v.st > 0 then
 			keep[k] = v
 			num = num + 1
 		else

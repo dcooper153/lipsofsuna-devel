@@ -1,4 +1,4 @@
 --- Berserk modifier.
-Modifier{name = "berserk", func = function(self, object, timer, secs)
-	return timer - secs
+Modifier{name = "berserk", func = function(self, object, args, secs)
+	return {st=args.st - secs}
 end}

@@ -344,7 +344,8 @@ end
 -- @param self Object.
 -- @param name Modifier name.
 -- @param strength Modifier strength.
-Object.inflict_modifier = function(self, name, strength)
+-- @param args Args passed to modifier
+Object.inflict_modifier = function(self, name, strength, args)
 end
 
 --- Loots the object.

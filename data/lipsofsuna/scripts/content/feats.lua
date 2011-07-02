@@ -184,6 +184,19 @@ Feateffectspec{
 	reagent_base = {["milky powder"] = 0.5},
 	reagent_mult = {["milky powder"] = 0.02}}
 
+Feateffectspec{
+	name = "follow",
+	animations = {"ranged spell","spell on touch"},
+	categories = {"follow", "spell"},
+	description = "Forces the target to follow you",
+	effect = "light1",
+	icon = "modifier-light",
+	influences = {{"follow", 5,10}},
+	skill_base = {willpower = 5},
+	skill_mult = {willpower = 0.1},
+	projectile = "magicmissile1",
+	reagent_base = {["milky powder"] = 0.5},
+	reagent_mult = {["milky powder"] = 0.02}}
 
 Feateffectspec{
 	name = "physical damage",
