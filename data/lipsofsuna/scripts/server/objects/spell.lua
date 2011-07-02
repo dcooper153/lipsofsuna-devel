@@ -34,7 +34,7 @@ Spell.new = function(clss, args)
 			local objs = Object:find{point = pos, radius = 10}
 			for k,v in pairs(objs) do
 				if dir:dot((v.position - pos):normalize()) > 0.8 then
-					v:inflict_modifier("burning", {st=3})
+					v:inflict_modifier("burning", 3)
 					v:damaged{amount = 5, type = "fire"}
 				end
 			end
