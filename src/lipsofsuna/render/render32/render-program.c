@@ -320,8 +320,8 @@ static int private_compile (
 		"in vec3 LOS_tangent;\n"
 		"in vec4 LOS_weights1;\n"
 		"in vec4 LOS_weights2;\n"
-		"in vec4 LOS_bones1;\n"
-		"in vec4 LOS_bones2;\n",
+		"in ivec4 LOS_bones1;\n"
+		"in ivec4 LOS_bones2;\n",
 		/* Geometry */
 		"#version 150\n"
 		"#extension GL_EXT_geometry_shader4 : enable\n",

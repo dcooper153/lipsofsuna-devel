@@ -421,13 +421,13 @@ static inline void private_vert_xform (
 		tmp.y = (in->coord.y - buf[offset + 1]) * buf[offset + 7];
 		tmp.z = (in->coord.z - buf[offset + 2]) * buf[offset + 7];
 		private_quat_xform (poserot, tmp, &ret);
-		vtx.x += in->weights[i] * (ret.x + buf[offset + 4]);
-		vtx.y += in->weights[i] * (ret.y + buf[offset + 5]);
-		vtx.z += in->weights[i] * (ret.z + buf[offset + 6]);
+		vtx.x += in->weights[i] / 255.0f * (ret.x + buf[offset + 4]);
+		vtx.y += in->weights[i] / 255.0f * (ret.y + buf[offset + 5]);
+		vtx.z += in->weights[i] / 255.0f * (ret.z + buf[offset + 6]);
 		private_quat_xform (poserot, in->normal, &ret);
-		nml.x += in->weights[i] * ret.x;
-		nml.y += in->weights[i] * ret.y;
-		nml.z += in->weights[i] * ret.z;
+		nml.x += in->weights[i] / 255.0f * ret.x;
+		nml.y += in->weights[i] / 255.0f * ret.y;
+		nml.z += in->weights[i] / 255.0f * ret.z;
 	}
 	out->coord = vtx;
 	out->normal = nml;

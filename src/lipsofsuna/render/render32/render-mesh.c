@@ -34,16 +34,14 @@ int liren_mesh32_init (
 	int          vertex_count)
 {
 	GLint restore;
-	const int vertex_size = 23 * sizeof (float) + 8 * sizeof (char);
+	const int vertex_size = 11 * sizeof (float) + 12 * sizeof (char);
 	const int vertex_tex_offset = 0 * sizeof (float);
 	const int vertex_nml_offset = 2 * sizeof (float);
 	const int vertex_vtx_offset = 5 * sizeof (float);
 	const int vertex_tan_offset = 8 * sizeof (float);
 	const int vertex_col_offset = 11 * sizeof (float);
-	const int vertex_we1_offset = 15 * sizeof (float);
-	const int vertex_we2_offset = 19 * sizeof (float);
-	const int vertex_bo1_offset = 23 * sizeof (float);
-	const int vertex_bo2_offset = 23 * sizeof (float) + 4 * sizeof (char);
+	const int vertex_we1_offset = 11 * sizeof (float) + 4 * sizeof (char);
+	const int vertex_bo1_offset = 11 * sizeof (float) + 8 * sizeof (char);
 
 	/* Allocate objects. */
 	memset (self, 0, sizeof (LIRenMesh32));
@@ -78,18 +76,14 @@ int liren_mesh32_init (
 	glEnableVertexAttribArray (LIREN_ATTRIBUTE_TANGENT);
 	glEnableVertexAttribArray (LIREN_ATTRIBUTE_COLOR);
 	glEnableVertexAttribArray (LIREN_ATTRIBUTE_WEIGHTS1);
-	glEnableVertexAttribArray (LIREN_ATTRIBUTE_WEIGHTS2);
 	glEnableVertexAttribArray (LIREN_ATTRIBUTE_BONES1);
-	glEnableVertexAttribArray (LIREN_ATTRIBUTE_BONES2);
 	glVertexAttribPointer (LIREN_ATTRIBUTE_TEXCOORD, 2, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_tex_offset);
 	glVertexAttribPointer (LIREN_ATTRIBUTE_NORMAL, 3, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_nml_offset);
 	glVertexAttribPointer (LIREN_ATTRIBUTE_COORD, 3, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_vtx_offset);
 	glVertexAttribPointer (LIREN_ATTRIBUTE_TANGENT, 3, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_tan_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_COLOR, 4, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_col_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_WEIGHTS1, 4, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_we1_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_WEIGHTS2, 4, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_we2_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_BONES1, 4, GL_UNSIGNED_BYTE, GL_FALSE, vertex_size, NULL + vertex_bo1_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_BONES2, 4, GL_UNSIGNED_BYTE, GL_FALSE, vertex_size, NULL + vertex_bo2_offset);
+	glVertexAttribPointer (LIREN_ATTRIBUTE_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, vertex_size, NULL + vertex_col_offset);
+	glVertexAttribPointer (LIREN_ATTRIBUTE_WEIGHTS1, 4, GL_UNSIGNED_BYTE, GL_TRUE, vertex_size, NULL + vertex_we1_offset);
+	glVertexAttribIPointer (LIREN_ATTRIBUTE_BONES1, 4, GL_UNSIGNED_BYTE, vertex_size, NULL + vertex_bo1_offset);
 
 	/* Don't break the active vertex array. */
 	glBindVertexArray (restore);
@@ -202,7 +196,7 @@ void liren_mesh32_get_format (
 {
 	const LIRenFormat format =
 	{
-		23 * sizeof (float) + 8 * sizeof (char),
+		11 * sizeof (float) + 12 * sizeof (char),
 		GL_FLOAT, 0 * sizeof (float),
 		GL_FLOAT, 2 * sizeof (float),
 		GL_FLOAT, 5 * sizeof (float)

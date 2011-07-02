@@ -98,7 +98,7 @@ limat_convert_quaternion_to_matrix (LIMatQuaternion self)
 	return matrix;
 }
 
-static inline LIMatMatrix
+static inline LIMatMatrix 
 limat_convert_transform_to_matrix (LIMatTransform self)
 {
 	LIMatMatrix result;

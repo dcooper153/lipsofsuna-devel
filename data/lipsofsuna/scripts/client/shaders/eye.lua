@@ -8,7 +8,7 @@ pass1_depth_func = "lequal",
 pass1_vertex = [[
 void main()
 {
-	]] .. Shader.los_animation_co() .. [[
+	]] .. Shader.los_animation_default() .. [[
 	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
@@ -22,7 +22,7 @@ pass4_vertex = [[
 out vec2 F_texcoord;
 void main()
 {
-	]] .. Shader.los_animation_co() .. [[
+	]] .. Shader.los_animation_default() .. [[
 	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	F_texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
@@ -43,7 +43,7 @@ pass1_depth_func = "lequal",
 pass1_vertex = [[
 void main()
 {
-	]] .. Shader.los_animation_co() .. [[
+	]] .. Shader.los_animation_default() .. [[
 	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
@@ -61,7 +61,7 @@ out vec3 F_normal;
 out vec2 F_texcoord;
 void main()
 {
-	]] .. Shader.los_animation_co() .. [[
+	]] .. Shader.los_animation_default() .. [[
 	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	]] .. Shader.los_lighting_vectors("F_lightvector", "F_halfvector", "tmp.xyz") .. [[
 	F_coord = tmp.xyz;

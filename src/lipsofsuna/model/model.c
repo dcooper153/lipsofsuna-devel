@@ -1328,7 +1328,7 @@ static int private_read_vertices (
 		for (i = 0 ; i < self->vertices.count ; i++)
 		{
 			vertex = self->vertices.array + i;
-			vertex->weights[0] = 1.0f;
+			vertex->weights[0] = 255;
 			if (!liarc_reader_get_float (reader, vertex->texcoord + 0) ||
 				!liarc_reader_get_float (reader, vertex->texcoord + 1) ||
 				!liarc_reader_get_float (reader, &vertex->normal.x) ||
@@ -1459,8 +1459,9 @@ static int private_read_vertex_weights (
 	}
 
 	/* Store the most significant weights to the vertex. */
-	memcpy (vertex->weights, weights_tmp, LIMDL_VERTEX_WEIGHTS_MAX * sizeof (float));
 	memcpy (vertex->bones, bones_tmp, LIMDL_VERTEX_WEIGHTS_MAX * sizeof (char));
+	for (i = 0 ; i < LIMDL_VERTEX_WEIGHTS_MAX ; i++)
+		vertex->weights[i] = (int)(255 * weights_tmp[i]);
 
 	return 1;
 }
@@ -1838,7 +1839,7 @@ static int private_write_weights (
 		for (j = 0 ; j < count ; j++)
 		{
 			if (!liarc_writer_append_uint32 (writer, vertex->bones[j] - 1) ||
-			    !liarc_writer_append_float (writer, vertex->weights[j]))
+			    !liarc_writer_append_float (writer, vertex->weights[j] / 255.0f))
 				return 0;
 		}
 	}

@@ -437,6 +437,7 @@ int liren_context32_set_pose (
 	int count;
 	int count1;
 	GLfloat* data;
+	LIMatDualquat dq;
 	LIMdlPoseGroup* group;
 
 	/* Clear the old pose. */
@@ -470,18 +471,21 @@ int liren_context32_set_pose (
 	for (i = 0 ; i < count1 ; i++)
 	{
 		group = pose->groups.array + i;
+		dq = limat_dualquat_multiply (
+			limat_dualquat_init (group->head_pose, group->rotation),
+			limat_dualquat_init_translation (limat_vector_multiply (group->head_rest, -1.0f)));
+		data[j++] = dq.r.x;
+		data[j++] = dq.r.y;
+		data[j++] = dq.r.z;
+		data[j++] = dq.r.w;
+		data[j++] = dq.d.x;
+		data[j++] = dq.d.y;
+		data[j++] = dq.d.z;
+		data[j++] = dq.d.w;
 		data[j++] = group->head_rest.x;
 		data[j++] = group->head_rest.y;
 		data[j++] = group->head_rest.z;
-		data[j++] = 0.0;
-		data[j++] = group->head_pose.x;
-		data[j++] = group->head_pose.y;
-		data[j++] = group->head_pose.z;
 		data[j++] = group->scale_pose;
-		data[j++] = group->rotation.x;
-		data[j++] = group->rotation.y;
-		data[j++] = group->rotation.z;
-		data[j++] = group->rotation.w;
 	}
 
 	/* Upload to the buffer texture. */

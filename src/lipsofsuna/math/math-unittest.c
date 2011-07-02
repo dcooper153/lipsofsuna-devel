@@ -94,6 +94,12 @@ static inline void print_matrix (const char* s, LIMatMatrix m)
 		m.m[12], m.m[13], m.m[14], m.m[15]);
 }
 
+static inline void print_dualquat (const char* s, LIMatDualquat dq)
+{
+	printf ("%s: Dualquat({%f,%f,%f,%f}, {%f,%f,%f,%f})\n",
+		s, dq.r.x, dq.r.y, dq.r.z, dq.r.w, dq.d.x, dq.d.y, dq.d.z, dq.d.w);
+}
+
 /*****************************************************************************/
 
 static void convert_quaternion_matrix ()
@@ -777,6 +783,47 @@ static void vector_basics ()
 	}
 }
 
+/*****************************************************************************/
+
+static void dualquat_basics ()
+{
+	LIMatDualquat dq0;
+	LIMatDualquat dq1;
+	LIMatVector v0;
+	LIMatVector v1;
+	LIMatVector v2;
+	LIMatQuaternion q0;
+
+	printf ("Testing dual quaternion basics...\n");
+
+	/* Multiplication. */
+	v0 = limat_vector_init (-10.0f, 20.0f, 30.0f);
+	q0 = limat_quaternion_init (0.0f, 1.0f, 0.0f, 0.0f);
+	dq0 = limat_dualquat_init (v0, q0);
+	dq1 = limat_dualquat_multiply (
+		limat_dualquat_init_translation (v0),
+		limat_dualquat_init_rotation (q0));
+	if (!check_vector (v1, v2))
+	{
+		printf ("1: FAILED!\n");
+		print_dualquat ("Got", dq0);
+		print_dualquat ("Expected", dq1);
+	}
+
+	/* Transforming vectors. */
+	v0 = limat_vector_init (10.0f, 20.0f, 30.0f);
+	dq0 = limat_dualquat_init_translation (v0);
+	v1 = limat_dualquat_transform (dq0, limat_vector_init (3.0f, 2.0f, 1.0f));
+	v2 = limat_vector_init (13.0f, 22.0f, 31.0f);
+	if (!check_vector (v1, v2))
+	{
+		printf ("2: FAILED!\n");
+		print_dualquat ("DQ", dq0);
+		print_vector ("Got", v0);
+		print_vector ("Expected", v1);
+	}
+}
+
 void limat_math_unittest ()
 {
 	convert_quaternion_matrix ();
@@ -796,4 +843,5 @@ void limat_math_unittest ()
 	transform_look ();
 	transform_vector ();
 	vector_basics ();
+	dualquat_basics ();
 }

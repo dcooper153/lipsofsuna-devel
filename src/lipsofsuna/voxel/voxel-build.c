@@ -403,7 +403,7 @@ static int private_merge_triangles_model (
 
 			/* Initialize the vertex. */
 			limdl_vertex_init (vertices + j, coord + j, normal + j, uv[0], uv[1]);
-			vertices[j].color[3] = splat;
+			vertices[j].color[3] = (int)(255 * splat);
 		}
 
 		/* Merge vertices. */

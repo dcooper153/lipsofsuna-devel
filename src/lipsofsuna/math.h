@@ -20,6 +20,7 @@
 
 #include "lipsofsuna/math/math-aabb.h"
 #include "lipsofsuna/math/math-convert.h"
+#include "lipsofsuna/math/math-dualquat.h"
 #include "lipsofsuna/math/math-frustum.h"
 #include "lipsofsuna/math/math-generic.h"
 #include "lipsofsuna/math/math-geometry.h"
