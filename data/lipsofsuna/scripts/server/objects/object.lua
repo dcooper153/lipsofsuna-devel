@@ -504,6 +504,7 @@ Object.teleport = function(self, args)
 	elseif args.position then
 		self.position = args.position
 	else return end
+	self.velocity = Vector()
 	self.realized = true
 	return true
 end

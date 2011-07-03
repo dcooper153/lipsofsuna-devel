@@ -459,6 +459,7 @@ Creature.die = function(self)
 	-- Sanctuary save.
 	if self.modifiers and self.modifiers.sanctuary and not self.beheaded then
 		self:remove_modifier("sanctuary")
+		self:damaged{amount = -10, type = "physical"}
 		self:teleport{marker = "sanctuary"}
 		return
 	end
