@@ -3,7 +3,7 @@ local spawn_player = function(object, client)
 	Network:send{client = client, packet = Packet(packets.CHARACTER_ACCEPT)}
 	-- Add to the map.
 	Player.clients[client] = object
-	if object.spawnpoint then
+	if object.spawnpoint and Marker:find{name=object.spawnpoint} then
 		--TODO decide between region or marker for spawn point
 		--local reg = Regionspec:find{name = object.spawnpoint}
 		--object:teleport{point = reg.spawn_point_world+Vector(0,0,5)}

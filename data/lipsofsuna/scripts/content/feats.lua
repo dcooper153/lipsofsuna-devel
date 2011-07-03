@@ -172,7 +172,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "mindless march",
-	animations = {"ranged spell","spell on self","spell on touch"},
+	animations = {"ranged spell","spell on touch"},
 	categories = {"harmful", "push", "spell"},
 	description = "Forces the target to march forward",
 	effect = "light1",
@@ -195,6 +195,19 @@ Feateffectspec{
 	skill_base = {willpower = 5},
 	skill_mult = {willpower = 0.1},
 	projectile = "magicmissile1",
+	reagent_base = {["milky powder"] = 0.5},
+	reagent_mult = {["milky powder"] = 0.02}}
+
+Feateffectspec{
+	name = "home",
+	animations = {"spell on self"},
+	categories = {"follow", "spell"},
+	description = "Creates a home location where you can respawn from",
+	effect = "light1",
+	icon = "sanctuary1",
+	influences = {{"home", 1,1}},
+	skill_base = {willpower = 1},
+	skill_mult = {willpower = 0.1},
 	reagent_base = {["milky powder"] = 0.5},
 	reagent_mult = {["milky powder"] = 0.02}}
 

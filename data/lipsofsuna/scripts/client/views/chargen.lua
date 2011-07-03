@@ -10,7 +10,7 @@ Views.Chargen.list_races = {
 	{"Wyrm - female", "wyrm"},
 	{"Wyrm - male", "wyrmmale"}}
 
-Views.Chargen.list_spawnpoints={{"Tutorial","lyra"},{"Lips Town","mentor"}}
+Views.Chargen.list_spawnpoints={{"Tutorial","lyra"},{"Lips Town","mentor"},{"Home (if you've made one)","home"}}
 
 --- Creates a new chargen view.
 -- @param clss Chargen class.
