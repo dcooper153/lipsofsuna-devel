@@ -392,6 +392,7 @@ static void private_render_pass_sort (
 				liren_context32_set_shader (context, pass, face->group.material->shader);
 				liren_context32_set_textures (context, face->group.material->textures.array, face->group.material->textures.count);
 				liren_context32_set_mesh (context, face->group.mesh);
+				liren_context32_set_pose (context, face->group.pose);
 				liren_context32_bind (context);
 				liren_context32_render_indexed (context, face->group.index, face->group.count);
 			}

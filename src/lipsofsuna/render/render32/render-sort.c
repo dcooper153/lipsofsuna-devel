@@ -80,6 +80,7 @@ int liren_sort32_add_faces (
 	int              count,
 	LIRenMesh32*     mesh,
 	LIRenMaterial32* material,
+	LIMdlPose*       pose,
 	LIMatVector*     center)
 {
 	int n;
@@ -117,6 +118,7 @@ int liren_sort32_add_faces (
 	self->faces.array[n].group.matrix = *matrix;
 	self->faces.array[n].group.index = index;
 	self->faces.array[n].group.count = count;
+	self->faces.array[n].group.pose = pose;
 	self->faces.array[n].group.mesh = mesh;
 	self->faces.array[n].group.material = material;
 	self->buckets.array[bucket] = self->faces.array + n;
@@ -125,61 +127,34 @@ int liren_sort32_add_faces (
 	return 1;
 }
 
-int liren_sort32_add_group (
-	LIRenSort32*     self,
-	LIMatAabb*       bounds,
-	LIMatMatrix*     matrix,
-	int              index,
-	int              count,
-	LIRenMesh32*     mesh,
-	LIRenMaterial32* material,
-	LIMatVector*     center)
-{
-	/* Don't add groups with no valid shader. */
-	/* Don't sort groups that don't need sorting. */
-	if (material->shader == NULL || !material->shader->sort)
-		return 1;
-
-	/* Append the group to the sorting buckets. */
-	return liren_sort32_add_faces (self, bounds, matrix, index, count, mesh, material, center);
-}
-
-int liren_sort32_add_model (
-	LIRenSort32*  self,
-	LIMatAabb*    bounds,
-	LIMatMatrix*  matrix,
-	LIRenModel32* model)
-{
-	int i;
-	int ret = 1;
-	LIRenMaterial32* material;
-
-	/* Frustum culling. */
-	if (limat_frustum_cull_aabb (&self->frustum, bounds))
-		return 1;
-
-	/* Add each material group. */
-	for (i = 0 ; i < model->materials.count ; i++)
-	{
-		material = model->materials.array[i];
-		ret &= liren_sort32_add_group (self, bounds, matrix,
-			model->groups.array[i].start, model->groups.array[i].count,
-			&model->mesh, material, &model->groups.array[i].center);
-	}
-
-	return ret;
-}
-
 int liren_sort32_add_object (
 	LIRenSort32*   self,
 	LIRenObject32* object)
 {
+	int i;
+	int ret = 1;
 	LIMatAabb bounds;
+	LIRenMaterial32* material;
 
-	/* Add each face group of the model. */
+	/* Frustum culling. */
 	liren_object32_get_bounds (object, &bounds);
-	if (!liren_sort32_add_model (self, &bounds, &object->orientation.matrix, object->model))
-		return 0;
+	if (limat_frustum_cull_aabb (&self->frustum, &bounds))
+		return 1;
+
+	/* Add each face group. */
+	for (i = 0 ; i < object->model->materials.count ; i++)
+	{
+		/* Don't add groups with no valid shader. */
+		/* Don't sort groups that don't need sorting. */
+		material = object->model->materials.array[i];
+		if (material->shader == NULL || !material->shader->sort)
+			continue;
+
+		/* Append the group to the sorting buckets. */
+		ret &= liren_sort32_add_faces (self, &bounds, &object->orientation.matrix,
+			object->model->groups.array[i].start, object->model->groups.array[i].count,
+			&object->model->mesh, material, object->pose, &object->model->groups.array[i].center);
+	}
 
 	/* Add particle systems of the object. */
 	liren_particles32_sort (
@@ -188,7 +163,7 @@ int liren_sort32_add_object (
 		object->particle.loop,
 		&object->transform, self);
 
-	return 1;
+	return ret;
 }
 
 int liren_sort32_add_particle (

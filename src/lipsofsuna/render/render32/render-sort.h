@@ -64,6 +64,7 @@ struct _LIRenSortface32
 			int count;
 			LIMatAabb bounds;
 			LIMatMatrix matrix;
+			LIMdlPose* pose;
 			LIRenMesh32* mesh;
 			LIRenMaterial32* material;
 		} group;
@@ -121,31 +122,20 @@ LIAPICALL (int, liren_sort32_add_faces, (
 	int              count,
 	LIRenMesh32*     mesh,
 	LIRenMaterial32* material,
+	LIMdlPose*       pose,
 	LIMatVector*     center));
-
-LIAPICALL (int, liren_sort32_add_model, (
-	LIRenSort32*  self,
-	LIMatAabb*    bounds,
-	LIMatMatrix*  matrix,
-	LIRenModel32* model));
 
 LIAPICALL (int, liren_sort32_add_object, (
 	LIRenSort32*   self,
 	LIRenObject32* object));
 
-LIAPICALL (int, liren_sort32_add_object_effect, (
-	LIRenSort32*     self,
-	LIMatAabb*       bounds,
-	LIMatMatrix*     matrix,
-	LIRenObject32*   object));
-
-int liren_sort32_add_particle (
+LIAPICALL (int, liren_sort32_add_particle, (
 	LIRenSort32*       self,
 	const LIMatVector* position,
 	float              size,
 	const float*       diffuse,
 	LIRenImage32*      image,
-	LIRenShader32*     shader);
+	LIRenShader32*     shader));
 
 LIAPICALL (void, liren_sort32_clear, (
 	LIRenSort32*       self,
