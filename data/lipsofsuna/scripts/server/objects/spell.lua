@@ -45,23 +45,34 @@ Spell.new = function(clss, args)
 			end
 		end}
 	elseif args.effect == "firewall" then
-		-- Create a firewall in the given position.
-		self.model = "firewall1"
-		self.collision_mask = 0
-		self.position = args.position
-		self.realized = true
-		self.timer = Timer{delay = 0.1, func = function(t, secs)
-			self.power = self.power - secs
-			if self.power > 0 then
-				local objs = Object:find{point = self.position + Vector(0,1), radius = 1.3}
-				for k,v in pairs(objs) do
-					v:inflict_modifier("burning", 3)
+		-- Create a firewall.
+		-- When the feat is performed, a projectile is created here. When the
+		-- projectile hits something, we return here and create the flames.
+		if not args.position then
+			-- Create a projectile.
+			self.gravity = Vector()
+			self.model = args.model
+			self.physics = "rigid"
+			self:fire{collision = true, feat = args.feat, owner = args.owner}
+		else
+			-- Create a flame.
+			self.model = "firewall1"
+			self.collision_mask = 0
+			self.position = args.position
+			self.realized = true
+			self.timer = Timer{delay = 0.1, func = function(t, secs)
+				self.power = self.power - secs
+				if self.power > 0 then
+					local objs = Object:find{point = self.position + Vector(0,1), radius = 1.3}
+					for k,v in pairs(objs) do
+						v:inflict_modifier("burning", 3)
+					end
+				else
+					self:detach()
+					t:disable()
 				end
-			else
-				self:detach()
-				t:disable()
-			end
-		end}
+			end}
+		end
 	elseif args.effect == "magic missile" then
 		-- Create a magic missile.
 		self.gravity = Vector()
@@ -118,8 +129,26 @@ Spell.contact_cb = function(self, result)
 		if self.power < 1 then self:detach() end
 	elseif self.effect == "firewall" then
 		-- Firewall.
-		-- Inflict the burning modifier until the wall times out.
-		if result.object then
+		if not self.burning then
+			-- Create the wall.
+			-- The projectile has hit something here so we create the actual flames.
+			self:detach()
+			local p = Utils:find_empty_ground(self.position)
+			if not p then return end
+			local makewall = function(ctr, dir)
+				for i=-2,2 do
+					local w = ctr + dir * i * Voxel.tile_size
+					local t = (w * Voxel.tile_scale + Vector(0,0.5,0)):floor()
+					if Voxel:get_tile(t) == 0 and Voxel:get_tile(t - Vector(0,1)) ~= 0 then
+						Spell{burning = true, effect = "firewall", position = w, power = self.power}
+					end
+				end
+			end
+			local d = (p - self.owner.position):abs()
+			makewall(p, (d.x < d.z) and Vector(1) or Vector(0,0,1))
+		elseif result.object then
+			-- Inflict the burning modifier until the wall times out.
+			-- The actual flames have touched something here.
 			result.object:inflict_modifier("burning", 3)
 		end
 	elseif self.effect == "magic missile" then
