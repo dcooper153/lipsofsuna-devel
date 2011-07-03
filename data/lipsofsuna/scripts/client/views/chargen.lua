@@ -33,7 +33,7 @@ Views.Chargen.new = function(clss)
 	-- Spawn Point Selector
 	local spawnpoints = {}
 	for k,v in ipairs(self.list_spawnpoints) do
-		table.insert(spawnpoints, {v[1], function() print(v[2]) end})
+		table.insert(spawnpoints, {v[1], function() end})
 	end
 	self.label_spawn = Widgets.Label{text="Spawn Point:"}
 	self.combo_spawn = Widgets.ComboBox(spawnpoints)
@@ -141,8 +141,11 @@ Views.Chargen.new = function(clss)
 		row = row + 1
 	end
 	self.group_appearance:set_expand{col = 2}
+	self.group_spawn = Widget{rows = 1, cols =2, margins={0,0,0,0}}
+	self.group_spawn:set_child{row=1,col=1,widget=self.label_spawn}
+	self.group_spawn:set_child{row=1,col=2,widget=self.combo_spawn}
 	self.group_buttons = Widget{rows = 3, cols = 1, margins = {0,0,5,5}}
-	self.group_buttons:set_child{row = 1, col = 1, widget = self.combo_spawn}
+	self.group_buttons:set_child{row = 1, col = 1, widget = self.group_spawn}
 	self.group_buttons:set_child{row = 2, col = 1, widget = self.button_create}
 	self.group_buttons:set_child{row = 3, col = 1, widget = self.button_quit}
 	self.group_buttons:set_expand{col = 1}
