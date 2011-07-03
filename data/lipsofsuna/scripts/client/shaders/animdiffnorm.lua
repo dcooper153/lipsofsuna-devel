@@ -3,8 +3,8 @@ Shader{name = "animdiffnorm",
 -- Low quality program.
 -- No lighting.
 low = {
-pass4_depth_func = "equal",
-pass4_depth_write = false,
+pass4_depth_func = "lequal",
+pass4_depth_write = true,
 pass4_vertex = [[
 out vec2 F_texcoord;
 void main()
