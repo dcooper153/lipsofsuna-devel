@@ -321,9 +321,13 @@ static int private_merge_triangles_model (
 	int yr;
 	int zr;
 	int group;
+	float ao;
+	float dot;
+	float tmp;
 	float scale;
 	float splat;
 	float uv[2] = { 0.0f, 0.0f };
+	LIMatVector diff;
 	LIMatVector coord[3];
 	LIMatVector normal[3];
 	LIMdlVertex vertices[3];
@@ -371,6 +375,30 @@ static int private_merge_triangles_model (
 				}
 			}
 
+			/* Calculate the fake ambient occlusion factor. */
+			/* Zero means fully lit and one fully in shadow. */
+			ao = 0.0f;
+			for (z = 0 ; z <= 2 ; z++)
+			for (y = 0 ; y <= 2 ; y++)
+			for (x = 0 ; x <= 2 ; x++)
+			{
+				if (x == 1 && y == 1 && z == 1)
+					continue;
+				if (!types[x][y][z])
+					continue;
+				diff = limat_vector_subtract (limat_vector_init (x - 0.5, y - 0.5, z - 0.5), coords[i + j]);
+				dot = limat_vector_dot (limat_vector_normalize (diff), normal[j]);
+				if (dot >= 0.0f)
+				{
+					/* Occlusion by an individual neighbor. */
+					/* The formula is nonsensical but sort of works. */
+					tmp = limat_vector_get_length (diff);
+					tmp = LIMAT_MIN (tmp / 1.7f, 1.0f);
+					ao += 0.6f * dot * (1.0f - tmp);
+				}
+			}
+			ao = LIMAT_CLAMP (ao, 0.0f, 1.0f);
+
 			/* Calculate texture coordinates. */
 			switch (faces[i / 3])
 			{
@@ -403,6 +431,7 @@ static int private_merge_triangles_model (
 
 			/* Initialize the vertex. */
 			limdl_vertex_init (vertices + j, coord + j, normal + j, uv[0], uv[1]);
+			vertices[j].color[0] = vertices[j].color[1] = vertices[j].color[2] = (int)(255 * (1.0 - ao));
 			vertices[j].color[3] = (int)(255 * splat);
 		}
 

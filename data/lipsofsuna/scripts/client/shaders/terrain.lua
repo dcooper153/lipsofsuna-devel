@@ -18,19 +18,22 @@ void main()
 pass4_depth_func = "equal",
 pass4_depth_write = false,
 pass4_vertex = [[
+out vec4 F_color;
 out vec2 F_texcoord;
 void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	F_color = LOS_color;
 	F_texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass4_fragment = [[
+in vec4 F_color;
 in vec2 F_texcoord;
 void main()
 {
 	vec4 diffuse = texture(LOS_diffuse_texture_0, F_texcoord);
-	LOS_output_0 = LOS_material_diffuse * diffuse;
+	LOS_output_0 = F_color * LOS_material_diffuse * diffuse;
 }]]},
 
 -- Medium quality program.
@@ -51,6 +54,7 @@ void main()
 pass4_depth_func = "equal",
 pass4_depth_write = false,
 pass4_vertex = [[
+out vec4 F_color;
 out vec3 F_coord;
 out vec3 F_halfvector[LOS_LIGHT_MAX];
 out vec3 F_lightvector[LOS_LIGHT_MAX];
@@ -62,6 +66,7 @@ void main()
 {
 	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
 	]] .. Shader.los_lighting_vectors("F_lightvector", "F_halfvector", "tmp.xyz") .. [[
+	F_color = LOS_color;
 	F_coord = tmp.xyz;
 	F_normal = LOS_matrix_normal * LOS_normal;
 	F_tangent = LOS_matrix_normal * LOS_tangent;
@@ -70,6 +75,7 @@ void main()
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass4_fragment = Shader.los_normal_mapping .. [[
+in vec4 F_color;
 in vec3 F_coord;
 in vec3 F_halfvector[LOS_LIGHT_MAX];
 in vec3 F_lightvector[LOS_LIGHT_MAX];
@@ -89,5 +95,5 @@ void main()
 	float shininess_splat = mix(1.0, 1.0, F_splatting);
 	]] .. Shader.los_lighting_default("F_coord", "normal", "F_lightvector", "F_halfvector",
 		"specular_splat", "shininess_splat") .. [[
-	LOS_output_0 = diffuse * lighting;
+	LOS_output_0 = diffuse * max(vec4(-1.0) + F_color + lighting, vec4(0.0));
 }]]}}
