@@ -3,6 +3,7 @@ Shader{name = "hair",
 -- Medium quality program.
 medium = {
 pass1_alpha_to_coverage = true,
+pass1_animated = true,
 pass1_color_write = false,
 pass1_depth_func = "lequal",
 pass1_vertex = [[
@@ -21,6 +22,7 @@ void main()
 	LOS_output_0.rgb = vec3(0.0);
 	LOS_output_0.a = texture(LOS_diffuse_texture_0, F_texcoord).a;
 }]],
+pass4_animated = true,
 pass4_depth_func = "equal",
 pass4_depth_write = false,
 pass4_vertex = [[

@@ -3,6 +3,7 @@ Shader{name = "animslime",
 -- Medium quality program.
 medium = {
 sort = true,
+pass6_animated = true,
 pass6_blend = true,
 pass6_blend_src = "src_alpha",
 pass6_blend_dst = "one_minus_src_alpha",

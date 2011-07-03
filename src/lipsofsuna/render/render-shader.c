@@ -118,7 +118,7 @@ void liren_shader_clear_pass (
  * \param vertex Vertex shader code.
  * \param geometry Geometry shader code or NULL.
  * \param fragment Fragment shader code.
- * \param feedback Nonzero to enable transform feedback.
+ * \param animated Nonzero to enable skeletal transformation uploads.
  * \param alpha_to_coverage Nonzero to enable alpha to coverage.
  * \param blend_enable Nonzero to enable blending.
  * \param blend_src Source blend function.
@@ -135,7 +135,7 @@ int liren_shader_compile (
 	const char*  vertex,
 	const char*  geometry,
 	const char*  fragment,
-	int          feedback,
+	int          animated,
 	int          alpha_to_coverage,
 	int          blend_enable,
 	GLenum       blend_src,
@@ -148,13 +148,13 @@ int liren_shader_compile (
 	if (self->v32 != NULL)
 	{
 		return liren_shader32_compile (self->v32, pass, vertex, geometry, fragment,
-			feedback, alpha_to_coverage, blend_enable, blend_src, blend_dst,
+			animated, alpha_to_coverage, blend_enable, blend_src, blend_dst,
 			color_write, depth_test, depth_write, depth_func);
 	}
 	else
 	{
 		return liren_shader21_compile (self->v21, pass, vertex, geometry, fragment,
-			feedback, alpha_to_coverage, blend_enable, blend_src, blend_dst,
+			animated, alpha_to_coverage, blend_enable, blend_src, blend_dst,
 			color_write, depth_test, depth_write, depth_func);
 	}
 }

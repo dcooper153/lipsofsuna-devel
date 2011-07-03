@@ -3,6 +3,7 @@ Shader{name = "fur",
 -- Low quality program.
 -- No lighting.
 low = {
+pass4_animated = true,
 pass4_depth_func = "lequal",
 pass4_depth_write = true,
 pass4_vertex = [[
@@ -25,6 +26,7 @@ void main()
 -- Medium quality program.
 -- Vertex lighting.
 medium = {
+pass1_animated = true,
 pass1_color_write = false,
 pass1_depth_func = "lequal",
 pass1_vertex = [[
@@ -38,6 +40,7 @@ pass1_fragment = [[
 void main()
 {
 }]],
+pass4_animated = true,
 pass4_depth_func = "equal",
 pass4_depth_write = false,
 pass4_vertex = [[
@@ -69,6 +72,7 @@ void main()
 -- Vertex lighting, geometry layers.
 high = {
 sort = true,
+pass1_animated = true,
 pass1_color_write = false,
 pass1_depth_func = "lequal",
 pass1_vertex = [[
@@ -82,6 +86,7 @@ pass1_fragment = [[
 void main()
 {
 }]],
+pass6_animated = true,
 pass6_blend = true,
 pass6_depth_func = "lequal",
 pass6_depth_write = false,

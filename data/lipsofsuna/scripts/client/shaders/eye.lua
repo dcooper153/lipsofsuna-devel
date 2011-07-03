@@ -3,21 +3,9 @@ Shader{name = "eye",
 -- Low quality program.
 -- No lighting, color adjustment.
 low = {
-pass1_color_write = false,
-pass1_depth_func = "lequal",
-pass1_vertex = [[
-void main()
-{
-	]] .. Shader.los_animation_default() .. [[
-	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
-	gl_Position = LOS_matrix_projection * tmp;
-}]],
-pass1_fragment = [[
-void main()
-{
-}]],
-pass4_depth_func = "equal",
-pass4_depth_write = false,
+pass4_animated = true,
+pass4_depth_func = "lequal",
+pass4_depth_write = true,
 pass4_vertex = [[
 out vec2 F_texcoord;
 void main()
@@ -38,6 +26,7 @@ void main()
 -- Medium quality program.
 -- Fragment lighting, color adjustment.
 medium = {
+pass1_animated = true,
 pass1_color_write = false,
 pass1_depth_func = "lequal",
 pass1_vertex = [[
@@ -51,6 +40,7 @@ pass1_fragment = [[
 void main()
 {
 }]],
+pass4_animated = true,
 pass4_depth_func = "equal",
 pass4_depth_write = false,
 pass4_vertex = [[

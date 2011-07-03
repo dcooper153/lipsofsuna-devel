@@ -94,8 +94,8 @@ void liren_shader32_clear_pass (
  * \param vertex Vertex shader code.
  * \param geometry Geometry shader code or NULL.
  * \param fragment Fragment shader code.
+ * \param animated Nonzero to enable skeletal transformation uploads.
  * \param alpha_to_coverage Nonzero to enable alpha to coverage.
- * \param feedback Nonzero to enable transform feedback.
  * \param blend_enable Nonzero to enable blending.
  * \param blend_src Source blend function.
  * \param blend_dst Destination blend function.
@@ -111,7 +111,7 @@ int liren_shader32_compile (
 	const char*    vertex,
 	const char*    geometry,
 	const char*    fragment,
-	int            feedback,
+	int            animated,
 	int            alpha_to_coverage,
 	int            blend_enable,
 	GLenum         blend_src,
@@ -132,7 +132,7 @@ int liren_shader32_compile (
 	liren_program32_set_color (self->passes + pass, color_write);
 	liren_program32_set_depth (self->passes + pass, depth_test, depth_write, depth_func);
 	ret = liren_program32_compile (self->passes + pass, name,
-		vertex, geometry, fragment, feedback);
+		vertex, geometry, fragment, animated);
 	lisys_free (name);
 
 	return ret;

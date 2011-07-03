@@ -35,7 +35,7 @@ static int private_compile (
 	const char*     vertex,
 	const char*     geometry,
 	const char*     fragment,
-	int             feedback);
+	int             animated);
 
 static int private_check_compile (
 	LIRenProgram32* self,
@@ -98,7 +98,7 @@ void liren_program32_clear (
  * \param vertex Vertex shader code.
  * \param geometry Geometry shader code or NULL.
  * \param fragment Fragment shader code.
- * \param feedback Nonzero to enable transform feedback.
+ * \param animated Nonzero to enable skeletal transformation uploads.
  * \return Nonzero on success.
  */
 int liren_program32_compile (
@@ -107,13 +107,13 @@ int liren_program32_compile (
 	const char*     vertex,
 	const char*     geometry,
 	const char*     fragment,
-	int             feedback)
+	int             animated)
 {
 	LIRenProgram32 tmp;
 
 	/* Test with a temporary program. */
 	liren_program32_init (&tmp, self->render);
-	if (!private_compile (&tmp, name, vertex, geometry, fragment, feedback))
+	if (!private_compile (&tmp, name, vertex, geometry, fragment, animated))
 	{
 		liren_program32_clear (&tmp);
 		return 0;
@@ -128,6 +128,7 @@ int liren_program32_compile (
 	self->vertex = tmp.vertex;
 	self->geometry = tmp.geometry;
 	self->fragment = tmp.fragment;
+	self->animated = tmp.animated;
 
 	/* Store values needed by the Windows context rebuild. */
 	/* When the program is reloaded, this function is called with the
@@ -156,7 +157,6 @@ int liren_program32_compile (
 	{
 		lisys_free (self->reload_fragment);
 		self->reload_fragment = listr_dup (fragment);
-		self->reload_feedback = feedback;
 	}
 
 	return 1;
@@ -195,7 +195,7 @@ void liren_program32_reload (
 			self->reload_vertex,
 			self->reload_geometry,
 			self->reload_fragment,
-			self->reload_feedback);
+			self->animated);
 	}
 }
 
@@ -243,7 +243,7 @@ static int private_compile (
 	const char*     vertex,
 	const char*     geometry,
 	const char*     fragment,
-	int             feedback)
+	int             animated)
 {
 	int i;
 	GLint restore;
@@ -261,13 +261,6 @@ static int private_compile (
 		"LOS_cube_texture",
 		"LOS_noise_texture",
 		"LOS_shadow_texture"
-	};
-	const GLchar* feedbacks[4] =
-	{
-		"LOS_output_texcoord",
-		"LOS_output_normal",
-		"LOS_output_coord",
-		"LOS_output_tangent"
 	};
 	const GLchar* outputs[4] =
 	{
@@ -402,11 +395,6 @@ static int private_compile (
 	glBindAttribLocation (self->program, LIREN_ATTRIBUTE_BONES2, "LOS_bones2");
 	for (i = 0 ; i < sizeof (outputs) / sizeof (*outputs) ; i++)
 		glBindFragDataLocation (self->program, i, outputs[i]);
-	if (feedback)
-	{
-		glTransformFeedbackVaryings (self->program, sizeof (feedbacks) /
-			sizeof (*feedbacks), feedbacks, GL_INTERLEAVED_ATTRIBS);
-	}
 
 	/* Link the shader program. */
 	glLinkProgram (self->program);
@@ -435,6 +423,9 @@ static int private_compile (
 			glUniform1i (binding, i);
 	}
 	glUseProgram (restore);
+
+	/* Set animation enable. */
+	self->animated = animated;
 
 	return 1;
 }

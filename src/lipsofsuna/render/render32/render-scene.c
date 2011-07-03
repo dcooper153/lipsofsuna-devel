@@ -300,6 +300,7 @@ static void private_render_pass_nosort (
 	int i;
 	int start;
 	int count;
+	int first;
 	LIAlgU32dicIter iter;
 	LIMatAabb bounds;
 	LIRenMaterial32* material;
@@ -319,7 +320,7 @@ static void private_render_pass_nosort (
 		/* Bind the object data. */
 		liren_context32_set_modelmatrix (context, &object->orientation.matrix);
 		liren_context32_set_mesh (context, &object->model->mesh);
-		liren_context32_set_pose (context, object->pose);
+		first = 1;
 
 		/* Render each material group that has the pass. */
 		for (i = 0 ; i < object->model->materials.count ; i++)
@@ -332,6 +333,11 @@ static void private_render_pass_nosort (
 			liren_context32_set_material (context, material);
 			liren_context32_set_shader (context, pass, material->shader);
 			liren_context32_set_textures (context, material->textures.array, material->textures.count);
+			if (first && material->shader->passes[pass].animated)
+			{
+				liren_context32_set_pose (context, object->pose);
+				first = 0;
+			}
 			liren_context32_bind (context);
 			liren_context32_render_indexed (context, start, count);
 		}
@@ -345,6 +351,8 @@ static void private_render_pass_nosort (
 			liren_context32_set_material (context, material);
 			liren_context32_set_shader (context, pass, material->shader);
 			liren_context32_set_textures (context, material->textures.array, material->textures.count);
+			if (first && material->shader->passes[pass].animated)
+				liren_context32_set_pose (context, object->pose);
 			liren_context32_bind (context);
 			liren_context32_render_indexed (context, 0, start + count);
 		}

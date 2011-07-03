@@ -43,7 +43,7 @@ struct _LIRenProgram32
 	char* reload_vertex;
 	char* reload_geometry;
 	char* reload_fragment;
-	int reload_feedback;
+	int animated;
 };
 
 LIAPICALL (int, liren_program32_init, (
@@ -59,7 +59,7 @@ LIAPICALL (int, liren_program32_compile, (
 	const char*   vertex,
 	const char*   geometry,
 	const char*   fragment,
-	int           feedback));
+	int           animated));
 
 LIAPICALL (void, liren_program32_reload, (
 	LIRenProgram32* self,

@@ -34,7 +34,7 @@ static void private_compile (
 {
 	int i;
 	int tmpbool;
-	int feedback = 0;
+	int animated;
 	int alpha_coverage;
 	int blend_enable;
 	GLenum blend_src;
@@ -44,6 +44,7 @@ static void private_compile (
 	int depth_write;
 	GLenum depth_func;
 	char field_alpha_coverage[64];
+	char field_animated[64];
 	char field_blend_enable[64];
 	char field_blend_src[64];
 	char field_blend_dst[64];
@@ -60,9 +61,9 @@ static void private_compile (
 	const char* vertex;
 
 	/* Compile passes. */
-	liscr_args_gets_bool (args, "transform_feedback", &feedback);
 	for (i = 0 ; i < LIREN_SHADER_PASS_COUNT ; i++)
 	{
+		animated = 0;
 		fragment = default_fragment_shader;
 		geometry = NULL;
 		vertex = default_vertex_shader;
@@ -74,6 +75,7 @@ static void private_compile (
 		depth_test = 1;
 		depth_write = 1;
 		depth_func = GL_LEQUAL;
+		snprintf (field_animated, sizeof (field_animated), "pass%d_animated", i + 1);
 		snprintf (field_fragment, sizeof (field_fragment), "pass%d_fragment", i + 1);
 		snprintf (field_geometry, sizeof (field_geometry), "pass%d_geometry", i + 1);
 		snprintf (field_vertex, sizeof (field_vertex), "pass%d_vertex", i + 1);
@@ -88,6 +90,7 @@ static void private_compile (
 		liren_shader_clear_pass (shader, i);
 		if (liscr_args_gets_string (args, field_fragment, &fragment))
 		{
+			liscr_args_gets_bool (args, field_animated, &animated);
 			liscr_args_gets_string (args, field_geometry, &geometry);
 			liscr_args_gets_string (args, field_vertex, &vertex);
 			if (liscr_args_gets_bool (args, field_alpha_coverage, &tmpbool))
@@ -127,7 +130,7 @@ static void private_compile (
 				else if (!strcmp (tmpstr, "less"))
 					depth_func = GL_LESS;
 			}
-			if (!liren_shader_compile (shader, i, vertex, geometry, fragment, feedback, alpha_coverage,
+			if (!liren_shader_compile (shader, i, vertex, geometry, fragment, animated, alpha_coverage,
 			     blend_enable, blend_src, blend_dst, color_write, depth_test, depth_write, depth_func))
 				lisys_error_report ();
 		}

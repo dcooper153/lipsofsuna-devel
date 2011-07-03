@@ -40,7 +40,7 @@ LIAPICALL (int, liren_shader_compile, (
 	const char*  vertex,
 	const char*  geometry,
 	const char*  fragment,
-	int          feedback,
+	int          animated,
 	int          alpha_to_coverage,
 	int          blend_enable,
 	GLenum       blend_src,

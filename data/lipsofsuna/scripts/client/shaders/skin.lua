@@ -3,6 +3,7 @@ Shader{name = "skin",
 -- Low quality program.
 -- No lighting.
 low = {
+pass4_animated = true,
 pass4_depth_func = "lequal",
 pass4_depth_write = true,
 pass4_vertex = [[
@@ -25,6 +26,7 @@ void main()
 -- Medium quality program.
 -- Fragment lighting, fake skin diffuse.
 medium = {
+pass1_animated = true,
 pass1_color_write = false,
 pass1_depth_func = "lequal",
 pass1_vertex = [[
@@ -38,6 +40,7 @@ pass1_fragment = [[
 void main()
 {
 }]],
+pass4_animated = true,
 pass4_depth_func = "equal",
 pass4_depth_write = false,
 pass4_vertex = [[
@@ -77,6 +80,7 @@ void main()
 -- High quality program.
 -- Normal mapping, fragment lighting, fake skin diffuse.
 high = {
+pass1_animated = true,
 pass1_color_write = false,
 pass1_depth_func = "lequal",
 pass1_vertex = [[
@@ -90,6 +94,7 @@ pass1_fragment = [[
 void main()
 {
 }]],
+pass4_animated = true,
 pass4_depth_func = "equal",
 pass4_depth_write = false,
 pass4_vertex = [[
