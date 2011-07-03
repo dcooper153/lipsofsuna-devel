@@ -160,8 +160,6 @@ Object.create_character_model = function(self, args)
 	m:edit_material{match_shader = "skin", diffuse = args.skin_color,
 		shader = species.skin_shader, textures = species.skin_textures}
 	m:edit_material{match_texture = "eye1", diffuse = args.eye_color}
-	m:edit_material{match_shader = "default", shader = "animdiff"}
-	m:edit_material{match_shader = "normalmap", shader = "animdiffnorm"}
 	-- Recalculate bounding box.
 	m:calculate_bounds()
 	m:changed()

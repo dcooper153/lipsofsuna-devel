@@ -3,25 +3,14 @@ Shader{name = "fur",
 -- Low quality program.
 -- No lighting.
 low = {
-pass1_color_write = false,
-pass1_depth_func = "lequal",
-pass1_vertex = [[
-void main()
-{
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
-	gl_Position = LOS_matrix_projection * tmp;
-}]],
-pass1_fragment = [[
-void main()
-{
-}]],
-pass4_depth_func = "equal",
+pass4_depth_func = "lequal",
 pass4_depth_write = false,
 pass4_vertex = [[
 out vec2 F_texcoord;
 void main()
 {
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	]] .. Shader.los_animation_default() .. [[
+	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	F_texcoord = LOS_texcoord;
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
@@ -41,7 +30,8 @@ pass1_depth_func = "lequal",
 pass1_vertex = [[
 void main()
 {
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	]] .. Shader.los_animation_default() .. [[
+	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass1_fragment = [[
@@ -55,8 +45,9 @@ out vec4 F_light;
 out vec2 F_texcoord;
 void main()
 {
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
-	vec3 normal = LOS_matrix_normal * LOS_normal;
+	]] .. Shader.los_animation_default() .. [[
+	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
+	vec3 normal = LOS_matrix_normal * anim_normal;
 	F_texcoord = LOS_texcoord;
 	vec3 halfvector[LOS_LIGHT_MAX];
 	vec3 lightvector[LOS_LIGHT_MAX];
@@ -83,7 +74,8 @@ pass1_depth_func = "lequal",
 pass1_vertex = [[
 void main()
 {
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	]] .. Shader.los_animation_default() .. [[
+	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass1_fragment = [[
@@ -101,9 +93,10 @@ out vec3 G_tangent;
 out vec2 G_texcoord;
 void main()
 {
-	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord,1.0);
+	]] .. Shader.los_animation_default() .. [[
+	vec4 tmp = LOS_matrix_modelview * vec4(anim_coord,1.0);
 	G_coord = tmp.xyz;
-	G_normal = LOS_matrix_normal * LOS_normal;
+	G_normal = LOS_matrix_normal * anim_normal;
 	G_texcoord = LOS_texcoord;
 	vec3 halfvector[LOS_LIGHT_MAX];
 	vec3 lightvector[LOS_LIGHT_MAX];

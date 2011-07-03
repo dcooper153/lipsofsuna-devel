@@ -99,11 +99,11 @@ Object:add_getters{
 Object:add_setters{
 	model = function(s, v)
 		local m = v
-		if type(v) == "string" then m = Model:load{file = v, mesh = s.load_meshes} end
+		if type(v) == "string" then m = Model:load{file = v, mesh = Object.load_meshes} end
 		rawset(s, "__model", m)
 		Los.object_set_model(s.handle, m and m.handle)
 	end,
-	model_name = function(s, v) s.model = Model:load{file = v, mesh = s.load_meshes} end,
+	model_name = function(s, v) s.model = Model:load{file = v, mesh = Object.load_meshes} end,
 	position = function(s, v) Los.object_set_position(s.handle, v.handle) end,
 	rotation = function(s, v) Los.object_set_rotation(s.handle, v.handle) end,
 	realized = function(s, v)

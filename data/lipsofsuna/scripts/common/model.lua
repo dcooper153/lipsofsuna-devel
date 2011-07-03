@@ -1,3 +1,5 @@
+require "common/modelspec"
+
 local oldinst = Model.new
 local oldload = Model.load
 Model.models = {}
@@ -21,10 +23,20 @@ end
 --   <li>mesh: False to not load the mesh.</li></ul>
 -- @return Model.
 Model.load = function(clss, args)
+	-- Reuse existing models.
 	local self = clss:find(args)
 	if self then return self end
-	self = clss:new{name = args.file}
+	-- Load a new model.
+	local spec = Modelspec:find{name = args.file}
+	self = clss:new{name = spec and spec.file or args.file}
 	oldload(self, args)
+	-- Replace shaders.
+	if args.mesh ~= false and spec and spec.replace_shaders then
+		for k,v in pairs(spec.replace_shaders) do
+			self:edit_material{match_shader = k, shader = v}
+		end
+		self:changed()
+	end
 	return self
 end
 

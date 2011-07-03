@@ -57,9 +57,11 @@ void main()
 	gl_Position = LOS_matrix_projection * tmp;
 }]],
 pass4_fragment = [[
+in vec3 F_coord;
+in vec3 F_halfvector[LOS_LIGHT_MAX];
+in vec3 F_lightvector[LOS_LIGHT_MAX];
 in vec3 F_normal;
 in vec2 F_texcoord;
-in vec4 F_light;
 void main()
 {
 	vec3 normal = normalize(F_normal);
