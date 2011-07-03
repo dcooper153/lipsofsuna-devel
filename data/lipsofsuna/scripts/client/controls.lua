@@ -159,6 +159,26 @@ Action{name = "grab", mode = "press", key1 = Keysym.g, func = function(v)
 	end
 end}
 
+Action{name = "copy", mode = "press", key1 = Keysym.x, func = function(v)
+	if Client.mode == "game" then
+		-- Game controls.
+		-- TODO
+	elseif Client.mode == "editor" then
+		-- Editor controls.
+		Client.views.editor.editor:copy()
+	end
+end}
+
+Action{name = "paste", mode = "press", key1 = Keysym.v, func = function(v)
+	if Client.mode == "game" then
+		-- Game controls.
+		-- TODO
+	elseif Client.mode == "editor" then
+		-- Editor controls.
+		Client.views.editor.editor:paste()
+	end
+end}
+
 Action{name = "inventory", mode = "press", key1 = Keysym.i, func = function()
 	if Client.player_object then
 		Client:set_mode("inventory")

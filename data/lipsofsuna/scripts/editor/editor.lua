@@ -10,6 +10,7 @@ Editor.new = function(clss)
 	self.prev_tiles = {}
 	self.mouse_sensitivity = 0.01
 	self.selection = {}
+	self.copybuffer = {}
 	-- Camera and lighting.
 	self.camera = EditorCamera()
 	self.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equation={1.0,0.0,0.01}, priority = 2}
@@ -223,6 +224,36 @@ Editor.load = function(self, name)
 	self:update_corners()
 	-- Update the map name entry.
 	self.entry_map.text = name
+end
+
+Editor.copy = function(self, args)
+	self.copybuffer = self.selection
+end
+
+Editor.paste = function(self, args)
+	--FIXME make objects spawn at cursor
+	--TODO Tile copying
+	--TODO make pasted objects current selection
+	local point,object,tile = Target:pick_ray{camera = self.camera}
+	local prevpoint = nil
+	
+	--Calculate offset of pastebuffer objects
+	for k,v in pairs(self.copybuffer) do
+		
+		if v.object.position then
+			if not prevpoint then prevpoint = v.object.position v.offset = Vector(0,0,0)
+			else
+				v.offset = prevpoint - v.object.position
+			end
+		end
+	end
+	
+	--insert pastebuffer objects into world
+	for k,v in pairs(self.copybuffer) do
+		if v.object and point then
+			EditorObject{position = point+v.offset, realized = true, spec = v.object.spec}
+		end
+	end
 end
 
 Editor.pressed = function(self, args)
