@@ -10,6 +10,8 @@ Views.Chargen.list_races = {
 	{"Wyrm - female", "wyrm"},
 	{"Wyrm - male", "wyrmmale"}}
 
+Views.Chargen.list_spawnpoints={{"Tutorial","lyra"},{"Lips Town","mentor"}}
+
 --- Creates a new chargen view.
 -- @param clss Chargen class.
 -- @return Chargen.
@@ -28,9 +30,18 @@ Views.Chargen.new = function(clss)
 	self.list_hair_styles = {}
 	self.list_eye_styles = {}
 	self.list_skin_styles = {}
+	-- Spawn Point Selector
+	local spawnpoints = {}
+	for k,v in ipairs(self.list_spawnpoints) do
+		table.insert(spawnpoints, {v[1], function() print(v[2]) end})
+	end
+	self.label_spawn = Widgets.Label{text="Spawn Point:"}
+	self.combo_spawn = Widgets.ComboBox(spawnpoints)
+	--self.combo_spawn.activated = function() self.list_spawnpoints[self.combo_spawn.value][2]() end
 	-- Character name.
 	self.label_name = Widgets.Label{text = "Name:"}
 	self.entry_name = Widgets.Entry()
+	
 	-- Race selector.
 	local races = {}
 	for k,v in ipairs(self.list_races) do
@@ -130,9 +141,10 @@ Views.Chargen.new = function(clss)
 		row = row + 1
 	end
 	self.group_appearance:set_expand{col = 2}
-	self.group_buttons = Widget{rows = 2, cols = 1, margins = {0,0,5,5}}
-	self.group_buttons:set_child{row = 1, col = 1, widget = self.button_create}
-	self.group_buttons:set_child{row = 2, col = 1, widget = self.button_quit}
+	self.group_buttons = Widget{rows = 3, cols = 1, margins = {0,0,5,5}}
+	self.group_buttons:set_child{row = 1, col = 1, widget = self.combo_spawn}
+	self.group_buttons:set_child{row = 2, col = 1, widget = self.button_create}
+	self.group_buttons:set_child{row = 3, col = 1, widget = self.button_quit}
 	self.group_buttons:set_expand{col = 1}
 	self.group_left = Widget{cols = 1, spacings = {0,0}}
 	self.group_left:append_row(Widgets.Frame{style = "title", text = "Character"})
@@ -188,7 +200,9 @@ Views.Chargen.apply = function(self)
 		"string", "default",
 		"uint8", 255 * self.color_skin.red,
 		"uint8", 255 * self.color_skin.green,
-		"uint8", 255 * self.color_skin.blue)
+		"uint8", 255 * self.color_skin.blue,
+		--Spawnpoint
+		"string", self.list_spawnpoints[self.combo_spawn.value][2])
 	Network:send{packet = packet}
 end
 

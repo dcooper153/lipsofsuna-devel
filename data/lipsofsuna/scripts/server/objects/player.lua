@@ -33,6 +33,7 @@ end
 -- @return Player.
 Player.new = function(clss, args)
 	local self = Creature.new(clss, args)
+	print(args.spawnpoint)
 	self.account = args.account
 	self.running = true
 	self:calculate_speed()

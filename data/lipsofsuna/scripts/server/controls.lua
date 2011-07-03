@@ -3,7 +3,15 @@ local spawn_player = function(object, client)
 	Network:send{client = client, packet = Packet(packets.CHARACTER_ACCEPT)}
 	-- Add to the map.
 	Player.clients[client] = object
-	object:teleport{position = Config.inst.spawn_point}
+	if object.spawnpoint then
+		--TODO decide between region or marker for spawn point
+		--local reg = Regionspec:find{name = object.spawnpoint}
+		--object:teleport{point = reg.spawn_point_world+Vector(0,0,5)}
+		object:teleport{marker = object.spawnpoint}
+	else 
+		print"nospawn"
+		object:teleport{position =Config.inst.spawn_point} 
+	end
 	object.realized = true
 	-- Transmit active and completed quests.
 	for k,q in pairs(Quest.dict_name) do
@@ -21,7 +29,7 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	if player then return end
 	-- Get character flags.
 	local ok,na,ra,s1,s2,s3,s4,s5,s6,b1,b2,b3,b4,b5,b6,eye,eyer,eyeg,eyeb,f1,f2,f3,f4,f5,
-	hair,hairr,hairg,hairb,skin,skinr,sking,skinb = args.packet:read(
+	hair,hairr,hairg,hairb,skin,skinr,sking,skinb,spawnpoint = args.packet:read(
 		"string", "string",
 		-- Skills.
 		"uint8", "uint8", "uint8", "uint8", "uint8", "uint8",
@@ -34,7 +42,9 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		-- Hair style.
 		"string", "uint8", "uint8", "uint8",
 		-- Skin style.
-		"string", "uint8", "uint8", "uint8")
+		"string", "uint8", "uint8", "uint8",
+		-- Spawnpoint.
+		"string")
 	if not ok then return end
 	local spec = Species:find{name = ra .. "-player"}
 	if not spec then return end
@@ -53,7 +63,8 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		name = (na ~= "" and na or "Player"),
 		random = true,
 		skin_style = {skin, skinr, sking, skinb},
-		spec = spec}
+		spec = spec,
+		spawnpoint = spawnpoint}
 	-- Set skills.
 	local names = {"dexterity", "health", "intelligence", "perception", "strength", "willpower"}
 	local values = {s1, s2, s3, s4, s5, s6}

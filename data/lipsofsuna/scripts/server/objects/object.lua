@@ -496,7 +496,7 @@ Object.teleport = function(self, args)
 	if args.marker then
 		local marker = Marker:find{name = args.marker}
 		if not marker or not marker.position then return end
-		self.position = marker.position + Vector(0, 2, 0)
+		self.position = marker.position + Vector(0, 2, -1)
 	elseif args.region then
 		local reg = Regionspec:find{name = args.region}
 		if not reg then return end

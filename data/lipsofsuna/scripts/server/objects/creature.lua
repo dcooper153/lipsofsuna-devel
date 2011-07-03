@@ -173,6 +173,7 @@ Creature.new = function(clss, args)
 	copy("skin_style")
 	copy("carried_weight", 0)
 	copy("spec")
+	copy("spawnpoint")
 	self.update_timer = 0.1 * math.random()
 	self:calculate_speed()
 	if args and args.dead then self:set_dead_state() end
