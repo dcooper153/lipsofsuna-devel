@@ -46,6 +46,7 @@ extern LIMaiExtensionInfo liext_sound_info;
 extern LIMaiExtensionInfo liext_tiles_info;
 extern LIMaiExtensionInfo liext_tiles_physics_info;
 extern LIMaiExtensionInfo liext_tiles_render_info;
+extern LIMaiExtensionInfo liext_vision_info;
 extern LIMaiExtensionInfo liext_widgets_info;
 
 /**
@@ -84,6 +85,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "tiles", &liext_tiles_info },
 		{ "tiles-physics", &liext_tiles_physics_info },
 		{ "tiles-render", &liext_tiles_render_info },
+		{ "vision", &liext_vision_info },
 		{ "widgets", &liext_widgets_info }
 	};
 

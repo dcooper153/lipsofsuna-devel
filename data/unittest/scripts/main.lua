@@ -37,6 +37,9 @@ catch(function() Ai.unittest() end)
 require "system/database"
 catch(function() Database.unittest() end)
 
+require "system/vision"
+catch(function() Vision.unittest() end)
+
 require "system/graphics"
 -- TODO
 
