@@ -196,7 +196,7 @@ void liren_scene32_render (
 		return;
 
 	/* Upload light settings. */
-	liren_lighting32_upload (self->lighting, context);
+	liren_lighting32_upload (self->lighting, context, &eye);
 
 	/* Reset profiling. */
 #ifdef LIREN_ENABLE_PROFILING

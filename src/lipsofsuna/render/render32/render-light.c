@@ -189,12 +189,7 @@ int liren_light32_compare (
 	if (self->priority > light->priority)
 		return 1;
 
-	/* Secondary sorting by pointer. */
-	/* This ensures that the choice is consistent across frames
-	   when there are multiple lights with the same priority. */
-	if (self < light)
-		return -1;
-	return 1;
+	return 0;
 }
 
 void liren_light32_update (

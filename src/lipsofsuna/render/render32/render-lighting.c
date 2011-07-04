@@ -120,20 +120,29 @@ void liren_lighting32_update (
  * \brief Uploads the lights to the context.
  * \param self Lighting.
  * \param context Context.
+ * \param center Camera center.
  */
 void liren_lighting32_upload (
 	LIRenLighting32* self,
-	LIRenContext32*  context)
+	LIRenContext32*  context,
+	LIMatVector*     center)
 {
 	int i;
+	int cmp;
 	int count;
+	float dist;
+	float dists[LIREN_CONTEXT_MAX_LIGHTS + 1];
 	LIAlgPtrdicIter iter;
+	LIMatVector diff;
 	LIRenLight32* light;
 	LIRenLight32* lights[LIREN_CONTEXT_MAX_LIGHTS + 1];
 
 	/* Clear the light list. */
 	for (i = 0 ; i < LIREN_CONTEXT_MAX_LIGHTS ; i++)
+	{
 		lights[i] = NULL;
+		dists[i] = 1000000000.0f;
+	}
 
 	/* Sort the light list. */
 	/* This is an insertion sort algorithm with a small destination array.
@@ -143,12 +152,24 @@ void liren_lighting32_upload (
 	LIALG_PTRDIC_FOREACH (iter, self->lights)
 	{
 		light = iter.value;
+		diff = limat_vector_subtract (light->transform.position, *center);
+		dist = limat_vector_dot (diff, diff);
 		for (i = count ; i > 0 ; i--)
 		{
-			if (liren_light32_compare (light, lights[i - 1]) < 0)
+			/* Compare priorities. */
+			cmp = liren_light32_compare (light, lights[i - 1]);
+			if (cmp < 0)
 				break;
+
+			/* Compare distances. */
+			if (cmp == 0 && dist > dists[i - 1])
+				break;
+
+			/* Shift the weaker light. */
+			dists[i] = dists[i - 1];
 			lights[i] = lights[i - 1];
 		}
+		dists[i] = dist;
 		lights[i] = light;
 		count = LIMAT_MIN (LIREN_CONTEXT_MAX_LIGHTS, count + 1);
 	}

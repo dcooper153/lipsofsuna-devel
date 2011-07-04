@@ -50,6 +50,7 @@ LIAPICALL (void, liren_lighting32_update, (
 
 LIAPICALL (void, liren_lighting32_upload, (
 	LIRenLighting32* self,
-	LIRenContext32*  context));
+	LIRenContext32*  context,
+	LIMatVector*     center));
 
 #endif
