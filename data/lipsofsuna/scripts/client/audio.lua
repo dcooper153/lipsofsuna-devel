@@ -18,7 +18,3 @@ Sound.switch_music_track = function(clss, mode)
 	clss.music_volume = Client.views.options.music_volume
 	clss.music = tracks[math.random(1, #tracks)]
 end
-
-Eventhandler{type = "music-ended", func = function(self, args)
-	Sound:switch_music_track()
-end}

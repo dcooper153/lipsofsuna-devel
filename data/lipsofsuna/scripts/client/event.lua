@@ -128,6 +128,10 @@ Eventhandler{type = "mousemotion", func = function(self, args)
 	end
 end}
 
+Eventhandler{type = "music-ended", func = function(self, args)
+	Sound:switch_music_track()
+end}
+
 Eventhandler{type = "quit", func = function(self, args)
 	Program.quit = true
 end}

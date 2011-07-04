@@ -8,6 +8,7 @@ require "server/chat"
 require "server/config"
 require "server/crafting"
 require "server/dialog"
+require "server/event"
 require "server/feat"
 require "server/sectors"
 require "server/admin"
@@ -41,16 +42,6 @@ if Settings.generate or
 else
 	Serialize:load()
 end
-
--- Simulate.
-Eventhandler{type = "object-motion", func = function(self, event)
-	Vision:event{type = "object-moved", object = event.object}
-end}
-Eventhandler{type = "object-contact", func = function(self, event)
-	if event.self.contact_cb then
-		event.self:contact_cb(event)
-	end
-end}
 
 Voxel.block_changed_cb = function(index, stamp)
 	Vision:event{type = "voxel-block-changed", index = index, point = ARGH, stamp = stamp}
