@@ -38,7 +38,7 @@ static void Vision_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_VISION, liext_vision_free);
+	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_VISION, liext_vision_listener_free);
 	if (data == NULL)
 	{
 		liext_vision_listener_free (self);
