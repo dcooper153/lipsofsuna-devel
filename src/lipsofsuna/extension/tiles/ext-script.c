@@ -30,11 +30,11 @@ static void Voxel_copy_region (LIScrArgs* args)
 	int length;
 	int sector;
 	int offset[3];
-	LIArcWriter* writer;
+	LIArcPacket* packet;
+	LIScrData* data;
 	LIExtModule* module;
 	LIMatVector point;
 	LIMatVector size;
-	LIScrData* packet;
 	LIVoxVoxel* result;
 
 	/* Get region offset and size. */
@@ -67,19 +67,18 @@ static void Voxel_copy_region (LIScrArgs* args)
 		(int) point.x, (int) point.y, (int) point.z,
 		(int) size.x, (int) size.y, (int) size.z, result);
 
-	/* Create packet writer. */
-	packet = liscr_packet_new_writable (args->script, 0);
+	/* Create a packet writer. */
+	packet = liarc_packet_new_writable (0);
 	if (packet == NULL)
 	{
 		lisys_free (result);
 		return;
 	}
-	writer = ((LIScrPacket*) liscr_data_get_data (packet))->writer;
 
-	/* Write dimensions. */
-	if (!liarc_writer_append_uint32 (writer, (int) size.x) ||
-		!liarc_writer_append_uint32 (writer, (int) size.y) ||
-		!liarc_writer_append_uint32 (writer, (int) size.z))
+	/* Write the dimensions. */
+	if (!liarc_writer_append_uint32 (packet->writer, (int) size.x) ||
+		!liarc_writer_append_uint32 (packet->writer, (int) size.y) ||
+		!liarc_writer_append_uint32 (packet->writer, (int) size.z))
 	{
 		lisys_free (result);
 		return;
@@ -88,16 +87,22 @@ static void Voxel_copy_region (LIScrArgs* args)
 	/* Write voxel data. */
 	for (i = 0 ; i < length ; i++)
 	{
-		if (!livox_voxel_write (result + i, writer))
+		if (!livox_voxel_write (result + i, packet->writer))
 		{
 			lisys_free (result);
 			return;
 		}
 	}
+	lisys_free (result);
 
 	/* Return data. */
-	liscr_args_seti_data (args, packet);
-	lisys_free (result);
+	data = liscr_data_new (args->script, args->lua, packet, LISCR_SCRIPT_PACKET, liarc_packet_free);
+	if (data == NULL)
+	{
+		liarc_packet_free (packet);
+		return;
+	}
+	liscr_args_seti_stack (args);
 }
 
 static void Voxel_fill_region (LIScrArgs* args)
@@ -251,9 +256,9 @@ static void Voxel_get_block (LIScrArgs* args)
 	int tmp;
 	int index;
 	int type = 1;
+	LIArcPacket* packet;
 	LIExtModule* module;
 	LIScrData* data = NULL;
-	LIScrPacket* packet;
 	LIVoxSector* sector;
 	LIVoxBlockAddr addr;
 
@@ -281,28 +286,27 @@ static void Voxel_get_block (LIScrArgs* args)
 	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
 	{
 		liscr_args_gets_int (args, "type", &type);
-		data = liscr_packet_new_writable (args->script, type);
-		if (data == NULL)
+		packet = liarc_packet_new_writable (type);
+		if (packet == NULL)
 			return;
-		packet = liscr_data_get_data (data);
+		data = liscr_data_new (args->script, args->lua, packet, LISCR_SCRIPT_PACKET, liarc_packet_free);
+		if (data == NULL)
+		{
+			liarc_packet_free (packet);
+			return;
+		}
+		liscr_args_seti_stack (args);
 	}
 	else
 	{
 		packet = liscr_data_get_data (data);
 		if (packet->writer == NULL)
 			return;
-		liscr_data_ref (data);
 	}
 
-	/* Build packet. */
-	if (!liarc_writer_append_uint32 (packet->writer, index) ||
-		!livox_sector_write_block (sector, addr.block[0], addr.block[1], addr.block[2], packet->writer))
-	{
-		liscr_data_unref (data);
-		return;
-	}
-	liscr_args_seti_data (args, data);
-	liscr_data_unref (data);
+	/* Build the packet. */
+	liarc_writer_append_uint32 (packet->writer, index);
+	livox_sector_write_block (sector, addr.block[0], addr.block[1], addr.block[2], packet->writer);
 }
 
 static void Voxel_get_tile (LIScrArgs* args)
@@ -362,11 +366,11 @@ static void Voxel_paste_region (LIScrArgs* args)
 	int offset[3];
 	uint8_t tmp;
 	uint32_t size[3];
+	LIArcPacket* packet;
 	LIArcReader* reader;
 	LIExtModule* module;
 	LIMatVector point;
 	LIScrData* data;
-	LIScrPacket* packet;
 	LIVoxVoxel* voxels;
 
 	/* Get region offset. */
@@ -465,11 +469,11 @@ static void Voxel_set_block (LIScrArgs* args)
 	uint8_t skip;
 	uint32_t index;
 	uint32_t tmp;
+	LIArcPacket* packet;
 	LIExtModule* module;
 	LIVoxBlockAddr addr;
 	LIVoxSector* sector;
 	LIScrData* data;
-	LIScrPacket* packet;
 
 	/* Get packet. */
 	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))

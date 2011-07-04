@@ -187,23 +187,15 @@ static void private_object_contact (
 	LIExtModule*  self,
 	LIPhyContact* contact)
 {
-	LIScrData* point;
-	LIScrData* normal;
-	LIScrData* tile;
 	LIEngObject* object0;
 	LIEngObject* object1;
 	LIMatVector vector;
-	LIScrScript* script = self->program->script;
 
 	if (contact->object1 != NULL)
 	{
 		object0 = liphy_object_get_userdata (contact->object0);
 		object1 = liphy_object_get_userdata (contact->object1);
-		point = liscr_vector_new (script, &contact->point);
-		normal = liscr_vector_new (script, &contact->normal);
-		limai_program_event (self->program, "object-contact", "impulse", LISCR_TYPE_FLOAT, contact->impulse, "normal", LISCR_SCRIPT_VECTOR, normal, "object", LISCR_SCRIPT_OBJECT, object1->script, "point", LISCR_SCRIPT_VECTOR, point, "self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
-		liscr_data_unref (point);
-		liscr_data_unref (normal);
+		limai_program_event (self->program, "object-contact", "impulse", LISCR_TYPE_FLOAT, contact->impulse, "normal", LISCR_SCRIPT_VECTOR, &contact->normal, "object", LISCR_SCRIPT_OBJECT, object1->script, "point", LISCR_SCRIPT_VECTOR, &contact->point, "self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
 	}
 	else
 	{
@@ -211,13 +203,7 @@ static void private_object_contact (
 		vector.x = contact->terrain_tile[0];
 		vector.y = contact->terrain_tile[1];
 		vector.z = contact->terrain_tile[2];
-		point = liscr_vector_new (script, &contact->point);
-		normal = liscr_vector_new (script, &contact->normal);
-		tile = liscr_vector_new (script, &vector);
-		limai_program_event (self->program, "object-contact", "impulse", LISCR_TYPE_FLOAT, contact->impulse, "normal", LISCR_SCRIPT_VECTOR, normal,  "point", LISCR_SCRIPT_VECTOR, point, "tile", LISCR_SCRIPT_VECTOR, tile, "self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
-		liscr_data_unref (point);
-		liscr_data_unref (normal);
-		liscr_data_unref (tile);
+		limai_program_event (self->program, "object-contact", "impulse", LISCR_TYPE_FLOAT, contact->impulse, "normal", LISCR_SCRIPT_VECTOR, &contact->normal,  "point", LISCR_SCRIPT_VECTOR, &contact->point, "tile", LISCR_SCRIPT_VECTOR, &vector, "self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
 	}
 }
 

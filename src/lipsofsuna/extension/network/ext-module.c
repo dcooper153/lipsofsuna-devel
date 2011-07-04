@@ -432,8 +432,7 @@ static int private_message_client (
 {
 	int len;
 	const uint8_t* data;
-	LIArcReader* reader;
-	LIScrData* packet;
+	LIArcPacket* reader;
 
 	/* Check for valid length. */
 	len = event->packet->dataLength;
@@ -445,19 +444,13 @@ static int private_message_client (
 	}
 
 	/* Create packet reader. */
-	reader = liarc_reader_new ((char*) data, len);
+	reader = liarc_packet_new_readable ((char*) data, len);
 	if (reader == NULL)
 		return 0;
-	reader->pos = 1;
+	reader->reader->pos = 1;
 
 	/* Emit an event. */
-	packet = liscr_packet_new_readable (self->program->script, reader);
-	if (packet != NULL)
-	{
-		limai_program_event (self->program, "packet", "message", LISCR_TYPE_INT, data[0], "packet", LISCR_SCRIPT_PACKET, packet, NULL);
-		liscr_data_unref (packet);
-	}
-	liarc_reader_free (reader);
+	limai_program_event (self->program, "packet", "message", LISCR_TYPE_INT, data[0], "packet", LISCR_SCRIPT_PACKET, reader, NULL);
 
 	return 1;
 }
@@ -466,9 +459,8 @@ static int private_message_server (
 	LIExtModule* self,
 	ENetEvent*   event)
 {
-	LIArcReader* reader;
+	LIArcPacket* reader;
 	LIExtClient* client;
-	LIScrData* packet;
 
 	/* Get the client. */
 	client = event->peer->data;
@@ -478,19 +470,13 @@ static int private_message_server (
 	/* Create packet reader. */
 	if (event->packet->dataLength < 1)
 		return 0;
-	reader = liarc_reader_new ((void*) event->packet->data, event->packet->dataLength);
+	reader = liarc_packet_new_readable ((void*) event->packet->data, event->packet->dataLength);
 	if (reader == NULL)
 		return 0;
-	reader->pos = 1;
+	reader->reader->pos = 1;
 
 	/* Emit an event. */
-	packet = liscr_packet_new_readable (self->program->script, reader);
-	if (packet != NULL)
-	{
-		limai_program_event (self->program, "packet", "message", LISCR_TYPE_INT, ((uint8_t*) event->packet->data)[0], "client", LISCR_TYPE_INT, client->id, "packet", LISCR_SCRIPT_PACKET, packet, NULL);
-		liscr_data_unref (packet);
-	}
-	liarc_reader_free (reader);
+	limai_program_event (self->program, "packet", "message", LISCR_TYPE_INT, ((uint8_t*) event->packet->data)[0], "client", LISCR_TYPE_INT, client->id, "packet", LISCR_SCRIPT_PACKET, reader, NULL);
 
 	return 1;
 }

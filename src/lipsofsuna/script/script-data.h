@@ -18,27 +18,23 @@
 #ifndef __SCRIPT_DATA_H__
 #define __SCRIPT_DATA_H__
 
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "script-types.h"
 
 LIAPICALL (LIScrData*, liscr_data_new, (
 	LIScrScript* script,
+	lua_State*   lua,
 	void*        data,
 	const char*  type,
 	LIScrGCFunc  free));
 
 LIAPICALL (LIScrData*, liscr_data_new_alloc, (
 	LIScrScript* script,
+	lua_State*   lua,
 	size_t       size,
 	const char*  type));
 
 LIAPICALL (void, liscr_data_free, (
-	LIScrData* object));
-
-LIAPICALL (void, liscr_data_ref, (
-	LIScrData* object));
-
-LIAPICALL (void, liscr_data_unref, (
 	LIScrData* object));
 
 LIAPICALL (void*, liscr_data_get_data, (

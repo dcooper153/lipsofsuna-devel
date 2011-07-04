@@ -42,14 +42,13 @@ static void Camera_new (LIScrArgs* args)
 		module->client->window->mode.height);
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_CAMERA, lialg_camera_free);
+	data = liscr_data_new (args->script, args->lua, self, LIEXT_SCRIPT_CAMERA, lialg_camera_free);
 	if (data == NULL)
 	{
 		lialg_camera_free (self);
 		return;
 	}
-	liscr_args_seti_data (args, data);
-	liscr_data_unref (data);
+	liscr_args_seti_stack (args);
 }
 
 static void Camera_move (LIScrArgs* args)

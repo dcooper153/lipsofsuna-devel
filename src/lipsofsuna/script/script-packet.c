@@ -22,17 +22,17 @@
  * @{
  */
 
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/network.h>
-#include <lipsofsuna/script.h>
+#include "lipsofsuna/archive.h"
+#include "lipsofsuna/string.h"
+#include "lipsofsuna/script.h"
 #include "script-private.h"
 
 static void private_read (
-	LIScrPacket* self,
+	LIArcPacket* self,
 	LIScrArgs*   args);
 
 static void private_write (
-	LIScrPacket* self,
+	LIArcPacket* self,
 	LIScrArgs*   args,
 	int          start);
 
@@ -41,26 +41,32 @@ static void private_write (
 static void Packet_new (LIScrArgs* args)
 {
 	int type = 0;
-	LIScrData* self;
+	LIArcPacket* self;
+	LIScrData* data;
 
 	liscr_args_geti_int (args, 0, &type);
 
-	/* Allocate packet. */
-	self = liscr_packet_new_writable (args->script, type);
+	/* Allocate the packet. */
+	self = liarc_packet_new_writable (type);
 	if (self == NULL)
 		return;
 
-	/* Write content. */
-	private_write (self->data, args, 1);
+	/* Allocate the userdata. */
+	data = liscr_data_new (args->script, args->lua, self, LISCR_SCRIPT_PACKET, liarc_packet_free);
+	if (data == NULL)
+	{
+		liarc_packet_free (self);
+		return;
+	}
+	liscr_args_seti_stack (args);
 
-	/* Return packet. */
-	liscr_args_seti_data (args, self);
-	liscr_data_unref (self);
+	/* Write content. */
+	private_write (data->data, args, 1);
 }
 
 static void Packet_read (LIScrArgs* args)
 {
-	LIScrPacket* self;
+	LIArcPacket* self;
 
 	self = args->self;
 	if (self->reader != NULL)
@@ -72,7 +78,7 @@ static void Packet_read (LIScrArgs* args)
 
 static void Packet_resume (LIScrArgs* args)
 {
-	LIScrPacket* self;
+	LIArcPacket* self;
 
 	self = args->self;
 	if (self->reader != NULL)
@@ -81,7 +87,7 @@ static void Packet_resume (LIScrArgs* args)
 
 static void Packet_write (LIScrArgs* args)
 {
-	LIScrPacket* self;
+	LIArcPacket* self;
 
 	self = args->self;
 	if (self->writer != NULL)
@@ -90,7 +96,7 @@ static void Packet_write (LIScrArgs* args)
 
 static void Packet_get_size (LIScrArgs* args)
 {
-	LIScrPacket* self;
+	LIArcPacket* self;
 
 	self = args->self;
 	if (self->reader != NULL)
@@ -101,7 +107,7 @@ static void Packet_get_size (LIScrArgs* args)
 
 static void Packet_get_type (LIScrArgs* args)
 {
-	LIScrPacket* self;
+	LIArcPacket* self;
 
 	self = args->self;
 	if (self->reader != NULL)
@@ -113,7 +119,7 @@ static void Packet_set_type (LIScrArgs* args)
 {
 	int value;
 	uint8_t* buffer;
-	LIScrPacket* self;
+	LIArcPacket* self;
 
 	self = args->self;
 	if (self->writer != NULL)
@@ -140,93 +146,10 @@ void liscr_script_packet (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_PACKET, "packet_set_type", Packet_set_type);
 }
 
-LIScrData* liscr_packet_new_readable (
-	LIScrScript*       script,
-	const LIArcReader* reader)
-{
-	LIScrData* data;
-	LIScrPacket* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIScrPacket));
-	if (self == NULL)
-		return NULL;
-	self->buffer = lisys_calloc (reader->length, 1);
-	if (self->buffer == NULL)
-	{
-		lisys_free (self);
-		return NULL;
-	}
-
-	/* Allocate reader. */
-	self->reader = liarc_reader_new (self->buffer, reader->length);
-	if (self->reader == NULL)
-	{
-		lisys_free (self->buffer);
-		lisys_free (self);
-		return NULL;
-	}
-	memcpy (self->buffer, reader->buffer, reader->length);
-
-	/* Allocate script data. */
-	data = liscr_data_new (script, self, LISCR_SCRIPT_PACKET, liscr_packet_free);
-	if (data == NULL)
-	{
-		liarc_reader_free (self->reader);
-		lisys_free (self->buffer);
-		lisys_free (self);
-	}
-
-	return data;
-}
-
-LIScrData* liscr_packet_new_writable (
-	LIScrScript* script,
-	int          type)
-{
-	LIScrData* data;
-	LIScrPacket* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIScrPacket));
-	if (self == NULL)
-		return NULL;
-
-	/* Allocate writer. */
-	self->writer = liarc_writer_new_packet (type);
-	if (self->writer == NULL)
-	{
-		lisys_free (self);
-		return NULL;
-	}
-
-	/* Allocate script data. */
-	data = liscr_data_new (script, self, LISCR_SCRIPT_PACKET, liscr_packet_free);
-	if (data == NULL)
-	{
-		liarc_writer_free (self->writer);
-		lisys_free (self);
-		return NULL;
-	}
-
-	return data;
-}
-
-void liscr_packet_free (
-	LIScrPacket* self)
-{
-	if (self->writer != NULL)
-		liarc_writer_free (self->writer);
-	if (self->reader != NULL)
-		liarc_reader_free (self->reader);
-	lisys_free (self->buffer);
-	lisys_free (self);
-}
-
 /*****************************************************************************/
 
 static void private_read (
-	LIScrPacket* self,
+	LIArcPacket* self,
 	LIScrArgs*   args)
 {
 	int i;
@@ -339,7 +262,7 @@ static void private_read (
 }
 
 static void private_write (
-	LIScrPacket* self,
+	LIArcPacket* self,
 	LIScrArgs*   args,
 	int          start)
 {

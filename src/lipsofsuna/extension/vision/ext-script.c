@@ -38,14 +38,13 @@ static void Vision_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_VISION, liext_vision_listener_free);
+	data = liscr_data_new (args->script, args->lua, self, LIEXT_SCRIPT_VISION, liext_vision_listener_free);
 	if (data == NULL)
 	{
 		liext_vision_listener_free (self);
 		return;
 	}
-	liscr_args_seti_data (args, data);
-	liscr_data_unref (data);
+	liscr_args_seti_stack (args);
 }
 
 static void Vision_clear (LIScrArgs* args)

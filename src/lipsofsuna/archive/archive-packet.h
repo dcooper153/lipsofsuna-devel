@@ -15,20 +15,23 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SCRIPT_PACKET_H__
-#define __SCRIPT_PACKET_H__
+#ifndef __ARCHIVE_PACKET_H__
+#define __ARCHIVE_PACKET_H__
 
-enum
+#include "lipsofsuna/system.h"
+#include "archive-reader.h"
+#include "archive-writer.h"
+
+typedef struct _LIArcPacket LIArcPacket;
+struct _LIArcPacket
 {
-	LISCR_PACKET_FORMAT_BOOL,
-	LISCR_PACKET_FORMAT_FLOAT,
-	LISCR_PACKET_FORMAT_INT8,
-	LISCR_PACKET_FORMAT_INT16,
-	LISCR_PACKET_FORMAT_INT32,
-	LISCR_PACKET_FORMAT_STRING,
-	LISCR_PACKET_FORMAT_UINT8,
-	LISCR_PACKET_FORMAT_UINT16,
-	LISCR_PACKET_FORMAT_UINT32,
+	char* buffer;
+	LIArcReader* reader;
+	LIArcWriter* writer;
 };
+
+LIAPICALL (LIArcPacket*, liarc_packet_new_readable, (const char* buffer, int length));
+LIAPICALL (LIArcPacket*, liarc_packet_new_writable, (int type));
+LIAPICALL (void, liarc_packet_free, (LIArcPacket* self));
 
 #endif

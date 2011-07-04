@@ -76,7 +76,7 @@ static void Network_send (LIScrArgs* args)
 	int reliable = 1;
 	LIExtModule* module;
 	LIScrData* data;
-	LIScrPacket* packet;
+	LIArcPacket* packet;
 
 	/* Get packet. */
 	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))

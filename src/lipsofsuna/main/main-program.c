@@ -189,6 +189,7 @@ void limai_program_eventva (
 	float pfloat;
 	const char* type_;
 	const char* name;
+	LIScrData* data;
 	lua_State* lua = liscr_script_get_lua (self->script);
 
 	/* Get the event queue. */
@@ -235,6 +236,19 @@ void limai_program_eventva (
 		{
 			pstr = va_arg (args, char*);
 			lua_pushstring (lua, pstr);
+		}
+		else if (!strcmp (type_, LISCR_SCRIPT_PACKET))
+		{
+			pptr = va_arg (args, void*);
+			data = liscr_data_new (self->script, lua, pptr, LISCR_SCRIPT_PACKET, liarc_packet_free);
+		}
+		else if (!strcmp (type_, LISCR_SCRIPT_VECTOR))
+		{
+			data = liscr_data_new_alloc (self->script, lua, sizeof (LIMatVector), LISCR_SCRIPT_VECTOR);
+			if (data == NULL)
+				break;
+			pptr = va_arg (args, void*);
+			*((LIMatVector*) liscr_data_get_data (data)) = *((LIMatVector*) pptr);
 		}
 		else
 		{

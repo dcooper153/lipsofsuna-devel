@@ -249,28 +249,5 @@ void liscr_script_quaternion (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_set_w", Quaternion_set_w);
 }
 
-/**
- * \brief Creates a new script quaternion.
- *
- * The initial reference count of the quaternion is one.
- *
- * \param script Script.
- * \param quaternion Quaternion.
- * \return New script quaternion or NULL.
- */
-LIScrData* liscr_quaternion_new (
-	LIScrScript*           script,
-	const LIMatQuaternion* quaternion)
-{
-	LIScrData* self;
-
-	self = liscr_data_new_alloc (script, sizeof (LIMatQuaternion), LISCR_SCRIPT_QUATERNION);
-	if (self == NULL)
-		return NULL;
-	*((LIMatQuaternion*) self->data) = *quaternion;
-
-	return self;
-}
-
 /** @} */
 /** @} */

@@ -156,14 +156,13 @@ static void ConfigFile_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, cfg, LIEXT_SCRIPT_CONFIG_FILE, private_free_config);
+	data = liscr_data_new (args->script, args->lua, cfg, LIEXT_SCRIPT_CONFIG_FILE, private_free_config);
 	if (data == NULL)
 	{
 		private_free_config (cfg);
 		return;
 	}
-	liscr_args_seti_data (args, data);
-	liscr_data_unref (data);
+	liscr_args_seti_stack (args);
 }
 
 static void ConfigFile_get (LIScrArgs* args)

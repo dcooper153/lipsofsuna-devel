@@ -94,14 +94,13 @@ static void Database_new (LIScrArgs* args)
 	lisys_free (path);
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, sql, LIEXT_SCRIPT_DATABASE, private_free_database);
+	data = liscr_data_new (args->script, args->lua, sql, LIEXT_SCRIPT_DATABASE, private_free_database);
 	if (data == NULL)
 	{
 		sqlite3_close (sql);
 		return;
 	}
-	liscr_args_seti_data (args, data);
-	liscr_data_unref (data);
+	liscr_args_seti_stack (args);
 }
 
 static void Database_query (LIScrArgs* args)
@@ -114,9 +113,8 @@ static void Database_query (LIScrArgs* args)
 	const char* query;
 	const char* str;
 	sqlite3* self;
-	LIArcReader* reader;
+	LIArcPacket* packet;
 	LIScrData* data;
-	LIScrPacket* packet;
 	sqlite3_stmt* statement;
 
 	self = args->self;
@@ -257,16 +255,17 @@ static void Database_query (LIScrArgs* args)
 				case SQLITE_BLOB:
 					str = sqlite3_column_blob (statement, col);
 					size = sqlite3_column_bytes (statement, col);
-					reader = liarc_reader_new (str, size);
-					if (reader != NULL)
+					packet = liarc_packet_new_readable (str, size);
+					if (packet != NULL)
 					{
-						data = liscr_packet_new_readable (args->script, reader);
-						liarc_reader_free (reader);
+						lua_pushnumber (args->lua, col + 1);
+						data = liscr_data_new (args->script, args->lua, packet, LISCR_SCRIPT_PACKET, liarc_packet_free);
 						if (data != NULL)
-						{
-							lua_pushnumber (args->lua, col + 1);
-							liscr_pushdata (args->lua, data);
 							lua_settable (args->lua, -3);
+						else
+						{
+							lua_pop (args->lua, 1);
+							liarc_packet_free (packet);
 						}
 					}
 					break;

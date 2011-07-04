@@ -40,14 +40,13 @@ static void Light_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_LIGHT, liren_light_free);
+	data = liscr_data_new (args->script, args->lua, self, LIEXT_SCRIPT_LIGHT, liren_light_free);
 	if (data == NULL)
 	{
 		liren_light_free (self);
 		return;
 	}
-	liscr_args_seti_data (args, data);
-	liscr_data_unref (data);
+	liscr_args_seti_stack (args);
 }
 
 static void Light_get_ambient (LIScrArgs* args)

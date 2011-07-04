@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,6 +18,7 @@
 #ifndef __LIPS_ARCHIVE_H__
 #define __LIPS_ARCHIVE_H__
 
+#include "archive/archive-packet.h"
 #include "archive/archive-reader.h"
 #include "archive/archive-tar.h"
 #include "archive/archive-writer.h"

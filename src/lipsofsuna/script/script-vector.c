@@ -164,28 +164,5 @@ void liscr_script_vector (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_VECTOR, "vector_set_z", Vector_set_z);
 }
 
-/**
- * \brief Creates a new script vector.
- *
- * The initial reference count of the vector is one.
- *
- * \param script Script.
- * \param vector Vector.
- * \return New script vector or NULL.
- */
-LIScrData*
-liscr_vector_new (LIScrScript*       script,
-                  const LIMatVector* vector)
-{
-	LIScrData* self;
-
-	self = liscr_data_new_alloc (script, sizeof (LIMatVector), LISCR_SCRIPT_VECTOR);
-	if (self == NULL)
-		return NULL;
-	*((LIMatVector*) self->data) = *vector;
-
-	return self;
-}
-
 /** @} */
 /** @} */

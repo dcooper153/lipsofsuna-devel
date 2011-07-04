@@ -41,6 +41,7 @@ static int private_gc (
  * variable to the stack as return value.
  *
  * \param script Script.
+ * \param lua Lua state whose stack will contain the userdata.
  * \param data Wrapped data.
  * \param type Type identifier string.
  * \param free Free function called by garbage collector.
@@ -48,6 +49,7 @@ static int private_gc (
  */
 LIScrData* liscr_data_new (
 	LIScrScript* script,
+	lua_State*   lua,
 	void*        data,
 	const char*  type,
 	LIScrGCFunc  free)
@@ -55,7 +57,7 @@ LIScrData* liscr_data_new (
 	LIScrData* object;
 
 	/* Allocate object. */
-	object = lua_newuserdata (script->lua, sizeof (LIScrData));
+	object = lua_newuserdata (lua, sizeof (LIScrData));
 	if (object == NULL)
 	{
 		lisys_error_set (ENOMEM, NULL);
@@ -67,27 +69,23 @@ LIScrData* liscr_data_new (
 	object->script = script;
 	object->data = data;
 	object->free = free;
-	lua_newtable (script->lua);
-	lua_pushcfunction (script->lua, private_gc);
-	lua_setfield (script->lua, -2, "__gc");
-	lua_setmetatable (script->lua, -2);
+	lua_newtable (lua);
+	lua_pushcfunction (lua, private_gc);
+	lua_setfield (lua, -2, "__gc");
+	lua_setmetatable (lua, -2);
 
 	/* Add to lookup table. */
-	lua_pushlightuserdata (script->lua, LISCR_SCRIPT_LOOKUP_DATA);
-	lua_gettable (script->lua, LUA_REGISTRYINDEX);
-	lisys_assert (lua_type (script->lua, -1) == LUA_TTABLE);
-	lua_pushlightuserdata (script->lua, object);
-	lua_pushvalue (script->lua, -3);
-	lua_settable (script->lua, -3);
-	lua_pop (script->lua, 1);
+	lua_pushlightuserdata (lua, LISCR_SCRIPT_LOOKUP_DATA);
+	lua_gettable (lua, LUA_REGISTRYINDEX);
+	lisys_assert (lua_type (lua, -1) == LUA_TTABLE);
+	lua_pushlightuserdata (lua, object);
+	lua_pushvalue (lua, -3);
+	lua_settable (lua, -3);
+	lua_pop (lua, 1);
 
 	/* Create private table. */
-	lua_newtable (script->lua);
-	lua_setfenv (script->lua, -2);
-
-	/* Reference the userdata. */
-	liscr_data_ref (object);
-	lua_pop (script->lua, 1);
+	lua_newtable (lua);
+	lua_setfenv (lua, -2);
 
 	return object;
 }
@@ -98,12 +96,14 @@ LIScrData* liscr_data_new (
  * Like #liscr_data_new but allocates a new wrapped data.
  *
  * \param script Script.
+ * \param lua Lua state whose stack will contain the userdata.
  * \param size Wrapped data size.
  * \param type Type identifier string.
  * \return New script userdata or NULL.
  */
 LIScrData* liscr_data_new_alloc (
 	LIScrScript* script,
+	lua_State*   lua,
 	size_t       size,
 	const char*  type)
 {
@@ -113,7 +113,7 @@ LIScrData* liscr_data_new_alloc (
 	data = lisys_calloc (1, size);
 	if (data == NULL)
 		return NULL;
-	self = liscr_data_new (script, data, type, lisys_free);
+	self = liscr_data_new (script, lua, data, type, lisys_free);
 	if (self == NULL)
 	{
 		lisys_free (data);
@@ -151,57 +151,6 @@ void liscr_data_free (
 	lua_pushnil (script->lua);
 	lua_settable (script->lua, -3);
 	lua_pop (script->lua, 1);
-}
-
-/**
- * \brief References the userdata.
- *
- * The function increments the global reference count of the userdata.
- * This has the effect of preventing the garbage collection of the userdata
- * as long as any global references remain. After the global references have
- * been cleared, the normal garbage collection rules apply.
- * 
- * \param self Script userdata.
- */
-void liscr_data_ref (
-	LIScrData* self)
-{
-	LIScrScript* script = self->script;
-
-	if (!self->refcount++)
-	{
-		/* Add to reference table. */
-		lua_pushlightuserdata (script->lua, LISCR_SCRIPT_REFS);
-		lua_gettable (script->lua, LUA_REGISTRYINDEX);
-		lisys_assert (lua_type (script->lua, -1) == LUA_TTABLE);
-		lua_pushlightuserdata (script->lua, self);
-		liscr_pushdata (script->lua, self);
-		lua_settable (script->lua, -3);
-		lua_pop (script->lua, 1);
-	}
-}
-
-/**
- * \brief Unreferences the userdata.
- * \param self Script userdata.
- */
-void liscr_data_unref (
-	LIScrData* self)
-{
-	LIScrScript* script = self->script;
-
-	lisys_assert (self->refcount > 0);
-	if (!--self->refcount)
-	{
-		/* Remove from reference table. */
-		lua_pushlightuserdata (script->lua, LISCR_SCRIPT_REFS);
-		lua_gettable (script->lua, LUA_REGISTRYINDEX);
-		lisys_assert (lua_type (script->lua, -1) == LUA_TTABLE);
-		lua_pushlightuserdata (script->lua, self);
-		lua_pushnil (script->lua);
-		lua_settable (script->lua, -3);
-		lua_pop (script->lua, 1);
-	}
 }
 
 /**

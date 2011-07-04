@@ -170,14 +170,13 @@ static void Shader_new (LIScrArgs* args)
 	private_compile (shader, args);
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, shader, LIEXT_SCRIPT_SHADER, liren_shader_free);
+	data = liscr_data_new (args->script, args->lua, shader, LIEXT_SCRIPT_SHADER, liren_shader_free);
 	if (data == NULL)
 	{
 		liren_shader_free (shader);
 		return;
 	}
-	liscr_args_seti_data (args, data);
-	liscr_data_unref (data);
+	liscr_args_seti_stack (args);
 }
 
 static void Shader_compile (LIScrArgs* args)

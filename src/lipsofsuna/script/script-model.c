@@ -40,16 +40,13 @@ static void Model_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, self, LISCR_SCRIPT_MODEL, lieng_model_free);
+	self->script = liscr_data_new (args->script, args->script->lua, self, LISCR_SCRIPT_MODEL, lieng_model_free);
 	if (self->script == NULL)
 	{
 		lieng_model_free (self);
 		return;
 	}
-
-	/* Initialize userdata. */
-	liscr_args_seti_data (args, self->script);
-	liscr_data_unref (self->script);
+	liscr_args_seti_stack (args);
 }
 
 static void Model_copy (LIScrArgs* args)
@@ -65,16 +62,13 @@ static void Model_copy (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, self, LISCR_SCRIPT_MODEL, lieng_model_free);
+	self->script = liscr_data_new (args->script, args->lua, self, LISCR_SCRIPT_MODEL, lieng_model_free);
 	if (self->script == NULL)
 	{
 		lieng_model_free (self);
 		return;
 	}
-
-	/* Initialize userdata. */
-	liscr_args_seti_data (args, self->script);
-	liscr_data_unref (self->script);
+	liscr_args_seti_stack (args);
 }
 
 static void Model_calculate_bounds (LIScrArgs* args)

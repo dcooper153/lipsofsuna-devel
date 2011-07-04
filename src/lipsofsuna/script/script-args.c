@@ -820,11 +820,10 @@ liscr_args_seti_quaternion (LIScrArgs*             self,
 
 	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
 	{
-		quat = liscr_quaternion_new (self->script, value);
+		quat = liscr_data_new_alloc (self->script, self->lua, sizeof (LIMatQuaternion), LISCR_SCRIPT_QUATERNION);
 		if (quat != NULL)
 		{
-			liscr_pushdata (self->lua, quat);
-			liscr_data_unref (quat);
+			*((LIMatQuaternion*) quat->data) = *value;
 			self->ret++;
 		}
 	}
@@ -835,14 +834,15 @@ liscr_args_seti_quaternion (LIScrArgs*             self,
 			lua_newtable (self->lua);
 			self->output_table = lua_gettop (self->lua);
 		}
-		quat = liscr_quaternion_new (self->script, value);
+		lua_pushnumber (self->lua, ++self->ret);
+		quat = liscr_data_new_alloc (self->script, self->lua, sizeof (LIMatQuaternion), LISCR_SCRIPT_QUATERNION);
 		if (quat != NULL)
 		{
-			lua_pushnumber (self->lua, ++self->ret);
-			liscr_pushdata (self->lua, quat);
+			*((LIMatQuaternion*) quat->data) = *value;
 			lua_settable (self->lua, self->output_table);
-			liscr_data_unref (quat);
 		}
+		else
+			lua_pop (self->lua, 1);
 	}
 }
 
@@ -902,19 +902,18 @@ liscr_args_seti_string (LIScrArgs*  self,
 	}
 }
 
-void
-liscr_args_seti_vector (LIScrArgs*         self,
-                        const LIMatVector* value)
+void liscr_args_seti_vector (
+	LIScrArgs*         self,
+	const LIMatVector* value)
 {
 	LIScrData* vector;
 
 	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
 	{
-		vector = liscr_vector_new (self->script, value);
+		vector = liscr_data_new_alloc (self->script, self->lua, sizeof (LIMatVector), LISCR_SCRIPT_VECTOR);
 		if (vector != NULL)
 		{
-			liscr_pushdata (self->lua, vector);
-			liscr_data_unref (vector);
+			*((LIMatVector*) vector->data) = *value;
 			self->ret++;
 		}
 	}
@@ -925,14 +924,15 @@ liscr_args_seti_vector (LIScrArgs*         self,
 			lua_newtable (self->lua);
 			self->output_table = lua_gettop (self->lua);
 		}
-		vector = liscr_vector_new (self->script, value);
+		lua_pushnumber (self->lua, ++self->ret);
+		vector = liscr_data_new_alloc (self->script, self->lua, sizeof (LIMatVector), LISCR_SCRIPT_VECTOR);
 		if (vector != NULL)
 		{
-			lua_pushnumber (self->lua, ++self->ret);
-			liscr_pushdata (self->lua, vector);
+			*((LIMatVector*) vector->data) = *value;
 			lua_settable (self->lua, self->output_table);
-			liscr_data_unref (vector);
 		}
+		else
+			lua_pop (self->lua, 1);
 	}
 }
 
@@ -1007,10 +1007,10 @@ liscr_args_sets_int (LIScrArgs*  self,
 	}
 }
 
-void
-liscr_args_sets_quaternion (LIScrArgs*             self,
-                            const char*            name,
-                            const LIMatQuaternion* value)
+void liscr_args_sets_quaternion (
+	LIScrArgs*             self,
+	const char*            name,
+	const LIMatQuaternion* value)
 {
 	LIScrData* quat;
 
@@ -1021,12 +1021,11 @@ liscr_args_sets_quaternion (LIScrArgs*             self,
 			lua_newtable (self->lua);
 			self->output_table = lua_gettop (self->lua);
 		}
-		quat = liscr_quaternion_new (self->script, value);
+		quat = liscr_data_new_alloc (self->script, self->lua, sizeof (LIMatQuaternion), LISCR_SCRIPT_QUATERNION);
 		if (quat != NULL)
 		{
-			liscr_pushdata (self->lua, quat);
+			*((LIMatQuaternion*) quat->data) = *value;
 			lua_setfield (self->lua, self->output_table, name);
-			liscr_data_unref (quat);
 		}
 	}
 }
@@ -1065,10 +1064,10 @@ liscr_args_sets_string (LIScrArgs*  self,
 	}
 }
 
-void
-liscr_args_sets_vector (LIScrArgs*         self,
-                        const char*        name,
-                        const LIMatVector* value)
+void liscr_args_sets_vector (
+	LIScrArgs*         self,
+	const char*        name,
+	const LIMatVector* value)
 {
 	LIScrData* vector;
 
@@ -1079,12 +1078,11 @@ liscr_args_sets_vector (LIScrArgs*         self,
 			lua_newtable (self->lua);
 			self->output_table = lua_gettop (self->lua);
 		}
-		vector = liscr_vector_new (self->script, value);
+		vector = liscr_data_new_alloc (self->script, self->lua, sizeof (LIMatVector), LISCR_SCRIPT_VECTOR);
 		if (vector != NULL)
 		{
-			liscr_pushdata (self->lua, vector);
+			*((LIMatVector*) vector->data) = *value;
 			lua_setfield (self->lua, self->output_table, name);
-			liscr_data_unref (vector);
 		}
 	}
 }

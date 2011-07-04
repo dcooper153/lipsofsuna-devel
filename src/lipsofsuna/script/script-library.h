@@ -52,18 +52,6 @@ LIAPICALL (void, liscr_script_quaternion, (
 LIAPICALL (void, liscr_script_vector, (
 	LIScrScript* self));
 
-/*****************************************************************************/
-
-LIAPICALL (LIScrData*, liscr_quaternion_new, (
-	LIScrScript*           script,
-	const LIMatQuaternion* quat));
-
-LIAPICALL (LIScrData*, liscr_vector_new, (
-	LIScrScript*       script,
-	const LIMatVector* vector));
-
-/*****************************************************************************/
-
 #include "script-packet.h"
 
 #endif

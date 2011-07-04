@@ -73,7 +73,6 @@ static void Object_find (LIScrArgs* args)
 
 static void Object_new (LIScrArgs* args)
 {
-	int realize = 0;
 	LIEngObject* self;
 	LIMaiProgram* program;
 
@@ -86,18 +85,13 @@ static void Object_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, self, LISCR_SCRIPT_OBJECT, lieng_object_free);
+	self->script = liscr_data_new (args->script, args->lua, self, LISCR_SCRIPT_OBJECT, lieng_object_free);
 	if (self->script == NULL)
 	{
 		lieng_object_free (self);
 		return;
 	}
-
-	/* Initialize userdata. */
-	liscr_args_gets_bool (args, "realized", &realize);
-	liscr_args_seti_data (args, self->script);
-	liscr_data_unref (self->script);
-	lieng_object_set_realized (self, realize);
+	liscr_args_seti_stack (args);
 }
 
 static void Object_refresh (LIScrArgs* args)

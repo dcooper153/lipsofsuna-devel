@@ -38,14 +38,13 @@ static void Scene_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_SCENE, liren_framebuffer_free);
+	data = liscr_data_new (args->script, args->lua, self, LIEXT_SCRIPT_SCENE, liren_framebuffer_free);
 	if (data == NULL)
 	{
 		liren_framebuffer_free (self);
 		return;
 	}
-	liscr_args_seti_data (args, data);
-	liscr_data_unref (data);
+	liscr_args_seti_stack (args);
 }
 
 static void Scene_render (LIScrArgs* args)

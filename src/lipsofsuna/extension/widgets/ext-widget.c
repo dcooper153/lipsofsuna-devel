@@ -37,15 +37,14 @@ static void Widget_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, self, LIEXT_SCRIPT_WIDGET, liwdg_widget_free);
+	data = liscr_data_new (args->script, args->lua, self, LIEXT_SCRIPT_WIDGET, liwdg_widget_free);
 	if (data == NULL)
 	{
 		liwdg_widget_free (self);
 		return;
 	}
 	liwdg_widget_set_script (self, data);
-	liscr_args_seti_data (args, data);
-	liscr_data_unref (data);
+	liscr_args_seti_stack (args);
 }
 
 static void Widget_append_col (LIScrArgs* args)
@@ -341,7 +340,6 @@ static void Widget_popup (LIScrArgs* args)
 	liwdg_widget_set_visible (widget, 1);
 	liwdg_manager_insert_window (widget->manager, widget);
 	liwdg_widget_set_allocation (widget, rect.x, rect.y, rect.width, rect.height);
-	liscr_data_ref (args->data);
 }
 
 static void Widget_remove (LIScrArgs* args)
