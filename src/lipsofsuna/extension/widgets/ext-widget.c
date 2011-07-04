@@ -45,6 +45,7 @@ static void Widget_new (LIScrArgs* args)
 	}
 	liwdg_widget_set_script (self, data);
 	liscr_args_seti_data (args, data);
+	liscr_data_unref (data);
 }
 
 static void Widget_append_col (LIScrArgs* args)

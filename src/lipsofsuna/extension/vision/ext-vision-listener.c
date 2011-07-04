@@ -95,11 +95,15 @@ void liext_vision_listener_update (
 				lialg_u32dic_remove (self->objects, object->id);
 				lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
 				lua_newtable (lua);
-				lua_pushstring (lua, "object-hidden");
-				lua_setfield (lua, -2, "type");
-				liscr_pushdata (lua, object->script);
-				lua_setfield (lua, -2, "object");
-				lua_settable (lua, -3);
+				if (liscr_pushdata (lua, object->script))
+				{
+					lua_setfield (lua, -2, "object");
+					lua_pushstring (lua, "object-hidden");
+					lua_setfield (lua, -2, "type");
+					lua_settable (lua, -3);
+				}
+				else
+					lua_pop (lua, 2);
 			}
 			continue;
 		}
@@ -117,11 +121,15 @@ void liext_vision_listener_update (
 				lialg_u32dic_insert (self->objects, object->id, NULL + 1);
 				lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
 				lua_newtable (lua);
-				lua_pushstring (lua, "object-shown");
-				lua_setfield (lua, -2, "type");
-				liscr_pushdata (lua, object->script);
-				lua_setfield (lua, -2, "object");
-				lua_settable (lua, -3);
+				if (liscr_pushdata (lua, object->script))
+				{
+					lua_setfield (lua, -2, "object");
+					lua_pushstring (lua, "object-shown");
+					lua_setfield (lua, -2, "type");
+					lua_settable (lua, -3);
+				}
+				else
+					lua_pop (lua, 2);
 			}
 		}
 
@@ -133,11 +141,15 @@ void liext_vision_listener_update (
 				lialg_u32dic_remove (self->objects, object->id);
 				lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
 				lua_newtable (lua);
-				lua_pushstring (lua, "object-hidden");
-				lua_setfield (lua, -2, "type");
-				liscr_pushdata (lua, object->script);
-				lua_setfield (lua, -2, "object");
-				lua_settable (lua, -3);
+				if (liscr_pushdata (lua, object->script))
+				{
+					lua_setfield (lua, -2, "object");
+					lua_pushstring (lua, "object-hidden");
+					lua_setfield (lua, -2, "type");
+					lua_settable (lua, -3);
+				}
+				else
+					lua_pop (lua, 2);
 			}
 		}
 	}

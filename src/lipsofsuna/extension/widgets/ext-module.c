@@ -143,7 +143,11 @@ static void private_widget_allocation (
 		lua_pop (lua, 1);
 		return;
 	}
-	liscr_pushdata (lua, widget->script);
+	if (!liscr_pushdata (lua, widget->script))
+	{
+		lua_pop (lua, 1);
+		return;
+	}
 	if (lua_pcall (lua, 1, 0, 0) != 0)
 	{
 		lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.reshaped: %s", lua_tostring (lua, -1));
@@ -167,7 +171,11 @@ static void private_widget_paint (
 		lua_pop (lua, 1);
 		return;
 	}
-	liscr_pushdata (lua, data);
+	if (!liscr_pushdata (lua, data))
+	{
+		lua_pop (lua, 1);
+		return;
+	}
 	if (lua_pcall (lua, 1, 0, 0) != 0)
 	{
 		lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.render: %s", lua_tostring (lua, -1));

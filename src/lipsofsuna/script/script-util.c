@@ -102,18 +102,31 @@ LIScrData* liscr_isdata (
  *
  * \param lua Lua state.
  * \param object Pointer to script userdata.
+ * \param return Nonzero if succeded.
  */
-void liscr_pushdata (
+int liscr_pushdata (
 	lua_State* lua,
 	LIScrData* object)
 {
+	/* Get the lookup table. */
 	lua_pushlightuserdata (lua, LISCR_SCRIPT_LOOKUP_DATA);
 	lua_gettable (lua, LUA_REGISTRYINDEX);
 	lisys_assert (lua_type (lua, -1) == LUA_TTABLE);
+
+	/* Get the userdata. */
+	/* In some cases, the object might have been garbage collected when we
+	   do this. We let the caller decide whether to catch the error or prevent
+	   it by disabling garbage collection. */
 	lua_pushlightuserdata (lua, object);
 	lua_gettable (lua, -2);
 	lua_remove (lua, -2);
-	lisys_assert (lua_isuserdata (lua, -1));
+	if (!lua_isuserdata (lua, -1))
+	{
+		lua_pop (lua, 1);
+		return 0;
+	}
+
+	return 1;
 }
 
 /**

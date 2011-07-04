@@ -29,7 +29,7 @@ LIAPICALL (LIScrData*, liscr_isdata, (
 	int         arg,
 	const char* meta));
 
-LIAPICALL (void, liscr_pushdata, (
+LIAPICALL (int, liscr_pushdata, (
 	lua_State* lua,
 	LIScrData* object));
 
