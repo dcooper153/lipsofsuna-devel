@@ -162,12 +162,21 @@ Protocol:add_handler{type = "ADMIN_STATS", func = function(args)
 	end
 	-- Send stats.
 	player:send{packet = Packet(packets.ADMIN_STATS, "string", string.format(
-		"Players: %d+%d\nCreatures: %d+%d\nItems: %d+%d+%d\nObstacles: %d+%d\nOthers: %d+%d\nVision: %d+%d\nSectors: %d",
+		[[Players: %d+%d
+		Creatures: %d+%d
+		Items: %d+%d+%d
+		Obstacles: %d+%d
+		Others: %d+%d
+		Vision: %d+%d
+		Sectors: %d
+		Tick update: %d ms
+		Tick event: %d ms]],
 		num_players_real, num_players_miss,
 		num_creatures_real, num_creatures_miss,
 		num_items_real, num_items_inv, num_items_miss,
 		num_obstacles_real, num_obstacles_miss,
 		num_objects_real, num_objects_miss,
 		num_vision_real, num_vision_miss,
-		num_sectors))}
+		num_sectors,
+		Program.profiling.update * 1000, Program.profiling.event * 1000))}
 end}

@@ -66,17 +66,24 @@ Voxel.block_changed_cb = function(index, stamp)
 end
 
 Program.sleep = 1/60
+Program.profiling = {}
 
 -- Main loop.
 while not Program.quit do
 	-- Update program state.
+	local t1 = Program.time
 	Program:update()
+	local t2 = Program.time
 	-- Handle events.
 	local event = Program:pop_event()
 	while event do
 		Eventhandler:event(event)
 		event = Program:pop_event()
 	end
+	local t3 = Program.time
+	-- Store timings.
+	Program.profiling.update = t2 - t1
+	Program.profiling.event = t3 - t2
 end
 
 -- Save at exit.
