@@ -77,12 +77,13 @@ end
 
 Player.set_client = function(self, client)
 	self.client = client
-	self.vision = Vision{object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
+	self.vision = Vision{enabled = true, object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
 	self.vision.terrain = {}
 	self.inventory:subscribe{object = self, callback = function(args) self:inventory_cb(args) end}
 	-- Terrain listener.
-	self.player_timer = Timer{delay = 0.2, func = function()
+	self.player_timer = Timer{delay = 0.1, func = function()
 		self:update_vision_radius()
+		self.vision:update()
 		self:vision_cb{type = "player-tick"}
 	end}
 end
@@ -99,7 +100,7 @@ end
 
 Player.disable = function(self)
 	self.player_timer:disable()
-	self.vision:disable()
+	self.vision.enabled = false
 	if not keep then
 		self:send{packet = Packet(packets.CHARACTER_CREATE)}
 		Player.clients[self.client] = nil
@@ -173,9 +174,9 @@ Player.update_vision_radius = function(self)
 	local perception = skills:get_value{skill = "perception"}
 	if not perception then return end
 	local r = 15 + perception / 6
+	self.vision.position = self.position
 	if math.floor(r) ~= self.vision.radius then
 		self.vision.radius = r
-		self.vision:rescan_objects()
 	end
 end
 
@@ -240,10 +241,7 @@ Player.vision_cb = function(self, args)
 				"float", o.rotation.x, "float", o.rotation.y, "float", o.rotation.z, "float", o.rotation.w,
 				"float", o.velocity.x, "float", o.velocity.y, "float", o.velocity.z)
 			self:send{packet = p, reliable = false}
-			if o == self then
-				self.vision:rescan_objects()
-				sendmap()
-			end
+			if o == self then sendmap() end
 		end,
 		["object-shown"] = function(args)
 			local o = args.object

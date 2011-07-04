@@ -52,15 +52,6 @@ Eventhandler{type = "object-contact", func = function(self, event)
 	end
 end}
 
--- Visibility.
-Eventhandler{type = "object-visibility", func = function(self, event)
-	if event.visible then
-		Vision:event{type = "object-shown", object = event.object}
-	else
-		Vision:event{type = "object-hidden", object = event.object}
-	end
-end}
-
 Voxel.block_changed_cb = function(index, stamp)
 	Vision:event{type = "voxel-block-changed", index = index, point = ARGH, stamp = stamp}
 end

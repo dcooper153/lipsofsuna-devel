@@ -60,7 +60,7 @@ require "common/voxel"
 
 require "system/lobby"
 if Settings.server then
-require "common/vision"
+require "system/vision"
 require "common/inventory"
 require "common/skills"
 Object.load_meshes = false
