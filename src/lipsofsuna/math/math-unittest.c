@@ -803,7 +803,8 @@ static void dualquat_basics ()
 	dq1 = limat_dualquat_multiply (
 		limat_dualquat_init_translation (v0),
 		limat_dualquat_init_rotation (q0));
-	if (!check_vector (v1, v2))
+	if (!check_quaternion (dq0.r, dq1.r) ||
+	    !check_quaternion (dq0.d, dq1.d))
 	{
 		printf ("1: FAILED!\n");
 		print_dualquat ("Got", dq0);
