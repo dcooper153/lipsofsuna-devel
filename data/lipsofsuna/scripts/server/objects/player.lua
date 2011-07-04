@@ -173,7 +173,7 @@ Player.update_vision_radius = function(self)
 	local skills = self.skills
 	local perception = skills:get_value{skill = "perception"}
 	if not perception then return end
-	local r = 15 + perception / 6
+	local r = 20 + perception / 4
 	self.vision.position = self.position
 	if math.floor(r) ~= self.vision.radius then
 		self.vision.radius = r
