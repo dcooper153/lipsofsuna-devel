@@ -240,7 +240,7 @@ Editor.paste = function(self, args)
 	--Calculate offset of pastebuffer objects
 	for k,v in pairs(self.copybuffer) do
 		
-		if v.object.position then
+		if v.object and v.object.position then
 			if not prevpoint then prevpoint = v.object.position v.offset = Vector(0,0,0)
 			else
 				v.offset = prevpoint - v.object.position
