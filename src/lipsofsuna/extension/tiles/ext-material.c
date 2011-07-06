@@ -255,6 +255,12 @@ static void Material_get_type (LIScrArgs* args)
 		case LIVOX_MATERIAL_TYPE_ROUNDED_FRACTAL:
 			liscr_args_seti_string (args, "rounded fractal");
 			break;
+		case LIVOX_MATERIAL_TYPE_SLOPED:
+			liscr_args_seti_string (args, "sloped");
+			break;
+		case LIVOX_MATERIAL_TYPE_SLOPED_FRACTAL:
+			liscr_args_seti_string (args, "sloped fractal");
+			break;
 		default:
 			liscr_args_seti_string (args, "cube");
 			break;
@@ -276,6 +282,10 @@ static void Material_set_type (LIScrArgs* args)
 			self->type = LIVOX_MATERIAL_TYPE_ROUNDED;
 		else if (!strcmp (value, "rounded fractal"))
 			self->type = LIVOX_MATERIAL_TYPE_ROUNDED_FRACTAL;
+		else if (!strcmp (value, "sloped"))
+			self->type = LIVOX_MATERIAL_TYPE_SLOPED;
+		else if (!strcmp (value, "sloped fractal"))
+			self->type = LIVOX_MATERIAL_TYPE_SLOPED_FRACTAL;
 	}
 }
 
