@@ -25,19 +25,19 @@
 #include "voxel-material.h"
 #include "voxel-triangulate.h"
 
-#define ISFILLED(x,y,z) (types[x][y][z])
-#define ISCUBE(x,y,z) (types[x][y][z] && (voxels[x][y][z]->material->type != LIVOX_MATERIAL_TYPE_SLOPED && voxels[x][y][z]->material->type != LIVOX_MATERIAL_TYPE_SLOPED_FRACTAL))
-#define ISEMPTY(x,y,z) (!types[x][y][z])
-#define ISROUNDED(x,y,z) (types[x][y][z] && (voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_ROUNDED || voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_ROUNDED_FRACTAL))
-#define ISROUNDEDSLOPED(x,y,z) (types[x][y][z] && (\
+#define ISFILLED(x,y,z) (voxels[x][y][z]->voxel != NULL)
+#define ISCUBE(x,y,z) (voxels[x][y][z]->voxel != NULL && (voxels[x][y][z]->material->type != LIVOX_MATERIAL_TYPE_SLOPED && voxels[x][y][z]->material->type != LIVOX_MATERIAL_TYPE_SLOPED_FRACTAL))
+#define ISEMPTY(x,y,z) (voxels[x][y][z]->voxel == NULL)
+#define ISROUNDED(x,y,z) (voxels[x][y][z]->voxel != NULL && (voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_ROUNDED || voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_ROUNDED_FRACTAL))
+#define ISROUNDEDSLOPED(x,y,z) (voxels[x][y][z]->voxel != NULL && (\
 	voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_ROUNDED ||\
 	voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_ROUNDED_FRACTAL ||\
 	voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_SLOPED ||\
 	voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_SLOPED_FRACTAL))
-#define ISSLOPED(x,y,z) (types[x][y][z] && (voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_SLOPED || voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_SLOPED_FRACTAL))
-#define ISSOLID(x,y,z) (types[x][y][z] && voxels[x][y][z]->material->type != LIVOX_MATERIAL_TYPE_LIQUID)
-#define ISLIQUID(x,y,z) (types[x][y][z] && voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_LIQUID)
-#define ISLIQUIDEMPTY(x,y,z) (!types[x][y][z] || voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_LIQUID)
+#define ISSLOPED(x,y,z) (voxels[x][y][z]->voxel != NULL && (voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_SLOPED || voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_SLOPED_FRACTAL))
+#define ISSOLID(x,y,z) (voxels[x][y][z]->voxel != NULL && voxels[x][y][z]->material->type != LIVOX_MATERIAL_TYPE_LIQUID)
+#define ISLIQUID(x,y,z) (voxels[x][y][z]->voxel != NULL && voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_LIQUID)
+#define ISLIQUIDEMPTY(x,y,z) (voxels[x][y][z]->voxel == NULL || voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_LIQUID)
 #define ISLIQUIDEMPTYFRACTAL(x,y,z) (ISLIQUIDEMPTY(x,y,z) || voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_ROUNDED_FRACTAL || voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_SLOPED_FRACTAL)
 #define ISLIQUIDEMPTYROUNDED(x,y,z) (ISLIQUIDEMPTY(x,y,z) || voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_ROUNDED || voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_ROUNDED_FRACTAL)
 #define ISLIQUIDEMPTYSLOPED(x,y,z) (ISLIQUIDEMPTY(x,y,z) || voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_SLOPED || voxels[x][y][z]->material->type == LIVOX_MATERIAL_TYPE_SLOPED_FRACTAL)
@@ -57,25 +57,21 @@ static inline void private_noise_3d (
 static void private_triangulate_liquid (
 	LIVoxBuilder* self,
 	LIVoxVoxelB*  voxels[3][3][3],
-	int           types[3][3][3],
 	LIMatVector   v[3][3][3]);
 
 static void private_triangulate_fractal (
 	LIVoxBuilder* self,
 	LIVoxVoxelB*  voxels[3][3][3],
-	int           types[3][3][3],
 	LIMatVector   v[3][3][3]);
 
 static void private_triangulate_rounded (
 	LIVoxBuilder* self,
 	LIVoxVoxelB*  voxels[3][3][3],
-	int           types[3][3][3],
 	LIMatVector   v[3][3][3]);
 
 static void private_triangulate_sloped (
 	LIVoxBuilder* self,
-	LIVoxVoxelB*  voxels[3][3][3],
-	int           types[3][3][3],
+	LIVoxVoxel*   voxel,
 	LIMatVector   v[3][3][3]);
 
 /*****************************************************************************/
@@ -130,7 +126,10 @@ int livox_triangulate_voxel (
 	{
 		voxel = self->voxelsb + (x + vx) + (y + vy) * self->step[1] + (z + vz) * self->step[2];
 		voxels[x + 1][y + 1][z + 1] = voxel;
-		result_types[x + 1][y + 1][z + 1] = voxel->type;
+		if (voxel->voxel != NULL)
+			result_types[x + 1][y + 1][z + 1] = voxel->voxel->type;
+		else
+			result_types[x + 1][y + 1][z + 1] = 0;
 		count += ISSOLID(x + 1, y + 1, z + 1);
 	}
 	if (count == 27)
@@ -141,21 +140,21 @@ int livox_triangulate_voxel (
 	{
 		case LIVOX_MATERIAL_TYPE_LIQUID:
 			liquid = 1;
-			private_triangulate_liquid (self, voxels, result_types, v);
+			private_triangulate_liquid (self, voxels, v);
 			break;
 		case LIVOX_MATERIAL_TYPE_ROUNDED:
-			private_triangulate_rounded (self, voxels, result_types, v);
+			private_triangulate_rounded (self, voxels, v);
 			break;
 		case LIVOX_MATERIAL_TYPE_ROUNDED_FRACTAL:
-			private_triangulate_rounded (self, voxels, result_types, v);
-			private_triangulate_fractal (self, voxels, result_types, v);
+			private_triangulate_rounded (self, voxels, v);
+			private_triangulate_fractal (self, voxels, v);
 			break;
 		case LIVOX_MATERIAL_TYPE_SLOPED:
-			private_triangulate_sloped (self, voxels, result_types, v);
+			private_triangulate_sloped (self, voxels[1][1][1]->voxel, v);
 			break;
 		case LIVOX_MATERIAL_TYPE_SLOPED_FRACTAL:
-			private_triangulate_sloped (self, voxels, result_types, v);
-			private_triangulate_fractal (self, voxels, result_types, v);
+			private_triangulate_sloped (self, voxels[1][1][1]->voxel, v);
+			private_triangulate_fractal (self, voxels, v);
 			break;
 	}
 
@@ -282,7 +281,6 @@ static inline void private_noise_3d (
 static void private_triangulate_fractal (
 	LIVoxBuilder* self,
 	LIVoxVoxelB*  voxels[3][3][3],
-	int           types[3][3][3],
 	LIMatVector   v[3][3][3])
 {
 	int a;
@@ -330,7 +328,6 @@ static void private_triangulate_fractal (
 static void private_triangulate_liquid (
 	LIVoxBuilder* self,
 	LIVoxVoxelB*  voxels[3][3][3],
-	int           types[3][3][3],
 	LIMatVector   v[3][3][3])
 {
 	int y;
@@ -417,66 +414,147 @@ static void private_triangulate_liquid (
  * \brief Rounds the edges and corners of a voxel cube.
  * \param self Voxel builder.
  * \param voxels Voxels in the neighborhood.
- * \param types Types of voxels in the neighborhood.
- * \param types Voxel neighborhood.
  * \param v Array of vertices to modify.
  */
 static void private_triangulate_rounded (
 	LIVoxBuilder* self,
 	LIVoxVoxelB*  voxels[3][3][3],
-	int           types[3][3][3],
 	LIMatVector   v[3][3][3])
 {
 	int x;
 	int y;
 	int z;
+
 	int t;
 	float f;
+	int C000 = (ISLIQUIDEMPTY(0,0,0) &&
+		ISLIQUIDEMPTYROUNDED(1,0,0) && ISLIQUIDEMPTYROUNDED(0,1,0) &&
+		ISLIQUIDEMPTYROUNDED(1,1,0) && ISLIQUIDEMPTYROUNDED(0,0,1) &&
+		ISLIQUIDEMPTYROUNDED(1,0,1) && ISLIQUIDEMPTYROUNDED(0,1,1));
+	int C200 = (ISLIQUIDEMPTY(2,0,0) &&
+		ISLIQUIDEMPTYROUNDED(1,0,0) && ISLIQUIDEMPTYROUNDED(2,1,0) &&
+		ISLIQUIDEMPTYROUNDED(1,1,0) && ISLIQUIDEMPTYROUNDED(2,0,1) &&
+		ISLIQUIDEMPTYROUNDED(1,0,1) && ISLIQUIDEMPTYROUNDED(2,1,1));
+	int C020 = (ISLIQUIDEMPTY(0,2,0) &&
+		ISLIQUIDEMPTYROUNDED(1,2,0) && ISLIQUIDEMPTYROUNDED(0,1,0) &&
+		ISLIQUIDEMPTYROUNDED(1,1,0) && ISLIQUIDEMPTYROUNDED(0,2,1) &&
+		ISLIQUIDEMPTYROUNDED(1,2,1) && ISLIQUIDEMPTYROUNDED(0,1,1));
+	int C220 = (ISLIQUIDEMPTY(2,2,0) &&
+		ISLIQUIDEMPTYROUNDED(1,2,0) && ISLIQUIDEMPTYROUNDED(2,1,0) &&
+		ISLIQUIDEMPTYROUNDED(1,1,0) && ISLIQUIDEMPTYROUNDED(2,2,1) &&
+		ISLIQUIDEMPTYROUNDED(1,2,1) && ISLIQUIDEMPTYROUNDED(2,1,1));
+	int C002 = (ISLIQUIDEMPTY(0,0,2) &&
+		ISLIQUIDEMPTYROUNDED(1,0,2) && ISLIQUIDEMPTYROUNDED(0,1,2) &&
+		ISLIQUIDEMPTYROUNDED(1,1,2) && ISLIQUIDEMPTYROUNDED(0,0,1) &&
+		ISLIQUIDEMPTYROUNDED(1,0,1) && ISLIQUIDEMPTYROUNDED(0,1,1));
+	int C202 = (ISLIQUIDEMPTY(2,0,2) &&
+		ISLIQUIDEMPTYROUNDED(1,0,2) && ISLIQUIDEMPTYROUNDED(2,1,2) &&
+		ISLIQUIDEMPTYROUNDED(1,1,2) && ISLIQUIDEMPTYROUNDED(2,0,1) &&
+		ISLIQUIDEMPTYROUNDED(1,0,1) && ISLIQUIDEMPTYROUNDED(2,1,1));
+	int C022 = (ISLIQUIDEMPTY(0,2,2) &&
+		ISLIQUIDEMPTYROUNDED(1,2,2) && ISLIQUIDEMPTYROUNDED(0,1,2) &&
+		ISLIQUIDEMPTYROUNDED(1,1,2) && ISLIQUIDEMPTYROUNDED(0,2,1) &&
+		ISLIQUIDEMPTYROUNDED(1,2,1) && ISLIQUIDEMPTYROUNDED(0,1,1));
+	int C222 = (ISLIQUIDEMPTY(2,2,2) &&
+		ISLIQUIDEMPTYROUNDED(1,2,2) && ISLIQUIDEMPTYROUNDED(2,1,2) &&
+		ISLIQUIDEMPTYROUNDED(1,1,2) && ISLIQUIDEMPTYROUNDED(2,2,1) &&
+		ISLIQUIDEMPTYROUNDED(1,2,1) && ISLIQUIDEMPTYROUNDED(2,1,1));
 
-	/* Deform the cube. */
-#define SMOOTH_CORNER(vx,vy,vz, ox,oy,oz, ix,iy,iz)\
-	if (ISLIQUIDEMPTY(ox,oy,oz) &&\
-	    ISLIQUIDEMPTYROUNDED(ix, oy, oz) && ISLIQUIDEMPTYROUNDED(ox, iy, oz) &&\
-	    ISLIQUIDEMPTYROUNDED(ix, iy, oz) && ISLIQUIDEMPTYROUNDED(ox, oy, iz) &&\
-	    ISLIQUIDEMPTYROUNDED(ix, oy, iz) && ISLIQUIDEMPTYROUNDED(ox, iy, iz))\
+#define SMOOTH_CORNER(ox,oy,oz)\
 	{\
-		if (ISLIQUIDEMPTY(ox,iy,oz) && ISLIQUIDEMPTY(ox,oy,iz) && ISLIQUIDEMPTY(ox,iy,iz))\
+		if (ISLIQUIDEMPTY(ox,1,oz) && ISLIQUIDEMPTY(ox,oy,1) && ISLIQUIDEMPTY(ox,1,1))\
 		{\
-			t = !types[ix][oy][oz] + !types[ix][iy][oz] + !types[ix][oy][iz];\
+			t = ISLIQUIDEMPTY(1,oy,oz) + ISLIQUIDEMPTY(1,1,oz) + ISLIQUIDEMPTY(1,oy,1);\
 			f = (t == 3)? 0.25f : (t == 2)? 0.15f : 0.0f;\
-			v[vx][vy][vz].x += (ox < ix)? f : -f;\
+			v[ox][oy][oz].x += (ox < 1)? f : -f;\
 		}\
-		if (ISLIQUIDEMPTY(ix,oy,oz) && ISLIQUIDEMPTY(ox,oy,iz) && ISLIQUIDEMPTY(ix,oy,iz))\
+		if (ISLIQUIDEMPTY(1,oy,oz) && ISLIQUIDEMPTY(ox,oy,1) && ISLIQUIDEMPTY(1,oy,1))\
 		{\
-			t = !types[ox][iy][oz] + !types[ix][iy][oz] + !types[ox][iy][iz];\
+			t = ISLIQUIDEMPTY(ox,1,oz) + ISLIQUIDEMPTY(1,1,oz) + ISLIQUIDEMPTY(ox,1,1);\
 			f = (t == 3)? 0.25f : (t == 2)? 0.15f : 0.0f;\
-			v[vx][vy][vz].y += (oy < iy)? f : -f;\
+			v[ox][oy][oz].y += (oy < 1)? f : -f;\
 		}\
-		if (ISLIQUIDEMPTY(ix,oy,oz) && ISLIQUIDEMPTY(ox,iy,oz) && ISLIQUIDEMPTY(ix,iy,oz))\
+		if (ISLIQUIDEMPTY(1,oy,oz) && ISLIQUIDEMPTY(ox,1,oz) && ISLIQUIDEMPTY(1,1,oz))\
 		{\
-			t = !types[ox][oy][iz] + !types[ix][oy][iz] + !types[ox][iy][iz];\
+			t = ISLIQUIDEMPTY(ox,oy,1) + ISLIQUIDEMPTY(1,oy,1) + ISLIQUIDEMPTY(ox,1,1);\
 			f = (t == 3)? 0.25f : (t == 2)? 0.15f : 0.0f;\
-			v[vx][vy][vz].z += (oz < iz)? f : -f;\
+			v[ox][oy][oz].z += (oz < 1)? f : -f;\
 		}\
 	}
-#define SMOOTH_EDGEX(vx,vy,vz, ox,oy,oz, ix,iy,iz)\
-	if (ISLIQUIDEMPTY(ox,oy,oz) && ISLIQUIDEMPTY(ox,iy,oz) && ISLIQUIDEMPTY(ox,oy,iz))\
-	{\
-		v[vx][vy][vz].z += (oz < iz)? 0.15f : -0.15f;\
-		v[vx][vy][vz].y += (oy < iy)? 0.15f : -0.15f;\
+	if (C000) SMOOTH_CORNER(0,0,0);
+	if (C200) SMOOTH_CORNER(2,0,0);
+	if (C020) SMOOTH_CORNER(0,2,0);
+	if (C220) SMOOTH_CORNER(2,2,0);
+	if (C002) SMOOTH_CORNER(0,0,2);
+	if (C202) SMOOTH_CORNER(2,0,2);
+	if (C022) SMOOTH_CORNER(0,2,2);
+	if (C222) SMOOTH_CORNER(2,2,2);
+#undef SMOOTH_CORNER
+
+	/* X edges. */
+	if (ISLIQUIDEMPTY(1,0,0) && ISLIQUIDEMPTY(1,1,0) && ISLIQUIDEMPTY(1,0,1))
+	{
+		v[1][0][0].z += 0.15f;
+		v[1][0][0].y += 0.15f;
 	}
-#define SMOOTH_EDGEY(vx,vy,vz, ox,oy,oz, ix,iy,iz)\
-	if (ISLIQUIDEMPTY(ox,oy,oz) && ISLIQUIDEMPTY(ix,oy,oz) && ISLIQUIDEMPTY(ox,oy,iz))\
-	{\
-		v[vx][vy][vz].z += (oz < iz)? 0.15f : -0.15f;\
-		v[vx][vy][vz].x += (ox < ix)? 0.15f : -0.15f;\
+	if (ISLIQUIDEMPTY(1,2,0) && ISLIQUIDEMPTY(1,1,0) && ISLIQUIDEMPTY(1,2,1))
+	{
+		v[1][2][0].z += 0.15f;
+		v[1][2][0].y -= 0.15f;
 	}
-#define SMOOTH_EDGEZ(vx,vy,vz, ox,oy,oz, ix,iy,iz)\
-	if (ISLIQUIDEMPTY(ox,oy,oz) && ISLIQUIDEMPTY(ix,oy,oz) && ISLIQUIDEMPTY(ox,iy,oz))\
-	{\
-		v[vx][vy][vz].y += (oy < iy)? 0.15f : -0.15f;\
-		v[vx][vy][vz].x += (ox < ix)? 0.15f : -0.15f;\
+	if (ISLIQUIDEMPTY(1,0,2) && ISLIQUIDEMPTY(1,1,2) && ISLIQUIDEMPTY(1,0,1))
+	{
+		v[1][0][2].z -= 0.15f;
+		v[1][0][2].y += 0.15f;
 	}
+	if (ISLIQUIDEMPTY(1,2,2) && ISLIQUIDEMPTY(1,1,2) && ISLIQUIDEMPTY(1,2,1))
+	{
+		v[1][2][2].z -= 0.15f;
+		v[1][2][2].y -= 0.15f;
+	}
+	/* Y edges. */
+	if (ISLIQUIDEMPTY(0,1,0) && ISLIQUIDEMPTY(1,1,0) && ISLIQUIDEMPTY(0,1,1))
+	{
+		v[0][1][0].z += 0.15f;
+		v[0][1][0].x += 0.15f;
+	}
+	if (ISLIQUIDEMPTY(2,1,0) && ISLIQUIDEMPTY(1,1,0) && ISLIQUIDEMPTY(2,1,1))
+	{
+		v[2][1][0].z += 0.15f;
+		v[2][1][0].x -= 0.15f;
+	}
+	if (ISLIQUIDEMPTY(0,1,2) && ISLIQUIDEMPTY(1,1,2) && ISLIQUIDEMPTY(0,1,1))
+	{
+		v[0][1][2].z -= 0.15f;
+		v[0][1][2].x += 0.15f;
+	}
+	if (ISLIQUIDEMPTY(2,1,2) && ISLIQUIDEMPTY(1,1,2) && ISLIQUIDEMPTY(2,1,1))
+	{
+		v[2][1][2].z -= 0.15f;
+		v[2][1][2].x -= 0.15f;
+	}
+	/* Z edges. */
+	if (ISLIQUIDEMPTY(0,0,1) && ISLIQUIDEMPTY(1,0,1) && ISLIQUIDEMPTY(0,1,1))
+	{
+		v[0][0][1].y += 0.15f;
+		v[0][0][1].x += 0.15f;
+	}
+	if (ISLIQUIDEMPTY(2,0,1) && ISLIQUIDEMPTY(1,0,1) && ISLIQUIDEMPTY(2,1,1))
+	{
+		v[2][0][1].y += 0.15f;
+		v[2][0][1].x -= 0.15f;
+	}
+	if (ISLIQUIDEMPTY(0,2,1) && ISLIQUIDEMPTY(1,2,1) && ISLIQUIDEMPTY(0,1,1))
+	{
+		v[0][2][1].y -= 0.15f;
+		v[0][2][1].x += 0.15f;
+	}
+	if (ISLIQUIDEMPTY(2,2,1) && ISLIQUIDEMPTY(1,2,1) && ISLIQUIDEMPTY(2,1,1))
+	{
+		v[2][2][1].y -= 0.15f;
+		v[2][2][1].x -= 0.15f;
+	}
+
 #define SMOOTH_FACE(vx,vy,vz, x0,y0,z0, x1,y1,z1, A, max)\
 	v[vx][vy][vz].z = 0.5f;\
 	for (x = x0 ; x <= x1 ; x++)\
@@ -491,104 +569,40 @@ static void private_triangulate_rounded (
 				v[vx][vy][vz].A = LIMAT_MIN (v[vx][vy][vz].A, v[x][y][z].A);\
 		}\
 	}
-	SMOOTH_CORNER(0,0,0, 0,0,0, 1,1,1);
-	SMOOTH_CORNER(2,0,0, 2,0,0, 1,1,1);
-	SMOOTH_CORNER(0,2,0, 0,2,0, 1,1,1);
-	SMOOTH_CORNER(2,2,0, 2,2,0, 1,1,1);
-	SMOOTH_CORNER(0,0,2, 0,0,2, 1,1,1);
-	SMOOTH_CORNER(2,0,2, 2,0,2, 1,1,1);
-	SMOOTH_CORNER(0,2,2, 0,2,2, 1,1,1);
-	SMOOTH_CORNER(2,2,2, 2,2,2, 1,1,1);
-	SMOOTH_EDGEX(1,0,0, 1,0,0, 1,1,1);
-	SMOOTH_EDGEX(1,2,0, 1,2,0, 1,1,1);
-	SMOOTH_EDGEX(1,0,2, 1,0,2, 1,1,1);
-	SMOOTH_EDGEX(1,2,2, 1,2,2, 1,1,1);
-	SMOOTH_EDGEY(0,1,0, 0,1,0, 1,1,1);
-	SMOOTH_EDGEY(2,1,0, 2,1,0, 1,1,1);
-	SMOOTH_EDGEY(0,1,2, 0,1,2, 1,1,1);
-	SMOOTH_EDGEY(2,1,2, 2,1,2, 1,1,1);
-	SMOOTH_EDGEZ(0,0,1, 0,0,1, 1,1,1);
-	SMOOTH_EDGEZ(2,0,1, 2,0,1, 1,1,1);
-	SMOOTH_EDGEZ(0,2,1, 0,2,1, 1,1,1);
-	SMOOTH_EDGEZ(2,2,1, 2,2,1, 1,1,1);
 	SMOOTH_FACE(0,1,1, 0,0,0, 0,2,2, x, 0);
 	SMOOTH_FACE(2,1,1, 2,0,0, 2,2,2, x, 1);
 	SMOOTH_FACE(1,0,1, 0,0,0, 2,0,2, y, 0);
 	SMOOTH_FACE(1,2,1, 0,2,0, 2,2,2, y, 1);
 	SMOOTH_FACE(1,1,0, 0,0,0, 2,2,0, z, 0);
 	SMOOTH_FACE(1,1,2, 0,0,2, 2,2,2, z, 1);
-#undef SMOOTH_CORNER
-#undef SMOOTH_EDGEX
-#undef SMOOTH_EDGEY
-#undef SMOOTH_EDGEZ
 #undef SMOOTH_FACE
 }
 
 static void private_triangulate_sloped (
 	LIVoxBuilder* self,
-	LIVoxVoxelB*  voxels[3][3][3],
-	int           types[3][3][3],
+	LIVoxVoxel*   voxel,
 	LIMatVector   v[3][3][3])
 {
 	int y;
-	int y1;
+	int hint = voxel->hint;
 	float sign;
-	int slope[2][2] = { { 1, 1 }, { 1, 1 } };
 
 	/* Decide whether to slope the bottom or the top side. */
-	if (ISLIQUIDEMPTY(1,0,1) + ISLIQUIDEMPTY(1,2,1) != 1)
-		return;
-	if (!ISLIQUIDEMPTY(1,0,1))
+	if (hint & LIVOX_HINT_SLOPE_FACEUP)
 	{
 		sign = -1.0f;
 		y = 2;
-		y1 = 0;
 	}
-	else
+	else if (hint & LIVOX_HINT_SLOPE_FACEDOWN)
 	{
 		sign = 1.0f;
 		y = 0;
-		y1 = 2;
 	}
-
-	/* Determine the sloping states of corners. */
-	/* Other tiles prevent slope creation by default. */
-	if (!ISLIQUIDEMPTY(0,1,1)) slope[0][0] = slope[0][1] = 0;
-	if (!ISLIQUIDEMPTY(2,1,1)) slope[1][0] = slope[1][1] = 0;
-	if (!ISLIQUIDEMPTY(1,1,0)) slope[0][0] = slope[1][0] = 0;
-	if (!ISLIQUIDEMPTY(1,1,2)) slope[0][1] = slope[1][1] = 0;
-	/* Adjacent slopes are possible when facing empty tiles. */
-	/* Facing negative X (west). */
-	if (ISLIQUIDEMPTY(0,1,0) && ISLIQUIDEMPTY(0,1,1) && ISSLOPED(1,1,0) &&
-	    ISLIQUIDEMPTY(1,y,0) && !ISLIQUIDEMPTY(1,y1,0) && 
-	   !ISLIQUIDEMPTY(2,1,0) && !ISLIQUIDEMPTY(2,1,1)) slope[0][0] = 1;
-	if (ISLIQUIDEMPTY(0,1,2) && ISLIQUIDEMPTY(0,1,1) && ISSLOPED(1,1,2) &&
-	    ISLIQUIDEMPTY(1,y,2) && !ISLIQUIDEMPTY(1,y1,2) && 
-	   !ISLIQUIDEMPTY(2,1,2) && !ISLIQUIDEMPTY(2,1,1)) slope[0][1] = 1;
-	/* Facing positive X (east). */
-	if (ISLIQUIDEMPTY(2,1,0) && ISLIQUIDEMPTY(2,1,1) && ISSLOPED(1,1,0) &&
-	    ISLIQUIDEMPTY(1,y,0) && !ISLIQUIDEMPTY(1,y1,0) && 
-	   !ISLIQUIDEMPTY(0,1,0) && !ISLIQUIDEMPTY(0,1,1)) slope[1][0] = 1;
-	if (ISLIQUIDEMPTY(2,1,2) && ISLIQUIDEMPTY(2,1,1) && ISSLOPED(1,1,2) &&
-	    ISLIQUIDEMPTY(1,y,2) && !ISLIQUIDEMPTY(1,y1,2) && 
-	   !ISLIQUIDEMPTY(0,1,2) && !ISLIQUIDEMPTY(0,1,1)) slope[1][1] = 1;
-	/* Facing negative Z (north). */
-	if (ISLIQUIDEMPTY(1,1,0) && ISLIQUIDEMPTY(0,1,0) && ISSLOPED(0,1,1) &&
-	    ISLIQUIDEMPTY(0,y,1) && !ISLIQUIDEMPTY(0,y1,1) && 
-	   !ISLIQUIDEMPTY(1,1,2) && !ISLIQUIDEMPTY(0,1,2)) slope[0][0] = 1;
-	if (ISLIQUIDEMPTY(1,1,0) && ISLIQUIDEMPTY(2,1,0) && ISSLOPED(2,1,1) &&
-	    ISLIQUIDEMPTY(2,y,1) && !ISLIQUIDEMPTY(2,y1,1) && 
-	   !ISLIQUIDEMPTY(1,1,2) && !ISLIQUIDEMPTY(2,1,2)) slope[1][0] = 1;
-	/* Facing positive Z (south). */
-	if (ISLIQUIDEMPTY(1,1,2) && ISLIQUIDEMPTY(0,1,2) && ISSLOPED(0,1,1) &&
-	    ISLIQUIDEMPTY(0,y,1) && !ISLIQUIDEMPTY(0,y1,1) && 
-	   !ISLIQUIDEMPTY(1,1,0) && !ISLIQUIDEMPTY(0,1,0)) slope[0][1] = 1;
-	if (ISLIQUIDEMPTY(1,1,2) && ISLIQUIDEMPTY(2,1,2) && ISSLOPED(2,1,1) &&
-	    ISLIQUIDEMPTY(2,y,1) && !ISLIQUIDEMPTY(2,y1,1) && 
-	   !ISLIQUIDEMPTY(1,1,0) && !ISLIQUIDEMPTY(2,1,0)) slope[1][1] = 1;
+	else
+		return;
 
 	/* Create the slopes. */
-	if (slope[0][0])
+	if (hint & LIVOX_HINT_SLOPE_CORNER00)
 	{
 		v[0][1][0].y += sign * 0.5f;
 		v[0][y][0].y += sign * 1.0f;
@@ -597,7 +611,7 @@ static void private_triangulate_sloped (
 		v[0][1][1].y += sign * 0.25f;
 		v[0][y][1].y += sign * 0.5f;
 	}
-	if (slope[1][0])
+	if (hint & LIVOX_HINT_SLOPE_CORNER10)
 	{
 		v[2][1][0].y += sign * 0.5f;
 		v[2][y][0].y += sign * 1.0f;
@@ -606,7 +620,7 @@ static void private_triangulate_sloped (
 		v[2][1][1].y += sign * 0.25f;
 		v[2][y][1].y += sign * 0.5f;
 	}
-	if (slope[0][1])
+	if (hint & LIVOX_HINT_SLOPE_CORNER01)
 	{
 		v[0][1][2].y += sign * 0.5f;
 		v[0][y][2].y += sign * 1.0f;
@@ -615,7 +629,7 @@ static void private_triangulate_sloped (
 		v[0][1][1].y += sign * 0.25f;
 		v[0][y][1].y += sign * 0.5f;
 	}
-	if (slope[1][1])
+	if (hint & LIVOX_HINT_SLOPE_CORNER11)
 	{
 		v[2][1][2].y += sign * 0.5f;
 		v[2][y][2].y += sign * 1.0f;
@@ -627,15 +641,15 @@ static void private_triangulate_sloped (
 	v[1][y][1].y = 0.25f * (v[0][y][1].y + v[2][y][1].y + v[1][y][0].y + v[1][y][2].y);
 
 	/* Resolve degenerate cases. */
-	if (slope[0][0] && slope[1][0] && slope[0][1] && slope[1][1])
+	if ((hint & LIVOX_HINT_SLOPE_CORNERALL) == LIVOX_HINT_SLOPE_CORNERALL)
 	{
 		v[1][y][1].y -= sign * 0.5f;
-		if (ISLIQUIDEMPTY(1,0,0) && ISLIQUIDEMPTY(1,0,2))
+		if (hint & LIVOX_HINT_SLOPE_SPECIAL1)
 		{
 			v[1][y][0].y -= sign * 0.5f;
 			v[1][y][2].y -= sign * 0.5f;
 		}
-		else if (ISLIQUIDEMPTY(0,0,1) && ISLIQUIDEMPTY(2,0,1))
+		else if (hint & LIVOX_HINT_SLOPE_SPECIAL2)
 		{
 			v[0][y][1].y -= sign * 0.5f;
 			v[2][y][1].y -= sign * 0.5f;

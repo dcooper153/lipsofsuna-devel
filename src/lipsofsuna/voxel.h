@@ -25,5 +25,6 @@
 #include "voxel/voxel-manager.h"
 #include "voxel/voxel-material.h"
 #include "voxel/voxel-sector.h"
+#include "voxel/voxel-unittest.h"
 
 #endif

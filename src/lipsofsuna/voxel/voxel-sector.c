@@ -22,8 +22,9 @@
  * @{
  */
 
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/string.h"
+#include "lipsofsuna/system.h"
+#include "voxel-hinting.h"
 #include "voxel-manager.h"
 #include "voxel-sector.h"
 #include "voxel-private.h"
@@ -31,11 +32,11 @@
 #define LIVOX_ERASE_SHIFT (0.25f * LIVOX_TILE_WIDTH)
 #define LIVOX_TILES_PER_SECLINE (LIVOX_TILES_PER_LINE * LIVOX_BLOCKS_PER_LINE)
 
-static int
-private_build_block (LIVoxSector* self,
-                     int          x,
-                     int          y,
-                     int          z);
+static int private_build_block (
+	LIVoxSector* self,
+	int          x,
+	int          y,
+	int          z);
 
 static int private_set_voxel (
 	LIVoxSector* self,
@@ -428,13 +429,45 @@ livox_sector_set_voxel (LIVoxSector* self,
 
 /*****************************************************************************/
 
-static int
-private_build_block (LIVoxSector* self,
-                     int          x,
-                     int          y,
-                     int          z)
+static int private_build_block (
+	LIVoxSector* self,
+	int          x,
+	int          y,
+	int          z)
 {
+	int x1;
+	int y1;
+	int z1;
+	int blockw;
+	int sectorw;
 	LIVoxUpdateEvent event;
+	LIVoxVoxel* src;
+	LIVoxVoxel* dst;
+	LIVoxVoxel* voxels;
+
+	/* Build triangulation and physics hints. */
+	sectorw = self->manager->tiles_per_line;
+	blockw = sectorw / self->manager->blocks_per_line;
+	voxels = livox_hinting_process_area (self->manager,
+		sectorw * self->sector->x + blockw * x,
+		sectorw * self->sector->y + blockw * y,
+		sectorw * self->sector->z + blockw * z,
+		blockw, blockw, blockw);
+	if (voxels != NULL)
+	{
+		for (z1 = 0 ; z1 < blockw ; z1++)
+		for (y1 = 0 ; y1 < blockw ; y1++)
+		for (x1 = 0 ; x1 < blockw ; x1++)
+		{
+			src = voxels + x1 + y1 * blockw + z1 * blockw * blockw;
+			dst = self->tiles +
+				(x * blockw + x1) + 
+				(y * blockw + y1) * sectorw + 
+				(z * blockw + z1) * sectorw * sectorw;
+			*dst = *src;
+		}
+		lisys_free (voxels);
+	}
 
 	/* Invoke callbacks. */
 	event.sector[0] = self->sector->x;

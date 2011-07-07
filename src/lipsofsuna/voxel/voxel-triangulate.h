@@ -36,13 +36,14 @@ typedef struct _LIVoxVoxelB LIVoxVoxelB;
 struct _LIVoxVoxelB
 {
 	int index;
-	int type;
 	LIMatVector position;
 	LIVoxMaterial* material;
+	LIVoxVoxel* voxel;
 };
 
 struct _LIVoxBuilder
 {
+	int count;
 	int offset[3];
 	int size[3];
 	int step[3];
@@ -54,7 +55,7 @@ struct _LIVoxBuilder
 	LIVoxVoxelB* voxelsb;
 };
 
-LIAPICALL (int ,livox_triangulate_voxel, (
+LIAPICALL (int, livox_triangulate_voxel, (
 	LIVoxBuilder* self,
 	int           vx,
 	int           vy,

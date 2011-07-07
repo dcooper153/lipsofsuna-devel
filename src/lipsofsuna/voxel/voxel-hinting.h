@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,32 +15,31 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __VOXEL_BUILD_H__
-#define __VOXEL_BUILD_H__
+#ifndef __VOXEL_HINTING_H__
+#define __VOXEL_HINTING_H__
 
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "voxel-manager.h"
 
-typedef struct _LIVoxBuilder LIVoxBuilder;
-
-LIAPICALL (LIVoxBuilder*, livox_builder_new, (
+LIAPICALL (LIVoxVoxel*, livox_hinting_process_area, (
 	LIVoxManager* manager,
-	int           xstart,
-	int           ystart,
-	int           zstart,
-	int           xsize,
-	int           ysize,
-	int           zsize));
+	int           px,
+	int           py,
+	int           pz,
+	int           sx,
+	int           sy,
+	int           sz));
 
-LIAPICALL (void, livox_builder_free, (
-	LIVoxBuilder* self));
-
-LIAPICALL (int, livox_builder_build_model, (
-	LIVoxBuilder* self,
-	LIMdlModel**  result));
-
-LIAPICALL (void, livox_builder_preprocess, (
-	LIVoxBuilder* self));
+LIAPICALL (void, livox_hinting_process_voxel, (
+	LIVoxManager*   manager,
+	LIVoxVoxel*     voxels,
+	LIVoxMaterial** materials,
+	int             vx,
+	int             vy,
+	int             vz,
+	int             sx,
+	int             sy,
+	int             sz));
 
 #endif

@@ -36,9 +36,6 @@
    but it needs to be fixed in the future. */
 #warning Thread-safety issues in terrain builder
 
-static int private_build (
-	LIVoxBuilder* self);
-
 static int private_merge_material (
 	LIVoxBuilder*  self,
 	LIMdlMaterial* material);
@@ -113,23 +110,52 @@ void livox_builder_free (
 	lisys_free (self);
 }
 
-int livox_builder_build (
+int livox_builder_build_model (
 	LIVoxBuilder*  self,
 	LIMdlModel**   result)
+{
+	int x;
+	int y;
+	int z;
+
+	lisys_assert (result != NULL);
+
+	if (!self->count)
+	{
+		*result = NULL;
+		return 1;
+	}
+
+	/* Build all voxels inside the area. */
+	for (z = 1 ; z < self->size[2] - 1 ; z++)
+	for (y = 1 ; y < self->size[1] - 1 ; y++)
+	for (x = 1 ; x < self->size[0] - 1 ; x++)
+		private_merge_voxel (self, x, y, z);
+
+	/* Calculate bounds and tangents. */
+	if (self->model_builder != NULL)
+	{
+		*result = self->model_builder->model;
+		limdl_builder_finish (self->model_builder);
+		limdl_builder_free (self->model_builder);
+	}
+	else
+		*result = NULL;
+
+	return 1;
+}
+
+void livox_builder_preprocess (
+	LIVoxBuilder* self)
 {
 	int i;
 	int x;
 	int y;
 	int z;
-	int count;
-	int ret;
 	LIMatVector offset;
 	LIMatVector vector;
 	LIVoxMaterial* material;
 	LIVoxVoxel* voxel;
-
-	count = 0;
-	lisys_assert (result != NULL);
 
 	/* Calculate area offset. */
 	offset = limat_vector_init (self->offset[0] - 1.5f, self->offset[1] - 1.5f, self->offset[2] - 1.5f);
@@ -141,7 +167,7 @@ int livox_builder_build (
 	for (x = 0 ; x < self->size[0] ; x++)
 	{
 		i = x + y * self->step[1] + z * self->step[2];
-		self->voxelsb[i].type = 0;
+		self->voxelsb[i].voxel = NULL;
 
 		/* Type check. */
 		voxel = self->voxels + i;
@@ -153,8 +179,8 @@ int livox_builder_build (
 		if (material == NULL)
 			continue;
 		self->voxelsb[i].material = material;
-		self->voxelsb[i].type = voxel->type;
-		count++;
+		self->voxelsb[i].voxel = voxel;
+		self->count++;
 
 		/* Cache position. */
 		vector = limat_vector_init (x + 0.5f, y + 0.5f, z + 0.5f);
@@ -171,110 +197,9 @@ int livox_builder_build (
 		i = (x + 1) + (y + 1) * self->step[1] + (z + 1) * self->step[2];
 		self->voxelsb[i].index = x + y * (self->size[0] - 2) + z * (self->size[0] - 2) * (self->size[1] - 2);
 	}
-
-	/* Build mesh and/or physics. */
-	ret = 1;
-	if (count)
-	{
-		ret = private_build (self);
-		if (ret)
-		{
-			if (self->model_builder != NULL)
-				*result = self->model_builder->model;
-			else
-				*result = NULL;
-		}
-		if (self->model_builder != NULL)
-			limdl_builder_free (self->model_builder);
-	}
-
-	return ret;
-}
-
-/**
- * \brief Solves occlusion masks for a volume of voxels.
- * \param manager Voxel manager.
- * \param xsize Number of voxels.
- * \param ysize Number of voxels.
- * \param zsize Number of voxels.
- * \param voxels Array of voxels in the volume.
- * \param result Buffer with room for size[0]*size[1]*size[2] integers.
- * \return Number of completely occluded voxels.
- */
-int livox_build_occlusion (
-	LIVoxManager* manager,
-	int           xsize,
-	int           ysize,
-	int           zsize,
-	LIVoxVoxel*   voxels,
-	char*         result)
-{
-	int i;
-	int x;
-	int y;
-	int z;
-	int count = 0;
-
-	/* Solve occluders. */
-	for (i = 0 ; i < xsize * ysize * zsize ; i++)
-	{
-		if (livox_manager_check_occluder (manager, voxels + i))
-			result[i] = LIVOX_OCCLUDE_OCCLUDER;
-		else
-			result[i] = 0;
-	}
-
-	/* Solve occlusion. */
-	for (z = 1 ; z < zsize - 1 ; z++)
-	for (y = 1 ; y < ysize - 1 ; y++)
-	for (x = 1 ; x < xsize - 1 ; x++)
-	{
-		/* Check for occlusion from each side. */
-		i = x + y * xsize + z * xsize * ysize;
-		if (result[i - 1] & LIVOX_OCCLUDE_OCCLUDER)
-			result[i] |= LIVOX_OCCLUDE_XNEG;
-		if (result[i + 1] & LIVOX_OCCLUDE_OCCLUDER)
-			result[i] |= LIVOX_OCCLUDE_XPOS;
-		if (result[i - xsize] & LIVOX_OCCLUDE_OCCLUDER)
-			result[i] |= LIVOX_OCCLUDE_YNEG;
-		if (result[i + xsize] & LIVOX_OCCLUDE_OCCLUDER)
-			result[i] |= LIVOX_OCCLUDE_YPOS;
-		if (result[i - xsize * ysize] & LIVOX_OCCLUDE_OCCLUDER)
-			result[i] |= LIVOX_OCCLUDE_ZNEG;
-		if (result[i + xsize * ysize] & LIVOX_OCCLUDE_OCCLUDER)
-			result[i] |= LIVOX_OCCLUDE_ZPOS;
-		if ((result[i] & LIVOX_OCCLUDE_ALL) == LIVOX_OCCLUDE_ALL)
-		{
-			result[i] |= LIVOX_OCCLUDE_OCCLUDED;
-			count++;
-		}
-	}
-
-	return count;
 }
 
 /*****************************************************************************/
-
-static int private_build (
-	LIVoxBuilder* self)
-{
-	int x;
-	int y;
-	int z;
-	int ret = 1;
-
-	/* Build all voxels inside the area. */
-	for (z = 1 ; z < self->size[2] - 1 ; z++)
-	for (y = 1 ; y < self->size[1] - 1 ; y++)
-	for (x = 1 ; x < self->size[0] - 1 ; x++)
-		private_merge_voxel (self, x, y, z);
-
-	/* Calculate bounds and tangents. */
-	if (self->model_builder != NULL)
-		limdl_builder_finish (self->model_builder);
-
-	return ret;
-}
 
 static int private_merge_material (
 	LIVoxBuilder*  self,
@@ -457,7 +382,7 @@ static void private_merge_voxel (
 
 	/* Skip empty voxels. */
 	voxel = self->voxelsb + vx + vy * self->step[1] + vz * self->step[2];
-	if (!voxel->type)
+	if (voxel->voxel == NULL)
 		return;
 
 	/* Generate triangles. */

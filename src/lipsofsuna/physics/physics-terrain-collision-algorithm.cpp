@@ -20,6 +20,10 @@
 #include "physics-terrain.hpp"
 #include "physics-terrain-collision-algorithm.hpp"
 
+float LIPhyTerrainCollisionAlgorithm::tile_size = -1.0f;
+btConvexHullShape* LIPhyTerrainCollisionAlgorithm::slopes_above[16];
+btConvexHullShape* LIPhyTerrainCollisionAlgorithm::slopes_below[16];
+
 LIPhyTerrainCollisionAlgorithm::LIPhyTerrainCollisionAlgorithm (btPersistentManifold* mf, const btCollisionAlgorithmConstructionInfo& ci, btCollisionObject* body0, btCollisionObject* body1, btSimplexSolverInterface* simplexSolver, btConvexPenetrationDepthSolver* pdSolver, int numPerturbationIterations, int minimumPointsPerturbationThreshold) :
 	btConvexConvexAlgorithm (mf, ci, body0, body1, simplexSolver, pdSolver, numPerturbationIterations, minimumPointsPerturbationThreshold)
 {
@@ -97,9 +101,12 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 	livox_manager_copy_voxels (shape_terrain->terrain->voxels,
 		min[0], min[1], min[2], size[0], size[1], size[2], tiles);
 
+	/* Ensure correct collision shape sizes. */
+	if (tile_size != LIPhyTerrainCollisionAlgorithm::tile_size)
+		rebuild_shape_cache (tile_size);
+
 	/* Modify the terrain object. */
-	btBoxShape tmp_shape (btVector3 (0.5f * tile_size, 0.5f * tile_size, 0.5f * tile_size));
-	object_terrain->setCollisionShape (&tmp_shape);
+	btBoxShape box_shape (btVector3 (0.5f * tile_size, 0.5f * tile_size, 0.5f * tile_size));
 
 	/* Process collisions with each tile. */
 	liquid = 0.0f;
@@ -120,6 +127,18 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 			continue;
 		}
 		transform.setOrigin (aabb_min + btVector3 (x, y, z) * tile_size);
+		if (material->type == LIVOX_MATERIAL_TYPE_SLOPED ||
+		    material->type == LIVOX_MATERIAL_TYPE_SLOPED_FRACTAL)
+		{
+			if (tile->hint & LIVOX_HINT_SLOPE_FACEUP)
+				object_terrain->setCollisionShape (slopes_above[tile->hint & LIVOX_HINT_SLOPE_CORNERALL]);
+			else if (tile->hint & LIVOX_HINT_SLOPE_FACEDOWN)
+				object_terrain->setCollisionShape (slopes_below[tile->hint & LIVOX_HINT_SLOPE_CORNERALL]);
+			else
+				object_terrain->setCollisionShape (&box_shape);
+		}
+		else
+			object_terrain->setCollisionShape (&box_shape);
 		object_terrain->setWorldTransform (transform);
 		object_terrain->setInterpolationWorldTransform (transform);
 		pointer_terrain->tile[0] = min[0] + x;
@@ -157,4 +176,64 @@ void LIPhyTerrainCollisionAlgorithm::processCollision (btCollisionObject* body0,
 	object_terrain->setWorldTransform (transform);
 	object_terrain->setInterpolationWorldTransform (transform);
 	lisys_free (tiles);
+}
+
+void LIPhyTerrainCollisionAlgorithm::rebuild_shape_cache (float size)
+{
+	int i;
+	int j;
+	btVector3 slope_verts[8];
+	btVector3 cube_verts[8] =
+	{
+		btVector3(-0.5f * size, -0.5f * size, -0.5f * size),
+		btVector3( 0.5f * size, -0.5f * size, -0.5f * size),
+		btVector3(-0.5f * size, -0.5f * size,  0.5f * size),
+		btVector3( 0.5f * size, -0.5f * size,  0.5f * size),
+		btVector3(-0.5f * size,  0.5f * size, -0.5f * size),
+		btVector3( 0.5f * size,  0.5f * size, -0.5f * size),
+		btVector3(-0.5f * size,  0.5f * size,  0.5f * size),
+		btVector3( 0.5f * size,  0.5f * size,  0.5f * size)
+	};
+
+	/* Free the old shapes. */
+	/* FIXME: These are leaked once at exit regardless. */
+	if (tile_size != -1.0f)
+	{
+		for (i = 0 ; i < 16 ; i++)
+			delete slopes_above[i];
+		for (i = 0 ; i < 16 ; i++)
+			delete slopes_below[i];
+	}
+
+	/* Slopes above. */
+	for (i = 0 ; i < 16 ; i++)
+	{
+		j = 0;
+		slope_verts[j++] = cube_verts[0];
+		slope_verts[j++] = cube_verts[1];
+		slope_verts[j++] = cube_verts[2];
+		slope_verts[j++] = cube_verts[3];
+		if (!(i & LIVOX_HINT_SLOPE_CORNER00)) slope_verts[j++] = cube_verts[4];
+		if (!(i & LIVOX_HINT_SLOPE_CORNER10)) slope_verts[j++] = cube_verts[5];
+		if (!(i & LIVOX_HINT_SLOPE_CORNER01)) slope_verts[j++] = cube_verts[6];
+		if (!(i & LIVOX_HINT_SLOPE_CORNER11)) slope_verts[j++] = cube_verts[7];
+		slopes_above[i] = new btConvexHullShape ((btScalar*) slope_verts, j, sizeof (btVector3));
+	}
+
+	/* Slopes below. */
+	for (i = 0 ; i < 16 ; i++)
+	{
+		j = 0;
+		slope_verts[j++] = cube_verts[4];
+		slope_verts[j++] = cube_verts[5];
+		slope_verts[j++] = cube_verts[6];
+		slope_verts[j++] = cube_verts[7];
+		if (!(i & LIVOX_HINT_SLOPE_CORNER00)) slope_verts[j++] = cube_verts[0];
+		if (!(i & LIVOX_HINT_SLOPE_CORNER10)) slope_verts[j++] = cube_verts[1];
+		if (!(i & LIVOX_HINT_SLOPE_CORNER01)) slope_verts[j++] = cube_verts[2];
+		if (!(i & LIVOX_HINT_SLOPE_CORNER11)) slope_verts[j++] = cube_verts[3];
+		slopes_below[i] = new btConvexHullShape ((btScalar*) slope_verts, j, sizeof (btVector3));
+	}
+
+	tile_size = size;
 }

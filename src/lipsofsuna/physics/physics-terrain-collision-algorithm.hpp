@@ -39,6 +39,10 @@ public:
 			return new(mem) LIPhyTerrainCollisionAlgorithm (ci.m_manifold, ci, body0, body1, m_simplexSolver, m_pdSolver, m_numPerturbationIterations, m_minimumPointsPerturbationThreshold);
 		}
 	};
+	static void rebuild_shape_cache (float size);
+	static float tile_size;
+	static btConvexHullShape* slopes_above[16];
+	static btConvexHullShape* slopes_below[16];
 };
 
 #endif
