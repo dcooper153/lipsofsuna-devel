@@ -416,7 +416,7 @@ Action{name = "zoom", mode = "analog", key1 = "mouse4", key2 = "mouse5", func = 
 		Client.camera:zoom{rate = 1 * v}
 	elseif Client.mode == "editor" then
 		-- Editor controls.
-		if Program.cursor_grabbed then
+		if Program.cursor_grabbed and v ~= 0 then
 			Client.views.editor.editor:extrude(v < 0)
 		end
 	end
