@@ -96,4 +96,5 @@ void main()
 	]] .. Shader.los_lighting_default("F_coord", "normal", "F_lightvector", "F_halfvector",
 		"specular_splat", "shininess_splat") .. [[
 	LOS_output_0 = diffuse * max(vec4(-1.0) + F_color + lighting, vec4(0.0));
+	LOS_output_0.a = 1.0;
 }]]}}
