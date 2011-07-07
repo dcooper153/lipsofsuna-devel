@@ -40,10 +40,10 @@ Material{
 Material{
 	effect_build = "builtrock1",
 	effect_collapse = "collapse1",
-	name = "brick2",
+	name = "brick1slope",
 	shader = "terrain",
 	specular = {0.5,0.5,0.5,0.5},
-	texture = {"bricks3", "bricks3n", "stone-001"},
+	texture = {"bricks3", "bricks3n", "bricks3"},
 	texture_scale = 0.11,
 	type = "sloped"}
 
@@ -133,6 +133,17 @@ Material{
 	type = "rounded"}
 
 Material{
+	effect_build = "builtrock1",
+	effect_collapse = "collapse2",
+	mining_transform = "soil1",
+	name = "grass2",
+	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
+	texture = {"grass-000", "grass-000-nml", "grass-000"},
+	texture_scale = 0.11,
+	type = "sloped"}
+
+Material{
 	name = "ice1",
 	shader = "terrain",
 	shininess = 100,
@@ -201,3 +212,14 @@ Material{
 	specular = {0.5,0.5,0.5,0.5},
 	texture = {"wood1", "wood1n", "stone-001"},
 	texture_scale = 0.11}
+
+Material{
+	effect_build = "builtwood1",
+	effect_collapse = "collapse2",
+	mining_materials = {["log"] = 1},
+	name = "wood1sloped",
+	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
+	texture = {"wood1", "wood1n", "wood1"},
+	texture_scale = 0.11,
+	type = "sloped"}
