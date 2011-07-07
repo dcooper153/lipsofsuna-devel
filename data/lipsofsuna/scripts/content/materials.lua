@@ -40,6 +40,16 @@ Material{
 Material{
 	effect_build = "builtrock1",
 	effect_collapse = "collapse1",
+	name = "brick2",
+	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
+	texture = {"bricks3", "bricks3n", "stone-001"},
+	texture_scale = 0.11,
+	type = "sloped"}
+
+Material{
+	effect_build = "builtrock1",
+	effect_collapse = "collapse1",
 	name = "brittlerock1",
 	shader = "terrain",
 	specular = {0.5,0.5,0.5,0.5},
@@ -55,7 +65,7 @@ Material{
 	specular = {0.5,0.5,0.5,0.5},
 	texture = {"cobbles1", "cobbles1n", "stone-001"},
 	texture_scale = 0.11,
-	type = "rounded"}
+	type = "sloped"}
 
 Material{
 	effect_build = "builtrock1",
@@ -67,6 +77,17 @@ Material{
 	texture = {"granite1", "concrete1n", "stone-001"},
 	texture_scale = 0.11,
 	type = "cube"}
+
+Material{
+	effect_build = "builtrock1",
+	effect_collapse = "collapse1",
+	mining_materials = {["granite stone"] = 1},
+	name = "concrete2",
+	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
+	texture = {"granite1", "concrete1n", "stone-001"},
+	texture_scale = 0.11,
+	type = "sloped"}
 
 Material{
 	effect_build = "builtrock1",
