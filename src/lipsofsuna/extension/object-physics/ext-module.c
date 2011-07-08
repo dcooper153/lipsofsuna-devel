@@ -238,7 +238,10 @@ static int private_object_model (
 		return 1;
 
 	/* Set shape from a physics model. */
-	model_ = liphy_physics_find_model (self->physics, model->id);
+	if (model != NULL)
+		model_ = liphy_physics_find_model (self->physics, model->id);
+	else
+		model_ = NULL;
 	if (model_ != NULL)
 		liphy_object_set_model (phyobj, model_);
 	else
