@@ -2,6 +2,7 @@ require "system/class"
 
 Model = Class()
 Model.class_name = "Model"
+Model.models = setmetatable({}, {__mode = "v"})
 
 --- Creates a new model.
 -- @param clss Model class.
@@ -12,9 +13,21 @@ Model.new = function(clss, args)
 	self.handle = Los.model_new()
 	__userdata_lookup[self.handle] = self
 	if args then
+		if args.name then clss.models[args.name] = self end
 		for k,v in pairs(args) do self[k] = v end
 	end
 	return self
+end
+
+--- Finds a model by name.
+-- @param clss Model class.
+-- @param args Arguments.<ul>
+--   <li>file: Model filename.</li></ul>
+-- @return Model or nil.
+Model.find = function(clss, args)
+	if args.file then
+		return clss.models[args.file]
+	end
 end
 
 --- Creates a copy of the model.
