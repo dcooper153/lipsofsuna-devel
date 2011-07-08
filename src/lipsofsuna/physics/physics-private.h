@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -185,6 +185,8 @@ public:
 	virtual void apply_impulse (const btVector3& pos, const btVector3& imp);
 	virtual void transform (const btTransform& value);
 	virtual void update ();
+	virtual int get_activated ();
+	virtual void set_activated (int value);
 	virtual void get_angular (btVector3* value);
 	virtual void set_angular (const btVector3& value);
 	virtual void set_collision_group (int mask);
@@ -211,6 +213,8 @@ public:
 	virtual void apply_impulse (const btVector3& pos, const btVector3& imp);
 	virtual void transform (const btTransform& value);
 	virtual void update ();
+	virtual int get_activated ();
+	virtual void set_activated (int value);
 	virtual void get_angular (btVector3* res);
 	virtual void set_angular (const btVector3& value);
 	virtual void set_collision_group (int mask);

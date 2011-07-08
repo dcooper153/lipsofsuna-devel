@@ -50,6 +50,10 @@ Object.jump = function(self, args)
 	end
 end
 
+--- Activation state of the object.
+-- @name Object.activated
+-- @class table
+
 --- Angular velocity.<br/>
 -- Angular velocity specifies how the object rotates. The direction of the
 -- vector points towards the axis of rotation and the length of the vector
@@ -132,6 +136,7 @@ end
 -- @class table
 
 Object:add_getters{
+	activated = function(self) return Los.object_get_activated(self.handle) end,
 	angular = function(s) return Class.new(Vector, {handle = Los.object_get_angular(s.handle)}) end,
 	bounding_box_physics = function(self)
 		local h1,h2 = Los.object_get_bounding_box_physics(self.handle)
@@ -159,6 +164,7 @@ Object:add_getters{
 	velocity = function(s) return Class.new(Vector, {handle = Los.object_get_velocity(s.handle)}) end}
 
 Object:add_setters{
+	activated = function(self, v) return Los.object_set_activated(self.handle, v) end,
 	angular = function(s, v) Los.object_set_angular(s.handle, v.handle) end,
 	collision_group = function(s, v) Los.object_set_collision_group(s.handle, v) end,
 	collision_mask = function(s, v) Los.object_set_collision_mask(s.handle, v) end,

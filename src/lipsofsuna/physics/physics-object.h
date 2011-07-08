@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -65,6 +65,13 @@ LIAPICALL (LIPhyObject*, liphy_object_scan_sphere, (
 	LIPhyObject*       self,
 	const LIMatVector* relctr,
 	float              radius));
+
+LIAPICALL (int, liphy_object_get_activated, (
+	LIPhyObject* self));
+
+LIAPICALL (void, liphy_object_set_activated, (
+	LIPhyObject* self,
+	int          value));
 
 LIAPICALL (void, liphy_object_get_angular, (
 	const LIPhyObject* self,

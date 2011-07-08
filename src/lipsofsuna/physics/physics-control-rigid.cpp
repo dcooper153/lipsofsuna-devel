@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -68,6 +68,19 @@ void LIPhyControlRigid::update ()
 	const btVector3& velocity = this->body.getLinearVelocity ();
 
 	this->object->config.velocity = limat_vector_init (velocity[0], velocity[1], velocity[2]);
+}
+
+int LIPhyControlRigid::get_activated ()
+{
+	return this->body.getActivationState () == ACTIVE_TAG;
+}
+
+void LIPhyControlRigid::set_activated (int value)
+{
+	if (value)
+		this->body.activate (true);
+	else
+		this->body.setActivationState (ISLAND_SLEEPING);
 }
 
 void LIPhyControlRigid::get_angular (btVector3* value)

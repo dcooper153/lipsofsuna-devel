@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -310,8 +310,33 @@ void liphy_object_jump (
 }
 
 /**
+ * \brief Gets the activation state of the object.
+ * \param self Object.
+ * \return Activation state.
+ */
+int liphy_object_get_activated (
+	LIPhyObject* self)
+{
+	if (self->control != NULL)
+		return self->control->get_activated ();
+	return 0;
+}
+
+/**
+ * \brief Sets the activation state of the object.
+ * \param self Object.
+ * \param value Activation state.
+ */
+void liphy_object_set_activated (
+	LIPhyObject* self,
+	int          value)
+{
+	if (self->control != NULL)
+		self->control->set_activated (value);
+}
+
+/**
  * \brief Gets the angular velocity of the object.
- *
  * \param self Object.
  * \param value Return location for the angular velocity vector.
  */
