@@ -36,6 +36,9 @@ LIAPICALL (int, liscr_pushdata, (
 LIAPICALL (LIScrScript*, liscr_script, (
 	lua_State* lua));
 
+LIAPICALL (void, liscr_stackdump, (
+	lua_State* lua));
+
 LIAPICALL (void, liscr_traceback, (
 	lua_State* lua));
 
