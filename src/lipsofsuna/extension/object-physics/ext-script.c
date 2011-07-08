@@ -106,6 +106,35 @@ static void Object_jump (LIScrArgs* args)
 		liphy_object_jump (object, &impulse);
 }
 
+static void Object_get_activated (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIPhyObject* object;
+
+	/* Get physics object. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
+	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	if (object == NULL)
+		return;
+
+	liscr_args_seti_bool (args, liphy_object_get_activated (object));
+}
+static void Object_set_activated (LIScrArgs* args)
+{
+	int value;
+	LIExtModule* module;
+	LIPhyObject* object;
+
+	/* Get physics object. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
+	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	if (object == NULL)
+		return;
+
+	if (liscr_args_geti_bool (args, 0, &value))
+		liphy_object_set_activated (object, value);
+}
+
 static void Object_get_angular (LIScrArgs* args)
 {
 	LIMatVector tmp;
@@ -612,6 +641,8 @@ void liext_script_physics_object (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_impulse", Object_impulse);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_insert_hinge_constraint", Object_insert_hinge_constraint);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_jump", Object_jump);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_activated", Object_get_activated);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_activated", Object_set_activated);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_angular", Object_get_angular);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_angular", Object_set_angular);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_bounding_box_physics", Object_get_bounding_box_physics);

@@ -105,7 +105,7 @@ Object.create_character_model = function(self, args)
 		end
 	end
 	-- Create skeleton.
-	local m = Model:load{file = meshes.skeleton}
+	local m = Model:find_or_load{file = meshes.skeleton}
 	m = m:copy()
 	-- Add other meshes.
 	local has_head = not Bitwise:bchk(self.flags or 0, Protocol.object_flags.BEHEADED)
@@ -113,7 +113,7 @@ Object.create_character_model = function(self, args)
 	for k,v in pairs(meshes) do
 		if k ~= "skeleton" and (has_head or not mesh_head[k]) then
 			local tmp
-			local ref = Model:load{file = v}
+			local ref = Model:find_or_load{file = v}
 			-- Face customization.
 			if args.face_style and (string.match(k, ".*head.*") or string.match(k, ".*eye.*")) then
 				tmp = ref:copy()

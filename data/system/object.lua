@@ -28,7 +28,10 @@ Object.new = function(clss, args)
 	self.handle = Los.object_new()
 	__userdata_lookup[self.handle] = self
 	if args then
-		for k,v in pairs(args) do self[k] = v end
+		for k,v in pairs(args) do
+			if k ~= "realized" then self[k] = v end
+		end
+		if args.realized then self.realized = true end
 	end
 	return self
 end
@@ -99,11 +102,11 @@ Object:add_getters{
 Object:add_setters{
 	model = function(s, v)
 		local m = v
-		if type(v) == "string" then m = Model:load{file = v, mesh = Object.load_meshes} end
+		if type(v) == "string" then m = Model:find_or_load{file = v, mesh = Object.load_meshes} end
 		rawset(s, "__model", m)
 		Los.object_set_model(s.handle, m and m.handle)
 	end,
-	model_name = function(s, v) s.model = Model:load{file = v, mesh = Object.load_meshes} end,
+	model_name = function(s, v) s.model = Model:find_or_load{file = v, mesh = Object.load_meshes} end,
 	position = function(s, v) Los.object_set_position(s.handle, v.handle) end,
 	rotation = function(s, v) Los.object_set_rotation(s.handle, v.handle) end,
 	realized = function(s, v)

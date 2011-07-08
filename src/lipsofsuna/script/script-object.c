@@ -116,6 +116,8 @@ static void Object_set_model (LIScrArgs* args)
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &value))
 		lieng_object_set_model (args->self, value->data);
+	else
+		lieng_object_set_model (args->self, NULL);
 }
 
 static void Object_get_position (LIScrArgs* args)

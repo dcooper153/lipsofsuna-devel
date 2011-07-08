@@ -40,7 +40,7 @@ static void Model_new (LIScrArgs* args)
 		return;
 
 	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, args->script->lua, self, LISCR_SCRIPT_MODEL, lieng_model_free);
+	self->script = liscr_data_new (args->script, args->lua, self, LISCR_SCRIPT_MODEL, lieng_model_free);
 	if (self->script == NULL)
 	{
 		lieng_model_free (self);

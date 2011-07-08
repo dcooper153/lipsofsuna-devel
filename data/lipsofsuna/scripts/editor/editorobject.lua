@@ -11,7 +11,7 @@ EditorObject:add_setters{
 			local m = s.model:copy()
 			for k,v in pairs(v.models) do
 				if k ~= "skeleton" then
-					m:merge(Model:load{file = v})
+					m:merge(Model:find_or_load{file = v})
 				end
 			end
 			m:calculate_bounds()

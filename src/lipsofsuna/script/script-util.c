@@ -149,6 +149,25 @@ LIScrScript* liscr_script (
 }
 
 /**
+ * \brief Dumpts the stack to the terminal.
+ *
+ * This function is intended to be used for debugging. It helps with locating
+ * stack populatin and cleanup errors.
+ *
+ * \param lua Lua state.
+ */
+void liscr_stackdump (
+	lua_State* lua)
+{
+	int i;
+
+	printf ("\nLua stackdump:\n");
+	for (i = 1 ; i <= lua_gettop (lua) ; i++)
+		printf ("  %d: %s\n", i, lua_typename (lua, lua_type (lua, i)));
+	printf ("\n");
+}
+
+/**
  * \brief Prints the traceback to the terminal.
  *
  * This function is intended to be used for debugging. It helps with locating
