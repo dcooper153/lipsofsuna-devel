@@ -109,7 +109,7 @@ Feateffectspec{
 	categories = {"dig", "spell"},
 	description = "Fire a digging ray",
 	effect = "spell1",
-	icon = "modifier-dig",
+	icon = "modifier-earthmove",
 	influences = {{"dig", 1, 1}},
 	projectile = "fireball1", -- FIXME
 	skill_base = {willpower = 3},
