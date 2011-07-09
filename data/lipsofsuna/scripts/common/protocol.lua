@@ -75,6 +75,10 @@ do
 	add("INVENTORY_ITEM_REMOVED")
 	add("INVENTORY_WEIGHT")
 
+	add("MARKER_ADD")
+	add("MARKER_REMOVE")
+	add("MARKER_UPDATE")
+
 	add("MESSAGE")
 
 	add("MODIFIER_ADD")

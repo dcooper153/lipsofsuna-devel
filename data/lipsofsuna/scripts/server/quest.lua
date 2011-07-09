@@ -1,4 +1,4 @@
-require "system/eventhandler"
+require "server/marker"
 
 --- Marks the quest as active.
 -- @param clss Quest class.
@@ -70,7 +70,7 @@ Quest.send_marker = function(self, args)
 	-- Create marker packet.
 	local m = self.marker and Marker:find{name = self.marker}
 	local pos = m and m.position or Vector()
-	local p = Packet(packets.QUEST_MARKER, "uint32", self.id, "float", pos.x, "float", pos.y, "float", pos.z)
+	local p = Packet(packets.QUEST_MARKER, "uint32", self.id, "string", self.marker)
 	-- Send the packet to clients.
 	if args.all then
 		for k,v in pairs(Player.clients) do
@@ -95,7 +95,11 @@ Quest.update = function(self, args)
 	local ch_s = false
 	local ch_t = false
 	if args.marker and self.marker ~= args.marker then
-		if Marker:find{name = args.marker} then
+		local m = Marker:find{name = args.marker}
+		if m then
+			if not m.unlocked then
+				m:unlock()
+			end
 			self.marker = args.marker
 			ch_m = true
 		end

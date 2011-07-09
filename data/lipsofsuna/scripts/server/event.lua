@@ -35,3 +35,28 @@ end}
 Eventhandler{type = "object-motion", func = function(self, event)
 	Vision:event{type = "object-moved", object = event.object}
 end}
+
+local marker_timer = 0
+Eventhandler{type = "tick", func = function(self, event)
+	-- Update markers.
+	marker_timer = marker_timer + event.secs
+	if marker_timer > 2 then
+		marker_timer = 0
+		for k,m in pairs(Marker.dict_name) do
+			if m.unlocked and m.target then
+				local o = Object:find{id = m.target}
+				if o and (m.position - o.position).length > 1 then
+					m.position = o.position
+					local p = Packet(packets.MARKER_UPDATE,
+						"string", m.name,
+						"float", m.position.x,
+						"float", m.position.y,
+						"float", m.position.z)
+					for k,v in pairs(Player.clients) do
+						v:send(p)
+					end
+				end
+			end
+		end
+	end
+end}

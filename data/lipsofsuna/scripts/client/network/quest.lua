@@ -1,11 +1,11 @@
 -- Sets to position of the quest marker.
 Protocol:add_handler{type = "QUEST_MARKER", func = function(event)
-	local ok,id,x,y,z = event.packet:read("uint32", "float", "float", "float")
+	local ok,id,n = event.packet:read("uint32", "string")
 	if not ok then return end
 	local quest = Quest:find{id = id}
 	if not quest then return end
-	if x > 0.1 and y > 0.1 and z > 0.1 then
-		quest.marker = Vector(x,y,z)
+	if n ~= "" then
+		quest.marker = n
 	else
 		quest.marker = nil
 	end

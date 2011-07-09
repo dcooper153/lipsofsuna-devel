@@ -38,40 +38,48 @@ end
 -- @param self Quest class.
 -- @return Compass direction in radians, or nil.
 Views.Quests.get_compass_direction = function(self)
-	if self.shown_quest then
-		local quest = Quest:find{name = self.shown_quest}
-		if not quest or not quest.marker then return end
-		if not Player.object then return end
-		local diff = quest.marker - Player.object.position
-		return 0.5 * math.pi + math.atan2(diff.z, -diff.x)
-	end
+	-- Find the marker.
+	local marker = self:get_active_marker()
+	if not marker then return end
+	-- Calculate the direction.
+	local diff = marker.position - Player.object.position
+	return 0.5 * math.pi + math.atan2(diff.z, -diff.x)
 end
 
 --- Gets the distance to the shown quest marker in the X-Z plane.
 -- @param self Quest class.
 -- @return Compass distance or nil.
 Views.Quests.get_compass_distance = function(self)
-	if self.shown_quest then
-		local quest = Quest:find{name = self.shown_quest}
-		if not quest or not quest.marker then return end
-		if not Player.object then return end
-		local diff = quest.marker - Player.object.position
-		diff.y = 0
-		return diff.length
-	end
+	-- Find the marker.
+	local marker = self:get_active_marker()
+	if not marker then return end
+	-- Calculate the distance.
+	local diff = marker.position - Player.object.position
+	diff.y = 0
+	return diff.length
 end
 
 --- Gets the compass height offset for the currently shown quest.
 -- @param self Quest class.
 -- @return Compass height offset or nil.
 Views.Quests.get_compass_height = function(self)
-	if self.shown_quest then
-		local quest = Quest:find{name = self.shown_quest}
-		if not quest or not quest.marker then return end
-		if not Player.object then return end
-		local diff = quest.marker - Player.object.position
-		return diff.y
-	end
+	-- Find the marker.
+	local marker = self:get_active_marker()
+	if not marker then return end
+	-- Calculate the height offset.
+	local diff = marker.position - Player.object.position
+	return diff.y
+end
+
+--- Gets the currently shown map marker.
+-- @param self Quests view.
+-- @return Marker or nil.
+Views.Quests.get_active_marker = function(self)
+	if not self.shown_quest then return end
+	if not Player.object then return end
+	local quest = Quest:find{name = self.shown_quest}
+	if not quest or not quest.marker then return end
+	return Marker:find{name = quest.marker}
 end
 
 --- Shows a quest.

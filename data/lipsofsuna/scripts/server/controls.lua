@@ -13,6 +13,16 @@ local spawn_player = function(object, client)
 		object:teleport{position =Config.inst.spawn_point} 
 	end
 	object.realized = true
+	-- Transmit unlocked map markers.
+	for k,m in pairs(Marker.dict_name) do
+		if m.unlocked then
+			object:send(Packet(packets.MARKER_ADD,
+				"string", m.name,
+				"float", m.position.x,
+				"float", m.position.y,
+				"float", m.position.z))
+		end
+	end
 	-- Transmit active and completed quests.
 	for k,q in pairs(Quest.dict_name) do
 		q:send{client = object}

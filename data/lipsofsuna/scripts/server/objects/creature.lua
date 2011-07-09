@@ -117,9 +117,17 @@ Creature:add_setters{
 				end
 			end
 		end
-		-- Create map marker.
+		-- Create the map marker.
+		-- Usually the marker exists already but we support creating new markers on
+		-- the fly in case that'll be needed in the future.
 		if spec.marker then
-			s.marker = Marker{name = spec.marker, position = s.position, target = s.id}
+			s.marker = Marker:find{name = spec.marker}
+			if s.marker then
+				s.marker.position = s.position
+				s.marker.target = s.id
+			else
+				s.marker = Marker{name = spec.marker, position = s.position, target = s.id}
+			end
 		end
 		-- Kill dead quest characters.
 		if spec.dead then

@@ -19,8 +19,6 @@ end
 Marker.new = function(clss, args)
 	local self = Class.new(clss, args)
 	clss.dict_name[args.name] = self
-	self:enable()
-	self:update()
 	return self
 end
 
@@ -33,14 +31,6 @@ Marker.reset = function(clss)
 	clss.dict_name = {}
 end
 
---- Enables updates for the map marker.
--- @param self Marker.
-Marker.enable = function(self)
-	if not self.timer then
-		self.timer = Timer{delay = 5, func = function() self:update() end}
-	end
-end
-
 --- Disables updates for the map marker.
 -- @param self Marker.
 Marker.disable = function(self)
@@ -48,15 +38,4 @@ Marker.disable = function(self)
 		self.timer:disable()
 		self.timer = nil
 	end
-end
-
---- Updates the position of the map marker.
--- @param self Marker.
--- @return True if updated.
-Marker.update = function(self)
-	if not self.target then return end
-	local o = Object:find{id = self.target}
-	if not o then return end
-	self.position = o.position
-	return true
 end

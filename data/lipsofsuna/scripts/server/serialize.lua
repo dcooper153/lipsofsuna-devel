@@ -1,5 +1,5 @@
 Serialize = Class()
-Serialize.data_version = "7"
+Serialize.data_version = "8"
 
 --- Initializes the serializer.
 -- @param clss Serialize class.
@@ -17,7 +17,7 @@ Serialize.init = function(clss)
 	clss.db:query("CREATE TABLE IF NOT EXISTS dialog_flags (name TEXT PRIMARY KEY,value TEXT);")
 	clss.db:query("CREATE TABLE IF NOT EXISTS generator_sectors (id INTEGER PRIMARY KEY,value TEXT);")
 	clss.db:query("CREATE TABLE IF NOT EXISTS generator_settings (key TEXT PRIMARY KEY,value TEXT);")
-	clss.db:query("CREATE TABLE IF NOT EXISTS markers (name TEXT PRIMARY KEY,id INTEGER,x FLOAT,y FLOAT,z FLOAT);")
+	clss.db:query("CREATE TABLE IF NOT EXISTS markers (name TEXT PRIMARY KEY,id INTEGER,x FLOAT,y FLOAT,z FLOAT,unlocked INTENGER);")
 	clss.db:query("CREATE TABLE IF NOT EXISTS quests (name TEXT PRIMARY KEY,status TEXT,desc TEXT,marker TEXT);")
 	Sectors.instance = clss.sectors
 end
@@ -106,9 +106,9 @@ end
 --- Loads map markers from the database.
 -- @param clss Serialize class.
 Serialize.load_markers = function(clss)
-	local r = clss.db:query("SELECT name,id,x,y,z FROM markers;")
+	local r = clss.db:query("SELECT name,id,x,y,z,unlocked FROM markers;")
 	for k,v in ipairs(r) do
-		Marker{name = v[1], target = v[2], position = Vector(v[3], v[4], v[5])}
+		Marker{name = v[1], target = v[2], position = Vector(v[3], v[4], v[5]), unlocked = (v[6] == 1)}
 	end
 end
 
@@ -189,8 +189,8 @@ end
 -- @param marker Map marker.
 Serialize.save_marker = function(clss, marker)
 	clss.db:query("BEGIN TRANSACTION;")
-	clss.db:query("REPLACE INTO markers (name,id,x,y,z) VALUES (?,?,?,?,?);",
-		{marker.name, marker.target, marker.position.x, marker.position.y, marker.position.z})
+	clss.db:query("REPLACE INTO markers (name,id,x,y,z,unlocked) VALUES (?,?,?,?,?,?);",
+		{marker.name, marker.target, marker.position.x, marker.position.y, marker.position.z, marker.unlocked and 1 or 0})
 	clss.db:query("END TRANSACTION;")
 end
 
@@ -203,8 +203,8 @@ Serialize.save_markers = function(clss, erase)
 		clss.db:query("DELETE FROM markers;")
 	end
 	for k,v in pairs(Marker.dict_name) do
-		clss.db:query("REPLACE INTO markers (name,id,x,y,z) VALUES (?,?,?,?,?);",
-			{k, v.target, v.position.x, v.position.y, v.position.z})
+		clss.db:query("REPLACE INTO markers (name,id,x,y,z,unlocked) VALUES (?,?,?,?,?,?);",
+			{k, v.target, v.position.x, v.position.y, v.position.z, v.unlocked and 1 or 0})
 	end
 	clss.db:query("END TRANSACTION;")
 end

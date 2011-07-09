@@ -123,6 +123,16 @@ ChatCommand{pattern = "^/teleport (.*)$", permission = "admin", func = function(
 	end
 end}
 
+-- Unlock a map marker.
+ChatCommand{pattern = "^/unlock marker (.*)$", permission = "admin", func = function(player, matches)
+	local m = Marker:find{name = matches[1]}
+	if m then
+		m:unlock()
+	else
+		player:send(string.format("No such map marker %q.", matches[1]))
+	end
+end}
+
 -- Any other command.
 ChatCommand{pattern = "^(/[^ ]*).*", permission = "player", func = function(player, matches)
 	player:send("Unrecognized command.")
