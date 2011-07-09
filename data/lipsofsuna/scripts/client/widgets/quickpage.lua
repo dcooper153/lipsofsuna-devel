@@ -24,6 +24,7 @@ Widgets.Quickpage.new = function(clss, args)
 		end}
 		self:append_col(self.buttons[i])
 	end
+	self:append_col(Widgets.Label{text=self.type:gsub("^%l", string.upper)})
 	-- Load feats from the database.
 	self:load()
 	return self
