@@ -143,6 +143,9 @@
     <url>http://opengameart.org/user/1170</url>
   </author-info>
   <author-info>
+    <name>jute</name>
+  </author-info>
+  <author-info>
     <name>zero-project</name>
     <url>http://www.zero-project.gr/</url>
   </author-info>
@@ -192,6 +195,14 @@
     <license>Creative Commons BY 3.0</license>
     <status>complete</status>
     <type>texture</type>
+  </asset>
+  
+  <asset>
+    <file>sound/stepdirt_2.ogg</file>
+    <author>jute</author>
+    <license>GPL2 or 3</license>
+    <status>complete</status>
+    <type>sound</type>
   </asset>
 
   <asset>

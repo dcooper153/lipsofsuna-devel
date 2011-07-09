@@ -140,8 +140,8 @@ Effect{
 
 Effect{
 	name = "step1",
-	sound = "step1",
-	sound_volume = 0.7}
+	sound = "stepdirt_2",
+	sound_volume = 0.6}
 
 Effect{
 	name = "swing1",
