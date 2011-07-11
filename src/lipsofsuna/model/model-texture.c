@@ -22,7 +22,7 @@
  * @{
  */
 
-#include <lipsofsuna/string.h>
+#include "lipsofsuna/system.h"
 #include "model-texture.h"
 
 int

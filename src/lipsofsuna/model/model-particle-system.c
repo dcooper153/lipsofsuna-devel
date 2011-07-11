@@ -22,7 +22,7 @@
  * @{
  */
 
-#include <lipsofsuna/string.h>
+#include "lipsofsuna/system.h"
 #include "model-particle.h"
 
 static int private_read_v1 (

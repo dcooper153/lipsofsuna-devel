@@ -18,10 +18,9 @@
 #ifndef __MODEL_NODE_H__
 #define __MODEL_NODE_H__
 
-#include <lipsofsuna/archive.h>
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/archive.h"
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/system.h"
 #include "model-bone.h"
 #include "model-light.h"
 #include "model-types.h"

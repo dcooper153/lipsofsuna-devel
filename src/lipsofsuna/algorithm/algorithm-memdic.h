@@ -18,8 +18,7 @@
 #ifndef __ALGORITHM_MEMDIC_H__
 #define __ALGORITHM_MEMDIC_H__
 
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "algorithm-bst.h"
 
 typedef struct _LIAlgMemdic LIAlgMemdic;

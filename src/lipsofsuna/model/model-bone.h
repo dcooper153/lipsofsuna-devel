@@ -18,10 +18,9 @@
 #ifndef __MODEL_BONE_H__
 #define __MODEL_BONE_H__
 
-#include <lipsofsuna/archive.h>
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/archive.h"
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/system.h"
 #include "model-types.h"
 
 struct _LIMdlBone

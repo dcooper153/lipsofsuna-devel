@@ -23,8 +23,7 @@
  */
 
 #include <unistd.h>
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "archive-tar.h"
 
 #ifdef SUPPORT_DEVICES

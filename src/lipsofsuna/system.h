@@ -35,5 +35,6 @@
 #include "system/system-string.h"
 #include "system/system-types.h"
 #include "system/system-user.h"
+#include "system/system-utf8.h"
 
 #endif

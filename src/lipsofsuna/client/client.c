@@ -22,13 +22,7 @@
  * @{
  */
 
-#include <stdio.h>
-#include <string.h>
-#include <time.h>
-#include <sys/time.h>
-#include <lipsofsuna/network.h>
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "client.h"
 #include "client-script.h"
 #include "client-window.h"
@@ -274,7 +268,7 @@ static int private_event (
 			/* Fall through */
 		case SDL_KEYUP:
 			if (event->key.keysym.unicode != 0)
-				str = listr_wchar_to_utf8 (event->key.keysym.unicode);
+				str = lisys_wchar_to_utf8 (event->key.keysym.unicode);
 			if (str != NULL)
 			{
 				limai_program_event (self->program, (event->type == SDL_KEYDOWN)? "keypress" : "keyrelease", "code", LISCR_TYPE_INT, event->key.keysym.sym, "mods", LISCR_TYPE_INT, event->key.keysym.mod, "text", LISCR_TYPE_STRING, str, NULL);

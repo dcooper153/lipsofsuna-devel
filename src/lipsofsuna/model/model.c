@@ -22,8 +22,7 @@
  * @{
  */
 
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "model.h"
 #include "model-builder.h"
 

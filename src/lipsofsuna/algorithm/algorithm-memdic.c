@@ -22,8 +22,7 @@
  * @{
  */
 
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "algorithm-memdic.h"
 
 static void private_memdic_node_free (

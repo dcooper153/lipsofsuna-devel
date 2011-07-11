@@ -18,9 +18,8 @@
 #ifndef __MODEL_FACES_H__
 #define __MODEL_FACES_H__
 
-#include <lipsofsuna/archive.h>
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/archive.h"
+#include "lipsofsuna/system.h"
 #include "model-types.h"
 
 typedef struct _LIMdlFaces LIMdlFaces;

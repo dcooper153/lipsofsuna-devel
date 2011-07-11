@@ -22,8 +22,7 @@
  * @{
  */
 
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "algorithm-strdic.h"
 
 static void private_strdic_node_free (

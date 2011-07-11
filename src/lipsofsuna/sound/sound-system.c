@@ -24,8 +24,7 @@
 
 #ifndef LI_DISABLE_SOUND
 
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "sound-system.h"
 
 /*****************************************************************************/

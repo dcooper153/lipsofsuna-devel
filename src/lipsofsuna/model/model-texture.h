@@ -18,9 +18,8 @@
 #ifndef __MODEL_TEXTURE_H__
 #define __MODEL_TEXTURE_H__
 
-#include <lipsofsuna/archive.h>
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/archive.h"
+#include "lipsofsuna/system.h"
 
 typedef int LIMdlTextureFlags;
 typedef int LIMdlTextureType;

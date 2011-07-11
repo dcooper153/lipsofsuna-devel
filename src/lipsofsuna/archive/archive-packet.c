@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "lipsofsuna/string.h"
+#include "lipsofsuna/system.h"
 #include "archive-packet.h"
 
 LIArcPacket* liarc_packet_new_readable (

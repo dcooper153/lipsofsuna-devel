@@ -23,8 +23,7 @@
  */
 
 #include <zlib.h>
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "archive-writer.h"
 
 #define FORMAT_BUFFER_SIZE 128

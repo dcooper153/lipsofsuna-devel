@@ -22,7 +22,6 @@
  * @{
  */
 
-#include "lipsofsuna/string.h"
 #include "lipsofsuna/system.h"
 #include "render-shader.h"
 #include "render-private.h"

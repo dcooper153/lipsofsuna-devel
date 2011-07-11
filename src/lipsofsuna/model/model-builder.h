@@ -18,10 +18,9 @@
 #ifndef __MODEL_BUILDER_H__
 #define __MODEL_BUILDER_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/algorithm.h"
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/system.h"
 #include "model.h"
 
 typedef struct _LIMdlBuilder LIMdlBuilder;

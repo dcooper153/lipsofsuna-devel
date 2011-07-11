@@ -27,9 +27,8 @@
 #include <stream_decoder.h>
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
-#include <lipsofsuna/archive.h>
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/archive.h"
+#include "lipsofsuna/system.h"
 #include "sound-sample.h"
 
 static void private_flac_error_callback (

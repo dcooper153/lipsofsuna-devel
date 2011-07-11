@@ -16,15 +16,14 @@
  */
 
 /**
- * \addtogroup LIStr String
+ * \addtogroup LISys System
  * @{
- * \addtogroup LIStrGeneric Generic
+ * \addtogroup LISysUtf8 Utf8
  * @{
  */
 
-#include <stdarg.h>
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
+#include "system-memory.h"
+#include "system-utf8.h"
 
 /* Stolen from Glib. */
 #define UTF8_LENGTH(Char)              \
@@ -48,9 +47,9 @@
  * \param result Return location for the character.
  * \return Nonzero on success.
  */
-int
-listr_utf8_get_char (const char* self,
-                     wchar_t*    result)
+int lisys_utf8_get_char (
+	const char* self,
+	wchar_t*    result)
 {
 	int i;
 	int len;
@@ -113,20 +112,19 @@ listr_utf8_get_char (const char* self,
 
 /**
  * \brief Gets the number of characters in an UTF-8 string.
- *
  * \param self String.
  * \return Length or -1 on error.
  */
-int
-listr_utf8_get_length (const char* self)
+int lisys_utf8_get_length (
+	const char* self)
 {
 	const char* ptr;
 	wchar_t dummy;
 	int length = 0;
 
-	for (ptr = self ; *ptr != '\0' ; ptr = listr_utf8_get_next (ptr))
+	for (ptr = self ; *ptr != '\0' ; ptr = lisys_utf8_get_next (ptr))
 	{
-		if (!listr_utf8_get_char (ptr, &dummy))
+		if (!lisys_utf8_get_char (ptr, &dummy))
 			return -1;
 		length++;
 	}
@@ -144,8 +142,8 @@ listr_utf8_get_length (const char* self)
  * \param self String.
  * \return Pointer within the same string.
  */
-char*
-listr_utf8_get_next (const char* self)
+char* lisys_utf8_get_next (
+	const char* self)
 {
 	for (self++ ; (*self & 0xC0) == 0x80 ; self++);
 
@@ -154,19 +152,18 @@ listr_utf8_get_next (const char* self)
 
 /**
  * \brief Checks if the UTF-8 string is valid.
- *
  * \param self String.
  * \return Nonzero if valid.
  */
-int
-listr_utf8_get_valid (const char* self)
+int lisys_utf8_get_valid (
+	const char* self)
 {
 	const char* ptr;
 	wchar_t dummy;
 
-	for (ptr = self ; *ptr != '\0' ; ptr = listr_utf8_get_next (ptr))
+	for (ptr = self ; *ptr != '\0' ; ptr = lisys_utf8_get_next (ptr))
 	{
-		if (!listr_utf8_get_char (ptr, &dummy))
+		if (!lisys_utf8_get_char (ptr, &dummy))
 			return 0;
 	}
 
@@ -175,12 +172,11 @@ listr_utf8_get_valid (const char* self)
 
 /**
  * \brief Converts an UTF-8 encoded string to wide characters.
- *
  * \param self String.
  * \return Wide string or NULL on error.
  */
-wchar_t*
-listr_utf8_to_wchar (const char* self)
+wchar_t* lisys_utf8_to_wchar (
+	const char* self)
 {
 	int i = 0;
 	int length;
@@ -188,7 +184,7 @@ listr_utf8_to_wchar (const char* self)
 	wchar_t* result;
 
 	/* Get length. */
-	length = listr_utf8_get_length (self);
+	length = lisys_utf8_get_length (self);
 	if (length == -1)
 		return NULL;
 
@@ -200,8 +196,8 @@ listr_utf8_to_wchar (const char* self)
 	/* Actual conversion. */
 	for (ptr = self, i = 0 ; i < length ; i++)
 	{
-		listr_utf8_get_char (ptr, result + i);
-		ptr = listr_utf8_get_next (ptr);
+		lisys_utf8_get_char (ptr, result + i);
+		ptr = lisys_utf8_get_next (ptr);
 	}
 	result[length] = L'\0';
 
@@ -216,8 +212,8 @@ listr_utf8_to_wchar (const char* self)
  * \param self Wide character.
  * \return New string or NULL.
  */
-char*
-listr_wchar_to_utf8 (wchar_t self)
+char* lisys_wchar_to_utf8 (
+	wchar_t self)
 {
 	int i;
 	int first;

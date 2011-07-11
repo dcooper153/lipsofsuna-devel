@@ -22,7 +22,7 @@
  * @{
  */
 
-#include <lipsofsuna/string.h>
+#include "lipsofsuna/system.h"
 #include "model-animation.h"
 
 #define TIMESCALE 0.02f

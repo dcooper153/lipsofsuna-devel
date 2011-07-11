@@ -15,9 +15,31 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_STRING_H__
-#define __LIPS_STRING_H__
+#ifndef __SYSTEM_UTF8_H__
+#define __SYSTEM_UTF8_H__
 
-#include "string/string-generic.h"
+#include <string.h>
+#include <wchar.h>
+#include <wctype.h>
+#include "system-compiler.h"
+
+LIAPICALL (int, lisys_utf8_get_char, (
+	const char* self,
+	wchar_t*    result));
+
+LIAPICALL (int, lisys_utf8_get_length, (
+	const char* self));
+
+LIAPICALL (char*, lisys_utf8_get_next, (
+	const char* self));
+
+LIAPICALL (int, lisys_utf8_get_valid, (
+	const char* self));
+
+LIAPICALL (wchar_t*, lisys_utf8_to_wchar, (
+	const char* self));
+
+LIAPICALL (char*, lisys_wchar_to_utf8, (
+	wchar_t self));
 
 #endif

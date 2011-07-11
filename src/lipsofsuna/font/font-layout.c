@@ -22,9 +22,8 @@
  * @{
  */
 
-#include <wctype.h>
-#include <lipsofsuna/render.h>
-#include <lipsofsuna/string.h>
+#include "lipsofsuna/render.h"
+#include "lipsofsuna/system.h"
 #include "font-layout.h"
 
 #define LIFNT_TEXT_DEFAULT_CAPACITY 32
@@ -96,7 +95,7 @@ lifnt_layout_append_string (LIFntLayout* self,
 	LIFntLayoutGlyph* glyph;
 
 	/* Convert to wide characters. */
-	wstr = listr_utf8_to_wchar (string);
+	wstr = lisys_utf8_to_wchar (string);
 	if (wstr == NULL)
 		return 0;
 	length = wcslen (wstr);

@@ -18,11 +18,8 @@
 #ifndef __SYSTEM_MEMORY_H__
 #define __SYSTEM_MEMORY_H__
 
+#include <stdlib.h>
 #include "system-compiler.h"
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 LIAPICALL (void*, lisys_calloc, (
 	size_t num,
@@ -37,9 +34,5 @@ LIAPICALL (void*, lisys_realloc, (
 
 LIAPICALL (void, lisys_free, (
 	void* mem));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

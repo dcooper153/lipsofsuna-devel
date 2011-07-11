@@ -23,8 +23,8 @@
  */
 
 #include "lipsofsuna/archive.h"
-#include "lipsofsuna/string.h"
 #include "lipsofsuna/script.h"
+#include "lipsofsuna/system.h"
 #include "script-private.h"
 
 static void private_read (
@@ -186,7 +186,7 @@ static void private_read (
 		{
 			if (liarc_reader_get_text (self->reader, "", &tmp.str))
 			{
-				ok = listr_utf8_get_valid (tmp.str);
+				ok = lisys_utf8_get_valid (tmp.str);
 				lisys_free (tmp.str);
 			}
 			else
