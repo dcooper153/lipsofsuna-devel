@@ -152,7 +152,7 @@ static void Scene_render (LIScrArgs* args)
 				lua_pop (args->lua, 2);
 				continue;
 			}
-			shader = listr_dup (lua_tostring (args->lua, -1));
+			shader = lisys_string_dup (lua_tostring (args->lua, -1));
 			lua_pop (args->lua, 1);
 
 			/* Get mipmapping. */

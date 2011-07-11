@@ -68,7 +68,7 @@ LIMdlNode* limdl_node_copy (
 	/* Copy name. */
 	if (node->name != NULL)
 	{
-		self->name = listr_dup (node->name);
+		self->name = lisys_string_dup (node->name);
 		if (self->name == NULL)
 			goto error;
 	}

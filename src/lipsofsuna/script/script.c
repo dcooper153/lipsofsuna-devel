@@ -187,7 +187,7 @@ int liscr_script_load (
 		lisys_free (inc2);
 		return 0;
 	}
-	inc = listr_format ("%s;%s", inc1, inc2);
+	inc = lisys_string_format ("%s;%s", inc1, inc2);
 	lisys_free (inc1);
 	lisys_free (inc2);
 	if (inc == NULL)

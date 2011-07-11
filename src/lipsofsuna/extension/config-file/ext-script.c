@@ -218,7 +218,7 @@ static void ConfigFile_save (LIScrArgs* args)
 			}
 			line_arr = tmp;
 		}
-		line = listr_format ("%s %s\n", iter.key, (char*) iter.value);
+		line = lisys_string_format ("%s %s\n", iter.key, (char*) iter.value);
 		if (line == NULL)
 		{
 			error = 1;
@@ -282,7 +282,7 @@ static void ConfigFile_set (LIScrArgs* args)
 	/* Add the new value. */
 	if (value != NULL)
 	{
-		tmp = listr_dup (value);
+		tmp = lisys_string_dup (value);
 		if (tmp == NULL)
 			return;
 		if (!lialg_strdic_insert (self->dict, key, tmp))

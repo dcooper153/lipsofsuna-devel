@@ -153,12 +153,12 @@ static int private_init (
 	char* file;
 
 	/* Allocate name. */
-	self->name = listr_dup (name);
+	self->name = lisys_string_dup (name);
 	if (self->name == NULL)
 		return 0;
 
 	/* Allocate path. */
-	file = listr_concat (name, ".dds");
+	file = lisys_string_concat (name, ".dds");
 	if (file == NULL)
 		return 0;
 	self->path = lipth_paths_get_graphics (self->render->paths, file);

@@ -146,7 +146,7 @@ LIAlgStrdicNode* lialg_strdic_insert (
 	node = (LIAlgStrdicNode*) lisys_malloc (sizeof (LIAlgStrdicNode));
 	if (node == NULL)
 		return NULL;
-	node->key = listr_dup (key);
+	node->key = lisys_string_dup (key);
 	if (node->key == NULL)
 	{
 		lisys_free (node);

@@ -45,7 +45,7 @@ LIRenShader32* liren_shader32_new (
 	if (self == NULL)
 		return NULL;
 	self->render = render;
-	self->name = listr_dup (name);
+	self->name = lisys_string_dup (name);
 	if (self->name == NULL)
 	{
 		liren_shader32_free (self);
@@ -124,7 +124,7 @@ int liren_shader32_compile (
 	int ret;
 	char* name;
 
-	name = listr_format ("%s[%d]", self->name, pass);
+	name = lisys_string_format ("%s[%d]", self->name, pass);
 	if (name == NULL)
 		return 0;
 	liren_program32_set_alpha_to_coverage (self->passes + pass, alpha_to_coverage);

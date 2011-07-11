@@ -138,25 +138,25 @@ int liren_program32_compile (
 	if (self->reload_name != name)
 	{
 		lisys_free (self->reload_name);
-		self->reload_name = listr_dup (name);
+		self->reload_name = lisys_string_dup (name);
 	}
 	if (self->reload_vertex != vertex)
 	{
 		lisys_free (self->reload_vertex);
-		self->reload_vertex = listr_dup (vertex);
+		self->reload_vertex = lisys_string_dup (vertex);
 	}
 	if (self->reload_geometry != geometry)
 	{
 		lisys_free (self->reload_geometry);
 		if (geometry != NULL)
-			self->reload_geometry = listr_dup (geometry);
+			self->reload_geometry = lisys_string_dup (geometry);
 		else
 			self->reload_geometry = NULL;
 	}
 	if (self->reload_fragment != fragment)
 	{
 		lisys_free (self->reload_fragment);
-		self->reload_fragment = listr_dup (fragment);
+		self->reload_fragment = lisys_string_dup (fragment);
 	}
 
 	return 1;

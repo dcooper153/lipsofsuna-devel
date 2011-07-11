@@ -125,7 +125,7 @@ LIWdgElement* liwdg_element_new_text (
 	if (self == NULL)
 		return 0;
 	self->font = font;
-	self->text = listr_dup (text);
+	self->text = lisys_string_dup (text);
 	if (self->text == NULL)
 	{
 		lisys_free (self);

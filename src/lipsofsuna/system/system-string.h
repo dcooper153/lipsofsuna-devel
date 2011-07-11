@@ -20,6 +20,27 @@
 
 #include "system-compiler.h"
 
+LIAPICALL (char*, lisys_string_dup, (
+	const char* self));
+
+LIAPICALL (char*, lisys_string_dupn, (
+	const char* self,
+	int         count));
+
+LIAPICALL (char*, lisys_string_concat, (
+	const char* self,
+	const char* string));
+
+LIAPICALL (char*, lisys_string_format, (
+	const char* format,
+	            ...)) LISYS_ATTR_FORMAT(1, 2);
+
+LIAPICALL (int, lisys_string_split, (
+	const char* self,
+	char        separator,
+	char***     result,
+	int*        resultn));
+
 LIAPICALL (char*, lisys_string_convert_sys_to_utf8, (
 	const char* str));
 

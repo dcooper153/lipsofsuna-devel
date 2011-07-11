@@ -116,7 +116,7 @@ static int private_read_v1 (
 	self->frame_start = tmp[0];
 	self->frame_end_emit = tmp[1];
 	self->frame_end = tmp[2];
-	self->shader = listr_dup ("particle");
+	self->shader = lisys_string_dup ("particle");
 	if (self->shader == NULL)
 		return 0;
 

@@ -34,7 +34,7 @@
 int
 limdl_material_init (LIMdlMaterial* self)
 {
-	self->shader = listr_dup ("default");
+	self->shader = lisys_string_dup ("default");
 	if (self->shader == NULL)
 		return 0;
 	self->flags = 0;
@@ -73,7 +73,7 @@ limdl_material_init_copy (LIMdlMaterial*       self,
 	*self = *src;
 	if (src->shader != NULL)
 	{
-		self->shader = listr_dup (src->shader);
+		self->shader = lisys_string_dup (src->shader);
 		if (self->shader == NULL)
 			return 0;
 	}
@@ -88,7 +88,7 @@ limdl_material_init_copy (LIMdlMaterial*       self,
 		memcpy (self->textures.array, src->textures.array, src->textures.count * sizeof (LIMdlTexture));
 		for (i = 0 ; i < src->textures.count ; i++)
 		{
-			self->textures.array[i].string = listr_dup (src->textures.array[i].string);
+			self->textures.array[i].string = lisys_string_dup (src->textures.array[i].string);
 			if (self->textures.array[i].string == NULL)
 			{
 				for (i-- ; i >= 0 ; i--)
@@ -410,7 +410,7 @@ int limdl_material_set_shader (
 {
 	char* tmp;
 
-	tmp = listr_dup (value);
+	tmp = lisys_string_dup (value);
 	if (tmp == NULL)
 		return 0;
 	lisys_free (self->shader);
@@ -452,7 +452,7 @@ limdl_material_set_texture (LIMdlMaterial* self,
 	lisys_assert (unit >= 0);
 	lisys_assert (unit < self->textures.count);
 
-	dup = listr_dup (name);
+	dup = lisys_string_dup (name);
 	if (dup == NULL)
 		return 0;
 	lisys_free (self->textures.array[unit].string);

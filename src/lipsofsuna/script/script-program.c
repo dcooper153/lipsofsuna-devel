@@ -41,11 +41,11 @@ static void Program_launch_mod (LIScrArgs* args)
 	if (liscr_args_gets_string (args, "name", &name) ||
 	    liscr_args_geti_string (args, 0, &name))
 	{
-		program->launch_name = listr_dup (name);
+		program->launch_name = lisys_string_dup (name);
 		if (liscr_args_gets_string (args, "args", &name) ||
 		    liscr_args_geti_string (args, 1, &name))
 		{
-			program->launch_args = listr_dup (name);
+			program->launch_args = lisys_string_dup (name);
 		}
 	}
 }

@@ -82,7 +82,7 @@ int liren_particles32_init (
 			dstsystem->frame_end_emit = srcsystem->frame_end_emit;
 			dstsystem->particle_start = self->particles.count;
 			dstsystem->particle_size = srcsystem->particle_size;
-			dstsystem->shader = listr_dup (srcsystem->shader);
+			dstsystem->shader = lisys_string_dup (srcsystem->shader);
 			if (dstsystem->shader == NULL)
 			{
 				liren_particles32_clear (self);

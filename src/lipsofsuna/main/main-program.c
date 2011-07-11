@@ -69,7 +69,7 @@ LIMaiProgram* limai_program_new (
 	self = lisys_calloc (1, sizeof (LIMaiProgram));
 	if (self == NULL)
 		return NULL;
-	self->args = listr_dup ((args != NULL)? args : "");
+	self->args = lisys_string_dup ((args != NULL)? args : "");
 	if (self->args == NULL)
 	{
 		lisys_free (self);
@@ -363,7 +363,7 @@ int limai_program_insert_extension (
 
 	/* Determine extension info struct name. We restrict the
 	 * name of the extension to [a-z_] for security reasons. */
-	ident = listr_format ("liext_%s_info", name);
+	ident = lisys_string_format ("liext_%s_info", name);
 	if (ident == NULL)
 		return 0;
 	for (ptr = ident ; *ptr != '\0' ; ptr++)

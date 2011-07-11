@@ -85,7 +85,7 @@ LISndSample* lisnd_sample_new (
 		return NULL;
 
 	/* Store the filename. */
-	self->file = listr_dup (file);
+	self->file = lisys_string_dup (file);
 	if (self->file == NULL)
 	{
 		lisnd_sample_free (self);

@@ -44,7 +44,7 @@ LIRenShader21* liren_shader21_new (
 	if (self == NULL)
 		return NULL;
 	self->render = render;
-	self->name = listr_dup (name);
+	self->name = lisys_string_dup (name);
 	if (self->name == NULL)
 	{
 		liren_shader21_free (self);

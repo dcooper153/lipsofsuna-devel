@@ -72,7 +72,7 @@ LIPhyObject* liphy_object_new (
 	self->config.character_step = 0.35;
 	self->config.collision_group = LIPHY_DEFAULT_COLLISION_GROUP;
 	self->config.collision_mask = LIPHY_DEFAULT_COLLISION_MASK;
-	self->shape_name = listr_dup ("default");
+	self->shape_name = lisys_string_dup ("default");
 	if (self->shape_name == NULL)
 	{
 		liphy_object_free (self);
@@ -803,7 +803,7 @@ void liphy_object_set_shape (
 
 	if (!strcmp (self->shape_name, value))
 		return;
-	tmp = listr_dup (value);
+	tmp = lisys_string_dup (value);
 	if (tmp != NULL)
 	{
 		lisys_free (self->shape_name);

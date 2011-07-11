@@ -46,7 +46,7 @@ limdl_texture_set_string (LIMdlTexture* self,
 {
 	char* tmp;
 
-	tmp = listr_dup (value);
+	tmp = lisys_string_dup (value);
 	if (tmp == NULL)
 		return 0;
 	lisys_free (self->string);

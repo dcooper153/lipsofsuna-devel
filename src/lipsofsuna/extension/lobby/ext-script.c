@@ -65,7 +65,7 @@ static void Lobby_download_server_list (LIScrArgs* args)
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 
 	/* Format the script URL. */
-	url = listr_concat (master, "/lossrvapi.php");
+	url = lisys_string_concat (master, "/lossrvapi.php");
 	if (url == NULL)
 		return;
 
@@ -148,7 +148,7 @@ static void Lobby_upload_server_info (LIScrArgs* args)
 	port = LIMAT_CLAMP (port, 1, 65535);
 
 	/* Format the script URL. */
-	url = listr_concat (master, "/lossrvapi.php");
+	url = lisys_string_concat (master, "/lossrvapi.php");
 	if (url == NULL)
 		return;
 
@@ -156,7 +156,7 @@ static void Lobby_upload_server_info (LIScrArgs* args)
 	curl = curl_easy_init();
 	if (curl != NULL)
 	{
-		decoded = listr_format ("u=%d|%d|%s|%s", port, players, name, desc);
+		decoded = lisys_string_format ("u=%d|%d|%s|%s", port, players, name, desc);
 		curl_easy_setopt (curl, CURLOPT_URL, url);
 		curl_easy_setopt (curl, CURLOPT_POSTFIELDS, decoded);
 		curl_easy_perform (curl);

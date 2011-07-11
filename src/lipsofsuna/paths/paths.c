@@ -46,14 +46,14 @@ LIPthPaths* lipth_paths_new (
 		return NULL;
 
 	/* Set module name. */
-	self->module_name = listr_dup (name);
+	self->module_name = lisys_string_dup (name);
 	if (self->module_name == NULL)
 		goto error;
 
 	/* Set root directory. */
 	if (path != NULL)
 	{
-		self->root = listr_dup (path);
+		self->root = lisys_string_dup (path);
 		if (self->root == NULL)
 			goto error;
 	}
@@ -323,7 +323,7 @@ char* lipth_paths_get_root ()
 #ifdef LI_RELATIVE_PATHS
 	return lisys_relative_exedir ();
 #else
-	return listr_dup (LIDATADIR);
+	return lisys_string_dup (LIDATADIR);
 #endif
 }
 

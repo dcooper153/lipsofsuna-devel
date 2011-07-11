@@ -81,7 +81,7 @@ LIFntFont* liwdg_styles_load_font (
 		return font;
 
 	/* Load font. */
-	file_ = listr_concat (file, ".ttf");
+	file_ = lisys_string_concat (file, ".ttf");
 	if (file == NULL)
 		return NULL;
 	path = lipth_paths_get_font (self->paths, file_);

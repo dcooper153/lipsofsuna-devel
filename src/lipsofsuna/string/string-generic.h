@@ -22,27 +22,6 @@
 #include <wchar.h>
 #include <lipsofsuna/system.h>
 
-LIAPICALL (char*, listr_dup, (
-	const char* self));
-
-LIAPICALL (char*, listr_dupn, (
-	const char* self,
-	int         count));
-
-LIAPICALL (char*, listr_concat, (
-	const char* self,
-	const char* string));
-
-LIAPICALL (char*, listr_format, (
-	const char* format,
-	            ...)) LISYS_ATTR_FORMAT(1, 2);
-
-LIAPICALL (int, listr_split, (
-	const char* self,
-	char        separator,
-	char***     result,
-	int*        resultn));
-
 LIAPICALL (int, listr_utf8_get_char, (
 	const char* self,
 	wchar_t*    result));

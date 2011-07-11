@@ -310,8 +310,8 @@ int limdl_builder_insert_weightgroup (
 
 	/* Copy weight group. */
 	tmp = self->model->weightgroups.array + self->model->weightgroups.count;
-	tmp->name = listr_dup (name);
-	tmp->bone = listr_dup (bone);
+	tmp->name = lisys_string_dup (name);
+	tmp->bone = lisys_string_dup (bone);
 	if (tmp->name == NULL || tmp->bone == NULL)
 	{
 		lisys_free (tmp->name);

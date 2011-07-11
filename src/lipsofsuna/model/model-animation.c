@@ -55,7 +55,7 @@ LIMdlAnimation* limdl_animation_new_copy (
 	self->blendin = anim->blendin;
 	self->blendout = anim->blendout;
 	if (anim->name != NULL)
-		self->name = listr_dup (anim->name);
+		self->name = lisys_string_dup (anim->name);
 
 	/* Copy channels. */
 	if (anim->channels.count)
@@ -69,7 +69,7 @@ LIMdlAnimation* limdl_animation_new_copy (
 		self->channels.count = anim->channels.count;
 		for (i = 0 ; i < self->channels.count ; i++)
 		{
-			self->channels.array[i] = listr_dup (anim->channels.array[i]);
+			self->channels.array[i] = lisys_string_dup (anim->channels.array[i]);
 			if (self->channels.array[i] == NULL)
 			{
 				limdl_animation_free (self);
@@ -132,7 +132,7 @@ int limdl_animation_insert_channel (
 		return 1;
 
 	/* Duplicate the name. */
-	str = listr_dup (name);
+	str = lisys_string_dup (name);
 	if (str == NULL)
 		return 0;
 

@@ -45,14 +45,14 @@ static int private_parse_arguments (
 		else if (*args == NULL)
 		{
 			/* Copy the first switch to the argument list. */
-			*args = listr_dup (argv[i]);
+			*args = lisys_string_dup (argv[i]);
 			if (*args == NULL)
 				return 0;
 		}
 		else
 		{
 			/* Append the remaining switches to the argument list. */
-			tmp = listr_format ("%s %s", *args, argv[i]);
+			tmp = lisys_string_format ("%s %s", *args, argv[i]);
 			if (tmp == NULL)
 			{
 				lisys_free (*args);

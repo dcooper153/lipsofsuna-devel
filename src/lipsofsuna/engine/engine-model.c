@@ -170,7 +170,7 @@ int lieng_model_load (
 	LIMdlModel* tmpmdl;
 
 	/* Allocate path. */
-	file = listr_concat (name, ".lmdl");
+	file = lisys_string_concat (name, ".lmdl");
 	if (name == NULL)
 		return 0;
 	path = lipth_paths_get_graphics (self->engine->paths, file);

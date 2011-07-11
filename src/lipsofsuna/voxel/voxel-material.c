@@ -42,7 +42,7 @@ LIVoxMaterial* livox_material_new ()
 	self->type = LIVOX_MATERIAL_TYPE_CUBE;
 
 	/* Allocate name. */
-	self->name = listr_dup ("");
+	self->name = lisys_string_dup ("");
 	if (self->name == NULL)
 	{
 		livox_material_free (self);
@@ -84,7 +84,7 @@ LIVoxMaterial* livox_material_new_copy (
 	self->texture_scale = src->texture_scale;
 
 	/* Copy name. */
-	self->name = listr_dup (src->name);
+	self->name = lisys_string_dup (src->name);
 	if (self->name == NULL)
 	{
 		livox_material_free (self);
@@ -119,7 +119,7 @@ int livox_material_set_name (
 {
 	char* tmp;
 
-	tmp = listr_dup (value);
+	tmp = lisys_string_dup (value);
 	if (tmp == NULL)
 		return 0;
 	lisys_free (self->name);

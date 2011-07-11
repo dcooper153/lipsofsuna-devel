@@ -116,7 +116,7 @@ static void Client_screenshot (LIScrArgs* args)
 
 	/* Construct file path. */
 	home = lisys_paths_get_home ();
-	file = listr_format ("screenshot-%d.bmp", (int) time (NULL));
+	file = lisys_string_format ("screenshot-%d.bmp", (int) time (NULL));
 	if (home == NULL || file == NULL)
 	{
 		SDL_FreeSurface (surface);
