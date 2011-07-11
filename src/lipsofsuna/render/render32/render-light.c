@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenLight32 Light
+ * \addtogroup LIRenLight32 Light32
  * @{
  */
 

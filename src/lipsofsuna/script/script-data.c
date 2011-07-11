@@ -35,10 +35,7 @@ static int private_gc (
 /**
  * \brief Allocates a script userdata object.
  *
- * The created userdata has one initial reference to avoid garbage collection
- * when it's still being initialized. If you intend to give the control of the
- * variable to the script, remember to call #liscr_data_unref after pushing the
- * variable to the stack as return value.
+ * The created userdata is pushed to the top of the Lua stack.
  *
  * \param script Script.
  * \param lua Lua state whose stack will contain the userdata.

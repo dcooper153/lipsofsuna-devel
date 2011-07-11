@@ -332,7 +332,7 @@ livox_sector_get_empty (const LIVoxSector* self)
 
 /**
  * \brief Gets the memory used by the sector.
- * \param sector Sector.
+ * \param self Sector.
  * \return Memory used in bytes.
  */
 int livox_sector_get_memory (const LIVoxSector* self)

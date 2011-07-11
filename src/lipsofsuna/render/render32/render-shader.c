@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenShader32 Shader
+ * \addtogroup LIRenShader32 Shader32
  * @{
  */
 

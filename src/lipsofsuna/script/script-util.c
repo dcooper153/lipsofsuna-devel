@@ -102,7 +102,7 @@ LIScrData* liscr_isdata (
  *
  * \param lua Lua state.
  * \param object Pointer to script userdata.
- * \param return Nonzero if succeded.
+ * \return Nonzero if succeded.
  */
 int liscr_pushdata (
 	lua_State* lua,

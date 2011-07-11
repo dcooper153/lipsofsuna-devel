@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIRen Render
  * @{
- * \addtogroup LIRenError Error
+ * \addtogroup LIRenError Error32
  * @{
  */
 
