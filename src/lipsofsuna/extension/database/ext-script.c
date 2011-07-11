@@ -45,6 +45,7 @@ static void Database_new (LIScrArgs* args)
 {
 	int ok;
 	char* path;
+	char* path1;
 	const char* ptr;
 	const char* name;
 	sqlite3* sql;
@@ -74,12 +75,22 @@ static void Database_new (LIScrArgs* args)
 		}
 	}
 
-	/* Format path. */
+	/* Format the path. */
 	path = lipth_paths_get_sql (module->program->paths, name);
 	if (path == NULL)
 	{
 		lisys_error_report ();
 		return;
+	}
+
+	/* Convert the path to UTF-8. */
+	/* Unlike other file functions we use, SQLite requires the filename to
+	   be in UTF-8 instead of the system locale. */
+	path1 = lisys_string_convert_sys_to_utf8 (path);
+	if (path1 != NULL)
+	{
+		lisys_free (path);
+		path = path1;
 	}
 
 	/* Open database. */

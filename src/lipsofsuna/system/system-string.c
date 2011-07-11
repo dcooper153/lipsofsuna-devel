@@ -18,48 +18,54 @@
 /**
  * \addtogroup LISys System
  * @{
- * \addtogroup LISysSystem System
+ * \addtogroup LISysString String
  * @{
  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-#include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#ifdef HAVE_WINDOWS_H
-#define _WIN32_IE 0x0400
-#include <windows.h>
-#include <shlobj.h>
-#endif
-#include "system.h"
-#include "system-error.h"
-#include "system-path.h"
+#include <iconv.h>
+#include "system-memory.h"
 
-void lisys_assert_fail (
-	const char* asrt,
-	const char* file,
-	int         line,
-	const char* func)
+char* lisys_string_convert_sys_to_utf8 (
+	const char* str)
 {
-	fprintf (stderr, "%s:%d: %s: Assertion `%s' failed.\n", file, line, func, asrt);
-	abort ();
-}
+	char* tmp;
+	char* inbuf;
+	char* outbuf;
+	size_t n;
+	size_t ninbytes;
+	size_t noutbytes;
+	iconv_t cd;
 
-/**
- * \brief Gets the current time.
- *
- * \param t Return location for the time or NULL.
- * \return Time.
- */
-time_t lisys_time (
-	time_t* t)
-{
-	return time (t);
+	/* Initialize buffers. */
+	ninbytes = strlen (str);
+	noutbytes = 4 * (ninbytes + 10);
+	tmp = lisys_calloc (noutbytes, sizeof (char));
+	if (tmp == NULL)
+		return NULL;
+	inbuf = (char*) str;
+	outbuf = tmp;
+
+	/* Initialize iconv. */
+	cd = iconv_open ("UTF-8", "char");
+	if (cd == (iconv_t) -1)
+		cd = iconv_open ("UTF-8", "");
+	if (cd == (iconv_t) -1)
+	{
+		lisys_free (tmp);
+		return NULL;
+	}
+
+	/* Perform the conversion. */
+	n = iconv (cd, &inbuf, &ninbytes, &outbuf, &noutbytes);
+	iconv_close (cd);
+	if (n == (size_t) -1)
+	{
+		lisys_free (tmp);
+		return NULL;
+	}
+
+	return tmp;
 }
 
 /** @} */

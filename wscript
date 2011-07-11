@@ -74,11 +74,13 @@ def configure(ctx):
 	ctx.check(header_name='time.h', define_name='HAVE_TIME_H')
 	ctx.check(header_name='unistd.h', define_name='HAVE_UNISTD_H')
 	ctx.check(header_name='windows.h', define_name='HAVE_WINDOWS_H', mandatory=False)
+	ctx.check(header_name='iconv.h', define_name='HAVE_ICONV_H')
 	ctx.check_cc(msg='Checking for function fork', header_name='unistd.h', function_name='fork', define_name='HAVE_FORK', mandatory=False)
 	ctx.check_cc(msg='Checking for function usleep', header_name='unistd.h', function_name='usleep', define_name='HAVE_USLEEP', mandatory=False)
 	ctx.check_cc(lib='dl', uselib_store='CORE', mandatory=False)
 	ctx.check_cc(lib='m', uselib_store='CORE', mandatory=False)
 	ctx.check_cc(lib='pthread', uselib_store='THREAD', mandatory=False)
+	ctx.check_cc(lib='iconv', uselib_store='CORE', mandatory=False) # BSD
 
 	# zlib
 	if not ctx.check_cc(lib='z', mandatory=False, uselib_store='ZLIB'):

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -40,24 +40,13 @@
 #define lisys_assert(exp) ((exp)? (void) 0 : lisys_assert_fail (#exp, __FILE__, __LINE__, __func__))
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 LIAPICALL (void, lisys_assert_fail, (
 	const char* asrt,
 	const char* file,
 	int         line,
 	const char* func));
 
-LIAPICALL (time_t, lisys_time, (time_t* t));
-LIAPICALL (char*, lisys_system_get_path_home, ());
-LIAPICALL (char*, lisys_system_get_path_data_home, ());
-LIAPICALL (char*, lisys_system_get_path_config_home, ());
-LIAPICALL (char*, lisys_system_get_path_cache_home, ());
-
-#ifdef __cplusplus
-}
-#endif
+LIAPICALL (time_t, lisys_time, (
+	time_t* t));
 
 #endif

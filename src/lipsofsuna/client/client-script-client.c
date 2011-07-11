@@ -115,7 +115,7 @@ static void Client_screenshot (LIScrArgs* args)
 	}
 
 	/* Construct file path. */
-	home = lisys_system_get_path_home ();
+	home = lisys_paths_get_home ();
 	file = listr_format ("screenshot-%d.bmp", (int) time (NULL));
 	if (home == NULL || file == NULL)
 	{

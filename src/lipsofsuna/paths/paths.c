@@ -77,7 +77,7 @@ LIPthPaths* lipth_paths_new (
 		goto error;
 
 	/* Get data override directory. */
-	tmp = lisys_system_get_path_data_home ();
+	tmp = lisys_paths_get_data_home ();
 	if (tmp == NULL)
 		goto error;
 	self->override_data = lisys_path_concat (tmp, "lipsofsuna", "data", name, NULL);
