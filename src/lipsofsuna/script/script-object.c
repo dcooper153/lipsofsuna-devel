@@ -32,7 +32,6 @@ static void Object_find (LIScrArgs* args)
 	int id;
 	float radius = 32.0f;
 	LIAlgU32dicIter iter1;
-	LIEngObjectIter iter;
 	LIEngObject* object;
 	LIEngSector* sector;
 	LIMatVector center;
@@ -47,11 +46,12 @@ static void Object_find (LIScrArgs* args)
 	{
 		liscr_args_gets_float (args, "radius", &radius);
 		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-		LIENG_FOREACH_OBJECT (iter, program->engine, &center, radius)
+		LIALG_U32DIC_FOREACH (iter1, program->engine->objects)
 		{
-			diff = limat_vector_subtract (center, iter.object->transform.position);
+			object = iter1.value;
+			diff = limat_vector_subtract (center, object->transform.position);
 			if (limat_vector_get_length (diff) < radius)
-				liscr_args_seti_data (args, iter.object->script);
+				liscr_args_seti_data (args, object->script);
 		}
 	}
 

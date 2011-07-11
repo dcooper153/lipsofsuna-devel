@@ -27,6 +27,5 @@ typedef struct _LIEngObject LIEngObject;
 typedef struct _LIEngRender LIEngRender;
 typedef struct _LIEngResources LIEngResources;
 typedef struct _LIEngSector LIEngSector;
-typedef struct _LIEngSelection LIEngSelection;
 
 #endif

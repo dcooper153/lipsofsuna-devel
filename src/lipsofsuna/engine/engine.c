@@ -24,8 +24,6 @@
 
 #include <stdarg.h>
 #include "engine.h"
-#include "engine-iterator.h"
-#include "engine-selection.h"
 
 static int
 private_init (LIEngEngine* self);

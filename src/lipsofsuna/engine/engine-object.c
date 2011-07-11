@@ -22,9 +22,8 @@
  * @{
  */
 
-#include <lipsofsuna/network.h>
+#include "lipsofsuna/network.h"
 #include "engine-object.h"
-#include "engine-selection.h"
 
 #define SCRIPT_POINTER_MODEL ((void*) -1)
 #define SMOOTHING_TIMESTEP (1.0f / 60.0f)
