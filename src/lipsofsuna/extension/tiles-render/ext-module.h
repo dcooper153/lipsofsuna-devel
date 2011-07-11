@@ -45,8 +45,8 @@ struct _LIExtModule
 	LIVoxManager* voxels;
 	struct
 	{
-		LIThrAsyncCall* worker;
-		LIThrMutex* mutex;
+		LISysAsyncCall* worker;
+		LISysMutex* mutex;
 		LIExtBuildTask* pending;
 		LIExtBuildTask* completed;
 	} tasks;

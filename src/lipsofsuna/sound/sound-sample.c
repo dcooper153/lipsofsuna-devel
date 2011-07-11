@@ -58,7 +58,7 @@ static void private_load_raw (
 	int          freq);
 
 static void private_worker_thread (
-	LIThrAsyncCall* call,
+	LISysAsyncCall* call,
 	void*           data);
 
 /*****************************************************************************/
@@ -100,7 +100,7 @@ LISndSample* lisnd_sample_new (
 	}
 
 	/* Start loading the sample. */
-	self->worker = lithr_async_call_new (private_worker_thread, NULL, self);
+	self->worker = lisys_async_call_new (private_worker_thread, NULL, self);
 	if (self->worker == NULL)
 	{
 		lisnd_sample_free (self);
@@ -120,8 +120,8 @@ void lisnd_sample_free (
 	/* Stop the worker thread. */
 	if (self->worker != NULL)
 	{
-		lithr_async_call_stop (self->worker);
-		lithr_async_call_free (self->worker);
+		lisys_async_call_stop (self->worker);
+		lisys_async_call_free (self->worker);
 	}
 
 	alDeleteBuffers (2, self->buffers);
@@ -375,7 +375,7 @@ static void private_load_raw (
 }
 
 static void private_worker_thread (
-	LIThrAsyncCall* call,
+	LISysAsyncCall* call,
 	void*           data)
 {
 	LISndSample* self = data;

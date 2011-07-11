@@ -15,22 +15,22 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __THREAD_MUTEX_H__
-#define __THREAD_MUTEX_H__
+#ifndef __SYSTEM_MUTEX_H__
+#define __SYSTEM_MUTEX_H__
 
-#include <lipsofsuna/system.h>
+#include "system-memory.h"
 
-typedef struct _LIThrMutex LIThrMutex;
+typedef struct _LISysMutex LISysMutex;
 
-LIAPICALL (LIThrMutex*, lithr_mutex_new, ());
+LIAPICALL (LISysMutex*, lisys_mutex_new, ());
 
-LIAPICALL (void, lithr_mutex_free, (
-	LIThrMutex* self));
+LIAPICALL (void, lisys_mutex_free, (
+	LISysMutex* self));
 
-LIAPICALL (void, lithr_mutex_lock, (
-	LIThrMutex* self));
+LIAPICALL (void, lisys_mutex_lock, (
+	LISysMutex* self));
 
-LIAPICALL (void, lithr_mutex_unlock, (
-	LIThrMutex* self));
+LIAPICALL (void, lisys_mutex_unlock, (
+	LISysMutex* self));
 
 #endif

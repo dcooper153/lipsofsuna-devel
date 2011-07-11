@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -19,6 +19,7 @@
 #define __LIPS_SYSTEM_H__
 
 #include "system/system.h"
+#include "system/system-async-call.h"
 #include "system/system-compiler.h"
 #include "system/system-directory.h"
 #include "system/system-endian.h"
@@ -28,11 +29,13 @@
 #include "system/system-memory.h"
 #include "system/system-misc.h"
 #include "system/system-module.h"
+#include "system/system-mutex.h"
 #include "system/system-notify.h"
 #include "system/system-path.h"
 #include "system/system-paths.h"
 #include "system/system-relative.h"
 #include "system/system-string.h"
+#include "system/system-thread.h"
 #include "system/system-types.h"
 #include "system/system-user.h"
 #include "system/system-utf8.h"

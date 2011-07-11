@@ -15,11 +15,52 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_THREAD_H__
-#define __LIPS_THREAD_H__
+/**
+ * \addtogroup LISys System
+ * @{
+ * \addtogroup LISysMutex Mutex
+ * @{
+ */
 
-#include "thread/thread.h"
-#include "thread/thread-async-call.h"
-#include "thread/thread-mutex.h"
+#include <pthread.h>
+#include "system-memory.h"
+#include "system-mutex.h"
 
-#endif
+struct _LISysMutex
+{
+	pthread_mutex_t mutex;
+};
+
+LISysMutex* lisys_mutex_new ()
+{
+	LISysMutex* self;
+
+	self = lisys_calloc (1, sizeof (LISysMutex));
+	if (self == NULL)
+		return NULL;
+	pthread_mutex_init (&self->mutex, NULL);
+
+	return self;
+}
+
+void lisys_mutex_free (
+	LISysMutex* self)
+{
+	pthread_mutex_destroy (&self->mutex);
+	lisys_free (self);
+}
+
+void lisys_mutex_lock (
+	LISysMutex* self)
+{
+	pthread_mutex_lock (&self->mutex);
+}
+
+void lisys_mutex_unlock (
+	LISysMutex* self)
+{
+	pthread_mutex_unlock (&self->mutex);
+}
+
+/** @} */
+/** @} */

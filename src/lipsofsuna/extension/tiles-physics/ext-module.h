@@ -19,7 +19,7 @@
 #define __EXT_MODULE_H__
 
 #include "lipsofsuna/extension.h"
-#include "lipsofsuna/thread.h"
+#include "lipsofsuna/system.h"
 #include "lipsofsuna/voxel.h"
 
 typedef struct _LIExtModule LIExtModule;

@@ -16,46 +16,41 @@
  */
 
 /**
- * \addtogroup LIThr Thread
+ * \addtogroup LISys System
  * @{
- * \addtogroup LIThrAsyncCall AsyncCall
+ * \addtogroup LISysThread Thread
  * @{
  */
 
 #include <pthread.h>
-#include <lipsofsuna/system.h>
-#include "thread-async-call.h"
+#include "system-error.h"
+#include "system-memory.h"
+#include "system-thread.h"
 
-struct _LIThrAsyncCall
+struct _LISysThread
 {
 	pthread_t thread;
 	int done;
-	int result;
-	int stop;
-	float progress;
 	void* data;
-	lithrAsyncFunc func;
-	lithrAsyncFunc free;
+	LISysThreadFunc func;
 };
 
-static void*
-private_thread (void* data);
+static void* private_thread (
+	void* data);
 
 /*****************************************************************************/
 
-LIThrAsyncCall*
-lithr_async_call_new (lithrAsyncFunc func,
-                      lithrAsyncFunc freecb,
-                      void*          data)
+LISysThread* lisys_thread_new (
+	LISysThreadFunc func,
+	void*           data)
 {
-	LIThrAsyncCall* self;
+	LISysThread* self;
 
-	self = lisys_calloc (1, sizeof (LIThrAsyncCall));
+	self = lisys_calloc (1, sizeof (LISysThread));
 	if (self == NULL)
 		return NULL;
 	self->data = data;
 	self->func = func;
-	self->free = freecb;
 	if (pthread_create (&self->thread, NULL, private_thread, self) != 0)
 	{
 		lisys_error_set (ENOMEM, "not enough resources to create thread");
@@ -66,70 +61,23 @@ lithr_async_call_new (lithrAsyncFunc func,
 	return self;
 }
 
-void
-lithr_async_call_free (LIThrAsyncCall* self)
+void lisys_thread_free (
+	LISysThread* self)
 {
-	lithr_async_call_join (self);
-	if (self->free != NULL)
-		self->free (self, self->data);
+	lisys_thread_join (self);
 	lisys_free (self);
 }
 
-int
-lithr_async_call_join (LIThrAsyncCall* self)
+void lisys_thread_join (
+	LISysThread* self)
 {
 	pthread_join (self->thread, NULL);
-	return self->result;
 }
 
-void
-lithr_async_call_stop (LIThrAsyncCall* self)
-{
-	self->stop = 1;
-}
-
-int
-lithr_async_call_get_done (LIThrAsyncCall* self)
+int lisys_thread_call_get_done (
+	LISysThread* self)
 {
 	return self->done;
-}
-
-float
-lithr_async_call_get_progress (LIThrAsyncCall* self)
-{
-	return self->progress;
-}
-
-void
-lithr_async_call_set_progress (LIThrAsyncCall* self,
-                               float           value)
-{
-	self->progress = value;
-}
-
-int
-lithr_async_call_get_result (LIThrAsyncCall* self)
-{
-	return self->result;
-}
-
-void
-lithr_async_call_set_result (LIThrAsyncCall* self,
-                             int             value)
-{
-	self->result = value;
-}
-
-int
-lithr_async_call_get_stop (LIThrAsyncCall* self)
-{
-	return self->stop;
-}
-
-void*
-lithr_async_call_get_userdata (LIThrAsyncCall* self)
-{
-	return self->data;
 }
 
 /*****************************************************************************/
@@ -137,7 +85,7 @@ lithr_async_call_get_userdata (LIThrAsyncCall* self)
 static void*
 private_thread (void* data)
 {
-	LIThrAsyncCall* self;
+	LISysThread* self;
 
 	self = data;
 	self->func (self, self->data);

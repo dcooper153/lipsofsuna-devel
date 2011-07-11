@@ -18,8 +18,7 @@
 #ifndef __SOUND_SAMPLE_H__
 #define __SOUND_SAMPLE_H__
 
-#include <lipsofsuna/system.h>
-#include <lipsofsuna/thread.h>
+#include "lipsofsuna/system.h"
 #include "sound-system.h"
 
 typedef struct _LISndSample LISndSample;
@@ -29,7 +28,7 @@ struct _LISndSample
 	int stereo;
 	char* file;
 	ALuint buffers[2];
-	LIThrAsyncCall* worker;
+	LISysAsyncCall* worker;
 };
 
 LIAPICALL (LISndSample*, lisnd_sample_new, (

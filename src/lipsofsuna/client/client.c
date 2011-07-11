@@ -42,7 +42,7 @@ static int private_event (
 	SDL_Event*   event);
 
 static void private_server_main (
-	LIThrThread* thread,
+	LISysThread* thread,
 	void*        data);
 
 static void private_server_shutdown (
@@ -137,7 +137,7 @@ int licli_client_host (
 		return 0;
 
 	/* Create server thread. */
-	self->server_thread = lithr_thread_new (private_server_main, self);
+	self->server_thread = lisys_thread_new (private_server_main, self);
 	if (self->server_thread == NULL)
 	{
 		licli_server_free (self->server);
@@ -314,7 +314,7 @@ static int private_event (
 }
 
 static void private_server_main (
-	LIThrThread* thread,
+	LISysThread* thread,
 	void*        data)
 {
 	LICliClient* self = data;
@@ -339,7 +339,7 @@ static void private_server_shutdown (
 	   exit. This doesn't take long since we asked the server to quit already. */
 	if (self->server_thread != NULL)
 	{
-		lithr_thread_free (self->server_thread);
+		lisys_thread_free (self->server_thread);
 		self->server_thread = NULL;
 		lisys_assert (self->server == NULL);
 	}

@@ -15,52 +15,25 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup LIThr Thread
- * @{
- * \addtogroup LIThrMutex Mutex
- * @{
- */
+#ifndef __SYSTEM_THREAD_H__
+#define __SYSTEM_THREAD_H__
 
-#include <pthread.h>
-#include <lipsofsuna/system.h>
-#include "thread-mutex.h"
+#include "system-compiler.h"
 
-struct _LIThrMutex
-{
-	pthread_mutex_t mutex;
-};
+typedef struct _LISysThread LISysThread;
+typedef void (*LISysThreadFunc)(LISysThread*, void*);
 
-LIThrMutex* lithr_mutex_new ()
-{
-	LIThrMutex* self;
+LIAPICALL (LISysThread*, lisys_thread_new, (
+	LISysThreadFunc func,
+	void*           data));
 
-	self = lisys_calloc (1, sizeof (LIThrMutex));
-	if (self == NULL)
-		return NULL;
-	pthread_mutex_init (&self->mutex, NULL);
+LIAPICALL (void, lisys_thread_free, (
+	LISysThread* self));
 
-	return self;
-}
+LIAPICALL (void, lisys_thread_join, (
+	LISysThread* self));
 
-void lithr_mutex_free (
-	LIThrMutex* self)
-{
-	pthread_mutex_destroy (&self->mutex);
-	lisys_free (self);
-}
+LIAPICALL (int, lisys_thread_get_done, (
+	LISysThread* self));
 
-void lithr_mutex_lock (
-	LIThrMutex* self)
-{
-	pthread_mutex_lock (&self->mutex);
-}
-
-void lithr_mutex_unlock (
-	LIThrMutex* self)
-{
-	pthread_mutex_unlock (&self->mutex);
-}
-
-/** @} */
-/** @} */
+#endif

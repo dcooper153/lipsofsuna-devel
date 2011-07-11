@@ -25,7 +25,7 @@
 #include "lipsofsuna/paths.h"
 #include "lipsofsuna/render.h"
 #include "lipsofsuna/script.h"
-#include "lipsofsuna/thread.h"
+#include "lipsofsuna/system.h"
 #include "lipsofsuna/video.h"
 #include "lipsofsuna/widget.h"
 #include "client-server.h"
@@ -41,7 +41,7 @@ struct _LICliClient
 	LIRenRender* render;
 	LIRenScene* scene;
 	LICliServer* server;
-	LIThrThread* server_thread;
+	LISysThread* server_thread;
 };
 
 LIAPICALL (LICliClient*, licli_client_new, (

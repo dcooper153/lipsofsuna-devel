@@ -42,7 +42,7 @@ static int private_tick (
 	float        secs);
 
 static void private_worker_thread (
-	LIThrAsyncCall* call,
+	LISysAsyncCall* call,
 	void*           data);
 
 /*****************************************************************************/
@@ -65,7 +65,7 @@ LIExtModule* liext_tiles_render_new (
 		return NULL;
 	self->program = program;
 	self->client = limai_program_find_component (program, "client");
-	self->tasks.mutex = lithr_mutex_new ();
+	self->tasks.mutex = lisys_mutex_new ();
 	if (self->tasks.mutex == NULL)
 	{
 		liext_tiles_render_free (self);
@@ -129,11 +129,11 @@ void liext_tiles_render_free (
 	/* Stop the worker thread. */
 	if (self->tasks.worker != NULL)
 	{
-		lithr_async_call_stop (self->tasks.worker);
-		lithr_async_call_free (self->tasks.worker);
+		lisys_async_call_stop (self->tasks.worker);
+		lisys_async_call_free (self->tasks.worker);
 	}
 	if (self->tasks.mutex != NULL)
-		lithr_mutex_free (self->tasks.mutex);
+		lisys_mutex_free (self->tasks.mutex);
 
 	/* Free unhandled build tasks. */
 	for (task = self->tasks.pending ; task != NULL ; task = task_next)
@@ -226,7 +226,7 @@ static int private_block_load (
 	}
 
 	/* Add the task to the pending queue. */
-	lithr_mutex_lock (self->tasks.mutex);
+	lisys_mutex_lock (self->tasks.mutex);
 	if (self->tasks.pending != NULL)
 	{
 		for (ptr = self->tasks.pending ; ptr->next != NULL ; ptr = ptr->next) {}
@@ -234,7 +234,7 @@ static int private_block_load (
 	}
 	else
 		self->tasks.pending = task;
-	lithr_mutex_unlock (self->tasks.mutex);
+	lisys_mutex_unlock (self->tasks.mutex);
 
 	return 1;
 }
@@ -299,10 +299,10 @@ static int private_tick (
 	/* Without this, there'd be major stuttering when multiple blocks are
 	   loaded quickly. That can happen when, for example, the player moves fast,
 	   teleports to a new area, or witnesses a lot of terrain destruction. */
-	lithr_mutex_lock (self->tasks.mutex);
-	if (self->tasks.worker != NULL && lithr_async_call_get_done (self->tasks.worker))
+	lisys_mutex_lock (self->tasks.mutex);
+	if (self->tasks.worker != NULL && lisys_async_call_get_done (self->tasks.worker))
 	{
-		lithr_async_call_free (self->tasks.worker);
+		lisys_async_call_free (self->tasks.worker);
 		self->tasks.worker = NULL;
 	}
 	for (task = self->tasks.completed ; task != NULL ; task = task_next)
@@ -315,8 +315,8 @@ static int private_tick (
 	}
 	self->tasks.completed = NULL;
 	if (self->tasks.worker == NULL && self->tasks.pending != NULL)
-		self->tasks.worker = lithr_async_call_new (private_worker_thread, NULL, self);
-	lithr_mutex_unlock (self->tasks.mutex);
+		self->tasks.worker = lisys_async_call_new (private_worker_thread, NULL, self);
+	lisys_mutex_unlock (self->tasks.mutex);
 
 	/* FIXME: Should be in the tiles module? */
 	livox_manager_update (self->voxels, secs);
@@ -325,29 +325,29 @@ static int private_tick (
 }
 
 static void private_worker_thread (
-	LIThrAsyncCall* call,
+	LISysAsyncCall* call,
 	void*           data)
 {
 	LIExtBuildTask* ptr;
 	LIExtBuildTask* task;
 	LIExtModule* self = data;
 
-	lithr_mutex_lock (self->tasks.mutex);
-	while (!lithr_async_call_get_stop (call))
+	lisys_mutex_lock (self->tasks.mutex);
+	while (!lisys_async_call_get_stop (call))
 	{
 		/* Get the next task. */
 		task = self->tasks.pending;
 		if (task == NULL)
 			break;
 		self->tasks.pending = task->next;
-		lithr_mutex_unlock (self->tasks.mutex);
+		lisys_mutex_unlock (self->tasks.mutex);
 
 		/* Process the task. */
 		livox_builder_preprocess (task->builder);
 		if (!livox_builder_build_model (task->builder, &task->model))
 		{
 			livox_builder_free (task->builder);
-			lithr_mutex_lock (self->tasks.mutex);
+			lisys_mutex_lock (self->tasks.mutex);
 			continue;
 		}
 		livox_builder_free (task->builder);
@@ -355,7 +355,7 @@ static void private_worker_thread (
 		task->next = NULL;
 
 		/* Publish the result. */
-		lithr_mutex_lock (self->tasks.mutex);
+		lisys_mutex_lock (self->tasks.mutex);
 		if (self->tasks.completed != NULL)
 		{
 			for (ptr = self->tasks.completed ; ptr->next != NULL ; ptr = ptr->next) {}
@@ -364,7 +364,7 @@ static void private_worker_thread (
 		else
 			self->tasks.completed = task;
 	}
-	lithr_mutex_unlock (self->tasks.mutex);
+	lisys_mutex_unlock (self->tasks.mutex);
 }
 
 /** @} */
