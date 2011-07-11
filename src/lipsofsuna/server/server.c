@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,12 +22,7 @@
  * @{
  */
 
-#include <lipsofsuna/network.h>
-#include <lipsofsuna/script.h>
-#include <lipsofsuna/string.h>
-#include <lipsofsuna/system.h>
 #include "server.h"
-#include "server-callbacks.h"
 
 /**
  * \brief Creates a new server instance.
@@ -67,22 +62,16 @@ LISerServer* liser_server_new (
 		limai_program_free (self->program);
 		return NULL;
 	}
-	if (!liser_server_init_callbacks_client (self))
-	{
-		liser_server_free (self);
-		return NULL;
-	}
 
 	return self;
 }
 
 /**
  * \brief Frees the server.
- *
  * \param self Server.
  */
-void
-liser_server_free (LISerServer* self)
+void liser_server_free (
+	LISerServer* self)
 {
 	/* Invoke callbacks. */
 	if (self->callbacks != NULL)
