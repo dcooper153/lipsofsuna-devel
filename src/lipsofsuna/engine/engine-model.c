@@ -192,19 +192,6 @@ int lieng_model_load (
 	return 1;
 }
 
-/**
- * \brief Merges the mesh from a model to another.
- * \param self Destination model.
- * \param model Source model.
- * \return Nonzero on success.
- */
-int lieng_model_merge (
-	LIEngModel* self,
-	LIEngModel* model)
-{
-	return limdl_model_merge (self->model, model->model);
-}
-
 /*****************************************************************************/
 
 static void private_changed (

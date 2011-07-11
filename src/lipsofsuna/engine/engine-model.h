@@ -51,8 +51,4 @@ LIAPICALL (int, lieng_model_load, (
 	const char* name,
 	int         mesh));
 
-LIAPICALL (int, lieng_model_merge, (
-	LIEngModel* self,
-	LIEngModel* model));
-
 #endif

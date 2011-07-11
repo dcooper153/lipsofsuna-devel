@@ -148,18 +148,6 @@ static void Model_load (LIScrArgs* args)
 	liscr_args_seti_bool (args, 1);
 }
 
-static void Model_merge (LIScrArgs* args)
-{
-	LIScrData* model;
-
-	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &model) ||
-	    liscr_args_gets_data (args, "model", LISCR_SCRIPT_MODEL, &model))
-	{
-		if (!lieng_model_merge (args->self, model->data))
-			lisys_error_report ();
-	}
-}
-
 /*****************************************************************************/
 
 void liscr_script_model (
@@ -173,7 +161,6 @@ void liscr_script_model (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_center_offset", Model_get_center_offset);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_memory_used", Model_get_memory_used);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_load", Model_load);
-	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_merge", Model_merge);
 }
 
 /** @} */

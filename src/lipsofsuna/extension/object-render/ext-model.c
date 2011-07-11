@@ -253,6 +253,22 @@ static void Model_edit_material (LIScrArgs* args)
 	}
 }
 
+static void Model_merge (LIScrArgs* args)
+{
+	LIScrData* data;
+	LIEngModel* model1;
+	LIEngModel* model2;
+
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &data) ||
+	    liscr_args_gets_data (args, "model", LISCR_SCRIPT_MODEL, &data))
+	{
+		model1 = args->self;
+		model2 = liscr_data_get_data (data);
+		if (!limdl_model_merge (model1->model, model2->model))
+			lisys_error_report ();
+	}
+}
+
 static void Model_morph (LIScrArgs* args)
 {
 	float value = 0.5f;
@@ -304,6 +320,7 @@ void liext_script_render_model (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_add_material", Model_add_material);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_add_triangles", Model_add_triangles);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_edit_material", Model_edit_material);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_merge", Model_merge);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_morph", Model_morph);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_remove_vertices", Model_remove_vertices);
 }
