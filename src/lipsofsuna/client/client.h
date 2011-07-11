@@ -18,17 +18,17 @@
 #ifndef __CLIENT_H__
 #define __CLIENT_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/callback.h>
-#include <lipsofsuna/engine.h>
-#include <lipsofsuna/main.h>
-#include <lipsofsuna/paths.h>
-#include <lipsofsuna/render.h>
-#include <lipsofsuna/script.h>
-#include <lipsofsuna/server.h>
-#include <lipsofsuna/thread.h>
-#include <lipsofsuna/video.h>
-#include <lipsofsuna/widget.h>
+#include "lipsofsuna/algorithm.h"
+#include "lipsofsuna/callback.h"
+#include "lipsofsuna/engine.h"
+#include "lipsofsuna/main.h"
+#include "lipsofsuna/paths.h"
+#include "lipsofsuna/render.h"
+#include "lipsofsuna/script.h"
+#include "lipsofsuna/thread.h"
+#include "lipsofsuna/video.h"
+#include "lipsofsuna/widget.h"
+#include "client-server.h"
 #include "client-types.h"
 #include "client-window.h"
 
@@ -40,7 +40,7 @@ struct _LICliClient
 	LIMaiProgram* program;
 	LIRenRender* render;
 	LIRenScene* scene;
-	LISerServer* server;
+	LICliServer* server;
 	LIThrThread* server_thread;
 };
 

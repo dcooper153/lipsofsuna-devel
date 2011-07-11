@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,9 +15,35 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __LIPS_SERVER_H__
-#define __LIPS_SERVER_H__
+#ifndef __SERVER_H__
+#define __SERVER_H__
 
-#include "server/server.h"
+#include "lipsofsuna/archive.h"
+#include "lipsofsuna/main.h"
+
+typedef struct _LICliServer LICliServer;
+struct _LICliServer
+{
+	/* Server. */
+	LIMaiProgram* program;
+
+	/* Program. */
+	LIAlgSectors* sectors;
+	LICalCallbacks* callbacks;
+	LIEngEngine* engine;
+	LIPthPaths* paths;
+	LIScrScript* script;
+};
+
+LIAPICALL (LICliServer*, licli_server_new, (
+	const char* path,
+	const char* name,
+	const char* args));
+
+LIAPICALL (void, licli_server_free, (
+	LICliServer* self));
+
+LIAPICALL (int, licli_server_main, (
+	LICliServer* self));
 
 #endif

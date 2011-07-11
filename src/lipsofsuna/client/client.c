@@ -138,7 +138,7 @@ int licli_client_host (
 	private_server_shutdown (self);
 
 	/* Create new server. */
-	self->server = liser_server_new (self->program->paths->root, self->program->paths->module_name, args);
+	self->server = licli_server_new (self->program->paths->root, self->program->paths->module_name, args);
 	if (self->server == NULL)
 		return 0;
 
@@ -146,7 +146,7 @@ int licli_client_host (
 	self->server_thread = lithr_thread_new (private_server_main, self);
 	if (self->server_thread == NULL)
 	{
-		liser_server_free (self->server);
+		licli_server_free (self->server);
 		self->server = NULL;
 	}
 
@@ -325,9 +325,9 @@ static void private_server_main (
 {
 	LICliClient* self = data;
 
-	if (!liser_server_main (self->server))
+	if (!licli_server_main (self->server))
 		lisys_error_report ();
-	liser_server_free (self->server);
+	licli_server_free (self->server);
 	self->server = NULL;
 }
 

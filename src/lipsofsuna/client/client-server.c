@@ -16,13 +16,13 @@
  */
 
 /**
- * \addtogroup LISer Server
+ * \addtogroup LICli Client
  * @{
- * \addtogroup LISerServer Server
+ * \addtogroup LICliServer Server
  * @{
  */
 
-#include "server.h"
+#include "client-server.h"
 
 /**
  * \brief Creates a new server instance.
@@ -31,15 +31,15 @@
  * \param args Arguments passed to the program.
  * \return New server or NULL.
  */
-LISerServer* liser_server_new (
+LICliServer* licli_server_new (
 	const char* path,
 	const char* name,
 	const char* args)
 {
-	LISerServer* self;
+	LICliServer* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LISerServer));
+	self = lisys_calloc (1, sizeof (LICliServer));
 	if (self == NULL)
 		return NULL;
 
@@ -70,8 +70,8 @@ LISerServer* liser_server_new (
  * \brief Frees the server.
  * \param self Server.
  */
-void liser_server_free (
-	LISerServer* self)
+void licli_server_free (
+	LICliServer* self)
 {
 	/* Invoke callbacks. */
 	if (self->callbacks != NULL)
@@ -92,8 +92,8 @@ void liser_server_free (
  * \param self Server.
  * \return Nonzero on success.
  */
-int liser_server_main (
-	LISerServer* self)
+int licli_server_main (
+	LICliServer* self)
 {
 	return limai_program_execute_script (self->program, "main.lua");
 }
