@@ -24,7 +24,6 @@
 #include <lipsofsuna/math.h>
 #include <lipsofsuna/model.h>
 #include <lipsofsuna/paths.h>
-#include <lipsofsuna/physics.h>
 #include <lipsofsuna/system.h>
 #include "engine-model.h"
 #include "engine-object.h"
@@ -35,19 +34,12 @@
 
 struct _LIEngEngine
 {
-	void* userdata;
 	LIAlgRandom random;
 	LIAlgSectors* sectors;
 	LIAlgU32dic* models;
 	LIAlgU32dic* objects;
 	LICalCallbacks* callbacks;
-	LICalHandle calls[1];
 	LIPthPaths* paths;
-	struct
-	{
-		int flags;
-		int radius;
-	} config;
 };
 
 LIAPICALL (LIEngEngine*, lieng_engine_new, (
@@ -65,19 +57,5 @@ LIAPICALL (LIEngObject*, lieng_engine_find_object, (
 LIAPICALL (void, lieng_engine_update, (
 	LIEngEngine* self,
 	float        secs));
-
-LIAPICALL (int, lieng_engine_get_flags, (
-	const LIEngEngine* self));
-
-LIAPICALL (void, lieng_engine_set_flags, (
-	LIEngEngine* self,
-	int          flags));
-
-LIAPICALL (void*, lieng_engine_get_userdata, (
-	LIEngEngine* self));
-
-LIAPICALL (void, lieng_engine_set_userdata, (
-	LIEngEngine* self,
-	void*        value));
 
 #endif

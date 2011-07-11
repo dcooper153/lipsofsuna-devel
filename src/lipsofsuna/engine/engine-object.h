@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -31,8 +31,6 @@
 
 struct _LIEngObject
 {
-	int refs;
-	void* userdata;
 	uint32_t id;
 	LIEngEngine* engine;
 	LIEngModel* model;
@@ -51,14 +49,6 @@ LIAPICALL (LIEngObject*, lieng_object_new, (
 LIAPICALL (void, lieng_object_free, (
 	LIEngObject* self));
 
-LIAPICALL (LIMdlNode*, lieng_object_find_node, (
-	LIEngObject* self,
-	const char*  name));
-
-LIAPICALL (int, lieng_object_merge_model, (
-	LIEngObject* self,
-	LIEngModel*  model));
-
 LIAPICALL (int, lieng_object_moved, (
 	LIEngObject* self));
 
@@ -66,15 +56,7 @@ LIAPICALL (void, lieng_object_refresh, (
 	LIEngObject* self,
 	float        radius));
 
-LIAPICALL (void, lieng_object_update, (
-	LIEngObject* self,
-	float        secs));
-
 LIAPICALL (void, lieng_object_get_bounds, (
-	const LIEngObject* self,
-	LIMatAabb*         bounds));
-
-LIAPICALL (void, lieng_object_get_bounds_transform, (
 	const LIEngObject* self,
 	LIMatAabb*         bounds));
 
@@ -110,12 +92,5 @@ LIAPICALL (void, lieng_object_get_transform, (
 LIAPICALL (int, lieng_object_set_transform, (
 	LIEngObject*          self,
 	const LIMatTransform* value));
-
-LIAPICALL (void*, lieng_object_get_userdata, (
-	LIEngObject* self));
-
-LIAPICALL (void, lieng_object_set_userdata, (
-	LIEngObject* self,
-	void*        data));
 
 #endif

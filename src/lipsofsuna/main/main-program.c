@@ -608,7 +608,6 @@ static int private_init (
 	self->engine = lieng_engine_new (self->callbacks, self->sectors, self->paths);
 	if (self->engine == NULL)
 		return 0;
-	lieng_engine_set_userdata (self->engine, self);
 
 	/* Allocate the script. */
 	self->script = liscr_script_new ();

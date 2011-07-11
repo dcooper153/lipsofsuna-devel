@@ -291,9 +291,12 @@ static int private_tick (
 		{
 			/* Update speech offset. */
 			lieng_object_get_transform (engobj, &transform);
-			lieng_object_get_bounds (engobj, &bounds);
 			extobj->position = transform.position;
-			extobj->position.y += bounds.max.y;
+			if (engobj->model != NULL && engobj->model->model != NULL)
+			{
+				bounds = engobj->model->model->bounds;
+				extobj->position.y += bounds.max.y;
+			}
 
 			/* Update speech timing. */
 			for (ptr = extobj->speech ; ptr != NULL ; ptr = next)

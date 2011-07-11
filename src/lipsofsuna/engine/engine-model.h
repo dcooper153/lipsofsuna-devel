@@ -55,13 +55,4 @@ LIAPICALL (int, lieng_model_merge, (
 	LIEngModel* self,
 	LIEngModel* model));
 
-LIAPICALL (void, lieng_model_get_bounds, (
-	const LIEngModel* self,
-	LIMatAabb*        result));
-
-LIAPICALL (void, lieng_model_get_bounds_transform, (
-	const LIEngModel*     self,
-	const LIMatTransform* transform,
-	LIMatAabb*            result));
-
 #endif

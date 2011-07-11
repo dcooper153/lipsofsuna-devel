@@ -63,16 +63,14 @@ LIEngEngine* lieng_engine_new (
 	self->sectors->sector_load_callback.callback = private_sector_load;
 	self->sectors->sector_load_callback.userdata = self;
 	self->paths = paths;
-	self->config.radius = 1;
 	if (!private_init (self))
-		goto error;
+	{
+		lieng_engine_free (self);
+		lisys_error_append ("cannot initialize engine");
+		return NULL;
+	}
 
 	return self;
-
-error:
-	lieng_engine_free (self);
-	lisys_error_append ("cannot initialize engine");
-	return NULL;
 }
 
 void
@@ -113,7 +111,6 @@ lieng_engine_free (LIEngEngine* self)
 		lialg_u32dic_free (self->objects);
 	if (self->models != NULL)
 		lialg_u32dic_free (self->models);
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	lisys_free (self);
 }
 
@@ -133,74 +130,15 @@ lieng_engine_find_object (LIEngEngine* self,
 
 /**
  * \brief Updates the scene.
- *
  * \param self Engine.
  * \param secs Number of seconds since the last update.
  */
-void
-lieng_engine_update (LIEngEngine* self,
-                     float        secs)
+void lieng_engine_update (
+	LIEngEngine* self,
+	float        secs)
 {
-	LIAlgSectorsIter siter;
-	LIAlgU32dicIter iter;
-	LIEngObject* object;
-	LIEngSector* sector;
-
-	/* Update sectors. */
-	LIALG_SECTORS_FOREACH (siter, self->sectors)
-	{
-		sector = siter.sector->content[LIALG_SECTORS_CONTENT_ENGINE];
-		if (sector != NULL)
-			lieng_sector_update (sector, secs);
-	}
-
-	/* Update objects. */
-	LIALG_U32DIC_FOREACH (iter, self->objects)
-	{
-		object = iter.value;
-		lieng_object_update (object, secs);
-	}
-
 	/* Maintain callbacks. */
 	lical_callbacks_update (self->callbacks);
-}
-
-/**
- * \brief Gets the engine flags.
- *
- * \param self Engine.
- * \return Flags.
- */
-int
-lieng_engine_get_flags (const LIEngEngine* self)
-{
-	return self->config.flags;
-}
-
-/**
- * \brief Sets the engine flags.
- *
- * \param self Engine.
- * \param flags Flags.
- */
-void
-lieng_engine_set_flags (LIEngEngine* self,
-                        int          flags)
-{
-	self->config.flags = flags;
-}
-
-void*
-lieng_engine_get_userdata (LIEngEngine* self)
-{
-	return self->userdata;
-}
-
-void
-lieng_engine_set_userdata (LIEngEngine* self,
-                           void*        value)
-{
-	self->userdata = value;
 }
 
 /*****************************************************************************/

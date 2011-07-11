@@ -26,32 +26,15 @@
 
 struct _LIEngSector
 {
-	uint8_t dirty;
 	LIAlgSector* sector;
 	LIAlgU32dic* objects;
 	LIEngEngine* engine;
 };
 
-LIEngSector*
-lieng_sector_new (LIAlgSector* sector);
+LIAPICALL (LIEngSector*, lieng_sector_new, (
+	LIAlgSector* sector));
 
-void
-lieng_sector_free (LIEngSector* self);
-
-int
-lieng_sector_insert_object (LIEngSector* self,
-                            LIEngObject* object);
-
-void
-lieng_sector_remove_object (LIEngSector* self,
-                            LIEngObject* object);
-
-void
-lieng_sector_update (LIEngSector* self,
-                     float        secs);
-
-void
-lieng_sector_get_bounds (const LIEngSector* self,
-                         LIMatAabb*         result);
+LIAPICALL (void, lieng_sector_free, (
+	LIEngSector* self));
 
 #endif

@@ -27,12 +27,11 @@
 
 /**
  * \brief Creates a new sector.
- *
  * \param sector Sector manager sector.
  * \return New sector or NULL.
  */
-LIEngSector*
-lieng_sector_new (LIAlgSector* sector)
+LIEngSector* lieng_sector_new (
+	LIAlgSector* sector)
 {
 	LIEngSector* self;
 
@@ -58,7 +57,8 @@ lieng_sector_new (LIAlgSector* sector)
  * \brief Frees the sector.
  * \param self Sector.
  */
-void lieng_sector_free (LIEngSector* self)
+void lieng_sector_free (
+	LIEngSector* self)
 {
 	LIAlgU32dicIter iter;
 	LIEngObject* object;
@@ -75,71 +75,6 @@ void lieng_sector_free (LIEngSector* self)
 	}
 
 	lisys_free (self);
-}
-
-/**
- * \brief Inserts an object to the sector.
- *
- * \param self Sector.
- * \param object Object.
- */
-int
-lieng_sector_insert_object (LIEngSector* self,
-                            LIEngObject* object)
-{
-	lisys_assert (!lialg_u32dic_find (self->objects, object->id));
-
-	if (lialg_u32dic_insert (self->objects, object->id, object) == NULL)
-		return 0;
-	return 1;
-}
-
-/**
- * \brief Removes an object from the sector.
- *
- * \param self Sector.
- * \param object Object.
- */
-void
-lieng_sector_remove_object (LIEngSector* self,
-                            LIEngObject* object)
-{
-	lisys_assert (lialg_u32dic_find (self->objects, object->id));
-
-	lialg_u32dic_remove (self->objects, object->id);
-}
-
-/**
- * \brief Called once per tick to update the status of the sector.
- *
- * \param self Sector.
- * \param secs Number of seconds since the last update.
- */
-void
-lieng_sector_update (LIEngSector* self,
-                     float        secs)
-{
-}
-
-/**
- * \brief Gets the bounding box of the sector.
- *
- * \param self Sector.
- * \param result Return location for the bounding box.
- */
-void
-lieng_sector_get_bounds (const LIEngSector* self,
-                         LIMatAabb*         result)
-{
-	float size;
-	LIMatVector min;
-	LIMatVector max;
-
-	size = self->sector->manager->width;
-	min = self->sector->position;
-	max = limat_vector_init (size, size, size);
-	max = limat_vector_add (min, max);
-	limat_aabb_init_from_points (result, &min, &max);
 }
 
 /** @} */

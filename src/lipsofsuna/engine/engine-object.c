@@ -25,9 +25,6 @@
 #include "lipsofsuna/network.h"
 #include "engine-object.h"
 
-#define SCRIPT_POINTER_MODEL ((void*) -1)
-#define SMOOTHING_TIMESTEP (1.0f / 60.0f)
-
 static int private_warp (
 	LIEngObject*       self,
 	const LIMatVector* position);
@@ -83,7 +80,6 @@ LIEngObject* lieng_object_new (
 
 /**
  * \brief Frees the object.
- *
  * \param self Object.
  */
 void lieng_object_free (
@@ -111,62 +107,11 @@ void lieng_object_free (
 }
 
 /**
- * \brief Finds a node by name.
- *
- * Searches for a pose node if the object has a pose associated to it and a
- * model node otherwise.
- *
- * \param self Object.
- * \param name Node name or NULL.
- */
-LIMdlNode*
-lieng_object_find_node (LIEngObject* self,
-                        const char*  name)
-{
-	if (self->pose != NULL)
-		return limdl_pose_find_node (self->pose, name);
-	if (self->model != NULL)
-		return limdl_model_find_node (self->model->model, name);
-
-	return NULL;
-}
-
-/**
- * \brief Merges a model to the object.
- * \param self Object.
- * \param model Model.
- * \return Nonzero on success.
- */
-int lieng_object_merge_model (
-	LIEngObject* self,
-	LIEngModel*  model)
-{
-	LIEngModel* tmp;
-
-	if (self->model == NULL)
-	{
-		tmp = lieng_model_new_copy (model);
-		if (tmp == NULL)
-			return 0;
-		lieng_object_set_model (self, tmp);
-	}
-	else
-	{
-		if (!limdl_model_merge (self->model->model, model->model))
-			return 0;
-		lieng_object_set_model (self, self->model);
-	}
-
-	return 1;
-}
-
-/**
  * \brief Called when the object has moved.
- *
  * \param self Object.
  */
-int
-lieng_object_moved (LIEngObject* self)
+int lieng_object_moved (
+	LIEngObject* self)
 {
 	LIEngSector* dst;
 	LIEngSector* src;
@@ -180,10 +125,10 @@ lieng_object_moved (LIEngObject* self)
 		return 0;
 	if (src != dst)
 	{
-		if (!lieng_sector_insert_object (dst, self))
+		if (lialg_u32dic_insert (dst->objects, self->id, self) == NULL)
 			return 0;
 		if (src != NULL)
-			lieng_sector_remove_object (src, self);
+			lialg_u32dic_remove (src->objects, self->id);
 		self->sector = dst;
 	}
 
@@ -203,9 +148,9 @@ lieng_object_moved (LIEngObject* self)
  * \param self Object.
  * \param radius Refresh radius.
  */
-void
-lieng_object_refresh (LIEngObject* self,
-                      float        radius)
+void lieng_object_refresh (
+	LIEngObject* self,
+	float        radius)
 {
 	LIMatTransform transform;
 
@@ -217,50 +162,16 @@ lieng_object_refresh (LIEngObject* self,
 }
 
 /**
- * \brief Updates the state of the object.
- * 
- * \param self Object.
- * \param secs Number of seconds since last tick.
- */
-void lieng_object_update (
-	LIEngObject* self,
-	float        secs)
-{
-}
-
-/**
  * \brief Gets the bounding box size of the object.
- *
  * \param self Object.
  * \param bounds Return location for the bounding box.
  */
-void
-lieng_object_get_bounds (const LIEngObject* self,
-                         LIMatAabb*         bounds)
+void lieng_object_get_bounds (
+	const LIEngObject* self,
+	LIMatAabb*         bounds)
 {
 	if (self->model != NULL && self->model->model != NULL)
 		*bounds = self->model->model->bounds;
-	else
-		limat_aabb_init (bounds);
-}
-
-/**
- * \brief Gets the transformed bounding box of the object.
- *
- * \param self Object.
- * \param bounds Return location for the bounding box.
- */
-void
-lieng_object_get_bounds_transform (const LIEngObject* self,
-                                   LIMatAabb*         bounds)
-{
-	LIMatTransform t;
-
-	if (self->model != NULL && self->model->model != NULL)
-	{
-		lieng_object_get_transform (self, &t);
-		lieng_model_get_bounds_transform (self->model, &t, bounds);
-	}
 	else
 		limat_aabb_init (bounds);
 }
@@ -274,9 +185,9 @@ lieng_object_get_bounds_transform (const LIEngObject* self,
  * \param object An object.
  * \return The distance.
  */
-float
-lieng_object_get_distance (const LIEngObject* self,
-                           const LIEngObject* object)
+float lieng_object_get_distance (
+	const LIEngObject* self,
+	const LIEngObject* object)
 {
 	LIMatTransform t0;
 	LIMatTransform t1;
@@ -321,12 +232,11 @@ int lieng_object_set_model (
 
 /**
  * \brief Checks if the object is added to the simulation.
- *
  * \param self Object.
  * \return Nonzero if realized.
  */
-int
-lieng_object_get_realized (const LIEngObject* self)
+int lieng_object_get_realized (
+	const LIEngObject* self)
 {
 	if (self->sector == NULL)
 		return 0;
@@ -350,9 +260,9 @@ lieng_object_get_realized (const LIEngObject* self)
  * \param value Nonzero if the object should be realized.
  * \return Nonzero on success.
  */
-int
-lieng_object_set_realized (LIEngObject* self,
-                           int          value)
+int lieng_object_set_realized (
+	LIEngObject* self,
+	int          value)
 {
 	LIMatTransform transform;
 
@@ -374,7 +284,7 @@ lieng_object_set_realized (LIEngObject* self,
 		lical_callbacks_call (self->engine->callbacks, "object-visibility", lical_marshal_DATA_PTR_INT, self, 0);
 
 		/* Remove from map. */
-		lieng_sector_remove_object (self->sector, self);
+		lialg_u32dic_remove (self->sector->objects, self->id);
 		self->sector = NULL;
 	}
 
@@ -401,14 +311,13 @@ void lieng_object_get_transform (
 
 /**
  * \brief Sets the world space transformation of the object.
- *
  * \param self Object.
  * \param value Transformation.
  * \return Nonzero on success.
  */
-int
-lieng_object_set_transform (LIEngObject*          self,
-                            const LIMatTransform* value)
+int lieng_object_set_transform (
+	LIEngObject*          self,
+	const LIMatTransform* value)
 {
 	int realized;
 
@@ -427,24 +336,11 @@ lieng_object_set_transform (LIEngObject*          self,
 	return 1;
 }
 
-void* lieng_object_get_userdata (
-	LIEngObject* self)
-{
-	return self->userdata;
-}
-
-void lieng_object_set_userdata (
-	LIEngObject* self,
-	void*        data)
-{
-	self->userdata = data;
-}
-
 /*****************************************************************************/
 
-static int
-private_warp (LIEngObject*       self,
-              const LIMatVector* position)
+static int private_warp (
+	LIEngObject*       self,
+	const LIMatVector* position)
 {
 	LIEngSector* dst;
 	LIEngSector* src;
@@ -456,10 +352,10 @@ private_warp (LIEngObject*       self,
 		return 0;
 	if (src != dst)
 	{
-		if (!lieng_sector_insert_object (dst, self))
+		if (lialg_u32dic_insert (dst->objects, self->id, self) == NULL)
 			return 0;
 		if (src != NULL)
-			lieng_sector_remove_object (src, self);
+			lialg_u32dic_remove (src->objects, self->id);
 		self->sector = dst;
 	}
 
