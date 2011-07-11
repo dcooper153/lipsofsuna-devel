@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -32,27 +32,11 @@
 #include "model-shape-key.h"
 #include "model-types.h"
 #include "model-vertex.h"
+#include "model-weight-group.h"
 
 #define LIMDL_FORMAT_VERSION 0xFFFFFFF3
 
 typedef int LIMdlModelFlags;
-
-enum
-{
-	LIMDL_MATERIAL_FLAG_BILLBOARD    = 0x01,
-	LIMDL_MATERIAL_FLAG_COLLISION    = 0x02,
-	LIMDL_MATERIAL_FLAG_CULLFACE     = 0x04,
-	LIMDL_MATERIAL_FLAG_TRANSPARENCY = 0x08,
-};
-
-struct _LIMdlWeightGroup
-{
-	char* name;
-	char* bone;
-	LIMdlNode* node;
-};
-
-/*****************************************************************************/
 
 struct _LIMdlModel
 {
@@ -60,14 +44,14 @@ struct _LIMdlModel
 	LIMatAabb bounds;
 	struct { int count; LIMdlAnimation* array; } animations;
 	struct { int count; LIMdlHairs* array; } hairs;
-	struct { int count; LIMdlFaces* array; } facegroups;
+	struct { int count; LIMdlFaces* array; } face_groups;
 	struct { int count; LIMdlMaterial* array; } materials;
 	struct { int count; LIMdlNode** array; } nodes;
-	struct { int count; LIMdlParticleSystem* array; } particlesystems;
+	struct { int count; LIMdlParticleSystem* array; } particle_systems;
 	struct { int count; LIMdlShape* array; } shapes;
 	struct { int count; LIMdlShapeKey* array; } shape_keys;
 	struct { int count; LIMdlVertex* array; } vertices;
-	struct { int count; LIMdlWeightGroup* array; } weightgroups;
+	struct { int count; LIMdlWeightGroup* array; } weight_groups;
 };
 
 LIAPICALL (LIMdlModel*, limdl_model_new, ());

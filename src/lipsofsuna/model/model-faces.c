@@ -24,15 +24,33 @@
 
 #include "model-faces.h"
 
-void
-limdl_faces_free (LIMdlFaces* self)
+int limdl_faces_init_copy (
+	LIMdlFaces* self,
+	LIMdlFaces* faces)
+{
+	self->material = faces->material;
+	if (faces->indices.count)
+	{
+		self->indices.array = lisys_calloc (faces->indices.count, sizeof (uint32_t));
+		if (self->indices.array == NULL)
+			return 0;
+		self->indices.count = faces->indices.count;
+		self->indices.capacity = faces->indices.count;
+		memcpy (self->indices.array, faces->indices.array, faces->indices.count * sizeof (uint32_t));
+	}
+
+	return 1;
+}
+
+void limdl_faces_free (
+	LIMdlFaces* self)
 {
 	lisys_free (self->indices.array);
 }
 
-int
-limdl_faces_read (LIMdlFaces*  self,
-                  LIArcReader* reader)
+int limdl_faces_read (
+	LIMdlFaces*  self,
+	LIArcReader* reader)
 {
 	uint32_t i;
 	uint32_t mat;
@@ -62,9 +80,9 @@ limdl_faces_read (LIMdlFaces*  self,
 	return 1;
 }
 
-int
-limdl_faces_write (LIMdlFaces*  self,
-                   LIArcWriter* writer)
+int limdl_faces_write (
+	LIMdlFaces*  self,
+	LIArcWriter* writer)
 {
 	int i;
 

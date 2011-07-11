@@ -18,8 +18,8 @@
 #ifndef __MODEL_VERTEX_H__
 #define __MODEL_VERTEX_H__
 
-#include <string.h>
-#include <lipsofsuna/math.h>
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/system.h"
 
 #define LIMDL_VERTEX_WEIGHTS_MAX 4
 
@@ -35,12 +35,12 @@ struct _LIMdlVertex
 	unsigned char bones[LIMDL_VERTEX_WEIGHTS_MAX];
 };
 
-static inline void
-limdl_vertex_init (LIMdlVertex*       self,
-                   const LIMatVector* coord,
-                   const LIMatVector* normal,
-                   float              u,
-                   float              v)
+static inline void limdl_vertex_init (
+	LIMdlVertex*       self,
+	const LIMatVector* coord,
+	const LIMatVector* normal,
+	float              u,
+	float              v)
 {
 	memset (self, 0, sizeof (LIMdlVertex));
 	self->texcoord[0] = u;
@@ -54,9 +54,16 @@ limdl_vertex_init (LIMdlVertex*       self,
 	self->weights[0] = 255;
 }
 
-static inline int
-limdl_vertex_compare (const LIMdlVertex* self,
-                      const LIMdlVertex* vertex)
+static inline void limdl_vertex_init_copy (
+	LIMdlVertex*       self,
+	const LIMdlVertex* vertex)
+{
+	memcpy (self, vertex, sizeof (LIMdlVertex));
+}
+
+static inline int limdl_vertex_compare (
+	const LIMdlVertex* self,
+	const LIMdlVertex* vertex)
 {
 	return memcmp (self, vertex, sizeof (LIMdlVertex));
 }

@@ -251,14 +251,14 @@ int liren_model21_set_model (
 	LIRenScene21* scene;
 
 	/* Create face groups. */
-	if (model->facegroups.count)
+	if (model->face_groups.count)
 	{
-		groups = lisys_calloc (model->facegroups.count, sizeof (LIRenModelGroup21));
+		groups = lisys_calloc (model->face_groups.count, sizeof (LIRenModelGroup21));
 		if (groups == NULL)
 			return 0;
-		for (index_count = i = 0 ; i < model->facegroups.count ; i++)
+		for (index_count = i = 0 ; i < model->face_groups.count ; i++)
 		{
-			group = model->facegroups.array + i;
+			group = model->face_groups.array + i;
 			groups[i].start = index_count;
 			groups[i].count = group->indices.count;
 			index_count += group->indices.count;
@@ -309,9 +309,9 @@ int liren_model21_set_model (
 			lisys_free (groups);
 			return 0;
 		}
-		for (c = i = 0 ; i < model->facegroups.count ; i++)
+		for (c = i = 0 ; i < model->face_groups.count ; i++)
 		{
-			group = model->facegroups.array + i;
+			group = model->face_groups.array + i;
 			memcpy (indices + c, group->indices.array, group->indices.count * sizeof (uint32_t));
 			c += group->indices.count;
 		}
@@ -354,7 +354,7 @@ int liren_model21_set_model (
 	self->materials.count = model->materials.count;
 	lisys_free (self->groups.array);
 	self->groups.array = groups;
-	self->groups.count = model->facegroups.count;
+	self->groups.count = model->face_groups.count;
 	lisys_free (self->indices.array);
 	self->indices.array = indices;
 	self->indices.count = index_count;

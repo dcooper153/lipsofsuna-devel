@@ -48,6 +48,10 @@ struct _LIMdlAnimation
 	} channels;
 };
 
+LIAPICALL (int, limdl_animation_init_copy, (
+	LIMdlAnimation* self,
+	LIMdlAnimation* anim));
+
 LIAPICALL (LIMdlAnimation*, limdl_animation_new_copy, (
 	LIMdlAnimation* anim));
 

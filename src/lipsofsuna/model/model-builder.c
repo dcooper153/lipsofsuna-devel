@@ -61,9 +61,9 @@ LIMdlBuilder* limdl_builder_new (
 		self->model = model;
 
 	/* Initialize builder state. */
-	self->facegroup_capacity = self->model->facegroups.count;
+	self->facegroup_capacity = self->model->face_groups.count;
 	self->material_capacity = self->model->materials.count;
-	self->weightgroup_capacity = self->model->weightgroups.count;
+	self->weightgroup_capacity = self->model->weight_groups.count;
 	self->vertex_capacity = self->model->vertices.count;
 
 	return self;
@@ -146,15 +146,15 @@ int limdl_builder_insert_facegroup (
 	lisys_assert (material < self->model->materials.count);
 
 	/* Allocate space for face groups. */
-	if (!private_realloc_array ((void**) &self->model->facegroups.array,
-	    &self->facegroup_capacity, self->model->facegroups.count + 1, sizeof (LIMdlFaces)))
+	if (!private_realloc_array ((void**) &self->model->face_groups.array,
+	    &self->facegroup_capacity, self->model->face_groups.count + 1, sizeof (LIMdlFaces)))
 		return 0;
 
 	/* Initialize the face group. */
-	tmp = self->model->facegroups.array + self->model->facegroups.count;
+	tmp = self->model->face_groups.array + self->model->face_groups.count;
 	memset (tmp, 0, sizeof (LIMdlFaces));
 	tmp->material = material;
-	self->model->facegroups.count++;
+	self->model->face_groups.count++;
 
 	return 1;
 }
@@ -176,8 +176,8 @@ int limdl_builder_insert_indices (
 	LIMdlFaces* group;
 
 	lisys_assert (groupidx >= 0);
-	lisys_assert (groupidx < self->model->facegroups.count);
-	group = self->model->facegroups.array + groupidx;
+	lisys_assert (groupidx < self->model->face_groups.count);
+	group = self->model->face_groups.array + groupidx;
 
 	/* Allocate space for indices. */
 	if (!private_realloc_array (&group->indices.array, &group->indices.capacity,
@@ -304,12 +304,12 @@ int limdl_builder_insert_weightgroup (
 	LIMdlWeightGroup* tmp;
 
 	/* Allocate space for weight groups. */
-	if (!private_realloc_array (&self->model->weightgroups.array,
-	    &self->weightgroup_capacity, self->model->weightgroups.count + 1, sizeof (LIMdlWeightGroup)))
+	if (!private_realloc_array (&self->model->weight_groups.array,
+	    &self->weightgroup_capacity, self->model->weight_groups.count + 1, sizeof (LIMdlWeightGroup)))
 		return 0;
 
 	/* Copy weight group. */
-	tmp = self->model->weightgroups.array + self->model->weightgroups.count;
+	tmp = self->model->weight_groups.array + self->model->weight_groups.count;
 	tmp->name = lisys_string_dup (name);
 	tmp->bone = lisys_string_dup (bone);
 	if (tmp->name == NULL || tmp->bone == NULL)
@@ -318,7 +318,7 @@ int limdl_builder_insert_weightgroup (
 		lisys_free (tmp->bone);
 		return 0;
 	}
-	self->model->weightgroups.count++;
+	self->model->weight_groups.count++;
 
 	/* Map node. */
 	tmp->node = limdl_model_find_node (self->model, tmp->bone);

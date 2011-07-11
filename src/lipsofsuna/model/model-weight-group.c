@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,38 +15,37 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __MODEL_FACES_H__
-#define __MODEL_FACES_H__
+/**
+ * \addtogroup LIMdl Model
+ * @{
+ * \addtogroup LIMdlWeightGroup WeightGroup
+ * @{
+ */
 
-#include "lipsofsuna/archive.h"
-#include "lipsofsuna/system.h"
-#include "model-types.h"
+#include "model-weight-group.h"
 
-typedef struct _LIMdlFaces LIMdlFaces;
-struct _LIMdlFaces
+int limdl_weight_group_init_copy (
+	LIMdlWeightGroup*       self,
+	const LIMdlWeightGroup* group)
 {
-	int material;
-	struct
+	if (group->name != NULL)
 	{
-		int count;
-		uint32_t* array;
-		int capacity;
-	} indices;
-};
+		self->name = lisys_string_dup (group->name);
+		if (self->name == NULL)
+			return 0;
+	}
+	if (group->bone != NULL)
+	{
+		self->bone = lisys_string_dup (group->bone);
+		if (self->bone == NULL)
+		{
+			lisys_free (self->bone);
+			return 0;
+		}
+	}
 
-LIAPICALL (int, limdl_faces_init_copy, (
-	LIMdlFaces* self,
-	LIMdlFaces* faces));
+	return 1;
+}
 
-LIAPICALL (void, limdl_faces_free, (
-	LIMdlFaces* self));
-
-LIAPICALL (int, limdl_faces_read, (
-	LIMdlFaces*  self,
-	LIArcReader* reader));
-
-LIAPICALL (int, limdl_faces_write, (
-	LIMdlFaces*  self,
-	LIArcWriter* writer));
-
-#endif
+/** @} */
+/** @} */

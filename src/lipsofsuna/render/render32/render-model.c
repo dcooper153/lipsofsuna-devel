@@ -295,7 +295,7 @@ static int private_init_model (
 	LIMdlFaces* group;
 
 	/* Allocate face groups. */
-	self->groups.count = model->facegroups.count;
+	self->groups.count = model->face_groups.count;
 	if (self->groups.count)
 	{
 		self->groups.array = lisys_calloc (self->groups.count, sizeof (LIRenModelGroup32));
@@ -306,7 +306,7 @@ static int private_init_model (
 	/* Calculate face group offsets. */
 	for (c = i = 0 ; i < self->groups.count ; i++)
 	{
-		group = model->facegroups.array + i;
+		group = model->face_groups.array + i;
 		self->groups.array[i].start = c;
 		self->groups.array[i].count = group->indices.count;
 		c += group->indices.count;
@@ -320,7 +320,7 @@ static int private_init_model (
 			return 0;
 		for (c = i = 0 ; i < self->groups.count ; i++)
 		{
-			group = model->facegroups.array + i;
+			group = model->face_groups.array + i;
 			memcpy (indices + c, group->indices.array, group->indices.count * sizeof (uint32_t));
 			c += group->indices.count;
 		}

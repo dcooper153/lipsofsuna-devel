@@ -299,9 +299,9 @@ static void Model_remove_vertices (LIScrArgs* args)
 	LIMdlFaces* group;
 
 	model = args->self;
-	for (i = 0 ; i < model->model->facegroups.count ; i++)
+	for (i = 0 ; i < model->model->face_groups.count ; i++)
 	{
-		group = model->model->facegroups.array + i;
+		group = model->model->face_groups.array + i;
 		lisys_free (group->indices.array);
 		group->indices.array = NULL;
 		group->indices.capacity = 0;

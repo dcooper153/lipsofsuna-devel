@@ -23,6 +23,14 @@
 #include <lipsofsuna/system.h>
 #include "model-texture.h"
 
+enum
+{
+	LIMDL_MATERIAL_FLAG_BILLBOARD    = 0x01,
+	LIMDL_MATERIAL_FLAG_COLLISION    = 0x02,
+	LIMDL_MATERIAL_FLAG_CULLFACE     = 0x04,
+	LIMDL_MATERIAL_FLAG_TRANSPARENCY = 0x08,
+};
+
 typedef struct _LIMdlMaterial LIMdlMaterial;
 struct _LIMdlMaterial
 {

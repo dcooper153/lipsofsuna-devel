@@ -163,30 +163,92 @@ LIMdlModel* limdl_model_new ()
 LIMdlModel* limdl_model_new_copy (
 	LIMdlModel* model)
 {
+	int i;
 	LIMdlModel* self;
-	LIArcReader* reader;
-	LIArcWriter* writer;
 
-	/* FIXME: This is lousy. */
-	writer = liarc_writer_new ();
-	if (writer == NULL)
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (LIMdlModel));
+	if (self == NULL)
 		return NULL;
-	if (!limdl_model_write (model, writer))
+	self->flags = model->flags;
+	self->bounds = model->bounds;
+
+	/* Copy everything. */
+	/* FIXME: Not all are supported yet.  */
+	if (model->animations.count)
 	{
-		liarc_writer_free (writer);
-		return NULL;
+		self->animations.array = lisys_calloc (model->animations.count, sizeof (LIMdlAnimation));
+		self->animations.count = model->animations.count;
+		for (i = 0 ; i < model->animations.count ; i++)
+			limdl_animation_init_copy (self->animations.array + i, model->animations.array + i);
 	}
-	reader = liarc_reader_new (
-		liarc_writer_get_buffer (writer),
-		liarc_writer_get_length (writer));
-	if (reader == NULL)
+#if 0
+	if (model->hairs.count)
 	{
-		liarc_writer_free (writer);
-		return NULL;
+		self->hairs.array = lisys_calloc (model->hairs.count, sizeof (LIMdlHairs));
+		self->hairs.count = model->hairs.count;
+		for (i = 0 ; i < model->hairs.count ; i++)
+			limdl_hairs_init_copy (self->hairs.array + i, model->hairs.array + i);
 	}
-	self = limdl_model_new_from_data (reader, 1);
-	liarc_reader_free (reader);
-	liarc_writer_free (writer);
+#endif
+	if (model->face_groups.count)
+	{
+		self->face_groups.array = lisys_calloc (model->face_groups.count, sizeof (LIMdlFaces));
+		self->face_groups.count = model->face_groups.count;
+		for (i = 0 ; i < model->face_groups.count ; i++)
+			limdl_faces_init_copy (self->face_groups.array + i, model->face_groups.array + i);
+	}
+	if (model->materials.count)
+	{
+		self->materials.array = lisys_calloc (model->materials.count, sizeof (LIMdlMaterial));
+		self->materials.count = model->materials.count;
+		for (i = 0 ; i < model->materials.count ; i++)
+			limdl_material_init_copy (self->materials.array + i, model->materials.array + i);
+	}
+	if (model->nodes.count)
+	{
+		self->nodes.array = lisys_calloc (model->nodes.count, sizeof (LIMdlNode*));
+		self->nodes.count = model->nodes.count;
+		for (i = 0 ; i < model->nodes.count ; i++)
+			self->nodes.array[i] = limdl_node_copy (model->nodes.array[i]);
+	}
+#if 0
+	if (model->particle_systems.count)
+	{
+		self->particle_systems.array = lisys_calloc (model->particle_systems.count, sizeof (LIMdlParticleSystem));
+		self->particle_systems.count = model->particle_systems.count;
+		for (i = 0 ; i < model->particle_systems.count ; i++)
+			limdl_particle_systems_init_copy (self->particle_systems.array + i, model->particle_systems.array + i);
+	}
+	if (model->shapes.count)
+	{
+		self->shapes.array = lisys_calloc (model->shapes.count, sizeof (LIMdlShape));
+		self->shapes.count = model->shapes.count;
+		for (i = 0 ; i < model->shapes.count ; i++)
+			limdl_shapes_init_copy (self->shapes.array + i, model->shapes.array + i);
+	}
+	if (model->shape_keys.count)
+	{
+		self->shape_keys.array = lisys_calloc (model->shape_keys.count, sizeof (LIMdlShapeKey));
+		self->shape_keys.count = model->shape_keys.count;
+		for (i = 0 ; i < model->shape_keys.count ; i++)
+			limdl_shape_keys_init_copy (self->shape_keys.array + i, model->shape_keys.array + i);
+	}
+#endif
+	if (model->vertices.count)
+	{
+		self->vertices.array = lisys_calloc (model->vertices.count, sizeof (LIMdlVertex));
+		self->vertices.count = model->vertices.count;
+		for (i = 0 ; i < model->vertices.count ; i++)
+			limdl_vertex_init_copy (self->vertices.array + i, model->vertices.array + i);
+	}
+	if (model->weight_groups.count)
+	{
+		self->weight_groups.array = lisys_calloc (model->weight_groups.count, sizeof (LIMdlWeightGroup));
+		self->weight_groups.count = model->weight_groups.count;
+		for (i = 0 ; i < model->weight_groups.count ; i++)
+			limdl_weight_group_init_copy (self->weight_groups.array + i, model->weight_groups.array + i);
+	}
 
 	return self;
 }
@@ -289,22 +351,22 @@ void limdl_model_free (
 	}
 
 	/* Free face groups. */
-	if (self->facegroups.array != NULL)
+	if (self->face_groups.array != NULL)
 	{
-		for (i = 0 ; i < self->facegroups.count ; i++)
-			limdl_faces_free (self->facegroups.array + i);
-		lisys_free (self->facegroups.array);
+		for (i = 0 ; i < self->face_groups.count ; i++)
+			limdl_faces_free (self->face_groups.array + i);
+		lisys_free (self->face_groups.array);
 	}
 
 	/* Free weight groups. */
-	if (self->weightgroups.array != NULL)
+	if (self->weight_groups.array != NULL)
 	{
-		for (i = 0 ; i < self->weightgroups.count ; i++)
+		for (i = 0 ; i < self->weight_groups.count ; i++)
 		{
-			lisys_free (self->weightgroups.array[i].name);
-			lisys_free (self->weightgroups.array[i].bone);
+			lisys_free (self->weight_groups.array[i].name);
+			lisys_free (self->weight_groups.array[i].bone);
 		}
-		lisys_free (self->weightgroups.array);
+		lisys_free (self->weight_groups.array);
 	}
 	lisys_free (self->vertices.array);
 
@@ -328,11 +390,11 @@ void limdl_model_free (
 	}
 
 	/* Free particles. */
-	if (self->particlesystems.array != NULL)
+	if (self->particle_systems.array != NULL)
 	{
-		for (i = 0 ; i < self->particlesystems.count ; i++)
-			limdl_particle_system_clear (self->particlesystems.array + i);
-		lisys_free (self->particlesystems.array);
+		for (i = 0 ; i < self->particle_systems.count ; i++)
+			limdl_particle_system_clear (self->particle_systems.array + i);
+		lisys_free (self->particle_systems.array);
 	}
 	if (self->hairs.array != NULL)
 	{
@@ -441,9 +503,9 @@ int limdl_model_find_facegroup (
 {
 	int i;
 
-	for (i = 0 ; i < self->facegroups.count ; i++)
+	for (i = 0 ; i < self->face_groups.count ; i++)
 	{
-		if (self->facegroups.array[i].material == material)
+		if (self->face_groups.array[i].material == material)
 			return i;
 	}
 
@@ -582,9 +644,9 @@ int limdl_model_find_weightgroup (
 	int i;
 	LIMdlWeightGroup* group;
 
-	for (i = 0 ; i < self->weightgroups.count ; i++)
+	for (i = 0 ; i < self->weight_groups.count ; i++)
 	{
-		group = self->weightgroups.array + i;
+		group = self->weight_groups.array + i;
 		if (!strcmp (group->name, name) &&
 		    !strcmp (group->bone, bone))
 			return i;
@@ -616,25 +678,25 @@ int limdl_model_merge (
 		goto error;
 
 	/* Map weight groups. */
-	if (model->weightgroups.count)
+	if (model->weight_groups.count)
 	{
-		wgroups = lisys_calloc (model->weightgroups.count, sizeof (int));
+		wgroups = lisys_calloc (model->weight_groups.count, sizeof (int));
 		if (wgroups == NULL)
 			return 0;
-		for (i = 0 ; i < model->weightgroups.count ; i++)
+		for (i = 0 ; i < model->weight_groups.count ; i++)
 		{
 			group = limdl_model_find_weightgroup (self,
-				model->weightgroups.array[i].name,
-				model->weightgroups.array[i].bone);
+				model->weight_groups.array[i].name,
+				model->weight_groups.array[i].bone);
 			if (group == -1)
 			{
-				group = self->weightgroups.count;
+				group = self->weight_groups.count;
 				if (!limdl_builder_insert_weightgroup (builder, 
-				    model->weightgroups.array[i].name,
-				    model->weightgroups.array[i].bone))
+				    model->weight_groups.array[i].name,
+				    model->weight_groups.array[i].bone))
 					goto error;
 			}
-			lisys_assert (group < self->weightgroups.count);
+			lisys_assert (group < self->weight_groups.count);
 			wgroups[i] = group;
 		}
 	}
@@ -650,9 +712,9 @@ int limdl_model_merge (
 	}
 
 	/* Merge each face group. */
-	for (i = 0 ; i < model->facegroups.count ; i++)
+	for (i = 0 ; i < model->face_groups.count ; i++)
 	{
-		srcfaces = model->facegroups.array + i;
+		srcfaces = model->face_groups.array + i;
 
 		/* Find or create material. */
 		material = limdl_model_find_material (self, model->materials.array + srcfaces->material);
@@ -667,13 +729,13 @@ int limdl_model_merge (
 		group = limdl_model_find_facegroup (self, material);
 		if (group == -1)
 		{
-			group = self->facegroups.count;
+			group = self->face_groups.count;
 			if (!limdl_builder_insert_facegroup (builder, material))
 				goto error;
 		}
 
 		/* Destination group for cloned faces. */
-		dstfaces = self->facegroups.array + group;
+		dstfaces = self->face_groups.array + group;
 
 		/* Allocate space for indices. */
 		count = dstfaces->indices.count + srcfaces->indices.count;
@@ -801,8 +863,8 @@ int limdl_model_get_index_count (
 	int i;
 	int c;
 
-	for (i = c = 0 ; i < self->facegroups.count ; i++)
-		c += self->facegroups.array[i].indices.count;
+	for (i = c = 0 ; i < self->face_groups.count ; i++)
+		c += self->face_groups.array[i].indices.count;
 
 	return c;
 }
@@ -824,16 +886,16 @@ int limdl_model_get_memory (
 		total += sizeof (LIMdlAnimation);
 	for (i = 0 ; i < self->hairs.count ; i++)
 		total += sizeof (LIMdlHairs);
-	for (i = 0 ; i < self->facegroups.count ; i++)
+	for (i = 0 ; i < self->face_groups.count ; i++)
 	{
 		total += sizeof (LIMdlFaces);
-		total += self->facegroups.array[i].indices.count * sizeof (uint32_t);
+		total += self->face_groups.array[i].indices.count * sizeof (uint32_t);
 	}
 	for (i = 0 ; i < self->materials.count ; i++)
 		total += sizeof (LIMdlMaterial*) + sizeof (LIMdlMaterial);
 	for (i = 0 ; i < self->nodes.count ; i++)
 		total += sizeof (LIMdlNode*) + sizeof (LIMdlNode);
-	for (i = 0 ; i < self->particlesystems.count ; i++)
+	for (i = 0 ; i < self->particle_systems.count ; i++)
 		total += sizeof (LIMdlParticleSystem);
 	for (i = 0 ; i < self->shapes.count ; i++)
 		total += sizeof (LIMdlShape);
@@ -845,7 +907,7 @@ int limdl_model_get_memory (
 	}
 	for (i = 0 ; i < self->vertices.count ; i++)
 		total += sizeof (LIMdlVertex);
-	for (i = 0 ; i < self->weightgroups.count ; i++)
+	for (i = 0 ; i < self->weight_groups.count ; i++)
 		total += sizeof (LIMdlWeightGroup);
 
 	return total;
@@ -861,9 +923,9 @@ static void private_build (
 	LIMdlWeightGroup* group;
 
 	/* Resolve node references. */
-	for (i = 0 ; i < self->weightgroups.count ; i++)
+	for (i = 0 ; i < self->weight_groups.count ; i++)
 	{
-		group = self->weightgroups.array + i;
+		group = self->weight_groups.array + i;
 		group->node = limdl_model_find_node (self, group->bone);
 	}
 
@@ -896,9 +958,9 @@ static void private_build_tangents (
 
 	for (i = 0 ; i < self->vertices.count ; i++)
 		self->vertices.array[i].tangent = limat_vector_init (0.0f, 0.0f, 0.0f);
-	for (i = 0 ; i < self->facegroups.count ; i++)
+	for (i = 0 ; i < self->face_groups.count ; i++)
 	{
-		faces = self->facegroups.array + i;
+		faces = self->face_groups.array + i;
 		for (j = 0, idx = faces->indices.array ; j < faces->indices.count ; j += 3, idx += 3)
 		{
 			vtx[0] = self->vertices.array + idx[0];
@@ -1028,9 +1090,9 @@ static int private_read (
 	}
 
 	/* Sanity checks. */
-	for (i = 0 ; i < self->facegroups.count ; i++)
+	for (i = 0 ; i < self->face_groups.count ; i++)
 	{
-		group = self->facegroups.array + i;
+		group = self->face_groups.array + i;
 		if (group->material >= self->materials.count)
 		{
 			lisys_error_set (EINVAL, "material index out of bounds");
@@ -1041,7 +1103,7 @@ static int private_read (
 	{
 		for (j = 0 ; j < LIMDL_VERTEX_WEIGHTS_MAX ; j++)
 		{
-			if (self->vertices.array[i].bones[j] > self->weightgroups.count)
+			if (self->vertices.array[i].bones[j] > self->weight_groups.count)
 			{
 				lisys_error_set (EINVAL, "weight group index out of bounds");
 				return 0;
@@ -1112,17 +1174,17 @@ static int private_read_faces (
 	/* Read header. */
 	if (!liarc_reader_get_uint32 (reader, &tmp))
 		return 0;
-	self->facegroups.count = tmp;
+	self->face_groups.count = tmp;
 
 	/* Read face groups. */
-	if (self->facegroups.count)
+	if (self->face_groups.count)
 	{
-		self->facegroups.array = lisys_calloc (self->facegroups.count, sizeof (LIMdlFaces));
-		if (self->facegroups.array == NULL)
+		self->face_groups.array = lisys_calloc (self->face_groups.count, sizeof (LIMdlFaces));
+		if (self->face_groups.array == NULL)
 			return 0;
-		for (i = 0 ; i < self->facegroups.count ; i++)
+		for (i = 0 ; i < self->face_groups.count ; i++)
 		{
-			group = self->facegroups.array + i;
+			group = self->face_groups.array + i;
 			if (!limdl_faces_read (group, reader))
 				return 0;
 		}
@@ -1232,16 +1294,16 @@ static int private_read_particles (
 	/* Allocate particle systems. */
 	if (tmp[0])
 	{
-		self->particlesystems.array = lisys_calloc (tmp[0], sizeof (LIMdlParticleSystem));
-		if (self->particlesystems.array == NULL)
+		self->particle_systems.array = lisys_calloc (tmp[0], sizeof (LIMdlParticleSystem));
+		if (self->particle_systems.array == NULL)
 			return 0;
-		self->particlesystems.count = tmp[0];
+		self->particle_systems.count = tmp[0];
 	}
 
 	/* Read particle systems. */
-	for (i = 0 ; i < self->particlesystems.count ; i++)
+	for (i = 0 ; i < self->particle_systems.count ; i++)
 	{
-		if (!limdl_particle_system_read (self->particlesystems.array + i, reader))
+		if (!limdl_particle_system_read (self->particle_systems.array + i, reader))
 			return 0;
 	}
 
@@ -1358,13 +1420,13 @@ static int private_read_weights (
 	/* Read weight groups. */
 	if (tmp[0])
 	{
-		self->weightgroups.array = lisys_calloc (tmp[0], sizeof (LIMdlWeightGroup));
-		if (self->weightgroups.array == NULL)
+		self->weight_groups.array = lisys_calloc (tmp[0], sizeof (LIMdlWeightGroup));
+		if (self->weight_groups.array == NULL)
 			return 0;
-		self->weightgroups.count = tmp[0];
-		for (i = 0 ; i < self->weightgroups.count ; i++)
+		self->weight_groups.count = tmp[0];
+		for (i = 0 ; i < self->weight_groups.count ; i++)
 		{
-			group = self->weightgroups.array + i;
+			group = self->weight_groups.array + i;
 			if (!liarc_reader_get_text (reader, "", &group->name) ||
 				!liarc_reader_get_text (reader, "", &group->bone))
 				return 0;
@@ -1426,7 +1488,7 @@ static int private_read_vertex_weights (
 		if (!liarc_reader_get_uint32 (reader, &group) ||
 		    !liarc_reader_get_float (reader, &weight))
 			return 0;
-		if (group >= self->weightgroups.count)
+		if (group >= self->weight_groups.count)
 		{
 			lisys_error_set (EINVAL, "weight group index out of bounds");
 			return 0;
@@ -1592,14 +1654,14 @@ static int private_write_faces (
 	int i;
 
 	/* Check if writing is needed. */
-	if (!self->facegroups.count)
+	if (!self->face_groups.count)
 		return 1;
 
-	if (!liarc_writer_append_uint32 (writer, self->facegroups.count))
+	if (!liarc_writer_append_uint32 (writer, self->face_groups.count))
 		return 0;
-	for (i = 0 ; i < self->facegroups.count ; i++)
+	for (i = 0 ; i < self->face_groups.count ; i++)
 	{
-		if (!limdl_faces_write (self->facegroups.array + i, writer))
+		if (!limdl_faces_write (self->face_groups.array + i, writer))
 			return 0;
 	}
 
@@ -1694,17 +1756,17 @@ static int private_write_particles (
 	int i;
 
 	/* Check if writing is needed. */
-	if (!self->particlesystems.count)
+	if (!self->particle_systems.count)
 		return 1;
 
 	/* Write header. */
-	if (!liarc_writer_append_uint32 (writer, self->particlesystems.count))
+	if (!liarc_writer_append_uint32 (writer, self->particle_systems.count))
 		return 0;
 
 	/* Write particle systems. */
-	for (i = 0 ; i < self->particlesystems.count ; i++)
+	for (i = 0 ; i < self->particle_systems.count ; i++)
 	{
-		if (!limdl_particle_system_write (self->particlesystems.array + i, writer))
+		if (!limdl_particle_system_write (self->particle_systems.array + i, writer))
 			return 0;
 	}
 
@@ -1803,17 +1865,17 @@ static int private_write_weights (
 	LIMdlWeightGroup* group;
 
 	/* Check if writing is needed. */
-	if (!self->weightgroups.count)
+	if (!self->weight_groups.count)
 		return 1;
 
 	/* Write header. */
-	if (!liarc_writer_append_uint32 (writer, self->weightgroups.count))
+	if (!liarc_writer_append_uint32 (writer, self->weight_groups.count))
 		return 0;
 
 	/* Write weight groups. */
-	for (i = 0 ; i < self->weightgroups.count ; i++)
+	for (i = 0 ; i < self->weight_groups.count ; i++)
 	{
-		group = self->weightgroups.array + i;
+		group = self->weight_groups.array + i;
 		liarc_writer_append_string (writer, group->name);
 		liarc_writer_append_nul (writer);
 		liarc_writer_append_string (writer, group->bone);

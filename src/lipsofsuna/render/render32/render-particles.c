@@ -61,10 +61,10 @@ int liren_particles32_init (
 	memset (self, 0, sizeof (LIRenParticles32));
 
 	/* Create particle systems and count particles. */
-	if (model->particlesystems.count)
+	if (model->particle_systems.count)
 	{
 		/* Allocate particle system information. */
-		self->systems.count = model->particlesystems.count;
+		self->systems.count = model->particle_systems.count;
 		self->systems.array = lisys_calloc (self->systems.count, sizeof (LIRenParticleSystem32));
 		if (self->systems.array == NULL)
 		{
@@ -73,10 +73,10 @@ int liren_particles32_init (
 		}
 
 		/* Copy particle system information. */
-		for (i = 0 ; i < model->particlesystems.count ; i++)
+		for (i = 0 ; i < model->particle_systems.count ; i++)
 		{
 			dstsystem = self->systems.array + i;
-			srcsystem = model->particlesystems.array + i;
+			srcsystem = model->particle_systems.array + i;
 			dstsystem->frame_start = srcsystem->frame_start;
 			dstsystem->frame_end = srcsystem->frame_end;
 			dstsystem->frame_end_emit = srcsystem->frame_end_emit;
@@ -108,10 +108,10 @@ int liren_particles32_init (
 		}
 
 		/* Copy particle information. */
-		for (l = i = 0 ; i < model->particlesystems.count ; i++)
+		for (l = i = 0 ; i < model->particle_systems.count ; i++)
 		{
 			dstsystem = self->systems.array + i;
-			srcsystem = model->particlesystems.array + i;
+			srcsystem = model->particle_systems.array + i;
 			dstsystem->buffer_start = self->frames.count;
 			for (j = 0 ; j < srcsystem->particles.count ; j++)
 			{
@@ -139,10 +139,10 @@ int liren_particles32_init (
 		}
 
 		/* Copy particle frame information. */
-		for (l = i = 0 ; i < model->particlesystems.count ; i++)
+		for (l = i = 0 ; i < model->particle_systems.count ; i++)
 		{
 			dstsystem = self->systems.array + i;
-			srcsystem = model->particlesystems.array + i;
+			srcsystem = model->particle_systems.array + i;
 			for (j = 0 ; j < srcsystem->particles.count ; j++)
 			{
 				srcparticle = srcsystem->particles.array + j;

@@ -221,7 +221,7 @@ static int private_merge_material (
 	g = limdl_model_find_facegroup (self->model_builder->model, m);
 	if (g == -1)
 	{
-		g = self->model_builder->model->facegroups.count;
+		g = self->model_builder->model->face_groups.count;
 		if (!limdl_builder_insert_facegroup (self->model_builder, m))
 			return -1;
 	}

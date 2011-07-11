@@ -37,20 +37,18 @@ static void private_frame_transform (
 /*****************************************************************************/
 
 /**
- * \brief Creates a soft copy of the animation.
+ * \brief Copies the animation.
+ * \param self Animation.
  * \param anim Animation.
- * \return New animation or NULL.
+ * \return Nonzero on success.
  */
-LIMdlAnimation* limdl_animation_new_copy (
+int limdl_animation_init_copy (
+	LIMdlAnimation* self,
 	LIMdlAnimation* anim)
 {
 	int i;
-	LIMdlAnimation* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIMdlAnimation));
-	if (self == NULL)
-		return NULL;
 	self->length = anim->length;
 	self->blendin = anim->blendin;
 	self->blendout = anim->blendout;
@@ -62,19 +60,13 @@ LIMdlAnimation* limdl_animation_new_copy (
 	{
 		self->channels.array = lisys_calloc (anim->channels.count, sizeof (char*));
 		if (self->channels.array == NULL)
-		{
-			limdl_animation_free (self);
-			return NULL;
-		}
+			return 0;
 		self->channels.count = anim->channels.count;
 		for (i = 0 ; i < self->channels.count ; i++)
 		{
 			self->channels.array[i] = lisys_string_dup (anim->channels.array[i]);
 			if (self->channels.array[i] == NULL)
-			{
-				limdl_animation_free (self);
-				return NULL;
-			}
+				return 0;
 		}
 	}
 
@@ -83,13 +75,33 @@ LIMdlAnimation* limdl_animation_new_copy (
 	{
 		self->buffer.array = lisys_calloc (anim->buffer.count, sizeof (LIMdlFrame));
 		if (self->buffer.array == NULL)
-		{
-			limdl_animation_free (self);
-			return NULL;
-		}
+			return 0;
 		self->buffer.count = anim->buffer.count;
 		memcpy (self->buffer.array, anim->buffer.array,
 			self->buffer.count * sizeof (LIMdlFrame));
+	}
+
+	return 1;
+}
+
+/**
+ * \brief Creates a soft copy of the animation.
+ * \param anim Animation.
+ * \return New animation or NULL.
+ */
+LIMdlAnimation* limdl_animation_new_copy (
+	LIMdlAnimation* anim)
+{
+	LIMdlAnimation* self;
+
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (LIMdlAnimation));
+	if (self == NULL)
+		return NULL;
+	if (!limdl_animation_init_copy (self, anim))
+	{
+		limdl_animation_free (self);
+		return NULL;
 	}
 
 	return self;

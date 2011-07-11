@@ -51,10 +51,6 @@ struct _LIMdlNode
 	};
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 LIAPICALL (LIMdlNode*, limdl_node_new, (
 	LIMdlModel* model));
 
@@ -115,10 +111,6 @@ LIAPICALL (void, limdl_node_get_world_transform, (
 
 LIAPICALL (LIMdlNodeType, limdl_node_get_type, (
 	const LIMdlNode* self));
-
-#ifdef __cplusplus
-}
-#endif
 
 /*****************************************************************************/
 

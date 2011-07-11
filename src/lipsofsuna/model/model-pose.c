@@ -1019,7 +1019,7 @@ static int private_init_pose (
 
 	/* Set model. */
 	self->model = model;
-	self->groups.count = model->weightgroups.count;
+	self->groups.count = model->weight_groups.count;
 	self->nodes.count = model->nodes.count;
 
 	/* Copy nodes. */
@@ -1044,7 +1044,7 @@ static int private_init_pose (
 			return 0;
 		for (i = 0 ; i < self->groups.count ; i++)
 		{
-			weight_group = model->weightgroups.array + i;
+			weight_group = model->weight_groups.array + i;
 			pose_group = self->groups.array + i;
 			pose_group->weight_group = weight_group;
 			pose_group->rest_node = weight_group->node;
