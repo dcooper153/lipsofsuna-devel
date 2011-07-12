@@ -20,5 +20,5 @@ pass6_fragment = [[
 in float F_alpha;
 void main()
 {
-	LOS_output_0 = vec4(1.0, 1.0, 1.0, F_alpha);
+	LOS_output_0 = vec4(LOS_material_diffuse.rgb, F_alpha);
 }]]}}
