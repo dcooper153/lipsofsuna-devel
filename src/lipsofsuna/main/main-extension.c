@@ -33,6 +33,7 @@ extern LIMaiExtensionInfo liext_database_info;
 extern LIMaiExtensionInfo liext_file_info;
 extern LIMaiExtensionInfo liext_graphics_info;
 extern LIMaiExtensionInfo liext_lobby_info;
+extern LIMaiExtensionInfo liext_model_editing_info;
 extern LIMaiExtensionInfo liext_network_info;
 extern LIMaiExtensionInfo liext_noise_info;
 extern LIMaiExtensionInfo liext_object_physics_info;
@@ -73,6 +74,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "file", &liext_file_info },
 		{ "graphics", &liext_graphics_info },
 		{ "lobby", &liext_lobby_info },
+		{ "model-editing", &liext_model_editing_info },
 		{ "network", &liext_network_info },
 		{ "noise", &liext_noise_info },
 		{ "object-physics", &liext_object_physics_info },

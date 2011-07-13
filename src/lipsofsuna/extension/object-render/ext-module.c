@@ -121,9 +121,7 @@ LIExtModule* liext_object_render_new (
 	}
 
 	/* Extend classes. */
-	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_RENDER_MODEL, self);
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_RENDER_OBJECT, self);
-	liext_script_render_model (program->script);
 	liext_script_render_object (program->script);
 
 	return self;

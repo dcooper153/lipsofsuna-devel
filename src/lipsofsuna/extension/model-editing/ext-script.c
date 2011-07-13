@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIExt Extension
  * @{
- * \addtogroup LIExtObjectRender ObjectRender
+ * \addtogroup LIExtModelEditing ModelEditing
  * @{
  */
 
@@ -33,14 +33,10 @@ static void Model_add_material (LIScrArgs* args)
 	const char* shader;
 	LIMdlBuilder* builder;
 	LIMdlMaterial material;
-	LIExtModule* module;
 	LIEngModel* model;
 
-	/* Get the engine model. */
-	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_MODEL);
-	model = args->self;
-
 	/* Create a model builder. */
+	model = args->self;
 	builder = limdl_builder_new (model->model);
 	if (builder == NULL)
 		return;
@@ -81,14 +77,10 @@ static void Model_add_triangles (LIScrArgs* args)
 	LIMdlVertex* tmp;
 	LIMdlVertex* vertex;
 	LIMdlVertex* vertices = NULL;
-	LIExtModule* module;
 	LIEngModel* model;
 
-	/* Get the engine model. */
-	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_MODEL);
-	model = args->self;
-
 	/* Get the edited material group. */
+	model = args->self;
 	liscr_args_gets_int (args, "material", &group);
 	if (group < 1 || group > model->model->materials.count)
 		return;
@@ -201,12 +193,10 @@ static void Model_edit_material (LIScrArgs* args)
 	const char* str;
 	const char* shader = NULL;
 	const char* texture = NULL;
-	LIExtModule* module;
 	LIEngModel* model;
 	LIMdlMaterial* material;
 
 	/* Get the engine model. */
-	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_MODEL);
 	model = args->self;
 	liscr_args_gets_string (args, "match_shader", &shader);
 	liscr_args_gets_string (args, "match_texture", &texture);
@@ -320,7 +310,7 @@ static void Model_remove_vertices (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void liext_script_render_model (
+void liext_script_model_editing (
 	LIScrScript* self)
 {
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_add_material", Model_add_material);
