@@ -1,3 +1,5 @@
+require "common/string"
+
 Settings = Class()
 Settings.arguments = string.split(Program.args)
 Settings.address = "localhost"

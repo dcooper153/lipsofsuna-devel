@@ -1,4 +1,5 @@
 require "common/spec"
+require "common/string"
 
 Itemspec = Class(Spec)
 Itemspec.type = "item"
