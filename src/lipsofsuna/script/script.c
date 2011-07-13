@@ -29,6 +29,16 @@
 #include "script-private.h"
 #include "script-util.h"
 
+static int private_exec_script (
+	LIScrScript* self);
+
+static int private_init_includes (
+	LIScrScript* self,
+	const char*  path1,
+	const char*  path2);
+
+/*****************************************************************************/
+
 /**
  * \brief Creates a new script.
  * \return New script or NULL.
@@ -162,43 +172,24 @@ void liscr_script_insert_mfunc (
 }
 
 /**
- * \brief Attaches a file to the script.
+ * \brief Executes a file.
  * \param self Script.
  * \param path Path to the file.
+ * \param path_mod Module include path.
  * \param path_core Core include path.
  * \return Nonzero on success.
  */
-int liscr_script_load (
+int liscr_script_load_file (
 	LIScrScript* self,
 	const char*  path,
+	const char*  path_mod,
 	const char*  path_core)
 {
 	int ret;
-	char* inc;
-	char* inc1;
-	char* inc2;
 
-	/* Construct the include path. */
-	inc1 = lisys_path_format (LISYS_PATH_PATHNAME, path, LISYS_PATH_SEPARATOR, "?.lua", NULL);
-	inc2 = lisys_path_format (path_core, LISYS_PATH_SEPARATOR, "?.lua", NULL);
-	if (inc1 == NULL || inc2 == NULL)
-	{
-		lisys_free (inc1);
-		lisys_free (inc2);
+	/* Setup include paths. */
+	if (!private_init_includes (self, path_mod, path_core))
 		return 0;
-	}
-	inc = lisys_string_format ("%s;%s", inc1, inc2);
-	lisys_free (inc1);
-	lisys_free (inc2);
-	if (inc == NULL)
-		return 0;
-
-	/* Set the include path. */
-	lua_getfield (self->lua, LUA_GLOBALSINDEX, "package");
-	lua_pushstring (self->lua, inc);
-	lua_setfield (self->lua, -2, "path");
-	lua_pop (self->lua, 1);
-	lisys_free (inc);
 
 	/* Load the file. */
 	ret = luaL_loadfile (self->lua, path);
@@ -209,22 +200,44 @@ int liscr_script_load (
 		return 0;
 	}
 
-	/* Set the error handler. */
-	lua_pushvalue (self->lua, 1);
-	lua_getglobal (self->lua, "debug");
-	lua_getfield (self->lua, 3, "traceback");
-	lua_replace (self->lua, 1);
-	lua_pop (self->lua, 1);
+	/* Execute the file. */
+	if (!private_exec_script (self))
+		return 0;
 
-	/* Parse the file. */
-	ret = lua_pcall (self->lua, 0, 0, 1);
+	return 1;
+}
+
+/**
+ * \brief Executes a string.
+ * \param self Script.
+ * \param path_mod Module include path.
+ * \param path_core Core include path.
+ * \return Nonzero on success.
+ */
+int liscr_script_load_string (
+	LIScrScript* self,
+	const char*  code,
+	const char*  path_mod,
+	const char*  path_core)
+{
+	int ret;
+
+	/* Setup include paths. */
+	if (!private_init_includes (self, path_mod, path_core))
+		return 0;
+
+	/* Load the string. */
+	ret = luaL_loadstring (self->lua, code);
 	if (ret)
 	{
-		lisys_error_set (EINVAL, "%s", lua_tostring (self->lua, -1));
-		lua_pop (self->lua, 2);
+		lisys_error_set (EIO, "%s", lua_tostring (self->lua, -1));
+		lua_pop (self->lua, 1);
 		return 0;
 	}
-	lua_pop (self->lua, 1);
+
+	/* Execute the string. */
+	if (!private_exec_script (self))
+		return 0;
 
 	return 1;
 }
@@ -274,6 +287,55 @@ void liscr_script_set_userdata (
 	void*        value)
 {
 	lialg_strdic_insert (self->userdata, key, value);
+}
+
+/*****************************************************************************/
+
+static int private_exec_script (
+	LIScrScript* self)
+{
+	int ret;
+
+	/* Set the error handler. */
+	lua_pushvalue (self->lua, 1);
+	lua_getglobal (self->lua, "debug");
+	lua_getfield (self->lua, 3, "traceback");
+	lua_replace (self->lua, 1);
+	lua_pop (self->lua, 1);
+
+	/* Execute the script. */
+	ret = lua_pcall (self->lua, 0, 0, 1);
+	if (ret)
+	{
+		lisys_error_set (EINVAL, "%s", lua_tostring (self->lua, -1));
+		lua_pop (self->lua, 2);
+		return 0;
+	}
+	lua_pop (self->lua, 1);
+
+	return 1;
+}
+
+static int private_init_includes (
+	LIScrScript* self,
+	const char*  path1,
+	const char*  path2)
+{
+	char* inc;
+
+	/* Construct the include path. */
+	inc = lisys_string_format ("%s/?.lua;%s/?.lua", path1, path2);
+	if (inc == NULL)
+		return 0;
+
+	/* Set the include path. */
+	lua_getfield (self->lua, LUA_GLOBALSINDEX, "package");
+	lua_pushstring (self->lua, inc);
+	lua_setfield (self->lua, -2, "path");
+	lua_pop (self->lua, 1);
+	lisys_free (inc);
+
+	return 1;
 }
 
 /** @} */

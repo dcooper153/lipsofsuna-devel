@@ -270,7 +270,6 @@ void limai_program_eventva (
 
 /**
  * \brief Executes a script file.
- *
  * \param self Program.
  * \param file Filename.
  * \return Nonzero on success.
@@ -281,21 +280,59 @@ int limai_program_execute_script (
 {
 	int ret;
 	char* path;
+	char* path_mod;
 	char* path_core;
 
 	/* Get paths. */
 	path = lipth_paths_get_script (self->paths, file);
+	path_mod = lisys_path_concat (self->paths->module_data, "scripts", NULL);
 	path_core = lisys_path_concat (self->paths->global_data, NULL);
-	if (path == NULL || path_core == NULL)
+	if (path == NULL || path_mod == NULL || path_core == NULL)
 	{
 		lisys_free (path);
+		lisys_free (path_mod);
 		lisys_free (path_core);
 		return 0;
 	}
 
-	/* Load the script. */
-	ret = liscr_script_load (self->script, path, path_core);
+	/* Load and execute the script. */
+	ret = liscr_script_load_file (self->script, path, path_mod, path_core);
 	lisys_free (path);
+	lisys_free (path_mod);
+	lisys_free (path_core);
+	if (!ret)
+		return 0;
+
+	return 1;
+}
+
+/**
+ * \brief Executes a script string.
+ * \param self Program.
+ * \param code Code string.
+ * \return Nonzero on success.
+ */
+int limai_program_execute_string (
+	LIMaiProgram* self,
+	const char*   code)
+{
+	int ret;
+	char* path_mod;
+	char* path_core;
+
+	/* Get paths. */
+	path_mod = lisys_path_concat (self->paths->module_data, "scripts", NULL);
+	path_core = lisys_path_concat (self->paths->global_data, NULL);
+	if (path_mod == NULL || path_core == NULL)
+	{
+		lisys_free (path_mod);
+		lisys_free (path_core);
+		return 0;
+	}
+
+	/* Execute the script. */
+	ret = liscr_script_load_string (self->script, code, path_mod, path_core);
+	lisys_free (path_mod);
 	lisys_free (path_core);
 	if (!ret)
 		return 0;

@@ -115,5 +115,4 @@ Model.unittest = function()
 	assert(m1.handle)
 	-- Function access.
 	m:calculate_bounds()
-	m:merge(m1)
 end

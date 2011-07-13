@@ -13,6 +13,9 @@ catch(function() Class.unittest() end)
 require "system/core"
 catch(function() Program.unittest() end)
 
+require "system/thread"
+catch(function() Thread.unittest() end)
+
 require "system/file"
 catch(function() File.unittest() end)
 

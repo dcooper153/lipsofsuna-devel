@@ -76,6 +76,10 @@ LIAPICALL (int, limai_program_execute_script, (
 	LIMaiProgram* self,
 	const char*   file));
 
+LIAPICALL (int, limai_program_execute_string, (
+	LIMaiProgram* self,
+	const char*   code));
+
 LIAPICALL (void*, limai_program_find_component, (
 	LIMaiProgram* self,
 	const char*   name));
