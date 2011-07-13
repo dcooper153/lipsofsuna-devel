@@ -194,6 +194,17 @@ static void Program_update (LIScrArgs* args)
 	limai_program_update (program);
 }
 
+static void Program_wait (LIScrArgs* args)
+{
+	float secs = 1.0f;
+	LIMaiProgram* program;
+
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	liscr_args_geti_float (args, 0, &secs);
+	if (secs > 0.0f)
+		lisys_usleep ((int)(1000000 * secs));
+}
+
 static void Program_get_args (LIScrArgs* args)
 {
 	LIMaiProgram* program;
@@ -291,6 +302,7 @@ void liscr_script_program (
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_unload_world", Program_unload_world);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_shutdown", Program_shutdown);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_update", Program_update);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_wait", Program_wait);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_args", Program_get_args);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_quit", Program_get_quit);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_set_quit", Program_set_quit);

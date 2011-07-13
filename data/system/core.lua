@@ -89,6 +89,13 @@ Program.update = function(clss, args)
 	Los.program_update(args)
 end
 
+--- Waits for the given number seconds.
+-- @param clss Program class.
+-- @param secs Delay in seconds.
+Program.wait = function(clss, secs)
+	Los.program_wait(secs)
+end
+
 --- The argument string passed to the program at startup time.
 -- @name Program.args
 -- @class table
