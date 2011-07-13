@@ -179,9 +179,15 @@ Eventhandler{type = "tick", func = function(self, args)
 		Client.camera3:update(args.secs)
 		Player:update_light(args.secs)
 		-- Sound playback.
-		Sound.listener_position = Player.object.position
-		Sound.listener_rotation = Player.object.rotation
-		local vel = Player.object.velocity
+		local p,r = Client.player_object:find_node{name = "#neck", space = "world"}
+		if p then
+			Sound.listener_position = p
+			Sound.listener_rotation = r
+		else
+			Sound.listener_position = Client.player_object.position + Vector(0,1.5,0)
+			Sound.listener_rotation = Client.player_object.rotation
+		end
+		local vel = Client.player_object.velocity
 		if vel then Sound.listener_velocity = vel end
 		-- Refresh the active portion of the map.
 		Player.object:refresh()
