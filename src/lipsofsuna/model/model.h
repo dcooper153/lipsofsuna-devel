@@ -57,7 +57,7 @@ struct _LIMdlModel
 LIAPICALL (LIMdlModel*, limdl_model_new, ());
 
 LIAPICALL (LIMdlModel*, limdl_model_new_copy, (
-	LIMdlModel* model));
+	const LIMdlModel* model));
 
 LIAPICALL (LIMdlModel*, limdl_model_new_from_data, (
 	LIArcReader* reader,

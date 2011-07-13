@@ -67,6 +67,91 @@ static void Program_load_extension (LIScrArgs* args)
 	}
 }
 
+static void Program_pop_message (LIScrArgs* args)
+{
+	LIMaiMessage* message;
+	LIMaiProgram* self;
+	LIEngModel* model;
+
+	/* Only allowed for child programs. */
+	self = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	if (self->parent == NULL)
+		return;
+
+	/* Pop the message. */
+	message = limai_program_pop_message (self, LIMAI_MESSAGE_QUEUE_THREAD);
+	if (message == NULL)
+		return;
+
+	/* Return the message. */
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_sets_string (args, "name", message->name);
+	switch (message->type)
+	{
+		case LIMAI_MESSAGE_TYPE_EMPTY:
+			liscr_args_sets_string (args, "type", "empty");
+			break;
+		case LIMAI_MESSAGE_TYPE_MODEL:
+			liscr_args_sets_string (args, "type", "model");
+			model = lieng_model_new_model (self->engine, message->model);
+			if (model != NULL)
+			{
+				message->model = NULL;
+				model->script = liscr_data_new (args->script, args->lua, model, LISCR_SCRIPT_MODEL, lieng_model_free);
+				if (model->script != NULL)
+					liscr_args_sets_stack (args, "model");
+				else
+					lieng_model_free (model);
+			}
+			break;
+		case LIMAI_MESSAGE_TYPE_STRING:
+			liscr_args_sets_string (args, "type", "string");
+			liscr_args_sets_string (args, "string", message->string);
+			break;
+	}
+
+	/* Free the message. */
+	limai_message_free (message);
+}
+
+static void Program_push_message (LIScrArgs* args)
+{
+	const char* name = "";
+	const char* string = NULL;
+	LIMaiProgram* self;
+	LIScrData* data;
+	LIEngModel* emodel;
+
+	/* Only allowed for child programs. */
+	self = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	if (self->parent == NULL)
+		return;
+
+	/* Read the name. */
+	if (!liscr_args_geti_string (args, 0, &name))
+		liscr_args_gets_string (args, "name", &name);
+
+	/* Read and push the data. */
+	if (liscr_args_geti_string (args, 1, &string) ||
+	    liscr_args_gets_string (args, "string", &string))
+	{
+		if (limai_program_push_message (self, LIMAI_MESSAGE_QUEUE_PROGRAM, LIMAI_MESSAGE_TYPE_STRING, name, string))
+			liscr_args_seti_bool (args, 1);
+	}
+	else if (liscr_args_geti_data (args, 1, LISCR_SCRIPT_MODEL, &data) ||
+	         liscr_args_gets_data (args, "model", LISCR_SCRIPT_MODEL, &data))
+	{
+		emodel = liscr_data_get_data (data);
+		if (limai_program_push_message (self, LIMAI_MESSAGE_QUEUE_PROGRAM, LIMAI_MESSAGE_TYPE_MODEL, name, emodel->model))
+			liscr_args_seti_bool (args, 1);
+	}
+	else
+	{
+		if (limai_program_push_message (self, LIMAI_MESSAGE_QUEUE_PROGRAM, LIMAI_MESSAGE_TYPE_EMPTY, name, NULL))
+			liscr_args_seti_bool (args, 1);
+	}
+}
+
 static void Program_unittest (LIScrArgs* args)
 {
 	LIMaiProgram* program;
@@ -199,6 +284,8 @@ void liscr_script_program (
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_launch_mod", Program_launch_mod);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_load_extension", Program_load_extension);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_pop_message", Program_pop_message);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_push_message", Program_push_message);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_unittest", Program_unittest);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_unload_sector", Program_unload_sector);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_unload_world", Program_unload_world);

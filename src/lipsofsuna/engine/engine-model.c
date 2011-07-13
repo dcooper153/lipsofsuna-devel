@@ -33,20 +33,58 @@ LIEngModel* lieng_model_new (
 	LIEngEngine* engine)
 {
 	LIEngModel* self;
+	LIMdlModel* model;
+
+	/* Create an empty model. */
+	model = limdl_model_new ();
+	if (model == NULL)
+		return NULL;
+
+	/* Allocate self. */
+	self = lieng_model_new_model (engine, model);
+	if (self == NULL)
+	{
+		limdl_model_free (model);
+		return NULL;
+	}
+
+	return self;
+}
+
+LIEngModel* lieng_model_new_copy (
+	LIEngModel* model)
+{
+	LIEngModel* self;
+	LIMdlModel* model_;
+
+	/* Copy the model. */
+	model_ = limdl_model_new_copy (model->model);
+	if (model_ == NULL)
+		return NULL;
+
+	/* Allocate self. */
+	self = lieng_model_new_model (model->engine, model_);
+	if (self == NULL)
+	{
+		limdl_model_free (model_);
+		return NULL;
+	}
+
+	return self;
+}
+
+LIEngModel* lieng_model_new_model (
+	LIEngEngine* engine,
+	LIMdlModel*  model)
+{
+	LIEngModel* self;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIEngModel));
 	if (self == NULL)
 		return NULL;
 	self->engine = engine;
-
-	/* Create an empty model. */
-	self->model = limdl_model_new ();
-	if (self->model == NULL)
-	{
-		lieng_model_free (self);
-		return NULL;
-	}
+	self->model = model;
 
 	/* Choose model number. */
 	while (!self->id)
@@ -65,46 +103,6 @@ LIEngModel* lieng_model_new (
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, "model-new", lical_marshal_DATA_PTR, self);
-
-	return self;
-}
-
-LIEngModel* lieng_model_new_copy (
-	LIEngModel* model)
-{
-	LIEngModel* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIEngModel));
-	if (self == NULL)
-		return NULL;
-	self->engine = model->engine;
-
-	/* Copy model geometry. */
-	self->model = limdl_model_new_copy (model->model);
-	if (self->model == NULL)
-	{
-		lieng_model_free (self);
-		return 0;
-	}
-
-	/* Choose model number. */
-	while (!self->id)
-	{
-		self->id = lialg_random_rand (&model->engine->random);
-		if (!self->id)
-			continue;
-		if (lialg_u32dic_find (model->engine->models, self->id) != NULL)
-			self->id = 0;
-	}
-	if (!lialg_u32dic_insert (model->engine->models, self->id, self))
-	{
-		lieng_model_free (self);
-		return NULL;
-	}
-
-	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, "model-new", lical_marshal_DATA_PTR_PTR, self, model);
 
 	return self;
 }

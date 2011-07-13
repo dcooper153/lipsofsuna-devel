@@ -25,6 +25,7 @@
 #include <lipsofsuna/paths.h>
 #include <lipsofsuna/script.h>
 #include "main-extension.h"
+#include "main-message.h"
 
 #define LIMAI_PROGRAM_FPS_TICKS 32
 
@@ -50,8 +51,11 @@ struct _LIMaiProgram
 	LICalHandle calls[4];
 	LIEngEngine* engine;
 	LIMaiExtension* extensions;
+	LIMaiMessage* messages[LIMAI_MESSAGE_QUEUE_MAX];
+	LIMaiProgram* parent;
 	LIPthPaths* paths;
 	LIScrScript* script;
+	LISysMutex* message_mutex;
 };
 
 LIAPICALL (LIMaiProgram*, limai_program_new, (
@@ -96,6 +100,17 @@ LIAPICALL (int, limai_program_insert_component, (
 LIAPICALL (int, limai_program_insert_extension, (
 	LIMaiProgram* self,
 	const char*   name));
+
+LIAPICALL (LIMaiMessage*, limai_program_pop_message, (
+	LIMaiProgram* self,
+	int           queue));
+
+LIAPICALL (int, limai_program_push_message, (
+	LIMaiProgram* self,
+	int           queue,
+	int           type,
+	const char*   name,
+	const void*   data));
 
 LIAPICALL (void, limai_program_remove_component, (
 	LIMaiProgram* self,

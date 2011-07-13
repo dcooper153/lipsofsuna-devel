@@ -22,12 +22,38 @@ Program.pop_event = function(clss)
 	return t
 end
 
+--- Pops a message sent by the parent script.
+-- @param self Thread.
+-- @return Message table or nil.
+Program.pop_message = function(self)
+	local r = Los.program_pop_message()
+	if not r then return end
+	if r.type == "model" and r.model then
+		r.model = Class.new(Model, {handle = r.model})
+	end
+	return r
+end
+
 --- Pushes an event to the back of the event queue.
 -- @param clss Program class.
 -- @return event Event table.
 Program.push_event = function(clss, event)
 	if not __events then __events = {} end
 	table.insert(__events, event)
+end
+
+--- Pushes a message to the parent script.
+-- @param self Thread.
+-- @param ... Message arguments.
+-- @return True on success.
+Program.push_message = function(self, ...)
+	local a = ...
+	if type(a) == "table" then
+		if a.model then a.model = a.model.handle end
+		return Los.program_push_message(a)
+	else
+		return Los.program_push_message(...)
+	end
 end
 
 --- Unloads a sector.<br/>
@@ -114,4 +140,7 @@ Program.unittest = function()
 	assert(type(Program.time) == "number")
 	Program.quit = true
 	assert(Program.quit)
+	-- Message passing disabled for non-threads.
+	assert(not Program:push_message("fail", "fail"))
+	assert(not Program:pop_message())
 end

@@ -45,6 +45,83 @@ static void Thread_new (LIScrArgs* args)
 		liscr_args_seti_stack (args);
 }
 
+static void Thread_pop_message (LIScrArgs* args)
+{
+	LIMaiMessage* message;
+	LIExtThread* self;
+	LIEngModel* model;
+
+	/* Pop the name. */
+	self = args->self;
+	message = limai_program_pop_message (self->program, LIMAI_MESSAGE_QUEUE_PROGRAM);
+	if (message == NULL)
+		return;
+
+	/* Return the message. */
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_sets_string (args, "name", message->name);
+	switch (message->type)
+	{
+		case LIMAI_MESSAGE_TYPE_EMPTY:
+			liscr_args_sets_string (args, "type", "empty");
+			break;
+		case LIMAI_MESSAGE_TYPE_MODEL:
+			liscr_args_sets_string (args, "type", "model");
+			model = lieng_model_new_model (self->program->parent->engine, message->model);
+			if (model != NULL)
+			{
+				message->model = NULL;
+				model->script = liscr_data_new (args->script, args->lua, model, LISCR_SCRIPT_MODEL, lieng_model_free);
+				if (model->script != NULL)
+					liscr_args_sets_stack (args, "model");
+				else
+					lieng_model_free (model);
+			}
+			break;
+		case LIMAI_MESSAGE_TYPE_STRING:
+			liscr_args_sets_string (args, "type", "string");
+			liscr_args_sets_string (args, "string", message->string);
+			break;
+	}
+
+	/* Free the message. */
+	limai_message_free (message);
+}
+
+static void Thread_push_message (LIScrArgs* args)
+{
+	const char* name = "";
+	const char* string = NULL;
+	LIScrData* data;
+	LIEngModel* emodel;
+	LIExtThread* self;
+
+	/* Read the name. */
+	self = args->self;
+	if (!liscr_args_geti_string (args, 0, &name))
+		liscr_args_gets_string (args, "name", &name);
+
+	/* Read and push the data. */
+	if (liscr_args_geti_string (args, 1, &string) ||
+	    liscr_args_gets_string (args, "string", &string))
+	{
+		if (limai_program_push_message (self->program, LIMAI_MESSAGE_QUEUE_THREAD, LIMAI_MESSAGE_TYPE_STRING, name, string))
+			liscr_args_seti_bool (args, 1);
+	}
+	else if (liscr_args_geti_data (args, 1, LISCR_SCRIPT_MODEL, &data) ||
+	         liscr_args_gets_data (args, "model", LISCR_SCRIPT_MODEL, &data))
+	{
+		emodel = liscr_data_get_data (data);
+		if (limai_program_push_message (self->program, LIMAI_MESSAGE_QUEUE_THREAD, LIMAI_MESSAGE_TYPE_MODEL, name, emodel->model))
+			liscr_args_seti_bool (args, 1);
+	}
+	else
+	{
+		if (limai_program_push_message (self->program, LIMAI_MESSAGE_QUEUE_THREAD, LIMAI_MESSAGE_TYPE_EMPTY, name, NULL))
+			liscr_args_seti_bool (args, 1);
+	}
+}
+
 static void Thread_set_quit (LIScrArgs* args)
 {
 	liext_thread_inst_set_quit (args->self);
@@ -56,6 +133,8 @@ void liext_script_thread (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_THREAD, "thread_new", Thread_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_THREAD, "thread_pop_message", Thread_pop_message);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_THREAD, "thread_push_message", Thread_push_message);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_THREAD, "thread_set_quit", Thread_set_quit);
 }
 

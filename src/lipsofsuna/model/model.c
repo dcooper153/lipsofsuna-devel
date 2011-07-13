@@ -161,7 +161,7 @@ LIMdlModel* limdl_model_new ()
 }
 
 LIMdlModel* limdl_model_new_copy (
-	LIMdlModel* model)
+	const LIMdlModel* model)
 {
 	int i;
 	LIMdlModel* self;

@@ -37,6 +37,10 @@ LIAPICALL (LIEngModel*, lieng_model_new, (
 LIAPICALL (LIEngModel*, lieng_model_new_copy, (
 	LIEngModel* model));
 
+LIAPICALL (LIEngModel*, lieng_model_new_model, (
+	LIEngEngine* engine,
+	LIMdlModel*  model));
+
 LIAPICALL (void, lieng_model_free, (
 	LIEngModel* self));
 

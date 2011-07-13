@@ -94,8 +94,11 @@ LIMaiProgram* limai_program_new (
 void limai_program_free (
 	LIMaiProgram* self)
 {
+	int i;
 	LIMaiExtension* extension;
 	LIMaiExtension* extension_next;
+	LIMaiMessage* message;
+	LIMaiMessage* message_next;
 
 	/* Invoke callbacks. */
 	if (self->callbacks != NULL)
@@ -148,6 +151,18 @@ void limai_program_free (
 		lialg_sectors_free (self->sectors);
 	if (self->paths != NULL)
 		lipth_paths_free (self->paths);
+
+	/* Free messaging. */
+	if (self->message_mutex != NULL)
+		lisys_mutex_free (self->message_mutex);
+	for (i = 0 ; i < LIMAI_MESSAGE_QUEUE_MAX ; i++)
+	{
+		for (message = self->messages[i] ; message != NULL ; message = message_next)
+		{
+			message_next = message->next;
+			limai_message_free (message);
+		}
+	}
 
 	lisys_free (self->launch_args);
 	lisys_free (self->launch_name);
@@ -509,6 +524,79 @@ int limai_program_insert_component (
 }
 
 /**
+ * \brief Pops a message from the message queue.
+ *
+ * This function is thread safe. It's specifically intended for thread safe
+ * communication between scripted programs running in different threads.
+ *
+ * \param self Program.
+ * \param queue Message queue.
+ * \return Message or NULL.
+ */
+LIMaiMessage* limai_program_pop_message (
+	LIMaiProgram* self,
+	int           queue)
+{
+	LIMaiMessage* message;
+
+	/* Pop a message from the queue. */
+	lisys_mutex_lock (self->message_mutex);
+	message = self->messages[queue];
+	if (message != NULL)
+	{
+		if (message->next != NULL)
+			message->next->prev = NULL;
+		self->messages[queue] = message->next;
+	}
+	lisys_mutex_unlock (self->message_mutex);
+
+	return message;
+}
+
+/**
+ * \brief Pushes a message to the message queue.
+ *
+ * This function is thread safe. It's specifically intended for thread safe
+ * communication between scripted programs running in different threads.
+ *
+ * \param queue Message queue.
+ * \param type Message type.
+ * \param name Message name.
+ * \param data Message data to be soft copied.
+ * \return Nonzero on success.
+ */
+int limai_program_push_message (
+	LIMaiProgram* self,
+	int           queue,
+	int           type,
+	const char*   name,
+	const void*   data)
+{
+	LIMaiMessage* ptr;
+	LIMaiMessage* message;
+
+	/* Create the message. */
+	message = limai_message_new (type, name, data);
+	if (message == NULL)
+		return 0;
+
+	/* Append it to the message queue. */
+	lisys_mutex_lock (self->message_mutex);
+	if (self->messages[queue] != NULL)
+	{
+		for (ptr = self->messages[queue] ; ptr->next != NULL ; ptr = ptr->next)
+			{}
+		ptr->next = message;
+		message->prev = ptr;
+	}
+	else
+		self->messages[queue] = message;
+	lisys_mutex_unlock (self->message_mutex);
+
+	return 1;
+}
+
+/**
  * \brief Unregisters a component.
  *
  * \param self Program.
@@ -655,6 +743,11 @@ static int private_init (
 	gettimeofday (&self->start, NULL);
 	self->prev_tick = self->start;
 	self->curr_tick = self->start;
+
+	/* Initialize messaging. */
+	self->message_mutex = lisys_mutex_new ();
+	if (self->message_mutex == NULL)
+		return 0;
 
 	/* Register classes. */
 	liscr_script_set_userdata (self->script, LISCR_SCRIPT_PROGRAM, self);

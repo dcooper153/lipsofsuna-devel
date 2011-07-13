@@ -71,6 +71,7 @@ LIExtThread* liext_thread_inst_new (
 		lisys_free (self);
 		return NULL;
 	}
+	self->program->parent = program;
 
 	/* Allocate the host userdata. */
 	self->script = liscr_data_new (program->script, lua, self, LIEXT_SCRIPT_THREAD, liext_thread_inst_free);
