@@ -15,7 +15,7 @@ Actionspec{name = "melee", func = function(feat, info, args)
 	elseif args.user.movement > 0.2 then move = 5
 	else move = 1 end
 	local path = paths[move]
-	Thread(function(t)
+	Coroutine(function(t)
 		local apply = function(r)
 			feat:apply{
 				attacker = args.user,
@@ -41,7 +41,7 @@ Actionspec{name = "melee", func = function(feat, info, args)
 		-- Cast attack rays.
 		feat:play_effects(args)
 		for i = 1,4 do
-			Thread:sleep(args.user.spec.timing_attack_melee * 0.02 / 4)
+			Coroutine:sleep(args.user.spec.timing_attack_melee * 0.02 / 4)
 			if cast(path[i]) then return end
 		end
 	end)

@@ -2,9 +2,9 @@
 -- While the attack animation is played, an attack ray is cast.
 -- If a tile collides with the ray, a new tile is attached to it.
 Actionspec{name = "build", func = function(feat, info, args)
-	Thread(function(t)
+	Coroutine(function(t)
 		feat:play_effects(args)
-		Thread:sleep(args.user.spec.timing_build * 0.02)
+		Coroutine:sleep(args.user.spec.timing_build * 0.02)
 		local src,dst = args.user:get_attack_ray()
 		local r = Physics:cast_ray{src = src, dst = dst}
 		if not r or not r.tile then return end

@@ -187,7 +187,7 @@ Creature.new = function(clss, args)
 	if args and args.dead then self:set_dead_state() end
 	copy("realized")
 
-	Thread(function()
+	Coroutine(function()
 		while true do
 			local secs = coroutine.yield()
 			if not self.realized then return end
@@ -410,7 +410,7 @@ Creature.climb = function(self)
 		self.jumping = nil
 		self.climbing = true
 		self:animate("climb high")
-		Thread(function()
+		Coroutine(function()
 			-- Rise.
 			local t = 0
 			local p = self.position
@@ -435,7 +435,7 @@ Creature.climb = function(self)
 		self.jumping = nil
 		self.climbing = true
 		self:animate("climb low")
-		Thread(function()
+		Coroutine(function()
 			-- Rise.
 			local t = 0
 			local p = self.position
@@ -662,8 +662,8 @@ Creature.jump = function(self)
 		self.jumping = true
 		Effect:play{effect = "jump1", object = self}
 		self:animate("jump")
-		Thread(function(thread)
-			Thread:sleep(self.spec.timing_jump * 0.02)
+		Coroutine(function(thread)
+			Coroutine:sleep(self.spec.timing_jump * 0.02)
 			if not self.realized then return end
 			local v = self.velocity
 			Object.jump(self, {impulse = Vector(v.x, self.spec.jump_force * self.spec.mass, v.z)})

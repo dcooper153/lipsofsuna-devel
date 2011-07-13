@@ -115,7 +115,7 @@ EffectObject.new = function(clss, args)
 		end
 	end
 	-- Update in a thread until the effect ends.
-	Thread(function()
+	Coroutine(function()
 		local t = 0
 		local moved = parent and (self.position - parent.position) or self.position
 		while t < life and (not parent or parent.realized) do

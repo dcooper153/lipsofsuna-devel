@@ -1,27 +1,29 @@
-Thread = Class()
-Thread.class_name = "Thread"
-Thread.routines = {}
+require "system/eventhandler"
+
+Coroutine = Class()
+Coroutine.class_name = "Coroutine"
+Coroutine.routines = {}
 
 --- Creates a thread executing a function.
--- @param self Thread class.
+-- @param self Coroutine class.
 -- @param func Function to execute.
 -- @return Coroutine.
-Thread.new = function(clss, func)
+Coroutine.new = function(clss, func)
 	local co = coroutine.create(func)
 	if coroutine.status(co) == "dead" then return end
 	clss.routines[co] = co
 	return co
 end
 
-Thread.sleep = function(self, delay)
+Coroutine.sleep = function(self, delay)
 	local t = 0.0
 	while t < delay do t = t + coroutine.yield() end
 end
 
 --- Updates all the threads.
--- @param clss Thread class.
+-- @param clss Coroutine class.
 -- @param secs Number of seconds since the last update.
-Thread.update = function(clss, secs)
+Coroutine.update = function(clss, secs)
 	for key,value in pairs(clss.routines) do
 		local ret,err = coroutine.resume(value, secs)
 		if not ret then print(err) end
@@ -31,11 +33,11 @@ Thread.update = function(clss, secs)
 	end
 end
 
-Thread.yield = function(self)
+Coroutine.yield = function(self)
 	return coroutine.yield()
 end
 
 -- Updating threads.
 Eventhandler{type = "tick", func = function(self, args)
-	Thread:update(args.secs)
+	Coroutine:update(args.secs)
 end}

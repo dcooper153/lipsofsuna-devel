@@ -84,7 +84,7 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 	-- being loaded. It's useful since sectors are often loaded in clusters.
 	local org = self:get_sector_offset(sector)
 	local spawn = Config.inst.spawn_point * Voxel.tile_scale
-	Thread(function(thread)
+	Coroutine(function(thread)
 		for i = 1,monsters do
 			for j = 1,15 do
 				local c = Vector()

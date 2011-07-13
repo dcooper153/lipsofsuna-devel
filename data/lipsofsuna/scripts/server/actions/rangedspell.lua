@@ -3,8 +3,8 @@
 -- animation. The collision callback of the projectile takes
 -- care of damaging the hit object or tile.
 Actionspec{name = "ranged spell", func = function(feat, info, args)
-	Thread(function(t)
-		Thread:sleep(args.user.spec.timing_spell_ranged * 0.02)
+	Coroutine(function(t)
+		Coroutine:sleep(args.user.spec.timing_spell_ranged * 0.02)
 		feat:play_effects(args)
 		for index,data in ipairs(feat.effects) do
 			local effect = Feateffectspec:find{name = data[1]}

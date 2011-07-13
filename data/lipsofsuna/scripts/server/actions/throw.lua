@@ -4,8 +4,8 @@
 -- care of damaging the hit object or tile.
 Actionspec{name = "throw", func = function(feat, info, args)
 	local charge = 1 + 2 * math.min(1, (args.charge or 0) / 2)
-	Thread(function(t)
-		Thread:sleep(args.user.spec.timing_attack_throw * 0.02)
+	Coroutine(function(t)
+		Coroutine:sleep(args.user.spec.timing_attack_throw * 0.02)
 		feat:play_effects(args)
 		local proj = args.weapon:fire{
 			charge = charge,

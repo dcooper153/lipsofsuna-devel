@@ -1,9 +1,9 @@
 -- Custom melee attacks.
 -- This is mainly used by monster specific special moves.
 Actionspec{name = "melee custom", func = function(feat, info, args)
-	Thread(function(t)
+	Coroutine(function(t)
 		feat:play_effects(args)
-		Thread:sleep(args.user.spec.timing_attack_melee * 0.02)
+		Coroutine:sleep(args.user.spec.timing_attack_melee * 0.02)
 		-- Get the attack ray.
 		local src,dst = args.user:get_attack_ray(rel)
 		-- Cast the attack ray.
