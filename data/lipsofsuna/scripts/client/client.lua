@@ -40,6 +40,9 @@ Client.init = function(self)
 	self.camera1 = FirstPersonCamera(camcfg)
 	self.camera3 = ThirdPersonCamera(camcfg)
 	self.camera_mode = "third-person"
+	-- Initialize helper threads.
+	self.threads = {}
+	self.threads.model_builder = Thread("client/threads/modelbuilder.lua")
 end
 
 --- Applies a world space quake.

@@ -147,6 +147,18 @@ Eventhandler{type = "tick", func = function(self, args)
 	end
 	-- Update the cursor.
 	Widgets.Cursor.inst:update()
+	-- Update built models.
+	while true do
+		local msg = Client.threads.model_builder:pop_message()
+		if not msg then break end
+		if msg.model then
+			local obj = Object:find{id = tonumber(msg.name)}
+			if obj and obj.spec then
+				msg.model:changed()
+				obj:replace_model(msg.model)
+			end
+		end
+	end
 	-- Update animations.
 	if Object.deform_mesh then
 		animt = animt + args.secs

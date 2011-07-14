@@ -2,18 +2,6 @@ require "client/speedline"
 
 Object.physics_position_correction = Vector(0, 0, 0)
 
-local oldanimate = Object.animate
-Object.animate = function(self, args)
-	if not self.animated and self.model then
-		local m = self.model:copy()
-		m:calculate_bounds()
-		m:changed()
-		self.model = m
-		self.animated = true
-	end
-	oldanimate(self, args)
-end
-
 Object.animate_spec = function(self, name)
 	-- Find the animation from the spec.
 	if not self.spec then return end
@@ -59,121 +47,6 @@ Object.detach = function(self)
 	end
 	-- Hide self.
 	self.realized = false
-end
-
---- Creates a customized character model for the object.<br/>
--- This function is used by both the network events and the character creation
--- screen to create customized character objects.
--- @param self Object.
--- @param args Arguments.<ul>
---   <li>body_scale: Scale factor.</li>
---   <li>body_style: Body style array.</li>
---   <li>equipment: List of equipment.</li>
---   <li>face_style: Array of face morphing weights.</li>
---   <li>hair_color: Hair color array.</li>
---   <li>hair_style: Hair style string.</li>
---   <li>race: Race string.</li></ul>
-Object.create_character_model = function(self, args)
-	local lod = (Client.views.options.model_quality == 0)
-	-- Get the species.
-	local name = args.race
-	local species = Species:find{name = name}
-	if not species then return end
-	-- Get the base meshes.
-	local meshes = {skeleton = species.model}
-	if species.models then
-		for k,v in pairs(lod and species.models_lod or species.models) do
-			meshes[k] = v
-		end
-	end
-	-- Add hair model.
-	if args.hair_style and args.hair_style ~= "" then
-		meshes.hair = args.hair_style
-	end
-	-- Add equipment models.
-	if args.equipment then
-		for slot,name in pairs(args.equipment) do
-			local spec = Itemspec:find{name = name}
-			if spec and spec.equipment_models then
-				local models = spec:get_equipment_models(species.equipment_class or species.name, lod)
-				if models then
-					for k,v in pairs(models) do
-						meshes[k] = v
-					end
-				end
-			end
-		end
-	end
-	-- Create skeleton.
-	local m = Model:find_or_load{file = meshes.skeleton}
-	m = m:copy()
-	-- Add other meshes.
-	local has_head = not Bitwise:bchk(self.flags or 0, Protocol.object_flags.BEHEADED)
-	local mesh_head = {eyes = true, head = true, hair = true}
-	for k,v in pairs(meshes) do
-		if k ~= "skeleton" and (has_head or not mesh_head[k]) then
-			local tmp
-			local ref = Model:find_or_load{file = v}
-			-- Face customization.
-			if args.face_style and (string.match(k, ".*head.*") or string.match(k, ".*eye.*")) then
-				tmp = ref:copy()
-				if args.face_style[1] then
-					if args.face_style[1] < 0.5 then
-						tmp:morph("cheekbone small", 1 - 2 * args.face_style[1], ref)
-					elseif args.face_style[1] > 0.5 then
-						tmp:morph("cheekbone big", 2 * args.face_style[1] - 1, ref)
-					end
-				end
-				if args.face_style[2] then tmp:morph("cheek small", 1 - args.face_style[2], ref) end
-				if args.face_style[3] then tmp:morph("chin rough", args.face_style[3], ref) end
-				if args.face_style[4] then tmp:morph("chin round", args.face_style[4], ref) end
-				if args.face_style[5] then tmp:morph("chin small", 1 - args.face_style[5], ref) end
-				if args.face_style[6] then tmp:morph("eye inner", args.face_style[6], ref) end
-				if args.face_style[7] then tmp:morph("eye outer", args.face_style[7], ref) end
-				if args.face_style[8] then tmp:morph("eye small", 1 - args.face_style[8], ref) end
-				if args.face_style[9] then tmp:morph("face thin", 1 - args.face_style[9], ref) end
-				if args.face_style[10] then tmp:morph("face wrinkle", args.face_style[10], ref) end
-				if args.face_style[11] then tmp:morph("jaw wide", args.face_style[11], ref) end
-				if args.face_style[12] then tmp:morph("nose dull", 1 - args.face_style[12], ref) end
-			end
-			-- Body customization.
-			if args.body_style then
-				if not tmp then tmp = ref:copy() end
-				if args.body_style[1] then tmp:morph("hips wide", args.body_style[1], ref) end
-				if args.body_style[2] then tmp:morph("limbs muscular", args.body_style[2], ref) end
-				if args.body_style[3] then
-					if args.body_style[3] < 0.5 then
-						tmp:morph("torso small", 1 - 2 * args.body_style[3], ref)
-					elseif args.body_style[3] > 0.5 then
-						tmp:morph("torso big", 2 * args.body_style[3] - 1, ref)
-					end
-				end
-				if args.body_style[4] then tmp:morph("torso thick", args.body_style[4], ref) end
-				if args.body_style[5] then tmp:morph("waist thick", args.body_style[5], ref) end
-			end
-			-- Merge to the character model.
-			m:merge(tmp or ref)
-		end
-	end
-	-- Colorize materials.
-	m:edit_material{match_shader = "hair", diffuse = args.hair_color}
-	m:edit_material{match_shader = "skin", diffuse = args.skin_color,
-		shader = species.skin_shader, textures = species.skin_textures}
-	m:edit_material{match_texture = "eye1", diffuse = args.eye_color}
-	-- Recalculate bounding box.
-	m:calculate_bounds()
-	m:changed()
-	self.model = m
-	-- Apply body scale.
-	local factor = args.body_scale or 0.5
-	local scale = species.body_scale[1] * (1 - factor) + species.body_scale[2] * factor
-	self.animated = true
-	self:animate{animation = "empty", channel = Animation.CHANNEL_CUSTOMIZE,
-		weight = 0, weight_scale = 1000, fade_in = 0, fade_out = 0, permanent = true}
-	self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "mover", scale = scale}
-	-- Apply initial deformation.
-	self:update_animations{secs = 0}
-	self:deform_mesh()
 end
 
 Object.set_anim = function(self, name, time)
@@ -335,26 +208,28 @@ Object.update = function(self, secs)
 	end
 end
 
-Object.update_model = function(self)
-	if not Model.morph then return end
-	-- Instantiate the model for creatures.
-	if self.type == "creature" and self.model and self.model.name then
-		self.model = self.model:copy()
+Object.replace_model = function(self, model)
+	-- Apply the new model.
+	local shape = self.shape
+	self.model = model
+	self.shape = shape
+	-- Initialize the pose.
+	if self.spec and self.spec.type == "species" then
+		self.animated = true
+		self:update_animations{secs = 0}
+		if Program.opengl_version < 3.2 and model.name then
+			local m = self.model:copy()
+			m:changed()
+			self.model = m
+		end
 	end
-	-- Character customizations.
-	if self.spec and self.spec.models then
-		self:create_character_model{
-			body_scale = self.body_scale,
-			body_style = self.body_style,
-			equipment = self.equipment,
-			eye_color = self.eye_color,
-			eye_style = self.eye_style,
-			face_style = self.face_style,
-			hair_color = self.hair_color,
-			hair_style = self.hair_style,
-			race = self.spec.name,
-			skin_color = self.skin_color,
-			skin_style = self.skin_style}
+	-- Apply body scale.
+	if self.spec and self.spec.body_scale then
+		local factor = self.body_scale or 0.5
+		local scale = self.spec.body_scale[1] * (1 - factor) + self.spec.body_scale[2] * factor
+		self:animate{animation = "empty", channel = Animation.CHANNEL_CUSTOMIZE,
+			weight = 0, weight_scale = 1000, fade_in = 0, fade_out = 0, permanent = true}
+		self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "mover", scale = scale}
 	end
 	-- Create the customization animation.
 	if self.spec and (self.spec.models or self.spec.tilt_bone) then
@@ -381,6 +256,34 @@ Object.update_model = function(self)
 		end
 	else
 		self.special_effects = nil
+	end
+end
+
+Object.update_model = function(self)
+	if not Model.morph then return end
+	if self.spec and self.spec.models then
+		-- Build the character model in a separate thread.
+		-- The result is handled in the tick handler in event.lua.
+		Client.threads.model_builder:push_message(tostring(self.id), serialize{
+			beheaded = Bitwise:bchk(self.flags or 0, Protocol.object_flags.BEHEADED),
+			body_scale = self.body_scale,
+			body_style = self.body_style,
+			equipment = self.equipment,
+			eye_color = self.eye_color,
+			eye_style = self.eye_style,
+			face_style = self.face_style,
+			hair_color = self.hair_color,
+			hair_style = self.hair_style,
+			species = self.spec.name,
+			skin_color = self.skin_color,
+			skin_style = self.skin_style})
+	elseif self.spec and self.spec.model then
+		-- Replace the model and the special effects.
+		local model = Model:find_or_load{file = self.spec.model}
+		self:replace_model(model)
+	else
+		-- Replace the special effects.
+		self:replace_model(self.model)
 	end
 end
 

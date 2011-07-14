@@ -415,16 +415,18 @@ Views.Chargen.update_model = function(self)
 	for k,v in pairs(self.scroll_face) do
 		face[k] = v.value
 	end
-	self.object:create_character_model{
-		body_scale = self.scroll_height.value,
-		body_style = body,
-		equipment = items,
-		eye_color = {self.color_eye.red, self.color_eye.green, self.color_eye.blue},
-		face_style = face,
-		hair_color = {self.color_hair.red, self.color_hair.green, self.color_hair.blue},
-		hair_style = self.hair_style,
-		race = self.race,
-		skin_color = {self.color_skin.red, self.color_skin.green, self.color_skin.blue}}
+	self.object.spec = spec
+	self.object.body_scale = self.scroll_height.value
+	self.object.body_style = body
+	self.object.equipment = items
+	self.object.eye_color = {self.color_eye.red, self.color_eye.green, self.color_eye.blue}
+	self.object.eye_style = nil
+	self.object.face_style = face
+	self.object.hair_color = {self.color_hair.red, self.color_hair.green, self.color_hair.blue}
+	self.object.hair_style = self.hair_style
+	self.object.skin_color = {self.color_skin.red, self.color_skin.green, self.color_skin.blue}
+	self.object.skin_style = nil
+	self.object:update_model()
 	self.object:animate{animation = "idle", channel = 1, permanent = true}
 	self.object:update_animations{secs = 1}
 	self.object:deform_mesh()
