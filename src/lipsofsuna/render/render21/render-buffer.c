@@ -36,7 +36,7 @@
  * \return Vertex buffer or NULL.
  */
 LIRenBuffer21* liren_buffer21_new (
-	const void*        index_data,
+	const LIRenIndex*  index_data,
 	int                index_count,
 	const LIRenFormat* vertex_format,
 	const void*        vertex_data,
@@ -55,7 +55,7 @@ LIRenBuffer21* liren_buffer21_new (
 	/* Create index buffer object. */
 	if (index_count)
 	{
-		size = index_count * sizeof (uint32_t);
+		size = index_count * sizeof (LIRenIndex);
 		glGenBuffers (1, &self->index_buffer);
 		glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, self->index_buffer);
 		glBufferData (GL_ELEMENT_ARRAY_BUFFER, size, index_data, GL_STATIC_DRAW);

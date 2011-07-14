@@ -147,13 +147,13 @@ lifnt_layout_get_height (LIFntLayout* self)
 
 int lifnt_layout_get_vertices (
 	LIFntLayout* self,
-	uint32_t**   result_index,
+	LIMdlIndex** result_index,
 	float**      result_vertex)
 {
 	int i;
 	int j;
 	float* vertices;
-	uint32_t* indices;
+	LIMdlIndex* indices;
 	LIFntLayoutGlyph* glyph;
 
 	/* Layout glyphs. */
@@ -162,7 +162,7 @@ int lifnt_layout_get_vertices (
 	/* Allocate buffer data. */
 	if (self->n_glyphs)
 	{
-		indices = lisys_calloc (6 * self->n_glyphs, sizeof (uint32_t));
+		indices = lisys_calloc (6 * self->n_glyphs, sizeof (LIMdlIndex));
 		if (indices == NULL)
 			return 0;
 		vertices = lisys_calloc (20 * self->n_glyphs, sizeof (float));

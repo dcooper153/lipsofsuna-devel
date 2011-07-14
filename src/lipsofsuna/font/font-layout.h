@@ -18,7 +18,8 @@
 #ifndef __FONT_LAYOUT_H__
 #define __FONT_LAYOUT_H__
 
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/model.h"
+#include "lipsofsuna/system.h"
 #include "font.h"
 
 typedef struct _LIFntLayoutGlyph LIFntLayoutGlyph;
@@ -67,7 +68,7 @@ LIAPICALL (int, lifnt_layout_get_height, (
 
 LIAPICALL (int, lifnt_layout_get_vertices, (
 	LIFntLayout* self,
-	uint32_t**   result_index,
+	LIMdlIndex** result_index,
 	float**      result_vertex));
 
 LIAPICALL (int, lifnt_layout_get_width, (

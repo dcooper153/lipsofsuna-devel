@@ -32,6 +32,7 @@ enum _LIMdlNodeType
 	LIMDL_NODE_LIGHT,
 };
 
+typedef uint16_t LIMdlIndex;
 typedef enum _LIMdlNodeType LIMdlNodeType;
 typedef struct _LIMdlBone LIMdlBone;
 typedef struct _LIMdlHair LIMdlHair;

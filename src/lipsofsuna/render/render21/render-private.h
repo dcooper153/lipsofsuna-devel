@@ -101,7 +101,7 @@ struct _LIRenModel21
 	struct
 	{
 		int count;
-		uint32_t* array;
+		LIRenIndex* array;
 	} indices;
 	struct
 	{

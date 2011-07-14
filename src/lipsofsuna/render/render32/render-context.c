@@ -209,7 +209,12 @@ void liren_context32_render_indexed (
 
 	lisys_assert (start >= 0);
 
-	glDrawElements (GL_TRIANGLES, count, GL_UNSIGNED_INT, NULL + start * sizeof (uint32_t));
+	if (sizeof (LIRenIndex) == 2)
+		glDrawElements (GL_TRIANGLES, count, GL_UNSIGNED_SHORT, NULL + start * sizeof (LIRenIndex));
+	else if (sizeof (LIRenIndex) == 4)
+		glDrawElements (GL_TRIANGLES, count, GL_UNSIGNED_INT, NULL + start * sizeof (LIRenIndex));
+	else
+		lisys_assert (0);
 
 #ifdef LIREN_ENABLE_PROFILING
 	self->render->profiling.materials++;

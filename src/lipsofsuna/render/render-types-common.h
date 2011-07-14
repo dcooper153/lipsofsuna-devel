@@ -18,8 +18,9 @@
 #ifndef __RENDER_TYPES_COMMON_H__
 #define __RENDER_TYPES_COMMON_H__
 
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/video.h>
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/model.h"
+#include "lipsofsuna/video.h"
 
 enum
 {
@@ -51,6 +52,7 @@ enum
 	LIREN_MATERIAL_FLAG_SORTFACES = 0x080000
 };
 
+typedef LIMdlIndex LIRenIndex;
 typedef enum _LIRenFlags LIRenFlags;
 typedef struct _LIRenFormat LIRenFormat;
 typedef struct _LIRenPassRender LIRenPassRender;

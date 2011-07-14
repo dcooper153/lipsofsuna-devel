@@ -259,7 +259,7 @@ static int private_init_materials (
 	LIRenModel32* self,
 	LIMdlModel*   model)
 {
-	uint32_t i;
+	int i;
 	LIMdlMaterial* src;
 	LIRenMaterial32* dst;
 
@@ -291,7 +291,7 @@ static int private_init_model (
 {
 	int c;
 	int i;
-	uint32_t* indices;
+	LIRenIndex* indices;
 	LIMdlFaces* group;
 
 	/* Allocate face groups. */
@@ -315,13 +315,13 @@ static int private_init_model (
 	/* Combine the index lists. */
 	if (c)
 	{
-		indices = lisys_calloc (c, sizeof (uint32_t));
+		indices = lisys_calloc (c, sizeof (LIRenIndex));
 		if (indices == NULL)
 			return 0;
 		for (c = i = 0 ; i < self->groups.count ; i++)
 		{
 			group = model->face_groups.array + i;
-			memcpy (indices + c, group->indices.array, group->indices.count * sizeof (uint32_t));
+			memcpy (indices + c, group->indices.array, group->indices.count * sizeof (LIRenIndex));
 			c += group->indices.count;
 		}
 	}

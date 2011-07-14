@@ -136,14 +136,14 @@ void liren_render32_draw_clipped_buffer (
 }
 
 void liren_render32_draw_indexed_triangles_T2V3 (
-	LIRenRender32*  self,
-	LIRenShader32*  shader,
-	LIMatMatrix*    matrix,
-	GLuint          texture,
-	const float*    diffuse,
-	const float*    vertex_data,
-	const uint32_t* index_data,
-	int             index_count)
+	LIRenRender32*    self,
+	LIRenShader32*    shader,
+	LIMatMatrix*      matrix,
+	GLuint            texture,
+	const float*      diffuse,
+	const float*      vertex_data,
+	const LIRenIndex* index_data,
+	int               index_count)
 {
 	int j;
 
@@ -397,7 +397,7 @@ static int private_init_helpers (
 	unsigned char* pixels;
 	const float depth_texture[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	const uint8_t empty_texture[16] = { 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255, 255 };
-	uint32_t quad_index_data[] = { 0, 1, 2, 1, 2, 3 };
+	LIRenIndex quad_index_data[] = { 0, 1, 2, 1, 2, 3 };
 	LIRenFormat immediate_vertex_format = { 32, GL_FLOAT, 24, GL_FLOAT, 12, GL_FLOAT, 0 };
 	LIRenFormat quad_vertex_format = { 20, GL_FLOAT, 12, 0, 0, GL_FLOAT, 0 };
 	const float quad_vertex_data[] =

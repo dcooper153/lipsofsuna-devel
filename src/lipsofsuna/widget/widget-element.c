@@ -342,7 +342,7 @@ static void private_pack_text (
 	int h;
 	float* vertex;
 	float* vertex_data;
-	uint32_t* index_data;
+	LIMdlIndex* index_data;
 	LIFntLayout* text;
 	LIFntLayoutGlyph* glyph;
 	LIRenVertex vertices[6];

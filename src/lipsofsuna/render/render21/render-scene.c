@@ -220,7 +220,12 @@ void liren_scene21_render (
 				glBindTexture (GL_TEXTURE_2D, material->image->texture->texture);
 			else
 				glBindTexture (GL_TEXTURE_2D, 0);
-			glDrawElements (GL_TRIANGLES, group->count, GL_UNSIGNED_INT, NULL + group->start * sizeof (uint32_t));
+			if (sizeof (LIRenIndex) == 2)
+				glDrawElements (GL_TRIANGLES, group->count, GL_UNSIGNED_SHORT, NULL + group->start * sizeof (LIRenIndex));
+			else if (sizeof (LIRenIndex) == 4)
+				glDrawElements (GL_TRIANGLES, group->count, GL_UNSIGNED_INT, NULL + group->start * sizeof (LIRenIndex));
+			else
+				lisys_assert (0);
 		}
 		glPopMatrix ();
 	}

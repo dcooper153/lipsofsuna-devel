@@ -111,7 +111,7 @@ int limdl_builder_insert_face (
 	const LIMdlVertex* vertices,
 	const int*         bone_mapping)
 {
-	uint32_t indices[3];
+	LIMdlIndex indices[3];
 
 	/* Insert vertices. */
 	if (!limdl_builder_insert_vertices (self, vertices, 3, bone_mapping))
@@ -168,10 +168,10 @@ int limdl_builder_insert_facegroup (
  * \return Nonzero on success.
  */
 int limdl_builder_insert_indices (
-	LIMdlBuilder*   self,
-	int             groupidx,
-	const uint32_t* indices,
-	int             count)
+	LIMdlBuilder*     self,
+	int               groupidx,
+	const LIMdlIndex* indices,
+	int               count)
 {
 	LIMdlFaces* group;
 
@@ -181,11 +181,11 @@ int limdl_builder_insert_indices (
 
 	/* Allocate space for indices. */
 	if (!private_realloc_array (&group->indices.array, &group->indices.capacity,
-	    group->indices.count + count, sizeof (uint32_t)))
+	    group->indices.count + count, sizeof (LIMdlIndex)))
 		return 0;
 
 	/* Insert indices. */
-	memcpy (group->indices.array + group->indices.count, indices, count * sizeof (uint32_t));
+	memcpy (group->indices.array + group->indices.count, indices, count * sizeof (LIMdlIndex));
 	group->indices.count += count;
 
 	return 1;

@@ -25,7 +25,7 @@
 #include "render-types.h"
 
 LIAPICALL (LIRenBuffer32*, liren_buffer32_new, (
-	const void*        index_data,
+	const LIRenIndex*  index_data,
 	int                index_count,
 	const LIRenFormat* vertex_format,
 	const void*        vertex_data,

@@ -27,7 +27,7 @@
 
 /**
  * \brief Allocates a vertex buffer.
- * \param index_data Pointer to an array of 32-bit unsigned indices, or NULL.
+ * \param index_data Pointer to an array indices, or NULL.
  * \param index_count Number of indices to allocate.
  * \param vertex_format Vertex format.
  * \param vertex_data Pointer to vertex format specific array of vertices, or NULL.
@@ -36,7 +36,7 @@
  * \return Vertex buffer or NULL.
  */
 LIRenBuffer32* liren_buffer32_new (
-	const void*        index_data,
+	const LIRenIndex*  index_data,
 	int                index_count,
 	const LIRenFormat* vertex_format,
 	const void*        vertex_data,
@@ -56,7 +56,7 @@ LIRenBuffer32* liren_buffer32_new (
 	/* Create index buffer object. */
 	if (index_count)
 	{
-		size = index_count * sizeof (uint32_t);
+		size = index_count * sizeof (LIRenIndex);
 		glGenBuffers (1, &self->index_buffer);
 		glBindBuffer (GL_ELEMENT_ARRAY_BUFFER, self->index_buffer);
 		glBufferData (GL_ELEMENT_ARRAY_BUFFER, size, index_data, GL_STATIC_DRAW);

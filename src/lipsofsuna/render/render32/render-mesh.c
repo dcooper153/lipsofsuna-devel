@@ -28,7 +28,7 @@
 
 int liren_mesh32_init (
 	LIRenMesh32* self,
-	void*        index_data,
+	LIRenIndex*  index_data,
 	int          index_count,
 	void*        vertex_data,
 	int          vertex_count)
@@ -51,7 +51,7 @@ int liren_mesh32_init (
 	glGenVertexArrays (1, &self->vao);
 	self->counts[0] = index_count;
 	self->counts[1] = vertex_count;
-	self->sizes[0] = self->counts[0] * sizeof (GLuint);
+	self->sizes[0] = self->counts[0] * sizeof (LIRenIndex);
 	self->sizes[1] = self->counts[1] * vertex_size;
 
 	/* Don't break the active vertex array. */

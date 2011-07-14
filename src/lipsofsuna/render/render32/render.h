@@ -47,12 +47,12 @@ LIAPICALL (void, liren_render32_draw_clipped_buffer, (
 LIAPICALL (void, liren_render32_draw_indexed_triangles_T2V3, (
 	LIRenRender32*    self,
 	LIRenShader32*    shader,
-	LIMatMatrix*    matrix,
-	GLuint          texture,
-	const float*    diffuse,
-	const float*    vertex_data,
-	const uint32_t* index_data,
-	int             index_count));
+	LIMatMatrix*      matrix,
+	GLuint            texture,
+	const float*      diffuse,
+	const float*      vertex_data,
+	const LIRenIndex* index_data,
+	int               index_count));
 
 LIAPICALL (LIRenShader32*, liren_render32_find_shader, (
 	LIRenRender32* self,

@@ -53,10 +53,10 @@ LIAPICALL (int, limdl_builder_insert_facegroup, (
 	int           material));
 
 LIAPICALL (int, limdl_builder_insert_indices, (
-	LIMdlBuilder*   self,
-	int             groupidx,
-	const uint32_t* indices,
-	int             count));
+	LIMdlBuilder*     self,
+	int               groupidx,
+	const LIMdlIndex* indices,
+	int               count));
 
 LIAPICALL (int, limdl_builder_insert_material, (
 	LIMdlBuilder*        self,

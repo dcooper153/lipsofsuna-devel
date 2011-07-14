@@ -112,7 +112,7 @@ void liext_speeches_render (
 	int h;
 	int width;
 	float* vertex_data;
-	uint32_t* index_data;
+	LIRenIndex* index_data;
 	LIAlgU32dicIter iter;
 	LIAlgList* ptr;
 	LIExtObject* object;

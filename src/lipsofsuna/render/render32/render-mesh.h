@@ -37,7 +37,7 @@ struct _LIRenMesh32
 
 LIAPICALL (int, liren_mesh32_init, (
 	LIRenMesh32* self,
-	void*        index_data,
+	LIRenIndex*  index_data,
 	int          index_count,
 	void*        vertex_data,
 	int          vertex_count));

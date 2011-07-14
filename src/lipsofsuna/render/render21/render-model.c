@@ -238,7 +238,7 @@ int liren_model21_set_model (
 	int c;
 	int i;
 	int index_count;
-	uint32_t* indices;
+	LIRenIndex* indices;
 	LIAlgPtrdicIter iter0;
 	LIAlgU32dicIter iter1;
 	LIMdlFaces* group;
@@ -302,7 +302,7 @@ int liren_model21_set_model (
 	/* Combine index lists. */
 	if (index_count)
 	{
-		indices = lisys_calloc (index_count, sizeof (uint32_t));
+		indices = lisys_calloc (index_count, sizeof (LIRenIndex));
 		if (indices == NULL)
 		{
 			lisys_free (materials);
@@ -312,7 +312,7 @@ int liren_model21_set_model (
 		for (c = i = 0 ; i < model->face_groups.count ; i++)
 		{
 			group = model->face_groups.array + i;
-			memcpy (indices + c, group->indices.array, group->indices.count * sizeof (uint32_t));
+			memcpy (indices + c, group->indices.array, group->indices.count * sizeof (LIRenIndex));
 			c += group->indices.count;
 		}
 	}

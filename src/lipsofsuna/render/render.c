@@ -151,14 +151,14 @@ void liren_render_draw_clipped_buffer (
 }
 
 void liren_render_draw_indexed_triangles_T2V3 (
-	LIRenRender*    self,
-	LIRenShader*    shader,
-	LIMatMatrix*    matrix,
-	GLuint          texture,
-	const float*    diffuse,
-	const float*    vertex_data,
-	const uint32_t* index_data,
-	int             index_count)
+	LIRenRender*      self,
+	LIRenShader*      shader,
+	LIMatMatrix*      matrix,
+	GLuint            texture,
+	const float*      diffuse,
+	const float*      vertex_data,
+	const LIRenIndex* index_data,
+	int               index_count)
 {
 	if (self->v32 != NULL)
 	{

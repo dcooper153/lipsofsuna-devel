@@ -71,7 +71,7 @@ static void Model_add_triangles (LIScrArgs* args)
 	int vertices_cap = 0;
 	int vertices_num = 0;
 	float* attrs[8];
-	uint32_t* indices = NULL;
+	LIMdlIndex* indices = NULL;
 	LIMatVector zero = { 0.0f, 0.0f, 0.0f };
 	LIMdlBuilder* builder;
 	LIMdlVertex* tmp;
@@ -155,7 +155,7 @@ static void Model_add_triangles (LIScrArgs* args)
 	}
 
 	/* Create the index buffer. */
-	indices = calloc (vertices_num, sizeof (uint32_t));
+	indices = calloc (vertices_num, sizeof (LIMdlIndex));
 	if (indices == NULL)
 	{
 		lisys_free (vertices);

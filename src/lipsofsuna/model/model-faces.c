@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -31,12 +31,12 @@ int limdl_faces_init_copy (
 	self->material = faces->material;
 	if (faces->indices.count)
 	{
-		self->indices.array = lisys_calloc (faces->indices.count, sizeof (uint32_t));
+		self->indices.array = lisys_calloc (faces->indices.count, sizeof (LIMdlIndex));
 		if (self->indices.array == NULL)
 			return 0;
 		self->indices.count = faces->indices.count;
 		self->indices.capacity = faces->indices.count;
-		memcpy (self->indices.array, faces->indices.array, faces->indices.count * sizeof (uint32_t));
+		memcpy (self->indices.array, faces->indices.array, faces->indices.count * sizeof (LIMdlIndex));
 	}
 
 	return 1;
@@ -55,6 +55,7 @@ int limdl_faces_read (
 	uint32_t i;
 	uint32_t mat;
 	uint32_t count;
+	uint32_t index;
 
 	/* Read header. */
 	if (!liarc_reader_get_uint32 (reader, &mat) ||
@@ -65,15 +66,16 @@ int limdl_faces_read (
 	/* Read indices. */
 	if (count)
 	{
-		self->indices.array = lisys_calloc (count, sizeof (uint32_t));
+		self->indices.array = lisys_calloc (count, sizeof (LIMdlIndex));
 		if (self->indices.array == NULL)
 			return 0;
 		self->indices.count = count;
 		self->indices.capacity = count;
 		for (i = 0 ; i < count ; i++)
 		{
-			if (!liarc_reader_get_uint32 (reader, self->indices.array + i))
+			if (!liarc_reader_get_uint32 (reader, &index))
 				return 0;
+			self->indices.array[i] = index;
 		}
 	}
 

@@ -674,8 +674,8 @@ int limdl_model_merge (
 	int material;
 	int* vertices = NULL;
 	int* wgroups = NULL;
-	uint32_t index;
-	uint32_t* indices;
+	LIMdlIndex index;
+	LIMdlIndex* indices;
 	LIMdlBuilder* builder = NULL;
 	LIMdlFaces* dstfaces;
 	LIMdlFaces* srcfaces;
@@ -749,7 +749,7 @@ int limdl_model_merge (
 		count = dstfaces->indices.count + srcfaces->indices.count;
 		if (dstfaces->indices.capacity < count)
 		{
-			indices = lisys_realloc (dstfaces->indices.array, count * sizeof (uint32_t));
+			indices = lisys_realloc (dstfaces->indices.array, count * sizeof (LIMdlIndex));
 			if (indices == NULL)
 				goto error;
 			dstfaces->indices.array = indices;
@@ -897,7 +897,7 @@ int limdl_model_get_memory (
 	for (i = 0 ; i < self->face_groups.count ; i++)
 	{
 		total += sizeof (LIMdlFaces);
-		total += self->face_groups.array[i].indices.count * sizeof (uint32_t);
+		total += self->face_groups.array[i].indices.count * sizeof (LIMdlIndex);
 	}
 	for (i = 0 ; i < self->materials.count ; i++)
 		total += sizeof (LIMdlMaterial*) + sizeof (LIMdlMaterial);
@@ -957,7 +957,7 @@ static void private_build_tangents (
 	float sign;
 	float uv0[2];
 	float uv1[2];
-	uint32_t* idx;
+	LIMdlIndex* idx;
 	LIMatVector tmp;
 	LIMatVector ed0;
 	LIMatVector ed1;
