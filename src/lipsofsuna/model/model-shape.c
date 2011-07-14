@@ -25,6 +25,69 @@
 #include <lipsofsuna/system.h>
 #include "model-shape.h"
 
+int limdl_shape_init_copy (
+	LIMdlShape*       self,
+	const LIMdlShape* shape)
+{
+	int i;
+	int j;
+	LIMatVector* vertex;
+	LIMdlShapePart* srcpart;
+	LIMdlShapePart* dstpart;
+
+	/* Copy the name. */
+	self->name = lisys_string_dup (shape->name);
+	if (self->name == NULL)
+	{
+		limdl_shape_clear (self);
+		return 0;
+	}
+
+	/* Copy the bounding box. */
+	self->bounds = shape->bounds;
+	self->center = shape->center;
+
+	/* Allocate parts. */
+	if (shape->parts.count)
+	{
+		self->parts.array = lisys_calloc (shape->parts.count, sizeof (LIMdlShapePart));
+		if (self->parts.array == NULL)
+		{
+			limdl_shape_clear (self);
+			return 0;
+		}
+		self->parts.count = shape->parts.count;
+	}
+
+	/* Read parts. */
+	for (i = 0 ; i < self->parts.count ; i++)
+	{
+		srcpart = shape->parts.array + i;
+		dstpart = self->parts.array + i;
+
+		/* Allocate vertices. */
+		if (srcpart->vertices.count)
+		{
+			dstpart->vertices.count = srcpart->vertices.count;
+			dstpart->vertices.array = lisys_calloc (3 * srcpart->vertices.count, sizeof (LIMatVector));
+			if (dstpart->vertices.array == NULL)
+			{
+				limdl_shape_clear (self);
+				return 0;
+			}
+		}
+
+		/* Copy vertices. */
+		for (j = 0 ; j < srcpart->vertices.count ; j++)
+		{
+			vertex = dstpart->vertices.array + j;
+			*vertex = srcpart->vertices.array[j];
+		}
+	}
+
+	return 1;
+}
+
 void limdl_shape_clear (
 	LIMdlShape*  self)
 {

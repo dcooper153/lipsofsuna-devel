@@ -45,8 +45,12 @@ struct _LIMdlShape
 	} parts;
 };
 
+LIAPICALL (int, limdl_shape_init_copy, (
+	LIMdlShape*       self,
+	const LIMdlShape* shape));
+
 LIAPICALL (void, limdl_shape_clear, (
-	LIMdlShape*  self));
+	LIMdlShape* self));
 
 LIAPICALL (int, limdl_shape_read, (
 	LIMdlShape*  self,

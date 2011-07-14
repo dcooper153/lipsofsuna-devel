@@ -165,6 +165,7 @@ LIMdlModel* limdl_model_new_copy (
 {
 	int i;
 	LIMdlModel* self;
+	LIMdlWeightGroup* group;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIMdlModel));
@@ -220,13 +221,15 @@ LIMdlModel* limdl_model_new_copy (
 		for (i = 0 ; i < model->particle_systems.count ; i++)
 			limdl_particle_systems_init_copy (self->particle_systems.array + i, model->particle_systems.array + i);
 	}
+#endif
 	if (model->shapes.count)
 	{
 		self->shapes.array = lisys_calloc (model->shapes.count, sizeof (LIMdlShape));
 		self->shapes.count = model->shapes.count;
 		for (i = 0 ; i < model->shapes.count ; i++)
-			limdl_shapes_init_copy (self->shapes.array + i, model->shapes.array + i);
+			limdl_shape_init_copy (self->shapes.array + i, model->shapes.array + i);
 	}
+#if 0
 	if (model->shape_keys.count)
 	{
 		self->shape_keys.array = lisys_calloc (model->shape_keys.count, sizeof (LIMdlShapeKey));
@@ -248,6 +251,13 @@ LIMdlModel* limdl_model_new_copy (
 		self->weight_groups.count = model->weight_groups.count;
 		for (i = 0 ; i < model->weight_groups.count ; i++)
 			limdl_weight_group_init_copy (self->weight_groups.array + i, model->weight_groups.array + i);
+	}
+
+	/* Resolve node references. */
+	for (i = 0 ; i < self->weight_groups.count ; i++)
+	{
+		group = self->weight_groups.array + i;
+		group->node = limdl_model_find_node (self, group->bone);
 	}
 
 	return self;
