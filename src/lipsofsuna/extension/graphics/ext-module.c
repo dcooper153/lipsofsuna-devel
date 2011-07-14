@@ -63,6 +63,9 @@ LIExtModule* liext_graphics_new (
 		return NULL;
 	}
 
+	/* Extend scripts. */
+	liext_script_graphics (program->script);
+
 	return self;
 }
 

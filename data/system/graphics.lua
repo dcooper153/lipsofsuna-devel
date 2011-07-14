@@ -58,6 +58,10 @@ end
 -- @name Program.fps
 -- @class table
 
+--- Gets the version of the OpenGL renderer used.
+-- @name Program.opengl_version
+-- @class table
+
 --- Current video mode (read-only).
 -- @name Program.video_mode
 -- @class table
@@ -74,6 +78,7 @@ Program:add_class_getters{
 	cursor_grabbed = function(s) return Los.client_get_moving() end,
 	cursor_position = function(s) return Class.new(Vector, {handle = Los.client_get_cursor_pos()}) end,
 	fps = function(s) return Los.client_get_fps() end,
+	opengl_version = function(s) return Los.program_get_opengl_version() end,
 	video_mode = function(s) return Los.client_get_video_mode() end,
 	video_modes = function(s) return Los.client_get_video_modes() end,
 	window_title = function(s) return s.window_title or "" end}

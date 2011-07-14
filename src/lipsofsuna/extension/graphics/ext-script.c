@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,31 +15,30 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+/**
+ * \addtogroup LIExt Extension
+ * @{
+ * \addtogroup LIExtGraphics Graphics
+ * @{
+ */
 
-#include "lipsofsuna/extension.h"
-#include "lipsofsuna/client.h"
+#include "ext-module.h"
 
-#define LIEXT_SCRIPT_GRAPHICS "Graphics"
-
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+static void Program_get_opengl_version (LIScrArgs* args)
 {
-	LICalHandle calls[1];
-	LICliClient* client;
-	LIMaiProgram* program;
-};
-
-LIExtModule* liext_graphics_new (
-	LIMaiProgram* program);
-
-void liext_graphics_free (
-	LIExtModule* self);
+	if (GLEW_VERSION_3_2)
+		liscr_args_seti_float (args, 3.2f);
+	else
+		liscr_args_seti_float (args, 2.1f);
+}
 
 /*****************************************************************************/
 
 void liext_script_graphics (
-	LIScrScript* self);
+	LIScrScript* self)
+{
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_opengl_version", Program_get_opengl_version);
+}
 
-#endif
+/** @} */
+/** @} */
