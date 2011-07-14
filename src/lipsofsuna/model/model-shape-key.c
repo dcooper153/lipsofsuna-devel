@@ -25,6 +25,41 @@
 #include <lipsofsuna/system.h>
 #include "model-shape-key.h"
 
+int limdl_shape_key_init_copy (
+	LIMdlShapeKey*       self,
+	const LIMdlShapeKey* key)
+{
+	int i;
+	LIMdlShapeKeyVertex* vertex;
+
+	/* Copy the name. */
+	self->name = lisys_string_dup (key->name);
+	if (self->name == NULL)
+		return 0;
+
+	/* Allocate vertices. */
+	if (key->vertices.count)
+	{
+		self->vertices.array = lisys_calloc (key->vertices.count, sizeof (LIMdlShapeKeyVertex));
+		if (self->vertices.array == NULL)
+		{
+			lisys_free (self->name);
+			self->name = NULL;
+			return 0;
+		}
+		self->vertices.count = key->vertices.count;
+	}
+
+	/* Copy vertices. */
+	for (i = 0 ; i < self->vertices.count ; i++)
+	{
+		vertex = self->vertices.array + i;
+		*vertex = key->vertices.array[i];
+	}
+
+	return 1;
+}
+
 void limdl_shape_key_clear (
 	LIMdlShapeKey*  self)
 {

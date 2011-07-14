@@ -229,15 +229,13 @@ LIMdlModel* limdl_model_new_copy (
 		for (i = 0 ; i < model->shapes.count ; i++)
 			limdl_shape_init_copy (self->shapes.array + i, model->shapes.array + i);
 	}
-#if 0
 	if (model->shape_keys.count)
 	{
 		self->shape_keys.array = lisys_calloc (model->shape_keys.count, sizeof (LIMdlShapeKey));
 		self->shape_keys.count = model->shape_keys.count;
 		for (i = 0 ; i < model->shape_keys.count ; i++)
-			limdl_shape_keys_init_copy (self->shape_keys.array + i, model->shape_keys.array + i);
+			limdl_shape_key_init_copy (self->shape_keys.array + i, model->shape_keys.array + i);
 	}
-#endif
 	if (model->vertices.count)
 	{
 		self->vertices.array = lisys_calloc (model->vertices.count, sizeof (LIMdlVertex));

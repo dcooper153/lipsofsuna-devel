@@ -40,6 +40,10 @@ struct _LIMdlShapeKey
 	} vertices;
 };
 
+LIAPICALL (int, limdl_shape_key_init_copy, (
+	LIMdlShapeKey*       self,
+	const LIMdlShapeKey* key));
+
 LIAPICALL (void, limdl_shape_key_clear, (
 	LIMdlShapeKey* self));
 
