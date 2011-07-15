@@ -23,14 +23,30 @@
 #include "lipsofsuna/system.h"
 #include "model.h"
 
+typedef struct _LIMdlBuilderFaces LIMdlBuilderFaces;
+struct _LIMdlBuilderFaces
+{
+	struct
+	{
+		int count;
+		int capacity;
+		LIMdlIndex* array;
+	} indices;
+};
+
 typedef struct _LIMdlBuilder LIMdlBuilder;
 struct _LIMdlBuilder
 {
-	int facegroup_capacity;
 	int material_capacity;
 	int weightgroup_capacity;
 	int vertex_capacity;
 	LIMdlModel* model;
+	struct
+	{
+		int count;
+		int capacity;
+		LIMdlBuilderFaces* array;
+	} face_groups;
 };
 
 LIAPICALL (LIMdlBuilder*, limdl_builder_new, (
@@ -39,24 +55,21 @@ LIAPICALL (LIMdlBuilder*, limdl_builder_new, (
 LIAPICALL (void, limdl_builder_free, (
 	LIMdlBuilder* self));
 
-LIAPICALL (void, limdl_builder_finish, (
+LIAPICALL (int, limdl_builder_finish, (
 	LIMdlBuilder* self));
 
 LIAPICALL (int, limdl_builder_insert_face, (
 	LIMdlBuilder*      self,
-	int                groupidx,
+	int                material,
 	const LIMdlVertex* vertices,
 	const int*         bone_mapping));
 
-LIAPICALL (int, limdl_builder_insert_facegroup, (
-	LIMdlBuilder* self,
-	int           material));
-
 LIAPICALL (int, limdl_builder_insert_indices, (
 	LIMdlBuilder*     self,
-	int               groupidx,
+	int               material,
 	const LIMdlIndex* indices,
-	int               count));
+	int               count,
+	int               vertex_start_remap));
 
 LIAPICALL (int, limdl_builder_insert_material, (
 	LIMdlBuilder*        self,

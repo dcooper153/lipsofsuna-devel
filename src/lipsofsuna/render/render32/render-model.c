@@ -125,61 +125,6 @@ void liren_model32_replace_image (
 {
 }
 
-/**
- * \brief Caches transparent faces for fast depth sorting.
- *
- * Recalculates the center points of transparent triangles after an animation
- * has deformed the mesh. For maximum correctness of transparency, the function
- * should be called every time the mesh is deformed, but since the update
- * involves an expensive download from video memory, the user might choose to
- * trade transparency quality for better performance.
- *
- * \param self Model.
- */
-void liren_model32_update_transparency (
-	LIRenModel32* self)
-{
-	int i;
-	int j;
-	void* vtxdata;
-	LIRenFormat format;
-	LIRenModelGroup32* group;
-	LIRenMaterial32* material;
-
-	/* Update each material group. */
-	for (i = 0 ; i < self->groups.count ; i++)
-	{
-		/* Check if transparency center is needed. */
-		group = self->groups.array + i;
-		group->center = limat_vector_init (0.0f, 0.0f, 0.0f);
-		material = self->materials.array[i];
-		if (material->shader == NULL)
-			continue;
-		if (!material->shader->sort)
-			continue;
-
-		/* Download the deformed vertices from video memory. */
-		liren_mesh32_get_format (&self->mesh, &format);
-		vtxdata = liren_mesh32_lock_vertices (&self->mesh, group->start, group->count);
-		if (vtxdata == NULL)
-			continue;
-
-		/* Calculate the center of the group. */
-		if (group->count > 0)
-		{
-			for (j = 0 ; j < group->count ; j++)
-			{
-				group->center = limat_vector_add (group->center,
-					*((LIMatVector*)(vtxdata + format.vtx_offset + format.size * j)));
-			}
-			group->center = limat_vector_multiply (group->center, 1.0f / group->count);
-		}
-
-		/* Unmap the deformed vertices. */
-		liren_mesh32_unlock_vertices (&self->mesh);
-	}
-}
-
 void liren_model32_get_bounds (
 	LIRenModel32* self,
 	LIMatAabb*    aabb)
@@ -289,9 +234,7 @@ static int private_init_model (
 	LIRenModel32* self,
 	LIMdlModel*   model)
 {
-	int c;
 	int i;
-	LIRenIndex* indices;
 	LIMdlFaces* group;
 
 	/* Allocate face groups. */
@@ -304,29 +247,12 @@ static int private_init_model (
 	}
 
 	/* Calculate face group offsets. */
-	for (c = i = 0 ; i < self->groups.count ; i++)
+	for (i = 0 ; i < self->groups.count ; i++)
 	{
 		group = model->face_groups.array + i;
-		self->groups.array[i].start = c;
-		self->groups.array[i].count = group->indices.count;
-		c += group->indices.count;
+		self->groups.array[i].start = group->start;
+		self->groups.array[i].count = group->count;
 	}
-
-	/* Combine the index lists. */
-	if (c)
-	{
-		indices = lisys_calloc (c, sizeof (LIRenIndex));
-		if (indices == NULL)
-			return 0;
-		for (c = i = 0 ; i < self->groups.count ; i++)
-		{
-			group = model->face_groups.array + i;
-			memcpy (indices + c, group->indices.array, group->indices.count * sizeof (LIRenIndex));
-			c += group->indices.count;
-		}
-	}
-	else
-		indices = NULL;
 
 	/* Initialize particles. */
 	liren_particles32_init (&self->particles, self->render, model);
@@ -334,16 +260,9 @@ static int private_init_model (
 		self->bounds = limat_aabb_union (self->bounds, self->particles.bounds);
 
 	/* Initialize the render buffer. */
-	if (!liren_mesh32_init (&self->mesh, indices, c,
+	if (!liren_mesh32_init (&self->mesh, model->indices.array, model->indices.count,
 	     model->vertices.array, model->vertices.count))
-	{
-		lisys_free (indices);
 		return 0;
-	}
-	lisys_free (indices);
-
-	/* Initialize face sorting for transparent material groups. */
-	liren_model32_update_transparency (self);
 
 	return 1;
 }

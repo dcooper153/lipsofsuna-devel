@@ -37,9 +37,6 @@ LIAPICALL (int, liren_model_deform, (
 	const char*      shader,
 	const LIMdlPose* pose));
 
-LIAPICALL (void, liren_model_update_transparency, (
-	LIRenModel* self));
-
 LIAPICALL (int, liren_model_set_model, (
 	LIRenModel* self,
 	LIMdlModel* model));

@@ -25,13 +25,8 @@
 typedef struct _LIMdlFaces LIMdlFaces;
 struct _LIMdlFaces
 {
-	int material;
-	struct
-	{
-		int count;
-		LIMdlIndex* array;
-		int capacity;
-	} indices;
+	int start;
+	int count;
 };
 
 LIAPICALL (int, limdl_faces_init_copy, (
@@ -43,10 +38,12 @@ LIAPICALL (void, limdl_faces_free, (
 
 LIAPICALL (int, limdl_faces_read, (
 	LIMdlFaces*  self,
+	LIMdlModel*  model,
 	LIArcReader* reader));
 
 LIAPICALL (int, limdl_faces_write, (
-	LIMdlFaces*  self,
-	LIArcWriter* writer));
+	const LIMdlFaces* self,
+	const LIMdlModel* model,
+	LIArcWriter*      writer));
 
 #endif

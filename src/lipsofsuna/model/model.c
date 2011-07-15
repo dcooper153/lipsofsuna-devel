@@ -199,6 +199,12 @@ LIMdlModel* limdl_model_new_copy (
 		for (i = 0 ; i < model->face_groups.count ; i++)
 			limdl_faces_init_copy (self->face_groups.array + i, model->face_groups.array + i);
 	}
+	if (model->indices.count)
+	{
+		self->indices.array = lisys_calloc (model->indices.count, sizeof (LIMdlIndex));
+		self->indices.count = model->indices.count;
+		memcpy (self->indices.array, model->indices.array, model->indices.count * sizeof (LIMdlIndex));
+	}
 	if (model->materials.count)
 	{
 		self->materials.array = lisys_calloc (model->materials.count, sizeof (LIMdlMaterial));
@@ -327,6 +333,7 @@ LIMdlModel* limdl_model_new_from_file (
 
 	/* Construct the rest pose. */
 	private_build (self);
+
 	return self;
 
 error:
@@ -427,6 +434,7 @@ void limdl_model_free (
 		lisys_free (self->shape_keys.array);
 	}
 
+	lisys_free (self->indices.array);
 	lisys_free (self);
 }
 
@@ -497,27 +505,6 @@ LIMdlAnimation* limdl_model_find_animation (
 	}
 
 	return NULL;
-}
-
-/**
- * \brief Finds a face group.
- * \param self Model.
- * \param material Material index.
- * \return Face group index or -1.
- */
-int limdl_model_find_facegroup (
-	LIMdlModel* self,
-	int         material)
-{
-	int i;
-
-	for (i = 0 ; i < self->face_groups.count ; i++)
-	{
-		if (self->face_groups.array[i].material == material)
-			return i;
-	}
-
-	return -1;
 }
 
 /**
@@ -668,29 +655,27 @@ int limdl_model_merge (
 	LIMdlModel* model)
 {
 	int i;
-	int j;
-	int count;
 	int group;
 	int material;
-	int* vertices = NULL;
+	int vertex_offset;
 	int* wgroups = NULL;
-	LIMdlIndex index;
-	LIMdlIndex* indices;
-	LIMdlBuilder* builder = NULL;
-	LIMdlFaces* dstfaces;
+	LIMdlBuilder* builder;
 	LIMdlFaces* srcfaces;
 
 	/* Create a model builder. */
 	builder = limdl_builder_new (self);
 	if (builder == NULL)
-		goto error;
+		return 0;
 
 	/* Map weight groups. */
 	if (model->weight_groups.count)
 	{
 		wgroups = lisys_calloc (model->weight_groups.count, sizeof (int));
 		if (wgroups == NULL)
+		{
+			limdl_builder_free (builder);
 			return 0;
+		}
 		for (i = 0 ; i < model->weight_groups.count ; i++)
 		{
 			group = limdl_model_find_weightgroup (self,
@@ -702,21 +687,27 @@ int limdl_model_merge (
 				if (!limdl_builder_insert_weightgroup (builder, 
 				    model->weight_groups.array[i].name,
 				    model->weight_groups.array[i].bone))
-					goto error;
+				{
+					limdl_builder_free (builder);
+					lisys_free (wgroups);
+					return 0;
+				}
 			}
 			lisys_assert (group < self->weight_groups.count);
 			wgroups[i] = group;
 		}
 	}
 
-	/* Map vertices. */
+	/* Merge vertices. */
+	vertex_offset = self->vertices.count;
 	if (model->vertices.count)
 	{
-		vertices = lisys_calloc (model->vertices.count, sizeof (int));
-		for (i = 0 ; i < model->vertices.count ; i++)
-			vertices[i] = self->vertices.count + i;
 		if (!limdl_builder_insert_vertices (builder, model->vertices.array, model->vertices.count, wgroups))
-			goto error;
+		{
+			limdl_builder_free (builder);
+			lisys_free (wgroups);
+			return 0;
+		}
 	}
 
 	/* Merge each face group. */
@@ -724,60 +715,33 @@ int limdl_model_merge (
 	{
 		srcfaces = model->face_groups.array + i;
 
-		/* Find or create material. */
-		material = limdl_model_find_material (self, model->materials.array + srcfaces->material);
+		/* Find or create the material. */
+		material = limdl_model_find_material (self, model->materials.array + i);
 		if (material == -1)
 		{
 			material = self->materials.count;
-			if (!limdl_builder_insert_material (builder, model->materials.array + srcfaces->material))
-				goto error;
-		}
-
-		/* Find or create face group. */
-		group = limdl_model_find_facegroup (self, material);
-		if (group == -1)
-		{
-			group = self->face_groups.count;
-			if (!limdl_builder_insert_facegroup (builder, material))
-				goto error;
-		}
-
-		/* Destination group for cloned faces. */
-		dstfaces = self->face_groups.array + group;
-
-		/* Allocate space for indices. */
-		count = dstfaces->indices.count + srcfaces->indices.count;
-		if (dstfaces->indices.capacity < count)
-		{
-			indices = lisys_realloc (dstfaces->indices.array, count * sizeof (LIMdlIndex));
-			if (indices == NULL)
-				goto error;
-			dstfaces->indices.array = indices;
-			dstfaces->indices.capacity = count;
+			if (!limdl_builder_insert_material (builder, model->materials.array + i))
+			{
+				limdl_builder_free (builder);
+				lisys_free (wgroups);
+				return 0;
+			}
 		}
 
 		/* Insert indices. */
-		for (j = 0 ; j < srcfaces->indices.count ; j++)
+		if (!limdl_builder_insert_indices (builder, material, model->indices.array + srcfaces->start, srcfaces->count, vertex_offset))
 		{
-			index = vertices[srcfaces->indices.array[j]];
-			dstfaces->indices.array[dstfaces->indices.count] = index;
-			dstfaces->indices.count++;
+			limdl_builder_free (builder);
+			lisys_free (wgroups);
+			return 0;
 		}
 	}
 
 	limdl_builder_finish (builder);
 	limdl_builder_free (builder);
 	lisys_free (wgroups);
-	lisys_free (vertices);
 
 	return 1;
-
-error:
-	if (builder != NULL)
-		limdl_builder_free (builder);
-	lisys_free (wgroups);
-	lisys_free (vertices);
-	return 0;
 }
 
 /**
@@ -868,13 +832,7 @@ int limdl_model_write_file (
 int limdl_model_get_index_count (
 	const LIMdlModel* self)
 {
-	int i;
-	int c;
-
-	for (i = c = 0 ; i < self->face_groups.count ; i++)
-		c += self->face_groups.array[i].indices.count;
-
-	return c;
+	return self->indices.count;
 }
 
 /**
@@ -890,15 +848,13 @@ int limdl_model_get_memory (
 
 	/* TODO: Many of these have memory allocations of their own, */
 	total = sizeof (LIMdlModel);
+	total += self->indices.count * sizeof (LIMdlIndex);
 	for (i = 0 ; i < self->animations.count ; i++)
 		total += sizeof (LIMdlAnimation);
 	for (i = 0 ; i < self->hairs.count ; i++)
 		total += sizeof (LIMdlHairs);
 	for (i = 0 ; i < self->face_groups.count ; i++)
-	{
 		total += sizeof (LIMdlFaces);
-		total += self->face_groups.array[i].indices.count * sizeof (LIMdlIndex);
-	}
 	for (i = 0 ; i < self->materials.count ; i++)
 		total += sizeof (LIMdlMaterial*) + sizeof (LIMdlMaterial);
 	for (i = 0 ; i < self->nodes.count ; i++)
@@ -952,7 +908,6 @@ static void private_build_tangents (
 	LIMdlModel* self)
 {
 	int i;
-	int j;
 	int k;
 	float sign;
 	float uv0[2];
@@ -961,35 +916,30 @@ static void private_build_tangents (
 	LIMatVector tmp;
 	LIMatVector ed0;
 	LIMatVector ed1;
-	LIMdlFaces* faces;
 	LIMdlVertex* vtx[3];
 
 	for (i = 0 ; i < self->vertices.count ; i++)
 		self->vertices.array[i].tangent = limat_vector_init (0.0f, 0.0f, 0.0f);
-	for (i = 0 ; i < self->face_groups.count ; i++)
+	for (i = 0, idx = self->indices.array ; i < self->indices.count ; i += 3, idx += 3)
 	{
-		faces = self->face_groups.array + i;
-		for (j = 0, idx = faces->indices.array ; j < faces->indices.count ; j += 3, idx += 3)
-		{
-			vtx[0] = self->vertices.array + idx[0];
-			vtx[1] = self->vertices.array + idx[1];
-			vtx[2] = self->vertices.array + idx[2];
-			ed0 = limat_vector_subtract (vtx[1]->coord, vtx[0]->coord);
-			ed1 = limat_vector_subtract (vtx[2]->coord, vtx[0]->coord);
-			uv0[0] = vtx[1]->texcoord[0] - vtx[0]->texcoord[0];
-			uv0[1] = vtx[1]->texcoord[1] - vtx[0]->texcoord[1];
-			uv1[0] = vtx[2]->texcoord[0] - vtx[0]->texcoord[0];
-			uv1[1] = vtx[2]->texcoord[1] - vtx[0]->texcoord[1];
-			sign = uv0[0] * uv1[1] - uv1[0] * uv0[1];
-			sign = (sign > 0.0f)? 1.0f : -1.0f;
-			tmp = limat_vector_subtract (
-				limat_vector_multiply (ed1, uv0[1]),
-				limat_vector_multiply (ed0, uv1[1]));
-			tmp = limat_vector_multiply (tmp, sign);
-			tmp = limat_vector_normalize (tmp);
-			for (k = 0 ; k < 3 ; k++)
-				vtx[k]->tangent = limat_vector_add (vtx[k]->tangent, tmp);
-		}
+		vtx[0] = self->vertices.array + idx[0];
+		vtx[1] = self->vertices.array + idx[1];
+		vtx[2] = self->vertices.array + idx[2];
+		ed0 = limat_vector_subtract (vtx[1]->coord, vtx[0]->coord);
+		ed1 = limat_vector_subtract (vtx[2]->coord, vtx[0]->coord);
+		uv0[0] = vtx[1]->texcoord[0] - vtx[0]->texcoord[0];
+		uv0[1] = vtx[1]->texcoord[1] - vtx[0]->texcoord[1];
+		uv1[0] = vtx[2]->texcoord[0] - vtx[0]->texcoord[0];
+		uv1[1] = vtx[2]->texcoord[1] - vtx[0]->texcoord[1];
+		sign = uv0[0] * uv1[1] - uv1[0] * uv0[1];
+		sign = (sign > 0.0f)? 1.0f : -1.0f;
+		tmp = limat_vector_subtract (
+			limat_vector_multiply (ed1, uv0[1]),
+			limat_vector_multiply (ed0, uv1[1]));
+		tmp = limat_vector_multiply (tmp, sign);
+		tmp = limat_vector_normalize (tmp);
+		for (k = 0 ; k < 3 ; k++)
+			vtx[k]->tangent = limat_vector_add (vtx[k]->tangent, tmp);
 	}
 	for (i = 0 ; i < self->vertices.count ; i++)
 		self->vertices.array[i].tangent = limat_vector_normalize (self->vertices.array[i].tangent);
@@ -1007,7 +957,6 @@ static int private_read (
 	uint32_t tmp;
 	uint32_t size;
 	uint32_t version;
-	LIMdlFaces* group;
 
 	/* Read magic. */
 	if (!liarc_reader_check_text (reader, "lips/mdl", ""))
@@ -1098,14 +1047,15 @@ static int private_read (
 	}
 
 	/* Sanity checks. */
-	for (i = 0 ; i < self->face_groups.count ; i++)
+	if (self->face_groups.count != self->materials.count)
 	{
-		group = self->face_groups.array + i;
-		if (group->material >= self->materials.count)
-		{
-			lisys_error_set (EINVAL, "material index out of bounds");
-			return 0;
-		}
+		lisys_error_set (EINVAL, "material and face group counts don't match");
+		return 0;
+	}
+	for (i = 0 ; i < self->indices.count ; i++)
+	{
+		if (self->indices.array[i] >= self->vertices.count)
+			lisys_error_set (EINVAL, "vertex index out of bounds");
 	}
 	for (i = 0 ; i < self->vertices.count ; i++)
 	{
@@ -1193,7 +1143,7 @@ static int private_read_faces (
 		for (i = 0 ; i < self->face_groups.count ; i++)
 		{
 			group = self->face_groups.array + i;
-			if (!limdl_faces_read (group, reader))
+			if (!limdl_faces_read (group, self, reader))
 				return 0;
 		}
 	}
@@ -1669,7 +1619,7 @@ static int private_write_faces (
 		return 0;
 	for (i = 0 ; i < self->face_groups.count ; i++)
 	{
-		if (!limdl_faces_write (self->face_groups.array + i, writer))
+		if (!limdl_faces_write (self->face_groups.array + i, self, writer))
 			return 0;
 	}
 

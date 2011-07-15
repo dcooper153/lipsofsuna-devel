@@ -106,19 +106,6 @@ void liren_model_free (
 	lisys_free (self);
 }
 
-/**
- * \brief Caches transparency data.
- * \param self Model.
- */
-void liren_model_update_transparency (
-	LIRenModel* self)
-{
-	if (self->v32 != NULL)
-		return liren_model32_update_transparency (self->v32);
-	else
-		return liren_model21_update_transparency (self->v21);
-}
-
 int liren_model_set_model (
 	LIRenModel* self,
 	LIMdlModel* model)

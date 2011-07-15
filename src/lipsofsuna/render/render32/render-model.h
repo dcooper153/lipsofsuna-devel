@@ -46,9 +46,6 @@ LIAPICALL (void, liren_model32_replace_image, (
 	LIRenModel32* self,
 	LIRenImage32* image));
 
-LIAPICALL (void, liren_model32_update_transparency, (
-	LIRenModel32* self));
-
 LIAPICALL (void, liren_model32_get_bounds, (
 	LIRenModel32* self,
 	LIMatAabb*    aabb));

@@ -215,15 +215,6 @@ void liren_model21_replace_image (
 {
 }
 
-/**
- * \brief Caches transparent faces for fast depth sorting.
- * \param self Model.
- */
-void liren_model21_update_transparency (
-	LIRenModel21* self)
-{
-}
-
 void liren_model21_get_bounds (
 	LIRenModel21* self,
 	LIMatAabb*    aabb)
@@ -235,9 +226,7 @@ int liren_model21_set_model (
 	LIRenModel21* self,
 	LIMdlModel*   model)
 {
-	int c;
 	int i;
-	int index_count;
 	LIRenIndex* indices;
 	LIAlgPtrdicIter iter0;
 	LIAlgU32dicIter iter1;
@@ -256,19 +245,15 @@ int liren_model21_set_model (
 		groups = lisys_calloc (model->face_groups.count, sizeof (LIRenModelGroup21));
 		if (groups == NULL)
 			return 0;
-		for (index_count = i = 0 ; i < model->face_groups.count ; i++)
+		for (i = 0 ; i < model->face_groups.count ; i++)
 		{
 			group = model->face_groups.array + i;
-			groups[i].start = index_count;
-			groups[i].count = group->indices.count;
-			index_count += group->indices.count;
+			groups[i].start = group->start;
+			groups[i].count = group->count;
 		}
 	}
 	else
-	{
-		index_count = 0;
 		groups = NULL;
-	}
 
 	/* Create materials. */
 	if (model->materials.count)
@@ -299,22 +284,17 @@ int liren_model21_set_model (
 	else
 		materials = NULL;
 
-	/* Combine index lists. */
-	if (index_count)
+	/* Create a copy of the indices. */
+	if (model->indices.count)
 	{
-		indices = lisys_calloc (index_count, sizeof (LIRenIndex));
+		indices = lisys_calloc (model->indices.count, sizeof (LIRenIndex));
 		if (indices == NULL)
 		{
 			lisys_free (materials);
 			lisys_free (groups);
 			return 0;
 		}
-		for (c = i = 0 ; i < model->face_groups.count ; i++)
-		{
-			group = model->face_groups.array + i;
-			memcpy (indices + c, group->indices.array, group->indices.count * sizeof (LIRenIndex));
-			c += group->indices.count;
-		}
+		memcpy (indices, model->indices.array, model->indices.count * sizeof (LIRenIndex));
 	}
 	else
 		indices = NULL;
@@ -344,7 +324,7 @@ int liren_model21_set_model (
 	}
 	if (indices != NULL)
 	{
-		self->buffer = liren_buffer21_new (indices, index_count, &private_vertex_format,
+		self->buffer = liren_buffer21_new (indices, model->indices.count, &private_vertex_format,
 			model->vertices.array, model->vertices.count, LIREN_BUFFER_TYPE_STATIC);
 	}
 
@@ -357,7 +337,7 @@ int liren_model21_set_model (
 	self->groups.count = model->face_groups.count;
 	lisys_free (self->indices.array);
 	self->indices.array = indices;
-	self->indices.count = index_count;
+	self->indices.count = model->indices.count;
 	lisys_free (self->vertices.array);
 	self->vertices.array = vertices;
 	self->vertices.count = model->vertices.count;

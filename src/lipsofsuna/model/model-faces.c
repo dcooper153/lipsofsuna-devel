@@ -22,22 +22,15 @@
  * @{
  */
 
+#include "model.h"
 #include "model-faces.h"
 
 int limdl_faces_init_copy (
 	LIMdlFaces* self,
 	LIMdlFaces* faces)
 {
-	self->material = faces->material;
-	if (faces->indices.count)
-	{
-		self->indices.array = lisys_calloc (faces->indices.count, sizeof (LIMdlIndex));
-		if (self->indices.array == NULL)
-			return 0;
-		self->indices.count = faces->indices.count;
-		self->indices.capacity = faces->indices.count;
-		memcpy (self->indices.array, faces->indices.array, faces->indices.count * sizeof (LIMdlIndex));
-	}
+	self->start = faces->start;
+	self->count = faces->count;
 
 	return 1;
 }
@@ -45,58 +38,61 @@ int limdl_faces_init_copy (
 void limdl_faces_free (
 	LIMdlFaces* self)
 {
-	lisys_free (self->indices.array);
 }
 
 int limdl_faces_read (
 	LIMdlFaces*  self,
+	LIMdlModel*  model,
 	LIArcReader* reader)
 {
 	uint32_t i;
 	uint32_t mat;
 	uint32_t count;
 	uint32_t index;
+	LIMdlIndex* tmp;
 
 	/* Read header. */
 	if (!liarc_reader_get_uint32 (reader, &mat) ||
 	    !liarc_reader_get_uint32 (reader, &count))
 		return 0;
-	self->material = mat;
+	self->start = model->indices.count;
+	self->count = count;
 
 	/* Read indices. */
 	if (count)
 	{
-		self->indices.array = lisys_calloc (count, sizeof (LIMdlIndex));
-		if (self->indices.array == NULL)
+		tmp = lisys_realloc (model->indices.array, (model->indices.count + count) * sizeof (LIMdlIndex));
+		if (tmp == NULL)
 			return 0;
-		self->indices.count = count;
-		self->indices.capacity = count;
+		model->indices.array = tmp;
 		for (i = 0 ; i < count ; i++)
 		{
 			if (!liarc_reader_get_uint32 (reader, &index))
 				return 0;
-			self->indices.array[i] = index;
+			model->indices.array[model->indices.count + i] = index;
 		}
+		model->indices.count += count;
 	}
 
 	return 1;
 }
 
 int limdl_faces_write (
-	LIMdlFaces*  self,
-	LIArcWriter* writer)
+	const LIMdlFaces* self,
+	const LIMdlModel* model,
+	LIArcWriter*      writer)
 {
 	int i;
 
 	/* Write header. */
-	if (!liarc_writer_append_uint32 (writer, self->material) ||
-	    !liarc_writer_append_uint32 (writer, self->indices.count))
+	if (!liarc_writer_append_uint32 (writer, 0) ||
+	    !liarc_writer_append_uint32 (writer, self->count))
 		return 0;
 
 	/* Write indices. */
-	for (i = 0 ; i < self->indices.count ; i++)
+	for (i = 0 ; i < self->count ; i++)
 	{
-		if (!liarc_writer_append_uint32 (writer, self->indices.array[i]))
+		if (!liarc_writer_append_uint32 (writer, model->indices.array[self->start + i]))
 			return 0;
 	}
 

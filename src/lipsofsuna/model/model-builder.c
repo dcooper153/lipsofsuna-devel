@@ -40,7 +40,10 @@ static int private_realloc_array (
 LIMdlBuilder* limdl_builder_new (
 	LIMdlModel* model)
 {
+	int i;
 	LIMdlBuilder* self;
+	LIMdlBuilderFaces* dstfaces;
+	LIMdlFaces* srcfaces;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIMdlBuilder));
@@ -60,8 +63,38 @@ LIMdlBuilder* limdl_builder_new (
 	else
 		self->model = model;
 
+	/* Separate indices of face groups. */
+	lisys_assert (self->model->face_groups.count == self->model->materials.count);
+	if (self->model->face_groups.count)
+	{
+		self->face_groups.array = lisys_calloc (self->model->face_groups.count, sizeof (LIMdlBuilderFaces));
+		if (self->face_groups.array == NULL)
+		{
+			limdl_builder_free (self);
+			return NULL;
+		}
+		self->face_groups.count = self->model->face_groups.count;
+		self->face_groups.capacity = self->model->face_groups.count;
+		for (i = 0 ; i < self->face_groups.count ; i++)
+		{
+			dstfaces = self->face_groups.array + i;
+			srcfaces = self->model->face_groups.array + i;
+			if (srcfaces->count)
+			{
+				dstfaces->indices.array = lisys_calloc (srcfaces->count, sizeof (LIMdlIndex));
+				if (dstfaces->indices.array == NULL)
+				{
+					limdl_builder_free (self);
+					return NULL;
+				}
+				memcpy (dstfaces->indices.array, self->model->indices.array + srcfaces->start, srcfaces->count * sizeof (LIMdlIndex));
+				dstfaces->indices.count = srcfaces->count;
+				dstfaces->indices.capacity = srcfaces->count;
+			}
+		}
+	}
+
 	/* Initialize builder state. */
-	self->facegroup_capacity = self->model->face_groups.count;
 	self->material_capacity = self->model->materials.count;
 	self->weightgroup_capacity = self->model->weight_groups.count;
 	self->vertex_capacity = self->model->vertices.count;
@@ -76,21 +109,90 @@ LIMdlBuilder* limdl_builder_new (
 void limdl_builder_free (
 	LIMdlBuilder* self)
 {
+	int i;
+
+	for (i = 0 ; i < self->face_groups.count ; i++)
+		lisys_free (self->face_groups.array[i].indices.array);
+	lisys_free (self->face_groups.array);
 	lisys_free (self);
 }
 
 /**
  * \brief Finishes building the model.
  * \param self Model builder.
+ * \return Nonzero on success.
  */
-void limdl_builder_finish (
+int limdl_builder_finish (
 	LIMdlBuilder* self)
 {
+	int i;
+	int num_indices;
+	int pos_indices;
+	LIMdlBuilderFaces* srcfaces;
+	LIMdlFaces* dstfaces;
+	LIMdlFaces* new_faces;
+	LIMdlIndex* new_indices;
+
+	/* Recreate face groups. */
+	num_indices = 0;
+	if (self->face_groups.count)
+	{
+		new_faces = lisys_calloc (self->face_groups.count, sizeof (LIMdlFaces));
+		if (new_faces == NULL)
+			return 0;
+		for (i = 0 ; i < self->face_groups.count ; i++)
+		{
+			srcfaces = self->face_groups.array + i;
+			dstfaces = new_faces + i;
+			dstfaces->start = num_indices;
+			dstfaces->count = srcfaces->indices.count;
+			num_indices += srcfaces->indices.count;
+		}
+		lisys_free (self->model->face_groups.array);
+		self->model->face_groups.array = new_faces;
+		self->model->face_groups.count = self->face_groups.count;
+	}
+	else
+	{
+		lisys_free (self->model->face_groups.array);
+		self->model->face_groups.array = NULL;
+		self->model->face_groups.count = 0;
+	}
+	lisys_assert (self->model->face_groups.count == self->face_groups.count);
+	lisys_assert (self->model->face_groups.count == self->model->materials.count);
+
+	/* Merge indices of face groups. */
+	if (num_indices)
+	{
+		new_indices = lisys_calloc (num_indices, sizeof (LIMdlIndex));
+		if (new_indices == NULL)
+			return 0;
+		pos_indices = 0;
+		for (i = 0 ; i < self->face_groups.count ; i++)
+		{
+			srcfaces = self->face_groups.array + i;
+			memcpy (new_indices + pos_indices, srcfaces->indices.array, srcfaces->indices.count * sizeof (LIMdlIndex));
+			pos_indices += srcfaces->indices.count;
+		}
+		lisys_assert (pos_indices == num_indices);
+		lisys_free (self->model->indices.array);
+		self->model->indices.array = new_indices;
+		self->model->indices.count = num_indices;
+	}
+	else
+	{
+		lisys_free (self->model->indices.array);
+		self->model->indices.array = NULL;
+		self->model->indices.count = 0;
+	}
+
 	/* Calculate the bounding box. */
 	limdl_model_calculate_bounds (self->model);
 
 	/* Calculate vertex tangents. */
 	limdl_model_calculate_tangents (self->model);
+
+	return 1;
 }
 
 /**
@@ -100,14 +202,14 @@ void limdl_builder_finish (
  * new vertex with existing vertices, if possible.
  *
  * \param self Model builder.
- * \param groupidx Face group index.
+ * \param material Material index.
  * \param vertices Array of three vertices.
  * \param bone_mapping Bone index mapping array or NULL.
  * \return Nonzero on success.
  */
 int limdl_builder_insert_face (
 	LIMdlBuilder*      self,
-	int                groupidx,
+	int                material,
 	const LIMdlVertex* vertices,
 	const int*         bone_mapping)
 {
@@ -121,7 +223,7 @@ int limdl_builder_insert_face (
 	indices[0] = self->model->vertices.count - 3;
 	indices[1] = self->model->vertices.count - 2;
 	indices[2] = self->model->vertices.count - 1;
-	if (!limdl_builder_insert_indices (self, groupidx, indices, 3))
+	if (!limdl_builder_insert_indices (self, material, indices, 3, 0))
 	{
 		self->model->vertices.count -= 3;
 		return 0;
@@ -131,53 +233,27 @@ int limdl_builder_insert_face (
 }
 
 /**
- * \brief Inserts a face group to the model.
- * \param self Model builder.
- * \param material Material index.
- * \return Nonzero on success.
- */
-int limdl_builder_insert_facegroup (
-	LIMdlBuilder* self,
-	int           material)
-{
-	LIMdlFaces* tmp;
-
-	lisys_assert (material >= 0);
-	lisys_assert (material < self->model->materials.count);
-
-	/* Allocate space for face groups. */
-	if (!private_realloc_array ((void**) &self->model->face_groups.array,
-	    &self->facegroup_capacity, self->model->face_groups.count + 1, sizeof (LIMdlFaces)))
-		return 0;
-
-	/* Initialize the face group. */
-	tmp = self->model->face_groups.array + self->model->face_groups.count;
-	memset (tmp, 0, sizeof (LIMdlFaces));
-	tmp->material = material;
-	self->model->face_groups.count++;
-
-	return 1;
-}
-
-/**
  * \brief Inserts indices to the model.
  * \param self Model builder.
- * \param groupidx Face group index.
+ * \param material Material index.
  * \param indices Array of indices.
  * \param count Number of indices.
+ * \param vertex_start_remap Offset of the first vertex for remap purposes.
  * \return Nonzero on success.
  */
 int limdl_builder_insert_indices (
 	LIMdlBuilder*     self,
-	int               groupidx,
+	int               material,
 	const LIMdlIndex* indices,
-	int               count)
+	int               count,
+	int               vertex_start_remap)
 {
-	LIMdlFaces* group;
+	int i;
+	LIMdlBuilderFaces* group;
 
-	lisys_assert (groupidx >= 0);
-	lisys_assert (groupidx < self->model->face_groups.count);
-	group = self->model->face_groups.array + groupidx;
+	lisys_assert (material >= 0);
+	lisys_assert (material < self->face_groups.count);
+	group = self->face_groups.array + material;
 
 	/* Allocate space for indices. */
 	if (!private_realloc_array (&group->indices.array, &group->indices.capacity,
@@ -185,8 +261,16 @@ int limdl_builder_insert_indices (
 		return 0;
 
 	/* Insert indices. */
-	memcpy (group->indices.array + group->indices.count, indices, count * sizeof (LIMdlIndex));
-	group->indices.count += count;
+	if (vertex_start_remap)
+	{
+		for (i = 0 ; i < count ; i++)
+			group->indices.array[group->indices.count++] = indices[i] + vertex_start_remap;
+	}
+	else
+	{
+		memcpy (group->indices.array + group->indices.count, indices, count * sizeof (LIMdlIndex));
+		group->indices.count += count;
+	}
 
 	return 1;
 }
@@ -203,16 +287,25 @@ int limdl_builder_insert_material (
 {
 	LIMdlMaterial* tmp;
 
+	lisys_assert (self->model->materials.count == self->face_groups.count);
+
 	/* Allocate space for materials. */
 	if (!private_realloc_array (&self->model->materials.array,
 	    &self->material_capacity, self->model->materials.count + 1, sizeof (LIMdlMaterial)))
 		return 0;
+
+	/* Allocate space for face groups. */
+	if (!private_realloc_array (&self->face_groups.array,
+	    &self->face_groups.capacity, self->face_groups.count + 1, sizeof (LIMdlBuilderFaces)))
+		return 0;
+	memset (self->face_groups.array + self->face_groups.count, 0, sizeof (LIMdlBuilderFaces));
 
 	/* Copy material. */
 	tmp = self->model->materials.array + self->model->materials.count;
 	if (!limdl_material_init_copy (tmp, material))
 		return 0;
 	self->model->materials.count++;
+	self->face_groups.count++;
 
 	return 1;
 }

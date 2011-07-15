@@ -45,6 +45,7 @@ struct _LIMdlModel
 	struct { int count; LIMdlAnimation* array; } animations;
 	struct { int count; LIMdlHairs* array; } hairs;
 	struct { int count; LIMdlFaces* array; } face_groups;
+	struct { int count; LIMdlIndex* array; } indices;
 	struct { int count; LIMdlMaterial* array; } materials;
 	struct { int count; LIMdlNode** array; } nodes;
 	struct { int count; LIMdlParticleSystem* array; } particle_systems;
@@ -79,10 +80,6 @@ LIAPICALL (void, limdl_model_calculate_tangents, (
 LIAPICALL (LIMdlAnimation*, limdl_model_find_animation, (
 	LIMdlModel* self,
 	const char* name));
-
-LIAPICALL (int, limdl_model_find_facegroup, (
-	LIMdlModel* self,
-	int         material));
 
 LIAPICALL (int, limdl_model_find_material, (
 	const LIMdlModel*    self,

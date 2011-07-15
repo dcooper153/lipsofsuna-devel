@@ -29,9 +29,3 @@ end
 Object.set_effect = function(self, ...)
 	Los.object_set_effect(self.handle, ...)
 end
-
---- Recalculates the positions of transparent faces for correct depth sorting.
--- @param self Object.
-Object.update_transparency = function(self)
-	return Los.object_update_transparency(self.handle)
-end

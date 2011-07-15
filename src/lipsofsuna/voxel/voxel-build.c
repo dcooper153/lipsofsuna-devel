@@ -205,7 +205,6 @@ static int private_merge_material (
 	LIVoxBuilder*  self,
 	LIMdlMaterial* material)
 {
-	int g;
 	int m;
 
 	/* Find or create material. */
@@ -217,16 +216,7 @@ static int private_merge_material (
 			return -1;
 	}
 
-	/* Find or create face group. */
-	g = limdl_model_find_facegroup (self->model_builder->model, m);
-	if (g == -1)
-	{
-		g = self->model_builder->model->face_groups.count;
-		if (!limdl_builder_insert_facegroup (self->model_builder, m))
-			return -1;
-	}
-
-	return g;
+	return m;
 }
 
 static int private_merge_triangles_model (

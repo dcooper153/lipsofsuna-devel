@@ -27,7 +27,6 @@
 static void Model_add_material (LIScrArgs* args)
 {
 	int cull;
-	int index;
 	float diffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	float specular[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	const char* shader;
@@ -54,9 +53,7 @@ static void Model_add_material (LIScrArgs* args)
 		limdl_material_set_specular (&material, specular);
 
 	/* Insert the material. */
-	index = model->model->materials.count;
-	if (limdl_builder_insert_material (builder, &material))
-		limdl_builder_insert_facegroup (builder, index);
+	limdl_builder_insert_material (builder, &material);
 	limdl_builder_finish (builder);
 
 	/* Cleanup. */
@@ -175,7 +172,7 @@ static void Model_add_triangles (LIScrArgs* args)
 
 	/* Insert the vertices and indices. */
 	limdl_builder_insert_vertices (builder, vertices, vertices_num, NULL);
-	limdl_builder_insert_indices (builder, group - 1, indices, vertices_num);
+	limdl_builder_insert_indices (builder, group - 1, indices, vertices_num, 0);
 	limdl_builder_finish (builder);
 
 	/* Cleanup. */
@@ -298,12 +295,13 @@ static void Model_remove_vertices (LIScrArgs* args)
 	for (i = 0 ; i < model->model->face_groups.count ; i++)
 	{
 		group = model->model->face_groups.array + i;
-		lisys_free (group->indices.array);
-		group->indices.array = NULL;
-		group->indices.capacity = 0;
-		group->indices.count = 0;
+		group->start = 0;
+		group->count = 0;
 	}
+	lisys_free (model->model->indices.array);
 	lisys_free (model->model->vertices.array);
+	model->model->indices.array = NULL;
+	model->model->indices.count = 0;
 	model->model->vertices.array = NULL;
 	model->model->vertices.count = 0;
 }
