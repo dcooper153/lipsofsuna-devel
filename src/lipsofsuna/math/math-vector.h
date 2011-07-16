@@ -58,6 +58,31 @@ limat_vector_init (float x,
 }
 
 /**
+ * \brief Compares two vertices using a threshold.
+ * \param self Vector.
+ * \param vector Vector.
+ * \param threshold Threshold for each coordinate.
+ * \return Vector.
+ */
+static inline int limat_vector_compare (
+	LIMatVector self,
+	LIMatVector vector,
+	float       threshold)
+{
+	LIMatVector tmp =
+	{
+		self.x - vector.x,
+		self.y - vector.y,
+		self.z - vector.z
+	};
+	if (-threshold <= tmp.x && tmp.x < threshold &&
+	    -threshold <= tmp.y && tmp.y < threshold &&
+	    -threshold <= tmp.z && tmp.z < threshold)
+		return 1;
+	return 0;
+}
+
+/**
  * \brief Gets the opposite vector.
  *
  * \param self Vector.

@@ -118,12 +118,8 @@ int limdl_builder_calculate_lod (
 			return 0;
 		}
 		lod = self->lod.array + self->lod.count - 1;
-		target = (int)(num_indices - num_indices * factor * (i + 1) / levels);
-		if (!private_build_level (self, lod, &edges_left, target))
-		{
-			lisys_free (edges);
-			return 0;
-		}
+		target = (int)(num_indices - num_indices * (1.0f - factor) * (i + 1) / levels);
+		private_build_level (self, lod, &edges_left, target);
 	}
 
 	lisys_free (edges);
@@ -139,7 +135,7 @@ static int private_build_level (
 	LIMdlEdge**      edges_left,
 	int              target_index_count)
 {
-	int num_indices;
+	int num_indices = 0;
 	LIMdlEdge* edge;
 	LIMdlEdge* best_edge;
 
@@ -161,8 +157,6 @@ static int private_build_level (
 		}
 		if (best_edge == NULL)
 			break;
-		if (best_edge->cost >= 1000000.0f)
-			break;
 
 		/* Collapse the edge. */
 		/* If the edge has a twin, collapse it too so that we can collapse
@@ -182,7 +176,7 @@ static int private_build_level (
 			best_edge->next->prev = best_edge->prev;
 	}
 
-	return 1;
+	return num_indices;
 }
 
 static float private_calculate_collapse_cost (

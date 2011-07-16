@@ -183,8 +183,8 @@ static void Model_add_triangles (LIScrArgs* args)
 
 static void Model_calculate_lod (LIScrArgs* args)
 {
-	int levels = 4;
-	float factor = 0.5f;
+	int levels = 5;
+	float factor = 0.3f;
 	LIEngModel* model;
 	LIMdlBuilder* builder;
 

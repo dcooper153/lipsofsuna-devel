@@ -51,6 +51,8 @@ struct _LIMdlBuilder
 	int material_capacity;
 	int weightgroup_capacity;
 	int vertex_capacity;
+	int vertex_lookup_count;
+	LIAlgMemdic* vertex_lookup;
 	LIMdlModel* model;
 	struct
 	{
@@ -75,6 +77,10 @@ LIAPICALL (int, limdl_builder_calculate_lod, (
 	int           levels,
 	float         factor));
 
+LIAPICALL (int, limdl_builder_find_vertex, (
+	LIMdlBuilder*      self,
+	const LIMdlVertex* vertex));
+
 LIAPICALL (int, limdl_builder_finish, (
 	LIMdlBuilder* self));
 
@@ -84,6 +90,12 @@ LIAPICALL (int, limdl_builder_insert_face, (
 	int                material,
 	const LIMdlVertex* vertices,
 	const int*         bone_mapping));
+
+LIAPICALL (int, limdl_builder_insert_face_welded, (
+	LIMdlBuilder*      self,
+	int                level,
+	int                material,
+	const LIMdlVertex* vertices));
 
 LIAPICALL (int, limdl_builder_insert_indices, (
 	LIMdlBuilder*     self,

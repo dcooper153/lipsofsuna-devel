@@ -126,6 +126,8 @@ void limdl_builder_free (
 {
 	int j;
 
+	if (self->vertex_lookup)
+		lialg_memdic_free (self->vertex_lookup);
 	for (j = 0 ; j < self->lod.count ; j++)
 		private_lod_clear (self->lod.array + j);
 	lisys_free (self->lod.array);
@@ -162,6 +164,48 @@ int limdl_builder_add_detail_levels (
 	}
 
 	return 1;
+}
+
+/**
+ * \brief Finds the index of a matching vertex.
+ * \param self Model builder.
+ * \param vertex Matched vertex.
+ * \return Vertex index or -1.
+ */
+int limdl_builder_find_vertex (
+	LIMdlBuilder*      self,
+	const LIMdlVertex* vertex)
+{
+	int i;
+	void* ptr;
+	LIMdlVertex tmp;
+
+	/* Create the vertex lookup table. */
+	if (self->vertex_lookup == NULL)
+	{
+		self->vertex_lookup = lialg_memdic_new ();
+		if (self->vertex_lookup == NULL)
+			return -1;
+	}
+
+	/* Update the vertex lookup table. */
+	for (i = self->vertex_lookup_count ; i < self->model->vertices.count ; i++)
+	{
+		ptr = (void*)(intptr_t)(i + 1);
+		tmp = self->model->vertices.array[i];
+		limdl_vertex_round (&tmp);
+		lialg_memdic_insert (self->vertex_lookup, &tmp, sizeof (LIMdlVertex), ptr);
+	}
+	self->vertex_lookup_count = self->model->vertices.count;
+
+	/* Find the vertex. */
+	tmp = *vertex;
+	limdl_vertex_round (&tmp);
+	ptr = lialg_memdic_find (self->vertex_lookup, &tmp, sizeof (LIMdlVertex));
+	if (ptr == NULL)
+		return -1;
+
+	return ((int)(intptr_t) ptr) - 1;
 }
 
 /**
@@ -258,8 +302,7 @@ int limdl_builder_finish (
 /**
  * \brief Inserts a triangle to the model.
  *
- * Inserts vertices, vertex weights, and indices to the model, merging the
- * new vertex with existing vertices, if possible.
+ * Inserts new vertices, vertex weights, and indices to the model.
  *
  * \param self Model builder.
  * \param level Level of detail.
@@ -285,6 +328,52 @@ int limdl_builder_insert_face (
 	indices[0] = self->model->vertices.count - 3;
 	indices[1] = self->model->vertices.count - 2;
 	indices[2] = self->model->vertices.count - 1;
+	if (!limdl_builder_insert_indices (self, level, material, indices, 3, 0))
+	{
+		self->model->vertices.count -= 3;
+		return 0;
+	}
+
+	return 1;
+}
+
+/**
+ * \brief Inserts a triangle to the model while trying to weld vertices.
+ *
+ * Inserts vertices and indices to the model, merging the new vertex with
+ * existing vertices, if possible.
+ *
+ * \param self Model builder.
+ * \param level Level of detail.
+ * \param material Material index.
+ * \param vertices Array of three vertices.
+ * \return Nonzero on success.
+ */
+int limdl_builder_insert_face_welded (
+	LIMdlBuilder*      self,
+	int                level,
+	int                material,
+	const LIMdlVertex* vertices)
+{
+	int i;
+	int index;
+	LIMdlIndex indices[3];
+
+	/* Insert vertices. */
+	for (i = 0 ; i < 3 ; i++)
+	{
+		index = limdl_builder_find_vertex (self, vertices + i);
+		if (index == -1)
+		{
+			if (!limdl_builder_insert_vertices (self, vertices + i, 1, NULL))
+				return 0;
+			indices[i] = self->model->vertices.count - 1;
+		}
+		else
+			indices[i] = index;
+	}
+
+	/* Insert indices. */
 	if (!limdl_builder_insert_indices (self, level, material, indices, 3, 0))
 	{
 		self->model->vertices.count -= 3;
