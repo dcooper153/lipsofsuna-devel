@@ -37,6 +37,7 @@ struct _LIMdlEdge
 	float cost;
 	LIMdlEdge* next;
 	LIMdlEdge* prev;
+	LIMdlEdge* twin;
 };
 
 static int private_build_level (
@@ -164,7 +165,11 @@ static int private_build_level (
 			break;
 
 		/* Collapse the edge. */
+		/* If the edge has a twin, collapse it too so that we can collapse
+		   edges at UV seams without creating holes. */
 		num_indices = private_collapse_edge (self, lod, best_edge);
+		if (best_edge->twin)
+			num_indices = private_collapse_edge (self, lod, best_edge->twin);
 		if (num_indices <= target_index_count)
 			break;
 
@@ -190,9 +195,12 @@ static float private_calculate_collapse_cost (
 	LIMatVector d_vtx = limat_vector_subtract (v1->coord, v2->coord);
 	LIMatVector d_nml = limat_vector_subtract (v1->normal, v2->normal);
 	float d_tex[2] = { v1->texcoord[0] - v2->texcoord[0], v1->texcoord[1] - v2->texcoord[1] };
+	float d_col[4] = { v1->color[0] - v2->color[0], v1->color[1] - v2->color[1],
+		v1->color[3] - v2->color[3], v1->color[4] - v2->color[4] };
 
 	return limat_vector_dot (d_vtx, d_vtx) + limat_vector_dot (d_nml, d_nml) +
-		d_tex[0] * d_tex[0] + d_tex[1] * d_tex[1];
+		d_tex[0] * d_tex[0] + d_tex[1] * d_tex[1] +
+		d_col[0] * d_col[0] + d_col[1] * d_col[1] + d_col[2] * d_col[2] + d_col[3] * d_col[3];
 }
 
 static int private_collapse_edge (
@@ -318,10 +326,14 @@ static LIMdlEdge* private_extract_sliding_edges (
 	int              edge_count)
 {
 	int i;
+	int j;
 	char* locked_indices;
 	uint32_t swap;
 	LIMdlEdge* edge;
+	LIMdlEdge* twin;
 	LIMdlEdge* root = NULL;
+	LIMdlIndex index;
+	LIMdlVertex* verts;
 
 	/* Allocate a temporary lookup table. */
 	locked_indices = lisys_calloc (self->model->vertices.count, sizeof (char));
@@ -339,15 +351,47 @@ static LIMdlEdge* private_extract_sliding_edges (
 		}
 	}
 
-	/* Create a linked list of slideable edges. */
-	/* Edges with two locked vertices are rejected. */
-	/* Edges with one locked vertex are reordered so that the free index slides. */
+	/* Find twin edges of non-manifold edges. */
+	verts = self->model->vertices.array;
 	for (i = 0 ; i < edge_count ; i++)
 	{
 		edge = edges + i;
 		if (locked_indices[edge->i1] && locked_indices[edge->i2])
+		{
+			for (j = 0 ; j < edge_count ; j++)
+			{
+				twin = edges + j;
+				if ((edge->i1 == twin->i1 && edge->i2 == twin->i2) ||
+				    (edge->i1 == twin->i2 && edge->i2 == twin->i1))
+					continue;
+				if (limat_vector_compare (verts[edge->i1].coord, verts[twin->i1].coord, 0.001f) &&
+				    limat_vector_compare (verts[edge->i2].coord, verts[twin->i2].coord, 0.001f))
+				{
+					edge->twin = twin;
+					twin->twin = edge;
+				}
+				if (limat_vector_compare (verts[edge->i1].coord, verts[twin->i2].coord, 0.001f) &&
+				    limat_vector_compare (verts[edge->i2].coord, verts[twin->i1].coord, 0.001f))
+				{
+					index = twin->i1;
+					twin->i1 = twin->i2;
+					twin->i2 = index;
+					edge->twin = twin;
+					twin->twin = edge;
+				}
+			}
+		}
+	}
+
+	/* Create a linked list of slideable edges. */
+	/* Edges with two locked vertices and no twin are rejected. */
+	/* Edges with one locked vertex are reordered so that the free index slides. */
+	for (i = 0 ; i < edge_count ; i++)
+	{
+		edge = edges + i;
+		if (edge->twin == NULL && locked_indices[edge->i1] && locked_indices[edge->i2])
 			continue;
-		if (locked_indices[edge->i1])
+		if (edge->twin == NULL && locked_indices[edge->i1])
 		{
 			swap = edge->i1;
 			edge->i1 = edge->i2;

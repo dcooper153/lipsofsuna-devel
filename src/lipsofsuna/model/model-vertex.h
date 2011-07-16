@@ -68,5 +68,26 @@ static inline int limdl_vertex_compare (
 	return memcmp (self, vertex, sizeof (LIMdlVertex));
 }
 
-#endif
+static inline void limdl_vertex_round (
+	LIMdlVertex* self)
+{
+#define ROUND(a, b) a = (int)(a / b + 0.5f) * b
+	ROUND (self->texcoord[0], 0.01f);
+	ROUND (self->texcoord[1], 0.01f);
+	ROUND (self->normal.x, 0.1f);
+	ROUND (self->normal.y, 0.1f);
+	ROUND (self->normal.z, 0.1f);
+	ROUND (self->coord.x, 0.1f);
+	ROUND (self->coord.y, 0.1f);
+	ROUND (self->coord.z, 0.1f);
+	ROUND (self->tangent.x, 0.1f);
+	ROUND (self->tangent.y, 0.1f);
+	ROUND (self->tangent.z, 0.1f);
+	ROUND (self->color[0], 0.1f);
+	ROUND (self->color[1], 0.1f);
+	ROUND (self->color[2], 0.1f);
+	ROUND (self->color[3], 0.1f);
+#undef ROUND
+}
 
+#endif
