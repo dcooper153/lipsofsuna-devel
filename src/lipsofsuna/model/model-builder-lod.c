@@ -34,6 +34,7 @@ struct _LIMdlEdge
 	uint32_t i2;
 	int users;
 	int locked;
+	int collapsed;
 	float cost;
 	LIMdlEdge* next;
 	LIMdlEdge* prev;
@@ -44,6 +45,7 @@ static int private_build_level (
 	LIMdlBuilder*    self,
 	LIMdlBuilderLod* lod,
 	LIMdlEdge**      edges_left,
+	LIMdlEdge**      edges_sort,
 	int              target_index_count);
 
 static float private_calculate_collapse_cost (
@@ -54,7 +56,8 @@ static float private_calculate_collapse_cost (
 static int private_collapse_edge (
 	LIMdlBuilder*    self,
 	LIMdlBuilderLod* lod,
-	LIMdlEdge*        edge);
+	LIMdlEdge*       edge,
+	LIMdlEdge**      edges_left);
 
 static LIMdlEdge* private_extract_edges (
 	LIMdlBuilder*    self,
@@ -88,6 +91,7 @@ int limdl_builder_calculate_lod (
 	int num_indices;
 	LIMdlEdge* edges;
 	LIMdlEdge* edges_left;
+	LIMdlEdge** edges_sort;
 	LIMdlBuilderLod* lod;
 
 	/* Calculate maximum memory use. */
@@ -109,19 +113,29 @@ int limdl_builder_calculate_lod (
 		return 1;
 	}
 
+	/* Preallocate the edge sorting array. */
+	edges_sort = lisys_calloc (num_edges, sizeof (LIMdlEdge*));
+	if (edges_sort == NULL)
+	{
+		lisys_free (edges);
+		return 1;
+	}
+
 	/* Calculate the levels of detail. */
 	for (i = 0 ; i < levels ; i++)
 	{
 		if (!limdl_builder_add_detail_levels (self, 1))
 		{
+			lisys_free (edges_left);
 			lisys_free (edges);
 			return 0;
 		}
 		lod = self->lod.array + self->lod.count - 1;
 		target = (int)(num_indices - num_indices * (1.0f - factor) * (i + 1) / levels);
-		private_build_level (self, lod, &edges_left, target);
+		private_build_level (self, lod, &edges_left, edges_sort, target);
 	}
 
+	lisys_free (edges_sort);
 	lisys_free (edges);
 
 	return 1;
@@ -129,51 +143,63 @@ int limdl_builder_calculate_lod (
 
 /*****************************************************************************/
 
+static int private_compare_edges (
+	const void* a,
+	const void* b)
+{
+	LIMdlEdge* const* A = a;
+	LIMdlEdge* const* B = b;
+
+	if ((*A)->cost < (*B)->cost)
+		return -1;
+	if ((*A)->cost > (*B)->cost)
+		return 1;
+	return 0;
+}
+
 static int private_build_level (
 	LIMdlBuilder*    self,
 	LIMdlBuilderLod* lod,
 	LIMdlEdge**      edges_left,
+	LIMdlEdge**      edges_sort,
 	int              target_index_count)
 {
+	int i;
+	int num_left;
 	int num_indices = 0;
 	LIMdlEdge* edge;
 	LIMdlEdge* best_edge;
 
 	/* Calculate collapse costs. */
-	/* TODO: Should be recalculated for each iteration but it's too slow
-	   without an incremental recalculation algorithm. */
 	for (edge = *edges_left ; edge != NULL ; edge = edge->next)
 		edge->cost = private_calculate_collapse_cost (self, lod, edge);
 
-	while (1)
+	/* Sort the edge list. */
+	/* Ideally the collapse costs should be updated incrementally every time
+	   a merge occurs. We're lazy and don't take it into account. */
+	for (num_left = 0, edge = *edges_left ; edge != NULL ; edge = edge->next)
+		edges_sort[num_left++] = edge;
+	qsort (edges_sort, num_left, sizeof (LIMdlEdge*), private_compare_edges);
+
+	/* Collapse edges until the target or the end has been reached. */
+	for (i = 0 ; i < num_left ; i++)
 	{
 		/* Find the best edge to collapse. */
-		/* TODO: This is slow, better sort first or use a priority queue. */
-		best_edge = NULL;
-		for (edge = *edges_left ; edge != NULL ; edge = edge->next)
-		{
-			if (best_edge == NULL || edge->cost < best_edge->cost)
-				best_edge = edge;
-		}
-		if (best_edge == NULL)
-			break;
+		/* Although the edges are sorted and picked in order, they can
+		   be removed out order due to twin edge removal. We need to
+		   check for that here. */
+		best_edge = edges_sort[i];
+		if (best_edge->collapsed)
+			continue;
 
 		/* Collapse the edge. */
 		/* If the edge has a twin, collapse it too so that we can collapse
 		   edges at UV seams without creating holes. */
-		num_indices = private_collapse_edge (self, lod, best_edge);
+		num_indices = private_collapse_edge (self, lod, best_edge, edges_left);
 		if (best_edge->twin)
-			num_indices = private_collapse_edge (self, lod, best_edge->twin);
+			num_indices = private_collapse_edge (self, lod, best_edge->twin, edges_left);
 		if (num_indices <= target_index_count)
 			break;
-
-		/* Remove the edge from the linked list. */
-		if (best_edge->prev != NULL)
-			best_edge->prev->next = best_edge->next;
-		else
-			*edges_left = best_edge->next;
-		if (best_edge->next != NULL)
-			best_edge->next->prev = best_edge->prev;
 	}
 
 	return num_indices;
@@ -200,7 +226,8 @@ static float private_calculate_collapse_cost (
 static int private_collapse_edge (
 	LIMdlBuilder*    self,
 	LIMdlBuilderLod* lod,
-	LIMdlEdge*       edge)
+	LIMdlEdge*       edge,
+	LIMdlEdge**      edges_left)
 {
 	int i;
 	int j;
@@ -209,6 +236,7 @@ static int private_collapse_edge (
 	uint32_t face[3];
 	LIMdlBuilderFaces* group;
 
+	/* Replace indices and eliminate degenerate faces. */
 	for (count = i = 0 ; i < lod->face_groups.count ; i++)
 	{
 		group = lod->face_groups.array + i;
@@ -239,6 +267,18 @@ static int private_collapse_edge (
 		}
 		group->indices.count = dst;
 	}
+
+	/* Remove the edge from the linked list. */
+	if (edge->prev != NULL)
+		edge->prev->next = edge->next;
+	else
+		*edges_left = edge->next;
+	if (edge->next != NULL)
+		edge->next->prev = edge->prev;
+
+	/* Mark the edge as collapsed. */
+	/* This is needed so that we can avoid picking collapsed twin edges. */
+	edge->collapsed = 1;
 
 	return count;
 }
@@ -361,12 +401,22 @@ static LIMdlEdge* private_extract_sliding_edges (
 				if (limat_vector_compare (verts[edge->i1].coord, verts[twin->i1].coord, 0.001f) &&
 				    limat_vector_compare (verts[edge->i2].coord, verts[twin->i2].coord, 0.001f))
 				{
+					if (edge->twin != NULL)
+					{
+						edge->twin = NULL;
+						break;
+					}
 					edge->twin = twin;
 					twin->twin = edge;
 				}
 				if (limat_vector_compare (verts[edge->i1].coord, verts[twin->i2].coord, 0.001f) &&
 				    limat_vector_compare (verts[edge->i2].coord, verts[twin->i1].coord, 0.001f))
 				{
+					if (edge->twin != NULL)
+					{
+						edge->twin = NULL;
+						break;
+					}
 					index = twin->i1;
 					twin->i1 = twin->i2;
 					twin->i2 = index;
