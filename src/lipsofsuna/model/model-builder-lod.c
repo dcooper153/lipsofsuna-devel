@@ -27,6 +27,8 @@
 #include "model.h"
 #include "model-builder.h"
 
+#define MAX_TWINS 32
+
 typedef struct _LIMdlEdge LIMdlEdge;
 struct _LIMdlEdge
 {
@@ -38,7 +40,11 @@ struct _LIMdlEdge
 	float cost;
 	LIMdlEdge* next;
 	LIMdlEdge* prev;
-	LIMdlEdge* twin;
+	struct
+	{
+		int count;
+		LIMdlEdge* array[MAX_TWINS];
+	} twins;
 };
 
 static int private_build_level (
@@ -46,7 +52,7 @@ static int private_build_level (
 	LIMdlBuilderLod* lod,
 	LIMdlEdge**      edges_left,
 	LIMdlEdge**      edges_sort,
-	int              target_index_count);
+	float            target_cost);
 
 static float private_calculate_collapse_cost (
 	LIMdlBuilder*    self,
@@ -77,6 +83,7 @@ static LIMdlEdge* private_extract_sliding_edges (
 /**
  * \brief Calculates a level-of-detail version of the model.
  * \param self Model.
+ * \param levels Number of detail levels to create.
  * \param factor Polygon reduction factor.
  * \return Nonzero on success.
  */
@@ -86,7 +93,6 @@ int limdl_builder_calculate_lod (
 	float         factor)
 {
 	int i;
-	int target;
 	int num_edges;
 	int num_indices;
 	LIMdlEdge* edges;
@@ -131,8 +137,7 @@ int limdl_builder_calculate_lod (
 			return 0;
 		}
 		lod = self->lod.array + self->lod.count - 1;
-		target = (int)(num_indices - num_indices * (1.0f - factor) * (i + 1) / levels);
-		private_build_level (self, lod, &edges_left, edges_sort, target);
+		private_build_level (self, lod, &edges_left, edges_sort, (i + 1) * factor);
 	}
 
 	lisys_free (edges_sort);
@@ -162,13 +167,19 @@ static int private_build_level (
 	LIMdlBuilderLod* lod,
 	LIMdlEdge**      edges_left,
 	LIMdlEdge**      edges_sort,
-	int              target_index_count)
+	float            target_cost)
 {
 	int i;
+	int j;
 	int num_left;
 	int num_indices = 0;
+	LIMdlIndex index;
 	LIMdlEdge* edge;
+	LIMdlEdge* twin;
 	LIMdlEdge* best_edge;
+	LIMdlVertex* verts;
+
+	verts = self->model->vertices.array;
 
 	/* Calculate collapse costs. */
 	for (edge = *edges_left ; edge != NULL ; edge = edge->next)
@@ -179,6 +190,8 @@ static int private_build_level (
 	   a merge occurs. We're lazy and don't take it into account. */
 	for (num_left = 0, edge = *edges_left ; edge != NULL ; edge = edge->next)
 		edges_sort[num_left++] = edge;
+	if (!num_left)
+		return 0;
 	qsort (edges_sort, num_left, sizeof (LIMdlEdge*), private_compare_edges);
 
 	/* Collapse edges until the target or the end has been reached. */
@@ -191,21 +204,47 @@ static int private_build_level (
 		best_edge = edges_sort[i];
 		if (best_edge->collapsed)
 			continue;
+		if (best_edge->cost > target_cost)
+			break;
 
 		/* Collapse the edge. */
 		/* If the edge has a twin, collapse it too so that we can collapse
 		   edges at UV seams without creating holes. */
 		num_indices = private_collapse_edge (self, lod, best_edge, edges_left);
-		if (best_edge->twin)
-			num_indices = private_collapse_edge (self, lod, best_edge->twin, edges_left);
-		if (num_indices <= target_index_count)
-			break;
+		for (j = 0 ; j < best_edge->twins.count ; j++)
+		{
+			twin = best_edge->twins.array[j];
+			if (limat_vector_compare (verts[best_edge->i1].coord, verts[twin->i2].coord, 0.001f))
+			{
+				index = twin->i1;
+				twin->i1 = twin->i2;
+				twin->i2 = index;
+			}
+			num_indices = private_collapse_edge (self, lod, best_edge->twins.array[j], edges_left);
+		}
 	}
 
 	return num_indices;
 }
 
-static float private_calculate_collapse_cost (
+static float private_calculate_collapse_cost_attr (
+	LIMdlBuilder*    self,
+	LIMdlBuilderLod* lod,
+	LIMdlEdge*       edge)
+{
+	LIMdlVertex* v1 = self->model->vertices.array + edge->i1;
+	LIMdlVertex* v2 = self->model->vertices.array + edge->i2;
+	LIMatVector d_nml = limat_vector_subtract (v1->normal, v2->normal);
+	float d_tex[2] = { v1->texcoord[0] - v2->texcoord[0], v1->texcoord[1] - v2->texcoord[1] };
+	float d_col[4] = { v1->color[0] - v2->color[0], v1->color[1] - v2->color[1],
+	                   v1->color[3] - v2->color[3], v1->color[4] - v2->color[4] };
+
+	return limat_vector_dot (d_nml, d_nml) +
+		(d_tex[0] * d_tex[0] + d_tex[1] * d_tex[1]) +
+		(d_col[0] * d_col[0] + d_col[1] * d_col[1] + d_col[2] * d_col[2] + d_col[3] * d_col[3]);
+}
+
+static float private_calculate_collapse_cost_geom (
 	LIMdlBuilder*    self,
 	LIMdlBuilderLod* lod,
 	LIMdlEdge*       edge)
@@ -213,14 +252,25 @@ static float private_calculate_collapse_cost (
 	LIMdlVertex* v1 = self->model->vertices.array + edge->i1;
 	LIMdlVertex* v2 = self->model->vertices.array + edge->i2;
 	LIMatVector d_vtx = limat_vector_subtract (v1->coord, v2->coord);
-	LIMatVector d_nml = limat_vector_subtract (v1->normal, v2->normal);
-	float d_tex[2] = { v1->texcoord[0] - v2->texcoord[0], v1->texcoord[1] - v2->texcoord[1] };
-	float d_col[4] = { v1->color[0] - v2->color[0], v1->color[1] - v2->color[1],
-		v1->color[3] - v2->color[3], v1->color[4] - v2->color[4] };
 
-	return limat_vector_dot (d_vtx, d_vtx) + limat_vector_dot (d_nml, d_nml) +
-		d_tex[0] * d_tex[0] + d_tex[1] * d_tex[1] +
-		d_col[0] * d_col[0] + d_col[1] * d_col[1] + d_col[2] * d_col[2] + d_col[3] * d_col[3];
+	return limat_vector_dot (d_vtx, d_vtx);
+}
+
+static float private_calculate_collapse_cost (
+	LIMdlBuilder*    self,
+	LIMdlBuilderLod* lod,
+	LIMdlEdge*       edge)
+{
+	int i;
+	float attr;
+	float geom;
+
+	geom = private_calculate_collapse_cost_geom (self, lod, edge);
+	attr = private_calculate_collapse_cost_attr (self, lod, edge);
+	for (i = 0 ; i < edge->twins.count ; i++)
+		attr += private_calculate_collapse_cost_attr (self, lod, edge->twins.array[i]);
+
+	return geom * (1 + edge->twins.count) + 0.1f * attr;
 }
 
 static int private_collapse_edge (
@@ -362,11 +412,10 @@ static LIMdlEdge* private_extract_sliding_edges (
 	int i;
 	int j;
 	char* locked_indices;
-	uint32_t swap;
 	LIMdlEdge* edge;
 	LIMdlEdge* twin;
 	LIMdlEdge* root = NULL;
-	LIMdlIndex index;
+	LIMdlIndex swap;
 	LIMdlVertex* verts;
 
 	/* Allocate a temporary lookup table. */
@@ -395,33 +444,20 @@ static LIMdlEdge* private_extract_sliding_edges (
 			for (j = 0 ; j < edge_count ; j++)
 			{
 				twin = edges + j;
-				if ((edge->i1 == twin->i1 && edge->i2 == twin->i2) ||
-				    (edge->i1 == twin->i2 && edge->i2 == twin->i1))
+				if (twin == edge)
 					continue;
-				if (limat_vector_compare (verts[edge->i1].coord, verts[twin->i1].coord, 0.001f) &&
-				    limat_vector_compare (verts[edge->i2].coord, verts[twin->i2].coord, 0.001f))
+				if ((edge->i1 == twin->i1 || edge->i2 == twin->i2) ||
+				    (edge->i1 == twin->i2 || edge->i2 == twin->i1))
+					continue;
+				if ((limat_vector_compare (verts[edge->i1].coord, verts[twin->i1].coord, 0.001f) &&
+				     limat_vector_compare (verts[edge->i2].coord, verts[twin->i2].coord, 0.001f)) ||
+				    (limat_vector_compare (verts[edge->i1].coord, verts[twin->i2].coord, 0.001f) &&
+				     limat_vector_compare (verts[edge->i2].coord, verts[twin->i1].coord, 0.001f)))
 				{
-					if (edge->twin != NULL)
-					{
-						edge->twin = NULL;
-						break;
-					}
-					edge->twin = twin;
-					twin->twin = edge;
-				}
-				if (limat_vector_compare (verts[edge->i1].coord, verts[twin->i2].coord, 0.001f) &&
-				    limat_vector_compare (verts[edge->i2].coord, verts[twin->i1].coord, 0.001f))
-				{
-					if (edge->twin != NULL)
-					{
-						edge->twin = NULL;
-						break;
-					}
-					index = twin->i1;
-					twin->i1 = twin->i2;
-					twin->i2 = index;
-					edge->twin = twin;
-					twin->twin = edge;
+					lisys_assert (edge->twins.count < MAX_TWINS);
+					lisys_assert (twin->twins.count < MAX_TWINS);
+					edge->twins.array[edge->twins.count++] = twin;
+					twin->twins.array[twin->twins.count++] = edge;
 				}
 			}
 		}
@@ -433,9 +469,9 @@ static LIMdlEdge* private_extract_sliding_edges (
 	for (i = 0 ; i < edge_count ; i++)
 	{
 		edge = edges + i;
-		if (edge->twin == NULL && locked_indices[edge->i1] && locked_indices[edge->i2])
+		if (!edge->twins.count && locked_indices[edge->i1] && locked_indices[edge->i2])
 			continue;
-		if (edge->twin == NULL && locked_indices[edge->i1])
+		if (!edge->twins.count && locked_indices[edge->i1])
 		{
 			swap = edge->i1;
 			edge->i1 = edge->i2;

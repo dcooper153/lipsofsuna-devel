@@ -254,6 +254,19 @@ def build(ctx):
 		add_objects = objs,
 		use = libs)
 
+	# LOD tool.
+	ctx.new_task_gen(
+		features = 'c',
+		source = ctx.path.ant_glob('src/lodtool/*.c'),
+		target = 'lodtool_objs',
+		use = 'CORE THREAD ZLIB')
+	ctx.new_task_gen(
+		features = 'c cprogram',
+		target = 'lipsofsuna-lodtool',
+		install_path = '${BINDIR}',
+		add_objects = 'algorithm_objs archive_objs model_objs system_objs lodtool_objs',
+		use = 'CORE THREAD ZLIB')
+
 	# Installation. Since relpath uses the same directory layout as the source tree, the executable
 	# will find the data files from their current locations and we can avoid installing them.
 	ctx.set_group("install")

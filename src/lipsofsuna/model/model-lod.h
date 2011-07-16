@@ -49,6 +49,10 @@ LIAPICALL (int, limdl_lod_read, (
 	LIMdlLod*    self,
 	LIArcReader* reader));
 
+LIAPICALL (int, limdl_lod_read_old, (
+	LIMdlLod*    self,
+	LIArcReader* reader));
+
 LIAPICALL (int, limdl_lod_write, (
 	const LIMdlLod* self,
 	LIArcWriter*    writer));

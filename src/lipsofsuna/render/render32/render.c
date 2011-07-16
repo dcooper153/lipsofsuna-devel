@@ -55,7 +55,7 @@ LIRenRender32* liren_render32_new (
 	self->render = render;
 	self->paths = paths;
 	self->lod_near = 10.0f;
-	self->lod_far = 30.0f;
+	self->lod_far = 50.0f;
 
 	/* Allocate scene list. */
 	self->scenes = lialg_ptrdic_new ();

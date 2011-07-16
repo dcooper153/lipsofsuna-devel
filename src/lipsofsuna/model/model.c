@@ -55,6 +55,10 @@ static int private_read_hairs (
 	LIMdlModel*  self,
 	LIArcReader* reader);
 
+static int private_read_lod (
+	LIMdlModel*  self,
+	LIArcReader* reader);
+
 static int private_read_materials (
 	LIMdlModel*  self,
 	LIArcReader* reader);
@@ -106,15 +110,15 @@ static int private_write_bounds (
 	const LIMdlModel* self,
 	LIArcWriter*      writer);
 
-static int private_write_faces (
-	const LIMdlModel* self,
-	LIArcWriter*      writer);
-
 static int private_write_hairs (
 	const LIMdlModel* self,
 	LIArcWriter*      writer);
 
 static int private_write_header (
+	const LIMdlModel* self,
+	LIArcWriter*      writer);
+
+static int private_write_lod (
 	const LIMdlModel* self,
 	LIArcWriter*      writer);
 
@@ -1069,10 +1073,12 @@ static int private_read (
 			ret = private_read_materials (self, reader);
 		else if (mesh && !strcmp (id, "ver"))
 			ret = private_read_vertices (self, reader);
-		else if (mesh && !strcmp (id, "fac"))
+		else if (mesh && !strcmp (id, "fac")) /* Deprecated */
 			ret = private_read_faces (self, reader);
 		else if (mesh && !strcmp (id, "wei"))
 			ret = private_read_weights (self, reader);
+		else if (mesh && !strcmp (id, "lod"))
+			ret = private_read_lod (self, reader);
 		else if (mesh && !strcmp (id, "shk"))
 			ret = private_read_shape_keys (self, reader);
 		else if (mesh && !strcmp (id, "nod"))
@@ -1197,6 +1203,7 @@ static int private_read_bounds (
 	return 1;
 }
 
+/* Deprecated by read_lod(). */
 static int private_read_faces (
 	LIMdlModel*  self,
 	LIArcReader* reader)
@@ -1208,7 +1215,7 @@ static int private_read_faces (
 		return 0;
 	self->lod.count = 1;
 
-	return limdl_lod_read (self->lod.array, reader);
+	return limdl_lod_read_old (self->lod.array, reader);
 }
 
 static int private_read_hairs (
@@ -1234,6 +1241,38 @@ static int private_read_hairs (
 			if (!limdl_hairs_read (self->hairs.array + i, reader))
 				return 0;
 		}
+	}
+
+	return 1;
+}
+
+static int private_read_lod (
+	LIMdlModel*  self,
+	LIArcReader* reader)
+{
+	uint32_t i;
+	uint32_t count;
+
+	/* Read header. */
+	if (!liarc_reader_get_uint32 (reader, &count))
+		return 0;
+	if (!count)
+	{
+		lisys_error_set (EINVAL, "empty lod block");
+		return 0;
+	}
+
+	/* Allocate the detail levels. */
+	self->lod.array = lisys_calloc (count, sizeof (LIMdlLod));
+	if (self->lod.array == NULL)
+		return 0;
+	self->lod.count = count;
+
+	/* Read the detail levels. */
+	for (i = 0 ; i < count ; i++)
+	{
+		if (!limdl_lod_read (self->lod.array + i, reader))
+			return 0;
 	}
 
 	return 1;
@@ -1553,8 +1592,8 @@ static int private_write (
 	    !private_write_block (self, "bou", private_write_bounds, writer) ||
 	    !private_write_block (self, "mat", private_write_materials, writer) ||
 	    !private_write_block (self, "ver", private_write_vertices, writer) ||
-	    !private_write_block (self, "fac", private_write_faces, writer) ||
 	    !private_write_block (self, "wei", private_write_weights, writer) ||
+	    !private_write_block (self, "lod", private_write_lod, writer) ||
 	    !private_write_block (self, "shk", private_write_shape_keys, writer) ||
 	    !private_write_block (self, "nod", private_write_nodes, writer) ||
 	    !private_write_block (self, "ani", private_write_animations, writer) ||
@@ -1665,13 +1704,6 @@ static int private_write_bounds (
 	return 1;
 }
 
-static int private_write_faces (
-	const LIMdlModel* self,
-	LIArcWriter*      writer)
-{
-	return limdl_lod_write (self->lod.array, writer);
-}
-
 static int private_write_hairs (
 	const LIMdlModel* self,
 	LIArcWriter*      writer)
@@ -1703,6 +1735,29 @@ static int private_write_header (
 	if (!liarc_writer_append_uint32 (writer, LIMDL_FORMAT_VERSION) ||
 	    !liarc_writer_append_uint32 (writer, self->flags))
 		return 0;
+	return 1;
+}
+
+static int private_write_lod (
+	const LIMdlModel* self,
+	LIArcWriter*      writer)
+{
+	int i;
+	LIMdlLod* lod;
+
+	/* Check if writing is needed. */
+	if (self->lod.count == 1 && !self->lod.array[0].face_groups.count)
+		return 1;
+
+	if (!liarc_writer_append_uint32 (writer, self->lod.count))
+		return 0;
+	for (i = 0 ; i < self->lod.count ; i++)
+	{
+		lod = self->lod.array + i;
+		if (!limdl_lod_write (lod, writer))
+			return 0;
+	}
+
 	return 1;
 }
 

@@ -58,6 +58,63 @@ int limdl_lod_read (
 	LIMdlLod*    self,
 	LIArcReader* reader)
 {
+	int pos;
+	uint32_t i;
+	uint32_t count1;
+	uint32_t count2;
+	uint32_t index;
+	LIMdlFaces* group;
+
+	/* Read header. */
+	if (!liarc_reader_get_uint32 (reader, &count1) ||
+	    !liarc_reader_get_uint32 (reader, &count2))
+		return 0;
+	self->face_groups.count = count1;
+	self->indices.count = count2;
+
+	/* Allocate face groups. */
+	if (self->face_groups.count)
+	{
+		self->face_groups.array = lisys_calloc (self->face_groups.count, sizeof (LIMdlFaces));
+		if (self->face_groups.array == NULL)
+			return 0;
+	}
+
+	/* Read face groups. */
+	for (i = pos = 0 ; i < self->face_groups.count ; i++)
+	{
+		/* Read the face group header. */
+		group = self->face_groups.array + i;
+		if (!liarc_reader_get_uint32 (reader, &count1))
+			return 0;
+		group->start = pos;
+		group->count = count1;
+		pos += count1;
+	}
+
+	/* Allocate indices. */
+	if (self->indices.count)
+	{
+		self->indices.array = lisys_calloc (self->indices.count, sizeof (LIMdlIndex));;
+		if (self->indices.array == NULL)
+			return 0;
+	}
+
+	/* Read indices. */
+	for (i = 0 ; i < self->indices.count ; i++)
+	{
+		if (!liarc_reader_get_uint32 (reader, &index))
+			return 0;
+		self->indices.array[i] = index;
+	}
+
+	return 1;
+}
+
+int limdl_lod_read_old (
+	LIMdlLod*    self,
+	LIArcReader* reader)
+{
 	uint32_t i;
 	uint32_t j;
 	uint32_t mat;
@@ -115,30 +172,29 @@ int limdl_lod_write (
 	LIArcWriter*    writer)
 {
 	int i;
-	int j;
 	LIMdlFaces* group;
 
 	/* Check if writing is needed. */
 	if (!self->face_groups.count)
 		return 1;
 
-	/* Write face groups. */
-	if (!liarc_writer_append_uint32 (writer, self->face_groups.count))
+	if (!liarc_writer_append_uint32 (writer, self->face_groups.count) ||
+	    !liarc_writer_append_uint32 (writer, self->indices.count))
 		return 0;
+
+	/* Write face groups. */
 	for (i = 0 ; i < self->face_groups.count ; i++)
 	{
-		/* Write the header. */
 		group = self->face_groups.array + i;
-		if (!liarc_writer_append_uint32 (writer, 0) ||
-		    !liarc_writer_append_uint32 (writer, group->count))
+		if (!liarc_writer_append_uint32 (writer, group->count))
 			return 0;
+	}
 
-		/* Write indices. */
-		for (j = 0 ; j < group->count ; j++)
-		{
-			if (!liarc_writer_append_uint32 (writer, self->indices.array[group->start + i]))
-				return 0;
-		}
+	/* Write indices. */
+	for (i = 0 ; i < self->indices.count ; i++)
+	{
+		if (!liarc_writer_append_uint32 (writer, self->indices.array[i]))
+			return 0;
 	}
 
 	return 1;
