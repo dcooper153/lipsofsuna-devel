@@ -134,6 +134,7 @@ int liren_sort32_add_object (
 	int i;
 	int ret = 1;
 	LIMatAabb bounds;
+	LIRenLod32* lod;
 	LIRenMaterial32* material;
 
 	/* Frustum culling. */
@@ -150,10 +151,14 @@ int liren_sort32_add_object (
 		if (material->shader == NULL || !material->shader->sort)
 			continue;
 
+		/* Select the level of detail. */
+		lod = liren_model32_get_distance_lod (object->model,
+			&object->transform.position, &self->render->context->camera_position);
+
 		/* Append the group to the sorting buckets. */
 		ret &= liren_sort32_add_faces (self, &bounds, &object->orientation.matrix,
-			object->model->groups.array[i].start, object->model->groups.array[i].count,
-			&object->model->mesh, material, object->pose, &object->model->groups.array[i].center);
+			lod->groups.array[i].start, lod->groups.array[i].count,
+			&lod->mesh, material, object->pose, &lod->groups.array[i].center);
 	}
 
 	/* Add particle systems of the object. */

@@ -22,6 +22,7 @@
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "render.h"
+#include "render-lod.h"
 #include "render-material.h"
 #include "render-types.h"
 
@@ -49,6 +50,11 @@ LIAPICALL (void, liren_model32_replace_image, (
 LIAPICALL (void, liren_model32_get_bounds, (
 	LIRenModel32* self,
 	LIMatAabb*    aabb));
+
+LIAPICALL (LIRenLod32*, liren_model32_get_distance_lod, (
+	LIRenModel32*      self,
+	const LIMatVector* position,
+	const LIMatVector* camera));
 
 LIAPICALL (int, liren_model32_set_model, (
 	LIRenModel32* self,

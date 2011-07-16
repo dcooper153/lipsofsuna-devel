@@ -268,6 +268,19 @@ void liren_context32_set_buffer (
 	}
 }
 
+void liren_context32_set_camera_position (
+	LIRenContext32*    self,
+	const LIMatVector* value)
+{
+	float tmp[3];
+
+	self->camera_position = *value;
+	tmp[0] = value->x;
+	tmp[1] = value->y;
+	tmp[2] = value->z;
+	liren_uniforms32_set_vec3 (&self->uniforms, LIREN_UNIFORM_CAMERA_POSITION, tmp);
+}
+
 void liren_context32_set_cull (
 	LIRenContext32* self,
 	int           enable,

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -34,6 +34,17 @@ struct _LIMdlBuilderFaces
 	} indices;
 };
 
+typedef struct _LIMdlBuilderLod LIMdlBuilderLod;
+struct _LIMdlBuilderLod
+{
+	struct
+	{
+		int count;
+		int capacity;
+		LIMdlBuilderFaces* array;
+	} face_groups;
+};
+
 typedef struct _LIMdlBuilder LIMdlBuilder;
 struct _LIMdlBuilder
 {
@@ -45,8 +56,8 @@ struct _LIMdlBuilder
 	{
 		int count;
 		int capacity;
-		LIMdlBuilderFaces* array;
-	} face_groups;
+		LIMdlBuilderLod* array;
+	} lod;
 };
 
 LIAPICALL (LIMdlBuilder*, limdl_builder_new, (
@@ -55,17 +66,28 @@ LIAPICALL (LIMdlBuilder*, limdl_builder_new, (
 LIAPICALL (void, limdl_builder_free, (
 	LIMdlBuilder* self));
 
+LIAPICALL (int, limdl_builder_add_detail_levels, (
+	LIMdlBuilder* self,
+	int           count));
+
+LIAPICALL (int, limdl_builder_calculate_lod, (
+	LIMdlBuilder* self,
+	int           levels,
+	float         factor));
+
 LIAPICALL (int, limdl_builder_finish, (
 	LIMdlBuilder* self));
 
 LIAPICALL (int, limdl_builder_insert_face, (
 	LIMdlBuilder*      self,
+	int                level,
 	int                material,
 	const LIMdlVertex* vertices,
 	const int*         bone_mapping));
 
 LIAPICALL (int, limdl_builder_insert_indices, (
 	LIMdlBuilder*     self,
+	int               level,
 	int               material,
 	const LIMdlIndex* indices,
 	int               count,

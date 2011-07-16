@@ -15,30 +15,45 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup LIMdl Model
- * @{
- * \addtogroup LIMdlFaces Faces
- * @{
- */
+#ifndef __MODEL_LOD_H__
+#define __MODEL_LOD_H__
 
-#include "model.h"
+#include "lipsofsuna/archive.h"
+#include "lipsofsuna/system.h"
 #include "model-faces.h"
+#include "model-types.h"
 
-int limdl_faces_init_copy (
-	LIMdlFaces* self,
-	LIMdlFaces* faces)
+typedef struct _LIMdlLod LIMdlLod;
+struct _LIMdlLod
 {
-	self->start = faces->start;
-	self->count = faces->count;
+	struct
+	{
+		int count;
+		LIMdlFaces* array;
+	} face_groups;
+	struct
+	{
+		int count;
+		LIMdlIndex* array;
+	} indices;
+};
 
-	return 1;
-}
+LIAPICALL (int, limdl_lod_init_copy, (
+	LIMdlLod* self,
+	LIMdlLod* lod));
 
-void limdl_faces_free (
-	LIMdlFaces* self)
-{
-}
+LIAPICALL (void, limdl_lod_free, (
+	LIMdlLod* self));
 
-/** @} */
-/** @} */
+LIAPICALL (int, limdl_lod_read, (
+	LIMdlLod*    self,
+	LIArcReader* reader));
+
+LIAPICALL (int, limdl_lod_write, (
+	const LIMdlLod* self,
+	LIArcWriter*    writer));
+
+LIAPICALL (int, limdl_lod_get_memory, (
+	const LIMdlLod* self));
+
+#endif

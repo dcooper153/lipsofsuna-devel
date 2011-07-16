@@ -172,13 +172,35 @@ static void Model_add_triangles (LIScrArgs* args)
 
 	/* Insert the vertices and indices. */
 	limdl_builder_insert_vertices (builder, vertices, vertices_num, NULL);
-	limdl_builder_insert_indices (builder, group - 1, indices, vertices_num, 0);
+	limdl_builder_insert_indices (builder, 0, group - 1, indices, vertices_num, 0);
 	limdl_builder_finish (builder);
 
 	/* Cleanup. */
 	limdl_builder_free (builder);
 	lisys_free (vertices);
 	lisys_free (indices);
+}
+
+static void Model_calculate_lod (LIScrArgs* args)
+{
+	int levels = 4;
+	float factor = 0.5f;
+	LIEngModel* model;
+	LIMdlBuilder* builder;
+
+	model = args->self;
+	if (liscr_args_geti_int (args, 0, &levels))
+		levels = LIMAT_MAX (1, levels);
+	if (liscr_args_geti_float (args, 1, &factor))
+		factor = LIMAT_CLAMP (factor, 0.0f, 1.0f);
+
+	builder = limdl_builder_new (model->model);
+	if (builder == NULL)
+		return;
+	limdl_builder_calculate_lod (builder, levels, factor);
+	limdl_builder_finish (builder);
+	limdl_builder_free (builder);
+	liscr_args_seti_bool (args, 1);
 }
 
 static void Model_edit_material (LIScrArgs* args)
@@ -287,23 +309,10 @@ static void Model_morph (LIScrArgs* args)
 
 static void Model_remove_vertices (LIScrArgs* args)
 {
-	int i;
 	LIEngModel* model;
-	LIMdlFaces* group;
 
 	model = args->self;
-	for (i = 0 ; i < model->model->face_groups.count ; i++)
-	{
-		group = model->model->face_groups.array + i;
-		group->start = 0;
-		group->count = 0;
-	}
-	lisys_free (model->model->indices.array);
-	lisys_free (model->model->vertices.array);
-	model->model->indices.array = NULL;
-	model->model->indices.count = 0;
-	model->model->vertices.array = NULL;
-	model->model->vertices.count = 0;
+	limdl_model_clear_vertices (model->model);
 }
 
 /*****************************************************************************/
@@ -313,6 +322,7 @@ void liext_script_model_editing (
 {
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_add_material", Model_add_material);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_add_triangles", Model_add_triangles);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_calculate_lod", Model_calculate_lod);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_edit_material", Model_edit_material);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_merge", Model_merge);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_morph", Model_morph);

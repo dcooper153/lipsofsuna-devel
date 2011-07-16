@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,6 +24,29 @@
 
 #include "model-builder.h"
 
+static int private_faces_init (
+	LIMdlBuilderFaces* self,
+	LIMdlFaces*        src,
+	LIMdlLod*          srclod);
+
+static int private_faces_copy (
+	LIMdlBuilderFaces* self,
+	LIMdlBuilderFaces* src);
+
+static void private_faces_clear (
+	LIMdlBuilderFaces* self);
+
+static int private_lod_init (
+	LIMdlBuilderLod* self,
+	LIMdlLod*        src);
+
+static int private_lod_copy (
+	LIMdlBuilderLod* self,
+	LIMdlBuilderLod* src);
+
+static void private_lod_clear (
+	LIMdlBuilderLod* self);
+
 static int private_realloc_array (
 	void*  array,
 	int*   capacity,
@@ -40,10 +63,10 @@ static int private_realloc_array (
 LIMdlBuilder* limdl_builder_new (
 	LIMdlModel* model)
 {
-	int i;
+	int j;
 	LIMdlBuilder* self;
-	LIMdlBuilderFaces* dstfaces;
-	LIMdlFaces* srcfaces;
+	LIMdlBuilderLod* dstlod;
+	LIMdlLod* srclod;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIMdlBuilder));
@@ -63,34 +86,26 @@ LIMdlBuilder* limdl_builder_new (
 	else
 		self->model = model;
 
-	/* Separate indices of face groups. */
-	lisys_assert (self->model->face_groups.count == self->model->materials.count);
-	if (self->model->face_groups.count)
+	/* Allocate levels of detail. */
+	lisys_assert (self->model->lod.count);
+	self->lod.array = lisys_calloc (self->model->lod.count, sizeof (LIMdlBuilderLod));
+	if (self->lod.array == NULL)
 	{
-		self->face_groups.array = lisys_calloc (self->model->face_groups.count, sizeof (LIMdlBuilderFaces));
-		if (self->face_groups.array == NULL)
+		limdl_builder_free (self);
+		return NULL;
+	}
+	self->lod.count = self->model->lod.count;
+
+	/* Initialize levels of detail. */
+	for (j = 0 ; j < self->model->lod.count ; j++)
+	{
+		srclod = self->model->lod.array + j;
+		dstlod = self->lod.array + j;
+		lisys_assert (srclod->face_groups.count == self->model->materials.count);
+		if (!private_lod_init (dstlod, srclod))
 		{
 			limdl_builder_free (self);
 			return NULL;
-		}
-		self->face_groups.count = self->model->face_groups.count;
-		self->face_groups.capacity = self->model->face_groups.count;
-		for (i = 0 ; i < self->face_groups.count ; i++)
-		{
-			dstfaces = self->face_groups.array + i;
-			srcfaces = self->model->face_groups.array + i;
-			if (srcfaces->count)
-			{
-				dstfaces->indices.array = lisys_calloc (srcfaces->count, sizeof (LIMdlIndex));
-				if (dstfaces->indices.array == NULL)
-				{
-					limdl_builder_free (self);
-					return NULL;
-				}
-				memcpy (dstfaces->indices.array, self->model->indices.array + srcfaces->start, srcfaces->count * sizeof (LIMdlIndex));
-				dstfaces->indices.count = srcfaces->count;
-				dstfaces->indices.capacity = srcfaces->count;
-			}
 		}
 	}
 
@@ -109,12 +124,44 @@ LIMdlBuilder* limdl_builder_new (
 void limdl_builder_free (
 	LIMdlBuilder* self)
 {
-	int i;
+	int j;
 
-	for (i = 0 ; i < self->face_groups.count ; i++)
-		lisys_free (self->face_groups.array[i].indices.array);
-	lisys_free (self->face_groups.array);
+	for (j = 0 ; j < self->lod.count ; j++)
+		private_lod_clear (self->lod.array + j);
+	lisys_free (self->lod.array);
 	lisys_free (self);
+}
+
+/**
+ * \brief Adds detail levels.
+ * \param self Model builder.
+ * \param count Number of levels to add.
+ * \return Nonzero on success.
+ */
+int limdl_builder_add_detail_levels (
+	LIMdlBuilder* self,
+	int           count)
+{
+	int i;
+	int orig;
+	LIMdlBuilderLod* lod;
+
+	orig = self->lod.count - 1;
+	lod = lisys_realloc (self->lod.array, (self->lod.count + count) * sizeof (LIMdlBuilderLod));
+	if (lod == NULL)
+		return 0;
+	self->lod.array = lod;
+
+	for (i = 0 ; i < count ; i++)
+	{
+		lod = self->lod.array + self->lod.count;
+		if (!private_lod_copy (lod, self->lod.array + orig))
+			return 0;
+		lisys_assert (lod->face_groups.count == self->model->materials.count);
+		self->lod.count++;
+	}
+
+	return 1;
 }
 
 /**
@@ -126,65 +173,78 @@ int limdl_builder_finish (
 	LIMdlBuilder* self)
 {
 	int i;
+	int j;
 	int num_indices;
 	int pos_indices;
 	LIMdlBuilderFaces* srcfaces;
 	LIMdlFaces* dstfaces;
 	LIMdlFaces* new_faces;
 	LIMdlIndex* new_indices;
+	LIMdlLod* new_lod;
+	LIMdlLod* dstlod;
+	LIMdlBuilderLod* srclod;
 
-	/* Recreate face groups. */
-	num_indices = 0;
-	if (self->face_groups.count)
+	/* Create new LOD data. */
+	new_lod = lisys_calloc (self->lod.count, sizeof (LIMdlLod));
+	if (new_lod == NULL)
+		return 0;
+	for (j = 0 ; j < self->lod.count ; j++)
 	{
-		new_faces = lisys_calloc (self->face_groups.count, sizeof (LIMdlFaces));
-		if (new_faces == NULL)
-			return 0;
-		for (i = 0 ; i < self->face_groups.count ; i++)
-		{
-			srcfaces = self->face_groups.array + i;
-			dstfaces = new_faces + i;
-			dstfaces->start = num_indices;
-			dstfaces->count = srcfaces->indices.count;
-			num_indices += srcfaces->indices.count;
-		}
-		lisys_free (self->model->face_groups.array);
-		self->model->face_groups.array = new_faces;
-		self->model->face_groups.count = self->face_groups.count;
-	}
-	else
-	{
-		lisys_free (self->model->face_groups.array);
-		self->model->face_groups.array = NULL;
-		self->model->face_groups.count = 0;
-	}
-	lisys_assert (self->model->face_groups.count == self->face_groups.count);
-	lisys_assert (self->model->face_groups.count == self->model->materials.count);
+		srclod = self->lod.array + j;
+		dstlod = new_lod + j;
 
-	/* Merge indices of face groups. */
-	if (num_indices)
-	{
-		new_indices = lisys_calloc (num_indices, sizeof (LIMdlIndex));
-		if (new_indices == NULL)
-			return 0;
-		pos_indices = 0;
-		for (i = 0 ; i < self->face_groups.count ; i++)
+		/* Recreate face groups. */
+		num_indices = 0;
+		if (srclod->face_groups.count)
 		{
-			srcfaces = self->face_groups.array + i;
-			memcpy (new_indices + pos_indices, srcfaces->indices.array, srcfaces->indices.count * sizeof (LIMdlIndex));
-			pos_indices += srcfaces->indices.count;
+			new_faces = lisys_calloc (srclod->face_groups.count, sizeof (LIMdlFaces));
+			if (new_faces == NULL)
+			{
+				lisys_free (new_lod);
+				return 0;
+			}
+			for (i = 0 ; i < srclod->face_groups.count ; i++)
+			{
+				srcfaces = srclod->face_groups.array + i;
+				dstfaces = new_faces + i;
+				dstfaces->start = num_indices;
+				dstfaces->count = srcfaces->indices.count;
+				num_indices += srcfaces->indices.count;
+			}
+			dstlod->face_groups.array = new_faces;
+			dstlod->face_groups.count = srclod->face_groups.count;
 		}
-		lisys_assert (pos_indices == num_indices);
-		lisys_free (self->model->indices.array);
-		self->model->indices.array = new_indices;
-		self->model->indices.count = num_indices;
+		lisys_assert (dstlod->face_groups.count == srclod->face_groups.count);
+		lisys_assert (dstlod->face_groups.count == self->model->materials.count);
+
+		/* Merge indices of face groups. */
+		if (num_indices)
+		{
+			new_indices = lisys_calloc (num_indices, sizeof (LIMdlIndex));
+			if (new_indices == NULL)
+			{
+				lisys_free (new_lod);
+				return 0;
+			}
+			pos_indices = 0;
+			for (i = 0 ; i < srclod->face_groups.count ; i++)
+			{
+				srcfaces = srclod->face_groups.array + i;
+				memcpy (new_indices + pos_indices, srcfaces->indices.array, srcfaces->indices.count * sizeof (LIMdlIndex));
+				pos_indices += srcfaces->indices.count;
+			}
+			lisys_assert (pos_indices == num_indices);
+			dstlod->indices.array = new_indices;
+			dstlod->indices.count = num_indices;
+		}
 	}
-	else
-	{
-		lisys_free (self->model->indices.array);
-		self->model->indices.array = NULL;
-		self->model->indices.count = 0;
-	}
+
+	/* Use the new LOD data. */
+	for (i = 0 ; i < self->model->lod.count ; i++)
+		limdl_lod_free (self->model->lod.array + i);
+	lisys_free (self->model->lod.array);
+	self->model->lod.array = new_lod;
+	self->model->lod.count = self->lod.count;
 
 	/* Calculate the bounding box. */
 	limdl_model_calculate_bounds (self->model);
@@ -202,6 +262,7 @@ int limdl_builder_finish (
  * new vertex with existing vertices, if possible.
  *
  * \param self Model builder.
+ * \param level Level of detail.
  * \param material Material index.
  * \param vertices Array of three vertices.
  * \param bone_mapping Bone index mapping array or NULL.
@@ -209,6 +270,7 @@ int limdl_builder_finish (
  */
 int limdl_builder_insert_face (
 	LIMdlBuilder*      self,
+	int                level,
 	int                material,
 	const LIMdlVertex* vertices,
 	const int*         bone_mapping)
@@ -223,7 +285,7 @@ int limdl_builder_insert_face (
 	indices[0] = self->model->vertices.count - 3;
 	indices[1] = self->model->vertices.count - 2;
 	indices[2] = self->model->vertices.count - 1;
-	if (!limdl_builder_insert_indices (self, material, indices, 3, 0))
+	if (!limdl_builder_insert_indices (self, level, material, indices, 3, 0))
 	{
 		self->model->vertices.count -= 3;
 		return 0;
@@ -235,6 +297,7 @@ int limdl_builder_insert_face (
 /**
  * \brief Inserts indices to the model.
  * \param self Model builder.
+ * \param level Detail level.
  * \param material Material index.
  * \param indices Array of indices.
  * \param count Number of indices.
@@ -243,17 +306,23 @@ int limdl_builder_insert_face (
  */
 int limdl_builder_insert_indices (
 	LIMdlBuilder*     self,
+	int               level,
 	int               material,
 	const LIMdlIndex* indices,
 	int               count,
 	int               vertex_start_remap)
 {
 	int i;
+	LIMdlBuilderLod* lod;
 	LIMdlBuilderFaces* group;
 
 	lisys_assert (material >= 0);
-	lisys_assert (material < self->face_groups.count);
-	group = self->face_groups.array + material;
+	lisys_assert (material < self->model->materials.count);
+	lisys_assert (level >= 0);
+	lisys_assert (level < self->lod.count);
+
+	lod = self->lod.array + level;
+	group = lod->face_groups.array + material;
 
 	/* Allocate space for indices. */
 	if (!private_realloc_array (&group->indices.array, &group->indices.capacity,
@@ -285,9 +354,9 @@ int limdl_builder_insert_material (
 	LIMdlBuilder*        self,
 	const LIMdlMaterial* material)
 {
+	int i;
+	LIMdlBuilderLod* lod;
 	LIMdlMaterial* tmp;
-
-	lisys_assert (self->model->materials.count == self->face_groups.count);
 
 	/* Allocate space for materials. */
 	if (!private_realloc_array (&self->model->materials.array,
@@ -295,17 +364,22 @@ int limdl_builder_insert_material (
 		return 0;
 
 	/* Allocate space for face groups. */
-	if (!private_realloc_array (&self->face_groups.array,
-	    &self->face_groups.capacity, self->face_groups.count + 1, sizeof (LIMdlBuilderFaces)))
-		return 0;
-	memset (self->face_groups.array + self->face_groups.count, 0, sizeof (LIMdlBuilderFaces));
+	for (i = 0 ; i < self->lod.count ; i++)
+	{
+		lod = self->lod.array + i;
+		lisys_assert (self->model->materials.count == lod->face_groups.count);
+		if (!private_realloc_array (&lod->face_groups.array,
+		    &lod->face_groups.capacity, lod->face_groups.count + 1, sizeof (LIMdlBuilderFaces)))
+			return 0;
+		memset (lod->face_groups.array + lod->face_groups.count, 0, sizeof (LIMdlBuilderFaces));
+		lod->face_groups.count++;
+	}
 
 	/* Copy material. */
 	tmp = self->model->materials.array + self->model->materials.count;
 	if (!limdl_material_init_copy (tmp, material))
 		return 0;
 	self->model->materials.count++;
-	self->face_groups.count++;
 
 	return 1;
 }
@@ -420,6 +494,124 @@ int limdl_builder_insert_weightgroup (
 }
 
 /*****************************************************************************/
+
+static int private_faces_init (
+	LIMdlBuilderFaces* self,
+	LIMdlFaces*        src,
+	LIMdlLod*          srclod)
+{
+	memset (self, 0, sizeof (LIMdlBuilderFaces));
+
+	if (src->count)
+	{
+		self->indices.array = lisys_calloc (src->count, sizeof (LIMdlIndex));
+		if (self->indices.array == NULL)
+			return 0;
+		memcpy (self->indices.array, srclod->indices.array + src->start, src->count * sizeof (LIMdlIndex));
+		self->indices.count = src->count;
+		self->indices.capacity = src->count;
+	}
+
+	return 1;
+}
+
+static int private_faces_copy (
+	LIMdlBuilderFaces* self,
+	LIMdlBuilderFaces* src)
+{
+	memset (self, 0, sizeof (LIMdlBuilderFaces));
+
+	if (src->indices.count)
+	{
+		self->indices.array = lisys_calloc (src->indices.count, sizeof (LIMdlIndex));
+		if (self->indices.array == NULL)
+			return 0;
+		memcpy (self->indices.array, src->indices.array, src->indices.count * sizeof (LIMdlIndex));
+		self->indices.count = src->indices.count;
+		self->indices.capacity = src->indices.count;
+	}
+
+	return 1;
+}
+
+static void private_faces_clear (
+	LIMdlBuilderFaces* self)
+{
+	lisys_free (self->indices.array);
+}
+
+static int private_lod_init (
+	LIMdlBuilderLod* self,
+	LIMdlLod*        src)
+{
+	int i;
+
+	memset (self, 0, sizeof (LIMdlBuilderLod));
+
+	if (src->face_groups.count)
+	{
+		self->face_groups.capacity = src->face_groups.count;
+		self->face_groups.array = lisys_calloc (src->face_groups.count, sizeof (LIMdlBuilderFaces));
+		if (self->face_groups.array == NULL)
+		{
+			private_lod_clear (self);
+			return 0;
+		}
+		for (i = 0 ; i < src->face_groups.count ; i++)
+		{
+			if (!private_faces_init (self->face_groups.array + i, src->face_groups.array + i, src))
+			{
+				private_lod_clear (self);
+				return 0;
+			}
+			self->face_groups.count++;
+		}
+	}
+
+	return 1;
+}
+
+static int private_lod_copy (
+	LIMdlBuilderLod* self,
+	LIMdlBuilderLod* src)
+{
+	int i;
+
+	memset (self, 0, sizeof (LIMdlBuilderLod));
+
+	/* Allocate face groups. */
+	if (!src->face_groups.count)
+		return 1;
+	self->face_groups.array = lisys_calloc (src->face_groups.count, sizeof (LIMdlBuilderFaces));
+	if (self->face_groups.array == NULL)
+		return 0;
+	self->face_groups.capacity = src->face_groups.count;
+
+	/* Copy face group data. */
+	for (i = 0 ; i < src->face_groups.count ; i++)
+	{
+		if (!private_faces_copy (self->face_groups.array + i, src->face_groups.array + i))
+		{
+			private_lod_clear (self);
+			return 0;
+		}
+		self->face_groups.count++;
+	}
+
+	lisys_assert (self->face_groups.count == src->face_groups.count);
+
+	return 1;
+}
+
+static void private_lod_clear (
+	LIMdlBuilderLod* self)
+{
+	int i;
+
+	for (i = 0 ; i < self->face_groups.count ; i++)
+		private_faces_clear (self->face_groups.array + i);
+	lisys_free (self->face_groups.array);
+}
 
 static int private_realloc_array (
 	void*  array,

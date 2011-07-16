@@ -22,6 +22,7 @@
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/paths.h"
 #include "lipsofsuna/image.h"
+#include "render-lod.h"
 #include "render-mesh.h"
 #include "render-particles.h"
 #include "render-program.h"
@@ -123,25 +124,16 @@ struct _LIRenMaterial32
 	} textures;
 };
 
-typedef struct _LIRenModelGroup32 LIRenModelGroup32;
-struct _LIRenModelGroup32
-{
-	int start;
-	int count;
-	LIMatVector center;
-};
-
 struct _LIRenModel32
 {
 	LIMatAabb bounds;
-	LIRenMesh32 mesh;
 	LIRenParticles32 particles;
 	LIRenRender32* render;
 	struct
 	{
 		int count;
-		LIRenModelGroup32* array;
-	} groups;
+		LIRenLod32* array;
+	} lod;
 	struct
 	{
 		int count;
@@ -190,6 +182,8 @@ struct _LIRenObject32
 struct _LIRenRender32
 {
 	int anisotrophy;
+	float lod_near;
+	float lod_far;
 	LIAlgPtrdic* framebuffers;
 	LIAlgPtrdic* scenes;
 	LIPthPaths* paths;

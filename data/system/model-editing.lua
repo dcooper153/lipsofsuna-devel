@@ -24,6 +24,16 @@ Model.add_triangles = function(self, ...)
 	Los.model_add_triangles(self.handle, ...)
 end
 
+--- Calculates LOD data for the model.
+-- @param self Object.
+-- @param ... Arguments.<ul>
+--   <li>1: Number of levels.</li>
+--   <li>2: Minimum detail level.</li></ul>
+-- @return True on success.
+Model.calculate_lod = function(self, ...)
+	Los.model_calculate_lod(self.handle, ...)
+end
+
 --- Edits the matching material.
 -- @param self Object.
 -- @param args Arguments.<ul>

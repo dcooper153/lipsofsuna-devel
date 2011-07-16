@@ -718,6 +718,7 @@ static void private_update_shadow (
 	LIMatAabb aabb;
 	LIMatFrustum frustum;
 	LIRenContext32* context;
+	LIRenLod32* lod;
 	LIRenObject32* object;
 	LIRenShader32* shader;
 
@@ -752,10 +753,11 @@ static void private_update_shadow (
 		liren_object32_get_bounds (object, &aabb);
 		if (limat_frustum_cull_aabb (&frustum, &aabb))
 			continue;
+		lod = object->model->lod.array + 0;
 		liren_context32_set_modelmatrix (context, &object->orientation.matrix);
-		liren_context32_set_mesh (context, &object->model->mesh);
+		liren_context32_set_mesh (context, &lod->mesh);
 		liren_context32_bind (context);
-		liren_context32_render_indexed (context, 0, object->model->mesh.counts[0]);
+		liren_context32_render_indexed (context, 0, lod->mesh.counts[0]);
 	}
 
 	/* Disable depth rendering mode. */

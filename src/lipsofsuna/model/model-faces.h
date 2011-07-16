@@ -36,14 +36,4 @@ LIAPICALL (int, limdl_faces_init_copy, (
 LIAPICALL (void, limdl_faces_free, (
 	LIMdlFaces* self));
 
-LIAPICALL (int, limdl_faces_read, (
-	LIMdlFaces*  self,
-	LIMdlModel*  model,
-	LIArcReader* reader));
-
-LIAPICALL (int, limdl_faces_write, (
-	const LIMdlFaces* self,
-	const LIMdlModel* model,
-	LIArcWriter*      writer));
-
 #endif

@@ -231,6 +231,7 @@ int liren_model21_set_model (
 	LIAlgPtrdicIter iter0;
 	LIAlgU32dicIter iter1;
 	LIMdlFaces* group;
+	LIMdlLod* lod;
 	LIMdlMaterial* src;
 	LIMdlVertex* vertices;
 	LIRenMaterial21* dst;
@@ -240,14 +241,15 @@ int liren_model21_set_model (
 	LIRenScene21* scene;
 
 	/* Create face groups. */
-	if (model->face_groups.count)
+	lod = model->lod.array;
+	if (lod->face_groups.count)
 	{
-		groups = lisys_calloc (model->face_groups.count, sizeof (LIRenModelGroup21));
+		groups = lisys_calloc (lod->face_groups.count, sizeof (LIRenModelGroup21));
 		if (groups == NULL)
 			return 0;
-		for (i = 0 ; i < model->face_groups.count ; i++)
+		for (i = 0 ; i < lod->face_groups.count ; i++)
 		{
-			group = model->face_groups.array + i;
+			group = lod->face_groups.array + i;
 			groups[i].start = group->start;
 			groups[i].count = group->count;
 		}
@@ -285,16 +287,16 @@ int liren_model21_set_model (
 		materials = NULL;
 
 	/* Create a copy of the indices. */
-	if (model->indices.count)
+	if (lod->indices.count)
 	{
-		indices = lisys_calloc (model->indices.count, sizeof (LIRenIndex));
+		indices = lisys_calloc (lod->indices.count, sizeof (LIRenIndex));
 		if (indices == NULL)
 		{
 			lisys_free (materials);
 			lisys_free (groups);
 			return 0;
 		}
-		memcpy (indices, model->indices.array, model->indices.count * sizeof (LIRenIndex));
+		memcpy (indices, lod->indices.array, lod->indices.count * sizeof (LIRenIndex));
 	}
 	else
 		indices = NULL;
@@ -324,7 +326,7 @@ int liren_model21_set_model (
 	}
 	if (indices != NULL)
 	{
-		self->buffer = liren_buffer21_new (indices, model->indices.count, &private_vertex_format,
+		self->buffer = liren_buffer21_new (indices, lod->indices.count, &private_vertex_format,
 			model->vertices.array, model->vertices.count, LIREN_BUFFER_TYPE_STATIC);
 	}
 
@@ -334,10 +336,10 @@ int liren_model21_set_model (
 	self->materials.count = model->materials.count;
 	lisys_free (self->groups.array);
 	self->groups.array = groups;
-	self->groups.count = model->face_groups.count;
+	self->groups.count = lod->face_groups.count;
 	lisys_free (self->indices.array);
 	self->indices.array = indices;
-	self->indices.count = model->indices.count;
+	self->indices.count = lod->indices.count;
 	lisys_free (self->vertices.array);
 	self->vertices.array = vertices;
 	self->vertices.count = model->vertices.count;

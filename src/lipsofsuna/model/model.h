@@ -25,6 +25,7 @@
 #include "model-faces.h"
 #include "model-hair.h"
 #include "model-light.h"
+#include "model-lod.h"
 #include "model-material.h"
 #include "model-particle.h"
 #include "model-node.h"
@@ -44,8 +45,7 @@ struct _LIMdlModel
 	LIMatAabb bounds;
 	struct { int count; LIMdlAnimation* array; } animations;
 	struct { int count; LIMdlHairs* array; } hairs;
-	struct { int count; LIMdlFaces* array; } face_groups;
-	struct { int count; LIMdlIndex* array; } indices;
+	struct { int count; LIMdlLod* array; } lod;
 	struct { int count; LIMdlMaterial* array; } materials;
 	struct { int count; LIMdlNode** array; } nodes;
 	struct { int count; LIMdlParticleSystem* array; } particle_systems;
@@ -75,6 +75,9 @@ LIAPICALL (void, limdl_model_calculate_bounds, (
 	LIMdlModel* self));
 
 LIAPICALL (void, limdl_model_calculate_tangents, (
+	LIMdlModel* self));
+
+LIAPICALL (void, limdl_model_clear_vertices, (
 	LIMdlModel* self));
 
 LIAPICALL (LIMdlAnimation*, limdl_model_find_animation, (

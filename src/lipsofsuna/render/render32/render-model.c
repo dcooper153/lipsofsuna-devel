@@ -25,6 +25,7 @@
 #include "lipsofsuna/system.h"
 #include "render-buffer-texture.h"
 #include "render-context.h"
+#include "render-lod.h"
 #include "render-model.h"
 #include "render-private.h"
 #include "../render-private.h"
@@ -115,8 +116,11 @@ void liren_model32_reload (
 	LIRenModel32* self,
 	int           pass)
 {
+	int i;
+
 	/* Reload the vertex buffer. */
-	liren_mesh32_reload (&self->mesh, pass);
+	for (i = 0 ; i < self->lod.count ; i++)
+		liren_mesh32_reload (&self->lod.array[i].mesh, pass);
 }
 
 void liren_model32_replace_image (
@@ -130,6 +134,31 @@ void liren_model32_get_bounds (
 	LIMatAabb*    aabb)
 {
 	*aabb = self->bounds;
+}
+
+/**
+ * \brief Gets the level of detail for the model.
+ * \param self Model.
+ * \param position Model position in world space.
+ * \param camera Camera position in world space.
+ * \return Level of detail.
+ */
+LIRenLod32* liren_model32_get_distance_lod (
+	LIRenModel32*      self,
+	const LIMatVector* position,
+	const LIMatVector* camera)
+{
+	int index;
+	float dist;
+	float level;
+
+	dist = limat_vector_get_length (limat_vector_subtract (*position, *camera));
+	if (dist <= self->render->lod_near || self->lod.count == 1)
+		return self->lod.array;
+	level = self->lod.count * (dist - self->render->lod_near) / (self->render->lod_far - self->render->lod_near);
+	index = LIMAT_CLAMP ((int) level + 1, 1, self->lod.count - 1);
+
+	return self->lod.array + index;
 }
 
 int liren_model32_set_model (
@@ -193,11 +222,14 @@ static void private_clear_materials (
 static void private_clear_model (
 	LIRenModel32* self)
 {
+	int i;
+
 	liren_particles32_clear (&self->particles);
-	liren_mesh32_clear (&self->mesh);
-	lisys_free (self->groups.array);
-	self->groups.array = NULL;
-	self->groups.count = 0;
+	for (i = 0 ; i < self->lod.count ; i++)
+		liren_lod32_clear (self->lod.array + i);
+	lisys_free (self->lod.array);
+	self->lod.array = NULL;
+	self->lod.count = 0;
 }
 
 static int private_init_materials (
@@ -235,34 +267,25 @@ static int private_init_model (
 	LIMdlModel*   model)
 {
 	int i;
-	LIMdlFaces* group;
 
-	/* Allocate face groups. */
-	self->groups.count = model->face_groups.count;
-	if (self->groups.count)
+	/* Initialize levels of detail. */
+	self->lod.count = model->lod.count;
+	if (self->lod.count)
 	{
-		self->groups.array = lisys_calloc (self->groups.count, sizeof (LIRenModelGroup32));
-		if (self->groups.array == NULL)
+		self->lod.array = lisys_calloc (self->lod.count, sizeof (LIRenLod32));
+		if (self->lod.array == NULL)
 			return 0;
-	}
-
-	/* Calculate face group offsets. */
-	for (i = 0 ; i < self->groups.count ; i++)
-	{
-		group = model->face_groups.array + i;
-		self->groups.array[i].start = group->start;
-		self->groups.array[i].count = group->count;
+		for (i = 0 ; i < self->lod.count ; i++)
+		{
+			if (!liren_lod32_init (self->lod.array + i, model, model->lod.array + i))
+				return 0;
+		}
 	}
 
 	/* Initialize particles. */
 	liren_particles32_init (&self->particles, self->render, model);
 	if (self->particles.frames.count)
 		self->bounds = limat_aabb_union (self->bounds, self->particles.bounds);
-
-	/* Initialize the render buffer. */
-	if (!liren_mesh32_init (&self->mesh, model->indices.array, model->indices.count,
-	     model->vertices.array, model->vertices.count))
-		return 0;
 
 	return 1;
 }

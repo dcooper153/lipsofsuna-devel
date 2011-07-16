@@ -23,6 +23,16 @@ require "content/weapons"
 -- TODO: Could also cache morphed models for a short period.
 Model.dict_name = {}
 
+Model.find_or_load_lod = function(self, args)
+	local m = Model:find_or_load(args)
+	if not m then return end
+	if not m.lod then
+		m:calculate_lod()
+		m.lod = true
+	end
+	return m
+end
+
 local build = function(args)
 	local species = Species:find{name = args.species}
 	if not species then return end
@@ -50,7 +60,7 @@ local build = function(args)
 		end
 	end
 	-- Create the skeleton.
-	local m = Model:find_or_load{file = meshes.skeleton}
+	local m = Model:find_or_load_lod{file = meshes.skeleton}
 	m = m:copy()
 	-- Add other meshes.
 	local has_head = not args.beheaded
@@ -58,7 +68,7 @@ local build = function(args)
 	for k,v in pairs(meshes) do
 		if k ~= "skeleton" and (has_head or not mesh_head[k]) then
 			local tmp
-			local ref = Model:find_or_load{file = v}
+			local ref = Model:find_or_load_lod{file = v}
 			-- Face customization.
 			if args.face_style and (string.match(k, ".*head.*") or string.match(k, ".*eye.*")) then
 				tmp = ref:copy()

@@ -160,7 +160,6 @@ void liren_scene32_render (
 {
 	int i;
 	int postproc_passes_done;
-	float tmp[3];
 	GLint orig_viewport[4];
 	LIMatMatrix inv;
 	LIMatVector eye;
@@ -186,10 +185,7 @@ void liren_scene32_render (
 	/* Calculate camera position. */
 	inv = limat_matrix_invert (*modelview);
 	eye = limat_matrix_transform (inv, limat_vector_init (0.0f, 0.0f, 0.0f));
-	tmp[0] = eye.x;
-	tmp[1] = eye.y;
-	tmp[2] = eye.z;
-	liren_uniforms32_set_vec3 (&context->uniforms, LIREN_UNIFORM_CAMERA_POSITION, tmp);
+	liren_context32_set_camera_position (context, &eye);
 
 	/* Depth sort the scene. */
 	if (!private_sort_scene (self, context))
@@ -303,6 +299,7 @@ static void private_render_pass_nosort (
 	int first;
 	LIAlgU32dicIter iter;
 	LIMatAabb bounds;
+	LIRenLod32* lod;
 	LIRenMaterial32* material;
 	LIRenObject32* object;
 
@@ -317,9 +314,13 @@ static void private_render_pass_nosort (
 		if (limat_frustum_cull_aabb (frustum, &bounds))
 			continue;
 
+		/* Select the level of detail. */
+		lod = liren_model32_get_distance_lod (object->model,
+			&object->transform.position, &context->camera_position);
+
 		/* Bind the object data. */
 		liren_context32_set_modelmatrix (context, &object->orientation.matrix);
-		liren_context32_set_mesh (context, &object->model->mesh);
+		liren_context32_set_mesh (context, &lod->mesh);
 		first = 1;
 
 		/* Render each material group that has the pass. */
@@ -328,8 +329,8 @@ static void private_render_pass_nosort (
 			material = object->model->materials.array[i];
 			if (!material->shader->passes[pass].program)
 				continue;
-			start = object->model->groups.array[i].start;
-			count = object->model->groups.array[i].count;
+			start = lod->groups.array[i].start;
+			count = lod->groups.array[i].count;
 			liren_context32_set_material (context, material);
 			liren_context32_set_shader (context, pass, material->shader);
 			liren_context32_set_textures (context, material->textures.array, material->textures.count);
@@ -344,10 +345,10 @@ static void private_render_pass_nosort (
 
 		/* Render the effect layer. */
 		material = object->effect.material;
-		if (material != NULL && object->model->groups.count && material->shader->passes[pass].program)
+		if (material != NULL && lod->groups.count && material->shader->passes[pass].program)
 		{
-			start = object->model->groups.array[object->model->groups.count - 1].start;
-			count = object->model->groups.array[object->model->groups.count - 1].count;
+			start = lod->groups.array[lod->groups.count - 1].start;
+			count = lod->groups.array[lod->groups.count - 1].count;
 			liren_context32_set_material (context, material);
 			liren_context32_set_shader (context, pass, material->shader);
 			liren_context32_set_textures (context, material->textures.array, material->textures.count);

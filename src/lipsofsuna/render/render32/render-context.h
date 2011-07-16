@@ -49,6 +49,7 @@ struct _LIRenContext32
 	LIRenScene32* scene;
 	LIRenShader32* shader;
 	LIMatFrustum frustum;
+	LIMatVector camera_position;
 	LIRenBufferTexture32 buffer_texture;
 	LIRenUniforms32 uniforms;
 	GLuint shadow_texture;
@@ -138,6 +139,10 @@ LIAPICALL (void, liren_context32_set_blend, (
 LIAPICALL (void, liren_context32_set_buffer, (
 	LIRenContext32* self,
 	LIRenBuffer32*  vertex));
+
+LIAPICALL (void, liren_context32_set_camera_position, (
+	LIRenContext32*    self,
+	const LIMatVector* value));
 
 LIAPICALL (void, liren_context32_set_color_write, (
 	LIRenContext32* self,

@@ -157,6 +157,15 @@ LIMdlModel* limdl_model_new ()
 	if (self == NULL)
 		return NULL;
 
+	/* Allocate the mandatory LOD. */
+	self->lod.count = 1;
+	self->lod.array = lisys_calloc (1, sizeof (LIMdlLod));
+	if (self->lod.array == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
+
 	return self;
 }
 
@@ -192,18 +201,12 @@ LIMdlModel* limdl_model_new_copy (
 			limdl_hairs_init_copy (self->hairs.array + i, model->hairs.array + i);
 	}
 #endif
-	if (model->face_groups.count)
+	if (model->lod.count)
 	{
-		self->face_groups.array = lisys_calloc (model->face_groups.count, sizeof (LIMdlFaces));
-		self->face_groups.count = model->face_groups.count;
-		for (i = 0 ; i < model->face_groups.count ; i++)
-			limdl_faces_init_copy (self->face_groups.array + i, model->face_groups.array + i);
-	}
-	if (model->indices.count)
-	{
-		self->indices.array = lisys_calloc (model->indices.count, sizeof (LIMdlIndex));
-		self->indices.count = model->indices.count;
-		memcpy (self->indices.array, model->indices.array, model->indices.count * sizeof (LIMdlIndex));
+		self->lod.array = lisys_calloc (model->lod.count, sizeof (LIMdlLod));
+		self->lod.count = model->lod.count;
+		for (i = 0 ; i < model->lod.count ; i++)
+			limdl_lod_init_copy (self->lod.array + i, model->lod.array + i);
 	}
 	if (model->materials.count)
 	{
@@ -365,12 +368,12 @@ void limdl_model_free (
 		lisys_free (self->materials.array);
 	}
 
-	/* Free face groups. */
-	if (self->face_groups.array != NULL)
+	/* Free levels of detail. */
+	if (self->lod.array != NULL)
 	{
-		for (i = 0 ; i < self->face_groups.count ; i++)
-			limdl_faces_free (self->face_groups.array + i);
-		lisys_free (self->face_groups.array);
+		for (i = 0 ; i < self->lod.count ; i++)
+			limdl_lod_free (self->lod.array + i);
+		lisys_free (self->lod.array);
 	}
 
 	/* Free weight groups. */
@@ -434,7 +437,6 @@ void limdl_model_free (
 		lisys_free (self->shape_keys.array);
 	}
 
-	lisys_free (self->indices.array);
 	lisys_free (self);
 }
 
@@ -484,6 +486,38 @@ void limdl_model_calculate_tangents (
 	LIMdlModel* self)
 {
 	private_build_tangents (self);
+}
+
+void limdl_model_clear_vertices (
+	LIMdlModel* self)
+{
+	int i;
+	int j;
+	LIMdlLod* lod;
+	LIMdlFaces* group;
+
+	/* Free vertices. */
+	lisys_free (self->vertices.array);
+	self->vertices.array = NULL;
+	self->vertices.count = 0;
+
+	/* Free levels of detail. */
+	for (j = 0 ; j < self->lod.count ; j++)
+	{
+		lod = self->lod.array + i;
+		for (i = 0 ; i < lod->face_groups.count ; i++)
+		{
+			group = lod->face_groups.array + i;
+			group->start = 0;
+			group->count = 0;
+		}
+		if (i)
+			lisys_free (lod->face_groups.array);
+		lisys_free (lod->indices.array);
+		lod->indices.array = NULL;
+		lod->indices.count = 0;
+	}
+	self->lod.count = 1;
 }
 
 /**
@@ -655,12 +689,14 @@ int limdl_model_merge (
 	LIMdlModel* model)
 {
 	int i;
+	int j;
 	int group;
 	int material;
 	int vertex_offset;
 	int* wgroups = NULL;
 	LIMdlBuilder* builder;
 	LIMdlFaces* srcfaces;
+	LIMdlLod* lod;
 
 	/* Create a model builder. */
 	builder = limdl_builder_new (self);
@@ -710,26 +746,10 @@ int limdl_model_merge (
 		}
 	}
 
-	/* Merge each face group. */
-	for (i = 0 ; i < model->face_groups.count ; i++)
+	/* Create levels of detail. */
+	if (builder->lod.count < model->lod.count)
 	{
-		srcfaces = model->face_groups.array + i;
-
-		/* Find or create the material. */
-		material = limdl_model_find_material (self, model->materials.array + i);
-		if (material == -1)
-		{
-			material = self->materials.count;
-			if (!limdl_builder_insert_material (builder, model->materials.array + i))
-			{
-				limdl_builder_free (builder);
-				lisys_free (wgroups);
-				return 0;
-			}
-		}
-
-		/* Insert indices. */
-		if (!limdl_builder_insert_indices (builder, material, model->indices.array + srcfaces->start, srcfaces->count, vertex_offset))
+		if (!limdl_builder_add_detail_levels (builder, model->lod.count - builder->lod.count))
 		{
 			limdl_builder_free (builder);
 			lisys_free (wgroups);
@@ -737,6 +757,46 @@ int limdl_model_merge (
 		}
 	}
 
+	/* Merge each level of detail. */
+	/* If the added model doesn't have enough detail levels, the lowest
+	   quality level provided by it is used for the missing levels. */
+	for (j = 0 ; j < builder->lod.count ; j++)
+	{
+		if (j < model->lod.count)
+			lod = model->lod.array + j;
+		else
+			lod = model->lod.array + model->lod.count - 1;
+
+		/* Merge each face group. */
+		for (i = 0 ; i < lod->face_groups.count ; i++)
+		{
+			srcfaces = lod->face_groups.array + i;
+
+			/* Find or create the material. */
+			material = limdl_model_find_material (self, model->materials.array + i);
+			if (material == -1)
+			{
+				material = self->materials.count;
+				if (!limdl_builder_insert_material (builder, model->materials.array + i))
+				{
+					limdl_builder_free (builder);
+					lisys_free (wgroups);
+					return 0;
+				}
+			}
+
+			/* Insert indices. */
+			if (!limdl_builder_insert_indices (builder, j, material, lod->indices.array + srcfaces->start, srcfaces->count, vertex_offset))
+			{
+				limdl_builder_free (builder);
+				lisys_free (wgroups);
+				return 0;
+			}
+		}
+	}
+
+	/* FIXME: Recalculates tangents unnecessarily. */
+	/* FIXME: Recalculates the bounding box from scratch even though could just calculate the intersection. */
 	limdl_builder_finish (builder);
 	limdl_builder_free (builder);
 	lisys_free (wgroups);
@@ -832,7 +892,7 @@ int limdl_model_write_file (
 int limdl_model_get_index_count (
 	const LIMdlModel* self)
 {
-	return self->indices.count;
+	return self->lod.array[0].indices.count;
 }
 
 /**
@@ -848,13 +908,12 @@ int limdl_model_get_memory (
 
 	/* TODO: Many of these have memory allocations of their own, */
 	total = sizeof (LIMdlModel);
-	total += self->indices.count * sizeof (LIMdlIndex);
 	for (i = 0 ; i < self->animations.count ; i++)
 		total += sizeof (LIMdlAnimation);
 	for (i = 0 ; i < self->hairs.count ; i++)
 		total += sizeof (LIMdlHairs);
-	for (i = 0 ; i < self->face_groups.count ; i++)
-		total += sizeof (LIMdlFaces);
+	for (i = 0 ; i < self->lod.count ; i++)
+		total += limdl_lod_get_memory (self->lod.array + i);
 	for (i = 0 ; i < self->materials.count ; i++)
 		total += sizeof (LIMdlMaterial*) + sizeof (LIMdlMaterial);
 	for (i = 0 ; i < self->nodes.count ; i++)
@@ -916,11 +975,15 @@ static void private_build_tangents (
 	LIMatVector tmp;
 	LIMatVector ed0;
 	LIMatVector ed1;
+	LIMdlLod* lod;
 	LIMdlVertex* vtx[3];
+
+	lisys_assert (self->lod.count);
+	lod = self->lod.array;
 
 	for (i = 0 ; i < self->vertices.count ; i++)
 		self->vertices.array[i].tangent = limat_vector_init (0.0f, 0.0f, 0.0f);
-	for (i = 0, idx = self->indices.array ; i < self->indices.count ; i += 3, idx += 3)
+	for (i = 0, idx = lod->indices.array ; i < lod->indices.count ; i += 3, idx += 3)
 	{
 		vtx[0] = self->vertices.array + idx[0];
 		vtx[1] = self->vertices.array + idx[1];
@@ -957,6 +1020,7 @@ static int private_read (
 	uint32_t tmp;
 	uint32_t size;
 	uint32_t version;
+	LIMdlLod* lod;
 
 	/* Read magic. */
 	if (!liarc_reader_check_text (reader, "lips/mdl", ""))
@@ -1046,16 +1110,34 @@ static int private_read (
 		lisys_free (id);
 	}
 
-	/* Sanity checks. */
-	if (self->face_groups.count != self->materials.count)
+	/* Ensure that the mandatory first level of detail exists. */
+	if (!self->lod.count)
 	{
-		lisys_error_set (EINVAL, "material and face group counts don't match");
-		return 0;
+		if (self->materials.count)
+		{
+			lisys_error_set (EINVAL, "model with materials but no level-of-detail data");
+			return 0;
+		}
+		self->lod.array = lisys_calloc (1, sizeof (LIMdlLod));
+		if (self->lod.array == NULL)
+			return 0;
+		self->lod.count = 1;
 	}
-	for (i = 0 ; i < self->indices.count ; i++)
+
+	/* Sanity checks. */
+	for (i = 0 ; i < self->lod.count ; i++)
 	{
-		if (self->indices.array[i] >= self->vertices.count)
-			lisys_error_set (EINVAL, "vertex index out of bounds");
+		lod = self->lod.array + i;
+		if (lod->face_groups.count != self->materials.count)
+		{
+			lisys_error_set (EINVAL, "material and face group counts don't match");
+			return 0;
+		}
+		for (j = 0 ; j < lod->indices.count ; j++)
+		{
+			if (lod->indices.array[i] >= self->vertices.count)
+				lisys_error_set (EINVAL, "vertex index out of bounds");
+		}
 	}
 	for (i = 0 ; i < self->vertices.count ; i++)
 	{
@@ -1125,30 +1207,14 @@ static int private_read_faces (
 	LIMdlModel*  self,
 	LIArcReader* reader)
 {
-	int i;
-	uint32_t tmp;
-	LIMdlFaces* group;
-
-	/* Read header. */
-	if (!liarc_reader_get_uint32 (reader, &tmp))
+	/* Allocate the mandatory LOD. */
+	lisys_assert (!self->lod.count);
+	self->lod.array = lisys_calloc (1, sizeof (LIMdlLod));
+	if (self->lod.array == NULL)
 		return 0;
-	self->face_groups.count = tmp;
+	self->lod.count = 1;
 
-	/* Read face groups. */
-	if (self->face_groups.count)
-	{
-		self->face_groups.array = lisys_calloc (self->face_groups.count, sizeof (LIMdlFaces));
-		if (self->face_groups.array == NULL)
-			return 0;
-		for (i = 0 ; i < self->face_groups.count ; i++)
-		{
-			group = self->face_groups.array + i;
-			if (!limdl_faces_read (group, self, reader))
-				return 0;
-		}
-	}
-
-	return 1;
+	return limdl_lod_read (self->lod.array, reader);
 }
 
 static int private_read_hairs (
@@ -1609,21 +1675,7 @@ static int private_write_faces (
 	const LIMdlModel* self,
 	LIArcWriter*      writer)
 {
-	int i;
-
-	/* Check if writing is needed. */
-	if (!self->face_groups.count)
-		return 1;
-
-	if (!liarc_writer_append_uint32 (writer, self->face_groups.count))
-		return 0;
-	for (i = 0 ; i < self->face_groups.count ; i++)
-	{
-		if (!limdl_faces_write (self->face_groups.array + i, self, writer))
-			return 0;
-	}
-
-	return 1;
+	return limdl_lod_write (self->lod.array, writer);
 }
 
 static int private_write_hairs (
