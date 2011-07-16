@@ -128,9 +128,6 @@ LIAPICALL (int, limdl_model_write_file, (
 	const LIMdlModel* self,
 	const char*       path));
 
-LIAPICALL (int, limdl_model_get_index_count, (
-	const LIMdlModel* self));
-
 LIAPICALL (int, limdl_model_get_memory, (
 	const LIMdlModel* self));
 

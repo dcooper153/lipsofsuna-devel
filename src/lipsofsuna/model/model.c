@@ -889,12 +889,6 @@ int limdl_model_write_file (
 	return 1;
 }
 
-int limdl_model_get_index_count (
-	const LIMdlModel* self)
-{
-	return self->lod.array[0].indices.count;
-}
-
 /**
  * \brief Gets the approximate memory used by the model.
  * \param self Model.
