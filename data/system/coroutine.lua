@@ -26,7 +26,9 @@ end
 Coroutine.update = function(clss, secs)
 	for key,value in pairs(clss.routines) do
 		local ret,err = coroutine.resume(value, secs)
-		if not ret then print(err) end
+		if not ret then
+			print(debug.traceback(value, "ERROR: " .. err))
+		end
 		if coroutine.status(value) == "dead" then
 			clss.routines[key] = nil
 		end
