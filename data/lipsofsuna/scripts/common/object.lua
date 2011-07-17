@@ -1,5 +1,4 @@
 local oldinst = Object.new
-local oldfind = Object.find
 Object.objects = {}
 Object.load_meshes = true
 setmetatable(Object.objects, {__mode = "v"})
@@ -34,28 +33,5 @@ Object.get_free_id = function(clss)
 		if not Object:find{id = id} then
 			return id
 		end
-	end
-end
-
-Object.find = function(self, args)
-	if args.id then
-		-- Search by ID.
-		local obj = Object.objects[args.id]
-		if not obj then return end
-		-- Optional distance check.
-		if args.point and args.radius then
-			if not obj.realized then return end
-			if (obj.position - args.point).length > args.radius then return end
-		end
-		return obj
-	else
-		-- Search by position or sector.
-		local ret = oldfind(self, args)
-		-- Create an easily searchable dictionary.
-		local dict = {}
-		for k,v in pairs(ret) do
-			dict[v.id] = v
-		end
-		return dict
 	end
 end

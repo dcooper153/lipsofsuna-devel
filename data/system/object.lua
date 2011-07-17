@@ -3,20 +3,39 @@ require "system/model"
 Object = Class()
 Object.class_name = "Object"
 
---- Finds all objects inside a sphere.
+--- Finds objects.
 -- @param clss Object class.
 -- @param args Arguments.<ul>
---   <li>point: Center point.</li>
---   <li>radius: Search radius.</li>
+--   <li>id: Object ID for ID search.</li>
+--   <li>point: Center point for radius search.</li>
+--   <li>radius: Search radius for radius search.</li>
 --   <li>sector: Return all object in this sector.</li></ul>
 -- @return Table of matching objects.
-Object.find = function(clss, args)
-	local t = Los.object_find{
-		point = args.point and args.point.handle,
-		radius = args.radius,
-		sector = args.sector}
-	for k,v in pairs(t) do t[k] = __userdata_lookup[v] end
-	return t
+Object.find = function(self, args)
+	if args.id then
+		-- Search by ID.
+		local obj = Object.objects[args.id]
+		if not obj then return end
+		-- Optional distance check.
+		if args.point and args.radius then
+			if not obj.realized then return end
+			if (obj.position - args.point).length > args.radius then return end
+		end
+		return obj
+	else
+		-- Search by position or sector.
+		local list = Los.object_find{
+			point = args.point and args.point.handle,
+			radius = args.radius,
+			sector = args.sector}
+		for k,v in pairs(list) do list[k] = __userdata_lookup[v] end
+		-- Create an easily searchable dictionary.
+		local dict = {}
+		for k,v in pairs(list) do
+			dict[v.id] = v
+		end
+		return dict
+	end
 end
 
 --- Creates a new object.

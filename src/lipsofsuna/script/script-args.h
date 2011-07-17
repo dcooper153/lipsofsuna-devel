@@ -181,7 +181,7 @@ LIAPICALL (void, liscr_args_seti_bool, (
 	LIScrArgs* self,
 	int        value));
 
-LIAPICALL (void, liscr_args_seti_data, (
+LIAPICALL (int, liscr_args_seti_data, (
 	LIScrArgs* self,
 	LIScrData* value));
 

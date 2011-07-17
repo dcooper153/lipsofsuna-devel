@@ -728,14 +728,17 @@ liscr_args_seti_bool (LIScrArgs* self,
 	}
 }
 
-void
-liscr_args_seti_data (LIScrArgs* self,
-                      LIScrData* value)
+int liscr_args_seti_data (
+	LIScrArgs* self,
+	LIScrData* value)
 {
 	if (self->output_mode != LISCR_ARGS_OUTPUT_TABLE)
 	{
 		if (value != NULL)
-			liscr_pushdata (self->lua, value);
+		{
+			if (!liscr_pushdata (self->lua, value))
+				return 0;
+		}
 		else
 			lua_pushnil (self->lua);
 		self->ret++;
@@ -750,10 +753,16 @@ liscr_args_seti_data (LIScrArgs* self,
 		if (value != NULL)
 		{
 			lua_pushnumber (self->lua, ++self->ret);
-			liscr_pushdata (self->lua, value);
+			if (!liscr_pushdata (self->lua, value))
+			{
+				lua_pop (self->lua, 1);
+				return 0;
+			}
 			lua_settable (self->lua, self->output_table);
 		}
 	}
+
+	return 1;
 }
 
 void
