@@ -40,16 +40,13 @@ static void private_pack_quad (
 	float         y1);
 
 static void private_pack_scaled (
-	LIWdgElement*    self,
-	const LIWdgRect* rect);
+	LIWdgElement* self);
 
 static void private_pack_text (
-	LIWdgElement*    self,
-	const LIWdgRect* rect);
+	LIWdgElement* self);
 
 static void private_pack_tiled (
-	LIWdgElement*    self,
-	const LIWdgRect* rect);
+	LIWdgElement* self);
 
 static void private_pack_verts (
 	LIWdgElement*      self,
@@ -162,8 +159,9 @@ void liwdg_element_free (
 }
 
 void liwdg_element_paint (
-	LIWdgElement* self,
-	LIWdgManager* manager)
+	LIWdgElement*      self,
+	LIWdgManager*      manager,
+	const LIMatMatrix* matrix)
 {
 	int scissor[5];
 	GLuint texture;
@@ -188,7 +186,7 @@ void liwdg_element_paint (
 			texture = liren_image_get_handle (self->image);
 		else
 			texture = self->font->texture;
-		liren_render_draw_clipped_buffer (manager->render, manager->shader,
+		liren_render_draw_clipped_buffer (manager->render, manager->shader, matrix,
 			&manager->projection, texture, self->text_color, scissor, self->buffer);
 	}
 }
@@ -233,12 +231,12 @@ void liwdg_element_update (
 	if (self->image != NULL)
 	{
 		if (self->src_tiling_enabled)
-			private_pack_tiled (self, rect);
+			private_pack_tiled (self);
 		else
-			private_pack_scaled (self, rect);
+			private_pack_scaled (self);
 	}
 	else if (self->text != NULL)
-		private_pack_text (self, rect);
+		private_pack_text (self);
 
 	/* Create vertex buffer. */
 	if (self->vertices.count)
@@ -283,8 +281,7 @@ static void private_pack_quad (
 }
 
 static void private_pack_scaled (
-	LIWdgElement*    self,
-	const LIWdgRect* rect)
+	LIWdgElement* self)
 {
 	float center;
 	float size;
@@ -325,14 +322,13 @@ static void private_pack_scaled (
 
 	/* Pack fill. */
 	private_pack_quad (self, tx[0], ty[0],
-		rect->x + self->dst_pos[0], rect->y + self->dst_pos[1], tx[1], ty[1],
-		rect->x + self->dst_pos[0] + self->dst_size[0],
-		rect->y + self->dst_pos[0] + self->dst_size[1]);
+		self->dst_pos[0], self->dst_pos[1], tx[1], ty[1],
+		self->dst_pos[0] + self->dst_size[0],
+		self->dst_pos[0] + self->dst_size[1]);
 }
 
 static void private_pack_text (
-	LIWdgElement*    self,
-	const LIWdgRect* rect)
+	LIWdgElement* self)
 {
 	int i;
 	int j;
@@ -364,8 +360,8 @@ static void private_pack_text (
 	/* Apply translation. */
 	w = lifnt_layout_get_width (text);
 	h = lifnt_layout_get_height (text);
-	x = rect->x + self->dst_pos[0] + (int)(self->text_align[0] * (self->dst_size[0] - w));
-	y = rect->y + self->dst_pos[1] + (int)(self->text_align[1] * (self->dst_size[1] - h));
+	x = self->dst_pos[0] + (int)(self->text_align[0] * (self->dst_size[0] - w));
+	y = self->dst_pos[1] + (int)(self->text_align[1] * (self->dst_size[1] - h));
 	for (i = 2 ; i < text->n_glyphs * 20 ; i += 5)
 	{
 		glyph = text->glyphs + i;
@@ -393,8 +389,7 @@ static void private_pack_text (
 }
 
 static void private_pack_tiled (
-	LIWdgElement*    self,
-	const LIWdgRect* rect)
+	LIWdgElement* self)
 {
 	int px;
 	int py;
@@ -411,8 +406,8 @@ static void private_pack_tiled (
 	LIWdgRect r;
 
 	/* Calculate destination rectangle. */
-	r.x = rect->x + self->dst_pos[0];
-	r.y = rect->y + self->dst_pos[1];
+	r.x = self->dst_pos[0];
+	r.y = self->dst_pos[1];
 	r.width = self->dst_size[0];
 	r.height = self->dst_size[1];
 

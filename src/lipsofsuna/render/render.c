@@ -130,23 +130,24 @@ void liren_render_free (
 }
 
 void liren_render_draw_clipped_buffer (
-	LIRenRender* self,
-	LIRenShader* shader,
-	LIMatMatrix* projection,
-	GLuint       texture,
-	const float* diffuse,
-	const int*   scissor,
-	LIRenBuffer* buffer)
+	LIRenRender*       self,
+	LIRenShader*       shader,
+	const LIMatMatrix* modelview,
+	const LIMatMatrix* projection,
+	GLuint             texture,
+	const float*       diffuse,
+	const int*         scissor,
+	LIRenBuffer*       buffer)
 {
 	if (self->v32 != NULL)
 	{
-		liren_render32_draw_clipped_buffer (self->v32, shader->v32, projection,
-			texture, diffuse, scissor, buffer->v32);
+		liren_render32_draw_clipped_buffer (self->v32, shader->v32, modelview,
+			projection, texture, diffuse, scissor, buffer->v32);
 	}
 	else
 	{
-		liren_render21_draw_clipped_buffer (self->v21, shader->v21, projection,
-			texture, diffuse, scissor, buffer->v21);
+		liren_render21_draw_clipped_buffer (self->v21, shader->v21, modelview,
+			projection, texture, diffuse, scissor, buffer->v21);
 	}
 }
 

@@ -424,6 +424,7 @@ void liwdg_widget_draw (
 {
 	int x;
 	int y;
+	LIMatMatrix matrix;
 	LIWdgGroupCell* cell;
 	LIWdgElement* elem;
 
@@ -431,8 +432,12 @@ void liwdg_widget_draw (
 	lical_callbacks_call (self->manager->callbacks, "widget-paint", lical_marshal_DATA_PTR, self);
 
 	/* Paint canvas. */
-	for (elem = self->elements ; elem != NULL ; elem = elem->next)
-		liwdg_element_paint (elem, self->manager);
+	if (self->elements != NULL)
+	{
+		matrix = limat_matrix_translation (self->allocation.x, self->allocation.y, 0.0f);
+		for (elem = self->elements ; elem != NULL ; elem = elem->next)
+			liwdg_element_paint (elem, self->manager, &matrix);
+	}
 
 	/* Paint children. */
 	for (y = 0 ; y < self->height ; y++)

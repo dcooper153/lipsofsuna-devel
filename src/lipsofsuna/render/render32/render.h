@@ -36,13 +36,14 @@ LIAPICALL (void, liren_render32_free, (
 	LIRenRender32* self));
 
 LIAPICALL (void, liren_render32_draw_clipped_buffer, (
-	LIRenRender32* self,
-	LIRenShader32* shader,
-	LIMatMatrix* projection,
-	GLuint       texture,
-	const float* diffuse,
-	const int*   scissor,
-	LIRenBuffer32* buffer));
+	LIRenRender32*     self,
+	LIRenShader32*     shader,
+	const LIMatMatrix* modelview,
+	const LIMatMatrix* projection,
+	GLuint             texture,
+	const float*       diffuse,
+	const int*         scissor,
+	LIRenBuffer32*     buffer));
 
 LIAPICALL (void, liren_render32_draw_indexed_triangles_T2V3, (
 	LIRenRender32*    self,

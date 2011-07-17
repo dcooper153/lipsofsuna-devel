@@ -83,13 +83,14 @@ void liren_render21_free (
 }
 
 void liren_render21_draw_clipped_buffer (
-	LIRenRender21* self,
-	LIRenShader21* shader,
-	LIMatMatrix*   projection,
-	GLuint         texture,
-	const float*   diffuse,
-	const int*     scissor,
-	LIRenBuffer21* buffer)
+	LIRenRender21*     self,
+	LIRenShader21*     shader,
+	const LIMatMatrix* modelview,
+	const LIMatMatrix* projection,
+	GLuint             texture,
+	const float*       diffuse,
+	const int*         scissor,
+	LIRenBuffer21*     buffer)
 {
 	/* Enable clipping. */
 	glPushAttrib (GL_SCISSOR_BIT);
@@ -104,6 +105,8 @@ void liren_render21_draw_clipped_buffer (
 	glDisable (GL_DEPTH_TEST);
 	glMatrixMode (GL_PROJECTION);
 	glLoadMatrixf (projection->m);
+	glMatrixMode (GL_MODELVIEW);
+	glLoadMatrixf (modelview->m);
 	glBindTexture (GL_TEXTURE_2D, texture);
 
 	/* Enable the vertex buffer. */

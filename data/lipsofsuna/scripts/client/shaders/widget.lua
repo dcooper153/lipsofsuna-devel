@@ -11,7 +11,8 @@ pass1_vertex = [[
 out vec2 F_texcoord;
 void main()
 {
-	gl_Position = LOS_matrix_projection * vec4(LOS_coord, 1.0);
+	vec4 tmp = LOS_matrix_modelview * vec4(LOS_coord, 1.0);
+	gl_Position = LOS_matrix_projection * tmp;
 	F_texcoord = LOS_texcoord;
 }]],
 pass1_fragment = [[

@@ -74,8 +74,9 @@ LIAPICALL (void, liwdg_element_free, (
 	LIWdgElement* self));
 
 LIAPICALL (void, liwdg_element_paint, (
-	LIWdgElement* self,
-	LIWdgManager* manager));
+	LIWdgElement*      self,
+	LIWdgManager*      manager,
+	const LIMatMatrix* matrix));
 
 LIAPICALL (void, liwdg_element_reload, (
 	LIWdgElement* self,

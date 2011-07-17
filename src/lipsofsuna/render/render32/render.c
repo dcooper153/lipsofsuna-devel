@@ -106,15 +106,17 @@ void liren_render32_free (
 }
 
 void liren_render32_draw_clipped_buffer (
-	LIRenRender32* self,
-	LIRenShader32* shader,
-	LIMatMatrix*   projection,
-	GLuint         texture,
-	const float*   diffuse,
-	const int*     scissor,
-	LIRenBuffer32* buffer)
+	LIRenRender32*     self,
+	LIRenShader32*     shader,
+	const LIMatMatrix* modelview,
+	const LIMatMatrix* projection,
+	GLuint             texture,
+	const float*       diffuse,
+	const int*         scissor,
+	LIRenBuffer32*     buffer)
 {
 	int scissor1[5];
+	LIMatMatrix identity = limat_matrix_identity ();
 
 	/* Enable clipping. */
 	scissor1[4] = liren_context32_get_scissor (self->context,
@@ -125,6 +127,8 @@ void liren_render32_draw_clipped_buffer (
 	/* Render the vertex buffer. */
 	liren_context32_set_buffer (self->context, buffer);
 	liren_context32_set_cull (self->context, 0, GL_CCW);
+	liren_context32_set_modelmatrix (self->context, &identity);
+	liren_context32_set_viewmatrix (self->context, modelview);
 	liren_context32_set_projection (self->context, projection);
 	liren_context32_set_shader (self->context, 0, shader);
 	liren_context32_set_diffuse (self->context, diffuse);
