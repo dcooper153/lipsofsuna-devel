@@ -508,14 +508,14 @@ void limdl_model_clear_vertices (
 	/* Free levels of detail. */
 	for (j = 0 ; j < self->lod.count ; j++)
 	{
-		lod = self->lod.array + i;
+		lod = self->lod.array + j;
 		for (i = 0 ; i < lod->face_groups.count ; i++)
 		{
 			group = lod->face_groups.array + i;
 			group->start = 0;
 			group->count = 0;
 		}
-		if (i)
+		if (j)
 			lisys_free (lod->face_groups.array);
 		lisys_free (lod->indices.array);
 		lod->indices.array = NULL;
