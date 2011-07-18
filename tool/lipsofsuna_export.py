@@ -1640,8 +1640,10 @@ class LIExporter(bpy.types.Operator):
 		# It seems that there's no way to update the GUI without user
 		# input so we have to export in one pass even though our code
 		# could easily do it iteratively.
+		bpy.context.user_preferences.edit.use_global_undo = False
 		while self.process():
 			pass
+		bpy.context.user_preferences.edit.use_global_undo = True
 		return {'FINISHED'}
 
 	def process(self):
