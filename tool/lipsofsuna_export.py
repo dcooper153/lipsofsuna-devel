@@ -570,55 +570,14 @@ class LIMesh:
 		self.vertmapping = [] # los_index -> bl_index
 		self.weightgroupdict = {}
 		self.weightgrouplist = []
-		# Reset shape keys.
-		shape_keys = {}
-		if obj.data.shape_keys:
-			index = 0
-			for k in obj.data.shape_keys.key_blocks:
-				shape_keys[k.name] = index
-				k.value = 1.0
-				index += 1
-			obj.data.update()
 		# Emit faces.
 		self.emit_faces(obj, mesh)
 		# Emit shape keys.
-		for name in shape_keys:
-			# Skip the basis shape.
-			index = shape_keys[name]
-			if index == 0:
-				continue
-			# Duplicate the object.
-			# This is needed because we delete the shape keys every time we
-			# save one and there may be multiple ones we want to save.
-			bpy.ops.object.duplicate()
-			tmpobj = None
-			obj.select = False
-			for obj1 in bpy.data.objects:
-				if obj1.select:
-					tmpobj = obj1
-					break
-			bpy.context.scene.objects.active = tmpobj
-			# Remove shape keys.
-			# Apparently the only way to get the vertex data of the shape key is
-			# to remove all shape keys. If the key we want is the last one removed,
-			# its vertices become the vertices of the mesh itself.
-			for i in range(len(shape_keys)-1,-1,-1):
-				blkey = tmpobj.data.shape_keys.key_blocks[i]
-				if blkey.name != name:
-					tmpobj.active_shape_key_index = i
-					bpy.ops.object.shape_key_remove()
-			tmpobj.active_shape_key_index = 0
-			bpy.ops.object.shape_key_remove()
-			# Record vertex positions.
-			# The vertex positions are taken from the temporary object to
-			# which they were baked by removing the shape keys.
-			key = LIShapeKey(self, tmpobj, name)
-			self.shapekeydict[name] = key
-			self.shapekeylist.append(key)
-			# Delete the temporary object.
-			bpy.ops.object.delete()
-			obj.select = True
-			bpy.context.scene.objects.active = obj
+		if obj.data.shape_keys:
+			for bl_key in obj.data.shape_keys.key_blocks:
+				key = LIShapeKey(self, obj, bl_key)
+				self.shapekeydict[bl_key.name] = key
+				self.shapekeylist.append(key)
 
 	def emit_face(self, obj, mesh, face):
 		# Vertices.
@@ -1178,12 +1137,12 @@ class LIShapePart:
 
 class LIShapeKey:
 
-	def __init__(self, mesh, obj, name):
-		self.name = name
+	def __init__(self, mesh, obj, bl_key):
+		self.name = bl_key.name
 		self.vertices = []
 		for li_idx in range(len(mesh.vertmapping)):
 			bl_idx = mesh.vertmapping[li_idx]
-			self.vertices.append((obj.data.vertices[bl_idx].co, obj.data.vertices[bl_idx].normal))
+			self.vertices.append((bl_key.data[bl_idx].co, obj.data.vertices[bl_idx].normal))
 
 	def write(self, writer):
 		writer.write_string(self.name)
