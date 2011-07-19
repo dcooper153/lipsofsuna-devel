@@ -29,12 +29,14 @@ require "client/effect"
 require "client/equipment"
 require "client/quickslots"
 require "client/gui"
-require "client/object"
 require "client/player"
 require "client/slots"
 require "client/target"
 for k,v in pairs(File:scan_directory("scripts/client/network")) do
 	require("client/network/" .. string.gsub(v, "([^.]*).*", "%1"))
+end
+for k,v in pairs(File:scan_directory("scripts/client/objects")) do
+	require("client/objects/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
 for k,v in pairs(File:scan_directory("scripts/client/shaders")) do
 	require("client/shaders/" .. string.gsub(v, "([^.]*).*", "%1"))

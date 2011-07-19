@@ -1,4 +1,4 @@
-require "client/speedline"
+require "client/objects/speedline"
 
 Object.physics_position_correction = Vector(0, 0, 0)
 
