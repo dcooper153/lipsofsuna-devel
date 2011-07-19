@@ -124,8 +124,7 @@ in vec3 F_tangent;
 in vec2 F_texcoord;
 void main()
 {
-	vec3 tangent = normalize(F_tangent);
-	vec3 normal = los_normal_mapping(F_normal, tangent, F_texcoord, LOS_diffuse_texture_1);
+	vec3 normal = los_normal_mapping(F_normal, F_tangent, F_texcoord, LOS_diffuse_texture_1);
 	vec4 diffuse = texture(LOS_diffuse_texture_0, F_texcoord);
 	]] .. Shader.los_lighting_skin("F_coord", "normal", "F_lightvector", "F_halfvector") .. [[
 	float fake1 = 0.5 * abs(dot(normal, vec3(1.0,0.0,0.0))) + abs(dot(normal, vec3(0.0,1.0,0.0)));
