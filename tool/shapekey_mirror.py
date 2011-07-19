@@ -13,6 +13,7 @@ def apply_shape_key_mirror(obj, mod):
 	face_newtoold = {}
 	face_oldtonew = {}
 	verts = []
+	vert_merged = {}
 	vert_newtoold = {}
 	vert_oldtonew = {}
 	# Store original counts.
@@ -35,6 +36,7 @@ def apply_shape_key_mirror(obj, mod):
 		if vert.x > -0.001 and vert.x < 0.001:
 			vert_newtoold[i] = i
 			vert_oldtonew[i] = i
+			vert_merged[i] = True
 		else:
 			l = len(verts)
 			vert_newtoold[l] = i
@@ -71,7 +73,12 @@ def apply_shape_key_mirror(obj, mod):
 	for i in range(0,len(verts)):
 		old_vert = obj.data.vertices[vert_newtoold[i]]
 		new_vert = mesh.vertices[i]
-		new_vert.normal = old_vert.normal.copy()
+		if i in vert_merged:
+			n = old_vert.normal.copy()
+			n.x = 0
+			new_vert.normal = n.normalized()
+		else:
+			new_vert.normal = old_vert.normal.copy()
 	# Create materials.
 	for mat in obj.data.materials:
 		mesh.materials.append(mat)
