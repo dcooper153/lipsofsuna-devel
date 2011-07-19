@@ -22,6 +22,12 @@
 #include "lipsofsuna/system.h"
 
 #define LIMDL_VERTEX_WEIGHTS_MAX 4
+#define LIMDL_VERTEX_WEIGHT_UINT16
+#define LIMDL_VERTEX_WEIGHT_MAX 65535.0f
+
+typedef uint16_t LIMdlVertexWeight;
+typedef uint8_t LIMdlVertexColor;
+typedef uint8_t LIMdlVertexBone;
 
 typedef struct _LIMdlVertex LIMdlVertex;
 struct _LIMdlVertex
@@ -30,9 +36,9 @@ struct _LIMdlVertex
 	LIMatVector normal;
 	LIMatVector coord;
 	LIMatVector tangent;
-	unsigned char color[4];
-	unsigned char weights[LIMDL_VERTEX_WEIGHTS_MAX];
-	unsigned char bones[LIMDL_VERTEX_WEIGHTS_MAX];
+	LIMdlVertexColor color[4];
+	LIMdlVertexWeight weights[LIMDL_VERTEX_WEIGHTS_MAX];
+	LIMdlVertexBone bones[LIMDL_VERTEX_WEIGHTS_MAX];
 };
 
 static inline void limdl_vertex_init (
@@ -51,7 +57,11 @@ static inline void limdl_vertex_init (
 	self->color[1] = 255;
 	self->color[2] = 255;
 	self->color[3] = 255;
-	self->weights[0] = 255;
+#ifdef LIMDL_VERTEX_WEIGHT_FLOAT
+	self->weights[0] = 1.0f;
+#else
+	self->weights[0] = (int) LIMDL_VERTEX_WEIGHT_MAX;
+#endif
 }
 
 static inline void limdl_vertex_init_copy (

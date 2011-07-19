@@ -34,14 +34,15 @@ int liren_mesh32_init (
 	int          vertex_count)
 {
 	GLint restore;
-	const int vertex_size = 11 * sizeof (float) + 12 * sizeof (char);
-	const int vertex_tex_offset = 0 * sizeof (float);
-	const int vertex_nml_offset = 2 * sizeof (float);
-	const int vertex_vtx_offset = 5 * sizeof (float);
-	const int vertex_tan_offset = 8 * sizeof (float);
-	const int vertex_col_offset = 11 * sizeof (float);
-	const int vertex_we1_offset = 11 * sizeof (float) + 4 * sizeof (char);
-	const int vertex_bo1_offset = 11 * sizeof (float) + 8 * sizeof (char);
+
+	const int vertex_size = sizeof (LIMdlVertex);
+	const int vertex_tex_offset = offsetof (LIMdlVertex, texcoord);
+	const int vertex_nml_offset = offsetof (LIMdlVertex, normal);
+	const int vertex_vtx_offset = offsetof (LIMdlVertex, coord);
+	const int vertex_tan_offset = offsetof (LIMdlVertex, tangent);
+	const int vertex_col_offset = offsetof (LIMdlVertex, color);
+	const int vertex_we1_offset = offsetof (LIMdlVertex, weights);
+	const int vertex_bo1_offset = offsetof (LIMdlVertex, bones);
 
 	/* Allocate objects. */
 	memset (self, 0, sizeof (LIRenMesh32));
@@ -82,7 +83,7 @@ int liren_mesh32_init (
 	glVertexAttribPointer (LIREN_ATTRIBUTE_COORD, 3, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_vtx_offset);
 	glVertexAttribPointer (LIREN_ATTRIBUTE_TANGENT, 3, GL_FLOAT, GL_FALSE, vertex_size, NULL + vertex_tan_offset);
 	glVertexAttribPointer (LIREN_ATTRIBUTE_COLOR, 4, GL_UNSIGNED_BYTE, GL_TRUE, vertex_size, NULL + vertex_col_offset);
-	glVertexAttribPointer (LIREN_ATTRIBUTE_WEIGHTS1, 4, GL_UNSIGNED_BYTE, GL_TRUE, vertex_size, NULL + vertex_we1_offset);
+	glVertexAttribPointer (LIREN_ATTRIBUTE_WEIGHTS1, 4, LIREN_WEIGHT_FORMAT, GL_TRUE, vertex_size, NULL + vertex_we1_offset);
 	glVertexAttribIPointer (LIREN_ATTRIBUTE_BONES1, 4, GL_UNSIGNED_BYTE, vertex_size, NULL + vertex_bo1_offset);
 
 	/* Don't break the active vertex array. */
@@ -196,10 +197,10 @@ void liren_mesh32_get_format (
 {
 	const LIRenFormat format =
 	{
-		11 * sizeof (float) + 12 * sizeof (char),
-		GL_FLOAT, 0 * sizeof (float),
-		GL_FLOAT, 2 * sizeof (float),
-		GL_FLOAT, 5 * sizeof (float)
+		sizeof (LIMdlVertex),
+		GL_FLOAT, offsetof (LIMdlVertex, texcoord),
+		GL_FLOAT, offsetof (LIMdlVertex, normal),
+		GL_FLOAT, offsetof (LIMdlVertex, coord)
 	};
 	*value = format;
 }

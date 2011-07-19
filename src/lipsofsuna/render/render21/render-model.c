@@ -30,10 +30,10 @@
 
 static const LIRenFormat private_vertex_format =
 {
-	11 * sizeof (float) + 12 * sizeof (char),
-	GL_FLOAT, 0 * sizeof (float),
-	GL_FLOAT, 2 * sizeof (float),
-	GL_FLOAT, 5 * sizeof (float)
+	sizeof (LIMdlVertex),
+	GL_FLOAT, offsetof (LIMdlVertex, texcoord),
+	GL_FLOAT, offsetof (LIMdlVertex, normal),
+	GL_FLOAT, offsetof (LIMdlVertex, coord)
 };
 
 static inline void private_quat_xform (
@@ -403,13 +403,13 @@ static inline void private_vert_xform (
 		tmp.y = (in->coord.y - buf[offset + 1]) * buf[offset + 7];
 		tmp.z = (in->coord.z - buf[offset + 2]) * buf[offset + 7];
 		private_quat_xform (poserot, tmp, &ret);
-		vtx.x += in->weights[i] / 255.0f * (ret.x + buf[offset + 4]);
-		vtx.y += in->weights[i] / 255.0f * (ret.y + buf[offset + 5]);
-		vtx.z += in->weights[i] / 255.0f * (ret.z + buf[offset + 6]);
+		vtx.x += in->weights[i] / LIMDL_VERTEX_WEIGHT_MAX * (ret.x + buf[offset + 4]);
+		vtx.y += in->weights[i] / LIMDL_VERTEX_WEIGHT_MAX * (ret.y + buf[offset + 5]);
+		vtx.z += in->weights[i] / LIMDL_VERTEX_WEIGHT_MAX * (ret.z + buf[offset + 6]);
 		private_quat_xform (poserot, in->normal, &ret);
-		nml.x += in->weights[i] / 255.0f * ret.x;
-		nml.y += in->weights[i] / 255.0f * ret.y;
-		nml.z += in->weights[i] / 255.0f * ret.z;
+		nml.x += in->weights[i] / LIMDL_VERTEX_WEIGHT_MAX * ret.x;
+		nml.y += in->weights[i] / LIMDL_VERTEX_WEIGHT_MAX * ret.y;
+		nml.z += in->weights[i] / LIMDL_VERTEX_WEIGHT_MAX * ret.z;
 	}
 	out->coord = vtx;
 	out->normal = nml;
