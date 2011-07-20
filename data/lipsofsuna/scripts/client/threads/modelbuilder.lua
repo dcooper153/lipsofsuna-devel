@@ -104,7 +104,7 @@ local build = function(args)
 	m:edit_material{match_shader = "hair", diffuse = args.hair_color}
 	m:edit_material{match_shader = "skin", diffuse = args.skin_color,
 		shader = species.skin_shader, textures = species.skin_textures}
-	m:edit_material{match_texture = "eye1", diffuse = args.eye_color}
+	m:edit_material{match_shader = "eye", diffuse = args.eye_color}
 	-- Recalculate the bounding box.
 	m:calculate_bounds()
 	return m
