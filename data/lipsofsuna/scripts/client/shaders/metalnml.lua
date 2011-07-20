@@ -79,8 +79,7 @@ in vec2 F_texcoord;
 in vec3 F_reflection;
 void main()
 {
-	vec3 tangent = normalize(F_tangent);
-	vec3 normal = los_normal_mapping(F_normal, tangent, F_texcoord, LOS_diffuse_texture_1);
+	vec3 normal = los_normal_mapping(F_normal, F_tangent, F_texcoord, LOS_diffuse_texture_1);
 	vec4 diffuse1 = texture(LOS_diffuse_texture_0, F_texcoord);
 	vec4 diffuse2 = texture(LOS_cube_texture, normalize(F_reflection));
 	]] .. Shader.los_lighting_default("F_coord", "normal", "F_lightvector", "F_halfvector") .. [[

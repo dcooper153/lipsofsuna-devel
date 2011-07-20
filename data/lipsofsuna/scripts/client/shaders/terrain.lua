@@ -85,8 +85,7 @@ in vec2 F_texcoord;
 in float F_splatting;
 void main()
 {
-	vec3 tangent = normalize(F_tangent);
-	vec3 normal = los_normal_mapping(F_normal, tangent, F_texcoord, LOS_diffuse_texture_1);
+	vec3 normal = los_normal_mapping(F_normal, F_tangent, F_texcoord, LOS_diffuse_texture_1);
 	normal = mix(normal, normalize(F_normal), F_splatting);
 	vec4 diffuse0 = texture(LOS_diffuse_texture_0, F_texcoord);
 	vec4 diffuse1 = texture(LOS_diffuse_texture_2, F_texcoord);
