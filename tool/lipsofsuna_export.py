@@ -747,8 +747,9 @@ class LIMesh:
 		if obj.data.shape_keys:
 			for bl_key in obj.data.shape_keys.key_blocks:
 				key = LIShapeKey(self, obj, bl_key)
-				self.shapekeydict[bl_key.name] = key
-				self.shapekeylist.append(key)
+				if not key.empty:
+					self.shapekeydict[bl_key.name] = key
+					self.shapekeylist.append(key)
 
 	def emit_face(self, obj, mesh, face):
 		# Vertices.
@@ -1311,9 +1312,40 @@ class LIShapeKey:
 	def __init__(self, mesh, obj, bl_key):
 		self.name = bl_key.name
 		self.vertices = []
+		self.empty = True
+		# Calculate shape key vertex normals.
+		dict_index = {}
+		for face in obj.data.faces:
+			coords = [bl_key.data[face.vertices[i]].co for i in range(len(face.vertices))]
+			if len(face.vertices) == 3:
+				nml = mathutils.geometry.normal(coords[0], coords[1], coords[2])
+			else:
+				nml = mathutils.geometry.normal(coords[0], coords[1], coords[2], coord[3])
+			for i in face.vertices:
+				if i not in dict_index:
+					dict_index[i] = [nml]
+				else:
+					dict_index[i].append(nml)
+		dict_normal = {}
+		for i in dict_index:
+			arr = dict_index[i]
+			nml = mathutils.Vector((0, 0, 0))
+			for n in arr:
+				nml += n
+			nml.normalize()
+			dict_normal[i] = nml
+		# Create shape key vertices.
 		for li_idx in range(len(mesh.vertmapping)):
 			bl_idx = mesh.vertmapping[li_idx]
-			self.vertices.append((bl_key.data[bl_idx].co, obj.data.vertices[bl_idx].normal))
+			key = bl_key.data[bl_idx]
+			vtx = obj.data.vertices[bl_idx]
+			if bl_idx in dict_normal:
+				nml = dict_normal[bl_idx]
+			else:
+				nml = vtx.normal
+			self.vertices.append((key.co, nml))
+			if key.co != vtx.co:
+				self.empty = False
 
 	def write(self, writer):
 		writer.write_string(self.name)
