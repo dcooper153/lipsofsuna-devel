@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -39,18 +39,17 @@ struct _LIMatQuaternion
 
 /**
  * \brief Initializes a new quaternion from floating point values.
- *
  * \param x Float.
  * \param y Float.
  * \param z Float.
  * \param w Float.
  * \return Quaternion.
  */
-static inline LIMatQuaternion
-limat_quaternion_init (float x,
-                       float y,
-                       float z,
-                       float w)
+static inline LIMatQuaternion limat_quaternion_init (
+	float x,
+	float y,
+	float z,
+	float w)
 {
 	LIMatQuaternion self;
 
@@ -63,12 +62,32 @@ limat_quaternion_init (float x,
 }
 
 /**
- * \brief Returns an identity quaternion.
- *
+ * \brief Returns the shortest rotation from the first vector to the second.
+ * \param v1 Vector.
+ * \param v2 Vector.
  * \return Quaternion.
  */
-static inline LIMatQuaternion
-limat_quaternion_identity ()
+static inline LIMatQuaternion limat_quaternion_init_vectors (
+	LIMatVector v1,
+	LIMatVector v2)
+{
+	LIMatQuaternion self;
+	LIMatVector c;
+
+	c = limat_vector_cross (v1, v2);
+	self.x = c.x;
+	self.y = c.y;
+	self.z = c.z;
+	self.w = sqrtf (limat_vector_dot (v1, v1) + limat_vector_dot (v2, v2)) + limat_vector_dot (v1, v2);
+
+	return self;
+}
+
+/**
+ * \brief Returns an identity quaternion.
+ * \return Quaternion.
+ */
+static inline LIMatQuaternion limat_quaternion_identity ()
 {
 	LIMatQuaternion self;
 
@@ -82,16 +101,15 @@ limat_quaternion_identity ()
 
 /**
  * \brief Creates a rotation quaternion from euler angles.
- *
  * \param phi Rotation around X-axis.
  * \param theta Rotation around Y-axis.
  * \param psi Rotation around Z-axis.
  * \return Quaternion.
  */
-static inline LIMatQuaternion
-limat_quaternion_euler (float phi,
-                        float theta,
-                        float psi)
+static inline LIMatQuaternion limat_quaternion_euler (
+	float phi,
+	float theta,
+	float psi)
 {
 	float c1 = cos (0.5f * phi);
 	float c2 = cos (0.5f * theta);
@@ -111,14 +129,13 @@ limat_quaternion_euler (float phi,
 
 /**
  * \brief Creates a quaternion from forwards and up vectors.
- *
  * \param dir Forwards vector.
  * \param up Up vector.
  * \return Quaternion.
  */
-static inline LIMatQuaternion
-limat_quaternion_look (LIMatVector dir,
-                       LIMatVector up)
+static inline LIMatQuaternion limat_quaternion_look (
+	LIMatVector dir,
+	LIMatVector up)
 {
 	float len;
 	LIMatQuaternion self;
@@ -174,10 +191,10 @@ limat_quaternion_look (LIMatVector dir,
  * \param up Up vector.
  * \return Quaternion.
  */
-static inline LIMatQuaternion
-limat_quaternion_lookat (LIMatVector position,
-                         LIMatVector center,
-                         LIMatVector up)
+static inline LIMatQuaternion limat_quaternion_lookat (
+	LIMatVector position,
+	LIMatVector center,
+	LIMatVector up)
 {
 	LIMatVector direction;
 
@@ -189,14 +206,13 @@ limat_quaternion_lookat (LIMatVector position,
 
 /**
  * \brief Creates a rotation quaternion.
- *
  * \param angle Amount of rotation in radians.
  * \param axis Axis of rotation.
  * \return Quaternion.
  */
-static inline LIMatQuaternion
-limat_quaternion_rotation (float       angle,
-                           LIMatVector axis)
+static inline LIMatQuaternion limat_quaternion_rotation (
+	float       angle,
+	LIMatVector axis)
 {
 	LIMatQuaternion self;
 	float w = cos (angle / 2);

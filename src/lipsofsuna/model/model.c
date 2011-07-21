@@ -823,6 +823,8 @@ int limdl_model_morph (
 	float       value)
 {
 	int i;
+	LIMatQuaternion q0;
+	LIMatQuaternion q1;
 	LIMdlShapeKey* key;
 	LIMdlShapeKeyVertex* k;
 	LIMdlVertex* r;
@@ -842,9 +844,13 @@ int limdl_model_morph (
 			v = self->vertices.array + i;
 			v->coord = limat_vector_add (v->coord, limat_vector_multiply (
 				limat_vector_subtract (k->coord, r->coord), value));
-			v->normal = limat_vector_normalize (
-				limat_vector_add (v->normal, limat_vector_multiply (
-				limat_vector_subtract (k->normal, r->normal), value)));
+
+			/* Normals need spherical interpolation because a linear sum gives
+			   ugly results in detailed areas such as character faces. */
+			q0 = limat_quaternion_identity ();
+			q1 = limat_quaternion_init_vectors (v->normal, k->normal);
+			q1 = limat_quaternion_nlerp (q1, q0, value);
+			v->normal = limat_quaternion_transform (q1, v->normal);
 		}
 	}
 	else
