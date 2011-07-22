@@ -43,7 +43,7 @@ Itemspec{
 
 Itemspec{
 	name = "berry",
-	model = "book-000", -- FIXME
+	model = "fruit1",
 	mass = 1,
 	categories = {"material"},
 	stacking = true}
@@ -107,6 +107,20 @@ Itemspec{
 	categories = {"build", "material"},
 	description = "Used to construct buildings and craft stone items",
 	construct_tile = "granite1",
+	construct_tile_count = 1,
+	equipment_slot = "hand.R",
+	health = 50,
+	mass = 5,
+	stacking = true}
+
+Itemspec{
+	name = "granite ramp",
+	model = "granitestone1",
+	icon = "stone1",
+	categories = {"build","material"},
+	crafting_materials = {["granite stone"] = 1},
+	description = "Left click to build a ramp block",
+	construct_tile = "concrete2",
 	construct_tile_count = 1,
 	equipment_slot = "hand.R",
 	health = 50,
