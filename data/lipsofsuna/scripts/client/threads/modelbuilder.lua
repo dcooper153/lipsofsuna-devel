@@ -62,39 +62,39 @@ local build = function(args)
 			-- Face customization.
 			if args.face_style and (string.match(k, ".*head.*") or string.match(k, ".*eye.*")) then
 				tmp = ref:copy()
-				if args.face_style[1] then
-					if args.face_style[1] < 0.5 then
-						tmp:morph("cheekbone small", 1 - 2 * args.face_style[1], ref)
-					elseif args.face_style[1] > 0.5 then
-						tmp:morph("cheekbone big", 2 * args.face_style[1] - 1, ref)
-					end
-				end
-				if args.face_style[2] then tmp:morph("cheek small", 1 - args.face_style[2], ref) end
-				if args.face_style[3] then tmp:morph("chin rough", args.face_style[3], ref) end
-				if args.face_style[4] then tmp:morph("chin round", args.face_style[4], ref) end
-				if args.face_style[5] then tmp:morph("chin small", 1 - args.face_style[5], ref) end
-				if args.face_style[6] then tmp:morph("eye inner", args.face_style[6], ref) end
+				if args.face_style[1] then tmp:morph("cheekbone small", args.face_style[1], ref) end
+				if args.face_style[2] then tmp:morph("cheek small", args.face_style[2], ref) end
+				if args.face_style[3] then tmp:morph("chin sharp", args.face_style[3], ref) end
+				if args.face_style[4] then tmp:morph("chin small", args.face_style[4], ref) end
+				if args.face_style[5] then tmp:morph("eye inner", args.face_style[5], ref) end
+				if args.face_style[6] then tmp:morph("eye near", args.face_style[6], ref) end
 				if args.face_style[7] then tmp:morph("eye outer", args.face_style[7], ref) end
-				if args.face_style[8] then tmp:morph("eye small", 1 - args.face_style[8], ref) end
-				if args.face_style[9] then tmp:morph("face thin", 1 - args.face_style[9], ref) end
-				if args.face_style[10] then tmp:morph("face wrinkle", args.face_style[10], ref) end
+				if args.face_style[8] then tmp:morph("eye small", args.face_style[8], ref) end
+				if args.face_style[9] then tmp:morph("face wrinkle", args.face_style[9], ref) end
+				if args.face_style[10] then tmp:morph("jaw straight", args.face_style[10], ref) end
 				if args.face_style[11] then tmp:morph("jaw wide", args.face_style[11], ref) end
-				if args.face_style[12] then tmp:morph("nose dull", 1 - args.face_style[12], ref) end
+				if args.face_style[12] then tmp:morph("lips protrude", args.face_style[12], ref) end
+				if args.face_style[13] then tmp:morph("mouth wide", args.face_style[13], ref) end
+				if args.face_style[14] then tmp:morph("nose dull", args.face_style[14], ref) end
+				if args.face_style[15] then tmp:morph("nose up", args.face_style[15], ref) end
 			end
 			-- Body customization.
 			if args.body_style then
 				if not tmp then tmp = ref:copy() end
-				if args.body_style[1] then tmp:morph("hips wide", args.body_style[1], ref) end
-				if args.body_style[2] then tmp:morph("limbs muscular", args.body_style[2], ref) end
+				if args.body_style[1] then tmp:morph("arms muscular", args.body_style[1], ref) end
+				if args.body_style[2] then tmp:morph("body thin", args.body_style[2], ref) end
 				if args.body_style[3] then
 					if args.body_style[3] < 0.5 then
-						tmp:morph("torso small", 1 - 2 * args.body_style[3], ref)
+						tmp:morph("breast small", 1 - 2 * args.body_style[3], ref)
 					elseif args.body_style[3] > 0.5 then
-						tmp:morph("torso big", 2 * args.body_style[3] - 1, ref)
+						tmp:morph("breast big", 2 * args.body_style[3] - 1, ref)
 					end
 				end
-				if args.body_style[4] then tmp:morph("torso thick", args.body_style[4], ref) end
-				if args.body_style[5] then tmp:morph("waist thick", args.body_style[5], ref) end
+				if args.body_style[4] then tmp:morph("hips wide", args.body_style[4], ref) end
+				if args.body_style[5] then tmp:morph("legs muscular", args.body_style[5], ref) end
+				if args.body_style[6] then tmp:morph("torso wide", args.body_style[6], ref) end
+				if args.body_style[7] then tmp:morph("waist fat", args.body_style[7], ref) end
+				if args.body_style[8] then tmp:morph("waist wide", args.body_style[8], ref) end
 			end
 			-- Merge to the character model.
 			m:merge(tmp or ref)

@@ -291,17 +291,19 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	-- Body style.
 	if Bitwise:band(flags, Protocol.object_show_flags.BODY_STYLE) ~= 0 then
 		debug("  BODY STYLE")
-		local ok,a,b,c,d,e
+		local ok,a,b,c,d,e,f,g,h,i
 		-- Scale.
 		ok,a = event.packet:resume("uint8")
 		if not ok then return end
 		o.body_scale = a / 255
 		debug("    SCALE %d", a)
 		-- Style.
-		ok,a,b,c,d,e = event.packet:resume("uint8", "uint8", "uint8", "uint8", "uint8")
+		ok,a,b,c,d,e,f,g,h,i = event.packet:resume("uint8", "uint8", "uint8", "uint8", "uint8",
+			"uint8", "uint8", "uint8", "uint8", "uint8")
 		if not ok then return end
-		o.body_style = {a / 255, b / 255, c / 255, d / 255, e / 255}
-		debug("    STYLE %d %d %d %d %d", a, b, c, d, e)
+		o.body_style = {a / 255, b / 255, c / 255, d / 255, e / 255,
+			f / 255, g / 255, h / 255, i / 255}
+		debug("    STYLE %d %d %d %d %d %d %d %d %d", a, b, c, d, e, f, g, h, i)
 		-- Skin.
 		ok,a,b,c,d = event.packet:resume("string", "uint8", "uint8", "uint8")
 		if not ok then return end
@@ -312,7 +314,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	-- Head style.
 	if Bitwise:band(flags, Protocol.object_show_flags.HEAD_STYLE) ~= 0 then
 		debug("  HEAD STYLE")
-		local ok,a,b,c,d,e,f,g,h,i,j,k,l
+		local ok,a,b,c,d,e,f,g,h,i,j,k,l,m,n,p
 		-- Eyes.
 		ok,a,b,c,d = event.packet:resume("string", "uint8", "uint8", "uint8")
 		if not ok then return end
@@ -320,12 +322,12 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		o.eye_color = {b / 255, c / 255, d / 255}
 		debug("    EYE %s %d %d %d", a, b, c, d)
 		-- Face.
-		ok,a,b,c,d,e,f,g,h,i,j,k,l = event.packet:resume("uint8", "uint8", "uint8", "uint8", "uint8",
-			"uint8", "uint8", "uint8", "uint8", "uint8", "uint8", "uint8")
+		ok,a,b,c,d,e,f,g,h,i,j,k,l,m,n,p = event.packet:resume("uint8", "uint8", "uint8", "uint8", "uint8",
+			"uint8", "uint8", "uint8", "uint8", "uint8", "uint8", "uint8", "uint8", "uint8", "uint8")
 		if not ok then return end
 		o.face_style = {a / 255, b / 255, c / 255, d / 255, e / 255, f / 255, g / 255,
-			h / 255, i / 255, j / 255, k / 255, l / 255}
-		debug("    FACE %d %d %d %d %d %d %d %d %d %d %d %d", a, b, c, d, e, f, g, h, i, j, k, l)
+			h / 255, i / 255, j / 255, k / 255, l / 255, m / 255, n / 255, p / 255}
+		debug("    FACE %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d", a, b, c, d, e, f, g, h, i, j, k, l, m, n, p)
 		-- Hair.
 		ok,a,b,c,d = event.packet:resume("string", "uint8", "uint8", "uint8")
 		if not ok then return end

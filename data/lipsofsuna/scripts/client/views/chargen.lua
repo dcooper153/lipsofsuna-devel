@@ -80,19 +80,30 @@ Views.Chargen.new = function(clss)
 		pressed = function(widget) self:set_height(widget:get_value_at(Program.cursor_position)) end}
 	self.label_body = {}
 	self.scroll_body = {}
-	local body_slider_names = {"Hips width", "Limb muscularity", "Bust size", "Torso width", "Waist width"}
-	for i = 1,5 do
-		self.label_body[i] = Widgets.Label{text = body_slider_names[i]}
-		self.scroll_body[i] = Widgets.Progress{min = 0, max = 1, value = 0,
-			pressed = function(widget) self:set_body(i, widget:get_value_at(Program.cursor_position)) end}
+	local body_slider_names = {
+		"Arm muscularity", "Body width", "Bust size", "Hips width", "Leg muscularity",
+			"Torso width", "Waist fatness", "Waist width"}
+	local body_slider_inverse = {
+		false, true, false, false, false, false, false, false}
+	for k,v in ipairs(body_slider_names) do
+		self.label_body[k] = Widgets.Label{text = v}
+		self.scroll_body[k] = Widgets.Progress{min = 0, max = 1, value = 0, inverse = body_slider_inverse[k],
+			pressed = function(widget) self:set_body(k, widget:get_value_at(Program.cursor_position)) end}
 	end
 	-- Face style sliders.
 	self.label_face = {}
 	self.scroll_face = {}
-	local face_slider_names = {"Cheekbone size", "Cheek size", "Chin squareness", "Chin roundness", "Chin size", "Eye inner", "Eye outer", "Eye size", "Face width", "Face roughness", "Jaw width", "Nose pointedness"}
+	local face_slider_names = {
+		"Cheekbone size", "Cheek size", "Chin sharpness", "Chin size",
+		"Eye inner", "Eye distance", "Eye outer", "Eye size",
+		"Face roughness", "Jaw pronounced", "Jaw width", "Lips protruded",
+		"Mouth width", "Nose pointedness", "Nose position"}
+	local face_slider_inverse = {
+		true, true, false, true, false, true, false, true,
+		false, true, false, false, false, true, false}
 	for k,v in ipairs(face_slider_names) do
 		self.label_face[k] = Widgets.Label{text = v}
-		self.scroll_face[k] = Widgets.Progress{min = 0, max = 1, value = 0,
+		self.scroll_face[k] = Widgets.Progress{min = 0, max = 1, value = 0, inverse = face_slider_inverse[k],
 			pressed = function(widget) self:set_face(k, widget:get_value_at(Program.cursor_position)) end}
 	end
 	-- Apply and quit buttons.
@@ -166,6 +177,9 @@ Views.Chargen.new = function(clss)
 end
 
 Views.Chargen.apply = function(self)
+	local scroll_value = function(scroll)
+		return 255 * (scroll.inverse and (1 - scroll.value) or scroll.value)
+	end
 	local packet = Packet(packets.CHARACTER_CREATE,
 		"string", self.entry_name.text,
 		"string", self.list_races[self.combo_race.value][2],
@@ -177,23 +191,36 @@ Views.Chargen.apply = function(self)
 		"uint8", self.skills:get_value("strength"),
 		"uint8", self.skills:get_value("willpower"),
 		-- Body style.
-		"uint8", 255 * self.scroll_height.value,
-		"uint8", 255 * self.scroll_body[1].value,
-		"uint8", 255 * self.scroll_body[2].value,
-		"uint8", 255 * self.scroll_body[3].value,
-		"uint8", 255 * self.scroll_body[4].value,
-		"uint8", 255 * self.scroll_body[5].value,
+		"uint8", scroll_value(self.scroll_height),
+		"uint8", scroll_value(self.scroll_body[1]),
+		"uint8", scroll_value(self.scroll_body[2]),
+		"uint8", scroll_value(self.scroll_body[3]),
+		"uint8", scroll_value(self.scroll_body[4]),
+		"uint8", scroll_value(self.scroll_body[5]),
+		"uint8", scroll_value(self.scroll_body[6]),
+		"uint8", scroll_value(self.scroll_body[7]),
+		"uint8", scroll_value(self.scroll_body[8]),
 		-- Eye style.
 		"string", "default",
 		"uint8", 255 * self.color_eye.red,
 		"uint8", 255 * self.color_eye.green,
 		"uint8", 255 * self.color_eye.blue,
 		-- Face style.
-		"uint8", 255 * self.scroll_face[1].value,
-		"uint8", 255 * self.scroll_face[2].value,
-		"uint8", 255 * self.scroll_face[3].value,
-		"uint8", 0,
-		"uint8", 0,
+		"uint8", scroll_value(self.scroll_face[1]),
+		"uint8", scroll_value(self.scroll_face[2]),
+		"uint8", scroll_value(self.scroll_face[3]),
+		"uint8", scroll_value(self.scroll_face[4]),
+		"uint8", scroll_value(self.scroll_face[5]),
+		"uint8", scroll_value(self.scroll_face[6]),
+		"uint8", scroll_value(self.scroll_face[7]),
+		"uint8", scroll_value(self.scroll_face[8]),
+		"uint8", scroll_value(self.scroll_face[9]),
+		"uint8", scroll_value(self.scroll_face[10]),
+		"uint8", scroll_value(self.scroll_face[11]),
+		"uint8", scroll_value(self.scroll_face[12]),
+		"uint8", scroll_value(self.scroll_face[13]),
+		"uint8", scroll_value(self.scroll_face[14]),
+		"uint8", scroll_value(self.scroll_face[15]),
 		-- Hair style.
 		"string", self.list_hair_styles[self.combo_hair_style.value][2],
 		"uint8", 255 * self.color_hair.red,
@@ -409,11 +436,19 @@ Views.Chargen.update_model = function(self)
 	end
 	local body = {}
 	for k,v in pairs(self.scroll_body) do
-		body[k] = v.value
+		if v.inverse then
+			body[k] = 1 - v.value
+		else
+			body[k] = v.value
+		end
 	end
 	local face = {}
 	for k,v in pairs(self.scroll_face) do
-		face[k] = v.value
+		if v.inverse then
+			face[k] = 1 - v.value
+		else
+			face[k] = v.value
+		end
 	end
 	self.object.spec = spec
 	self.object.body_scale = self.scroll_height.value
