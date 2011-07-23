@@ -36,6 +36,7 @@ enum _LIMdlPoseChannelState
 
 struct _LIMdlPoseChannel
 {
+	int additive;
 	int state;
 	int repeat;
 	int repeats;
@@ -126,6 +127,15 @@ LIAPICALL (LIMdlNode*, limdl_pose_find_node, (
 LIAPICALL (void, limdl_pose_update, (
 	LIMdlPose* self,
 	float      secs));
+
+LIAPICALL (int, limdl_pose_get_channel_additive, (
+	const LIMdlPose* self,
+	int              channel));
+
+LIAPICALL (void, limdl_pose_set_channel_additive, (
+	LIMdlPose* self,
+	int        channel,
+	int        value));
 
 LIAPICALL (LIMdlAnimation*, limdl_pose_get_channel_animation, (
 	const LIMdlPose* self,

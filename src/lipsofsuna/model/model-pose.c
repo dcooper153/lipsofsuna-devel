@@ -353,6 +353,31 @@ void limdl_pose_update (
 	}
 }
 
+int limdl_pose_get_channel_additive (
+	const LIMdlPose* self,
+	int              channel)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_find_channel (self, channel);
+	if (chan == NULL)
+		return 0;
+	return chan->additive;
+}
+
+void limdl_pose_set_channel_additive (
+	LIMdlPose* self,
+	int        channel,
+	int        value)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_create_channel (self, channel);
+	if (chan == NULL)
+		return;
+	chan->additive = value;
+}
+
 LIMdlAnimation* limdl_pose_get_channel_animation (
 	const LIMdlPose* self,
 	int              channel)
@@ -1138,6 +1163,8 @@ static void private_transform_node (
 	LIALG_U32DIC_FOREACH (iter, self->channels)
 	{
 		chan = iter.value;
+		if (chan->additive)
+			continue;
 		if (limdl_animation_get_channel (chan->animation, node->name) != -1)
 		{
 			private_get_channel_weight (self, chan, node, &weight, &weight1);
@@ -1165,6 +1192,8 @@ static void private_transform_node (
 		LIALG_U32DIC_FOREACH (iter, self->channels)
 		{
 			chan = iter.value;
+			if (chan->additive)
+				continue;
 			if (limdl_animation_get_transform (chan->animation, node->name, chan->time, &scale1, &transform))
 			{
 				bonepos = transform.position;
@@ -1215,6 +1244,27 @@ static void private_transform_node (
 	}
 	else
 		scale = 1.0f;
+
+	/* Apply additive transformations and scaling. */
+	/* Additive channels aren't normalized against the total weight but applied as
+	   is on top of other transformations. If the weight of an additive channel is
+	   1, the blended transformation of other channels is multiplied by its full
+	   rotation and scaling. */
+	LIALG_U32DIC_FOREACH (iter, self->channels)
+	{
+		chan = iter.value;
+		if (!chan->additive)
+			continue;
+		if (limdl_animation_get_transform (chan->animation, node->name, chan->time, &scale1, &transform))
+		{
+			bonepos = transform.position;
+			bonerot = transform.rotation;
+			private_get_channel_weight (self, chan, node, &weight1, &weight);
+			rotation = limat_quaternion_nlerp (bonerot, rotation, weight);
+			position = limat_vector_lerp (bonepos, position, weight);
+			scale += scale1 * weight1;
+		}
+	}
 
 	/* Update node transformation. */
 	transform = limat_transform_init (position, rotation);

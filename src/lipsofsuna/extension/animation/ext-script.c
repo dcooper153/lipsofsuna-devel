@@ -26,6 +26,7 @@
 
 static void Object_animate (LIScrArgs* args)
 {
+	int additive = 0;
 	int repeat = 0;
 	int repeat_start = 0;
 	int channel = -1;
@@ -41,6 +42,7 @@ static void Object_animate (LIScrArgs* args)
 	LIEngObject* self = args->self;
 
 	/* Handle arguments. */
+	liscr_args_gets_bool (args, "addivite", &additive);
 	liscr_args_gets_string (args, "animation", &animation);
 	liscr_args_gets_int (args, "channel", &channel);
 	liscr_args_gets_float (args, "fade_in", &fade_in);
@@ -94,6 +96,7 @@ static void Object_animate (LIScrArgs* args)
 			limdl_pose_set_channel_state (self->pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
 		}
 	}
+	limdl_pose_set_channel_additive (self->pose, channel, additive);
 	limdl_pose_set_channel_repeat_start (self->pose, channel, repeat_start);
 	limdl_pose_set_channel_priority_scale (self->pose, channel, weight_scale);
 	limdl_pose_set_channel_priority_transform (self->pose, channel, weight);
