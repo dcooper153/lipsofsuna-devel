@@ -135,7 +135,8 @@ Species{
 		{name = "intelligence", max = 100, val = 50},
 		{name = "perception", max = 60, val = 20},
 		{name = "strength", max = 40, val = 20},
-		{name = "willpower", max = 80, val = 30}}}
+		{name = "willpower", max = 80, val = 30}},
+	tilt_bone = {"back1", "back2", "back3"}}
 
 Species{
 	name = "aermale",
@@ -183,7 +184,8 @@ Species{
 		{name = "strength", max = 80, val = 30},
 		{name = "willpower", max = 40, val = 20}},
 	skin_shader = "android",
-	skin_textures = {"android1", "aer1n"}}
+	skin_textures = {"android1", "aer1n"},
+	tilt_bone = {"back1", "back2", "back3"}}
 
 -- TODO
 Species{
@@ -235,6 +237,7 @@ Species{
 		{name = "willpower", max = 80, val = 30}},
 	skin_shader = "animdiffnorm",
 	skin_textures = {"devora1", "devora1n"},
+	tilt_bone = {"back1", "back2", "back3"},
 	vulnerabilities = {fire = 2, physical = 0.8}}
 
 Species{
@@ -287,6 +290,7 @@ Species{
 		{name = "perception", max = 80, val = 30},
 		{name = "strength", max = 100, val = 50},
 		{name = "willpower", max = 60, val = 20}},
+	tilt_bone = {"back1", "back2", "back3"},
 	vulnerabilities = {cold = 2, fire = 0.5}}
 
 -- TODO

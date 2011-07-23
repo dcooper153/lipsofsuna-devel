@@ -127,7 +127,7 @@ Species.new = function(clss, args)
 				ARMS = {"arm1.L", "arm2.L", "wrist.L", "palm.L", "arm1.R", "arm2.R", "wrist.R", "palm.R"},
 				ARML = {"arm1.L", "arm2.L", "wrist.L", "palm.L"},
 				ARMR = {"arm1.R", "arm2.R", "wrist.R", "palm.R"},
-				BACK = {"back", "back1"}}
+				BACK = {"back", "back1", "back2", "back3"}}
 			local w = {}
 			for k,v in pairs(args) do
 				local replace = mapping[k]

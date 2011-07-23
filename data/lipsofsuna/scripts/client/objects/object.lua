@@ -231,10 +231,10 @@ Object.replace_model = function(self, model)
 			weight = 0, weight_scale = 1000, fade_in = 0, fade_out = 0, permanent = true}
 		self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "mover", scale = scale}
 	end
-	-- Create the customization animation.
+	-- Create the tilting channel.
 	if self.spec and (self.spec.models or self.spec.tilt_bone) then
 		self:animate{animation = "empty", channel = Animation.CHANNEL_TILT,
-			weight = 1000, permanent = true}
+			additive = true, weight = 1, permanent = true}
 	end
 	-- Detach old special effects.
 	if self.special_effects then
@@ -340,8 +340,14 @@ Object.update_rotation = function(self, quat, tilt)
 	self.rotation = quat
 	self.tilt = tilt
 	local spec = self.spec
-	if not self.dead and spec and spec.tilt_bone then
-		self:edit_pose{channel = Animation.CHANNEL_TILT, node = spec.tilt_bone, rotation = Quaternion{axis = Vector(1,0,0), angle = -tilt}}
+	if spec and spec.tilt_bone then
+		local nodes = spec.tilt_bone
+		if type(nodes) ~= "table" then nodes = {nodes} end
+		local angle = self.dead and 0 or -tilt
+		local rot = Quaternion{axis = Vector(1,0,0), angle = angle / #nodes}
+		for k,v in pairs(nodes) do
+			self:edit_pose{channel = Animation.CHANNEL_TILT, node = v, rotation = rot}
+		end
 	end
 end
 
