@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assets>
-
+  <author-info>
+    <name>Harald</name>
+  </author-info>
   <author-info>
     <name>Andrew Kator &amp; Jennifer Legaz</name>
     <url>http://www.katorlegaz.com/3d_models/</url>
@@ -2586,6 +2588,13 @@
     <source>http://www.opengameart.org/content/wooden-weapon-training-set</source>
     <dep>import/weaponwood.png</dep>
     <dep>import/weaponwoodn.png</dep>
+  </asset>
+  
+  <asset>
+    <file>import/gate01.blend</file>
+    <author>Harald</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/simple-jail-door</source>
   </asset>
 
   <asset>
