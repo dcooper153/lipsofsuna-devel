@@ -93,6 +93,13 @@ Views.Options.new = function(clss)
 		local v = widget:get_value_at(Program.cursor_position)
 		self.bloom_exposure = v
 	end
+	-- Nudity toggle.
+	self.toggle_nudity = Widgets.Toggle{active = true}
+	self.toggle_nudity:set_request{width = 100}
+	self.toggle_nudity.pressed = function(widget)
+		widget.active = not widget.active
+		self:changed()
+	end
 	-- Mouse sensitivity.
 	self.scroll_mouse = Widgets.Progress{min = 0, max = 2, value = 0.5}
 	self.scroll_mouse:set_request{width = 100}
@@ -128,7 +135,8 @@ Views.Options.new = function(clss)
 	bloom_group:append_row(Widgets.Label{text = "Influence"}, self.scroll_luminance)
 	bloom_group:append_row(Widgets.Label{text = "Exposure"}, self.scroll_exposure)
 	local mouse_group = Widgets.Frame{cols = 2}
-	mouse_group:append_row(Widgets.Label{text = "Sensitivity"}, self.scroll_mouse)
+	mouse_group:append_row(Widgets.Label{text = "Mouse sensitivity"}, self.scroll_mouse)
+	mouse_group:append_row(Widgets.Label{text = "Enable nudity"}, self.toggle_nudity)
 	local sound_group = Widgets.Frame{cols = 2}
 	sound_group:append_row(Widgets.Label{text = "Music"}, self.scroll_music)
 	sound_group:append_row(Widgets.Label{text = "Effects"}, self.scroll_sound)
@@ -229,6 +237,7 @@ Views.Options.load = function(self)
 	self.anisotrophic_filter = 0
 	self.mouse_sensitivity = 1
 	self.multisamples = 2
+	self.nudity_enabled = false
 	self.shader_quality = 2
 	self.transparency_quality = 0.3
 	self.sound_volume = 1.0
@@ -245,6 +254,7 @@ Views.Options.load = function(self)
 		mouse_sensitivity = function(v) self.mouse_sensitivity = tonumber(v) end,
 		multisamples = function(v) self.multisamples = tonumber(v) end,
 		music_volume = function(v) self.music_volume = tonumber(v) end,
+		nudity_enabled = function(v) self.nudity_enabled = (v == "true") end,
 		shader_quality = function(v) self.shader_quality = tonumber(v) end,
 		sound_volume = function(v) self.sound_volume = tonumber(v) end,
 		transparency_quality = function(v) self.transparency_quality = tonumber(v) end,
@@ -286,6 +296,7 @@ Views.Options.save = function(self)
 	write("mouse_sensitivity", self.mouse_sensitivity)
 	write("multisamples", self.multisamples)
 	write("music_volume", self.music_volume)
+	write("nudity_enabled", self.nudity_enabled)
 	write("shader_quality", self.shader_quality)
 	write("sound_volume", self.sound_volume)
 	write("transparency_quality", self.transparency_quality)
@@ -316,6 +327,7 @@ Views.Options:add_getters{
 	mouse_sensitivity = function(self) return self.scroll_mouse.value end,
 	multisamples = function(self) return rawget(self, "_multisamples") end,
 	music_volume = function(self) return self.scroll_music.value end,
+	nudity_enabled = function(self) return self.toggle_nudity.active end,
 	shader_quality = function(self) return rawget(self, "_shader_quality") end,
 	sound_volume = function(self) return self.scroll_sound.value end,
 	transparency_quality = function(self) return self.scroll_transparency.value end,
@@ -379,6 +391,11 @@ Views.Options:add_setters{
 	music_volume = function(self, v)
 		self.scroll_music.value = v
 		Sound.music_volume = v
+		self:changed()
+	end,
+	nudity_enabled = function(self, v)
+		rawset(self, "_nudity", v)
+		self.toggle_nudity.active = v
 		self:changed()
 	end,
 	shader_quality = function(self, v)

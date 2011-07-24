@@ -274,6 +274,7 @@ Object.update_model = function(self)
 			face_style = self.face_style,
 			hair_color = self.hair_color,
 			hair_style = self.hair_style,
+			nudity = Client.views.options.nudity_enabled,
 			species = self.spec.name,
 			skin_color = self.skin_color,
 			skin_style = self.skin_style})

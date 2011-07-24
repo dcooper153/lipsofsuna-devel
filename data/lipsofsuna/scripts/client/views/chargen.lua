@@ -431,9 +431,6 @@ end
 Views.Chargen.update_model = function(self)
 	local spec = Species:find{name = self.race .. "-player"}
 	local items = {}
-	for k,v in pairs(spec.inventory_items) do
-		table.insert(items, k)
-	end
 	local body = {}
 	for k,v in pairs(self.scroll_body) do
 		if v.inverse then

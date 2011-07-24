@@ -128,7 +128,9 @@ Species{
 		feet = "aerfoot1",
 		legs = "aerleg1",
 		lower = "aerlower1",
-		upper = "aerupper1"},
+		lower_safe = "aerbloomers1",
+		upper = "aerupper1",
+		upper_safe = "aerbloomerstop1"},
 	skills = {
 		{name = "dexterity", max = 80, val = 30},
 		{name = "health", max = 100, val = 50},
@@ -175,7 +177,9 @@ Species{
 		head = "aerhead1",
 		legs = "aerleg1",
 		lower = "aerlower1",
-		upper = "aerupper1"},
+		lower_safe = "aerbloomers1",
+		upper = "aerupper1",
+		upper_safe = "aerbloomerstop1"},
 	skills = {
 		{name = "dexterity", max = 60, val = 20},
 		{name = "health", max = 100, val = 50},
@@ -227,7 +231,9 @@ Species{
 		head = "aerhead1",
 		legs = "aerleg1",
 		lower = "aerlower1",
-		upper = "aerupper1"},
+		lower_safe = "aerbloomers1",
+		upper = "aerupper1",
+		upper_safe = "aerbloomerstop1"},
 	skills = {
 		{name = "dexterity", max = 100, val = 50},
 		{name = "health", max = 100, val = 50},
@@ -256,7 +262,8 @@ Species{
 		feet = "krakenfoot1",
 		legs = "krakenleg1",
 		lower = "krakenlower1",
-		upper = "aerupper1"},
+		upper = "aerupper1",
+		upper_safe = "aerbloomerstop1"},
 	skills = {
 		{name = "dexterity", max = 80, val = 30},
 		{name = "health", max = 100, val = 50},
@@ -285,7 +292,9 @@ Species{
 		feet = "aerfoot1",
 		legs = "aerleg1",
 		lower = "aerlower1",
-		upper = "aerupper1"},
+		lower_safe = "aerbloomers1",
+		upper = "aerupper1",
+		upper_safe = "aerbloomerstop1"},
 	skills = {
 		{name = "dexterity", max = 40, val = 20},
 		{name = "health", max = 100, val = 50},

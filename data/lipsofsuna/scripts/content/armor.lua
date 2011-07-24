@@ -7,7 +7,7 @@ Itemspec{
 	crafting_materials = {log = 1},
 	effect_craft = "craftsewing1",
 	equipment_models = {
-		["aer/android/devora/wyrm"] = {upper1 = "aerchinadress1", panties = "panties2"},
+		["aer/android/devora/wyrm"] = {upper_safe = false, upper1 = "aerchinadress1", panties = "panties2"},
 		["kraken"] = {upper1 = "aerchinadress1"}},
 	equipment_slot = "upperbody",
 	mass = 1,
@@ -76,7 +76,7 @@ Itemspec{
 	crafting_materials = {["iron ingot"] = 5},
 	effect_craft = "craftmetal1",
 	equipment_models = {
-		["aer/android/devora/kraken/wyrm"] = {upper1 = "aerupperplate1"}},
+		["aer/android/devora/kraken/wyrm"] = {upper_safe = false, upper1 = "aerupperplate1"}},
 	equipment_slot = "upperbody",
 	equipment_slots_reserved = {"lowerbody"},
 	mass = 25}
@@ -192,7 +192,7 @@ Itemspec{
 	crafting_materials = {hide = 4},
 	effect_craft = "craftsewing1",
 	equipment_models = {
-		["aer/android/devora/kraken/wyrm"] = {upper1 = "aerbra1"}},
+		["aer/android/devora/kraken/wyrm"] = {upper_safe = false, upper1 = "aerbra1"}},
 	equipment_slot = "upperbody",
 	mass = 5,
 	water_gravity = Vector(0,6,0)}
@@ -233,7 +233,7 @@ Itemspec{
 	crafting_materials = {["lizard scale"] = 6},
 	effect_craft = "craftsewing1",
 	equipment_models = {
-		["aer/android/devora/wyrm"] = {dress1 = "aerlizarddress1", panties = "panties2"},
+		["aer/android/devora/wyrm"] = {dress1 = "aerlizarddress1", panties = "panties2", upper_safe = false},
 		["kraken"] = {dress1 = "aerlizarddress1"}},
 	equipment_slot = "upperbody",
 	icon = "lizardarmor1",

@@ -49,6 +49,21 @@ local build = function(args)
 			end
 		end
 	end
+	-- Remove worksafety stuff in the eyecandy mode.
+	if args.nudity then
+		meshes["lower_safe"] = nil
+		meshes["upper_safe"] = nil
+	end
+	-- Remove the top if the character is sufficiently male.
+	if args.body_style then
+		local male = 0
+		if args.body_style[3] and args.body_style[3] < 0.1 then male = male + 5 end -- breast size
+		if args.body_style[4] and args.body_style[4] < 0.3 then male = male + 1 end -- hips wide
+		if args.body_style[4] and args.body_style[4] > 0.6 then male = male - 5 end -- hips wide
+		if args.body_style[6] and args.body_style[6] > 0.3 then male = male + 1 end -- torso wide
+		if args.body_style[8] and args.body_style[8] > 0.5 then male = male + 1 end -- waist wide
+		if male >= 7 then meshes["upper_safe"] = nil end
+	end
 	-- Create the skeleton.
 	local m = Model:find_or_load{file = meshes.skeleton}
 	m = m:copy()
