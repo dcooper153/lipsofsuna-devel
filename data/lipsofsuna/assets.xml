@@ -424,6 +424,15 @@
     <tag>prop</tag>
     <type>model</type>
   </asset>
+  
+  <asset>
+    <file>import/windowsill.blend</file>
+    <author>Harald</author>
+    <license>Creative Commons 0</license>
+    <status>textured</status>
+    <tag>prop</tag>
+    <type>model</type>
+  </asset>
 
   <asset>
     <file>import/bench-000.png</file>

@@ -154,6 +154,13 @@ Obstaclespec{
 	interactive = false}
 
 Obstaclespec{
+	name = "windowsill 1",
+	model = "windowsill1",
+	categories = {"prop"},
+	health = 100,
+	interactive = false}
+
+Obstaclespec{
 	name = "wooden mine support (simple)",
 	model = "minesupport3",
 	categories = {"prop"},
