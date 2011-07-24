@@ -433,6 +433,16 @@
     <tag>prop</tag>
     <type>model</type>
   </asset>
+  
+  <asset>
+    <file>import/classiclampost.blend</file>
+    <author>Andrew Kator &amp; Jennifer Legaz</author>
+    <license>Creative Commons 0</license>
+    <status>textured</status>
+    <source>http://www.katorlegaz.com/3d_models/lights_outdoor/0152/index.php</source>
+    <tag>prop</tag>
+    <type>model</type>
+  </asset>
 
   <asset>
     <file>import/bench-000.png</file>

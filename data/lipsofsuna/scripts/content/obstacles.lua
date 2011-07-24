@@ -126,6 +126,16 @@ Obstaclespec{
 	interactive = false}
 
 Obstaclespec{
+	name = "lamppost 1",
+	model = "lamppost01",
+	categories = {"prop"},
+	health = 100,
+	special_effects = {
+	  {type = "light", diffuse = {1,0.7,0.6,1}, equation = {0.5,0.5,0.5}, node = "#root"}
+	},
+	interactive = false}
+
+Obstaclespec{
 	name = "wooden mine support (wall)",
 	model = "minesupport2",
 	categories = {"prop"},
