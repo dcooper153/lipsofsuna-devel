@@ -28,10 +28,15 @@
 #define LIPHY_CHARACTER_FLIGHT_FACTOR 0.3f
 #define LIPHY_CHARACTER_RISING_LIMIT 5.0f 
 #define LIPHY_CHARACTER_GROUND_DAMPING 1.0f
+#define LIPHY_CHARACTER_HOVER_DETECTION_TIME 0.2f
+#define LIPHY_CHARACTER_HOVER_DETECTION_THRESHOLD 0.5f
+#define LIPHY_CHARACTER_HOVER_RESOLUTION_TIME 1.0f
 
 static void private_calculate_control (
+	int              ground,
 	float            current_speed,
 	float            target_speed,
+	const btVector3* position,
 	const btVector3* direction,
 	btVector3*       velocity_result,
 	btVector3*       acceleration_result);
@@ -44,6 +49,7 @@ LIPhyCharacterAction::LIPhyCharacterAction (
 	this->object = object;
 	this->timer = 0.0f;
 	this->ground = 0;
+	this->hover = 0.0f;
 }
 
 void LIPhyCharacterAction::updateAction (
@@ -80,7 +86,7 @@ void LIPhyCharacterAction::updateAction (
 
 	/* Check for ground. */
 	this->timer += delta;
-	if (this->timer >= 0.2f)
+	if (this->timer >= 0.05f)
 	{
 		LIMatVector check0 = { pos[0], pos[1] + 0.1f, pos[2] };
 		LIMatVector check1 = { pos[0], pos[1] - 0.6f, pos[2] };
@@ -103,6 +109,20 @@ void LIPhyCharacterAction::updateAction (
 	btVector3 vely = doty * -down;
 	btVector3 velz = dotz * -forward;
 
+	/* Hovering hack. */
+	/* The body is often large enough for a part of it to be able to get on
+	   obstacles while ground check ray cast indicates it being in air. This
+	   leads to the character appearing as is hovering. To stop prevent it,
+	   we grant ground contact status if we detect hovering. */
+	if (!ground && LIMAT_ABS (vely[1]) < LIPHY_CHARACTER_HOVER_DETECTION_THRESHOLD)
+		this->hover += delta;
+	else
+		this->hover = 0.0f;
+	if (this->hover >= LIPHY_CHARACTER_HOVER_DETECTION_TIME)
+		this->hover = -LIPHY_CHARACTER_HOVER_RESOLUTION_TIME;
+	if (this->hover < 0.0f)
+		this->ground = 1;
+
 	/* Damp when moving upwards too fast. */
 	/* Without this the player would shoot upwards from any slopes. */
 	/* FIXME: Doesn't work for non-vertical gravity. */
@@ -116,9 +136,9 @@ void LIPhyCharacterAction::updateAction (
 	/* Walking. */
 	speed = this->object->config.movement * this->object->config.speed;
 	speed *= 1.0f - this->object->config.friction_liquid * this->object->submerged;
-	if (speed != 0.0f)
+	if (speed != 0.0f && vely[1] > -5.0)
 	{
-		private_calculate_control (-dotz, speed, &forward, &velz, &accel);
+		private_calculate_control (ground, -dotz, speed, &pos, &forward, &velz, &accel);
 		velz *= damp0;
 	}
 	else if (ground)
@@ -127,9 +147,9 @@ void LIPhyCharacterAction::updateAction (
 	/* Strafing. */
 	speed = this->object->config.strafing * this->object->config.speed;
 	speed *= 1.0f - this->object->config.friction_liquid * this->object->submerged;
-	if (speed != 0.0f)
+	if (speed != 0.0f && vely[1] > -5.0)
 	{
-		private_calculate_control (dotx, speed, &right, &velx, &accel);
+		private_calculate_control (ground, dotx, speed, &pos, &right, &velx, &accel);
 		velx *= damp0;
 	}
 	else if (ground)
@@ -168,8 +188,10 @@ bool LIPhyCharacterControl::get_ground ()
 /*****************************************************************************/
 
 static void private_calculate_control (
+	int              ground,
 	float            current_speed,
 	float            target_speed,
+	const btVector3* position,
 	const btVector3* direction,
 	btVector3*       velocity_result,
 	btVector3*       acceleration_result)
@@ -178,16 +200,18 @@ static void private_calculate_control (
 	float speed_factor;
 
 	/* Set velocity. */
-	/* Fully acceleration-based movement may lead to the character not starting
-	   to walk properly due to contact friction. We work around this by forcing
-	   some of the target velocity on the character. We need to be careful not
-	   to hack the velocity too much or else the character will be able to push
-	   heavy objects effortlessly. */
-	speed_factor = limat_smoothstep (current_speed, 0.0f, 7.0f);
-	speed_factor = limat_mix (0.5f, 0.3f, speed_factor);
-	if ((target_speed > 0.0f && current_speed < speed_factor * target_speed) ||
-	    (target_speed < 0.0f && current_speed > speed_factor * target_speed))
-		*velocity_result = *direction * target_speed * speed_factor;
+	/* Fully acceleration-based movement doesn't allow slope climbing. If the
+	   character is on the ground, we force some of the target velocity to aid
+	   it at slopes. We need to be careful not to hack the velocity too much or
+	   else the character will be able to push heavy objects effortlessly. */
+	if (ground)
+	{
+		speed_factor = limat_smoothstep (current_speed, 0.0f, 7.0f);
+		speed_factor = limat_mix (0.5f, 0.3f, speed_factor);
+		if ((target_speed > 0.0f && current_speed < speed_factor * target_speed) ||
+			(target_speed < 0.0f && current_speed > speed_factor * target_speed))
+			*velocity_result = *direction * target_speed * speed_factor;
+	}
 
 	/* Set acceleration. */
 	/* Acceleration is only set when the character isn't already moving faster

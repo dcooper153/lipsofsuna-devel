@@ -173,6 +173,7 @@ public:
 public:
 	int ground;
 	float timer;
+	float hover;
 	LIPhyObject* object;
 };
 
