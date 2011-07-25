@@ -366,6 +366,22 @@ Object.update_motion_state = function(self, tick)
 	self.correction = self.correction * 0.93
 end
 
+--- Writes the appearance preset of the object to a string.
+-- @param self Object.
+-- @return String.
+Object.write_preset = function(self)
+	return serialize{
+		body_scale = self.body_scale,
+		body_style = self.body_style,
+		eye_color = self.eye_color,
+		eye_style = self.eye_style,
+		face_style = self.face_style,
+		hair_color = self.hair_color,
+		hair_style = self.hair_style,
+		skin_color = self.skin_color,
+		skin_style = self.skin_style}
+end
+
 Object.set_motion_state = function(self, pos, rot, vel, tilt)
 	-- Store the prediction error so that it can be corrected over time.
 	if (pos - self.position).length < 5 then
