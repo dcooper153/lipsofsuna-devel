@@ -13,7 +13,9 @@ Gui.init = function(clss)
 	skillgrp:append_row(Gui.skill_mana)
 	-- Chat entry.
 	Gui.chat_label = Widgets.Label{text = " "}
-	Gui.chat_entry = Widgets.Entry{transparent = true, visible = false}
+	Gui.chat_entry = Widgets.Entry{color = {1,1,1,1}, visible = false,
+		background = {dest_position = {0,4}, source_image = "widgets1",
+		source_position = {722,63}, source_tiling = {6,32,6,6,24,6}}}
 	Gui.chat_entry.pressed = function(self)
 		Network:send{packet = Packet(packets.PLAYER_CHAT, "string", self.text)}
 		self:clear()

@@ -9,6 +9,20 @@ Widgets.Entry.class_name = "Widgets.Entry"
 -- @return Entry widget.
 Widgets.Entry.new = function(clss, args)
 	local self = Widgets.Label.new(clss, args)
+	self.background = args and args.background
+	self.background_focus = args and args.background_focus
+	if not self.background then
+		self.background = {
+			dest_position = {0,0},
+			source_image = "widgets1",
+			source_position = {910,383},
+			source_tiling = {15,25,15,10,14,10}}
+		self.background_focus = {
+			dest_position = {0,0},
+			source_image = "widgets1",
+			source_position = {967,383},
+			source_tiling = {15,25,15,10,14,10}}
+	end
 	self.init = true
 	return self
 end
@@ -65,13 +79,14 @@ Widgets.Entry.reshaped = function(self)
 	local h = self.height
 	-- Pack the background.
 	self:canvas_clear()
-	if not self.transparent then
+	local style = self.focus and self.background_focus or self.background
+	if style then
 		self:canvas_image{
-			dest_position = {0,0},
+			dest_position = style.dest_position,
 			dest_size = {w,h},
-			source_image = "widgets1",
-			source_position = self.focused and {967,383} or {910,383},
-			source_tiling = {15,25,15,10,14,10}}
+			source_image = style.source_image,
+			source_position = style.source_position,
+			source_tiling = style.source_tiling}
 	end
 	-- Pack the text.
 	self:canvas_text{
@@ -79,7 +94,7 @@ Widgets.Entry.reshaped = function(self)
 		dest_size = {w,h},
 		text = text .. (self.focused and "|" or ""),
 		text_alignment = {0,0.5},
-		text_color = self.focused and {1,1,1,1} or {0.6,0.6,0.6,1},
+		text_color = self.color or self.focused and {1,1,1,1} or {0.6,0.6,0.6,1},
 		text_font = self.font}
 	self:canvas_compile()
 end

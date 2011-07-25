@@ -35,6 +35,12 @@ Widgets.DialogLabel.reshaped = function(self)
 	-- Populate the canvas.
 	self:canvas_clear()
 	if self.index and self.text then
+		self:canvas_image{
+			dest_position = {0,4},
+			dest_size = {w,h},
+			source_image = "widgets1",
+			source_position = {722,63},
+			source_tiling = {6,32,6,6,24,6}}
 		self:canvas_text{
 			dest_position = {0,0},
 			dest_size = {w,h},
