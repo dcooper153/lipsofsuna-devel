@@ -37,7 +37,7 @@ Player.pick_look = function(clss)
 	if not r1 then return end
 	local p,o = Target:pick_ray{ray1 = r1, ray2 = r2}
 	-- Update highlighting.
-	if o ~= Target.target_object then
+	if o ~= Target.target_object and Object.set_effect then
 		if Target.target_object then
 			Target.target_object:set_effect()
 		end
