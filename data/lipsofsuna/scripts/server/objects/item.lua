@@ -264,17 +264,28 @@ end
 -- @param self Object.
 -- @param user User.
 Item.use_cb = function(self, user)
+	local rundialog = function()
+		if not self.dialog then
+			local dialog = Dialog{object = self, user = user}
+			if dialog then
+				self.dialog = dialog
+				self.dialog:execute()
+			end
+		end
+	end
 	-- Actions that take preference over picking up.
 	-- Containers are looted instead of being picked up since the player
 	-- usually doesn't want to pick up heavy chests. Books are read since
 	-- they aren't horribly useful after being read once.
 	if self.spec.categories["container"] then
 		self:loot(user)
+		rundialog()
 		return
 	elseif self.spec.categories["book"] then
 		user:send{packet = Packet(packets.BOOK,
 			"string", self.spec.name,
 			"string", self.spec.book_text)}
+		rundialog()
 		return
 	end
 	-- Pick up items not yet in the inventory of the user.
@@ -320,6 +331,8 @@ Item.use_cb = function(self, user)
 	if self.spec.effect_use then
 		Effect:play{effect = self.spec.effect_use, object = user}
 	end
+	-- Execute the dialog.
+	rundialog()
 end
 
 --- Called when the item is being equipped.
