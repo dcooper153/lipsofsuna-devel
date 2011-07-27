@@ -47,7 +47,12 @@ Gui.init = function(clss)
 end
 
 Gui.resize = function(self)
+	-- Check for changes to the screen size.
 	local size = Vector(Program.video_mode[1], Program.video_mode[2])
+	if not self.need_rebuild and self.prev_size and size.x == self.prev_size.x and size.y == self.prev_size.y then return end
+	self.need_rebuild = nil
+	self.prev_size = size
+	-- Update widget positions to match the new screen size.
 	self.skills_group.offset = Vector(4, size.y - 80)
 	self.skills_group.request = Vector(size.x-4,82)
 	self.button_respawn.offset = Vector(size.x / 2 - 100, size.y / 2 - 30)
@@ -116,6 +121,8 @@ Gui.set_dialog = function(clss, id)
 		clss.group_dialog:append_row(widget)
 		clss.group_dialog.visible = true
 	end
+	-- Make sure the dialog widget is positioned correctly.
+	clss.need_rebuild = true
 end
 
 --- Sets or unsets the active target.
