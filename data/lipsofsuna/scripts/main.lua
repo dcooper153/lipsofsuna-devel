@@ -99,6 +99,8 @@ for k,v in pairs(File:scan_directory("scripts/content/dialogs")) do
 	require("content/dialogs/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
 
+Itemspec:validate()
+
 if Settings.quit then Program.quit = true end
 if Settings.server then
 	require "server/main"

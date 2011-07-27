@@ -402,7 +402,7 @@ Itemspec{
 	categories = {"container"},
 	inventory_size = 20,
 	inventory_type = "chest",
-	inventory_items = {"wooden sword", "wooden hatchet", "wooden mattock", "wooden bow", "wooden crossbow", "wooden spear", "log", "log", "log", "iron musket", "iron revolver", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet"},
+	inventory_items = {"wooden sword", "wooden hatchet", "wooden mattock", "wooden bow", "wooden crossbow", "log", "log", "log", "iron musket", "iron revolver", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet", "bullet"},
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
 

@@ -164,3 +164,14 @@ Itemspec.get_trading_value = function(self)
 	self.value = value
 	return value
 end
+
+Itemspec.validate = function(clss)
+	for name,spec in pairs(clss.dict_name) do
+		-- Validate inventory items.
+		for slot,item in pairs(spec.inventory_items) do
+			if not clss.dict_name[item] then
+				error(string.format("item %q contains an invalid item %q", name, item))
+			end
+		end
+	end
+end
