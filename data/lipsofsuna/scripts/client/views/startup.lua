@@ -43,7 +43,7 @@ Views.Startup.enter = function(self, from)
 	if from then
 		for k,v in pairs(Object.objects) do v:detach() end
 		Player.object = nil
-		Gui.main.floating = false
+		Gui.scene.floating = false
 	end
 	-- Show the UI.
 	self.floating = true

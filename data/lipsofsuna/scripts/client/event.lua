@@ -146,6 +146,7 @@ Eventhandler{type = "tick", func = function(self, args)
 		Client.views.startup:set_state("Lost connection to the server!")
 	end
 	-- Update the cursor.
+	Gui:resize()
 	Widgets.Cursor.inst:update()
 	-- Update built models.
 	while true do

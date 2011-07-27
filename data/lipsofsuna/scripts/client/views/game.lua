@@ -18,7 +18,7 @@ end
 Views.Game.enter = function(self, from)
 	-- Handle fresh startup.
 	if from == "startup" or from == "chargen" then
-		Gui.main.floating = true
+		Gui.scene.floating = true
 		Program:unload_world()
 		Sound:switch_music_track("game")
 	end

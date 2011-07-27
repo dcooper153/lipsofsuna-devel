@@ -52,7 +52,7 @@ Views.Login.enter = function(self, from)
 	if from then
 		for k,v in pairs(Object.objects) do v:detach() end
 		Player.object = nil
-		Gui.main.floating = false
+		Gui.scene.floating = false
 	end
 	if from ~= "controls" and from ~= "join" and from ~= "host" and from ~= "options" then
 		Sound:switch_music_track("menu")

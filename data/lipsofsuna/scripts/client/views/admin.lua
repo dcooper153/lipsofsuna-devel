@@ -19,7 +19,6 @@ Views.Admin.new = function(clss)
 end
 
 Views.Admin.enter = function(self, from, level)
-	Gui.chat_history.visible = false
 	Gui.menus:open{level = level, widget = self}
 	Network:send{packet = Packet(packets.ADMIN_STATS)}
 	-- Client stats.
@@ -61,5 +60,4 @@ Views.Admin.back = function(self)
 end
 
 Views.Admin.close = function(self)
-	Gui.chat_history.visible = true
 end

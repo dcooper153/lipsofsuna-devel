@@ -54,7 +54,6 @@ end
 --- Closes the book view.
 -- @param self Help view.
 Views.Help.close = function(self)
-	Gui.chat_history.visible = true
 	self.return_mode = nil
 	self.mode = nil
 end
@@ -72,7 +71,6 @@ Views.Help.enter = function(self, from, level)
 		self:show("index")
 	end
 	-- Show the UI.
-	Gui.chat_history.visible = false
 	Gui.menus:open{level = level, widget = self}
 end
 

@@ -66,13 +66,6 @@ Client.set_mode = function(self, mode, level)
 	Drag:cancel()
 	if self.view and self.view.close then self.view:close() end
 	if Widgets.ComboBox.active then Widgets.ComboBox.active:close() end
-	-- Maintain dialog visibility.
-	-- Dialogs don't fit most of the time so only show them in game and menu modes.
-	if mode == "game" or mode == "menu" then
-		Gui.group_dialog.visible = true
-	else
-		Gui.group_dialog.visible = false
-	end
 	-- Open the new view.
 	local from = self.mode
 	self.mode = mode

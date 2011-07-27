@@ -4,83 +4,68 @@ Gui = Class()
 -- @param clss Gui class.
 Gui.init = function(clss)
 	Gui.menus = Widgets.Menus()
+	-- Chat widgets.
 	Gui.chat_history = Widgets.Log()
-	-- Skill group.
-	Gui.skill_health = Widgets.SkillControl{compact = true}
-	Gui.skill_mana = Widgets.SkillControl{compact = true}
-	local skillgrp = Widget{cols = 1, spacings = {0,0}}
-	skillgrp:append_row(Gui.skill_health)
-	skillgrp:append_row(Gui.skill_mana)
-	-- Chat entry.
 	Gui.chat_label = Widgets.Label{text = " "}
-	Gui.chat_entry = Widgets.Entry{color = {1,1,1,1}, visible = false,
+	Gui.chat_entry = Widgets.Entry{color = {1,1,1,1}, visible = false, width_request = 500,
 		background = {dest_position = {0,4}, source_image = "widgets1",
 		source_position = {722,63}, source_tiling = {6,32,6,6,24,6}}}
 	Gui.chat_entry.pressed = function(self)
 		Network:send{packet = Packet(packets.PLAYER_CHAT, "string", self.text)}
 		self:clear()
 	end
-	Gui.chat_group = Widget{cols = 1, spacings = {0,0}}
-	Gui.chat_group:append_row(Gui.chat_history)
-	Gui.chat_group:set_expand{col = 1, row = 1}
-	Gui.chat_group = Widget{cols = 2, rows = 1, spacings = {0, 0}}
-	Gui.chat_group:set_child(1, 1, Gui.chat_label)
-	Gui.chat_group:set_child(2, 1, Gui.chat_entry)
-	Gui.chat_group:set_expand{col = 2}
-	-- Skills group.
-	local pad = Widget()
-	pad:set_request{width = 64}
-	Gui.fps_label = Widgets.Label{valign = 1}
-	Gui.skills_group = Widgets.Frame{cols = 4, rows = 2, style = "quickbar"}
-	Gui.skills_group:set_child{col = 1, row = 2, widget = skillgrp}
-	Gui.skills_group:set_child{col = 2, row = 2, widget = pad}
-	Gui.skills_group:set_child{col = 3, row = 1, widget = Gui.chat_group}
-	Gui.skills_group:set_child{col = 3, row = 2, widget = Quickslots.group}
-	Gui.skills_group:set_child{col = 4, row = 2, widget = Gui.fps_label}
-	Gui.skills_group:set_expand{col = 3}
-	-- Modifiers.
-	Gui.modifiers = Widgets.Modifiers()
-	-- Respawning.
-	Gui.button_respawn = Widgets.Button{font = "medium", text = "Create a new character",
-		pressed = function() Network:send{packet = Packet(packets.PLAYER_RESPAWN)} end}
-	Gui.group_respawn = Widget{cols = 1, rows = 3, margins = {0,0,5,0}, visible = false}
-	Gui.group_respawn:set_expand{col = 1, row = 1}
-	Gui.group_respawn:set_expand{row = 3}
-	Gui.group_respawn:set_child(1, 1, Gui.button_respawn)
-	Gui.group_respawn:set_child(1, 2, Gui.button_respawn)
-	-- Dialog.
+	-- Skill widgets.
+	Gui.skill_health = Widgets.SkillControl{compact = true}
+	Gui.skill_mana = Widgets.SkillControl{compact = true}
+	Gui.fps_label = Widgets.Label{valign = 1, request = Vector(60,20)}
+	-- NPC dialog.
 	Gui.group_dialog = Widget{cols = 1, rows = 3}
 	Gui.group_dialog:set_expand{row = 1}
 	Gui.group_dialog:set_child(1, 2, Widgets.Label())
+	-- Modifiers, respawning and skill background.
+	Gui.modifiers = Widgets.Modifiers()
+	Gui.button_respawn = Widgets.Button{font = "medium", text = "Create a new character", visible = false,
+		pressed = function() Network:send{packet = Packet(packets.PLAYER_RESPAWN)} end}
+	Gui.skills_group = Widgets.Frame{style = "quickbar"}
 	-- Packing.
-	Gui.group_top = Widget{cols = 3, rows = 1}
-	Gui.group_top:set_expand{col = 1}
-	Gui.group_top:set_child(1, 1, Gui.chat_history)
-	Gui.group_top:set_child(2, 1, Gui.modifiers)
-	Gui.group_top:set_child(3, 1, Gui.group_respawn)
-	Gui.group_middle = Widget{cols = 2, rows = 1}
-	Gui.group_middle:set_expand{col = 1, row = 1}
-	Gui.group_middle:set_child(1, 1, Gui.menus)
-	Gui.group_middle:set_child(2, 1, Gui.group_dialog)
-	Gui.scene = Widgets.Scene{cols = 1, rows = 3, margins = {5,5,0,0}, spacings = {0,0}}
+	Gui.scene = Widgets.Scene{cols = 1, rows = 3, behind = true, fullscreen = true, margins = {5,5,0,0}, spacings = {0,0}}
 	Gui.scene:set_expand{col = 1, row = 1}
-	Gui.scene:set_child(1, 1, Gui.group_top)
-	Gui.scene:set_child(1, 2, Gui.group_middle)
-	Gui.scene:set_child(1, 3, Gui.skills_group)
-	Gui.main = Widget{cols = 1, behind = true, fullscreen = true}
-	Gui.main:append_row(Gui.scene)
-	Gui.main:set_expand{col = 1, row = 1}
+	Gui.scene:set_request{width = 32, height = 32}
+	Gui.scene:add_child(Gui.button_respawn)
+	Gui.scene:add_child(Gui.menus)
+	Gui.scene:add_child(Gui.group_dialog)
+	Gui.scene:add_child(Quickslots.group)
+	Gui.scene:add_child(Gui.modifiers)
+	Gui.scene:add_child(Gui.fps_label)
+	Gui.scene:add_child(Gui.chat_history)
+	Gui.scene:add_child(Gui.chat_label)
+	Gui.scene:add_child(Gui.chat_entry)
+	Gui.scene:add_child(Gui.skill_health)
+	Gui.scene:add_child(Gui.skill_mana)
+	Gui.scene:add_child(Gui.skills_group)
+	Gui:resize()
+end
+
+Gui.resize = function(self)
+	local size = Vector(Program.video_mode[1], Program.video_mode[2])
+	self.skills_group.offset = Vector(4, size.y - 80)
+	self.skills_group.request = Vector(size.x-4,82)
+	self.button_respawn.offset = Vector(size.x / 2 - 100, size.y / 2 - 30)
+	self.menus.offset = Vector((size.x - self.menus.width) / 2, size.y - self.menus.height - 80)
+	self.modifiers.offset = Vector(size.x - self.modifiers.width - 5, 5)
+	self.group_dialog.offset = Vector(size.x - 510, size.y - self.group_dialog.height - 60)
+	self.chat_label.offset = Vector(250, size.y - 70)
+	self.chat_entry.offset = Vector(300, size.y - 70)
+	self.chat_history.offset = Vector(5, 0)
+	self.skill_health.offset = Vector(83, size.y - 37)
+	self.skill_mana.offset = Vector(83, size.y - 21)
+	self.fps_label.offset = Vector(size.x - 60, size.y - 20)
+	Quickslots.group.offset = Vector(250, size.y - 36)
 end
 
 Gui.set_dead = function(self, value)
-	if self.group_respawn.visible == value then return end
-	if value then
-		self.modifiers.visible = false
-		self.group_respawn.visible = true
-	else
-		self.group_respawn.visible = false
-		self.modifiers.visible = true
-	end
+	if self.button_respawn.visible == value then return end
+	self.button_respawn.visible = value
 end
 
 --- Sets or unsets the text of the action label.
