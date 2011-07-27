@@ -83,6 +83,7 @@ Species.dict_name = {}
 --   <li>timing_spell_self: Timing of casting a spell on self, in frames.</li>
 --   <li>timing_spell_touch: Timing of casting a spell on touch, in frames.</li>
 --   <li>view_cone: View cone angle in radians.</li>
+--   <li>weapon_slot: Name of the weapon slot.</li>
 --   <li>water_friction: How much being in water slows the creature down.</li>
 --   <li>water_gravity: The gravity of the creature in water.</li></ul>
 -- @return New species.
@@ -274,6 +275,7 @@ Species.new = function(clss, args)
 	copy("timing_spell_self", 40)
 	copy("timing_spell_touch", 40)
 	copy("view_cone", 0.8 * math.pi)
+	copy("weapon_slot", "hand.R")
 	copy("water_friction", 0.8)
 	copy("water_gravity", Vector(0,-1,0))
 	-- Precalculate combat abilities.

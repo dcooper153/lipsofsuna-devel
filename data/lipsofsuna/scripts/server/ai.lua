@@ -70,7 +70,7 @@ end
 -- @return Tilt angle in radians.
 Ai.calculate_ranged_tilt = function(self)
 	-- Get the ammo type.
-	local weapon = self.object:get_item{slot = "hand.R"}
+	local weapon = self.object:get_weapon()
 	if not weapon or not weapon.spec.ammo_type then return Quaternion() end
 	local spec = Itemspec:find{name = weapon.spec.ammo_type}
 	if not spec then return Quaternion() end
@@ -226,7 +226,7 @@ Ai.choose_combat_action = function(self)
 	-- also used by all the checks so they're determined here.
 	local feat
 	local attack = spec.ai_enable_attack and not self.cooldown and (allow_forward or allow_forward_jump or not spec.ai_enable_walk)
-	local weapon = self.object:get_item{slot = "hand.R"}
+	local weapon = self.object:get_weapon()
 	local look = self.object.rotation * Vector(0,0,-1)
 	local aim = dir:dot(Vector(look.x, 0, look.z):normalize())
 	-- Calculate the melee attack probability.
@@ -405,7 +405,7 @@ Ai.choose_combat_action = function(self)
 			if self.best_melee_weapon then
 				self.object:equip_item{object = self.best_melee_weapon}
 			else
-				self.object:unequip_item{slot = "hand.R"}
+				self.object:unequip_item{slot = self.object.spec.weapon_slot}
 			end
 		elseif self.ranged_rating > self.throw_rating then
 			self.object:equip_item{object = self.best_ranged_weapon}

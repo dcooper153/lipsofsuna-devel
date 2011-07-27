@@ -43,7 +43,7 @@ end
 
 Player.attack_charge_start = function(self)
 	if self.cooldown then return end
-	local weapon = self:get_item{slot = "hand.R"}
+	local weapon = self:get_weapon()
 	if weapon and weapon.spec.animation_charge then
 		self:animate(weapon.spec.animation_charge, true)
 	else
@@ -55,7 +55,7 @@ end
 Player.attack_charge_end = function(self, args)
 	-- Get the feat animation.
 	local anim = nil
-	local weapon = self:get_item{slot = "hand.R"}
+	local weapon = self:get_weapon()
 	if not weapon or weapon.spec.categories["melee"] then
 		anim = "right hand"
 	elseif weapon.spec.categories["ranged"] then

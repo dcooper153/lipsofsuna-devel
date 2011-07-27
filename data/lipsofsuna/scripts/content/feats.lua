@@ -5,8 +5,7 @@ Featanimspec{
 	categories = {"build"},
 	cooldown = 0.5,
 	effect = "swing1",
-	required_weapon = "build",
-	slot = "hand.R"}
+	required_weapon = "build"}
 
 Featanimspec{
 	name = "right hand",
@@ -18,8 +17,7 @@ Featanimspec{
 	cooldown = 0.8,
 	effect = "swing1",
 	effect_impact = "impact1",
-	required_weapon = "melee",
-	slot = "hand.R"}
+	required_weapon = "melee"}
 
 Featanimspec{
 	name = "ranged",
@@ -31,8 +29,7 @@ Featanimspec{
 	cooldown = 1.2,
 	effect_impact = "impact1",
 	required_ammo = true,
-	required_weapon = "ranged",
-	slot = "hand.R"}
+	required_weapon = "ranged"}
 
 Featanimspec{
 	name = "ranged spell",
@@ -70,8 +67,7 @@ Featanimspec{
 	cooldown = 1,
 	effect = "swing1",
 	effect_impact = "impact1",
-	required_weapon = "throwable",
-	slot = "hand.R"}
+	required_weapon = "throwable"}
 
 ---------------------------------------------------------------------
 -- Effects usable to players.

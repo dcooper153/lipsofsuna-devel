@@ -95,9 +95,9 @@ Item.contact_cb = function(self, result)
 		-- Boomerang mode.
 		if result.object == self.contact_args.owner then
 			-- Owner catch.
-			local o = self.contact_args.owner:get_item{slot = "hand.R"}
+			local o = self.contact_args.owner:get_weapon()
 			if not o then
-				self.contact_args.owner:set_item{slot = "hand.R", object = self}
+				self.contact_args.owner:set_weapon(self)
 			elseif not o:merge{object = self} then
 				self.contact_args.owner:add_item{object = proj}
 			end

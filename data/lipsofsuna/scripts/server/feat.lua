@@ -130,7 +130,7 @@ end
 -- @return True if performed successfully.
 Feat.perform = function(self, args)
 	local anim = Featanimspec:find{name = self.animation}
-	local slot = anim and anim.slot
+	local slot = anim and (anim.slot or (anim.required_weapon and args.user.spec.weapon_slot))
 	local weapon = slot and args.user:get_item{slot = slot}
 	local info = anim and self:get_info{attacker = args.user, weapon = weapon}
 	-- Check for cooldown and requirements.
@@ -236,7 +236,7 @@ Feat.usable = function(self, args)
 	-- Check for weapon.
 	if info.required_weapon then
 		if not inventory then return info.required_weapon == "melee" end
-		local weapon = inventory:get_object{slot = "hand.R"}
+		local weapon = inventory:get_object{slot = args.user.spec.weapon_slot}
 		if not weapon then return info.required_weapon == "melee" end
 		if not weapon.spec.categories[info.required_weapon] then return end
 	end

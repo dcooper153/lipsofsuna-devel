@@ -370,6 +370,14 @@ Creature.damaged = function(self, args)
 	end
 end
 
+Creature.get_weapon = function(self)
+	return self:get_item{slot = self.spec.weapon_slot}
+end
+
+Creature.set_weapon = function(self, value)
+	return self:set_item{slot = self.spec.weapon_slot, object = value}
+end
+
 Creature.set_dead_state = function(self, drop)
 	-- Playback animation.
 	-- This needs to be done first because setting the 'dead' member will
@@ -392,7 +400,7 @@ Creature.set_dead_state = function(self, drop)
 			o.position = self.position
 			o.realized = true
 		end
-		o = self:get_item{slot = "hand.R"}
+		o = self:get_weapon()
 		if o then
 			o:detach()
 			o.position = self.position
