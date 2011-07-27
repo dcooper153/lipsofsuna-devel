@@ -152,6 +152,7 @@ void liren_render32_draw_indexed_triangles_T2V3 (
 	int               index_count)
 {
 	int j;
+	LIMatMatrix identity = limat_matrix_identity ();
 
 	liren_context32_set_shader (self->context, 0, shader);
 	liren_context32_set_blend (self->context, 1, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -159,6 +160,8 @@ void liren_render32_draw_indexed_triangles_T2V3 (
 	liren_context32_set_cull (self->context, 0, GL_CCW);
 	liren_context32_set_diffuse (self->context, diffuse);
 	liren_context32_set_depth (self->context, 0, 0, GL_LEQUAL);
+	liren_context32_set_modelmatrix (self->context, &identity);
+	liren_context32_set_viewmatrix (self->context, &identity);
 	liren_context32_set_projection (self->context, matrix);
 	liren_context32_set_textures_raw (self->context, &texture, 1);
 	liren_context32_bind (self->context);

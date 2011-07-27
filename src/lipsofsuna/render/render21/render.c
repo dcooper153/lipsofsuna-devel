@@ -151,6 +151,8 @@ void liren_render21_draw_indexed_triangles_T2V3 (
 	glDisable (GL_CULL_FACE);
 	glColor4fv (diffuse);
 	glDisable (GL_DEPTH_TEST);
+	glMatrixMode (GL_MODELVIEW);
+	glLoadIdentity ();
 	glMatrixMode (GL_PROJECTION);
 	glLoadMatrixf (matrix->m);
 	glBindTexture (GL_TEXTURE_2D, texture);
