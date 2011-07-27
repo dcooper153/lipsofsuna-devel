@@ -2,6 +2,7 @@ Quest{name = "Agathe's House"}
 Quest{name = "Chara's Illusion"}
 Quest{name = "Elise's Sorrow"}
 Quest{name = "Erinyes"}
+Quest{name = "Keepers of Knowledge"}
 Quest{name = "Maurice's House"}
 Quest{name = "Peculiar Pet"}
 Quest{name = "Portal of Lips"}

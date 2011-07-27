@@ -569,6 +569,28 @@ Itemspec{
 	mass = 15}
 
 Itemspec{
+	name = "security robot arm",
+	model = "musket1",
+	icon = "musket1",
+	ammo_type = "bullet",
+	categories = {"ranged", "weapon"},
+	effect_attack = "musket1",
+	influences_base = {physical = -30},
+	equipment_slot = "robotarm.R",
+	mass = 15}
+
+Itemspec{
+	name = "security turret barrel",
+	model = "musket1",
+	icon = "musket1",
+	ammo_type = "bullet",
+	categories = {"ranged", "weapon"},
+	effect_attack = "musket1",
+	influences_base = {physical = -15},
+	equipment_slot = "turretbarrel",
+	mass = 15}
+
+Itemspec{
 	name = "stone dagger",
 	model = "dagger1", -- FIXME
 	icon = "dagger1",

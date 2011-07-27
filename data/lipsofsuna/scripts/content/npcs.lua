@@ -48,6 +48,83 @@ Species{
 	marker = "erinyes"}
 
 Species{
+	name = "library security enforcer",
+	base = "base",
+	model = "barrel1",
+	dialog = "librarysecurityenforcer",
+	marker = "sealed library",
+	ai_enable_wander = false,
+	ai_offsense_factor = 1,
+	aim_ray_start = 0.7,
+	factions = {"keepers of knowledge"},
+	feat_anims = {"ranged"},
+	feat_effects = {"physical damage"},
+	inventory_size = 4,
+	inventory_items = {["bullet"] = 100, "security robot arm"},
+	equipment_slots = {
+		{name = "robotarm.L", node = "#hand.L"},
+		{name = "robotarm.R", node = "#hand.R"}},
+	skills = {
+		{name = "dexterity", max = 10, val = 10},
+		{name = "health", max = 100, val = 100},
+		{name = "intelligence", max = 10, val = 10},
+		{name = "perception", max = 30, val = 30},
+		{name = "strength", max = 100, val = 100},
+		{name = "willpower", max = 100, val = 100}},
+	weapon_slot = "robotarm.R"}
+
+Species{
+	name = "library security robot",
+	base = "base",
+	model = "barrel1",
+	factions = {"sealed library"},
+	feat_anims = {"ranged"},
+	feat_effects = {"physical damage"},
+	aim_ray_start = 0.7,
+	inventory_size = 4,
+	inventory_items = {["bullet"] = 100, "security robot arm"},
+	equipment_slots = {
+		{name = "robotarm.L", node = "#hand.L"},
+		{name = "robotarm.R", node = "#hand.R"}},
+	skills = {
+		{name = "dexterity", max = 10, val = 10},
+		{name = "health", max = 100, val = 100},
+		{name = "intelligence", max = 10, val = 10},
+		{name = "perception", max = 30, val = 30},
+		{name = "strength", max = 100, val = 100},
+		{name = "willpower", max = 100, val = 100}},
+	weapon_slot = "robotarm.R"}
+
+Species{
+	name = "library security turret",
+	base = "base",
+	model = "barrel1",
+	ai_enable_backstep = false,
+	ai_enable_block = false,
+	ai_enable_jump = false,
+	ai_enable_strafe = false,
+	ai_enable_wander = false,
+	ai_enable_walk = false,
+	ai_enable_weapon_switch = false,
+	aim_ray_start = 0.7,
+	-- TODO: Should have no gravity, shouldn't be pushable
+	factions = {"sealed library"},
+	feat_anims = {"ranged"},
+	feat_effects = {"physical damage"},
+	inventory_size = 2,
+	inventory_items = {["bullet"] = 100, "security turret barrel"},
+	equipment_slots = {
+		{name = "turretbarrel", node = "#barrel"}},
+	skills = {
+		{name = "dexterity", max = 10, val = 10},
+		{name = "health", max = 100, val = 100},
+		{name = "intelligence", max = 10, val = 10},
+		{name = "perception", max = 30, val = 30},
+		{name = "strength", max = 100, val = 100},
+		{name = "willpower", max = 100, val = 100}},
+	weapon_slot = "turretbarrel"}
+
+Species{
 	name = "Martin",
 	base = "aermale",
 	dialog = "martin",

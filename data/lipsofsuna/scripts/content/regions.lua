@@ -17,6 +17,13 @@ Regionspec{
 	spawn_point = {17,15,22}}
 
 Regionspec{
+	name = "Great Library",
+	categories = {"special"},
+	depth = {930,1000},
+	distance = {"Lips",30,60},
+	pattern_name = "greatlibrary1"}
+
+Regionspec{
 	name = "Chasm",
 	categories = {"special"},
 	depth = {930,1000},
@@ -46,6 +53,13 @@ Regionspec{
 	depth = {930,1000},
 	distance = {"Lips",30,60},
 	pattern_name = "sanctuary1"}
+
+Regionspec{
+	name = "Sealed Library",
+	categories = {"special"},
+	depth = {930,1000},
+	distance = {"Lips",30,60},
+	pattern_name = "sealedlibrary1"}
 
 Regionspec{
 	name = "Chara's Root Grove",

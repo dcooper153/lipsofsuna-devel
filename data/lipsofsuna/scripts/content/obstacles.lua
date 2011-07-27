@@ -100,6 +100,13 @@ Obstaclespec{
 	dialog = "bridgechest",
 	marker = "bridgechest"}
 
+Obstaclespec{
+	name = "great library steam lever",
+	model = "torch1",
+	categories = {"special"},
+	dialog = "greatlibrarysteamlever",
+	marker = "great library"}
+
 ------------------------------------------------------------------------------
 -- Map objects
 
