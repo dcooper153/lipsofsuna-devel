@@ -4,6 +4,7 @@ Widgets.Label.class_name = "Widgets.Label"
 Widgets.Label.new = function(clss, args)
 	local self = Widget.new(clss)
 	local copy = function(f, d) self[f] = (args and args[f] ~= nil) and args[f] or d end
+	copy("request")
 	copy("width_request")
 	copy("color")
 	copy("font", "default")

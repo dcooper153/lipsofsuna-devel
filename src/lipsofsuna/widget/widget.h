@@ -68,7 +68,7 @@ struct _LIWdgWidget
 	LIWdgRect allocation;
 	LIWdgSize request[3];
 
-	/* Hierarchy. */
+	/* Table layout. */
 	int width;
 	int height;
 	int homogeneous;
@@ -84,6 +84,10 @@ struct _LIWdgWidget
 	LIWdgGroupRow* rows;
 	LIWdgGroupCol* cols;
 	LIWdgGroupCell* cells;
+
+	/* Manual layout. */
+	LIWdgRect offset;
+	LIWdgWidget* children;
 };
 
 LIAPICALL (LIWdgWidget*, liwdg_widget_new, (
@@ -91,6 +95,10 @@ LIAPICALL (LIWdgWidget*, liwdg_widget_new, (
 
 LIAPICALL (void, liwdg_widget_free, (
 	LIWdgWidget* self));
+
+LIAPICALL (void, liwdg_widget_add_child, (
+	LIWdgWidget* self,
+	LIWdgWidget* child));
 
 LIAPICALL (int, liwdg_widget_append_col, (
 	LIWdgWidget* self));
@@ -284,6 +292,16 @@ LIAPICALL (void, liwdg_widget_set_row_expand, (
 	LIWdgWidget* self,
 	int          y,
 	int          expand));
+
+LIAPICALL (void, liwdg_widget_get_offset, (
+	LIWdgWidget* self,
+	int*         x,
+	int*         y));
+
+LIAPICALL (void, liwdg_widget_set_offset, (
+	LIWdgWidget* self,
+	int          x,
+	int          y));
 
 LIAPICALL (LIScrData*, liwdg_widget_get_script, (
 	LIWdgWidget* self));

@@ -63,6 +63,11 @@ static int private_get_row_size (
 	LIWdgWidget* self,
 	int          y);
 
+static LIWdgWidget* private_table_child_at (
+	LIWdgWidget* self,
+	int          pixx,
+	int          pixy);
+
 /*****************************************************************************/
 
 LIWdgWidget* liwdg_widget_new (
@@ -124,6 +129,18 @@ void liwdg_widget_free (LIWdgWidget* self)
 	lisys_free (self->cells);
 	lialg_ptrdic_remove (self->manager->widgets.all, self);
 	lisys_free (self);
+}
+
+void liwdg_widget_add_child (
+	LIWdgWidget* self,
+	LIWdgWidget* child)
+{
+	child->prev = NULL;
+	child->next = self->children;
+	if (self->children != NULL)
+		self->children->prev = child;
+	self->children = child;
+	child->parent = self;
 }
 
 /**
@@ -201,40 +218,33 @@ LIWdgWidget* liwdg_widget_child_at (
 	int          pixx,
 	int          pixy)
 {
-	int x;
-	int y;
 	LIWdgRect rect;
+	LIWdgWidget* widget;
 
 	liwdg_widget_get_allocation (self, &rect);
 	pixx -= rect.x;
 	pixy -= rect.y;
 
-	/* Get column. */
-	for (x = 0 ; x < self->width ; x++)
-	{
-		if (pixx >= self->cols[x].start + self->cols[x].allocation)
-			continue;
-		if (pixx >= self->cols[x].start)
-			break;
-		return NULL;
-	}
-	if (x == self->width)
-		return NULL;
+	/* Try table packet widgets. */
+	widget = private_table_child_at (self, pixx, pixy);
+	if (widget != NULL)
+		return widget;
 
-	/* Get row. */
-	for (y = 0 ; y < self->height ; y++)
+	/* Try manually packed widgets. */
+	if (self->children != NULL)
 	{
-		if (pixy >= self->rows[y].start + self->rows[y].allocation)
-			continue;
-		if (pixy >= self->rows[y].start)
-			break;
-		return NULL;
+		for (widget = self->children ; widget->next != NULL ; widget = widget->next)
+			{}
+		for ( ; widget != NULL ; widget = widget->prev)
+		{
+			if (widget->visible &&
+			    widget->allocation.x <= pixx && pixx < widget->allocation.x + widget->allocation.width &&
+			    widget->allocation.y <= pixy && pixy < widget->allocation.y + widget->allocation.height)
+				return widget;
+		}
 	}
-	if (y == self->height)
-		return NULL;
 
-	/* Return the child. */
-	return self->cells[x + y * self->width].child;
+	return NULL;
 }
 
 /**
@@ -252,6 +262,7 @@ void liwdg_widget_child_request (
 	LIWdgSize size;
 	LIWdgGroupCell* cell;
 
+	/* Table layout. */
 	for (y = 0 ; y < self->height ; y++)
 	{
 		for (x = 0 ; x < self->width ; x++)
@@ -268,7 +279,13 @@ void liwdg_widget_child_request (
 			}
 		}
 	}
-	lisys_assert (0 && "Invalid child request");
+
+	/* Manual layout. */
+	liwdg_widget_get_request (child, &size);
+	liwdg_widget_set_allocation (child,
+		self->allocation.x + child->offset.x,
+		self->allocation.y + child->offset.y,
+		size.width, size.height);
 }
 
 LIWdgWidget* liwdg_widget_cycle_focus (
@@ -405,6 +422,7 @@ void liwdg_widget_detach_child (
 	int y;
 	LIWdgGroupCell* cell;
 
+	/* Table packing. */
 	for (y = 0 ; y < self->height ; y++)
 	{
 		for (x = 0 ; x < self->width ; x++)
@@ -417,6 +435,17 @@ void liwdg_widget_detach_child (
 			}
 		}
 	}
+
+	/* Manual packing. */
+	if (child->prev != NULL)
+		child->prev->next = child->next;
+	else
+		self->children = child->next;
+	if (child->next != NULL)
+		child->next->prev = child->prev;
+	child->next = NULL;
+	child->prev = NULL;
+	child->parent = NULL;
 }
 
 void liwdg_widget_draw (
@@ -425,8 +454,9 @@ void liwdg_widget_draw (
 	int x;
 	int y;
 	LIMatMatrix matrix;
-	LIWdgGroupCell* cell;
 	LIWdgElement* elem;
+	LIWdgGroupCell* cell;
+	LIWdgWidget* widget;
 
 	/* Paint custom. */
 	lical_callbacks_call (self->manager->callbacks, "widget-paint", lical_marshal_DATA_PTR, self);
@@ -439,7 +469,7 @@ void liwdg_widget_draw (
 			liwdg_element_paint (elem, self->manager, &matrix);
 	}
 
-	/* Paint children. */
+	/* Paint table packed children. */
 	for (y = 0 ; y < self->height ; y++)
 	{
 		for (x = 0 ; x < self->width ; x++)
@@ -448,6 +478,13 @@ void liwdg_widget_draw (
 			if (cell->child != NULL && cell->child->visible)
 				liwdg_widget_draw (cell->child);
 		}
+	}
+
+	/* Paint manually packed children. */
+	for (widget = self->children ; widget != NULL ; widget = widget->next)
+	{
+		if (widget->visible)
+			liwdg_widget_draw (widget);
 	}
 }
 
@@ -1003,6 +1040,29 @@ void liwdg_widget_set_margins (
 
 	/* Rebuild the layout. */
 	private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
+}
+
+void liwdg_widget_get_offset (
+	LIWdgWidget* self,
+	int*         x,
+	int*         y)
+{
+	*x = self->offset.x;
+	*y = self->offset.y;
+}
+
+void liwdg_widget_set_offset (
+	LIWdgWidget* self,
+	int          x,
+	int          y)
+{
+	if (self->offset.x != x || self->offset.y != y)
+	{
+		self->offset.x = x;
+		self->offset.y = y;
+		if (self->parent != NULL)
+			liwdg_widget_child_request (self->parent, self);
+	}
 }
 
 /**
@@ -1680,6 +1740,42 @@ static int private_get_row_size (
 		}
 	}
 	return height;
+}
+
+static LIWdgWidget* private_table_child_at (
+	LIWdgWidget* self,
+	int          pixx,
+	int          pixy)
+{
+	int x;
+	int y;
+
+	/* Get column. */
+	for (x = 0 ; x < self->width ; x++)
+	{
+		if (pixx >= self->cols[x].start + self->cols[x].allocation)
+			continue;
+		if (pixx >= self->cols[x].start)
+			break;
+		return NULL;
+	}
+	if (x == self->width)
+		return NULL;
+
+	/* Get row. */
+	for (y = 0 ; y < self->height ; y++)
+	{
+		if (pixy >= self->rows[y].start + self->rows[y].allocation)
+			continue;
+		if (pixy >= self->rows[y].start)
+			break;
+		return NULL;
+	}
+	if (y == self->height)
+		return NULL;
+
+	/* Return the child. */
+	return self->cells[x + y * self->width].child;
 }
 
 /** @} */

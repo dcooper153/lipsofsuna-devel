@@ -47,6 +47,18 @@ static void Widget_new (LIScrArgs* args)
 	liscr_args_seti_stack (args);
 }
 
+static void Widget_add_child (LIScrArgs* args)
+{
+	LIScrData* data;
+
+	/* Append rows. */
+	if (liscr_args_geti_data (args, 0, LIEXT_SCRIPT_WIDGET, &data))
+	{
+		liwdg_widget_detach (liscr_data_get_data (data));
+		liwdg_widget_add_child (args->self, liscr_data_get_data (data));
+	}
+}
+
 static void Widget_append_col (LIScrArgs* args)
 {
 	int i;
@@ -415,15 +427,24 @@ static void Widget_set_request (LIScrArgs* args)
 	const char* font_name;
 	LIFntFont* font;
 	LIFntLayout* layout;
+	LIMatVector vector;
 	LIWdgSize size = { -1, -1 };
 	LIWdgWidget* widget;
 
 	widget = args->self;
 	liscr_args_gets_bool (args, "internal", &internal);
-	if (!liscr_args_geti_int (args, 0, &size.width))
-		liscr_args_gets_int (args, "width", &size.width);
-	if (!liscr_args_geti_int (args, 1, &size.width))
-		liscr_args_gets_int (args, "height", &size.height);
+	if (liscr_args_geti_vector (args, 0, &vector))
+	{
+		size.width = (int) vector.x;
+		size.height = (int) vector.y;
+	}
+	else
+	{
+		if (!liscr_args_geti_int (args, 0, &size.width))
+			liscr_args_gets_int (args, "width", &size.width);
+		if (!liscr_args_geti_int (args, 1, &size.width))
+			liscr_args_gets_int (args, "height", &size.height);
+	}
 
 	/* Calculate from text if given. */
 	if (liscr_args_gets_string (args, "font", &font_name) &&
@@ -563,6 +584,24 @@ static void Widget_set_margins (LIScrArgs* args)
 	liwdg_widget_set_margins (args->self, v[0], v[1], v[2], v[3]);
 }
 
+static void Widget_get_offset (LIScrArgs* args)
+{
+	int x;
+	int y;
+	LIMatVector v;
+
+	liwdg_widget_get_offset (args->self, &x, &y);
+	v = limat_vector_init (x, y, 0.0f);
+	liscr_args_seti_vector (args, &v);
+}
+static void Widget_set_offset (LIScrArgs* args)
+{
+	LIMatVector value;
+
+	if (liscr_args_geti_vector (args, 0, &value))
+		liwdg_widget_set_offset (args->self, (int) value.x, (int) value.y);
+}
+
 static void Widget_get_parent (LIScrArgs* args)
 {
 	LIWdgWidget* self = args->self;
@@ -669,6 +708,7 @@ void liext_script_widget (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_WIDGET, "widget_new", Widget_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_add_child", Widget_add_child);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_append_col", Widget_append_col);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_append_row", Widget_append_row);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_canvas_clear", Widget_canvas_clear);
@@ -697,6 +737,8 @@ void liext_script_widget (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_height", Widget_get_height);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_margins", Widget_get_margins);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_margins", Widget_set_margins);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_offset", Widget_get_offset);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_offset", Widget_set_offset);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_parent", Widget_get_parent);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_rows", Widget_get_rows);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_rows", Widget_set_rows);

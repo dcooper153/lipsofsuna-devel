@@ -24,6 +24,14 @@ Widget.new = function(clss, args)
 	return self
 end
 
+--- Adds a child widget.
+-- @param self Widget.
+-- @param widget Widget.
+Widget.add_child = function(self, widget)
+	Los.widget_add_child(self.handle, widget.handle)
+	self.__children[widget] = widget
+end
+
 --- Appends a column to the widget.
 -- @param self Widget.
 -- @param args List of widgets.
@@ -271,6 +279,10 @@ end
 -- @name Widget.margins
 -- @class table
 
+--- Pixel offset relative to the parent.
+-- @name Widget.offset
+-- @class table
+
 --- The parent of this widget.
 -- @name Widget.parent
 -- @class table
@@ -310,6 +322,7 @@ Widget:add_getters{
 		return b
 	end,
 	margins = function(s) return Los.widget_get_margins(s.handle) end,
+	offset = function(s) return Class.new(Vector, {handle = Los.widget_get_offset(s.handle)}) end,
 	parent = function(s)
 		local handle = Los.widget_get_parent(s.handle)
 		if not handle then return end
@@ -352,7 +365,14 @@ Widget:add_setters{
 	fullscreen = function(s, v) Los.widget_set_fullscreen(s.handle, v) end,
 	height_request = function(s, v) Los.widget_set_request(s.handle, s.width_request, v) end,
 	margins = function(s, v) Los.widget_set_margins(s.handle, v) end,
-	request = function(s, v) Los.widget_set_request(s.handle, v) end,
+	offset = function(s, v) Los.widget_set_offset(s.handle, v.handle) end,
+	request = function(s, v)
+		if v and v.class_name == "Vector" then
+			Los.widget_set_request(s.handle, v.handle)
+		else
+			Los.widget_set_request(s.handle, v)
+		end
+	end,
 	rows = function(s, v)
 		local w,h = s.cols,s.rows
 		if v < h then

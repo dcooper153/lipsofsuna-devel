@@ -4,7 +4,7 @@ Widgets.Scrollbar.new = function(clss, args)
 	local self = Widget.new(clss, args)
 	self.max = 0
 	self.page = 1
-	self.offset = 1
+	self.scroll_offset = 1
 	return self
 end
 
@@ -24,25 +24,25 @@ Widgets.Scrollbar.pressed = function(self)
 	local c = cursor - Vector(self.x, self.y)
 	if c.y < 21 then
 		-- Scroll up.
-		if self.offset >= 1 then
-			self.offset = self.offset - 1
+		if self.scroll_offset >= 1 then
+			self.scroll_offset = self.scroll_offset - 1
 			self:reshaped()
-			self:changed(self.offset)
+			self:changed(self.scroll_offset)
 		end
 	elseif c.y >= self.height - 21 then
 		-- Scroll down.
-		if self.offset < self.max - self.page then
-			self.offset = self.offset + 1
+		if self.scroll_offset < self.max - self.page then
+			self.scroll_offset = self.scroll_offset + 1
 			self:reshaped()
-			self:changed(self.offset)
+			self:changed(self.scroll_offset)
 		end
 	else
 		-- Scroll to cursor.
 		local v = self:get_value_at(cursor)
 		if not v then return end
-		self.offset = math.max(0, math.min(v - math.floor(self.page/2), self.max - self.page))
+		self.scroll_offset = math.max(0, math.min(v - math.floor(self.page/2), self.max - self.page))
 		self:reshaped()
-		self:changed(self.offset)
+		self:changed(self.scroll_offset)
 	end
 end
 
@@ -65,7 +65,7 @@ Widgets.Scrollbar.reshaped = function(self)
 	local sy,sh
 	local alloc = h - 42
 	if self.max > 0 then
-		sy = alloc * self.offset / self.max
+		sy = alloc * self.scroll_offset / self.max
 		sh = math.min(alloc, math.max(20, alloc * self.page / self.max))
 	else
 		sy = 0
@@ -82,13 +82,13 @@ Widgets.Scrollbar.reshaped = function(self)
 		dest_position = {0,0},
 		dest_size = {21,21},
 		source_image = "widgets1",
-		source_position = (self.offset > 0) and {700,100} or {700,130},
+		source_position = (self.scroll_offset > 0) and {700,100} or {700,130},
 		source_tiling = {0,21,0,0,21,0}}
 	self:canvas_image{
 		dest_position = {0,h-22},
 		dest_size = {21,21},
 		source_image = "widgets1",
-		source_position = (self.offset < self.max - self.page) and {700,160} or {700,190},
+		source_position = (self.scroll_offset < self.max - self.page) and {700,160} or {700,190},
 		source_tiling = {0,21,0,0,21,0}}
 	self:canvas_compile()
 end
@@ -96,26 +96,26 @@ end
 Widgets.Scrollbar.scrolled = function(self, args)
 	if args.button == 4 then
 		-- Scroll up.
-		if self.offset >= 1 then
-			self.offset = self.offset - 1
+		if self.scroll_offset >= 1 then
+			self.scroll_offset = self.scroll_offset - 1
 			self:reshaped()
-			self:changed(self.offset)
+			self:changed(self.scroll_offset)
 		end
 	else
 		-- Scroll down.
-		if self.offset < self.max - self.page then
-			self.offset = self.offset + 1
+		if self.scroll_offset < self.max - self.page then
+			self.scroll_offset = self.scroll_offset + 1
 			self:reshaped()
-			self:changed(self.offset)
+			self:changed(self.scroll_offset)
 		end
 	end
 	return true
 end
 
-Widgets.Scrollbar.set_range = function(self, max, offset, page)
-	if offset then self.offset = offset end
+Widgets.Scrollbar.set_range = function(self, max, scroll_offset, page)
+	if scroll_offset then self.scroll_offset = scroll_offset end
 	if page then self.page = page end
 	self.max = max
-	self.offset = math.max(0, math.min(self.offset, self.max - self.page))
+	self.scroll_offset = math.max(0, math.min(self.scroll_offset, self.max - self.page))
 	self:reshaped()
 end
