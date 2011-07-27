@@ -118,7 +118,14 @@ void liwdg_widget_free (LIWdgWidget* self)
 {
 	int x;
 	int y;
+	LIWdgWidget* widget;
 
+	for (widget = self->children ; widget != NULL ; widget = widget->next)
+	{
+		widget->next = NULL;
+		widget->prev = NULL;
+		widget->parent = NULL;
+	}
 	for (y = 0 ; y < self->height ; y++)
 	for (x = 0 ; x < self->width ; x++)
 		private_call_detach (self, x, y);
