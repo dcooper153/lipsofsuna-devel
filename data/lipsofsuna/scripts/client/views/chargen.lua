@@ -26,7 +26,7 @@ Views.Chargen.new = function(clss)
 	-- Preview scene.
 	local camera = Camera{far = 60.0, near = 0.3, mode = "first-person"}
 	local self = Widgets.Scene.new(clss, {rows = 1, behind = true, fullscreen = true, camera = camera, spacings = {0,0}})
-	self.offset = Vector(0, 1.8, -2)
+	self.view_offset = Vector(0, 1.8, -2)
 	self.margins = {5,5,5,5}
 	self.skills = Widgets.Skills{changed = function(widget, skill)
 		skill.value = skill.cap
@@ -338,8 +338,8 @@ Views.Chargen.event = function(self, args)
 		end
 	elseif args.type == "mousemotion" then
 		if self.dragging then
-			local y = self.offset.y + args.dy / 300
-			self.offset.y = math.min(math.max(y, 1), 2)
+			local y = self.view_offset.y + args.dy / 300
+			self.view_offset.y = math.min(math.max(y, 1), 2)
 			self:rotate(math.pi * args.dx / 300)
 		end
 	end
@@ -472,7 +472,7 @@ Views.Chargen.update = function(self, secs)
 	-- Update light.
 	self.light.position = self.object.position + self.object.rotation * Vector(0, 2, -5)
 	-- Update camera.
-	self.camera.target_position = self.object.position + self.offset
+	self.camera.target_position = self.object.position + self.view_offset
 	self.camera.target_rotation = Quaternion{axis = Vector(0, 1, 0), angle = math.pi}
 	self.camera.viewport = {self.x, self.y, self.width, self.height}
 	self.camera:update(secs)
