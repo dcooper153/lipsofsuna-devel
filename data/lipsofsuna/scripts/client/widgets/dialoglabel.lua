@@ -21,6 +21,9 @@ Widgets.DialogLabel.reshaped = function(self)
 			color = self.focused and {0.7,0.3,0.3,1} or {1,1,1,1}
 			text = string.format("<%s> %s", key, self.text)
 		end
+	elseif self.text then
+		color = self.focused and {0.7,0.3,0.3,1} or {1,1,1,1}
+		text = string.format("%s:", self.text)
 	end
 	-- Calculate the size.
 	local wrap = self:get_request() or 500
@@ -34,7 +37,7 @@ Widgets.DialogLabel.reshaped = function(self)
 	local h = self.height
 	-- Populate the canvas.
 	self:canvas_clear()
-	if self.index and self.text then
+	if self.text then
 		self:canvas_image{
 			dest_position = {0,4},
 			dest_size = {w,h},

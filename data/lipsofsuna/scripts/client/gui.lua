@@ -118,11 +118,16 @@ Gui.set_dialog = function(clss, id)
 		clss.group_dialog.visible = true
 	else
 		-- Show a dialog line.
-		local widget = Widgets.DialogLabel{index = 1, text = dlg.message, pressed = function()
-			Network:send{packet = Packet(packets.DIALOG_ANSWER, "uint32", id, "string", "")}
-		end}
-		clss.dialog_choices = {widget}
+		clss.dialog_choices = {}
 		clss.group_dialog.rows = 1
+		local pressed = function() Network:send{packet = Packet(packets.DIALOG_ANSWER, "uint32", id, "string", "")} end
+		if dlg.character ~= "" then
+			local widget = Widgets.DialogLabel{text = dlg.character, pressed = pressed}
+			table.insert(clss.dialog_choices, widget)
+			clss.group_dialog:append_row(widget)
+		end
+		local widget = Widgets.DialogLabel{index = 1, text = dlg.message, pressed = pressed}
+		table.insert(clss.dialog_choices, widget)
 		clss.group_dialog:append_row(widget)
 		clss.group_dialog.visible = true
 	end

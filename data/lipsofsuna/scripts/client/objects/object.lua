@@ -63,7 +63,7 @@ Object.set_dialog = function(self, type, args)
 	if type == "choice" then
 		self.dialog = {type = type, choices = args}
 	elseif type == "message" then
-		self.dialog = {type = type, message = args}
+		self.dialog = {type = type, character = args.character, message = args.message}
 	else
 		self.dialog = nil
 	end

@@ -190,7 +190,7 @@ Dialog.execute = function(self)
 		end,
 		say = function(vm, c)
 			-- Publish the line.
-			self.event = {type = "object-dialog", object = self.object, message = string.format("%s: %s", c[2], c[3])}
+			self.event = {type = "object-dialog", object = self.object, character = c[2], message = c[3]}
 			Vision:event(self.event)
 			-- Break until answered.
 			self.choices = "line"

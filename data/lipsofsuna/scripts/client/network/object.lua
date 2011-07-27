@@ -54,13 +54,13 @@ end}
 
 Protocol:add_handler{type = "OBJECT_DIALOG_MESSAGE", func = function(args)
 	-- Parse the packet.
-	local ok,i,m = args.packet:read("uint32", "string")
+	local ok,i,c,m = args.packet:read("uint32", "string", "string")
 	if not ok then return end
 	-- Find the object.
 	local obj = Object:find{id = i}
 	if not obj then return end
 	-- Update the dialog.
-	obj:set_dialog("message", m)
+	obj:set_dialog("message", {character = c, message = m})
 end}
 
 Protocol:add_handler{type = "OBJECT_DIALOG_NONE", func = function(args)
