@@ -400,7 +400,7 @@ Protocol:add_handler{type = "OBJECT_SPEECH", func = function(event)
 	if ok then
 		local o = Object:find{id = i}
 		if o then
-			local n = o.name or "???"
+			local n = o.name or o.spec.name
 			Speech:add{object = o, message = m}
 			Gui.chat_history:append{text = "<" .. n .. "> " .. m}
 			Sound:effect{object = o, effect = "spring-000"}
