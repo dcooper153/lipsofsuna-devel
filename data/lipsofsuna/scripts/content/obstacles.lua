@@ -97,11 +97,13 @@ Obstaclespec{
 	name = "building marker",
 	model = "minesupport1",--FIXME
 	categories = {"special"},
+	health= 100,
 	dialog = "castleforeman"}
 
 Obstaclespec{
 	name = "small building marker",
-	model = "minesupport2",--FIXME
+	model = "torch1",--FIXME
+	health= 100,
 	categories = {"special"},
 	dialog = "smallbuildings"}
 
