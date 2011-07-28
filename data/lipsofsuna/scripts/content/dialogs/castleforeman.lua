@@ -12,7 +12,7 @@ Dialogspec{name = "castleforeman",
 	{"choice","Build a wall node and tower",
 		{"spawn pattern", "walltower", position_relative=Vector(5,4,5)},{"exit"}},
 	{"choice","Build a space for small buildings",
-		{"spawn pattern", "smallbuildingnode", position_relative=Vector(5,4,5)},{"exit"}},
+		{"spawn pattern", "smallbuildingnodes", position_relative=Vector(5,4,5)},{"exit"}},
 	{"choice", "Goodbye.",
 		{"exit"}},
 	{"loop"}}
