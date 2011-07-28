@@ -94,6 +94,18 @@ Obstaclespec{
 	marker = "sanctuary"}
 
 Obstaclespec{
+	name = "building marker",
+	model = "minesupport1",--FIXME
+	categories = {"special"},
+	dialog = "castleforeman"}
+
+Obstaclespec{
+	name = "small building marker",
+	model = "minesupport2",--FIXME
+	categories = {"special"},
+	dialog = "smallbuildings"}
+
+Obstaclespec{
 	name = "bridge chest",
 	model = "chest1",
 	categories = {"special"},

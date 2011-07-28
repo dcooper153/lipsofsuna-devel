@@ -158,6 +158,17 @@ Species{
 	inventory_items = {"shirt", "pants", "leather boots"}}
 
 Species{
+	name = "Castle Foreman",
+	base = "aer",
+	dialog = "castleforeman",
+	marker = "castleforeman",
+	ai_enable_combat = false,
+	ai_enable_wander = false,
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"shirt", "pants", "leather boots"}}
+
+Species{
 	name = "Merchant",
 	base = "aer",
 	ai_enable_combat = false,

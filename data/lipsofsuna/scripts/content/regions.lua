@@ -17,6 +17,14 @@ Regionspec{
 	spawn_point = {17,15,22}}
 
 Regionspec{
+	name = "Castle Cave",
+	categories = {"special"},
+	depth = {1000,1000},
+	links = {"Lips", "Sanctuary"},
+	pattern_name = "castlecave1",
+	position = {800,700}}
+
+Regionspec{
 	name = "Great Library",
 	categories = {"special"},
 	depth = {930,1000},
