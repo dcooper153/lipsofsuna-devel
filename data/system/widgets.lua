@@ -113,6 +113,23 @@ Widget.canvas_text = function(self, args)
 	Los.widget_canvas_text(self.handle, a)
 end
 
+--- Removes the widget from its parent.
+-- @param self Widget.
+Widget.detach = function(self)
+	-- Remove from the script parent.
+	local p = self.parent
+	if p then
+		for k,v in pairs(p.__children) do
+			if v == self then
+				p[k] = nil
+				break
+			end
+		end
+	end
+	-- Remove from the internal parent.
+	Los.widget_detach(self.handle)
+end
+
 --- Gets a child widget.
 -- @param self Widget.
 -- @param ... Arguments.<ul>

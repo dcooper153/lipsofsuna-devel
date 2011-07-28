@@ -221,6 +221,11 @@ static void Widget_canvas_text (LIScrArgs* args)
 	}
 }
 
+static void Widget_detach (LIScrArgs* args)
+{
+	liwdg_widget_detach (args->self);
+}
+
 static void Widget_get_child (LIScrArgs* args)
 {
 	int x = 1;
@@ -715,6 +720,7 @@ void liext_script_widget (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_canvas_compile", Widget_canvas_compile);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_canvas_image", Widget_canvas_image);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_canvas_text", Widget_canvas_text);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_detach", Widget_detach);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_child", Widget_get_child);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_request", Widget_get_request);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_insert_col", Widget_insert_col);

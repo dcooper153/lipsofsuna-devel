@@ -148,6 +148,7 @@ void liwdg_widget_add_child (
 		self->children->prev = child;
 	self->children = child;
 	child->parent = self;
+	liwdg_widget_child_request (self, child);
 }
 
 /**
@@ -225,12 +226,7 @@ LIWdgWidget* liwdg_widget_child_at (
 	int          pixx,
 	int          pixy)
 {
-	LIWdgRect rect;
 	LIWdgWidget* widget;
-
-	liwdg_widget_get_allocation (self, &rect);
-	pixx -= rect.x;
-	pixy -= rect.y;
 
 	/* Try table packet widgets. */
 	widget = private_table_child_at (self, pixx, pixy);
@@ -1721,6 +1717,8 @@ static void private_rebuild (
 				}
 			}
 		}
+		for (child = self->children ; child != NULL ; child = child->next)
+			liwdg_widget_child_request (self, child);
 	}
 
 	self->rebuilding = 0;
@@ -1756,6 +1754,11 @@ static LIWdgWidget* private_table_child_at (
 {
 	int x;
 	int y;
+	LIWdgRect rect;
+
+	liwdg_widget_get_allocation (self, &rect);
+	pixx -= rect.x;
+	pixy -= rect.y;
 
 	/* Get column. */
 	for (x = 0 ; x < self->width ; x++)
