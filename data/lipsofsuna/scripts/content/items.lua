@@ -603,6 +603,22 @@ Itemspec{
 	categories = {"reagent"},
 	stacking = true}
 
+------------------------------------------------------------------------------
+-- Potions
+
+Itemspec{
+	name = "cure disease potion",
+	model = "potion1",
+	mass = 2,
+	categories = {"potion"},
+	crafting_materials = {["empty bottle"] = 1, ["dewspring leaf"] = 1},
+	crafting_skills = {intelligence = 20},
+	effect_craft = "craftpotion1",
+	effect_use = "potiondrink1",
+	stacking = true,
+	icon = "potion2",
+	water_gravity = Vector(0,6,0)}
+
 Itemspec{
 	name = "health potion",
 	model = "potion3",
@@ -632,17 +648,17 @@ Itemspec{
 	water_gravity = Vector(0,6,0)}
 
 Itemspec{
-	name = "Steamworks",
-	icon = "scroll1",
-	model = "book-000",
+	name = "poison potion",
+	model = "potion2",
 	mass = 2,
-	categories = {"book"},
-	book_text =
-[[Steam-powered devices have brought a world of new opportunities to the aer society. The technology is still young but it has shown lots of promise in automating tasks. There is even progress in creating advanced devices that are able to reason and act on their own.
-
-Steam technology relies on mechanical parts that are brought into motion by steam circulating in a system of pipes. The steam was initially created by conventional heating methods but more compact and efficient methods based on elemental forces such as ki were discovered very quickly.
-
-With the power of this new technology on their side, the aer society are confident that they can defeat the unknown forces behind the withering of the World Tree.]]}
+	categories = {"potion"},
+	crafting_materials = {["empty bottle"] = 1, ["dewspring leaf"] = 1},
+	crafting_skills = {intelligence = 20},
+	effect_craft = "craftpotion1",
+	effect_use = "potiondrink1",
+	stacking = true,
+	icon = "potion2",
+	water_gravity = Vector(0,6,0)}
 
 ----------------------------------------------------------------
 --Quest
