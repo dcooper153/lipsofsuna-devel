@@ -516,21 +516,25 @@ Creature.equip_item = function(self, args)
 	-- This handles cases such as a two-handed weapon being in the right
 	-- hand and a shield being equipped into the left hand.
 	if spec then
-		for k,v in pairs(self.inventory.slots) do
-			local conflict
-			if type(k) == "string" and v.spec.equipment_slots_reserved then
-				if v.spec.equipment_slots_reserved[slot] then
-					conflict = true
-				elseif spec.equipment_slots_reserved then
-					for k1 in pairs(spec.equipment_slots_reserved) do
-						if v.spec.equipment_slots_reserved[k1] then conflict = true end
+		-- Conflict resolution can cause an error because the next key of the
+		-- loop may be removed. In such a case, we catch the error and retry.
+		repeat until pcall(function()
+			for k,v in pairs(self.inventory.slots) do
+				local conflict
+				if type(k) == "string" and v.spec.equipment_slots_reserved then
+					if v.spec.equipment_slots_reserved[slot] then
+						conflict = true
+					elseif spec.equipment_slots_reserved then
+						for k1 in pairs(spec.equipment_slots_reserved) do
+							if v.spec.equipment_slots_reserved[k1] then conflict = true end
+						end
 					end
 				end
+				if conflict then
+					if not self:unequip_item{slot = k} then return end
+				end
 			end
-			if conflict then
-				if not self:unequip_item{slot = k} then return end
-			end
-		end
+		end)
 	end
 	-- Equip the item.
 	self.inventory:set_object{object = args.object, slot = slot}
