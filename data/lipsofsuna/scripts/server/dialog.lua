@@ -126,6 +126,14 @@ Dialog.execute = function(self)
 			self.user = nil
 			return true
 		end,
+		["default death check"] = function(vm, c)
+			if self.object.dead then
+				self.object:loot(self.user)
+				for i = #vm,1,-1 do vm[i] = nil end
+			else
+				vm[1].pos = vm[1].pos + 1
+			end
+		end,
 		exit = function(vm, c)
 			for i = #vm,1,-1 do vm[i] = nil end
 		end,

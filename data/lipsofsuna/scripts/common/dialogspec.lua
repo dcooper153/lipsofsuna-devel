@@ -48,6 +48,10 @@ Dialogspec.validate = function(self, args)
 			validate_arguments(c, {cond = true, cond_not = true})
 			validate_branch(c, 3)
 		end,
+		["default death check"] = function(c)
+			assert(type(c[2]) == "nil", "too many arguments to \"loot\" command")
+			validate_arguments(c, {})
+		end,
 		effect = function(c)
 			assert(type(c[2]) == "nil" or type(c[2]) == "string", "argument #2 of \"effect\" must be the effect name string")
 		end,
