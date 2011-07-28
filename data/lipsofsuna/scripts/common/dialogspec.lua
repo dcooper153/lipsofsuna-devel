@@ -126,6 +126,16 @@ Dialogspec.validate = function(self, args)
 			assert(type(c[4]) == "nil", "too many arguments to \"say\" command")
 			validate_arguments(c, {})
 		end,
+		["spawn object"] = function(c)
+			assert(type(c[2]) == "string", "argument #2 of \"spawn object\" must be the name of the object")
+			assert(type(c[3]) == "nil", "too many arguments to \"spawn object\" command")
+			validate_arguments(c, {assign_marker = true, distance_max = true, distance_min = true, position_absolute = true, position_marker = true, position_relative = true})
+		end,
+		["spawn pattern"] = function(c)
+			assert(type(c[2]) == "string", "argument #2 of \"spawn pattern\" must be the name of the pattern")
+			assert(type(c[3]) == "nil", "too many arguments to \"spawn pattern\" command")
+			validate_arguments(c, {distance_max = true, distance_min = true, position_absolute = true, position_marker = true, position_relative = true})
+		end,
 		teleport = function(c)
 			assert(type(c[2]) == "nil", "too many arguments to \"teleport\" command")
 			assert(type(c.marker) == "string", "argument \"marker\" of \"teleport\" must be the name of the map marker")
@@ -133,6 +143,11 @@ Dialogspec.validate = function(self, args)
 		end,
 		trade = function(c)
 			assert(type(c[2]) == "nil", "too many arguments to \"trade\" command")
+			validate_arguments(c, {})
+		end,
+		["unlock marker"] = function(v)
+			assert(type(c[2]) == "string", "argument #2 of \"unlock marker\" must be the name of the marker")
+			assert(type(c[3]) == "nil", "too many arguments to \"unlock marker\" command")
 			validate_arguments(c, {})
 		end}
 	validate_arguments = function(cmd, allow)

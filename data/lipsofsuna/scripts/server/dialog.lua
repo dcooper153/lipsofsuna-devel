@@ -64,6 +64,26 @@ end
 -- the dialog ends.
 -- @param self Dialog.
 Dialog.execute = function(self)
+	-- Utility functions.
+	local select_spawn_position = function(c)
+		if c.position_absolute then return c.position_absolute end
+		local pos = self.object.position
+		if c.position_marker then
+			local m = Marker:find{name = c.position_marker}
+			if m then pos = m.position end
+		end
+		if c.position_relative then
+			pos = pos + c.position_relative
+		end
+		local min = c.distance_min or 0
+		local max = c.distance_max or 0
+		if min < max then
+			local x = min + (min-max)*math.random()
+			local y = min + (min-max)*math.random()
+			pos = pos + Vector(x,y)
+		end
+		return pos
+	end
 	-- Command handlers of the virtual machine.
 	-- Handlers increment stack pointers and push and pop command arrays to the stack.
 	local commands = {
@@ -197,6 +217,46 @@ Dialog.execute = function(self)
 			self.user = nil
 			return true
 		end,
+		["spawn object"] = function(vm, c)
+			-- Spawn the object.
+			local spec1 = Species:find{name = c[2]}
+			local spec2 = Itemspec:find{name = c[2]}
+			local spec3 = Obstaclespec:find{name = c[2]}
+			local object
+			if spec1 then
+				object = Creature{spec = spec1, random = true}
+			elseif spec2 then
+				object = Item{spec = spec2, random = true}
+			elseif spec3 then
+				object = Obstacle{spec = spec3, random = true}
+			end
+			-- Set the position.
+			if object then
+				object.position = select_spawn_position(c)
+				object.realized = true
+			end
+			-- Create the marker.
+			if object and c.assign_marker then
+				local name = c.assign_marker
+				local marker
+				local index = 1
+				while Marker:find{name = name} do
+					name = string.format("%s(%d)", c.assign_marker, index)
+					index = index + 1
+				end
+				object.marker = Marker{name = name, position = object.position, target = object.id}
+				object.marker:unlock()
+			end
+			vm[1].pos = vm[1].pos + 1
+		end,
+		["spawn pattern"] = function(vm, c)
+			local pat = Pattern:find{name = c[2]}
+			if pat then
+				local pos = select_spawn_position(c) * Voxel.tile_scale - pat.size * 0.5
+				Voxel:place_pattern{name = c[2], point = pos:round()}
+			end
+			vm[1].pos = vm[1].pos + 1
+		end,
 		teleport = function(vm, c)
 			self.user:teleport(c)
 			vm[1].pos = vm[1].pos + 1
@@ -204,6 +264,13 @@ Dialog.execute = function(self)
 		trade = function(vm, c)
 			Trading:start(self.user, self.object)
 			for i = #vm,1,-1 do vm[i] = nil end
+		end,
+		["unlock marker"] = function(vm, c)
+			local m = Marker:find{name = c[2]}
+			if m and not m.unlocked then
+				m:unlock()
+			end
+			vm[1].pos = vm[1].pos + 1
 		end}
 	-- Execute commands until break or end.
 	local vm = self.vm
