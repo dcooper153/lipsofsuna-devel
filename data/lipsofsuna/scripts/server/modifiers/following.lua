@@ -1,7 +1,4 @@
- 
 Modifier{name = "following", func = function(self, object, args, secs)
-	print"following"
-	print(args)
 	if not object.following_timer then
 		object.following_timer = secs
 	else
