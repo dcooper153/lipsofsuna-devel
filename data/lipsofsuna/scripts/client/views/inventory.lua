@@ -56,6 +56,7 @@ Views.Inventory.add_container = function(self, widget, own)
 		self.containers:append_col(Widget(), Widgets.Frame{style = "title", text = text}, widget)
 		Client:set_mode("inventory")
 	end
+	Gui.need_rebuild = true
 end
 
 --- Removes a container from the inventory view.
@@ -75,6 +76,7 @@ Views.Inventory.remove_container = function(self, widget)
 			break
 		end
 	end
+	Gui.need_rebuild = true
 end
 
 Views.Inventory.back = function(self)
