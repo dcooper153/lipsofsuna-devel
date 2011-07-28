@@ -432,8 +432,8 @@ Itemspec{
 	effect_craft = "craftwood1",
 	inventory_size = 8,
 	inventory_type = "chest",
-	loot_categories = {"book", "material", "misc", "potion"},
-	loot_count = {2, 4},
+	loot_categories = {"book"},
+	loot_count = {4, 8},
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
 
