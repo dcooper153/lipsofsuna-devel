@@ -19,9 +19,11 @@ Widgets.Icon.reshaped = function(self)
 	self:canvas_image{
 		dest_position = {0,0},
 		dest_size = icon.size,
+		rotation = self.rotation,
+		rotation_center = Vector(icon.size[1],icon.size[2])*0.5,
 		source_image = icon.image,
 		source_position = icon.offset,
-		source_tiling = {0,icon.size[1],0,0,icon.size[1],0}}
+		source_tiling = {0,icon.size[1],0,0,icon.size[2],0}}
 	self:canvas_compile()
 end
 

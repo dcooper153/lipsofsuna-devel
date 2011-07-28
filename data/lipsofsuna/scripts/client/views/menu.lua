@@ -17,6 +17,7 @@ Views.Menu.new = function(clss)
 		{"Quests", function() Client:set_mode("quests", 2) end, arrow = true},
 		{"Skills", function() Client:set_mode("skills", 2) end, arrow = true},
 		{"Spells", function() Client:set_mode("feats", 2) end, arrow = true},
+		{"Map", function() Client:set_mode("map", 2) end, arrow = true},
 		{"-----", function() end},
 		{"Controls", function() Client:set_mode("controls", 2) end, arrow = true},
 		{"Options", function() Client:set_mode("options", 2) end, arrow = true},

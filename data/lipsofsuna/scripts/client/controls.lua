@@ -191,6 +191,12 @@ Action{name = "jump", mode = "press", key1 = Keysym.SPACE, func = function()
 	end
 end}
 
+Action{name = "map", mode = "press", key1 = Keysym.m, func = function()
+	if Client.player_object then
+		Client:set_mode("map")
+	end
+end}
+
 Action{name = "menu", mode = "press", key1 = Keysym.ESCAPE, func = function()
 	if Client.mode == "game" then
 		-- Game controls.

@@ -526,3 +526,15 @@ Iconspec{
 	image = "icons1",
 	offset = {222,222},
 	size = {32,32}}
+
+Iconspec{
+	name = "mapmarker1",
+	image = "compass1",
+	offset = {0,8},
+	size = {12,13}}
+
+Iconspec{
+	name = "mapmarker2",
+	image = "compass1",
+	offset = {15,5},
+	size = {16,16}}
