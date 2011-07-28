@@ -1,65 +1,114 @@
-Dialogspec{name = "celine", unique = true,
-	{"branch", cond_dead = true,
-		{"loot"}},
-	{"branch", cond = "peculiar pet completed",
-		{"say", "Celine", "I hope that Puppy is coming home soon."},
-		{"exit"}},
-	{"branch", cond = "puppy dead",
-		{"say", "Celine", "What have you done? You... my poor little Puppy..."},
-		{"say", "Celine", "But, this... what is this? Why a worm? Why?"},
-		{"choice", "That isn't your pet.",
-			{"say", "Celine", "Then where is Puppy?"},
-			{"choice", "In the belly of the worm.",
-				{"choice", "It can't be! No! Puppy... dead. My last friend... dead."},
-				{"info", "Celine wields a knife and stabs herself."},
-				{"choice", "Puppy..."},
-				{"quest", "Peculiar Pet", status = "completed", text = "Celine has fallen into despair after realizing the tragic demise of her pet and has ended her life."},
-				{"flag", "peculiar pet completed"},
-				{"flag", "celine dead"},
-				{"func", function(q) q.object:die() end},
-				{"exit"}},
-			{"choice", "She was chased away by the worm.",
-				{"say", "Celine", "I'm so happy that it's again safe for Puppy to return."},
-				{"say", "Celine", "I'll teach you this feat in return for killing the worm."},
-				{"feat"},
-				{"say", "Celine", "I'll wait for Puppy to return, no matter how long it takes."},
-				{"quest", "Peculiar Pet", status = "completed", text = "Celine was convinced that Puppy is still alive. She's waiting for the pet to return back home."},
-				{"flag", "peculiar pet completed"},
-				{"exit"}}},
-		{"choice", "I wanted to make you suffer.",
-			{"say", "Celine", "I don't know why or how you did this but I will never forgive you!"},
-			{"quest", "Peculiar Pet", status = "active", text = "We have angered Celine by telling that we killed her pet and turned the corpse into a dead bloodworm to offend her."},
-			{"func", function(q)
-				q.object.spec.ai_enable_combat = true
-				q.object.spec:set_factions{"evil"} end},
-			{"exit"}},
+Dialogspec{name = "celine",
+	{"default death check"},
+	{"branch", cond = "imaginary friend completed",
+		{"choice", "Have you been feeling alright lately?",
+			{"say", "Celine", "A cat scratched my toe the other day."},
+			{"say", "Celine", "I'm worrying that I might die."}
+		},
 		{"choice", "Goodbye.",
-			{"exit"}}},
+			{"exit"}
+		},
+		{"loop"}
+	},
+	{"say", "Celine", "Isn't she adorable?"},
 	{"branch",
-		{"choice", "What is that bloodworm doing here?",
-			{"say", "Celine", "Bloodworm? If that was supposed to be a joke, it wasn't funny."},
-			{"branch", cond_not = "known puppy",
-				{"quest", "Peculiar Pet", status = "active", marker = "celine", text = "Celine has called us crazy because we told her that her pet, Puppy, is a bloodworm."},
-				{"flag", "puppy known"}},
-			{"say", "Celine", "Why does everyone keep calling my poor Puppy a worm?"},
-			{"choice", "Because it's a bloodworm, no matter how you look at it.",
-				{"say", "Celine", "You're crazy! Seeing things, I tell you. Get away from me!"},
-				{"exit"}},
-			{"choice", "Sorry, I didn't mean to offend you.",
-				{"say", "Celine", "I hope you have better luck as an adventurer than as a comedian."}},
-			{"choice", "Goodbye",
-				{"exit"}}},
-		{"choice", "Could you tell me about your pet?", cond = "puppy known",
-			{"say", "Celine", "She's such a sweet little furball. Puppy wouldn't harm a fly."},
-			{"say", "Celine", "Lately, she's been a little..."},
-			{"info", "Celine pauses for a moment"},
-			{"say", "Celine", "I'd never forgive myself if she came into harm's way."}},
+		{"choice", "What are you talking about?",
+			{"say", "Celine", "This cute, furry, little lamb of course."},
+			{"branch", cond_not = "hallucinations known",
+				{"quest", "Imaginary Friend", status = "active", marker = "roland", text = "We have met Celine who appears to be hallucinating. Perhaps a doctor knows a way to cure her."},
+				{"flag", "hallucinations known"}
+			},
+			{"choice", "I don't see a lamb there.",
+				{"say", "Celine", "Oh, I get it, you got to be another blind guy."},
+				{"say", "Celine", "There sure are lots of you here."},
+				{"say", "Celine", "Everyone's about to step on her as if she was thin air."},
+			},
+			{"choice", "Err, sure, she's cute.",
+				{"say", "Celine", "Isn't she? I found her when I was collecting mushrooms."},
+				{"say", "Celine", "I lost my consciousness there for some reason but it wasn't anything serious."},
+				{"say", "Celine", "When I woke up, she was licking and nibbing me."},
+				{"say", "Celine", "She followed me all the way here. I think she likes me."},
+				{"say", "Celine", "Ah, don't try to lick me there again, you silly!"}
+			},
+			{"choice", "Trade for a one-horned, ham-handed, split-dicked titmouse!",
+				{"say", "Celine", "No way! I'm not giving her to you."},
+				{"say", "Celine", "Look now, you're scaring her."},
+				{"say", "Celine", "What kind of dork would trade pets like that anyway?"},
+				{"choice", "Sounds like you're asking for a pet battle...",
+					{"flag", "pet battle joke"},
+					{"say", "Celine", "No, no, not at all. I was just kidding."},
+					{"say", "Celine", "Ahahaha..."},
+				},
+				{"choice", "Whatever."}
+			},
+			{"choice", "I got to go...",
+				{"exit"}
+			}
+		},
+		{"choice", "I need to talk about a more important matter.", cond = "hallucinations known"},
+	},
+	{"branch",
+		{"choice", "Have you been feeling weird lately?",
+			{"say", "Celine", "Not at all."},
+			{"say", "Celine", "My head has been hurting badly lately."},
+			{"say", "Celine", "My vision has been blurry occasionally."},
+			{"say", "Celine", "I have been hearing voices as well."},
+			{"say", "Celine", "Nothing to worry about."},
+		},
+		{"choice", "[Cure disease potion] You look thirsty, have a drink.", cond = "black-spotted parasite known",
+			{"remove player item", "cure disease potion",
+				{"branch",
+					{"say", "Celine", "Wow, my headache disappeared."},
+					{"say", "Celine", "But where did the lamb go?"},
+					{"choice", "You were hallucinating.",
+						{"say", "Celine", "Perhaps it was because of that funny mushroom."},
+						{"say", "Celine", "It must have been a really funny one to last this long."}
+					},
+					{"choice", "In your imaginary pet ball, obviously.", cond = "pet battle joke",
+						{"say", "Celine", "Ahahaha..."}
+					},
+					{"quest", "Imaginary Friend", status = "completed", marker = "celine", text = "Celine has been cured by our potion."},
+					{"flag", "imaginary friend completed"},
+					{"exit"}
+				},
+				{"branch",
+					{"say", "Celine", "I see it clearly, you don't have anything there."},
+					{"say", "Celine", "Nothing can fool my eyes."}
+				},
+			}
+		},
+		{"choice", "[Poison potion] You look thirsty, have a drink.", cond = "black-spotted parasite known",
+			{"remove player item", "poison potion",
+				{"branch",
+					{"func", function(q)
+						q.object:say("Aaaahhhh!")
+						q.object:die()
+						q.object:damaged{amount = 200, type = "physical"}
+					end},
+					{"spawn object", "bloodworm", position_relative = Vector(0,3,0)},
+					{"quest", "Imaginary Friend", status = "completed", marker = "celine", text = "Celine is dead. Her brain parasite broke through her skull violently when escaping the poison of the potion Celine drank."},
+					{"flag", "imaginary friend completed"},
+					{"exit"}
+				},
+				{"branch",
+					{"say", "Celine", "I see it clearly, you don't have anything there."},
+					{"say", "Celine", "Nothing can fool my eyes."}
+				}
+			}
+		},
 		{"choice", "Goodbye.",
-			{"exit"}}},
-		{"loop"}}
+			{"exit"}
+		},
+		{"loop"}
+	}
+}
 
-Dialogspec{name = "celine death", unique = true,
-	{"branch", cond_not = "peculiar pet completed",
-		{"quest", "Peculiar Pet", status = "completed", marker = "celine", text = "Celine has been killed."},
-		{"flag", "celine dead"},
-		{"flag", "peculiar pet completed"}}}
+Dialogspec{name = "celine death",
+	{"branch", cond_not = "imaginary friend completed",
+		{"quest", "Imaginary Friend", status = "completed", marker = "celine", text = "Celine has been killed."}
+	},
+	{"branch", cond = "imaginary friend completed",
+		{"quest", "Imaginary Friend", status = "completed", marker = "celine", text = "Celine has been cured, permanently."}
+	},
+	{"flag", "imaginary friend completed"}
+}

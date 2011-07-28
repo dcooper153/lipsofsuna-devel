@@ -289,16 +289,6 @@ Species{
 	factions = {"good"}}
 
 Species{
-	name = "Puppy",
-	base = "bloodworm",
-	categories = {},
-	dialog = "puppy",
-	marker = "puppy",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
-	factions = {"peculiar pet"}}
-
-Species{
 	name = "Roland",
 	base = "aermale",
 	dialog = "roland",
