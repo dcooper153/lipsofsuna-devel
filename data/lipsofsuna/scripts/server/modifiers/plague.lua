@@ -8,7 +8,7 @@ Modifier{name = "plague", func = function(self, object, args, secs)
 	if object.plague_timer and args.st - object.plague_timer > 5 then
 		-- Damage.
 		object:damaged{amount = 5, type = "disease"}
-		object.plague_timer = timer
+		object.plague_timer = args.st
 		-- Infect.
 		local near = Object:find{point = object.position, radius = 5}
 		for k,v in pairs(near) do
