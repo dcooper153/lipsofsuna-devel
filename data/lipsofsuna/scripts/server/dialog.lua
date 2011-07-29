@@ -288,7 +288,11 @@ Dialog.execute = function(self)
 			local pat = Pattern:find{name = c[2]}
 			if pat then
 				local pos = select_spawn_position(c) * Voxel.tile_scale - pat.size * 0.5
-				Voxel:place_pattern{name = c[2], point = pos:round(), rotation = c.rotation}
+				pos = pos:round()
+				if c.erase_tiles then
+					Voxel:fill_region{point = pos, size = pat.size}
+				end
+				Voxel:place_pattern{name = c[2], point = pos, rotation = c.rotation}
 			end
 			vm[1].pos = vm[1].pos + 1
 		end,
