@@ -709,7 +709,7 @@ end
 -- @param self Object.
 -- @param name Modifier name.
 Creature.remove_modifier = function(self, name)
-	if self.modifiers[name] then
+	if self.modifiers and self.modifiers[name] then
 		self.modifiers[name] = nil
 		self:removed_modifier(name)
 	end
