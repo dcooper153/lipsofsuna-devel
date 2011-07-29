@@ -43,6 +43,9 @@ catch(function() Database.unittest() end)
 require "system/vision"
 catch(function() Vision.unittest() end)
 
+require "system/password"
+catch(function() Password.unittest() end)
+
 require "system/graphics"
 -- TODO
 

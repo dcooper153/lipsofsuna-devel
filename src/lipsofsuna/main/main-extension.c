@@ -38,6 +38,7 @@ extern LIMaiExtensionInfo liext_network_info;
 extern LIMaiExtensionInfo liext_noise_info;
 extern LIMaiExtensionInfo liext_object_physics_info;
 extern LIMaiExtensionInfo liext_object_render_info;
+extern LIMaiExtensionInfo liext_password_info;
 extern LIMaiExtensionInfo liext_physics_info;
 extern LIMaiExtensionInfo liext_reload_info;
 extern LIMaiExtensionInfo liext_render_info;
@@ -79,6 +80,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "noise", &liext_noise_info },
 		{ "object-physics", &liext_object_physics_info },
 		{ "object-render", &liext_object_render_info },
+		{ "password", &liext_password_info },
 		{ "physics", &liext_physics_info },
 		{ "reload", &liext_reload_info },
 		{ "render", &liext_render_info },
