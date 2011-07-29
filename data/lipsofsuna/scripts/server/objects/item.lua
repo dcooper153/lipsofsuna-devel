@@ -265,6 +265,11 @@ end
 -- @param self Object.
 -- @param user User.
 Item.use_cb = function(self, user)
+	local playeffect = function()
+		if self.spec.effect_use then
+			Effect:play{effect = self.spec.effect_use, object = user}
+		end
+	end
 	local rundialog = function()
 		if not self.dialog then
 			local dialog = Dialog{object = self, user = user}
@@ -274,18 +279,17 @@ Item.use_cb = function(self, user)
 			end
 		end
 	end
+	-- Find the use action of the item.
+	-- Non-item actions shouldn't be used but we reject them just in case.
+	local action = Actionspec:find{name = self.spec.action_use}
+	if action and action.type ~= "item" then action = nil end
 	-- Actions that take preference over picking up.
 	-- Containers are looted instead of being picked up since the player
 	-- usually doesn't want to pick up heavy chests. Books are read since
 	-- they aren't horribly useful after being read once.
-	if self.spec.categories["container"] then
-		self:loot(user)
-		rundialog()
-		return
-	elseif self.spec.categories["book"] then
-		user:send{packet = Packet(packets.BOOK,
-			"string", self.spec.name,
-			"string", self.spec.book_text)}
+	if action and (action.name == "loot" or action.name == "read") then
+		action.func(self, user)
+		playeffect()
 		rundialog()
 		return
 	end
@@ -300,39 +304,9 @@ Item.use_cb = function(self, user)
 	if inv.id ~= user.id then
 		return Actions:move_from_inv_to_inv(user, inv.id, slot, user.id, 0)
 	end
-	-- Perform a type specific action.
-	-- These are actions that can only be performed to inventory items.
-	if self.spec.categories["potion"] then
-		local types =
-		{
-			["health potion"] = { skill = "health", value = 30 },
-			["mana potion"] = { skill = "willpower", value = 30 },
-		}
-		local type = types[self.name]
-		if not type then return end
-		local skills = user.skills
-		if not skills then return end
-		local value = skills:get_value{skill = type.skill}
-		if not value then return end
-		skills:set_value{skill = type.skill, value = value + type.value}
-		self:subtract{count = 1}
-		user:add_item{object = Item{spec = Itemspec:find{name = "empty bottle"}}}
-	elseif self.spec.equipment_slot then
-		if type(slot) == "string" then
-			-- Unequip items in equipment slots.
-			local dstslot = user.inventory:get_empty_slot()
-			if not dstslot then return end
-			Actions:move_from_inv_to_inv(user, inv.id, slot, user.id, dstslot)
-		else
-			-- Equip items in inventory slots.
-			Actions:move_from_inv_to_inv(user, inv.id, slot, user.id, self.spec.equipment_slot)
-		end
-	end
-	-- Play the use sound.
-	if self.spec.effect_use then
-		Effect:play{effect = self.spec.effect_use, object = user}
-	end
-	-- Execute the dialog.
+	-- Perform type specific actions.
+	if action then action.func(self, user) end
+	playeffect()
 	rundialog()
 end
 

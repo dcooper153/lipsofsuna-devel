@@ -376,6 +376,7 @@ Itemspec{
 	model = "chest1",
 	icon = "chest1",
 	mass = 30,
+	action_use = "loot",
 	animations = {
 		["loot"] = {animation = "opening", channel = 1, permanent = true, repeat_start = 10},
 		["looted"] = {animation = "open", channel = 1, permanent = true, repeat_start = 10, time = 10}},
@@ -389,13 +390,12 @@ Itemspec{
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
 
-
-
 Itemspec{
 	name = "weapons",
 	model = "chest1",
 	icon = "chest1",
 	mass = 30,
+	action_use = "loot",
 	animations = {
 		["loot"] = {animation = "opening", channel = 1, permanent = true, repeat_start = 10},
 		["looted"] = {animation = "open", channel = 1, permanent = true, repeat_start = 10, time = 10}},
@@ -412,6 +412,7 @@ Itemspec{
 	model = "chest1",
 	icon = "chest1",
 	mass = 30,
+	action_use = "loot",
 	animations = {
 		["loot"] = {animation = "opening", channel = 1, permanent = true, repeat_start = 10},
 		["looted"] = {animation = "open", channel = 1, permanent = true, repeat_start = 10, time = 10}},
@@ -427,6 +428,7 @@ Itemspec{
 	model = "bookcase1",
 	icon = "chest1",
 	mass = 30,
+	action_use = "loot",
 	categories = {"container", "generate"},
 	crafting_materials = {log = 10},
 	effect_craft = "craftwood1",
@@ -442,6 +444,7 @@ Itemspec{
 	model = "jar1",
 	icon = "potion3", -- FIXME
 	mass = 9,
+	action_use = "loot",
 	categories = {"container", "generate"},
 	crafting_materials = {["granite stone"] = 3},
 	description = "Small container, used for storing things",
@@ -456,6 +459,7 @@ Itemspec{
 	model = "jar1",
 	icon = "potion3", -- FIXME
 	mass = 5,
+	action_use = "loot",
 	categories = {"container"},
 	description = "Small container, used for storing things",
 	inventory_size = 40,
@@ -468,6 +472,7 @@ Itemspec{
 	model = "jar1",
 	icon = "potion3", -- FIXME
 	mass = 5,
+	action_use = "loot",
 	categories = {"container"},
 	description = "Small container, used for storing things",
 	inventory_size = 40,
@@ -480,6 +485,7 @@ Itemspec{
 	model = "barrel1",
 	icon = "potion3", -- FIXME
 	mass = 9,
+	action_use = "loot",
 	categories = {"container", "generate"},
 	crafting_materials = {log = 7},
 	inventory_size = 6,
@@ -494,6 +500,7 @@ Itemspec{
 	model = "workbench1",
 	icon = "workbench1",
 	mass = 21,
+	action_use = "loot",
 	animation_looted = "open",
 	animation_looting = "opening",
 	categories = {"container", "workbench"},
@@ -610,6 +617,7 @@ Itemspec{
 	name = "cure disease potion",
 	model = "potion1",
 	mass = 2,
+	action_use = "curedisease",
 	categories = {"potion"},
 	crafting_materials = {["empty bottle"] = 1, ["dewspring leaf"] = 1},
 	crafting_skills = {intelligence = 20},
@@ -623,6 +631,7 @@ Itemspec{
 	name = "health potion",
 	model = "potion3",
 	mass = 2,
+	action_use = "recoverhealth",
 	categories = {"potion"},
 	crafting_materials = {["empty bottle"] = 1, ["milky powder"] = 1},
 	crafting_skills = {intelligence = 20},
@@ -637,6 +646,7 @@ Itemspec{
 	name = "mana potion",
 	model = "potion7",
 	mass = 2,
+	action_use = "recovermana",
 	categories = {"potion"},
 	crafting_materials = {["empty bottle"] = 1, ["dewspring leaf"] = 1},
 	crafting_skills = {intelligence = 20},

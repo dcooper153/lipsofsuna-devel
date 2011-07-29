@@ -10,6 +10,7 @@ Itemspec.dict_name = {}
 --- Creates a new item specification.
 -- @param clss Itemspec class.
 -- @param args Arguments.<ul>
+--   <li>action_use: Name of the action to perform when the item is used.</li>
 --   <li>ammo_type: Name of the ammunition item type.</li>
 --   <li>animation_attack: Attack animation name for creatures wielding the item.</li>
 --   <li>animation_charge: Charge animation name for creatures wielding the item.</li>
@@ -85,6 +86,7 @@ Itemspec.new = function(clss, args)
 	end
 	-- Default values.
 	local copy = function(f, d) if self[f] == nil then self[f] = d end end
+	copy("action_use", "autoequip")
 	copy("animation_attack")
 	copy("animation_charge")
 	copy("animation_hold")

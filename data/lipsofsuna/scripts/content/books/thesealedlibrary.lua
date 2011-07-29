@@ -3,6 +3,7 @@ Itemspec{
 	icon = "scroll1",
 	model = "book-000",
 	mass = 2,
+	action_use = "read",
 	categories = {"book"},
 	dialog = "sealedlibrarybook",
 	book_text = [[
