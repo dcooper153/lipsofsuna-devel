@@ -138,7 +138,7 @@ Dialogspec.validate = function(self, args)
 		["spawn pattern"] = function(c)
 			assert(type(c[2]) == "string", "argument #2 of \"spawn pattern\" must be the name of the pattern")
 			assert(type(c[3]) == "nil", "too many arguments to \"spawn pattern\" command")
-			validate_arguments(c, {distance_max = true, distance_min = true, position_absolute = true, position_marker = true, position_relative = true})
+			validate_arguments(c, {distance_max = true, distance_min = true, position_absolute = true, position_marker = true, position_relative = true, rotation = true})
 		end,
 		teleport = function(c)
 			assert(type(c[2]) == "nil", "too many arguments to \"teleport\" command")
