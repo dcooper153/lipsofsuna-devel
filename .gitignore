@@ -1,6 +1,8 @@
 lipsofsuna
+lipsofsuna-lodtool
 lipsofsuna.geany
 data/lipsofsuna/import
+tool/goatexperiments
 docs/html
 .build
 .lock-wscript
