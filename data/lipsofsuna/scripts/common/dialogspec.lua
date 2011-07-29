@@ -136,7 +136,7 @@ Dialogspec.validate = function(self, args)
 		["spawn object"] = function(c)
 			assert(type(c[2]) == "string", "argument #2 of \"spawn object\" must be the name of the object")
 			assert(type(c[3]) == "nil", "too many arguments to \"spawn object\" command")
-			validate_arguments(c, {assign_marker = true, distance_max = true, distance_min = true, position_absolute = true, position_marker = true, position_relative = true})
+			validate_arguments(c, {assign_marker = true, distance_max = true, distance_min = true, position_absolute = true, position_marker = true, position_relative = true, rotation = true})
 		end,
 		["spawn pattern"] = function(c)
 			assert(type(c[2]) == "string", "argument #2 of \"spawn pattern\" must be the name of the pattern")

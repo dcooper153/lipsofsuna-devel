@@ -263,6 +263,11 @@ Dialog.execute = function(self)
 			-- Set the position.
 			if object then
 				object.position = select_spawn_position(c)
+				if type(c.rotation) == "number" then
+					object.rotation = Quaternion{axis = Vector(0,1), angle = c.rotation / math.pi * 180}
+				elseif type(c.rotation) == "table" then
+					object.rotation = c.rotation
+				end
 				object.realized = true
 			end
 			-- Create the marker.
