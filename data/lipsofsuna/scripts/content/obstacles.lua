@@ -107,6 +107,12 @@ Obstaclespec{
 	dialog = "bigbuildings"}
 
 Obstaclespec{
+	name = "large wall scaffold",
+	model = "wallscaffold1",--FIXME
+	categories = {"special"},
+	health= 50}
+
+Obstaclespec{
 	name = "small building marker",
 	model = "torch1",--FIXME
 	health= 100,
