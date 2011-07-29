@@ -1,22 +1,7 @@
 Dialogspec{name = "castleforeman",
 	{"branch", cond_dead = true,
 		{"loot"}},
-	{"choice","Build a north-south wall",
-		{"spawn pattern", "wallns", position_relative=Vector(5,4,5)}},
-	{"choice","Build an east-west wall",
-		{"spawn pattern", "wallew", position_relative=Vector(5,4,5)}},
-	{"choice","Build a right diagonal wall",
-		{"spawn pattern", "walldiagr", position_relative=Vector(5,4,5)}},
-	{"choice","Build a left diagonal wall",
-		{"spawn pattern", "walldiagl", position_relative=Vector(5,4,5)}},
-	{"choice","Build a wall node and tower",
-		{"spawn pattern", "walltower", position_relative=Vector(5,4,5)}},
-	{"choice","Build a space for small buildings",
-		{"spawn pattern", "smallbuildingnodes", position_relative=Vector(5,2,5)}},
-	{"func", function(q)
-						q.object:damaged{amount = 200, type = "physical"}
-					end},
-	{"exit"},
+	{"say","Castle Foreman","I presume you're the new lord around these parts"},
 	{"choice", "Goodbye.",
 		{"exit"}},
 	{"loop"}}
