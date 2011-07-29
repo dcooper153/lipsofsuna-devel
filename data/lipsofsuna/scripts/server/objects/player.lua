@@ -505,7 +505,8 @@ Player.write = function(self)
 		rotation = self.rotation,
 		skin_style = self.skin_style,
 		spec = self.spec.name,
-		spawnpoint = self.spawnpoint},
+		spawnpoint = self.spawnpoint,
+		variables = self.variables},
 		Serialize:encode_skills(self.skills),
 		Serialize:encode_inventory(self.inventory),
 		"return self")

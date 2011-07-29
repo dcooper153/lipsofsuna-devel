@@ -28,12 +28,14 @@ Dialogspec.validate = function(self, args)
 	local validate_arguments
 	local validate_branch
 	local validate_command
+	local validate_cond
 	local commands = {
 		branch = function(c)
 			assert(type(c.cond) == "nil" or type(c.cond) == "string", "argument \"cond\" of \"branch\" must be the flag string")
 			assert(type(c.cond_dead) == "nil" or type(c.cond_dead) == "boolean", "argument \"cond_dead\" of \"branch\" must be a boolean")
 			assert(type(c.cond_not) == "nil" or type(c.cond_not) == "string", "argument \"cond_not\" of \"branch\" must be the flag string")
-			validate_arguments(c, {cond = true, cond_dead = true, cond_not = true})
+			validate_arguments(c, {check = true, cond = true, cond_dead = true, cond_not = true})
+			validate_cond(c.check)
 			validate_branch(c, 2)
 		end,
 		["break"] = function(c)
@@ -45,7 +47,8 @@ Dialogspec.validate = function(self, args)
 			assert(type(c[2]) == "string", "argument #2 of \"choice\" must be the choice string")
 			assert(type(c.cond) == "nil" or type(c.cond) == "string", "argument \"cond\" of \"choice\" must be the flag string")
 			assert(type(c.cond_not) == "nil" or type(c.cond_not) == "string", "argument \"cond_not\" of \"choice\" must be the flag string")
-			validate_arguments(c, {cond = true, cond_not = true})
+			validate_arguments(c, {check = true, cond = true, cond_not = true})
+			validate_cond(c.check)
 			validate_branch(c, 3)
 		end,
 		["default death check"] = function(c)
@@ -153,6 +156,11 @@ Dialogspec.validate = function(self, args)
 			assert(type(c[2]) == "string", "argument #2 of \"unlock marker\" must be the name of the marker")
 			assert(type(c[3]) == "nil", "too many arguments to \"unlock marker\" command")
 			validate_arguments(c, {})
+		end,
+		var = function(c)
+			assert(type(c[2]) == "string", "argument #2 of \"var\" must be the variable name")
+			assert(type(c[3]) == "nil", "too many arguments to \"var\" command")
+			validate_arguments(c, {})
 		end}
 	validate_arguments = function(cmd, allow)
 		for k,v in pairs(cmd) do
@@ -166,6 +174,30 @@ Dialogspec.validate = function(self, args)
 		local f = commands[c[1]]
 		assert(f, string.format("invalid dialog command \"%s\"", c[1]))
 		f(c)
+	end
+	validate_cond = function(c)
+		if not c then return true end
+		assert(type(c) == "string", "argument \"check\" must be a string")
+		for _,str in ipairs(string.split(c, "&")) do
+			local list = string.split(str, ":")
+			assert(#list <= 2, string.format("invalid check %q", c))
+			local type,name = list[1],list[2]
+			if type == "dead" then
+				assert(not name, string.format("invalid check %q", c))
+			elseif type == "!dead" then
+				assert(not name, string.format("invalid check %q", c))
+			elseif type == "flag" then
+				assert(name, string.format("invalid check %q", c))
+			elseif type == "!flag" then
+				assert(name, string.format("invalid check %q", c))
+			elseif type == "var" then
+				assert(name, string.format("invalid check %q", c))
+			elseif type == "!var" then
+				assert(name, string.format("invalid check %q", c))
+			else
+				assert(false, string.format("invalid check %q", c))
+			end
+		end
 	end
 	validate_branch = function(b, start, name)
 		for k,v in ipairs(b) do

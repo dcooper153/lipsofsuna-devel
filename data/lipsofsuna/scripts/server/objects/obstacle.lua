@@ -47,6 +47,7 @@ Obstacle.new = function(clss, args)
 	copy("position")
 	copy("spec")
 	copy("realized")
+	copy("variables")
 	return self
 end
 
@@ -117,6 +118,7 @@ Obstacle.write = function(self)
 		id = self.id,
 		position = self.position,
 		rotation = self.rotation,
-		spec = self.spec.name},
+		spec = self.spec.name,
+		variables = self.variables},
 		"return self")
 end

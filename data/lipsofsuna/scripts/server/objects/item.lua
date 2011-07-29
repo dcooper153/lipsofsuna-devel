@@ -68,6 +68,7 @@ Item.new = function(clss, args)
 	copy("spec")
 	copy("looted")
 	copy("realized")
+	copy("variables")
 	self.update_timer = 0.3 * math.random()
 	if self.looted then self:animate("looted") end
 	return self
@@ -360,7 +361,8 @@ Item.write = function(self)
 		looted = self.looted,
 		spec = self.spec.name,
 		position = self.position,
-		rotation = self.rotation},
+		rotation = self.rotation,
+		variables = self.variables},
 		Serialize:encode_inventory(self.inventory),
 		"return self")
 end

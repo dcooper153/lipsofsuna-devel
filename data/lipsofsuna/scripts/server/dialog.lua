@@ -65,6 +65,32 @@ end
 -- @param self Dialog.
 Dialog.execute = function(self)
 	-- Utility functions.
+	local check_cond = function(c)
+		-- Backward compatibility.
+		if c.cond and not Dialog.flags[c.cond] then return end
+		if c.cond_dead and not self.object.dead then return end
+		if c.cond_not and Dialog.flags[c.cond_not] then return end
+		-- New condition string.
+		if not c.check then return true end
+		for _,str in ipairs(string.split(c.check, "&")) do
+			local list = string.split(str, ":")
+			local type,name = list[1],list[2]
+			if type == "dead" then
+				if not self.object.dead then return end
+			elseif type == "!dead" then
+				if self.object.dead then return end
+			elseif type == "flag" then
+				if not Dialog.flags[name] then return end
+			elseif type == "!flag" then
+				if Dialog.flags[name] then return end
+			elseif type == "var" then
+				if not self.object.variables or not self.object.variables[name] then return end
+			elseif type == "!var" then
+				if self.object.variables and self.object.variables[name] then return end
+			end
+		end
+		return true
+	end
 	local select_spawn_position = function(c)
 		if c.position_absolute then return c.position_absolute end
 		local pos = self.object.position
@@ -89,9 +115,7 @@ Dialog.execute = function(self)
 	local commands = {
 		branch = function(vm, c)
 			vm[1].pos = vm[1].pos + 1
-			if (c.cond == nil or Dialog.flags[c.cond]) and
-			   (c.cond_dead == nil or self.object.dead) and
-			   (c.cond_not == nil or not Dialog.flags[c.cond_not]) then
+			if check_cond(c) then
 				table.insert(vm, 1, {exe = c, off = 1, pos = 1, len = #c - 1})
 			end
 		end,
@@ -108,9 +132,7 @@ Dialog.execute = function(self)
 			local cmds = {}
 			local choices = {}
 			repeat
-				if (cmd.cond == nil or Dialog.flags[cmd.cond]) and
-				   (cmd.cond_dead == nil or self.object.dead) and
-				   (cmd.cond_not == nil or not Dialog.flags[cmd.cond_not]) then
+				if check_cond(cmd) then
 					table.insert(choices, cmd[2])
 					cmds[cmd[2]] = cmd
 				end
@@ -278,6 +300,11 @@ Dialog.execute = function(self)
 			if m and not m.unlocked then
 				m:unlock()
 			end
+			vm[1].pos = vm[1].pos + 1
+		end,
+		var = function(vm, c)
+			if not self.object.variables then self.object.variables = {} end
+			self.object.variables[c[2]] = "true"
 			vm[1].pos = vm[1].pos + 1
 		end}
 	-- Execute commands until break or end.

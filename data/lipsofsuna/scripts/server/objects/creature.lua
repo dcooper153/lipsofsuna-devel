@@ -182,6 +182,7 @@ Creature.new = function(clss, args)
 	copy("carried_weight", 0)
 	copy("spec")
 	copy("spawnpoint")
+	copy("variables")
 	self.update_timer = 0.1 * math.random()
 	self:calculate_speed()
 	if args and args.dead then self:set_dead_state() end
@@ -981,7 +982,8 @@ Creature.write = function(self)
 		physics = self.physics,
 		position = self.position,
 		rotation = self.rotation,
-		spec = self.spec.name},
+		spec = self.spec.name,
+		variables = self.variables},
 		Serialize:encode_skills(self.skills),
 		Serialize:encode_inventory(self.inventory),
 		"return self")
