@@ -18,3 +18,4 @@ Quest{name = "Down to the Dungeons"}
 Quest{name = "An Introduction to Crafting"}
 Quest{name = "An Introduction to Magic"}
 Quest{name = "An Introduction to Ultraviolence"}
+Quest{name = "My Little Castle"}
