@@ -109,8 +109,6 @@ def configure(ctx):
 	# Lua/LuaJIT
 	# Ubuntu Lucid ships a broken 32-bit LuaJIT on 64-bit systems so we need some extra
 	# checks to know if it really works or if we should fall back to standard Lua.
-	luajit_found = False
-	luajit_compiles = False
 	if ctx.check_cfg(package='luajit', atleast_version='2.0.0', args='--cflags --libs', uselib_store='LUAJIT', mandatory=False) and\
 	   ctx.check(msg="Checking for luajit architecture", fragment='int main() { return 0; }\n', mandatory=False, uselib='CORE TEST LUAJIT'):
 		ctx.check_cfg(package='luajit', args='--cflags --libs', uselib_store='LUA', mandatory=False)
