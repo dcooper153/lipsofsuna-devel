@@ -87,6 +87,12 @@ Obstaclespec{
 -- Quest obstacles
 
 Obstaclespec{
+	name = "wanted poster",
+	model = "wantedposter1",
+	categories = {"special"},
+	dialog = "castlewanted"}
+
+Obstaclespec{
 	name = "sanctuary device",
 	model = "torch1",
 	categories = {"special"},
