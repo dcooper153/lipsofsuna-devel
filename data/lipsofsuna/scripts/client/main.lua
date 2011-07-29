@@ -65,20 +65,29 @@ else
 	Client:set_mode("login")
 end
 
+Program.profiling = {}
+
 -- Main loop.
 while not Program.quit do
 	-- Update program state.
+	local t1 = Program.time
 	Program:update()
+	local t2 = Program.time
 	-- Handle events.
 	local event = Program:pop_event()
 	while event do
 		Eventhandler:event(event)
 		event = Program:pop_event()
 	end
+	Widgets:update()
+	local t3 = Program.time
 	-- Render the scene.
 	Program:clear_buffer()
 	Widgets:draw()
 	Program:swap_buffers()
-	-- Focus widgets.
-	Widgets:update()
+	local t4 = Program.time
+	-- Update profiling stats.
+	Program.profiling.update = t2 - t1
+	Program.profiling.event = t3 - t2
+	Program.profiling.render = t4 - t3
 end

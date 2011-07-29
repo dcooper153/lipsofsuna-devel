@@ -51,7 +51,12 @@ Views.Admin.enter = function(self, from, level)
 Database memory: %d kB
 Script memory: %d kB
 Terrain memory: %d kB
-Model memory: %d kB]], Database.memory_used / 1024, gcinfo(), Voxel.memory_used / 1024, models / 1024)
+Model memory: %d kB
+Update tick: %d ms
+Event tick: %d ms
+Render tick: %d ms
+]], Database.memory_used / 1024, gcinfo(), Voxel.memory_used / 1024, models / 1024,
+1000 * Program.profiling.update, 1000 * Program.profiling.event, 1000 * Program.profiling.render)
 	self.label_database:build()
 end
 
