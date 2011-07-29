@@ -160,28 +160,22 @@ Eventhandler{type = "tick", func = function(self, args)
 			end
 		end
 	end
-	-- Update animations.
-	if Object.deform_mesh then
-		animt = animt + args.secs
-		if animt > 0.2 * (1 - Client.views.options.animation_quality) then
-			for k,v in pairs(Object.objects) do
-				if v.animated then
-					v:update_animations{secs = animt}
-					v:update_sound(animt)
-					v:deform_mesh()
-				end
-			end
-			animt = 0
+	-- Update objects.
+	animt = animt + args.secs
+	local anim = Object.deform_mesh and animt > 0.2 * (1 - Client.views.options.animation_quality)
+	for k,v in pairs(Object.objects) do
+		-- Update animations.
+		if anim and v.animated then
+			v:update_animations{secs = animt}
+			v:update_sound(animt)
+			v:deform_mesh()
 		end
+		-- Interpolate positions.
+		v:update_motion_state(args.secs)
+		-- Update slots and special effects.
+		v:update(args.secs)
 	end
-	-- Interpolate objects.
-	ipolt = math.min(ipolt + args.secs, 1)
-	while ipolt > 1/60 do
-		for k,v in pairs(Object.objects) do
-			v:update_motion_state(1/60)
-		end
-		ipolt = ipolt - 1/60
-	end
+	if anim then animt = 0 end
 	-- Update player state.
 	if Player.object then
 		Player:update_pose(args.secs)
@@ -206,10 +200,6 @@ Eventhandler{type = "tick", func = function(self, args)
 		Player.object:refresh()
 		-- Maintain the respawn widget.
 		Gui:set_dead(Player.object.dead)
-	end
-	-- Update slots and special effects of objects.
-	for k,v in pairs(Object.objects) do
-		v:update(args.secs)
 	end
 	-- Update the FPS label.
 	if Gui.fps_label then
