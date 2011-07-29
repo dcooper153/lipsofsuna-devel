@@ -3,10 +3,10 @@ Pattern{
 	size = Vector(44,16,44),
 	categories = {},
 	obstacles = {
-		{02,02,00,"building marker"},{12,02,00,"building marker"},{20,02,00,"building marker"},{30,02,00,"building marker"},
-		{02,02,10,"building marker"},{12,02,10,"building marker"},{20,02,10,"building marker"},{30,02,10,"building marker"},
-		{02,02,20,"building marker"},{12,02,20,"building marker"},{20,02,20,"building marker"},{30,02,20,"building marker"},
-		{02,02,30,"building marker"},{12,02,30,"building marker"},{20,02,30,"building marker"},{30,02,30,"building marker"}},
+		{02,02,00,"building marker"},{12,02,00,"building marker"},{22,02,00,"building marker"},{32,02,00,"building marker"},
+		{02,02,10,"building marker"},{12,02,10,"building marker"},{22,02,10,"building marker"},{32,02,10,"building marker"},
+		{02,02,20,"building marker"},{12,02,20,"building marker"},{22,02,20,"building marker"},{32,02,20,"building marker"},
+		{02,02,30,"building marker"},{12,02,30,"building marker"},{22,02,30,"building marker"},{32,02,30,"building marker"}},
 	creatures = {
 		{23.650000,0.990000,34.770000,"Castle Foreman"}},
 	tiles = {
