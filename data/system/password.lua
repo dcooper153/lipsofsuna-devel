@@ -4,14 +4,22 @@ end
 
 Password = Class()
 
---- Generates Perlin noise.
--- @param self Noise class.
+--- Creates a password hash.
+-- @param self Program class.
 -- @param pass Password string.
 -- @param salt Salt string.
 -- @param rounds Number of PBKDF2 rounds.
 -- @return Password hash as a hexadecimal string.
 Password.hash = function(self, pass, salt, rounds)
 	return Los.program_hash_password(pass, salt, rounds)
+end
+
+--- Generates a random password salt string.
+-- @param self Program class.
+-- @param length String length.
+-- @return Password salt string.
+Password.random_salt = function(self, length)
+	return Los.program_random_salt(length)
 end
 
 Password.unittest = function()
@@ -34,4 +42,6 @@ Password.unittest = function()
 		local h = Password:hash(v[1])
 		assert(h == string.sub(v[2], 0, 32))
 	end
+	local salt = Password:random_salt(12)
+	assert(#salt == 12)
 end

@@ -59,12 +59,34 @@ static void Program_hash_password (LIScrArgs* args)
 	liscr_args_seti_string (args, hex);
 }
 
+static void Program_random_salt (LIScrArgs* args)
+{
+	int i;
+	int length = 32;
+	char* string;
+	LIAlgRandom random;
+
+	if (liscr_args_geti_int (args, 0, &length))
+		length = LIMAT_MAX (length, 1);
+
+	string = lisys_calloc (length + 1, sizeof (char));
+	if (string == NULL)
+		return;
+	lialg_random_init (&random, lisys_time (NULL));
+	for (i = 0 ; i < length ; i++)
+		string[i] = lialg_random_range (&random, (int) '!', (int) '~');
+	string[i] = '\0';
+	liscr_args_seti_string (args, string);
+	lisys_free (string);
+}
+
 /*****************************************************************************/
 
 void liext_script_password (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_hash_password", Program_hash_password);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_random_salt", Program_random_salt);
 }
 
 /** @} */
