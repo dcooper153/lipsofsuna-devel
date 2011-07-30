@@ -56,6 +56,7 @@ require "system/render"
 catch(function() Light.unittest() end)
 
 -- Checks for valgrind.
+require "system/model-editing"
 require "system/object-render"
 local create_cube_model = function(aabb)
 	-- Calculate the vertices of the bounding box.
