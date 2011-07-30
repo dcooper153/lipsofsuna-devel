@@ -53,6 +53,14 @@ Quickslots.activate = function(clss, index)
 	end
 end
 
+--- Resets the quickslots to the original state.
+-- @param clss Quickslots class.
+Quickslots.reset = function(clss)
+	for i = 1,12 do
+		clss.items:assign_none(i)
+	end
+end
+
 --- Saves the quickslots.
 -- @param clss Quickslots class.
 Quickslots.save = function(clss)

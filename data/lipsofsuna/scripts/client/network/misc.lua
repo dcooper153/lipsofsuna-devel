@@ -8,6 +8,7 @@ end}
 
 Protocol:add_handler{type = "CHARACTER_ACCEPT", func = function(event)
 	Client:set_mode("game")
+	Quickslots:reset()
 end}
 Protocol:add_handler{type = "CHARACTER_CREATE", func = function(event)
 	Client:set_mode("chargen")

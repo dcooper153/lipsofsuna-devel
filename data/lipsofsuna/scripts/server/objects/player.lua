@@ -18,7 +18,6 @@ end
 --   <li>angular: Angular velocity.</li>
 --   <li>body_scale: Scale factor of the body.</li>
 --   <li>body_style: Body style defined by an array of scalars.</li>
---   <li>client: Client controlling the character.</li>
 --   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
 --   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
 --   <li>id: Unique object ID or nil for a random free one.</li>
@@ -36,7 +35,6 @@ Player.new = function(clss, args)
 	self.account = args.account
 	self.running = true
 	self:calculate_speed()
-	if args.client then self:set_client(args.client) end
 	return self
 end
 

@@ -1,6 +1,4 @@
 local spawn_player = function(object, client, spawnpoint)
-	-- Inform client.
-	Network:send{client = client, packet = Packet(packets.CHARACTER_ACCEPT)}
 	-- Select the spawn point.
 	-- If the account doesn't have a spawn point yet, set the selected
 	-- marker or the default spawn point as its spawn point.
@@ -77,7 +75,6 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		account = account,
 		body_scale = b1,
 		body_style = {b2,b3,b4,b5,b6,b7,b8,b9},
-		client = args.client,
 		eye_style = {eye, eyer, eyeg, eyeb},
 		face_style = {f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15},
 		hair_style = {hair, hairr, hairg, hairb},
@@ -95,6 +92,8 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		o.skills:set_value{skill = names[i], value = 0.666 * real}
 	end
 	-- Add to the map.
+	Network:send{client = args.client, packet = Packet(packets.CHARACTER_ACCEPT)}
+	o:set_client(args.client)
 	spawn_player(o, args.client, spawnpoint)
 	Serialize:save_account(account, o)
 end}
