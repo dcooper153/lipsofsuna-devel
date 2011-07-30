@@ -102,6 +102,7 @@ Protocol:add_handler{type = "ADMIN_STATS", func = function(args)
 	-- Count objects.
 	local num_players_miss = 0
 	local num_players_real = 0
+	local num_creatures_idle = 0
 	local num_creatures_miss = 0
 	local num_creatures_real = 0
 	local num_items_miss = 0
@@ -131,7 +132,11 @@ Protocol:add_handler{type = "ADMIN_STATS", func = function(args)
 			end
 		elseif v.class_name == "Creature" then
 			if v.realized then
-				num_creatures_real = num_creatures_real + 1
+				if v.ai and v.ai.state ~= "none" then
+					num_creatures_real = num_creatures_real + 1
+				else
+					num_creatures_idle = num_creatures_idle + 1
+				end
 			else
 				num_creatures_miss = num_creatures_miss + 1
 			end
@@ -165,7 +170,7 @@ Protocol:add_handler{type = "ADMIN_STATS", func = function(args)
 	-- Send stats.
 	player:send{packet = Packet(packets.ADMIN_STATS, "string", string.format(
 		[[Players: %d+%d
-		Creatures: %d+%d
+		Creatures: %d+%d+%d
 		Items: %d+%d+%d
 		Obstacles: %d+%d
 		Others: %d+%d
@@ -174,7 +179,7 @@ Protocol:add_handler{type = "ADMIN_STATS", func = function(args)
 		Tick update: %d ms
 		Tick event: %d ms]],
 		num_players_real, num_players_miss,
-		num_creatures_real, num_creatures_miss,
+		num_creatures_real, num_creatures_idle, num_creatures_miss,
 		num_items_real, num_items_inv, num_items_miss,
 		num_obstacles_real, num_obstacles_miss,
 		num_objects_real, num_objects_miss,

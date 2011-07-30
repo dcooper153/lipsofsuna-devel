@@ -1,6 +1,10 @@
 Ai = Class()
 
---- Creates a new creature AI.
+--- Creates a new creature AI.<br/>
+-- The AI is inactive when created. It's only activated when the controlled
+-- creature enters the vision radius of the player. This allows us to save lots
+-- of computing time since player motion often triggers loading of sectors whose
+-- creatures are never seen.
 -- @param clss AI class.
 -- @param object Controlled creature.
 -- @return AI.
@@ -10,7 +14,7 @@ Ai.new = function(clss, object)
 	self.enemies = setmetatable({}, {__mode = "kv"})
 	self.update_timer = 0
 	self:calculate_combat_ratings()
-	self:set_state{state = "wander"}
+	self:set_state{state = "none"}
 	self.object:set_movement(0)
 	return self
 end
@@ -553,6 +557,12 @@ Ai.find_best_feat = function(self, args)
 	return best_feat
 end
 
+--- Used to wake up the AI when a player is nearby.
+-- @param self AI.
+Ai.refresh = function(self)
+	if self.state == "none" then self:set_state{state = "wander"} end
+end
+
 --- Updates the enemy list of the AI.
 -- @param self AI.
 Ai.scan_enemies = function(self)
@@ -606,6 +616,11 @@ end
 -- @param self AI.
 -- @param secs Seconds since the last update.
 Ai.update = function(self, secs)
+	-- Early exit for inactive AI.
+	-- There are often lots of creatures in the active map area but most of them
+	-- have their AI disabled due no player being nearby. Since this function
+	-- would otherwise do at least a bit of work for each tick, it pays to exit early.
+	if self.state == "none" then return end
 	-- Avoid excessive updates.
 	-- Combat needs a high update rate so that we can react to the movements of
 	-- the enemy. The peaceful mode needs to be able to avoid getting stuck.

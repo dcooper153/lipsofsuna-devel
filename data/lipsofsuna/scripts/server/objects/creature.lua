@@ -3,6 +3,7 @@ require "server/objects/object"
 
 Creature = Class(Object)
 Creature.class_name = "Creature"
+Creature.dict_id = setmetatable({}, {__mode = "kv"})
 
 Creature:add_getters{
 	armor_class = function(s)
@@ -182,19 +183,11 @@ Creature.new = function(clss, args)
 	copy("carried_weight", 0)
 	copy("spec")
 	copy("variables")
+	clss.dict_id[self.id] = self
 	self.update_timer = 0.1 * math.random()
 	self:calculate_speed()
 	if args and args.dead then self:set_dead_state() end
 	copy("realized")
-
-	Coroutine(function()
-		while true do
-			local secs = coroutine.yield()
-			if not self.realized then return end
-			self:update(secs)
-		end
-	end)
-
 	return self
 end
 
@@ -938,7 +931,7 @@ Creature.update_environment = function(self, secs)
 	local tick = self.env_timer
 	self.env_timer = 0
 	-- Prevent sectors from unloading if a player is present.
-	if self.client then self:refresh{radius = 13} end
+	if self.client then self:refresh{radius = 20} end
 	-- Count tiles affecting us.
 	local src,dst = self:get_tile_range()
 	local env = Voxel:check_range(src, dst)

@@ -241,7 +241,9 @@ Player.vision_cb = function(self, args)
 			if o == self then sendmap() end
 		end,
 		["object-shown"] = function(args)
+			-- Wake up the AI.
 			local o = args.object
+			if o.ai then o.ai:refresh() end
 			local flags = o.flags or 0
 			-- Spec.
 			local data_spec = {}
