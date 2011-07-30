@@ -176,7 +176,7 @@ Serialize.save_accounts = function(clss, erase)
 		clss.accounts:query("DELETE FROM accounts;")
 	elseif erase then
 		clss.accounts:query("UPDATE accounts SET character = NULL;")
-		clss.accounts:query("UPDATE accounts SET spawn = NULL;")
+		clss.accounts:query("UPDATE accounts SET spawn_point = NULL;")
 	end
 	-- Write accounts.
 	for k,v in pairs(Player.clients) do
