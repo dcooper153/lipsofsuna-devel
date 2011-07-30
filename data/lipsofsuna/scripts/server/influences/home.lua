@@ -1,8 +1,7 @@
 Influencespec{name = "home", func = function(feat, info, args, value)
-	if Marker:find{name="home"} then
-		local a = Marker.find{name="home"}
-		a.position = args.target.position
-	else
-		local a = Marker{name="home",position=args.target.position} 
-	end
+	if not args.attacker.account then return end
+	local home = args.attacker.position
+	args.attacker.account.spawn_point = home
+	args.attacker:send(Packet(packets.MARKER_ADD, "string", "home",
+		"float", home.x, "float", home.y, "float", home.z))
 end}

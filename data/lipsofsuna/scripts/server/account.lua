@@ -17,6 +17,10 @@ Account.new = function(clss, login, password)
 		password = hash,
 		permissions = data and data[3] or 0,
 		character = data and data[4]})
+	if data and data[5] then
+		local ok,vec = pcall(loadstring("return " .. data[5]))
+		if ok then self.spawn_point = vec end
+	end
 	clss.dict_name[login] = self
 	return self
 end

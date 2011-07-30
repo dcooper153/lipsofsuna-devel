@@ -1,5 +1,5 @@
 Serialize = Class()
-Serialize.account_version = "1"
+Serialize.account_version = "2"
 Serialize.data_version = "8"
 
 --- Initializes the serializer.
@@ -29,7 +29,7 @@ Serialize.init = function(clss)
 		clss.accounts:query("DELETE FROM keyval;")
 		clss.accounts:query("REPLACE INTO keyval (key,value) VALUES (?,?);", {"account_version", clss.account_version})
 	end
-	clss.accounts:query("CREATE TABLE IF NOT EXISTS accounts (login TEXT PRIMARY KEY,password TEXT,permissions INTEGER,character TEXT);")
+	clss.accounts:query("CREATE TABLE IF NOT EXISTS accounts (login TEXT PRIMARY KEY,password TEXT,permissions INTEGER,character TEXT,spawn_point TEXT);")
 	rows = clss.accounts:query("SELECT value FROM keyval WHERE key=?;", {"password_salt"})
 	if #rows ~= 1 then
 		clss.accounts.password_salt = Password:random_salt()
@@ -94,7 +94,7 @@ end
 -- @param login Login name.
 -- @return Account database row or nil.
 Serialize.load_account = function(clss, login)
-	local r = clss.accounts:query("SELECT login,password,permissions,character FROM accounts WHERE login=?;", {login})
+	local r = clss.accounts:query("SELECT login,password,permissions,character,spawn_point FROM accounts WHERE login=?;", {login})
 	for k,v in ipairs(r) do
 		return v
 	end
@@ -162,20 +162,21 @@ end
 -- @param object Player object or nil.
 Serialize.save_account = function(clss, account, object)
 	clss.accounts:query("BEGIN TRANSACTION;")
-	clss.accounts:query("REPLACE INTO accounts (login,password,permissions,character) VALUES (?,?,?,?);",
-		{account.login, account.password, account.permissions, object and object:write()})
+	clss.accounts:query("REPLACE INTO accounts (login,password,permissions,character,spawn_point) VALUES (?,?,?,?,?);",
+		{account.login, account.password, account.permissions, object and object:write(), account.spawn_point and tostring(account.spawn_point)})
 	clss.accounts:query("END TRANSACTION;")
 end
 
 --- Saves all active player accounts.
 -- @param clss Serialize class.
--- @param erase True to erase existing characters, "all" to erase all account data.
+-- @param erase True to erase characters, "all" to erase all account data.
 Serialize.save_accounts = function(clss, erase)
 	-- Delete accounts or characters.
 	if erase == "all" then
 		clss.accounts:query("DELETE FROM accounts;")
 	elseif erase then
 		clss.accounts:query("UPDATE accounts SET character = NULL;")
+		clss.accounts:query("UPDATE accounts SET spawn = NULL;")
 	end
 	-- Write accounts.
 	for k,v in pairs(Player.clients) do

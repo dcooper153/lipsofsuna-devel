@@ -1,18 +1,25 @@
-local spawn_player = function(object, client)
+local spawn_player = function(object, client, spawnpoint)
 	-- Inform client.
 	Network:send{client = client, packet = Packet(packets.CHARACTER_ACCEPT)}
+	-- Select the spawn point.
+	-- If the account doesn't have a spawn point yet, set the selected
+	-- marker or the default spawn point as its spawn point.
+	local home = object.account.spawn_point or Config.inst.spawn_point
+	if spawnpoint and spawnpoint ~= "home" then
+		-- TODO: Rather spawn to regions?
+		local m = Marker:find{name = spawnpoint}
+		if m then home = m.position end
+	end
+	if not object.account.spawn_point then
+		object.account.spawn_point = home
+	end
 	-- Add to the map.
 	Player.clients[client] = object
-	if object.spawnpoint and Marker:find{name=object.spawnpoint} then
-		--TODO decide between region or marker for spawn point
-		--local reg = Regionspec:find{name = object.spawnpoint}
-		--object:teleport{point = reg.spawn_point_world+Vector(0,0,5)}
-		object:teleport{marker = object.spawnpoint}
-	else 
-		print"nospawn"
-		object:teleport{position =Config.inst.spawn_point} 
-	end
+	object:teleport{position = home}
 	object.realized = true
+	-- Transmit the home marker.
+	object:send(Packet(packets.MARKER_ADD, "string", "home",
+		"float", home.x, "float", home.y, "float", home.z))
 	-- Transmit unlocked map markers.
 	for k,m in pairs(Marker.dict_name) do
 		if m.unlocked then
@@ -77,8 +84,7 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		name = (na ~= "" and na or "Player"),
 		random = true,
 		skin_style = {skin, skinr, sking, skinb},
-		spec = spec,
-		spawnpoint = spawnpoint}
+		spec = spec}
 	-- Set skills.
 	local names = {"dexterity", "health", "intelligence", "perception", "strength", "willpower"}
 	local values = {s1, s2, s3, s4, s5, s6}
@@ -89,7 +95,7 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		o.skills:set_value{skill = names[i], value = 0.666 * real}
 	end
 	-- Add to the map.
-	spawn_player(o, args.client)
+	spawn_player(o, args.client, spawnpoint)
 	Serialize:save_account(account, o)
 end}
 

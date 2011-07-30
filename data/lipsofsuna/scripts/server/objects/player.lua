@@ -29,7 +29,6 @@ end
 --   <li>rotation: Rotation quaternion of the creature.</li>
 --   <li>skin_style: Skin style defined by an array of {style, red, green, blue}.</li>
 --   <li>spec: Species of the creature.</li>
---   <li>spawnpoint: spawnpoint of the creature</li>
 --   <li>realized: True to add the object to the simulation.</li></ul>
 -- @return Player.
 Player.new = function(clss, args)
@@ -505,7 +504,6 @@ Player.write = function(self)
 		rotation = self.rotation,
 		skin_style = self.skin_style,
 		spec = self.spec.name,
-		spawnpoint = self.spawnpoint,
 		variables = self.variables},
 		Serialize:encode_skills(self.skills),
 		Serialize:encode_inventory(self.inventory),
