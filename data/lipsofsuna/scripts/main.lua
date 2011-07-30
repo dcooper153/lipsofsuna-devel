@@ -54,6 +54,7 @@ require "common/voxel"
 
 require "system/lobby"
 if Settings.server then
+require "system/password"
 require "system/vision"
 require "common/inventory"
 require "common/skills"

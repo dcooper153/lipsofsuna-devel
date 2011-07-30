@@ -1,11 +1,11 @@
 Serialize = Class()
+Serialize.account_version = "1"
 Serialize.data_version = "8"
 
 --- Initializes the serializer.
 -- @param clss Serialize class.
 Serialize.init = function(clss)
-	clss.accounts = Database{name = "accounts" .. Settings.file .. ".sqlite"}
-	clss.accounts:query("CREATE TABLE IF NOT EXISTS accounts (login TEXT PRIMARY KEY,password TEXT,permissions INTEGER,character TEXT);")
+	-- Create the save database.
 	clss.db = Database{name = "save" .. Settings.file .. ".sqlite"}
 	clss.sectors = Sectors{database = clss.db}
 	clss.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
@@ -20,6 +20,23 @@ Serialize.init = function(clss)
 	clss.db:query("CREATE TABLE IF NOT EXISTS markers (name TEXT PRIMARY KEY,id INTEGER,x FLOAT,y FLOAT,z FLOAT,unlocked INTENGER);")
 	clss.db:query("CREATE TABLE IF NOT EXISTS quests (name TEXT PRIMARY KEY,status TEXT,desc TEXT,marker TEXT);")
 	Sectors.instance = clss.sectors
+	-- Create the account database.
+	clss.accounts = Database{name = "accounts" .. Settings.file .. ".sqlite"}
+	clss.accounts:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
+	local rows = clss.accounts:query("SELECT value FROM keyval WHERE key=?;", {"account_version"})
+	if #rows ~= 1 or rows[1][1] ~= clss.account_version then
+		clss.accounts:query("DROP TABLE IF EXISTS accounts;")
+		clss.accounts:query("DELETE FROM keyval;")
+		clss.accounts:query("REPLACE INTO keyval (key,value) VALUES (?,?);", {"account_version", clss.account_version})
+	end
+	clss.accounts:query("CREATE TABLE IF NOT EXISTS accounts (login TEXT PRIMARY KEY,password TEXT,permissions INTEGER,character TEXT);")
+	rows = clss.accounts:query("SELECT value FROM keyval WHERE key=?;", {"password_salt"})
+	if #rows ~= 1 then
+		clss.accounts.password_salt = Password:random_salt()
+		clss.accounts:query("REPLACE INTO keyval (key,value) VALUES (?,?);", {"password_salt", clss.accounts.password_salt})
+	else
+		clss.accounts.password_salt = rows[1][1]
+	end
 end
 
 --- Makes a string out of an inventory and saves the items to the database.
