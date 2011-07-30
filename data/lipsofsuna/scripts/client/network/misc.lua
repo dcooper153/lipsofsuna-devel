@@ -6,14 +6,6 @@ Protocol:add_handler{type = "BOOK", func = function(event)
 	end
 end}
 
-Protocol:add_handler{type = "CHARACTER_ACCEPT", func = function(event)
-	Client:set_mode("game")
-	Quickslots:reset()
-end}
-Protocol:add_handler{type = "CHARACTER_CREATE", func = function(event)
-	Client:set_mode("chargen")
-end}
-
 Protocol:add_handler{type = "FEAT_UNLOCK", func = function(event)
 	local ok,n = event.packet:read("string")
 	if ok then
@@ -40,17 +32,6 @@ Protocol:add_handler{type = "EFFECT_WORLD", func = function(event)
 	if ok then
 		Effect:play_world(t, Vector(x,y,z))
 	end
-end}
-
-Protocol:add_handler{type = "AUTHENTICATE_REJECT", func = function(event)
-	local ok,s = event.packet:read("string")
-	if not ok then return end
-	Client:set_mode("startup")
-	Client.views.startup:set_state("Authentication failed: " .. s)
-end}
-
-Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(event)
-	Network:send{packet = Packet(packets.CLIENT_AUTHENTICATE, "string", Settings.account, "string", Settings.password)}
 end}
 
 Protocol:add_handler{type = "GENERATOR_STATUS", func = function(event)
