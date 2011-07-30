@@ -120,11 +120,13 @@ Protocol:add_handler{type = "ADMIN_STATS", func = function(args)
 			else
 				num_players_miss = num_players_miss + 1
 			end
-			for k1,v1 in pairs(v.vision.objects) do
-				if k1.realized then
-					num_vision_real = num_vision_real + 1
-				else
-					num_vision_miss = num_vision_miss + 1
+			if v.vision then
+				for k1,v1 in pairs(v.vision.objects) do
+					if k1.realized then
+						num_vision_real = num_vision_real + 1
+					else
+						num_vision_miss = num_vision_miss + 1
+					end
 				end
 			end
 		elseif v.class_name == "Creature" then
