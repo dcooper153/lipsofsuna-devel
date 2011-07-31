@@ -74,7 +74,7 @@ end
 
 Player.set_client = function(self, client)
 	self.client = client
-	self.vision = Vision{enabled = true, object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
+	self.vision = Vision{cone_factor = 0.5, cone_angle = math.pi/2.5, enabled = true, object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
 	self.vision.terrain = {}
 	self.inventory:subscribe{object = self, callback = function(args) self:inventory_cb(args) end}
 	-- Terrain listener.
@@ -171,6 +171,7 @@ Player.update_vision_radius = function(self)
 	local perception = skills:get_value{skill = "perception"}
 	if not perception then return end
 	local r = 20 + perception / 4
+	self.vision.direction = self.rotation * Vector(0,0,-1)
 	self.vision.position = self.position
 	if math.floor(r) ~= self.vision.radius then
 		self.vision.radius = r

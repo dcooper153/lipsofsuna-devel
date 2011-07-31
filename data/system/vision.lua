@@ -71,6 +71,11 @@ Vision.update = function(self)
 end
 
 Vision:add_getters{
+	cone_angle = function(self) return Los.vision_get_cone_angle(self.handle) end,
+	cone_factor = function(self) return Los.vision_get_cone_factor(self.handle) end,
+	direction = function(self)
+		return Class.new(Vector, {handle = Los.vision_get_direction(self.handle)})
+	end,
 	enabled = function(self) return Vision.dict[self] end,
 	position = function(self)
 		return Class.new(Vector, {handle = Los.vision_get_position(self.handle)})
@@ -79,6 +84,9 @@ Vision:add_getters{
 	threshold = function(self) return Los.vision_get_threshold(self.handle) end}
 
 Vision:add_setters{
+	cone_angle = function(self, v) Los.vision_set_cone_angle(self.handle, v) end,
+	cone_factor = function(self, v) Los.vision_set_cone_factor(self.handle, v) end,
+	direction = function(self, v) Los.vision_set_direction(self.handle, v.handle) end,
 	enabled = function(self, v) Vision.dict[self] = v and true or nil end,
 	position = function(self, v) Los.vision_set_position(self.handle, v.handle) end,
 	radius = function(self, v) Los.vision_set_radius(self.handle, v) end,

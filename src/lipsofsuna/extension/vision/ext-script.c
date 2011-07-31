@@ -62,6 +62,63 @@ static void Vision_update (LIScrArgs* args)
 	liscr_script_set_gc (args->script, 1);
 }
 
+static void Vision_get_cone_angle (LIScrArgs* args)
+{
+	LIExtVisionListener* self;
+
+	self = args->self;
+	liscr_args_seti_float (args, self->cone_angle);
+}
+
+static void Vision_set_cone_angle (LIScrArgs* args)
+{
+	float v;
+	LIExtVisionListener* self;
+
+	self = args->self;
+	if (liscr_args_geti_float (args, 0, &v))
+	{
+		self->cone_angle = v;
+		self->cone_cosine = cos (v);
+	}
+}
+
+static void Vision_get_cone_factor (LIScrArgs* args)
+{
+	LIExtVisionListener* self;
+
+	self = args->self;
+	liscr_args_seti_float (args, self->cone_factor);
+}
+
+static void Vision_set_cone_factor (LIScrArgs* args)
+{
+	float v;
+	LIExtVisionListener* self;
+
+	self = args->self;
+	if (liscr_args_geti_float (args, 0, &v))
+		self->cone_factor = v;
+}
+
+static void Vision_get_direction (LIScrArgs* args)
+{
+	LIExtVisionListener* self;
+
+	self = args->self;
+	liscr_args_seti_vector (args, &self->direction);
+}
+
+static void Vision_set_direction (LIScrArgs* args)
+{
+	LIMatVector v;
+	LIExtVisionListener* self;
+
+	self = args->self;
+	if (liscr_args_geti_vector (args, 0, &v))
+		self->direction = v;
+}
+
 static void Vision_get_position (LIScrArgs* args)
 {
 	LIExtVisionListener* self;
@@ -124,6 +181,12 @@ void liext_script_vision (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_VISION, "vision_new", Vision_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_clear", Vision_clear);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_update", Vision_update);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_get_cone_angle", Vision_get_cone_angle);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_set_cone_angle", Vision_set_cone_angle);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_get_cone_factor", Vision_get_cone_factor);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_set_cone_factor", Vision_set_cone_factor);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_get_direction", Vision_get_direction);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_set_direction", Vision_set_direction);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_get_position", Vision_get_position);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_set_position", Vision_set_position);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_get_radius", Vision_get_radius);

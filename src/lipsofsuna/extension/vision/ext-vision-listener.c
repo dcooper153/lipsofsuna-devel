@@ -27,8 +27,12 @@ LIExtVisionListener* liext_vision_listener_new (
 	self = lisys_calloc (1, sizeof (LIExtVisionListener));
 	if (self == NULL)
 		return NULL;
+	self->cone_angle = 0.0f;
+	self->cone_cosine = 0.5f * M_PI;
+	self->cone_factor = 0.5f;
 	self->keep_threshold = 5.0f;
 	self->scan_radius = 32.0f;
+	self->direction = limat_vector_init (0.0f, 0.0f, -1.0f);
 	self->module = module;
 
 	/* Allocate the object dictionary. */
@@ -70,8 +74,12 @@ void liext_vision_listener_update (
 	lua_State*           lua)
 {
 	float dist2;
+	float dot;
+	float mult;
 	float radius2_add;
 	float radius2_del;
+	float radius2_add_obj;
+	float radius2_del_obj;
 	LIAlgU32dicIter iter;
 	LIEngObject* object;
 	LIMatVector diff;
@@ -112,11 +120,21 @@ void liext_vision_listener_update (
 		pos = object->transform.position;
 		diff = limat_vector_subtract (pos, self->position);
 		dist2 = limat_vector_dot (diff, diff);
+		dot = limat_vector_dot (self->direction, limat_vector_normalize (diff));
+		radius2_add_obj = radius2_add;
+		radius2_del_obj = radius2_del;
+		if (dot < self->cone_cosine)
+		{
+			mult = (dot + 1.0f) / (self->cone_cosine + 1.0f);
+			mult = (1.0f - mult) * self->cone_factor + mult;
+			radius2_add_obj *= mult;
+			radius2_del_obj *= mult;
+		}
 
 		/* Check if the object just entered the vision sphere. */
 		if (lialg_u32dic_find (self->objects, object->id) == NULL)
 		{
-			if (dist2 <= radius2_add)
+			if (dist2 <= radius2_add_obj)
 			{
 				lialg_u32dic_insert (self->objects, object->id, NULL + 1);
 				lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
@@ -136,7 +154,7 @@ void liext_vision_listener_update (
 		/* Check if the object has just left the vision sphere. */
 		else
 		{
-			if (dist2 > radius2_del)
+			if (dist2 > radius2_del_obj)
 			{
 				lialg_u32dic_remove (self->objects, object->id);
 				lua_pushnumber (lua, lua_objlen (lua, -1) + 1);

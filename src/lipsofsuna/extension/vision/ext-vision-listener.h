@@ -24,11 +24,16 @@
 typedef struct _LIExtVisionListener LIExtVisionListener;
 struct _LIExtVisionListener
 {
+	float cone_angle;
+	float cone_cosine;
+	float cone_cutoff;
+	float cone_factor;
 	float scan_radius;
 	float keep_threshold;
 	LIAlgU32dic* objects;
 	LIExtModule* module;
 	LIMatVector position;
+	LIMatVector direction;
 	LIScrData* script;
 };
 
