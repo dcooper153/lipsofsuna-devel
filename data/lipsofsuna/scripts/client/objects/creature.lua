@@ -24,7 +24,7 @@ Creature.set_model = function(self, model)
 		local m = model or Model:find_or_load{file = self.spec.model}
 		if not m then return end
 		if m and m.name and Program.opengl_version < 3.2 then
-			m = model:copy()
+			m = m:copy()
 			m:changed()
 		end
 		self.model = m
