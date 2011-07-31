@@ -15,7 +15,7 @@ local radian_wrap = function(x)
 end
 
 Player.get_ignored_objects = function(clss)
-	local ignore = {clss.crosshair, clss.object}
+	local ignore = {clss.object}
 	local slots = clss.object.slots
 	if slots then
 		for k,v in pairs(slots.slots) do
@@ -29,7 +29,6 @@ Player.pick_look = function(clss)
 	-- Make sure that the player is logged in.
 	if not clss.object then
 		Target.target_object = nil
-		clss.crosshair.realized = false
 		return
 	end
 	-- Ray pick an object in front of the player.
@@ -61,9 +60,8 @@ Player.pick_look = function(clss)
 	else
 		Gui:set_target_text()
 	end
-	-- Update the crosshair.
-	clss.crosshair.position = (p or r2) - (r2 - r1):normalize() * 0.1
-	clss.crosshair.realized = true
+	-- Update the 3D crosshair position.
+	clss.crosshair_position = (p or r2) - (r2 - r1):normalize() * 0.1
 end
 
 Player.update_compass = function(clss)

@@ -137,9 +137,9 @@ Eventhandler{type = "quit", func = function(self, args)
 end}
 
 local animt = 0
-local ipolt = 0
+local compasst = 0
 local fpst = 0
-local pickt = 0
+local ipolt = 0
 Eventhandler{type = "tick", func = function(self, args)
 	-- Update the connection status.
 	if Client.views.startup.joined and not Network.connected then
@@ -208,16 +208,18 @@ Eventhandler{type = "tick", func = function(self, args)
 		-- Maintain the respawn widget.
 		Gui:set_dead(Client.player_object.dead)
 	end
-	pickt = pickt + args.secs
-	if pickt > 0.1 then
-		pickt = 0
-		-- Periodically check if there's an object in front of the player.
-		if Client.player_object and Program.cursor_grabbed then
-			Player:pick_look()
-		else
-			Target.target_object = nil
-		end
-		-- Periodically update the compass.
+	-- Update the 3D cursor.
+	-- This really needs to be done every frame since the 3rd person
+	-- camera suffers greatly from any big cursor position changes.
+	if Client.player_object and Program.cursor_grabbed then
+		Player:pick_look()
+	else
+		Target.target_object = nil
+	end
+	-- Periodically update the compass.
+	compasst = compasst + args.secs
+	if compasst > 0.1 then
+		compasst = 0
 		Player:update_compass()
 	end
 	-- Update the FPS label.

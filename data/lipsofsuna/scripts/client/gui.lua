@@ -27,6 +27,7 @@ Gui.init = function(clss)
 	Gui.button_respawn = Widgets.Button{font = "medium", text = "Create a new character", visible = false,
 		pressed = function() Network:send{packet = Packet(packets.PLAYER_RESPAWN)} end}
 	Gui.skills_group = Widgets.Frame{style = "quickbar"}
+	Gui.crosshair = Widgets.Icon{icon = Iconspec:find{name = "crosshair1"}}
 	-- Packing.
 	Gui.scene = Widgets.Scene{cols = 1, rows = 3, behind = true, fullscreen = true, margins = {5,5,0,0}, spacings = {0,0}}
 	Gui.scene:set_expand{col = 1, row = 1}
@@ -43,6 +44,7 @@ Gui.init = function(clss)
 	Gui.scene:add_child(Gui.skill_health)
 	Gui.scene:add_child(Gui.skill_mana)
 	Gui.scene:add_child(Gui.skills_group)
+	Gui.scene:add_child(Gui.crosshair)
 	Gui:resize()
 end
 
@@ -66,6 +68,9 @@ Gui.resize = function(self)
 	self.skill_mana.offset = Vector(83, size.y - 21)
 	self.fps_label.offset = Vector(size.x - 60, size.y - 20)
 	Quickslots.group.offset = Vector(250, size.y - 36)
+	local chx = (size.x - self.crosshair.width) / 2
+	local chy = (size.y - self.crosshair.height) / 2
+	self.crosshair.offset = Vector(chx, chy)
 end
 
 Gui.set_dead = function(self, value)

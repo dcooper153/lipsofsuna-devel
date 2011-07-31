@@ -528,6 +528,12 @@ Iconspec{
 	size = {32,32}}
 
 Iconspec{
+	name = "crosshair1",
+	image = "widgets1",
+	offset = {800,70},
+	size = {20,20}}
+
+Iconspec{
 	name = "mapmarker1",
 	image = "compass1",
 	offset = {0,8},

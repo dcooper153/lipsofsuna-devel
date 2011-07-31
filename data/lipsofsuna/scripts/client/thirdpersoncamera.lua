@@ -14,6 +14,8 @@ ThirdPersonCamera.new = function(clss, args)
 	local self = Camera.new(clss, args)
 	self.collision_mask = Physics.MASK_CAMERA
 	self.mode = "third-person"
+	self.rotation_smoothing = 0.15
+	self.position_smoothing = 0.15
 	self.tilt_speed = 0
 	self.tilt_state = 0
 	self.turn_speed = 0
@@ -41,8 +43,8 @@ ThirdPersonCamera.get_transform = function(self)
 	-- the character doesn't obstruct the crosshair so badly.
 	local best_center = self.object.position + rel
 	local best_score = -1
-	local stepl = 0.26
-	local stepn = 5
+	local stepl = 0.12
+	local stepn = 6
 	local steps = stepn
 	local r1 = self.object.position + rel
 	local r2 = r1 + turn1 * Vector(stepl * stepn)
@@ -53,18 +55,38 @@ ThirdPersonCamera.get_transform = function(self)
 	end
 	for i=0,steps do
 		-- Calculate the score of the camera position.
-		-- Camera positions that have the best displacement to the side and
-		-- the most distance to the target before hitting a wall are favored.
+		-- Grant points to positions that have the best displacement to the
+		-- side and the most distance to the target before hitting a wall.
 		local center = r1 + turn1 * Vector(i * stepl)
 		local back = Physics:cast_ray{collision_mask = self.collision_mask, src = center, dst = center + rot * Vector(0,0,5)}
 		local dist = back and (back.point - center).length or 5
 		local score = 3 * dist + (i + 1)
+		-- Prevent the crosshair corrected rotation from diverging too much
+		-- from the look direction when the target is very close.
+		if Player.crosshair_position then
+			local dir = (Player.crosshair_position - best_center):normalize()
+			local rot1 = Quaternion{dir = dir, up = Vector(0,1,0)}
+			local dir1 = rot * Vector(0,0,-1)
+			local dir2 = rot1 * Vector(0,0,-1)
+			if i > 0 and dir1:dot(dir2) < 0.95 then score = -2 end
+		end
 		-- Choose the best camera center.
 		if best_score <= score then
-			local side = i * stepl
 			best_score = score
 			best_center = center
 		end
+	end
+	-- Rotate the crosshair to screen center.
+	if Player.crosshair_position then
+		-- Calculate such a camera rotation that the 3D cursor is projected to
+		-- the center of screen. A simple look-at transformation does it.
+		local dir = (Player.crosshair_position - best_center):normalize()
+		local rot1 = Quaternion{dir = dir, up = Vector(0,1,0)}
+		-- Because we want the free rotation mode to still work, we mix the user
+		-- manipulated and crosshair correct rotations based on how much the user
+		-- has applied custom rotation to the camera.
+		local mix2 = math.min(1, 30 * math.max(math.abs(self.turn_state),math.abs(self.tilt_state)))
+		rot = rot:nlerp(rot1, mix2)
 	end
 	-- Return the final transformation.
 	return best_center, rot
