@@ -31,7 +31,7 @@ Views.Chargen.new = function(clss)
 	self.skills = Widgets.Skills{changed = function(widget, skill)
 		skill.value = skill.cap
 	end}
-	self.object = Object{position = Vector(1, 1, 1), type = "character"}
+	self.object = Creature{position = Vector(1, 1, 1)}
 	self.light = Light{ambient = {1.0,1.0,1.0,1.0}, diffuse = {1.0,1.0,1.0,1.0}, equation = {2,0.3,0.03}}
 	self.timer = Timer{enabled = false, func = function(timer, secs) self:update(secs) end}
 	self.list_hair_styles = {}
@@ -141,7 +141,6 @@ Views.Chargen.new = function(clss)
 			self.active_preset = w
 			w.active = true
 			self:set_preset(w.preset)
-			self:update_model()
 		end}
 		table.insert(self.toggle_presets, widget)
 		self.group_presets:set_child(1, k, widget)
@@ -558,10 +557,8 @@ Views.Chargen.update_model = function(self)
 	self.object.hair_style = self.hair_style
 	self.object.skin_color = {self.color_skin.red, self.color_skin.green, self.color_skin.blue}
 	self.object.skin_style = nil
-	self.object:update_model()
-	self.object:animate{animation = "idle", channel = 1, permanent = true}
-	self.object:update_animations{secs = 1}
-	self.object:deform_mesh()
+	self.object:set_model()
+	self.object:animate_spec("idle")
 	if self.dump_presets then
 		print(self.object:write_preset())
 	end

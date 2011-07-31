@@ -206,9 +206,15 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		type = "object"
 	end
 	-- Create the object.
-	local o = Object{collision_group = Physics.GROUP_OBJECT,
-		flags = Bitwise:band(flags, 0xFF),
+	local o
+	local o_args = {collision_group = Physics.GROUP_OBJECT, flags = Bitwise:band(flags, 0xFF),
 		id = id, model = model, spec = spec, type = type}
+	if type == "species" then
+		o = Creature(o_args)
+	else
+		o = Object(o_args)
+		if spec and spec.special_effects then Object.dict_active[o] = 0.1 end
+	end
 	-- Self.
 	if Bitwise:band(flags, Protocol.object_show_flags.SELF) ~= 0 then
 		debug("  SELF")
@@ -367,10 +373,10 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 			o:set_dialog("none")
 		end
 	end
-	-- Rebuild the model.
+	-- Set the spec model.
 	debug("  OK")
 	o.flags = Bitwise:band(flags, 0xFF)
-	o:update_model()
+	o:set_model()
 	o:update_rotation(o.rotation, o.tilt)
 	o.realized = true
 	-- Initialize speed lines.

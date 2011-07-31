@@ -34,7 +34,13 @@ Views.Admin.enter = function(self, from, level)
 		table.insert(listtype, string.format("%s: %d", k, v))
 	end
 	table.sort(listtype)
-	local t = string.format("Userdata: %d", userdata)
+	local numactive = 0
+	for k in pairs(Object.dict_active) do
+		numactive = numactive + 1
+	end
+	local t = string.format([[
+Active objects: %d
+Userdata: %d]], numactive, userdata)
 	for k,v in ipairs(listtype) do
 		t = string.format("%s\n%s", t, v)
 	end

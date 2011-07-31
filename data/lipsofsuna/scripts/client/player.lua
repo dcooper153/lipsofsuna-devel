@@ -132,14 +132,3 @@ end
 Player.set_light = function(clss, value)
 	clss.light_spell.enabled = value
 end
-
-Timer{delay = 0.1, func = function()
-	-- Periodically check if there's an object in front of the player.
-	if Player.object and Program.cursor_grabbed then
-		Player:pick_look()
-	else
-		Target.target_object = nil
-	end
-	-- Periodically update the compass.
-	Player:update_compass()
-end}

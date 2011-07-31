@@ -373,9 +373,6 @@ Views.Options:add_setters{
 		else
 			self.button_model_quality.text = "Low quality"
 		end
-		for i,o in pairs(Object.objects) do
-			o:update_model()
-		end
 		self:changed()
 	end,
 	mouse_sensitivity = function(self, v)

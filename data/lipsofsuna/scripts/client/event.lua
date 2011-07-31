@@ -139,6 +139,7 @@ end}
 local animt = 0
 local ipolt = 0
 local fpst = 0
+local pickt = 0
 Eventhandler{type = "tick", func = function(self, args)
 	-- Update the connection status.
 	if Client.views.startup.joined and not Network.connected then
@@ -156,28 +157,34 @@ Eventhandler{type = "tick", func = function(self, args)
 			local obj = Object:find{id = tonumber(msg.name)}
 			if obj and obj.spec then
 				msg.model:changed()
-				obj:replace_model(msg.model)
+				obj:set_model(msg.model)
 			end
 		end
 	end
-	-- Update objects.
+	-- Update active objects.
 	animt = animt + args.secs
 	local anim = Object.deform_mesh and animt > 0.2 * (1 - Client.views.options.animation_quality)
-	for k,v in pairs(Object.objects) do
+	for k,v in pairs(Object.dict_active) do
 		-- Update animations.
-		if anim and v.animated then
-			v:update_animations{secs = animt}
-			v:update_sound(animt)
-			v:deform_mesh()
+		if anim and k.animated then
+			k:update_animations{secs = animt}
+			k:update_sound(animt)
+			k:deform_mesh()
 		end
 		-- Interpolate positions.
-		v:update_motion_state(args.secs)
+		k:update_motion_state(args.secs)
 		-- Update slots and special effects.
-		v:update(args.secs)
+		k:update(args.secs)
+		-- Maintain activity.
+		if k.spec and k.spec.type ~= "species" then
+			v = v - args.secs
+			if v <= 0 then v = nil end
+			Object.dict_active[k] = v
+		end
 	end
 	if anim then animt = 0 end
 	-- Update player state.
-	if Player.object then
+	if Client.player_object then
 		Player:update_pose(args.secs)
 		Player:update_rotation(args.secs)
 		Client.camera1.object = Client.player_object
@@ -197,9 +204,21 @@ Eventhandler{type = "tick", func = function(self, args)
 		local vel = Client.player_object.velocity
 		if vel then Sound.listener_velocity = vel end
 		-- Refresh the active portion of the map.
-		Player.object:refresh()
+		Client.player_object:refresh()
 		-- Maintain the respawn widget.
-		Gui:set_dead(Player.object.dead)
+		Gui:set_dead(Client.player_object.dead)
+	end
+	pickt = pickt + args.secs
+	if pickt > 0.1 then
+		pickt = 0
+		-- Periodically check if there's an object in front of the player.
+		if Client.player_object and Program.cursor_grabbed then
+			Player:pick_look()
+		else
+			Target.target_object = nil
+		end
+		-- Periodically update the compass.
+		Player:update_compass()
 	end
 	-- Update the FPS label.
 	if Gui.fps_label then
