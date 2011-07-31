@@ -111,6 +111,9 @@ int liren_model21_deform (
 	LIMdlPoseGroup* group;
 	LIMdlVertex* vertices;
 
+	if (self->buffer == NULL)
+		return 1;
+
 	/* Collect pose data. */
 	/* The first transformation in the list is the fallback identity
 	   transformation used by vertices that don't have all four weights. */
