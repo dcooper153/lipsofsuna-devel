@@ -173,6 +173,13 @@ Player.update = function(self, secs)
 end
 
 Player.update_map = function(self)
+	-- Discover map markers.
+	for k,v in pairs(Marker.dict_discoverable) do
+		if (self.position - v.position).length < 3 * self.vision.radius then
+			v:unlock()
+		end
+	end
+	-- Update changed map blocks.
 	local b = Voxel:find_blocks{point = self.position, radius = self.vision.radius}
 	for k,v in pairs(b) do
 		self:update_map_block{index = k, stamp = v}
@@ -194,7 +201,7 @@ Player.update_vision_radius = function(self)
 	local skills = self.skills
 	local perception = skills:get_value{skill = "perception"}
 	if not perception then return end
-	local r = 20 + perception / 4
+	local r = 15 + perception / 4
 	self.vision.direction = self.rotation * Vector(0,0,-1)
 	self.vision.position = self.position
 	if math.floor(r) ~= self.vision.radius then

@@ -1,5 +1,6 @@
 Marker = Class()
 Marker.dict_name = {}
+Marker.dict_discoverable = {}
 
 --- Finds a map marker.
 -- @param clss Marker class.
@@ -13,12 +14,16 @@ end
 --- Creates a new map marker.
 -- @param clss Marker class.
 -- @param args Arguments.<ul>
+--   <li>discoverable: True to allow the marker to be automatically discovered.</li>
 --   <li>name: Marker name.</li>
 --   <li>target: ID of the target object.</li></ul>
 -- @return Marker.
 Marker.new = function(clss, args)
 	local self = Class.new(clss, args)
 	clss.dict_name[args.name] = self
+	if self.discoverable then
+		clss.dict_discoverable[args.name] = self
+	end
 	return self
 end
 

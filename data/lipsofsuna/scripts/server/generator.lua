@@ -116,6 +116,12 @@ Generator.generate = function(self, args)
 		self:mark_road(src, dst)
 		self:update_status(i / linkn)
 	end]]
+	-- Add map markers for regions.
+	-- These are used by location discovery.
+	for _,reg in pairs(self.regions_dict_id) do
+		local p = reg.point + reg.pattern.size * 0.5
+		Marker{name = reg.spec.name, discoverable = true, position = p * Voxel.tile_size}
+	end
 	-- Format regions.
 	-- This creates the sectors that contain special areas.
 	self:update_status(0, "Formatting regions")
