@@ -56,7 +56,7 @@ end
 --- Resets the quickslots to the original state.
 -- @param clss Quickslots class.
 Quickslots.reset = function(clss)
-	for i = 1,12 do
+	for i = 1,10 do
 		clss.items:assign_none(i)
 	end
 end

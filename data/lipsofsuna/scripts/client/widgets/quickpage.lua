@@ -34,7 +34,7 @@ end
 -- @param self Quickpage.
 -- @param index Quickslot index number.
 Widgets.Quickpage.assign_none = function(self, index)
-	if index >= #self.buttons then return end
+	if index > #self.buttons then return end
 	self.buttons[index].feat = nil
 	self.buttons[index].icon = nil
 	self.buttons[index].item = nil
@@ -48,7 +48,7 @@ end
 -- @param index Quickslot index number.
 -- @param feat Feat to assign.
 Widgets.Quickpage.assign_feat = function(self, index, feat)
-	if index >= #self.buttons then return end
+	if index > #self.buttons then return end
 	local icon = feat:get_icon()
 	self.buttons[index].feat = feat
 	self.buttons[index].icon = icon
@@ -63,7 +63,7 @@ end
 -- @param index Quickslot index number.
 -- @param item Item to assign.
 Widgets.Quickpage.assign_item = function(self, index, item)
-	if index >= #self.buttons then return end
+	if index > #self.buttons then return end
 	-- Find the icon.
 	local spec = Itemspec:find{name = item.name}
 	local icon = Iconspec:find{name = item.icon} or Iconspec:find{name = "missing1"}
