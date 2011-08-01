@@ -34,6 +34,7 @@ Player.new = function(clss, args)
 	local self = Creature.new(clss, args)
 	self.account = args.account
 	self.running = true
+	self.vision_timer = 0
 	self:calculate_speed()
 	return self
 end
@@ -77,12 +78,6 @@ Player.set_client = function(self, client)
 	self.vision = Vision{cone_factor = 0.5, cone_angle = math.pi/2.5, enabled = true, object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
 	self.vision.terrain = {}
 	self.inventory:subscribe{object = self, callback = function(args) self:inventory_cb(args) end}
-	-- Terrain listener.
-	self.player_timer = Timer{delay = 0.1, func = function()
-		self:update_vision_radius()
-		self.vision:update()
-		self:vision_cb{type = "player-tick"}
-	end}
 end
 
 --- Causes the player to die and respawn.
@@ -96,7 +91,6 @@ Player.die = function(self)
 end
 
 Player.disable = function(self)
-	self.player_timer:disable()
 	self.vision.enabled = false
 	if not keep then
 		self:send{packet = Packet(packets.CHARACTER_CREATE)}
@@ -162,6 +156,36 @@ Player.inventory_cb = function(self, args)
 	if fun then fun(args) end
 end
 
+--- Updates the state of the player.
+-- @param self Object.
+-- @param secs Seconds since the last update.
+Player.update = function(self, secs)
+	-- Update vision.
+	self.vision_timer = self.vision_timer + secs
+	if self.vision_timer > 0.1 then
+		self.vision_timer = 0
+		self:update_vision_radius()
+		self.vision:update()
+		self:update_map()
+	end
+	-- Update the base class.
+	Creature.update(self, secs)
+end
+
+Player.update_map = function(self)
+	local b = Voxel:find_blocks{point = self.position, radius = self.vision.radius}
+	for k,v in pairs(b) do
+		self:update_map_block{index = k, stamp = v}
+	end
+end
+
+Player.update_map_block = function(self, args)
+	if self.vision.terrain[args.index] ~= args.stamp then
+		self:send{packet = Voxel:get_block{index = args.index, type = packets.VOXEL_DIFF}}
+		self.vision.terrain[args.index] = args.stamp
+	end
+end
+
 --- Updates the vision radius of the player.<br/>
 -- The view distance depends on the perception skill so it's necessary to
 -- recalculate it occasionally. That can be done by calling this function.
@@ -180,12 +204,6 @@ end
 
 Player.vision_cb = function(self, args)
 	local funs
-	local sendmap = function()
-		local b = Voxel:find_blocks{point = self.position, radius = self.vision.radius}
-		for k,v in pairs(b) do
-			funs["voxel-block-changed"]({index = k, stamp = v})
-		end
-	end
 	funs =
 	{
 		["object-animated"] = function(args)
@@ -239,7 +257,6 @@ Player.vision_cb = function(self, args)
 				"float", o.rotation.x, "float", o.rotation.y, "float", o.rotation.z, "float", o.rotation.w,
 				"float", o.velocity.x, "float", o.velocity.y, "float", o.velocity.z)
 			self:send{packet = p, reliable = false}
-			if o == self then sendmap() end
 		end,
 		["object-shown"] = function(args)
 			-- Wake up the AI.
@@ -442,14 +459,11 @@ Player.vision_cb = function(self, args)
 			p:write(data_head)
 			p:write(data_dialog)
 			self:send(p)
-			if o == self then sendmap() end
+			if o == self then self:update_map() end
 		end,
 		["object-speech"] = function(args)
 			local o = args.object
 			self:send{packet = Packet(packets.OBJECT_SPEECH, "uint32", o.id, "string", args.message)}
-		end,
-		["player-tick"] = function(args)
-			sendmap()
 		end,
 		["skill-changed"] = function(args)
 			local o = args.object
@@ -472,10 +486,7 @@ Player.vision_cb = function(self, args)
 				"string", spec, "string", args.slot)}
 		end,
 		["voxel-block-changed"] = function(args)
-			if self.vision.terrain[args.index] ~= args.stamp then
-				self:send{packet = Voxel:get_block{index = args.index, type = packets.VOXEL_DIFF}}
-				self.vision.terrain[args.index] = args.stamp
-			end
+			self:update_map_block(args)
 		end,
 		["world-effect"] = function(args)
 			self:send{packet = Packet(packets.EFFECT_WORLD, "string", args.effect,
