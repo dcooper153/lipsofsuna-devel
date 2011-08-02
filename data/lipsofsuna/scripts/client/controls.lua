@@ -363,9 +363,11 @@ Action{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func 
 end}
 
 Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
+	local sens = Client.views.options.mouse_sensitivity
+	if Client.views.options.invert_mouse then sens = -sens end
 	if Client.mode == "game" then
 		-- Game controls.
-		local scale = 0.01 * Client.views.options.mouse_sensitivity
+		local scale = 0.01 * sens
 		if Action.dict_press[Keysym.LCTRL] then
 			Client.camera.tilt_state = Client.camera.tilt_state - v * scale
 		else
@@ -376,7 +378,7 @@ Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 		if Client.views.editor.editor.mode == "grab" then
 			Client.views.editor.editor:grab(Vector(0, v * Client.views.editor.editor.mouse_sensitivity))
 		else
-			Client.views.editor.editor.camera:rotate(0, v * Client.views.editor.editor.mouse_sensitivity)
+			Client.views.editor.editor.camera:rotate(0, v * sens)
 		end
 	end
 end}

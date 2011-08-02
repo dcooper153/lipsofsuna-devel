@@ -113,6 +113,12 @@ Views.Options.new = function(clss)
 	self.toggle_mouse_smoothing.pressed = function(widget)
 		self.mouse_smoothing = not widget.active
 	end
+	-- Invert mouse.
+	self.toggle_invert_mouse = Widgets.Toggle{active = true}
+	self.toggle_invert_mouse:set_request{width = 100}
+	self.toggle_invert_mouse.pressed = function(widget)
+		self.invert_mouse = not widget.active
+	end
 	-- Sound settings.
 	self.scroll_music = Widgets.Progress{min = 0, max = 0.5, value = 1}
 	self.scroll_music:set_request{width = 100}
@@ -143,6 +149,7 @@ Views.Options.new = function(clss)
 	local mouse_group = Widgets.Frame{cols = 2}
 	mouse_group:append_row(Widgets.Label{text = "Mouse sensitivity"}, self.scroll_mouse)
 	mouse_group:append_row(Widgets.Label{text = "Mouse smoothing"}, self.toggle_mouse_smoothing)
+	mouse_group:append_row(Widgets.Label{text = "Invert mouse"}, self.toggle_invert_mouse)
 	mouse_group:append_row(Widgets.Label{text = "Enable nudity"}, self.toggle_nudity)
 	local sound_group = Widgets.Frame{cols = 2}
 	sound_group:append_row(Widgets.Label{text = "Music"}, self.scroll_music)
@@ -242,6 +249,7 @@ Views.Options.load = function(self)
 	self.model_quality = 1
 	self.animation_quality = 1
 	self.anisotrophic_filter = 0
+	self.invert_mouse = false
 	self.mouse_sensitivity = 1
 	self.mouse_smoothing = true
 	self.multisamples = 2
@@ -258,6 +266,7 @@ Views.Options.load = function(self)
 		bloom_exposure = function(v) self.bloom_exposure = tonumber(v) end,
 		bloom_luminance = function(v) self.bloom_luminance = tonumber(v) end,
 		fullscreen = function(v) self.fullscreen = (v == "true") end,
+		invert_mouse = function(v) self.invert_mouse = (v == "true") end,
 		model_quality = function(v) self.model_quality = tonumber(v) end,
 		mouse_sensitivity = function(v) self.mouse_sensitivity = tonumber(v) end,
 		mouse_smoothing = function(v) self.mouse_smoothing = (v == "true") end,
@@ -301,6 +310,7 @@ Views.Options.save = function(self)
 	write("bloom_exposure", self.bloom_exposure)
 	write("bloom_luminance", self.bloom_luminance)
 	write("fullscreen", self.fullscreen)
+	write("invert_mouse", self.invert_mouse)
 	write("model_quality", self.model_quality)
 	write("mouse_sensitivity", self.mouse_sensitivity)
 	write("mouse_smoothing", self.mouse_smoothing)
@@ -333,9 +343,10 @@ Views.Options:add_getters{
 	bloom_enabled = function(self) return self.button_bloom.text == "Enabled" end,
 	bloom_exposure = function(self) return self.scroll_exposure.value end,
 	bloom_luminance = function(self) return 1 - self.scroll_luminance.value end,
+	invert_mouse = function(self) return self.toggle_invert_mouse.active end,
 	model_quality = function(self) return self.button_model_quality.text == "High quality" end,
 	mouse_sensitivity = function(self) return self.scroll_mouse.value end,
-	mouse_smoothing = function(self) return self.toggle_mouse_smoothing.value end,
+	mouse_smoothing = function(self) return self.toggle_mouse_smoothing.active end,
 	multisamples = function(self) return rawget(self, "_multisamples") end,
 	music_volume = function(self) return self.scroll_music.value end,
 	nudity_enabled = function(self) return self.toggle_nudity.active end,
@@ -376,6 +387,10 @@ Views.Options:add_setters{
 		self.scroll_luminance.value = 1 - v
 		Bloom.luminance = v
 		Bloom:compile()
+		self:changed()
+	end,
+	invert_mouse = function(self, v)
+		self.toggle_invert_mouse.active = v
 		self:changed()
 	end,
 	model_quality = function(self, v)
