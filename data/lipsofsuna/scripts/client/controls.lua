@@ -381,15 +381,14 @@ Action{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func 
 end}
 
 Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
-	local sens = Client.views.options.mouse_sensitivity
+	local sens = 0.01 * Client.views.options.mouse_sensitivity
 	if Client.views.options.invert_mouse then sens = -sens end
 	if Client.mode == "game" then
 		-- Game controls.
-		local scale = 0.01 * sens
 		if Action.dict_press[Keysym.LCTRL] then
-			Client.camera.tilt_state = Client.camera.tilt_state - v * scale
+			Client.camera.tilt_state = Client.camera.tilt_state - v * sens
 		else
-			Player.tilt_state = Player.tilt_state + v * scale
+			Player.tilt_state = Player.tilt_state + v * sens
 		end
 	elseif Client.mode == "editor" then
 		-- Editor controls.
@@ -402,13 +401,13 @@ Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 end}
 
 Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
+	local sens = 0.01 * Client.views.options.mouse_sensitivity
 	if Client.mode == "game" then
 		-- Game controls.
-		local scale = 0.01 * Client.views.options.mouse_sensitivity
 		if Action.dict_press[Keysym.LCTRL] then
-			Client.camera.turn_state = Client.camera.turn_state + v * scale
+			Client.camera.turn_state = Client.camera.turn_state + v * sens
 		else
-			Player.turn_state = Player.turn_state - v * scale
+			Player.turn_state = Player.turn_state - v * sens
 		end
 	elseif Client.mode == "editor" then
 		-- Editor controls.
@@ -417,12 +416,12 @@ Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
 			Client.views.editor.editor:grab(Vector(-v * Client.views.editor.editor.mouse_sensitivity), 0)
 		elseif Client.views.editor.editor.mode ~= "rotate" then
 			-- Rotate the camera.
-			Client.views.editor.editor.camera:rotate(-v * Client.views.editor.editor.mouse_sensitivity, 0)
+			Client.views.editor.editor.camera:rotate(-v * sens, 0)
 		else
 			-- Rotate the selected objects.
 			-- If left control is pressed, rotation is 10x slower.
 			local mult = Action.dict_press[Keysym.LCTRL] and 0.1 or 1
-			local drot = Quaternion{euler = {-v * mult * Client.views.editor.editor.mouse_sensitivity, 0, 0}}
+			local drot = Quaternion{euler = {-v * mult * sens, 0, 0}}
 			for k,v in pairs(Client.views.editor.editor.selection) do
 				v:rotate(drot)
 			end
