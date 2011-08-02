@@ -53,6 +53,9 @@ ThirdPersonCamera.get_transform = function(self)
 		steps = math.floor((ctr.point - r1).length / stepl)
 		steps = math.max(0, steps - 1)
 	end
+	if self.rotation_smoothing == 1 then
+		steps = 0
+	end
 	for i=0,steps do
 		-- Calculate the score of the camera position.
 		-- Grant points to positions that have the best displacement to the

@@ -15,6 +15,12 @@ Client.init = function(self)
 	-- Initialize the world.
 	self.sectors = Sectors{database = Client.db, save_objects = false}
 	self.sectors:erase_world()
+	-- Initialize the camera.
+	-- These need to be initialized before options since they'll be
+	-- reconfigured when the options are loaded.
+	self.camera1 = FirstPersonCamera{collision_mask = Physics.MASK_CAMERA, far = 40.0, fov = 1.1, near = 0.01}
+	self.camera3 = ThirdPersonCamera{collision_mask = Physics.MASK_CAMERA, far = 40.0, fov = 1.1, near = 0.01}
+	self.camera_mode = "third-person"
 	-- Initialize views.
 	self.views = {}
 	self.views.admin = Views.Admin()
@@ -36,11 +42,6 @@ Client.init = function(self)
 	self.views.quests = Views.Quests()
 	self.views.skills = Views.Skills{main = true, sync = true}
 	self.views.startup = Views.Startup()
-	-- Initialize the camera.
-	local camcfg = {collision_mask = Physics.MASK_CAMERA, far = 40.0, fov = 1.1, near = 0.01, position_smoothing = 0.15, rotation_smoothing = 0.15}
-	self.camera1 = FirstPersonCamera(camcfg)
-	self.camera3 = ThirdPersonCamera(camcfg)
-	self.camera_mode = "third-person"
 	-- Initialize helper threads.
 	self.threads = {}
 	self.threads.model_builder = Thread("client/threads/modelbuilder.lua")
@@ -93,6 +94,14 @@ Client:add_class_setters{
 		end
 		self.camera:reset()
 		Gui.scene.camera = self.camera
+	end,
+	mouse_smoothing = function(self, v)
+		local s = v and 0.15 or 1
+		if self.player_object then
+			self.player_object.rotation_smoothing = s
+		end
+		self.camera3.rotation_smoothing = s
+		self.camera3.position_smoothing = s
 	end,
 	player_object = function(self, v)
 		Client.views.skills:set_species(v.spec)

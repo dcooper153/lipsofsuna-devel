@@ -107,6 +107,12 @@ Views.Options.new = function(clss)
 		local v = widget:get_value_at(Program.cursor_position)
 		self.mouse_sensitivity = v
 	end
+	-- Mouse smoothing.
+	self.toggle_mouse_smoothing = Widgets.Toggle{active = true}
+	self.toggle_mouse_smoothing:set_request{width = 100}
+	self.toggle_mouse_smoothing.pressed = function(widget)
+		self.mouse_smoothing = not widget.active
+	end
 	-- Sound settings.
 	self.scroll_music = Widgets.Progress{min = 0, max = 0.5, value = 1}
 	self.scroll_music:set_request{width = 100}
@@ -136,6 +142,7 @@ Views.Options.new = function(clss)
 	bloom_group:append_row(Widgets.Label{text = "Exposure"}, self.scroll_exposure)
 	local mouse_group = Widgets.Frame{cols = 2}
 	mouse_group:append_row(Widgets.Label{text = "Mouse sensitivity"}, self.scroll_mouse)
+	mouse_group:append_row(Widgets.Label{text = "Mouse smoothing"}, self.toggle_mouse_smoothing)
 	mouse_group:append_row(Widgets.Label{text = "Enable nudity"}, self.toggle_nudity)
 	local sound_group = Widgets.Frame{cols = 2}
 	sound_group:append_row(Widgets.Label{text = "Music"}, self.scroll_music)
@@ -236,6 +243,7 @@ Views.Options.load = function(self)
 	self.animation_quality = 1
 	self.anisotrophic_filter = 0
 	self.mouse_sensitivity = 1
+	self.mouse_smoothing = true
 	self.multisamples = 2
 	self.nudity_enabled = false
 	self.shader_quality = 2
@@ -252,6 +260,7 @@ Views.Options.load = function(self)
 		fullscreen = function(v) self.fullscreen = (v == "true") end,
 		model_quality = function(v) self.model_quality = tonumber(v) end,
 		mouse_sensitivity = function(v) self.mouse_sensitivity = tonumber(v) end,
+		mouse_smoothing = function(v) self.mouse_smoothing = (v == "true") end,
 		multisamples = function(v) self.multisamples = tonumber(v) end,
 		music_volume = function(v) self.music_volume = tonumber(v) end,
 		nudity_enabled = function(v) self.nudity_enabled = (v == "true") end,
@@ -294,6 +303,7 @@ Views.Options.save = function(self)
 	write("fullscreen", self.fullscreen)
 	write("model_quality", self.model_quality)
 	write("mouse_sensitivity", self.mouse_sensitivity)
+	write("mouse_smoothing", self.mouse_smoothing)
 	write("multisamples", self.multisamples)
 	write("music_volume", self.music_volume)
 	write("nudity_enabled", self.nudity_enabled)
@@ -325,6 +335,7 @@ Views.Options:add_getters{
 	bloom_luminance = function(self) return 1 - self.scroll_luminance.value end,
 	model_quality = function(self) return self.button_model_quality.text == "High quality" end,
 	mouse_sensitivity = function(self) return self.scroll_mouse.value end,
+	mouse_smoothing = function(self) return self.toggle_mouse_smoothing.value end,
 	multisamples = function(self) return rawget(self, "_multisamples") end,
 	music_volume = function(self) return self.scroll_music.value end,
 	nudity_enabled = function(self) return self.toggle_nudity.active end,
@@ -378,6 +389,11 @@ Views.Options:add_setters{
 	mouse_sensitivity = function(self, v)
 		self.scroll_mouse.value = v
 		self:changed()
+	end,
+	mouse_smoothing = function(self, v)
+		self.toggle_mouse_smoothing.active = v
+		self:changed()
+		Client.mouse_smoothing = v
 	end,
 	multisamples = function(self, v)
 		rawset(self, "_multisamples", v)
