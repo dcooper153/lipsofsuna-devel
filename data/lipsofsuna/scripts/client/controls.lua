@@ -134,7 +134,10 @@ Action{name = "editor_select_rect", mode = "toggle", key1 = Keysym.LCTRL, func =
 end}
 
 Action{name = "feats", mode = "press", key1 = Keysym.f, func = function()
-	if Client.player_object then
+	if Client.mode == "feats" then
+		-- Close with same button.
+		Client:set_mode("game")
+	elseif Client.player_object then
 		-- Game controls.
 		Client:set_mode("feats")
 	elseif Client.mode == "editor" then
@@ -180,7 +183,10 @@ Action{name = "paste", mode = "press", key1 = Keysym.v, func = function(v)
 end}
 
 Action{name = "inventory", mode = "press", key1 = Keysym.i, func = function()
-	if Client.player_object then
+	if Client.mode == "inventory" then
+		-- Close with same button.
+		Client:set_mode("game")
+	elseif Client.player_object then
 		Client:set_mode("inventory")
 	end
 end}
@@ -192,7 +198,10 @@ Action{name = "jump", mode = "press", key1 = Keysym.SPACE, func = function()
 end}
 
 Action{name = "map", mode = "press", key1 = Keysym.m, func = function()
-	if Client.player_object then
+	if Client.mode == "map" then
+		-- Close with same button.
+		Client:set_mode("game")
+	elseif Client.player_object then
 		Client:set_mode("map")
 	end
 end}
@@ -229,7 +238,10 @@ Action{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = 
 end}
 
 Action{name = "options", mode = "press", key1 = Keysym.o, func = function()
-	if Client.player_object then
+	if Client.mode == "options" then
+		-- Close with same button.
+		Client:set_mode("game")
+	elseif Client.player_object then
 		Client:set_mode("options")
 	end
 end}
@@ -241,13 +253,19 @@ Action{name = "pick_up", mode = "press", key1 = Keysym.COMMA, func = function()
 end}
 
 Action{name = "quests", mode = "press", key1 = Keysym.q, func = function()
-	if Client.player_object then
+	if Client.mode == "quests" then
+		-- Close with same button.
+		Client:set_mode("game")
+	elseif Client.player_object then
 		Client:set_mode("quests")
 	end
 end}
 
 Action{name = "skills", mode = "press", key1 = Keysym.k, func = function()
-	if Client.player_object then
+	if Client.mode == "skills" then
+		-- Close with same button.
+		Client:set_mode("game")
+	elseif Client.player_object then
 		-- Game controls.
 		Client:set_mode("skills")
 	elseif Client.mode == "editor" then
