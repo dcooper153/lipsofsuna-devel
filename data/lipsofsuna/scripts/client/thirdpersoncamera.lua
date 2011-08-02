@@ -41,12 +41,12 @@ ThirdPersonCamera.get_transform = function(self)
 	-- Calculate the center position.
 	-- If there's room, the camera is placed slightly to the right so that
 	-- the character doesn't obstruct the crosshair so badly.
-	local best_center = self.object.position + rel
+	local best_center = self.object.position + rel + rot * Vector(0,0,0.5)
 	local best_score = -1
 	local stepl = 0.12
 	local stepn = 6
 	local steps = stepn
-	local r1 = self.object.position + rel
+	local r1 = best_center:copy()
 	local r2 = r1 + turn1 * Vector(stepl * stepn)
 	local ctr = Physics:cast_ray{collision_mask = self.collision_mask, src = r1, dst = r2}
 	if ctr then
