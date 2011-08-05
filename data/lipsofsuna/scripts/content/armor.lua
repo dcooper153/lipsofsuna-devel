@@ -145,7 +145,8 @@ Itemspec{
 	crafting_materials = {hide = 4},
 	effect_craft = "craftsewing1",
 	equipment_models = {
-		["aer/android/devora/wyrm"] = {legs = "aerlegarmor2", legs1 = "boots1"},
+		-- TODO: Needs to be redone to fit the new player model.
+		--["aer/android/devora/wyrm"] = {feet = "boots1"},
 		["aermale"] = {feet = "aermale1boots1"}},
 	equipment_slot = "feet",
 	mass = 3,
@@ -264,7 +265,8 @@ Itemspec{
 	crafting_materials = {hide = 4},
 	effect_craft = "craftsewing1",
 	equipment_models = {
-		["aer/android/devora/kraken/wyrm"] = {upper1 = "aerleatherchest1"},
+		-- TODO: Needs to be redone to fit the new player model.
+		--["aer/android/devora/kraken/wyrm"] = {upper1 = "aerleatherchest1"},
 		["aermale"] = {upper = "aermale1leatherchest2"}},
 	equipment_slot = "upperbody",
 	mass = 5,
