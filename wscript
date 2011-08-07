@@ -21,6 +21,7 @@ def options(ctx):
 	ctx.add_option('--datadir', action='store', default=None, help='override data directory [default: PREFIX/share]')
 	ctx.add_option('--sound', action='store', default=True, help='compile with sound support [default: true]')
 	ctx.add_option('--optimize', action='store', default=False, help='compile with heavy optimizations [default: false]')
+	ctx.add_option('--luajit', action='store', default=True, help='compile with LuaJIT if possible [default: true]')
 
 def configure(ctx):
 
@@ -109,7 +110,8 @@ def configure(ctx):
 	# Lua/LuaJIT
 	# Ubuntu Lucid ships a broken 32-bit LuaJIT on 64-bit systems so we need some extra
 	# checks to know if it really works or if we should fall back to standard Lua.
-	if ctx.check_cfg(package='luajit', atleast_version='2.0.0', args='--cflags --libs', uselib_store='LUAJIT', mandatory=False) and\
+	if Options.options.luajit == "true" and\
+	   ctx.check_cfg(package='luajit', atleast_version='2.0.0', args='--cflags --libs', uselib_store='LUAJIT', mandatory=False) and\
 	   ctx.check(msg="Checking for luajit architecture", fragment='int main() { return 0; }\n', mandatory=False, uselib='CORE TEST LUAJIT'):
 		ctx.check_cfg(package='luajit', args='--cflags --libs', uselib_store='LUA', mandatory=False)
 	elif not ctx.check_cfg(package='lua5.1', atleast_version='5.1', args='--cflags --libs', uselib_store='LUA', mandatory=False):
