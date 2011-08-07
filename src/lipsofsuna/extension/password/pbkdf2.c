@@ -19,6 +19,11 @@
 #include "sha1.h"
 #include "lipsofsuna/math.h"
 
+#ifdef WIN32
+#define bcopy(b1,b2,len) (memmove((b2), (b1), (len)), (void) 0)
+#define bzero(b,len) (memset((b), '\0', (len)), (void) 0)
+#endif
+
 /*
  * HMAC-SHA-1 (from RFC 2202).
  */
