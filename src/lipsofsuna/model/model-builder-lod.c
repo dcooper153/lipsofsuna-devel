@@ -237,7 +237,7 @@ static float private_calculate_collapse_cost_attr (
 	LIMatVector d_nml = limat_vector_subtract (v1->normal, v2->normal);
 	float d_tex[2] = { v1->texcoord[0] - v2->texcoord[0], v1->texcoord[1] - v2->texcoord[1] };
 	float d_col[4] = { v1->color[0] - v2->color[0], v1->color[1] - v2->color[1],
-	                   v1->color[3] - v2->color[3], v1->color[4] - v2->color[4] };
+	                   v1->color[2] - v2->color[2], v1->color[3] - v2->color[3] };
 
 	return limat_vector_dot (d_nml, d_nml) +
 		(d_tex[0] * d_tex[0] + d_tex[1] * d_tex[1]) +
