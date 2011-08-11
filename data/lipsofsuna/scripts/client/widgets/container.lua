@@ -44,7 +44,10 @@ Widgets.Container.new = function(clss, args)
 		self.group:set_child{col = 2, row = 1, widget = self.equipment}
 	end
 	-- Crafting list.
+	self.show_uncraftable = true
 	if args.spec and args.spec.inventory_type == "workbench" then
+		self.button_hide_uncraftable = Widgets.Toggle{text = "Hide Uncraftable", pressed = function(w) w.active=not w.active self.show_uncraftable=w.active self:update() end}
+		self.group:set_child{col = 1, row = 3, widget = self.button_hide_uncraftable}
 		-- Crafting actions.
 		local pressed = function(w)
 			if not w.enabled then return end
@@ -59,9 +62,10 @@ Widgets.Container.new = function(clss, args)
 		self.craftable = {}
 		for k,v in ipairs(craftable) do
 			local spec = Itemspec:find{name = v}
+			--if Crafting:can_craft({spec=spec}) then print("can") end
 			local widget = Widgets.ItemButton{enabled = false, id = self.id,
 				index = k, icon = spec and spec.icon, spec = spec, text = v,
-				pressed = pressed, scrolled = scrolled}
+				pressed = pressed, scrolled = scrolled, visible= self.show_uncraftable}
 			table.insert(self.craftable, widget)
 		end
 		-- Pack the crafting list.
@@ -87,7 +91,7 @@ Widgets.Container.new = function(clss, args)
 	-- Close button.
 	self.closed = args.closed
 	self.button_close = Widgets.Button{text = "Close", pressed = function() self:close() end}
-	self.group:set_child{col = 1, row = 3, widget = self.button_close}
+	self.group:set_child{col = 2, row = 3, widget = self.button_close}
 	return self
 end
 
@@ -207,8 +211,10 @@ Widgets.Container.update = function(self)
 	local args = {
 		get_item = function(name) return items[name] end,
 		get_skill = function(name) return Client.views.skills.skills:get_value(name) end}
+
 	for k,v in pairs(self.craftable) do
 		args.spec = v.spec
 		v.enabled = Crafting:can_craft(args)
+		if self.show_uncraftable then v.visible = true else v.visible = false v.visible = Crafting:can_craft(args) end 
 	end
 end
