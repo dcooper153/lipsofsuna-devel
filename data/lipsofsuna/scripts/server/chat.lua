@@ -109,6 +109,31 @@ ChatCommand{pattern = "^/spawn species (.*)$", permission = "admin", func = func
 		realized = true}
 end}
 
+-- Spawn any object.
+ChatCommand{pattern = "^/spawn (.*)$", permission = "admin", func = function(player, matches)
+	local spec1 = Species:find{name = matches[1]}
+	local spec2 = Itemspec:find{name = matches[1]}
+	local spec3 = Obstaclespec:find{name = matches[1]}
+	if spec1 then
+		Creature{
+			spec = spec1,
+			position = player.position,
+			random = true,
+			realized = true}
+	elseif spec2 then
+		Item{
+			spec = spec2,
+			position = player.position,
+			random = true,
+			realized = true}
+	elseif spec3 then
+		Obstacle{
+			spec = spec3,
+			position = player.position,
+			realized = true}
+	end
+end}
+
 -- Suicide.
 ChatCommand{pattern = "^/suicide$", permission = "player", func = function(player, matches)
 	player:die()
