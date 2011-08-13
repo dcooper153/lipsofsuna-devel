@@ -5,62 +5,7 @@ Editing.visible = false
 -- @param clss Editor class.
 Editing.init = function(clss)
 
-	-- Creating objects.
-	clss.popup_class_button = Widgets.ComboBox{
-		"creature",
-		"item",
-		"item-cat",
-		"obstacle",
-		"obstacle-cat",
-		-- FIXME:
-		"door",
-		"chest",
-		"mover",
-		"object",
-		"spawner"}
-	clss.popup_class_button:activate{index = 2}
-	clss.entry_model = Widgets.Entry()
-	clss.group_object_create = Widget{cols = 1}
-	clss.group_object_create:set_expand{col = 1}
-	clss.group_object_create:append_row(Widgets.Label{text = "Type:"})
-	clss.group_object_create:append_row(clss.popup_class_button)
-	clss.group_object_create:append_row(Widgets.Label{text = "Model:"})
-	clss.group_object_create:append_row(clss.entry_model)
-	clss.group_object_create:append_row(Widgets.Button{text = "Create", pressed = function()
-		Network:send{packet = Packet(packets.ADMIN_SPAWN,
-			"string", Editing.popup_class_button.text,
-			"string", Editing.entry_model.text)}
-	end})
-
-	-- Deleting objects.
-	clss.group_object_delete = Widget{cols = 1}
-	clss.group_object_delete:set_expand{col = 1}
-	clss.group_object_delete:append_row(Widgets.Button{text = "Delete", pressed = function()
-		local packet = Packet(packets.ADMIN_DELETE)
-		for k,v in pairs(Object.selected_objects) do
-			packet:write("uint32", v.id)
-		end
-		Network:send{packet = packet}
-	end})
-
 	-- Creating terrain.
-	clss.preview_terrain = Widget()
-	clss.preview_terrain:set_request{width = 200, height=200}
-	clss.preview_terrain.scene = Scene()
-	clss.preview_terrain.render = function(self)
-		--[[Player.camera.viewport = {self.x, self.y, self.width, self.height}
-		self.scene:draw_begin{
-			modelview = Player.camera.modelview,
-			projection = Player.camera.projection,
-			viewport = Player.camera.viewport}
-		self.scene:draw_deferred_begin()
-		self.scene:draw_deferred_opaque()
-		self.scene:draw_deferred_end()
-		self.scene:draw_forward_transparent()
-		self.scene:draw_post_process{shader = "postprocess-vert-hdr"}
-		self.scene:draw_post_process{shader = "postprocess-horz-hdr"}
-		self.scene:draw_end()--]]
-	end
 	clss.spin_terrain = Widgets.ComboBox()
 	local mats = {}
 	for k,v in ipairs(Material.dict_id) do table.insert(mats, v.name) end
@@ -73,7 +18,6 @@ Editing.init = function(clss)
 	clss.group_terrain_create:set_expand{col = 1}
 	clss.group_terrain_create:append_row(Widgets.Label{text = "Material:"})
 	clss.group_terrain_create:append_row(clss.spin_terrain)
-	clss.group_terrain_create:append_row(clss.preview_terrain)
 	clss.group_terrain_create:append_row(Widgets.Button{text = "Create", pressed = function()
 		Editing:insert()
 	end})
@@ -87,10 +31,8 @@ Editing.init = function(clss)
 
 	-- Popup button.
 	clss.popup_button = Widgets.ComboBox{
-		{"Objects: create", function() Editing:set_mode(1) end},
-		{"Objects: delete", function() Editing:set_mode(2) end},
-		{"Terrain: create", function() Editing:set_mode(3) end},
-		{"Terrain: delete", function() Editing:set_mode(4) end}}
+		{"Terrain: create", function() Editing:set_mode(1) end},
+		{"Terrain: delete", function() Editing:set_mode(2) end}}
 
 	-- Packing.
 	clss.dialog = Widgets.Frame{cols = 1, rows = 3, style = "popup"}
@@ -108,14 +50,6 @@ end
 Editing.set_mode = function(clss, mode)
 	local funs =
 	{
-		function()
-			clss.dialog:set_child{col = 1, row = 3, widget = clss.group_object_create}
-			clss.popup_button.text = "Object: create"
-		end,
-		function()
-			clss.dialog:set_child{col = 1, row = 3, widget = clss.group_object_delete}
-			clss.popup_button.text = "Object: delete"
-		end,
 		function()
 			clss.dialog:set_child{col = 1, row = 3, widget = clss.group_terrain_create}
 			clss.popup_button.text = "Terrain: create"
