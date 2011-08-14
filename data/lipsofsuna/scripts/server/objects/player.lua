@@ -90,11 +90,14 @@ Player.die = function(self)
 	end
 end
 
-Player.disable = function(self)
-	self.vision.enabled = false
-	if not keep then
+Player.disable = function(self, keep)
+	if self.vision then
+		self.vision.enabled = false
+	end
+	if not keep and self.client then
 		self:send{packet = Packet(packets.CHARACTER_CREATE)}
 		Player.clients[self.client] = nil
+		self.client = nil
 	end
 end
 
@@ -160,13 +163,21 @@ end
 -- @param self Object.
 -- @param secs Seconds since the last update.
 Player.update = function(self, secs)
+	if self.client then
+		-- Check for bugged characters just in case.
+		if not self.realized or not self.vision then return self:detach() end
+		-- Prevent sectors from unloading if a player is present.
+		self:refresh{radius = 20}
+	end
 	-- Update vision.
-	self.vision_timer = self.vision_timer + secs
-	if self.vision_timer > 0.1 then
-		self.vision_timer = 0
-		self:update_vision_radius()
-		self.vision:update()
-		self:update_map()
+	if self.vision then
+		self.vision_timer = self.vision_timer + secs
+		if self.vision_timer > 0.1 then
+			self.vision_timer = 0
+			self:update_vision_radius()
+			self.vision:update()
+			self:update_map()
+		end
 	end
 	-- Update the base class.
 	Creature.update(self, secs)

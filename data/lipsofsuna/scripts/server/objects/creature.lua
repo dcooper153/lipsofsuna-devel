@@ -930,8 +930,6 @@ Creature.update_environment = function(self, secs)
 	if self.env_timer < 1.2 then return true end
 	local tick = self.env_timer
 	self.env_timer = 0
-	-- Prevent sectors from unloading if a player is present.
-	if self.client then self:refresh{radius = 20} end
 	-- Count tiles affecting us.
 	local src,dst = self:get_tile_range()
 	local env = Voxel:check_range(src, dst)
