@@ -37,7 +37,11 @@ struct _LICliWindow
 };
 
 LIAPICALL (LICliWindow*, licli_window_new, (
-	LICliClient* client));
+	LICliClient* client,
+	int          width,
+	int          height,
+	int          fullscreen,
+	int          vsync));
 
 LIAPICALL (void, licli_window_free, (
 	LICliWindow* self));

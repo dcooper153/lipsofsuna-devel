@@ -30,7 +30,11 @@ static int private_init_input (
 	LICliWindow* self);
 
 static int private_init_video (
-	LICliWindow* self);
+	LICliWindow* self,
+	int          width,
+	int          height,
+	int          fullscreen,
+	int          vsync);
 
 static int private_resize (
 	LICliWindow* self,
@@ -42,7 +46,11 @@ static int private_resize (
 /****************************************************************************/
 
 LICliWindow* licli_window_new (
-	LICliClient* client)
+	LICliClient* client,
+	int          width,
+	int          height,
+	int          fullscreen,
+	int          vsync)
 {
 	LICliWindow* self;
 
@@ -54,7 +62,7 @@ LICliWindow* licli_window_new (
 
 	/* Initialize subsystems. */
 	if (!private_init_input (self) ||
-	    !private_init_video (self))
+	    !private_init_video (self, width, height, fullscreen, vsync))
 	{
 		licli_window_free (self);
 		return NULL;
@@ -115,10 +123,14 @@ static int private_init_input (
 }
 
 static int private_init_video (
-	LICliWindow* self)
+	LICliWindow* self,
+	int          width,
+	int          height,
+	int          fullscreen,
+	int          vsync)
 {
 	/* Create the window. */
-	if (!private_resize (self, 1024, 768, 0, 0))
+	if (!private_resize (self, width, height, fullscreen, vsync))
 		return 0;
 	if (TTF_Init () == -1)
 	{

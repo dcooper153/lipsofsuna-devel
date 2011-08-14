@@ -55,7 +55,11 @@ static int private_tick (
 /*****************************************************************************/
 
 LICliClient* licli_client_new (
-	LIMaiProgram* program)
+	LIMaiProgram* program,
+	int           width,
+	int           height,
+	int           fullscreen,
+	int           vsync)
 {
 	LICliClient* self;
 
@@ -76,7 +80,7 @@ LICliClient* licli_client_new (
 
 	/* Create window. */
 	SDL_EnableUNICODE (1);
-	self->window = licli_window_new (self);
+	self->window = licli_window_new (self, width, height, fullscreen, vsync);
 	if (self->window == NULL)
 	{
 		licli_client_free (self);

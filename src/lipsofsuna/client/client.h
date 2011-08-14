@@ -45,7 +45,11 @@ struct _LICliClient
 };
 
 LIAPICALL (LICliClient*, licli_client_new, (
-	LIMaiProgram* program));
+	LIMaiProgram* program,
+	int           width,
+	int           height,
+	int           fullscreen,
+	int           vsync));
 
 LIAPICALL (void, licli_client_free, (
 	LICliClient* self));

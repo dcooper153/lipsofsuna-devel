@@ -24,6 +24,13 @@
 
 #include "ext-module.h"
 
+static void private_initial_videomode (
+	LIExtModule* self,
+	int*         width,
+	int*         height,
+	int*         fullscreen,
+	int*         vsync);
+
 static void private_context_lost (
 	LIExtModule* self,
 	int          pass);
@@ -40,6 +47,10 @@ LIMaiExtensionInfo liext_graphics_info =
 LIExtModule* liext_graphics_new (
 	LIMaiProgram* program)
 {
+	int width = 1024;
+	int height = 768;
+	int fullscreen = 0;
+	int vsync = 0;
 	LIExtModule* self;
 
 	/* Allocate self. */
@@ -48,8 +59,11 @@ LIExtModule* liext_graphics_new (
 		return NULL;
 	self->program = program;
 
+	/* Get the initial video mode. */
+	private_initial_videomode (self, &width, &height, &fullscreen, &vsync);
+
 	/* Allocate client. */
-	self->client = licli_client_new (program);
+	self->client = licli_client_new (program, width, height, fullscreen, vsync);
 	if (self->client == NULL)
 	{
 		liext_graphics_free (self);
@@ -81,6 +95,62 @@ void liext_graphics_free (
 }
 
 /*****************************************************************************/
+
+static void private_initial_videomode (
+	LIExtModule* self,
+	int*         width,
+	int*         height,
+	int*         fullscreen,
+	int*         vsync)
+{
+	lua_State* lua;
+
+	/* Get the videomode table. */
+	lua = liscr_script_get_lua (self->program->script);
+	lua_getglobal (lua, "__initial_videomode");
+	if (lua_type (lua, -1) != LUA_TTABLE)
+	{
+		lua_pop (lua, 1);
+		return;
+	}
+
+	/* Get the width. */
+	lua_pushnumber (lua, 1);
+	lua_gettable (lua, -2);
+	if (lua_type (lua, -1) == LUA_TNUMBER)
+	{
+		*width = (int) lua_tonumber (lua, -1);
+		*width = LIMAT_CLAMP (*width, 32, 65536);
+	}
+	lua_pop (lua, 1);
+
+	/* Get the height. */
+	lua_pushnumber (lua, 2);
+	lua_gettable (lua, -2);
+	if (lua_type (lua, -1) == LUA_TNUMBER)
+	{
+		*height = (int) lua_tonumber (lua, -1);
+		*height = LIMAT_CLAMP (*height, 32, 65536);
+	}
+	lua_pop (lua, 1);
+
+	/* Get the fullscreen flag. */
+	lua_pushnumber (lua, 3);
+	lua_gettable (lua, -2);
+	if (lua_type (lua, -1) == LUA_TBOOLEAN)
+		*fullscreen = (int) lua_toboolean (lua, -1);
+	lua_pop (lua, 1);
+
+	/* Get the vsync flag. */
+	lua_pushnumber (lua, 4);
+	lua_gettable (lua, -2);
+	if (lua_type (lua, -1) == LUA_TBOOLEAN)
+		*vsync = (int) lua_toboolean (lua, -1);
+	lua_pop (lua, 1);
+
+	/* Pop the videomode table. */
+	lua_pop (lua, 1);
+}
 
 static void private_context_lost (
 	LIExtModule* self,
