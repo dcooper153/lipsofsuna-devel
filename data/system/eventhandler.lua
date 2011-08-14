@@ -53,7 +53,7 @@ Eventhandler.event = function(clss, args)
 	-- Invoke event handlers.
 	for k,v in pairs(clss.handlers) do
 		if k.type == args.type then
-			k:func(args)
+			Program:safe_call(function() k:func(args) end)
 		end
 	end
 end

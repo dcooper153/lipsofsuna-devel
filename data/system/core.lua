@@ -77,6 +77,13 @@ Program.unload_world = function(clss)
 	Los.program_unload_world()
 end
 
+--- Calls the function and catches and handles errors.
+-- @param clss Program class.
+-- @param func Function to call.
+Program.safe_call = function(clss, func)
+	xpcall(func, function(err) print(debug.traceback("ERROR: " .. err)) end)
+end
+
 --- Request program shutdown.
 -- @param clss Program class.
 Program.shutdown = function(clss, args)
