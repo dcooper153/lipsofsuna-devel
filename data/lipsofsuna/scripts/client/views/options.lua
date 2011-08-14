@@ -192,20 +192,12 @@ Views.Options.back = function(self)
 	end
 end
 
---- Saves the options after a delay.<br/>
--- This function is called every time an option is changed. It sets a timer
--- that will save the options to the database after a small delay. The delay
--- exists just in case something goes wrong and the new options cause the game
--- to crash shortly.
+--- Saves the options.
 -- @param self Options.
 Views.Options.changed = function(self)
-	if self.changed_timer ~= nil then
-		self.changed_timer:disable()
-	end
-	self.changed_timer = Timer{delay = 3, func = function(timer)
+	if not self.loading then
 		self:save()
-		timer:disable()
-	end}
+	end
 end
 
 --- Closes the options view.
@@ -241,53 +233,33 @@ Views.Options.enter = function(self, from, level)
 end
 
 Views.Options.load = function(self)
-	-- Initialize defaults.
-	local vsync = false
-	self.fullscreen = false
-	self.window_width = 1024
-	self.window_height = 768
-	self.model_quality = 1
-	self.animation_quality = 1
-	self.anisotrophic_filter = 0
-	self.invert_mouse = false
-	self.mouse_sensitivity = 1
-	self.mouse_smoothing = true
-	self.multisamples = 2
-	self.nudity_enabled = false
-	self.shader_quality = 2
-	self.transparency_quality = 0.3
-	self.sound_volume = 1.0
-	self.music_volume = 0.1
-	-- Read values from the configuration file.
+	-- Update the GUI to reflect the options.
 	local opts = {
-		animation_quality = function(v) self.animation_quality = tonumber(v) end,
-		anisotrophic_filter = function(v) self.anisotrophic_filter = tonumber(v) end,
-		bloom = function(v) self.bloom_enabled = (v == "true") end,
-		bloom_exposure = function(v) self.bloom_exposure = tonumber(v) end,
-		bloom_luminance = function(v) self.bloom_luminance = tonumber(v) end,
-		fullscreen = function(v) self.fullscreen = (v == "true") end,
-		invert_mouse = function(v) self.invert_mouse = (v == "true") end,
-		model_quality = function(v) self.model_quality = tonumber(v) end,
-		mouse_sensitivity = function(v) self.mouse_sensitivity = tonumber(v) end,
-		mouse_smoothing = function(v) self.mouse_smoothing = (v == "true") end,
-		multisamples = function(v) self.multisamples = tonumber(v) end,
-		music_volume = function(v) self.music_volume = tonumber(v) end,
-		nudity_enabled = function(v) self.nudity_enabled = (v == "true") end,
-		shader_quality = function(v) self.shader_quality = tonumber(v) end,
-		sound_volume = function(v) self.sound_volume = tonumber(v) end,
-		transparency_quality = function(v) self.transparency_quality = tonumber(v) end,
-		vsync = function(v) vsync = (v == "true") end,
-		window_height = function(v) self.window_height = tonumber(v) end,
-		window_width = function(v) self.window_width = tonumber(v) end}
-	for k in pairs(opts) do
-		local v = self.config:get(k)
-		if v then
-			local opt = opts[k]
-			opt(v)
-		end
+		animation_quality = function(v) self.animation_quality = v end,
+		anisotrophic_filter = function(v) self.anisotrophic_filter = v end,
+		bloom_enabled = function(v) self.bloom_enabled = v end,
+		bloom_exposure = function(v) self.bloom_exposure = v end,
+		bloom_luminance = function(v) self.bloom_luminance = v end,
+		fullscreen = function(v) self.fullscreen = v end,
+		invert_mouse = function(v) self.invert_mouse = v end,
+		model_quality = function(v) self.model_quality = v end,
+		mouse_sensitivity = function(v) self.mouse_sensitivity = v end,
+		mouse_smoothing = function(v) self.mouse_smoothing = v end,
+		multisamples = function(v) self.multisamples = v end,
+		music_volume = function(v) self.music_volume = v end,
+		nudity_enabled = function(v) self.nudity_enabled = v end,
+		shader_quality = function(v) self.shader_quality = v end,
+		sound_volume = function(v) self.sound_volume = v end,
+		transparency_quality = function(v) self.transparency_quality = v end,
+		vsync = function(v) self.vsync = v end,
+		window_height = function(v) self.window_height = v end,
+		window_width = function(v) self.window_width = v end}
+	self.loading = true
+	for k,v in pairs(opts) do
+		v(Client.options[k])
 	end
-	-- Set the video mode.
-	self:set_video_mode(self.window_width, self.window_height, self.fullscreen, vsync)
+	self.loading = nil
+	-- Update the selection of the video mode combo box.
 	if self.fullscreen then
 		for k,v in ipairs(self.video_modes) do
 			if v.width == self.window_width and v.height == self.window_height then
@@ -301,12 +273,15 @@ Views.Options.load = function(self)
 end
 
 Views.Options.save = function(self)
-	local write = function(k, v)
-		self.config:set(k, tostring(v))
-	end
+	-- Update the window size.
+	local mode = Program.video_mode
+	self.window_width = mode[1]
+	self.window_height = mode[2]
+	-- Update the client options.
+	local write = function(k, v) Client.options[k] = v end
 	write("animation_quality", self.animation_quality)
 	write("anisotrophic_filter", self.anisotrophic_filter)
-	write("bloom", self.bloom_enabled)
+	write("bloom_enabled", self.bloom_enabled)
 	write("bloom_exposure", self.bloom_exposure)
 	write("bloom_luminance", self.bloom_luminance)
 	write("fullscreen", self.fullscreen)
@@ -323,7 +298,8 @@ Views.Options.save = function(self)
 	write("vsync", self.vsync)
 	write("window_height", self.window_height)
 	write("window_width", self.window_width)
-	self.config:save()
+	-- Save the client options.
+	Client.options:save()
 end
 
 Views.Options.set_video_mode = function(self, w, h, f)
@@ -444,10 +420,7 @@ Views.Options:add_setters{
 		self:changed()
 	end,
 	vsync = function(self, v)
-		local mode = Program.video_mode
-		self.window_width = mode[1]
-		self.window_height = mode[2]
-		self.fullscreen = mode[3]
-		self.button_vsync.text = self.vsync and "Enabled" or "Disabled"
-		self:set_video_mode(self.window_width, self.window_height, self.fullscreen, self.vsync)
+		-- Changing vsync doesn't work without restarting.
+		self.button_vsync.text = v and "Enabled" or "Disabled"
+		self:changed()
 	end}

@@ -1,4 +1,5 @@
 require "client/config"
+require "client/options"
 require "client/firstpersoncamera"
 require "client/thirdpersoncamera"
 
@@ -12,6 +13,7 @@ Client.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value T
 
 Client.init = function(self)
 	self.config = Config()
+	self.options = Options.inst
 	-- Initialize the world.
 	self.sectors = Sectors{database = Client.db, save_objects = false}
 	self.sectors:erase_world()

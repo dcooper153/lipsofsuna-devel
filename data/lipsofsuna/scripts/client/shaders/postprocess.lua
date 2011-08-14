@@ -1,6 +1,6 @@
 Bloom = Class()
-Bloom.exposure = 1.5  -- The intensity of the bloom halo.
-Bloom.luminance = 1   -- The smallest luminance value that gets bloomed.
+Bloom.exposure = Options.inst.bloom_exposure   -- The intensity of the bloom halo.
+Bloom.luminance = Options.inst.bloom_luminance -- The smallest luminance value that gets bloomed.
 
 --- Initializes the bloom filter.
 -- @param clss Bloom class.

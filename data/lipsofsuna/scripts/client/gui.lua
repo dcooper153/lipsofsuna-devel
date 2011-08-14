@@ -71,6 +71,7 @@ Gui.resize = function(self)
 	local chx = (size.x - self.crosshair.width) / 2
 	local chy = (size.y - self.crosshair.height) / 2
 	self.crosshair.offset = Vector(chx, chy)
+	return true
 end
 
 Gui.set_dead = function(self, value)

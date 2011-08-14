@@ -61,6 +61,9 @@ require "common/skills"
 Object.load_meshes = false
 Physics.enable_simulation = true
 else
+require "client/options"
+Options.inst = Options()
+__initial_videomode = {Options.inst.window_width, Options.inst.window_height, Options.inst.fullscreen, Options.inst.vsync}
 require "system/animation"
 require "system/graphics"
 require "system/camera"

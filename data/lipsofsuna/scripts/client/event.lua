@@ -146,8 +146,11 @@ Eventhandler{type = "tick", func = function(self, args)
 		Client:set_mode("startup")
 		Client.views.startup:set_state("Lost connection to the server!")
 	end
+	-- Update the window size.
+	if Gui:resize() then
+		Client.views.options:changed()
+	end
 	-- Update the cursor.
-	Gui:resize()
 	Widgets.Cursor.inst:update()
 	-- Update built models.
 	while true do
