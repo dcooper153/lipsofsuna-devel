@@ -83,7 +83,7 @@ Dialogspec.validate = function(self, args)
 		["give player item"] = function(c)
 			assert(type(c[2]) == "string", "argument #2 of \"give player item\" must be the item name string")
 			assert(type(c[3]) == "nil", "command \"give player item\" only takes 1 argument")
-			validate_arguments(c, {})
+			validate_arguments(c, {count = true})
 		end,
 		info = function(c)
 			assert(type(c[2]) == "string", "argument #2 of \"info\" must be the info string")

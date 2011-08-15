@@ -185,7 +185,7 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 			local s = Itemspec:find{name = c[2]}
 			if not s then return end
-			local o = Item{spec = s}
+			local o = Item{spec = s, count = c.count}
 			if self.user:give_item(o) then
 				self.user:send("Received " .. c[2])
 			else
