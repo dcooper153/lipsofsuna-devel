@@ -80,6 +80,7 @@ do
 	add("MARKER_UPDATE")
 
 	add("MESSAGE")
+	add("MESSAGE_NOTIFICATION")
 
 	add("MODIFIER_ADD")
 	add("MODIFIER_REMOVE")

@@ -98,6 +98,11 @@ Dialogspec.validate = function(self, args)
 			assert(type(c[2]) == "nil", "too many arguments to \"loot\" command")
 			validate_arguments(c, {})
 		end,
+		notification = function(c)
+			assert(type(c[2]) == "string", "argument #2 of \"notification\" must be the notification string")
+			assert(type(c[3]) == "nil", "too many arguments to \"notification\" command")
+			validate_arguments(c, {})
+		end,
 		quest = function(c)
 			assert(type(c[2]) == "string", "argument #2 of \"quest\" must be the quest name")
 			assert(type(c[3]) == "nil", "too many arguments to \"quest\" command")

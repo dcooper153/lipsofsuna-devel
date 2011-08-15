@@ -208,6 +208,10 @@ Dialog.execute = function(self)
 			self.object:loot(self.user)
 			for i = #vm,1,-1 do vm[i] = nil end
 		end,
+		notification = function(vm, c)
+			vm[1].pos = vm[1].pos + 1
+			self.user:send{packet = Packet(packets.MESSAGE_NOTIFICATION, "string", c[2])}
+		end,
 		quest = function(vm, c)
 			local q = Quest:find{name = c[2]}
 			if q then q:update(c) end

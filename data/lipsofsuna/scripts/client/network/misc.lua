@@ -23,6 +23,12 @@ Protocol:add_handler{type = "MESSAGE", func = function(event)
 	end
 end}
 
+Protocol:add_handler{type = "MESSAGE_NOTIFICATION", func = function(event)
+	local ok,msg = event.packet:read("string")
+	if not ok then return end
+	Client.notification_text = msg
+end}
+
 Protocol:add_handler{type = "VOXEL_DIFF", func = function(event)
 	Voxel:set_block{packet = event.packet}
 end}
