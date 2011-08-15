@@ -4,6 +4,7 @@ Gui = Class()
 -- @param clss Gui class.
 Gui.init = function(clss)
 	Gui.menus = Widgets.Menus()
+	Gui.notification = Widgets.Notification()
 	-- Chat widgets.
 	Gui.chat_history = Widgets.Log()
 	Gui.chat_label = Widgets.Label{text = " "}
@@ -32,6 +33,7 @@ Gui.init = function(clss)
 	Gui.scene = Widgets.Scene{cols = 1, rows = 3, behind = true, fullscreen = true, margins = {5,5,0,0}, spacings = {0,0}}
 	Gui.scene:set_expand{col = 1, row = 1}
 	Gui.scene:set_request{width = 32, height = 32}
+	Gui.scene:add_child(Gui.notification)
 	Gui.scene:add_child(Gui.button_respawn)
 	Gui.scene:add_child(Gui.menus)
 	Gui.scene:add_child(Gui.group_dialog)

@@ -105,6 +105,9 @@ Client:add_class_setters{
 		self.camera3.rotation_smoothing = s
 		self.camera3.position_smoothing = s
 	end,
+	notification_text = function(self, v)
+		Gui.notification.text = v
+	end,
 	player_object = function(self, v)
 		Client.views.skills:set_species(v.spec)
 		self.views.feats:set_race(v.spec.name)

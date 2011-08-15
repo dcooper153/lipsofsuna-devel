@@ -150,6 +150,8 @@ Eventhandler{type = "tick", func = function(self, args)
 	if Gui:resize() then
 		Client.views.options:changed()
 	end
+	-- Update the notification widget.
+	Gui.notification:update(args.secs)
 	-- Update the cursor.
 	Widgets.Cursor.inst:update()
 	-- Update built models.
