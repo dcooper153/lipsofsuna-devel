@@ -37,6 +37,9 @@ static int private_process_result (
 	LIExtModule*    self,
 	LIExtBuildTask* task);
 
+static void private_remove_redundant_tasks (
+	LIExtBuildTask** tasks);
+
 static int private_tick (
 	LIExtModule* self,
 	float        secs);
@@ -245,12 +248,22 @@ static int private_process_result (
 {
 	LIExtBlock* block;
 
-	/* Find or create the affected block. */
+	/* Delete emptied blocks. */
+	if (task->model == NULL)
+	{
+		block = lialg_memdic_find (self->blocks, &task->addr, sizeof (LIVoxBlockAddr));
+		if (block != NULL)
+		{
+			lialg_memdic_remove (self->blocks, &task->addr, sizeof (LIVoxBlockAddr));
+			liext_tiles_render_block_free (block);
+		}
+		return 0;
+	}
+
+	/* Find or create the block. */
 	block = lialg_memdic_find (self->blocks, &task->addr, sizeof (LIVoxBlockAddr));
 	if (block == NULL)
 	{
-		if (task->model == NULL)
-			return 0;
 		block = liext_tiles_render_block_new (self);
 		if (block == NULL)
 			return 0;
@@ -260,38 +273,67 @@ static int private_process_result (
 			return 0;
 		}
 	}
-	else
-	{
-		if (task->model == NULL)
-		{
-			lialg_memdic_remove (self->blocks, &task->addr, sizeof (LIVoxBlockAddr));
-			liext_tiles_render_block_free (block);
-			return 0;
-		}
-	}
 
 	/* Replace the model of the block. */
 	liext_tiles_render_block_clear (block);
-	if (task->model != NULL)
+	block->model = liren_model_new (self->client->render, task->model, 0);
+	if (block->model != NULL)
 	{
-		block->model = liren_model_new (self->client->render, task->model, 0);
-		if (block->model != NULL)
+		block->object = liren_object_new (self->client->scene, 0);
+		if (block->object != NULL)
 		{
-			block->object = liren_object_new (self->client->scene, 0);
-			if (block->object != NULL)
-				liren_object_set_model (block->object, block->model);
+			liren_object_set_model (block->object, block->model);
+			liren_object_set_realized (block->object, 1);
 		}
 	}
-	if (block->object != NULL)
-		liren_object_set_realized (block->object, 1);
 
 	return 1;
+}
+
+static void private_remove_redundant_tasks (
+	LIExtBuildTask** tasks)
+{
+	LIExtBuildTask* task1;
+	LIExtBuildTask* task1_next;
+	LIExtBuildTask* task1_prev;
+	LIExtBuildTask* task2;
+
+	task1_prev = NULL;
+	for (task1 = *tasks ; task1 != NULL ; task1 = task1_next)
+	{
+		/* Search for a duplicate. */
+		task1_next = task1->next;
+		for (task2 = task1->next ; task2 != NULL ; task2 = task2->next)
+		{
+			if (!memcmp (&task1->addr, &task2->addr, sizeof (LIVoxBlockAddr)))
+				break;
+		}
+		if (task2 == NULL)
+		{
+			task1_prev = task1;
+			continue;
+		}
+
+		/* Remove from the list. */
+		if (task1_prev == NULL)
+			*tasks = task1->next;
+		else
+			task1_prev->next = task1->next;
+
+		/* Free. */
+		if (task1->builder != NULL)
+			livox_builder_free (task1->builder);
+		if (task1->model != NULL)
+			limdl_model_free (task1->model);
+		lisys_free (task1);
+	}
 }
 
 static int private_tick (
 	LIExtModule* self,
 	float        secs)
 {
+	int i;
 	LIExtBuildTask* task;
 	LIExtBuildTask* task_next;
 
@@ -305,7 +347,7 @@ static int private_tick (
 		lisys_async_call_free (self->tasks.worker);
 		self->tasks.worker = NULL;
 	}
-	for (task = self->tasks.completed ; task != NULL ; task = task_next)
+	for (i = 0, task = self->tasks.completed ; task != NULL && i < 5 ; task = task_next, i++)
 	{
 		task_next = task->next;
 		private_process_result (self, task);
@@ -313,13 +355,10 @@ static int private_tick (
 			limdl_model_free (task->model);
 		lisys_free (task);
 	}
-	self->tasks.completed = NULL;
+	self->tasks.completed = task;
 	if (self->tasks.worker == NULL && self->tasks.pending != NULL)
 		self->tasks.worker = lisys_async_call_new (private_worker_thread, NULL, self);
 	lisys_mutex_unlock (self->tasks.mutex);
-
-	/* FIXME: Should be in the tiles module? */
-	livox_manager_update (self->voxels, secs);
 
 	return 1;
 }
@@ -336,6 +375,7 @@ static void private_worker_thread (
 	while (!lisys_async_call_get_stop (call))
 	{
 		/* Get the next task. */
+		private_remove_redundant_tasks (&self->tasks.pending);
 		task = self->tasks.pending;
 		if (task == NULL)
 			break;
@@ -356,6 +396,7 @@ static void private_worker_thread (
 
 		/* Publish the result. */
 		lisys_mutex_lock (self->tasks.mutex);
+		private_remove_redundant_tasks (&self->tasks.completed);
 		if (self->tasks.completed != NULL)
 		{
 			for (ptr = self->tasks.completed ; ptr->next != NULL ; ptr = ptr->next) {}
