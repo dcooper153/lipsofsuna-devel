@@ -172,7 +172,7 @@ int lieng_model_load (
 	if (name == NULL)
 		return 0;
 	path = lipth_paths_get_graphics (self->engine->paths, file);
-	free (file);
+	lisys_free (file);
 	if (path == NULL)
 		return 0;
 

@@ -49,7 +49,7 @@ LIRenBuffer* liren_buffer_new (
 
 	lisys_assert (vertex_format->vtx_format);
 
-	self = calloc (1, sizeof (LIRenBuffer));
+	self = lisys_calloc (1, sizeof (LIRenBuffer));
 	if (self == NULL)
 		return NULL;
 

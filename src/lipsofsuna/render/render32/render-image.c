@@ -162,7 +162,7 @@ static int private_init (
 	if (file == NULL)
 		return 0;
 	self->path = lipth_paths_get_graphics (self->render->paths, file);
-	free (file);
+	lisys_free (file);
 	if (self->path == NULL)
 		return 0;
 

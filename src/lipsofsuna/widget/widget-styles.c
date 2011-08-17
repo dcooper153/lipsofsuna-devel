@@ -85,7 +85,7 @@ LIFntFont* liwdg_styles_load_font (
 	if (file == NULL)
 		return NULL;
 	path = lipth_paths_get_font (self->paths, file_);
-	free (file_);
+	lisys_free (file_);
 	if (path == NULL)
 		return NULL;
 	font = lifnt_font_new (path, size);

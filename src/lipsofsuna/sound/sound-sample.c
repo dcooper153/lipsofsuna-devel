@@ -248,7 +248,7 @@ static int private_load_flac (
 	}
 
 	/* Upload to OpenAL. */
-	buffer = calloc (length, sizeof (uint8_t));
+	buffer = lisys_calloc (length, sizeof (uint8_t));
 	if (buffer != NULL)
 	{
 		memcpy (buffer, liarc_writer_get_buffer (writer), length);

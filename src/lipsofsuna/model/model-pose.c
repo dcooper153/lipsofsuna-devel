@@ -580,7 +580,7 @@ int limdl_pose_set_channel_priority_node (
 	ptr = lialg_strdic_find (chan->weights, node);
 	if (ptr == NULL)
 	{
-		ptr = calloc (1, sizeof (float));
+		ptr = lisys_calloc (1, sizeof (float));
 		if (ptr == NULL)
 			return 0;
 		if (!lialg_strdic_insert (chan->weights, node, ptr))

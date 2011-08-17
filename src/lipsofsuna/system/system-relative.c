@@ -58,13 +58,13 @@ lisys_relative_exename ()
 
 	/* Allocate memory. */
 	buf_size = PATH_MAX + 128;
-	path = (char *) lisys_malloc (buf_size);
+	path = (char*) lisys_malloc (buf_size);
 	if (path == NULL)
 		return NULL;
 	tmp = (char*) lisys_malloc (buf_size);
 	if (tmp == NULL)
 	{
-		free (path);
+		lisys_free (path);
 		return NULL;
 	}
 
@@ -76,7 +76,7 @@ lisys_relative_exename ()
 		size = readlink (tmp, path, buf_size - 1);
 		if (size == -1)
 		{
-			free (tmp);
+			lisys_free (tmp);
 			break;
 		}
 		path[size] = '\0';
@@ -85,7 +85,7 @@ lisys_relative_exename ()
 		i = stat (path, &stat_buf);
 		if (i == -1)
 		{
-			free (tmp);
+			lisys_free (tmp);
 			break;
 		}
 		if (S_ISLNK (stat_buf.st_mode))
@@ -141,7 +141,7 @@ lisys_relative_exename ()
 
 	/* Construct the final string. */
 	lisys_free (path);
-	path = calloc (strlen (tmp) + 1, sizeof (char));
+	path = lisys_calloc (strlen (tmp) + 1, sizeof (char));
 	if (path == NULL)
 		return NULL;
 	strcpy (path, tmp);
