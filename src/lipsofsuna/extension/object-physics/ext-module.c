@@ -24,18 +24,6 @@
 
 #include "ext-module.h"
 
-static int private_model_changed (
-	LIExtModule* self,
-	LIEngModel*  model);
-
-static int private_model_free (
-	LIExtModule* self,
-	LIEngModel*  model);
-
-static int private_model_new (
-	LIExtModule* self,
-	LIEngModel*  model);
-
 static void private_object_contact (
 	LIExtModule*  self,
 	LIPhyContact* contact);
@@ -102,16 +90,13 @@ LIExtModule* liext_object_physics_new (
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, "model-changed", -65535, private_model_changed, self, self->calls + 0) ||
-	    !lical_callbacks_insert (program->callbacks, "model-free", -65535, private_model_free, self, self->calls + 1) ||
-	    !lical_callbacks_insert (program->callbacks, "model-new", -65535, private_model_new, self, self->calls + 2) ||
-	    !lical_callbacks_insert (program->callbacks, "object-contact", -65535, private_object_contact, self, self->calls + 3) ||
-	    !lical_callbacks_insert (program->callbacks, "object-free", -65535, private_object_free, self, self->calls + 4) ||
-	    !lical_callbacks_insert (program->callbacks, "object-model", -65535, private_object_model, self, self->calls + 5) ||
-	    !lical_callbacks_insert (program->callbacks, "object-new", -65535, private_object_new, self, self->calls + 6) ||
-	    !lical_callbacks_insert (program->callbacks, "object-transform", -65535, private_object_transform, self, self->calls + 7) ||
-	    !lical_callbacks_insert (program->callbacks, "object-visibility", -65535, private_object_visibility, self, self->calls + 8) ||
-	    !lical_callbacks_insert (program->callbacks, "physics-transform", -65535, private_physics_transform, self, self->calls + 9))
+	if (!lical_callbacks_insert (program->callbacks, "object-contact", -65535, private_object_contact, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, "object-free", -65535, private_object_free, self, self->calls + 1) ||
+	    !lical_callbacks_insert (program->callbacks, "object-model", -65535, private_object_model, self, self->calls + 2) ||
+	    !lical_callbacks_insert (program->callbacks, "object-new", -65535, private_object_new, self, self->calls + 3) ||
+	    !lical_callbacks_insert (program->callbacks, "object-transform", -65535, private_object_transform, self, self->calls + 4) ||
+	    !lical_callbacks_insert (program->callbacks, "object-visibility", -65535, private_object_visibility, self, self->calls + 5) ||
+	    !lical_callbacks_insert (program->callbacks, "physics-transform", -65535, private_physics_transform, self, self->calls + 6))
 	{
 		liext_object_physics_free (self);
 		return NULL;
@@ -134,54 +119,6 @@ void liext_object_physics_free (
 }
 
 /*****************************************************************************/
-
-static int private_model_changed (
-	LIExtModule* self,
-	LIEngModel*  model)
-{
-	LIPhyModel* model_;
-
-	model_ = liphy_physics_find_model (self->physics, model->id);
-	if (model_ != NULL)
-		liphy_model_set_model (model_, model->model);
-
-	return 1;
-}
-
-static int private_model_free (
-	LIExtModule* self,
-	LIEngModel*  model)
-{
-	LIPhyModel* model_;
-
-	/* Find the model. */
-	model_ = liphy_physics_find_model (self->physics, model->id);
-	if (model_ == NULL)
-		return 1;
-
-	/* Remove from objects. */
-	/* Keeping the model alive when it's assigned to objects is the job of scripts.
-	   If they don't reference the model, we'll remove it even if it's in use. We
-	   prevent crashing by removing it from objects in such a case. */
-	liphy_physics_remove_model (self->physics, model_);
-
-	liphy_model_free (model_);
-
-	return 1;
-}
-
-static int private_model_new (
-	LIExtModule* self,
-	LIEngModel*  model)
-{
-	LIPhyModel* model_;
-
-	model_ = liphy_model_new (self->physics, model->model, model->id);
-	if (model_ == NULL)
-		return 1;
-
-	return 1;
-}
 
 static void private_object_contact (
 	LIExtModule*  self,

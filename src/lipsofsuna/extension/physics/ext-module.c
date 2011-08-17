@@ -133,8 +133,17 @@ static int private_model_free (
 	lisys_assert (model != NULL);
 
 	model_ = liphy_physics_find_model (self->physics, model->id);
-	if (model_ != NULL)
-		liphy_model_free (model_);
+	if (model_ == NULL)
+		return 1;
+
+	/* Remove from objects. */
+	/* Keeping the model alive when it's assigned to objects is the job of scripts.
+	   If they don't reference the model, we'll remove it even if it's in use. We
+	   prevent crashing by removing it from objects in such a case. */
+	liphy_physics_remove_model (self->physics, model_);
+
+	/* Free the model. */
+	liphy_model_free (model_);
 
 	return 1;
 }
