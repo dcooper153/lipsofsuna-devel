@@ -31,6 +31,7 @@ struct _LIExtVisionListener
 	float scan_radius;
 	float keep_threshold;
 	LIAlgU32dic* objects;
+	LIAlgU32dic* terrain;
 	LIExtModule* module;
 	LIMatVector position;
 	LIMatVector direction;

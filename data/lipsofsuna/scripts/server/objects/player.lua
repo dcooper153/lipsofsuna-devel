@@ -190,18 +190,6 @@ Player.update_map = function(self)
 			v:unlock()
 		end
 	end
-	-- Update changed map blocks.
-	local b = Voxel:find_blocks{point = self.position, radius = self.vision.radius}
-	for k,v in pairs(b) do
-		self:update_map_block{index = k, stamp = v}
-	end
-end
-
-Player.update_map_block = function(self, args)
-	if self.vision.terrain[args.index] ~= args.stamp then
-		self:send{packet = Voxel:get_block{index = args.index, type = packets.VOXEL_DIFF}}
-		self.vision.terrain[args.index] = args.stamp
-	end
 end
 
 --- Updates the vision radius of the player.<br/>
@@ -504,7 +492,7 @@ Player.vision_cb = function(self, args)
 				"string", spec, "string", args.slot)}
 		end,
 		["voxel-block-changed"] = function(args)
-			self:update_map_block(args)
+			self:send{packet = Voxel:get_block{index = args.index, type = packets.VOXEL_DIFF}}
 		end,
 		["world-effect"] = function(args)
 			self:send{packet = Packet(packets.EFFECT_WORLD, "string", args.effect,

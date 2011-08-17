@@ -62,8 +62,10 @@ Vision.update = function(self)
 	local e = Los.vision_update(self.handle)
 	for k,v in ipairs(e) do
 		-- Translate the object handle.
-		v.object = __userdata_lookup[v.object]
-		self.objects[v.object] = (v.type == "object-shown") and true or nil
+		if v.object then
+			v.object = __userdata_lookup[v.object]
+			self.objects[v.object] = (v.type == "object-shown") and true or nil
+		end
 		-- Call the callback.
 		if self.callback then self.callback(v) end
 	end
