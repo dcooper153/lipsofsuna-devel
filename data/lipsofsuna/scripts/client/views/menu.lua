@@ -44,5 +44,5 @@ Views.Menu:add_setters{
 	admin_enabled = function(self, v)
 		if v == self.admin_enabled then return end
 		rawset(self, "_admin_enabled", v)
-		self:replace(8, v and {"Admin", self.admin_menu})
+		self:replace(9, v and {"Admin", self.admin_menu})
 	end}
