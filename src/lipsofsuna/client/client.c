@@ -309,8 +309,8 @@ static int private_event (
 			}
 			break;
 		case SDL_VIDEORESIZE:
-			if (!licli_window_set_size (self->window, event->resize.w, event->resize.h, 0, self->window->mode.vsync))
-				return 1;
+			self->window->mode.width = event->resize.w;
+			self->window->mode.height = event->resize.h;
 			break;
 	}
 
