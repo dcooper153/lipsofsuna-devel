@@ -121,7 +121,7 @@ char* lisys_string_format (
 	{
 		/* Try to write to the buffer. */
 		va_start (args, format);
-		num = vsnprintf (buf, len, format, args);
+		num = vsnprintf (buf, len - 1, format, args);
 		va_end (args);
 		if (-1 < num && num < len)
 			break;

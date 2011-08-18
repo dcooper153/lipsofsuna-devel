@@ -22,6 +22,7 @@ def options(ctx):
 	ctx.add_option('--sound', action='store', default=True, help='compile with sound support [default: true]')
 	ctx.add_option('--optimize', action='store', default=False, help='compile with heavy optimizations [default: false]')
 	ctx.add_option('--luajit', action='store', default=True, help='compile with LuaJIT if possible [default: true]')
+	ctx.add_option('--memdebug', action='store', default=False, help='compile with expensive memory debugging [default: false]')
 
 def configure(ctx):
 
@@ -32,6 +33,7 @@ def configure(ctx):
 		exit(1)
 	ctx.env.RELPATH = Options.options.relpath != "false"
 	ctx.env.SOUND = Options.options.sound != "false"
+	ctx.env.MEMDEBUG = Options.options.memdebug == "true"
 	if Options.options.optimize == "true":
 		optimize = '-O3'
 	else:
@@ -167,10 +169,15 @@ def configure(ctx):
 				if ctx.check_cc(header_name='curl/curl.h', lib='curl', mandatory=False, uselib='CORE TEST', uselib_store='CURL'):
 					found_curl = True
 			if found_curl:
+				ctx.env.CURL = True
 				ctx.define('HAVE_CURL', 1)
+	else:
+		ctx.env.CURL = True
 
 	# Paths and defines
 	ctx.define('LI_ENABLE_ERROR', 1)
+	if ctx.env.MEMDEBUG:
+		ctx.define('LI_ENABLE_MEMDEBUG', 1)
 	if not ctx.env.SOUND:
 		ctx.define('LI_DISABLE_SOUND', 1)
 	if ctx.env.RELPATH:
@@ -209,13 +216,19 @@ def configure(ctx):
 	if ctx.env.RELPATH:
 		ctx.define('LI_RELATIVE_PATHS', 1)
 		print("\nConfigured with:")
-		print("\trelative paths\n")
+		print("\trelative paths")
 	else:
 		print("\nConfigured with:")
 		print("\tbindir: " + bindir)
 		print("\tlibdir: " + libdir)
 		print("\tdatadir: " + datadir)
-	print("Build command: ./waf")
+	if ctx.env.SOUND:
+		print("\tsound support")
+	if ctx.env.CURL:
+		print("\tmaster server connectivity")
+	if ctx.env.MEMDEBUG:
+		print("\tmemory debugging")
+	print("\nBuild command: ./waf")
 	print("Install command: ./waf install\n")
 
 def build(ctx):

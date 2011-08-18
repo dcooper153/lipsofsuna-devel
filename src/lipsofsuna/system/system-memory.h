@@ -35,4 +35,9 @@ LIAPICALL (void*, lisys_realloc, (
 LIAPICALL (void, lisys_free, (
 	void* mem));
 
+LIAPICALL (void, lisys_memchk, (
+	void*  mem));
+
+LIAPICALL (void, lisys_memstats, ());
+
 #endif
