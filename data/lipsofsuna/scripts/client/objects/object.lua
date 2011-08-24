@@ -1,5 +1,7 @@
 require "client/objects/speedline"
 
+Object.ipol_correction = 0.8
+Object.ipol_max_error = 20
 Object.dict_active = setmetatable({}, {__mode = "k"})
 Object.physics_position_correction = Vector(0, 0, 0)
 
@@ -153,13 +155,13 @@ Object.update_motion_state = function(self, tick)
 	-- Apply position change predicted by the velocity.
 	self.position = self.position + self.velocity * tick
 	-- Correct prediction errors over time.
-	self.position = self.position + self.correction * 0.07
-	self.correction = self.correction * 0.93
+	self.position = self.position + self.correction * (1 - Object.ipol_correction)
+	self.correction = self.correction * Object.ipol_correction
 end
 
 Object.set_motion_state = function(self, pos, rot, vel, tilt)
 	-- Store the prediction error so that it can be corrected over time.
-	if (pos - self.position).length < 5 then
+	if (pos - self.position).length < Object.ipol_max_error then
 		self.correction = pos - self.position
 	else
 		self.position = pos
