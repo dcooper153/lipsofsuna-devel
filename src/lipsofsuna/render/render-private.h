@@ -21,6 +21,8 @@
 #include "lipsofsuna/algorithm.h"
 #include "render-types.h"
 #include "render21/render.h"
+#include "render21/render-light.h"
+#include "render21/render-scene.h"
 #include "render32/render.h"
 #include "render32/render-buffer.h"
 #include "render32/render-framebuffer.h"
@@ -55,7 +57,7 @@ struct _LIRenImage
 
 struct _LIRenLight
 {
-	LIRenScene* scene;
+	LIRenRender* render;
 	LIRenLight21* v21;
 	LIRenLight32* v32;
 };
@@ -72,7 +74,7 @@ struct _LIRenObject
 {
 	int id;
 	LIRenModel* model;
-	LIRenScene* scene;
+	LIRenRender* render;
 	LIRenObject21* v21;
 	LIRenObject32* v32;
 };
@@ -83,17 +85,9 @@ struct _LIRenRender
 	LIAlgStrdic* images;
 	LIAlgStrdic* shaders;
 	LIAlgU32dic* models;
-	LIAlgPtrdic* models_ptr;
+	LIAlgU32dic* objects;
 	LIRenRender21* v21;
 	LIRenRender32* v32;
-};
-
-struct _LIRenScene
-{
-	LIAlgU32dic* objects;
-	LIRenRender* render;
-	LIRenScene21* v21;
-	LIRenScene32* v32;
 };
 
 struct _LIRenShader

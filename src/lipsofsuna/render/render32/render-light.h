@@ -28,24 +28,14 @@
 #define SHADOWMAPSIZE 512
 
 LIAPICALL (LIRenLight32*, liren_light32_new, (
-	LIRenScene32*  scene,
-	const float* ambient,
-	const float* diffuse,
-	const float* specular,
-	const float* equation,
-	float        cutoff,
-	float        exponent,
-	int          shadow));
-
-LIAPICALL (LIRenLight32*, liren_light32_new_directional, (
-	LIRenScene32*  scene,
-	const float* ambient,
-	const float* diffuse,
-	const float* specular));
-
-LIAPICALL (LIRenLight32*, liren_light32_new_from_model, (
-	LIRenScene32*      scene,
-	const LIMdlNode* light));
+	LIRenRender32* render,
+	const float*   ambient,
+	const float*   diffuse,
+	const float*   specular,
+	const float*   equation,
+	float          cutoff,
+	float          exponent,
+	int            shadow));
 
 LIAPICALL (void, liren_light32_free, (
 	LIRenLight32* self));
@@ -130,7 +120,7 @@ LIAPICALL (void, liren_light32_set_projection, (
 	LIRenLight32*        self,
 	const LIMatMatrix* value));
 
-LIAPICALL (LIRenScene32*, liren_light32_get_scene, (
+LIAPICALL (LIRenRender32*, liren_light32_get_render, (
 	const LIRenLight32* self));
 
 LIAPICALL (int, liren_light32_get_shadow, (

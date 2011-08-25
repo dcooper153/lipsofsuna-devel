@@ -26,7 +26,9 @@
 #include "lipsofsuna/video.h"
 #include "render.h"
 #include "render-context.h"
+#include "render-lighting.h"
 #include "render-private.h"
+#include "render-sort.h"
 #include "render-uniforms.h"
 #include "../render.h"
 #include "../render-private.h"
@@ -57,17 +59,23 @@ LIRenRender32* liren_render32_new (
 	self->lod_near = 10.0f;
 	self->lod_far = 50.0f;
 
-	/* Allocate scene list. */
-	self->scenes = lialg_ptrdic_new ();
-	if (self->scenes == NULL)
+	/* Allocate framebuffer list. */
+	self->framebuffers = lialg_ptrdic_new ();
+	if (self->framebuffers == NULL)
 	{
 		liren_render32_free (self);
 		return NULL;
 	}
 
-	/* Allocate framebuffer list. */
-	self->framebuffers = lialg_ptrdic_new ();
-	if (self->framebuffers == NULL)
+	/* Allocate the scene. */
+	self->lighting = liren_lighting32_new (self);
+	if (self->lighting == NULL)
+	{
+		liren_render32_free (self);
+		return NULL;
+	}
+	self->sort = liren_sort32_new (self);
+	if (self->sort == NULL)
 	{
 		liren_render32_free (self);
 		return NULL;
@@ -87,11 +95,10 @@ void liren_render32_free (
 	LIRenRender32* self)
 {
 	private_free_helpers (self);
-	if (self->scenes != NULL)
-	{
-		lisys_assert (self->scenes->size == 0);
-		lialg_ptrdic_free (self->scenes);
-	}
+	if (self->lighting != NULL)
+		liren_lighting32_free (self->lighting);
+	if (self->sort != NULL)
+		liren_sort32_free (self->sort);
 	if (self->framebuffers != NULL)
 	{
 		lisys_assert (self->framebuffers->size == 0);
@@ -266,6 +273,7 @@ void liren_render32_reload (
 {
 	LIAlgStrdicIter iter;
 	LIAlgPtrdicIter iter1;
+	LIAlgU32dicIter iter2;
 
 	if (!pass)
 	{
@@ -281,7 +289,7 @@ void liren_render32_reload (
 		liren_shader32_reload (((LIRenShader*) iter.value)->v32, pass);
 	LIALG_STRDIC_FOREACH (iter, self->render->images)
 		liren_image32_reload (((LIRenImage*) iter.value)->v32, pass);
-	LIALG_PTRDIC_FOREACH (iter1, self->render->models_ptr)
+	LIALG_U32DIC_FOREACH (iter2, self->render->models)
 		liren_model32_reload (((LIRenModel*) iter1.value)->v32, pass);
 	LIALG_PTRDIC_FOREACH (iter1, self->framebuffers)
 		liren_framebuffer32_reload (iter1.value, pass);
@@ -302,7 +310,7 @@ int liren_render32_reload_image (
 	LIRenRender32* self,
 	LIRenImage32*  image)
 {
-	LIAlgPtrdicIter iter;
+	LIAlgU32dicIter iter;
 	LIRenModel* model;
 
 	/* Reload the image. */
@@ -310,7 +318,7 @@ int liren_render32_reload_image (
 		return 0;
 
 	/* Replace in all models. */
-	LIALG_PTRDIC_FOREACH (iter, self->render->models_ptr)
+	LIALG_U32DIC_FOREACH (iter, self->render->models)
 	{
 		model = iter.value;
 		liren_model32_replace_image (model->v32, image);
@@ -328,8 +336,21 @@ void liren_render32_update (
 	LIRenRender32* self,
 	float          secs)
 {
+	LIAlgU32dicIter iter;
+	LIRenObject32* object;
+
 	/* Update time. */
 	self->helpers.time += secs;
+
+	/* Update objects. */
+	LIALG_U32DIC_FOREACH (iter, self->render->objects)
+	{
+		object = ((LIRenObject*) iter.value)->v32;
+		liren_object32_update (object, secs);
+	}
+
+	/* Update lights. */
+	liren_lighting32_update (self->lighting);
 }
 
 int liren_render32_get_anisotropy (

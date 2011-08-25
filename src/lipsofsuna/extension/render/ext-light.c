@@ -35,7 +35,7 @@ static void Light_new (LIScrArgs* args)
 
 	/* Allocate self. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_LIGHT);
-	self = liren_light_new (module->client->scene, black, white, white, equation, M_PI, 0.0f, 0);
+	self = liren_light_new (module->client->render, black, white, white, equation, M_PI, 0.0f, 0);
 	if (self == NULL)
 		return;
 
@@ -107,17 +107,10 @@ static void Light_set_enabled (LIScrArgs* args)
 {
 	int value;
 	LIRenLight* light;
-	LIRenScene* scene;
 
 	light = args->self;
-	scene = liren_light_get_scene (light);
-	if (liscr_args_geti_bool (args, 0, &value) && value != liren_light_get_enabled (light))
-	{
-		if (value)
-			liren_scene_insert_light (scene, light);
-		else
-			liren_scene_remove_light (scene, light);
-	}
+	if (liscr_args_geti_bool (args, 0, &value))
+		liren_light_set_enabled (light, value);
 }
 
 static void Light_get_equation (LIScrArgs* args)

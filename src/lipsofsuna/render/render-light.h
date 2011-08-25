@@ -18,14 +18,14 @@
 #ifndef __RENDER_LIGHT_H__
 #define __RENDER_LIGHT_H__
 
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/model.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/model.h"
+#include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-types.h"
 
 LIAPICALL (LIRenLight*, liren_light_new, (
-	LIRenScene*  scene,
+	LIRenRender* render,
 	const float* ambient,
 	const float* diffuse,
 	const float* specular,
@@ -56,6 +56,10 @@ LIAPICALL (void, liren_light_set_diffuse, (
 LIAPICALL (int, liren_light_get_enabled, (
 	const LIRenLight* self));
 
+LIAPICALL (void, liren_light_set_enabled, (
+	LIRenLight* self,
+	int         value));
+
 LIAPICALL (void, liren_light_get_equation, (
 	LIRenLight* self,
 	float*      value));
@@ -75,7 +79,7 @@ LIAPICALL (void, liren_light_set_priority, (
 	LIRenLight* self,
 	float       value));
 
-LIAPICALL (LIRenScene*, liren_light_get_scene, (
+LIAPICALL (LIRenRender*, liren_light_get_render, (
 	const LIRenLight* self));
 
 LIAPICALL (int, liren_light_get_shadow, (

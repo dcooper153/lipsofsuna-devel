@@ -25,24 +25,14 @@
 #include "render-types.h"
 
 LIAPICALL (LIRenLight21*, liren_light21_new, (
-	LIRenScene21* scene,
-	const float*  ambient,
-	const float*  diffuse,
-	const float*  specular,
-	const float*  equation,
-	float         cutoff,
-	float         exponent,
-	int           shadow));
-
-LIAPICALL (LIRenLight21*, liren_light21_new_directional, (
-	LIRenScene21*  scene,
-	const float* ambient,
-	const float* diffuse,
-	const float* specular));
-
-LIAPICALL (LIRenLight21*, liren_light21_new_from_model, (
-	LIRenScene21*    scene,
-	const LIMdlNode* light));
+	LIRenRender21* render,
+	const float*   ambient,
+	const float*   diffuse,
+	const float*   specular,
+	const float*   equation,
+	float          cutoff,
+	float          exponent,
+	int            shadow));
 
 LIAPICALL (void, liren_light21_free, (
 	LIRenLight21* self));
@@ -117,7 +107,7 @@ LIAPICALL (void, liren_light21_set_projection, (
 	LIRenLight21*      self,
 	const LIMatMatrix* value));
 
-LIAPICALL (LIRenScene21*, liren_light21_get_scene, (
+LIAPICALL (LIRenRender21*, liren_light21_get_render, (
 	const LIRenLight21* self));
 
 LIAPICALL (int, liren_light21_get_shadow, (

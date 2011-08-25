@@ -52,15 +52,17 @@ LIRenRender* liren_render_new (
 		return NULL;
 	}
 
-	/* Initialize model dictionaries. */
+	/* Allocate the model dictionary. */
 	self->models = lialg_u32dic_new ();
 	if (self->models == NULL)
 	{
 		liren_render_free (self);
 		return NULL;
 	}
-	self->models_ptr = lialg_ptrdic_new ();
-	if (self->models_ptr == NULL)
+
+	/* Allocate the object dictionary. */
+	self->objects = lialg_u32dic_new ();
+	if (self->objects == NULL)
 	{
 		liren_render_free (self);
 		return NULL;
@@ -93,16 +95,18 @@ void liren_render_free (
 	LIRenRender* self)
 {
 	LIAlgStrdicIter iter1;
-	LIAlgPtrdicIter iter2;
+	LIAlgU32dicIter iter2;
+
+	/* Free objects. */
+	if (self->objects != NULL)
+		lialg_u32dic_free (self->objects);
 
 	/* Free models. */
 	if (self->models != NULL)
-		lialg_u32dic_free (self->models);
-	if (self->models_ptr != NULL)
 	{
-		LIALG_PTRDIC_FOREACH (iter2, self->models_ptr)
-			liren_model_free (iter2.value);
-		lialg_ptrdic_free (self->models_ptr);
+		LIALG_U32DIC_FOREACH (iter2, self->models)
+			liren_render_model_free (self, iter2.key);
+		lialg_u32dic_free (self->models);
 	}
 
 	/* Free images. */

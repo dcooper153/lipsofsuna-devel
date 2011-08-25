@@ -89,7 +89,7 @@ struct _LIRenLight32
 	LIMatMatrix modelview_inverse;
 	LIMatTransform transform;
 	const LIMdlNode* node;
-	LIRenScene32* scene;
+	LIRenRender32* render;
 	struct
 	{
 		float pos_world[3];
@@ -148,8 +148,8 @@ struct _LIRenObject32
 	LIMatAabb bounds;
 	LIMatTransform transform;
 	LIMdlPose* pose;
-	LIRenScene32* scene;
 	LIRenModel32* model;
+	LIRenRender32* render;
 	struct
 	{
 		int width;
@@ -185,9 +185,10 @@ struct _LIRenRender32
 	float lod_near;
 	float lod_far;
 	LIAlgPtrdic* framebuffers;
-	LIAlgPtrdic* scenes;
 	LIPthPaths* paths;
 	LIRenContext32* context;
+	LIRenLighting32* lighting;
+	LIRenSort32* sort;
 	struct _LIRenRender* render;
 	struct
 	{
@@ -211,15 +212,6 @@ struct _LIRenRender32
 		int vertices;
 	} profiling;
 #endif
-};
-
-struct _LIRenScene32
-{
-	float time;
-	LIRenRender32* render;
-	LIRenSort32* sort;
-	LIRenLighting32* lighting;
-	struct _LIRenScene* scene;
 };
 
 struct _LIRenShader32

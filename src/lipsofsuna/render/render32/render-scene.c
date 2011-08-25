@@ -35,22 +35,19 @@
 #define LIREN_LIGHT_MAXIMUM_RATING 100.0f
 #define LIREN_PARTICLE_MAXIMUM_COUNT 1000
 
-static int private_init (
-	LIRenScene32* self);
-
 static void private_render_pass_nosort (
-	LIRenScene32*   self,
+	LIRenRender32*  self,
 	LIRenContext32* context,
 	LIMatFrustum*   frustum,
 	int             pass);
 
 static void private_render_pass_sort (
-	LIRenScene32*   self,
+	LIRenRender32*  self,
 	LIRenContext32* context,
 	int             pass);
 
 static int private_render_postproc (
-	LIRenScene32*       self,
+	LIRenRender32*      self,
 	LIRenContext32*     context,
 	LIRenFramebuffer32* framebuffer,
 	int                 pass,
@@ -58,74 +55,33 @@ static int private_render_postproc (
 	int                 mipmaps);
 
 static int private_sort_scene (
-	LIRenScene32*   self,
+	LIRenRender32*  self,
 	LIRenContext32* context);
 
 /*****************************************************************************/
 
-LIRenScene32* liren_scene32_new (
-	void*          scene,
-	LIRenRender32* render)
-{
-	LIRenScene32* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIRenScene32));
-	if (self == NULL)
-		return NULL;
-	self->scene = scene;
-	self->render = render;
-
-	/* Register self. */
-	if (!lialg_ptrdic_insert (render->scenes, self, self))
-	{
-		liren_scene32_free (self);
-		return NULL;
-	}
-
-	/* Initialize subsystems. */
-	if (!private_init (self))
-	{
-		liren_scene32_free (self);
-		return NULL;
-	}
-
-	return self;
-}
-
-void liren_scene32_free (
-	LIRenScene32* self)
-{
-	if (self->lighting != NULL)
-		liren_lighting32_free (self->lighting);
-	if (self->sort != NULL)
-		liren_sort32_free (self->sort);
-	lialg_ptrdic_remove (self->render->scenes, self);
-	lisys_free (self);
-}
-
-void liren_scene32_insert_light (
-	LIRenScene32* self,
-	LIRenLight32* light)
+void liren_render32_insert_light (
+	LIRenRender32* self,
+	LIRenLight32*  light)
 {
 	liren_lighting32_insert_light (self->lighting, light);
 }
 
-void liren_scene32_remove_light (
-	LIRenScene32* self,
-	LIRenLight32* light)
+void liren_render32_remove_light (
+	LIRenRender32* self,
+	LIRenLight32*  light)
 {
 	liren_lighting32_remove_light (self->lighting, light);
 }
 
-void liren_scene32_remove_model (
-	LIRenScene32* self,
-	LIRenModel32* model)
+void liren_render32_remove_model (
+	LIRenRender32* self,
+	LIRenModel32*  model)
 {
 	LIAlgU32dicIter iter;
 	LIRenObject32* object;
 
-	LIALG_U32DIC_FOREACH (iter, self->scene->objects)
+	LIALG_U32DIC_FOREACH (iter, self->render->objects)
 	{
 		object = ((LIRenObject*) iter.value)->v32;
 		if (object->model == model)
@@ -146,8 +102,8 @@ void liren_scene32_remove_model (
  * \param postproc_passes Array of post-processing passes.
  * \param postproc_passes_num Number of post-processing passes.
  */
-void liren_scene32_render (
-	LIRenScene32*       self,
+void liren_render32_render (
+	LIRenRender32*       self,
 	LIRenFramebuffer32* framebuffer,
 	const GLint*        viewport,
 	LIMatMatrix*        modelview,
@@ -174,13 +130,12 @@ void liren_scene32_render (
 	glGetIntegerv (GL_VIEWPORT, orig_viewport);
 
 	/* Initialize the context. */
-	context = liren_render32_get_context (self->render);
+	context = liren_render32_get_context (self);
 	liren_context32_init (context);
-	liren_context32_set_scene (context, self);
 	liren_context32_set_frustum (context, frustum);
 	liren_context32_set_projection (context, projection);
 	liren_context32_set_viewmatrix (context, modelview);
-	liren_context32_set_time (context, self->time);
+	liren_context32_set_time (context, self->helpers.time);
 
 	/* Calculate camera position. */
 	inv = limat_matrix_invert (*modelview);
@@ -247,48 +202,10 @@ void liren_scene32_render (
 #endif
 }
 
-/**
- * \brief Updates the scene.
- * \param self Scene.
- * \param secs Number of seconds since the last update.
- */
-void liren_scene32_update (
-	LIRenScene32* self,
-	float         secs)
-{
-	LIAlgU32dicIter iter;
-	LIRenObject32* object;
-
-	/* Update the effect timer. */
-	self->time += secs;
-
-	/* Update objects. */
-	LIALG_U32DIC_FOREACH (iter, self->scene->objects)
-	{
-		object = ((LIRenObject*) iter.value)->v32;
-		liren_object32_update (object, secs);
-	}
-
-	/* Update lights. */
-	liren_lighting32_update (self->lighting);
-}
-
 /*****************************************************************************/
 
-static int private_init (
-	LIRenScene32* self)
-{
-	self->lighting = liren_lighting32_new (self->render);
-	if (self->lighting == NULL)
-		return 0;
-	self->sort = liren_sort32_new (self->render);
-	if (self->sort == NULL)
-		return 0;
-	return 1;
-}
-
 static void private_render_pass_nosort (
-	LIRenScene32*   self,
+	LIRenRender32*  self,
 	LIRenContext32* context,
 	LIMatFrustum*   frustum,
 	int             pass)
@@ -303,7 +220,7 @@ static void private_render_pass_nosort (
 	LIRenMaterial32* material;
 	LIRenObject32* object;
 
-	LIALG_U32DIC_FOREACH (iter, self->scene->objects)
+	LIALG_U32DIC_FOREACH (iter, self->render->objects)
 	{
 		object = ((LIRenObject*) iter.value)->v32;
 
@@ -361,7 +278,7 @@ static void private_render_pass_nosort (
 }
 
 static void private_render_pass_sort (
-	LIRenScene32*   self,
+	LIRenRender32*   self,
 	LIRenContext32* context,
 	int             pass)
 {
@@ -428,7 +345,7 @@ static void private_render_pass_sort (
 }
 
 static int private_render_postproc (
-	LIRenScene32*       self,
+	LIRenRender32*       self,
 	LIRenContext32*     context,
 	LIRenFramebuffer32* framebuffer,
 	int                 pass,
@@ -440,7 +357,7 @@ static int private_render_postproc (
 	LIRenShader32* shader;
 
 	/* Find the shader. */
-	shader = liren_render32_find_shader (self->render, name);
+	shader = liren_render32_find_shader (self, name);
 	if (shader == NULL)
 		return 0;
 
@@ -464,7 +381,7 @@ static int private_render_postproc (
 
 	/* Render from the first buffer to the second. */
 	glBindFramebuffer (GL_FRAMEBUFFER, framebuffer->postproc_framebuffers[1]);
-	liren_context32_set_buffer (context, self->render->helpers.unit_quad);
+	liren_context32_set_buffer (context, self->helpers.unit_quad);
 	liren_context32_set_blend (context, 0, GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	liren_context32_set_cull (context, 0, GL_CCW);
 	liren_context32_set_param (context, param);
@@ -494,7 +411,7 @@ static int private_render_postproc (
 }
 
 static int private_sort_scene (
-	LIRenScene32*   self,
+	LIRenRender32*   self,
 	LIRenContext32* context)
 {
 	LIAlgU32dicIter iter;
@@ -505,7 +422,7 @@ static int private_sort_scene (
 	liren_context32_bind (context);
 
 	/* Collect scene objects. */
-	LIALG_U32DIC_FOREACH (iter, self->scene->objects)
+	LIALG_U32DIC_FOREACH (iter, self->render->objects)
 	{
 		rndobj = ((LIRenObject*) iter.value)->v32;
 		if (!liren_object32_get_realized (rndobj))

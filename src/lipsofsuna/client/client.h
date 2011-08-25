@@ -39,7 +39,6 @@ struct _LICliClient
 	LICliWindow* window;
 	LIMaiProgram* program;
 	LIRenRender* render;
-	LIRenScene* scene;
 	LICliServer* server;
 	LISysThread* server_thread;
 };

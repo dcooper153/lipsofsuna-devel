@@ -65,10 +65,10 @@ static void Scene_render (LIScrArgs* args)
 	LIMatMatrix projection;
 	LIRenPassPostproc postproc_passes[10];
 	LIRenPassRender render_passes[10];
-	LIRenScene* scene;
+	LIRenRender* render;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SCENE);
-	scene = module->client->scene;
+	render = module->client->render;
 
 	/* Get arguments. */
 	modelview = limat_matrix_identity ();
@@ -172,7 +172,7 @@ static void Scene_render (LIScrArgs* args)
 	limat_frustum_init (&frustum, &modelview, &projection);
 	if (liren_framebuffer_resize (args->self, viewport[2], viewport[3], multisamples, hdr))
 	{
-		liren_scene_render (scene, args->self, viewport, &modelview, &projection, &frustum,
+		liren_render_render (render, args->self, viewport, &modelview, &projection, &frustum,
 			render_passes, render_passes_num, postproc_passes, postproc_passes_num);
 	}
 	else

@@ -22,10 +22,16 @@
  * @{
  */
 
+#include "lipsofsuna/network.h"
 #include "lipsofsuna/system.h"
 #include "render-model.h"
 #include "render-private.h"
 #include "render32/render-private.h"
+
+static void private_free (
+	LIRenModel* self);
+
+/*****************************************************************************/
 
 /**
  * \brief Creates a new model from a loaded model buffer.
@@ -36,9 +42,9 @@
  * \param render Renderer.
  * \param model Model description.
  * \param id Unique model ID.
- * \return New model or NULL.
+ * \return Model ID or zero on failure.
  */
-LIRenModel* liren_model_new (
+int liren_render_model_new (
 	LIRenRender* render,
 	LIMdlModel*  model,
 	int          id)
@@ -47,7 +53,7 @@ LIRenModel* liren_model_new (
 
 	self = lisys_calloc (1, sizeof (LIRenModel));
 	if (self == NULL)
-		return NULL;
+		return 0;
 	self->id = id;
 	self->render = render;
 
@@ -58,7 +64,7 @@ LIRenModel* liren_model_new (
 		if (self->v32 == NULL)
 		{
 			lisys_free (self);
-			return NULL;
+			return 0;
 		}
 	}
 	else
@@ -67,53 +73,77 @@ LIRenModel* liren_model_new (
 		if (self->v21 == NULL)
 		{
 			lisys_free (self);
-			return NULL;
+			return 0;
 		}
+	}
+
+	/* Find a free model ID. */
+	if (!id)
+	{
+		do
+		{
+			id = lialg_random_range (&render->random, LINET_RANGE_RENDER_START, LINET_RANGE_RENDER_END);
+		}
+		while (lialg_u32dic_find (render->models, id) != NULL);
+		self->id = id;
 	}
 
 	/* Add to the dictionary. */
-	if (id)
+	if (!lialg_u32dic_insert (render->models, id, self))
 	{
-		if (!lialg_u32dic_insert (render->models, id, self))
-		{
-			liren_model_free (self);
-			return NULL;
-		}
-	}
-	if (!lialg_ptrdic_insert (render->models_ptr, self, self))
-	{
-		liren_model_free (self);
-		return NULL;
+		private_free (self);
+		return 0;
 	}
 
-	return self;
+	return id;
 }
 
 /**
  * \brief Frees the model.
- * \param self Model.
+ * \param self Renderer.
+ * \param id Model ID.
  */
-void liren_model_free (
+void liren_render_model_free (
+	LIRenRender* self,
+	int          id)
+{
+	LIRenModel* model;
+
+	model = lialg_u32dic_find (self->models, id);
+	if (model == NULL)
+		return;
+
+	private_free (model);
+}
+
+int liren_render_model_set_model (
+	LIRenRender* self,
+	int          id,
+	LIMdlModel*  model)
+{
+	LIRenModel* model_;
+
+	model_ = lialg_u32dic_find (self->models, id);
+	if (model_ == NULL)
+		return 0;
+
+	if (model_->v32 != NULL)
+		return liren_model32_set_model (model_->v32, model);
+	else
+		return liren_model21_set_model (model_->v21, model);
+}
+
+/*****************************************************************************/
+
+static void private_free (
 	LIRenModel* self)
 {
-	lialg_ptrdic_remove (self->render->models_ptr, self);
-	if (self->id)
-		lialg_u32dic_remove (self->render->models, self->id);
+	lialg_u32dic_remove (self->render->models, self->id);
 	if (self->v32 != NULL)
 		liren_model32_free (self->v32);
 	if (self->v21 != NULL)
 		liren_model21_free (self->v21);
 	lisys_free (self);
-}
-
-int liren_model_set_model (
-	LIRenModel* self,
-	LIMdlModel* model)
-{
-	if (self->v32 != NULL)
-		return liren_model32_set_model (self->v32, model);
-	else
-		return liren_model21_set_model (self->v21, model);
 }
 
 /** @} */

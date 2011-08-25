@@ -42,13 +42,13 @@ static void private_lights_update (
 
 /**
  * \brief Creates a new render object and adds it to the scene.
- * \param scene Scene.
+ * \param render Renderer.
  * \param id Unique identifier.
  * \return New object or NULL.
  */
 LIRenObject21* liren_object21_new (
-	LIRenScene21* scene,
-	int           id)
+	LIRenRender21* render,
+	int            id)
 {
 	LIRenObject21* self;
 
@@ -56,7 +56,7 @@ LIRenObject21* liren_object21_new (
 	self = lisys_calloc (1, sizeof (LIRenObject21));
 	if (self == NULL)
 		return NULL;
-	self->scene = scene;
+	self->render = render;
 	self->transform = limat_transform_identity ();
 	self->orientation.matrix = limat_matrix_identity ();
 
@@ -274,7 +274,7 @@ static void private_lights_clear (
 	{
 		if (self->lights.array[i] != NULL)
 		{
-			liren_scene21_remove_light (self->scene, self->lights.array[i]);
+			liren_render21_remove_light (self->render, self->lights.array[i]);
 			liren_light21_free (self->lights.array[i]);
 		}
 	}
@@ -305,7 +305,7 @@ static int private_lights_create (
 				continue;
 
 			/* Create a light source. */
-			light = liren_light21_new (self->scene, node->light.ambient,
+			light = liren_light21_new (self->render, node->light.ambient,
 				node->light.diffuse, node->light.specular, node->light.equation,
 				node->light.spot.cutoff, node->light.spot.exponent,
 				node->light.flags & LIMDL_LIGHT_FLAG_SHADOW);
@@ -313,6 +313,7 @@ static int private_lights_create (
 				return 0;
 			light->node = node;
 			limdl_node_get_world_transform (node, &scale, &transform);
+			transform = limat_transform_multiply (self->transform, transform);
 			liren_light21_set_transform (light, &transform);
 
 			/* Add to the object. */
@@ -328,12 +329,12 @@ static int private_lights_create (
 	for (i = 0 ; i < self->lights.count ; i++)
 	{
 		light = self->lights.array[i];
-		if (!liren_scene21_insert_light (self->scene, light))
+		if (!liren_render21_insert_light (self->render, light))
 		{
 			while (i--)
 			{
 				light = self->lights.array[i];
-				liren_scene21_remove_light (self->scene, light);
+				liren_render21_remove_light (self->render, light);
 			}
 			return 0;
 		}

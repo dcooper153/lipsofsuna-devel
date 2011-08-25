@@ -28,7 +28,7 @@
 
 /**
  * \brief Creates a new light source.
- * \param scene Scene.
+ * \param render Renderer.
  * \param ambient Ambient color, array of 4 floats.
  * \param diffuse Diffuse color, array of 4 floats.
  * \param specular Specular color, array of 4 floats.
@@ -39,7 +39,7 @@
  * \return New light source or NULL.
  */
 LIRenLight* liren_light_new (
-	LIRenScene*  scene,
+	LIRenRender* render,
 	const float* ambient,
 	const float* diffuse,
 	const float* specular,
@@ -53,12 +53,12 @@ LIRenLight* liren_light_new (
 	self = lisys_calloc (1, sizeof (LIRenLight));
 	if (self == NULL)
 		return NULL;
-	self->scene = scene;
+	self->render = render;
 
 	/* Initialize the backend. */
-	if (scene->v32 != NULL)
+	if (render->v32 != NULL)
 	{
-		self->v32 = liren_light32_new (scene->v32, ambient, diffuse,
+		self->v32 = liren_light32_new (render->v32, ambient, diffuse,
 			specular, equation, cutoff, exponent, shadows);
 		if (self->v32 == NULL)
 		{
@@ -68,7 +68,7 @@ LIRenLight* liren_light_new (
 	}
 	else
 	{
-		self->v21 = liren_light21_new (scene->v21, ambient, diffuse,
+		self->v21 = liren_light21_new (render->v21, ambient, diffuse,
 			specular, equation, cutoff, exponent, shadows);
 		if (self->v21 == NULL)
 		{
@@ -87,6 +87,7 @@ LIRenLight* liren_light_new (
 void liren_light_free (
 	LIRenLight* self)
 {
+	liren_light_set_enabled (self, 0);
 	if (self->v32 != NULL)
 		liren_light32_free (self->v32);
 	if (self->v21 != NULL)
@@ -135,9 +136,9 @@ void liren_light_set_diffuse (
 }
 
 /**
- * \brief Checks if the light is registered.
+ * \brief Checks if the light is enabled.
  * \param self Light source.
- * \return Nonzero if registered.
+ * \return Nonzero if enabled.
  */
 int liren_light_get_enabled (
 	const LIRenLight* self)
@@ -146,6 +147,33 @@ int liren_light_get_enabled (
 		return liren_light32_get_enabled (self->v32);
 	else
 		return liren_light21_get_enabled (self->v21);
+}
+
+/**
+ * \brief Enables or disables the light.
+ * \param self Light source.
+ * \param value Nonzero to enable.
+ */
+void liren_light_set_enabled (
+	LIRenLight* self,
+	int         value)
+{
+	if (value == liren_light_get_enabled (self))
+		return;
+	if (value)
+	{
+		if (self->v32 != NULL)
+			liren_render32_insert_light (self->render->v32, self->v32);
+		else
+			liren_render21_insert_light (self->render->v21, self->v21);
+	}
+	else
+	{
+		if (self->v32 != NULL)
+			liren_render32_remove_light (self->render->v32, self->v32);
+		else
+			liren_render21_remove_light (self->render->v21, self->v21);
+	}
 }
 
 void liren_light_get_equation (
@@ -212,10 +240,10 @@ void liren_light_set_priority (
 		liren_light21_set_priority (self->v21, value);
 }
 
-LIRenScene* liren_light_get_scene (
+LIRenRender* liren_light_get_render (
 	const LIRenLight* self)
 {
-	return self->scene;
+	return self->render;
 }
 
 /**

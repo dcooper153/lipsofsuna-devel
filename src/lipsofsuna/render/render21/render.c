@@ -50,9 +50,9 @@ LIRenRender21* liren_render21_new (
 	self->render = render;
 	self->paths = paths;
 
-	/* Allocate scene list. */
-	self->scenes = lialg_ptrdic_new ();
-	if (self->scenes == NULL)
+	/* Allocate the light list. */
+	self->lights = lialg_ptrdic_new ();
+	if (self->lights == NULL)
 	{
 		liren_render21_free (self);
 		return NULL;
@@ -74,10 +74,10 @@ void liren_render21_free (
 	LIRenRender21* self)
 {
 	private_free_helpers (self);
-	if (self->scenes != NULL)
+	if (self->lights != NULL)
 	{
-		lisys_assert (self->scenes->size == 0);
-		lialg_ptrdic_free (self->scenes);
+		lisys_assert (self->lights->size == 0);
+		lialg_ptrdic_free (self->lights);
 	}
 	lisys_free (self);
 }
@@ -258,7 +258,7 @@ void liren_render21_reload (
 	int            pass)
 {
 	LIAlgStrdicIter iter;
-	LIAlgPtrdicIter iter1;
+	LIAlgU32dicIter iter1;
 
 	if (pass)
 		glEnable (GL_TEXTURE_2D);
@@ -267,7 +267,7 @@ void liren_render21_reload (
 		liren_shader21_reload (((LIRenShader*) iter.value)->v21);
 	LIALG_STRDIC_FOREACH (iter, self->render->images)
 		liren_image21_reload (((LIRenImage*) iter.value)->v21, pass);
-	LIALG_PTRDIC_FOREACH (iter1, self->render->models_ptr)
+	LIALG_U32DIC_FOREACH (iter1, self->render->models)
 		liren_model21_reload (((LIRenModel*) iter1.value)->v21, pass);
 }
 
@@ -286,7 +286,7 @@ int liren_render21_reload_image (
 	LIRenRender21* self,
 	LIRenImage21*  image)
 {
-	LIAlgPtrdicIter iter;
+	LIAlgU32dicIter iter;
 	LIRenModel* model;
 
 	/* Reload the image. */
@@ -294,7 +294,7 @@ int liren_render21_reload_image (
 		return 0;
 
 	/* Replace in all models. */
-	LIALG_PTRDIC_FOREACH (iter, self->render->models_ptr)
+	LIALG_U32DIC_FOREACH (iter, self->render->models)
 	{
 		model = iter.value;
 		liren_model21_replace_image (model->v21, image);
@@ -312,6 +312,18 @@ void liren_render21_update (
 	LIRenRender21* self,
 	float          secs)
 {
+	LIAlgU32dicIter iter;
+	LIRenObject21* object;
+
+	/* Update the effect timer. */
+	self->time += secs;
+
+	/* Update objects. */
+	LIALG_U32DIC_FOREACH (iter, self->render->objects)
+	{
+		object = ((LIRenObject*) iter.value)->v21;
+		liren_object21_update (object, secs);
+	}
 }
 
 int liren_render21_get_anisotropy (

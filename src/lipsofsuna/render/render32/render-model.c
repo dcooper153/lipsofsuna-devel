@@ -165,11 +165,9 @@ int liren_model32_set_model (
 	LIRenModel32* self,
 	LIMdlModel*   model)
 {
-	LIAlgPtrdicIter iter0;
 	LIAlgU32dicIter iter1;
 	LIRenModel32 backup;
 	LIRenObject32* object;
-	LIRenScene32* scene;
 
 	/* Create new model data and erase the old data. */
 	backup = *self;
@@ -188,15 +186,11 @@ int liren_model32_set_model (
 	/* We need to refresh any objects that use the model. Lights reference
 	   the nodes of the model directly and changing the content of the model
 	   invalidates the old node data. */
-	LIALG_PTRDIC_FOREACH (iter0, self->render->scenes)
+	LIALG_U32DIC_FOREACH (iter1, self->render->render->objects)
 	{
-		scene = iter0.value;
-		LIALG_U32DIC_FOREACH (iter1, scene->scene->objects)
-		{
-			object = ((LIRenObject*) iter1.value)->v32;
-			if (object->model == self)
-				liren_object32_set_model (object, self);
-		}
+		object = ((LIRenObject*) iter1.value)->v32;
+		if (object->model == self)
+			liren_object32_set_model (object, self);
 	}
 
 	return 1;

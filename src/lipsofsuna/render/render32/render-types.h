@@ -31,7 +31,6 @@ typedef struct _LIRenMaterial32 LIRenMaterial32;
 typedef struct _LIRenModel32 LIRenModel32;
 typedef struct _LIRenObject32 LIRenObject32;
 typedef struct _LIRenRender32 LIRenRender32;
-typedef struct _LIRenScene32 LIRenScene32;
 typedef struct _LIRenShader32 LIRenShader32;
 typedef struct _LIRenSort32 LIRenSort32;
 typedef struct _LIRenSortgroup32 LIRenSortgroup32;

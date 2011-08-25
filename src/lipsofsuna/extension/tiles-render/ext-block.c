@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -42,25 +42,25 @@ LIExtBlock* liext_tiles_render_block_new (
 void liext_tiles_render_block_free (
 	LIExtBlock* self)
 {
-	if (self->object != NULL)
-		liren_object_free (self->object);
-	if (self->model != NULL)
-		liren_model_free (self->model);
+	if (self->object)
+		liren_render_object_free (self->module->client->render, self->object);
+	if (self->model)
+		liren_render_model_free (self->module->client->render, self->model);
 	lisys_free (self);
 }
 
 void liext_tiles_render_block_clear (
 	LIExtBlock* self)
 {
-	if (self->object != NULL)
+	if (self->object)
 	{
-		liren_object_free (self->object);
-		self->object = NULL;
+		liren_render_object_free (self->module->client->render, self->object);
+		self->object = 0;
 	}
-	if (self->model != NULL)
+	if (self->model)
 	{
-		liren_model_free (self->model);
-		self->model = NULL;
+		liren_render_model_free (self->module->client->render, self->model);
+		self->model = 0;
 	}
 }
 

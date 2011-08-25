@@ -30,7 +30,6 @@ struct _LIExtModule
 	LICliClient* client;
 	LIMaiProgram* program;
 	LIRenRender* render;
-	LIRenScene* scene;
 };
 
 LIExtModule* liext_object_render_new (

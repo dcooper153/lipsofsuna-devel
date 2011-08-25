@@ -26,8 +26,8 @@
 #include "render-types.h"
 
 LIAPICALL (LIRenObject21*, liren_object21_new, (
-	LIRenScene21* scene,
-	int           id));
+	LIRenRender21* render,
+	int            id));
 
 LIAPICALL (void, liren_object21_free, (
 	LIRenObject21* self));

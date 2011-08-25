@@ -231,7 +231,6 @@ int liren_model21_set_model (
 {
 	int i;
 	LIRenIndex* indices;
-	LIAlgPtrdicIter iter0;
 	LIAlgU32dicIter iter1;
 	LIMdlFaces* group;
 	LIMdlLod* lod;
@@ -241,7 +240,6 @@ int liren_model21_set_model (
 	LIRenMaterial21* materials;
 	LIRenModelGroup21* groups;
 	LIRenObject21* object;
-	LIRenScene21* scene;
 
 	/* Create face groups. */
 	lod = model->lod.array;
@@ -350,15 +348,11 @@ int liren_model21_set_model (
 	/* We need to refresh any objects that use the model. Lights reference
 	   the nodes of the model directly and changing the content of the model
 	   invalidates the old node data. */
-	LIALG_PTRDIC_FOREACH (iter0, self->render->scenes)
+	LIALG_U32DIC_FOREACH (iter1, self->render->render->objects)
 	{
-		scene = iter0.value;
-		LIALG_U32DIC_FOREACH (iter1, scene->scene->objects)
-		{
-			object = ((LIRenObject*) iter1.value)->v21;
-			if (object->model == self)
-				liren_object21_set_model (object, self);
-		}
+		object = ((LIRenObject*) iter1.value)->v21;
+		if (object->model == self)
+			liren_object21_set_model (object, self);
 	}
 
 	return 1;

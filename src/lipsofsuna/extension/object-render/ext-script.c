@@ -27,18 +27,14 @@
 static void Object_deform_mesh (LIScrArgs* args)
 {
 	LIExtModule* module;
-	LIEngObject* engobj;
-	LIRenObject* object;
+	LIEngObject* object;
 
 	/* Get render object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
-	engobj = args->self;
-	object = liren_scene_find_object (module->scene, engobj->id);
-	if (object == NULL)
-		return;
+	object = args->self;
 
 	/* Deform the mesh. */
-	liren_object_deform (object);
+	liren_render_object_deform (module->render, object->id);
 }
 
 static void Object_particle_animation (LIScrArgs* args)
@@ -46,22 +42,18 @@ static void Object_particle_animation (LIScrArgs* args)
 	int loop = 1;
 	float start = 0.0f;
 	LIExtModule* module;
-	LIEngObject* engobj;
-	LIRenObject* object;
+	LIEngObject* object;
 
 	/* Get render object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
-	engobj = args->self;
-	object = liren_scene_find_object (module->scene, engobj->id);
-	if (object == NULL)
-		return;
+	object = args->self;
 
 	/* Get arguments. */
 	liscr_args_gets_bool (args, "loop", &loop);
 	liscr_args_gets_float (args, "time", &start);
 
 	/* Deform the mesh. */
-	liren_object_particle_animation (object, start, loop);
+	liren_render_object_particle_animation (module->render, object->id, start, loop);
 }
 
 static void Object_set_effect (LIScrArgs* args)
@@ -69,15 +61,11 @@ static void Object_set_effect (LIScrArgs* args)
 	float params[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	const char* shader = NULL;
 	LIExtModule* module;
-	LIEngObject* engobj;
-	LIRenObject* object;
+	LIEngObject* object;
 
 	/* Get render object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
-	engobj = args->self;
-	object = liren_scene_find_object (module->scene, engobj->id);
-	if (object == NULL)
-		return;
+	object = args->self;
 
 	/* Get arguments. */
 	if (!liscr_args_geti_string (args, 0, &shader))
@@ -85,7 +73,7 @@ static void Object_set_effect (LIScrArgs* args)
 	liscr_args_gets_floatv (args, "params", 4, params);
 
 	/* Deform the mesh. */
-	liren_object_set_effect (object, shader, params);
+	liren_render_object_set_effect (module->render, object->id, shader, params);
 }
 
 /*****************************************************************************/

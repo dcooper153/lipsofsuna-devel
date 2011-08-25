@@ -25,30 +25,24 @@
 #include "render-object.h"
 #include "render-types.h"
 
-LIAPICALL (LIRenScene*, liren_scene_new, (
-	LIRenRender* render));
+LIAPICALL (LIRenObject*, liren_render_find_object, (
+	LIRenRender* self,
+	int          id));
 
-LIAPICALL (void, liren_scene_free, (
-	LIRenScene* self));
+LIAPICALL (void, liren_render_insert_light, (
+	LIRenRender* self,
+	LIRenLight*  light));
 
-LIAPICALL (LIRenObject*, liren_scene_find_object, (
-	LIRenScene* self,
-	int         id));
+LIAPICALL (void, liren_render_remove_light, (
+	LIRenRender* self,
+	LIRenLight*  light));
 
-LIAPICALL (void, liren_scene_insert_light, (
-	LIRenScene* self,
-	LIRenLight* light));
+LIAPICALL (void, liren_render_remove_model, (
+	LIRenRender* self,
+	LIRenModel*  model));
 
-LIAPICALL (void, liren_scene_remove_light, (
-	LIRenScene* self,
-	LIRenLight* light));
-
-LIAPICALL (void, liren_scene_remove_model, (
-	LIRenScene* self,
-	LIRenModel* model));
-
-LIAPICALL (void, liren_scene_render, (
-	LIRenScene*        self,
+LIAPICALL (void, liren_render_render, (
+	LIRenRender*       self,
 	LIRenFramebuffer*  framebuffer,
 	const GLint*       viewport,
 	LIMatMatrix*       modelview,
@@ -58,9 +52,5 @@ LIAPICALL (void, liren_scene_render, (
 	int                render_passes_num,
 	LIRenPassPostproc* postproc_passes,
 	int                postproc_passes_num));
-
-LIAPICALL (void, liren_scene_update, (
-	LIRenScene* self,
-	float       secs));
 
 #endif

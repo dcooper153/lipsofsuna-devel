@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -23,8 +23,8 @@
 struct _LIExtBlock
 {
 	LIExtModule* module;
-	LIRenModel* model;
-	LIRenObject* object;
+	int model;
+	int object;
 };
 
 LIExtBlock* liext_tiles_render_block_new (

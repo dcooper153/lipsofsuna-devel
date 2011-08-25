@@ -18,34 +18,27 @@
 #ifndef __RENDER21_SCENE_H__
 #define __RENDER21_SCENE_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/algorithm.h"
+#include "lipsofsuna/system.h"
 #include "render-framebuffer.h"
 #include "render-light.h"
 #include "render-object.h"
 #include "render-types.h"
 
-LIAPICALL (LIRenScene21*, liren_scene21_new, (
-	void*          scene,
-	LIRenRender21* render));
+LIAPICALL (int, liren_render21_insert_light, (
+	LIRenRender21* self,
+	LIRenLight21*  light));
 
-LIAPICALL (void, liren_scene21_free, (
-	LIRenScene21* self));
+LIAPICALL (void, liren_render21_remove_light, (
+	LIRenRender21* self,
+	LIRenLight21*  light));
 
-LIAPICALL (int, liren_scene21_insert_light, (
-	LIRenScene21* self,
-	LIRenLight21* light));
+LIAPICALL (void, liren_render21_remove_model, (
+	LIRenRender21* self,
+	LIRenModel21*  model));
 
-LIAPICALL (void, liren_scene21_remove_light, (
-	LIRenScene21* self,
-	LIRenLight21* light));
-
-LIAPICALL (void, liren_scene21_remove_model, (
-	LIRenScene21* self,
-	LIRenModel21* model));
-
-LIAPICALL (void, liren_scene21_render, (
-	LIRenScene21*       self,
+LIAPICALL (void, liren_render21_render, (
+	LIRenRender21*      self,
 	LIRenFramebuffer21* framebuffer,
 	const GLint*        viewport,
 	LIMatMatrix*        modelview,
@@ -55,9 +48,5 @@ LIAPICALL (void, liren_scene21_render, (
 	int                 render_passes_num,
 	LIRenPassPostproc*  postproc_passes,
 	int                 postproc_passes_num));
-
-LIAPICALL (void, liren_scene21_update, (
-	LIRenScene21* self,
-	float         secs));
 
 #endif

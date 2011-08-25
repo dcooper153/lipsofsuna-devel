@@ -42,7 +42,7 @@ static void private_update_shadow (
 
 /**
  * \brief Creates a new light source.
- * \param scene Scene.
+ * \param render Renderer.
  * \param ambient Ambient color, array of 4 floats.
  * \param diffuse Diffuse color, array of 4 floats.
  * \param specular Specular color, array of 4 floats.
@@ -53,14 +53,14 @@ static void private_update_shadow (
  * \return New light source or NULL.
  */
 LIRenLight32* liren_light32_new (
-	LIRenScene32* scene,
-	const float*  ambient,
-	const float*  diffuse,
-	const float*  specular,
-	const float*  equation,
-	float         cutoff,
-	float         exponent,
-	int           shadows)
+	LIRenRender32* render,
+	const float*   ambient,
+	const float*   diffuse,
+	const float*   specular,
+	const float*   equation,
+	float          cutoff,
+	float          exponent,
+	int            shadows)
 {
 	LIRenLight32* self;
 
@@ -68,7 +68,7 @@ LIRenLight32* liren_light32_new (
 	self = lisys_calloc (1, sizeof (LIRenLight32));
 	if (self == NULL)
 		return NULL;
-	self->scene = scene;
+	self->render = render;
 	self->ambient[0] = ambient[0];
 	self->ambient[1] = ambient[1];
 	self->ambient[2] = ambient[2];
@@ -99,66 +99,6 @@ LIRenLight32* liren_light32_new (
 }
 
 /**
- * \brief Creates a new directional light source.
- * \param scene Scene.
- * \param ambient Ambient color, array of 4 floats.
- * \param diffuse Diffuse color, array of 4 floats.
- * \param specular Specular color, array of 4 floats.
- * \return New light source or NULL.
- */
-LIRenLight32* liren_light32_new_directional (
-	LIRenScene32* scene,
-	const float*  ambient,
-	const float*  diffuse,
-	const float*  specular)
-{
-	const float equation[3] = { 1.0f, 0.0f, 0.0f };
-	const LIMatVector direction = { 0.0f, 0.0f, -1.0f };
-	LIRenLight32* self;
-
-	/* Create the sun.  */
-	self = liren_light32_new (scene, ambient, diffuse, specular, equation, M_PI, 0.0f, 0);
-	if (self == NULL)
-		return NULL;
-	liren_light32_set_direction (self, &direction);
-
-	return self;
-}
-
-/**
- * \brief Creates a new light from a model light.
- * \param scene Scene.
- * \param light Model light.
- * \return New light or NULL.
- */
-LIRenLight32* liren_light32_new_from_model (
-	LIRenScene32*    scene,
-	const LIMdlNode* light)
-{
-	float scale;
-	LIMatMatrix projection;
-	LIMatTransform transform;
-	LIRenLight32* self;
-
-	/* Allocate self. */
-	self = liren_light32_new (scene, light->light.ambient,
-		light->light.diffuse, light->light.specular, light->light.equation,
-		light->light.spot.cutoff, light->light.spot.exponent,
-		light->light.flags & LIMDL_LIGHT_FLAG_SHADOW);
-	if (self == NULL)
-		return NULL;
-
-	/* Set transform. */
-	self->node = light;
-	limdl_node_get_world_transform (light, &scale, &transform);
-	liren_light32_set_transform (self, &transform);
-	limdl_light_get_projection (light, &projection);
-	liren_light32_set_projection (self, &projection);
-
-	return self;
-}
-
-/**
  * \brief Frees a light source.
  * \param self Light source.
  */
@@ -166,7 +106,7 @@ void liren_light32_free (
 	LIRenLight32* self)
 {
 	liren_light32_set_shadow (self, 0);
-	liren_lighting32_remove_light (self->scene->lighting, self);
+	liren_lighting32_remove_light (self->render->lighting, self);
 	lisys_free (self);
 }
 
@@ -481,10 +421,10 @@ void liren_light32_set_projection (
 	private_update_bounds (self);
 }
 
-LIRenScene32* liren_light32_get_scene (
+LIRenRender32* liren_light32_get_render (
 	const LIRenLight32* self)
 {
-	return self->scene;
+	return self->render;
 }
 
 /**
@@ -723,7 +663,7 @@ static void private_update_shadow (
 	LIRenShader32* shader;
 
 	/* Find the shader. */
-	shader = liren_render32_find_shader (self->scene->render, "shadowmap");
+	shader = liren_render32_find_shader (self->render, "shadowmap");
 	if (shader == NULL)
 		return;
 
@@ -734,9 +674,8 @@ static void private_update_shadow (
 	glDisable (GL_SCISSOR_TEST);
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	limat_frustum_init (&frustum, &self->modelview, &self->projection);
-	context = liren_render32_get_context (self->scene->render);
+	context = liren_render32_get_context (self->render);
 	liren_context32_init (context);
-	liren_context32_set_scene (context, self->scene);
 	liren_context32_set_cull (context, 1, GL_CCW);
 	liren_context32_set_depth (context, 1, 1, GL_LEQUAL);
 	liren_context32_set_frustum (context, &frustum);
@@ -745,7 +684,7 @@ static void private_update_shadow (
 	liren_context32_set_viewmatrix (context, &self->modelview);
 
 	/* Render objects to the depth texture. */
-	LIALG_U32DIC_FOREACH (iter1, ((LIRenScene*) self->scene->scene)->objects)
+	LIALG_U32DIC_FOREACH (iter1, self->render->render->objects)
 	{
 		object = ((LIRenObject*) iter1.value)->v32;
 		if (!liren_object32_get_realized (object))

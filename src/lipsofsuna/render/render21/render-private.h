@@ -70,7 +70,7 @@ struct _LIRenLight21
 	LIMatAabb bounds;
 	LIMatTransform transform;
 	const LIMdlNode* node;
-	LIRenScene21* scene;
+	LIRenRender21* render;
 };
 
 struct _LIRenMaterial21
@@ -121,8 +121,8 @@ struct _LIRenObject21
 	LIMatAabb bounds;
 	LIMatTransform transform;
 	LIMdlPose* pose;
-	LIRenScene21* scene;
 	LIRenModel21* model;
+	LIRenRender21* render;
 	struct
 	{
 		int count;
@@ -137,17 +137,10 @@ struct _LIRenObject21
 
 struct _LIRenRender21
 {
-	LIAlgPtrdic* scenes;
-	LIPthPaths* paths;
-	struct _LIRenRender* render;
-};
-
-struct _LIRenScene21
-{
 	float time;
 	LIAlgPtrdic* lights;
-	LIRenRender21* render;
-	struct _LIRenScene* scene;
+	LIPthPaths* paths;
+	struct _LIRenRender* render;
 };
 
 struct _LIRenShader21

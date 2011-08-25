@@ -30,7 +30,6 @@ typedef struct _LIRenMaterial21 LIRenMaterial21;
 typedef struct _LIRenModel21 LIRenModel21;
 typedef struct _LIRenObject21 LIRenObject21;
 typedef struct _LIRenRender21 LIRenRender21;
-typedef struct _LIRenScene21 LIRenScene21;
 typedef struct _LIRenShader21 LIRenShader21;
 
 #endif

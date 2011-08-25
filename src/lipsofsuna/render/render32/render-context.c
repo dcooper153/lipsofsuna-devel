@@ -35,7 +35,6 @@ void liren_context32_init (
 	uniforms = self->uniforms;
 	memset (self, 0, sizeof (LIRenContext32));
 	self->render = render;
-	self->scene = NULL;
 	self->array = 0;
 	self->incomplete = 1;
 	self->blend.enable = 0;
@@ -541,15 +540,6 @@ void liren_context32_set_projection (
 		liren_uniforms32_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_PROJECTION, self->matrix.projection.m);
 		liren_uniforms32_set_mat4 (&self->uniforms, LIREN_UNIFORM_MATRIX_PROJECTION_INVERSE, self->matrix.projectioninverse.m);
 	}
-}
-
-void liren_context32_set_scene (
-	LIRenContext32* self,
-	LIRenScene32*   scene)
-{
-	self->scene = scene;
-	/* FIXME */
-	self->textures.count = 0;
 }
 
 int liren_context32_get_scissor (

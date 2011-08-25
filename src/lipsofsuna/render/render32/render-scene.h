@@ -25,27 +25,20 @@
 #include "render-object.h"
 #include "render-types.h"
 
-LIAPICALL (LIRenScene32*, liren_scene32_new, (
-	void*          scene,
-	LIRenRender32* render));
+LIAPICALL (void, liren_render32_insert_light, (
+	LIRenRender32* self,
+	LIRenLight32*  light));
 
-LIAPICALL (void, liren_scene32_free, (
-	LIRenScene32* self));
+LIAPICALL (void, liren_render32_remove_light, (
+	LIRenRender32* self,
+	LIRenLight32*  light));
 
-LIAPICALL (void, liren_scene32_insert_light, (
-	LIRenScene32* self,
-	LIRenLight32* light));
+LIAPICALL (void, liren_render32_remove_model, (
+	LIRenRender32* self,
+	LIRenModel32*  model));
 
-LIAPICALL (void, liren_scene32_remove_light, (
-	LIRenScene32* self,
-	LIRenLight32* light));
-
-LIAPICALL (void, liren_scene32_remove_model, (
-	LIRenScene32* self,
-	LIRenModel32* model));
-
-LIAPICALL (void, liren_scene32_render, (
-	LIRenScene32*       self,
+LIAPICALL (void, liren_render32_render, (
+	LIRenRender32*      self,
 	LIRenFramebuffer32* framebuffer,
 	const GLint*        viewport,
 	LIMatMatrix*        modelview,
@@ -55,9 +48,5 @@ LIAPICALL (void, liren_scene32_render, (
 	int                 render_passes_num,
 	LIRenPassPostproc*  postproc_passes,
 	int                 postproc_passes_num));
-
-LIAPICALL (void, liren_scene32_update, (
-	LIRenScene32* self,
-	float         secs));
 
 #endif

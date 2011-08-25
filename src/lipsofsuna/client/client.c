@@ -111,8 +111,6 @@ void licli_client_free (
 	/* Free the server. */
 	private_server_shutdown (self);
 
-	if (self->scene != NULL)
-		liren_scene_free (self->scene);
 	if (self->render != NULL)
 		liren_render_free (self->render);
 	if (self->window != NULL)
@@ -219,9 +217,6 @@ static int private_init (
 	/* Initialize renderer. */
 	self->render = liren_render_new (self->program->paths);
 	if (self->render == NULL)
-		return 0;
-	self->scene = liren_scene_new (self->render);
-	if (self->scene == NULL)
 		return 0;
 
 	/* Register component. */

@@ -46,7 +46,6 @@ struct _LIRenContext32
 	int shadows;
 	GLuint array;
 	LIRenRender32* render;
-	LIRenScene32* scene;
 	LIRenShader32* shader;
 	LIMatFrustum frustum;
 	LIMatVector camera_position;
@@ -210,10 +209,6 @@ LIAPICALL (void, liren_context32_set_viewmatrix, (
 LIAPICALL (void, liren_context32_set_projection, (
 	LIRenContext32*    self,
 	const LIMatMatrix* value));
-
-LIAPICALL (void, liren_context32_set_scene, (
-	LIRenContext32* self,
-	LIRenScene32*   scene));
 
 LIAPICALL (int, liren_context32_get_scissor, (
 	LIRenContext32* self,

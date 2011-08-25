@@ -276,14 +276,14 @@ static int private_process_result (
 
 	/* Replace the model of the block. */
 	liext_tiles_render_block_clear (block);
-	block->model = liren_model_new (self->client->render, task->model, 0);
-	if (block->model != NULL)
+	block->model = liren_render_model_new (self->client->render, task->model, 0);
+	if (block->model)
 	{
-		block->object = liren_object_new (self->client->scene, 0);
-		if (block->object != NULL)
+		block->object = liren_render_object_new (self->client->render, 0);
+		if (block->object)
 		{
-			liren_object_set_model (block->object, block->model);
-			liren_object_set_realized (block->object, 1);
+			liren_render_object_set_model (self->client->render, block->object, block->model);
+			liren_render_object_set_realized (self->client->render, block->object, 1);
 		}
 	}
 

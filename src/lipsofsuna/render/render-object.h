@@ -18,51 +18,56 @@
 #ifndef __RENDER_OBJECT_H__
 #define __RENDER_OBJECT_H__
 
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/model.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/model.h"
+#include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-buffer.h"
 #include "render-model.h"
 #include "render-types.h"
 
-LIAPICALL (LIRenObject*, liren_object_new, (
-	LIRenScene* scene,
-	int         id));
+LIAPICALL (int, liren_render_object_new, (
+	LIRenRender* render,
+	int          id));
 
-LIAPICALL (void, liren_object_free, (
-	LIRenObject* self));
+LIAPICALL (void, liren_render_object_free, (
+	LIRenRender* self,
+	int          id));
 
-LIAPICALL (void, liren_object_deform, (
-	LIRenObject* self));
+LIAPICALL (void, liren_render_object_deform, (
+	LIRenRender* self,
+	int          id));
 
-LIAPICALL (void, liren_object_particle_animation, (
-	LIRenObject* self,
+LIAPICALL (void, liren_render_object_particle_animation, (
+	LIRenRender* self,
+	int          id,
 	float        start,
 	int          loop));
 
-LIAPICALL (int, liren_object_set_effect, (
-	LIRenObject* self,
+LIAPICALL (int, liren_render_object_set_effect, (
+	LIRenRender* self,
+	int          id,
 	const char*  shader,
 	const float* params));
 
-LIAPICALL (LIRenModel*, liren_object_get_model, (
-	LIRenObject* self));
+LIAPICALL (int, liren_render_object_set_model, (
+	LIRenRender* self,
+	int          id,
+	int          model));
 
-LIAPICALL (int, liren_object_set_model, (
-	LIRenObject* self,
-	LIRenModel*  model));
-
-LIAPICALL (int, liren_object_set_pose, (
-	LIRenObject* self,
+LIAPICALL (int, liren_render_object_set_pose, (
+	LIRenRender* self,
+	int          id,
 	LIMdlPose*   pose));
 
-LIAPICALL (int, liren_object_set_realized, (
-	LIRenObject* self,
+LIAPICALL (int, liren_render_object_set_realized, (
+	LIRenRender* self,
+	int          id,
 	int          value));
 
-LIAPICALL (void, liren_object_set_transform, (
-	LIRenObject*          self,
+LIAPICALL (void, liren_render_object_set_transform, (
+	LIRenRender*          self,
+	int                   id,
 	const LIMatTransform* value));
 
 #endif

@@ -30,7 +30,7 @@
 
 /**
  * \brief Creates a new light source.
- * \param scene Scene.
+ * \param render Renderer.
  * \param ambient Ambient color, array of 4 floats.
  * \param diffuse Diffuse color, array of 4 floats.
  * \param specular Specular color, array of 4 floats.
@@ -41,14 +41,14 @@
  * \return New light source or NULL.
  */
 LIRenLight21* liren_light21_new (
-	LIRenScene21* scene,
-	const float*  ambient,
-	const float*  diffuse,
-	const float*  specular,
-	const float*  equation,
-	float         cutoff,
-	float         exponent,
-	int           shadows)
+	LIRenRender21* render,
+	const float*   ambient,
+	const float*   diffuse,
+	const float*   specular,
+	const float*   equation,
+	float          cutoff,
+	float          exponent,
+	int            shadows)
 {
 	LIRenLight21* self;
 
@@ -56,7 +56,7 @@ LIRenLight21* liren_light21_new (
 	self = lisys_calloc (1, sizeof (LIRenLight21));
 	if (self == NULL)
 		return NULL;
-	self->scene = scene;
+	self->render = render;
 	self->ambient[0] = ambient[0];
 	self->ambient[1] = ambient[1];
 	self->ambient[2] = ambient[2];
@@ -222,10 +222,10 @@ void liren_light21_set_priority (
 	self->priority = value;
 }
 
-LIRenScene21* liren_light21_get_scene (
+LIRenRender21* liren_light21_get_scene (
 	const LIRenLight21* self)
 {
-	return self->scene;
+	return self->render;
 }
 
 /**

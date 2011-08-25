@@ -28,8 +28,8 @@
 #include "render-types.h"
 
 LIAPICALL (LIRenObject32*, liren_object32_new, (
-	LIRenScene32* scene,
-	int           id));
+	LIRenRender32* render,
+	int            id));
 
 LIAPICALL (void, liren_object32_free, (
 	LIRenObject32* self));

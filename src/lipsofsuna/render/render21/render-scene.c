@@ -31,49 +31,9 @@
 
 #define LIREN_SCENE21_MAX_LIGHTS 8
 
-LIRenScene21* liren_scene21_new (
-	void*          scene,
-	LIRenRender21* render)
-{
-	LIRenScene21* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIRenScene21));
-	if (self == NULL)
-		return NULL;
-	self->scene = scene;
-	self->render = render;
-
-	/* Allocate light list. */
-	self->lights = lialg_ptrdic_new ();
-	if (self->lights == NULL)
-	{
-		liren_scene21_free (self);
-		return NULL;
-	}
-
-	/* Register self. */
-	if (!lialg_ptrdic_insert (render->scenes, self, self))
-	{
-		liren_scene21_free (self);
-		return NULL;
-	}
-
-	return self;
-}
-
-void liren_scene21_free (
-	LIRenScene21* self)
-{
-	lialg_ptrdic_remove (self->render->scenes, self);
-	if (self->lights != NULL)
-		lialg_ptrdic_free (self->lights);
-	lisys_free (self);
-}
-
-int liren_scene21_insert_light (
-	LIRenScene21* self,
-	LIRenLight21* light)
+int liren_render21_insert_light (
+	LIRenRender21* self,
+	LIRenLight21*  light)
 {
 	if (!lialg_ptrdic_insert (self->lights, light, light))
 		return 0;
@@ -82,22 +42,22 @@ int liren_scene21_insert_light (
 	return 1;
 }
 
-void liren_scene21_remove_light (
-	LIRenScene21* self,
-	LIRenLight21* light)
+void liren_render21_remove_light (
+	LIRenRender21* self,
+	LIRenLight21*  light)
 {
 	lialg_ptrdic_remove (self->lights, light);
 	light->enabled = 0;
 }
 
-void liren_scene21_remove_model (
-	LIRenScene21* self,
-	LIRenModel21* model)
+void liren_render21_remove_model (
+	LIRenRender21* self,
+	LIRenModel21*  model)
 {
 	LIAlgU32dicIter iter;
 	LIRenObject21* object;
 
-	LIALG_U32DIC_FOREACH (iter, self->scene->objects)
+	LIALG_U32DIC_FOREACH (iter, self->render->objects)
 	{
 		object = ((LIRenObject*) iter.value)->v21;
 		if (object->model == model)
@@ -118,8 +78,8 @@ void liren_scene21_remove_model (
  * \param postproc_passes Array of post-processing passes.
  * \param postproc_passes_num Number of post-processing passes.
  */
-void liren_scene21_render (
-	LIRenScene21*       self,
+void liren_render21_render (
+	LIRenRender21*      self,
 	LIRenFramebuffer21* framebuffer,
 	const GLint*        viewport,
 	LIMatMatrix*        modelview,
@@ -185,7 +145,7 @@ void liren_scene21_render (
 	}
 
 	/* Render each object. */
-	LIALG_U32DIC_FOREACH (iter, self->scene->objects)
+	LIALG_U32DIC_FOREACH (iter, self->render->objects)
 	{
 		object = ((LIRenObject*) iter.value)->v21;
 		model = object->model;
@@ -243,29 +203,6 @@ void liren_scene21_render (
 	glMatrixMode (GL_MODELVIEW);
 	glLoadIdentity ();
 	glPopAttrib ();
-}
-
-/**
- * \brief Updates the scene.
- * \param self Scene.
- * \param secs Number of seconds since the last update.
- */
-void liren_scene21_update (
-	LIRenScene21* self,
-	float         secs)
-{
-	LIAlgU32dicIter iter;
-	LIRenObject21* object;
-
-	/* Update the effect timer. */
-	self->time += secs;
-
-	/* Update objects. */
-	LIALG_U32DIC_FOREACH (iter, self->scene->objects)
-	{
-		object = ((LIRenObject*) iter.value)->v21;
-		liren_object21_update (object, secs);
-	}
 }
 
 /** @} */

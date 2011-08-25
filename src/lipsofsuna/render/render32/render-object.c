@@ -55,13 +55,13 @@ static void private_lights_update (
 
 /**
  * \brief Creates a new render object and adds it to the scene.
- * \param scene Scene.
+ * \param render Renderer.
  * \param id Unique identifier.
  * \return New object or NULL.
  */
 LIRenObject32* liren_object32_new (
-	LIRenScene32* scene,
-	int           id)
+	LIRenRender32* render,
+	int            id)
 {
 	LIRenObject32* self;
 
@@ -69,7 +69,7 @@ LIRenObject32* liren_object32_new (
 	self = lisys_calloc (1, sizeof (LIRenObject32));
 	if (self == NULL)
 		return NULL;
-	self->scene = scene;
+	self->render = render;
 	self->transform = limat_transform_identity ();
 	self->orientation.matrix = limat_matrix_identity ();
 
@@ -188,7 +188,7 @@ int liren_object32_set_effect (
 
 	/* Find the effect shader. */
 	if (shader != NULL)
-		shader_ = liren_render32_find_shader (self->scene->render, shader);
+		shader_ = liren_render32_find_shader (self->render, shader);
 	else
 		shader_ = NULL;
 
@@ -583,7 +583,7 @@ static void private_lights_clear (
 	{
 		if (self->lights.array[i] != NULL)
 		{
-			liren_lighting32_remove_light (self->scene->lighting, self->lights.array[i]);
+			liren_lighting32_remove_light (self->render->lighting, self->lights.array[i]);
 			liren_light32_free (self->lights.array[i]);
 		}
 	}
@@ -597,6 +597,8 @@ static int private_lights_create (
 	LIMdlPose*     pose)
 {
 	int i;
+	float scale;
+	LIMatTransform transform;
 	LIMdlNode* node;
 	LIMdlNodeIter iter;
 	LIRenLight32* light;
@@ -606,12 +608,24 @@ static int private_lights_create (
 	{
 		LIMDL_FOREACH_NODE (iter, &pose->nodes)
 		{
+			/* Find a light source. */
 			node = iter.value;
 			if (node->type != LIMDL_NODE_LIGHT)
 				continue;
-			light = liren_light32_new_from_model (self->scene, node);
+
+			/* Create a light source. */
+			light = liren_light32_new (self->render, node->light.ambient,
+				node->light.diffuse, node->light.specular, node->light.equation,
+				node->light.spot.cutoff, node->light.spot.exponent,
+				node->light.flags & LIMDL_LIGHT_FLAG_SHADOW);
 			if (light == NULL)
 				return 0;
+			light->node = node;
+			limdl_node_get_world_transform (node, &scale, &transform);
+			transform = limat_transform_multiply (self->transform, transform);
+			liren_light32_set_transform (light, &transform);
+
+			/* Add to the object. */
 			if (!lialg_array_append (&self->lights, &light))
 			{
 				liren_light32_free (light);
@@ -624,12 +638,12 @@ static int private_lights_create (
 	for (i = 0 ; i < self->lights.count ; i++)
 	{
 		light = self->lights.array[i];
-		if (!liren_lighting32_insert_light (self->scene->lighting, light))
+		if (!liren_lighting32_insert_light (self->render->lighting, light))
 		{
 			while (i--)
 			{
 				light = self->lights.array[i];
-				liren_lighting32_remove_light (self->scene->lighting, light);
+				liren_lighting32_remove_light (self->render->lighting, light);
 			}
 			return 0;
 		}
