@@ -25,7 +25,7 @@
 #include "lipsofsuna/system.h"
 #include "render-light.h"
 #include "render-private.h"
-#include "../render-scene.h"
+#include "../render.h"
 #include "../render-private.h"
 
 /**

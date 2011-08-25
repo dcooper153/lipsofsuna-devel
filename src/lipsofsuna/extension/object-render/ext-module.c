@@ -155,19 +155,13 @@ static int private_model_free (
 	LIExtModule* self,
 	LIEngModel*  model)
 {
-	LIRenModel* model_;
-
-	/* Find the model. */
 	lisys_assert (model != NULL);
-	model_ = liren_render_find_model (self->render, model->id);
-	if (model_ == NULL)
-		return 1;
 
 	/* Remove from objects. */
 	/* Keeping the model alive when it's assigned to objects is the job of scripts.
 	   If they don't reference the model, we'll remove it even if it's in use. We
 	   prevent crashing by removing it from objects in such a case. */
-	liren_render_remove_model (self->render, model_);
+	liren_render_remove_model (self->render, model->id);
 
 	liren_render_model_free (self->render, model->id);
 
@@ -178,13 +172,7 @@ static int private_model_new (
 	LIExtModule* self,
 	LIEngModel*  model)
 {
-	LIRenModel* model_;
-
-	lisys_assert (model != NULL);
-
-	model_ = liren_render_find_model (self->render, model->id);
-	if (model_ == NULL)
-		liren_render_model_new (self->render, model->model, model->id);
+	liren_render_model_new (self->render, model->model, model->id);
 
 	return 1;
 }
@@ -212,21 +200,15 @@ static int private_object_model (
 	LIEngObject* object,
 	LIEngModel*  model)
 {
-	LIRenObject* object_;
-
-	object_ = liren_render_find_object (self->render, object->id);
-	if (object_ != NULL)
+	if (model != NULL)
 	{
-		if (model != NULL)
-		{
-			liren_render_object_set_pose (self->render, object->id, object->pose);
-			liren_render_object_set_model (self->render, object->id, model->id);
-		}
-		else
-		{
-			liren_render_object_set_pose (self->render, object->id, NULL);
-			liren_render_object_set_model (self->render, object->id, 0);
-		}
+		liren_render_object_set_pose (self->render, object->id, object->pose);
+		liren_render_object_set_model (self->render, object->id, model->id);
+	}
+	else
+	{
+		liren_render_object_set_pose (self->render, object->id, NULL);
+		liren_render_object_set_model (self->render, object->id, 0);
 	}
 
 	return 1;

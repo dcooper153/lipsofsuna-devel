@@ -24,7 +24,7 @@
 #include "render.h"
 #include "render-types.h"
 
-LIAPICALL (LIRenLight*, liren_light_new, (
+LIAPICALL (int, liren_render_light_new, (
 	LIRenRender* render,
 	const float* ambient,
 	const float* diffuse,
@@ -34,103 +34,73 @@ LIAPICALL (LIRenLight*, liren_light_new, (
 	float        exponent,
 	int          shadow));
 
-LIAPICALL (void, liren_light_free, (
-	LIRenLight* self));
+LIAPICALL (void, liren_render_light_free, (
+	LIRenRender* self,
+	int          id));
 
-LIAPICALL (void, liren_light_get_ambient, (
-	LIRenLight* self,
-	float*      value));
-
-LIAPICALL (void, liren_light_set_ambient, (
-	LIRenLight*  self,
+LIAPICALL (void, liren_render_light_set_ambient, (
+	LIRenRender* self,
+	int          id,
 	const float* value));
 
-LIAPICALL (void, liren_light_get_diffuse, (
-	LIRenLight* self,
-	float*      value));
-
-LIAPICALL (void, liren_light_set_diffuse, (
-	LIRenLight*  self,
+LIAPICALL (void, liren_render_light_set_diffuse, (
+	LIRenRender* self,
+	int          id,
 	const float* value));
 
-LIAPICALL (int, liren_light_get_enabled, (
-	const LIRenLight* self));
+LIAPICALL (void, liren_render_light_set_enabled, (
+	LIRenRender* self,
+	int          id,
+	int          value));
 
-LIAPICALL (void, liren_light_set_enabled, (
-	LIRenLight* self,
-	int         value));
-
-LIAPICALL (void, liren_light_get_equation, (
-	LIRenLight* self,
-	float*      value));
-
-LIAPICALL (void, liren_light_set_equation, (
-	LIRenLight*  self,
+LIAPICALL (void, liren_render_light_set_equation, (
+	LIRenRender* self,
+	int          id,
 	const float* value));
 
-LIAPICALL (void, liren_light_get_position, (
-	const LIRenLight* self,
-	GLfloat*          value));
+LIAPICALL (void, liren_render_light_set_priority, (
+	LIRenRender* self,
+	int          id,
+	float        value));
 
-LIAPICALL (float, liren_light_get_priority, (
-	LIRenLight* self));
+LIAPICALL (void, liren_render_light_set_shadow, (
+	LIRenRender* self,
+	int          id,
+	int          value));
 
-LIAPICALL (void, liren_light_set_priority, (
-	LIRenLight* self,
-	float       value));
+LIAPICALL (void, liren_render_light_set_shadow_far, (
+	LIRenRender* self,
+	int          id,
+	float        value));
 
-LIAPICALL (LIRenRender*, liren_light_get_render, (
-	const LIRenLight* self));
+LIAPICALL (void, liren_render_light_set_shadow_near, (
+	LIRenRender* self,
+	int          id,
+	float        value));
 
-LIAPICALL (int, liren_light_get_shadow, (
-	const LIRenLight* self));
-
-LIAPICALL (void, liren_light_set_shadow, (
-	LIRenLight* self,
-	int         value));
-
-LIAPICALL (float, liren_light_get_shadow_far, (
-	const LIRenLight* self));
-
-LIAPICALL (void, liren_light_set_shadow_far, (
-	LIRenLight* self,
-	float       value));
-
-LIAPICALL (float, liren_light_get_shadow_near, (
-	const LIRenLight* self));
-
-LIAPICALL (void, liren_light_set_shadow_near, (
-	LIRenLight* self,
-	float       value));
-
-LIAPICALL (void, liren_light_get_specular, (
-	LIRenLight* self,
-	float*      value));
-
-LIAPICALL (void, liren_light_set_specular, (
-	LIRenLight*  self,
+LIAPICALL (void, liren_render_light_set_specular, (
+	LIRenRender* self,
+	int          id,
 	const float* value));
 
-LIAPICALL (float, liren_light_get_spot_cutoff, (
-	const LIRenLight* self));
+LIAPICALL (void, liren_render_light_set_spot_cutoff, (
+	LIRenRender* self,
+	int          id,
+	float        value));
 
-LIAPICALL (void, liren_light_set_spot_cutoff, (
-	LIRenLight* self,
-	float       value));
+LIAPICALL (void, liren_render_light_set_spot_exponent, (
+	LIRenRender* self,
+	int          id,
+	float        value));
 
-LIAPICALL (float, liren_light_get_spot_exponent, (
-	const LIRenLight* self));
-
-LIAPICALL (void, liren_light_set_spot_exponent, (
-	LIRenLight* self,
-	float       value));
-
-LIAPICALL (void, liren_light_get_transform, (
-	LIRenLight*     self,
+LIAPICALL (void, liren_render_light_get_transform, (
+	LIRenRender*    self,
+	int             id,
 	LIMatTransform* value));
 
-LIAPICALL (void, liren_light_set_transform, (
-	LIRenLight*           self,
+LIAPICALL (void, liren_render_light_set_transform, (
+	LIRenRender*          self,
+	int                   id,
 	const LIMatTransform* value));
 
 #endif

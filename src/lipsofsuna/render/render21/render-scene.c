@@ -26,8 +26,8 @@
 #include "render.h"
 #include "render-private.h"
 #include "render-scene.h"
+#include "../render.h"
 #include "../render-private.h"
-#include "../render-scene.h"
 
 #define LIREN_SCENE21_MAX_LIGHTS 8
 
@@ -106,6 +106,7 @@ void liren_render21_render (
 	/* Set the rendering mode. */
 	glPushAttrib (GL_VIEWPORT_BIT);
 	glViewport (viewport[0], viewport[1], viewport[2], viewport[3]);
+	glClear (GL_DEPTH_BUFFER_BIT);
 	glMatrixMode (GL_PROJECTION);
 	glLoadMatrixf (projection->m);
 	glMatrixMode (GL_MODELVIEW);
@@ -145,12 +146,14 @@ void liren_render21_render (
 	}
 
 	/* Render each object. */
+	printf("DERP %d\n", self->render->objects->size);
 	LIALG_U32DIC_FOREACH (iter, self->render->objects)
 	{
 		object = ((LIRenObject*) iter.value)->v21;
 		model = object->model;
 		if (!object->realized || model == NULL || model->buffer == NULL)
 			continue;
+		printf("   RENDER! %d grp=%d\n", iter.key, model->groups.count);
 
 		/* Enable the vertex buffer. */
 		buffer = model->buffer;
@@ -172,6 +175,7 @@ void liren_render21_render (
 		for (i = 0 ; i < model->groups.count ; i++)
 		{
 			group = model->groups.array + i;
+			printf("      GROUP! %d sta=%d cou=%d\n", i, group->start, group->count);
 			material = model->materials.array + i;
 			glMaterialf (GL_FRONT, GL_SHININESS, material->shininess);
 			glMaterialfv (GL_FRONT, GL_DIFFUSE, material->diffuse);

@@ -48,6 +48,7 @@ LIExtModule* liext_render_new (
 		liext_render_free (self);
 		return NULL;
 	}
+	self->render = self->client->render;
 
 	/* Register classes. */
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_LIGHT, self);

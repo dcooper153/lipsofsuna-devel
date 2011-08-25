@@ -27,7 +27,7 @@
 #include "render-light.h"
 #include "render-lighting.h"
 #include "render-private.h"
-#include "../render-scene.h"
+#include "../render.h"
 #include "../render-private.h"
 
 #define LIGHT_CONTRIBUTION_EPSILON 0.001f

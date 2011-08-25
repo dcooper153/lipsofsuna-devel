@@ -31,6 +31,7 @@ struct _LIExtModule
 {
 	LICliClient* client;
 	LIMaiProgram* program;
+	LIRenRender* render;
 };
 
 LIExtModule* liext_render_new (
@@ -38,6 +39,15 @@ LIExtModule* liext_render_new (
 
 void liext_render_free (
 	LIExtModule* self);
+
+/*****************************************************************************/
+
+typedef struct _LIExtLight LIExtLight;
+struct _LIExtLight
+{
+	LIExtModule* module;
+	int id;
+};
 
 /*****************************************************************************/
 

@@ -25,7 +25,6 @@
 #include "render/render-light.h"
 #include "render/render-model.h"
 #include "render/render-object.h"
-#include "render/render-scene.h"
 #include "render/render-shader.h"
 #include "render/render-types.h"
 

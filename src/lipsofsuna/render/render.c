@@ -52,6 +52,14 @@ LIRenRender* liren_render_new (
 		return NULL;
 	}
 
+	/* Allocate the light dictionary. */
+	self->lights = lialg_u32dic_new ();
+	if (self->lights == NULL)
+	{
+		liren_render_free (self);
+		return NULL;
+	}
+
 	/* Allocate the model dictionary. */
 	self->models = lialg_u32dic_new ();
 	if (self->models == NULL)
@@ -96,6 +104,10 @@ void liren_render_free (
 {
 	LIAlgStrdicIter iter1;
 	LIAlgU32dicIter iter2;
+
+	/* Free lights. */
+	if (self->lights != NULL)
+		lialg_u32dic_free (self->lights);
 
 	/* Free objects. */
 	if (self->objects != NULL)
@@ -276,6 +288,61 @@ void liren_render_reload (
 		liren_render32_reload (self->v32, pass);
 	else
 		liren_render21_reload (self->v21, pass);
+}
+
+void liren_render_remove_model (
+	LIRenRender* self,
+	int          id)
+{
+	LIRenModel* model;
+
+	model = lialg_u32dic_find (self->models, id);
+	if (model == NULL)
+		return;
+
+	if (model->v32 != NULL)
+		return liren_render32_remove_model (self->v32, model->v32);
+	else
+		return liren_render21_remove_model (self->v21, model->v21);
+}
+
+/**
+ * \brief Renders the scene.
+ * \param self Scene.
+ * \param framebuffer Render target framebuffer.
+ * \param viewport Viewport array.
+ * \param modelview Modelview matrix of the camera.
+ * \param projection Projeciton matrix of the camera.
+ * \param frustum Frustum of the camera.
+ * \param render_passes Array of render passes.
+ * \param render_passes_num Number of render passes.
+ * \param postproc_passes Array of post-processing passes.
+ * \param postproc_passes_num Number of post-processing passes.
+ */
+void liren_render_render (
+	LIRenRender*       self,
+	LIRenFramebuffer*  framebuffer,
+	const GLint*       viewport,
+	LIMatMatrix*       modelview,
+	LIMatMatrix*       projection,
+	LIMatFrustum*      frustum,
+	LIRenPassRender*   render_passes,
+	int                render_passes_num,
+	LIRenPassPostproc* postproc_passes,
+	int                postproc_passes_num)
+{
+	if (self->v32 != NULL)
+	{
+		return liren_render32_render (self->v32, framebuffer->v32, viewport,
+			modelview, projection, frustum, render_passes, render_passes_num,
+			postproc_passes, postproc_passes_num);
+	}
+	else
+	{
+		return liren_render21_render (self->v21, framebuffer->v21, viewport,
+			modelview, projection, frustum, render_passes, render_passes_num,
+			postproc_passes, postproc_passes_num);
+	}
 }
 
 /**

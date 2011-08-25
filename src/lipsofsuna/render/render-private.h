@@ -36,6 +36,9 @@
 
 /* #define LIREN_ENABLE_PROFILING */
 
+typedef struct _LIRenLight LIRenLight;
+typedef struct _LIRenModel LIRenModel;
+
 struct _LIRenBuffer
 {
 	LIRenBuffer21* v21;
@@ -57,6 +60,7 @@ struct _LIRenImage
 
 struct _LIRenLight
 {
+	int id;
 	LIRenRender* render;
 	LIRenLight21* v21;
 	LIRenLight32* v32;
@@ -84,6 +88,7 @@ struct _LIRenRender
 	LIAlgRandom random;
 	LIAlgStrdic* images;
 	LIAlgStrdic* shaders;
+	LIAlgU32dic* lights;
 	LIAlgU32dic* models;
 	LIAlgU32dic* objects;
 	LIRenRender21* v21;
@@ -96,5 +101,9 @@ struct _LIRenShader
 	LIRenShader21* v21;
 	LIRenShader32* v32;
 };
+
+LIAPICALL (LIRenModel*, liren_render_find_model, (
+	LIRenRender* self,
+	int          id));
 
 #endif

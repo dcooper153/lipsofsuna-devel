@@ -18,14 +18,12 @@
 #ifndef __RENDER_TYPES_H__
 #define __RENDER_TYPES_H__
 
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/video.h>
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/video.h"
 #include "render-types-common.h"
 
 typedef struct _LIRenBuffer LIRenBuffer;
 typedef struct _LIRenFramebuffer LIRenFramebuffer;
-typedef struct _LIRenLight LIRenLight;
-typedef struct _LIRenModel LIRenModel;
 typedef struct _LIRenObject LIRenObject;
 typedef struct _LIRenRender LIRenRender;
 typedef struct _LIRenShader LIRenShader;

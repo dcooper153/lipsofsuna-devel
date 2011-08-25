@@ -21,6 +21,7 @@
 #include "lipsofsuna/paths.h"
 #include "lipsofsuna/system.h"
 #include "render-buffer.h"
+#include "render-framebuffer.h"
 #include "render-image.h"
 #include "render-light.h"
 #include "render-object.h"
@@ -61,10 +62,6 @@ LIAPICALL (LIRenImage*, liren_render_find_image, (
 	LIRenRender* self,
 	const char*  name));
 
-LIAPICALL (LIRenModel*, liren_render_find_model, (
-	LIRenRender* self,
-	int          id));
-
 LIAPICALL (int, liren_render_load_image, (
 	LIRenRender* self,
 	const char*  name));
@@ -72,6 +69,22 @@ LIAPICALL (int, liren_render_load_image, (
 LIAPICALL (void, liren_render_reload, (
 	LIRenRender* self,
 	int          pass));
+
+LIAPICALL (void, liren_render_remove_model, (
+	LIRenRender* self,
+	int          id));
+
+LIAPICALL (void, liren_render_render, (
+	LIRenRender*       self,
+	LIRenFramebuffer*  framebuffer,
+	const GLint*       viewport,
+	LIMatMatrix*       modelview,
+	LIMatMatrix*       projection,
+	LIMatFrustum*      frustum,
+	LIRenPassRender*   render_passes,
+	int                render_passes_num,
+	LIRenPassPostproc* postproc_passes,
+	int                postproc_passes_num));
 
 LIAPICALL (void, liren_render_update, (
 	LIRenRender* self,
