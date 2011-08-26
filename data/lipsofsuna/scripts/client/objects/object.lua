@@ -147,16 +147,29 @@ end
 
 Object.update_motion_state = function(self, tick)
 	if not self.interpolation then return end
-	-- Damp velocity to reduce overshoots.
-	self.interpolation = self.interpolation + tick
-	if self.interpolation > 0.3 then
-		self.velocity = self.velocity * 0.93
+	if self.interpolation_linear then
+		-- Linear interpolation when the object is stopping.
+		local t = 10 * tick
+		if self.interpolation < 1 - t then
+			self.position = self.position + self.correction * t
+			self.interpolation = self.interpolation + t
+		elseif self.interpolation < 1 then
+			self.position = self.position + self.correction * (1 - self.interpolation)
+			self.correction = Vector()
+			self.interpolation = 1
+		end
+	else
+		-- Damp velocity to reduce overshoots.
+		self.interpolation = self.interpolation + tick
+		if self.interpolation > 0.3 then
+			self.velocity = self.velocity * 0.93
+		end
+		-- Apply position change predicted by the velocity.
+		self.position = self.position + self.velocity * tick
+		-- Correct prediction errors over time.
+		self.position = self.position + self.correction * (1 - Object.ipol_correction)
+		self.correction = self.correction * Object.ipol_correction
 	end
-	-- Apply position change predicted by the velocity.
-	self.position = self.position + self.velocity * tick
-	-- Correct prediction errors over time.
-	self.position = self.position + self.correction * (1 - Object.ipol_correction)
-	self.correction = self.correction * Object.ipol_correction
 end
 
 Object.set_motion_state = function(self, pos, rot, vel, tilt)
@@ -168,8 +181,9 @@ Object.set_motion_state = function(self, pos, rot, vel, tilt)
 		self.correction = Vector()
 	end
 	-- Store the current velocity so that we can predict future movements.
-	self.velocity = Vector(vx, vy, vz)
+	self.velocity = vel
 	self.interpolation = 0
+	self.interpolation_linear = (vel.length < 0.5)
 	-- Set rotation unless controlled by the local player.
 	if self ~= Player.object then
 		self:update_rotation(rot, tilt)
