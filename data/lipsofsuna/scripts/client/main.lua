@@ -83,9 +83,8 @@ while not Program.quit do
 	Widgets:update()
 	local t3 = Program.time
 	-- Render the scene.
-	Program:clear_buffer()
+	Gui.scene:update_camera()
 	Widgets:draw()
-	Program:swap_buffers()
 	local t4 = Program.time
 	-- Update profiling stats.
 	Program.profiling.update = t2 - t1

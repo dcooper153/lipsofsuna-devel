@@ -22,7 +22,6 @@
 
 typedef int (*liwdgHandler)();
 typedef int LIWdgWidgetState;
-typedef struct _LIWdgElement LIWdgElement;
 typedef struct _LIWdgManager LIWdgManager;
 typedef struct _LIWdgWidget LIWdgWidget;
 typedef struct _LIWdgRect LIWdgRect;

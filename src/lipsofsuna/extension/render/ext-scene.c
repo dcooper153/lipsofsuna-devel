@@ -172,7 +172,7 @@ static void Scene_render (LIScrArgs* args)
 	limat_frustum_init (&frustum, &modelview, &projection);
 	if (liren_framebuffer_resize (args->self, viewport[2], viewport[3], multisamples, hdr))
 	{
-		liren_render_render (render, args->self, viewport, &modelview, &projection, &frustum,
+		liren_render_render_scene (render, args->self, viewport, &modelview, &projection, &frustum,
 			render_passes, render_passes_num, postproc_passes, postproc_passes_num);
 	}
 	else

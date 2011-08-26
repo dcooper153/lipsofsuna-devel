@@ -41,10 +41,18 @@ static void private_call_attach (
 	int          x,
 	int          y);
 
+static void private_call_attach_manual (
+	LIWdgWidget* self,
+	LIWdgWidget* child);
+
 static void private_call_detach (
 	LIWdgWidget* self,
 	int          x,
 	int          y);
+
+static void private_call_detach_manual (
+	LIWdgWidget* self,
+	LIWdgWidget* child);
 
 static void private_cell_changed (
 	LIWdgWidget* self,
@@ -98,6 +106,10 @@ LIWdgWidget* liwdg_widget_new (
 	self->margin_top = 0;
 	self->margin_bottom = 0;
 
+	/* Allocate the overlay. */
+	self->overlay = liren_render_overlay_new (manager->render);
+	liren_render_overlay_set_visible (manager->render, self->overlay, self->visible);
+
 	/* Add to dictionary. */
 	if (!lialg_ptrdic_insert (manager->widgets.all, self, self))
 	{
@@ -118,14 +130,9 @@ void liwdg_widget_free (LIWdgWidget* self)
 {
 	int x;
 	int y;
-	LIWdgWidget* widget;
 
-	for (widget = self->children ; widget != NULL ; widget = widget->next)
-	{
-		widget->next = NULL;
-		widget->prev = NULL;
-		widget->parent = NULL;
-	}
+	while (self->children != NULL)
+		private_call_detach_manual (self, self->children);
 	for (y = 0 ; y < self->height ; y++)
 	for (x = 0 ; x < self->width ; x++)
 		private_call_detach (self, x, y);
@@ -135,6 +142,7 @@ void liwdg_widget_free (LIWdgWidget* self)
 	lisys_free (self->rows);
 	lisys_free (self->cells);
 	lialg_ptrdic_remove (self->manager->widgets.all, self);
+	liren_render_overlay_free (self->manager->render, self->overlay);
 	lisys_free (self);
 }
 
@@ -142,12 +150,9 @@ void liwdg_widget_add_child (
 	LIWdgWidget* self,
 	LIWdgWidget* child)
 {
-	child->prev = NULL;
-	child->next = self->children;
-	if (self->children != NULL)
-		self->children->prev = child;
-	self->children = child;
-	child->parent = self;
+	liwdg_widget_detach (child);
+
+	private_call_attach_manual (self, child);
 	liwdg_widget_child_request (self, child);
 }
 
@@ -171,46 +176,6 @@ int liwdg_widget_append_row (
 	LIWdgWidget* self)
 {
 	return liwdg_widget_set_size (self, self->width, self->height + 1);
-}
-
-void liwdg_widget_canvas_clear (
-	LIWdgWidget* self)
-{
-	LIWdgElement* elem;
-	LIWdgElement* elem_next;
-
-	for (elem = self->elements ; elem != NULL ; elem = elem_next)
-	{
-		elem_next = elem->next;
-		liwdg_element_free (elem);
-	}
-	self->elements = NULL;
-}
-
-void liwdg_widget_canvas_compile (
-	LIWdgWidget* self)
-{
-	LIWdgElement* elem;
-
-	for (elem = self->elements ; elem != NULL ; elem = elem->next)
-		liwdg_element_update (elem, self->manager, &self->allocation);
-}
-
-int liwdg_widget_canvas_insert (
-	LIWdgWidget*  self,
-	LIWdgElement* element)
-{
-	LIWdgElement* elem;
-
-	if (self->elements != NULL)
-	{
-		for (elem = self->elements ; elem->next != NULL ; elem = elem->next) {}
-		elem->next = element;
-	}
-	else
-		self->elements = element;
-
-	return 1;
 }
 
 /**
@@ -433,62 +398,14 @@ void liwdg_widget_detach_child (
 			cell = self->cells + x + y * self->width;
 			if (cell->child == child)
 			{
-				liwdg_widget_set_child (self, x, y, NULL);
+				private_call_detach (self, x, y);
 				return;
 			}
 		}
 	}
 
 	/* Manual packing. */
-	if (child->prev != NULL)
-		child->prev->next = child->next;
-	else
-		self->children = child->next;
-	if (child->next != NULL)
-		child->next->prev = child->prev;
-	child->next = NULL;
-	child->prev = NULL;
-	child->parent = NULL;
-}
-
-void liwdg_widget_draw (
-	LIWdgWidget* self)
-{
-	int x;
-	int y;
-	LIMatMatrix matrix;
-	LIWdgElement* elem;
-	LIWdgGroupCell* cell;
-	LIWdgWidget* widget;
-
-	/* Paint custom. */
-	lical_callbacks_call (self->manager->callbacks, "widget-paint", lical_marshal_DATA_PTR, self);
-
-	/* Paint canvas. */
-	if (self->elements != NULL)
-	{
-		matrix = limat_matrix_translation (self->allocation.x, self->allocation.y, 0.0f);
-		for (elem = self->elements ; elem != NULL ; elem = elem->next)
-			liwdg_element_paint (elem, self->manager, &matrix);
-	}
-
-	/* Paint table packed children. */
-	for (y = 0 ; y < self->height ; y++)
-	{
-		for (x = 0 ; x < self->width ; x++)
-		{
-			cell = self->cells + x + y * self->width;
-			if (cell->child != NULL && cell->child->visible)
-				liwdg_widget_draw (cell->child);
-		}
-	}
-
-	/* Paint manually packed children. */
-	for (widget = self->children ; widget != NULL ; widget = widget->next)
-	{
-		if (widget->visible)
-			liwdg_widget_draw (widget);
-	}
+	private_call_detach_manual (self, child);
 }
 
 /**
@@ -605,17 +522,6 @@ void liwdg_widget_move (
 		self->allocation.height);
 }
 
-void liwdg_widget_reload (
-	LIWdgWidget* self,
-	int          pass)
-{
-	LIWdgElement* elem;
-
-	/* Reload canvas. */
-	for (elem = self->elements ; elem != NULL ; elem = elem->next)
-		liwdg_element_reload (elem, self->manager, pass);
-}
-
 /**
  * \brief Removes a column from the widget.
  * \param self Widget.
@@ -706,6 +612,8 @@ void liwdg_widget_set_allocation (
 	int          w,
 	int          h)
 {
+	LIMatVector pos;
+
 	if (self->allocation.x != x ||
 	    self->allocation.y != y ||
 	    self->allocation.width != w ||
@@ -715,6 +623,8 @@ void liwdg_widget_set_allocation (
 		self->allocation.y = y;
 		self->allocation.width = w;
 		self->allocation.height = h;
+		pos = limat_vector_init (x, y, 0.0f);
+		liren_render_overlay_set_position (self->manager->render, self->overlay, &pos);
 		private_rebuild (self, PRIVATE_REBUILD_REQUEST | PRIVATE_REBUILD_HORZ | PRIVATE_REBUILD_VERT | PRIVATE_REBUILD_CHILDREN);
 		lical_callbacks_call (self->manager->callbacks, "widget-allocation", lical_marshal_DATA_PTR, self);
 	}
@@ -761,6 +671,9 @@ void liwdg_widget_set_behind (
 			}
 		}
 	}
+
+	/* Update the overlay. */
+	liren_render_overlay_set_behind (self->manager->render, self->overlay, value);
 }
 
 /**
@@ -867,7 +780,7 @@ int liwdg_widget_get_col_expand (
 void liwdg_widget_set_col_expand (
 	LIWdgWidget* self,
 	int          x,
-	int          expand) 
+	int          expand)
 {
 	if (self->cols[x].expand != expand)
 	{
@@ -922,13 +835,13 @@ void liwdg_widget_set_floating (
 		if (liwdg_manager_insert_window (self->manager, self))
 		{
 			self->floating = 1;
-			self->visible = 1;
+			liwdg_widget_set_visible (self, 1);
 		}
 	}
 	else
 	{
 		self->floating = 0;
-		self->visible = 0;
+		liwdg_widget_set_visible (self, 0);
 	}
 }
 
@@ -1367,11 +1280,16 @@ void liwdg_widget_set_visible (
 	LIWdgWidget* self,
 	int          visible)
 {
+	if (self->visible == (visible != 0))
+		return;
 	self->visible = (visible != 0);
-	if (self->parent != NULL)
+
+	if (self->floating && !visible)
+		liwdg_widget_detach (self);
+	else if (self->parent != NULL)
 		liwdg_widget_child_request (self->parent, self);
-	if (self->floating)
-		liwdg_manager_remove_window (self->manager, self);
+
+	liren_render_overlay_set_visible (self->manager->render, self->overlay, visible);
 }
 
 /*****************************************************************************/
@@ -1381,6 +1299,30 @@ static void private_call_attach (
 	int          x,
 	int          y)
 {
+	LIWdgWidget* child;
+
+	child = self->cells[x + y * self->width].child;
+	if (child != NULL)
+	{
+		/* Add to the overlay. */
+		liren_render_overlay_add_overlay (self->manager->render, self->overlay, child->overlay);
+	}
+}
+
+static void private_call_attach_manual (
+	LIWdgWidget* self,
+	LIWdgWidget* child)
+{
+	/* Add to the widget. */
+	child->prev = NULL;
+	child->next = self->children;
+	if (self->children != NULL)
+		self->children->prev = child;
+	self->children = child;
+	child->parent = self;
+
+	/* Add to the overlay. */
+	liren_render_overlay_add_overlay (self->manager->render, self->overlay, child->overlay);
 }
 
 static void private_call_detach (
@@ -1393,9 +1335,32 @@ static void private_call_detach (
 	child = self->cells[x + y * self->width].child;
 	if (child != NULL)
 	{
+		/* Remove from the cell. */
 		child->parent = NULL;
 		self->cells[x + y * self->width].child = NULL;
+
+		/* Remove from the overlay. */
+		liren_render_overlay_remove_overlay (self->manager->render, self->overlay, child->overlay);
 	}
+}
+
+static void private_call_detach_manual (
+	LIWdgWidget* self,
+	LIWdgWidget* child)
+{
+	/* Remove from the widget. */
+	if (child->prev != NULL)
+		child->prev->next = child->next;
+	else
+		self->children = child->next;
+	if (child->next != NULL)
+		child->next->prev = child->prev;
+	child->next = NULL;
+	child->prev = NULL;
+	child->parent = NULL;
+
+	/* Remove from the overlay. */
+	liren_render_overlay_remove_overlay (self->manager->render, self->overlay, child->overlay);
 }
 
 static void private_cell_changed (

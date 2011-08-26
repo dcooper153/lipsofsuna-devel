@@ -19,6 +19,8 @@
 #define __RENDER_PRIVATE_H__
 
 #include "lipsofsuna/algorithm.h"
+#include "lipsofsuna/font.h"
+#include "render-image.h"
 #include "render-types.h"
 #include "render21/render.h"
 #include "render21/render-light.h"
@@ -38,6 +40,8 @@
 
 typedef struct _LIRenLight LIRenLight;
 typedef struct _LIRenModel LIRenModel;
+typedef struct _LIRenOverlay LIRenOverlay;
+typedef struct _LIRenOverlayElement LIRenOverlayElement;
 
 struct _LIRenBuffer
 {
@@ -83,6 +87,59 @@ struct _LIRenObject
 	LIRenObject32* v32;
 };
 
+struct _LIRenOverlay
+{
+	int id;
+	int behind;
+	int visible;
+	LIMatVector position;
+	LIRenBuffer* buffer;
+	LIRenOverlay* parent;
+	LIRenRender* render;
+	struct
+	{
+		int count;
+		LIRenOverlayElement* array;
+	} elements;
+	struct
+	{
+		int count;
+		LIRenOverlay** array;
+	} overlays;
+	struct
+	{
+		int count;
+		LIRenVertex* array;
+	} vertices;
+	struct
+	{
+		int enabled;
+		int samples;
+		int hdr;
+		GLint viewport[4];
+		LIMatMatrix modelview;
+		LIMatMatrix projection;
+		LIMatFrustum frustum;
+		LIRenFramebuffer* framebuffer;
+		LIRenPassRender* render_passes;
+		int render_passes_num;
+		LIRenPassPostproc* postproc_passes;
+		int postproc_passes_num;
+	} scene;
+};
+
+struct _LIRenOverlayElement
+{
+	int buffer_start;
+	int buffer_count;
+	float color[4];
+	int scissor_enabled;
+	GLint scissor_rect[4];
+	LIFntFont* font;
+	LIRenImage* image;
+	LIRenShader* shader;
+};
+
 struct _LIRenRender
 {
 	LIAlgRandom random;
@@ -91,6 +148,8 @@ struct _LIRenRender
 	LIAlgU32dic* lights;
 	LIAlgU32dic* models;
 	LIAlgU32dic* objects;
+	LIAlgU32dic* overlays;
+	LIRenOverlay* root_overlay;
 	LIRenRender21* v21;
 	LIRenRender32* v32;
 };

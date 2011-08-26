@@ -22,14 +22,34 @@
  * @{
  */
 
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "widget.h"
 #include "widget-element.h"
 
-static const LIRenFormat private_format = { 32, GL_FLOAT, 24, GL_FLOAT, 12, GL_FLOAT, 0 };
+typedef struct _LIWdgElement LIWdgElement;
+struct _LIWdgElement
+{
+	int dst_clip_enabled;
+	int dst_clip[4];
+	int dst_clip_screen[4];
+	int dst_pos[2];
+	int dst_size[2];
+	int src_pos[2];
+	int src_tiling_enabled;
+	int src_tiling[6];
+	float rotation;
+	const char* text;
+	const char* image_name;
+	float text_align[2];
+	float text_color[4];
+	LIFntFont* font;
+	LIMatVector center;
+	LIRenImage* image;
+};
 
 static void private_pack_quad (
-	LIWdgElement* self,
+	LIWdgWidget*  self,
+	LIWdgElement* elem,
 	float         u0,
 	float         v0,
 	float         x0,
@@ -40,23 +60,39 @@ static void private_pack_quad (
 	float         y1);
 
 static void private_pack_scaled (
-	LIWdgElement* self);
+	LIWdgWidget*  self,
+	LIWdgElement* elem);
 
 static void private_pack_text (
-	LIWdgElement* self);
+	LIWdgWidget*  self,
+	LIWdgElement* elem);
 
 static void private_pack_tiled (
-	LIWdgElement* self);
+	LIWdgWidget*  self,
+	LIWdgElement* elem);
 
 static void private_pack_verts (
-	LIWdgElement*      self,
-	const LIRenVertex* verts,
-	int                count);
+	LIWdgWidget*  self,
+	LIWdgElement* elem,
+	LIRenVertex*  verts,
+	int           count);
 
 /*****************************************************************************/
 
-LIWdgElement* liwdg_element_new_image (
-	LIRenImage*        image,
+void liwdg_widget_canvas_clear (
+	LIWdgWidget* self)
+{
+	liren_render_overlay_clear (self->manager->render, self->overlay);
+}
+
+void liwdg_widget_canvas_compile (
+	LIWdgWidget* self)
+{
+}
+
+int liwdg_widget_canvas_insert_image (
+	LIWdgWidget*       self,
+	const char*        image,
 	const float*       color,
 	const int*         dst_clip,
 	const int*         dst_pos,
@@ -67,45 +103,52 @@ LIWdgElement* liwdg_element_new_image (
 	const LIMatVector* rotation_center)
 {
 	const float white[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-	LIWdgElement* self;
+	LIWdgElement elem;
 
-	self = lisys_calloc (1, sizeof (LIWdgElement));
-	if (self == NULL)
+	memset (&elem, 0, sizeof (LIWdgElement));
+	elem.image_name = image;
+	elem.image = liwdg_manager_find_image (self->manager, image);
+	if (elem.image == NULL)
 		return 0;
-	self->image = image;
 	if (color != NULL)
-		memcpy (self->text_color, color, 4 * sizeof (float));
+		memcpy (elem.text_color, color, 4 * sizeof (float));
 	else
-		memcpy (self->text_color, white, 4 * sizeof (float));
+		memcpy (elem.text_color, white, 4 * sizeof (float));
 	if (dst_clip != NULL)
 	{
-		self->dst_clip_enabled = 1;
-		memcpy (self->dst_clip, dst_clip, 4 * sizeof (int));
+		elem.dst_clip_enabled = 1;
+		memcpy (elem.dst_clip, dst_clip, 4 * sizeof (int));
 	}
 	if (dst_pos != NULL)
-		memcpy (self->dst_pos, dst_pos, 2 * sizeof (int));
+		memcpy (elem.dst_pos, dst_pos, 2 * sizeof (int));
 	if (dst_size != NULL)
-		memcpy (self->dst_size, dst_size, 2 * sizeof (int));
+		memcpy (elem.dst_size, dst_size, 2 * sizeof (int));
 	if (src_pos != NULL)
-		memcpy (self->src_pos, src_pos, 2 * sizeof (int));
+		memcpy (elem.src_pos, src_pos, 2 * sizeof (int));
 	if (src_tiling != NULL)
 	{
-		self->src_tiling_enabled = 1;
-		memcpy (self->src_tiling, src_tiling, 6 * sizeof (int));
+		elem.src_tiling_enabled = 1;
+		memcpy (elem.src_tiling, src_tiling, 6 * sizeof (int));
 	}
 	else
 	{
-		self->src_tiling[1] = liren_image_get_width (self->image);
-		self->src_tiling[4] = liren_image_get_height (self->image);
+		elem.src_tiling[1] = liren_image_get_width (elem.image);
+		elem.src_tiling[4] = liren_image_get_height (elem.image);
 	}
-	self->rotation = rotation_angle;
+	elem.rotation = rotation_angle;
 	if (rotation_center != NULL)
-		self->center = *rotation_center;
+		elem.center = *rotation_center;
 
-	return self;
+	if (elem.src_tiling_enabled)
+		private_pack_tiled (self, &elem);
+	else
+		private_pack_scaled (self, &elem);
+
+	return 1;
 }
 
-LIWdgElement* liwdg_element_new_text (
+int liwdg_widget_canvas_insert_text (
+	LIWdgWidget*       self,
 	LIFntFont*         font,
 	const char*        text,
 	const int*         dst_clip,
@@ -116,148 +159,43 @@ LIWdgElement* liwdg_element_new_text (
 	float              rotation_angle,
 	const LIMatVector* rotation_center)
 {
-	LIWdgElement* self;
+	LIWdgElement elem;
 
-	self = lisys_calloc (1, sizeof (LIWdgElement));
-	if (self == NULL)
-		return 0;
-	self->font = font;
-	self->text = lisys_string_dup (text);
-	if (self->text == NULL)
+	memset (&elem, 0, sizeof (LIWdgElement));
+	elem.font = font;
+	elem.text = text;
+	if (elem.text == NULL)
 	{
 		lisys_free (self);
-		return NULL;
+		return 0;
 	}
 	if (dst_clip != NULL)
 	{
-		self->dst_clip_enabled = 1;
-		memcpy (self->dst_clip, dst_clip, 4 * sizeof (int));
+		elem.dst_clip_enabled = 1;
+		memcpy (elem.dst_clip, dst_clip, 4 * sizeof (int));
 	}
 	if (dst_pos != NULL)
-		memcpy (self->dst_pos, dst_pos, 2 * sizeof (int));
+		memcpy (elem.dst_pos, dst_pos, 2 * sizeof (int));
 	if (dst_size != NULL)
-		memcpy (self->dst_size, dst_size, 2 * sizeof (int));
+		memcpy (elem.dst_size, dst_size, 2 * sizeof (int));
 	if (text_align != NULL)
-		memcpy (self->text_align, text_align, 2 * sizeof (float));
+		memcpy (elem.text_align, text_align, 2 * sizeof (float));
 	if (text_color != NULL)
-		memcpy (self->text_color, text_color, 4 * sizeof (float));
-	self->rotation = rotation_angle;
+		memcpy (elem.text_color, text_color, 4 * sizeof (float));
+	elem.rotation = rotation_angle;
 	if (rotation_center != NULL)
-		self->center = *rotation_center;
+		elem.center = *rotation_center;
 
-	return self;
-}
+	private_pack_text (self, &elem);
 
-void liwdg_element_free (
-	LIWdgElement* self)
-{
-	if (self->buffer != NULL)
-		liren_buffer_free (self->buffer);
-	lisys_free (self->vertices.array);
-	lisys_free (self->text);
-	lisys_free (self);
-}
-
-void liwdg_element_paint (
-	LIWdgElement*      self,
-	LIWdgManager*      manager,
-	const LIMatMatrix* matrix)
-{
-	int scissor[5];
-	GLuint texture;
-
-	if (self->buffer != NULL)
-	{
-		if (self->dst_clip_enabled)
-		{
-			scissor[0] = self->dst_clip_screen[0];
-			scissor[1] = manager->height - self->dst_clip_screen[1] - self->dst_clip_screen[3];
-			scissor[2] = self->dst_clip_screen[2];
-			scissor[3] = self->dst_clip_screen[3];
-		}
-		else
-		{
-			scissor[0] = 0;
-			scissor[1] = 0;
-			scissor[2] = manager->width;
-			scissor[3] = manager->height;
-		}
-		if (self->image != NULL)
-			texture = liren_image_get_handle (self->image);
-		else
-			texture = self->font->texture;
-		liren_render_draw_clipped_buffer (manager->render, manager->shader, matrix,
-			&manager->projection, texture, self->text_color, scissor, self->buffer);
-	}
-}
-
-void liwdg_element_reload (
-	LIWdgElement* self,
-	LIWdgManager* manager,
-	int           pass)
-{
-	if (!pass)
-	{
-		if (self->buffer != NULL)
-		{
-			liren_buffer_free (self->buffer);
-			self->buffer = NULL;
-		}
-	}
-	else if (self->vertices.count)
-	{
-		self->buffer = liren_buffer_new (manager->render, NULL, 0, &private_format,
-			 self->vertices.array, self->vertices.count, LIREN_BUFFER_TYPE_STATIC);
-	}
-}
-
-void liwdg_element_update (
-	LIWdgElement*    self,
-	LIWdgManager*    manager,
-	const LIWdgRect* rect)
-{
-	/* Free old vertices. */
-	if (self->buffer != NULL)
-	{
-		liren_buffer_free (self->buffer);
-		self->buffer = NULL;
-	}
-	lisys_free (self->vertices.array);
-	self->vertices.array = NULL;
-	self->vertices.count = 0;
-	self->vertices.capacity = 0;
-
-	/* Format vertices. */
-	if (self->image != NULL)
-	{
-		if (self->src_tiling_enabled)
-			private_pack_tiled (self);
-		else
-			private_pack_scaled (self);
-	}
-	else if (self->text != NULL)
-		private_pack_text (self);
-
-	/* Create vertex buffer. */
-	if (self->vertices.count)
-	{
-		self->buffer = liren_buffer_new (manager->render, NULL, 0, &private_format,
-			 self->vertices.array, self->vertices.count, LIREN_BUFFER_TYPE_STATIC);
-		if (self->buffer == NULL)
-			return;
-	}
-
-	/* Update scissor rectangle. */
-	self->dst_clip_screen[0] = self->dst_clip[0] + rect->x;
-	self->dst_clip_screen[1] = self->dst_clip[1] + rect->y;
-	self->dst_clip_screen[2] = self->dst_clip[2];
-	self->dst_clip_screen[3] = self->dst_clip[3];
+	return 1;
 }
 
 /*****************************************************************************/
 
 static void private_pack_quad (
-	LIWdgElement* self,
+	LIWdgWidget*  self,
+	LIWdgElement* elem,
 	float         u0,
 	float         v0,
 	float         x0,
@@ -277,11 +215,12 @@ static void private_pack_quad (
 		{ { x1, y1, 0.0f }, { 0.0f, 0.0f, 0.0f }, { u1, v1 } }
 	};
 
-	private_pack_verts (self, vertices, 6);
+	private_pack_verts (self, elem, vertices, 6);
 }
 
 static void private_pack_scaled (
-	LIWdgElement* self)
+	LIWdgWidget*  self,
+	LIWdgElement* elem)
 {
 	float center;
 	float size;
@@ -291,105 +230,55 @@ static void private_pack_scaled (
 	float ty[2];
 
 	/* Calculate texture coordinates. */
-	tx[0] = (float)(self->src_pos[0]) / liren_image_get_width (self->image);
-	tx[1] = (float)(self->src_pos[0] + self->src_tiling[1]) / liren_image_get_width (self->image);
-	ty[0] = (float)(self->src_pos[1]) / liren_image_get_height (self->image);
-	ty[1] = (float)(self->src_pos[1] + self->src_tiling[4]) / liren_image_get_height (self->image);
+	tx[0] = (float)(elem->src_pos[0]) / liren_image_get_width (elem->image);
+	tx[1] = (float)(elem->src_pos[0] + elem->src_tiling[1]) / liren_image_get_width (elem->image);
+	ty[0] = (float)(elem->src_pos[1]) / liren_image_get_height (elem->image);
+	ty[1] = (float)(elem->src_pos[1] + elem->src_tiling[4]) / liren_image_get_height (elem->image);
 
 	/* Calculate pixels per texture unit. */
 	xs = tx[1] - tx[0];
 	ys = ty[1] - ty[0];
 	if (xs < LIMAT_EPSILON || ys < LIMAT_EPSILON)
 		return;
-	xs = self->dst_size[0] / xs;
-	ys = self->dst_size[1] / ys;
+	xs = elem->dst_size[0] / xs;
+	ys = elem->dst_size[1] / ys;
 
 	/* Scale and translate to fill widget area. */
-	if (ty[1] - ty[0] >= self->dst_size[1] / xs)
+	if (ty[1] - ty[0] >= elem->dst_size[1] / xs)
 	{
 		center = 0.5f * (ty[0] + ty[1]);
 		size = ty[1] - ty[0];
-		ty[0] = center - 0.5f * self->dst_size[1] / xs;
-		ty[1] = center + 0.5f * self->dst_size[1] / xs;
+		ty[0] = center - 0.5f * elem->dst_size[1] / xs;
+		ty[1] = center + 0.5f * elem->dst_size[1] / xs;
 	}
 	else
 	{
 		center = 0.5f * (tx[0] + tx[1]);
 		size = tx[1] - tx[0];
-		tx[0] = center - 0.5f * self->dst_size[0] / ys;
-		tx[1] = center + 0.5f * self->dst_size[0] / ys;
+		tx[0] = center - 0.5f * elem->dst_size[0] / ys;
+		tx[1] = center + 0.5f * elem->dst_size[0] / ys;
 	}
 
 	/* Pack fill. */
-	private_pack_quad (self, tx[0], ty[0],
-		self->dst_pos[0], self->dst_pos[1], tx[1], ty[1],
-		self->dst_pos[0] + self->dst_size[0],
-		self->dst_pos[0] + self->dst_size[1]);
+	private_pack_quad (self, elem, tx[0], ty[0],
+		elem->dst_pos[0], elem->dst_pos[1], tx[1], ty[1],
+		elem->dst_pos[0] + elem->dst_size[0],
+		elem->dst_pos[0] + elem->dst_size[1]);
 }
 
 static void private_pack_text (
-	LIWdgElement* self)
+	LIWdgWidget*  self,
+	LIWdgElement* elem)
 {
-	int i;
-	int j;
-	int x;
-	int y;
-	int w;
-	int h;
-	float* vertex;
-	float* vertex_data;
-	LIMdlIndex* index_data;
-	LIFntLayout* text;
-	LIFntLayoutGlyph* glyph;
-	LIRenVertex vertices[6];
-
-	/* Layout the text. */
-	if (!strlen (self->text))
-		return;
-	text = lifnt_layout_new ();
-	if (text == NULL)
-		return;
-	lifnt_layout_set_width_limit (text, self->dst_size[0]);
-	lifnt_layout_append_string (text, self->font, self->text);
-	if (!lifnt_layout_get_vertices (text, &index_data, &vertex_data))
-	{
-		lifnt_layout_free (text);
-		return;
-	}
-
-	/* Apply translation. */
-	w = lifnt_layout_get_width (text);
-	h = lifnt_layout_get_height (text);
-	x = self->dst_pos[0] + (int)(self->text_align[0] * (self->dst_size[0] - w));
-	y = self->dst_pos[1] + (int)(self->text_align[1] * (self->dst_size[1] - h));
-	for (i = 2 ; i < text->n_glyphs * 20 ; i += 5)
-	{
-		glyph = text->glyphs + i;
-		vertex_data[i + 0] += x;
-		vertex_data[i + 1] += y;
-	}
-
-	/* Pack glyphs. */
-	for (i = 0 ; i < text->n_glyphs ; i++)
-	{
-		glyph = text->glyphs + i;
-		for (j = 0 ; j < 6 ; j++)
-		{
-			vertex = vertex_data + 5 * index_data[6 * i + j];
-			memcpy (vertices[j].coord, vertex + 2, 3 * sizeof (float));
-			memset (vertices[j].normal, 0, 3 * sizeof (float));
-			memcpy (vertices[j].texcoord, vertex + 0, 2 * sizeof (float));
-		}
-		private_pack_verts (self, vertices, 6);
-	}
-
-	lifnt_layout_free (text);
-	lisys_free (index_data);
-	lisys_free (vertex_data);
+	liren_render_overlay_add_text (self->manager->render, self->overlay, "widget",
+		elem->font, elem->text, elem->text_color,
+		elem->dst_clip_enabled? elem->dst_clip : NULL,
+		elem->dst_pos, elem->dst_size, elem->text_align);
 }
 
 static void private_pack_tiled (
-	LIWdgElement* self)
+	LIWdgWidget*  self,
+	LIWdgElement* elem)
 {
 	int px;
 	int py;
@@ -406,47 +295,47 @@ static void private_pack_tiled (
 	LIWdgRect r;
 
 	/* Calculate destination rectangle. */
-	r.x = self->dst_pos[0];
-	r.y = self->dst_pos[1];
-	r.width = self->dst_size[0];
-	r.height = self->dst_size[1];
+	r.x = elem->dst_pos[0];
+	r.y = elem->dst_pos[1];
+	r.width = elem->dst_size[0];
+	r.height = elem->dst_size[1];
 
 	/* Calculate repeat counts. */
-	w[0] = self->src_tiling[0];
-	w[1] = LIMAT_MAX (1, self->src_tiling[1]);
-	w[2] = self->src_tiling[2];
-	h[0] = self->src_tiling[3];
-	h[1] = LIMAT_MAX (1, self->src_tiling[4]);
-	h[2] = self->src_tiling[5];
+	w[0] = elem->src_tiling[0];
+	w[1] = LIMAT_MAX (1, elem->src_tiling[1]);
+	w[2] = elem->src_tiling[2];
+	h[0] = elem->src_tiling[3];
+	h[1] = LIMAT_MAX (1, elem->src_tiling[4]);
+	h[2] = elem->src_tiling[5];
 
 	/* Calculate texture coordinates. */
-	iw = liren_image_get_width (self->image);
-	ih = liren_image_get_height (self->image);
-	tx[0] = (float)(self->src_pos[0]) / iw;
-	tx[1] = (float)(self->src_pos[0] + self->src_tiling[0]) / iw;
-	tx[2] = (float)(self->src_pos[0] + self->src_tiling[0] + self->src_tiling[1]) / iw;
-	tx[3] = (float)(self->src_pos[0] + self->src_tiling[0] + self->src_tiling[1] + self->src_tiling[2]) / iw;
-	ty[0] = (float)(self->src_pos[1]) / ih;
-	ty[1] = (float)(self->src_pos[1] + self->src_tiling[3]) / ih;
-	ty[2] = (float)(self->src_pos[1] + self->src_tiling[3] + self->src_tiling[4]) / ih;
-	ty[3] = (float)(self->src_pos[1] + self->src_tiling[3] + self->src_tiling[4] + self->src_tiling[5]) / ih;
+	iw = liren_image_get_width (elem->image);
+	ih = liren_image_get_height (elem->image);
+	tx[0] = (float)(elem->src_pos[0]) / iw;
+	tx[1] = (float)(elem->src_pos[0] + elem->src_tiling[0]) / iw;
+	tx[2] = (float)(elem->src_pos[0] + elem->src_tiling[0] + elem->src_tiling[1]) / iw;
+	tx[3] = (float)(elem->src_pos[0] + elem->src_tiling[0] + elem->src_tiling[1] + elem->src_tiling[2]) / iw;
+	ty[0] = (float)(elem->src_pos[1]) / ih;
+	ty[1] = (float)(elem->src_pos[1] + elem->src_tiling[3]) / ih;
+	ty[2] = (float)(elem->src_pos[1] + elem->src_tiling[3] + elem->src_tiling[4]) / ih;
+	ty[3] = (float)(elem->src_pos[1] + elem->src_tiling[3] + elem->src_tiling[4] + elem->src_tiling[5]) / ih;
 
 	/* Pack corners. */
 	px = r.x;
 	py = r.y;
-	private_pack_quad (self,
+	private_pack_quad (self, elem,
 		tx[0], ty[0], px, py,
 		tx[1], ty[1], px + w[0], py + h[0]);
 	px = r.x + r.width - w[2] - 1;
-	private_pack_quad (self,
+	private_pack_quad (self, elem,
 		tx[2], ty[0], px, py,
 		tx[3], ty[1], px + w[2], py + h[0]);
 	py = r.y + r.height - h[2] - 1;
-	private_pack_quad (self,
+	private_pack_quad (self, elem,
 		tx[2], ty[2], px, py,
 		tx[3], ty[3], px + w[2], py + h[2]);
 	px = r.x;
-	private_pack_quad (self,
+	private_pack_quad (self, elem,
 		tx[0], ty[2], px, py,
 		tx[1], ty[3], px + w[0], py + h[2]);
 
@@ -456,11 +345,11 @@ static void private_pack_tiled (
 		fw = LIMAT_MIN (w[1], r.x + r.width - px - w[2] - 1);
 		fu = (tx[2] - tx[1]) * fw / w[1];
 		py = r.y;
-		private_pack_quad (self,
+		private_pack_quad (self, elem,
 			tx[1], ty[0], px, py,
 			tx[1] + fu, ty[1], px + fw, py + h[0]);
 		py = r.y + r.height - h[2] - 1;
-		private_pack_quad (self,
+		private_pack_quad (self, elem,
 			tx[1], ty[2], px, py,
 			tx[1] + fu, ty[3], px + fw, py + h[2]);
 	}
@@ -471,11 +360,11 @@ static void private_pack_tiled (
 		fh = LIMAT_MIN (h[1], r.y + r.height - py - h[2] - 1);
 		fv = (ty[2] - ty[1]) * fh / h[1];
 		px = r.x;
-		private_pack_quad (self,
+		private_pack_quad (self, elem,
 			tx[0], ty[1], px, py,
 			tx[1], ty[1] + fv, px + w[0], py + fh);
 		px = r.x + r.width - w[2] - 1;
-		private_pack_quad (self,
+		private_pack_quad (self, elem,
 			tx[2], ty[1], px, py,
 			tx[3], ty[1] + fv, px + w[2], py + fh);
 	}
@@ -488,59 +377,44 @@ static void private_pack_tiled (
 		fh = LIMAT_MIN (h[1], r.y + r.height - py - h[2] - 1);
 		fu = (tx[2] - tx[1]) * fw / w[1];
 		fv = (ty[2] - ty[1]) * fh / h[1];
-		private_pack_quad (self,
+		private_pack_quad (self, elem,
 			tx[1], ty[1], px, py,
 			tx[1] + fu, ty[1] + fv, px + fw, py + fh);
 	}
 }
 
 static void private_pack_verts (
-	LIWdgElement*      self,
-	const LIRenVertex* verts,
-	int                count)
+	LIWdgWidget*  self,
+	LIWdgElement* elem,
+	LIRenVertex*  verts,
+	int           count)
 {
 	int i;
-	int cap;
 	LIMatQuaternion q;
 	LIMatVector v;
 	LIRenVertex* tmp;
 
-	/* Allocate space for vertices. */
-	cap = self->vertices.capacity;
-	if (cap < self->vertices.count + count)
-	{
-		if (!cap)
-			cap = 32;
-		while (cap < self->vertices.count + count)
-			cap <<= 1;
-		tmp = lisys_realloc (self->vertices.array, cap * sizeof (LIRenVertex));
-		if (tmp == NULL)
-			return;
-		self->vertices.array = tmp;
-		self->vertices.capacity = cap;
-	}
-
-	/* Append vertices. */
-	memcpy (self->vertices.array + self->vertices.count, verts, count * sizeof (LIRenVertex));
-	self->vertices.count += count;
-
 	/* Apply rotation. */
-	if (self->rotation != 0.0f)
+	if (elem->rotation != 0.0f)
 	{
 		v = limat_vector_init (0.0f, 0.0f, -1.0f);
-		q = limat_quaternion_rotation (self->rotation, v);
-		for (i = self->vertices.count - count ; i < self->vertices.count ; i++)
+		q = limat_quaternion_rotation (elem->rotation, v);
+		for (i = 0 ; i < count ; i++)
 		{
-			tmp = self->vertices.array + i;
+			tmp = verts + i;
 			v = limat_vector_init (tmp->coord[0], tmp->coord[1], tmp->coord[2]);
-			v = limat_vector_subtract (v, self->center);
+			v = limat_vector_subtract (v, elem->center);
 			v = limat_quaternion_transform (q, v);
-			v = limat_vector_add (v, self->center);
+			v = limat_vector_add (v, elem->center);
 			tmp->coord[0] = v.x;
 			tmp->coord[1] = v.y;
 			tmp->coord[2] = v.z;
 		}
 	}
+
+	/* Add to the overlay. */
+	liren_render_overlay_add_triangles (self->manager->render, self->overlay, "widget",
+		elem->image_name, elem->text_color, elem->dst_clip_enabled? elem->dst_clip : NULL, verts, count);
 }
 
 /** @} */

@@ -42,6 +42,8 @@ LIAPICALL (void, liren_render21_draw_clipped_buffer, (
 	GLuint             texture,
 	const float*       diffuse,
 	const int*         scissor,
+	int                start,
+	int                count,
 	LIRenBuffer21*     buffer));
 
 LIAPICALL (void, liren_render21_draw_indexed_triangles_T2V3, (

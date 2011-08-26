@@ -42,6 +42,8 @@ LIAPICALL (void, liren_render_draw_clipped_buffer, (
 	GLuint             texture,
 	const float*       diffuse,
 	const int*         scissor,
+	int                start,
+	int                count,
 	LIRenBuffer*       buffer));
 
 LIAPICALL (void, liren_render_draw_indexed_triangles_T2V3, (
@@ -75,6 +77,11 @@ LIAPICALL (void, liren_render_remove_model, (
 	int          id));
 
 LIAPICALL (void, liren_render_render, (
+	LIRenRender* self,
+	int          width,
+	int          height));
+
+LIAPICALL (void, liren_render_render_scene, (
 	LIRenRender*       self,
 	LIRenFramebuffer*  framebuffer,
 	const GLint*       viewport,

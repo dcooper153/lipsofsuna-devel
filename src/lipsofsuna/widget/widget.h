@@ -64,7 +64,7 @@ struct _LIWdgWidget
 	unsigned int visible : 1;
 
 	/* Canvas. */
-	LIWdgElement* elements;
+	int overlay;
 	LIWdgRect allocation;
 	LIWdgSize request[3];
 
@@ -106,16 +106,6 @@ LIAPICALL (int, liwdg_widget_append_col, (
 LIAPICALL (int, liwdg_widget_append_row, (
 	LIWdgWidget* self));
 
-LIAPICALL (void, liwdg_widget_canvas_clear, (
-	LIWdgWidget* self));
-
-LIAPICALL (void, liwdg_widget_canvas_compile, (
-	LIWdgWidget* self));
-
-LIAPICALL (int, liwdg_widget_canvas_insert, (
-	LIWdgWidget*  self,
-	LIWdgElement* element));
-
 LIAPICALL (LIWdgWidget*, liwdg_widget_child_at, (
 	LIWdgWidget* self,
 	int          x,
@@ -137,9 +127,6 @@ LIAPICALL (void, liwdg_widget_detach_child, (
 	LIWdgWidget* self,
 	LIWdgWidget* child));
 
-LIAPICALL (void, liwdg_widget_draw, (
-	LIWdgWidget* self));
-
 LIAPICALL (void, liwdg_widget_foreach_child, (
 	LIWdgWidget* self,
 	void       (*call)(),
@@ -157,14 +144,6 @@ LIAPICALL (void, liwdg_widget_move, (
 	LIWdgWidget* self,
 	int          x,
 	int          y));
-
-LIAPICALL (void, liwdg_widget_paint, (
-	LIWdgWidget* self,
-	LIWdgRect*   rect));
-
-LIAPICALL (void, liwdg_widget_reload, (
-	LIWdgWidget* self,
-	int          pass));
 
 LIAPICALL (void, liwdg_widget_remove_col, (
 	LIWdgWidget* self,

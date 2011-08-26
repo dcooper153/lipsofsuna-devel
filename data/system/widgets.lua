@@ -76,6 +76,30 @@ Widget.canvas_compile = function(self)
 	Los.widget_canvas_compile(self.handle)
 end
 
+--- Disables scene rendering for the widget.
+-- @param self Widget.
+Widget.canvas_disable_scene = function(self)
+	Los.widget_canvas_disable_scene(self.handle)
+end
+
+--- Enables scene rendering for the widget.
+-- @param self Widget.
+-- @param ... Arguments.<ul>
+--   <li>hdr: True to enable HDR.</li>
+--   <li>modelview: Modelview matrix.</li>
+--   <li>multisamples: Number of multisamples. Pass arguments:</li>
+--   <li>postproc_passes: Array of post-processing passes.<ul>
+--     <li>mipmaps: True to generate mipmaps.</li>
+--     <li>shader: Post-processing shader name.</li></ul></li>
+--   <li>projection: Projection matrix.</li>
+--   <li>render_passes: Array of render passes. Pass arguments:<ul>
+--     <li>pass: Pass number.</li>
+--     <li>sorting: True to enable sorting.</li></ul></li>
+--   <li>viewport: Viewport array.</li></ul>
+Widget.canvas_enable_scene = function(self, ...)
+	Los.widget_canvas_enable_scene(self.handle, ...)
+end
+
 --- Packs an image to the canvas of the widget.
 -- @param self Widget.
 -- @param args Arguments.<ul>
@@ -523,11 +547,7 @@ Widget.unittest = function()
 end
 
 -- Userdata don't have members but the engine needs to be able to call the
--- render functions of widgets. This is done with a global variable.
-__widget_render = function(handle)
-	local w = __userdata_lookup[handle]
-	if w and w.render then w:render() end
-end
+-- reshape functions of widgets. This is done with a global variable.
 __widget_reshape = function(handle)
 	local w = __userdata_lookup[handle]
 	if w and w.reshaped then w:reshaped() end

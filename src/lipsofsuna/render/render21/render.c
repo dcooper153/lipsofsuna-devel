@@ -90,6 +90,8 @@ void liren_render21_draw_clipped_buffer (
 	GLuint             texture,
 	const float*       diffuse,
 	const int*         scissor,
+	int                start,
+	int                count,
 	LIRenBuffer21*     buffer)
 {
 	/* Enable clipping. */
@@ -123,7 +125,7 @@ void liren_render21_draw_clipped_buffer (
 	}
 
 	/* Render the vertex buffer. */
-	glDrawArrays (GL_TRIANGLES, 0, buffer->vertices.count);
+	glDrawArrays (GL_TRIANGLES, start, count);
 
 	/* Disable the vertex buffer. */
 	glDisableClientState (GL_VERTEX_ARRAY);

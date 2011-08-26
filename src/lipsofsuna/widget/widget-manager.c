@@ -88,6 +88,11 @@ LIWdgManager* liwdg_manager_new (
 	self->render = render;
 	self->projection = limat_matrix_identity ();
 
+	/* Allocate the root overlay. */
+	self->overlay = liren_render_overlay_new (render);
+	liren_render_overlay_set_root (render, self->overlay);
+	liren_render_overlay_set_visible (render, self->overlay, 1);
+
 	/* Initialize widget dictionary. */
 	self->widgets.all = lialg_ptrdic_new ();
 	if (self->widgets.all == NULL)
@@ -115,6 +120,9 @@ void liwdg_manager_free (
 {
 	lisys_assert (self->dialogs.bottom == NULL);
 	lisys_assert (self->dialogs.top == NULL);
+
+	/* Free the root overlay. */
+	liren_render_overlay_free (self->render, self->overlay);
 
 	if (self->widgets.all != NULL)
 		lialg_ptrdic_free (self->widgets.all);
@@ -295,12 +303,9 @@ void liwdg_manager_reload (
 	int           pass)
 {
 	LIAlgStrdicIter iter;
-	LIAlgPtrdicIter iter1;
 
 	LIALG_STRDIC_FOREACH (iter, self->styles->fonts)
 		lifnt_font_reload (iter.value, pass);
-	LIALG_PTRDIC_FOREACH (iter1, self->widgets.all)
-		liwdg_widget_reload (iter1.value, pass);
 }
 
 int liwdg_manager_remove_window (
@@ -325,24 +330,9 @@ int liwdg_manager_remove_window (
 void liwdg_manager_render (
 	LIWdgManager* self)
 {
-	LIWdgWidget* widget;
-
-	/* Find the widget shader. */
-	self->shader = liren_render_find_shader (self->render, "widget");
-	if (self->shader == NULL)
-		return;
-
-	/* Setup viewport. */
-	glViewport (0, 0, self->width, self->height);
-
-	/* Render widgets. */
-	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
-	glClear (GL_COLOR_BUFFER_BIT);
-	for (widget = self->dialogs.bottom ; widget != NULL ; widget = widget->prev)
-	{
-		if (liwdg_widget_get_visible (widget))
-			liwdg_widget_draw (widget);
-	}
+	/* Render overlays. */
+	/* FIXME: Should be in the graphics module instead. */
+	liren_render_render (self->render, self->width, self->height);
 }
 
 void liwdg_manager_update (
@@ -427,6 +417,7 @@ static void private_attach_window (
 	LIWdgManager* self,
 	LIWdgWidget*  widget)
 {
+	/* Add the widget to the dialog list. */
 	widget->prev = NULL;
 	widget->next = self->dialogs.top;
 	if (self->dialogs.top != NULL)
@@ -434,12 +425,16 @@ static void private_attach_window (
 	else
 		self->dialogs.bottom = widget;
 	self->dialogs.top = widget;
+
+	/* Add the overlay to the root. */
+	liren_render_overlay_add_overlay (self->render, self->overlay, widget->overlay);
 }
 
 static void private_detach_window (
 	LIWdgManager* self,
 	LIWdgWidget*  widget)
 {
+	/* Remove the widget from the dialog list. */
 	if (widget->next != NULL)
 		widget->next->prev = widget->prev;
 	else
@@ -448,6 +443,9 @@ static void private_detach_window (
 		widget->prev->next = widget->next;
 	else
 		self->dialogs.top = widget->next;
+
+	/* Remove the overlay from the root. */
+	liren_render_overlay_remove_overlay (self->render, self->overlay, widget->overlay);
 }
 
 static LIWdgWidget* private_find_window (

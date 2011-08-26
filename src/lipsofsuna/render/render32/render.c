@@ -120,6 +120,8 @@ void liren_render32_draw_clipped_buffer (
 	GLuint             texture,
 	const float*       diffuse,
 	const int*         scissor,
+	int                start,
+	int                count,
 	LIRenBuffer32*     buffer)
 {
 	int scissor1[5];
@@ -134,14 +136,15 @@ void liren_render32_draw_clipped_buffer (
 	/* Render the vertex buffer. */
 	liren_context32_set_buffer (self->context, buffer);
 	liren_context32_set_cull (self->context, 0, GL_CCW);
+	liren_context32_set_diffuse (self->context, diffuse);
+	liren_context32_set_depth (self->context, 0, 0, GL_LEQUAL);
 	liren_context32_set_modelmatrix (self->context, &identity);
 	liren_context32_set_viewmatrix (self->context, modelview);
 	liren_context32_set_projection (self->context, projection);
 	liren_context32_set_shader (self->context, 0, shader);
-	liren_context32_set_diffuse (self->context, diffuse);
 	liren_context32_set_textures_raw (self->context, &texture, 1);
 	liren_context32_bind (self->context);
-	liren_context32_render_array (self->context, GL_TRIANGLES, 0, buffer->vertices.count);
+	liren_context32_render_array (self->context, GL_TRIANGLES, start, count);
 
 	/* Disable clipping. */
 	liren_context32_set_scissor (self->context, scissor1[4],

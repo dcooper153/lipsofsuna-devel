@@ -33,6 +33,7 @@ struct _LIWdgManager
 {
 	int width;
 	int height;
+	int overlay;
 	LIWdgStyles* styles;
 	LICalCallbacks* callbacks;
 	LIMatMatrix projection;

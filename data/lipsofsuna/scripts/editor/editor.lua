@@ -496,6 +496,7 @@ Editor.update = function(self, secs, force)
 	local cp0 = self.camera.target_position
 	local cr0 = self.camera.rotation
 	self.camera:update(secs)
+	self.scene:update_camera()
 	local cp1 = self.camera.target_position
 	local cr1 = self.camera.rotation
 	-- Update the light source.

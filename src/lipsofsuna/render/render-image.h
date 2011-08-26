@@ -40,4 +40,7 @@ LIAPICALL (int, liren_image_get_height, (
 LIAPICALL (int, liren_image_get_width, (
 	const LIRenImage* self));
 
+#define liren_image_ref(self) /*TODO*/
+#define liren_image_unref(self) /*TODO*/
+
 #endif

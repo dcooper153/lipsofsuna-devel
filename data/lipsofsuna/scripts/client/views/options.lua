@@ -1,4 +1,5 @@
 Views.Options = Class(Widget)
+Views.Options.class_name = "Views.Options"
 
 Views.Options.new = function(clss)
 	-- Allocate self.

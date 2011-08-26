@@ -17,31 +17,32 @@ Widgets.Scene.pressed = function(self)
 	end
 end
 
-Widgets.Scene.render = function(self)
-	local postproc_enabled = Views and Client.views.options.bloom_enabled
-	local render_passes = {
-		{pass = 1}, -- Depth pass
-		{pass = 4}, -- Opaque pass
-		{pass = 6, sorting = true}} -- Transparent pass
-	self.camera.viewport = {self.x, self.y, self.width, self.height}
-	self.scene:render{
-		hdr = Views and Client.views.options.bloom_enabled,
-		modelview = self.camera.modelview,
-		multisamples = Views and Client.views.options.multisamples,
-		projection = self.camera.projection,
-		viewport = self.camera.viewport,
-		render_passes = render_passes,
-		postproc_passes = postproc_enabled and {{mipmaps = true, shader = "postprocess-hdr"}}}
-	Speech:draw{
-		modelview = self.camera.modelview,
-		projection = self.camera.projection,
-		viewport = self.camera.viewport}
+Widgets.Scene.update_camera = function(self)
+	-- Enable scene rendering.
+	if Client and Client.views and Client.views.options then
+		local postproc_enabled = Client.views.options.bloom_enabled
+		local render_passes = {
+			{pass = 1}, -- Depth pass
+			{pass = 4}, -- Opaque pass
+			{pass = 6, sorting = true}} -- Transparent pass
+		self.camera.viewport = {self.x, self.y, self.width, self.height}
+		self:canvas_enable_scene{
+			hdr = Views and Client.views.options.bloom_enabled,
+			modelview = self.camera.modelview,
+			multisamples = Views and Client.views.options.multisamples,
+			projection = self.camera.projection,
+			viewport = self.camera.viewport,
+			render_passes = render_passes,
+			postproc_passes = postproc_enabled and {{mipmaps = true, shader = "postprocess-hdr"}}}
+	end
 end
 
 Widgets.Scene.reshaped = function(self)
 	local w = self.width
 	local h = self.height
+	self:update_camera()
 	self:canvas_clear()
+	-- Add the compass overlay.
 	if self.compass then
 		self:canvas_image{
 			dest_position = {6,h-77},
@@ -72,6 +73,7 @@ Widgets.Scene.reshaped = function(self)
 				text_font = "tiny"}
 		end
 	end
+	-- Add the action text.
 	if self.action then
 		local o = 20
 		self:canvas_text{

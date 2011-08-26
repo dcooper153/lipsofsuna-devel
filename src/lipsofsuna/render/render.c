@@ -25,8 +25,17 @@
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/video.h"
 #include "render.h"
+#include "render-overlay.h"
 #include "render-private.h"
 #include "render32/render-private.h"
+
+static void private_render_overlay (
+	LIRenRender*  self,
+	LIRenOverlay* overlay,
+	int           width,
+	int           height);
+
+/*****************************************************************************/
 
 LIRenRender* liren_render_new (
 	LIPthPaths* paths)
@@ -71,6 +80,14 @@ LIRenRender* liren_render_new (
 	/* Allocate the object dictionary. */
 	self->objects = lialg_u32dic_new ();
 	if (self->objects == NULL)
+	{
+		liren_render_free (self);
+		return NULL;
+	}
+
+	/* Allocate the overlay dictionary. */
+	self->overlays = lialg_u32dic_new ();
+	if (self->overlays == NULL)
 	{
 		liren_render_free (self);
 		return NULL;
@@ -121,6 +138,14 @@ void liren_render_free (
 		lialg_u32dic_free (self->models);
 	}
 
+	/* Free overlays. */
+	if (self->overlays != NULL)
+	{
+		LIALG_U32DIC_FOREACH (iter2, self->overlays)
+			liren_render_overlay_free (self, iter2.key);
+		lialg_u32dic_free (self->overlays);
+	}
+
 	/* Free images. */
 	if (self->images != NULL)
 	{
@@ -153,17 +178,19 @@ void liren_render_draw_clipped_buffer (
 	GLuint             texture,
 	const float*       diffuse,
 	const int*         scissor,
+	int                start,
+	int                count,
 	LIRenBuffer*       buffer)
 {
 	if (self->v32 != NULL)
 	{
 		liren_render32_draw_clipped_buffer (self->v32, shader->v32, modelview,
-			projection, texture, diffuse, scissor, buffer->v32);
+			projection, texture, diffuse, scissor, start, count, buffer->v32);
 	}
 	else
 	{
 		liren_render21_draw_clipped_buffer (self->v21, shader->v21, modelview,
-			projection, texture, diffuse, scissor, buffer->v21);
+			projection, texture, diffuse, scissor, start, count, buffer->v21);
 	}
 }
 
@@ -284,6 +311,21 @@ void liren_render_reload (
 	LIRenRender* self,
 	int          pass)
 {
+	LIAlgU32dicIter iter;
+	LIRenOverlay* overlay;
+
+	/* Reload overlays. */
+	LIALG_U32DIC_FOREACH (iter, self->overlays)
+	{
+		overlay = iter.value;
+		if (overlay->buffer != NULL)
+		{
+			liren_buffer_free (overlay->buffer);
+			overlay->buffer = NULL;
+		}
+	}
+
+	/* Reload others. */
 	if (self->v32 != NULL)
 		liren_render32_reload (self->v32, pass);
 	else
@@ -307,8 +349,27 @@ void liren_render_remove_model (
 }
 
 /**
+ * \brief Renders the overlays.
+ * \param self Renderer.
+ * \param width Screen width.
+ * \param height Screen height.
+ */
+void liren_render_render (
+	LIRenRender* self,
+	int          width,
+	int          height)
+{
+	glViewport (0, 0, width, height);
+	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
+	glClear (GL_COLOR_BUFFER_BIT);
+	if (self->root_overlay != NULL)
+		private_render_overlay (self, self->root_overlay, width, height);
+	SDL_GL_SwapBuffers ();
+}
+
+/**
  * \brief Renders the scene.
- * \param self Scene.
+ * \param self Renderer.
  * \param framebuffer Render target framebuffer.
  * \param viewport Viewport array.
  * \param modelview Modelview matrix of the camera.
@@ -319,7 +380,7 @@ void liren_render_remove_model (
  * \param postproc_passes Array of post-processing passes.
  * \param postproc_passes_num Number of post-processing passes.
  */
-void liren_render_render (
+void liren_render_render_scene (
 	LIRenRender*       self,
 	LIRenFramebuffer*  framebuffer,
 	const GLint*       viewport,
@@ -377,6 +438,118 @@ void liren_render_set_anisotropy (
 		liren_render32_set_anisotropy (self->v32, value);
 	else
 		liren_render21_set_anisotropy (self->v21, value);
+}
+
+/*****************************************************************************/
+
+static void private_render_overlay (
+	LIRenRender*  self,
+	LIRenOverlay* overlay,
+	int           width,
+	int           height)
+{
+	int i;
+	GLuint texture;
+	GLint scissor[4];
+	LIMatMatrix modelview;
+	LIMatMatrix projection;
+	LIRenOverlayElement* element;
+	static const LIRenFormat overlay_format = { 32, GL_FLOAT, 24, GL_FLOAT, 12, GL_FLOAT, 0 };
+
+	if (!overlay->visible)
+		return;
+	projection = limat_matrix_ortho (0, width, height, 0, -1.0f, 1.0f);
+
+	/* Render the scene. */
+	if (overlay->scene.enabled)
+	{
+		/* Update the framebuffer. */
+		if (overlay->scene.framebuffer == NULL)
+		{
+			overlay->scene.framebuffer = liren_framebuffer_new (self,
+				overlay->scene.viewport[2], overlay->scene.viewport[3],
+				overlay->scene.samples, overlay->scene.hdr);
+		}
+		else
+		{
+			liren_framebuffer_resize (overlay->scene.framebuffer,
+				overlay->scene.viewport[2], overlay->scene.viewport[3],
+				overlay->scene.samples, overlay->scene.hdr);
+		}
+
+		/* Render the scene. */
+		if (overlay->scene.framebuffer != NULL)
+		{
+			if (self->v32 != NULL)
+			{
+				liren_render32_render (self->v32, overlay->scene.framebuffer->v32, overlay->scene.viewport,
+					&overlay->scene.modelview, &overlay->scene.projection, &overlay->scene.frustum,
+					overlay->scene.render_passes, overlay->scene.render_passes_num,
+					overlay->scene.postproc_passes, overlay->scene.postproc_passes_num);
+			}
+			else
+			{
+				liren_render21_render (self->v21, overlay->scene.framebuffer->v21, overlay->scene.viewport,
+					&overlay->scene.modelview, &overlay->scene.projection, &overlay->scene.frustum,
+					overlay->scene.render_passes, overlay->scene.render_passes_num,
+					overlay->scene.postproc_passes, overlay->scene.postproc_passes_num);
+			}
+		}
+	}
+
+	/* Render elements. */
+	if (overlay->elements.count)
+	{
+		/* Update the buffer. */
+		if (overlay->buffer == NULL)
+		{
+			overlay->buffer = liren_buffer_new (self, NULL, 0, &overlay_format,
+				overlay->vertices.array, overlay->vertices.count, LIREN_BUFFER_TYPE_STATIC);
+		}
+
+		/* Render each element. */
+		if (overlay->buffer != NULL)
+		{
+			modelview = limat_matrix_translation (overlay->position.x, overlay->position.y, 0.0f);
+			for (i = 0 ; i < overlay->elements.count ; i++)
+			{
+				element = overlay->elements.array + i;
+				if (element->scissor_enabled)
+				{
+					scissor[0] = (int) overlay->position.x + element->scissor_rect[0];
+					scissor[1] = height - (int) overlay->position.y - element->scissor_rect[1] - element->scissor_rect[3];
+					scissor[2] = element->scissor_rect[2];
+					scissor[3] = element->scissor_rect[3];
+				}
+				else
+				{
+					scissor[0] = 0;
+					scissor[1] = 0;
+					scissor[2] = width;
+					scissor[3] = height;
+				}
+				if (element->image != NULL)
+					texture = liren_image_get_handle (element->image);
+				else
+					texture = element->font->texture;
+				liren_render_draw_clipped_buffer (self, element->shader, &modelview,
+					&projection, texture, element->color, scissor,
+					element->buffer_start, element->buffer_count, overlay->buffer);
+			}
+		}
+	}
+
+	/* Render child overlays. */
+	for (i = overlay->overlays.count - 1 ; i >= 0 ; i--)
+	{
+		if (overlay->overlays.array[i]->behind)
+			private_render_overlay (self, overlay->overlays.array[i], width, height);
+	}
+	for (i = overlay->overlays.count - 1 ; i >= 0 ; i--)
+	{
+		if (!overlay->overlays.array[i]->behind)
+			private_render_overlay (self, overlay->overlays.array[i], width, height);
+	}
 }
 
 /** @} */
