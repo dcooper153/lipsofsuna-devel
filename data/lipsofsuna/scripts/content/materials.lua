@@ -204,6 +204,14 @@ Material{
 	type = "liquid"}
 
 Material{
+	name = "water2",
+	cullface = false,
+	shader = "swamp",
+	texture = {"noise1", "noise1", "stone-001"},
+	texture_scale = 0.11,
+	type = "liquid"}
+
+Material{
 	effect_build = "builtwood1",
 	effect_collapse = "collapse2",
 	mining_materials = {["log"] = 1},
@@ -223,3 +231,14 @@ Material{
 	texture = {"wood1", "wood1n", "wood1"},
 	texture_scale = 0.11,
 	type = "sloped"}
+
+Material{
+	effect_build = "builtwood1",
+	effect_collapse = "collapse2",
+	mining_materials = {["log"] = 1},
+	name = "wood1smooth",
+	shader = "terrain",
+	specular = {0.5,0.5,0.5,0.5},
+	texture = {"wood1", "wood1n", "wood1"},
+	texture_scale = 0.11,
+	type = "rounded"}
