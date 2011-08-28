@@ -50,6 +50,7 @@ LIRenRender* liren_render_new (
 	self = lisys_calloc (1, sizeof (LIRenRender));
 	if (self == NULL)
 		return NULL;
+	self->paths = paths;
 	lialg_random_init (&self->random, lisys_time (NULL));
 
 	/* Initialize the image dictionary. */
@@ -92,6 +93,14 @@ LIRenRender* liren_render_new (
 	/* Allocate the overlay dictionary. */
 	self->overlays = lialg_u32dic_new ();
 	if (self->overlays == NULL)
+	{
+		liren_render_free (self);
+		return NULL;
+	}
+
+	/* Allocate the font dictionary. */
+	self->fonts = lialg_strdic_new ();
+	if (self->fonts == NULL)
 	{
 		liren_render_free (self);
 		return NULL;
@@ -166,12 +175,58 @@ void liren_render_free (
 		lialg_strdic_free (self->shaders);
 	}
 
+	/* Free fonts. */
+	if (self->fonts != NULL)
+	{
+		LIALG_STRDIC_FOREACH (iter1, self->fonts)
+			lifnt_font_free (iter1.value);
+		lialg_strdic_free (self->fonts);
+	}
+
 	/* Free the backend. */
 	if (self->v21 != NULL)
 		liren_render21_free (self->v21);
 	if (self->v32 != NULL)
 		liren_render32_free (self->v32);
 	lisys_free (self);
+}
+
+int liren_render_load_font (
+	LIRenRender* self,
+	const char*  name,
+	const char*  file,
+	int          size)
+{
+	char* path;
+	char* file_;
+	LIFntFont* font;
+
+	/* Check for existing. */
+	font = lialg_strdic_find (self->fonts, name);
+	if (font != NULL)
+		return 0;
+
+	/* Load the font. */
+	file_ = lisys_string_concat (file, ".ttf");
+	if (file == NULL)
+		return 0;
+	path = lipth_paths_get_font (self->paths, file_);
+	lisys_free (file_);
+	if (path == NULL)
+		return 0;
+	font = lifnt_font_new (path, size);
+	lisys_free (path);
+	if (font == NULL)
+		return 0;
+
+	/* Add to the dictionary. */
+	if (!lialg_strdic_insert (self->fonts, name, font))
+	{
+		lifnt_font_free (font);
+		return 0;
+	}
+
+	return 1;
 }
 
 void liren_render_draw_clipped_buffer (
@@ -302,6 +357,35 @@ int liren_render_load_image (
 	return 1;
 }
 
+int liren_render_measure_text (
+	LIRenRender* self,
+	const char*  font,
+	const char*  text,
+	int          width_limit,
+	int*         result_width,
+	int*         result_height)
+{
+	LIFntFont* font_;
+	LIFntLayout* layout;
+
+	font_ = lialg_strdic_find (self->fonts, font);
+	if (font_ == NULL)
+		return 0;
+
+	layout = lifnt_layout_new ();
+	if (layout == NULL)
+		return 0;
+
+	if (width_limit != -1)
+		lifnt_layout_set_width_limit (layout, width_limit);
+	lifnt_layout_append_string (layout, font_, text);
+	*result_width = lifnt_layout_get_width (layout);
+	*result_height = lifnt_layout_get_height (layout);
+	lifnt_layout_free (layout);
+
+	return 1;
+}
+
 /**
  * \brief Reloads all images, shaders and other graphics state.
  *
@@ -316,7 +400,12 @@ void liren_render_reload (
 	int          pass)
 {
 	LIAlgU32dicIter iter;
+	LIAlgStrdicIter iter1;
 	LIRenOverlay* overlay;
+
+	/* Reload fonts. */
+	LIALG_STRDIC_FOREACH (iter1, self->fonts)
+		lifnt_font_reload (iter1.value, pass);
 
 	/* Reload overlays. */
 	LIALG_U32DIC_FOREACH (iter, self->overlays)

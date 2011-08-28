@@ -43,7 +43,7 @@ static void Widgets_add_font_style (LIScrArgs* args)
 
 	/* Load the font. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_WIDGETS);
-	if (!liwdg_styles_load_font (module->widgets->styles, name, file, size))
+	if (!liren_render_load_font (module->widgets->render, name, file, size))
 		lisys_error_report ();
 }
 

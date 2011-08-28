@@ -26,8 +26,6 @@ typedef struct _LIWdgManager LIWdgManager;
 typedef struct _LIWdgWidget LIWdgWidget;
 typedef struct _LIWdgRect LIWdgRect;
 typedef struct _LIWdgSize LIWdgSize;
-typedef struct _LIWdgStyle LIWdgStyle;
-typedef struct _LIWdgStyles LIWdgStyles;
 
 struct _LIWdgRect
 {

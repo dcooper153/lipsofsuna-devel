@@ -39,11 +39,11 @@ struct _LIWdgElement
 	int src_tiling[6];
 	int img_size[2];
 	float rotation;
+	const char* font;
 	const char* text;
 	const char* image_name;
 	float text_align[2];
 	float text_color[4];
-	LIFntFont* font;
 	LIMatVector center;
 };
 
@@ -148,7 +148,7 @@ int liwdg_widget_canvas_insert_image (
 
 int liwdg_widget_canvas_insert_text (
 	LIWdgWidget*       self,
-	LIFntFont*         font,
+	const char*        font,
 	const char*        text,
 	const int*         dst_clip,
 	const int*         dst_pos,

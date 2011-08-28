@@ -42,7 +42,7 @@ LIAPICALL (int, liwdg_widget_canvas_insert_image, (
 
 LIAPICALL (int, liwdg_widget_canvas_insert_text, (
 	LIWdgWidget*       self,
-	LIFntFont*         font,
+	const char*        font,
 	const char*        text,
 	const int*         dst_clip,
 	const int*         dst_pos,

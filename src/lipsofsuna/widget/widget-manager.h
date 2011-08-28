@@ -26,7 +26,6 @@
 #include <lipsofsuna/render.h>
 #include <lipsofsuna/system.h>
 #include "widget.h"
-#include "widget-styles.h"
 #include "widget-types.h"
 
 struct _LIWdgManager
@@ -34,7 +33,6 @@ struct _LIWdgManager
 	int width;
 	int height;
 	int overlay;
-	LIWdgStyles* styles;
 	LICalCallbacks* callbacks;
 	LIMatMatrix projection;
 	LIPthPaths* paths;
@@ -64,10 +62,6 @@ LIAPICALL (int, liwdg_manager_alloc_widgets, (
 	LIWdgManager* self,
 	              ...));
 
-LIAPICALL (LIFntFont*, liwdg_manager_find_font, (
-	LIWdgManager* self,
-	const char*   name));
-
 LIAPICALL (LIWdgWidget*, liwdg_manager_find_widget_by_point, (
 	LIWdgManager* self,
 	int           x,
@@ -81,10 +75,6 @@ LIAPICALL (LIWdgWidget*, liwdg_manager_find_window_by_point, (
 LIAPICALL (int, liwdg_manager_insert_window, (
 	LIWdgManager* self,
 	LIWdgWidget*  widget));
-
-LIAPICALL (void, liwdg_manager_reload, (
-	LIWdgManager* self,
-	int           pass));
 
 LIAPICALL (int, liwdg_manager_remove_window, (
 	LIWdgManager* self,

@@ -314,7 +314,6 @@ static void Widget_canvas_text (LIScrArgs* args)
 	float rotation = 0.0f;
 	LIScrData* vector = NULL;
 	LIMatVector* rotation_center_ptr = NULL;
-	LIFntFont* font;
 	LIWdgWidget* widget;
 
 	/* Process arguments. */
@@ -322,9 +321,6 @@ static void Widget_canvas_text (LIScrArgs* args)
 	if (!liscr_args_gets_string (args, "text", &text))
 		return;
 	liscr_args_gets_string (args, "text_font", &text_font);
-	font = lialg_strdic_find (widget->manager->styles->fonts, text_font);
-	if (font == NULL)
-		return;
 	if (liscr_args_gets_intv (args, "dest_clip", 4, dest_clip) == 4)
 		dest_clip_ptr = dest_clip;
 	if (liscr_args_gets_intv (args, "dest_position", 2, dest_position) == 2)
@@ -340,7 +336,7 @@ static void Widget_canvas_text (LIScrArgs* args)
 		rotation_center_ptr = liscr_data_get_data (vector);
 
 	/* Create the canvas element. */
-	liwdg_widget_canvas_insert_text (widget, font, text, dest_clip_ptr, dest_position_ptr,
+	liwdg_widget_canvas_insert_text (widget, text_font, text, dest_clip_ptr, dest_position_ptr,
 		dest_size_ptr, text_align_ptr, text_color_ptr, rotation, rotation_center_ptr);
 }
 
@@ -553,10 +549,9 @@ static void Widget_set_request (LIScrArgs* args)
 	int paddings[4];
 	const char* text;
 	const char* font_name;
-	LIFntFont* font;
-	LIFntLayout* layout;
 	LIMatVector vector;
 	LIWdgSize size = { -1, -1 };
+	LIWdgSize size_tmp;
 	LIWdgWidget* widget;
 
 	widget = args->self;
@@ -578,21 +573,12 @@ static void Widget_set_request (LIScrArgs* args)
 	if (liscr_args_gets_string (args, "font", &font_name) &&
 	    liscr_args_gets_string (args, "text", &text))
 	{
-		font = lialg_strdic_find (widget->manager->styles->fonts, font_name);
-		if (font != NULL)
+		if (liren_render_measure_text (widget->manager->render, font_name, text, size.width, &size_tmp.width, &size_tmp.height))
 		{
-			layout = lifnt_layout_new ();
-			if (layout != NULL)
-			{
-				if (size.width != -1)
-					lifnt_layout_set_width_limit (layout, size.width);
-				lifnt_layout_append_string (layout, font, text);
-				if (size.width == -1)
-					size.width = lifnt_layout_get_width (layout);
-				if (size.height == -1)
-					size.height = lifnt_layout_get_height (layout);
-				lifnt_layout_free (layout);
-			}
+			if (size.width == -1)
+				size.width = size_tmp.width;
+			if (size.height == -1)
+				size.height = size_tmp.height;
 		}
 	}
 

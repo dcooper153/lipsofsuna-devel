@@ -33,6 +33,9 @@ LIExtSpeech* liext_speech_new (
 	LIExtSpeech* self;
 	LIFntFont* font1;
 
+	/* FIXME */
+	return NULL;
+
 	self = lisys_malloc (sizeof (LIExtSpeech));
 	if (self == NULL)
 		return NULL;
@@ -51,9 +54,9 @@ LIExtSpeech* liext_speech_new (
 		return NULL;
 	}
 	lifnt_layout_set_width_limit (self->text, 150);
-	font1 = liwdg_manager_find_font (module->widgets, font);
+/*	font1 = liwdg_manager_find_font (module->widgets, font);
 	if (font1 != NULL)
-		lifnt_layout_append_string (self->text, font1, text);
+		lifnt_layout_append_string (self->text, font1, text);*/
 
 	return self;
 }

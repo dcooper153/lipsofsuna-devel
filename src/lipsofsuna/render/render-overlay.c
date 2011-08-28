@@ -141,7 +141,7 @@ void liren_render_overlay_clear (
  * \param render Renderer.
  * \param id Overlay ID.
  * \param shader Shader name.
- * \param font Font.
+ * \param font Font name.
  * \param color Diffuse color.
  * \param scissor Screen space scissor rectangle.
  * \param pos Text offset relative to the overlay origin.
@@ -152,7 +152,7 @@ void liren_render_overlay_add_text (
 	LIRenRender* self,
 	int          id,
 	const char*  shader,
-	LIFntFont*   font,
+	const char*  font,
 	const char*  text,
 	const float* color,
 	const GLint* scissor,
@@ -170,6 +170,7 @@ void liren_render_overlay_add_text (
 	float* vertex;
 	float* vertex_data;
 	LIMdlIndex* index_data;
+	LIFntFont* font_;
 	LIFntLayout* layout;
 	LIFntLayoutGlyph* glyph;
 	LIRenVertex* verts;
@@ -189,12 +190,17 @@ void liren_render_overlay_add_text (
 	if (shader_ == NULL)
 		return;
 
+	/* Find the font. */
+	font_ = lialg_strdic_find (self->fonts, font);
+	if (font_ == NULL)
+		return;
+
 	/* Layout the text. */
 	layout = lifnt_layout_new ();
 	if (layout == NULL)
 		return;
 	lifnt_layout_set_width_limit (layout, size[0]);
-	lifnt_layout_append_string (layout, font, text);
+	lifnt_layout_append_string (layout, font_, text);
 	if (!lifnt_layout_get_vertices (layout, &index_data, &vertex_data))
 	{
 		lifnt_layout_free (layout);
@@ -246,7 +252,7 @@ void liren_render_overlay_add_text (
 
 	/* Copy attributes. */
 	element->shader = shader_;
-	element->font = font;
+	element->font = font_;
 	memcpy (element->color, color, 4 * sizeof (float));
 	if (scissor != NULL)
 	{

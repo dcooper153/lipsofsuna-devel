@@ -28,9 +28,23 @@ LIAPICALL (LIRenRender*, liren_render_new, (
 LIAPICALL (void, liren_render_free, (
 	LIRenRender* self));
 
+LIAPICALL (int, liren_render_load_font, (
+	LIRenRender* self,
+	const char*  name,
+	const char*  file,
+	int          size));
+
 LIAPICALL (int, liren_render_load_image, (
 	LIRenRender* self,
 	const char*  name));
+
+LIAPICALL (int, liren_render_measure_text, (
+	LIRenRender* self,
+	const char*  font,
+	const char*  text,
+	int          width_limit,
+	int*         result_width,
+	int*         result_height));
 
 LIAPICALL (void, liren_render_reload, (
 	LIRenRender* self,

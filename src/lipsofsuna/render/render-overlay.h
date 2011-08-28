@@ -50,7 +50,7 @@ LIAPICALL (void, liren_render_overlay_add_text, (
 	LIRenRender* self,
 	int          id,
 	const char*  shader,
-	LIFntFont*   font,
+	const char*  font,
 	const char*  text,
 	const float* color,
 	const GLint* scissor,

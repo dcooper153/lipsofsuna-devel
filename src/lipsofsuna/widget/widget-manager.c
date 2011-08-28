@@ -58,10 +58,6 @@ static void private_resize_window (
 	LIWdgManager* self,
 	LIWdgWidget*  window);
 
-static int private_load_config (
-	LIWdgManager* self,
-	LIPthPaths*   paths);
-
 /*****************************************************************************/
 
 /**
@@ -101,13 +97,6 @@ LIWdgManager* liwdg_manager_new (
 		return NULL;
 	}
 
-	/* Load config and resources. */
-	if (!private_load_config (self, paths))
-	{
-		liwdg_manager_free (self);
-		return NULL;
-	}
-
 	return self;
 }
 
@@ -126,8 +115,6 @@ void liwdg_manager_free (
 
 	if (self->widgets.all != NULL)
 		lialg_ptrdic_free (self->widgets.all);
-	if (self->styles != NULL)
-		liwdg_styles_free (self->styles);
 	lisys_free (self);
 }
 
@@ -191,13 +178,6 @@ int liwdg_manager_alloc_widgets (
 	va_end (args);
 
 	return 1;
-}
-
-LIFntFont* liwdg_manager_find_font (
-	LIWdgManager* self,
-	const char*   name)
-{
-	return lialg_strdic_find (self->styles->fonts, name);
 }
 
 /**
@@ -271,25 +251,6 @@ int liwdg_manager_insert_window (
 	private_resize_window (self, widget);
 
 	return 1;
-}
-
-/**
- * \brief Reloads all fonts.
- *
- * This function is called when the video mode changes in Windows. It
- * reloads all fonts that were lost when the context was erased.
- *
- * \param self Renderer.
- * \param pass Reload pass.
- */
-void liwdg_manager_reload (
-	LIWdgManager* self,
-	int           pass)
-{
-	LIAlgStrdicIter iter;
-
-	LIALG_STRDIC_FOREACH (iter, self->styles->fonts)
-		lifnt_font_reload (iter.value, pass);
 }
 
 int liwdg_manager_remove_window (
@@ -479,17 +440,6 @@ static void private_resize_window (
 		if (rect.width != size.width || rect.height != size.height)
 			liwdg_widget_set_allocation (window, rect.x, rect.y, size.width, size.height);
 	}
-}
-
-static int private_load_config (
-	LIWdgManager* self,
-	LIPthPaths*   paths)
-{
-	self->styles = liwdg_styles_new (self, paths);
-	if (self->styles == NULL)
-		return 0;
-
-	return 1;
 }
 
 /** @} */

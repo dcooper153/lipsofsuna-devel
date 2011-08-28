@@ -124,12 +124,14 @@ struct _LIRenOverlayElement
 struct _LIRenRender
 {
 	LIAlgRandom random;
+	LIAlgStrdic* fonts;
 	LIAlgStrdic* images;
 	LIAlgStrdic* shaders;
 	LIAlgU32dic* lights;
 	LIAlgU32dic* models;
 	LIAlgU32dic* objects;
 	LIAlgU32dic* overlays;
+	LIPthPaths* paths;
 	LIRenOverlay* root_overlay;
 	LIRenRender21* v21;
 	LIRenRender32* v32;
