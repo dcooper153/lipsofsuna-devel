@@ -18,7 +18,6 @@
 #ifndef __RENDER32_IMAGE_H__
 #define __RENDER32_IMAGE_H__
 
-#include "lipsofsuna/image.h"
 #include "lipsofsuna/system.h"
 #include "render-types.h"
 

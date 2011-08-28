@@ -21,8 +21,8 @@
 #include "lipsofsuna/algorithm.h"
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/paths.h"
-#include "lipsofsuna/image.h"
 #include "render-types.h"
+#include "../image/image-texture.h"
 
 struct _LIRenBuffer21
 {

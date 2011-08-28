@@ -18,7 +18,6 @@
 #ifndef __RENDER_INTERNAL_MODEL_H__
 #define __RENDER_INTERNAL_MODEL_H__
 
-#include "lipsofsuna/image.h"
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "render-types.h"

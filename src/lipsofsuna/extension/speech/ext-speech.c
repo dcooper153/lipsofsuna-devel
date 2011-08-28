@@ -30,11 +30,11 @@ LIExtSpeech* liext_speech_new (
 	const char*  font,
 	const char*  text)
 {
-	LIExtSpeech* self;
-	LIFntFont* font1;
-
 	/* FIXME */
 	return NULL;
+#if 0
+	LIExtSpeech* self;
+	LIFntFont* font1;
 
 	self = lisys_malloc (sizeof (LIExtSpeech));
 	if (self == NULL)
@@ -59,12 +59,13 @@ LIExtSpeech* liext_speech_new (
 		lifnt_layout_append_string (self->text, font1, text);*/
 
 	return self;
+#endif
 }
 
 void
 liext_speech_free (LIExtSpeech* self)
 {
-	lifnt_layout_free (self->text);
+//	lifnt_layout_free (self->text);
 	lisys_free (self);
 }
 

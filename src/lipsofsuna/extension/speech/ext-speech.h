@@ -27,7 +27,7 @@ struct _LIExtSpeech
 	float life_time;
 	float timer;
 	float diffuse[4];
-	LIFntLayout* text;
+//	LIFntLayout* text;
 };
 
 LIExtSpeech* liext_speech_new (

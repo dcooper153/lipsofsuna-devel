@@ -105,6 +105,7 @@ void liext_speeches_render (
 	const LIMatMatrix* modelview,
 	const int*         viewport)
 {
+#if 0
 	int i;
 	int x;
 	int y;
@@ -175,6 +176,7 @@ void liext_speeches_render (
 			lisys_free (vertex_data);
 		}
 	}
+#endif
 }
 
 /**

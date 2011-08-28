@@ -18,9 +18,8 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/font.h>
-#include <lipsofsuna/extension.h>
+#include "lipsofsuna/client.h"
+#include "lipsofsuna/extension.h"
 
 #define LIEXT_SCRIPT_SPEECH "Speech"
 

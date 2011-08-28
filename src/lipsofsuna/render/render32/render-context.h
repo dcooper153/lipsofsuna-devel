@@ -18,7 +18,6 @@
 #ifndef __RENDER32_CONTEXT_H__
 #define __RENDER32_CONTEXT_H__
 
-#include "lipsofsuna/image.h"
 #include "lipsofsuna/model.h"
 #include "render-buffer.h"
 #include "render-buffer-texture.h"

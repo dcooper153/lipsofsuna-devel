@@ -21,12 +21,12 @@
 #include "lipsofsuna/algorithm.h"
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/paths.h"
-#include "lipsofsuna/image.h"
 #include "render-lod.h"
 #include "render-mesh.h"
 #include "render-particles.h"
 #include "render-program.h"
 #include "render-types.h"
+#include "../image/image-texture.h"
 
 #define LIREN_SHADER_PASS_COUNT 10
 

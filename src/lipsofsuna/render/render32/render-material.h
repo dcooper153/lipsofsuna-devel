@@ -18,7 +18,6 @@
 #ifndef __RENDER32_MATERIAL_H__
 #define __RENDER32_MATERIAL_H__
 
-#include "lipsofsuna/image.h"
 #include "lipsofsuna/model.h"
 #include "render-image.h"
 #include "render-shader.h"

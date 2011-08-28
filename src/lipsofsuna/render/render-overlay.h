@@ -18,9 +18,7 @@
 #ifndef __RENDER_OVERLAY_H__
 #define __RENDER_OVERLAY_H__
 
-#include "lipsofsuna/font.h"
 #include "lipsofsuna/math.h"
-#include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-types.h"

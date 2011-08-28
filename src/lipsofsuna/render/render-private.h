@@ -19,8 +19,10 @@
 #define __RENDER_PRIVATE_H__
 
 #include "lipsofsuna/algorithm.h"
-#include "lipsofsuna/font.h"
 #include "render-types.h"
+#include "font/font.h"
+#include "font/font-layout.h"
+#include "image/image-texture.h"
 #include "internal/render-buffer.h"
 #include "internal/render-image.h"
 #include "render21/render.h"

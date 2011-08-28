@@ -18,13 +18,11 @@
 #ifndef __WIDGET_MANAGER_H__
 #define __WIDGET_MANAGER_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/callback.h>
-#include <lipsofsuna/font.h>
-#include <lipsofsuna/image.h>
-#include <lipsofsuna/paths.h>
-#include <lipsofsuna/render.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/algorithm.h"
+#include "lipsofsuna/callback.h"
+#include "lipsofsuna/paths.h"
+#include "lipsofsuna/render.h"
+#include "lipsofsuna/system.h"
 #include "widget.h"
 #include "widget-types.h"
 

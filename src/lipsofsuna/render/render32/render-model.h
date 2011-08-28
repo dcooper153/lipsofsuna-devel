@@ -18,7 +18,6 @@
 #ifndef __RENDER32_MODEL_H__
 #define __RENDER32_MODEL_H__
 
-#include "lipsofsuna/image.h"
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "render.h"
