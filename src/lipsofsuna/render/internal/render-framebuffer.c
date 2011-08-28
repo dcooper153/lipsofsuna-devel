@@ -18,15 +18,16 @@
 /**
  * \addtogroup LIRen Render
  * @{
+ * \addtogroup LIRenInternal Internal
+ * @{
  * \addtogroup LIRenFramebuffer Framebuffer
  * @{
  */
 
-#include "lipsofsuna/system.h"
 #include "render-framebuffer.h"
-#include "render-private.h"
-#include "render21/render-framebuffer.h"
-#include "render32/render-framebuffer.h"
+#include "../render-private.h"
+#include "../render21/render-private.h"
+#include "../render32/render-private.h"
 
 /**
  * \brief Creates a rendering framebuffer.
@@ -111,4 +112,4 @@ int liren_framebuffer_resize (
 
 /** @} */
 /** @} */
-
+/** @} */

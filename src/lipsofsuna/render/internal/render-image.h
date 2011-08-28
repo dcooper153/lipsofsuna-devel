@@ -15,14 +15,22 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_IMAGE_H__
-#define __RENDER_IMAGE_H__
+#ifndef __RENDER_INTERNAL_IMAGE_H__
+#define __RENDER_INTERNAL_IMAGE_H__
 
 #include "lipsofsuna/image.h"
 #include "lipsofsuna/system.h"
-#include "render-types.h"
+#include "../render-types.h"
+#include "../render21/render-image.h"
+#include "../render32/render-image.h"
 
 typedef struct _LIRenImage LIRenImage;
+struct _LIRenImage
+{
+	LIRenRender* render;
+	LIRenImage21* v21;
+	LIRenImage32* v32;
+};
 
 LIAPICALL (LIRenImage*, liren_image_new, (
 	LIRenRender* render,

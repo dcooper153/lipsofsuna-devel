@@ -18,17 +18,16 @@
 /**
  * \addtogroup LIRen Render
  * @{
+ * \addtogroup LIRenInternal Internal
+ * @{
  * \addtogroup LIRenImage Image
  * @{
  */
 
-#include "render.h"
 #include "render-image.h"
-#include "render-private.h"
-#include "render21/render-image.h"
-#include "render21/render-private.h"
-#include "render32/render-image.h"
-#include "render32/render-private.h"
+#include "../render-private.h"
+#include "../render21/render-private.h"
+#include "../render32/render-private.h"
 
 /**
  * \brief Creates an empty image.
@@ -124,5 +123,6 @@ int liren_image_get_width (
 		return liren_image21_get_width (self->v21);
 }
 
+/** @} */
 /** @} */
 /** @} */

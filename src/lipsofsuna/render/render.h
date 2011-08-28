@@ -20,8 +20,8 @@
 
 #include "lipsofsuna/paths.h"
 #include "lipsofsuna/system.h"
-#include "render-buffer.h"
-#include "render-framebuffer.h"
+#include "internal/render-buffer.h"
+#include "internal/render-framebuffer.h"
 #include "render-light.h"
 #include "render-object.h"
 #include "render-shader.h"

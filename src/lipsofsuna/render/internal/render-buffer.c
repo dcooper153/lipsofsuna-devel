@@ -18,12 +18,14 @@
 /**
  * \addtogroup LIRen Render
  * @{
+ * \addtogroup LIRenInternal Internal
+ * @{
  * \addtogroup LIRenBuffer Buffer
  * @{
  */
 
 #include "render-buffer.h"
-#include "render-private.h"
+#include "../render-private.h"
 
 /**
  * \brief Allocates a vertex buffer.
@@ -92,5 +94,6 @@ void liren_buffer_free (
 	lisys_free (self);
 }
 
+/** @} */
 /** @} */
 /** @} */

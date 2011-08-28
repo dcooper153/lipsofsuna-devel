@@ -26,12 +26,8 @@
 #include "lipsofsuna/system.h"
 #include "render-model.h"
 #include "render-private.h"
+#include "internal/render-model.h"
 #include "render32/render-private.h"
-
-static void private_free (
-	LIRenModel* self);
-
-/*****************************************************************************/
 
 /**
  * \brief Creates a new model from a loaded model buffer.
@@ -91,7 +87,7 @@ int liren_render_model_new (
 	/* Add to the dictionary. */
 	if (!lialg_u32dic_insert (render->models, id, self))
 	{
-		private_free (self);
+		liren_model_free (self);
 		return 0;
 	}
 
@@ -113,7 +109,7 @@ void liren_render_model_free (
 	if (model == NULL)
 		return;
 
-	private_free (model);
+	liren_model_free (model);
 }
 
 int liren_render_model_set_model (
@@ -127,23 +123,7 @@ int liren_render_model_set_model (
 	if (model_ == NULL)
 		return 0;
 
-	if (model_->v32 != NULL)
-		return liren_model32_set_model (model_->v32, model);
-	else
-		return liren_model21_set_model (model_->v21, model);
-}
-
-/*****************************************************************************/
-
-static void private_free (
-	LIRenModel* self)
-{
-	lialg_u32dic_remove (self->render->models, self->id);
-	if (self->v32 != NULL)
-		liren_model32_free (self->v32);
-	if (self->v21 != NULL)
-		liren_model21_free (self->v21);
-	lisys_free (self);
+	return liren_model_set_model (model_, model);
 }
 
 /** @} */

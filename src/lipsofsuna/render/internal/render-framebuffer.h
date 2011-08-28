@@ -15,11 +15,20 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_FRAMEBUFFER_H__
-#define __RENDER_FRAMEBUFFER_H__
+#ifndef __RENDER_INTERNAL_FRAMEBUFFER_H__
+#define __RENDER_INTERNAL_FRAMEBUFFER_H__
 
-#include "render.h"
-#include "render-types.h"
+#include "lipsofsuna/system.h"
+#include "../render.h"
+#include "../render-types.h"
+#include "../render21/render-framebuffer.h"
+#include "../render32/render-framebuffer.h"
+
+struct _LIRenFramebuffer
+{
+	LIRenFramebuffer21* v21;
+	LIRenFramebuffer32* v32;
+};
 
 LIAPICALL (LIRenFramebuffer*, liren_framebuffer_new, (
 	LIRenRender* render,

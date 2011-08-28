@@ -22,9 +22,6 @@
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "render.h"
-#include "render-buffer.h"
-#include "render-model.h"
-#include "render-types.h"
 
 LIAPICALL (int, liren_render_object_new, (
 	LIRenRender* render,

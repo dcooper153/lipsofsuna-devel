@@ -20,8 +20,8 @@
 
 #include "lipsofsuna/algorithm.h"
 #include "lipsofsuna/font.h"
-#include "render-image.h"
 #include "render-types.h"
+#include "internal/render-image.h"
 #include "render21/render.h"
 #include "render21/render-light.h"
 #include "render21/render-scene.h"
@@ -42,25 +42,6 @@ typedef struct _LIRenLight LIRenLight;
 typedef struct _LIRenModel LIRenModel;
 typedef struct _LIRenOverlay LIRenOverlay;
 typedef struct _LIRenOverlayElement LIRenOverlayElement;
-
-struct _LIRenBuffer
-{
-	LIRenBuffer21* v21;
-	LIRenBuffer32* v32;
-};
-
-struct _LIRenFramebuffer
-{
-	LIRenFramebuffer21* v21;
-	LIRenFramebuffer32* v32;
-};
-
-struct _LIRenImage
-{
-	LIRenRender* render;
-	LIRenImage21* v21;
-	LIRenImage32* v32;
-};
 
 struct _LIRenLight
 {

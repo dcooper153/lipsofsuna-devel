@@ -15,24 +15,38 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_BUFFER_H__
-#define __RENDER_BUFFER_H__
+/**
+ * \addtogroup LIRen Render
+ * @{
+ * \addtogroup LIRenInternal Internal
+ * @{
+ * \addtogroup LIRenModel Model
+ * @{
+ */
 
-#include "lipsofsuna/model.h"
-#include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
-#include "render-types.h"
+#include "render-model.h"
 
-LIAPICALL (LIRenBuffer*, liren_buffer_new, (
-	LIRenRender*       render,
-	const void*        index_data,
-	int                index_count,
-	const LIRenFormat* vertex_format,
-	const void*        vertex_data,
-	int                vertex_count,
-	int                type));
+void liren_model_free (
+	LIRenModel* self)
+{
+	lialg_u32dic_remove (self->render->models, self->id);
+	if (self->v32 != NULL)
+		liren_model32_free (self->v32);
+	if (self->v21 != NULL)
+		liren_model21_free (self->v21);
+	lisys_free (self);
+}
 
-LIAPICALL (void, liren_buffer_free, (
-	LIRenBuffer* self));
+int liren_model_set_model (
+	LIRenModel* self,
+	LIMdlModel* model)
+{
+	if (self->v32 != NULL)
+		return liren_model32_set_model (self->v32, model);
+	else
+		return liren_model21_set_model (self->v21, model);
+}
 
-#endif
+/** @} */
+/** @} */
+/** @} */
