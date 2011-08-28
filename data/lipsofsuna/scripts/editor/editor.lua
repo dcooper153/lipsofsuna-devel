@@ -587,34 +587,14 @@ Editor.update_rect_select = function(self)
 		local s = Selection(tile, face)
 		self.selection_rect[key] = s
 	end
-	if p.face == 1 or p.face == 2 then
-		if p.tile.x == s.tile.x then
-			local y1,y2 = ord(p.tile.y, s.tile.y)
-			local z1,z2 = ord(p.tile.z, s.tile.z)
-			for y=y1,y2 do
-				for z=z1,z2 do
-					add(Vector(p.tile.x, y, z), p.face)
-				end
-			end
-		end
-	elseif p.face == 3 or p.face == 4 then
-		if p.tile.y == s.tile.y then
-			local x1,x2 = ord(p.tile.x, s.tile.x)
-			local z1,z2 = ord(p.tile.z, s.tile.z)
-			for x=x1,x2 do
-				for z=z1,z2 do
-					add(Vector(x, p.tile.y, z), p.face)
-				end
-			end
-		end
-	else
-		if p.tile.z == s.tile.z then
-			local x1,x2 = ord(p.tile.x, s.tile.x)
-			local y1,y2 = ord(p.tile.y, s.tile.y)
-			for x=x1,x2 do
-				for y=y1,y2 do
-					add(Vector(x, y, p.tile.z), p.face)
-				end
+--simplified selection to select in a cube instead of a plane
+	local x1,x2 = ord(p.tile.x, s.tile.x)
+	local y1,y2 = ord(p.tile.y, s.tile.y)
+	local z1,z2 = ord(p.tile.z, s.tile.z)
+	for x=x1,x2 do
+		for y=y1,y2 do
+			for z=z1,z2 do
+				add(Vector(x, y, z), p.face)
 			end
 		end
 	end
