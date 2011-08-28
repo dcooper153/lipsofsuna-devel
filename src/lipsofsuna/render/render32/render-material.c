@@ -118,6 +118,13 @@ LIRenMaterial32* liren_material32_new_from_model (
 void liren_material32_free (
 	LIRenMaterial32* self)
 {
+	int i;
+
+	for (i = 0 ; i < self->textures.count ; i++)
+	{
+		if (self->textures.array[i] != NULL)
+			liren_image32_unref (self->textures.array[i]);
+	}
 	lisys_free (self->textures.array);
 	lisys_free (self);
 }
@@ -202,13 +209,18 @@ void liren_material32_set_specular (
  */
 void liren_material32_set_texture (
 	LIRenMaterial32* self,
-	int            index,
-	LIMdlTexture*  texture,
-	LIRenImage32*  image)
+	int              index,
+	LIMdlTexture*    texture,
+	LIRenImage32*    image)
 {
 	if (index < 0 || index >= self->textures.count)
 		return;
+
+	if (self->textures.array[index] != NULL)
+		liren_image32_unref (self->textures.array[index]);
 	self->textures.array[index] = image;
+	if (image != NULL)
+		liren_image32_ref (image);
 }
 
 int liren_material32_set_texture_count (

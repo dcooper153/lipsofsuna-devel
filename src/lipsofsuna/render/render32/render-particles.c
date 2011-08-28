@@ -91,6 +91,8 @@ int liren_particles32_init (
 			dstsystem->image = liren_render32_find_image (render, srcsystem->texture);
 			if (dstsystem->image == NULL)
 				dstsystem->image = liren_render32_load_image (render, srcsystem->texture);
+			if (dstsystem->image != NULL)
+				liren_image32_ref (dstsystem->image);
 			self->particles.count += srcsystem->particles.count;
 			dstsystem->particle_end = self->particles.count;
 		}
@@ -186,9 +188,15 @@ void liren_particles32_clear (
 	LIRenParticles32* self)
 {
 	int i;
+	LIRenParticleSystem32* system;
 
 	for (i = 0 ; i < self->systems.count ; i++)
-		lisys_free (self->systems.array[i].shader);
+	{
+		system = self->systems.array + i;
+		if (system->image != NULL)
+			liren_image32_unref (system->image);
+		lisys_free (system->shader);
+	}
 	lisys_free (self->particles.array);
 	lisys_free (self->frames.array);
 	lisys_free (self->systems.array);

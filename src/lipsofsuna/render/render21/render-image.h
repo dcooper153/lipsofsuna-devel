@@ -28,6 +28,12 @@ LIAPICALL (LIRenImage21*, liren_image21_new_from_file, (
 LIAPICALL (void, liren_image21_free, (
 	LIRenImage21* self));
 
+LIAPICALL (void, liren_image21_ref, (
+	LIRenImage21* self));
+
+LIAPICALL (void, liren_image21_unref, (
+	LIRenImage21* self));
+
 LIAPICALL (int, liren_image21_load, (
 	LIRenImage21* self));
 

@@ -30,6 +30,12 @@ LIAPICALL (LIRenImage32*, liren_image32_new_from_file, (
 LIAPICALL (void, liren_image32_free, (
 	LIRenImage32* self));
 
+LIAPICALL (void, liren_image32_ref, (
+	LIRenImage32* self));
+
+LIAPICALL (void, liren_image32_unref, (
+	LIRenImage32* self));
+
 LIAPICALL (int, liren_image32_load, (
 	LIRenImage32* self));
 

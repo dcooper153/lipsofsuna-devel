@@ -89,9 +89,20 @@ LIRenModel21* liren_model21_new (
 void liren_model21_free (
 	LIRenModel21* self)
 {
+	int i;
+
+	/* Unreference images. */
+	for (i = 0 ; i < self->materials.count ; i++)
+	{
+		if (self->materials.array[i].image != NULL)
+			liren_image21_unref (self->materials.array[i].image);
+	}
+	lisys_free (self->materials.array);
+
+	/* Free the vertex buffer. */
 	if (self->buffer != NULL)
 		liren_buffer21_free (self->buffer);
-	lisys_free (self->materials.array);
+
 	lisys_free (self->groups.array);
 	lisys_free (self->indices.array);
 	lisys_free (self->vertices.array);
@@ -329,6 +340,20 @@ int liren_model21_set_model (
 	{
 		self->buffer = liren_buffer21_new (indices, lod->indices.count, &private_vertex_format,
 			model->vertices.array, model->vertices.count, LIREN_BUFFER_TYPE_STATIC);
+	}
+
+	/* Update reference counts. */
+	for (i = 0 ; i < self->materials.count ; i++)
+	{
+		dst = self->materials.array + i;
+		if (dst->image != NULL)
+			liren_image21_unref (dst->image);
+	}
+	for (i = 0 ; i < model->materials.count ; i++)
+	{
+		dst = materials + i;
+		if (dst->image != NULL)
+			liren_image21_ref (dst->image);
 	}
 
 	/* Replace materials. */

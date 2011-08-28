@@ -45,6 +45,7 @@ LIRenImage* liren_image_new (
 	if (self == NULL)
 		return NULL;
 	self->render = render;
+	self->timestamp = SDL_GetTicks ();
 
 	/* Initialize the backend. */
 	if (render->v32 != NULL)
@@ -83,6 +84,7 @@ LIRenImage* liren_image_new (
 void liren_image_free (
 	LIRenImage* self)
 {
+	lisys_assert (!self->refs);
 	if (self->v32 != NULL)
 	{
 		lialg_strdic_remove (self->render->images, self->v32->name);
@@ -94,6 +96,20 @@ void liren_image_free (
 		liren_image21_free (self->v21);
 	}
 	lisys_free (self);
+}
+
+void liren_image_ref (
+	LIRenImage* self)
+{
+	self->refs++;
+}
+
+void liren_image_unref (
+	LIRenImage* self)
+{
+	lisys_assert (self->refs > 0);
+	self->refs--;
+	self->timestamp = SDL_GetTicks ();
 }
 
 GLuint liren_image_get_handle (

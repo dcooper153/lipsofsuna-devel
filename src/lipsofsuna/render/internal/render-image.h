@@ -25,6 +25,8 @@
 
 struct _LIRenImage
 {
+	int refs;
+	Uint32 timestamp;
 	LIRenRender* render;
 	LIRenImage21* v21;
 	LIRenImage32* v32;
@@ -37,6 +39,12 @@ LIAPICALL (LIRenImage*, liren_image_new, (
 LIAPICALL (void, liren_image_free, (
 	LIRenImage* self));
 
+LIAPICALL (void, liren_image_ref, (
+	LIRenImage* self));
+
+LIAPICALL (void, liren_image_unref, (
+	LIRenImage* self));
+
 LIAPICALL (GLuint, liren_image_get_handle, (
 	const LIRenImage* self));
 
@@ -45,8 +53,5 @@ LIAPICALL (int, liren_image_get_height, (
 
 LIAPICALL (int, liren_image_get_width, (
 	const LIRenImage* self));
-
-#define liren_image_ref(self) /*TODO*/
-#define liren_image_unref(self) /*TODO*/
 
 #endif

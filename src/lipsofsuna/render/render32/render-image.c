@@ -25,6 +25,8 @@
 #include "render.h"
 #include "render-image.h"
 #include "render-private.h"
+#include "../render-private.h"
+#include "../internal/render-image.h"
 
 static int private_init (
 	LIRenImage32* self,
@@ -79,6 +81,36 @@ void liren_image32_free (
 	lisys_free (self->name);
 	lisys_free (self->path);
 	lisys_free (self);
+}
+
+/**
+ * \brief References the image.
+ * \param self Image.
+ */
+void liren_image32_ref (
+	LIRenImage32* self)
+{
+	LIRenImage* image;
+
+	image = liren_render_find_image (self->render->render, self->name);
+	lisys_assert (image != NULL);
+	lisys_assert (image->v32 == self);
+	liren_image_ref (image);
+}
+
+/**
+ * \brief Unreferences the image.
+ * \param self Image.
+ */
+void liren_image32_unref (
+	LIRenImage32* self)
+{
+	LIRenImage* image;
+
+	image = liren_render_find_image (self->render->render, self->name);
+	lisys_assert (image != NULL);
+	lisys_assert (image->v32 == self);
+	liren_image_unref (image);
 }
 
 /**
