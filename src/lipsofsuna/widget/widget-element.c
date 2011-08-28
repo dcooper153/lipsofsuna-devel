@@ -37,6 +37,7 @@ struct _LIWdgElement
 	int src_pos[2];
 	int src_tiling_enabled;
 	int src_tiling[6];
+	int img_size[2];
 	float rotation;
 	const char* text;
 	const char* image_name;
@@ -44,7 +45,6 @@ struct _LIWdgElement
 	float text_color[4];
 	LIFntFont* font;
 	LIMatVector center;
-	LIRenImage* image;
 };
 
 static void private_pack_quad (
@@ -107,8 +107,7 @@ int liwdg_widget_canvas_insert_image (
 
 	memset (&elem, 0, sizeof (LIWdgElement));
 	elem.image_name = image;
-	elem.image = liwdg_manager_find_image (self->manager, image);
-	if (elem.image == NULL)
+	if (!liren_render_get_image_size (self->manager->render, image, elem.img_size))
 		return 0;
 	if (color != NULL)
 		memcpy (elem.text_color, color, 4 * sizeof (float));
@@ -132,8 +131,8 @@ int liwdg_widget_canvas_insert_image (
 	}
 	else
 	{
-		elem.src_tiling[1] = liren_image_get_width (elem.image);
-		elem.src_tiling[4] = liren_image_get_height (elem.image);
+		elem.src_tiling[1] = elem.img_size[0];
+		elem.src_tiling[4] = elem.img_size[1];
 	}
 	elem.rotation = rotation_angle;
 	if (rotation_center != NULL)
@@ -230,10 +229,10 @@ static void private_pack_scaled (
 	float ty[2];
 
 	/* Calculate texture coordinates. */
-	tx[0] = (float)(elem->src_pos[0]) / liren_image_get_width (elem->image);
-	tx[1] = (float)(elem->src_pos[0] + elem->src_tiling[1]) / liren_image_get_width (elem->image);
-	ty[0] = (float)(elem->src_pos[1]) / liren_image_get_height (elem->image);
-	ty[1] = (float)(elem->src_pos[1] + elem->src_tiling[4]) / liren_image_get_height (elem->image);
+	tx[0] = (float)(elem->src_pos[0]) / elem->img_size[0];
+	tx[1] = (float)(elem->src_pos[0] + elem->src_tiling[1]) / elem->img_size[0];
+	ty[0] = (float)(elem->src_pos[1]) / elem->img_size[1];
+	ty[1] = (float)(elem->src_pos[1] + elem->src_tiling[4]) / elem->img_size[1];
 
 	/* Calculate pixels per texture unit. */
 	xs = tx[1] - tx[0];
@@ -309,8 +308,8 @@ static void private_pack_tiled (
 	h[2] = elem->src_tiling[5];
 
 	/* Calculate texture coordinates. */
-	iw = liren_image_get_width (elem->image);
-	ih = liren_image_get_height (elem->image);
+	iw = elem->img_size[0];
+	ih = elem->img_size[1];
 	tx[0] = (float)(elem->src_pos[0]) / iw;
 	tx[1] = (float)(elem->src_pos[0] + elem->src_tiling[0]) / iw;
 	tx[2] = (float)(elem->src_pos[0] + elem->src_tiling[0] + elem->src_tiling[1]) / iw;

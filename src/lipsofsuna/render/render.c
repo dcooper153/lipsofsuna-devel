@@ -440,6 +440,37 @@ void liren_render_set_anisotropy (
 		liren_render21_set_anisotropy (self->v21, value);
 }
 
+/**
+ * \brief Gets the size of an image.
+ * \param self Renderer.
+ * \param name Image name.
+ * \param result Return location for two integers.
+ * \return Nonzero on success.
+ */
+int liren_render_get_image_size (
+	LIRenRender* self,
+	const char*  name,
+	int*         result)
+{
+	LIRenImage* image;
+
+	/* Load the image. */
+	image = lialg_strdic_find (self->images, name);
+	if (image == NULL)
+	{
+		liren_render_load_image (self, name);
+		image = lialg_strdic_find (self->images, name);
+		if (image == NULL)
+			return 0;
+	}
+
+	/* Return the size. */
+	result[0] = liren_image_get_width (image);
+	result[1] = liren_image_get_height (image);
+
+	return 1;
+}
+
 /*****************************************************************************/
 
 static void private_render_overlay (

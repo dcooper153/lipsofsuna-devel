@@ -69,10 +69,6 @@ LIAPICALL (LIFntFont*, liwdg_manager_find_font, (
 	LIWdgManager* self,
 	const char*   name));
 
-LIAPICALL (LIRenImage*, liwdg_manager_find_image, (
-	LIWdgManager* self,
-	const char*   name));
-
 LIAPICALL (LIWdgWidget*, liwdg_manager_find_widget_by_point, (
 	LIWdgManager* self,
 	int           x,

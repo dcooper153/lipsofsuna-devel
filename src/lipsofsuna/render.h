@@ -21,7 +21,6 @@
 #include "render/render.h"
 #include "render/render-buffer.h"
 #include "render/render-framebuffer.h"
-#include "render/render-image.h"
 #include "render/render-light.h"
 #include "render/render-model.h"
 #include "render/render-object.h"

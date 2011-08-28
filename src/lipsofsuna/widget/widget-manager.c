@@ -200,22 +200,6 @@ LIFntFont* liwdg_manager_find_font (
 	return lialg_strdic_find (self->styles->fonts, name);
 }
 
-LIRenImage* liwdg_manager_find_image (
-	LIWdgManager* self,
-	const char*   name)
-{
-	LIRenImage* image;
-
-	image = liren_render_find_image (self->render, name);
-	if (image == NULL)
-	{
-		liren_render_load_image (self->render, name);
-		image = liren_render_find_image (self->render, name);
-	}
-
-	return image;
-}
-
 /**
  * \brief Finds a widget by screen position.
  * \param self Widget manager.

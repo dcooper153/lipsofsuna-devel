@@ -22,7 +22,6 @@
 #include "lipsofsuna/system.h"
 #include "render-buffer.h"
 #include "render-framebuffer.h"
-#include "render-image.h"
 #include "render-light.h"
 #include "render-object.h"
 #include "render-shader.h"
@@ -57,10 +56,6 @@ LIAPICALL (void, liren_render_draw_indexed_triangles_T2V3, (
 	int               index_count));
 
 LIAPICALL (LIRenShader*, liren_render_find_shader, (
-	LIRenRender* self,
-	const char*  name));
-
-LIAPICALL (LIRenImage*, liren_render_find_image, (
 	LIRenRender* self,
 	const char*  name));
 
@@ -103,5 +98,10 @@ LIAPICALL (int, liren_render_get_anisotropy, (
 LIAPICALL (void, liren_render_set_anisotropy, (
 	LIRenRender* self,
 	int          value));
+
+LIAPICALL (int, liren_render_get_image_size, (
+	LIRenRender* self,
+	const char*  name,
+	int*         result));
 
 #endif

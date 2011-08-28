@@ -161,6 +161,10 @@ struct _LIRenShader
 	LIRenShader32* v32;
 };
 
+LIAPICALL (LIRenImage*, liren_render_find_image, (
+	LIRenRender* self,
+	const char*  name));
+
 LIAPICALL (LIRenModel*, liren_render_find_model, (
 	LIRenRender* self,
 	int          id));
