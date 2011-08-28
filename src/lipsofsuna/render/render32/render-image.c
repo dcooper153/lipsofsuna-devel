@@ -23,6 +23,7 @@
  */
 
 #include "render.h"
+#include "render-context.h"
 #include "render-image.h"
 #include "render-private.h"
 #include "../render-private.h"
@@ -76,6 +77,9 @@ LIRenImage32* liren_image32_new_from_file (
 void liren_image32_free (
 	LIRenImage32* self)
 {
+	/* Make sure that the context doesn't refer to unused textures that are being freed. */
+	liren_context32_set_textures (self->render->context, NULL, 0);
+
 	if (self->texture != NULL)
 		liimg_texture_free (self->texture);
 	lisys_free (self->name);

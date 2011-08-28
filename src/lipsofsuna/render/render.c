@@ -33,6 +33,8 @@
 #include "internal/render-shader.h"
 #include "render32/render-private.h"
 
+#define LIREN_RENDER_TEXTURE_UNLOAD_TIME 10
+
 static void private_render_overlay (
 	LIRenRender*  self,
 	LIRenOverlay* overlay,
@@ -508,10 +510,24 @@ void liren_render_update (
 	LIRenRender* self,
 	float        secs)
 {
+	Uint32 now;
+	LIAlgStrdicIter iter;
+	LIRenImage* image;
+
+	/* Update the backend. */
 	if (self->v32 != NULL)
 		liren_render32_update (self->v32, secs);
 	else
 		liren_render21_update (self->v21, secs);
+
+	/* Free unused images. */
+	now = SDL_GetTicks ();
+	LIALG_STRDIC_FOREACH (iter, self->images)
+	{
+		image = iter.value;
+		if (!image->refs && image->timestamp < now + 1000 * LIREN_RENDER_TEXTURE_UNLOAD_TIME)
+			liren_image_free (image);
+	}
 }
 
 int liren_render_get_anisotropy (
