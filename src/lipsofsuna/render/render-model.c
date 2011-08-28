@@ -47,11 +47,20 @@ int liren_render_model_new (
 {
 	LIRenModel* self;
 
+	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIRenModel));
 	if (self == NULL)
 		return 0;
-	self->id = id;
 	self->render = render;
+
+	/* Choose a unique ID. */
+	while (!id)
+	{
+		id = lialg_random_range (&render->random, LINET_RANGE_RENDER_START, LINET_RANGE_RENDER_END);
+		if (lialg_u32dic_find (render->objects, id))
+			id = 0;
+	}
+	self->id = id;
 
 	/* Initialize the backend. */
 	if (render->v32 != NULL)
