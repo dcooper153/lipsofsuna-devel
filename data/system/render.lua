@@ -193,43 +193,6 @@ Render.class_setters = {
 
 ------------------------------------------------------------------------------
 
-Scene = Class()
-Scene.class_name = "Scene"
-
---- Creates a new scene rendering buffer.
--- @param clss Scene class.
--- @param args Arguments.
--- @return Scene.
-Scene.new = function(clss, args)
-	local self = Class.new(clss)
-	self.handle = Los.scene_new()
-	__userdata_lookup[self.handle] = self
-	if args then
-		for k,v in pairs(args) do self[k] = v end
-	end
-	return self
-end
-
---- Renders the scene.
--- @param self Scene.
--- @param args Arguments.<ul>
---   <li>hdr: True to enable HDR.</li>
---   <li>modelview: Modelview matrix.</li>
---   <li>multisamples: Number of multisamples. Pass arguments:</li>
---   <li>postproc_passes: Array of post-processing passes.<ul>
---     <li>mipmaps: True to generate mipmaps.</li>
---     <li>shader: Post-processing shader name.</li></ul></li>
---   <li>projection: Projection matrix.</li>
---   <li>render_passes: Array of render passes. Pass arguments:<ul>
---     <li>pass: Pass number.</li>
---     <li>sorting: True to enable sorting.</li></ul></li>
---   <li>viewport: Viewport array.</li></ul>
-Scene.render = function(self, args)
-	Los.scene_render(self.handle, args)
-end
-
-------------------------------------------------------------------------------
-
 Shader = Class()
 Shader.class_name = "Shader"
 

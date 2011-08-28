@@ -23,7 +23,6 @@
 
 #define LIEXT_SCRIPT_LIGHT "Light"
 #define LIEXT_SCRIPT_RENDER "Render"
-#define LIEXT_SCRIPT_SCENE "Scene"
 #define LIEXT_SCRIPT_SHADER "Shader"
 
 typedef struct _LIExtModule LIExtModule;
@@ -55,9 +54,6 @@ void liext_script_light (
 	LIScrScript* self);
 
 void liext_script_render (
-	LIScrScript* self);
-
-void liext_script_scene (
 	LIScrScript* self);
 
 void liext_script_shader (

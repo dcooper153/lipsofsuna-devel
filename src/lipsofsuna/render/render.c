@@ -27,6 +27,10 @@
 #include "render.h"
 #include "render-overlay.h"
 #include "render-private.h"
+#include "internal/render-buffer.h"
+#include "internal/render-framebuffer.h"
+#include "internal/render-model.h"
+#include "internal/render-shader.h"
 #include "render32/render-private.h"
 
 static void private_render_overlay (
@@ -134,7 +138,7 @@ void liren_render_free (
 	if (self->models != NULL)
 	{
 		LIALG_U32DIC_FOREACH (iter2, self->models)
-			liren_render_model_free (self, iter2.key);
+			liren_model_free (iter2.value);
 		lialg_u32dic_free (self->models);
 	}
 

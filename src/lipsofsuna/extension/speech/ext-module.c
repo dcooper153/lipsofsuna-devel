@@ -121,12 +121,8 @@ void liext_speeches_render (
 	LIFntLayoutGlyph* glyph;
 	LIMatMatrix matrix;
 	LIMatVector win;
-	LIRenShader* shader;
 	LIRenRender* render = self->client->render;
 
-	shader = liren_render_find_shader (render, "widget");
-	if (shader == NULL)
-		return;
 	matrix = limat_matrix_ortho (0, viewport[2], 0, viewport[3], -100.0f, 100.0f);
 	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
@@ -170,8 +166,9 @@ void liext_speeches_render (
 			for (i = 0 ; i < text->n_glyphs ; i++)
 			{
 				glyph = text->glyphs + i;
-				liren_render_draw_indexed_triangles_T2V3 (render, shader, &matrix,
-					glyph->font->texture, speech->diffuse, vertex_data, index_data + 6 * i, 6);
+				/* FIXME: Should use overlays. */
+/*				liren_render_draw_indexed_triangles_T2V3 (render, shader, &matrix,
+					glyph->font->texture, speech->diffuse, vertex_data, index_data + 6 * i, 6);*/
 			}
 
 			lisys_free (index_data);

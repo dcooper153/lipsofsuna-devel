@@ -15,30 +15,34 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_SHADER_H__
-#define __RENDER_SHADER_H__
+#ifndef __RENDER_INTERNAL_SHADER_H__
+#define __RENDER_INTERNAL_SHADER_H__
 
 #include "lipsofsuna/system.h"
 #include "render-types.h"
+#include "../render21/render-shader.h"
+#include "../render32/render-shader.h"
 
-#define LIREN_SHADER_PASS_COUNT 10
+struct _LIRenShader
+{
+	LIRenRender* render;
+	LIRenShader21* v21;
+	LIRenShader32* v32;
+};
 
-LIAPICALL (int, liren_render_shader_new, (
+LIAPICALL (LIRenShader*, liren_shader_new, (
 	LIRenRender* render,
 	const char*  name));
 
-LIAPICALL (void, liren_render_shader_free, (
-	LIRenRender* self,
-	const char*  shader));
+LIAPICALL (void, liren_shader_free, (
+	LIRenShader* self));
 
-LIAPICALL (void, liren_render_shader_clear_pass, (
-	LIRenRender* self,
-	const char*  shader,
+LIAPICALL (void, liren_shader_clear_pass, (
+	LIRenShader* self,
 	int          pass));
 
-LIAPICALL (int, liren_render_shader_compile, (
-	LIRenRender* self,
-	const char*  shader,
+LIAPICALL (int, liren_shader_compile, (
+	LIRenShader* self,
 	int          pass,
 	const char*  vertex,
 	const char*  geometry,
@@ -53,9 +57,8 @@ LIAPICALL (int, liren_render_shader_compile, (
 	int          depth_write,
 	GLenum       depth_func));
 
-LIAPICALL (void, liren_render_shader_set_sort, (
-	LIRenRender* self,
-	const char*  shader,
+LIAPICALL (void, liren_shader_set_sort, (
+	LIRenShader* self,
 	int          value));
 
 #endif

@@ -20,11 +20,10 @@
 
 #include "lipsofsuna/image.h"
 #include "lipsofsuna/system.h"
-#include "../render-types.h"
+#include "render-types.h"
 #include "../render21/render-image.h"
 #include "../render32/render-image.h"
 
-typedef struct _LIRenImage LIRenImage;
 struct _LIRenImage
 {
 	LIRenRender* render;

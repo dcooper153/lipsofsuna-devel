@@ -19,8 +19,7 @@
 #define __RENDER_INTERNAL_FRAMEBUFFER_H__
 
 #include "lipsofsuna/system.h"
-#include "../render.h"
-#include "../render-types.h"
+#include "render-types.h"
 #include "../render21/render-framebuffer.h"
 #include "../render32/render-framebuffer.h"
 

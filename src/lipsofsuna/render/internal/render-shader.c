@@ -18,78 +18,103 @@
 /**
  * \addtogroup LIRen Render
  * @{
+ * \addtogroup LIRenInternal Internal
+ * @{
  * \addtogroup LIRenShader Shader
  * @{
  */
 
 #include "lipsofsuna/system.h"
 #include "render-shader.h"
-#include "render-private.h"
-#include "internal/render-shader.h"
+#include "../render-private.h"
+#include "../render21/render-private.h"
+#include "../render32/render-private.h"
 
 /**
  * \brief Creates a new shader program.
  * \param render Renderer.
- * \param name Unique shader name.
+ * \param name Unique name.
  * \return New shader or NULL.
  */
-int liren_render_shader_new (
+LIRenShader* liren_shader_new (
 	LIRenRender* render,
 	const char*  name)
 {
 	LIRenShader* self;
 
-	self = lialg_strdic_find (render->shaders, name);
-	if (self != NULL)
-		return 0;
+	self = lisys_calloc (1, sizeof (LIRenShader));
+	if (self == NULL)
+		return NULL;
+	self->render = render;
 
-	self = liren_shader_new (render, name);
+	/* Initialize the backend. */
+	if (render->v32 != NULL)
+	{
+		self->v32 = liren_shader32_new (render->v32, name);
+		if (self->v32 == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
+	}
+	else
+	{
+		self->v21 = liren_shader21_new (render->v21, name);
+		if (self->v21 == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
+	}
 
-	return self != NULL;
+	/* Insert to dictionary. */
+	if (!lialg_strdic_insert (render->shaders, name, self))
+	{
+		liren_shader_free (self);
+		return NULL;
+	}
+
+	return self;
 }
 
 /**
  * \brief Frees the shader program.
- * \param self Renderer.
- * \param shader Shader name.
+ * \param self Shader.
  */
-void liren_render_shader_free (
-	LIRenRender* self,
-	const char*  shader)
+void liren_shader_free (
+	LIRenShader* self)
 {
-	LIRenShader* shader_;
-
-	shader_ = lialg_strdic_find (self->shaders, shader);
-	if (shader_ == NULL)
-		return;
-
-	liren_shader_free (shader_);
+	if (self->v32 != NULL)
+	{
+		lialg_strdic_remove (self->render->shaders, self->v32->name);
+		liren_shader32_free (self->v32);
+	}
+	if (self->v21 != NULL)
+	{
+		lialg_strdic_remove (self->render->shaders, self->v21->name);
+		liren_shader21_free (self->v21);
+	}
+	lisys_free (self);
 }
 
 /**
  * \brief Removes a pass from the shader.
- * \param self Renderer.
- * \param shader Shader name.
+ * \param self Shader.
  * \param pass Pass number.
  */
-void liren_render_shader_clear_pass (
-	LIRenRender* self,
-	const char*  shader,
+void liren_shader_clear_pass (
+	LIRenShader* self,
 	int          pass)
 {
-	LIRenShader* shader_;
-
-	shader_ = lialg_strdic_find (self->shaders, shader);
-	if (shader_ == NULL)
-		return;
-
-	liren_shader_clear_pass (shader_, pass);
+	if (self->v32 != NULL)
+		liren_shader32_clear_pass (self->v32, pass);
+	else
+		liren_shader21_clear_pass (self->v21, pass);
 }
 
 /**
  * \brief Recompiles the shader out of new code.
- * \param self Renderer.
- * \param shader Shader name.
+ * \param self Shader.
  * \param pass Pass number.
  * \param vertex Vertex shader code.
  * \param geometry Geometry shader code or NULL.
@@ -105,9 +130,8 @@ void liren_render_shader_clear_pass (
  * \param depth_func Depth test function.
  * \return Nonzero on success.
  */
-int liren_render_shader_compile (
-	LIRenRender* self,
-	const char*  shader,
+int liren_shader_compile (
+	LIRenShader* self,
 	int          pass,
 	const char*  vertex,
 	const char*  geometry,
@@ -122,30 +146,30 @@ int liren_render_shader_compile (
 	int          depth_write,
 	GLenum       depth_func)
 {
-	LIRenShader* shader_;
-
-	shader_ = lialg_strdic_find (self->shaders, shader);
-	if (shader_ == NULL)
-		return 0;
-
-	return liren_shader_compile (shader_, pass, vertex, geometry, fragment,
-		animated, alpha_to_coverage, blend_enable, blend_src, blend_dst,
-		color_write, depth_test, depth_write, depth_func);
+	if (self->v32 != NULL)
+	{
+		return liren_shader32_compile (self->v32, pass, vertex, geometry, fragment,
+			animated, alpha_to_coverage, blend_enable, blend_src, blend_dst,
+			color_write, depth_test, depth_write, depth_func);
+	}
+	else
+	{
+		return liren_shader21_compile (self->v21, pass, vertex, geometry, fragment,
+			animated, alpha_to_coverage, blend_enable, blend_src, blend_dst,
+			color_write, depth_test, depth_write, depth_func);
+	}
 }
 
-void liren_render_shader_set_sort (
-	LIRenRender* self,
-	const char*  shader,
+void liren_shader_set_sort (
+	LIRenShader* self,
 	int          value)
 {
-	LIRenShader* shader_;
-
-	shader_ = lialg_strdic_find (self->shaders, shader);
-	if (shader_ == NULL)
-		return;
-
-	liren_shader_set_sort (shader_, value);
+	if (self->v32 != NULL)
+		liren_shader32_set_sort (self->v32, value);
+	else
+		liren_shader21_set_sort (self->v21, value);
 }
 
+/** @} */
 /** @} */
 /** @} */

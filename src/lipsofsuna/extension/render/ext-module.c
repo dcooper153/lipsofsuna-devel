@@ -53,11 +53,9 @@ LIExtModule* liext_render_new (
 	/* Register classes. */
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_LIGHT, self);
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_RENDER, self);
-	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_SCENE, self);
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_SHADER, self);
 	liext_script_light (program->script);
 	liext_script_render (program->script);
-	liext_script_scene (program->script);
 	liext_script_shader (program->script);
 
 	return self;

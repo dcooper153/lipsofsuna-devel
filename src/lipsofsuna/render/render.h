@@ -20,11 +20,6 @@
 
 #include "lipsofsuna/paths.h"
 #include "lipsofsuna/system.h"
-#include "internal/render-buffer.h"
-#include "internal/render-framebuffer.h"
-#include "render-light.h"
-#include "render-object.h"
-#include "render-shader.h"
 #include "render-types.h"
 
 LIAPICALL (LIRenRender*, liren_render_new, (
@@ -32,32 +27,6 @@ LIAPICALL (LIRenRender*, liren_render_new, (
 
 LIAPICALL (void, liren_render_free, (
 	LIRenRender* self));
-
-LIAPICALL (void, liren_render_draw_clipped_buffer, (
-	LIRenRender*       self,
-	LIRenShader*       shader,
-	const LIMatMatrix* modelview,
-	const LIMatMatrix* projection,
-	GLuint             texture,
-	const float*       diffuse,
-	const int*         scissor,
-	int                start,
-	int                count,
-	LIRenBuffer*       buffer));
-
-LIAPICALL (void, liren_render_draw_indexed_triangles_T2V3, (
-	LIRenRender*      self,
-	LIRenShader*      shader,
-	LIMatMatrix*      matrix,
-	GLuint            texture,
-	const float*      diffuse,
-	const float*      vertex_data,
-	const LIRenIndex* index_data,
-	int               index_count));
-
-LIAPICALL (LIRenShader*, liren_render_find_shader, (
-	LIRenRender* self,
-	const char*  name));
 
 LIAPICALL (int, liren_render_load_image, (
 	LIRenRender* self,
@@ -75,18 +44,6 @@ LIAPICALL (void, liren_render_render, (
 	LIRenRender* self,
 	int          width,
 	int          height));
-
-LIAPICALL (void, liren_render_render_scene, (
-	LIRenRender*       self,
-	LIRenFramebuffer*  framebuffer,
-	const GLint*       viewport,
-	LIMatMatrix*       modelview,
-	LIMatMatrix*       projection,
-	LIMatFrustum*      frustum,
-	LIRenPassRender*   render_passes,
-	int                render_passes_num,
-	LIRenPassPostproc* postproc_passes,
-	int                postproc_passes_num));
 
 LIAPICALL (void, liren_render_update, (
 	LIRenRender* self,

@@ -22,10 +22,6 @@
 #include "lipsofsuna/video.h"
 #include "render-types-common.h"
 
-typedef struct _LIRenBuffer LIRenBuffer;
-typedef struct _LIRenFramebuffer LIRenFramebuffer;
-typedef struct _LIRenObject LIRenObject;
 typedef struct _LIRenRender LIRenRender;
-typedef struct _LIRenShader LIRenShader;
 
 #endif

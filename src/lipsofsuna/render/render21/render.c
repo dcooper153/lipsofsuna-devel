@@ -28,6 +28,7 @@
 #include "render-private.h"
 #include "../render.h"
 #include "../render-private.h"
+#include "../internal/render-shader.h"
 
 static void private_free_helpers (
 	LIRenRender21* self);

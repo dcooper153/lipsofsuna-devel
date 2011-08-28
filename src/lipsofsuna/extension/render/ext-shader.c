@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -28,8 +28,22 @@
 static const char* default_fragment_shader = "void main()\n{\nLOS_output_0 = vec4(1.0,1.0,1.0,1.0);\n}";
 static const char* default_vertex_shader = "void main()\n{\ngl_Position=vec4(LOS_coord,1.0);\n}";
 
-static void private_compile (
-	LIRenShader* shader,
+typedef struct _LIExtShader LIExtShader;
+struct _LIExtShader
+{
+	LIExtModule* module;
+	LIRenRender* render;
+	char* name;
+};
+
+static void private_shader_free (
+	LIExtShader* shader)
+{
+	liren_render_shader_free (shader->render, shader->name);
+}
+
+static void private_shader_compile (
+	LIExtShader* shader,
 	LIScrArgs*   args)
 {
 	int i;
@@ -87,7 +101,7 @@ static void private_compile (
 		snprintf (field_depth_test, sizeof (field_depth_test), "pass%d_depth_test", i + 1);
 		snprintf (field_depth_write, sizeof (field_depth_write), "pass%d_depth_write", i + 1);
 		snprintf (field_depth_func, sizeof (field_depth_func), "pass%d_depth_func", i + 1);
-		liren_shader_clear_pass (shader, i);
+		liren_render_shader_clear_pass (shader->render, shader->name, i);
 		if (liscr_args_gets_string (args, field_fragment, &fragment))
 		{
 			liscr_args_gets_bool (args, field_animated, &animated);
@@ -130,15 +144,19 @@ static void private_compile (
 				else if (!strcmp (tmpstr, "less"))
 					depth_func = GL_LESS;
 			}
-			if (!liren_shader_compile (shader, i, vertex, geometry, fragment, animated, alpha_coverage,
-			     blend_enable, blend_src, blend_dst, color_write, depth_test, depth_write, depth_func))
+			if (!liren_render_shader_compile (shader->render, shader->name, i,
+			     vertex, geometry, fragment, animated, alpha_coverage,
+			     blend_enable, blend_src, blend_dst, color_write,
+			     depth_test, depth_write, depth_func))
+			{
 				lisys_error_report ();
+			}
 		}
 	}
 
 	/* Setup sorting. */
 	if (liscr_args_gets_bool (args, "sort", &tmpbool))
-		liren_shader_set_sort (shader, tmpbool);
+		liren_render_shader_set_sort (shader->render, shader->name, tmpbool);
 }
 
 /*****************************************************************************/
@@ -148,32 +166,40 @@ static void Shader_new (LIScrArgs* args)
 	const char* name = "default";
 	LIExtModule* module;
 	LIScrData* data;
-	LIRenShader* shader;
+	LIExtShader* shader;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_SHADER);
 	liscr_args_gets_string (args, "name", &name);
 
-	/* Avoid duplicate names. */
-	shader = liren_render_find_shader (module->client->render, name);
-	if (shader != NULL)
-		return;
-
 	/* Allocate self. */
-	shader = liren_shader_new (module->client->render, name);
+	shader = lisys_calloc (1, sizeof (LIExtShader));
 	if (shader == NULL)
+		return;
+	shader->module = module;
+	shader->render = module->client->render;
+	shader->name = lisys_string_dup (name);
+	if (shader->name == NULL)
 	{
-		lisys_error_report ();
+		lisys_free (shader);
+		return;
+	}
+
+	/* Allocate the shader. */
+	if (!liren_render_shader_new (shader->render, name))
+	{
+		lisys_free (shader->name);
+		lisys_free (shader);
 		return;
 	}
 
 	/* Compile passes. */
-	private_compile (shader, args);
+	private_shader_compile (shader, args);
 
 	/* Allocate userdata. */
-	data = liscr_data_new (args->script, args->lua, shader, LIEXT_SCRIPT_SHADER, liren_shader_free);
+	data = liscr_data_new (args->script, args->lua, shader, LIEXT_SCRIPT_SHADER, private_shader_free);
 	if (data == NULL)
 	{
-		liren_shader_free (shader);
+		private_shader_free (shader);
 		return;
 	}
 	liscr_args_seti_stack (args);
@@ -181,7 +207,7 @@ static void Shader_new (LIScrArgs* args)
 
 static void Shader_compile (LIScrArgs* args)
 {
-	private_compile (args->self, args);
+	private_shader_compile (args->self, args);
 }
 
 /*****************************************************************************/

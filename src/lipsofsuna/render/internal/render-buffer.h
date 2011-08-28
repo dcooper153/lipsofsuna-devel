@@ -21,7 +21,7 @@
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/video.h"
-#include "../render-types.h"
+#include "render-types.h"
 #include "../render21/render-buffer.h"
 #include "../render32/render-buffer.h"
 

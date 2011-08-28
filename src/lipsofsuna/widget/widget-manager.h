@@ -39,7 +39,6 @@ struct _LIWdgManager
 	LIMatMatrix projection;
 	LIPthPaths* paths;
 	LIRenRender* render;
-	LIRenShader* shader;
 	struct
 	{
 		LIWdgWidget* top;

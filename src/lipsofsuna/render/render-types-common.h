@@ -46,12 +46,6 @@ enum _LIRenFlags
 	LIREN_FLAG_TEXTURING = 0x10, /* Render with texturing. */
 };
 
-enum _LIRenSelect
-{
-	LIREN_SELECT_OBJECT,
-	LIREN_SELECT_SECTOR,
-};
-
 enum
 {
 	LIREN_MATERIAL_FLAG_BILLBOARD = 0x010000,
@@ -65,8 +59,6 @@ typedef enum _LIRenFlags LIRenFlags;
 typedef struct _LIRenFormat LIRenFormat;
 typedef struct _LIRenPassRender LIRenPassRender;
 typedef struct _LIRenPassPostproc LIRenPassPostproc;
-typedef enum _LIRenSelect LIRenSelect;
-typedef struct _LIRenSelection LIRenSelection;
 typedef struct _LIRenVertex LIRenVertex;
 
 struct _LIRenFormat
@@ -90,14 +82,6 @@ struct _LIRenPassPostproc
 {
 	int mipmap;
 	char* shader;
-};
-
-struct _LIRenSelection
-{
-	LIRenSelect type;
-	float depth;
-	uint32_t object;
-	LIMatVector point;
 };
 
 struct _LIRenVertex
