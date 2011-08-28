@@ -227,14 +227,15 @@ Editor.load = function(self, name)
 end
 
 Editor.copy = function(self, args)
-	self.copybuffer = self.selection
+	self.copybuffer = deepcopy(self.selection)
 end
 
 Editor.paste = function(self, args)
 	--FIXME make objects spawn at cursor
-	--TODO Tile copying
+	--FIXME Tile copying
 	--TODO make pasted objects current selection
 	local point,object,tile = Target:pick_ray{camera = self.camera}
+	if self.highlight and self.selection[self.highlight.key] then point = self.selection[self.highlight.key].tile end
 	local prevpoint = nil
 	
 	--Calculate offset of pastebuffer objects
@@ -246,13 +247,27 @@ Editor.paste = function(self, args)
 				v.offset = prevpoint - v.object.position
 			end
 		end
+		if v.tile then
+			if not prevpoint then prevpoint = v.tile v.offset = Vector(0,0,0)
+			else
+				v.offset = prevpoint - v.tile
+			end
+		end
 	end
 	
 	--insert pastebuffer objects into world
 	for k,v in pairs(self.copybuffer) do
 		if v.object and point then
+			--if self.selection[1].object and then print "bas" point=self.selection[1].object.position end
 			EditorObject{position = point+v.offset, realized = true, spec = v.object.spec}
+		elseif v.tile and point then
+		--local mat = v.tile.material
+		local t,p = Voxel:find_tile{point = point+v.offset}
+		if p then
+			Voxel:set_tile(p, Voxel:get_tile(v.tile))
+		end 
 		end
+		
 	end
 end
 
@@ -603,4 +618,22 @@ Editor.update_rect_select = function(self)
 			end
 		end
 	end
+end
+
+function deepcopy(object)
+    local lookup_table = {}
+    local function _copy(object)
+        if type(object) ~= "table" then
+            return object
+        elseif lookup_table[object] then
+            return lookup_table[object]
+        end
+        local new_table = {}
+        lookup_table[object] = new_table
+        for index, value in pairs(object) do
+            new_table[_copy(index)] = _copy(value)
+        end
+        return setmetatable(new_table, getmetatable(object))
+    end
+    return _copy(object)
 end
