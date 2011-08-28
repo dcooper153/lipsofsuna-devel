@@ -136,40 +136,6 @@ void liren_render21_draw_clipped_buffer (
 	glPopAttrib ();
 }
 
-void liren_render21_draw_indexed_triangles_T2V3 (
-	LIRenRender21*    self,
-	LIRenShader21*    shader,
-	LIMatMatrix*      matrix,
-	GLuint            texture,
-	const float*      diffuse,
-	const float*      vertex_data,
-	const LIRenIndex* index_data,
-	int               index_count)
-{
-	int j;
-
-	/* Set the rendering mode. */
-	glEnable (GL_BLEND);
-	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable (GL_CULL_FACE);
-	glColor4fv (diffuse);
-	glDisable (GL_DEPTH_TEST);
-	glMatrixMode (GL_MODELVIEW);
-	glLoadIdentity ();
-	glMatrixMode (GL_PROJECTION);
-	glLoadMatrixf (matrix->m);
-	glBindTexture (GL_TEXTURE_2D, texture);
-
-	/* Draw the triangles. */
-	glBegin (GL_TRIANGLES);
-	for (j = 0 ; j < index_count ; j++)
-	{
-		glTexCoord2fv (vertex_data + 5 * index_data[j] + 0);
-		glVertex2fv (vertex_data + 5 * index_data[j] + 2);
-	}
-	glEnd ();
-}
-
 /**
  * \brief Finds a shader by name.
  * \param self Renderer.

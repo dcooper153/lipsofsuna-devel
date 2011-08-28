@@ -255,28 +255,6 @@ void liren_render_draw_clipped_buffer (
 	}
 }
 
-void liren_render_draw_indexed_triangles_T2V3 (
-	LIRenRender*      self,
-	LIRenShader*      shader,
-	LIMatMatrix*      matrix,
-	GLuint            texture,
-	const float*      diffuse,
-	const float*      vertex_data,
-	const LIRenIndex* index_data,
-	int               index_count)
-{
-	if (self->v32 != NULL)
-	{
-		liren_render32_draw_indexed_triangles_T2V3 (self->v32, shader->v32, matrix,
-			texture, diffuse, vertex_data, index_data, index_count);
-	}
-	else
-	{
-		liren_render21_draw_indexed_triangles_T2V3 (self->v21, shader->v21, matrix,
-			texture, diffuse, vertex_data, index_data, index_count);
-	}
-}
-
 /**
  * \brief Finds a shader by name.
  * \param self Renderer.
