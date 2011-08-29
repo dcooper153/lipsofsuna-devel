@@ -23,10 +23,9 @@
  */
 
 #include "lipsofsuna/system.h"
+#include "render.h"
 #include "render-model.h"
 #include "render-private.h"
-#include "../render.h"
-#include "../render-private.h"
 
 static const LIRenFormat private_vertex_format =
 {

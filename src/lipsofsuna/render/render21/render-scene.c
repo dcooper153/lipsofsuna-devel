@@ -25,9 +25,7 @@
 #include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-private.h"
-#include "render-scene.h"
-#include "../render.h"
-#include "../render-private.h"
+#include "../internal/render-internal.h"
 
 #define LIREN_SCENE21_MAX_LIGHTS 8
 

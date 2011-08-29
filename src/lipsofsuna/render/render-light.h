@@ -19,7 +19,6 @@
 #define __RENDER_LIGHT_H__
 
 #include "lipsofsuna/math.h"
-#include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-types.h"

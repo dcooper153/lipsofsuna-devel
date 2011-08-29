@@ -15,113 +15,13 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_PRIVATE_H__
-#define __RENDER_PRIVATE_H__
+#ifndef __RENDER_INTERNAL_RENDER_H__
+#define __RENDER_INTERNAL_RENDER_H__
 
-#include "lipsofsuna/algorithm.h"
+#include "lipsofsuna/paths.h"
 #include "render-types.h"
-#include "font/font.h"
-#include "font/font-layout.h"
-#include "image/image-texture.h"
-#include "internal/render-buffer.h"
-#include "internal/render-image.h"
-#include "render21/render.h"
-#include "render21/render-light.h"
-#include "render21/render-scene.h"
-#include "render32/render.h"
-#include "render32/render-buffer.h"
-#include "render32/render-framebuffer.h"
-#include "render32/render-image.h"
-#include "render32/render-light.h"
-#include "render32/render-material.h"
-#include "render32/render-model.h"
-#include "render32/render-object.h"
-#include "render32/render-scene.h"
-#include "render32/render-shader.h"
-
-/* #define LIREN_ENABLE_PROFILING */
-
-typedef struct _LIRenLight LIRenLight;
-typedef struct _LIRenOverlay LIRenOverlay;
-typedef struct _LIRenOverlayElement LIRenOverlayElement;
-
-struct _LIRenLight
-{
-	int id;
-	LIRenRender* render;
-	LIRenLight21* v21;
-	LIRenLight32* v32;
-};
-
-struct _LIRenModel
-{
-	int id;
-	LIRenRender* render;
-	LIRenModel21* v21;
-	LIRenModel32* v32;
-};
-
-struct _LIRenObject
-{
-	int id;
-	LIRenModel* model;
-	LIRenRender* render;
-	LIRenObject21* v21;
-	LIRenObject32* v32;
-};
-
-struct _LIRenOverlay
-{
-	int id;
-	int behind;
-	int visible;
-	LIMatVector position;
-	LIRenBuffer* buffer;
-	LIRenOverlay* parent;
-	LIRenRender* render;
-	struct
-	{
-		int count;
-		LIRenOverlayElement* array;
-	} elements;
-	struct
-	{
-		int count;
-		LIRenOverlay** array;
-	} overlays;
-	struct
-	{
-		int count;
-		LIRenVertex* array;
-	} vertices;
-	struct
-	{
-		int enabled;
-		int samples;
-		int hdr;
-		GLint viewport[4];
-		LIMatMatrix modelview;
-		LIMatMatrix projection;
-		LIMatFrustum frustum;
-		LIRenFramebuffer* framebuffer;
-		LIRenPassRender* render_passes;
-		int render_passes_num;
-		LIRenPassPostproc* postproc_passes;
-		int postproc_passes_num;
-	} scene;
-};
-
-struct _LIRenOverlayElement
-{
-	int buffer_start;
-	int buffer_count;
-	float color[4];
-	int scissor_enabled;
-	GLint scissor_rect[4];
-	LIFntFont* font;
-	LIRenImage* image;
-	LIRenShader* shader;
-};
+#include "../render21/render.h"
+#include "../render32/render.h"
 
 struct _LIRenRender
 {

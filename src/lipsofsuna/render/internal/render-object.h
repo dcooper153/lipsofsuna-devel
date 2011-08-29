@@ -15,21 +15,20 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER21_TYPES_H__
-#define __RENDER21_TYPES_H__
+#ifndef __RENDER_INTERNAL_OBJECT_H__
+#define __RENDER_INTERNAL_OBJECT_H__
 
-#include "lipsofsuna/math.h"
-#include "lipsofsuna/video.h"
-#include "../render-types.h"
+#include "render-types.h"
+#include "../render21/render-object.h"
+#include "../render32/render-object.h"
 
-typedef struct _LIRenBuffer21 LIRenBuffer21;
-typedef struct _LIRenFramebuffer21 LIRenFramebuffer21;
-typedef struct _LIRenImage21 LIRenImage21;
-typedef struct _LIRenLight21 LIRenLight21;
-typedef struct _LIRenMaterial21 LIRenMaterial21;
-typedef struct _LIRenModel21 LIRenModel21;
-typedef struct _LIRenObject21 LIRenObject21;
-typedef struct _LIRenRender21 LIRenRender21;
-typedef struct _LIRenShader21 LIRenShader21;
+struct _LIRenObject
+{
+	int id;
+	LIRenModel* model;
+	LIRenRender* render;
+	LIRenObject21* v21;
+	LIRenObject32* v32;
+};
 
 #endif

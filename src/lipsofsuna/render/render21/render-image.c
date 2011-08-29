@@ -25,8 +25,7 @@
 #include "render.h"
 #include "render-image.h"
 #include "render-private.h"
-#include "../render-private.h"
-#include "../internal/render-image.h"
+#include "../internal/render-internal.h"
 
 static int private_init (
 	LIRenImage21* self,

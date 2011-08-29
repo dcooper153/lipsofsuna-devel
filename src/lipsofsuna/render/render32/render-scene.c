@@ -27,10 +27,8 @@
 #include "render-context.h"
 #include "render-lighting.h"
 #include "render-private.h"
-#include "render-scene.h"
 #include "render-sort.h"
-#include "../render.h"
-#include "../render-private.h"
+#include "../internal/render-internal.h"
 
 #define LIREN_LIGHT_MAXIMUM_RATING 100.0f
 #define LIREN_PARTICLE_MAXIMUM_COUNT 1000

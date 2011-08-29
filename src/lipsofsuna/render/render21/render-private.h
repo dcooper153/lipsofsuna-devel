@@ -23,6 +23,7 @@
 #include "lipsofsuna/paths.h"
 #include "render-types.h"
 #include "../image/image-texture.h"
+#include "../internal/render-internal.h"
 
 struct _LIRenBuffer21
 {

@@ -27,7 +27,6 @@
 #include "render-lighting.h"
 #include "render-object.h"
 #include "render-private.h"
-#include "render-scene.h"
 
 static void private_bounds_update (
 	LIRenObject32* self);

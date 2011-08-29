@@ -157,12 +157,6 @@ static int private_model_free (
 {
 	lisys_assert (model != NULL);
 
-	/* Remove from objects. */
-	/* Keeping the model alive when it's assigned to objects is the job of scripts.
-	   If they don't reference the model, we'll remove it even if it's in use. We
-	   prevent crashing by removing it from objects in such a case. */
-	liren_render_remove_model (self->render, model->id);
-
 	liren_render_model_free (self->render, model->id);
 
 	return 1;

@@ -25,7 +25,10 @@
 typedef struct _LIRenBuffer LIRenBuffer;
 typedef struct _LIRenFramebuffer LIRenFramebuffer;
 typedef struct _LIRenImage LIRenImage;
+typedef struct _LIRenLight LIRenLight;
 typedef struct _LIRenObject LIRenObject;
+typedef struct _LIRenOverlay LIRenOverlay;
+typedef struct _LIRenOverlayElement LIRenOverlayElement;
 typedef struct _LIRenModel LIRenModel;
 typedef struct _LIRenShader LIRenShader;
 

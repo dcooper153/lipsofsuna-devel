@@ -23,8 +23,7 @@
  */
 
 #include "render-overlay.h"
-#include "render-private.h"
-#include "internal/render-framebuffer.h"
+#include "internal/render-internal.h"
 
 static void private_free (
 	LIRenOverlay* self);

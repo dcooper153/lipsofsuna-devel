@@ -26,7 +26,6 @@
 #include "lipsofsuna/system.h"
 #include "render-object.h"
 #include "render-private.h"
-#include "render-scene.h"
 
 static void private_lights_clear (
 	LIRenObject21* self);

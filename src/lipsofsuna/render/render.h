@@ -50,10 +50,6 @@ LIAPICALL (void, liren_render_reload, (
 	LIRenRender* self,
 	int          pass));
 
-LIAPICALL (void, liren_render_remove_model, (
-	LIRenRender* self,
-	int          id));
-
 LIAPICALL (void, liren_render_render, (
 	LIRenRender* self,
 	int          width,

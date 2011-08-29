@@ -26,11 +26,8 @@
 #include "lipsofsuna/video.h"
 #include "render.h"
 #include "render-overlay.h"
-#include "render-private.h"
-#include "internal/render-buffer.h"
-#include "internal/render-framebuffer.h"
-#include "internal/render-model.h"
-#include "internal/render-shader.h"
+#include "internal/render-internal.h"
+#include "render21/render-private.h"
 #include "render32/render-private.h"
 
 #define LIREN_RENDER_TEXTURE_UNLOAD_TIME 10
@@ -231,73 +228,6 @@ int liren_render_load_font (
 	return 1;
 }
 
-void liren_render_draw_clipped_buffer (
-	LIRenRender*       self,
-	LIRenShader*       shader,
-	const LIMatMatrix* modelview,
-	const LIMatMatrix* projection,
-	GLuint             texture,
-	const float*       diffuse,
-	const int*         scissor,
-	int                start,
-	int                count,
-	LIRenBuffer*       buffer)
-{
-	if (self->v32 != NULL)
-	{
-		liren_render32_draw_clipped_buffer (self->v32, shader->v32, modelview,
-			projection, texture, diffuse, scissor, start, count, buffer->v32);
-	}
-	else
-	{
-		liren_render21_draw_clipped_buffer (self->v21, shader->v21, modelview,
-			projection, texture, diffuse, scissor, start, count, buffer->v21);
-	}
-}
-
-/**
- * \brief Finds a shader by name.
- * \param self Renderer.
- * \param name Name of the shader.
- * \return Shader or NULL.
- */
-LIRenShader* liren_render_find_shader (
-	LIRenRender* self,
-	const char*  name)
-{
-	return lialg_strdic_find (self->shaders, name);
-}
-
-/**
- * \brief Finds a texture by name.
- *
- * Searches for a texture from the texture cache and returns the match, if any.
- * If no match is found, NULL is returned.
- *
- * \param self Renderer.
- * \param name Name of the texture.
- * \return Texture or NULL.
- */
-LIRenImage* liren_render_find_image (
-	LIRenRender* self,
-	const char*  name)
-{
-	return lialg_strdic_find (self->images, name);
-}
-
-/**
- * \brief Finds a model by ID.
- * \param self Renderer.
- * \param id Model ID.
- * \return Model.
- */
-LIRenModel* liren_render_find_model (
-	LIRenRender* self,
-	int          id)
-{
-	return lialg_u32dic_find (self->models, id);
-}
-
 /**
  * \brief Forces the renderer to load or reload a texture image.
  *
@@ -405,22 +335,6 @@ void liren_render_reload (
 		liren_render21_reload (self->v21, pass);
 }
 
-void liren_render_remove_model (
-	LIRenRender* self,
-	int          id)
-{
-	LIRenModel* model;
-
-	model = lialg_u32dic_find (self->models, id);
-	if (model == NULL)
-		return;
-
-	if (model->v32 != NULL)
-		return liren_render32_remove_model (self->v32, model->v32);
-	else
-		return liren_render21_remove_model (self->v21, model->v21);
-}
-
 /**
  * \brief Renders the overlays.
  * \param self Renderer.
@@ -438,45 +352,6 @@ void liren_render_render (
 	if (self->root_overlay != NULL)
 		private_render_overlay (self, self->root_overlay, width, height);
 	SDL_GL_SwapBuffers ();
-}
-
-/**
- * \brief Renders the scene.
- * \param self Renderer.
- * \param framebuffer Render target framebuffer.
- * \param viewport Viewport array.
- * \param modelview Modelview matrix of the camera.
- * \param projection Projeciton matrix of the camera.
- * \param frustum Frustum of the camera.
- * \param render_passes Array of render passes.
- * \param render_passes_num Number of render passes.
- * \param postproc_passes Array of post-processing passes.
- * \param postproc_passes_num Number of post-processing passes.
- */
-void liren_render_render_scene (
-	LIRenRender*       self,
-	LIRenFramebuffer*  framebuffer,
-	const GLint*       viewport,
-	LIMatMatrix*       modelview,
-	LIMatMatrix*       projection,
-	LIMatFrustum*      frustum,
-	LIRenPassRender*   render_passes,
-	int                render_passes_num,
-	LIRenPassPostproc* postproc_passes,
-	int                postproc_passes_num)
-{
-	if (self->v32 != NULL)
-	{
-		return liren_render32_render (self->v32, framebuffer->v32, viewport,
-			modelview, projection, frustum, render_passes, render_passes_num,
-			postproc_passes, postproc_passes_num);
-	}
-	else
-	{
-		return liren_render21_render (self->v21, framebuffer->v21, viewport,
-			modelview, projection, frustum, render_passes, render_passes_num,
-			postproc_passes, postproc_passes_num);
-	}
 }
 
 /**

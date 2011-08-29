@@ -27,6 +27,7 @@
 #include "render-program.h"
 #include "render-types.h"
 #include "../image/image-texture.h"
+#include "../internal/render-internal.h"
 
 #define LIREN_SHADER_PASS_COUNT 10
 

@@ -25,7 +25,7 @@
 #include "lipsofsuna/network.h"
 #include "lipsofsuna/system.h"
 #include "render-model.h"
-#include "render-private.h"
+#include "internal/render.h"
 #include "internal/render-model.h"
 #include "render32/render-private.h"
 

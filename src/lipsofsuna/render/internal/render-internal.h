@@ -15,38 +15,18 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER32_SCENE_H__
-#define __RENDER32_SCENE_H__
+#ifndef __RENDER_INTERNAL_INTERNAL_H__
+#define __RENDER_INTERNAL_INTERNAL_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/system.h>
+#include "render.h"
+#include "render-buffer.h"
 #include "render-framebuffer.h"
+#include "render-image.h"
 #include "render-light.h"
+#include "render-model.h"
 #include "render-object.h"
+#include "render-overlay.h"
+#include "render-shader.h"
 #include "render-types.h"
-
-LIAPICALL (void, liren_render32_insert_light, (
-	LIRenRender32* self,
-	LIRenLight32*  light));
-
-LIAPICALL (void, liren_render32_remove_light, (
-	LIRenRender32* self,
-	LIRenLight32*  light));
-
-LIAPICALL (void, liren_render32_remove_model, (
-	LIRenRender32* self,
-	LIRenModel32*  model));
-
-LIAPICALL (void, liren_render32_render, (
-	LIRenRender32*      self,
-	LIRenFramebuffer32* framebuffer,
-	const GLint*        viewport,
-	LIMatMatrix*        modelview,
-	LIMatMatrix*        projection,
-	LIMatFrustum*       frustum,
-	LIRenPassRender*    render_passes,
-	int                 render_passes_num,
-	LIRenPassPostproc*  postproc_passes,
-	int                 postproc_passes_num));
 
 #endif

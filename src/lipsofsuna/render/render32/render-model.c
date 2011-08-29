@@ -28,8 +28,7 @@
 #include "render-lod.h"
 #include "render-model.h"
 #include "render-private.h"
-#include "../render.h"
-#include "../render-private.h"
+#include "../internal/render-internal.h"
 
 static void private_clear_materials (
 	LIRenModel32* self);

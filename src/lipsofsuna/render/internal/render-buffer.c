@@ -24,8 +24,7 @@
  * @{
  */
 
-#include "render-buffer.h"
-#include "../render-private.h"
+#include "render-internal.h"
 
 /**
  * \brief Allocates a vertex buffer.

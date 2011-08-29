@@ -24,7 +24,7 @@
 
 #include "lipsofsuna/system.h"
 #include "render-shader.h"
-#include "render-private.h"
+#include "internal/render.h"
 #include "internal/render-shader.h"
 
 /**

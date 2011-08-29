@@ -58,6 +58,10 @@ LIAPICALL (LIRenModel21*, liren_render21_find_model, (
 	LIRenRender21* self,
 	int            id));
 
+LIAPICALL (int, liren_render21_insert_light, (
+	LIRenRender21* self,
+	LIRenLight21*  light));
+
 LIAPICALL (LIRenImage21*, liren_render21_load_image, (
 	LIRenRender21* self,
 	const char*    name));
@@ -69,6 +73,26 @@ LIAPICALL (void, liren_render21_reload, (
 LIAPICALL (int, liren_render21_reload_image, (
 	LIRenRender21* self,
 	LIRenImage21*  image));
+
+LIAPICALL (void, liren_render21_remove_light, (
+	LIRenRender21* self,
+	LIRenLight21*  light));
+
+LIAPICALL (void, liren_render21_remove_model, (
+	LIRenRender21* self,
+	LIRenModel21*  model));
+
+LIAPICALL (void, liren_render21_render, (
+	LIRenRender21*      self,
+	LIRenFramebuffer21* framebuffer,
+	const GLint*        viewport,
+	LIMatMatrix*        modelview,
+	LIMatMatrix*        projection,
+	LIMatFrustum*       frustum,
+	LIRenPassRender*    render_passes,
+	int                 render_passes_num,
+	LIRenPassPostproc*  postproc_passes,
+	int                 postproc_passes_num));
 
 LIAPICALL (void, liren_render21_update, (
 	LIRenRender21* self,

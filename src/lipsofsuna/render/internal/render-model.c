@@ -24,11 +24,20 @@
  * @{
  */
 
-#include "render-model.h"
+#include "render-internal.h"
 
 void liren_model_free (
 	LIRenModel* self)
 {
+	/* Remove from objects. */
+	/* Keeping the model alive when it's assigned to objects is the job of scripts.
+	   If they don't reference the model, we'll remove it even if it's in use. We
+	   prevent crashing by removing it from objects in such a case. */
+	if (self->v32 != NULL)
+		liren_render32_remove_model (self->render->v32, self->v32);
+	else
+		liren_render21_remove_model (self->render->v21, self->v21);
+
 	lialg_u32dic_remove (self->render->models, self->id);
 	if (self->v32 != NULL)
 		liren_model32_free (self->v32);

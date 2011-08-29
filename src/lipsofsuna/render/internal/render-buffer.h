@@ -18,7 +18,6 @@
 #ifndef __RENDER_INTERNAL_BUFFER_H__
 #define __RENDER_INTERNAL_BUFFER_H__
 
-#include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/video.h"
 #include "render-types.h"

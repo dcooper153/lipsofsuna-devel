@@ -25,8 +25,7 @@
 #include "lipsofsuna/system.h"
 #include "render-light.h"
 #include "render-private.h"
-#include "../render.h"
-#include "../render-private.h"
+#include "../internal/render-internal.h"
 
 /**
  * \brief Creates a new light source.

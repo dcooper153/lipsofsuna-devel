@@ -21,7 +21,16 @@
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "render-types.h"
-#include "../render-private.h"
+#include "../render21/render-model.h"
+#include "../render32/render-model.h"
+
+struct _LIRenModel
+{
+	int id;
+	LIRenRender* render;
+	LIRenModel21* v21;
+	LIRenModel32* v32;
+};
 
 LIAPICALL (void, liren_model_free, (
 	LIRenModel* self));

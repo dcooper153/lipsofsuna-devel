@@ -28,8 +28,7 @@
 #include "render-private.h"
 #include "render-particles.h"
 #include "render-sort.h"
-#include "../render.h"
-#include "../render-private.h"
+#include "../internal/render-internal.h"
 
 #define TIMESCALE 0.02f
 

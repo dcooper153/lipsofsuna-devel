@@ -23,7 +23,6 @@
 #include "render-buffer-texture.h"
 #include "render-light.h"
 #include "render-material.h"
-#include "render-scene.h"
 #include "render-types.h"
 #include "render-mesh.h"
 #include "render-uniforms.h"
