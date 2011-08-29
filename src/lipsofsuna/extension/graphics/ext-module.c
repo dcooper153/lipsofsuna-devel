@@ -78,6 +78,7 @@ LIExtModule* liext_graphics_new (
 	}
 
 	/* Extend scripts. */
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_GRAPHICS, self);
 	liext_script_graphics (program->script);
 
 	return self;

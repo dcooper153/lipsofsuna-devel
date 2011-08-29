@@ -128,7 +128,7 @@ static void Widget_canvas_enable_scene (LIScrArgs* args)
 	int postproc_passes_num = 0;
 	int render_passes_num = 0;
 	char* shader;
-	GLint viewport[4];
+	int viewport[4];
 	LIExtModule* module;
 	LIMatFrustum frustum;
 	LIMatMatrix modelview;

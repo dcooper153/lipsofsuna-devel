@@ -20,7 +20,6 @@
 
 #include "lipsofsuna/math.h"
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
 #include "render-mesh.h"
 #include "render-types.h"
 

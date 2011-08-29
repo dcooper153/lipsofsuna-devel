@@ -18,9 +18,8 @@
 #ifndef __RENDER32_LIGHTING_H__
 #define __RENDER32_LIGHTING_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/system.h>
-#include <lipsofsuna/video.h>
+#include "lipsofsuna/algorithm.h"
+#include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-light.h"
 #include "render-types.h"

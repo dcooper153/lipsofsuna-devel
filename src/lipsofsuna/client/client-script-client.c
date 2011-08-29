@@ -45,68 +45,19 @@ static void Client_host (LIScrArgs* args)
 
 static void Client_screenshot (LIScrArgs* args)
 {
-	int i;
-	int width;
-	int height;
-	int pitch;
 	char* home;
 	char* file;
 	char* path;
-	uint32_t rmask;
-	uint32_t gmask;
-	uint32_t bmask;
-	uint32_t amask;
-	uint8_t* pixels;
-	SDL_Surface* surface;
+	void* pixels;
 	LICliClient* client;
+	SDL_Surface* surface;
 
-	/* Get window size. */
+	/* Capture the screen. */
 	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
-	width = client->mode.width;
-	height = client->mode.height;
-	pitch = 4 * width;
-
-	/* Capture pixel data. */
-	/* The one extra row we allocate is used for flipping. */
-	pixels = calloc ((height + 1) * pitch, sizeof (uint8_t));
-	if (pixels == NULL)
-		return;
-	glBindFramebuffer (GL_FRAMEBUFFER, 0);
-	glBindFramebuffer (GL_DRAW_FRAMEBUFFER, 0);
-	glBindFramebuffer (GL_READ_FRAMEBUFFER, 0);
-	glReadPixels (0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
-
-	/* Flip the image vertically. */
-	/* We use the extra row as temporary storage. */
-	for (i = 0 ; i < height / 2 ; i++)
-	{
-		memcpy (pixels + pitch * height, pixels + pitch * i, pitch);
-		memcpy (pixels + pitch * i, pixels + pitch * (height - i - 1), pitch);
-		memcpy (pixels + pitch * (height - i - 1), pixels + pitch * height, pitch);
-	}
-
-	/* Create a temporary SDL surface. */
-	if (lisys_endian_big ())
-	{
-		rmask = 0xFF000000;
-		gmask = 0x00FF0000;
-		bmask = 0x0000FF00;
-		amask = 0x000000FF;
-	}
-	else
-	{
-		rmask = 0x000000FF;
-		gmask = 0x0000FF00;
-		bmask = 0x00FF0000;
-		amask = 0xFF000000;
-	}
-	surface = SDL_CreateRGBSurfaceFrom(pixels, width, height,
-		32, pitch, rmask, gmask, bmask, amask);
+	surface = liren_render_screenshot (client->render);
 	if (surface == NULL)
-	{
-		lisys_free (pixels);
 		return;
-	}
+	pixels = surface->pixels;
 
 	/* Construct file path. */
 	home = lisys_paths_get_home ();

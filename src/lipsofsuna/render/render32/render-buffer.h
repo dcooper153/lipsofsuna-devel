@@ -18,9 +18,8 @@
 #ifndef __RENDER32_BUFFER_H__
 #define __RENDER32_BUFFER_H__
 
-#include <lipsofsuna/model.h>
-#include <lipsofsuna/system.h>
-#include <lipsofsuna/video.h>
+#include "lipsofsuna/model.h"
+#include "lipsofsuna/system.h"
 #include "render-material.h"
 #include "render-types.h"
 

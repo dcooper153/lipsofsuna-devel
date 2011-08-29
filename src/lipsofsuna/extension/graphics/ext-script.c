@@ -26,10 +26,12 @@
 
 static void Program_get_opengl_version (LIScrArgs* args)
 {
-	if (GLEW_VERSION_3_2)
-		liscr_args_seti_float (args, 3.2f);
-	else
-		liscr_args_seti_float (args, 2.1f);
+	float v;
+	LIExtModule* module;
+
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
+	v = liren_render_get_opengl_version (module->client->render);
+	liscr_args_seti_float (args, v);
 }
 
 /*****************************************************************************/

@@ -18,8 +18,8 @@
 #ifndef __RENDER32_TYPES_H__
 #define __RENDER32_TYPES_H__
 
+#include <GL/glew.h>
 #include "lipsofsuna/math.h"
-#include "lipsofsuna/video.h"
 #include "../render-types.h"
 
 typedef struct _LIRenBuffer32 LIRenBuffer32;

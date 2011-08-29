@@ -18,7 +18,6 @@
 #ifndef __RENDER32_UNIFORM_H__
 #define __RENDER32_UNIFORM_H__
 
-#include <lipsofsuna/video.h>
 #include "render-types.h"
 
 enum

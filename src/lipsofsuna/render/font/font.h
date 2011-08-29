@@ -19,9 +19,10 @@
 #define __FONT_H__
 
 #include <wchar.h>
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/system.h>
-#include <lipsofsuna/video.h>
+#include "SDL_ttf.h"
+#include <GL/glew.h>
+#include "lipsofsuna/algorithm.h"
+#include "lipsofsuna/system.h"
 
 #define LIFNT_CACHE_WIDTH 1024
 #define LIFNT_CACHE_HEIGHT 1024

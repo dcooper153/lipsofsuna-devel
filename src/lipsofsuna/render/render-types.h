@@ -20,22 +20,6 @@
 
 #include "lipsofsuna/math.h"
 #include "lipsofsuna/model.h"
-#include "lipsofsuna/video.h"
-
-#if defined LIMDL_VERTEX_WEIGHT_UINT8
-#define LIREN_WEIGHT_FORMAT GL_UNSIGNED_BYTE
-#elif defined LIMDL_VERTEX_WEIGHT_UINT16
-#define LIREN_WEIGHT_FORMAT GL_UNSIGNED_SHORT
-#else
-#define LIREN_WEIGHT_FORMAT GL_FLOAT
-#endif
-
-enum
-{
-	LIREN_BUFFER_TYPE_DYNAMIC,
-	LIREN_BUFFER_TYPE_STATIC,
-	LIREN_BUFFER_TYPE_STREAM
-};
 
 enum _LIRenFlags
 {

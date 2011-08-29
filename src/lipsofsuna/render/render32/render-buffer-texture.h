@@ -18,7 +18,7 @@
 #ifndef __RENDER32_BUFFER_TEXTURE_H__
 #define __RENDER32_BUFFER_TEXTURE_H__
 
-#include "lipsofsuna/video.h"
+#include "render-types.h"
 
 typedef struct _LIRenBufferTexture32 LIRenBufferTexture32;
 struct _LIRenBufferTexture32

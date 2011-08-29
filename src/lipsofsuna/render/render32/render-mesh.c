@@ -18,6 +18,7 @@
 #include "render.h"
 #include "render-attribute.h"
 #include "render-mesh.h"
+#include "../internal/render-internal.h"
 
 /**
  * \addtogroup LIRen Render

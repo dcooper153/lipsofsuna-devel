@@ -18,6 +18,7 @@
 #ifndef __CLIENT_H__
 #define __CLIENT_H__
 
+#include "SDL.h"
 #include "lipsofsuna/algorithm.h"
 #include "lipsofsuna/callback.h"
 #include "lipsofsuna/engine.h"
@@ -26,7 +27,6 @@
 #include "lipsofsuna/render.h"
 #include "lipsofsuna/script.h"
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
 #include "lipsofsuna/widget.h"
 #include "client-server.h"
 #include "client-types.h"

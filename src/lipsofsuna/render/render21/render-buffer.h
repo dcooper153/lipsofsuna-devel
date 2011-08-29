@@ -19,7 +19,6 @@
 #define __RENDER21_BUFFER_H__
 
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
 #include "render-types.h"
 
 LIAPICALL (LIRenBuffer21*, liren_buffer21_new, (

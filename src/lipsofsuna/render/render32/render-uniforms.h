@@ -19,7 +19,7 @@
 #define __RENDER32_UNIFORMS_H__
 
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
+#include "render-types.h"
 #include "render-uniform.h"
 
 #define LIREN_UNIFORM_BUFFER_SIZE 1600

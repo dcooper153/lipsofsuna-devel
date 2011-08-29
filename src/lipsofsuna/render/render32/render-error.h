@@ -18,8 +18,8 @@
 #ifndef __RENDER32_ERROR_H__
 #define __RENDER32_ERROR_H__
 
-#include <lipsofsuna/system.h>
-#include <lipsofsuna/video.h>
+#include "lipsofsuna/system.h"
+#include "render-types.h"
 
 LIAPICALL (int, liren_error32_get, ());
 

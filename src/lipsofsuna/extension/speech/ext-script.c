@@ -58,7 +58,7 @@ static void Speech_add (LIScrArgs* args)
 
 static void Speech_draw (LIScrArgs* args)
 {
-	GLint viewport[4];
+	int viewport[4];
 	LIExtModule* module;
 	LIMatMatrix modelview;
 	LIMatMatrix projection;

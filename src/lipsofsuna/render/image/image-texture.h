@@ -19,7 +19,6 @@
 #define __IMAGE_TEXTURE_H__
 
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
 
 typedef struct _LIImgTexture LIImgTexture;
 struct _LIImgTexture

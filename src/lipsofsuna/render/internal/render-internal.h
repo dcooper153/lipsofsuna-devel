@@ -18,6 +18,11 @@
 #ifndef __RENDER_INTERNAL_INTERNAL_H__
 #define __RENDER_INTERNAL_INTERNAL_H__
 
+#include "SDL.h"
+#include "SDL_main.h"
+#include "SDL_ttf.h"
+#include <GL/glew.h>
+
 #include "render.h"
 #include "render-buffer.h"
 #include "render-framebuffer.h"
@@ -28,5 +33,13 @@
 #include "render-overlay.h"
 #include "render-shader.h"
 #include "render-types.h"
+
+#if defined LIMDL_VERTEX_WEIGHT_UINT8
+#define LIREN_WEIGHT_FORMAT GL_UNSIGNED_BYTE
+#elif defined LIMDL_VERTEX_WEIGHT_UINT16
+#define LIREN_WEIGHT_FORMAT GL_UNSIGNED_SHORT
+#else
+#define LIREN_WEIGHT_FORMAT GL_FLOAT
+#endif
 
 #endif

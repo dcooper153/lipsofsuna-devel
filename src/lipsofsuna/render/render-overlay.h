@@ -40,7 +40,7 @@ LIAPICALL (void, liren_render_overlay_add_triangles, (
 	const char*        shader,
 	const char*        image,
 	const float*       color,
-	const GLint*       scissor,
+	const int*         scissor,
 	const LIRenVertex* verts,
 	int                count));
 
@@ -51,7 +51,7 @@ LIAPICALL (void, liren_render_overlay_add_text, (
 	const char*  font,
 	const char*  text,
 	const float* color,
-	const GLint* scissor,
+	const int*   scissor,
 	const int*   pos,
 	const int*   size,
 	const float* align));
@@ -75,7 +75,7 @@ LIAPICALL (void, liren_render_overlay_enable_scene, (
 	int                id,
 	int                samples,
 	int                hdr,
-	const GLint*       viewport,
+	const int*         viewport,
 	LIMatMatrix*       modelview,
 	LIMatMatrix*       projection,
 	LIMatFrustum*      frustum,

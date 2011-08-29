@@ -19,10 +19,16 @@
 #define __RENDER_INTERNAL_BUFFER_H__
 
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
 #include "render-types.h"
 #include "../render21/render-buffer.h"
 #include "../render32/render-buffer.h"
+
+enum
+{
+	LIREN_BUFFER_TYPE_DYNAMIC,
+	LIREN_BUFFER_TYPE_STATIC,
+	LIREN_BUFFER_TYPE_STREAM
+};
 
 struct _LIRenBuffer
 {

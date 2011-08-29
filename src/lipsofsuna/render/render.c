@@ -23,7 +23,6 @@
  */
 
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
 #include "render.h"
 #include "render-overlay.h"
 #include "internal/render-internal.h"
@@ -31,6 +30,9 @@
 #include "render32/render-private.h"
 
 #define LIREN_RENDER_TEXTURE_UNLOAD_TIME 10
+
+static int private_init_glew (
+	LIRenRender* self);
 
 static void private_render_overlay (
 	LIRenRender*  self,
@@ -383,6 +385,70 @@ void liren_render_render (
 	SDL_GL_SwapBuffers ();
 }
 
+SDL_Surface* liren_render_screenshot (
+	LIRenRender* self)
+{
+	int i;
+	int width;
+	int height;
+	int pitch;
+	uint32_t rmask;
+	uint32_t gmask;
+	uint32_t bmask;
+	uint32_t amask;
+	uint8_t* pixels;
+	SDL_Surface* surface;
+
+	/* Get window size. */
+	width = self->mode.width;
+	height = self->mode.height;
+	pitch = 4 * width;
+
+	/* Capture pixel data. */
+	/* The one extra row we allocate is used for flipping. */
+	pixels = calloc ((height + 1) * pitch, sizeof (uint8_t));
+	if (pixels == NULL)
+		return NULL;
+	glBindFramebuffer (GL_FRAMEBUFFER, 0);
+	glBindFramebuffer (GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer (GL_READ_FRAMEBUFFER, 0);
+	glReadPixels (0, 0, width, height, GL_RGBA, GL_UNSIGNED_BYTE, pixels);
+
+	/* Flip the image vertically. */
+	/* We use the extra row as temporary storage. */
+	for (i = 0 ; i < height / 2 ; i++)
+	{
+		memcpy (pixels + pitch * height, pixels + pitch * i, pitch);
+		memcpy (pixels + pitch * i, pixels + pitch * (height - i - 1), pitch);
+		memcpy (pixels + pitch * (height - i - 1), pixels + pitch * height, pitch);
+	}
+
+	/* Create a temporary SDL surface. */
+	if (lisys_endian_big ())
+	{
+		rmask = 0xFF000000;
+		gmask = 0x00FF0000;
+		bmask = 0x0000FF00;
+		amask = 0x000000FF;
+	}
+	else
+	{
+		rmask = 0x000000FF;
+		gmask = 0x0000FF00;
+		bmask = 0x00FF0000;
+		amask = 0xFF000000;
+	}
+	surface = SDL_CreateRGBSurfaceFrom(pixels, width, height,
+		32, pitch, rmask, gmask, bmask, amask);
+	if (surface == NULL)
+	{
+		lisys_free (pixels);
+		return NULL;
+	}
+
+	return surface;
+}
+
 /**
  * \brief Updates the renderer state.
  * \param self Renderer.
@@ -462,6 +528,15 @@ int liren_render_get_image_size (
 	return 1;
 }
 
+float liren_render_get_opengl_version (
+	LIRenRender* self)
+{
+	if (self->v32 != NULL)
+		return 3.2f;
+	else
+		return 2.1f;
+}
+
 int liren_render_set_videomode (
 	LIRenRender*    self,
 	LIRenVideomode* mode)
@@ -470,6 +545,51 @@ int liren_render_set_videomode (
 }
 
 /*****************************************************************************/
+
+/**
+ * \brief Initializes the global video card information.
+ * \return Nonzero on success.
+ */
+static int private_init_glew (
+	LIRenRender* self)
+{
+	int ver[3];
+	GLenum error;
+	const GLubyte* tmp;
+
+	/* Initialize GLEW. */
+	error = glewInit ();
+	if (error != GLEW_OK)
+	{
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "%s", glewGetErrorString (error));
+		return 0;
+	}
+
+	/* Check for OpenGL 3.2 capabilities. */
+	/* GLEW versions up to 1.5.3 had a bug that completely broke OpenGL 3.2
+	   support. We try to detect it and warn the user of the problem. */
+	if (GLEW_VERSION_3_2)
+		return 1;
+	tmp = glewGetString (GLEW_VERSION);
+	if (sscanf ((const char*) tmp, "%d.%d.%d", ver, ver + 1, ver + 2) == 3 &&
+	   (ver[0] < 1 || ver[1] < 5 || ver[2] <= 3))
+	{
+		lisys_error_set (EINVAL, "OpenGL 3.2 isn't supported because it requires GLEW 1.5.4 or newer while you have %s", tmp);
+		lisys_error_report ();
+	}
+	else
+	{
+		lisys_error_set (EINVAL, "OpenGL 3.2 isn't supported by your graphics card or drivers");
+		lisys_error_report ();
+	}
+
+	/* Check for OpenGL 2.1 capabilities. */
+	if (GLEW_VERSION_2_1)
+		return 1;
+	lisys_error_set (EINVAL, "OpenGL 2.1 isn't supported by your graphics card or drivers");
+
+	return 0;
+}
 
 static void private_render_overlay (
 	LIRenRender*  self,
@@ -644,7 +764,7 @@ static int private_resize_window (
 	}
 
 	/* Initialize libraries. */
-	if (!livid_video_init ())
+	if (!private_init_glew (self))
 		return 0;
 
 	/* Store mode. */

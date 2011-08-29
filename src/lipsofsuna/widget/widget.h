@@ -18,9 +18,8 @@
 #ifndef __WIDGET_H__
 #define __WIDGET_H__
 
-#include <lipsofsuna/system.h>
-#include <lipsofsuna/script.h>
-#include <lipsofsuna/video.h>
+#include "lipsofsuna/system.h"
+#include "lipsofsuna/script.h"
 #include "widget-manager.h"
 #include "widget-types.h"
 

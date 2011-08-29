@@ -19,7 +19,6 @@
 #define __RENDER32_MESH_H__
 
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
 #include "render-types.h"
 
 typedef struct _LIRenMesh32 LIRenMesh32;

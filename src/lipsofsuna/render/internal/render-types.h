@@ -18,8 +18,9 @@
 #ifndef __RENDER_INTERNAL_TYPES_H__
 #define __RENDER_INTERNAL_TYPES_H__
 
+#include "SDL.h"
+#include <GL/glew.h>
 #include "lipsofsuna/math.h"
-#include "lipsofsuna/video.h"
 #include "../render-types.h"
 
 typedef struct _LIRenBuffer LIRenBuffer;

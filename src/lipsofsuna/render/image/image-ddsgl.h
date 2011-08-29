@@ -28,7 +28,7 @@
 #ifndef __IMAGE_DDSGL_H__
 #define __IMAGE_DDSGL_H__
 
-#include <lipsofsuna/video.h>
+#include <GL/glew.h>
 #include "image-dds.h"
 
 typedef struct _LIImgDDSGLFormat LIImgDDSGLFormat;

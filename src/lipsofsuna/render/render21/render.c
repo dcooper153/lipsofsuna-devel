@@ -23,7 +23,6 @@
  */
 
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
 #include "render.h"
 #include "render-private.h"
 #include "../render.h"

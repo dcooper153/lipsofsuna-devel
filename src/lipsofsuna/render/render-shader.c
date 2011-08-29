@@ -115,12 +115,12 @@ int liren_render_shader_compile (
 	int          animated,
 	int          alpha_to_coverage,
 	int          blend_enable,
-	GLenum       blend_src,
-	GLenum       blend_dst,
+	int          blend_src,
+	int          blend_dst,
 	int          color_write,
 	int          depth_test,
 	int          depth_write,
-	GLenum       depth_func)
+	int          depth_func)
 {
 	LIRenShader* shader_;
 
