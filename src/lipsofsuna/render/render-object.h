@@ -41,23 +41,23 @@ LIAPICALL (void, liren_render_object_particle_animation, (
 	float        start,
 	int          loop));
 
-LIAPICALL (int, liren_render_object_set_effect, (
+LIAPICALL (void, liren_render_object_set_effect, (
 	LIRenRender* self,
 	int          id,
 	const char*  shader,
 	const float* params));
 
-LIAPICALL (int, liren_render_object_set_model, (
+LIAPICALL (void, liren_render_object_set_model, (
 	LIRenRender* self,
 	int          id,
 	int          model));
 
-LIAPICALL (int, liren_render_object_set_pose, (
+LIAPICALL (void, liren_render_object_set_pose, (
 	LIRenRender* self,
 	int          id,
 	LIMdlPose*   pose));
 
-LIAPICALL (int, liren_render_object_set_realized, (
+LIAPICALL (void, liren_render_object_set_realized, (
 	LIRenRender* self,
 	int          id,
 	int          value));

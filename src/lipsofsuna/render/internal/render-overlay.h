@@ -75,4 +75,69 @@ struct _LIRenOverlayElement
 	LIRenShader* shader;
 };
 
+LIAPICALL (LIRenOverlay*, liren_overlay_new, (
+	LIRenRender* render));
+
+LIAPICALL (void, liren_overlay_free, (
+	LIRenOverlay* self));
+
+LIAPICALL (void, liren_overlay_clear, (
+	LIRenOverlay* self));
+
+LIAPICALL (void, liren_overlay_add_text, (
+	LIRenOverlay* self,
+	const char*   shader,
+	const char*   font,
+	const char*   text,
+	const float*  color,
+	const int*    scissor,
+	const int*    pos,
+	const int*    size,
+	const float*  align));
+
+LIAPICALL (void, liren_overlay_add_triangles, (
+	LIRenOverlay*      self,
+	const char*        shader,
+	const char*        image,
+	const float*       color,
+	const int*         scissor,
+	const LIRenVertex* verts,
+	int                count));
+
+LIAPICALL (void, liren_overlay_add_overlay, (
+	LIRenOverlay* self,
+	LIRenOverlay* overlay));
+
+LIAPICALL (void, liren_overlay_remove_overlay, (
+	LIRenOverlay* self,
+	LIRenOverlay* overlay));
+
+LIAPICALL (void, liren_overlay_disable_scene, (
+	LIRenOverlay* self));
+
+LIAPICALL (void, liren_overlay_enable_scene, (
+	LIRenOverlay*      self,
+	int                samples,
+	int                hdr,
+	const int*         viewport,
+	LIMatMatrix*       modelview,
+	LIMatMatrix*       projection,
+	LIMatFrustum*      frustum,
+	LIRenPassRender*   render_passes,
+	int                render_passes_num,
+	LIRenPassPostproc* postproc_passes,
+	int                postproc_passes_num));
+
+LIAPICALL (void, liren_overlay_set_behind, (
+	LIRenOverlay* self,
+	int           value));
+
+LIAPICALL (void, liren_overlay_set_position, (
+	LIRenOverlay*      self,
+	const LIMatVector* value));
+
+LIAPICALL (void, liren_overlay_set_visible, (
+	LIRenOverlay* self,
+	int           value));
+
 #endif

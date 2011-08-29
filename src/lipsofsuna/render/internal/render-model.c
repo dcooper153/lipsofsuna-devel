@@ -24,7 +24,82 @@
  * @{
  */
 
+#include "lipsofsuna/network.h"
 #include "render-internal.h"
+
+/**
+ * \brief Creates a new model from a loaded model buffer.
+ *
+ * The previous owner of the model buffer retains the ownership and must
+ * ensure that the buffer is not freed before the created renderer model.
+ *
+ * \param render Renderer.
+ * \param model Model description.
+ * \param id Unique model ID.
+ * \return Model or NULL on failure.
+ */
+LIRenModel* liren_model_new (
+	LIRenRender* render,
+	LIMdlModel*  model,
+	int          id)
+{
+	LIRenModel* self;
+
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (LIRenModel));
+	if (self == NULL)
+		return 0;
+	self->render = render;
+
+	/* Choose a unique ID. */
+	while (!id)
+	{
+		id = lialg_random_range (&render->random, LINET_RANGE_RENDER_START, LINET_RANGE_RENDER_END);
+		if (lialg_u32dic_find (render->objects, id))
+			id = 0;
+	}
+	self->id = id;
+
+	/* Initialize the backend. */
+	if (render->v32 != NULL)
+	{
+		self->v32 = liren_model32_new (render->v32, model, id);
+		if (self->v32 == NULL)
+		{
+			lisys_free (self);
+			return 0;
+		}
+	}
+	else
+	{
+		self->v21 = liren_model21_new (render->v21, model, id);
+		if (self->v21 == NULL)
+		{
+			lisys_free (self);
+			return 0;
+		}
+	}
+
+	/* Find a free model ID. */
+	if (!id)
+	{
+		do
+		{
+			id = lialg_random_range (&render->random, LINET_RANGE_RENDER_START, LINET_RANGE_RENDER_END);
+		}
+		while (lialg_u32dic_find (render->models, id) != NULL);
+		self->id = id;
+	}
+
+	/* Add to the dictionary. */
+	if (!lialg_u32dic_insert (render->models, id, self))
+	{
+		liren_model_free (self);
+		return 0;
+	}
+
+	return self;
+}
 
 void liren_model_free (
 	LIRenModel* self)

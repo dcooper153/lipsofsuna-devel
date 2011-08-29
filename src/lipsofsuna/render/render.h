@@ -48,14 +48,8 @@ LIAPICALL (int, liren_render_measure_text, (
 	int*         result_width,
 	int*         result_height));
 
-LIAPICALL (void, liren_render_reload, (
-	LIRenRender* self,
-	int          pass));
-
 LIAPICALL (void, liren_render_render, (
-	LIRenRender* self,
-	int          width,
-	int          height));
+	LIRenRender* self));
 
 LIAPICALL (SDL_Surface*, liren_render_screenshot, (
 	LIRenRender* self));

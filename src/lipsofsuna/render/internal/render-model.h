@@ -32,6 +32,11 @@ struct _LIRenModel
 	LIRenModel32* v32;
 };
 
+LIAPICALL (LIRenModel*, liren_model_new, (
+	LIRenRender* render,
+	LIMdlModel*  model,
+	int          id));
+
 LIAPICALL (void, liren_model_free, (
 	LIRenModel* self));
 

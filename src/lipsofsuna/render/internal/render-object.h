@@ -31,4 +31,40 @@ struct _LIRenObject
 	LIRenObject32* v32;
 };
 
+LIAPICALL (LIRenObject*, liren_object_new, (
+	LIRenRender* render,
+	int          id));
+
+LIAPICALL (void, liren_object_free, (
+	LIRenObject* self));
+
+LIAPICALL (void, liren_object_deform, (
+	LIRenObject* self));
+
+LIAPICALL (void, liren_object_particle_animation, (
+	LIRenObject* self,
+	float        start,
+	int          loop));
+
+LIAPICALL (int, liren_object_set_effect, (
+	LIRenObject* self,
+	const char*  shader,
+	const float* params));
+
+LIAPICALL (int, liren_object_set_model, (
+	LIRenObject* self,
+	LIRenModel*  model));
+
+LIAPICALL (int, liren_object_set_pose, (
+	LIRenObject* self,
+	LIMdlPose*   pose));
+
+LIAPICALL (int, liren_object_set_realized, (
+	LIRenObject* self,
+	int          value));
+
+LIAPICALL (void, liren_object_set_transform, (
+	LIRenObject*          self,
+	const LIMatTransform* value));
+
 #endif

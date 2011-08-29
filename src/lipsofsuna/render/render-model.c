@@ -22,11 +22,9 @@
  * @{
  */
 
-#include "lipsofsuna/network.h"
 #include "lipsofsuna/system.h"
 #include "render-model.h"
-#include "internal/render.h"
-#include "internal/render-model.h"
+#include "internal/render-internal.h"
 #include "render32/render-private.h"
 
 /**
@@ -47,60 +45,11 @@ int liren_render_model_new (
 {
 	LIRenModel* self;
 
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIRenModel));
+	self = liren_model_new (render, model, id);
 	if (self == NULL)
 		return 0;
-	self->render = render;
 
-	/* Choose a unique ID. */
-	while (!id)
-	{
-		id = lialg_random_range (&render->random, LINET_RANGE_RENDER_START, LINET_RANGE_RENDER_END);
-		if (lialg_u32dic_find (render->objects, id))
-			id = 0;
-	}
-	self->id = id;
-
-	/* Initialize the backend. */
-	if (render->v32 != NULL)
-	{
-		self->v32 = liren_model32_new (render->v32, model, id);
-		if (self->v32 == NULL)
-		{
-			lisys_free (self);
-			return 0;
-		}
-	}
-	else
-	{
-		self->v21 = liren_model21_new (render->v21, model, id);
-		if (self->v21 == NULL)
-		{
-			lisys_free (self);
-			return 0;
-		}
-	}
-
-	/* Find a free model ID. */
-	if (!id)
-	{
-		do
-		{
-			id = lialg_random_range (&render->random, LINET_RANGE_RENDER_START, LINET_RANGE_RENDER_END);
-		}
-		while (lialg_u32dic_find (render->models, id) != NULL);
-		self->id = id;
-	}
-
-	/* Add to the dictionary. */
-	if (!lialg_u32dic_insert (render->models, id, self))
-	{
-		liren_model_free (self);
-		return 0;
-	}
-
-	return id;
+	return self->id;
 }
 
 /**
@@ -115,13 +64,11 @@ void liren_render_model_free (
 	LIRenModel* model;
 
 	model = lialg_u32dic_find (self->models, id);
-	if (model == NULL)
-		return;
-
-	liren_model_free (model);
+	if (model != NULL)
+		liren_model_free (model);
 }
 
-int liren_render_model_set_model (
+void liren_render_model_set_model (
 	LIRenRender* self,
 	int          id,
 	LIMdlModel*  model)
@@ -129,10 +76,8 @@ int liren_render_model_set_model (
 	LIRenModel* model_;
 
 	model_ = lialg_u32dic_find (self->models, id);
-	if (model_ == NULL)
-		return 0;
-
-	return liren_model_set_model (model_, model);
+	if (model_ != NULL)
+		liren_model_set_model (model_, model);
 }
 
 /** @} */

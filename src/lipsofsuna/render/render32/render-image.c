@@ -95,7 +95,7 @@ void liren_image32_ref (
 {
 	LIRenImage* image;
 
-	image = liren_render_find_image (self->render->render, self->name);
+	image = liren_internal_find_image (self->render->render, self->name);
 	lisys_assert (image != NULL);
 	lisys_assert (image->v32 == self);
 	liren_image_ref (image);
@@ -110,7 +110,7 @@ void liren_image32_unref (
 {
 	LIRenImage* image;
 
-	image = liren_render_find_image (self->render->render, self->name);
+	image = liren_internal_find_image (self->render->render, self->name);
 	lisys_assert (image != NULL);
 	lisys_assert (image->v32 == self);
 	liren_image_unref (image);

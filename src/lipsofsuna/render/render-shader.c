@@ -60,10 +60,8 @@ void liren_render_shader_free (
 	LIRenShader* shader_;
 
 	shader_ = lialg_strdic_find (self->shaders, shader);
-	if (shader_ == NULL)
-		return;
-
-	liren_shader_free (shader_);
+	if (shader_ != NULL)
+		liren_shader_free (shader_);
 }
 
 /**
@@ -80,10 +78,8 @@ void liren_render_shader_clear_pass (
 	LIRenShader* shader_;
 
 	shader_ = lialg_strdic_find (self->shaders, shader);
-	if (shader_ == NULL)
-		return;
-
-	liren_shader_clear_pass (shader_, pass);
+	if (shader_ != NULL)
+		liren_shader_clear_pass (shader_, pass);
 }
 
 /**
@@ -125,12 +121,12 @@ int liren_render_shader_compile (
 	LIRenShader* shader_;
 
 	shader_ = lialg_strdic_find (self->shaders, shader);
-	if (shader_ == NULL)
-		return 0;
-
-	return liren_shader_compile (shader_, pass, vertex, geometry, fragment,
-		animated, alpha_to_coverage, blend_enable, blend_src, blend_dst,
-		color_write, depth_test, depth_write, depth_func);
+	if (shader_ != NULL)
+	{
+		return liren_shader_compile (shader_, pass, vertex, geometry, fragment,
+			animated, alpha_to_coverage, blend_enable, blend_src, blend_dst,
+			color_write, depth_test, depth_write, depth_func);
+	}
 }
 
 void liren_render_shader_set_sort (
@@ -141,10 +137,8 @@ void liren_render_shader_set_sort (
 	LIRenShader* shader_;
 
 	shader_ = lialg_strdic_find (self->shaders, shader);
-	if (shader_ == NULL)
-		return;
-
-	liren_shader_set_sort (shader_, value);
+	if (shader_ != NULL)
+		liren_shader_set_sort (shader_, value);
 }
 
 /** @} */

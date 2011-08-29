@@ -15,33 +15,29 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_INTERNAL_H__
-#define __RENDER_INTERNAL_INTERNAL_H__
+#ifndef __RENDER_INTERNAL_QUEUE_H__
+#define __RENDER_INTERNAL_QUEUE_H__
 
-#include "SDL.h"
-#include "SDL_main.h"
-#include "SDL_ttf.h"
-#include <GL/glew.h>
-
-#include "render.h"
-#include "render-buffer.h"
-#include "render-framebuffer.h"
-#include "render-image.h"
-#include "render-light.h"
-#include "render-message.h"
-#include "render-model.h"
-#include "render-object.h"
-#include "render-overlay.h"
-#include "render-queue.h"
-#include "render-shader.h"
+#include "lipsofsuna/system.h"
 #include "render-types.h"
 
-#if defined LIMDL_VERTEX_WEIGHT_UINT8
-#define LIREN_WEIGHT_FORMAT GL_UNSIGNED_BYTE
-#elif defined LIMDL_VERTEX_WEIGHT_UINT16
-#define LIREN_WEIGHT_FORMAT GL_UNSIGNED_SHORT
-#else
-#define LIREN_WEIGHT_FORMAT GL_FLOAT
-#endif
+struct _LIRenQueue
+{
+	LISysMutex* mutex;
+	LIRenMessage* message_first;
+	LIRenMessage* message_last;
+};
+
+LIAPICALL (LIRenQueue*, liren_queue_new, ());
+
+LIAPICALL (void, liren_queue_free, (
+	LIRenQueue* self));
+
+LIAPICALL (LIRenMessage*, liren_queue_pop_message, (
+	LIRenQueue* self));
+
+LIAPICALL (void, liren_queue_push_message, (
+	LIRenQueue*   self,
+	LIRenMessage* message));
 
 #endif

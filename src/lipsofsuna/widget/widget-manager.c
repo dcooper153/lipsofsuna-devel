@@ -277,7 +277,7 @@ void liwdg_manager_render (
 {
 	/* Render overlays. */
 	/* FIXME: Should be in the graphics module instead. */
-	liren_render_render (self->render, self->width, self->height);
+	liren_render_render (self->render);
 }
 
 void liwdg_manager_update (

@@ -30,4 +30,69 @@ struct _LIRenLight
 	LIRenLight32* v32;
 };
 
+LIAPICALL (LIRenLight*, liren_light_new, (
+	LIRenRender* render,
+	const float* ambient,
+	const float* diffuse,
+	const float* specular,
+	const float* equation,
+	float        cutoff,
+	float        exponent,
+	int          shadow));
+
+LIAPICALL (void, liren_light_free, (
+	LIRenLight* self));
+
+LIAPICALL (void, liren_light_set_ambient, (
+	LIRenLight*  self,
+	const float* value));
+
+LIAPICALL (void, liren_light_set_diffuse, (
+	LIRenLight*  self,
+	const float* value));
+
+LIAPICALL (void, liren_light_set_enabled, (
+	LIRenLight* self,
+	int         value));
+
+LIAPICALL (void, liren_light_set_equation, (
+	LIRenLight*  self,
+	const float* value));
+
+LIAPICALL (void, liren_light_set_priority, (
+	LIRenLight* self,
+	float       value));
+
+LIAPICALL (void, liren_light_set_shadow, (
+	LIRenLight* self,
+	int         value));
+
+LIAPICALL (void, liren_light_set_shadow_far, (
+	LIRenLight* self,
+	float       value));
+
+LIAPICALL (void, liren_light_set_shadow_near, (
+	LIRenLight* self,
+	float       value));
+
+LIAPICALL (void, liren_light_set_specular, (
+	LIRenLight*  self,
+	const float* value));
+
+LIAPICALL (void, liren_light_set_spot_cutoff, (
+	LIRenLight* self,
+	float       value));
+
+LIAPICALL (void, liren_light_set_spot_exponent, (
+	LIRenLight* self,
+	float       value));
+
+LIAPICALL (void, liren_light_get_transform, (
+	LIRenLight*     self,
+	LIMatTransform* value));
+
+LIAPICALL (void, liren_light_set_transform, (
+	LIRenLight*           self,
+	const LIMatTransform* value));
+
 #endif

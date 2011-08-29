@@ -31,10 +31,6 @@ static void private_initial_videomode (
 	int*         fullscreen,
 	int*         vsync);
 
-static void private_context_lost (
-	LIExtModule* self,
-	int          pass);
-
 /*****************************************************************************/
 
 LIMaiExtensionInfo liext_graphics_info =
@@ -70,13 +66,6 @@ LIExtModule* liext_graphics_new (
 		return NULL;
 	}
 
-	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, "context-lost", 0, private_context_lost, self, self->calls + 0))
-	{
-		liext_graphics_free (self);
-		return NULL;
-	}
-
 	/* Extend scripts. */
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_GRAPHICS, self);
 	liext_script_graphics (program->script);
@@ -87,9 +76,6 @@ LIExtModule* liext_graphics_new (
 void liext_graphics_free (
 	LIExtModule* self)
 {
-	/* Remove callbacks. */
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
-
 	if (self->client != NULL)
 		licli_client_free (self->client);
 	lisys_free (self);
@@ -151,13 +137,6 @@ static void private_initial_videomode (
 
 	/* Pop the videomode table. */
 	lua_pop (lua, 1);
-}
-
-static void private_context_lost (
-	LIExtModule* self,
-	int          pass)
-{
-	liren_render_reload (self->client->render, pass);
 }
 
 /** @} */

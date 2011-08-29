@@ -162,7 +162,7 @@ LIRenShader32* liren_render32_find_shader (
 {
 	LIRenShader* shader;
 
-	shader = liren_render_find_shader (self->render, name);
+	shader = liren_internal_find_shader (self->render, name);
 	if (shader == NULL)
 		return NULL;
 
@@ -185,7 +185,7 @@ LIRenImage32* liren_render32_find_image (
 {
 	LIRenImage* image;
 
-	image = liren_render_find_image (self->render, name);
+	image = liren_internal_find_image (self->render, name);
 	if (image == NULL)
 		return NULL;
 
@@ -205,7 +205,7 @@ LIRenModel32* liren_render32_find_model (
 {
 	LIRenModel* model;
 
-	model = liren_render_find_model (self->render, id);
+	model = liren_internal_find_model (self->render, id);
 	if (model == NULL)
 		return NULL;
 
