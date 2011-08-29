@@ -25,7 +25,6 @@
 #include "lipsofsuna/system.h"
 #include "client.h"
 #include "client-script.h"
-#include "client-window.h"
 
 #define ENABLE_GRABS
 
@@ -35,7 +34,11 @@ static void private_grab (
 
 static int private_init (
 	LICliClient*  self,
-	LIMaiProgram* program);
+	LIMaiProgram* program,
+	int           width,
+	int           height,
+	int           fullscreen,
+	int           sync);
 
 static int private_event (
 	LICliClient* client,
@@ -78,18 +81,8 @@ LICliClient* licli_client_new (
 		return NULL;
 	}
 
-	/* Create window. */
-	SDL_EnableUNICODE (1);
-	self->window = licli_window_new (self, width, height, fullscreen, vsync);
-	if (self->window == NULL)
-	{
-		licli_client_free (self);
-		return NULL;
-	}
-	SDL_ShowCursor (SDL_DISABLE);
-
-	/* Load module. */
-	if (!private_init (self, program))
+	/* Initialize graphics and input. */
+	if (!private_init (self, program, width, height, fullscreen, vsync))
 	{
 		licli_client_free (self);
 		return NULL;
@@ -104,17 +97,20 @@ void licli_client_free (
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->program->callbacks, "client-free", lical_marshal_DATA);
 
-	/* Remove component. */
+	/* Remove the client component. */
 	if (self->program != NULL)
 		limai_program_remove_component (self->program, "client");
 
-	/* Free the server. */
+	/* Free the server thread. */
 	private_server_shutdown (self);
 
+	/* Free the graphics engine. */
 	if (self->render != NULL)
 		liren_render_free (self->render);
-	if (self->window != NULL)
-		licli_window_free (self->window);
+
+	/* Uninitialize input. */
+	if (self->joystick != NULL)
+		SDL_JoystickClose (self->joystick);
 
 	lisys_free (self);
 }
@@ -196,6 +192,26 @@ void licli_client_set_moving (
 #endif
 }
 
+int licli_client_set_videomode (
+	LICliClient* self,
+	int          width,
+	int          height,
+	int          fullscreen,
+	int          sync)
+{
+	LIRenVideomode mode;
+
+	mode.width = width;
+	mode.height = height;
+	mode.fullscreen = fullscreen;
+	mode.sync = sync;
+	if (!liren_render_set_videomode (self->render, &mode))
+		return 0;
+	self->mode = mode;
+
+	return 1;
+}
+
 /*****************************************************************************/
 
 static void private_grab (
@@ -212,12 +228,28 @@ static void private_grab (
 
 static int private_init (
 	LICliClient*  self,
-	LIMaiProgram* program)
+	LIMaiProgram* program,
+	int           width,
+	int           height,
+	int           fullscreen,
+	int           sync)
 {
-	/* Initialize renderer. */
-	self->render = liren_render_new (self->program->paths);
+	LIRenVideomode mode;
+
+	/* Initialize the renderer. */
+	mode.width = width;
+	mode.height = height;
+	mode.fullscreen = fullscreen;
+	mode.sync = sync;
+	self->render = liren_render_new (self->program->paths, &mode);
 	if (self->render == NULL)
 		return 0;
+	self->mode = mode;
+
+	/* Initialize input. */
+	self->joystick = SDL_JoystickOpen (0);
+	SDL_EnableUNICODE (1);
+	SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
 
 	/* Register component. */
 	if (!limai_program_insert_component (self->program, "client", self))
@@ -304,8 +336,8 @@ static int private_event (
 			}
 			break;
 		case SDL_VIDEORESIZE:
-			self->window->mode.width = event->resize.w;
-			self->window->mode.height = event->resize.h;
+			self->mode.width = event->resize.w;
+			self->mode.height = event->resize.h;
 			break;
 	}
 
@@ -364,8 +396,8 @@ static int private_tick (
 #ifndef ENABLE_GRABS
 	if (self->moving)
 	{
-		cx = self->window->mode.width / 2;
-		cy = self->window->mode.height / 2;
+		cx = self->mode.width / 2;
+		cy = self->mode.height / 2;
 		SDL_GetMouseState (&x, &y);
 		if (x != cx || y != cy)
 		{

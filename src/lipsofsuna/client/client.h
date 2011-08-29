@@ -30,17 +30,17 @@
 #include "lipsofsuna/widget.h"
 #include "client-server.h"
 #include "client-types.h"
-#include "client-window.h"
 
 struct _LICliClient
 {
 	int active;
 	int moving;
-	LICliWindow* window;
 	LIMaiProgram* program;
-	LIRenRender* render;
 	LICliServer* server;
 	LISysThread* server_thread;
+	LIRenRender* render;
+	LIRenVideomode mode;
+	SDL_Joystick* joystick;
 };
 
 LIAPICALL (LICliClient*, licli_client_new, (
@@ -48,7 +48,7 @@ LIAPICALL (LICliClient*, licli_client_new, (
 	int           width,
 	int           height,
 	int           fullscreen,
-	int           vsync));
+	int           sync));
 
 LIAPICALL (void, licli_client_free, (
 	LICliClient* self));
@@ -63,5 +63,12 @@ LIAPICALL (int, licli_client_get_moving, (
 LIAPICALL (void, licli_client_set_moving, (
 	LICliClient* self,
 	int          value));
+
+LIAPICALL (int, licli_client_set_videomode, (
+	LICliClient* self,
+	int          width,
+	int          height,
+	int          fullscreen,
+	int          sync));
 
 #endif

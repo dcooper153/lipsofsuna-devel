@@ -7,12 +7,6 @@ end
 
 ------------------------------------------------------------------------------
 
---- Clears the screen.
--- @param clss Program class.
-Program.clear_buffer = function(clss)
-	Los.client_clear_buffer()
-end
-
 --- Launches a server.
 -- @param clss Program class.
 -- @param args Arguments.<ul>
@@ -38,12 +32,6 @@ end
 -- @return True on success.
 Program.set_video_mode = function(clss, ...)
 	return Los.client_set_video_mode(...)
-end
-
---- Copies the rendered scene to the screen.
--- @param clss Program class.
-Program.swap_buffers = function(clss)
-	Los.client_swap_buffers()
 end
 
 --- Movement mode flag.

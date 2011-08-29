@@ -37,6 +37,8 @@ struct _LIRenRender
 	LIRenOverlay* root_overlay;
 	LIRenRender21* v21;
 	LIRenRender32* v32;
+	LIRenVideomode mode;
+	SDL_Surface* screen;
 };
 
 LIAPICALL (void, liren_render_draw_clipped_buffer, (

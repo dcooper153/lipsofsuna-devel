@@ -38,10 +38,15 @@ static void private_render_overlay (
 	int           width,
 	int           height);
 
+static int private_resize_window (
+	LIRenRender*    self,
+	LIRenVideomode* mode);
+
 /*****************************************************************************/
 
 LIRenRender* liren_render_new (
-	LIPthPaths* paths)
+	LIPthPaths*     paths,
+	LIRenVideomode* mode)
 {
 	LIRenRender* self;
 
@@ -104,6 +109,20 @@ LIRenRender* liren_render_new (
 		liren_render_free (self);
 		return NULL;
 	}
+
+	/* Initialize the videomode. */
+	if (!private_resize_window (self, mode))
+	{
+		liren_render_free (self);
+		return NULL;
+	}
+	if (TTF_Init () == -1)
+	{
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot initialize SDL_ttf");
+		liren_render_free (self);
+		return NULL;
+	}
+	SDL_ShowCursor (SDL_DISABLE);
 
 	/* Initialize the backend. */
 	if (GLEW_VERSION_3_2 && getenv ("LOS_OPENGL21") == NULL)
@@ -187,6 +206,13 @@ void liren_render_free (
 		liren_render21_free (self->v21);
 	if (self->v32 != NULL)
 		liren_render32_free (self->v32);
+
+	/* Uninitialize the videomode. */
+	if (self->screen != NULL)
+		SDL_FreeSurface (self->screen);
+	if (TTF_WasInit ())
+		TTF_Quit ();
+
 	lisys_free (self);
 }
 
@@ -351,6 +377,9 @@ void liren_render_render (
 	glClear (GL_COLOR_BUFFER_BIT);
 	if (self->root_overlay != NULL)
 		private_render_overlay (self, self->root_overlay, width, height);
+	glBindFramebuffer (GL_FRAMEBUFFER, 0);
+	glBindFramebuffer (GL_DRAW_FRAMEBUFFER, 0);
+	glBindFramebuffer (GL_READ_FRAMEBUFFER, 0);
 	SDL_GL_SwapBuffers ();
 }
 
@@ -431,6 +460,13 @@ int liren_render_get_image_size (
 	result[1] = liren_image_get_height (image);
 
 	return 1;
+}
+
+int liren_render_set_videomode (
+	LIRenRender*    self,
+	LIRenVideomode* mode)
+{
+	return private_resize_window (self, mode);
 }
 
 /*****************************************************************************/
@@ -543,6 +579,85 @@ static void private_render_overlay (
 		if (!overlay->overlays.array[i]->behind)
 			private_render_overlay (self, overlay->overlays.array[i], width, height);
 	}
+}
+
+static int private_resize_window (
+	LIRenRender*    self,
+	LIRenVideomode* mode)
+{
+	int i;
+	Uint32 flags;
+	SDL_Rect* best = NULL;
+	SDL_Rect** modes;
+
+	/* Determine screen surface flags. */
+	if (mode->fullscreen)
+	{
+		flags = SDL_OPENGL | SDL_FULLSCREEN;
+		modes = SDL_ListModes (NULL, flags);
+		if (modes != NULL && modes != (SDL_Rect**) -1)
+		{
+			/* Determine the best possible fullscreen mode. */
+			for (i = 0 ; modes[i] ; i++)
+			{
+				if (best == NULL ||
+				   (LIMAT_ABS (modes[i]->w - mode->width) < LIMAT_ABS (best->w - mode->width) &&
+				    LIMAT_ABS (modes[i]->h - mode->height) < LIMAT_ABS (best->h - mode->height)))
+					best = modes[i];
+			}
+		}
+		if (best != NULL)
+		{
+			/* Set the resolution to the best mode found. */
+			mode->width = best->w;
+			mode->height = best->h;
+		}
+		else
+		{
+			/* Revert to windowed mode if no fullscreen modes. */
+			flags = SDL_OPENGL | SDL_RESIZABLE;
+			mode->fullscreen = 0;
+		}
+	}
+	else
+		flags = SDL_OPENGL | SDL_RESIZABLE;
+
+	/* Unload all graphics. */
+	/* Since changing the video mode erases the OpenGL context in Windows,
+	   we have to unload all textures, shaders, vertex buffers, etc. */
+#ifdef WIN32
+	liren_render_reload (self, 0);
+#endif
+
+	/* Recreate surface. */
+	/* This destroys all graphics data in Windows. */
+	SDL_GL_SetAttribute (SDL_GL_DEPTH_SIZE, 24);
+	SDL_GL_SetAttribute (SDL_GL_STENCIL_SIZE, 0);
+	if (mode->sync)
+		SDL_GL_SetAttribute (SDL_GL_SWAP_CONTROL, 1);
+	SDL_GL_SetAttribute (SDL_GL_DOUBLEBUFFER, 1);
+	self->screen = SDL_SetVideoMode (mode->width, mode->height, 0, flags);
+	if (self->screen == NULL)
+	{
+		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot set video mode");
+		return 0;
+	}
+
+	/* Initialize libraries. */
+	if (!livid_video_init ())
+		return 0;
+
+	/* Store mode. */
+	self->mode = *mode;
+
+	/* Reload all graphics. */
+	/* Since changing the video mode erases the OpenGL context in Windows,
+	   we have to reload all textures, shaders, vertex buffers, etc. */
+#ifdef WIN32
+	liren_render_reload (self, 1);
+#endif
+
+	return 1;
 }
 
 /** @} */

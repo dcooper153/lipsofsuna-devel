@@ -21,6 +21,5 @@
 #include "client/client.h"
 #include "client/client-script.h"
 #include "client/client-types.h"
-#include "client/client-window.h"
 
 #endif

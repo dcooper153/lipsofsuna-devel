@@ -152,12 +152,12 @@ static void Widget_canvas_enable_scene (LIScrArgs* args)
 	liscr_args_gets_floatv (args, "projection", 16, projection.m);
 	viewport[0] = 0;
 	viewport[1] = 0;
-	viewport[2] = module->client->window->mode.width;
-	viewport[3] = module->client->window->mode.height;
+	viewport[2] = module->client->mode.width;
+	viewport[3] = module->client->mode.height;
 	liscr_args_gets_intv (args, "viewport", 4, viewport);
 	viewport[0] = LIMAT_MAX (0, viewport[0]);
 	viewport[1] = LIMAT_MAX (0, viewport[1]);
-	viewport[1] = module->client->window->mode.height - viewport[1] - viewport[3];
+	viewport[1] = module->client->mode.height - viewport[1] - viewport[3];
 	viewport[2] = LIMAT_MAX (2, viewport[2]);
 	viewport[3] = LIMAT_MAX (2, viewport[3]);
 

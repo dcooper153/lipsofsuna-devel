@@ -66,8 +66,8 @@ LIExtModule* liext_widgets_new (
 		liext_widgets_free (self);
 		return NULL;
 	}
-	liwdg_manager_set_size (self->widgets, self->client->window->mode.width,
-		self->client->window->mode.height);
+	liwdg_manager_set_size (self->widgets, self->client->mode.width,
+		self->client->mode.height);
 
 	/* Register component. */
 	if (!limai_program_insert_component (program, "widgets", self->widgets))
@@ -143,15 +143,11 @@ static int private_widget_tick (
 	LIExtModule* module,
 	float        secs)
 {
-	int w;
-	int h;
-
 	/* Update widgets. */
 	liwdg_manager_update (module->widgets, secs);
 
 	/* Update dimensions. */
-	licli_window_get_size (module->client->window, &w, &h);
-	liwdg_manager_set_size (module->widgets, w, h);
+	liwdg_manager_set_size (module->widgets, module->client->mode.width, module->client->mode.height);
 
 	return 1;
 }

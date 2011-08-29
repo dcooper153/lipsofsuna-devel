@@ -61,6 +61,7 @@ typedef struct _LIRenPassRender LIRenPassRender;
 typedef struct _LIRenPassPostproc LIRenPassPostproc;
 typedef struct _LIRenRender LIRenRender;
 typedef struct _LIRenVertex LIRenVertex;
+typedef struct _LIRenVideomode LIRenVideomode;
 
 struct _LIRenFormat
 {
@@ -90,6 +91,14 @@ struct _LIRenVertex
 	float coord[3];
 	float normal[3];
 	float texcoord[2];
+};
+
+struct _LIRenVideomode
+{
+	int width;
+	int height;
+	int fullscreen;
+	int sync;
 };
 
 #endif

@@ -19,6 +19,5 @@
 #define __CLIENT_TYPES_H__
 
 typedef struct _LICliClient LICliClient;
-typedef struct _LICliWindow LICliWindow;
 
 #endif

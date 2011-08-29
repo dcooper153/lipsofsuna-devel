@@ -26,12 +26,6 @@
 #include <lipsofsuna/system.h>
 #include <lipsofsuna/client.h>
 
-static void Client_clear_buffer (LIScrArgs* args)
-{
-	glClearColor (0.0f, 0.0f, 0.0f, 1.0f);
-	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
-
 static void Client_host (LIScrArgs* args)
 {
 	const char* str = "--server";
@@ -68,8 +62,8 @@ static void Client_screenshot (LIScrArgs* args)
 
 	/* Get window size. */
 	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
-	width = client->window->mode.width;
-	height = client->window->mode.height;
+	width = client->mode.width;
+	height = client->mode.height;
 	pitch = 4 * width;
 
 	/* Capture pixel data. */
@@ -166,20 +160,12 @@ static void Client_set_video_mode (LIScrArgs* args)
 	height = LIMAT_MAX (240, height);
 
 	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
-	if (!licli_window_set_size (client->window, width, height, fullscreen, vsync))
+	if (!licli_client_set_videomode (client, width, height, fullscreen, vsync))
 	{
 		lisys_error_report ();
 		return;
 	}
 	liscr_args_seti_bool (args, 1);
-}
-
-static void Client_swap_buffers (LIScrArgs* args)
-{
-	glBindFramebuffer (GL_FRAMEBUFFER, 0);
-	glBindFramebuffer (GL_DRAW_FRAMEBUFFER, 0);
-	glBindFramebuffer (GL_READ_FRAMEBUFFER, 0);
-	SDL_GL_SwapBuffers ();
 }
 
 static void Client_get_cursor_pos (LIScrArgs* args)
@@ -240,10 +226,10 @@ static void Client_get_video_mode (LIScrArgs* args)
 
 	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-	liscr_args_seti_int (args, client->window->mode.width);
-	liscr_args_seti_int (args, client->window->mode.height);
-	liscr_args_seti_bool (args, client->window->mode.fullscreen);
-	liscr_args_seti_bool (args, client->window->mode.vsync);
+	liscr_args_seti_int (args, client->mode.width);
+	liscr_args_seti_int (args, client->mode.height);
+	liscr_args_seti_bool (args, client->mode.fullscreen);
+	liscr_args_seti_bool (args, client->mode.sync);
 }
 
 static void Client_get_video_modes (LIScrArgs* args)
@@ -276,11 +262,9 @@ static void Client_get_video_modes (LIScrArgs* args)
 void licli_script_client (
 	LIScrScript* self)
 {
-	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_clear_buffer", Client_clear_buffer);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_host", Client_host);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_screenshot", Client_screenshot);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_set_video_mode", Client_set_video_mode);
-	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_swap_buffers", Client_swap_buffers);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_cursor_pos", Client_get_cursor_pos);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_fps", Client_get_fps);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_moving", Client_get_moving);

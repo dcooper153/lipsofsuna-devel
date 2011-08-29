@@ -23,7 +23,8 @@
 #include "render-types.h"
 
 LIAPICALL (LIRenRender*, liren_render_new, (
-	LIPthPaths* paths));
+	LIPthPaths*     paths,
+	LIRenVideomode* mode));
 
 LIAPICALL (void, liren_render_free, (
 	LIRenRender* self));
@@ -70,5 +71,9 @@ LIAPICALL (int, liren_render_get_image_size, (
 	LIRenRender* self,
 	const char*  name,
 	int*         result));
+
+LIAPICALL (int, liren_render_set_videomode, (
+	LIRenRender*    self,
+	LIRenVideomode* mode));
 
 #endif
