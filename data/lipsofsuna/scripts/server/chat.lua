@@ -139,6 +139,10 @@ ChatCommand{pattern = "^/suicide$", permission = "player", func = function(playe
 	player:die()
 end}
 
+ChatCommand{pattern = "^/wireframe$", permission = "player", func = function(player, matches)
+	Los.Wireframe_on()
+end}
+
 -- Teleportation.
 ChatCommand{pattern = "^/teleport (.*)$", permission = "admin", func = function(player, matches)
 	if player:teleport{marker = matches[1]} then

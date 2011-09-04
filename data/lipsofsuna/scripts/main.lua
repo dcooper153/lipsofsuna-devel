@@ -77,6 +77,7 @@ require "system/tiles-render"
 require "system/reload"
 require "system/watchdog"
 require "system/widgets"
+require "system/wireframe"
 require "client/shader"
 require "client/shaders/skeletal"
 end

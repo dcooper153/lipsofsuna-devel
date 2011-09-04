@@ -52,6 +52,7 @@ extern LIMaiExtensionInfo liext_tiles_render_info;
 extern LIMaiExtensionInfo liext_vision_info;
 extern LIMaiExtensionInfo liext_watchdog_info;
 extern LIMaiExtensionInfo liext_widgets_info;
+extern LIMaiExtensionInfo liext_wireframe_info;
 
 /**
  * \brief Gets a built-in extension by name.
@@ -94,7 +95,8 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "tiles-render", &liext_tiles_render_info },
 		{ "vision", &liext_vision_info },
 		{ "watchdog", &liext_watchdog_info },
-		{ "widgets", &liext_widgets_info }
+		{ "widgets", &liext_widgets_info },
+		{ "wireframe", &liext_wireframe_info },
 	};
 
 	for (i = 0 ; i < sizeof (info) / sizeof (*info) ; i++)
