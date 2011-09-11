@@ -449,65 +449,28 @@ int liren_context32_set_pose (
 	LIRenContext32*  self,
 	const LIMdlPose* pose)
 {
-	int i;
-	int j;
 	int count;
-	int count1;
-	GLfloat* data;
-	LIMatDualquat dq;
-	LIMdlPoseGroup* group;
+	float empty_pose[12] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
+	const void* data;
 
 	/* Clear the old pose. */
 	if (self->buffer_texture.size)
 		liren_buffer_texture32_clear (&self->buffer_texture);
 
-	/* Collect pose data. */
-	/* The first transformation in the list is the fallback identity
-	   transformation used by vertices that don't have all four weights. */
+	/* Get the pose buffer. */
 	if (pose != NULL)
-		count1 = pose->groups.count;
-	else
-		count1 = 0;
-	count = 12 * (count1 + 1);
-	data = lisys_calloc (count, sizeof (GLfloat));
-	if (data == NULL)
-		return 0;
-	j = 0;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 1.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 0.0f;
-	data[j++] = 1.0f;
-	for (i = 0 ; i < count1 ; i++)
 	{
-		group = pose->groups.array + i;
-		dq = limat_dualquat_multiply (
-			limat_dualquat_init (group->head_pose, group->rotation),
-			limat_dualquat_init_translation (limat_vector_multiply (group->head_rest, -1.0f)));
-		data[j++] = dq.r.x;
-		data[j++] = dq.r.y;
-		data[j++] = dq.r.z;
-		data[j++] = dq.r.w;
-		data[j++] = dq.d.x;
-		data[j++] = dq.d.y;
-		data[j++] = dq.d.z;
-		data[j++] = dq.d.w;
-		data[j++] = group->head_rest.x;
-		data[j++] = group->head_rest.y;
-		data[j++] = group->head_rest.z;
-		data[j++] = group->scale_pose;
+		count = pose->buffer.count * 12;
+		data = pose->buffer.array;
+	}
+	else
+	{
+		count = 12;
+		data = empty_pose;
 	}
 
 	/* Upload to the buffer texture. */
 	liren_buffer_texture32_init (&self->buffer_texture, data, count * sizeof (GLfloat));
-	lisys_free (data);
 	glActiveTexture (GL_TEXTURE0 + LIREN_SAMPLER_BUFFER_TEXTURE);
 	glBindTexture (GL_TEXTURE_BUFFER, self->buffer_texture.texture);
 

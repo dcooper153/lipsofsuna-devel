@@ -26,7 +26,7 @@
 
 void liren_buffer_texture32_init (
 	LIRenBufferTexture32* self,
-	void*                 data,
+	const void*           data,
 	int                   size)
 {
 	GLint restore;
@@ -59,7 +59,7 @@ void liren_buffer_texture32_clear (
 void liren_buffer_texture32_upload (
 	LIRenBufferTexture32* self,
 	int                   size,
-	void*                 data)
+	const void*           data)
 {
 	GLint restore;
 

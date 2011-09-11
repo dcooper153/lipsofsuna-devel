@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -32,6 +32,15 @@ enum _LIMdlPoseChannelState
 	LIMDL_POSE_CHANNEL_STATE_INVALID,
 	LIMDL_POSE_CHANNEL_STATE_PLAYING,
 	LIMDL_POSE_CHANNEL_STATE_PAUSED,
+};
+
+typedef struct _LIMdlPoseBuffer LIMdlPoseBuffer;
+struct _LIMdlPoseBuffer
+{
+	float quat1[4];
+	float quat2[4];
+	float head[3];
+	float scale;
 };
 
 struct _LIMdlPoseChannel
@@ -89,16 +98,9 @@ struct _LIMdlPose
 	LIAlgStrdic* animations;
 	LIAlgU32dic* channels;
 	LIMdlPoseFade* fades;
-	struct
-	{
-		int count;
-		LIMdlPoseGroup* array;
-	} groups;
-	struct
-	{
-		int count;
-		LIMdlNode** array;
-	} nodes;
+	struct { int count; LIMdlPoseBuffer* array; } buffer;
+	struct { int count; LIMdlPoseGroup* array; } groups;
+	struct { int count; LIMdlNode** array; } nodes;
 };
 
 LIAPICALL (LIMdlPose*, limdl_pose_new, ());

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -260,8 +260,10 @@ void limdl_pose_update (
 {
 	int i;
 	LIAlgU32dicIter iter;
+	LIMatDualquat dq;
 	LIMatQuaternion quat0;
 	LIMatQuaternion quat1;
+	LIMdlPoseBuffer* buffer;
 	LIMdlPoseFade* fade;
 	LIMdlPoseFade* fade_next;
 	LIMdlPoseChannel* chan;
@@ -334,6 +336,28 @@ void limdl_pose_update (
 			group->head_pose = limat_vector_init (0.0f, 0.0f, 0.0f);
 			group->scale_pose = 1.0f;
 		}
+	}
+
+	/* Update the skeletal animation buffer. */
+	for (i = 0 ; i < self->groups.count ; i++)
+	{
+		buffer = self->buffer.array + i + 1;
+		group = self->groups.array + i;
+		dq = limat_dualquat_multiply (
+			limat_dualquat_init (group->head_pose, group->rotation),
+			limat_dualquat_init_translation (limat_vector_multiply (group->head_rest, -1.0f)));
+		buffer->quat1[0] = dq.r.x;
+		buffer->quat1[1] = dq.r.y;
+		buffer->quat1[2] = dq.r.z;
+		buffer->quat1[3] = dq.r.w;
+		buffer->quat2[0] = dq.d.x;
+		buffer->quat2[1] = dq.d.y;
+		buffer->quat2[2] = dq.d.z;
+		buffer->quat2[3] = dq.d.w;
+		buffer->head[0] = group->head_rest.x;
+		buffer->head[1] = group->head_rest.y;
+		buffer->head[2] = group->head_rest.z;
+		buffer->scale = group->scale_pose;
 	}
 }
 
@@ -909,7 +933,7 @@ static void private_clear_pose (
 	}
 	self->fades = NULL;
 
-	/* Clear channel tree. */
+	/* Clear the channel tree. */
 	if (self->channels != NULL)
 	{
 		LIALG_U32DIC_FOREACH (iter, self->channels)
@@ -936,6 +960,8 @@ static void private_clear_pose (
 		lialg_strdic_free (self->animations);
 	}
 
+	/* Free the skeletal animation buffer and pose groups. */
+	lisys_free (self->buffer.array);
 	lisys_free (self->groups.array);
 }
 
@@ -1080,6 +1106,14 @@ static int private_init_pose (
 			}
 		}
 	}
+
+	/* Allocate the skeletal animation buffer. */
+	self->buffer.count = self->groups.count + 1;
+	self->buffer.array = lisys_calloc (self->buffer.count, sizeof (LIMdlPoseBuffer));
+	if (self->buffer.array == NULL)
+		return 0;
+	self->buffer.array[0].quat2[3] = 1.0f;
+	self->buffer.array[0].scale = 1.0f;
 
 	return 1;
 }
