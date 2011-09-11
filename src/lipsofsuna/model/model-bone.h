@@ -26,7 +26,6 @@
 struct _LIMdlBone
 {
 	LIMatVector length;
-	LIMatVector tail;
 };
 
 LIAPICALL (int, limdl_bone_read, (
@@ -37,11 +36,11 @@ LIAPICALL (int, limdl_bone_write, (
 	const LIMdlNode* self,
 	LIArcWriter*     writer));
 
-LIAPICALL (void, limdl_bone_get_pose_head, (
+LIAPICALL (void, limdl_bone_get_head, (
 	const LIMdlNode* self,
 	LIMatVector*     head));
 
-LIAPICALL (void, limdl_bone_get_pose_tail, (
+LIAPICALL (void, limdl_bone_get_tail, (
 	const LIMdlNode* self,
 	LIMatVector*     tail));
 

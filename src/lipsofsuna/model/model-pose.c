@@ -28,11 +28,6 @@
 static void private_channel_free (
 	LIMdlPoseChannel* chan);
 
-static void private_clear_node (
-	LIMdlPose*       self,
-	LIMdlNode*       node,
-	const LIMdlNode* rest);
-
 static void private_clear_pose (
 	LIMdlPose* self);
 
@@ -46,6 +41,10 @@ static void private_fade_free (
 static void private_fade_remove (
 	LIMdlPose*     self,
 	LIMdlPoseFade* fade);
+
+static LIMdlAnimation* private_find_animation (
+	const LIMdlPose* self,
+	const char*      name);
 
 static LIMdlPoseChannel* private_find_channel (
 	const LIMdlPose* self,
@@ -238,9 +237,6 @@ LIMdlNode* limdl_pose_find_node (
 	int i;
 	LIMdlNode* node;
 
-	if (self->model == NULL)
-		return NULL;
-
 	for (i = 0 ; i < self->nodes.count ; i++)
 	{
 		node = self->nodes.array[i];
@@ -271,10 +267,6 @@ void limdl_pose_update (
 	LIMdlPoseChannel* chan;
 	LIMdlPoseGroup* group;
 	LIMdlNode* node0;
-	LIMdlNode* node1;
-
-	if (self->model == NULL)
-		return;
 
 	/* Update channels. */
 	LIALG_U32DIC_FOREACH (iter, self->channels)
@@ -316,14 +308,6 @@ void limdl_pose_update (
 		}
 	}
 
-	/* Clear each node. */
-	for (i = 0 ; i < self->nodes.count ; i++)
-	{
-		node0 = self->nodes.array[i];
-		node1 = self->model->nodes.array[i];
-		private_clear_node (self, node0, node1);
-	}
-
 	/* Transform each node. */
 	for (i = 0 ; i < self->nodes.count ; i++)
 	{
@@ -337,12 +321,12 @@ void limdl_pose_update (
 		group = self->groups.array + i;
 		if (group->enabled)
 		{
-			quat0 = group->rest_node->transform.global.rotation;
-			quat1 = group->pose_node->transform.global.rotation;
+			quat0 = group->node->rest_transform.global.rotation;
+			quat1 = group->node->pose_transform.global.rotation;
 			quat0 = limat_quaternion_conjugate (quat0);
 			group->rotation = limat_quaternion_multiply (quat1, quat0);
-			group->head_pose = group->pose_node->transform.global.position;
-			group->scale_pose = group->pose_node->transform.global_scale;
+			group->head_pose = group->node->pose_transform.global.position;
+			group->scale_pose = group->node->pose_transform.global_scale;
 		}
 		else
 		{
@@ -398,11 +382,8 @@ void limdl_pose_set_channel_animation (
 	LIMdlAnimation* anim;
 	LIMdlPoseChannel* chan;
 
-	if (self->model == NULL)
-		return;
-
 	/* Create an animation. */
-	anim = limdl_model_find_animation (self->model, animation);
+	anim = private_find_animation (self, animation);
 	if (anim == NULL)
 	{
 		limdl_pose_destroy_channel (self, channel);
@@ -823,9 +804,9 @@ int limdl_pose_set_model (
 
 	/* Backup old data. */
 	memcpy (&backup, self, sizeof (LIMdlPose));
+	self->animations = NULL;
 	self->channels = NULL;
 	self->fades = NULL;
-	self->model = NULL;
 	self->groups.count = 0;
 	self->groups.array = NULL;
 	self->nodes.count = 0;
@@ -911,29 +892,12 @@ static void private_channel_free (
 	lisys_free (chan);
 }
 
-static void private_clear_node (
-	LIMdlPose*       self,
-	LIMdlNode*       node,
-	const LIMdlNode* rest)
-{
-	int i;
-	LIMdlNode* node0;
-	LIMdlNode* node1;
-
-	node->transform.global = rest->transform.global;
-	for (i = 0 ; i < node->nodes.count ; i++)
-	{
-		node0 = node->nodes.array[i];
-		node1 = rest->nodes.array[i];
-		private_clear_node (self, node0, node1);
-	}
-}
-
 static void private_clear_pose (
 	LIMdlPose* self)
 {
 	int i;
 	LIAlgU32dicIter iter;
+	LIAlgStrdicIter iter1;
 	LIMdlPoseFade* fade;
 	LIMdlPoseFade* fade_next;
 
@@ -962,6 +926,14 @@ static void private_clear_pose (
 				limdl_node_free (self->nodes.array[i]);
 		}
 		lisys_free (self->nodes.array);
+	}
+
+	/* Free animations. */
+	if (self->animations != NULL)
+	{
+		LIALG_STRDIC_FOREACH (iter1, self->animations)
+			limdl_animation_free (iter1.value);
+		lialg_strdic_free (self->animations);
 	}
 
 	lisys_free (self->groups.array);
@@ -1027,6 +999,15 @@ static void private_fade_remove (
 		self->fades = fade->next;
 }
 
+static LIMdlAnimation* private_find_animation (
+	const LIMdlPose* self,
+	const char*      name)
+{
+	if (self->animations == NULL)
+		return NULL;
+	return lialg_strdic_find (self->animations, name);
+}
+
 static LIMdlPoseChannel* private_find_channel (
 	const LIMdlPose* self,
 	int              channel)
@@ -1039,15 +1020,32 @@ static int private_init_pose (
 	LIMdlModel* model)
 {
 	int i;
+	LIMdlAnimation* anim;
 	LIMdlPoseGroup* pose_group;
 	LIMdlWeightGroup* weight_group;
 
-	/* Set model. */
-	self->model = model;
-	self->groups.count = model->weight_groups.count;
-	self->nodes.count = model->nodes.count;
+	/* Copy animations. */
+	if (model->animations.count)
+	{
+		self->animations = lialg_strdic_new ();
+		if (self->animations == NULL)
+			return 0;
+		for (i = 0 ; i < model->animations.count ; i++)
+		{
+			anim = model->animations.array + i;
+			anim = limdl_animation_new_copy (anim);
+			if (anim == NULL)
+				return 0;
+			if (!lialg_strdic_insert (self->animations, anim->name, anim))
+			{
+				limdl_animation_free (anim);
+				return 0;
+			}
+		}
+	}
 
 	/* Copy nodes. */
+	self->nodes.count = model->nodes.count;
 	if (self->nodes.count)
 	{
 		self->nodes.array = lisys_calloc (self->nodes.count, sizeof (LIMdlNode*));
@@ -1062,6 +1060,7 @@ static int private_init_pose (
 	}
 
 	/* Precalculate weight group information. */
+	self->groups.count = model->weight_groups.count;
 	if (self->groups.count)
 	{
 		self->groups.array = lisys_calloc (self->groups.count, sizeof (LIMdlPoseGroup));
@@ -1072,13 +1071,13 @@ static int private_init_pose (
 			weight_group = model->weight_groups.array + i;
 			pose_group = self->groups.array + i;
 			pose_group->weight_group = weight_group;
-			pose_group->rest_node = weight_group->node;
-			pose_group->pose_node = limdl_pose_find_node (self, weight_group->bone);
+			pose_group->node = limdl_pose_find_node (self, weight_group->bone);
 			pose_group->rotation = limat_quaternion_identity ();
-			if (pose_group->rest_node != NULL)
-				pose_group->head_rest = pose_group->rest_node->transform.global.position;
-			if (pose_group->rest_node != NULL && pose_group->pose_node != NULL)
+			if (pose_group->node != NULL)
+			{
+				pose_group->head_rest = pose_group->node->rest_transform.global.position;
 				pose_group->enabled = 1;
+			}
 		}
 	}
 
@@ -1269,7 +1268,7 @@ static void private_transform_node (
 	/* Update node transformation. */
 	transform = limat_transform_init (position, rotation);
 	limdl_node_set_local_transform (node, scale, &transform);
-	limdl_node_rebuild (node, 0);
+	limdl_node_rebuild_pose (node, 0);
 
 	/* Update child transformations recursively. */
 	for (i = 0 ; i < node->nodes.count ; i++)

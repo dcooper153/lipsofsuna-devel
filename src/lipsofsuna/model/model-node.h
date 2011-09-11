@@ -25,25 +25,29 @@
 #include "model-light.h"
 #include "model-types.h"
 
+typedef struct _LIMdlNodeTransform LIMdlNodeTransform;
+struct _LIMdlNodeTransform
+{
+	float local_scale;
+	float global_scale;
+	LIMatTransform rest;
+	LIMatTransform local;
+	LIMatTransform global;
+	LIMatVector tail;
+};
+
 struct _LIMdlNode
 {
 	int type;
 	char* name;
-	LIMdlModel* model;
 	LIMdlNode* parent;
+	LIMdlNodeTransform rest_transform;
+	LIMdlNodeTransform pose_transform;
 	struct
 	{
 		int count;
 		LIMdlNode** array;
 	} nodes;
-	struct
-	{
-		float local_scale;
-		float global_scale;
-		LIMatTransform rest;
-		LIMatTransform local;
-		LIMatTransform global;
-	} transform;
 	union
 	{
 		LIMdlBone bone;
@@ -51,8 +55,7 @@ struct _LIMdlNode
 	};
 };
 
-LIAPICALL (LIMdlNode*, limdl_node_new, (
-	LIMdlModel* model));
+LIAPICALL (LIMdlNode*, limdl_node_new, ());
 
 LIAPICALL (LIMdlNode*, limdl_node_copy, (
 	const LIMdlNode* node));
@@ -69,6 +72,10 @@ LIAPICALL (int, limdl_node_read, (
 	LIArcReader* reader));
 
 LIAPICALL (void, limdl_node_rebuild, (
+	LIMdlNode* self,
+	int        recursive));
+
+LIAPICALL (void, limdl_node_rebuild_pose, (
 	LIMdlNode* self,
 	int        recursive));
 

@@ -18,7 +18,7 @@
 #ifndef __MODEL_POSE_H__
 #define __MODEL_POSE_H__
 
-#include <lipsofsuna/algorithm.h>
+#include "lipsofsuna/algorithm.h"
 #include "model.h"
 #include "model-animation.h"
 #include "model-bone.h"
@@ -73,8 +73,7 @@ struct _LIMdlPoseGroup
 	LIMatVector head_pose;
 	LIMatVector head_rest;
 	LIMatQuaternion rotation;
-	LIMdlNode* rest_node;
-	LIMdlNode* pose_node;
+	LIMdlNode* node;
 	LIMdlWeightGroup* weight_group;
 };
 
@@ -87,7 +86,7 @@ struct _LIMdlPoseVertex
 
 struct _LIMdlPose
 {
-	LIMdlModel* model;
+	LIAlgStrdic* animations;
 	LIAlgU32dic* channels;
 	LIMdlPoseFade* fades;
 	struct
