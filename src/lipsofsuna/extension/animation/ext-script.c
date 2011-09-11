@@ -42,7 +42,7 @@ static void Object_animate (LIScrArgs* args)
 	LIEngObject* self = args->self;
 
 	/* Handle arguments. */
-	liscr_args_gets_bool (args, "addivite", &additive);
+	liscr_args_gets_bool (args, "additive", &additive);
 	liscr_args_gets_string (args, "animation", &animation);
 	liscr_args_gets_int (args, "channel", &channel);
 	liscr_args_gets_float (args, "fade_in", &fade_in);
