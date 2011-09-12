@@ -127,6 +127,8 @@ int liren_render_shader_compile (
 			animated, alpha_to_coverage, blend_enable, blend_src, blend_dst,
 			color_write, depth_test, depth_write, depth_func);
 	}
+
+	return 0;
 }
 
 void liren_render_shader_set_sort (

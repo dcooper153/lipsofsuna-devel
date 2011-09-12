@@ -99,7 +99,139 @@ void liren_object_free (
 		liren_object32_free (self->v32);
 	if (self->v21 != NULL)
 		liren_object21_free (self->v21);
+	if (self->pose != NULL)
+		limdl_pose_free (self->pose);
 	lisys_free (self);
+}
+
+int liren_object_channel_animate (
+	LIRenObject* self,
+	int          channel,
+	const char*  name,
+	int          additive,
+	int          repeat,
+	int          repeat_start,
+	int          keep,
+	float        fade_in,
+	float        fade_out,
+	float        weight,
+	float        weight_scale,
+	float        time,
+	float        time_scale,
+	const char** node_names,
+	float*       node_weights,
+	int          node_count)
+{
+	int i;
+	const char* name1;
+
+	/* Create the pose if it doesn't exist. */
+	if (self->pose == NULL)
+	{
+		self->pose = limdl_pose_new ();
+		if (self->pose == NULL)
+			return 0;
+		if (self->model != NULL)
+			limdl_pose_set_model (self->pose, self->model->model);
+		if (self->v32 != NULL)
+			liren_object32_set_pose (self->v32, self->pose);
+		else
+			liren_object21_set_pose (self->v21, self->pose);
+	}
+
+	/* Avoid restarts in simple cases. */
+	/* The position is kept if the animation is repeating and being replaced with
+	   the same one but parameters such as fading and weights still need to be reset. */
+	if (repeat && channel != -1 && name != NULL)
+	{
+		if (limdl_pose_get_channel_state (self->pose, channel) == LIMDL_POSE_CHANNEL_STATE_PLAYING &&
+		    limdl_pose_get_channel_repeats (self->pose, channel) == -1)
+		{
+			name1 = limdl_pose_get_channel_name (self->pose, channel);
+			if (!strcmp (name, name1))
+				keep = 1;
+		}
+	}
+
+	/* Automatic channel assignment. */
+	if (channel == -1)
+	{
+		for (channel = 254 ; channel > 0 ; channel--)
+		{
+			if (limdl_pose_get_channel_state (self->pose, channel) == LIMDL_POSE_CHANNEL_STATE_INVALID)
+				break;
+		}
+	}
+
+	/* Update or initialize the channel. */
+	if (!keep)
+	{
+		limdl_pose_fade_channel (self->pose, channel, LIMDL_POSE_FADE_AUTOMATIC);
+		if (name != NULL)
+		{
+			limdl_pose_set_channel_animation (self->pose, channel, name);
+			limdl_pose_set_channel_repeats (self->pose, channel, repeat? -1 : 1);
+			limdl_pose_set_channel_position (self->pose, channel, time);
+			limdl_pose_set_channel_state (self->pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
+		}
+	}
+	limdl_pose_set_channel_additive (self->pose, channel, additive);
+	limdl_pose_set_channel_repeat_start (self->pose, channel, repeat_start);
+	limdl_pose_set_channel_priority_scale (self->pose, channel, weight_scale);
+	limdl_pose_set_channel_priority_transform (self->pose, channel, weight);
+	limdl_pose_set_channel_time_scale (self->pose, channel, time_scale);
+	limdl_pose_set_channel_fade_in (self->pose, channel, fade_in);
+	limdl_pose_set_channel_fade_out (self->pose, channel, fade_out);
+
+	/* Handle optional per-node weights. */
+	if (name != NULL && node_count)
+	{
+		limdl_pose_clear_channel_node_priorities (self->pose, channel);
+		for (i = 0 ; i < node_count ; i++)
+		{
+			limdl_pose_set_channel_priority_node (self->pose, channel,
+				node_names[i], node_weights[i]);
+		}
+	}
+
+	return 1;
+}
+
+void liren_object_channel_edit (
+	LIRenObject*          self,
+	int                   channel,
+	int                   frame,
+	const char*           node,
+	const LIMatTransform* transform,
+	float                 scale)
+{
+	if (self->pose != NULL)
+		limdl_pose_set_channel_transform (self->pose, channel, frame, node, scale, transform);
+}
+
+void liren_object_channel_fade (
+	LIRenObject* self,
+	int          channel,
+	float        time)
+{
+	if (self->pose != NULL)
+		limdl_pose_fade_channel (self->pose, channel, time);
+}
+
+LIMdlPoseChannel* liren_object_channel_get_state (
+	LIRenObject* self,
+	int          channel)
+{
+	LIMdlPoseChannel* chan;
+
+	if (self->pose == NULL)
+		return NULL;
+	chan = lialg_u32dic_find (self->pose->channels, channel);
+	if (chan == NULL)
+		return NULL;
+	chan = limdl_pose_channel_new_copy (chan);
+
+	return chan;
 }
 
 /**
@@ -113,6 +245,41 @@ void liren_object_deform (
 		liren_object32_deform (self->v32);
 	else
 		liren_object21_deform (self->v21);
+}
+
+int liren_object_find_node (
+	LIRenObject*    self,
+	const char*     name,
+	int             world,
+	LIMatTransform* result)
+{
+	float scale;
+	LIMatTransform transform;
+	LIMatTransform transform1;
+	LIMdlNode* node;
+
+	/* Find the node. */
+	if (self->pose == NULL)
+		return 0;
+	node = limdl_pose_find_node (self->pose, name);
+	if (node == NULL)
+		return 0;
+
+	/* Get the transformation. */
+	if (world)
+	{
+		limdl_node_get_world_transform (node, &scale, &transform);
+		if (self->v32 != NULL)
+			transform1 = self->v32->transform;
+		else
+			transform1 = self->v21->transform;
+		transform = limat_transform_multiply (transform1, transform);
+	}
+	else
+		limdl_node_get_world_transform (node, &scale, &transform);
+	*result = transform;
+
+	return 1;
 }
 
 /**
@@ -163,6 +330,18 @@ int liren_object_set_model (
 	LIRenObject* self,
 	LIRenModel*  model)
 {
+	/* Update the pose if the model has one. */
+	if (self->pose != NULL)
+	{
+		if (model != NULL)
+			limdl_pose_set_model (self->pose, model->model);
+		else
+		{
+			limdl_pose_free (self->pose);
+			self->pose = NULL;
+		}
+	}
+
 	if (self->v32 != NULL)
 	{
 		if (!liren_object32_set_model (self->v32, (model != NULL)? model->v32 : NULL))

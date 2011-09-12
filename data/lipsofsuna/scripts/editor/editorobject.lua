@@ -20,8 +20,6 @@ EditorObject:add_setters{
 		end
 		if v.type == "species" then
 			s:animate{animation = "idle", channel = 1, permanent = true}
-			s:update_animations{secs = 0}
-			s:deform_mesh()
 		end
 	end}
 

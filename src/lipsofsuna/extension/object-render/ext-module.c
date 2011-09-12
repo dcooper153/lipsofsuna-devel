@@ -195,15 +195,9 @@ static int private_object_model (
 	LIEngModel*  model)
 {
 	if (model != NULL)
-	{
-		liren_render_object_set_pose (self->render, object->id, object->pose);
 		liren_render_object_set_model (self->render, object->id, model->id);
-	}
 	else
-	{
-		liren_render_object_set_pose (self->render, object->id, NULL);
 		liren_render_object_set_model (self->render, object->id, 0);
-	}
 
 	return 1;
 }

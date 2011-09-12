@@ -168,13 +168,11 @@ Eventhandler{type = "tick", func = function(self, args)
 	end
 	-- Update active objects.
 	animt = animt + args.secs
-	local anim = Object.deform_mesh and animt > 0.2 * (1 - Client.views.options.animation_quality)
+	local anim = Object.animate and animt > 0.2 * (1 - Client.views.options.animation_quality)
 	for k,v in pairs(Object.dict_active) do
-		-- Update animations.
+		-- Update sound.
 		if anim and k.animated then
-			k:update_animations{secs = animt}
 			k:update_sound(animt)
-			k:deform_mesh()
 		end
 		-- Interpolate positions.
 		k:update_motion_state(args.secs)

@@ -450,8 +450,9 @@ int liren_context32_set_pose (
 	const LIMdlPose* pose)
 {
 	int count;
-	float empty_pose[12] = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 1.0f};
 	const void* data;
+	static int empty_pose_init = 0;
+	static LIMdlPoseBuffer empty_pose[256];
 
 	/* Clear the old pose. */
 	if (self->buffer_texture.size)
@@ -465,7 +466,17 @@ int liren_context32_set_pose (
 	}
 	else
 	{
-		count = 12;
+		if (!empty_pose_init)
+		{
+			empty_pose_init = 1;
+			memset (empty_pose, 0, sizeof (empty_pose));
+			for (count = 0 ; count < 256 ; count++)
+			{
+				empty_pose[count].quat2[3] = 1.0f;
+				empty_pose[count].scale = 1.0f;
+			}
+		}
+		count = 256 * 12;
 		data = empty_pose;
 	}
 

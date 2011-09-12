@@ -22,17 +22,11 @@
 #include "model.h"
 #include "model-animation.h"
 #include "model-bone.h"
+#include "model-pose-channel.h"
 #include "model-types.h"
 #include "model-vertex.h"
 
 #define LIMDL_POSE_FADE_AUTOMATIC -1.0f
-
-enum _LIMdlPoseChannelState
-{
-	LIMDL_POSE_CHANNEL_STATE_INVALID,
-	LIMDL_POSE_CHANNEL_STATE_PLAYING,
-	LIMDL_POSE_CHANNEL_STATE_PAUSED,
-};
 
 typedef struct _LIMdlPoseBuffer LIMdlPoseBuffer;
 struct _LIMdlPoseBuffer
@@ -41,23 +35,6 @@ struct _LIMdlPoseBuffer
 	float quat2[4];
 	float head[3];
 	float scale;
-};
-
-struct _LIMdlPoseChannel
-{
-	int additive;
-	int state;
-	int repeat;
-	int repeats;
-	int repeat_start;
-	float time;
-	float time_scale;
-	float priority_scale;
-	float priority_transform;
-	float fade_in;
-	float fade_out;
-	LIAlgStrdic* weights;
-	LIMdlAnimation* animation;
 };
 
 struct _LIMdlPoseFade

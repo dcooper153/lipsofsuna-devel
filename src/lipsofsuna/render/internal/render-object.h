@@ -25,6 +25,7 @@
 struct _LIRenObject
 {
 	int id;
+	LIMdlPose* pose;
 	LIRenModel* model;
 	LIRenRender* render;
 	LIRenObject21* v21;
@@ -40,6 +41,47 @@ LIAPICALL (void, liren_object_free, (
 
 LIAPICALL (void, liren_object_deform, (
 	LIRenObject* self));
+
+LIAPICALL (int, liren_object_channel_animate, (
+	LIRenObject* self,
+	int          channel,
+	const char*  name,
+	int          additive,
+	int          repeat,
+	int          repeat_start,
+	int          keep,
+	float        fade_in,
+	float        fade_out,
+	float        weight,
+	float        weight_scale,
+	float        time,
+	float        time_scale,
+	const char** node_names,
+	float*       node_weights,
+	int          node_count));
+
+LIAPICALL (void, liren_object_channel_edit, (
+	LIRenObject*          self,
+	int                   channel,
+	int                   frame,
+	const char*           node,
+	const LIMatTransform* transform,
+	float                 scale));
+
+LIAPICALL (void, liren_object_channel_fade, (
+	LIRenObject* self,
+	int          channel,
+	float        time));
+
+LIAPICALL (LIMdlPoseChannel*, liren_object_channel_get_state, (
+	LIRenObject* self,
+	int          channel));
+
+LIAPICALL (int, liren_object_find_node, (
+	LIRenObject*    self,
+	const char*     name,
+	int             world,
+	LIMatTransform* result));
 
 LIAPICALL (void, liren_object_particle_animation, (
 	LIRenObject* self,

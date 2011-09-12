@@ -60,12 +60,24 @@ LIRenModel* liren_model_new (
 	}
 	self->id = id;
 
+	/* Copy the model. */
+	if (model != NULL)
+	{
+		self->model = limdl_model_new_copy (model);
+		if (self->model == NULL)
+		{
+			lisys_free (self);
+			return 0;
+		}
+	}
+
 	/* Initialize the backend. */
 	if (render->v32 != NULL)
 	{
 		self->v32 = liren_model32_new (render->v32, model, id);
 		if (self->v32 == NULL)
 		{
+			limdl_model_free (self->model);
 			lisys_free (self);
 			return 0;
 		}
@@ -75,6 +87,7 @@ LIRenModel* liren_model_new (
 		self->v21 = liren_model21_new (render->v21, model, id);
 		if (self->v21 == NULL)
 		{
+			limdl_model_free (self->model);
 			lisys_free (self);
 			return 0;
 		}
@@ -113,6 +126,10 @@ void liren_model_free (
 	else
 		liren_render21_remove_model (self->render->v21, self->v21);
 
+	/* Free the model data. */
+	if (self->model != NULL)
+		limdl_model_free (self->model);
+
 	lialg_u32dic_remove (self->render->models, self->id);
 	if (self->v32 != NULL)
 		liren_model32_free (self->v32);
@@ -125,10 +142,20 @@ int liren_model_set_model (
 	LIRenModel* self,
 	LIMdlModel* model)
 {
+	LIMdlModel* copy;
+
+	/* Copy the model. */
+	copy = limdl_model_new_copy (model);
+	if (copy == NULL)
+		return 0;
+	if (self->model != NULL)
+		limdl_model_free (self->model);
+	self->model = copy;
+
 	if (self->v32 != NULL)
-		return liren_model32_set_model (self->v32, model);
+		return liren_model32_set_model (self->v32, self->model);
 	else
-		return liren_model21_set_model (self->v21, model);
+		return liren_model21_set_model (self->v21, self->model);
 }
 
 /** @} */

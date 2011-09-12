@@ -22,11 +22,8 @@
  * @{
  */
 
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "model-pose.h"
-
-static void private_channel_free (
-	LIMdlPoseChannel* chan);
 
 static void private_clear_pose (
 	LIMdlPose* self);
@@ -54,21 +51,9 @@ static int private_init_pose (
 	LIMdlPose*  self,
 	LIMdlModel* model);
 
-static int private_play_channel (
-	const LIMdlPose*  self,
-	LIMdlPoseChannel* channel,
-	float             secs);
-
 static void private_transform_node (
 	LIMdlPose* self,
 	LIMdlNode* node);
-
-static void private_get_channel_weight (
-	const LIMdlPose*        self,
-	const LIMdlPoseChannel* channel,
-	const LIMdlNode*        node,
-	float*                  scale,
-	float*                  transform);
 
 static float private_smooth_fade (
 	float channel_weight,
@@ -154,7 +139,7 @@ void limdl_pose_destroy_channel (
 	if (chan == NULL)
 		return;
 	lialg_u32dic_remove (self->channels, channel);
-	private_channel_free (chan);
+	limdl_pose_channel_free (chan);
 }
 
 /**
@@ -198,7 +183,7 @@ void limdl_pose_fade_channel (
 		limdl_pose_destroy_channel (self, channel);
 		return;
 	}
-	private_get_channel_weight (self, chan, NULL, &fade->priority_scale, &fade->priority_transform);
+	limdl_pose_channel_get_weight (chan, NULL, &fade->priority_scale, &fade->priority_transform);
 	fade->fade_out = secs;
 	fade->time = chan->time;
 	fade->time_fade = 0.0f;
@@ -279,10 +264,10 @@ void limdl_pose_update (
 			case LIMDL_POSE_CHANNEL_STATE_PAUSED:
 				break;
 			case LIMDL_POSE_CHANNEL_STATE_PLAYING:
-				if (!private_play_channel (self, chan, secs))
+				if (!limdl_pose_channel_play (chan, secs))
 				{
 					lialg_u32dic_remove (self->channels, iter.key);
-					private_channel_free (chan);
+					limdl_pose_channel_free (chan);
 				}
 				break;
 		}
@@ -869,7 +854,7 @@ int limdl_pose_set_model (
 		else
 		{
 			lialg_u32dic_remove (self->channels, iter.key);
-			private_channel_free (chan);
+			limdl_pose_channel_free (chan);
 		}
 	}
 
@@ -901,21 +886,6 @@ int limdl_pose_set_model (
 
 /*****************************************************************************/
 
-static void private_channel_free (
-	LIMdlPoseChannel* chan)
-{
-	LIAlgStrdicIter iter;
-
-	limdl_animation_free (chan->animation);
-	if (chan->weights)
-	{
-		LIALG_STRDIC_FOREACH (iter, chan->weights)
-			lisys_free (iter.value);
-		lialg_strdic_free (chan->weights);
-	}
-	lisys_free (chan);
-}
-
 static void private_clear_pose (
 	LIMdlPose* self)
 {
@@ -937,7 +907,7 @@ static void private_clear_pose (
 	if (self->channels != NULL)
 	{
 		LIALG_U32DIC_FOREACH (iter, self->channels)
-			private_channel_free (iter.value);
+			limdl_pose_channel_free (iter.value);
 		lialg_u32dic_clear (self->channels);
 	}
 
@@ -1118,52 +1088,6 @@ static int private_init_pose (
 	return 1;
 }
 
-static int private_play_channel (
-	const LIMdlPose*  self,
-	LIMdlPoseChannel* channel,
-	float             secs)
-{
-	int cycles;
-	float duration;
-	float start;
-
-	/* Skip empty. */
-	duration = limdl_animation_get_duration (channel->animation);
-	if (duration < LIMAT_EPSILON)
-	{
-		channel->time = 0.0f;
-		if (channel->repeats == -1)
-			return 1;
-		return 0;
-	}
-
-	/* Advance time. */
-	channel->time += channel->time_scale * secs;
-
-	/* Handle looping. */
-	if (channel->time > duration)
-	{
-		start = LIMAT_CLAMP (channel->repeat_start, 0.0f, duration);
-		if (start < duration)
-		{
-			cycles = (int) floor ((channel->time - start) / (duration - start));
-			channel->time = channel->time - (duration - start) * cycles;
-			channel->repeat += cycles;
-		}
-		else
-		{
-			channel->time = duration;
-			channel->repeat++;
-		}
-	}
-
-	/* Handle ending. */
-	if (channel->repeats != -1 && channel->repeat >= channel->repeats)
-		return 0;
-
-	return 1;
-}
-
 static void private_transform_node (
 	LIMdlPose* self,
 	LIMdlNode* node)
@@ -1200,7 +1124,7 @@ static void private_transform_node (
 			continue;
 		if (limdl_animation_get_channel (chan->animation, node->name) != -1)
 		{
-			private_get_channel_weight (self, chan, node, &weight, &weight1);
+			limdl_pose_channel_get_weight (chan, node->name, &weight, &weight1);
 			total_scale += weight;
 			total_transform += weight1;
 			channels++;
@@ -1231,7 +1155,7 @@ static void private_transform_node (
 			{
 				bonepos = transform.position;
 				bonerot = transform.rotation;
-				private_get_channel_weight (self, chan, node, &weight1, &weight);
+				limdl_pose_channel_get_weight (chan, node->name, &weight1, &weight);
 				rotation = limat_quaternion_nlerp (bonerot, rotation, weight / total_transform);
 				position = limat_vector_lerp (bonepos, position, weight / total_transform);
 			}
@@ -1260,7 +1184,7 @@ static void private_transform_node (
 			chan = iter.value;
 			if (limdl_animation_get_transform (chan->animation, node->name, chan->time, &scale1, &transform))
 			{
-				private_get_channel_weight (self, chan, node, &weight, &weight1);
+				limdl_pose_channel_get_weight (chan, node->name, &weight, &weight1);
 				scale += scale1 * weight / total_scale;
 			}
 		}
@@ -1292,7 +1216,7 @@ static void private_transform_node (
 		{
 			bonepos = transform.position;
 			bonerot = transform.rotation;
-			private_get_channel_weight (self, chan, node, &weight1, &weight);
+			limdl_pose_channel_get_weight (chan, node->name, &weight1, &weight);
 			rotation = limat_quaternion_nlerp (bonerot, rotation, weight);
 			position = limat_vector_lerp (bonepos, position, weight);
 			scale += scale1 * weight1;
@@ -1307,60 +1231,6 @@ static void private_transform_node (
 	/* Update child transformations recursively. */
 	for (i = 0 ; i < node->nodes.count ; i++)
 		private_transform_node (self, node->nodes.array[i]);
-}
-
-static void private_get_channel_weight (
-	const LIMdlPose*        self,
-	const LIMdlPoseChannel* channel,
-	const LIMdlNode*        node,
-	float*                  scale,
-	float*                  transform)
-{
-	float end;
-	float time;
-	float duration;
-	float weight_scale;
-	float weight_transform;
-	float* weight_ptr;
-
-	/* Calculate channel offset. */
-	duration = limdl_animation_get_duration (channel->animation);
-	time = channel->repeat * duration + channel->time;
-	end = channel->repeats * duration;
-
-	/* Calculate base weights. */
-	weight_scale = channel->priority_scale;
-	weight_transform = channel->priority_transform;
-	if (node != NULL && channel->weights)
-	{
-		weight_ptr = lialg_strdic_find (channel->weights, node->name);
-		if (weight_ptr != NULL)
-			weight_transform = *weight_ptr;
-	}
-
-	/* Calculate channel weight. */
-	if (!channel->repeat && time < channel->fade_in)
-	{
-		/* Fade in period. */
-		*scale = private_smooth_fade (weight_scale,
-			channel->fade_in - time, channel->fade_in);
-		*transform = private_smooth_fade (weight_transform,
-			channel->fade_in - time, channel->fade_in);
-	}
-	else if (channel->repeats == -1 || time < end - channel->fade_out)
-	{
-		/* No fade period. */
-		*scale = weight_scale;
-		*transform = weight_transform;
-	}
-	else
-	{
-		/* Fade out period. */
-		*scale = private_smooth_fade (weight_scale,
-			time - (end - channel->fade_out), channel->fade_out);
-		*transform = private_smooth_fade (weight_transform,
-			time - (end - channel->fade_out), channel->fade_out);
-	}
 }
 
 static float private_smooth_fade (

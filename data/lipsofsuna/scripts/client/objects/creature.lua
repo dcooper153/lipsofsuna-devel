@@ -44,7 +44,6 @@ Creature.set_model = function(self, model)
 		end
 		-- Initialize the pose.
 		self.animated = true
-		self:update_animations{secs = 0}
 	else
 		-- Order a new model to be built.
 		-- The model is instantly replaced only if there's no existing model.

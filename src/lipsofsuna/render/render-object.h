@@ -31,9 +31,55 @@ LIAPICALL (void, liren_render_object_free, (
 	LIRenRender* self,
 	int          id));
 
+LIAPICALL (void, liren_render_object_channel_animate, (
+	LIRenRender* self,
+	int          id,
+	int          channel,
+	const char*  name,
+	int          additive,
+	int          repeat,
+	int          repeat_start,
+	int          keep,
+	float        fade_in,
+	float        fade_out,
+	float        weight,
+	float        weight_scale,
+	float        time,
+	float        time_scale,
+	const char** node_names,
+	float*       node_weights,
+	int          node_count));
+
+LIAPICALL (void, liren_render_object_channel_edit, (
+	LIRenRender*          self,
+	int                   id,
+	int                   channel,
+	int                   frame,
+	const char*           node,
+	const LIMatTransform* transform,
+	float                 scale));
+
+LIAPICALL (void, liren_render_object_channel_fade, (
+	LIRenRender* self,
+	int          id,
+	int          channel,
+	float        time));
+
+LIAPICALL (LIMdlPoseChannel*, liren_render_object_channel_get_state, (
+	LIRenRender* self,
+	int          id,
+	int          channel));
+
 LIAPICALL (void, liren_render_object_deform, (
 	LIRenRender* self,
 	int          id));
+
+LIAPICALL (int, liren_render_object_find_node, (
+	LIRenRender*    self,
+	int             id,
+	const char*     name,
+	int             world,
+	LIMatTransform* result));
 
 LIAPICALL (void, liren_render_object_particle_animation, (
 	LIRenRender* self,
@@ -51,11 +97,6 @@ LIAPICALL (void, liren_render_object_set_model, (
 	LIRenRender* self,
 	int          id,
 	int          model));
-
-LIAPICALL (void, liren_render_object_set_pose, (
-	LIRenRender* self,
-	int          id,
-	LIMdlPose*   pose));
 
 LIAPICALL (void, liren_render_object_set_realized, (
 	LIRenRender* self,

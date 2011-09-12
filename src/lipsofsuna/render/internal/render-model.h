@@ -27,6 +27,7 @@
 struct _LIRenModel
 {
 	int id;
+	LIMdlModel* model;
 	LIRenRender* render;
 	LIRenModel21* v21;
 	LIRenModel32* v32;

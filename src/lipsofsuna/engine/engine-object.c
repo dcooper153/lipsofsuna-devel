@@ -64,14 +64,6 @@ LIEngObject* lieng_object_new (
 		return 0;
 	}
 
-	/* Allocate pose buffer. */
-	self->pose = limdl_pose_new ();
-	if (self->pose == NULL)
-	{
-		lialg_u32dic_remove (engine->objects, self->id);
-		lisys_free (self);
-	}
-
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, "object-new", lical_marshal_DATA_PTR, self);
 
@@ -97,10 +89,6 @@ void lieng_object_free (
 
 	/* Remove from engine. */
 	lialg_u32dic_remove (self->engine->objects, self->id);
-
-	/* Free pose. */
-	if (self->pose != NULL)
-		limdl_pose_free (self->pose);
 
 	/* Free all memory. */
 	lisys_free (self);
@@ -211,17 +199,7 @@ int lieng_object_set_model (
 	LIEngObject* self,
 	LIEngModel*  model)
 {
-	lua_State* lua;
-	LIScrScript* script;
-
-	script = liscr_data_get_script (self->script);
-	lua = liscr_script_get_lua (script);
-
-	/* Switch model. */
-	if (model != NULL)
-		limdl_pose_set_model (self->pose, model->model);
-	else
-		limdl_pose_set_model (self->pose, NULL);
+	/* Switch the model. */
 	self->model = model;
 
 	/* Invoke callbacks. */

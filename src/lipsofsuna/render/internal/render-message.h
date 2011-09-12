@@ -45,19 +45,39 @@ enum
 	/* Object */
 	LIREN_MESSAGE_OBJECT_NEW,
 	LIREN_MESSAGE_OBJECT_FREE,
-	LIREN_MESSAGE_OBJECT_DEFORM,
+	LIREN_MESSAGE_OBJECT_CHANNEL_ANIMATE,
+	LIREN_MESSAGE_OBJECT_CHANNEL_EDIT,
+	LIREN_MESSAGE_OBJECT_CHANNEL_FADE,
+	LIREN_MESSAGE_OBJECT_CHANNEL_GET_STATE,
+	LIREN_MESSAGE_OBJECT_FIND_NODE,
 	LIREN_MESSAGE_OBJECT_PARTICLE_ANIMATION,
 	LIREN_MESSAGE_OBJECT_SET_EFFECT,
-	LIREN_MESSAGE_OBJECT_SET_MODEL,
-	LIREN_MESSAGE_OBJECT_SET_POSE,
+	LIREN_MESSAGE_OBJECT_SET_MODEL, /* 40 */
 	LIREN_MESSAGE_OBJECT_SET_REALIZED,
 	LIREN_MESSAGE_OBJECT_SET_TRANSFORM,
 
 	/* Overlay */
-	/* TODO */
+	LIREN_MESSAGE_OVERLAY_NEW,
+	LIREN_MESSAGE_OVERLAY_FREE,
+	LIREN_MESSAGE_OVERLAY_CLEAR,
+	LIREN_MESSAGE_OVERLAY_ADD_IMAGE,
+	LIREN_MESSAGE_OVERLAY_ADD_TRIANGLES,
+	LIREN_MESSAGE_OVERLAY_ADD_TEXT,
+	LIREN_MESSAGE_OVERLAY_ADD_OVERLAY,
+	LIREN_MESSAGE_OVERLAY_REMOVE_OVERLAY, /* 50 */
+	LIREN_MESSAGE_OVERLAY_DISABLE_SCENE,
+	LIREN_MESSAGE_OVERLAY_ENABLE_SCENE,
+	LIREN_MESSAGE_OVERLAY_SET_BEHIND,
+	LIREN_MESSAGE_OVERLAY_SET_POSITION,
+	LIREN_MESSAGE_OVERLAY_SET_ROOT,
+	LIREN_MESSAGE_OVERLAY_SET_VISIBLE,
 
 	/* Shader */
-	/* TODO */
+	LIREN_MESSAGE_SHADER_NEW,
+	LIREN_MESSAGE_SHADER_FREE,
+	LIREN_MESSAGE_SHADER_CLEAR_PASS,
+	LIREN_MESSAGE_SHADER_COMPILE, /* 60 */
+	LIREN_MESSAGE_SHADER_SET_SORT
 };
 
 struct _LIRenMessage
@@ -145,7 +165,51 @@ struct _LIRenMessage
 		struct
 		{
 			int id;
-		} object_deform;
+			int channel;
+			char* name;
+			int additive;
+			int repeat;
+			int repeat_start;
+			int keep;
+			float fade_in;
+			float fade_out;
+			float weight;
+			float weight_scale;
+			float time;
+			float time_scale;
+			char** node_names;
+			float* node_weights;
+			int node_count;
+		} object_channel_animate;
+		struct
+		{
+			int id;
+			int channel;
+			int frame;
+			char* node;
+			LIMatTransform transform;
+			float scale;
+		} object_channel_edit;
+		struct
+		{
+			int id;
+			int channel;
+			float time;
+		} object_channel_fade;
+		struct
+		{
+			int id;
+			int channel;
+			LIMdlPoseChannel** result;
+		} object_channel_get_state;
+		struct
+		{
+			int id;
+			char* name;
+			int world;
+			LIMatTransform* result_transform;
+			int* result;
+		} object_find_node;
 		struct
 		{
 			int id;
@@ -163,11 +227,6 @@ struct _LIRenMessage
 			int id;
 			int model;
 		} object_set_model;
-		struct
-		{
-			int id;
-			LIMdlPose* pose;
-		} object_set_pose;
 		struct
 		{
 			int id;

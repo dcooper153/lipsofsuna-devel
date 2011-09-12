@@ -86,6 +86,9 @@ void liren_internal_handle_message (
 	LIRenRender*  self,
 	LIRenMessage* message)
 {
+	int i;
+	LIRenObject* object;
+
 	switch (message->type)
 	{
 		/* Render */
@@ -153,15 +156,82 @@ void liren_internal_handle_message (
 			break;
 		case LIREN_MESSAGE_OBJECT_FREE:
 			break;
-		case LIREN_MESSAGE_OBJECT_DEFORM:
+		case LIREN_MESSAGE_OBJECT_CHANNEL_ANIMATE:
+			object = lialg_u32dic_find (self->objects, message->object_channel_animate.id);
+			if (object != NULL)
+			{
+				liren_object_channel_animate (object,
+					message->object_channel_animate.channel,
+					message->object_channel_animate.name,
+					message->object_channel_animate.additive,
+					message->object_channel_animate.repeat,
+					message->object_channel_animate.repeat_start,
+					message->object_channel_animate.keep,
+					message->object_channel_animate.fade_in,
+					message->object_channel_animate.fade_out,
+					message->object_channel_animate.weight,
+					message->object_channel_animate.weight_scale,
+					message->object_channel_animate.time,
+					message->object_channel_animate.time_scale,
+					(const char**) message->object_channel_animate.node_names,
+					message->object_channel_animate.node_weights,
+					message->object_channel_animate.node_count);
+			}
+			lisys_free (message->object_channel_animate.name);
+			if (message->object_channel_animate.node_names != NULL)
+			{
+				for (i = 0 ; i < message->object_channel_animate.node_count ; i++)
+					lisys_free (message->object_channel_animate.node_names[i]);
+			}
+			lisys_free (message->object_channel_animate.node_names);
+			lisys_free (message->object_channel_animate.node_weights);
+			break;
+		case LIREN_MESSAGE_OBJECT_CHANNEL_EDIT:
+			object = lialg_u32dic_find (self->objects, message->object_channel_edit.id);
+			if (object != NULL)
+			{
+				liren_object_channel_edit (object,
+					message->object_channel_edit.channel,
+					message->object_channel_edit.frame,
+					message->object_channel_edit.node,
+					&message->object_channel_edit.transform,
+					message->object_channel_edit.scale);
+			}
+			lisys_free (message->object_channel_edit.node);
+			break;
+		case LIREN_MESSAGE_OBJECT_CHANNEL_FADE:
+			object = lialg_u32dic_find (self->objects, message->object_channel_fade.id);
+			if (object != NULL)
+			{
+				liren_object_channel_fade (object,
+					message->object_channel_fade.channel,
+					message->object_channel_fade.time);
+			}
+			break;
+		case LIREN_MESSAGE_OBJECT_CHANNEL_GET_STATE:
+			object = lialg_u32dic_find (self->objects, message->object_channel_get_state.id);
+			if (object != NULL)
+			{
+				*message->object_channel_get_state.result = liren_object_channel_get_state (object,
+					message->object_channel_get_state.channel);
+			}
+			break;
+		case LIREN_MESSAGE_OBJECT_FIND_NODE:
+			object = lialg_u32dic_find (self->objects, message->object_find_node.id);
+			if (object != NULL)
+			{
+				*message->object_find_node.result = liren_object_find_node (object,
+					message->object_find_node.name,
+					message->object_find_node.world,
+					message->object_find_node.result_transform);
+			}
+			lisys_free (message->object_find_node.name);
 			break;
 		case LIREN_MESSAGE_OBJECT_PARTICLE_ANIMATION:
 			break;
 		case LIREN_MESSAGE_OBJECT_SET_EFFECT:
 			break;
 		case LIREN_MESSAGE_OBJECT_SET_MODEL:
-			break;
-		case LIREN_MESSAGE_OBJECT_SET_POSE:
 			break;
 		case LIREN_MESSAGE_OBJECT_SET_REALIZED:
 			break;
@@ -451,7 +521,17 @@ void liren_internal_update (
 {
 	Uint32 now;
 	LIAlgStrdicIter iter;
+	LIAlgU32dicIter iter1;
 	LIRenImage* image;
+	LIRenObject* object;
+
+	/* Animate objects. */
+	LIALG_U32DIC_FOREACH (iter1, self->objects)
+	{
+		object = iter1.value;
+		if (object->pose != NULL)
+			limdl_pose_update (object->pose, secs);
+	}
 
 	/* Update the backend. */
 	if (self->v32 != NULL)
