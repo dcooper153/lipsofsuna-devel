@@ -221,13 +221,6 @@ LIAPICALL (void, liwdg_widget_set_fullscreen, (
 	LIWdgWidget* self,
 	int          value));
 
-LIAPICALL (int, liwdg_widget_get_grab, (
-	const LIWdgWidget* self));
-
-LIAPICALL (void, liwdg_widget_set_grab, (
-	LIWdgWidget* self,
-	int          value));
-
 LIAPICALL (int, liwdg_widget_get_homogeneous, (
 	const LIWdgWidget* self));
 

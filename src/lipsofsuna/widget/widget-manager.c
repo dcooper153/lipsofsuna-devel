@@ -284,25 +284,8 @@ void liwdg_manager_update (
 	LIWdgManager* self,
 	float         secs)
 {
-	int x;
-	int y;
-	int cx;
-	int cy;
-	int buttons;
 	LIWdgWidget* widget;
 
-	if (self->widgets.grab != NULL)
-	{
-		cx = self->width / 2;
-		cy = self->height / 2;
-		buttons = SDL_GetMouseState (&x, &y);
-		if (x != cx || y != cy)
-		{
-			SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
-			SDL_WarpMouse (cx, cy);
-			SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
-		}
-	}
 	for (widget = self->dialogs.top ; widget != NULL ; widget = self->widgets.iter)
 	{
 		self->widgets.iter = widget->next;

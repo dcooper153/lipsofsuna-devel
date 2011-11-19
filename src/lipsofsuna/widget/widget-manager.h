@@ -44,7 +44,6 @@ struct _LIWdgManager
 	{
 		LIAlgPtrdic* all;
 		LIWdgWidget* iter;
-		LIWdgWidget* grab;
 	} widgets;
 };
 

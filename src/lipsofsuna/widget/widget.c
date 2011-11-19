@@ -858,36 +858,6 @@ void liwdg_widget_set_fullscreen (
 	self->fullscreen = value;
 }
 
-int liwdg_widget_get_grab (
-	const LIWdgWidget* self)
-{
-	return self->manager->widgets.grab == self;
-}
-
-void liwdg_widget_set_grab (
-	LIWdgWidget* self,
-	int          value)
-{
-	int cx;
-	int cy;
-
-	if (value)
-	{
-		cx = self->manager->width / 2;
-		cy = self->manager->height / 2;
-		SDL_ShowCursor (SDL_DISABLE);
-		SDL_WarpMouse (cx, cy);
-		SDL_WM_GrabInput (SDL_GRAB_OFF);
-		self->manager->widgets.grab = self;
-	}
-	else
-	{
-		SDL_ShowCursor (SDL_ENABLE);
-		SDL_WM_GrabInput (SDL_GRAB_OFF);
-		self->manager->widgets.grab = NULL;
-	}
-}
-
 /**
  * \brief Get the homogeneousness flag.
  * \param self Widget.
