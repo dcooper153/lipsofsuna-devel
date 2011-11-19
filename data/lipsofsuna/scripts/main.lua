@@ -66,6 +66,7 @@ Options.inst = Options()
 __initial_videomode = {Options.inst.window_width, Options.inst.window_height, Options.inst.fullscreen, Options.inst.vsync}
 require "system/animation"
 require "system/graphics"
+require "system/input"
 require "system/camera"
 require "system/keysym"
 require "system/model-editing"

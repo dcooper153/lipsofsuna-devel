@@ -119,44 +119,12 @@ static void Client_set_video_mode (LIScrArgs* args)
 	liscr_args_seti_bool (args, 1);
 }
 
-static void Client_get_cursor_pos (LIScrArgs* args)
-{
-	int x;
-	int y;
-	LICliClient* client;
-	LIMatVector tmp;
-
-	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
-	SDL_GetMouseState (&x, &y);
-	tmp = limat_vector_init (x, y, 0.0f);
-	liscr_args_seti_vector (args, &tmp);
-}
-
 static void Client_get_fps (LIScrArgs* args)
 {
 	LICliClient* client;
 
 	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
 	liscr_args_seti_float (args, client->program->fps);
-}
-
-static void Client_get_moving (LIScrArgs* args)
-{
-	LICliClient* client;
-
-	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
-	liscr_args_seti_bool (args, licli_client_get_moving (client));
-}
-static void Client_set_moving (LIScrArgs* args)
-{
-	int value;
-	LICliClient* client;
-
-	if (liscr_args_geti_bool (args, 0, &value))
-	{
-		client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
-		licli_client_set_moving (client, value);
-	}
 }
 
 static void Client_set_title (LIScrArgs* args)
@@ -216,10 +184,7 @@ void licli_script_client (
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_host", Client_host);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_screenshot", Client_screenshot);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_set_video_mode", Client_set_video_mode);
-	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_cursor_pos", Client_get_cursor_pos);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_fps", Client_get_fps);
-	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_moving", Client_get_moving);
-	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_set_moving", Client_set_moving);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_set_title", Client_set_title);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_video_mode", Client_get_video_mode);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_video_modes", Client_get_video_modes);

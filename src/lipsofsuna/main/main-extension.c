@@ -32,6 +32,7 @@ extern LIMaiExtensionInfo liext_config_file_info;
 extern LIMaiExtensionInfo liext_database_info;
 extern LIMaiExtensionInfo liext_file_info;
 extern LIMaiExtensionInfo liext_graphics_info;
+extern LIMaiExtensionInfo liext_input_info;
 extern LIMaiExtensionInfo liext_lobby_info;
 extern LIMaiExtensionInfo liext_model_editing_info;
 extern LIMaiExtensionInfo liext_network_info;
@@ -75,6 +76,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "database", &liext_database_info },
 		{ "file", &liext_file_info },
 		{ "graphics", &liext_graphics_info },
+		{ "input", &liext_input_info },
 		{ "lobby", &liext_lobby_info },
 		{ "model-editing", &liext_model_editing_info },
 		{ "network", &liext_network_info },

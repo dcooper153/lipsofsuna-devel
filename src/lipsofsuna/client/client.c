@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -26,12 +26,6 @@
 #include "client.h"
 #include "client-script.h"
 
-#define ENABLE_GRABS
-
-static void private_grab (
-	LICliClient* self,
-	int          value);
-
 static int private_init (
 	LICliClient*  self,
 	LIMaiProgram* program,
@@ -40,20 +34,12 @@ static int private_init (
 	int           fullscreen,
 	int           sync);
 
-static int private_event (
-	LICliClient* client,
-	SDL_Event*   event);
-
 static void private_server_main (
 	LISysThread* thread,
 	void*        data);
 
 static void private_server_shutdown (
 	LICliClient* self);
-
-static int private_tick (
-	LICliClient* self,
-	float        secs);
 
 /*****************************************************************************/
 
@@ -81,7 +67,7 @@ LICliClient* licli_client_new (
 		return NULL;
 	}
 
-	/* Initialize graphics and input. */
+	/* Initialize graphics. */
 	if (!private_init (self, program, width, height, fullscreen, vsync))
 	{
 		licli_client_free (self);
@@ -107,10 +93,6 @@ void licli_client_free (
 	/* Free the graphics engine. */
 	if (self->render != NULL)
 		liren_render_free (self->render);
-
-	/* Uninitialize input. */
-	if (self->joystick != NULL)
-		SDL_JoystickClose (self->joystick);
 
 	lisys_free (self);
 }
@@ -145,53 +127,6 @@ int licli_client_host (
 	return 1;
 }
 
-/**
- * \brief Returns nonzero if movement mode is active.
- *
- * \param self Client.
- * \return Boolean.
- */
-int licli_client_get_moving (
-	LICliClient* self)
-{
-	return self->moving;
-}
-
-/**
- * \brief Enables or disables movement mode.
- *
- * When the movement mode is enabled, all mouse events are passed directly to
- * the scripts. Otherwise, the events are first passed to the user interface.
- *
- * \param self Client.
- * \param value Nonzero for movement mode, zero for user interface mode
- */
-void licli_client_set_moving (
-	LICliClient* self,
-	int          value)
-{
-#ifdef ENABLE_GRABS
-	self->moving = value;
-	if (self->active && value)
-		private_grab (self, 1);
-	else
-		private_grab (self, 0);
-#else
-	int cx;
-	int cy;
-
-	self->moving = value;
-	if (value)
-	{
-		cx = self->window->mode.width / 2;
-		cy = self->window->mode.height / 2;
-		SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
-		SDL_WarpMouse (cx, cy);
-		SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
-	}
-#endif
-}
-
 int licli_client_set_videomode (
 	LICliClient* self,
 	int          width,
@@ -214,18 +149,6 @@ int licli_client_set_videomode (
 
 /*****************************************************************************/
 
-static void private_grab (
-	LICliClient* self,
-	int          value)
-{
-#ifdef ENABLE_GRABS
-	if (value)
-		SDL_WM_GrabInput (SDL_GRAB_ON);
-	else
-		SDL_WM_GrabInput (SDL_GRAB_OFF);
-#endif
-}
-
 static int private_init (
 	LICliClient*  self,
 	LIMaiProgram* program,
@@ -246,11 +169,6 @@ static int private_init (
 		return 0;
 	self->mode = mode;
 
-	/* Initialize input. */
-	self->joystick = SDL_JoystickOpen (0);
-	SDL_EnableUNICODE (1);
-	SDL_EnableKeyRepeat (SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-
 	/* Register component. */
 	if (!limai_program_insert_component (self->program, "client", self))
 		return 0;
@@ -258,88 +176,6 @@ static int private_init (
 	/* Register classes. */
 	liscr_script_set_userdata (program->script, LICLI_SCRIPT_CLIENT, self);
 	licli_script_client (program->script);
-
-	/* Register callbacks. */
-	lical_callbacks_insert (program->callbacks, "event", -5, private_event, self, NULL);
-	lical_callbacks_insert (program->callbacks, "tick", -1000, private_tick, self, NULL);
-
-	return 1;
-}
-
-static int private_event (
-	LICliClient* self,
-	SDL_Event*   event)
-{
-	char* str = NULL;
-
-	switch (event->type)
-	{
-		case SDL_JOYAXISMOTION:
-			limai_program_event (self->program, "joystickmotion", "axis", LISCR_TYPE_INT, event->jaxis.axis + 1, "value", LISCR_TYPE_FLOAT, event->jaxis.value / 32768.0f, NULL);
-			return 0;
-		case SDL_JOYBUTTONDOWN:
-		case SDL_JOYBUTTONUP:
-			limai_program_event (self->program, (event->type == SDL_JOYBUTTONDOWN)? "joystickpress" : "joystickrelease", "button", LISCR_TYPE_INT, event->jbutton.button, NULL);
-			return 0;
-		case SDL_MOUSEBUTTONDOWN:
-		case SDL_MOUSEBUTTONUP:
-			limai_program_event (self->program, (event->type == SDL_MOUSEBUTTONDOWN)? "mousepress" : "mouserelease", "button", LISCR_TYPE_INT, event->button.button, "x", LISCR_TYPE_INT, event->button.x, "y", LISCR_TYPE_INT, event->button.y, NULL);
-			return 0;
-		case SDL_KEYDOWN:
-			if (event->key.keysym.sym == SDLK_F4 &&
-			   (event->key.keysym.mod & KMOD_ALT))
-				self->program->quit = 1;
-			if (event->key.keysym.sym == SDLK_F5 &&
-			   (event->key.keysym.mod & KMOD_CTRL) &&
-			   (event->key.keysym.mod & KMOD_SHIFT))
-			{
-				lical_callbacks_call (self->program->callbacks, "context-lost", lical_marshal_DATA_INT, 0);
-				lical_callbacks_call (self->program->callbacks, "context-lost", lical_marshal_DATA_INT, 1);
-			}
-			/* Fall through */
-		case SDL_KEYUP:
-			if (event->key.keysym.unicode != 0)
-				str = lisys_wchar_to_utf8 (event->key.keysym.unicode);
-			if (str != NULL)
-			{
-				limai_program_event (self->program, (event->type == SDL_KEYDOWN)? "keypress" : "keyrelease", "code", LISCR_TYPE_INT, event->key.keysym.sym, "mods", LISCR_TYPE_INT, event->key.keysym.mod, "text", LISCR_TYPE_STRING, str, NULL);
-				lisys_free (str);
-			}
-			else
-			{
-				limai_program_event (self->program, (event->type == SDL_KEYDOWN)? "keypress" : "keyrelease", "code", LISCR_TYPE_INT, event->key.keysym.sym, "mods", LISCR_TYPE_INT, event->key.keysym.mod, NULL);
-			}
-			return 0;
-		case SDL_MOUSEMOTION:
-			limai_program_event (self->program, "mousemotion", "x", LISCR_TYPE_INT, event->motion.x, "y", LISCR_TYPE_INT, event->motion.y, "dx", LISCR_TYPE_INT, event->motion.xrel, "dy", LISCR_TYPE_INT, event->motion.yrel, NULL);
-			return 0;
-		case SDL_QUIT:
-			limai_program_event (self->program, "quit", NULL);
-			break;
-		case SDL_ACTIVEEVENT:
-			if (event->active.state & SDL_APPINPUTFOCUS)
-			{
-				if (event->active.gain)
-				{
-					self->active = 1;
-					self->program->sleep = 0;
-					if (self->moving)
-						private_grab (self, 1);
-				}
-				else
-				{
-					self->active = 0;
-					self->program->sleep = 100000;
-					if (self->moving)
-						private_grab (self, 0);
-				}
-			}
-			break;
-		case SDL_VIDEORESIZE:
-			self->mode.width = event->resize.w;
-			self->mode.height = event->resize.h;
-			break;
-	}
 
 	return 1;
 }
@@ -374,41 +210,6 @@ static void private_server_shutdown (
 		self->server_thread = NULL;
 		lisys_assert (self->server == NULL);
 	}
-}
-
-static int private_tick (
-	LICliClient* self,
-	float        secs)
-{
-#ifndef ENABLE_GRABS
-	int x;
-	int y;
-	int cx;
-	int cy;
-#endif
-	SDL_Event event;
-
-	/* Invoke input callbacks. */
-	while (SDL_PollEvent (&event))
-		lical_callbacks_call (self->program->callbacks, "event", lical_marshal_DATA_PTR, &event);
-
-	/* Pointer warping in movement mode. */
-#ifndef ENABLE_GRABS
-	if (self->moving)
-	{
-		cx = self->mode.width / 2;
-		cy = self->mode.height / 2;
-		SDL_GetMouseState (&x, &y);
-		if (x != cx || y != cy)
-		{
-			SDL_EventState (SDL_MOUSEMOTION, SDL_IGNORE);
-			SDL_WarpMouse (cx, cy);
-			SDL_EventState (SDL_MOUSEMOTION, SDL_ENABLE);
-		}
-	}
-#endif
-
-	return 1;
 }
 
 /** @} */

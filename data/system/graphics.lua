@@ -34,14 +34,6 @@ Program.set_video_mode = function(clss, ...)
 	return Los.client_set_video_mode(...)
 end
 
---- Movement mode flag.
--- @name Program.cursor_grabbed
--- @class table
-
---- The current cursor position.
--- @name Program.cursor_position
--- @class table
-
 --- Short term average frames per second.
 -- @name Program.fps
 -- @class table
@@ -63,8 +55,6 @@ end
 -- @class table
 
 Program:add_class_getters{
-	cursor_grabbed = function(s) return Los.client_get_moving() end,
-	cursor_position = function(s) return Class.new(Vector, {handle = Los.client_get_cursor_pos()}) end,
 	fps = function(s) return Los.client_get_fps() end,
 	opengl_version = function(s) return Los.program_get_opengl_version() end,
 	video_mode = function(s) return Los.client_get_video_mode() end,
@@ -72,7 +62,6 @@ Program:add_class_getters{
 	window_title = function(s) return s.window_title or "" end}
 
 Program:add_class_setters{
-	cursor_grabbed = function(s, v) Los.client_set_moving(v) end,
 	window_title = function(s, v)
 		s._window_title = v
 		Los.client_set_title(v)
