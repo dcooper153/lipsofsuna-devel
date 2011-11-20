@@ -56,16 +56,7 @@ LICliClient* licli_client_new (
 	self = lisys_calloc (1, sizeof (LICliClient));
 	if (self == NULL)
 		return NULL;
-	self->active = 1;
 	self->program = program;
-
-	/* Initialize SDL. */
-	if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
-	{
-		lisys_error_set (ENOTSUP, "initializing SDL failed");
-		lisys_free (self);
-		return NULL;
-	}
 
 	/* Initialize graphics. */
 	if (!private_init (self, program, width, height, fullscreen, vsync))

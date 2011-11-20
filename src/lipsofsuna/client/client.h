@@ -32,14 +32,11 @@
 
 struct _LICliClient
 {
-	int active;
-	int moving;
 	LIMaiProgram* program;
 	LICliServer* server;
 	LISysThread* server_thread;
 	LIRenRender* render;
 	LIRenVideomode mode;
-	SDL_Joystick* joystick;
 };
 
 LIAPICALL (LICliClient*, licli_client_new, (

@@ -307,6 +307,13 @@ float liren_render_get_opengl_version (
 		return 2.1f;
 }
 
+void liren_render_set_title (
+	LIRenRender* self,
+	const char*  value)
+{
+	SDL_WM_SetCaption (value, value);
+}
+
 int liren_render_set_videomode (
 	LIRenRender*    self,
 	LIRenVideomode* mode)

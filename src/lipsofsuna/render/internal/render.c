@@ -615,6 +615,17 @@ int liren_internal_set_videomode (
 	SDL_Rect* best = NULL;
 	SDL_Rect** modes;
 
+	/* Initialize SDL. */
+	if (!SDL_WasInit (SDL_INIT_VIDEO))
+	{
+		if (SDL_Init (SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) == -1)
+		{
+			lisys_error_set (ENOTSUP, "initializing SDL failed");
+			lisys_free (self);
+			return 0;
+		}
+	}
+
 	/* Determine screen surface flags. */
 	if (mode->fullscreen)
 	{

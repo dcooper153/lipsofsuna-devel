@@ -18,6 +18,7 @@
 #ifndef __RENDER_INTERNAL_RENDER_H__
 #define __RENDER_INTERNAL_RENDER_H__
 
+#include "SDL.h"
 #include "lipsofsuna/paths.h"
 #include "render-types.h"
 #include "../render21/render.h"

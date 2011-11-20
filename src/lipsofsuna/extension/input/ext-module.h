@@ -15,8 +15,8 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __EXT_INPUT_MODULE_H__
+#define __EXT_INPUT_MODULE_H__
 
 #include "SDL.h"
 #include "lipsofsuna/extension.h"
@@ -43,6 +43,11 @@ LIInpInput* liinp_input_new (
 
 void liinp_input_free (
 	LIInpInput* self);
+
+void liinp_input_get_pointer (
+	LIInpInput* self,
+	int*        x,
+	int*        y);
 
 int liinp_input_get_pointer_grab (
 	LIInpInput* self);

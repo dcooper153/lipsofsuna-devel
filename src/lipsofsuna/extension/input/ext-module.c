@@ -118,6 +118,20 @@ void liinp_input_free (
 }
 
 /**
+ * \brief Gets the current pointer position.
+ * \param self Input.
+ * \param x Return location for the X coordinate.
+ * \param y Return location for the Y coordinate.
+ */
+void liinp_input_get_pointer (
+	LIInpInput* self,
+	int*        x,
+	int*        y)
+{
+	SDL_GetMouseState (x, y);
+}
+
+/**
  * \brief Returns nonzero if movement mode is active.
  * \param self Input.
  * \return Boolean.

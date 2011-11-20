@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,9 +22,9 @@
  * @{
  */
 
-#include <lipsofsuna/network.h>
-#include <lipsofsuna/system.h>
-#include <lipsofsuna/client.h>
+#include "lipsofsuna/network.h"
+#include "lipsofsuna/system.h"
+#include "lipsofsuna/client.h"
 
 static void Client_host (LIScrArgs* args)
 {
@@ -119,7 +119,7 @@ static void Client_set_title (LIScrArgs* args)
 	if (liscr_args_geti_string (args, 0, &value))
 	{
 		client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
-		SDL_WM_SetCaption (value, value);
+		liren_render_set_title (client->render, value);
 	}
 }
 

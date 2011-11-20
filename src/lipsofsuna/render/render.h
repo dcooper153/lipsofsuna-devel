@@ -18,7 +18,6 @@
 #ifndef __RENDER_H__
 #define __RENDER_H__
 
-#include "SDL.h"
 #include "lipsofsuna/paths.h"
 #include "lipsofsuna/system.h"
 #include "render-types.h"
@@ -73,6 +72,10 @@ LIAPICALL (int, liren_render_get_image_size, (
 
 LIAPICALL (float, liren_render_get_opengl_version, (
 	LIRenRender* self));
+
+LIAPICALL (void, liren_render_set_title, (
+	LIRenRender* self,
+	const char*  value));
 
 LIAPICALL (int, liren_render_set_videomode, (
 	LIRenRender*    self,
