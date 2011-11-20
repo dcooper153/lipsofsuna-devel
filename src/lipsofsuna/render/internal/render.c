@@ -116,7 +116,7 @@ void liren_internal_handle_message (
 			lisys_free (message->render_measure_text.text);
 			break;
 		case LIREN_MESSAGE_RENDER_SCREENSHOT:
-			*message->render_screenshot.result = liren_internal_screenshot (self);
+			//*message->render_screenshot.result = liren_internal_screenshot (self);
 			break;
 		case LIREN_MESSAGE_RENDER_UPDATE:
 			liren_internal_update (self,
@@ -446,8 +446,9 @@ void liren_internal_render_scene (
 	}
 }
 
-SDL_Surface* liren_internal_screenshot (
-	LIRenRender* self)
+int liren_internal_screenshot (
+	LIRenRender* self,
+	const char*  path)
 {
 	int i;
 	int width;
@@ -469,7 +470,7 @@ SDL_Surface* liren_internal_screenshot (
 	/* The one extra row we allocate is used for flipping. */
 	pixels = calloc ((height + 1) * pitch, sizeof (uint8_t));
 	if (pixels == NULL)
-		return NULL;
+		return 0;
 	glBindFramebuffer (GL_FRAMEBUFFER, 0);
 	glBindFramebuffer (GL_DRAW_FRAMEBUFFER, 0);
 	glBindFramebuffer (GL_READ_FRAMEBUFFER, 0);
@@ -504,10 +505,16 @@ SDL_Surface* liren_internal_screenshot (
 	if (surface == NULL)
 	{
 		lisys_free (pixels);
-		return NULL;
+		return 9;
 	}
 
-	return surface;
+	/* Save the surface to a file. */
+	pixels = surface->pixels;
+	SDL_SaveBMP (surface, path);
+	SDL_FreeSurface (surface);
+	lisys_free (pixels);
+
+	return 1;
 }
 
 /**
@@ -674,6 +681,39 @@ int liren_internal_set_videomode (
 #ifdef WIN32
 	liren_render_reload (self, 1);
 #endif
+
+	return 1;
+}
+
+int liren_internal_get_videomodes (
+	LIRenRender*     self,
+	LIRenVideomode** modes,
+	int*             modes_num)
+{
+	int i;
+	SDL_Rect** m;
+
+	/* Get the list of modes. */
+	m = SDL_ListModes (NULL, SDL_OPENGL | SDL_FULLSCREEN);
+	if (m == NULL && m == (SDL_Rect**) -1)
+		return 0;
+
+	/* Count modes. */
+	for (i = 0 ; m[i] != NULL ; i++)
+		{}
+	*modes = lisys_calloc (i, sizeof (LIRenVideomode));
+	if (*modes == NULL)
+		return 0;
+
+	/* Convert modes. */
+	*modes_num = i;
+	for (i = 0 ; m[i] != NULL ; i++)
+	{
+		(*modes)[i].width = m[i]->w;
+		(*modes)[i].height = m[i]->h;
+		(*modes)[i].fullscreen = 1;
+		(*modes)[i].sync = self->mode.sync;
+	}
 
 	return 1;
 }

@@ -90,8 +90,9 @@ LIAPICALL (void, liren_internal_render_scene, (
 	LIRenPassPostproc* postproc_passes,
 	int                postproc_passes_num));
 
-LIAPICALL (SDL_Surface*, liren_internal_screenshot, (
-	LIRenRender* self));
+LIAPICALL (int, liren_internal_screenshot, (
+	LIRenRender* self,
+	const char*  path));
 
 LIAPICALL (void, liren_internal_update, (
 	LIRenRender* self,
@@ -115,5 +116,10 @@ LIAPICALL (float, liren_internal_get_opengl_version, (
 LIAPICALL (int, liren_internal_set_videomode, (
 	LIRenRender*    self,
 	LIRenVideomode* mode));
+
+LIAPICALL (int, liren_internal_get_videomodes, (
+	LIRenRender*     self,
+	LIRenVideomode** modes,
+	int*             modes_num));
 
 #endif

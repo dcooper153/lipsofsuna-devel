@@ -251,10 +251,11 @@ void liren_render_render (
 	liren_internal_render (self);
 }
 
-SDL_Surface* liren_render_screenshot (
-	LIRenRender* self)
+int liren_render_screenshot (
+	LIRenRender* self,
+	const char*  path)
 {
-	return liren_internal_screenshot (self);
+	return liren_internal_screenshot (self, path);
 }
 
 /**
@@ -311,6 +312,14 @@ int liren_render_set_videomode (
 	LIRenVideomode* mode)
 {
 	return liren_internal_set_videomode (self, mode);
+}
+
+int liren_render_get_videomodes (
+	LIRenRender*     self,
+	LIRenVideomode** modes,
+	int*             modes_num)
+{
+	return liren_internal_get_videomodes (self, modes, modes_num);
 }
 
 /** @} */

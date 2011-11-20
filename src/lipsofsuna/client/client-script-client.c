@@ -48,24 +48,13 @@ static void Client_screenshot (LIScrArgs* args)
 	char* home;
 	char* file;
 	char* path;
-	void* pixels;
 	LICliClient* client;
-	SDL_Surface* surface;
-
-	/* Capture the screen. */
-	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
-	surface = liren_render_screenshot (client->render);
-	if (surface == NULL)
-		return;
-	pixels = surface->pixels;
 
 	/* Construct file path. */
 	home = lisys_paths_get_home ();
 	file = lisys_string_format ("screenshot-%d.bmp", (int) time (NULL));
 	if (home == NULL || file == NULL)
 	{
-		SDL_FreeSurface (surface);
-		lisys_free (pixels);
 		lisys_free (home);
 		lisys_free (file);
 		return;
@@ -74,19 +63,14 @@ static void Client_screenshot (LIScrArgs* args)
 	lisys_free (home);
 	if (path == NULL)
 	{
-		SDL_FreeSurface (surface);
-		lisys_free (pixels);
 		lisys_free (file);
 		return;
 	}
 
-	/* Save the surface to a file. */
-	SDL_SaveBMP (surface, path);
-	SDL_FreeSurface (surface);
-	lisys_free (pixels);
-
-	/* Return the file name. */
-	liscr_args_seti_string (args, file);
+	/* Capture the screen. */
+	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
+	if (liren_render_screenshot (client->render, path))
+		liscr_args_seti_string (args, file);
 	lisys_free (path);
 	lisys_free (file);
 }
@@ -154,25 +138,26 @@ static void Client_get_video_mode (LIScrArgs* args)
 static void Client_get_video_modes (LIScrArgs* args)
 {
 	int i;
-	SDL_Rect** modes;
+	int num;
 	LICliClient* client;
+	LIRenVideomode* modes;
 
 	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-	modes = SDL_ListModes (NULL, SDL_OPENGL | SDL_FULLSCREEN);
-	if (modes != NULL && modes != (SDL_Rect**) -1)
+	if (liren_render_get_videomodes (client->render, &modes, &num))
 	{
-		for (i = 0 ; modes[i] ; i++)
+		for (i = 0 ; i < num ; i++)
 		{
 			lua_newtable (args->lua);
 			lua_pushnumber (args->lua, 1);
-			lua_pushnumber (args->lua, modes[i]->w);
+			lua_pushnumber (args->lua, modes[i].width);
 			lua_settable (args->lua, -3);
 			lua_pushnumber (args->lua, 2);
-			lua_pushnumber (args->lua, modes[i]->h);
+			lua_pushnumber (args->lua, modes[i].height);
 			lua_settable (args->lua, -3);
 			liscr_args_seti_stack (args);
 		}
+		lisys_free (modes);
 	}
 }
 
