@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "lipsofsuna/extension/input/ext-module.h"
+#include "lipsofsuna/extension/input/input.h"
 #include "ext-module.h"
 
 static void private_get_pointer (

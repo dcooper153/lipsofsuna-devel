@@ -151,9 +151,11 @@ end
 Camera:add_getters{
 	collision_group = function(s) return Los.camera_get_collision_group(s.handle) end,
 	collision_mask = function(s) return Los.camera_get_collision_mask(s.handle) end,
+	far = function(s) return rawget(s, "__far") or 75 end,
 	fov = function(s) return Los.camera_get_fov(s.handle) end,
 	mode = function(s) return Los.camera_get_mode(s.handle) end,
 	modelview = function(s) return Los.camera_get_modelview(s.handle) end,
+	near = function(s) return rawget(s, "__near") or 1 end,
 	position = function(s) return Class.new(Vector, {handle = Los.camera_get_position(s.handle)}) end,
 	position_smoothing = function(s) return Los.camera_get_position_smoothing(s.handle) end,
 	projection = function(s) return Los.camera_get_projection(s.handle) end,
@@ -166,10 +168,16 @@ Camera:add_getters{
 Camera:add_setters{
 	collision_group = function(s, v) Los.camera_set_collision_group(s.handle, v) end,
 	collision_mask = function(s, v) Los.camera_set_collision_mask(s.handle, v) end,
-	far = function(s, v) Los.camera_set_far(s.handle, v) end,
+	far = function(s, v)
+		rawset(s, "__far", v)
+		Los.camera_set_far(s.handle, v)
+	end,
 	fov = function(s, v) Los.camera_set_fov(s.handle, v) end,
 	mode = function(s, v) Los.camera_set_mode(s.handle, v) end,
-	near = function(s, v) Los.camera_set_near(s.handle, v) end,
+	near = function(s, v)
+		rawset(s, "__near", v)
+		Los.camera_set_near(s.handle, v)
+	end,
 	position_smoothing = function(s, v) Los.camera_set_position_smoothing(s.handle, v) end,
 	rotation_smoothing = function(s, v) Los.camera_set_rotation_smoothing(s.handle, v) end,
 	target_position = function(s, v) Los.camera_set_target_position(s.handle, v.handle) end,

@@ -108,7 +108,7 @@ struct _LIRenMessage
 		} render_measure_text;
 		struct
 		{
-			SDL_Surface** result;
+			/* TODO */
 		} render_screenshot;
 		struct
 		{

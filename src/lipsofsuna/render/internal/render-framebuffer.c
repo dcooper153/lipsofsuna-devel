@@ -25,8 +25,6 @@
  */
 
 #include "render-internal.h"
-#include "../render21/render-private.h"
-#include "../render32/render-private.h"
 
 /**
  * \brief Creates a rendering framebuffer.
@@ -51,24 +49,7 @@ LIRenFramebuffer* liren_framebuffer_new (
 		return NULL;
 
 	/* Initialize the backend. */
-	if (render->v32 != NULL)
-	{
-		self->v32 = liren_framebuffer32_new (render->v32, width, height, samples, hdr);
-		if (self->v32 == NULL)
-		{
-			lisys_free (self);
-			return NULL;
-		}
-	}
-	else
-	{
-		self->v21 = liren_framebuffer21_new (render->v21, width, height, samples, hdr);
-		if (self->v21 == NULL)
-		{
-			lisys_free (self);
-			return NULL;
-		}
-	}
+	/* TODO */
 
 	return self;
 }
@@ -80,10 +61,7 @@ LIRenFramebuffer* liren_framebuffer_new (
 void liren_framebuffer_free (
 	LIRenFramebuffer* self)
 {
-	if (self->v32 != NULL)
-		liren_framebuffer32_free (self->v32);
-	if (self->v21 != NULL)
-		liren_framebuffer21_free (self->v21);
+	/* TODO */
 	lisys_free (self);
 }
 
@@ -103,10 +81,8 @@ int liren_framebuffer_resize (
 	int               samples,
 	int               hdr)
 {
-	if (self->v32 != NULL)
-		return liren_framebuffer32_resize (self->v32, width, height, samples, hdr);
-	else
-		return liren_framebuffer21_resize (self->v21, width, height, samples, hdr);
+	/* TODO */
+	return 1;
 }
 
 /** @} */

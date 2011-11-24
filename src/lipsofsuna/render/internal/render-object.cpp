@@ -24,12 +24,17 @@
  * @{
  */
 
+#include "lipsofsuna/model.h"
 #include "lipsofsuna/network.h"
 #include "lipsofsuna/system.h"
-#include "render-object.h"
 #include "render.h"
-#include "../render21/render-private.h"
-#include "../render32/render-private.h"
+#include "render-model.h"
+#include "render-object.h"
+
+static Ogre::String private_unique_id (
+	LIRenObject* self);
+
+/*****************************************************************************/
 
 /**
  * \brief Creates a new render object and adds it to the scene.
@@ -43,10 +48,18 @@ LIRenObject* liren_object_new (
 {
 	LIRenObject* self;
 
-	self = lisys_calloc (1, sizeof (LIRenObject));
+	self = (LIRenObject*) lisys_calloc (1, sizeof (LIRenObject));
 	if (self == NULL)
-		return 0;
+		return NULL;
 	self->render = render;
+
+	/* Initialize the private data. */
+	self->data = (LIRenObjectData*) lisys_calloc (1, sizeof (LIRenObjectData));
+	if (self->data == NULL)
+	{
+		lisys_free (self);
+		return NULL;
+	}
 
 	/* Choose a unique ID. */
 	while (!id)
@@ -57,25 +70,9 @@ LIRenObject* liren_object_new (
 	}
 	self->id = id;
 
-	/* Initialize backend. */
-	if (render->v32 != NULL)
-	{
-		self->v32 = liren_object32_new (render->v32, id);
-		if (self->v32 == NULL)
-		{
-			liren_object_free (self);
-			return 0;
-		}
-	}
-	else
-	{
-		self->v21 = liren_object21_new (render->v21, id);
-		if (self->v21 == NULL)
-		{
-			liren_object_free (self);
-			return 0;
-		}
-	}
+	/* Initialize the backend. */
+	self->data->node = render->data->scene_manager->getRootSceneNode ()->createChildSceneNode ();
+	self->data->node->setVisible (false);
 
 	/* Add to dictionary. */
 	if (!lialg_u32dic_insert (render->objects, id, self))
@@ -95,10 +92,20 @@ void liren_object_free (
 	LIRenObject* self)
 {
 	lialg_u32dic_remove (self->render->objects, self->id);
-	if (self->v32 != NULL)
-		liren_object32_free (self->v32);
-	if (self->v21 != NULL)
-		liren_object21_free (self->v21);
+
+	/* Free the private data. */
+	if (self->data != NULL)
+	{
+		if (self->data->entity != NULL)
+		{
+			self->data->node->detachAllObjects ();
+			self->render->data->scene_manager->destroyEntity (self->data->entity);
+		}
+		if (self->data->node != NULL)
+			self->render->data->scene_root->removeAndDestroyChild (self->data->node->getName ());
+		lisys_free (self->data);
+	}
+
 	if (self->pose != NULL)
 		limdl_pose_free (self->pose);
 	lisys_free (self);
@@ -133,10 +140,7 @@ int liren_object_channel_animate (
 			return 0;
 		if (self->model != NULL)
 			limdl_pose_set_model (self->pose, self->model->model);
-		if (self->v32 != NULL)
-			liren_object32_set_pose (self->v32, self->pose);
-		else
-			liren_object21_set_pose (self->v21, self->pose);
+		/* TODO */
 	}
 
 	/* Avoid restarts in simple cases. */
@@ -226,7 +230,7 @@ LIMdlPoseChannel* liren_object_channel_get_state (
 
 	if (self->pose == NULL)
 		return NULL;
-	chan = lialg_u32dic_find (self->pose->channels, channel);
+	chan = (LIMdlPoseChannel*) lialg_u32dic_find (self->pose->channels, channel);
 	if (chan == NULL)
 		return NULL;
 	chan = limdl_pose_channel_new_copy (chan);
@@ -241,10 +245,7 @@ LIMdlPoseChannel* liren_object_channel_get_state (
 void liren_object_deform (
 	LIRenObject* self)
 {
-	if (self->v32 != NULL)
-		liren_object32_deform (self->v32);
-	else
-		liren_object21_deform (self->v21);
+	/* TODO */
 }
 
 int liren_object_find_node (
@@ -269,10 +270,8 @@ int liren_object_find_node (
 	if (world)
 	{
 		limdl_node_get_world_transform (node, &scale, &transform);
-		if (self->v32 != NULL)
-			transform1 = self->v32->transform;
-		else
-			transform1 = self->v21->transform;
+		/* TODO: transform1 = self->v32->transform */
+		/* FIXME */ transform1 = limat_transform_identity ();
 		transform = limat_transform_multiply (transform1, transform);
 	}
 	else
@@ -293,10 +292,7 @@ void liren_object_particle_animation (
 	float        start,
 	int          loop)
 {
-	if (self->v32 != NULL)
-		liren_object32_particle_animation (self->v32, start, loop);
-	else
-		liren_object21_particle_animation (self->v21, start, loop);
+	/* TODO */
 }
 
 /**
@@ -311,11 +307,7 @@ int liren_object_set_effect (
 	const char*  shader,
 	const float* params)
 {
-	if (self->v32 != NULL)
-	{
-		if (!liren_object32_set_effect (self->v32, shader, params))
-			return 0;
-	}
+	/* TODO */
 
 	return 1;
 }
@@ -342,17 +334,23 @@ int liren_object_set_model (
 		}
 	}
 
-	if (self->v32 != NULL)
+	self->model = model;
+
+	/* Remove the old entity. */
+	if (self->data->entity != NULL)
 	{
-		if (!liren_object32_set_model (self->v32, (model != NULL)? model->v32 : NULL))
-			return 0;
-		self->model = model;
+		self->data->node->detachAllObjects ();
+		self->render->data->scene_manager->destroyEntity (self->data->entity);
+		self->data->entity = NULL;
 	}
-	else
+
+	/* Attach a new entity to the scene node. */
+	if (model != NULL && !model->data->mesh.isNull ())
 	{
-		if (!liren_object21_set_model (self->v21, (model != NULL)? model->v21 : NULL))
-			return 0;
-		self->model = model;
+		Ogre::String e_name = private_unique_id (self);
+		Ogre::String m_name = model->data->mesh->getName ();
+		self->data->entity = self->render->data->scene_manager->createEntity (e_name, m_name);
+		self->data->node->attachObject (self->data->entity);
 	}
 
 	return 1;
@@ -368,10 +366,8 @@ int liren_object_set_pose (
 	LIRenObject* self,
 	LIMdlPose*   pose)
 {
-	if (self->v32 != NULL)
-		return liren_object32_set_pose (self->v32, pose);
-	else
-		return liren_object21_set_pose (self->v21, pose);
+	/* TODO */
+	return 1;
 }
 
 /**
@@ -384,10 +380,8 @@ int liren_object_set_realized (
 	LIRenObject* self,
 	int          value)
 {
-	if (self->v32 != NULL)
-		return liren_object32_set_realized (self->v32, value);
-	else
-		return liren_object21_set_realized (self->v21, value);
+	self->data->node->setVisible (value);
+	return 1;
 }
 
 /**
@@ -399,10 +393,16 @@ void liren_object_set_transform (
 	LIRenObject*          self,
 	const LIMatTransform* value)
 {
-	if (self->v32 != NULL)
-		liren_object32_set_transform (self->v32, value);
-	else
-		liren_object21_set_transform (self->v21, value);
+	self->data->node->setPosition (value->position.x, value->position.y, value->position.z);
+	self->data->node->setOrientation (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z);
+}
+
+/*****************************************************************************/
+
+static Ogre::String private_unique_id (
+	LIRenObject* self)
+{
+	return Ogre::StringConverter::toString (self->id);
 }
 
 /** @} */

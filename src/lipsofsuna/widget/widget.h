@@ -53,8 +53,8 @@ struct _LIWdgWidget
 {
 	LIWdgManager* manager;
 	LIWdgWidget* parent;
-	LIWdgWidget* prev;
-	LIWdgWidget* next;
+	LIWdgWidget* above;
+	LIWdgWidget* below;
 	LIScrData* script;
 	unsigned int behind : 1;
 	unsigned int fixed_size : 1;

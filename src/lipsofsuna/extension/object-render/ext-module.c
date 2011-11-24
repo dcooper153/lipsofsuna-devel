@@ -63,10 +63,6 @@ static int private_object_transform (
 	LIEngObject*    object,
 	LIMatTransform* value);
 
-static int private_engine_tick (
-	LIExtModule* self,
-	float        secs);
-
 /*****************************************************************************/
 
 LIMaiExtensionInfo liext_object_render_info =
@@ -108,12 +104,11 @@ LIExtModule* liext_object_render_new (
 	    !lical_callbacks_insert (program->callbacks, "model-changed", 1, private_model_changed, self, self->calls + 1) ||
 	    !lical_callbacks_insert (program->callbacks, "model-free", 1, private_model_free, self, self->calls + 2) ||
 	    !lical_callbacks_insert (program->callbacks, "model-new", 1, private_model_new, self, self->calls + 3) ||
-	    !lical_callbacks_insert (program->callbacks, "tick", 1, private_engine_tick, self, self->calls + 4) ||
-	    !lical_callbacks_insert (program->callbacks, "object-new", 1, private_object_new, self, self->calls + 5) ||
-	    !lical_callbacks_insert (program->callbacks, "object-free", 1, private_object_free, self, self->calls + 6) ||
-	    !lical_callbacks_insert (program->callbacks, "object-model", 1, private_object_model, self, self->calls + 7) ||
-	    !lical_callbacks_insert (program->callbacks, "object-visibility", 1, private_object_realize, self, self->calls + 8) ||
-	    !lical_callbacks_insert (program->callbacks, "object-transform", 1, private_object_transform, self, self->calls + 9))
+	    !lical_callbacks_insert (program->callbacks, "object-new", 1, private_object_new, self, self->calls + 4) ||
+	    !lical_callbacks_insert (program->callbacks, "object-free", 1, private_object_free, self, self->calls + 5) ||
+	    !lical_callbacks_insert (program->callbacks, "object-model", 1, private_object_model, self, self->calls + 6) ||
+	    !lical_callbacks_insert (program->callbacks, "object-visibility", 1, private_object_realize, self, self->calls + 7) ||
+	    !lical_callbacks_insert (program->callbacks, "object-transform", 1, private_object_transform, self, self->calls + 8))
 	{
 		liext_object_render_free (self);
 		return NULL;
@@ -218,15 +213,6 @@ static int private_object_transform (
 	LIMatTransform* value)
 {
 	liren_render_object_set_transform (self->render, object->id, value);
-
-	return 1;
-}
-
-static int private_engine_tick (
-	LIExtModule* self,
-	float        secs)
-{
-	liren_render_update (self->render, secs);
 
 	return 1;
 }

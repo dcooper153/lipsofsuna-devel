@@ -25,27 +25,17 @@
 struct _LIRenOverlay
 {
 	int id;
-	int behind;
+	int depth;
 	int visible;
 	LIMatVector position;
-	LIRenBuffer* buffer;
 	LIRenOverlay* parent;
+	LIRenOverlayData* data;
 	LIRenRender* render;
-	struct
-	{
-		int count;
-		LIRenOverlayElement* array;
-	} elements;
 	struct
 	{
 		int count;
 		LIRenOverlay** array;
 	} overlays;
-	struct
-	{
-		int count;
-		LIRenVertex* array;
-	} vertices;
 	struct
 	{
 		int enabled;
@@ -95,14 +85,21 @@ LIAPICALL (void, liren_overlay_add_text, (
 	const int*    size,
 	const float*  align));
 
-LIAPICALL (void, liren_overlay_add_triangles, (
-	LIRenOverlay*      self,
-	const char*        shader,
-	const char*        image,
-	const float*       color,
-	const int*         scissor,
-	const LIRenVertex* verts,
-	int                count));
+LIAPICALL (void, liren_overlay_add_scaled, (
+	LIRenOverlay* self,
+	const char*   material_name,
+	const int*    dest_position,
+	const int*    dest_size,
+	const int*    source_position,
+	const int*    source_tiling));
+
+LIAPICALL (void, liren_overlay_add_tiled, (
+	LIRenOverlay* self,
+	const char*   material_name,
+	const int*    dest_position,
+	const int*    dest_size,
+	const int*    source_position,
+	const int*    source_tiling));
 
 LIAPICALL (void, liren_overlay_add_overlay, (
 	LIRenOverlay* self,
@@ -128,7 +125,11 @@ LIAPICALL (void, liren_overlay_enable_scene, (
 	LIRenPassPostproc* postproc_passes,
 	int                postproc_passes_num));
 
-LIAPICALL (void, liren_overlay_set_behind, (
+LIAPICALL (void, liren_overlay_set_depth, (
+	LIRenOverlay* self,
+	int           value));
+
+LIAPICALL (void, liren_overlay_set_floating, (
 	LIRenOverlay* self,
 	int           value));
 

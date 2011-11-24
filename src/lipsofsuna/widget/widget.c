@@ -201,9 +201,9 @@ LIWdgWidget* liwdg_widget_child_at (
 	/* Try manually packed widgets. */
 	if (self->children != NULL)
 	{
-		for (widget = self->children ; widget->next != NULL ; widget = widget->next)
+		for (widget = self->children ; widget->below != NULL ; widget = widget->below)
 			{}
-		for ( ; widget != NULL ; widget = widget->prev)
+		for ( ; widget != NULL ; widget = widget->above)
 		{
 			if (widget->visible &&
 			    widget->allocation.x <= pixx && pixx < widget->allocation.x + widget->allocation.width &&
@@ -644,36 +644,10 @@ void liwdg_widget_set_behind (
 	if (self->floating)
 	{
 		if (value)
-		{
-			/* Move to bottom. */
-			if (self != self->manager->dialogs.bottom)
-			{
-				if (self->next != NULL)
-					self->next->prev = self->prev;
-				if (self->prev != NULL)
-					self->prev->next = self->next;
-				self->prev = self->manager->dialogs.bottom;
-				if (self->prev != NULL)
-					self->prev->next = self;
-				self->manager->dialogs.bottom = self;
-			}
-		}
+			liwdg_manager_lower_window_to_bottom (self->manager, self);
 		else
-		{
-			/* Move out of bottom. */
-			if (self == self->manager->dialogs.bottom && self->prev != NULL)
-			{
-				self->prev->next = NULL;
-				self->manager->dialogs.bottom = self->prev;
-				self->next = self->manager->dialogs.bottom;
-				self->prev = self->manager->dialogs.bottom->prev;
-				self->manager->dialogs.bottom->prev = self;
-			}
-		}
+			liwdg_manager_raise_window_from_bottom (self->manager, self);
 	}
-
-	/* Update the overlay. */
-	liren_render_overlay_set_behind (self->manager->render, self->overlay, value);
 }
 
 /**
@@ -829,6 +803,8 @@ void liwdg_widget_set_floating (
 	LIWdgWidget* self,
 	int          value)
 {
+	if (value == self->floating)
+		return;
 	liwdg_widget_detach (self);
 	if (value)
 	{
@@ -836,6 +812,7 @@ void liwdg_widget_set_floating (
 		{
 			self->floating = 1;
 			liwdg_widget_set_visible (self, 1);
+			liwdg_widget_set_behind (self, self->behind);
 		}
 	}
 	else
@@ -1284,10 +1261,10 @@ static void private_call_attach_manual (
 	LIWdgWidget* child)
 {
 	/* Add to the widget. */
-	child->prev = NULL;
-	child->next = self->children;
+	child->above = NULL;
+	child->below = self->children;
 	if (self->children != NULL)
-		self->children->prev = child;
+		self->children->above = child;
 	self->children = child;
 	child->parent = self;
 
@@ -1319,14 +1296,14 @@ static void private_call_detach_manual (
 	LIWdgWidget* child)
 {
 	/* Remove from the widget. */
-	if (child->prev != NULL)
-		child->prev->next = child->next;
+	if (child->above != NULL)
+		child->above->above = child->below;
 	else
-		self->children = child->next;
-	if (child->next != NULL)
-		child->next->prev = child->prev;
-	child->next = NULL;
-	child->prev = NULL;
+		self->children = child->below;
+	if (child->below != NULL)
+		child->below->above = child->above;
+	child->below = NULL;
+	child->above = NULL;
 	child->parent = NULL;
 
 	/* Remove from the overlay. */
@@ -1652,7 +1629,7 @@ static void private_rebuild (
 				}
 			}
 		}
-		for (child = self->children ; child != NULL ; child = child->next)
+		for (child = self->children ; child != NULL ; child = child->below)
 			liwdg_widget_child_request (self, child);
 	}
 

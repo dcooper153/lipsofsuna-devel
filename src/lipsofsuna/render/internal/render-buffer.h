@@ -20,8 +20,6 @@
 
 #include "lipsofsuna/system.h"
 #include "render-types.h"
-#include "../render21/render-buffer.h"
-#include "../render32/render-buffer.h"
 
 enum
 {
@@ -32,8 +30,6 @@ enum
 
 struct _LIRenBuffer
 {
-	LIRenBuffer21* v21;
-	LIRenBuffer32* v32;
 };
 
 LIAPICALL (LIRenBuffer*, liren_buffer_new, (

@@ -15,31 +15,23 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_MODEL_H__
-#define __RENDER_INTERNAL_MODEL_H__
+#ifndef __EXT_INPUT_INPUT_HPP__
+#define __EXT_INPUT_INPUT_HPP__
 
-#include "lipsofsuna/model.h"
-#include "lipsofsuna/system.h"
-#include "render-types.h"
+#include "input.h"
+#include "input-system.hpp"
+#include "lipsofsuna/render/internal/render-internal.h"
 
-struct _LIRenModel
+struct _LIInpInput
 {
-	int id;
-	LIMdlModel* model;
-	LIRenModelData* data;
+	int active;
+	int grab;
+	LICalHandle calls[1];
+	LICliClient* client;
+	LIInpSystem* system;
+	LIMaiProgram* program;
 	LIRenRender* render;
+	LIRenVideomode mode;
 };
-
-LIAPICALL (LIRenModel*, liren_model_new, (
-	LIRenRender* render,
-	LIMdlModel*  model,
-	int          id));
-
-LIAPICALL (void, liren_model_free, (
-	LIRenModel* self));
-
-LIAPICALL (int, liren_model_set_model, (
-	LIRenModel* self,
-	LIMdlModel* model));
 
 #endif

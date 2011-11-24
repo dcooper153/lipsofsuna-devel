@@ -19,8 +19,6 @@
 #define __RENDER_INTERNAL_OBJECT_H__
 
 #include "render-types.h"
-#include "../render21/render-object.h"
-#include "../render32/render-object.h"
 
 struct _LIRenObject
 {
@@ -28,8 +26,7 @@ struct _LIRenObject
 	LIMdlPose* pose;
 	LIRenModel* model;
 	LIRenRender* render;
-	LIRenObject21* v21;
-	LIRenObject32* v32;
+	LIRenObjectData* data;
 };
 
 LIAPICALL (LIRenObject*, liren_object_new, (

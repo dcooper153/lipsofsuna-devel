@@ -26,7 +26,7 @@
 #include "lipsofsuna/system.h"
 #include "render-object.h"
 #include "internal/render.h"
-#include "render32/render-private.h"
+#include "internal/render-object.h"
 
 /**
  * \brief Creates a new render object and adds it to the scene.

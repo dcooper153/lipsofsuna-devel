@@ -26,8 +26,6 @@
 #include "render.h"
 #include "render-overlay.h"
 #include "internal/render-internal.h"
-#include "render21/render-private.h"
-#include "render32/render-private.h"
 
 LIRenRender* liren_render_new (
 	LIPthPaths*     paths,
@@ -45,7 +43,15 @@ LIRenRender* liren_render_new (
 	/* Initialize the image dictionary. */
 	self->images = lialg_strdic_new ();
 	if (self->images == NULL)
-		return 0;
+		return NULL;
+
+	/* Initialize the font dictionary. */
+	self->fonts = lialg_strdic_new ();
+	if (self->fonts == NULL)
+	{
+		liren_render_free (self);
+		return NULL;
+	}
 
 	/* Initialize the shader dictionary. */
 	self->shaders = lialg_strdic_new ();
@@ -87,9 +93,8 @@ LIRenRender* liren_render_new (
 		return NULL;
 	}
 
-	/* Allocate the font dictionary. */
-	self->fonts = lialg_strdic_new ();
-	if (self->fonts == NULL)
+	/* Initialize the backend. */
+	if (!liren_internal_init (self, mode))
 	{
 		liren_render_free (self);
 		return NULL;
@@ -101,33 +106,6 @@ LIRenRender* liren_render_new (
 		liren_render_free (self);
 		return NULL;
 	}
-	if (TTF_Init () == -1)
-	{
-		lisys_error_set (LISYS_ERROR_UNKNOWN, "cannot initialize SDL_ttf");
-		liren_render_free (self);
-		return NULL;
-	}
-	SDL_ShowCursor (SDL_DISABLE);
-
-	/* Initialize the backend. */
-	if (GLEW_VERSION_3_2 && getenv ("LOS_OPENGL21") == NULL)
-	{
-		self->v32 = liren_render32_new (self, paths);
-		if (self->v32 == NULL)
-		{
-			lisys_free (self);
-			return NULL;
-		}
-	}
-	else
-	{
-		self->v21 = liren_render21_new (self, paths);
-		if (self->v21 == NULL)
-		{
-			lisys_free (self);
-			return NULL;
-		}
-	}
 
 	return self;
 }
@@ -137,8 +115,6 @@ void liren_render_free (
 {
 	LIAlgStrdicIter iter1;
 	LIAlgU32dicIter iter2;
-
-	/* TODO: Wait for the handler thread to exit. */
 
 	/* Free lights. */
 	if (self->lights != NULL)
@@ -189,16 +165,7 @@ void liren_render_free (
 	}
 
 	/* Free the backend. */
-	if (self->v21 != NULL)
-		liren_render21_free (self->v21);
-	if (self->v32 != NULL)
-		liren_render32_free (self->v32);
-
-	/* Uninitialize the videomode. */
-	if (self->screen != NULL)
-		SDL_FreeSurface (self->screen);
-	if (TTF_WasInit ())
-		TTF_Quit ();
+	liren_internal_deinit (self);
 
 	lisys_free (self);
 }
@@ -262,12 +229,13 @@ int liren_render_screenshot (
  * \brief Updates the renderer state.
  * \param self Renderer.
  * \param secs Number of seconds since the last update.
+ * \return Nonzero when running, zero if the window was closed.
  */
-void liren_render_update (
+int liren_render_update (
 	LIRenRender* self,
 	float        secs)
 {
-	liren_internal_update (self, secs);
+	return liren_internal_update (self, secs);
 }
 
 int liren_render_get_anisotropy (
@@ -281,6 +249,42 @@ void liren_render_set_anisotropy (
 	int          value)
 {
 	liren_internal_set_anisotropy (self, value);
+}
+
+/**
+ * \brief Sets the far plane distance of the camera.
+ * \param self Renderer.
+ * \param value Distance.
+ */
+void liren_render_set_camera_far (
+	LIRenRender* self,
+	float        value)
+{
+	liren_internal_set_camera_far (self, value);
+}
+
+/**
+ * \brief Sets the near plane distance of the camera.
+ * \param self Renderer.
+ * \param value Distance.
+ */
+void liren_render_set_camera_near (
+	LIRenRender* self,
+	float        value)
+{
+	liren_internal_set_camera_near (self, value);
+}
+
+/**
+ * \brief Sets the position and orientation of the camera.
+ * \param self Renderer.
+ * \param value Transformation.
+ */
+void liren_render_set_camera_transform (
+	LIRenRender*          self,
+	const LIMatTransform* value)
+{
+	liren_internal_set_camera_transform (self, value);
 }
 
 /**
@@ -301,17 +305,22 @@ int liren_render_get_image_size (
 float liren_render_get_opengl_version (
 	LIRenRender* self)
 {
-	if (self->v32 != NULL)
-		return 3.2f;
-	else
-		return 2.1f;
+	/* TODO */
+	return 3.2f;
 }
 
 void liren_render_set_title (
 	LIRenRender* self,
 	const char*  value)
 {
-	SDL_WM_SetCaption (value, value);
+	liren_internal_set_title (self, value);
+}
+
+void liren_render_get_videomode (
+	LIRenRender*    self,
+	LIRenVideomode* mode)
+{
+	*mode = self->mode;
 }
 
 int liren_render_set_videomode (

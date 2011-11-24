@@ -62,6 +62,13 @@ Client.apply_quake = function(self, point, magnitude)
 	end
 end
 
+Client.update = function(self, secs)
+	-- FIXME
+	if self.mode == "game" then
+		Gui.scene:update_camera()
+	end
+end
+
 Client.set_mode = function(self, mode, level)
 	-- Check for state changes.
 	if self.mode == mode then return end

@@ -15,31 +15,25 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_MODEL_H__
-#define __RENDER_INTERNAL_MODEL_H__
+#ifndef __RENDER_INTERNAL_CONTAINER_HPP__
+#define __RENDER_INTERNAL_CONTAINER_HPP__
 
-#include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "render-types.h"
+#include <OgrePanelOverlayElement.h>
 
-struct _LIRenModel
+class LIRenContainer : public Ogre::PanelOverlayElement
 {
-	int id;
-	LIMdlModel* model;
-	LIRenModelData* data;
-	LIRenRender* render;
+public:
+	LIRenContainer (const Ogre::String& name);
+	virtual ~LIRenContainer ();
+	virtual const Ogre::String& getTypeName () const;
+protected:
+	virtual ushort _notifyZOrder (ushort z);
+	virtual ushort _notifyZOrderNonrecursive (ushort z);
+	void get_children (std::vector<LIRenContainer*>& children);
+private:
+	static Ogre::String type_name;
 };
-
-LIAPICALL (LIRenModel*, liren_model_new, (
-	LIRenRender* render,
-	LIMdlModel*  model,
-	int          id));
-
-LIAPICALL (void, liren_model_free, (
-	LIRenModel* self));
-
-LIAPICALL (int, liren_model_set_model, (
-	LIRenModel* self,
-	LIMdlModel* model));
 
 #endif

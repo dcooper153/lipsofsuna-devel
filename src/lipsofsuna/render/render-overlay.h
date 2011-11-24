@@ -34,16 +34,6 @@ LIAPICALL (void, liren_render_overlay_clear, (
 	LIRenRender* self,
 	int          id));
 
-LIAPICALL (void, liren_render_overlay_add_triangles, (
-	LIRenRender*       self,
-	int                id,
-	const char*        shader,
-	const char*        image,
-	const float*       color,
-	const int*         scissor,
-	const LIRenVertex* verts,
-	int                count));
-
 LIAPICALL (void, liren_render_overlay_add_text, (
 	LIRenRender* self,
 	int          id,
@@ -55,6 +45,24 @@ LIAPICALL (void, liren_render_overlay_add_text, (
 	const int*   pos,
 	const int*   size,
 	const float* align));
+
+LIAPICALL (void, liren_render_overlay_add_scaled, (
+	LIRenRender* self,
+	int          id,
+	const char*  material_name,
+	const int*   dest_position,
+	const int*   dest_size,
+	const int*   source_position,
+	const int*   source_tiling));
+
+LIAPICALL (void, liren_render_overlay_add_tiled, (
+	LIRenRender* self,
+	int          id,
+	const char*  material_name,
+	const int*   dest_position,
+	const int*   dest_size,
+	const int*   source_position,
+	const int*   source_tiling));
 
 LIAPICALL (void, liren_render_overlay_add_overlay, (
 	LIRenRender* self,
@@ -84,7 +92,12 @@ LIAPICALL (void, liren_render_overlay_enable_scene, (
 	LIRenPassPostproc* postproc_passes,
 	int                postproc_passes_num));
 
-LIAPICALL (void, liren_render_overlay_set_behind, (
+LIAPICALL (void, liren_render_overlay_set_depth, (
+	LIRenRender* self,
+	int          id,
+	int          value));
+
+LIAPICALL (void, liren_render_overlay_set_floating, (
 	LIRenRender* self,
 	int          id,
 	int          value));
@@ -93,10 +106,6 @@ LIAPICALL (void, liren_render_overlay_set_position, (
 	LIRenRender*       self,
 	int                id,
 	const LIMatVector* value));
-
-LIAPICALL (void, liren_render_overlay_set_root, (
-	LIRenRender*       self,
-	int                id));
 
 LIAPICALL (void, liren_render_overlay_set_visible, (
 	LIRenRender* self,

@@ -473,8 +473,8 @@ Views.Chargen.update = function(self, secs)
 	-- Update camera.
 	self.camera.target_position = self.object.position + self.view_offset
 	self.camera.target_rotation = Quaternion{axis = Vector(0, 1, 0), angle = math.pi}
-	self.camera.viewport = {self.x, self.y, self.width, self.height}
 	self.camera:update(secs)
+	self:update_camera()
 end
 
 --- Sets the character from a preset.

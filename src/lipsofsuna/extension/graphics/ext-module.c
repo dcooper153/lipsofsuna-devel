@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -31,6 +31,10 @@ static void private_initial_videomode (
 	int*         fullscreen,
 	int*         vsync);
 
+static int private_engine_tick (
+	LIExtModule* self,
+	float        secs);
+
 /*****************************************************************************/
 
 LIMaiExtensionInfo liext_graphics_info =
@@ -58,9 +62,16 @@ LIExtModule* liext_graphics_new (
 	/* Get the initial video mode. */
 	private_initial_videomode (self, &width, &height, &fullscreen, &vsync);
 
-	/* Allocate client. */
+	/* Allocate the client. */
 	self->client = licli_client_new (program, width, height, fullscreen, vsync);
 	if (self->client == NULL)
+	{
+		liext_graphics_free (self);
+		return NULL;
+	}
+
+	/* Register callbacks. */
+	if (!lical_callbacks_insert (program->callbacks, "tick", 1, private_engine_tick, self, self->calls + 0))
 	{
 		liext_graphics_free (self);
 		return NULL;
@@ -76,6 +87,7 @@ LIExtModule* liext_graphics_new (
 void liext_graphics_free (
 	LIExtModule* self)
 {
+	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
 	if (self->client != NULL)
 		licli_client_free (self->client);
 	lisys_free (self);
@@ -137,6 +149,16 @@ static void private_initial_videomode (
 
 	/* Pop the videomode table. */
 	lua_pop (lua, 1);
+}
+
+static int private_engine_tick (
+	LIExtModule* self,
+	float        secs)
+{
+	if (!liren_render_update (self->client->render, secs))
+		self->program->quit = 1;
+
+	return 1;
 }
 
 /** @} */

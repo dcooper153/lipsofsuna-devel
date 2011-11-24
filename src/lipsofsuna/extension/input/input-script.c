@@ -22,7 +22,7 @@
  * @{
  */
 
-#include "ext-module.h"
+#include "input.h"
 
 static void Input_get_cursor_pos (LIScrArgs* args)
 {
@@ -32,7 +32,7 @@ static void Input_get_cursor_pos (LIScrArgs* args)
 	LIMatVector tmp;
 
 	self = liscr_script_get_userdata (args->script, LIINP_SCRIPT_INPUT);
-	SDL_GetMouseState (&x, &y);
+	liinp_input_get_pointer (self, &x, &y);
 	tmp = limat_vector_init (x, y, 0.0f);
 	liscr_args_seti_vector (args, &tmp);
 }

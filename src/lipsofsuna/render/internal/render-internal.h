@@ -18,9 +18,6 @@
 #ifndef __RENDER_INTERNAL_INTERNAL_H__
 #define __RENDER_INTERNAL_INTERNAL_H__
 
-#include "SDL.h"
-#include "SDL_main.h"
-#include "SDL_ttf.h"
 #include <GL/glew.h>
 
 #include "render.h"

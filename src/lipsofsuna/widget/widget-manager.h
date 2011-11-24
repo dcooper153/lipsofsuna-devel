@@ -30,7 +30,6 @@ struct _LIWdgManager
 {
 	int width;
 	int height;
-	int overlay;
 	LICalCallbacks* callbacks;
 	LIMatMatrix projection;
 	LIPthPaths* paths;
@@ -83,6 +82,17 @@ LIAPICALL (void, liwdg_manager_render, (
 LIAPICALL (void, liwdg_manager_update, (
 	LIWdgManager* self,
 	float         secs));
+
+LIAPICALL (void, liwdg_manager_lower_window_to_bottom, (
+	LIWdgManager* self,
+	LIWdgWidget*  widget));
+
+LIAPICALL (void, liwdg_manager_raise_window_from_bottom, (
+	LIWdgManager* self,
+	LIWdgWidget*  widget));
+
+LIAPICALL (void, liwdg_manager_sort_windows, (
+	LIWdgManager* self));
 
 LIAPICALL (void, liwdg_manager_get_projection, (
 	LIWdgManager* self,

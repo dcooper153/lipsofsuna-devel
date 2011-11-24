@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,6 +16,8 @@
  */
 
 /**
+ * \addtogroup LIRen Render
+ * @{
  * \addtogroup LIFnt Font
  * @{
  * \addtogroup LIFntLayout Layout
@@ -28,32 +30,31 @@
 
 #define LIFNT_TEXT_DEFAULT_CAPACITY 32
 
-static void
-private_layout (LIFntLayout* self);
+static void private_layout (
+	LIFntLayout* self);
 
-static int
-private_get_line_height (LIFntLayout* self,
-                         int          start,
-                         int          end);
+static int private_get_line_height (
+	LIFntLayout* self,
+	int          start,
+	int          end);
 
-static int
-private_get_line_ascent (LIFntLayout* self,
-                         int          start,
-                         int          end);
+static int private_get_line_ascent (
+	LIFntLayout* self,
+	int          start,
+	int          end);
 
-static int
-private_get_line_width (LIFntLayout* self,
-                        int          start,
-                        int*         end);
+static int private_get_line_width (
+	LIFntLayout* self,
+	int          start,
+	int*         end);
 
-static int
-private_get_white_length (LIFntLayout* self,
-                          int          start);
+static int private_get_white_length (
+	LIFntLayout* self,
+	int          start);
 
 /*****************************************************************************/
 
-LIFntLayout*
-lifnt_layout_new ()
+LIFntLayout* lifnt_layout_new ()
 {
 	LIFntLayout* self;
 
@@ -77,17 +78,17 @@ lifnt_layout_new ()
 	return self;
 }
 
-void
-lifnt_layout_free (LIFntLayout* self)
+void lifnt_layout_free (
+	LIFntLayout* self)
 {
 	lisys_free (self->glyphs);
 	lisys_free (self);
 }
 
-int
-lifnt_layout_append_string (LIFntLayout* self,
-                            LIFntFont*   font,
-                            const char*  string)
+int lifnt_layout_append_string (
+	LIFntLayout* self,
+	LIFntFont*   font,
+	const char*  string)
 {
 	int i;
 	int length;
@@ -129,8 +130,8 @@ lifnt_layout_append_string (LIFntLayout* self,
 	return 1;
 }
 
-void
-lifnt_layout_clear (LIFntLayout* self)
+void lifnt_layout_clear (
+	LIFntLayout* self)
 {
 	self->dirty = 1;
 	self->glyphs = lisys_realloc (self->glyphs, LIFNT_TEXT_DEFAULT_CAPACITY * sizeof (LIFntLayoutGlyph));
@@ -138,80 +139,22 @@ lifnt_layout_clear (LIFntLayout* self)
 	self->c_glyphs = LIFNT_TEXT_DEFAULT_CAPACITY;
 }
 
-int
-lifnt_layout_get_height (LIFntLayout* self)
+int lifnt_layout_get_height (
+	LIFntLayout* self)
 {
 	private_layout (self);
 	return self->height;
 }
 
-int lifnt_layout_get_vertices (
-	LIFntLayout* self,
-	LIMdlIndex** result_index,
-	float**      result_vertex)
-{
-	int i;
-	int j;
-	float* vertices;
-	LIMdlIndex* indices;
-	LIFntLayoutGlyph* glyph;
-
-	/* Layout glyphs. */
-	private_layout (self);
-
-	/* Allocate buffer data. */
-	if (self->n_glyphs)
-	{
-		indices = lisys_calloc (6 * self->n_glyphs, sizeof (LIMdlIndex));
-		if (indices == NULL)
-			return 0;
-		vertices = lisys_calloc (20 * self->n_glyphs, sizeof (float));
-		if (vertices == NULL)
-		{
-			lisys_free (indices);
-			return 0;
-		}
-	}
-	else
-	{
-		indices = NULL;
-		vertices = NULL;
-	}
-
-	/* Create vertices and indices. */
-	for (i = 0 ; i < self->n_glyphs ; i++)
-	{
-		glyph = self->glyphs + i;
-		indices[6 * i + 0] = 4 * i + 0;
-		indices[6 * i + 1] = 4 * i + 1;
-		indices[6 * i + 2] = 4 * i + 2;
-		indices[6 * i + 3] = 4 * i + 1;
-		indices[6 * i + 4] = 4 * i + 2;
-		indices[6 * i + 5] = 4 * i + 3;
-		lifnt_font_get_vertices (glyph->font, glyph->glyph, vertices + 20 * i);
-		for (j = 2 ; j < 20 ; j += 5)
-		{
-			vertices[20 * i + j + 0] += glyph->x;
-			vertices[20 * i + j + 1] += glyph->y;
-		}
-	}
-
-	/* Return the buffers. */
-	*result_index = indices;
-	*result_vertex = vertices;
-
-	return 1;
-}
-
-int
-lifnt_layout_get_width (LIFntLayout* self)
+int lifnt_layout_get_width (
+	LIFntLayout* self)
 {
 	private_layout (self);
 	return self->width;
 }
 
-int
-lifnt_layout_get_width_limit (const LIFntLayout* self)
+int lifnt_layout_get_width_limit (
+	const LIFntLayout* self)
 {
 	return self->limit_width;
 }
@@ -224,9 +167,9 @@ lifnt_layout_get_width_limit (const LIFntLayout* self)
  * \param self A text object.
  * \param width The new width.
  */
-void
-lifnt_layout_set_width_limit (LIFntLayout* self,
-                              int          width)
+void lifnt_layout_set_width_limit (
+	LIFntLayout* self,
+	int          width)
 {
 	self->limit_width = width;
 	self->dirty = 1;
@@ -234,8 +177,8 @@ lifnt_layout_set_width_limit (LIFntLayout* self,
 
 /*****************************************************************************/
 
-static void
-private_layout (LIFntLayout* self)
+static void private_layout (
+	LIFntLayout* self)
 {
 	int i;
 	int w;
@@ -276,9 +219,9 @@ private_layout (LIFntLayout* self)
 	self->height = y;
 }
 
-static int
-private_get_white_length (LIFntLayout* self,
-                          int          start)
+static int private_get_white_length (
+	LIFntLayout* self,
+	int          start)
 {
 	int i;
 	LIFntLayoutGlyph* glyph;
@@ -292,10 +235,10 @@ private_get_white_length (LIFntLayout* self,
 	return i;
 }
 
-static int
-private_get_line_ascent (LIFntLayout* self,
-                         int          start,
-                         int          end)
+static int private_get_line_ascent (
+	LIFntLayout* self,
+	int          start,
+	int          end)
 {
 	int i;
 	int asctmp;
@@ -304,17 +247,17 @@ private_get_line_ascent (LIFntLayout* self,
 	lisys_assert (end < self->n_glyphs);
 	for (i = start ; i <= end ; i++)
 	{
-		asctmp = self->glyphs[i].font->font_ascent;
+		asctmp = lifnt_font_get_ascent (self->glyphs[i].font);
 		if (ascmax < asctmp)
 			ascmax = asctmp;
 	}
 	return ascmax;
 }
 
-static int
-private_get_line_height (LIFntLayout* self,
-                         int          start,
-                         int          end)
+static int private_get_line_height (
+	LIFntLayout* self,
+	int          start,
+	int          end)
 {
 	int i;
 	int htmp;
@@ -330,10 +273,10 @@ private_get_line_height (LIFntLayout* self,
 	return hmax;
 }
 
-static int
-private_get_line_width (LIFntLayout* self,
-                        int          start,
-                        int*         end)
+static int private_get_line_width (
+	LIFntLayout* self,
+	int          start,
+	int*         end)
 {
 	int i;
 	int w;
@@ -395,5 +338,6 @@ private_get_line_width (LIFntLayout* self,
 	return x;
 }
 
+/** @} */
 /** @} */
 /** @} */

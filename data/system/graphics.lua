@@ -34,6 +34,22 @@ Program.set_video_mode = function(clss, ...)
 	return Los.client_set_video_mode(...)
 end
 
+--- The far plane distance of the camera.
+-- @name Program.camera_far
+-- @class table
+
+--- The near plane distance of the camera.
+-- @name Program.camera_near
+-- @class table
+
+--- The position of the camera.
+-- @name Program.camera_position
+-- @class table
+
+--- The rotation of the camera.
+-- @name Program.camera_rotation
+-- @class table
+
 --- Short term average frames per second.
 -- @name Program.fps
 -- @class table
@@ -55,14 +71,34 @@ end
 -- @class table
 
 Program:add_class_getters{
+	camera_far = function(s) return rawget(s, "__camera_far") or 50 end,
+	camera_near = function(s) return rawget(s, "__camera_near") or 0.1 end,
+	camera_position = function(s) return rawget(s, "__camera_position") or Vector() end,
+	camera_rotation = function(s) return rawget(s, "__camera_rotation") or Quaternion() end,
 	fps = function(s) return Los.client_get_fps() end,
 	opengl_version = function(s) return Los.program_get_opengl_version() end,
 	video_mode = function(s) return Los.client_get_video_mode() end,
 	video_modes = function(s) return Los.client_get_video_modes() end,
-	window_title = function(s) return s.window_title or "" end}
+	window_title = function(s) return rawget(s, "__window_title") or "" end}
 
 Program:add_class_setters{
+	camera_far = function(s, v)
+		rawset(s, "__camera_far", v)
+		Los.render_set_camera_far(v)
+	end,
+	camera_near = function(s, v)
+		rawset(s, "__camera_near", v)
+		Los.render_set_camera_near(v)
+	end,
+	camera_position = function(s, v)
+		rawset(s, "__camera_position", v)
+		Los.render_set_camera_transform(v.handle, s.camera_rotation.handle)
+	end,
+	camera_rotation = function(s, v)
+		rawset(s, "__camera_rotation", v)
+		Los.render_set_camera_transform(s.camera_position.handle, v.handle)
+	end,
 	window_title = function(s, v)
-		s._window_title = v
+		rawset(s, "__window_title", v)
 		Los.client_set_title(v)
 	end}

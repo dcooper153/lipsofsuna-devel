@@ -70,7 +70,7 @@ Program.profiling = {}
 -- Main loop.
 while not Program.quit do
 	-- Update program state.
-	Program:watchdog_start(3)
+	Program:watchdog_start(300)
 	local t1 = Program.time
 	Program:update()
 	local t2 = Program.time
@@ -83,7 +83,7 @@ while not Program.quit do
 	Widgets:update()
 	local t3 = Program.time
 	-- Render the scene.
-	Gui.scene:update_camera()
+	Client:update()
 	Widgets:draw()
 	local t4 = Program.time
 	-- Update profiling stats.

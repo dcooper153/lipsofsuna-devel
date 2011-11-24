@@ -20,16 +20,13 @@
 
 #include "lipsofsuna/system.h"
 #include "render-types.h"
-#include "../render21/render-image.h"
-#include "../render32/render-image.h"
 
 struct _LIRenImage
 {
 	int refs;
-	Uint32 timestamp;
+	char* name;
+	time_t timestamp;
 	LIRenRender* render;
-	LIRenImage21* v21;
-	LIRenImage32* v32;
 };
 
 LIAPICALL (LIRenImage*, liren_image_new, (

@@ -25,6 +25,46 @@
 #include <lipsofsuna/render.h>
 #include "ext-module.h"
 
+static void Render_set_camera_far (LIScrArgs* args)
+{
+	float value;
+	LIExtModule* module;
+
+	if (liscr_args_geti_float (args, 0, &value))
+	{
+		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
+		liren_render_set_camera_far (module->client->render, value);
+	}
+}
+
+static void Render_set_camera_near (LIScrArgs* args)
+{
+	float value;
+	LIExtModule* module;
+
+	if (liscr_args_geti_float (args, 0, &value))
+	{
+		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
+		liren_render_set_camera_near (module->client->render, value);
+	}
+}
+
+static void Render_set_camera_transform (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIMatVector position;
+	LIMatQuaternion rotation;
+	LIMatTransform transform;
+
+	if (liscr_args_geti_vector (args, 0, &position) &&
+	    liscr_args_geti_quaternion (args, 1, &rotation))
+	{
+		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
+		transform = limat_transform_init (position, rotation);
+		liren_render_set_camera_transform (module->client->render, &transform);
+	}
+}
+
 static void Render_get_anisotrophy (LIScrArgs* args)
 {
 	LIExtModule* module;
@@ -50,6 +90,9 @@ static void Render_set_anisotrophy (LIScrArgs* args)
 void liext_script_render (
 	LIScrScript* self)
 {
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_camera_far", Render_set_camera_far);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_camera_near", Render_set_camera_near);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_camera_transform", Render_set_camera_transform);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_get_anisotrophy", Render_get_anisotrophy);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_anisotrophy", Render_set_anisotrophy);
 }

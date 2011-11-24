@@ -19,15 +19,13 @@
 #define __RENDER_INTERNAL_LIGHT_H__
 
 #include "render-types.h"
-#include "../render21/render-light.h"
-#include "../render32/render-light.h"
 
 struct _LIRenLight
 {
 	int id;
+	LIMatTransform transform;
+	LIRenLightData* data;
 	LIRenRender* render;
-	LIRenLight21* v21;
-	LIRenLight32* v32;
 };
 
 LIAPICALL (LIRenLight*, liren_light_new, (

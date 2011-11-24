@@ -20,14 +20,11 @@
 
 #include "lipsofsuna/system.h"
 #include "render-types.h"
-#include "../render21/render-shader.h"
-#include "../render32/render-shader.h"
 
 struct _LIRenShader
 {
+	char* name;
 	LIRenRender* render;
-	LIRenShader21* v21;
-	LIRenShader32* v32;
 };
 
 LIAPICALL (LIRenShader*, liren_shader_new, (
@@ -50,12 +47,12 @@ LIAPICALL (int, liren_shader_compile, (
 	int          animated,
 	int          alpha_to_coverage,
 	int          blend_enable,
-	GLenum       blend_src,
-	GLenum       blend_dst,
+	int          blend_src,
+	int          blend_dst,
 	int          color_write,
 	int          depth_test,
 	int          depth_write,
-	GLenum       depth_func));
+	int          depth_func));
 
 LIAPICALL (void, liren_shader_set_sort, (
 	LIRenShader* self,

@@ -84,11 +84,6 @@ LIWdgManager* liwdg_manager_new (
 	self->render = render;
 	self->projection = limat_matrix_identity ();
 
-	/* Allocate the root overlay. */
-	self->overlay = liren_render_overlay_new (render);
-	liren_render_overlay_set_root (render, self->overlay);
-	liren_render_overlay_set_visible (render, self->overlay, 1);
-
 	/* Initialize widget dictionary. */
 	self->widgets.all = lialg_ptrdic_new ();
 	if (self->widgets.all == NULL)
@@ -109,9 +104,6 @@ void liwdg_manager_free (
 {
 	lisys_assert (self->dialogs.bottom == NULL);
 	lisys_assert (self->dialogs.top == NULL);
-
-	/* Free the root overlay. */
-	liren_render_overlay_free (self->render, self->overlay);
 
 	if (self->widgets.all != NULL)
 		lialg_ptrdic_free (self->widgets.all);
@@ -250,6 +242,9 @@ int liwdg_manager_insert_window (
 	liwdg_widget_move (widget, size.width, size.height);
 	private_resize_window (self, widget);
 
+	/* Re-sort windows. */
+	liwdg_manager_sort_windows (self);
+
 	return 1;
 }
 
@@ -258,16 +253,19 @@ int liwdg_manager_remove_window (
 	LIWdgWidget*  widget)
 {
 	lisys_assert (widget->floating);
-	lisys_assert (widget->prev != NULL || widget == self->dialogs.top);
-	lisys_assert (widget->next != NULL || widget == self->dialogs.bottom);
+	lisys_assert (widget->above != NULL || widget == self->dialogs.top);
+	lisys_assert (widget->below != NULL || widget == self->dialogs.bottom);
 
 	/* Make sure that the update loop doesn't break. */
 	if (self->widgets.iter == widget)
-		self->widgets.iter = widget->next;
+		self->widgets.iter = widget->below;
 
 	/* Remove from stack. */
 	private_detach_window (self, widget);
 	widget->floating = 0;
+
+	/* Re-sort windows. */
+	liwdg_manager_sort_windows (self);
 
 	return 1;
 }
@@ -275,9 +273,81 @@ int liwdg_manager_remove_window (
 void liwdg_manager_render (
 	LIWdgManager* self)
 {
-	/* Render overlays. */
-	/* FIXME: Should be in the graphics module instead. */
-	liren_render_render (self->render);
+}
+
+void liwdg_manager_lower_window_to_bottom (
+	LIWdgManager* self,
+	LIWdgWidget*  widget)
+{
+	/* Check if already at the bottom. */
+	if (widget == self->dialogs.bottom)
+		return;
+	if (self->dialogs.bottom->above == NULL)
+		return;
+	lisys_assert (widget->below != NULL);
+
+	/* Remove from the list. */
+	if (widget->below != NULL)
+		widget->below->above = widget->above;
+	if (widget->above != NULL)
+		widget->above->below = widget->below;
+	if (widget == self->dialogs.top)
+		self->dialogs.top = widget->below;
+
+	/* Add to the bottom. */
+	widget->above = self->dialogs.bottom;
+	widget->below = NULL;
+	if (widget->above != NULL)
+		widget->above->below = widget;
+	self->dialogs.bottom = widget;
+
+	/* Update depth values. */
+	liwdg_manager_sort_windows (self);
+}
+
+void liwdg_manager_raise_window_from_bottom (
+	LIWdgManager* self,
+	LIWdgWidget*  widget)
+{
+	/* Check if already not at the bottom. */
+	if (widget != self->dialogs.bottom)
+		return;
+	if (widget->above == NULL)
+		return;
+	lisys_assert (widget->below == NULL);
+	lisys_assert (widget->above != NULL);
+
+	/* Remove from the list. */
+	self->dialogs.bottom = widget->above;
+	self->dialogs.bottom->below = NULL;
+
+	/* Add above the bottom. */
+	widget->below = self->dialogs.bottom;
+	widget->above = self->dialogs.bottom->above;
+	widget->below->above = widget;
+	if (widget->above != NULL)
+		widget->above->below = widget;
+	else
+		self->dialogs.top = widget;
+
+	/* Update depth values. */
+	liwdg_manager_sort_windows (self);
+}
+
+void liwdg_manager_sort_windows (
+	LIWdgManager* self)
+{
+	int depth;
+	LIWdgWidget* widget;
+
+	for (depth = 0, widget = self->dialogs.bottom ; widget != NULL ; widget = widget->above)
+	{
+		if (liwdg_widget_get_visible (widget))
+		{
+			liren_render_overlay_set_depth (self->render, widget->overlay, 100*depth);
+			depth++;
+		}
+	}
 }
 
 void liwdg_manager_update (
@@ -288,7 +358,7 @@ void liwdg_manager_update (
 
 	for (widget = self->dialogs.top ; widget != NULL ; widget = self->widgets.iter)
 	{
-		self->widgets.iter = widget->next;
+		self->widgets.iter = widget->below;
 		private_resize_window (self, widget);
 	}
 }
@@ -346,16 +416,16 @@ static void private_attach_window (
 	LIWdgWidget*  widget)
 {
 	/* Add the widget to the dialog list. */
-	widget->prev = NULL;
-	widget->next = self->dialogs.top;
+	widget->above = NULL;
+	widget->below = self->dialogs.top;
 	if (self->dialogs.top != NULL)
-		self->dialogs.top->prev = widget;
+		self->dialogs.top->above = widget;
 	else
 		self->dialogs.bottom = widget;
 	self->dialogs.top = widget;
 
 	/* Add the overlay to the root. */
-	liren_render_overlay_add_overlay (self->render, self->overlay, widget->overlay);
+	liren_render_overlay_set_floating (self->render, widget->overlay, 1);
 }
 
 static void private_detach_window (
@@ -363,17 +433,17 @@ static void private_detach_window (
 	LIWdgWidget*  widget)
 {
 	/* Remove the widget from the dialog list. */
-	if (widget->next != NULL)
-		widget->next->prev = widget->prev;
+	if (widget->below != NULL)
+		widget->below->above = widget->above;
 	else
-		self->dialogs.bottom = widget->prev;
-	if (widget->prev != NULL)
-		widget->prev->next = widget->next;
+		self->dialogs.bottom = widget->above;
+	if (widget->above != NULL)
+		widget->above->below = widget->below;
 	else
-		self->dialogs.top = widget->next;
+		self->dialogs.top = widget->below;
 
 	/* Remove the overlay from the root. */
-	liren_render_overlay_remove_overlay (self->render, self->overlay, widget->overlay);
+	liren_render_overlay_set_floating (self->render, widget->overlay, 0);
 }
 
 static LIWdgWidget* private_find_window (
@@ -385,7 +455,7 @@ static LIWdgWidget* private_find_window (
 	LIWdgRect rect;
 	LIWdgWidget* widget;
 
-	for (widget = self->dialogs.top ; widget != NULL ; widget = widget->next)
+	for (widget = self->dialogs.top ; widget != NULL ; widget = widget->below)
 	{
 		lisys_assert (liwdg_widget_get_visible (widget));
 		liwdg_widget_get_allocation (widget, &rect);

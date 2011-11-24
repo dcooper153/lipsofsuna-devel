@@ -54,7 +54,7 @@ LIAPICALL (int, liren_render_screenshot, (
 	LIRenRender* self,
 	const char*  path));
 
-LIAPICALL (void, liren_render_update, (
+LIAPICALL (int, liren_render_update, (
 	LIRenRender* self,
 	float        secs));
 
@@ -64,6 +64,18 @@ LIAPICALL (int, liren_render_get_anisotropy, (
 LIAPICALL (void, liren_render_set_anisotropy, (
 	LIRenRender* self,
 	int          value));
+
+LIAPICALL (void, liren_render_set_camera_far, (
+	LIRenRender* self,
+	float        value));
+
+LIAPICALL (void, liren_render_set_camera_near, (
+	LIRenRender* self,
+	float        value));
+
+LIAPICALL (void, liren_render_set_camera_transform, (
+	LIRenRender*          self,
+	const LIMatTransform* value));
 
 LIAPICALL (int, liren_render_get_image_size, (
 	LIRenRender* self,
@@ -76,6 +88,10 @@ LIAPICALL (float, liren_render_get_opengl_version, (
 LIAPICALL (void, liren_render_set_title, (
 	LIRenRender* self,
 	const char*  value));
+
+LIAPICALL (void, liren_render_get_videomode, (
+	LIRenRender*    self,
+	LIRenVideomode* mode));
 
 LIAPICALL (int, liren_render_set_videomode, (
 	LIRenRender*    self,

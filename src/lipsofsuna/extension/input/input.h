@@ -15,10 +15,9 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_INPUT_MODULE_H__
-#define __EXT_INPUT_MODULE_H__
+#ifndef __EXT_INPUT_INPUT_H__
+#define __EXT_INPUT_INPUT_H__
 
-#include "SDL.h"
 #include "lipsofsuna/extension.h"
 #include "lipsofsuna/client.h"
 #include "lipsofsuna/render.h"
@@ -26,39 +25,28 @@
 #define LIINP_SCRIPT_INPUT "Input"
 
 typedef struct _LIInpInput LIInpInput;
-struct _LIInpInput
-{
-	int active;
-	int grab;
-	SDL_Joystick* joystick;
-	LICalHandle calls[1];
-	LICliClient* client;
-	LIMaiProgram* program;
-	LIRenRender* render;
-	LIRenVideomode mode;
-};
 
-LIInpInput* liinp_input_new (
-	LIMaiProgram* program);
+LIAPICALL (LIInpInput*, liinp_input_new, (
+	LIMaiProgram* program));
 
-void liinp_input_free (
-	LIInpInput* self);
+LIAPICALL (void, liinp_input_free, (
+	LIInpInput* self));
 
-void liinp_input_get_pointer (
+LIAPICALL (void, liinp_input_get_pointer, (
 	LIInpInput* self,
 	int*        x,
-	int*        y);
+	int*        y));
 
-int liinp_input_get_pointer_grab (
-	LIInpInput* self);
+LIAPICALL (int, liinp_input_get_pointer_grab, (
+	LIInpInput* self));
 
-void liinp_input_set_pointer_grab (
+LIAPICALL (void, liinp_input_set_pointer_grab, (
 	LIInpInput* self,
-	int         value);
+	int         value));
 
 /*****************************************************************************/
 
-void liinp_script_input (
-	LIScrScript* self);
+LIAPICALL (void, liinp_script_input, (
+	LIScrScript* self));
 
 #endif

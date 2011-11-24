@@ -105,32 +105,36 @@ void liren_render_overlay_add_text (
 		liren_overlay_add_text (overlay, shader, font, text, color, scissor, pos, size, align);
 }
 
-/**
- * \brief Adds triangles to the overlay.
- * \param render Renderer.
- * \param id Overlay ID.
- * \param shader Shader name.
- * \param image Texture image name.
- * \param color Diffuse color.
- * \param scissor Screen space scissor rectangle.
- * \param verts Array of vertices.
- * \param count Number of vertices.
- */
-void liren_render_overlay_add_triangles (
-	LIRenRender*       self,
-	int                id,
-	const char*        shader,
-	const char*        image,
-	const float*       color,
-	const int*         scissor,
-	const LIRenVertex* verts,
-	int                count)
+void liren_render_overlay_add_scaled (
+	LIRenRender* self,
+	int          id,
+	const char*  material_name,
+	const int*   dest_position,
+	const int*   dest_size,
+	const int*   source_position,
+	const int*   source_tiling)
 {
 	LIRenOverlay* overlay;
 
 	overlay = lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
-		liren_overlay_add_triangles (overlay, shader, image, color, scissor, verts, count);
+		liren_overlay_add_scaled (overlay, material_name, dest_position, dest_size, source_position, source_tiling);
+}
+
+void liren_render_overlay_add_tiled (
+	LIRenRender* self,
+	int          id,
+	const char*  material_name,
+	const int*   dest_position,
+	const int*   dest_size,
+	const int*   source_position,
+	const int*   source_tiling)
+{
+	LIRenOverlay* overlay;
+
+	overlay = lialg_u32dic_find (self->overlays, id);
+	if (overlay != NULL)
+		liren_overlay_add_tiled (overlay, material_name, dest_position, dest_size, source_position, source_tiling);
 }
 
 /**
@@ -230,12 +234,12 @@ void liren_render_overlay_enable_scene (
 }
 
 /**
- * \brief Sets the overlay behind other overlays.
+ * \brief Sets the Z offset of the overlay.
  * \param render Renderer.
  * \param id Overlay ID.
- * \param value Nonzero for behind.
+ * \param value Positive integer.
  */
-void liren_render_overlay_set_behind (
+void liren_render_overlay_set_depth (
 	LIRenRender* self,
 	int          id,
 	int          value)
@@ -244,7 +248,25 @@ void liren_render_overlay_set_behind (
 
 	overlay = lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
-		liren_overlay_set_behind (overlay, value);
+		liren_overlay_set_depth (overlay, value);
+}
+
+/**
+ * \brief Sets the floating status of the overlay.
+ * \param render Renderer.
+ * \param id Overlay ID.
+ * \param value Nonzero for floating.
+ */
+void liren_render_overlay_set_floating (
+	LIRenRender* self,
+	int          id,
+	int          value)
+{
+	LIRenOverlay* overlay;
+
+	overlay = lialg_u32dic_find (self->overlays, id);
+	if (overlay != NULL)
+		liren_overlay_set_floating (overlay, value);
 }
 
 /**
@@ -263,21 +285,6 @@ void liren_render_overlay_set_position (
 	overlay = lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
 		liren_overlay_set_position (overlay, value);
-}
-
-/**
- * \brief Sets the overlay as the root overlay.
- * \param render Renderer.
- * \param id Overlay ID.
- */
-void liren_render_overlay_set_root (
-	LIRenRender* self,
-	int          id)
-{
-	LIRenOverlay* overlay;
-
-	overlay = lialg_u32dic_find (self->overlays, id);
-	self->root_overlay = overlay;
 }
 
 /**

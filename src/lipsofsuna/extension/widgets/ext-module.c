@@ -143,11 +143,14 @@ static int private_widget_tick (
 	LIExtModule* module,
 	float        secs)
 {
+	LIRenVideomode mode;
+
 	/* Update widgets. */
 	liwdg_manager_update (module->widgets, secs);
 
 	/* Update dimensions. */
-	liwdg_manager_set_size (module->widgets, module->client->mode.width, module->client->mode.height);
+	liren_render_get_videomode (module->client->render, &mode);
+	liwdg_manager_set_size (module->widgets, mode.width, mode.height);
 
 	return 1;
 }

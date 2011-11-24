@@ -18,14 +18,12 @@
 #ifndef __RENDER_INTERNAL_RENDER_H__
 #define __RENDER_INTERNAL_RENDER_H__
 
-#include "SDL.h"
 #include "lipsofsuna/paths.h"
 #include "render-types.h"
-#include "../render21/render.h"
-#include "../render32/render.h"
 
 struct _LIRenRender
 {
+	int anisotropy;
 	LIAlgRandom random;
 	LIAlgStrdic* fonts;
 	LIAlgStrdic* images;
@@ -35,12 +33,16 @@ struct _LIRenRender
 	LIAlgU32dic* objects;
 	LIAlgU32dic* overlays;
 	LIPthPaths* paths;
-	LIRenOverlay* root_overlay;
-	LIRenRender21* v21;
-	LIRenRender32* v32;
 	LIRenVideomode mode;
-	SDL_Surface* screen;
+	LIRenRenderData* data;
 };
+
+LIAPICALL (int, liren_internal_init, (
+	LIRenRender*    self,
+	LIRenVideomode* mode));
+
+LIAPICALL (void, liren_internal_deinit, (
+	LIRenRender* self));
 
 LIAPICALL (LIRenImage*, liren_internal_find_image, (
 	LIRenRender* self,
@@ -79,23 +81,11 @@ LIAPICALL (void, liren_internal_reload, (
 LIAPICALL (void, liren_internal_render, (
 	LIRenRender* self));
 
-LIAPICALL (void, liren_internal_render_scene, (
-	LIRenRender*       self,
-	LIRenFramebuffer*  framebuffer,
-	const GLint*       viewport,
-	LIMatMatrix*       modelview,
-	LIMatMatrix*       projection,
-	LIMatFrustum*      frustum,
-	LIRenPassRender*   render_passes,
-	int                render_passes_num,
-	LIRenPassPostproc* postproc_passes,
-	int                postproc_passes_num));
-
 LIAPICALL (int, liren_internal_screenshot, (
 	LIRenRender* self,
 	const char*  path));
 
-LIAPICALL (void, liren_internal_update, (
+LIAPICALL (int, liren_internal_update, (
 	LIRenRender* self,
 	float        secs));
 
@@ -106,6 +96,18 @@ LIAPICALL (void, liren_internal_set_anisotropy, (
 	LIRenRender* self,
 	int          value));
 
+LIAPICALL (void, liren_internal_set_camera_far, (
+	LIRenRender* self,
+	float        value));
+
+LIAPICALL (void, liren_internal_set_camera_near, (
+	LIRenRender* self,
+	float        value));
+
+LIAPICALL (void, liren_internal_set_camera_transform, (
+	LIRenRender*          self,
+	const LIMatTransform* value));
+
 LIAPICALL (int, liren_internal_get_image_size, (
 	LIRenRender* self,
 	const char*  name,
@@ -113,6 +115,10 @@ LIAPICALL (int, liren_internal_get_image_size, (
 
 LIAPICALL (float, liren_internal_get_opengl_version, (
 	LIRenRender* self));
+
+LIAPICALL (void, liren_internal_set_title, (
+	LIRenRender* self,
+	const char*  value));
 
 LIAPICALL (int, liren_internal_set_videomode, (
 	LIRenRender*    self,
