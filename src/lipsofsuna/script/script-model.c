@@ -52,9 +52,6 @@ static void Model_new (LIScrArgs* args)
 static void Model_copy (LIScrArgs* args)
 {
 	LIEngModel* self;
-	LIMaiProgram* program;
-
-	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
 
 	/* Allocate model. */
 	self = lieng_model_new_copy (args->self);

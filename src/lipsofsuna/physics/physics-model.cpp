@@ -504,7 +504,7 @@ static int private_build_terrain_triangulate (
 	delete[] tmp;
 	delete[] idx;
 
-	return 1;
+	return ret;
 }
 
 static void private_clear_terrain (

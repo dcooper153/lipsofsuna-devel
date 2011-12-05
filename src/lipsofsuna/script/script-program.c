@@ -197,9 +197,7 @@ static void Program_update (LIScrArgs* args)
 static void Program_wait (LIScrArgs* args)
 {
 	float secs = 1.0f;
-	LIMaiProgram* program;
 
-	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
 	liscr_args_geti_float (args, 0, &secs);
 	if (secs > 0.0f)
 		lisys_usleep ((int)(1000000 * secs));

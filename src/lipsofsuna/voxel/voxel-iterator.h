@@ -127,7 +127,6 @@ static inline int livox_voxel_iter_first (
 	LIAlgRange*     tiles,
 	int             load)
 {
-	int ret;
 	int offset[3];
 
 	self->voxels = voxels;
@@ -173,7 +172,7 @@ static inline int livox_voxel_iter_first (
 	self->range1 = lialg_range_clamp (self->range1, 0, self->voxels->tiles_per_line - 1);
 
 	/* Find first voxel. */
-	ret = lialg_range_iter_first (&self->rangei1, &self->range1);
+	lialg_range_iter_first (&self->rangei1, &self->range1);
 	self->voxel[0] = self->rangei1.x;
 	self->voxel[1] = self->rangei1.y;
 	self->voxel[2] = self->rangei1.z;
@@ -193,7 +192,6 @@ empty:
 static inline int livox_voxel_iter_next (
 	LIVoxVoxelIter* self)
 {
-	int ret;
 	int offset[3];
 
 	/* Next voxel. */
@@ -231,7 +229,7 @@ static inline int livox_voxel_iter_next (
 	self->range1 = lialg_range_clamp (self->range1, 0, self->voxels->tiles_per_line - 1);
 
 	/* Find first voxel. */
-	ret = lialg_range_iter_first (&self->rangei1, &self->range1);
+	lialg_range_iter_first (&self->rangei1, &self->range1);
 	self->voxel[0] = self->rangei1.x;
 	self->voxel[1] = self->rangei1.y;
 	self->voxel[2] = self->rangei1.z;

@@ -40,6 +40,13 @@
 #define lisys_assert(exp) ((exp)? (void) 0 : lisys_assert_fail (#exp, __FILE__, __LINE__, __func__))
 #endif
 
+/* Workaround for libflac providing its own assert.h that doesn't have assert(). */
+#ifdef __cplusplus
+#ifndef assert
+#define assert lisys_assert
+#endif
+#endif
+
 LIAPICALL (void, lisys_assert_fail, (
 	const char* asrt,
 	const char* file,

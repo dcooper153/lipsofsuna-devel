@@ -135,12 +135,10 @@ static void Widget_canvas_enable_scene (LIScrArgs* args)
 	LIMatMatrix projection;
 	LIRenPassPostproc postproc_passes[10];
 	LIRenPassRender render_passes[10];
-	LIRenRender* render;
 	LIWdgWidget* widget;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_WIDGET);
 	widget = args->self;
-	render = widget->manager->render;
 
 	/* Get arguments. */
 	modelview = limat_matrix_identity ();
@@ -249,7 +247,6 @@ static void Widget_canvas_enable_scene (LIScrArgs* args)
 	/* Free the shader names we allocated. */
 	for (i = 0 ; i < postproc_passes_num ; i++)
 		lisys_free ((char*) postproc_passes[i].shader);
-
 }
 
 static void Widget_canvas_image (LIScrArgs* args)

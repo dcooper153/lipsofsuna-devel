@@ -145,7 +145,6 @@ void livox_hinting_process_voxel (
 	int y;
 	int z;
 	int index;
-	int liquid = 0;
 	LIVoxVoxel* voxel;
 	LIVoxVoxel* voxels[3][3][3];
 	LIVoxMaterial* materials[3][3][3];
@@ -174,7 +173,6 @@ void livox_hinting_process_voxel (
 	switch (materials[1][1][1]->type)
 	{
 		case LIVOX_MATERIAL_TYPE_LIQUID:
-			liquid = 1;
 			private_hint_liquid (voxels, materials);
 			break;
 		case LIVOX_MATERIAL_TYPE_ROUNDED:
