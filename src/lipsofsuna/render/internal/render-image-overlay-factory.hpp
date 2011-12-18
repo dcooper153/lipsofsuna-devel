@@ -15,28 +15,37 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_CONTAINER_HPP__
-#define __RENDER_INTERNAL_CONTAINER_HPP__
+#ifndef __RENDER_INTERNAL_IMAGE_OVERLAY_FACTORY_HPP__
+#define __RENDER_INTERNAL_IMAGE_OVERLAY_FACTORY_HPP__
 
 #include "lipsofsuna/system.h"
 #include "render-types.h"
-#include <OgrePanelOverlayElement.h>
+#include "render-image-overlay.hpp"
+#include <OgreOverlayElementFactory.h>
 
-class LIRenContainer : public Ogre::PanelOverlayElement
+class LIRenImageOverlayFactory : public Ogre::OverlayElementFactory
 {
 public:
-	LIRenContainer (const Ogre::String& name);
-	virtual ~LIRenContainer ();
-	virtual void initialise ();
-	virtual const Ogre::String& getTypeName () const;
-	virtual void getRenderOperation (Ogre::RenderOperation& op);
-protected:
-	virtual ushort _notifyZOrder (ushort z);
-	virtual ushort _notifyZOrderNonrecursive (ushort z);
-	void get_children (std::vector<LIRenContainer*>& children);
+	LIRenImageOverlayFactory () : name ("LIRenImageOverlay")
+	{
+	}
+	virtual ~LIRenImageOverlayFactory ()
+	{
+	}
+	virtual Ogre::OverlayElement* createOverlayElement (const Ogre::String& name)
+	{
+		return new LIRenImageOverlay (name);
+	}
+	virtual void destroyOverlayElement (Ogre::OverlayElement* element)
+	{
+		delete element;
+	}
+	virtual const Ogre::String& getTypeName () const
+	{
+		return name;
+	}
 private:
-	Ogre::RenderOperation render_op;
-	static Ogre::String type_name;
+	Ogre::String name;
 };
 
 #endif

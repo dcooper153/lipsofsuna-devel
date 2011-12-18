@@ -27,7 +27,11 @@
 #include "render-internal.h"
 #include "render-container.hpp"
 
+#define MAX_VERTEX_COUNT 1024
+
 Ogre::String LIRenContainer::type_name ("LIRenContainer");
+
+/*****************************************************************************/
 
 LIRenContainer::LIRenContainer (const Ogre::String& name) : Ogre::PanelOverlayElement (name)
 {
@@ -35,11 +39,49 @@ LIRenContainer::LIRenContainer (const Ogre::String& name) : Ogre::PanelOverlayEl
 
 LIRenContainer::~LIRenContainer ()
 {
+	delete render_op.vertexData;
+}
+
+void LIRenContainer::initialise ()
+{
+	bool init = !mInitialised;
+	Ogre::PanelOverlayElement::initialise();
+	if (init)
+	{
+		/* Initialize the render operation. */
+		render_op.vertexData = new Ogre::VertexData ();
+		render_op.vertexData->vertexStart = 0;
+		render_op.vertexData->vertexCount = 0;
+
+		/* Setup the vertex format. */
+		size_t offset = 0;
+		Ogre::VertexDeclaration* format = render_op.vertexData->vertexDeclaration;
+		format->addElement (0, offset, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES);
+		offset += Ogre::VertexElement::getTypeSize (Ogre::VET_FLOAT2);
+		format->addElement (0, offset, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
+		offset += Ogre::VertexElement::getTypeSize (Ogre::VET_FLOAT3);
+
+		/* Create the vertex buffer. */
+		Ogre::HardwareVertexBufferSharedPtr vbuf =
+			Ogre::HardwareBufferManager::getSingleton().createVertexBuffer (
+			offset, MAX_VERTEX_COUNT, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+
+		/* Bind the vertex buffer. */
+		render_op.vertexData->vertexBufferBinding->setBinding (0, vbuf);
+		render_op.useIndexes = false;
+		render_op.operationType = Ogre::RenderOperation::OT_TRIANGLE_LIST;
+		mInitialised = true;
+	}
 }
 
 const Ogre::String& LIRenContainer::getTypeName () const
 {
 	return type_name;
+}
+
+void LIRenContainer::getRenderOperation (Ogre::RenderOperation& op)
+{
+	op = render_op;
 }
 
 ushort LIRenContainer::_notifyZOrder (ushort z)

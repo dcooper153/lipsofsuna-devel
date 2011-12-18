@@ -142,6 +142,8 @@ int liren_internal_init (
 	self->data->overlay_manager = &(Ogre::OverlayManager::getSingleton ());
 	self->data->container_factory = new LIRenContainerFactory;
 	self->data->overlay_manager->addOverlayElementFactory (self->data->container_factory);
+	self->data->image_factory = new LIRenImageOverlayFactory;
+	self->data->overlay_manager->addOverlayElementFactory (self->data->image_factory);
 
 	return 1;
 }
@@ -153,6 +155,7 @@ void liren_internal_deinit (
 	{
 		delete self->data->root;
 		delete self->data->container_factory;
+		delete self->data->image_factory;
 		delete self->data;
 		self->data = NULL;
 	}

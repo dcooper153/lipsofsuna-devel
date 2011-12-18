@@ -125,16 +125,19 @@ void liren_render_overlay_add_tiled (
 	LIRenRender* self,
 	int          id,
 	const char*  material_name,
+	const int*   dest_clip,
 	const int*   dest_position,
 	const int*   dest_size,
 	const int*   source_position,
-	const int*   source_tiling)
+	const int*   source_tiling,
+	float        rotation_angle,
+	const float* rotation_center)
 {
 	LIRenOverlay* overlay;
 
 	overlay = lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
-		liren_overlay_add_tiled (overlay, material_name, dest_position, dest_size, source_position, source_tiling);
+		liren_overlay_add_tiled (overlay, material_name, dest_clip, dest_position, dest_size, source_position, source_tiling, rotation_angle, rotation_center);
 }
 
 /**

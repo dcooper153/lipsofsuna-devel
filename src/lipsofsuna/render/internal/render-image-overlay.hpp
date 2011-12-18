@@ -15,26 +15,34 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_CONTAINER_HPP__
-#define __RENDER_INTERNAL_CONTAINER_HPP__
+#ifndef __RENDER_INTERNAL_IMAGE_OVERLAY_HPP__
+#define __RENDER_INTERNAL_IMAGE_OVERLAY_HPP__
 
 #include "lipsofsuna/system.h"
 #include "render-types.h"
-#include <OgrePanelOverlayElement.h>
+#include <OgreOverlayElement.h>
 
-class LIRenContainer : public Ogre::PanelOverlayElement
+class LIRenImageOverlay : public Ogre::OverlayElement
 {
 public:
-	LIRenContainer (const Ogre::String& name);
-	virtual ~LIRenContainer ();
+	LIRenImageOverlay (const Ogre::String& name);
+	virtual ~LIRenImageOverlay ();
+	void set_clipping (const int* rect);
+	void set_rotation (float angle, float center_x, float center_y);
+	void set_tiling (const int* source_position, const int* source_size, const int* source_tiling);
 	virtual void initialise ();
 	virtual const Ogre::String& getTypeName () const;
 	virtual void getRenderOperation (Ogre::RenderOperation& op);
-protected:
-	virtual ushort _notifyZOrder (ushort z);
-	virtual ushort _notifyZOrderNonrecursive (ushort z);
-	void get_children (std::vector<LIRenContainer*>& children);
+	virtual void updatePositionGeometry ();
+	virtual void updateTextureGeometry ();
 private:
+	bool clipping;
+	int dst_clip[4];
+	int src_pos[2];
+	int src_size[2];
+	int src_tiling[6];
+	float rotation_angle;
+	float rotation_center[2];
 	Ogre::RenderOperation render_op;
 	static Ogre::String type_name;
 };

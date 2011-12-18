@@ -67,7 +67,7 @@ Widgets.SkillControl.reshaped = function(self)
 	-- Value.
 	if v > 0 then
 		self:canvas_image{
-			dest_clip = {xbar,0,v*w,h},
+			dest_clip = {0,0,v*w,h},
 			dest_position = {xbar,0},
 			dest_size = {w,h},
 			source_image = "widgets1",
@@ -77,7 +77,7 @@ Widgets.SkillControl.reshaped = function(self)
 	-- Cap.
 	if c > v then
 		self:canvas_image{
-			dest_clip = {xbar+v*w,0,c*w-v*w,h},
+			dest_clip = {v*w,0,c*w-v*w,h},
 			dest_position = {xbar,0},
 			dest_size = {w,h},
 			source_image = "widgets1",

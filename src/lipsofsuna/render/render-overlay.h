@@ -59,10 +59,13 @@ LIAPICALL (void, liren_render_overlay_add_tiled, (
 	LIRenRender* self,
 	int          id,
 	const char*  material_name,
+	const int*   dest_clip,
 	const int*   dest_position,
 	const int*   dest_size,
 	const int*   source_position,
-	const int*   source_tiling));
+	const int*   source_tiling,
+	float        rotation_angle,
+	const float* rotation_center));
 
 LIAPICALL (void, liren_render_overlay_add_overlay, (
 	LIRenRender* self,

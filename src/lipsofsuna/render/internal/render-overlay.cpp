@@ -252,61 +252,42 @@ void liren_overlay_add_text (
  * \brief Adds a tiled image to the overlay.
  * \param self Overlay.
  * \param material_name Material name.
+ * \param dest_clip Destination clip rectangle in pixels, or NULL for no clipping.
  * \param dest_position Position in pixels relative to the parent.
  * \param dest_size Size in pixels.
  * \param source_position Position in pixels in the source image.
  * \param source_tiling Tiling pattern in pixels.
+ * \param rotation_angle Rotation angle in radians.
+ * \param rotation_center Rotation center position in pixels.
  */
 void liren_overlay_add_tiled (
 	LIRenOverlay* self,
 	const char*   material_name,
+	const int*    dest_clip,
 	const int*    dest_position,
 	const int*    dest_size,
 	const int*    source_position,
-	const int*    source_tiling)
+	const int*    source_tiling,
+	float         rotation_angle,
+	const float*  rotation_center)
 {
 	/* Get the texture size. */
 	Ogre::MaterialPtr material;
 	Ogre::TexturePtr texture;
 	if (!private_create_material (self, material_name, &material, &texture))
 		return;
-	Ogre::Real w = texture->getWidth ();
-	Ogre::Real h = texture->getHeight ();
+	int source_size[2] = { texture->getWidth (), texture->getHeight () };
 
-	/* Create a new border panel overlay. */
+	/* Create a new image overlay. */
 	Ogre::String id = private_unique_element (self);
-	Ogre::BorderPanelOverlayElement* elem = (Ogre::BorderPanelOverlayElement*) self->render->data->overlay_manager->createOverlayElement ("BorderPanel", id); 
+	LIRenImageOverlay* elem = (LIRenImageOverlay*) self->render->data->overlay_manager->createOverlayElement ("LIRenImageOverlay", id); 
 	elem->setMetricsMode (Ogre::GMM_PIXELS);
 	elem->setPosition (dest_position[0], dest_position[1]);
 	elem->setDimensions (dest_size[0], dest_size[1]);
 	elem->setMaterialName (material_name);
-	elem->setBorderMaterialName (material_name);
-	elem->setBorderSize (source_tiling[0], source_tiling[2], source_tiling[3], source_tiling[5]);
-
-	/* Set texture coordinates. */
-	float x[4] =
-	{
-		source_position[0],
-		source_position[0] + source_tiling[0],
-		source_position[0] + source_tiling[0] + source_tiling[1],
-		source_position[0] + source_tiling[0] + source_tiling[1] + source_tiling[2]
-	};
-	float y[4] =
-	{
-		source_position[1],
-		source_position[1] + source_tiling[3],
-		source_position[1] + source_tiling[3] + source_tiling[4],
-		source_position[1] + source_tiling[3] + source_tiling[4] + source_tiling[5]
-	};
-	elem->setTopLeftBorderUV     (x[0] / w, y[0] / h, x[1] / w, y[1] / h);
-	elem->setTopBorderUV         (x[1] / w, y[0] / h, x[2] / w, y[1] / h);
-	elem->setTopRightBorderUV    (x[2] / w, y[0] / h, x[3] / w, y[1] / h);
-	elem->setLeftBorderUV        (x[0] / w, y[1] / h, x[1] / w, y[2] / h);
-	elem->setUV                  (x[1] / w, y[1] / h, x[2] / w, y[2] / h);
-	elem->setRightBorderUV       (x[2] / w, y[1] / h, x[3] / w, y[2] / h);
-	elem->setBottomLeftBorderUV  (x[0] / w, y[2] / h, x[1] / w, y[3] / h);
-	elem->setBottomBorderUV      (x[1] / w, y[2] / h, x[2] / w, y[3] / h);
-	elem->setBottomRightBorderUV (x[2] / w, y[2] / h, x[3] / w, y[3] / h);
+	elem->set_clipping (dest_clip);
+	elem->set_tiling (source_position, source_size, source_tiling);
+	elem->set_rotation (rotation_angle, rotation_center[0], rotation_center[1]);
 	elem->show ();
 
 	/* Add to the list. */

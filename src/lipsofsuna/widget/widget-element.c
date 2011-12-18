@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -44,7 +44,7 @@ struct _LIWdgElement
 	const char* image_name;
 	float text_align[2];
 	float text_color[4];
-	LIMatVector center;
+	float center[2];
 };
 
 /*****************************************************************************/
@@ -75,6 +75,7 @@ int liwdg_widget_canvas_insert_image (
 	const float white[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	LIWdgElement elem;
 
+	/* Process parameters. */
 	memset (&elem, 0, sizeof (LIWdgElement));
 	elem.image_name = image;
 	if (color != NULL)
@@ -104,12 +105,23 @@ int liwdg_widget_canvas_insert_image (
 	}
 	elem.rotation = rotation_angle;
 	if (rotation_center != NULL)
-		elem.center = *rotation_center;
+	{
+		elem.center[0] = rotation_center->x;
+		elem.center[1] = rotation_center->y;
+	}
+	else
+	{
+		elem.center[0] = 0.0f;
+		elem.center[1] = 0.0f;
+	}
 
+	/* Create the render overlay. */
 	if (elem.src_tiling_enabled)
 	{
-		liren_render_overlay_add_tiled (self->manager->render, self->overlay,
-			elem.image_name, elem.dst_pos, elem.dst_size, elem.src_pos, elem.src_tiling);
+		liren_render_overlay_add_tiled (self->manager->render, self->overlay, elem.image_name,
+			elem.dst_clip_enabled? elem.dst_clip : NULL,
+			elem.dst_pos, elem.dst_size, elem.src_pos, elem.src_tiling,
+			elem.rotation, elem.center);
 	}
 	else
 	{
@@ -157,7 +169,10 @@ int liwdg_widget_canvas_insert_text (
 		memcpy (elem.text_color, text_color, 4 * sizeof (float));
 	elem.rotation = rotation_angle;
 	if (rotation_center != NULL)
-		elem.center = *rotation_center;
+	{
+		elem.center[0] = rotation_center->x;
+		elem.center[0] = rotation_center->y;
+	}
 
 	liren_render_overlay_add_text (self->manager->render, self->overlay, "widget",
 		elem.font, elem.text, elem.text_color,
