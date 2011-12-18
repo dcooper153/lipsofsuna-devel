@@ -30,6 +30,7 @@ struct _LIFntLayoutGlyph
 	int x;
 	int y;
 	int advance;
+	int wrapped;
 };
 
 typedef struct _LIFntLayout LIFntLayout;
@@ -61,6 +62,9 @@ LIAPICALL (int, lifnt_layout_append_string, (
 	const char*  string));
 
 LIAPICALL (void, lifnt_layout_clear, (
+	LIFntLayout* self));
+
+LIAPICALL (void, lifnt_layout_update, (
 	LIFntLayout* self));
 
 LIAPICALL (int, lifnt_layout_get_height, (

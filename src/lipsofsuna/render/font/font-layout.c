@@ -139,6 +139,12 @@ void lifnt_layout_clear (
 	self->c_glyphs = LIFNT_TEXT_DEFAULT_CAPACITY;
 }
 
+void lifnt_layout_update (
+	LIFntLayout* self)
+{
+	private_layout (self);
+}
+
 int lifnt_layout_get_height (
 	LIFntLayout* self)
 {
@@ -181,7 +187,6 @@ static void private_layout (
 	LIFntLayout* self)
 {
 	int i;
-	int w;
 	int h = 0;
 	int x;
 	int y = 0;
@@ -197,18 +202,22 @@ static void private_layout (
 	/* Wrap glyphs on lines. */
 	for (start = 0 ; start < self->n_glyphs ; start = end + 1)
 	{
-		x = 0;
-		w = private_get_line_width (self, start, &end);
+		/* Calculate the line length and height. */
+		private_get_line_width (self, start, &end);
 		lisys_assert (end < self->n_glyphs);
 		y += private_get_line_height (self, start, end);
-		for (i = start ; i <= end ; i++)
+
+		/* Layout the glyphs of the line. */
+		for (x = 0, i = start ; i <= end ; i++)
 		{
 			glyph = self->glyphs + i;
 			glyph->x = x;
 			glyph->y = y;
+			glyph->wrapped = (start && i == start);
 			x += glyph->advance;
-			/* FIXME: No kerning! */
 		}
+
+		/* Update layout dimensions. */
 		if (!start)
 			self->ascent = private_get_line_ascent (self, start, end);
 		if (self->width < x)
@@ -288,7 +297,6 @@ static int private_get_line_width (
 	for (x = 0, i = start ; i < self->n_glyphs ; i++)
 	{
 		glyph = self->glyphs + i;
-		/* FIXME: No kerning. */
 		x += glyph->advance;
 		*end = i;
 		if (glyph->glyph == L'\n')
@@ -311,7 +319,6 @@ static int private_get_line_width (
 			*end = i;
 			w = x;
 		}
-		/* FIXME: No kerning. */
 		if (x + glyph->advance >= self->limit_width)
 			break;
 		x += glyph->advance;
@@ -323,7 +330,6 @@ static int private_get_line_width (
 	for (x = 0, i = start ; i < self->n_glyphs ; i++)
 	{
 		glyph = self->glyphs + i;
-		/* FIXME: No kerning. */
 		if (x + glyph->advance >= self->limit_width)
 		{
 			if (i > start)

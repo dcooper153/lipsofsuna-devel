@@ -444,6 +444,7 @@ int liren_internal_measure_text (
 	if (width_limit != -1)
 		lifnt_layout_set_width_limit (layout, width_limit);
 	lifnt_layout_append_string (layout, font_, text);
+	lifnt_layout_update (layout);
 	*result_width = lifnt_layout_get_width (layout);
 	*result_height = lifnt_layout_get_height (layout);
 	lifnt_layout_free (layout);

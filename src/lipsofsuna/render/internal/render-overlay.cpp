@@ -26,6 +26,8 @@
 
 #include "render-internal.h"
 
+#define MAX_CHARS_PER_LINE 1024
+
 static bool private_create_material (
 	LIRenOverlay*      self,
 	const char*        material_name,
@@ -175,28 +177,75 @@ void liren_overlay_add_text (
 	const int*    size,
 	const float*  align)
 {
+	int i;
+	int j;
+	int h;
+	int w;
+	int x;
+	int y;
+	wchar_t chars[MAX_CHARS_PER_LINE + 1];
 	LIFntFont* font_;
+	LIFntLayout* layout;
 
 	/* Get the font. */
 	font_ = (LIFntFont*) lialg_strdic_find (self->render->fonts, font);
 	if (font_ == NULL)
 		return;
+	h = lifnt_font_get_height (font_);
 
-	/* Create the element. */
-	Ogre::String id = private_unique_element (self);
-	Ogre::TextAreaOverlayElement* elem = (Ogre::TextAreaOverlayElement*) self->render->data->overlay_manager->createOverlayElement ("TextArea", id);
-	elem->setMetricsMode (Ogre::GMM_PIXELS);
-	elem->setPosition (pos[0], pos[1]);
-	elem->setDimensions (size[0], size[1]);
-	elem->setCharHeight (lifnt_font_get_height (font_));
-	elem->setFontName (font);
-	elem->setColour (Ogre::ColourValue (color[0], color[1], color[2], color[3]));
-	elem->setCaption (text);
-	elem->show ();
+	/* Layout the text. */
+	layout = lifnt_layout_new ();
+	if (layout == NULL)
+		return;
+	lifnt_layout_set_width_limit (layout, size[0]);
+	lifnt_layout_append_string (layout, font_, text);
+	lifnt_layout_update (layout);
 
-	/* Add to the list. */
-	self->data->elements.push_back (elem);
-	self->data->container->addChild (elem);
+	/* Vertical alignment. */
+	y = pos[1];
+	y += (size[1] - lifnt_layout_get_height (layout)) * align[1];
+
+	/* Handle each line */
+	for (i = 0 ; i < layout->n_glyphs ; i += j)
+	{
+		/* Get the characters of the line. */
+		for (w = 0, j = 0 ; i + j < layout->n_glyphs ; j++)
+		{
+			if (j > 0 && layout->glyphs[i + j].wrapped)
+				break;
+			if (j < MAX_CHARS_PER_LINE)
+				chars[j] = layout->glyphs[i + j].glyph;
+			w = layout->glyphs[i + j].x + layout->glyphs[i + j].advance;
+		}
+		if (j < MAX_CHARS_PER_LINE)
+			chars[j] = 0;
+		else
+			chars[MAX_CHARS_PER_LINE] = 0;
+
+		/* Horizontal alignment. */
+		x = pos[0];
+		x += (size[0] - w) * align[0];
+
+		/* Create the element. */
+		Ogre::String id = private_unique_element (self);
+		Ogre::TextAreaOverlayElement* elem = (Ogre::TextAreaOverlayElement*) self->render->data->overlay_manager->createOverlayElement ("TextArea", id);
+		elem->setMetricsMode (Ogre::GMM_PIXELS);
+		elem->setPosition (x, y);
+		elem->setDimensions (size[0], size[1]);
+		elem->setCharHeight (h);
+		elem->setFontName (font);
+		elem->setColour (Ogre::ColourValue (color[0], color[1], color[2], color[3]));
+		elem->setCaption (chars);
+		elem->show ();
+
+		/* Add to the list. */
+		self->data->elements.push_back (elem);
+		self->data->container->addChild (elem);
+
+		/* Start the next line. */
+		y += h;
+	}
+	lifnt_layout_free (layout);
 }
 
 /**
@@ -317,18 +366,15 @@ void liren_overlay_add_scaled (
 
 	/* Scale and translate to fill the area. */
 	float center;
-	float size;
 	if (ty[1] - ty[0] >= dest_size[1] / xs)
 	{
 		center = 0.5f * (ty[0] + ty[1]);
-		size = ty[1] - ty[0];
 		ty[0] = center - 0.5f * dest_size[1] / xs;
 		ty[1] = center + 0.5f * dest_size[1] / xs;
 	}
 	else
 	{
 		center = 0.5f * (tx[0] + tx[1]);
-		size = tx[1] - tx[0];
 		tx[0] = center - 0.5f * dest_size[0] / ys;
 		tx[1] = center + 0.5f * dest_size[0] / ys;
 	}
