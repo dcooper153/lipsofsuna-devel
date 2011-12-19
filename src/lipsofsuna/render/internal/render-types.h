@@ -75,8 +75,7 @@ struct _LIRenObjectData
 struct _LIRenOverlayData
 {
 	Ogre::Overlay* overlay;
-	Ogre::OverlayContainer* container;
-	std::vector<Ogre::OverlayElement*> elements;
+	LIRenContainer* container;
 };
 struct _LIRenRenderData
 {

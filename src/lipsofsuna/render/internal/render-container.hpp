@@ -30,13 +30,22 @@ public:
 	virtual void initialise ();
 	virtual const Ogre::String& getTypeName () const;
 	virtual void getRenderOperation (Ogre::RenderOperation& op);
+	void add_container (LIRenContainer* cont);
+	void add_element (Ogre::OverlayElement* elem);
+	void remove_container (int index);
+	void remove_element (int index);
+	void remove_all_elements ();
 protected:
 	virtual ushort _notifyZOrder (ushort z);
 	virtual ushort _notifyZOrderNonrecursive (ushort z);
+	virtual void _updateRenderQueue (Ogre::RenderQueue* queue);
 	void get_children (std::vector<LIRenContainer*>& children);
 private:
 	Ogre::RenderOperation render_op;
 	static Ogre::String type_name;
+public:
+	std::vector<LIRenContainer*> containers;
+	std::vector<Ogre::OverlayElement*> elements;
 };
 
 #endif

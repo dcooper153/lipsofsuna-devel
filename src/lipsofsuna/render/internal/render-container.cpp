@@ -84,8 +84,59 @@ void LIRenContainer::getRenderOperation (Ogre::RenderOperation& op)
 	op = render_op;
 }
 
+void LIRenContainer::add_container (LIRenContainer* cont)
+{
+	containers.push_back (cont);
+	addChild (cont);
+	_notifyZOrder (mZOrder);
+}
+
+void LIRenContainer::add_element (Ogre::OverlayElement* elem)
+{
+	elements.push_back (elem);
+	addChild (elem);
+	_notifyZOrder (mZOrder);
+}
+
+void LIRenContainer::remove_container (int index)
+{
+	LIRenContainer* child = containers[index];
+	containers.erase (containers.begin () + index);
+	Ogre::String name (child->getName ());
+	removeChild (name);
+	_notifyZOrder (mZOrder);
+}
+
+void LIRenContainer::remove_element (int index)
+{
+	Ogre::OverlayElement* child = elements[index];
+	elements.erase (elements.begin () + index);
+	Ogre::String name (child->getName ());
+	removeChild (name);
+	_notifyZOrder (mZOrder);
+}
+
+void LIRenContainer::remove_all_elements ()
+{
+	Ogre::OverlayElement* elem;
+
+	for (size_t i = 0 ; i < elements.size () ; i++)
+	{
+		elem = elements[i];
+		Ogre::String name (elem->getName ());
+		removeChild (name);
+		Ogre::OverlayManager::getSingleton ().destroyOverlayElement (name);
+	}
+	elements.clear ();
+	_notifyZOrder (mZOrder);
+}
+
 ushort LIRenContainer::_notifyZOrder (ushort z)
 {
+	/* Set our own Z order. */
+	mZOrder = z;
+
+	/* Get the first set of children. */
 	std::vector<LIRenContainer*> children;
 	children.push_back (this);
 
@@ -101,33 +152,35 @@ ushort LIRenContainer::_notifyZOrder (ushort z)
 		children.erase (children.begin (), children.begin () + count);
 	}
 
-	return z;
+	return z + 1;
 }
 
 ushort LIRenContainer::_notifyZOrderNonrecursive (ushort z)
 {
-	OverlayElement::_notifyZOrder (z);
+	z = OverlayElement::_notifyZOrder (z);
 
-	ChildIterator it = getChildIterator();
-	while (it.hasMoreElements ())
-	{
-		Ogre::OverlayElement* child = it.getNext ();
-		if (child->getTypeName () != type_name)
-			z = child->_notifyZOrder (z);
-	}
+	for (size_t i = 0 ; i < elements.size () ; i++)
+		z = elements[i]->_notifyZOrder (z);
 
 	return z + 1;
 }
 
+void LIRenContainer::_updateRenderQueue (Ogre::RenderQueue* queue)
+{
+	if (mVisible)
+	{
+		OverlayElement::_updateRenderQueue (queue);
+		for (size_t i = 0 ; i < elements.size () ; i++)
+			elements[i]->_updateRenderQueue (queue);
+		for (size_t i = 0 ; i < containers.size () ; i++)
+			containers[i]->_updateRenderQueue (queue);
+	}
+}
+
 void LIRenContainer::get_children (std::vector<LIRenContainer*>& children)
 {
-	ChildIterator it = getChildIterator ();
-	while (it.hasMoreElements ())
-	{
-		Ogre::OverlayElement* child = it.getNext ();
-		if (child->getTypeName () == type_name)
-			children.push_back ((LIRenContainer*) child);
-	}
+	for (size_t i = 0 ; i < containers.size () ; i++)
+		children.push_back (containers[i]);
 }
 
 /** @} */

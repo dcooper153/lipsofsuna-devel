@@ -87,7 +87,7 @@ LIRenOverlay* liren_overlay_new (
 		liren_overlay_free (self);
 		return 0;
 	}
-	self->data->container = (Ogre::OverlayContainer*) render->data->overlay_manager->createOverlayElement ("LIRenContainer", private_unique_overlay (self));
+	self->data->container = (LIRenContainer*) render->data->overlay_manager->createOverlayElement ("LIRenContainer", private_unique_overlay (self));
 	self->data->container->setMetricsMode (Ogre::GMM_PIXELS);
 
 	return self;
@@ -141,18 +141,7 @@ void liren_overlay_free (
 void liren_overlay_clear (
 	LIRenOverlay* self)
 {
-	size_t i;
-	Ogre::OverlayElement* elem;
-
-	/* Free elements. */
-	for (i = 0 ; i < self->data->elements.size () ; i++)
-	{
-		elem = self->data->elements[i];
-		Ogre::String name (elem->getName ());
-		self->data->container->removeChild (name);
-		self->render->data->overlay_manager->destroyOverlayElement (name);
-	}
-	self->data->elements.clear ();
+	self->data->container->remove_all_elements ();
 }
 
 /**
@@ -238,9 +227,8 @@ void liren_overlay_add_text (
 		elem->setCaption (chars);
 		elem->show ();
 
-		/* Add to the list. */
-		self->data->elements.push_back (elem);
-		self->data->container->addChild (elem);
+		/* Add to the container. */
+		self->data->container->add_element (elem);
 
 		/* Start the next line. */
 		y += h;
@@ -290,9 +278,8 @@ void liren_overlay_add_tiled (
 	elem->set_rotation (rotation_angle, rotation_center[0], rotation_center[1]);
 	elem->show ();
 
-	/* Add to the list. */
-	self->data->elements.push_back (elem);
-	self->data->container->addChild (elem);
+	/* Add to the container. */
+	self->data->container->add_element (elem);
 }
 
 /**
@@ -370,9 +357,8 @@ void liren_overlay_add_scaled (
 	elem->setUV (tx[0], ty[0], tx[1], ty[1]);
 	elem->show ();
 
-	/* Add to the list. */
-	self->data->elements.push_back (elem);
-	self->data->container->addChild (elem);
+	/* Add to the container. */
+	self->data->container->add_element (elem);
 }
 
 /**
@@ -402,7 +388,7 @@ void liren_overlay_add_overlay (
 	overlay->parent = self;
 
 	/* Add to container. */
-	self->data->container->addChild (overlay->data->container);
+	self->data->container->add_container (overlay->data->container);
 	private_update_position (overlay);
 }
 
@@ -641,6 +627,7 @@ static void private_remove_overlay (
 	LIRenOverlay* child)
 {
 	int i;
+	int j;
 
 	for (i = 0 ; i < self->overlays.count ; i++)
 	{
@@ -649,8 +636,8 @@ static void private_remove_overlay (
 			/* Remove from the array. */
 			if (self->overlays.count)
 			{
-				for ( ; i < self->overlays.count - 1 ; i++)
-					self->overlays.array[i] = self->overlays.array[i + 1];
+				for (j = i ; j < self->overlays.count - 1 ; j++)
+					self->overlays.array[j] = self->overlays.array[j + 1];
 				self->overlays.count--;
 			}
 			else
@@ -662,7 +649,7 @@ static void private_remove_overlay (
 
 			/* Detach the child. */
 			child->parent = NULL;
-			self->data->container->removeChild (private_unique_overlay (child));
+			self->data->container->remove_container (i);
 
 			/* Remove the overlay. */
 			if (child->data->overlay != NULL)
@@ -680,7 +667,7 @@ static Ogre::String private_unique_element (
 	LIRenOverlay* self)
 {
 	Ogre::String id1(Ogre::StringConverter::toString (self->id));
-	Ogre::String id2(Ogre::StringConverter::toString (self->data->elements.size ()));
+	Ogre::String id2(Ogre::StringConverter::toString (self->data->container->elements.size ()));
 	return id1 + "." + id2;
 }
 
