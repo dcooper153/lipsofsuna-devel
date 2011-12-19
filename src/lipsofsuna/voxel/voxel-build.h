@@ -38,6 +38,7 @@ LIAPICALL (void, livox_builder_free, (
 
 LIAPICALL (int, livox_builder_build_model, (
 	LIVoxBuilder* self,
+	LIMatVector*  offset,
 	LIMdlModel**  result));
 
 LIAPICALL (void, livox_builder_preprocess, (

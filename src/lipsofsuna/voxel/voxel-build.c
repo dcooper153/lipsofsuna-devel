@@ -112,6 +112,7 @@ void livox_builder_free (
 
 int livox_builder_build_model (
 	LIVoxBuilder*  self,
+	LIMatVector*   offset,
 	LIMdlModel**   result)
 {
 	int x;
@@ -136,6 +137,7 @@ int livox_builder_build_model (
 	if (self->model_builder != NULL)
 	{
 		*result = self->model_builder->model;
+		*offset = self->offset_vector;
 		limdl_builder_finish (self->model_builder);
 		limdl_builder_free (self->model_builder);
 	}
@@ -154,12 +156,17 @@ void livox_builder_preprocess (
 	int z;
 	LIMatVector offset;
 	LIMatVector vector;
+	LIMatVector tmp;
 	LIVoxMaterial* material;
 	LIVoxVoxel* voxel;
 
 	/* Calculate area offset. */
-	offset = limat_vector_init (self->offset[0] - 1.5f, self->offset[1] - 1.5f, self->offset[2] - 1.5f);
-	offset = limat_vector_multiply (offset, self->tile_width);
+	offset = limat_vector_init (self->size[0], self->size[1], self->size[2]);
+	offset = limat_vector_multiply (tmp, -0.5f * self->tile_width);
+	tmp = limat_vector_init (self->offset[0] - 1.5f, self->offset[1] - 1.5f, self->offset[2] - 1.5f);
+	tmp = limat_vector_multiply (tmp, self->tile_width);
+	tmp = limat_vector_add (tmp, offset);
+	self->offset_vector = tmp;
 
 	/* Precalculate useful information on voxels. */
 	for (z = 0 ; z < self->size[2] ; z++)

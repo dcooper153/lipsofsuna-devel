@@ -247,6 +247,7 @@ static int private_process_result (
 	LIExtBuildTask* task)
 {
 	LIExtBlock* block;
+	LIMatTransform transform;
 
 	/* Delete emptied blocks. */
 	if (task->model == NULL)
@@ -282,7 +283,9 @@ static int private_process_result (
 		block->object = liren_render_object_new (self->client->render, 0);
 		if (block->object)
 		{
+			transform = limat_transform_init (task->offset, limat_quaternion_identity ());
 			liren_render_object_set_model (self->client->render, block->object, block->model);
+			liren_render_object_set_transform (self->client->render, block->object, &transform);
 			liren_render_object_set_realized (self->client->render, block->object, 1);
 		}
 	}
@@ -384,7 +387,7 @@ static void private_worker_thread (
 
 		/* Process the task. */
 		livox_builder_preprocess (task->builder);
-		if (!livox_builder_build_model (task->builder, &task->model))
+		if (!livox_builder_build_model (task->builder, &task->offset, &task->model))
 		{
 			livox_builder_free (task->builder);
 			lisys_mutex_lock (self->tasks.mutex);
