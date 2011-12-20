@@ -14,12 +14,24 @@ Model.find_or_load = function(clss, args)
 	local spec = Modelspec:find{name = args.file}
 	self = Model{name = spec and spec.file or args.file}
 	self:load(args)
-	-- Replace shaders.
-	if args.mesh ~= false and spec and spec.replace_shaders then
-		for k,v in pairs(spec.replace_shaders) do
-			self:edit_material{match_shader = k, shader = v}
+	-- Edit materials.
+	if args.mesh ~= false and spec then
+		-- Replace shaders.
+		if spec.replace_shaders then
+			for k,v in pairs(spec.replace_shaders) do
+				self:edit_material{match_shader = k, shader = v}
+			end
 		end
-		self:changed()
+		-- Edit materials.
+		if spec.edit_materials then
+			for k,v in pairs(spec.edit_materials) do
+				self:edit_material(v)
+			end
+		end
+		-- Update the model.
+		if spec.replace_shaders or spec.edit_materials then
+			self:changed()
+		end
 	end
 	return self
 end

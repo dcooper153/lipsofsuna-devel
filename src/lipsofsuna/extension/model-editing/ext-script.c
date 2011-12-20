@@ -29,6 +29,7 @@ static void Model_add_material (LIScrArgs* args)
 	int cull;
 	float diffuse[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	float specular[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	const char* name;
 	const char* shader;
 	LIMdlBuilder* builder;
 	LIMdlMaterial material;
@@ -47,6 +48,8 @@ static void Model_add_material (LIScrArgs* args)
 		material.flags &= ~LIMDL_MATERIAL_FLAG_CULLFACE;
 	if (liscr_args_gets_floatv (args, "diffuse", 4, diffuse))
 		limdl_material_set_diffuse (&material, diffuse);
+	if (liscr_args_gets_string (args, "material", &name))
+		limdl_material_set_material (&material, name);
 	if (liscr_args_gets_string (args, "shader", &shader))
 		limdl_material_set_shader (&material, shader);
 	if (liscr_args_gets_floatv (args, "specular", 4, specular))
@@ -232,6 +235,8 @@ static void Model_edit_material (LIScrArgs* args)
 			limdl_material_set_specular (material, color);
 		if (liscr_args_gets_string (args, "shader", &str))
 			limdl_material_set_shader (material, str);
+		if (liscr_args_gets_string (args, "material", &str))
+			limdl_material_set_material (material, str);
 		if (liscr_args_gets_table (args, "textures"))
 		{
 			/* Count textures. */

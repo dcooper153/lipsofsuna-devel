@@ -10,6 +10,7 @@ Modelspec.dict_name = {}
 --- Creates a new model specification.
 -- @param clss Modelspec class.
 -- @param args Arguments.<ul>
+--   <li>edit_materials: Dictionary of material edits.</li></ul>
 --   <li>file: Overriding filename.</li>
 --   <li>name: Name of the model.</li>
 --   <li>replace_shaders: Dictionary of shaders overrides.</li></ul>

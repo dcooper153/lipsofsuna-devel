@@ -52,6 +52,7 @@ LIRenObject* liren_object_new (
 	if (self == NULL)
 		return NULL;
 	self->render = render;
+	self->shadow_casting = 0;
 
 	/* Initialize the private data. */
 	self->data = (LIRenObjectData*) lisys_calloc (1, sizeof (LIRenObjectData));
@@ -353,6 +354,10 @@ int liren_object_set_model (
 		self->data->node->attachObject (self->data->entity);
 	}
 
+	/* Set entity flags. */
+	if (self->data->entity != NULL)
+		self->data->entity->setCastShadows (self->shadow_casting);
+
 	return 1;
 }
 
@@ -382,6 +387,20 @@ int liren_object_set_realized (
 {
 	self->data->node->setVisible (value);
 	return 1;
+}
+
+/**
+ * \brief Sets the shadow casting mode of the object.
+ * \param self Object.
+ * \param value Nonzero to allow shadow casting, zero to disable.
+ */
+void liren_object_set_shadow (
+	LIRenObject* self,
+	int          value)
+{
+	self->shadow_casting = value;
+	if (self->data->entity != NULL)
+		self->data->entity->setCastShadows (self->shadow_casting);
 }
 
 /**

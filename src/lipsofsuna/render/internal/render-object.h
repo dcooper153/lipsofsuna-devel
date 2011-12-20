@@ -23,6 +23,7 @@
 struct _LIRenObject
 {
 	int id;
+	int shadow_casting;
 	LIMdlPose* pose;
 	LIRenModel* model;
 	LIRenRender* render;
@@ -99,6 +100,10 @@ LIAPICALL (int, liren_object_set_pose, (
 	LIMdlPose*   pose));
 
 LIAPICALL (int, liren_object_set_realized, (
+	LIRenObject* self,
+	int          value));
+
+LIAPICALL (void, liren_object_set_shadow, (
 	LIRenObject* self,
 	int          value));
 

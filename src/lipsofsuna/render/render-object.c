@@ -183,7 +183,6 @@ void liren_render_object_particle_animation (
  * \param id Object ID.
  * \param shader Shader name or NULL to disable the effect.
  * \param params Effect parameters or NULL.
- * \return Nonzero on success.
  */
 void liren_render_object_set_effect (
 	LIRenRender* self,
@@ -203,7 +202,6 @@ void liren_render_object_set_effect (
  * \param self Renderer.
  * \param id Object ID.
  * \param model Model.
- * \return Nonzero on success.
  */
 void liren_render_object_set_model (
 	LIRenRender* self,
@@ -226,7 +224,6 @@ void liren_render_object_set_model (
  * \param self Renderer.
  * \param id Object ID.
  * \param value Flag value.
- * \return Nonzero if succeeded.
  */
 void liren_render_object_set_realized (
 	LIRenRender* self,
@@ -238,6 +235,24 @@ void liren_render_object_set_realized (
 	object = lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
 		liren_object_set_realized (object, value);
+}
+
+/**
+ * \brief Sets the shadow casting mode of the object.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \param value Nonzero to allow shadow casting, zero to disable.
+ */
+void liren_render_object_set_shadow (
+	LIRenRender* self,
+	int          id,
+	int          value)
+{
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		liren_object_set_shadow (object, value);
 }
 
 /**

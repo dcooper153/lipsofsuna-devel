@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,9 +18,8 @@
 #ifndef __MODEL_MATERIAL_H__
 #define __MODEL_MATERIAL_H__
 
-#include <string.h>
-#include <lipsofsuna/archive.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/archive.h"
+#include "lipsofsuna/system.h"
 #include "model-texture.h"
 
 enum
@@ -29,6 +28,7 @@ enum
 	LIMDL_MATERIAL_FLAG_COLLISION    = 0x02,
 	LIMDL_MATERIAL_FLAG_CULLFACE     = 0x04,
 	LIMDL_MATERIAL_FLAG_TRANSPARENCY = 0x08,
+	LIMDL_MATERIAL_FLAG_REFERENCE    = 0x10
 };
 
 typedef struct _LIMdlMaterial LIMdlMaterial;
@@ -36,6 +36,7 @@ struct _LIMdlMaterial
 {
 	int flags;
 	char* shader;
+	char* material;
 	float emission;
 	float shininess;
 	float diffuse[4];
@@ -93,6 +94,10 @@ LIAPICALL (int, limdl_material_write, (
 LIAPICALL (void, limdl_material_set_diffuse, (
 	LIMdlMaterial* self,
 	const float*   value));
+
+LIAPICALL (int, limdl_material_set_material, (
+	LIMdlMaterial* self,
+	const char*    value));
 
 LIAPICALL (int, limdl_material_set_shader, (
 	LIMdlMaterial* self,

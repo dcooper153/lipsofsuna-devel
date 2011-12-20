@@ -163,7 +163,19 @@ static void private_create_material (
 	int            index,
 	Ogre::SubMesh* submesh)
 {
-	/* Load or create the material. */
+	/* Check for an existing material. */
+	if (mat->material != NULL && mat->material[0] != '\0')
+	{
+		Ogre::String name = Ogre::String (mat->material);
+		Ogre::MaterialPtr material = self->render->data->material_manager->getByName (name);
+		if (!material.isNull())
+		{
+			submesh->setMaterialName (name);
+			return;
+		}
+	}
+
+	/* Create a new the material. */
 	Ogre::String name = private_unique_material (self, index);
 	const Ogre::String& group = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 	Ogre::MaterialPtr material = self->render->data->material_manager->create (name, group);
@@ -182,7 +194,7 @@ static void private_create_material (
 
 	/* Set pass properties. */
 	pass->setSelfIllumination (mat->emission, mat->emission, mat->emission);
-	pass->setShininess (mat->shininess / 128.0f);
+	pass->setShininess (mat->shininess);
 	pass->setDiffuse (Ogre::ColourValue (mat->diffuse[0], mat->diffuse[1], mat->diffuse[2], mat->diffuse[3]));
 	pass->setSpecular (Ogre::ColourValue (mat->specular[0], mat->specular[1], mat->specular[2], mat->specular[3]));
 	pass->setVertexColourTracking (Ogre::TVC_DIFFUSE);

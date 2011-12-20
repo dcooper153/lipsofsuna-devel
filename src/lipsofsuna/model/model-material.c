@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -31,12 +31,13 @@
  * \param self Material.
  * \return Nonzero on success.
  */
-int
-limdl_material_init (LIMdlMaterial* self)
+int limdl_material_init (
+	LIMdlMaterial* self)
 {
 	self->shader = lisys_string_dup ("default");
 	if (self->shader == NULL)
 		return 0;
+	self->material = NULL;
 	self->flags = 0;
 	self->emission = 0.0f;
 	self->shininess = 1.0f;
@@ -58,15 +59,14 @@ limdl_material_init (LIMdlMaterial* self)
 }
 
 /**
- * \brief Initializes a copy of a material.
- *
+ * \brief Initializes a copy of the material.
  * \param self Copy destination.
  * \param src Copy source.
  * \return Nonzero on success.
  */
-int
-limdl_material_init_copy (LIMdlMaterial*       self,
-                          const LIMdlMaterial* src)
+int limdl_material_init_copy (
+	LIMdlMaterial*       self,
+	const LIMdlMaterial* src)
 {
 	int i;
 
@@ -76,6 +76,16 @@ limdl_material_init_copy (LIMdlMaterial*       self,
 		self->shader = lisys_string_dup (src->shader);
 		if (self->shader == NULL)
 			return 0;
+	}
+	if (src->material != NULL)
+	{
+		self->material = lisys_string_dup (src->material);
+		if (self->material == NULL)
+		{
+			lisys_free (self->shader);
+			self->shader = NULL;
+			return 0;
+		}
 	}
 	if (src->textures.count)
 	{
@@ -105,21 +115,21 @@ limdl_material_init_copy (LIMdlMaterial*       self,
 
 /**
  * \brief Frees the material.
- *
  * \param self Material.
  */
-void
-limdl_material_free (LIMdlMaterial* self)
+void limdl_material_free (
+	LIMdlMaterial* self)
 {
 	limdl_material_clear_textures (self);
+	lisys_free (self->material);
 	lisys_free (self->shader);
 }
 
-int
-limdl_material_append_texture (LIMdlMaterial* self,
-                               int            type,
-                               int            flags,
-                               const char*    name)
+int limdl_material_append_texture (
+	LIMdlMaterial* self,
+	int            type,
+	int            flags,
+	const char*    name)
 {
 	if (!limdl_material_realloc_textures (self, self->textures.count + 1))
 		return 0;
@@ -134,11 +144,10 @@ limdl_material_append_texture (LIMdlMaterial* self,
 
 /**
  * \brief Removes all textures from the material.
- *
  * \param self Material.
  */
-void
-limdl_material_clear_textures (LIMdlMaterial* self)
+void limdl_material_clear_textures (
+	LIMdlMaterial* self)
 {
 	int i;
 
@@ -151,17 +160,17 @@ limdl_material_clear_textures (LIMdlMaterial* self)
 
 /**
  * \brief Compares two materials.
- *
  * \param self Material.
  * \param material Material.
  * \return Nonzero if the materials are identical.
  */
-int
-limdl_material_compare (const LIMdlMaterial* self,
-                        const LIMdlMaterial* material)
+int limdl_material_compare (
+	const LIMdlMaterial* self,
+	const LIMdlMaterial* material)
 {
 	int i;
 
+	/* Compare numeric values. */
 	if (self->flags != material->flags ||
 	    self->emission != material->emission ||
 	    self->shininess != material->shininess ||
@@ -175,8 +184,30 @@ limdl_material_compare (const LIMdlMaterial* self,
 	    self->specular[3] != material->specular[3] ||
 	    self->textures.count != material->textures.count)
 		return 0;
-	if (strcmp (self->shader, material->shader))
+
+	/* Compare shaders. */
+	if (self->shader != NULL)
+	{
+		if (material->shader == NULL)
+			return 0;
+		if (strcmp (self->shader, material->shader))
+			return 0;
+	}
+	else if (material->shader != NULL)
 		return 0;
+
+	/* Compare materials. */
+	if (self->material != NULL)
+	{
+		if (material->material == NULL)
+			return 0;
+		if (strcmp (self->material, material->material))
+			return 0;
+	}
+	else if (material->material != NULL)
+		return 0;
+
+	/* Compare textures. */
 	for (i = 0 ; i < self->textures.count ; i++)
 	{
 		if (!limdl_texture_compare (self->textures.array + i, material->textures.array + i))
@@ -219,9 +250,9 @@ int limdl_material_compare_shader_and_texture (
  * \param reader Stream reader.
  * \return Nonzero on success.
  */
-int
-limdl_material_read (LIMdlMaterial* self,
-                     LIArcReader*   reader)
+int limdl_material_read (
+	LIMdlMaterial* self,
+	LIArcReader*   reader)
 {
 	int i;
 	uint32_t tmp[4];
@@ -247,12 +278,19 @@ limdl_material_read (LIMdlMaterial* self,
 		!liarc_reader_get_float (reader, &tmpmat.strand_shape) ||
 		!liarc_reader_get_uint32 (reader, tmp + 1))
 		return 0;
-	tmpmat.flags = tmp[0];
+	tmpmat.flags = tmp[0] & ~LIMDL_MATERIAL_FLAG_REFERENCE;
 	tmpmat.textures.count = tmp[1];
 
-	/* Read shader to temporary. */
+	/* Read the shader name to the temporary. */
 	if (!liarc_reader_get_text (reader, "", &tmpmat.shader))
 		return 0;
+
+	/* Read the material name to the temporary. */
+	if (tmp[0] & LIMDL_MATERIAL_FLAG_REFERENCE)
+	{
+		if (!liarc_reader_get_text (reader, "", &tmpmat.material))
+			return 0;
+	}
 
 	/* Read textures to temporary. */
 	if (tmpmat.textures.count > 0)
@@ -291,14 +329,13 @@ limdl_material_read (LIMdlMaterial* self,
 
 /**
  * \brief Allocates or reallocates the textures of the material.
- *
  * \param self Material.
  * \param count Texture count.
  * \return Nonzero on success.
  */
-int
-limdl_material_realloc_textures (LIMdlMaterial* self,
-                                 int            count)
+int limdl_material_realloc_textures (
+	LIMdlMaterial* self,
+	int            count)
 {
 	int i;
 	LIMdlTexture* tmp;
@@ -341,19 +378,23 @@ limdl_material_realloc_textures (LIMdlMaterial* self,
 
 /**
  * \brief Serializes the material to a stream.
- *
  * \param self Material.
  * \param writer Stream writer.
  * \return Nonzero on success.
  */
-int
-limdl_material_write (LIMdlMaterial* self,
-                      LIArcWriter*   writer)
+int limdl_material_write (
+	LIMdlMaterial* self,
+	LIArcWriter*   writer)
 {
 	int i;
+	uint32_t flags;
 	LIMdlTexture* texture;
 
-	if (!liarc_writer_append_uint32 (writer, self->flags) ||
+	flags = self->flags;
+	if (self->material != NULL)
+		flags |= LIMDL_MATERIAL_FLAG_REFERENCE;
+
+	if (!liarc_writer_append_uint32 (writer, flags) ||
 	    !liarc_writer_append_float (writer, self->emission) ||
 	    !liarc_writer_append_float (writer, self->shininess) ||
 	    !liarc_writer_append_float (writer, self->diffuse[0]) ||
@@ -371,6 +412,12 @@ limdl_material_write (LIMdlMaterial* self,
 	    !liarc_writer_append_string (writer, self->shader) ||
 	    !liarc_writer_append_nul (writer))
 		return 0;
+	if (self->material != NULL)
+	{
+		if (!liarc_writer_append_string (writer, self->material) ||
+		    !liarc_writer_append_nul (writer))
+		return 0;
+	}
 	for (i = 0 ; i < self->textures.count ; i++)
 	{
 		texture = self->textures.array + i;
@@ -396,6 +443,27 @@ void limdl_material_set_diffuse (
 	const float*   value)
 {
 	memcpy (self->diffuse, value, 4 * sizeof (float));
+}
+
+/**
+ * \brief Sets the reference name of the material.
+ * \param self Material.
+ * \param value Reference name.
+ * \return Nonzero on success.
+ */
+int limdl_material_set_material (
+	LIMdlMaterial* self,
+	const char*    value)
+{
+	char* tmp;
+
+	tmp = lisys_string_dup (value);
+	if (tmp == NULL)
+		return 0;
+	lisys_free (self->material);
+	self->material = tmp;
+
+	return 1;
 }
 
 /**
@@ -440,12 +508,12 @@ void limdl_material_set_specular (
  * \param name Image name.
  * \return Nonzero on success.
  */
-int
-limdl_material_set_texture (LIMdlMaterial* self,
-                            int            unit,
-                            int            type,
-                            int            flags,
-                            const char*    name)
+int limdl_material_set_texture (
+	LIMdlMaterial* self,
+	int            unit,
+	int            type,
+	int            flags,
+	const char*    name)
 {
 	char* dup;
 

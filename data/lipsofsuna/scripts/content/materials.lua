@@ -51,9 +51,7 @@ Material{
 	effect_build = "builtrock1",
 	effect_collapse = "collapse1",
 	name = "brittlerock1",
-	shader = "terrain",
-	specular = {0.5,0.5,0.5,0.5},
-	texture = {"granite1", "granite1n", "stone-001"}, -- FIXME
+	material = "granite1", -- FIXME
 	texture_scale = 0.11,
 	type = "rounded"}
 
@@ -115,9 +113,7 @@ Material{
 	effect_collapse = "collapse1",
 	mining_materials = {["granite stone"] = 1},
 	name = "granite1",
-	shader = "terrain",
-	specular = {0.5,0.5,0.5,0.5},
-	texture = {"granite1", "granite1n", "stone-001"},
+	material = "granite1",
 	texture_scale = 0.11,
 	type = "rounded fractal"}
 
@@ -169,7 +165,7 @@ Material{
 	mining_materials = {["iron ingot"] = 1},
 	name = "pipe1",
 	shader = "terrain",
-	texture = {"wood1", "wood1n", "stone-001"}, -- FIXME
+	material = "wood1", -- FIXME
 	texture_scale = 0.11,
 	type = "rounded"}
 
@@ -208,9 +204,7 @@ Material{
 	effect_collapse = "collapse2",
 	mining_materials = {["log"] = 1},
 	name = "wood1",
-	shader = "terrain",
-	specular = {0.5,0.5,0.5,0.5},
-	texture = {"wood1", "wood1n", "stone-001"},
+	material = "wood1",
 	texture_scale = 0.11}
 
 Material{
@@ -218,8 +212,6 @@ Material{
 	effect_collapse = "collapse2",
 	mining_materials = {["log"] = 1},
 	name = "wood1sloped",
-	shader = "terrain",
-	specular = {0.5,0.5,0.5,0.5},
-	texture = {"wood1", "wood1n", "wood1"},
+	material = "wood1",
 	texture_scale = 0.11,
 	type = "sloped"}

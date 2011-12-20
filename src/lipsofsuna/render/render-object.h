@@ -103,6 +103,11 @@ LIAPICALL (void, liren_render_object_set_realized, (
 	int          id,
 	int          value));
 
+LIAPICALL (void, liren_render_object_set_shadow, (
+	LIRenRender* self,
+	int          id,
+	int          value));
+
 LIAPICALL (void, liren_render_object_set_transform, (
 	LIRenRender*          self,
 	int                   id,

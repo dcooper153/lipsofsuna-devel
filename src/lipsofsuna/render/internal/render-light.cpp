@@ -92,6 +92,7 @@ LIRenLight* liren_light_new (
 	self->data->light->setCastShadows (shadows);
 	self->data->light->setSpotlightOuterAngle (Ogre::Radian (cutoff));
 	self->data->light->setSpotlightFalloff (exponent / 128.0f);
+	self->data->light->setVisible (false);
 	private_update_type (self);
 
 	/* Add to the dictionary. */
@@ -256,7 +257,7 @@ static void private_update_type (
 {
 	Ogre::Radian angle(self->data->light->getSpotlightOuterAngle ());
 
-	if ((angle.valueRadians () - 0.001f) < LIMAT_EPSILON)
+	if (angle.valueRadians () < 0.5f * M_PI)
 		self->data->light->setType (Ogre::Light::LT_SPOTLIGHT);
 	else
 		self->data->light->setType (Ogre::Light::LT_POINT);

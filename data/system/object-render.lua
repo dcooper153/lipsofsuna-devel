@@ -88,3 +88,15 @@ end
 Object.set_effect = function(self, ...)
 	Los.object_set_effect(self.handle, ...)
 end
+
+Object:add_getters{
+	shadow_casting = function(s)
+		local v = rawset(s, "__shadow_casting")
+		return (v ~= nil) and v or false
+	end}
+
+Object:add_setters{
+	shadow_casting = function(s, v)
+		rawset(s, "__shadow_casting", v)
+		Los.object_set_shadow_casting(s.handle, v)
+	end}
