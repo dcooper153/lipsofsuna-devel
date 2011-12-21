@@ -515,7 +515,10 @@ int liren_internal_update (
 	{
 		object = (LIRenObject*) iter1.value;
 		if (object->pose != NULL)
+		{
 			limdl_pose_update (object->pose, secs);
+			liren_object_update_pose (object);
+		}
 	}
 
 	/* Update the backend. */

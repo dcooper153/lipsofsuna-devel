@@ -27,6 +27,7 @@
 #include "lipsofsuna/network.h"
 #include "render-internal.h"
 #include <OgreSubMesh.h>
+#include <OgreSkeletonManager.h>
 
 static void private_create_material (
 	LIRenModel*    self,
@@ -35,6 +36,10 @@ static void private_create_material (
 	Ogre::SubMesh* submesh);
 
 static void private_create_mesh (
+	LIRenModel* self,
+	LIMdlModel* model);
+
+static void private_create_skeleton (
 	LIRenModel* self,
 	LIMdlModel* model);
 
@@ -223,44 +228,79 @@ static void private_create_mesh (
 	vertex_data->vertexCount = model->vertices.count;
 
 	/* Initialize the vertex format. */
-	size_t offset = 0;
+	/* Positions and normals need to be in their own vertex buffer for software
+	   skinning to work. Let's be nice and support the software fallback too. */
+	size_t offset0 = 0;
+	size_t offset1 = 0;
 	Ogre::VertexDeclaration* format = vertex_data->vertexDeclaration;
-	format->addElement (0, offset, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES);
-	offset += Ogre::VertexElement::getTypeSize (Ogre::VET_FLOAT2);
-	format->addElement (0, offset, Ogre::VET_FLOAT3, Ogre::VES_NORMAL);
-	offset += Ogre::VertexElement::getTypeSize (Ogre::VET_FLOAT3);
-	format->addElement (0, offset, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
-	offset += Ogre::VertexElement::getTypeSize (Ogre::VET_FLOAT3);
-	format->addElement (0, offset, Ogre::VET_FLOAT3, Ogre::VES_TANGENT);
-	offset += Ogre::VertexElement::getTypeSize (Ogre::VET_FLOAT3);
-	// FIXME: Ogre doesn't support the right format? Change in model?
-	//format->addElement (0, offset, Ogre::VET_UBYTE4, Ogre::VES_DIFFUSE);
-	offset += Ogre::VertexElement::getTypeSize (Ogre::VET_UBYTE4);
-#ifdef LIMDL_VERTEX_WEIGHT_UINT16
-	format->addElement (0, offset, Ogre::VET_SHORT4, Ogre::VES_BLEND_WEIGHTS);
-	offset += Ogre::VertexElement::getTypeSize (Ogre::VET_SHORT4);
-#else
-	format->addElement (0, offset, Ogre::VET_UBYTE4, Ogre::VES_BLEND_WEIGHTS);
-	offset += Ogre::VertexElement::getTypeSize (Ogre::VET_UBYTE4);
-#endif
-	format->addElement (0, offset, Ogre::VET_UBYTE4, Ogre::VES_BLEND_INDICES);
-	offset += Ogre::VertexElement::getTypeSize (Ogre::VET_UBYTE4);
-#if LIMDL_VERTEX_WEIGHTS_MAX != 4
-#error LIMDL_VERTEX_WEIGHTS_MAX must currently be exactly 4
-#endif
+	format->addElement (0, offset0, Ogre::VET_FLOAT3, Ogre::VES_POSITION);
+	offset0 += Ogre::VertexElement::getTypeSize (Ogre::VET_FLOAT3);
+	format->addElement (0, offset0, Ogre::VET_FLOAT3, Ogre::VES_NORMAL);
+	offset0 += Ogre::VertexElement::getTypeSize (Ogre::VET_FLOAT3);
+	format->addElement (1, offset1, Ogre::VET_FLOAT3, Ogre::VES_TANGENT);
+	offset1 += Ogre::VertexElement::getTypeSize (Ogre::VET_FLOAT3);
+	format->addElement (1, offset1, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES);
+	offset1 += Ogre::VertexElement::getTypeSize (Ogre::VET_FLOAT2);
+	format->addElement (1, offset1, Ogre::VET_COLOUR_ABGR, Ogre::VES_DIFFUSE);
+	offset1 += Ogre::VertexElement::getTypeSize (Ogre::VET_COLOUR_ABGR);
+	lisys_assert (offset0 == 6 * 4);
+	lisys_assert (offset1 == 6 * 4);
 
 	/* Create the mesh. */
 	self->data->mesh = Ogre::MeshManager::getSingleton ().createManual (private_unique_id (self), "General");
 	self->data->mesh->sharedVertexData = vertex_data;
 
-	/* Create the vertex buffer. */
-	self->data->vertex_buffer = Ogre::HardwareBufferManager::getSingleton ().createVertexBuffer (
-		offset, model->vertices.count, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-	self->data->vertex_buffer->writeData (0, self->data->vertex_buffer->getSizeInBytes (), model->vertices.array, true);
+	/* Allocate a temporary buffer for vertex data. */
+	/* Unfortunately the vertex data from the model can't be used as is for a
+	   multitude of reasons. We need to rearrange the data with this buffer. */
+	float* buffer = new float[6 * model->vertices.count];
 
-	/* Bind the vertex buffer. */
+	/* Create the first vertex buffer. */
+	/* Contains positions and normals only. */
+	int j = 0;
+	for (int i = 0 ; i < model->vertices.count ; i++)
+	{
+		LIMdlVertex* v = model->vertices.array + i;
+		buffer[j++] = v->coord.x;
+		buffer[j++] = v->coord.y;
+		buffer[j++] = v->coord.z;
+		buffer[j++] = v->normal.x;
+		buffer[j++] = v->normal.y;
+		buffer[j++] = v->normal.z;
+	}
+	lisys_assert (j == 6 * model->vertices.count);
+	self->data->vertex_buffer_0 = Ogre::HardwareBufferManager::getSingleton ().createVertexBuffer (
+		offset0, model->vertices.count, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+	self->data->vertex_buffer_0->writeData (0, self->data->vertex_buffer_0->getSizeInBytes (), buffer, true);
+
+	/* Create the second vertex buffer. */
+	/* Contains everything else. */
+	j = 0;
+	buffer = new float[6 * model->vertices.count];
+	for (int i = 0 ; i < model->vertices.count ; i++)
+	{
+		LIMdlVertex* v = model->vertices.array + i;
+		buffer[j++] = v->tangent.x;
+		buffer[j++] = v->tangent.y;
+		buffer[j++] = v->tangent.z;
+		buffer[j++] = v->texcoord[0];
+		buffer[j++] = v->texcoord[1];
+		uint8_t* color = (uint8_t*)(buffer + j++);
+		color[0] = v->color[3];
+		color[1] = v->color[2];
+		color[2] = v->color[1];
+		color[3] = v->color[0];
+	}
+	lisys_assert (j == 6 * model->vertices.count);
+	self->data->vertex_buffer_1 = Ogre::HardwareBufferManager::getSingleton ().createVertexBuffer (
+		offset1, model->vertices.count, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+	self->data->vertex_buffer_1->writeData (0, self->data->vertex_buffer_1->getSizeInBytes (), buffer, true);
+	delete[] buffer;
+
+	/* Bind the vertex buffers. */
 	self->data->vertex_buffer_binding = vertex_data->vertexBufferBinding;
-	self->data->vertex_buffer_binding->setBinding (0, self->data->vertex_buffer);
+	self->data->vertex_buffer_binding->setBinding (0, self->data->vertex_buffer_0);
+	self->data->vertex_buffer_binding->setBinding (1, self->data->vertex_buffer_1);
 
 	/* Create the index buffer. */
 	self->data->index_buffer = Ogre::HardwareBufferManager::getSingleton().createIndexBuffer (
@@ -286,9 +326,76 @@ static void private_create_mesh (
 		(model->bounds.max.x - model->bounds.min.x) +
 		(model->bounds.max.y - model->bounds.min.y) +
 		(model->bounds.max.z - model->bounds.min.z));
- 
+
 	/* Mark the mesh as loaded. */
 	self->data->mesh->load ();
+
+	/* Create a skeleton if needed. */
+	if (model->weight_groups.count)
+		private_create_skeleton (self, model);
+}
+
+static void private_create_skeleton (
+	LIRenModel* self,
+	LIMdlModel* model)
+{
+	Ogre::Bone* bone;
+	LIMdlWeightGroup* group;
+
+	/* Create the skeleton. */
+	Ogre::String name (private_unique_id (self));
+	Ogre::ResourcePtr resource = Ogre::SkeletonManager::getSingleton ().create (name, "General", true);
+	Ogre::SkeletonPtr skeleton (resource);
+
+	/* Create the dummy bone. */
+	bone = skeleton->createBone (0);
+	bone->setManuallyControlled (true);
+
+	/* Create weight group bones. */
+	/* We disregard the hierarchy and just create a bone for each weight group.
+	   This ensures that the minimal number of bones is uploaded to the GPU. */
+	for (int i = 0 ; i < model->weight_groups.count ; i++)
+	{
+		group = model->weight_groups.array + i;
+		if (group->node != NULL)
+		{
+			LIMatTransform t = group->node->rest_transform.global;
+			bone = skeleton->createBone (i + 1);
+			bone->setPosition (t.position.x, t.position.y, t.position.z);
+			bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
+		}
+		else
+			bone = skeleton->createBone (i + 1);
+		bone->setManuallyControlled (true);
+		bone->setInitialState ();
+	}
+
+	/* Set the binding pose. */
+	skeleton->setBindingPose ();
+	skeleton->load ();
+
+	/* Assign the skeleton to the mesh. */
+	self->data->mesh->_notifySkeleton (skeleton);
+
+	/* Compile vertex weights. */
+	/* FIXME: The model format already has sane weight assignments but
+	   Ogre seems to throw an exception we try to use them directly. */
+	for (int i = 0 ; i < model->vertices.count ; i++)
+	{
+		LIMdlVertex* vertex = model->vertices.array + i;
+		Ogre::VertexBoneAssignment assignment;
+		assignment.vertexIndex = i;
+		for (int j = 0; j < LIMDL_VERTEX_WEIGHTS_MAX ; j++)
+		{
+			assignment.boneIndex = vertex->bones[j];
+#ifdef LIMDL_VERTEX_WEIGHT_UINT16
+			assignment.weight = vertex->weights[j] / 65535.0f;
+#else
+			assignment.weight = vertex->weights[j] / 255.0f;
+#endif
+			self->data->mesh->addBoneAssignment (assignment);
+		}
+	}
 }
 
 static Ogre::String private_unique_id (

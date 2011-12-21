@@ -296,6 +296,41 @@ void liren_object_particle_animation (
 	/* TODO */
 }
 
+void liren_object_update_pose (
+	LIRenObject* self)
+{
+	/* Do nothing if the object isn't initialized. */
+	if (self->data->entity == NULL)
+		return;
+
+	/* Get the skeleton. */
+	/* If the model doesn't have one, we don't need to do anything. */
+	Ogre::SkeletonInstance* skeleton = self->data->entity->getSkeleton ();
+	if (skeleton == NULL)
+		return;
+
+	/* Update weight group bones. */
+	/* The hierarchy doesn't matter because LIMdlPose already calculated the
+	   global transformations of the bones. We just need to copy the
+	   transformations of the bones used by weight groups. */
+	for (int i = 0 ; i < self->model->model->weight_groups.count ; i++)
+	{
+		LIMdlWeightGroup* group = self->model->model->weight_groups.array + i;
+		if (group->node != NULL)
+		{
+			LIMdlNode* node = limdl_pose_find_node (self->pose, group->node->name);
+			Ogre::Bone* bone = skeleton->getBone (i + 1);
+			LIMatTransform t = node->pose_transform.global;
+			float s = node->pose_transform.global_scale;
+			bone->setScale (s, s, s);
+			bone->setPosition (t.position.x, t.position.y, t.position.z);
+			bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
+		}
+	}
+
+	skeleton->_notifyManualBonesDirty ();
+}
+
 /**
  * \brief Sets the effect layer of the object.
  * \param self Object.
@@ -357,6 +392,20 @@ int liren_object_set_model (
 	/* Set entity flags. */
 	if (self->data->entity != NULL)
 		self->data->entity->setCastShadows (self->shadow_casting);
+
+	/* Mark all bones as manually controlled. */
+	if (self->data->entity != NULL)
+	{
+		Ogre::SkeletonInstance* skeleton = self->data->entity->getSkeleton ();
+		if (skeleton != NULL)
+		{
+			for (int i = 0 ; i < skeleton->getNumBones () ; i++)
+			{
+				Ogre::Bone* bone = skeleton->getBone (i);
+				bone->setManuallyControlled (true);
+			}
+		}
+	}
 
 	return 1;
 }
