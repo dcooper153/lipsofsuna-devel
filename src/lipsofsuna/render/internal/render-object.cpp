@@ -296,6 +296,12 @@ void liren_object_particle_animation (
 	/* TODO */
 }
 
+void liren_object_model_changed (
+	LIRenObject* self)
+{
+	liren_object_set_model (self, self->model);
+}
+
 void liren_object_update_pose (
 	LIRenObject* self)
 {
@@ -319,12 +325,15 @@ void liren_object_update_pose (
 		if (group->node != NULL)
 		{
 			LIMdlNode* node = limdl_pose_find_node (self->pose, group->node->name);
-			Ogre::Bone* bone = skeleton->getBone (i + 1);
-			LIMatTransform t = node->pose_transform.global;
-			float s = node->pose_transform.global_scale;
-			bone->setScale (s, s, s);
-			bone->setPosition (t.position.x, t.position.y, t.position.z);
-			bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
+			if (node != NULL)
+			{
+				Ogre::Bone* bone = skeleton->getBone (i + 1);
+				LIMatTransform t = node->pose_transform.global;
+				float s = node->pose_transform.global_scale;
+				bone->setScale (s, s, s);
+				bone->setPosition (t.position.x, t.position.y, t.position.z);
+				bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
+			}
 		}
 	}
 

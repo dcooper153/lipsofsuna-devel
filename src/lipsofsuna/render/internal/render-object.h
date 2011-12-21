@@ -86,6 +86,9 @@ LIAPICALL (void, liren_object_particle_animation, (
 	float        start,
 	int          loop));
 
+LIAPICALL (void, liren_object_model_changed, (
+	LIRenObject* self));
+
 LIAPICALL (void, liren_object_update_pose, (
 	LIRenObject* self));
 

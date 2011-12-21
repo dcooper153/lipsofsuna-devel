@@ -1,6 +1,6 @@
-vertex_program skin_vert glsl
+vertex_program animdiff_vert glsl
 {
-	source skin.vert
+	source animdiff.vert
 	preprocessor_defines LIGHTS=3,BONES=128
 	includes_skeletal_animation true
 	default_params
@@ -13,9 +13,9 @@ vertex_program skin_vert glsl
 	}
 }
 
-fragment_program skin_frag glsl
+fragment_program animdiff_frag glsl
 {
-	source skin.frag
+	source animdiff.frag
 	preprocessor_defines LIGHTS=3
 	default_params
 	{

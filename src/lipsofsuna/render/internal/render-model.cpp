@@ -43,6 +43,9 @@ static void private_create_skeleton (
 	LIRenModel* self,
 	LIMdlModel* model);
 
+static bool private_check_override (
+	const Ogre::String& name);
+
 static Ogre::String private_unique_id (
 	LIRenModel* self);
 
@@ -125,7 +128,13 @@ void liren_model_free (
 	/* Keeping the model alive when it's assigned to objects is the job of scripts.
 	   If they don't reference the model, we'll remove it even if it's in use. We
 	   prevent crashing by removing it from objects in such a case. */
-	/* TODO */
+	LIAlgU32dicIter iter;
+	LIALG_U32DIC_FOREACH (iter, self->render->objects)
+	{
+		LIRenObject* object = (LIRenObject*) iter.value;
+		if (object->model == self)
+			liren_object_set_model (object, NULL);
+	}
 
 	/* Free the model data. */
 	if (self->model != NULL)
@@ -153,9 +162,17 @@ int liren_model_set_model (
 		limdl_model_free (self->model);
 	self->model = copy;
 
-	/* TODO */
-/*	if (self->model != NULL)
-		private_create_mesh (self, self->model);*/
+	/* Create a new mesh. */
+	private_create_mesh (self, self->model);
+
+	/* Tell objects to update their model bindings. */
+	LIAlgU32dicIter iter;
+	LIALG_U32DIC_FOREACH (iter, self->render->objects)
+	{
+		LIRenObject* object = (LIRenObject*) iter.value;
+		if (object->model == self)
+			liren_object_model_changed (object);
+	}
 
 	return 1;
 }
@@ -168,51 +185,103 @@ static void private_create_material (
 	int            index,
 	Ogre::SubMesh* submesh)
 {
-	/* Check for an existing material. */
+	bool newmat = true;
+	bool overridden = false;
+	Ogre::MaterialPtr material;
+	Ogre::String unique_name = private_unique_material (self, index);
+
+	/* Load or create a material. */
+	/* If the model specifies the name of the material to be used, we use
+	   an Ogre material. Some properties of loaded materials may be subject
+	   to overriding. If no material is loaded, a new one is created. */
 	if (mat->material != NULL && mat->material[0] != '\0')
 	{
 		Ogre::String name = Ogre::String (mat->material);
-		Ogre::MaterialPtr material = self->render->data->material_manager->getByName (name);
+		material = self->render->data->material_manager->getByName (name);
 		if (!material.isNull())
-		{
-			submesh->setMaterialName (name);
-			return;
-		}
+			newmat = false;
+	}
+	if (newmat)
+	{
+		const Ogre::String& group = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+		material = self->render->data->material_manager->create (unique_name, group);
 	}
 
-	/* Create a new the material. */
-	Ogre::String name = private_unique_material (self, index);
-	const Ogre::String& group = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
-	Ogre::MaterialPtr material = self->render->data->material_manager->create (name, group);
-
 	/* Set material properties. */
-	if (mat->flags & LIMDL_MATERIAL_FLAG_TRANSPARENCY)
-		material->setSceneBlending (Ogre::SBT_TRANSPARENT_ALPHA);
-	if (mat->flags & LIMDL_MATERIAL_FLAG_CULLFACE)
-		material->setCullingMode (Ogre::CULL_CLOCKWISE);
-	else
-		material->setCullingMode (Ogre::CULL_NONE);
+	/* Loaded materials get them from the material script so only newly
+	   created materials need to use the properties from the model file. */
+	if (newmat)
+	{
+		if (mat->flags & LIMDL_MATERIAL_FLAG_TRANSPARENCY)
+			material->setSceneBlending (Ogre::SBT_TRANSPARENT_ALPHA);
+		if (mat->flags & LIMDL_MATERIAL_FLAG_CULLFACE)
+			material->setCullingMode (Ogre::CULL_CLOCKWISE);
+		else
+			material->setCullingMode (Ogre::CULL_NONE);
+	}
 
 	/* Get the first pass. */
 	Ogre::Technique* technique = material->getTechnique (0);
 	Ogre::Pass* pass = technique->getPass (0);
 
 	/* Set pass properties. */
-	pass->setSelfIllumination (mat->emission, mat->emission, mat->emission);
-	pass->setShininess (mat->shininess);
-	pass->setDiffuse (Ogre::ColourValue (mat->diffuse[0], mat->diffuse[1], mat->diffuse[2], mat->diffuse[3]));
-	pass->setSpecular (Ogre::ColourValue (mat->specular[0], mat->specular[1], mat->specular[2], mat->specular[3]));
-	pass->setVertexColourTracking (Ogre::TVC_DIFFUSE);
-
-	/* Create texture units. */
-	pass->removeAllTextureUnitStates ();
-	for (int i = 0 ; i < mat->textures.count && i < 1 ; i++)
+	/* If this is a newly created material or the name of the first pass
+	   starts with the string "LOS", we override some of the parameters. */
+	if (newmat || private_check_override (pass->getName ()))
 	{
-		Ogre::String tex = Ogre::String (mat->textures.array[i].string);
-		pass->createTextureUnitState (tex + ".dds");
+		if (!newmat && !overridden)
+		{
+			material = material->clone (unique_name);
+			technique = material->getTechnique (0);
+			pass = technique->getPass (0);
+			overridden = true;
+		}
+		pass->setSelfIllumination (mat->emission, mat->emission, mat->emission);
+		pass->setShininess (mat->shininess);
+		pass->setDiffuse (Ogre::ColourValue (mat->diffuse[0], mat->diffuse[1], mat->diffuse[2], mat->diffuse[3]));
+		pass->setSpecular (Ogre::ColourValue (mat->specular[0], mat->specular[1], mat->specular[2], mat->specular[3]));
+		pass->setVertexColourTracking (Ogre::TVC_DIFFUSE);
 	}
 
-	submesh->setMaterialName (name);
+	/* Setup texture units. */
+	/* If this is a new material, recreate the texture units from scratch.
+	   Otherwise, override texture units whose names start with "LOS". */
+	if (newmat)
+	{
+		pass->removeAllTextureUnitStates ();
+		for (int i = 0 ; i < mat->textures.count && i < 1 ; i++)
+		{
+			Ogre::String tex = Ogre::String (mat->textures.array[i].string);
+			pass->createTextureUnitState (tex + ".dds");
+		}
+	}
+	else
+	{
+		int j = 0;
+		for (int i = 0 ; i < pass->getNumTextureUnitStates () ; i++)
+		{
+			if (j >= mat->textures.count)
+				break;
+			Ogre::TextureUnitState* state = pass->getTextureUnitState (i);
+			if (private_check_override (state->getName ()))
+			{
+				if (!overridden)
+				{
+					material = material->clone (unique_name);
+					technique = material->getTechnique (0);
+					pass = technique->getPass (0);
+					state = pass->getTextureUnitState (i);
+					overridden = true;
+				}
+				Ogre::String tex = Ogre::String (mat->textures.array[j].string);
+				state->setTextureName (tex + ".dds");
+				j++;
+			}
+		}
+	}
+
+	/* Assign the material to the submesh. */
+	submesh->setMaterialName (material->getName ());
 }
 
 static void private_create_mesh (
@@ -396,6 +465,16 @@ static void private_create_skeleton (
 			self->data->mesh->addBoneAssignment (assignment);
 		}
 	}
+}
+
+static bool private_check_override (
+	const Ogre::String& name)
+{
+	if (name.size () < 3)
+		return 0;
+	if (name[0] != 'L' || name[1] != 'O' || name[2] != 'S')
+		return 0;
+	return 1;
 }
 
 static Ogre::String private_unique_id (

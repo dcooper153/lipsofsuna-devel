@@ -1,4 +1,4 @@
-material granite1
+material terrain1
 {
 	technique
 	{
@@ -8,13 +8,17 @@ material granite1
 			ambient 0.3 0.3 0.3
 			diffuse 1.0 1.0 1.0
 			specular 0.5 0.5 0.5 0.5 64
-			texture_unit
+			texture_unit LOS1
 			{
 				texture granite1.dds
 			}
-			texture_unit
+			texture_unit LOS2
 			{
 				texture granite1n.dds
+			}
+			texture_unit LOS3
+			{
+				texture stone-001.dds
 			}
 			texture_unit
 			{

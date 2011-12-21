@@ -2,7 +2,7 @@ Material{
 	effect_build = "builtrock1",
 	mining_materials = {["adamantium"] = 1},
 	name = "adamantium1",
-	shader = "adamantium",
+	material = "adamantium",
 	shininess = 100,
 	texture = {"adamantium1", "stone-001"},
 	texture_scale = 0.11,
@@ -12,7 +12,7 @@ Material{
 	effect_build = "builtrock1",
 	mining_materials = {["aquanite stone"] = 1},
 	name = "aquanite1",
-	shader = "terrain",
+	material = "terrain1",
 	shininess = 80,
 	texture = {"aquanite1", "crimson1n", "stone-001"},
 	texture_scale = 0.11,
@@ -22,7 +22,7 @@ Material{
 	effect_build = "builtrock1",
 	mining_materials = {["basalt stone"] = 1},
 	name = "basalt1",
-	shader = "terrain",
+	material = "terrain1",
 	texture = {"basalt1", "basalt1n", "stone-001"},
 	texture_scale = 0.11,
 	type = "rounded"}
@@ -31,7 +31,7 @@ Material{
 	effect_build = "builtrock1",
 	effect_collapse = "collapse1",
 	name = "brick1",
-	shader = "terrain",
+	material = "terrain1",
 	specular = {0.5,0.5,0.5,0.5},
 	texture = {"bricks3", "bricks3n", "stone-001"},
 	texture_scale = 0.11,
@@ -41,7 +41,7 @@ Material{
 	effect_build = "builtrock1",
 	effect_collapse = "collapse1",
 	name = "brick1slope",
-	shader = "terrain",
+	material = "terrain1",
 	specular = {0.5,0.5,0.5,0.5},
 	texture = {"bricks3", "bricks3n", "bricks3"},
 	texture_scale = 0.11,
@@ -51,7 +51,9 @@ Material{
 	effect_build = "builtrock1",
 	effect_collapse = "collapse1",
 	name = "brittlerock1",
-	material = "granite1", -- FIXME
+	material = "terrain1",
+	specular = {0.5,0.5,0.5,0.5},
+	texture = {"granite1", "granite1n", "stone-001"}, -- FIXME
 	texture_scale = 0.11,
 	type = "rounded"}
 
@@ -59,7 +61,7 @@ Material{
 	effect_build = "builtrock1",
 	effect_collapse = "collapse1",
 	name = "cobbles1",
-	shader = "terrain",
+	material = "terrain1",
 	specular = {0.5,0.5,0.5,0.5},
 	texture = {"cobbles1", "cobbles1n", "stone-001"},
 	texture_scale = 0.11,
@@ -70,7 +72,7 @@ Material{
 	effect_collapse = "collapse1",
 	mining_materials = {["granite stone"] = 1},
 	name = "concrete1",
-	shader = "terrain",
+	material = "terrain1",
 	specular = {0.5,0.5,0.5,0.5},
 	texture = {"granite1", "concrete1n", "stone-001"},
 	texture_scale = 0.11,
@@ -81,7 +83,7 @@ Material{
 	effect_collapse = "collapse1",
 	mining_materials = {["granite stone"] = 1},
 	name = "concrete2",
-	shader = "terrain",
+	material = "terrain1",
 	specular = {0.5,0.5,0.5,0.5},
 	texture = {"granite1", "concrete1n", "stone-001"},
 	texture_scale = 0.11,
@@ -91,7 +93,7 @@ Material{
 	effect_build = "builtrock1",
 	mining_materials = {["crimson stone"] = 1},
 	name = "crimson1",
-	shader = "terrain",
+	material = "terrain1",
 	shininess = 80,
 	texture = {"crimson1", "crimson1n", "stone-001"},
 	texture_scale = 0.11,
@@ -102,7 +104,7 @@ Material{
 	effect_collapse = "collapse2",
 	mining_materials = {["ferrostone"] = 1},
 	name = "ferrostone1",
-	shader = "terrain",
+	material = "terrain1",
 	shininess = 60,
 	texture = {"ferrostone1", "ferrostone1n", "stone-001"},
 	texture_scale = 0.11,
@@ -113,7 +115,9 @@ Material{
 	effect_collapse = "collapse1",
 	mining_materials = {["granite stone"] = 1},
 	name = "granite1",
-	material = "granite1",
+	material = "terrain1",
+	specular = {0.5,0.5,0.5,0.5},
+	texture = {"granite1", "granite1n", "stone-001"},
 	texture_scale = 0.11,
 	type = "rounded fractal"}
 
@@ -122,7 +126,7 @@ Material{
 	effect_collapse = "collapse2",
 	mining_transform = "soil1",
 	name = "grass1",
-	shader = "terrain",
+	material = "terrain1",
 	specular = {0.5,0.5,0.5,0.5},
 	texture = {"grass-000", "grass-000-nml", "stone-001"},
 	texture_scale = 0.11,
@@ -133,7 +137,7 @@ Material{
 	effect_collapse = "collapse2",
 	mining_transform = "soil1",
 	name = "grass2",
-	shader = "terrain",
+	material = "terrain1",
 	specular = {0.5,0.5,0.5,0.5},
 	texture = {"grass-000", "grass-000-nml", "grass-000"},
 	texture_scale = 0.11,
@@ -141,7 +145,7 @@ Material{
 
 Material{
 	name = "ice1",
-	shader = "terrain",
+	material = "terrain1",
 	shininess = 100,
 	texture = {"ice1", "ice1n", "stone-001"},
 	texture_scale = 0.11,
@@ -150,22 +154,22 @@ Material{
 Material{
 	mining_materials = {["iron ingot"] = 1},
 	name = "iron1",
-	shader = "terrain",
+	material = "terrain1",
 	texture = {"metal-000", "ice1n", "metal-000"}} -- FIXME
 
 Material{
 	name = "magma1",
 	cullface = false,
 	magma = true,
-	shader = "lava",
+	material = "lava",
 	texture = {"noise1", "noise1", "stone-001"},
 	type = "liquid"}
 
 Material{
 	mining_materials = {["iron ingot"] = 1},
 	name = "pipe1",
-	shader = "terrain",
-	material = "wood1", -- FIXME
+	material = "terrain1",
+	texture = {"wood1", "wood1n", "stone-001"}, -- FIXME
 	texture_scale = 0.11,
 	type = "rounded"}
 
@@ -174,7 +178,7 @@ Material{
 	effect_collapse = "collapse2",
 	mining_materials = {["sand chunk"] = 1},
 	name = "sand1",
-	shader = "terrain",
+	material = "terrain1",
 	specular = {0.5,0.5,0.5,0.5},
 	texture = {"sand1", "sand1n", "stone-001"},
 	texture_scale = 0.11,
@@ -185,7 +189,7 @@ Material{
 	effect_collapse = "collapse2",
 	mining_materials = {["soil chunk"] = 1},
 	name = "soil1",
-	shader = "terrain",
+	material = "terrain1",
 	specular = {0.5,0.5,0.5,0.5},
 	texture = {"soil1", "soil1n", "stone-001"},
 	texture_scale = 0.11,
@@ -194,7 +198,7 @@ Material{
 Material{
 	name = "water1",
 	cullface = false,
-	shader = "water",
+	material = "water",
 	texture = {"noise1", "noise1", "stone-001"},
 	texture_scale = 0.11,
 	type = "liquid"}
@@ -204,7 +208,9 @@ Material{
 	effect_collapse = "collapse2",
 	mining_materials = {["log"] = 1},
 	name = "wood1",
-	material = "wood1",
+	material = "terrain1",
+	specular = {0.5,0.5,0.5,0.5},
+	texture = {"wood1", "wood1n", "stone-001"},
 	texture_scale = 0.11}
 
 Material{
@@ -212,6 +218,8 @@ Material{
 	effect_collapse = "collapse2",
 	mining_materials = {["log"] = 1},
 	name = "wood1sloped",
-	material = "wood1",
+	material = "terrain1",
+	specular = {0.5,0.5,0.5,0.5},
+	texture = {"wood1", "wood1n", "wood1"},
 	texture_scale = 0.11,
 	type = "sloped"}
