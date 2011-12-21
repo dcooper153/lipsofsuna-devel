@@ -355,10 +355,10 @@ static void private_create_mesh (
 		buffer[j++] = v->texcoord[0];
 		buffer[j++] = v->texcoord[1];
 		uint8_t* color = (uint8_t*)(buffer + j++);
-		color[0] = v->color[3];
-		color[1] = v->color[2];
-		color[2] = v->color[1];
-		color[3] = v->color[0];
+		color[0] = v->color[0];
+		color[1] = v->color[1];
+		color[2] = v->color[2];
+		color[3] = v->color[3];
 	}
 	lisys_assert (j == 6 * model->vertices.count);
 	self->data->vertex_buffer_1 = Ogre::HardwareBufferManager::getSingleton ().createVertexBuffer (

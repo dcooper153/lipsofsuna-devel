@@ -51,8 +51,7 @@ void main()
 	vec3 normal = los_normal_mapping(F_normal, F_tangent, F_texcoord, LOS_diffuse_texture_1);
 	vec4 diffuse0 = texture(LOS_diffuse_texture_0, F_texcoord);
 	vec4 diffuse1 = texture(LOS_diffuse_texture_2, F_texcoord);
-	vec4 diffuse = mix(diffuse0, diffuse1, F_splatting);
-	diffuse.a = 1.0;
+	vec4 diffuse = vec4(F_color.rgb, 1.0) * mix(diffuse0, diffuse1, F_splatting);
 	vec4 light = LOS_scene_ambient;
 	float shadows[3];
 	shadows[0] = textureProj(LOS_shadow_texture_0, F_shadow[0]).x;
