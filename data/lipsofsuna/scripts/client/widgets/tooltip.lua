@@ -3,6 +3,7 @@ Widgets.Tooltip = Class(Widgets.Frame)
 Widgets.Tooltip.new = function(clss, args)
 	local self = Widget.new(clss, args)
 	self.spacings = {0,0}
+	self.depth = 15
 	self.style = "tooltip"
 	self.cols = 1
 	if self.text then
