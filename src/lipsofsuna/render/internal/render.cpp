@@ -643,7 +643,10 @@ int liren_internal_set_videomode (
 	LIRenRender*    self,
 	LIRenVideomode* mode)
 {
-	/* TODO */
+	if (mode->fullscreen)
+		self->data->render_window->setFullscreen (true, mode->width, mode->height);
+	else
+		self->data->render_window->setFullscreen (false, mode->width, mode->height);
 	return 1;
 }
 
@@ -652,27 +655,29 @@ int liren_internal_get_videomodes (
 	LIRenVideomode** modes,
 	int*             modes_num)
 {
-	int i;
-
-	/* TODO */
-
 	/* Count modes. */
-	/* TODO */
-	for (i = 0 ; i < 1 ; i++)
-		{}
-	*modes = (LIRenVideomode*) lisys_calloc (i, sizeof (LIRenVideomode));
-	if (*modes == NULL)
+	const Ogre::StringVector& list = self->data->render_system->
+		getConfigOptions()["Video Mode"].possibleValues;
+	if (!list.size ())
 		return 0;
 
+	/* Allocate the result. */
+	*modes = (LIRenVideomode*) lisys_calloc (list.size (), sizeof (LIRenVideomode));
+	if (*modes == NULL)
+		return 0;
+	*modes_num = list.size ();
+
 	/* Convert modes. */
-	/* TODO */
-	*modes_num = i;
-	for (i = 0 ; i < *modes_num ; i++)
+	for (int i = 0 ; i < *modes_num ; i++)
 	{
-		(*modes)[i].width = 800;
-		(*modes)[i].height = 600;
-		(*modes)[i].fullscreen = 1;
-		(*modes)[i].sync = self->mode.sync;
+		int w, h;
+		if (sscanf (list[i].c_str (), "%d x %d", &w, &h) == 2)
+		{
+			(*modes)[i].width = w;
+			(*modes)[i].height = h;
+			(*modes)[i].fullscreen = 1;
+			(*modes)[i].sync = self->mode.sync;
+		}
 	}
 
 	return 1;
