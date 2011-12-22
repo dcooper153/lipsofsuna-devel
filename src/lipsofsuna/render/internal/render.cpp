@@ -173,23 +173,6 @@ void liren_internal_deinit (
 }
 
 /**
- * \brief Finds a texture by name.
- *
- * Searches for a texture from the texture cache and returns the match, if any.
- * If no match is found, NULL is returned.
- *
- * \param self Renderer.
- * \param name Name of the texture.
- * \return Texture or NULL.
- */
-LIRenImage* liren_internal_find_image (
-	LIRenRender* self,
-	const char*  name)
-{
-	return (LIRenImage*) lialg_strdic_find (self->images, name);
-}
-
-/**
  * \brief Finds a model by ID.
  * \param self Renderer.
  * \param id Model ID.
@@ -200,19 +183,6 @@ LIRenModel* liren_internal_find_model (
 	int          id)
 {
 	return (LIRenModel*) lialg_u32dic_find (self->models, id);
-}
-
-/**
- * \brief Finds a shader by name.
- * \param self Renderer.
- * \param name Name of the shader.
- * \return Shader or NULL.
- */
-LIRenShader* liren_internal_find_shader (
-	LIRenRender* self,
-	const char*  name)
-{
-	return (LIRenShader*) lialg_strdic_find (self->shaders, name);
 }
 
 void liren_internal_handle_message (
@@ -232,11 +202,6 @@ void liren_internal_handle_message (
 				message->render_load_font.size);
 			lisys_free (message->render_load_font.name);
 			lisys_free (message->render_load_font.file);
-			break;
-		case LIREN_MESSAGE_RENDER_LOAD_IMAGE:
-			liren_internal_load_image (self,
-				message->render_load_image.name);
-			lisys_free (message->render_load_image.name);
 			break;
 		case LIREN_MESSAGE_RENDER_MEASURE_TEXT:
 			liren_internal_measure_text (self,
@@ -261,12 +226,6 @@ void liren_internal_handle_message (
 		case LIREN_MESSAGE_RENDER_SET_ANISOTROPY:
 			liren_internal_set_anisotropy (self,
 				message->render_set_anisotropy.value);
-			break;
-		case LIREN_MESSAGE_RENDER_GET_IMAGE_SIZE:
-			liren_internal_get_image_size (self,
-				message->render_get_image_size.name,
-				message->render_get_image_size.result);
-			lisys_free (message->render_get_image_size.name);
 			break;
 		case LIREN_MESSAGE_RENDER_SET_VIDEOMODE:
 			liren_internal_set_videomode (self,
@@ -405,37 +364,6 @@ int liren_internal_load_font (
 	return 1;
 }
 
-/**
- * \brief Forces the renderer to load or reload a texture image.
- *
- * Reloads the requested texture and updates any materials that reference it
- * to point to the new texture. Any other references to the texture become
- * invalid and need to be manually replaced.
- *
- * \param self Renderer.
- * \param name Texture name.
- * \return Nonzero on success.
- */
-int liren_internal_load_image (
-	LIRenRender* self,
-	const char*  name)
-{
-	LIRenImage* image;
-
-	image = liren_internal_find_image (self, name);
-	if (image != NULL)
-	{
-		/* TODO */
-		//return liren_render32_reload_image (self->v32, image->v32);
-		return 1;
-	}
-	image = liren_image_new (self, name);
-	if (image == NULL)
-		return 0;
-
-	return 1;
-}
-
 int liren_internal_measure_text (
 	LIRenRender* self,
 	const char*  font,
@@ -509,10 +437,7 @@ int liren_internal_update (
 	LIRenRender* self,
 	float        secs)
 {
-	time_t now;
-	LIAlgStrdicIter iter;
 	LIAlgU32dicIter iter1;
-	LIRenImage* image;
 	LIRenObject* object;
 
 	/* Animate objects. */
@@ -534,15 +459,6 @@ int liren_internal_update (
 
 	/* Render a frame. */
 	self->data->root->renderOneFrame ();
-
-	/* Free unused images. */
-	now = lisys_time (NULL);
-	LIALG_STRDIC_FOREACH (iter, self->images)
-	{
-		image = (LIRenImage*) iter.value;
-		if (!image->refs && image->timestamp < now + 1000 * LIREN_RENDER_TEXTURE_UNLOAD_TIME)
-			liren_image_free (image);
-	}
 
 	return 1;
 }
@@ -604,37 +520,6 @@ void liren_internal_set_camera_transform (
 {
 	self->data->camera->setPosition (value->position.x, value->position.y, value->position.z);
 	self->data->camera->setOrientation (Ogre::Quaternion (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z));
-}
-
-/**
- * \brief Gets the size of an image.
- * \param self Renderer.
- * \param name Image name.
- * \param result Return location for two integers.
- * \return Nonzero on success.
- */
-int liren_internal_get_image_size (
-	LIRenRender* self,
-	const char*  name,
-	int*         result)
-{
-	LIRenImage* image;
-
-	/* Load the image. */
-	image = (LIRenImage*) lialg_strdic_find (self->images, name);
-	if (image == NULL)
-	{
-		liren_internal_load_image (self, name);
-		image = (LIRenImage*) lialg_strdic_find (self->images, name);
-		if (image == NULL)
-			return 0;
-	}
-
-	/* Return the size. */
-	result[0] = liren_image_get_width (image);
-	result[1] = liren_image_get_height (image);
-
-	return 1;
 }
 
 void liren_internal_set_title (

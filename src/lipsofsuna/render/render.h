@@ -35,10 +35,6 @@ LIAPICALL (int, liren_render_load_font, (
 	const char*  file,
 	int          size));
 
-LIAPICALL (int, liren_render_load_image, (
-	LIRenRender* self,
-	const char*  name));
-
 LIAPICALL (int, liren_render_measure_text, (
 	LIRenRender* self,
 	const char*  font,
@@ -76,11 +72,6 @@ LIAPICALL (void, liren_render_set_camera_near, (
 LIAPICALL (void, liren_render_set_camera_transform, (
 	LIRenRender*          self,
 	const LIMatTransform* value));
-
-LIAPICALL (int, liren_render_get_image_size, (
-	LIRenRender* self,
-	const char*  name,
-	int*         result));
 
 LIAPICALL (float, liren_render_get_opengl_version, (
 	LIRenRender* self));

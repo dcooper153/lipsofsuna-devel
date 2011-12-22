@@ -111,12 +111,6 @@ void liren_overlay_free (
 		private_remove_overlay (self->parent, self);
 	lialg_u32dic_remove (self->render->overlays, self->id);
 
-	/* Free scene data. */
-	if (self->scene.framebuffer != NULL)
-		liren_framebuffer_free (self->scene.framebuffer);
-	lisys_free (self->scene.render_passes);
-	lisys_free (self->scene.postproc_passes);
-
 	/* Free private data. */
 	if (self->data != NULL)
 	{
@@ -404,96 +398,6 @@ void liren_overlay_remove_overlay (
 	/* Detach the overlay. */
 	if (overlay->parent == self)
 		private_remove_overlay (self, overlay);
-}
-
-/**
- * \brief Disables scene rendering for the overlay.
- * \param self Overlay.
- */
-void liren_overlay_disable_scene (
-	LIRenOverlay* self)
-{
-	/* Disable the scene. */
-	self->scene.enabled = 0;
-	if (self->scene.framebuffer != NULL)
-	{
-		liren_framebuffer_free (self->scene.framebuffer);
-		self->scene.framebuffer = NULL;
-	}
-	lisys_free (self->scene.render_passes);
-	self->scene.render_passes = NULL;
-	self->scene.render_passes_num = 0;
-	lisys_free (self->scene.postproc_passes);
-	self->scene.postproc_passes = NULL;
-	self->scene.postproc_passes_num = 0;
-}
-
-/**
- * \brief Enables scene rendering for the overlay.
- * \param self Overlay.
- * \param samples Number of multisamples.
- * \param hdr Nonzero to enable HDR.
- * \param viewport Viewport array of the camera.
- * \param modelview Modelview matrix of the camera.
- * \param projection Projection matrix of the camera.
- * \param frustum Frustum of the camera.
- * \param render_passes Array of render passes.
- * \param render_passes_num Number of render passes.
- * \param postproc_passes Array of post-processing passes.
- * \param postproc_passes_num Number of post-processing passes.
- */
-void liren_overlay_enable_scene (
-	LIRenOverlay*      self,
-	int                samples,
-	int                hdr,
-	const int*         viewport,
-	LIMatMatrix*       modelview,
-	LIMatMatrix*       projection,
-	LIMatFrustum*      frustum,
-	LIRenPassRender*   render_passes,
-	int                render_passes_num,
-	LIRenPassPostproc* postproc_passes,
-	int                postproc_passes_num)
-{
-	/* Copy camera settings. */
-	self->scene.enabled = 1;
-	self->scene.viewport[0] = viewport[0];
-	self->scene.viewport[1] = viewport[1];
-	self->scene.viewport[2] = viewport[2];
-	self->scene.viewport[3] = viewport[3];
-	self->scene.modelview = *modelview;
-	self->scene.projection = *projection;
-	self->scene.frustum = *frustum;
-	self->scene.samples = samples;
-	self->scene.hdr = hdr;
-
-	/* Copy render passes. */
-	lisys_free (self->scene.render_passes);
-	self->scene.render_passes = NULL;
-	self->scene.render_passes_num = 0;
-	if (render_passes_num)
-	{
-		self->scene.render_passes = (LIRenPassRender*) lisys_calloc (render_passes_num, sizeof (LIRenPassRender));
-		if (self->scene.render_passes != NULL)
-		{
-			memcpy (self->scene.render_passes, render_passes, render_passes_num * sizeof (LIRenPassRender));
-			self->scene.render_passes_num = render_passes_num;
-		}
-	}
-
-	/* Copy post-processing passes. */
-	lisys_free (self->scene.postproc_passes);
-	self->scene.postproc_passes = NULL;
-	self->scene.postproc_passes_num = 0;
-	if (postproc_passes_num)
-	{
-		self->scene.postproc_passes = (LIRenPassPostproc*) lisys_calloc (postproc_passes_num, sizeof (LIRenPassPostproc));
-		if (self->scene.postproc_passes != NULL)
-		{
-			memcpy (self->scene.postproc_passes, postproc_passes, postproc_passes_num * sizeof (LIRenPassPostproc));
-			self->scene.postproc_passes_num = postproc_passes_num;
-		}
-	}
 }
 
 /**

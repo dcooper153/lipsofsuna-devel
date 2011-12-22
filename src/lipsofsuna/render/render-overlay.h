@@ -77,24 +77,6 @@ LIAPICALL (void, liren_render_overlay_remove_overlay, (
 	int          id,
 	int          overlay));
 
-LIAPICALL (void, liren_render_overlay_disable_scene, (
-	LIRenRender* self,
-	int          id));
-
-LIAPICALL (void, liren_render_overlay_enable_scene, (
-	LIRenRender*       self,
-	int                id,
-	int                samples,
-	int                hdr,
-	const int*         viewport,
-	LIMatMatrix*       modelview,
-	LIMatMatrix*       projection,
-	LIMatFrustum*      frustum,
-	LIRenPassRender*   render_passes,
-	int                render_passes_num,
-	LIRenPassPostproc* postproc_passes,
-	int                postproc_passes_num));
-
 LIAPICALL (void, liren_render_overlay_set_depth, (
 	LIRenRender* self,
 	int          id,

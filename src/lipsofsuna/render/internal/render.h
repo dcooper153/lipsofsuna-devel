@@ -26,8 +26,6 @@ struct _LIRenRender
 	int anisotropy;
 	LIAlgRandom random;
 	LIAlgStrdic* fonts;
-	LIAlgStrdic* images;
-	LIAlgStrdic* shaders;
 	LIAlgU32dic* lights;
 	LIAlgU32dic* models;
 	LIAlgU32dic* objects;
@@ -44,27 +42,15 @@ LIAPICALL (int, liren_internal_init, (
 LIAPICALL (void, liren_internal_deinit, (
 	LIRenRender* self));
 
-LIAPICALL (LIRenImage*, liren_internal_find_image, (
-	LIRenRender* self,
-	const char*  name));
-
 LIAPICALL (LIRenModel*, liren_internal_find_model, (
 	LIRenRender* self,
 	int          id));
-
-LIAPICALL (LIRenShader*, liren_internal_find_shader, (
-	LIRenRender* self,
-	const char*  name));
 
 LIAPICALL (int, liren_internal_load_font, (
 	LIRenRender* self,
 	const char*  name,
 	const char*  file,
 	int          size));
-
-LIAPICALL (int, liren_internal_load_image, (
-	LIRenRender* self,
-	const char*  name));
 
 LIAPICALL (int, liren_internal_measure_text, (
 	LIRenRender* self,
@@ -107,11 +93,6 @@ LIAPICALL (void, liren_internal_set_camera_near, (
 LIAPICALL (void, liren_internal_set_camera_transform, (
 	LIRenRender*          self,
 	const LIMatTransform* value));
-
-LIAPICALL (int, liren_internal_get_image_size, (
-	LIRenRender* self,
-	const char*  name,
-	int*         result));
 
 LIAPICALL (float, liren_internal_get_opengl_version, (
 	LIRenRender* self));

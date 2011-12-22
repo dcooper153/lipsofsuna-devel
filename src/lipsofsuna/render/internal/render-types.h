@@ -31,12 +31,10 @@ typedef struct _LIRenObject LIRenObject;
 typedef struct _LIRenObjectData LIRenObjectData;
 typedef struct _LIRenOverlay LIRenOverlay;
 typedef struct _LIRenOverlayData LIRenOverlayData;
-typedef struct _LIRenOverlayElement LIRenOverlayElement;
 typedef struct _LIRenQueue LIRenQueue;
 typedef struct _LIRenModel LIRenModel;
 typedef struct _LIRenModelData LIRenModelData;
 typedef struct _LIRenRenderData LIRenRenderData;
-typedef struct _LIRenShader LIRenShader;
 
 #ifdef __cplusplus
 #include <OgreBorderPanelOverlayElement.h>

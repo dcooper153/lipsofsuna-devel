@@ -193,46 +193,12 @@ Render.class_setters = {
 
 ------------------------------------------------------------------------------
 
+-- FIXME: Deprecated dummy class, remove
 Shader = Class()
 Shader.class_name = "Shader"
-
---- Creates a new shader.
--- @param clss Shader class.
--- @param args Arguments.<ul>
---   <li>name: Unique shader name.</li>
---   <li>sort: True to allow depth sorting for materials with this shader.</li>
---   <li>transform_feedback: True to enable transform feedback.</li>
---   <li>passN_blend: True to enable blending.</li>
---   <li>passN_blend_src: Source blend function.</li>
---   <li>passN_blend_dst: Destination blend function.</li>
---   <li>passN_depth_test: False to disable depth test.</li>
---   <li>passN_depth_write: False to disable depth writes.</li>
---   <li>passN_depth_func: Depth test function.</li>
---   <li>passN_fragment: Fragment program code.</li>
---   <li>passN_geometry: Geometry program code.</li>
---   <li>passN_vertex: Vertex program code.</li></ul>
--- @return New shader.
 Shader.new = function(clss, args)
 	local self = Class.new(clss)
-	self.handle = Los.shader_new(args)
-	__userdata_lookup[self.handle] = self
 	return self
 end
-
---- Recompiles the shader from new source code.
--- @param self Shader.
--- @param args Arguments.<ul>
---   <li>sort: True to allow depth sorting for materials with this shader.</li>
---   <li>transform_feedback: True to enable transform feedback.</li>
---   <li>passN_blend: True to enable blending.</li>
---   <li>passN_blend_src: Source blend function.</li>
---   <li>passN_blend_dst: Destination blend function.</li>
---   <li>passN_depth_test: False to disable depth test.</li>
---   <li>passN_depth_write: False to disable depth writes.</li>
---   <li>passN_depth_func: Depth test function.</li>
---   <li>passN_fragment: Fragment program code.</li>
---   <li>passN_geometry: Geometry program code.</li>
---   <li>passN_vertex: Vertex program code.</li></ul>
 Shader.compile = function(self, args)
-	Los.shader_compile(self.handle, args)
 end

@@ -123,25 +123,6 @@ def configure(ctx):
 			if not ctx.check_cc(lib='lua5.1', uselib='CORE TEST', uselib_store='LUA', mandatory=False):
 				ctx.check_cc(lib='lua', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
 
-	# SDL
-	if not ctx.check_cfg(package='sdl', atleast_version='1.2.0', args='--cflags --libs', mandatory=False):
-		ctx.check_cxx(header_name='SDL.h', mandatory=True, uselib='CORE TEST', uselib_store='SDL')
-		ctx.check_cxx(lib='SDL', mandatory=True, uselib='CORE TEST', uselib_store='SDL')
-
-	# SDL_ttf
-	ctx.check_cc(lib='SDL_ttf', mandatory=True, uselib='CORE TEST SDL', uselib_store='SDL_TTF')
-	ctx.check_cc(msg = "Checking for header SDL_ttf.h", mandatory=True, uselib='CORE TEST SDL', fragment="#include <SDL_ttf.h>\nint main(int argc, char** argv) { return 0; }\n")
-
-	# GLEW
-	if not ctx.check_cfg(package='glew', atleast_version='1.5.5', args='--cflags --libs', mandatory=False):
-		ctx.check_cc(header_name='GL/glew.h', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
-		if not ctx.check_cc(lib='GLEW', mandatory=False, uselib='CORE TEST', uselib_store='GLEW'):
-			ctx.check_cc(lib='GLEW32', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
-
-	# GL
-	if not ctx.check_cc(lib='GL', mandatory=False, uselib='CORE TEST', uselib_store='GLEW'):
-		ctx.check_cc(lib='OpenGL32', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
-
 	# Ogre
 	if ctx.check_cfg(package='OGRE', atleast_version='1.7.0', args='--cflags --libs', mandatory=False):
 		ctx.check_cfg(package='OGRE', msg='Checking for OGRE plugindir', variables='plugindir', mandatory=False)
@@ -252,7 +233,7 @@ def build(ctx):
 	ctx.add_group("install")
 	ctx.set_group("build")
 	objs = ''
-	libs = 'CORE LUA SQLITE BULLET ENET OIS OGRE SDL SDL_TTF GLEW THREAD AL VORBIS OGG FLAC CURL ZLIB'
+	libs = 'CORE LUA SQLITE BULLET ENET OIS OGRE THREAD AL VORBIS OGG FLAC CURL ZLIB'
 
 	# Core objects.
 	for dir in CORE_DIRS.split(' '):

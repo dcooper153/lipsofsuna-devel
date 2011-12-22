@@ -38,44 +38,9 @@ enum
 	LIREN_MATERIAL_FLAG_SORTFACES = 0x080000
 };
 
-typedef LIMdlIndex LIRenIndex;
 typedef enum _LIRenFlags LIRenFlags;
-typedef struct _LIRenFormat LIRenFormat;
-typedef struct _LIRenPassRender LIRenPassRender;
-typedef struct _LIRenPassPostproc LIRenPassPostproc;
 typedef struct _LIRenRender LIRenRender;
-typedef struct _LIRenVertex LIRenVertex;
 typedef struct _LIRenVideomode LIRenVideomode;
-
-struct _LIRenFormat
-{
-	int size;
-	int tex_format;
-	int tex_offset;
-	int nml_format;
-	int nml_offset;
-	int vtx_format;
-	int vtx_offset;
-};
-
-struct _LIRenPassRender
-{
-	int pass;
-	int sort;
-};
-
-struct _LIRenPassPostproc
-{
-	int mipmap;
-	char* shader;
-};
-
-struct _LIRenVertex
-{
-	float coord[3];
-	float normal[3];
-	float texcoord[2];
-};
 
 struct _LIRenVideomode
 {

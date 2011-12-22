@@ -181,62 +181,6 @@ void liren_render_overlay_remove_overlay (
 }
 
 /**
- * \brief Disables scene rendering for the overlay.
- * \param render Renderer.
- * \param id Overlay ID.
- */
-void liren_render_overlay_disable_scene (
-	LIRenRender* self,
-	int          id)
-{
-	LIRenOverlay* overlay;
-
-	overlay = lialg_u32dic_find (self->overlays, id);
-	if (overlay != NULL)
-		liren_overlay_disable_scene (overlay);
-}
-
-/**
- * \brief Enables scene rendering for the overlay.
- * \param render Renderer.
- * \param id Overlay ID.
- * \param samples Number of multisamples.
- * \param hdr Nonzero to enable HDR.
- * \param viewport Viewport array of the camera.
- * \param modelview Modelview matrix of the camera.
- * \param projection Projection matrix of the camera.
- * \param frustum Frustum of the camera.
- * \param render_passes Array of render passes.
- * \param render_passes_num Number of render passes.
- * \param postproc_passes Array of post-processing passes.
- * \param postproc_passes_num Number of post-processing passes.
- */
-void liren_render_overlay_enable_scene (
-	LIRenRender*       self,
-	int                id,
-	int                samples,
-	int                hdr,
-	const int*         viewport,
-	LIMatMatrix*       modelview,
-	LIMatMatrix*       projection,
-	LIMatFrustum*      frustum,
-	LIRenPassRender*   render_passes,
-	int                render_passes_num,
-	LIRenPassPostproc* postproc_passes,
-	int                postproc_passes_num)
-{
-	LIRenOverlay* overlay;
-
-	overlay = lialg_u32dic_find (self->overlays, id);
-	if (overlay != NULL)
-	{
-		return liren_overlay_enable_scene (overlay, samples, hdr, viewport,
-			modelview, projection, frustum, render_passes, render_passes_num,
-			postproc_passes, postproc_passes_num);
-	}
-}
-
-/**
  * \brief Sets the Z offset of the overlay.
  * \param render Renderer.
  * \param id Overlay ID.

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,11 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/extension.h>
+#include "lipsofsuna/client.h"
+#include "lipsofsuna/extension.h"
 
 #define LIEXT_SCRIPT_LIGHT "Light"
 #define LIEXT_SCRIPT_RENDER "Render"
-#define LIEXT_SCRIPT_SHADER "Shader"
 
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
@@ -54,9 +53,6 @@ void liext_script_light (
 	LIScrScript* self);
 
 void liext_script_render (
-	LIScrScript* self);
-
-void liext_script_shader (
 	LIScrScript* self);
 
 #endif

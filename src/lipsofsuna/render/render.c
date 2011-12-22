@@ -40,22 +40,9 @@ LIRenRender* liren_render_new (
 	self->paths = paths;
 	lialg_random_init (&self->random, lisys_time (NULL));
 
-	/* Initialize the image dictionary. */
-	self->images = lialg_strdic_new ();
-	if (self->images == NULL)
-		return NULL;
-
 	/* Initialize the font dictionary. */
 	self->fonts = lialg_strdic_new ();
 	if (self->fonts == NULL)
-	{
-		liren_render_free (self);
-		return NULL;
-	}
-
-	/* Initialize the shader dictionary. */
-	self->shaders = lialg_strdic_new ();
-	if (self->shaders == NULL)
 	{
 		liren_render_free (self);
 		return NULL;
@@ -140,22 +127,6 @@ void liren_render_free (
 		lialg_u32dic_free (self->overlays);
 	}
 
-	/* Free images. */
-	if (self->images != NULL)
-	{
-		LIALG_STRDIC_FOREACH (iter1, self->images)
-			liren_image_free (iter1.value);
-		lialg_strdic_free (self->images);
-	}
-
-	/* Free shaders. */
-	if (self->shaders != NULL)
-	{
-		LIALG_STRDIC_FOREACH (iter1, self->shaders)
-			liren_shader_free (iter1.value);
-		lialg_strdic_free (self->shaders);
-	}
-
 	/* Free fonts. */
 	if (self->fonts != NULL)
 	{
@@ -177,24 +148,6 @@ int liren_render_load_font (
 	int          size)
 {
 	return liren_internal_load_font (self, name, file, size);
-}
-
-/**
- * \brief Forces the renderer to load or reload a texture image.
- *
- * Reloads the requested texture and updates any materials that reference it
- * to point to the new texture. Any other references to the texture become
- * invalid and need to be manually replaced.
- *
- * \param self Renderer.
- * \param name Texture name.
- * \return Nonzero on success.
- */
-int liren_render_load_image (
-	LIRenRender* self,
-	const char*  name)
-{
-	return liren_internal_load_image (self, name);
 }
 
 int liren_render_measure_text (
@@ -285,21 +238,6 @@ void liren_render_set_camera_transform (
 	const LIMatTransform* value)
 {
 	liren_internal_set_camera_transform (self, value);
-}
-
-/**
- * \brief Gets the size of an image.
- * \param self Renderer.
- * \param name Image name.
- * \param result Return location for two integers.
- * \return Nonzero on success.
- */
-int liren_render_get_image_size (
-	LIRenRender* self,
-	const char*  name,
-	int*         result)
-{
-	return liren_internal_get_image_size (self, name, result);
 }
 
 float liren_render_get_opengl_version (

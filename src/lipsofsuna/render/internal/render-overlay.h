@@ -36,33 +36,6 @@ struct _LIRenOverlay
 		int count;
 		LIRenOverlay** array;
 	} overlays;
-	struct
-	{
-		int enabled;
-		int samples;
-		int hdr;
-		GLint viewport[4];
-		LIMatMatrix modelview;
-		LIMatMatrix projection;
-		LIMatFrustum frustum;
-		LIRenFramebuffer* framebuffer;
-		LIRenPassRender* render_passes;
-		int render_passes_num;
-		LIRenPassPostproc* postproc_passes;
-		int postproc_passes_num;
-	} scene;
-};
-
-struct _LIRenOverlayElement
-{
-	int buffer_start;
-	int buffer_count;
-	float color[4];
-	int scissor_enabled;
-	GLint scissor_rect[4];
-	LIFntFont* font;
-	LIRenImage* image;
-	LIRenShader* shader;
 };
 
 LIAPICALL (LIRenOverlay*, liren_overlay_new, (
@@ -111,22 +84,6 @@ LIAPICALL (void, liren_overlay_add_overlay, (
 LIAPICALL (void, liren_overlay_remove_overlay, (
 	LIRenOverlay* self,
 	LIRenOverlay* overlay));
-
-LIAPICALL (void, liren_overlay_disable_scene, (
-	LIRenOverlay* self));
-
-LIAPICALL (void, liren_overlay_enable_scene, (
-	LIRenOverlay*      self,
-	int                samples,
-	int                hdr,
-	const int*         viewport,
-	LIMatMatrix*       modelview,
-	LIMatMatrix*       projection,
-	LIMatFrustum*      frustum,
-	LIRenPassRender*   render_passes,
-	int                render_passes_num,
-	LIRenPassPostproc* postproc_passes,
-	int                postproc_passes_num));
 
 LIAPICALL (void, liren_overlay_set_depth, (
 	LIRenOverlay* self,
