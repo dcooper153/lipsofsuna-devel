@@ -31,9 +31,14 @@
 #include <OgreEntity.h>
 #include <OgreWindowEventUtilities.h>
 #include <OgrePlugin.h>
-
 #include <OgreFontManager.h>
 #include <OgreBorderPanelOverlayElement.h>
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#include <X11/Xlib.h>
+#endif
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#include <windows.h>
+#endif
 
 #define LIREN_RENDER_TEXTURE_UNLOAD_TIME 10
 
@@ -636,7 +641,19 @@ void liren_internal_set_title (
 	LIRenRender* self,
 	const char*  value)
 {
+#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+	Display* display;
+	Window window;
+	self->data->render_window->getCustomAttribute ("DISPLAY", &display);
+	self->data->render_window->getCustomAttribute ("WINDOW", &window);
+	XStoreName (display, window, value);
+#elif OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+	HWND window;
+	self->data->render_window->getCustomAttribute ("WINDOW", &window);
+	SetWindowText (window, value);
+#else
 	/* TODO */
+#endif
 }
 
 int liren_internal_set_videomode (
