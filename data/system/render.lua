@@ -186,10 +186,15 @@ Render.class_name = "Render"
 -- @class table
 
 Render.class_getters = {
-	anisotrophy = function(s) return Los.render_get_anisotrophy() end}
+	anisotrophy = function(s) return Los.render_get_anisotrophy() end,
+	scene_ambient = function(s) return rawget(s, "__scene_ambient") or {0.5,0.5,0.5,1.0} end}
 
 Render.class_setters = {
-	anisotrophy = function(s, v) Los.render_set_anisotrophy(v) end}
+	anisotrophy = function(s, v) Los.render_set_anisotrophy(v) end,
+	scene_ambient = function(s, v)
+		rawset(s, "__scene_ambient", v)
+		Los.render_set_scene_ambient(v)
+	end}
 
 ------------------------------------------------------------------------------
 

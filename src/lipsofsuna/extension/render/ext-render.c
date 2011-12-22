@@ -85,6 +85,18 @@ static void Render_set_anisotrophy (LIScrArgs* args)
 	}
 }
 
+static void Render_set_scene_ambient (LIScrArgs* args)
+{
+	int i;
+	float value[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+	LIExtModule* module;
+
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
+	for (i = 0 ; i < 4 ; i++)
+		liscr_args_geti_float (args, i, value + i);
+	liren_render_set_scene_ambient (module->client->render, value);
+}
+
 /*****************************************************************************/
 
 void liext_script_render (
@@ -95,6 +107,7 @@ void liext_script_render (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_camera_transform", Render_set_camera_transform);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_get_anisotrophy", Render_get_anisotrophy);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_anisotrophy", Render_set_anisotrophy);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_scene_ambient", Render_set_scene_ambient);
 }
 
 /** @} */

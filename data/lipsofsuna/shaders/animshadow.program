@@ -1,0 +1,12 @@
+vertex_program animshadow_vert glsl
+{
+	source animshadow.vert
+	preprocessor_defines BONES=128
+	includes_skeletal_animation true
+	default_params
+	{
+		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
+		param_named_auto LOS_matrix_world_inverse inverse_world_matrix
+		param_named_auto LOS_skeletal_matrix world_matrix_array_3x4 128
+	}
+}

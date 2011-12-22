@@ -20,12 +20,10 @@ vec3 los_blinn_phong(in vec3 lv, in vec3 hv, in vec3 ld, in vec4 eq,
 {
 	vec3 lvn = normalize(lv);
 	float diff = dot(normal, lvn);
-	if(diff <= 0.0)
-		return vec3(0.0);
 	float dist = length(lv);
 	float att = 1.0 / dot(eq.yzw, vec3(1.0, dist, dist * dist));
 	float ndh = dot(normal, normalize(hv));
-	float spec = pow(max(0.0, ndh), shininess);
+	float spec = pow(max(0.0, ndh), shininess) * step(0.0, diff);
 	float spot = max(0.0, -dot(ld, lvn));
 	att *= pow(smoothstep(spotparam.y, spotparam.x, spot), spotparam.z);
 	return vec3(diff, spec, att);

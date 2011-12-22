@@ -97,6 +97,10 @@ LIAPICALL (void, liren_internal_set_camera_transform, (
 LIAPICALL (float, liren_internal_get_opengl_version, (
 	LIRenRender* self));
 
+LIAPICALL (void, liren_internal_set_scene_ambient, (
+	LIRenRender* self,
+	const float* value));
+
 LIAPICALL (void, liren_internal_set_title, (
 	LIRenRender* self,
 	const char*  value));

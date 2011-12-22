@@ -247,6 +247,13 @@ float liren_render_get_opengl_version (
 	return 3.2f;
 }
 
+void liren_render_set_scene_ambient (
+	LIRenRender* self,
+	const float* value)
+{
+	liren_internal_set_scene_ambient (self, value);
+}
+
 void liren_render_set_title (
 	LIRenRender* self,
 	const char*  value)

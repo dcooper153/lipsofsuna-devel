@@ -32,7 +32,8 @@ Views.Chargen.new = function(clss)
 		skill.value = skill.cap
 	end}
 	self.object = Creature{position = Vector(1, 1, 1)}
-	self.light = Light{ambient = {1.0,1.0,1.0,1.0}, diffuse = {1.0,1.0,1.0,1.0}, equation = {2,0.3,0.03}}
+	self.light = Light{ambient = {0.3,0.3,0.4,1.0}, diffuse={0.7,0.7,0.8,1.0}, equation={1.5,0.1,0.1}, priority = 10}
+
 	self.timer = Timer{enabled = false, func = function(timer, secs) self:update(secs) end}
 	self.list_hair_styles = {}
 	self.list_eye_styles = {}
@@ -469,7 +470,7 @@ Views.Chargen.update = function(self, secs)
 	end
 	self.object:refresh()
 	-- Update light.
-	self.light.position = self.object.position + self.object.rotation * Vector(0, 2, -5)
+	self.light.position = self.object.position + self.object.rotation * Vector(0.5, 2, -3)
 	-- Update camera.
 	self.camera.target_position = self.object.position + self.view_offset
 	self.camera.target_rotation = Quaternion{axis = Vector(0, 1, 0), angle = math.pi}

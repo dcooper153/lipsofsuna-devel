@@ -122,8 +122,8 @@ int liren_internal_init (
 
 	/* Initialize the scene manager. */
 	self->data->scene_manager = self->data->root->createSceneManager("OctreeSceneManager", "DefaultSceneManager");
-	self->data->scene_manager->setAmbientLight (Ogre::ColourValue (0.2, 0.2, 0.2));
-	self->data->scene_manager->setShadowTechnique (Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
+	self->data->scene_manager->setAmbientLight (Ogre::ColourValue (0.5, 0.5, 0.5));
+	self->data->scene_manager->setShadowTechnique (Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 	self->data->scene_manager->setShadowTextureSelfShadow (false);
 	self->data->scene_manager->setShowDebugShadows (true);
 	self->data->scene_manager->setShadowFarDistance (100.0f);
@@ -520,6 +520,13 @@ void liren_internal_set_camera_transform (
 {
 	self->data->camera->setPosition (value->position.x, value->position.y, value->position.z);
 	self->data->camera->setOrientation (Ogre::Quaternion (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z));
+}
+
+void liren_internal_set_scene_ambient (
+	LIRenRender* self,
+	const float* value)
+{
+	self->data->scene_manager->setAmbientLight (Ogre::ColourValue (value[0], value[1], value[2]));
 }
 
 void liren_internal_set_title (

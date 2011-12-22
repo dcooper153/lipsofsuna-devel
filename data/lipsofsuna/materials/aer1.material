@@ -33,6 +33,9 @@ material animskin1
 			fragment_program_ref skin_frag
 			{
 			}
+			shadow_caster_vertex_program_ref animshadow_vert
+			{
+			}
 		}
 	}
 }
@@ -69,6 +72,9 @@ material animdiff1
 			{
 			}
 			fragment_program_ref animdiff_frag
+			{
+			}
+			shadow_caster_vertex_program_ref animshadow_vert
 			{
 			}
 		}
@@ -108,6 +114,9 @@ material animdiffnorm1
 			{
 			}
 			fragment_program_ref skin_frag
+			{
+			}
+			shadow_caster_vertex_program_ref animshadow_vert
 			{
 			}
 		}
