@@ -70,7 +70,8 @@ LIAPICALL (void, liren_render_overlay_add_tiled, (
 LIAPICALL (void, liren_render_overlay_add_overlay, (
 	LIRenRender* self,
 	int          id,
-	int          overlay));
+	int          overlay,
+	int          layer));
 
 LIAPICALL (void, liren_render_overlay_remove_overlay, (
 	LIRenRender* self,

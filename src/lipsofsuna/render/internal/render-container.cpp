@@ -35,6 +35,7 @@ Ogre::String LIRenContainer::type_name ("LIRenContainer");
 
 LIRenContainer::LIRenContainer (const Ogre::String& name) : Ogre::PanelOverlayElement (name)
 {
+	layer = 0;
 }
 
 LIRenContainer::~LIRenContainer ()
@@ -84,8 +85,9 @@ void LIRenContainer::getRenderOperation (Ogre::RenderOperation& op)
 	op = render_op;
 }
 
-void LIRenContainer::add_container (LIRenContainer* cont)
+void LIRenContainer::add_container (LIRenContainer* cont, int layer)
 {
+	cont->layer = layer;
 	containers.push_back (cont);
 	addChild (cont);
 	_notifyZOrder (mZOrder);
@@ -143,12 +145,21 @@ ushort LIRenContainer::_notifyZOrder (ushort z)
 	/* Sort children using the breadth first search algorithm. */
 	for (size_t count = children.size () ; count ; count = children.size ())
 	{
-		for (size_t i = 0 ; i < count ; i++)
+		/* Sort the layers separately. */
+		for (int layer = 0 ; layer < 2 ; layer++)
 		{
-			LIRenContainer* child = children[i];
-			z = child->_notifyZOrderNonrecursive (z);
-			child->get_children (children);
+			for (size_t i = 0 ; i < count ; i++)
+			{
+				LIRenContainer* child = children[i];
+				if (child->layer == layer)
+				{
+					z = child->_notifyZOrderNonrecursive (z);
+					child->get_children (children);
+				}
+			}
 		}
+
+		/* Remove the previous hierarchy level. */
 		children.erase (children.begin (), children.begin () + count);
 	}
 

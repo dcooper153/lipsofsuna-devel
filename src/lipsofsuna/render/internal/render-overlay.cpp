@@ -359,10 +359,12 @@ void liren_overlay_add_scaled (
  * \brief Adds a child overlay to the overlay.
  * \param self Overlay.
  * \param overlay Overlay ID.
+ * \param layer Zero for bottom, one for top.
  */
 void liren_overlay_add_overlay (
 	LIRenOverlay* self,
-	LIRenOverlay* overlay)
+	LIRenOverlay* overlay,
+	int           layer)
 {
 	LIRenOverlay** tmp;
 
@@ -382,7 +384,7 @@ void liren_overlay_add_overlay (
 	overlay->parent = self;
 
 	/* Add to container. */
-	self->data->container->add_container (overlay->data->container);
+	self->data->container->add_container (overlay->data->container, layer);
 	private_update_position (overlay);
 }
 

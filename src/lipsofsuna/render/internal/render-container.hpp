@@ -30,7 +30,7 @@ public:
 	virtual void initialise ();
 	virtual const Ogre::String& getTypeName () const;
 	virtual void getRenderOperation (Ogre::RenderOperation& op);
-	void add_container (LIRenContainer* cont);
+	void add_container (LIRenContainer* cont, int layer);
 	void add_element (Ogre::OverlayElement* elem);
 	void remove_container (int index);
 	void remove_element (int index);
@@ -41,6 +41,7 @@ protected:
 	virtual void _updateRenderQueue (Ogre::RenderQueue* queue);
 	void get_children (std::vector<LIRenContainer*>& children);
 private:
+	int layer;
 	Ogre::RenderOperation render_op;
 	static Ogre::String type_name;
 public:

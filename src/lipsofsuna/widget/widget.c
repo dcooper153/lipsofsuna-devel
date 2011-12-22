@@ -1252,7 +1252,7 @@ static void private_call_attach (
 	if (child != NULL)
 	{
 		/* Add to the overlay. */
-		liren_render_overlay_add_overlay (self->manager->render, self->overlay, child->overlay);
+		liren_render_overlay_add_overlay (self->manager->render, self->overlay, child->overlay, 0);
 	}
 }
 
@@ -1269,7 +1269,7 @@ static void private_call_attach_manual (
 	child->parent = self;
 
 	/* Add to the overlay. */
-	liren_render_overlay_add_overlay (self->manager->render, self->overlay, child->overlay);
+	liren_render_overlay_add_overlay (self->manager->render, self->overlay, child->overlay, 1);
 }
 
 static void private_call_detach (

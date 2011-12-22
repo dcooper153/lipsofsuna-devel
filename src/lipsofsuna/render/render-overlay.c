@@ -145,11 +145,13 @@ void liren_render_overlay_add_tiled (
  * \param render Renderer.
  * \param id Overlay ID.
  * \param overlay Overlay ID.
+ * \param layer Zero for bottom, one for top.
  */
 void liren_render_overlay_add_overlay (
 	LIRenRender* self,
 	int          id,
-	int          overlay)
+	int          overlay,
+	int          layer)
 {
 	LIRenOverlay* overlay1;
 	LIRenOverlay* overlay2;
@@ -157,7 +159,7 @@ void liren_render_overlay_add_overlay (
 	overlay1 = lialg_u32dic_find (self->overlays, id);
 	overlay2 = lialg_u32dic_find (self->overlays, overlay);
 	if (overlay1 != NULL && overlay2 != NULL)
-		liren_overlay_add_overlay (overlay1, overlay2);
+		liren_overlay_add_overlay (overlay1, overlay2, layer);
 }
 
 /**
