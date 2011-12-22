@@ -2,7 +2,7 @@ Widgets.Cursor = Class(Widget)
 Widgets.Cursor.class_name = "Widgets.Cursor"
 
 Widgets.Cursor.new = function(clss, cursor)
-	local self = Widget.new(clss, {cursor = cursor, cols = 1, rows = 1})
+	local self = Widget.new(clss, {cursor = cursor, cols = 1, rows = 1, depth = 10})
 	return self
 end
 

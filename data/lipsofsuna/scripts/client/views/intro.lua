@@ -7,7 +7,7 @@ Views.Intro.class_name = "Views.Intro"
 Views.Intro.new = function(clss)
 	-- Preview scene.
 	local camera = Camera{far = 60.0, near = 0.3, mode = "first-person"}
-	local self = Widgets.Scene.new(clss, {cols = 1, rows = 2, behind = true, fullscreen = true, camera = camera, spacings = {0,0}})
+	local self = Widgets.Scene.new(clss, {cols = 1, rows = 2, fullscreen = true, camera = camera, spacings = {0,0}})
 	self.offset = Vector(0, 1.8, -10)
 	self.light = Light{ambient = {0.5,0.5,0.5,1}, diffuse = {1,1,1,1}, equation = {1,0.1,0.03}}
 	self.timer = Timer{enabled = false, func = function(timer, secs) self:update(secs) end}

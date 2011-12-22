@@ -56,7 +56,7 @@ struct _LIWdgWidget
 	LIWdgWidget* above;
 	LIWdgWidget* below;
 	LIScrData* script;
-	unsigned int behind : 1;
+	unsigned int depth;
 	unsigned int fixed_size : 1;
 	unsigned int floating : 1;
 	unsigned int fullscreen : 1;
@@ -163,10 +163,10 @@ LIAPICALL (void, liwdg_widget_set_allocation, (
 	int          w,
 	int          h));
 
-LIAPICALL (int, liwdg_widget_get_behind, (
+LIAPICALL (int, liwdg_widget_get_depth, (
 	LIWdgWidget* self));
 
-LIAPICALL (void, liwdg_widget_set_behind, (
+LIAPICALL (void, liwdg_widget_set_depth, (
 	LIWdgWidget* self,
 	int          value));
 

@@ -453,16 +453,16 @@ static void Widget_set_request (LIScrArgs* args)
 		liwdg_widget_set_request (args->self, 2, size.width, size.height);
 }
 
-static void Widget_get_behind (LIScrArgs* args)
+static void Widget_get_depth (LIScrArgs* args)
 {
-	liscr_args_seti_bool (args, liwdg_widget_get_behind (args->self));
+	liscr_args_seti_int (args, liwdg_widget_get_depth (args->self));
 }
-static void Widget_set_behind (LIScrArgs* args)
+static void Widget_set_depth (LIScrArgs* args)
 {
 	int value;
 
-	if (liscr_args_geti_bool (args, 0, &value))
-		liwdg_widget_set_behind (args->self, value);
+	if (liscr_args_geti_int (args, 0, &value))
+		liwdg_widget_set_depth (args->self, value);
 }
 
 static void Widget_get_cols (LIScrArgs* args)
@@ -696,8 +696,8 @@ void liext_script_widget (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_child", Widget_set_child);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_expand", Widget_set_expand);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_request", Widget_set_request);
-	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_behind", Widget_get_behind);
-	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_behind", Widget_set_behind);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_depth", Widget_get_depth);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_depth", Widget_set_depth);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_cols", Widget_get_cols);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_set_cols", Widget_set_cols);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_WIDGET, "widget_get_fixed_size", Widget_get_fixed_size);

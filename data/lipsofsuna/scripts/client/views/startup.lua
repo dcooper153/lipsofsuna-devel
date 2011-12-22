@@ -4,7 +4,7 @@ Views.Startup = Class(Widgets.Background)
 -- @param clss Startup class.
 -- @return Startup view.
 Views.Startup.new = function(clss)
-	local self = Widgets.Background.new(clss, {cols = 1, rows = 3, behind = true, fullscreen = true, image = "mainmenu1"})
+	local self = Widgets.Background.new(clss, {cols = 1, rows = 3, fullscreen = true, image = "mainmenu1"})
 	self.text = Widgets.Label{halign = 0.5}
 	self.button_back = Widgets.Label{font = "mainmenu", text = "Back", pressed = function() self:back() end}
 	self.button_quit = Widgets.Label{font = "mainmenu", text = "Quit", pressed = function() Program:shutdown() end}

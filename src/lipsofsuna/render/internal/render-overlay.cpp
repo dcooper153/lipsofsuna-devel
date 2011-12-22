@@ -401,9 +401,9 @@ void liren_overlay_remove_overlay (
 }
 
 /**
- * \brief Sets the overlay behind other overlays.
+ * \brief Sets the depth sort priority of the overlay.
  * \param self Overlay.
- * \param value Nonzero for behind.
+ * \param value Depth sort priority.
  */
 void liren_overlay_set_depth (
 	LIRenOverlay* self,

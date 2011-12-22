@@ -232,18 +232,17 @@ int liwdg_manager_insert_window (
 {
 	LIWdgSize size;
 
+	/* Detach and attach. */
 	liwdg_widget_detach (widget);
 	widget->floating = 1;
 	private_attach_window (self, widget);
 
+	/* Set the geometry of the window. */
 	liwdg_widget_get_request (widget, &size);
 	size.width = (self->width - size.width) / 2;
 	size.height = (self->height - size.height) / 2;
 	liwdg_widget_move (widget, size.width, size.height);
 	private_resize_window (self, widget);
-
-	/* Re-sort windows. */
-	liwdg_manager_sort_windows (self);
 
 	return 1;
 }
@@ -264,9 +263,6 @@ int liwdg_manager_remove_window (
 	private_detach_window (self, widget);
 	widget->floating = 0;
 
-	/* Re-sort windows. */
-	liwdg_manager_sort_windows (self);
-
 	return 1;
 }
 
@@ -275,71 +271,13 @@ void liwdg_manager_render (
 {
 }
 
-void liwdg_manager_lower_window_to_bottom (
-	LIWdgManager* self,
-	LIWdgWidget*  widget)
-{
-	/* Check if already at the bottom. */
-	if (widget == self->dialogs.bottom)
-		return;
-	if (self->dialogs.bottom->above == NULL)
-		return;
-	lisys_assert (widget->below != NULL);
-
-	/* Remove from the list. */
-	if (widget->below != NULL)
-		widget->below->above = widget->above;
-	if (widget->above != NULL)
-		widget->above->below = widget->below;
-	if (widget == self->dialogs.top)
-		self->dialogs.top = widget->below;
-
-	/* Add to the bottom. */
-	widget->above = self->dialogs.bottom;
-	widget->below = NULL;
-	if (widget->above != NULL)
-		widget->above->below = widget;
-	self->dialogs.bottom = widget;
-
-	/* Update depth values. */
-	liwdg_manager_sort_windows (self);
-}
-
-void liwdg_manager_raise_window_from_bottom (
-	LIWdgManager* self,
-	LIWdgWidget*  widget)
-{
-	/* Check if already not at the bottom. */
-	if (widget != self->dialogs.bottom)
-		return;
-	if (widget->above == NULL)
-		return;
-	lisys_assert (widget->below == NULL);
-	lisys_assert (widget->above != NULL);
-
-	/* Remove from the list. */
-	self->dialogs.bottom = widget->above;
-	self->dialogs.bottom->below = NULL;
-
-	/* Add above the bottom. */
-	widget->below = self->dialogs.bottom;
-	widget->above = self->dialogs.bottom->above;
-	widget->below->above = widget;
-	if (widget->above != NULL)
-		widget->above->below = widget;
-	else
-		self->dialogs.top = widget;
-
-	/* Update depth values. */
-	liwdg_manager_sort_windows (self);
-}
-
 void liwdg_manager_sort_windows (
 	LIWdgManager* self)
 {
 	int depth;
 	LIWdgWidget* widget;
 
+	/* Update render overlays. */
 	for (depth = 0, widget = self->dialogs.bottom ; widget != NULL ; widget = widget->above)
 	{
 		if (liwdg_widget_get_visible (widget))
@@ -415,14 +353,40 @@ static void private_attach_window (
 	LIWdgManager* self,
 	LIWdgWidget*  widget)
 {
+	LIWdgWidget* below;
+
+	/* Find the insertion position based on the depth. */
+	/* Simply find the first widget from the top that has a depth less
+	   than ours. We'll link ourselves above that widget. */
+	for (below = self->dialogs.top ; below != NULL ; below = below->below)
+	{
+		if (below->depth < widget->depth)
+			break;
+	}
+
 	/* Add the widget to the dialog list. */
-	widget->above = NULL;
-	widget->below = self->dialogs.top;
-	if (self->dialogs.top != NULL)
-		self->dialogs.top->above = widget;
-	else
+	/* If our depth was the lowest, make us the new bottom widget.
+	   Otherwise, link ourselves above the found widget. */
+	if (below == NULL)
+	{
+		widget->above = self->dialogs.bottom;
+		widget->below = NULL;
+		if (widget->above != NULL)
+			widget->above->below = widget;
+		else
+			self->dialogs.top = widget;
 		self->dialogs.bottom = widget;
-	self->dialogs.top = widget;
+	}
+	else
+	{
+		widget->above = below->above;
+		widget->below = below;
+		below->above = widget;
+		if (widget->above != NULL)
+			widget->above->below = widget;
+		else
+			self->dialogs.top = widget;
+	}
 
 	/* Add the overlay to the root. */
 	liren_render_overlay_set_floating (self->render, widget->overlay, 1);

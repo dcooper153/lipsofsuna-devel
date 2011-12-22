@@ -1,7 +1,7 @@
 Views.Host = Class(Widgets.Background)
 
 Views.Host.new = function(clss)
-	local self = Widgets.Background.new(clss, {cols = 1, rows = 2, behind = true, fullscreen = true, image = "mainmenu1"})
+	local self = Widgets.Background.new(clss, {cols = 1, rows = 2, fullscreen = true, image = "mainmenu1"})
 	self.text = Widgets.Label()
 	-- Save slot settings.
 	self.combo_file = Widgets.ComboBox({

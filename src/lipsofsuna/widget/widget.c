@@ -630,23 +630,24 @@ void liwdg_widget_set_allocation (
 	}
 }
 
-int liwdg_widget_get_behind (
+int liwdg_widget_get_depth (
 	LIWdgWidget* self)
 {
-	return self->behind;
+	return self->depth;
 }
 
-void liwdg_widget_set_behind (
+void liwdg_widget_set_depth (
 	LIWdgWidget* self,
 	int          value)
 {
-	self->behind = value;
+	if (self->depth == value)
+		return;
+	self->depth = value;
+	liren_render_overlay_set_depth (self->manager->render, self->overlay, self->depth);
 	if (self->floating)
 	{
-		if (value)
-			liwdg_manager_lower_window_to_bottom (self->manager, self);
-		else
-			liwdg_manager_raise_window_from_bottom (self->manager, self);
+		liwdg_manager_remove_window (self->manager, self);
+		liwdg_manager_insert_window (self->manager, self);
 	}
 }
 
@@ -812,7 +813,6 @@ void liwdg_widget_set_floating (
 		{
 			self->floating = 1;
 			liwdg_widget_set_visible (self, 1);
-			liwdg_widget_set_behind (self, self->behind);
 		}
 	}
 	else

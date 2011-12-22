@@ -178,7 +178,7 @@ Views.Options.new = function(clss)
 	self.group_buttons:set_expand{col = 1}
 	self.group_buttons:set_expand{col = 3}
 	self.group_buttons:set_child(2, 1, self.button_back)
-	self.background = Widgets.Background{cols = 3, rows = 3, behind = true, fullscreen = true, image = "mainmenu1"}
+	self.background = Widgets.Background{cols = 3, rows = 3, fullscreen = true, image = "mainmenu1"}
 	self.background:set_expand{col = 1, row = 1}
 	self.background:set_expand{col = 3}
 	self.background:set_child(2, 3, self.group_buttons)

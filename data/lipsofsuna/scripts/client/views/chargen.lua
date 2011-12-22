@@ -25,7 +25,7 @@ Views.Chargen.list_spawnpoints={{"Tutorial","lyra"},{"Lips Town","mentor"},{"Hom
 Views.Chargen.new = function(clss)
 	-- Preview scene.
 	local camera = Camera{far = 60.0, near = 0.3, mode = "first-person"}
-	local self = Widgets.Scene.new(clss, {rows = 1, behind = true, fullscreen = true, camera = camera, spacings = {0,0}})
+	local self = Widgets.Scene.new(clss, {rows = 1, fullscreen = true, camera = camera, spacings = {0,0}})
 	self.view_offset = Vector(0, 1.8, -2)
 	self.margins = {5,5,5,5}
 	self.skills = Widgets.Skills{changed = function(widget, skill)

@@ -7,7 +7,7 @@ Views.Editor.class_name = "Views.Editor"
 -- @param clss Editor view class.
 -- @return Editor view.
 Views.Editor.new = function(clss)
-	local self = Widget.new(clss, {cols = 1, rows = 1, behind = true, fullscreen = true})
+	local self = Widget.new(clss, {cols = 1, rows = 1, fullscreen = true})
 	self.timer = Timer{enabled = false, func = function(timer, secs) self:update(secs) end}
 	self.editor = Editor()
 	Editor.inst = self.editor

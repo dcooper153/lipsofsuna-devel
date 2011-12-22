@@ -12,7 +12,7 @@ Widgets.ComboBox.class_name = "Widgets.ComboBox"
 Widgets.ComboBox.new = function(clss, args)
 	local self = Widgets.Button.new(clss)
 	self.value = 1
-	self.menu = Widgets.Frame{cols = 1, expand_col = 1, style = "popup", temporary = true}
+	self.menu = Widgets.Frame{cols = 1, expand_col = 1, depth = 5, style = "popup", temporary = true}
 	-- Copy arguments.
 	for k,v in pairs(args or {}) do
 		if type(k) ~= "number" then
