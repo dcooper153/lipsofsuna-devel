@@ -105,6 +105,7 @@ void liren_overlay_free (
 	/* Detach children. */
 	for (i = 0 ; i < self->overlays.count ; i++)
 		self->overlays.array[i]->parent = NULL;
+	lisys_free (self->overlays.array);
 
 	/* Remove from the scene. */
 	if (self->parent != NULL)
@@ -540,7 +541,7 @@ static void private_remove_overlay (
 		if (self->overlays.array[i] == child)
 		{
 			/* Remove from the array. */
-			if (self->overlays.count)
+			if (self->overlays.count > 1)
 			{
 				for (j = i ; j < self->overlays.count - 1 ; j++)
 					self->overlays.array[j] = self->overlays.array[j + 1];
