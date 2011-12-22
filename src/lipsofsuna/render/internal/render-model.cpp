@@ -345,7 +345,6 @@ static void private_create_mesh (
 	/* Create the second vertex buffer. */
 	/* Contains everything else. */
 	j = 0;
-	buffer = new float[6 * model->vertices.count];
 	for (int i = 0 ; i < model->vertices.count ; i++)
 	{
 		LIMdlVertex* v = model->vertices.array + i;
