@@ -112,13 +112,14 @@ void liren_render_overlay_add_scaled (
 	const int*   dest_position,
 	const int*   dest_size,
 	const int*   source_position,
-	const int*   source_tiling)
+	const int*   source_tiling,
+	const float* color)
 {
 	LIRenOverlay* overlay;
 
 	overlay = lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
-		liren_overlay_add_scaled (overlay, material_name, dest_position, dest_size, source_position, source_tiling);
+		liren_overlay_add_scaled (overlay, material_name, dest_position, dest_size, source_position, source_tiling, color);
 }
 
 void liren_render_overlay_add_tiled (
@@ -131,13 +132,14 @@ void liren_render_overlay_add_tiled (
 	const int*   source_position,
 	const int*   source_tiling,
 	float        rotation_angle,
-	const float* rotation_center)
+	const float* rotation_center,
+	const float* color)
 {
 	LIRenOverlay* overlay;
 
 	overlay = lialg_u32dic_find (self->overlays, id);
 	if (overlay != NULL)
-		liren_overlay_add_tiled (overlay, material_name, dest_clip, dest_position, dest_size, source_position, source_tiling, rotation_angle, rotation_center);
+		liren_overlay_add_tiled (overlay, material_name, dest_clip, dest_position, dest_size, source_position, source_tiling, rotation_angle, rotation_center, color);
 }
 
 /**

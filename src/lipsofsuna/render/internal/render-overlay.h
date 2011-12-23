@@ -64,7 +64,8 @@ LIAPICALL (void, liren_overlay_add_scaled, (
 	const int*    dest_position,
 	const int*    dest_size,
 	const int*    source_position,
-	const int*    source_tiling));
+	const int*    source_tiling,
+	const float*  color));
 
 LIAPICALL (void, liren_overlay_add_tiled, (
 	LIRenOverlay* self,
@@ -75,7 +76,8 @@ LIAPICALL (void, liren_overlay_add_tiled, (
 	const int*    source_position,
 	const int*    source_tiling,
 	float         rotation_angle,
-	const float*  rotation_center));
+	const float*  rotation_center,
+	const float*  color));
 
 LIAPICALL (void, liren_overlay_add_overlay, (
 	LIRenOverlay* self,

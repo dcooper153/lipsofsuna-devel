@@ -42,6 +42,10 @@ public:
 		rotation_center[0] = 0.0f;
 		rotation_center[1] = 0.0f;
 	}
+	void set_color (const float* color)
+	{
+		memcpy (this->color, color, 4 * sizeof (float));
+	}
 	void set_clipping (float* rect)
 	{
 		clip = rect;
@@ -79,7 +83,7 @@ public:
 protected:
 	void add_vertex (float x, float y, float u, float v)
 	{
-		if (pos >= 5 * MAX_VERTEX_COUNT)
+		if (pos >= 6 * MAX_VERTEX_COUNT)
 			return;
 		if (rotation_angle != 0.0f)
 		{
@@ -95,6 +99,11 @@ protected:
 		verts[pos++] = z;
 		verts[pos++] = u;
 		verts[pos++] = v;
+		uint8_t* c = (uint8_t*)(verts + pos++);
+		c[0] = (uint8_t) 255 * color[0];
+		c[1] = (uint8_t) 255 * color[1];
+		c[2] = (uint8_t) 255 * color[2];
+		c[3] = (uint8_t) 255 * color[3];
 	}
 	void clip_coord (float& coord, float& tex, float tex_scale, float min, float max)
 	{
@@ -114,6 +123,7 @@ protected:
 public:
 	int pos;
 	float z;
+	float color[4];
 	float* clip;
 	float* verts;
 	float rotation_angle;
@@ -132,6 +142,11 @@ LIRenImageOverlay::LIRenImageOverlay (const Ogre::String& name) : Ogre::OverlayE
 LIRenImageOverlay::~LIRenImageOverlay ()
 {
 	delete render_op.vertexData;
+}
+
+void LIRenImageOverlay::set_color (const float* color)
+{
+	memcpy (this->color, color, 4 * sizeof (float));
 }
 
 void LIRenImageOverlay::set_clipping (const int* rect)
@@ -184,6 +199,8 @@ void LIRenImageOverlay::initialise ()
 	offset += Ogre::VertexElement::getTypeSize (Ogre::VET_FLOAT3);
 	format->addElement (0, offset, Ogre::VET_FLOAT2, Ogre::VES_TEXTURE_COORDINATES);
 	offset += Ogre::VertexElement::getTypeSize (Ogre::VET_FLOAT2);
+	format->addElement (0, offset, Ogre::VET_COLOUR_ABGR, Ogre::VES_DIFFUSE);
+	offset += Ogre::VertexElement::getTypeSize (Ogre::VET_COLOUR_ABGR);
 
 	/* Create the vertex buffer. */
 	Ogre::HardwareVertexBufferSharedPtr vbuf =
@@ -208,6 +225,13 @@ void LIRenImageOverlay::getRenderOperation (Ogre::RenderOperation& op)
 
 void LIRenImageOverlay::updatePositionGeometry ()
 {
+	/* Prevent divide by zero. */
+	if (!mPixelWidth || !mPixelHeight)
+	{
+		render_op.vertexData->vertexCount = 0;
+		return;
+	}
+
 	/* Calculate vertex coordinates. */
 	float left = _getDerivedLeft() * 2.0f - 1.0f;
 	float top = 1.0f - _getDerivedTop() * 2.0f;
@@ -252,16 +276,17 @@ void LIRenImageOverlay::updatePositionGeometry ()
 	Ogre::HardwareVertexBufferSharedPtr vbuf =
 		render_op.vertexData->vertexBufferBinding->getBuffer (0);
 	float z = Ogre::Root::getSingleton().getRenderSystem()->getMaximumDepthInputValue ();
-	LIRenTilePacker packer (vbuf->lock (Ogre::HardwareBuffer::HBL_DISCARD), z);
 
-	/* Setup rotation and clipping. */
-	float clip[4];
+	/* Setup vertex packing. */
+	LIRenTilePacker packer (vbuf->lock (Ogre::HardwareBuffer::HBL_DISCARD), z);
+	packer.set_color (color);
 	if (rotation_angle != 0.0f)
 	{
 		float cx = left + xscale * rotation_center[0];
 		float cy = top - yscale * rotation_center[1];
 		packer.set_rotation (rotation_angle, cx, cy, xscale / yscale);
 	}
+	float clip[4];
 	if (clipping)
 	{
 		clip[0] = left + xscale * dst_clip[0];
@@ -313,7 +338,7 @@ void LIRenImageOverlay::updatePositionGeometry ()
 	}
 
 	/* Unlock the vertex buffer. */
-	render_op.vertexData->vertexCount = packer.pos / 5;
+	render_op.vertexData->vertexCount = packer.pos / 6;
 	vbuf->unlock();
 }
 

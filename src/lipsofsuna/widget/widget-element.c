@@ -121,12 +121,12 @@ int liwdg_widget_canvas_insert_image (
 		liren_render_overlay_add_tiled (self->manager->render, self->overlay, elem.image_name,
 			elem.dst_clip_enabled? elem.dst_clip : NULL,
 			elem.dst_pos, elem.dst_size, elem.src_pos, elem.src_tiling,
-			elem.rotation, elem.center);
+			elem.rotation, elem.center, elem.text_color);
 	}
 	else
 	{
-		liren_render_overlay_add_scaled (self->manager->render, self->overlay,
-			elem.image_name, elem.dst_pos, elem.dst_size, elem.src_pos, elem.src_tiling);
+		liren_render_overlay_add_scaled (self->manager->render, self->overlay, elem.image_name,
+			elem.dst_pos, elem.dst_size, elem.src_pos, elem.src_tiling, elem.text_color);
 	}
 
 	return 1;

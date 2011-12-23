@@ -27,6 +27,7 @@ class LIRenImageOverlay : public Ogre::OverlayElement
 public:
 	LIRenImageOverlay (const Ogre::String& name);
 	virtual ~LIRenImageOverlay ();
+	void set_color (const float* color);
 	void set_clipping (const int* rect);
 	void set_rotation (float angle, float center_x, float center_y);
 	void set_tiling (const int* source_position, const int* source_size, const int* source_tiling);
@@ -41,6 +42,7 @@ private:
 	int src_pos[2];
 	int src_size[2];
 	int src_tiling[6];
+	float color[4];
 	float rotation_angle;
 	float rotation_center[2];
 	Ogre::RenderOperation render_op;

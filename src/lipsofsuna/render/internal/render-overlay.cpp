@@ -242,6 +242,7 @@ void liren_overlay_add_text (
  * \param source_tiling Tiling pattern in pixels.
  * \param rotation_angle Rotation angle in radians.
  * \param rotation_center Rotation center position in pixels.
+ * \param color Diffuse color.
  */
 void liren_overlay_add_tiled (
 	LIRenOverlay* self,
@@ -252,7 +253,8 @@ void liren_overlay_add_tiled (
 	const int*    source_position,
 	const int*    source_tiling,
 	float         rotation_angle,
-	const float*  rotation_center)
+	const float*  rotation_center,
+	const float*  color)
 {
 	/* Get the texture size. */
 	Ogre::MaterialPtr material;
@@ -271,6 +273,7 @@ void liren_overlay_add_tiled (
 	elem->set_clipping (dest_clip);
 	elem->set_tiling (source_position, source_size, source_tiling);
 	elem->set_rotation (rotation_angle, rotation_center[0], rotation_center[1]);
+	elem->set_color (color);
 	elem->show ();
 
 	/* Add to the container. */
@@ -285,6 +288,7 @@ void liren_overlay_add_tiled (
  * \param dest_size Size in pixels.
  * \param source_position Position in pixels in the source image.
  * \param source_tiling Tiling pattern in pixels.
+ * \param color Diffuse color.
  */
 void liren_overlay_add_scaled (
 	LIRenOverlay* self,
@@ -292,7 +296,8 @@ void liren_overlay_add_scaled (
 	const int*    dest_position,
 	const int*    dest_size,
 	const int*    source_position,
-	const int*    source_tiling)
+	const int*    source_tiling,
+	const float*  color)
 {
 	/* Get the texture size. */
 	Ogre::MaterialPtr material;
