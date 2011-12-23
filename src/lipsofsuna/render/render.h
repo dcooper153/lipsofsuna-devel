@@ -43,6 +43,11 @@ LIAPICALL (int, liren_render_measure_text, (
 	int*         result_width,
 	int*         result_height));
 
+LIAPICALL (void, liren_render_project, (
+	LIRenRender*       self,
+	const LIMatVector* world,
+	LIMatVector*       screen));
+
 LIAPICALL (void, liren_render_render, (
 	LIRenRender* self));
 

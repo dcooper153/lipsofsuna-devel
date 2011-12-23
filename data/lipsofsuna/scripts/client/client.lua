@@ -49,6 +49,34 @@ Client.init = function(self)
 	self.threads.model_builder = Thread("client/threads/modelbuilder.lua")
 end
 
+Client.add_speech_text = function(self, args)
+	-- FIXME
+	Sound:effect{object = args.object, effect = "spring-000"}
+	-- Add to the chat log.
+	Gui.chat_history:append{text = "<" .. args.name .. "> " .. args.text}
+	-- Create a text bubble.
+	TextBubble{
+		life = 10,
+		fade = 10,
+		object = args.object,
+		position = Vector(0,2,0),
+		text = args.text,
+		text_color = {1,1,1,1},
+		text_font = "medium"}
+end
+
+Client.add_damage_text = function(self, args)
+	TextBubble{
+		life = 3,
+		fade = 1,
+		object = args.object,
+		position = Vector(0,2,0),
+		text = args.text,
+		text_color = args.color,
+		text_font = "medium",
+		velocity = Vector(0,-30)}
+end
+
 --- Applies a world space quake.
 -- @param self Client class.
 -- @param point Quake point in world space.

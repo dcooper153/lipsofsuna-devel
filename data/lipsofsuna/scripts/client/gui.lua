@@ -30,23 +30,26 @@ Gui.init = function(clss)
 	Gui.skills_group = Widgets.Frame{style = "quickbar"}
 	Gui.crosshair = Widgets.Icon{icon = Iconspec:find{name = "crosshair1"}}
 	-- Packing.
-	Gui.scene = Widgets.Scene{cols = 1, rows = 3, fullscreen = true, margins = {5,5,0,0}, spacings = {0,0}}
+	local extra = Widget()
+	extra:set_expand{col = 1, row = 1}
+	extra:add_child(Gui.crosshair)
+	extra:add_child(Gui.skills_group)
+	extra:add_child(Gui.notification)
+	extra:add_child(Gui.button_respawn)
+	extra:add_child(Gui.menus)
+	extra:add_child(Gui.group_dialog)
+	extra:add_child(Quickslots.group)
+	extra:add_child(Gui.modifiers)
+	extra:add_child(Gui.fps_label)
+	extra:add_child(Gui.chat_history)
+	extra:add_child(Gui.chat_label)
+	extra:add_child(Gui.chat_entry)
+	extra:add_child(Gui.skill_health)
+	extra:add_child(Gui.skill_mana)
+	Gui.scene = Widgets.Scene{cols = 1, rows = 1, fullscreen = true, margins = {5,5,0,0}, spacings = {0,0}}
 	Gui.scene:set_expand{col = 1, row = 1}
 	Gui.scene:set_request{width = 32, height = 32}
-	Gui.scene:add_child(Gui.crosshair)
-	Gui.scene:add_child(Gui.skills_group)
-	Gui.scene:add_child(Gui.notification)
-	Gui.scene:add_child(Gui.button_respawn)
-	Gui.scene:add_child(Gui.menus)
-	Gui.scene:add_child(Gui.group_dialog)
-	Gui.scene:add_child(Quickslots.group)
-	Gui.scene:add_child(Gui.modifiers)
-	Gui.scene:add_child(Gui.fps_label)
-	Gui.scene:add_child(Gui.chat_history)
-	Gui.scene:add_child(Gui.chat_label)
-	Gui.scene:add_child(Gui.chat_entry)
-	Gui.scene:add_child(Gui.skill_health)
-	Gui.scene:add_child(Gui.skill_mana)
+	Gui.scene:set_child(1, 1, extra)
 	Gui:resize()
 end
 

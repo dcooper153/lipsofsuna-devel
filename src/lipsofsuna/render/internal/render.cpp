@@ -396,6 +396,25 @@ int liren_internal_measure_text (
 }
 
 /**
+ * \brief Projects a point in the world space to the screen space.
+ * \param self Renderer.
+ * \param world Point in the world space.
+ * \param screen Return location for the point in the screen space.
+ */
+void liren_internal_project (
+	LIRenRender*       self,
+	const LIMatVector* world,
+	LIMatVector*       screen)
+{
+	Ogre::Matrix4 mat = self->data->camera->getViewMatrix ();
+	Ogre::Vector3 w (world->x, world->y, world->z);
+	Ogre::Vector3 s = mat * w;
+	screen->x = (s.x / s.z + 0.5f) * self->mode.width;
+	screen->y = (s.y / s.z + 0.5f) * self->mode.height;
+	screen->z = s.z;
+}
+
+/**
  * \brief Reloads all images, shaders and other graphics state.
  *
  * This function is called when the video mode changes in Windows. It

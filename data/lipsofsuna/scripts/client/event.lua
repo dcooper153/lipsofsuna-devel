@@ -237,6 +237,11 @@ Eventhandler{type = "tick", func = function(self, args)
 		-- Maintain the respawn widget.
 		Gui:set_dead(Client.player_object.dead)
 	end
+	-- Update text bubbles.
+	-- Must be done after camera for the bubbles to stay fixed.
+	for k,v in pairs(TextBubble.dict) do
+		k:update(args.secs)
+	end
 	-- Update the 3D cursor.
 	-- This really needs to be done every frame since the 3rd person
 	-- camera suffers greatly from any big cursor position changes.

@@ -404,13 +404,9 @@ end}
 
 Protocol:add_handler{type = "OBJECT_SPEECH", func = function(event)
 	local ok,i,m = event.packet:read("uint32", "string")
-	if ok then
-		local o = Object:find{id = i}
-		if o then
-			local n = o.name or o.spec.name
-			Speech:add{object = o, message = m}
-			Gui.chat_history:append{text = "<" .. n .. "> " .. m}
-			Sound:effect{object = o, effect = "spring-000"}
-		end
-	end
+	if not ok then return end
+	local o = Object:find{id = i}
+	if not o then return end
+	local n = o.name or o.spec.name
+	Client:add_speech_text{object = o, name = o.name or o.spec.name, text = m}
 end}

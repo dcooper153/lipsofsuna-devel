@@ -25,6 +25,20 @@
 #include <lipsofsuna/render.h>
 #include "ext-module.h"
 
+static void Render_project (LIScrArgs* args)
+{
+	LIMatVector value;
+	LIMatVector result;
+	LIExtModule* module;
+
+	if (liscr_args_geti_vector (args, 0, &value))
+	{
+		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
+		liren_render_project (module->client->render, &value, &result);
+		liscr_args_seti_vector (args, &result);
+	}
+}
+
 static void Render_set_camera_far (LIScrArgs* args)
 {
 	float value;
@@ -102,6 +116,7 @@ static void Render_set_scene_ambient (LIScrArgs* args)
 void liext_script_render (
 	LIScrScript* self)
 {
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_project", Render_project);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_camera_far", Render_set_camera_far);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_camera_near", Render_set_camera_near);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_camera_transform", Render_set_camera_transform);

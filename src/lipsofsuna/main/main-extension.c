@@ -44,7 +44,6 @@ extern LIMaiExtensionInfo liext_physics_info;
 extern LIMaiExtensionInfo liext_reload_info;
 extern LIMaiExtensionInfo liext_render_info;
 extern LIMaiExtensionInfo liext_skeleton_info;
-extern LIMaiExtensionInfo liext_speech_info;
 extern LIMaiExtensionInfo liext_sound_info;
 extern LIMaiExtensionInfo liext_thread_info;
 extern LIMaiExtensionInfo liext_tiles_info;
@@ -88,7 +87,6 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "reload", &liext_reload_info },
 		{ "render", &liext_render_info },
 		{ "skeleton", &liext_skeleton_info },
-		{ "speech", &liext_speech_info },
 		{ "sound", &liext_sound_info },
 		{ "thread", &liext_thread_info },
 		{ "tiles", &liext_tiles_info },

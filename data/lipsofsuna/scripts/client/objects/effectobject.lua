@@ -50,8 +50,6 @@ EffectObject = Class(Object)
 --- Creates a new effect.
 -- @param clss EffectObject class.
 -- @param args Arguments.<ul>
---   <li>font: Font name.</li>
---   <li>font_color: Font color table.</li>
 --   <li>life: Life time in seconds.</li>
 --   <li>model: Particle effect name.</li>
 --   <li>node: Parent node or nil.</li>
@@ -62,7 +60,6 @@ EffectObject = Class(Object)
 --   <li>sound_delay: Sound delay in seconds.</li>
 --   <li>sound_pitch: Sound effect pitch range.</li>
 --   <li>sound_positional: False to make the sound non-positional.</li>
---   <li>text: Text effect string.</li>
 --   <li>velocity: Velocity vector.</li></ul>
 -- @return Object.
 EffectObject.new = function(clss, args)
@@ -97,11 +94,6 @@ EffectObject.new = function(clss, args)
 		else
 			play()
 		end
-	end
-	-- Attach a text effect.
-	if args.text then
-		Speech:add{object = self, diffuse = args.text_color, font = args.text_font,
-			message = args.text, fade_time = args.text_fade_time, life_time = args.life}
 	end
 	-- Copy parent transformation.
 	if parent then

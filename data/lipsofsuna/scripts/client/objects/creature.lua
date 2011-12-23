@@ -71,16 +71,7 @@ Creature.set_skill = function(self, s, v, m)
 					[0x01] = {0,1,1,1},
 					[0x10] = {1,0,0,1},
 					[0x11] = {0,1,0,1}}
-				EffectObject{
-					life = 3,
-					object = self,
-					position = Vector(0,2,0),
-					realized = true,
-					text = tostring(diff),
-					text_color = colors[code],
-					text_fade_time = 1,
-					text_font = "medium",
-					velocity = Vector(0,0.5,0)}
+				Client:add_damage_text{object = self, color = colors[code], text = tostring(diff)}
 			end
 			-- Quake the camera if the player was hurt.
 			if self == Player.object and diff < -5 then

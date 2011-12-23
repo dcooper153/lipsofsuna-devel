@@ -181,6 +181,11 @@ end
 Render = Class()
 Render.class_name = "Render"
 
+Render.project = function(self, point)
+	local r = Los.render_project(point.handle)
+	return Class.new(Vector, {handle = r})
+end
+
 --- Anisotrophic filtering setting.
 -- @name Render.anisotrophy
 -- @class table

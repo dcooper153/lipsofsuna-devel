@@ -60,6 +60,11 @@ LIAPICALL (int, liren_internal_measure_text, (
 	int*         result_width,
 	int*         result_height));
 
+LIAPICALL (void, liren_internal_project, (
+	LIRenRender*       self,
+	const LIMatVector* world,
+	LIMatVector*       screen));
+
 LIAPICALL (void, liren_internal_reload, (
 	LIRenRender* self,
 	int          pass));

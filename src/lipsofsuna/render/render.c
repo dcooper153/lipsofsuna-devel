@@ -162,6 +162,20 @@ int liren_render_measure_text (
 }
 
 /**
+ * \brief Projects a point in the world space to the screen space.
+ * \param self Renderer.
+ * \param world Point in the world space.
+ * \param screen Return location for the point in the screen space.
+ */
+void liren_render_project (
+	LIRenRender*       self,
+	const LIMatVector* world,
+	LIMatVector*       screen)
+{
+	liren_internal_project (self, world, screen);
+}
+
+/**
  * \brief Renders the overlays.
  * \param self Renderer.
  */
