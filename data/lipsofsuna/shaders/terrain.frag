@@ -52,11 +52,11 @@ void main()
 	vec4 diffuse0 = texture(LOS_diffuse_texture_0, F_texcoord);
 	vec4 diffuse1 = texture(LOS_diffuse_texture_2, F_texcoord);
 	vec4 diffuse = vec4(F_color.rgb, 1.0) * mix(diffuse0, diffuse1, F_splatting);
-	vec4 light = LOS_scene_ambient;
 	float shadows[3];
 	shadows[0] = textureProj(LOS_shadow_texture_0, F_shadow[0]).x;
 	shadows[1] = textureProj(LOS_shadow_texture_1, F_shadow[1]).x;
 	shadows[2] = textureProj(LOS_shadow_texture_2, F_shadow[2]).x;
+	vec4 light = LOS_scene_ambient;
 	for(int i = 0 ; i < LIGHTS ; i++)
 	{
 		vec3 l = los_blinn_phong(F_lightv[i], F_lighthv[i],

@@ -1,5 +1,5 @@
 Player = Class()
-Player.light = Light{ambient = {0.3,0.3,0.4,1.0}, diffuse={0.7,0.7,0.8,1.0}, equation={1.5,0.1,0.1}, priority = 10, shadow_casting = true}--, spot_cutoff = 1.5, spot_exponent = 64}
+Player.light = Light{diffuse={1.0,1.0,1.0,1.0}, equation={0.2,0.04,0.004}, priority = 10, shadow_casting = true, spot_cutoff = 1.5, spot_exponent = 127}
 Player.light_spell = Light{ambient = {0.1,0.1,0.1,1}, diffuse={1,1,1,1}, equation={1.5,0,0.05}, priority = 5}
 Player.species = "aer" -- FIXME
 
@@ -119,8 +119,8 @@ Player.update_light = function(clss, secs)
 	local p = clss.object.position
 	local r = clss.object.rotation
 	-- Update the light ball.
-	clss.light.position = p + r * Vector(0.5, 2, -3)
-	clss.light.rotation = r * Quaternion{axis = Vector(0,1), angle = math.pi}
+	clss.light.position = p + r * Vector(0,18,-10)
+	clss.light.rotation = Quaternion{dir = p - clss.light.position, up = Vector(0, 1)}
 	clss.light.enabled = true
 	-- Update the light spell.
 	if clss.light_spell.enabled then
