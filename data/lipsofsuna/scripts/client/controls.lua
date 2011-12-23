@@ -435,14 +435,14 @@ Action{name = "use", mode = "press", key1 = Keysym.e, func = function()
 	end
 end}
 
-Action{name = "zoom", mode = "analog", key1 = "mouse4", key2 = "mouse5", func = function(v)
+Action{name = "zoom", mode = "analog", key1 = "mousez", key2 = "", func = function(v)
 	if Client.mode == "game" then
 		-- Game controls.
-		Client.camera:zoom{rate = 1 * v}
+		Client.camera:zoom{rate = -v}
 	elseif Client.mode == "editor" then
 		-- Editor controls.
 		if Program.cursor_grabbed and v ~= 0 then
-			Client.views.editor.editor:extrude(v < 0)
+			Client.views.editor.editor:extrude(v > 0)
 		end
 	end
 end}

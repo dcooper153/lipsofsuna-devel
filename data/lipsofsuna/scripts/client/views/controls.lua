@@ -98,6 +98,11 @@ Views.Controls.input = function(self, args)
 	elseif args.type == "mousepress" then
 		a[k] = string.format("mouse%d", args.button)
 		accept = true
+	elseif args.type == "mousescroll" then
+		a.key1 = "mousez"
+		a.key2 = nil
+		accept = true
+		self.editing_binding_key = "key2"
 	elseif args.type == "mousemotion" and a.mode == "analog" then
 		local v = Vector(args.dx, args.dy)
 		local n = self.editing_binding_motion + v

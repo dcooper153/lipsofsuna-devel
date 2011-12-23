@@ -144,7 +144,7 @@ end
 -- @param args Event arguments.
 Widgets.ComboBox.scrolled = function(self, args)
 	if self.menu.rows == 0 then return end
-	if args.button == 5 then
+	if args.rel < 0 then
 		-- Previous item.
 		if self.value > 1 then
 			self:activate{index = self.value - 1}

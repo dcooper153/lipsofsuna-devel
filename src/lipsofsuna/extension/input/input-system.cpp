@@ -131,19 +131,26 @@ bool LIInpSystem::keyReleased (const OIS::KeyEvent& event)
 
 bool LIInpSystem::mouseMoved (const OIS::MouseEvent& event)
 {
-	limai_program_event (this->input->program, "mousemotion", "x", LISCR_TYPE_INT, event.state.X.abs, "y", LISCR_TYPE_INT, event.state.Y.abs, "dx", LISCR_TYPE_INT, event.state.X.rel, "dy", LISCR_TYPE_INT, event.state.Y.rel, NULL);
+	if (event.state.X.rel || event.state.Y.rel)
+	{
+		limai_program_event (this->input->program, "mousemotion", "x", LISCR_TYPE_INT, event.state.X.abs, "y", LISCR_TYPE_INT, event.state.Y.abs, "dx", LISCR_TYPE_INT, event.state.X.rel, "dy", LISCR_TYPE_INT, event.state.Y.rel, NULL);
+	}
+	if (event.state.Z.rel)
+	{
+		limai_program_event (this->input->program, "mousescroll", "abs", LISCR_TYPE_INT, event.state.Z.abs, "rel", LISCR_TYPE_INT, event.state.Z.rel, NULL);
+	}
 	return true;
 }
 
 bool LIInpSystem::mousePressed (const OIS::MouseEvent& event, OIS::MouseButtonID id)
 {
-	limai_program_event (this->input->program, "mousepress", "button", LISCR_TYPE_INT, translate_mouse_button (id), "x", LISCR_TYPE_INT, event.state.X.abs, "y", LISCR_TYPE_INT, event.state.Y.abs, "dx", LISCR_TYPE_INT, event.state.X.rel, "dy", LISCR_TYPE_INT, event.state.Y.rel, NULL);
+	limai_program_event (this->input->program, "mousepress", "button", LISCR_TYPE_INT, translate_mouse_button (id), "x", LISCR_TYPE_INT, event.state.X.abs, "y", LISCR_TYPE_INT, event.state.Y.abs, NULL);
 	return true;
 }
 
 bool LIInpSystem::mouseReleased (const OIS::MouseEvent& event, OIS::MouseButtonID id)
 {
-	limai_program_event (this->input->program, "mouserelease", "button", LISCR_TYPE_INT, translate_mouse_button (id), "x", LISCR_TYPE_INT, event.state.X.abs, "y", LISCR_TYPE_INT, event.state.Y.abs, "dx", LISCR_TYPE_INT, event.state.X.rel, "dy", LISCR_TYPE_INT, event.state.Y.rel, NULL);
+	limai_program_event (this->input->program, "mouserelease", "button", LISCR_TYPE_INT, translate_mouse_button (id), "x", LISCR_TYPE_INT, event.state.X.abs, "y", LISCR_TYPE_INT, event.state.Y.abs, NULL);
 	return true;
 }
 

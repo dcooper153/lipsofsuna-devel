@@ -94,7 +94,7 @@ Widgets.Scrollbar.reshaped = function(self)
 end
 
 Widgets.Scrollbar.scrolled = function(self, args)
-	if args.button == 4 then
+	if args.rel > 0 then
 		-- Scroll up.
 		if self.scroll_offset >= 1 then
 			self.scroll_offset = self.scroll_offset - 1

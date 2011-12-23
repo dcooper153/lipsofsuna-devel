@@ -51,6 +51,8 @@ Action.event = function(clss, args, list)
 		digital("mouse" .. args.button, true)
 	elseif args.type == "mouserelease" then
 		digital("mouse" .. args.button, false)
+	elseif args.type == "mousescroll" then
+		analog("mousez", args.rel < 0 and -1 or 1)
 	elseif args.type == "keypress" then
 		digital(args.code, true)
 	elseif args.type == "keyrelease" then

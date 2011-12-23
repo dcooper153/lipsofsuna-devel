@@ -67,11 +67,7 @@ Eventhandler{type = "mousepress", func = function(self, args)
 		end
 	else
 		-- Normal input.
-		if args.button == 4 and Drag.drag then
-			Drag:change_count(1)
-		elseif args.button == 5 and Drag.drag then
-			Drag:change_count(-1)
-		elseif Client.mode ~= "game" then
+		if Client.mode ~= "game" then
 			Widgets:handle_event(args)
 			Action:event(args, {})
 		else
@@ -96,6 +92,36 @@ Eventhandler{type = "mouserelease", func = function(self, args)
 	else
 		-- Normal input.
 		if Client.mode ~= "game" then
+			Widgets:handle_event(args)
+			Action:event(args, {})
+		else
+			Action:event(args)
+		end
+	end
+end}
+
+Eventhandler{type = "mousescroll", func = function(self, args)
+	if Client.views.controls.editing_binding then
+		-- Binding input.
+		Client.views.controls:input(args)
+		Action:event(args, {})
+	elseif Client.mode == "editor" then
+		-- Editor input.
+		if not Program.cursor_grabbed then
+			Widgets:handle_event(args)
+			Action:event(args, editor_gui_actions)
+		else
+			Action:event(args)
+		end
+	else
+		-- Normal input.
+		if Drag.drag then
+			if args.rel > 0 then
+				Drag:change_count(1)
+			else
+				Drag:change_count(-1)
+			end
+		elseif Client.mode ~= "game" then
 			Widgets:handle_event(args)
 			Action:event(args, {})
 		else

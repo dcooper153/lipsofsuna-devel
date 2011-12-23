@@ -10,16 +10,15 @@ Widgets.handle_event = function(clss, args)
 	if Program.cursor_grabbed then return end
 	local generic = {keypress = true, keyrelease = true, mousemotion = true, mouserelease = true}
 	if args.type == "mousepress" then
-		-- Mouse button pressed or wheel scrolled.
-		if args.button ~= 4 and args.button ~= 5 then
-			local w = clss:find_handler_widget("pressed")
-			if clss:handle_popups(w) then return end
-			if w then return w:pressed(args) end
-		else
-			local w = clss:find_handler_widget("scrolled")
-			if clss:handle_popups(w) then return end
-			if w then return w:scrolled(args) end
-		end
+		-- Buttons.
+		local w = clss:find_handler_widget("pressed")
+		if clss:handle_popups(w) then return end
+		if w then return w:pressed(args) end
+	elseif args.type == "mousescroll" then
+		-- Scroll wheel.
+		local w = clss:find_handler_widget("scrolled")
+		if clss:handle_popups(w) then return end
+		if w then return w:scrolled(args) end
 	elseif generic[args.type] then
 		-- Other events.
 		local w = clss:find_handler_widget("event")

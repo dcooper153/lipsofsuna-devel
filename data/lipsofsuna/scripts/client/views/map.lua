@@ -12,7 +12,7 @@ Views.Map.new = function(clss)
 		help = function() Client.views.help:show("map") end}
 	self.frame = Widgets.Frame{style = "default", request = Vector(400, 400)}
 	self.frame.scrolled = function(w, args)
-		if args.button == 4 then
+		if args.rel > 0 then
 			self.scale = self.scale * 1.5
 		else
 			self.scale = self.scale / 1.5
