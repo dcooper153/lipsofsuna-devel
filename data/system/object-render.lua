@@ -89,13 +89,29 @@ Object.set_effect = function(self, ...)
 	Los.object_set_effect(self.handle, ...)
 end
 
+--- The particle system of the object.
+-- @name Object.particle
+-- @class table
+
+--- Toggles shadow casting for the object.
+-- @name Object.shadow_casting
+-- @class table
+
 Object:add_getters{
+	particle = function(s)
+		return rawget(s, "__particle")
+	end,
 	shadow_casting = function(s)
-		local v = rawset(s, "__shadow_casting")
+		local v = rawget(s, "__shadow_casting")
 		return (v ~= nil) and v or false
 	end}
 
 Object:add_setters{
+	particle = function(s,v )
+		rawset(s, "__particle", v)
+		rawset(s, "__model", nil)
+		Los.object_set_particle(s.handle, v)
+	end,
 	shadow_casting = function(s, v)
 		rawset(s, "__shadow_casting", v)
 		Los.object_set_shadow_casting(s.handle, v)

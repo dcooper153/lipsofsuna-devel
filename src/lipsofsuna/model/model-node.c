@@ -257,6 +257,7 @@ void limdl_node_rebuild (
 	else
 		tp = NULL;
 	private_calculate_world_transform (self, ts, tp);
+	self->pose_transform = *ts;
 
 	/* Rebuild children. */
 	if (recursive)

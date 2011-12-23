@@ -45,6 +45,7 @@ typedef struct _LIRenRenderData LIRenRenderData;
 #include <OgreOverlay.h>
 #include <OgreOverlayContainer.h>
 #include <OgreOverlayManager.h>
+#include <OgreParticleSystem.h>
 #include <OgreRenderWindow.h>
 #include <OgreRoot.h>
 #include <OgreSceneManager.h>
@@ -69,6 +70,7 @@ struct _LIRenModelData
 struct _LIRenObjectData
 {
 	Ogre::Entity* entity;
+	Ogre::ParticleSystem* particles;
 	Ogre::SceneNode* node;
 };
 struct _LIRenOverlayData

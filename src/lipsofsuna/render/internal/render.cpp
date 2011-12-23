@@ -77,6 +77,7 @@ int liren_internal_init (
 	/* Load plugins. */
 	private_load_plugin (self, "RenderSystem_GL");
 	private_load_plugin (self, "Plugin_OctreeSceneManager");
+	private_load_plugin (self, "Plugin_ParticleFX");
 
 	/* Make sure that the required plugins were loaded. */
 	if (!private_check_plugin (self, "GL RenderSystem") ||

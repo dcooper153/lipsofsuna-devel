@@ -257,26 +257,22 @@ int liren_object_find_node (
 {
 	float scale;
 	LIMatTransform transform;
-	LIMatTransform transform1;
 	LIMdlNode* node;
 
 	/* Find the node. */
-	if (self->pose == NULL)
+	if (self->model == NULL || self->model->model == NULL)
 		return 0;
-	node = limdl_pose_find_node (self->pose, name);
+	if (self->pose == NULL)
+		node = limdl_model_find_node (self->model->model, name);
+	else
+		node = limdl_pose_find_node (self->pose, name);
 	if (node == NULL)
 		return 0;
 
 	/* Get the transformation. */
+	limdl_node_get_world_transform (node, &scale, &transform);
 	if (world)
-	{
-		limdl_node_get_world_transform (node, &scale, &transform);
-		/* TODO: transform1 = self->v32->transform */
-		/* FIXME */ transform1 = limat_transform_identity ();
-		transform = limat_transform_multiply (transform1, transform);
-	}
-	else
-		limdl_node_get_world_transform (node, &scale, &transform);
+		transform = limat_transform_multiply (self->transform, transform);
 	*result = transform;
 
 	return 1;
@@ -381,12 +377,17 @@ int liren_object_set_model (
 
 	self->model = model;
 
-	/* Remove the old entity. */
+	/* Remove the old entity or particle system. */
+	self->data->node->detachAllObjects ();
 	if (self->data->entity != NULL)
 	{
-		self->data->node->detachAllObjects ();
 		self->render->data->scene_manager->destroyEntity (self->data->entity);
 		self->data->entity = NULL;
+	}
+	if (self->data->particles != NULL)
+	{
+		self->render->data->scene_manager->destroyParticleSystem (self->data->particles);
+		self->data->particles = NULL;
 	}
 
 	/* Attach a new entity to the scene node. */
@@ -420,16 +421,42 @@ int liren_object_set_model (
 }
 
 /**
- * \brief Sets the pose of the object.
+ * \brief Sets the particle effect of the object.
  * \param self Object.
- * \param pose Pose.
+ * \param name Particle effect name.
  * \return Nonzero on success.
  */
-int liren_object_set_pose (
+int liren_object_set_particle (
 	LIRenObject* self,
-	LIMdlPose*   pose)
+	const char*  name)
 {
-	/* TODO */
+	/* Remove the pose. */
+	if (self->pose != NULL)
+	{
+		limdl_pose_free (self->pose);
+		self->pose = NULL;
+	}
+
+	/* Remove the existing model or particle system. */
+	self->data->node->detachAllObjects ();
+	if (self->data->entity != NULL)
+	{
+		self->render->data->scene_manager->destroyEntity (self->data->entity);
+		self->data->entity = NULL;
+	}
+	if (self->data->particles != NULL)
+	{
+		self->render->data->scene_manager->destroyParticleSystem (self->data->particles);
+		self->data->particles = NULL;
+	}
+	self->model = NULL;
+
+	/* Attach a new particle system to the scene node. */
+	Ogre::String e_name = private_unique_id (self);
+	self->data->particles = self->render->data->scene_manager->createParticleSystem (e_name, name);
+	if (self->data->particles != NULL)
+		self->data->node->attachObject (self->data->particles);
+
 	return 1;
 }
 
@@ -470,6 +497,7 @@ void liren_object_set_transform (
 	LIRenObject*          self,
 	const LIMatTransform* value)
 {
+	self->transform = *value;
 	self->data->node->setPosition (value->position.x, value->position.y, value->position.z);
 	self->data->node->setOrientation (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z);
 }

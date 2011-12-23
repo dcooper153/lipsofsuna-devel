@@ -98,6 +98,11 @@ LIAPICALL (void, liren_render_object_set_model, (
 	int          id,
 	int          model));
 
+LIAPICALL (void, liren_render_object_set_particle, (
+	LIRenRender* self,
+	int          id,
+	const char*  name));
+
 LIAPICALL (void, liren_render_object_set_realized, (
 	LIRenRender* self,
 	int          id,

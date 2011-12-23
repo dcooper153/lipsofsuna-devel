@@ -118,7 +118,7 @@ Object.set_model = function(self, skip)
 					equation = v.equation, position = self.position, enabled = true}
 				table.insert(self.special_effects, fx)
 			else
-				local fx = Object{model = v.model, node = v.node, position = self.position, realized = true}
+				local fx = Object{particle = v.model, node = v.node, position = self.position, realized = true}
 				table.insert(self.special_effects, fx)
 			end
 		end

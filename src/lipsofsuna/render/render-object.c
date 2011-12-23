@@ -220,6 +220,24 @@ void liren_render_object_set_model (
 }
 
 /**
+ * \brief Sets the particle system of the object.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \param name Particle system name.
+ */
+void liren_render_object_set_particle (
+	LIRenRender* self,
+	int          id,
+	const char*  name)
+{
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		liren_object_set_particle (object, name);
+}
+
+/**
  * \brief Sets the realized flag of the object.
  * \param self Renderer.
  * \param id Object ID.
