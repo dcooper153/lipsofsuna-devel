@@ -1,4 +1,7 @@
+require "system/class"
+
 Bitwise = Class()
+Bitwise.class_name = "Bitwise"
 
 Bitwise.bchk = function(clss, x, y)
 	return x % (y + y) >= y

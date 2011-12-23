@@ -1,3 +1,4 @@
+require "system/bitwise"
 require "system/config-file"
 require "system/core"
 require "system/coroutine"
@@ -26,7 +27,6 @@ end
 Voxel.blocks_per_line = 2
 Voxel.tiles_per_line = 12
 require "common/actionspec"
-require "common/bitwise"
 require "common/color"
 require "common/crafting"
 require "common/dialogspec"
