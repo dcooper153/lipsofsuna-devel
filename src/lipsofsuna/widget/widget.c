@@ -364,6 +364,8 @@ int liwdg_widget_detach (
 	{
 		liwdg_manager_remove_window (self->manager, self);
 		self->floating = 0;
+		self->above = NULL;
+		self->below = NULL;
 		changed = 1;
 	}
 	else if (self->parent != NULL)
@@ -371,6 +373,11 @@ int liwdg_widget_detach (
 		liwdg_widget_detach_child (self->parent, self);
 		lisys_assert (self->parent == NULL);
 		changed = 1;
+	}
+	else
+	{
+		lisys_assert (self->above == NULL);
+		lisys_assert (self->below == NULL);
 	}
 
 	return changed;
@@ -1282,6 +1289,10 @@ static void private_call_detach (
 	child = self->cells[x + y * self->width].child;
 	if (child != NULL)
 	{
+		lisys_assert (child->parent == self);
+		lisys_assert (child->above == NULL);
+		lisys_assert (child->below == NULL);
+
 		/* Remove from the cell. */
 		child->parent = NULL;
 		self->cells[x + y * self->width].child = NULL;
@@ -1295,6 +1306,8 @@ static void private_call_detach_manual (
 	LIWdgWidget* self,
 	LIWdgWidget* child)
 {
+	lisys_assert (child->parent == self);
+
 	/* Remove from the widget. */
 	if (child->above != NULL)
 		child->above->above = child->below;
