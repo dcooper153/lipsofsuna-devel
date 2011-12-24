@@ -624,11 +624,14 @@ static void private_load_plugin (
 	Ogre::String path(Ogre::String(self->paths->root) + "/plugins/");
 #endif
 
-#ifdef _DEBUG
-	self->data->root->loadPlugin (path + name + Ogre::String("_d"));
-#else
-	self->data->root->loadPlugin (path + name);
-#endif
+	try
+	{
+		self->data->root->loadPlugin (path + name);
+	}
+	catch (...)
+	{
+		self->data->root->loadPlugin (path + name + Ogre::String("_d"));
+	}
 }
 
 static int private_check_plugin (
