@@ -1310,7 +1310,7 @@ static void private_call_detach_manual (
 
 	/* Remove from the widget. */
 	if (child->above != NULL)
-		child->above->above = child->below;
+		child->above->below = child->below;
 	else
 		self->children = child->below;
 	if (child->below != NULL)
