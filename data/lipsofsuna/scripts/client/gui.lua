@@ -46,7 +46,7 @@ Gui.init = function(clss)
 	extra:add_child(Gui.chat_entry)
 	extra:add_child(Gui.skill_health)
 	extra:add_child(Gui.skill_mana)
-	Gui.scene = Widgets.Scene{cols = 1, rows = 1, fullscreen = true, margins = {5,5,0,0}, spacings = {0,0}}
+	Gui.scene = Widgets.Scene{cols = 1, rows = 1, fullscreen = true, margins = {0,5,0,0}, spacings = {0,0}}
 	Gui.scene:set_expand{col = 1, row = 1}
 	Gui.scene:set_request{width = 32, height = 32}
 	Gui.scene:set_child(1, 1, extra)
