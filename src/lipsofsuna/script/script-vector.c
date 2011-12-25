@@ -52,6 +52,7 @@ static void Vector_mul (LIScrArgs* args)
 	if (!liscr_args_geti_float (args, 0, &s))
 		return;
 
+	lisys_assert (!isnanf (s));
 	tmp = limat_vector_multiply (*((LIMatVector*) args->self), s);
 	liscr_args_seti_vector (args, &tmp);
 }
@@ -121,7 +122,9 @@ static void Vector_get_x (LIScrArgs* args)
 }
 static void Vector_set_x (LIScrArgs* args)
 {
-	liscr_args_geti_float (args, 0, &((LIMatVector*) args->self)->x);
+	LIMatVector* self = args->self;
+	liscr_args_geti_float (args, 0, &self->x);
+	lisys_assert (!isnanf (self->x));
 }
 
 static void Vector_get_y (LIScrArgs* args)
@@ -130,7 +133,9 @@ static void Vector_get_y (LIScrArgs* args)
 }
 static void Vector_set_y (LIScrArgs* args)
 {
-	liscr_args_geti_float (args, 0, &((LIMatVector*) args->self)->y);
+	LIMatVector* self = args->self;
+	liscr_args_geti_float (args, 0, &self->y);
+	lisys_assert (!isnanf (self->y));
 }
 
 static void Vector_get_z (LIScrArgs* args)
@@ -139,7 +144,9 @@ static void Vector_get_z (LIScrArgs* args)
 }
 static void Vector_set_z (LIScrArgs* args)
 {
-	liscr_args_geti_float (args, 0, &((LIMatVector*) args->self)->z);
+	LIMatVector* self = args->self;
+	liscr_args_geti_float (args, 0, &self->z);
+	lisys_assert (!isnanf (self->z));
 }
 
 /*****************************************************************************/

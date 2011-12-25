@@ -171,6 +171,7 @@ static void Object_set_rotation (LIScrArgs* args)
 	{
 		lieng_object_get_transform (args->self, &transform);
 		transform.rotation = *((LIMatQuaternion*) quat->data);
+		limat_quaternion_normalize (transform.rotation);
 		lieng_object_set_transform (args->self, &transform);
 	}
 }

@@ -143,6 +143,7 @@ static void Light_set_rotation (LIScrArgs* args)
 	{
 		liren_render_light_get_transform (light->module->render, light->id, &transform);
 		transform.rotation = value;
+		limat_quaternion_normalize (transform.rotation);
 		liren_render_light_set_transform (light->module->render, light->id, &transform);
 	}
 }
