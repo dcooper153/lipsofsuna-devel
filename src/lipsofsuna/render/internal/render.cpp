@@ -26,13 +26,14 @@
 
 #include "render-internal.h"
 #include "render-container-factory.hpp"
-#include <OgreLogManager.h>
-#include <OgreViewport.h>
 #include <OgreEntity.h>
-#include <OgreWindowEventUtilities.h>
-#include <OgrePlugin.h>
 #include <OgreFontManager.h>
-#include <OgreBorderPanelOverlayElement.h>
+#include <OgreLogManager.h>
+#include <OgrePlugin.h>
+#include <OgreRenderSystemCapabilitiesManager.h>
+#include <OgreRenderSystemCapabilitiesSerializer.h>
+#include <OgreViewport.h>
+#include <OgreWindowEventUtilities.h>
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
 #include <X11/Xlib.h>
 #endif
@@ -117,9 +118,46 @@ int liren_internal_init (
 
 	/* Initialize the render window. */
 	self->data->root->setRenderSystem (self->data->render_system);
+
+
+	/* Initialize custom render system capabilities. */
+	/* This is a debug feature that allows emulating older hardware by setting
+	   the LOS_READ_RENDERCAPS environment variable. */
+	if (getenv ("LOS_READ_RENDERCAPS"))
+	{
+		Ogre::String dirname = data1 + "/debug";
+		Ogre::String capsname = getenv ("LOS_READ_RENDERCAPS");
+		Ogre::RenderSystemCapabilitiesManager* rscm = Ogre::RenderSystemCapabilitiesManager::getSingletonPtr ();
+		rscm->parseCapabilitiesFromArchive (dirname, "FileSystem", true);
+		Ogre::RenderSystemCapabilities* caps = rscm->loadParsedCapabilities (capsname);
+		if (caps != NULL)
+		{
+			self->data->root->useCustomRenderSystemCapabilities (caps);
+			printf ("NOTE: read rendercaps `%s'\n", capsname.c_str ());
+		}
+		else
+		{
+			lisys_error_set (EINVAL, "could not find rendercaps `%s'", capsname.c_str ());
+			lisys_error_report ();
+		}
+	}
+
 	self->data->render_window = self->data->root->initialise (true, "Lips of Suna");
 	self->mode = *mode;
 	private_update_mode (self);
+
+	/* Dump the render system capabilities. */
+	/* The rendercaps files require all the fields to be present so we can't
+	   realistically expect anyone to write them manually. */
+	if (getenv ("LOS_WRITE_RENDERCAPS"))
+	{
+		const Ogre::RenderSystemCapabilities* caps = self->data->render_system->getCapabilities ();
+		Ogre::RenderSystemCapabilitiesSerializer s;
+		Ogre::String capsname = getenv ("LOS_WRITE_RENDERCAPS");
+		Ogre::String filename = data1 + "/debug/" + capsname + ".rendercaps";
+		s.writeScript (caps, capsname, filename);
+		printf ("NOTE: dumped rendercaps to `%s'\n", filename.c_str ());
+	}
 
 	/* Initialize the scene manager. */
 	self->data->scene_manager = self->data->root->createSceneManager("OctreeSceneManager", "DefaultSceneManager");
