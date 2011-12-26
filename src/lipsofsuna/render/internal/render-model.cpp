@@ -43,8 +43,22 @@ static void private_create_skeleton (
 	LIRenModel* self,
 	LIMdlModel* model);
 
-static bool private_check_override (
+static bool private_check_material_override (
+	LIRenModel*        self,
+	Ogre::MaterialPtr& material);
+
+static bool private_check_name_override (
 	const Ogre::String& name);
+
+static void private_initialize_pass (
+	LIRenModel*    self,
+	LIMdlMaterial* mat,
+	Ogre::Pass*    pass);
+
+static void private_override_pass (
+	LIRenModel*    self,
+	LIMdlMaterial* mat,
+	Ogre::Pass*    pass);
 
 static Ogre::String private_unique_id (
 	LIRenModel* self);
@@ -185,33 +199,24 @@ static void private_create_material (
 	int            index,
 	Ogre::SubMesh* submesh)
 {
-	bool newmat = true;
-	bool overridden = false;
+	bool existing = false;
 	Ogre::MaterialPtr material;
 	Ogre::String unique_name = private_unique_material (self, index);
 
-	/* Load or create a material. */
-	/* If the model specifies the name of the material to be used, we use
-	   an Ogre material. Some properties of loaded materials may be subject
-	   to overriding. If no material is loaded, a new one is created. */
+	/* Try to load an existing material. */
 	if (mat->material != NULL && mat->material[0] != '\0')
 	{
 		Ogre::String name = Ogre::String (mat->material);
 		material = self->render->data->material_manager->getByName (name);
 		if (!material.isNull())
-			newmat = false;
+			existing = true;
 	}
-	if (newmat)
+
+	/* Create a new material if an existing one was not found. */
+	if (!existing)
 	{
 		const Ogre::String& group = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
 		material = self->render->data->material_manager->create (unique_name, group);
-	}
-
-	/* Set material properties. */
-	/* Loaded materials get them from the material script so only newly
-	   created materials need to use the properties from the model file. */
-	if (newmat)
-	{
 		if (mat->flags & LIMDL_MATERIAL_FLAG_TRANSPARENCY)
 			material->setSceneBlending (Ogre::SBT_TRANSPARENT_ALPHA);
 		if (mat->flags & LIMDL_MATERIAL_FLAG_CULLFACE)
@@ -220,64 +225,23 @@ static void private_create_material (
 			material->setCullingMode (Ogre::CULL_NONE);
 	}
 
-	/* Get the first pass. */
-	Ogre::Technique* technique = material->getTechnique (0);
-	Ogre::Pass* pass = technique->getPass (0);
-
-	/* Set pass properties. */
-	/* If this is a newly created material or the name of the first pass
-	   starts with the string "LOS", we override some of the parameters. */
-	if (newmat || private_check_override (pass->getName ()))
+	/* Instantiate the material if it needs to be overridden. */
+	if (existing)
 	{
-		if (!newmat && !overridden)
-		{
-			material = material->clone (unique_name);
-			technique = material->getTechnique (0);
-			pass = technique->getPass (0);
-			overridden = true;
-		}
-		pass->setSelfIllumination (mat->emission, mat->emission, mat->emission);
-		pass->setShininess (mat->shininess);
-		pass->setDiffuse (Ogre::ColourValue (mat->diffuse[0], mat->diffuse[1], mat->diffuse[2], mat->diffuse[3]));
-		pass->setSpecular (Ogre::ColourValue (mat->specular[0], mat->specular[1], mat->specular[2], mat->specular[3]));
-		pass->setVertexColourTracking (Ogre::TVC_DIFFUSE);
+		if (!private_check_material_override (self, material))
+			return;
+		material = material->clone (unique_name);
 	}
 
-	/* Setup texture units. */
-	/* If this is a new material, recreate the texture units from scratch.
-	   Otherwise, override texture units whose names start with "LOS". */
-	if (newmat)
+	/* Override the fields of techniques. */
+	for (int i = 0 ; i < material->getNumTechniques () ; i++)
 	{
-		pass->removeAllTextureUnitStates ();
-		for (int i = 0 ; i < mat->textures.count && i < 1 ; i++)
-		{
-			Ogre::String tex = Ogre::String (mat->textures.array[i].string);
-			pass->createTextureUnitState (tex + ".dds");
-		}
-	}
-	else
-	{
-		int j = 0;
-		for (int i = 0 ; i < pass->getNumTextureUnitStates () ; i++)
-		{
-			if (j >= mat->textures.count)
-				break;
-			Ogre::TextureUnitState* state = pass->getTextureUnitState (i);
-			if (private_check_override (state->getName ()))
-			{
-				if (!overridden)
-				{
-					material = material->clone (unique_name);
-					technique = material->getTechnique (0);
-					pass = technique->getPass (0);
-					state = pass->getTextureUnitState (i);
-					overridden = true;
-				}
-				Ogre::String tex = Ogre::String (mat->textures.array[j].string);
-				state->setTextureName (tex + ".dds");
-				j++;
-			}
-		}
+		Ogre::Technique* technique = material->getTechnique (i);
+		Ogre::Pass* pass = technique->getPass (0);
+		if (existing)
+			private_override_pass (self, mat, pass);
+		else
+			private_initialize_pass (self, mat, pass);
 	}
 
 	/* Assign the material to the submesh. */
@@ -466,7 +430,31 @@ static void private_create_skeleton (
 	}
 }
 
-static bool private_check_override (
+static bool private_check_material_override (
+	LIRenModel*        self,
+	Ogre::MaterialPtr& material)
+{
+	for (int k = 0 ; k < material->getNumTechniques () ; k++)
+	{
+		/* Check if the pass needs to be overridden. */
+		Ogre::Technique* tech = material->getTechnique (k);
+		Ogre::Pass* pass = tech->getPass (0);
+		if (private_check_name_override (pass->getName ()))
+			return true;
+
+		/* Check if any textures need to be overridden. */
+		for (int i = 0 ; i < pass->getNumTextureUnitStates () ; i++)
+		{
+			Ogre::TextureUnitState* state = pass->getTextureUnitState (i);
+			if (private_check_name_override (state->getName ()))
+				return true;
+		}
+	}
+
+	return false;
+}
+
+static bool private_check_name_override (
 	const Ogre::String& name)
 {
 	if (name.size () < 3)
@@ -474,6 +462,60 @@ static bool private_check_override (
 	if (name[0] != 'L' || name[1] != 'O' || name[2] != 'S')
 		return 0;
 	return 1;
+}
+
+static void private_initialize_pass (
+	LIRenModel*    self,
+	LIMdlMaterial* mat,
+	Ogre::Pass*    pass)
+{
+	/* Initialize pass properties. */
+	pass->setSelfIllumination (mat->emission, mat->emission, mat->emission);
+	pass->setShininess (mat->shininess);
+	pass->setDiffuse (Ogre::ColourValue (mat->diffuse[0], mat->diffuse[1], mat->diffuse[2], mat->diffuse[3]));
+	pass->setSpecular (Ogre::ColourValue (mat->specular[0], mat->specular[1], mat->specular[2], mat->specular[3]));
+	pass->setVertexColourTracking (Ogre::TVC_DIFFUSE);
+
+	/* Initialize texture units. */
+	for (int i = 0 ; i < mat->textures.count && i < 1 ; i++)
+	{
+		Ogre::String tex = Ogre::String (mat->textures.array[i].string);
+		pass->createTextureUnitState (tex + ".dds");
+	}
+}
+
+static void private_override_pass (
+	LIRenModel*    self,
+	LIMdlMaterial* mat,
+	Ogre::Pass*    pass)
+{
+	/* Set pass properties. */
+	/* If this is a newly created material or the name of the first pass
+	   starts with the string "LOS", we override some of the parameters. */
+	if (private_check_name_override (pass->getName ()))
+	{
+		pass->setSelfIllumination (mat->emission, mat->emission, mat->emission);
+		pass->setShininess (mat->shininess);
+		pass->setDiffuse (Ogre::ColourValue (mat->diffuse[0], mat->diffuse[1], mat->diffuse[2], mat->diffuse[3]));
+		pass->setSpecular (Ogre::ColourValue (mat->specular[0], mat->specular[1], mat->specular[2], mat->specular[3]));
+		pass->setVertexColourTracking (Ogre::TVC_DIFFUSE);
+	}
+
+	/* Override texture units. */
+	/* Texture units whose names start with "LOS" are considered overridable. */
+	int j = 0;
+	for (int i = 0 ; i < pass->getNumTextureUnitStates () ; i++)
+	{
+		if (j >= mat->textures.count)
+			break;
+		Ogre::TextureUnitState* state = pass->getTextureUnitState (i);
+		if (private_check_name_override (state->getName ()))
+		{
+			Ogre::String tex = Ogre::String (mat->textures.array[j].string);
+			state->setTextureName (tex + ".dds");
+			j++;
+		}
+	}
 }
 
 static Ogre::String private_unique_id (
