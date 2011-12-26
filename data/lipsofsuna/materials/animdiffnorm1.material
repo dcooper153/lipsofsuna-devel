@@ -1,4 +1,4 @@
-material animskin1
+material animdiffnorm1
 {
 	receive_shadows off
 	technique

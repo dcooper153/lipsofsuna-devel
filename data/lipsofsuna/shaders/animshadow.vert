@@ -1,4 +1,4 @@
-#version 150
+#version 130
 uniform mat4 LOS_matrix_modelviewproj;
 uniform mat4 LOS_matrix_world_inverse;
 uniform mat4x3 LOS_skeletal_matrix[BONES];

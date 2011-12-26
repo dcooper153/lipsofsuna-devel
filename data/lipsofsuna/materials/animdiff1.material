@@ -1,4 +1,4 @@
-material animskin1
+material animdiff1
 {
 	receive_shadows off
 	technique
@@ -13,9 +13,8 @@ material animskin1
 			{
 				texture aer1.dds
 			}
-			texture_unit LOS2
+			texture_unit
 			{
-				texture aer1n.dds
 			}
 			texture_unit
 			{
@@ -27,10 +26,10 @@ material animskin1
 				texture celramp2.png 1d
 				tex_address_mode clamp
 			}
-			vertex_program_ref skin_vert
+			vertex_program_ref animdiff_vert
 			{
 			}
-			fragment_program_ref skin_frag
+			fragment_program_ref animdiff_frag
 			{
 			}
 			shadow_caster_vertex_program_ref animshadow_vert

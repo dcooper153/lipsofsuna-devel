@@ -40,4 +40,17 @@ material terrain1
 			}
 		}
 	}
+	technique
+	{
+		pass
+		{
+			ambient 0.3 0.3 0.3
+			diffuse 1.0 1.0 1.0
+			specular 0.5 0.5 0.5 0.5 64
+			texture_unit LOS1
+			{
+				texture granite1.dds
+			}
+		}
+	}
 }
