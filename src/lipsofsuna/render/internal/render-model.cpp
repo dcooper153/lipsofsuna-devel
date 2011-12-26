@@ -374,6 +374,16 @@ static void private_create_skeleton (
 	Ogre::Bone* bone;
 	LIMdlWeightGroup* group;
 
+	/* Make sure that there aren't too many bones. */
+	/* Ogre seems to occasionally fail an assertion when it tries to
+	   upload bone matrices to shaders. This check seems to have eliminated
+	   the issue so it probably can't handle too many matrices. */
+	if (model->weight_groups.count > 32)
+	{
+		printf ("WARNING: too many weighted bones: %d/%d!\n", model->weight_groups.count, 32);
+		return;
+	}
+
 	/* Create the skeleton. */
 	Ogre::String name (private_unique_id (self));
 	Ogre::ResourcePtr resource = Ogre::SkeletonManager::getSingleton ().create (name, "General", true);
