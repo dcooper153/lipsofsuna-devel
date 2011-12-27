@@ -472,7 +472,7 @@ Views.Chargen.update = function(self, secs)
 	-- Update light.
 	local p = self.object.position
 	local r = self.object.rotation
-	self.light.position = p + r * Vector(0,18,-10)
+	self.light.position = p + r * Vector(0,15,-15)
 	self.light.rotation = Quaternion{dir = p - self.light.position, up = Vector(0, 1)}
 	self.camera.target_position = self.object.position + self.view_offset
 	self.camera.target_rotation = Quaternion{axis = Vector(0, 1, 0), angle = math.pi}

@@ -117,9 +117,9 @@ local build = function(args)
 	end
 	-- Colorize materials.
 	m:edit_material{match_shader = "hair", diffuse = args.hair_color}
-	m:edit_material{match_shader = "skin", diffuse = args.skin_color,
-		shader = species.skin_shader, textures = species.skin_textures}
-	m:edit_material{match_shader = "eye", diffuse = args.eye_color}
+	m:edit_material{match_material = "animskin1", diffuse = args.skin_color,
+		material = species.skin_material, textures = species.skin_textures}
+	m:edit_material{match_material = "animeye1", diffuse = args.eye_color}
 	-- Recalculate the bounding box.
 	m:calculate_bounds()
 	return m

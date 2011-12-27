@@ -241,7 +241,7 @@ Species{
 		{name = "perception", max = 80, val = 30},
 		{name = "strength", max = 60, val = 20},
 		{name = "willpower", max = 80, val = 30}},
-	skin_shader = "animdiffnorm",
+	skin_material = "animdiffnorm1",
 	skin_textures = {"devora1", "devora1n"},
 	tilt_bone = {"back1", "back2", "back3"},
 	vulnerabilities = {fire = 2, physical = 0.8}}

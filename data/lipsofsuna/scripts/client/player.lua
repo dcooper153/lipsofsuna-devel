@@ -119,7 +119,7 @@ Player.update_light = function(clss, secs)
 	local p = clss.object.position
 	local r = clss.object.rotation
 	-- Update the light ball.
-	clss.light.position = p + r * Vector(0,18,-10)
+	clss.light.position = p + r * Vector(0,12,-12)
 	clss.light.rotation = Quaternion{dir = p - clss.light.position, up = Vector(0, 1)}
 	clss.light.enabled = true
 	-- Update the light spell.
