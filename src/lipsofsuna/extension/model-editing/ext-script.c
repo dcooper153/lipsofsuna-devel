@@ -215,6 +215,7 @@ static void Model_edit_material (LIScrArgs* args)
 	const char* str;
 	const char* shader = NULL;
 	const char* texture = NULL;
+	const char* material_ = NULL;
 	LIEngModel* model;
 	LIMdlMaterial* material;
 
@@ -222,12 +223,13 @@ static void Model_edit_material (LIScrArgs* args)
 	model = args->self;
 	liscr_args_gets_string (args, "match_shader", &shader);
 	liscr_args_gets_string (args, "match_texture", &texture);
+	liscr_args_gets_string (args, "match_material", &material_);
 
 	/* Edit each matching material. */
 	for (i = 0 ; i < model->model->materials.count ; i++)
 	{
 		material = model->model->materials.array + i;
-		if (!limdl_material_compare_shader_and_texture (material, shader, texture))
+		if (!limdl_material_compare_shader_and_texture (material, material_, shader, texture))
 			continue;
 		if (liscr_args_gets_floatv (args, "diffuse", 4, color))
 			limdl_material_set_diffuse (material, color);

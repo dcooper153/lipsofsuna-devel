@@ -219,9 +219,16 @@ int limdl_material_compare (
 
 int limdl_material_compare_shader_and_texture (
 	const LIMdlMaterial* self,
+	const char*          material,
 	const char*          shader,
 	const char*          texture)
 {
+	if (material != NULL)
+	{
+		/* The name of the material must match. */
+		if (self->material != NULL && strcmp (material, self->material))
+			return 0;
+	}
 	if (shader != NULL)
 	{
 		/* The name of the shader must match. */
