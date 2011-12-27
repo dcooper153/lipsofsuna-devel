@@ -67,6 +67,8 @@ int liren_internal_init (
 	self->data = new LIRenRenderData;
 	if (self->data == NULL)
 		return 0;
+	self->data->container_factory = NULL;
+	self->data->image_factory = NULL;
 
 	/* Disable console output. */
 	Ogre::LogManager* log = new Ogre::LogManager ();
@@ -81,8 +83,7 @@ int liren_internal_init (
 	private_load_plugin (self, "Plugin_ParticleFX");
 
 	/* Make sure that the required plugins were loaded. */
-	if (!private_check_plugin (self, "GL RenderSystem") ||
-		!private_check_plugin (self, "Octree & Terrain Scene Manager"))
+	if (!private_check_plugin (self, "GL RenderSystem"))
 		return 0;
 
 	/* Setup resource paths. */
