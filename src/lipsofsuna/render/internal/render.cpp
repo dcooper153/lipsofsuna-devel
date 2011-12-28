@@ -32,6 +32,7 @@
 #include <OgrePlugin.h>
 #include <OgreRenderSystemCapabilitiesManager.h>
 #include <OgreRenderSystemCapabilitiesSerializer.h>
+#include <OgreSkeletonManager.h>
 #include <OgreViewport.h>
 #include <OgreWindowEventUtilities.h>
 #if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
@@ -518,6 +519,14 @@ int liren_internal_update (
 
 	/* Render a frame. */
 	self->data->root->renderOneFrame ();
+
+	/* Free unused resources. */
+	/* Ogre doesn't automatically free resources so we need to do it manually. */
+	/* FIXME: Trying to unload materials crashes so they're leaking currently. */
+	Ogre::MeshManager::getSingleton ().removeUnreferencedResources (false);
+	Ogre::SkeletonManager::getSingleton ().removeUnreferencedResources (false);
+/*	Ogre::MaterialManager::getSingleton ().removeUnreferencedResources (false);*/
+	Ogre::TextureManager::getSingleton ().removeUnreferencedResources (false);
 
 	return 1;
 }
