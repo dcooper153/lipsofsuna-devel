@@ -588,6 +588,21 @@ void liren_internal_set_scene_ambient (
 	self->data->scene_manager->setAmbientLight (Ogre::ColourValue (value[0], value[1], value[2]));
 }
 
+/**
+ * \brief Sets the skybox material.
+ * \param self Renderer.
+ * \param value Material name.
+ */
+void liren_internal_set_skybox (
+	LIRenRender* self,
+	const char*  value)
+{
+	if (value != NULL)
+		self->data->scene_manager->setSkyBox (true, value, 10.0f, true);
+	else
+		self->data->scene_manager->setSkyBox (false, "");
+}
+
 void liren_internal_set_title (
 	LIRenRender* self,
 	const char*  value)

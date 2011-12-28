@@ -1,6 +1,7 @@
 print "INFO: Loading client scripts."
 
 Program.window_title = "Lips of Suna"
+Render.skybox = "skybox1"
 Reload.enabled = true
 
 require "client/client"

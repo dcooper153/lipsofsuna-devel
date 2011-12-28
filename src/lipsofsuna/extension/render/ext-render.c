@@ -111,6 +111,16 @@ static void Render_set_scene_ambient (LIScrArgs* args)
 	liren_render_set_scene_ambient (module->client->render, value);
 }
 
+static void Render_set_skybox (LIScrArgs* args)
+{
+	const char* value;
+	LIExtModule* module;
+
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
+	if (liscr_args_geti_string (args, 0, &value))
+		liren_render_set_skybox (module->client->render, value);
+}
+
 /*****************************************************************************/
 
 void liext_script_render (
@@ -123,6 +133,7 @@ void liext_script_render (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_get_anisotrophy", Render_get_anisotrophy);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_anisotrophy", Render_set_anisotrophy);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_scene_ambient", Render_set_scene_ambient);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_skybox", Render_set_skybox);
 }
 
 /** @} */

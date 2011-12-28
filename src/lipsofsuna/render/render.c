@@ -268,6 +268,18 @@ void liren_render_set_scene_ambient (
 	liren_internal_set_scene_ambient (self, value);
 }
 
+/**
+ * \brief Sets the skybox material.
+ * \param self Renderer.
+ * \param value Material name.
+ */
+void liren_render_set_skybox (
+	LIRenRender* self,
+	const char*  value)
+{
+	liren_internal_set_skybox (self, value);
+}
+
 void liren_render_set_title (
 	LIRenRender* self,
 	const char*  value)
