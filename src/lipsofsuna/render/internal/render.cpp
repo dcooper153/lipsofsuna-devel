@@ -26,6 +26,7 @@
 
 #include "render-internal.h"
 #include "render-container-factory.hpp"
+#include <OgreCompositorManager.h>
 #include <OgreEntity.h>
 #include <OgreFontManager.h>
 #include <OgreLogManager.h>
@@ -211,6 +212,31 @@ void liren_internal_deinit (
 		delete self->data;
 		self->data = NULL;
 	}
+}
+
+/**
+ * \brief Enables a compositor script.
+ * \param self Renderer.
+ * \param name Compositor script name.
+ */
+void liren_internal_add_compositor (
+	LIRenRender* self,
+	const char*  name)
+{
+	Ogre::CompositorManager::getSingleton ().addCompositor (self->data->viewport, name);
+	Ogre::CompositorManager::getSingleton ().setCompositorEnabled (self->data->viewport, name, true);
+}
+
+/**
+ * \brief Disables a compositor script.
+ * \param self Renderer.
+ * \param name Compositor script name.
+ */
+void liren_internal_remove_compositor (
+	LIRenRender* self,
+	const char*  name)
+{
+	Ogre::CompositorManager::getSingleton ().removeCompositor (self->data->viewport, name);
 }
 
 /**

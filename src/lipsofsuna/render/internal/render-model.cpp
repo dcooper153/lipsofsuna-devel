@@ -256,6 +256,13 @@ static void private_create_mesh (
 		return;
 	LIMdlLod* lod = model->lod.array;
 
+	/* Make sure that the mesh is valid. */
+#ifndef _NDEBUG
+	lisys_assert (lod->indices.count % 3 == 0);
+	for (int i = 0 ; i < lod->indices.count ; i++)
+		lisys_assert (lod->indices.array[i] < model->vertices.count);
+#endif
+
 	/* Allocate the vertex data. */
 	Ogre::VertexData* vertex_data = new Ogre::VertexData ();
 	vertex_data->vertexCount = model->vertices.count;

@@ -181,6 +181,24 @@ end
 Render = Class()
 Render.class_name = "Render"
 
+--- Enables a compositor script.
+-- @param self Render class.
+-- @param name Compositor script name.
+Render.add_compositor = function(self, name)
+	Los.render_add_compositor(name)
+end
+
+--- Disables a compositor script.
+-- @param self Render class.
+-- @param name Compositor script name.
+Render.remove_compositor = function(self, name)
+	Los.render_remove_compositor(name)
+end
+
+--- Projects a point to the screen space.
+-- @param self Render class.
+-- @param point Vector.
+-- @return Vector.
 Render.project = function(self, point)
 	local r = Los.render_project(point.handle)
 	return Class.new(Vector, {handle = r})

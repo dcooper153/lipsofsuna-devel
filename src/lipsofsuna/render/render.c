@@ -141,6 +141,30 @@ void liren_render_free (
 	lisys_free (self);
 }
 
+/**
+ * \brief Enables a compositor script.
+ * \param self Renderer.
+ * \param name Compositor script name.
+ */
+void liren_render_add_compositor (
+	LIRenRender* self,
+	const char*  name)
+{
+	liren_internal_add_compositor (self, name);
+}
+
+/**
+ * \brief Disables a compositor script.
+ * \param self Renderer.
+ * \param name Compositor script name.
+ */
+void liren_render_remove_compositor (
+	LIRenRender* self,
+	const char*  name)
+{
+	liren_internal_remove_compositor (self, name);
+}
+
 int liren_render_load_font (
 	LIRenRender* self,
 	const char*  name,

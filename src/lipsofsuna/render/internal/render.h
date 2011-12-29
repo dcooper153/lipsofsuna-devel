@@ -42,6 +42,14 @@ LIAPICALL (int, liren_internal_init, (
 LIAPICALL (void, liren_internal_deinit, (
 	LIRenRender* self));
 
+LIAPICALL (void, liren_internal_add_compositor, (
+	LIRenRender* self,
+	const char*  name));
+
+LIAPICALL (void, liren_internal_remove_compositor, (
+	LIRenRender* self,
+	const char*  name));
+
 LIAPICALL (LIRenModel*, liren_internal_find_model, (
 	LIRenRender* self,
 	int          id));

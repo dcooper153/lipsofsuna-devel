@@ -29,6 +29,14 @@ LIAPICALL (LIRenRender*, liren_render_new, (
 LIAPICALL (void, liren_render_free, (
 	LIRenRender* self));
 
+LIAPICALL (void, liren_render_add_compositor, (
+	LIRenRender* self,
+	const char*  name));
+
+LIAPICALL (void, liren_render_remove_compositor, (
+	LIRenRender* self,
+	const char*  name));
+
 LIAPICALL (int, liren_render_load_font, (
 	LIRenRender* self,
 	const char*  name,

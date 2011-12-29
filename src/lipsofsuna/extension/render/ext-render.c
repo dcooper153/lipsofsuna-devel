@@ -25,6 +25,30 @@
 #include <lipsofsuna/render.h>
 #include "ext-module.h"
 
+static void Render_add_compositor (LIScrArgs* args)
+{
+	const char* value;
+	LIExtModule* module;
+
+	if (liscr_args_geti_string (args, 0, &value))
+	{
+		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
+		liren_render_add_compositor (module->client->render, value);
+	}
+}
+
+static void Render_remove_compositor (LIScrArgs* args)
+{
+	const char* value;
+	LIExtModule* module;
+
+	if (liscr_args_geti_string (args, 0, &value))
+	{
+		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
+		liren_render_remove_compositor (module->client->render, value);
+	}
+}
+
 static void Render_project (LIScrArgs* args)
 {
 	LIMatVector value;
@@ -126,6 +150,8 @@ static void Render_set_skybox (LIScrArgs* args)
 void liext_script_render (
 	LIScrScript* self)
 {
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_add_compositor", Render_add_compositor);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_remove_compositor", Render_remove_compositor);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_project", Render_project);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_camera_far", Render_set_camera_far);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_camera_near", Render_set_camera_near);
