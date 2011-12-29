@@ -1,0 +1,47 @@
+﻿// Dark Sylinc's Bloom implementation from Ogre
+// Copyright (C) Dark Sylinc 2007-2008
+
+vertex_program bloom1_vert glsl
+{
+	source bloom1.vert
+}
+
+fragment_program bloompass1_frag glsl
+{
+	source bloompass1.frag
+	default_params
+	{
+		param_named RT int 0
+	}
+}
+
+fragment_program bloompass2_frag glsl
+{
+	source bloompass2.frag
+	preprocessor_defines SAMPLING=0.005
+	default_params
+	{
+		param_named Blur0 int 0
+	}
+}
+
+fragment_program bloompass3_frag glsl
+{
+	source bloompass3.frag
+	preprocessor_defines SAMPLING=0.005
+	default_params
+	{
+		param_named Blur0 int 0
+	}
+}
+
+fragment_program bloompass4_frag glsl
+{
+	source bloompass4.frag
+	default_params
+	{
+		param_named RT int 0
+		param_named Blur1 int 1
+	}
+}
+
