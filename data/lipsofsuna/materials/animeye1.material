@@ -11,7 +11,7 @@ material animeye1
 			specular 0.0 0.0 0.0 0.0 1
 			texture_unit LOS1
 			{
-				texture aereye1.dds
+				texture eye1.dds
 			}
 			texture_unit
 			{
@@ -29,7 +29,7 @@ material animeye1
 			vertex_program_ref animdiff_vert
 			{
 			}
-			fragment_program_ref animdiff_frag
+			fragment_program_ref animeye1_frag
 			{
 			}
 			shadow_caster_vertex_program_ref animdiff_vert
@@ -39,14 +39,15 @@ material animeye1
 	}
 	technique
 	{
-		pass
+		pass LOS
 		{
-			ambient 0.3 0.3 0.3
+			ambient 0.6 0.6 0.6
 			diffuse 1.0 1.0 1.0
 			specular 1.0 1.0 1.0 1.0 64
 			texture_unit LOS1
 			{
-				texture aereye1.dds
+				texture eye1.dds
+				colour_op_ex blend_texture_alpha src_texture src_diffuse
 			}
 		}
 	}
