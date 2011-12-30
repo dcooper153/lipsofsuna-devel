@@ -19,7 +19,6 @@
 #define __RENDER_INTERNAL_INTERNAL_H__
 
 #include "render.h"
-#include "render-framebuffer.h"
 #include "render-light.h"
 #include "render-message.h"
 #include "render-model.h"
