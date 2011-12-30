@@ -349,8 +349,10 @@ Views.Options:add_setters{
 	bloom_enabled = function(self, v)
 		if v then
 			self.button_bloom.text = "Enabled"
+			Render:add_compositor("bloom1")
 		else
 			self.button_bloom.text = "Disabled"
+			Render:remove_compositor("bloom1")
 		end
 		self:changed()
 	end,
