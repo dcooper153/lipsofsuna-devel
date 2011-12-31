@@ -1,3 +1,4 @@
+#version 130
 uniform mat4 LOS_matrix_modelviewproj;
 uniform vec3 LOS_camera_position;
 uniform vec4 LOS_light_position[LIGHTS];

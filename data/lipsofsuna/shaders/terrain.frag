@@ -1,3 +1,4 @@
+#version 130
 uniform sampler2D LOS_diffuse_texture_0;
 uniform sampler2D LOS_diffuse_texture_1;
 uniform sampler2D LOS_diffuse_texture_2;
