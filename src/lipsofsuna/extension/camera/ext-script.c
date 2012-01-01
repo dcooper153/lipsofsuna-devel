@@ -91,9 +91,11 @@ static void Camera_picking_ray (LIScrArgs* args)
 
 	/* Calculate ray vector. */
 	cursor.z = 0.0f;
-	lialg_camera_unproject (self, &cursor, &ray0);
+	if (!lialg_camera_unproject (self, &cursor, &ray0))
+		return;
 	cursor.z = 1.0f;
-	lialg_camera_unproject (self, &cursor, &ray1);
+	if (!lialg_camera_unproject (self, &cursor, &ray1))
+		return;
 	dir = limat_vector_subtract (ray1, ray0);
 	dir = limat_vector_normalize (dir);
 
