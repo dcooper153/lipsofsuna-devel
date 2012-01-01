@@ -50,7 +50,7 @@ struct _LIVoxBuilder
 	float tile_width;
 	float vertex_scale;
 	LIMdlBuilder* model_builder;
-	LIMatVector offset_vector;
+	LIMatVector translation;
 	LIVoxManager* manager;
 	LIVoxVoxel* voxels;
 	LIVoxVoxelB* voxelsb;
