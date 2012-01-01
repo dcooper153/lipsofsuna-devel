@@ -39,7 +39,7 @@ LIExtVisionListener* liext_vision_listener_new (
 	if (self == NULL)
 		return NULL;
 	self->cone_angle = 0.0f;
-	self->cone_cosine = 0.5f * M_PI;
+	self->cone_cosine = 0.0f;
 	self->cone_factor = 0.5f;
 	self->keep_threshold = 5.0f;
 	self->scan_radius = 32.0f;
