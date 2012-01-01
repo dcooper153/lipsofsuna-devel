@@ -53,6 +53,10 @@ static int private_check_plugin (
 	LIRenRender* self,
 	const char*  name);
 
+static void private_unload_unused_resources (
+	LIRenRender*           self,
+	Ogre::ResourceManager& manager);
+
 static void private_update_mode (
 	LIRenRender*  self);
 
@@ -83,28 +87,41 @@ int liren_internal_init (
 	private_load_plugin (self, "RenderSystem_GL");
 	private_load_plugin (self, "Plugin_OctreeSceneManager");
 	private_load_plugin (self, "Plugin_ParticleFX");
+	/* FIXME: We really don't want this, but Ogre terrain doesn't have GLSL support. */
+	private_load_plugin (self, "Plugin_CgProgramManager");
 
 	/* Make sure that the required plugins were loaded. */
 	if (!private_check_plugin (self, "GL RenderSystem"))
 		return 0;
 
-	/* Setup resource paths. */
+	/* Create the group for temporary resources. */
+	/* This group is used for temporary resources such as meshes or
+	   materials instantiated and overridden for specific meshes. We
+	   want this kind of resources to be completely purged when unused. */
+	Ogre::ResourceGroupManager& mgr = Ogre::ResourceGroupManager::getSingleton ();
+	mgr.createResourceGroup (LIREN_RESOURCES_TEMPORARY);
+
+	/* Create the group for permanent resources. */
+	/* This group is used for resources that are managed by Ogre. They
+	   include textures and various scripts detected at initialization.
+	   Out of these, we only want to unload textures and even for them
+	   we want to keep the resource info available at all times. */
 	Ogre::String data0(self->paths->override_data);
 	Ogre::String data1(self->paths->module_data);
-	const Ogre::String& group = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation (data0, "FileSystem", group, true);
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation (data0 + "/fonts", "FileSystem", group, true);
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation (data0 + "/graphics", "FileSystem", group, true);
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation (data0 + "/materials", "FileSystem", group, true);
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation (data0 + "/meshes", "FileSystem", group, true);
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation (data0 + "/shaders", "FileSystem", group, true);
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation (data0 + "/textures", "FileSystem", group, true);
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation (data1 + "/fonts", "FileSystem", group, true);
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation (data1 + "/graphics", "FileSystem", group, true);
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation (data1 + "/materials", "FileSystem", group, true);
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation (data1 + "/meshes", "FileSystem", group, true);
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation (data1 + "/shaders", "FileSystem", group, true);
-	Ogre::ResourceGroupManager::getSingleton().addResourceLocation (data1 + "/textures", "FileSystem", group, true);
+	Ogre::String group = LIREN_RESOURCES_PERMANENT;
+	mgr.addResourceLocation (data0, "FileSystem", group, true);
+	mgr.addResourceLocation (data0 + "/fonts", "FileSystem", group, true);
+	mgr.addResourceLocation (data0 + "/graphics", "FileSystem", group, true);
+	mgr.addResourceLocation (data0 + "/materials", "FileSystem", group, true);
+	mgr.addResourceLocation (data0 + "/meshes", "FileSystem", group, true);
+	mgr.addResourceLocation (data0 + "/shaders", "FileSystem", group, true);
+	mgr.addResourceLocation (data0 + "/textures", "FileSystem", group, true);
+	mgr.addResourceLocation (data1 + "/fonts", "FileSystem", group, true);
+	mgr.addResourceLocation (data1 + "/graphics", "FileSystem", group, true);
+	mgr.addResourceLocation (data1 + "/materials", "FileSystem", group, true);
+	mgr.addResourceLocation (data1 + "/meshes", "FileSystem", group, true);
+	mgr.addResourceLocation (data1 + "/shaders", "FileSystem", group, true);
+	mgr.addResourceLocation (data1 + "/textures", "FileSystem", group, true);
 
 	/* Initialize the render system. */
 	self->data->render_system = self->data->root->getRenderSystemByName ("OpenGL Rendering Subsystem");
@@ -121,7 +138,6 @@ int liren_internal_init (
 
 	/* Initialize the render window. */
 	self->data->root->setRenderSystem (self->data->render_system);
-
 
 	/* Initialize custom render system capabilities. */
 	/* This is a debug feature that allows emulating older hardware by setting
@@ -547,12 +563,18 @@ int liren_internal_update (
 	self->data->root->renderOneFrame ();
 
 	/* Free unused resources. */
-	/* Ogre doesn't automatically free resources so we need to do it manually. */
-	/* FIXME: Trying to unload materials crashes so they're leaking currently. */
-	Ogre::MeshManager::getSingleton ().removeUnreferencedResources (false);
-	Ogre::SkeletonManager::getSingleton ().removeUnreferencedResources (false);
-/*	Ogre::MaterialManager::getSingleton ().removeUnreferencedResources (false);*/
-	Ogre::TextureManager::getSingleton ().removeUnreferencedResources (false);
+	/* Ogre internals seem to be sloppy with using resource pointers. At
+	   least the terrain system will crash if we try to remove all unused
+	   resources. We need to limit unloading to our own resource group. */
+	/* Ogre seems to not have a function for removing unreferenced
+	   resources from a specific group so we need to do it manually. */
+	if (true)
+	{
+		private_unload_unused_resources (self, Ogre::MeshManager::getSingleton ());
+		private_unload_unused_resources (self, Ogre::SkeletonManager::getSingleton ());
+		private_unload_unused_resources (self, Ogre::MaterialManager::getSingleton ());
+		private_unload_unused_resources (self, Ogre::TextureManager::getSingleton ());
+	}
 
 	return 1;
 }
@@ -735,6 +757,32 @@ static int private_check_plugin (
 	}
 
 	return 0;
+}
+
+static void private_unload_unused_resources (
+	LIRenRender*           self,
+	Ogre::ResourceManager& manager)
+{
+	Ogre::ResourceManager::ResourceMapIterator iter = manager.getResourceIterator ();
+	while (iter.hasMoreElements ())
+	{
+		/* Check if the resource is in use. */
+		/* The resource pointer we create here adds one extra reference. */
+		Ogre::ResourcePtr resource = iter.getNext ();
+		if (resource.useCount () > Ogre::ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+			continue;
+
+		/* Remove or unload the resource. */
+		/* Resources in the temporary group are completely removed since we
+		   don't want to keep any records of garbage collected meshes and such.
+		   Resources in the permanent group can be unloaded but their records
+		   are kept so that predefined materials and scripts don't get deleted.
+		   The rest are Ogre's internal resources that shouldn't be touched. */
+		if (resource->getGroup () == LIREN_RESOURCES_TEMPORARY)
+			manager.remove (resource->getHandle ());
+		else if (resource->getGroup () == LIREN_RESOURCES_PERMANENT)
+			manager.unload (resource->getHandle ());
+	}
 }
 
 static void private_update_mode (

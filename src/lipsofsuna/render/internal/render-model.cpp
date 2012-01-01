@@ -215,7 +215,7 @@ static void private_create_material (
 	/* Create a new material if an existing one was not found. */
 	if (!existing)
 	{
-		const Ogre::String& group = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+		Ogre::String group = LIREN_RESOURCES_TEMPORARY;
 		material = self->render->data->material_manager->create (unique_name, group);
 		if (mat->flags & LIMDL_MATERIAL_FLAG_TRANSPARENCY)
 			material->setSceneBlending (Ogre::SBT_TRANSPARENT_ALPHA);
@@ -226,11 +226,14 @@ static void private_create_material (
 	}
 
 	/* Instantiate the material if it needs to be overridden. */
+	/* The original material is in the group of permanent resources but
+	   the instantiated material needs to be put into the temporary group
+	   so that it can be removed when the model is garbage collected. */
 	if (existing)
 	{
 		if (!private_check_material_override (self, material))
 			return;
-		material = material->clone (unique_name);
+		material = material->clone (unique_name, true, LIREN_RESOURCES_TEMPORARY);
 	}
 
 	/* Override the fields of techniques. */
@@ -287,7 +290,7 @@ static void private_create_mesh (
 	lisys_assert (offset1 == 6 * 4);
 
 	/* Create the mesh. */
-	self->data->mesh = Ogre::MeshManager::getSingleton ().createManual (private_unique_id (self), "General");
+	self->data->mesh = Ogre::MeshManager::getSingleton ().createManual (private_unique_id (self), LIREN_RESOURCES_TEMPORARY);
 	self->data->mesh->sharedVertexData = vertex_data;
 
 	/* Allocate a temporary buffer for vertex data. */
@@ -393,7 +396,7 @@ static void private_create_skeleton (
 
 	/* Create the skeleton. */
 	Ogre::String name (private_unique_id (self));
-	Ogre::ResourcePtr resource = Ogre::SkeletonManager::getSingleton ().create (name, "General", true);
+	Ogre::ResourcePtr resource = Ogre::SkeletonManager::getSingleton ().create (name, LIREN_RESOURCES_TEMPORARY, true);
 	Ogre::SkeletonPtr skeleton (resource);
 
 	/* Create the dummy bone. */

@@ -21,6 +21,9 @@
 #include "lipsofsuna/math.h"
 #include "../render-types.h"
 
+#define LIREN_RESOURCES_PERMANENT "permanent"
+#define LIREN_RESOURCES_TEMPORARY "temporary"
+
 typedef struct _LIRenBuffer LIRenBuffer;
 typedef struct _LIRenFramebuffer LIRenFramebuffer;
 typedef struct _LIRenImage LIRenImage;

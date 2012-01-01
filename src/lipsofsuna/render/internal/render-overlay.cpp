@@ -494,7 +494,7 @@ static bool private_create_material (
 	Ogre::TexturePtr*  texture_result)
 {
 	/* Load or create the material. */
-	const Ogre::String& group = Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME;
+	Ogre::String group = LIREN_RESOURCES_TEMPORARY;
 	Ogre::MaterialPtr material = self->render->data->material_manager->load (material_name, group);
 	if (material.isNull ())
 		return false;

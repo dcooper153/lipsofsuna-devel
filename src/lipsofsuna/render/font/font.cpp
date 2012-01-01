@@ -25,6 +25,7 @@
  */
 
 #include "lipsofsuna/system.h"
+#include "../internal/render-types.h"
 #include "font.h"
 #include <OgreFont.h>
 #include <OgreFontManager.h>
@@ -64,7 +65,7 @@ LIFntFont* lifnt_font_new (
 
 	/* Load the font. */
 	Ogre::FontManager& manager = Ogre::FontManager::getSingleton ();
-	Ogre::FontPtr resource = manager.create (name, Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	Ogre::FontPtr resource = manager.create (name, LIREN_RESOURCES_TEMPORARY);
 	resource->setParameter ("type", "truetype");
 	resource->setParameter ("source", Ogre::String (file) + ".ttf");
 	resource->setParameter ("size", Ogre::StringConverter::toString (size * 72 / 96));
