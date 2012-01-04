@@ -15,28 +15,21 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __EXT_HEIGHTMAP_PHYSICS_HEIGHTFIELD_TERRAIN_SHAPE_H__
+#define __EXT_HEIGHTMAP_PHYSICS_HEIGHTFIELD_TERRAIN_SHAPE_H__
 
 #include "lipsofsuna/extension.h"
+#include <btBulletDynamicsCommon.h>
+#include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 
-#define LIEXT_SCRIPT_SKELETON "Skeleton"
-
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+class LIExtHeightfieldTerrainShape : public btHeightfieldTerrainShape
 {
-	LIMaiProgram* program;
+public:
+	LIExtHeightfieldTerrainShape (
+		int heightStickWidth, int heightStickLength, void* heightfieldData,
+		btScalar heightScale, btScalar minHeight, btScalar maxHeight,int upAxis,
+		PHY_ScalarType hdt, bool flipQuadEdges);
+	virtual void processAllTriangles(btTriangleCallback* callback,const btVector3& aabbMin,const btVector3& aabbMax) const;
 };
-
-LIExtModule* liext_skeleton_new (
-	LIMaiProgram* program);
-
-void liext_skeleton_free (
-	LIExtModule* self);
-
-/*****************************************************************************/
-
-void liext_script_skeleton (
-	LIScrScript* self);
 
 #endif

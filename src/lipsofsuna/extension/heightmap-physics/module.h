@@ -15,28 +15,36 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __EXT_HEIGHTMAP_PHYSICS_MODULE_H__
+#define __EXT_HEIGHTMAP_PHYSICS_MODULE_H__
 
 #include "lipsofsuna/extension.h"
+#include "../heightmap/module.h"
+#include <btBulletDynamicsCommon.h>
+#include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 
-#define LIEXT_SCRIPT_SKELETON "Skeleton"
+#define LIEXT_SCRIPT_HEIGHTMAP_PHYSICS "HeightmapPhysics"
 
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+typedef struct _LIExtHeightmapPhysics LIExtHeightmapPhysics;
+struct _LIExtHeightmapPhysics
 {
-	LIMaiProgram* program;
+	btHeightfieldTerrainShape* shape;
+	btCollisionObject* body;
 };
 
-LIExtModule* liext_skeleton_new (
+typedef struct _LIExtHeightmapPhysicsModule LIExtHeightmapPhysicsModule;
+struct _LIExtHeightmapPhysicsModule
+{
+	LIExtHeightmapModule* heightmap;
+	LIExtHeightmapHooks hooks;
+	LIMaiProgram* program;
+	LIPhyPhysics* physics;
+};
+
+LIExtHeightmapPhysicsModule* liext_heightmap_physics_module_new (
 	LIMaiProgram* program);
 
-void liext_skeleton_free (
-	LIExtModule* self);
-
-/*****************************************************************************/
-
-void liext_script_skeleton (
-	LIScrScript* self);
+void liext_heightmap_physics_module_free (
+	LIExtHeightmapPhysicsModule* self);
 
 #endif

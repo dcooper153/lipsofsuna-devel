@@ -15,28 +15,28 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __EXT_HEIGHTMAP_RENDER_MODULE_H__
+#define __EXT_HEIGHTMAP_RENDER_MODULE_H__
 
 #include "lipsofsuna/extension.h"
+#include "lipsofsuna/render.h"
+#include "../heightmap/module.h"
 
-#define LIEXT_SCRIPT_SKELETON "Skeleton"
+#define LIEXT_SCRIPT_HEIGHTMAP_RENDER "HeightmapRender"
 
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+typedef struct _LIExtHeightmapRender LIExtHeightmapRender;
+struct _LIExtHeightmapRender
 {
+	LIExtHeightmapModule* heightmap;
+	LIExtHeightmapHooks hooks;
 	LIMaiProgram* program;
+	LIRenRender* render;
 };
 
-LIExtModule* liext_skeleton_new (
+LIExtHeightmapRender* liext_heightmap_render_new (
 	LIMaiProgram* program);
 
-void liext_skeleton_free (
-	LIExtModule* self);
-
-/*****************************************************************************/
-
-void liext_script_skeleton (
-	LIScrScript* self);
+void liext_heightmap_render_free (
+	LIExtHeightmapRender* self);
 
 #endif

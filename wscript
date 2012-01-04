@@ -10,7 +10,7 @@ top = '.'
 out = '.build'
 
 CORE_DIRS = 'ai algorithm archive callback client engine extension generator main math model network particle paths physics render render/font render/image render/internal script sound system voxel widget'
-EXTS_DIRS = 'ai animation camera config-file database file graphics input lobby model-editing network noise object-physics object-render password physics reload render skeleton sound thread tiles tiles-physics tiles-render vision watchdog widgets'
+EXTS_DIRS = 'ai animation camera config-file database file graphics heightmap heightmap-physics heightmap-render input lobby model-editing network noise object-physics object-render password physics reload render skeleton sound thread tiles tiles-physics tiles-render vision watchdog widgets'
 
 def options(ctx):
 	ctx.tool_options('compiler_cc')
@@ -129,6 +129,9 @@ def configure(ctx):
 	else:
 		ctx.check_cxx(header_name='Ogre.h', mandatory=True, uselib='CORE TEST', uselib_store='OGRE')
 		ctx.check_cxx(lib='OgreMain', mandatory=True, uselib='CORE TEST', uselib_store='OGRE')
+	if not ctx.check_cfg(package='OGRE-Terrain', atleast_version='1.7.0', args='--cflags --libs', mandatory=False, uselib_store='OGRE'):
+		ctx.check_cxx(header_name='Terrain/OgreTerrain.h', mandatory=True, uselib='CORE TEST', uselib_store='OGRE')
+		ctx.check_cxx(lib='OgreTerrain', mandatory=True, uselib='CORE TEST', uselib_store='OGRE')
 
 	# OIS
 	if not ctx.check_cfg(package='OIS', atleast_version='1.3.0', args='--cflags --libs', mandatory=False):

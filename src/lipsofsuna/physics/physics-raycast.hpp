@@ -37,8 +37,15 @@ public:
 		int i;
 		LIPhyObject* object;
 		LIPhyPointer* pointer = (LIPhyPointer*) result.m_collisionObject->getUserPointer ();
-		if (pointer->object)
+		if (pointer == NULL)
 		{
+			/* Heightmap. */
+			this->object = NULL;
+			this->terrain = NULL;
+		}
+		else if (pointer->object)
+		{
+			/* Object. */
 			object = (LIPhyObject*) pointer->pointer;
 			for (i = 0 ; i < this->ignore_count ; i++)
 			{
@@ -53,6 +60,7 @@ public:
 		}
 		else
 		{
+			/* Tiles. */
 			this->object = NULL;
 			this->terrain = (LIPhyTerrain*) pointer->pointer;
 			this->terrain_tile[0] = pointer->tile[0];

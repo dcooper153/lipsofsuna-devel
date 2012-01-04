@@ -76,7 +76,10 @@ void licli_client_free (
 
 	/* Remove the client component. */
 	if (self->program != NULL)
+	{
 		limai_program_remove_component (self->program, "client");
+		limai_program_remove_component (self->program, "render");
+	}
 
 	/* Free the server thread. */
 	private_server_shutdown (self);
@@ -162,6 +165,8 @@ static int private_init (
 
 	/* Register component. */
 	if (!limai_program_insert_component (self->program, "client", self))
+		return 0;
+	if (!limai_program_insert_component (self->program, "render", self->render))
 		return 0;
 
 	/* Register classes. */

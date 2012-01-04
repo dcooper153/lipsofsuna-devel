@@ -469,10 +469,16 @@ static bool private_contact_processed (
 	LIPhyPointer* pointer1;
 	LIPhyContact contact;
 
-	/* Get contact information. */
-	memset (&contact, 0, sizeof (LIPhyContact));
 	pointer0 = (LIPhyPointer*)((btCollisionObject*) body0)->getUserPointer ();
 	pointer1 = (LIPhyPointer*)((btCollisionObject*) body1)->getUserPointer ();
+	if (pointer0 == NULL || pointer1 == NULL)
+	{
+		/* TODO: The user probably wants this reported too. */
+		return false;
+	}
+
+	/* Get contact information. */
+	memset (&contact, 0, sizeof (LIPhyContact));
 	if (pointer0->object)
 	{
 		contact.object0 = (LIPhyObject*) pointer0->pointer;
