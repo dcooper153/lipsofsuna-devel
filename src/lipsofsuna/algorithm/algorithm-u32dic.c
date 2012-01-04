@@ -160,6 +160,38 @@ LIAlgU32dicNode* lialg_u32dic_insert (
 }
 
 /**
+ * \brief Inserts data and use any free ID as a key.
+ * \param self Associative array.
+ * \param random Random number generator.
+ * \param value Value of the inserted node.
+ * \return Key of the inserted node, or zero.
+ */
+uint32_t lialg_u32dic_insert_auto (
+	LIAlgU32dic* self,
+	LIAlgRandom* random,
+	void*        value)
+{
+	uint32_t key;
+	LIAlgU32dicNode* node;
+
+	/* Find a unique key. */
+	
+	for (key = 0 ; !key ;)
+	{
+		key= lialg_random_range (random, 0, 0x7FFFFFF);
+		if (lialg_u32dic_find (self, key))
+			key = 0;
+	}
+
+	/* Insert normally. */
+	node = lialg_u32dic_insert (self, key, value);
+	if (node == NULL)
+		return 0;
+
+	return key;
+}
+
+/**
  * \brief Removes data from the associative array.
  * \param self Associative array.
  * \param key Key of the removed node.
