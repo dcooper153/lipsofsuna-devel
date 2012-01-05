@@ -11,11 +11,9 @@ material animskin1
 			specular 1.0 1.0 1.0 1.0 64
 			texture_unit LOS1
 			{
-				texture aer1.dds
 			}
 			texture_unit LOS2
 			{
-				texture aer1n.dds
 			}
 			texture_unit
 			{
@@ -27,10 +25,10 @@ material animskin1
 				texture celramp2.png 1d
 				tex_address_mode clamp
 			}
-			vertex_program_ref skin_vert
+			vertex_program_ref animdiffnorm1_vert
 			{
 			}
-			fragment_program_ref skin_frag
+			fragment_program_ref diffnorm1_frag
 			{
 			}
 			shadow_caster_vertex_program_ref animshadow_vert
@@ -40,14 +38,13 @@ material animskin1
 	}
 	technique
 	{
-		pass
+		pass LOS1
 		{
 			ambient 0.3 0.3 0.3
 			diffuse 1.0 1.0 1.0
 			specular 1.0 1.0 1.0 1.0 64
 			texture_unit LOS1
 			{
-				texture aer1.dds
 			}
 		}
 	}

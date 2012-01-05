@@ -1,4 +1,4 @@
-material animdiffnorm1
+material diff1
 {
 	receive_shadows off
 	technique
@@ -25,13 +25,13 @@ material animdiffnorm1
 				texture celramp2.png 1d
 				tex_address_mode clamp
 			}
-			vertex_program_ref animdiffnorm1_vert
+			vertex_program_ref diff1_vert
 			{
 			}
-			fragment_program_ref diffnorm1_frag
+			fragment_program_ref diff1_frag
 			{
 			}
-			shadow_caster_vertex_program_ref animshadow_vert
+			shadow_caster_vertex_program_ref shadow_vert
 			{
 			}
 		}

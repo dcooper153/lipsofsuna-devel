@@ -2,7 +2,7 @@ material terrain1
 {
 	technique
 	{
-		pass
+		pass LOS1
 		{
 			max_lights 3
 			ambient 0.3 0.3 0.3
@@ -32,17 +32,17 @@ material terrain1
 			{
 				content_type shadow
 			}
-			vertex_program_ref terrain_vert
+			vertex_program_ref terrain1_vert
 			{
 			}
-			fragment_program_ref terrain_frag
+			fragment_program_ref terrain1_frag
 			{
 			}
 		}
 	}
 	technique
 	{
-		pass
+		pass LOS1
 		{
 			ambient 0.3 0.3 0.3
 			diffuse 1.0 1.0 1.0
