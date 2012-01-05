@@ -64,6 +64,10 @@ LIAPICALL (char*, lipth_paths_get_sql, (
 	const LIPthPaths* self,
 	const char*       name));
 
+LIAPICALL (char*, lipth_paths_get_texture, (
+	const LIPthPaths* self,
+	const char*       name));
+
 LIAPICALL (char*, lipth_paths_get_root, ());
 
 #endif

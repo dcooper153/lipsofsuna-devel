@@ -314,6 +314,31 @@ char* lipth_paths_get_sql (
 }
 
 /**
+ * \brief Gets the path to a texture file.
+ *
+ * \param self Paths object.
+ * \param name File name.
+ * \return Full path or NULL.
+ */
+char* lipth_paths_get_texture (
+	const LIPthPaths* self,
+	const char*       name)
+{
+	char* path;
+
+	/* Try the override path. */
+	path = lisys_path_concat (self->override_data, "textures", name, NULL);
+	if (path == NULL)
+		return NULL;
+	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
+		return path;
+	lisys_free (path);
+
+	/* Try the real path. */
+	return lisys_path_concat (self->module_data, "textures", name, NULL);
+}
+
+/**
  * \brief Gets the game root directory.
  * \return Path or NULL.
  */

@@ -531,8 +531,20 @@ static void private_override_pass (
 		Ogre::TextureUnitState* state = pass->getTextureUnitState (i);
 		if (private_check_name_override (state->getName ()))
 		{
-			Ogre::String tex = Ogre::String (mat->textures.array[j].string);
-			state->setTextureName (tex + ".dds");
+			/* Check if a PNG version is available. */
+			Ogre::String texname = Ogre::String (mat->textures.array[j].string);
+			Ogre::String pngname = texname + ".png";
+			char* path = lipth_paths_get_texture (self->render->paths, pngname.c_str ());
+			int gotpng = lisys_filesystem_access (path, LISYS_ACCESS_READ);
+			lisys_free (path);
+
+			/* Use either a PNG or a DDS file. */
+			/* PNG is favored over DDS so that artists don't need to bother
+			   with converting their textures when testing them. */
+			if (gotpng)
+				state->setTextureName (pngname);
+			else
+				state->setTextureName (texname + ".dds");
 			j++;
 		}
 	}
