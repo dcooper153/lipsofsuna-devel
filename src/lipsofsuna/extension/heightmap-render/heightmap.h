@@ -15,31 +15,22 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_HEIGHTMAP_RENDER_MODULE_H__
-#define __EXT_HEIGHTMAP_RENDER_MODULE_H__
+#ifndef __EXT_HEIGHTMAP_RENDER_HEIGHTMAP_H__
+#define __EXT_HEIGHTMAP_RENDER_HEIGHTMAP_H__
 
-#include "lipsofsuna/extension.h"
-#include "lipsofsuna/render.h"
-#include "../heightmap/module.h"
+#include "module.h"
 
-#define LIEXT_SCRIPT_HEIGHTMAP_RENDER "HeightmapRender"
+LIAPICALL (int, liext_heightmap_add_texture_layer, (
+	LIExtHeightmap* self,
+	float           size,
+	const char*     name,
+	const char*     diffuse,
+	const char*     specular,
+	const char*     normal,
+	const char*     height,
+	const char*     blend));
 
-typedef struct _LIExtHeightmapRender LIExtHeightmapRender;
-struct _LIExtHeightmapRender
-{
-	LIExtHeightmapModule* heightmap;
-	LIExtHeightmapHooks hooks;
-	LIMaiProgram* program;
-	LIRenRender* render;
-};
-
-LIAPICALL (LIExtHeightmapRender*, liext_heightmap_render_new, (
-	LIMaiProgram* program));
-
-LIAPICALL (void, liext_heightmap_render_free, (
-	LIExtHeightmapRender* self));
-
-LIAPICALL (void, liext_script_heightmap_render, (
-	LIScrScript* self));
+LIAPICALL (void, liext_heightmap_rebuild, (
+	LIExtHeightmap* self));
 
 #endif

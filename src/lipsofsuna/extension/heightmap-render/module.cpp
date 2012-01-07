@@ -89,6 +89,10 @@ LIExtHeightmapRender* liext_heightmap_render_new (
 	globals->setCompositeMapAmbient (Ogre::ColourValue(0.5f, 0.5f, 0.5f));
 	globals->setCompositeMapDiffuse (Ogre::ColourValue(1.0f, 1.0f, 1.0f));
 
+	/* Register classes. */
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_HEIGHTMAP_RENDER, self);
+	liext_script_heightmap_render (program->script);
+
 	return self;
 }
 
@@ -133,19 +137,6 @@ static void private_init_heightmap (
 	settings.inputScale = 1;
 	settings.minBatchSize = 33;
 	settings.maxBatchSize = 65;
-
-	/* Setup materials. */
-	/* FIXME */
-	settings.layerList.resize(1);
-	settings.layerList[0].worldSize = 100;
-	settings.layerList[0].textureNames.push_back("dirt1ds.dds");
-	settings.layerList[0].textureNames.push_back("dirt1nh.dds");
-/*	settings.layerList[1].worldSize = 30;
-	settings.layerList[1].textureNames.push_back("grass-000.dds");
-	settings.layerList[1].textureNames.push_back("grass-000-nml.dds");
-	settings.layerList[2].worldSize = 200;
-	settings.layerList[2].textureNames.push_back("granite1.dds");
-	settings.layerList[2].textureNames.push_back("granite1n.dds");*/
 
 	/* Convert the heightmap. */
 	/* Bullet and Ogre use a different heightmap scheme so we need to convert
