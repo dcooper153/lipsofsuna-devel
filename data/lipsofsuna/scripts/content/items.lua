@@ -278,7 +278,7 @@ Itemspec{
 	mass_inventory = 0.1,
 	stacking = true,
 	special_effects = {
-		{node = "#root", model = "torchfx1"}},
+		{node = "#root", type = "light", equation = {1,0.1,0.01}, diffuse = {1,1,1,1}}},
 	water_gravity = Vector(0,6,0)}
 
 Itemspec{
@@ -334,7 +334,8 @@ Itemspec{
 	icon = "torch1",
 	mass = 3,
 	special_effects = {
-		{node = "#flame", model = "torchfx1"}},
+		{node = "#flame", model = "torchfx1"},
+		{node = "#flame", type = "light", equation = {2,0.1,0.1}, diffuse = {1,1,1,1}}},
 	water_gravity = Vector(0,6,0)}
 
 Itemspec{
@@ -365,7 +366,8 @@ Itemspec{
 	health = 1,
 	mass = 4,
 	special_effects = {
-		{node = "#flame", model = "torchfx1"}},
+		{node = "#flame", model = "torchfx1"},
+		{node = "#flame", type = "light", equation = {1,1,1}, diffuse = {1,0.5,0.25,1}}},
 	stacking = false}
 
 ------------------------------------------------------------------------------
@@ -685,7 +687,8 @@ Itemspec{
 	icon = "torch1",
 	mass = 3,
 	special_effects = {
-		{node = "#flame", model = "torchfx1"}},
+		{node = "#flame", model = "torchfx1"},
+		{node = "#flame", type = "light", equation = {2,0.2,0.2}, diffuse = {1,1,1,1}}},
 	water_gravity = Vector(0,6,0)}
 
 Itemspec{
