@@ -15,45 +15,42 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup LIExt Extension
- * @{
- * \addtogroup LIExtSkeleton Skeleton
- * @{
- */
+#ifndef __EXT_IMAGE_IMAGE_H__
+#define __EXT_IMAGE_IMAGE_H__
 
-#include "module.h"
-
-LIMaiExtensionInfo liext_skeleton_info =
+typedef struct _LIImgImage LIImgImage;
+struct _LIImgImage
 {
-	LIMAI_EXTENSION_VERSION, "Skeleton",
-	liext_skeleton_new,
-	liext_skeleton_free
+	int width;
+	int height;
+	void* pixels;
 };
 
-LIExtModule* liext_skeleton_new (
-	LIMaiProgram* program)
-{
-	LIExtModule* self;
+LIImgImage* liimg_image_new ();
 
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIExtModule));
-	if (self == NULL)
-		return NULL;
-	self->program = program;
+LIImgImage* liimg_image_new_from_file (
+	const char* path);
 
-	/* Register classes. */
-	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_SKELETON, self);
-	liext_script_skeleton (program->script);
+void liimg_image_free (
+	LIImgImage* self);
 
-	return self;
-}
+int liimg_image_load_dds (
+	LIImgImage* self,
+	const char* path);
 
-void liext_skeleton_free (
-	LIExtModule* self)
-{
-	lisys_free (self);
-}
+int liimg_image_load_png (
+	LIImgImage* self,
+	const char* path);
 
-/** @} */
-/** @} */
+int liimg_image_save_rgba (
+	LIImgImage* self,
+	const char* path);
+
+int liimg_image_save_s3tc (
+	LIImgImage* self,
+	const char* path);
+
+void liimg_image_shrink_half (
+	LIImgImage* self);
+
+#endif

@@ -15,6 +15,6 @@ generatefile ()
 }
 
 mkdir ../$1
-generatefile ext-module.c $1 > ../$1/ext-module.c
-generatefile ext-module.h $1 > ../$1/ext-module.h
-generatefile ext-script.c $1 > ../$1/ext-script.c
+generatefile module.c $1 > ../$1/module.c
+generatefile module.h $1 > ../$1/module.h
+generatefile script.c $1 > ../$1/script.c

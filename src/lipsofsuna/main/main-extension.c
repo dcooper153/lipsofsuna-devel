@@ -35,6 +35,7 @@ extern LIMaiExtensionInfo liext_graphics_info;
 extern LIMaiExtensionInfo liext_heightmap_info;
 extern LIMaiExtensionInfo liext_heightmap_physics_info;
 extern LIMaiExtensionInfo liext_heightmap_render_info;
+extern LIMaiExtensionInfo liext_image_info;
 extern LIMaiExtensionInfo liext_input_info;
 extern LIMaiExtensionInfo liext_lobby_info;
 extern LIMaiExtensionInfo liext_model_editing_info;
@@ -81,6 +82,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "heightmap", &liext_heightmap_info },
 		{ "heightmap-physics", &liext_heightmap_physics_info },
 		{ "heightmap-render", &liext_heightmap_render_info },
+		{ "image", &liext_image_info },
 		{ "input", &liext_input_info },
 		{ "lobby", &liext_lobby_info },
 		{ "model-editing", &liext_model_editing_info },

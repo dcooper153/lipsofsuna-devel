@@ -10,7 +10,7 @@ top = '.'
 out = '.build'
 
 CORE_DIRS = 'ai algorithm archive callback client engine extension generator main math model network particle paths physics render render/font render/image render/internal script sound system voxel widget'
-EXTS_DIRS = 'ai animation camera config-file database file graphics heightmap heightmap-physics heightmap-render input lobby model-editing network noise object-physics object-render password physics reload render skeleton sound thread tiles tiles-physics tiles-render vision watchdog widgets'
+EXTS_DIRS = 'ai animation camera config-file database file graphics heightmap heightmap-physics heightmap-render image input lobby model-editing network noise object-physics object-render password physics reload render skeleton sound thread tiles tiles-physics tiles-render vision watchdog widgets'
 
 def options(ctx):
 	ctx.tool_options('compiler_cc')
@@ -138,6 +138,11 @@ def configure(ctx):
 		ctx.check_cxx(header_name='OIS.h', mandatory=True, uselib='CORE TEST', uselib_store='OIS')
 		ctx.check_cxx(lib='OIS', mandatory=True, uselib='CORE TEST', uselib_store='OIS')
 
+	# libpng
+	if not ctx.check_cfg(package='libpng', atleast_version='1.2.0', args='--cflags --libs', uselib_store='PNG', mandatory=False):
+		ctx.check_cc(lib='png', mandatory=True, uselib_store='PNG')
+		ctx.check_cc(header_name='png.h', mandatory=True, uselib_store='PNG')
+
 	if ctx.env.SOUND:
 		# AL
 		if not ctx.check_cfg(package='openal', atleast_version='0.0.8', args='--cflags --libs', uselib_store="AL", mandatory=False):
@@ -236,7 +241,7 @@ def build(ctx):
 	ctx.add_group("install")
 	ctx.set_group("build")
 	objs = ''
-	libs = 'CORE LUA SQLITE BULLET ENET OIS OGRE THREAD AL VORBIS OGG FLAC CURL ZLIB'
+	libs = 'CORE LUA SQLITE BULLET ENET OIS OGRE PNG THREAD AL VORBIS OGG FLAC CURL ZLIB'
 
 	# Core objects.
 	for dir in CORE_DIRS.split(' '):

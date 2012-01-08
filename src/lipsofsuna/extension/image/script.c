@@ -18,23 +18,53 @@
 /**
  * \addtogroup LIExt Extension
  * @{
- * \addtogroup LIExtSkeleton Skeleton
+ * \addtogroup LIExtImage Image
  * @{
  */
 
 #include "module.h"
+#include "image.h"
 
-static void Skeleton_test (LIScrArgs* args)
+static void Image_new (LIScrArgs* args)
 {
-	printf ("Skeleton.test\n");
+	char* path;
+	const char* name;
+	LIImgImage* image;
+	LIExtImageModule* module;
+	LIScrData* data;
+
+	/* Get arguments. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_IMAGE);
+	if (!liscr_args_geti_string (args, 0, &name))
+		return;
+
+	/* Create the path. */
+	path = lipth_paths_get_texture (module->program->paths, name);
+	if (path == NULL)
+		return;
+
+	/* Allocate the image. */
+	image = liimg_image_new_from_file (path);
+	lisys_free (path);
+	if (image == NULL)
+		return;
+
+	/* Allocate the userdata. */
+	data = liscr_data_new (args->script, args->lua, image, LIEXT_SCRIPT_IMAGE, liimg_image_free);
+	if (data == NULL)
+	{
+		liimg_image_free (image);
+		return;
+	}
+	liscr_args_seti_stack (args);
 }
 
 /*****************************************************************************/
 
-void liext_script_skeleton (
+void liext_script_image (
 	LIScrScript* self)
 {
-	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_SKELETON, "skeleton_test", Skeleton_test);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_IMAGE, "image_new", Image_new);
 }
 
 /** @} */

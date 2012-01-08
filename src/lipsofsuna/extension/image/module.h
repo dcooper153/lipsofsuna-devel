@@ -15,45 +15,29 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup LIExt Extension
- * @{
- * \addtogroup LIExtSkeleton Skeleton
- * @{
- */
+#ifndef __EXT_IMAGE_MODULE_H__
+#define __EXT_IMAGE_MODULE_H__
 
-#include "module.h"
+#include "lipsofsuna/extension.h"
+#include "image.h"
 
-LIMaiExtensionInfo liext_skeleton_info =
+#define LIEXT_SCRIPT_IMAGE "Image"
+
+typedef struct _LIExtImageModule LIExtImageModule;
+struct _LIExtImageModule
 {
-	LIMAI_EXTENSION_VERSION, "Skeleton",
-	liext_skeleton_new,
-	liext_skeleton_free
+	LIMaiProgram* program;
 };
 
-LIExtModule* liext_skeleton_new (
-	LIMaiProgram* program)
-{
-	LIExtModule* self;
+LIExtImageModule* liext_image_module_new (
+	LIMaiProgram* program);
 
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIExtModule));
-	if (self == NULL)
-		return NULL;
-	self->program = program;
+void liext_image_module_free (
+	LIExtImageModule* self);
 
-	/* Register classes. */
-	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_SKELETON, self);
-	liext_script_skeleton (program->script);
+/*****************************************************************************/
 
-	return self;
-}
+void liext_script_image (
+	LIScrScript* self);
 
-void liext_skeleton_free (
-	LIExtModule* self)
-{
-	lisys_free (self);
-}
-
-/** @} */
-/** @} */
+#endif
