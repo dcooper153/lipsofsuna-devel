@@ -28,8 +28,10 @@ static void Heightmap_new (LIScrArgs* args)
 {
 	int size;
 	float spacing;
+	float scaling;
 	LIExtHeightmap* heightmap;
 	LIExtHeightmapModule* module;
+	LIImgImage* image;
 	LIMatVector position;
 	LIScrData* data;
 
@@ -45,9 +47,17 @@ static void Heightmap_new (LIScrArgs* args)
 		spacing = 1.0f;
 	else if (spacing <= 0.0f)
 		spacing = 1.0f;
+	if (!liscr_args_geti_float (args, 3, &scaling))
+		scaling = 1.0f;
+	else if (scaling <= 0.0f)
+		scaling = 1.0f;
+	if (liscr_args_geti_data (args, 4, LIEXT_SCRIPT_IMAGE, &data))
+		image = liscr_data_get_data (data);
+	else
+		image = NULL;
 
 	/* Allocate the heightmap. */
-	heightmap = liext_heightmap_new (module, &position, size, spacing);
+	heightmap = liext_heightmap_new (module, image, &position, size, spacing, scaling);
 	if (heightmap == NULL)
 		return;
 

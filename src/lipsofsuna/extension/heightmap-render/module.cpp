@@ -85,9 +85,9 @@ LIExtHeightmapRender* liext_heightmap_render_new (
 	Ogre::TerrainGlobalOptions* globals = OGRE_NEW Ogre::TerrainGlobalOptions ();
 	globals->setMaxPixelError (8);
 	globals->setCompositeMapDistance (3000);
-	globals->setLightMapDirection (Ogre::Vector3(0.57, -0.57, 0.57));
-	globals->setCompositeMapAmbient (Ogre::ColourValue(0.5f, 0.5f, 0.5f));
-	globals->setCompositeMapDiffuse (Ogre::ColourValue(1.0f, 1.0f, 1.0f));
+	globals->setLightMapDirection (Ogre::Vector3 (0.0f, -1.0f, 0.0f));
+	globals->setCompositeMapAmbient (Ogre::ColourValue (0.9f, 0.9f, 0.9f));
+	globals->setCompositeMapDiffuse (Ogre::ColourValue (1.0f, 1.0f, 1.0f));
 
 	/* Register classes. */
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_HEIGHTMAP_RENDER, self);

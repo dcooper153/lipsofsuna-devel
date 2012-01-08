@@ -26,10 +26,15 @@
 
 LIExtHeightmap* liext_heightmap_new (
 	LIExtHeightmapModule* module,
+	LIImgImage*           image,
 	const LIMatVector*    position,
 	int                   size,
-	float                 spacing)
+	float                 spacing,
+	float                 scaling)
 {
+	int x;
+	int z;
+	float h;
 	LIExtHeightmap* self;
 
 	/* Allocate self. */
@@ -40,6 +45,8 @@ LIExtHeightmap* liext_heightmap_new (
 	self->position = *position;
 	self->size = size;
 	self->spacing = spacing;
+	self->min = 0.0f;
+	self->max = scaling;
 
 	/* Allocate heights. */
 	if (size)
@@ -60,14 +67,17 @@ LIExtHeightmap* liext_heightmap_new (
 		return NULL;
 	}
 
-	/* FIXME: Should load from an image instead. */
-	LIAlgRandom rnd;
-	lialg_random_init (&rnd, lisys_time (NULL));
-	int x,z,i;
-	for(x = 0, i = 0 ; x < size ; x++)
+	/* Copy heights from the image. */
+	if (image != NULL && image->width && image->height)
 	{
-		for(z = 0 ; z < size ; z++, i++)
-			self->heights[i] = 1.0f * (2.0f + sin(x) + cos(z));
+		for (z = 0 ; z < size && z < image->height ; z++)
+		{
+			for (x = 0 ; x < size && x < image->width ; x++)
+			{
+				h = scaling / 255.0f * ((uint8_t*) image->pixels)[4 * (x + z * image->width)];
+				self->heights[x + z * size] = h;
+			}
+		}
 	}
 
 	/* Call hooks. */

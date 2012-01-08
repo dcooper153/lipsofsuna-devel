@@ -121,8 +121,8 @@ static void private_init_heightmap (
 		return;
 
 	/* Create the collision shape. */
-	float min = 0.0f;
-	float max = 100.0f;
+	float min = heightmap->min;
+	float max = heightmap->max;
 	data->shape = new LIExtHeightfieldTerrainShape (heightmap->size, heightmap->size,
 		heightmap->heights, 1.0f, min, max, 1, PHY_FLOAT, false);
 	data->shape->setUseDiamondSubdivision (true);

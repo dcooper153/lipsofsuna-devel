@@ -19,6 +19,7 @@
 #define __EXT_HEIGHTMAP_MODULE_H__
 
 #include "lipsofsuna/extension.h"
+#include "../image/module.h"
 
 #define LIEXT_SCRIPT_HEIGHTMAP "Heightmap"
 
@@ -32,6 +33,8 @@ struct _LIExtHeightmap
 {
 	int id;
 	int size;
+	float min;
+	float max;
 	float spacing;
 	float* heights;
 	void* physics_data;
@@ -42,9 +45,11 @@ struct _LIExtHeightmap
 
 LIExtHeightmap* liext_heightmap_new (
 	LIExtHeightmapModule* module,
+	LIImgImage*           image,
 	const LIMatVector*    position,
 	int                   size,
-	float                 spacing);
+	float                 spacing,
+	float                 scaling);
 
 void liext_heightmap_free (
 	LIExtHeightmap* self);
