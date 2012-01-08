@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -88,6 +88,15 @@ static void Light_set_diffuse (LIScrArgs* args)
 	for (i = 0 ; i < 4 ; i++)
 		liscr_args_geti_float (args, i, value + i);
 	liren_render_light_set_diffuse (light->module->render, light->id, value);
+}
+
+static void Light_set_directional (LIScrArgs* args)
+{
+	int value;
+	LIExtLight* light = args->self;
+
+	if (liscr_args_geti_bool (args, 0, &value))
+		liren_render_light_set_directional (light->module->render, light->id, value);
 }
 
 static void Light_set_enabled (LIScrArgs* args)
@@ -212,6 +221,7 @@ void liext_script_light (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_LIGHT, "light_new", Light_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_ambient", Light_set_ambient);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_diffuse", Light_set_diffuse);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_directional", Light_set_directional);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_enabled", Light_set_enabled);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_equation", Light_set_equation);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_LIGHT, "light_set_position", Light_set_position);

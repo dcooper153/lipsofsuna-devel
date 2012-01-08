@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -23,6 +23,7 @@
 struct _LIRenLight
 {
 	int id;
+	int directional;
 	LIMatTransform transform;
 	LIRenLightData* data;
 	LIRenRender* render;
@@ -48,6 +49,10 @@ LIAPICALL (void, liren_light_set_ambient, (
 LIAPICALL (void, liren_light_set_diffuse, (
 	LIRenLight*  self,
 	const float* value));
+
+LIAPICALL (void, liren_light_set_directional, (
+	LIRenLight* self,
+	int         value));
 
 LIAPICALL (void, liren_light_set_enabled, (
 	LIRenLight* self,

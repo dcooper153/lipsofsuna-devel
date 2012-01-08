@@ -17,7 +17,9 @@ Light.class_name = "Light"
 Light.new = function(clss, args)
 	local self = Class.new(clss)
 	self.handle = Los.light_new()
-	__userdata_lookup[self.handle] = self
+	if self.handle then
+		__userdata_lookup[self.handle] = self
+	end
 	rawset(self, "__ambient", {0,0,0,1})
 	rawset(self, "__diffuse", {1,1,1,1})
 	rawset(self, "__enabled", false)
@@ -43,6 +45,10 @@ end
 
 --- The diffuse color of the light source.
 -- @name Light.diffuse
+-- @class table
+
+--- Sets the light directional.
+-- @name Light.directional
 -- @class table
 
 --- Enables or disables the light.
@@ -92,6 +98,7 @@ end
 Light:add_getters{
 	ambient = function(s) return rawget(s, "__ambient") end,
 	diffuse = function(s) return rawget(s, "__diffuse") end,
+	directional = function(s) return rawget(s, "__directional") end,
 	enabled = function(s) return rawget(s, "__enabled") end,
 	equation = function(s) return rawget(s, "__equation") end,
 	position = function(s) return rawget(s, "__position") end,
@@ -112,6 +119,10 @@ Light:add_setters{
 	diffuse = function(s, v)
 		rawset(s, "__diffuse", v)
 		Los.light_set_diffuse(s.handle, v)
+	end,
+	directional = function(s, v)
+		rawset(s, "__directional", v)
+		Los.light_set_directional(s.handle, v)
 	end,
 	enabled = function(s, v)
 		rawset(s, "__enabled", v)

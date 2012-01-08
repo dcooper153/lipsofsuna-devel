@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -95,6 +95,23 @@ void liren_render_light_set_diffuse (
 	light = lialg_u32dic_find (self->lights, id);
 	if (light != NULL)
 		liren_light_set_diffuse (light, value);
+}
+
+/**
+ * \brief Sets the light directional.
+ * \param self Light source.
+ * \param value Nonzero to set directional.
+ */
+void liren_render_light_set_directional (
+	LIRenRender* self,
+	int          id,
+	int          value)
+{
+	LIRenLight* light;
+
+	light = lialg_u32dic_find (self->lights, id);
+	if (light != NULL)
+		liren_light_set_directional (light, value);
 }
 
 /**

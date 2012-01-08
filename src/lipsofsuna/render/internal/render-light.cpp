@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -136,6 +136,19 @@ void liren_light_set_diffuse (
 }
 
 /**
+ * \brief Sets the light directional
+ * \param self Light source.
+ * \param value Nonzero for directional.
+ */
+void liren_light_set_directional (
+	LIRenLight* self,
+	int         value)
+{
+	self->directional = value;
+	private_update_type (self);
+}
+
+/**
  * \brief Enables or disables the light.
  * \param self Light source.
  * \param value Nonzero to enable.
@@ -257,7 +270,9 @@ static void private_update_type (
 {
 	Ogre::Radian angle(self->data->light->getSpotlightOuterAngle ());
 
-	if (angle.valueRadians () < 0.5f * M_PI)
+	if (self->directional)
+		self->data->light->setType (Ogre::Light::LT_DIRECTIONAL);
+	else if (angle.valueRadians () < 0.5f * M_PI)
 		self->data->light->setType (Ogre::Light::LT_SPOTLIGHT);
 	else
 		self->data->light->setType (Ogre::Light::LT_POINT);
