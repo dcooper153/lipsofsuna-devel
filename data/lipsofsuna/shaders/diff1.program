@@ -1,3 +1,16 @@
+vertex_program diff1_vert glsl
+{
+	source diff1.vert
+	preprocessor_defines LIGHTS=3
+	includes_skeletal_animation true
+	default_params
+	{
+		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
+		param_named_auto LOS_camera_position camera_position_object_space
+		param_named_auto LOS_light_position light_position_object_space_array 3
+	}
+}
+
 fragment_program diff1_frag glsl
 {
 	source diff1.frag

@@ -516,9 +516,11 @@ static void private_override_pass (
 	{
 		pass->setSelfIllumination (mat->emission, mat->emission, mat->emission);
 		pass->setShininess (mat->shininess);
-		pass->setDiffuse (Ogre::ColourValue (mat->diffuse[0], mat->diffuse[1], mat->diffuse[2], mat->diffuse[3]));
-		pass->setSpecular (Ogre::ColourValue (mat->specular[0], mat->specular[1], mat->specular[2], mat->specular[3]));
-		pass->setVertexColourTracking (Ogre::TVC_DIFFUSE);
+		Ogre::TrackVertexColourType track = pass->getVertexColourTracking ();
+		if (track != Ogre::TVC_DIFFUSE)
+			pass->setDiffuse (Ogre::ColourValue (mat->diffuse[0], mat->diffuse[1], mat->diffuse[2], mat->diffuse[3]));
+		if (track != Ogre::TVC_SPECULAR)
+			pass->setSpecular (Ogre::ColourValue (mat->specular[0], mat->specular[1], mat->specular[2], mat->specular[3]));
 	}
 
 	/* Override texture units. */

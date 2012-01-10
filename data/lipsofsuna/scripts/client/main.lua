@@ -67,7 +67,7 @@ else
 end
 
 Program.profiling = {}
-Render.scene_ambient = {0.15,0.15,0.15}
+Render.scene_ambient = {0.2,0.2,0.2}
 
 -- Main loop.
 while not Program.quit do
