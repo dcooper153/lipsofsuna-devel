@@ -22,6 +22,7 @@ Options.new = function(clss)
 	self.transparency_quality = 0.3
 	self.sound_volume = 1.0
 	self.music_volume = 0.1
+	self.view_distance = 5000
 	-- Read values from the configuration file.
 	self.config = ConfigFile{name = "options.cfg"}
 	local opts = {
@@ -41,6 +42,7 @@ Options.new = function(clss)
 		shader_quality = {"int", 1, 3},
 		sound_volume = {"float", 0, 1},
 		transparency_quality = {"float", 0, 1},
+		view_distance = {"float", 10, 1000000},
 		vsync = {"bool"},
 		window_height = {"int", 32, 65536},
 		window_width = {"int", 32, 65536}}
@@ -109,6 +111,7 @@ Options.save = function(self)
 	write("shader_quality", self.shader_quality)
 	write("sound_volume", self.sound_volume)
 	write("transparency_quality", self.transparency_quality)
+	write("view_distance", self.view_distance)
 	write("vsync", self.vsync)
 	write("window_height", self.window_height)
 	write("window_width", self.window_width)

@@ -20,8 +20,8 @@ Client.init = function(self)
 	-- Initialize the camera.
 	-- These need to be initialized before options since they'll be
 	-- reconfigured when the options are loaded.
-	self.camera1 = FirstPersonCamera{collision_mask = Physics.MASK_CAMERA, far = 40.0, fov = 1.1, near = 0.01}
-	self.camera3 = ThirdPersonCamera{collision_mask = Physics.MASK_CAMERA, far = 40.0, fov = 1.1, near = 0.01}
+	self.camera1 = FirstPersonCamera{collision_mask = Physics.MASK_CAMERA, far = Options.inst.view_distance, fov = 1.1, near = 0.01}
+	self.camera3 = ThirdPersonCamera{collision_mask = Physics.MASK_CAMERA, far = Options.inst.view_distance, fov = 1.1, near = 0.01}
 	self.camera_mode = "third-person"
 	-- Initialize views.
 	self.views = {}
