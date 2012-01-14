@@ -23,7 +23,7 @@ fragment_program terrain1_frag glsl
 		param_named LOS_shadow_texture_0 int 3
 		param_named LOS_shadow_texture_1 int 4
 		param_named LOS_shadow_texture_2 int 5
-		param_named_auto LOS_scene_ambient ambient_light_colour
+		param_named_auto LOS_scene_ambient derived_scene_colour
 		param_named_auto LOS_material_diffuse surface_diffuse_colour
 		param_named_auto LOS_material_shininess surface_shininess
 		param_named_auto LOS_light_direction light_direction_object_space_array 3

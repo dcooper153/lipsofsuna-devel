@@ -30,6 +30,8 @@ require "client/effect"
 require "client/equipment"
 require "client/quickslots"
 require "client/gui"
+require "client/lighting"
+Lighting:init()
 require "client/player"
 require "client/slots"
 require "client/target"

@@ -31,7 +31,7 @@ vec3 los_blinn_phong(in vec3 lv, in vec3 hv, in vec3 ld, in vec4 eq,
 vec2 los_cel_shading(in vec3 l, in vec4 p, in sampler1D t1, in sampler1D t2)
 {
 	float celd = p.x * texture(t1, l.z * (1.0 + 0.5 * l.x)).x;
-	float cels = p.y * texture(t2, l.z * (1.0 + 0.5 * l.y)).x;
+	float cels = p.y * texture(t2, l.z * l.y).x;
 	float diff = mix(l.z * l.x, celd, p.z);
 	float spec = mix(l.z * l.y, cels, p.w);
 	return vec2(diff, spec);

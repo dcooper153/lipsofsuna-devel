@@ -220,7 +220,7 @@ Eventhandler{type = "tick", func = function(self, args)
 		Client.camera3.object = Client.player_object
 		Client.camera1:update(args.secs)
 		Client.camera3:update(args.secs)
-		Player:update_light(args.secs)
+		Lighting:update(args.secs)
 		-- Sound playback.
 		local p,r = Client.player_object:find_node{name = "#neck", space = "world"}
 		if p then

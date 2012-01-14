@@ -5,7 +5,7 @@ material terrain1
 		pass
 		{
 			max_lights 3
-			ambient 0.3 0.3 0.3
+			ambient 0.7 0.7 0.7
 			diffuse 1.0 1.0 1.0
 			specular 0.1 0.1 0.1 0.1 64
 			texture_unit LOS1

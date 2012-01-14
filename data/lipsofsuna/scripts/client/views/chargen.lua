@@ -32,8 +32,6 @@ Views.Chargen.new = function(clss)
 		skill.value = skill.cap
 	end}
 	self.object = Creature{position = Vector(1, 1, 1)}
-	self.light = Light{diffuse={1.0,1.0,1.0,1.0}, equation={0.2,0.04,0.004}, priority = 10, spot_cutoff = 1.5, spot_exponent = 127}
-
 	self.timer = Timer{enabled = false, func = function(timer, secs) self:update(secs) end}
 	self.list_hair_styles = {}
 	self.list_eye_styles = {}
@@ -302,7 +300,6 @@ Views.Chargen.close = function(self)
 	self.floating = false
 	self.object.realized = false
 	self.timer.enabled = false
-	self.light.enabled = false
 end
 
 --- Executes the character generator.
@@ -318,7 +315,6 @@ Views.Chargen.enter = function(self, from)
 	self.floating = true
 	self.object.realized = true
 	self.timer.enabled = true
-	self.light.enabled = true
 	self:random()
 	self:update(0.0)
 	self.camera:warp()
@@ -469,15 +465,13 @@ Views.Chargen.update = function(self, secs)
 		self:update_model()
 	end
 	self.object:refresh()
-	-- Update light.
-	local p = self.object.position
-	local r = self.object.rotation
-	self.light.position = p + r * Vector(0,15,-15)
-	self.light.rotation = Quaternion{dir = p - self.light.position, up = Vector(0, 1)}
+	-- Update the camera.
 	self.camera.target_position = self.object.position + self.view_offset
 	self.camera.target_rotation = Quaternion{axis = Vector(0, 1, 0), angle = math.pi}
 	self.camera:update(secs)
 	self:update_camera()
+	-- Update lighting.
+	Lighting:update(secs)
 end
 
 --- Sets the character from a preset.
