@@ -129,12 +129,14 @@ int liren_internal_init (
 		return 0;
 
 	/* Choose the video mode. */
+	Ogre::String fsaa = Ogre::StringConverter::toString (mode->multisamples);
 	Ogre::String video_mode =
 		Ogre::StringConverter::toString (mode->width) + " x " +
 		Ogre::StringConverter::toString (mode->height);
 	self->data->render_system->setConfigOption ("Full Screen", mode->fullscreen? "Yes" : "No");
 	self->data->render_system->setConfigOption ("VSync", mode->sync? "Yes" : "No");
 	self->data->render_system->setConfigOption ("Video Mode", video_mode);
+	self->data->render_system->setConfigOption ("FSAA", fsaa);
 
 	/* Initialize the render window. */
 	self->data->root->setRenderSystem (self->data->render_system);
@@ -183,7 +185,6 @@ int liren_internal_init (
 	self->data->scene_manager->setAmbientLight (Ogre::ColourValue (0.5, 0.5, 0.5));
 	self->data->scene_manager->setShadowTechnique (Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
 	self->data->scene_manager->setShadowTextureSelfShadow (false);
-	self->data->scene_manager->setShowDebugShadows (true);
 	self->data->scene_manager->setShadowFarDistance (100.0f);
 	self->data->scene_manager->setShadowCameraSetup (Ogre::ShadowCameraSetupPtr (new Ogre::DefaultShadowCameraSetup ()));
 	self->data->scene_manager->setShadowTextureCount (8);
@@ -717,6 +718,7 @@ int liren_internal_get_videomodes (
 			(*modes)[i].height = h;
 			(*modes)[i].fullscreen = 1;
 			(*modes)[i].sync = self->mode.sync;
+			(*modes)[i].multisamples = self->mode.multisamples;
 		}
 	}
 

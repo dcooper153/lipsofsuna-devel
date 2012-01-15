@@ -48,6 +48,7 @@ struct _LIRenVideomode
 	int height;
 	int fullscreen;
 	int sync;
+	int multisamples;
 };
 
 #endif

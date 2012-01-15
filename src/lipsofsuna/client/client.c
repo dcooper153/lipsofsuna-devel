@@ -32,7 +32,8 @@ static int private_init (
 	int           width,
 	int           height,
 	int           fullscreen,
-	int           sync);
+	int           sync,
+	int           multisamples);
 
 static void private_server_main (
 	LISysThread* thread,
@@ -48,7 +49,8 @@ LICliClient* licli_client_new (
 	int           width,
 	int           height,
 	int           fullscreen,
-	int           vsync)
+	int           vsync,
+	int           multisamples)
 {
 	LICliClient* self;
 
@@ -59,7 +61,7 @@ LICliClient* licli_client_new (
 	self->program = program;
 
 	/* Initialize graphics. */
-	if (!private_init (self, program, width, height, fullscreen, vsync))
+	if (!private_init (self, program, width, height, fullscreen, vsync, multisamples))
 	{
 		licli_client_free (self);
 		return NULL;
@@ -149,7 +151,8 @@ static int private_init (
 	int           width,
 	int           height,
 	int           fullscreen,
-	int           sync)
+	int           sync,
+	int           multisamples)
 {
 	LIRenVideomode mode;
 
@@ -158,6 +161,7 @@ static int private_init (
 	mode.height = height;
 	mode.fullscreen = fullscreen;
 	mode.sync = sync;
+	mode.multisamples = multisamples;
 	self->render = liren_render_new (self->program->paths, &mode);
 	if (self->render == NULL)
 		return 0;

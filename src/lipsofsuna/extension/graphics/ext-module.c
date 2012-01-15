@@ -29,7 +29,8 @@ static void private_initial_videomode (
 	int*         width,
 	int*         height,
 	int*         fullscreen,
-	int*         vsync);
+	int*         vsync,
+	int*         multisamples);
 
 static int private_engine_tick (
 	LIExtModule* self,
@@ -51,6 +52,7 @@ LIExtModule* liext_graphics_new (
 	int height = 768;
 	int fullscreen = 0;
 	int vsync = 0;
+	int multisamples = 0;
 	LIExtModule* self;
 
 	/* Allocate self. */
@@ -60,10 +62,10 @@ LIExtModule* liext_graphics_new (
 	self->program = program;
 
 	/* Get the initial video mode. */
-	private_initial_videomode (self, &width, &height, &fullscreen, &vsync);
+	private_initial_videomode (self, &width, &height, &fullscreen, &vsync, &multisamples);
 
 	/* Allocate the client. */
-	self->client = licli_client_new (program, width, height, fullscreen, vsync);
+	self->client = licli_client_new (program, width, height, fullscreen, vsync, multisamples);
 	if (self->client == NULL)
 	{
 		liext_graphics_free (self);
@@ -100,7 +102,8 @@ static void private_initial_videomode (
 	int*         width,
 	int*         height,
 	int*         fullscreen,
-	int*         vsync)
+	int*         vsync,
+	int*         multisamples)
 {
 	lua_State* lua;
 
@@ -145,6 +148,16 @@ static void private_initial_videomode (
 	lua_gettable (lua, -2);
 	if (lua_type (lua, -1) == LUA_TBOOLEAN)
 		*vsync = (int) lua_toboolean (lua, -1);
+	lua_pop (lua, 1);
+
+	/* Get the number of multisamples. */
+	lua_pushnumber (lua, 5);
+	lua_gettable (lua, -2);
+	if (lua_type (lua, -1) == LUA_TNUMBER)
+	{
+		*multisamples = (int) lua_tonumber (lua, -1);
+		*multisamples = LIMAT_CLAMP (*multisamples, 0, 128);
+	}
 	lua_pop (lua, 1);
 
 	/* Pop the videomode table. */

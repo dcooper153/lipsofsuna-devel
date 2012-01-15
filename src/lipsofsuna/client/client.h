@@ -44,7 +44,8 @@ LIAPICALL (LICliClient*, licli_client_new, (
 	int           width,
 	int           height,
 	int           fullscreen,
-	int           sync));
+	int           sync,
+	int           multisamples));
 
 LIAPICALL (void, licli_client_free, (
 	LICliClient* self));

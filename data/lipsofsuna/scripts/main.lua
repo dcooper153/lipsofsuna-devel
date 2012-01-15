@@ -66,7 +66,7 @@ Physics.enable_simulation = true
 else
 require "client/options"
 Options.inst = Options()
-__initial_videomode = {Options.inst.window_width, Options.inst.window_height, Options.inst.fullscreen, Options.inst.vsync}
+__initial_videomode = {Options.inst.window_width, Options.inst.window_height, Options.inst.fullscreen, Options.inst.vsync, Options.inst.multisamples}
 require "system/animation"
 require "system/graphics"
 require "system/input"
