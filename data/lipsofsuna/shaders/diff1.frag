@@ -11,10 +11,12 @@ uniform vec4 LOS_light_diffuse[LIGHTS];
 uniform vec4 LOS_light_specular[LIGHTS];
 uniform vec4 LOS_light_equation[LIGHTS];
 uniform vec4 LOS_light_spotparams[LIGHTS];
+
 in vec3 F_normal;
 in vec2 F_texcoord;
 in vec3 F_lightv[LIGHTS];
 in vec3 F_lighthv[LIGHTS];
+
 vec3 los_blinn_phong(in vec3 lv, in vec3 hv, in vec3 ld, in vec4 eq,
 	in vec3 normal, in vec4 spotparam, in float shininess)
 {
@@ -36,6 +38,7 @@ vec2 los_cel_shading(in vec3 l, in vec4 p, in sampler1D t1, in sampler1D t2)
 	float spec = mix(l.z * l.y, cels, p.w);
 	return vec2(diff, spec);
 }
+
 void main()
 {
 	vec3 normal = normalize(F_normal);
@@ -50,5 +53,5 @@ void main()
 			LOS_diffuse_texture_2, LOS_diffuse_texture_3);
 		light += c.x * LOS_light_diffuse[i] + c.y * LOS_light_specular[i];
 	}
-	gl_FragColor = LOS_material_diffuse * diffuse * light;
+	gl_FragColor = vec4((LOS_material_diffuse * diffuse * light).rgb, diffuse.a);
 }
