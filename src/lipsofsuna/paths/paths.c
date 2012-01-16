@@ -25,6 +25,12 @@
 #include "lipsofsuna/system.h"
 #include "paths.h"
 
+static int private_create_save_path (
+	LIPthPaths* paths,
+	const char* path);
+
+/*****************************************************************************/
+
 /**
  * \brief Creates a new paths object.
  *
@@ -151,6 +157,14 @@ LIPthPaths* lipth_paths_new (
 	if (stat.type != LISYS_STAT_DIRECTORY && stat.type != LISYS_STAT_LINK)
 	{
 		lisys_error_set (EIO, "invalid data directory `%s': not a directory", self->module_data);
+		lipth_paths_free (self);
+		return NULL;
+	}
+
+	/* Create the save directories. */
+	if (!private_create_save_path (self, self->module_state) ||
+	    !private_create_save_path (self, self->override_data))
+	{
 		lipth_paths_free (self);
 		return NULL;
 	}
@@ -309,6 +323,37 @@ int lipth_paths_add_path_abs (
 }
 
 /**
+ * \brief Creates a new file in the override directory.
+ * \param self Paths.
+ * \param name Filename.
+ * \return path Absolute path or NULL.
+ */
+const char* lipth_paths_create_file (
+	LIPthPaths* self,
+	const char* name)
+{
+	char* path;
+	LIAlgStrdicNode* node;
+
+	/* Format the path. */
+	path = lisys_path_concat (self->override_data, name, NULL);
+	if (path == NULL)
+		return NULL;
+
+	/* Register the file. */
+	node = lialg_strdic_find_node (self->files, name);
+	if (node != NULL)
+	{
+		lisys_free (node->value);
+		node->value = path;
+	}
+	else
+		lialg_strdic_insert (self->files, name, path);
+
+	return path;
+}
+
+/**
  * \brief Finds a file by name.
  * \param self Paths.
  * \param name File name.
@@ -386,33 +431,7 @@ char* lipth_paths_get_sql (
 	const LIPthPaths* self,
 	const char*       name)
 {
-	char* path;
-
-	/* Format the path. */
-	path = lisys_path_concat (self->module_state, name, NULL);
-	if (path == NULL)
-		return NULL;
-
-	/* Check if the save directory exists. */
-	if (lisys_filesystem_access (self->module_state, LISYS_ACCESS_EXISTS))
-	{
-		if (!lisys_filesystem_access (self->module_state, LISYS_ACCESS_WRITE))
-		{
-			lisys_error_set (EINVAL, "save path `%s' is not writable", path);
-			lisys_free (path);
-			return NULL;
-		}
-		return path;
-	}
-
-	/* Create the save directory. */
-	if (!lisys_filesystem_makepath (self->module_state))
-	{
-		lisys_free (path);
-		return NULL;
-	}
-
-	return path;
+	return lisys_path_concat (self->module_state, name, NULL);
 }
 
 /**
@@ -426,6 +445,30 @@ char* lipth_paths_get_root ()
 #else
 	return lisys_string_dup (LIDATADIR);
 #endif
+}
+
+/*****************************************************************************/
+
+static int private_create_save_path (
+	LIPthPaths* self,
+	const char* path)
+{
+	/* Check if the save directory exists. */
+	if (lisys_filesystem_access (path, LISYS_ACCESS_EXISTS))
+	{
+		if (!lisys_filesystem_access (path, LISYS_ACCESS_WRITE))
+		{
+			lisys_error_set (EINVAL, "save path `%s' is not writable", path);
+			return 0;
+		}
+		return 1;
+	}
+
+	/* Create the save directory. */
+	if (!lisys_filesystem_makepath (path))
+		return 0;
+
+	return 1;
 }
 
 /** @} */

@@ -51,6 +51,10 @@ LIAPICALL (int, lipth_paths_add_path_abs, (
 	LIPthPaths* self,
 	const char* path));
 
+LIAPICALL (const char*, lipth_paths_create_file, (
+	LIPthPaths* self,
+	const char* name));
+
 LIAPICALL (const char*, lipth_paths_find_file, (
 	LIPthPaths* self,
 	const char* name));
