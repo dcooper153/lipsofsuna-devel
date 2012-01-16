@@ -1,6 +1,6 @@
 Program:add_path("graphics")
-Program:add_path("fonts")
 Program:add_path("textures")
 Program:add_path("materials")
 Program:add_path("sounds")
 Program:add_path("shaders")
+Program:add_path("ui")
