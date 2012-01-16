@@ -212,6 +212,17 @@ static void private_create_material (
 			existing = true;
 	}
 
+	/* Try to default to diff1 if no material found yet. */
+	/* Although the model could specify almost all the important properties,
+	   we strongly prefer to use a base material. This can be avoided by not
+	   specifying the `diff1' shader, though there should be no reason for that. */
+	if (!existing)
+	{
+		material = self->render->data->material_manager->getByName ("diff1");
+		if (!material.isNull())
+			existing = true;
+	}
+
 	/* Create a new material if an existing one was not found. */
 	if (!existing)
 	{

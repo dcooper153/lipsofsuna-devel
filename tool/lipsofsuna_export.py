@@ -647,8 +647,8 @@ class LIMaterial:
 		self.emission = 0
 		self.flags = LIFormat.MATRFLAG_DEFAULT
 		self.name = 'default'
-		self.shader = 'default'
-		self.material = 'default'
+		self.shader = 'diff1'
+		self.material = 'diff1'
 		self.shininess = 0
 		self.specular = [1, 1, 1, 1]
 		self.strands = [0.2, 0.0, 0.0]
