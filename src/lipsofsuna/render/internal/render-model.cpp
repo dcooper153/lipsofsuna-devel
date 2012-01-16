@@ -547,9 +547,8 @@ static void private_override_pass (
 			/* Check if a PNG version is available. */
 			Ogre::String texname = Ogre::String (mat->textures.array[j].string);
 			Ogre::String pngname = texname + ".png";
-			char* path = lipth_paths_get_texture (self->render->paths, pngname.c_str ());
+			const char* path = lipth_paths_find_file (self->render->paths, pngname.c_str ());
 			int gotpng = lisys_filesystem_access (path, LISYS_ACCESS_READ);
-			lisys_free (path);
 
 			/* Use either a PNG or a DDS file. */
 			/* PNG is favored over DDS so that artists don't need to bother

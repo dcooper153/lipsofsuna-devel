@@ -3,6 +3,13 @@ require "system/class"
 Program = Class()
 Program.class_name = "Program"
 
+--- Adds a data lookup path.
+-- @param clss Program class.
+-- @param path Path name.
+Program.add_path = function(self, path)
+	return Los.program_add_path(path)
+end
+
 --- Sets the name of the mod to be executed after this one quits.
 -- @param clss Program class.
 -- @param args Arguments.<ul>

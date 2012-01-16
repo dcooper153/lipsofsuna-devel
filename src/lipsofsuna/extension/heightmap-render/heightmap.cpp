@@ -46,7 +46,7 @@ int liext_heightmap_add_texture_layer (
 	const char*     height,
 	const char*     blend)
 {
-	char* path;
+	const char* path;
 	Ogre::String fmt = ".png";
 	LIExtHeightmapRender* module = (LIExtHeightmapRender*) self->module->render_hooks->data;
 
@@ -56,9 +56,8 @@ int liext_heightmap_add_texture_layer (
 	{
 		Ogre::Image ds;
 		ds.loadTwoImagesAsRGBA (diffuse + fmt, specular + fmt, LIREN_RESOURCES_PERMANENT, Ogre::PF_BYTE_RGBA);
-		path = lipth_paths_get_texture (module->render->paths, dsname.c_str ());
+		path = lipth_paths_find_file (module->render->paths, dsname.c_str ());
 		ds.save (path);
-		lisys_free (path);
 	}
 	catch (Ogre::Exception& e)
 	{
@@ -72,9 +71,8 @@ int liext_heightmap_add_texture_layer (
 	{
 		Ogre::Image nh;
 		nh.loadTwoImagesAsRGBA (normal + fmt, height + fmt, LIREN_RESOURCES_PERMANENT, Ogre::PF_BYTE_RGBA);
-		path = lipth_paths_get_texture (module->render->paths, nhname.c_str ());
+		path = lipth_paths_find_file (module->render->paths, nhname.c_str ());
 		nh.save (path);
-		lisys_free (path);
 	}
 	catch (Ogre::Exception& e)
 	{

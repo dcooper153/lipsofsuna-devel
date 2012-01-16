@@ -132,7 +132,8 @@ LISndSample* liext_sound_find_sample (
 	const char*  name)
 {
 	int ret;
-	char* path;
+	char* file;
+	const char* path;
 	LISndSample* sample;
 
 	/* Check for existing. */
@@ -141,36 +142,30 @@ LISndSample* liext_sound_find_sample (
 		return sample;
 
 	/* Try to load FLAC. */
-	path = lisys_path_format (self->program->paths->module_data,
-		LISYS_PATH_SEPARATOR, "sounds",
-		LISYS_PATH_SEPARATOR, name, ".flac", NULL);
-	if (path == NULL)
+	file = lisys_string_concat (name, ".flag");
+	if (file == NULL)
 		return NULL;
-	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
+	path = lipth_paths_find_file (self->program->paths, file);
+	lisys_free (file);
+	if (path != NULL)
 	{
 		ret = lisnd_manager_set_sample (self->sound, name, path);
-		lisys_free (path);
 		if (ret)
 			return lisnd_manager_get_sample (self->sound, name);
 	}
-	else
-		lisys_free (path);
 
 	/* Try to load OGG. */
-	path = lisys_path_format (self->program->paths->module_data,
-		LISYS_PATH_SEPARATOR, "sounds",
-		LISYS_PATH_SEPARATOR, name, ".ogg", NULL);
-	if (path == NULL)
+	file = lisys_string_concat (name, ".ogg");
+	if (file == NULL)
 		return NULL;
-	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
+	path = lipth_paths_find_file (self->program->paths, file);
+	lisys_free (file);
+	if (path != NULL)
 	{
 		ret = lisnd_manager_set_sample (self->sound, name, path);
-		lisys_free (path);
 		if (ret)
 			return lisnd_manager_get_sample (self->sound, name);
 	}
-	else
-		lisys_free (path);
 
 	return 0;
 }

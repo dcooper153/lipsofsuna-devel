@@ -65,24 +65,10 @@ Object.load_meshes = false
 Physics.enable_simulation = true
 else
 require "client/options"
-Options.inst = Options()
-__initial_videomode = {Options.inst.window_width, Options.inst.window_height, Options.inst.fullscreen, Options.inst.vsync, Options.inst.multisamples}
 require "system/animation"
-require "system/graphics"
-require "system/input"
-require "system/camera"
 require "system/keysym"
-require "system/heightmap-render"
-require "system/model-editing"
-require "system/object-render"
-require "system/render"
 require "system/sound"
-require "system/tiles-render"
-require "system/reload"
 require "system/watchdog"
-require "system/widgets"
-require "client/shader"
-require "client/shaders/skeletal"
 end
 
 require "content/armor"
@@ -107,8 +93,26 @@ end
 for k,v in pairs(File:scan_directory("scripts/content/dialogs")) do
 	require("content/dialogs/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
+require "mods"
 
 Itemspec:validate()
+
+if not Settings.server then
+Options.inst = Options()
+__initial_videomode = {Options.inst.window_width, Options.inst.window_height, Options.inst.fullscreen, Options.inst.vsync, Options.inst.multisamples}
+require "system/graphics"
+require "system/camera"
+require "system/input"
+require "system/heightmap-render"
+require "system/model-editing"
+require "system/object-render"
+require "system/render"
+require "system/tiles-render"
+require "system/reload"
+require "system/widgets"
+require "client/shader"
+require "client/shaders/skeletal"
+end
 
 if Settings.quit then Program.quit = true end
 if Settings.server then

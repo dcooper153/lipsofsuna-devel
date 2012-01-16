@@ -164,21 +164,19 @@ int lieng_model_load (
 	int         mesh)
 {
 	char* file;
-	char* path;
+	const char* path;
 	LIMdlModel* tmpmdl;
 
 	/* Allocate path. */
 	file = lisys_string_concat (name, ".lmdl");
 	if (name == NULL)
 		return 0;
-	path = lipth_paths_get_graphics (self->engine->paths, file);
-	lisys_free (file);
+	path = lipth_paths_find_file (self->engine->paths, file);
 	if (path == NULL)
 		return 0;
 
 	/* Load model geometry. */
 	tmpmdl = limdl_model_new_from_file (path, mesh);
-	lisys_free (path);
 	if (tmpmdl == NULL)
 		return 0;
 

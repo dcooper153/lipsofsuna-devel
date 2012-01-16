@@ -27,7 +27,7 @@
 
 static void Image_new (LIScrArgs* args)
 {
-	char* path;
+	const char* path;
 	const char* name;
 	LIImgImage* image;
 	LIExtImageModule* module;
@@ -39,13 +39,12 @@ static void Image_new (LIScrArgs* args)
 		return;
 
 	/* Create the path. */
-	path = lipth_paths_get_texture (module->program->paths, name);
+	path = lipth_paths_find_file (module->program->paths, name);
 	if (path == NULL)
 		return;
 
 	/* Allocate the image. */
 	image = liimg_image_new_from_file (path);
-	lisys_free (path);
 	if (image == NULL)
 		return;
 

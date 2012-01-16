@@ -26,6 +26,7 @@
 
 #include "render-internal.h"
 #include "render-container-factory.hpp"
+#include "render-resource-loading-listener.hpp"
 #include <OgreCompositorManager.h>
 #include <OgreEntity.h>
 #include <OgreFontManager.h>
@@ -68,6 +69,7 @@ int liren_internal_init (
 {
 	Ogre::Real w;
 	Ogre::Real h;
+	LIAlgList* ptr;
 
 	/* Initialize the private data. */
 	self->data = new LIRenRenderData;
@@ -101,27 +103,22 @@ int liren_internal_init (
 	Ogre::ResourceGroupManager& mgr = Ogre::ResourceGroupManager::getSingleton ();
 	mgr.createResourceGroup (LIREN_RESOURCES_TEMPORARY);
 
+	/* Allow overriding of resources. */
+	/* FIXME: Leaked? */
+	mgr.setLoadingListener (new LIRenResourceLoadingListener ());
+
 	/* Create the group for permanent resources. */
 	/* This group is used for resources that are managed by Ogre. They
 	   include textures and various scripts detected at initialization.
 	   Out of these, we only want to unload textures and even for them
 	   we want to keep the resource info available at all times. */
-	Ogre::String data0(self->paths->override_data);
-	Ogre::String data1(self->paths->module_data);
+	Ogre::String data1 (self->paths->module_data);
 	Ogre::String group = LIREN_RESOURCES_PERMANENT;
-	mgr.addResourceLocation (data0, "FileSystem", group, true);
-	mgr.addResourceLocation (data0 + "/fonts", "FileSystem", group, true);
-	mgr.addResourceLocation (data0 + "/graphics", "FileSystem", group, true);
-	mgr.addResourceLocation (data0 + "/materials", "FileSystem", group, true);
-	mgr.addResourceLocation (data0 + "/meshes", "FileSystem", group, true);
-	mgr.addResourceLocation (data0 + "/shaders", "FileSystem", group, true);
-	mgr.addResourceLocation (data0 + "/textures", "FileSystem", group, true);
-	mgr.addResourceLocation (data1 + "/fonts", "FileSystem", group, true);
-	mgr.addResourceLocation (data1 + "/graphics", "FileSystem", group, true);
-	mgr.addResourceLocation (data1 + "/materials", "FileSystem", group, true);
-	mgr.addResourceLocation (data1 + "/meshes", "FileSystem", group, true);
-	mgr.addResourceLocation (data1 + "/shaders", "FileSystem", group, true);
-	mgr.addResourceLocation (data1 + "/textures", "FileSystem", group, true);
+	for (ptr = self->paths->paths ; ptr != NULL ; ptr = ptr->next)
+	{
+		const char* dir = (const char*) ptr->data;
+		mgr.addResourceLocation (dir, "FileSystem", group, false);
+	}
 
 	/* Initialize the render system. */
 	self->data->render_system = self->data->root->getRenderSystemByName ("OpenGL Rendering Subsystem");

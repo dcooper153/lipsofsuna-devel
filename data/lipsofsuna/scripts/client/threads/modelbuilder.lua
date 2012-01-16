@@ -18,6 +18,7 @@ require "content/models"
 require "content/npcs"
 require "content/species"
 require "content/weapons"
+require "mods"
 
 -- Character meshes are kept in memory to ensure fast builds.
 -- TODO: Could also cache morphed models for a short period.

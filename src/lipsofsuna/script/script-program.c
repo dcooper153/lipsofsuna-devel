@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,8 +22,18 @@
  * @{
  */
 
-#include <lipsofsuna/main.h>
-#include <lipsofsuna/script.h>
+#include "lipsofsuna/main.h"
+#include "lipsofsuna/script.h"
+
+static void Program_add_path (LIScrArgs* args)
+{
+	const char* name;
+	LIMaiProgram* program;
+
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	if (liscr_args_geti_string (args, 0, &name))
+		lipth_paths_add_path (program->paths, name);
+}
 
 static void Program_launch_mod (LIScrArgs* args)
 {
@@ -291,6 +301,7 @@ static void Program_get_time (LIScrArgs* args)
 void liscr_script_program (
 	LIScrScript* self)
 {
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_add_path", Program_add_path);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_launch_mod", Program_launch_mod);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_load_extension", Program_load_extension);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_pop_message", Program_pop_message);
