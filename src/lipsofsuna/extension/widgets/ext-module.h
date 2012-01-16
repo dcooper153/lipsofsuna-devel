@@ -19,8 +19,10 @@
 #define __EXT_MODULE_H__
 
 #include "lipsofsuna/client.h"
-#include "lipsofsuna/widget.h"
 #include "lipsofsuna/extension.h"
+#include "widget.h"
+#include "widget-element.h"
+#include "widget-manager.h"
 
 #define LIEXT_SCRIPT_WIDGET "Widget"
 #define LIEXT_SCRIPT_WIDGETS "Widgets"

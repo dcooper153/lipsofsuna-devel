@@ -26,7 +26,6 @@
 #include "lipsofsuna/render.h"
 #include "lipsofsuna/script.h"
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/widget.h"
 #include "client-server.h"
 #include "client-types.h"
 
