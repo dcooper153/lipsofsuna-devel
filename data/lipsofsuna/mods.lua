@@ -1,70 +1,82 @@
-Program:add_path("materials")
-Program:add_path("sounds")
-Program:add_path("shaders")
-Program:add_path("textures")
+-- Core
+Mod:load "core"
+Mod:load "server"
+Mod:load "client"
 
-Program:add_path("aer")
-Program:add_path("aermale")
-Program:add_path("airtank")
-Program:add_path("android")
-Program:add_path("barrel")
-Program:add_path("bitingbark")
-Program:add_path("bloodworm")
-Program:add_path("bloomers")
-Program:add_path("book")
-Program:add_path("bricks")
-Program:add_path("building")
-Program:add_path("celshading")
-Program:add_path("chest")
-Program:add_path("crossbow")
-Program:add_path("dagger")
-Program:add_path("debug")
-Program:add_path("devora")
-Program:add_path("dewspring")
-Program:add_path("door")
-Program:add_path("dragon")
-Program:add_path("dress")
-Program:add_path("fedora")
-Program:add_path("food")
-Program:add_path("furnace")
-Program:add_path("furniture")
-Program:add_path("grenade")
-Program:add_path("hair")
-Program:add_path("headband")
-Program:add_path("imp")
-Program:add_path("jar")
-Program:add_path("kraken")
-Program:add_path("leggings")
-Program:add_path("lizardarmor")
-Program:add_path("lizardman")
-Program:add_path("mines")
-Program:add_path("misc")
-Program:add_path("miscapparel")
-Program:add_path("musket")
-Program:add_path("panties")
-Program:add_path("particle")
-Program:add_path("platearmor")
-Program:add_path("portal")
-Program:add_path("potion")
-Program:add_path("rat")
-Program:add_path("revolver")
-Program:add_path("shield")
-Program:add_path("sky")
-Program:add_path("slime")
-Program:add_path("sounds")
-Program:add_path("spell")
-Program:add_path("stones")
-Program:add_path("stoneweapon")
-Program:add_path("sword")
-Program:add_path("table")
-Program:add_path("terrain")
-Program:add_path("torch")
-Program:add_path("tree")
-Program:add_path("troglodyte")
-Program:add_path("ui")
-Program:add_path("unused")
-Program:add_path("weapons")
-Program:add_path("wood")
-Program:add_path("woodweapon")
-Program:add_path("workbench")
-Program:add_path("wyrm")
+-- Components
+Mod:load "aer"
+Mod:load "aermale"
+Mod:load "airtank"
+Mod:load "android"
+Mod:load "barrel"
+Mod:load "bitingbark"
+Mod:load "bloodworm"
+Mod:load "bloomers"
+Mod:load "book"
+Mod:load "bow"
+Mod:load "bricks"
+Mod:load "brigand"
+Mod:load "building"
+Mod:load "celshading"
+Mod:load "chest"
+Mod:load "club"
+Mod:load "crossbow"
+Mod:load "dagger"
+Mod:load "devora"
+Mod:load "dewspring"
+Mod:load "door"
+Mod:load "dragon"
+Mod:load "dress"
+Mod:load "fedora"
+Mod:load "furnace"
+Mod:load "furniture"
+Mod:load "grenade"
+Mod:load "hair"
+Mod:load "halberd"
+Mod:load "hatchet"
+Mod:load "headband"
+Mod:load "heightmap"
+Mod:load "imp"
+Mod:load "jar"
+Mod:load "kraken"
+Mod:load "leatherarmor"
+Mod:load "leggings"
+Mod:load "lizardarmor"
+Mod:load "lizardman"
+Mod:load "mattock"
+Mod:load "mines"
+Mod:load "misc"
+Mod:load "mushroom"
+Mod:load "musket"
+Mod:load "panties"
+Mod:load "particle"
+Mod:load "platearmor"
+Mod:load "portal"
+Mod:load "potion"
+Mod:load "rat"
+Mod:load "revolver"
+Mod:load "seirei"
+Mod:load "shield"
+Mod:load "sky"
+Mod:load "slime"
+Mod:load "sounds"
+Mod:load "spear"
+Mod:load "spell"
+Mod:load "staff"
+Mod:load "stones"
+Mod:load "sword"
+Mod:load "terrain"
+Mod:load "torch"
+Mod:load "tree"
+Mod:load "troglodyte"
+Mod:load "ui"
+Mod:load "unused"
+Mod:load "wood"
+Mod:load "workbench"
+Mod:load "wyrm"
+
+-- Quests/bundles
+Mod:load "castle"
+Mod:load "keepersofknowledge"
+Mod:load "silverspring"
+Mod:load "tutorial"

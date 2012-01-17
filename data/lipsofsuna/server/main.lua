@@ -32,7 +32,7 @@ end
 require "server/generator"
 require "server/generator/main"
 
-Map:init()
+if Map then Map:init() end
 Network:host{port = Config.inst.server_port}
 if Settings.generate or
    Serialize:get_value("map_version") ~= Generator.map_version or

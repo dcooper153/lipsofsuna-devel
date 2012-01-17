@@ -26,73 +26,8 @@ if not Settings:parse_command_line() then
 	return
 end
 
-Voxel.blocks_per_line = 2
-Voxel.tiles_per_line = 12
-require "common/actionspec"
-require "common/color"
-require "common/crafting"
-require "common/dialogspec"
-require "common/effect"
-require "common/faction"
-require "common/feat"
-require "common/iconspec"
-require "common/influencespec"
-require "common/itemspec"
-require "common/map"
-require "common/material"
-require "common/marker"
-require "common/model"
-require "common/modelspec"
-require "common/names"
-require "common/object"
-require "common/obstaclespec"
-require "common/pattern"
-require "common/protocol"
-require "common/quest"
-require "common/regionspec"
-require "common/serialize"
-require "common/sectors"
-require "common/species"
-require "common/voxel"
-
-require "system/lobby"
-if Settings.server then
-require "system/password"
-require "system/vision"
-require "common/inventory"
-require "common/skills"
-Object.load_meshes = false
-Physics.enable_simulation = true
-else
-require "client/options"
-require "system/animation"
-require "system/keysym"
-require "system/sound"
-require "system/watchdog"
-end
-
-require "content/armor"
-require "content/effects"
-require "content/enemies"
-require "content/factions"
-require "content/feats"
-require "content/icons"
-require "content/items"
-require "content/materials"
-require "content/models"
-require "content/npcs"
-require "content/obstacles"
-require "content/patterns"
-require "content/quests"
-require "content/regions"
-require "content/species"
-require "content/weapons"
-for k,v in pairs(File:scan_directory("content/books")) do
-	require("content/books/" .. string.gsub(v, "([^.]*).*", "%1"))
-end
-for k,v in pairs(File:scan_directory("content/dialogs")) do
-	require("content/dialogs/" .. string.gsub(v, "([^.]*).*", "%1"))
-end
+-- Load mods.
+require "common/mod"
 require "mods"
 
 Itemspec:validate()

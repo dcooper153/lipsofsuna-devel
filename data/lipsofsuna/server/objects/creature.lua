@@ -43,8 +43,8 @@ Creature:add_setters{
 		-- Set appearance.
 		-- Only set once when spawned by the map generator or an admin.
 		if s.random and spec.eye_style then
-			if spec.eye_style == "random" then
-				local s = spec.hair_styles[math.random(1, #spec.eye_styles)]
+			if spec.eye_style == "random" and spec.eye_styles then
+				local s = spec.eye_styles[math.random(1, #spec.eye_styles)]
 				local rgb = Color:hsv_to_rgb{math.random(), 0.2 + 0.8 * math.random(), math.random()}
 				rgb[1] = math.floor(255 * rgb[1] + 0.5)
 				rgb[2] = math.floor(255 * rgb[1] + 0.5)
@@ -56,7 +56,7 @@ Creature:add_setters{
 			end
 		end
 		if s.random and spec.hair_style then
-			if spec.hair_style == "random" then
+			if spec.hair_style == "random" and spec.hair_styles then
 				local h = spec.hair_styles[math.random(1, #spec.hair_styles)]
 				local r = math.random(0, 255)
 				local g = math.random(0, 255)

@@ -74,7 +74,7 @@ Render.scene_ambient = {0.2,0.2,0.2}
 -- Initialize the map.
 -- Graphics and lighting in particulat need to be initialized before this
 -- since Ogre uses directional lights to precalculate heightmap lighting.
-Map:init()
+if Map then Map:init() end
 
 -- Main loop.
 while not Program.quit do
