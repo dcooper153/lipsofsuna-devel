@@ -16,7 +16,7 @@ Physics.GROUP_TILES = 0x8000
 Physics.MASK_CAMERA = 0xF001
 Physics.MASK_PICK = 0xF001
 
-for k,v in pairs(File:scan_directory("scripts/client/widgets")) do
+for k,v in pairs(File:scan_directory("client/widgets")) do
 	require("client/widgets/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
 require "client/action"
@@ -35,16 +35,16 @@ Lighting:init()
 require "client/player"
 require "client/slots"
 require "client/target"
-for k,v in pairs(File:scan_directory("scripts/client/network")) do
+for k,v in pairs(File:scan_directory("client/network")) do
 	require("client/network/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
-for k,v in pairs(File:scan_directory("scripts/client/objects")) do
+for k,v in pairs(File:scan_directory("client/objects")) do
 	require("client/objects/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
-for k,v in pairs(File:scan_directory("scripts/client/shaders")) do
+for k,v in pairs(File:scan_directory("client/shaders")) do
 	require("client/shaders/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
-for k,v in pairs(File:scan_directory("scripts/client/views")) do
+for k,v in pairs(File:scan_directory("client/views")) do
 	require("client/views/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
 

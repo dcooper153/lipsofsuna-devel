@@ -87,10 +87,10 @@ require "content/quests"
 require "content/regions"
 require "content/species"
 require "content/weapons"
-for k,v in pairs(File:scan_directory("scripts/content/books")) do
+for k,v in pairs(File:scan_directory("content/books")) do
 	require("content/books/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
-for k,v in pairs(File:scan_directory("scripts/content/dialogs")) do
+for k,v in pairs(File:scan_directory("content/dialogs")) do
 	require("content/dialogs/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
 require "mods"

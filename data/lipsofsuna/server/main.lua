@@ -17,16 +17,16 @@ require "server/quest"
 require "server/modifier"
 require "server/editing"
 require "server/particles"
-for k,v in pairs(File:scan_directory("scripts/server/actions")) do
+for k,v in pairs(File:scan_directory("server/actions")) do
 	require("server/actions/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
-for k,v in pairs(File:scan_directory("scripts/server/objects")) do
+for k,v in pairs(File:scan_directory("server/objects")) do
 	require("server/objects/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
-for k,v in pairs(File:scan_directory("scripts/server/influences")) do
+for k,v in pairs(File:scan_directory("server/influences")) do
 	require("server/influences/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
-for k,v in pairs(File:scan_directory("scripts/server/modifiers")) do
+for k,v in pairs(File:scan_directory("server/modifiers")) do
 	require("server/modifiers/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
 require "server/generator"

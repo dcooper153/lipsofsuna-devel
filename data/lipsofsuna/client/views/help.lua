@@ -3,7 +3,7 @@ Views.Help.class_name = "Views.Help"
 Views.Help.index = {}
 
 -- Load the manual pages.
-for k,v in pairs(File:scan_directory("scripts/client/help")) do
+for k,v in pairs(File:scan_directory("client/help")) do
 	require("client/help/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
 

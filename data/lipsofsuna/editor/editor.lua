@@ -369,7 +369,7 @@ Editor.save = function(self)
 	end
 	-- Write to the file.
 	local t = self.pattern:write()
-	local name = string.format("scripts/content/patterns/%s.lua", self.pattern.name)
+	local name = string.format("content/patterns/%s.lua", self.pattern.name)
 	if not File:write(name, t) then
 		print(string.format("ERROR: Could not save `%s'.", name))
 	end
