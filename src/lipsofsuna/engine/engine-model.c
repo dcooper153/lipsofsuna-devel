@@ -164,21 +164,19 @@ int lieng_model_load (
 	int         mesh)
 {
 	char* file;
-	char* path;
+	const char* path;
 	LIMdlModel* tmpmdl;
 
 	/* Allocate path. */
 	file = lisys_string_concat (name, ".lmdl");
 	if (name == NULL)
 		return 0;
-	path = lipth_paths_get_graphics (self->engine->paths, file);
-	lisys_free (file);
+	path = lipth_paths_find_file (self->engine->paths, file);
 	if (path == NULL)
 		return 0;
 
 	/* Load model geometry. */
 	tmpmdl = limdl_model_new_from_file (path, mesh);
-	lisys_free (path);
 	if (tmpmdl == NULL)
 		return 0;
 
@@ -195,18 +193,6 @@ int lieng_model_load (
 static void private_changed (
 	LIEngModel* self)
 {
-	LIAlgU32dicIter iter;
-	LIEngObject* object;
-
-	/* We need to refresh any objects using the model since poses reference
-	   the nodes of the model directly and those might have changed. */
-	LIALG_U32DIC_FOREACH (iter, self->engine->objects)
-	{
-		object = iter.value;
-		if (object->model == self)
-			limdl_pose_set_model (object->pose, self->model);
-	}
-
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, "model-changed", lical_marshal_DATA_PTR, self);
 }

@@ -24,15 +24,7 @@
 
 #include "ext-module.h"
 
-static void private_context_lost (
-	LIExtModule* self,
-	int          pass);
-
 static void private_widget_allocation (
-	LIExtModule* module,
-	LIWdgWidget* widget);
-
-static void private_widget_paint (
 	LIExtModule* module,
 	LIWdgWidget* widget);
 
@@ -74,8 +66,8 @@ LIExtModule* liext_widgets_new (
 		liext_widgets_free (self);
 		return NULL;
 	}
-	liwdg_manager_set_size (self->widgets, self->client->window->mode.width,
-		self->client->window->mode.height);
+	liwdg_manager_set_size (self->widgets, self->client->mode.width,
+		self->client->mode.height);
 
 	/* Register component. */
 	if (!limai_program_insert_component (program, "widgets", self->widgets))
@@ -85,10 +77,8 @@ LIExtModule* liext_widgets_new (
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, "context-lost", 0, private_context_lost, self, self->calls + 0) ||
-	    !lical_callbacks_insert (program->callbacks, "tick", 1, private_widget_tick, self, self->calls + 1) ||
-	    !lical_callbacks_insert (program->callbacks, "widget-allocation", 5, private_widget_allocation, self, self->calls + 2) ||
-	    !lical_callbacks_insert (program->callbacks, "widget-paint", 5, private_widget_paint, self, self->calls + 3))
+	if (!lical_callbacks_insert (program->callbacks, "tick", 1, private_widget_tick, self, self->calls + 0) ||
+	    !lical_callbacks_insert (program->callbacks, "widget-allocation", 5, private_widget_allocation, self, self->calls + 1))
 	{
 		liext_widgets_free (self);
 		return 0;
@@ -122,13 +112,6 @@ void liext_widgets_free (
 
 /*****************************************************************************/
 
-static void private_context_lost (
-	LIExtModule* self,
-	int          pass)
-{
-	liwdg_manager_reload (self->widgets, pass);
-}
-
 static void private_widget_allocation (
 	LIExtModule* module,
 	LIWdgWidget* widget)
@@ -156,47 +139,18 @@ static void private_widget_allocation (
 	}
 }
 
-static void private_widget_paint (
-	LIExtModule* module,
-	LIWdgWidget* widget)
-{
-	LIScrData* data = widget->script;
-	LIScrScript* script = liscr_data_get_script (data);
-	lua_State* lua = liscr_script_get_lua (script);
-
-	/* Call a global function. */
-	lua_getglobal (lua, "__widget_render");
-	if (lua_type (lua, -1) != LUA_TFUNCTION)
-	{
-		lua_pop (lua, 1);
-		return;
-	}
-	if (!liscr_pushdata (lua, data))
-	{
-		lua_pop (lua, 1);
-		return;
-	}
-	if (lua_pcall (lua, 1, 0, 0) != 0)
-	{
-		lisys_error_set (LISYS_ERROR_UNKNOWN, "Widget.render: %s", lua_tostring (lua, -1));
-		lisys_error_report ();
-		lua_pop (lua, 1);
-	}
-}
-
 static int private_widget_tick (
 	LIExtModule* module,
 	float        secs)
 {
-	int w;
-	int h;
+	LIRenVideomode mode;
 
 	/* Update widgets. */
 	liwdg_manager_update (module->widgets, secs);
 
 	/* Update dimensions. */
-	licli_window_get_size (module->client->window, &w, &h);
-	liwdg_manager_set_size (module->widgets, w, h);
+	liren_render_get_videomode (module->client->render, &mode);
+	liwdg_manager_set_size (module->widgets, mode.width, mode.height);
 
 	return 1;
 }

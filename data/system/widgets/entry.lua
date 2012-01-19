@@ -1,3 +1,4 @@
+require "system/string"
 require "system/widgets/label"
 
 Widgets.Entry = Class(Widgets.Label)
@@ -39,12 +40,10 @@ end
 -- @return True if absorbed.
 Widgets.Entry.event = function(self, args)
 	if args.type == "keypress" then
-		if args.code == 8 then
+		if args.code == Keysym.BACKSPACE then
 			-- Backspace.
-			if self.text and #self.text then
-				self.text = string.sub(self.text, 1, math.max(0, #self.text - 1))
-			end
-		elseif args.code == 13 then
+			self.text = String.utf8_erase_last_char(self.text, 1)
+		elseif args.code == Keysym.RETURN then
 			-- Enter.
 			if self.pressed then
 				self:pressed()

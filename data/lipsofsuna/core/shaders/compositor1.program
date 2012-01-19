@@ -1,0 +1,4 @@
+vertex_program compositor1_vert glsl
+{
+	source compositor1.vert
+}

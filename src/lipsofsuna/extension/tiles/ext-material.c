@@ -136,6 +136,24 @@ static void Material_get_id (LIScrArgs* args)
 	liscr_args_seti_int (args, self->id);
 }
 
+static void Material_get_material (LIScrArgs* args)
+{
+	LIVoxMaterial* self = args->self;
+
+	if (self->material.material != NULL)
+		liscr_args_seti_string (args, self->material.material);
+	else
+		liscr_args_seti_string (args, "");
+}
+static void Material_set_material (LIScrArgs* args)
+{
+	const char* value;
+	LIVoxMaterial* self = args->self;
+
+	if (liscr_args_geti_string (args, 0, &value))
+		limdl_material_set_material (&self->material, value);
+}
+
 static void Material_get_name (LIScrArgs* args)
 {
 	liscr_args_seti_string (args, ((LIVoxMaterial*) args->self)->name);
@@ -306,6 +324,8 @@ void liext_script_material (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_id", Material_get_id);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_name", Material_get_name);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_name", Material_set_name);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_material", Material_get_material);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_material", Material_set_material);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_shader", Material_get_shader);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_set_shader", Material_set_shader);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_MATERIAL, "material_get_shininess", Material_get_shininess);

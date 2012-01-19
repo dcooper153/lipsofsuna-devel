@@ -24,33 +24,16 @@
 
 #include "ext-module.h"
 
-
-static size_t private_write (
-	void*        ptr,
-	size_t       size,
-	size_t       nmemb,
-	LIArcWriter* writer)
-{
-    liarc_writer_append_raw (writer, ptr, size * nmemb);
-
-    return size * nmemb;
-}
-
-
-/*****************************************************************************/
-
 static void Wireframe_on (LIScrArgs* args)
 {
-
-	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
-
+	printf ("FIXME: Wireframe_on is disabled due to Ogre transition\n");
+//	glPolygonMode( GL_FRONT_AND_BACK, GL_LINE );
 }
 
 static void Wireframe_off (LIScrArgs* args)
 {
-
-	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
-
+	printf ("FIXME: Wireframe_off is disabled due to Ogre transition\n");
+//	glPolygonMode( GL_FRONT_AND_BACK, GL_FILL );
 }
 
 /*****************************************************************************/

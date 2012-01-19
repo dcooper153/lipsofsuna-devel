@@ -21,7 +21,6 @@
 #include <lipsofsuna/system.h>
 
 typedef struct _LIEngEngine LIEngEngine;
-typedef enum _LIEngMatrix LIEngMatrix;
 typedef struct _LIEngModel LIEngModel;
 typedef struct _LIEngObject LIEngObject;
 typedef struct _LIEngRender LIEngRender;

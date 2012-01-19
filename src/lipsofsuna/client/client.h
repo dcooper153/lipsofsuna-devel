@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -26,22 +26,16 @@
 #include "lipsofsuna/render.h"
 #include "lipsofsuna/script.h"
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/video.h"
-#include "lipsofsuna/widget.h"
 #include "client-server.h"
 #include "client-types.h"
-#include "client-window.h"
 
 struct _LICliClient
 {
-	int active;
-	int moving;
-	LICliWindow* window;
 	LIMaiProgram* program;
-	LIRenRender* render;
-	LIRenScene* scene;
 	LICliServer* server;
 	LISysThread* server_thread;
+	LIRenRender* render;
+	LIRenVideomode mode;
 };
 
 LIAPICALL (LICliClient*, licli_client_new, (
@@ -49,7 +43,8 @@ LIAPICALL (LICliClient*, licli_client_new, (
 	int           width,
 	int           height,
 	int           fullscreen,
-	int           vsync));
+	int           sync,
+	int           multisamples));
 
 LIAPICALL (void, licli_client_free, (
 	LICliClient* self));
@@ -64,5 +59,12 @@ LIAPICALL (int, licli_client_get_moving, (
 LIAPICALL (void, licli_client_set_moving, (
 	LICliClient* self,
 	int          value));
+
+LIAPICALL (int, licli_client_set_videomode, (
+	LICliClient* self,
+	int          width,
+	int          height,
+	int          fullscreen,
+	int          sync));
 
 #endif

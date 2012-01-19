@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -112,6 +112,7 @@ void livox_builder_free (
 
 int livox_builder_build_model (
 	LIVoxBuilder*  self,
+	LIMatVector*   offset,
 	LIMdlModel**   result)
 {
 	int x;
@@ -136,6 +137,7 @@ int livox_builder_build_model (
 	if (self->model_builder != NULL)
 	{
 		*result = self->model_builder->model;
+		*offset = self->translation;
 		limdl_builder_finish (self->model_builder);
 		limdl_builder_free (self->model_builder);
 	}
@@ -158,8 +160,11 @@ void livox_builder_preprocess (
 	LIVoxVoxel* voxel;
 
 	/* Calculate area offset. */
-	offset = limat_vector_init (self->offset[0] - 1.5f, self->offset[1] - 1.5f, self->offset[2] - 1.5f);
-	offset = limat_vector_multiply (offset, self->tile_width);
+	offset = limat_vector_init (self->size[0], self->size[1], self->size[2]);
+	offset = limat_vector_multiply (offset, -0.5f * self->tile_width);
+	self->translation = limat_vector_init (self->offset[0] - 1.5f, self->offset[1] - 1.5f, self->offset[2] - 1.5f);
+	self->translation = limat_vector_multiply (self->translation, self->tile_width);
+	self->translation = limat_vector_subtract (self->translation, offset);
 
 	/* Precalculate useful information on voxels. */
 	for (z = 0 ; z < self->size[2] ; z++)

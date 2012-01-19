@@ -2,7 +2,7 @@ bl_info = {
 	"name": "Export Lips of Suna (.lmdl)",
 	"author": "Lips of Suna development team",
 	"version": (1, 0),
-	"blender": (2, 5, 7),
+	"blender": (2, 6, 0),
 	"api": 35622,
 	"location": "File > Export",
 	"description": "Lips of Suna (.lmdl)",
@@ -22,11 +22,12 @@ class LIEnum:
 		self.VERSION = 0xFFFFFFF3
 		self.LIGHTFLAG_NOSHADOW = 0x01
 		self.LIGHTFLAG_NEWFORMAT = 0x80
-		self.MATRFLAG_BILLBOARD = 1
-		self.MATRFLAG_COLLISION = 2
-		self.MATRFLAG_CULLFACE = 4
-		self.MATRFLAG_ALPHA = 8
-		self.MATRFLAG_DEFAULT = self.MATRFLAG_COLLISION | self.MATRFLAG_CULLFACE
+		self.MATRFLAG_BILLBOARD = 0x01
+		self.MATRFLAG_COLLISION = 0x02
+		self.MATRFLAG_CULLFACE = 0x04
+		self.MATRFLAG_ALPHA = 0x08
+		self.MATRFLAG_REFERENCE = 0x10
+		self.MATRFLAG_DEFAULT = self.MATRFLAG_COLLISION | self.MATRFLAG_CULLFACE | self.MATRFLAG_REFERENCE
 		self.NODETYPE_BONE = 0
 		self.NODETYPE_EMPTY = 1
 		self.NODETYPE_LIGHT = 2
@@ -646,7 +647,8 @@ class LIMaterial:
 		self.emission = 0
 		self.flags = LIFormat.MATRFLAG_DEFAULT
 		self.name = 'default'
-		self.shader = 'default'
+		self.shader = 'diff1'
+		self.material = 'diff1'
 		self.shininess = 0
 		self.specular = [1, 1, 1, 1]
 		self.strands = [0.2, 0.0, 0.0]
@@ -656,6 +658,10 @@ class LIMaterial:
 			self.name = mat.name
 			try:
 				self.shader = mat["shader"]
+			except:
+				pass
+			try:
+				self.material = mat["material"]
 			except:
 				pass
 			try:
@@ -722,6 +728,7 @@ class LIMaterial:
 		writer.write_float(self.strands[2])
 		writer.write_int(len(self.textures))
 		writer.write_string(self.shader)
+		writer.write_string(self.material)
 		writer.write_marker()
 		for tex in self.textures:
 			tex.write(writer)

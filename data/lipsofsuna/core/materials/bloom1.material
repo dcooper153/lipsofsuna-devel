@@ -1,0 +1,110 @@
+﻿// Dark Sylinc's Bloom implementation from Ogre
+// Copyright (C) Dark Sylinc 2007-2008
+
+material bloompass1
+{
+	technique
+	{
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_check off
+			vertex_program_ref compositor1_vert
+			{
+			}
+			fragment_program_ref bloompass1_frag
+			{
+			}
+			texture_unit
+			{
+				tex_address_mode clamp
+  				filtering none
+			}
+		}
+	}
+}
+
+material bloompass2
+{
+	technique
+	{
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_check off
+			vertex_program_ref bloom1_vert
+			{
+			}
+			fragment_program_ref bloompass2_frag
+			{
+			}
+			texture_unit
+			{
+				tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+		}
+	}
+}
+
+material bloompass3
+{
+	technique
+	{
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_check off
+			vertex_program_ref bloom1_vert
+			{
+			}
+			fragment_program_ref bloompass3_frag
+			{
+			}
+			texture_unit
+			{
+				tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+		}
+	}
+}
+
+material bloompass4
+{
+	technique
+	{
+		pass
+		{
+			cull_hardware none
+			cull_software none
+			depth_check off
+			vertex_program_ref bloom1_vert
+			{
+			}
+			fragment_program_ref bloompass4_frag
+			{
+				param_named OriginalImageWeight float 1.0
+				param_named BlurWeight float 0.65
+			}
+			texture_unit
+			{
+				tex_coord_set 0
+				tex_address_mode clamp
+				filtering none
+			}
+			texture_unit
+			{
+				tex_coord_set 0
+				tex_address_mode clamp
+				filtering trilinear
+			}
+		}
+	}
+}
+

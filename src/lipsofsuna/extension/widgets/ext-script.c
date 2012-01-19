@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,7 +22,23 @@
  * @{
  */
 
+#include "lipsofsuna/extension/input/input.h"
 #include "ext-module.h"
+
+static void private_get_pointer (
+	LIExtModule* self,
+	int*         x,
+	int*         y)
+{
+	LIInpInput* input;
+
+	*x = *y = 0;
+	input = limai_program_find_component (self->program, "input");
+	if (input != NULL)
+		liinp_input_get_pointer (input, x, y);
+}
+
+/*****************************************************************************/
 
 static void Widgets_add_font_style (LIScrArgs* args)
 {
@@ -43,7 +59,7 @@ static void Widgets_add_font_style (LIScrArgs* args)
 
 	/* Load the font. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_WIDGETS);
-	if (!liwdg_styles_load_font (module->widgets->styles, name, file, size))
+	if (!liren_render_load_font (module->widgets->render, name, file, size))
 		lisys_error_report ();
 }
 
@@ -60,18 +76,18 @@ static void Widgets_find_widget (LIScrArgs* args)
 	int x;
 	int y;
 	LIExtModule* module;
-	LIWdgWidget* widget;
 	LIMatVector vector;
 	LIScrData* data;
+	LIWdgWidget* widget;
 
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_WIDGETS);
 	if (!liscr_args_gets_vector (args, "point", &vector) &&
 	    !liscr_args_geti_vector (args, 0, &vector))
 	{
-		SDL_GetMouseState (&x, &y);
+		private_get_pointer (module, &x, &y);
 		vector = limat_vector_init (x, y, 0.0f);
 	}
 
-	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_WIDGETS);
 	widget = liwdg_manager_find_widget_by_point (module->widgets, (int) vector.x, (int) vector.y);
 	if (widget == NULL)
 		return;
@@ -89,8 +105,8 @@ static void Widgets_get_focused_widget (LIScrArgs* args)
 	LIWdgWidget* widget;
 	LIScrData* data;
 
-	SDL_GetMouseState (&x, &y);
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_WIDGETS);
+	private_get_pointer (module, &x, &y);
 	widget = liwdg_manager_find_widget_by_point (module->widgets, x, y);
 	if (widget == NULL)
 		return;

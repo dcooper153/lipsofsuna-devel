@@ -1,0 +1,54 @@
+material animeye1
+{
+	receive_shadows off
+	technique
+	{
+		pass LOS1
+		{
+			max_lights 3
+			ambient 0.6 0.6 0.6
+			diffuse 1.0 1.0 1.0
+			specular 0.0 0.0 0.0 0.0 1
+			texture_unit LOS1
+			{
+				texture eye1.dds
+			}
+			texture_unit
+			{
+			}
+			texture_unit
+			{
+				texture celramp1.png 1d
+				tex_address_mode clamp
+			}
+			texture_unit
+			{
+				texture celramp2.png 1d
+				tex_address_mode clamp
+			}
+			vertex_program_ref animdiff1_vert
+			{
+			}
+			fragment_program_ref animeye1_frag
+			{
+			}
+			shadow_caster_vertex_program_ref animshadow_vert
+			{
+			}
+		}
+	}
+	technique
+	{
+		pass LOS1
+		{
+			ambient 0.6 0.6 0.6
+			diffuse 1.0 1.0 1.0
+			specular 1.0 1.0 1.0 1.0 64
+			texture_unit LOS1
+			{
+				texture eye1.dds
+				colour_op_ex blend_texture_alpha src_texture src_diffuse
+			}
+		}
+	}
+}

@@ -63,10 +63,6 @@ static int private_object_transform (
 	LIEngObject*    object,
 	LIMatTransform* value);
 
-static int private_engine_tick (
-	LIExtModule* self,
-	float        secs);
-
 /*****************************************************************************/
 
 LIMaiExtensionInfo liext_object_render_info =
@@ -95,7 +91,6 @@ LIExtModule* liext_object_render_new (
 		return NULL;
 	}
 	self->render = self->client->render;
-	self->scene = self->client->scene;
 
 	/* Make sure that the required extensions are loaded. */
 	if (!limai_program_insert_extension (program, "render"))
@@ -109,12 +104,11 @@ LIExtModule* liext_object_render_new (
 	    !lical_callbacks_insert (program->callbacks, "model-changed", 1, private_model_changed, self, self->calls + 1) ||
 	    !lical_callbacks_insert (program->callbacks, "model-free", 1, private_model_free, self, self->calls + 2) ||
 	    !lical_callbacks_insert (program->callbacks, "model-new", 1, private_model_new, self, self->calls + 3) ||
-	    !lical_callbacks_insert (program->callbacks, "tick", 1, private_engine_tick, self, self->calls + 4) ||
-	    !lical_callbacks_insert (program->callbacks, "object-new", 1, private_object_new, self, self->calls + 5) ||
-	    !lical_callbacks_insert (program->callbacks, "object-free", 1, private_object_free, self, self->calls + 6) ||
-	    !lical_callbacks_insert (program->callbacks, "object-model", 1, private_object_model, self, self->calls + 7) ||
-	    !lical_callbacks_insert (program->callbacks, "object-visibility", 1, private_object_realize, self, self->calls + 8) ||
-	    !lical_callbacks_insert (program->callbacks, "object-transform", 1, private_object_transform, self, self->calls + 9))
+	    !lical_callbacks_insert (program->callbacks, "object-new", 1, private_object_new, self, self->calls + 4) ||
+	    !lical_callbacks_insert (program->callbacks, "object-free", 1, private_object_free, self, self->calls + 5) ||
+	    !lical_callbacks_insert (program->callbacks, "object-model", 1, private_object_model, self, self->calls + 6) ||
+	    !lical_callbacks_insert (program->callbacks, "object-visibility", 1, private_object_realize, self, self->calls + 7) ||
+	    !lical_callbacks_insert (program->callbacks, "object-transform", 1, private_object_transform, self, self->calls + 8))
 	{
 		liext_object_render_free (self);
 		return NULL;
@@ -140,11 +134,6 @@ static int private_engine_free (
 	LIExtModule* self,
 	LIEngEngine* engine)
 {
-	if (self->scene != NULL)
-		liren_scene_free (self->scene);
-	if (self->render != NULL)
-		liren_render_free (self->render);
-
 	return 1;
 }
 
@@ -152,13 +141,7 @@ static int private_model_changed (
 	LIExtModule* self,
 	LIEngModel*  model)
 {
-	LIRenModel* model_;
-
-	lisys_assert (model != NULL);
-
-	model_ = liren_render_find_model (self->render, model->id);
-	if (model_ != NULL)
-		liren_model_set_model (model_, model->model);
+	liren_render_model_set_model (self->render, model->id, model->model);
 
 	return 1;
 }
@@ -167,21 +150,9 @@ static int private_model_free (
 	LIExtModule* self,
 	LIEngModel*  model)
 {
-	LIRenModel* model_;
-
-	/* Find the model. */
 	lisys_assert (model != NULL);
-	model_ = liren_render_find_model (self->render, model->id);
-	if (model_ == NULL)
-		return 1;
 
-	/* Remove from objects. */
-	/* Keeping the model alive when it's assigned to objects is the job of scripts.
-	   If they don't reference the model, we'll remove it even if it's in use. We
-	   prevent crashing by removing it from objects in such a case. */
-	liren_scene_remove_model (self->scene, model_);
-
-	liren_model_free (model_);
+	liren_render_model_free (self->render, model->id);
 
 	return 1;
 }
@@ -190,13 +161,7 @@ static int private_model_new (
 	LIExtModule* self,
 	LIEngModel*  model)
 {
-	LIRenModel* model_;
-
-	lisys_assert (model != NULL);
-
-	model_ = liren_render_find_model (self->render, model->id);
-	if (model_ == NULL)
-		liren_model_new (self->render, model->model, model->id);
+	liren_render_model_new (self->render, model->model, model->id);
 
 	return 1;
 }
@@ -205,7 +170,7 @@ static int private_object_new (
 	LIExtModule* self,
 	LIEngObject* object)
 {
-	liren_object_new (self->scene, object->id);
+	liren_render_object_new (self->render, object->id);
 
 	return 1;
 }
@@ -214,11 +179,7 @@ static int private_object_free (
 	LIExtModule* self,
 	LIEngObject* object)
 {
-	LIRenObject* object_;
-
-	object_ = liren_scene_find_object (self->scene, object->id);
-	if (object_ != NULL)
-		liren_object_free (object_);
+	liren_render_object_free (self->render, object->id);
 
 	return 1;
 }
@@ -228,25 +189,10 @@ static int private_object_model (
 	LIEngObject* object,
 	LIEngModel*  model)
 {
-	LIRenObject* object_;
-	LIRenModel* model_;
-
-	object_ = liren_scene_find_object (self->scene, object->id);
-	if (object_ != NULL)
-	{
-		if (model != NULL)
-		{
-			model_ = liren_render_find_model (self->render, model->id);
-			if (model_ != NULL)
-			{
-				liren_object_set_pose (object_, object->pose);
-				liren_object_set_model (object_, model_);
-				return 1;
-			}
-		}
-		liren_object_set_pose (object_, NULL);
-		liren_object_set_model (object_, NULL);
-	}
+	if (model != NULL)
+		liren_render_object_set_model (self->render, object->id, model->id);
+	else
+		liren_render_object_set_model (self->render, object->id, 0);
 
 	return 1;
 }
@@ -256,11 +202,7 @@ static int private_object_realize (
 	LIEngObject* object,
 	int          value)
 {
-	LIRenObject* object_;
-
-	object_ = liren_scene_find_object (self->scene, object->id);
-	if (object_ != NULL)
-		liren_object_set_realized (object_, value);
+	liren_render_object_set_realized (self->render, object->id, value);
 
 	return 1;
 }
@@ -270,21 +212,7 @@ static int private_object_transform (
 	LIEngObject*    object,
 	LIMatTransform* value)
 {
-	LIRenObject* object_;
-
-	object_ = liren_scene_find_object (self->scene, object->id);
-	if (object_ != NULL)
-		liren_object_set_transform (object_, value);
-
-	return 1;
-}
-
-static int private_engine_tick (
-	LIExtModule* self,
-	float        secs)
-{
-	liren_render_update (self->render, secs);
-	liren_scene_update (self->scene, secs);
+	liren_render_object_set_transform (self->render, object->id, value);
 
 	return 1;
 }

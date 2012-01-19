@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,8 +18,9 @@
 #ifndef __ALGORITHM_U32DIC_H__
 #define __ALGORITHM_U32DIC_H__
 
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "algorithm-bst.h"
+#include "algorithm-random.h"
 
 typedef struct _LIAlgU32dic LIAlgU32dic;
 typedef struct _LIAlgU32dicNode LIAlgU32dicNode;
@@ -50,10 +51,6 @@ struct _LIAlgU32dicIter
 	LIAlgU32dicNode* next;
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 LIAPICALL (LIAlgU32dic*, lialg_u32dic_new, ());
 
 LIAPICALL (void, lialg_u32dic_free, (
@@ -75,6 +72,11 @@ LIAPICALL (LIAlgU32dicNode*, lialg_u32dic_insert, (
 	uint32_t     key,
 	void*        value));
 
+LIAPICALL (uint32_t, lialg_u32dic_insert_auto, (
+	LIAlgU32dic* self,
+	LIAlgRandom* random,
+	void*        value));
+
 LIAPICALL (int, lialg_u32dic_remove, (
 	LIAlgU32dic* self,
 	uint32_t     key));
@@ -82,10 +84,6 @@ LIAPICALL (int, lialg_u32dic_remove, (
 LIAPICALL (void, lialg_u32dic_remove_node, (
 	LIAlgU32dic*     self,
 	LIAlgU32dicNode* node));
-
-#ifdef __cplusplus
-}
-#endif
 
 /*****************************************************************************/
 

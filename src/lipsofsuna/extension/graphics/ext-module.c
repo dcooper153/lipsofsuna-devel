@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,11 +29,12 @@ static void private_initial_videomode (
 	int*         width,
 	int*         height,
 	int*         fullscreen,
-	int*         vsync);
+	int*         vsync,
+	int*         multisamples);
 
-static void private_context_lost (
+static int private_engine_tick (
 	LIExtModule* self,
-	int          pass);
+	float        secs);
 
 /*****************************************************************************/
 
@@ -51,6 +52,7 @@ LIExtModule* liext_graphics_new (
 	int height = 768;
 	int fullscreen = 0;
 	int vsync = 0;
+	int multisamples = 0;
 	LIExtModule* self;
 
 	/* Allocate self. */
@@ -60,10 +62,10 @@ LIExtModule* liext_graphics_new (
 	self->program = program;
 
 	/* Get the initial video mode. */
-	private_initial_videomode (self, &width, &height, &fullscreen, &vsync);
+	private_initial_videomode (self, &width, &height, &fullscreen, &vsync, &multisamples);
 
-	/* Allocate client. */
-	self->client = licli_client_new (program, width, height, fullscreen, vsync);
+	/* Allocate the client. */
+	self->client = licli_client_new (program, width, height, fullscreen, vsync, multisamples);
 	if (self->client == NULL)
 	{
 		liext_graphics_free (self);
@@ -71,13 +73,14 @@ LIExtModule* liext_graphics_new (
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, "context-lost", 0, private_context_lost, self, self->calls + 0))
+	if (!lical_callbacks_insert (program->callbacks, "tick", 1, private_engine_tick, self, self->calls + 0))
 	{
 		liext_graphics_free (self);
 		return NULL;
 	}
 
 	/* Extend scripts. */
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_GRAPHICS, self);
 	liext_script_graphics (program->script);
 
 	return self;
@@ -86,9 +89,7 @@ LIExtModule* liext_graphics_new (
 void liext_graphics_free (
 	LIExtModule* self)
 {
-	/* Remove callbacks. */
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
-
 	if (self->client != NULL)
 		licli_client_free (self->client);
 	lisys_free (self);
@@ -101,7 +102,8 @@ static void private_initial_videomode (
 	int*         width,
 	int*         height,
 	int*         fullscreen,
-	int*         vsync)
+	int*         vsync,
+	int*         multisamples)
 {
 	lua_State* lua;
 
@@ -148,15 +150,28 @@ static void private_initial_videomode (
 		*vsync = (int) lua_toboolean (lua, -1);
 	lua_pop (lua, 1);
 
+	/* Get the number of multisamples. */
+	lua_pushnumber (lua, 5);
+	lua_gettable (lua, -2);
+	if (lua_type (lua, -1) == LUA_TNUMBER)
+	{
+		*multisamples = (int) lua_tonumber (lua, -1);
+		*multisamples = LIMAT_CLAMP (*multisamples, 0, 128);
+	}
+	lua_pop (lua, 1);
+
 	/* Pop the videomode table. */
 	lua_pop (lua, 1);
 }
 
-static void private_context_lost (
+static int private_engine_tick (
 	LIExtModule* self,
-	int          pass)
+	float        secs)
 {
-	liren_render_reload (self->client->render, pass);
+	if (!liren_render_update (self->client->render, secs))
+		self->program->quit = 1;
+
+	return 1;
 }
 
 /** @} */

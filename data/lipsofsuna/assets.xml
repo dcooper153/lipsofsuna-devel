@@ -151,9 +151,12 @@
     <name>zero-project</name>
     <url>http://www.zero-project.gr/</url>
   </author-info>
- <author-info>
+  <author-info>
     <name>Francisco "FreeLikeGNU" Athens</name>
     <url>http://freelikegnu.org</url>
+  </author-info>
+  <author-info>
+    <name>SkiingPenguins</name>
   </author-info>
 
   <license-info>
@@ -3045,6 +3048,18 @@
     <author>Kabraxis</author>
     <license>Creative Commons BY-SA 3.0</license>
     <type>sound effect</type>
+  </asset>
+
+  <asset>
+    <file>textures/divine_fg.png</file>
+    <file>textures/divine_fr.png</file>
+    <file>textures/divine_bk.png</file>
+    <file>textures/divine_lf.png</file>
+    <file>textures/divine_rt.png</file>
+    <file>textures/divine_up.png</file>
+    <file>textures/divine_dn.png</file>
+    <author>SkiingPenguin</author>
+    <license>Creative Commons BY 3.0</license>
   </asset>
 
  <asset>

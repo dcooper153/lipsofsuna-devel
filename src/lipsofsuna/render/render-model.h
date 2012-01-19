@@ -18,27 +18,23 @@
 #ifndef __RENDER_MODEL_H__
 #define __RENDER_MODEL_H__
 
-#include "lipsofsuna/image.h"
 #include "lipsofsuna/model.h"
 #include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-types.h"
 
-LIAPICALL (LIRenModel*, liren_model_new, (
+LIAPICALL (int, liren_render_model_new, (
 	LIRenRender* render,
 	LIMdlModel*  model,
 	int          id));
 
-LIAPICALL (void, liren_model_free, (
-	LIRenModel* self));
+LIAPICALL (void, liren_render_model_free, (
+	LIRenRender* render,
+	int          id));
 
-LIAPICALL (int, liren_model_deform, (
-	LIRenModel*      self,
-	const char*      shader,
-	const LIMdlPose* pose));
-
-LIAPICALL (int, liren_model_set_model, (
-	LIRenModel* self,
-	LIMdlModel* model));
+LIAPICALL (void, liren_render_model_set_model, (
+	LIRenRender* render,
+	int          id,
+	LIMdlModel*  model));
 
 #endif

@@ -272,12 +272,12 @@ Widget.set_request = function(self, ...)
 	Los.widget_set_request(self.handle, ...)
 end
 
---- Behind flag.
--- @name Widget.behind
--- @class table
-
 --- Number of columns in the widget.
 -- @name Widget.cols
+-- @class table
+
+--- Depth sorting priority.
+-- @name Widget.depth
 -- @class table
 
 --- Floating flag.
@@ -329,8 +329,8 @@ end
 -- @class table
 
 Widget:add_getters{
-	behind = function(s) return Los.widget_get_behind(s.handle) end,
 	cols = function(s) return Los.widget_get_cols(s.handle) end,
+	depth = function(s) return Los.widget_get_depth(s.handle) end,
 	floating = function(s) return Los.widget_get_floating(s.handle) end,
 	fullscreen = function(s) return Los.widget_get_fullscreen(s.handle) end,
 	height = function(s) return Los.widget_get_height(s.handle) end,
@@ -361,7 +361,6 @@ Widget:add_getters{
 	y = function(s) return Los.widget_get_y(s.handle) end}
 
 Widget:add_setters{
-	behind = function(s, v) Los.widget_set_behind(s.handle, v) end,
 	cols = function(s, v)
 		local w,h = s.cols,s.rows
 		if v < w then
@@ -373,6 +372,7 @@ Widget:add_setters{
 		end
 		Los.widget_set_cols(s.handle, v)
 	end,
+	depth = function(s, v) Los.widget_set_depth(s.handle, v) end,
 	expand_col = function(s, v) Los.widget_set_expand(s.handle, v) end,
 	expand_row = function(s, v) Los.widget_set_expand(s.handle, nil, v) end,
 	floating = function(s, v)
@@ -523,11 +523,7 @@ Widget.unittest = function()
 end
 
 -- Userdata don't have members but the engine needs to be able to call the
--- render functions of widgets. This is done with a global variable.
-__widget_render = function(handle)
-	local w = __userdata_lookup[handle]
-	if w and w.render then w:render() end
-end
+-- reshape functions of widgets. This is done with a global variable.
 __widget_reshape = function(handle)
 	local w = __userdata_lookup[handle]
 	if w and w.reshaped then w:reshaped() end

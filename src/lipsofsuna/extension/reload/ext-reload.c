@@ -186,7 +186,6 @@ static void private_reload_image (
 	LIExtReload* self,
 	const char*  name)
 {
-	liren_render_load_image (self->client->render, name);
 	limai_program_event (self->program, "reload-image", "file", LISCR_TYPE_STRING, name, NULL);
 }
 

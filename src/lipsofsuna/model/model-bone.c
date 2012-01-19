@@ -26,9 +26,9 @@
 #include "model-bone.h"
 #include "model-node.h"
 
-int
-limdl_bone_read (LIMdlNode*   self,
-                 LIArcReader* reader)
+int limdl_bone_read (
+	LIMdlNode*   self,
+	LIArcReader* reader)
 {
 	LIMdlBone* bone = &self->bone;
 
@@ -40,9 +40,9 @@ limdl_bone_read (LIMdlNode*   self,
 	return 1;
 }
 
-int
-limdl_bone_write (const LIMdlNode* self,
-                  LIArcWriter*     writer)
+int limdl_bone_write (
+	const LIMdlNode* self,
+	LIArcWriter*     writer)
 {
 	const LIMdlBone* bone = &self->bone;
 
@@ -56,28 +56,26 @@ limdl_bone_write (const LIMdlNode* self,
 
 /**
  * \brief Gets the head of the bone in global coordinates.
- *
  * \param self Bone node.
  * \param head Return location for the head.
  */
-void
-limdl_bone_get_pose_head (const LIMdlNode* self,
-                          LIMatVector*     head)
+void limdl_bone_get_head (
+	const LIMdlNode* self,
+	LIMatVector*     head)
 {
-	*head = self->transform.global.position;
+	*head = self->rest_transform.global.position;
 }
 
 /**
  * \brief Gets the tail of the bone in global coordinates.
- *
  * \param self Bone node.
  * \param tail Return location for the tail.
  */
-void
-limdl_bone_get_pose_tail (const LIMdlNode* self,
-                          LIMatVector*     tail)
+void limdl_bone_get_tail (
+	const LIMdlNode* self,
+	LIMatVector*     tail)
 {
-	*tail = self->bone.tail;
+	*tail = self->rest_transform.tail;
 }
 
 /** @} */

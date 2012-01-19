@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,21 +15,40 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_TYPES_H__
-#define __RENDER_TYPES_H__
+#ifndef __RENDER_TYPES_COMMON_H__
+#define __RENDER_TYPES_COMMON_H__
 
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/video.h>
-#include "render-types-common.h"
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/model.h"
 
-typedef struct _LIRenBuffer LIRenBuffer;
-typedef struct _LIRenFramebuffer LIRenFramebuffer;
-typedef struct _LIRenLight LIRenLight;
-typedef struct _LIRenMaterial LIRenMaterial;
-typedef struct _LIRenModel LIRenModel;
-typedef struct _LIRenObject LIRenObject;
+enum _LIRenFlags
+{
+	LIREN_FLAG_FIXED     = 0x01, /* Force fixed function. */
+	LIREN_FLAG_SHADOW0   = 0x02, /* Sun casts shadows. */
+	LIREN_FLAG_SHADOW1   = 0x04, /* Lamps cast shadows. */
+	LIREN_FLAG_LIGHTING  = 0x08, /* Render with lighting. */
+	LIREN_FLAG_TEXTURING = 0x10, /* Render with texturing. */
+};
+
+enum
+{
+	LIREN_MATERIAL_FLAG_BILLBOARD = 0x010000,
+	LIREN_MATERIAL_FLAG_CULLFACE = 0x020000,
+	LIREN_MATERIAL_FLAG_TRANSPARENCY = 0x040000,
+	LIREN_MATERIAL_FLAG_SORTFACES = 0x080000
+};
+
+typedef enum _LIRenFlags LIRenFlags;
 typedef struct _LIRenRender LIRenRender;
-typedef struct _LIRenScene LIRenScene;
-typedef struct _LIRenShader LIRenShader;
+typedef struct _LIRenVideomode LIRenVideomode;
+
+struct _LIRenVideomode
+{
+	int width;
+	int height;
+	int fullscreen;
+	int sync;
+	int multisamples;
+};
 
 #endif

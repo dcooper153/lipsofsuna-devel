@@ -25,213 +25,270 @@
 #include "lipsofsuna/network.h"
 #include "lipsofsuna/system.h"
 #include "render-object.h"
-#include "render-private.h"
-#include "render32/render-private.h"
+#include "internal/render.h"
+#include "internal/render-object.h"
 
 /**
  * \brief Creates a new render object and adds it to the scene.
- * \param scene Scene.
+ * \param render Renderer.
  * \param id Unique identifier.
- * \return New object or NULL.
+ * \return Object ID or zero on failure.
  */
-LIRenObject* liren_object_new (
-	LIRenScene* scene,
-	int         id)
+int liren_render_object_new (
+	LIRenRender* render,
+	int          id)
 {
 	LIRenObject* self;
 
-	self = lisys_calloc (1, sizeof (LIRenObject));
+	self = liren_object_new (render, id);
 	if (self == NULL)
-		return NULL;
-	self->scene = scene;
+		return 0;
 
-	/* Choose a unique ID. */
-	while (!id)
-	{
-		id = lialg_random_range (&scene->render->random, LINET_RANGE_RENDER_START, LINET_RANGE_RENDER_END);
-		if (lialg_u32dic_find (scene->objects, id))
-			id = 0;
-	}
-	self->id = id;
-
-	/* Initialize backend. */
-	if (scene->v32 != NULL)
-	{
-		self->v32 = liren_object32_new (scene->v32, id);
-		if (self->v32 == NULL)
-		{
-			liren_object_free (self);
-			return NULL;
-		}
-	}
-	else
-	{
-		self->v21 = liren_object21_new (scene->v21, id);
-		if (self->v21 == NULL)
-		{
-			liren_object_free (self);
-			return NULL;
-		}
-	}
-
-	/* Add to dictionary. */
-	if (!lialg_u32dic_insert (scene->objects, id, self))
-	{
-		liren_object_free (self);
-		return NULL;
-	}
-
-	return self;
+	return self->id;
 }
 
 /**
  * \brief Frees the render object.
- * \param self Object.
+ * \param self Renderer.
+ * \param id Object ID.
  */
-void liren_object_free (
-	LIRenObject* self)
+void liren_render_object_free (
+	LIRenRender* self,
+	int          id)
 {
-	lialg_u32dic_remove (self->scene->objects, self->id);
-	if (self->v32 != NULL)
-		liren_object32_free (self->v32);
-	if (self->v21 != NULL)
-		liren_object21_free (self->v21);
-	lisys_free (self);
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		liren_object_free (object);
 }
 
-/**
- * \brief Deforms the object.
- * \param self Object.
- */
-void liren_object_deform (
-	LIRenObject* self)
+void liren_render_object_channel_animate (
+	LIRenRender* self,
+	int          id,
+	int          channel,
+	const char*  name,
+	int          additive,
+	int          repeat,
+	int          repeat_start,
+	int          keep,
+	float        fade_in,
+	float        fade_out,
+	float        weight,
+	float        weight_scale,
+	float        time,
+	float        time_scale,
+	const char** node_names,
+	float*       node_weights,
+	int          node_count)
 {
-	if (self->v32 != NULL)
-		liren_object32_deform (self->v32);
-	else
-		liren_object21_deform (self->v21);
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object == NULL)
+		return;
+
+	liren_object_channel_animate (object,
+		channel, name, additive, repeat, repeat_start, keep, fade_in,
+		fade_out, weight, weight_scale, time, time_scale, node_names,
+		node_weights, node_count);
+}
+
+void liren_render_object_channel_edit (
+	LIRenRender*          self,
+	int                   id,
+	int                   channel,
+	int                   frame,
+	const char*           node,
+	const LIMatTransform* transform,
+	float                 scale)
+{
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object == NULL)
+		return;
+
+	liren_object_channel_edit (object, channel, frame, node, transform, scale);
+}
+
+void liren_render_object_channel_fade (
+	LIRenRender* self,
+	int          id,
+	int          channel,
+	float        time)
+{
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object == NULL)
+		return;
+
+	liren_object_channel_fade (object, channel, time);
+}
+
+LIMdlPoseChannel* liren_render_object_channel_get_state (
+	LIRenRender* self,
+	int          id,
+	int          channel)
+{
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object == NULL)
+		return NULL;
+
+	return liren_object_channel_get_state (object, channel);
+}
+
+int liren_render_object_find_node (
+	LIRenRender*    self,
+	int             id,
+	const char*     name,
+	int             world,
+	LIMatTransform* result)
+{
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object == NULL)
+		return 0;
+
+	return liren_object_find_node (object, name, world, result);
 }
 
 /**
  * \brief Sets the particle animation state of the object.
- * \param self Object.
+ * \param self Renderer.
+ * \param id Object ID.
  * \param start Animation offset in seconds.
  * \param loop Nonzero to enable looping.
  */
-void liren_object_particle_animation (
-	LIRenObject* self,
+void liren_render_object_particle_animation (
+	LIRenRender* self,
+	int          id,
 	float        start,
 	int          loop)
 {
-	if (self->v32 != NULL)
-		liren_object32_particle_animation (self->v32, start, loop);
-	else
-		liren_object21_particle_animation (self->v21, start, loop);
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		liren_object_particle_animation (object, start, loop);
 }
 
 /**
  * \brief Sets the effect layer of the object.
- * \param self Object.
+ * \param self Renderer.
+ * \param id Object ID.
  * \param shader Shader name or NULL to disable the effect.
  * \param params Effect parameters or NULL.
- * \return Nonzero on success.
  */
-int liren_object_set_effect (
-	LIRenObject* self,
+void liren_render_object_set_effect (
+	LIRenRender* self,
+	int          id,
 	const char*  shader,
 	const float* params)
 {
-	if (self->v32 != NULL)
-	{
-		if (!liren_object32_set_effect (self->v32, shader, params))
-			return 0;
-	}
+	LIRenObject* object;
 
-	return 1;
-}
-
-/**
- * \brief Gets the model of the object.
- * \param self Object.
- * \return Model or NULL.
- */
-LIRenModel* liren_object_get_model (
-	LIRenObject* self)
-{
-	return self->model;
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		liren_object_set_effect (object, shader, params);
 }
 
 /**
  * \brief Sets the model of the object.
- * \param self Object.
+ * \param self Renderer.
+ * \param id Object ID.
  * \param model Model.
- * \return Nonzero on success.
  */
-int liren_object_set_model (
-	LIRenObject* self,
-	LIRenModel*  model)
+void liren_render_object_set_model (
+	LIRenRender* self,
+	int          id,
+	int          model)
 {
-	if (self->v32 != NULL)
-	{
-		if (!liren_object32_set_model (self->v32, (model != NULL)? model->v32 : NULL))
-			return 0;
-		self->model = model;
-	}
-	else
-	{
-		if (!liren_object21_set_model (self->v21, (model != NULL)? model->v21 : NULL))
-			return 0;
-		self->model = model;
-	}
+	LIRenObject* object;
+	LIRenModel* model_;
 
-	return 1;
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+	{
+		model_ = lialg_u32dic_find (self->models, model);
+		liren_object_set_model (object, model_);
+	}
 }
 
 /**
- * \brief Sets the pose of the object.
- * \param self Object.
- * \param pose Pose.
- * \return Nonzero on success.
+ * \brief Sets the particle system of the object.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \param name Particle system name.
  */
-int liren_object_set_pose (
-	LIRenObject* self,
-	LIMdlPose*   pose)
+void liren_render_object_set_particle (
+	LIRenRender* self,
+	int          id,
+	const char*  name)
 {
-	if (self->v32 != NULL)
-		return liren_object32_set_pose (self->v32, pose);
-	else
-		return liren_object21_set_pose (self->v21, pose);
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		liren_object_set_particle (object, name);
 }
 
 /**
  * \brief Sets the realized flag of the object.
- * \param self Object.
+ * \param self Renderer.
+ * \param id Object ID.
  * \param value Flag value.
- * \return Nonzero if succeeded.
  */
-int liren_object_set_realized (
-	LIRenObject* self,
+void liren_render_object_set_realized (
+	LIRenRender* self,
+	int          id,
 	int          value)
 {
-	if (self->v32 != NULL)
-		return liren_object32_set_realized (self->v32, value);
-	else
-		return liren_object21_set_realized (self->v21, value);
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		liren_object_set_realized (object, value);
+}
+
+/**
+ * \brief Sets the shadow casting mode of the object.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \param value Nonzero to allow shadow casting, zero to disable.
+ */
+void liren_render_object_set_shadow (
+	LIRenRender* self,
+	int          id,
+	int          value)
+{
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		liren_object_set_shadow (object, value);
 }
 
 /**
  * \brief Sets the transformation of the object.
- * \param self Object.
+ * \param self Renderer.
+ * \param id Object ID.
  * \param value Transformation.
  */
-void liren_object_set_transform (
-	LIRenObject*          self,
+void liren_render_object_set_transform (
+	LIRenRender*          self,
+	int                   id,
 	const LIMatTransform* value)
 {
-	if (self->v32 != NULL)
-		liren_object32_set_transform (self->v32, value);
-	else
-		liren_object21_set_transform (self->v21, value);
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		liren_object_set_transform (object, value);
 }
 
 /** @} */

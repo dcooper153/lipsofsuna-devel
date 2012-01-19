@@ -20,60 +20,50 @@
 
 #include "lipsofsuna/paths.h"
 #include "lipsofsuna/system.h"
-#include "render-buffer.h"
-#include "render-image.h"
-#include "render-light.h"
-#include "render-object.h"
-#include "render-shader.h"
 #include "render-types.h"
 
 LIAPICALL (LIRenRender*, liren_render_new, (
-	LIPthPaths* paths));
+	LIPthPaths*     paths,
+	LIRenVideomode* mode));
 
 LIAPICALL (void, liren_render_free, (
 	LIRenRender* self));
 
-LIAPICALL (void, liren_render_draw_clipped_buffer, (
+LIAPICALL (void, liren_render_add_compositor, (
+	LIRenRender* self,
+	const char*  name));
+
+LIAPICALL (void, liren_render_remove_compositor, (
+	LIRenRender* self,
+	const char*  name));
+
+LIAPICALL (int, liren_render_load_font, (
+	LIRenRender* self,
+	const char*  name,
+	const char*  file,
+	int          size));
+
+LIAPICALL (int, liren_render_measure_text, (
+	LIRenRender* self,
+	const char*  font,
+	const char*  text,
+	int          width_limit,
+	int*         result_width,
+	int*         result_height));
+
+LIAPICALL (void, liren_render_project, (
 	LIRenRender*       self,
-	LIRenShader*       shader,
-	const LIMatMatrix* modelview,
-	const LIMatMatrix* projection,
-	GLuint             texture,
-	const float*       diffuse,
-	const int*         scissor,
-	LIRenBuffer*       buffer));
+	const LIMatVector* world,
+	LIMatVector*       screen));
 
-LIAPICALL (void, liren_render_draw_indexed_triangles_T2V3, (
-	LIRenRender*      self,
-	LIRenShader*      shader,
-	LIMatMatrix*      matrix,
-	GLuint            texture,
-	const float*      diffuse,
-	const float*      vertex_data,
-	const LIRenIndex* index_data,
-	int               index_count));
+LIAPICALL (void, liren_render_render, (
+	LIRenRender* self));
 
-LIAPICALL (LIRenShader*, liren_render_find_shader, (
+LIAPICALL (int, liren_render_screenshot, (
 	LIRenRender* self,
-	const char*  name));
+	const char*  path));
 
-LIAPICALL (LIRenImage*, liren_render_find_image, (
-	LIRenRender* self,
-	const char*  name));
-
-LIAPICALL (LIRenModel*, liren_render_find_model, (
-	LIRenRender* self,
-	int          id));
-
-LIAPICALL (int, liren_render_load_image, (
-	LIRenRender* self,
-	const char*  name));
-
-LIAPICALL (void, liren_render_reload, (
-	LIRenRender* self,
-	int          pass));
-
-LIAPICALL (void, liren_render_update, (
+LIAPICALL (int, liren_render_update, (
 	LIRenRender* self,
 	float        secs));
 
@@ -83,5 +73,45 @@ LIAPICALL (int, liren_render_get_anisotropy, (
 LIAPICALL (void, liren_render_set_anisotropy, (
 	LIRenRender* self,
 	int          value));
+
+LIAPICALL (void, liren_render_set_camera_far, (
+	LIRenRender* self,
+	float        value));
+
+LIAPICALL (void, liren_render_set_camera_near, (
+	LIRenRender* self,
+	float        value));
+
+LIAPICALL (void, liren_render_set_camera_transform, (
+	LIRenRender*          self,
+	const LIMatTransform* value));
+
+LIAPICALL (float, liren_render_get_opengl_version, (
+	LIRenRender* self));
+
+LIAPICALL (void, liren_render_set_scene_ambient, (
+	LIRenRender* self,
+	const float* value));
+
+LIAPICALL (void, liren_render_set_skybox, (
+	LIRenRender* self,
+	const char*  value));
+
+LIAPICALL (void, liren_render_set_title, (
+	LIRenRender* self,
+	const char*  value));
+
+LIAPICALL (void, liren_render_get_videomode, (
+	LIRenRender*    self,
+	LIRenVideomode* mode));
+
+LIAPICALL (int, liren_render_set_videomode, (
+	LIRenRender*    self,
+	LIRenVideomode* mode));
+
+LIAPICALL (int, liren_render_get_videomodes, (
+	LIRenRender*     self,
+	LIRenVideomode** modes,
+	int*             modes_num));
 
 #endif

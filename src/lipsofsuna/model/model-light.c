@@ -140,7 +140,7 @@ void limdl_light_get_modelview (
 	const LIMdlNode* self,
 	LIMatMatrix*     value)
 {
-	*value = limat_convert_transform_to_matrix (self->transform.global);
+	*value = limat_convert_transform_to_matrix (self->pose_transform.global);
 }
 
 /**

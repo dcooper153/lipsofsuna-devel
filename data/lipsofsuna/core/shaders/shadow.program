@@ -1,0 +1,9 @@
+vertex_program shadow_vert glsl
+{
+	source shadow.vert
+	includes_skeletal_animation true
+	default_params
+	{
+		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
+	}
+}

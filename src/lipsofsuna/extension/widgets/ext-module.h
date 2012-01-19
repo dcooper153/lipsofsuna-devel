@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,9 +18,11 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/client.h>
-#include <lipsofsuna/widget.h>
-#include <lipsofsuna/extension.h>
+#include "lipsofsuna/client.h"
+#include "lipsofsuna/extension.h"
+#include "widget.h"
+#include "widget-element.h"
+#include "widget-manager.h"
 
 #define LIEXT_SCRIPT_WIDGET "Widget"
 #define LIEXT_SCRIPT_WIDGETS "Widgets"
@@ -28,7 +30,7 @@
 typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
-	LICalHandle calls[4];
+	LICalHandle calls[2];
 	LICliClient* client;
 	LIMaiProgram* program;
 	LIWdgManager* widgets;

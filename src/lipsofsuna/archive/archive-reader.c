@@ -289,11 +289,9 @@ int
 liarc_reader_check_uint32 (LIArcReader* self,
                            uint32_t     value)
 {
-	int pos;
 	int ret;
 	uint32_t tmp;
 
-	pos = self->pos;
 	ret = liarc_reader_get_uint32 (self, &tmp);
 	if (!ret || tmp != value)
 	{

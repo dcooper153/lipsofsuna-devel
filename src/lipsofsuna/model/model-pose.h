@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,37 +18,23 @@
 #ifndef __MODEL_POSE_H__
 #define __MODEL_POSE_H__
 
-#include <lipsofsuna/algorithm.h>
+#include "lipsofsuna/algorithm.h"
 #include "model.h"
 #include "model-animation.h"
 #include "model-bone.h"
+#include "model-pose-channel.h"
 #include "model-types.h"
 #include "model-vertex.h"
 
 #define LIMDL_POSE_FADE_AUTOMATIC -1.0f
 
-enum _LIMdlPoseChannelState
+typedef struct _LIMdlPoseBuffer LIMdlPoseBuffer;
+struct _LIMdlPoseBuffer
 {
-	LIMDL_POSE_CHANNEL_STATE_INVALID,
-	LIMDL_POSE_CHANNEL_STATE_PLAYING,
-	LIMDL_POSE_CHANNEL_STATE_PAUSED,
-};
-
-struct _LIMdlPoseChannel
-{
-	int additive;
-	int state;
-	int repeat;
-	int repeats;
-	int repeat_start;
-	float time;
-	float time_scale;
-	float priority_scale;
-	float priority_transform;
-	float fade_in;
-	float fade_out;
-	LIAlgStrdic* weights;
-	LIMdlAnimation* animation;
+	float quat1[4];
+	float quat2[4];
+	float head[3];
+	float scale;
 };
 
 struct _LIMdlPoseFade
@@ -73,8 +59,7 @@ struct _LIMdlPoseGroup
 	LIMatVector head_pose;
 	LIMatVector head_rest;
 	LIMatQuaternion rotation;
-	LIMdlNode* rest_node;
-	LIMdlNode* pose_node;
+	LIMdlNode* node;
 	LIMdlWeightGroup* weight_group;
 };
 
@@ -87,19 +72,12 @@ struct _LIMdlPoseVertex
 
 struct _LIMdlPose
 {
-	LIMdlModel* model;
+	LIAlgStrdic* animations;
 	LIAlgU32dic* channels;
 	LIMdlPoseFade* fades;
-	struct
-	{
-		int count;
-		LIMdlPoseGroup* array;
-	} groups;
-	struct
-	{
-		int count;
-		LIMdlNode** array;
-	} nodes;
+	struct { int count; LIMdlPoseBuffer* array; } buffer;
+	struct { int count; LIMdlPoseGroup* array; } groups;
+	struct { int count; LIMdlNode** array; } nodes;
 };
 
 LIAPICALL (LIMdlPose*, limdl_pose_new, ());

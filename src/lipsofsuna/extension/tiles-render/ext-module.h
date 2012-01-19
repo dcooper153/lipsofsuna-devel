@@ -32,6 +32,7 @@ struct _LIExtBuildTask
 {
 	LIVoxBlockAddr addr;
 	LIVoxBuilder* builder;
+	LIMatVector offset;
 	LIMdlModel* model;
 	LIExtBuildTask* next;
 };

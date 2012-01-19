@@ -1,0 +1,56 @@
+material terrain1
+{
+	technique
+	{
+		pass
+		{
+			max_lights 3
+			ambient 0.7 0.7 0.7
+			diffuse 1.0 1.0 1.0
+			specular 0.1 0.1 0.1 0.1 64
+			texture_unit LOS1
+			{
+				texture granite1.dds
+			}
+			texture_unit LOS2
+			{
+				texture granite1n.dds
+			}
+			texture_unit LOS3
+			{
+				texture stone-001.dds
+			}
+			texture_unit
+			{
+				content_type shadow
+			}
+			texture_unit
+			{
+				content_type shadow
+			}
+			texture_unit
+			{
+				content_type shadow
+			}
+			vertex_program_ref terrain1_vert
+			{
+			}
+			fragment_program_ref terrain1_frag
+			{
+			}
+		}
+	}
+	technique
+	{
+		pass
+		{
+			ambient 1.0 1.0 1.0
+			diffuse vertexcolour
+			specular 0.1 0.1 0.1 0.1 64
+			texture_unit LOS1
+			{
+				texture granite1.dds
+			}
+		}
+	}
+}

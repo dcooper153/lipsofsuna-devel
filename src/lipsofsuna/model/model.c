@@ -589,7 +589,7 @@ LIMdlMaterial* limdl_model_find_material_by_texture (
 	for (i = 0 ; i < self->materials.count ; i++)
 	{
 		material = self->materials.array + i;
-		if (limdl_material_compare_shader_and_texture (material, shader, texture))
+		if (limdl_material_compare_shader_and_texture (material, NULL, shader, texture))
 			return material;
 	}
 

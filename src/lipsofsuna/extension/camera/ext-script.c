@@ -38,8 +38,8 @@ static void Camera_new (LIScrArgs* args)
 	lialg_camera_set_driver (self, LIALG_CAMERA_THIRDPERSON);
 	lialg_camera_set_clipping (self, (LIAlgCameraClip) liext_cameras_clip_camera, module);
 	lialg_camera_set_viewport (self, 0, 0,
-		module->client->window->mode.width,
-		module->client->window->mode.height);
+		module->client->mode.width,
+		module->client->mode.height);
 
 	/* Allocate userdata. */
 	data = liscr_data_new (args->script, args->lua, self, LIEXT_SCRIPT_CAMERA, lialg_camera_free);
@@ -91,9 +91,11 @@ static void Camera_picking_ray (LIScrArgs* args)
 
 	/* Calculate ray vector. */
 	cursor.z = 0.0f;
-	lialg_camera_unproject (self, &cursor, &ray0);
+	if (!lialg_camera_unproject (self, &cursor, &ray0))
+		return;
 	cursor.z = 1.0f;
-	lialg_camera_unproject (self, &cursor, &ray1);
+	if (!lialg_camera_unproject (self, &cursor, &ray1))
+		return;
 	dir = limat_vector_subtract (ray1, ray0);
 	dir = limat_vector_normalize (dir);
 

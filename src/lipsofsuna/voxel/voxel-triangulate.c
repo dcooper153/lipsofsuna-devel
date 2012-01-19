@@ -320,6 +320,7 @@ static void private_triangulate_fractal (
 		/* Randomize the vertex coordinates. */
 		vtx = limat_vector_multiply (v[a][b][c], self->tile_width);
 		vtx = limat_vector_add (vtx, voxels[1][1][1]->position);
+		vtx = limat_vector_add (vtx, self->translation);
 		private_noise_3d (&vtx, &rnd);
 		v[a][b][c] = limat_vector_add (v[a][b][c], rnd);
 	}

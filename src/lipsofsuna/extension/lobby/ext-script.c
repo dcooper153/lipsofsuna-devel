@@ -55,11 +55,9 @@ static void Lobby_download_server_list (LIScrArgs* args)
 	const char* master;
 	LIArcReader* reader;
 	LIArcWriter* writer;
-	LIExtModule* module;
 	CURL* curl;
 
 	/* Get arguments. */
-	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_LOBBY);
 	if (!liscr_args_gets_string (args, "master", &master))
 		return;
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
@@ -133,11 +131,9 @@ static void Lobby_upload_server_info (LIScrArgs* args)
 	const char* desc = NULL;
 	const char* master = NULL;
 	const char* name = NULL;
-	LIExtModule* module;
 	CURL* curl;
 
 	/* Get arguments. */
-	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_LOBBY);
 	if (!liscr_args_gets_string (args, "desc", &desc) ||
 	    !liscr_args_gets_string (args, "master", &master) ||
 	    !liscr_args_gets_string (args, "name", &name) ||

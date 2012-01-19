@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -19,6 +19,7 @@
 #define __PATHS_H__
 
 #include "lipsofsuna/system.h"
+#include "lipsofsuna/algorithm.h"
 
 typedef struct _LIPthPaths LIPthPaths;
 struct _LIPthPaths
@@ -31,6 +32,8 @@ struct _LIPthPaths
 	char* module_name;
 	char* module_state;
 	char* override_data;
+	LIAlgList* paths;
+	LIAlgStrdic* files;
 };
 
 LIAPICALL (LIPthPaths*, lipth_paths_new, (
@@ -40,23 +43,27 @@ LIAPICALL (LIPthPaths*, lipth_paths_new, (
 LIAPICALL (void, lipth_paths_free, (
 	LIPthPaths* self));
 
+LIAPICALL (int, lipth_paths_add_path, (
+	LIPthPaths* self,
+	const char* path));
+
+LIAPICALL (int, lipth_paths_add_path_abs, (
+	LIPthPaths* self,
+	const char* path));
+
+LIAPICALL (const char*, lipth_paths_create_file, (
+	LIPthPaths* self,
+	const char* name));
+
+LIAPICALL (const char*, lipth_paths_find_file, (
+	LIPthPaths* self,
+	const char* name));
+
 LIAPICALL (char*, lipth_paths_get_data, (
 	const LIPthPaths* self,
 	const char*       name));
 
-LIAPICALL (char*, lipth_paths_get_font, (
-	const LIPthPaths* self,
-	const char*       name));
-
-LIAPICALL (char*, lipth_paths_get_graphics, (
-	const LIPthPaths* self,
-	const char*       name));
-
 LIAPICALL (char*, lipth_paths_get_script, (
-	const LIPthPaths* self,
-	const char*       name));
-
-LIAPICALL (char*, lipth_paths_get_sound, (
 	const LIPthPaths* self,
 	const char*       name));
 

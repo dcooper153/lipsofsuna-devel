@@ -123,6 +123,7 @@ Object:add_setters{
 		local m = v
 		if type(v) == "string" then m = Model:find_or_load{file = v, mesh = Object.load_meshes} end
 		rawset(s, "__model", m)
+		rawset(s, "__particle", nil)
 		Los.object_set_model(s.handle, m and m.handle)
 	end,
 	model_name = function(s, v) s.model = Model:find_or_load{file = v, mesh = Object.load_meshes} end,

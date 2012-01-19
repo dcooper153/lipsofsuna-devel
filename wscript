@@ -9,8 +9,8 @@ VERSION='0.5.0'
 top = '.'
 out = '.build'
 
-CORE_DIRS = 'ai algorithm archive binding callback client engine extension font generator image main math model network particle paths physics render render/render21 render/render32 script server sound string system thread video voxel widget'
-EXTS_DIRS = 'ai animation camera config-file database file graphics lobby model-editing network noise object-physics object-render password physics reload render skeleton sound speech thread tiles tiles-physics tiles-render vision watchdog widgets wireframe'
+CORE_DIRS = 'ai algorithm archive callback client engine extension generator main math model network particle paths physics render render/font render/image render/internal script sound system voxel widget'
+EXTS_DIRS = 'ai animation camera config-file database file graphics heightmap heightmap-physics heightmap-render image input lobby model-editing network noise object-physics object-render password physics reload render skeleton sound thread tiles tiles-physics tiles-render vision watchdog widgets wireframe'
 
 def options(ctx):
 	ctx.tool_options('compiler_cc')
@@ -123,24 +123,25 @@ def configure(ctx):
 			if not ctx.check_cc(lib='lua5.1', uselib='CORE TEST', uselib_store='LUA', mandatory=False):
 				ctx.check_cc(lib='lua', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
 
-	# SDL
-	if not ctx.check_cfg(package='sdl', atleast_version='1.2.0', args='--cflags --libs', mandatory=False):
-		ctx.check_cxx(header_name='SDL.h', mandatory=True, uselib='CORE TEST', uselib_store='SDL')
-		ctx.check_cxx(lib='SDL', mandatory=True, uselib='CORE TEST', uselib_store='SDL')
+	# Ogre
+	if ctx.check_cfg(package='OGRE', atleast_version='1.7.0', args='--cflags --libs', mandatory=False):
+		ctx.check_cfg(package='OGRE', msg='Checking for OGRE plugindir', variables='plugindir', mandatory=False)
+	else:
+		ctx.check_cxx(header_name='Ogre.h', mandatory=True, uselib='CORE TEST', uselib_store='OGRE')
+		ctx.check_cxx(lib='OgreMain', mandatory=True, uselib='CORE TEST', uselib_store='OGRE')
+	if not ctx.check_cfg(package='OGRE-Terrain', atleast_version='1.7.0', args='--cflags --libs', mandatory=False, uselib_store='OGRE'):
+		ctx.check_cxx(header_name='Terrain/OgreTerrain.h', mandatory=True, uselib='CORE TEST', uselib_store='OGRE')
+		ctx.check_cxx(lib='OgreTerrain', mandatory=True, uselib='CORE TEST', uselib_store='OGRE')
 
-	# SDL_ttf
-	ctx.check_cc(lib='SDL_ttf', mandatory=True, uselib='CORE TEST SDL', uselib_store='SDL_TTF')
-	ctx.check_cc(msg = "Checking for header SDL_ttf.h", mandatory=True, uselib='CORE TEST SDL', fragment="#include <SDL_ttf.h>\nint main(int argc, char** argv) { return 0; }\n")
+	# OIS
+	if not ctx.check_cfg(package='OIS', atleast_version='1.3.0', args='--cflags --libs', mandatory=False):
+		ctx.check_cxx(header_name='OIS.h', mandatory=True, uselib='CORE TEST', uselib_store='OIS')
+		ctx.check_cxx(lib='OIS', mandatory=True, uselib='CORE TEST', uselib_store='OIS')
 
-	# GLEW
-	if not ctx.check_cfg(package='glew', atleast_version='1.5.5', args='--cflags --libs', mandatory=False):
-		ctx.check_cc(header_name='GL/glew.h', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
-		if not ctx.check_cc(lib='GLEW', mandatory=False, uselib='CORE TEST', uselib_store='GLEW'):
-			ctx.check_cc(lib='GLEW32', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
-
-	# GL
-	if not ctx.check_cc(lib='GL', mandatory=False, uselib='CORE TEST', uselib_store='GLEW'):
-		ctx.check_cc(lib='OpenGL32', mandatory=True, uselib='CORE TEST', uselib_store='GLEW')
+	# libpng
+	if not ctx.check_cfg(package='libpng', atleast_version='1.2.0', args='--cflags --libs', uselib_store='PNG', mandatory=False):
+		ctx.check_cc(lib='png', mandatory=True, uselib_store='PNG')
+		ctx.check_cc(header_name='png.h', mandatory=True, uselib_store='PNG')
 
 	if ctx.env.SOUND:
 		# AL
@@ -210,6 +211,8 @@ def configure(ctx):
 		ctx.define('LIDATADIR', os.path.join(datadir, APPNAME))
 		ctx.define('LIPROGDIR', ctx.env.PROGDIR)
 		ctx.define('LITOOLDIR', ctx.env.TOOLDIR)
+	if ctx.env.OGRE_plugindir:
+		ctx.define('OGRE_PLUGIN_DIR', ctx.env.OGRE_plugindir)
 	ctx.write_config_header('config.h')
 
 	# Messages
@@ -228,6 +231,8 @@ def configure(ctx):
 		print("\tmaster server connectivity")
 	if ctx.env.MEMDEBUG:
 		print("\tmemory debugging")
+	if ctx.env.OGRE_plugindir:
+		print("\tOgre plugin directory: " + ctx.env.OGRE_plugindir)
 	print("\nBuild command: ./waf")
 	print("Install command: ./waf install\n")
 
@@ -236,7 +241,7 @@ def build(ctx):
 	ctx.add_group("install")
 	ctx.set_group("build")
 	objs = ''
-	libs = 'CORE LUA SQLITE BULLET ENET SDL SDL_TTF GLEW THREAD AL VORBIS OGG FLAC CURL ZLIB'
+	libs = 'CORE LUA SQLITE BULLET ENET OIS OGRE PNG THREAD AL VORBIS OGG FLAC CURL ZLIB'
 
 	# Core objects.
 	for dir in CORE_DIRS.split(' '):
@@ -259,12 +264,22 @@ def build(ctx):
 
 	# Extension objects.
 	for dir in EXTS_DIRS.split(' '):
-		objs += dir + '_ext_objs '
-		ctx.new_task_gen(
-			features = 'c',
-			source = ctx.path.ant_glob('src/lipsofsuna/extension/%s/*.c' % dir),
-			target = dir + '_ext_objs',
-			use = 'EXTENSION LUA SQLITE ENET SDL SDL_TTF GLEW THREAD AL VORBIS OGG FLAC CURL ZLIB')
+		srcs = ctx.path.ant_glob('src/lipsofsuna/extension/%s/*.c' % dir)
+		if srcs:
+			objs += dir + '_ext_objs '
+			ctx.new_task_gen(
+				features = 'c',
+				source = srcs,
+				target = dir + '_ext_objs',
+				use = libs)
+		srcs = ctx.path.ant_glob('src/lipsofsuna/extension/%s/*.cpp' % dir)
+		if srcs:
+			objs += dir + '_ext_cxx_objs '
+			ctx.new_task_gen(
+				features = 'cxx',
+				source = srcs,
+				target = dir + '_ext_cxx_objs',
+				use = libs)
 
 	# Target executable.
 	ctx.new_task_gen(
