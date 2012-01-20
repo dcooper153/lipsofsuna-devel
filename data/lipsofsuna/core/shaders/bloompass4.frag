@@ -14,9 +14,11 @@ uniform float BlurWeight;
 
 in vec2 F_uv;
 
+out vec4 colour;
+
 void main()
 {
 	vec4 orig = texture(RT, F_uv);
 	vec4 blur = texture(Blur1, F_uv);
-	gl_FragColor = (blur * BlurWeight) + (orig * OriginalImageWeight);
+	colour = (blur * BlurWeight) + (orig * OriginalImageWeight);
 }

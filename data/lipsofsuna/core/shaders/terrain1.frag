@@ -24,6 +24,8 @@ in vec3 F_lightv[LIGHTS];
 in vec3 F_lighthv[LIGHTS];
 in vec4 F_shadow[LIGHTS];
 
+out vec4 colour;
+
 vec3 los_normal_mapping(in vec3 normal, in vec3 tangent, in vec2 texcoord, in sampler2D sampler)
 {
 	vec3 nml1 = normalize(normal);
@@ -69,5 +71,5 @@ void main()
 			LOS_light_spotparams[i], LOS_material_shininess);
 		light += l.z * shadows[i] * (l.x * LOS_light_diffuse[i] + l.y * LOS_light_specular[i]);
 	}
-	gl_FragColor = LOS_material_diffuse * diffuse * light;
+	colour = LOS_material_diffuse * diffuse * light;
 }

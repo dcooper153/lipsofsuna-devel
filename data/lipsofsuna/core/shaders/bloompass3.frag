@@ -8,6 +8,8 @@ uniform sampler2D Blur0;
 
 in vec2 F_uv;
 
+out vec4 colour;
+
 vec2 pos[11] = vec2[11](
 	vec2(0.0, -5.0 * SAMPLING),
 	vec2(0.0, -4.0 * SAMPLING),
@@ -40,5 +42,5 @@ void main()
 	{
 		sum += samples[i] * texture(Blur0, F_uv + pos[i]);
 	}
-	gl_FragColor = sum;
+	colour = sum;
 }

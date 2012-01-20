@@ -19,6 +19,8 @@ in vec2 F_texcoord;
 in vec3 F_lightv[LIGHTS];
 in vec3 F_lighthv[LIGHTS];
 
+out vec4 colour;
+
 vec3 los_blinn_phong(in vec3 lv, in vec3 hv, in vec3 ld, in vec4 eq,
 	in vec3 normal, in vec4 spotparam, in float shininess)
 {
@@ -56,5 +58,5 @@ void main()
 			LOS_diffuse_texture_2, LOS_diffuse_texture_3);
 		light += c.x * LOS_light_diffuse[i] + c.y * LOS_light_specular[i];
 	}
-	gl_FragColor = diffuse * light;
+	colour = diffuse * light;
 }
