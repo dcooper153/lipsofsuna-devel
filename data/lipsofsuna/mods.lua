@@ -78,5 +78,6 @@ Mod:load "wyrm"
 -- Quests/bundles
 Mod:load "castle"
 Mod:load "keepersofknowledge"
+Mod:load "rootsofworld"
 Mod:load "silverspring"
 Mod:load "tutorial"
