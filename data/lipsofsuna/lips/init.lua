@@ -5,6 +5,8 @@ Quest{name = "Imaginary Friend"}
 Quest{name = "Sword on the Stone"}
 Quest{name = "Mining Guild"}
 
+Faction{name = "peculiar pet"}
+
 Species{
 	name = "lipscitizen",
 	base = "aer",

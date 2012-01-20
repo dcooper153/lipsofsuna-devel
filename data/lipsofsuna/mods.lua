@@ -77,6 +77,7 @@ Mod:load "wyrm"
 
 -- Quests/bundles
 Mod:load "castle"
+Mod:load "lips"
 Mod:load "keepersofknowledge"
 Mod:load "rootsofworld"
 Mod:load "silverspring"
