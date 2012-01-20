@@ -25,7 +25,8 @@ Gui.init = function(clss)
 	Gui.group_dialog:set_child(1, 2, Widgets.Label())
 	-- Modifiers, respawning and skill background.
 	Gui.modifiers = Widgets.Modifiers()
-	Gui.button_respawn = Widgets.Button{font = "medium", text = "Create a new character", visible = false,
+	Gui.button_respawn = Widgets.Button{font = "medium", text = "Create a new character",
+		depth = 3, visible = false,
 		pressed = function() Network:send{packet = Packet(packets.PLAYER_RESPAWN)} end}
 	Gui.skills_group = Widgets.Frame{style = "quickbar"}
 	Gui.crosshair = Widgets.Icon{icon = Iconspec:find{name = "crosshair1"}}
@@ -35,7 +36,6 @@ Gui.init = function(clss)
 	extra:add_child(Gui.crosshair)
 	extra:add_child(Gui.skills_group)
 	extra:add_child(Gui.notification)
-	extra:add_child(Gui.button_respawn)
 	extra:add_child(Gui.menus)
 	extra:add_child(Gui.group_dialog)
 	extra:add_child(Quickslots.group)
@@ -80,8 +80,8 @@ Gui.resize = function(self)
 end
 
 Gui.set_dead = function(self, value)
-	if self.button_respawn.visible == value then return end
-	self.button_respawn.visible = value
+	if self.button_respawn.floating == value then return end
+	self.button_respawn.floating = value
 end
 
 --- Sets or unsets the text of the action label.

@@ -306,6 +306,9 @@ end
 -- @param self Chargen.
 -- @param from Name of the previous mode.
 Views.Chargen.enter = function(self, from)
+	-- Cleanup after respawn.
+	Gui.scene.floating = false
+	Gui.button_respawn.floating = false
 	-- Cleanup if disconnected.
 	if from ~= "startup" then
 		for k,v in pairs(Object.objects) do v:detach() end
