@@ -5,6 +5,7 @@
 //   OriginalImageWeight
 //   BlurWeight
 //-------------------------------
+#version 130
 
 uniform sampler2D RT;
 uniform sampler2D Blur1;

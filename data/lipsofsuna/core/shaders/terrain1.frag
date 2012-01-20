@@ -1,4 +1,5 @@
 #version 130
+
 uniform sampler2D LOS_diffuse_texture_0;
 uniform sampler2D LOS_diffuse_texture_1;
 uniform sampler2D LOS_diffuse_texture_2;
@@ -13,6 +14,7 @@ uniform vec4 LOS_light_diffuse[LIGHTS];
 uniform vec4 LOS_light_specular[LIGHTS];
 uniform vec4 LOS_light_equation[LIGHTS];
 uniform vec4 LOS_light_spotparams[LIGHTS];
+
 in vec3 F_normal;
 in vec3 F_tangent;
 in vec2 F_texcoord;
@@ -21,6 +23,7 @@ in float F_splatting;
 in vec3 F_lightv[LIGHTS];
 in vec3 F_lighthv[LIGHTS];
 in vec4 F_shadow[LIGHTS];
+
 vec3 los_normal_mapping(in vec3 normal, in vec3 tangent, in vec2 texcoord, in sampler2D sampler)
 {
 	vec3 nml1 = normalize(normal);
@@ -47,6 +50,7 @@ vec3 los_blinn_phong(in vec3 lv, in vec3 hv, in vec3 ld, in vec4 eq,
 	att *= pow(smoothstep(spotparam.y, spotparam.x, spot), spotparam.z);
 	return vec3(diff, spec, att);
 }
+
 void main()
 {
 	vec3 normal = los_normal_mapping(F_normal, F_tangent, F_texcoord, LOS_diffuse_texture_1);

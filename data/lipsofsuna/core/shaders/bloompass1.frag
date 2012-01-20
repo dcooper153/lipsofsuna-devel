@@ -8,6 +8,7 @@
 // Special thanks to ATI for their great HLSL2GLSL utility
 //     http://sourceforge.net/projects/hlsl2glsl
 //-------------------------------
+#version 130
 
 uniform sampler2D RT;
 

@@ -1,3 +1,5 @@
+#version 130
+
 uniform sampler2D LOS_diffuse_texture_0;
 uniform sampler2D LOS_diffuse_texture_1;
 uniform sampler1D LOS_diffuse_texture_2;
@@ -11,10 +13,12 @@ uniform vec4 LOS_light_diffuse[LIGHTS];
 uniform vec4 LOS_light_specular[LIGHTS];
 uniform vec4 LOS_light_equation[LIGHTS];
 uniform vec4 LOS_light_spotparams[LIGHTS];
+
 in vec3 F_normal;
 in vec2 F_texcoord;
 in vec3 F_lightv[LIGHTS];
 in vec3 F_lighthv[LIGHTS];
+
 vec3 los_blinn_phong(in vec3 lv, in vec3 hv, in vec3 ld, in vec4 eq,
 	in vec3 normal, in vec4 spotparam, in float shininess)
 {
@@ -36,6 +40,7 @@ vec2 los_cel_shading(in vec3 l, in vec4 p, in sampler1D t1, in sampler1D t2)
 	float spec = mix(l.z * l.y, cels, p.w);
 	return vec2(diff, spec);
 }
+
 void main()
 {
 	vec3 normal = normalize(F_normal);
