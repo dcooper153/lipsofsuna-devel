@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -100,14 +100,12 @@ LIRenOverlay* liren_overlay_new (
 void liren_overlay_free (
 	LIRenOverlay* self)
 {
-	int i;
-
-	/* Detach children. */
-	for (i = 0 ; i < self->overlays.count ; i++)
-		self->overlays.array[i]->parent = NULL;
+	/* Detach all our children. */
+	while (self->overlays.count)
+		private_remove_overlay (self, self->overlays.array[0]);
 	lisys_free (self->overlays.array);
 
-	/* Remove from the scene. */
+	/* Remove ourselves from our parent. */
 	if (self->parent != NULL)
 		private_remove_overlay (self->parent, self);
 	lialg_u32dic_remove (self->render->overlays, self->id);
@@ -377,6 +375,12 @@ void liren_overlay_add_overlay (
 	/* Detach the overlay. */
 	if (overlay->parent == self)
 		return;
+	if (overlay->data->overlay != NULL)
+	{
+		overlay->data->overlay->remove2D (overlay->data->container);
+		overlay->render->data->overlay_manager->destroy (private_unique_overlay (overlay));
+		overlay->data->overlay = NULL;
+	}
 	if (overlay->parent != NULL)
 		private_remove_overlay (overlay->parent, overlay);
 
@@ -431,6 +435,8 @@ void liren_overlay_set_floating (
 	Ogre::String id (private_unique_overlay (self));
 	if (value && self->data->overlay == NULL)
 	{
+		if (self->parent != NULL)
+			private_remove_overlay (self->parent, self);
 		self->data->overlay = self->render->data->overlay_manager->create (id);
 		self->data->overlay->add2D (self->data->container);
 		self->data->overlay->setZOrder (self->depth);
@@ -541,6 +547,12 @@ static void private_remove_overlay (
 	int i;
 	int j;
 
+	/* Floating overlays can't have a parent so such an overlay getting
+	   here is an error. We check for it here just in case. */
+	lisys_assert (child->parent == self);
+	lisys_assert (child->data->overlay == NULL);
+
+	/* Find the child from the list and detach it. */
 	for (i = 0 ; i < self->overlays.count ; i++)
 	{
 		if (self->overlays.array[i] == child)
@@ -562,14 +574,6 @@ static void private_remove_overlay (
 			/* Detach the child. */
 			child->parent = NULL;
 			self->data->container->remove_container (i);
-
-			/* Remove the overlay. */
-			if (child->data->overlay != NULL)
-			{
-				child->data->overlay->remove2D (child->data->container);
-				child->render->data->overlay_manager->destroy (private_unique_overlay (child));
-				child->data->overlay = NULL;
-			}
 			break;
 		}
 	}
