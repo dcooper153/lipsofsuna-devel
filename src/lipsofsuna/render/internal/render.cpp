@@ -37,7 +37,7 @@
 #include <OgreSkeletonManager.h>
 #include <OgreViewport.h>
 #include <OgreWindowEventUtilities.h>
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#ifdef HAVE_XLIB
 #include <X11/Xlib.h>
 #endif
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -662,7 +662,7 @@ void liren_internal_set_title (
 	LIRenRender* self,
 	const char*  value)
 {
-#if OGRE_PLATFORM == OGRE_PLATFORM_LINUX
+#ifdef HAVE_XLIB
 	Display* display;
 	Window window;
 	self->data->render_window->getCustomAttribute ("DISPLAY", &display);
