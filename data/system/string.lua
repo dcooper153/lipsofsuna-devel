@@ -1,25 +1,34 @@
 require "system/bitwise"
 
+if not Los.program_load_extension("string") then
+	error("loading extension `string' failed")
+end
+
+------------------------------------------------------------------------------
+
 String = Class()
 String.class_name = "String"
 
---- Checks if the byte at the index of the string is the first byte of a UTF-8 character.
+--- Converts a UTF-8 string to an array of wide characters.
 -- @param str String.
--- @param index Index to the string.
--- @return True if starts a character, false if not.
-String.utf8_is_char_start = function(str, index)
-	local b = string.byte(str, index)
-	return Bitwise:band(b, 0xC0) <= 0x80
+-- @return Array of wide characters.
+String.utf8_to_wchar = function(str)
+	return Los.string_utf8_to_wchar(str)
 end
 
---- Removes the last UTF-8 character of the string.
--- @param str String.
--- @return Copied and modified string.
-String.utf8_erase_last_char = function(str)
-	local l = #str - 1
-	if l < 1 then return "" end
-	while l > 0 and not String.utf8_is_char_start(str, l) do
-		l = l - 1
-	end
-	return string.sub(str, 1, l)
+--- Converts an array of wide characters to a UTF-8 string.
+-- @param wstr Array of wide characters.
+-- @return String.
+String.wchar_to_utf8 = function(wstr)
+	return Los.string_wchar_to_utf8(wstr)
+end
+
+String.unittest = function()
+	-- Wide character conversion.
+	local pos = 1
+	local str = "STOP、ペロペロ"
+	local wstr = String.utf8_to_wchar(str)
+	assert(#wstr == 9)
+	local str1 = String.wchar_to_utf8(wstr)
+	assert(str == str1)
 end

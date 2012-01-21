@@ -23,6 +23,9 @@ require "system/math"
 catch(function() Vector.unittest() end)
 catch(function() Quaternion.unittest() end)
 
+require "system/string"
+catch(function() String.unittest() end)
+
 require "system/model"
 catch(function() Model.unittest() end)
 
