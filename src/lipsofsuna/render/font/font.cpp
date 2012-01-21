@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -119,7 +119,10 @@ int lifnt_font_get_advance (
 	LIFntFont* self,
 	wchar_t    glyph)
 {
-	return self->size * (*self->font)->getGlyphAspectRatio (glyph);
+	if (glyph == 0x0020)
+		return self->size * (*self->font)->getGlyphAspectRatio (0x0030) + 1;
+	else
+		return self->size * (*self->font)->getGlyphAspectRatio (glyph) + 1;
 }
 
 int lifnt_font_get_ascent (

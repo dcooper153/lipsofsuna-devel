@@ -24,6 +24,28 @@
 
 #include "ext-module.h"
 
+static void Program_measure_text (LIScrArgs* args)
+{
+	int width_limit = -1;
+	int width;
+	int height;
+	const char* font_name;
+	const char* text;
+	LIExtModule* module;
+
+	if (liscr_args_geti_string (args, 0, &font_name) &&
+	    liscr_args_geti_string (args, 1, &text))
+	{
+		liscr_args_geti_int (args, 2, &width_limit);
+		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
+		if (liren_render_measure_text (module->client->render, font_name, text, width_limit, &width, &height))
+		{
+			liscr_args_seti_int (args, width);
+			liscr_args_seti_int (args, height);
+		}
+	}
+}
+
 static void Program_get_opengl_version (LIScrArgs* args)
 {
 	float v;
@@ -39,6 +61,7 @@ static void Program_get_opengl_version (LIScrArgs* args)
 void liext_script_graphics (
 	LIScrScript* self)
 {
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_measure_text", Program_measure_text);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_opengl_version", Program_get_opengl_version);
 }
 

@@ -7,6 +7,13 @@ end
 
 ------------------------------------------------------------------------------
 
+--- Takes a screenshot.
+-- @param clss Program class.
+-- @return Screenshot filename.
+Program.capture_screen = function(clss)
+	return Los.client_screenshot()
+end
+
 --- Launches a server.
 -- @param clss Program class.
 -- @param args Arguments.<ul>
@@ -16,11 +23,20 @@ Program.launch_server = function(clss, args)
 	return Los.client_host(args)
 end
 
---- Takes a screenshot.
+--- Measures a string.
 -- @param clss Program class.
--- @return Screenshot filename.
-Program.capture_screen = function(clss)
-	return Los.client_screenshot()
+-- @param ... Arguments.<ul>
+--   <li>1,font: Font name.</li>
+--   <li>2,text: Text to measure.</li></ul>
+--   <li>3,width: Width limit, or nil.</li></ul>
+-- @return Width, height.
+Program.measure_text = function(clss, ...)
+	local a,b,c = ...
+	if type(a) == "table" then
+		return Los.program_measure_text(a[1] or a.font, a[2] or a.text, a[3] or a.width)
+	else
+		return Los.program_measure_text(a, b, c)
+	end
 end
 
 --- Sets the current video mode.
