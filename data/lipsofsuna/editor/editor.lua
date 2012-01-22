@@ -204,7 +204,7 @@ Editor.load = function(self, name)
 	-- Find or create the pattern.
 	local pattern = Pattern:find{name = name}
 	if not pattern then
-		pattern = Pattern{name = name, size = Vector(32,8,32)}
+		pattern = Pattern{name = name, file = name .. ".lua", size = Vector(32,8,32)}
 		local i = 1
 		for x=0,31 do
 			for z=0,31 do
@@ -393,7 +393,7 @@ Editor.save = function(self)
 	end
 	-- Write to the file.
 	local t = self.pattern:write()
-	local name = string.format("content/patterns/%s.lua", self.pattern.name)
+	local name = self.pattern.file
 	if not File:write(name, t) then
 		print(string.format("ERROR: Could not save `%s'.", name))
 	end

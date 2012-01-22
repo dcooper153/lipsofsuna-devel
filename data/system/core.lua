@@ -10,6 +10,17 @@ Program.add_path = function(self, path)
 	return Los.program_add_path(path)
 end
 
+--- Gets the filename of the calling script file.
+-- @param clss Program class.
+-- @param index Caller index in the hierarchy.
+-- @return Path relative to the data directory root.
+Program.get_calling_file = function(clss, index)
+	-- FIXME: Should use the module name in the regular expression.
+	local absname = debug.getinfo(index).source
+	local relname = string.match(absname, ".*/data/lipsofsuna/(.*)")
+	return relname
+end
+
 --- Sets the name of the mod to be executed after this one quits.
 -- @param clss Program class.
 -- @param args Arguments.<ul>

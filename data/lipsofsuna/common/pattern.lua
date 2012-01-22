@@ -10,12 +10,16 @@ Pattern.dict_name = {}
 -- @param clss Pattern class.
 -- @param args Arguments.<ul>
 --   <li>creatures: Array of creatures to create.</li>
+--   <li>file: Path to the file where the pattern was specified. nil for autodetect.</li>
 --   <li>items: Array of items to create.</li>
 --   <li>obstacles: Array of obstacles to create.</li>
 --   <li>tiles: Array of terrain tiles to create.</li></ul>
 -- @return New map pattern.
 Pattern.new = function(clss, args)
 	local self = Spec.new(clss, args)
+	if not self.file then
+		self.file = Program:get_calling_file(4)
+	end
 	self.creatures = self.creatures or {}
 	self.items = self.items or {}
 	self.obstacles = self.obstacles or {}
