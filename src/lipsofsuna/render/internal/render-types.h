@@ -67,6 +67,7 @@ struct _LIRenModelData
 	Ogre::VertexData* vertex_data;
 	Ogre::HardwareVertexBufferSharedPtr vertex_buffer_0;
 	Ogre::HardwareVertexBufferSharedPtr vertex_buffer_1;
+	Ogre::HardwareVertexBufferSharedPtr vertex_buffer_2;
 	Ogre::VertexBufferBinding* vertex_buffer_binding;
 	Ogre::HardwareIndexBufferSharedPtr index_buffer;
 };
