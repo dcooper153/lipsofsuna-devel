@@ -131,6 +131,16 @@ static void private_init_heightmap (
 	   image instead of whatever default value Ogre happens to use. */
 	self->globals->setLayerBlendMapSize (heightmap->size);
 
+	/* Copy global lighting settings from the scene. */
+	/* This means that the ambient light color is set at heightmap creation
+	   time. If it's set correctly at this time, the composite map should
+	   look good enough. */
+	Ogre::ColourValue ambient = self->render->data->scene_manager->getAmbientLight ();
+	self->globals->setCompositeMapAmbient (ambient);
+	/* FIXME: For whatever reason, distant terrain is still too bright. This
+	   hack compensates for it but probably doesn't work with all lighting setups. */
+	self->globals->setCompositeMapDiffuse (Ogre::ColourValue (0.7f, 0.7f, 0.7f));
+
 	/* Create the terrain group. */
 	float width = (heightmap->size - 1) * heightmap->spacing;
 	Ogre::TerrainGroup* group = OGRE_NEW Ogre::TerrainGroup (self->render->data->scene_manager,
