@@ -69,21 +69,27 @@ Views.Startup.retry = function(self)
 	end
 	if Settings.host then
 		-- Host a game.
-		local opts = string.format("--file %s --server %s %d", Settings.file, Settings.address, Settings.port)
-		if Settings.admin then opts = opts .. " -d" end
-		if Settings.generate then opts = opts .. " -g" end
 		Program:unload_world()
-		Program:launch_server(opts)
+		Client:start_server(Settings)
 		self:set_state("Starting the server on port " .. Settings.port .. "...")
-		self.host_wait_timer = Timer{delay = 2, func = function(timer)
-			if Network:join{host = "localhost", Settings.port} then
-				self:set_state("Connecting to the server...")
-				self.connecting = true
-			else
-				self:set_state("Failed to start the server!")
+		self.host_wait_timer = Timer{delay = 0.1, func = function(timer)
+			if Client.threads.server.done then
+				self:set_state("The server terminated unexpectedly!")
 				self.connecting = nil
+				timer:disable()
+				return
 			end
-			timer:disable()
+			local msg = Client.threads.server:pop_message()
+			if msg then
+				if Network:join{host = "localhost", Settings.port} then
+					self:set_state("Connecting to the server...")
+					self.connecting = true
+				else
+					self:set_state("Failed to connect to the server!")
+					self.connecting = nil
+				end
+				timer:disable()
+			end
 		end}
 	else
 		-- Join a game.

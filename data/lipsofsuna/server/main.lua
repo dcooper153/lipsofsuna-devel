@@ -35,11 +35,15 @@ require "server/generator/main"
 -- Initialize the heightmap.
 if Map then Map:init() end
 
--- Initialize the dynamic map.
+-- Initialize networking.
+-- When the socket is up, we tell the local client that it can join.
 Network:host{port = Config.inst.server_port}
+Program:push_message{name = "join"}
+
+-- Initialize the dynamic map.
 if Settings.generate or
-   Serialize:get_value("map_version") ~= Generator.map_version or
-   Serialize:get_value("data_version") ~= Serialize.data_version then
+	Serialize:get_value("map_version") ~= Generator.map_version or
+	Serialize:get_value("data_version") ~= Serialize.data_version then
 	Generator.inst:generate()
 	Serialize:set_value("data_version", Serialize.data_version)
 else

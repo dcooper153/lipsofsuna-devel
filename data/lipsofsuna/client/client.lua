@@ -110,6 +110,13 @@ Client.update = function(self, secs)
 	end
 end
 
+Client.start_server = function(self, settings)
+	local opts = string.format("--file %s --server %s %d", settings.file, settings.address, settings.port)
+	if settings.admin then opts = opts .. " -d" end
+	if settings.generate then opts = opts .. " -g" end
+	self.threads.server = Thread("main.lua", opts)
+end
+
 Client.set_mode = function(self, mode, level)
 	-- Check for state changes.
 	if self.mode == mode then return end
