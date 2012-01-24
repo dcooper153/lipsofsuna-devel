@@ -5,7 +5,7 @@ Map.class_name = "Map"
 
 Map.init = function(self)
 	local heights = Image("terrainheight1.png")
-	self.heightmap = Heightmap{position = Vector(819.613, 1005.0, 961.556), size = 513, scaling = 256, spacing = 16, heights = heights}
+	self.heightmap = Heightmap{position = Vector(819.613, 1005.0, 961.556), size = 513, scaling = 320, spacing = 16, heights = heights}
 	if not Settings.server then
 		self.heightmap:add_texture_layer{size = 10, name = "soil1",
 			diffuse = "soil1", specular = "soil1s",
