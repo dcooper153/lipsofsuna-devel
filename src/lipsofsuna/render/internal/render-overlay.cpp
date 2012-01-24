@@ -267,7 +267,7 @@ void liren_overlay_add_tiled (
 	elem->setMetricsMode (Ogre::GMM_PIXELS);
 	elem->setPosition (dest_position[0], dest_position[1]);
 	elem->setDimensions (dest_size[0], dest_size[1]);
-	elem->setMaterialName (material_name);
+	elem->setMaterialName (material->getName ());
 	elem->set_clipping (dest_clip);
 	elem->set_tiling (source_position, source_size, source_tiling);
 	elem->set_rotation (rotation_angle, rotation_center[0], rotation_center[1]);
@@ -351,7 +351,7 @@ void liren_overlay_add_scaled (
 	elem->setMetricsMode (Ogre::GMM_PIXELS);
 	elem->setPosition (dest_position[0], dest_position[1]);
 	elem->setDimensions (dest_size[0], dest_size[1]);
-	elem->setMaterialName (material_name);
+	elem->setMaterialName (material->getName ());
 	elem->setUV (tx[0], ty[0], tx[1], ty[1]);
 	elem->show ();
 
@@ -499,39 +499,64 @@ static bool private_create_material (
 	Ogre::MaterialPtr* material_result,
 	Ogre::TexturePtr*  texture_result)
 {
-	/* Load or create the material. */
-	Ogre::String group = LIREN_RESOURCES_TEMPORARY;
-	Ogre::MaterialPtr material = self->render->data->material_manager->load (material_name, group);
-	if (material.isNull ())
-		return false;
-
-	/* Get the first technique. */
-	if (!material->getNumTechniques ())
-		return false;
-	Ogre::Technique* technique = material->getTechnique (0);
-
-	/* Get the first pass. */
-	if (!technique->getNumPasses ())
-		return false;
-	Ogre::Pass* pass = technique->getPass (0);
-
-	/* Get or create the texture unit. */
-	Ogre::TextureUnitState* unit;
-	if (!pass->getNumTextureUnitStates ())
+	/* Check for an existing material. */
+	Ogre::String matname = Ogre::String ("LOS_GUI_") + material_name;
+	Ogre::MaterialPtr material = self->render->data->material_manager->getByName (matname);
+	if (!material.isNull ())
 	{
-		if (pass->isProgrammable ())
-			return false;
-		material->setSceneBlending (Ogre::SBT_TRANSPARENT_ALPHA);
-		unit = pass->createTextureUnitState (Ogre::String (material_name) + ".dds");
-	}
-	else
-		unit = pass->getTextureUnitState (0);
+		/* Get the texture unit. */
+		lisys_assert (material->getNumTechniques () == 1);
+		Ogre::Technique* technique = material->getTechnique (0);
+		lisys_assert (technique->getNumPasses () == 1);
+		Ogre::Pass* pass = technique->getPass (0);
+		lisys_assert (pass->getNumTextureUnitStates () == 1);
+		Ogre::TextureUnitState* unit = pass->getTextureUnitState (0);
 
-	/* Get the texture. */
-	const Ogre::String& texname = unit->getTextureName ();
-	Ogre::TexturePtr texture = self->render->data->texture_manager->load (texname, group);
-	if (texture.isNull ())
-		return false;
+		/* Get the texture. */
+		const Ogre::String& texname = unit->getTextureName ();
+		Ogre::TexturePtr texture = self->render->data->texture_manager->getByName (texname);
+		lisys_assert (!texture.isNull ());
+
+		/* Return the results. */
+		*material_result = material;
+		*texture_result = texture;
+
+		return true;
+	}
+
+	/* Load the texture. */
+	Ogre::String group = LIREN_RESOURCES_TEMPORARY;
+	Ogre::String texname = Ogre::String (material_name) + ".png";
+	Ogre::TexturePtr texture;
+	try
+	{
+		texture = self->render->data->texture_manager->load (texname, group);
+	}
+	catch (...)
+	{
+		texname = Ogre::String (material_name) + ".dds";
+		try
+		{
+			texture = self->render->data->texture_manager->load (texname, group);
+		}
+		catch (...)
+		{
+			return false;
+		}
+	}
+
+	/* Create a new material. */
+	material = self->render->data->material_manager->load (matname, group);
+	lisys_assert (!material.isNull ());
+	material->setSceneBlending (Ogre::SBT_TRANSPARENT_ALPHA);
+
+	/* Create the texture unit. */
+	lisys_assert (material->getNumTechniques () == 1);
+	Ogre::Technique* technique = material->getTechnique (0);
+	lisys_assert (technique->getNumPasses () == 1);
+	Ogre::Pass* pass = technique->getPass (0);
+	lisys_assert (pass->getNumTextureUnitStates () == 0);
+	pass->createTextureUnitState (texname);
 
 	/* Return the results. */
 	*material_result = material;
