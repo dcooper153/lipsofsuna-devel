@@ -265,8 +265,10 @@ Player.vision_cb = function(self, args)
 			self:send{packet = p, reliable = false}
 		end,
 		["object-shown"] = function(args)
-			-- Wake up the AI.
+			-- Don't send static objects.
 			local o = args.object
+			if o.spec.name == "static" then return end
+			-- Wake up the AI.
 			if o.ai then o.ai:refresh() end
 			local flags = o.flags or 0
 			-- Spec.
