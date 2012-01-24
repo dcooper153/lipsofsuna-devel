@@ -169,9 +169,10 @@ int lieng_model_load (
 
 	/* Allocate path. */
 	file = lisys_string_concat (name, ".lmdl");
-	if (name == NULL)
+	if (file == NULL)
 		return 0;
 	path = lipth_paths_find_file (self->engine->paths, file);
+	lisys_free (file);
 	if (path == NULL)
 		return 0;
 

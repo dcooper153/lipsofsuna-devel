@@ -79,8 +79,8 @@ int liren_internal_init (
 	self->data->image_factory = NULL;
 
 	/* Disable console output. */
-	Ogre::LogManager* log = new Ogre::LogManager ();
-	log->createLog ("render.log", true, false, false);
+	self->data->log = new Ogre::LogManager ();
+	self->data->log->createLog ("render.log", true, false, false);
 
 	/* Initialize the Ogre root. */
 	self->data->root = new Ogre::Root("", "", "");
@@ -104,8 +104,8 @@ int liren_internal_init (
 	mgr.createResourceGroup (LIREN_RESOURCES_TEMPORARY);
 
 	/* Allow overriding of resources. */
-	/* FIXME: Leaked? */
-	mgr.setLoadingListener (new LIRenResourceLoadingListener ());
+	self->data->resource_loading_listener = new LIRenResourceLoadingListener ();
+	mgr.setLoadingListener (self->data->resource_loading_listener);
 
 	/* Create the group for permanent resources. */
 	/* This group is used for resources that are managed by Ogre. They
@@ -220,9 +220,11 @@ void liren_internal_deinit (
 {
 	if (self->data != NULL)
 	{
+		delete self->data->resource_loading_listener;
 		delete self->data->root;
 		delete self->data->container_factory;
 		delete self->data->image_factory;
+		delete self->data->log;
 		delete self->data;
 		self->data = NULL;
 	}

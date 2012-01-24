@@ -56,6 +56,7 @@ typedef struct _LIRenRenderData LIRenRenderData;
 #include <OgreTextAreaOverlayElement.h>
 #include "render-container-factory.hpp"
 #include "render-image-overlay-factory.hpp"
+#include "render-resource-loading-listener.hpp"
 struct _LIRenLightData
 {
 	Ogre::Light* light;
@@ -95,8 +96,10 @@ struct _LIRenRenderData
 	Ogre::SceneNode* scene_root;
 	Ogre::TextureManager* texture_manager;
 	Ogre::Viewport* viewport;
+	Ogre::LogManager* log;
 	LIRenContainerFactory* container_factory;
 	LIRenImageOverlayFactory* image_factory;
+	LIRenResourceLoadingListener* resource_loading_listener;
 };
 #endif
 
