@@ -32,3 +32,6 @@ Heightmap.new = function(clss, args)
 	end
 	return self
 end
+
+Heightmap.add_texture_layer = function()
+end
