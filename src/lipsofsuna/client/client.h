@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -26,8 +26,8 @@
 #include "lipsofsuna/render.h"
 #include "lipsofsuna/script.h"
 #include "lipsofsuna/system.h"
-#include "client-types.h"
 
+typedef struct _LICliClient LICliClient;
 struct _LICliClient
 {
 	LIMaiProgram* program;

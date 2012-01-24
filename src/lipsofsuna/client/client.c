@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,7 +24,6 @@
 
 #include "lipsofsuna/system.h"
 #include "client.h"
-#include "client-script.h"
 
 static int private_init (
 	LICliClient*  self,
@@ -132,10 +131,6 @@ static int private_init (
 		return 0;
 	if (!limai_program_insert_component (self->program, "render", self->render))
 		return 0;
-
-	/* Register classes. */
-	liscr_script_set_userdata (program->script, LICLI_SCRIPT_CLIENT, self);
-	licli_script_client (program->script);
 
 	return 1;
 }

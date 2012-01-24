@@ -11,7 +11,7 @@ end
 -- @param clss Program class.
 -- @return Screenshot filename.
 Program.capture_screen = function(clss)
-	return Los.client_screenshot()
+	return Los.program_screenshot()
 end
 
 --- Measures a string.
@@ -38,7 +38,7 @@ end
 --   <li>3,fullscreen: True for fullscreen.</li></ul>
 -- @return True on success.
 Program.set_video_mode = function(clss, ...)
-	return Los.client_set_video_mode(...)
+	return Los.program_set_video_mode(...)
 end
 
 --- The far plane distance of the camera.
@@ -82,10 +82,10 @@ Program:add_class_getters{
 	camera_near = function(s) return rawget(s, "__camera_near") or 0.1 end,
 	camera_position = function(s) return rawget(s, "__camera_position") or Vector() end,
 	camera_rotation = function(s) return rawget(s, "__camera_rotation") or Quaternion() end,
-	fps = function(s) return Los.client_get_fps() end,
+	fps = function(s) return Los.program_get_fps() end,
 	opengl_version = function(s) return Los.program_get_opengl_version() end,
-	video_mode = function(s) return Los.client_get_video_mode() end,
-	video_modes = function(s) return Los.client_get_video_modes() end,
+	video_mode = function(s) return Los.program_get_video_mode() end,
+	video_modes = function(s) return Los.program_get_video_modes() end,
 	window_title = function(s) return rawget(s, "__window_title") or "" end}
 
 Program:add_class_setters{
@@ -107,5 +107,5 @@ Program:add_class_setters{
 	end,
 	window_title = function(s, v)
 		rawset(s, "__window_title", v)
-		Los.client_set_title(v)
+		Los.program_set_title(v)
 	end}
