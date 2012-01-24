@@ -90,6 +90,19 @@ Client.apply_quake = function(self, point, magnitude)
 	end
 end
 
+--- Creates the static terrain and objects of the world.
+-- @param self Client.
+Client.create_world = function(self)
+	-- Create static objects.
+	for k,v in pairs(Staticspec.dict_id) do
+		Object{spec = v, type = v.type, model = v.model,
+			collision_group = v.collision_group,
+			collision_mask = v.collision_mask,
+			position = v.position, rotation = v.rotation, realized = true,
+			disable_unloading = true, disabling_saving = true}
+	end
+end
+
 Client.update = function(self, secs)
 	-- FIXME
 	if self.mode == "game" then

@@ -16,6 +16,7 @@ if not Settings then
 	require "common/pattern"
 	require "common/regionspec"
 	require "common/species"
+	require "common/staticspec"
 	require "common/quest"
 else
 	Voxel.blocks_per_line = 2
@@ -44,6 +45,7 @@ else
 	require "common/serialize"
 	require "common/sectors"
 	require "common/species"
+	require "common/staticspec"
 	require "common/voxel"
 	require "system/lobby"
 end

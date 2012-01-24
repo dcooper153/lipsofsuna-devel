@@ -32,7 +32,10 @@ end
 require "server/generator"
 require "server/generator/main"
 
+-- Initialize the heightmap.
 if Map then Map:init() end
+
+-- Initialize the dynamic map.
 Network:host{port = Config.inst.server_port}
 if Settings.generate or
    Serialize:get_value("map_version") ~= Generator.map_version or
@@ -41,6 +44,11 @@ if Settings.generate or
 	Serialize:set_value("data_version", Serialize.data_version)
 else
 	Serialize:load()
+end
+
+-- Initialize static objects.
+for k,v in pairs(Staticspec.dict_id) do
+	Staticobject{spec = v, realized = true}
 end
 
 Voxel.block_changed_cb = function(index, stamp)

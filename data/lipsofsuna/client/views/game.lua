@@ -20,6 +20,7 @@ Views.Game.enter = function(self, from)
 	if from == "startup" or from == "chargen" then
 		Gui.scene.floating = true
 		Program:unload_world()
+		Client:create_world()
 		Sound:switch_music_track("game")
 	end
 	-- Enter movement mode.

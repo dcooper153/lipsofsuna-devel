@@ -75,13 +75,24 @@ Program.push_message = function(self, ...)
 end
 
 --- Unloads a sector.<br/>
--- Unrealizes all objects in the sector and clears the terrain in the sector.
--- The sector is then removed from the sector list.
+-- Unrealizes all normal objects in the sector and clears the terrain in the sector.
+-- Objects that have the disable_unloading member set are kept despite calling this.
+-- The sector is removed from the sector list if no realized objects remain.
 -- @param clss Program class.
 -- @param args Arguments.<ul>
 --   <li>sector: Sector index.</li></ul>
 Program.unload_sector = function(clss, args)
-	for k,v in pairs(Object:find{sector = args.sector}) do v.realized = false end
+	-- Don't unload if the sector contains non-unloadable objects.
+	-- Sectors can't be partially unloaded so we can't unload sectors
+	-- that have distant objects if we want to keep them around.
+	for k,v in pairs(Object:find{sector = args.sector}) do
+		if v.disable_unloading then return end
+	end
+	-- Unrealize all objects.
+	for k,v in pairs(Object:find{sector = args.sector}) do
+		v.realized = false
+	end
+	-- Remove the sector.
 	Los.program_unload_sector(args)
 end
 
