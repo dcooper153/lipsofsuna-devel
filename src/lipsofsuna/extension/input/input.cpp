@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -61,18 +61,17 @@ LIInpInput* liinp_input_new (
 	self->program = program;
 
 	/* Make sure that the required extensions are loaded. */
-	if (!limai_program_insert_extension (program, "render"))
+	if (!limai_program_insert_extension (program, "graphics"))
 	{
 		liinp_input_free (self);
 		return NULL;
 	}
-	self->client = (LICliClient*) limai_program_find_component (program, "client");
-	if (self->client == NULL)
+	self->render = (LIRenRender*) limai_program_find_component (program, "render");
+	if (self->render == NULL)
 	{
 		liinp_input_free (self);
 		return NULL;
 	}
-	self->render = self->client->render;
 
 	/* Initialize the input system. */
 	self->system = new LIInpSystem (self, false);

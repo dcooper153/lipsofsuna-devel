@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -67,7 +67,6 @@ LIExtModule* liext_tiles_render_new (
 	if (self == NULL)
 		return NULL;
 	self->program = program;
-	self->client = limai_program_find_component (program, "client");
 	self->tasks.mutex = lisys_mutex_new ();
 	if (self->tasks.mutex == NULL)
 	{
@@ -86,6 +85,14 @@ LIExtModule* liext_tiles_render_new (
 	/* Make sure that the required extensions are loaded. */
 	if (!limai_program_insert_extension (program, "render") ||
 	    !limai_program_insert_extension (program, "tiles"))
+	{
+		liext_tiles_render_free (self);
+		return NULL;
+	}
+
+	/* Find the render manager. */
+	self->render = limai_program_find_component (program, "render");
+	if (self->render == NULL)
 	{
 		liext_tiles_render_free (self);
 		return NULL;
@@ -277,16 +284,16 @@ static int private_process_result (
 
 	/* Replace the model of the block. */
 	liext_tiles_render_block_clear (block);
-	block->model = liren_render_model_new (self->client->render, task->model, 0);
+	block->model = liren_render_model_new (self->render, task->model, 0);
 	if (block->model)
 	{
-		block->object = liren_render_object_new (self->client->render, 0);
+		block->object = liren_render_object_new (self->render, 0);
 		if (block->object)
 		{
 			transform = limat_transform_init (task->offset, limat_quaternion_identity ());
-			liren_render_object_set_model (self->client->render, block->object, block->model);
-			liren_render_object_set_transform (self->client->render, block->object, &transform);
-			liren_render_object_set_realized (self->client->render, block->object, 1);
+			liren_render_object_set_model (self->render, block->object, block->model);
+			liren_render_object_set_transform (self->render, block->object, &transform);
+			liren_render_object_set_realized (self->render, block->object, 1);
 		}
 	}
 

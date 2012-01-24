@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,17 +29,17 @@ static void Camera_new (LIScrArgs* args)
 	LIAlgCamera* self;
 	LIExtModule* module;
 	LIScrData* data;
+	LIRenVideomode mode;
 
 	/* Allocate self. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_CAMERA);
 	self = lialg_camera_new ();
 	if (self == NULL)
 		return;
+	liren_render_get_videomode (module->render, &mode);
 	lialg_camera_set_driver (self, LIALG_CAMERA_THIRDPERSON);
 	lialg_camera_set_clipping (self, (LIAlgCameraClip) liext_cameras_clip_camera, module);
-	lialg_camera_set_viewport (self, 0, 0,
-		module->client->mode.width,
-		module->client->mode.height);
+	lialg_camera_set_viewport (self, 0, 0, mode.width, mode.height);
 
 	/* Allocate userdata. */
 	data = liscr_data_new (args->script, args->lua, self, LIEXT_SCRIPT_CAMERA, lialg_camera_free);

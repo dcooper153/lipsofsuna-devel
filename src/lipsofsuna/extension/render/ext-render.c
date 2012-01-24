@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -33,7 +33,7 @@ static void Render_add_compositor (LIScrArgs* args)
 	if (liscr_args_geti_string (args, 0, &value))
 	{
 		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
-		liren_render_add_compositor (module->client->render, value);
+		liren_render_add_compositor (module->render, value);
 	}
 }
 
@@ -45,7 +45,7 @@ static void Render_remove_compositor (LIScrArgs* args)
 	if (liscr_args_geti_string (args, 0, &value))
 	{
 		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
-		liren_render_remove_compositor (module->client->render, value);
+		liren_render_remove_compositor (module->render, value);
 	}
 }
 
@@ -58,7 +58,7 @@ static void Render_project (LIScrArgs* args)
 	if (liscr_args_geti_vector (args, 0, &value))
 	{
 		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
-		liren_render_project (module->client->render, &value, &result);
+		liren_render_project (module->render, &value, &result);
 		liscr_args_seti_vector (args, &result);
 	}
 }
@@ -71,7 +71,7 @@ static void Render_set_camera_far (LIScrArgs* args)
 	if (liscr_args_geti_float (args, 0, &value))
 	{
 		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
-		liren_render_set_camera_far (module->client->render, value);
+		liren_render_set_camera_far (module->render, value);
 	}
 }
 
@@ -83,7 +83,7 @@ static void Render_set_camera_near (LIScrArgs* args)
 	if (liscr_args_geti_float (args, 0, &value))
 	{
 		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
-		liren_render_set_camera_near (module->client->render, value);
+		liren_render_set_camera_near (module->render, value);
 	}
 }
 
@@ -99,7 +99,7 @@ static void Render_set_camera_transform (LIScrArgs* args)
 	{
 		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
 		transform = limat_transform_init (position, rotation);
-		liren_render_set_camera_transform (module->client->render, &transform);
+		liren_render_set_camera_transform (module->render, &transform);
 	}
 }
 
@@ -108,7 +108,7 @@ static void Render_get_anisotrophy (LIScrArgs* args)
 	LIExtModule* module;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
-	liscr_args_seti_int (args, liren_render_get_anisotropy (module->client->render));
+	liscr_args_seti_int (args, liren_render_get_anisotropy (module->render));
 }
 static void Render_set_anisotrophy (LIScrArgs* args)
 {
@@ -119,7 +119,7 @@ static void Render_set_anisotrophy (LIScrArgs* args)
 	if (liscr_args_geti_int (args, 0, &value))
 	{
 		value = LIMAT_MAX (0, value);
-		liren_render_set_anisotropy (module->client->render, value);
+		liren_render_set_anisotropy (module->render, value);
 	}
 }
 
@@ -132,7 +132,7 @@ static void Render_set_scene_ambient (LIScrArgs* args)
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
 	for (i = 0 ; i < 4 ; i++)
 		liscr_args_geti_float (args, i, value + i);
-	liren_render_set_scene_ambient (module->client->render, value);
+	liren_render_set_scene_ambient (module->render, value);
 }
 
 static void Render_set_skybox (LIScrArgs* args)
@@ -142,7 +142,7 @@ static void Render_set_skybox (LIScrArgs* args)
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
 	if (liscr_args_geti_string (args, 0, &value))
-		liren_render_set_skybox (module->client->render, value);
+		liren_render_set_skybox (module->render, value);
 }
 
 /*****************************************************************************/

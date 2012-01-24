@@ -50,7 +50,7 @@ static void Light_new (LIScrArgs* args)
 	self->module = module;
 
 	/* Allocate the light data. */
-	self->id = liren_render_light_new (module->client->render, black, white, white, equation, M_PI, 0.0f, 0);
+	self->id = liren_render_light_new (module->render, black, white, white, equation, M_PI, 0.0f, 0);
 	if (!self->id)
 	{
 		lisys_free (self);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,16 +25,16 @@
 #include "ext-module.h"
 
 static void private_initial_videomode (
-	LIExtModule* self,
-	int*         width,
-	int*         height,
-	int*         fullscreen,
-	int*         vsync,
-	int*         multisamples);
+	LIExtGraphics* self,
+	int*           width,
+	int*           height,
+	int*           fullscreen,
+	int*           vsync,
+	int*           multisamples);
 
 static int private_engine_tick (
-	LIExtModule* self,
-	float        secs);
+	LIExtGraphics* self,
+	float          secs);
 
 /*****************************************************************************/
 
@@ -45,28 +45,43 @@ LIMaiExtensionInfo liext_graphics_info =
 	liext_graphics_free
 };
 
-LIExtModule* liext_graphics_new (
+LIExtGraphics* liext_graphics_new (
 	LIMaiProgram* program)
 {
 	int width = 1024;
 	int height = 768;
 	int fullscreen = 0;
-	int vsync = 0;
+	int sync = 0;
 	int multisamples = 0;
-	LIExtModule* self;
+	LIExtGraphics* self;
+	LIRenVideomode mode;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIExtModule));
+	self = lisys_calloc (1, sizeof (LIExtGraphics));
 	if (self == NULL)
 		return NULL;
 	self->program = program;
 
 	/* Get the initial video mode. */
-	private_initial_videomode (self, &width, &height, &fullscreen, &vsync, &multisamples);
+	private_initial_videomode (self, &width, &height, &fullscreen, &sync, &multisamples);
 
-	/* Allocate the client. */
-	self->client = licli_client_new (program, width, height, fullscreen, vsync, multisamples);
-	if (self->client == NULL)
+	/* Initialize the renderer. */
+	mode.width = width;
+	mode.height = height;
+	mode.fullscreen = fullscreen;
+	mode.sync = sync;
+	mode.multisamples = multisamples;
+	self->render = liren_render_new (self->program->paths, &mode);
+	if (self->render == NULL)
+	{
+		liext_graphics_free (self);
+		return NULL;
+	}
+	self->mode = mode;
+
+	/* Register component. */
+	if (!limai_program_insert_component (self->program, "graphics", self) ||
+	    !limai_program_insert_component (self->program, "render", self->render))
 	{
 		liext_graphics_free (self);
 		return NULL;
@@ -87,23 +102,53 @@ LIExtModule* liext_graphics_new (
 }
 
 void liext_graphics_free (
-	LIExtModule* self)
+	LIExtGraphics* self)
 {
 	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
-	if (self->client != NULL)
-		licli_client_free (self->client);
+
+	/* Remove the components. */
+	if (self->program != NULL)
+	{
+		limai_program_remove_component (self->program, "graphics");
+		limai_program_remove_component (self->program, "render");
+	}
+
+	/* Free the graphics engine. */
+	if (self->render != NULL)
+		liren_render_free (self->render);
+
 	lisys_free (self);
+}
+
+int liext_graphics_set_videomode (
+	LIExtGraphics* self,
+	int            width,
+	int            height,
+	int            fullscreen,
+	int            sync)
+{
+	LIRenVideomode mode;
+
+	mode.width = width;
+	mode.height = height;
+	mode.fullscreen = fullscreen;
+	mode.sync = sync;
+	if (!liren_render_set_videomode (self->render, &mode))
+		return 0;
+	self->mode = mode;
+
+	return 1;
 }
 
 /*****************************************************************************/
 
 static void private_initial_videomode (
-	LIExtModule* self,
-	int*         width,
-	int*         height,
-	int*         fullscreen,
-	int*         vsync,
-	int*         multisamples)
+	LIExtGraphics* self,
+	int*           width,
+	int*           height,
+	int*           fullscreen,
+	int*           vsync,
+	int*           multisamples)
 {
 	lua_State* lua;
 
@@ -165,10 +210,10 @@ static void private_initial_videomode (
 }
 
 static int private_engine_tick (
-	LIExtModule* self,
-	float        secs)
+	LIExtGraphics* self,
+	float          secs)
 {
-	if (!liren_render_update (self->client->render, secs))
+	if (!liren_render_update (self->render, secs))
 		self->program->quit = 1;
 
 	return 1;

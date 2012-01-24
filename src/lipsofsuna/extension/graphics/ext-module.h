@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,27 +15,38 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __EXT_GRAPHICS_MODULE_H__
+#define __EXT_GRAPHICS_MODULE_H__
 
 #include "lipsofsuna/extension.h"
-#include "lipsofsuna/client.h"
+#include "lipsofsuna/render.h"
 
 #define LIEXT_SCRIPT_GRAPHICS "Graphics"
 
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+typedef struct _LIExtGraphics LIExtGraphics;
+struct _LIExtGraphics
 {
 	LICalHandle calls[1];
-	LICliClient* client;
 	LIMaiProgram* program;
+	LIRenRender* render;
+	LIRenVideomode mode;
 };
 
-LIExtModule* liext_graphics_new (
-	LIMaiProgram* program);
+LIAPICALL (LIExtGraphics*, liext_graphics_new, (
+	LIMaiProgram* program));
 
-void liext_graphics_free (
-	LIExtModule* self);
+LIAPICALL (void, liext_graphics_free, (
+	LIExtGraphics* self));
+
+LIAPICALL (void, liext_graphics_free, (
+	LIExtGraphics* self));
+
+LIAPICALL (int, liext_graphics_set_videomode, (
+	LIExtGraphics* self,
+	int            width,
+	int            height,
+	int            fullscreen,
+	int            sync));
 
 /*****************************************************************************/
 

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,8 +18,8 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/extension.h>
-#include <lipsofsuna/client.h>
+#include "lipsofsuna/extension.h"
+#include "lipsofsuna/render.h"
 
 #define LIEXT_SCRIPT_RENDER_OBJECT "RenderObject"
 
@@ -27,7 +27,6 @@ typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
 	LICalHandle calls[9];
-	LICliClient* client;
 	LIMaiProgram* program;
 	LIRenRender* render;
 };

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -45,14 +45,15 @@ LIExtModule* liext_widgets_new (
 	LIMaiProgram* program)
 {
 	LIExtModule* self;
+	LIRenVideomode mode;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIExtModule));
 	if (self == NULL)
 		return NULL;
 	self->program = program;
-	self->client = limai_program_find_component (program, "client");
-	if (self->client == NULL)
+	self->render = limai_program_find_component (program, "render");
+	if (self->render == NULL)
 	{
 		lisys_error_set (EINVAL, "extension `widgets' can only be used by the client");
 		liext_widgets_free (self);
@@ -60,14 +61,14 @@ LIExtModule* liext_widgets_new (
 	}
 
 	/* Allocate the widget manager. */
-	self->widgets = liwdg_manager_new (self->client->render, self->program->callbacks, self->program->paths);
+	self->widgets = liwdg_manager_new (self->render, self->program->callbacks, self->program->paths);
 	if (self->widgets == NULL)
 	{
 		liext_widgets_free (self);
 		return NULL;
 	}
-	liwdg_manager_set_size (self->widgets, self->client->mode.width,
-		self->client->mode.height);
+	liren_render_get_videomode (self->render, &mode);
+	liwdg_manager_set_size (self->widgets, mode.width, mode.height);
 
 	/* Register component. */
 	if (!limai_program_insert_component (program, "widgets", self->widgets))
@@ -149,7 +150,7 @@ static int private_widget_tick (
 	liwdg_manager_update (module->widgets, secs);
 
 	/* Update dimensions. */
-	liren_render_get_videomode (module->client->render, &mode);
+	liren_render_get_videomode (module->render, &mode);
 	liwdg_manager_set_size (module->widgets, mode.width, mode.height);
 
 	return 1;

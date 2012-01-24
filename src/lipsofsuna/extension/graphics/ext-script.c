@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -31,14 +31,14 @@ static void Program_measure_text (LIScrArgs* args)
 	int height;
 	const char* font_name;
 	const char* text;
-	LIExtModule* module;
+	LIExtGraphics* module;
 
 	if (liscr_args_geti_string (args, 0, &font_name) &&
 	    liscr_args_geti_string (args, 1, &text))
 	{
 		liscr_args_geti_int (args, 2, &width_limit);
 		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
-		if (liren_render_measure_text (module->client->render, font_name, text, width_limit, &width, &height))
+		if (liren_render_measure_text (module->render, font_name, text, width_limit, &width, &height))
 		{
 			liscr_args_seti_int (args, width);
 			liscr_args_seti_int (args, height);
@@ -51,7 +51,7 @@ static void Program_screenshot (LIScrArgs* args)
 	char* home;
 	char* file;
 	char* path;
-	LIExtModule* module;
+	LIExtGraphics* module;
 
 	/* Construct file path. */
 	home = lisys_paths_get_home ();
@@ -72,7 +72,7 @@ static void Program_screenshot (LIScrArgs* args)
 
 	/* Capture the screen. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
-	if (liren_render_screenshot (module->client->render, path))
+	if (liren_render_screenshot (module->render, path))
 		liscr_args_seti_string (args, file);
 	lisys_free (path);
 	lisys_free (file);
@@ -80,7 +80,7 @@ static void Program_screenshot (LIScrArgs* args)
 
 static void Program_get_fps (LIScrArgs* args)
 {
-	LIExtModule* module;
+	LIExtGraphics* module;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
 	liscr_args_seti_float (args, module->program->fps);
@@ -89,35 +89,35 @@ static void Program_get_fps (LIScrArgs* args)
 static void Program_get_opengl_version (LIScrArgs* args)
 {
 	float v;
-	LIExtModule* module;
+	LIExtGraphics* module;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
-	v = liren_render_get_opengl_version (module->client->render);
+	v = liren_render_get_opengl_version (module->render);
 	liscr_args_seti_float (args, v);
 }
 
 static void Program_set_title (LIScrArgs* args)
 {
 	const char* value;
-	LIExtModule* module;
+	LIExtGraphics* module;
 
 	if (liscr_args_geti_string (args, 0, &value))
 	{
 		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
-		liren_render_set_title (module->client->render, value);
+		liren_render_set_title (module->render, value);
 	}
 }
 
 static void Program_get_video_mode (LIScrArgs* args)
 {
-	LIExtModule* module;
+	LIExtGraphics* module;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-	liscr_args_seti_int (args, module->client->mode.width);
-	liscr_args_seti_int (args, module->client->mode.height);
-	liscr_args_seti_bool (args, module->client->mode.fullscreen);
-	liscr_args_seti_bool (args, module->client->mode.sync);
+	liscr_args_seti_int (args, module->mode.width);
+	liscr_args_seti_int (args, module->mode.height);
+	liscr_args_seti_bool (args, module->mode.fullscreen);
+	liscr_args_seti_bool (args, module->mode.sync);
 }
 
 static void Program_set_video_mode (LIScrArgs* args)
@@ -126,7 +126,7 @@ static void Program_set_video_mode (LIScrArgs* args)
 	int height = 768;
 	int fullscreen = 0;
 	int vsync = 0;
-	LIExtModule* module;
+	LIExtGraphics* module;
 
 	if (!liscr_args_gets_int (args, "width", &width))
 		liscr_args_geti_int (args, 0, &width);
@@ -140,7 +140,7 @@ static void Program_set_video_mode (LIScrArgs* args)
 	height = LIMAT_MAX (240, height);
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
-	if (!licli_client_set_videomode (module->client, width, height, fullscreen, vsync))
+	if (!liext_graphics_set_videomode (module, width, height, fullscreen, vsync))
 	{
 		lisys_error_report ();
 		return;
@@ -152,12 +152,12 @@ static void Program_get_video_modes (LIScrArgs* args)
 {
 	int i;
 	int num;
-	LIExtModule* module;
+	LIExtGraphics* module;
 	LIRenVideomode* modes;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-	if (liren_render_get_videomodes (module->client->render, &modes, &num))
+	if (liren_render_get_videomodes (module->render, &modes, &num))
 	{
 		for (i = 0 ; i < num ; i++)
 		{

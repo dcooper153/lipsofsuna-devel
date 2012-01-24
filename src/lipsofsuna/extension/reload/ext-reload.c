@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -56,7 +56,6 @@ LIExtReload* liext_reload_new (
 		return NULL;
 	self->program = program;
 	self->paths = program->paths;
-	self->client = limai_program_find_component (program, "client");
 
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (program->callbacks, "tick", 0, private_callback_tick, self, self->calls + 0))

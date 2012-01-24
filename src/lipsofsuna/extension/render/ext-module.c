@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -41,14 +41,13 @@ LIExtModule* liext_render_new (
 	if (self == NULL)
 		return NULL;
 	self->program = program;
-	self->client = limai_program_find_component (program, "client");
-	if (self->client == NULL)
+	self->render = limai_program_find_component (program, "render");
+	if (self->render == NULL)
 	{
 		lisys_error_set (EINVAL, "extension `render' can only be used by the client");
 		liext_render_free (self);
 		return NULL;
 	}
-	self->render = self->client->render;
 
 	/* Register classes. */
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_LIGHT, self);
