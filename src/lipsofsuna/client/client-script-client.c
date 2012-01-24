@@ -26,23 +26,6 @@
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/client.h"
 
-static void Client_host (LIScrArgs* args)
-{
-	const char* str = "--server";
-	LICliClient* client;
-
-	if (!liscr_args_gets_string (args, "args", &str))
-	    liscr_args_geti_string (args, 0, &str);
-
-	client = liscr_script_get_userdata (args->script, LICLI_SCRIPT_CLIENT);
-	if (!licli_client_host (client, str))
-	{
-		lisys_error_report ();
-		return;
-	}
-	liscr_args_seti_bool (args, 1);
-}
-
 static void Client_screenshot (LIScrArgs* args)
 {
 	char* home;
@@ -166,7 +149,6 @@ static void Client_get_video_modes (LIScrArgs* args)
 void licli_script_client (
 	LIScrScript* self)
 {
-	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_host", Client_host);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_screenshot", Client_screenshot);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_set_video_mode", Client_set_video_mode);
 	liscr_script_insert_cfunc (self, LICLI_SCRIPT_CLIENT, "client_get_fps", Client_get_fps);

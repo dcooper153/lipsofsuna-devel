@@ -14,15 +14,6 @@ Program.capture_screen = function(clss)
 	return Los.client_screenshot()
 end
 
---- Launches a server.
--- @param clss Program class.
--- @param args Arguments.<ul>
---   <li>1,args: String to pass to the server.</li></ul>
--- @return True on success.
-Program.launch_server = function(clss, args)
-	return Los.client_host(args)
-end
-
 --- Measures a string.
 -- @param clss Program class.
 -- @param ... Arguments.<ul>

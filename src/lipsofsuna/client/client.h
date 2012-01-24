@@ -26,14 +26,11 @@
 #include "lipsofsuna/render.h"
 #include "lipsofsuna/script.h"
 #include "lipsofsuna/system.h"
-#include "client-server.h"
 #include "client-types.h"
 
 struct _LICliClient
 {
 	LIMaiProgram* program;
-	LICliServer* server;
-	LISysThread* server_thread;
 	LIRenRender* render;
 	LIRenVideomode mode;
 };
@@ -48,17 +45,6 @@ LIAPICALL (LICliClient*, licli_client_new, (
 
 LIAPICALL (void, licli_client_free, (
 	LICliClient* self));
-
-LIAPICALL (int, licli_client_host, (
-	LICliClient* self,
-	const char*  args));
-
-LIAPICALL (int, licli_client_get_moving, (
-	LICliClient* self));
-
-LIAPICALL (void, licli_client_set_moving, (
-	LICliClient* self,
-	int          value));
 
 LIAPICALL (int, licli_client_set_videomode, (
 	LICliClient* self,

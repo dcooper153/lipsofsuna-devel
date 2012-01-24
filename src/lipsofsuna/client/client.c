@@ -35,13 +35,6 @@ static int private_init (
 	int           sync,
 	int           multisamples);
 
-static void private_server_main (
-	LISysThread* thread,
-	void*        data);
-
-static void private_server_shutdown (
-	LICliClient* self);
-
 /*****************************************************************************/
 
 LICliClient* licli_client_new (
@@ -83,44 +76,11 @@ void licli_client_free (
 		limai_program_remove_component (self->program, "render");
 	}
 
-	/* Free the server thread. */
-	private_server_shutdown (self);
-
 	/* Free the graphics engine. */
 	if (self->render != NULL)
 		liren_render_free (self->render);
 
 	lisys_free (self);
-}
-
-/**
- * \brief Starts an embedded server.
- *
- * \param self Client.
- * \param args Arguments to pass to the server.
- * \return Nonzero on success.
- */
-int licli_client_host (
-	LICliClient* self,
-	const char*  args)
-{
-	/* Kill old thread. */
-	private_server_shutdown (self);
-
-	/* Create new server. */
-	self->server = licli_server_new (self->program->paths->root, self->program->paths->module_name, args);
-	if (self->server == NULL)
-		return 0;
-
-	/* Create server thread. */
-	self->server_thread = lisys_thread_new (private_server_main, self);
-	if (self->server_thread == NULL)
-	{
-		licli_server_free (self->server);
-		self->server = NULL;
-	}
-
-	return 1;
 }
 
 int licli_client_set_videomode (
@@ -178,38 +138,6 @@ static int private_init (
 	licli_script_client (program->script);
 
 	return 1;
-}
-
-static void private_server_main (
-	LISysThread* thread,
-	void*        data)
-{
-	LICliClient* self = data;
-
-	if (!licli_server_main (self->server))
-		lisys_error_report ();
-	licli_server_free (self->server);
-	self->server = NULL;
-}
-
-static void private_server_shutdown (
-	LICliClient* self)
-{
-	/* Terminate the server if it's running. If the server closed on its own,
-	   for example due to an error its scripts, the server program has already
-	   been freed by the server thread but the thread still exists. */
-	if (self->server != NULL)
-		limai_program_shutdown (self->server->program);
-
-	/* Free the server thread. The server program is guaranteed to be freed
-	   by the server thread so all we need to do is to wait for the thread to
-	   exit. This doesn't take long since we asked the server to quit already. */
-	if (self->server_thread != NULL)
-	{
-		lisys_thread_free (self->server_thread);
-		self->server_thread = NULL;
-		lisys_assert (self->server == NULL);
-	}
 }
 
 /** @} */
