@@ -47,6 +47,13 @@ Thread.push_message = function(self, ...)
 	end
 end
 
+Thread:add_getters{
+	done = function(self) return Los.thread_get_done(self.handle) end}
+
+Thread:add_setters{
+	done = function(self, v) end,
+	quit = function(self, v) return Los.thread_set_quit(self.handle, v) end}
+
 Thread.unittest = function()
 	-- Creation.
 	print("Testing thread creation...")
@@ -79,4 +86,12 @@ Thread.unittest = function()
 	assert(m.type == "model")
 	assert(m.model)
 	assert(m.model.class_name == "Model")
+	-- Thread termination.
+	print("Testing thread termination...")
+	local t3 = Thread(nil, "", [[
+		require "system/core"
+		while not Program.quit do Program:update() end]])
+	assert(not t3.done)
+	t3.quit = true
+	repeat until t3.done
 end

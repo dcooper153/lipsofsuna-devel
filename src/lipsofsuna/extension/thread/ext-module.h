@@ -42,6 +42,9 @@ LIExtThread* liext_thread_inst_new (
 void liext_thread_inst_free (
 	LIExtThread* self);
 
+int liext_thread_inst_get_done (
+	LIExtThread* self);
+
 void liext_thread_inst_set_quit (
 	LIExtThread* self);
 

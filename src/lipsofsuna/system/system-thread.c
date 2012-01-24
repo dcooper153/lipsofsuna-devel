@@ -74,7 +74,7 @@ void lisys_thread_join (
 	pthread_join (self->thread, NULL);
 }
 
-int lisys_thread_call_get_done (
+int lisys_thread_get_done (
 	LISysThread* self)
 {
 	return self->done;

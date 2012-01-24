@@ -122,6 +122,12 @@ static void Thread_push_message (LIScrArgs* args)
 	}
 }
 
+static void Thread_get_done (LIScrArgs* args)
+{
+	if (liext_thread_inst_get_done (args->self))
+		liscr_args_seti_bool (args, 1);
+}
+
 static void Thread_set_quit (LIScrArgs* args)
 {
 	liext_thread_inst_set_quit (args->self);
@@ -135,6 +141,7 @@ void liext_script_thread (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_THREAD, "thread_new", Thread_new);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_THREAD, "thread_pop_message", Thread_pop_message);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_THREAD, "thread_push_message", Thread_push_message);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_THREAD, "thread_get_done", Thread_get_done);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_THREAD, "thread_set_quit", Thread_set_quit);
 }
 

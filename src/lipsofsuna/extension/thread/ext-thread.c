@@ -105,6 +105,12 @@ void liext_thread_inst_free (
 	lisys_free (self);
 }
 
+int liext_thread_inst_get_done (
+	LIExtThread* self)
+{
+	return lisys_thread_get_done (self->thread);
+}
+
 void liext_thread_inst_set_quit (
 	LIExtThread* self)
 {
