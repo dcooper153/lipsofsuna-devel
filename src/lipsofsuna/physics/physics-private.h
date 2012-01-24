@@ -237,6 +237,7 @@ public:
 	LIPhyCharacterControl (LIPhyObject* object, btCollisionShape* shape);
 	virtual ~LIPhyCharacterControl ();
 public:
+	virtual void apply_impulse (const btVector3& pos, const btVector3& imp);
 	virtual bool get_ground ();
 public:
 	LIPhyCharacterAction action;

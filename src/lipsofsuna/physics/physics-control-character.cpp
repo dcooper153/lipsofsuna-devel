@@ -124,10 +124,16 @@ void LIPhyCharacterAction::updateAction (
 		this->ground = 1;
 
 	/* Damp when moving upwards too fast. */
-	/* Without this the player would shoot upwards from any slopes. */
-	/* FIXME: Doesn't work for non-vertical gravity. */
-	damp0 = 1.0f - LIMAT_CLAMP (vel[1], 0.0f, LIPHY_CHARACTER_RISING_LIMIT) /
-		LIPHY_CHARACTER_RISING_LIMIT;
+	/* Without this the player would shoot upwards from any slopes.
+	   This interferes with jumping so we only do this when the
+	   character is on ground. */
+	damp0 = 1.0f;
+	if (ground)
+	{
+		/* FIXME: Doesn't work for non-vertical gravity. */
+		damp0 -= LIMAT_CLAMP (vel[1], 0.0f, LIPHY_CHARACTER_RISING_LIMIT) /
+			LIPHY_CHARACTER_RISING_LIMIT;
+	}
 
 	/* Damp when not moving. */
 	/* Without this the character would slide a lot after releasing controls. */
@@ -178,6 +184,18 @@ LIPhyCharacterControl::~LIPhyCharacterControl ()
 {
 	object->physics->dynamics->removeAction (&this->action);
 	this->body.setAngularFactor (1.0f);
+}
+
+void LIPhyCharacterControl::apply_impulse (const btVector3& pos, const btVector3& imp)
+{
+	LIPhyControlRigid::apply_impulse (pos, imp);
+
+	/* Mark the character as not being on ground for a while. */
+	/* Impulses are primarily used for jumping and tossing characters around.
+	   We want the ground friction to end immediately in those cases so we
+	   make it the default behavior. */
+	this->action.timer = -0.5f;
+	this->action.ground = false;
 }
 
 bool LIPhyCharacterControl::get_ground ()
