@@ -81,13 +81,13 @@ LIExtHeightmapRender* liext_heightmap_render_new (
 	self->hooks.free = (LIExtHeightmapFreeFunc) private_free_heightmap;
 	self->heightmap->render_hooks = &self->hooks;
 
-	/* FIXME: Leaked. */
-	Ogre::TerrainGlobalOptions* globals = OGRE_NEW Ogre::TerrainGlobalOptions ();
-	globals->setMaxPixelError (8);
-	globals->setCompositeMapDistance (3000);
-	globals->setLightMapDirection (Ogre::Vector3 (0.0f, -1.0f, 0.0f));
-	globals->setCompositeMapAmbient (Ogre::ColourValue (0.9f, 0.9f, 0.9f));
-	globals->setCompositeMapDiffuse (Ogre::ColourValue (1.0f, 1.0f, 1.0f));
+	/* Setup default terrain options. */
+	self->globals = OGRE_NEW Ogre::TerrainGlobalOptions ();
+	self->globals->setMaxPixelError (8);
+	self->globals->setCompositeMapDistance (3000);
+	self->globals->setLightMapDirection (Ogre::Vector3 (0.0f, -1.0f, 0.0f));
+	self->globals->setCompositeMapAmbient (Ogre::ColourValue (0.9f, 0.9f, 0.9f));
+	self->globals->setCompositeMapDiffuse (Ogre::ColourValue (1.0f, 1.0f, 1.0f));
 
 	/* Register classes. */
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_HEIGHTMAP_RENDER, self);
@@ -116,6 +116,7 @@ void liext_heightmap_render_free (
 		self->heightmap->render_hooks = NULL;
 	}
 
+	delete self->globals;
 	lisys_free (self);
 }
 
@@ -125,7 +126,10 @@ static void private_init_heightmap (
 	LIExtHeightmapRender* self,
 	LIExtHeightmap*       heightmap)
 {
-	/* TODO: Ensure valid size. */
+	/* Specify the blend map size. */
+	/* We want the blend map to be of the same size with the terrain
+	   image instead of whatever default value Ogre happens to use. */
+	self->globals->setLayerBlendMapSize (heightmap->size);
 
 	/* Create the terrain group. */
 	float width = (heightmap->size - 1) * heightmap->spacing;

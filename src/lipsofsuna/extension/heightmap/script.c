@@ -26,6 +26,7 @@
 
 static void Heightmap_new (LIScrArgs* args)
 {
+	int i;
 	int size;
 	float spacing;
 	float scaling;
@@ -40,7 +41,7 @@ static void Heightmap_new (LIScrArgs* args)
 	if (!liscr_args_geti_vector (args, 0, &position))
 		position = limat_vector_init (0.0f, 0.0f, 0.0f);
 	if (!liscr_args_geti_int (args, 1, &size))
-		size = 32;
+		size = 33;
 	else if (size < 0)
 		size = 0;
 	if (!liscr_args_geti_float (args, 2, &spacing))
@@ -55,6 +56,19 @@ static void Heightmap_new (LIScrArgs* args)
 		image = liscr_data_get_data (data);
 	else
 		image = NULL;
+
+	/* Ensure that the size is valid. */
+	for (i = 32 ; i < 65536 ; i *= 2)
+	{
+		if (size == i + 1)
+			break;
+	}
+	if (size != i + 1)
+	{
+		lisys_error_set (EINVAL, "invalid heightmap size");
+		lisys_error_report ();
+		return;
+	}
 
 	/* Allocate the heightmap. */
 	heightmap = liext_heightmap_new (module, image, &position, size, spacing, scaling);

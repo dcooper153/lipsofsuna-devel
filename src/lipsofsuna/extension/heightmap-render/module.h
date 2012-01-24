@@ -21,6 +21,9 @@
 #include "lipsofsuna/extension.h"
 #include "lipsofsuna/render.h"
 #include "../heightmap/module.h"
+#ifdef __cplusplus
+#include <OgreTerrain.h>
+#endif
 
 #define LIEXT_SCRIPT_HEIGHTMAP_RENDER "HeightmapRender"
 
@@ -31,6 +34,11 @@ struct _LIExtHeightmapRender
 	LIExtHeightmapHooks hooks;
 	LIMaiProgram* program;
 	LIRenRender* render;
+#ifdef __cplusplus
+	Ogre::TerrainGlobalOptions* globals;
+#else
+	void* globals;
+#endif
 };
 
 LIAPICALL (LIExtHeightmapRender*, liext_heightmap_render_new, (
