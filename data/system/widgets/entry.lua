@@ -11,6 +11,7 @@ Widgets.Entry.class_name = "Widgets.Entry"
 Widgets.Entry.new = function(clss, args)
 	local self = Widgets.Label.new(clss, args)
 	if not self.cursor_pos then self.cursor_pos = 1 end
+	self.force_cursor = args and args.force_cursor
 	self.background = args and args.background
 	self.background_focus = args and args.background_focus
 	if not self.background then
@@ -131,7 +132,7 @@ Widgets.Entry.reshaped = function(self)
 		text_color = self.color or self.focused and {1,1,1,1} or {0.6,0.6,0.6,1},
 		text_font = self.font}
 	-- Pack the cursor.
-	if self.focused then
+	if self.focused or self.force_cursor then
 		local ws = String.utf8_to_wchar(text)
 		ws[self.cursor_pos] = nil
 		local us = String.wchar_to_utf8(ws)

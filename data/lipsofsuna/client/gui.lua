@@ -9,7 +9,7 @@ Gui.init = function(clss)
 	Gui.chat_history = Widgets.Log()
 	Gui.chat_label = Widgets.Label{text = " "}
 	Gui.chat_entry = Widgets.Entry{color = {1,1,1,1}, visible = false, width_request = 500,
-		background = {dest_position = {0,4}, source_image = "widgets1",
+		force_cursor = true, background = {dest_position = {0,4}, source_image = "widgets1",
 		source_position = {722,63}, source_tiling = {6,32,6,6,24,6}}}
 	Gui.chat_entry.pressed = function(self)
 		Network:send{packet = Packet(packets.PLAYER_CHAT, "string", self.text)}
