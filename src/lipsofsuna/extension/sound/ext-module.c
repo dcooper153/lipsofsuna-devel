@@ -142,7 +142,7 @@ LISndSample* liext_sound_find_sample (
 		return sample;
 
 	/* Try to load FLAC. */
-	file = lisys_string_concat (name, ".flag");
+	file = lisys_string_concat (name, ".flac");
 	if (file == NULL)
 		return NULL;
 	path = lipth_paths_find_file (self->program->paths, file);

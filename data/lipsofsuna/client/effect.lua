@@ -15,7 +15,7 @@ Effect.play_object = function(clss, name, object, node)
 	if n then p = object:find_node{name = n} end
 	-- Create the effect object.
 	EffectObject{
-		model = effect.model,
+		particle = effect.model,
 		object = object,
 		node = p and n,
 		rotation_inherit = (effect.rotation ~= false),
@@ -35,7 +35,7 @@ Effect.play_world = function(clss, name, position)
 	if not effect then return end
 	-- Create the effect object.
 	EffectObject{
-		model = effect.model,
+		particle = effect.model,
 		position = position,
 		sound = effect.sound,
 		sound_delay = effect.sound_delay,
