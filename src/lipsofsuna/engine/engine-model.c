@@ -172,9 +172,13 @@ int lieng_model_load (
 	if (file == NULL)
 		return 0;
 	path = lipth_paths_find_file (self->engine->paths, file);
-	lisys_free (file);
 	if (path == NULL)
+	{
+		lisys_error_set (EINVAL, "cannot find model `%s'", file);
+		lisys_free (file);
 		return 0;
+	}
+	lisys_free (file);
 
 	/* Load model geometry. */
 	tmpmdl = limdl_model_new_from_file (path, mesh);
