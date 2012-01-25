@@ -452,10 +452,16 @@ int liren_object_set_particle (
 	self->model = NULL;
 
 	/* Attach a new particle system to the scene node. */
-	Ogre::String e_name = private_unique_id (self);
-	self->data->particles = self->render->data->scene_manager->createParticleSystem (e_name, name);
-	if (self->data->particles != NULL)
+	try
+	{
+		Ogre::String e_name = private_unique_id (self);
+		self->data->particles = self->render->data->scene_manager->createParticleSystem (e_name, name);
+		lisys_assert (self->data->particles != NULL);
 		self->data->node->attachObject (self->data->particles);
+	}
+	catch (...)
+	{
+	}
 
 	return 1;
 }
