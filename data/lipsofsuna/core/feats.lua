@@ -291,7 +291,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "explode",
-	action = "melee custom",
+	action = "explode",
 	animation = "explode",
 	categories = {"explode", "melee"},
 	cooldown = 2,
