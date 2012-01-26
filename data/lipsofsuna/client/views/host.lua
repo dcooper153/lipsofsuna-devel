@@ -15,7 +15,7 @@ Views.Host.new = function(clss)
 	self.entry_account = Widgets.Entry{text = Client.config.host_account}
 	self.entry_password = Widgets.Entry{password = true}
 	self.toggle_restart = Widgets.Toggle()
-	self.toggle_admin = Widgets.Toggle()
+	self.toggle_admin = Widgets.Toggle{active = Client.config.host_admin}
 	self.group_account = Widgets.Frame{style = "default", cols = 2, rows = 6}
 	self.group_account:set_expand{col = 2, row = 4}
 	self.group_account:set_child{col = 1, row = 1, widget = Widgets.Label{text = "Savefile:"}}
@@ -61,6 +61,7 @@ end
 -- @param self Host view.
 Views.Host.close = function(self)
 	self.floating = false
+	self:save()
 end
 
 --- Enters the host view.
@@ -73,34 +74,42 @@ end
 -- @param self Host view.
 Views.Host.play = function(self)
 	-- Save config.
-	local saveslot = self.combo_file.value or 1
-	local account = self.entry_account.text
-	local password = self.entry_password.text
-	Client.config.host_saveslot = saveslot
-	Client.config.host_account = account
-	Client.config:save()
+	self:save()
 	-- Setup hosting.
 	Settings.address = "localhost"
-	Settings.file = saveslot
+	Settings.file = self.combo_file.value or 1
 	Settings.admin = self.toggle_admin.active
 	Settings.generate = self.toggle_restart.active
 	Settings.host = true
 	Settings.port = 10101
+	-- Setup credentials.
+	local account = self.entry_account.text
 	if account and #account > 0 then
 		Settings.account = account
 	else
 		Settings.account = "guest"
 	end
+	local password = self.entry_password.text
 	if password and #password > 0 then
 		Settings.password = password
 	else
 		Settings.password = ""
 	end
+	-- Enter the startup mode.
 	Client:set_mode("startup")
 end
 
+---- Saves the configuration.
+--- @param self Host view.
+Views.Host.save = function(self)
+	Client.config.host_saveslot = self.combo_file.value or 1
+	Client.config.host_account = self.entry_account.text
+	Client.config.host_admin = self.toggle_admin.active
+	Client.config:save()
+end
+
 ---- Sets the active saveslot.
---- @param self Startup.
+--- @param self Host view.
 --- @param slot Saveslot number.
 Views.Host.set_slot = function(self, slot)
 end

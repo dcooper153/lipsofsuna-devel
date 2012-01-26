@@ -7,6 +7,7 @@ Config.new = function(clss)
 	local self = Class.new(clss)
 	-- Initialize defaults.
 	self.host_account = "guest"
+	self.host_admin = true
 	self.host_saveslot = 1
 	self.join_account = "guest"
 	self.join_address = "localhost"
@@ -26,6 +27,7 @@ end
 Config.load = function(self)
 	local opts = {
 		host_account = function(v) self.host_account = v end,
+		host_admin = function(v) self.host_admin = (v == "true") end,
 		host_saveslot = function(v) self.host_saveslot = tonumber(v) end,
 		join_account = function(v) self.join_account = v end,
 		join_address = function(v) self.join_address = v end,
@@ -45,7 +47,8 @@ end
 -- @param self Config.
 Config.save = function(self)
 	-- Write launcher settings.
-	self.config:set("host_account", host_account)
+	self.config:set("host_account", self.host_account)
+	self.config:set("host_admin", self.host_admin and "true" or "false")
 	self.config:set("host_saveslot", tostring(self.host_saveslot))
 	self.config:set("join_account", self.join_account)
 	self.config:set("join_address", self.join_address)
