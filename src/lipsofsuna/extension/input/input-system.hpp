@@ -28,6 +28,7 @@ class LIInpSystem : public OIS::KeyListener, public OIS::MouseListener
 public:
 	LIInpSystem (LIInpInput* input, bool grab);
 	virtual ~LIInpSystem ();
+	int get_mouse_button_state ();
 	void get_mouse_state (int* x, int* y);
 	void update (float secs);
 protected:

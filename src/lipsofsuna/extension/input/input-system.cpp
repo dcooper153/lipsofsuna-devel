@@ -100,6 +100,12 @@ LIInpSystem::~LIInpSystem ()
 		OIS::InputManager::destroyInputSystem (this->input_manager);
 }
 
+int LIInpSystem::get_mouse_button_state ()
+{
+	const OIS::MouseState& state = this->mouse->getMouseState ();
+	return state.buttons;
+}
+
 void LIInpSystem::get_mouse_state (int* x, int* y)
 {
 	const OIS::MouseState& state = this->mouse->getMouseState ();

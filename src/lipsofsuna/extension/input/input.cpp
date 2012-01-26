@@ -115,6 +115,17 @@ void liinp_input_free (
 }
 
 /**
+ * \brief Gets the mouse button mask.
+ * \param self Input.
+ * \return Integer.
+ */
+int liinp_input_get_mouse_button_state (
+	LIInpInput* self)
+{
+	return self->system->get_mouse_button_state ();
+}
+
+/**
  * \brief Gets the current pointer position.
  * \param self Input.
  * \param x Return location for the X coordinate.

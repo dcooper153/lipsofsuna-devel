@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -37,6 +37,16 @@ static void Input_get_cursor_pos (LIScrArgs* args)
 	liscr_args_seti_vector (args, &tmp);
 }
 
+static void Input_get_mouse_button_state (LIScrArgs* args)
+{
+	int s;
+	LIInpInput* self;
+
+	self = liscr_script_get_userdata (args->script, LIINP_SCRIPT_INPUT);
+	s = liinp_input_get_mouse_button_state (self);
+	liscr_args_seti_int (args, s);
+}
+
 static void Input_get_pointer_grab (LIScrArgs* args)
 {
 	LIInpInput* self;
@@ -62,6 +72,7 @@ void liinp_script_input (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LIINP_SCRIPT_INPUT, "input_get_cursor_pos", Input_get_cursor_pos);
+	liscr_script_insert_cfunc (self, LIINP_SCRIPT_INPUT, "input_get_mouse_button_state", Input_get_mouse_button_state);
 	liscr_script_insert_cfunc (self, LIINP_SCRIPT_INPUT, "input_get_pointer_grab", Input_get_pointer_grab);
 	liscr_script_insert_cfunc (self, LIINP_SCRIPT_INPUT, "input_set_pointer_grab", Input_set_pointer_grab);
 }

@@ -36,6 +36,9 @@ LIAPICALL (void, liinp_input_get_pointer, (
 	int*        x,
 	int*        y));
 
+LIAPICALL (int, liinp_input_get_mouse_button_state, (
+	LIInpInput* self));
+
 LIAPICALL (int, liinp_input_get_pointer_grab, (
 	LIInpInput* self));
 
