@@ -82,29 +82,5 @@ end
 --- Initiates hosting of a game.
 -- @param self Host view.
 Views.Login.play = function(self)
-	-- Save config.
-	local saveslot = 1
-	local account = "guest"
-	local password = ""
-	Client.config.host_saveslot = saveslot
-	Client.config.host_account = account
-	Client.config:save()
-	-- Setup hosting.
-	Settings.address = "localhost"
-	Settings.file = saveslot
-	Settings.admin = false
-	Settings.generate = false
-	Settings.host = true
-	Settings.port = 10101
-	if account and #account > 0 then
-		Settings.account = account
-	else
-		Settings.account = "guest"
-	end
-	if password and #password > 0 then
-		Settings.password = password
-	else
-		Settings.password = ""
-	end
-	Client:set_mode("startup")
+	Client.views.host:play()
 end
