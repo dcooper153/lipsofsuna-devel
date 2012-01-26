@@ -37,6 +37,14 @@ Widgets.SkillControl.get_value_at = function(self, point)
 	end
 end
 
+Widgets.SkillControl.mousemotion = function(self, args)
+	if math.mod(Program.mouse_button_state, 2) == 1 then
+		local v = self:get_value_at(Vector(args.x, args.y))
+		if not v then return end
+		self:changed(v)
+	end
+end
+
 Widgets.SkillControl.pressed = function(self)
 	local v = self:get_value_at(Program.cursor_position)
 	if not v then return end

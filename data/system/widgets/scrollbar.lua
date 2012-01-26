@@ -18,6 +18,28 @@ Widgets.Scrollbar.get_value_at = function(self, point)
 	return math.floor(v + 0.5)
 end
 
+Widgets.Scrollbar.set_value_at = function(self, point)
+	-- Ignore if the scroll range is empty.
+	if self.max <= self.page then return end
+	-- Clamp clicks on the buttons.
+	local c = point - Vector(self.x, self.y)
+	c.y = math.max(c.y, 21)
+	c.y = math.min(c.y, self.height - 21 - 1)
+	-- Scroll to the cursor.
+	local v = self:get_value_at(point)
+	if not v then return end
+	self.scroll_offset = math.max(0, math.min(v - math.floor(self.page/2), self.max - self.page))
+	self:reshaped()
+	self:changed(self.scroll_offset)
+	return true
+end
+
+Widgets.Scrollbar.mousemotion = function(self, args)
+	if math.mod(Program.mouse_button_state, 2) == 1 then
+		self:set_value_at(Vector(args.x, args.y))
+	end
+end
+
 Widgets.Scrollbar.pressed = function(self)
 	if self.max <= self.page then return end
 	local cursor = Program.cursor_position
@@ -37,12 +59,8 @@ Widgets.Scrollbar.pressed = function(self)
 			self:changed(self.scroll_offset)
 		end
 	else
-		-- Scroll to cursor.
-		local v = self:get_value_at(cursor)
-		if not v then return end
-		self.scroll_offset = math.max(0, math.min(v - math.floor(self.page/2), self.max - self.page))
-		self:reshaped()
-		self:changed(self.scroll_offset)
+		-- Scroll to the cursor.
+		self:set_value_at(cursor)
 	end
 end
 

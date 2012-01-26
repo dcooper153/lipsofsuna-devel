@@ -8,7 +8,7 @@ end
 
 Widgets.handle_event = function(clss, args)
 	if Program.cursor_grabbed then return end
-	local generic = {keypress = true, keyrelease = true, mousemotion = true, mouserelease = true}
+	local generic = {keypress = true, keyrelease = true, mouserelease = true}
 	if args.type == "mousepress" then
 		-- Buttons.
 		local w = clss:find_handler_widget("pressed")
@@ -19,6 +19,11 @@ Widgets.handle_event = function(clss, args)
 		local w = clss:find_handler_widget("scrolled")
 		if clss:handle_popups(w) then return end
 		if w then return w:scrolled(args) end
+	elseif args.type == "mousemotion" then
+		-- Motion.
+		local w = clss:find_handler_widget("mousemotion")
+		if clss:handle_popups(w) then return end
+		if w then return w:mousemotion(args) end
 	elseif generic[args.type] then
 		-- Other events.
 		local w = clss:find_handler_widget("event")

@@ -324,6 +324,14 @@ Views.Chargen.enter = function(self, from)
 	Sound:switch_music_track("char")
 end
 
+Views.Chargen.mousemotion = function(self, args)
+	if self.dragging then
+		local y = self.view_offset.y + args.dy / 300
+		self.view_offset.y = math.min(math.max(y, 1), 2)
+		self:rotate(math.pi * args.dx / 300)
+	end
+end
+
 Views.Chargen.pressed = function(self, args)
 	if args.button == 1 then
 		self.dragging = true
@@ -334,12 +342,6 @@ Views.Chargen.event = function(self, args)
 	if args.type == "mouserelease" then
 		if args.button == 1 then
 			self.dragging = nil
-		end
-	elseif args.type == "mousemotion" then
-		if self.dragging then
-			local y = self.view_offset.y + args.dy / 300
-			self.view_offset.y = math.min(math.max(y, 1), 2)
-			self:rotate(math.pi * args.dx / 300)
 		end
 	end
 end
