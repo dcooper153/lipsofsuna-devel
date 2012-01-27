@@ -44,7 +44,7 @@ Generator.Main.get_cluster = function(self, pos, size)
 end
 
 Generator.Main.get_sector = function(self, pos, size)
-	if pos.y > 972 then return "Empty" end
+	if pos.y > 1100 then return "Empty" end
 	-- Predefined sectors.
 	-- The map generator allocates some sectors for towns. They're formatted
 	-- using a specific town generator.
