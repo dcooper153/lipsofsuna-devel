@@ -22,7 +22,6 @@ Widgets.handle_event = function(clss, args)
 	elseif args.type == "mousemotion" then
 		-- Motion.
 		local w = clss:find_handler_widget("mousemotion")
-		if clss:handle_popups(w) then return end
 		if w then return w:mousemotion(args) end
 	elseif generic[args.type] then
 		-- Other events.
