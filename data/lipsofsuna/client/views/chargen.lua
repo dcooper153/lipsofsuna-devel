@@ -17,8 +17,6 @@ Views.Chargen.list_presets = {
 	{name="Male 2",body_style={[1]=0.33177570093458,[2]=0.45327102803738,[3]=0.0093457943925234,[4]=0.0093457943925234,[5]=0.36854397941779,[6]=0.91121495327103,[7]=0.18224299065421,[8]=0.88317757009346},skin_color={[1]=1,[2]=1,[3]=1},eye_color={[1]=0.98758912830967,[2]=0.50854464038673,[3]=0.50543860742144},body_scale=0.97416166254513,hair_color={[1]=0.19428798472243,[2]=0.68148148148148,[3]=0.81481481481481},face_style={[1]=0.095238095238095,[2]=0.44285714285714,[3]=0.12857142857143,[4]=0.97711486973665,[5]=0.070011058389214,[6]=0.27460515605035,[7]=0.74761904761905,[8]=0.1952380952381,[9]=0.44866463469745,[10]=0.36289419623227,[11]=0.78943752580762,[12]=0.28424429627333,[13]=0.35238095238095,[14]=0.91790563423089,[15]=0.65714285714286},hair_style="hair5"},
 	{name="Male 3",body_style={[1]=0.63084112149533,[2]=0.42056074766355,[3]=0.018691588785047,[4]=0.023364485981308,[5]=0.78504672897196,[6]=0.97196261682243,[7]=0.13084112149533,[8]=0.77570093457944},skin_color={[1]=1,[2]=1,[3]=1},eye_color={[1]=0.95925925925926,[2]=0.57777777777778,[3]=0.25185185185185},body_scale=1.0366804412376,hair_color={[1]=0.36666666666667,[2]=0.53703703703704,[3]=0.9037037037037},face_style={[1]=0.64285714285714,[2]=0.78571428571429,[3]=0.0047619047619048,[4]=0.84761904761905,[5]=0.12857142857143,[6]=0.35238095238095,[7]=0.17142857142857,[8]=0.63809523809524,[9]=0.42380952380952,[10]=0.25238095238095,[11]=0.5952380952381,[12]=0.15714285714286,[13]=0.9952380952381,[14]=0.98095238095238,[15]=0.24761904761905},hair_style="hair5"}}
 
-Views.Chargen.list_spawnpoints={{"Tutorial","lyra"},{"Lips Town","mentor"},{"Home (if you've made one)","home"}}
-
 --- Creates a new chargen view.
 -- @param clss Chargen class.
 -- @return Chargen.
@@ -36,18 +34,17 @@ Views.Chargen.new = function(clss)
 	self.list_hair_styles = {}
 	self.list_eye_styles = {}
 	self.list_skin_styles = {}
-	-- Spawn Point Selector
-	local spawnpoints = {}
-	for k,v in ipairs(self.list_spawnpoints) do
-		table.insert(spawnpoints, {v[1], function() end})
+	-- Spawn point selector.
+	local spawnpoints = {{"Home", function() end}}
+	for k,v in ipairs(Regionspec:find_spawn_points()) do
+		table.insert(spawnpoints, {v.name, function() end})
 	end
-	self.label_spawn = Widgets.Label{text="Spawn Point:"}
+	self.label_spawn = Widgets.Label{text = "Spawn point:"}
 	self.combo_spawn = Widgets.ComboBox(spawnpoints)
-	--self.combo_spawn.activated = function() self.list_spawnpoints[self.combo_spawn.value][2]() end
+	self.combo_spawn:activate{index = 1}
 	-- Character name.
 	self.label_name = Widgets.Label{text = "Name:"}
 	self.entry_name = Widgets.Entry()
-
 	-- Race selector.
 	local races = {}
 	for k,v in ipairs(self.list_races) do
@@ -211,13 +208,14 @@ Views.Chargen.new = function(clss)
 	self.group_tabs:set_child(3, 1, self.toggle_appearance_face)
 	self.group_tabs:set_child(1, 2, self.toggle_appearance_misc)
 	-- Packing.
-	self.group_spawn = Widget{rows = 1, cols =2, margins={0,0,0,0}}
-	self.group_spawn:set_child{row=1,col=1,widget=self.label_spawn}
-	self.group_spawn:set_child{row=1,col=2,widget=self.combo_spawn}
+	self.group_spawn = Widget{rows = 1, cols = 2, margins={0,0,0,0}}
+	self.group_spawn:set_expand{col = 2}
+	self.group_spawn:set_child(1, 1, self.label_spawn)
+	self.group_spawn:set_child(2, 1, self.combo_spawn)
 	self.group_buttons = Widget{rows = 3, cols = 1, margins = {0,0,5,5}}
-	self.group_buttons:set_child{row = 1, col = 1, widget = self.group_spawn}
-	self.group_buttons:set_child{row = 2, col = 1, widget = self.button_create}
-	self.group_buttons:set_child{row = 3, col = 1, widget = self.button_quit}
+	self.group_buttons:set_child(1, 1, self.group_spawn)
+	self.group_buttons:set_child(1, 2, self.button_create)
+	self.group_buttons:set_child(1, 3, self.button_quit)
 	self.group_buttons:set_expand{col = 1}
 	self.group_left = Widget{cols = 1, spacings = {0,0}}
 	self.group_left:append_row(Widgets.Frame{style = "title", text = "Character"})
@@ -292,7 +290,7 @@ Views.Chargen.apply = function(self)
 		"uint8", 255 * self.color_skin.green,
 		"uint8", 255 * self.color_skin.blue,
 		--Spawnpoint
-		"string", self.list_spawnpoints[self.combo_spawn.value][2])
+		"string", self.combo_spawn.text)
 	Network:send{packet = packet}
 end
 

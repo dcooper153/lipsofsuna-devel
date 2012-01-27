@@ -23,8 +23,22 @@ Regionspec.new = function(clss, args)
 	return self
 end
 
+--- Finds regions that have a spawn point.
+-- @param self Regionspec class.
+-- @return Table of regions.
+Regionspec.find_spawn_points = function(self)
+	local list = {}
+	for k,v in pairs(self.dict_id) do
+		if v.spawn_point then
+			table.insert(list, v)
+		end
+	end
+	return list
+end
+
 Regionspec:add_getters{
 	spawn_point_world = function(self)
+		if not self.spawn_point then return end
 		local o = Vector(self.position[1], self.depth[1], self.position[2])
 		local p = Vector(self.spawn_point[1], self.spawn_point[2], self.spawn_point[3])
 		return (o + p) * Voxel.tile_size

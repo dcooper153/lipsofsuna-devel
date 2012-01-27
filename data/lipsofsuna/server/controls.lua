@@ -1,13 +1,26 @@
 local spawn_player = function(object, client, spawnpoint)
 	-- Select the spawn point.
-	-- If the account doesn't have a spawn point yet, set the selected
-	-- marker or the default spawn point as its spawn point.
-	local home = object.account.spawn_point or Config.inst.spawn_point
-	if spawnpoint and spawnpoint ~= "home" then
-		-- TODO: Rather spawn to regions?
-		local m = Marker:find{name = spawnpoint}
-		if m then home = m.position end
+	-- The character creation message contains the name of the spawn point.
+	-- If home was chosen, the default spawn point of the account is used,
+	-- if set. Otherwise, the chosen spawn point or the fallback is used.
+	local home
+	if not spawnpoint or spawnpoint == "Home" then
+		home = object.account.spawn_point
+	else
+		local r = Regionspec:find{name = spawnpoint}
+		if r and not r.spawn_point then r = nil end
+		if r then home = r.spawn_point_world end
 	end
+	if not home then
+		local r = Regionspec:find{name = "Supply Camp"}
+		if r and not r.spawn_point then r = nil end
+		if not r then r = Regionspec:find_spawn_points()[1] end
+		if r then home = r.spawn_point_world end
+	end
+	-- Set the default spawn point.
+	-- The default spawn point is set once at account creation. If it's
+	-- already set, the old one is kept regardless of where the player
+	-- decided to spawn this time.
 	if not object.account.spawn_point then
 		object.account.spawn_point = home
 	end
