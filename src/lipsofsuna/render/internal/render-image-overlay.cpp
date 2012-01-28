@@ -27,16 +27,17 @@
 #include "render-internal.h"
 #include "render-image-overlay.hpp"
 
-#define MAX_VERTEX_COUNT 1024
+#define VERTEX_SIZE 24
+#define VERTEX_COUNT_INIT 0
+#define VERTEX_COUNT_MAX 1024
 
 class LIRenTilePacker
 {
 public:
-	LIRenTilePacker (void* ptr, float zv)
+	LIRenTilePacker (float zv)
 	{
 		pos = 0;
 		z = zv;
-		verts = (float*) ptr;
 		clip = NULL;
 		rotation_angle = 0.0f;
 		rotation_center[0] = 0.0f;
@@ -83,7 +84,7 @@ public:
 protected:
 	void add_vertex (float x, float y, float u, float v)
 	{
-		if (pos >= 6 * MAX_VERTEX_COUNT)
+		if (pos >= 6 * VERTEX_COUNT_MAX)
 			return;
 		if (rotation_angle != 0.0f)
 		{
@@ -125,7 +126,7 @@ public:
 	float z;
 	float color[4];
 	float* clip;
-	float* verts;
+	float verts[VERTEX_COUNT_MAX * 6];
 	float rotation_angle;
 	float rotation_aspect;
 	float rotation_center[2];
@@ -201,11 +202,11 @@ void LIRenImageOverlay::initialise ()
 	offset += Ogre::VertexElement::getTypeSize (Ogre::VET_FLOAT2);
 	format->addElement (0, offset, Ogre::VET_COLOUR_ABGR, Ogre::VES_DIFFUSE);
 	offset += Ogre::VertexElement::getTypeSize (Ogre::VET_COLOUR_ABGR);
+	lisys_assert (offset == VERTEX_SIZE);
 
 	/* Create the vertex buffer. */
-	Ogre::HardwareVertexBufferSharedPtr vbuf =
-		Ogre::HardwareBufferManager::getSingleton().createVertexBuffer (
-		offset, MAX_VERTEX_COUNT, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+	vbuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer (
+		offset, VERTEX_COUNT_INIT, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
 
 	/* Bind the vertex buffer. */
 	render_op.vertexData->vertexBufferBinding->setBinding (0, vbuf);
@@ -272,13 +273,9 @@ void LIRenImageOverlay::updatePositionGeometry ()
 		vscale * (src_pos[1] + src_tiling[3] + src_tiling[4] + src_tiling[5])
 	};
 
-	/* Lock the vertex buffer. */
-	Ogre::HardwareVertexBufferSharedPtr vbuf =
-		render_op.vertexData->vertexBufferBinding->getBuffer (0);
-	float z = Ogre::Root::getSingleton().getRenderSystem()->getMaximumDepthInputValue ();
-
 	/* Setup vertex packing. */
-	LIRenTilePacker packer (vbuf->lock (Ogre::HardwareBuffer::HBL_DISCARD), z);
+	float z = Ogre::Root::getSingleton().getRenderSystem()->getMaximumDepthInputValue ();
+	LIRenTilePacker packer (z);
 	packer.set_color (color);
 	if (rotation_angle != 0.0f)
 	{
@@ -337,9 +334,20 @@ void LIRenImageOverlay::updatePositionGeometry ()
 		}
 	}
 
-	/* Unlock the vertex buffer. */
+	/* Update vertex buffer. */
+	lisys_assert (packer.pos <= 6 * VERTEX_COUNT_MAX);
+	if (vbuf->getNumVertices () < (size_t)(packer.pos / 6))
+	{
+		vbuf = Ogre::HardwareBufferManager::getSingleton().createVertexBuffer (
+			VERTEX_SIZE, packer.pos / 6, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
+		render_op.vertexData->vertexBufferBinding->setBinding (0, vbuf);
+	}
+	vbuf->writeData (0, vbuf->getSizeInBytes (), packer.verts);
+
+	/* Bind the vertex buffer. */
+	render_op.useIndexes = false;
+	render_op.operationType = Ogre::RenderOperation::OT_TRIANGLE_LIST;
 	render_op.vertexData->vertexCount = packer.pos / 6;
-	vbuf->unlock();
 }
 
 void LIRenImageOverlay::updateTextureGeometry ()

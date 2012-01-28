@@ -46,6 +46,7 @@ private:
 	float rotation_angle;
 	float rotation_center[2];
 	Ogre::RenderOperation render_op;
+	Ogre::HardwareVertexBufferSharedPtr vbuf;
 	static Ogre::String type_name;
 };
 
