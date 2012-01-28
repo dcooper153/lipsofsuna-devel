@@ -150,7 +150,8 @@ Protocol:add_handler{type = "OBJECT_MOVED", func = function(event)
 		if o.spec and o.spec.speed_walk then
 			local a = o:get_animation{channel = 1}
 			if a then
-				local ref
+				local ref_speed
+				local ref_scale
 				local map = {
 					["run"] = o.spec.speed_run,
 					["run left"] = o.spec.speed_run,
@@ -161,15 +162,15 @@ Protocol:add_handler{type = "OBJECT_MOVED", func = function(event)
 					["walk back"] = o.spec.speed_run}
 				for k,v in pairs(o.spec.animations) do
 					if v.animation == a.animation and map[k] then
-						ref = map[k]
+						ref_speed = map[k]
+						ref_scale = v.time_scale or 1
 						break
 					end
 				end
-				if ref then
-					local fract = 0.3
-					local speed = Vector(vx, vy, vz).length
-					local scale = speed / math.max(0.1, ref)
-					a.time_scale = a.time_scale * (1 - fract) + scale * fract
+				if ref_speed then
+					local speed = Vector(vx, vt, vz).length-- * 1.5
+					local scale = speed / math.max(0.1, ref_speed)
+					a.time_scale = ref_scale * scale
 					o:animate(a)
 				end
 			end

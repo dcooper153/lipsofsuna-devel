@@ -47,9 +47,9 @@ Species{
 		["land ground"] = {animation = "land", channel = 5, fade_in = 0.1, fade_out = 0.5, weight = 10, node_weights = {LOWER = 1000}},
 		["land water"] = {animation = "land", channel = 5, node_weights = {LOWER = 1000}},
 		["pick up"] = {animation = "pickup", channel = 2, weight = 10},
-		["run"] = {animation = "run", channel = 1, permanent = true, node_weights = {LOWER = 100}},
-		["run left"] = {animation = "run-left", channel = 1, permanent = true, node_weights = {LOWER = 100}},
-		["run right"] = {animation = "run-right", channel = 1, permanent = true, node_weights = {LOWER = 100}},
+		["run"] = {animation = "run", channel = 1, permanent = true, time_scale = 1.5, node_weights = {LOWER = 100}},
+		["run left"] = {animation = "run-left", channel = 1, permanent = true, time_scale = 1.5, node_weights = {LOWER = 100}},
+		["run right"] = {animation = "run-right", channel = 1, permanent = true, time_scale = 1.5, node_weights = {LOWER = 100}},
 		["spell ranged"] = {animation = "cast-spell", channel = 2, weight = 30},
 		["spell self"] = {animation = "spell-self", channel = 2, weight = 30},
 		["spell touch"] = {animation = "cast-spell", channel = 2, weight = 30},
@@ -58,8 +58,8 @@ Species{
 		["throw"] = {animation = "throw", channel = 2, weight = 10},
 		["throw bulky"] = {animation = "throw-bulky", channel = 2, weight = 10},
 		["throw grenade"] = {animation = "throw", channel = 2, weight = 10},
-		["walk"] = {animation = "walk", channel = 1, permanent = true, node_weights = {LOWER = 100}},
-		["walk back"] = {animation = "walk-back", channel = 1, permanent = true, node_weights = {LOWER = 100}}}}
+		["walk"] = {animation = "walk", channel = 1, permanent = true, time_scale = 1.3, node_weights = {LOWER = 100}},
+		["walk back"] = {animation = "walk-back", channel = 1, permanent = true, time_scale = 1, node_weights = {LOWER = 100}}}}
 
 Species{
 	name = "race",
