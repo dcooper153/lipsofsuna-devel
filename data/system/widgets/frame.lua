@@ -71,8 +71,8 @@ Widgets.Frame.reshaped = function(self)
 			dest_position = {0,0},
 			dest_size = {w,h},
 			source_image = "widgets1",
-			source_position = {350,455},
-			source_tiling = {14,60,24,13,10,27}}
+			source_position = {850,0},
+			source_tiling = {14,128,24,13,50,27}}
 	elseif self.style == "quickbar" then
 		self:set_request{internal = true, width = 200, height = 82}
 		self:canvas_image{
