@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -88,10 +88,14 @@ LIRenModel* liren_model_new (
 	LIRenModel* self;
 
 	/* Allocate self. */
-	self = (LIRenModel*) lisys_calloc (1, sizeof (LIRenModel));
+	self = new LIRenModel ();
 	if (self == NULL)
 		return 0;
+	self->id = 0;
+	self->model = NULL;
 	self->render = render;
+	self->vertex_data = NULL;
+	self->vertex_buffer_binding = NULL;
 
 	/* Copy the model. */
 	if (model != NULL)
@@ -112,14 +116,6 @@ LIRenModel* liren_model_new (
 			id = 0;
 	}
 	self->id = id;
-
-	/* Initialize the private data. */
-	self->data = new LIRenModelData;
-	if (self->data == NULL)
-	{
-		liren_model_free (self);
-		return NULL;
-	}
 
 	/* Initialize the backend. */
 	if (self->model != NULL)
@@ -154,12 +150,19 @@ void liren_model_free (
 	if (self->model != NULL)
 		limdl_model_free (self->model);
 
-	/* Free the private data. */
-	if (self->data != NULL)
-		delete self->data;
-
 	lialg_u32dic_remove (self->render->models, self->id);
-	lisys_free (self);
+	delete self;
+}
+
+/**
+ * \brief Gets the ID of the model.
+ * \param self Model.
+ * \return ID.
+ */
+int liren_model_get_id (
+	LIRenModel* self)
+{
+	return self->id;
 }
 
 int liren_model_set_model (
@@ -307,14 +310,14 @@ static void private_create_mesh (
 	lisys_assert (offset2 == 5 * 4);
 
 	/* Create the mesh. */
-	self->data->mesh = Ogre::MeshManager::getSingleton ().createManual (private_unique_id (self), LIREN_RESOURCES_TEMPORARY);
-	self->data->mesh->sharedVertexData = vertex_data;
+	self->mesh = Ogre::MeshManager::getSingleton ().createManual (private_unique_id (self), LIREN_RESOURCES_TEMPORARY);
+	self->mesh->sharedVertexData = vertex_data;
 
 	/* Create the bone index to blend index mapping. */
 	/* The indices are always the same but Ogre needs the map regardless. */
-	self->data->mesh->sharedBlendIndexToBoneIndexMap.resize (model->weight_groups.count + 1);
+	self->mesh->sharedBlendIndexToBoneIndexMap.resize (model->weight_groups.count + 1);
 	for (int i = 0 ; i < model->weight_groups.count + 1 ; i++)
-		self->data->mesh->sharedBlendIndexToBoneIndexMap[i] = i;
+		self->mesh->sharedBlendIndexToBoneIndexMap[i] = i;
 
 	/* Allocate a temporary buffer for vertex data. */
 	/* Unfortunately the vertex data from the model can't be used as is for a
@@ -335,9 +338,9 @@ static void private_create_mesh (
 		buffer[j++] = v->normal.z;
 	}
 	lisys_assert (j == 6 * model->vertices.count);
-	self->data->vertex_buffer_0 = Ogre::HardwareBufferManager::getSingleton ().createVertexBuffer (
+	self->vertex_buffer_0 = Ogre::HardwareBufferManager::getSingleton ().createVertexBuffer (
 		offset0, model->vertices.count, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-	self->data->vertex_buffer_0->writeData (0, self->data->vertex_buffer_0->getSizeInBytes (), buffer, true);
+	self->vertex_buffer_0->writeData (0, self->vertex_buffer_0->getSizeInBytes (), buffer, true);
 
 	/* Create the second vertex buffer. */
 	/* Contains the rest apart from blending information. */
@@ -357,9 +360,9 @@ static void private_create_mesh (
 		color[3] = v->color[3];
 	}
 	lisys_assert (j == 6 * model->vertices.count);
-	self->data->vertex_buffer_1 = Ogre::HardwareBufferManager::getSingleton ().createVertexBuffer (
+	self->vertex_buffer_1 = Ogre::HardwareBufferManager::getSingleton ().createVertexBuffer (
 		offset1, model->vertices.count, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-	self->data->vertex_buffer_1->writeData (0, self->data->vertex_buffer_1->getSizeInBytes (), buffer, true);
+	self->vertex_buffer_1->writeData (0, self->vertex_buffer_1->getSizeInBytes (), buffer, true);
 
 	/* Create the third vertex buffer. */
 	/* Contains blending indices. */
@@ -380,44 +383,44 @@ static void private_create_mesh (
 		}
 	}
 	lisys_assert (j == 5 * model->vertices.count);
-	self->data->vertex_buffer_2 = Ogre::HardwareBufferManager::getSingleton ().createVertexBuffer (
+	self->vertex_buffer_2 = Ogre::HardwareBufferManager::getSingleton ().createVertexBuffer (
 		offset2, model->vertices.count, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY, true);
-	self->data->vertex_buffer_2->writeData (0, self->data->vertex_buffer_2->getSizeInBytes (), buffer, true);
+	self->vertex_buffer_2->writeData (0, self->vertex_buffer_2->getSizeInBytes (), buffer, true);
 	delete[] buffer;
 
 	/* Bind the vertex buffers. */
-	self->data->vertex_buffer_binding = vertex_data->vertexBufferBinding;
-	self->data->vertex_buffer_binding->setBinding (0, self->data->vertex_buffer_0);
-	self->data->vertex_buffer_binding->setBinding (1, self->data->vertex_buffer_1);
-	self->data->vertex_buffer_binding->setBinding (2, self->data->vertex_buffer_2);
+	self->vertex_buffer_binding = vertex_data->vertexBufferBinding;
+	self->vertex_buffer_binding->setBinding (0, self->vertex_buffer_0);
+	self->vertex_buffer_binding->setBinding (1, self->vertex_buffer_1);
+	self->vertex_buffer_binding->setBinding (2, self->vertex_buffer_2);
 
 	/* Create the index buffer. */
-	self->data->index_buffer = Ogre::HardwareBufferManager::getSingleton().createIndexBuffer (
+	self->index_buffer = Ogre::HardwareBufferManager::getSingleton().createIndexBuffer (
 		Ogre::HardwareIndexBuffer::IT_16BIT, lod->indices.count, Ogre::HardwareBuffer::HBU_STATIC_WRITE_ONLY);
-	self->data->index_buffer->writeData (0, self->data->index_buffer->getSizeInBytes (), lod->indices.array, true);
+	self->index_buffer->writeData (0, self->index_buffer->getSizeInBytes (), lod->indices.array, true);
 
 	/* Create submeshes. */
 	for (int i = 0 ; i < lod->face_groups.count ; i++)
 	{
-		Ogre::SubMesh* submesh = self->data->mesh->createSubMesh ();
+		Ogre::SubMesh* submesh = self->mesh->createSubMesh ();
 		private_create_material (self, model->materials.array + i, i, submesh);
 		submesh->useSharedVertices = true;
-		submesh->indexData->indexBuffer = self->data->index_buffer;
+		submesh->indexData->indexBuffer = self->index_buffer;
 		submesh->indexData->indexStart = lod->face_groups.array[i].start;
 		submesh->indexData->indexCount = lod->face_groups.array[i].count;
 	}
 
 	/* Set the bounding box. */
-	self->data->mesh->_setBounds (Ogre::AxisAlignedBox (
+	self->mesh->_setBounds (Ogre::AxisAlignedBox (
 		model->bounds.min.x, model->bounds.min.y, model->bounds.min.z,
 		model->bounds.max.x, model->bounds.max.y, model->bounds.max.z));
-	self->data->mesh->_setBoundingSphereRadius (
+	self->mesh->_setBoundingSphereRadius (
 		(model->bounds.max.x - model->bounds.min.x) +
 		(model->bounds.max.y - model->bounds.min.y) +
 		(model->bounds.max.z - model->bounds.min.z));
 
 	/* Mark the mesh as loaded. */
-	self->data->mesh->load ();
+	self->mesh->load ();
 
 	/* Create a skeleton if needed. */
 	if (model->weight_groups.count)
@@ -474,7 +477,7 @@ static void private_create_skeleton (
 	skeleton->load ();
 
 	/* Assign the skeleton to the mesh. */
-	self->data->mesh->_notifySkeleton (skeleton);
+	self->mesh->_notifySkeleton (skeleton);
 }
 
 static bool private_check_material_override (

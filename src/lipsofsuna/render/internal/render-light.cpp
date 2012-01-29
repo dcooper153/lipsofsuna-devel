@@ -68,14 +68,6 @@ LIRenLight* liren_light_new (
 	self->render = render;
 	self->transform = limat_transform_identity ();
 
-	/* Initialize the private data. */
-	self->data = (LIRenLightData*) lisys_calloc (1, sizeof (LIRenLightData));
-	if (self->data == NULL)
-	{
-		lisys_free (self);
-		return NULL;
-	}
-
 	/* Choose a unique ID. */
 	while (!self->id)
 	{
@@ -85,14 +77,14 @@ LIRenLight* liren_light_new (
 	}
 
 	/* Initialize the backend. */
-	self->data->light = render->data->scene_manager->createLight (private_unique_id (self));
-	self->data->light->setDiffuseColour (Ogre::ColourValue (diffuse[0], diffuse[1], diffuse[2], diffuse[3]));
-	self->data->light->setSpecularColour (Ogre::ColourValue (specular[0], specular[1], specular[2], specular[3]));
-	self->data->light->setAttenuation (LIGHT_RANGE_MAX, equation[0], equation[1], equation[2]);
-	self->data->light->setCastShadows (shadows);
-	self->data->light->setSpotlightOuterAngle (Ogre::Radian (cutoff));
-	self->data->light->setSpotlightFalloff (exponent / 128.0f);
-	self->data->light->setVisible (false);
+	self->light = render->data->scene_manager->createLight (private_unique_id (self));
+	self->light->setDiffuseColour (Ogre::ColourValue (diffuse[0], diffuse[1], diffuse[2], diffuse[3]));
+	self->light->setSpecularColour (Ogre::ColourValue (specular[0], specular[1], specular[2], specular[3]));
+	self->light->setAttenuation (LIGHT_RANGE_MAX, equation[0], equation[1], equation[2]);
+	self->light->setCastShadows (shadows);
+	self->light->setSpotlightOuterAngle (Ogre::Radian (cutoff));
+	self->light->setSpotlightFalloff (exponent / 128.0f);
+	self->light->setVisible (false);
 	private_update_type (self);
 
 	/* Add to the dictionary. */
@@ -112,12 +104,8 @@ LIRenLight* liren_light_new (
 void liren_light_free (
 	LIRenLight* self)
 {
-	if (self->data != NULL)
-	{
-		if (self->data->light != NULL)
-			self->render->data->scene_manager->destroyLight (self->data->light);
-		lisys_free (self->data);
-	}
+	if (self->light != NULL)
+		self->render->data->scene_manager->destroyLight (self->light);
 	lisys_free (self);
 }
 
@@ -132,7 +120,7 @@ void liren_light_set_diffuse (
 	LIRenLight*  self,
 	const float* value)
 {
-	self->data->light->setDiffuseColour (Ogre::ColourValue (value[0], value[1], value[2], value[3]));
+	self->light->setDiffuseColour (Ogre::ColourValue (value[0], value[1], value[2], value[3]));
 }
 
 /**
@@ -157,14 +145,25 @@ void liren_light_set_enabled (
 	LIRenLight* self,
 	int         value)
 {
-	self->data->light->setVisible (value);
+	self->light->setVisible (value);
 }
 
 void liren_light_set_equation (
 	LIRenLight*  self,
 	const float* value)
 {
-	self->data->light->setAttenuation (LIGHT_RANGE_MAX, value[0], value[1], value[2]);
+	self->light->setAttenuation (LIGHT_RANGE_MAX, value[0], value[1], value[2]);
+}
+
+/**
+ * \brief Gets the ID of the light.
+ * \param self Light.
+ * \return ID.
+ */
+int liren_light_get_id (
+	LIRenLight* self)
+{
+	return self->id;
 }
 
 /**
@@ -188,36 +187,36 @@ void liren_light_set_shadow (
 	LIRenLight* self,
 	int         value)
 {
-	self->data->light->setCastShadows (value);
+	self->light->setCastShadows (value);
 }
 
 void liren_light_set_shadow_far (
 	LIRenLight* self,
 	float       value)
 {
-	self->data->light->setShadowFarDistance (value);
-	self->data->light->setShadowFarClipDistance (value);
+	self->light->setShadowFarDistance (value);
+	self->light->setShadowFarClipDistance (value);
 }
 
 void liren_light_set_shadow_near (
 	LIRenLight* self,
 	float       value)
 {
-	self->data->light->setShadowNearClipDistance (value);
+	self->light->setShadowNearClipDistance (value);
 }
 
 void liren_light_set_specular (
 	LIRenLight*  self,
 	const float* value)
 {
-	self->data->light->setSpecularColour (Ogre::ColourValue (value[0], value[1], value[2], value[3]));
+	self->light->setSpecularColour (Ogre::ColourValue (value[0], value[1], value[2], value[3]));
 }
 
 void liren_light_set_spot_cutoff (
 	LIRenLight* self,
 	float       value)
 {
-	self->data->light->setSpotlightOuterAngle (Ogre::Radian (value));
+	self->light->setSpotlightOuterAngle (Ogre::Radian (value));
 	private_update_type (self);
 }
 
@@ -225,7 +224,7 @@ void liren_light_set_spot_exponent (
 	LIRenLight* self,
 	float       value)
 {
-	self->data->light->setSpotlightFalloff (value / 128.0f);
+	self->light->setSpotlightFalloff (value / 128.0f);
 }
 
 /**
@@ -252,8 +251,8 @@ void liren_light_set_transform (
 	LIMatVector v;
 
 	v = limat_quaternion_transform (value->rotation, limat_vector_init (0.0f, 0.0f, -1.0f));
-	self->data->light->setPosition (value->position.x, value->position.y, value->position.z);
-	self->data->light->setDirection (v.x, v.y, v.z);
+	self->light->setPosition (value->position.x, value->position.y, value->position.z);
+	self->light->setDirection (v.x, v.y, v.z);
 	self->transform = *value;
 }
 
@@ -268,14 +267,14 @@ static Ogre::String private_unique_id (
 static void private_update_type (
 	LIRenLight* self)
 {
-	Ogre::Radian angle(self->data->light->getSpotlightOuterAngle ());
+	Ogre::Radian angle(self->light->getSpotlightOuterAngle ());
 
 	if (self->directional)
-		self->data->light->setType (Ogre::Light::LT_DIRECTIONAL);
+		self->light->setType (Ogre::Light::LT_DIRECTIONAL);
 	else if (angle.valueRadians () < 0.5f * M_PI)
-		self->data->light->setType (Ogre::Light::LT_SPOTLIGHT);
+		self->light->setType (Ogre::Light::LT_SPOTLIGHT);
 	else
-		self->data->light->setType (Ogre::Light::LT_POINT);
+		self->light->setType (Ogre::Light::LT_POINT);
 }
 
 /** @} */

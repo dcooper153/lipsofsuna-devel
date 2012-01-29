@@ -20,15 +20,6 @@
 
 #include "render-types.h"
 
-struct _LIRenLight
-{
-	int id;
-	int directional;
-	LIMatTransform transform;
-	LIRenLightData* data;
-	LIRenRender* render;
-};
-
 LIAPICALL (LIRenLight*, liren_light_new, (
 	LIRenRender* render,
 	const float* ambient,
@@ -61,6 +52,9 @@ LIAPICALL (void, liren_light_set_enabled, (
 LIAPICALL (void, liren_light_set_equation, (
 	LIRenLight*  self,
 	const float* value));
+
+LIAPICALL (int, liren_light_get_id, (
+	LIRenLight* self));
 
 LIAPICALL (void, liren_light_set_priority, (
 	LIRenLight* self,

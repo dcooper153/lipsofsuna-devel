@@ -44,7 +44,7 @@ int liren_render_object_new (
 	if (self == NULL)
 		return 0;
 
-	return self->id;
+	return liren_object_get_id (self);
 }
 
 /**

@@ -27,6 +27,8 @@
 #include "render-internal.h"
 #include "render-container-factory.hpp"
 #include "render-resource-loading-listener.hpp"
+#include "../font/font.h"
+#include "../font/font-layout.h"
 #include <OgreCompositorManager.h>
 #include <OgreEntity.h>
 #include <OgreFontManager.h>

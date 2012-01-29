@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -19,24 +19,6 @@
 #define __RENDER_INTERNAL_OVERLAY_H__
 
 #include "render-types.h"
-#include "../font/font.h"
-#include "../font/font-layout.h"
-
-struct _LIRenOverlay
-{
-	int id;
-	int depth;
-	int visible;
-	LIMatVector position;
-	LIRenOverlay* parent;
-	LIRenOverlayData* data;
-	LIRenRender* render;
-	struct
-	{
-		int count;
-		LIRenOverlay** array;
-	} overlays;
-};
 
 LIAPICALL (LIRenOverlay*, liren_overlay_new, (
 	LIRenRender* render));
@@ -95,6 +77,9 @@ LIAPICALL (void, liren_overlay_set_depth, (
 LIAPICALL (void, liren_overlay_set_floating, (
 	LIRenOverlay* self,
 	int           value));
+
+LIAPICALL (int, liren_overlay_get_id, (
+	LIRenOverlay* self));
 
 LIAPICALL (void, liren_overlay_set_position, (
 	LIRenOverlay*      self,

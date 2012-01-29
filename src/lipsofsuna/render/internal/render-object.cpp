@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -54,14 +54,6 @@ LIRenObject* liren_object_new (
 	self->render = render;
 	self->shadow_casting = 0;
 
-	/* Initialize the private data. */
-	self->data = (LIRenObjectData*) lisys_calloc (1, sizeof (LIRenObjectData));
-	if (self->data == NULL)
-	{
-		lisys_free (self);
-		return NULL;
-	}
-
 	/* Choose a unique ID. */
 	while (!id)
 	{
@@ -72,8 +64,8 @@ LIRenObject* liren_object_new (
 	self->id = id;
 
 	/* Initialize the backend. */
-	self->data->node = render->data->scene_manager->getRootSceneNode ()->createChildSceneNode ();
-	self->data->node->setVisible (false);
+	self->node = render->data->scene_manager->getRootSceneNode ()->createChildSceneNode ();
+	self->node->setVisible (false);
 
 	/* Add to dictionary. */
 	if (!lialg_u32dic_insert (render->objects, id, self))
@@ -95,17 +87,13 @@ void liren_object_free (
 	lialg_u32dic_remove (self->render->objects, self->id);
 
 	/* Free the private data. */
-	if (self->data != NULL)
+	if (self->entity != NULL)
 	{
-		if (self->data->entity != NULL)
-		{
-			self->data->node->detachAllObjects ();
-			self->render->data->scene_manager->destroyEntity (self->data->entity);
-		}
-		if (self->data->node != NULL)
-			self->render->data->scene_root->removeAndDestroyChild (self->data->node->getName ());
-		lisys_free (self->data);
+		self->node->detachAllObjects ();
+		self->render->data->scene_manager->destroyEntity (self->entity);
 	}
+	if (self->node != NULL)
+		self->render->data->scene_root->removeAndDestroyChild (self->node->getName ());
 
 	if (self->pose != NULL)
 		limdl_pose_free (self->pose);
@@ -239,16 +227,6 @@ LIMdlPoseChannel* liren_object_channel_get_state (
 	return chan;
 }
 
-/**
- * \brief Deforms the object.
- * \param self Object.
- */
-void liren_object_deform (
-	LIRenObject* self)
-{
-	/* TODO */
-}
-
 int liren_object_find_node (
 	LIRenObject*    self,
 	const char*     name,
@@ -302,12 +280,12 @@ void liren_object_update_pose (
 	LIRenObject* self)
 {
 	/* Do nothing if the object isn't initialized. */
-	if (self->data->entity == NULL)
+	if (self->entity == NULL)
 		return;
 
 	/* Get the skeleton. */
 	/* If the model doesn't have one, we don't need to do anything. */
-	Ogre::SkeletonInstance* skeleton = self->data->entity->getSkeleton ();
+	Ogre::SkeletonInstance* skeleton = self->entity->getSkeleton ();
 	if (skeleton == NULL)
 		return;
 
@@ -354,6 +332,17 @@ int liren_object_set_effect (
 }
 
 /**
+ * \brief Gets the ID of the object.
+ * \param self Object.
+ * \return ID.
+ */
+int liren_object_get_id (
+	LIRenObject* self)
+{
+	return self->id;
+}
+
+/**
  * \brief Sets the model of the object.
  * \param self Object.
  * \param model Model.
@@ -378,35 +367,35 @@ int liren_object_set_model (
 	self->model = model;
 
 	/* Remove the old entity or particle system. */
-	self->data->node->detachAllObjects ();
-	if (self->data->entity != NULL)
+	self->node->detachAllObjects ();
+	if (self->entity != NULL)
 	{
-		self->render->data->scene_manager->destroyEntity (self->data->entity);
-		self->data->entity = NULL;
+		self->render->data->scene_manager->destroyEntity (self->entity);
+		self->entity = NULL;
 	}
-	if (self->data->particles != NULL)
+	if (self->particles != NULL)
 	{
-		self->render->data->scene_manager->destroyParticleSystem (self->data->particles);
-		self->data->particles = NULL;
+		self->render->data->scene_manager->destroyParticleSystem (self->particles);
+		self->particles = NULL;
 	}
 
 	/* Attach a new entity to the scene node. */
-	if (model != NULL && !model->data->mesh.isNull ())
+	if (model != NULL && !model->mesh.isNull ())
 	{
 		Ogre::String e_name = private_unique_id (self);
-		Ogre::String m_name = model->data->mesh->getName ();
-		self->data->entity = self->render->data->scene_manager->createEntity (e_name, m_name);
-		self->data->node->attachObject (self->data->entity);
+		Ogre::String m_name = model->mesh->getName ();
+		self->entity = self->render->data->scene_manager->createEntity (e_name, m_name);
+		self->node->attachObject (self->entity);
 	}
 
 	/* Set entity flags. */
-	if (self->data->entity != NULL)
-		self->data->entity->setCastShadows (self->shadow_casting);
+	if (self->entity != NULL)
+		self->entity->setCastShadows (self->shadow_casting);
 
 	/* Mark all bones as manually controlled. */
-	if (self->data->entity != NULL)
+	if (self->entity != NULL)
 	{
-		Ogre::SkeletonInstance* skeleton = self->data->entity->getSkeleton ();
+		Ogre::SkeletonInstance* skeleton = self->entity->getSkeleton ();
 		if (skeleton != NULL)
 		{
 			for (int i = 0 ; i < skeleton->getNumBones () ; i++)
@@ -438,16 +427,16 @@ int liren_object_set_particle (
 	}
 
 	/* Remove the existing model or particle system. */
-	self->data->node->detachAllObjects ();
-	if (self->data->entity != NULL)
+	self->node->detachAllObjects ();
+	if (self->entity != NULL)
 	{
-		self->render->data->scene_manager->destroyEntity (self->data->entity);
-		self->data->entity = NULL;
+		self->render->data->scene_manager->destroyEntity (self->entity);
+		self->entity = NULL;
 	}
-	if (self->data->particles != NULL)
+	if (self->particles != NULL)
 	{
-		self->render->data->scene_manager->destroyParticleSystem (self->data->particles);
-		self->data->particles = NULL;
+		self->render->data->scene_manager->destroyParticleSystem (self->particles);
+		self->particles = NULL;
 	}
 	self->model = NULL;
 
@@ -455,9 +444,9 @@ int liren_object_set_particle (
 	try
 	{
 		Ogre::String e_name = private_unique_id (self);
-		self->data->particles = self->render->data->scene_manager->createParticleSystem (e_name, name);
-		lisys_assert (self->data->particles != NULL);
-		self->data->node->attachObject (self->data->particles);
+		self->particles = self->render->data->scene_manager->createParticleSystem (e_name, name);
+		lisys_assert (self->particles != NULL);
+		self->node->attachObject (self->particles);
 	}
 	catch (...)
 	{
@@ -476,7 +465,7 @@ int liren_object_set_realized (
 	LIRenObject* self,
 	int          value)
 {
-	self->data->node->setVisible (value);
+	self->node->setVisible (value);
 	return 1;
 }
 
@@ -490,8 +479,8 @@ void liren_object_set_shadow (
 	int          value)
 {
 	self->shadow_casting = value;
-	if (self->data->entity != NULL)
-		self->data->entity->setCastShadows (self->shadow_casting);
+	if (self->entity != NULL)
+		self->entity->setCastShadows (self->shadow_casting);
 }
 
 /**
@@ -504,8 +493,8 @@ void liren_object_set_transform (
 	const LIMatTransform* value)
 {
 	self->transform = *value;
-	self->data->node->setPosition (value->position.x, value->position.y, value->position.z);
-	self->data->node->setOrientation (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z);
+	self->node->setPosition (value->position.x, value->position.y, value->position.z);
+	self->node->setOrientation (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z);
 }
 
 /*****************************************************************************/

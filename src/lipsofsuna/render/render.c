@@ -25,6 +25,7 @@
 #include "lipsofsuna/system.h"
 #include "render.h"
 #include "render-overlay.h"
+#include "font/font.h"
 #include "internal/render-internal.h"
 
 LIRenRender* liren_render_new (

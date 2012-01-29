@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,20 +22,15 @@
 #include "lipsofsuna/system.h"
 #include "render-types.h"
 
-struct _LIRenModel
-{
-	int id;
-	LIMdlModel* model;
-	LIRenModelData* data;
-	LIRenRender* render;
-};
-
 LIAPICALL (LIRenModel*, liren_model_new, (
 	LIRenRender* render,
 	LIMdlModel*  model,
 	int          id));
 
 LIAPICALL (void, liren_model_free, (
+	LIRenModel* self));
+
+LIAPICALL (int, liren_model_get_id, (
 	LIRenModel* self));
 
 LIAPICALL (int, liren_model_set_model, (

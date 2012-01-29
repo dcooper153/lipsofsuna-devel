@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,25 +20,11 @@
 
 #include "render-types.h"
 
-struct _LIRenObject
-{
-	int id;
-	int shadow_casting;
-	LIMatTransform transform;
-	LIMdlPose* pose;
-	LIRenModel* model;
-	LIRenRender* render;
-	LIRenObjectData* data;
-};
-
 LIAPICALL (LIRenObject*, liren_object_new, (
 	LIRenRender* render,
 	int          id));
 
 LIAPICALL (void, liren_object_free, (
-	LIRenObject* self));
-
-LIAPICALL (void, liren_object_deform, (
 	LIRenObject* self));
 
 LIAPICALL (int, liren_object_channel_animate, (
@@ -97,6 +83,9 @@ LIAPICALL (int, liren_object_set_effect, (
 	LIRenObject* self,
 	const char*  shader,
 	const float* params));
+
+LIAPICALL (int, liren_object_get_id, (
+	LIRenObject* self));
 
 LIAPICALL (int, liren_object_set_model, (
 	LIRenObject* self,

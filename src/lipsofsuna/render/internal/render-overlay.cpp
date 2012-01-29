@@ -25,6 +25,8 @@
  */
 
 #include "render-internal.h"
+#include "../font/font.h"
+#include "../font/font-layout.h"
 
 #define MAX_CHARS_PER_LINE 1024
 
@@ -80,15 +82,9 @@ LIRenOverlay* liren_overlay_new (
 		return 0;
 	}
 
-	/* Initialize the private data. */
-	self->data = (LIRenOverlayData*) lisys_calloc (1, sizeof (LIRenOverlayData));
-	if (self->data == NULL)
-	{
-		liren_overlay_free (self);
-		return 0;
-	}
-	self->data->container = (LIRenContainer*) render->data->overlay_manager->createOverlayElement ("LIRenContainer", private_unique_overlay (self));
-	self->data->container->setMetricsMode (Ogre::GMM_PIXELS);
+	/* Create the overlay element. */
+	self->container = (LIRenContainer*) render->data->overlay_manager->createOverlayElement ("LIRenContainer", private_unique_overlay (self));
+	self->container->setMetricsMode (Ogre::GMM_PIXELS);
 
 	return self;
 }
@@ -110,19 +106,15 @@ void liren_overlay_free (
 		private_remove_overlay (self->parent, self);
 	lialg_u32dic_remove (self->render->overlays, self->id);
 
-	/* Free private data. */
-	if (self->data != NULL)
+	/* Free the overlay element. */
+	liren_overlay_clear (self);
+	if (self->overlay != NULL)
 	{
-		liren_overlay_clear (self);
-		if (self->data->overlay != NULL)
-		{
-			self->data->overlay->remove2D (self->data->container);
-			self->render->data->overlay_manager->destroy (self->data->container->getName ());
-		}
-		if (self->data->container != NULL)
-			self->render->data->overlay_manager->destroyOverlayElement (self->data->container);
-		lisys_free (self->data);
+		self->overlay->remove2D (self->container);
+		self->render->data->overlay_manager->destroy (self->container->getName ());
 	}
+	if (self->container != NULL)
+		self->render->data->overlay_manager->destroyOverlayElement (self->container);
 
 	lisys_free (self);
 }
@@ -134,7 +126,7 @@ void liren_overlay_free (
 void liren_overlay_clear (
 	LIRenOverlay* self)
 {
-	self->data->container->remove_all_elements ();
+	self->container->remove_all_elements ();
 }
 
 /**
@@ -221,7 +213,7 @@ void liren_overlay_add_text (
 		elem->show ();
 
 		/* Add to the container. */
-		self->data->container->add_element (elem);
+		self->container->add_element (elem);
 
 		/* Start the next line. */
 		y += h;
@@ -275,7 +267,7 @@ void liren_overlay_add_tiled (
 	elem->show ();
 
 	/* Add to the container. */
-	self->data->container->add_element (elem);
+	self->container->add_element (elem);
 }
 
 /**
@@ -356,7 +348,7 @@ void liren_overlay_add_scaled (
 	elem->show ();
 
 	/* Add to the container. */
-	self->data->container->add_element (elem);
+	self->container->add_element (elem);
 }
 
 /**
@@ -375,11 +367,11 @@ void liren_overlay_add_overlay (
 	/* Detach the overlay. */
 	if (overlay->parent == self)
 		return;
-	if (overlay->data->overlay != NULL)
+	if (overlay->overlay != NULL)
 	{
-		overlay->data->overlay->remove2D (overlay->data->container);
+		overlay->overlay->remove2D (overlay->container);
 		overlay->render->data->overlay_manager->destroy (private_unique_overlay (overlay));
-		overlay->data->overlay = NULL;
+		overlay->overlay = NULL;
 	}
 	if (overlay->parent != NULL)
 		private_remove_overlay (overlay->parent, overlay);
@@ -394,7 +386,7 @@ void liren_overlay_add_overlay (
 	overlay->parent = self;
 
 	/* Add to container. */
-	self->data->container->add_container (overlay->data->container, layer);
+	self->container->add_container (overlay->container, layer);
 	private_update_position (overlay);
 }
 
@@ -424,8 +416,8 @@ void liren_overlay_set_depth (
 	if (self->depth == value)
 		return;
 	self->depth = value;
-	if (self->data->overlay != NULL)
-		self->data->overlay->setZOrder (self->depth);
+	if (self->overlay != NULL)
+		self->overlay->setZOrder (self->depth);
 }
 
 void liren_overlay_set_floating (
@@ -433,23 +425,34 @@ void liren_overlay_set_floating (
 	int           value)
 {
 	Ogre::String id (private_unique_overlay (self));
-	if (value && self->data->overlay == NULL)
+	if (value && self->overlay == NULL)
 	{
 		if (self->parent != NULL)
 			private_remove_overlay (self->parent, self);
-		self->data->overlay = self->render->data->overlay_manager->create (id);
-		self->data->overlay->add2D (self->data->container);
-		self->data->overlay->setZOrder (self->depth);
+		self->overlay = self->render->data->overlay_manager->create (id);
+		self->overlay->add2D (self->container);
+		self->overlay->setZOrder (self->depth);
 		if (self->visible)
-			self->data->overlay->show ();
+			self->overlay->show ();
 		private_update_position (self);
 	}
-	else if (!value && self->data->overlay != NULL)
+	else if (!value && self->overlay != NULL)
 	{
-		self->data->overlay->remove2D (self->data->container);
+		self->overlay->remove2D (self->container);
 		self->render->data->overlay_manager->destroy (id);
-		self->data->overlay = NULL;
+		self->overlay = NULL;
 	}
+}
+
+/**
+ * \brief Gets the ID of the overlay.
+ * \param self Overlay.
+ * \return ID.
+ */
+int liren_overlay_get_id (
+	LIRenOverlay* self)
+{
+	return self->id;
 }
 
 /**
@@ -477,17 +480,17 @@ void liren_overlay_set_visible (
 	self->visible = value;
 	if (value)
 	{
-		self->data->container->show ();
+		self->container->show ();
 		private_update_position (self);
 	}
 	else
-		self->data->container->hide ();
-	if (self->data->overlay != NULL)
+		self->container->hide ();
+	if (self->overlay != NULL)
 	{
 		if (value)
-			self->data->overlay->show ();
+			self->overlay->show ();
 		else
-			self->data->overlay->hide ();
+			self->overlay->hide ();
 	}
 }
 
@@ -575,7 +578,7 @@ static void private_remove_overlay (
 	/* Floating overlays can't have a parent so such an overlay getting
 	   here is an error. We check for it here just in case. */
 	lisys_assert (child->parent == self);
-	lisys_assert (child->data->overlay == NULL);
+	lisys_assert (child->overlay == NULL);
 
 	/* Find the child from the list and detach it. */
 	for (i = 0 ; i < self->overlays.count ; i++)
@@ -598,7 +601,7 @@ static void private_remove_overlay (
 
 			/* Detach the child. */
 			child->parent = NULL;
-			self->data->container->remove_container (i);
+			self->container->remove_container (i);
 			break;
 		}
 	}
@@ -608,7 +611,7 @@ static Ogre::String private_unique_element (
 	LIRenOverlay* self)
 {
 	Ogre::String id1(Ogre::StringConverter::toString (self->id));
-	Ogre::String id2(Ogre::StringConverter::toString (self->data->container->elements.size ()));
+	Ogre::String id2(Ogre::StringConverter::toString (self->container->elements.size ()));
 	return id1 + "." + id2;
 }
 
@@ -630,7 +633,7 @@ static void private_update_position (
 		x -= self->parent->position.x;
 		y -= self->parent->position.y;
 	}
-	self->data->container->setPosition (x, y);
+	self->container->setPosition (x, y);
 }
 
 /** @} */

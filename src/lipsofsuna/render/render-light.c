@@ -55,7 +55,7 @@ int liren_render_light_new (
 	if (self == NULL)
 		return 0;
 
-	return self->id;
+	return liren_light_get_id (self);
 }
 
 /**

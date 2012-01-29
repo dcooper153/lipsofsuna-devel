@@ -24,19 +24,13 @@
 #define LIREN_RESOURCES_PERMANENT "permanent"
 #define LIREN_RESOURCES_TEMPORARY "temporary"
 
-typedef struct _LIRenBuffer LIRenBuffer;
-typedef struct _LIRenFramebuffer LIRenFramebuffer;
 typedef struct _LIRenImage LIRenImage;
 typedef struct _LIRenLight LIRenLight;
-typedef struct _LIRenLightData LIRenLightData;
 typedef struct _LIRenMessage LIRenMessage;
 typedef struct _LIRenObject LIRenObject;
-typedef struct _LIRenObjectData LIRenObjectData;
 typedef struct _LIRenOverlay LIRenOverlay;
-typedef struct _LIRenOverlayData LIRenOverlayData;
 typedef struct _LIRenQueue LIRenQueue;
 typedef struct _LIRenModel LIRenModel;
-typedef struct _LIRenModelData LIRenModelData;
 typedef struct _LIRenRenderData LIRenRenderData;
 
 #ifdef __cplusplus
@@ -57,12 +51,19 @@ typedef struct _LIRenRenderData LIRenRenderData;
 #include "render-container-factory.hpp"
 #include "render-image-overlay-factory.hpp"
 #include "render-resource-loading-listener.hpp"
-struct _LIRenLightData
+struct _LIRenLight
 {
+	int id;
+	int directional;
+	LIMatTransform transform;
+	LIRenRender* render;
 	Ogre::Light* light;
 };
-struct _LIRenModelData
+struct _LIRenModel
 {
+	int id;
+	LIMdlModel* model;
+	LIRenRender* render;
 	Ogre::MeshPtr mesh;
 	Ogre::VertexDeclaration vertex_declaration;
 	Ogre::VertexData* vertex_data;
@@ -72,16 +73,33 @@ struct _LIRenModelData
 	Ogre::VertexBufferBinding* vertex_buffer_binding;
 	Ogre::HardwareIndexBufferSharedPtr index_buffer;
 };
-struct _LIRenObjectData
+struct _LIRenObject
 {
+	int id;
+	int shadow_casting;
+	LIMatTransform transform;
+	LIMdlPose* pose;
+	LIRenModel* model;
+	LIRenRender* render;
 	Ogre::Entity* entity;
 	Ogre::ParticleSystem* particles;
 	Ogre::SceneNode* node;
 };
-struct _LIRenOverlayData
+struct _LIRenOverlay
 {
-	Ogre::Overlay* overlay;
+	int id;
+	int depth;
+	int visible;
+	LIMatVector position;
+	LIRenOverlay* parent;
+	LIRenRender* render;
 	LIRenContainer* container;
+	Ogre::Overlay* overlay;
+	struct
+	{
+		int count;
+		LIRenOverlay** array;
+	} overlays;
 };
 struct _LIRenRenderData
 {

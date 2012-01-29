@@ -39,7 +39,7 @@ int liren_render_overlay_new (
 	if (self == NULL)
 		return 0;
 
-	return self->id;
+	return liren_overlay_get_id (self);
 }
 
 /**
