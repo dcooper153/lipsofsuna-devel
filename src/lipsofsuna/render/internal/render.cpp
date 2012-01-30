@@ -34,6 +34,7 @@
 #include <OgreFontManager.h>
 #include <OgreLogManager.h>
 #include <OgrePlugin.h>
+#include <OgreShadowCameraSetupLiSPSM.h>
 #include <OgreRenderSystemCapabilitiesManager.h>
 #include <OgreRenderSystemCapabilitiesSerializer.h>
 #include <OgreSkeletonManager.h>
@@ -182,12 +183,16 @@ int liren_internal_init (
 	/* Initialize the scene manager. */
 	self->data->scene_manager = self->data->root->createSceneManager("OctreeSceneManager", "DefaultSceneManager");
 	self->data->scene_manager->setAmbientLight (Ogre::ColourValue (0.5, 0.5, 0.5));
-	self->data->scene_manager->setShadowTechnique (Ogre::SHADOWTYPE_TEXTURE_MODULATIVE_INTEGRATED);
+	self->data->scene_manager->setShadowTechnique (Ogre::SHADOWTYPE_TEXTURE_ADDITIVE_INTEGRATED);
 	self->data->scene_manager->setShadowTextureSelfShadow (false);
-	self->data->scene_manager->setShadowFarDistance (100.0f);
-	self->data->scene_manager->setShadowCameraSetup (Ogre::ShadowCameraSetupPtr (new Ogre::DefaultShadowCameraSetup ()));
-	self->data->scene_manager->setShadowTextureCount (8);
-	self->data->scene_manager->setShadowTextureSize (512);
+	self->data->scene_manager->setShadowCasterRenderBackFaces (false);
+	self->data->scene_manager->setShadowFarDistance (50.0f);
+	self->data->scene_manager->setShadowDirLightTextureOffset (0.6f);
+	Ogre::LiSPSMShadowCameraSetup* shadow_camera = new Ogre::LiSPSMShadowCameraSetup ();
+	shadow_camera->setOptimalAdjustFactor (2.0f);
+	self->data->scene_manager->setShadowCameraSetup (Ogre::ShadowCameraSetupPtr (shadow_camera));
+	self->data->scene_manager->setShadowTextureCount (3);
+	self->data->scene_manager->setShadowTextureSize (1024);
 	self->data->scene_root = self->data->scene_manager->getRootSceneNode ();
 
 	/* Initialize resources. */
