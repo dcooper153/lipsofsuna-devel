@@ -246,7 +246,10 @@ static void private_create_material (
 	if (existing)
 	{
 		if (!private_check_material_override (self, material))
+		{
+			submesh->setMaterialName (material->getName ());
 			return;
+		}
 		material = material->clone (unique_name, true, LIREN_RESOURCES_TEMPORARY);
 	}
 
