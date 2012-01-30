@@ -1,0 +1,35 @@
+material speedline1
+{
+	technique
+	{
+		pass
+		{
+			ambient 0.7 0.7 0.7
+			diffuse 1.0 1.0 1.0
+			specular 0.0 0.0 0.0 0.0 64
+			lighting off
+			depth_write off
+			cull_hardware none
+			scene_blend alpha_blend
+			vertex_program_ref speedline1_vert
+			{
+			}
+			fragment_program_ref speedline1_frag
+			{
+			}
+		}
+	}
+	technique
+	{
+		pass
+		{
+			ambient 1.0 1.0 1.0
+			diffuse 1.0 0.0 0.0
+			specular 0.0 0.0 0.0 0.0 64
+			lighting off
+			depth_write off
+			cull_hardware none
+			scene_blend alpha_blend
+		}
+	}
+}

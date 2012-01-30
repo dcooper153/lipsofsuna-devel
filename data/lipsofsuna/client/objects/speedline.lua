@@ -18,7 +18,7 @@ Speedline.new = function(clss, args)
 	self.delay = args.delay or 0
 	self.duration = args.duration or 10000
 	self.model = Model()
-	self.model:add_material{cull = false, shader = "speedline"}
+	self.model:add_material{cull = false, material = "speedline1"}
 	return self
 end
 
