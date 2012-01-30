@@ -17,7 +17,8 @@ Featanimspec{
 	cooldown = 0.8,
 	effect = "swing1",
 	effect_impact = "impact1",
-	required_weapon = "melee"}
+	required_weapon = "melee",
+	slot = "hand.R"}
 
 Featanimspec{
 	name = "ranged",
