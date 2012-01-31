@@ -133,7 +133,7 @@ void LIRenContainer::remove_all_elements ()
 	_notifyZOrder (mZOrder);
 }
 
-ushort LIRenContainer::_notifyZOrder (ushort z)
+Ogre::ushort LIRenContainer::_notifyZOrder (Ogre::ushort z)
 {
 	/* Set our own Z order. */
 	mZOrder = z;
@@ -166,7 +166,7 @@ ushort LIRenContainer::_notifyZOrder (ushort z)
 	return z + 1;
 }
 
-ushort LIRenContainer::_notifyZOrderNonrecursive (ushort z)
+Ogre::ushort LIRenContainer::_notifyZOrderNonrecursive (Ogre::ushort z)
 {
 	z = OverlayElement::_notifyZOrder (z);
 

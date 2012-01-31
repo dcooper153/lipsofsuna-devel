@@ -36,8 +36,8 @@ public:
 	void remove_element (int index);
 	void remove_all_elements ();
 protected:
-	virtual ushort _notifyZOrder (ushort z);
-	virtual ushort _notifyZOrderNonrecursive (ushort z);
+	virtual Ogre::ushort _notifyZOrder (Ogre::ushort z);
+	virtual Ogre::ushort _notifyZOrderNonrecursive (Ogre::ushort z);
 	virtual void _updateRenderQueue (Ogre::RenderQueue* queue);
 	void get_children (std::vector<LIRenContainer*>& children);
 private:

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -52,7 +52,7 @@ static void Vector_mul (LIScrArgs* args)
 	if (!liscr_args_geti_float (args, 0, &s))
 		return;
 
-	lisys_assert (!isnanf (s));
+	lisys_assert (!isnan (s));
 	tmp = limat_vector_multiply (*((LIMatVector*) args->self), s);
 	liscr_args_seti_vector (args, &tmp);
 }
@@ -124,7 +124,7 @@ static void Vector_set_x (LIScrArgs* args)
 {
 	LIMatVector* self = args->self;
 	liscr_args_geti_float (args, 0, &self->x);
-	lisys_assert (!isnanf (self->x));
+	lisys_assert (!isnan (self->x));
 }
 
 static void Vector_get_y (LIScrArgs* args)
@@ -135,7 +135,7 @@ static void Vector_set_y (LIScrArgs* args)
 {
 	LIMatVector* self = args->self;
 	liscr_args_geti_float (args, 0, &self->y);
-	lisys_assert (!isnanf (self->y));
+	lisys_assert (!isnan (self->y));
 }
 
 static void Vector_get_z (LIScrArgs* args)
@@ -146,7 +146,7 @@ static void Vector_set_z (LIScrArgs* args)
 {
 	LIMatVector* self = args->self;
 	liscr_args_geti_float (args, 0, &self->z);
-	lisys_assert (!isnanf (self->z));
+	lisys_assert (!isnan (self->z));
 }
 
 /*****************************************************************************/

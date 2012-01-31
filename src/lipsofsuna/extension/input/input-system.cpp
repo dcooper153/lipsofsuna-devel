@@ -37,7 +37,8 @@ LIInpSystem::LIInpSystem (LIInpInput* input, bool grab) :
 	if (!grab)
 	{
 #if defined OIS_WIN32_PLATFORM
-		params.insert (std::make_pair(std::string ("w32_mouse"), std::string ("DISCL_NONEXCLUSIVE")));
+		// FIXME: This causes device initialization to throw an error.
+		//params.insert (std::make_pair(std::string ("w32_mouse"), std::string ("DISCL_NONEXCLUSIVE")));
 #elif defined OIS_LINUX_PLATFORM
 		params.insert (std::make_pair (std::string ("x11_mouse_grab"), std::string ("false")));
 #endif
@@ -45,7 +46,8 @@ LIInpSystem::LIInpSystem (LIInpInput* input, bool grab) :
 
 	/* Always disable keyboard grabs so that you can close the window with Alt+F4. */
 #if defined OIS_WIN32_PLATFORM
-	params.insert (std::make_pair(std::string ("w32_keyboard"), std::string ("DISCL_NONEXCLUSIVE")));
+	// FIXME: This causes device initialization to throw an error.
+	//params.insert (std::make_pair(std::string ("w32_keyboard"), std::string ("DISCL_NONEXCLUSIVE")));
 #elif defined OIS_LINUX_PLATFORM
 	params.insert (std::make_pair (std::string ("x11_keyboard_grab"), std::string ("false")));
 	params.insert (std::make_pair (std::string ("XAutoRepeatOn"), std::string ("true")));
