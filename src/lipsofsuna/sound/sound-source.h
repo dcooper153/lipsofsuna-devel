@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -20,21 +20,10 @@
 
 #include "sound-sample.h"
 #include "sound-system.h"
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/system.h"
 
 typedef struct _LISndSource LISndSource;
-struct _LISndSource
-{
-	int blocked_playing;
-	int stereo;
-	float volume;
-	float fade_factor;
-	float fade_value;
-	ALuint source;
-	ALint queued;
-	LISndSample* blocked_sample;
-};
 
 LIAPICALL (LISndSource*, lisnd_source_new, (
 	LISndSystem* system,
@@ -86,6 +75,9 @@ LIAPICALL (void, lisnd_source_set_offset, (
 LIAPICALL (void, lisnd_source_set_position, (
 	LISndSource*       self,
 	const LIMatVector* value));
+
+LIAPICALL (int, lisnd_source_get_stereo, (
+	LISndSource* self));
 
 LIAPICALL (void, lisnd_source_set_velocity, (
 	LISndSource*       self,

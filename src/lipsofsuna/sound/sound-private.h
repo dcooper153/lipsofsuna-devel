@@ -15,39 +15,48 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SOUND_MANAGER_H__
-#define __SOUND_MANAGER_H__
+#ifndef __SOUND_PRIVATE_H__
+#define __SOUND_PRIVATE_H__
 
+#include <AL/al.h>
+#include <AL/alc.h>
 #include "lipsofsuna/algorithm.h"
-#include "lipsofsuna/system.h"
-#include "sound-sample.h"
+#include "sound-manager.h"
 #include "sound-system.h"
+#include "sound-source.h"
+#include "sound-sample.h"
 
-typedef struct _LISndManager LISndManager;
+struct _LISndManager
+{
+	LISndSystem* system;
+	LIAlgStrdic* samples;
+};
 
-LIAPICALL (LISndManager*, lisnd_manager_new, (
-	LISndSystem* system));
+struct _LISndSystem
+{
+	ALCdevice* device;
+	ALCcontext* context;
+};
 
-LIAPICALL (void, lisnd_manager_free, (
-	LISndManager* self));
+struct _LISndSource
+{
+	int blocked_playing;
+	int stereo;
+	float volume;
+	float fade_factor;
+	float fade_value;
+	ALuint source;
+	ALint queued;
+	LISndSample* blocked_sample;
+};
 
-LIAPICALL (void, lisnd_manager_clear, (
-	LISndManager* self));
-
-LIAPICALL (void, lisnd_manager_set_listener, (
-	LISndManager*      self,
-	const LIMatVector* pos,
-	const LIMatVector* vel,
-	const LIMatVector* dir,
-	const LIMatVector* up));
-
-LIAPICALL (LISndSample*, lisnd_manager_get_sample, (
-	LISndManager* self,
-	const char*   name));
-
-LIAPICALL (int, lisnd_manager_set_sample, (
-	LISndManager* self,
-	const char*   name,
-	const char*   path));
+struct _LISndSample
+{
+	int loaded;
+	int stereo;
+	char* file;
+	ALuint buffers[2];
+	LISysAsyncCall* worker;
+};
 
 #endif

@@ -360,7 +360,7 @@ int liext_object_update (
 	{
 		next = ptr->next;
 		source = ptr->data;
-		if (source->stereo)
+		if (lisnd_source_get_stereo (source))
 		{
 			lisnd_source_set_position (source, &module->listener_position);
 		}

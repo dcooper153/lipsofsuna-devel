@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,20 +22,17 @@
  * @{
  */
 
-#ifndef LI_DISABLE_SOUND
-
 #include "lipsofsuna/system.h"
-#include "sound-system.h"
+#ifndef LI_DISABLE_SOUND
+#include "sound-private.h"
 
 /*****************************************************************************/
 
 /**
  * \brief Initializes the sound system.
- *
  * \return Sound system.
  */
-LISndSystem*
-lisnd_system_new ()
+LISndSystem* lisnd_system_new ()
 {
 	LISndSystem* self;
 
@@ -65,11 +62,10 @@ lisnd_system_new ()
 
 /**
  * \brief Deinitializes the sound system.
- *
  * \param self Sound system.
  */
-void
-lisnd_system_free (LISndSystem* self)
+void lisnd_system_free (
+	LISndSystem* self)
 {
 	if (self->context != NULL)
 	{
@@ -83,19 +79,18 @@ lisnd_system_free (LISndSystem* self)
 
 /**
  * \brief Sets the orientation of the listener.
- *
  * \param self Sound system.
  * \param pos Position of the listener.
  * \param vel Velocity of the listener.
  * \param dir Facing direction of the listener.
  * \param up Up direction of the listener.
  */
-void
-lisnd_system_set_listener (LISndSystem*       self,
-                           const LIMatVector* pos,
-                           const LIMatVector* vel,
-                           const LIMatVector* dir,
-                           const LIMatVector* up)
+void lisnd_system_set_listener (
+	LISndSystem*       self,
+	const LIMatVector* pos,
+	const LIMatVector* vel,
+	const LIMatVector* dir,
+	const LIMatVector* up)
 {
 	ALfloat alpos[3] = { -pos->x, pos->y, -pos->z };
 	ALfloat alvel[3] = { vel->x, vel->y, vel->z };

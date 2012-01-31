@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,10 +22,9 @@
  * @{
  */
 
+#include "lipsofsuna/system.h"
 #ifndef LI_DISABLE_SOUND
-
-#include <lipsofsuna/system.h>
-#include "sound-source.h"
+#include "sound-private.h"
 
 static int private_init_source (
 	LISndSource* self,
@@ -303,6 +302,17 @@ void lisnd_source_set_position (
 	const LIMatVector* value)
 {
 	alSource3f (self->source, AL_POSITION, -value->x, value->y, -value->z);
+}
+
+/**
+ * \brief Checks if the source has stereo sound.
+ * \param self Sound source.
+ * \return Nonzero if stereo.
+ */
+int lisnd_source_get_stereo (
+	LISndSource* self)
+{
+	return self->stereo;
 }
 
 /**

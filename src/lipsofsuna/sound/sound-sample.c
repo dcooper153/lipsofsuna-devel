@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,14 +22,14 @@
  * @{
  */
 
+#include "lipsofsuna/system.h"
 #ifndef LI_DISABLE_SOUND
-
 #include <stream_decoder.h>
 #include <vorbis/codec.h>
 #include <vorbis/vorbisfile.h>
 #include "lipsofsuna/archive.h"
 #include "lipsofsuna/system.h"
-#include "sound-sample.h"
+#include "sound-private.h"
 
 static void private_flac_error_callback (
 	const FLAC__StreamDecoder*     decoder,
