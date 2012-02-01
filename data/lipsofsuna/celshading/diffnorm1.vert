@@ -1,16 +1,20 @@
-#version 130
+#version 120
+
 uniform mat4 LOS_matrix_modelviewproj;
 uniform vec3 LOS_camera_position;
 uniform vec4 LOS_light_position[LIGHTS];
-in vec3 vertex;
-in vec3 normal;
-in vec3 tangent;
-in vec2 uv0;
-out vec3 F_normal;
-out vec3 F_tangent;
-out vec2 F_texcoord;
-out vec3 F_lightv[LIGHTS];
-out vec3 F_lighthv[LIGHTS];
+
+attribute vec3 vertex;
+attribute vec3 normal;
+attribute vec3 tangent;
+attribute vec2 uv0;
+
+varying vec3 F_normal;
+varying vec3 F_tangent;
+varying vec2 F_texcoord;
+varying vec3 F_lightv[LIGHTS];
+varying vec3 F_lighthv[LIGHTS];
+
 void main()
 {
 	F_normal = normal;

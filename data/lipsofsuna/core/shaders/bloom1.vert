@@ -1,7 +1,8 @@
-#version 130
-in vec4 vertex;
+#version 120
 
-out vec2 F_uv;
+attribute vec4 vertex;
+
+varying vec2 F_uv;
 
 void main()
 {

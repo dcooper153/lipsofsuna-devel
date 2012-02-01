@@ -1,12 +1,10 @@
-#version 130
+#version 120
 
 uniform vec4 LOS_material_diffuse;
 
-in float F_alpha;
-
-out vec4 colour;
+varying float F_alpha;
 
 void main()
 {
-	colour = vec4(LOS_material_diffuse.rgb, F_alpha);
+	gl_FragColor = vec4(LOS_material_diffuse.rgb, F_alpha);
 }

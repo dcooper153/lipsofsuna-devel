@@ -8,18 +8,16 @@
 // Special thanks to ATI for their great HLSL2GLSL utility
 //     http://sourceforge.net/projects/hlsl2glsl
 //-------------------------------
-#version 130
+#version 120
 
 uniform sampler2D RT;
 
-in vec2 F_uv;
-
-out vec4 colour;
+varying vec2 F_uv;
 
 void main()
 {
-	vec4 tex = texture(RT, F_uv) - vec4(1.0);
+	vec4 tex = texture2D(RT, F_uv) - vec4(1.0);
 	vec4 bright4 = -6.0 * tex * tex + vec4(2.0);
 	float bright = dot(bright4, vec4(0.333333, 0.333333, 0.333333, 0.000000));
-	colour = tex + vec4(bright + 0.6);
+	gl_FragColor = tex + vec4(bright + 0.6);
 }

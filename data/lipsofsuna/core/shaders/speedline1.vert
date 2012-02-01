@@ -1,11 +1,11 @@
-#version 130
+#version 120
 
 uniform mat4 LOS_matrix_modelviewproj;
 
-in vec3 vertex;
-in vec3 normal;
+attribute vec3 vertex;
+attribute vec3 normal;
 
-out float F_alpha;
+varying float F_alpha;
 
 void main()
 {

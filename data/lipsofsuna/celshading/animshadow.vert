@@ -1,10 +1,13 @@
-#version 130
+#version 120
+
 uniform mat4 LOS_matrix_modelviewproj;
 uniform mat4 LOS_matrix_world_inverse;
 uniform mat4x3 LOS_skeletal_matrix[BONES];
-in vec3 vertex;
-in vec4 blendIndices;
-in vec4 blendWeights;
+
+attribute vec3 vertex;
+attribute vec4 blendIndices;
+attribute vec4 blendWeights;
+
 void LOS_skeletal_animation_nonortan(
 	in vec3 vertex, in mat4 inverse,
 	out vec3 vertex_res)

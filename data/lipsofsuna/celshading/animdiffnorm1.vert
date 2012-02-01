@@ -1,20 +1,24 @@
-#version 130
+#version 120
+
 uniform mat4 LOS_matrix_modelviewproj;
 uniform mat4 LOS_matrix_world_inverse;
 uniform vec3 LOS_camera_position;
 uniform vec4 LOS_light_position[LIGHTS];
 uniform mat4x3 LOS_skeletal_matrix[BONES];
-in vec3 vertex;
-in vec3 normal;
-in vec3 tangent;
-in vec2 uv0;
-in vec4 blendIndices;
-in vec4 blendWeights;
-out vec3 F_normal;
-out vec3 F_tangent;
-out vec2 F_texcoord;
-out vec3 F_lightv[LIGHTS];
-out vec3 F_lighthv[LIGHTS];
+
+attribute vec3 vertex;
+attribute vec3 normal;
+attribute vec3 tangent;
+attribute vec2 uv0;
+attribute vec4 blendIndices;
+attribute vec4 blendWeights;
+
+varying vec3 F_normal;
+varying vec3 F_tangent;
+varying vec2 F_texcoord;
+varying vec3 F_lightv[LIGHTS];
+varying vec3 F_lighthv[LIGHTS];
+
 void LOS_skeletal_animation(
 	in vec3 vertex, in vec3 normal, in vec3 tangent, in mat4 inverse,
 	out vec3 vertex_res, out vec3 normal_res, out vec3 tangent_res)
@@ -36,6 +40,7 @@ void LOS_skeletal_animation(
 	normal_res = (inverse * vec4(normalize(n), 0.0)).xyz;
 	tangent_res = (inverse * vec4(normalize(t), 0.0)).xyz;
 }
+
 void main()
 {
 	vec3 t_vertex;

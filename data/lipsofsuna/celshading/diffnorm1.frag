@@ -1,4 +1,4 @@
-#version 130
+#version 120
 
 uniform sampler2D LOS_diffuse_texture_0;
 uniform sampler2D LOS_diffuse_texture_1;
@@ -14,13 +14,11 @@ uniform vec4 LOS_light_specular[LIGHTS];
 uniform vec4 LOS_light_equation[LIGHTS];
 uniform vec4 LOS_light_spotparams[LIGHTS];
 
-in vec3 F_normal;
-in vec3 F_tangent;
-in vec2 F_texcoord;
-in vec3 F_lightv[LIGHTS];
-in vec3 F_lighthv[LIGHTS];
-
-out vec4 colour;
+varying vec3 F_normal;
+varying vec3 F_tangent;
+varying vec2 F_texcoord;
+varying vec3 F_lightv[LIGHTS];
+varying vec3 F_lighthv[LIGHTS];
 
 vec3 los_normal_mapping(in vec3 normal, in vec3 tangent, in vec2 texcoord, in sampler2D sampler)
 {
@@ -29,7 +27,7 @@ vec3 los_normal_mapping(in vec3 normal, in vec3 tangent, in vec2 texcoord, in sa
 	vec3 tan1 = normalize(tangent);
 	if(abs(dot(nml1, tan1)) > 0.9) return nml1;
 	mat3 tangentspace = mat3(tan1, cross(tan1, nml1), nml1);
-	vec3 n = tangentspace * (texture(sampler, texcoord).xyz * 2.0 - 1.0);
+	vec3 n = tangentspace * (texture2D(sampler, texcoord).xyz * 2.0 - 1.0);
 	if(length(n) < 0.01) return nml1;
 	return normalize(n);
 }
@@ -48,8 +46,8 @@ vec3 los_blinn_phong(in vec3 lv, in vec3 hv, in vec3 ld, in vec4 eq,
 }
 vec2 los_cel_shading(in vec3 l, in vec4 p, in sampler1D t1, in sampler1D t2)
 {
-	float celd = p.x * texture(t1, l.z * (1.0 + 0.5 * l.x)).x;
-	float cels = p.y * texture(t2, l.z * l.y).x;
+	float celd = p.x * texture1D(t1, l.z * (1.0 + 0.5 * l.x)).x;
+	float cels = p.y * texture1D(t2, l.z * l.y).x;
 	float diff = mix(l.z * l.x, celd, p.z);
 	float spec = mix(l.z * l.y, cels, p.w);
 	return vec2(diff, spec);
@@ -58,7 +56,7 @@ vec2 los_cel_shading(in vec3 l, in vec4 p, in sampler1D t1, in sampler1D t2)
 void main()
 {
 	vec3 normal = los_normal_mapping(F_normal, F_tangent, F_texcoord, LOS_diffuse_texture_1);
-	vec4 diffuse = texture(LOS_diffuse_texture_0, F_texcoord);
+	vec4 diffuse = texture2D(LOS_diffuse_texture_0, F_texcoord);
 	vec4 light = LOS_scene_ambient;
 	for(int i = 0 ; i < LIGHTS ; i++)
 	{
@@ -69,5 +67,5 @@ void main()
 			LOS_diffuse_texture_2, LOS_diffuse_texture_3);
 		light += c.x * LOS_light_diffuse[i] + c.y * LOS_light_specular[i];
 	}
-	colour = vec4((LOS_material_diffuse * diffuse * light).rgb, diffuse.a);
+	gl_FragColor = vec4((LOS_material_diffuse * diffuse * light).rgb, diffuse.a);
 }

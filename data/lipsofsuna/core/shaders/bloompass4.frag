@@ -5,20 +5,18 @@
 //   OriginalImageWeight
 //   BlurWeight
 //-------------------------------
-#version 130
+#version 120
 
 uniform sampler2D RT;
 uniform sampler2D Blur1;
 uniform float OriginalImageWeight;
 uniform float BlurWeight;
 
-in vec2 F_uv;
-
-out vec4 colour;
+varying vec2 F_uv;
 
 void main()
 {
-	vec4 orig = texture(RT, F_uv);
-	vec4 blur = texture(Blur1, F_uv);
-	colour = (blur * BlurWeight) + (orig * OriginalImageWeight);
+	vec4 orig = texture2D(RT, F_uv);
+	vec4 blur = texture2D(Blur1, F_uv);
+	gl_FragColor = (blur * BlurWeight) + (orig * OriginalImageWeight);
 }
