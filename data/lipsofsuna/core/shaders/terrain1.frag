@@ -24,14 +24,14 @@ varying vec3 F_lightv[LIGHTS];
 varying vec3 F_lighthv[LIGHTS];
 varying vec4 F_shadow[LIGHTS];
 
-vec3 los_normal_mapping(in vec3 normal, in vec3 tangent, in vec2 texcoord, in sampler2D sampler)
+vec3 los_normal_mapping(in vec3 normal, in vec3 tangent, in vec4 sample)
 {
 	vec3 nml1 = normalize(normal);
 	if(length(tangent) < 0.01) return nml1;
 	vec3 tan1 = normalize(tangent);
 	if(abs(dot(nml1, tan1)) > 0.9) return nml1;
 	mat3 tangentspace = mat3(tan1, cross(tan1, nml1), nml1);
-	vec3 n = tangentspace * (texture2D(sampler, texcoord).xyz * 2.0 - 1.0);
+	vec3 n = tangentspace * (sample.xyz * 2.0 - vec3(1.0));
 	if(length(n) < 0.01) return nml1;
 	return normalize(n);
 }
@@ -53,7 +53,8 @@ vec3 los_blinn_phong(in vec3 lv, in vec3 hv, in vec3 ld, in vec4 eq,
 
 void main()
 {
-	vec3 normal = los_normal_mapping(F_normal, F_tangent, F_texcoord, LOS_diffuse_texture_1);
+	vec4 normalmap = texture2D(LOS_diffuse_texture_1, F_texcoord);
+	vec3 normal = los_normal_mapping(F_normal, F_tangent, normalmap);
 	vec4 diffuse0 = texture2D(LOS_diffuse_texture_0, F_texcoord);
 	vec4 diffuse1 = texture2D(LOS_diffuse_texture_2, F_texcoord);
 	vec4 diffuse = vec4(F_color.rgb, 1.0) * mix(diffuse0, diffuse1, F_splatting);

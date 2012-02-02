@@ -20,14 +20,14 @@ varying vec2 F_texcoord;
 varying vec3 F_lightv[LIGHTS];
 varying vec3 F_lighthv[LIGHTS];
 
-vec3 los_normal_mapping(in vec3 normal, in vec3 tangent, in vec2 texcoord, in sampler2D sampler)
+vec3 los_normal_mapping(in vec3 normal, in vec3 tangent, in vec4 sample)
 {
 	vec3 nml1 = normalize(normal);
 	if(length(tangent) < 0.01) return nml1;
 	vec3 tan1 = normalize(tangent);
 	if(abs(dot(nml1, tan1)) > 0.9) return nml1;
 	mat3 tangentspace = mat3(tan1, cross(tan1, nml1), nml1);
-	vec3 n = tangentspace * (texture2D(sampler, texcoord).xyz * 2.0 - 1.0);
+	vec3 n = tangentspace * (sample.xyz * 2.0 - vec3(1.0));
 	if(length(n) < 0.01) return nml1;
 	return normalize(n);
 }
@@ -55,7 +55,8 @@ vec2 los_cel_shading(in vec3 l, in vec4 p, in sampler1D t1, in sampler1D t2)
 
 void main()
 {
-	vec3 normal = los_normal_mapping(F_normal, F_tangent, F_texcoord, LOS_diffuse_texture_1);
+	vec4 normalmap = texture2D(LOS_diffuse_texture_1, F_texcoord);
+	vec3 normal = los_normal_mapping(F_normal, F_tangent, normalmap);
 	vec4 diffuse = texture2D(LOS_diffuse_texture_0, F_texcoord);
 	vec4 light = LOS_scene_ambient;
 	for(int i = 0 ; i < LIGHTS ; i++)
