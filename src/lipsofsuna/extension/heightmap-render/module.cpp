@@ -24,6 +24,7 @@
 
 #include "module.h"
 #include "lipsofsuna/render/internal/render-internal.h"
+#include "lipsofsuna/render/internal/render-terrain-material-generator.hpp"
 #include <OgreTerrainGroup.h>
 
 static void private_init_heightmap (
@@ -88,6 +89,14 @@ LIExtHeightmapRender* liext_heightmap_render_new (
 	self->globals->setLightMapDirection (Ogre::Vector3 (0.0f, -1.0f, 0.0f));
 	self->globals->setCompositeMapAmbient (Ogre::ColourValue (0.9f, 0.9f, 0.9f));
 	self->globals->setCompositeMapDiffuse (Ogre::ColourValue (1.0f, 1.0f, 1.0f));
+
+	/* Override the material generator. */
+	/* Ogre only supports Cg but it's not supported by many Linux distributions.
+	   Even with Cg installed, the default terrain doesn't work with the open
+	   source AMD driver. We use GLSL for everything else so there are enough
+	   incentives to get rid of it. */
+	Ogre::TerrainMaterialGeneratorPtr generator (new LIRenTerrainMaterialGenerator ());
+	self->globals->setDefaultMaterialGenerator (generator);
 
 	/* Register classes. */
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_HEIGHTMAP_RENDER, self);

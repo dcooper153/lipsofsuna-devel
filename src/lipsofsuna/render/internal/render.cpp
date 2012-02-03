@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -92,8 +92,6 @@ int liren_internal_init (
 	private_load_plugin (self, "RenderSystem_GL");
 	private_load_plugin (self, "Plugin_OctreeSceneManager");
 	private_load_plugin (self, "Plugin_ParticleFX");
-	/* FIXME: We really don't want this, but Ogre terrain doesn't have GLSL support. */
-	private_load_plugin (self, "Plugin_CgProgramManager");
 
 	/* Make sure that the required plugins were loaded. */
 	if (!private_check_plugin (self, "GL RenderSystem"))
