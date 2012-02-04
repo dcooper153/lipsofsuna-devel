@@ -203,10 +203,10 @@ void LIRenTerrainMaterialGenerator::SM2Profile::setReceiveDynamicShadowsLowLod(b
 	}
 }
 //---------------------------------------------------------------------
-uint8 LIRenTerrainMaterialGenerator::SM2Profile::getMaxLayers(const Terrain* terrain) const
+Ogre::uint8 LIRenTerrainMaterialGenerator::SM2Profile::getMaxLayers(const Terrain* terrain) const
 {
 	// count the texture units free
-	uint8 freeTextureUnits = 16;
+	Ogre::uint8 freeTextureUnits = 16;
 	// lightmap
 	--freeTextureUnits;
 	// normalmap
@@ -216,7 +216,7 @@ uint8 LIRenTerrainMaterialGenerator::SM2Profile::getMaxLayers(const Terrain* ter
 		--freeTextureUnits;
 	if (isShadowingEnabled(HIGH_LOD, terrain))
 	{
-		uint numShadowTextures = 1;
+		Ogre::uint numShadowTextures = 1;
 		if (getReceiveDynamicShadowsPSSM())
 		{
 			numShadowTextures = getReceiveDynamicShadowsPSSM()->getSplitCount();
@@ -225,7 +225,7 @@ uint8 LIRenTerrainMaterialGenerator::SM2Profile::getMaxLayers(const Terrain* ter
 	}
 
 	// each layer needs 2.25 units (1xdiffusespec, 1xnormalheight, 0.25xblend)
-	return static_cast<uint8>(freeTextureUnits / 2.25f);
+	return static_cast<Ogre::uint8>(freeTextureUnits / 2.25f);
 	
 
 }
@@ -362,10 +362,10 @@ void LIRenTerrainMaterialGenerator::SM2Profile::addTechnique(
 		}
 
 		// blend maps
-		uint maxLayers = getMaxLayers(terrain);
-		uint numBlendTextures = std::min(terrain->getBlendTextureCount(maxLayers), terrain->getBlendTextureCount());
-		uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
-		for (uint i = 0; i < numBlendTextures; ++i)
+		Ogre::uint maxLayers = getMaxLayers(terrain);
+		Ogre::uint numBlendTextures = std::min(terrain->getBlendTextureCount(maxLayers), terrain->getBlendTextureCount());
+		Ogre::uint numLayers = std::min(maxLayers, static_cast<Ogre::uint>(terrain->getLayerCount()));
+		for (Ogre::uint i = 0; i < numBlendTextures; ++i)
 		{
 			tu = pass->createTextureUnitState(terrain->getBlendTextureName(i));
 			tu->setTextureAddressingMode(TextureUnitState::TAM_CLAMP);
@@ -373,7 +373,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::addTechnique(
 		}
 
 		// layer textures
-		for (uint i = 0; i < numLayers; ++i)
+		for (Ogre::uint i = 0; i < numLayers; ++i)
 		{
 			// diffuse / specular
 			pass->createTextureUnitState(terrain->getLayerTextureName(i, 0));
@@ -400,12 +400,12 @@ void LIRenTerrainMaterialGenerator::SM2Profile::addTechnique(
 	// Add shadow textures (always at the end)
 	if (isShadowingEnabled(tt, terrain))
 	{
-		uint numTextures = 1;
+		Ogre::uint numTextures = 1;
 		if (getReceiveDynamicShadowsPSSM())
 		{
 			numTextures = getReceiveDynamicShadowsPSSM()->getSplitCount();
 		}
-		for (uint i = 0; i < numTextures; ++i)
+		for (Ogre::uint i = 0; i < numTextures; ++i)
 		{
 			TextureUnitState* tu = pass->createTextureUnitState();
 			tu->setContentType(TextureUnitState::CONTENT_SHADOW);
@@ -490,10 +490,10 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelper::generateVertexProg
 
 	if (tt != LOW_LOD)
 	{
-		uint maxLayers = prof->getMaxLayers(terrain);
-		uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
+		Ogre::uint maxLayers = prof->getMaxLayers(terrain);
+		Ogre::uint numLayers = std::min(maxLayers, static_cast<Ogre::uint>(terrain->getLayerCount()));
 
-		for (uint i = 0; i < numLayers; ++i)
+		for (Ogre::uint i = 0; i < numLayers; ++i)
 			generateVpLayer(prof, terrain, tt, i, outStream);
 	}
 
@@ -508,10 +508,10 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelper::generateFragmentPr
 
 	if (tt != LOW_LOD)
 	{
-		uint maxLayers = prof->getMaxLayers(terrain);
-		uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
+		Ogre::uint maxLayers = prof->getMaxLayers(terrain);
+		Ogre::uint numLayers = std::min(maxLayers, static_cast<Ogre::uint>(terrain->getLayerCount()));
 
-		for (uint i = 0; i < numLayers; ++i)
+		for (Ogre::uint i = 0; i < numLayers; ++i)
 			generateFpLayer(prof, terrain, tt, i, outStream);
 	}
 
@@ -531,12 +531,12 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelper::defaultVpParams(
 
 	if (prof->isShadowingEnabled(tt, terrain))
 	{
-		uint numTextures = 1;
+		Ogre::uint numTextures = 1;
 		if (prof->getReceiveDynamicShadowsPSSM())
 		{
 			numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
 		}
-		for (uint i = 0; i < numTextures; ++i)
+		for (Ogre::uint i = 0; i < numTextures; ++i)
 		{
 			params->setNamedAutoConstant("texViewProjMatrix" + StringConverter::toString(i), 
 				GpuProgramParameters::ACT_TEXTURE_VIEWPROJ_MATRIX, i);
@@ -575,7 +575,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelper::defaultFpParams(
 
 	if (prof->isShadowingEnabled(tt, terrain))
 	{
-		uint numTextures = 1;
+		Ogre::uint numTextures = 1;
 		if (prof->getReceiveDynamicShadowsPSSM())
 		{
 			PSSMShadowCameraSetup* pssm = prof->getReceiveDynamicShadowsPSSM();
@@ -583,7 +583,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelper::defaultFpParams(
 			Vector4 splitPoints;
 			const PSSMShadowCameraSetup::SplitPointList& splitPointList = pssm->getSplitPoints();
 			// Populate from split point 1, not 0, since split 0 isn't useful (usually 0)
-			for (uint i = 1; i < numTextures; ++i)
+			for (Ogre::uint i = 1; i < numTextures; ++i)
 			{
 				splitPoints[i-1] = splitPointList[i];
 			}
@@ -593,7 +593,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelper::defaultFpParams(
 		if (prof->getReceiveDynamicShadowsDepth())
 		{
 			size_t samplerOffset = (tt == HIGH_LOD) ? mShadowSamplerStartHi : mShadowSamplerStartLo;
-			for (uint i = 0; i < numTextures; ++i)
+			for (Ogre::uint i = 0; i < numTextures; ++i)
 			{
 				params->setNamedAutoConstant("inverseShadowmapSize" + StringConverter::toString(i), 
 					GpuProgramParameters::ACT_INVERSE_TEXTURE_SIZE, i + samplerOffset);
@@ -633,12 +633,12 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelper::updateVpParams(
 	const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, const GpuProgramParametersSharedPtr& params)
 {
 	params->setIgnoreMissingParams(true);
-	uint maxLayers = prof->getMaxLayers(terrain);
-	uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
-	uint numUVMul = numLayers / 4;
+	Ogre::uint maxLayers = prof->getMaxLayers(terrain);
+	Ogre::uint numLayers = std::min(maxLayers, static_cast<Ogre::uint>(terrain->getLayerCount()));
+	Ogre::uint numUVMul = numLayers / 4;
 	if (numLayers % 4)
 		++numUVMul;
-	for (uint i = 0; i < numUVMul; ++i)
+	for (Ogre::uint i = 0; i < numUVMul; ++i)
 	{
 		Vector4 uvMul(
 			terrain->getLayerUVMultiplier(i * 4), 
@@ -669,9 +669,9 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelper::updateFpParams(
 
 }
 //---------------------------------------------------------------------
-String LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelper::getChannel(uint idx)
+String LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelper::getChannel(Ogre::uint idx)
 {
-	uint rem = idx % 4;
+	Ogre::uint rem = idx % 4;
 	switch(rem)
 	{
 	case 0:
@@ -826,30 +826,30 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateVpHead
 			"uniform float baseUVScale;\n";
 	}
 	// uv multipliers
-	uint maxLayers = prof->getMaxLayers(terrain);
-	uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
-	uint numUVMultipliers = (numLayers / 4);
+	Ogre::uint maxLayers = prof->getMaxLayers(terrain);
+	Ogre::uint numLayers = std::min(maxLayers, static_cast<Ogre::uint>(terrain->getLayerCount()));
+	Ogre::uint numUVMultipliers = (numLayers / 4);
 	if (numLayers % 4)
 		++numUVMultipliers;
-	for (uint i = 0; i < numUVMultipliers; ++i)
+	for (Ogre::uint i = 0; i < numUVMultipliers; ++i)
 		outStream << "uniform vec4 uvMul_" << i << ";\n";
 
 	outStream <<
 		"varying vec4 vertexPos;\n"
 		"varying vec4 position;\n";
 
-	uint texCoordSet = 1;
+	Ogre::uint texCoordSet = 1;
 	outStream <<
 		"varying vec4 uvMisc;\n"; // xy = uv, z = camDepth\n";
 	texCoordSet++;
 
 	// layer UV's premultiplied, packed as xy/zw
-	uint numUVSets = numLayers / 2;
+	Ogre::uint numUVSets = numLayers / 2;
 	if (numLayers % 2)
 		++numUVSets;
 	if (tt != LOW_LOD)
 	{
-		for (uint i = 0; i < numUVSets; ++i)
+		for (Ogre::uint i = 0; i < numUVSets; ++i)
 		{
 			outStream <<
 				"varying vec4 layerUV" << i << ";\n";
@@ -939,10 +939,10 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateVpHead
 	// generate UVs
 	if (tt != LOW_LOD)
 	{
-		for (uint i = 0; i < numUVSets; ++i)
+		for (Ogre::uint i = 0; i < numUVSets; ++i)
 		{
-			uint layer  =  i * 2;
-			uint uvMulIdx = layer / 4;
+			Ogre::uint layer  =  i * 2;
+			Ogre::uint uvMulIdx = layer / 4;
 
 			outStream <<
 				"	layerUV" << i << ".xy = " << " uv0.xy * uvMul_" << uvMulIdx << "." << getChannel(layer) << ";\n";
@@ -979,21 +979,21 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpHead
 		"varying vec4 vertexPos;\n"
 		"varying vec4 position;\n";
 
-	uint texCoordSet = 1;
+	Ogre::uint texCoordSet = 1;
 	outStream <<
 		"varying vec4 uvMisc;\n";
 	texCoordSet++;
 
 	// UV's premultiplied, packed as xy/zw
-	uint maxLayers = prof->getMaxLayers(terrain);
-	uint numBlendTextures = std::min(terrain->getBlendTextureCount(maxLayers), terrain->getBlendTextureCount());
-	uint numLayers = std::min(maxLayers, static_cast<uint>(terrain->getLayerCount()));
-	uint numUVSets = numLayers / 2;
+	Ogre::uint maxLayers = prof->getMaxLayers(terrain);
+	Ogre::uint numBlendTextures = std::min(terrain->getBlendTextureCount(maxLayers), terrain->getBlendTextureCount());
+	Ogre::uint numLayers = std::min(maxLayers, static_cast<Ogre::uint>(terrain->getLayerCount()));
+	Ogre::uint numUVSets = numLayers / 2;
 	if (numLayers % 2)
 		++numUVSets;
 	if (tt != LOW_LOD)
 	{
-		for (uint i = 0; i < numUVSets; ++i)
+		for (Ogre::uint i = 0; i < numUVSets; ++i)
 		{
 			outStream <<
 				"varying vec4 layerUV" << i << ";\n";
@@ -1015,7 +1015,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpHead
 			"varying float fogVal;\n";
 	}
 
-	uint currentSamplerIdx = 0;
+	Ogre::uint currentSamplerIdx = 0;
 
 	outStream <<
 		// Only 1 light supported in this version
@@ -1053,14 +1053,14 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpHead
 			currentSamplerIdx++;
 		}
 		// Blend textures - sampler definitions
-		for (uint i = 0; i < numBlendTextures; ++i)
+		for (Ogre::uint i = 0; i < numBlendTextures; ++i)
 		{
 			outStream << "uniform sampler2D blendTex" << i << ";\n";
 			currentSamplerIdx++;
 		}
 
 		// Layer textures - sampler definitions & UV multipliers
-		for (uint i = 0; i < numLayers; ++i)
+		for (Ogre::uint i = 0; i < numLayers; ++i)
 		{
 			outStream << "uniform sampler2D difftex" << i << ";\n";
 			currentSamplerIdx++;
@@ -1120,7 +1120,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpHead
 	else
 	{
 		// set up the blend values
-		for (uint i = 0; i < numBlendTextures; ++i)
+		for (Ogre::uint i = 0; i < numBlendTextures; ++i)
 		{
 			outStream << "	vec4 blendTexVal" << i << " = texture2D(blendTex" << i << ", uv);\n";
 		}
@@ -1173,17 +1173,17 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpHead
 }
 //---------------------------------------------------------------------
 void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateVpLayer(
-	const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream)
+	const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, Ogre::uint layer, StringUtil::StrStreamType& outStream)
 {
 	// nothing to do
 }
 //---------------------------------------------------------------------
 void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpLayer(
-	const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, uint layer, StringUtil::StrStreamType& outStream)
+	const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, Ogre::uint layer, StringUtil::StrStreamType& outStream)
 {
-	uint uvIdx = layer / 2;
+	Ogre::uint uvIdx = layer / 2;
 	String uvChannels = layer % 2 ? ".zw" : ".xy";
-	uint blendIdx = (layer-1) / 4;
+	Ogre::uint blendIdx = (layer-1) / 4;
 	String blendChannel = getChannel(layer-1);
 	String blendWeightStr = String("blendTexVal") + StringConverter::toString(blendIdx) + 
 		"." + blendChannel;
@@ -1410,7 +1410,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpDyna
 
 	if (prof->getReceiveDynamicShadowsPSSM())
 	{
-		uint numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+		Ogre::uint numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
 
 
 		if (prof->getReceiveDynamicShadowsDepth())
@@ -1425,15 +1425,15 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpDyna
 		}
 
 		outStream << "\n	";
-		for (uint i = 0; i < numTextures; ++i)
+		for (Ogre::uint i = 0; i < numTextures; ++i)
 			outStream << "sampler2D shadowMap" << i << ", ";
 		outStream << "\n	";
-		for (uint i = 0; i < numTextures; ++i)
+		for (Ogre::uint i = 0; i < numTextures; ++i)
 			outStream << "vec4 lsPos" << i << ", ";
 		if (prof->getReceiveDynamicShadowsDepth())
 		{
 			outStream << "\n	";
-			for (uint i = 0; i < numTextures; ++i)
+			for (Ogre::uint i = 0; i < numTextures; ++i)
 				outStream << "float invShadowmapSize" << i << ", ";
 		}
 		outStream << "\n"
@@ -1442,7 +1442,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpDyna
 			"	float shadow; \n"
 			"	// calculate shadow \n";
 		
-		for (uint i = 0; i < numTextures; ++i)
+		for (Ogre::uint i = 0; i < numTextures; ++i)
 		{
 			if (!i)
 				outStream << "	if (camDepth <= pssmSplitPoints." << ShaderHelper::getChannel(i) << ") \n";
@@ -1476,16 +1476,16 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpDyna
 
 }
 //---------------------------------------------------------------------
-uint LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateVpDynamicShadowsParams(
-	uint texCoord, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
+Ogre::uint LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateVpDynamicShadowsParams(
+	Ogre::uint texCoord, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
 {
 	// out semantics & params
-	uint numTextures = 1;
+	Ogre::uint numTextures = 1;
 	if (prof->getReceiveDynamicShadowsPSSM())
 	{
 		numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
 	}
-	for (uint i = 0; i < numTextures; ++i)
+	for (Ogre::uint i = 0; i < numTextures; ++i)
 	{
 		outStream <<
 			"varying vec4 lightSpacePos" << i << ";\n"
@@ -1505,14 +1505,14 @@ uint LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateVpDyna
 void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateVpDynamicShadows(
 	const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
 {
-	uint numTextures = 1;
+	Ogre::uint numTextures = 1;
 	if (prof->getReceiveDynamicShadowsPSSM())
 	{
 		numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
 	}
 
 	// Calculate the position of vertex in light space
-	for (uint i = 0; i < numTextures; ++i)
+	for (Ogre::uint i = 0; i < numTextures; ++i)
 	{
 		outStream <<
 			"	lightSpacePos" << i << " = texViewProjMatrix" << i << " * worldPos; \n";
@@ -1536,7 +1536,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateVpDyna
 }
 //---------------------------------------------------------------------
 void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpDynamicShadowsParams(
-	uint* texCoord, uint* sampler, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
+	Ogre::uint* texCoord, Ogre::uint* sampler, const SM2Profile* prof, const Terrain* terrain, TechniqueType tt, StringUtil::StrStreamType& outStream)
 {
 	if (tt == HIGH_LOD)
 		mShadowSamplerStartHi = *sampler;
@@ -1544,14 +1544,14 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpDyna
 		mShadowSamplerStartLo = *sampler;
 
 	// in semantics & params
-	uint numTextures = 1;
+	Ogre::uint numTextures = 1;
 	if (prof->getReceiveDynamicShadowsPSSM())
 	{
 		numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
 		outStream <<
 			"uniform vec4 pssmSplitPoints;\n";
 	}
-	for (uint i = 0; i < numTextures; ++i)
+	for (Ogre::uint i = 0; i < numTextures; ++i)
 	{
 		outStream <<
 			"varying vec4 lightSpacePos" << i << ";\n"
@@ -1572,7 +1572,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpDyna
 {
 	if (prof->getReceiveDynamicShadowsPSSM())
 	{
-		uint numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
+		Ogre::uint numTextures = prof->getReceiveDynamicShadowsPSSM()->getSplitCount();
 		outStream << 
 			"	float camDepth = uvMisc.z;\n";
 
@@ -1586,16 +1586,16 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateFpDyna
 			outStream << 
 				"	float rtshadow = calcPSSMSimpleShadow(";
 		}
-		for (uint i = 0; i < numTextures; ++i)
+		for (Ogre::uint i = 0; i < numTextures; ++i)
 			outStream << "shadowMap" << i << ", ";
 		outStream << "\n		";
 
-		for (uint i = 0; i < numTextures; ++i)
+		for (Ogre::uint i = 0; i < numTextures; ++i)
 			outStream << "lightSpacePos" << i << ", ";
 		if (prof->getReceiveDynamicShadowsDepth())
 		{
 			outStream << "\n		";
-			for (uint i = 0; i < numTextures; ++i)
+			for (Ogre::uint i = 0; i < numTextures; ++i)
 				outStream << "inverseShadowmapSize" << i << ", ";
 		}
 		outStream << "\n" <<
