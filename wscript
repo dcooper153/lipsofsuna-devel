@@ -86,9 +86,10 @@ def configure(ctx):
 	ctx.check_cc(lib='iconv', uselib_store='CORE', mandatory=False) # BSD
 
 	# zlib
-	if not ctx.check_cc(lib='z', mandatory=False, uselib_store='ZLIB'):
-		ctx.check_cc(lib='zdll', mandatory=True, uselib_store='ZLIB')
-	ctx.check_cc(header_name='zlib.h', mandatory=True, uselib_store='ZLIB')
+	if not ctx.check_cfg(package='zlib', atleast_version='1.2.0', args='--cflags --libs', mandatory=False):
+		if not ctx.check_cc(lib='z', mandatory=False, uselib_store='ZLIB'):
+			ctx.check_cc(lib='zdll', mandatory=True, uselib_store='ZLIB')
+		ctx.check_cc(header_name='zlib.h', mandatory=True, uselib_store='ZLIB')
 
 	# SQLite
 	if not ctx.check_cfg(package='sqlite3', atleast_version='3.6.0', args='--cflags --libs', uselib_store='SQLITE', mandatory=False):
