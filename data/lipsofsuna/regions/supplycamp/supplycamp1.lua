@@ -1,6 +1,7 @@
 Pattern{
 	name = "supplycamp1",
 	size = Vector(32,8,32),
+	position = Vector(100,1300,800),
 	categories = {},
 	obstacles = {
 		{12.020000,0.990000,8.710000,"entrance to suna dungeons"}},

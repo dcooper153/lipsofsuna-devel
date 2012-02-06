@@ -215,7 +215,7 @@ Editor.load = function(self, name)
 	end
 	-- Load the pattern.
 	self.pattern = pattern
-	self.origin = Vector(100,100,100)
+	self.origin = pattern.position or Vector(100,100,100)
 	self.size = pattern.size or Vector(10,10,10)
 	local tmp = Object
 	Object = EditorObject
