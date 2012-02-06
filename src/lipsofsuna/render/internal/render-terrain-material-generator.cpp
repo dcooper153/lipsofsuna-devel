@@ -45,6 +45,11 @@ The changes are under the same license as the original OGRE source code.
 #include "OgreHardwarePixelBuffer.h"
 #include "OgreShadowCameraSetupPSSM.h"
 
+/* Vertex compression is only available since 1.8.0 */
+#if OGRE_VERSION_MAJOR >= 1 && OGRE_VERSION_MINOR >= 8
+#define HAVE_TERRAIN_VERTEX_COMPRESSION
+#endif
+
 //---------------------------------------------------------------------
 LIRenTerrainMaterialGenerator::LIRenTerrainMaterialGenerator()
 {
@@ -548,7 +553,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelper::defaultVpParams(
 		}
 	}
 
-#ifdef OGRE_NEWER_VERSION
+#ifdef HAVE_TERRAIN_VERTEX_COMPRESSION
 	if (terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP)
 	{
 		Matrix4 posIndexToObjectSpace;
@@ -649,7 +654,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelper::updateVpParams(
 		params->setNamedConstant("uvMul_" + StringConverter::toString(i), uvMul);
 	}
 
-#ifdef OGRE_NEWER_VERSION
+#ifdef HAVE_TERRAIN_VERTEX_COMPRESSION
 	if (terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP)
 	{
 		Real baseUVScale = 1.0f / (terrain->getSize() - 1);
@@ -793,7 +798,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateVpHead
 {
 	outStream <<
 		"#version 120\n";
-#ifdef OGRE_NEWER_VERSION
+#ifdef HAVE_TERRAIN_VERTEX_COMPRESSION
 	bool compression = terrain->_getUseVertexCompression() && tt != RENDER_COMPOSITE_MAP;
 #else
 	bool compression = false;
@@ -891,12 +896,18 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateVpHead
 	{
 		outStream <<
 			"	vec4 pos;\n"
-			"	pos = posIndexToObjectSpace * vec4(vertex, uv0, 1);\n"
-			"   vec2 uv = vec2(vertex.x * baseUVScale, 1.0 - (vertex.y * baseUVScale));\n";
+			"	pos = posIndexToObjectSpace * vec4(vertex, uv0, 1.0);\n"
+			"   vec2 uv = vec2(vertex.x * baseUVScale, 1.0 - (vertex.y * baseUVScale));\n"
+			"	vec4 worldPos = worldMatrix * pos;\n"
+			"	position = pos;\n";
 	}
-	outStream <<
-		"	vec4 worldPos = worldMatrix * vertex;\n"
-		"	position = vertex;\n";
+	else
+	{
+		outStream <<
+			"   vec2 uv = uv0;\n"
+			"	vec4 worldPos = worldMatrix * vertex;\n"
+			"	position = vertex;\n";
+	}
 
 	if (tt != RENDER_COMPOSITE_MAP)
 	{
@@ -945,9 +956,9 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateVpHead
 			Ogre::uint uvMulIdx = layer / 4;
 
 			outStream <<
-				"	layerUV" << i << ".xy = " << " uv0.xy * uvMul_" << uvMulIdx << "." << getChannel(layer) << ";\n";
+				"	layerUV" << i << ".xy = " << " uv.xy * uvMul_" << uvMulIdx << "." << getChannel(layer) << ";\n";
 			outStream <<
-				"	layerUV" << i << ".zw = " << " uv0.xy * uvMul_" << uvMulIdx << "." << getChannel(layer+1) << ";\n";
+				"	layerUV" << i << ".zw = " << " uv.xy * uvMul_" << uvMulIdx << "." << getChannel(layer+1) << ";\n";
 			
 		}
 	}
@@ -1253,7 +1264,7 @@ void LIRenTerrainMaterialGenerator::SM2Profile::ShaderHelperGLSL::generateVpFoot
 
 	outStream << 
 		"	vertexPos = viewProjMatrix * worldPos;\n"
-		"	uvMisc.xy = uv0.xy;\n";
+		"	uvMisc.xy = uv.xy;\n";
 	outStream <<
 		"	gl_Position = vertexPos;\n";
 
