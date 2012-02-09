@@ -16,8 +16,8 @@ varying vec3 F_tangent;
 varying vec2 F_texcoord;
 varying vec4 F_color;
 varying float F_splatting;
+varying vec3 F_eyev;
 varying vec3 F_lightv[LIGHTS];
-varying vec3 F_lighthv[LIGHTS];
 varying vec4 F_shadow[LIGHTS];
 
 void main()
@@ -28,11 +28,10 @@ void main()
 	F_color = colour;
 	F_splatting = 1.0 - colour.a;
 	gl_Position = LOS_matrix_modelviewproj * vec4(vertex,1.0);
-	vec3 eye_dir = normalize(LOS_camera_position - vertex.xyz);
+	F_eyev = normalize(LOS_camera_position - vertex.xyz);
 	for(int i = 0 ; i < LIGHTS ; i++)
 	{
 		F_lightv[i] = LOS_light_position[i].xyz - (vertex.xyz * LOS_light_position[i].w);
-		F_lighthv[i] = normalize(F_lightv[i]) + eye_dir.xyz;
 		F_shadow[i] = LOS_matrix_shadow[i] * vec4(vertex,1.0);
 	}
 }

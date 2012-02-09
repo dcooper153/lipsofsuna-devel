@@ -69,7 +69,6 @@ else
 end
 
 Program.profiling = {}
-Render.scene_ambient = {0.2,0.2,0.2}
 
 -- Initialize the map.
 -- Graphics and lighting in particulat need to be initialized before this

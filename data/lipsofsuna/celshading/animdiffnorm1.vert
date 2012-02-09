@@ -16,8 +16,8 @@ attribute vec4 blendWeights;
 varying vec3 F_normal;
 varying vec3 F_tangent;
 varying vec2 F_texcoord;
+varying vec3 F_eyev;
 varying vec3 F_lightv[LIGHTS];
-varying vec3 F_lighthv[LIGHTS];
 
 void LOS_skeletal_animation(
 	in vec3 vertex, in vec3 normal, in vec3 tangent, in mat4 inverse,
@@ -48,10 +48,9 @@ void main()
 		LOS_matrix_world_inverse, t_vertex, F_normal, F_tangent);
 	F_texcoord = uv0;
 	gl_Position = LOS_matrix_modelviewproj * vec4(t_vertex,1.0);
-	vec3 eye_dir = normalize(LOS_camera_position - t_vertex.xyz);
+	F_eyev = normalize(LOS_camera_position - vertex.xyz);
 	for(int i = 0 ; i < LIGHTS ; i++)
 	{
-		F_lightv[i] = LOS_light_position[i].xyz - (t_vertex.xyz * LOS_light_position[i].w);
-		F_lighthv[i] = normalize(F_lightv[i]) + eye_dir.xyz;
+		F_lightv[i] = LOS_light_position[i].xyz - (vertex.xyz * LOS_light_position[i].w);
 	}
 }

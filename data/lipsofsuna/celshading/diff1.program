@@ -17,7 +17,7 @@ fragment_program diff1_frag glsl
 	preprocessor_defines LIGHTS=3
 	default_params
 	{
-		param_named LOS_material_celshading float4 1.0 1.0 0.8 0.9
+		param_named LOS_material_celshading float4 1.0 1.0 0.9 0.9
 		param_named LOS_diffuse_texture_0 int 0
 		param_named LOS_diffuse_texture_1 int 1
 		param_named LOS_diffuse_texture_2 int 2

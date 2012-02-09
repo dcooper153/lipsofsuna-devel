@@ -22,11 +22,13 @@ material terrain1
 			}
 			texture_unit
 			{
-				content_type shadow
+				texture celramp1.png 1d
+				tex_address_mode clamp
 			}
 			texture_unit
 			{
-				content_type shadow
+				texture celramp2.png 1d
+				tex_address_mode clamp
 			}
 			texture_unit
 			{

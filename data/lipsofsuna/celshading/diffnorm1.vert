@@ -12,8 +12,8 @@ attribute vec2 uv0;
 varying vec3 F_normal;
 varying vec3 F_tangent;
 varying vec2 F_texcoord;
+varying vec3 F_eyev;
 varying vec3 F_lightv[LIGHTS];
-varying vec3 F_lighthv[LIGHTS];
 
 void main()
 {
@@ -21,10 +21,9 @@ void main()
 	F_tangent = tangent;
 	F_texcoord = uv0;
 	gl_Position = LOS_matrix_modelviewproj * vec4(vertex,1.0);
-	vec3 eye_dir = normalize(LOS_camera_position - vertex.xyz);
+	F_eyev = normalize(LOS_camera_position - vertex.xyz);
 	for(int i = 0 ; i < LIGHTS ; i++)
 	{
 		F_lightv[i] = LOS_light_position[i].xyz - (vertex.xyz * LOS_light_position[i].w);
-		F_lighthv[i] = normalize(F_lightv[i]) + eye_dir.xyz;
 	}
 }

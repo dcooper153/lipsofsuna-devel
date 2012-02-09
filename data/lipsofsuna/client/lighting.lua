@@ -2,9 +2,11 @@ Lighting = Class()
 Lighting.class_name = "Lighting"
 
 Lighting.init = function(self)
-	self.light_global = Light{diffuse={1,1,1,1}, directional = true, equation={1.3,0,0}, shadow_casting = true}
+	self.light_global = Light{diffuse={1,1,1,1}, directional = true, equation={1.9,0,0},
+	 shadow_casting = true}
 	--, spot_cutoff = 1.5, spot_exponent = 127}
 	self.light_spell = Light{diffuse={1,1,1,1}, equation={1.5,0,0.05}}
+	Render.scene_ambient = {0.5,0.5,0.5}
 end
 
 Lighting.update = function(self, secs)

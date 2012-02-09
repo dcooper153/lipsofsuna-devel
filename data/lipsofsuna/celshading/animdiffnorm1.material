@@ -6,7 +6,7 @@ material animdiffnorm1
 		pass LOS1
 		{
 			max_lights 3
-			ambient 0.3 0.3 0.3
+			ambient 0.7 0.7 0.7
 			diffuse 1.0 1.0 1.0
 			specular 1.0 1.0 1.0 1.0 64
 			texture_unit LOS1
