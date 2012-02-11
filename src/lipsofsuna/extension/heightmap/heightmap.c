@@ -106,5 +106,100 @@ void liext_heightmap_free (
 	lisys_free (self);
 }
 
+int liext_heightmap_get_height (
+	LIExtHeightmap* self,
+	float           x,
+	float           z,
+	int             clamp,
+	float*          result)
+{
+	float local_x;
+	float local_z;
+	int vx;
+	int vz;
+	float bx;
+	float bz;
+	int i;
+	int j;
+	float h;
+	LIMatPlane plane;
+	LIMatVector v[2][2];
+	LIMatVector src;
+	LIMatVector dst;
+	LIMatVector res;
+
+	/* Translate and scale the point to the heightmap space. */
+	/* The space between two vertices is one unit and the first vertex is at the origin. */
+	local_x = (x - self->position.x) / self->spacing + 0.5f * (self->size - 1);
+	local_z = (z - self->position.z) / self->spacing + 0.5f * (self->size - 1);
+
+	/* Clamp the point to terrain bounds if clamping is enabled.
+	   Otherwise, return 0 to indicate a miss. */
+	if (clamp)
+	{
+		local_x = LIMAT_MAX (0.0f, local_x);
+		local_z = LIMAT_MAX (0.0f, local_z);
+		local_x = LIMAT_MIN (self->size - 0.001f, local_x);
+		local_z = LIMAT_MIN (self->size - 0.001f, local_z);
+	}
+	else if (local_x < 0.0f || local_x >= self->size ||
+	         local_z < 0.0f || local_z >= self->size)
+		return 0;
+
+	/* Calculate the position relative to the four nearby vertices. */
+	/* At this point, it's guaranteed that there's at least one more
+	   vertex available along both axes. Hence, we can interpolate
+	   without worrying about going out of bounds. */
+	vx = (int) local_x;
+	vz = (int) local_z;
+	bx = local_x - vx;
+	bz = local_z - vz;
+
+	/* Calculate the positions of the four vertices. */
+	/* Since only Y needs to be in the world space, we can set X and Z
+	   to the [0,1] range and use the sampling position within the quad
+	   when calculating the plane intersection. */
+	for (j = 0 ; j < 2 ; j++)
+	{
+		for (i = 0 ; i < 2 ; i++)
+		{
+			h = self->position.y + self->heights[(vx + i) + (vz + j) * self->size];
+			v[i][j] = limat_vector_init (i, h, j);
+		}
+	}
+
+	/* The way how the quad is triangulated depends on the row index
+	   due to the triangulation scheme used by Ogre and Bullet. We use
+	   the algorithm from Bullet source code. */
+	if (!(vz % 2))
+	{
+		/* 3---2
+		   | / | Even rows.
+		   0---1 */
+		if (bz > bx)
+			limat_plane_init_from_points (&plane, &(v[0][0]), &(v[1][1]), &(v[0][1]));
+		else
+			limat_plane_init_from_points (&plane, &(v[0][0]), &(v[1][0]), &(v[1][1]));
+	}
+	else
+	{
+		/* 3---2
+		   | \ | Odd rows.
+		   0---1 */
+		if (1.0 - bz > bx)
+			limat_plane_init_from_points (&plane, &(v[0][0]), &(v[1][0]), &(v[0][1]));
+		else
+			limat_plane_init_from_points (&plane, &(v[1][0]), &(v[1][1]), &(v[0][1]));
+	}
+
+	/* Solve the height with a plane intersection. */
+	src = limat_vector_init (bx, 0.0, bz);
+	dst = limat_vector_init (bx, 1.0, bz);
+	limat_plane_intersects_line (&plane, &src, &dst, &res);
+	*result = res.y;
+
+	return 1;
+}
+
 /** @} */
 /** @} */

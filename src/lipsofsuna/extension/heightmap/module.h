@@ -43,16 +43,23 @@ struct _LIExtHeightmap
 	LIMatVector position;
 };
 
-LIExtHeightmap* liext_heightmap_new (
+LIAPICALL (LIExtHeightmap*, liext_heightmap_new, (
 	LIExtHeightmapModule* module,
 	LIImgImage*           image,
 	const LIMatVector*    position,
 	int                   size,
 	float                 spacing,
-	float                 scaling);
+	float                 scaling));
 
-void liext_heightmap_free (
-	LIExtHeightmap* self);
+LIAPICALL (void, liext_heightmap_free, (
+	LIExtHeightmap* self));
+
+LIAPICALL (int, liext_heightmap_get_height, (
+	LIExtHeightmap* self,
+	float           x,
+	float           z,
+	int             clamp,
+	float*          result));
 
 /*****************************************************************************/
 
@@ -76,15 +83,15 @@ struct _LIExtHeightmapModule
 	LIExtHeightmapHooks* render_hooks;
 };
 
-LIExtHeightmapModule* liext_heightmap_module_new (
-	LIMaiProgram* program);
+LIAPICALL (LIExtHeightmapModule*, liext_heightmap_module_new, (
+	LIMaiProgram* program));
 
-void liext_heightmap_module_free (
-	LIExtHeightmapModule* self);
+LIAPICALL (void, liext_heightmap_module_free, (
+	LIExtHeightmapModule* self));
 
 /*****************************************************************************/
 
-void liext_script_heightmap (
-	LIScrScript* self);
+LIAPICALL (void, liext_script_heightmap, (
+	LIScrScript* self));
 
 #endif

@@ -85,12 +85,27 @@ static void Heightmap_new (LIScrArgs* args)
 	liscr_args_seti_stack (args);
 }
 
+static void Heightmap_get_height (LIScrArgs* args)
+{
+	int clamp = 1;
+	float height;
+	LIMatVector vector;
+
+	if (!liscr_args_geti_vector (args, 0, &vector))
+		return;
+	liscr_args_geti_bool (args, 1, &clamp);
+
+	if (liext_heightmap_get_height (args->self, vector.x, vector.z, clamp, &height))
+		liscr_args_seti_float (args, height);
+}
+
 /*****************************************************************************/
 
 void liext_script_heightmap (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_HEIGHTMAP, "heightmap_new", Heightmap_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_HEIGHTMAP, "heightmap_get_height", Heightmap_get_height);
 }
 
 /** @} */

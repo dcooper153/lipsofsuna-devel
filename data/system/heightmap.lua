@@ -35,3 +35,12 @@ end
 
 Heightmap.add_texture_layer = function()
 end
+
+--- Gets the height of the heightmap at the given point.
+-- @param self Heightmap.
+-- @param point Point in world space. X and Z values are used.
+-- @param clamp False to disable clamping.
+-- @return World space Y value.
+Heightmap.get_height = function(self, point, clamp)
+	return Los.heightmap_get_height(self.handle, point.handle, clamp)
+end
