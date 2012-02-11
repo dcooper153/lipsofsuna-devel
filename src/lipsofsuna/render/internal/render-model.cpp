@@ -39,7 +39,7 @@ static void private_create_mesh (
 	LIRenModel* self,
 	LIMdlModel* model);
 
-static void private_create_skeleton (
+static int private_create_skeleton (
 	LIRenModel* self,
 	LIMdlModel* model);
 
@@ -427,10 +427,19 @@ static void private_create_mesh (
 
 	/* Create a skeleton if needed. */
 	if (model->weight_groups.count)
-		private_create_skeleton (self, model);
+	{
+		if (!private_create_skeleton (self, model))
+		{
+			/* If creating the skeleton failed due to too many bones, disable
+			   the mesh completely to avoid exploding vertices. */
+			for (int i = self->mesh->getNumSubMeshes () - 1 ; i >= 0 ; i--)
+				self->mesh->destroySubMesh (i);
+			self->mesh->load ();
+		}
+	}
 }
 
-static void private_create_skeleton (
+static int private_create_skeleton (
 	LIRenModel* self,
 	LIMdlModel* model)
 {
@@ -444,7 +453,7 @@ static void private_create_skeleton (
 	if (model->weight_groups.count > 32)
 	{
 		printf ("WARNING: too many weighted bones: %d/%d!\n", model->weight_groups.count, 32);
-		return;
+		return 0;
 	}
 
 	/* Create the skeleton. */
@@ -481,6 +490,8 @@ static void private_create_skeleton (
 
 	/* Assign the skeleton to the mesh. */
 	self->mesh->_notifySkeleton (skeleton);
+
+	return 1;
 }
 
 static bool private_check_material_override (
