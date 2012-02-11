@@ -106,7 +106,7 @@ Utils.find_spawn_point = function(clss, point)
 	-- Find an empty tile.
 	local t,c = Voxel:find_tile{match = "empty", point = point, radius = Voxel.tile_size}
 	if not t then return end
-	-- Find the floor.
+	-- Find the voxel floor.
 	for i=1,3 do
 		if Voxel:get_tile(c + Vector(0,-i)) ~= 0 then
 			local p = c + Vector(0,1-i)
@@ -120,6 +120,12 @@ Utils.find_spawn_point = function(clss, point)
 				return (p + Vector(0.5,0.5,0.5)) * Voxel.tile_size
 			end
 		end
+	end
+	-- Find the heightmap floor.
+	-- FIXME: Doesn't check if there are voxels blocking the point.
+	local hm = Map.heightmap:get_height(point, false)
+	if hm and point.y - 1 < hm and hm < point.y + 0.1 then
+		return point
 	end
 end
 
