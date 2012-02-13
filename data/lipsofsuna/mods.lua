@@ -76,6 +76,7 @@ Mod:load "environment/mines"
 Mod:load "environment/portal"
 Mod:load "environment/sky"
 Mod:load "environment/terrain"
+Mod:load "environment/voxel"
 Mod:load "environment/wood"
 
 -- Miscellaneous
