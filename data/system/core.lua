@@ -136,6 +136,10 @@ end
 -- @name Program.args
 -- @class table
 
+--- Short term average frames per second.
+-- @name Program.fps
+-- @class table
+
 --- Boolean indicating whether the game needs to exit.
 -- @name Program.quit
 -- @class table
@@ -162,6 +166,7 @@ end
 
 Program.class_getters = {
 	args = function(s) return Los.program_get_args() end,
+	fps = function(s) return Los.program_get_fps() end,
 	quit = function(s) return Los.program_get_quit() end,
 	sectors = function(s) return Los.program_get_sectors() end,
 	sector_size = function(s) return Los.program_get_sector_size() end,

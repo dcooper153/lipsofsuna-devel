@@ -221,6 +221,14 @@ static void Program_get_args (LIScrArgs* args)
 	liscr_args_seti_string (args, program->args);
 }
 
+static void Program_get_fps (LIScrArgs* args)
+{
+	LIMaiProgram* program;
+
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	liscr_args_seti_float (args, program->fps);
+}
+
 static void Program_get_quit (LIScrArgs* args)
 {
 	LIMaiProgram* program;
@@ -313,6 +321,7 @@ void liscr_script_program (
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_update", Program_update);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_wait", Program_wait);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_args", Program_get_args);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_fps", Program_get_fps);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_quit", Program_get_quit);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_set_quit", Program_set_quit);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_sectors", Program_get_sectors);

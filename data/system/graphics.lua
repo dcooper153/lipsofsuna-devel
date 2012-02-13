@@ -57,10 +57,6 @@ end
 -- @name Program.camera_rotation
 -- @class table
 
---- Short term average frames per second.
--- @name Program.fps
--- @class table
-
 --- Gets the version of the OpenGL renderer used.
 -- @name Program.opengl_version
 -- @class table
@@ -82,7 +78,6 @@ Program:add_class_getters{
 	camera_near = function(s) return rawget(s, "__camera_near") or 0.1 end,
 	camera_position = function(s) return rawget(s, "__camera_position") or Vector() end,
 	camera_rotation = function(s) return rawget(s, "__camera_rotation") or Quaternion() end,
-	fps = function(s) return Los.program_get_fps() end,
 	opengl_version = function(s) return Los.program_get_opengl_version() end,
 	video_mode = function(s) return Los.program_get_video_mode() end,
 	video_modes = function(s) return Los.program_get_video_modes() end,

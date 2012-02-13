@@ -78,14 +78,6 @@ static void Program_screenshot (LIScrArgs* args)
 	lisys_free (file);
 }
 
-static void Program_get_fps (LIScrArgs* args)
-{
-	LIExtGraphics* module;
-
-	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
-	liscr_args_seti_float (args, module->program->fps);
-}
-
 static void Program_get_opengl_version (LIScrArgs* args)
 {
 	float v;
@@ -182,7 +174,6 @@ void liext_script_graphics (
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_measure_text", Program_measure_text);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_screenshot", Program_screenshot);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_set_video_mode", Program_set_video_mode);
-	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_fps", Program_get_fps);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_opengl_version", Program_get_opengl_version);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_set_title", Program_set_title);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_video_mode", Program_get_video_mode);
