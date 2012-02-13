@@ -143,6 +143,8 @@ static void Render_set_skybox (LIScrArgs* args)
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
 	if (liscr_args_geti_string (args, 0, &value))
 		liren_render_set_skybox (module->render, value);
+	else
+		liren_render_set_skybox (module->render, NULL);
 }
 
 /*****************************************************************************/

@@ -660,9 +660,17 @@ void liren_internal_set_skybox (
 	const char*  value)
 {
 	if (value != NULL)
-		self->data->scene_manager->setSkyBox (true, value, 10.0f, true);
-	else
-		self->data->scene_manager->setSkyBox (false, "");
+	{
+		try
+		{
+			self->data->scene_manager->setSkyBox (true, value, 10.0f, true);
+			return;
+		}
+		catch (...)
+		{
+		}
+	}
+	self->data->scene_manager->setSkyBox (false, "");
 }
 
 void liren_internal_set_title (
