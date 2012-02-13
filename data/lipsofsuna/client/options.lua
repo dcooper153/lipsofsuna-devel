@@ -23,6 +23,7 @@ Options.new = function(clss)
 	self.sound_volume = 1.0
 	self.music_volume = 0.1
 	self.view_distance = 5000
+	self.view_distance_underground = 30
 	-- Read values from the configuration file.
 	self.config = ConfigFile{name = "options.cfg"}
 	local opts = {
@@ -43,6 +44,7 @@ Options.new = function(clss)
 		sound_volume = {"float", 0, 1},
 		transparency_quality = {"float", 0, 1},
 		view_distance = {"float", 10, 1000000},
+		view_distance_underground = {"float", 5, 1000000},
 		vsync = {"bool"},
 		window_height = {"int", 32, 65536},
 		window_width = {"int", 32, 65536}}
@@ -112,6 +114,7 @@ Options.save = function(self)
 	write("sound_volume", self.sound_volume)
 	write("transparency_quality", self.transparency_quality)
 	write("view_distance", self.view_distance)
+	write("view_distance_underground", self.view_distance_underground)
 	write("vsync", self.vsync)
 	write("window_height", self.window_height)
 	write("window_width", self.window_width)

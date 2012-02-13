@@ -113,6 +113,9 @@ Client.update = function(self, secs)
 			local overworld = (player_y > overworld_y)
 			Map.heightmap.visible = overworld
 			Lighting:set_dungeon_mode(not overworld)
+			local wd = overworld and Options.inst.view_distance or Options.inst.view_distance_underground
+			self.camera1.far = wd
+			self.camera3.far = wd
 		end
 	end
 end
