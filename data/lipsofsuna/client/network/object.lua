@@ -96,7 +96,7 @@ Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
 		end
 		if weapon and weapon.effect_attack_speedline then
 			local w = obj.slots:get_object{slot = anim.slot}
-			if w then w.speedline = Speedline{delay = 0.3, duration = 0.8, object = w} end
+			if w then w:add_speedline{delay = 0.3, duration = 0.8} end
 		end
 	end
 	-- Melee feats may further override the animation since controls affect
@@ -383,7 +383,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	o.realized = true
 	-- Initialize speed lines.
 	if Bitwise:band(flags, Protocol.object_flags.SPEEDLINE) ~= 0 then
-		o.speedline = Speedline{object = o}
+		o:add_speedline()
 	end
 end}
 

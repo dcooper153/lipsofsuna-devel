@@ -5,6 +5,19 @@ Object.ipol_max_error = 20
 Object.dict_active = setmetatable({}, {__mode = "k"})
 Object.physics_position_correction = Vector(0, 0, 0)
 
+Object.add_speedline = function(self, args)
+	-- Remove the old speedline
+	if self.speedline then
+		self.speedline.realized = false
+		self.speedline.duration = 0
+		self.speedline = nil
+	end
+	-- Create the new speedline
+	if not args then args = {} end
+	args.object = self
+	self.speedline = Speedline(args)
+end
+
 Object.animate_spec = function(self, name)
 	return self:set_anim(name)
 end
