@@ -107,6 +107,13 @@ Client.update = function(self, secs)
 	-- FIXME
 	if self.mode == "game" then
 		Gui.scene:update_camera()
+		if self.player_object then
+			local player_y = self.player_object.position.y
+			local overworld_y = Map.heightmap.position.y - 10
+			local overworld = (player_y > overworld_y)
+			Map.heightmap.visible = overworld
+			Lighting:set_dungeon_mode(not overworld)
+		end
 	end
 end
 
