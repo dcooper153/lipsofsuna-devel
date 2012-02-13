@@ -54,6 +54,7 @@ Userdata: %d]], numactive, userdata)
 		end
 	end
 	self.label_database.text = string.format([[
+FPS: %.2f
 Database memory: %d kB
 Script memory: %d kB
 Terrain memory: %d kB
@@ -61,7 +62,7 @@ Model memory: %d kB
 Update tick: %d ms
 Event tick: %d ms
 Render tick: %d ms
-]], Database.memory_used / 1024, gcinfo(), Voxel.memory_used / 1024, models / 1024,
+]], Program.fps, Database.memory_used / 1024, gcinfo(), Voxel.memory_used / 1024, models / 1024,
 1000 * Program.profiling.update, 1000 * Program.profiling.event, 1000 * Program.profiling.render)
 	self.label_database:build()
 end
