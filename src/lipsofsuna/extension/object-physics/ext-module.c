@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -130,17 +130,25 @@ static void private_object_contact (
 
 	if (contact->object1 != NULL)
 	{
+		/* Object -> object */
 		object0 = liphy_object_get_userdata (contact->object0);
 		object1 = liphy_object_get_userdata (contact->object1);
 		limai_program_event (self->program, "object-contact", "impulse", LISCR_TYPE_FLOAT, contact->impulse, "normal", LISCR_SCRIPT_VECTOR, &contact->normal, "object", LISCR_SCRIPT_OBJECT, object1->script, "point", LISCR_SCRIPT_VECTOR, &contact->point, "self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
 	}
-	else
+	else if (contact->terrain != NULL)
 	{
+		/* Object -> voxels */
 		object0 = liphy_object_get_userdata (contact->object0);
 		vector.x = contact->terrain_tile[0];
 		vector.y = contact->terrain_tile[1];
 		vector.z = contact->terrain_tile[2];
 		limai_program_event (self->program, "object-contact", "impulse", LISCR_TYPE_FLOAT, contact->impulse, "normal", LISCR_SCRIPT_VECTOR, &contact->normal,  "point", LISCR_SCRIPT_VECTOR, &contact->point, "tile", LISCR_SCRIPT_VECTOR, &vector, "self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
+	}
+	else
+	{
+		/* Object -> heightmap */
+		object0 = liphy_object_get_userdata (contact->object0);
+		limai_program_event (self->program, "object-contact", "impulse", LISCR_TYPE_FLOAT, contact->impulse, "normal", LISCR_SCRIPT_VECTOR, &contact->normal, "heightmap", LISCR_TYPE_BOOLEAN, 1, "point", LISCR_SCRIPT_VECTOR, &contact->point, "self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
 	}
 }
 

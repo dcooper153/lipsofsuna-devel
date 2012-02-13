@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -469,35 +469,41 @@ static bool private_contact_processed (
 	LIPhyPointer* pointer1;
 	LIPhyContact contact;
 
+	/* Get the userdata pointers. */
+	/* These contain information on the types of the bodies. */
 	pointer0 = (LIPhyPointer*)((btCollisionObject*) body0)->getUserPointer ();
 	pointer1 = (LIPhyPointer*)((btCollisionObject*) body1)->getUserPointer ();
-	if (pointer0 == NULL || pointer1 == NULL)
-	{
-		/* TODO: The user probably wants this reported too. */
-		return false;
-	}
 
 	/* Get contact information. */
+	/* If the userdata is NULL, the body was a heightmap. Otherwise, was
+	   either an object or voxels depending on which one is set in the
+	   struct to which the pointer points. */
 	memset (&contact, 0, sizeof (LIPhyContact));
-	if (pointer0->object)
+	if (pointer0 != NULL)
 	{
-		contact.object0 = (LIPhyObject*) pointer0->pointer;
-		physics = contact.object0->physics;
+		if (pointer0->object)
+		{
+			contact.object0 = (LIPhyObject*) pointer0->pointer;
+			physics = contact.object0->physics;
+		}
+		else
+		{
+			contact.terrain = (LIPhyTerrain*) pointer0->pointer;
+			memcpy (contact.terrain_tile, pointer0->tile, 3 * sizeof (int));
+		}
 	}
-	else
+	if (pointer1 != NULL)
 	{
-		contact.terrain = (LIPhyTerrain*) pointer0->pointer;
-		memcpy (contact.terrain_tile, pointer0->tile, 3 * sizeof (int));
-	}
-	if (pointer1->object)
-	{
-		contact.object1 = (LIPhyObject*) pointer1->pointer;
-		physics = contact.object1->physics;
-	}
-	else
-	{
-		contact.terrain = (LIPhyTerrain*) pointer1->pointer;
-		memcpy (contact.terrain_tile, pointer1->tile, 3 * sizeof (int));
+		if (pointer1->object)
+		{
+			contact.object1 = (LIPhyObject*) pointer1->pointer;
+			physics = contact.object1->physics;
+		}
+		else
+		{
+			contact.terrain = (LIPhyTerrain*) pointer1->pointer;
+			memcpy (contact.terrain_tile, pointer1->tile, 3 * sizeof (int));
+		}
 	}
 
 	/* Make sure that the contact involved at least one object with a contact
