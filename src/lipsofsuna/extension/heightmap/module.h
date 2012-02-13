@@ -33,6 +33,7 @@ struct _LIExtHeightmap
 {
 	int id;
 	int size;
+	int visible;
 	float min;
 	float max;
 	float spacing;

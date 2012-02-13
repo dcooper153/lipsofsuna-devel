@@ -57,6 +57,14 @@ static void Heightmap_rebuild (LIScrArgs* args)
 	liext_heightmap_rebuild (args->self);
 }
 
+static void Heightmap_set_visible (LIScrArgs* args)
+{
+	int value;
+
+	if (liscr_args_geti_bool (args, 0, &value))
+		liext_heightmap_set_visible (args->self, value);
+}
+
 /*****************************************************************************/
 
 void liext_script_heightmap_render (
@@ -64,6 +72,7 @@ void liext_script_heightmap_render (
 {
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_HEIGHTMAP, "heightmap_add_texture_layer", Heightmap_add_texture_layer);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_HEIGHTMAP, "heightmap_rebuild", Heightmap_rebuild);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_HEIGHTMAP, "heightmap_set_visible", Heightmap_set_visible);
 }
 
 /** @} */

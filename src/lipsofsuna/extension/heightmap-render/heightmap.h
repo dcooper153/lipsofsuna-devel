@@ -33,4 +33,8 @@ LIAPICALL (int, liext_heightmap_add_texture_layer, (
 LIAPICALL (void, liext_heightmap_rebuild, (
 	LIExtHeightmap* self));
 
+LIAPICALL (void, liext_heightmap_set_visible, (
+	LIExtHeightmap* self,
+	int             value));
+
 #endif

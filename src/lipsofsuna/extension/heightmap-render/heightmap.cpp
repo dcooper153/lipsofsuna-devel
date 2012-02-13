@@ -142,3 +142,27 @@ void liext_heightmap_rebuild (
 	terrain->dirty ();
 	terrain->update ();
 }
+
+/**
+ * \brief Rebuilds the heightmap.
+ * \param self Heightmap.
+ */
+void liext_heightmap_set_visible (
+	LIExtHeightmap* self,
+	int             value)
+{
+	if (self->visible == value)
+		return;
+	self->visible = value;
+	Ogre::TerrainGroup* group = (Ogre::TerrainGroup*) self->render_data;
+	Ogre::TerrainGroup::TerrainIterator iter = group->getTerrainIterator ();
+	while (iter.hasMoreElements ())
+	{
+		Ogre::TerrainGroup::TerrainSlot* slot = iter.getNext ();
+		Ogre::Terrain* terrain = slot->instance;
+		if (value)
+			terrain->setVisibilityFlags (0xFFFFFFFF);
+		else
+			terrain->setVisibilityFlags (0);
+	}
+}

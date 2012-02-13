@@ -24,3 +24,19 @@ end
 Heightmap.rebuild = function(self)
 	Los.heightmap_rebuild(self.handle)
 end
+
+--- Toggles the visibility of the heightmap.
+-- @name Heightmap.visible
+-- @class table
+
+Heightmap:add_getters{
+	visible = function(self)
+		local v = rawget(self, "__visible")
+		return v ~= nil and v or true
+	end}
+
+Heightmap:add_setters{
+	visible = function(self, value)
+		rawset(self, "__visible", value)
+		Los.heightmap_set_visible(self.handle, value)
+	end}

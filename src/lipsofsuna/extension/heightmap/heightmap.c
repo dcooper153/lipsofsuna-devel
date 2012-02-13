@@ -47,6 +47,7 @@ LIExtHeightmap* liext_heightmap_new (
 	self->spacing = spacing;
 	self->min = 0.0f;
 	self->max = scaling;
+	self->visible = 1;
 
 	/* Allocate heights. */
 	if (size)
