@@ -52,6 +52,7 @@ LIRenObject* liren_object_new (
 	if (self == NULL)
 		return NULL;
 	self->render = render;
+	self->visible = 0;
 	self->shadow_casting = 0;
 
 	/* Choose a unique ID. */
@@ -392,6 +393,13 @@ int liren_object_set_model (
 	if (self->entity != NULL)
 		self->entity->setCastShadows (self->shadow_casting);
 
+	/* Set entity visibility. */
+	/* If a visible entity is added to a hidden scene node, the entity is
+	   still rendered. Hence, newly added entities needs to be explicitly
+	   hidden or Ogre will render our invisible objects. */
+	if (self->entity != NULL)
+		self->entity->setVisible (self->visible);
+
 	/* Mark all bones as manually controlled. */
 	if (self->entity != NULL)
 	{
@@ -465,6 +473,7 @@ int liren_object_set_realized (
 	LIRenObject* self,
 	int          value)
 {
+	self->visible = value;
 	self->node->setVisible (value);
 	return 1;
 }

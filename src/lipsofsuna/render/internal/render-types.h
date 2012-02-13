@@ -76,6 +76,7 @@ struct _LIRenModel
 struct _LIRenObject
 {
 	int id;
+	int visible;
 	int shadow_casting;
 	LIMatTransform transform;
 	LIMdlPose* pose;
