@@ -1,0 +1,15 @@
+material shadowcaster1
+{
+	technique 
+	{
+		pass
+		{
+			vertex_program_ref shadowcasteralpha1_vp
+			{
+			}
+			fragment_program_ref shadowcasteralpha1_fp
+			{
+			}
+		}
+	}
+}

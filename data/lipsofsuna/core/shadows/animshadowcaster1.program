@@ -1,6 +1,6 @@
-vertex_program animshadow_vert glsl
+vertex_program animshadowcaster1_vp glsl
 {
-	source animshadow.vert
+	source animshadowcaster1.vert
 	preprocessor_defines BONES=32
 	includes_skeletal_animation true
 	default_params

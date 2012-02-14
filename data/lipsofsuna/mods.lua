@@ -1,5 +1,6 @@
 -- Core
 Mod:load "core"
+Mod:load "core/shadows"
 Mod:load "server"
 Mod:load "client"
 

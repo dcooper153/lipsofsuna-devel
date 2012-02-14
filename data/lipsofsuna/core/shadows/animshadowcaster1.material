@@ -1,0 +1,15 @@
+material animshadowcaster1
+{
+	technique 
+	{
+		pass
+		{
+			vertex_program_ref animshadowcaster1_vp
+			{
+			}
+			fragment_program_ref shadowcaster1_fp
+			{
+			}
+		}
+	}
+}

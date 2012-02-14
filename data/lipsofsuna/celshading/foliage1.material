@@ -3,6 +3,7 @@ material foliage1
 	receive_shadows off
 	technique
 	{
+		shadow_caster_material shadowcaster1
 		pass LOS1
 		{
 			max_lights 3
@@ -31,9 +32,6 @@ material foliage1
 			{
 			}
 			fragment_program_ref diffnorm1_frag
-			{
-			}
-			shadow_caster_vertex_program_ref shadow_vert
 			{
 			}
 		}

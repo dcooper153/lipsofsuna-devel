@@ -8,6 +8,8 @@ attribute vec3 vertex;
 attribute vec4 blendIndices;
 attribute vec4 blendWeights;
 
+varying vec2 F_depth;
+
 void LOS_skeletal_animation_nonortan(
 	in vec3 vertex, in mat4 inverse,
 	out vec3 vertex_res)
@@ -25,9 +27,11 @@ void LOS_skeletal_animation_nonortan(
 	}
 	vertex_res = (inverse * vec4(v / total, 1.0)).xyz;
 }
+
 void main()
 {
 	vec3 t_vertex;
 	LOS_skeletal_animation_nonortan(vertex, LOS_matrix_world_inverse, t_vertex);
 	gl_Position = LOS_matrix_modelviewproj * vec4(t_vertex,1.0);
+	F_depth = gl_Position.zw;
 }
