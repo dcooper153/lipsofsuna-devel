@@ -19,7 +19,7 @@ if not Settings then
 	require "common/staticspec"
 	require "common/quest"
 else
-	Voxel.blocks_per_line = 2
+	Voxel.blocks_per_line = 1
 	Voxel.tiles_per_line = 12
 	require "common/actionspec"
 	require "common/color"
