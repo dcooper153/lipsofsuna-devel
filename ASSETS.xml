@@ -1,0 +1,1423 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+This file contains attribution and license information for non-script files
+in the data directory. The rest of the files are licensed under the same
+license as the source code of the game (GNU LGPL 3.0 or newer).
+
+Originals generally aren't included to the package. This mainly applies
+to Blender models and PNG originals of DDS files. Such files are start
+with 'import/' and can be downloaded from the Lips of Suna data repository.
+-->
+
+<assets>
+
+  <!-------------------------------------------------------------------------->
+  <!-- Authors -->
+
+  <author-info>
+    <name>Harald</name>
+  </author-info>
+  <author-info>
+    <name>Andrew Kator &amp; Jennifer Legaz</name>
+    <url>http://www.katorlegaz.com/3d_models/</url>
+  </author-info>
+  <author-info>
+    <name>Antique Military Rifles</name>
+    <url>http://www.flickr.com/photos/36224933@N07/</url>
+  </author-info>
+  <author-info>
+    <name>Ari Mustonen</name>
+    <email>amuzen@users.sourceforge.net</email>
+    <url>http://lipsofsuna.org/</url>
+  </author-info>
+  <author-info>
+    <name>Bart Kelsey</name>
+    <url>http://opengameart.org/</url>
+  </author-info>
+  <author-info>
+    <name>Bitiquinho</name>
+    <url>http://opengameart.org/user/773</url>
+  </author-info>
+  <author-info>
+    <name>Blender Open Model Repository</name>
+    <url>http://blendermodels.org/license.html</url>
+  </author-info>
+  <author-info>
+    <name>Brian Rocz</name>
+    <url>http://3dblenderstuff.wordpress.com/</url>
+  </author-info>
+  <author-info>
+    <name>Clint Bellanger</name>
+    <url>http://pfunked.deviantart.com/</url>
+  </author-info>
+  <author-info>
+    <name>Dim</name>
+  </author-info>
+  <author-info>
+    <name>Dm3d</name>
+    <url>http://opengameart.org/user/933</url>
+  </author-info>
+  <author-info>
+    <name>Georges Grondin</name>
+  </author-info>
+  <author-info>
+    <name>Henrique Lazarini</name>
+    <url>http://ails.deviantart.com/</url>
+  </author-info>
+  <author-info>
+    <name>Independent.nu</name>
+    <url>http://www.johannespinter.com/inu/ljudbank.htm</url>
+  </author-info>
+  <author-info>
+    <name>Julius</name>
+    <url>http://opengameart.org/user/99</url>
+  </author-info>
+  <author-info>
+    <name>Kabraxis</name>
+  </author-info>
+  <author-info>
+    <name>Lamoot</name>
+    <url>http://opengameart.org/user/209</url>
+  </author-info>
+  <author-info>
+    <name>Lauris Kaplinski</name>
+    <url>http://khayyam.kaplinski.com/</url>
+  </author-info>
+  <author-info>
+    <name>Martin Frydenlund</name>
+  </author-info>
+  <author-info>
+    <name>Michel Baradari</name>
+    <url>http://apollo-music.de</url>
+  </author-info>
+  <author-info>
+    <name>Millz</name>
+  </author-info>
+  <author-info>
+    <name>Mysteryem</name>
+    <url>http://www.mysterymayhem.co.uk/</url>
+  </author-info>
+  <author-info>
+    <name>Peragro Tempus Project</name>
+    <url>http://peragro.org/</url>
+  </author-info>
+  <author-info>
+    <name>Scopia Visual Interfaces Systems, s.l.</name>
+    <url>http://www.scopia.es/</url>
+  </author-info>
+  <author-info>
+    <name>SenshiStock</name>
+  </author-info>
+  <author-info>
+    <name>Tranberry</name>
+    <url>http://tranberry.se/</url>
+  </author-info>
+  <author-info>
+    <name>Unknown</name>
+  </author-info>
+  <author-info>
+    <name>WeaponGuy</name>
+    <url>http://opengameart.org/user/301</url>
+  </author-info>
+  <author-info>
+    <name>adrix89</name>
+  </author-info>
+  <author-info>
+    <name>anonymous</name>
+    <url>http://www.blendswap.com/3D-models/author/anonymous/</url>
+  </author-info>
+  <author-info>
+    <name>hiponboy</name>
+    <url>http://opengameart.org/user/783</url>
+  </author-info>
+  <author-info>
+    <name>johndh</name>
+    <url>http://opengameart.org/user/681</url>
+  </author-info>
+  <author-info>
+    <name>major4zmeakrob</name>
+  </author-info>
+  <author-info>
+    <name>solvalou</name>
+    <url>http://opengameart.org/users/solvalou</url>
+  </author-info>
+  <author-info>
+    <name>sunburn</name>
+    <url>http://opengameart.org/user/394</url>
+  </author-info>
+  <author-info>
+    <name>thecubber</name>
+  </author-info>
+  <author-info>
+    <name>tidbit (Joseph)</name>
+  </author-info>
+  <author-info>
+    <name>titus tscharntk</name>
+  </author-info>
+  <author-info>
+    <name>yughues</name>
+    <url>http://opengameart.org/user/1170</url>
+  </author-info>
+  <author-info>
+    <name>jute</name>
+  </author-info>
+  <author-info>
+    <name>zero-project</name>
+    <url>http://www.zero-project.gr/</url>
+  </author-info>
+  <author-info>
+    <name>Francisco "FreeLikeGNU" Athens</name>
+    <url>http://freelikegnu.org</url>
+  </author-info>
+  <author-info>
+    <name>SkiingPenguins</name>
+  </author-info>
+
+  <!-------------------------------------------------------------------------->
+  <!-- Licenses -->
+
+  <license-info>
+    <name>CC0</name>
+    <url>http://creativecommons.org/publicdomain/zero/1.0/</url>
+  </license-info>
+  <license-info>
+    <name>Creative Commons BY 3.0</name>
+    <url>http://creativecommons.org/licenses/by/3.0/</url>
+  </license-info>
+  <license-info>
+    <name>Creative Commons BY-SA 3.0</name>
+    <url>http://creativecommons.org/licenses/by-sa/3.0/</url>
+  </license-info>
+
+  <!-------------------------------------------------------------------------->
+  <!-- Assets -->
+
+  <asset>
+    <file>concept/aer1.xcf</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>concept/logo.svg</file>
+    <author>Tranberry</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+  
+  <asset>
+    <file>data/lipsofsuna/sounds/stepdirt_2.ogg</file>
+    <author>jute</author>
+    <license>GPL2 or 3</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/aer/*.lmdl</file>
+    <file>data/lipsofsuna/actors/aer/*.dds</file>
+    <file>import/aer1.blend</file>
+    <file>import/aer1.png</file>
+    <file>import/aer1n.png</file>
+    <file>import/eye1.png</file>
+    <file>import/eyes-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>import/aeritem1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/aer1.png</dep>
+    <dep>import/aer1n.png</dep>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/apparel/lizardarmor/lizardarmor1.lmdl</file>
+    <file>import/lizardarmor1.blend</file>
+    <author>major4zmeakrob</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.blendswap.com/3D-models/characters/aika-thompson/</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/apparel/lizardarmor/lizardarmor1.dds</file>
+    <file>data/lipsofsuna/apparel/lizardarmor/lizardarmor1n.dds</file>
+    <file>import/lizardarmor1.png</file>
+    <file>import/lizardarmor1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/items/airtank/*.lmdl</file>
+    <file>data/lipsofsuna/items/airtank/*.dds</file>
+    <file>import/airtank1.blend</file>
+    <file>import/airtank1.png</file>
+    <file>import/airtank2.png</file>
+    <file>import/airtank1n.png</file>
+    <author>Brian Rocz</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <comment>Reduced the polygon count of the original.</comment>
+  </asset>
+
+  <asset>
+    <file>import/alchemy-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/android/*.dds</file>
+    <file>import/android1.blend</file>
+    <file>import/android1.png</file>
+    <file>import/android1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/terrain/aquanite1.dds</file>
+    <file>data/lipsofsuna/environment/terrain/crimson1.dds</file>
+    <file>data/lipsofsuna/environment/terrain/crimson1n.dds</file>
+    <file>data/lipsofsuna/environment/terrain/granite1.png</file>
+    <file>data/lipsofsuna/environment/terrain/ice1.dds</file>
+    <file>data/lipsofsuna/environment/terrain/ice1n.dds</file>
+    <file>data/lipsofsuna/environment/terrain/sand1.dds</file>
+    <file>data/lipsofsuna/environment/terrain/sand1n.png</file>
+    <file>import/aquanite1.png</file>
+    <file>import/crimson1.png</file>
+    <file>import/crimson1n.png</file>
+    <file>import/granite1.png</file>
+    <file>import/ice1.png</file>
+    <file>import/ice1n.png</file>
+    <file>import/sand1.png</file>
+    <file>import/sand1n.png</file>
+    <author>Mysteryem</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/29-grounds-and-walls-and-water-1024x1024</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/bow/arrow-000.lmdl</file>
+    <file>data/lipsofsuna/weapons/bow/arrow-000.dds</file>
+    <file>import/arrow-000.blend</file>
+    <file>import/arrow-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <comment>Too plain; the head and fletchings don't look quite good. See http://en.wikipedia.org/wiki/Arrow for possible ideas.</comment>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/items/barrel/*.lmdl</file>
+    <file>data/lipsofsuna/items/barrel/*.dds</file>
+    <file>import/barrel1.blend</file>
+    <file>import/barrel1.png</file>
+    <file>import/barrel1n.png</file>
+    <file>import/barrel1s.png</file>
+    <author>yughues</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/wood-barrels-pack</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/terrain/basalt1.dds</file>
+    <file>data/lipsofsuna/environment/terrain/basalt1n.dds</file>
+    <file>import/basalt1.png</file>
+    <author>Dim</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/dims-enviromental-and-architectural-textures</source>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+  
+  <asset>
+    <file>data/lipsofsuna/environment/building/windowsill.lmdl</file>
+    <file>import/windowsill.blend</file>
+    <author>Harald</author>
+    <license>CC0</license>
+  </asset>
+  
+  <asset>
+    <file>data/lipsofsuna/misc/lamppost01.lmdl</file>
+    <file>import/classiclampost.blend</file>
+    <author>Andrew Kator &amp; Jennifer Legaz</author>
+    <license>CC0</license>
+    <source>http://www.katorlegaz.com/3d_models/lights_outdoor/0152/index.php</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/particle/blood1.lmdl</file>
+    <file>data/lipsofsuna/particle/blood1.dds</file>
+    <file>import/blood1.blend</file>
+    <file>import/blood1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/items/book/book-000.lmdl</file>
+    <file>data/lipsofsuna/items/book/book-000.dds</file>
+    <file>import/book-000.blend</file>
+    <file>import/book-000.png</file>
+    <author>Peragro Tempus Project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/book-000.png</dep>
+    <status>complete</status>
+    <tag>item</tag>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/items/book/book1.dds</file>
+    <file>import/book1.png</file>
+    <author>sunburn</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/open-book</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/furniture/bookcase1.blend</file>
+    <file>data/lipsofsuna/environment/furniture/bookcase1.dds</file>
+    <file>import/bookcase1.blend</file>
+    <file>import/bookcase1.png</file>
+    <author>Dm3d</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/bookshelf</source>
+    <dep>import/bookcase1.png</dep>
+  </asset>
+
+  <asset>
+    <file>import/bottle-000.blend</file>
+    <author>Andrew Kator &amp; Jennifer Legaz</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.katorlegaz.com/3d_models/household_dining/0113/index.php</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/bricks/bricks1.dds</file>
+    <file>data/lipsofsuna/environment/bricks/bricks2.dds</file>
+    <file>data/lipsofsuna/environment/bricks/bricks3.dds</file>
+    <file>import/bricks1.png</file>
+    <file>import/bricks2.png</file>
+    <file>import/bricks3.png</file>
+    <author>WeaponGuy</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/bricks/bricks1n.dds</file>
+    <file>data/lipsofsuna/environment/bricks/bricks2n.dds</file>
+    <file>data/lipsofsuna/environment/bricks/bricks3n.png</file>
+    <file>import/bricks1n.png</file>
+    <file>import/bricks2n.png</file>
+    <file>import/bricks3n.png</file>
+    <author>WeaponGuy</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+  </asset>
+
+  <asset>
+    <file>import/bricks-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <comment>Needs better textures</comment>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/furniture/chair1.lmdl</file>
+    <file>data/lipsofsuna/environment/furniture/chair1.dds</file>
+    <file>import/chair1.blend</file>
+    <file>import/chair1.png</file>
+    <author>solvalou</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/low-poly-chair</source>
+  </asset>
+
+  <asset>
+    <file>import/chair-001.blend</file>
+    <author>Martin Frydenlund</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>FIXME</status>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/items/chest/chest1.lmdl</file>
+    <file>import/chest1.blend</file>
+    <author>WeaponGuy</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/treasure-chest</source>
+    <dep>import/metal2.png</dep>
+    <dep>import/metal3.png</dep>
+    <dep>import/planks1.png</dep>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/apparel/*.lmdl</file>
+    <file>data/lipsofsuna/apparel/*.dds</file>
+    <file>import/chinadress1.blend</file>
+    <file>import/chinadress1.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/terrain/cobbles1.dds</file>
+    <file>data/lipsofsuna/environment/terrain/cobbles1n.png</file>
+    <file>import/cobbles1.png</file>
+    <file>import/cobbles1n.png</file>
+    <author>titus tscharntk</author>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <source>http://www.burningwell.org/gallery2/v/textures/buildings/pavingBrickCobbles/cobbles_grey_texture_TT7010071.JPG.html</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/ui/compass1.dds</file>
+    <file>import/compass1.svg</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>usable</status>
+    <tag>ui</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/crossbow/*.lmdl</file>
+    <file>data/lipsofsuna/weapons/crossbow/*.dds</file>
+    <file>import/crossbow1.blend</file>
+    <file>import/crossbow1.png</file>
+    <author>Lamoot</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/low-poly-crossbow</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/dagger/*.lmdl</file>
+    <file>data/lipsofsuna/weapons/dagger/*.dds</file>
+    <file>import/dagger1.blend</file>
+    <file>import/dagger1.png</file>
+    <file>import/dagger1n.png</file>
+    <author>Clint Bellanger</author>
+    <author>p0ss</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.opengameart.org/content/undead-weapon-set-and-weapon-rack</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/devora/*.lmdl</file>
+    <file>data/lipsofsuna/actors/devora/*.dds</file>
+    <file>import/devora1.blend</file>
+    <file>import/devora1.png</file>
+    <file>import/devora1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/plants/dewspring/*.lmdl</file>
+    <file>data/lipsofsuna/plants/dewspring/*.dds</file>
+    <file>import/dewspring1.blend</file>
+    <file>import/dewspring1.png</file>
+    <file>import/dewspring1n.png</file>
+    <file>import/dewspring1s.png</file>
+    <author>yughues</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/tropical-plant-01-pack</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/door/*.dds</file>
+    <file>import/door1.png</file>
+    <file>import/door1n.png</file>
+    <author>Georges Grondin</author>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <source>http://www.burningwell.org/gallery2/v/textures/buildings/windowsHouses/door968.jpg.html</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/door/*.lmdl</file>
+    <file>import/door1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/dragon/*.lmdl</file>
+    <file>import/dragon1.blend</file>
+    <author>Bitiquinho</author>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <dep>import/dragon1.png</dep>
+    <dep>import/dragon1n.png</dep>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/dragon/*.dds</file>
+    <file>import/dragon1.png</file>
+    <file>import/dragon1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/spells/dust1.lmdl</file>
+    <file>data/lipsofsuna/spells/dust2.lmdl</file>
+    <file>data/lipsofsuna/spells/dust1.dds</file>
+    <file>data/lipsofsuna/spells/dust2.dds</file>
+    <file>data/lipsofsuna/spells/sanctuary1.lmdl</file>
+    <file>import/dust1.blend</file>
+    <file>import/dust1.png</file>
+    <file>import/dust2.png</file>
+    <file>import/spell1.blend</file>
+    <file>import/spell2.blend</file>
+    <file>import/sanctuary1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/apparel/fedora/*.lmdl</file>
+    <file>data/lipsofsuna/apparel/fedora/*.dds</file>
+    <file>import/fedora1.blend</file>
+    <file>import/fedora1.png</file>
+    <file>import/fedora1n.png</file>
+    <author>Brian Rocz</author>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <source>http://www.blendswap.com/3D-models/clothes/fedora/</source>
+    <comment>Manually retopologized and fitted to the original texture.</comment>
+    <comment>Applied contrast stretching to the texture.</comment>
+    <comment>Baked normals from the high polygon model.</comment>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/terrain/ferrostone1.dds</file>
+    <file>data/lipsofsuna/environment/terrain/ferrostone1n.dds</file>
+    <file>import/ferrostone1.png</file>
+    <file>import/ferrostone1n.png</file>
+    <author>Dim</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/dims-enviromental-and-architectural-textures</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/spells/fireball1.lmdl</file>
+    <file>data/lipsofsuna/spells/firewall1.lmdl</file>
+    <file>import/fireball1.blend</file>
+    <file>import/firewall1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>import/flowerpot-000.blend</file>
+    <author>Scopia Visual Interfaces Systems, s.l.</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://resources.blogscopia.com/models/arboles/maceta/maceta_en.html</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/misc/fruit1.lmdl</file>
+    <file>data/lipsofsuna/misc/fruit1.dds</file>
+    <file>import/food1.blend</file>
+    <file>import/fruit1.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/food-pack</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/rat/fur1.dds</file>
+    <file>import/fur1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <comment>This is a special texture used by the fur shader.</comment>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/furnace/furnace1.lmdl</file>
+    <file>data/lipsofsuna/environment/furnace/furnace1.dds</file>
+    <file>data/lipsofsuna/environment/furnace/furnace1n.dds</file>
+    <file>import/furnace1.blend</file>
+    <author>Millz</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/terrain/granite1n.png</file>
+    <file>import/granite1n.blend</file>
+    <file>import/granite1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/terrain/grass-000.png</file>
+    <file>data/lipsofsuna/environment/terrain/grass-000-nml.png</file>
+    <file>import/grass-000.png</file>
+    <file>import/grass-000-nml.png</file>
+    <file>import/grass-001.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>import/grass-002.png</file>
+    <author>Unknown</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/golgotha-textures-francegrassfulljpg</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/grenade/grenade1.blend</file>
+    <file>data/lipsofsuna/weapons/grenade/grenade1.dds</file>
+    <file>import/grenade1.blend</file>
+    <file>import/grenade1.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>import/ground-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/hair/hair3.lmdl</file>
+    <file>data/lipsofsuna/actors/hair/hair2.dds</file>
+    <file>data/lipsofsuna/actors/hair/hair2n.dds</file>
+    <file>import/hair1.blend</file>
+    <file>import/hair2.png</file>
+    <file>import/hair2n.png</file>
+    <author>Lauris Kaplinski</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.blendswap.com/3D-models/characters/sara-tween-girl/</source>
+    <comment>Minor modifications were done to fit the mesh with our rigs.</comment>
+    <comment>The texture was desaturated to make it compatible with our hair coloring system.</comment>
+    <comment>The normal map was generated from hair2.png</comment>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/apparel/*.lmdl</file>
+    <file>data/lipsofsuna/apparel/*.dds</file>
+    <file>import/headband1.blend</file>
+    <file>import/headband1.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/fur1.png</dep>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/spells/heal1.lmdl</file>
+    <file>import/heal1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>import/house1.blend</file>
+    <author>WeaponGuy</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/ui/icons1.dds</file>
+    <file>import/icons1.png</file>
+    <author>Henrique Lazarini</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/420-pixel-art-icons-medievalfantasy-rpg</source>
+    <comment>The icons are scaled down from 34x34.</comment>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/items/jar/*.dds</file>
+    <file>data/lipsofsuna/items/jar/*.lmdl</file>
+    <file>import/jar1.blend</file>
+    <file>import/jar1.png</file>
+    <file>import/jar1n.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/netted-jar</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/kraken/*.lmdl</file>
+    <file>data/lipsofsuna/actors/kraken/*.dds</file>
+    <file>data/lipsofsuna/actors/kraken/*.png</file>
+    <file>import/kraken1.blend</file>
+    <file>import/kraken1.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>import/lizardman1.blend</file>
+    <file>import/lizardman1.png</file>
+    <file>import/lizardman1n.png</file>
+    <file>import/lizardman1s.png</file>
+    <author>thecubber</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/rigged-textured-reptile</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/spells/magicmissile1.lmdl</file>
+    <file>import/magicmissile1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <dep>import/particle6.png</dep>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/ui/mainmenu1.dds</file>
+    <file>import/mainmenu1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/mattock/*.lmdl</file>
+    <file>data/lipsofsuna/weapons/mattock/*.dds</file>
+    <file>import/mattock-000.blend</file>
+    <file>import/mattock-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>import/meat-000.blend</file>
+    <file>import/meat-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/misc/metal2.dds</file>
+    <file>data/lipsofsuna/misc/metal3.dds</file>
+    <file>import/metal2.png</file>
+    <file>import/metal3.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/treasure-chest</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/plants/mushroom/*.lmdl</file>
+    <file>data/lipsofsuna/plants/mushroom/*.dds</file>
+    <file>import/mushroom-000.blend</file>
+    <file>import/mushroom-000.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/low-poly-mushrooms</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/musket/*.lmdl</file>
+    <file>import/musket1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/musket1.png</dep>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/musket/*.dds</file>
+    <file>import/musket1.png</file>
+    <author>Antique Military Rifles</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.flickr.com/photos/36224933@N07/3344703041/</source>
+    <comment>Projected from the original and modified with texture paint.</comment>
+  </asset>
+
+  <asset>
+    <file>import/noise1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <comment>This is a special texture used by the lava and water shaders.</comment>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/particle/particle*.dds</file>
+    <file>import/particle1.png</file>
+    <file>import/particle2.png</file>
+    <file>import/particle5.png</file>
+    <file>import/particle6.png</file>
+    <file>import/particle-000.png</file>
+    <file>import/particle-001.png</file>
+    <file>import/particle-002.png</file>
+    <file>import/particle-003.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/wood/planks1.dds</file>
+    <file>import/planks1.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/treasure-chest</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/apparel/platearmor/*.lmdl</file>
+    <file>data/lipsofsuna/apparel/platearmor/*.dds</file>
+    <file>import/plate1.blend</file>
+    <file>import/platemail1.png</file>
+    <file>import/platemail1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/portal/*.lmdl</file>
+    <file>data/lipsofsuna/environment/portal/*.dds</file>
+    <file>import/portal1.blend</file>
+    <file>import/portal1.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>wip</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/items/potion/*.lmdl</file>
+    <file>import/potion1.blend</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/potions</source>
+    <status>usable</status>
+    <type>model</type>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/revolver/*.lmdl</file>
+    <file>data/lipsofsuna/weapons/revolver/*.dds</file>
+    <file>import/revolver1.blend</file>
+    <file>import/revolver1.png</file>
+    <author>johndh</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/steampunk-multi-barrel-revolver</source>
+    <comment>Texture baked from the procedural textures.</comment>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/building/roof1.dds</file>
+    <file>import/roof1.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/building/roof1n.dds</file>
+    <file>import/roof1n.png</file>
+    <author>WeaponGuy</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+  </asset>
+
+  <asset>
+    <file>import/rune-000.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>import/saw1.blend</file>
+    <file>import/saw1.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/seirei/seirei1.lmdl</file>
+    <file>import/seirei1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/shield/shield1.lmdl</file>
+    <file>data/lipsofsuna/weapons/shield/shield1.dds</file>
+    <file>data/lipsofsuna/weapons/shield/shield1n.dds</file>
+    <file>import/shield1.blend</file>
+    <file>import/shield1.png</file>
+    <file>import/shield1n.png</file>
+    <author>anonymous</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://www.blendswap.com/3D-models/weapons/weapons/</source>
+    <comment>Textures baked from the original model.</comment>
+  </asset>
+
+  <asset>
+    <file>import/shield-000.blend</file>
+    <author>Peragro Tempus Project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <dep>import/shield-000.png</dep>
+  </asset>
+
+  <asset>
+    <file>import/shield-000.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/building/shutter1.lmdl</file>
+    <file>data/lipsofsuna/environment/building/shutter1.dds</file>
+    <file>data/lipsofsuna/environment/building/shutter1n.dds</file>
+    <file>import/shutter1.blend</file>
+    <author>Millz</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/ui/skills1.dds</file>
+    <file>import/skills1.svg</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/terrain/soil1.png</file>
+    <file>import/soil1.png</file>
+    <author>Dim</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/dims-enviromental-and-architectural-textures</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/terrain/soil1n.png</file>
+    <file>data/lipsofsuna/environment/terrain/soil1h.png</file>
+    <file>data/lipsofsuna/environment/terrain/soil1s.png</file>
+    <file>import/soil1n.blend</file>
+    <file>import/soil1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/spear/spear1.lmdl</file>
+    <file>import/spear-000.blend</file>
+    <author>Blender Open Model Repository</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://www.blendermodels.org/models/weapon/</source>
+  </asset>
+
+  <asset>
+    <file>import/stone_color.png</file>
+    <file>import/stone_normal.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/stone-and-wood-barricade</source>
+    <status>usable</status>
+    <tag>stone</tag>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/hatchet/stoneaxe1.lmdl</file>
+    <file>data/lipsofsuna/weapons/hatchet/stoneaxe1.dds</file>
+    <file>data/lipsofsuna/weapons/hatchet/stoneaxe1n.dds</file>
+    <file>import/stoneaxe1.blend</file>
+    <file>import/stoneaxe1.png</file>
+    <file>import/stoneaxe1n.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/stone-axe</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/sword/sword1.lmdl</file>
+    <file>data/lipsofsuna/weapons/sword/sword1.dds</file>
+    <file>data/lipsofsuna/weapons/sword/sword1n.dds</file>
+    <file>import/sword1.blend</file>
+    <file>import/sword1.png</file>
+    <file>import/sword1n.png</file>
+    <author>johndh</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/naval-cutlass-with-basket-hilt</source>
+    <comment>Textures baked from the procedural textures.</comment>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/sword/sword5.lmdl</file>
+    <file>import/sword5.blend</file>
+    <author>Clint Bellanger</author>
+    <author>adrix89</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/kingdom-weapon-set</source>
+    <dep>import/sword5.png</dep>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/sword/sword6.lmdl</file>
+    <file>data/lipsofsuna/weapons/sword/sword6.dds</file>
+    <file>import/sword6.blend</file>
+    <file>import/sword6.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://www.opengameart.org/content/seraphim-sword</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/sword/sword5.dds</file>
+    <file>import/sword5.png</file>
+    <author>adrix89</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <status>complete</status>
+    <type>texture</type>
+  </asset>
+
+  <asset>
+    <file>import/tiles1.blend</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <dep>import/wood2.png</dep>
+    <dep>import/wood2n.png</dep>
+    <source>http://opengameart.org/content/cave-tileset</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/plants/tree/tree1.lmdl</file>
+    <file>data/lipsofsuna/plants/tree/tree2.lmdl</file>
+    <file>data/lipsofsuna/plants/tree/tree1.dds</file>
+    <file>data/lipsofsuna/plants/tree/tree1n.dds</file>
+    <file>data/lipsofsuna/plants/tree/tree3.dds</file>
+    <file>data/lipsofsuna/plants/tree/tree3n.dds</file>
+    <file>data/lipsofsuna/plants/tree/tree4.dds</file>
+    <file>data/lipsofsuna/plants/tree/tree4n.dds</file>
+    <file>import/tree1.blend</file>
+    <file>import/tree1.png</file>
+    <file>import/tree1n.png</file>
+    <file>import/tree3.blend</file>
+    <file>import/tree3.png</file>
+    <file>import/tree3n.png</file>
+    <file>import/tree4.png</file>
+    <file>import/tree4n.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/plants/tree/tree2.dds</file>
+    <file>import/tree2.png</file>
+    <author>Julius</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/jkms-tree-set</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/items/torch/*.lmdl</file>
+    <file>data/lipsofsuna/items/torch/*.dds</file>
+    <file>import/torch1.blend</file>
+    <file>import/torch1.png</file>
+    <file>import/torch1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/hatchet/axe1.dds</file>
+    <file>data/lipsofsuna/weapons/bow/bow1.dds</file>
+    <file>import/axe1.png</file>
+    <file>import/bow1.png</file>
+    <file>import/katana-000.png</file>
+    <file>import/morningstar-000.png</file>
+    <file>import/poleaxe-000.png</file>
+    <file>import/poleaxe-001.png</file>
+    <file>import/stone-000.png</file>
+    <file>import/stone1.blend</file>
+    <file>import/wand-000.png</file>
+    <file>import/wand-001.png</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/terrain/adamantium1.dds</file>
+    <file>data/lipsofsuna/weapons/axe/axe1.lmdl</file>
+    <file>data/lipsofsuna/weapons/bow/bow1.lmdl</file>
+    <file>data/lipsofsuna/items/chest/chest1.lmdl</file>
+    <file>data/lipsofsuna/misc/fence1.lmdl</file>
+    <file>data/lipsofsuna/environment/terrain/stone-001.dds</file>
+    <file>data/lipsofsuna/environment/terrain/stone-001-nml.dds</file>
+    <file>data/lipsofsuna/environment/wood/wood-002.dds</file>
+    <file>data/lipsofsuna/environment/wood/wood-002-nml.dds</file>
+    <file>import/adamantium1.png</file>
+    <file>import/bricks-002.png</file>
+    <file>import/bricks-002-nml.png</file>
+    <file>import/candle-000.blend</file>
+    <file>import/candle-000.png</file>
+    <file>import/candle-001.blend</file>
+    <file>import/candle-001.png</file>
+    <file>import/candle-002.blend</file>
+    <file>import/candle-002.png</file>
+    <file>import/candle-003.blend</file>
+    <file>import/chair-002.blend</file>
+    <file>import/chair-002.png</file>
+    <file>import/chest-000.blend</file>
+    <file>import/chest-000.png</file>
+    <file>import/axe1.blend</file>
+    <file>import/bench-000.blend</file>
+    <file>import/bench-000.png</file>
+    <file>import/bow1.blend</file>
+    <file>import/crate-000.blend</file>
+    <file>import/crate-000.png</file>
+    <file>import/fence1.blend</file>
+    <file>import/gem-000.blend</file>
+    <file>import/gem-000.png</file>
+    <file>import/katana-000.blend</file>
+    <file>import/lantern-000.blend</file>
+    <file>import/lantern-000.png</file>
+    <file>import/metal-000.png</file>
+    <file>import/morningstar-000.blend</file>
+    <file>import/poleaxe-000.blend</file>
+    <file>import/poleaxe-001.blend</file>
+    <file>import/porticullis-000.blend</file>
+    <file>import/stone-000.blend</file>
+    <file>import/stone-001.blend</file>
+    <file>import/stone-001.png</file>
+    <file>import/stone-001-nml.png</file>
+    <file>import/stone-002.blend</file>
+    <file>import/stone-002.png</file>
+    <file>import/stone-002-nml.png</file>
+    <file>import/stone-003.blend</file>
+    <file>import/stone-004.blend</file>
+    <file>import/table-000.blend</file>
+    <file>import/wand-000.blend</file>
+    <file>import/wand-001.blend</file>
+    <file>import/wood-002.png</file>
+    <file>import/wood-002-nml.png</file>
+    <file>import/wood-003.png</file>
+    <file>import/wood-004.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/ui/widgets1.png</file>
+    <file>import/widgets1.png</file>
+    <author>hiponboy</author>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/moderna-graphical-interface</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/wood/wood1.png</file>
+    <file>import/wood1.png</file>
+    <author>WeaponGuy</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cottage</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/wood/wood1n.png</file>
+    <file>import/wood1n.blend</file>
+    <file>import/wood1n.png</file>
+    <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/wood/wood2.dds</file>
+    <file>data/lipsofsuna/environment/wood/wood2n.dds</file>
+    <file>import/wood2.png</file>
+    <file>import/wood2n.png</file>
+    <author>Clint Bellanger</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/cave-tileset</source>
+  </asset>
+  
+  <asset>
+    <file>data/lipsofsuna/misc/gate01.lmdl</file>
+    <file>import/gate01.blend</file>
+    <author>Harald</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/simple-jail-door</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/weapons/sword/weaponwood.dds</file>
+    <file>data/lipsofsuna/weapons/sword/weaponwoodn.dds</file>
+    <file>data/lipsofsuna/weapons/sword/woodsword.lmdl</file>
+    <file>data/lipsofsuna/weapons/sword/woodshortsword.lmdl</file>
+    <file>import/woodweapons1.blend</file>
+    <file>import/weaponwood.png</file>
+    <file>import/weaponwoodn.png</file>
+    <author>Clint Bellanger</author>
+    <author>p0ss</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.opengameart.org/content/wooden-weapon-training-set</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/sounds/explosion1.flac</file>
+    <author>Michel Baradari</author>
+    <license>Creative Commons BY 3.0</license>
+    <source>http://opengameart.org/content/2-explosions</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/sounds/fairytale1.ogg</file>
+    <file>data/lipsofsuna/sounds/fairytale10.ogg</file>
+    <file>data/lipsofsuna/sounds/fairytale11.ogg</file>
+    <file>data/lipsofsuna/sounds/fairytale12.ogg</file>
+    <file>data/lipsofsuna/sounds/fairytale13.ogg</file>
+    <file>data/lipsofsuna/sounds/fairytale2.ogg</file>
+    <file>data/lipsofsuna/sounds/fairytale3.ogg</file>
+    <file>data/lipsofsuna/sounds/fairytale4.ogg</file>
+    <file>data/lipsofsuna/sounds/fairytale5.ogg</file>
+    <file>data/lipsofsuna/sounds/fairytale6.ogg</file>
+    <file>data/lipsofsuna/sounds/fairytale7.ogg</file>
+    <file>data/lipsofsuna/sounds/fairytale8.ogg</file>
+    <file>data/lipsofsuna/sounds/fairytale9.ogg</file>
+    <author>zero-project</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://www.jamendo.com/en/download/album/60457</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/sounds/crack-000.flac</file>
+    <file>data/lipsofsuna/sounds/crack-001.flac</file>
+    <file>data/lipsofsuna/sounds/swing-001.flac</file>
+    <file>data/lipsofsuna/sounds/impact-000.flac</file>
+    <file>data/lipsofsuna/sounds/squish-000.flac</file>
+    <author>Independent.nu</author>
+    <license>CC0</license>
+    <source>http://opengameart.org/content/2-wooden-squish-splatter-sequences</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/sounds/fire-000.flac</file>
+    <file>data/lipsofsuna/sounds/spell-001.flac</file>
+    <author>Bart Kelsey</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/spell-3</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/sounds/growl-000.flac</file>
+    <author>Bart Kelsey</author>
+    <license>Creative Commons BY-SA 3.0</license>
+    <source>http://opengameart.org/content/6-monstrous-growls</source>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/sounds/beam-000.flac</file>
+    <file>data/lipsofsuna/sounds/hop-000.flac</file>
+    <file>data/lipsofsuna/sounds/item1.flac</file>
+    <file>data/lipsofsuna/sounds/quest1.flac</file>
+    <file>data/lipsofsuna/sounds/scissor1.flac</file>
+    <file>data/lipsofsuna/sounds/snap-000.flac</file>
+    <file>data/lipsofsuna/sounds/spell-000.flac</file>
+    <file>data/lipsofsuna/sounds/spring-000.flac</file>
+    <file>data/lipsofsuna/sounds/swing-000.flac</file>
+    <file>data/lipsofsuna/sounds/step1.ogg</file>
+    <file>data/lipsofsuna/sounds/step2.ogg</file>
+    <file>data/lipsofsuna/sounds/thud-000.flac</file>
+    <file>data/lipsofsuna/sounds/wield-000.flac</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+    <status>FIXME</status>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/sounds/builtrock1.ogg</file>
+    <file>data/lipsofsuna/sounds/builtwood1.ogg</file>
+    <file>data/lipsofsuna/sounds/craftmetal1.ogg</file>
+    <file>data/lipsofsuna/sounds/craftpotion1.ogg</file>
+    <file>data/lipsofsuna/sounds/craftsewing1.ogg</file>
+    <file>data/lipsofsuna/sounds/craftwood1.ogg</file>
+    <file>data/lipsofsuna/sounds/destroyrock1.ogg</file>
+    <file>data/lipsofsuna/sounds/diseasecontact1.ogg</file>
+    <file>data/lipsofsuna/sounds/menu1.ogg</file>
+    <file>data/lipsofsuna/sounds/portal1.ogg</file>
+    <file>data/lipsofsuna/sounds/potiondrink1.ogg</file>
+    <file>data/lipsofsuna/sounds/selfdestructcountdown1.ogg</file>
+    <file>data/lipsofsuna/sounds/spellberserk1.ogg</file>
+    <file>data/lipsofsuna/sounds/spellhealing1.ogg</file>
+    <file>data/lipsofsuna/sounds/spelllight1.ogg</file>
+    <file>data/lipsofsuna/sounds/spellsanctuary1.ogg</file>
+    <file>data/lipsofsuna/sounds/torchlit1.ogg</file>
+    <file>data/lipsofsuna/sounds/weaponcrossbow1.ogg</file>
+    <file>data/lipsofsuna/sounds/weaponmusket1.ogg</file>
+    <author>Kabraxis</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/sky/divine_fg.png</file>
+    <file>data/lipsofsuna/environment/sky/divine_fr.png</file>
+    <file>data/lipsofsuna/environment/sky/divine_bk.png</file>
+    <file>data/lipsofsuna/environment/sky/divine_lf.png</file>
+    <file>data/lipsofsuna/environment/sky/divine_rt.png</file>
+    <file>data/lipsofsuna/environment/sky/divine_up.png</file>
+    <file>data/lipsofsuna/environment/sky/divine_dn.png</file>
+    <author>SkiingPenguin</author>
+    <license>Creative Commons BY 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/rat/*.lmdl</file>
+    <file>import/plaguerat1.blend</file>
+    <file>import/smallrat1.blend</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/slime/slime2.lmdl</file>
+    <file>import/slime2.blend</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/bloodworm/bloodworm2.lmdl</file>
+    <file>import/bloodworm2.blend</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/lizardman/lizardman2.lmdl</file>
+    <file>data/lipsofsuna/actors/lizardman/lizardman2.dds</file>
+    <file>import/lizardman2.blend</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/aermale/*.lmdl</file>
+    <file>data/lipsofsuna/actors/aermale/*.dds</file>
+    <file>import/aermale1.blend</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/bitingbark/*.lmdl</file>
+    <file>data/lipsofsuna/actors/bitingbark/*.dds</file>
+    <file>import/bitingbark1.blend</file>
+    <file>import/bitingbark1.png</file>
+    <file>import/bitingbark1n.png</file>
+    <author>Francisco "FreeLikeGNU" Athens</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+</assets>

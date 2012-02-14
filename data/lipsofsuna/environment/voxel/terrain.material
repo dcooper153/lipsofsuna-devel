@@ -94,7 +94,7 @@ material cobbles1 : terrainmaterial
 
 material concrete1 : terrainmaterial
 {
-	set $texture1 "granite1.dds"
+	set $texture1 "granite1.png"
 	set $texture2 "concrete1n.dds"
 }
 
