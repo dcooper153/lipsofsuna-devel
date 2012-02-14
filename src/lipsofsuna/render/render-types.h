@@ -51,4 +51,17 @@ struct _LIRenVideomode
 	int multisamples;
 };
 
+typedef struct _LIRenStats LIRenStats;
+struct _LIRenStats
+{
+	int batch_count;
+	int face_count;
+	int material_count;
+	int mesh_count;
+	int mesh_memory;
+	int skeleton_count;
+	int texture_count;
+	int texture_memory;
+};
+
 #endif

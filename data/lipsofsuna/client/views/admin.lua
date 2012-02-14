@@ -53,6 +53,7 @@ Userdata: %d]], numactive, userdata)
 			models = models + v.memory_used
 		end
 	end
+	local stats = Render.stats
 	self.label_database.text = string.format([[
 FPS: %.2f
 Database memory: %d kB
@@ -62,8 +63,16 @@ Model memory: %d kB
 Update tick: %d ms
 Event tick: %d ms
 Render tick: %d ms
+Rendered batches: %d
+Rendered faces: %d
+Allocated meshes: %d / %dkB
+Allocated skeletons: %d
+Allocated textures: %d / %dkB
+Allocated materials: %d
 ]], Program.fps, Database.memory_used / 1024, gcinfo(), Voxel.memory_used / 1024, models / 1024,
-1000 * Program.profiling.update, 1000 * Program.profiling.event, 1000 * Program.profiling.render)
+1000 * Program.profiling.update, 1000 * Program.profiling.event, 1000 * Program.profiling.render,
+stats.batch_count, stats.face_count, stats.mesh_count, stats.mesh_memory / 1000,
+stats.skeleton_count, stats.texture_count, stats.texture_memory / 1000, stats.material_count)
 	self.label_database:build()
 end
 

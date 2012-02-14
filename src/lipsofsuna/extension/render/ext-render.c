@@ -147,6 +147,24 @@ static void Render_set_skybox (LIScrArgs* args)
 		liren_render_set_skybox (module->render, NULL);
 }
 
+static void Render_get_stats (LIScrArgs* args)
+{
+	LIExtModule* module;
+	LIRenStats stats;
+
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
+	liren_render_get_stats (module->render, &stats);
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_sets_int (args, "batch_count", stats.batch_count);
+	liscr_args_sets_int (args, "face_count", stats.face_count);
+	liscr_args_sets_int (args, "material_count", stats.material_count);
+	liscr_args_sets_int (args, "mesh_count", stats.mesh_count);
+	liscr_args_sets_int (args, "mesh_memory", stats.mesh_memory);
+	liscr_args_sets_int (args, "skeleton_count", stats.skeleton_count);
+	liscr_args_sets_int (args, "texture_count", stats.texture_count);
+	liscr_args_sets_int (args, "texture_memory", stats.texture_memory);
+}
+
 /*****************************************************************************/
 
 void liext_script_render (
@@ -162,6 +180,7 @@ void liext_script_render (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_anisotrophy", Render_set_anisotrophy);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_scene_ambient", Render_set_scene_ambient);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_skybox", Render_set_skybox);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_get_stats", Render_get_stats);
 }
 
 /** @} */

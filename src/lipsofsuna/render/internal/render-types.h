@@ -104,6 +104,7 @@ struct _LIRenOverlay
 };
 struct _LIRenRenderData
 {
+	float unload_timer;
 	Ogre::Root* root;
 	Ogre::Camera* camera;
 	Ogre::MaterialManager* material_manager;

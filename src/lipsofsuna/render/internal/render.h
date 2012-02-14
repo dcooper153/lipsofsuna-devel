@@ -118,6 +118,10 @@ LIAPICALL (void, liren_internal_set_skybox, (
 	LIRenRender* self,
 	const char*  value));
 
+LIAPICALL (void, liren_internal_get_stats, (
+	LIRenRender* self,
+	LIRenStats*  result));
+
 LIAPICALL (void, liren_internal_set_title, (
 	LIRenRender* self,
 	const char*  value));

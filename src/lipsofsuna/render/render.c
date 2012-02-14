@@ -305,6 +305,13 @@ void liren_render_set_skybox (
 	liren_internal_set_skybox (self, value);
 }
 
+void liren_render_get_stats (
+	LIRenRender* self,
+	LIRenStats*  result)
+{
+	liren_internal_get_stats (self, result);
+}
+
 void liren_render_set_title (
 	LIRenRender* self,
 	const char*  value)
