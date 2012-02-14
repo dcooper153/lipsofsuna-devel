@@ -2,6 +2,7 @@ Creature = Class(Object)
 
 Creature.new = function(clss, args)
 	local self = Object.new(clss, args)
+	self.shadow_casting = Options.inst.shadow_casting_actors
 	Object.dict_active[self] = 1.0
 	return self
 end

@@ -212,9 +212,10 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		id = id, model = model, spec = spec, type = type}
 	if type == "species" then
 		o = Creature(o_args)
+	elseif type == "item" then
+		o = Item(o_args)
 	else
-		o = Object(o_args)
-		if spec and spec.special_effects then Object.dict_active[o] = 0.1 end
+		o = Obstacle(o_args)
 	end
 	-- Self.
 	if Bitwise:band(flags, Protocol.object_show_flags.SELF) ~= 0 then

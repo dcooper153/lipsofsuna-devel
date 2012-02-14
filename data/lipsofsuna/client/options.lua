@@ -19,6 +19,9 @@ Options.new = function(clss)
 	self.multisamples = 2
 	self.nudity_enabled = false
 	self.shader_quality = 2
+	self.shadow_casting_actors = true
+	self.shadow_casting_items = true
+	self.shadow_casting_obstacles = true
 	self.transparency_quality = 0.3
 	self.sound_volume = 1.0
 	self.music_volume = 0.1
@@ -41,6 +44,9 @@ Options.new = function(clss)
 		music_volume = {"float", 0, 1},
 		nudity_enabled = {"bool"},
 		shader_quality = {"int", 1, 3},
+		shadow_casting_actors = {"bool"},
+		shadow_casting_items = {"bool"},
+		shadow_casting_obstacles = {"bool"},
 		sound_volume = {"float", 0, 1},
 		transparency_quality = {"float", 0, 1},
 		view_distance = {"float", 10, 1000000},
@@ -111,6 +117,9 @@ Options.save = function(self)
 	write("music_volume", self.music_volume)
 	write("nudity_enabled", self.nudity_enabled)
 	write("shader_quality", self.shader_quality)
+	write("shadow_casting_actors", self.shadows_casting_actors)
+	write("shadow_casting_items", self.shadows_casting_items)
+	write("shadow_casting_obstacles", self.shadows_casting_obstacles)
 	write("sound_volume", self.sound_volume)
 	write("transparency_quality", self.transparency_quality)
 	write("view_distance", self.view_distance)

@@ -79,7 +79,6 @@ Player.rotation_sync_timer = 0
 Player.update_rotation = function(clss, secs)
 	if clss.object.dead then return end
 	local spec = Player.object.spec
-	clss.object.shadow_casting = true
 	-- Update turning.
 	clss.turn_state = clss.turn_state + clss.turn * secs
 	clss.turn_state = radian_wrap(clss.turn_state)
