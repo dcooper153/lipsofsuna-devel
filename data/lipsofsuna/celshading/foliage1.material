@@ -3,7 +3,7 @@ material foliage1
 	receive_shadows off
 	technique
 	{
-		shadow_caster_material shadowcaster1
+		shadow_caster_material shadowcasteralpha1
 		pass LOS1
 		{
 			max_lights 3

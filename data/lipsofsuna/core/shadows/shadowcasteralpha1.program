@@ -1,0 +1,17 @@
+vertex_program shadowcasteralpha1_vp glsl
+{
+	source shadowcasteralpha1.vert
+	includes_skeletal_animation true
+	default_params
+	{
+		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
+	}
+}
+
+fragment_program shadowcasteralpha1_fp glsl
+{
+	source shadowcasteralpha1.frag
+	default_params
+	{
+	}
+}

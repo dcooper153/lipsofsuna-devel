@@ -1,0 +1,22 @@
+material shadowcasteralpha1
+{
+	set $texture1 "tree3.dds"
+	technique 
+	{
+		pass
+		{
+			alpha_rejection greater_equal 128
+			cull_hardware none
+			texture_unit
+			{
+				texture $texture1
+			}
+			vertex_program_ref shadowcasteralpha1_vp
+			{
+			}
+			fragment_program_ref shadowcasteralpha1_fp
+			{
+			}
+		}
+	}
+}
