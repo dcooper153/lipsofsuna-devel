@@ -1,0 +1,17 @@
+vertex_program bounds1_vert glsl
+{
+	source bounds1.vert
+	default_params
+	{
+		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
+	}
+}
+
+fragment_program bounds1_frag glsl
+{
+	source bounds1.frag
+	default_params
+	{
+		param_named_auto LOS_material_diffuse surface_diffuse_colour
+	}
+}

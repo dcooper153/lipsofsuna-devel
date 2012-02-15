@@ -77,7 +77,7 @@ Selection.create_face_model = function(self, face, rotation, aabb)
 	if face == 6 then addbox(p[5], p[6], p[7], p[8], {0,0,1}) end
 	-- Create the model.
 	local model = Model()
-	model:add_material{cull = false, shader = "default"}
+	model:add_material{material = "bounds1"}
 	--model:remove_vertices()
 	model:add_triangles{material = 1, vertices = v}
 	model:changed()

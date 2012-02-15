@@ -228,7 +228,7 @@ Editor.load = function(self, name)
 		self.corners = EditorObject{position = self.origin * Voxel.tile_size, realized = true}
 	end
 	self.corners.model = Model()
-	self.corners.model:add_material{cull = false, shader = "default"}
+	self.corners.model:add_material{material = "bounds1"}
 	self:update_corners()
 	-- Update the map name entry.
 	self.entry_map.text = name
