@@ -1,4 +1,5 @@
 EditorObject = Class(Object)
+EditorObject.class_name = "EditorObject"
 
 EditorObject:add_getters{
 	spec = function(s) return rawget(s, "__spec") end}
@@ -7,7 +8,7 @@ EditorObject:add_setters{
 	spec = function(s, v)
 		rawset(s, "__spec", v)
 		s.model = v.model
-		if v.models then
+		if s.model and v.models then
 			local m = s.model:copy()
 			for k,v in pairs(v.models) do
 				if k ~= "skeleton" then

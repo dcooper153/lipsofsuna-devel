@@ -217,10 +217,7 @@ Editor.load = function(self, name)
 	self.pattern = pattern
 	self.origin = pattern.position or Vector(100,100,100)
 	self.size = pattern.size or Vector(10,10,10)
-	local tmp = Object
-	Object = EditorObject
-	Voxel:place_pattern{point = self.origin, name = name}
-	Object = tmp
+	Voxel:place_pattern{class = EditorObject, point = self.origin, name = name}
 	-- Setup the camera.
 	self.camera:warp((self.origin + self.size * 0.5) * Voxel.tile_size, Quaternion(0, 1, 0, 0))
 	-- Corner markers.

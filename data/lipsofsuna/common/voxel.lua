@@ -39,6 +39,7 @@ end
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
 --   <li>category: Species category.</li>
+--   <li>class: Forces all objects to use the given class.</li>
 --   <li>diffuculty: Maximum difficulty of the creature.</li>
 --   <li>name: Species name.</li>
 --   <li>point: Position vector, in tiles.</li>
@@ -70,7 +71,7 @@ Voxel.place_creature = function(clss, args)
 	-- Spawn the creature.
 	-- This needs to support both the client and the server so the class
 	-- used varies depending on what's available.
-	local clss_ = Creature or Object
+	local clss_ = args.class or Creature or Object
 	clss_.new(clss_, {
 		spec = spec,
 		position = args.point * clss.tile_size,
@@ -83,13 +84,14 @@ end
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
 --   <li>category: Item category.</li>
+--   <li>class: Forces all objects to use the given class.</li>
 --   <li>name: Item name.</li>
 --   <li>point: Position vector, in tiles.</li>
 --   <li>rotation: Rotation around Y axis.</li></ul>
 Voxel.place_item = function(clss, args)
 	local spec = Itemspec:random(args)
 	if not spec then return end
-	local clss_ = Item or Object
+	local clss_ = args.class or Item or Object
 	clss_.new(clss_, {
 		spec = spec,
 		position = args.point * clss.tile_size,
@@ -101,13 +103,14 @@ end
 --- Places an obstacle to the map.
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
+--   <li>class: Forces all objects to use the given class.</li>
 --   <li>name: Obstacle name.</li>
 --   <li>point: Position vector, in tiles.</li>
 --   <li>rotation: Rotation around Y axis.</li></ul>
 Voxel.place_obstacle = function(clss, args)
 	local spec = Obstaclespec:random(args)
 	if not spec then return end
-	local clss_ = Obstacle or Object
+	local clss_ = args.class or Obstacle or Object
 	clss_.new(clss_, {
 		spec = spec,
 		position = args.point * clss.tile_size,
@@ -118,6 +121,7 @@ end
 --- Places a predefined map pattern to the map.
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
+--   <li>class: Forces all objects to use the given class.</li>
 --   <li>name: Pattern name.</li>
 --   <li>point: Position vector, in tiles.</li>
 --   <li>rotation: Counter-clockwise rotation in 90 degree steps.</li></ul>
@@ -160,16 +164,16 @@ Voxel.place_pattern = function(clss, args)
 	-- Create obstacles.
 	for k,v in pairs(pat.obstacles) do
 		local point = args.point + coord(v[1], v[2], v[3])
-		clss:place_obstacle{name = v[4], point = point, rotation = v[5]}
+		clss:place_obstacle{class = args.class, name = v[4], point = point, rotation = v[5]}
 	end
 	-- Create items.
 	for k,v in pairs(pat.items) do
 		local point = args.point + coord(v[1], v[2], v[3])
-		clss:place_item{name = v[4], point = point, rotation = v[5]}
+		clss:place_item{class = args.class, name = v[4], point = point, rotation = v[5]}
 	end
 	-- Create creatures.
 	for k,v in pairs(pat.creatures) do
 		local point = args.point + coord(v[1], v[2], v[3])
-		clss:place_creature{name = v[4], point = point, rotation = v[5]}
+		clss:place_creature{class = args.class, name = v[4], point = point, rotation = v[5]}
 	end
 end
