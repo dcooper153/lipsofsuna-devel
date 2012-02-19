@@ -88,11 +88,12 @@ void liren_object_free (
 	lialg_u32dic_remove (self->render->objects, self->id);
 
 	/* Free the private data. */
-	if (self->entity != NULL)
-	{
+	if (self->node != NULL)
 		self->node->detachAllObjects ();
+	if (self->entity != NULL)
 		self->render->data->scene_manager->destroyEntity (self->entity);
-	}
+	if (self->particles != NULL)
+		self->render->data->scene_manager->destroyParticleSystem (self->particles);
 	if (self->node != NULL)
 		self->render->data->scene_root->removeAndDestroyChild (self->node->getName ());
 
@@ -448,13 +449,16 @@ int liren_object_set_particle (
 	}
 	self->model = NULL;
 
-	/* Attach a new particle system to the scene node. */
 	try
 	{
+		/* Attach a new particle system to the scene node. */
 		Ogre::String e_name = private_unique_id (self);
 		self->particles = self->render->data->scene_manager->createParticleSystem (e_name, name);
 		lisys_assert (self->particles != NULL);
 		self->node->attachObject (self->particles);
+
+		/* Set particle effect visibility. */
+		self->particles->setVisible (self->visible);
 	}
 	catch (...)
 	{
