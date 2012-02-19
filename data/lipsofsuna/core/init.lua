@@ -16,6 +16,7 @@ if not Settings then
 	require "common/pattern"
 	require "common/regionspec"
 	require "common/species"
+	require "common/spellspec"
 	require "common/staticspec"
 	require "common/quest"
 else
@@ -45,6 +46,7 @@ else
 	require "common/serialize"
 	require "common/sectors"
 	require "common/species"
+	require "common/spellspec"
 	require "common/staticspec"
 	require "common/voxel"
 	require "system/lobby"

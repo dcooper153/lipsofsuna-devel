@@ -55,6 +55,10 @@ Effect{
 	sound = "fire-000"}
 
 Effect{
+	name = "firewall1",
+	model = "firewall1"}
+
+Effect{
 	name = "collapse1",
 	model = "dust1",
 	sound = "destroyrock1"}

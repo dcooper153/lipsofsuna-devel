@@ -196,7 +196,8 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		type = type_
 		if type == "item" then spec = Itemspec:find{name = name}
 		elseif type == "obstacle" then spec = Obstaclespec:find{name = name}
-		elseif type == "species" then spec = Species:find{name = name} end
+		elseif type == "species" then spec = Species:find{name = name}
+		elseif type == "spell" then spec = Spellspec:find{name = name} end
 		debug("  SPEC %s %s", type, name)
 		if not spec then return end
 		model = spec.model
@@ -214,6 +215,8 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		o = Creature(o_args)
 	elseif type == "item" then
 		o = Item(o_args)
+	elseif type == "spell" then
+		o = Spell(o_args)
 	else
 		o = Obstacle(o_args)
 	end

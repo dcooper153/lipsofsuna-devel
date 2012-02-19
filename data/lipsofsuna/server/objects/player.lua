@@ -273,7 +273,7 @@ Player.vision_cb = function(self, args)
 			local flags = o.flags or 0
 			-- Spec.
 			local data_spec = {}
-			if o.spec.name ~= "object" then
+			if o.spec.type ~= "object" then
 				data_spec = {
 					"string", o.spec.type,
 					"string", o.spec.name}

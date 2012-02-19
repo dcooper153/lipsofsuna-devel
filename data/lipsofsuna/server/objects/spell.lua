@@ -1,6 +1,7 @@
 require "server/objects/object"
 
 Spell = Class(Object)
+Spell.class_name = "Spell"
 
 --- Creates a new spell.
 -- @param clss Spell class.
@@ -10,14 +11,15 @@ Spell = Class(Object)
 --   <li>model: Model name.</li>
 --   <li>owner: Caster of the spell.</li>
 --   <li>position: Position in world space.</li>
---   <li>power: Effect power</li></ul>
+--   <li>power: Effect power</li>
+--   <li>spec: Spell spec.</li></ul>
 -- @return Spell.
 Spell.new = function(clss, args)
-	local self = Object.new(clss, {effect = args.effect, feat = args.feat, owner = args.owner, power = args.power})
+	local self = Object.new(clss, {effect = args.effect, feat = args.feat, owner = args.owner, power = args.power, spec = args.spec})
 	if args.effect == "dig" then
 		-- Create a digger projectile.
 		self.gravity = Vector()
-		self.model = args.model
+		self.model = args.spec.model
 		self.physics = "rigid"
 		self:fire{collision = true, feat = args.feat, owner = args.owner, timer = 10}
 		self.orig_rotation = self.rotation
@@ -48,14 +50,16 @@ Spell.new = function(clss, args)
 		-- Create a firewall.
 		-- When the feat is performed, a projectile is created here. When the
 		-- projectile hits something, we return here and create the flames.
-		if not args.position then
+		if not args.burning then
 			-- Create a projectile.
 			self.gravity = Vector()
-			self.model = args.model
+			self.model = args.spec.model
 			self.physics = "rigid"
 			self:fire{collision = true, feat = args.feat, owner = args.owner}
 		else
 			-- Create a flame.
+			self.spec = Spellspec:find{name = "firewall1"}
+			self.burning = true
 			self.model = "firewall1"
 			self.collision_mask = 0
 			self.position = args.position
@@ -76,7 +80,7 @@ Spell.new = function(clss, args)
 	elseif args.effect == "magic missile" then
 		-- Create a magic missile.
 		self.gravity = Vector()
-		self.model = args.model
+		self.model = args.spec.model
 		self.physics = "rigid"
 		self.speed = 3
 		self:fire{collision = true, feat = args.feat, owner = args.owner, speed = self.speed}
@@ -91,7 +95,7 @@ Spell.new = function(clss, args)
 	else
 		-- Create a normal projectile.
 		self.gravity = Vector()
-		self.model = args.model
+		self.model = args.spec.model
 		self.physics = "rigid"
 		self:fire{collision = true, feat = args.feat, owner = args.owner}
 	end
@@ -140,7 +144,8 @@ Spell.contact_cb = function(self, result)
 					local w = ctr + dir * i * Voxel.tile_size
 					local t = (w * Voxel.tile_scale + Vector(0,0.5,0)):floor()
 					if Voxel:get_tile(t) == 0 and Voxel:get_tile(t - Vector(0,1)) ~= 0 then
-						Spell{burning = true, effect = "firewall", position = w, power = self.power}
+						Spell{burning = true, effect = "firewall", power = self.power,
+							position = self.position, spec = Spellspec:find{name = "firewall1"}}
 					end
 				end
 			end

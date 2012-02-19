@@ -9,8 +9,11 @@ Actionspec{name = "ranged spell", func = function(feat, info, args)
 		for index,data in ipairs(feat.effects) do
 			local effect = Feateffectspec:find{name = data[1]}
 			if effect and effect.projectile then
-				Spell{effect = effect.name, feat = feat, model = effect.projectile, owner = args.user, power = data[2]}
-				return
+				local spec = Spellspec:find{name = effect.projectile}
+				if spec then
+					Spell{effect = effect.name, feat = feat, owner = args.user, power = data[2], spec = spec}
+					return
+				end
 			end
 		end
 	end)
