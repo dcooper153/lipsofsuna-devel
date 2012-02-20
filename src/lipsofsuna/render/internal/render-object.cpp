@@ -60,7 +60,7 @@ LIRenObject* liren_object_new (
 	self->id = id;
 
 	/* Initialize the backend. */
-	self->node = render->data->scene_manager->getRootSceneNode ()->createChildSceneNode ();
+	self->node = render->data->scene_root->createChildSceneNode ();
 	self->node->setVisible (false);
 
 	/* Add to dictionary. */

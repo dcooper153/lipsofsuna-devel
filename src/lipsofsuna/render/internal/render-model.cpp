@@ -415,9 +415,6 @@ static void private_create_mesh (
 		(model->bounds.max.y - model->bounds.min.y) +
 		(model->bounds.max.z - model->bounds.min.z));
 
-	/* Mark the mesh as loaded. */
-	self->mesh->load ();
-
 	/* Create a skeleton if needed. */
 	if (model->weight_groups.count)
 	{
@@ -427,9 +424,11 @@ static void private_create_mesh (
 			   the mesh completely to avoid exploding vertices. */
 			for (int i = self->mesh->getNumSubMeshes () - 1 ; i >= 0 ; i--)
 				self->mesh->destroySubMesh (i);
-			self->mesh->load ();
 		}
 	}
+
+	/* Mark the mesh as loaded. */
+	self->mesh->load ();
 }
 
 static int private_create_skeleton (

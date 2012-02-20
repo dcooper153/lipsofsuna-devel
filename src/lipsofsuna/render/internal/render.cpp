@@ -81,6 +81,7 @@ int liren_internal_init (
 	Ogre::Real w;
 	Ogre::Real h;
 	LIAlgList* ptr;
+	Ogre::String data1 (self->paths->module_data);
 
 	/* Initialize the private data. */
 	self->data = new LIRenRenderData;
@@ -105,30 +106,6 @@ int liren_internal_init (
 	/* Make sure that the required plugins were loaded. */
 	if (!private_check_plugin (self, "GL RenderSystem"))
 		return 0;
-
-	/* Create the group for temporary resources. */
-	/* This group is used for temporary resources such as meshes or
-	   materials instantiated and overridden for specific meshes. We
-	   want this kind of resources to be completely purged when unused. */
-	Ogre::ResourceGroupManager& mgr = Ogre::ResourceGroupManager::getSingleton ();
-	mgr.createResourceGroup (LIREN_RESOURCES_TEMPORARY);
-
-	/* Allow overriding of resources. */
-	self->data->resource_loading_listener = new LIRenResourceLoadingListener ();
-	mgr.setLoadingListener (self->data->resource_loading_listener);
-
-	/* Create the group for permanent resources. */
-	/* This group is used for resources that are managed by Ogre. They
-	   include textures and various scripts detected at initialization.
-	   Out of these, we only want to unload textures and even for them
-	   we want to keep the resource info available at all times. */
-	Ogre::String data1 (self->paths->module_data);
-	Ogre::String group = LIREN_RESOURCES_PERMANENT;
-	for (ptr = self->paths->paths ; ptr != NULL ; ptr = ptr->next)
-	{
-		const char* dir = (const char*) ptr->data;
-		mgr.addResourceLocation (dir, "FileSystem", group, false);
-	}
 
 	/* Initialize the render system. */
 	self->data->render_system = self->data->root->getRenderSystemByName ("OpenGL Rendering Subsystem");
@@ -170,6 +147,7 @@ int liren_internal_init (
 		}
 	}
 
+	/* Create the main window. */
 	self->data->render_window = self->data->root->initialise (true, "Lips of Suna");
 	self->mode = *mode;
 	private_update_mode (self);
@@ -202,13 +180,6 @@ int liren_internal_init (
 	self->data->scene_manager->setShadowTextureSize (1024);
 	self->data->scene_root = self->data->scene_manager->getRootSceneNode ();
 
-	/* Initialize resources. */
-	self->data->texture_manager = &Ogre::TextureManager::getSingleton ();
-	self->data->texture_manager->setDefaultNumMipmaps (5);
-	self->data->material_manager = &Ogre::MaterialManager::getSingleton ();
-	self->data->mesh_manager = &Ogre::MeshManager::getSingleton ();
-	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups ();
-
 	/* Initialize the camera. */
 	self->data->camera = self->data->scene_manager->createCamera ("Camera");
 	self->data->camera->setNearClipDistance (1);
@@ -225,6 +196,36 @@ int liren_internal_init (
 	self->data->overlay_manager->addOverlayElementFactory (self->data->container_factory);
 	self->data->image_factory = new LIRenImageOverlayFactory;
 	self->data->overlay_manager->addOverlayElementFactory (self->data->image_factory);
+
+	/* Create the group for temporary resources. */
+	/* This group is used for temporary resources such as meshes or
+	   materials instantiated and overridden for specific meshes. We
+	   want this kind of resources to be completely purged when unused. */
+	Ogre::ResourceGroupManager& mgr = Ogre::ResourceGroupManager::getSingleton ();
+	mgr.createResourceGroup (LIREN_RESOURCES_TEMPORARY);
+
+	/* Allow overriding of resources. */
+	self->data->resource_loading_listener = new LIRenResourceLoadingListener ();
+	mgr.setLoadingListener (self->data->resource_loading_listener);
+
+	/* Create the group for permanent resources. */
+	/* This group is used for resources that are managed by Ogre. They
+	   include textures and various scripts detected at initialization.
+	   Out of these, we only want to unload textures and even for them
+	   we want to keep the resource info available at all times. */
+	Ogre::String group = LIREN_RESOURCES_PERMANENT;
+	for (ptr = self->paths->paths ; ptr != NULL ; ptr = ptr->next)
+	{
+		const char* dir = (const char*) ptr->data;
+		mgr.addResourceLocation (dir, "FileSystem", group, false);
+	}
+
+	/* Load all resource scripts. */
+	self->data->texture_manager = &Ogre::TextureManager::getSingleton ();
+	self->data->texture_manager->setDefaultNumMipmaps (5);
+	self->data->material_manager = &Ogre::MaterialManager::getSingleton ();
+	self->data->mesh_manager = &Ogre::MeshManager::getSingleton ();
+	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups ();
 
 	return 1;
 }
@@ -853,6 +854,13 @@ static void private_unload_unused_resources (
 		/* The resource pointer we create here adds one extra reference. */
 		Ogre::ResourcePtr resource = iter.getNext ();
 		if (resource.useCount () > Ogre::ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+			continue;
+
+		/* Don't unload resources that are still loading. */
+		/* These resources are likely to be used by someone once loaded so unloading
+		   them could potentially degrade the overall performance. */
+		Ogre::Resource::LoadingState state = resource->getLoadingState ();
+		if (state == Ogre::Resource::LOADSTATE_LOADING || state == Ogre::Resource::LOADSTATE_PREPARING)
 			continue;
 
 		/* Remove or unload the resource. */
