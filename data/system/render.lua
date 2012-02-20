@@ -221,12 +221,17 @@ end
 
 Render.class_getters = {
 	anisotrophy = function(s) return Los.render_get_anisotrophy() end,
+	material_scheme = function(s) return rawget(s, "__material_scheme") or "Default" end,
 	scene_ambient = function(s) return rawget(s, "__scene_ambient") or {0.5,0.5,0.5,1.0} end,
 	skybox = function(s) return rawget(s, "__skybox") end,
 	stats = function(self) return Los.render_get_stats() end}
 
 Render.class_setters = {
 	anisotrophy = function(s, v) Los.render_set_anisotrophy(v) end,
+	material_scheme = function(s, v)
+		rawset(s, "__material_scheme", v)
+		Los.render_set_material_scheme(v)
+	end,
 	scene_ambient = function(s, v)
 		rawset(s, "__scene_ambient", v)
 		Los.render_set_scene_ambient(v)

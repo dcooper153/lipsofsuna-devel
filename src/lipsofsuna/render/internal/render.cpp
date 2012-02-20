@@ -650,6 +650,18 @@ void liren_internal_set_camera_transform (
 	self->data->camera->setOrientation (Ogre::Quaternion (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z));
 }
 
+/**
+ * \brief Sets the name of the preferred Ogre material scheme.
+ * \param self Renderer.
+ * \param value Material scheme name.
+ */
+void liren_internal_set_material_scheme (
+	LIRenRender* self,
+	const char*  value)
+{
+	self->data->viewport->setMaterialScheme (value);
+}
+
 void liren_internal_set_scene_ambient (
 	LIRenRender* self,
 	const float* value)

@@ -123,6 +123,18 @@ static void Render_set_anisotrophy (LIScrArgs* args)
 	}
 }
 
+static void Render_set_material_scheme (LIScrArgs* args)
+{
+	const char* value;
+	LIExtModule* module;
+
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
+	if (liscr_args_geti_string (args, 0, &value))
+		liren_render_set_material_scheme (module->render, value);
+	else
+		liren_render_set_material_scheme (module->render, "Default");
+}
+
 static void Render_set_scene_ambient (LIScrArgs* args)
 {
 	int i;
@@ -178,6 +190,7 @@ void liext_script_render (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_camera_transform", Render_set_camera_transform);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_get_anisotrophy", Render_get_anisotrophy);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_anisotrophy", Render_set_anisotrophy);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_material_scheme", Render_set_material_scheme);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_scene_ambient", Render_set_scene_ambient);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_set_skybox", Render_set_skybox);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_RENDER, "render_get_stats", Render_get_stats);

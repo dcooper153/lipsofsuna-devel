@@ -86,6 +86,10 @@ LIAPICALL (void, liren_render_set_camera_transform, (
 	LIRenRender*          self,
 	const LIMatTransform* value));
 
+LIAPICALL (void, liren_render_set_material_scheme, (
+	LIRenRender* self,
+	const char*  value));
+
 LIAPICALL (float, liren_render_get_opengl_version, (
 	LIRenRender* self));
 

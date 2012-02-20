@@ -279,6 +279,18 @@ void liren_render_set_camera_transform (
 	liren_internal_set_camera_transform (self, value);
 }
 
+/**
+ * \brief Sets the name of the preferred Ogre material scheme.
+ * \param self Renderer.
+ * \param value Material scheme name.
+ */
+void liren_render_set_material_scheme (
+	LIRenRender* self,
+	const char*  value)
+{
+	liren_internal_set_material_scheme (self, value);
+}
+
 float liren_render_get_opengl_version (
 	LIRenRender* self)
 {
