@@ -51,6 +51,7 @@ typedef struct _LIRenRenderData LIRenRenderData;
 #include "render-container-factory.hpp"
 #include "render-image-overlay-factory.hpp"
 #include "render-resource-loading-listener.hpp"
+#include "render-unique-id.hpp"
 struct _LIRenLight
 {
 	int id;
@@ -120,6 +121,7 @@ struct _LIRenRenderData
 	LIRenContainerFactory* container_factory;
 	LIRenImageOverlayFactory* image_factory;
 	LIRenResourceLoadingListener* resource_loading_listener;
+	LIRenUniqueId id;
 };
 #endif
 

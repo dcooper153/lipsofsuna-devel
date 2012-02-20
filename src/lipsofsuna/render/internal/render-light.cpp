@@ -29,9 +29,6 @@
 
 #define LIGHT_RANGE_MAX 32.0f
 
-static Ogre::String private_unique_id (
-	LIRenLight* self);
-
 static void private_update_type (
 	LIRenLight* self);
 
@@ -77,7 +74,7 @@ LIRenLight* liren_light_new (
 	}
 
 	/* Initialize the backend. */
-	self->light = render->data->scene_manager->createLight (private_unique_id (self));
+	self->light = render->data->scene_manager->createLight (self->render->data->id.next ());
 	self->light->setDiffuseColour (Ogre::ColourValue (diffuse[0], diffuse[1], diffuse[2], diffuse[3]));
 	self->light->setSpecularColour (Ogre::ColourValue (specular[0], specular[1], specular[2], specular[3]));
 	self->light->setAttenuation (LIGHT_RANGE_MAX, equation[0], equation[1], equation[2]);
@@ -257,12 +254,6 @@ void liren_light_set_transform (
 }
 
 /*****************************************************************************/
-
-static Ogre::String private_unique_id (
-	LIRenLight* self)
-{
-	return Ogre::StringConverter::toString (self->id);
-}
 
 static void private_update_type (
 	LIRenLight* self)

@@ -40,12 +40,6 @@ static void private_remove_overlay (
 	LIRenOverlay* self,
 	LIRenOverlay* child);
 
-static Ogre::String private_unique_element (
-	LIRenOverlay* self);
-
-static Ogre::String private_unique_overlay (
-	LIRenOverlay* self);
-
 static void private_update_position (
 	LIRenOverlay* self);
 
@@ -83,7 +77,7 @@ LIRenOverlay* liren_overlay_new (
 	}
 
 	/* Create the overlay element. */
-	self->container = (LIRenContainer*) render->data->overlay_manager->createOverlayElement ("LIRenContainer", private_unique_overlay (self));
+	self->container = (LIRenContainer*) render->data->overlay_manager->createOverlayElement ("LIRenContainer", self->render->data->id.next ());
 	self->container->setMetricsMode (Ogre::GMM_PIXELS);
 
 	return self;
@@ -111,7 +105,7 @@ void liren_overlay_free (
 	if (self->overlay != NULL)
 	{
 		self->overlay->remove2D (self->container);
-		self->render->data->overlay_manager->destroy (self->container->getName ());
+		self->render->data->overlay_manager->destroy (self->overlay->getName ());
 	}
 	if (self->container != NULL)
 		self->render->data->overlay_manager->destroyOverlayElement (self->container);
@@ -201,7 +195,7 @@ void liren_overlay_add_text (
 		x += (size[0] - w) * align[0];
 
 		/* Create the element. */
-		Ogre::String id = private_unique_element (self);
+		Ogre::String id = self->render->data->id.next ();
 		Ogre::TextAreaOverlayElement* elem = (Ogre::TextAreaOverlayElement*) self->render->data->overlay_manager->createOverlayElement ("TextArea", id);
 		elem->setMetricsMode (Ogre::GMM_PIXELS);
 		elem->setPosition (x, y);
@@ -254,7 +248,7 @@ void liren_overlay_add_tiled (
 	int source_size[2] = { texture->getWidth (), texture->getHeight () };
 
 	/* Create a new image overlay. */
-	Ogre::String id = private_unique_element (self);
+	Ogre::String id = self->render->data->id.next ();
 	LIRenImageOverlay* elem = (LIRenImageOverlay*) self->render->data->overlay_manager->createOverlayElement ("LIRenImageOverlay", id); 
 	elem->setMetricsMode (Ogre::GMM_PIXELS);
 	elem->setPosition (dest_position[0], dest_position[1]);
@@ -338,7 +332,7 @@ void liren_overlay_add_scaled (
 	}
 
 	/* Create a new panel overlay. */
-	Ogre::String id = private_unique_element (self);
+	Ogre::String id = self->render->data->id.next ();
 	Ogre::PanelOverlayElement* elem = (Ogre::PanelOverlayElement*) self->render->data->overlay_manager->createOverlayElement ("Panel", id); 
 	elem->setMetricsMode (Ogre::GMM_PIXELS);
 	elem->setPosition (dest_position[0], dest_position[1]);
@@ -370,7 +364,7 @@ void liren_overlay_add_overlay (
 	if (overlay->overlay != NULL)
 	{
 		overlay->overlay->remove2D (overlay->container);
-		overlay->render->data->overlay_manager->destroy (private_unique_overlay (overlay));
+		overlay->render->data->overlay_manager->destroy (overlay->overlay->getName ());
 		overlay->overlay = NULL;
 	}
 	if (overlay->parent != NULL)
@@ -424,7 +418,7 @@ void liren_overlay_set_floating (
 	LIRenOverlay* self,
 	int           value)
 {
-	Ogre::String id (private_unique_overlay (self));
+	Ogre::String id (self->render->data->id.next ());
 	if (value && self->overlay == NULL)
 	{
 		if (self->parent != NULL)
@@ -439,7 +433,7 @@ void liren_overlay_set_floating (
 	else if (!value && self->overlay != NULL)
 	{
 		self->overlay->remove2D (self->container);
-		self->render->data->overlay_manager->destroy (id);
+		self->render->data->overlay_manager->destroy (self->overlay->getName ());
 		self->overlay = NULL;
 	}
 }
@@ -605,21 +599,6 @@ static void private_remove_overlay (
 			break;
 		}
 	}
-}
-
-static Ogre::String private_unique_element (
-	LIRenOverlay* self)
-{
-	Ogre::String id1(Ogre::StringConverter::toString (self->id));
-	Ogre::String id2(Ogre::StringConverter::toString (self->container->elements.size ()));
-	return id1 + "." + id2;
-}
-
-static Ogre::String private_unique_overlay (
-	LIRenOverlay* self)
-{
-	Ogre::String id1(Ogre::StringConverter::toString (self->id));
-	return id1;
 }
 
 static void private_update_position (

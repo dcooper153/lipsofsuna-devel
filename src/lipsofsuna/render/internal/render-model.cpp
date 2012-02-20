@@ -60,13 +60,6 @@ static void private_override_pass (
 	LIMdlMaterial* mat,
 	Ogre::Pass*    pass);
 
-static Ogre::String private_unique_id (
-	LIRenModel* self);
-
-static Ogre::String private_unique_material (
-	LIRenModel* self,
-	int         index);
-
 /*****************************************************************************/
 
 /**
@@ -204,7 +197,7 @@ static void private_create_material (
 {
 	bool existing = false;
 	Ogre::MaterialPtr material;
-	Ogre::String unique_name = private_unique_material (self, index);
+	Ogre::String unique_name = self->render->data->id.next ();
 
 	/* Try to load an existing material. */
 	if (mat->material != NULL && mat->material[0] != '\0')
@@ -313,7 +306,7 @@ static void private_create_mesh (
 	lisys_assert (offset2 == 5 * 4);
 
 	/* Create the mesh. */
-	self->mesh = Ogre::MeshManager::getSingleton ().createManual (private_unique_id (self), LIREN_RESOURCES_TEMPORARY);
+	self->mesh = Ogre::MeshManager::getSingleton ().createManual (self->render->data->id.next (), LIREN_RESOURCES_TEMPORARY);
 	self->mesh->sharedVertexData = vertex_data;
 
 	/* Create the bone index to blend index mapping. */
@@ -457,7 +450,7 @@ static int private_create_skeleton (
 	}
 
 	/* Create the skeleton. */
-	Ogre::String name (private_unique_id (self));
+	Ogre::String name (self->render->data->id.next ());
 	Ogre::ResourcePtr resource = Ogre::SkeletonManager::getSingleton ().create (name, LIREN_RESOURCES_TEMPORARY, true);
 	Ogre::SkeletonPtr skeleton (resource);
 
@@ -593,20 +586,6 @@ static void private_override_pass (
 			j++;
 		}
 	}
-}
-
-static Ogre::String private_unique_id (
-	LIRenModel* self)
-{
-	return Ogre::StringConverter::toString (self->id);
-}
-
-static Ogre::String private_unique_material (
-	LIRenModel* self,
-	int         index)
-{
-	return private_unique_id (self) + "." +
-		Ogre::StringConverter::toString (index);
 }
 
 /** @} */

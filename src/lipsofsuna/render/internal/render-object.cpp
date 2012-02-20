@@ -31,11 +31,6 @@
 #include "render-model.h"
 #include "render-object.h"
 
-static Ogre::String private_unique_id (
-	LIRenObject* self);
-
-/*****************************************************************************/
-
 /**
  * \brief Creates a new render object and adds it to the scene.
  * \param render Renderer.
@@ -384,7 +379,7 @@ int liren_object_set_model (
 	/* Attach a new entity to the scene node. */
 	if (model != NULL && !model->mesh.isNull ())
 	{
-		Ogre::String e_name = private_unique_id (self);
+		Ogre::String e_name = self->render->data->id.next ();
 		Ogre::String m_name = model->mesh->getName ();
 		self->entity = self->render->data->scene_manager->createEntity (e_name, m_name);
 		self->node->attachObject (self->entity);
@@ -452,7 +447,7 @@ int liren_object_set_particle (
 	try
 	{
 		/* Attach a new particle system to the scene node. */
-		Ogre::String e_name = private_unique_id (self);
+		Ogre::String e_name = self->render->data->id.next ();
 		self->particles = self->render->data->scene_manager->createParticleSystem (e_name, name);
 		lisys_assert (self->particles != NULL);
 		self->node->attachObject (self->particles);
@@ -508,14 +503,6 @@ void liren_object_set_transform (
 	self->transform = *value;
 	self->node->setPosition (value->position.x, value->position.y, value->position.z);
 	self->node->setOrientation (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z);
-}
-
-/*****************************************************************************/
-
-static Ogre::String private_unique_id (
-	LIRenObject* self)
-{
-	return Ogre::StringConverter::toString (self->id);
 }
 
 /** @} */
