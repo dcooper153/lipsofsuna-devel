@@ -18,6 +18,7 @@ Options.new = function(clss)
 	self.mouse_smoothing = true
 	self.multisamples = 2
 	self.nudity_enabled = false
+	self.outlines_enabled = true
 	self.shader_quality = 2
 	self.shadow_casting_actors = true
 	self.shadow_casting_items = true
@@ -43,6 +44,7 @@ Options.new = function(clss)
 		multisamples = {"pow", 0, 6},
 		music_volume = {"float", 0, 1},
 		nudity_enabled = {"bool"},
+		outlines_enabled = {"bool"},
 		shader_quality = {"int", 1, 3},
 		shadow_casting_actors = {"bool"},
 		shadow_casting_items = {"bool"},
@@ -116,6 +118,7 @@ Options.save = function(self)
 	write("multisamples", self.multisamples)
 	write("music_volume", self.music_volume)
 	write("nudity_enabled", self.nudity_enabled)
+	write("outlines_enabled", self.outlines_enabled)
 	write("shader_quality", self.shader_quality)
 	write("shadow_casting_actors", self.shadows_casting_actors)
 	write("shadow_casting_items", self.shadows_casting_items)

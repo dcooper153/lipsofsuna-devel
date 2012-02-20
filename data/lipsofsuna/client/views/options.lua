@@ -248,6 +248,7 @@ Views.Options.load = function(self)
 		mouse_smoothing = function(v) self.mouse_smoothing = v end,
 		multisamples = function(v) self.multisamples = v end,
 		music_volume = function(v) self.music_volume = v end,
+		outlines_enabled = function(v) self.outlines_enabled = v end,
 		nudity_enabled = function(v) self.nudity_enabled = v end,
 		shader_quality = function(v) self.shader_quality = v end,
 		sound_volume = function(v) self.sound_volume = v end,
@@ -327,6 +328,7 @@ Views.Options:add_getters{
 	multisamples = function(self) return rawget(self, "_multisamples") end,
 	music_volume = function(self) return self.scroll_music.value end,
 	nudity_enabled = function(self) return self.toggle_nudity.active end,
+	outlines_enabled = function(self) return rawget(self, "__outlines_enabled")  end,
 	shader_quality = function(self) return rawget(self, "_shader_quality") end,
 	sound_volume = function(self) return self.scroll_sound.value end,
 	transparency_quality = function(self) return self.scroll_transparency.value end,
@@ -403,6 +405,11 @@ Views.Options:add_setters{
 	nudity_enabled = function(self, v)
 		rawset(self, "_nudity", v)
 		self.toggle_nudity.active = v
+		self:changed()
+	end,
+	outlines_enabled = function(self, v)
+		rawset(self, "__outlines_enabled", v)
+		Render.material_scheme = v and "Default" or "no-outline"
 		self:changed()
 	end,
 	shader_quality = function(self, v)

@@ -1,0 +1,15 @@
+vertex_program animoutline1_vert glsl
+{
+	source animoutline1.vert
+	preprocessor_defines BONES=32
+	includes_skeletal_animation true
+	default_params
+	{
+		param_named LOS_outline_width float 0.015
+		param_named LOS_outline_distance_factor float 0.17
+		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
+		param_named_auto LOS_matrix_world_inverse inverse_world_matrix
+		param_named_auto LOS_skeletal_matrix world_matrix_array_3x4 32
+		param_named_auto LOS_camera_position camera_position_object_space
+	}
+}

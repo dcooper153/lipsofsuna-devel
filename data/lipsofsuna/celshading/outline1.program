@@ -1,0 +1,20 @@
+vertex_program outline1_vert glsl
+{
+	source outline1.vert
+	includes_skeletal_animation true
+	default_params
+	{
+		param_named LOS_outline_width float 0.015
+		param_named LOS_outline_distance_factor float 0.17
+		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
+		param_named_auto LOS_camera_position camera_position_object_space
+	}
+}
+
+fragment_program outline1_frag glsl
+{
+	source outline1.frag
+	default_params
+	{
+	}
+}

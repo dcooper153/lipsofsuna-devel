@@ -1,37 +1,63 @@
+pass diffnorm1/lighting
+{
+	max_lights 3
+	ambient 0.7 0.7 0.7
+	diffuse 1.0 1.0 1.0
+	specular 1.0 1.0 1.0 1.0 64
+	texture_unit LOS1
+	{
+	}
+	texture_unit LOS2
+	{
+	}
+	texture_unit
+	{
+		texture celramp1.png 1d
+		tex_address_mode clamp
+	}
+	texture_unit
+	{
+		texture celramp2.png 1d
+		tex_address_mode clamp
+	}
+	vertex_program_ref diffnorm1_vert
+	{
+	}
+	fragment_program_ref diffnorm1_frag
+	{
+	}
+}
+
+pass diffnorm1/outline
+{
+	cull_hardware anticlockwise
+	vertex_program_ref outline1_vert
+	{
+	}
+	fragment_program_ref outline1_frag
+	{
+	}
+}
+
 material diffnorm1
 {
 	receive_shadows off
 	technique
 	{
 		shadow_caster_material shadowcaster1
-		pass LOS1
+		pass LOS1 : diffnorm1/lighting
 		{
-			max_lights 3
-			ambient 0.7 0.7 0.7
-			diffuse 1.0 1.0 1.0
-			specular 1.0 1.0 1.0 1.0 64
-			texture_unit LOS1
-			{
-			}
-			texture_unit LOS2
-			{
-			}
-			texture_unit
-			{
-				texture celramp1.png 1d
-				tex_address_mode clamp
-			}
-			texture_unit
-			{
-				texture celramp2.png 1d
-				tex_address_mode clamp
-			}
-			vertex_program_ref diffnorm1_vert
-			{
-			}
-			fragment_program_ref diffnorm1_frag
-			{
-			}
+		}
+		pass outline : diffnorm1/outline
+		{
+		}
+	}
+	technique
+	{
+		scheme no-outline
+		shadow_caster_material animshadowcaster1
+		pass LOS1 : diffnorm1/lighting
+		{
 		}
 	}
 	technique
