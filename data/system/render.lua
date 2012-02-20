@@ -240,15 +240,3 @@ Render.class_setters = {
 		rawset(s, "__skybox", v)
 		Los.render_set_skybox(v)
 	end}
-
-------------------------------------------------------------------------------
-
--- FIXME: Deprecated dummy class, remove
-Shader = Class()
-Shader.class_name = "Shader"
-Shader.new = function(clss, args)
-	local self = Class.new(clss)
-	return self
-end
-Shader.compile = function(self, args)
-end

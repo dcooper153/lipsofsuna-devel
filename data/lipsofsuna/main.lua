@@ -45,8 +45,6 @@ require "system/render"
 require "system/tiles-render"
 require "system/reload"
 require "system/widgets"
-require "client/shader"
-require "client/shaders/skeletal"
 end
 
 if Settings.quit then Program.quit = true end

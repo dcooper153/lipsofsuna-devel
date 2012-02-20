@@ -41,9 +41,6 @@ end
 for k,v in pairs(File:scan_directory("client/objects")) do
 	require("client/objects/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
-for k,v in pairs(File:scan_directory("client/shaders")) do
-	require("client/shaders/" .. string.gsub(v, "([^.]*).*", "%1"))
-end
 for k,v in pairs(File:scan_directory("client/views")) do
 	require("client/views/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
