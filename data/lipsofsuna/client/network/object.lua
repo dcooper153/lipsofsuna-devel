@@ -225,7 +225,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		debug("  SELF")
 		o.collision_group = Physics.GROUP_PLAYER
 		Client.player_object = o
-		Client.mouse_smoothing = Client.views.options.mouse_smoothing
+		Client.mouse_smoothing = Client.options.mouse_smoothing
 	end
 	-- Species.
 	if Bitwise:band(flags, Protocol.object_show_flags.SPECIES) ~= 0 then

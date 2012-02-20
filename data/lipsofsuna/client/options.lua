@@ -1,5 +1,30 @@
 Options = Class()
 
+Options.config_keys = {
+	anisotropic_filter = {"Anisotropic filtering", "int", 0, 32},
+	bloom_enabled = {"Bloom enabled", "bool"},
+	bloom_exposure = {"Bloom exposure", "float", 0, 10},
+	bloom_luminance = {"Bloom luminance", "float", 0, 1},
+	fullscreen = {"Fullscreen mode", "bool"},
+	invert_mouse = {"Inverted mouse", "bool"},
+	model_quality = {"High quality models", "bool"},
+	mouse_sensitivity = {"Mouse sensitivity", "float", 0, 1},
+	mouse_smoothing = {"Mouse smoothing", "bool"},
+	multisamples = {"Antialiasing", "pow", 0, 6},
+	music_volume = {"Music volume", "float", 0, 1},
+	nudity_enabled = {"Nudity enabled", "bool"},
+	outlines_enabled = {"Render outlines", "bool"},
+	shader_quality = {"Shader quality", "int", 1, 3},
+	shadow_casting_actors = {"Actors cast shadows", "bool"},
+	shadow_casting_items = {"Items cast shadows", "bool"},
+	shadow_casting_obstacles = {"Obstacles cast shadows", "bool"},
+	sound_volume = {"Effect volume", "float", 0, 1},
+	view_distance = {"View distance", "float", 10, 1000000},
+	view_distance_underground = {"View distance underground", "float", 5, 1000000},
+	vsync = {"Vertical sync", "bool"},
+	window_height = {"Window height", "int", 32, 65536},
+	window_width = {"Window width", "int", 32, 65536}}
+
 Options.new = function(clss)
 	-- Initialize defaults.
 	local self = Class.new(clss)
@@ -8,11 +33,8 @@ Options.new = function(clss)
 	self.window_width = 1024
 	self.window_height = 768
 	self.bloom_enabled = false
-	self.bloom_exposure = 1.5
-	self.bloom_luminance = 1
 	self.model_quality = 1
-	self.animation_quality = 1
-	self.anisotrophic_filter = 0
+	self.anisotropic_filter = 0
 	self.invert_mouse = false
 	self.mouse_sensitivity = 1
 	self.mouse_smoothing = true
@@ -23,72 +45,45 @@ Options.new = function(clss)
 	self.shadow_casting_actors = true
 	self.shadow_casting_items = true
 	self.shadow_casting_obstacles = true
-	self.transparency_quality = 0.3
 	self.sound_volume = 1.0
 	self.music_volume = 0.1
 	self.view_distance = 5000
 	self.view_distance_underground = 30
 	-- Read values from the configuration file.
 	self.config = ConfigFile{name = "options.cfg"}
-	local opts = {
-		animation_quality = {"float", 0, 1},
-		anisotrophic_filter = {"int", 0, 32},
-		bloom_enabled = {"bool"},
-		bloom_exposure = {"float", 0, 10},
-		bloom_luminance = {"float", 0, 1},
-		fullscreen = {"bool"},
-		invert_mouse = {"bool"},
-		model_quality = {"bool"},
-		mouse_sensitivity = {"float", 0, 1},
-		mouse_smoothing = {"bool"},
-		multisamples = {"pow", 0, 6},
-		music_volume = {"float", 0, 1},
-		nudity_enabled = {"bool"},
-		outlines_enabled = {"bool"},
-		shader_quality = {"int", 1, 3},
-		shadow_casting_actors = {"bool"},
-		shadow_casting_items = {"bool"},
-		shadow_casting_obstacles = {"bool"},
-		sound_volume = {"float", 0, 1},
-		transparency_quality = {"float", 0, 1},
-		view_distance = {"float", 10, 1000000},
-		view_distance_underground = {"float", 5, 1000000},
-		vsync = {"bool"},
-		window_height = {"int", 32, 65536},
-		window_width = {"int", 32, 65536}}
-	for k,t in pairs(opts) do
+	for k,t in pairs(clss.config_keys) do
 		local v = self.config:get(k)
 		if v then
 			-- Boolean.
-			if t[1] == "bool" then
+			if t[2] == "bool" then
 				if v == "true" then
 					self[k] = true
 				elseif v == "false" then
 					self[k] = false
 				end
 			-- Float.
-			elseif t[1] == "float" then
+			elseif t[2] == "float" then
 				local v = tonumber(v)
 				if v then
-					v = math.max(t[2], v)
-					v = math.min(t[3], v)
+					v = math.max(t[3], v)
+					v = math.min(t[4], v)
 					self[k] = v
 				end
 			-- Integer.
-			elseif t[1] == "int" then
+			elseif t[2] == "int" then
 				local v = tonumber(v)
 				if v then
 					v = math.floor(v)
-					v = math.max(t[2], v)
-					v = math.min(t[3], v)
+					v = math.max(t[3], v)
+					v = math.min(t[4], v)
 					self[k] = v
 				end
 			-- Power of two integer.
-			elseif t[1] == "pow" then
+			elseif t[2] == "pow" then
 				local v = tonumber(v)
 				if v then
-					local vv = 2^t[2]
-					for i=t[2],t[3] do
+					local vv = 2^t[3]
+					for i=t[3],t[4] do
 						if v < 2^i then break end
 						vv = 2^i
 					end
@@ -102,33 +97,15 @@ Options.new = function(clss)
 end
 
 Options.save = function(self)
-	local write = function(k, v)
-		self.config:set(k, tostring(v))
+	-- Get the sorted list of options.
+	local options = {}
+	for k in pairs(self.config_keys) do
+		table.insert(options, k)
 	end
-	write("animation_quality", self.animation_quality)
-	write("anisotrophic_filter", self.anisotrophic_filter)
-	write("bloom_enabled", self.bloom_enabled)
-	write("bloom_exposure", self.bloom_exposure)
-	write("bloom_luminance", self.bloom_luminance)
-	write("fullscreen", self.fullscreen)
-	write("invert_mouse", self.invert_mouse)
-	write("model_quality", self.model_quality)
-	write("mouse_sensitivity", self.mouse_sensitivity)
-	write("mouse_smoothing", self.mouse_smoothing)
-	write("multisamples", self.multisamples)
-	write("music_volume", self.music_volume)
-	write("nudity_enabled", self.nudity_enabled)
-	write("outlines_enabled", self.outlines_enabled)
-	write("shader_quality", self.shader_quality)
-	write("shadow_casting_actors", self.shadows_casting_actors)
-	write("shadow_casting_items", self.shadows_casting_items)
-	write("shadow_casting_obstacles", self.shadows_casting_obstacles)
-	write("sound_volume", self.sound_volume)
-	write("transparency_quality", self.transparency_quality)
-	write("view_distance", self.view_distance)
-	write("view_distance_underground", self.view_distance_underground)
-	write("vsync", self.vsync)
-	write("window_height", self.window_height)
-	write("window_width", self.window_width)
+	table.sort(options)
+	-- Update and save the configuration file.
+	for k,v in ipairs(options) do
+		self.config:set(v, tostring(self[v]))
+	end
 	self.config:save()
 end

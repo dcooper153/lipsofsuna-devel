@@ -15,6 +15,6 @@ Sound.switch_music_track = function(clss, mode)
 	local tracks = modes[clss.music_mode];
 	clss.music_fading = 2.0
 	clss.music_looping = (#tracks > 1)
-	clss.music_volume = Client.views.options.music_volume
+	clss.music_volume = Client.options.music_volume
 	clss.music = tracks[math.random(1, #tracks)]
 end

@@ -162,10 +162,8 @@ Eventhandler{type = "quit", func = function(self, args)
 	Program.quit = true
 end}
 
-local animt = 0
 local compasst = 0
 local fpst = 0
-local ipolt = 0
 Eventhandler{type = "tick", func = function(self, args)
 	-- Update the connection status.
 	if Client.views.startup.joined and not Network.connected then
@@ -173,8 +171,15 @@ Eventhandler{type = "tick", func = function(self, args)
 		Client.views.startup:set_state("Lost connection to the server!")
 	end
 	-- Update the window size.
+	local m = Program.video_mode
 	if Gui:resize() then
-		Client.views.options:changed()
+		local v = Program.video_mode
+		Client.options.window_width = v[1]
+		Client.options.window_height = v[2]
+		Client.options.fullscreen = v[3]
+		Client.options.vsync = v[4]
+		Client.options:save()
+		Client.views.options:load()
 	end
 	-- Update the notification widget.
 	Gui.notification:update(args.secs)
@@ -193,11 +198,9 @@ Eventhandler{type = "tick", func = function(self, args)
 		end
 	end
 	-- Update active objects.
-	animt = animt + args.secs
-	local anim = Object.animate and animt > 0.2 * (1 - Client.views.options.animation_quality)
 	for k,v in pairs(Object.dict_active) do
 		-- Update sound.
-		if anim and k.animated then
+		if k.animated then
 			k:update_sound(animt)
 		end
 		-- Interpolate positions.
@@ -211,7 +214,6 @@ Eventhandler{type = "tick", func = function(self, args)
 			Object.dict_active[k] = v
 		end
 	end
-	if anim then animt = 0 end
 	-- Update player state.
 	if Client.player_object then
 		Player:update_pose(args.secs)

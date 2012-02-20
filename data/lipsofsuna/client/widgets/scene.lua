@@ -18,9 +18,9 @@ end
 
 Widgets.Scene.update_camera = function(self)
 	-- Update the scene camera.
-	if Client and Client.views and Client.views.options then
-		Program.hdr = Views and Client.views.options.bloom_enabled
-		Program.multisamples = Views and Client.views.options.multisamples
+	if Client then
+		Program.hdr = Views and Client.options.bloom_enabled
+		Program.multisamples = Client.options.multisamples
 		Program.camera_far = self.camera.far
 		Program.camera_near = self.camera.near
 		Program.camera_position = self.camera.position
