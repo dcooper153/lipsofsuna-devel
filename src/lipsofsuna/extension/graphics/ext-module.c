@@ -215,6 +215,8 @@ static int private_engine_tick (
 {
 	if (!liren_render_update (self->render, secs))
 		self->program->quit = 1;
+	else
+		liren_render_get_videomode (self->render, &self->mode);
 
 	return 1;
 }
