@@ -27,7 +27,7 @@
 typedef struct _LIExtConfigFile LIExtConfigFile;
 struct _LIExtConfigFile
 {
-	char* path;
+	const char* path;
 	LIAlgStrdic* dict;
 };
 
@@ -46,7 +46,7 @@ static LIExtConfigFile* private_new_config (
 		return NULL;
 
 	/* Resolve the full path. */
-	self->path = lipth_paths_get_sql (module->program->paths, name);
+	self->path = lipth_paths_create_file (module->program->paths, name, 1);
 	if (self->path == NULL)
 	{
 		lisys_error_report ();
@@ -58,7 +58,6 @@ static LIExtConfigFile* private_new_config (
 	self->dict = lialg_strdic_new ();
 	if (self->dict == NULL)
 	{
-		lisys_free (self->path);
 		lisys_free (self);
 		return NULL;
 	}
@@ -105,7 +104,6 @@ static void private_free_config (
 	LIALG_STRDIC_FOREACH (iter, self->dict)
 		lisys_free (iter.value);
 	lialg_strdic_free (self->dict);
-	lisys_free (self->path);
 	lisys_free (self);
 }
 

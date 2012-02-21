@@ -56,7 +56,7 @@ int liext_heightmap_add_texture_layer (
 	{
 		Ogre::Image ds;
 		ds.loadTwoImagesAsRGBA (diffuse + fmt, specular + fmt, LIREN_RESOURCES_PERMANENT, Ogre::PF_BYTE_RGBA);
-		path = lipth_paths_create_file (module->render->paths, dsname.c_str ());
+		path = lipth_paths_create_file (module->render->paths, dsname.c_str (), 0);
 		ds.save (path);
 	}
 	catch (Ogre::Exception& e)
@@ -71,7 +71,7 @@ int liext_heightmap_add_texture_layer (
 	{
 		Ogre::Image nh;
 		nh.loadTwoImagesAsRGBA (normal + fmt, height + fmt, LIREN_RESOURCES_PERMANENT, Ogre::PF_BYTE_RGBA);
-		path = lipth_paths_create_file (module->render->paths, nhname.c_str ());
+		path = lipth_paths_create_file (module->render->paths, nhname.c_str (), 0);
 		nh.save (path);
 	}
 	catch (Ogre::Exception& e)

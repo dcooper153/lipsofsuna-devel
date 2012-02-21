@@ -76,12 +76,15 @@ static void Database_new (LIScrArgs* args)
 	}
 
 	/* Format the path. */
-	path = lipth_paths_get_sql (module->program->paths, name);
-	if (path == NULL)
+	ptr = lipth_paths_create_file (module->program->paths, name, 0);
+	if (ptr == NULL)
 	{
 		lisys_error_report ();
 		return;
 	}
+	path = lisys_string_dup (ptr);
+	if (path == NULL)
+		return;
 
 	/* Convert the path to UTF-8. */
 	/* Unlike other file functions we use, SQLite requires the filename to

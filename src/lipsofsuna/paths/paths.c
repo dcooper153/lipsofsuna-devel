@@ -88,6 +88,8 @@ LIPthPaths* lipth_paths_new (
 	}
 
 	/* Get the data directory. */
+	/* This is where the data files of the game are installed. The directory
+	   functions as a fallback for both data and configuration files.  */
 #ifdef LI_RELATIVE_PATHS
 	self->global_data = lisys_path_concat (self->root, "data", NULL);
 	if (self->global_data == NULL)
@@ -105,31 +107,37 @@ LIPthPaths* lipth_paths_new (
 		return NULL;
 	}
 
-	/* Get the data override directory. */
+	/* Get the data save directory. */
+	/* This is where save files are written and where the user can copy any
+	   custom data files or mods. It's the first place where data files are
+	   looked for. */
 	tmp = lisys_paths_get_data_home ();
 	if (tmp == NULL)
 	{
 		lipth_paths_free (self);
 		return NULL;
 	}
-	self->override_data = lisys_path_concat (tmp, "lipsofsuna", "data", name, NULL);
-	if (self->override_data == NULL)
+	self->module_data_save = lisys_path_concat (tmp, "lipsofsuna", name, NULL);
+	lisys_free (tmp);
+	if (self->module_data_save == NULL)
 	{
-		lisys_free (tmp);
 		lipth_paths_free (self);
 		return NULL;
 	}
 
-	/* Get the save directory. */
-	self->global_state = lisys_path_concat (tmp, "lipsofsuna", "save", NULL);
-	lisys_free (tmp);
-	if (self->global_state == NULL)
+	/* Get the config directory. */
+	/* This is where configuration files are stored. It's separate from the save
+	   directory since in Linux that's the case. In Windows it's actually the
+	   save directory. */
+	tmp = lisys_paths_get_config_home ();
+	if (tmp == NULL)
 	{
 		lipth_paths_free (self);
 		return NULL;
 	}
-	self->module_state = lisys_path_concat (self->global_state, name, NULL);
-	if (self->module_state == NULL)
+	self->module_config = lisys_path_concat (tmp, "lipsofsuna", name, NULL);
+	lisys_free (tmp);
+	if (self->module_config == NULL)
 	{
 		lipth_paths_free (self);
 		return NULL;
@@ -162,8 +170,8 @@ LIPthPaths* lipth_paths_new (
 	}
 
 	/* Create the save directories. */
-	if (!private_create_save_path (self, self->module_state) ||
-	    !private_create_save_path (self, self->override_data))
+	if (!private_create_save_path (self, self->module_data_save) ||
+	    !private_create_save_path (self, self->module_config))
 	{
 		lipth_paths_free (self);
 		return NULL;
@@ -206,11 +214,10 @@ void lipth_paths_free (
 	lisys_free (self->global_exts);
 	lisys_free (self->global_data);
 #endif
-	lisys_free (self->global_state);
-	lisys_free (self->module_data);
 	lisys_free (self->module_name);
-	lisys_free (self->module_state);
-	lisys_free (self->override_data);
+	lisys_free (self->module_config);
+	lisys_free (self->module_data);
+	lisys_free (self->module_data_save);
 	lisys_free (self->root);
 	lisys_free (self);
 }
@@ -239,7 +246,7 @@ int lipth_paths_add_path (
 		ret = 0;
 
 	/* Add the override directory. */
-	path1 = lisys_path_concat (self->override_data, path, NULL);
+	path1 = lisys_path_concat (self->module_data_save, path, NULL);
 	if (path1 != NULL)
 	{
 		lipth_paths_add_path_abs (self, path1);
@@ -326,35 +333,43 @@ int lipth_paths_add_path_abs (
  * \brief Creates a new file in the override directory.
  * \param self Paths.
  * \param name Filename.
+ * \param config One for a config file, zero for a data file.
  * \return path Absolute path or NULL.
  */
 const char* lipth_paths_create_file (
 	LIPthPaths* self,
-	const char* name)
+	const char* name,
+	int         config)
 {
 	char* path;
 	LIAlgStrdicNode* node;
 
 	/* Format the path. */
-	path = lisys_path_concat (self->override_data, name, NULL);
+	if (config)
+		path = lisys_path_concat (self->module_config, name, NULL);
+	else
+		path = lisys_path_concat (self->module_data_save, name, NULL);
 	if (path == NULL)
 		return NULL;
 
 	/* Register the file. */
-	node = lialg_strdic_find_node (self->files, name);
-	if (node != NULL)
+	if (!config)
 	{
-		lisys_free (node->value);
-		node->value = path;
+		node = lialg_strdic_find_node (self->files, name);
+		if (node != NULL)
+		{
+			lisys_free (node->value);
+			node->value = path;
+		}
+		else
+			lialg_strdic_insert (self->files, name, path);
 	}
-	else
-		lialg_strdic_insert (self->files, name, path);
 
 	return path;
 }
 
 /**
- * \brief Finds a file by name.
+ * \brief Finds a data file by name.
  * \param self Paths.
  * \param name File name.
  * \return path Absolute path or NULL.
@@ -367,71 +382,36 @@ const char* lipth_paths_find_file (
 }
 
 /**
- * \brief Gets the path to a generic data file.
- *
- * \param self Paths object.
+ * \brief Finds a data ir cibfug file by a path relative to the data directory root.
+ * \param self Paths.
  * \param name File name.
- * \return Full path or NULL.
+ * \return Absolute path or NULL.
  */
-char* lipth_paths_get_data (
+char* lipth_paths_find_path (
 	const LIPthPaths* self,
-	const char*       name)
+	const char*       path,
+	int               config)
 {
-	char* path;
+	char* path1;
 
-	/* Try the override path. */
-	path = lisys_path_concat (self->override_data, name, NULL);
-	if (path == NULL)
-		return NULL;
-	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
-		return path;
-	lisys_free (path);
+	/* Try the config/save path. */
+	if (config)
+		path1 = lisys_path_concat (self->module_config, path, NULL);
+	else
+		path1 = lisys_path_concat (self->module_data_save, path, NULL);
+	if (path1 == NULL)
+		   return NULL;
+	if (lisys_filesystem_access (path1, LISYS_ACCESS_READ))
+		   return path1;
+	lisys_free (path1);
 
-	/* Try the real path. */
-	return lisys_path_concat (self->module_data, name, NULL);
-}
+	/* Try the data path. */
+	path1 = lisys_path_concat (self->module_data, path, NULL);
+	if (lisys_filesystem_access (path1, LISYS_ACCESS_READ))
+		   return path1;
+	lisys_free (path1);
 
-/**
- * \brief Gets the path to a script file.
- *
- * \param self Paths object.
- * \param name File name.
- * \return Full path or NULL.
- */
-char* lipth_paths_get_script (
-	const LIPthPaths* self,
-	const char*       name)
-{
-	char* path;
-
-	/* Try the override path. */
-	path = lisys_path_concat (self->override_data, "scripts", name, NULL);
-	if (path == NULL)
-		return NULL;
-	if (lisys_filesystem_access (path, LISYS_ACCESS_READ))
-		return path;
-	lisys_free (path);
-
-	/* Try the real path. */
-	return lisys_path_concat (self->module_data, "scripts", name, NULL);
-}
-
-/**
- * \brief Gets the path to an SQL database.
- *
- * Calling this function will create the save directory if it doesn't exist
- * yet. If the creation fails or the function runs out of memory, NULL is
- * returned and the error message is set.
- *
- * \param self Paths object.
- * \param name File name.
- * \return Newly allocated absolute path or NULL.
- */
-char* lipth_paths_get_sql (
-	const LIPthPaths* self,
-	const char*       name)
-{
-	return lisys_path_concat (self->module_state, name, NULL);
+	return NULL;
 }
 
 /**

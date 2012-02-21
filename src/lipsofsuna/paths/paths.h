@@ -27,11 +27,10 @@ struct _LIPthPaths
 	char* root;
 	char* global_exts;
 	char* global_data;
-	char* global_state;
-	char* module_data;
 	char* module_name;
-	char* module_state;
-	char* override_data;
+	char* module_config;
+	char* module_data;
+	char* module_data_save;
 	LIAlgList* paths;
 	LIAlgStrdic* files;
 };
@@ -53,23 +52,17 @@ LIAPICALL (int, lipth_paths_add_path_abs, (
 
 LIAPICALL (const char*, lipth_paths_create_file, (
 	LIPthPaths* self,
-	const char* name));
+	const char* name,
+	int         config));
 
 LIAPICALL (const char*, lipth_paths_find_file, (
 	LIPthPaths* self,
 	const char* name));
 
-LIAPICALL (char*, lipth_paths_get_data, (
+LIAPICALL (char*, lipth_paths_find_path, (
 	const LIPthPaths* self,
-	const char*       name));
-
-LIAPICALL (char*, lipth_paths_get_script, (
-	const LIPthPaths* self,
-	const char*       name));
-
-LIAPICALL (char*, lipth_paths_get_sql, (
-	const LIPthPaths* self,
-	const char*       name));
+	const char*       path,
+	int               config));
 
 LIAPICALL (char*, lipth_paths_get_root, ());
 
