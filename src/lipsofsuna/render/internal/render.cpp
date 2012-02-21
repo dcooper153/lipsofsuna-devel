@@ -205,7 +205,7 @@ int liren_internal_init (
 	mgr.createResourceGroup (LIREN_RESOURCES_TEMPORARY);
 
 	/* Allow overriding of resources. */
-	self->data->resource_loading_listener = new LIRenResourceLoadingListener ();
+	self->data->resource_loading_listener = new LIRenResourceLoadingListener (self->paths);
 	mgr.setLoadingListener (self->data->resource_loading_listener);
 
 	/* Create the group for permanent resources. */
@@ -214,10 +214,15 @@ int liren_internal_init (
 	   Out of these, we only want to unload textures and even for them
 	   we want to keep the resource info available at all times. */
 	Ogre::String group = LIREN_RESOURCES_PERMANENT;
-	for (ptr = self->paths->paths ; ptr != NULL ; ptr = ptr->next)
+	if (self->paths->paths != NULL)
 	{
-		const char* dir = (const char*) ptr->data;
-		mgr.addResourceLocation (dir, "FileSystem", group, false);
+		for (ptr = self->paths->paths ; ptr->next != NULL ; ptr = ptr->next)
+			{}
+		for ( ; ptr != NULL ; ptr = ptr->prev)
+		{
+			const char* dir = (const char*) ptr->data;
+			mgr.addResourceLocation (dir, "FileSystem", group, false);
+		}
 	}
 
 	/* Load all resource scripts. */

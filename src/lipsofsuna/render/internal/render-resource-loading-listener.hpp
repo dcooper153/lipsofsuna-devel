@@ -19,13 +19,30 @@
 #define __RENDER_INTERNAL_RESOURCE_LOADING_LISTENER_HPP__
 
 #include "lipsofsuna/system.h"
+#include "lipsofsuna/paths.h"
 #include <OgreResourceGroupManager.h>
 
 class LIRenResourceLoadingListener : public Ogre::ResourceLoadingListener
 {
 public:
+	LIRenResourceLoadingListener (LIPthPaths* paths) : paths (paths)
+	{
+	}
 	virtual Ogre::DataStreamPtr resourceLoading (const Ogre::String& name, const Ogre::String& group, Ogre::Resource* resource)
 	{
+		/* Use the file lookup system the rest of the game uses to ensure proper
+		   overriding. With the order that was used for loading scripts, the
+		   priorities of images and other non-script data would be inverted. */
+		if (group == LIREN_RESOURCES_PERMANENT)
+		{
+			const char* path = lipth_paths_find_file (paths, name.c_str ());
+			if (path != NULL)
+			{
+				FILE* file = fopen (path, "rb");
+				if (file != NULL)
+					return Ogre::DataStreamPtr (OGRE_NEW Ogre::FileHandleDataStream (file, true));
+			}
+		}
 		return Ogre::DataStreamPtr ();
 	}
 	virtual void resourceStreamOpened (const Ogre::String& name, const Ogre::String& group, Ogre::Resource* resource, Ogre::DataStreamPtr& dataStream)
@@ -33,9 +50,15 @@ public:
 	}
 	virtual bool resourceCollision (Ogre::Resource* resource, Ogre::ResourceManager* resourceManager)
 	{
+		/* Replace old resources. */
+		/* This occurs when loading a script that overrides a previously defined script.
+		   Scripts are always loaded before any models that could use them so we can
+		   safely remove the old one. */
 		resourceManager->remove (resource->getName ());
 		return true;
 	}
+protected:
+	LIPthPaths* paths;
 };
 
 #endif
