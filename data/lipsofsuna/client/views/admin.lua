@@ -65,14 +65,15 @@ Event tick: %d ms
 Render tick: %d ms
 Rendered batches: %d
 Rendered faces: %d
-Allocated meshes: %d / %dkB
+Allocated meshes: %d : %dkB
 Allocated skeletons: %d
-Allocated textures: %d / %dkB
-Allocated materials: %d
+Allocated textures: %d/%d : %dkB
+Allocated materials: %d/%d
 ]], Program.fps, Database.memory_used / 1024, gcinfo(), Voxel.memory_used / 1024, models / 1024,
 1000 * Program.profiling.update, 1000 * Program.profiling.event, 1000 * Program.profiling.render,
-stats.batch_count, stats.face_count, stats.mesh_count, stats.mesh_memory / 1000,
-stats.skeleton_count, stats.texture_count, stats.texture_memory / 1000, stats.material_count)
+stats.batch_count, stats.face_count, stats.mesh_count, stats.mesh_memory / 1000, stats.skeleton_count,
+stats.texture_count_loaded, stats.texture_count, stats.texture_memory / 1000,
+stats.material_count_loaded, stats.material_count)
 	self.label_database:build()
 end
 

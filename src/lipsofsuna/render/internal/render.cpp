@@ -53,6 +53,10 @@ static int private_count_resources (
 	LIRenRender*           self,
 	Ogre::ResourceManager& manager);
 
+static int private_count_resources_loaded (
+	LIRenRender*           self,
+	Ogre::ResourceManager& manager);
+
 static void private_load_plugin (
 	LIRenRender* self,
 	const char*  name);
@@ -699,10 +703,13 @@ void liren_internal_get_stats (
 	result->batch_count = self->data->viewport->_getNumRenderedBatches ();
 	result->face_count = self->data->viewport->_getNumRenderedFaces ();
 	result->material_count = private_count_resources (self, Ogre::MaterialManager::getSingleton ());
+	result->material_count = private_count_resources (self, Ogre::MaterialManager::getSingleton ());
+	result->material_count_loaded = private_count_resources_loaded (self, Ogre::MaterialManager::getSingleton ());
 	result->mesh_count = private_count_resources (self, Ogre::MeshManager::getSingleton ());
 	result->mesh_memory = (int) Ogre::MeshManager::getSingleton ().getMemoryUsage ();
 	result->skeleton_count = private_count_resources (self, Ogre::SkeletonManager::getSingleton ());
 	result->texture_count = private_count_resources (self, Ogre::TextureManager::getSingleton ());
+	result->texture_count_loaded = private_count_resources_loaded (self, Ogre::TextureManager::getSingleton ());
 	result->texture_memory = (int) Ogre::TextureManager::getSingleton ().getMemoryUsage ();
 }
 
@@ -781,6 +788,22 @@ static int private_count_resources (
 	Ogre::ResourceManager::ResourceMapIterator iter = manager.getResourceIterator ();
 	for (count = 0 ; iter.hasMoreElements () ; iter.moveNext ())
 		count++;
+
+	return count;
+}
+
+static int private_count_resources_loaded (
+	LIRenRender*           self,
+	Ogre::ResourceManager& manager)
+{
+	int count;
+
+	Ogre::ResourceManager::ResourceMapIterator iter = manager.getResourceIterator ();
+	for (count = 0 ; iter.hasMoreElements () ; iter.moveNext ())
+	{
+		if (iter.peekNextValue ()->isLoaded ())
+			count++;
+	}
 
 	return count;
 }

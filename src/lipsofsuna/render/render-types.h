@@ -57,10 +57,12 @@ struct _LIRenStats
 	int batch_count;
 	int face_count;
 	int material_count;
+	int material_count_loaded;
 	int mesh_count;
 	int mesh_memory;
 	int skeleton_count;
 	int texture_count;
+	int texture_count_loaded;
 	int texture_memory;
 };
 

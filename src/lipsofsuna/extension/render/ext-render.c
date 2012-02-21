@@ -170,10 +170,12 @@ static void Render_get_stats (LIScrArgs* args)
 	liscr_args_sets_int (args, "batch_count", stats.batch_count);
 	liscr_args_sets_int (args, "face_count", stats.face_count);
 	liscr_args_sets_int (args, "material_count", stats.material_count);
+	liscr_args_sets_int (args, "material_count_loaded", stats.material_count_loaded);
 	liscr_args_sets_int (args, "mesh_count", stats.mesh_count);
 	liscr_args_sets_int (args, "mesh_memory", stats.mesh_memory);
 	liscr_args_sets_int (args, "skeleton_count", stats.skeleton_count);
 	liscr_args_sets_int (args, "texture_count", stats.texture_count);
+	liscr_args_sets_int (args, "texture_count_loaded", stats.texture_count_loaded);
 	liscr_args_sets_int (args, "texture_memory", stats.texture_memory);
 }
 
