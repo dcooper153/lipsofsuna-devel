@@ -65,14 +65,14 @@ char* lisys_paths_get_home ()
 		if (tmp[i] == '\\')
 			tmp[i] = '/';
 	}
-	return strdup (tmp);
+	return lisys_string_dup (tmp);
 #else
 	char* home;
 
 	home = getenv ("HOME");
 	if (home != NULL)
-		return strdup (home);
-	return strdup (".");
+		return lisys_string_dup  (home);
+	return lisys_string_dup  (".");
 #endif
 }
 
@@ -105,12 +105,12 @@ char* lisys_paths_get_data_home ()
 
 	dir = getenv ("XDG_DATA_HOME");
 	if (dir != NULL && dir[0] != '\0')
-		return strdup (dir);
+		return lisys_string_dup  (dir);
 	tmp = lisys_paths_get_home ();
 	if (tmp == NULL)
 		return NULL;
 	ret = lisys_path_concat (tmp, ".local/share", NULL);
-	free (tmp);
+	lisys_free (tmp);
 
 	return ret;
 #endif
@@ -135,12 +135,12 @@ char* lisys_paths_get_config_home ()
 
 	dir = getenv ("XDG_CONFIG_HOME");
 	if (dir != NULL && dir[0] != '\0')
-		return strdup (dir);
+		return lisys_string_dup  (dir);
 	tmp = lisys_paths_get_home ();
 	if (tmp == NULL)
 		return NULL;
 	ret = lisys_path_concat (tmp, ".config", NULL);
-	free (tmp);
+	lisys_free (tmp);
 
 	return ret;
 #endif

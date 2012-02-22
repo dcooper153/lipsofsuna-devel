@@ -109,7 +109,7 @@ static void Model_add_triangles (LIScrArgs* args)
 					vertices_cap = 32;
 				else
 					vertices_cap <<= 1;
-				tmp = realloc (vertices, vertices_cap * sizeof (LIMdlVertex));
+				tmp = lisys_realloc (vertices, vertices_cap * sizeof (LIMdlVertex));
 				if (tmp == NULL)
 				{
 					lisys_free (vertices);
@@ -155,7 +155,7 @@ static void Model_add_triangles (LIScrArgs* args)
 	}
 
 	/* Create the index buffer. */
-	indices = calloc (vertices_num, sizeof (LIMdlIndex));
+	indices = lisys_calloc (vertices_num, sizeof (LIMdlIndex));
 	if (indices == NULL)
 	{
 		lisys_free (vertices);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -36,6 +36,8 @@
 typedef struct _LISysMemrec LISysMemrec;
 struct _LISysMemrec { size_t size; size_t bt_size; void* bt[MEMDEBUG_BTSIZE]; };
 static int memdebug_skip = 0;
+static int memdebug_allocated = 0;
+static int memdebug_allocated_max = 0;
 static LIAlgPtrdic* memdebug_dict = NULL;
 static pthread_mutex_t memdebug_mutex = PTHREAD_RECURSIVE_MUTEX_INITIALIZER_NP;
 static void private_mem_add (void* mem, size_t size);
@@ -134,7 +136,7 @@ void lisys_memchk (
 /**
  * \brief Dumps all the allocated memory blocks when compiled with memory debugging.
  */
-void lisys_memstats ()
+void lisys_memdump ()
 {
 #ifdef LI_ENABLE_MEMDEBUG
 	size_t i;
@@ -155,6 +157,20 @@ void lisys_memstats ()
 			free (names);
 		}
 	}
+	pthread_mutex_unlock (&memdebug_mutex);
+	lisys_memstats ();
+#endif
+}
+
+/**
+ * \brief Dumps memory usage when compiled with memory debugging.
+ */
+void lisys_memstats ()
+{
+#ifdef LI_ENABLE_MEMDEBUG
+	pthread_mutex_lock (&memdebug_mutex);
+	printf ("\nTotal memory in use: %dB\n", memdebug_allocated);
+	printf ("Maximum memory used: %dB\n", memdebug_allocated_max);
 	pthread_mutex_unlock (&memdebug_mutex);
 #endif
 }
@@ -190,10 +206,15 @@ static void private_mem_add (void* mem, size_t size)
 		if (memdebug_dict == NULL)
 		{
 			memdebug_dict = lialg_ptrdic_new ();
-			atexit (lisys_memstats);
+			atexit (lisys_memdump);
 		}
 		lialg_ptrdic_insert (memdebug_dict, mem, rec);
 		memdebug_skip--;
+
+		/* Remove to total. */
+		memdebug_allocated += size;
+		if (memdebug_allocated_max < memdebug_allocated)
+			memdebug_allocated_max = memdebug_allocated;
 
 		/* Add the padding. */
 		for (i = 0 ; i < MEMDEBUG_PADSIZE ; i++)
@@ -222,6 +243,9 @@ static size_t private_mem_del (void* mem)
 		lialg_ptrdic_remove (memdebug_dict, mem);
 		memdebug_skip--;
 		free (rec);
+
+		/* Remove from total. */
+		memdebug_allocated -= size;
 	}
 	pthread_mutex_unlock (&memdebug_mutex);
 

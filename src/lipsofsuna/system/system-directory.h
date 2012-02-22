@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,10 +24,6 @@ typedef int (*LISysDirFilter)(const char* dir, const char* name, void* data);
 typedef int (*LISysDirSorter)(const char** name0, const char** name1);
 typedef struct _LISysDir LISysDir;
 struct _LISysDir;
-
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 LIAPICALL (LISysDir*, lisys_dir_open, (
 	const char* path));
@@ -81,9 +77,5 @@ LIAPICALL (int, lisys_dir_filter_visible, (
 LIAPICALL (int, lisys_dir_sorter_alpha, (
 	const char** name0,
 	const char** name1));
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif

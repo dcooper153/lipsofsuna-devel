@@ -1,9 +1,9 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
- * Lips of Suna is free software: you can redistribute it and/or modify
+ * Lips of Suna is lisys_free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
- * published by the Free Software Foundation, either version 3 of the
+ * published by the lisys_free Software Foundation, either version 3 of the
  * License, or (at your option) any later version.
  *
  * Lips of Suna is distributed in the hope that it will be useful,
@@ -31,6 +31,8 @@
 #include <unistd.h>
 #include "system.h"
 #include "system-directory.h"
+#include "system-memory.h"
+#include "system-string.h"
 
 #ifdef LI_ENABLE_ERROR
 #include "system-error.h"
@@ -58,25 +60,24 @@ struct _LISysDir
 	} names;
 };
 
-static char*
-private_concat_paths (const char* a,
-                      const char* b);
+static char* private_concat_paths (
+	const char* a,
+	const char* b);
 
 /*****************************************************************************/
 
 /**
  * \brief Opens a directory.
- *
  * \param path Path to directory.
  * \return Directory or NULL.
  */
-LISysDir*
-lisys_dir_open (const char* path)
+LISysDir* lisys_dir_open (
+	const char* path)
 {
 	LISysDir* self;
 
 	/* Allocate self. */
-	self = calloc (1, sizeof (LISysDir));
+	self = lisys_calloc (1, sizeof (LISysDir));
 	if (self == NULL)
 	{
 		error_memory ();
@@ -84,11 +85,11 @@ lisys_dir_open (const char* path)
 	}
 
 	/* Store path. */
-	self->path = strdup (path);
+	self->path = lisys_string_dup (path);
 	if (self->path == NULL)
 	{
 		error_memory ();
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -97,8 +98,8 @@ lisys_dir_open (const char* path)
 	if (self->dir == NULL)
 	{
 		error_open ("cannot open directory `%s'", path);
-		free (self->path);
-		free (self);
+		lisys_free (self->path);
+		lisys_free (self);
 		return NULL;
 	}
 
@@ -106,21 +107,20 @@ lisys_dir_open (const char* path)
 }
 
 /**
- * \brief Frees a directory.
- *
+ * \brief lisys_frees a directory.
  * \param self Directory.
  */
-void
-lisys_dir_free (LISysDir* self)
+void lisys_dir_free (
+	LISysDir* self)
 {
 	int i;
 
 	closedir (self->dir);
 	for (i = 0 ; i < self->names.count ; i++)
-		free (self->names.array[i]);
-	free (self->names.array);
-	free (self->path);
-	free (self);
+		lisys_free (self->names.array[i]);
+	lisys_free (self->names.array);
+	lisys_free (self->path);
+	lisys_free (self);
 }
 
 /**
@@ -132,8 +132,8 @@ lisys_dir_free (LISysDir* self)
  * \param self Directory.
  * \return Nonzero on success.
  */
-int
-lisys_dir_scan (LISysDir* self)
+int lisys_dir_scan (
+	LISysDir* self)
 {
 	int i;
 	int num = 0;
@@ -143,7 +143,7 @@ lisys_dir_scan (LISysDir* self)
 	struct dirent* ent;
 
 	/* Allocate the name list. */
-	list = malloc (cap * sizeof (char*));
+	list = lisys_malloc (cap * sizeof (char*));
 	if (list == NULL)
 	{
 		error_memory ();
@@ -164,7 +164,7 @@ lisys_dir_scan (LISysDir* self)
 		/* Resize the list. */
 		if (num == cap)
 		{
-			tmp = realloc (list, (cap << 1) * sizeof (char*));
+			tmp = lisys_realloc (list, (cap << 1) * sizeof (char*));
 			if (tmp == NULL)
 			{
 				error_memory ();
@@ -175,7 +175,7 @@ lisys_dir_scan (LISysDir* self)
 		}
 
 		/* Append to the list. */
-		list[num] = strdup (ent->d_name);
+		list[num] = lisys_string_dup (ent->d_name);
 		if (list[num] == NULL)
 		{
 			error_memory ();
@@ -187,13 +187,13 @@ lisys_dir_scan (LISysDir* self)
 	/* Shrink. */
 	if (num != 0)
 	{
-		tmp = realloc (list, num * sizeof (char*));
+		tmp = lisys_realloc (list, num * sizeof (char*));
 		if (tmp != NULL)
 			list = tmp;
 	}
 	else
 	{
-		free (list);
+		lisys_free (list);
 		list = NULL;
 	}
 
@@ -203,8 +203,8 @@ lisys_dir_scan (LISysDir* self)
 
 	/* Replace old names. */
 	for (i = 0 ; i < self->names.count ; i++)
-		free (self->names.array[i]);
-	free (self->names.array);
+		lisys_free (self->names.array[i]);
+	lisys_free (self->names.array);
 	self->names.count = num;
 	self->names.array = list;
 
@@ -212,33 +212,31 @@ lisys_dir_scan (LISysDir* self)
 
 error:
 	for (i = 0 ; i < num ; i++)
-		free (list[i]);
-	free (list);
+		lisys_free (list[i]);
+	lisys_free (list);
 	return 0;
 }
 
 /**
  * \brief Gets the number of files in the directory.
- * 
  * \param self Directory.
  * \return Number of files.
  */
-int
-lisys_dir_get_count (const LISysDir* self)
+int lisys_dir_get_count (
+	const LISysDir* self)
 {
 	return self->names.count;
 }
 
 /**
  * \brief Gets the name of one of the files in the name array.
- *
  * \param self Directory.
  * \param i Index in the name array.
  * \return String owned by the directory.
  */
-const char*
-lisys_dir_get_name (const LISysDir* self,
-                    int             i)
+const char* lisys_dir_get_name (
+	const LISysDir* self,
+	int             i)
 {
 	lisys_assert (i >= 0);
 	lisys_assert (i < self->names.count);
@@ -248,14 +246,13 @@ lisys_dir_get_name (const LISysDir* self,
 
 /**
  * \brief Gets the path to one of the files in the name array.
- *
  * \param self Directory.
  * \param i Index in the name array.
  * \return New string or NULL.
  */
-char*
-lisys_dir_get_path (const LISysDir* self,
-                    int             i)
+char* lisys_dir_get_path (
+	const LISysDir* self,
+	int             i)
 {
 	lisys_assert (i >= 0);
 	lisys_assert (i < self->names.count);
@@ -265,15 +262,14 @@ lisys_dir_get_path (const LISysDir* self,
 
 /**
  * \brief Set the current filter rule.
- *
  * \param self Directory.
  * \param filter Filter function or NULL.
  * \param data Userdata to be passed to the filter function.
  */
-void
-lisys_dir_set_filter (LISysDir*      self,
-                      LISysDirFilter filter,
-                      void*          data)
+void lisys_dir_set_filter (
+	LISysDir*      self,
+	LISysDirFilter filter,
+	void*          data)
 {
 	self->calls.filter = filter;
 	self->calls.filter_data = data;
@@ -281,13 +277,12 @@ lisys_dir_set_filter (LISysDir*      self,
 
 /**
  * \brief Set the current sorter rule.
- *
  * \param self Directory.
  * \param sorter Sorter function or NULL.
  */
-void
-lisys_dir_set_sorter (LISysDir*      self,
-                      LISysDirSorter sorter)
+void lisys_dir_set_sorter (
+	LISysDir*      self,
+	LISysDirSorter sorter)
 {
 	self->calls.sorter = sorter;
 }
@@ -297,10 +292,10 @@ lisys_dir_set_sorter (LISysDir*      self,
 /**
  * \brief Lets everything except directories through.
  */
-int
-lisys_dir_filter_files (const char* dir,
-                        const char* name,
-                        void*       data)
+int lisys_dir_filter_files (
+	const char* dir,
+	const char* name,
+	void*       data)
 {
 	char* path;
 	struct stat st;
@@ -310,26 +305,26 @@ lisys_dir_filter_files (const char* dir,
 		return 1;
 	if (stat (path, &st) < 0)
 	{
-		free (path);
+		lisys_free (path);
 		return 0;
 	}
 	if (!S_ISDIR (st.st_mode))
 	{
-		free (path);
+		lisys_free (path);
 		return 1;
 	}
 
-	free (path);
+	lisys_free (path);
 	return 0;
 }
 
 /**
  * \brief Only lets directories through.
  */
-int
-lisys_dir_filter_dirs (const char* dir,
-                       const char* name,
-                       void*       data)
+int lisys_dir_filter_dirs (
+	const char* dir,
+	const char* name,
+	void*       data)
 {
 	char* path;
 	struct stat st;
@@ -339,26 +334,26 @@ lisys_dir_filter_dirs (const char* dir,
 		return 1;
 	if (stat (path, &st) < 0)
 	{
-		free (path);
+		lisys_free (path);
 		return 0;
 	}
 	if (S_ISDIR (st.st_mode))
 	{
-		free (path);
+		lisys_free (path);
 		return 1;
 	}
 
-	free (path);
+	lisys_free (path);
 	return 0;
 }
 
 /**
  * \brief Only lets hidden files through.
  */
-int
-lisys_dir_filter_hidden (const char* dir,
-                         const char* name,
-                         void*       data)
+int lisys_dir_filter_hidden (
+	const char* dir,
+	const char* name,
+	void*       data)
 {
 	if (name[0] == '.')
 		return 1;
@@ -368,10 +363,10 @@ lisys_dir_filter_hidden (const char* dir,
 /**
  * \brief Only lets non-hidden files through.
  */
-int
-lisys_dir_filter_visible (const char* dir,
-                          const char* name,
-                          void*       data)
+int lisys_dir_filter_visible (
+	const char* dir,
+	const char* name,
+	void*       data)
 {
 	if (name[0] == '.')
 		return 0;
@@ -381,18 +376,18 @@ lisys_dir_filter_visible (const char* dir,
 /**
  * \brief Sorts entries alphabetically.
  */
-int
-lisys_dir_sorter_alpha (const char** name0,
-                        const char** name1)
+int lisys_dir_sorter_alpha (
+	const char** name0,
+	const char** name1)
 {
 	return strcmp (*name0, *name1);
 }
 
 /*****************************************************************************/
 
-static char*
-private_concat_paths (const char* a,
-                      const char* b)
+static char* private_concat_paths (
+	const char* a,
+	const char* b)
 {
 	int len0;
 	int len1;
@@ -400,7 +395,7 @@ private_concat_paths (const char* a,
 
 	len0 = strlen (a);
 	len1 = strlen (b);
-	ret = malloc (len0 + len1 + 2);
+	ret = lisys_malloc (len0 + len1 + 2);
 	if (ret == NULL)
 	{
 		error_memory ();

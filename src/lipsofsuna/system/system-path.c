@@ -305,7 +305,7 @@ char* lisys_path_format (
 	if (error)
 	{
 		lisys_error_set (ENOMEM, "not enough memory to construct path");
-		free (self);
+		lisys_free (self);
 		return NULL;
 	}
 

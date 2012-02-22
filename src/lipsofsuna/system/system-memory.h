@@ -38,6 +38,8 @@ LIAPICALL (void, lisys_free, (
 LIAPICALL (void, lisys_memchk, (
 	void*  mem));
 
+LIAPICALL (void, lisys_memdump, ());
+
 LIAPICALL (void, lisys_memstats, ());
 
 #endif
