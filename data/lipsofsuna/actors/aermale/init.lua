@@ -35,10 +35,12 @@ Species{
 		["land ground"] = {animation = "land", channel = 5, fade_in = 0.1, fade_out = 0.5, weight = 10, node_weights = {LOWER = 1000}},
 		["spell self"] = {animation = "spell-self", channel = 2, weight = 30}},
 	effect_falling_damage = "aerhurt1",
+	equipment_class = "aermale",
+	model = "aermale1",
 	models = {
 		skeleton = "aermale1",
 		arms = "aermale1arms1",
-		hands = "aermale1hands1",
+		--hands = "aermale1hands1",
 		head = "aermale1head1",
 		legs = "aermale1legs1",
 		feet = "aermale1feet1",

@@ -33,6 +33,7 @@ Species{
 	categories = {"enemy"},
 	difficulty = 0.25,
 	effect_physical_damage = "fleshimpact1",
+	equipment_class = "troglodyte",
 	eye_style = "random",
 	hair_style = "random",
 	factions = {"evil"},
@@ -42,7 +43,7 @@ Species{
 	model = "trogfem1",
 	models = {
 		skeleton = "trogfem1",
-		arms = "trogfemarmnude1",
+		--arms = "trogfemarmnude1",
 		head = "trogfemhead1",
 		legs = "trogfemlegnude1",
 		lower = "trogfemlowernude1",
