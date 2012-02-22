@@ -403,6 +403,12 @@ int limai_program_insert_extension (
 	info = limai_extension_get_builtin (name);
 	if (info == NULL)
 	{
+		if (self->paths->global_exts != NULL)
+		{
+			lisys_error_set (EINVAL, "cannot open extension `%s'");
+			lisys_free (ident);
+			return 0;
+		}
 		path = lisys_path_format (self->paths->global_exts, LISYS_PATH_SEPARATOR,
 			"lib", name, ".", LISYS_EXTENSION_DLL, NULL);
 		if (path == NULL)
@@ -425,8 +431,9 @@ int limai_program_insert_extension (
 			lisys_free (path);
 			if (module == NULL)
 			{
+				lisys_error_set (EINVAL, "cannot open extension `%s'");
 				lisys_free (ident);
-				goto error;
+				return 0;
 			}
 		}
 		info = lisys_module_symbol (module, ident);
@@ -436,24 +443,34 @@ int limai_program_insert_extension (
 	/* Check for valid module info. */
 	if (info == NULL)
 	{
-		lisys_error_set (EINVAL, "no module info");
-		goto error;
+		lisys_error_set (EINVAL, "cannot load extension `%s': no module info");
+		if (module != NULL)
+			lisys_module_free (module);
+		return 0;
 	}
 	if (info->version != LIMAI_EXTENSION_VERSION)
 	{
-		lisys_error_set (EINVAL, "invalid module version");
-		goto error;
+		lisys_error_set (EINVAL, "cannot load extension `%s': invalid module version");
+		if (module != NULL)
+			lisys_module_free (module);
+		return 0;
 	}
 	if (info->name == NULL || info->init == NULL || info->free == NULL)
 	{
-		lisys_error_set (EINVAL, "invalid module format");
-		goto error;
+		lisys_error_set (EINVAL, "cannot load extension `%s': invalid module format");
+		if (module != NULL)
+			lisys_module_free (module);
+		return 0;
 	}
 
 	/* Allocate extension. */
 	extension = lisys_calloc (1, sizeof (LIMaiExtension));
 	if (extension == NULL)
-		goto error;
+	{
+		if (module != NULL)
+			lisys_module_free (module);
+		return 0;
+	}
 	strncpy (extension->name, name, sizeof (extension->name) - 1);
 	extension->info = info;
 	extension->module = module;
@@ -462,8 +479,10 @@ int limai_program_insert_extension (
 	extension->object = ((void* (*)(LIMaiProgram*)) info->init)(self);
 	if (extension->object == NULL)
 	{
+		if (module != NULL)
+			lisys_module_free (module);
 		lisys_free (extension);
-		goto error;
+		return 0;
 	}
 
 	/* Insert to extension list. */
@@ -474,12 +493,6 @@ int limai_program_insert_extension (
 	self->extensions = extension;
 
 	return 1;
-
-error:
-	lisys_error_append ("cannot initialize module `%s'", name);
-	if (module != NULL)
-		lisys_module_free (module);
-	return 0;
 }
 
 /**

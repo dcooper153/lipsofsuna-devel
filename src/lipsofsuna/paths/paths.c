@@ -25,6 +25,9 @@
 #include "lipsofsuna/system.h"
 #include "paths.h"
 
+static int private_validate_dir (
+	char** path);
+
 static int private_create_save_path (
 	LIPthPaths* paths,
 	const char* path);
@@ -44,7 +47,6 @@ LIPthPaths* lipth_paths_new (
 {
 	char* tmp;
 	LIPthPaths* self;
-	LISysStat stat;
 
 	/* Allocate self. */
 	self = lisys_calloc (1, sizeof (LIPthPaths));
@@ -87,22 +89,39 @@ LIPthPaths* lipth_paths_new (
 		}
 	}
 
-	/* Get the data directory. */
-	/* This is where the data files of the game are installed. The directory
-	   functions as a fallback for both data and configuration files.  */
+	/* Get the data directory root. */
+	/* This is where modules and system scripts are located. If relative paths
+	   are enabled, the directory of the executable is searched for a data
+	   directory. Failing that, XDG data directories are searched for the game
+	   directory. As the last resort, the hardcoded data directory is used. */
 #ifdef LI_RELATIVE_PATHS
 	self->global_data = lisys_path_concat (self->root, "data", NULL);
-	if (self->global_data == NULL)
-	{
-		lipth_paths_free (self);
-		return NULL;
-	}
-#else
-	self->global_data = LIDATADIR;
+	if (!private_validate_dir (&self->global_data))
 #endif
-	self->module_data = lisys_path_concat (self->global_data, name, NULL);
-	if (self->module_data == NULL)
 	{
+		self->global_data = lisys_paths_get_data_global ("lipsofsuna");
+		private_validate_dir (&self->global_data);
+		if (self->global_data == NULL)
+		{
+#ifdef LIDATADIR
+			self->global_data = lisys_string_dup (LIDATADIR);
+			if (!private_validate_dir (&self->global_data))
+#endif
+			{
+				lisys_error_set (EINVAL, "cannot find the data directory");
+				lipth_paths_free (self);
+				return NULL;
+			}
+		}
+	}
+
+	/* Get the data directory of the current module. */
+	/* This is where the data files of the module are installed. The directory
+	   functions as a fallback for both data and configuration files. */
+	self->module_data = lisys_path_concat (self->global_data, name, NULL);
+	if (!private_validate_dir (&self->module_data))
+	{
+		lisys_error_set (EINVAL, "cannot find the module data directory");
 		lipth_paths_free (self);
 		return NULL;
 	}
@@ -144,29 +163,22 @@ LIPthPaths* lipth_paths_new (
 	}
 
 	/* Get the extension directory. */
+	/* This directory is reserved for potential third party extension libraries.
+	   The path is lib/extensions either in the relative path, XDG data path or
+	   the hardcoded extension directory. */
 #ifdef LI_RELATIVE_PATHS
 	self->global_exts = lisys_path_concat (self->global_data, "lib", "extensions", NULL);
-	if (self->global_exts == NULL)
-	{
-		lipth_paths_free (self);
-		return NULL;
-	}
-#else
-	self->global_exts = LIEXTSDIR;
+	if (!private_validate_dir (&self->global_exts))
 #endif
-
-	/* Check for a valid data directory. */
-	if (!lisys_filesystem_stat (self->module_data, &stat))
 	{
-		lisys_error_set (EIO, "missing data directory `%s'", self->module_data);
-		lipth_paths_free (self);
-		return NULL;
-	}
-	if (stat.type != LISYS_STAT_DIRECTORY && stat.type != LISYS_STAT_LINK)
-	{
-		lisys_error_set (EIO, "invalid data directory `%s': not a directory", self->module_data);
-		lipth_paths_free (self);
-		return NULL;
+		self->global_exts = lisys_paths_get_data_global ("lipsofsuna/lib/extensions");
+#ifdef LIEXTSDIR
+		if (!private_validate_dir (self->global_exts))
+		{
+			self->global_exts = lisys_string_dup (LIEXTSDIR);
+			private_validate_dir (self->global_exts);
+		}
+#endif
 	}
 
 	/* Create the save directories. */
@@ -210,10 +222,8 @@ void lipth_paths_free (
 		lialg_strdic_free (self->files);
 	}
 
-#ifdef LI_RELATIVE_PATHS
 	lisys_free (self->global_exts);
 	lisys_free (self->global_data);
-#endif
 	lisys_free (self->module_name);
 	lisys_free (self->module_config);
 	lisys_free (self->module_data);
@@ -353,17 +363,14 @@ const char* lipth_paths_create_file (
 		return NULL;
 
 	/* Register the file. */
-	if (!config)
+	node = lialg_strdic_find_node (self->files, name);
+	if (node != NULL)
 	{
-		node = lialg_strdic_find_node (self->files, name);
-		if (node != NULL)
-		{
-			lisys_free (node->value);
-			node->value = path;
-		}
-		else
-			lialg_strdic_insert (self->files, name, path);
+		lisys_free (node->value);
+		node->value = path;
 	}
+	else
+		lialg_strdic_insert (self->files, name, path);
 
 	return path;
 }
@@ -400,9 +407,9 @@ char* lipth_paths_find_path (
 	else
 		path1 = lisys_path_concat (self->module_data_save, path, NULL);
 	if (path1 == NULL)
-		   return NULL;
+		return NULL;
 	if (lisys_filesystem_access (path1, LISYS_ACCESS_READ))
-		   return path1;
+		return path1;
 	lisys_free (path1);
 
 	/* Try the data path. */
@@ -428,6 +435,27 @@ char* lipth_paths_get_root ()
 }
 
 /*****************************************************************************/
+
+static int private_validate_dir (
+	char** path)
+{
+	LISysStat stat;
+
+	if (!lisys_filesystem_stat (*path, &stat))
+	{
+		lisys_free (*path);
+		*path = NULL;
+		return 0;
+	}
+	if (stat.type != LISYS_STAT_DIRECTORY && stat.type != LISYS_STAT_LINK)
+	{
+		lisys_free (*path);
+		*path = NULL;
+		return 0;
+	}
+
+	return 1;
+}
 
 static int private_create_save_path (
 	LIPthPaths* self,

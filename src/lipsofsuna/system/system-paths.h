@@ -22,5 +22,6 @@ LIAPICALL (char*, lisys_paths_get_home, ());
 LIAPICALL (char*, lisys_paths_get_data_home, ());
 LIAPICALL (char*, lisys_paths_get_config_home, ());
 LIAPICALL (char*, lisys_paths_get_cache_home, ());
+LIAPICALL (char*, lisys_paths_get_data_global, (const char* path));
 
 #endif

@@ -38,8 +38,11 @@
 #endif
 #include "system.h"
 #include "system-error.h"
+#include "system-filesystem.h"
+#include "system-memory.h"
 #include "system-path.h"
 #include "system-paths.h"
+#include "system-string.h"
 
 /**
  * \brief Gets the home directory.
@@ -162,13 +165,81 @@ char* lisys_paths_get_cache_home ()
 
 	dir = getenv ("XDG_CACHE_HOME");
 	if (dir != NULL && dir[0] != '\0')
-		return strdup (dir);
+		return lisys_string_dup  (dir);
 	tmp = lisys_paths_get_home ();
 	if (tmp == NULL)
 		return NULL;
 	ret = lisys_path_concat (tmp, ".cache", NULL);
-	free (tmp);
+	lisys_free (tmp);
 
+	return ret;
+#endif
+}
+
+/**
+ * \brief Gets the global data directory.
+ *
+ * Follows the XDG Base Directory Specification:
+ * http://www.freedesktop.org/Standards/basedir-spec
+ *
+ * \param path Relative path being searched for.
+ * \return New string or NULL.
+ */
+char* lisys_paths_get_data_global (
+	const char* path)
+{
+#ifdef __WIN32__
+	return NULL;
+#else
+	int last;
+	char* dup;
+	char* ptr;
+	char* ret;
+	char* start;
+	const char* dirs;
+
+	/* Get the list of global data directories. */
+	dirs = getenv ("XDG_DATA_DIRS");
+	if (dirs == NULL || dirs[0] == '\0')
+		return NULL;
+	dup = lisys_string_dup  (dirs);
+	if (dup == NULL)
+		return NULL;
+
+	/* Loop through all directories. */
+	ptr = start = dup;
+	ret = NULL;
+	last = 0;
+	while (1)
+	{
+		/* Search for the delimiter. */
+		last = (*ptr == '\0');
+		if (*ptr != ':' && !last)
+		{
+			ptr++;
+			continue;
+		}
+		*ptr = '\0';
+
+		/* Test if the path is valid. */
+		ret = lisys_path_concat (start, path, NULL);
+		if (ret != NULL)
+		{
+			if (lisys_filesystem_access (ret, LISYS_ACCESS_READ))
+				break;
+			lisys_free (ret);
+			ret = NULL;
+		}
+
+		/* Check if more candidates exist. */
+		if (last)
+			break;
+		ptr++;
+		start = ptr;
+	}
+
+	/* Return the result or NULL. */
+	lisys_free (dup);
 	return ret;
 #endif
 }
