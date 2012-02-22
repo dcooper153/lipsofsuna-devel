@@ -1,19 +1,4 @@
-ChatCommand = Class()
-ChatCommand.dict_id = {}
-
---- Registers a new chat command.
--- @param clss Chat command class.
--- @param args Arguments.<ul>
---   <li>func: Handler function.</li>
---   <li>pattern: Pattern to match.</li>
---   <li>permission: Permission level.</ul>
--- @return New chat command.
-ChatCommand.new = function(clss, args)
-	local self = Class.new(clss, args)
-	self.id = #clss.dict_id + 1
-	clss.dict_id[self.id] = self
-	return self
-end
+require "common/chatcommand"
 
 -- God mode.
 ChatCommand{pattern = "^/god$", permission = "admin", func = function(player, matches)
@@ -177,14 +162,12 @@ Protocol:add_handler{type = "PLAYER_CHAT", func = function(args)
 	if not player then return end
 	local ok,msg = args.packet:read("string")
 	if ok then
-		for k,v in ipairs(ChatCommand.dict_id) do
-			local matches = string.match(msg, v.pattern)
-			if matches then
-				if v.permission == "admin" and not player.admin then
-					return player:send("You have no permission to do that.")
-				end
-				return v.func(player, {matches})
+		local cmd,match = ChatCommand:find(msg)
+		if cmd then
+			if cmd.permission == "admin" and not player.admin then
+				return player:send("You have no permission to do that.")
 			end
+			return cmd.func(player, {match})
 		end
 	end
 end}

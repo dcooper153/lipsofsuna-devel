@@ -12,7 +12,8 @@ Gui.init = function(clss)
 		force_cursor = true, background = {dest_position = {0,4}, source_image = "widgets1",
 		source_position = {722,63}, source_tiling = {6,32,6,6,24,6}}}
 	Gui.chat_entry.pressed = function(self)
-		Network:send{packet = Packet(packets.PLAYER_CHAT, "string", self.text)}
+		local cmd,match = ChatCommand:find(self.text)
+		if cmd then cmd.func{match} end
 		self:clear()
 	end
 	-- Skill widgets.

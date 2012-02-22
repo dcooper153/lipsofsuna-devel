@@ -21,6 +21,7 @@ for k,v in pairs(File:scan_directory("client/widgets")) do
 end
 require "client/action"
 require "client/audio"
+require "client/chat"
 require "client/event"
 require "client/theme"
 require "client/drag"
