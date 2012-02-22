@@ -110,6 +110,9 @@ TextBubble.update = function(self, secs)
 			local c = v.color
 			v.color = {c[1], c[2], c[3], v.life / v.fade}
 		end
+		if p.z > 1 then
+			v.color[4] = 0
+		end
 		v.offset = p + v.motion
 		if not v.velocity then
 			p = Vector(p.x, p.y - v.height - 5)

@@ -508,11 +508,12 @@ void liren_internal_project (
 	const LIMatVector* world,
 	LIMatVector*       screen)
 {
-	Ogre::Matrix4 mat = self->data->camera->getViewMatrix ();
+	Ogre::Matrix4 proj = self->data->camera->getProjectionMatrix ();
+	Ogre::Matrix4 view = self->data->camera->getViewMatrix ();
 	Ogre::Vector3 w (world->x, world->y, world->z);
-	Ogre::Vector3 s = mat * w;
-	screen->x = (s.x / s.z + 0.5f) * self->mode.width;
-	screen->y = (s.y / s.z + 0.5f) * self->mode.height;
+	Ogre::Vector3 s = proj * view * w;
+	screen->x = (0.5f + 0.5f * s.x) * self->mode.width;
+	screen->y = (0.5f - 0.5f * s.y) * self->mode.height;
 	screen->z = s.z;
 }
 
