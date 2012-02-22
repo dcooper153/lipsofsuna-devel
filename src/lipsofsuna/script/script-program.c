@@ -35,6 +35,11 @@ static void Program_add_path (LIScrArgs* args)
 		lipth_paths_add_path (program->paths, name);
 }
 
+static void Program_debug_dump (LIScrArgs* args)
+{
+	lisys_memstats (0);
+}
+
 static void Program_launch_mod (LIScrArgs* args)
 {
 	const char* name;
@@ -310,6 +315,7 @@ void liscr_script_program (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_add_path", Program_add_path);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_debug_dump", Program_debug_dump);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_launch_mod", Program_launch_mod);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_load_extension", Program_load_extension);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_pop_message", Program_pop_message);

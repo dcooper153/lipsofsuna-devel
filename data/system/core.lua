@@ -10,6 +10,12 @@ Program.add_path = function(self, path)
 	return Los.program_add_path(path)
 end
 
+--- Dumps debug information to the console.
+-- @param self Program class.
+Program.debug_dump = function(self)
+	return Los.program_debug_dump()
+end
+
 --- Gets the filename of the calling script file.
 -- @param clss Program class.
 -- @param index Caller index in the hierarchy.
