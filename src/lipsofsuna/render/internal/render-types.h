@@ -50,6 +50,7 @@ typedef struct _LIRenRenderData LIRenRenderData;
 #include <OgreTextAreaOverlayElement.h>
 #include "render-container-factory.hpp"
 #include "render-image-overlay-factory.hpp"
+#include "render-model-loader.hpp"
 #include "render-resource-loading-listener.hpp"
 #include "render-unique-id.hpp"
 struct _LIRenLight
@@ -65,14 +66,8 @@ struct _LIRenModel
 	int id;
 	LIMdlModel* model;
 	LIRenRender* render;
+	LIRenModelLoader* loader;
 	Ogre::MeshPtr mesh;
-	Ogre::VertexDeclaration vertex_declaration;
-	Ogre::VertexData* vertex_data;
-	Ogre::HardwareVertexBufferSharedPtr vertex_buffer_0;
-	Ogre::HardwareVertexBufferSharedPtr vertex_buffer_1;
-	Ogre::HardwareVertexBufferSharedPtr vertex_buffer_2;
-	Ogre::VertexBufferBinding* vertex_buffer_binding;
-	Ogre::HardwareIndexBufferSharedPtr index_buffer;
 };
 struct _LIRenObject
 {

@@ -22,10 +22,8 @@
 #include "lipsofsuna/system.h"
 
 #define LIMDL_VERTEX_WEIGHTS_MAX 4
-#define LIMDL_VERTEX_WEIGHT_UINT16
-#define LIMDL_VERTEX_WEIGHT_MAX 65535.0f
 
-typedef uint16_t LIMdlVertexWeight;
+typedef float LIMdlVertexWeight;
 typedef uint8_t LIMdlVertexColor;
 typedef uint8_t LIMdlVertexBone;
 
@@ -57,11 +55,7 @@ static inline void limdl_vertex_init (
 	self->color[1] = 255;
 	self->color[2] = 255;
 	self->color[3] = 255;
-#ifdef LIMDL_VERTEX_WEIGHT_FLOAT
 	self->weights[0] = 1.0f;
-#else
-	self->weights[0] = (int) LIMDL_VERTEX_WEIGHT_MAX;
-#endif
 }
 
 static inline void limdl_vertex_init_copy (
