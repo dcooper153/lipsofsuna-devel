@@ -76,6 +76,7 @@ void LIRenModelLoader::start (bool background)
 {
 	if (background)
 	{
+		/* Load in a background thread. */
 		completed = false;
 		prepared = false;
 		ticket = Ogre::ResourceBackgroundQueue::getSingleton ().load (
@@ -83,16 +84,23 @@ void LIRenModelLoader::start (bool background)
 	}
 	else
 	{
+		/* Load in this thread and block until done. */
 		model_dst->mesh = Ogre::MeshManager::getSingleton ().createManual (id,
 			LIREN_RESOURCES_TEMPORARY, this);
 		model_dst->mesh->load ();
+		completed = true;
 		update_entities ();
 	}
 }
 
 bool LIRenModelLoader::get_aborted ()
 {
-	return true;
+	return aborted;
+}
+
+bool LIRenModelLoader::get_completed ()
+{
+	return completed;
 }
 
 LIMdlModel* LIRenModelLoader::get_model ()
@@ -146,6 +154,7 @@ void LIRenModelLoader::operationCompleted (
 	}
 	else
 	{
+		/* Update the mesh of the caller. */
 		model_dst->mesh = render->data->mesh_manager->getByName (id);
 		update_entities ();
 	}

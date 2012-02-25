@@ -67,6 +67,25 @@ void liren_render_model_free (
 		liren_model_free (model);
 }
 
+/**
+ * \brief Returns nonzero if the model has been fully background loaded.
+ * \param self Renderer.
+ * \param id Model ID.
+ * \return Nonzero if background loaded, zero if not.
+ */
+int liren_render_model_get_loaded (
+	LIRenRender* self,
+	int          id)
+{
+	LIRenModel* model;
+
+	model = lialg_u32dic_find (self->models, id);
+	if (model != NULL)
+		return liren_model_get_loaded (model);
+	else
+		return 1;
+}
+
 void liren_render_model_set_model (
 	LIRenRender* self,
 	int          id,

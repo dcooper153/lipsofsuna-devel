@@ -24,7 +24,9 @@ struct _LIExtBlock
 {
 	LIExtModule* module;
 	int model;
+	int model_next;
 	int object;
+	LIMatVector offset_next;
 };
 
 LIExtBlock* liext_tiles_render_block_new (

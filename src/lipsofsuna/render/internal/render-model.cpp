@@ -122,6 +122,20 @@ int liren_model_get_id (
 	return self->id;
 }
 
+/**
+ * \brief Returns nonzero if the model has been fully background loaded.
+ * \param self Model.
+ * \return Nonzero if background loaded, zero if not.
+ */
+int liren_model_get_loaded (
+	LIRenModel* self)
+{
+	if (self->loader != NULL)
+		return self->loader->get_completed ();
+	else
+		return 1;
+}
+
 LIMdlModel* liren_model_get_model (
 	LIRenModel* self)
 {

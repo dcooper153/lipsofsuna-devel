@@ -32,6 +32,10 @@ LIAPICALL (void, liren_render_model_free, (
 	LIRenRender* render,
 	int          id));
 
+LIAPICALL (int, liren_render_model_get_loaded, (
+	LIRenRender* render,
+	int          id));
+
 LIAPICALL (void, liren_render_model_set_model, (
 	LIRenRender* render,
 	int          id,

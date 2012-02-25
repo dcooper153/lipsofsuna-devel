@@ -33,6 +33,9 @@ LIAPICALL (void, liren_model_free, (
 LIAPICALL (int, liren_model_get_id, (
 	LIRenModel* self));
 
+LIAPICALL (int, liren_model_get_loaded, (
+	LIRenModel* self));
+
 LIAPICALL (LIMdlModel*, liren_model_get_model, (
 	LIRenModel* self));
 

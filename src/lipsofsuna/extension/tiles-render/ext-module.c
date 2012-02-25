@@ -254,7 +254,6 @@ static int private_process_result (
 	LIExtBuildTask* task)
 {
 	LIExtBlock* block;
-	LIMatTransform transform;
 
 	/* Delete emptied blocks. */
 	if (task->model == NULL)
@@ -282,20 +281,11 @@ static int private_process_result (
 		}
 	}
 
-	/* Replace the model of the block. */
-	liext_tiles_render_block_clear (block);
-	block->model = liren_render_model_new (self->render, task->model, 0);
-	if (block->model)
-	{
-		block->object = liren_render_object_new (self->render, 0);
-		if (block->object)
-		{
-			transform = limat_transform_init (task->offset, limat_quaternion_identity ());
-			liren_render_object_set_model (self->render, block->object, block->model);
-			liren_render_object_set_transform (self->render, block->object, &transform);
-			liren_render_object_set_realized (self->render, block->object, 1);
-		}
-	}
+	/* Start loading the build model. */
+	if (block->model_next)
+		liren_render_model_free (self->render, block->model_next);
+	block->model_next = liren_render_model_new (self->render, task->model, 0);
+	block->offset_next = task->offset;
 
 	return 1;
 }
@@ -344,8 +334,11 @@ static int private_tick (
 	float        secs)
 {
 	int i;
+	LIAlgMemdicIter iter;
+	LIExtBlock* block;
 	LIExtBuildTask* task;
 	LIExtBuildTask* task_next;
+	LIMatTransform transform;
 
 	/* Build blocks in another thread. */
 	/* Without this, there'd be major stuttering when multiple blocks are
@@ -369,6 +362,44 @@ static int private_tick (
 	if (self->tasks.worker == NULL && self->tasks.pending != NULL)
 		self->tasks.worker = lisys_async_call_new (private_worker_thread, NULL, self);
 	lisys_mutex_unlock (self->tasks.mutex);
+
+	/* Show blocks when they have been loaded. */
+	LIALG_MEMDIC_FOREACH (iter, self->blocks)
+	{
+		/* Filter out up-to-date blocks. */
+		block = iter.value;
+		if (!block->model_next)
+			continue;
+		if (!liren_render_model_get_loaded (self->render, block->model_next))
+			continue;
+
+		/* Create the render object if one doesn't exist. */
+		if (!block->object)
+		{
+			block->object = liren_render_object_new (self->render, 0);
+			if (!block->object)
+			{
+				liren_render_model_free (self->render, block->model_next);
+				block->model_next = 0;
+				continue;
+			}
+		}
+
+		/* Set the model of the object. */
+		transform = limat_transform_init (block->offset_next, limat_quaternion_identity ());
+		liren_render_object_set_model (self->render, block->object, block->model_next);
+		liren_render_object_set_transform (self->render, block->object, &transform);
+		liren_render_object_set_realized (self->render, block->object, 1);
+
+		/* Mark loading done. */
+		if (block->model)
+		{
+			liren_render_model_free (self->render, block->model);
+			block->model = 0;
+		}
+		block->model = block->model_next;
+		block->model_next = 0;
+	}
 
 	return 1;
 }

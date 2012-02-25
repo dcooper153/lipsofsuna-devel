@@ -34,6 +34,7 @@ public:
 	void abort ();
 	void start (bool background);
 	bool get_aborted ();
+	bool get_completed ();
 	LIMdlModel* get_model ();
 public:
 	virtual void loadResource (Ogre::Resource* resource);
