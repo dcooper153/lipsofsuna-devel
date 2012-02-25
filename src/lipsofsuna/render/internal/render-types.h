@@ -64,7 +64,6 @@ struct _LIRenLight
 struct _LIRenModel
 {
 	int id;
-	LIMdlModel* model;
 	LIRenRender* render;
 	LIRenModelLoader* loader;
 	Ogre::MeshPtr mesh;

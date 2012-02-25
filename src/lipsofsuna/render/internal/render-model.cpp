@@ -29,6 +29,10 @@
 #include "render-model-loader.hpp"
 #include <OgreSubMesh.h>
 #include <OgreSkeletonManager.h>
+#include <OgreResourceBackgroundQueue.h>
+
+static void private_abort_load (
+	LIRenModel* self);
 
 static void private_create_mesh (
 	LIRenModel* self,
@@ -59,19 +63,8 @@ LIRenModel* liren_model_new (
 	if (self == NULL)
 		return 0;
 	self->id = 0;
-	self->model = NULL;
 	self->render = render;
-
-	/* Copy the model. */
-	if (model != NULL)
-	{
-		self->model = limdl_model_new_copy (model);
-		if (self->model == NULL)
-		{
-			liren_model_free (self);
-			return 0;
-		}
-	}
+	self->loader = NULL;
 
 	/* Choose a unique ID. */
 	while (!id)
@@ -82,9 +75,9 @@ LIRenModel* liren_model_new (
 	}
 	self->id = id;
 
-	/* Initialize the backend. */
-	if (self->model != NULL)
-		private_create_mesh (self, self->model);
+	/* Load the model. */
+	if (model != NULL)
+		private_create_mesh (self, model);
 
 	/* Add to the dictionary. */
 	if (!lialg_u32dic_insert (render->models, id, self))
@@ -111,11 +104,8 @@ void liren_model_free (
 			liren_object_set_model (object, NULL);
 	}
 
-	/* Free the model data. */
-	if (self->model != NULL)
-		limdl_model_free (self->model);
-	if (self->loader != NULL)
-		OGRE_DELETE self->loader;
+	/* Free the model loader. */
+	private_abort_load (self);
 
 	lialg_u32dic_remove (self->render->models, self->id);
 	delete self;
@@ -132,48 +122,64 @@ int liren_model_get_id (
 	return self->id;
 }
 
+LIMdlModel* liren_model_get_model (
+	LIRenModel* self)
+{
+	if (self->loader != NULL)
+		return self->loader->get_model ();
+	else
+		return NULL;
+}
+
 int liren_model_set_model (
 	LIRenModel* self,
 	LIMdlModel* model)
 {
-	LIMdlModel* copy;
-
-	/* Copy the model. */
-	copy = limdl_model_new_copy (model);
-	if (copy == NULL)
-		return 0;
-	if (self->model != NULL)
-		limdl_model_free (self->model);
-	self->model = copy;
+	/* Abort the old load. */
+	private_abort_load (self);
 
 	/* Create a new mesh. */
 	/* The old mesh is automatically freed due to the Ogre::MeshPtr overwrite. */
-	private_create_mesh (self, self->model);
-
-	/* Tell objects to update their model bindings. */
-	LIAlgU32dicIter iter;
-	LIALG_U32DIC_FOREACH (iter, self->render->objects)
-	{
-		LIRenObject* object = (LIRenObject*) iter.value;
-		if (object->model == self)
-			liren_object_model_changed (object);
-	}
+	private_create_mesh (self, model);
 
 	return 1;
 }
 
 /*****************************************************************************/
 
+static void private_abort_load (
+	LIRenModel* self)
+{
+	/* If the loader has finished, it's deleted immediately. Otherwise,
+	   it's ordered to delete itself without committing the results. */
+	if (self->loader != NULL)
+	{
+		self->loader->abort ();
+		self->loader = NULL;
+	}
+}
+
 static void private_create_mesh (
 	LIRenModel* self,
 	LIMdlModel* model)
 {
-	if (self->loader != NULL)
-		OGRE_DELETE self->loader;
-	self->loader = OGRE_NEW LIRenModelLoader (self->render, model);
-	self->mesh = Ogre::MeshManager::getSingleton ().createManual (
-		self->render->data->id.next (),
-		LIREN_RESOURCES_TEMPORARY, self->loader);
+	Ogre::String id = self->render->data->id.next ();
+
+	/* Copy the model. */
+	model = limdl_model_new_copy (model);
+	if (model == NULL)
+		return;
+
+#ifdef LIREN_DISABLE_BACKGROUND_LOADING
+	/* Load the model in this thread. */
+	self->loader = OGRE_NEW LIRenModelLoader (id, self, model);
+	self->loader->start (false);
+#else
+	/* Load the model in a background thread. */
+	lisys_assert (self->loader == NULL);
+	self->loader = OGRE_NEW LIRenModelLoader (id, self, model);
+	self->loader->start (true);
+#endif
 }
 
 /** @} */

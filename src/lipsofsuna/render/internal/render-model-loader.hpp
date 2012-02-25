@@ -23,15 +23,26 @@
 class LIRenModelLoader;
 #include "render-types.h"
 #include <OgreResource.h>
+#include <OgreResourceBackgroundQueue.h>
 
-class LIRenModelLoader : public Ogre::ManualResourceLoader
+class LIRenModelLoader : public Ogre::ManualResourceLoader, Ogre::ResourceBackgroundQueue::Listener
 {
 public:
-	LIRenModelLoader (LIRenRender* render, LIMdlModel* model);
+	LIRenModelLoader (const Ogre::String& id, LIRenModel* model_dst, LIMdlModel* model_src);
 	virtual ~LIRenModelLoader ();
+public:
+	void abort ();
+	void start (bool background);
+	bool get_aborted ();
+	LIMdlModel* get_model ();
+public:
 	virtual void loadResource (Ogre::Resource* resource);
 	virtual void prepareResource (Ogre::Resource* resource);
+	virtual void operationCompleted (
+		Ogre::BackgroundProcessTicket ticket,
+		const Ogre::BackgroundProcessResult& result);
 private:
+	void init ();
 	void prepare_mesh (Ogre::Mesh* mesh);
 	void create_mesh (Ogre::Mesh* mesh);
 	void create_material (LIMdlMaterial* mat, int index, Ogre::SubMesh* submesh);
@@ -40,10 +51,16 @@ private:
 	bool check_name_override (const Ogre::String& name);
 	void initialize_pass (LIMdlMaterial* mat, Ogre::Pass* pass);
 	void override_pass (LIMdlMaterial* mat, Ogre::Pass* pass);
+	void update_entities ();
 private:
-	int prepared;
+	bool aborted;
+	bool completed;
+	bool prepared;
+	Ogre::String id;
 	LIRenRender* render;
 	LIMdlModel* model;
+	LIRenModel* model_dst;
+	Ogre::BackgroundProcessTicket ticket;
 	/* Prepared data. */
 	size_t buffer_size_0;
 	size_t buffer_size_1;

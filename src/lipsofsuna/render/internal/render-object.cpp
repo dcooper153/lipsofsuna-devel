@@ -125,7 +125,7 @@ int liren_object_channel_animate (
 		if (self->pose == NULL)
 			return 0;
 		if (self->model != NULL)
-			limdl_pose_set_model (self->pose, self->model->model);
+			limdl_pose_set_model (self->pose, liren_model_get_model (self->model));
 		/* TODO */
 	}
 
@@ -232,13 +232,19 @@ int liren_object_find_node (
 {
 	float scale;
 	LIMatTransform transform;
+	LIMdlModel* model;
 	LIMdlNode* node;
 
-	/* Find the node. */
-	if (self->model == NULL || self->model->model == NULL)
+	/* Get the model. */
+	if (self->model == NULL)
 		return 0;
+	model = liren_model_get_model (self->model);
+	if (model == NULL)
+		return 0;
+
+	/* Find the node. */
 	if (self->pose == NULL)
-		node = limdl_model_find_node (self->model->model, name);
+		node = limdl_model_find_node (model, name);
 	else
 		node = limdl_pose_find_node (self->pose, name);
 	if (node == NULL)
@@ -276,6 +282,8 @@ void liren_object_model_changed (
 void liren_object_update_pose (
 	LIRenObject* self)
 {
+	LIMdlModel* model;
+
 	/* Do nothing if the object isn't initialized. */
 	if (self->entity == NULL)
 		return;
@@ -286,13 +294,17 @@ void liren_object_update_pose (
 	if (skeleton == NULL)
 		return;
 
+	/* Get the model. */
+	model = liren_model_get_model (self->model);
+	lisys_assert (model != NULL);
+
 	/* Update weight group bones. */
 	/* The hierarchy doesn't matter because LIMdlPose already calculated the
 	   global transformations of the bones. We just need to copy the
 	   transformations of the bones used by weight groups. */
-	for (int i = 0 ; i < self->model->model->weight_groups.count ; i++)
+	for (int i = 0 ; i < model->weight_groups.count ; i++)
 	{
-		LIMdlWeightGroup* group = self->model->model->weight_groups.array + i;
+		LIMdlWeightGroup* group = model->weight_groups.array + i;
 		if (group->node != NULL)
 		{
 			LIMdlNode* node = limdl_pose_find_node (self->pose, group->node->name);
@@ -353,7 +365,7 @@ int liren_object_set_model (
 	if (self->pose != NULL)
 	{
 		if (model != NULL)
-			limdl_pose_set_model (self->pose, model->model);
+			limdl_pose_set_model (self->pose, liren_model_get_model (model));
 		else
 		{
 			limdl_pose_free (self->pose);

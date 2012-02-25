@@ -27,12 +27,137 @@
 #include "lipsofsuna/system.h"
 #include "render-model-loader.hpp"
 #include "render.h"
+#include "render-object.h"
 #include <OgreSubMesh.h>
 #include <OgreSkeletonManager.h>
 
-LIRenModelLoader::LIRenModelLoader (LIRenRender* render, LIMdlModel* model) : render (render), model (model)
+LIRenModelLoader::LIRenModelLoader (const Ogre::String& id, LIRenModel* model_dst, LIMdlModel* model_src) :
+	id (id), render (model_dst->render), model (model_src), model_dst (model_dst),
+	buffer_data_0 (0), buffer_data_1 (0), buffer_data_2 (0)
 {
+	aborted = false;
+	completed = false;
 	prepared = false;
+	init ();
+}
+
+LIRenModelLoader::~LIRenModelLoader ()
+{
+	/* Free the buffer data. */
+	init ();
+
+	/* Free the model data. */
+	if (model != NULL)
+		limdl_model_free (model);
+}
+
+void LIRenModelLoader::abort ()
+{
+	/* Since loading is always finished in the main thread and this function is
+	   only called from there, there can be no race condition. Either loading is
+	   already finished or it will be finished only after this call exits. */
+	if (completed)
+	{
+		/* Loading has been completed already so delete ourselves. The caller
+		   has started a new load or been deleted so no one is referencing us
+		   anymore. */
+		OGRE_DELETE this;
+	}
+	else
+	{
+		/* The completion handler has yet to be called, and we can't delete
+		   before that. Set the "aborted" flag so that we know to delete
+		   ourselves there. */
+		aborted = true;
+	}
+}
+
+void LIRenModelLoader::start (bool background)
+{
+	if (background)
+	{
+		completed = false;
+		prepared = false;
+		ticket = Ogre::ResourceBackgroundQueue::getSingleton ().load (
+			"Mesh", id, LIREN_RESOURCES_TEMPORARY, true, this, 0, this);
+	}
+	else
+	{
+		model_dst->mesh = Ogre::MeshManager::getSingleton ().createManual (id,
+			LIREN_RESOURCES_TEMPORARY, this);
+		model_dst->mesh->load ();
+		update_entities ();
+	}
+}
+
+bool LIRenModelLoader::get_aborted ()
+{
+	return true;
+}
+
+LIMdlModel* LIRenModelLoader::get_model ()
+{
+	return model;
+}
+
+void LIRenModelLoader::loadResource (Ogre::Resource* resource)
+{
+	if (aborted)
+		return;
+
+	lisys_assert (resource->getName () == id);
+	if (!prepared)
+		prepare_mesh ((Ogre::Mesh*) resource);
+	create_mesh ((Ogre::Mesh*) resource);
+	init ();
+}
+
+void LIRenModelLoader::prepareResource (Ogre::Resource* resource)
+{
+	if (aborted)
+		return;
+
+	lisys_assert (resource->getName () == id);
+	prepare_mesh ((Ogre::Mesh*) resource);
+	prepared = true;
+}
+
+/**
+ * \brief Called by Ogre when the mesh has been loaded completely.
+ *
+ * This is always called in the main thread. Because of that, we don't need to
+ * pay attention to thread safety. However, we need to still take aborting into
+ * account since it could occur while we were working.
+ *
+ * If the loading was aborted, we must not make any calls to the model whose
+ * mesh we were loaded since it could have already been deleted. The caller has
+ * no reference to us anymore so we must delete ourselves or we'd leak memory.
+ *
+ * \param ticket Background process ticket.
+ * \param result Background process result.
+ */
+void LIRenModelLoader::operationCompleted (
+	Ogre::BackgroundProcessTicket ticket,
+	const Ogre::BackgroundProcessResult& result)
+{
+	if (aborted)
+	{
+		OGRE_DELETE this;
+	}
+	else
+	{
+		model_dst->mesh = render->data->mesh_manager->getByName (id);
+		update_entities ();
+	}
+}
+
+void LIRenModelLoader::init ()
+{
+	delete[] buffer_data_0;
+	delete[] buffer_data_1;
+	delete[] buffer_data_2;
+	prepared = false;
+	completed = true;
 	buffer_size_0 = 0;
 	buffer_size_1 = 0;
 	buffer_size_2 = 0;
@@ -41,27 +166,6 @@ LIRenModelLoader::LIRenModelLoader (LIRenRender* render, LIMdlModel* model) : re
 	buffer_data_2 = NULL;
 	vertex_data = NULL;
 	vertex_buffer_binding = NULL;
-}
-
-LIRenModelLoader::~LIRenModelLoader ()
-{
-	delete[] buffer_data_0;
-	delete[] buffer_data_1;
-	delete[] buffer_data_2;
-}
-
-void LIRenModelLoader::loadResource (Ogre::Resource* resource)
-{
-	if (!prepared)
-		prepare_mesh ((Ogre::Mesh*) resource);
-	create_mesh ((Ogre::Mesh*) resource);
-	prepared = false;
-}
-
-void LIRenModelLoader::prepareResource (Ogre::Resource* resource)
-{
-	prepared = true;
-	prepare_mesh ((Ogre::Mesh*) resource);
 }
 
 void LIRenModelLoader::prepare_mesh (Ogre::Mesh* mesh)
@@ -456,6 +560,17 @@ void LIRenModelLoader::override_pass (
 				state->setTextureName (texname + ".dds");
 			j++;
 		}
+	}
+}
+
+void LIRenModelLoader::update_entities ()
+{
+	LIAlgU32dicIter iter;
+	LIALG_U32DIC_FOREACH (iter, render->objects)
+	{
+		LIRenObject* object = (LIRenObject*) iter.value;
+		if (object->model == model_dst)
+			liren_object_model_changed (object);
 	}
 }
 
