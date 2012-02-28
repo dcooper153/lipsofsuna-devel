@@ -49,7 +49,6 @@ Views.Book.close = function(self)
 end
 
 Views.Book.enter = function(self, from, level)
-	Gui.menus:open{level = level, widget = self}
 end
 
 --- Shows the book UI.

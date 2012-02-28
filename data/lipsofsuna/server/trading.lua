@@ -8,7 +8,7 @@ Trading.accept = function(clss, player)
 	for k,v in pairs(player.trading.buy) do
 		local s = Itemspec:find{name = v[1]}
 		local o = Item{spec = s, count = v[2]}
-		player:give_item(o)
+		player.inventory:merge_or_drop_object(o)
 	end
 	-- Close the trading screen.
 	player.trading = nil
@@ -19,7 +19,7 @@ Trading.cancel = function(clss, player)
 	if not player.trading then return end
 	player:send(Packet(packets.TRADING_CANCEL))
 	for k,v in pairs(player.trading.sell) do
-		player:give_item(v)
+		player.inventory:merge_or_drop_object(v)
 	end
 	player.trading = nil
 end
@@ -118,7 +118,7 @@ Protocol:add_handler{type = "TRADING_ADD_SELL", func = function(args)
 	if dst >= 8 then return end
 	local srcinv = player:find_open_inventory(srcid)
 	if not srcinv then return end
-	local srcobj = srcinv:get_object{slot = srcslot}
+	local srcobj = srcinv:get_object_by_index(srcslot)
 	if not srcobj then return end
 	local dstobj = player.trading.sell[dst + 1]
 	if dstobj then return end -- TODO: swap
@@ -126,7 +126,7 @@ Protocol:add_handler{type = "TRADING_ADD_SELL", func = function(args)
 	if count == 0 or count > srcobj.count then return end
 	-- Move to the trading list.
 	if count < srcobj.count then
-		local o = srcobj:split{count = count}
+		local o = srcobj:split(count)
 		player.trading.sell[dst + 1] = o
 	else
 		srcobj:detach()
@@ -177,7 +177,7 @@ Protocol:add_handler{type = "TRADING_REMOVE_SELL", func = function(args)
 	local srcobj = player.trading.sell[src + 1]
 	if not srcobj then return end
 	-- Move to the inventory.
-	player:give_item(srcobj)
+	player.inventory:merge_or_drop_object(srcobj)
 	player.trading.sell[src + 1] = nil
 	player:send(Packet(packets.TRADING_REMOVE_SELL, "uint8", src))
 	-- Update deal status.

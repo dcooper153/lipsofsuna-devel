@@ -1,16 +1,17 @@
 -- Automatically equips an item.
 Actionspec{name = "autoequip", type = "item", func = function(item, user)
 	if not item.spec.equipment_slot then return end
-	local inv = Inventory:find{object = item}
-	if not inv then return end
-	local _,srcslot = inv:find_object{object = item}
-	if type(srcslot) == "string" then
-		-- Unequip items in equipment slots.
-		local dstslot = user.inventory:get_empty_slot()
-		if not dstslot then return end
-		Actions:move_from_inv_to_inv(user, inv.id, srcslot, user.id, dstslot)
+	-- Find the object whose inventory contains the item.
+	local owner = Object:find{id = item.parent}
+	if not owner then return end
+	-- Check if the item is equipped.
+	local index = owner.inventory:get_slot_by_object(item)
+	if not index then return end
+	local slot = owner.inventory:get_slot_by_index(index)
+	-- Toggle equip status.
+	if slot then
+		owner.inventory:unequip_index(index)
 	else
-		-- Equip items in inventory slots.
-		Actions:move_from_inv_to_inv(user, inv.id, srcslot, user.id, item.spec.equipment_slot)
+		owner.inventory:equip_index(index, item.spec_equipment_slot)
 	end
 end}

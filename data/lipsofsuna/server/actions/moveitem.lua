@@ -47,7 +47,7 @@ Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstsl
 	split = math.min(split, srcobj.count)
 	if split ~= srcobj.count then
 		local splitsrc = srcobj
-		srcobj = srcobj:split{count = split}
+		srcobj = srcobj:split(split)
 		undo = function()
 			splitsrc:merge{object = srcobj}
 			srcobj:detach()

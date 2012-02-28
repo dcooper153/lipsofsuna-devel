@@ -1,6 +1,9 @@
 -- Core
 Mod:load "core"
+Mod:load "core/client"
 Mod:load "core/shadows"
+Mod:load "core/specs"
+Mod:load "core/misc"
 Mod:load "server"
 Mod:load "client"
 
@@ -87,7 +90,6 @@ Mod:load "misc"
 Mod:load "particle"
 Mod:load "sounds"
 Mod:load "spells"
-Mod:load "ui"
 Mod:load "unused"
 
 -- Regions and quests
@@ -98,3 +100,9 @@ Mod:load "regions/rootsofworld"
 Mod:load "regions/silverspring"
 Mod:load "regions/supplycamp"
 Mod:load "regions/tutorial"
+
+-- User interface.
+Mod:load "ui"
+Mod:load "ui/widgets"
+Mod:load "ui/hud"
+Mod:load "ui/states"

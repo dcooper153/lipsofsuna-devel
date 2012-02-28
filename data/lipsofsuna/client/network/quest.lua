@@ -19,17 +19,17 @@ Protocol:add_handler{type = "QUEST_STATUS", func = function(event)
 	local quest = Quest:find{id = id}
 	if not quest then return end
 	if quest.status == "inactive" and c == 0 then
-		Gui.chat_history:append{text = "Started quest: " .. quest.name}
+		Client:append_log("Started quest: " .. quest.name)
 		quest.status = "active"
 		quest.text = t
 		Client.views.quests:update(quest)
 	elseif quest.status ~= "completed" and c == 1 then
-		Gui.chat_history:append{text = "Completed quest: " .. quest.name}
+		Client:append_log("Completed quest: " .. quest.name)
 		quest.status = "completed"
 		quest.text = t
 		Client.views.quests:update(quest)
 	elseif quest.text ~= t then
-		Gui.chat_history:append{text = "Updated quest: " .. quest.name}
+		Client:append_log("Updated quest: " .. quest.name)
 		quest.text = t
 		Client.views.quests:update(quest)
 	end

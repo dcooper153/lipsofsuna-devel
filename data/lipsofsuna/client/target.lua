@@ -4,7 +4,7 @@ Target = Class()
 -- @param self Target class.
 Target.cancel = function(self)
 	if not self.active then return end
-	if Gui then Gui:set_action_text() end
+	if Client then Client:set_action_text() end
 	self.func = nil
 	self.active = false
 end
@@ -25,7 +25,9 @@ Target.pick_ray = function(clss, args)
 	local r1 = args.ray1
 	local r2 = args.ray2
 	if args.camera then
-		r1,r2 = args.camera:picking_ray{cursor = Program.cursor_position}
+		--local mode = Program.video_mode
+		r1,r2 = args.camera:get_picking_ray()--{cursor = Vector(mode[1]/2, mode[2]/2)}
+		--r1,r2 = args.camera:picking_ray{cursor = Program.cursor_position}
 	end
 	-- Pick from the scene.
 	local ret = Physics:cast_ray{collision_mask = Physics.MASK_PICK, src = r1, dst = r2, ignore = args.ignore}
@@ -75,13 +77,7 @@ end
 -- @param clss Target class.
 -- @param func Targeting callback.
 Target.start = function(clss, msg, func)
-	if Program.cursor_grabbed then
-		if clss.target_object then
-			func("obj", clss.target_object.id)
-		end
-	else
-		if Gui then Gui:set_action_text(msg) end
-		clss.func = func
-		clss.active = true
+	if clss.target_object then
+		func("obj", clss.target_object.id)
 	end
 end

@@ -5,6 +5,13 @@ Object.ipol_max_error = 20
 Object.dict_active = setmetatable({}, {__mode = "k"})
 Object.physics_position_correction = Vector(0, 0, 0)
 
+local oldinit = Object.new
+Object.new = function(clss, args)
+	local self = oldinit(clss, args)
+	self.inventory = Inventory{id = self.id}
+	return self
+end
+
 Object.add_speedline = function(self, args)
 	-- Remove the old speedline
 	if self.speedline then
@@ -68,8 +75,8 @@ Object.set_dialog = function(self, type, args)
 		self.dialog = nil
 	end
 	-- Update the dialog UI.
-	if Gui.active_dialog == self.id then
-		Gui:set_dialog(self.id)
+	if Client.active_dialog_object == self then
+		Ui:restart_state()
 	end
 end
 

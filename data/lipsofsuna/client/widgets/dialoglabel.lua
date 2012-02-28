@@ -15,12 +15,11 @@ Widgets.DialogLabel.reshaped = function(self)
 		local action = Action.dict_name[string.format("choice_%d", self.index)]
 		local key = action and action.key1 and Keycode[action.key1] or "--"
 		if self.choice then
-			color = self.focused and {0.7,0.3,0.3,1} or {0,0.7,0,1}
-			text = string.format("<%s> %s", key, self.text)
+			color = self.focused and {0.7,0.3,0.3,1} or {1,1,0,1}
 		else
 			color = self.focused and {0.7,0.3,0.3,1} or {1,1,1,1}
-			text = string.format("<%s> %s", key, self.text)
 		end
+		text = self.text
 	elseif self.text then
 		color = self.focused and {0.7,0.3,0.3,1} or {1,1,1,1}
 		text = string.format("%s:", self.text)
@@ -38,12 +37,6 @@ Widgets.DialogLabel.reshaped = function(self)
 	-- Populate the canvas.
 	self:canvas_clear()
 	if self.text then
-		self:canvas_image{
-			dest_position = {0,4},
-			dest_size = {w,h},
-			source_image = "widgets1",
-			source_position = {722,63},
-			source_tiling = {6,32,6,6,24,6}}
 		self:canvas_text{
 			dest_position = {0,0},
 			dest_size = {w,h},

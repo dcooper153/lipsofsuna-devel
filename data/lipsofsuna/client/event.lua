@@ -1,161 +1,29 @@
-local editor_gui_actions = {menu = true, screenshot = true}
-
 Eventhandler{type = "keypress", func = function(self, args)
-	if Client.views.controls.editing_binding then
-		-- Binding input.
-		Client.views.controls:input(args)
-		Action:event(args, {})
-	elseif Client.mode == "editor" then
-		-- Editor input.
-		if not Program.cursor_grabbed then
-			Widgets:handle_event(args)
-			Action:event(args, editor_gui_actions)
-		else
-			Action:event(args)
-		end
-	elseif Client.mode ~= "game" and Widgets:handle_event(args) then
-		-- Widget input.
-		Action:event(args, {})
-	elseif Gui.chat_active then
-		-- Chat input.
-		if args.code == Keysym.ESCAPE then
-			Gui.chat_active = false
-		else
-			Gui.chat_entry:event(args)
-			if args.code == Keysym.RETURN then
-				Gui.chat_active = false
-			end
-		end
-		Action:event(args, {})
-	else
-		-- Game controls.
-		Action:event(args)
-	end
+	Action:event(args, not Ui:handle_event(args) and {})
 end}
 
 Eventhandler{type = "keyrelease", func = function(self, args)
-	if Client.views.controls.editing_binding then
-		-- Binding input.
-		Client.views.controls:input(args)
-		Action:event(args, {})
-	elseif Client.mode == "editor" then
-		-- Editor input.
-		if not Program.cursor_grabbed then
-			Widgets:handle_event(args)
-			Action:event(args, editor_gui_actions)
-		else
-			Action:event(args)
-		end
-	else
-		-- Normal input.
-		Action:event(args)
-	end
+	Action:event(args, not Ui:handle_event(args) and {})
 end}
 
 Eventhandler{type = "mousepress", func = function(self, args)
-	if Client.views.controls.editing_binding then
-		-- Binding input.
-		Client.views.controls:input(args)
-		Action:event(args, {})
-	elseif Client.mode == "editor" then
-		-- Editor input.
-		if not Program.cursor_grabbed then
-			Widgets:handle_event(args)
-			Action:event(args, editor_gui_actions)
-		else
-			Action:event(args)
-		end
-	else
-		-- Normal input.
-		if Client.mode ~= "game" then
-			Widgets:handle_event(args)
-			Action:event(args, {})
-		else
-			Action:event(args)
-		end
-	end
+	Action:event(args, not Ui:handle_event(args) and {})
 end}
 
 Eventhandler{type = "mouserelease", func = function(self, args)
-	if Client.views.controls.editing_binding then
-		-- Binding input.
-		Client.views.controls:input(args)
-		Action:event(args, {})
-	elseif Client.mode == "editor" then
-		-- Editor input.
-		if not Program.cursor_grabbed then
-			Widgets:handle_event(args)
-			Action:event(args, editor_gui_actions)
-		else
-			Action:event(args)
-		end
-	else
-		-- Normal input.
-		if Client.mode ~= "game" then
-			Widgets:handle_event(args)
-			Action:event(args, {})
-		else
-			Action:event(args)
-		end
-	end
+	Action:event(args, not Ui:handle_event(args) and {})
 end}
 
 Eventhandler{type = "mousescroll", func = function(self, args)
-	if Client.views.controls.editing_binding then
-		-- Binding input.
-		Client.views.controls:input(args)
-		Action:event(args, {})
-	elseif Client.mode == "editor" then
-		-- Editor input.
-		if not Program.cursor_grabbed then
-			Widgets:handle_event(args)
-			Action:event(args, editor_gui_actions)
-		else
-			Action:event(args)
-		end
-	else
-		-- Normal input.
-		if Drag.drag then
-			if args.rel > 0 then
-				Drag:change_count(1)
-			else
-				Drag:change_count(-1)
-			end
-		elseif Client.mode ~= "game" then
-			Widgets:handle_event(args)
-			Action:event(args, {})
-		else
-			Action:event(args)
-		end
-	end
+	Action:event(args, not Ui:handle_event(args) and {})
 end}
 
 Eventhandler{type = "mousemotion", func = function(self, args)
-	if Client.views.controls.editing_binding then
-		-- Binding input.
-		Client.views.controls:input(args)
-		Action:event(args, {})
-	elseif Client.mode == "editor" then
-		-- Editor input.
-		if not Program.cursor_grabbed then
-			Widgets:handle_event(args)
-			Action:event(args, editor_gui_actions)
-		else
-			Action:event(args)
-		end
-	else
-		-- Normal input.
-		if Client.mode ~= "game" then
-			Widgets:handle_event(args)
-			Action:event(args, {})
-		else
-			Action:event(args)
-		end
-	end
+	Action:event(args, not Ui:handle_event(args) and {})
 end}
 
 Eventhandler{type = "music-ended", func = function(self, args)
-	Sound:switch_music_track()
+	Sound:cycle_music_track()
 end}
 
 Eventhandler{type = "quit", func = function(self, args)
@@ -166,13 +34,19 @@ local compasst = 0
 local fpst = 0
 Eventhandler{type = "tick", func = function(self, args)
 	-- Update the connection status.
-	if Client.views.startup.joined and not Network.connected then
-		Client:set_mode("startup")
-		Client.views.startup:set_state("Lost connection to the server!")
+	if Client.connected and not Network.connected then
+		Client:terminate_game()
+		Client.options.host_restart = false
+		Client.data.connection.active = false
+		Client.data.connection.waiting = false
+		Client.data.connection.connecting = false
+		Client.data.connection.text = "Lost connection to the server!"
+		Ui.state = "start-game"
 	end
+	-- Update the user interface state.
+	Ui:update(args.secs)
 	-- Update the window size.
-	local m = Program.video_mode
-	if Gui:resize() then
+	if Ui.was_resized then
 		local v = Program.video_mode
 		Client.options.window_width = v[1]
 		Client.options.window_height = v[2]
@@ -181,8 +55,6 @@ Eventhandler{type = "tick", func = function(self, args)
 		Client.options:save()
 		Client.views.options:load()
 	end
-	-- Update the notification widget.
-	Gui.notification:update(args.secs)
 	-- Update the cursor.
 	Widgets.Cursor.inst:update()
 	-- Update built models.
@@ -236,8 +108,6 @@ Eventhandler{type = "tick", func = function(self, args)
 		if vel then Sound.listener_velocity = vel end
 		-- Refresh the active portion of the map.
 		Client.player_object:refresh()
-		-- Maintain the respawn widget.
-		Gui:set_dead(Client.player_object.dead)
 	end
 	-- Update text bubbles.
 	-- Must be done after camera for the bubbles to stay fixed.
@@ -251,19 +121,5 @@ Eventhandler{type = "tick", func = function(self, args)
 		Player:pick_look()
 	else
 		Target.target_object = nil
-	end
-	-- Periodically update the compass.
-	compasst = compasst + args.secs
-	if compasst > 0.1 then
-		compasst = 0
-		Player:update_compass()
-	end
-	-- Update the FPS label.
-	if Gui.fps_label then
-		fpst = fpst + args.secs
-		if fpst > 0.1 then
-			Gui.fps_label.text = "FPS: " .. math.floor(Program.fps + 0.5)
-			fpst = 0
-		end
 	end
 end}

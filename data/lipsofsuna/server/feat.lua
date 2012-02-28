@@ -110,7 +110,7 @@ Feat.apply = function(self, args)
 			if m and need <= have then
 				local t,p = Utils:find_build_point(args.point, args.attacker)
 				if t then
-					local o = args.weapon:split{count = need}
+					local o = args.weapon:split(need)
 					o:detach()
 					Voxel:set_tile(p, m.id)
 					if m.effect_build then
@@ -131,14 +131,14 @@ end
 Feat.perform = function(self, args)
 	local anim = Featanimspec:find{name = self.animation}
 	local slot = anim and (anim.slot or (anim.required_weapon and args.user.spec.weapon_slot))
-	local weapon = slot and args.user:get_item{slot = slot}
+	local weapon = slot and args.user.inventory:get_object_by_slot(slot)
 	local info = anim and self:get_info{attacker = args.user, weapon = weapon}
 	-- Check for cooldown and requirements.
 	if info and not args.stop then
 		if args.user.cooldown then return end
 		if not self:usable(args) then return end
 		for k,v in pairs(info.required_reagents) do
-			args.user:subtract_items{name = k, count = v}
+			args.user.inventory:subtract_objects_by_name(k, v)
 		end
 		local w = info.required_skills["willpower"]
 		if w then args.user.skills:subtract{skill = "willpower", value = w} end
@@ -178,7 +178,7 @@ Feat.play_effects = function(self, args)
 		Effect:play{effect = anim.effect, object = args.user}
 	end
 	if anim.action ~= "melee" and anim.slot then
-		local weapon = args.user:get_item{slot = anim.slot}
+		local weapon = args.user.inventory:get_object_by_slot(anim.slot)
 		if weapon and weapon.spec.effect_attack then
 			Effect:play{effect = weapon.spec.effect_attack, object = args.user}
 		end
@@ -211,7 +211,7 @@ Feat.usable = function(self, args)
 	-- Get feat information.
 	local anim = Featanimspec:find{name = self.animation}
 	if not anim then return end
-	local weapon = args.user:get_item{slot = anim.slot}
+	local weapon = args.user.inventory:get_object_by_slot(anim.slot)
 	local info = self:get_info{attacker = args.user, weapon = weapon}
 	-- Check for skills.
 	local skills = args.skills or args.user.skills
@@ -223,20 +223,17 @@ Feat.usable = function(self, args)
 	-- Check for reagents.
 	local inventory = args.inventory or args.user.inventory
 	for k,v in pairs(info.required_reagents) do
-		if not inventory then return end
-		local item = inventory:find_object{name = k}
-		if not item or item.count < v then return end
+		local count = inventory:count_objects_by_name(k)
+		if count < v then return end
 	end
 	-- Check for ammo.
 	for k,v in pairs(info.required_ammo) do
-		if not inventory then return end
-		local item = inventory:find_object{name = k}
-		if not item or item.count < v then return end
+		local count = inventory:count_objects_by_name(k)
+		if count < v then return end
 	end
 	-- Check for weapon.
 	if info.required_weapon then
-		if not inventory then return info.required_weapon == "melee" end
-		local weapon = inventory:get_object{slot = args.user.spec.weapon_slot}
+		local weapon = inventory:get_object_by_slot(args.user.spec.weapon_slot)
 		if not weapon then return info.required_weapon == "melee" end
 		if not weapon.spec.categories[info.required_weapon] then return end
 	end

@@ -54,9 +54,6 @@ Commands.use = function(self, inv, slot)
 		-- Target known so use.
 		if type(slot) == "number" then
 			Network:send{packet = Packet(packets.PLAYER_USE, "uint32", inv, "uint8", 0, "uint32", slot)}
-			if inv == 0 then
-				Gui:set_dialog(slot)
-			end
 		else
 			Network:send{packet = Packet(packets.PLAYER_USE, "uint32", inv, "uint8", 1, "string", slot)}
 		end

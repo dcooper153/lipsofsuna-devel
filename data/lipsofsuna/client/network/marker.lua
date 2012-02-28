@@ -5,7 +5,7 @@ Protocol:add_handler{type = "MARKER_ADD", func = function(event)
 	local m = Marker:find{name = n}
 	if not m then
 		m = Marker{name = n}
-		Gui.chat_history:append{text = "Location added: " .. n}
+		Client:append_log("Location added: " .. n)
 	end
 	m.position = Vector(x,y,z)
 end}

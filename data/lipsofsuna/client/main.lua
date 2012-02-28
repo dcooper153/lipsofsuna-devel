@@ -30,7 +30,6 @@ require "client/controls"
 require "client/effect"
 require "client/equipment"
 require "client/quickslots"
-require "client/gui"
 require "client/lighting"
 Lighting:init()
 require "client/player"
@@ -48,11 +47,13 @@ end
 
 -- Initialize the UI state.
 Widgets.Cursor.inst = Widgets.Cursor(Iconspec:find{name = "cursor1"})
-Gui:init()
+Ui:init()
 Client:init()
 Player.crosshair = Object{model = "crosshair1", collision_group = Physics.GROUP_CROSSHAIR}
-if Settings.join or Settings.host then
-	Client:set_mode("startup")
+if Settings.join then
+	Client:join_game()
+elseif Settings.host then
+	Client:host_game()
 elseif Settings.editor then
 	-- FIXME: Why is this needed?
 	Program:update()
@@ -61,9 +62,9 @@ elseif Settings.editor then
 		Eventhandler:event(event)
 		event = Program:pop_event()
 	end
-	Client:set_mode("editor")
+	Ui.state = "editor"
 else
-	Client:set_mode("login")
+	Ui.state = "mainmenu"
 end
 
 Program.profiling = {}
@@ -72,6 +73,8 @@ Program.profiling = {}
 -- Graphics and lighting in particulat need to be initialized before this
 -- since Ogre uses directional lights to precalculate heightmap lighting.
 if Map then Map:init() end
+
+Program.cursor_grabbed = true
 
 -- Main loop.
 while not Program.quit do
@@ -86,7 +89,6 @@ while not Program.quit do
 		Eventhandler:event(event)
 		event = Program:pop_event()
 	end
-	Widgets:update()
 	local t3 = Program.time
 	-- Render the scene.
 	Client:update()

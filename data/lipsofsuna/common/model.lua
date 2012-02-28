@@ -1,5 +1,3 @@
-require "common/modelspec"
-
 --- Finds or loads a model by name.
 -- @param clss Model class.
 -- @param args Arguments.<ul>

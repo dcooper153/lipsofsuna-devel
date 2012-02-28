@@ -98,7 +98,7 @@ Obstacle.use_cb = function(self, user)
 		end
 		-- Choose a random item from the list.
 		local item = Item{spec = Itemspec:find{name = mats[math.random(1, #mats)]}}
-		user:add_item{object = item}
+		user.inventory:merge_or_drop_object(item)
 		user:send{packet = Packet(packets.MESSAGE, "string", "Harvested " .. item.name .. ".")}
 		-- Harvesting behavior.
 		if self.spec.harvest_behavior == "destroy" then

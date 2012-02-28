@@ -29,7 +29,7 @@ TextBubble.new = function(clss, args)
 		if self then
 			table.insert(self.widgets, widget)
 			self:transform()
-			Gui.scene:add_child(widget)
+			Ui:add_speech_bubble(widget)
 			return self
 		end
 	end
@@ -39,7 +39,7 @@ TextBubble.new = function(clss, args)
 	-- Add the text widget.
 	self.widgets = {widget}
 	self:transform()
-	Gui.scene:add_child(widget)
+	Ui:add_speech_bubble(widget)
 	-- Register for updates.
 	TextBubble.dict[self] = true
 	if self.object then
@@ -54,7 +54,7 @@ TextBubble.disable = function(self)
 	end
 	TextBubble.dict[self] = nil
 	for k,v in pairs(self.widgets) do
-		v:detach()
+		Ui:remove_speech_bubble(v)
 	end
 	self.widgets = nil
 end
@@ -82,7 +82,7 @@ TextBubble.update = function(self, secs)
 		local v = self.widgets[n - i + 1]
 		v.life = v.life - secs
 		if v.life < 0 then
-			v:detach()
+			Ui:remove_speech_bubble(v)
 			table.remove(self.widgets, n - i + 1)
 		end
 	end

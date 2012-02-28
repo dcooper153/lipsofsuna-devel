@@ -9,7 +9,7 @@ Creature:add_getters{
 	armor_class = function(s)
 		local value = 0
 		for k,v in pairs(s.spec.equipment_slots) do
-			local i = s:get_item{slot = v.name}
+			local i = s.inventory:get_object_by_slot(v.name)
 			value = value + (i and i.spec.armor_class or 0)
 		end
 		return value
@@ -22,7 +22,7 @@ Creature:add_setters{
 	beheaded = function(s, v)
 		s.flags = Bitwise:bor(s.flags or 0, Protocol.object_flags.BEHEADED)
 		Vision:event{type = "object-beheaded", object = s}
-		local hat = s:get_item{slot = "head"}
+		local hat = s.inventory:get_object_by_slot("head")
 		if hat then
 			local p = s.position
 			hat:detach()
@@ -88,15 +88,15 @@ Creature:add_setters{
 				local itemspec = Itemspec:find{name = k}
 				if itemspec then
 					if itemspec.stacking then
-						s:add_item{object = Item{spec = itemspec, count = v}}
+						s.inventory:merge_object(Item{spec = itemspec, count = v})
 					else
-						for i = 1,v do s:add_item{object = Item{spec = itemspec}} end
+						for i = 1,v do s.inventory:merge_object(Item{spec = itemspec}) end
 					end
 				else
 					print(string.format("WARNING: Creature '%s' uses an invalid inventory item name '%s'", s.spec.name, k))
 				end
 			end
-			s:equip_best_items()
+			s.inventory:equip_best_objects()
 		end
 		-- Create random loot.
 		-- The same about random objects applies as above.
@@ -112,7 +112,7 @@ Creature:add_setters{
 				local cat = spec.loot_categories[math.random(1, num_cat)]
 				local itemspec = Itemspec:random{category = cat}
 				if itemspec then
-					s:add_item{object = Item{spec = itemspec}}
+					s.inventory:merge_object(Item{spec = itemspec})
 				else
 					print(string.format("WARNING: Creature '%s' uses an invalid inventory item category '%s'", s.spec.name, v))
 				end
@@ -136,6 +136,7 @@ Creature:add_setters{
 		end
 		-- Create the AI.
 		if not spec.dead and spec.ai_enabled then
+			s:update_skills()
 			s.ai = Ai(s)
 		end
 	end}
@@ -156,6 +157,7 @@ Creature:add_setters{
 --   <li>physics: Physics mode.</li>
 --   <li>position: Position vector of the creature.</li>
 --   <li>rotation: Rotation quaternion of the creature.</li>
+--   <li>skills: Skill table of the character.</li>
 --   <li>skin_style: Skin style defined by an array of {style, red, green, blue}.</li>
 --   <li>spec: Species of the creature.</li>
 --   <li>realized: True to add the object to the simulation.</li></ul>
@@ -166,6 +168,8 @@ Creature.new = function(clss, args)
 			self[n] = (args[n] ~= nil) and args[n] or d
 		end
 	end
+	self.attributes = {}
+	self.skills1 = {}
 	copy("angular")
 	copy("beheaded")
 	copy("body_scale")
@@ -185,9 +189,16 @@ Creature.new = function(clss, args)
 	copy("variables")
 	clss.dict_id[self.id] = self
 	self.update_timer = 0.1 * math.random()
-	self:calculate_speed()
 	if args and args.dead then self:set_dead_state() end
 	copy("realized")
+	-- Initialize skills.
+	if args.skills then
+		self.skills1 = {}
+		for k,v in pairs(args.skills) do
+			self.skills1[k] = v
+		end
+	end
+	self:update_skills()
 	return self
 end
 
@@ -234,9 +245,7 @@ Creature.calculate_speed = function(self)
 	-- Base speed.
 	local s = (self.running and not self.blocking) and self.spec.speed_run or self.spec.speed_walk
 	-- Skill bonuses.
-	local str = self.skills:get_value{skill = "strength"} or 20
-	local dex = self.skills:get_value{skill = "dexterity"} or 20
-	s = s * (0.5 + dex / 100 + str / 200)
+	s = s * self.attributes.speed
 	-- Burdening penalty.
 	if self:get_burdened() then
 		s = math.max(1, s * 0.3)
@@ -364,11 +373,11 @@ Creature.damaged = function(self, args)
 end
 
 Creature.get_weapon = function(self)
-	return self:get_item{slot = self.spec.weapon_slot}
+	return self.inventory:get_object_by_slot(self.spec.weapon_slot)
 end
 
 Creature.set_weapon = function(self, value)
-	return self:set_item{slot = self.spec.weapon_slot, object = value}
+	return self.inventory:equip_object(value, self.spec.weapon_slot)
 end
 
 Creature.set_dead_state = function(self, drop)
@@ -387,7 +396,7 @@ Creature.set_dead_state = function(self, drop)
 	self.skills:set_value{skill = "health", value = 0}
 	-- Drop held items.
 	if drop then
-		local o = self:get_item{slot = "hand.L"}
+		local o = self.inventory:get_object_by_slot("hand.L")
 		if o then
 			o:detach()
 			o.position = self.position
@@ -484,86 +493,6 @@ Creature.die = function(self)
 	-- Disable controls etc.
 	self:set_dead_state(true)
 	return true
-end
-
---- Equips the item passed as a parameter.
--- @param self Object.
--- @param args Arguments.<ul>
---   <li>object: Item to equip.</li></ul>
--- @return True if equipped successfully.
-Creature.equip_item = function(self, args)
-	local slot = args.object.spec.equipment_slot
-	if not slot then return end
-	local spec = args.object and args.object.spec
-	-- Unequip the item in the destination slot.
-	if not self:unequip_item{slot = slot} then return end
-	-- Unequip items in slots reserved by the item.
-	-- This handles cases such as a shield being in the left hand and a
-	-- two-handed weapon being equipped into the right hand.
-	if spec and spec.equipment_slots_reserved then
-		for k in pairs(spec.equipment_slots_reserved) do
-			if not self:unequip_item{slot = k} then return end
-		end
-	end
-	-- Unequip items whose slot reservations conflict with the new item.
-	-- This handles cases such as a two-handed weapon being in the right
-	-- hand and a shield being equipped into the left hand.
-	if spec then
-		-- Conflict resolution can cause an error because the next key of the
-		-- loop may be removed. In such a case, we catch the error and retry.
-		repeat until pcall(function()
-			for k,v in pairs(self.inventory.slots) do
-				local conflict
-				if type(k) == "string" and v.spec.equipment_slots_reserved then
-					if v.spec.equipment_slots_reserved[slot] then
-						conflict = true
-					elseif spec.equipment_slots_reserved then
-						for k1 in pairs(spec.equipment_slots_reserved) do
-							if v.spec.equipment_slots_reserved[k1] then conflict = true end
-						end
-					end
-				end
-				if conflict then
-					if not self:unequip_item{slot = k} then return end
-				end
-			end
-		end)
-	end
-	-- Equip the item.
-	self.inventory:set_object{object = args.object, slot = slot}
-	-- Play the equip effect.
-	if args.object and args.object.spec.effect_equip then
-		Effect:play{effect = args.object.spec.effect_equip, object = self}
-	end
-	return true
-end
-
---- Automatically equips the best set of items.
--- @param self Object.
--- @param args Arguments.
-Creature.equip_best_items = function(self, args)
-	-- Loop through all our equipment slots.
-	for name in pairs(self.spec.equipment_slots) do
-		-- Find the best item to place to the slot.
-		local best = self:get_item{slot = name}
-		local best_score = -1
-		for index,item in pairs(self.inventory.slots) do
-			if item.spec.equipment_slot == name then
-				local score = 50 * item:get_armor_class(self)
-				for k,v in pairs(item:get_weapon_influences(self)) do
-					if k ~= "hatchet" then
-						score = score + v
-					end
-				end
-				if not best or score < best_score then
-					best = item
-					best_score = score
-				end
-			end
-		end
-		-- Place the best item to the slot.
-		if best then self:equip_item{object = best} end
-	end
 end
 
 --- Makes the creature face a point.
@@ -680,7 +609,6 @@ end
 -- @param self Object.
 -- @param user Object doing the looting.
 Creature.loot = function(self, user)
-	if not self.dead and not user.sneak then return end
 	return Object.loot(self, user)
 end
 
@@ -741,9 +669,8 @@ end
 
 --- Sets a skill of the creature.
 -- @param self Object.
--- @param args Arguments.<ul>
---   <li>name: Skill name.</li>
---   <li>value: New target value for the skill.</li></ul>
+-- @param name: Skill name.
+-- @param value: New target value for the skill.
 Creature.set_skill = function(self, name, value)
 	-- Enforce species limit.
 	local spec = self.spec.skills[name]
@@ -765,22 +692,6 @@ end
 Creature.set_strafing = function(self, value)
 	self.strafing = value
 	self:calculate_animation()
-end
-
---- Unequips the item in the given equipment slot.
--- @param self Object.
--- @param args Arguments.<ul>
---   <li>slot: Slot name.</li></ul>
--- @return True if the slot is now empty.
-Creature.unequip_item = function(self, args)
-	local item = self.inventory:get_object{slot = args.slot}
-	if not item then return true end
-	if not self:add_item{object = item} then return end
-	-- Play the unequip effect.
-	if args.object and args.object.spec.effect_unequip then
-		Effect:play{effect = args.object.spec.effect_unequip, object = self}
-	end
-	return true
 end
 
 --- Updates the state of the creature.
@@ -899,7 +810,7 @@ Creature.update_burdening = function(self, secs)
 	local prev_limit = self.burden_limit or 0
 	local curr_limit = math.floor(self:get_burden_limit())
 	local prev_burden = self:get_burdened()
-	local curr_weight = math.ceil(self:calculate_carried_weight())
+	local curr_weight = math.ceil(self.inventory:calculate_weight())
 	if curr_weight ~= self.carried_weight or prev_limit ~= curr_limit then
 		self.carried_weight = curr_weight
 		self.burden_limit = curr_limit
@@ -957,6 +868,32 @@ Creature.update_environment = function(self, secs)
 	return true, env
 end
 
+--- Updates the skills and related attributes of the creature.
+-- @param self Object.
+Creature.update_skills = function(self)
+	-- Default attributes.
+	local attr = {
+		max_health = 20,
+		max_willpower = 20,
+		speed = 0.5,
+		view_distance = 15}
+	-- Modify the attributes.
+	for k,v in pairs(self.skills1) do
+		local skill = Skillspec:find{name = k}
+		if skill then skill.assign(attr) end
+	end
+	-- Assign the attributes to the creature.
+	self.attributes = attr
+	self:set_skill("health", attr.max_health)
+	self:set_skill("willpower", attr.max_willpower)
+	-- Update the movement speed.
+	self:calculate_speed()
+	-- Update the vision radius.
+	if self.vision then
+		self.vision.radius = attr.view_distance
+	end
+end
+
 --- Serializes the object to a string.
 -- @param self Object.
 -- @return Data string.
@@ -972,6 +909,7 @@ Creature.write = function(self)
 		physics = self.physics,
 		position = self.position,
 		rotation = self.rotation,
+		skills = self.skills1,
 		spec = self.spec.name,
 		variables = self.variables},
 		Serialize:encode_skills(self.skills),

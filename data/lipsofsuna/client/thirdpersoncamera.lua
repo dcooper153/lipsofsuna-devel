@@ -123,6 +123,5 @@ ThirdPersonCamera.update = function(self, secs)
 	self.target_position = pos
 	self.target_rotation = rot
 	-- Interpolate.
-	self.viewport = {Gui.scene.x, Gui.scene.y, Gui.scene.width, Gui.scene.height}
 	Camera.update(self, secs)
 end

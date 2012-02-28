@@ -1,4 +1,5 @@
 Widgets.SkillControl = Class(Widget)
+Widgets.SkillControl.class_name = "Widgets.SkillControl"
 
 Widgets.SkillControl.new = function(clss, args)
 	local self = Widget.new(clss, {cols = 3, rows = 2, margins = {left=100-15}})

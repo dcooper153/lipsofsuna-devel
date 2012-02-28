@@ -44,16 +44,3 @@ Widgets.handle_popups = function(clss, w)
 	clss.popup = nil
 	return true
 end
-
-Widgets.update = function(clss)
-	local w
-	if not Program.cursor_grabbed then
-		w = clss.focused_widget
-	end
-	local o = clss.focused_widget_prev
-	if o ~= w then
-		if o then o.focused = nil end
-		if w then w.focused = true end
-		clss.focused_widget_prev = w
-	end
-end

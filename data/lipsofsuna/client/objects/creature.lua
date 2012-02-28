@@ -2,6 +2,8 @@ Creature = Class(Object)
 
 Creature.new = function(clss, args)
 	local self = Object.new(clss, args)
+	self.inventory = Inventory()
+	self.inventory:subscribe(self, function(args) self:update_inventory(args) end)
 	self.shadow_casting = Options.inst.shadow_casting_actors
 	Object.dict_active[self] = 1.0
 	return self
@@ -9,14 +11,37 @@ end
 
 Creature.detach = function(self)
 	-- Hide equipment.
-	if self.slots then
-		for k,v in pairs(self.slots.slots) do
-			v:detach()
-		end
-		self.slots = nil
-	end
+	self.inventory:clear()
 	-- Call base.
 	Object.detach(self)
+end
+
+--- Disables the equipment holding animation for the given slot.
+-- @param self Creature.
+-- @param slot Slot being modified.
+Creature.disable_equipment_holding_animation = function(self, slot)
+	if not self.equipment_animations then return end
+	if not self.equipment_animations[slot] then return end
+	self:animate{channel = self.equipment_animations[slot].channel}
+	self.equipment_animations[slot] = nil
+end
+
+--- Enables the equipment holding animation for the given slot.
+-- @param self Creature.
+-- @param slot Slot being modified.
+-- @param item Item added to the slot.
+Creature.enable_equipment_holding_animation = function(self, slot, item)
+	-- Enable the animation if supported by the creature.
+	local anim = self:animate_spec(item.spec.animation_hold)
+	if anim then
+		if self.equipment_animations then
+			self.equipment_animations[slot] = anim
+		else
+			self.equipment_animations = {[slot] = anim}
+		end
+	else
+		self:disable_equipment_holding_animation(slot)
+	end
 end
 
 Creature.set_model = function(self, model)
@@ -51,7 +76,7 @@ Creature.set_model = function(self, model)
 		-- The base model only contains the armature and animations so we'd
 		-- rather keep the existing build result until the new model has been built.
 		Object.set_model(self, self.model)
-		self:update_model()
+		self:request_model_rebuild()
 	end
 end
 
@@ -91,86 +116,105 @@ Creature.set_skill = function(self, s, v, m)
 	end
 end
 
-Creature.set_slot = function(self, slot, spec, count)
-	if not self.slots then self.slots = Slots() end
-	local slots = self.slots
-	spec = Itemspec:find{name = spec}
-	-- Update the model.
-	if not spec then
-		-- Missing spec.
-		slots:set_object{slot = slot}
-		if self.equipment and self.equipment[slot] then
-			self.equipment[slot] = nil
-			if self.realized then self:update_model() end
+--- Updates the positions of equipment tagged to the creature.
+-- @param self Creature.
+-- @param secs Seconds since the last update.
+Creature.update = function(self, secs)
+	-- Call the base class.
+	Object.update(self, secs)
+	-- Handle model rebuilding.
+	-- Equipment changes can occur frequently when newly appearing creatures are
+	-- being setup. Because of that, a delay is used to avoid too many expensive
+	-- rebuilds.
+	if self.model_rebuild_timer then
+		self.model_rebuild_timer = self.model_rebuild_timer - secs
+		if self.model_rebuild_timer <= 0 then
+			self.model_rebuild_timer = nil
+			self:update_model()
 		end
-	elseif spec.equipment_models then
-		-- Replacer equipment.
-		slots:set_object{slot = slot}
-		self.equipment = self.equipment or {}
-		self.equipment[slot] = spec.name
-		if self.realized then self:update_model() end
-	else
-		-- Add-on equipment.
-		slots:set_object{slot = slot, model = spec.model, spec = spec}
-		self.equipment = self.equipment or {}
-		self.equipment[slot] = spec.name
-		if self.realized then self:update_model() end
 	end
-	-- Equip animations.
-	local a
-	if spec then
-		a = self:animate_spec(spec.animation_hold)
-	end
-	if self.equipment_animations then
-		if not a and self.equipment_animations[slot] then
-			self:animate{channel = self.equipment_animations[slot].channel}
+	-- Get the creature spec.
+	if not self.realized then return end
+	local spec = self.spec
+	if not spec then return end
+	-- Update objects in equipment slots.
+	for slot,index in pairs(self.inventory.equipped) do
+		local eslot = spec.equipment_slots[slot]
+		local object = self.inventory:get_object_by_index(index)
+		if eslot and eslot.node and object then
+			local p,r = self:find_node{name = eslot.node, space = "world"}
+			if not p then p,r = self.position,self.rotation end
+			local h = object:find_node{name = "#handle"}
+			if h then p = p - r * h end
+			object.position = p
+			object.rotation = r
+			object.realized = true
+			object:update(secs)
 		end
-		self.equipment_animations[slot] = a
-	else
-		self.equipment_animations = {[slot] = a}
 	end
 end
 
-Creature.update = function(self, secs)
-	-- Update slots.
-	if self.slots then
-		local species = self.spec
-		for name,object in pairs(self.slots.slots) do
-			local slot = species and species.equipment_slots[name]
-			if slot and slot.node and self.realized then
-				-- Show slot.
-				local p,r = self:find_node{name = slot.node, space = "world"}
-				if p then
-					local h = object:find_node{name = "#handle"}
-					if h then p = p - r * h end
-					object.position = p
-					object.rotation = r
-					object.realized = true
-					object:update(secs)
-				else
-					object:detach()
-				end
-			else
-				-- Hide slot.
-				object:detach()
-			end
+--- Called when the inventory of the creature is updated.
+-- @param self Creature.
+-- @param args Inventory event arguments.
+Creature.update_inventory = function(self, args)
+	-- Get slot information from the actor spec.
+	if not self.spec then return end
+	local slot = self.spec.equipment_slots[args.slot]
+	if not slot then return end
+	-- Update achored equipment or the actor model.
+	if args.type == "inventory-equipped" then
+		if slot.node then
+			-- Enable the anchored item.
+			args.object.collision_group = 0
+			args.object.collision_mask = 0
+			args.object.realized = true
+			args.object:set_model()
+			self:enable_equipment_holding_animation(args.slot, args.object)
+		else
+			-- Require a model rebuild.
+			self:request_model_rebuild()
+		end
+		if args.object.spec.effect_equip then
+			Effect:play_object(args.object.spec.effect_equip, self, slot.node)
+		end
+	elseif args.type == "inventory-unequipped" then
+		if slot.node then
+			-- Disable the anchored item.
+			args.object:detach()
+			self:disable_equipment_holding_animation(args.slot)
+		else
+			-- Require a model rebuild.
+			self:request_model_rebuild()
+		end
+		if args.object.spec.effect_equip then
+			Effect:play_object(args.object.spec.effect_unequip, self, slot.node)
 		end
 	end
-	-- Call the base class.
-	Object.update(self, secs)
+end
+
+--- Queues a model rebuild for the actor.
+-- @param self Actor.
+Creature.request_model_rebuild = function(self)
+	self.model_rebuild_timer = 0.1
 end
 
 Creature.update_model = function(self)
 	if not self.spec then return end
 	if not self.spec.models then return end
-	if not Model.morph then return end
+	-- Create the equipment list.
+	equipment = {}
+	for k in pairs(self.spec.equipment_slots) do
+		local object = self.inventory:get_object_by_slot(k)
+		if object then equipment[k] = object.spec.name end
+	end
 	-- Build the character model in a separate thread.
 	-- The result is handled in the tick handler in event.lua.
 	Client.threads.model_builder:push_message(tostring(self.id), serialize{
 		beheaded = Bitwise:bchk(self.flags or 0, Protocol.object_flags.BEHEADED),
 		body_scale = self.body_scale,
 		body_style = self.body_style,
-		equipment = self.equipment,
+		equipment = equipment,
 		eye_color = self.eye_color,
 		eye_style = self.eye_style,
 		face_style = self.face_style,

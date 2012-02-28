@@ -19,14 +19,15 @@ end
 Widgets.Scene.update_camera = function(self)
 	-- Update the scene camera.
 	if Client then
-		Program.hdr = Views and Client.options.bloom_enabled
+		Program.hdr = Client.options.bloom_enabled
 		Program.multisamples = Client.options.multisamples
 		Program.camera_far = self.camera.far
 		Program.camera_near = self.camera.near
 		Program.camera_position = self.camera.position
 		Program.camera_rotation = self.camera.rotation
 		-- FIXME: The scene is always fullscreen.
-		self.camera.viewport = {self.x, self.y, self.width, self.height}
+		local mode = Program.video_mode
+		self.camera.viewport = {0, 0, mode[1], mode[2]}
 	end
 end
 

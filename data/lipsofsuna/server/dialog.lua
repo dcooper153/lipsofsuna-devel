@@ -186,7 +186,7 @@ Dialog.execute = function(self)
 			local s = Itemspec:find{name = c[2]}
 			if not s then return end
 			local o = Item{spec = s, count = c.count}
-			if self.user:give_item(o) then
+			if self.user.inventory:merge_or_drop_object(o) then
 				self.user:send("Received " .. c[2])
 			else
 				self.user:send("Received " .. c[2] .. " but couldn't carry it")
@@ -224,7 +224,7 @@ Dialog.execute = function(self)
 		end,
 		["remove player item"] = function(vm, c)
 			vm[1].pos = vm[1].pos + 1
-			local o = self.user:get_item{name = c[2]}
+			local o = self.user.inventory:get_object_by_name(c[2])
 			if o then
 				self.user:send("Lost " .. c[2])
 				o:detach()
@@ -235,7 +235,7 @@ Dialog.execute = function(self)
 		end,
 		["require player item"] = function(vm, c)
 			vm[1].pos = vm[1].pos + 1
-			local o = self.user:get_item{name = c[2]}
+			local o = self.user.inventory:get_object_by_name(c[2])
 			if o then
 				table.insert(vm, 1, {exe = c, off = 2, pos = 1, len = 1})
 			elseif #c >= 3 then

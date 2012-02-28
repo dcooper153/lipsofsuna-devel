@@ -29,7 +29,7 @@ Ai.calculate_combat_ratings = function(self)
 	self.best_ranged_weapon = nil
 	self.best_throw_weapon = nil
 	if self.object.spec.can_melee then self.melee_rating = 1 end
-	for k,v in pairs(self.object.inventory.slots) do
+	for k,v in pairs(self.object.inventory.stored) do
 		local score,melee,ranged,throw = self:calculate_weapon_ratings(v)
 		if melee >= self.melee_rating then
 			self.melee_rating = melee
@@ -126,7 +126,7 @@ Ai.calculate_weapon_ratings = function(self, weapon)
 	if spec.can_ranged and weapon.spec.categories["ranged"] then
 		local has_ammo
 		if weapon.spec.ammo_type then
-			has_ammo = self.object:get_item{name = weapon.spec.ammo_type}
+			has_ammo = self.object.inventory:get_object_by_name(weapon.spec.ammo_type)
 		else
 			has_ammo = true
 		end

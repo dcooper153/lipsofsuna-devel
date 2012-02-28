@@ -30,6 +30,11 @@ Widgets.Entry.new = function(clss, args)
 	return self
 end
 
+--- Called when the user has modified the text.
+-- @param self Entry widget.
+Widgets.Entry.changed = function(self)
+end
+
 --- Clears the text of the entry.
 -- @param self Entry widget.
 Widgets.Entry.clear = function(self)
@@ -50,6 +55,7 @@ Widgets.Entry.event = function(self, args)
 				table.remove(w, p)
 				self.text = String.wchar_to_utf8(w)
 				self.cursor_pos = p
+				self:changed()
 			end
 		elseif args.code == Keysym.DELETE then
 			-- Delete.
@@ -59,6 +65,7 @@ Widgets.Entry.event = function(self, args)
 				table.remove(w, p)
 				self.text = String.wchar_to_utf8(w)
 				self.cursor_pos = p
+				self:changed()
 			end
 		elseif args.code == Keysym.RETURN then
 			-- Enter.
@@ -87,6 +94,7 @@ Widgets.Entry.event = function(self, args)
 			end
 			self.text = String.wchar_to_utf8(w)
 			self.cursor_pos = p
+			self:changed()
 		end
 		return true
 	end

@@ -14,94 +14,7 @@ Editor.new = function(clss)
 	-- Camera and lighting.
 	self.camera = EditorCamera()
 	self.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equation={1.0,0.0,0.01}, priority = 2}
-	-- Map selector.
-	local maps = {}
-	for k in pairs(Pattern.dict_name) do table.insert(maps, k) end
-	self.combo_maps = Widgets.ComboBox(maps)
-	local combo_map_over = self.combo_maps.close
-	self.combo_maps.activated = function() self.entry_map.text = self.combo_maps.text end
-	self.entry_map = Widgets.Entry()
-	self.button_map = Widgets.Button{text = "Load", pressed = function(w)
-		if #self.entry_map.text == 0 then return end
-		self:load(self.entry_map.text)
-		Settings.pattern = self.entry_map.text
-	end}
-	self.group_map = Widget{cols = 2, rows = 2}
-	self.group_map:set_expand{col = 1}
-	self.group_map:set_child{col = 1, row = 1, widget = self.combo_maps}
-	self.group_map:set_child{col = 1, row = 2, widget = self.entry_map}
-	self.group_map:set_child{col = 2, row = 2, widget = self.button_map}
-	-- Item selector.
-	local items = {}
-	for k in pairs(Itemspec.dict_name) do table.insert(items, k) end	
-	table.sort(items)
-	
-	self.itemselected=""
-	self.combo_items = Widgets.ComboBox(items)
-	self.combo_items:activate{index = 1, pressed = false}
-	self.button_items = Widgets.Button{text = "Add", pressed = function() self.mode = "add item" end}
-	self.group_items = Widget{cols = 2, rows = 1}
-	self.group_items:set_expand{col = 1}
-	self.combo_items = makeGridSelect(self,items)
-	self.group_items:set_child{col = 1, row = 1, widget = self.combo_items}
-	self.group_items:set_child{col = 2, row = 1, widget = self.button_items}
-	
-	-- Obstacle selector.
-	local obstacles = {}
-	for k in pairs(Obstaclespec.dict_name) do table.insert(obstacles, k) end
-	table.sort(obstacles)
-	self.combo_obstacles = Widgets.ComboBox(obstacles)
-	self.combo_obstacles:activate{index = 1, pressed = false}
-	self.button_obstacles = Widgets.Button{text = "Add", pressed = function() self.mode = "add obstacle" end}
-	self.group_obstacles = Widget{cols = 2, rows = 1}
-	self.group_obstacles:set_expand{col = 1}
-	self.group_obstacles:set_child{col = 1, row = 1, widget = self.combo_obstacles}
-	self.group_obstacles:set_child{col = 2, row = 1, widget = self.button_obstacles}
-	-- Species selector.
-	local species = {}
-	for k in pairs(Species.dict_name) do table.insert(species, k) end
-	table.sort(species)
-	self.combo_species = Widgets.ComboBox(species)
-	self.combo_species:activate{index = 1, pressed = false}
-	self.button_species = Widgets.Button{text = "Add", pressed = function() self.mode = "add species" end}
-	self.group_species = Widget{cols = 2, rows = 1}
-	self.group_species:set_expand{col = 1}
-	self.group_species:set_child{col = 1, row = 1, widget = self.combo_species}
-	self.group_species:set_child{col = 2, row = 1, widget = self.button_species}
-	-- Tile selector.
-	local tiles = {}
-	for k in pairs(Material.dict_name) do table.insert(tiles, k) end
-	table.sort(tiles)
-	self.combo_tiles = Widgets.ComboBox(tiles)
-	self.combo_tiles:activate{index = 1, pressed = false}
-	self.button_tiles = Widgets.Button{text = "Add", pressed = function() self.mode = "add tile" end}
-	self.group_tiles = Widget{cols = 2, rows = 1}
-	self.group_tiles:set_expand{col = 1}
-	self.group_tiles:set_child{col = 1, row = 1, widget = self.combo_tiles}
-	self.group_tiles:set_child{col = 2, row = 1, widget = self.button_tiles}
-	-- Buttons.
-	self.button_delete = Widgets.Button{text = "Delete", pressed = function() self.mode = "delete" end}
-	self.button_save = Widgets.Button{text = "Save", pressed = function() self:save() end}
-	self.button_quit = Widgets.Button{text = "Exit", pressed = function() Client.views.editor:back() end}
-	-- Packing.
-	self.group = Widgets.Frame{cols = 1, rows = 8}
-	self.group:set_expand{col = 1}
-	self.group:set_child{col = 1, row = 1, widget = self.group_map}
-	self.group:set_child{col = 1, row = 2, widget = self.group_items}
-	self.group:set_child{col = 1, row = 3, widget = self.group_obstacles}
-	self.group:set_child{col = 1, row = 4, widget = self.group_species}
-	self.group:set_child{col = 1, row = 5, widget = self.group_tiles}
-	self.group:set_child{col = 1, row = 6, widget = self.button_delete}
-	self.group:set_child{col = 1, row = 7, widget = self.button_save}
-	self.group:set_child{col = 1, row = 8, widget = self.button_quit}
-	self.scene = Widgets.Scene{cols = 2, rows = 2, camera = self.camera}
-	self.scene.pressed = function(w, args) self:pressed(args) end
-	self.scene:set_expand{col = 2, row = 2}
-	self.scene:set_child{col = 1, row = 1, widget = self.group}
-	self.label_hint = Widgets.Label{halign = 0.1, valign = 0.1, font = "medium"}
-	self.label_hint.text = [[Hit ESC to start editing
-]]
-	self.scene:set_child(2, 1, self.label_hint)
+	self.scene = Widgets.Scene{camera = self.camera} -- FIXME
 	return self
 end
 
@@ -228,7 +141,7 @@ Editor.load = function(self, name)
 	self.corners.model:add_material{material = "bounds1"}
 	self:update_corners()
 	-- Update the map name entry.
-	self.entry_map.text = name
+	self.map_name = name
 end
 
 Editor.copy = function(self, args)
@@ -276,38 +189,81 @@ Editor.paste = function(self, args)
 	end
 end
 
-Editor.pressed = function(self, args)
-	local point,object,tile = Target:pick_ray{camera = self.camera}
+--- Creates an actor.
+-- @param self Editor.
+-- @param name Object spec name.
+Editor.create_actor = function(self, name)
+	-- Find the insertion point.
+	local point,object,tile = self:pick_scene()
 	if not point then return end
-	if args.button ~= 1 then return end
-	self.entry_map.text = self.combo_maps.text
-	if self.mode == "add item" then
-		local spec = Itemspec:find{name = self.itemselected}
-		print(self.combo_items.craftable)
-		EditorObject{position = point, realized = true, spec = spec}
-	elseif self.mode == "add obstacle" then
-		local spec = Obstaclespec:find{name = self.combo_obstacles.text}
-		EditorObject{position = point, realized = true, spec = spec}
-	elseif self.mode == "add species" then
-		local spec = Species:find{name = self.combo_species.text}
-		EditorObject{position = point, realized = true, spec = spec}
-	elseif self.mode == "add tile" then
-		local mat = Material:find{name = self.combo_tiles.text}
-		local t,p = Voxel:find_tile{match = "empty", point = point}
-		if p then
-			Voxel:set_tile(p, mat.id)
-			self.prev_tiles[2] = self.prev_tiles[1]
-			self.prev_tiles[1] = p
-		end
-	elseif self.mode == "delete" then
-		if object then
-			if object.spec then
-				object.realized = false
-			end
-		elseif tile then
-			Voxel:set_tile(tile, 0)
-		end
+	-- Find the inserted object type.
+	local spec = Species:find{name = name}
+	if not spec then return end
+	-- Create the object.
+	EditorObject{position = point, realized = true, spec = spec}
+end
+
+--- Creates an item.
+-- @param self Editor.
+-- @param name Object spec name.
+Editor.create_item = function(self, name)
+	-- Find the insertion point.
+	local point,object,tile = self:pick_scene()
+	if not point then return end
+	-- Find the inserted object type.
+	local spec = Itemspec:find{name = name}
+	if not spec then return end
+	-- Create the object.
+	EditorObject{position = point, realized = true, spec = spec}
+end
+
+--- Creates an obstacle.
+-- @param self Editor.
+-- @param name Object spec name.
+Editor.create_obstacle = function(self, name)
+	-- Find the insertion point.
+	local point,object,tile = self:pick_scene()
+	if not point then return end
+	-- Find the inserted object type.
+	local spec = Obstaclespec:find{name = name}
+	if not spec then return end
+	-- Create the object.
+	EditorObject{position = point, realized = true, spec = spec}
+end
+
+--- Creates a tile.
+-- @param self Editor.
+-- @param name Tile spec name.
+Editor.create_tile = function(self, name)
+	-- Find the insertion point.
+	local point,object,tile = self:pick_scene()
+	if not point then return end
+	-- Find the inserted tile type.
+	local mat = Material:find{name = name}
+	if not mat then return end
+	-- Find an empty tile.
+	local t,p = Voxel:find_tile{match = "empty", point = point}
+	if not p then return end
+	-- Fill the tile.
+	Voxel:set_tile(p, mat.id)
+	self.prev_tiles[2] = self.prev_tiles[1]
+	self.prev_tiles[1] = p
+end
+
+--- Deletes an item or obstacle.
+-- @param self Editor.
+Editor.delete = function(self)
+	-- Find the active object or tile.
+	local point,object,tile = self:pick_scene()
+	-- Delete the object or tile.
+	if object then
+		object:detach()
+	elseif tile then
+		Voxel:set_tile(tile, 0)
 	end
+end
+
+Editor.pressed = function(self, args)
 end
 
 Editor.save = function(self)
@@ -396,14 +352,20 @@ Editor.save = function(self)
 	end
 end
 
+Editor.pick_scene = function(self)
+	local mode = Program.video_mode
+	local cursor = Vector(mode[1]/2, mode[2]/2)
+	local r1,r2 = self.camera:picking_ray{cursor = cursor, far = 20, near = 0.1}
+	local ret = Physics:cast_ray{src = r1, dst = r2}
+	if not ret then return end
+	return ret.point, ret.object, ret.tile
+end
+
 Editor.pick = function(self)
 	-- Pick from the scene.
 	local hl = self.highlight and self.highlight.visual
-	local mode = Program.video_mode
-	local r1,r2 = self.camera:picking_ray{cursor = Vector(mode[1]/2, mode[2]/2), far = 20, near = 0.1}
-	local ret = Physics:cast_ray{src = r1, dst = r2}
-	if not ret then return end
-	local point,object,tile = ret.point, ret.object, ret.tile
+	local point,object,tile = self:pick_scene()
+	if not point then return end
 	-- Find or create a selection.
 	if object then
 		--determine the object face

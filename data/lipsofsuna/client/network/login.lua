@@ -1,17 +1,18 @@
 Protocol:add_handler{type = "CHARACTER_ACCEPT", func = function(event)
-	Client:set_mode("game")
+	Ui.state = "play"
 	Quickslots:reset()
 end}
 
 Protocol:add_handler{type = "CHARACTER_CREATE", func = function(event)
-	Client:set_mode("chargen")
+	Client.views.chargen:init()
+	Ui.state = "chargen"
 end}
 
 Protocol:add_handler{type = "AUTHENTICATE_REJECT", func = function(event)
 	local ok,s = event.packet:read("string")
 	if not ok then return end
-	Client:set_mode("startup")
-	Client.views.startup:set_state("Authentication failed: " .. s)
+	Ui.state = "start-game"
+	Client.data.start_game.text = "Authentication failed: " .. s
 end}
 
 Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(event)

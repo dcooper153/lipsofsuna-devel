@@ -60,6 +60,69 @@ Action.event = function(clss, args, list)
 	end
 end
 
+--- Returns the name of the control that triggers the action with the requested name.
+-- @param self Action class.
+-- @param name Action name.
+-- @return Key name or nil.
+Action.get_control_name = function(self, name)
+	local action = self.dict_name[name]
+	if not action then return nil end
+	if not action.key1 then return nil end
+	return "[" .. (Keycode[action.key1] or tostring(action.key1)) .. "]"
+end
+
+--- Executes the action if it matches the input event.
+-- @param self Action.
+-- @param args Event arguments.
+-- @return True if handled.
+Action.handle_event = function(self, args)
+	-- Activate actions.
+	local analog = function(k, v)
+		if self.mode == "analog" then
+			if self.key1 == k then
+				self.func(v)
+				return true
+			end
+		end
+	end
+	local digital = function(k, p)
+		if self.mode == "press" and p then
+			if self.key1 == k then
+				self.func()
+				return true
+			end
+		elseif self.mode == "toggle" then
+			if self.key1 == k then
+				self.func(p)
+				return true
+			end
+		elseif self.mode == "analog" then
+			if self.key1 == k then
+				self.func(p and -1 or 0)
+				return true
+			elseif self.key2 == k then
+				self.func(p and 1 or 0)
+				return true
+			end
+		end
+	end
+	if args.type == "mousemotion" then
+		local res1 = analog("mousex", Action.mouse_sensitivity_x * args.dx)
+		local res2 = analog("mousey", Action.mouse_sensitivity_y * args.dy)
+		return res1 or res2
+	elseif args.type == "mousepress" then
+		return digital("mouse" .. args.button, true)
+	elseif args.type == "mouserelease" then
+		return digital("mouse" .. args.button, false)
+	elseif args.type == "mousescroll" then
+		return analog("mousez", args.rel < 0 and -1 or 1)
+	elseif args.type == "keypress" then
+		return digital(args.code, true)
+	elseif args.type == "keyrelease" then
+		return digital(args.code, false)
+	end
+end
+
 Action:add_getters{
 	key1 = function(s) return rawget(s, "__key1") end,
 	key2 = function(s) return rawget(s, "__key2") end,

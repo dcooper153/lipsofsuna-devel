@@ -7,7 +7,6 @@ Widgets.Menus.new = function(clss, args)
 end
 
 Widgets.Menus.back = function(self)
-	Gui.need_rebuild = true
 	local w = self.stack[#self.stack]
 	if w.back then
 		w:back()
@@ -22,7 +21,6 @@ end
 --   <li>level: Activated menu level.</li>
 --   <li>widget: Submenu to show.</li></ul>
 Widgets.Menus.open = function(self, args)
-	Gui.need_rebuild = true
 	-- Close levels if opening from an upper level.
 	if #self.stack >= args.level then
 		self:close{hide = false, level = args.level}
@@ -41,7 +39,6 @@ end
 --   <li>hide: False to not hide the menu even if it becomes empty.</li>
 --   <li>level: Closed menu level or nil to close all.</li></ul>
 Widgets.Menus.close = function(self, args)
-	Gui.need_rebuild = true
 	local h = not args or args.hide ~= false
 	-- Pop levels from the stack.
 	local l = math.max(1, args and args.level or 1)

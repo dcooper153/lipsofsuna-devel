@@ -1,6 +1,7 @@
 require "system/bitwise"
 require "system/class"
 require "system/core"
+require "system/file"
 require "system/math"
 require "system/model"
 require "system/model-editing"

@@ -77,7 +77,9 @@ Player.set_client = function(self, client)
 	self.client = client
 	self.vision = Vision{cone_factor = 0.5, cone_angle = math.pi/2.5, enabled = true, object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
 	self.vision.terrain = {}
-	self.inventory:subscribe{object = self, callback = function(args) self:inventory_cb(args) end}
+	self:update_vision_radius()
+	self.vision:update()
+	self.inventory:subscribe(self, function(args) self:inventory_cb(args) end)
 end
 
 --- Causes the player to die and respawn.
@@ -133,16 +135,22 @@ Player.inventory_cb = function(self, args)
 	local funs =
 	{
 		["inventory-changed"] = function()
-			local islot = (type(args.slot) == "number") and args.slot or 0
-			local sslot = (type(args.slot) == "string") and args.slot or ""
 			if args.object then
 				local name = args.object.spec.name
 				self:send{packet = Packet(packets.INVENTORY_ITEM_ADDED, "uint32", id,
-					"uint8", islot, "string", sslot, "uint32", args.object.count, "string", name)}
+					"uint8", args.index, "string", name, "uint32", args.object.count)}
 			else
 				self:send{packet = Packet(packets.INVENTORY_ITEM_REMOVED, "uint32", id,
-					"uint8", islot, "string", sslot)}
+					"uint8", args.index)}
 			end
+		end,
+		["inventory-equipped"] = function()
+			self:send{packet = Packet(packets.INVENTORY_ITEM_EQUIPPED, "uint32", id,
+				"uint8", args.index, "string", args.slot)}
+		end,
+		["inventory-unequipped"] = function()
+			self:send{packet = Packet(packets.INVENTORY_ITEM_UNEQUIPPED, "uint32", id,
+				"uint8", args.index)}
 		end,
 		["inventory-subscribed"] = function()
 			local owner = Object:find{id = id}
@@ -192,20 +200,26 @@ Player.update_map = function(self)
 	end
 end
 
+--- Updates the skills and related attributes of the creature.
+-- @param self Object.
+Player.update_skills = function(self)
+	-- Recalculate the skills.
+	Creature.update_skills(self)
+	-- Send an update to the client.
+	local packet = Packet(packets.PLAYER_SKILLS)
+	for k,v in pairs(self.skills1) do
+		if v then packet:write("string", k) end
+	end
+	self:send{packet = packet}
+end
+
 --- Updates the vision radius of the player.<br/>
--- The view distance depends on the perception skill so it's necessary to
--- recalculate it occasionally. That can be done by calling this function.
+-- The vision system needs the direction and position of the player, so we
+-- update it here.
 -- @param self Object.
 Player.update_vision_radius = function(self)
-	local skills = self.skills
-	local perception = skills:get_value{skill = "perception"}
-	if not perception then return end
-	local r = 15 + perception / 4
 	self.vision.direction = self.rotation * Vector(0,0,-1)
 	self.vision.position = self.position
-	if math.floor(r) ~= self.vision.radius then
-		self.vision.radius = r
-	end
 end
 
 Player.vision_cb = function(self, args)
@@ -335,18 +349,21 @@ Player.vision_cb = function(self, args)
 					flags = flags + Protocol.object_show_flags.ANIMS
 				end
 			end
-			-- Slots.
+			-- Equipment.
 			local data_slots = {}
 			if o.inventory then
 				local num = 0
-				for slot,item in pairs(o.inventory.slots) do
-					if item and type(slot) == "string" then
+				for slot,index in pairs(o.inventory.equipped) do
+					local item = o.inventory:get_object_by_index(index)
+					if item then
 						table.insert(data_slots, "uint32")
-						table.insert(data_slots, item.count or 1)
-						table.insert(data_slots, "string")
-						table.insert(data_slots, item.spec.name)
+						table.insert(data_slots, index)
 						table.insert(data_slots, "string")
 						table.insert(data_slots, slot)
+						table.insert(data_slots, "string")
+						table.insert(data_slots, item.spec.name)
+						table.insert(data_slots, "uint32")
+						table.insert(data_slots, item.count)
 						num = num + 1
 					end
 				end
@@ -484,14 +501,31 @@ Player.vision_cb = function(self, args)
 					"string", args.skill, "int32", math.ceil(v.value), "int32", math.ceil(v.maximum))}
 			end
 		end,
-		["slot-changed"] = function(args)
-			local item = args.item
-			local spec = item and item.spec.name
-			local model = item and item.model_name or ""
-			local count = item and item.count or 1
-			self:send{packet = Packet(packets.OBJECT_SLOT,
-				"uint32", args.object.id, "uint32", count,
-				"string", spec, "string", args.slot)}
+		["object-equip"] = function(args)
+			-- If the player is subscribed to the inventory of the object, the
+			-- equip message is already sent by the inventory listener.
+			local id = args.object.id
+			if args.object.inventory:is_subscribed(self) then return end
+			-- The contents of the inventory slot must be revealed to the client
+			-- since it would otherwise have no information on the equipped item.
+			self:send{packet = Packet(packets.INVENTORY_ITEM_ADDED,
+				"uint32", id, "uint8", args.index, "string", args.item.name, "uint32", args.item.count)}
+			-- Send the equip message.
+			self:send{packet = Packet(packets.INVENTORY_ITEM_EQUIPPED,
+				"uint32", id, "uint8", args.index, "string", args.slot)}
+		end,
+		["object-unequip"] = function(args)
+			-- If the player is subscribed to the inventory of the object, the
+			-- unequip message is already sent by the inventory listener.
+			local id = args.object.id
+			if args.object.inventory:is_subscribed(self) then return end
+			-- Send the unequip message.
+			self:send{packet = Packet(packets.INVENTORY_ITEM_UNEQUIPPED,
+				"uint32", id, "uint8", args.index)}
+			-- The client doesn't need the item information of the unsubscribed
+			-- inventory anymore so we can clear the item.
+			self:send{packet = Packet(packets.INVENTORY_ITEM_REMOVED,
+				"uint32", id, "uint8", args.index)}
 		end,
 		["voxel-block-changed"] = function(args)
 			self:send{packet = Voxel:get_block{index = args.index, type = packets.VOXEL_DIFF}}
@@ -522,6 +556,7 @@ Player.write = function(self)
 		physics = self.dead and "rigid" or "kinematic",
 		position = self.position,
 		rotation = self.rotation,
+		skills = self.skills1,
 		skin_style = self.skin_style,
 		spec = self.spec.name,
 		variables = self.variables},

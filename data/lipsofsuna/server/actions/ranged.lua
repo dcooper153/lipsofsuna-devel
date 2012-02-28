@@ -17,7 +17,7 @@ Actionspec{name = "ranged", func = function(feat, info, args)
 		end
 		feat:play_effects(args)
 		for name,count in pairs(info.required_ammo) do
-			local ammo = args.user:split_items{name = name, count = count}
+			local ammo = args.user.inventory:split_object_by_name(name, count)
 			if ammo then
 				ammo:fire{
 					charge = args.charge,

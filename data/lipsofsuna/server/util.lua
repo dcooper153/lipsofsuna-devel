@@ -228,12 +228,7 @@ Voxel.damage = function(self, user, point)
 			for i = 1,v do
 				local spec = Itemspec:find{name = k}
 				local item = Item{spec = spec}
-				if not user or not user:add_item{object = item} then
-					local offset = Vector(math.random(), math.random(), math.random())
-					offset = offset * 0.7 + Vector(0.3, 0.3, 0.3)
-					item.position = (point + offset) * Voxel.tile_size
-					item.realized = true
-				end
+				user.inventory:merge_or_drop_object(item)
 			end
 		end
 	end

@@ -19,7 +19,7 @@ Item:add_setters{
 		if spec.inventory_size and not self.inventory then
 			self.inventory = Inventory{id = self.id, size = spec.inventory_size}
 			for k,v in pairs(spec.inventory_items) do
-				self:add_item{object = Item{spec = Itemspec:find{name = v}}}
+				self.inventory:merge_object(Item{spec = Itemspec:find{name = v}})
 			end
 		end
 		-- Create random loot.
@@ -36,11 +36,10 @@ Item:add_setters{
 			end
 			for i = 1,num_item do
 				local cat = spec.loot_categories[math.random(1, num_cat)]
-				self:add_item{object = Item{spec = Itemspec:random{category = cat}}}
+				self.inventory:merge_object(Item{spec = Itemspec:random{category = cat}})
 			end
 		end
 	end}
-
 
 --- Creates an item.
 -- @param clss Item class.
@@ -99,8 +98,8 @@ Item.contact_cb = function(self, result)
 			local o = self.contact_args.owner:get_weapon()
 			if not o then
 				self.contact_args.owner:set_weapon(self)
-			elseif not o:merge{object = self} then
-				self.contact_args.owner:add_item{object = proj}
+			elseif not o:merge(self) then
+				self.contact_args.owner.inventory:merge_object(proj)
 			end
 		else
 			-- Damage target.
@@ -199,18 +198,19 @@ end
 
 --- Splits items from the stack.
 -- @param self Object.
--- @param args Arguments.<ul>
---   <li>count: Number of items to split.</li></ul>
+-- @param count Number of items to split.
 -- @return Object.
-Item.split = function(self, args)
+Item.split = function(self, count)
 	local c = args and args.count or 1
 	if c < self.count then
 		local o = self:clone()
-		self:subtract{count = c}
+		self:subtract(c)
 		o.count = c
 		return o
+	else
+		self:detach()
+		return self
 	end
-	return self
 end
 
 --- Fires or throws the item.
@@ -296,13 +296,13 @@ Item.use_cb = function(self, user)
 	-- Pick up items not yet in the inventory of the user.
 	-- This has the side-effect of not allowing items to be used before
 	-- taken out of containers.
-	local inv = Inventory:find{object = self}
-	if not inv then
+	local parent = Object:find{id = self.parent}
+	if not parent then
 		return user:pick_up(self.id, user.id, 0)
 	end
-	local _,slot = inv:find_object{object = self}
-	if inv.id ~= user.id then
-		return Actions:move_from_inv_to_inv(user, inv.id, slot, user.id, 0)
+	local index = parent.inventory:get_index_by_object(self)
+	if parent ~= user then
+		return Actions:move_from_inv_to_inv(user, inv.id, index, user.id, 0)
 	end
 	-- Perform type specific actions.
 	if action then action.func(self, user) end

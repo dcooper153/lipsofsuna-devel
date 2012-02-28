@@ -70,8 +70,6 @@ Views.Help.enter = function(self, from, level)
 		self.mode = "standalone"
 		self:show("index")
 	end
-	-- Show the UI.
-	Gui.menus:open{level = level, widget = self}
 end
 
 --- Shows the help UI.

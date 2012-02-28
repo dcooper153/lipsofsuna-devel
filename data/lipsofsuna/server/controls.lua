@@ -28,6 +28,7 @@ local spawn_player = function(object, client, spawnpoint)
 	Player.clients[client] = object
 	object:teleport{position = home}
 	object.realized = true
+	object:set_client(client)
 	-- Transmit the home marker.
 	object:send(Packet(packets.MARKER_ADD, "string", "home",
 		"float", home.x, "float", home.y, "float", home.z))
@@ -41,6 +42,8 @@ local spawn_player = function(object, client, spawnpoint)
 				"float", m.position.z))
 		end
 	end
+	-- Transmit skills.
+	object:update_skills()
 	-- Transmit active and completed quests.
 	for k,q in pairs(Quest.dict_name) do
 		q:send{client = object}
@@ -78,12 +81,10 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		-- Spawnpoint.
 		"string")
 	if not ok then return end
+	-- TODO: Input validation.
 	local spec = Species:find{name = ra .. "-player"}
 	if not spec then return end
-	-- TODO: Input validation.
-	-- Create character. To prevent the player from falling inside the ground
-	-- when spawned in a yet to be loaded region, we disable the physics of
-	-- the object for a short while.
+	-- Create the character.
 	local o = Player{
 		account = account,
 		body_scale = b1,
@@ -95,18 +96,8 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		random = true,
 		skin_style = {skin, skinr, sking, skinb},
 		spec = spec}
-	-- Set skills.
-	local names = {"dexterity", "health", "intelligence", "perception", "strength", "willpower"}
-	local values = {s1, s2, s3, s4, s5, s6}
-	for i = 1,#names do o:set_skill(names[i], 0) end
-	for i = 1,#names do
-		o:set_skill(names[i], values[i])
-		local real = o.skills:get_maximum{skill = names[i]}
-		o.skills:set_value{skill = names[i], value = 0.666 * real}
-	end
 	-- Add to the map.
 	Network:send{client = args.client, packet = Packet(packets.CHARACTER_ACCEPT)}
-	o:set_client(args.client)
 	spawn_player(o, args.client, spawnpoint)
 	Serialize:save_account(account, o)
 end}
@@ -148,7 +139,6 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
 			if object then
 				Network:send{client = args.client, packet = Packet(packets.CHARACTER_ACCEPT)}
 				object.account = account
-				object:set_client(args.client)
 				spawn_player(object, args.client)
 				created = true
 			end
@@ -168,25 +158,6 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
 	-- Enter the character creation mode.
 	if not created then
 		Network:send{client = args.client, packet = Packet(packets.CHARACTER_CREATE)}
-	end
-end}
-
-Protocol:add_handler{type = "PLAYER_EXAMINE", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if not player.dead then
-		local ok,inv,slot = args.packet:read("uint32", "uint32")
-		if ok then
-			local object = player:find_target(inv, slot)
-			if object then
-				if object.examine_cb then
-					object:examine_cb(player)
-				else
-					player:send{packet = Packet(packets.MESSAGE, "string",
-						"There's nothing special about this object.")}
-				end
-			end
-		end
 	end
 end}
 
@@ -214,23 +185,19 @@ Protocol:add_handler{type = "FEAT", func = function(args)
 end}
 
 Protocol:add_handler{type = "INVENTORY_CLOSED", func = function(args)
+	-- Find the player.
 	local player = Player:find{client = args.client}
 	if not player then return end
-	if not player.dead then
-		local ok,id = args.packet:read("uint32")
-		if not ok then return end
-		local inv = Inventory:find{id = id}
-		if not inv or inv == player.inventory then return end
-		inv:unsubscribe{object = player}
-	end
-end}
-
-Protocol:add_handler{type = "PLAYER_JUMP", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if not player.dead then
-		player:jump()
-	end
+	if player.dead then return end
+	-- Read the inventory ID.
+	local ok,id = args.packet:read("uint32")
+	if not ok then return end
+	if id == player.id then return end
+	-- Find the inventory.
+	local obj = Object:find{id = id}
+	if not obj then return end
+	-- Unsubscribe.
+	obj.inventory:unsubscribe(player)
 end}
 
 Protocol:add_handler{type = "MOVE_ITEM", func = function(args)
@@ -279,85 +246,6 @@ Protocol:add_handler{type = "MOVE_ITEM", func = function(args)
 	end
 end}
 
-Protocol:add_handler{type = "PLAYER_BLOCK", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if player.dead then return end
-	local ok,v = args.packet:read("bool")
-	if ok then player:set_block(v) end
-end}
-
-Protocol:add_handler{type = "PLAYER_CLIMB", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if not player.dead then
-		player:climb()
-	end
-end}
-
-Protocol:add_handler{type = "PLAYER_MOVE", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if not player.dead then
-		local ok,v = args.packet:read("int8")
-		if ok then
-			if v > 0 then
-				player:set_movement(1)
-			elseif v < 0 then
-				player:set_movement(-1)
-			else
-				player:set_movement(0)
-			end
-		end
-	end
-end}
-
-Protocol:add_handler{type = "PLAYER_RESPAWN", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if not player.dead then return end
-	player:respawn()
-end}
-
-Protocol:add_handler{type = "PLAYER_TURN", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if not player.dead then
-		local ok,x,y,z,w = args.packet:read("float", "float", "float", "float")
-		if ok then
-			local e = Quaternion(x, y, z, w).euler
-			e[3] = math.min(player.spec.tilt_limit, e[3])
-			e[3] = math.max(-player.spec.tilt_limit, e[3])
-			player.tilt = Quaternion{euler = {0, 0, e[3]}}
-			player.rotation = Quaternion{euler = {e[1], e[2], 0}}
-			Vision:event{type = "object-moved", object = o}
-		end
-	end
-end}
-
-Protocol:add_handler{type = "PLAYER_RUN", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if not player.dead then
-		local ok,on = args.packet:read("bool")
-		if ok then
-			player.running = on
-			player:calculate_speed()
-		end
-	end
-end}
-
-Protocol:add_handler{type = "PLAYER_SKILLS", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if not player.dead then
-		-- Read packet data.
-		local ok,s,v = args.packet:read("string", "float")
-		if not ok then return end
-		player:set_skill(s, v)
-	end
-end}
-
 Protocol:add_handler{type = "PLAYER_ATTACK", func = function(args)
 	-- Find the player.
 	local player = Player:find{client = args.client}
@@ -382,44 +270,331 @@ Protocol:add_handler{type = "PLAYER_ATTACK", func = function(args)
 	end
 end}
 
-Protocol:add_handler{type = "PLAYER_STRAFE", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if not player.dead then
-		local ok,val = args.packet:read("int8")
-		if ok then
-			player:set_strafing(val / 127)
-		end
-	end
-end}
-
-Protocol:add_handler{type = "THROW", func = function(args)
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if not player.dead then
-		local ok,inv,slot = args.packet:read("uint32", "uint32")
-		if ok then player:throw(inv, slot) end
-	end
-end}
-
-Protocol:add_handler{type = "PLAYER_USE", func = function(args)
+Protocol:add_handler{type = "PLAYER_BLOCK", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
 	if player.dead then return end
-	-- Read the source type.
-	local ok,inv,type = args.packet:read("uint32", "uint8")
+	local ok,v = args.packet:read("bool")
 	if not ok then return end
-	-- Read the source slot.
-	local slot
-	if type == 0 then
-		ok,slot = args.packet:resume("uint32")
-	else
-		ok,slot = args.packet:resume("string")
+	player:set_block(v)
+end}
+
+Protocol:add_handler{type = "PLAYER_CLIMB", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	player:climb()
+end}
+
+Protocol:add_handler{type = "PLAYER_DIALOG", func = function(args)
+	-- Get the player.
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the object ID.
+	local ok,id = args.packet:read("uint32")
+	if not ok then return end
+	-- Find the object.
+	local object = Object:find{id = id}
+	if not object then return end
+	if not player:can_reach_object(object) then return end
+	-- Execute the dialog of the object.
+	if object.dialog then return end
+	local dialog = Dialog{object = object, user = player}
+	if not dialog then return end
+	object.dialog = dialog
+	object.dialog:execute()
+end}
+
+Protocol:add_handler{type = "PLAYER_DROP", func = function(args)
+	-- Find the player.
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the inventory index and drop count.
+	local ok,index,count = args.packet:read("uint32", "uint32")
+	if not ok then return end
+	-- Get the item.
+	local object = player.inventory:get_object_by_index(index)
+	if not object then return end
+	-- Split the dropped stack.
+	count = math.min(object.count, count)
+	local split = object:split(count)
+	-- Drop the item.
+	-- TODO: Better positioning.
+	split.position = player.position + player.rotation * Vector(0,0,-1) + Vector(0,1)
+	split.velocity = Vector()
+	split.rotation = Quaternion()
+	split.realized = true
+end}
+
+Protocol:add_handler{type = "PLAYER_EQUIP", func = function(args)
+	-- Find the player.
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the inventory index and slot.
+	local ok,index,slot = args.packet:read("uint32", "string")
+	if not ok then return end
+	-- Get the item and validate the equip.
+	local object = player.inventory:get_object_by_index(index)
+	if not object then return end
+	if object.spec.equipment_slot ~= slot then return end
+	-- Equip the item in the slot.
+	player.inventory:equip_index(index, slot)
+end}
+
+Protocol:add_handler{type = "PLAYER_HARVEST", func = function(args)
+	-- Get the player.
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the object ID.
+	local ok,id = args.packet:read("uint32")
+	if not ok then return end
+	-- Find the object.
+	local object = Object:find{id = id}
+	if not object then return end
+	if not player:can_reach_object(object) then return end
+	if not object.spec.harvest_enabled then return end
+	-- Create list of harvestable items.
+	local mats = {}
+	for k,v in pairs(object.spec.harvest_materials) do table.insert(mats, k) end
+	if #mats == 0 then return end
+	-- Play the harvesting effect.
+	if object.spec.harvest_effect then
+		Effect:play{effect = object.spec.harvest_effect, point = object.position}
 	end
+	-- Choose a random item from the list.
+	local item = Item{spec = Itemspec:find{name = mats[math.random(1, #mats)]}}
+	player.inventory:merge_or_drop_object(item)
+	player:send{packet = Packet(packets.MESSAGE, "string", "Harvested " .. item.name .. ".")}
+	-- Apply the harvesting behavior.
+	if object.spec.harvest_behavior == "destroy" then
+		object:die()
+	end
+end}
+
+Protocol:add_handler{type = "PLAYER_JUMP", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	player:jump()
+end}
+
+Protocol:add_handler{type = "PLAYER_LOOT_INVENTORY", func = function(args)
+	-- Get the player.
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the inventory index.
+	local ok,inv,index = args.packet:read("uint32", "uint32")
 	if not ok then return end
+	-- Get the object.
+	local parent = Object:find{id = inv}
+	if not parent.inventory:is_subscribed(player) then return end
+	if not player:can_reach_object(parent) then return end
+	local object = parent.inventory:get_object_by_index(index)
+	if not object then return end
 	-- Use the object.
-	local object = player:find_target(inv, slot)
-	if object and object.use_cb then
-		object:use_cb(player)
+	object:loot(player)
+end}
+
+Protocol:add_handler{type = "PLAYER_LOOT_WORLD", func = function(args)
+	-- Get the player.
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the object ID.
+	local ok,id = args.packet:read("uint32")
+	if not ok then return end
+	-- Find the object.
+	local object = Object:find{id = id}
+	if not object then return end
+	if not player:can_reach_object(object) then return end
+	-- Use the object.
+	object:loot(player)
+end}
+
+Protocol:add_handler{type = "PLAYER_MOVE", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	local ok,v = args.packet:read("int8")
+	if not ok then return end
+	if v > 0 then
+		player:set_movement(1)
+	elseif v < 0 then
+		player:set_movement(-1)
+	else
+		player:set_movement(0)
 	end
+end}
+
+Protocol:add_handler{type = "PLAYER_PICKPOCKET", func = function(args)
+	-- Get the player.
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the object ID.
+	local ok,id = args.packet:read("uint32")
+	if not ok then return end
+	-- Find the object.
+	local object = Object:find{id = id}
+	if not object then return end
+	if not player:can_reach_object(object) then return end
+	-- Use the object.
+	-- FIXME: Should use a different system.
+	object:loot(player)
+end}
+
+Protocol:add_handler{type = "PLAYER_PICKUP", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the object ID.
+	local ok,id = args.packet:read("uint32")
+	if not ok then return end
+	-- Find the object.
+	local object = Object:find{id = id}
+	if not object then return end
+	if object.spec.type ~= "item" then return end
+	if not player:can_reach_object(object) then return end
+	-- Pick up the object.
+	player.inventory:merge_object(object)
+	player:animate("pick up")
+end}
+
+Protocol:add_handler{type = "PLAYER_RESPAWN", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if not player.dead then return end
+	player:respawn()
+end}
+
+Protocol:add_handler{type = "PLAYER_RUN", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	local ok,on = args.packet:read("bool")
+	if not ok then return end
+	player.running = on
+	player:calculate_speed()
+end}
+
+Protocol:add_handler{type = "PLAYER_SKILLS", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read packet data.
+	local enabled = {}
+	while true do
+		local ok,s = args.packet:resume("string")
+		if not ok then break end
+		enabled[s] = true
+	end
+	-- Validate the input.
+	for k,v in pairs(enabled) do
+		local skill = Skillspec:find{name = k}
+		if not skill then enabled[k] = nil end
+	end
+	-- Enable and disable skills.
+	for k,v in pairs(Skillspec.dict_name) do
+		player.skills1[k] = enabled[k] and true or nil
+	end
+	-- Recalculate player attributes.
+	player:update_skills()
+end}
+
+Protocol:add_handler{type = "PLAYER_STRAFE", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	local ok,val = args.packet:read("int8")
+	if not ok then return end
+	player:set_strafing(val / 127)
+end}
+
+Protocol:add_handler{type = "PLAYER_TAKE", func = function(args)
+	-- Find the player.
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the inventory id and index.
+	local ok,id,index = args.packet:read("uint32", "uint32")
+	if not ok then return end
+	-- Get the item and validate the take.
+	local parent = Object:find{id = id}
+	if not parent then return end
+	if not parent.inventory:is_subscribed(player) then return end
+	if not player:can_reach_object(parent) then return end
+	local object = parent.inventory:get_object_by_index(index)
+	if not object then return end
+	-- Take the item.
+	player.inventory:merge_object(object)
+end}
+
+Protocol:add_handler{type = "PLAYER_TURN", func = function(args)
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	local ok,x,y,z,w = args.packet:read("float", "float", "float", "float")
+	if not ok then return end
+	local e = Quaternion(x, y, z, w).euler
+	e[3] = math.min(player.spec.tilt_limit, e[3])
+	e[3] = math.max(-player.spec.tilt_limit, e[3])
+	player.tilt = Quaternion{euler = {0, 0, e[3]}}
+	player.rotation = Quaternion{euler = {e[1], e[2], 0}}
+	Vision:event{type = "object-moved", object = o}
+end}
+
+Protocol:add_handler{type = "PLAYER_UNEQUIP", func = function(args)
+	-- Find the player.
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the inventory index.
+	local ok,index = args.packet:read("uint32")
+	if not ok then return end
+	-- Get the item and validate the equip.
+	local object = player.inventory:get_object_by_index(index)
+	if not object then return end
+	-- Equip the item in the slot.
+	player.inventory:unequip_index(index)
+end}
+
+Protocol:add_handler{type = "PLAYER_USE_INVENTORY", func = function(args)
+	-- Get the player.
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the inventory index.
+	local ok,inv,index = args.packet:read("uint32", "uint32")
+	if not ok then return end
+	-- Get the object.
+	local parent = Object:find{id = inv}
+	if not parent.inventory:is_subscribed(player) then return end
+	if not player:can_reach_object(parent) then return end
+	local object = parent.inventory:get_object_by_index(index)
+	if not object then return end
+	-- Use the object.
+	if not object.use_cb then return end
+	object:use_cb(player)
+end}
+
+Protocol:add_handler{type = "PLAYER_USE_WORLD", func = function(args)
+	-- Get the player.
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the object ID.
+	local ok,id = args.packet:read("uint32")
+	if not ok then return end
+	-- Find the object.
+	local object = Object:find{id = id}
+	if not object then return end
+	if not player:can_reach_object(object) then return end
+	-- Use the object.
+	if not object.use_cb then return end
+	object:use_cb(player)
 end}

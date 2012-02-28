@@ -48,25 +48,18 @@ Player.pick_look = function(clss)
 		local action = Action.dict_name["use"]
 		local key = action and action.key1 and Keycode[action.key1] or "--"
 		if o.name and o.name ~= "" then
-			Gui:set_target_text(string.format("[%s] Interact with %s", key, o.name))
+			Client:set_target_text(string.format("[%s] Interact with %s", key, o.name))
 		elseif o.spec.name then
-			Gui:set_target_text(string.format("[%s] Interact with %s", key, o.spec.name))
+			Client:set_target_text(string.format("[%s] Interact with %s", key, o.spec.name))
 		else
-			Gui:set_target_text(string.format("[%s] Interact", key))
+			Client:set_target_text(string.format("[%s] Interact", key))
 		end
 		set = true
 	else
-		Gui:set_target_text()
+		Client:set_target_text()
 	end
 	-- Update the 3D crosshair position.
 	clss.crosshair_position = (p or r2) - (r2 - r1):normalize() * 0.1
-end
-
-Player.update_compass = function(clss)
-	Gui.scene.compass = math.pi - clss.rotation_curr.euler[1]
-	Gui.scene.compass_quest_direction = Client.views.quests:get_compass_direction()
-	Gui.scene.compass_quest_distance = Client.views.quests:get_compass_distance()
-	Gui.scene.compass_quest_height = Client.views.quests:get_compass_height()
 end
 
 Player.tilt = 0
@@ -102,8 +95,6 @@ Player.update_rotation = function(clss, secs)
 	if (clss.rotation_prev - clss.rotation_curr).length > math.max(0, 0.1 - 0.4 * clss.rotation_sync_timer) then
 		clss:send_rotation()
 	end
-	-- Provide smooth compass rotation.
-	clss:update_compass()
 end
 
 Player.send_rotation = function(clss)

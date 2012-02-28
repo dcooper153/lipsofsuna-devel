@@ -24,14 +24,15 @@ Selection.new = function(clss, data, face)
 		self.key = clss:get_tile_key(data, face)
 		self.tile = data
 		self.face = face
-		self.visual = EditorObject{model = "select1", position = p, rotation = clss.face_rot[face], realized = true}
+		self.visual = EditorObject{model = "select1", position = p, rotation = clss.face_rot[face], realized = true, collision_mask = 0, collision_group = 0}
 	else
 		-- Object.
 		local model = self:create_face_model(face, data.rotation, data.bounding_box_physics)
 		self.face = face
 		self.key = data
 		self.object = data
-		self.visual = EditorObject{model = model, position = data.position, realized = true}
+		self.visual = EditorObject{model = model, position = data.position, realized = true,
+			collision_mask = 0, collision_group = 0}
 	end
 	self.visual.selection = self
 	return self

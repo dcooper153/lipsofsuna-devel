@@ -7,7 +7,7 @@ Quickslots.init = function(clss)
 	clss.group = Widget{rows = 1, cols = 1, spacings = {0,0}}
 	clss.items = Widgets.Quickpage{type = "items"}
 	clss.feats = Widgets.Quickpage{type = "feats"}
-	clss.mode = "items"
+	clss.mode = "feats"
 end
 
 --- Assigns a feat to a quickslot.

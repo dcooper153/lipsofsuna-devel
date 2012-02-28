@@ -26,7 +26,6 @@ Views.Quests.back = function(self)
 end
 
 Views.Quests.enter = function(self, from, level)
-	Gui.menus:open{level = level, widget = self}
 end
 
 --- Gets the compass direction for the currently shown quest.<br/>

@@ -46,10 +46,14 @@ end
 Serialize.encode_inventory = function(clss, inv)
 	if not inv then return "" end
 	local str = ""
-	for slot,obj in pairs(inv.slots) do
+	for slot,obj in pairs(inv.stored) do
 		obj:save()
-		str = string.format("%sself:add_item{slot=%s,object=Object:load{id=%s}}\n",
+		str = string.format("%sself.inventory:set_object(%s,Object:load{id=%s})\n",
 			str, serialize(slot), serialize(obj.id))
+	end
+	for slot,index in pairs(inv.equipped) do
+		str = string.format("%sself.inventory:equip_index(%s,%s)\n",
+			str, serialize(index), serialize(slot))
 	end
 	return str
 end

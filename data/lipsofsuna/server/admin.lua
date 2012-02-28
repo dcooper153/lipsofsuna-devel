@@ -143,7 +143,7 @@ Protocol:add_handler{type = "ADMIN_STATS", func = function(args)
 		elseif v.class_name == "Item" then
 			if v.realized then
 				num_items_real = num_items_real + 1
-			elseif Inventory:find{object = v} then
+			elseif v.parent then
 				num_items_inv = num_items_inv + 1
 			else
 				num_items_miss = num_items_miss + 1

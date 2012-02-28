@@ -23,19 +23,28 @@ Object:add_setters{
 		if s.count == v then return end
 		rawset(s, "__count", v ~= 0 and v or nil)
 		-- Update the inventory containing the object.
-		local inventory = Inventory:find{object = s}
-		if inventory then
-			for k,v in pairs(inventory.slots) do
-				if v == s then
-					inventory:update_slot(k)
-					break
-				end
+		if s.parent then
+			local parent = Object:find{id = s.parent}
+			if parent then
+				parent.inventory:update_object(s)
+			else
+				s.parent = nil
 			end
 		end
 	end,
 	spec = function(s, v)
 		rawset(s, "__spec", v)
 	end}
+
+local oldnew = Object.new
+Object.new = function(clss, args)
+	local self = oldnew(clss, {id = args.id})
+	self.inventory = Inventory{id = self.id}
+	for k,v in pairs(args) do
+		self[k] = v
+	end
+	return self
+end
 
 --- Handles physics contacts.
 -- @param self Object.
@@ -87,18 +96,6 @@ end
 Object.add_enemy = function(self, object)
 end
 
---- Merges or adds an item to the slots or inventory of the object.
--- @param self Object.
--- @param args Arguments.<ul>
---   <li>object: Object to add.</li>
---   <li>slot: Slot name.</li></ul>
--- @return True if succeeded.
-Object.add_item = function(self, args)
-	if not args.object then return end
-	if not self.inventory then return end
-	if self.inventory:merge_object(args) then return true end
-end
-
 --- Plays an animation.
 -- @param self Object.
 -- @param name Animation name.
@@ -128,16 +125,19 @@ Object.animate = function(self, name, force_temporary)
 	return true
 end
 
---- Calculates the weight of contained items.
+--- Returns true if the given object is reachable to this object.
 -- @param self Object.
--- @return Weight in kilograms.
-Object.calculate_carried_weight = function(self)
-	if not self.inventory then return 0 end
-	local w = 0
-	for k,v in pairs(self.inventory.slots) do
-		w = w + v.spec.mass_inventory * v.count + v:calculate_carried_weight()
+-- @param object Object.
+-- @return True if reachable.
+Object.can_reach_object = function(self, object)
+	if object.parent then
+		local parent = Object:find{id = object.parent}
+		if not parent then return end
+		if not parent.inventory:is_subscribed(self) then return end
+		return self:can_reach_object(parent)
 	end
-	return w
+	if not object.realized then return end
+	return (object.position - self.position).length <= 5
 end
 
 --- Clones the object.
@@ -146,22 +146,6 @@ end
 Object.clone = function(self)
 	local data = string.gsub(self:save(), "id=[0-9]*,", "")
 	return Object:load{data = data}
-end
-
---- Checks if the object contains the given object in its inventory.<br/>
--- The check is recursive so all the containers contained by the object
--- are also tested. The object is also considered to contain itself.
--- @param self Object.
--- @param object Object.
--- @return Container object and slot if found, nil otherwise.
-Object.contains_item = function(self, object)
-	local p = object
-	while p do
-		if p == self then return true end
-		local inv = Inventory:find{object = p}
-		if not inv then return end
-		p = inv.owner
-	end
 end
 
 --- Causes the object to take damage.
@@ -179,14 +163,12 @@ Object.detach = function(self)
 	-- Detach from world.
 	self.realized = false
 	-- Detach from inventory.
-	local inv = Inventory:find{object = self}
-	if inv then
-		for k,v in pairs(inv.slots) do
-			if v == self then
-				inv:set_object{slot = k}
-				break
-			end
+	if self.parent then
+		local parent = Object:find{id = self.parent}
+		if parent then
+			parent.inventory:remove_object(self)
 		end
+		self.parent = nil
 	end
 end
 
@@ -208,10 +190,10 @@ end
 -- @param id Inventory ID.
 -- @return Inventory or nil.
 Object.find_open_inventory = function(self, id)
-	local inv = Inventory:find{id = id}
-	if not inv then return end
-	if not inv:subscribed{object = self} then return end
-	return inv
+	local obj = Object:find{id = id}
+	if not obj then return end
+	if not object.inv:is_subscribed(self) then return end
+	return object.inv
 end
 
 --- Finds a targeted object.
@@ -223,9 +205,10 @@ Object.find_target = function(self, where, what)
 	if where == 0 then
 		return Object:find{id = what, point = self.position, radius = 5}
 	else
-		local inventory = Inventory:find{id = where}
-		if inventory and inventory:subscribed{object = self} then
-			return inventory:get_object{slot = what}
+		local obj = Object:find{id = where}
+		if not obj then return end
+		if obj.inventory:is_subscribed(self) then
+			return obj.inventory:get_object_by_index(what)
 		end
 	end
 	return nil
@@ -277,6 +260,15 @@ Object.fire = function(self, args)
 	self.realized = true
 end
 
+Object.get_equip_value = function(self, user)
+	local score = 50 * self:get_armor_class(user)
+	for k,v in pairs(self:get_weapon_influences(user)) do
+		if k ~= "hatchet" then
+			score = score + v
+		end
+	end
+end
+
 --- Gets a free object ID.
 -- @param clss Object class.
 -- @return Free object ID.
@@ -290,18 +282,6 @@ Object.get_free_id = function(clss)
 			end
 		end
 	end
-end
-
---- Finds an item from the inventory.
--- @param self Object.
--- @param args Arguments.<ul>
---   <li>name: Item name.</li>
---   <li>slot: Slot name or number.</li></ul>
--- @return Object or nil.
-Object.get_item = function(self, args)
-	if not self.inventory then return end
-	if args.slot then return self.inventory:get_object(args) end
-	if args.name then return self.inventory:find_object(args) end
 end
 
 --- Gets a full name string for the object.
@@ -329,17 +309,6 @@ Object.get_tile_range = function(self)
 	return src, src + size - Vector(1,1,1)
 end
 
---- Gives the item to the object or drops it to the floor if failed.
--- @param self Object.
--- @param object Object to give.
--- @return True if added to inventory, nil if dropped.
-Object.give_item = function(self, object)
-	if self:add_item{object = object} then return true end
-	local p = Utils:find_drop_point{point = self.position}
-	object.position = p or self.position
-	object.realized = true
-end
-
 --- Inflicts a modifier on the object.
 -- @param self Object.
 -- @param name Modifier name.
@@ -352,8 +321,8 @@ end
 -- @param self Object.
 -- @param user Object doing the looting.
 Object.loot = function(self, user)
-	if self.inventory then
-		self.inventory:subscribe{object = user, callback = function(args) user:inventory_cb(args) end}
+	if self.inventory.size > 0 then
+		self.inventory:subscribe(user, function(args) user:inventory_cb(args) end)
 		self:animate("loot")
 		self.looted = true
 	end
@@ -361,14 +330,12 @@ end
 
 --- Merges the objects if they're similar.
 -- @param self Object.
--- @param args Arguments.<ul>
---   <li>object: Object to merge to this one.</li></ul>
+-- @param object Object to merge to this one.
 -- @return True if merged successfully.
-Object.merge = function(self, args)
-	local obj = args.object
-	if self.spec == args.object.spec and self.spec.stacking then
-		self.count = self.count + obj.count
-		obj.realized = false
+Object.merge = function(self, object)
+	if self.spec == object.spec and self.spec.stacking then
+		self.count = self.count + object.count
+		object:detach()
 		return true
 	end
 end
@@ -411,33 +378,6 @@ Object.send = function(self, args)
 	end
 end
 
---- Sets the item in a specific inventory slot.
--- @param self Object.
--- @param args Arguments.<ul>
---   <li>object: Object to add.</li>
---   <li>slot: Slot name or number.</li></ul>
-Object.set_item = function(self, args)
-	if not args.object then return end
-	if not self.inventory then return end
-	self.inventory:set_object(args)
-end
-
---- Splits items from the inventory of the object.
--- @param self Object.
--- @param args Arguments.<ul>
---   <li>count: Number of items to split.</li>
---   <li>name: Item name.</li></ul>
--- @return Object or nil.
-Object.split_items = function(self, args)
-	local inv = self.inventory
-	if not inv then return end
-	local obj = inv:find_object{name = args.name}
-	if not obj then return end
-	obj = obj:split(args)
-	obj:detach()
-	return obj
-end
-
 --- Fixes the position of a stuck object.
 -- @param self Object.
 -- @return True if fixing succeeded.
@@ -456,32 +396,15 @@ end
 
 --- Subtracts stacked objects.
 -- @param self Object.
--- @param args Arguments.<ul>
---   <li>count: Count to subtract.</li></ul>
-Object.subtract = function(self, args)
-	local c = args and args.count or 1
+-- @param count: Count to subtract.
+Object.subtract = function(self, count)
+	local c = count or 1
 	if self.count > c then
 		self.count = self.count - c
 	else
 		self:detach()
 		self:purge()
 	end
-end
-
---- Subtracts items from the inventory of the object.
--- @param self Object.
--- @param args Arguments.<ul>
---   <li>count: Count to subtract.</li>
---   <li>name: Name to match.</li>
---   <li>type: Type to match.</li></ul>
--- @return True if succeeded.
-Object.subtract_items = function(self, args)
-	local inv = self.inventory
-	if not inv then return end
-	local obj = inv:find_object(args)
-	if not obj then return end
-	obj:subtract(args)
-	return true
 end
 
 --- Teleports the object.

@@ -5,7 +5,7 @@ Widgets.Menu = Class(Widget)
 Widgets.Menu.new = function(clss, args)
 	local self = Widget.new(clss, {cols = 1, rows = 2, spacings = {0,0}})
 	self.title = Widgets.Title{text = args and args.text,
-		back = function() Gui.menus:back() end,
+		back = function() end,
 		close = function() Client:set_mode("game") end,
 		help = function() Client.views.help:show("menu") end}
 	self.frame = Widgets.Frame{style = "paper", cols = 1}
@@ -32,7 +32,7 @@ Widgets.Menu.append = function(self, args)
 	local row = self.rows + 1
 	local button = Widgets.MenuItem{font = "medium", text = args.text, arrow = args.arrow,
 		color = {0,0,0,1}, color_focus = {0.7,0.3,0.3,1}, pressed = function()
-		if args.widget then Gui.menus:open{level = self.level + 1, widget = args.widget} end
+		if args.widget then end
 		if args.pressed then args.pressed(self, row) end
 	end}
 	self.frame:append_row(button)
@@ -43,7 +43,7 @@ Widgets.Menu.replace = function(self, row, args)
 	if args then
 		widget = Widgets.MenuItem{font = "medium", text = args.text, arrow = args.arrow,
 			color = {0,0,0,1}, color_focus = {0.7,0.3,0.3,1}, pressed = function()
-			if args.widget then Gui.menus:open{level = self.level + 1, widget = args.widget} end
+			if args.widget then end
 			if args.pressed then args.pressed(self, row) end
 		end}
 	end

@@ -13,7 +13,7 @@ Protocol:add_handler{type = "OBJECT_BEHEADED", func = function(event)
 	if not o then return end
 	-- Remove the head.
 	o.flags = Bitwise:bor(o.flags, Protocol.object_flags.BEHEADED)
-	o:update_model()
+	o:request_model_rebuild()
 	-- Play a particle effect.
 	Effect:play_object("behead1", o, "#neck")
 end}
@@ -32,6 +32,9 @@ Protocol:add_handler{type = "OBJECT_DEAD", func = function(args)
 	obj.dead = b
 	if obj.rotation_real then
 		obj:update_rotation(obj.rotation_real)
+	end
+	if obj == Client.player_object then
+		Client:set_player_dead(b)
 	end
 end}
 
@@ -130,7 +133,7 @@ Protocol:add_handler{type = "OBJECT_HIDDEN", func = function(event)
 	if ok then
 		local o = Object:find{id = i}
 		if o then o:detach() end
-		if i == Gui.active_dialog then Gui:set_dialog() end
+		if i == Client.active_dialog then Client:set_dialog() end
 	end
 end}
 
@@ -234,6 +237,9 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		if not ok then return end
 		o.dead = dead
 		o.tilt = tilt
+		if o == Client.player_object then
+			Client:set_player_dead(dead)
+		end
 	end
 	-- Position.
 	if Bitwise:band(flags, Protocol.object_show_flags.POSITION) ~= 0 then
@@ -274,17 +280,21 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 			o:set_anim(anim, time)
 		end
 	end
-	-- Slots.
+	-- Equipment.
 	if Bitwise:band(flags, Protocol.object_show_flags.SLOTS) ~= 0 then
 		debug("  SLOTS")
 		local ok,num = event.packet:resume("uint8")
 		if not ok then return end
 		debug("    %d", num)
 		for i=1,num do
-			local ok,count,spec,slot = event.packet:resume("uint32", "string", "string")
+			local ok,index,slot,name,count = event.packet:resume("uint32", "string", "string", "uint32")
 			if not ok then return end
-			debug("    %d %s %s", count, spec, slot)
-			o:set_slot(slot, spec, count)
+			debug("    %d %s %s %d", index, slot, name, count)
+			local spec = Itemspec:find{name = name}
+			if spec then
+				o.inventory:set_object(index, Item{spec = spec, count = count})
+				o.inventory:equip_index(index, slot)
+			end
 		end
 	end
 	-- Skills.
@@ -397,14 +407,6 @@ Protocol:add_handler{type = "OBJECT_SKILL", func = function(event)
 	local o = Object:find{id = id}
 	if not o then return end
 	o:set_skill(skill, value, max)
-end}
-
-Protocol:add_handler{type = "OBJECT_SLOT", func = function(event)
-	local ok,id,count,spec,slot = event.packet:read("uint32", "uint32", "string", "string")
-	if not ok then return end
-	local o = Object:find{id = id}
-	if not o then return end
-	o:set_slot(slot, spec, count)
 end}
 
 Protocol:add_handler{type = "OBJECT_SPEECH", func = function(event)

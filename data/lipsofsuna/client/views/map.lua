@@ -39,7 +39,6 @@ end
 
 Views.Map.enter = function(self, from, level)
 	self:update()
-	Gui.menus:open{level = level, widget = self}
 end
 
 Views.Map.update = function(self)

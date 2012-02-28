@@ -6,23 +6,6 @@
 -- @class table
 Inventory = Class()
 Inventory.class_name = "Inventory"
-Inventory.dict_object = {}
-setmetatable(Inventory.dict_object, {__mode = "kv"})
-
---- Finds an inventory by owner or stored object.
--- @param clss Inventory class.
--- @param args Arguments.<ul>
---   <li>id: Inventory ID.</li>
---   <li>object: Stored object.</li></ul>
--- @return Inventory or nil.
-Inventory.find = function(clss, args)
-	if args.id then
-		local owner = Object:find{id = args.id}
-		return owner and owner.inventory
-	elseif args.object then
-		return clss.dict_object[args.object.id]
-	end
-end
 
 --- Creates a new inventory.
 -- @param clss Inventory class.
@@ -31,206 +14,480 @@ end
 Inventory.new = function(clss, args)
 	local self = Class.new(clss, args)
 	self.size = args and args.size or 10
-	self.slots = {}
+	self.stored = {}
+	self.equipped = {}
 	self.listeners = setmetatable({}, {__mode = "k"})
 	return self
 end
 
---- Finds an object in the inventory.
+--- Calculates the weight of the contained items.
 -- @param self Inventory.
--- @param args Arguments.<ul>
---   <li>name: Item name to match.</li>
---   <li>object: Object to match.</li>
---   <li>type: Item category name to match.</li></ul>
--- @return Object and slot name or number, or nil if not found.
-Inventory.find_object = function(self, args)
-	if args.object then
-		-- Search by object
-		for k,v in pairs(self.slots) do
-			if v == args.object then return v, k end
+-- @return Weight in kilograms.
+Inventory.calculate_weight = function(self)
+	local w = 0
+	for k,v in pairs(self.stored) do
+		w = w + v.spec.mass_inventory * v.count + v.inventory:calculate_weight()
+	end
+	return w
+end
+
+--- Removes all objects from the inventory.
+-- @param self Inventory.
+Inventory.clear = function(self)
+	for k,v in pairs(self.stored) do
+		if v then self:set_object(k) end
+	end
+	self.stored = {}
+	self.equipped = {}
+end
+
+--- Counts objects that maches the name and type.
+-- @param self Inventory.
+-- @param name Item name to match.
+-- @return Object count.
+Inventory.count_objects_by_name = function(self, name)
+	local count = 0
+	for k,v in pairs(self.stored) do
+		if v.spec.name == name then
+			count = count + v.count
 		end
-	else
-		-- Search by name and type.
-		for k,v in pairs(self.slots) do
-			if (not args.name or (v.name and v.name == args.name)) and
-			   (not args.type or (v.spec.categories[args.type])) then
-				return v, k
+	end
+	return count
+end
+
+--- Finds an object in the inventory by type.
+-- @param self Inventory.
+-- @param type Item category name to match.
+-- @return Object and inventory index, or nil.
+Inventory.count_objects_by_type = function(self, type)
+	local count = 0
+	for k,v in pairs(self.stored) do
+		if v.spec.categories[type] then
+			count = count + v.count
+		end
+	end
+	return count
+end
+
+--- Automatically equips the best set of objects.
+-- @param self Inventory.
+-- @param args Arguments.
+Inventory.equip_best_objects = function(self)
+	-- Get the owner object.
+	local owner = Object:find{id = self.id}
+	if not owner then return end
+	-- Loop through all available equipment slots.
+	for name in pairs(owner.spec.equipment_slots) do
+		-- Find the best item to place to the slot.
+		local best = nil
+		local best_score = -1
+		for index,item in pairs(self.stored) do
+			if item.spec.equipment_slot == name then
+				local score = item:get_equip_value(owner)
+				if not best or score < best_score then
+					best = index
+					best_score = score
+				end
 			end
 		end
+		-- Place the best item to the slot.
+		if best then self:equip_index(best, name) end
 	end
 end
 
---- Gets the first empty slot in the inventory.
+--- Equips an inventory item.
 -- @param self Inventory.
-Inventory.get_empty_slot = function(self)
-	for slot = 1,self.size do
-		if not self.slots[slot] then return slot end
+-- @param index Inventory index.
+-- @param slot Equipment slot name.
+Inventory.equip_index = function(self, index, slot)
+	local o = self.stored[index]
+	if not o then return end
+	-- Make sure that the item isn't equipped in another slot.
+	self:unequip_index(index)
+	-- Unequip items in slots reserved by the item.
+	self:unequip_slot(slot)
+	if o.spec.equipment_slots_reserved then
+		for k in pairs(o.spec.equipment_slots_reserved) do
+			self:unequip_slot(k)
+		end
+	end
+	-- Equip the item.
+	self.equipped[slot] = index
+	-- Notify listeners.
+	for k,v in pairs(self.listeners) do
+		v{type = "inventory-equipped", index = index, inventory = self, object = o, slot = slot}
+	end
+	-- Notify vision.
+	if Vision then
+		local parent = Object:find{id = self.id}
+		Vision:event{type = "object-equip", id = self.id, index = index, item = o, object = parent, slot = slot}
 	end
 end
 
---- Gets an object in a slot.
+--- Gets the first empty inventory index.
 -- @param self Inventory.
--- @param args Arguments.<ul>
---   <li>slot: Slot index.</li></ul>
--- @return Object or nil.
-Inventory.get_object = function(self, args)
-	return args.slot and self.slots[args.slot]
+Inventory.get_empty_index = function(self)
+	for index = 1,self.size do
+		if not self.stored[index] then return index end
+	end
+end
+
+--- Gets the inventory index of the given object.
+-- @param self Inventory.
+-- @param object Object.
+-- @return Inventory index, or nil.
+Inventory.get_index_by_object = function(self, object)
+	for k,v in pairs(self.stored) do
+		if v == object then return k end
+	end
+end
+
+--- Gets the inventory index of the object in the given equipment slot.
+-- @param self Inventory.
+-- @param slot Equipment slot name.
+-- @return Inventory index, or nil.
+Inventory.get_index_by_slot = function(self, slot)
+	return self.equipped[slot]
+end
+
+--- Returns the object in the given inventory index.
+-- @param self Inventory.
+-- @param index Inventory index.
+-- @return Object, or nil.
+Inventory.get_object_by_index = function(self, index)
+	return self.stored[index]
+end
+
+--- Finds an object in the inventory by name.
+-- @param self Inventory.
+-- @param name Item name to match.
+-- @return Object and inventory index, or nil.
+Inventory.get_object_by_name = function(self, name)
+	for k,v in pairs(self.stored) do
+		if v.name == name then
+			return v, k
+		end
+	end
+end
+
+--- Finds an object in the inventory by type.
+-- @param self Inventory.
+-- @param type Item category name to match.
+-- @return Object and inventory index, or nil.
+Inventory.get_object_by_type = function(self, type)
+	for k,v in pairs(self.stored) do
+		if v.spec.categories[type] then
+			return v, k
+		end
+	end
+end
+
+--- Returns the object in the given equipment slot.
+-- @param self Inventory.
+-- @param slot Equipment slot name.
+-- @return Object, or nil.
+Inventory.get_object_by_slot = function(self, slot)
+	local i = self.equipped[slot]
+	if not i then return end
+	return self.stored[i]
+end
+
+--- Gets the equipment slot of the object in the given inventory slot.
+-- @param self Inventory.
+-- @param index Inventory index.
+-- @return Equipment slot name, or nil.
+Inventory.get_slot_by_index = function(self, index)
+	for k,v in pairs(self.equipped) do
+		if v == index then return k end
+	end
+end
+
+--- Gets the equipment slot of the given object.
+-- @param self Inventory.
+-- @param index Inventory index.
+-- @return Equipment slot name, or nil.
+Inventory.get_slot_by_object = function(self, object)
+	for k,v in pairs(self.equipped) do
+		if self.stored[v] == object then return k end
+	end
+end
+
+--- Checks if the object is subscribed to the inventory.
+-- @param self Inventory.
+-- @param object Object.
+-- @return True if subscribed.
+Inventory.is_subscribed = function(self, object)
+	return self.listeners[object] ~= nil
 end
 
 --- Intelligently adds an object to the inventory.<br/>
--- If no slot number is specified explicitly, loops through all objects in the
--- inventory, trying to merge the object with each of them, returning after the
--- first successful merge. If no merge succeeds, tries to add the object to the
--- first empty slot. If there are no empty slots, returns without adding the
--- object.<br/>
--- If an explicit slot number is requested, checks if the slot is empty. If so,
--- the object is added. Otherwise, a merge is attempted. If the merge fails,
--- the function returns without adding the object.<br/>
--- Note that merging and thus this function as well only works for objects. If
--- the inserted object or the object in the requested slot is nil, nothing is done.
+-- Loops through all objects in the inventory, trying to merge the object with
+-- each of them. If no merge succeeds, the object is added to the first free
+-- inventory index.
 -- @param self Inventory.
--- @param args Arguments.<ul>
---   <li>equip: True to auto-equip if possible.</li>
---   <li>exclude: Slot number to exclude.</li>
---   <li>object: Object.</li>
---   <li>slot: Slot name or number if requiring a specific slot.</li></ul>
+-- @param object Object.
+-- @param exclude Slot number to exclude, or nil.
 -- @return True if merged or added.
-Inventory.merge_object = function(self, args)
-	if type(args.object) ~= "table" then return end
-	if type(args.slot) == "number" then
-		-- Merge or insert to a specific inventory slot.
-		local object = self:get_object{slot = args.slot}
-		if not object then
-			args.object:detach()
-			self:set_object(args)
-			return true
-		elseif object:merge{object = args.object} then
-			args.object:detach()
-			self:update_slot(args.slot)
-			return true
-		end
-	elseif type(args.slot) == "string" then
-		-- Merge or insert to specific equipment slot.
-		local object = self:get_object{slot = args.slot}
-		if not object then
-			args.object:detach()
-			self:set_object(args)
-			return true
-		elseif object:merge{object = args.object} then
-			args.object:detach()
-			self:update_slot(args.slot)
-			return true
-		end
-	else
-		-- Merge to any equipment slot.
-		if args.equip then
-			for slot in pairs(self.slots) do
-				if type(slot) == "string" and slot ~= args.exclude then
-					local object = self:get_object{slot = slot}
-					if object and object:merge{object = args.object} then
-						args.object:detach()
-						self:update_slot(slot)
-						return true
-					end
-				end
+Inventory.merge_object = function(self, object, exclude)
+	-- Merge with any possible object.
+	for index = 1,self.size do
+		if index ~= exclude then
+			local object1 = self:get_object_by_index(index)
+			if object1 and object1:merge(object) then
+				object:detach()
+				self:update_index(index)
+				return true
 			end
 		end
-		-- Merge or insert to any slot.
-		for slot = 1,self.size do
-			if slot ~= args.exclude then
-				local object = self:get_object{slot = slot}
-				if object and object:merge{object = args.object} then
-					args.object:detach()
-					self:update_slot(slot)
-					return true
-				end
-			end
-		end
-		local slot = self:get_empty_slot()
-		if not slot then return end
-		args.object:detach()
-		self:set_object{slot = slot, object = args.object}
+	end
+	-- Insert to any free index.
+	local index = self:get_empty_index()
+	if not index then return end
+	object:detach()
+	self:set_object(index, object)
+	return true
+end
+
+--- Merges the object to the object in the given index.<br/>
+-- If the slot is emprt, the object is added. Otherwise, a merge is attempted.
+-- If the merge fails, the function returns without adding the object.<br/>
+-- @param self Inventory.
+-- @param index Inventory index.
+-- @param object Object.
+-- @return True if merged or added.
+Inventory.merge_object_to_index = function(self, index, object)
+	-- Merge or insert to a specific inventory index.
+	local object1 = self:get_object_by_index(index)
+	if not object1 then
+		object:detach()
+		self:set_object(index, object)
+		return true
+	elseif object1:merge(object) then
+		object:detach()
+		self:update_index(index)
 		return true
 	end
 end
 
---- Subscribes an object to the inventory.
+--- Merges the object to the inventory or drops it on the floor near the owner object.
 -- @param self Inventory.
--- @param args Arguments.<ul>
---   <li>callback: Callback.</li>
---   <li>object: Object to subscribe.</li></ul>
-Inventory.subscribe = function(self, args)
-	if args.object and args.callback and not self.listeners[args.object] then
-		self.listeners[args.object] = args.callback
-		args.callback{type = "inventory-subscribed", inventory = self}
-		for k,v in pairs(self.slots) do
-			args.callback{type = "inventory-changed", inventory = self, object = v, slot = k}
+-- @param object Object to give.
+-- @return True if added to inventory, nil if dropped.
+Inventory.merge_or_drop_object = function(self, object)
+	-- Try to merge.
+	if self:merge_object(object) then return true end
+	-- Find the owner.
+	if not Utils then return end
+	local o = Object:find{id = self.id}
+	if not o then return end
+	-- Drop near the owner.
+	local p = Utils:find_drop_point{point = o.position}
+	object.position = p or o.position
+	object.realized = true
+end
+
+--- Removes an object from the inventory.
+-- @param self Inventory.
+-- @param object Object.
+Inventory.remove_object = function(self, object)
+	for k,v in pairs(self.stored) do
+		if v == object then
+			self:set_object(k)
+			break
 		end
 	end
 end
 
---- Checks if an object is subscribed to the inventory.
+--- Sets the object in the given inventory index.
 -- @param self Inventory.
--- @param args Arguments.<ul>
---   <li>object: Object.</li></ul>
--- @return True if subscribed.
-Inventory.subscribed = function(self, args)
-	return self.listeners[args.object] ~= nil
+-- @param slot Slot name or number.
+-- @param object Object, or nil.
+Inventory.set_object = function(self, index, object)
+	-- Check for changes.
+	local oldobj = self.stored[index]
+	if oldobj == object then return end
+	-- Unequip and remove the old object.
+	if oldobj then
+		self:unequip_index(index)
+		oldobj.parent = nil
+	end
+	-- Detach the new object from the world.
+	if object then
+		object:detach()
+	end
+	-- Add to slot.
+	if object then
+		object.parent = self.id
+	end
+	self.stored[index] = object
+	self:update_index(index)
+end
+
+--- Splits items from the inventory of the object.
+-- @param self Object.
+-- @param index Inventory index.
+-- @param count Split count.
+-- @return Object, or nil.
+Inventory.split_object_by_index = function(self, index, count)
+	local obj = self:get_object_by_index(index)
+	if not obj then return end
+	obj = obj:split(count)
+	obj:detach()
+	return obj
+end
+
+--- Splits items from the inventory of the object.
+-- @param self Object.
+-- @param name Object name.
+-- @param count Split count.
+-- @return Object, or nil.
+Inventory.split_object_by_name = function(self, name, count)
+	-- TODO: Splitting from multiple piles.
+	local obj = self:get_object_by_name(name)
+	if not obj then return end
+	obj = obj:split(count)
+	obj:detach()
+	return obj
+end
+
+--- Subscribes the object to the inventory.
+-- @param self Inventory.
+-- @param object Object.
+-- @param callback Callback.
+Inventory.subscribe = function(self, object, callback)
+	if not self.listeners[object] then
+		self.listeners[object] = callback
+		callback{type = "inventory-subscribed", inventory = self}
+		for k,v in pairs(self.stored) do
+			callback{type = "inventory-changed", inventory = self, object = v, index = k}
+		end
+		for k,v in pairs(self.equipped) do
+			local o = self.stored[v]
+			callback{type = "inventory-equipped", index = v, inventory = self, object = o, slot = k}
+		end
+	end
+end
+
+--- Subtracts objects from the inventory by object type.
+-- @param self Inventory.
+-- @param name Object name to match.
+-- @param count Count to subtract.
+-- @return True if succeeded.
+Inventory.subtract_objects_by_name = function(self, name, count)
+	local left = count
+	for k,v in pairs(self.stored) do
+		if v.name == name then
+			if v.count < left then
+				left = left - v.count
+				self:set_object(k)
+			elseif v.count == left then
+				self:set_object(k)
+				left = 0
+				break
+			else
+				v:subtract(left)
+				left = 0
+				break
+			end
+		end
+	end
+	return left
+end
+
+--- Subtracts objects from the inventory by object name.
+-- @param self Inventory.
+-- @param type Object type to match.
+-- @param count Count to subtract.
+-- @return Number of objects that could not be subtracted.
+Inventory.subtract_objects_by_type = function(self, type, count)
+	local left = count
+	for k,v in pairs(self.stored) do
+		if v.categories[type] then
+			if v.count < left then
+				left = left - v.count
+				self:set_object(k)
+			elseif v.count == left then
+				self:set_object(k)
+				left = 0
+				break
+			else
+				v:subtract(left)
+				left = 0
+				break
+			end
+		end
+	end
+	return left
+end
+
+--- Unequips an inventory item by inventory index.
+-- @param self Inventory.
+-- @param index Inventory index.
+Inventory.unequip_index = function(self, index)
+	local o = self.stored[index]
+	if not o then return end
+	local slot = self:get_slot_by_index(index)
+	if not slot then return end
+	self.equipped[slot] = nil
+	-- Notify listeners.
+	for k,v in pairs(self.listeners) do
+		v{type = "inventory-unequipped", index = index, inventory = self, object = o, slot = slot}
+	end
+	-- Notify vision.
+	if Vision then
+		local parent = Object:find{id = self.id}
+		Vision:event{type = "object-unequip", id = self.id, index = index, item = o, object = parent, slot = slot}
+	end
+end
+
+--- Unequips an inventory item by equipment slot name.
+-- @param self Inventory.
+-- @param slot Equipment slot name.
+Inventory.unequip_slot = function(self, slot)
+	local index = self.equipped[slot]
+	if not index then return end
+	local o = self.stored[index]
+	if not o then return end
+	self.equipped[slot] = nil
+	-- Notify listeners.
+	for k,v in pairs(self.listeners) do
+		v{type = "inventory-unequipped", index = index, inventory = self, object = o, slot = slot}
+	end
+	-- Notify vision.
+	if Vision then
+		local parent = Object:find{id = self.id}
+		Vision:event{type = "object-unequip", id = self.id, index = index, item = o, object = parent, slot = slot}
+	end
 end
 
 --- Unsubscribes an object from the inventory.
 -- @param self Inventory.
--- @param args Arguments.<ul>
---   <li>object: Object to unsubscribe.</li></ul>
-Inventory.unsubscribe = function(self, args)
-	local listener = self.listeners[args.object]
+-- @param object Object.
+Inventory.unsubscribe = function(self, object)
+	local listener = self.listeners[object]
 	if listener then
 		listener{type = "inventory-unsubscribed", inventory = self}
-		self.listeners[args.object] = nil
+		self.listeners[object] = nil
 	end
 end
 
---- Sets the object of a slot.
+--- Emits an update event for the index where the object is.
 -- @param self Inventory.
--- @param args Arguments.<ul>
---   <li>slot: Slot name or number.</li>
---   <li>object: Object.</li></ul>
-Inventory.set_object = function(self, args)
-	-- Check for changes.
-	if not args.slot then return end
-	local oldobj = self.slots[args.slot]
-	if oldobj == args.object then return end
-	-- Maintain dictionaries.
-	if oldobj then
-		Inventory.dict_object[oldobj.id] = nil
-	end
-	if type(args.object) == "table" then
-		args.object:detach()
-		Inventory.dict_object[args.object.id] = self
-	end
-	-- Add to slot.
-	self.slots[args.slot] = args.object
-	self:update_slot(args.slot)
-end
-
---- Emits a slot update event.</br>
--- A private inventory-changed event is always sent to the subscibers.
--- If the slot was a string, a public vision event is also send to
--- nearby objects as if they saw an item being equipped or unequipped.</br>
--- If there are no subscribers and the Vision class hasn't been loaded,
--- the function does nothing, hence making the class usable to both the
--- client and the server.
--- @param self Inventory.
--- @param slot Slot number or name.
-Inventory.update_slot = function(self, slot)
-	local o = self:get_object{slot = slot}
-	-- Always send inventory change events to subscribers.
+-- @param object Object.
+Inventory.update_object = function(self, object)
+	local index = self:get_index_by_object(object)
+	if not index then return end
 	for k,v in pairs(self.listeners) do
-		v{type = "inventory-changed", inventory = self, object = o, slot = slot}
+		v{type = "inventory-changed", index = index, inventory = self, object = object}
 	end
-	-- Only send public slot change events when an equipment slot changed.
-	if type(slot) == "string" and Vision then
-		local owner = Object:find{id = self.id}
-		Vision:event{type = "slot-changed", item = o, id = self.id, slot = slot}
+end
+
+--- Emits an update event for the given inventory index.
+-- @param self Inventory.
+-- @param index Inventory index.
+Inventory.update_index = function(self, index)
+	local o = self:get_object_by_index(index)
+	for k,v in pairs(self.listeners) do
+		v{type = "inventory-changed", index = index, inventory = self, object = o}
 	end
 end
