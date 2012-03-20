@@ -1,6 +1,6 @@
-
 Ui:add_state{
 	state = "inventory",
+	label = "Inventory",
 	init = function()
 		local object = Client.player_object
 		if not object then return end

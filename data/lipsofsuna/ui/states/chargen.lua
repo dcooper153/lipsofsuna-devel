@@ -1,7 +1,7 @@
-
 Ui:add_state{
 	state = "chargen",
 	root = "chargen",
+	label = "Create character",
 	init = function()
 		Sound:switch_music_track("char")
 		Client.camera = Client.views.chargen.camera
@@ -56,6 +56,7 @@ Ui:add_widget{
 
 Ui:add_state{
 	state = "chargen/race",
+	label = "Select race",
 	init = function()
 		-- Create the race radio buttons.
 		local widgets = {}
@@ -80,6 +81,7 @@ Ui:add_widget{
 
 Ui:add_state{
 	state = "chargen/presets",
+	label = "Select preset",
 	init = function()
 		-- Create the preset radio buttons.
 		local widgets = {}
@@ -104,6 +106,7 @@ Ui:add_widget{
 
 Ui:add_state{
 	state = "chargen/body",
+	label = "Customize body",
 	init = function()
 		local sliders = {
 			{"Arm muscularity", false},
@@ -144,6 +147,7 @@ Ui:add_widget{
 
 Ui:add_state{
 	state = "chargen/face",
+	label = "Customize face",
 	init = function()
 		local sliders = {
 			{"Cheekbone size", true},
@@ -186,6 +190,7 @@ Ui:add_widget{
 
 Ui:add_state{
 	state = "chargen/misc",
+	label = "Customize other",
 	update = function(secs)
 		Client.views.chargen:update(secs)
 	end}
@@ -287,6 +292,7 @@ Ui:add_widget{
 
 Ui:add_state{
 	state = "chargen/misc/hairstyle",
+	label = "Select hair style",
 	init = function()
 		local widgets = {}
 		local spec = Client.views.chargen:get_race()

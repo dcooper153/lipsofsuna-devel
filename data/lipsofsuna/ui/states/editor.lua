@@ -53,6 +53,7 @@ Ui:add_widget{
 
 Ui:add_state{
 	state = "editor/load",
+	label = "Load map",
 	update = function(secs) Client.views.editor.editor:update(secs) end}
 
 Ui:add_state{
@@ -76,6 +77,7 @@ Ui:add_state{
 
 Ui:add_state{
 	state = "editor/items",
+	label = "Create items",
 	update = function(secs) Client.views.editor.editor:update(secs) end}
 
 Ui:add_state{
@@ -96,6 +98,7 @@ Ui:add_state{
 
 Ui:add_state{
 	state = "editor/obstacles",
+	label = "Create obstacles",
 	update = function(secs) Client.views.editor.editor:update(secs) end}
 
 Ui:add_state{
@@ -118,6 +121,7 @@ Ui:add_state{
 
 Ui:add_state{
 	state = "editor/actors",
+	label = "Create actors",
 	update = function(secs) Client.views.editor.editor:update(secs) end}
 
 Ui:add_state{
@@ -140,6 +144,7 @@ Ui:add_state{
 
 Ui:add_state{
 	state = "editor/tiles",
+	label = "Create voxels",
 	update = function(secs) Client.views.editor.editor:update(secs) end}
 
 Ui:add_state{

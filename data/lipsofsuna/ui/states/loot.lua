@@ -1,6 +1,6 @@
-
 Ui:add_state{
 	state = "loot",
+	label = "Loot",
 	init = function()
 		local object = Object:find{id = Client.data.inventory.id}
 		if not object then return end

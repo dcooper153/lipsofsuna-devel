@@ -1,6 +1,6 @@
-
 Ui:add_state{
 	state = "respawn",
+	label = "Respawn",
 	update = function()
 		if not Client.player_object.dead then
 			Ui.state = "play"

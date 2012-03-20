@@ -1,6 +1,6 @@
-
 Ui:add_state{
 	state = "quests",
+	label = "Quests",
 	init = function()
 		-- Sort the quests by name.
 		local quests = {}

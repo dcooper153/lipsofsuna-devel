@@ -1,6 +1,6 @@
-
 Ui:add_state{
 	state = "crafting",
+	label = "Crafting",
 	init = function()
 		-- Get the player object.
 		local object = Client.player_object

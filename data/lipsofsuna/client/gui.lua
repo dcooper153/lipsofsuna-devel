@@ -16,6 +16,8 @@ Ui.init = function(self)
 		pressed = function() self:pop_state() end}
 	self.hint = Widgets.Label()
 	self.hint:set_request{width = 200}
+	self.label = Widgets.Label{font = "medium"}
+	self.label:set_request{width = 200}
 	self.repeat_timer = 0
 	self.scroll = Widgets.Scrollbar{
 		offset = Vector(32, 0),
@@ -71,8 +73,10 @@ end
 -- @param self Ui class.
 -- @param args Arguments.<ul>
 --   <li>background: Background creation function.</li>
+--   <li>hint: Controls hint text shown to the user.</li>
 --   <li>init: Initializer function.</li>
 --   <li>input: Input handler function.</li>
+--   <li>label: State name shown to the user.</li>
 --   <li>root: Root state name.</li>
 --   <li>state: State name.</li>
 --   <li>update: Update function.</li></ul>
@@ -92,10 +96,6 @@ Ui.add_state = function(self, args)
 	if args.hint then
 		state.hint = args.hint
 	end
-	-- Set the root state.
-	if args.root then
-		state.root = args.root
-	end
 	-- Add the initializer.
 	if args.init then
 		table.insert(state.init, args.init)
@@ -103,6 +103,14 @@ Ui.add_state = function(self, args)
 	-- Add the input handler.
 	if args.input then
 		table.insert(state.input, args.input)
+	end
+	-- Set the label text.
+	if args.label then
+		state.label = args.label
+	end
+	-- Set the root state.
+	if args.root then
+		state.root = args.root
 	end
 	-- Add the update function.
 	if args.update then
@@ -415,6 +423,15 @@ Ui.show_state = function(self, state, focus)
 			add(widget)
 		end
 	end
+	-- Set the state name text.
+	local mode = Program.video_mode
+	if state_.label then
+		self.label.text = state_.label
+		self.hint.offset = Vector(mode[1] - 200, 30)
+	else
+		self.label.text = ""
+		self.hint.offset = Vector(mode[1] - 200, 0)
+	end
 	-- Attach the widgets.
 	self:show_state_attach()
 	-- Position the widgets.
@@ -453,6 +470,9 @@ Ui.show_state_attach = function(self)
 	end
 	if Client.options.help_messages then
 		root:add_child(self.hint)
+		if self.label.text ~= "" then
+			root:add_child(self.label)
+		end
 	end
 	if self.widgets[1] then
 		root:add_child(self.scroll)
@@ -479,6 +499,7 @@ Ui.show_state_detach = function(self)
 	-- Detach the navigation widgets.
 	self.back:detach()
 	self.hint:detach()
+	self.label:detach()
 	self.scroll:detach()
 end
 
@@ -495,7 +516,12 @@ Ui.update = function(self, secs)
 		if self.background then
 			self.background:set_request{width = mode[1], height = mode[2]}
 		end
-		self.hint.offset = Vector(mode[1] - 200, 0)
+		self.label.offset = Vector(mode[1] - 200, 0)
+		if self.label.text ~= "" then
+			self.hint.offset = Vector(mode[1] - 200, 30)
+		else
+			self.hint.offset = Vector(mode[1] - 200, 0)
+		end
 		self.need_relayout = true
 	end
 	-- Call the update functions of the state.

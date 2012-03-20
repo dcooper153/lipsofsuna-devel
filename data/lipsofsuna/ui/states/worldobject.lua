@@ -1,6 +1,6 @@
-
 Ui:add_state{
 	state = "world/object",
+	label = "Interact",
 	init = function()
 		-- Get the object.
 		local object = Target.target_object

@@ -1,3 +1,7 @@
+Ui:add_state{
+	state = "chat",
+	label = "Chat"}
+
 Ui:add_widget{
 	state = "chat",
 	widget = function()

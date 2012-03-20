@@ -1,6 +1,6 @@
-
 Ui:add_state{
 	state = "skills",
+	label = "Skills",
 	init = function()
 		-- Get the skill specs.
 		local skills = {}

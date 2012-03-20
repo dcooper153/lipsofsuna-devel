@@ -1,6 +1,6 @@
-
 Ui:add_state{
 	state = "dialog",
+	label = "Dialog",
 	init = function()
 		local o = Client.active_dialog_object
 		if not o then return end

@@ -1,3 +1,6 @@
+Ui:add_state{
+	state = "spells",
+	label = "Spells"}
 
 Ui:add_widget{
 	state = "spells",
@@ -88,6 +91,7 @@ Ui:add_widget{
 
 Ui:add_state{
 	state = "spells/effects",
+	label = "Select effect",
 	init = function()
 		local spec = Client.player_object.spec
 		if not spec then return end

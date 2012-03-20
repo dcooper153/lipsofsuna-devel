@@ -1,5 +1,6 @@
 Ui:add_state{
 	state = "options",
+	label = "Options",
 	background = function()
 		if Client.player_object then return end
 		return Widgets.Background{fullscreen = true, image = "mainmenu1"}
@@ -75,6 +76,7 @@ Ui:add_widget{
 
 Ui:add_state{
 	state = "options/videomode",
+	label = "Video mode",
 	background = function()
 		if Client.player_object then return end
 		return Widgets.Background{fullscreen = true, image = "mainmenu1"}

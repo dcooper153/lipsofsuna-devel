@@ -1,7 +1,7 @@
-
 Ui:add_state{
 	state = "start-game",
 	root = "start-game",
+	label = "Launching",
 	update = function(secs)
 		-- Check if already failed.
 		if not Client.data.connection.active then return end

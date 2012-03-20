@@ -1,6 +1,6 @@
-
 Ui:add_state{
 	state = "menu",
+	label = "Menu",
 	root = "play"}
 
 Ui:add_widget{

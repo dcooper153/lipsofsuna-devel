@@ -1,7 +1,7 @@
-
 Ui:add_state{
 	state = "mainmenu",
 	root = "mainmenu",
+	label = "Main menu",
 	background = function()
 		return Widgets.Background{fullscreen = true, image = "mainmenu1"}
 	end,

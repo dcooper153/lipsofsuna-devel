@@ -1,7 +1,7 @@
-
 Ui:add_state{
 	state = "join",
 	root = "mainmenu",
+	label = "Join",
 	background = function()
 		return Widgets.Background{fullscreen = true, image = "mainmenu1"}
 	end}
@@ -47,6 +47,7 @@ Ui:add_widget{
 Ui:add_state{
 	state = "join/servers",
 	root = "mainmenu",
+	label = "Select server",
 	background = function()
 		return Widgets.Background{fullscreen = true, image = "mainmenu1"}
 	end,

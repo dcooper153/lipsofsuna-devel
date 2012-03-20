@@ -1,3 +1,6 @@
+Ui:add_state{
+	state = "quit",
+	label = "Quit"}
 
 Ui:add_widget{
 	state = "quit",
