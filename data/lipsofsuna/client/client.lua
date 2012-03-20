@@ -146,6 +146,7 @@ Client.reset_data = function(self)
 	self.data.connection = {}
 	self.data.inventory = {}
 	self.data.modifiers = {}
+	self.data.quests = {sound_timer = Program.time, quests = {}}
 	self.data.skills = {}
 	for k,v in pairs(Skillspec.dict_name) do
 		local found = false

@@ -1,28 +1,11 @@
 Views.Quests = Class(Widget)
 
 Views.Quests.new = function(clss)
-	local self = Widget.new(clss, {cols = 1, rows = 3, spacings = {0, 0}})
-	self.title = Widgets.Title{text = "Quests",
-		back = function() self:back() end,
-		close = function() Client:set_mode("game") end,
-		help = function() Client.views.help:show("quests") end}
-	self.dict_name = {}
-	self.sound_play_time = Program.time
-	self.list = Widgets.List{page_size = 5}
-	self.list.pressed = function(view, row) self:show(row) end
-	self.quest_info = Widgets.QuestInfo()
-	self.frame = Widgets.Frame{style = "default", cols = 1, rows = 1}
-	self.frame:set_child{col = 1, row = 1, widget = self.list}
-	self.frame:set_expand{col = 1, row = 1}
-	self:set_expand{col = 1, row = 2}
-	self:set_child{col = 1, row = 1, widget = self.title}
-	self:set_child{col = 1, row = 2, widget = self.frame}
-	self:set_child{col = 1, row = 3, widget = self.quest_info}
+	local self = Widget.new(clss)
 	return self
 end
 
 Views.Quests.back = function(self)
-	Client:set_mode("menu")
 end
 
 Views.Quests.enter = function(self, from, level)
@@ -85,19 +68,6 @@ end
 -- @param self Quests class.
 -- @param name Quest name.
 Views.Quests.show = function(self, name)
-	-- Update toggle button statuses.
-	if self.shown_quest then
-		local w = self.dict_name[self.shown_quest]
-		if w then w.active = false end
-	end
-	if name then
-		local w = self.dict_name[name]
-		if w then w.active = true end
-	end
-	-- Show the quest info.
-	local quest = Quest:find{name = name}
-	if not quest then return end
-	self.quest_info.quest = quest
 	self.shown_quest = name
 end
 
@@ -105,13 +75,5 @@ end
 -- @param self Quests class.
 -- @param quest Quest.
 Views.Quests.update = function(self, quest)
-	local button = self.dict_name[quest.name]
-	if not button then
-		button = Widgets.Toggle{
-			pressed = function(widget) self:show(widget.text) end,
-			text = quest.name}
-		self.list:append{widget = button}
-		self.dict_name[quest.name] = button
-	end
 	self:show(quest.name)
 end
