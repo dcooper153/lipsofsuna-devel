@@ -53,6 +53,7 @@ static void Lobby_download_server_list (LIScrArgs* args)
 	char* ip;
 	char* name;
 	const char* master;
+	char error_buffer[CURL_ERROR_SIZE];
 	LIArcReader* reader;
 	LIArcWriter* writer;
 	CURL* curl;
@@ -75,7 +76,16 @@ static void Lobby_download_server_list (LIScrArgs* args)
 		curl_easy_setopt (curl, CURLOPT_URL, url);
 		curl_easy_setopt (curl, CURLOPT_WRITEDATA, writer);
 		curl_easy_setopt (curl, CURLOPT_WRITEFUNCTION, private_write);
-		curl_easy_perform (curl);
+		curl_easy_setopt (curl, CURLOPT_ERRORBUFFER, error_buffer);
+		if (curl_easy_perform (curl))
+		{
+			lisys_error_set (EINVAL, "lobby: %s", error_buffer);
+			lisys_error_report ();
+			curl_easy_cleanup (curl);
+			liarc_writer_free (writer);
+			lisys_free (url);
+			return;
+		}
 		curl_easy_cleanup (curl);
 		liarc_writer_append_nul (writer);
 		reader = liarc_reader_new (
@@ -131,6 +141,7 @@ static void Lobby_upload_server_info (LIScrArgs* args)
 	const char* desc = NULL;
 	const char* master = NULL;
 	const char* name = NULL;
+	char error_buffer[CURL_ERROR_SIZE];
 	CURL* curl;
 
 	/* Get arguments. */
@@ -155,7 +166,12 @@ static void Lobby_upload_server_info (LIScrArgs* args)
 		decoded = lisys_string_format ("u=%d|%d|%s|%s", port, players, name, desc);
 		curl_easy_setopt (curl, CURLOPT_URL, url);
 		curl_easy_setopt (curl, CURLOPT_POSTFIELDS, decoded);
-		curl_easy_perform (curl);
+		curl_easy_setopt (curl, CURLOPT_ERRORBUFFER, error_buffer);
+		if (curl_easy_perform (curl))
+		{
+			lisys_error_set (EINVAL, "lobby: %s", error_buffer);
+			lisys_error_report ();
+		}
 		curl_easy_cleanup (curl);
 		lisys_free (decoded);
 	}
