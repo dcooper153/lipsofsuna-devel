@@ -1,5 +1,6 @@
 require "client/firstpersoncamera"
 require "client/thirdpersoncamera"
+require "editor/editor"
 
 Client = Class()
 Client.class_name = "Client"
@@ -18,6 +19,8 @@ Client.init = function(self)
 	-- Initialize the world.
 	self.sectors = Sectors{database = Client.db, save_objects = false}
 	self.sectors:erase_world()
+	-- Initielize the editor.
+	self.editor = Editor()
 	-- Initialize the camera.
 	-- These need to be initialized before options since they'll be
 	-- reconfigured when the options are loaded.
@@ -30,7 +33,6 @@ Client.init = function(self)
 	self.views = {}
 	self.views.book = Views.Book()
 	self.views.chargen = Views.Chargen()
-	self.views.editor = Views.Editor()
 	self.views.feats = Views.Feats()
 	self.views.help = Views.Help()
 	self.views.inventory = Views.Inventory()

@@ -55,13 +55,6 @@ if Settings.join then
 elseif Settings.host then
 	Client:host_game()
 elseif Settings.editor then
-	-- FIXME: Why is this needed?
-	Program:update()
-	local event = Program:pop_event()
-	while event do
-		Eventhandler:event(event)
-		event = Program:pop_event()
-	end
 	Ui.state = "editor"
 else
 	Ui.state = "mainmenu"

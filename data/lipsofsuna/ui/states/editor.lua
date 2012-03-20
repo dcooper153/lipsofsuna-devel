@@ -3,9 +3,12 @@ Ui:add_state{
 	root = "editor",
 	init = function()
 		Sound:switch_music_track("game")
+		if not Client.editor.initialized then
+			Client.editor:initialize()
+		end
 	end,
 	update = function(secs)
-		Client.views.editor.editor:update(secs)
+		Client.editor:update(secs)
 	end}
 
 Ui:add_widget{
@@ -32,7 +35,7 @@ Ui:add_widget{
 	state = "editor",
 	widget = function()
 		return Widgets.Uibutton("Delete", function()
-			Client.views.editor.editor:delete()
+			Client.editor:delete()
 		end)
 	end}
 
@@ -41,7 +44,7 @@ Ui:add_widget{
 	widget = function()
 		return Widgets.Uibutton("Save", function()
 			-- TODO: Path selection
-			Client.views.editor.editor:save()
+			Client.editor:save()
 		end)
 	end}
 
@@ -54,7 +57,7 @@ Ui:add_widget{
 Ui:add_state{
 	state = "editor/load",
 	label = "Load map",
-	update = function(secs) Client.views.editor.editor:update(secs) end}
+	update = function(secs) Client.editor:update(secs) end}
 
 Ui:add_state{
 	state = "editor/load",
@@ -67,7 +70,7 @@ Ui:add_state{
 			-- Create widgets for the maps.
 			for k,v in pairs(widgets) do
 				widgets[k] = Widgets.Uibutton(v, function()
-					Client.views.editor.editor:load(v)
+					Client.editor:load(v)
 				end)
 			end
 			return widgets
@@ -78,7 +81,7 @@ Ui:add_state{
 Ui:add_state{
 	state = "editor/items",
 	label = "Create items",
-	update = function(secs) Client.views.editor.editor:update(secs) end}
+	update = function(secs) Client.editor:update(secs) end}
 
 Ui:add_state{
 	state = "editor/items",
@@ -99,7 +102,7 @@ Ui:add_state{
 Ui:add_state{
 	state = "editor/obstacles",
 	label = "Create obstacles",
-	update = function(secs) Client.views.editor.editor:update(secs) end}
+	update = function(secs) Client.editor:update(secs) end}
 
 Ui:add_state{
 	state = "editor/obstacles",
@@ -111,7 +114,7 @@ Ui:add_state{
 		-- Create widgets for the obstacles.
 		for k,v in pairs(widgets) do
 			widgets[k] = Widgets.Uibutton(v, function()
-				Client.views.editor.editor:create_obstacle(v)
+				Client.editor:create_obstacle(v)
 			end)
 		end
 		return widgets
@@ -122,7 +125,7 @@ Ui:add_state{
 Ui:add_state{
 	state = "editor/actors",
 	label = "Create actors",
-	update = function(secs) Client.views.editor.editor:update(secs) end}
+	update = function(secs) Client.editor:update(secs) end}
 
 Ui:add_state{
 	state = "editor/actors",
@@ -134,7 +137,7 @@ Ui:add_state{
 		-- Create widgets for the actors.
 		for k,v in pairs(widgets) do
 			widgets[k] = Widgets.Uibutton(v, function()
-				Client.views.editor.editor:create_actor(v)
+				Client.editor:create_actor(v)
 			end)
 		end
 		return widgets
@@ -145,7 +148,7 @@ Ui:add_state{
 Ui:add_state{
 	state = "editor/tiles",
 	label = "Create voxels",
-	update = function(secs) Client.views.editor.editor:update(secs) end}
+	update = function(secs) Client.editor:update(secs) end}
 
 Ui:add_state{
 	state = "editor/tiles",
@@ -157,7 +160,7 @@ Ui:add_state{
 		-- Create widgets for the tiles.
 		for k,v in pairs(widgets) do
 			widgets[k] = Widgets.Uibutton(v, function()
-				Client.views.editor.editor:create_tile(v)
+				Client.editor:create_tile(v)
 			end)
 		end
 		return widgets

@@ -12,5 +12,5 @@ Widgets.Uieditoritem.new = function(clss, name)
 end
 
 Widgets.Uieditoritem.apply = function(self)
-	Client.views.editor.editor:create_item(self.name)
+	Client.editor:create_item(self.name)
 end

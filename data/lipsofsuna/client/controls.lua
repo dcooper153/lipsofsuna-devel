@@ -6,13 +6,13 @@ Action{name = "attack", mode = "toggle", key1 = "mouse1", func = function(v)
 		-- Editor controls.
 		if v then
 
-			Client.views.editor.editor.mode = "grab"
+			Client.editor.mode = "grab"
 
 			local add = Action.dict_press[Keysym.LSHIFT]
-			Client.views.editor.editor:select(add)
+			Client.editor:select(add)
 		else
 			-- Released.
-			Client.views.editor.editor.mode = nil
+			Client.editor.mode = nil
 
 		end
 	end
@@ -54,10 +54,10 @@ end}
 Action{name = "editor_rotate", mode = "press", key1 = Keysym.v, func = function(v)
 	if Ui.root == "editor" then
 		-- Editor controls.
-		if Client.views.editor.editor.mode == "rotate" then
-			Client.views.editor.editor.mode = nil
+		if Client.editor.mode == "rotate" then
+			Client.editor.mode = nil
 		else
-			Client.views.editor.editor.mode = "rotate"
+			Client.editor.mode = "rotate"
 		end
 	end
 end}
@@ -65,7 +65,7 @@ end}
 Action{name = "editor_select_rect", mode = "toggle", key1 = Keysym.LCTRL, func = function(v)
 	if Ui.root == "editor" then
 		-- Editor controls.
-		Client.views.editor.editor:set_rect_select(v)
+		Client.editor:set_rect_select(v)
 	end
 end}
 
@@ -78,8 +78,8 @@ Action{name = "feats", mode = "press", key1 = Keysym.f, func = function()
 		end
 	elseif Ui.root == "editor" then
 		-- Editor controls.
-		if Client.views.editor.editor.prev_tiles[1] and Client.views.editor.editor.prev_tiles[2] then
-			Client.views.editor.editor:fill(Client.views.editor.editor.prev_tiles[1], Client.views.editor.editor.prev_tiles[2])
+		if Client.editor.prev_tiles[1] and Client.editor.prev_tiles[2] then
+			Client.editor:fill(Client.editor.prev_tiles[1], Client.editor.prev_tiles[2])
 		end
 	end
 end}
@@ -90,10 +90,10 @@ Action{name = "grab", mode = "press", key1 = Keysym.g, func = function(v)
 		-- TODO
 	elseif Ui.root == "editor" then
 		-- Editor controls.
-		if Client.views.editor.editor.mode == "grab" then
-			Client.views.editor.editor.mode = nil
+		if Client.editor.mode == "grab" then
+			Client.editor.mode = nil
 		else
-			Client.views.editor.editor.mode = "grab"
+			Client.editor.mode = "grab"
 		end
 	end
 end}
@@ -104,7 +104,7 @@ Action{name = "copy", mode = "press", key1 = Keysym.x, func = function(v)
 		-- TODO
 	elseif Ui.root == "editor" then
 		-- Editor controls.
-		Client.views.editor.editor:copy()
+		Client.editor:copy()
 	end
 end}
 
@@ -114,7 +114,7 @@ Action{name = "paste", mode = "press", key1 = Keysym.v, func = function(v)
 		-- TODO
 	elseif Ui.root == "editor" then
 		-- Editor controls.
-		Client.views.editor.editor:paste()
+		Client.editor:paste()
 	end
 end}
 
@@ -197,11 +197,11 @@ Action{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = 
 		-- Editor controls.
 		local mult = Action.dict_press[Keysym.LCTRL] and 1 or 10
 		if Action.dict_press[Keysym.LSHIFT] then
-			Client.views.editor.editor.camera.lifting = -mult * v
-			Client.views.editor.editor.camera.movement = nil
+			Client.editor.camera.lifting = -mult * v
+			Client.editor.camera.movement = nil
 		else
-			Client.views.editor.editor.camera.movement = -mult * v
-			Client.views.editor.editor.camera.lifting = nil
+			Client.editor.camera.movement = -mult * v
+			Client.editor.camera.lifting = nil
 		end
 	end
 end}
@@ -241,8 +241,8 @@ Action{name = "skills", mode = "press", key1 = Keysym.k, func = function()
 		end
 	elseif Ui.root == "editor" then
 		-- Editor controls.
-		if Client.views.editor.editor.prev_tiles[1] and Client.views.editor.editor.prev_tiles[2] then
-			Client.views.editor.editor:fill(Client.views.editor.editor.prev_tiles[1], Client.views.editor.editor.prev_tiles[2], true)
+		if Client.editor.prev_tiles[1] and Client.editor.prev_tiles[2] then
+			Client.editor:fill(Client.editor.prev_tiles[1], Client.editor.prev_tiles[2], true)
 		end
 	end
 end}
@@ -258,7 +258,7 @@ Action{name = "quickslot_mode", mode = "press", key1 = Keysym.PERIOD, func = fun
 	elseif Ui.root == "editor" then
 		-- Editor controls.
 		local mult = Action.dict_press[Keysym.LCTRL] and 0.25 or 0.5
-		for k,v in pairs(Client.views.editor.editor.selection) do
+		for k,v in pairs(Client.editor.selection) do
 			if v.object then
 				v.object:snap(mult * Voxel.tile_size, mult * math.pi)
 				v:refresh()
@@ -345,7 +345,7 @@ Action{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func 
 	elseif Ui.root == "editor" then
 		-- Editor controls.
 		local mult = Action.dict_press[Keysym.LCTRL] and 1 or 10
-		Client.views.editor.editor.camera.strafing = mult * v
+		Client.editor.camera.strafing = mult * v
 	end
 end}
 
@@ -361,10 +361,10 @@ Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 		end
 	elseif Ui.root == "editor" then
 		-- Editor controls.
-		if Client.views.editor.editor.mode == "grab" then
-			Client.views.editor.editor:grab(Vector(0, v * Client.views.editor.editor.mouse_sensitivity))
+		if Client.editor.mode == "grab" then
+			Client.editor:grab(Vector(0, v * Client.editor.mouse_sensitivity))
 		else
-			Client.views.editor.editor.camera:rotate(0, v * sens)
+			Client.editor.camera:rotate(0, v * sens)
 		end
 	end
 end}
@@ -380,18 +380,18 @@ Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
 		end
 	elseif Ui.root == "editor" then
 		-- Editor controls.
-		if Client.views.editor.editor.mode == "grab" then
+		if Client.editor.mode == "grab" then
 			-- Move the selection
-			Client.views.editor.editor:grab(Vector(-v * Client.views.editor.editor.mouse_sensitivity), 0)
-		elseif Client.views.editor.editor.mode ~= "rotate" then
+			Client.editor:grab(Vector(-v * Client.editor.mouse_sensitivity), 0)
+		elseif Client.editor.mode ~= "rotate" then
 			-- Rotate the camera.
-			Client.views.editor.editor.camera:rotate(-v * sens, 0)
+			Client.editor.camera:rotate(-v * sens, 0)
 		else
 			-- Rotate the selected objects.
 			-- If left control is pressed, rotation is 10x slower.
 			local mult = Action.dict_press[Keysym.LCTRL] and 0.1 or 1
 			local drot = Quaternion{euler = {-v * mult * sens, 0, 0}}
-			for k,v in pairs(Client.views.editor.editor.selection) do
+			for k,v in pairs(Client.editor.selection) do
 				v:rotate(drot)
 			end
 		end
@@ -411,7 +411,7 @@ Action{name = "zoom", mode = "analog", key1 = "mousez", key2 = "", func = functi
 	elseif Ui.root == "editor" then
 		-- Editor controls.
 		if Program.cursor_grabbed and v ~= 0 then
-			Client.views.editor.editor:extrude(v > 0)
+			Client.editor:extrude(v > 0)
 		end
 	end
 end}

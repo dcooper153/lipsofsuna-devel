@@ -18,6 +18,28 @@ Editor.new = function(clss)
 	return self
 end
 
+--- Initializes the editor mode.
+-- @param self Editor.
+Editor.initialize = function(self)
+	self.initialized = true
+	if Settings.pattern then
+		self:load(Settings.pattern)
+		Settings.pattern = nil
+	end
+	self.light.enabled = true
+	Client.sectors.unload_time = nil
+end
+
+--- Uninitializes the editor mode.
+-- @param self Editor.
+Editor.uninitialize = function(self)
+	self.initialized = nil
+	for k,v in pairs(Object.objects) do v:detach() end
+	Client.sectors:unload_world()
+	self.light.enabled = false
+	Client.sectors.unload_time = 10
+end
+
 --- Extrudes the selected tiles.
 -- @param self Editor.
 -- @param rev True to extrude in reverse.
