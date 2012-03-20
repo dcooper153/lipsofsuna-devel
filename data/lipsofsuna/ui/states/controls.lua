@@ -23,5 +23,7 @@ Ui:add_state{
 Ui:add_widget{
 	state = "controls",
 	widget = function()
-		return Widgets.Uibutton("Save bindings", function() Client.views.controls:save() end)
+		return Widgets.Uibutton("Save bindings", function()
+			Client:save_controls()
+		end)
 	end}
