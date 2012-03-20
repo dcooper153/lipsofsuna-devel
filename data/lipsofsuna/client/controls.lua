@@ -153,7 +153,12 @@ Action{name = "menu", mode = "press", key1 = Keysym.TAB, func = function()
 			Ui.state = "menu"
 		end
 	elseif Ui.root == "editor" then
-		Ui.state = "editor"
+		-- Editor controls.
+		if Ui.state ~= "editor" then
+			Ui.state = "editor"
+		else
+			Ui.state = "editor/menu"
+		end
 	elseif Ui.root == "chargen" then
 		Ui.state = "chargen"
 	else
@@ -183,8 +188,12 @@ Action{name = "mouse_grab", mode = "press", key1 = Keysym.ESCAPE, func = functio
 	local grab = not Program.cursor_grabbed
 	Program.cursor_grabbed = grab
 	-- Open the in-game menu at ungrab.
-	if not grab and Ui.state == "play" then
-		Ui.state = "menu"
+	if not grab then
+		if Ui.state == "play" then
+			Ui.state = "menu"
+		elseif Ui.state == "editor" then
+			Ui.state = "editor/menu"
+		end
 	end
 end}
 

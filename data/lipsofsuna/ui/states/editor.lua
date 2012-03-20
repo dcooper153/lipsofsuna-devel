@@ -1,6 +1,7 @@
 Ui:add_state{
 	state = "editor",
 	root = "editor",
+	hint = "",
 	init = function()
 		Sound:switch_music_track("game")
 		if not Client.editor.initialized then
@@ -11,28 +12,37 @@ Ui:add_state{
 		Client.editor:update(secs)
 	end}
 
+------------------------------------------------------------------------------
+
+Ui:add_state{
+	state = "editor/menu",
+	label = "Menu",
+	update = function(secs)
+		Client.editor:update(secs)
+	end}
+
 Ui:add_widget{
-	state = "editor",
+	state = "editor/menu",
 	widget = function() return Widgets.Uitransition("Load", "editor/load") end}
 
 Ui:add_widget{
-	state = "editor",
+	state = "editor/menu",
 	widget = function() return Widgets.Uitransition("Items", "editor/items") end}
 
 Ui:add_widget{
-	state = "editor",
+	state = "editor/menu",
 	widget = function() return Widgets.Uitransition("Obstacles", "editor/obstacles") end}
 
 Ui:add_widget{
-	state = "editor",
+	state = "editor/menu",
 	widget = function() return Widgets.Uitransition("Actors", "editor/actors") end}
 
 Ui:add_widget{
-	state = "editor",
+	state = "editor/menu",
 	widget = function() return Widgets.Uitransition("Tiles", "editor/tiles") end}
 
 Ui:add_widget{
-	state = "editor",
+	state = "editor/menu",
 	widget = function()
 		return Widgets.Uibutton("Delete", function()
 			Client.editor:delete()
@@ -40,7 +50,7 @@ Ui:add_widget{
 	end}
 
 Ui:add_widget{
-	state = "editor",
+	state = "editor/menu",
 	widget = function()
 		return Widgets.Uibutton("Save", function()
 			-- TODO: Path selection
@@ -49,7 +59,7 @@ Ui:add_widget{
 	end}
 
 Ui:add_widget{
-	state = "editor",
+	state = "editor/menu",
 	widget = function() return Widgets.Uitransition("Quit", "quit") end}
 
 ------------------------------------------------------------------------------
