@@ -1,4 +1,3 @@
-require "client/config"
 require "client/firstpersoncamera"
 require "client/thirdpersoncamera"
 
@@ -11,7 +10,6 @@ Client.db = Database{name = "client.sqlite"}
 Client.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
 
 Client.init = function(self)
-	self.config = Config()
 	self.options = Options.inst
 	self:update_rendering_style()
 	-- Initialize the world.
@@ -34,7 +32,6 @@ Client.init = function(self)
 	self.views.feats = Views.Feats()
 	self.views.help = Views.Help()
 	self.views.inventory = Views.Inventory()
-	self.views.join = Views.Join()
 	self.views.map = Views.Map()
 	self.views.quests = Views.Quests()
 	self.views.skills = Views.Skills{main = true, sync = true}
