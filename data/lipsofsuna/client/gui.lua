@@ -616,10 +616,10 @@ Ui.update_help = function(self)
 	hint = string.gsub(hint, "$$B", "$B: Close menu")
 	hint = string.gsub(hint, "$$U", "$U: Previous item")
 	hint = string.gsub(hint, "$$D", "$D: Next item")
-	hint = string.gsub(hint, "$A", Action:get_control_name("menu apply"))
-	hint = string.gsub(hint, "$B", Action:get_control_name("menu back"))
-	hint = string.gsub(hint, "$D", Action:get_control_name("menu down"))
-	hint = string.gsub(hint, "$U", Action:get_control_name("menu up"))
+	hint = string.gsub(hint, "$A", Action:get_control_name("menu apply") or "[---]")
+	hint = string.gsub(hint, "$B", Action:get_control_name("menu back") or "[---]")
+	hint = string.gsub(hint, "$D", Action:get_control_name("menu down") or "[---]")
+	hint = string.gsub(hint, "$U", Action:get_control_name("menu up") or "[---]")
 	-- Get the detailed help string.
 	if widget then
 		help = widget.help
