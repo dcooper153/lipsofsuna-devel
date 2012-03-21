@@ -1,7 +1,7 @@
 About Lips of Suna
 ==================
 
-Lips of Suna is an online dungeon crawl game.
+Lips of Suna is a tongue-in-cheek, online dungeon crawl game.
 
 Website: http://lipsofsuna.org/
 Forums: http://forum.freegamedev.net/viewforum.php?f=25
@@ -23,18 +23,23 @@ Dependencies
 ============
 
  * Python            http://www.python.org/
+ * Ogre    >= 1.7.0  http://www.ogre3d.org/
+ * OIS     >= 1.3.0  http://sourceforge.net/projects/wgois/
  * Bullet  >= 2.77   http://www.bulletphysics.com/
  * ENet    >= 1.2.2  http://enet.bespin.org/
  * Lua     >= 5.1    http://www.lua.org/
  * SQLite  >= 3.6    http://www.sqlite.org/
- * SDL     >= 1.2    http://libsdl.org/
- * SDL_ttf >= 2.0    http://www.libsdl.org/projects/SDL_ttf
- * GLEW    >= 1.5.5  http://glew.sourceforge.net/
- * OpenGL  >= 2.1    http://www.opengl.org/
  * OpenAL            http://www.openal.org/
  * libogg            http://xiph.org/downloads/
  * libvorbis         http://xiph.org/downloads/
  * libflac           http://flac.sourceforge.net/
+
+In Ubuntu and Mint, you can install the dependencies with the following
+command pasted to the terminal:
+
+sudo apt-get install build-essential libopenal-dev libogg-dev libvorbis-dev \
+  libflac-dev liblua5.1-0-dev libsqlite3-dev libbullet-dev libenet-dev \
+  libcurl3-dev libogre-dev libois-dev libpng12-dev
 
 
 Compiling
