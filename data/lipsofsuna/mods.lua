@@ -86,6 +86,7 @@ Mod:load "environment/wood"
 -- Miscellaneous
 Mod:load "celshading"
 Mod:load "heightmap"
+Mod:load "help"
 Mod:load "misc"
 Mod:load "particle"
 Mod:load "sounds"

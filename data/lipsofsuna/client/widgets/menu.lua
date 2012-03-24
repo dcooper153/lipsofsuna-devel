@@ -7,7 +7,7 @@ Widgets.Menu.new = function(clss, args)
 	self.title = Widgets.Title{text = args and args.text,
 		back = function() end,
 		close = function() Client:set_mode("game") end,
-		help = function() Client.views.help:show("menu") end}
+		help = function() end}
 	self.frame = Widgets.Frame{style = "paper", cols = 1}
 	self:set_child{col = 1, row = 1, widget = self.title}
 	self:set_child{col = 1, row = 2, widget = self.frame}

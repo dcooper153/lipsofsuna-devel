@@ -9,7 +9,7 @@ Views.Map.new = function(clss)
 	self.title = Widgets.Title{text = "Map",
 		back = function() self:back() end,
 		close = function() Client:set_mode("game") end,
-		help = function() Client.views.help:show("map") end}
+		help = function() end}
 	self.frame = Widgets.Frame{style = "default", request = Vector(400, 400)}
 	self.frame.scrolled = function(w, args)
 		if args.rel > 0 then
