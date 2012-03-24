@@ -341,10 +341,14 @@ end
 --  <li>data: Data string.</li></ul>
 -- @return Feat or nil.
 Feat.load = function(clss, args)
-	if args.data then
-		local func = assert(loadstring("return function()\n" .. args.data .. "\nend"))()
-		if func then return func() end
-	end
+	if not args.data then return end
+	local handler = function(err) print(debug.traceback("ERROR: " .. err)) end
+	-- Compile the string.
+	local func,err1 = loadstring(args.data)
+	if not func then return handler(err1) end
+	-- Execute the code.
+	local err2,ret = xpcall(func, handler)
+	return ret
 end
 
 --- Saves the feat to a data string.
