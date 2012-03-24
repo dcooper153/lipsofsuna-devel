@@ -51,5 +51,6 @@ Protocol:add_handler{type = "CRAFTING", func = function(args)
 	-- Try to craft the requested item.
 	local player = Player:find{client = args.client}
 	local o = Crafting:craft{name = name, user = player}
+	if not o then return end
 	player.inventory:merge_or_drop_object(o)
 end}
