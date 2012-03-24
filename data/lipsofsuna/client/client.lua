@@ -35,7 +35,6 @@ Client.init = function(self)
 	self.views.chargen = Views.Chargen()
 	self.views.feats = Views.Feats()
 	self.views.inventory = Views.Inventory()
-	self.views.map = Views.Map()
 	self.views.quests = Views.Quests()
 	self.views.skills = Views.Skills{main = true, sync = true}
 	-- Initialize helper threads.
