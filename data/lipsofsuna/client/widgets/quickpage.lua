@@ -1,6 +1,4 @@
-require "client/widgets/quickslot"
-
-Widgets.Quickpage = Class(Widget)
+Widgets.Quickpage = Class()
 Widgets.Quickpage.class_name = "Widgets.Quickpage"
 
 --- Creates a new quickslots page.
@@ -10,21 +8,11 @@ Widgets.Quickpage.class_name = "Widgets.Quickpage"
 -- @return Quickpage.
 Widgets.Quickpage.new = function(clss, args)
 	-- Create self.
-	local self = Widget.new(clss, {rows = 1, spacings = {0,0}})
+	local self = Class.new(clss)
 	self.type = args and args.type or "feats"
-	-- Create buttons.
+	-- Create the slots.
 	self.buttons = {}
-	for i = 1,10 do
-		self.buttons[i] = Widgets.Quickslot{index = i, pressed = function(w, a)
-			if a.button == 3 then
-				if self.type == "feats" then self:assign_none(i) end
-			else
-				self:activate(i)
-			end
-		end}
-		self:append_col(self.buttons[i])
-	end
-	self:append_col(Widgets.Label{text=self.type:gsub("^%l", string.upper)})
+	for i = 1,10 do self.buttons[i] = {} end
 	-- Load feats from the database.
 	self:load()
 	return self
@@ -36,10 +24,7 @@ end
 Widgets.Quickpage.assign_none = function(self, index)
 	if index > #self.buttons then return end
 	self.buttons[index].feat = nil
-	self.buttons[index].icon = nil
 	self.buttons[index].item = nil
-	self.buttons[index].text = nil
-	self.buttons[index].tooltip = nil
 	self:save()
 end
 
@@ -50,12 +35,8 @@ end
 Widgets.Quickpage.assign_feat = function(self, index, feat)
 	if not feat then return end
 	if index > #self.buttons then return end
-	local icon = feat:get_icon()
 	self.buttons[index].feat = feat
-	self.buttons[index].icon = icon
 	self.buttons[index].item = nil
-	self.buttons[index].text = nil
-	self.buttons[index].tooltip = Widgets.Feattooltip{feat = feat}
 	self:save()
 end
 
@@ -65,15 +46,8 @@ end
 -- @param item Item to assign.
 Widgets.Quickpage.assign_item = function(self, index, item)
 	if index > #self.buttons then return end
-	-- Find the icon.
-	local spec = Itemspec:find{name = item.name}
-	local icon = Iconspec:find{name = item.icon} or Iconspec:find{name = "missing1"}
-	-- Assign the item.
 	self.buttons[index].feat = nil
-	self.buttons[index].icon = icon
 	self.buttons[index].item = item.name
-	self.buttons[index].text = item.count and item.count > 1 and tostring(item.count)
-	self.buttons[index].tooltip = Widgets.Itemtooltip{spec = spec}
 	self:save()
 end
 
