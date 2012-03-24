@@ -180,6 +180,7 @@ Client.reset_data = function(self)
 	self.data.connection = {}
 	self.data.help = {page = "index"}
 	self.data.inventory = {}
+	self.data.map = {scale = 1}
 	self.data.modifiers = {}
 	self.data.quests = {sound_timer = Program.time, quests = {}}
 	self.data.skills = {}

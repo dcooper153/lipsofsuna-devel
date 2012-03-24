@@ -1,3 +1,4 @@
 Ui:add_widget{
 	state = "map",
-	widget = function() return Client.views.map end}
+	label = "Map",
+	widget = function() return Widgets.Uimap() end}
