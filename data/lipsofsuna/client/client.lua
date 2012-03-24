@@ -33,7 +33,6 @@ Client.init = function(self)
 	self.views = {}
 	self.views.book = Views.Book()
 	self.views.chargen = Views.Chargen()
-	self.views.feats = Views.Feats()
 	self.views.inventory = Views.Inventory()
 	self.views.quests = Views.Quests()
 	self.views.skills = Views.Skills{main = true, sync = true}
@@ -103,6 +102,26 @@ Client.create_world = function(self)
 			position = v.position, rotation = v.rotation, realized = true,
 			disable_unloading = true, disabling_saving = true}
 	end
+end
+
+--- Gets the spell in the given slot.
+-- @param self Client.
+-- @param slot Slot number.
+-- @return Spell.
+Client.get_spell = function(self, slot)
+	local feat = Quickslots.feats.buttons[slot].feat
+	if feat then return feat end
+	return Feat{animation = "ranged spell"}
+end
+
+--- Assigns a spell to the given slot.
+-- @param self Client.
+-- @param slot Slot number.
+-- @param type Spell type.
+-- @param effects Spell effects.
+Client.set_spell = function(self, slot, type, effects)
+	local feat = Feat{animation = type, effects = effects}
+	Quickslots:assign_feat(slot, feat)
 end
 
 --- Switches the game to the hosting start state.
@@ -182,6 +201,7 @@ Client.reset_data = function(self)
 	self.data.map = {scale = 1}
 	self.data.modifiers = {}
 	self.data.quests = {sound_timer = Program.time, quests = {}}
+	self.data.spells = {slot = 1}
 	self.data.skills = {}
 	for k,v in pairs(Skillspec.dict_name) do
 		local found = false
@@ -350,14 +370,10 @@ Client:add_class_setters{
 	player_object = function(self, v)
 		if v then
 			Client.views.skills:set_species(v.spec)
-			self.views.feats:set_race(v.spec.name)
-			self.views.feats:show(1)
 			Player.species = v.spec.name
 		else
 			-- FIXME
 			Client.views.skills:set_species(Species:find{name = "aer"})
-			self.views.feats:set_race("aer")
-			self.views.feats:show(1)
 			Player.species = "aer"
 		end
 		Player.object = v

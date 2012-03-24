@@ -48,6 +48,7 @@ end
 -- @param index Quickslot index number.
 -- @param feat Feat to assign.
 Widgets.Quickpage.assign_feat = function(self, index, feat)
+	if not feat then return end
 	if index > #self.buttons then return end
 	local icon = feat:get_icon()
 	self.buttons[index].feat = feat
