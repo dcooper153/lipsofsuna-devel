@@ -31,7 +31,6 @@ Client.init = function(self)
 	self:reset_data()
 	-- Initialize views.
 	self.views = {}
-	self.views.book = Views.Book()
 	self.views.chargen = Views.Chargen()
 	self.views.inventory = Views.Inventory()
 	self.views.quests = Views.Quests()
@@ -195,6 +194,7 @@ end
 Client.reset_data = function(self)
 	self.data = {}
 	self.data.admin = {}
+	self.data.book = {}
 	self.data.connection = {}
 	self.data.help = {page = "index"}
 	self.data.inventory = {}

@@ -1,9 +1,9 @@
 Protocol:add_handler{type = "BOOK", func = function(event)
 	local ok,title,text = event.packet:read("string", "string")
-	if ok then
-		Client.views.book:show{title = title, text = text}
-		Client:set_mode("book")
-	end
+	if not ok then return end
+	Client.data.book.title = title
+	Client.data.book.text = text
+	Ui.state = "book"
 end}
 
 Protocol:add_handler{type = "FEAT_UNLOCK", func = function(event)
