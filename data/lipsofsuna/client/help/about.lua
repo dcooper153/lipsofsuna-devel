@@ -1,4 +1,5 @@
-Views.Help.index["about"] = {
+Helpspec{
+	name = "about",
 	title = "Manual: About",
 	text = {
 {"paragraph", [[

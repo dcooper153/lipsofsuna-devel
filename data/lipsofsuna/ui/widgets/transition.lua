@@ -12,8 +12,8 @@ Widgets.Uitransition.new = function(clss, label, state, changed)
 end
 
 Widgets.Uitransition.apply = function(self)
-	Ui:push_state(self.target_state)
 	self:changed()
+	Ui:push_state(self.target_state)
 end
 
 Widgets.Uitransition.changed = function(self)

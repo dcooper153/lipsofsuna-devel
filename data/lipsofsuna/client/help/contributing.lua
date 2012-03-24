@@ -1,4 +1,5 @@
-Views.Help.index["contributing"] = {
+Helpspec{
+	name = "contributing",
 	title = "Manual: Contributing",
 	text = {
 {"paragraph", [[

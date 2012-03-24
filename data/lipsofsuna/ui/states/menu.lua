@@ -37,7 +37,11 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "menu",
-	widget = function() return Widgets.Uitransition("Help", "help") end}
+	widget = function()
+		return Widgets.Uitransition("Help", "help", function()
+			Client.data.help.page = "index"
+		end)
+	end}
 
 Ui:add_widget{
 	state = "menu",

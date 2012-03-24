@@ -179,6 +179,7 @@ Client.reset_data = function(self)
 	self.data = {}
 	self.data.admin = {}
 	self.data.connection = {}
+	self.data.help = {page = "index"}
 	self.data.inventory = {}
 	self.data.modifiers = {}
 	self.data.quests = {sound_timer = Program.time, quests = {}}
