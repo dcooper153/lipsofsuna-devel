@@ -406,7 +406,7 @@ Ui.show_state = function(self, state, focus)
 			print(debug.traceback("ERROR: " .. err))
 		end)
 		if ret and widgets then
-			for k,widget in pairs(widgets) do add(widget) end
+			for k,widget in ipairs(widgets) do add(widget) end
 		end
 	end
 	-- Create the widgets.
@@ -415,12 +415,16 @@ Ui.show_state = function(self, state, focus)
 			print(debug.traceback("ERROR: " .. err))
 		end)
 		if ret and widget then
-			if spec.help then widget.help = spec.help end
-			if spec.hint then widget.hint = spec.hint end
-			if spec.input then widget.handle_input = spec.input end
-			if spec.update then widget.update = spec.update end
-			if not widget.id then widget.id = id end
-			add(widget)
+			if widget.class_name then
+				if spec.help then widget.help = spec.help end
+				if spec.hint then widget.hint = spec.hint end
+				if spec.input then widget.handle_input = spec.input end
+				if spec.update then widget.update = spec.update end
+				if not widget.id then widget.id = id end
+				add(widget)
+			else
+				for k,v in ipairs(widget) do add(v) end
+			end
 		end
 	end
 	-- Set the state name text.

@@ -132,6 +132,18 @@ Inventory.get_empty_index = function(self)
 	end
 end
 
+--- Gets the inventory index of the object with the given name.
+-- @param self Inventory.
+-- @param name Item name to match.
+-- @return Inventory index, or nil.
+Inventory.get_index_by_name = function(self, name)
+	for k,v in pairs(self.stored) do
+		if v.name == name then
+			return k
+		end
+	end
+end
+
 --- Gets the inventory index of the given object.
 -- @param self Inventory.
 -- @param object Object.
@@ -368,11 +380,32 @@ Inventory.subscribe = function(self, object, callback)
 	end
 end
 
+--- Subtracts objects from the inventory by inventory index.
+-- @param self Inventory.
+-- @param index Inventory index.
+-- @param count Count to subtract.
+-- @return Number of objects that could not be subtracted.
+Inventory.subtract_objects_by_index = function(self, index, count)
+	local item = self:get_object_by_index(index)
+	if not item then return end
+	if item.count < count then
+		local left = count - item.count
+		self:set_object(index)
+		return left
+	elseif item.count == left then
+		self:set_object(index)
+		return 0
+	else
+		item:subtract(left)
+		return 0
+	end
+end
+
 --- Subtracts objects from the inventory by object type.
 -- @param self Inventory.
 -- @param name Object name to match.
 -- @param count Count to subtract.
--- @return True if succeeded.
+-- @return Number of objects that could not be subtracted.
 Inventory.subtract_objects_by_name = function(self, name, count)
 	local left = count
 	for k,v in pairs(self.stored) do

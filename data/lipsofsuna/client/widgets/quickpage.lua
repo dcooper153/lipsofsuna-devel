@@ -81,10 +81,10 @@ Widgets.Quickpage.activate = function(self, index)
 			"bool", false)}
 	elseif item then
 		-- Use an item.
-		local cont = Client.views.inventory.container
+		local cont = Client.player_object.inventory
 		if not cont then return end
-		local slot = cont:find_item{name = item}
-		if not slot then return end
+		local index = cont:get_index_by_name(item)
+		if not index then return end
 		Commands:use(cont.id, slot)
 	end
 end

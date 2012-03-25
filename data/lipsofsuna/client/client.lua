@@ -32,7 +32,6 @@ Client.init = function(self)
 	-- Initialize views.
 	self.views = {}
 	self.views.chargen = Views.Chargen()
-	self.views.inventory = Views.Inventory()
 	-- Initialize helper threads.
 	self.threads = {}
 	self.threads.model_builder = Thread("client/threads/modelbuilder.lua")
@@ -174,6 +173,49 @@ Client.set_spell = function(self, slot, type, effects)
 	Quickslots:assign_feat(slot, feat)
 end
 
+--- Sends a trade apply message to the server.
+-- @param self Client.
+Client.apply_trade = function(self)
+	local packet = Packet(packets.TRADING_ACCEPT)
+	Network:send{packet = packet}
+end
+
+--- Sends a trade update message to the server.
+-- @param self Client.
+Client.update_trade = function(self)
+	-- Collect bought items.
+	local buy = {}
+	for k,index in pairs(self.data.trading.buy) do
+		local item = self.data.trading.shop[index]
+		if item then
+			table.insert(buy, {index, item.count})
+		else
+			self.data.trading.buy[k] = nil
+		end
+	end
+	-- Collect sold items.
+	local sell = {}
+	local object = self.player_object
+	for k,index in pairs(self.data.trading.sell) do
+		local item = object.inventory:get_object_by_index(index)
+		if item then
+			table.insert(sell, {index, item.count})
+		else
+			self.data.trading.buy[k] = nil
+		end
+	end
+	-- Create the packet.
+	local packet = Packet(packets.TRADING_UPDATE, "uint8", #buy, "uint8", #sell)
+	for k,v in ipairs(buy) do
+		packet:write("uint32", v[1], "uint32", v[2])
+	end
+	for k,v in ipairs(sell) do
+		packet:write("uint32", v[1], "uint32", v[2])
+	end
+	-- Send the packet.
+	Network:send{packet = packet}
+end
+
 --- Switches the game to the hosting start state.
 -- @param self Client class.
 Client.host_game = function(self)
@@ -254,6 +296,7 @@ Client.reset_data = function(self)
 	self.data.quests = {sound_timer = Program.time, quests = {}}
 	self.data.spells = {slot = 1}
 	self.data.skills = {}
+	self.data.trading = {buy = {}, sell = {}, shop = {}}
 	for k,v in pairs(Skillspec.dict_name) do
 		local found = false
 		for k1,v1 in pairs(v.requires) do found = true end

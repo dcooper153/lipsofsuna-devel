@@ -227,7 +227,7 @@ end}
 
 Action{name = "pick_up", mode = "press", key1 = Keysym.COMMA, func = function()
 	if Client.player_object then
-		Commands:pickup()
+		-- TODO
 	end
 end}
 

@@ -1,41 +1,67 @@
 Trading = Class()
 
+--- Applies the trade if it's acceptable.
+-- @param clss Trading.
+-- @param player Player.
 Trading.accept = function(clss, player)
 	-- Check for an acceptable deal.
 	if not player.trading then return end
 	if not clss:deal(player) then return end
+	-- Remove the sold items.
+	for k,v in pairs(player.trading.sell) do
+		player.inventory:subtract_objects_by_index(v[1], v[2])
+	end
 	-- Give the bought items.
 	for k,v in pairs(player.trading.buy) do
-		local s = Itemspec:find{name = v[1]}
-		local o = Item{spec = s, count = v[2]}
-		player.inventory:merge_or_drop_object(o)
+		local name = player.trading.shop[v[1]]
+		local spec = Itemspec:find{name = name}
+		local item = Item{spec = spec, count = v[2]}
+		player.inventory:merge_or_drop_object(item)
 	end
 	-- Close the trading screen.
 	player.trading = nil
-	player:send(Packet(packets.TRADING_CANCEL))
+	player:send(Packet(packets.TRADING_CLOSE))
 end
 
+--- Cancels the trade.
+-- @param clss Trading.
+-- @param player Player.
 Trading.cancel = function(clss, player)
 	if not player.trading then return end
-	player:send(Packet(packets.TRADING_CANCEL))
-	for k,v in pairs(player.trading.sell) do
-		player.inventory:merge_or_drop_object(v)
-	end
+	player:send(Packet(packets.TRADING_CLOSE))
 	player.trading = nil
 end
 
+--- Returns true if the trade is acceptable.</br>
+--
+-- This function also takes care of validating the items of the trade in case
+-- the player inventory or other conditions have changed. Any invalid items
+-- are removed and invalid item counts clamped to the valid bounds.
+--
+-- @param clss Trading.
+-- @param player Player.
 Trading.deal = function(clss, player)
 	-- Calculate the value of the items sold by the player.
 	local sell = 0
 	for k,v in pairs(player.trading.sell) do
-		local spec = v.spec
-		if spec then sell = sell + spec:get_trading_value() * v.count end
+		local item = player.inventory:get_object_by_index(v[1])
+		if item then
+			v[2] = math.max(v[2], item.count)
+			sell = sell + v[2] * item.spec:get_trading_value()
+		else
+			player.trading.sell[k] = nil
+		end
 	end
 	-- Calculate the value of the items bought by the player.
 	local buy = 0
 	for k,v in pairs(player.trading.buy) do
-		local spec = Itemspec:find{name = v[1]}
-		if spec then buy = buy + spec:get_trading_value() * v[2] end
+		local name = player.trading.shop[v[1]]
+		if name then
+			local spec = Itemspec:find{name = name}
+			buy = buy + v[2] * spec:get_trading_value()
+		else
+			player.trading.shop[v[1]] = nil
+		end
 	end
 	-- Accept if the merchant profits.
 	-- TODO: Should merchants be more favorable to the same race?
@@ -43,6 +69,10 @@ Trading.deal = function(clss, player)
 	return 1.5 * sell >= buy
 end
 
+--- Starts a trade.
+-- @param clss Trading.
+-- @param player Player.
+-- @param merchant Actor.
 Trading.start = function(clss, player, merchant)
 	-- Initialize the trading data.
 	clss:cancel(player)
@@ -61,6 +91,9 @@ Trading.start = function(clss, player, merchant)
 	player:send(Packet(packets.TRADING_START, "uint8", count, unpack(data)))
 end
 
+--- Sends a deal status update to the player.
+-- @param clss Trading.
+-- @param player Player.
 Trading.update = function(clss, player)
 	player:send(Packet(packets.TRADING_ACCEPT, "bool", clss:deal(player)))
 end
@@ -75,68 +108,6 @@ Protocol:add_handler{type = "TRADING_ACCEPT", func = function(args)
 	Trading:accept(player)
 end}
 
-Protocol:add_handler{type = "TRADING_ADD_BUY", func = function(args)
-	-- Find the player.
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if player.dead then return end
-	if not player.trading then return end
-	-- Read slot info.
-	local ok,slot = args.packet:read("uint8")
-	if not ok then return end
-	-- Get the bought item.
-	local name = player.trading.shop[slot + 1]
-	if not name then return end
-	-- Choose the destination slot.
-	local dst
-	for i=1,8 do
-		if not player.trading.buy[i] then
-			dst = i
-			break
-		end
-	end
-	if not dst then return end
-	-- Add to the buy list.
-	player.trading.buy[dst] = {name, 1}
-	player:send(Packet(packets.TRADING_ADD_BUY, "uint8", dst - 1, "string", name, "uint32", 1))
-	-- Update deal status.
-	Trading:update(player)
-end}
-
-Protocol:add_handler{type = "TRADING_ADD_SELL", func = function(args)
-	-- Find the player.
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if player.dead then return end
-	if not player.trading then return end
-	-- Read slots.
-	local ok,srcid,srcslot,dst,count = args.packet:read("uint32", "string", "uint8", "uint32")
-	if not ok then return end
-	local srcslotnum = tonumber(srcslot)
-	if srcslotnum then srcslot = srcslotnum + 1 end
-	-- Validate slots.
-	if dst >= 8 then return end
-	local srcinv = player:find_open_inventory(srcid)
-	if not srcinv then return end
-	local srcobj = srcinv:get_object_by_index(srcslot)
-	if not srcobj then return end
-	local dstobj = player.trading.sell[dst + 1]
-	if dstobj then return end -- TODO: swap
-	-- Validate count.
-	if count == 0 or count > srcobj.count then return end
-	-- Move to the trading list.
-	if count < srcobj.count then
-		local o = srcobj:split(count)
-		player.trading.sell[dst + 1] = o
-	else
-		srcobj:detach()
-		player.trading.sell[dst + 1] = srcobj
-	end
-	player:send(Packet(packets.TRADING_ADD_SELL, "uint8", dst, "string", srcobj.spec.name, "uint32", count))
-	-- Update deal status.
-	Trading:update(player)
-end}
-
 Protocol:add_handler{type = "TRADING_CANCEL", func = function(args)
 	-- Find the player.
 	local player = Player:find{client = args.client}
@@ -147,39 +118,38 @@ Protocol:add_handler{type = "TRADING_CANCEL", func = function(args)
 	Trading:cancel(player)
 end}
 
-Protocol:add_handler{type = "TRADING_REMOVE_BUY", func = function(args)
+Protocol:add_handler{type = "TRADING_UPDATE", func = function(args)
 	-- Find the player.
 	local player = Player:find{client = args.client}
 	if not player then return end
 	if player.dead then return end
 	if not player.trading then return end
-	-- Read slot info.
-	local ok,slot = args.packet:read("uint8")
+	-- Read item counts info.
+	local ok,buy,sell = args.packet:read("uint8", "uint8")
 	if not ok then return end
-	if not player.trading.buy[slot + 1] then return end
-	-- Remove from the buy list.
-	player.trading.buy[slot + 1] = nil
-	player:send(Packet(packets.TRADING_REMOVE_BUY, "uint8", slot))
-	-- Update deal status.
-	Trading:update(player)
-end}
-
-Protocol:add_handler{type = "TRADING_REMOVE_SELL", func = function(args)
-	-- Find the player.
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if player.dead then return end
-	if not player.trading then return end
-	-- Read slots.
-	local ok,src = args.packet:read("uint8")
-	if not ok then return end
-	if src >= 8 then return end
-	local srcobj = player.trading.sell[src + 1]
-	if not srcobj then return end
-	-- Move to the inventory.
-	player.inventory:merge_or_drop_object(srcobj)
-	player.trading.sell[src + 1] = nil
-	player:send(Packet(packets.TRADING_REMOVE_SELL, "uint8", src))
-	-- Update deal status.
+	-- Read bought items.
+	player.trading.buy = {}
+	for i = 1,buy do
+		local ok,index,count = args.packet:resume("uint32", "uint32")
+		if ok then
+			local item = player.trading.shop[index]
+			if item then
+				table.insert(player.trading.buy, {index, count})
+			end
+		end
+	end
+	-- Read sold items.
+	player.trading.sell = {}
+	for i = 1,sell do
+		local ok,index,count = args.packet:resume("uint32", "uint32")
+		if ok then
+			local item = player.inventory:get_object_by_index(index)
+			if item then
+				count = math.max(item.count, count)
+				table.insert(player.trading.sell, {index, count})
+			end
+		end
+	end
+	-- Update the deal status.
 	Trading:update(player)
 end}
