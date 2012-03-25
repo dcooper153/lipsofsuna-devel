@@ -672,25 +672,6 @@ Creature.set_movement = function(self, value)
 	self:calculate_animation()
 end
 
---- Sets a skill of the creature.
--- @param self Object.
--- @param name: Skill name.
--- @param value: New target value for the skill.
-Creature.set_skill = function(self, name, value)
-	-- Enforce species limit.
-	local spec = self.spec.skills[name]
-	if not spec then return end
-	value = math.min(value, spec.max)
-	value = math.max(value, 0)
-	-- Enforce skill quota.
-	if not self.skills then return end
-	local t = self.skills:get_total() - self.skills:get_maximum{skill = name}
-	value = math.min(value, self.spec.skill_quota - t)
-	value = math.max(value, 0)
-	-- Set the new maximum value.
-	self.skills:set_maximum{skill = name, value = value}
-end
-
 --- Sets the strafing state of the creature.
 -- @param self Object.
 -- @param value Strafing rate.
@@ -889,8 +870,8 @@ Creature.update_skills = function(self)
 	end
 	-- Assign the attributes to the creature.
 	self.attributes = attr
-	self:set_skill("health", attr.max_health)
-	self:set_skill("willpower", attr.max_willpower)
+	self.skills:set_maximum{skill = "health", value = attr.max_health}
+	self.skills:set_maximum{skill = "willpower", value = attr.max_willpower}
 	-- Update the movement speed.
 	self:calculate_speed()
 	-- Update the vision radius.
