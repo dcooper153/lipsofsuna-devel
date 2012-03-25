@@ -196,6 +196,9 @@ Action{name = "mouse_grab", mode = "press", key1 = Keysym.ESCAPE, func = functio
 		elseif Ui.state == "editor" then
 			Ui.state = "editor/menu"
 		end
+	-- Close the in-game menu at grab.
+	elseif Ui.root == "play" then
+		Ui.state = "play"
 	end
 end}
 
