@@ -26,6 +26,9 @@
 
 #define ENABLE_GRABS
 
+static void private_initial_grab (
+	LIInpInput* self);
+
 static void private_grab (
 	LIInpInput* self,
 	int         value);
@@ -74,7 +77,8 @@ LIInpInput* liinp_input_new (
 	}
 
 	/* Initialize the input system. */
-	self->system = new LIInpSystem (self, false);
+	private_initial_grab (self);
+	self->system = new LIInpSystem (self, self->grab);
 
 	/* Register the component. */
 	if (!limai_program_insert_component (self->program, "input", self))
@@ -171,6 +175,18 @@ void liinp_input_set_pointer_grab (
 }
 
 /*****************************************************************************/
+
+static void private_initial_grab (
+	LIInpInput* self)
+{
+	lua_State* lua;
+
+	lua = liscr_script_get_lua (self->program->script);
+	lua_getglobal (lua, "__initial_pointer_grab");
+	if (lua_type (lua, -1) == LUA_TBOOLEAN)
+		self->grab = lua_toboolean (lua, -1);
+	lua_pop (lua, 1);
+}
 
 static void private_grab (
 	LIInpInput* self,

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,9 +18,14 @@
 #ifndef __SCRIPT_TYPES_H__
 #define __SCRIPT_TYPES_H__
 
-#include <lua.h>
-#include <lauxlib.h>
-#include <lipsofsuna/algorithm.h>
+#ifndef __cplusplus
+  #include <lua.h>
+  #include <lualib.h>
+  #include <lauxlib.h>
+#else
+  #include <lua.hpp>
+#endif
+#include "lipsofsuna/algorithm.h"
 
 #define LISCR_TYPE_BOOLEAN ((void*) -1)
 #define LISCR_TYPE_FLOAT ((void*) -2)

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,10 +18,7 @@
 #ifndef __SCRIPT_H__
 #define __SCRIPT_H__
 
-#include <lua.h>
-#include <lualib.h>
-#include <lauxlib.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
 #include "script-types.h"
 
 LIAPICALL (LIScrScript*, liscr_script_new, ());

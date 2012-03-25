@@ -87,6 +87,9 @@ LIInpSystem::LIInpSystem (LIInpInput* input, bool grab) :
 	catch (...)
 	{
 	}
+
+	/* Call update to initialize the grabs. */
+	update (0.0f);
 }
 
 LIInpSystem::~LIInpSystem ()
