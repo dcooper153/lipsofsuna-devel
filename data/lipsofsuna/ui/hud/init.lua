@@ -33,9 +33,9 @@ Ui:add_hud{
 			if self.timer < 0.1 then return end
 			self.timer = 0
 			self.look_direction = math.pi - clss.rotation_curr.euler[1]
-			self.quest_direction = Client.views.quests:get_compass_direction()
-			self.quest_distance = Client.views.quests:get_compass_distance()
-			self.quest_height = Client.views.quests:get_compass_height()
+			self.quest_direction = Client:get_compass_direction()
+			self.quest_distance = Client:get_compass_distance()
+			self.quest_height = Client:get_compass_height()
 		end
 		return self
 	end}]]
