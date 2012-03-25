@@ -2,6 +2,7 @@ Creature = Class(Object)
 
 Creature.new = function(clss, args)
 	local self = Object.new(clss, args)
+	self.stats = {}
 	self.inventory = Inventory()
 	self.inventory:subscribe(self, function(args) self:update_inventory(args) end)
 	self.shadow_casting = Options.inst.shadow_casting_actors
@@ -80,35 +81,38 @@ Creature.set_model = function(self, model)
 	end
 end
 
-Creature.set_skill = function(self, s, v, m)
-	-- Update player skills.
-	if self == Player.object then
-		Client.views.skills:update(s, v, m)
+Creature.set_stat = function(self, s, v, m)
+	-- Find or create the skill.
+	local stat = self.stats[s]
+	if not stat then
+		self.stats[s] = {cap = m, value = v}
+		return
 	end
-	-- Display health changes.
+	-- Update the stat.
+	local diff = v - stat.value
+	stat.value = v
+	stat.cap = m
+	-- Apply health effects.
+	local player = Client.player_object
 	if s == "health" then
-		if self.health then
-			-- Show a health change text.
-			local diff = v - self.health
-			if math.abs(diff) > 2 then
-				local code = (diff > 0 and 0x01 or 0x00) + (self == Player.object and 0x10 or 0x00)
-				local colors = {
-					[0x00] = {1,1,0,1},
-					[0x01] = {0,1,1,1},
-					[0x10] = {1,0,0,1},
-					[0x11] = {0,1,0,1}}
-				Client:add_damage_text{object = self, color = colors[code], text = tostring(diff)}
-			end
-			-- Quake the camera if the player was hurt.
-			if self == Player.object and diff < -5 then
-				Client:apply_quake(self.position, 0.01 * (5 - diff))
-			end
+		-- Show a health change text.
+		if math.abs(diff) > 2 then
+			local code = (diff > 0 and 0x01 or 0x00) + (self == player and 0x10 or 0x00)
+			local colors = {
+				[0x00] = {1,1,0,1},
+				[0x01] = {0,1,1,1},
+				[0x10] = {1,0,0,1},
+				[0x11] = {0,1,0,1}}
+			Client:add_damage_text{object = self, color = colors[code], text = tostring(diff)}
 		end
-		self.health = v
+		-- Quake the camera if the player was hurt.
+		if self == player and diff < -5 then
+			Client:apply_quake(self.position, 0.01 * (5 - diff))
+		end
 		-- Set the correct collision shape.
 		-- Dead creatures have a different collision shape. We switch between
 		-- the two when the health changes between zero and non-zero.
-		if self.health == 0 and self.animated then
+		if v == 0 and self.animated then
 			self.shape = "dead"
 		else
 			self.shape = "default"

@@ -34,7 +34,6 @@ Client.init = function(self)
 	self.views.chargen = Views.Chargen()
 	self.views.inventory = Views.Inventory()
 	self.views.quests = Views.Quests()
-	self.views.skills = Views.Skills{main = true, sync = true}
 	-- Initialize helper threads.
 	self.threads = {}
 	self.threads.model_builder = Thread("client/threads/modelbuilder.lua")
@@ -369,11 +368,8 @@ Client:add_class_setters{
 	end,
 	player_object = function(self, v)
 		if v then
-			Client.views.skills:set_species(v.spec)
 			Player.species = v.spec.name
 		else
-			-- FIXME
-			Client.views.skills:set_species(Species:find{name = "aer"})
 			Player.species = "aer"
 		end
 		Player.object = v

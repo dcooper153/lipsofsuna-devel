@@ -307,7 +307,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 			local ok,skill,value,max = event.packet:resume("string", "int32", "int32")
 			if not ok then return end
 			debug("    %s %d %d", skill, value, max)
-			o:set_skill(skill, value, max)
+			o:set_stat(skill, value, max)
 		end
 	end
 	-- Body style.
@@ -406,7 +406,7 @@ Protocol:add_handler{type = "OBJECT_SKILL", func = function(event)
 	if not ok then return end
 	local o = Object:find{id = id}
 	if not o then return end
-	o:set_skill(skill, value, max)
+	o:set_stat(skill, value, max)
 end}
 
 Protocol:add_handler{type = "OBJECT_SPEECH", func = function(event)

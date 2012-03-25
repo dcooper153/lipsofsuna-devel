@@ -52,7 +52,7 @@ Widgets.Uistat.update = function(self, secs)
 	-- Call the base class update.
 	Widgets.Uiwidget.update(self, secs)
 	-- Update the skill values.
-	local skill = Client.views.skills.skills.dict_id[self.skill]
+	local skill = Client.player_object.stats[self.skill]
 	if skill then
 		if self.cap ~= skill.cap or self.value ~= skill.value then
 			self.cap = skill.cap
