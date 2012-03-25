@@ -33,8 +33,9 @@ require "mods"
 -- Initialize the client core.
 if not Settings.server then
 require "system/graphics"
-require "system/camera"
 require "system/input"
+Program.window_title = "Lips of Suna"
+require "system/camera"
 require "system/heightmap-render"
 require "system/model-editing"
 require "system/object-render"

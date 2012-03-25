@@ -186,6 +186,8 @@ end}
 Action{name = "mouse_grab", mode = "press", key1 = Keysym.ESCAPE, func = function()
 	-- Toggle mouse grabbing.
 	local grab = not Program.cursor_grabbed
+	Client.options.grab_cursor = grab
+	Client.options:save()
 	Program.cursor_grabbed = grab
 	-- Open the in-game menu at ungrab.
 	if not grab then
