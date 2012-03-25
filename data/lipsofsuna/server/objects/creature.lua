@@ -82,7 +82,12 @@ Creature:add_setters{
 		-- When the map generator or an admin command creates an object, the
 		-- random field is set to indicate that items should be generated.
 		-- The field isn't saved so items are only created once as expected.
-		s.inventory = s.inventory or Inventory{id = s.id, size = spec.inventory_size} -- FIXME: Resizing not supported.
+		if s.inventory then
+			s.inventory = Inventory{id = s.id, size = spec.inventory_size}
+		else
+			-- FIXME: May break for existing objects that have too many inventory items.
+			s.inventory.size = spec.inventory_size
+		end
 		if s.random then
 			for k,v in pairs(spec.inventory_items) do
 				local itemspec = Itemspec:find{name = k}
