@@ -207,7 +207,7 @@ Player.update_skills = function(self)
 	Creature.update_skills(self)
 	-- Send an update to the client.
 	local packet = Packet(packets.PLAYER_SKILLS)
-	for k,v in pairs(self.skills1) do
+	for k,v in pairs(self.skills) do
 		if v then packet:write("string", k) end
 	end
 	self:send{packet = packet}
@@ -373,24 +373,24 @@ Player.vision_cb = function(self, args)
 					flags = flags + Protocol.object_show_flags.SLOTS
 				end
 			end
-			-- Skills.
-			local data_skills = {}
-			if o.skills then
+			-- Stats.
+			local data_stats = {}
+			if o.stats then
 				local num = 0
-				for name,skill in pairs(o.skills.skills) do
-					if skill.prot == "public" or self == o then
-						table.insert(data_skills, "string")
-						table.insert(data_skills, name)
-						table.insert(data_skills, "int32")
-						table.insert(data_skills, math.ceil(skill.value))
-						table.insert(data_skills, "int32")
-						table.insert(data_skills, math.ceil(skill.maximum))
+				for name,stat in pairs(o.stats.stats) do
+					if stat.prot == "public" or self == o then
+						table.insert(data_stats, "string")
+						table.insert(data_stats, name)
+						table.insert(data_stats, "int32")
+						table.insert(data_stats, math.ceil(stat.value))
+						table.insert(data_stats, "int32")
+						table.insert(data_stats, math.ceil(stat.maximum))
 						num = num + 1
 					end
 				end
 				if num > 0 then
-					table.insert(data_skills, 1, "uint8")
-					table.insert(data_skills, 2, num)
+					table.insert(data_stats, 1, "uint8")
+					table.insert(data_stats, 2, num)
 					flags = flags + Protocol.object_show_flags.SKILLS
 				end
 			end
@@ -479,7 +479,7 @@ Player.vision_cb = function(self, args)
 			p:write(data_name)
 			p:write(data_anims)
 			p:write(data_slots)
-			p:write(data_skills)
+			p:write(data_stats)
 			p:write(data_body)
 			p:write(data_head)
 			p:write(data_dialog)
@@ -492,9 +492,9 @@ Player.vision_cb = function(self, args)
 		end,
 		["skill-changed"] = function(args)
 			local o = args.object
-			local s = o.skills
+			local s = o.stats
 			if not s then return end
-			local v = s:get_skill{skill = args.skill}
+			local v = s:get_skill(args.skill)
 			if not v then return end
 			if v.prot == "public" or self == o then
 				self:send{packet = Packet(packets.OBJECT_SKILL, "uint32", o.id,
@@ -556,11 +556,11 @@ Player.write = function(self)
 		physics = self.dead and "rigid" or "kinematic",
 		position = self.position,
 		rotation = self.rotation,
-		skills = self.skills1,
+		skills = self.skills,
 		skin_style = self.skin_style,
 		spec = self.spec.name,
 		variables = self.variables},
-		Serialize:encode_skills(self.skills),
+		Serialize:encode_stats(self.stats),
 		Serialize:encode_inventory(self.inventory),
 		"return self")
 end

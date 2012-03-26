@@ -145,7 +145,7 @@ end
 Feat.get_info = function(self, args)
 	local damage = 0
 	local reagents = {}
-	local skills = {}
+	local stats = {}
 	local influences = {}
 	local health_influences = {cold = 1, fire = 1, physical = 1, poison = 1}
 	-- Get the feat animation.
@@ -165,25 +165,15 @@ Feat.get_info = function(self, args)
 	for index,data in pairs(self.effects) do
 		local effect = Feateffectspec:find{name = data[1]}
 		if effect then
-			-- Base skill requirements.
-			for skill,value in pairs(effect.skill_base) do
-				local val = skills[skill] or 0
-				skills[skill] = val + value
+			-- Stat requirements.
+			for stat,value in pairs(effect.skill_base) do
+				local val = stats[stat] or 0
+				stats[stat] = val + value
 			end
-			-- Magnitude based skill requirements.
-			for skill,mult in pairs(effect.skill_mult) do
-				local val = skills[skill] or 0
-				skills[skill] = val + mult * data[2]
-			end
-			-- Base reagent requirements.
+			-- Reagent requirements.
 			for reagent,value in pairs(effect.reagent_base) do
 				local val = reagents[reagent] or 0
 				reagents[reagent] = val + value
-			end
-			-- Magnitude based reagent requirements.
-			for reagent,mult in pairs(effect.reagent_mult) do
-				local val = reagents[reagent] or 0
-				reagents[reagent] = val + mult * data[2]
 			end
 			-- Cooldown contribution.
 			cooldown = cooldown + effect.cooldown_base + effect.cooldown_mult * data[2]
@@ -200,9 +190,9 @@ Feat.get_info = function(self, args)
 	end
 	-- Ammo requirements.
 	local ammo = args and args.weapon and args.weapon.spec.ammo_type
-	-- Skill requirements.
-	for k,v in pairs(skills) do
-		skills[k] = math.max(1, math.floor(v))
+	-- Stat requirements.
+	for k,v in pairs(stats) do
+		stats[k] = math.max(1, math.floor(v))
 	end
 	-- Reagent requirements.
 	for k,v in pairs(reagents) do
@@ -212,6 +202,7 @@ Feat.get_info = function(self, args)
 	-- In addition to the base influences, weapons may grant bonuses for
 	-- having points in certain skills. The skill bonuses are multiplicative
 	-- since the system is easier to balance that way.
+--[[
 	if args and args.weapon and anim.bonuses_weapon and args.weapon.spec.influences_base then
 		local mult = 1
 		local bonuses = args.weapon.spec.influences_bonus
@@ -226,9 +217,11 @@ Feat.get_info = function(self, args)
 			influences[k] = (prev or 0) + mult * v
 		end
 	end
+--]]
 	-- Add bare-handed specific influences.
 	-- Works like the weapon variant but uses hardcoded influences.
 	-- Bare-handed influence bonuses only apply to melee feats.
+--[[
 	if args and not args.weapon and anim.bonuses_barehanded then
 		local mult = 1
 		local bonuses = {dexterity = 0.02, strength = 0.01, willpower = 0.02}
@@ -244,8 +237,10 @@ Feat.get_info = function(self, args)
 			influences[k] = (prev or 0) + mult * v
 		end
 	end
+--]]
 	-- Add projectile specific influences.
 	-- Works like the weapon variant but uses the projectile as the item.
+--[[
 	if args and args.projectile and anim.bonuses_projectile and args.projectile.spec.influences_base then
 		local mult = 1
 		local bonuses = args.projectile.spec.influences_bonus
@@ -260,13 +255,14 @@ Feat.get_info = function(self, args)
 			influences[k] = (prev or 0) + mult * v
 		end
 	end
+--]]
 	-- Add berserk bonus.
 	-- The bonus increases physical damage if the health of the attacker is
 	-- lower than 25 points. If the health is 1 point, the damage is tripled.
 	if args and args.attacker:get_modifier("berserk") then
 		local p = influences["physical"]
 		if anim.categories["melee"] and p and p < 0 then
-			local h = args.attacker.skills:get_value{skill = "health"}
+			local h = args.attacker.stats:get_value("health")
 			local f = 3 - 2 * math.min(h, 25) / 25
 			influences["physical"] = p * f
 		end
@@ -331,7 +327,7 @@ Feat.get_info = function(self, args)
 		influences = influences,
 		required_ammo = ammo and {[ammo] = 1} or {},
 		required_reagents = reagents,
-		required_skills = skills,
+		required_stats = stats,
 		required_weapon = anim and anim.required_weapon}
 end
 

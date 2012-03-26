@@ -18,13 +18,6 @@ Species{
 		lower_safe = "aerbloomers1",
 		upper = "aerupper1",
 		upper_safe = "aerbloomerstop1"},
-	skills = {
-		{name = "dexterity", max = 40, val = 20},
-		{name = "health", max = 100, val = 50},
-		{name = "intelligence", max = 80, val = 30},
-		{name = "perception", max = 80, val = 30},
-		{name = "strength", max = 100, val = 50},
-		{name = "willpower", max = 60, val = 20}},
 	tilt_bone = {"back1", "back2", "back3"},
 	vulnerabilities = {cold = 2, fire = 0.5}}
 

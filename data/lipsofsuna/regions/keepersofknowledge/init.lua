@@ -58,13 +58,7 @@ Species{
 	equipment_slots = {
 		{name = "robotarm.L", node = "#hand.L"},
 		{name = "robotarm.R", node = "#hand.R"}},
-	skills = {
-		{name = "dexterity", max = 10, val = 10},
-		{name = "health", max = 100, val = 100},
-		{name = "intelligence", max = 10, val = 10},
-		{name = "perception", max = 30, val = 30},
-		{name = "strength", max = 100, val = 100},
-		{name = "willpower", max = 100, val = 100}},
+	skills = {"Health lv4", "Willpower lv4"},
 	weapon_slot = "robotarm.R"}
 
 Species{
@@ -80,13 +74,7 @@ Species{
 	equipment_slots = {
 		{name = "robotarm.L", node = "#hand.L"},
 		{name = "robotarm.R", node = "#hand.R"}},
-	skills = {
-		{name = "dexterity", max = 10, val = 10},
-		{name = "health", max = 100, val = 100},
-		{name = "intelligence", max = 10, val = 10},
-		{name = "perception", max = 30, val = 30},
-		{name = "strength", max = 100, val = 100},
-		{name = "willpower", max = 100, val = 100}},
+	skills = {"Health lv4", "Willpower lv4"},
 	weapon_slot = "robotarm.R"}
 
 Species{
@@ -109,13 +97,7 @@ Species{
 	inventory_items = {["bullet"] = 100, "security turret barrel"},
 	equipment_slots = {
 		{name = "turretbarrel", node = "#barrel"}},
-	skills = {
-		{name = "dexterity", max = 10, val = 10},
-		{name = "health", max = 100, val = 100},
-		{name = "intelligence", max = 10, val = 10},
-		{name = "perception", max = 30, val = 30},
-		{name = "strength", max = 100, val = 100},
-		{name = "willpower", max = 100, val = 100}},
+	skills = {"Health lv4", "Willpower lv4"},
 	weapon_slot = "turretbarrel"}
 
 Regionspec{

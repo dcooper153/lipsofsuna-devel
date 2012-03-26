@@ -18,13 +18,6 @@ Species{
 		lower = "krakenlower1",
 		upper = "aerupper1",
 		upper_safe = "aerbloomerstop1"},
-	skills = {
-		{name = "dexterity", max = 80, val = 30},
-		{name = "health", max = 100, val = 50},
-		{name = "intelligence", max = 60, val = 20},
-		{name = "perception", max = 40, val = 20},
-		{name = "strength", max = 80, val = 30},
-		{name = "willpower", max = 100, val = 50}},
 	skin_shader = "animdiffnorm",
 	skin_textures = {"kraken1", "kraken1n"},
 	tilt_bone = {"back1", "back2", "back3"},
@@ -44,10 +37,4 @@ Species{
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {"lizard dress", "lizard gloves", ["milky powder"] = 100},
-	skills = {
-		{name = "dexterity", max = 80, val = 5},
-		{name = "health", max = 100, val = 50},
-		{name = "intelligence", max = 60, val = 40},
-		{name = "perception", max = 40, val = 20},
-		{name = "strength", max = 80, val = 5},
-		{name = "willpower", max = 100, val = 80}}}
+	skills = {"Health lv1", "Willpower lv4"}}

@@ -16,8 +16,6 @@ Species{
 	jump_force = 4,
 	model = "slime2",
 	speed_walk = 2,
-	skills = {
-		{name = "health", max = 10, val = 10}},
 	vulnerabilities = {cold = 1.5, fire = 1.5, physical = 0.6}}
 
 Species{
@@ -37,6 +35,4 @@ Species{
 	jump_force = 4,
 	model = "slime2",
 	speed_walk = 2,
-	skills = {
-		{name = "health", max = 30, val = 30}},
 	vulnerabilities = {cold = 1.5, fire = 1.5, physical = 0.6}}

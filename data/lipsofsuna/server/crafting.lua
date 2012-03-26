@@ -37,7 +37,7 @@ Crafting.can_craft = function(clss, args)
 		return args.user.inventory:count_objects_by_name(name)
 	end
 	local get_skill = function(name)
-		return args.user.skills:get_value{skill = name}
+		return args.user.stats:get_value(name)
 	end
 	return oldcancraft(clss, {get_item = get_item, get_skill = get_skill, spec = args.spec})
 end

@@ -35,13 +35,6 @@ Views.Chargen.new = function(clss)
 		height = 1,
 		name = "Guest",
 		race = "aer",
-		skills = {
-			dexterity = 1,
-			health = 1,
-			intelligence = 1,
-			perception = 1,
-			strength = 1,
-			willpower = 1},
 		skin_color = {1,1,1},
 		skin_style = "default",
 		spawn_point = ""}
@@ -68,13 +61,6 @@ Views.Chargen.apply = function(self)
 	local packet = Packet(packets.CHARACTER_CREATE,
 		"string", self.char.name,
 		"string", self.char.race,
-		-- Skills.
-		"uint8", self.char.skills["dexterity"],
-		"uint8", self.char.skills["health"],
-		"uint8", self.char.skills["intelligence"],
-		"uint8", self.char.skills["perception"],
-		"uint8", self.char.skills["strength"],
-		"uint8", self.char.skills["willpower"],
 		-- Body style.
 		"uint8", 255 * self.char.height,
 		"uint8", 255 * self.char.body[1],
@@ -266,8 +252,6 @@ Views.Chargen.set_race = function(self, race)
 	self:set_preset(self.list_presets[index])
 	-- Randomize the name.
 	--self.entry_name.text = Names:random{race = self.list_races[self.combo_race.value][2], gender = "female"}
-	-- Reset skills.
-	--self.skills:set_species(spec)
 end
 
 Views.Chargen.set_skin_style = function(self, value)

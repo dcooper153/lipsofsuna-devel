@@ -58,18 +58,18 @@ Serialize.encode_inventory = function(clss, inv)
 	return str
 end
 
---- Makes a string out of skills.
+--- Makes a string out of stats.
 -- @param clss Serialize class.
--- @param skills Skills.
+-- @param stats Stats.
 -- @return String.
-Serialize.encode_skills = function(clss, skills)
-	if not skills then return "" end
-	local str = string.format("self.skills.enabled=%s\n", serialize(skills.enabled))
-	for k,v in pairs(skills:get_names()) do
-		local val = skills:get_value{skill = v}
-		local max = skills:get_maximum{skill = v}
-		str = string.format("%sself.skills:set{skill=%s,maximum=%s,value=%s}\n",
-			str, serialize(v), serialize(max), serialize(val))
+Serialize.encode_stats = function(clss, stats)
+	if not stats then return "" end
+	local str = string.format("self.stats.enabled=%s\n", serialize(stats.enabled))
+	for k,v in pairs(stats:get_names()) do
+		local val = stats:get_value(v)
+		local max = stats:get_maximum(v)
+		str = string.format("%sself.stats:set(%s,%s,%s)\n",
+			str, serialize(v), serialize(val), serialize(max))
 	end
 	return str
 end

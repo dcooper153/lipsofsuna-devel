@@ -35,8 +35,5 @@ Species{
 	inventory_items = {["dragon scale"] = 5, ["adamantium"] = 4, ["crimson stone"] = 2},
 	mass = 1000,
 	speed_walk = 1,
-	skills = {
-		{name = "health", max = 100, val = 100},
-		{name = "strength", max = 100, val = 100},
-		{name = "willpower", max = 50, val = 50}},
+	skills = {"Health lv4", "Willpower lv2"},
 	vulnerabilities = {cold = 2, fire = 0.3}}

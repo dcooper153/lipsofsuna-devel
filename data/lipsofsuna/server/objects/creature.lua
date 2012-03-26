@@ -66,17 +66,22 @@ Creature:add_setters{
 				s.hair_style = spec.hair_style
 			end
 		end
-		-- Create skills.
-		s.skills = s.skills or Skills{id = s.id}
-		s.skills:clear()
-		for k,v in pairs(spec.skills) do
-			local prot = v.name == "health" and "public" or "private"
-			s.skills:register{
-				prot = prot,
-				name = v.name,
-				maximum = v.val,
-				value = v.val,
-				regen = spec.skill_regen}
+		-- Assign skills.
+		for k in pairs(spec.skills) do
+			local skill = Skillspec:find{name = k}
+			if skill then
+				s.skills[k] = true
+				local reqs = skill:find_indirect_requirements()
+				for name in pairs(reqs) do
+					s.skills[name] = true
+				end
+			end
+		end
+		-- Initialize stats.
+		s:update_skills()
+		if s.random then
+			s.stats:set_value("health", s.stats:get_maximum("health"))
+			s.stats:set_value("willpower", s.stats:get_maximum("willpower"))
 		end
 		-- Create inventory.
 		-- When the map generator or an admin command creates an object, the
@@ -141,7 +146,6 @@ Creature:add_setters{
 		end
 		-- Create the AI.
 		if not spec.dead and spec.ai_enabled then
-			s:update_skills()
 			s.ai = Ai(s)
 		end
 	end}
@@ -174,7 +178,8 @@ Creature.new = function(clss, args)
 		end
 	end
 	self.attributes = {}
-	self.skills1 = {}
+	self.skills = {}
+	self.stats = Stats{id = self.id}
 	copy("angular")
 	copy("beheaded")
 	copy("body_scale")
@@ -198,9 +203,9 @@ Creature.new = function(clss, args)
 	copy("realized")
 	-- Initialize skills.
 	if args.skills then
-		self.skills1 = {}
+		self.skills = {}
 		for k,v in pairs(args.skills) do
-			self.skills1[k] = v
+			self.skills[k] = v
 		end
 	end
 	self:update_skills()
@@ -347,14 +352,14 @@ Creature.damaged = function(self, args)
 	-- Check for invulnerability.
 	if not self.realized then return end
 	if self.god then return end
-	local health = self.skills:get_value{skill = "health"}
+	local health = self.stats:get_value("health")
 	if not health then return end
 	-- Reduce health.
 	if args.amount < 0 then
-		local max = self.skills:get_maximum{skill = "health"}
-		self.skills:set_value{skill = "health", value = math.min(health - args.amount, max)}
+		local max = self.stats:get_maximum("health")
+		self.stats:set_value("health", math.min(health - args.amount, max))
 	elseif health - args.amount > 0 then
-		self.skills:set_value{skill = "health", value = health - args.amount}
+		self.stats:set_value("health", health - args.amount)
 	else
 		-- Behead if the blow was strong.
 		-- Players can't be beheaded with first hit.
@@ -366,7 +371,7 @@ Creature.damaged = function(self, args)
 			end
 		end
 		-- Kill if not killed already.
-		self.skills:set_value{skill = "health", value = 0}
+		self.stats:set_value("health", 0)
 		self:die()
 	end
 	-- Play the damage effect.
@@ -396,9 +401,9 @@ Creature.set_dead_state = function(self, drop)
 	self.shape = "dead"
 	self:set_movement(0)
 	self:set_strafing(0)
-	-- Disable skills.
-	self.skills.enabled = false
-	self.skills:set_value{skill = "health", value = 0}
+	-- Disable stats.
+	self.stats.enabled = false
+	self.stats:set_value("health", 0)
 	-- Drop held items.
 	if drop then
 		local o = self.inventory:get_object_by_slot("hand.L")
@@ -547,8 +552,8 @@ end
 -- @param self creature.
 -- @return Burdening limit in kilograms
 Creature.get_burden_limit = function(self)
-	local str = self.skills:get_value{skill = "strength"} or 10
-	return 100 + 4 * str
+	-- TODO
+	return 500
 end
 
 --- Returns true if the creature is burdened.
@@ -689,7 +694,7 @@ Creature.update = function(self, secs)
 	if self.update_timer > 0.3 then
 		local tick = self.update_timer
 		if self.modifiers then Modifier:update(self, tick) end
-		self.skills:update(tick)
+		self.stats:update(tick)
 		self:update_actions(tick)
 		self:update_burdening(tick)
 		self:update_environment(tick)
@@ -864,14 +869,14 @@ Creature.update_skills = function(self)
 		speed = 0.5,
 		view_distance = 15}
 	-- Modify the attributes.
-	for k,v in pairs(self.skills1) do
+	for k,v in pairs(self.skills) do
 		local skill = Skillspec:find{name = k}
 		if skill then skill.assign(attr) end
 	end
 	-- Assign the attributes to the creature.
 	self.attributes = attr
-	self.skills:set_maximum{skill = "health", value = attr.max_health}
-	self.skills:set_maximum{skill = "willpower", value = attr.max_willpower}
+	self.stats:set_maximum("health", attr.max_health)
+	self.stats:set_maximum("willpower", attr.max_willpower)
 	-- Update the movement speed.
 	self:calculate_speed()
 	-- Update the vision radius.
@@ -895,10 +900,10 @@ Creature.write = function(self)
 		physics = self.physics,
 		position = self.position,
 		rotation = self.rotation,
-		skills = self.skills1,
+		skills = self.skills,
 		spec = self.spec.name,
 		variables = self.variables},
-		Serialize:encode_skills(self.skills),
+		Serialize:encode_stats(self.stats),
 		Serialize:encode_inventory(self.inventory),
 		"return self")
 end

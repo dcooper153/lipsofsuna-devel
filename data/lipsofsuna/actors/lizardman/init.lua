@@ -30,8 +30,4 @@ Species{
 	speed_walk = 3,
 	equipment_slots = {
 		{name = "hand.L", node = "#hand.L"},
-		{name = "hand.R", node = "#hand.R"}},
-	skills = {
-		{name = "dexterity", max = 5, val = 5},
-		{name = "health", max = 30, val = 30},
-		{name = "strength", max = 15, val = 15}}}
+		{name = "hand.R", node = "#hand.R"}}}

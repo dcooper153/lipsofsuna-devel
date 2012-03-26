@@ -140,8 +140,8 @@ Feat.perform = function(self, args)
 		for k,v in pairs(info.required_reagents) do
 			args.user.inventory:subtract_objects_by_name(k, v)
 		end
-		local w = info.required_skills["willpower"]
-		if w then args.user.skills:subtract{skill = "willpower", value = w} end
+		local w = info.required_stats["willpower"]
+		if w then args.user.stats:subtract("willpower", w) end
 		if info.cooldown > 0 then
 			args.user.cooldown = info.cooldown
 		end
@@ -213,11 +213,11 @@ Feat.usable = function(self, args)
 	if not anim then return end
 	local weapon = args.user.inventory:get_object_by_slot(anim.slot)
 	local info = self:get_info{attacker = args.user, weapon = weapon}
-	-- Check for skills.
-	local skills = args.skills or args.user.skills
-	for k,v in pairs(info.required_skills) do
-		if not skills then return end
-		local val = skills:get_value{skill = k}
+	-- Check for stats.
+	local stats = args.stats or args.user.stats
+	for k,v in pairs(info.required_stats) do
+		if not stats then return end
+		local val = stats:get_value(k)
 		if not val or val < v then return end
 	end
 	-- Check for reagents.

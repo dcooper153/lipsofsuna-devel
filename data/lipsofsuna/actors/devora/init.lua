@@ -25,13 +25,6 @@ Species{
 		lower_safe = "aerbloomers1",
 		upper = "aerupper1",
 		upper_safe = "aerbloomerstop1"},
-	skills = {
-		{name = "dexterity", max = 100, val = 50},
-		{name = "health", max = 100, val = 50},
-		{name = "intelligence", max = 40, val = 20},
-		{name = "perception", max = 80, val = 30},
-		{name = "strength", max = 60, val = 20},
-		{name = "willpower", max = 80, val = 30}},
 	skin_material = "animdiffnorm1",
 	skin_textures = {"devora1", "devora1n"},
 	tilt_bone = {"back1", "back2", "back3"},

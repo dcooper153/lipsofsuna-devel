@@ -37,9 +37,23 @@ Skillspec.find_directly_dependent = function(self)
 	return deps
 end
 
+--- Finds all skills on which this one depends directly.
+-- @param self Skillspec.
+-- @return Table of specs.
+Skillspec.find_direct_requirements = function(self)
+	local reqs = {}
+	for index,name in pairs(self.requires) do
+		local spec = Skillspec:find{name = name}
+		if spec and not reqs[name] then
+			reqs[name] = spec
+		end
+	end
+	return reqs
+end
+
 --- Finds all skills that are directly or indirectly dependent on this one.
 -- @param self Skillspec.
--- @return Array of specs.
+-- @return Table of specs.
 Skillspec.find_indirectly_dependent = function(self)
 	-- Set this spec as a dependency.
 	local more = true
@@ -66,4 +80,23 @@ Skillspec.find_indirectly_dependent = function(self)
 	-- Remove this spec from the list.
 	deps[self.name] = nil
 	return deps
+end
+
+--- Finds all skills on which this one depends directly or indirectly.
+-- @param self Skillspec.
+-- @return Table of specs.
+Skillspec.find_indirect_requirements = function(self)
+	local reqs = {}
+	local recurse
+	recurse = function(spec)
+		for index,name in pairs(spec.requires) do
+			local spec = Skillspec:find{name = name}
+			if spec and not reqs[name] then
+				reqs[name] = spec
+				recurse(spec)
+			end
+		end
+	end
+	recurse(self)
+	return reqs
 end

@@ -31,13 +31,7 @@ Species{
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson crossbow", ["arrow"] = 100},
-	skills = {
-		{name = "dexterity", max = 80, val = 80},
-		{name = "health", max = 100, val = 70},
-		{name = "intelligence", max = 100, val = 0},
-		{name = "perception", max = 60, val = 20},
-		{name = "strength", max = 40, val = 20},
-		{name = "willpower", max = 80, val = 0}}}
+	skills = {"Health lv2"}}
 
 Species{
 	name = "Lips guard knight",
@@ -46,13 +40,7 @@ Species{
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson sword", "round shield"},
-	skills = {
-		{name = "dexterity", max = 80, val = 60},
-		{name = "health", max = 100, val = 70},
-		{name = "intelligence", max = 100, val = 0},
-		{name = "perception", max = 60, val = 20},
-		{name = "strength", max = 40, val = 40},
-		{name = "willpower", max = 80, val = 0}}}
+	skills = {"Health lv4"}}
 
 Species{
 	name = "Celine",

@@ -48,11 +48,6 @@ Species{
 		legs = "trogfemlegnude1",
 		lower = "trogfemlowernude1",
 		upper = "trogfemuppernude1"},
-	skills = {
-		{name = "dexterity", max = 15, val = 15},
-		{name = "health", max = 30, val = 30},
-		{name = "perception", max = 30, val = 30},
-		{name = "strength", max = 15, val = 15}},
 	hair_styles = {	
 		{"troglong", "trogfemlonghair1"},
 		{"trogshort", "trogfemshorthair1"}},

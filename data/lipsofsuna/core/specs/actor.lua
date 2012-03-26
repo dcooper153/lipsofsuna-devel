@@ -204,7 +204,7 @@ Species.new = function(clss, args)
 	self.skills = {}
 	if args.skills then
 		for k,v in pairs(args.skills) do
-			self.skills[v.name] = v
+			self.skills[v] = true
 		end
 	end
 	-- Default values.

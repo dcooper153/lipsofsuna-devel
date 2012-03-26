@@ -59,12 +59,10 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	local player = Player:find{client = args.client}
 	if player then return end
 	-- Get character flags.
-	local ok,na,ra,s1,s2,s3,s4,s5,s6,b1,b2,b3,b4,b5,b6,b7,b8,b9,eye,eyer,eyeg,eyeb,
+	local ok,na,ra,b1,b2,b3,b4,b5,b6,b7,b8,b9,eye,eyer,eyeg,eyeb,
 	f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,
 	hair,hairr,hairg,hairb,skin,skinr,sking,skinb,spawnpoint = args.packet:read(
 		"string", "string",
-		-- Skills.
-		"uint8", "uint8", "uint8", "uint8", "uint8", "uint8",
 		-- Body style.
 		"uint8", "uint8", "uint8", "uint8", "uint8",
 		"uint8", "uint8", "uint8", "uint8",
@@ -500,7 +498,7 @@ Protocol:add_handler{type = "PLAYER_SKILLS", func = function(args)
 	end
 	-- Enable and disable skills.
 	for k,v in pairs(Skillspec.dict_name) do
-		player.skills1[k] = enabled[k] and true or nil
+		player.skills[k] = enabled[k] and true or nil
 	end
 	-- Recalculate player attributes.
 	player:update_skills()

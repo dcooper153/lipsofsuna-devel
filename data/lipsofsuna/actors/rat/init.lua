@@ -18,10 +18,7 @@ Species{
 	inventory_items = {"hide"},
 	jump_force = 6,
 	model = "smallrat1",
-	speed_walk = 4,
-	skills = {
-		{name = "strength", max = 1, val = 1},
-		{name = "health", max = 5, val = 5}}}
+	speed_walk = 4}
 
 Species{
 	name = "rat",
@@ -41,10 +38,7 @@ Species{
 	inventory_items = {["hide"] = 2},
 	jump_force = 6,
 	model = "plaguerat1", -- FIXME
-	speed_walk = 4,
-	skills = {
-		{name = "strength", max = 5, val = 5},
-		{name = "health", max = 10, val = 10}}}
+	speed_walk = 4}
 
 Species{
 	name = "plague rat",
@@ -64,7 +58,4 @@ Species{
 	inventory_items = {["hide"] = 2},
 	jump_force = 6,
 	model = "plaguerat1",
-	speed_walk = 4,
-	skills = {
-		{name = "health", max = 30, val = 30},
-		{name = "strength", max = 5, val = 5}}}
+	speed_walk = 4}

@@ -19,7 +19,4 @@ Species{
 	inventory_items = {["hide"] = 2},
 	jump_force = 3,
 	model = "bloodworm2",
-	speed_walk = 2,
-	skills = {
-		{name = "health", max = 30, val = 30},
-		{name = "strength", max = 5, val = 5}}}
+	speed_walk = 2}

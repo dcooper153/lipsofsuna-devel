@@ -49,13 +49,6 @@ Species{
 	hair_styles = {
 		{"Bald", ""},
 		{"Short", "aermale1hair1"}},
-	skills = {
-		{name = "dexterity", max = 80, val = 30},
-		{name = "health", max = 100, val = 50},
-		{name = "intelligence", max = 100, val = 50},
-		{name = "perception", max = 60, val = 20},
-		{name = "strength", max = 40, val = 20},
-		{name = "willpower", max = 80, val = 30}},
 	tilt_bone = {"back1", "back2", "back3"},
 	timing_attack_throw = 4,
 	timing_spell_ranged = 4,

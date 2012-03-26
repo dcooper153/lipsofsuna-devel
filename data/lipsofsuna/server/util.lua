@@ -2,15 +2,6 @@
 
 Actions = Class()
 
-Skills.get_total = function(self)
-	local n = self:get_names()
-	local t = 0
-	for k,v in pairs(n) do
-		t = t + self:get_maximum{skill = v}
-	end
-	return t
-end
-
 Utils = Class()
 
 --- Checks if there's room for the model in the given point in space.

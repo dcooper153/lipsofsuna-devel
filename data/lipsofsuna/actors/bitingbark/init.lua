@@ -21,7 +21,4 @@ Species{
 	inventory_items = {["log"] = 2},
 	jump_force = 0,
 	model = "bitingbark1",
-	speed_walk = 1,
-	skills = {
-		{name = "health", max = 30, val = 30},
-		{name = "strength", max = 5, val = 5}}}
+	speed_walk = 1}

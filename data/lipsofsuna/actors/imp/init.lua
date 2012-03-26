@@ -54,9 +54,6 @@ Species{
 	jump_force = 4,
 	model = "stoneimp2",
 	speed_walk = 1,
-	skills = {
-		{name = "health", max = 20, val = 20},
-		{name = "strength", max = 10, val = 10}},
 	vulnerabilities = {cold = 1.1, fire = 1.1, physical = 0.8}}
 
 Species{
@@ -81,7 +78,4 @@ Species{
 	speed_walk = 1,
 	inventory_items = {"firestone"},
 	inventory_size = 2,
-	skills = {
-		{name = "health", max = 20, val = 20},
-		{name = "strength", max = 10, val = 10}},
 	vulnerabilities = {cold = 2, fire = 0.4, physical = 0.8}}

@@ -20,6 +20,7 @@ Ui:add_state{
 		end
 	end,
 	update = function()
+		if not Client.player_object then return end
 		if Client.player_object.dead then
 			Ui.state = "respawn"
 		elseif not Program.cursor_grabbed then
