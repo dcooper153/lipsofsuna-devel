@@ -58,6 +58,19 @@ Serialize.encode_inventory = function(clss, inv)
 	return str
 end
 
+--- Makes a string out of skills.
+-- @param clss Serialize class.
+-- @param skills Skills.
+-- @return String.
+Serialize.encode_skills = function(clss, skills)
+	if not skills then return "" end
+	local str = ""
+	for k in pairs(skills:get_names()) do
+		str = string.format("%sself.skills:add(%s)\n", str, serialize(k))
+	end
+	return str
+end
+
 --- Makes a string out of stats.
 -- @param clss Serialize class.
 -- @param stats Stats.

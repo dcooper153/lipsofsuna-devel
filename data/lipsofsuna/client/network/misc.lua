@@ -37,20 +37,9 @@ Protocol:add_handler{type = "PLAYER_SKILLS", func = function(event)
 		enabled[name] = true
 	end
 	-- Enable and disable skills.
-	for k,v in pairs(Client.data.skills) do
-		v.value = enabled[k] and true
-	end
-	-- Deactivate skills whose requirements aren't met.
-	for k,v in pairs(Client.data.skills) do
-		local skill = Skillspec:find{name = k}
-		v.active = true
-		for k1,name in pairs(skill.requires) do
-			local req = Client.data.skills[name]
-			if not req or not req.value then
-				v.active = false
-				break
-			end
-		end
+	Client.data.skills:clear()
+	for name in pairs(enabled) do
+		Client.data.skills:add(name)
 	end
 	-- Update the user interface.
 	if Ui.state == "skills" then

@@ -67,15 +67,9 @@ Creature:add_setters{
 			end
 		end
 		-- Assign skills.
+		s.skills:clear()
 		for k in pairs(spec.skills) do
-			local skill = Skillspec:find{name = k}
-			if skill then
-				s.skills[k] = true
-				local reqs = skill:find_indirect_requirements()
-				for name in pairs(reqs) do
-					s.skills[name] = true
-				end
-			end
+			s.skills:add(k)
 		end
 		-- Initialize stats.
 		s:update_skills()
@@ -178,7 +172,7 @@ Creature.new = function(clss, args)
 		end
 	end
 	self.attributes = {}
-	self.skills = {}
+	self.skills = Skills{id = self.id}
 	self.stats = Stats{id = self.id}
 	copy("angular")
 	copy("beheaded")
@@ -203,9 +197,9 @@ Creature.new = function(clss, args)
 	copy("realized")
 	-- Initialize skills.
 	if args.skills then
-		self.skills = {}
+		self.skills:clear()
 		for k,v in pairs(args.skills) do
-			self.skills[k] = v
+			self.skills:add(k)
 		end
 	end
 	self:update_skills()
@@ -862,17 +856,8 @@ end
 --- Updates the skills and related attributes of the creature.
 -- @param self Object.
 Creature.update_skills = function(self)
-	-- Default attributes.
-	local attr = {
-		max_health = 20,
-		max_willpower = 20,
-		speed = 0.5,
-		view_distance = 15}
-	-- Modify the attributes.
-	for k,v in pairs(self.skills) do
-		local skill = Skillspec:find{name = k}
-		if skill then skill.assign(attr) end
-	end
+	-- Calculate the attributes.
+	local attr = self.skills:calculate_attributes()
 	-- Assign the attributes to the creature.
 	self.attributes = attr
 	self.stats:set_maximum("health", attr.max_health)
@@ -889,7 +874,7 @@ end
 -- @param self Object.
 -- @return Data string.
 Creature.write = function(self)
-	return string.format("local self=Creature%s\n%s%s%s", serialize{
+	return string.format("local self=Creature%s\n%s%s%s%s", serialize{
 		angular = self.angular,
 		beheaded = self.beheaded or nil,
 		dead = self.dead,
@@ -900,9 +885,9 @@ Creature.write = function(self)
 		physics = self.physics,
 		position = self.position,
 		rotation = self.rotation,
-		skills = self.skills,
 		spec = self.spec.name,
 		variables = self.variables},
+		Serialize:encode_skills(self.skills),
 		Serialize:encode_stats(self.stats),
 		Serialize:encode_inventory(self.inventory),
 		"return self")

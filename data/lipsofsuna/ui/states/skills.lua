@@ -2,19 +2,22 @@ Ui:add_state{
 	state = "skills",
 	label = "Skills",
 	init = function()
-		-- Get the skill specs.
+		-- Create a sorted list of skills and their toggle states.
+		local status = Client.data.skills:get_statuses()
 		local skills = {}
-		for k,v in pairs(Skillspec.dict_name) do
-			table.insert(skills, v)
+		for name,status in pairs(status) do
+			if status ~= "incompatible" then
+				local spec = Skillspec:find{name = name}
+				local active = (status == "active")
+				local activable = (status == "activable")
+				table.insert(skills, {name, spec, active or activable, active})
+			end
 		end
-		table.sort(skills, function(a,b) return a.name < b.name end)
+		table.sort(skills, function(a,b) return a[1] < b[1] end)
 		-- Create the skill toggles.
 		local widgets = {}
 		for k,v in pairs(skills) do
-			local skill = Client.data.skills[v.name]
-			local active = skill and skill.active
-			local value = skill and skill.value
-			table.insert(widgets, Widgets.Uiskill(v, active, value))
+			table.insert(widgets, Widgets.Uiskill(v[2], v[3], v[4]))
 		end
 		return widgets
 	end}

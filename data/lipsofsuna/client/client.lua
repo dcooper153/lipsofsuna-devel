@@ -1,6 +1,7 @@
 require "client/firstpersoncamera"
 require "client/thirdpersoncamera"
 require "editor/editor"
+require "common/skills"
 
 Client = Class()
 Client.class_name = "Client"
@@ -295,7 +296,7 @@ Client.reset_data = function(self)
 	self.data.modifiers = {}
 	self.data.quests = {sound_timer = Program.time, quests = {}}
 	self.data.spells = {slot = 1}
-	self.data.skills = {}
+	self.data.skills = Skills()
 	self.data.trading = {buy = {}, sell = {}, shop = {}}
 	for k,v in pairs(Skillspec.dict_name) do
 		local found = false

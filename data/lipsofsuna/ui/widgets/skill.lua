@@ -20,27 +20,17 @@ Widgets.Uiskill.apply = function(self)
 	self.value = not self.value
 	self.hint = self.value and "$A: Disable\n$$B\n$$U\n$$D" or "$A: Enable\n$$B\n$$U\n$$D"
 	self.need_repaint = true
-	Client.data.skills[self.skill.name].value = self.value
-	-- Also disable dependent skills.
-	if not self.value then
-		local deps = self.skill:find_indirectly_dependent()
-		local changed = false
-		for name in pairs(deps) do
-			local skill = Client.data.skills[name]
-			if skill.active or skill.value then
-				skill.active = false
-				skill.value = false
-				changed = true
-			end
-		end
-		if changed then Ui:restart_state() end
+	-- Add or remove the skill.
+	if self.value then
+		Client.data.skills:add(self.skill.name)
+	else
+		Client.data.skills:remove(self.skill.name)
+		Ui:restart_state()
 	end
 	-- Send an update.
 	local packet = Packet(packets.PLAYER_SKILLS)
-	for k,v in pairs(Client.data.skills) do
-		if v.value then
-			packet:write("string", k)
-		end
+	for k in pairs(Client.data.skills:get_names()) do
+		packet:write("string", k)
 	end
 	Network:send{packet = packet}
 end

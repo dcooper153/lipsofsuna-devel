@@ -497,9 +497,11 @@ Protocol:add_handler{type = "PLAYER_SKILLS", func = function(args)
 		if not skill then enabled[k] = nil end
 	end
 	-- Enable and disable skills.
-	for k,v in pairs(Skillspec.dict_name) do
-		player.skills[k] = enabled[k] and true or nil
+	player.skills:clear()
+	for k in pairs(enabled) do
+		player.skills:add_without_requirements(k)
 	end
+	player.skills:remove_invalid()
 	-- Recalculate player attributes.
 	player:update_skills()
 end}

@@ -207,7 +207,7 @@ Player.update_skills = function(self)
 	Creature.update_skills(self)
 	-- Send an update to the client.
 	local packet = Packet(packets.PLAYER_SKILLS)
-	for k,v in pairs(self.skills) do
+	for k,v in pairs(self.skills:get_names()) do
 		if v then packet:write("string", k) end
 	end
 	self:send{packet = packet}
@@ -543,7 +543,7 @@ end
 -- @param self Object.
 -- @return Data string.
 Player.write = function(self)
-	return string.format("local self=Player%s\n%s%s%s", serialize{
+	return string.format("local self=Player%s\n%s%s%s%s", serialize{
 		angular = self.angular,
 		body_scale = self.body_scale,
 		body_style = self.body_style,
@@ -556,10 +556,10 @@ Player.write = function(self)
 		physics = self.dead and "rigid" or "kinematic",
 		position = self.position,
 		rotation = self.rotation,
-		skills = self.skills,
 		skin_style = self.skin_style,
 		spec = self.spec.name,
 		variables = self.variables},
+		Serialize:encode_skills(self.skills),
 		Serialize:encode_stats(self.stats),
 		Serialize:encode_inventory(self.inventory),
 		"return self")
