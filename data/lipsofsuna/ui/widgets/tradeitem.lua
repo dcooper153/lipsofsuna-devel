@@ -3,8 +3,8 @@ require(Mod.path .. "invitem")
 Widgets.Uitradeitem = Class(Widgets.Uiinvitem)
 Widgets.Uitradeitem.class_name = "Widgets.Uitradeitem"
 
-Widgets.Uitradeitem.new = function(clss, item, index, slot, buy)
-	local self = Widgets.Uiinvitem.new(clss, nil, item, index, slot)
+Widgets.Uitradeitem.new = function(clss, item, index, buy)
+	local self = Widgets.Uiinvitem.new(clss, nil, item, index, item and item.slot)
 	self.buy = buy
 	if item then
 		self.hint = "$A: Remove item\n$$B\n$$U\n$$D"
@@ -15,12 +15,12 @@ Widgets.Uitradeitem.new = function(clss, item, index, slot, buy)
 end
 
 Widgets.Uitradeitem.apply = function(self)
-	local index = Client.data.trading.index
 	if self.buy then
-		Client.data.trading.buy[index] = self.index
+		Operators.trading:set_buy_item_index(self.index)
+		Operators.trading:add_buy()
 	else
-		Client.data.trading.sell[index] = self.index
+		Operators.trading:set_sell_item_index(self.index)
+		Operators.trading:add_sell()
 	end
-	Client:update_trade()
 	Ui:pop_state()
 end

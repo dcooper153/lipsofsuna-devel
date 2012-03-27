@@ -9,17 +9,10 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "trading",
 	widget = function()
-		local object = Client.player_object
-		if not object then return end
+		local items = Operators.trading:get_buy_items()
 		local widgets = {}
 		for index = 1,5 do
-			local shopidx = Client.data.trading.buy[index]
-			local item = shopidx and Client.data.trading.shop[shopidx]
-			local data = item and {
-				text = item.spec.name,
-				count = item.count or 1,
-				icon = item.spec.icon}
-			table.insert(widgets, Widgets.Uitradeslot(data, index, nil, true))
+			table.insert(widgets, Widgets.Uitradeslot(items[index], index, true))
 		end
 		return widgets
 	end}
@@ -31,18 +24,10 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "trading",
 	widget = function()
-		local object = Client.player_object
-		if not object then return end
+		local items = Operators.trading:get_sell_items()
 		local widgets = {}
 		for index = 1,5 do
-			local invidx = Client.data.trading.sell[index]
-			local item = invidx and object.inventory:get_object_by_index(invidx)
-			local slot = invidx and object.inventory:get_slot_by_index(invidx)
-			local data = item and {
-				text = item.spec.name,
-				count = item.count or 1,
-				icon = item.spec.icon}
-			table.insert(widgets, Widgets.Uitradeslot(data, index, slot, false))
+			table.insert(widgets, Widgets.Uitradeslot(items[index], index, false))
 		end
 		return widgets
 	end}
@@ -50,8 +35,8 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "trading",
 	widget = function()
-		if Client.data.trading.accepted then
-			return Widgets.Uibutton("Accept", function() Client:apply_trade() end)
+		if Operators.trading:is_acceptable() then
+			return Widgets.Uibutton("Accept", function() Operators.trading:accept() end)
 		else
 			return Widgets.Uilabel("You need to pay more.")
 		end
@@ -62,15 +47,10 @@ Ui:add_widget{
 Ui:add_state{
 	state = "trading/buy",
 	init = function()
-		local object = Client.player_object
-		if not object then return end
+		local items = Operators.trading:get_shop_items()
 		local widgets = {}
-		for index,item in ipairs(Client.data.trading.shop) do
-			local data = {
-				text = item.spec.name,
-				count = item.count or 1,
-				icon = item.spec.icon}
-			table.insert(widgets, Widgets.Uitradeitem(data, index, nil, true))
+		for index,item in ipairs(items) do
+			table.insert(widgets, Widgets.Uitradeitem(item, index, true))
 		end
 		return widgets
 	end}
@@ -89,8 +69,9 @@ Ui:add_state{
 			local data = item and {
 				text = item.spec.name,
 				count = item.count or 1,
-				icon = item.spec.icon}
-			table.insert(widgets, Widgets.Uitradeitem(data, index, slot, false))
+				icon = item.spec.icon,
+				slot = slot}
+			table.insert(widgets, Widgets.Uitradeitem(data, index, false))
 		end
 		return widgets
 	end}

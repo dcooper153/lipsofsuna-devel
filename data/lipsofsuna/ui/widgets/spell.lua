@@ -14,11 +14,8 @@ end
 
 Widgets.Uispell.apply = function(self)
 	if not self.active then return end
-	local slot = Client.data.spells.slot
-	local spell = Client:get_spell(slot)
-	spell.effects[Client.data.spells.effect] = {self.effect.name, 1}
-	Client:set_spell(slot, spell.animation, spell.effects)
-	local spell = Client:get_spell(slot)
+	local spell = Operators.spells:get_spell()
+	Operators.spells:set_effect{self.effect.name, 1}
 	Ui:pop_state()
 end
 

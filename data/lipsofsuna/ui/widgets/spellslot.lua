@@ -13,14 +13,12 @@ end
 Widgets.Uispellslot.apply = function(self)
 	if self.effect then
 		-- Clear the existing effect.
-		local slot = Client.data.spells.slot
-		local spell = Client:get_spell(slot)
-		spell.effects[self.index] = nil
-		Client:set_spell(slot, spell.animation, spell.effects)
+		Operators.spells:set_effect_index(self.index)
+		Operators.spells:set_effect()
 		Ui:restart_state()
 	else
 		-- Chose a new effect.
-		Client.data.spells.effect = self.index
+		Operators.spells:set_effect_index(self.index)
 		Ui:push_state("spells/effects")
 	end
 end

@@ -6,6 +6,12 @@ require "common/skills"
 Client = Class()
 Client.class_name = "Client"
 
+Operators = {}
+
+for k,v in pairs(File:scan_directory("client/operators/")) do
+	require("client/operators/" .. string.gsub(v, "([^.]*).*", "%1"))
+end
+
 -- Initialize the database.
 -- FIXME: Should be initialized in the initializer.
 Client.db = Database{name = "client.sqlite"}
@@ -99,190 +105,6 @@ Client.create_world = function(self)
 			position = v.position, rotation = v.rotation, realized = true,
 			disable_unloading = true, disabling_saving = true}
 	end
-end
-
---- Gets the compass direction for the currently shown quest.<br/>
--- The returned direction is in radians. The coordinate convention is:<ul>
---  <li>north: 0*pi rad</li>
---  <li>east: 0.5*pi rad</li>
---  <li>south: 1*pi rad</li>
---  <li>west: 1.5*pi rad</li></ul>
--- @param self Client.
--- @return Compass direction in radians, or nil.
-Client.get_compass_direction = function(self)
-	-- Find the marker.
-	local marker = self:get_active_marker()
-	if not marker then return end
-	-- Calculate the direction.
-	local diff = marker.position - self.player_object.position
-	return 0.5 * math.pi + math.atan2(diff.z, -diff.x)
-end
-
---- Gets the distance to the shown quest marker in the X-Z plane.
--- @param self Client.
--- @return Compass distance, or nil.
-Client.get_compass_distance = function(self)
-	-- Find the marker.
-	local marker = self:get_active_marker()
-	if not marker then return end
-	-- Calculate the distance.
-	local diff = marker.position - self.player_object.position
-	diff.y = 0
-	return diff.length
-end
-
---- Gets the compass height offset for the currently shown quest.
--- @param self Client.
--- @return Compass height offset, or nil.
-Client.get_compass_height = function(self)
-	-- Find the marker.
-	local marker = self:get_active_marker()
-	if not marker then return end
-	-- Calculate the height offset.
-	local diff = marker.position - self.player_object.position
-	return diff.y
-end
-
---- Gets the currently shown map marker.
--- @param self Client.
--- @return Marker or nil.
-Client.get_active_marker = function(self)
-	if not self.data.quest.shown then return end
-	if not self.player_object then return end
-	local quest = Quest:find{name = self.data.quest.shown}
-	if not quest or not quest.marker then return end
-	return Marker:find{name = quest.marker}
-end
-
---- Gets the spell in the given slot.
--- @param self Client.
--- @param slot Slot number.
--- @return Spell.
-Client.get_spell = function(self, slot)
-	local feat = Quickslots.feats.buttons[slot].feat
-	if feat then return feat end
-	return Feat{animation = "ranged spell"}
-end
-
---- Assigns a spell to the given slot.
--- @param self Client.
--- @param slot Slot number.
--- @param type Spell type.
--- @param effects Spell effects.
-Client.set_spell = function(self, slot, type, effects)
-	local feat = Feat{animation = type, effects = effects}
-	Quickslots:assign_feat(slot, feat)
-end
-
---- Sends a trade apply message to the server.
--- @param self Client.
-Client.apply_trade = function(self)
-	local packet = Packet(packets.TRADING_ACCEPT)
-	Network:send{packet = packet}
-end
-
---- Sends a trade update message to the server.
--- @param self Client.
-Client.update_trade = function(self)
-	-- Collect bought items.
-	local buy = {}
-	for k,index in pairs(self.data.trading.buy) do
-		local item = self.data.trading.shop[index]
-		if item then
-			table.insert(buy, {index, item.count})
-		else
-			self.data.trading.buy[k] = nil
-		end
-	end
-	-- Collect sold items.
-	local sell = {}
-	local object = self.player_object
-	for k,index in pairs(self.data.trading.sell) do
-		local item = object.inventory:get_object_by_index(index)
-		if item then
-			table.insert(sell, {index, item.count})
-		else
-			self.data.trading.buy[k] = nil
-		end
-	end
-	-- Create the packet.
-	local packet = Packet(packets.TRADING_UPDATE, "uint8", #buy, "uint8", #sell)
-	for k,v in ipairs(buy) do
-		packet:write("uint32", v[1], "uint32", v[2])
-	end
-	for k,v in ipairs(sell) do
-		packet:write("uint32", v[1], "uint32", v[2])
-	end
-	-- Send the packet.
-	Network:send{packet = packet}
-end
-
---- Switches the game to the hosting start state.
--- @param self Client class.
-Client.host_game = function(self)
-	-- Start the server thread.
-	Program:unload_world()
-	local opts = string.format("--file %s --server %s %d", Settings.file, Settings.address, Settings.port)
-	if Settings.admin then opts = opts .. " -d" end
-	if Settings.generate then opts = opts .. " -g" end
-	self.threads.server = Thread("main.lua", opts)
-	-- Set information for the UI.
-	self.data.connection.mode = "host"
-	self.data.connection.text = "Starting the server on " .. Settings.address .. ":" .. Settings.port .. "..."
-	self.data.connection.active = true
-	self.data.connection.connecting = false
-	self.data.connection.waiting = false
-	-- Enter the start game mode.
-	Ui.state = "start-game"
-end
-
---- Switches the game to the joining start state.
--- @param self Client class.
-Client.join_game = function(self)
-	-- Clear the world.
-	Program:unload_world()
-	-- Set information for the UI.
-	self.data.connection.mode = "join"
-	self.data.connection.text = "Joining the server at " .. Settings.address .. ":" .. Settings.port .. "..."
-	self.data.connection.active = true
-	self.data.connection.connecting = false
-	self.data.connection.waiting = false
-	-- Enter the start game mode.
-	Ui.state = "start-game"
-end
-
---- Loads controls from the configuration file.
--- @param self Client.
-Client.load_controls = function(self)
-	local translate = function(k)
-		if not k or k == "none" then return end
-		return tonumber(k) or Keysym[k] or k
-	end
-	for k,v in pairs(Action.dict_name) do
-		local keys = self.controls:get(k)
-		if keys then
-			local key1,key2 = string.match(keys, "([a-zA-Z0-9]*)[ \t]*([a-zA-Z0-9]*)")
-			key1 = translate(key1)
-			key2 = translate(key2)
-			if key1 then v.key1 = key1 end
-			if key2 then v.key2 = key2 end
-		end
-	end
-end
-
---- Saves controls to the configuration file.
--- @param self Client.
-Client.save_controls = function(self)
-	local translate = function(k)
-		if not k then return "none" end
-		return Keycode[k] or tostring(k)
-	end
-	for k,v in pairs(Action.dict_name) do
-		local key1 = translate(v.key1)
-		local key2 = translate(v.key2)
-		self.controls:set(k, key1 .. " " .. key2)
-	end
-	self.controls:save()
 end
 
 Client.reset_data = function(self)
@@ -385,21 +207,6 @@ end
 -- @param text String or nil.
 Client.set_target_text = function(self, text)
 	self.action_text = text
-end
-
-Client.set_mode = function(self, mode, level)
-	-- Check for state changes.
-	if self.mode == mode then return end
-	-- Close the old view.
-	Target:cancel()
-	Drag:cancel()
-	if self.view and self.view.close then self.view:close() end
-	if Widgets.ComboBox.active then Widgets.ComboBox.active:close() end
-	-- Open the new view.
-	local from = self.mode
-	self.mode = mode
-	self.view = self.views[mode]
-	if self.view and self.view.enter then self.view:enter(from, level or 1) end
 end
 
 Client.set_player_dead = function(self, value)
