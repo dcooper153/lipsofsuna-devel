@@ -7,6 +7,7 @@ Ui.states = {}
 --- Initializes the user interface state system.
 -- @param self Ui class.
 Ui.init = function(self)
+	self.history = {}
 	self.size = Vector()
 	self.stack = {}
 	self.widgets = {}
@@ -215,6 +216,7 @@ Ui.command = function(self, cmd)
 				self:update_help()
 				self:autoscroll()
 			end
+			self.history[self.state] = self.focused_item
 		end
 	elseif cmd == "down" then
 		self.repeat_timer = 0
@@ -232,6 +234,7 @@ Ui.command = function(self, cmd)
 				self:update_help()
 				self:autoscroll()
 			end
+			self.history[self.state] = self.focused_item
 		end
 	end
 end
@@ -438,16 +441,18 @@ Ui.show_state = function(self, state, focus)
 	end
 	-- Attach the widgets.
 	self:show_state_attach()
-	-- Position the widgets.
-	self.scroll_offset = 0
 	-- Focus the first or previously focused widget.
-	local f = math.min(focus or 1, #self.widgets)
+	local f = math.min(focus or self.history[state] or 1, #self.widgets)
 	if self.widgets[f] then
 		self.focused_item = f
 		self.widgets[f].focused = true
 	else
 		self.focused_item = nil
 	end
+	self.history[state] = self.focused_item
+	-- Position the widgets.
+	self.scroll_offset = 0
+	self.need_autoscroll = true
 	-- Rebuild the help text.
 	self:update_help()
 end
@@ -547,6 +552,11 @@ Ui.update = function(self, secs)
 	if self.need_relayout then
 		self.need_relayout = nil
 		self.scroll_offset = self.scroll_offset or 0
+	end
+	-- Autoscroll after state changes.
+	if self.need_autoscroll then
+		self.need_autoscroll = nil
+		self:autoscroll()
 	end
 	-- Repack if a HUD was enabled.
 	if self.need_repack then
