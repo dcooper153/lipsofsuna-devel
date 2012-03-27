@@ -8,6 +8,6 @@ Itemspec{
 	crafting_materials = {["iron"] = 4},
 	effect_attack_speedline = true,
 	influences_base = {physical = -10},
-	influences_bonus = {dexterity = 0.01},
+	influences_bonus = {"melee"},
 	equipment_slot = "hand.R",
 	mass = 15}

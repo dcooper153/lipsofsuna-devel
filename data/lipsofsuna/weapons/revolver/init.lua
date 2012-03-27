@@ -16,7 +16,7 @@ Itemspec{
 	crafting_materials = {["adamantium"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
 	influences_base = {physical = -18},
-	influences_bonus = {intelligence = 0.005, perception = 0.005},
+	influences_bonus = {"ranged", "guns"},
 	equipment_slot = "hand.R",
 	mass = 8}
 
@@ -32,7 +32,7 @@ Itemspec{
 	crafting_materials = {["aquanite stone"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
 	influences_base = {cold = -7, physical = -7},
-	influences_bonus = {intelligence = 0.005, perception = 0.005},
+	influences_bonus = {"ranged", "guns"},
 	equipment_slot = "hand.R",
 	mass = 8}
 
@@ -48,7 +48,7 @@ Itemspec{
 	crafting_materials = {["crimson stone"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
 	influences_base = {fire = -7, physical = -7},
-	influences_bonus = {intelligence = 0.005, perception = 0.005},
+	influences_bonus = {"ranged", "guns"},
 	equipment_slot = "hand.R",
 	mass = 8}
 
@@ -64,6 +64,6 @@ Itemspec{
 	crafting_materials = {["iron ingot"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
 	influences_base = {physical = -10},
-	influences_bonus = {intelligence = 0.005, perception = 0.005},
+	influences_bonus = {"ranged", "guns"},
 	equipment_slot = "hand.R",
 	mass = 8}

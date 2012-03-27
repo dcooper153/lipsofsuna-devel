@@ -21,7 +21,7 @@ Itemspec{
 	animation_hold = "hold bulky",
 	animation_attack = "throw bulky",
 	influences_base = {fire = -10, physical = -10},
-	influences_bonus = {strength = 0.01},
+	influences_bonus = {"melee", "explosives"},
 	destroy_actions = {"explode"},
 	destroy_timer = 5,
 	equipment_slot = "hand.R",

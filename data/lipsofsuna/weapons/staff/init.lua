@@ -15,7 +15,7 @@ Itemspec{
 	equipment_slots_reserved = {"hand.L"},
 	health = 100,
 	influences_base = {physical = -4},
-	influences_bonus = {dexterity = 0.005, strength = 0.005},
+	influences_bonus = {"melee"},
 	mass = 7,
 	water_gravity = Vector(0,6,0)}
 
@@ -34,7 +34,7 @@ Itemspec{
 	equipment_slots_reserved = {"hand.L"},
 	health = 300,
 	influences_base = {fire = -2, physical = -4},
-	influences_bonus = {perception = 0.005, willpower = 0.005},
+	influences_bonus = {"melee"},
 	mass = 7,
 	special_effects = {
 		{node = "#flame", model = "torchfx1"},

@@ -53,3 +53,13 @@ Skillspec{
 	name = "Far sight",
 	description = "Spot items and creatures twice as far.",
 	assign = function(skills) skills.view_distance = skills.view_distance * 2 end}
+
+Skillspec{
+	name = "Fighter",
+	description = "Melee attacks do double damage.",
+	assign = function(skills) skills.melee = skills.melee * 2 end}
+
+Skillspec{
+	name = "Marksman",
+	description = "Ranged weapons do double damage.",
+	assign = function(skills) skills.ranged = skills.ranged * 2 end}

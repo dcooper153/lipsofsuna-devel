@@ -17,7 +17,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 1,
 	influences_base = {cold = -15, physical = -5},
-	influences_bonus = {intelligence = 0.01},
+	influences_bonus = {"explosives"},
 	mass = 5,
 	stacking = true}
 
@@ -33,7 +33,7 @@ Itemspec{
 	crafting_materials = {["crimson stone"] = 1, ["iron ingot"] = 1},
 	effect_craft = "craftmetal1",
 	influences_base = {fire = -15, physical = -5},
-	influences_bonus = {intelligence = 0.01},
+	influences_bonus = {"explosives"},
 	destroy_actions = {"explode"},
 	destroy_timer = 3,
 	equipment_slot = "hand.R",

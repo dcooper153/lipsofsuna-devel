@@ -16,7 +16,7 @@ Itemspec{
 	crafting_materials = {["adamantium"] = 9},
 	effect_attack = "crossbow1",
 	influences_base = {physical = -15},
-	influences_bonus = {dexterity = 0.01},
+	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	mass = 15}
@@ -34,7 +34,7 @@ Itemspec{
 	effect_attack = "crossbow1",
 	effect_craft = "craftmetal1",
 	influences_base = {cold = -6, physical = -6},
-	influences_bonus = {dexterity = 0.01},
+	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	mass = 15}
@@ -54,7 +54,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	influences_base = {fire = -6, physical = -6},
-	influences_bonus = {dexterity = 0.01},
+	influences_bonus = {"ranged"},
 	mass = 15}
 
 Itemspec{
@@ -70,7 +70,7 @@ Itemspec{
 	effect_attack = "crossbow1",
 	effect_craft = "craftmetal1",
 	influences_base = {physical = -8},
-	influences_bonus = {dexterity = 0.005},
+	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	mass = 15}
@@ -88,7 +88,7 @@ Itemspec{
 	effect_attack = "crossbow1",
 	effect_craft = "craftwood1",
 	influences_base = {physical = -4},
-	influences_bonus = {dexterity = 0.01},
+	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	water_gravity = Vector(0,6,0),

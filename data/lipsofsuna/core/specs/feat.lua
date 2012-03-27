@@ -180,7 +180,7 @@ Feat.get_info = function(self, args)
 			-- Influence contribution.
 			for _,influ in pairs(effect.influences) do
 				local n = influ[1]
-				local v = influ[2] + (influ[3] or 0) * data[2]
+				local v = influ[2]
 				influences[n] = (influences[n] or 0) + v
 				if influences[n] == 0 then
 					influences[n] = nil
@@ -198,64 +198,42 @@ Feat.get_info = function(self, args)
 	for k,v in pairs(reagents) do
 		reagents[k] = math.max(1, math.floor(v))
 	end
-	-- Add weapon specific influences.
-	-- In addition to the base influences, weapons may grant bonuses for
-	-- having points in certain skills. The skill bonuses are multiplicative
-	-- since the system is easier to balance that way.
---[[
+	-- Add weapon-specific influences.
+	-- In addition to the base influences, weapons may grant bonuses for having
+	-- points in certain skills. The skill bonuses are multiplicative since the
+	-- system is easier to balance that way.
 	if args and args.weapon and anim.bonuses_weapon and args.weapon.spec.influences_base then
 		local mult = 1
-		local bonuses = args.weapon.spec.influences_bonus
-		if bonuses and args.attacker.skills then
-			for k,v in pairs(bonuses) do
-				local s = args.attacker.skills:get_value{skill = k}
-				if s then mult = mult * (1 + v * s) end
-			end
+		if args.attacker.skills then
+			mult = args.attacker.skills:calculate_damage_multiplier_for_item(args.weapon)
 		end
 		for k,v in pairs(args.weapon.spec.influences_base) do
-			local prev = influences[k]
-			influences[k] = (prev or 0) + mult * v
+			influences[k] = (influences[k] or 0) + mult * v
 		end
 	end
---]]
-	-- Add bare-handed specific influences.
-	-- Works like the weapon variant but uses hardcoded influences.
-	-- Bare-handed influence bonuses only apply to melee feats.
---[[
+	-- Add bare-handed-specific influences.
+	-- Works like the weapon variant but uses hardcoded attributes and base damage.
 	if args and not args.weapon and anim.bonuses_barehanded then
 		local mult = 1
-		local bonuses = {dexterity = 0.02, strength = 0.01, willpower = 0.02}
 		if args.attacker.skills then
-			for k,v in pairs(bonuses) do
-				local s = args.attacker.skills:get_value{skill = k}
-				if s then mult = mult * (1 + v * s) end
-			end
+			mult = args.attacker.skills:calculate_damage_multiplier_for_unarmed()
 		end
-		local bonuses1 = {physical = -3}
-		for k,v in pairs(bonuses1) do
-			local prev = influences[k]
-			influences[k] = (prev or 0) + mult * v
+		local bonuses = {physical = -3}
+		for k,v in pairs(bonuses) do
+			influences[k] = (influences[k] or 0) + mult * v
 		end
 	end
---]]
-	-- Add projectile specific influences.
+	-- Add projectile-specific influences.
 	-- Works like the weapon variant but uses the projectile as the item.
---[[
 	if args and args.projectile and anim.bonuses_projectile and args.projectile.spec.influences_base then
 		local mult = 1
-		local bonuses = args.projectile.spec.influences_bonus
-		if bonuses then
-			for k,v in pairs(bonuses) do
-				local s = args.attacker.skills:get_value{skill = k}
-				if s then mult = mult * (1 + v * s) end
-			end
+		if args.attacker.skills then
+			mult = args.attacker.skills:calculate_damage_multiplier_for_item(args.weapon)
 		end
 		for k,v in pairs(args.projectile.spec.influences_base) do
-			local prev = influences[k]
-			influences[k] = (prev or 0) + mult * v
+			influences[k] = (influences[k] or 0) + mult * v
 		end
 	end
---]]
 	-- Add berserk bonus.
 	-- The bonus increases physical damage if the health of the attacker is
 	-- lower than 25 points. If the health is 1 point, the damage is tripled.

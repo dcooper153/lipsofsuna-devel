@@ -13,7 +13,7 @@ Itemspec{
 	effect_craft = "craftwood1",
 	gravity_projectile = Vector(0,2,0),
 	influences_base = {physical = -5},
-	influences_bonus = {dexterity = 0.01},
+	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
 	stacking = true,
 	water_gravity = Vector(0,6,0)}

@@ -46,8 +46,12 @@ end
 -- @return Attribute table.
 Skills.calculate_attributes = function(self)
 	local attr = {
+		explosives = 1,
+		guns = 1,
 		max_health = 20,
 		max_willpower = 20,
+		melee = 1,
+		ranged = 1,
 		speed = 0.5,
 		view_distance = 15}
 	for k,v in pairs(self.skills) do
@@ -55,6 +59,37 @@ Skills.calculate_attributes = function(self)
 		if skill then skill.assign(attr) end
 	end
 	return attr
+end
+
+--- Calculates the damage multiplier for the given item.<br/>
+--
+-- The damage multiplier depends on the active skills and the type of the item.
+-- The active skills determine the attributes of the actor. The attribute names
+-- that affect the damage of the weapon are listed in the spec of the item.
+--
+-- @param self Skills.
+-- @param item Item object.
+-- @return Number.
+Skills.calculate_damage_multiplier_for_item = function(self, item)
+	if not item.spec.influences_bonus then return 1 end
+	local mult = 1
+	local attr = self:calculate_attributes()
+	for name in pairs(item.spec.influences_bonus) do
+		if attr[name] then mult = mult * attr[name] end
+	end
+	return mult
+end
+
+-- Calculates the damage multiplier for unarmed attacks.<br/>
+--
+-- The damage multiplier depends on the active skills only. More specifically,
+-- the value of the "unarmed" attribute determines it.
+--
+-- @param self Skills.
+-- @return Number.
+Skills.calculate_damage_multiplier_for_unarmed = function(self, item)
+	local attr = self:calculate_attributes()
+	return attr["unarmed"] or 1
 end
 
 --- Removes all skills.

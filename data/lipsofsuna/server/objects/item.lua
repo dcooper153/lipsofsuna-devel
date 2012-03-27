@@ -144,12 +144,8 @@ Item.get_weapon_influences = function(self, user)
 	if not self.spec.influences_base then return {} end
 	-- Calculate the damage multiplier.
 	local mult = 1
-	local bonuses = self.spec.influences_bonus
-	if bonuses and user.stats then
-		for k,v in pairs(bonuses) do
-			local s = user.stats:get_value(k)
-			if s then mult = mult * (1 + v * s) end
-		end
+	if user.skills then
+		mult = user.skills:calculate_damage_multiplier_for_item(self)
 	end
 	-- Calculate influences.
 	local influences = {}

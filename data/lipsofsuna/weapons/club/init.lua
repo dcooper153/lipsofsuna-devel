@@ -14,6 +14,6 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 100,
 	influences_base = {physical = -4},
-	influences_bonus = {dexterity = 0.005, strength = 0.005},
+	influences_bonus = {"melee"},
 	mass = 7,
 	water_gravity = Vector(0,6,0)}

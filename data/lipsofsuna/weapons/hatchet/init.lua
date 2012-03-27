@@ -10,7 +10,7 @@ Itemspec{
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
 	influences_base = {hatchet = -10, physical = -10},
-	influences_bonus = {strength = 0.01},
+	influences_bonus = {"melee"},
 	equipment_slot = "hand.R",
 	mass = 15}
 
@@ -27,7 +27,7 @@ Itemspec{
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	influences_base = {cold = -4, hatchet = -7, physical = -4},
-	influences_bonus = {strength = 0.01},
+	influences_bonus = {"melee"},
 	health = 500,
 	mass = 15}
 
@@ -45,7 +45,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 500,
 	influences_base = {fire = -4, hatchet = -7, physical = -4},
-	influences_bonus = {strength = 0.01},
+	influences_bonus = {"melee"},
 	mass = 15}
 
 Itemspec{
@@ -62,7 +62,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 220,
 	influences_base = {hatchet = -5, physical = -5},
-	influences_bonus = {strength = 0.01},
+	influences_bonus = {"melee"},
 	mass = 10}
 
 Itemspec{
@@ -78,7 +78,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 130,
 	influences_base = {hatchet = -3, physical = -3},
-	influences_bonus = {strength = 0.01},
+	influences_bonus = {"melee"},
 	mass = 9}
 
 Itemspec{
@@ -96,6 +96,6 @@ Itemspec{
 	equipment_slot = "hand.R",
 	health = 100,
 	influences_base = {hatchet = -3, physical = -3},
-	influences_bonus = {strength = 0.01},
+	influences_bonus = {"melee"},
 	mass = 7,
 	water_gravity = Vector(0,6,0)}
