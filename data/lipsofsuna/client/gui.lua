@@ -642,6 +642,10 @@ Ui.update = function(self, secs)
 						self:update_help()
 						self:autoscroll()
 					end
+					if self.prev_custom_focus then
+						self.prev_custom_focus.focused = false
+						self.prev_custom_focus = nil
+					end
 					found = true
 					break
 				end
@@ -653,8 +657,6 @@ Ui.update = function(self, secs)
 				end
 				self.prev_custom_focus = focus
 				focus.focused = true
-				-- FIXME: Should be in the Ui class.
-				Widgets.focused_widget = focus
 			end
 		end
 	end
