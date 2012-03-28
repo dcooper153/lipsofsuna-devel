@@ -5,7 +5,6 @@ Reload.enabled = true
 
 require "client/client"
 
-Views = {}
 Physics.GROUP_OBJECT = 0x0001
 Physics.GROUP_EQUIPMENT = 0x0002
 Physics.GROUP_CROSSHAIR = 0x0004
@@ -39,9 +38,6 @@ for k,v in pairs(File:scan_directory("client/network")) do
 end
 for k,v in pairs(File:scan_directory("client/objects")) do
 	require("client/objects/" .. string.gsub(v, "([^.]*).*", "%1"))
-end
-for k,v in pairs(File:scan_directory("client/views")) do
-	require("client/views/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
 
 -- Initialize the UI state.

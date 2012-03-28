@@ -53,7 +53,6 @@ Eventhandler{type = "tick", func = function(self, args)
 		Client.options.fullscreen = v[3]
 		Client.options.vsync = v[4]
 		Client.options:save()
-		Client.views.options:load()
 	end
 	-- Update the cursor.
 	Widgets.Cursor.inst:update()

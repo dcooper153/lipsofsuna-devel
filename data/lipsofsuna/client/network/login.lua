@@ -4,7 +4,7 @@ Protocol:add_handler{type = "CHARACTER_ACCEPT", func = function(event)
 end}
 
 Protocol:add_handler{type = "CHARACTER_CREATE", func = function(event)
-	Client.views.chargen:init()
+	Operators.chargen:init()
 	Ui.state = "chargen"
 end}
 

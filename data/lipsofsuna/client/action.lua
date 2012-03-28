@@ -71,6 +71,48 @@ Action.get_control_name = function(self, name)
 	return "[" .. (Keycode[action.key1] or tostring(action.key1)) .. "]"
 end
 
+Action.get_event_response = function(self, args)
+	local analog = function(k, v)
+		if self.mode == "analog" then
+			if self.key1 == k then
+				return v
+			end
+		end
+	end
+	local digital = function(k, p)
+		if self.mode == "press" and p then
+			if self.key1 == k then
+				return true
+			end
+		elseif self.mode == "toggle" then
+			if self.key1 == k then
+				return p
+			end
+		elseif self.mode == "analog" then
+			if self.key1 == k then
+				return p and -1 or 0
+			elseif self.key2 == k then
+				return p and 1 or 0
+			end
+		end
+	end
+	if args.type == "mousemotion" then
+		local res1 = analog("mousex", Action.mouse_sensitivity_x * args.dx)
+		local res2 = analog("mousey", Action.mouse_sensitivity_y * args.dy)
+		return res1 or res2
+	elseif args.type == "mousepress" then
+		return digital("mouse" .. args.button, true)
+	elseif args.type == "mouserelease" then
+		return digital("mouse" .. args.button, false)
+	elseif args.type == "mousescroll" then
+		return analog("mousez", args.rel < 0 and -1 or 1)
+	elseif args.type == "keypress" then
+		return digital(args.code, true)
+	elseif args.type == "keyrelease" then
+		return digital(args.code, false)
+	end
+end
+
 --- Executes the action if it matches the input event.
 -- @param self Action.
 -- @param args Event arguments.

@@ -36,9 +36,6 @@ Client.init = function(self)
 	self.camera_mode = "third-person"
 	-- Initialize data.
 	self:reset_data()
-	-- Initialize views.
-	self.views = {}
-	self.views.chargen = Views.Chargen()
 	-- Initialize helper threads.
 	self.threads = {}
 	self.threads.model_builder = Thread("client/threads/modelbuilder.lua")
@@ -108,6 +105,7 @@ Client.create_world = function(self)
 end
 
 Client.reset_data = function(self)
+	Operators.chargen:reset()
 	self.data = {}
 	self.data.admin = {}
 	self.data.book = {}
