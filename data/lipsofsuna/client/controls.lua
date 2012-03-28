@@ -69,7 +69,7 @@ Action{name = "editor_select_rect", mode = "toggle", key1 = Keysym.LCTRL, func =
 	end
 end}
 
-Action{name = "feats", mode = "press", key1 = Keysym.f, func = function()
+Action{name = "feats", mode = "press", key1 = Keysym.u, func = function()
 	if Client.player_object then
 		if Ui.state ~= "feats" then
 			Ui.state = "feats"

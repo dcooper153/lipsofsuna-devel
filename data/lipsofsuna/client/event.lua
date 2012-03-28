@@ -1,25 +1,25 @@
 Eventhandler{type = "keypress", func = function(self, args)
-	Action:event(args, not Ui:handle_event(args) and {})
+	Action:event(args, Ui:handle_event(args))
 end}
 
 Eventhandler{type = "keyrelease", func = function(self, args)
-	Action:event(args, not Ui:handle_event(args) and {})
+	Action:event(args, Ui:handle_event(args))
 end}
 
 Eventhandler{type = "mousepress", func = function(self, args)
-	Action:event(args, not Ui:handle_event(args) and {})
+	Action:event(args, Ui:handle_event(args))
 end}
 
 Eventhandler{type = "mouserelease", func = function(self, args)
-	Action:event(args, not Ui:handle_event(args) and {})
+	Action:event(args, Ui:handle_event(args))
 end}
 
 Eventhandler{type = "mousescroll", func = function(self, args)
-	Action:event(args, not Ui:handle_event(args) and {})
+	Action:event(args, Ui:handle_event(args))
 end}
 
 Eventhandler{type = "mousemotion", func = function(self, args)
-	Action:event(args, not Ui:handle_event(args) and {})
+	Action:event(args, Ui:handle_event(args))
 end}
 
 Eventhandler{type = "music-ended", func = function(self, args)
