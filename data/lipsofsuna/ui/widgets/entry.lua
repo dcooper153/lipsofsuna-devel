@@ -28,8 +28,9 @@ Widgets.Uientry.changed = function(self)
 end
 
 Widgets.Uientry.handle_event = function(self, args)
-	if not self.input_mode then return true end
-	if args.type ~= "keypress" then return true end
+	if not self.input_mode or args.type ~= "keypress" then
+		return Widgets.Uiwidget.handle_event(self, args)
+	end
 	if args.code == Keysym.BACKSPACE then
 		-- Backspace.
 		if self.cursor_pos > 1 then

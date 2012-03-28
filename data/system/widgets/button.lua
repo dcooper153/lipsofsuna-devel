@@ -10,6 +10,11 @@ Widgets.Button.new = function(clss, args)
 	return self
 end
 
+Widgets.Button.handle_event = function(self, args)
+	if args.type ~= "mousepress" then return true end
+	self:pressed()
+end
+
 Widgets.Button.pressed = function(self)
 end
 

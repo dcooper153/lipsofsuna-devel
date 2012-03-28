@@ -1,14 +1,19 @@
 Widgets.Scrollbar = Class(Widget)
+Widgets.Scrollbar.class_name = "Widgets.Scrollbar"
 
 Widgets.Scrollbar.new = function(clss, args)
 	local self = Widget.new(clss, args)
 	self.max = 0
 	self.page = 1
+	self.step = 1
 	self.scroll_offset = 1
 	return self
 end
 
 Widgets.Scrollbar.changed = function(self, value)
+end
+
+Widgets.Scrollbar.grabbed = function(self, value)
 end
 
 Widgets.Scrollbar.get_value_at = function(self, point)
@@ -34,34 +39,39 @@ Widgets.Scrollbar.set_value_at = function(self, point)
 	return true
 end
 
-Widgets.Scrollbar.mousemotion = function(self, args)
-	if math.mod(Program.mouse_button_state, 2) == 1 then
-		self:set_value_at(Vector(args.x, args.y))
-	end
-end
-
-Widgets.Scrollbar.pressed = function(self)
-	if self.max <= self.page then return end
-	local cursor = Program.cursor_position
-	local c = cursor - Vector(self.x, self.y)
-	if c.y < 21 then
-		-- Scroll up.
-		if self.scroll_offset >= 1 then
-			self.scroll_offset = self.scroll_offset - 1
-			self:reshaped()
-			self:changed(self.scroll_offset)
+Widgets.Scrollbar.handle_event = function(self, args)
+	if args.type == "mousemotion" then
+		if math.mod(Program.mouse_button_state, 2) == 1 then
+			self:set_value_at(Vector(args.x, args.y))
+			return
 		end
-	elseif c.y >= self.height - 21 then
-		-- Scroll down.
-		if self.scroll_offset < self.max - self.page then
-			self.scroll_offset = self.scroll_offset + 1
-			self:reshaped()
-			self:changed(self.scroll_offset)
+	elseif args.type == "mousepress" then
+		if args.button ~= 1 then return end
+		if self.max <= self.page then return end
+		local cursor = Program.cursor_position
+		local c = cursor - Vector(self.x, self.y)
+		if c.y < 21 then
+			self:scroll("up")
+		elseif c.y >= self.height - 21 then
+			self:scroll("down")
+		else
+			self:set_value_at(cursor)
+			self:grabbed(true)
 		end
-	else
-		-- Scroll to the cursor.
-		self:set_value_at(cursor)
+		return
+	elseif args.type == "mouserelease" then
+		if args.button ~= 1 then return end
+		self:grabbed(false)
+		return
+	elseif args.type == "mousescroll" then
+		if args.rel > 0 then
+			self:scroll("up")
+		else
+			self:scroll("down")
+		end
+		return
 	end
+	return true
 end
 
 Widgets.Scrollbar.reshaped = function(self)
@@ -111,23 +121,17 @@ Widgets.Scrollbar.reshaped = function(self)
 	self:canvas_compile()
 end
 
-Widgets.Scrollbar.scrolled = function(self, args)
-	if args.rel > 0 then
-		-- Scroll up.
-		if self.scroll_offset >= 1 then
-			self.scroll_offset = self.scroll_offset - 1
-			self:reshaped()
-			self:changed(self.scroll_offset)
-		end
-	else
-		-- Scroll down.
-		if self.scroll_offset < self.max - self.page then
-			self.scroll_offset = self.scroll_offset + 1
-			self:reshaped()
-			self:changed(self.scroll_offset)
-		end
+Widgets.Scrollbar.scroll = function(self, dir)
+	if dir == "up" then
+		self.scroll_offset = math.max(0, self.scroll_offset - self.step)
+		self:reshaped()
+		self:changed(self.scroll_offset)
+	elseif dir == "down" then
+		self.scroll_offset = math.min(self.scroll_offset + self.step, self.max - self.page)
+		self.scroll_offset = math.max(0, self.scroll_offset)
+		self:reshaped()
+		self:changed(self.scroll_offset)
 	end
-	return true
 end
 
 Widgets.Scrollbar.set_range = function(self, max, scroll_offset, page)

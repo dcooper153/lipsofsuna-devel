@@ -26,10 +26,8 @@ Widgets.Uiwidget.apply_back = function(self)
 end
 
 Widgets.Uiwidget.handle_event = function(self, args)
-	return true
-end
-
-Widgets.Uiwidget.pressed = function(self)
+	if Program.cursor_grabbed then return true end
+	if args.type ~= "mousepress" then return true end
 	self:apply()
 end
 

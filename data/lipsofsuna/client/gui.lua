@@ -22,7 +22,9 @@ Ui.init = function(self)
 	self.repeat_timer = 0
 	self.scrollbar = Widgets.Scrollbar{
 		offset = Vector(32, 0),
-		changed = function(w, p) self.scroll_offset = p end}
+		changed = function(w, p) self.scroll_offset = p end,
+		grabbed = function(w, v) self.scroll_active = v end}
+	self.scrollbar.step = 50
 end
 
 --- Adds a heads over display widget to the user interface.
@@ -306,8 +308,15 @@ Ui.handle_event = function(self, args)
 	-- Find the state.
 	local state_ = self.states[self.state]
 	if not state_ then return true end
+	-- Check the mouse event handling mode.
+	local mouse_mode = not Program.cursor_grabbed
+	local mouse_event = false
+	if args.type == "mousepress" or args.type == "mouserelease" or
+	   args.type == "mousescroll" or args.type == "mousemotion" then
+		mouse_event = true
+	end
 	-- Call the event handler of the active widget.
-	if self.focused_item then
+	if self.focused_item and (not mouse_mode or not mouse_event) then
 		local widget = self.widgets[self.focused_item]
 		if widget and not widget:handle_event(args) then return end
 	end
@@ -315,22 +324,24 @@ Ui.handle_event = function(self, args)
 	for k,v in pairs(state_.input) do
 		if not v(args) then return end
 	end
-	-- Let widgets handle the event when the UI is mouse controlled.
-	if not Program.cursor_grabbed then
-		if Widgets:handle_event(args) then return end
+	-- Tell the caller to handle unhandled events.
+	if not mouse_mode or not mouse_event then
+		return true
 	end
-	-- Absorb all mouse events if the cursor isn't grabbed.
-	if not Program.cursor_grabbed then
-		if args.type == "mousepress" then return end
-		if args.type == "mouserelease" then return end
-		if args.type == "mousescroll" then
-			self:scroll(args.rel > 0 and "up" or "down")
-			return
-		end
-		if args.type == "mousemotion" then return end
+	-- Hijack input when the scrollbar is grabbed.
+	if self.scroll_active then
+		self.scrollbar:handle_event(args)
+		return
 	end
-	-- Tell the caller to handle if no handler did.
-	return true
+	-- Call the event handler of the widget under the cursor.
+	local widget = Widgets:find_handler_widget("handle_event")
+	if widget and not widget:handle_event(args) then
+		return
+	end
+	-- Scroll with remaining mouse wheel events.
+	if args.type == "mousescroll" then
+		self:scroll(args.rel > 0 and "up" or "down")
+	end
 end
 
 --- Pushes a new state on top of the state stack and shows it.

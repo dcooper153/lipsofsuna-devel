@@ -23,7 +23,9 @@ Widgets.Uibinding.apply = function(self)
 end
 
 Widgets.Uibinding.handle_event = function(self, args)
-	if not self.input_mode then return true end
+	if not self.input_mode then
+		return Widgets.Uiwidget.handle_event(self, args)
+	end
 	local accept
 	local a = self.action
 	local k = self.input_key

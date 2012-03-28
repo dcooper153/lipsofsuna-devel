@@ -31,14 +31,21 @@ end
 Widgets.Uiscrollfloat.changed = function(self)
 end
 
-Widgets.Uiscrollfloat.mousemotion = function(self, args)
-	if math.mod(Program.mouse_button_state, 2) == 1 then
-		self:set_value_at(args.x)
+Widgets.Uiscrollfloat.handle_event = function(self, args)
+	if not Program.cursor_grabbed then
+		if args.type == "mousepress" then
+			if args.button == 2 then
+				self:set_value_at(Program.cursor_position.x)
+			end
+			return
+		elseif args.type == "mousemotion" then
+			if math.mod(Program.mouse_button_state, 2) == 1 then
+				self:set_value_at(args.x)
+			end
+			return
+		end
 	end
-end
-
-Widgets.Uiscrollfloat.pressed = function(self)
-	self:set_value_at(Program.cursor_position.x)
+	return Widgets.Uiwidget.handle_event(self, args)
 end
 
 Widgets.Uiscrollfloat.rebuild_canvas = function(self)

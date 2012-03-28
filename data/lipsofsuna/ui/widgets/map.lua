@@ -47,14 +47,18 @@ Widgets.Uimap.clear_markers = function(self)
 end
 
 Widgets.Uimap.handle_event = function(self, args)
-	if Program.cursor_grabbed then return true end
-	if args.type ~= "mousescroll" then return true end
-	if args.rel > 0 then
-		Client.data.map.scale = Client.data.map.scale * 1.5
-	else
-		Client.data.map.scale = Client.data.map.scale / 1.5
+	if not Program.cursor_grabbed then
+		if args.type == "mousescroll" then
+			if args.rel > 0 then
+				Client.data.map.scale = Client.data.map.scale * 1.5
+			else
+				Client.data.map.scale = Client.data.map.scale / 1.5
+			end
+			self.need_repaint = true
+			return
+		end
 	end
-	self.need_repaint = true
+	return Widgets.Uiwidget.handle_event(self, args)
 end
 
 Widgets.Uimap.rebuild_size = function(self)
