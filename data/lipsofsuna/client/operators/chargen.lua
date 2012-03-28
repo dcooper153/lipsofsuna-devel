@@ -118,7 +118,7 @@ end
 -- @param args Event arguments.
 -- @return True if the caller should handle the event.
 Operators.chargen.input = function(self, args)
-	if not Program.cursor_grabbed then return true end
+	if not Ui.pointer_grab then return true end
 	local ret = true
 	-- Rotate the character.
 	local action1 = Action.dict_name["turn"]

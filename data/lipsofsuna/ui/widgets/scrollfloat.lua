@@ -32,7 +32,7 @@ Widgets.Uiscrollfloat.changed = function(self)
 end
 
 Widgets.Uiscrollfloat.handle_event = function(self, args)
-	if not Program.cursor_grabbed then
+	if not Ui.pointer_grab then
 		if args.type == "mousepress" then
 			if args.button == 2 then
 				self:set_value_at(Program.cursor_position.x)

@@ -1,6 +1,9 @@
 Ui:add_state{
 	state = "quit",
-	label = "Quit"}
+	label = "Quit",
+	grab = function()
+		return Client.player_object ~= nil
+	end}
 
 Ui:add_widget{
 	state = "quit",

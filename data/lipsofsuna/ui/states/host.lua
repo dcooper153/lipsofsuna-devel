@@ -2,6 +2,9 @@ Ui:add_state{
 	state = "host",
 	root = "mainmenu",
 	label = "Host",
+	grab = function()
+		return false
+	end,
 	background = function()
 		return Widgets.Background{fullscreen = true, image = "mainmenu1"}
 	end}

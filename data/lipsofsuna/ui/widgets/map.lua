@@ -47,7 +47,7 @@ Widgets.Uimap.clear_markers = function(self)
 end
 
 Widgets.Uimap.handle_event = function(self, args)
-	if not Program.cursor_grabbed then
+	if not Ui.pointer_grab then
 		if args.type == "mousescroll" then
 			if args.rel > 0 then
 				Client.data.map.scale = Client.data.map.scale * 1.5

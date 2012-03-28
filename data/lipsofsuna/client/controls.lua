@@ -185,10 +185,10 @@ end}
 
 Action{name = "mouse_grab", mode = "press", key1 = Keysym.ESCAPE, func = function()
 	-- Toggle mouse grabbing.
-	local grab = not Program.cursor_grabbed
+	local grab = not Ui.pointer_grab
 	Client.options.grab_cursor = grab
 	Client.options:save()
-	Program.cursor_grabbed = grab
+	Ui.pointer_grab = grab
 	-- Open the in-game menu at ungrab.
 	if not grab then
 		if Ui.state == "play" then
@@ -424,7 +424,7 @@ Action{name = "zoom", mode = "analog", key1 = "mousez", key2 = "", func = functi
 		Client.camera:zoom{rate = -v}
 	elseif Ui.root == "editor" then
 		-- Editor controls.
-		if Program.cursor_grabbed and v ~= 0 then
+		if Ui.pointer_grab and v ~= 0 then
 			Client.editor:extrude(v > 0)
 		end
 	end

@@ -12,19 +12,25 @@ Ui.init = function(self)
 	self.stack = {}
 	self.widgets = {}
 	self.window = Widget{floating = true, fullscreen = true}
+	self.repeat_timer = 0
+	-- Create the back button.
 	self.back = Widgets.Button{
 		text = "<",
 		pressed = function() self:pop_state() end}
+	-- Create the help labels.
 	self.hint = Widgets.Label()
 	self.hint:set_request{width = 200}
 	self.label = Widgets.Label{font = "medium"}
 	self.label:set_request{width = 200}
-	self.repeat_timer = 0
+	-- Create the scrollbar.
 	self.scrollbar = Widgets.Scrollbar{
 		offset = Vector(32, 0),
 		changed = function(w, p) self.scroll_offset = p end,
 		grabbed = function(w, v) self.scroll_active = v end}
 	self.scrollbar.step = 50
+	-- Initialize the cursor.
+	self.cursor = Widgets.Cursor(Iconspec:find{name = "cursor1"})
+	self.pointer_grab = Options.inst.grab_cursor
 end
 
 --- Adds a heads over display widget to the user interface.
@@ -76,6 +82,7 @@ end
 -- @param self Ui class.
 -- @param args Arguments.<ul>
 --   <li>background: Background creation function.</li>
+--   <li>grab: Grab disable function.</li>
 --   <li>hint: Controls hint text shown to the user.</li>
 --   <li>init: Initializer function.</li>
 --   <li>input: Input handler function.</li>
@@ -88,12 +95,23 @@ Ui.add_state = function(self, args)
 	-- Get or create the state.
 	local state = self.states[args.state]
 	if not state then
-		state = {background = function() end, ids = {}, init = {}, input = {}, update = {}, widgets = {}}
+		state = {
+			background = function() end,
+			grab = function() return true end,
+			ids = {},
+			init = {},
+			input = {},
+			update = {},
+			widgets = {}}
 		self.states[args.state] = state
 	end
 	-- Set the background.
 	if args.background then
 		state.background = args.background
+	end
+	-- Set the pointer grab mode.
+	if args.grab ~= nil then
+		state.grab = args.grab
 	end
 	-- Set the hint text.
 	if args.hint then
@@ -309,7 +327,7 @@ Ui.handle_event = function(self, args)
 	local state_ = self.states[self.state]
 	if not state_ then return true end
 	-- Check the mouse event handling mode.
-	local mouse_mode = not Program.cursor_grabbed
+	local mouse_mode = not self.pointer_grab
 	local mouse_event = false
 	if args.type == "mousepress" or args.type == "mouserelease" or
 	   args.type == "mousescroll" or args.type == "mousemotion" then
@@ -482,6 +500,8 @@ Ui.show_state = function(self, state, focus)
 	self.need_autoscroll = true
 	-- Rebuild the help text.
 	self:update_help()
+	-- Update the grab state.
+	self.pointer_grab = self.pointer_grab
 end
 
 --- Internal function that adds all widgets to the window in the right order.
@@ -560,6 +580,10 @@ Ui.update = function(self, secs)
 		end
 		self.need_relayout = true
 	end
+	-- Update the cursor.
+	if not self.pointer_grab then
+		self.cursor:update()
+	end
 	-- Call the update functions of the state.
 	local s = self.states[self.state]
 	if s then
@@ -604,7 +628,7 @@ Ui.update = function(self, secs)
 		end
 	end
 	-- Update mouse focus.
-	if not Program.cursor_grabbed then
+	if not self.pointer_grab then
 		local focus = Widgets.widget_under_cursor
 		if focus then
 			-- Focus a UI widget.
@@ -677,6 +701,9 @@ Ui:add_class_getters{
 		if not self.focused_item then return end
 		return self.widgets[self.focused_item]
 	end,
+	pointer_grab = function(self)
+		return rawget(self, "__pointer_grab")
+	end,
 	scroll_offset = function(self)
 		return rawget(self, "__scroll_offset")
 	end,
@@ -686,6 +713,24 @@ Ui:add_class_getters{
 	end}
 
 Ui:add_class_setters{
+	pointer_grab = function(self, v)
+		-- Set cursor visibility.
+		rawset(self, "__pointer_grab", v)
+		self.cursor.floating = not v
+		-- Set pointer grabbing.
+		-- If the state indicates that the cursor does not need to be grabbed,
+		-- we just hide it so that it can leave the window in windowed mode.
+		local state_ = self.states[self.state]
+		if v then
+			if state_ and state_.grab() then
+				Program.cursor_grabbed = true
+			else
+				Program.cursor_grabbed = false
+			end
+		else
+			Program.cursor_grabbed = false
+		end
+	end,
 	state = function(self, v)
 		self.stack = {v}
 		self:show_state(v)

@@ -54,8 +54,6 @@ Eventhandler{type = "tick", func = function(self, args)
 		Client.options.vsync = v[4]
 		Client.options:save()
 	end
-	-- Update the cursor.
-	Widgets.Cursor.inst:update()
 	-- Update built models.
 	while true do
 		local msg = Client.threads.model_builder:pop_message()
@@ -116,7 +114,7 @@ Eventhandler{type = "tick", func = function(self, args)
 	-- Update the 3D cursor.
 	-- This really needs to be done every frame since the 3rd person
 	-- camera suffers greatly from any big cursor position changes.
-	if Client.player_object and Program.cursor_grabbed then
+	if Client.player_object and Ui.pointer_grab then
 		Player:pick_look()
 	else
 		Target.target_object = nil

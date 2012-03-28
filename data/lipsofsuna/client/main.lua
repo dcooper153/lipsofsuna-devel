@@ -41,7 +41,6 @@ for k,v in pairs(File:scan_directory("client/objects")) do
 end
 
 -- Initialize the UI state.
-Widgets.Cursor.inst = Widgets.Cursor(Iconspec:find{name = "cursor1"})
 Ui:init()
 Client:init()
 Player.crosshair = Object{model = "crosshair1", collision_group = Physics.GROUP_CROSSHAIR}

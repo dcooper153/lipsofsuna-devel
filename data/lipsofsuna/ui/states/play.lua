@@ -23,7 +23,7 @@ Ui:add_state{
 		if not Client.player_object then return end
 		if Client.player_object.dead then
 			Ui.state = "respawn"
-		elseif not Program.cursor_grabbed then
-			Program.cursor_grabbed = true
+		elseif not Ui.pointer_grab then
+			Ui.pointer_grab = true
 		end
 	end}

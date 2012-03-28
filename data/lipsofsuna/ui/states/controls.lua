@@ -1,6 +1,9 @@
 Ui:add_state{
 	state = "controls",
 	label = "Controls",
+	grab = function()
+		return Client.player_object ~= nil
+	end,
 	background = function()
 		if Client.player_object then return end
 		return Widgets.Background{fullscreen = true, image = "mainmenu1"}
