@@ -1,3 +1,5 @@
+require "system/keysym"
+
 Action = Class()
 Action.dict_index = {}
 Action.dict_name = {}

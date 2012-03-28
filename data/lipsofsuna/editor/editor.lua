@@ -1,3 +1,4 @@
+require "editor/controls"
 require "editor/editorcamera"
 require "editor/editorobject"
 require "editor/selection"
