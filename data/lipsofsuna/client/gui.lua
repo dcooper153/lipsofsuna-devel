@@ -20,7 +20,7 @@ Ui.init = function(self)
 	self.label = Widgets.Label{font = "medium"}
 	self.label:set_request{width = 200}
 	self.repeat_timer = 0
-	self.scroll = Widgets.Scrollbar{
+	self.scrollbar = Widgets.Scrollbar{
 		offset = Vector(32, 0),
 		changed = function(w, p) self.scroll_offset = p end}
 end
@@ -323,7 +323,10 @@ Ui.handle_event = function(self, args)
 	if not Program.cursor_grabbed then
 		if args.type == "mousepress" then return end
 		if args.type == "mouserelease" then return end
-		if args.type == "mousescroll" then return end
+		if args.type == "mousescroll" then
+			self:scroll(args.rel > 0 and "up" or "down")
+			return
+		end
 		if args.type == "mousemotion" then return end
 	end
 	-- Tell the caller to handle if no handler did.
@@ -362,6 +365,19 @@ Ui.restart_state = function(self)
 	-- Remove and recreate the state.
 	self:pop_state()
 	self:push_state(s, f)
+end
+
+--- Scrolls the screen.
+-- @param self Ui class.
+Ui.scroll = function(self, dir)
+	if not self.scrollbar.visible then return end
+	local range = self.__scroll_range
+	if not range then return end
+	if dir == "up" then
+		self.scroll_offset = math.max(range[2] - 50, 0)
+	elseif dir == "down" then
+		self.scroll_offset = math.min(range[2] + 50, range[1] - range[3])
+	end
 end
 
 --- Shows a state by name.
@@ -484,7 +500,7 @@ Ui.show_state_attach = function(self)
 		end
 	end
 	if self.widgets[1] then
-		root:add_child(self.scroll)
+		root:add_child(self.scrollbar)
 	end
 	-- Mark repacking as done.
 	self.need_repack = nil
@@ -509,7 +525,7 @@ Ui.show_state_detach = function(self)
 	self.back:detach()
 	self.hint:detach()
 	self.label:detach()
-	self.scroll:detach()
+	self.scrollbar:detach()
 end
 
 --- Updates the user interface system.
@@ -650,6 +666,9 @@ Ui:add_class_getters{
 		if not self.focused_item then return end
 		return self.widgets[self.focused_item]
 	end,
+	scroll_offset = function(self)
+		return rawget(self, "__scroll_offset")
+	end,
 	state = function(self)
 		local s = self.stack[#self.stack]
 		return s or self.root or "play"
@@ -669,12 +688,12 @@ Ui:add_class_setters{
 		local x = (h < self.size.y) and 32 or 53
 		-- Update system widget positions.
 		if h < self.size.y then
-			self.scroll.visible = false
+			self.scrollbar.visible = false
 			self.back:set_request{width = 32, height = h}
 		else
-			self.scroll:set_range(h, v, self.size.y)
-			self.scroll:set_request{height = self.size.y}
-			self.scroll.visible = true
+			self.scrollbar:set_range(h, v, self.size.y)
+			self.scrollbar:set_request{height = self.size.y}
+			self.scrollbar.visible = true
 			self.back:set_request{width = 32, height = self.size.y}
 		end
 		-- Update state widget positions.
@@ -687,4 +706,7 @@ Ui:add_class_setters{
 			widget.visible = (wy > -wh and wy < sh)
 			y = y + wh
 		end
+		-- Store the scrolling state.
+		rawset(self, "__scroll_offset", v)
+		rawset(self, "__scroll_range", {h, v, self.size.y})
 	end}
