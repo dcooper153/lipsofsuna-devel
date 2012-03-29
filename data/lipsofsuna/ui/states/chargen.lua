@@ -84,10 +84,6 @@ Ui:add_state{
 	input = chargen_input,
 	update = chargen_update}
 
-Ui:add_widget{
-	state = "chargen/race",
-	widget = function() return Widgets.Uibutton("Back", function() Ui:pop_state() end) end}
-
 ------------------------------------------------------------------------------
 
 Ui:add_state{
@@ -108,10 +104,6 @@ Ui:add_state{
 	end,
 	input = chargen_input,
 	update = chargen_update}
-
-Ui:add_widget{
-	state = "chargen/presets",
-	widget = function() return Widgets.Uibutton("Back", function() Ui:pop_state() end) end}
 
 ------------------------------------------------------------------------------
 
@@ -153,10 +145,6 @@ Ui:add_widget{
 		end)
 	end}
 
-Ui:add_widget{
-	state = "chargen/body",
-	widget = function() return Widgets.Uibutton("Back", function() Ui:pop_state() end) end}
-
 ------------------------------------------------------------------------------
 
 Ui:add_state{
@@ -194,10 +182,6 @@ Ui:add_state{
 	end,
 	input = chargen_input,
 	update = chargen_update}
-
-Ui:add_widget{
-	state = "chargen/face",
-	widget = function() return Widgets.Uibutton("Back", function() Ui:pop_state() end) end}
 
 ------------------------------------------------------------------------------
 

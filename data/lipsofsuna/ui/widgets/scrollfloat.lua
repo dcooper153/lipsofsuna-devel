@@ -10,11 +10,16 @@ Widgets.Uiscrollfloat.new = function(clss, label, min, max, value, changed)
 	self.value = value
 	self.changed = changed
 	self.step = (max - min) / 10
-	self.hint = "$A: Increment\n$B: Decrement\n$$U\n$$D"
+	self.hint = "$A: Edit\n$$B\n$$U\n$$D"
 	return self
 end
 
 Widgets.Uiscrollfloat.apply = function(self)
+	if not self.input_mode then
+		self.input_mode = true
+		self.hint = "$A: Increment\n$B: Decrement\n$$U\n$$D"
+		return
+	end
 	if self.value == self.max then return end
 	self.value = math.min(self.value + self.step, self.max)
 	self.need_repaint = true
@@ -22,6 +27,9 @@ Widgets.Uiscrollfloat.apply = function(self)
 end
 
 Widgets.Uiscrollfloat.apply_back = function(self)
+	if not self.input_mode then
+		return Widgets.Uiwidget.apply_back(self)
+	end
 	if self.value == self.min then return true end
 	self.value = math.max(self.value - self.step, self.min)
 	self.need_repaint = true
@@ -32,6 +40,15 @@ Widgets.Uiscrollfloat.changed = function(self)
 end
 
 Widgets.Uiscrollfloat.handle_event = function(self, args)
+	if self.input_mode then
+		local action1 = Action.dict_name["menu up"]
+		local action2 = Action.dict_name["menu down"]
+		if (action1 and action1:get_event_response(args) ~= nil) or
+		   (action2 and action2:get_event_response(args) ~= nil) then
+			self.hint = "$A: Edit\n$$B\n$$U\n$$D"
+			self.input_mode = nil
+		end
+	end
 	if not Ui.pointer_grab then
 		if args.type == "mousepress" then
 			if args.button == 2 then
