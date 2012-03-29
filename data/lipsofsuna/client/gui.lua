@@ -36,7 +36,8 @@ end
 --- Adds a heads over display widget to the user interface.
 -- @param self Ui class.
 -- @param args Arguments.<ul>
---   <li>id: Optional widget ID for later identification.</li>
+--   <li>active: Activity control function.</li>
+--   <li>id: Optional ID for identification.</li>
 --   <li>init: Initializer function.</li></ul>
 Ui.add_hud = function(self, args)
 	-- Try to override an existing HUD.
@@ -483,6 +484,20 @@ Ui.show_state = function(self, state, focus)
 	else
 		self.label.text = ""
 		self.hint.offset = Vector(mode[1] - 200, 0)
+	end
+	-- Toggle HUD widgets.
+	for index,hud in pairs(self.huds) do
+		if hud.active and hud.active() then
+			if not hud.widget then
+				hud.widget = hud.init()
+			end
+		else
+			if hud.widget then
+				if hud.free then hud.free(hud.widget) end
+				hud.widget:detach()
+				hud.widget = nil
+			end
+		end
 	end
 	-- Attach the widgets.
 	self:show_state_attach()

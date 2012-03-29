@@ -143,24 +143,6 @@ Client.update = function(self)
 	else
 		Client.sectors.unload_time = 10
 	end
-	Ui:enable_hud("fps")
-	if Ui.root == "play" then
-		Ui:enable_hud("chat")
-		Ui:enable_hud("compass")
-		Ui:enable_hud("crosshair")
-		Ui:enable_hud("health")
-		Ui:enable_hud("modifier")
-		Ui:enable_hud("notification")
-		Ui:enable_hud("willpower")
-	else
-		Ui:disable_hud("chat")
-		Ui:disable_hud("compass")
-		Ui:disable_hud("crosshair")
-		Ui:disable_hud("health")
-		Ui:disable_hud("modifier")
-		Ui:disable_hud("notification")
-		Ui:disable_hud("willpower")
-	end
 end
 
 Client.update_camera = function(self)
