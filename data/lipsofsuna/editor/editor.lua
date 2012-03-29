@@ -29,6 +29,7 @@ Editor.initialize = function(self)
 	end
 	self.light.enabled = true
 	Client.sectors.unload_time = nil
+	if Map then Map:init() end
 end
 
 --- Uninitializes the editor mode.

@@ -4,6 +4,8 @@ Map = Class()
 Map.class_name = "Map"
 
 Map.init = function(self)
+	if self.initialized then return end
+	self.initialized = true
 	local heights = Image("terrainheight1.png")
 	self.heightmap = Heightmap{position = Vector(1024, 1700, 1024), size = 513, scaling = 160, spacing = 4, heights = heights}
 	if not Settings.server then

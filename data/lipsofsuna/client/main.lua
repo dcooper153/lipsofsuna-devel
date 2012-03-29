@@ -56,15 +56,10 @@ end
 
 Program.profiling = {}
 
--- Initialize the map.
--- Graphics and lighting in particulat need to be initialized before this
--- since Ogre uses directional lights to precalculate heightmap lighting.
-if Map then Map:init() end
-
 -- Main loop.
 while not Program.quit do
 	-- Update program state.
-	Program:watchdog_start(300)
+	Program:watchdog_start(30)
 	local t1 = Program.time
 	Program:update()
 	local t2 = Program.time

@@ -41,7 +41,8 @@ Eventhandler{type = "tick", func = function(self, args)
 		Client.data.connection.waiting = false
 		Client.data.connection.connecting = false
 		Client.data.connection.text = "Lost connection to the server!"
-		Ui.state = "start-game"
+		Client.data.load.next_state = "start-game"
+		Ui.state = "load"
 	end
 	-- Update the user interface state.
 	Ui:update(args.secs)

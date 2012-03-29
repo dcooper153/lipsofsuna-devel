@@ -10,6 +10,7 @@ Client.join_game = function(self)
 	self.data.connection.connecting = false
 	self.data.connection.waiting = false
 	-- Enter the start game mode.
-	Ui.state = "start-game"
+	Client.data.load.next_state = "start-game"
+	Ui.state = "load"
 end
 

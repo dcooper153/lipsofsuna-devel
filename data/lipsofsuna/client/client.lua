@@ -112,6 +112,7 @@ Client.reset_data = function(self)
 	self.data.connection = {}
 	self.data.help = {page = "index"}
 	self.data.inventory = {}
+	self.data.load = {}
 	self.data.map = {scale = 1}
 	self.data.modifiers = {}
 	self.data.quests = {sound_timer = Program.time, quests = {}}
@@ -127,22 +128,16 @@ end
 
 Client.update = function(self)
 	-- FIXME
-	if self.player_object then
-		self:update_camera()
-		local player_y = self.player_object.position.y
-		local overworld_y = Map.heightmap.position.y - 10
-		local overworld = (player_y > overworld_y)
-		Map.heightmap.visible = overworld
-		Lighting:set_dungeon_mode(not overworld)
-		local wd = overworld and Options.inst.view_distance or Options.inst.view_distance_underground
-		self.camera1.far = wd
-		self.camera3.far = wd
-	end
-	if Ui.root == "editor" then
-		Client.sectors.unload_time = nil
-	else
-		Client.sectors.unload_time = 10
-	end
+	if not self.player_object then return end
+	self:update_camera()
+	local player_y = self.player_object.position.y
+	local overworld_y = Map.heightmap.position.y - 10
+	local overworld = (player_y > overworld_y)
+	Map.heightmap.visible = overworld
+	Lighting:set_dungeon_mode(not overworld)
+	local wd = overworld and Options.inst.view_distance or Options.inst.view_distance_underground
+	self.camera1.far = wd
+	self.camera3.far = wd
 end
 
 Client.update_camera = function(self)
