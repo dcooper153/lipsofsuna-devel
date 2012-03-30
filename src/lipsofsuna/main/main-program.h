@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,11 @@
 #ifndef __MAIN_PROGRAM_H__
 #define __MAIN_PROGRAM_H__
 
-#include <sys/time.h>
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/callback.h>
-#include <lipsofsuna/engine.h>
-#include <lipsofsuna/paths.h>
-#include <lipsofsuna/script.h>
+#include "lipsofsuna/algorithm.h"
+#include "lipsofsuna/callback.h"
+#include "lipsofsuna/engine.h"
+#include "lipsofsuna/paths.h"
+#include "lipsofsuna/script.h"
 #include "main-extension.h"
 #include "main-message.h"
 
@@ -41,9 +40,9 @@ struct _LIMaiProgram
 	char* args;
 	char* launch_name;
 	char* launch_args;
-	struct timeval start;
-	struct timeval curr_tick;
-	struct timeval prev_tick;
+	LISysTimeval start;
+	LISysTimeval curr_tick;
+	LISysTimeval prev_tick;
 	LIAlgRandom random;
 	LIAlgSectors* sectors;
 	LIAlgStrdic* components;

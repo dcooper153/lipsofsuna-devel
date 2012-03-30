@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -632,9 +632,8 @@ int limai_program_update (
 	float secs;
 
 	/* Calculate time delta. */
-	gettimeofday (&self->curr_tick, NULL);
-	secs = self->curr_tick.tv_sec - self->prev_tick.tv_sec +
-	      (self->curr_tick.tv_usec - self->prev_tick.tv_usec) * 0.000001f;
+	self->curr_tick = lisys_timeval_init ();
+	secs = lisys_timeval_get_diff (self->prev_tick, self->curr_tick);
 	self->prev_tick = self->curr_tick;
 
 	/* Frames per second. */
@@ -728,7 +727,7 @@ static int private_init (
 		return 0;
 
 	/* Initialize timer. */
-	gettimeofday (&self->start, NULL);
+	self->start = lisys_timeval_init ();
 	self->prev_tick = self->start;
 	self->curr_tick = self->start;
 

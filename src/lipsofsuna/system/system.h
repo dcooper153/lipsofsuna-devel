@@ -53,7 +53,4 @@ LIAPICALL (void, lisys_assert_fail, (
 	int         line,
 	const char* func));
 
-LIAPICALL (time_t, lisys_time, (
-	time_t* t));
-
 #endif
