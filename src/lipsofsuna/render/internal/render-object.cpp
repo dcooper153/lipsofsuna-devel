@@ -28,6 +28,7 @@
 #include "lipsofsuna/network.h"
 #include "lipsofsuna/system.h"
 #include "render.h"
+#include "render-entity.hpp"
 #include "render-model.h"
 #include "render-object.h"
 
@@ -86,7 +87,7 @@ void liren_object_free (
 	if (self->node != NULL)
 		self->node->detachAllObjects ();
 	if (self->entity != NULL)
-		self->render->data->scene_manager->destroyEntity (self->entity);
+		OGRE_DELETE self->entity;
 	if (self->particles != NULL)
 		self->render->data->scene_manager->destroyParticleSystem (self->particles);
 	if (self->node != NULL)
@@ -361,25 +362,13 @@ int liren_object_set_model (
 	LIRenObject* self,
 	LIRenModel*  model)
 {
-	/* Update the pose if the model has one. */
-	if (self->pose != NULL)
-	{
-		if (model != NULL)
-			limdl_pose_set_model (self->pose, liren_model_get_model (model));
-		else
-		{
-			limdl_pose_free (self->pose);
-			self->pose = NULL;
-		}
-	}
-
-	self->model = model;
+	LIMdlModel* model_data;
 
 	/* Remove the old entity or particle system. */
 	self->node->detachAllObjects ();
 	if (self->entity != NULL)
 	{
-		self->render->data->scene_manager->destroyEntity (self->entity);
+		OGRE_DELETE self->entity;
 		self->entity = NULL;
 	}
 	if (self->particles != NULL)
@@ -388,16 +377,36 @@ int liren_object_set_model (
 		self->particles = NULL;
 	}
 
-	/* Attach a new entity to the scene node. */
+	/* Store the new render model. */
+	self->model = model;
+
+	/* Create a new entity. */
 	if (model != NULL && !model->mesh.isNull ())
 	{
 		Ogre::String e_name = self->render->data->id.next ();
-		Ogre::String m_name = model->mesh->getName ();
-		self->entity = self->render->data->scene_manager->createEntity (e_name, m_name);
+		self->entity = OGRE_NEW LIRenEntity (e_name, model->mesh);
 		self->node->attachObject (self->entity);
 	}
 
-	/* Set entity flags. */
+	/* Get the model copy created by the entity. */
+	if (self->entity != NULL)
+		model_data = self->entity->get_model ();
+	else
+		model_data = NULL;
+
+	/* Update the pose for the new model data. */
+	if (self->pose != NULL)
+	{
+		if (model_data != NULL)
+			limdl_pose_set_model (self->pose, model_data);
+		else
+		{
+			limdl_pose_free (self->pose);
+			self->pose = NULL;
+		}
+	}
+
+	/* Set the entity flags. */
 	if (self->entity != NULL)
 		self->entity->setCastShadows (self->shadow_casting);
 
@@ -407,20 +416,6 @@ int liren_object_set_model (
 	   hidden or Ogre will render our invisible objects. */
 	if (self->entity != NULL)
 		self->entity->setVisible (self->visible);
-
-	/* Mark all bones as manually controlled. */
-	if (self->entity != NULL)
-	{
-		Ogre::SkeletonInstance* skeleton = self->entity->getSkeleton ();
-		if (skeleton != NULL)
-		{
-			for (int i = 0 ; i < skeleton->getNumBones () ; i++)
-			{
-				Ogre::Bone* bone = skeleton->getBone (i);
-				bone->setManuallyControlled (true);
-			}
-		}
-	}
 
 	return 1;
 }
@@ -446,7 +441,7 @@ int liren_object_set_particle (
 	self->node->detachAllObjects ();
 	if (self->entity != NULL)
 	{
-		self->render->data->scene_manager->destroyEntity (self->entity);
+		OGRE_DELETE self->entity;
 		self->entity = NULL;
 	}
 	if (self->particles != NULL)

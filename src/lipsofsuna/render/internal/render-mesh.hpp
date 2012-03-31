@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,27 +15,30 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_BLOCK_H__
-#define __EXT_BLOCK_H__
+#ifndef __RENDER_INTERNAL_MESH_HPP__
+#define __RENDER_INTERNAL_MESH_HPP__
 
-#include "ext-module.h"
+#include "lipsofsuna/system.h"
+#include "lipsofsuna/model.h"
+#include "render-types.h"
+#include <OgreMesh.h>
 
-struct _LIExtBlock
+class LIRenMesh : public Ogre::Mesh
 {
-	LIExtModule* module;
-	int model;
-	int model_next;
-	int object;
-	int object_next;
+public:
+	LIRenMesh ();
+	LIRenMesh (
+		Ogre::ResourceManager* creator,
+		const Ogre::String&    name,
+		Ogre::ResourceHandle   handle,
+		const Ogre::String&    group,
+		LIRenRender*           render);
+	virtual ~LIRenMesh ();
+	void set_model (LIMdlModel* model);
+	LIMdlModel* get_model () const;
+private:
+	LIRenRender* render;
+	LIMdlModel* model;
 };
-
-LIExtBlock* liext_tiles_render_block_new (
-	LIExtModule* module);
-
-void liext_tiles_render_block_free (
-	LIExtBlock* self);
-
-void liext_tiles_render_block_clear (
-	LIExtBlock* self);
 
 #endif

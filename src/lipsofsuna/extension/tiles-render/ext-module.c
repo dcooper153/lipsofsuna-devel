@@ -254,6 +254,7 @@ static int private_process_result (
 	LIExtBuildTask* task)
 {
 	LIExtBlock* block;
+	LIMatTransform transform;
 
 	/* Delete emptied blocks. */
 	if (task->model == NULL)
@@ -281,11 +282,26 @@ static int private_process_result (
 		}
 	}
 
-	/* Start loading the build model. */
+	/* Start creating the render model. */
 	if (block->model_next)
 		liren_render_model_free (self->render, block->model_next);
 	block->model_next = liren_render_model_new (self->render, task->model, 0);
-	block->offset_next = task->offset;
+
+	/* Start creating the render object. */
+	if (block->object_next)
+		liren_render_object_free (self->render, block->object_next);
+	block->object_next = liren_render_object_new (self->render, 0);
+	if (block->object_next)
+	{
+		transform = limat_transform_init (task->offset, limat_quaternion_identity ());
+		liren_render_object_set_model (self->render, block->object_next, block->model_next);
+		liren_render_object_set_transform (self->render, block->object_next, &transform);
+	}
+	else
+	{
+		liren_render_model_free (self->render, block->model_next);
+		block->model_next = 0;
+	}
 
 	return 1;
 }
@@ -338,7 +354,6 @@ static int private_tick (
 	LIExtBlock* block;
 	LIExtBuildTask* task;
 	LIExtBuildTask* task_next;
-	LIMatTransform transform;
 
 	/* Build blocks in another thread. */
 	/* Without this, there'd be major stuttering when multiple blocks are
@@ -368,37 +383,25 @@ static int private_tick (
 	{
 		/* Filter out up-to-date blocks. */
 		block = iter.value;
-		if (!block->model_next)
+		if (!block->model_next || !block->object_next)
 			continue;
 		if (!liren_render_model_get_loaded (self->render, block->model_next))
 			continue;
 
-		/* Create the render object if one doesn't exist. */
-		if (!block->object)
-		{
-			block->object = liren_render_object_new (self->render, 0);
-			if (!block->object)
-			{
-				liren_render_model_free (self->render, block->model_next);
-				block->model_next = 0;
-				continue;
-			}
-		}
-
-		/* Set the model of the object. */
-		transform = limat_transform_init (block->offset_next, limat_quaternion_identity ());
-		liren_render_object_set_model (self->render, block->object, block->model_next);
-		liren_render_object_set_transform (self->render, block->object, &transform);
-		liren_render_object_set_realized (self->render, block->object, 1);
-
-		/* Mark loading done. */
+		/* Replace the old model. */
 		if (block->model)
-		{
 			liren_render_model_free (self->render, block->model);
-			block->model = 0;
-		}
 		block->model = block->model_next;
 		block->model_next = 0;
+
+		/* Replace the old object. */
+		if (block->object)
+			liren_render_object_free (self->render, block->object);
+		block->object = block->object_next;
+		block->object_next = 0;
+
+		/* Show the finished object. */
+		liren_render_object_set_realized (self->render, block->object, 1);
 	}
 
 	return 1;

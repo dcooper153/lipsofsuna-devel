@@ -26,13 +26,7 @@
 
 #include "lipsofsuna/network.h"
 #include "render-internal.h"
-#include "render-model-loader.hpp"
-#include <OgreSubMesh.h>
-#include <OgreSkeletonManager.h>
-#include <OgreResourceBackgroundQueue.h>
-
-static void private_abort_load (
-	LIRenModel* self);
+#include "render-mesh.hpp"
 
 static void private_create_mesh (
 	LIRenModel* self,
@@ -64,7 +58,6 @@ LIRenModel* liren_model_new (
 		return 0;
 	self->id = 0;
 	self->render = render;
-	self->loader = NULL;
 
 	/* Choose a unique ID. */
 	while (!id)
@@ -104,9 +97,7 @@ void liren_model_free (
 			liren_object_set_model (object, NULL);
 	}
 
-	/* Free the model loader. */
-	private_abort_load (self);
-
+	/* Remove from the model dictionary. */
 	lialg_u32dic_remove (self->render->models, self->id);
 	delete self;
 }
@@ -130,30 +121,23 @@ int liren_model_get_id (
 int liren_model_get_loaded (
 	LIRenModel* self)
 {
-	if (self->loader != NULL)
-		return self->loader->get_completed ();
-	else
-		return 1;
+	if (self->mesh.isNull ())
+		return 0;
+	return self->mesh->isLoaded ();
 }
 
 LIMdlModel* liren_model_get_model (
 	LIRenModel* self)
 {
-	if (self->loader != NULL)
-		return self->loader->get_model ();
-	else
+	if (self->mesh.isNull ())
 		return NULL;
+	return static_cast<LIRenMesh*>(self->mesh.get ())->get_model ();
 }
 
 int liren_model_set_model (
 	LIRenModel* self,
 	LIMdlModel* model)
 {
-	/* Abort the old load. */
-	private_abort_load (self);
-
-	/* Create a new mesh. */
-	/* The old mesh is automatically freed due to the Ogre::MeshPtr overwrite. */
 	private_create_mesh (self, model);
 
 	return 1;
@@ -161,39 +145,11 @@ int liren_model_set_model (
 
 /*****************************************************************************/
 
-static void private_abort_load (
-	LIRenModel* self)
-{
-	/* If the loader has finished, it's deleted immediately. Otherwise,
-	   it's ordered to delete itself without committing the results. */
-	if (self->loader != NULL)
-	{
-		self->loader->abort ();
-		self->loader = NULL;
-	}
-}
-
 static void private_create_mesh (
 	LIRenModel* self,
 	LIMdlModel* model)
 {
-	Ogre::String id = self->render->data->id.next ();
-
-	/* Copy the model. */
-	model = limdl_model_new_copy (model);
-	if (model == NULL)
-		return;
-
-#ifdef LIREN_DISABLE_BACKGROUND_LOADING
-	/* Load the model in this thread. */
-	self->loader = OGRE_NEW LIRenModelLoader (id, self, model);
-	self->loader->start (false);
-#else
-	/* Load the model in a background thread. */
-	lisys_assert (self->loader == NULL);
-	self->loader = OGRE_NEW LIRenModelLoader (id, self, model);
-	self->loader->start (true);
-#endif
+	self->mesh = self->render->data->mesh_manager->create_mesh (model);
 }
 
 /** @} */

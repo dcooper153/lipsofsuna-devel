@@ -208,6 +208,10 @@ int liren_internal_init (
 	self->data->resource_loading_listener = new LIRenResourceLoadingListener (self->paths);
 	mgr.setLoadingListener (self->data->resource_loading_listener);
 
+	/* Create the custom mesh loader. */
+	self->data->mesh_manager = new LIRenMeshManager (self);
+	mgr._registerResourceManager ("LIRenMesh", self->data->mesh_manager);
+
 	/* Create the group for permanent resources. */
 	/* This group is used for resources that are managed by Ogre. They
 	   include textures and various scripts detected at initialization.
@@ -229,7 +233,6 @@ int liren_internal_init (
 	self->data->texture_manager = &Ogre::TextureManager::getSingleton ();
 	self->data->texture_manager->setDefaultNumMipmaps (5);
 	self->data->material_manager = &Ogre::MaterialManager::getSingleton ();
-	self->data->mesh_manager = &Ogre::MeshManager::getSingleton ();
 	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups ();
 
 	return 1;
@@ -240,6 +243,8 @@ void liren_internal_deinit (
 {
 	if (self->data != NULL)
 	{
+		Ogre::ResourceGroupManager::getSingleton ()._unregisterResourceManager ("LIRenMesh");
+		delete self->data->mesh_manager;
 		delete self->data->resource_loading_listener;
 		delete self->data->root;
 		delete self->data->container_factory;
@@ -598,7 +603,7 @@ int liren_internal_update (
 	if (self->data->unload_timer > 2.0f)
 	{
 		self->data->unload_timer = 0.0f;
-		private_unload_unused_resources (self, Ogre::MeshManager::getSingleton ());
+		private_unload_unused_resources (self, *self->data->mesh_manager);
 		private_unload_unused_resources (self, Ogre::SkeletonManager::getSingleton ());
 		private_unload_unused_resources (self, Ogre::MaterialManager::getSingleton ());
 		private_unload_unused_resources (self, Ogre::TextureManager::getSingleton ());
@@ -717,8 +722,8 @@ void liren_internal_get_stats (
 	result->material_count = private_count_resources (self, Ogre::MaterialManager::getSingleton ());
 	result->material_count = private_count_resources (self, Ogre::MaterialManager::getSingleton ());
 	result->material_count_loaded = private_count_resources_loaded (self, Ogre::MaterialManager::getSingleton ());
-	result->mesh_count = private_count_resources (self, Ogre::MeshManager::getSingleton ());
-	result->mesh_memory = (int) Ogre::MeshManager::getSingleton ().getMemoryUsage ();
+	result->mesh_count = private_count_resources (self, *self->data->mesh_manager);
+	result->mesh_memory = (int) self->data->mesh_manager->getMemoryUsage ();
 	result->skeleton_count = private_count_resources (self, Ogre::SkeletonManager::getSingleton ());
 	result->texture_count = private_count_resources (self, Ogre::TextureManager::getSingleton ());
 	result->texture_count_loaded = private_count_resources_loaded (self, Ogre::TextureManager::getSingleton ());

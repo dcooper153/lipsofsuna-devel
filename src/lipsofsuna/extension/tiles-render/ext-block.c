@@ -59,6 +59,11 @@ void liext_tiles_render_block_clear (
 		liren_render_object_free (self->module->render, self->object);
 		self->object = 0;
 	}
+	if (self->object_next)
+	{
+		liren_render_object_free (self->module->render, self->object_next);
+		self->object_next = 0;
+	}
 	if (self->model)
 	{
 		liren_render_model_free (self->module->render, self->model);

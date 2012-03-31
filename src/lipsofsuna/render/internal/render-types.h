@@ -49,8 +49,10 @@ typedef struct _LIRenRenderData LIRenRenderData;
 #include <OgreMaterialManager.h>
 #include <OgreTextAreaOverlayElement.h>
 #include "render-container-factory.hpp"
+#include "render-entity.hpp"
 #include "render-image-overlay-factory.hpp"
-#include "render-model-loader.hpp"
+#include "render-mesh-builder.hpp"
+#include "render-mesh-manager.hpp"
 #include "render-resource-loading-listener.hpp"
 #include "render-unique-id.hpp"
 struct _LIRenLight
@@ -64,8 +66,8 @@ struct _LIRenLight
 struct _LIRenModel
 {
 	int id;
+	LIMdlModel* model;
 	LIRenRender* render;
-	LIRenModelLoader* loader;
 	Ogre::MeshPtr mesh;
 };
 struct _LIRenObject
@@ -77,7 +79,7 @@ struct _LIRenObject
 	LIMdlPose* pose;
 	LIRenModel* model;
 	LIRenRender* render;
-	Ogre::Entity* entity;
+	LIRenEntity* entity;
 	Ogre::ParticleSystem* particles;
 	Ogre::SceneNode* node;
 };
@@ -103,7 +105,6 @@ struct _LIRenRenderData
 	Ogre::Root* root;
 	Ogre::Camera* camera;
 	Ogre::MaterialManager* material_manager;
-	Ogre::MeshManager* mesh_manager;
 	Ogre::OverlayManager* overlay_manager;
 	Ogre::RenderWindow* render_window;
 	Ogre::RenderSystem* render_system;
@@ -114,6 +115,7 @@ struct _LIRenRenderData
 	Ogre::LogManager* log;
 	LIRenContainerFactory* container_factory;
 	LIRenImageOverlayFactory* image_factory;
+	LIRenMeshManager* mesh_manager;
 	LIRenResourceLoadingListener* resource_loading_listener;
 	LIRenUniqueId id;
 };

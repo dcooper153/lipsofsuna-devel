@@ -15,38 +15,30 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_MODEL_LOADER_HPP__
-#define __RENDER_MODEL_LOADER_HPP__
+#ifndef __RENDER_MESH_BUILDER_HPP__
+#define __RENDER_MESH_BUILDER_HPP__
 
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/model.h"
-class LIRenModelLoader;
 #include "render-types.h"
 #include <OgreResource.h>
-#include <OgreResourceBackgroundQueue.h>
 
-class LIRenModelLoader : public Ogre::ManualResourceLoader, Ogre::ResourceBackgroundQueue::Listener
+class LIRenMeshBuilder : public Ogre::ManualResourceLoader
 {
 public:
-	LIRenModelLoader (const Ogre::String& id, LIRenModel* model_dst, LIMdlModel* model_src);
-	virtual ~LIRenModelLoader ();
-public:
-	void abort ();
-	void start (bool background);
-	bool get_aborted ();
-	bool get_completed ();
-	LIMdlModel* get_model ();
-public:
+	LIRenMeshBuilder (LIRenRender* render);
+	virtual ~LIRenMeshBuilder ();
+private:
 	virtual void loadResource (Ogre::Resource* resource);
 	virtual void prepareResource (Ogre::Resource* resource);
-	virtual void operationCompleted (
-		Ogre::BackgroundProcessTicket ticket,
-		const Ogre::BackgroundProcessResult& result);
+public:
+	bool is_idle () const;
+	void set_model (LIMdlModel* model);
+	void step_1_bg (Ogre::Mesh* mesh);
+	void step_2_fg (Ogre::Mesh* mesh);
+	void step_3_fg (Ogre::Mesh* mesh);
 private:
-	void init ();
-	void prepare_mesh (Ogre::Mesh* mesh);
-	void create_mesh (Ogre::Mesh* mesh);
-	void create_material (LIMdlMaterial* mat, int index, Ogre::SubMesh* submesh);
+	Ogre::MaterialPtr create_material (LIMdlMaterial* mat);
 	bool create_skeleton (Ogre::Mesh* mesh);
 	bool check_material_override (Ogre::MaterialPtr& material);
 	bool check_name_override (const Ogre::String& name);
@@ -54,15 +46,11 @@ private:
 	void override_pass (LIMdlMaterial* mat, Ogre::Pass* pass);
 	void update_entities ();
 private:
-	bool aborted;
-	bool completed;
-	bool prepared;
-	Ogre::String id;
+	/* Static data. */
 	LIRenRender* render;
 	LIMdlModel* model;
-	LIRenModel* model_dst;
-	Ogre::BackgroundProcessTicket ticket;
 	/* Prepared data. */
+	int step;
 	size_t buffer_size_0;
 	size_t buffer_size_1;
 	size_t buffer_size_2;

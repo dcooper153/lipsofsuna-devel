@@ -20,153 +20,22 @@
  * @{
  * \addtogroup LIRenInternal Internal
  * @{
- * \addtogroup LIRenModelLoader ModelLoader
+ * \addtogroup LIRenMeshBuilder MeshBuilder
  * @{
  */
 
 #include "lipsofsuna/system.h"
-#include "render-model-loader.hpp"
+#include "render-mesh-builder.hpp"
 #include "render.h"
 #include "render-object.h"
 #include <OgreSubMesh.h>
 #include <OgreSkeletonManager.h>
 
-LIRenModelLoader::LIRenModelLoader (const Ogre::String& id, LIRenModel* model_dst, LIMdlModel* model_src) :
-	id (id), render (model_dst->render), model (model_src), model_dst (model_dst),
-	buffer_data_0 (0), buffer_data_1 (0), buffer_data_2 (0)
+LIRenMeshBuilder::LIRenMeshBuilder (LIRenRender* render)
 {
-	aborted = false;
-	completed = false;
-	prepared = false;
-	init ();
-}
-
-LIRenModelLoader::~LIRenModelLoader ()
-{
-	/* Free the buffer data. */
-	init ();
-
-	/* Free the model data. */
-	if (model != NULL)
-		limdl_model_free (model);
-}
-
-void LIRenModelLoader::abort ()
-{
-	/* Since loading is always finished in the main thread and this function is
-	   only called from there, there can be no race condition. Either loading is
-	   already finished or it will be finished only after this call exits. */
-	if (completed)
-	{
-		/* Loading has been completed already so delete ourselves. The caller
-		   has started a new load or been deleted so no one is referencing us
-		   anymore. */
-		OGRE_DELETE this;
-	}
-	else
-	{
-		/* The completion handler has yet to be called, and we can't delete
-		   before that. Set the "aborted" flag so that we know to delete
-		   ourselves there. */
-		aborted = true;
-	}
-}
-
-void LIRenModelLoader::start (bool background)
-{
-	if (background)
-	{
-		/* Load in a background thread. */
-		completed = false;
-		prepared = false;
-		ticket = Ogre::ResourceBackgroundQueue::getSingleton ().load (
-			"Mesh", id, LIREN_RESOURCES_TEMPORARY, true, this, 0, this);
-	}
-	else
-	{
-		/* Load in this thread and block until done. */
-		model_dst->mesh = Ogre::MeshManager::getSingleton ().createManual (id,
-			LIREN_RESOURCES_TEMPORARY, this);
-		model_dst->mesh->load ();
-		completed = true;
-		update_entities ();
-	}
-}
-
-bool LIRenModelLoader::get_aborted ()
-{
-	return aborted;
-}
-
-bool LIRenModelLoader::get_completed ()
-{
-	return completed;
-}
-
-LIMdlModel* LIRenModelLoader::get_model ()
-{
-	return model;
-}
-
-void LIRenModelLoader::loadResource (Ogre::Resource* resource)
-{
-	if (aborted)
-		return;
-
-	lisys_assert (resource->getName () == id);
-	if (!prepared)
-		prepare_mesh ((Ogre::Mesh*) resource);
-	create_mesh ((Ogre::Mesh*) resource);
-	init ();
-}
-
-void LIRenModelLoader::prepareResource (Ogre::Resource* resource)
-{
-	if (aborted)
-		return;
-
-	lisys_assert (resource->getName () == id);
-	prepare_mesh ((Ogre::Mesh*) resource);
-	prepared = true;
-}
-
-/**
- * \brief Called by Ogre when the mesh has been loaded completely.
- *
- * This is always called in the main thread. Because of that, we don't need to
- * pay attention to thread safety. However, we need to still take aborting into
- * account since it could occur while we were working.
- *
- * If the loading was aborted, we must not make any calls to the model whose
- * mesh we were loaded since it could have already been deleted. The caller has
- * no reference to us anymore so we must delete ourselves or we'd leak memory.
- *
- * \param ticket Background process ticket.
- * \param result Background process result.
- */
-void LIRenModelLoader::operationCompleted (
-	Ogre::BackgroundProcessTicket ticket,
-	const Ogre::BackgroundProcessResult& result)
-{
-	if (aborted)
-	{
-		OGRE_DELETE this;
-	}
-	else
-	{
-		/* Update the mesh of the caller. */
-		model_dst->mesh = render->data->mesh_manager->getByName (id);
-		update_entities ();
-	}
-}
-
-void LIRenModelLoader::init ()
-{
-	delete[] buffer_data_0;
-	delete[] buffer_data_1;
-	delete[] buffer_data_2;
-	prepared = false;
-	completed = true;
+	step = 0;
+	this->render = render;
+	this->model = NULL;
 	buffer_size_0 = 0;
 	buffer_size_1 = 0;
 	buffer_size_2 = 0;
@@ -177,7 +46,75 @@ void LIRenModelLoader::init ()
 	vertex_buffer_binding = NULL;
 }
 
-void LIRenModelLoader::prepare_mesh (Ogre::Mesh* mesh)
+LIRenMeshBuilder::~LIRenMeshBuilder ()
+{
+	delete[] buffer_data_0;
+	delete[] buffer_data_1;
+	delete[] buffer_data_2;
+}
+
+void LIRenMeshBuilder::prepareResource (Ogre::Resource* resource)
+{
+	if (step < 1)
+	{
+		step_1_bg ((Ogre::Mesh*) resource);
+		step = 1;
+	}
+}
+
+void LIRenMeshBuilder::loadResource (Ogre::Resource* resource)
+{
+	if (step < 1)
+	{
+		step_1_bg ((Ogre::Mesh*) resource);
+		step = 1;
+	}
+	if (step < 2)
+	{
+		step_2_fg ((Ogre::Mesh*) resource);
+		step = 2;
+	}
+	if (step < 3)
+	{
+		step_3_fg ((Ogre::Mesh*) resource);
+		step = 3;
+	}
+	step = 0;
+	delete[] buffer_data_0;
+	delete[] buffer_data_1;
+	delete[] buffer_data_2;
+	buffer_data_0 = NULL;
+	buffer_data_1 = NULL;
+	buffer_data_2 = NULL;
+	vertex_data = NULL;
+	vertex_buffer_binding = NULL;
+}
+
+bool LIRenMeshBuilder::is_idle () const
+{
+	return step == 0;
+}
+
+void LIRenMeshBuilder::set_model (LIMdlModel* model)
+{
+	this->model = model;
+}
+
+/**
+ * \brief Prepares the mesh.
+ *
+ * This is called from the background thread. It basically does everything
+ * except material initialization, which was done before, and vertex buffer
+ * initialization, which must be done in load_mesh() due to thread safe issues.
+ *
+ * Materials are also loaded here. They are loaded in yet another background
+ * loader. The function waits for the background loading of the materials to
+ * finish, but since this is done in a background thread, the main thread will
+ * never stall.
+ *
+ * \param mesh Ogre mesh to prepare.
+ */
+void LIRenMeshBuilder::step_1_bg (Ogre::Mesh* mesh)
 {
 	if (!model->vertices.count || !model->lod.count)
 		return;
@@ -274,7 +211,7 @@ void LIRenModelLoader::prepare_mesh (Ogre::Mesh* mesh)
 	lisys_assert (j == 5 * model->vertices.count);
 
 	/* Create submeshes. */
-	/* Materials and the index buffer cannot be prepared yet. */
+	/* The index buffer cannot be prepared yet since it doesn't exist. */
 	for (int i = 0 ; i < lod->face_groups.count ; i++)
 	{
 		Ogre::SubMesh* submesh = mesh->createSubMesh ();
@@ -293,7 +230,31 @@ void LIRenModelLoader::prepare_mesh (Ogre::Mesh* mesh)
 		(model->bounds.max.z - model->bounds.min.z));
 }
 
-void LIRenModelLoader::create_mesh (Ogre::Mesh* mesh)
+/**
+ * \brief Creates the materials.
+ */
+void LIRenMeshBuilder::step_2_fg (Ogre::Mesh* mesh)
+{
+	if (!model->vertices.count || !model->lod.count)
+		return;
+
+	for (int i = 0 ; i < model->materials.count ; i++)
+	{
+		Ogre::MaterialPtr material = create_material (model->materials.array + i);
+		Ogre::SubMesh* submesh = mesh->getSubMesh (i);
+		submesh->setMaterialName (material->getName ());
+	}
+}
+
+/**
+ * \brief Creates the mesh.
+ *
+ * This is called from the main thread. It creates the vertex buffers and
+ * initializes the skeleton.
+ *
+ * \param mesh Ogre mesh to finish.
+ */
+void LIRenMeshBuilder::step_3_fg (Ogre::Mesh* mesh)
 {
 	if (!model->vertices.count || !model->lod.count)
 		return;
@@ -329,12 +290,11 @@ void LIRenModelLoader::create_mesh (Ogre::Mesh* mesh)
 	index_buffer->writeData (0, index_buffer->getSizeInBytes (), lod->indices.array, true);
 
 	/* Complete submeshes. */
-	/* Materials and the index buffer need to be setup here since prepare couldn't do it. */
+	/* The index buffer needs to be setup here since prepare couldn't do it. */
 	for (int i = 0 ; i < lod->face_groups.count ; i++)
 	{
 		Ogre::SubMesh* submesh = mesh->getSubMesh (i);
 		submesh->indexData->indexBuffer = index_buffer;
-		create_material (model->materials.array + i, i, submesh);
 	}
 
 	/* Create a skeleton if needed. */
@@ -350,12 +310,15 @@ void LIRenModelLoader::create_mesh (Ogre::Mesh* mesh)
 	}
 }
 
-void LIRenModelLoader::create_material (
-	LIMdlMaterial* mat,
-	int            index,
-	Ogre::SubMesh* submesh)
+/**
+ * \brief Creates a material.
+ * \param mat Model material.
+ */
+Ogre::MaterialPtr LIRenMeshBuilder::create_material (
+	LIMdlMaterial* mat)
 {
 	bool existing = false;
+	bool override = true;
 	Ogre::MaterialPtr material;
 	Ogre::String unique_name = render->data->id.next ();
 
@@ -398,30 +361,30 @@ void LIRenModelLoader::create_material (
 	   so that it can be removed when the model is garbage collected. */
 	if (existing)
 	{
-		if (!check_material_override (material))
-		{
-			submesh->setMaterialName (material->getName ());
-			return;
-		}
-		material = material->clone (unique_name, true, LIREN_RESOURCES_TEMPORARY);
+		if (check_material_override (material))
+			material = material->clone (unique_name, true, LIREN_RESOURCES_TEMPORARY);
+		else
+			override = false;
 	}
 
 	/* Override the fields of techniques. */
-	for (int i = 0 ; i < material->getNumTechniques () ; i++)
+	if (override)
 	{
-		Ogre::Technique* technique = material->getTechnique (i);
-		Ogre::Pass* pass = technique->getPass (0);
-		if (existing)
-			override_pass (mat, pass);
-		else
-			initialize_pass (mat, pass);
+		for (int i = 0 ; i < material->getNumTechniques () ; i++)
+		{
+			Ogre::Technique* technique = material->getTechnique (i);
+			Ogre::Pass* pass = technique->getPass (0);
+			if (existing)
+				override_pass (mat, pass);
+			else
+				initialize_pass (mat, pass);
+		}
 	}
 
-	/* Assign the material to the submesh. */
-	submesh->setMaterialName (material->getName ());
+	return material;
 }
 
-bool LIRenModelLoader::create_skeleton (Ogre::Mesh* mesh)
+bool LIRenMeshBuilder::create_skeleton (Ogre::Mesh* mesh)
 {
 	Ogre::Bone* bone;
 	LIMdlWeightGroup* group;
@@ -474,7 +437,7 @@ bool LIRenModelLoader::create_skeleton (Ogre::Mesh* mesh)
 	return true;
 }
 
-bool LIRenModelLoader::check_material_override (
+bool LIRenMeshBuilder::check_material_override (
 	Ogre::MaterialPtr& material)
 {
 	for (int k = 0 ; k < material->getNumTechniques () ; k++)
@@ -497,7 +460,7 @@ bool LIRenModelLoader::check_material_override (
 	return false;
 }
 
-bool LIRenModelLoader::check_name_override (
+bool LIRenMeshBuilder::check_name_override (
 	const Ogre::String& name)
 {
 	if (name.size () < 3)
@@ -507,7 +470,7 @@ bool LIRenModelLoader::check_name_override (
 	return 1;
 }
 
-void LIRenModelLoader::initialize_pass (
+void LIRenMeshBuilder::initialize_pass (
 	LIMdlMaterial* mat,
 	Ogre::Pass*    pass)
 {
@@ -526,7 +489,7 @@ void LIRenModelLoader::initialize_pass (
 	}
 }
 
-void LIRenModelLoader::override_pass (
+void LIRenMeshBuilder::override_pass (
 	LIMdlMaterial* mat,
 	Ogre::Pass*    pass)
 {
@@ -569,17 +532,6 @@ void LIRenModelLoader::override_pass (
 				state->setTextureName (texname + ".dds");
 			j++;
 		}
-	}
-}
-
-void LIRenModelLoader::update_entities ()
-{
-	LIAlgU32dicIter iter;
-	LIALG_U32DIC_FOREACH (iter, render->objects)
-	{
-		LIRenObject* object = (LIRenObject*) iter.value;
-		if (object->model == model_dst)
-			liren_object_model_changed (object);
 	}
 }
 
