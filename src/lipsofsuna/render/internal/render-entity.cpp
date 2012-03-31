@@ -66,9 +66,9 @@ void LIRenEntity::initialize ()
 
 LIMdlModel* LIRenEntity::get_model () const
 {
-	if (mMesh.isNull ())
+	if (background_loaded_mesh.isNull ())
 		return NULL;
-	return static_cast<LIRenMesh*>(mMesh.get ())->get_model ();
+	return static_cast<LIRenMesh*>(background_loaded_mesh.get ())->get_model ();
 }
 
 /** @} */

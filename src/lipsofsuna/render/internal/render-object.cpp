@@ -127,7 +127,6 @@ int liren_object_channel_animate (
 			return 0;
 		if (self->model != NULL)
 			limdl_pose_set_model (self->pose, liren_model_get_model (self->model));
-		/* TODO */
 	}
 
 	/* Avoid restarts in simple cases. */
@@ -395,16 +394,12 @@ int liren_object_set_model (
 		model_data = NULL;
 
 	/* Update the pose for the new model data. */
+	/* The model data might be NULL currently, but that can be because the model
+	   is is still loading in the background. We cannot remove the pose because
+	   of that since the caller might want to transfer it to the new model once
+	   it has loaded. */
 	if (self->pose != NULL)
-	{
-		if (model_data != NULL)
-			limdl_pose_set_model (self->pose, model_data);
-		else
-		{
-			limdl_pose_free (self->pose);
-			self->pose = NULL;
-		}
-	}
+		limdl_pose_set_model (self->pose, model_data);
 
 	/* Set the entity flags. */
 	if (self->entity != NULL)

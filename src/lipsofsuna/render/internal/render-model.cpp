@@ -149,7 +149,17 @@ static void private_create_mesh (
 	LIRenModel* self,
 	LIMdlModel* model)
 {
+	/* Create the new mesh. */
 	self->mesh = self->render->data->mesh_manager->create_mesh (model);
+
+	/* Tell objects using the old mesh to rebuild. */
+	LIAlgU32dicIter iter;
+	LIALG_U32DIC_FOREACH (iter, self->render->objects)
+	{
+		LIRenObject* object = (LIRenObject*) iter.value;
+		if (object->model == self)
+			liren_object_model_changed (object);
+	}
 }
 
 /** @} */
