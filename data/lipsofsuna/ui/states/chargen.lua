@@ -1,4 +1,4 @@
-local chargen_update = function(args)
+local chargen_input = function(args)
 	return Operators.chargen:input(args)
 end
 
