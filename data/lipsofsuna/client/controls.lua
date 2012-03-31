@@ -227,6 +227,10 @@ Action{name = "quickslot_10", mode = "press", key1 = Keysym.NUM0, func = functio
 	Quickslots:activate(10)
 end}
 
+Action{name = "rotate_camera", mode = "toggle", key1 = Keysym.LCTRL, func = function(v)
+	Operators.camera:set_rotation_mode(v)
+end}
+
 Action{name = "run", mode = "toggle", key1 = Keysym.LSHIFT, func = function(v)
 	if not Client.player_object then return end
 	Network:send{packet = Packet(packets.PLAYER_RUN, "bool", not v)}
@@ -246,7 +250,7 @@ Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 	if not Client.player_object then return end
 	local sens = 0.01 * Client.options.mouse_sensitivity
 	if Client.options.invert_mouse then sens = -sens end
-	if Action.dict_press[Keysym.LCTRL] then
+	if Operators.camera:get_rotation_mode() then
 		Client.camera.tilt_state = Client.camera.tilt_state - v * sens
 	else
 		Player.tilt_state = Player.tilt_state + v * sens
@@ -256,7 +260,7 @@ end}
 Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
 	if not Client.player_object then return end
 	local sens = 0.01 * Client.options.mouse_sensitivity
-	if Action.dict_press[Keysym.LCTRL] then
+	if Operators.camera:get_rotation_mode() then
 		Client.camera.turn_state = Client.camera.turn_state + v * sens
 	else
 		Player.turn_state = Player.turn_state - v * sens

@@ -105,6 +105,7 @@ Client.create_world = function(self)
 end
 
 Client.reset_data = function(self)
+	Operators.camera:reset()
 	Operators.chargen:reset()
 	self.data = {}
 	self.data.admin = {}
