@@ -17,6 +17,7 @@ Ui:add_state{
 			Ui.state = Client.data.load.next_state
 		end
 		if Client.data.load.timer >= 0.1 then
+			Client:create_world()
 			Map:init()
 		end
 		Client.data.load.timer = Client.data.load.timer + secs

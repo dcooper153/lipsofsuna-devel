@@ -238,9 +238,9 @@ static void private_physics_transform (
 	LIEngObject* obj;
 	LIMatTransform transform;
 
-	/* Find physics object. */
+	/* Find the engine object. */
 	obj = liphy_object_get_userdata (object);
-	if (obj == NULL || obj->sector == NULL)
+	if (obj == NULL || !lieng_object_get_realized (obj))
 		return;
 
 	/* Copy the transformation to the engine object. We set the silence

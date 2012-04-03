@@ -94,13 +94,15 @@ end
 --- Creates the static terrain and objects of the world.
 -- @param self Client.
 Client.create_world = function(self)
-	-- Create static objects.
+	-- Clear the world.
+	for k,v in pairs(Object.objects) do v:detach() end
+	self.sectors:erase_world()
+	-- Create the static objects.
 	for k,v in pairs(Staticspec.dict_id) do
-		Object{spec = v, type = v.type, model = v.model,
+		Staticobject{spec = v, type = v.type, model = v.model,
 			collision_group = v.collision_group,
 			collision_mask = v.collision_mask,
-			position = v.position, rotation = v.rotation, realized = true,
-			disable_unloading = true, disabling_saving = true}
+			position = v.position, rotation = v.rotation, realized = true}
 	end
 end
 

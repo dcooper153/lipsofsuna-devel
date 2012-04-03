@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,9 +29,16 @@
 #include <lipsofsuna/script.h>
 #endif
 
+enum
+{
+	LIENG_OBJECT_FLAG_STATIC = 0x01,
+	LIENG_OBJECT_FLAG_REALIZED = 0x02
+};
+
 struct _LIEngObject
 {
 	uint32_t id;
+	int flags;
 	LIEngEngine* engine;
 	LIEngModel* model;
 	LIEngSector* sector;
@@ -83,6 +90,14 @@ LIAPICALL (int, lieng_object_set_realized, (
 
 LIAPICALL (LIEngSector*, lieng_object_get_sector, (
 	LIEngObject* self));
+
+
+LIAPICALL (int, lieng_object_get_static, (
+	const LIEngObject* self));
+
+LIAPICALL (void, lieng_object_set_static, (
+	LIEngObject* self,
+	int          value));
 
 LIAPICALL (void, lieng_object_get_transform, (
 	const LIEngObject* self,

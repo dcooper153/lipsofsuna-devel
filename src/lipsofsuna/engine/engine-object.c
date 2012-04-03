@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -101,24 +101,12 @@ void lieng_object_free (
 int lieng_object_moved (
 	LIEngObject* self)
 {
-	LIEngSector* dst;
-	LIEngSector* src;
 	LIMatTransform transform;
 
 	/* Move between sectors. */
 	lieng_object_get_transform (self, &transform);
-	src = self->sector;
-	dst = lialg_sectors_data_point (self->engine->sectors, LIALG_SECTORS_CONTENT_ENGINE, &transform.position, 1);
-	if (dst == NULL)
+	if (!private_warp (self, &transform.position))
 		return 0;
-	if (src != dst)
-	{
-		if (lialg_u32dic_insert (dst->objects, self->id, self) == NULL)
-			return 0;
-		if (src != NULL)
-			lialg_u32dic_remove (src->objects, self->id);
-		self->sector = dst;
-	}
 
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->engine->callbacks, "object-motion", lical_marshal_DATA_PTR, self);
@@ -216,9 +204,7 @@ int lieng_object_set_model (
 int lieng_object_get_realized (
 	const LIEngObject* self)
 {
-	if (self->sector == NULL)
-		return 0;
-	return 1;
+	return (self->flags & LIENG_OBJECT_FLAG_REALIZED) != 0;
 }
 
 /**
@@ -248,10 +234,11 @@ int lieng_object_set_realized (
 		return 1;
 	if (value)
 	{
-		/* Link to map. */
+		/* Link to the map. */
 		lieng_object_get_transform (self, &transform);
 		if (!private_warp (self, &transform.position))
 			return 0;
+		self->flags |= LIENG_OBJECT_FLAG_REALIZED;
 
 		/* Invoke callbacks. */
 		lical_callbacks_call (self->engine->callbacks, "object-visibility", lical_marshal_DATA_PTR_INT, self, 1);
@@ -261,18 +248,66 @@ int lieng_object_set_realized (
 		/* Invoke callbacks. */
 		lical_callbacks_call (self->engine->callbacks, "object-visibility", lical_marshal_DATA_PTR_INT, self, 0);
 
-		/* Remove from map. */
-		lialg_u32dic_remove (self->sector->objects, self->id);
-		self->sector = NULL;
+		/* Remove from the map. */
+		if (self->sector != NULL)
+		{
+			lialg_u32dic_remove (self->sector->objects, self->id);
+			self->sector = NULL;
+		}
+		self->flags &= ~LIENG_OBJECT_FLAG_REALIZED;
 	}
 
 	return 1;
 }
 
+/**
+ * \brief Returns the current sector of the object.
+ * \param self Object.
+ * \return Sector or NULL.
+ */
 LIEngSector* lieng_object_get_sector (
 	LIEngObject* self)
 {
 	return self->sector;
+}
+
+/**
+ * \brief Returns nonzero if the object is static.
+ * \param self Object.
+ * \return Nonzero if static.
+ */
+int lieng_object_get_static (
+	const LIEngObject* self)
+{
+	return (self->flags & LIENG_OBJECT_FLAG_STATIC) != 0;
+}
+
+/**
+ * \brief Sets whether the object is static.
+ * \param self Object.
+ * \param value Nonzero for static.
+ */
+void lieng_object_set_static (
+	LIEngObject* self,
+	int          value)
+{
+	LIMatTransform transform;
+
+	if (value)
+	{
+		self->flags |= LIENG_OBJECT_FLAG_STATIC;
+		if (self->sector != NULL)
+		{
+			lialg_u32dic_remove (self->sector->objects, self->id);
+			self->sector = NULL;
+		}
+	}
+	else
+	{
+		self->flags &= ~LIENG_OBJECT_FLAG_STATIC;
+		lieng_object_get_transform (self, &transform);
+		private_warp (self, &transform.position);
+	}
 }
 
 /**
@@ -297,15 +332,9 @@ int lieng_object_set_transform (
 	LIEngObject*          self,
 	const LIMatTransform* value)
 {
-	int realized;
-
 	/* Warp to new position. */
-	realized = lieng_object_get_realized (self);
-	if (realized)
-	{
-		if (!private_warp (self, &value->position))
-			return 0;
-	}
+	if (!private_warp (self, &value->position))
+		return 0;
 	self->transform = *value;
 
 	/* Invoke callbacks. */
@@ -323,11 +352,27 @@ static int private_warp (
 	LIEngSector* dst;
 	LIEngSector* src;
 
-	/* Move between sectors. */
+	/* Do not warp hidden objects. */
+	if (!(self->flags & LIENG_OBJECT_FLAG_REALIZED))
+	{
+		lisys_assert (self->sector == NULL);
+		return 1;
+	}
+
+	/* Do not add static objects to sectors. */
+	if (self->flags & LIENG_OBJECT_FLAG_STATIC)
+	{
+		lisys_assert (self->sector == NULL);
+		return 1;
+	}
+
+	/* Get the source and destination sectors. */
 	src = self->sector;
 	dst = lialg_sectors_data_point (self->engine->sectors, LIALG_SECTORS_CONTENT_ENGINE, position, 1);
 	if (dst == NULL)
 		return 0;
+
+	/* Move between the sectors. */
 	if (src != dst)
 	{
 		if (lialg_u32dic_insert (dst->objects, self->id, self) == NULL)

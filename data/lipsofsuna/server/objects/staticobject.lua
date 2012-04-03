@@ -28,12 +28,12 @@ Staticobject.new = function(clss, args)
 			self[n] = (args[n] ~= nil) and args[n] or d
 		end
 	end
+	self.static = true
 	copy("rotation")
 	copy("position")
 	copy("spec")
 	copy("realized")
 	copy("variables")
-	self.disable_unloading = true
 	self.disable_saving = true
 	return self
 end

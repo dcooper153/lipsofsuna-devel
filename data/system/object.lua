@@ -97,6 +97,16 @@ end
 -- @name Object.sector
 -- @class table
 
+--- The static object status of the object.
+--
+-- Static objects are not affected by the regular sector loading and unloading
+-- scheme. They will persist and retain their rendering and physics status even
+-- after the sector has been unloaded. On the contrary, non-static objects
+-- cannot remain visible if the sector in which they are is hidden.
+--
+-- @name Object.static
+-- @class table
+
 Object:add_getters{
 	bounding_box = function(self)
 		local m = rawget(self, "__model")
@@ -108,40 +118,42 @@ Object:add_getters{
 		if not m then return Vector() end
 		return m.center_offset
 	end,
-	model = function(s) return rawget(s, "__model") end,
-	model_name = function(s)
-		local m = rawget(s, "__model")
+	model = function(self) return rawget(self, "__model") end,
+	model_name = function(self)
+		local m = rawget(self, "__model")
 		return m and m.name or ""
 	end,
-	position = function(s) return Class.new(Vector, {handle = Los.object_get_position(s.handle)}) end,
-	rotation = function(s) return Class.new(Quaternion, {handle = Los.object_get_rotation(s.handle)}) end,
-	realized = function(s) return Los.object_get_realized(s.handle) end,
-	sector = function(s) return Los.object_get_sector(s.handle) end}
+	position = function(self) return Class.new(Vector, {handle = Los.object_get_position(self.handle)}) end,
+	rotation = function(self) return Class.new(Quaternion, {handle = Los.object_get_rotation(self.handle)}) end,
+	realized = function(self) return Los.object_get_realized(self.handle) end,
+	sector = function(self) return Los.object_get_sector(self.handle) end,
+	static = function(self, v) return Los.object_get_static(self.handle, v) end}
 
 Object:add_setters{
-	model = function(s, v)
+	model = function(self, v)
 		local m = v
 		if type(v) == "string" then m = Model:find_or_load{file = v, mesh = Object.load_meshes} end
-		rawset(s, "__model", m)
-		rawset(s, "__particle", nil)
-		Los.object_set_model(s.handle, m and m.handle)
+		rawset(self, "__model", m)
+		rawset(self, "__particle", nil)
+		Los.object_set_model(self.handle, m and m.handle)
 	end,
-	model_name = function(s, v) s.model = Model:find_or_load{file = v, mesh = Object.load_meshes} end,
-	position = function(s, v) Los.object_set_position(s.handle, v.handle) end,
-	rotation = function(s, v) Los.object_set_rotation(s.handle, v.handle) end,
-	realized = function(s, v)
+	model_name = function(self, v) self.model = Model:find_or_load{file = v, mesh = Object.load_meshes} end,
+	position = function(self, v) Los.object_set_position(self.handle, v.handle) end,
+	rotation = function(self, v) Los.object_set_rotation(self.handle, v.handle) end,
+	realized = function(self, v)
 		if v then
-			if __objects_realized[s] then return end
-			__objects_realized[s] = true
-			Los.object_set_realized(s.handle, true)
-			Program:push_event{type = "object-visibility", object = s, visible = true}
+			if __objects_realized[self] then return end
+			__objects_realized[self] = true
+			Los.object_set_realized(self.handle, true)
+			Program:push_event{type = "object-visibility", object = self, visible = true}
 		else
-			if not __objects_realized[s] then return end
-			__objects_realized[s] = nil
-			Los.object_set_realized(s.handle, false)
-			Program:push_event{type = "object-visibility", object = s, visible = false}
+			if not __objects_realized[self] then return end
+			__objects_realized[self] = nil
+			Los.object_set_realized(self.handle, false)
+			Program:push_event{type = "object-visibility", object = self, visible = false}
 		end
-	end}
+	end,
+	static = function(self, v) Los.object_set_static(self.handle, v) end}
 
 Object.unittest = function()
 	-- Getters and setters.

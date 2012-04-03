@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -184,6 +184,22 @@ static void Object_get_sector (LIScrArgs* args)
 		liscr_args_seti_int (args, self->sector->sector->index);
 }
 
+static void Object_get_static (LIScrArgs* args)
+{
+	LIEngObject* self = args->self;
+
+	liscr_args_seti_bool (args, lieng_object_get_static (self));
+}
+
+static void Object_set_static (LIScrArgs* args)
+{
+	int value;
+	LIEngObject* self = args->self;
+
+	if (liscr_args_geti_bool (args, 0, &value))
+		lieng_object_set_static (self, value);
+}
+
 /*****************************************************************************/
 
 void liscr_script_object (
@@ -201,6 +217,8 @@ void liscr_script_object (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_rotation", Object_get_rotation);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_rotation", Object_set_rotation);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_sector", Object_get_sector);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_static", Object_get_static);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_static", Object_set_static);
 }
 
 /** @} */
