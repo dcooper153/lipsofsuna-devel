@@ -17,4 +17,4 @@ Spellspec{
 Spellspec{
 	name = "magicmissile1",
 	model = "fireball1",
-	particle = "magicmissile1"}
+	particle = "fireball1"}

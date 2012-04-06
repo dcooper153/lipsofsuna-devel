@@ -8,6 +8,16 @@ Featanimspec{
 	required_weapon = "build"}
 
 Featanimspec{
+	name = "missile spell",
+	action = "missile spell",
+	animation = "spell ranged",
+	categories = {"ranged spell"},
+	cooldown = 1,
+	icon = "modifier-fireball", -- FIXME
+	description = "Cast a magical missile that you can control.",
+	effect = "spell1"}
+
+Featanimspec{
 	name = "right hand",
 	action = "melee",
 	animation = "attack punch",
@@ -75,7 +85,7 @@ Featanimspec{
 
 Feateffectspec{
 	name = "berserk",
-	animations = {"spell on self", "spell on touch"},
+	animations = {"missile spell", "spell on self", "spell on touch"},
 	categories = {"beneficial", "berserk", "spell"},
 	description = "Inflict additional damage when in low health",
 	effect = "berserk1",
@@ -88,7 +98,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "black haze",
-	animations = {"ranged spell"},
+	animations = {"missile spell", "ranged spell"},
 	categories = {"harmful", "plague", "spell"},
 	description = "Conjure infectious plagued monsters",
 	effect = "spell1",
@@ -102,7 +112,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "dig",
-	animations = {"ranged spell"},
+	animations = {"missile spell", "ranged spell"},
 	categories = {"dig", "spell"},
 	description = "Fire a digging ray",
 	effect = "spell1",
@@ -116,7 +126,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "fire damage",
-	animations = {"ranged spell", "spell on self", "spell on touch"},
+	animations = {"missile spell", "ranged spell", "spell on self", "spell on touch"},
 	categories = {"fire", "harmful", "melee", "spell"},
 	description = "Inflict fire damage",
 	effect = "explosion1",
@@ -129,7 +139,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "firewall",
-	animations = {"ranged spell"},
+	animations = {"missile spell", "ranged spell"},
 	categories = {"fire", "harmful", "spell"},
 	description = "Conjure a wall of fire",
 	effect = "firewall1",
@@ -155,21 +165,8 @@ Feateffectspec{
 	reagent_mult = {["milky powder"] = 0.02}}
 
 Feateffectspec{
-	name = "magic missile",
-	animations = {"ranged spell"},
-	categories = {"harmful", "spell"},
-	description = "Cast a controllable magic missile",
-	effect = "explosion1", -- FIXME
-	icon = "modifier-fireball", -- FIXME
-	influences = {{"fire", -5, -0.95}}, -- FIXME
-	projectile = "magicmissile1",
-	skill_mult = {intelligence = 1, willpower = 1},
-	reagent_base = {["milky powder"] = 1},
-	reagent_mult = {["milky powder"] = 0.1}}
-
-Feateffectspec{
 	name = "mindless march",
-	animations = {"ranged spell","spell on touch"},
+	animations = {"missile spell", "ranged spell", "spell on touch"},
 	categories = {"harmful", "push", "spell"},
 	description = "Forces the target to march forward",
 	effect = "light1",
@@ -183,7 +180,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "follow",
-	animations = {"ranged spell","spell on touch"},
+	animations = {"missile spell", "ranged spell", "spell on touch"},
 	categories = {"follow", "spell"},
 	description = "Forces the target to follow you",
 	effect = "light1",

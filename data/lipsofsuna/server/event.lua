@@ -44,6 +44,12 @@ Eventhandler{type = "tick", func = function(self, event)
 			v:update(event.secs)
 		end
 	end
+	-- Update spells.
+	for k,v in pairs(Spell.dict_id) do
+		if v.realized then
+			v:update(event.secs)
+		end
+	end
 	-- Update markers.
 	marker_timer = marker_timer + event.secs
 	if marker_timer > 2 then

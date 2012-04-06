@@ -15,67 +15,20 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "spells",
 	widget = function()
-		local w = Widgets.Uiradio("Self", "type", function()
-			Operators.spells:set_spell("spell on self")
-			Ui:restart_state()
-		end)
 		local spell = Operators.spells:get_spell()
-		if spell.animation == "spell on self" then
-			w.value = true
+		return Widgets.Uispellslot("type", spell and spell.animation)
+	end}
+
+Ui:add_widget{
+	state = "spells",
+	widget = function()
+		local widgets = {}
+		for i = 1,3 do
+			local spell = Operators.spells:get_spell()
+			local effect = spell.effects[i]
+			table.insert(widgets, Widgets.Uispellslot("effect", effect and effect[1], i))
 		end
-		return w
-	end}
-
-Ui:add_widget{
-	state = "spells",
-	widget = function()
-		local w = Widgets.Uiradio("Ranged", "type", function()
-			Operators.spells:set_spell("ranged spell")
-			Ui:restart_state()
-		end)
-		local spell = Operators.spells:get_spell()
-		if spell.animation == "ranged spell" then
-			w.value = true
-		end
-		return w
-	end}
-
-Ui:add_widget{
-	state = "spells",
-	widget = function()
-		local w = Widgets.Uiradio("Touch", "type", function()
-			Operators.spells:spell("spell on touch")
-			Ui:restart_state()
-		end)
-		local spell = Operators.spells:get_spell()
-		if spell.animation == "spell on touch" then
-			w.value = true
-		end
-		return w
-	end}
-
-Ui:add_widget{
-	state = "spells",
-	widget = function()
-		local spell = Operators.spells:get_spell()
-		local effect = spell.effects[1]
-		return Widgets.Uispellslot(effect and effect[1], 1)
-	end}
-
-Ui:add_widget{
-	state = "spells",
-	widget = function()
-		local spell = Operators.spells:get_spell()
-		local effect = spell.effects[2]
-		return Widgets.Uispellslot(effect and effect[1], 2)
-	end}
-
-Ui:add_widget{
-	state = "spells",
-	widget = function()
-		local spell = Operators.spells:get_spell()
-		local effect = spell.effects[3]
-		return Widgets.Uispellslot(effect and effect[1], 3)
+		return widgets
 	end}
 
 Ui:add_widget{
@@ -102,6 +55,29 @@ Ui:add_widget{
 ------------------------------------------------------------------------------
 
 Ui:add_state{
+	state = "spells/types",
+	label = "Select type",
+	init = function()
+		-- Create the list of types.
+		local types = {}
+		for name,spec in pairs(Featanimspec.dict_name) do
+			if spec.description then
+				table.insert(types, name)
+			end
+		end
+		table.sort(types)
+		-- Create the widgets.
+		local widgets = {}
+		for k,v in ipairs(types) do
+			local widget = Widgets.Uispell("type", v, true)
+			table.insert(widgets, widget)
+		end
+		return widgets
+	end}
+
+------------------------------------------------------------------------------
+
+Ui:add_state{
 	state = "spells/effects",
 	label = "Select effect",
 	init = function()
@@ -124,7 +100,7 @@ Ui:add_state{
 		-- Create the widgets.
 		local widgets = {}
 		for k,v in ipairs(effects) do
-			local widget = Widgets.Uispell(v, anim and anim.effects[v])
+			local widget = Widgets.Uispell("effect", v, anim and anim.effects[v])
 			table.insert(widgets, widget)
 		end
 		return widgets

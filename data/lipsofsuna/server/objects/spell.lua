@@ -2,6 +2,7 @@ require "server/objects/object"
 
 Spell = Class(Object)
 Spell.class_name = "Spell"
+Spell.dict_id = setmetatable({}, {__mode = "kv"})
 
 --- Creates a new spell.
 -- @param clss Spell class.
@@ -77,21 +78,6 @@ Spell.new = function(clss, args)
 				end
 			end}
 		end
-	elseif args.effect == "magic missile" then
-		-- Create a magic missile.
-		self.gravity = Vector()
-		self.model = args.spec.model
-		self.physics = "rigid"
-		self.speed = 3
-		self:fire{collision = true, feat = args.feat, owner = args.owner, speed = self.speed}
-		self.timer = Timer{delay = 0, func = function(t, secs)
-			-- Adjust rotation.
-			-- Controlling is done by copying the rotation from the caster.
-			self.rotation = self.owner.rotation * self.owner.tilt
-			-- Adjust velocity.
-			-- Velocity is smoothed but approaches the target value quickly.
-			self.velocity = (self.velocity + self.rotation * Vector(0,0,-self.speed)) * 0.5
-		end}
 	else
 		-- Create a normal projectile.
 		self.gravity = Vector()
@@ -156,13 +142,6 @@ Spell.contact_cb = function(self, result)
 			-- The actual flames have touched something here.
 			result.object:inflict_modifier("burning", 3)
 		end
-	elseif self.effect == "magic missile" then
-		-- Magic missile.
-		-- Stop the timer, apply damage and vanish.
-		self.timer:disable()
-		self.timer = nil
-		apply()
-		self:detach()
 	else
 		-- Normal projectile.
 		-- Apply to the first obstacle and vanish.

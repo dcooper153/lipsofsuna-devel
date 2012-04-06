@@ -3,19 +3,28 @@ require(Mod.path .. "widget")
 Widgets.Uispell = Class(Widgets.Uiwidget)
 Widgets.Uispell.class_name = "Widgets.Uispell"
 
-Widgets.Uispell.new = function(clss, name, active)
+Widgets.Uispell.new = function(clss, mode, name, active)
 	local self = Widgets.Uiwidget.new(clss)
+	if mode == "type" then
+		self.spec = Featanimspec:find{name = name}
+	else
+		self.spec = Feateffectspec:find{name = name}
+	end
+	self.mode = mode
 	self.active = active
-	self.effect = Feateffectspec:find{name = name}
 	self.hint = active and "$A: Select\n$$B\n$$U\n$$D" or "$$B\n$$U\n$$D"
-	self.icon = self.effect and Iconspec:find{name = self.effect.icon}
+	self.icon = self.spec and Iconspec:find{name = self.spec.icon}
 	return self
 end
 
 Widgets.Uispell.apply = function(self)
 	if not self.active then return end
-	local spell = Operators.spells:get_spell()
-	Operators.spells:set_effect{self.effect.name, 1}
+	if self.mode == "type" then
+		Operators.spells:set_spell(self.spec.name)
+	else
+		local spell = Operators.spells:get_spell()
+		Operators.spells:set_effect{self.spec.name, 1}
+	end
 	Ui:pop_state()
 end
 
@@ -23,8 +32,8 @@ Widgets.Uispell.rebuild_size = function(self)
 	-- Get the base size.
 	local size = Widgets.Uiwidget.rebuild_size(self)
 	-- Resize to fit the description.
-	if self.effect then
-		local w,h = Program:measure_text("default", self.effect.description, size.x - 40)
+	if self.spec then
+		local w,h = Program:measure_text("default", self.spec.description, size.x - 40)
 		if h then size.y = math.max(size.y, h + 25) end
 	end
 	return size
@@ -48,8 +57,8 @@ Widgets.Uispell.rebuild_canvas = function(self)
 			source_tiling = {0,icon.size[1],0,0,icon.size[2],0}}
 	end
 	-- Add the name.
-	if self.effect then
-		local cap = string.gsub(self.effect.name, "(.)(.*)", function(a,b) return string.upper(a) .. b end)
+	if self.spec then
+		local cap = string.gsub(self.spec.name, "(.)(.*)", function(a,b) return string.upper(a) .. b end)
 		self:canvas_text{
 			dest_position = {40,5},
 			dest_size = {w-40,h},
@@ -59,11 +68,11 @@ Widgets.Uispell.rebuild_canvas = function(self)
 			text_font = "bigger"}
 	end
 	-- Add the description.
-	if self.effect then
+	if self.spec then
 		self:canvas_text{
 			dest_position = {40,20},
 			dest_size = {w-40,h},
-			text = self.effect.description,
+			text = self.spec.description,
 			text_alignment = {0,0},
 			text_color = {a,a,a,1},
 			text_font = "default"}

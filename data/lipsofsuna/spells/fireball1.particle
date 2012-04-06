@@ -3,7 +3,7 @@ particle_system fireball1
 	material flarefx1
 	particle_width 1.0
 	particle_height 1.0
-	quota 50
+	quota 500
 	cull_each false
 	sorted false
 	local_space false
@@ -31,8 +31,8 @@ particle_system fireball1
 		velocity_max 0.0
 		time_to_live_min 5
 		time_to_live_max 5
-		duration_min 2
-		duration_max 2
+		duration_min 100
+		duration_max 100
 		repeat_delay_min 100
 		repeat_delay_max 100
 		colour_range_start 1 1 0.5 1
