@@ -12,7 +12,7 @@ Widgets.DialogLabel.reshaped = function(self)
 	local color
 	local text
 	if self.index and self.text then
-		local action = Action.dict_name[string.format("choice_%d", self.index)]
+		local action = Binding.dict_name[string.format("choice_%d", self.index)]
 		local key = action and action.key1 and Keycode[action.key1] or "--"
 		if self.choice then
 			color = self.focused and {0.7,0.3,0.3,1} or {1,1,0,1}

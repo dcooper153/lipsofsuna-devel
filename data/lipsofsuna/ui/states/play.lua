@@ -11,7 +11,7 @@ Ui:add_state{
 	input = function(args)
 		-- Only handle apply button presses.
 		if args.type ~= "keypress" then return true end
-		local action = Action.dict_name["menu apply"]
+		local action = Binding.dict_name["menu apply"]
 		if not action then return true end
 		if not action:handle_event(args) then return true end
 		-- Activate the item the player is looking at.

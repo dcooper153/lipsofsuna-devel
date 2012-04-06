@@ -1,18 +1,18 @@
 require "system/keysym"
 
-Action = Class()
-Action.dict_index = {}
-Action.dict_name = {}
-Action.dict_press = {}
-Action.mods = 0
-Action.mouse_sensitivity_x = 0.5
-Action.mouse_sensitivity_y = 0.3
+Binding = Class()
+Binding.dict_index = {}
+Binding.dict_name = {}
+Binding.dict_press = {}
+Binding.mods = 0
+Binding.mouse_sensitivity_x = 0.5
+Binding.mouse_sensitivity_y = 0.3
 
 --- Registers a new action.
 -- @param clss Action class.
 -- @param args Arguments.
--- @return Action.
-Action.new = function(clss, args)
+-- @return Binding.
+Binding.new = function(clss, args)
 	local self = Class.new(clss)
 	local copy = function(k) if args and args[k] then self[k] = args[k] end end
 	copy("name")
@@ -31,7 +31,7 @@ end
 -- @param self Action class.
 -- @param args Event.
 -- @param handle True to handle, false to only update input state.
-Action.event = function(clss, args, handle)
+Binding.event = function(clss, args, handle)
 	-- Maintain key states.
 	if args.type == "keypress" then
 		clss.mods = args.mods
@@ -52,7 +52,7 @@ end
 -- @param self Action class.
 -- @param name Action name.
 -- @return Key name or nil.
-Action.get_control_name = function(self, name)
+Binding.get_control_name = function(self, name)
 	local action = self.dict_name[name]
 	if not action then return nil end
 	if not action.key1 then return nil end
@@ -60,10 +60,10 @@ Action.get_control_name = function(self, name)
 end
 
 --- Gets the control response to the event.
--- @param self Action.
+-- @param self Binding.
 -- @param args Event.
 -- @return Control response, or nil.
-Action.get_event_response = function(self, args)
+Binding.get_event_response = function(self, args)
 	local analog = function(k, v)
 		if self.mode == "analog" then
 			if self.key1 == k then
@@ -89,8 +89,8 @@ Action.get_event_response = function(self, args)
 		end
 	end
 	if args.type == "mousemotion" then
-		local res1 = analog("mousex", Action.mouse_sensitivity_x * args.dx)
-		local res2 = analog("mousey", Action.mouse_sensitivity_y * args.dy)
+		local res1 = analog("mousex", Binding.mouse_sensitivity_x * args.dx)
+		local res2 = analog("mousey", Binding.mouse_sensitivity_y * args.dy)
 		return res1 or res2
 	elseif args.type == "mousepress" then
 		return digital("mouse" .. args.button, true)
@@ -106,10 +106,10 @@ Action.get_event_response = function(self, args)
 end
 
 --- Executes the action if it matches the input event.
--- @param self Action.
+-- @param self Binding.
 -- @param args Event arguments.
 -- @return True if handled.
-Action.handle_event = function(self, args)
+Binding.handle_event = function(self, args)
 	if not self.enabled then return end
 	local resp = self:get_event_response(args)
 	if resp == nil then return end
@@ -117,12 +117,12 @@ Action.handle_event = function(self, args)
 	return true
 end
 
-Action:add_getters{
+Binding:add_getters{
 	key1 = function(s) return rawget(s, "__key1") end,
 	key2 = function(s) return rawget(s, "__key2") end,
 	keys = function(s) return {s.key1, s.key2} end}
 
-Action:add_setters{
+Binding:add_setters{
 	key1 = function(s, v)
 		rawset(s, "__key1", v)
 	end,

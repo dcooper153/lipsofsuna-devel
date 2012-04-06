@@ -633,12 +633,12 @@ Ui.update = function(self, secs)
 	self.repeat_timer = self.repeat_timer + secs
 	if self.repeat_timer >= 0.15 then
 		self.repeat_timer = 0
-		local action1 = Action.dict_name["menu up"]
-		if action1.key1 and Action.dict_press[action1.key1] then
+		local action1 = Binding.dict_name["menu up"]
+		if action1.key1 and Binding.dict_press[action1.key1] then
 			self:command("up")
 		end
-		local action2 = Action.dict_name["menu down"]
-		if action2.key1 and Action.dict_press[action2.key1] then
+		local action2 = Binding.dict_name["menu down"]
+		if action2.key1 and Binding.dict_press[action2.key1] then
 			self:command("down")
 		end
 	end
@@ -698,10 +698,10 @@ Ui.update_help = function(self)
 	hint = string.gsub(hint, "$$B", "$B: Close menu")
 	hint = string.gsub(hint, "$$U", "$U: Previous item")
 	hint = string.gsub(hint, "$$D", "$D: Next item")
-	hint = string.gsub(hint, "$A", Action:get_control_name("menu apply") or "[---]")
-	hint = string.gsub(hint, "$B", Action:get_control_name("menu back") or "[---]")
-	hint = string.gsub(hint, "$D", Action:get_control_name("menu down") or "[---]")
-	hint = string.gsub(hint, "$U", Action:get_control_name("menu up") or "[---]")
+	hint = string.gsub(hint, "$A", Binding:get_control_name("menu apply") or "[---]")
+	hint = string.gsub(hint, "$B", Binding:get_control_name("menu back") or "[---]")
+	hint = string.gsub(hint, "$D", Binding:get_control_name("menu down") or "[---]")
+	hint = string.gsub(hint, "$U", Binding:get_control_name("menu up") or "[---]")
 	-- Get the detailed help string.
 	if widget then
 		help = widget.help

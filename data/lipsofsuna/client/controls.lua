@@ -1,15 +1,15 @@
-Action{name = "attack", mode = "toggle", key1 = "mouse1", func = function(v)
+Binding{name = "attack", mode = "toggle", key1 = "mouse1", func = function(v)
 	if not Client.player_object then return end
 	Network:send{packet = Packet(packets.PLAYER_ATTACK, "bool", v)}
 end}
 
-Action{name = "block", mode = "toggle", key1 = "mouse3", func = function(v)
+Binding{name = "block", mode = "toggle", key1 = "mouse3", func = function(v)
 	if Client.player_object then
 		Network:send{packet = Packet(packets.PLAYER_BLOCK, "bool", v)}
 	end
 end}
 
-Action{name = "camera", mode = "press", key1 = Keysym.y, func = function()
+Binding{name = "camera", mode = "press", key1 = Keysym.y, func = function()
 	if not Client.player_object then return end
 	if Client.camera_mode == "first-person" then
 		Client.camera_mode = "third-person"
@@ -23,17 +23,17 @@ Action{name = "camera", mode = "press", key1 = Keysym.y, func = function()
 	end
 end}
 
-Action{name = "chat", mode = "press", key1 = Keysym.t, func = function()
+Binding{name = "chat", mode = "press", key1 = Keysym.t, func = function()
 	if not Client.player_object then return end
 	Ui.state = "chat"
 end}
 
-Action{name = "climb", mode = "press", key1 = Keysym.c, func = function()
+Binding{name = "climb", mode = "press", key1 = Keysym.c, func = function()
 	if not Client.player_object then return end
 	Network:send{packet = Packet(packets.PLAYER_CLIMB)}
 end}
 
-Action{name = "feats", mode = "press", key1 = Keysym.u, func = function()
+Binding{name = "feats", mode = "press", key1 = Keysym.u, func = function()
 	if Client.player_object then
 		if Ui.state ~= "feats" then
 			Ui.state = "feats"
@@ -48,7 +48,7 @@ Action{name = "feats", mode = "press", key1 = Keysym.u, func = function()
 	end
 end}
 
-Action{name = "inventory", mode = "press", key1 = Keysym.i, func = function()
+Binding{name = "inventory", mode = "press", key1 = Keysym.i, func = function()
 	if not Client.player_object then return end
 	if Ui.state ~= "inventory" then
 		Ui.state = "inventory"
@@ -57,12 +57,12 @@ Action{name = "inventory", mode = "press", key1 = Keysym.i, func = function()
 	end
 end}
 
-Action{name = "jump", mode = "press", key1 = Keysym.SPACE, func = function()
+Binding{name = "jump", mode = "press", key1 = Keysym.SPACE, func = function()
 	if not Client.player_object then return end
 	Network:send{packet = Packet(packets.PLAYER_JUMP)}
 end}
 
-Action{name = "map", mode = "press", key1 = Keysym.m, func = function()
+Binding{name = "map", mode = "press", key1 = Keysym.m, func = function()
 	if not Client.player_object then return end
 	if Ui.state ~= "map" then
 		Ui.state = "map"
@@ -71,7 +71,7 @@ Action{name = "map", mode = "press", key1 = Keysym.m, func = function()
 	end
 end}
 
-Action{name = "menu", mode = "press", key1 = Keysym.TAB, func = function()
+Binding{name = "menu", mode = "press", key1 = Keysym.TAB, func = function()
 	if Ui.root == "play" then
 		-- Game controls.
 		if Ui.state ~= "play" then
@@ -94,23 +94,23 @@ Action{name = "menu", mode = "press", key1 = Keysym.TAB, func = function()
 	end
 end}
 
-Action{name = "menu up", mode = "press", key1 = Keysym.r, func = function()
+Binding{name = "menu up", mode = "press", key1 = Keysym.r, func = function()
 	Ui:command("up")
 end}
 
-Action{name = "menu down", mode = "press", key1 = Keysym.f, func = function()
+Binding{name = "menu down", mode = "press", key1 = Keysym.f, func = function()
 	Ui:command("down")
 end}
 
-Action{name = "menu back", mode = "press", key1 = Keysym.q, func = function()
+Binding{name = "menu back", mode = "press", key1 = Keysym.q, func = function()
 	Ui:command("back")
 end}
 
-Action{name = "menu apply", mode = "press", key1 = Keysym.e, func = function()
+Binding{name = "menu apply", mode = "press", key1 = Keysym.e, func = function()
 	Ui:command("apply")
 end}
 
-Action{name = "mouse_grab", mode = "press", key1 = Keysym.ESCAPE, func = function()
+Binding{name = "mouse_grab", mode = "press", key1 = Keysym.ESCAPE, func = function()
 	-- Toggle mouse grabbing.
 	local grab = not Ui.pointer_grab
 	Client.options.grab_cursor = grab
@@ -129,13 +129,13 @@ Action{name = "mouse_grab", mode = "press", key1 = Keysym.ESCAPE, func = functio
 	end
 end}
 
-Action{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = function(v)
+Binding{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = function(v)
 	if not Client.player_object then return end
 	v = math.max(-1, math.min(1, v))
 	Network:send{packet = Packet(packets.PLAYER_MOVE, "int8", v * -127)}
 end}
 
-Action{name = "options", mode = "press", key1 = Keysym.o, func = function()
+Binding{name = "options", mode = "press", key1 = Keysym.o, func = function()
 	if not Client.player_object then return end
 	if Ui.state ~= "options" then
 		Ui.state = "options"
@@ -144,12 +144,12 @@ Action{name = "options", mode = "press", key1 = Keysym.o, func = function()
 	end
 end}
 
-Action{name = "pick_up", mode = "press", key1 = Keysym.COMMA, func = function()
+Binding{name = "pick_up", mode = "press", key1 = Keysym.COMMA, func = function()
 	if not Client.player_object then return end
 	-- TODO
 end}
 
-Action{name = "quests", mode = "press", key1 = Keysym.n, func = function()
+Binding{name = "quests", mode = "press", key1 = Keysym.n, func = function()
 	if not Client.player_object then return end
 	if Ui.state ~= "quests" then
 		Ui.state = "quests"
@@ -158,7 +158,7 @@ Action{name = "quests", mode = "press", key1 = Keysym.n, func = function()
 	end
 end}
 
-Action{name = "skills", mode = "press", key1 = Keysym.k, func = function()
+Binding{name = "skills", mode = "press", key1 = Keysym.k, func = function()
 	if not Client.player_object then return end
 	if Ui.state ~= "skills" then
 		Ui.state = "skills"
@@ -167,7 +167,7 @@ Action{name = "skills", mode = "press", key1 = Keysym.k, func = function()
 	end
 end}
 
-Action{name = "quickslot_mode", mode = "press", key1 = Keysym.PERIOD, func = function()
+Binding{name = "quickslot_mode", mode = "press", key1 = Keysym.PERIOD, func = function()
 	if not Client.player_object then return end
 	if Quickslots.mode ~= "feats" then
 		Quickslots.mode = "feats"
@@ -176,77 +176,77 @@ Action{name = "quickslot_mode", mode = "press", key1 = Keysym.PERIOD, func = fun
 	end
 end}
 
-Action{name = "quickslot_1", mode = "press", key1 = Keysym.NUM1, func = function()
+Binding{name = "quickslot_1", mode = "press", key1 = Keysym.NUM1, func = function()
 	if not Client.player_object then return end
 	Quickslots:activate(1)
 end}
 
-Action{name = "quickslot_2", mode = "press", key1 = Keysym.NUM2, func = function()
+Binding{name = "quickslot_2", mode = "press", key1 = Keysym.NUM2, func = function()
 	if Client.player_object then
 		Quickslots:activate(2)
 	end
 end}
 
-Action{name = "quickslot_3", mode = "press", key1 = Keysym.NUM3, func = function()
+Binding{name = "quickslot_3", mode = "press", key1 = Keysym.NUM3, func = function()
 	if not Client.player_object then return end
 	Quickslots:activate(3)
 end}
 
-Action{name = "quickslot_4", mode = "press", key1 = Keysym.NUM4, func = function()
+Binding{name = "quickslot_4", mode = "press", key1 = Keysym.NUM4, func = function()
 	if not Client.player_object then return end
 	Quickslots:activate(4)
 end}
 
-Action{name = "quickslot_5", mode = "press", key1 = Keysym.NUM5, func = function()
+Binding{name = "quickslot_5", mode = "press", key1 = Keysym.NUM5, func = function()
 	if not Client.player_object then return end
 	Quickslots:activate(5)
 end}
 
-Action{name = "quickslot_6", mode = "press", key1 = Keysym.NUM6, func = function()
+Binding{name = "quickslot_6", mode = "press", key1 = Keysym.NUM6, func = function()
 	if not Client.player_object then return end
 	Quickslots:activate(6)
 end}
 
-Action{name = "quickslot_7", mode = "press", key1 = Keysym.NUM7, func = function()
+Binding{name = "quickslot_7", mode = "press", key1 = Keysym.NUM7, func = function()
 	if not Client.player_object then return end
 	Quickslots:activate(7)
 end}
 
-Action{name = "quickslot_8", mode = "press", key1 = Keysym.NUM8, func = function()
+Binding{name = "quickslot_8", mode = "press", key1 = Keysym.NUM8, func = function()
 	if not Client.player_object then return end
 	Quickslots:activate(8)
 end}
 
-Action{name = "quickslot_9", mode = "press", key1 = Keysym.NUM9, func = function()
+Binding{name = "quickslot_9", mode = "press", key1 = Keysym.NUM9, func = function()
 	if not Client.player_object then return end
 	Quickslots:activate(9)
 end}
 
-Action{name = "quickslot_10", mode = "press", key1 = Keysym.NUM0, func = function()
+Binding{name = "quickslot_10", mode = "press", key1 = Keysym.NUM0, func = function()
 	if not Client.player_object then return end
 	Quickslots:activate(10)
 end}
 
-Action{name = "rotate_camera", mode = "toggle", key1 = Keysym.LCTRL, func = function(v)
+Binding{name = "rotate_camera", mode = "toggle", key1 = Keysym.LCTRL, func = function(v)
 	Operators.camera:set_rotation_mode(v)
 end}
 
-Action{name = "run", mode = "toggle", key1 = Keysym.LSHIFT, func = function(v)
+Binding{name = "run", mode = "toggle", key1 = Keysym.LSHIFT, func = function(v)
 	if not Client.player_object then return end
 	Network:send{packet = Packet(packets.PLAYER_RUN, "bool", not v)}
 end}
 
-Action{name = "screenshot", mode = "press", key1 = Keysym.PRINT, func = function()
+Binding{name = "screenshot", mode = "press", key1 = Keysym.PRINT, func = function()
 	local n = Program:capture_screen()
 	Client:append_log("Screenshot: " .. n)
 end}
 
-Action{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func = function(v)
+Binding{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func = function(v)
 	if not Client.player_object then return end
 	Network:send{packet = Packet(packets.PLAYER_STRAFE, "int8", v * 127)}
 end}
 
-Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
+Binding{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 	if not Client.player_object then return end
 	local sens = 0.01 * Client.options.mouse_sensitivity
 	if Client.options.invert_mouse then sens = -sens end
@@ -257,7 +257,7 @@ Action{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 	end
 end}
 
-Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
+Binding{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
 	if not Client.player_object then return end
 	local sens = 0.01 * Client.options.mouse_sensitivity
 	if Operators.camera:get_rotation_mode() then
@@ -267,12 +267,12 @@ Action{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
 	end
 end}
 
-Action{name = "use", mode = "press", key1 = Keysym.b, func = function()
+Binding{name = "use", mode = "press", key1 = Keysym.b, func = function()
 	if not Client.player_object then return end
 	Ui.state = "world/object"
 end}
 
-Action{name = "zoom", mode = "analog", key1 = "mousez", key2 = "", func = function(v)
+Binding{name = "zoom", mode = "analog", key1 = "mousez", key2 = "", func = function(v)
 	if not Client.player_object then return end
 	Client.camera:zoom{rate = -v}
 end}

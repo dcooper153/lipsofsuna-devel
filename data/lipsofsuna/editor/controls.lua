@@ -1,22 +1,22 @@
-Action{name = "editor_copy", mode = "press", key1 = Keysym.x, func = function(v)
+Binding{name = "editor_copy", mode = "press", key1 = Keysym.x, func = function(v)
 	if Ui.root ~= "editor" then return end
 	Client.editor:copy()
 end}
 
-Action{name = "editor_extrude", mode = "analog", key1 = "mousez", key2 = "", func = function(v)
+Binding{name = "editor_extrude", mode = "analog", key1 = "mousez", key2 = "", func = function(v)
 	if Ui.root ~= "editor" then return end
 	if v == 0 then return end
 	Client.editor:extrude(v > 0)
 end}
 
-Action{name = "editor_fill", mode = "press", key1 = Keysym.t, func = function()
+Binding{name = "editor_fill", mode = "press", key1 = Keysym.t, func = function()
 	if Ui.root ~= "editor" then return end
 	if not Client.editor.prev_tiles[1] then return end
 	if not Client.editor.prev_tiles[2] then return end
 	Client.editor:fill(Client.editor.prev_tiles[1], Client.editor.prev_tiles[2], true)
 end}
 
-Action{name = "editor_grab", mode = "press", key1 = Keysym.g, func = function(v)
+Binding{name = "editor_grab", mode = "press", key1 = Keysym.g, func = function(v)
 	if Ui.root ~= "editor" then return end
 	if Client.editor.mode == "grab" then
 		Client.editor.mode = nil
@@ -25,10 +25,10 @@ Action{name = "editor_grab", mode = "press", key1 = Keysym.g, func = function(v)
 	end
 end}
 
-Action{name = "editor_move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = function(v)
+Binding{name = "editor_move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = function(v)
 	if Ui.root ~= "editor" then return end
-	local mult = Action.dict_press[Keysym.LCTRL] and 1 or 10
-	if Action.dict_press[Keysym.LSHIFT] then
+	local mult = Binding.dict_press[Keysym.LCTRL] and 1 or 10
+	if Binding.dict_press[Keysym.LSHIFT] then
 		Client.editor.camera.lifting = -mult * v
 		Client.editor.camera.movement = nil
 	else
@@ -37,12 +37,12 @@ Action{name = "editor_move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, 
 	end
 end}
 
-Action{name = "editor_paste", mode = "press", key1 = Keysym.v, func = function(v)
+Binding{name = "editor_paste", mode = "press", key1 = Keysym.v, func = function(v)
 	if Ui.root ~= "editor" then return end
 	Client.editor:paste()
 end}
 
-Action{name = "editor_rotate", mode = "press", key1 = Keysym.h, func = function(v)
+Binding{name = "editor_rotate", mode = "press", key1 = Keysym.h, func = function(v)
 	if Ui.root ~= "editor" then return end
 	if Client.editor.mode == "rotate" then
 		Client.editor.mode = nil
@@ -51,12 +51,12 @@ Action{name = "editor_rotate", mode = "press", key1 = Keysym.h, func = function(
 	end
 end}
 
-Action{name = "editor_select", mode = "toggle", key1 = "mouse1", func = function(v)
+Binding{name = "editor_select", mode = "toggle", key1 = "mouse1", func = function(v)
 	if Ui.root ~= "editor" then return end
 	if v then
 		-- Grabbed.
 		Client.editor.mode = "grab"
-		local add = Action.dict_press[Keysym.LSHIFT]
+		local add = Binding.dict_press[Keysym.LSHIFT]
 		Client.editor:select(add)
 	else
 		-- Released.
@@ -64,14 +64,14 @@ Action{name = "editor_select", mode = "toggle", key1 = "mouse1", func = function
 	end
 end}
 
-Action{name = "editor_select_rect", mode = "toggle", key1 = Keysym.LCTRL, func = function(v)
+Binding{name = "editor_select_rect", mode = "toggle", key1 = Keysym.LCTRL, func = function(v)
 	if Ui.root ~= "editor" then return end
 	Client.editor:set_rect_select(v)
 end}
 
-Action{name = "editor_snap", mode = "press", key1 = Keysym.PERIOD, func = function()
+Binding{name = "editor_snap", mode = "press", key1 = Keysym.PERIOD, func = function()
 	if Ui.root ~= "editor" then return end
-	local mult = Action.dict_press[Keysym.LCTRL] and 0.25 or 0.5
+	local mult = Binding.dict_press[Keysym.LCTRL] and 0.25 or 0.5
 	for k,v in pairs(Client.editor.selection) do
 		if v.object then
 			v.object:snap(mult * Voxel.tile_size, mult * math.pi)
@@ -80,13 +80,13 @@ Action{name = "editor_snap", mode = "press", key1 = Keysym.PERIOD, func = functi
 	end
 end}
 
-Action{name = "editor_strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func = function(v)
+Binding{name = "editor_strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func = function(v)
 	if Ui.root ~= "editor" then return end
-	local mult = Action.dict_press[Keysym.LCTRL] and 1 or 10
+	local mult = Binding.dict_press[Keysym.LCTRL] and 1 or 10
 	Client.editor.camera.strafing = mult * v
 end}
 
-Action{name = "editor_tilt", mode = "analog", key1 = "mousey", func = function(v)
+Binding{name = "editor_tilt", mode = "analog", key1 = "mousey", func = function(v)
 	if Ui.root ~= "editor" then return end
 	local sens = 0.01 * Client.options.mouse_sensitivity
 	if Client.options.invert_mouse then sens = -sens end
@@ -97,7 +97,7 @@ Action{name = "editor_tilt", mode = "analog", key1 = "mousey", func = function(v
 	end
 end}
 
-Action{name = "editor_turn", mode = "analog", key1 = "mousex", func = function(v)
+Binding{name = "editor_turn", mode = "analog", key1 = "mousex", func = function(v)
 	if Ui.root ~= "editor" then return end
 	local sens = 0.01 * Client.options.mouse_sensitivity
 	if Client.editor.mode == "grab" then
@@ -109,7 +109,7 @@ Action{name = "editor_turn", mode = "analog", key1 = "mousex", func = function(v
 	else
 		-- Rotate the selected objects.
 		-- If left control is pressed, rotation is 10x slower.
-		local mult = Action.dict_press[Keysym.LCTRL] and 0.1 or 1
+		local mult = Binding.dict_press[Keysym.LCTRL] and 0.1 or 1
 		local drot = Quaternion{euler = {-v * mult * sens, 0, 0}}
 		for k,v in pairs(Client.editor.selection) do
 			v:rotate(drot)

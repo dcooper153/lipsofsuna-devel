@@ -11,7 +11,7 @@ Ui:add_state{
 	init = function()
 		-- Get the control actions.
 		local actions = {}
-		for k,v in pairs(Action.dict_name) do
+		for k,v in pairs(Binding.dict_name) do
 			table.insert(actions, v)
 		end
 		table.sort(actions, function(a,b) return a.name < b.name end)

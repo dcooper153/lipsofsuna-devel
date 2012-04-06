@@ -41,8 +41,8 @@ end
 
 Widgets.Uiscrollfloat.handle_event = function(self, args)
 	if self.input_mode then
-		local action1 = Action.dict_name["menu up"]
-		local action2 = Action.dict_name["menu down"]
+		local action1 = Binding.dict_name["menu up"]
+		local action2 = Binding.dict_name["menu down"]
 		if (action1 and action1:get_event_response(args) ~= nil) or
 		   (action2 and action2:get_event_response(args) ~= nil) then
 			self.hint = "$A: Edit\n$$B\n$$U\n$$D"

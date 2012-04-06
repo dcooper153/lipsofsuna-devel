@@ -79,7 +79,7 @@ EditorCamera.update = function(self, secs)
 	-- Update turning and tilting.
 	-- If ctrl is pressed, add mouse movement to rotation.
 	-- If not, interpolate towards the default rotation.
-	if false then--not Action or Action.dict_press[Keysym.LCTRL] then
+	if false then--not Action or Binding.dict_press[Keysym.LCTRL] then
 		self.own_turn = self.own_turn * math.max(1 - 3 * secs, 0)
 		self.own_tilt = self.own_tilt * math.max(1 - 3 * secs, 0)
 	end

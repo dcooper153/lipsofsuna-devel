@@ -121,14 +121,14 @@ Operators.chargen.input = function(self, args)
 	if not Ui.pointer_grab then return true end
 	local ret = true
 	-- Rotate the character.
-	local action1 = Action.dict_name["turn"]
+	local action1 = Binding.dict_name["turn"]
 	local response1 = action1 and action1:get_event_response(args)
 	if response1 then
 		self:rotate(response1)
 		ret = false
 	end
 	-- Move the character.
-	local action2 = Action.dict_name["tilt"]
+	local action2 = Binding.dict_name["tilt"]
 	local response2 = action2 and action2:get_event_response(args)
 	if response2 then
 		self:translate(response2)
