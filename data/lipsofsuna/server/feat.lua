@@ -212,10 +212,14 @@ Feat.usable = function(self, args)
 	if not args.user then return end
 	local spec = args.user.spec
 	if spec.type ~= "species" then return end
-	if not spec.feat_anims[self.animation] then return end
+	if not spec.feat_anims[self.animation] then
+		return false, "Not doable by your race."
+	end
 	-- Get feat information.
 	local anim = Featanimspec:find{name = self.animation}
-	if not anim then return end
+	if not anim then
+		return false, "No such feat exists."
+	end
 	local weapon = args.user.inventory:get_object_by_slot(anim.slot)
 	local info = self:get_info{owner = args.user, weapon = weapon}
 	-- Check for stats.
@@ -223,24 +227,35 @@ Feat.usable = function(self, args)
 	for k,v in pairs(info.required_stats) do
 		if not stats then return end
 		local val = stats:get_value(k)
-		if not val or val < v then return end
+		if not val or val < v then
+			return false, "Not enough willpower."
+		end
 	end
 	-- Check for reagents.
 	local inventory = args.inventory or args.user.inventory
 	for k,v in pairs(info.required_reagents) do
 		local count = inventory:count_objects_by_name(k)
-		if count < v then return end
+		if count < v then
+			return false, "Not enough reagents."
+		end
 	end
 	-- Check for ammo.
 	for k,v in pairs(info.required_ammo) do
 		local count = inventory:count_objects_by_name(k)
-		if count < v then return end
+		if count < v then
+			return false, "Not enough ammo."
+		end
 	end
 	-- Check for weapon.
 	if info.required_weapon then
 		local weapon = inventory:get_object_by_slot(args.user.spec.weapon_slot)
-		if not weapon then return info.required_weapon == "melee" end
-		if not weapon.spec.categories[info.required_weapon] then return end
+		if not weapon then
+			if info.required_weapon ~= "melee" then
+				return false, "No weapon equipped."
+			end
+		elseif not weapon.spec.categories[info.required_weapon] then
+			return false, "Incorrect weapon equipped."
+		end
 	end
 	return true
 end
