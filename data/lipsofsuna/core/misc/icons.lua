@@ -446,6 +446,12 @@ Iconspec{
 	size = {34,34}}
 
 Iconspec{
+	name = "modifier-regeneration", -- FIXME: heal
+	image = "icons2",
+	offset = {34,0},
+	size = {34,34}}
+
+Iconspec{
 	name = "modifier-nature",
 	image = "icons2",
 	offset = {68,0},

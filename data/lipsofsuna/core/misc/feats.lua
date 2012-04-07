@@ -244,6 +244,17 @@ Feateffectspec{
 	influences = {{"physical damage", -1}}}
 
 Feateffectspec{
+	name = "regeneration",
+	animations = {"missile spell", "ranged spell", "spell on self", "spell on touch"},
+	categories = {"beneficial", "spell"},
+	description = "Regenerate health every second",
+	effect = "berserk1",
+	icon = "modifier-heal",
+	influences = {{"regeneration", 60}},
+	skill_base = {willpower = 15},
+	reagent_base = {["milky powder"] = 1}}
+
+Feateffectspec{
 	name = "restore health",
 	animations = {"spell on self", "spell on touch"},
 	categories = {"beneficial", "heal", "spell"},
