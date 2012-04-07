@@ -14,7 +14,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	health = 100,
-	influences_base = {physical = -4},
+	influences_base = {["physical damage"] = -4},
 	influences_bonus = {"melee"},
 	mass = 7,
 	water_gravity = Vector(0,6,0)}
@@ -33,7 +33,7 @@ Itemspec{
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
 	health = 300,
-	influences_base = {fire = -2, physical = -4},
+	influences_base = {["fire damage"] = -2, ["physical damage"] = -4},
 	influences_bonus = {"melee"},
 	mass = 7,
 	special_effects = {

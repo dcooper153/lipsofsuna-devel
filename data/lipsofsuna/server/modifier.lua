@@ -25,9 +25,9 @@ Modifier.update = function(clss, object, secs)
 	-- Update each modifier.
 	for k,v in pairs(object.modifiers) do
 		-- Update the modifier.
-		local m = Modifier:find{name = k}
-		if m and m.func then
-			v = m:func(object, v, secs)
+		local m = Feateffectspec:find{name = k}
+		if m and m.modifier then
+			v = m:modifier(object, v, secs)
 		else
 			v.st = 0
 		end

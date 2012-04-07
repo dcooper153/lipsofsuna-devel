@@ -124,6 +124,16 @@ Inventory.equip_index = function(self, index, slot)
 	end
 end
 
+--- Equips an inventory item.
+-- @param self Inventory.
+-- @param object Inventory item.
+-- @param slot Equipment slot name.
+Inventory.equip_object = function(self, object, slot)
+	local index = self:get_index_by_object(object)
+	if not index then return end
+	self:equip_index(index, slot)
+end
+
 --- Gets the first empty inventory index.
 -- @param self Inventory.
 Inventory.get_empty_index = function(self)

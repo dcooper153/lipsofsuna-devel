@@ -1,5 +1,10 @@
 -- Teleport to Lips.
-Influencespec{name = "travel", func = function(feat, info, args, value)
-	if not args.target then return end
-	args.target:teleport{region = "Lips"}
-end}
+Feateffectspec:extend{
+	name = "travel",
+	touch = function(self, args)
+		if not args.object then return end
+		args.object:teleport{region = "Lips"}
+	end,
+	ranged = function(self, args)
+		self:touch(args)
+	end}

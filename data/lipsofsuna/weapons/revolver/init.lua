@@ -15,7 +15,7 @@ Itemspec{
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["adamantium"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
-	influences_base = {physical = -18},
+	influences_base = {["physical damage"] = -18},
 	influences_bonus = {"ranged", "guns"},
 	equipment_slot = "hand.R",
 	mass = 8}
@@ -31,7 +31,7 @@ Itemspec{
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["aquanite stone"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
-	influences_base = {cold = -7, physical = -7},
+	influences_base = {["cold damage"] = -7, ["physical damage"] = -7},
 	influences_bonus = {"ranged", "guns"},
 	equipment_slot = "hand.R",
 	mass = 8}
@@ -47,7 +47,7 @@ Itemspec{
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["crimson stone"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
-	influences_base = {fire = -7, physical = -7},
+	influences_base = {["fire damage"] = -7, ["physical damage"] = -7},
 	influences_bonus = {"ranged", "guns"},
 	equipment_slot = "hand.R",
 	mass = 8}
@@ -63,7 +63,7 @@ Itemspec{
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["iron ingot"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
-	influences_base = {physical = -10},
+	influences_base = {["physical damage"] = -10},
 	influences_bonus = {"ranged", "guns"},
 	equipment_slot = "hand.R",
 	mass = 8}

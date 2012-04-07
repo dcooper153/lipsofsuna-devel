@@ -18,10 +18,10 @@ Actionspec{name = "melee", func = function(feat, info, args)
 	Coroutine(function(t)
 		local apply = function(r)
 			feat:apply{
-				attacker = args.user,
 				charge = args.charge,
+				object = r.object,
+				owner = args.user,
 				point = r.point,
-				target = r.object,
 				tile = r.tile,
 				weapon = args.weapon}
 			return true

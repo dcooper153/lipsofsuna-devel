@@ -11,10 +11,10 @@ Actionspec{name = "melee custom", func = function(feat, info, args)
 		if not r then return end
 		-- Apply to the target.
 		feat:apply{
-			attacker = args.user,
 			charge = args.charge,
+			object = r.object,
+			owner = args.user,
 			point = r.point,
-			target = r.object,
 			tile = r.tile,
 			weapon = args.weapon}
 	end)

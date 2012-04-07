@@ -10,7 +10,7 @@ Itemspec{
 	categories = {"melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
 	effect_attack_speedline = true,
-	influences_base = {physical = -20},
+	influences_base = {["physical damage"] = -20},
 	influences_bonus = {"melee"},
 	equipment_slot = "hand.R",
 	mass = 15}
@@ -29,7 +29,7 @@ Itemspec{
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	health = 500,
-	influences_base = {cold = -8, physical = -8},
+	influences_base = {["cold damage"] = -8, ["physical damage"] = -8},
 	influences_bonus = {"melee"},
 	mass = 15}
 
@@ -47,7 +47,7 @@ Itemspec{
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	health = 500,
-	influences_base = {fire = -8, physical = -8},
+	influences_base = {["fire damage"] = -8, ["physical damage"] = -8},
 	influences_bonus = {"melee"},
 	mass = 15}
 
@@ -65,7 +65,7 @@ Itemspec{
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	health = 220,
-	influences_base = {physical = -5},
+	influences_base = {["physical damage"] = -5},
 	influences_bonus = {"melee"},
 	mass = 15}
 
@@ -82,7 +82,7 @@ Itemspec{
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
 	health = 130,
-	influences_base = {physical = -5},
+	influences_base = {["physical damage"] = -5},
 	influences_bonus = {"melee"},
 	mass = 15}
 
@@ -98,7 +98,7 @@ Itemspec{
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
 	health = 130,
-	influences_base = {physical = -5},
+	influences_base = {["physical damage"] = -5},
 	influences_bonus = {"melee"},
 	mass = 15}
 
@@ -116,7 +116,7 @@ Itemspec{
 	effect_craft = "craftwood1",
 	equipment_slot = "hand.R",
 	health = 100,
-	influences_base = {physical = -5},
+	influences_base = {["physical damage"] = -5},
 	influences_bonus = {"melee"},
 	mass = 7,
 	water_gravity = Vector(0,6,0)}

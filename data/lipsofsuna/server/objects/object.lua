@@ -38,10 +38,12 @@ Object:add_setters{
 
 local oldnew = Object.new
 Object.new = function(clss, args)
-	local self = oldnew(clss, {id = args.id})
+	local self = oldnew(clss, {id = args and args.id})
 	self.inventory = Inventory{id = self.id}
-	for k,v in pairs(args) do
-		self[k] = v
+	if args then
+		for k,v in pairs(args) do
+			self[k] = v
+		end
 	end
 	return self
 end
@@ -58,11 +60,11 @@ Object.contact_cb = function(self, result)
 	end
 	if result.object == self.contact_args.owner then return end
 	self.contact_args.feat:apply{
-		attacker = self.contact_args.owner,
 		charge = self.contact_args.charge,
+		object = result.object,
+		owner = self.contact_args.owner,
 		point = result.point,
 		projectile = self,
-		target = result.object,
 		tile = result.tile,
 		weapon = self.contact_args.weapon}
 	self.contact_args = nil

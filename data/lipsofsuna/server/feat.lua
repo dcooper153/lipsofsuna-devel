@@ -40,12 +40,12 @@ end
 --- Applies the feat.
 -- @param self Feat.
 -- @param args Arguments.<ul>
---   <li>attacker: Attacking creature.</li>
+--   <li>object: Attacked object, or nil.</li>
+--   <li>owner: Attacking actor.</li>
 --   <li>point: Hit point in world space.</li>
---   <li>projectile: Projectile.</li>
---   <li>target: Attacked creature.</li>
---   <li>tile: Attacked tile or nil.</li>
---   <li>weapon: Used weapon.</li></ul>
+--   <li>projectile: Projectile object, or nil.</li>
+--   <li>tile: Attacked tile, or nil.</li>
+--   <li>weapon: Used weapon object, or nil.</li></ul>
 Feat.apply = function(self, args)
 	-- Effects.
 	local effects = {}
@@ -60,8 +60,8 @@ Feat.apply = function(self, args)
 		end
 	end
 	for effect in pairs(effects) do
-		if args.target then
-			Effect:play{effect = effect, object = args.target}
+		if args.object then
+			Effect:play{effect = effect, object = args.object}
 		else
 			Effect:play{effect = effect, point = args.point}
 		end
@@ -69,34 +69,39 @@ Feat.apply = function(self, args)
 	-- Impulse.
 	if anim.categories["melee"] or anim.categories["ranged"] or
 	   anim.categories["self"] or anim.categories["touch"] then
-		if args.target and args.attacker then
-			args.target:impulse{impulse = args.attacker.rotation * Vector(0, 0, -100)}
+		if args.object and args.owner then
+			args.object:impulse{impulse = args.owner.rotation * Vector(0, 0, -100)}
 		end
 	end
 	-- Cooldown.
 	-- The base cooldown has already been applied but we add some extra
-	-- if the target was blocking in order to penalize rampant swinging.
-	if anim.categories["melee"] and args.attacker and args.target and args.target.blocking then
-		if Program.time - args.target.blocking > args.target.spec.blocking_delay then
-			args.attacker.cooldown = (args.attacker.cooldown or 0) * 2
+	-- if the object was blocking in order to penalize rampant swinging.
+	if anim.categories["melee"] and args.owner and args.object and args.object.blocking then
+		if Program.time - args.object.blocking > args.object.spec.blocking_delay then
+			args.owner.cooldown = (args.owner.cooldown or 0) * 2
 		end
 	end
 	-- Influences.
 	local info = self:get_info(args)
 	for k,v in pairs(info.influences) do
-		local i = Influencespec:find{name = k}
-		if i then i.func(self, info, args, v) end
+		local i = Feateffectspec:find{name = k}
+		if i and i.touch then
+			args.feat = self
+			args.info = info
+			args.value = v
+			i:touch(args)
+		end
 	end
 	-- Digging.
 	if anim.categories["melee"] and args.tile then
 		-- Break the tile.
 		if (args.weapon and args.weapon.spec.categories["mattock"]) or math.random(1, 5) == 5 then
-			Voxel:damage(args.attacker, args.tile)
+			Voxel:damage(args.owner, args.tile)
 		end
 		-- Damage the weapon.
 		if args.weapon and args.weapon.spec.damage_mining then
 			if not args.weapon:damaged{amount = 2 * args.weapon.spec.damage_mining * math.random(), type = "mining"} then
-				args.attacker:send{packet = Packet(packets.MESSAGE, "string",
+				args.owner:send{packet = Packet(packets.MESSAGE, "string",
 					"The " .. args.weapon.spec.name .. " broke!")}
 			end
 		end
@@ -108,7 +113,7 @@ Feat.apply = function(self, args)
 			local need = args.weapon.spec.construct_tile_count or 1
 			local have = args.weapon.count
 			if m and need <= have then
-				local t,p = Utils:find_build_point(args.point, args.attacker)
+				local t,p = Utils:find_build_point(args.point, args.owner)
 				if t then
 					local o = args.weapon:split(need)
 					o:detach()
@@ -132,7 +137,7 @@ Feat.perform = function(self, args)
 	local anim = Featanimspec:find{name = self.animation}
 	local slot = anim and (anim.slot or (anim.required_weapon and args.user.spec.weapon_slot))
 	local weapon = slot and args.user.inventory:get_object_by_slot(slot)
-	local info = anim and self:get_info{attacker = args.user, weapon = weapon}
+	local info = anim and self:get_info{owner = args.user, weapon = weapon}
 	-- Check for cooldown and requirements.
 	if info and not args.stop then
 		if args.user.cooldown then return end
@@ -212,7 +217,7 @@ Feat.usable = function(self, args)
 	local anim = Featanimspec:find{name = self.animation}
 	if not anim then return end
 	local weapon = args.user.inventory:get_object_by_slot(anim.slot)
-	local info = self:get_info{attacker = args.user, weapon = weapon}
+	local info = self:get_info{owner = args.user, weapon = weapon}
 	-- Check for stats.
 	local stats = args.stats or args.user.stats
 	for k,v in pairs(info.required_stats) do

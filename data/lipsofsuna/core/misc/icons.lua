@@ -494,7 +494,7 @@ Iconspec{
 	size = {34,34}}
 
 Iconspec{
-	name = "modifier-plague",
+	name = "modifier-black haze",
 	image = "icons2",
 	offset = {34,170},
 	size = {34,34}}

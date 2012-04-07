@@ -19,7 +19,7 @@ Species{
 		upper = "aerupper1",
 		upper_safe = "aerbloomerstop1"},
 	tilt_bone = {"back1", "back2", "back3"},
-	vulnerabilities = {cold = 2, fire = 0.5}}
+	vulnerabilities = {["cold damage"] = 2, ["fire damage"] = 0.5}}
 
 Species{
 	name = "wyrm-player",

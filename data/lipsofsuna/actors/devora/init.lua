@@ -28,7 +28,7 @@ Species{
 	skin_material = "animdiffnorm1",
 	skin_textures = {"devora1", "devora1n"},
 	tilt_bone = {"back1", "back2", "back3"},
-	vulnerabilities = {fire = 2, physical = 0.8}}
+	vulnerabilities = {["fire damage"] = 2, ["physical damage"] = 0.8}}
 
 Species{
 	name = "devora-player",

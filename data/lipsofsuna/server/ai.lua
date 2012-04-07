@@ -405,16 +405,17 @@ Ai.choose_combat_action = function(self)
 		self.action_timer = math.random(1, 3)
 	elseif choice < p_melee + p_ranged + p_throw + p_forward + p_weapon then
 		-- Weapon switch.
+		local slot = self.object.spec.weapon_slot
 		if self.melee_rating > self.ranged_rating and self.melee_rating > self.throw_rating then
 			if self.best_melee_weapon then
-				self.object:equip_item{object = self.best_melee_weapon}
+				self.object.inventory:equip_object(self.best_melee_weapon, slot)
 			else
-				self.object:unequip_item{slot = self.object.spec.weapon_slot}
+				self.object.inventory:unequip_slot(slot)
 			end
 		elseif self.ranged_rating > self.throw_rating then
-			self.object:equip_item{object = self.best_ranged_weapon}
+			self.object.inventory:equip_object(self.best_ranged_weapon, slot)
 		else
-			self.object:equip_item{object = self.best_throw_weapon}
+			self.object.inventory:equip_object(self.best_throw_weapon, slot)
 		end
 		self.action_timer = 1
 	elseif choice < p_melee + p_ranged + p_throw + p_forward + p_weapon + p_backward then
@@ -539,7 +540,7 @@ Ai.find_best_feat = function(self, args)
 		feat:add_best_effects{category = effect, user = self.object}
 		-- Calculate the score.
 		-- TODO: Support influences other than health.
-		local info = feat:get_info{attacker = self.object, target = args.target, weapon = args.weapon}
+		local info = feat:get_info{owner = self.object, object = args.target, weapon = args.weapon}
 		local score = (info.influences.health or 0)
 		if args.target ~= self then score = -score end
 		if score < 1 then return end

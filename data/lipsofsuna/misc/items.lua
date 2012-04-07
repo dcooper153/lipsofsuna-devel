@@ -91,7 +91,7 @@ Itemspec{
 	name = "bullet",
 	model = "arrow-000", -- FIXME
 	categories = {"bullet"},
-	influences_base = {physical = -1},
+	influences_base = {["physical damage"] = -1},
 	crafting_count = 10,
 	crafting_materials = {["iron ingot"] = 1, ["crimson stone"] = 1},
 	gravity_projectile = Vector(0,-4,0),

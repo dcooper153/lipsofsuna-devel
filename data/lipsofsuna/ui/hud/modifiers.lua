@@ -19,7 +19,7 @@ end
 Widgets.Hudmodifiers.add = function(self, name, time)
 	-- Special handling for light and plague.
 	if name == "light" then Lighting:set_light_spell(true) end
-	if name == "plague" and not self.dict_name[name] then Effect:play("disease1") end
+	if name == "black haze" and not self.dict_name[name] then Effect:play("disease1") end
 	-- Add the icon.
 	local icon = self.dict_name[name]
 	if icon then

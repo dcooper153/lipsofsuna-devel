@@ -43,7 +43,7 @@ Obstaclespec{
 		{"log",Vector(0,3,0)}},
 	health = 50,
 	interactive = false,
-	vulnerabilities = {fire = 2, hatchet = 2}}
+	vulnerabilities = {["fire damage"] = 2, hatchet = 2}}
 
 Obstaclespec{
 	name = "rust sprig tree",
@@ -56,4 +56,4 @@ Obstaclespec{
 		{"log",Vector(0,3,0)}},
 	health = 50,
 	interactive = false,
-	vulnerabilities = {fire = 2, hatchet = 2}}
+	vulnerabilities = {["fire damage"] = 2, hatchet = 2}}

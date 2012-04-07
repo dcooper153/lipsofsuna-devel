@@ -1,4 +1,14 @@
 Featanimspec{
+	name = "area spell",
+	action = "area spell",
+	animation = "spell ranged",
+	categories = {"area spell"},
+	cooldown = 1,
+	icon = "modifier-fireball", -- FIXME
+	description = "Cast a spell that affects nearby targets.",
+	effect = "spell1"}
+
+Featanimspec{
 	name = "build",
 	action = "build",
 	animation = "build",
@@ -85,16 +95,14 @@ Featanimspec{
 
 Feateffectspec{
 	name = "berserk",
-	animations = {"missile spell", "spell on self", "spell on touch"},
+	animations = {"missile spell", "ranged spell", "spell on self", "spell on touch"},
 	categories = {"beneficial", "berserk", "spell"},
 	description = "Inflict additional damage when in low health",
 	effect = "berserk1",
 	icon = "modifier-berserk",
-	influences = {{"berserk", 30, 2}},
+	influences = {{"berserk", 60}},
 	skill_base = {willpower = 5},
-	skill_mult = {willpower = 0.1},
-	reagent_base = {["milky powder"] = 0.5},
-	reagent_mult = {["milky powder"] = 0.02}}
+	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
 	name = "black haze",
@@ -102,13 +110,22 @@ Feateffectspec{
 	categories = {"harmful", "plague", "spell"},
 	description = "Conjure infectious plagued monsters",
 	effect = "spell1",
-	icon = "modifier-plague",
-	influences = {{"plague", 1, 0.04}},
+	icon = "modifier-black haze",
+	influences = {{"black haze", 1}},
 	projectile = "fireball1",
-	skill_base = {willpower = 25},
-	skill_mult = {willpower = 0.2},
-	reagent_base = {mushroom = 0.5},
-	reagent_mult = {mushroom = 0.02}}
+	skill_base = {willpower = 20},
+	reagent_base = {mushroom = 1}}
+
+Feateffectspec{
+	name = "burning",
+	animations = {"missile spell", "ranged spell", "spell on self", "spell on touch"},
+	categories = {"harmful", "spell"},
+	description = "Inflict damage over time by putting the target on fire",
+	effect = "berserk1",
+	icon = "modifier-firewall", -- FIXME
+	influences = {{"burning", 10}},
+	skill_base = {willpower = 5},
+	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
 	name = "dig",
@@ -117,12 +134,10 @@ Feateffectspec{
 	description = "Fire a digging ray",
 	effect = "spell1",
 	icon = "modifier-earthmove",
-	influences = {{"dig", 1, 1}},
+	influences = {{"dig", 1}},
 	projectile = "fireball1", -- FIXME
 	skill_base = {willpower = 3},
-	skill_mult = {willpower = 0.3},
-	reagent_base = {["milky powder"] = 0.5},
-	reagent_mult = {["milky powder"] = 0.02}}
+	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
 	name = "fire damage",
@@ -131,11 +146,10 @@ Feateffectspec{
 	description = "Inflict fire damage",
 	effect = "explosion1",
 	icon = "modifier-fireball",
-	influences = {{"fire", -5, -0.95}},
+	influences = {{"fire damage", -5}},
 	projectile = "fireball1",
-	skill_mult = {intelligence = 1, willpower = 1},
-	reagent_base = {["milky powder"] = 1},
-	reagent_mult = {["milky powder"] = 0.1}}
+	skill_base = {willpower = 1},
+	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
 	name = "firewall",
@@ -144,12 +158,10 @@ Feateffectspec{
 	description = "Conjure a wall of fire",
 	effect = "firewall1",
 	icon = "modifier-firewall",
-	influences = {{"firewall", 5, 0.25}},
+	influences = {{"firewall", 5}},
 	projectile = "fireball1", -- FIXME
-	skill_mult = {intelligence = 1, willpower = 1},
-	reagent_base = {["milky powder"] = 1},
-	reagent_mult = {["milky powder"] = 0.1}}
-
+	skill_mult = {willpower = 1},
+	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
 	name = "light",
@@ -158,11 +170,9 @@ Feateffectspec{
 	description = "Illuminate your surroundings",
 	effect = "light1",
 	icon = "modifier-light",
-	influences = {{"light", 30, 2}},
+	influences = {{"light", 60}},
 	skill_base = {willpower = 5},
-	skill_mult = {willpower = 0.1},
-	reagent_base = {["milky powder"] = 0.5},
-	reagent_mult = {["milky powder"] = 0.02}}
+	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
 	name = "mindless march",
@@ -171,12 +181,10 @@ Feateffectspec{
 	description = "Forces the target to march forward",
 	effect = "light1",
 	icon = "modifier-light",
-	influences = {{"push", 30,10}},
+	influences = {{"mindless march", 30}},
 	skill_base = {willpower = 5},
-	skill_mult = {willpower = 0.1},
 	projectile = "magicmissile1",
-	reagent_base = {["milky powder"] = 0.5},
-	reagent_mult = {["milky powder"] = 0.02}}
+	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
 	name = "follow",
@@ -185,12 +193,10 @@ Feateffectspec{
 	description = "Forces the target to follow you",
 	effect = "light1",
 	icon = "modifier-light",
-	influences = {{"follow", 5,10}},
+	influences = {{"follow", 30}},
 	skill_base = {willpower = 5},
-	skill_mult = {willpower = 0.1},
 	projectile = "magicmissile1",
-	reagent_base = {["milky powder"] = 0.5},
-	reagent_mult = {["milky powder"] = 0.02}}
+	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
 	name = "home",
@@ -199,11 +205,9 @@ Feateffectspec{
 	description = "Creates a home location where you can respawn from",
 	effect = "light1",
 	icon = "sanctuary1",
-	influences = {{"home", 1,1}},
+	influences = {{"home", 1}},
 	skill_base = {willpower = 1},
-	skill_mult = {willpower = 0.1},
-	reagent_base = {["milky powder"] = 0.5},
-	reagent_mult = {["milky powder"] = 0.02}}
+	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
 	name = "physical damage",
@@ -211,8 +215,7 @@ Feateffectspec{
 	categories = {"harmful", "melee", "physical"},
 	effect = "impact1",
 	icon = "modifier-physical",
-	influences = {{"physical", -1, -0.2}},
-	skill_mult = {strength = 1, dexterity = 0.5}}
+	influences = {{"physical damage", -1}}}
 
 Feateffectspec{
 	name = "restore health",
@@ -221,11 +224,9 @@ Feateffectspec{
 	description = "Restore health",
 	effect = "heal1",
 	icon = "modifier-heal",
-	influences = {{"physical", 5, 1.06}},
-	skill_base = {intelligence = 10, willpower = 5},
-	skill_mult = {intelligence = 1, willpower = 0.1},
-	reagent_base = {["milky powder"] = 1},
-	reagent_mult = {["milky powder"] = 0.09}}
+	influences = {{"physical damage", 15}},
+	skill_base = {willpower = 5},
+	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
 	name = "sanctuary",
@@ -234,9 +235,9 @@ Feateffectspec{
 	description = "Protect from death",
 	effect = "sanctuary1",
 	icon = "modifier-sanctuary",
-	influences = {{"sanctuary", 30, 2}},
+	influences = {{"sanctuary", 30}},
 	reagent_base = {["milky powder"] = 3},
-	skill_base = {intelligence = 20, willpower = 20}}
+	skill_base = {willpower = 20}}
 
 Feateffectspec{
 	name = "travel",
@@ -245,9 +246,9 @@ Feateffectspec{
 	description = "Fast travel to Lips",
 	effect = "sanctuary1", -- FIXME
 	icon = "modifier-sanctuary", -- FIXME
-	influences = {{"travel", 30, 2}},
+	influences = {{"travel", 30}},
 	reagent_base = {["dewspring leaf"] = 1},
-	skill_base = {intelligence = 10, willpower = 10}}
+	skill_base = {willpower = 10}}
 
 Feateffectspec{
 	name = "wilderness",
@@ -256,11 +257,9 @@ Feateffectspec{
 	description = "Grow plants from soil",
 	effect = "wilderness1",
 	icon = "modifier-nature",
-	influences = {{"wilderness", 5, 1.06}},
+	influences = {{"wilderness", 5}},
 	reagent_base = {["milky powder"] = 1},
-	reagent_mult = {["milky powder"] = 0.09},
-	skill_base = {intelligence = 10, willpower = 5},
-	skill_mult = {intelligence = 1, willpower = 0.1}}
+	skill_base = {willpower = 5}}
 
 ---------------------------------------------------------------------
 -- Animations and effects usable to monsters only.
@@ -273,7 +272,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "growl1",
 	effect_impact = "impact1",
-	influences = {{"physical", -1}},
+	influences = {{"physical damage", -1}},
 	slot = "mouth"}
 
 Featanimspec{
@@ -284,7 +283,7 @@ Featanimspec{
 	categories = {"melee"},
 	cooldown = 4,
 	effect_impact = "impact1",
-	influences = {{"physical", -50}},
+	influences = {{"physical damage", -50}},
 	slot = "mouth"}
 
 Featanimspec{
@@ -293,7 +292,7 @@ Featanimspec{
 	animation = "explode",
 	categories = {"explode", "melee"},
 	cooldown = 2,
-	influences = {{"physical", -1}},
+	influences = {{"physical damage", -1}},
 	effect = "selfdestruct1"}
 
 Featanimspec{
@@ -305,7 +304,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
-	influences = {{"physical", -30}},
+	influences = {{"physical damage", -30}},
 	slot = "hand.L"}
 
 Featanimspec{
@@ -317,7 +316,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
-	influences = {{"physical", -30}},
+	influences = {{"physical damage", -30}},
 	slot = "hand.R"}
 
 Feateffectspec{
@@ -325,7 +324,7 @@ Feateffectspec{
 	categories = {"harmful", "melee custom", "physical"},
 	effect = "impact1",
 	icon = "modifier-physical",
-	influences = {{"physical", -1, -0.2}},
+	influences = {{"physical damage", -1}},
 	skill_mult = {dexterity = 1}}
 
 Feateffectspec{
@@ -334,10 +333,9 @@ Feateffectspec{
 	categories = {"harmful", "spell"},
 	effect = "dragonbreath1",
 	icon = "modifier-fireball",
-	influences = {{"fire", -20}},
+	influences = {{"fire damage", -20}},
 	projectile = "firebreath1",
-	skill_base = {willpower = 5},
-	skill_mult = {willpower = 0.1}}
+	skill_base = {willpower = 5}}
 
 Feateffectspec{
 	name = "strength to physical damage",
@@ -345,5 +343,4 @@ Feateffectspec{
 	categories = {"harmful", "melee custom", "physical"},
 	effect = "impact1",
 	icon = "modifier-physical",
-	influences = {{"physical", -1, -0.2}},
-	skill_mult = {strength = 1}}
+	influences = {{"physical damage", -1}}}

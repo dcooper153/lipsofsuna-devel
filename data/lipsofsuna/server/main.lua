@@ -26,9 +26,6 @@ end
 for k,v in pairs(File:scan_directory("server/influences")) do
 	require("server/influences/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
-for k,v in pairs(File:scan_directory("server/modifiers")) do
-	require("server/modifiers/" .. string.gsub(v, "([^.]*).*", "%1"))
-end
 require "server/generator"
 require "server/generator/main"
 

@@ -104,10 +104,10 @@ Item.contact_cb = function(self, result)
 		else
 			-- Damage target.
 			self.contact_args.feat:apply{
-				attacker = self.contact_args.owner,
 				charge = self.contact_args.charge,
+				object = result.object,
+				owner = self.contact_args.owner,
 				point = result.point,
-				target = result.object,
 				tile = result.tile,
 				weapon = self}
 		end

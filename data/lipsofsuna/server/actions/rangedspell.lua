@@ -6,15 +6,8 @@ Actionspec{name = "ranged spell", func = function(feat, info, args)
 	Coroutine(function(t)
 		Coroutine:sleep(args.user.spec.timing_spell_ranged * 0.02)
 		feat:play_effects(args)
-		for index,data in ipairs(feat.effects) do
-			local effect = Feateffectspec:find{name = data[1]}
-			if effect and effect.projectile then
-				local spec = Spellspec:find{name = effect.projectile}
-				if spec then
-					Spell{effect = effect.name, feat = feat, owner = args.user, power = data[2], spec = spec}
-					return
-				end
-			end
-		end
+		local spec = Spellspec:find{name = "fireball1"}
+		local spell = Spell{feat = feat, owner = args.user, spec = spec}
+		spell:fire()
 	end)
 end}

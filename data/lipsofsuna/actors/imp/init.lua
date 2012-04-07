@@ -8,7 +8,7 @@ Itemspec{
 	categories = {"melee", "weapon"},
 	animation_hold = "hold bulky",
 	animation_attack = "throw bulky",
-	influences_base = {physical = -1},
+	influences_base = {["physical damage"] = -1},
 	mass = 4,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
@@ -20,7 +20,7 @@ Itemspec{
 	categories = {"explosive", "melee", "weapon"},
 	animation_hold = "hold bulky",
 	animation_attack = "throw bulky",
-	influences_base = {fire = -10, physical = -10},
+	influences_base = {["fire damage"] = -10, ["physical damage"] = -10},
 	influences_bonus = {"melee", "explosives"},
 	destroy_actions = {"explode"},
 	destroy_timer = 5,
@@ -54,7 +54,7 @@ Species{
 	jump_force = 4,
 	model = "stoneimp2",
 	speed_walk = 1,
-	vulnerabilities = {cold = 1.1, fire = 1.1, physical = 0.8}}
+	vulnerabilities = {["cold damage"] = 1.1, ["fire damage"] = 1.1, ["physical damage"] = 0.8}}
 
 Species{
 	name = "fire imp",
@@ -78,4 +78,4 @@ Species{
 	speed_walk = 1,
 	inventory_items = {"firestone"},
 	inventory_size = 2,
-	vulnerabilities = {cold = 2, fire = 0.4, physical = 0.8}}
+	vulnerabilities = {["cold damage"] = 2, ["fire damage"] = 0.4, ["physical damage"] = 0.8}}

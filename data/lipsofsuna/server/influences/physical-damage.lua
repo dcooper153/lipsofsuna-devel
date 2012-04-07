@@ -1,6 +1,6 @@
 -- Increase or decrease health.
 Feateffectspec:extend{
-	name = "restore health",
+	name = "physical damage",
 	touch = function(self, args)
 		if not args.object then return end
 		-- Randomize the amount.
@@ -12,10 +12,10 @@ Feateffectspec:extend{
 		end
 		-- Apply unless friendly fire.
 		if val > 0 or not args.owner.client or not args.object.client then
-			args.target:damaged{amount = -val, point = args.point, type = "physical"}
+			args.object:damaged{amount = -val, point = args.point, type = "physical"}
 		end
 		-- Anger hurt creatures.
-		if val < 0 then
+		if val > 0 then
 			args.object:add_enemy(args.owner)
 		end
 	end,

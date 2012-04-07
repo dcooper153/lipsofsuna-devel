@@ -21,7 +21,7 @@ Species{
 	skin_shader = "animdiffnorm",
 	skin_textures = {"kraken1", "kraken1n"},
 	tilt_bone = {"back1", "back2", "back3"},
-	vulnerabilities = {cold = 0.5, fire = 2},
+	vulnerabilities = {["cold damage"] = 0.5, ["fire damage"] = 2},
 	water_friction = 0}
 
 Species{

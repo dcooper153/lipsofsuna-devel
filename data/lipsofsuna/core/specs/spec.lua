@@ -3,6 +3,18 @@ Spec.dict_id = {}
 Spec.dict_cat = {}
 Spec.dict_name = {}
 
+--- Extends a spec with the values in the table.
+-- @param clss Spec class.
+-- @param args Arguments.<ul>
+--   <li>name: Spec name.</li></ul>
+Spec.extend = function(clss, args)
+	local spec = clss:find(args)
+	if not spec then return end
+	for k,v in pairs(args) do
+		if k ~= "name" then spec[k] = v end
+	end
+end
+
 --- Finds a spec.
 -- @param clss Spec class.
 -- @param args Arguments.<ul>

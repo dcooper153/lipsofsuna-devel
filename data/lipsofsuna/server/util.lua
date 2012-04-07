@@ -231,4 +231,5 @@ Voxel.damage = function(self, user, point)
 			local object = Creature{random = true, spec = spec, position = offset, realized = true}
 		end
 	end
+	return true
 end

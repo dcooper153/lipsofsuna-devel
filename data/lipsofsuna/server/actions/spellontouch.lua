@@ -9,10 +9,10 @@ Actionspec{name = "spell on touch", func = function(feat, info, args)
 		local r = Physics:cast_ray{src = src, dst = dst}
 		if not r then return end
 		feat:apply{
-			attacker = args.user,
 			charge = args.charge,
+			object = r.object,
+			owner = args.user,
 			point = r.point,
-			target = r.object,
 			tile = r.tile,
 			weapon = args.weapon}
 	end)

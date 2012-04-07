@@ -36,4 +36,4 @@ Species{
 	mass = 1000,
 	speed_walk = 1,
 	skills = {"Health lv4", "Willpower lv2"},
-	vulnerabilities = {cold = 2, fire = 0.3}}
+	vulnerabilities = {["cold damage"] = 2, ["fire damage"] = 0.3}}

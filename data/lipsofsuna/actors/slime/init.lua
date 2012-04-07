@@ -16,7 +16,7 @@ Species{
 	jump_force = 4,
 	model = "slime2",
 	speed_walk = 2,
-	vulnerabilities = {cold = 1.5, fire = 1.5, physical = 0.6}}
+	vulnerabilities = {["cold damage"] = 1.5, ["fire damage"] = 1.5, ["physical damage"] = 0.6}}
 
 Species{
 	name = "plague slime",
@@ -35,4 +35,4 @@ Species{
 	jump_force = 4,
 	model = "slime2",
 	speed_walk = 2,
-	vulnerabilities = {cold = 1.5, fire = 1.5, physical = 0.6}}
+	vulnerabilities = {["cold damage"] = 1.5, ["fire damage"] = 1.5, ["physical damage"] = 0.6}}
