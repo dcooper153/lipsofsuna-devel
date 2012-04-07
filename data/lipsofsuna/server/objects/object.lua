@@ -351,6 +351,7 @@ end
 Object.save = function(self)
 	local data = self:write()
 	Serialize.db:query("REPLACE INTO objects (id,sector,data) VALUES (?,?,?);", {self.id, self.sector, data})
+	self:write_db(Serialize.db)
 end
 
 --- Sends a chat message to all players near the object.
@@ -495,4 +496,10 @@ Object.write = function(self)
 		position = self.position,
 		rotation = self.rotation},
 		"return self")
+end
+
+--- Writes the obstacle to a database.
+-- @param self Object.
+-- @param db Database.
+Object.write_db = function(self, db)
 end

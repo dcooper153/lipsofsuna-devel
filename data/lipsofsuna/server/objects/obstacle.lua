@@ -122,3 +122,20 @@ Obstacle.write = function(self)
 		variables = self.variables},
 		"return self")
 end
+
+--- Writes the obstacle to a database.
+-- @param self Object.
+-- @param db Database.
+Obstacle.write_db = function(self, db)
+	-- Write the object.
+	local data = self:write()
+	db:query("REPLACE INTO object_data (id,type,data) VALUES (?,?,?);",
+		{self.id, "obstacle", self.sector, self.parent, data})
+	-- Write the sector.
+	if self.sector then
+		db:query("REPLACE INTO object_sectors (id,sector) VALUES (?,?);",
+			{self.id, self.sector})
+	else
+		db:query("DELETE FROM object_sectors where id=?;", {self.id})
+	end
+end

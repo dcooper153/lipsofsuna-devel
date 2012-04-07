@@ -57,3 +57,18 @@ end
 -- @return Data string.
 Staticobject.write = function(self)
 end
+
+--- Writes the obstacle to a database.
+-- @param self Object.
+-- @param db Database.
+Staticobject.write_db = function(self, db)
+	-- Write the object.
+	local data = string.format("local self=Player%s\n%s", serialize{
+		id = self.id,
+		position = self.position,
+		rotation = self.rotation,
+		spec = self.spec.name},
+		"return self")
+	db:query("REPLACE INTO object_data (id,type,data) VALUES (?,?,?);",
+		{self.id, "static", data})
+end

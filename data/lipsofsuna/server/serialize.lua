@@ -7,6 +7,11 @@ Serialize.data_version = "9"
 Serialize.init = function(clss)
 	-- Create the save database.
 	clss.db = Database{name = "save" .. Settings.file .. ".sqlite"}
+	-- Create the object tables.
+	clss.db:query("CREATE TABLE IF NOT EXISTS object_data (id INTEGER PRIMARY KEY,type TEXT,data TEXT);")
+	clss.db:query("CREATE TABLE IF NOT EXISTS object_inventory (id INTEGER PRIMARY KEY,parent INTEGER,offset INTEGER,slot TEXT);")
+	clss.db:query("CREATE TABLE IF NOT EXISTS object_sectors (id INTEGER PRIMARY KEY,sector INTEGER);")
+	-- Create assorted tables.
 	clss.sectors = Sectors{database = clss.db}
 	clss.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
 	if clss:get_value("data_version") ~= clss.data_version then

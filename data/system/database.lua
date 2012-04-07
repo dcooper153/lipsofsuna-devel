@@ -49,6 +49,7 @@ Database.query = function(self, a, b)
 	end
 	-- Perform the query.
 	local t = Los.database_query(self.handle, a, s)
+	if not t then return end
 	-- Translate handles to packets.
 	for k1,v1 in pairs(t) do
 		for k2,v2 in pairs(v1) do

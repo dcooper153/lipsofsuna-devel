@@ -892,3 +892,23 @@ Creature.write = function(self)
 		Serialize:encode_inventory(self.inventory),
 		"return self")
 end
+
+--- Writes the obstacle to a database.
+-- @param self Object.
+-- @param db Database.
+Creature.write_db = function(self, db)
+	-- Write the object.
+	local data = self:write()
+	db:query("REPLACE INTO object_data (id,type,data) VALUES (?,?,?);", {self.id, "actor", data})
+	-- Write the sector.
+	if self.sector then
+		db:query("REPLACE INTO object_sectors (id,sector) VALUES (?,?);", {self.id, self.sector})
+	else
+		db:query("DELETE FROM object_sectors where id=?;", {self.id})
+	end
+	-- Write the inventory contents.
+	db:query("DELETE FROM object_inventory WHERE parent=?;", {self.id})
+	for index,object in pairs(self.inventory.stored) do
+		object:write_db(db, index)
+	end
+end
