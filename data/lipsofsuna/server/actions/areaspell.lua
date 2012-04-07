@@ -4,8 +4,19 @@ Actionspec{
 		Coroutine(function(t)
 			Coroutine:sleep(args.user.spec.timing_spell_ranged * 0.02)
 			feat:play_effects(args)
-			local spec = Spellspec:find{name = "firewall1"} --FIXME
-			local spell = AreaSpell{duration = 15, feat = feat, owner = args.user,
-				position = args.user.position, realized = true, spec = spec}
+			-- Create a separate object for each effect.
+			-- Area spells may have different durations so a combination of them
+			-- cannot generally be represented as one object.
+			for k,v in pairs(feat.effects) do
+				local effect = Feateffectspec:find{name = v[1]}
+				local spec = effect and Spellspec:find{name = effect.projectile}
+				if effect and spec then
+					local sub = Feat{animation = "area spell", effects = {{v[1], v[2]}}}
+					local spell = AreaSpell{
+						duration = effect.duration, radius = effect.radius,
+						feat = sub, owner = args.user, position = args.user.position,
+						realized = true, spec = spec}
+				end
+			end
 		end)
 	end}

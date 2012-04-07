@@ -128,6 +128,18 @@ Feateffectspec{
 	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
+	name = "cold damage",
+	animations = {"missile spell", "ranged spell", "spell on self", "spell on touch"},
+	categories = {"cold", "harmful", "melee", "spell"},
+	description = "Inflict cold damage",
+	effect = "explosion1", -- FIXME
+	icon = "modifier-ice",
+	influences = {{"cold damage", -5}},
+	projectile = "fireball1", -- FIXME
+	skill_base = {willpower = 1},
+	reagent_base = {["milky powder"] = 1}}
+
+Feateffectspec{
 	name = "dig",
 	animations = {"missile spell", "ranged spell"},
 	categories = {"dig", "spell"},
@@ -161,6 +173,20 @@ Feateffectspec{
 	influences = {{"firewall", 5}},
 	projectile = "fireball1", -- FIXME
 	skill_mult = {willpower = 1},
+	reagent_base = {["milky powder"] = 1}}
+
+Feateffectspec{
+	name = "frost vortex",
+	animations = {"area spell"},
+	categories = {"harmful", "spell"},
+	description = "Inflict cold damage to nearby targets",
+	effect = "spell1",
+	icon = "modifier-ice",
+	radius = 5,
+	duration = 10,
+	influences = {{"cold damage", -5}},
+	projectile = "fireball1",
+	skill_base = {willpower = 10},
 	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{

@@ -57,6 +57,7 @@ Feateffectspec.dict_name = {}
 --   <li>categories: List of categories.</li>
 --   <li>cooldown_base: Base cooldown time.</li>
 --   <li>cooldown_mult: Cooldown time multiplier.</li>
+--   <li>duration: Spell object duration, in seconds.</li>
 --   <li>effect: Effect name.</li>
 --   <li>influences: List of {type, base, mult} influences.</li>
 --   <li>locked: True for not unlocked yet.</li>
@@ -72,6 +73,7 @@ Feateffectspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.cooldown_base = self.cooldown_base or 0
 	self.cooldown_mult = self.cooldown_mult or 0
+	self.duration = self.duration or 0
 	self.influences = self.influences or {}
 	self.radius = self.radius or 0
 	self.range = self.range or 0
