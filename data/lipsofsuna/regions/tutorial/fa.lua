@@ -16,6 +16,7 @@
 				{"branch",
 					{"say","Fighting Instructor Fa","Nothing like a bit of the old Ultra-Violence, ey? Now, go to Spud and show him this token"},
 					{"quest", "An Introduction to Ultraviolence", status = "completed", marker = "spud", text = "I have learnt how to fight, and recieved the neccessary token"},
+					{"unlock reward"},
 					{"flag","done fighting"}},	
 				{"say","Fighting Instructor Fa","No, you bloody well haven't. What are you some kind of pansy pacifist? Go and get my token!"}}},
 		{"choice","Not yet",

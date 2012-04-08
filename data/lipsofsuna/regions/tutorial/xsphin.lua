@@ -17,6 +17,7 @@
 				{"branch",
 					{"say","Craftress Xsphin","Ah, good, good. And guessssss -dammit- what, it's your token as well. Now, go report to Zyra, or Fa, or Spud if you've completed your training"},
 					{"quest", "An Introduction to Crafting", status = "completed", marker = "spud", text = "I have learnt how to craft, and recieved the neccessary token"},
+					{"unlock reward"},
 					{"flag","done crafting"}},	
 				{"say","Craftress Xsphin","No, you haven't made a dagger. If you've wasted your wood, we have a problem"}}},
 		{"choice","Not yet",
