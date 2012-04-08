@@ -206,6 +206,26 @@ Creature.new = function(clss, args)
 	return self
 end
 
+--- Clones the object.
+-- @param self Object.
+-- @return New object.
+Creature.clone = function(self)
+	local variables = {}
+	for k,v in pairs(self.variables) do variables[k] = v end
+	return Creature{
+		angular = self.angular,
+		beheaded = self.beheaded,
+		dead = self.dead,
+		eye_style = self.eye_style,
+		face_style = self.face_style,
+		hair_style = self.hair_style,
+		physics = self.physics,
+		position = self.position,
+		rotation = self.rotation,
+		spec = self.spec,
+		variables = variables}
+end
+
 --- Adds an object to the list of known enemies.<br/>
 -- This function skips faction checks and adds the object directly to the
 -- list. Hence, calling this temporarily makes the creature angry at the
@@ -893,22 +913,53 @@ Creature.write = function(self)
 		"return self")
 end
 
---- Writes the obstacle to a database.
+--- Reads the object from a database.
+-- @param self Object.
+-- @param db Database.
+Creature.read_db = function(self, db)
+	Serialize:load_object_inventory(self)
+	Serialize:load_object_skills(self)
+	Serialize:load_object_stats(self)
+end
+
+--- Writes the object to a database.
 -- @param self Object.
 -- @param db Database.
 Creature.write_db = function(self, db)
 	-- Write the object.
-	local data = self:write()
-	db:query("REPLACE INTO object_data (id,type,data) VALUES (?,?,?);", {self.id, "actor", data})
+	local data = string.format("return Creature%s", serialize{
+		angular = self.angular,
+		beheaded = self.beheaded or nil,
+		dead = self.dead,
+		eye_style = self.eye_style,
+		face_style = self.face_style,
+		hair_style = self.hair_style,
+		id = self.id,
+		physics = self.physics,
+		position = self.position,
+		rotation = self.rotation,
+		spec = self.spec.name,
+		variables = self.variables})
+	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "actor", data})
 	-- Write the sector.
 	if self.sector then
-		db:query("REPLACE INTO object_sectors (id,sector) VALUES (?,?);", {self.id, self.sector})
+		db:query([[REPLACE INTO object_sectors (id,sector) VALUES (?,?);]], {self.id, self.sector})
 	else
-		db:query("DELETE FROM object_sectors where id=?;", {self.id})
+		db:query([[DELETE FROM object_sectors where id=?;]], {self.id})
 	end
 	-- Write the inventory contents.
-	db:query("DELETE FROM object_inventory WHERE parent=?;", {self.id})
+	db:query([[DELETE FROM object_inventory WHERE parent=?;]], {self.id})
 	for index,object in pairs(self.inventory.stored) do
 		object:write_db(db, index)
+	end
+	-- Write skills.
+	db:query([[DELETE FROM object_skills WHERE id=?;]], {self.id})
+	for name,value in pairs(self.skills.skills) do
+		db:query([[REPLACE INTO object_skills (id,name) VALUES (?,?);]], {self.id, name})
+	end
+	-- Write stats.
+	db:query([[DELETE FROM object_stats WHERE id=?;]], {self.id})
+	for name,args in pairs(self.stats.stats) do
+		db:query([[REPLACE INTO object_stats (id,name,value) VALUES (?,?,?);]], {self.id, name, args.value})
 	end
 end

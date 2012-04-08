@@ -51,6 +51,21 @@ Obstacle.new = function(clss, args)
 	return self
 end
 
+--- Clones the object.
+-- @param self Object.
+-- @return New object.
+Obstacle.clone = function(self)
+	local variables = {}
+	for k,v in pairs(self.variables) do variables[k] = v end
+	return Obstacle{
+		angular = self.angular,
+		health = self.health,
+		position = self.position,
+		rotation = self.rotation,
+		spec = self.spec,
+		variables = variables}
+end
+
 --- Causes the object to take damage.
 -- @param self Object.
 -- @param args Arguments.<ul>
@@ -108,34 +123,25 @@ Obstacle.use_cb = function(self, user)
 	Object.use_cb(self, user)
 end
 
---- Serializes the object to a string.
+--- Writes the object to a database.
 -- @param self Object.
--- @return Data string.
-Obstacle.write = function(self)
-	return string.format("local self=Obstacle%s\n%s", serialize{
+-- @param db Database.
+Obstacle.write_db = function(self, db)
+	-- Write the object.
+	local data = string.format("return Obstacle%s", serialize{
 		angular = self.angular,
 		health = self.health,
 		id = self.id,
 		position = self.position,
 		rotation = self.rotation,
 		spec = self.spec.name,
-		variables = self.variables},
-		"return self")
-end
-
---- Writes the obstacle to a database.
--- @param self Object.
--- @param db Database.
-Obstacle.write_db = function(self, db)
-	-- Write the object.
-	local data = self:write()
-	db:query("REPLACE INTO object_data (id,type,data) VALUES (?,?,?);",
-		{self.id, "obstacle", self.sector, self.parent, data})
+		variables = self.variables})
+	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "obstacle", data})
 	-- Write the sector.
 	if self.sector then
-		db:query("REPLACE INTO object_sectors (id,sector) VALUES (?,?);",
+		db:query([[REPLACE INTO object_sectors (id,sector) VALUES (?,?);]],
 			{self.id, self.sector})
 	else
-		db:query("DELETE FROM object_sectors where id=?;", {self.id})
+		db:query([[DELETE FROM object_sectors where id=?;]], {self.id})
 	end
 end

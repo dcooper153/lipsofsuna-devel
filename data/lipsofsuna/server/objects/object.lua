@@ -73,25 +73,6 @@ Object.contact_cb = function(self, result)
 	return true
 end
 
---- Creates a new object from a data string or database entry.
--- @param clss Object class.
--- @param args Arguments.<ul>
---  <li>data: Data string.</li>
---  <li>id: Object ID to search from the database.</li></ul>
--- @return Object or nil.
-Object.load = function(clss, args)
-	if args.data then
-		local func = assert(loadstring("return function()\n" .. args.data .. "\nend"))()
-		if func then return func() end
-	elseif args.id then
-		local rows = Serialize.db:query("SELECT * FROM objects WHERE id=?;", {args.id})
-		for k,v in ipairs(rows) do
-			local func = assert(loadstring("return function()\n" .. v[3] .. "\nend"))()
-			return func and func()
-		end
-	end
-end
-
 --- Default add enemy call.
 -- @param self Object.
 -- @param object Object to add to the list of enemies.
@@ -146,8 +127,6 @@ end
 -- @param self Object.
 -- @return New object.
 Object.clone = function(self)
-	local data = string.gsub(self:save(), "id=[0-9]*,", "")
-	return Object:load{data = data}
 end
 
 --- Causes the object to take damage.
@@ -278,7 +257,7 @@ Object.get_free_id = function(clss)
 	while true do
 		local id = math.random(0x0000001, 0x0FFFFFF)
 		if not Object:find{id = id} then
-			local rows = Serialize.db:query("SELECT id FROM objects WHERE id=?;", {id})
+			local rows = Serialize.db:query([[SELECT id FROM object_data WHERE id=?;]], {id})
 			if not rows[1] then
 				return id
 			end
@@ -343,15 +322,11 @@ Object.merge = function(self, object)
 end
 
 Object.purge = function(self)
-	Serialize.db:query("DELETE FROM objects WHERE id=?;", {self.id})
-end
-
---- Saves the object to the database.
--- @param self Object.
-Object.save = function(self)
-	local data = self:write()
-	Serialize.db:query("REPLACE INTO objects (id,sector,data) VALUES (?,?,?);", {self.id, self.sector, data})
-	self:write_db(Serialize.db)
+	Serialize.db:query([[DELETE FROM object_data WHERE id=?;]], {self.id})
+	Serialize.db:query([[DELETE FROM object_inventory WHERE id=?;]], {self.id})
+	Serialize.db:query([[DELETE FROM object_sectors WHERE id=?;]], {self.id})
+	Serialize.db:query([[DELETE FROM object_skills WHERE id=?;]], {self.id})
+	Serialize.db:query([[DELETE FROM object_stats WHERE id=?;]], {self.id})
 end
 
 --- Sends a chat message to all players near the object.
@@ -483,22 +458,13 @@ Object.use_cb = function(self, user)
 	self:loot(user)
 end
 
---- Serializes the object to a string.
+--- Reads the object from a database.
 -- @param self Object.
--- @return Data string.
-Object.write = function(self)
-	return string.format("local self=Object%s\n%s", serialize{
-		angular = self.angular,
-		id = self.id,
-		mass = self.mass,
-		name = self.name,
-		model = self.model_name,
-		position = self.position,
-		rotation = self.rotation},
-		"return self")
+-- @param db Database.
+Object.read_db = function(self, db)
 end
 
---- Writes the obstacle to a database.
+--- Writes the object to a database.
 -- @param self Object.
 -- @param db Database.
 Object.write_db = function(self, db)

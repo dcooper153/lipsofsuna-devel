@@ -11,13 +11,16 @@ Eventhandler{type = "logout", func = function(self, event)
 	-- Detach the player object.
 	local object = Player.clients[event.client]
 	if object then
+		Serialize:save_object(object)
 		object:detach()
 		Player.clients[event.client] = nil
 	end
 	-- Update the account.
 	local account = Account.dict_client[event.client]
 	if account then
-		Serialize:save_account(account, object)
+		if not object then
+			Serialize:save_account(account)
+		end
 		account.client = nil
 		Account.dict_client[event.client] = nil
 		Account.dict_name[account.login] = nil

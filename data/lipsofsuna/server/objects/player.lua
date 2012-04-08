@@ -539,11 +539,17 @@ Player.vision_cb = function(self, args)
 	if fun then fun(args) end
 end
 
---- Serializes the object to a string.
+--- Writes the object to a database.
+--
+-- Player objects are not added to sectors unless they are corpses. Apart from
+-- that and the account information being written, they behave similar to
+-- ordinary actors.
+--
 -- @param self Object.
--- @return Data string.
-Player.write = function(self)
-	return string.format("local self=Player%s\n%s%s%s%s", serialize{
+-- @param db Database.
+Player.write_db = function(self, db)
+	-- Write the object.
+	local data = string.format("return Player%s", serialize{
 		angular = self.angular,
 		body_scale = self.body_scale,
 		body_style = self.body_style,
@@ -551,16 +557,38 @@ Player.write = function(self)
 		eye_style = self.eye_style,
 		face_style = self.face_style,
 		hair_style = self.hair_style,
-		id = self.dead and self.id,
+		id = self.id,
 		name = self.name,
 		physics = self.dead and "rigid" or "kinematic",
 		position = self.position,
 		rotation = self.rotation,
 		skin_style = self.skin_style,
 		spec = self.spec.name,
-		variables = self.variables},
-		Serialize:encode_skills(self.skills),
-		Serialize:encode_stats(self.stats),
-		Serialize:encode_inventory(self.inventory),
-		"return self")
+		variables = self.variables})
+	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "player", data})
+	-- Write the sector.
+	if self.sector and not self.client then
+		db:query([[REPLACE INTO object_sectors (id,sector) VALUES (?,?);]], {self.id, self.sector})
+	else
+		db:query([[DELETE FROM object_sectors where id=?;]], {self.id})
+	end
+	-- Write the inventory contents.
+	db:query([[DELETE FROM object_inventory WHERE parent=?;]], {self.id})
+	for index,object in pairs(self.inventory.stored) do
+		object:write_db(db, index)
+	end
+	-- Write skills.
+	db:query([[DELETE FROM object_skills WHERE id=?;]], {self.id})
+	for name,value in pairs(self.skills.skills) do
+		db:query([[REPLACE INTO object_skills (id,name) VALUES (?,?);]], {self.id, name})
+	end
+	-- Write stats.
+	db:query([[DELETE FROM object_stats WHERE id=?;]], {self.id})
+	for name,args in pairs(self.stats.stats) do
+		db:query([[REPLACE INTO object_stats (id,name,value) VALUES (?,?,?);]], {self.id, name, args.value})
+	end
+	-- Write account information.
+	if self.client and self.account then
+		Serialize:save_account(self.account, self)
+	end
 end

@@ -68,19 +68,7 @@ Sectors.load_sector = function(self, sector)
 	end
 	-- Load objects.
 	if self.save_objects then
-		local rows = self.database:query("SELECT * FROM objects WHERE sector=?;", {sector})
-		for k,v in ipairs(rows) do
-			local func = assert(loadstring("return function()\n" .. v[3] .. "\nend"))()
-			if func then
-				local ok,ret = pcall(func)
-				if not ok then
-					print(ret)
-				elseif ret then
-					ret.realized = true
-					table.insert(objects, ret)
-				end
-			end
-		end
+		objects = Serialize:load_sector_objects(sector)
 	end
 	-- Load custom content.
 	self:created_sector(sector, terrain, objects)
@@ -92,13 +80,7 @@ end
 Sectors.save_sector = function(self, sector)
 	-- Write objects.
 	if self.save_objects then
-		self.database:query("DELETE FROM objects WHERE sector=?;", {sector})
-		local objs = Object:find{sector = sector}
-		for k,v in pairs(objs) do
-			if not v.disable_saving and (v.class ~= Player or not v.client) then
-				v:save()
-			end
-		end
+		Serialize:save_sector_objects(sector)
 	end
 	-- Write terrain.
 	if self.save_terrain then

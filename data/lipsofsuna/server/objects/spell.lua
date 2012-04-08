@@ -77,11 +77,6 @@ Spell.fire = function(self, args)
 	return ret
 end
 
---- Saves the object to the database.
--- @param self Object.
-Spell.save = function(self)
-end
-
 Spell.update = function(self, secs)
 	-- Prevent impacts from altering movement.
 	self.rotation = self.orig_rotation

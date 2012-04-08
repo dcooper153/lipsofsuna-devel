@@ -337,21 +337,36 @@ Item.write = function(self)
 		"return self")
 end
 
---- Writes the obstacle to a database.
+--- Reads the object from a database.
+-- @param self Object.
+-- @param db Database.
+Item.read_db = function(self, db)
+	Serialize:load_object_inventory(self)
+end
+
+--- Writes the object to a database.
 -- @param self Object.
 -- @param db Database.
 Item.write_db = function(self, db)
 	-- Write the object.
-	local data = self:write()
-	db:query("REPLACE INTO object_data (id,type,data) VALUES (?,?,?);", {self.id, "item", data})
+	local data = string.format("return Item%s", serialize{
+		angular = self.angular,
+		count = self.count,
+		id = self.id,
+		looted = self.looted,
+		spec = self.spec.name,
+		position = self.position,
+		rotation = self.rotation,
+		variables = self.variables})
+	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "item", data})
 	-- Write the sector.
 	if self.sector then
-		db:query("REPLACE INTO object_sectors (id,sector) VALUES (?,?);", {self.id, self.sector})
+		db:query([[REPLACE INTO object_sectors (id,sector) VALUES (?,?);]], {self.id, self.sector})
 	else
-		db:query("DELETE FROM object_sectors where id=?;", {self.id})
+		db:query([[DELETE FROM object_sectors where id=?;]], {self.id})
 	end
 	-- Write the inventory contents.
-	db:query("DELETE FROM object_inventory WHERE parent=?;", {self.id})
+	db:query([[DELETE FROM object_inventory WHERE parent=?;]], {self.id})
 	for index,object in pairs(self.inventory.stored) do
 		object:write_db(db, index)
 	end
@@ -360,9 +375,9 @@ Item.write_db = function(self, db)
 		local parent = Object:find{id = self.parent}
 		local index = parent.inventory:get_index_by_object(self)
 		local slot = parent.inventory:get_slot_by_index(index)
-		db:query("REPLACE INTO object_inventory (id,parent,offset,slot) VALUES (?,?,?,?);",
+		db:query([[REPLACE INTO object_inventory (id,parent,offset,slot) VALUES (?,?,?,?);]],
 			{self.id, self.parent, index, slot})
 	else
-		db:query("DELETE FROM object_inventory WHERE id=?;", {self.id})
+		db:query([[DELETE FROM object_inventory WHERE id=?;]], {self.id})
 	end
 end

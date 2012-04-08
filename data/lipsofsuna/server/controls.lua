@@ -97,7 +97,7 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 	-- Add to the map.
 	Network:send{client = args.client, packet = Packet(packets.CHARACTER_ACCEPT)}
 	spawn_player(o, args.client, spawnpoint)
-	Serialize:save_account(account, o)
+	Serialize:save_object(o)
 end}
 
 Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
@@ -129,18 +129,11 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
 	account.client = args.client
 	Account.dict_client[args.client] = account
 	-- Create existing characters.
-	local created
-	if account.character then
-		local func = assert(loadstring("return function()\n" .. account.character .. "\nend"))()
-		if func then
-			local object = func()
-			if object then
-				Network:send{client = args.client, packet = Packet(packets.CHARACTER_ACCEPT)}
-				object.account = account
-				spawn_player(object, args.client)
-				created = true
-			end
-		end
+	local object = Serialize:load_player_object(account)
+	if object then
+		Network:send{client = args.client, packet = Packet(packets.CHARACTER_ACCEPT)}
+		object.account = account
+		spawn_player(object, args.client)
 	end
 	-- Check for permissions.
 	-- Check if the account has admin rights in the config file.
@@ -154,7 +147,7 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
 	-- Inform about admin privileges.
 	Network:send{client = args.client, packet = Packet(packets.ADMIN_PRIVILEGE, "bool", admin)}
 	-- Enter the character creation mode.
-	if not created then
+	if not object then
 		Network:send{client = args.client, packet = Packet(packets.CHARACTER_CREATE)}
 	end
 end}
