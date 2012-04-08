@@ -63,6 +63,62 @@ Unlocks.unlock = function(self, type, name)
 	end
 end
 
+--- Unlocks a random skill, spell type or spell effect.
+-- @param self Unlocks class.
+-- @return Unlock type and unlock name, or nil.
+Unlocks.unlock_random = function(self)
+	local choices = {}
+	-- Find the unlockable skills.
+	-- All skill types that have a description are assumed to be used by
+	-- players. Such a skill can be unlocked if it hasn't been unlocked
+	-- already but all its requirements have been unlocked.
+	for k,v in pairs(Skillspec.dict_name) do
+		if v.description and not self:get("skill", k) then
+			local deps = v:find_direct_requirements()
+			local pass = true
+			for name in pairs(deps) do
+				if not self:get("skill", name) then
+					pass = false
+					break
+				end
+			end
+			if pass then
+				table.insert(choices, {"skill", k})
+			end
+		end
+	end
+	-- Find the unlockable spell types.
+	-- All spell types that have a description are assumed to be used by
+	-- players. Out of those, we choose ones not yet unlocked.
+	for k,v in pairs(Featanimspec.dict_name) do
+		if v.description and not self:get("spell type", k) then
+			table.insert(choices, {"spell type", k})
+		end
+	end
+	-- Find the unlockable spell effects.
+	-- All spell effects that have a description are assumed to be used by
+	-- players. Out of those, we choose ones that are not yet unlocked but
+	-- have at least one of the allowed spell types unlocked.
+	for k,v in pairs(Feateffectspec.dict_name) do
+		if v.description and not self:get("spell effect", k) then
+			local pass = false
+			for index,name in pairs(v.animations) do
+				if self:get("spell type", name) then
+					pass = true
+					break
+				end
+			end
+			if pass then
+				table.insert(choices, {"spell effect", k})
+			end
+		end
+	end
+	-- Unlock a random item.
+	if #choices == 0 then return end
+	local c = choices[math.random(1, #choices)]
+	self:unlock(c[1], c[2])
+end
+
 --- Reads the unlocks from a database.
 -- @param self Unlocks class.
 Unlocks.read_db = function(self)

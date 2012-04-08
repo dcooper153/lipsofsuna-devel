@@ -137,6 +137,11 @@ ChatCommand{pattern = "^/teleport (.*)$", permission = "admin", func = function(
 	end
 end}
 
+-- Unlock a random skill, spell type or spell effect.
+ChatCommand{pattern = "^/unlock$", permission = "admin", func = function(player, matches)
+	Unlocks:unlock_random()
+end}
+
 -- Unlock a map marker.
 ChatCommand{pattern = "^/unlock marker (.*)$", permission = "admin", func = function(player, matches)
 	local m = Marker:find{name = matches[1]}

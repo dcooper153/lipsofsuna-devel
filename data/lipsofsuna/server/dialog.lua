@@ -167,10 +167,6 @@ Dialog.execute = function(self)
 			Effect:play{effect = c[2], object = self.user}
 			vm[1].pos = vm[1].pos + 1
 		end,
-		feat = function(vm, c)
-			Feat:unlock(c)
-			vm[1].pos = vm[1].pos + 1
-		end,
 		flag = function(vm, c)
 			Dialog.flags[c[2]] = "true"
 			Serialize:save_quests()
@@ -313,6 +309,10 @@ Dialog.execute = function(self)
 			if m and not m.unlocked then
 				m:unlock()
 			end
+			vm[1].pos = vm[1].pos + 1
+		end,
+		["unlock reward"] = function(vm, c)
+			Unlocks:unlock_random()
 			vm[1].pos = vm[1].pos + 1
 		end,
 		var = function(vm, c)

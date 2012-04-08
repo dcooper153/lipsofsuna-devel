@@ -65,11 +65,6 @@ Dialogspec.validate = function(self, args)
 			assert(type(c[2]) == "nil", "too many arguments to \"exit\" command")
 			validate_arguments(c, {})
 		end,
-		feat = function(c)
-			assert(type(c[2]) == "nil", "too many arguments to \"feat\" command")
-			assert(type(c.category) == "nil" or type(c.category) == "string", "argument \"category\" of \"feat\" must be a feat category string")
-			validate_arguments(c, {category = true})
-		end,
 		flag = function(c)
 			assert(type(c[2]) == "string", "argument #2 of \"flag\" must be the flag name")
 			assert(type(c[3]) == "nil", "too many arguments to \"flag\" command")
@@ -160,6 +155,10 @@ Dialogspec.validate = function(self, args)
 		["unlock marker"] = function(v)
 			assert(type(c[2]) == "string", "argument #2 of \"unlock marker\" must be the name of the marker")
 			assert(type(c[3]) == "nil", "too many arguments to \"unlock marker\" command")
+			validate_arguments(c, {})
+		end,
+		["unlock reward"] = function(c)
+			assert(type(c[2]) == "nil", "too many arguments to \"unlock reward\" command")
 			validate_arguments(c, {})
 		end,
 		var = function(c)
