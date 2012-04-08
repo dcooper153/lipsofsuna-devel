@@ -142,6 +142,11 @@ ChatCommand{pattern = "^/unlock$", permission = "admin", func = function(player,
 	Unlocks:unlock_random()
 end}
 
+-- Unlock all skills, spell types or spell effects.
+ChatCommand{pattern = "^/unlock all$", permission = "admin", func = function(player, matches)
+	repeat until not Unlocks:unlock_random()
+end}
+
 -- Unlock a map marker.
 ChatCommand{pattern = "^/unlock marker (.*)$", permission = "admin", func = function(player, matches)
 	local m = Marker:find{name = matches[1]}

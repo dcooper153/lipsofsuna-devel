@@ -117,6 +117,7 @@ Unlocks.unlock_random = function(self)
 	if #choices == 0 then return end
 	local c = choices[math.random(1, #choices)]
 	self:unlock(c[1], c[2])
+	return c[1], c[2]
 end
 
 --- Reads the unlocks from a database.
