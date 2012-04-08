@@ -64,6 +64,16 @@ stats.material_count_loaded, stats.material_count, numactive, userdata, objects)
 	Ui.state = "admin/client-stats"
 end}
 
+-- Show player position.
+ChatCommand{pattern = "^/position$", func = function(matches)
+	local object = Client.player_object
+	if not object then return end
+	local pos = object.position
+	local str = string.format("Position: %.2f %.2f %.2f", pos.x, pos.y, pos.z)
+	Client.append_log(str)
+	print(str)
+end}
+
 -- Show server stats.
 ChatCommand{pattern = "^/server_stats$", func = function(matches)
 	-- Request stats from the server.
