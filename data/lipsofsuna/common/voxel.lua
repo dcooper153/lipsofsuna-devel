@@ -118,6 +118,24 @@ Voxel.place_obstacle = function(clss, args)
 		rotation = args.rotation and Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}})
 end
 
+--- Places a static object to the map.
+-- @param clss Voxel class.
+-- @param args Arguments.<ul>
+--   <li>class: Forces all objects to use the given class.</li>
+--   <li>name: Static object name.</li>
+--   <li>point: Position vector, in tiles.</li>
+--   <li>rotation: Rotation around Y axis.</li></ul>
+Voxel.place_static = function(clss, args)
+	local spec = Staticspec:random(args)
+	if not spec then return end
+	local clss_ = args.class or Staticobject or Object
+	clss_.new(clss_, {
+		spec = spec,
+		position = args.point * clss.tile_size,
+		realized = true,
+		rotation = args.rotation and Quaternion{euler = {args.rotation * 2 * math.pi, 0, 0}}})
+end
+
 --- Places a predefined map pattern to the map.
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
@@ -165,6 +183,11 @@ Voxel.place_pattern = function(clss, args)
 	for k,v in pairs(pat.obstacles) do
 		local point = args.point + coord(v[1], v[2], v[3])
 		clss:place_obstacle{class = args.class, name = v[4], point = point, rotation = v[5]}
+	end
+	-- Create static objects.
+	for k,v in pairs(pat.statics) do
+		local point = args.point + coord(v[1], v[2], v[3])
+		clss:place_static{class = args.class, name = v[4], point = point, rotation = v[5]}
 	end
 	-- Create items.
 	for k,v in pairs(pat.items) do

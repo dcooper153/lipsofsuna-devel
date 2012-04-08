@@ -49,12 +49,6 @@ end
 Staticobject.die = function(self)
 end
 
---- Serializes the object to a string.
--- @param self Object.
--- @return Data string.
-Staticobject.write = function(self)
-end
-
 --- Writes the obstacle to a database.
 -- @param self Object.
 -- @param db Database.
@@ -79,4 +73,7 @@ Staticobject:add_setters{
 		self.model = spec.model
 		self.gravity = spec.gravity
 		self.physics = "static"
+		if spec.marker then
+			self.marker = Marker{name = spec.marker, position = self.position, target = self.id}
+		end
 	end}

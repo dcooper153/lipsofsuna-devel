@@ -3,32 +3,6 @@ require "server/objects/object"
 Obstacle = Class(Object)
 Obstacle.class_name = "Obstacle"
 
-Obstacle:add_setters{
-	realized = function(self, value)
-		Object.setters.realized(self, value)
-		if value then
-			for k,v in pairs(self.spec.constraints) do
-				if v[1] == "hinge" then
-					self:insert_hinge_constraint{position = v[2], axis = v[3]}
-				end
-			end
-		end
-	end,
-	spec = function(self, value)
-		local spec = type(value) == "string" and Obstaclespec:find{name = value} or value
-		if not spec then return end
-		rawset(self, "spec", spec)
-		self.collision_group = spec.collision_group
-		self.collision_mask = spec.collision_mask
-		self.model = spec.model
-		self.mass = spec.mass
-		self.gravity = spec.gravity
-		self.physics = spec.physics
-		if spec.marker then
-			self.marker = Marker{name = spec.marker, position = self.position, target = self.id}
-		end
-	end}
-
 --- Creates an obstacle.
 -- @param clss Mover class.
 -- @param args Arguments.
@@ -145,3 +119,29 @@ Obstacle.write_db = function(self, db)
 		db:query([[DELETE FROM object_sectors where id=?;]], {self.id})
 	end
 end
+
+Obstacle:add_setters{
+	realized = function(self, value)
+		Object.setters.realized(self, value)
+		if value then
+			for k,v in pairs(self.spec.constraints) do
+				if v[1] == "hinge" then
+					self:insert_hinge_constraint{position = v[2], axis = v[3]}
+				end
+			end
+		end
+	end,
+	spec = function(self, value)
+		local spec = type(value) == "string" and Obstaclespec:find{name = value} or value
+		if not spec then return end
+		rawset(self, "spec", spec)
+		self.collision_group = spec.collision_group
+		self.collision_mask = spec.collision_mask
+		self.model = spec.model
+		self.mass = spec.mass
+		self.gravity = spec.gravity
+		self.physics = spec.physics
+		if spec.marker then
+			self.marker = Marker{name = spec.marker, position = self.position, target = self.id}
+		end
+	end}

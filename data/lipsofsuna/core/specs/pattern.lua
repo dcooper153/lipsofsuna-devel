@@ -13,6 +13,7 @@ Pattern.dict_name = {}
 --   <li>file: Path to the file where the pattern was specified. nil for autodetect.</li>
 --   <li>items: Array of items to create.</li>
 --   <li>obstacles: Array of obstacles to create.</li>
+--   <li>statics: Array of static objects to create.</li>
 --   <li>tiles: Array of terrain tiles to create.</li></ul>
 -- @return New map pattern.
 Pattern.new = function(clss, args)
@@ -23,6 +24,7 @@ Pattern.new = function(clss, args)
 	self.creatures = self.creatures or {}
 	self.items = self.items or {}
 	self.obstacles = self.obstacles or {}
+	self.statics = self.statics or {}
 	self.tiles = self.tiles or {}
 	return self
 end
@@ -68,6 +70,11 @@ Pattern.write = function(self)
 	if #self.obstacles > 0 then
 		t = t .. ",\n\tobstacles = {\n"
 		for k,v in ipairs(self.obstacles) do t = addobj(t, k, v) end
+		t = t .. "}"
+	end
+	if #self.statics > 0 then
+		t = t .. ",\n\tstatics = {\n"
+		for k,v in ipairs(self.statics) do t = addobj(t, k, v) end
 		t = t .. "}"
 	end
 	if #self.creatures > 0 then
