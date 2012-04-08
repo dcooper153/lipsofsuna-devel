@@ -95,8 +95,10 @@ Protocol:add_handler{type = "UNLOCK", func = function(event)
 	-- Unlock items.
 	for type,names in pairs(unlock) do
 		for name in pairs(names) do
-			Client.data.unlocks:unlock(type, name)
-			Client:append_log("Unlocked " .. type .. ": " .. name)
+			if not Client.data.unlocks:get(type, name) then
+				Client.data.unlocks:unlock(type, name)
+				Client:append_log("Unlocked " .. type .. ": " .. name)
+			end
 		end
 	end
 end}

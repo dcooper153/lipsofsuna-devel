@@ -159,7 +159,7 @@ end}
 
 -- Unlock a spell effect.
 ChatCommand{pattern = "^/unlock spell effect (.*)$", permission = "admin", func = function(player, matches)
-	local spec = Spelleffectspec:find{name = matches[1]}
+	local spec = Feateffectspec:find{name = matches[1]}
 	if spec then
 		Unlocks:unlock("spell effect", matches[1])
 	else
@@ -169,7 +169,7 @@ end}
 
 -- Unlock a spell type.
 ChatCommand{pattern = "^/unlock spell type (.*)$", permission = "admin", func = function(player, matches)
-	local spec = Spellanimspec:find{name = matches[1]}
+	local spec = Featanimspec:find{name = matches[1]}
 	if spec then
 		Unlocks:unlock("spell type", matches[1])
 	else

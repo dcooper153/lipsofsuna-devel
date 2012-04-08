@@ -83,10 +83,10 @@ end
 -- @param self Unlocks class.
 Unlocks.write_db = function(self)
 	if not self.db then return end
-	db:query([[DELETE FROM unlocks;]])
-	for type,names in pairs(unlocks) do
+	self.db:query([[DELETE FROM unlocks;]])
+	for type,names in pairs(self.unlocks) do
 		for name in pairs(names) do
-			db:query([[INSERT INTO unlocks (type,name) VALUES (?,?);]], {type, name})
+			self.db:query([[INSERT INTO unlocks (type,name) VALUES (?,?);]], {type, name})
 		end
 	end
 end

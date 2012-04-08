@@ -6,7 +6,8 @@ Ui:add_state{
 		local status = Client.data.skills:get_statuses()
 		local skills = {}
 		for name,status in pairs(status) do
-			if status ~= "incompatible" then
+			local unlocked = Client.data.unlocks:get("skill", name)
+			if unlocked and status ~= "incompatible" then
 				local spec = Skillspec:find{name = name}
 				local active = (status == "active")
 				local activable = (status == "activable")

@@ -61,7 +61,7 @@ Ui:add_state{
 		-- Create the list of types.
 		local types = {}
 		for name,spec in pairs(Featanimspec.dict_name) do
-			if spec.description then
+			if Client.data.unlocks:get("spell type", name) then
 				table.insert(types, name)
 			end
 		end
@@ -81,19 +81,15 @@ Ui:add_state{
 	state = "spells/effects",
 	label = "Select effect",
 	init = function()
-		-- Get the player actor spec.
-		local spec = Client.player_object.spec
-		if not spec then return end
 		-- Get the spell type spec.
 		local spell = Operators.spells:get_spell()
 		local anim = Featanimspec:find{name = spell.animation}
 		if not anim then return end
 		-- Create the list of effects.
 		local effects = {}
-		for k in pairs(spec.feat_effects) do
-			local e = Feateffectspec:find{name = k}
-			if e and e.description then
-				table.insert(effects, k)
+		for name in pairs(Feateffectspec.dict_name) do
+			if Client.data.unlocks:get("spell effect", name) then
+				table.insert(effects, name)
 			end
 		end
 		table.sort(effects)
