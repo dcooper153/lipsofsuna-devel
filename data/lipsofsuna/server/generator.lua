@@ -151,10 +151,23 @@ Generator.generate = function(self, args)
 		Voxel:fill_region{point = reg.point, size = reg.pattern.size}
 		Voxel:place_pattern{point = reg.point, name = reg.pattern.name}
 	end
+	-- Generate static objects.
+	-- FIXME: Generate static overworld obstacles properly.
+	local spec = Staticspec:find{name = "statictree1"}
+	Staticobject{spec = spec, position = Vector(1274.34,1734.36,1394.81), realized = true}
+	Staticobject{spec = spec, position = Vector(1281.98,1738.02,1408.34), realized = true}
+	Staticobject{spec = spec, position = Vector(1286.04,1733.41,1450.72), realized = true}
+	Staticobject{spec = spec, position = Vector(1303.29,1734.14,1458.60), realized = true}
+	local statics = {}
+	for k,v in pairs(Staticobject.dict_id) do
+		statics[k] = v
+	end
 	-- Save the map.
 	self:update_status(0, "Saving the map")
 	Sectors.instance:save_world(true, function(p) self:update_status(p) end)
 	Sectors.instance:unload_world()
+	for k,v in pairs(statics) do v.realized = true end
+	Serialize:save_static_objects()
 	Serialize:set_value("map_version", Generator.map_version)
 	-- Save map markers.
 	self:update_status(0, "Saving quests")

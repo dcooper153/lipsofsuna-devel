@@ -38,18 +38,11 @@ Network:host{port = Config.inst.server_port}
 Program:push_message{name = "join"}
 
 -- Initialize the dynamic map.
-if Settings.generate or
-	Serialize:get_value("map_version") ~= Generator.map_version or
-	Serialize:get_value("data_version") ~= Serialize.data_version then
+if Settings.generate or Serialize:get_value("map_version") ~= Generator.map_version then
 	Generator.inst:generate()
 	Serialize:set_value("data_version", Serialize.data_version)
 else
 	Serialize:load()
-end
-
--- Initialize static objects.
-for k,v in pairs(Staticspec.dict_id) do
-	Staticobject{spec = v, realized = true}
 end
 
 Voxel.block_changed_cb = function(index, stamp)

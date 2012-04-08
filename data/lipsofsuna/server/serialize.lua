@@ -23,6 +23,7 @@ Serialize.load = function(clss)
 	clss:load_generator()
 	clss:load_markers()
 	clss:load_quests()
+	clss:load_static_objects()
 end
 
 --- Loads map generator data from the database.

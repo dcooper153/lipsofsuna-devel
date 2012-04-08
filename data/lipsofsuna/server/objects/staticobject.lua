@@ -20,7 +20,6 @@ Staticobject.new = function(clss, args)
 	copy("position")
 	copy("spec")
 	copy("realized")
-	copy("variables")
 	self.disable_saving = true
 	clss.dict_id[self.id] = self
 	return self
@@ -80,6 +79,4 @@ Staticobject:add_setters{
 		self.model = spec.model
 		self.gravity = spec.gravity
 		self.physics = "static"
-		self.position = spec.position
-		self.rotation = spec.rotation
 	end}

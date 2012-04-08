@@ -21,6 +21,6 @@ Map.init = function(self)
 	end
 end
 
-Staticspec{name = "test1", model = "tree2", position = Vector(817.585,1341.5,1035.97)}
-Staticspec{name = "test2", model = "tree2", position = Vector(846.273,1343.51,1038.89)}
-Staticspec{name = "test3", model = "tree2", position = Vector(872.4,1360.04,1098.29)}
+Staticspec{
+	name = "statictree1",
+	model = "tree2"}

@@ -49,6 +49,20 @@ local spawn_player = function(object, client, spawnpoint)
 		q:send{client = object}
 		q:send_marker{client = object}
 	end
+	-- Transmit static objects.
+	local packet = Packet(packets.CREATE_STATIC_OBJECTS)
+	for k,v in pairs(Staticobject.dict_id) do
+		packet:write(
+			"string", v.spec.name,
+			"float", v.position.x,
+			"float", v.position.y,
+			"float", v.position.z,
+			"float", v.rotation.x,
+			"float", v.rotation.y,
+			"float", v.rotation.z,
+			"float", v.rotation.w)
+	end
+	object:send(packet)
 end
 
 Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
