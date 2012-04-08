@@ -35,6 +35,9 @@ end
 Pattern.write = function(self)
 	-- Format categories.
 	local t = "Pattern{\n\tname = \"" .. self.name .. "\",\n\tsize = " .. tostring(self.size) .. ",\n"
+	if self.position then
+		t = t .. "\tposition = " .. tostring(self.position) .. ",\n"
+	end
 	if self.categories then
 		local categories = {}
 		for k,v in pairs(self.categories) do

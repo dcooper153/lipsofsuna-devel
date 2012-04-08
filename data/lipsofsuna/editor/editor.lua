@@ -255,6 +255,20 @@ Editor.create_obstacle = function(self, name)
 	EditorObject{position = point, realized = true, spec = spec}
 end
 
+--- Creates a static object.
+-- @param self Editor.
+-- @param name Object spec name.
+Editor.create_static = function(self, name)
+	-- Find the insertion point.
+	local point,object,tile = self:pick_scene()
+	if not point then return end
+	-- Find the inserted object type.
+	local spec = Staticspec:find{name = name}
+	if not spec then return end
+	-- Create the object.
+	EditorObject{position = point, realized = true, spec = spec}
+end
+
 --- Creates a tile.
 -- @param self Editor.
 -- @param name Tile spec name.
@@ -294,6 +308,7 @@ Editor.save = function(self)
 	local items = {}
 	local obstacles = {}
 	local species = {}
+	local statics = {}
 	-- Collect objects.
 	for k,v in pairs(Object.objects) do
 		if v.realized and v.spec then
@@ -303,6 +318,8 @@ Editor.save = function(self)
 				table.insert(obstacles, v)
 			elseif v.spec.type == "species" then
 				table.insert(species, v)
+			elseif v.spec.type == "static" then
+				table.insert(statics, v)
 			end
 		end
 	end
@@ -329,6 +346,7 @@ Editor.save = function(self)
 	table.sort(items, sortobj)
 	table.sort(obstacles, sortobj)
 	table.sort(species, sortobj)
+	table.sort(statics, sortobj)
 	-- Update the pattern.
 	local makeobj = function(v)
 		local p = roundvec(v.position)
@@ -351,6 +369,10 @@ Editor.save = function(self)
 	self.pattern.creatures = {}
 	for k,v in pairs(species) do
 		self.pattern.creatures[k] = makeobj(v)
+	end
+	self.pattern.statics = {}
+	for k,v in pairs(statics) do
+		self.pattern.statics[k] = makeobj(v)
 	end
 	local i = 1
 	self.pattern.tiles = {}

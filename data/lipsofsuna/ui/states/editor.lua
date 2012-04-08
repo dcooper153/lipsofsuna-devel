@@ -27,19 +27,7 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "editor/menu",
-	widget = function() return Widgets.Uitransition("Items", "editor/items") end}
-
-Ui:add_widget{
-	state = "editor/menu",
-	widget = function() return Widgets.Uitransition("Obstacles", "editor/obstacles") end}
-
-Ui:add_widget{
-	state = "editor/menu",
-	widget = function() return Widgets.Uitransition("Actors", "editor/actors") end}
-
-Ui:add_widget{
-	state = "editor/menu",
-	widget = function() return Widgets.Uitransition("Tiles", "editor/tiles") end}
+	widget = function() return Widgets.Uitransition("Add", "editor/add") end}
 
 Ui:add_widget{
 	state = "editor/menu",
@@ -89,6 +77,33 @@ Ui:add_state{
 ------------------------------------------------------------------------------
 
 Ui:add_state{
+	state = "editor/add",
+	label = "Add objects",
+	update = function(secs) Client.editor:update(secs) end}
+
+Ui:add_widget{
+	state = "editor/add",
+	widget = function() return Widgets.Uitransition("Items", "editor/items") end}
+
+Ui:add_widget{
+	state = "editor/add",
+	widget = function() return Widgets.Uitransition("Obstacles", "editor/obstacles") end}
+
+Ui:add_widget{
+	state = "editor/add",
+	widget = function() return Widgets.Uitransition("Static objects", "editor/statics") end}
+
+Ui:add_widget{
+	state = "editor/add",
+	widget = function() return Widgets.Uitransition("Actors", "editor/actors") end}
+
+Ui:add_widget{
+	state = "editor/add",
+	widget = function() return Widgets.Uitransition("Tiles", "editor/tiles") end}
+
+------------------------------------------------------------------------------
+
+Ui:add_state{
 	state = "editor/items",
 	label = "Create items",
 	update = function(secs) Client.editor:update(secs) end}
@@ -125,6 +140,29 @@ Ui:add_state{
 		for k,v in pairs(widgets) do
 			widgets[k] = Widgets.Uibutton(v, function()
 				Client.editor:create_obstacle(v)
+			end)
+		end
+		return widgets
+	end}
+
+------------------------------------------------------------------------------
+
+Ui:add_state{
+	state = "editor/statics",
+	label = "Create static objects",
+	update = function(secs) Client.editor:update(secs) end}
+
+Ui:add_state{
+	state = "editor/statics",
+	init = function()
+		-- Get the list of static object names.
+		local widgets = {}
+		for k in pairs(Staticspec.dict_name) do table.insert(widgets, k) end
+		table.sort(widgets)
+		-- Create widgets for the static objects.
+		for k,v in pairs(widgets) do
+			widgets[k] = Widgets.Uibutton(v, function()
+				Client.editor:create_static(v)
 			end)
 		end
 		return widgets
