@@ -37,6 +37,7 @@
 #include <OgreShadowCameraSetupLiSPSM.h>
 #include <OgreRenderSystemCapabilitiesManager.h>
 #include <OgreRenderSystemCapabilitiesSerializer.h>
+#include <OgreResourceBackgroundQueue.h>
 #include <OgreSkeletonManager.h>
 #include <OgreViewport.h>
 #include <OgreWindowEventUtilities.h>
@@ -243,10 +244,16 @@ void liren_internal_deinit (
 {
 	if (self->data != NULL)
 	{
+		/* Free the mesh manager. */
+		/* Some meshes may be being loaded in other threads so the Ogre root
+		   needs to be shut down first to guarantee clean shutdown. */
+		self->data->root->shutdown ();
 		Ogre::ResourceGroupManager::getSingleton ()._unregisterResourceManager ("LIRenMesh");
 		delete self->data->mesh_manager;
-		delete self->data->resource_loading_listener;
+
+		/* Free the Ogre root. */
 		delete self->data->root;
+		delete self->data->resource_loading_listener;
 		delete self->data->container_factory;
 		delete self->data->image_factory;
 		delete self->data->log;
