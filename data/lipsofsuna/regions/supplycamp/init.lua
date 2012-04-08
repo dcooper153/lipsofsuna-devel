@@ -8,7 +8,7 @@ Regionspec{
 	position = {940,1050},
 	spawn_point = {5,5,5}}
 
-Obstaclespec{
+Staticspec{
 	name = "entrance to suna dungeons",
 	model = "portal1",
 	categories = {"portal", "special"},

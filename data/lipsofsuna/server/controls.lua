@@ -53,6 +53,7 @@ local spawn_player = function(object, client, spawnpoint)
 	local packet = Packet(packets.CREATE_STATIC_OBJECTS)
 	for k,v in pairs(Staticobject.dict_id) do
 		packet:write(
+			"uint32", v.id,
 			"string", v.spec.name,
 			"float", v.position.x,
 			"float", v.position.y,

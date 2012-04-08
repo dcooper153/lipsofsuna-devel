@@ -60,6 +60,13 @@ Ui:add_state{
 					Ui:pop_state()
 				end))
 			end
+		elseif spec.type == "static" then
+			if spec.dialog then
+				table.insert(widgets, Widgets.Uibutton("Use", function()
+					Network:send{packet = Packet(packets.PLAYER_DIALOG, "uint32", object.id)}
+					Ui:pop_state()
+				end))
+			end
 		end
 		return widgets
 	end}

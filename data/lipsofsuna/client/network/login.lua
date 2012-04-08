@@ -21,7 +21,8 @@ end}
 
 Protocol:add_handler{type = "CREATE_STATIC_OBJECTS", func = function(event)
 	while true do
-		local ok,name,x,y,z,rx,ry,rz,rw = event.packet:resume("string",
+		local ok,id,name,x,y,z,rx,ry,rz,rw = event.packet:resume(
+			"uint32", "string",
 			"float", "float", "float",
 			"float", "float", "float", "float")
 		if not ok then return end
@@ -29,7 +30,7 @@ Protocol:add_handler{type = "CREATE_STATIC_OBJECTS", func = function(event)
 		if spec then
 			local pos = Vector(x,y,z)
 			local rot = Quaternion(rx,ry,rz,rw)
-			Staticobject{spec = spec, type = spec.type, model = spec.model,
+			Staticobject{id = id, spec = spec, type = spec.type, model = spec.model,
 				collision_group = spec.collision_group,
 				collision_mask = spec.collision_mask,
 				position = pos, rotation = rot, realized = true}
