@@ -66,7 +66,6 @@ do
 	add("EFFECT_WORLD")
 
 	add("FEAT")
-	add("FEAT_UNLOCK")
 
 	add("GENERATOR_STATUS")
 
@@ -136,6 +135,8 @@ do
 	add("TRADING_CLOSE")
 	add("TRADING_START")
 	add("TRADING_UPDATE")
+
+	add("UNLOCK")
 
 	add("VOXEL_DIFF")
 end

@@ -1,5 +1,7 @@
+require "common/unlocks"
+
 Serialize = Class()
-Serialize.game_version = "1"
+Serialize.game_version = "2"
 Serialize.account_version = "1"
 Serialize.object_version = "1"
 
@@ -81,6 +83,7 @@ Serialize.save = function(clss, erase)
 	clss:save_markers(erase)
 	clss:save_quests(erase)
 	clss:save_accounts(erase)
+	Unlocks:write_db()
 end
 
 --- Saves the map generator state.
@@ -174,6 +177,7 @@ Serialize.init_game_database = function(self, reset)
 	self.db:query([[DROP TABLE IF EXISTS markers;]])
 	self.db:query([[DROP TABLE IF EXISTS options;]])
 	self.db:query([[DROP TABLE IF EXISTS quests;]])
+	self.db:query([[DROP TABLE IF EXISTS unlocks;]])
 	self.db:query(
 		[[CREATE TABLE options (
 		key TEXT PRIMARY KEY,
@@ -200,8 +204,25 @@ Serialize.init_game_database = function(self, reset)
 		status TEXT,
 		desc TEXT,
 		marker TEXT);]])
+	self.db:query([[CREATE TABLE unlocks (
+		type TEXT,
+		name TEXT,
+		PRIMARY KEY(type,name));]])
 	-- Set the version number.
 	self:set_value("game_version", self.game_version)
+end
+
+--- Saves an unlock to the database.
+-- @param self Serialize class.
+-- @param type Type of the unlocked item.
+-- @param name Name of the unlocked item.
+-- @param value True to unlock, false to lock.
+Serialize.save_unlock = function(self, type, name, value)
+	if value then
+		self.db:query([[REPLACE INTO unlocks (type,name) VALUES (?,?);]], {type, name})
+	else
+		self.db:query([[DELETE FROM unlocks WHERE type=? AND name=?;]], {type, name})
+	end
 end
 
 --- Gets a value from the key-value database.

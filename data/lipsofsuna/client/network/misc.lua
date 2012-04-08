@@ -6,16 +6,6 @@ Protocol:add_handler{type = "BOOK", func = function(event)
 	Ui.state = "book"
 end}
 
-Protocol:add_handler{type = "FEAT_UNLOCK", func = function(event)
-	local ok,n = event.packet:read("string")
-	if ok then
-		local feat = Feat:find{name = n}
-		if not feat then return end
-		Client:append_log("Unlocked feat " .. feat.name)
-		feat.locked = false
-	end
-end}
-
 Protocol:add_handler{type = "MESSAGE", func = function(event)
 	local ok,msg = event.packet:read("string")
 	if not ok then return end
@@ -67,5 +57,46 @@ Protocol:add_handler{type = "GENERATOR_STATUS", func = function(event)
 		Client.data.start_game.active = true
 		Client.data.start_game.waiting = true
 		Ui.state = "start-game"
+	end
+end}
+
+Protocol:add_handler{type = "UNLOCK", func = function(event)
+	local lock = {}
+	local unlock = {}
+	-- Read unlocked items.
+	while true do
+		local ok,t,n = event.packet:resume("string", "string")
+		if not ok then break end
+		if unlock[t] then
+			unlock[t][n] = true
+		else
+			unlock[t] = {[n] = true}
+		end
+	end
+	-- Determine locked items.
+	for type,names in pairs(Client.data.unlocks.unlocks) do
+		for name in pairs(names) do
+			if not unlock[type] or not unlock[type][name] then
+				if lock[t] then
+					lock[t][n] = true
+				else
+					lock[t] = {[n] = true}
+				end
+			end
+		end
+	end
+	-- Lock items.
+	for type,names in pairs(lock) do
+		for name in pairs(names) do
+			Client.data.unlocks:lock(type, name)
+			Client:append_log("Locked " .. type .. ": " .. name)
+		end
+	end
+	-- Unlock items.
+	for type,names in pairs(unlock) do
+		for name in pairs(names) do
+			Client.data.unlocks:unlock(type, name)
+			Client:append_log("Unlocked " .. type .. ": " .. name)
+		end
 	end
 end}

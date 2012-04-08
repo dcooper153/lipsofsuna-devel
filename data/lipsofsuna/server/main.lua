@@ -1,5 +1,6 @@
 print "INFO: Loading server scripts."
 
+require "common/unlocks"
 require "server/util"
 require "server/account"
 require "server/serialize"
@@ -41,10 +42,31 @@ Program:push_message{name = "join"}
 if Settings.generate or Serialize:get_value("map_version") ~= Generator.map_version then
 	Generator.inst:generate()
 	Serialize:set_value("data_version", Serialize.data_version)
+	Unlocks:init(Serialize.db)
 else
 	Serialize:load()
+	Unlocks:init(Serialize.db)
+	Unlocks:read_db()
 end
 
+-- Initialize unlock updates.
+Unlocks:unlock("skill", "Health lv1")
+Unlocks:unlock("skill", "Willpower lv1")
+Unlocks:unlock("spell type", "ranged spell")
+Unlocks:unlock("spell type", "spell on self")
+Unlocks:unlock("spell effect", "fire damage")
+Unlocks:unlock("spell effect", "light")
+Unlocks:unlock("spell effect", "restore health")
+Unlocks.changed = function(self)
+	local p = Packet(packets.UNLOCK)
+	self:write_packet(p)
+	for k,v in pairs(Network.clients) do
+		Network:send{client = v, packet = p}
+	end
+end
+Unlocks:changed()
+
+-- Initialize terrain updates.
 Voxel.block_changed_cb = function(index, stamp)
 	Vision:event{type = "voxel-block-changed", index = index, point = ARGH, stamp = stamp}
 end

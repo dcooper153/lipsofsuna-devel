@@ -147,6 +147,36 @@ ChatCommand{pattern = "^/unlock marker (.*)$", permission = "admin", func = func
 	end
 end}
 
+-- Unlock a skill.
+ChatCommand{pattern = "^/unlock skill (.*)$", permission = "admin", func = function(player, matches)
+	local spec = Skillspec:find{name = matches[1]}
+	if spec then
+		Unlocks:unlock("skill", matches[1])
+	else
+		player:send(string.format("No such skill %q.", matches[1]))
+	end
+end}
+
+-- Unlock a spell effect.
+ChatCommand{pattern = "^/unlock spell effect (.*)$", permission = "admin", func = function(player, matches)
+	local spec = Spelleffectspec:find{name = matches[1]}
+	if spec then
+		Unlocks:unlock("spell effect", matches[1])
+	else
+		player:send(string.format("No such spell effect %q.", matches[1]))
+	end
+end}
+
+-- Unlock a spell type.
+ChatCommand{pattern = "^/unlock spell type (.*)$", permission = "admin", func = function(player, matches)
+	local spec = Spellanimspec:find{name = matches[1]}
+	if spec then
+		Unlocks:unlock("spell type", matches[1])
+	else
+		player:send(string.format("No such spell type %q.", matches[1]))
+	end
+end}
+
 -- Any other command.
 ChatCommand{pattern = "^(/[^ ]*).*", permission = "player", func = function(player, matches)
 	player:send("Unrecognized command.")

@@ -42,6 +42,10 @@ local spawn_player = function(object, client, spawnpoint)
 				"float", m.position.z))
 		end
 	end
+	-- Transmit other unlocks.
+	local packet1 = Packet(packets.UNLOCK)
+	Unlocks:write_packet(packet1)
+	object:send(packet1)
 	-- Transmit skills.
 	object:update_skills()
 	-- Transmit active and completed quests.

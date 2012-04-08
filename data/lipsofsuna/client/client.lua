@@ -2,6 +2,7 @@ require "client/firstpersoncamera"
 require "client/thirdpersoncamera"
 require "editor/editor"
 require "common/skills"
+require "common/unlocks"
 
 Client = Class()
 Client.class_name = "Client"
@@ -114,6 +115,8 @@ Client.reset_data = function(self)
 	self.data.spells = {slot = 1}
 	self.data.skills = Skills()
 	self.data.trading = {buy = {}, sell = {}, shop = {}}
+	self.data.unlocks = Unlocks
+	self.data.unlocks:init()
 	for k,v in pairs(Skillspec.dict_name) do
 		local found = false
 		for k1,v1 in pairs(v.requires) do found = true end
