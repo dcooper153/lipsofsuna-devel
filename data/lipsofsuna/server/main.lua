@@ -30,6 +30,13 @@ end
 require "server/generator"
 require "server/generator/main"
 
+Physics.GROUP_ACTORS = 0x0001
+Physics.GROUP_ITEMS = 0x0002
+Physics.GROUP_OBSTACLES = 0x1000
+Physics.GROUP_STATICS = 0x2000
+Physics.GROUP_HEIGHTMAP = 0x4000
+Physics.GROUP_VOXELS = 0x8000
+
 -- Initialize the heightmap.
 if Map then Map:init() end
 

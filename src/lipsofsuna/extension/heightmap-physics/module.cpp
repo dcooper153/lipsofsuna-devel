@@ -141,7 +141,7 @@ static void private_init_heightmap (
 	data->body->setCollisionFlags (data->body->getCollisionFlags () | btCollisionObject::CF_STATIC_OBJECT);
 	data->body->setCollisionShape (data->shape);
 	data->body->setWorldTransform (transform);
-	self->physics->dynamics->addCollisionObject (data->body, LIPHY_DEFAULT_COLLISION_GROUP, LIPHY_DEFAULT_COLLISION_MASK & ~LIPHY_GROUP_TILES);
+	self->physics->dynamics->addCollisionObject (data->body, LIPHY_GROUP_HEIGHTMAP, LIPHY_DEFAULT_COLLISION_MASK & ~(LIPHY_GROUP_TILES | LIPHY_GROUP_HEIGHTMAP));
 
 	/* Register the physics data. */
 	heightmap->physics_data = data;

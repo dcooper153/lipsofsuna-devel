@@ -29,7 +29,7 @@ Obstaclespec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	local copy = function(f, d) if self[f] == nil then self[f] = d end end
 	self.harvest_enabled = args.harvest_materials ~= nil
-	copy("collision_group", 0x8000)
+	copy("collision_group", 0x1000)
 	copy("collision_mask", 0xFF)
 	copy("constraints", {})
 	copy("harvest_behavior", "keep")

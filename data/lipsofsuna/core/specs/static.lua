@@ -20,7 +20,7 @@ Staticspec.dict_name = {}
 Staticspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	local copy = function(f, d) if self[f] == nil then self[f] = d end end
-	copy("collision_group", 0x8000)
+	copy("collision_group", 0x2000)
 	copy("collision_mask", 0xFF)
 	copy("position", Vector())
 	copy("rotation", Quaternion())

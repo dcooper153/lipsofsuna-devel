@@ -27,23 +27,25 @@ Actionspec{name = "melee", func = function(feat, info, args)
 			return true
 		end
 		local prev
+		local mask = Physics.GROUP_ACTORS + Physics.GROUP_ITEMS
 		local cast = function(rel)
 			-- Get the attack ray.
 			local src,dst = args.user:get_attack_ray(rel)
 			-- Cast from the previous point.
-			local r = prev and Physics:cast_ray{src = prev, dst = dst}
-			if r then return apply(r) end
-			-- Cast from the center point.
-			local r = Physics:cast_ray{src = src, dst = dst}
+			local r = prev and Physics:cast_ray{src = prev, dst = dst, collision_mask = mask}
 			if r then return apply(r) end
 			prev = dst
 		end
-		-- Cast attack rays.
+		-- Cast a curve against actors and items.
 		feat:play_effects(args)
 		for i = 1,4 do
 			Coroutine:sleep(args.user.spec.timing_attack_melee * 0.02 / 4)
 			if cast(path[i]) then return end
 		end
+		-- Cast a straight ray against everything.
+		local src,dst = args.user:get_attack_ray()
+		local r = Physics:cast_ray{src = src, dst = dst}
+		if r then return apply(r) end
 	end)
 	return move
 end}
