@@ -106,25 +106,6 @@ Feat.apply = function(self, args)
 			end
 		end
 	end
-	-- Building.
-	if anim.categories["build"] and args.tile and args.weapon then
-		if args.weapon.spec.construct_tile then
-			local m = Material:find{name = args.weapon.spec.construct_tile}
-			local need = args.weapon.spec.construct_tile_count or 1
-			local have = args.weapon.count
-			if m and need <= have then
-				local t,p = Utils:find_build_point(args.point, args.owner)
-				if t then
-					local o = args.weapon:split(need)
-					o:detach()
-					Voxel:set_tile(p, m.id)
-					if m.effect_build then
-						Effect:play{effect = m.effect_build, point = p * Voxel.tile_size}
-					end
-				end
-			end
-		end
-	end
 end
 
 --- Performs a feat

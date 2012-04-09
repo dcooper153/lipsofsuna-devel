@@ -137,8 +137,13 @@ Player.inventory_cb = function(self, args)
 		["inventory-changed"] = function()
 			if args.object then
 				local name = args.object.spec.name
+				local slot = args.inventory:get_slot_by_index(args.index)
 				self:send{packet = Packet(packets.INVENTORY_ITEM_ADDED, "uint32", id,
 					"uint8", args.index, "string", name, "uint32", args.object.count)}
+				if slot then
+					self:send{packet = Packet(packets.INVENTORY_ITEM_EQUIPPED, "uint32", id,
+						"uint8", args.index, "string", slot)}
+				end
 			else
 				self:send{packet = Packet(packets.INVENTORY_ITEM_REMOVED, "uint32", id,
 					"uint8", args.index)}

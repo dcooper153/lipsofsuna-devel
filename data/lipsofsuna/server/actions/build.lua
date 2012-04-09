@@ -5,15 +5,26 @@ Actionspec{name = "build", func = function(feat, info, args)
 	Coroutine(function(t)
 		feat:play_effects(args)
 		Coroutine:sleep(args.user.spec.timing_build * 0.02)
+		-- Check for a correct weapon.
+		if not args.weapon then return end
+		if not args.weapon.spec.construct_tile then return end
+		-- Check for sufficient materials.
+		local m = Material:find{name = args.weapon.spec.construct_tile}
+		local need = args.weapon.spec.construct_tile_count or 1
+		local have = args.weapon.count
+		if not m or need > have then return end
+		-- Perform the ray cast.
 		local src,dst = args.user:get_attack_ray()
 		local r = Physics:cast_ray{src = src, dst = dst}
-		if not r or not r.tile then return end
-		feat:apply{
-			charge = args.charge,
-			object = r.object,
-			owner = args.user,
-			point = r.point,
-			tile = r.tile,
-			weapon = args.weapon}
+		if not r or r.object then return end
+		-- Find the affected tile.
+		local t,p = Utils:find_build_point(r.point, args.user)
+		if not t then return end
+		-- Build the tile.
+		args.weapon:subtract(need)
+		Voxel:set_tile(p, m.id)
+		if m.effect_build then
+			Effect:play{effect = m.effect_build, point = p * Voxel.tile_size}
+		end
 	end)
 end}
