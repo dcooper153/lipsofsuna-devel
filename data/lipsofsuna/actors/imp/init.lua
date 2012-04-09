@@ -45,7 +45,7 @@ Species{
 	difficulty = 0,
 	factions = {"evil"},
 	feat_anims = {"bite"},
-	feat_effects = {"strength to physical damage"},
+	feat_effects = {"physical damage"},
 	equipment_slots = {
 		{name = "hand.R", node = "#hand.R"},
 		{name = "hand.L", node = "#hand.L"}},
@@ -54,6 +54,7 @@ Species{
 	jump_force = 4,
 	model = "stoneimp2",
 	speed_walk = 1,
+	skills = {"Nerf health lv2", "Nerf combat lv2"},
 	vulnerabilities = {["cold damage"] = 1.1, ["fire damage"] = 1.1, ["physical damage"] = 0.8}}
 
 Species{
@@ -72,10 +73,11 @@ Species{
 		{name = "hand.L", node = "#hand.L"}},
 	factions = {"evil"},
 	feat_anims = {"bite", "explode"},
-	feat_effects = {"fire damage", "strength to physical damage"},
+	feat_effects = {"fire damage", "physical damage"},
 	jump_force = 4,
 	model = "stoneimp2",
 	speed_walk = 1,
 	inventory_items = {"firestone"},
 	inventory_size = 2,
+	skills = {"Nerf health lv1", "Nerf combat lv1"},
 	vulnerabilities = {["cold damage"] = 2, ["fire damage"] = 0.4, ["physical damage"] = 0.8}}

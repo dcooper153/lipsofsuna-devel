@@ -1,3 +1,6 @@
+---------------------------------------------------------------------
+-- Types usable to players.
+
 Featanimspec{
 	name = "area spell",
 	action = "area spell",
@@ -89,6 +92,64 @@ Featanimspec{
 	effect = "swing1",
 	effect_impact = "impact1",
 	required_weapon = "throwable"}
+
+---------------------------------------------------------------------
+-- Types usable to monsters only.
+
+Featanimspec{
+	name = "bite",
+	action = "melee custom",
+	animation = "attack bite",
+	categories = {"melee"},
+	cooldown = 2,
+	effect = "growl1",
+	effect_impact = "impact1",
+	influences = {{"physical damage", -1}},
+	slot = "mouth"}
+
+Featanimspec{
+	name = "dragon bite",
+	action = "melee custom",
+	action_frames = {0, 30},
+	animation = "attack bite",
+	categories = {"melee"},
+	cooldown = 4,
+	effect_impact = "impact1",
+	influences = {{"physical damage", -50}},
+	slot = "mouth"}
+
+Featanimspec{
+	name = "explode",
+	action = "explode",
+	animation = "explode",
+	categories = {"explode", "melee"},
+	cooldown = 2,
+	influences = {{"physical damage", -1}},
+	effect = "selfdestruct1"}
+
+Featanimspec{
+	name = "left claw",
+	action = "melee custom",
+	action_frames = {0, 15},
+	animation = "attack left claw",
+	categories = {"melee"},
+	cooldown = 2,
+	effect = "swing1",
+	effect_impact = "impact1",
+	influences = {{"physical damage", -30}},
+	slot = "hand.L"}
+
+Featanimspec{
+	name = "right claw",
+	action = "melee custom",
+	action_frames = {0, 15},
+	animation = "attack right claw",
+	categories = {"melee"},
+	cooldown = 2,
+	effect = "swing1",
+	effect_impact = "impact1",
+	influences = {{"physical damage", -30}},
+	slot = "hand.R"}
 
 ---------------------------------------------------------------------
 -- Effects usable to players.
@@ -237,7 +298,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "physical damage",
-	animations = {"ranged", "right hand"},
+	animations = {"bite", "dragon bite", "explode", "left claw", "ranged", "right hand", "right claw"},
 	categories = {"harmful", "melee", "physical"},
 	effect = "impact1",
 	icon = "modifier-physical",
@@ -299,70 +360,7 @@ Feateffectspec{
 	skill_base = {willpower = 5}}
 
 ---------------------------------------------------------------------
--- Animations and effects usable to monsters only.
-
-Featanimspec{
-	name = "bite",
-	action = "melee custom",
-	animation = "attack bite",
-	categories = {"melee"},
-	cooldown = 2,
-	effect = "growl1",
-	effect_impact = "impact1",
-	influences = {{"physical damage", -1}},
-	slot = "mouth"}
-
-Featanimspec{
-	name = "dragon bite",
-	action = "melee custom",
-	action_frames = {0, 30},
-	animation = "attack bite",
-	categories = {"melee"},
-	cooldown = 4,
-	effect_impact = "impact1",
-	influences = {{"physical damage", -50}},
-	slot = "mouth"}
-
-Featanimspec{
-	name = "explode",
-	action = "explode",
-	animation = "explode",
-	categories = {"explode", "melee"},
-	cooldown = 2,
-	influences = {{"physical damage", -1}},
-	effect = "selfdestruct1"}
-
-Featanimspec{
-	name = "left claw",
-	action = "melee custom",
-	action_frames = {0, 15},
-	animation = "attack left claw",
-	categories = {"melee"},
-	cooldown = 2,
-	effect = "swing1",
-	effect_impact = "impact1",
-	influences = {{"physical damage", -30}},
-	slot = "hand.L"}
-
-Featanimspec{
-	name = "right claw",
-	action = "melee custom",
-	action_frames = {0, 15},
-	animation = "attack right claw",
-	categories = {"melee"},
-	cooldown = 2,
-	effect = "swing1",
-	effect_impact = "impact1",
-	influences = {{"physical damage", -30}},
-	slot = "hand.R"}
-
-Feateffectspec{
-	name = "dexterity to physical damage",
-	categories = {"harmful", "melee custom", "physical"},
-	effect = "impact1",
-	icon = "modifier-physical",
-	influences = {{"physical damage", -1}},
-	skill_mult = {dexterity = 1}}
+-- Effects usable to monsters only.
 
 Feateffectspec{
 	name = "dragon breath",
@@ -373,11 +371,3 @@ Feateffectspec{
 	influences = {{"fire damage", -20}},
 	projectile = "firebreath1",
 	skill_base = {willpower = 5}}
-
-Feateffectspec{
-	name = "strength to physical damage",
-	animations = {"bite", "dragon bite", "explode", "left claw", "right claw"},
-	categories = {"harmful", "melee custom", "physical"},
-	effect = "impact1",
-	icon = "modifier-physical",
-	influences = {{"physical damage", -1}}}

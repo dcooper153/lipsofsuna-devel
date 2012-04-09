@@ -63,3 +63,30 @@ Skillspec{
 	name = "Marksman",
 	description = "Ranged weapons do double damage.",
 	assign = function(skills) skills.ranged = skills.ranged * 2 end}
+
+------------------------------------------------------------------------------
+-- Skills for monsters.
+
+Skillspec{
+	name = "Nerf combat lv1",
+	assign = function(skills)
+		skills.ranged = skills.ranged / 2
+		skills.melee = skills.melee / 2
+	end}
+
+Skillspec{
+	name = "Nerf combat lv2",
+	requires = {"Nerf combat lv1"},
+	assign = function(skills)
+		skills.ranged = skills.ranged / 2
+		skills.melee = skills.melee / 2
+	end}
+
+Skillspec{
+	name = "Nerf health lv1",
+	assign = function(skills) skills.max_health = skills.max_health / 2 end}
+
+Skillspec{
+	name = "Nerf health lv2",
+	requires = {"Nerf health lv1"},
+	assign = function(skills) skills.max_health = skills.max_health / 2 end}

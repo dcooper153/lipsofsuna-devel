@@ -30,10 +30,10 @@ Species{
 	effect_physical_damage = "fleshimpact1",
 	factions = {"evil"},
 	feat_anims = {"dragon bite", "left claw", "right claw"},--, "ranged spell"},
-	feat_effects = {"fire damage", "strength to physical damage"},
+	feat_effects = {"fire damage", "physical damage"},
 	inventory_size = 10,
 	inventory_items = {["dragon scale"] = 5, ["adamantium"] = 4, ["crimson stone"] = 2},
 	mass = 1000,
 	speed_walk = 1,
-	skills = {"Health lv4", "Willpower lv2"},
+	skills = {"Health lv4", "Willpower lv2", "Fighter"},
 	vulnerabilities = {["cold damage"] = 2, ["fire damage"] = 0.3}}

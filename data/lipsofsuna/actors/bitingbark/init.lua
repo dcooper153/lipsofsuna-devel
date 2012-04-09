@@ -16,9 +16,10 @@ Species{
 	effect_physical_damage = "fleshimpact1",
 	factions = {"evil"},
 	feat_anims = {"left claw", "right claw"},
-	feat_effects = {"strength to physical damage"},
+	feat_effects = {"physical damage"},
 	inventory_size = 3,
 	inventory_items = {["log"] = 2},
 	jump_force = 0,
 	model = "bitingbark1",
+	skills = {"Nerf health lv2", "Nerf combat lv1"},
 	speed_walk = 1}

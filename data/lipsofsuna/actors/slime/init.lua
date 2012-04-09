@@ -11,11 +11,12 @@ Species{
 	difficulty = 0,
 	factions = {"evil"},
 	feat_anims = {"bite"},
-	feat_effects = {"strength to physical damage"},
+	feat_effects = {"physical damage"},
 	inventory_size = 0,
 	jump_force = 4,
 	model = "slime2",
 	speed_walk = 2,
+	skills = {"Nerf health lv2", "Nerf combat lv2"},
 	vulnerabilities = {["cold damage"] = 1.5, ["fire damage"] = 1.5, ["physical damage"] = 0.6}}
 
 Species{
@@ -30,9 +31,10 @@ Species{
 	difficulty = 0.7,
 	factions = {"evil"},
 	feat_anims = {"bite"},
-	feat_effects = {"strength to physical damage"},
+	feat_effects = {"physical damage"},
 	inventory_size = 0,
 	jump_force = 4,
 	model = "slime2",
 	speed_walk = 2,
+	skills = {"Health lv2", "Nerf combat lv1"},
 	vulnerabilities = {["cold damage"] = 1.5, ["fire damage"] = 1.5, ["physical damage"] = 0.6}}

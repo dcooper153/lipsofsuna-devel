@@ -13,11 +13,12 @@ Species{
 	effect_physical_damage = "fleshimpact1",
 	factions = {"neutral"},
 	feat_anims = {"bite"},
-	feat_effects = {"strength to physical damage"},
+	feat_effects = {"physical damage"},
 	inventory_size = 3,
 	inventory_items = {"hide"},
 	jump_force = 6,
 	model = "smallrat1",
+	skills = {"Nerf health lv2", "Nerf combat lv2"},
 	speed_walk = 4}
 
 Species{
@@ -33,11 +34,12 @@ Species{
 	effect_physical_damage = "fleshimpact1",
 	factions = {"evil"},
 	feat_anims = {"bite"},
-	feat_effects = {"strength to physical damage"},
+	feat_effects = {"physical damage"},
 	inventory_size = 3,
 	inventory_items = {["hide"] = 2},
 	jump_force = 6,
 	model = "plaguerat1", -- FIXME
+	skills = {"Nerf health lv1", "Nerf combat lv2"},
 	speed_walk = 4}
 
 Species{
@@ -53,9 +55,10 @@ Species{
 	effect_physical_damage = "fleshimpact1",
 	factions = {"evil"},
 	feat_anims = {"bite"},
-	feat_effects = {"strength to physical damage"},
+	feat_effects = {"physical damage"},
 	inventory_size = 3,
 	inventory_items = {["hide"] = 2},
 	jump_force = 6,
 	model = "plaguerat1",
+	skills = {"Health lv2", "Nerf combat lv1"},
 	speed_walk = 4}
