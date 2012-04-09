@@ -120,6 +120,31 @@ Utils.find_spawn_point = function(clss, point)
 	end
 end
 
+--- Gets the default spawn point for players.
+-- @param self Utils class.
+-- @return Vector.
+Utils.get_player_spawn_point = function(self)
+	local r = Regionspec:find{name = "Supply Camp"}
+	if r and not r.spawn_point then return end
+	if not r then r = Regionspec:find_spawn_points()[1] end
+	if r then return r.spawn_point_world end
+end
+
+--- Gets the difficulty of the spawn point.
+-- @param self Utils class.
+-- @param point Point in world space.
+-- @param rare True to allow rare strong monsters.
+-- @return Difficulty value.
+Utils.get_spawn_point_difficulty = function(self, point, rare)
+	local spawn = Utils:get_player_spawn_point()
+	local d = math.min(1, (point - spawn).length / 500)
+	if rare then
+		if math.random(1, 5) == 5 then d = d * 2 end
+		if math.random(1, 5) == 5 then d = d * 2 end
+	end
+	return d
+end
+
 --- Spawns a plant or an item.
 -- @param clss Utils class.
 -- @param point Point in tiles.

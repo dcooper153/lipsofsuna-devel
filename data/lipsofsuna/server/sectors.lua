@@ -83,7 +83,6 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 	-- This is done in a thread to reduce pauses when lots of sectors are
 	-- being loaded. It's useful since sectors are often loaded in clusters.
 	local org = self:get_sector_offset(sector)
-	local spawn = Config.inst.spawn_point * Voxel.tile_scale
 	Coroutine(function(thread)
 		for i = 1,monsters do
 			for j = 1,15 do
@@ -93,7 +92,7 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 				c.z = org.z + math.random(4, Voxel.tiles_per_line - 4)
 				local p = Utils:find_spawn_point(c * Voxel.tile_size)
 				if p then
-					local d = math.min(1, (p - spawn).length / 500)
+					local d = Utils:get_spawn_point_difficulty(p, true)
 					Voxel:place_creature{point = p * Voxel.tile_scale, category = "enemy", difficulty = d}
 					break
 				end

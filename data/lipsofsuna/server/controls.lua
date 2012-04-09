@@ -12,10 +12,7 @@ local spawn_player = function(object, client, spawnpoint)
 		if r then home = r.spawn_point_world end
 	end
 	if not home then
-		local r = Regionspec:find{name = "Supply Camp"}
-		if r and not r.spawn_point then r = nil end
-		if not r then r = Regionspec:find_spawn_points()[1] end
-		if r then home = r.spawn_point_world end
+		home = Utils:get_player_spawn_point()
 	end
 	-- Set the default spawn point.
 	-- The default spawn point is set once at account creation. If it's

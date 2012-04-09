@@ -164,6 +164,7 @@ Generator.generate = function(self, args)
 	end
 	-- Save the map.
 	self:update_status(0, "Saving the map")
+	Serialize:clear_objects()
 	Sectors.instance:save_world(true, function(p) self:update_status(p) end)
 	Sectors.instance:unload_world()
 	for k,v in pairs(statics) do v.realized = true end

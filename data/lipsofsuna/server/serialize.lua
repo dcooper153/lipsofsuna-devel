@@ -74,10 +74,15 @@ Serialize.load_quests = function(clss)
 	end
 end
 
+Serialize.erase_world = function(self)
+	self.database:query([[DELETE FROM objects_data;]])
+end
+
 --- Saves everything.
 -- @param clss Serialize class.
 -- @param erase True to erase existing database entries first.
 Serialize.save = function(clss, erase)
+	if erase then clss:clear_objects() end
 	clss.sectors:save_world(erase)
 	clss:save_generator(erase)
 	clss:save_markers(erase)
@@ -383,6 +388,16 @@ Serialize.init_object_database = function(self, reset)
 		PRIMARY KEY(id,name));]])
 	-- Set the version number.
 	self:set_value("object_version", self.object_version)
+end
+
+--- Removes all objects from the database.
+-- @param self Serialize class.
+Serialize.clear_objects = function(self)
+	self.db:query([[DELETE FROM object_data;]])
+	self.db:query([[DELETE FROM object_inventory;]])
+	self.db:query([[DELETE FROM object_sectors;]])
+	self.db:query([[DELETE FROM object_skills;]])
+	self.db:query([[DELETE FROM object_stats;]])
 end
 
 --- Reads an object from the database.

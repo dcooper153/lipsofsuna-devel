@@ -98,7 +98,6 @@ Sectors.save_world = function(self, erase, progress)
 	self.database:query("BEGIN TRANSACTION;")
 	-- Erase old world from the database.
 	if erase then
-		if self.save_objects then self.database:query("DELETE FROM objects;") end
 		if self.save_terrain then self.database:query("DELETE FROM terrain;") end
 	end
 	-- Write the new world data.
