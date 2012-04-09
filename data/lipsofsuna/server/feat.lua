@@ -208,18 +208,33 @@ end
 --   <li>user: Object whose skills and inventory to use.</li></ul>
 -- @return True if usable.
 Feat.usable = function(self, args)
-	-- Check for support by the species.
+	-- Check that the user is valid.
 	if not args.user then return end
 	local spec = args.user.spec
 	if spec.type ~= "species" then return end
-	if not spec.feat_anims[self.animation] then
-		return false, "Not doable by your race."
-	end
-	-- Get feat information.
+	-- Check that the feat type exists.
 	local anim = Featanimspec:find{name = self.animation}
 	if not anim then
 		return false, "No such feat exists."
 	end
+	-- Check that the actor supports the feat.
+	if args.user.client then
+		if not spec.feat_anims[self.animation] and
+		   not Unlocks:get("spell type", self.animation) then
+			return false, "The spell type has not been unlocked."
+		end
+		for k,v in pairs(self.effects) do
+			if not spec.feat_effects[v[1]] and
+			   not Unlocks:get("spell effect", v[1]) then
+				return false, "The spell effect has not been unlocked."
+			end
+		end
+	else
+		if not spec.feat_anims[self.animation] then
+			return false, "Not doable by your race."
+		end
+	end
+	-- Calculate requirements.
 	local weapon = args.user.inventory:get_object_by_slot(anim.slot)
 	local info = self:get_info{owner = args.user, weapon = weapon}
 	-- Check for stats.
@@ -246,7 +261,7 @@ Feat.usable = function(self, args)
 			return false, "Not enough ammo."
 		end
 	end
-	-- Check for weapon.
+	-- Check for the weapon.
 	if info.required_weapon then
 		local weapon = inventory:get_object_by_slot(args.user.spec.weapon_slot)
 		if not weapon then

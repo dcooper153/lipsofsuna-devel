@@ -508,7 +508,9 @@ Protocol:add_handler{type = "PLAYER_SKILLS", func = function(args)
 	-- Validate the input.
 	for k,v in pairs(enabled) do
 		local skill = Skillspec:find{name = k}
-		if not skill then enabled[k] = nil end
+		if not skill or not Unlocks:get("skill", k) then
+			enabled[k] = nil
+		end
 	end
 	-- Enable and disable skills.
 	player.skills:clear()
