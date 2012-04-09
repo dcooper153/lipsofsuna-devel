@@ -12,11 +12,14 @@ Object.new = function(clss, args)
 	return self
 end
 
+Object.set_active_time = function(self, duration)
+	Object.dict_active[self] = duration
+end
+
 Object.add_speedline = function(self, args)
-	-- Remove the old speedline
+	-- Stop the old speedline
 	if self.speedline then
-		self.speedline.realized = false
-		self.speedline.duration = 0
+		self.speedline.object = nil
 		self.speedline = nil
 	end
 	-- Create the new speedline
@@ -41,10 +44,9 @@ Object.detach = function(self)
 		end
 		self.special_effects = nil
 	end
-	-- Hide speed lines.
+	-- Stop the speed line.
 	if self.speedline then
-		self.speedline.realized = false
-		self.speedline = nil
+		self.speedline.object = nil
 	end
 	-- Hide self.
 	self.realized = false
@@ -105,10 +107,6 @@ Object.update = function(self, secs)
 				v.position = p
 			end
 		end
-	end
-	-- Update speed lines.
-	if self.speedline then
-		self.speedline:update(secs)
 	end
 end
 

@@ -19,6 +19,7 @@ Speedline.new = function(clss, args)
 	self.duration = args.duration or 10000
 	self.model = Model()
 	self.model:add_material{cull = false, material = "speedline1"}
+	self:set_active_time(self.delay + self.duration + 3)
 	return self
 end
 
@@ -56,7 +57,7 @@ Speedline.update = function(self, secs)
 		end
 	end
 	-- Update the path.
-	if self.object.realized and self.duration > 0 then
+	if self.object and self.object.realized and self.duration > 0 then
 		-- Realize the effect.
 		if not self.realized then
 			self.position = self.object.position
@@ -111,8 +112,10 @@ Speedline.update = function(self, secs)
 		n = n - 1
 	end
 	if n == 0 then
-		self.realized = false
-		self.object.speedline = nil
+		self:detach()
+		if self.object then
+			self.object.speedline = nil
+		end
 	end
 	-- Update transparency.
 	local alpha = function(i) return (l-n+i)/l end
