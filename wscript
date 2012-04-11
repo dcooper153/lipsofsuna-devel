@@ -151,7 +151,9 @@ def configure(ctx):
 		ctx.check_cxx(lib='OIS', mandatory=True, uselib='CORE TEST', uselib_store='OIS')
 
 	# libpng
-	if not ctx.check_cfg(package='libpng', atleast_version='1.2.0', args='--cflags --libs', uselib_store='PNG', mandatory=False):
+	if not ctx.check_cfg(package='libpng12', atleast_version='1.2.0', args='--cflags --libs', uselib_store='PNG', mandatory=False) and\
+	   not ctx.check_cfg(package='libpng14', atleast_version='1.4.0', args='--cflags --libs', uselib_store='PNG', mandatory=False) and\
+	   not ctx.check_cfg(package='libpng', atleast_version='1.2.0', args='--cflags --libs', uselib_store='PNG', mandatory=False):
 		ctx.check_cc(lib='png', mandatory=True, uselib_store='PNG')
 		ctx.check_cc(header_name='png.h', mandatory=True, uselib_store='PNG')
 
