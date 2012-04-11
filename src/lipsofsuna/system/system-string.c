@@ -123,7 +123,7 @@ char* lisys_string_format (
 		va_start (args, format);
 		num = vsnprintf (buf, len - 1, format, args);
 		va_end (args);
-		if (-1 < num && num < len)
+		if (-1 < num && num < len - 1)
 			break;
 
 		/* Try to expand the buffer. */
