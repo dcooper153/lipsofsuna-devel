@@ -173,10 +173,10 @@ LIPthPaths* lipth_paths_new (
 	{
 		self->global_exts = lisys_paths_get_data_global ("lipsofsuna/lib/extensions");
 #ifdef LIEXTSDIR
-		if (!private_validate_dir (self->global_exts))
+		if (!private_validate_dir (&self->global_exts))
 		{
 			self->global_exts = lisys_string_dup (LIEXTSDIR);
-			private_validate_dir (self->global_exts);
+			private_validate_dir (&self->global_exts);
 		}
 #endif
 	}
@@ -441,6 +441,8 @@ static int private_validate_dir (
 {
 	LISysStat stat;
 
+	if (*path == NULL)
+		return 0;
 	if (!lisys_filesystem_stat (*path, &stat))
 	{
 		lisys_free (*path);
