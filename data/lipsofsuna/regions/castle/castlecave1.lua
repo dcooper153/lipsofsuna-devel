@@ -1,7 +1,8 @@
 Pattern{
 	name = "castlecave1",
 	size = Vector(44,16,44),
-	categories = {},
+	position = Vector(800,1000,700),
+	categories = {"init"},
 	obstacles = {
 		{02,02,00,"building marker"},{12,02,00,"building marker"},{22,02,00,"building marker"},{32,02,00,"building marker"},
 		{02,02,10,"building marker"},{12,02,10,"building marker"},{22,02,10,"building marker"},{32,02,10,"building marker"},

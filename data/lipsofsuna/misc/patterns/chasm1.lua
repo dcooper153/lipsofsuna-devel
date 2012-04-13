@@ -1,7 +1,10 @@
 Pattern{
 	name = "chasm1",
 	size = Vector(48,36,32),
-	categories = {},
+	distance = {"lips1",10,40},
+	position = Vector(700,960,700),
+	position_random = Vector(300,40,300),
+	categories = {"init"},
 	obstacles = {
 		{18.490000,20.990000,27.700000,"bridge chest"}},
 	creatures = {

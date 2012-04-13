@@ -6,13 +6,20 @@ Pattern.dict_id = {}
 Pattern.dict_cat = {}
 Pattern.dict_name = {}
 
+Patternspec = Pattern --FIXME
+
 --- Creates a new map pattern.
 -- @param clss Pattern class.
 -- @param args Arguments.<ul>
 --   <li>creatures: Array of creatures to create.</li>
---   <li>file: Path to the file where the pattern was specified. nil for autodetect.</li>
+--   <li>distance: Distance to another pattern.</li>
+--   <li>file: Path to the file where the pattern was specified. Nil for autodetect.</li>
 --   <li>items: Array of items to create.</li>
+--   <li>position: World map position, in tiles.</li>
+--   <li>position_random: Position randomization, in tiles.</li>
 --   <li>obstacles: Array of obstacles to create.</li>
+--   <li>size: Pattern size in tiles.</li>
+--   <li>spawn_point: Spawn point position, in tiles.</li>
 --   <li>statics: Array of static objects to create.</li>
 --   <li>tiles: Array of terrain tiles to create.</li></ul>
 -- @return New map pattern.
@@ -25,8 +32,24 @@ Pattern.new = function(clss, args)
 	self.items = self.items or {}
 	self.obstacles = self.obstacles or {}
 	self.statics = self.statics or {}
+	self.size = self.size or Vector(4,4,4)
+	self.position = self.position or Vector(700,700,700)
+	self.position_random = self.position_random or Vector()
 	self.tiles = self.tiles or {}
 	return self
+end
+
+--- Finds patterns that have a spawn point.
+-- @param self Patternspec class.
+-- @return Table of patterns.
+Pattern.find_spawn_points = function(self)
+	local list = {}
+	for k,v in pairs(self.dict_id) do
+		if v.spawn_point then
+			table.insert(list, v)
+		end
+	end
+	return list
 end
 
 --- Writes the pattern to a string.
@@ -35,8 +58,17 @@ end
 Pattern.write = function(self)
 	-- Format categories.
 	local t = "Pattern{\n\tname = \"" .. self.name .. "\",\n\tsize = " .. tostring(self.size) .. ",\n"
+	if self.distance then
+		t = t .. string.format("\tdistance = {%q,%d,%d},\n", self.distance[1], self.distance[2], self.distance[3])
+	end
 	if self.position then
 		t = t .. "\tposition = " .. tostring(self.position) .. ",\n"
+	end
+	if self.position_random then
+		t = t .. "\tposition_random = " .. tostring(self.position) .. ",\n"
+	end
+	if self.spawn_point then
+		t = t .. "\tspawn_point = " .. tostring(self.spawn_point) .. ",\n"
 	end
 	if self.categories then
 		local categories = {}
@@ -107,3 +139,9 @@ Pattern.write = function(self)
 	t = t .. "}\n"
 	return t
 end
+
+Patternspec:add_getters{
+	spawn_point_world = function(self)
+		if not self.spawn_point then return end
+		return (self.position + self.spawn_point) * Voxel.tile_size
+	end}

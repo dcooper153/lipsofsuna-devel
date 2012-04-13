@@ -124,9 +124,9 @@ end
 -- @param self Utils class.
 -- @return Vector.
 Utils.get_player_spawn_point = function(self)
-	local r = Regionspec:find{name = "Supply Camp"}
+	local r = Patternspec:find{name = "supplycamp1"}
 	if r and not r.spawn_point then return end
-	if not r then r = Regionspec:find_spawn_points()[1] end
+	if not r then r = Patternspec:find_spawn_points()[1] end
 	if r then return r.spawn_point_world end
 end
 

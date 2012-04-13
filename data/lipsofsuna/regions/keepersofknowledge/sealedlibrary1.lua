@@ -1,7 +1,10 @@
 Pattern{
 	name = "sealedlibrary1",
 	size = Vector(32,16,32),
-	categories = {},
+	distance = {"lips1",30,60},
+	position = Vector(700,960,700),
+	position_random = Vector(500,40,500),
+	categories = {"init"},
 	items = {
 		{2.810000,2.990000,16.740000,"bookcase"},
 		{5.350000,2.980000,13.340000,"bookcase",0.26},

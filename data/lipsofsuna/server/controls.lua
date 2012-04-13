@@ -7,7 +7,7 @@ local spawn_player = function(object, client, spawnpoint)
 	if not spawnpoint or spawnpoint == "Home" then
 		home = object.account.spawn_point
 	else
-		local r = Regionspec:find{name = spawnpoint}
+		local r = Patternspec:find{name = spawnpoint}
 		if r and not r.spawn_point then r = nil end
 		if r then home = r.spawn_point_world end
 	end

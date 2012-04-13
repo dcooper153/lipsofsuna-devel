@@ -100,20 +100,6 @@ Species{
 	skills = {"Health lv4", "Willpower lv4"},
 	weapon_slot = "turretbarrel"}
 
-Regionspec{
-	name = "Great Library",
-	categories = {"special"},
-	depth = {930,1000},
-	distance = {"Lips",30,60},
-	pattern_name = "greatlibrary1"}
-
-Regionspec{
-	name = "Sealed Library",
-	categories = {"special"},
-	depth = {930,1000},
-	distance = {"Lips",30,60},
-	pattern_name = "sealedlibrary1"}
-
 require(Mod.path .. "greatlibrary1")
 require(Mod.path .. "sealedlibrary1")
 require(Mod.path .. "greatlibrarysteamlever")

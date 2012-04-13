@@ -2,7 +2,8 @@ Pattern{
 	name = "supplycamp1",
 	size = Vector(32,8,32),
 	position = Vector(940,1300,1050),
-	categories = {},
+	spawn_point = Vector(5,5,5),
+	categories = {"init"},
 	obstacles = {
 		{-7.230000,-1.320000,23.200000,"rust sprig tree"},
 		{-5.330000,0.570000,9.640000,"rust sprig tree"},

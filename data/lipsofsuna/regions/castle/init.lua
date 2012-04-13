@@ -22,14 +22,6 @@ Obstaclespec{
 	categories = {"special"},
 	dialog = "smallbuildings"}
 
-Regionspec{
-	name = "Castle Cave",
-	categories = {"special"},
-	depth = {1000,1000},
-	links = {"Lips", "Sanctuary"},
-	pattern_name = "castlecave1",
-	position = {800,700}}
-
 Species{
 	name = "Castle Foreman",
 	base = "aer",

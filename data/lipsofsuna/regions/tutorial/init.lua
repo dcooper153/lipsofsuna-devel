@@ -95,15 +95,6 @@ Species{
 	hair_style = "random",
 	inventory_items = {"iron breastplate", "iron greaves", "iron gauntlets","wooden staff"}}
 
-Regionspec{
-	name = "Giant Shaft",
-	categories = {"spawn", "special"},
-	depth = {1000,1000},
-	links = {"Lips", "Sanctuary"},
-	pattern_name = "giantshaft",
-	position = {600,700},
-	spawn_point = {17,15,22}}
-
 require(Mod.path .. "fa")
 require(Mod.path .. "spud")
 require(Mod.path .. "lyra")

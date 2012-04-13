@@ -1,7 +1,9 @@
 Pattern{
 	name = "giantshaft",
 	size = Vector(42,64,42),
-	categories = {},
+	position = Vector(600,1000,700),
+	spawn_point = Vector(17,15,22),
+	categories = {"init"},
 	items = {
 		{12.930000,1.000000,34.740000,"barrel"},
 		{15.010000,13.210000,19.550000,"bookcase",-0.26},

@@ -1,7 +1,10 @@
 Pattern{
 	name = "charasgrove1",
 	size = Vector(10,10,10),
-	categories = {"charasgrove"},
+	distance = {"lips1",40,60},
+	position = Vector(700,960,700),
+	position_random = Vector(200,10,200),
+	categories = {"init"},
 	obstacles = {
 		{4.23,1.85,3.84,"chara's portal"}},
 	creatures = {

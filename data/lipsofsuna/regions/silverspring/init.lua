@@ -6,14 +6,6 @@ Quest{name = "The Hoarder"}
 Faction{name = "silverspring"}
 Faction{name = "the hoarder"}
 
-Regionspec{
-	name = "Silverspring",
-	categories = {"special"},
-	depth = {900, 1000},
-	distance = {"Lips",30,60},
-	links = {"Chara's Root Grove", "Portal of Lips", "Sanctuary"},
-	pattern_name = "silverspring1"}
-
 Species{
 	name = "Agathe",
 	base = "aer",

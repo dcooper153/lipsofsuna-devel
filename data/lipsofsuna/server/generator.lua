@@ -58,17 +58,16 @@ end
 -- @param args Arguments.
 Generator.generate = function(self, args)
 	local place_regions = function()
-		local special = Regionspec:find{category = "special"}
+		local special = Patternspec:find{category = "init"}
 		while true do
 			local placed = 0
 			local skipped = 0
 			-- Try to place one or more regions.
 			-- Regions are often placed relative to each other so we need to
 			-- add them iteratively in the other of least dependencies.
-			for name,reg in pairs(special) do
-				if not self.regions_dict_name[reg.name] then
-					local pat = Pattern:random{category = reg.pattern_category, name = reg.pattern_name}
-					if not self:place_region(reg, pat) then
+			for name,pat in pairs(special) do
+				if not self.regions_dict_name[pat.name] then
+					if not self:place_region(pat) then
 						skipped = skipped + 1
 					else
 						placed = placed + 1
@@ -152,12 +151,7 @@ Generator.generate = function(self, args)
 		Voxel:place_pattern{point = reg.point, name = reg.pattern.name}
 	end
 	-- Generate static objects.
-	-- FIXME: Generate static overworld obstacles properly.
-	local spec = Staticspec:find{name = "statictree1"}
-	Staticobject{spec = spec, position = Vector(1274.34,1734.36,1394.81), realized = true}
-	Staticobject{spec = spec, position = Vector(1281.98,1738.02,1408.34), realized = true}
-	Staticobject{spec = spec, position = Vector(1286.04,1733.41,1450.72), realized = true}
-	Staticobject{spec = spec, position = Vector(1303.29,1734.14,1458.60), realized = true}
+	self:generate_overworld()
 	local statics = {}
 	for k,v in pairs(Staticobject.dict_id) do
 		statics[k] = v
@@ -188,6 +182,23 @@ Generator.generate = function(self, args)
 	local status = Packet(packets.CLIENT_AUTHENTICATE)
 	for k,v in pairs(Network.clients) do
 		Network:send{client = v, packet = status}
+	end
+end
+
+--- Generates the static overworld objects.
+-- @param self Generator.
+Generator.generate_overworld = function(self)
+	-- FIXME: Generate static overworld obstacles properly.
+	local spec = Staticspec:find{name = "statictree1"}
+	local min = Map.aabb.point
+	local max = Map.aabb.point + Map.aabb.size
+	for i = 1,100 do
+		local point = Vector(math.random(min.x, max.x), 0, math.random(min.z, max.z))
+		local height = Map.heightmap:get_height(point, false)
+		if height then
+			point.y = height
+			Staticobject{spec = spec, position = point, realized = true}
+		end
 	end
 end
 
@@ -385,28 +396,24 @@ end
 
 --- Places a region to the map.
 -- @param self Generator.
--- @param reg Region spec.
 -- @param pat Pattern spec.
 -- @return Region or nil.
-Generator.place_region = function(self, reg, pat)
-	if not pat then
-		error(string.format("ERROR: No pattern was found for region `%s'.", reg.name))
-	end
+Generator.place_region = function(self, pat)
 	local size = pat.size
  	-- Determine the approximate position.
 	-- Regions can be placed randomly or relative to each other. Here we
 	-- decide the range of positions that are valid for the region.
 	local rel = nil
 	local dist = nil
-	if reg.position then
-		rel = Vector(reg.position[1], 0, reg.position[2])
-	elseif not reg.distance then
+	if pat.position then
+		rel = Vector(pat.position.x, 0, pat.position.z)
+	elseif not pat.distance then
 		rel = Vector(math.random(self.map_start.x, self.map_end.x), 0, math.random(self.map_start.z, self.map_end.z))
 		dist = {nil, 0.1 * self.map_size.x, 0.1 * self.map_size.x}
-	elseif self.regions_dict_name[reg.distance[1]] then
-		rel = self.regions_dict_name[reg.distance[1]].point
+	elseif self.regions_dict_name[pat.distance[1]] then
+		rel = self.regions_dict_name[pat.distance[1]].point
 		rel = Vector(rel.x, 0, rel.z)
-		dist = reg.distance
+		dist = pat.distance
 	else return end
 	-- Determine the final position.
 	-- Regions with a random position range are placed at different
@@ -414,11 +421,12 @@ Generator.place_region = function(self, reg, pat)
 	-- positions are simply placed there without any checks.
 	local pos = Vector()
 	local aabb = Aabb{point = pos, size = size + Vector(2,2,2)}
+	local var = pat.position_random.y
 	if dist then
 		local success
 		for retry=1,50 do
 			pos.x = math.random(dist[2], dist[3])
-			pos.y = math.random(reg.depth[1], reg.depth[2])
+			pos.y = math.random(pat.position.y - var, pat.position.y + var)
 			pos.z = math.random(dist[2], dist[3])
 			if math.random(0, 1) == 1 then pos.x = -pos.x end
 			if math.random(0, 1) == 1 then pos.z = -pos.z end
@@ -432,12 +440,12 @@ Generator.place_region = function(self, reg, pat)
 		if not success then return end
 	else
 		pos.x = rel.x
-		pos.y = math.random(reg.depth[1], reg.depth[2])
+		pos.y = math.random(pat.position.y - var, pat.position.y + var)
 		pos.z = rel.z
 		aabb.point = pos - Vector(5,5,5)
 	end
 	-- Create the region.
-	local region = Region{aabb = aabb, pattern = pat, point = pos, size = size, spec = reg}
+	local region = Region{aabb = aabb, pattern = pat, point = pos, size = size, spec = pat}
 	self:add_region(region)
 	return region
 end

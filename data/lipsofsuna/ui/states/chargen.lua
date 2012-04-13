@@ -315,7 +315,7 @@ Ui:add_state{
 	init = function()
 		-- Get the spawn point list.
 		local spawnpoints = {}
-		for k,v in ipairs(Regionspec:find_spawn_points()) do
+		for k,v in ipairs(Patternspec:find_spawn_points()) do
 			table.insert(spawnpoints, v.name)
 		end
 		table.sort(spawnpoints, function(a,b) return a < b end)

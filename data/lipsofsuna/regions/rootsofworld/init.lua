@@ -16,22 +16,6 @@ Species{
 	dialog = "chara",
 	marker = "chara"}
 
-Regionspec{
-	name = "Chara's Illusion",
-	categories = {"special"},
-	depth = {128,128},
-	pattern_name = "charasillusion1",
-	position = {128,128}}
-
-Regionspec{
-	name = "Chara's Root Grove",
-	categories = {"special"},
-	depth = {950,970},
-	distance = {"Lips",40,60},
-	links = {"Midguard"},
-	pattern_name = "charasgrove1",
-	random_resources = false}
-
 require(Mod.path .. "chara")
 require(Mod.path .. "charasportal")
 require(Mod.path .. "portalofillusion")

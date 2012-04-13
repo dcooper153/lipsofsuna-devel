@@ -1,13 +1,5 @@
 Program:add_path(Mod.path)
 
-Regionspec{
-	name = "Supply Camp",
-	categories = {"special"},
-	depth = {1300,1300},
-	pattern_name = "supplycamp1",
-	position = {940,1050},
-	spawn_point = {5,5,5}}
-
 Staticspec{
 	name = "entrance to suna dungeons",
 	model = "portal1",

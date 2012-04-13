@@ -1,7 +1,9 @@
 Pattern{
 	name = "brigandhq1",
 	size = Vector(32,16,32),
-	categories = {},
+	position = Vector(700,960,700),
+	position_random = Vector(400,40,400),
+	categories = {"init"},
 	items = {
 		{9.000000,4.980000,8.890000,"wood bench"},
 		{11.080000,4.980000,8.330000,"chest"},

@@ -4,10 +4,21 @@ Map = Class()
 Map.class_name = "Map"
 
 Map.init = function(self)
+	-- Only initialize once.
 	if self.initialized then return end
 	self.initialized = true
+	-- Configuration.
+	local position = Vector(1024, 1700, 1024)
+	local size = 513
+	local scaling = 160
+	local spacing = 4
+	-- Load the heightmap from a height image.
 	local heights = Image("terrainheight1.png")
-	self.heightmap = Heightmap{position = Vector(1024, 1700, 1024), size = 513, scaling = 160, spacing = 4, heights = heights}
+	local dimensions = Vector((size - 1) * spacing, 256 * scaling, (size - 1) * spacing)
+	self.aabb = Aabb{point = position - dimensions * 0.5, size = dimensions}
+	self.heightmap = Heightmap{position = position, size = size, scaling = scaling,
+		spacing = spacing, heights = heights}
+	-- Setup rendering textures.
 	if not Settings.server then
 		self.heightmap:add_texture_layer{size = 10, name = "soil1",
 			diffuse = "soil1", specular = "soil1s",

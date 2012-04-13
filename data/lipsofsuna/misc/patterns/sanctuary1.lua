@@ -1,6 +1,10 @@
 Pattern{
 	name = "sanctuary1",
 	size = Vector(32,24,32),
+	distance = {"lips1",30,60},
+	position = Vector(700,960,700),
+	position_random = Vector(300,40,300),
+	categories = {"init"},
 	obstacles = {
 		{17,2,17,"sanctuary device"}},
 	tiles = {
