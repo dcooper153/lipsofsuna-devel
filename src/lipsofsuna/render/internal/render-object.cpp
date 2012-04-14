@@ -465,6 +465,19 @@ int liren_object_set_particle (
 }
 
 /**
+ * \brief Enables or disables particle emission.
+ * \param self Object.
+ * \param value Nonzero to enable, zero to disable.
+ */
+void liren_object_set_particle_emitting (
+	LIRenObject* self,
+	int          value)
+{
+	if (self->particles != NULL)
+		self->particles->setEmitting (value);
+}
+
+/**
  * \brief Sets the realized flag of the object.
  * \param self Object.
  * \param value Flag value.

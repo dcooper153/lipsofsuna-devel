@@ -93,6 +93,10 @@ end
 -- @name Object.particle
 -- @class table
 
+--- Toggles particle emitting for the object.
+-- @name Object.particle_emitting
+-- @class table
+
 --- Toggles shadow casting for the object.
 -- @name Object.shadow_casting
 -- @class table
@@ -101,16 +105,24 @@ Object:add_getters{
 	particle = function(s)
 		return rawget(s, "__particle")
 	end,
+	particle_emitting = function(s)
+		return rawget(s, "__particle_emitting")
+	end,
 	shadow_casting = function(s)
 		local v = rawget(s, "__shadow_casting")
 		return (v ~= nil) and v or false
 	end}
 
 Object:add_setters{
-	particle = function(s,v )
+	particle = function(s, v)
 		rawset(s, "__particle", v)
+		rawset(s, "__particle_emitting", true)
 		rawset(s, "__model", nil)
 		Los.object_set_particle(s.handle, v)
+	end,
+	particle_emitting = function(s, v)
+		rawset(s, "__particle_emitting", v)
+		Los.object_set_particle_emitting(s.handle, v)
 	end,
 	shadow_casting = function(s, v)
 		rawset(s, "__shadow_casting", v)

@@ -282,6 +282,21 @@ static void Object_set_particle (LIScrArgs* args)
 		liren_render_object_set_particle (module->render, object->id, name);
 }
 
+static void Object_set_particle_emitting (LIScrArgs* args)
+{
+	int value;
+	LIExtModule* module;
+	LIEngObject* object;
+
+	/* Get render object. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
+	object = args->self;
+
+	/* Get arguments. */
+	if (liscr_args_geti_bool (args, 0, &value))
+		liren_render_object_set_particle_emitting (module->render, object->id, value);
+}
+
 static void Object_set_shadow_casting (LIScrArgs* args)
 {
 	int value;
@@ -309,6 +324,7 @@ void liext_script_render_object (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_animation", Object_get_animation);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_particle_animation", Object_particle_animation);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_particle", Object_set_particle);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_particle_emitting", Object_set_particle_emitting);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_effect", Object_set_effect);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_shadow_casting", Object_set_shadow_casting);
 }

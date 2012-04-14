@@ -132,7 +132,7 @@ Protocol:add_handler{type = "OBJECT_HIDDEN", func = function(event)
 	local ok,i = event.packet:read("uint32")
 	if ok then
 		local o = Object:find{id = i}
-		if o then o:detach() end
+		if o then o:detach(true) end
 		if i == Client.active_dialog then Client:set_dialog() end
 	end
 end}

@@ -103,6 +103,11 @@ LIAPICALL (void, liren_render_object_set_particle, (
 	int          id,
 	const char*  name));
 
+LIAPICALL (void, liren_render_object_set_particle_emitting, (
+	LIRenRender* self,
+	int          id,
+	int          value));
+
 LIAPICALL (void, liren_render_object_set_realized, (
 	LIRenRender* self,
 	int          id,

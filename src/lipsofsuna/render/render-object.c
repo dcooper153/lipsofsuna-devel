@@ -238,6 +238,24 @@ void liren_render_object_set_particle (
 }
 
 /**
+ * \brief Enables or disables particle emission.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \param value Nonzero to enable, zero to disable.
+ */
+void liren_render_object_set_particle_emitting (
+	LIRenRender* self,
+	int          id,
+	int          value)
+{
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		liren_object_set_particle_emitting (object, value);
+}
+
+/**
  * \brief Sets the realized flag of the object.
  * \param self Renderer.
  * \param id Object ID.

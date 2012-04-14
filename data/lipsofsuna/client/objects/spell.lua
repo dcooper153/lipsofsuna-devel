@@ -13,3 +13,26 @@ Spell.new = function(clss, args)
 	self.spec = nil -- FIXME: Why does setting this make the object disable?
 	return self
 end
+
+Spell.detach = function(self, soft)
+	if soft then
+		-- Delayed removal to allow particle fading.
+		self.destroy_timer = 5
+		self.particle_emitting = false
+	else
+		-- Forced instant removal.
+		Object.detach(self)
+	end
+end
+
+Spell.update = function(self, secs)
+	-- Call base update.
+	Object.update(self, secs)
+	-- Handle delayed destruction.
+	if self.destroy_timer then
+		self.destroy_timer = self.destroy_timer - secs
+		if self.destroy_timer <= 0 then
+			self:detach()
+		end
+	end
+end
