@@ -76,7 +76,7 @@ Client.append_log = function(self, text)
 	local hud = Ui:get_hud("chat")
 	if not hud then return end
 	if not hud.widget then return end
-	hud.widget:append{text = text}
+	hud.widget:append(text)
 end
 
 --- Applies a world space quake.

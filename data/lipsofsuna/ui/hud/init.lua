@@ -1,6 +1,7 @@
 if not Settings then return end
 if Settings.server then return end
 
+require(Mod.path .. "log")
 require(Mod.path .. "modifiers")
 
 Ui:add_hud{
@@ -16,14 +17,7 @@ Ui:add_hud{
 Ui:add_hud{
 	id = "chat",
 	active = function() return Ui.root == "play" end,
-	init = function()
-		local self = Widgets.Log()
-		self.update = function(self, secs)
-			local mode = Program.video_mode
-			self.offset = Vector(5, mode[2] - 200)
-		end
-		return self
-	end}
+	init = function() return Widgets.Uilog() end}
 
 -- TODO
 --[[Ui:add_hud{

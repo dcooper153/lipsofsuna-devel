@@ -70,7 +70,7 @@ ChatCommand{pattern = "^/position$", func = function(matches)
 	if not object then return end
 	local pos = object.position
 	local str = string.format("Position: %.2f %.2f %.2f", pos.x, pos.y, pos.z)
-	Client.append_log(str)
+	Client:append_log(str)
 	print(str)
 end}
 
@@ -85,7 +85,7 @@ ChatCommand{pattern = "^/lua (.*)$", func = function(matches)
 	-- Request stats from the server.
 	local func,err = loadstring(matches[1])
 	if err then
-		Client.append_log(err)
+		Client:append_log(err)
 	else
 		xpcall(func, function(err)
 			print(debug.traceback("ERROR: " .. err))
