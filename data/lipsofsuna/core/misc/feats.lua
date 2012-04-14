@@ -98,7 +98,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "bite",
-	action = "melee custom",
+	action = "melee",
 	animation = "attack bite",
 	categories = {"melee"},
 	cooldown = 2,
@@ -109,7 +109,7 @@ Featanimspec{
 
 Featanimspec{
 	name = "dragon bite",
-	action = "melee custom",
+	action = "melee",
 	action_frames = {0, 30},
 	animation = "attack bite",
 	categories = {"melee"},
@@ -129,7 +129,31 @@ Featanimspec{
 
 Featanimspec{
 	name = "left claw",
-	action = "melee custom",
+	action = "melee",
+	action_frames = {0, 15},
+	animation = "attack left claw",
+	categories = {"melee"},
+	cooldown = 2,
+	effect = "swing1",
+	effect_impact = "impact1",
+	influences = {{"physical damage", -5}},
+	slot = "hand.L"}
+
+Featanimspec{
+	name = "right claw",
+	action = "melee",
+	action_frames = {0, 15},
+	animation = "attack right claw",
+	categories = {"melee"},
+	cooldown = 2,
+	effect = "swing1",
+	effect_impact = "impact1",
+	influences = {{"physical damage", -5}},
+	slot = "hand.R"}
+
+Featanimspec{
+	name = "dragon left claw",
+	action = "melee",
 	action_frames = {0, 15},
 	animation = "attack left claw",
 	categories = {"melee"},
@@ -140,8 +164,8 @@ Featanimspec{
 	slot = "hand.L"}
 
 Featanimspec{
-	name = "right claw",
-	action = "melee custom",
+	name = "dragon right claw",
+	action = "melee",
 	action_frames = {0, 15},
 	animation = "attack right claw",
 	categories = {"melee"},

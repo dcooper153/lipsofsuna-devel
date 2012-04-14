@@ -396,6 +396,20 @@ Creature.damaged = function(self, args)
 	end
 end
 
+--- Gets the spell effects known by the object.
+-- @param self Object.
+-- @return Dictionary of booleans.
+Creature.get_known_spell_effects = function(self)
+	return self.spec.feat_effects
+end
+
+--- Gets the spell types known by the object.
+-- @param self Object.
+-- @return Dictionary of booleans.
+Object.get_known_spell_types = function(self)
+	return self.spec.feat_anims
+end
+
 Creature.get_weapon = function(self)
 	return self.inventory:get_object_by_slot(self.spec.weapon_slot)
 end

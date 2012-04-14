@@ -17,13 +17,17 @@ Actionspec{name = "melee", func = function(feat, info, args)
 	local path = paths[move]
 	Coroutine(function(t)
 		local apply = function(r)
-			feat:apply{
+			local args = {
 				charge = args.charge,
 				object = r.object,
 				owner = args.user,
 				point = r.point,
 				tile = r.tile,
 				weapon = args.weapon}
+			feat:play_effects_impact(args)
+			feat:apply_impulse(args)
+			feat:apply_digging(args)
+			feat:apply_touch(args)
 			return true
 		end
 		local prev

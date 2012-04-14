@@ -59,7 +59,7 @@ Object.contact_cb = function(self, result)
 		return
 	end
 	if result.object == self.contact_args.owner then return end
-	self.contact_args.feat:apply{
+	local args = {
 		charge = self.contact_args.charge,
 		object = result.object,
 		owner = self.contact_args.owner,
@@ -67,6 +67,8 @@ Object.contact_cb = function(self, result)
 		projectile = self,
 		tile = result.tile,
 		weapon = self.contact_args.weapon}
+	self.contact_args.feat:apply_impulse(args)
+	self.contact_args.feat:apply(args)
 	self.contact_args = nil
 	self.contact_events = false
 	self.realized = false
@@ -263,6 +265,20 @@ Object.get_free_id = function(clss)
 			end
 		end
 	end
+end
+
+--- Gets the spell effects known by the object.
+-- @param self Object.
+-- @return List of strings.
+Object.get_known_spell_effects = function(self)
+	return {}
+end
+
+--- Gets the spell types known by the object.
+-- @param self Object.
+-- @return Dictionary of booleans.
+Object.get_known_spell_types = function(self)
+	return {}
 end
 
 --- Gets a full name string for the object.

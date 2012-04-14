@@ -43,15 +43,17 @@ Spell.contact_cb = function(self, result)
 		point = result.point,
 		projectile = self,
 		tile = result.tile}
+	-- Apply an impulse to the target.
+	self.feat:apply_impulse(args)
+	self.feat:play_effects_impact(args)
 	-- Call the collision callback of each effect.
 	-- Effects can remove themselves from the feat by returning false.
 	local left = 0
 	for k,v in pairs(self.feat.effects) do
 		local effect = Feateffectspec:find{name = v[1]}
 		if effect and effect.ranged then
-			args.value = v[2]
-			args.object = self
-			if not effect:ranged(args) then
+			local feat = Feat{animation = self.feat.animation, effects = {v}}
+			if not feat:apply_ranged(args) then
 				self.feat.effects[k] = nil
 			else
 				left = left + 1

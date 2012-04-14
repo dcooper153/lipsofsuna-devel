@@ -29,7 +29,7 @@ Species{
 	difficulty = 1,
 	effect_physical_damage = "fleshimpact1",
 	factions = {"evil"},
-	feat_anims = {"dragon bite", "left claw", "right claw"},--, "ranged spell"},
+	feat_anims = {"dragon bite", "dragon left claw", "dragon right claw"},--, "ranged spell"},
 	feat_effects = {"fire damage", "physical damage"},
 	inventory_size = 10,
 	inventory_items = {["dragon scale"] = 5, ["adamantium"] = 4, ["crimson stone"] = 2},

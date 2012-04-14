@@ -12,7 +12,7 @@ Species{
 		["attack left claw"] = {animation = "claw-left", channel = 2, weight = 30},
 		["attack right claw"] = {animation = "claw-right", channel = 2, weight = 30}},
 	categories = {"enemy"},
-	difficulty = 0,
+	difficulty = 0.3,
 	effect_physical_damage = "fleshimpact1",
 	factions = {"evil"},
 	feat_anims = {"left claw", "right claw"},
@@ -21,5 +21,5 @@ Species{
 	inventory_items = {["log"] = 2},
 	jump_force = 0,
 	model = "bitingbark1",
-	skills = {"Nerf health lv2", "Nerf combat lv1"},
+	skills = {"Nerf combat lv1"},
 	speed_walk = 1}

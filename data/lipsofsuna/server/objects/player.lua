@@ -108,6 +108,27 @@ Player.detach = function(self, keep)
 	self.realized = false
 end
 
+--- Gets the spell effects known by the object.
+-- @param self Object.
+-- @return Dictionary of booleans.
+Player.get_known_spell_effects = function(self)
+	return Unlocks.unlocks["spell effect"] or {}
+end
+
+--- Gets the spell types known by the object.
+-- @param self Object.
+-- @return Dictionary of booleans.
+Player.get_known_spell_types = function(self)
+	local ret = {}
+	local base = Creature.get_known_spell_types(self)
+	local unlock = Unlocks.unlocks["spell type"]
+	for k in pairs(base) do ret[k] = true end
+	if unlock then
+		for k in pairs(unlock) do ret[k] = true end
+	end
+	return ret
+end
+
 --- Inflicts a modifier on the object.
 -- @param self Object.
 -- @param name Modifier name.
