@@ -116,7 +116,7 @@ Utils.find_spawn_point = function(clss, point)
 	-- FIXME: Doesn't check if there are voxels blocking the point.
 	local hm = Map.heightmap:get_height(point, false)
 	if hm and point.y - 1 < hm and hm < point.y + 0.1 then
-		return point
+		return Vector(point.x, hm, point.z)
 	end
 end
 

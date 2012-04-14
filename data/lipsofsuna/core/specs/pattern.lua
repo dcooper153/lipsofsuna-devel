@@ -64,8 +64,8 @@ Pattern.write = function(self)
 	if self.position then
 		t = t .. "\tposition = " .. tostring(self.position) .. ",\n"
 	end
-	if self.position_random then
-		t = t .. "\tposition_random = " .. tostring(self.position) .. ",\n"
+	if self.position_random.length >= 1 then
+		t = t .. "\tposition_random = " .. tostring(self.position_random) .. ",\n"
 	end
 	if self.spawn_point then
 		t = t .. "\tspawn_point = " .. tostring(self.spawn_point) .. ",\n"

@@ -10,8 +10,8 @@ Map.init = function(self)
 	-- Configuration.
 	local position = Vector(1024, 1700, 1024)
 	local size = 513
-	local scaling = 160
-	local spacing = 4
+	local scaling = 80
+	local spacing = 1
 	-- Load the heightmap from a height image.
 	local heights = Image("terrainheight1.png")
 	local dimensions = Vector((size - 1) * spacing, 256 * scaling, (size - 1) * spacing)
@@ -29,6 +29,9 @@ Map.init = function(self)
 		self.heightmap:add_texture_layer{size = 30, name = "granite1",
 			diffuse = "granite1", specular = "granite1s",
 			normal = "granite1n", height = "soil1h", blend = "terrainsplat2"}
+		self.heightmap:add_texture_layer{size = 20, name = "cobbles1",
+			diffuse = "cobbles1", specular = "granite1s",
+			normal = "cobbles1n", height = "soil1h", blend = "terrainsplat3"}
 	end
 end
 
