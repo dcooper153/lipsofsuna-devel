@@ -50,6 +50,7 @@ if Settings.generate or Serialize:get_value("map_version") ~= Generator.map_vers
 	Generator.inst:generate()
 	Serialize:set_value("data_version", Serialize.data_version)
 	Unlocks:init(Serialize.db)
+	Unlocks:write_db()
 else
 	Serialize:load()
 	Unlocks:init(Serialize.db)
