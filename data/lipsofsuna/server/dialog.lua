@@ -59,6 +59,79 @@ Dialog.answer = function(self, user, answer)
 	end
 end
 
+--- Creates a dialog for a random quest.
+-- @param name Quest name.
+-- @param difficulty Difficulty level. ("easy"/"hard")
+-- @return Dialog branch.
+Dialog.create_random_quest_branch = function(self, name, difficulty)
+	-- Check for an existing random quest.
+	local npc_name = self.object.spec.name
+	local npc_marker = self.object.spec.marker
+	local var_name = string.gsub(string.lower(name), "[^A-Za-z]", "_")
+	local var_type = self.object.variables and self.object.variables[var_name .. "_type"]
+	local var_item = self.object.variables and self.object.variables[var_name .. "_item"]
+	local var_excuse = self.object.variables and self.object.variables[var_name .. "_excuse"]
+	-- Select a new quest if not found.
+	if not var_type then
+		-- TODO: Support for more types.
+		local excuses = {
+			"I promised to bring one as a souvenir for my family.",
+			"I could make big money with one.",
+			"It's for my local sewing club.",
+			"No questions asked, alright?",
+			"I heard that they are fashionable these days.",
+			"I heard that they bring luck.",
+			"I'd like to play with one just like I did as a kid.",
+			"This particular type of item has sentimental value to me.",
+			"I need it as a replacement for the one my dog ate.",
+			"My mom discarded the old one so I need a new one.",
+			"It just feels so good to use one."}
+		local spec
+		if difficulty == "hard" then
+			spec = Itemspec:random()
+		else
+			spec = Itemspec:random{category = "material"}
+		end
+		var_type = "find item"
+		var_item = spec.name
+		var_excuse = excuses[math.random(1, #excuses)]
+		if not self.object.variables then self.object.variables = {} end
+		self.object.variables[var_name .. "_init"] = nil
+		self.object.variables[var_name .. "_type"] = var_type
+		self.object.variables[var_name .. "_item"] = var_item
+		self.object.variables[var_name .. "_excuse"] = var_excuse
+	end
+	-- Create the dialog.
+	if var_type == "find item" then
+		return
+			{"branch",
+				{"say", npc_name, "Could you perhaps find me a " .. var_item .. "?"},
+				{"branch", check = "!var:" .. var_name .. "_init",
+					{"quest", name, status = "active", marker = npc_marker, text = string.format("%s has asked us to find a %s.", npc_name, var_item)},
+					{"var", var_name .. "_init"}
+				},
+				{"say", npc_name, var_excuse},
+				{"branch",
+					{"choice", "Leave it to me."},
+					{"choice", "Here is your " .. var_item .. ".",
+						{"remove player item", var_item,
+							{"branch",
+								{"quest", name, status = "completed", marker = npc_marker, text = "The requested item has been delivered."},
+								{"say", npc_name, "Thank you!"},
+								{"var clear", var_name .. "_init"},
+								{"var clear", var_name .. "_type"},
+								{"unlock reward"}
+							},
+							{"branch",
+								{"say", npc_name, "I wanted a " .. var_item .. ", but you don't have it."}
+							}
+						}
+					}
+				}
+			}
+	end
+end
+
 --- Executes the dialog.<br/>
 -- Continues the dialog until the next choice or message is encountered or
 -- the dialog ends.
@@ -218,12 +291,19 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 			table.insert(vm, 1, {exe = c, off = o - 1, pos = 1, len = 1})
 		end,
+		["random quest"] = function(vm, c)
+			vm[1].pos = vm[1].pos + 1
+			local branch = self:create_random_quest_branch(c[2], c.difficulty)
+			if branch then
+				table.insert(vm, 1, {exe = branch, off = 1, pos = 1, len = #branch - 1})
+			end
+		end,
 		["remove player item"] = function(vm, c)
 			vm[1].pos = vm[1].pos + 1
 			local o = self.user.inventory:get_object_by_name(c[2])
 			if o then
 				self.user:send("Lost " .. c[2])
-				o:detach()
+				o:subtract(1)
 				table.insert(vm, 1, {exe = c, off = 2, pos = 1, len = 1})
 			elseif #c >= 3 then
 				table.insert(vm, 1, {exe = c, off = 3, pos = 1, len = 1})
@@ -315,9 +395,14 @@ Dialog.execute = function(self)
 			Unlocks:unlock_random()
 			vm[1].pos = vm[1].pos + 1
 		end,
-		var = function(vm, c)
+		["var"] = function(vm, c)
 			if not self.object.variables then self.object.variables = {} end
 			self.object.variables[c[2]] = "true"
+			vm[1].pos = vm[1].pos + 1
+		end,
+		["var clear"] = function(vm, c)
+			if not self.object.variables then return end
+			self.object.variables[c[2]] = nil
 			vm[1].pos = vm[1].pos + 1
 		end}
 	-- Execute commands until break or end.

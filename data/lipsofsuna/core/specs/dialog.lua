@@ -111,6 +111,11 @@ Dialogspec.validate = function(self, args)
 			validate_arguments(c, {})
 			validate_branch(c, 2)
 		end,
+		["random quest"] = function(c)
+			assert(type(c[2]) == "string", "argument #2 of \"random quest\" must be the quest name string")
+			assert(type(c[3]) == "nil", "too many arguments to \"random quest\" command")
+			validate_arguments(c, {difficulty = true})
+		end,
 		["remove player item"] = function(c)
 			assert(type(c[2]) == "string", "argument #2 of \"remove player item\" must be the item name string")
 			assert(type(c[3]) == "table", "argument #3 of \"remove player item\" must be a script branch")
@@ -161,9 +166,14 @@ Dialogspec.validate = function(self, args)
 			assert(type(c[2]) == "nil", "too many arguments to \"unlock reward\" command")
 			validate_arguments(c, {})
 		end,
-		var = function(c)
+		["var"] = function(c)
 			assert(type(c[2]) == "string", "argument #2 of \"var\" must be the variable name")
 			assert(type(c[3]) == "nil", "too many arguments to \"var\" command")
+			validate_arguments(c, {})
+		end,
+		["var clear"] = function(c)
+			assert(type(c[2]) == "string", "argument #2 of \"var clear\" must be the variable name")
+			assert(type(c[3]) == "nil", "too many arguments to \"var clear\" command")
 			validate_arguments(c, {})
 		end}
 	validate_arguments = function(cmd, allow)

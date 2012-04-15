@@ -10,4 +10,5 @@ Staticspec{
 Dialogspec{name = "entrance to suna dungeons",
 	{"teleport", marker = "lyra"}}
 
+require(Mod.path .. "guy")
 require(Mod.path .. "supplycamp1")

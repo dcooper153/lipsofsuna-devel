@@ -10,6 +10,8 @@ Dialogspec{name = "roland", unique = true,
 			{"branch", cond_not = "roland known",
 				{"flag", "roland known"}}
 		},
+		{"choice", "Do you have any work?",
+			{"random quest", "Guy's Request", difficulty = "hard"}},
 		{"choice", "I'd like to talk about a medical problem.", cond = "roland known",
 			{"choice", "What kind of a disease would cause hallucinations?", cond = "hallucinations known",
 				{"say", "Roland", "Are these temporary hallucinations we are talking about?"},
