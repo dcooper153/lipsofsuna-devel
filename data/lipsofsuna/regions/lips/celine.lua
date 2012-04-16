@@ -1,6 +1,6 @@
 Dialogspec{name = "celine",
 	{"default death check"},
-	{"branch", check = "flag:imaginary friend completed",
+	{"branch", check = {{"flag", "imaginary friend completed"}},
 		{"choice", "Have you been feeling alright lately?",
 			{"say", "Celine", "A cat scratched my toe the other day."},
 			{"say", "Celine", "I'm worrying that I might die."}
@@ -14,7 +14,7 @@ Dialogspec{name = "celine",
 	{"branch",
 		{"choice", "What are you talking about?",
 			{"say", "Celine", "This cute, furry, little lamb of course."},
-			{"branch", check = "!flag:hallucinations known",
+			{"branch", check = {{"!flag", "hallucinations known"}},
 				{"quest", "Imaginary Friend", status = "active", marker = "roland", text = "We have met Celine who appears to be hallucinating. Perhaps a doctor knows a way to cure her."},
 				{"flag", "hallucinations known"}
 			},
@@ -45,7 +45,7 @@ Dialogspec{name = "celine",
 				{"exit"}
 			}
 		},
-		{"choice", "I need to talk about a more important matter.", check = "flag:hallucinations known"},
+		{"choice", "I need to talk about a more important matter.", check = {{"flag", "hallucinations known"}}},
 	},
 	{"branch",
 		{"choice", "Have you been feeling weird lately?",
@@ -55,7 +55,7 @@ Dialogspec{name = "celine",
 			{"say", "Celine", "I have been hearing voices as well."},
 			{"say", "Celine", "Nothing to worry about."},
 		},
-		{"choice", "[Cure disease potion] You look thirsty, have a drink.", check = "flag:black-spotted parasite known",
+		{"choice", "[Cure disease potion] You look thirsty, have a drink.", check = {{"flag", "black-spotted parasite known"}},
 			{"remove player item", "cure disease potion",
 				{"branch",
 					{"say", "Celine", "Wow, my headache disappeared."},
@@ -64,7 +64,7 @@ Dialogspec{name = "celine",
 						{"say", "Celine", "Perhaps it was because of that funny mushroom."},
 						{"say", "Celine", "It must have been a really funny one to last this long."}
 					},
-					{"choice", "In your imaginary pet ball, obviously.", check = "flag:pet battle joke",
+					{"choice", "In your imaginary pet ball, obviously.", check = {{"flag", "pet battle joke"}},
 						{"say", "Celine", "Ahahaha..."}
 					},
 					{"quest", "Imaginary Friend", status = "completed", marker = "celine", text = "Celine has been cured by our potion."},
@@ -77,7 +77,7 @@ Dialogspec{name = "celine",
 				},
 			}
 		},
-		{"choice", "[Poison potion] You look thirsty, have a drink.", check = "flag:black-spotted parasite known",
+		{"choice", "[Poison potion] You look thirsty, have a drink.", check = {{"flag", "black-spotted parasite known"}},
 			{"remove player item", "poison potion",
 				{"branch",
 					{"func", function(q)
@@ -104,10 +104,10 @@ Dialogspec{name = "celine",
 }
 
 Dialogspec{name = "celine death",
-	{"branch", check = "!flag:imaginary friend completed",
+	{"branch", check = {{"!flag", "imaginary friend completed"}},
 		{"quest", "Imaginary Friend", status = "completed", marker = "celine", text = "Celine has been killed."}
 	},
-	{"branch", check = "flag:imaginary friend completed",
+	{"branch", check = {{"flag", "imaginary friend completed"}},
 		{"quest", "Imaginary Friend", status = "completed", marker = "celine", text = "Celine has been cured, permanently."}
 	},
 	{"flag", "imaginary friend completed"}

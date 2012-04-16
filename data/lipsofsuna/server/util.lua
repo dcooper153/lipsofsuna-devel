@@ -89,6 +89,22 @@ Utils.find_drop_point = function(clss, point)
 	return (c + Vector(0.5,0.5,0.5)) * Voxel.tile_size
 end
 
+--- Finds a random spawn point in the overworld that is suitable for creatures.
+-- @param clss Utils class.
+-- @return Point in world units.
+Utils.find_random_overworld_point = function(clss)
+	local point = Vector()
+	while true do
+		point.x = Map.aabb.point.x + Map.aabb.size.x * math.random()
+		point.z = Map.aabb.point.z + Map.aabb.size.z * math.random()
+		local hm = Map.heightmap:get_height(point, false)
+		if hm then
+			point.y = hm
+			return point
+		end
+	end
+end
+
 --- Finds a spawn point suitable for creatures.
 -- @param clss Utils class.
 -- @param point Point in world space.

@@ -151,10 +151,8 @@ end
 -- @param erase True to erase existing database entries first.
 Serialize.save_quests = function(clss, erase)
 	clss.db:query("BEGIN TRANSACTION;")
-	if erase then
-		clss.db:query("DELETE FROM quests;")
-		clss.db:query("DELETE FROM dialog_flags;")
-	end
+	clss.db:query("DELETE FROM quests;")
+	clss.db:query("DELETE FROM dialog_flags;")
 	for k,v in pairs(Quest.dict_name) do
 		clss.db:query("REPLACE INTO quests (name,status,desc,marker) VALUES (?,?,?,?);",
 			{k, v.status, v.text, v.marker})

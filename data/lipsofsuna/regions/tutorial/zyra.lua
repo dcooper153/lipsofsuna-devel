@@ -1,6 +1,6 @@
  Dialogspec{name = "zyra",
 	{"default death check"},
-	{"branch", check="!flag:zyra complained",
+	{"branch", check = {{"!flag", "zyra complained"}},
 		{"flag", "zyra complained"},
 		{"say", "Zyra the Mage", "I can't believe they're making me do this..."},
 		{"say", "Zyra the Mage", "I come here to study the largest discovery in all history, and I'm assigned as a trainer for idiots!"},

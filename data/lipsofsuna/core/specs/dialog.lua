@@ -30,7 +30,7 @@ Dialogspec.validate = function(self, args)
 	local validate_command
 	local validate_cond
 	local commands = {
-		branch = function(c)
+		["branch"] = function(c)
 			assert(type(c.cond) == "nil" or type(c.cond) == "string", "argument \"cond\" of \"branch\" must be the flag string")
 			assert(type(c.cond_dead) == "nil" or type(c.cond_dead) == "boolean", "argument \"cond_dead\" of \"branch\" must be a boolean")
 			assert(type(c.cond_not) == "nil" or type(c.cond_not) == "string", "argument \"cond_not\" of \"branch\" must be the flag string")
@@ -38,12 +38,18 @@ Dialogspec.validate = function(self, args)
 			validate_cond(c.check)
 			validate_branch(c, 2)
 		end,
+		["branch generate"] = function(c)
+			assert(type(c[2]) == "function", "argument #2 of \"branch generate\" must be a function")
+			assert(type(c[3]) == "nil", "too many arguments to \"branch generate\" command")
+			validate_arguments(c, {check = true})
+			validate_cond(c.check)
+		end,
 		["break"] = function(c)
 			assert(type(c[2]) == "nil" or type(c[2]) == "number", "argument #2 of \"break\" must be the number of branches to break")
 			assert(type(c[3]) == "nil", "too many arguments to \"break\" command")
 			validate_arguments(c, {})
 		end,
-		choice = function(c)
+		["choice"] = function(c)
 			assert(type(c[2]) == "string", "argument #2 of \"choice\" must be the choice string")
 			assert(type(c.cond) == "nil" or type(c.cond) == "string", "argument \"cond\" of \"choice\" must be the flag string")
 			assert(type(c.cond_not) == "nil" or type(c.cond_not) == "string", "argument \"cond_not\" of \"choice\" must be the flag string")
@@ -65,9 +71,14 @@ Dialogspec.validate = function(self, args)
 			assert(type(c[2]) == "nil", "too many arguments to \"exit\" command")
 			validate_arguments(c, {})
 		end,
-		flag = function(c)
+		["flag"] = function(c)
 			assert(type(c[2]) == "string", "argument #2 of \"flag\" must be the flag name")
 			assert(type(c[3]) == "nil", "too many arguments to \"flag\" command")
+			validate_arguments(c, {})
+		end,
+		["flag clear"] = function(c)
+			assert(type(c[2]) == "string", "argument #2 of \"flag clear\" must be the flag name")
+			assert(type(c[3]) == "nil", "too many arguments to \"flag clear\" command")
 			validate_arguments(c, {})
 		end,
 		func = function(c)
@@ -191,25 +202,29 @@ Dialogspec.validate = function(self, args)
 	end
 	validate_cond = function(c)
 		if not c then return true end
-		assert(type(c) == "string", "argument \"check\" must be a string")
-		for _,str in ipairs(string.split(c, "&")) do
-			local list = string.split(str, ":")
-			assert(#list <= 2, string.format("invalid check %q", c))
-			local type,name = list[1],list[2]
-			if type == "dead" then
-				assert(not name, string.format("invalid check %q", c))
-			elseif type == "!dead" then
-				assert(not name, string.format("invalid check %q", c))
-			elseif type == "flag" then
-				assert(name, string.format("invalid check %q", c))
-			elseif type == "!flag" then
-				assert(name, string.format("invalid check %q", c))
-			elseif type == "var" then
-				assert(name, string.format("invalid check %q", c))
-			elseif type == "!var" then
-				assert(name, string.format("invalid check %q", c))
+		assert(type(c) == "table", "argument \"check\" must be a table")
+		for _,cond in ipairs(c) do
+			assert(type(cond) == "table", "argument \"check\" must be a table of condition tables")
+			assert(#cond >= 1 and #cond <= 2, "argument \"check\" must be a table of condition tables")
+			local check,name = cond[1],cond[2]
+			if check == "dead" or
+			   check == "!dead" then
+				assert(not name, string.format("error in check %q", check))
+			elseif check == "flag" or
+			       check == "!flag" then
+				assert(type(name) == "string", string.format("error in check %q", check))
+			elseif check == "quest active" or
+			       check == "quest not active" or
+			       check == "quest completed" or
+			       check == "quest not completed" or
+			       check == "quest started" or
+			       check == "quest not started" then
+				assert(type(name) == "string", string.format("error in check %q", check))
+			elseif check == "var" or
+			       check == "!var" then
+				assert(type(name) == "string", string.format("error in check %q", check))
 			else
-				assert(false, string.format("invalid check %q", c))
+				assert(false, string.format("invalid check %q", check))
 			end
 		end
 	end
@@ -221,9 +236,18 @@ Dialogspec.validate = function(self, args)
 			end
 		end
 	end
-	local o,e = pcall(function() validate_branch(self.commands, 1, "Dialogspec") end)
-	if not o then
-		print(string.format("ERROR: in dialog \"%s\": %s", self.name,
-			string.match(e, ".*:[0-9]*: (.*)")))
+	xpcall(
+		function() validate_branch(self.commands, 1, "Dialogspec") end,
+		function(err)
+			print(string.format("ERROR: in dialog \"%s\": %s", self.name,
+				string.match(err, ".*:[0-9]*: (.*)")))
+		end)
+end
+
+--- Validates all registered dialogs.
+-- @param self Dialogspec class.
+Dialogspec.validate_all = function(self)
+	for k,v in pairs(self.dict_id) do
+		v:validate()
 	end
 end

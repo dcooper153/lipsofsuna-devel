@@ -30,7 +30,7 @@ Dialogspec{name = "smallbuildings",
 		{"choice","South to North",	{"spawn pattern", "castlebarracks",erase_tiles=true,position_relative=Vector(0,2,0),rotation=2},{"var","built"},{"break"}}},
 	{"choice", "Cancel",
 		{"exit"}}},
-	{"branch", check="var:built",
+	{"branch", check = {{"var", "built"}},
 	{"func", function(q)
 						--	q.object:damaged{amount = 200, type = "physical"}
 					end}},

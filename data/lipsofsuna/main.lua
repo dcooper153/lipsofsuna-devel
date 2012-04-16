@@ -46,6 +46,7 @@ require "system/widgets"
 end
 
 Itemspec:validate()
+Dialogspec:validate_all()
 
 if Settings.quit then Program.quit = true end
 if Settings.server then

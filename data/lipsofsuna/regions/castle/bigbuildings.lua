@@ -20,7 +20,7 @@ Dialogspec{name = "bigbuildings",
 		{"spawn pattern", "smallbuildingnodes", position_relative=Vector(5,2,5)},{"var","built"},{"break"}},
 	{"choice", "Cancel",
 		{"exit"}}},
-	{"branch", check="var:built",
+	{"branch", check = {{"var", "built"}},
 	{"func", function(q)
 						--q.object:damaged{amount = 200, type = "physical"}
 					end}},

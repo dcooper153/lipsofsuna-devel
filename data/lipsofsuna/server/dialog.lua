@@ -65,51 +65,130 @@ end
 -- @return Dialog branch.
 Dialog.create_random_quest_branch = function(self, name, difficulty)
 	-- Check for an existing random quest.
+	-- If one is found, the quest creation pass is skipped. The dialog tree will
+	-- be built from the existing actor variables in that case.
 	local npc_name = self.object.spec.name
 	local npc_marker = self.object.spec.marker
 	local var_name = string.gsub(string.lower(name), "[^A-Za-z]", "_")
 	local var_type = self.object.variables and self.object.variables[var_name .. "_type"]
 	local var_item = self.object.variables and self.object.variables[var_name .. "_item"]
+	local var_actor = self.object.variables and self.object.variables[var_name .. "_actor"]
 	local var_excuse = self.object.variables and self.object.variables[var_name .. "_excuse"]
-	-- Select a new quest if not found.
+	-- Quest creation functions.
+	-- These implement quest initialization for each random quest type. They
+	-- select and create the necessary actors and set their variables.
+	local random_quests = {
+		-- Find an item.
+		-- The player is asked to find a specific item type and bring it to the
+		-- actor. Any item of the requested type is accepted. The item type is
+		-- stored to the actor variables of the NPC.
+		function()
+			-- Set the quest type.
+			var_type = "find item"
+			-- Choose the wanted item.
+			local spec
+			if difficulty == "hard" then
+				spec = Itemspec:random()
+			else
+				spec = Itemspec:random{category = "material"}
+			end
+			var_item = spec.name
+			-- Choose a random excuse.
+			local excuses = {
+				"I promised to bring one as a souvenir for my family.",
+				"I could make big money with one.",
+				"It's for my local sewing club.",
+				"No questions asked, alright?",
+				"I heard that they are fashionable these days.",
+				"I heard that they bring luck.",
+				"I'd like to play with one just like I did as a kid.",
+				"This particular type of item has sentimental value to me.",
+				"I need it as a replacement for the one my dog ate.",
+				"My mom discarded the old one so I need a new one.",
+				"It just feels so good to use one."}
+			var_excuse = excuses[math.random(1, #excuses)]
+			-- Set the actor variables.
+			if not self.object.variables then self.object.variables = {} end
+			self.object.variables[var_name .. "_init"] = nil
+			self.object.variables[var_name .. "_type"] = var_type
+			self.object.variables[var_name .. "_item"] = var_item
+			self.object.variables[var_name .. "_excuse"] = var_excuse
+		end,
+		-- Kill an actor.
+		-- The player is asked to kill a randomly generated unique actor. The
+		-- mark randomly chosen and placed in the overworld. The name of the
+		-- mark is stored to the actor variables of the NPC. The quest and NPC
+		-- names are stored to the actor variables of the mark so that its
+		-- death dialog can update the quest.
+		function()
+			-- Set the quest type.
+			var_type = "kill actor"
+			-- Get the list of possible target actors.
+			local list = Species:find{category = "scapegoat"}
+			if not list then return end
+			-- Randomize the order of target actors.
+			local actors = {}
+			for k,v in pairs(list) do
+				table.insert(actors, v)
+			end
+			for i = 1,#actors do
+				local j = math.random(1,#actors)
+				actors[i],actors[j] = actors[j],actors[i]
+			end
+			-- Create the target actor.
+			local actor
+			for k,spec in ipairs(actors) do
+				if not Dialog.flags["scapegoat_alive_" .. spec.name] then
+					var_actor = spec.name
+					actor = Creature{
+						spec = spec,
+						position = Utils:find_random_overworld_point(),
+						random = true,
+						realized = true}
+					break
+				end
+			end
+			-- Choose a random excuse.
+			local excuses = {
+				"All is fair in love and war.",
+				"Trust me, this is for the best of everyone.",
+				"No one touches my cucumber that way.",
+				"Should have thought twice before teasing me in the kindergarten.",
+				"That pest knows too much.",
+				"This is what happens to those who criticize my ideas.",
+				"What is better than picking the mark by random?",
+				"Go now, my friend. Kill, kill! Muahahaha!"}
+			var_excuse = excuses[math.random(1, #excuses)]
+			-- Reserve the actor for this quest.
+			npc_marker = actor.spec.marker
+			Dialog.flags["scapegoat_alive_" .. actor.spec.name] = "true"
+			-- Set the actor variables.
+			if not self.object.variables then self.object.variables = {} end
+			self.object.variables[var_name .. "_init"] = nil
+			self.object.variables[var_name .. "_type"] = var_type
+			self.object.variables[var_name .. "_actor"] = var_actor
+			self.object.variables[var_name .. "_excuse"] = var_excuse
+			if not actor.variables then actor.variables = {} end
+			actor.variables[var_name .. "_mark_actor"] = npc_name
+			actor.variables[var_name .. "_mark_marker"] = self.object.spec.marker
+			actor.variables[var_name .. "_mark_quest"] = name
+		end}
 	if not var_type then
-		-- TODO: Support for more types.
-		local excuses = {
-			"I promised to bring one as a souvenir for my family.",
-			"I could make big money with one.",
-			"It's for my local sewing club.",
-			"No questions asked, alright?",
-			"I heard that they are fashionable these days.",
-			"I heard that they bring luck.",
-			"I'd like to play with one just like I did as a kid.",
-			"This particular type of item has sentimental value to me.",
-			"I need it as a replacement for the one my dog ate.",
-			"My mom discarded the old one so I need a new one.",
-			"It just feels so good to use one."}
-		local spec
-		if difficulty == "hard" then
-			spec = Itemspec:random()
-		else
-			spec = Itemspec:random{category = "material"}
-		end
-		var_type = "find item"
-		var_item = spec.name
-		var_excuse = excuses[math.random(1, #excuses)]
-		if not self.object.variables then self.object.variables = {} end
-		self.object.variables[var_name .. "_init"] = nil
-		self.object.variables[var_name .. "_type"] = var_type
-		self.object.variables[var_name .. "_item"] = var_item
-		self.object.variables[var_name .. "_excuse"] = var_excuse
+		local func = random_quests[math.random(1, #random_quests)]
+		func()
+		Serialize:save_quests()
 	end
-	-- Create the dialog.
-	if var_type == "find item" then
-		return
-			{"branch",
-				{"say", npc_name, "Could you perhaps find me a " .. var_item .. "?"},
-				{"branch", check = "!var:" .. var_name .. "_init",
+	-- Dialog creation functions.
+	-- These build the dialog trees for each random quest type.
+	local random_dialogs = {
+		-- Find an item.
+		["find item"] = function()
+			return {"branch",
+				{"branch", check = {{"!var", var_name .. "_init"}},
 					{"quest", name, status = "active", marker = npc_marker, text = string.format("%s has asked us to find a %s.", npc_name, var_item)},
 					{"var", var_name .. "_init"}
 				},
+				{"say", npc_name, "Could you perhaps find me a " .. var_item .. "?"},
 				{"say", npc_name, var_excuse},
 				{"branch",
 					{"choice", "Leave it to me."},
@@ -117,9 +196,11 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 						{"remove player item", var_item,
 							{"branch",
 								{"quest", name, status = "completed", marker = npc_marker, text = "The requested item has been delivered."},
-								{"say", npc_name, "Thank you!"},
 								{"var clear", var_name .. "_init"},
 								{"var clear", var_name .. "_type"},
+								{"var clear", var_name .. "_item"},
+								{"var clear", var_name .. "_excuse"},
+								{"say", npc_name, "Thank you!"},
 								{"unlock reward"}
 							},
 							{"branch",
@@ -129,6 +210,34 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 					}
 				}
 			}
+			end,
+		-- Kill an actor.
+		["kill actor"] = function()
+			return {"branch",
+				{"branch", check = {{"!var", var_name .. "_init"}},
+					{"quest", name, status = "active", marker = npc_marker, text = string.format("%s has asked us to kill %s.", npc_name, var_actor)},
+					{"var", var_name .. "_init"}
+				},
+				{"say", npc_name, string.format("I need you to go kill %s.", var_actor)},
+				{"say", npc_name, var_excuse},
+				{"branch",
+					{"choice", "Leave it to me."},
+					{"choice", string.format("%s has been killed.", var_actor), check = {{"flag", var_name .. "_mark_killed"}},
+						{"quest", name, status = "completed", marker = npc_marker, text = string.format("%s has been informed of %s being dead.", npc_name, var_actor)},
+						{"var clear", var_name .. "_init"},
+						{"var clear", var_name .. "_type"},
+						{"var clear", var_name .. "_actor"},
+						{"var clear", var_name .. "_excuse"},
+						{"flag clear", var_name .. "_mark_killed"},
+						{"say", npc_name, "Thank you!"},
+						{"unlock reward"}
+					}
+				}
+			}
+			end}
+	if var_type then
+		local func = random_dialogs[var_type]
+		if func then return func() end
 	end
 end
 
@@ -145,9 +254,8 @@ Dialog.execute = function(self)
 		if c.cond_not and Dialog.flags[c.cond_not] then return end
 		-- New condition string.
 		if not c.check then return true end
-		for _,str in ipairs(string.split(c.check, "&")) do
-			local list = string.split(str, ":")
-			local type,name = list[1],list[2]
+		for _,cond in ipairs(c.check) do
+			local type,name = cond[1],cond[2]
 			if type == "dead" then
 				if not self.object.dead then return end
 			elseif type == "!dead" then
@@ -156,6 +264,22 @@ Dialog.execute = function(self)
 				if not Dialog.flags[name] then return end
 			elseif type == "!flag" then
 				if Dialog.flags[name] then return end
+			elseif type == "quest active" then
+				local quest = Quest:find{name = name}
+				if not quest then return end
+				if quest.status ~= "active" then return end
+			elseif type == "quest not active" then
+				local quest = Quest:find{name = name}
+				if not quest then return end
+				if quest.status == "active" then return end
+			elseif type == "quest completed" then
+				local quest = Quest:find{name = name}
+				if not quest then return end
+				if quest.status ~= "completed" then return end
+			elseif type == "quest not completed" then
+				local quest = Quest:find{name = name}
+				if not quest then return end
+				if quest.status == "completed" then return end
 			elseif type == "var" then
 				if not self.object.variables or not self.object.variables[name] then return end
 			elseif type == "!var" then
@@ -186,10 +310,20 @@ Dialog.execute = function(self)
 	-- Command handlers of the virtual machine.
 	-- Handlers increment stack pointers and push and pop command arrays to the stack.
 	local commands = {
-		branch = function(vm, c)
+		["branch"] = function(vm, c)
 			vm[1].pos = vm[1].pos + 1
 			if check_cond(c) then
 				table.insert(vm, 1, {exe = c, off = 1, pos = 1, len = #c - 1})
+			end
+		end,
+		["branch generate"] = function(vm, c)
+			vm[1].pos = vm[1].pos + 1
+			if check_cond(c) then
+				local func = c[2]
+				local branch = func(self)
+				if branch then
+					table.insert(vm, 1, {exe = branch, off = 1, pos = 1, len = #branch - 1})
+				end
 			end
 		end,
 		["break"] = function(vm, c)
@@ -240,12 +374,17 @@ Dialog.execute = function(self)
 			Effect:play{effect = c[2], object = self.user}
 			vm[1].pos = vm[1].pos + 1
 		end,
-		flag = function(vm, c)
+		["flag"] = function(vm, c)
 			Dialog.flags[c[2]] = "true"
 			Serialize:save_quests()
 			vm[1].pos = vm[1].pos + 1
 		end,
-		func = function(vm, c)
+		["flag clear"] = function(vm, c)
+			Dialog.flags[c[2]] = nil
+			Serialize:save_quests()
+			vm[1].pos = vm[1].pos + 1
+		end,
+		["func"] = function(vm, c)
 			local f = c[2]
 			vm[1].pos = vm[1].pos + 1
 			f(self)
