@@ -140,11 +140,11 @@ int liext_heightmap_get_height (
 	{
 		local_x = LIMAT_MAX (0.0f, local_x);
 		local_z = LIMAT_MAX (0.0f, local_z);
-		local_x = LIMAT_MIN (self->size - 0.001f, local_x);
-		local_z = LIMAT_MIN (self->size - 0.001f, local_z);
+		local_x = LIMAT_MIN (self->size - 1.001f, local_x);
+		local_z = LIMAT_MIN (self->size - 1.001f, local_z);
 	}
-	else if (local_x < 0.0f || local_x >= self->size ||
-	         local_z < 0.0f || local_z >= self->size)
+	else if (local_x < 0.0f || local_x >= self->size - 1 ||
+	         local_z < 0.0f || local_z >= self->size - 1)
 		return 0;
 
 	/* Calculate the position relative to the four nearby vertices. */
