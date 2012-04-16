@@ -209,6 +209,13 @@ static void private_read (
 	/* Read and return contents. */
 	for (i = 0 ; liscr_args_geti_string (args, i, &type) ; i++)
 	{
+		/* Allocate size in the stack. */
+		/* The return values are pushed to the stack. If the packet is very
+		   long, the stack could overflow without this. That can cause memory
+		   corruption that lead to random crashes. */
+		lua_checkstack (args->lua, 10);
+
+		/* Read the value. */
 		liscr_args_geti_string (args, i, &type);
 		if (!strcmp (type, "bool"))
 		{
