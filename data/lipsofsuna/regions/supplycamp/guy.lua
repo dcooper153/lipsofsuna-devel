@@ -5,7 +5,8 @@ Species{
 	marker = "guy",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"}}
+	inventory_items = {"dress"},
+	preset = "Male 2"}
 
 Quest{
 	name = "Guy's Request"}

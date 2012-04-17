@@ -55,6 +55,7 @@ Species.dict_name = {}
 --   <li>jump_force: Mass-independent jump force of the creature.</li>
 --   <li>loot_categories: List of item categories this creature can have as random loot.</li>
 --   <li>loot_count: Minimum and maximum number of random loot items this creature can have.</li>
+--   <li>preset: The name of the actor preset to use.</li>
 --   <li>mass: Mass in kilograms.</li>
 --   <li>model: Model name.</li>
 --   <li>skill_regen: Skill regeneration speed in units per second.</li>

@@ -45,7 +45,8 @@ Species{
 	marker = "bobbles",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"}}
+	inventory_items = {"dress"},
+	preset = "Male 3"}
 
 Species{
 	name = "Mark",
@@ -55,7 +56,8 @@ Species{
 	marker = "mark",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"}}
+	inventory_items = {"dress"},
+	preset = "Male 1"}
 
 Species{
 	name = "Jerkins",
@@ -65,7 +67,8 @@ Species{
 	marker = "jerkins",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"}}
+	inventory_items = {"dress"},
+	preset = "Male 2"}
 
 Species{
 	name = "Rubert",
@@ -75,7 +78,8 @@ Species{
 	marker = "rubert",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"}}
+	inventory_items = {"dress"},
+	preset = "Male 3"}
 
 Species{
 	name = "Rocky",
@@ -85,4 +89,5 @@ Species{
 	marker = "rocky",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"}}
+	inventory_items = {"dress"},
+	preset = "Male 2"}
