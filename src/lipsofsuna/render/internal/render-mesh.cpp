@@ -50,6 +50,16 @@ LIRenMesh::LIRenMesh (
 {
 	this->render = render;
 	this->model = NULL;
+
+	/* Disable automatic edge list calculation. */
+	/* If left enabled, Ogre will calculate the edge lists in the main thread
+	   when the mesh is assigned to an entity. That will stall the game for a
+	   noticeable period of time. Since there's no need for edge lists at the
+	   moment, the problem is fixed by disabling them. */
+	/* For future reference, if there will be a need for edge lists, calculate
+	   them manually in the background thread of LIRenMeshBuilder to avoid
+	   stalling. */
+	mAutoBuildEdgeLists = false;
 }
 
 LIRenMesh::~LIRenMesh ()
