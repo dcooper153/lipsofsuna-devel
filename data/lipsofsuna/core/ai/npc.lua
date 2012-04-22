@@ -1,4 +1,7 @@
-Ai = Class()
+require(Mod.path .. "ai")
+
+NpcAi = Class(Ai)
+Ai.dict_name["npc"] = NpcAi
 
 --- Creates a new creature AI.<br/>
 -- The AI is inactive when created. It's only activated when the controlled
@@ -8,143 +11,16 @@ Ai = Class()
 -- @param clss AI class.
 -- @param object Controlled creature.
 -- @return AI.
-Ai.new = function(clss, object)
-	local self = Class.new(clss)
-	self.object = object
-	self.enemies = setmetatable({}, {__mode = "kv"})
+NpcAi.new = function(clss, object)
+	local self = Ai.new(clss, object)
 	self.update_timer = 0
-	self:calculate_combat_ratings()
 	self:set_state{state = "none"}
-	self.object:set_movement(0)
 	return self
-end
-
---- Updates the combat ratings of the creature.
--- @param self AI.
-Ai.calculate_combat_ratings = function(self)
-	self.melee_rating = 0
-	self.ranged_rating = 0
-	self.throw_rating = 0
-	self.best_melee_weapon = nil
-	self.best_ranged_weapon = nil
-	self.best_throw_weapon = nil
-	if self.object.spec.can_melee then self.melee_rating = 1 end
-	for k,v in pairs(self.object.inventory.stored) do
-		local score,melee,ranged,throw = self:calculate_weapon_ratings(v)
-		if melee >= self.melee_rating then
-			self.melee_rating = melee
-			self.best_melee_weapon = v
-		end
-		if ranged >= self.ranged_rating then
-			self.ranged_rating = ranged
-			self.best_ranged_weapon = v
-		end
-		if throw >= self.throw_rating then
-			self.throw_rating = throw
-			self.best_throw_weapon = v
-		end
-	end
-end
-
---- Calculates how desirable it is to attack the given enemy.
--- @param self Ai.
--- @param enemy Enemy object.
-Ai.calculate_enemy_rating = function(self, enemy)
-	-- TODO: Should take enemy weakness into account.
-	-- TODO: Should probably take terrain into account by solving paths.
-	return 1 / ((self.object.position - enemy.position).length + 1)
-end
-
---- Calculates the tilt value for melee attacks.
--- @param self Ai.
--- @return Tilt angle in radians.
-Ai.calculate_melee_tilt = function(self)
-	-- Calculate distance to the target.
-	local diff = self.target.position + self.target.center_offset_physics - self.object.position - self.object.spec.aim_ray_center
-	local dist = Vector(diff.x, 0, diff.z).length
-	-- Solve the tilt angle analytically.
-	local angle = math.atan2(diff.y, dist)
-	local limit = self.object.spec.tilt_limit
-	angle = math.min(math.max(angle, -limit), limit)
-	return Quaternion{euler = {0,0,angle}}
-end
-
---- Calculates the tilt value for ranged attacks.
--- @param self Ai.
--- @return Tilt angle in radians.
-Ai.calculate_ranged_tilt = function(self)
-	-- Get the ammo type.
-	local weapon = self.object:get_weapon()
-	if not weapon or not weapon.spec.ammo_type then return Quaternion() end
-	local spec = Itemspec:find{name = weapon.spec.ammo_type}
-	if not spec then return Quaternion() end
-	-- Calculate distance to the target.
-	local diff = self.target.position + self.target.center_offset_physics - self.object.position - self.object.spec.aim_ray_center
-	local dist = Vector(diff.x, 0, diff.z).length
-	-- Solve the tilt angle with brute force.
-	local speed = 20
-	local solve = function(angle)
-		local a = spec.gravity_projectile
-		local v = Quaternion{euler = {0,0,angle}} * Vector(0, 0, -speed)
-		local t_hit = dist / Vector(v.x,0,v.z).length
-		local y_hit = v.y * t_hit + 0.5 * a.y * t_hit^2
-		return y_hit
-	end
-	local best = 0
-	local best_error = 1000
-	for angle = 0,1.2,0.05 do
-		local e = math.abs(solve(angle) - diff.y)
-		if e < best_error then
-			best = angle
-			best_error = e
-		end
-	end
-	return Quaternion{euler = {0,0,best}}
-end
-
--- Calculates the combat ratings of a weapon.
--- @param self Ai.
--- @param weapon Item.
--- @return Best rating, melee rating, ranged rating, throw rating.
-Ai.calculate_weapon_ratings = function(self, weapon)
-	local spec = self.object.spec
-	-- Calculate total damage.
-	local score = 0
-	for k,v in pairs(weapon:get_weapon_influences(self)) do
-		if k ~= "hatchet" then
-			score = score + v
-		end
-	end
-	score = math.max(0, -score)
-	-- Melee rating.
-	local a = 0
-	if spec.can_melee and weapon.spec.categories["melee"] then
-		a = score
-	end
-	-- Ranged rating.
-	local b = 0
-	if spec.can_ranged and weapon.spec.categories["ranged"] then
-		local has_ammo
-		if weapon.spec.ammo_type then
-			has_ammo = self.object.inventory:get_object_by_name(weapon.spec.ammo_type)
-		else
-			has_ammo = true
-		end
-		if has_ammo then
-			b = score
-		end
-	end
-	-- Throw rating.
-	local c = 0
-	if spec.can_throw and weapon.spec.categories["throwable"] then
-		c = score
-	end
-	return math.max(a,b,c), a, b, c
 end
 
 --- Chooses the combat action of the creature.
 -- @param self AI.
-Ai.choose_combat_action = function(self)
+NpcAi.choose_combat_action = function(self)
 	local allow_forward
 	local allow_forward_jump
 	local allow_backward
@@ -492,7 +368,7 @@ end
 --- Analyzes the surrounding terrain and chooses a wander target.<br/>
 -- TODO: Having goals or a schedule would be nice.
 -- @param self AI.
-Ai.choose_wander_target = function(self)
+NpcAi.choose_wander_target = function(self)
 	-- Randomize the search order.
 	local src = (self.object.position * Voxel.tile_scale + Vector(0,0.5,0)):floor()
 	local dirs = {Vector(1,0,0), Vector(-1,0,0), Vector(0,0,1), Vector(0,0,-1)}
@@ -502,17 +378,9 @@ Ai.choose_wander_target = function(self)
 	end
 	-- Try to find an open path.
 	for k,v in ipairs(dirs) do
-		local dst = src + v
-		local t1 = Voxel:get_tile(dst)
-		local t2 = Voxel:get_tile(dst + Vector(0,1,0))
-		if t1 == 0 and t2 == 0 then
+		local dst = src + v * Voxel.tile_size
+		if self:avoid_wander_obstacles(dst) then
 			self.target = (src + v * 10 + Vector(0.5,0.5,0.5)) * Voxel.tile_size
-			return
-		end
-		local t3 = Voxel:get_tile(dst + Vector(0,2,0))
-		if t2 == 0 and t3 == 0 then
-			self.target = (src + v * 10 + Vector(0.5,0.5,0.5)) * Voxel.tile_size
-			self.object:jump()
 			return
 		end
 	end
@@ -521,74 +389,34 @@ Ai.choose_wander_target = function(self)
 	self.target = self.object.position + rot * Vector(0, 0, 10)
 end
 
---- Finds the best feat to use in combat.
--- @param self Object.
--- @param args Arguments.<ul>
---   <li>category: Feat category.</li>
---   <li>target: Object to be attacked.</li>
---   <li>weapon: Weapon to be used.</li></ul>
--- @return New feat.
-Ai.find_best_feat = function(self, args)
-	local effect = (self.object == args.target and "beneficial" or "harmful")
-	local best_feat = nil
-	local best_score = -1
-	local process_anim = function(anim)
-		-- Check if the feat animation is usable.
-		local feat = Feat{animation = anim.name}
-		if not feat:usable{user = self.object} then return end
-		-- Add best feat effects.
-		feat:add_best_effects{category = effect, user = self.object}
-		-- Calculate the score.
-		-- TODO: Support influences other than health.
-		local info = feat:get_info{owner = self.object, object = args.target, weapon = args.weapon}
-		local score = (info.influences.health or 0)
-		if args.target ~= self then score = -score end
-		if score < 1 then return end
-		score = score + 100 * math.random()
-		-- Maintain the best feat.
-		if score <= best_score then return end
-		best_feat = feat
-		best_score = score
+--- Tries to avoid obstacles on the path to the given wander target.
+-- @param self AI.
+-- @param target Point vector in world space.
+-- @return True if avoided successfully.
+NpcAi.avoid_wander_obstacles = function(self, target)
+	local src = (self.object.position * Voxel.tile_scale + Vector(0,0.5,0)):floor()
+	local dst = (target * Voxel.tile_scale + Vector(0,0.5,0)):floor()
+	local p = Vector(
+		math.min(math.max(dst.x, src.x - 1), src.x + 1), src.y,
+		math.min(math.max(dst.z, src.z - 1), src.z + 1), src.y)
+	local t1 = Voxel:get_tile(p)
+	p.y = p.y + 1
+	local t2 = Voxel:get_tile(p)
+	if t1 == 0 and t2 == 0 then
+		return true
 	end
-	-- Score each feat animation and choose the best one.
-	for anim_name in pairs(self.object.spec.feat_anims) do
-		local anim = Featanimspec:find{name = anim_name}
-		if anim and anim.categories[args.category] then process_anim(anim) end
+	p.y = p.y + 1
+	local t3 = Voxel:get_tile(p)
+	if t2 == 0 and t3 == 0 then
+		self.object:jump()
+		return true
 	end
-	return best_feat
 end
 
 --- Used to wake up the AI when a player is nearby.
 -- @param self AI.
-Ai.refresh = function(self)
+NpcAi.refresh = function(self)
 	if self.state == "none" then self:set_state{state = "wander"} end
-end
-
---- Updates the enemy list of the AI.
--- @param self AI.
-Ai.scan_enemies = function(self)
-	-- Clear old enemies.
-	local old = self.enemies
-	local time = Program.time
-	self.enemies = {}
-	-- Find new enemies.
-	local objs = Object:find{point = self.object.position, radius = 10}
-	for k,v in pairs(objs) do
-		local enemy = old[v]
-		if enemy and time - enemy[2] < 10 then
-			-- If the enemy is still nearby and was last seen a very short time
-			-- ago, we add it back to the list. Without this, the creature would
-			-- give up the moment the target hides behind anything.
-			self.enemies[v] = enemy
-		elseif self.object:check_enemy(v) then
-			-- If a new enemy was within the scan radius, a line of sight check
-			-- is performed to cull enemies behind walls. If the LOS check
-			-- succeeds, the enemy is considered found.
-			if self.object:check_line_of_sight{object = v} then
-				self.enemies[v] = {v, time}
-			end
-		end
-	end
 end
 
 --- Sets the AI state of the AI.
@@ -596,7 +424,7 @@ end
 -- @param args Arguments.<ul>
 --   <li>state: AI state.</li>
 --   <li>target: Targeted object.</li></ul>
-Ai.set_state = function(self, args)
+NpcAi.set_state = function(self, args)
 	local s = args.state
 	if (s == "wander" and not self.object.spec.ai_enable_wander) or
 	   (s == "combat" and not self.object.spec.ai_enable_combat) then
@@ -616,7 +444,7 @@ end
 --- Updates the AI.
 -- @param self AI.
 -- @param secs Seconds since the last update.
-Ai.update = function(self, secs)
+NpcAi.update = function(self, secs)
 	-- Early exit for inactive AI.
 	-- There are often lots of creatures in the active map area but most of them
 	-- have their AI disabled due no player being nearby. Since this function
@@ -648,7 +476,7 @@ end
 
 --- Updates the state of the AI.
 -- @param self AI.
-Ai.update_state = function(self)
+NpcAi.update_state = function(self)
 	self.ai_timer = 0
 	-- TODO: Flee if about to die.
 	-- Find the best enemy to attack.
@@ -685,7 +513,7 @@ end
 -- This table contains the functions called each tick to update the position
 -- of the creature and to initiate state specific actions such as attacking.
 -- No state changes can occur during these updates.
-Ai.state_updaters =
+NpcAi.state_updaters =
 {
 	chat = function(self, secs)
 		-- Turn towards the target.
@@ -746,7 +574,7 @@ Ai.state_updaters =
 -- This table contains the functions called every couple of seconds to switch
 -- the state of the creature. Switching to the combat mode is handled separately
 -- so it isn't present here but all other state changes are.
-Ai.state_switchers =
+NpcAi.state_switchers =
 {
 	chat = function(self)
 		if not self.object.dialog then

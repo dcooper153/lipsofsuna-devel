@@ -13,7 +13,8 @@ Species{
 	dialog = "lips citizen",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"leather top", "leather pants", "leather leggings"}}
+	inventory_items = {"leather top", "leather pants", "leather leggings"},
+	ai_type = "camper"}
 
 Species{
 	name = "Lips guard archer",
@@ -22,7 +23,8 @@ Species{
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson crossbow", ["arrow"] = 100},
-	skills = {"Health lv2"}}
+	skills = {"Health lv2"},
+	ai_type = "camper"}
 
 Species{
 	name = "Lips guard knight",
@@ -31,18 +33,18 @@ Species{
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson sword", "round shield"},
-	skills = {"Health lv4"}}
+	skills = {"Health lv4"},
+	ai_type = "camper"}
 
 Species{
 	name = "Celine",
 	base = "aer",
 	dialog = "celine",
 	marker = "celine",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
 	hair_style = {"hair1",0,255,0},
 	inventory_items = {"iron hatchet", "dress"},
-	factions = {"peculiar pet"}}
+	factions = {"peculiar pet"},
+	ai_type = "camper"}
 
 Species{
 	name = "Elise",
@@ -51,21 +53,19 @@ Species{
 		["idle"] = {animation = "tired", channel = 1, permanent = true}},
 	dialog = "elise",
 	marker = "elise",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
 	hair_style = {"hair2",200,180,20},
 	inventory_items = {"iron hatchet", "dress"},
-	factions = {"neutral"}}
+	factions = {"neutral"},
+	ai_type = "anchored"}
 
 Species{
 	name = "Merchant",
 	base = "aer",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
 	dialog = "merchant",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"}}
+	inventory_items = {"dress"},
+	ai_type = "anchored"}
 
 require(Mod.path .. "lips1")
 require(Mod.path .. "lipsguard")

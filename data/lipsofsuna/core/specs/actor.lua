@@ -22,6 +22,7 @@ Species.dict_name = {}
 --   <li>ai_enabled: False to disable AI for the species.</li>
 --   <li>ai_offense_factor: How much the creature prefers offense over defense, in the range of [0,1].</li>
 --   <li>ai_search_time: Time in seconds how long the AI will search for hidden foes.</li>
+--   <li>ai_type: Name of the AI type to use.</li>
 --   <li>ai_update_delay: Number of seconds between AI state updates.</li>
 --   <li>ai_wait_allowed: False to prohibit waiting.</li>
 --   <li>ai_wander_time: Time in seconds how long the AI will wander before going to sleep.</li>

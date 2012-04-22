@@ -1,4 +1,3 @@
-require "server/ai"
 require "server/objects/object"
 
 Creature = Class(Object)
@@ -139,8 +138,9 @@ Creature:add_setters{
 			s.dead = true
 		end
 		-- Create the AI.
-		if not spec.dead and spec.ai_enabled then
-			s.ai = Ai(s)
+		if not spec.dead and spec.ai_enabled and Ai then
+			ai_class = Ai.dict_name[spec.ai_type or "npc"]
+			s.ai = ai_class and ai_class(s)
 		end
 	end}
 
@@ -181,6 +181,7 @@ Creature.new = function(clss, args)
 	copy("eye_style")
 	copy("face_style")
 	copy("hair_style")
+	copy("home_point")
 	copy("jumped", 0)
 	copy("name")
 	copy("physics", "kinematic")
@@ -553,6 +554,16 @@ Creature.face_point = function(self, args)
 		self.rotation = quat
 		return 1.0
 	end
+end
+
+--- Gets the rotation quaternion towards the given point.
+-- @param self Object.
+-- @param point Position vector in world space.
+-- @return Quaternion.
+Creature.get_rotation_to_point = function(self, point)
+	local dir = (point - self.position):normalize()
+	dir.y = 0
+	return Quaternion{dir = dir, up = Vector(0, 1, 0)}
 end
 
 --- Gets the attack ray of the creature.
@@ -968,6 +979,7 @@ Creature.write_db = function(self, db)
 		eye_style = self.eye_style,
 		face_style = self.face_style,
 		hair_style = self.hair_style,
+		home_point = self.home_point,
 		id = self.id,
 		physics = self.physics,
 		position = self.position,
