@@ -282,45 +282,13 @@ void liren_object_model_changed (
 void liren_object_update_pose (
 	LIRenObject* self)
 {
-	LIMdlModel* model;
-
-	/* Do nothing if the object isn't initialized. */
-	if (self->entity == NULL)
-		return;
-
-	/* Get the skeleton. */
-	/* If the model doesn't have one, we don't need to do anything. */
-	Ogre::SkeletonInstance* skeleton = self->entity->getSkeleton ();
-	if (skeleton == NULL)
-		return;
-
-	/* Get the model. */
-	model = liren_model_get_model (self->model);
-	lisys_assert (model != NULL);
-
-	/* Update weight group bones. */
-	/* The hierarchy doesn't matter because LIMdlPose already calculated the
-	   global transformations of the bones. We just need to copy the
-	   transformations of the bones used by weight groups. */
-	for (int i = 0 ; i < model->weight_groups.count ; i++)
-	{
-		LIMdlWeightGroup* group = model->weight_groups.array + i;
-		if (group->node != NULL)
-		{
-			LIMdlNode* node = limdl_pose_find_node (self->pose, group->node->name);
-			if (node != NULL)
-			{
-				Ogre::Bone* bone = skeleton->getBone (i + 1);
-				LIMatTransform t = node->pose_transform.global;
-				float s = node->pose_transform.global_scale;
-				bone->setScale (s, s, s);
-				bone->setPosition (t.position.x, t.position.y, t.position.z);
-				bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
-			}
-		}
-	}
-
-	skeleton->_notifyManualBonesDirty ();
+	/* Send the pose to the entity. */
+	/* To reduce load when there are lots of animated objects, entities only
+	   update their skeletons when they are rendered. The pose tranformation is
+	   always recalculated for each frame, but at least uploading useless pose
+	   buffers to the GPU is avoided. */
+	if (self->entity != NULL)
+		self->entity->set_pose (self->pose);
 }
 
 /**
@@ -425,13 +393,6 @@ int liren_object_set_particle (
 	LIRenObject* self,
 	const char*  name)
 {
-	/* Remove the pose. */
-	if (self->pose != NULL)
-	{
-		limdl_pose_free (self->pose);
-		self->pose = NULL;
-	}
-
 	/* Remove the existing model or particle system. */
 	self->node->detachAllObjects ();
 	if (self->entity != NULL)
@@ -445,6 +406,13 @@ int liren_object_set_particle (
 		self->particles = NULL;
 	}
 	self->model = NULL;
+
+	/* Remove the pose. */
+	if (self->pose != NULL)
+	{
+		limdl_pose_free (self->pose);
+		self->pose = NULL;
+	}
 
 	try
 	{

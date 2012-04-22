@@ -40,6 +40,10 @@ LIRenEntity::LIRenEntity (const Ogre::String& name, const Ogre::MeshPtr& mesh) :
 	mMesh = Ogre::MeshPtr (new LIRenMesh ());
 	background_loaded_mesh = mesh;
 	builder.start ();
+
+	/* Clear the pose. */
+	pose = NULL;
+	pose_changed = false;
 }
 
 LIRenEntity::~LIRenEntity ()
@@ -64,11 +68,76 @@ void LIRenEntity::initialize ()
 	}
 }
 
+void LIRenEntity::update_pose ()
+{
+	LIMdlModel* model;
+
+	/* Get the skeleton. */
+	/* If the model doesn't have one, we don't need to do anything. */
+	Ogre::SkeletonInstance* skeleton = getSkeleton ();
+	if (skeleton == NULL)
+		return;
+
+	/* Get the model. */
+	model = get_model ();
+	lisys_assert (model != NULL);
+
+	/* Update weight group bones. */
+	/* The hierarchy doesn't matter because LIMdlPose already calculated the
+	   global transformations of the bones. We just need to copy the
+	   transformations of the bones used by weight groups. */
+	for (int i = 0 ; i < model->weight_groups.count ; i++)
+	{
+		LIMdlWeightGroup* group = model->weight_groups.array + i;
+		if (group->node != NULL)
+		{
+			LIMdlNode* node = limdl_pose_find_node (this->pose, group->node->name);
+			if (node != NULL)
+			{
+				Ogre::Bone* bone = skeleton->getBone (i + 1);
+				LIMatTransform t = node->pose_transform.global;
+				float s = node->pose_transform.global_scale;
+				bone->setScale (s, s, s);
+				bone->setPosition (t.position.x, t.position.y, t.position.z);
+				bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
+			}
+		}
+	}
+
+	skeleton->_notifyManualBonesDirty ();
+}
+
 LIMdlModel* LIRenEntity::get_model () const
 {
 	if (background_loaded_mesh.isNull ())
 		return NULL;
 	return static_cast<LIRenMesh*>(background_loaded_mesh.get ())->get_model ();
+}
+
+void LIRenEntity::set_pose (LIMdlPose* pose)
+{
+	this->pose = pose;
+	this->pose_changed = true;
+}
+
+void LIRenEntity::_updateRenderQueue (Ogre::RenderQueue* queue)
+{
+	/* Update the render queue. */
+	Ogre::Entity::_updateRenderQueue (queue);
+
+	/* Update the animation. */
+	if (this->pose_changed)
+	{
+		Ogre::Entity* displayEntity = this;
+		if (mMeshLodIndex > 0 && mMesh->isLodManual ())
+			displayEntity = mLodEntityList[mMeshLodIndex - 1];
+		if (mInitialised && displayEntity->hasSkeleton ())
+		{
+			this->pose_changed = false;
+			if (displayEntity->hasSkeleton ())
+				update_pose ();
+		}
+	}
 }
 
 /** @} */
