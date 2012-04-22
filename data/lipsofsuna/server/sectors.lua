@@ -67,9 +67,16 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 	-- Decide how many monsters to spawn.
 	-- The sector size is quite small so we spawn 1 monster per sector most
 	-- of the time, none second often and 2 least often.
+	local org = self:get_sector_offset(sector)
 	local r = math.random()
-	if r < 0.35 then return end
-	local monsters = (r < 0.85) and 1 or 2
+	local monsters
+	if org.y > 1600 then
+		if r < 0.6 then return end
+		monsters = 1
+	else
+		if r < 0.35 then return end
+		monsters = (r < 0.85) and 1 or 2
+	end
 	-- Count monsters.
 	-- If the sector already contains monsters, reduce the number of newly
 	-- spawned monsters accodingly to not cramp the sector.
@@ -82,7 +89,6 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 	-- Spawn monsters.
 	-- This is done in a thread to reduce pauses when lots of sectors are
 	-- being loaded. It's useful since sectors are often loaded in clusters.
-	local org = self:get_sector_offset(sector)
 	Coroutine(function(thread)
 		for i = 1,monsters do
 			for j = 1,15 do
