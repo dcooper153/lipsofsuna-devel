@@ -713,6 +713,23 @@ Creature.set_strafing = function(self, value)
 	self:calculate_animation()
 end
 
+--- Teleports the object.
+-- @param self Object.
+-- @param args Arguments.<ul>
+--   <li>marker: Map marker name.</li>
+--   <li>position: World position.</li>
+--   <li>region: Region name.</li></ul>
+-- @return True on success.
+Creature.teleport = function(self, args)
+	if Object.teleport(self, args) then
+		-- Update skills.
+		-- As long as actors always teleport between the overworld and the
+		-- underworld, this ensures that view distance is update correctly.
+		self:update_skills()
+		return true
+	end
+end
+
 --- Updates the state of the creature.
 -- @param self Object.
 -- @param secs Seconds since the last update.
@@ -900,6 +917,9 @@ Creature.update_skills = function(self)
 	self:calculate_speed()
 	-- Update the vision radius.
 	if self.vision then
+		if self.position.y > 1600 then
+			attr.view_distance = attr.view_distance * 1.5
+		end
 		self.vision.radius = attr.view_distance
 	end
 end

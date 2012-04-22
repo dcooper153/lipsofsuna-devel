@@ -201,7 +201,7 @@ Player.update = function(self, secs)
 		-- Check for bugged characters just in case.
 		if not self.realized or not self.vision then return self:detach() end
 		-- Prevent sectors from unloading if a player is present.
-		self:refresh{radius = 20}
+		self:refresh{radius = self.vision.radius}
 	end
 	-- Update vision.
 	if self.vision then
