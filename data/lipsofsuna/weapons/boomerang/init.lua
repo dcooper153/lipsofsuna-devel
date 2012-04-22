@@ -12,7 +12,7 @@ Itemspec{
 	crafting_materials = {log = 2},
 	effect_craft = "craftwood1",
 	gravity_projectile = Vector(0,2,0),
-	influences_base = {["physical damage"] = -5},
+	influences = {["physical damage"] = 5},
 	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
 	stacking = true,

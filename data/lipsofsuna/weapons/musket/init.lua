@@ -15,7 +15,7 @@ Itemspec{
 	categories = {"ranged", "weapon"},
 	crafting_materials = {["adamantium"] = 15, ["log"] = 2},
 	effect_attack = "musket1",
-	influences_base = {["physical damage"] = -25},
+	influences = {["physical damage"] = 25},
 	influences_bonus = {"ranged", "guns"},
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
@@ -35,7 +35,7 @@ Itemspec{
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
-	influences_base = {["cold damage"] = -9, ["physical damage"] = -9},
+	influences = {["cold damage"] = 9, ["physical damage"] = 9},
 	influences_bonus = {"ranged", "guns"},
 	mass = 15}
 
@@ -51,7 +51,7 @@ Itemspec{
 	crafting_materials = {["crimson stone"] = 15, ["log"] = 2},
 	effect_attack = "musket1",
 	effect_craft = "craftmetal1",
-	influences_base = {["fire damage"] = -8, ["physical damage"] = -8},
+	influences = {["fire damage"] = 8, ["physical damage"] = 8},
 	influences_bonus = {"ranged", "guns"},
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
@@ -71,6 +71,6 @@ Itemspec{
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {"hand.L"},
-	influences_base = {["physical damage"] = -13},
+	influences = {["physical damage"] = 13},
 	influences_bonus = {"ranged", "guns"},
 	mass = 20}

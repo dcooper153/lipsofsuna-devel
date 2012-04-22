@@ -141,7 +141,7 @@ end
 -- @param user Creature.
 -- @return Array of influences.
 Item.get_weapon_influences = function(self, user)
-	if not self.spec.influences_base then return {} end
+	if not self.spec.influences then return {} end
 	-- Calculate the damage multiplier.
 	local mult = 1
 	if user.skills then
@@ -149,7 +149,7 @@ Item.get_weapon_influences = function(self, user)
 	end
 	-- Calculate influences.
 	local influences = {}
-	for k,v in pairs(self.spec.influences_base) do
+	for k,v in pairs(self.spec.influences) do
 		influences[k] = mult * v
 	end
 	return influences

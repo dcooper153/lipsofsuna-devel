@@ -114,7 +114,7 @@ Ai.calculate_weapon_ratings = function(self, weapon)
 			score = score + v
 		end
 	end
-	score = math.max(0, -score)
+	score = math.max(0, score)
 	-- Melee rating.
 	local a = 0
 	if spec.can_melee and weapon.spec.categories["melee"] then
@@ -162,7 +162,7 @@ Ai.find_best_feat = function(self, args)
 		-- TODO: Support influences other than health.
 		local info = feat:get_info{owner = self.object, object = args.target, weapon = args.weapon}
 		local score = (info.influences.health or 0)
-		if args.target ~= self then score = -score end
+		if args.target ~= self then score = score end
 		if score < 1 then return end
 		score = score + 100 * math.random()
 		-- Maintain the best feat.

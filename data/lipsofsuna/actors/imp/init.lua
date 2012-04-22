@@ -8,7 +8,7 @@ Itemspec{
 	categories = {"melee", "weapon"},
 	animation_hold = "hold bulky",
 	animation_attack = "throw bulky",
-	influences_base = {["physical damage"] = -1},
+	influences = {["physical damage"] = 1},
 	mass = 4,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
@@ -20,7 +20,7 @@ Itemspec{
 	categories = {"explosive", "melee", "weapon"},
 	animation_hold = "hold bulky",
 	animation_attack = "throw bulky",
-	influences_base = {["fire damage"] = -10, ["physical damage"] = -10},
+	influences = {["fire damage"] = 10, ["physical damage"] = 10},
 	influences_bonus = {"melee", "explosives"},
 	destroy_actions = {"explode"},
 	destroy_timer = 5,

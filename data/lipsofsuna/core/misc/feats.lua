@@ -104,7 +104,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "growl1",
 	effect_impact = "impact1",
-	influences = {{"physical damage", -1}},
+	influences = {{"physical damage", 1}},
 	slot = "mouth"}
 
 Featanimspec{
@@ -115,7 +115,7 @@ Featanimspec{
 	categories = {"melee"},
 	cooldown = 4,
 	effect_impact = "impact1",
-	influences = {{"physical damage", -50}},
+	influences = {{"physical damage", 50}},
 	slot = "mouth"}
 
 Featanimspec{
@@ -124,7 +124,7 @@ Featanimspec{
 	animation = "explode",
 	categories = {"explode", "melee"},
 	cooldown = 2,
-	influences = {{"physical damage", -1}},
+	influences = {{"physical damage", 1}},
 	effect = "selfdestruct1"}
 
 Featanimspec{
@@ -136,7 +136,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
-	influences = {{"physical damage", -5}},
+	influences = {{"physical damage", 5}},
 	slot = "hand.L"}
 
 Featanimspec{
@@ -148,7 +148,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
-	influences = {{"physical damage", -5}},
+	influences = {{"physical damage", 5}},
 	slot = "hand.R"}
 
 Featanimspec{
@@ -160,7 +160,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
-	influences = {{"physical damage", -30}},
+	influences = {{"physical damage", 30}},
 	slot = "hand.L"}
 
 Featanimspec{
@@ -172,7 +172,7 @@ Featanimspec{
 	cooldown = 2,
 	effect = "swing1",
 	effect_impact = "impact1",
-	influences = {{"physical damage", -30}},
+	influences = {{"physical damage", 30}},
 	slot = "hand.R"}
 
 ---------------------------------------------------------------------
@@ -219,7 +219,7 @@ Feateffectspec{
 	description = "Inflict cold damage",
 	effect = "explosion1", -- FIXME
 	icon = "modifier-ice",
-	influences = {{"cold damage", -5}},
+	influences = {{"cold damage", 5}},
 	projectile = "fireball1", -- FIXME
 	skill_base = {willpower = 1},
 	reagent_base = {["milky powder"] = 1}}
@@ -243,7 +243,7 @@ Feateffectspec{
 	description = "Inflict fire damage",
 	effect = "explosion1",
 	icon = "modifier-fireball",
-	influences = {{"fire damage", -5}},
+	influences = {{"fire damage", 5}},
 	projectile = "fireball1",
 	skill_base = {willpower = 1},
 	reagent_base = {["milky powder"] = 1}}
@@ -269,7 +269,7 @@ Feateffectspec{
 	icon = "modifier-ice",
 	radius = 5,
 	duration = 10,
-	influences = {{"cold damage", -5}},
+	influences = {{"cold damage", 5}},
 	projectile = "fireball1",
 	skill_base = {willpower = 10},
 	reagent_base = {["milky powder"] = 1}}
@@ -326,7 +326,7 @@ Feateffectspec{
 	categories = {"harmful", "melee", "physical"},
 	effect = "impact1",
 	icon = "modifier-physical",
-	influences = {{"physical damage", -1}}}
+	influences = {{"physical damage", 1}}}
 
 Feateffectspec{
 	name = "regeneration",
@@ -346,7 +346,7 @@ Feateffectspec{
 	description = "Restore health",
 	effect = "heal1",
 	icon = "modifier-heal",
-	influences = {{"physical damage", 15}},
+	influences = {{"restore health", 15}},
 	skill_base = {willpower = 5},
 	reagent_base = {["milky powder"] = 1}}
 
@@ -392,6 +392,6 @@ Feateffectspec{
 	categories = {"harmful", "spell"},
 	effect = "dragonbreath1",
 	icon = "modifier-fireball",
-	influences = {{"fire damage", -20}},
+	influences = {{"fire damage", 20}},
 	projectile = "firebreath1",
 	skill_base = {willpower = 5}}

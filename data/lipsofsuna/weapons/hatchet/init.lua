@@ -9,7 +9,7 @@ Itemspec{
 	animation_hold = "hold axe",
 	categories = {"hatchet", "melee", "weapon"},
 	crafting_materials = {["adamantium"] = 3},
-	influences_base = {hatchet = -10, ["physical damage"] = -10},
+	influences = {hatchet = 10, ["physical damage"] = 10},
 	influences_bonus = {"melee"},
 	equipment_slot = "hand.R",
 	mass = 15}
@@ -26,7 +26,7 @@ Itemspec{
 	damage_mining = 1,
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
-	influences_base = {["cold damage"] = -4, hatchet = -7, ["physical damage"] = -4},
+	influences = {["cold damage"] = 4, ["hatchet"] = 7, ["physical damage"] = 4},
 	influences_bonus = {"melee"},
 	health = 500,
 	mass = 15}
@@ -44,7 +44,7 @@ Itemspec{
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	health = 500,
-	influences_base = {["fire damage"] = -4, hatchet = -7, ["physical damage"] = -4},
+	influences = {["fire damage"] = 4, ["hatchet"] = 7, ["physical damage"] = 4},
 	influences_bonus = {"melee"},
 	mass = 15}
 
@@ -61,7 +61,7 @@ Itemspec{
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	health = 220,
-	influences_base = {hatchet = -5, ["physical damage"] = -5},
+	influences = {["hatchet"] = 5, ["physical damage"] = 5},
 	influences_bonus = {"melee"},
 	mass = 10}
 
@@ -77,7 +77,7 @@ Itemspec{
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 130,
-	influences_base = {hatchet = -3, ["physical damage"] = -3},
+	influences = {["hatchet"] = 3, ["physical damage"] = 3},
 	influences_bonus = {"melee"},
 	mass = 9}
 
@@ -95,7 +95,7 @@ Itemspec{
 	effect_craft = "craftwood1",
 	equipment_slot = "hand.R",
 	health = 100,
-	influences_base = {hatchet = -3, ["physical damage"] = -3},
+	influences = {["hatchet"] = 3, ["physical damage"] = 3},
 	influences_bonus = {"melee"},
 	mass = 7,
 	water_gravity = Vector(0,6,0)}

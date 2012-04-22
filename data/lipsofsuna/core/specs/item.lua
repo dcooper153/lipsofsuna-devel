@@ -23,7 +23,7 @@ Itemspec.dict_name = {}
 --   <li>crafting_count: Number of items crafted per use.</li>
 --   <li>crafting_materials: Dictionary of crafting materials.</li>
 --   <li>crafting_skills: Dictionary of required crafting skills.</li>
---   <li>influences_base: Base influences.</li>
+--   <li>influences: The way how attacks with the weapon influence the target.</li>
 --   <li>influences_bonus: List of skill-derived attribute names that affect influences.</li>
 --   <li>destroy_actions: List of actions to perform when the item is destroyed.</li>
 --   <li>destroy_timer: Time in seconds after which to destruct when thrown.</li>
@@ -142,8 +142,8 @@ Itemspec.get_trading_value = function(self)
 	if self.armor_class then
 		value = value + 50 * self.armor_class
 	end
-	if self.influences_base then
-		for k,v in pairs(self.influences_base) do
+	if self.influences then
+		for k,v in pairs(self.influences) do
 			value = value + math.max(0, math.abs(v) - 3)
 		end
 	end

@@ -206,12 +206,12 @@ Feat.get_info = function(self, args)
 	-- In addition to the base influences, weapons may grant bonuses for having
 	-- points in certain skills. The skill bonuses are multiplicative since the
 	-- system is easier to balance that way.
-	if args and args.weapon and anim.bonuses_weapon and args.weapon.spec.influences_base then
+	if args and args.weapon and anim.bonuses_weapon and args.weapon.spec.influences then
 		local mult = 1
 		if args.owner.skills then
 			mult = args.owner.skills:calculate_damage_multiplier_for_item(args.weapon)
 		end
-		for k,v in pairs(args.weapon.spec.influences_base) do
+		for k,v in pairs(args.weapon.spec.influences) do
 			influences[k] = (influences[k] or 0) + mult * v
 		end
 	end
@@ -222,19 +222,19 @@ Feat.get_info = function(self, args)
 		if args.owner.skills then
 			mult = args.owner.skills:calculate_damage_multiplier_for_unarmed()
 		end
-		local bonuses = {["physical damage"] = -3}
+		local bonuses = {["physical damage"] = 3}
 		for k,v in pairs(bonuses) do
 			influences[k] = (influences[k] or 0) + mult * v
 		end
 	end
 	-- Add projectile-specific influences.
 	-- Works like the weapon variant but uses the projectile as the item.
-	if args and args.projectile and anim.bonuses_projectile and args.projectile.spec.influences_base then
+	if args and args.projectile and anim.bonuses_projectile and args.projectile.spec.influences then
 		local mult = 1
 		if args.owner.skills then
 			mult = args.owner.skills:calculate_damage_multiplier_for_item(args.weapon)
 		end
-		for k,v in pairs(args.projectile.spec.influences_base) do
+		for k,v in pairs(args.projectile.spec.influences) do
 			influences[k] = (influences[k] or 0) + mult * v
 		end
 	end

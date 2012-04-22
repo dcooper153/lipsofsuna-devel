@@ -19,7 +19,7 @@ Itemspec{
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	effect_attack = "musket1",
-	influences_base = {["physical damage"] = -30},
+	influences = {["physical damage"] = 30},
 	equipment_slot = "robotarm.R",
 	mass = 15}
 
@@ -30,7 +30,7 @@ Itemspec{
 	ammo_type = "bullet",
 	categories = {"ranged", "weapon"},
 	effect_attack = "musket1",
-	influences_base = {["physical damage"] = -15},
+	influences = {["physical damage"] = 15},
 	equipment_slot = "turretbarrel",
 	mass = 15}
 

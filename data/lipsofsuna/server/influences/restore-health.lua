@@ -1,6 +1,6 @@
 -- Increase or decrease health.
 Feateffectspec:extend{
-	name = "physical damage",
+	name = "restore health",
 	touch = function(self, args)
 		if not args.object then return end
 		-- Randomize the amount.

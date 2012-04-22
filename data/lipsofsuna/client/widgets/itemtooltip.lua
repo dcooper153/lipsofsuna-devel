@@ -26,9 +26,9 @@ Widgets.Itemtooltip.new = function(clss, args)
 		end
 	end
 	-- Influences.
-	if spec.influences_base then
+	if spec.influences then
 		local first = true
-		for k,v in pairs(spec.influences_base) do
+		for k,v in pairs(spec.influences) do
 			if first then
 				self:append(string.format("Powers:"))
 				first = false

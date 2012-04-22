@@ -11,8 +11,8 @@ Feateffectspec:extend{
 			val = math.max(1, val + val * 0.5 * math.random())
 		end
 		-- Apply unless friendly fire.
-		if val > 0 or not args.owner.client or not args.object.client then
-			args.object:damaged{amount = -val, point = args.point, type = "physical"}
+		if val < 0 or not args.owner.client or not args.object.client then
+			args.object:damaged{amount = val, point = args.point, type = "physical"}
 		end
 		-- Anger hurt creatures.
 		if val > 0 then
