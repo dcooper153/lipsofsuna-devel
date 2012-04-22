@@ -99,6 +99,7 @@ ChatCommand{pattern = "^/spawn (.*)$", permission = "admin", func = function(pla
 	local spec1 = Species:find{name = matches[1]}
 	local spec2 = Itemspec:find{name = matches[1]}
 	local spec3 = Obstaclespec:find{name = matches[1]}
+	local spec4 = Staticspec:find{name = matches[1]}
 	if spec1 then
 		Creature{
 			spec = spec1,
@@ -114,6 +115,11 @@ ChatCommand{pattern = "^/spawn (.*)$", permission = "admin", func = function(pla
 	elseif spec3 then
 		Obstacle{
 			spec = spec3,
+			position = player.position,
+			realized = true}
+	elseif spec4 then
+		Staticobject{
+			spec = spec4,
 			position = player.position,
 			realized = true}
 	end

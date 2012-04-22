@@ -732,6 +732,14 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
   </asset>
 
   <asset>
+    <file>import/house2.blend</file>
+    <file>data/lipsofsuna/environment/building/house2*</file>
+    <author>yazjack</author>
+    <license>CC0</license>
+    <source>http://www.blendswap.com/blends/architecture/medieval-house/</source>
+  </asset>
+
+  <asset>
     <file>data/lipsofsuna/ui/icons1.dds</file>
     <file>import/icons1.png</file>
     <author>Henrique Lazarini</author>

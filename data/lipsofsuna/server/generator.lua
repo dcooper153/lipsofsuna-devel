@@ -188,18 +188,24 @@ end
 --- Generates the static overworld objects.
 -- @param self Generator.
 Generator.generate_overworld = function(self)
-	-- FIXME: Generate static overworld obstacles properly.
-	local spec = Staticspec:find{name = "statictree1"}
-	local min = Map.aabb.point
-	local max = Map.aabb.point + Map.aabb.size
-	for i = 1,100 do
-		local point = Vector(math.random(min.x, max.x), 0, math.random(min.z, max.z))
-		local height = Map.heightmap:get_height(point, false)
-		if height then
-			point.y = height
-			Staticobject{spec = spec, position = point, realized = true}
+	local gen = function(name, count)
+		-- FIXME: Generate static overworld obstacles properly.
+		local spec = Staticspec:find{name = name}
+		if not spec then return end
+		local min = Map.aabb.point
+		local max = Map.aabb.point + Map.aabb.size
+		for i = 1,count do
+			local point = Vector(math.random(min.x, max.x), 0, math.random(min.z, max.z))
+			local height = Map.heightmap:get_height(point, false)
+			if height then
+				point.y = height
+				local rot = Quaternion{axis = Vector(0,1), angle = 2.0 * math.pi * math.random()}
+				Staticobject{spec = spec, position = point, rotation = rot, realized = true}
+			end
 		end
 	end
+	gen("statictree1", 100)
+	gen("statichouse2", 20)
 end
 
 --- Creates ore deposits and places plants.

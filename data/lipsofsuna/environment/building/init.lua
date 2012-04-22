@@ -77,3 +77,7 @@ Obstaclespec{
 	health = 100,
 	interactive = false,
 	physics = "rigid"}
+
+Staticspec{
+	name = "statichouse2",
+	model = "house2"}
