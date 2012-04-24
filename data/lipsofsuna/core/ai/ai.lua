@@ -156,6 +156,10 @@ Ai.find_best_feat = function(self, args)
 		-- Check if the feat animation is usable.
 		local feat = Feat{animation = anim.name}
 		if not feat:usable{user = self.object} then return end
+		-- Make sure that the feat can reach the target.
+		local range = anim.range or self.object.spec.aim_ray_end * 0.7
+		local dist = (self.object.position - args.target.position).length
+		if dist > range then return end
 		-- Add best feat effects.
 		feat:add_best_effects{category = effect, user = self.object}
 		-- Calculate the score.

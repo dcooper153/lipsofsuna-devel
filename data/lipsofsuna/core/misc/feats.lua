@@ -175,6 +175,16 @@ Featanimspec{
 	influences = {{"physical damage", 30}},
 	slot = "hand.R"}
 
+Featanimspec{
+	name = "tackle",
+	action = "tackle",
+	animation = "tackle",
+	categories = {"melee"},
+	cooldown = 5,
+	effect = "swing1",
+	influences = {{"physical damage", 5}},
+	range = 5}
+
 ---------------------------------------------------------------------
 -- Effects usable to players.
 
@@ -322,7 +332,7 @@ Feateffectspec{
 
 Feateffectspec{
 	name = "physical damage",
-	animations = {"bite", "dragon bite", "explode", "left claw", "ranged", "right hand", "right claw"},
+	animations = {"bite", "dragon bite", "explode", "left claw", "ranged", "right hand", "right claw", "tackle"},
 	categories = {"harmful", "melee", "physical"},
 	effect = "impact1",
 	icon = "modifier-physical",

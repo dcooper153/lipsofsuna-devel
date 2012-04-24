@@ -22,6 +22,7 @@ Featanimspec.dict_name = {}
 --   <li>icon: Icon name.</li>
 --   <li>influences: List of {type, base} influences.</li>
 --   <li>name: Feat animation name.</li>
+--   <li>range: Maximum attack range estimate for the AI.</li>
 --   <li>required_ammo: Table of required ammo.</li>
 --   <li>toggle: True to trigger the handler on the key release event as well.</li></ul>
 -- @return New feat animation.

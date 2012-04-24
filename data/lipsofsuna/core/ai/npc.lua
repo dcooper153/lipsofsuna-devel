@@ -113,7 +113,7 @@ NpcAi.choose_combat_action = function(self)
 	-- The creature must be bare-handed or wield a melee weapon.
 	-- Offensive, magnitude is 0 or 4.
 	local p_melee = 0
-	if attack and spec.can_melee and dist < hint and (not weapon or weapon.spec.categories["melee"]) and aim > 0.8 then
+	if attack and spec.can_melee and (not weapon or weapon.spec.categories["melee"]) and aim > 0.8 then
 		feat = self:find_best_feat{category = "melee", target = self.target, weapon = weapon}
 		if feat then p_melee = 4 end
 	end

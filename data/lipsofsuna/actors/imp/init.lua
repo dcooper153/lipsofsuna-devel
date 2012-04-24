@@ -44,7 +44,7 @@ Species{
 	categories = {"enemy", "mining"},
 	difficulty = 0,
 	factions = {"evil"},
-	feat_anims = {"bite"},
+	feat_anims = {"bite", "tackle"},
 	feat_effects = {"physical damage"},
 	equipment_slots = {
 		{name = "hand.R", node = "#hand.R"},
@@ -72,7 +72,7 @@ Species{
 		{name = "hand.R", node = "#hand.R"},
 		{name = "hand.L", node = "#hand.L"}},
 	factions = {"evil"},
-	feat_anims = {"bite", "explode"},
+	feat_anims = {"bite", "explode", "tackle"},
 	feat_effects = {"fire damage", "physical damage"},
 	jump_force = 4,
 	model = "stoneimp2",
