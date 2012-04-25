@@ -190,7 +190,7 @@ Ai.scan_enemies = function(self)
 	local time = Program.time
 	self.enemies = {}
 	-- Find new enemies.
-	local objs = Object:find{point = self.object.position, radius = 10}
+	local objs = Object:find{point = self.object.position, radius = 15}
 	for k,v in pairs(objs) do
 		local enemy = old[v]
 		if enemy and time - enemy[2] < 10 then
