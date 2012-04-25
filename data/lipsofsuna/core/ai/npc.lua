@@ -227,15 +227,23 @@ NpcAi.set_state = function(self, args)
 	   (s == "combat" and not self.object.spec.ai_enable_combat) then
 		s = "wait"
 	end
+	if not self.state_timer or s ~= self.state then
+		self.state_timer = 0
+	end
 	self.state = s
 	self.target = args.target
-	self.state_timer = 0
 	self.ai_timer = math.random()
 	self.action_timer = 0
 	self.action_state = nil
+	self.object:set_movement(0)
+	self.object:set_strafing(0)
 	self.object:set_block(false)
 	self.object.running = (self.state == "combat")
 	self.object:calculate_speed()
+	local state = Aistatespec:find{name = s}
+	if state and state.enter then
+		state.enter(self)
+	end
 end
 
 --- Updates the AI.
@@ -264,8 +272,8 @@ NpcAi.update = function(self, secs)
 	self.action_timer = self.action_timer - tick
 	-- Let the current state manipulate the position and other attributes
 	-- of the character and trigger state dependent actions such as attacking.
-	local func = self.state_updaters[self.state]
-	func(self, tick)
+	local state = Aistatespec:find{name = self.state}
+	if state then state.update(self, tick) end
 	-- Only consider state changes every couple of seconds.
 	if self.ai_timer < self.object.spec.ai_update_delay then return end
 	self:update_state()
@@ -275,7 +283,6 @@ end
 -- @param self AI.
 NpcAi.update_state = function(self)
 	self.ai_timer = 0
-	-- TODO: Flee if about to die.
 	-- Find the best enemy to attack.
 	self:scan_enemies()
 	local best_enemy = nil
@@ -289,145 +296,21 @@ NpcAi.update_state = function(self)
 			end
 		end
 	end
-	-- Enter combat mode if an enemy was found.
-	if best_enemy then
-		self:calculate_combat_ratings()
-		self:set_state{state = "combat", target = best_enemy}
-		return
+	self.best_enemy = best_enemy
+	-- Choose the next state.
+	local best_score
+	local best_state
+	for k,v in pairs(Aistatespec.dict_name) do
+		local score = v.calculate(self)
+		if score and score > 0 then
+			if not best_score or score > best_score then
+				best_state = k
+				best_score = score
+			end
+		end
 	end
-	-- Switch to chat mode if a dialog is active.
-	if self.dialog then
-		self:set_state{state = "chat"}
-		return
+	-- Enter the next state.
+	if best_state then
+		self:set_state{state = best_state}
 	end
-	-- Handle any other state changes.
-	local func = self.state_switchers[self.state]
-	func(self)
 end
-
-------------------------------------------------------------------------------
-
--- This table contains the functions called each tick to update the position
--- of the creature and to initiate state specific actions such as attacking.
--- No state changes can occur during these updates.
-NpcAi.state_updaters =
-{
-	chat = function(self, secs)
-		-- Turn towards the target.
-		if self.object.dialog then
-			self.object:set_movement(0)
-			if self.object.dialog.user then
-				self.object:face_point{point = self.object.dialog.user.position, secs = secs}
-			end
-		end
-	end,
-	combat = function(self, secs)
-		-- Decide what combat action to perform next.
-		if self.action_timer <= 0 then
-			self:choose_combat_action()
-		end
-		-- Turn towards the target.
-		local face = self.object:face_point{point = self.target.position, secs = secs}
-		if face < 0.5 then
-			self.object:set_movement(0)
-			return
-		end
-	end,
-	follow = function(self, secs)
-		-- TODO
-	end,
-	flee = function(self, secs)
-		-- TODO
-	end,
-	hide = function(self, secs)
-		-- TODO
-	end,
-	none = function(self, secs)
-	end,
-	search = function(self, secs)
-		-- TODO
-	end,
-	wait = function(self, secs)
-		-- TODO
-	end,
-	wander = function(self, secs)
-		if not self.target then return end
-		-- Turn towards the target.
-		local face = self.object:face_point{point = self.target, secs = secs}
-		if face < 0.5 then
-			self.object:set_movement(0)
-			return
-		end
-		-- Move towards the target.
-		local dist = (self.target - self.object.position).length
-		if dist < 0.5 then
-			self.object:set_movement(0)
-		else
-			self.object:set_movement(0.8)
-		end
-	end
-}
-
--- This table contains the functions called every couple of seconds to switch
--- the state of the creature. Switching to the combat mode is handled separately
--- so it isn't present here but all other state changes are.
-NpcAi.state_switchers =
-{
-	chat = function(self)
-		if not self.object.dialog then
-			self:set_state{state = "wander"}
-		end
-	end,
-	combat = function(self)
-		-- If we were in the combat state, enter the searching mode in hopes
-		-- of finding any enemies that are hiding or trying to escape.
-		-- TODO: Companion should follow master.
-		self:set_state{state = "search"}
-		self.object:set_movement(0)
-		self.object:set_strafing(0)
-		return
-	end,
-	follow = function(self)
-		-- TODO
-	end,
-	flee = function(self)
-		-- If we were fleeing, keep fleeing a bit more and then try to hide
-		-- so that the enemies have harder time to find us.
-		if self.state_timer > 5 then
-			self:set_state{state = "hide"}
-		end
-	end,
-	hide = function()
-		-- If we were hiding, keep hiding for a good while and hope that the
-		-- enemies got away. Then begin wandering.
-		if self.state_timer > 30 then
-			self:set_state{state = "wander"}
-		end
-	end,
-	none = function(self)
-	end,
-	search = function(self)
-		-- If we have been searching for a while without finding anything,
-		-- conclude that there are no enemies and enter the wandering mode.
-		--if self.state_timer > self.object.spec.ai_search_time then
-			self:set_state{state = "wander"}
-		--end
-	end,
-	wait = function(self)
-		-- Start wandering after resting a while.
-		if self.state_timer > 10 then
-			self:set_state{state = "wander"}
-		end
-	end,
-	wander = function(self)
-		-- Select target point.
-		self:choose_wander_target()
-		-- Switch to waiting mode after wandering enough.
-		if self.object.spec.ai_wait_allowed then
-			if self.state_timer > self.object.spec.ai_wander_time then
-				self.object:set_movement(0)
-				self:set_state{state = "wait"}
-			end
-		end
-	end
-}

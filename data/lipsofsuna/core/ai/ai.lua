@@ -192,18 +192,20 @@ Ai.scan_enemies = function(self)
 	-- Find new enemies.
 	local objs = Object:find{point = self.object.position, radius = 15}
 	for k,v in pairs(objs) do
-		local enemy = old[v]
-		if enemy and time - enemy[2] < 10 then
-			-- If the enemy is still nearby and was last seen a very short time
-			-- ago, we add it back to the list. Without this, the creature would
-			-- give up the moment the target hides behind anything.
-			self.enemies[v] = enemy
-		elseif self.object:check_enemy(v) then
-			-- If a new enemy was within the scan radius, a line of sight check
-			-- is performed to cull enemies behind walls. If the LOS check
-			-- succeeds, the enemy is considered found.
-			if self.object:check_line_of_sight{object = v} then
-				self.enemies[v] = {v, time}
+		if not v.dead then
+			local enemy = old[v]
+			if enemy and time - enemy[2] < 10 then
+				-- If the enemy is still nearby and was last seen a very short time
+				-- ago, we add it back to the list. Without this, the creature would
+				-- give up the moment the target hides behind anything.
+				self.enemies[v] = enemy
+			elseif self.object:check_enemy(v) then
+				-- If a new enemy was within the scan radius, a line of sight check
+				-- is performed to cull enemies behind walls. If the LOS check
+				-- succeeds, the enemy is considered found.
+				if self.object:check_line_of_sight{object = v} then
+					self.enemies[v] = {v, time}
+				end
 			end
 		end
 	end
