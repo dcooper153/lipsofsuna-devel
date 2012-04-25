@@ -1,9 +1,10 @@
 -- Core
 Mod:load "core"
+Mod:load "core/specs"
 Mod:load "core/ai"
+Mod:load "core/ai/combat"
 Mod:load "core/client"
 Mod:load "core/shadows"
-Mod:load "core/specs"
 Mod:load "core/misc"
 Mod:load "server"
 Mod:load "client"

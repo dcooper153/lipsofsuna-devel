@@ -1,0 +1,15 @@
+Aiactionspec{
+	name = "move forward",
+	categories = {"combat", "offensive"},
+	calculate = function(self, args)
+		if not args.allow_forward and not args.allow_forward_jump then return end
+		if args.dist < args.hint then return end
+		return 1
+	end,
+	perform = function(self, args)
+		if args.allow_forward_jump then self.object:jump() end
+		self.object:set_block(false)
+		self.object:set_movement(1)
+		self.object:set_strafing(0)
+		self.action_timer = math.random(1, 3)
+	end}
