@@ -275,10 +275,10 @@ int liscr_args_geti_intv (
 	return ret;
 }
 
-int
-liscr_args_geti_quaternion (LIScrArgs*       self,
-                            int              index,
-                            LIMatQuaternion* result)
+int liscr_args_geti_quaternion (
+	LIScrArgs*       self,
+	int              index,
+	LIMatQuaternion* result)
 {
 	LIScrData* tmp = NULL;
 
@@ -289,7 +289,10 @@ liscr_args_geti_quaternion (LIScrArgs*       self,
 		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_QUATERNION);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
+		{
 			*result = *((LIMatQuaternion*) tmp->data);
+			*result = limat_quaternion_validate (*result);
+		}
 	}
 	else
 	{
@@ -298,7 +301,10 @@ liscr_args_geti_quaternion (LIScrArgs*       self,
 		index += self->args_start;
 		tmp = liscr_isdata (self->lua, index, LISCR_SCRIPT_QUATERNION);
 		if (tmp != NULL)
+		{
 			*result = *((LIMatQuaternion*) tmp->data);
+			*result = limat_quaternion_validate (*result);
+		}
 	}
 
 	return tmp != NULL;
@@ -368,10 +374,10 @@ int liscr_args_geti_table (
 	return 0;
 }
 
-int
-liscr_args_geti_vector (LIScrArgs*   self,
-                        int          index,
-                        LIMatVector* result)
+int liscr_args_geti_vector (
+	LIScrArgs*   self,
+	int          index,
+	LIMatVector* result)
 {
 	LIScrData* tmp = NULL;
 
@@ -382,7 +388,10 @@ liscr_args_geti_vector (LIScrArgs*   self,
 		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_VECTOR);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
+		{
 			*result = *((LIMatVector*) tmp->data);
+			*result = limat_vector_validate (*result);
+		}
 	}
 	else
 	{
@@ -391,7 +400,10 @@ liscr_args_geti_vector (LIScrArgs*   self,
 		index += self->args_start;
 		tmp = liscr_isdata (self->lua, index, LISCR_SCRIPT_VECTOR);
 		if (tmp != NULL)
+		{
 			*result = *((LIMatVector*) tmp->data);
+			*result = limat_vector_validate (*result);
+		}
 	}
 
 	return tmp != NULL;
@@ -553,10 +565,10 @@ int liscr_args_gets_intv (
 	return ret;
 }
 
-int
-liscr_args_gets_quaternion (LIScrArgs*       self,
-                            const char*      name,
-                            LIMatQuaternion* result)
+int liscr_args_gets_quaternion (
+	LIScrArgs*       self,
+	const char*      name,
+	LIMatQuaternion* result)
 {
 	LIScrData* tmp = NULL;
 
@@ -566,7 +578,10 @@ liscr_args_gets_quaternion (LIScrArgs*       self,
 		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_QUATERNION);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
+		{
 			*result = *((LIMatQuaternion*) tmp->data);
+			*result = limat_quaternion_validate (*result);
+		}
 	}
 
 	return tmp != NULL;
@@ -613,10 +628,10 @@ int liscr_args_gets_table (
 	return 0;
 }
 
-int
-liscr_args_gets_vector (LIScrArgs*   self,
-                        const char*  name,
-                        LIMatVector* result)
+int liscr_args_gets_vector (
+	LIScrArgs*   self,
+	const char*  name,
+	LIMatVector* result)
 {
 	LIScrData* tmp = NULL;
 
@@ -626,7 +641,10 @@ liscr_args_gets_vector (LIScrArgs*   self,
 		tmp = liscr_isdata (self->lua, -1, LISCR_SCRIPT_VECTOR);
 		lua_pop (self->lua, 1);
 		if (tmp != NULL)
+		{
 			*result = *((LIMatVector*) tmp->data);
+			*result = limat_vector_validate (*result);
+		}
 	}
 
 	return tmp != NULL;

@@ -165,12 +165,12 @@ static void Object_get_rotation (LIScrArgs* args)
 static void Object_set_rotation (LIScrArgs* args)
 {
 	LIMatTransform transform;
-	LIScrData* quat;
+	LIMatQuaternion quat;
 
-	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &quat))
+	if (liscr_args_geti_quaternion (args, 0, &quat))
 	{
 		lieng_object_get_transform (args->self, &transform);
-		transform.rotation = *((LIMatQuaternion*) quat->data);
+		transform.rotation = quat;
 		limat_quaternion_normalize (transform.rotation);
 		lieng_object_set_transform (args->self, &transform);
 	}

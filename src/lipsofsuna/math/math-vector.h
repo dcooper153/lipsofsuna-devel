@@ -26,6 +26,7 @@
 #define __MATH_VECTOR_H__
 
 #include <math.h>
+#include "math-generic.h"
 
 #define LIMAT_VECTOR_EPSILON 0.0001f
 
@@ -166,7 +167,6 @@ limat_vector_multiply (LIMatVector self,
 
 /**
  * \brief Normalizes the vector.
- *
  * \param self Vector.
  * \return Vector.
  */
@@ -188,6 +188,23 @@ limat_vector_normalize (LIMatVector self)
 		result.y = self.y / len;
 		result.z = self.z / len;
 	}
+	return result;
+}
+
+/**
+ * \brief Removes all non-finite values from the vector.
+ * \param self Vector.
+ * \return Vector.
+ */
+static inline LIMatVector
+limat_vector_validate (LIMatVector self)
+{
+	LIMatVector result =
+	{
+		limat_number_validate (self.x),
+		limat_number_validate (self.y),
+		limat_number_validate (self.z)
+	};
 	return result;
 }
 

@@ -67,6 +67,8 @@ static void Quaternion_new_euler (LIScrArgs* args)
 	liscr_args_geti_float (args, 1, euler + 1);
 	liscr_args_geti_float (args, 2, euler + 2);
 	quat = limat_quaternion_euler (euler[0], euler[1], euler[2]);
+	quat = limat_quaternion_validate (quat);
+	quat = limat_quaternion_normalize (quat);
 	liscr_args_seti_quaternion (args, &quat);
 }
 
@@ -103,12 +105,14 @@ static void Quaternion_mul (LIScrArgs* args)
 	{
 		/* Transform vector. */
 		v = limat_quaternion_transform (*((LIMatQuaternion*) args->self), *((LIMatVector*) b->data));
+		v = limat_vector_validate (v);
 		liscr_args_seti_vector (args, &v);
 	}
 	else if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &b))
 	{
 		/* Concatenate rotations. */
 		q = limat_quaternion_multiply (*((LIMatQuaternion*) args->self), *((LIMatQuaternion*) b->data));
+		q = limat_quaternion_validate (q);
 		liscr_args_seti_quaternion (args, &q);
 	}
 }
@@ -177,9 +181,9 @@ static void Quaternion_get_euler (LIScrArgs* args)
 	data = args->self;
 	limat_quaternion_get_euler (*data, e + 0, e + 1, e + 2);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
-	liscr_args_seti_float (args, e[0]);
-	liscr_args_seti_float (args, e[1]);
-	liscr_args_seti_float (args, e[2]);
+	liscr_args_seti_float (args, limat_number_validate (e[0]));
+	liscr_args_seti_float (args, limat_number_validate (e[1]));
+	liscr_args_seti_float (args, limat_number_validate (e[2]));
 }
 
 static void Quaternion_get_length (LIScrArgs* args)

@@ -69,6 +69,18 @@ static inline float limat_quantize (
 		return value - tmp;
 }
 
+/**
+ * \brief Replaces non-finite numbers with zero.
+ * \return Finite number.
+ */
+static inline float limat_number_validate (
+	float value)
+{
+	if (finite (value))
+		return value;
+	return 0.0f;
+}
+
 #endif
 
 /** @} */

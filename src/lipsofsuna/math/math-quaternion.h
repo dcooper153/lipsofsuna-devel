@@ -364,6 +364,24 @@ limat_quaternion_normalize (LIMatQuaternion self)
 }
 
 /**
+ * \brief Removes all non-finite values from the quaternion.
+ * \param self Quaternion.
+ * \return Quaternion.
+ */
+static inline LIMatQuaternion
+limat_quaternion_validate (LIMatQuaternion self)
+{
+	LIMatQuaternion result =
+	{
+		limat_number_validate (self.x),
+		limat_number_validate (self.y),
+		limat_number_validate (self.z),
+		limat_number_validate (self.w)
+	};
+	return result;
+}
+
+/**
  * \brief Performs normalized linear quaternion interpolation.
  *
  * \param self First interpolated quaternion.
