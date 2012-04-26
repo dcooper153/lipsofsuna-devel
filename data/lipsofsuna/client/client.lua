@@ -183,7 +183,9 @@ Client.set_target_text = function(self, text)
 end
 
 Client.set_player_dead = function(self, value)
-	print("TODO: Client.set_player_dead")
+	if self.player_object then
+		self.player_object.dead = value
+	end
 end
 
 --- Terminates the connection to the server.

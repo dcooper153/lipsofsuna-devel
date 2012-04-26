@@ -431,10 +431,13 @@ Creature.set_dead_state = function(self, drop)
 	self:animate("death")
 	-- Disable controls.
 	self.dead = true
-	self.physics = "rigid"
-	self.shape = "dead"
 	self:set_movement(0)
 	self:set_strafing(0)
+	self.auto_attack = nil
+	self.jumping = nil
+	self.climbing = nil
+	self.shape = "dead"
+	self.physics = "rigid"
 	-- Disable stats.
 	self.stats.enabled = false
 	self.stats:set_value("health", 0)

@@ -203,7 +203,7 @@ Object.set_motion_state = function(self, pos, rot, vel, tilt)
 	self.interpolation = 0
 	self.interpolation_linear = (vel.length < 0.5)
 	-- Set rotation unless controlled by the local player.
-	if self ~= Player.object then
+	if self.dead or self ~= Client.player_object then
 		self:update_rotation(rot, tilt)
 	end
 	-- Mark as active.
