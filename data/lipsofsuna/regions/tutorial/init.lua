@@ -30,39 +30,6 @@ Itemspec{
 	stacking = true}
 
 Species{
-	name = "Expedition Leader Lyra",
-	base = "aer",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
-	dialog = "lyra",
-	marker = "lyra",
-	eye_style = "random",
-	hair_style = "random",
-	inventory_items = {"dress"}}
-
-Species{
-	name = "Zyra the Mage",
-	base = "aer",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
-	dialog = "zyra",
-	marker = "zyra",
-	eye_style = "random",
-	hair_style = "random",
-	inventory_items = {"dress"}}
-
-Species{
-	name = "Drill Sergent Spud",
-	base = "devora",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
-	dialog = "spud",
-	marker = "spud",
-	eye_style = "random",
-	hair_style = "random",
-	inventory_items = {"lizard dress","torch"}}
-
-Species{
 	name = "Dummy",
 	base = "devora",
 	ai_enable_combat = false,
@@ -72,28 +39,6 @@ Species{
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {"combat token"}}
-
-Species{
-	name = "Craftress Xsphin",
-	base = "kraken",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
-	dialog = "xsphin",
-	marker = "xsphin",
-	eye_style = "random",
-	hair_style = "random",
-	inventory_items = {"dress"}}
-
-Species{
-	name = "Fighting Instructor Fa",
-	base = "wyrm",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
-	dialog = "fa",
-	marker = "fa",
-	eye_style = "random",
-	hair_style = "random",
-	inventory_items = {"iron breastplate", "iron greaves", "iron gauntlets","wooden staff"}}
 
 require(Mod.path .. "fa")
 require(Mod.path .. "spud")

@@ -1,4 +1,14 @@
- Dialogspec{name = "zyra",
+Species{
+	name = "Zyra the Mage",
+	base = "aer",
+	dialog = "zyra",
+	marker = "zyra",
+	ai_type = "anchored",
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"dress"}}
+
+Dialogspec{name = "zyra",
 	{"default death check"},
 	{"branch", check = {{"!flag", "zyra complained"}},
 		{"flag", "zyra complained"},
