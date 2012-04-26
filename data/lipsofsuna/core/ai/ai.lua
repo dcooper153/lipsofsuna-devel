@@ -18,6 +18,18 @@ Ai.new = function(clss, object)
 	return self
 end
 
+--- Adds an enemy to the list of enemies.
+-- @param self AI.
+-- @param object Enemy object.
+Ai.add_enemy = function(self, object)
+	local enemy = self.enemies[object]
+	if enemy then
+		enemy[2] = Program.time + 30
+	else
+		self.enemies[object] = {object, Program.time + 30}
+	end
+end
+
 --- Updates the combat ratings of the creature.
 -- @param self AI.
 Ai.calculate_combat_ratings = function(self)

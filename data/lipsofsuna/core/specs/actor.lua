@@ -56,7 +56,8 @@ Species.dict_name = {}
 --   <li>jump_force: Mass-independent jump force of the creature.</li>
 --   <li>loot_categories: List of item categories this creature can have as random loot.</li>
 --   <li>loot_count: Minimum and maximum number of random loot items this creature can have.</li>
---   <li>preset: The name of the actor preset to use.</li>
+--   <li>personality: Name of the personality type.</li>
+--   <li>preset: Name of the actor preset to use.</li>
 --   <li>mass: Mass in kilograms.</li>
 --   <li>model: Model name.</li>
 --   <li>skill_regen: Skill regeneration speed in units per second.</li>
@@ -320,9 +321,18 @@ Species.check_enemy = function(self, object)
 	end
 end
 
---- Sets the factions of the species.
--- @param self Species.
--- @param args List of species.
+--- Gets the personality of the actor.
+-- @param self Actor spec.
+-- @return Personality spec, or nil.
+Species.get_personality = function(self)
+	if not self.personality then return end
+	if not Personalityspec then return end
+	return Personalityspec:find{name = self.personality}
+end
+
+--- Sets the factions of the actor.
+-- @param self Actor spec.
+-- @param args List of factions.
 Species.set_factions = function(self, args)
 	if args then
 		self.factions = {}

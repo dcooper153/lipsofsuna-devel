@@ -4,9 +4,15 @@ Aistatespec{
 		-- Check for enemies.
 		for k,v in pairs(self.enemies) do return 1 end
 	end,
-	enter = function(self)
+	enter = function(self, prev)
 		self:calculate_combat_ratings()
 		self.target = self.best_enemy
+		if prev ~= "combat" then
+			local p = self.object.spec:get_personality()
+			local s = p and p:get_phrase("angered")
+			if s then self.object:say(s) end
+			self.combat_taunt_timer = math.random(10, 30)
+		end
 	end,
 	update = function(self, secs)
 		-- Check if the target is has died.
@@ -23,5 +29,13 @@ Aistatespec{
 		if face < 0.5 then
 			self.object:set_movement(0)
 			return
+		end
+		-- Yell some taunts occasionally.
+		self.combat_taunt_timer = (self.combat_taunt_timer or 60) - secs
+		if self.combat_taunt_timer < 0 then
+			local p = self.object.spec:get_personality()
+			local s = p and p:get_phrase("combat")
+			if s then self.object:say(s) end
+			self.combat_taunt_timer = math.random(10, 30)
 		end
 	end}

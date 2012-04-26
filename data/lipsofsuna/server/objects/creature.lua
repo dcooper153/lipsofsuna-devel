@@ -236,12 +236,7 @@ end
 Creature.add_enemy = function(self, object)
 	if not self.ai then return end
 	if object.god then return end
-	local enemy = self.ai.enemies[object]
-	if enemy then
-		enemy[2] = Program.time + 30
-	else
-		self.ai.enemies[object] = {object, Program.time + 30}
-	end
+	self.ai:add_enemy(object)
 end
 
 --- Calculates the animation state based on the active controls.
@@ -383,6 +378,16 @@ Creature.damaged = function(self, args)
 				if args.amount > 15 then self.beheaded = true end
 			elseif not self.client then
 				if args.amount > 30 then self.beheaded = true end
+			end
+		end
+		-- Say the death message.
+		-- This is omitted if the actor is beheaded or killed by a surprise.
+		if not self.dead and not self.beheaded and self.ai then
+			for k,v in pairs(self.ai.enemies) do
+				local p = self.spec:get_personality()
+				local s = p and p:get_phrase("death")
+				if s then self:say(s) end
+				break
 			end
 		end
 		-- Kill if not killed already.

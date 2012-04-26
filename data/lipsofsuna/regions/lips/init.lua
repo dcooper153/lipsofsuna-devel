@@ -17,26 +17,6 @@ Species{
 	ai_type = "camper"}
 
 Species{
-	name = "Lips guard archer",
-	base = "aer",
-	dialog = "lips guard",
-	eye_style = "random",
-	hair_style = "random",
-	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson crossbow", ["arrow"] = 100},
-	skills = {"Health lv2"},
-	ai_type = "camper"}
-
-Species{
-	name = "Lips guard knight",
-	base = "aer",
-	dialog = "lips guard",
-	eye_style = "random",
-	hair_style = "random",
-	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson sword", "round shield"},
-	skills = {"Health lv4"},
-	ai_type = "camper"}
-
-Species{
 	name = "Celine",
 	base = "aer",
 	dialog = "celine",
@@ -56,15 +36,6 @@ Species{
 	hair_style = {"hair2",200,180,20},
 	inventory_items = {"iron hatchet", "dress"},
 	factions = {"neutral"},
-	ai_type = "anchored"}
-
-Species{
-	name = "Merchant",
-	base = "aer",
-	dialog = "merchant",
-	eye_style = "random",
-	hair_style = "random",
-	inventory_items = {"dress"},
 	ai_type = "anchored"}
 
 require(Mod.path .. "lips1")

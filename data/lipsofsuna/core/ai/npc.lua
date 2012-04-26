@@ -230,6 +230,7 @@ NpcAi.set_state = function(self, args)
 	if not self.state_timer or s ~= self.state then
 		self.state_timer = 0
 	end
+	local prev = self.state
 	self.state = s
 	self.target = args.target
 	self.ai_timer = math.random()
@@ -242,7 +243,7 @@ NpcAi.set_state = function(self, args)
 	self.object:calculate_speed()
 	local state = Aistatespec:find{name = s}
 	if state and state.enter then
-		state.enter(self)
+		state.enter(self, prev)
 	end
 end
 
