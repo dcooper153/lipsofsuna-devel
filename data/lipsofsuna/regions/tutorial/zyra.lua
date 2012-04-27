@@ -6,6 +6,7 @@ Species{
 	ai_type = "anchored",
 	eye_style = "random",
 	hair_style = "random",
+	personality = "noble",
 	inventory_items = {"dress"}}
 
 Dialogspec{name = "zyra",

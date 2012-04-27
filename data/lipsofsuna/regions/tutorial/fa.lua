@@ -6,6 +6,7 @@ Species{
 	ai_type = "anchored",
 	eye_style = "random",
 	hair_style = "random",
+	personality = "savage",
 	inventory_items = {"iron breastplate", "iron greaves", "iron gauntlets","wooden staff"}}
 
 Dialogspec{name = "fa",

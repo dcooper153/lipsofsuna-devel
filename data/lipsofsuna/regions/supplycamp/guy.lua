@@ -7,7 +7,8 @@ Species{
 	hair_style = "random",
 	inventory_items = {"dress"},
 	preset = "Male 2",
-	ai_type = "camper"}
+	ai_type = "camper",
+	personality = "tough"}
 
 Quest{
 	name = "Guy's Request"}

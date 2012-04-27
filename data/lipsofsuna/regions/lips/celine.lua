@@ -1,3 +1,14 @@
+Species{
+	name = "Celine",
+	base = "aer",
+	dialog = "celine",
+	marker = "celine",
+	hair_style = {"hair1",0,255,0},
+	inventory_items = {"iron hatchet", "dress"},
+	factions = {"peculiar pet"},
+	ai_type = "camper",
+	personality = "feeble"}
+
 Dialogspec{name = "celine",
 	{"default death check"},
 	{"branch", check = {{"flag", "imaginary friend completed"}},

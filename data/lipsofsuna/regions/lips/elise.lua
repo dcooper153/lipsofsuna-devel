@@ -1,3 +1,18 @@
+Species{
+	name = "Elise",
+	base = "aer",
+	animations = {
+		["idle"] = {animation = "tired", channel = 1, permanent = true}},
+	dialog = "elise",
+	marker = "elise",
+	hair_style = {"hair2",200,180,20},
+	inventory_items = {"iron hatchet", "dress"},
+	factions = {"neutral"},
+	ai_type = "anchored",
+	personality = "feeble"}
+
+Quest{name = "Elise's Sorrow"}
+
 Dialogspec{name = "elise", unique = true,
 	{"branch", cond_dead = true,
 		{"loot"}},

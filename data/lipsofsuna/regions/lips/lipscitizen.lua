@@ -1,3 +1,13 @@
+Species{
+	name = "Lips citizen",
+	base = "aer",
+	dialog = "lips citizen",
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {"leather top", "leather pants", "leather leggings"},
+	ai_type = "camper",
+	personality = "feeble"}
+
 Dialogspec{name = "lips citizen",
 	{"branch", cond_dead = true,
 		{"loot"}},

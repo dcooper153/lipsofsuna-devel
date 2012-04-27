@@ -1,42 +1,10 @@
 Program:add_path(Mod.path)
 
-Quest{name = "Elise's Sorrow"}
 Quest{name = "Imaginary Friend"}
 Quest{name = "Sword on the Stone"}
 Quest{name = "Mining Guild"}
 
 Faction{name = "peculiar pet"}
-
-Species{
-	name = "lipscitizen",
-	base = "aer",
-	dialog = "lips citizen",
-	eye_style = "random",
-	hair_style = "random",
-	inventory_items = {"leather top", "leather pants", "leather leggings"},
-	ai_type = "camper"}
-
-Species{
-	name = "Celine",
-	base = "aer",
-	dialog = "celine",
-	marker = "celine",
-	hair_style = {"hair1",0,255,0},
-	inventory_items = {"iron hatchet", "dress"},
-	factions = {"peculiar pet"},
-	ai_type = "camper"}
-
-Species{
-	name = "Elise",
-	base = "aer",
-	animations = {
-		["idle"] = {animation = "tired", channel = 1, permanent = true}},
-	dialog = "elise",
-	marker = "elise",
-	hair_style = {"hair2",200,180,20},
-	inventory_items = {"iron hatchet", "dress"},
-	factions = {"neutral"},
-	ai_type = "anchored"}
 
 require(Mod.path .. "lips1")
 require(Mod.path .. "lipsguard")
