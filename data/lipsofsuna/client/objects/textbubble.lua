@@ -20,7 +20,7 @@ TextBubble.new = function(clss, args)
 	local fade = args.fade or 0
 	local widget = Widgets.Label{
 		text = args.text, color = args.text_color,
-		font = args.text_font, width_request = 150, halign = 0.5,
+		font = args.text_font, width_request = 250, halign = 0.5,
 		life = life, fade = fade,
 		velocity = args.velocity, motion = Vector()}
 	-- Check for an existing bubble.
@@ -102,7 +102,7 @@ TextBubble.update = function(self, secs)
 	-- Calculate the position.
 	self:transform()
 	local p = Render:project(self.position)
-	p.x = p.x - 75
+	p.x = p.x - 125
 	-- Move the text widgets.
 	for i = 1,n do
 		local v = self.widgets[n - i + 1]

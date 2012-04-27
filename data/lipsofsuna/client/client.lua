@@ -49,8 +49,8 @@ Client.add_speech_text = function(self, args)
 	Client:append_log("<" .. args.name .. "> " .. args.text)
 	-- Create a text bubble.
 	TextBubble{
-		life = 10,
-		fade = 10,
+		life = 5,
+		fade = 1,
 		object = args.object,
 		position = Vector(0,2,0),
 		text = args.text,
