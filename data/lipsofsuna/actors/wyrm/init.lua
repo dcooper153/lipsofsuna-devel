@@ -1,10 +1,10 @@
 Program:add_path(Mod.path)
 
-Species{
+Actorspec{
 	name = "wyrm",
 	base = "race",
 	damage_from_magma = 0,
-	equipment_class = "wyrm",
+	equipment_class = "aer",
 	model = "aer1",
 	models = {
 		skeleton = "aer1",
@@ -21,8 +21,8 @@ Species{
 	tilt_bone = {"back1", "back2", "back3"},
 	vulnerabilities = {["cold damage"] = 2, ["fire damage"] = 0.5}}
 
-Species{
+Actorspec{
 	name = "wyrm-player",
 	base = "wyrm",
 	ai_enabled = false,
-	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
+	inventory_items = {["torch"] = 1, ["workbench"] = 1, ["dress"] = 1, ["leather leggings"] = 1}}

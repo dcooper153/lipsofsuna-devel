@@ -139,9 +139,9 @@ Editor.load = function(self, name)
 	for k,v in pairs(Object.objects) do v:detach() end
 	Client.sectors:unload_world()
 	-- Find or create the pattern.
-	local pattern = Pattern:find{name = name}
+	local pattern = Patternspec:find{name = name}
 	if not pattern then
-		pattern = Pattern{name = name, file = name .. ".lua", size = Vector(32,8,32)}
+		pattern = Patternspec{name = name, file = name .. ".lua", size = Vector(32,8,32)}
 		local i = 1
 		for x=0,31 do
 			for z=0,31 do

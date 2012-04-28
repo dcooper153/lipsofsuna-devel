@@ -1,4 +1,4 @@
-Dialogspec{name = "roland", unique = true,
+Dialogspec{name = "roland", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"branch",
@@ -45,4 +45,4 @@ Dialogspec{name = "roland", unique = true,
 		},
 		{"choice", "Goodbye.",
 			{"exit"}},
-		{"loop"}}}
+		{"loop"}}}}

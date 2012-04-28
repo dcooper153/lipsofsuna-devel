@@ -1,8 +1,7 @@
-Quest{name = "Elise's Sorrow"}
-Quest{name = "Erinyes"}
-Quest{name = "Imaginary Friend"}
-Quest{name = "Sanctuary"}
-Quest{name = "Brigands"}
-Quest{name = "Sword on the Stone"}
-Quest{name = "Mining Guild"}
-Quest{name = "Bridge Building"}
+Questspec{name = "Erinyes"}
+Questspec{name = "Imaginary Friend"}
+Questspec{name = "Sanctuary"}
+Questspec{name = "Brigands"}
+Questspec{name = "Sword on the Stone"}
+Questspec{name = "Mining Guild"}
+Questspec{name = "Bridge Building"}

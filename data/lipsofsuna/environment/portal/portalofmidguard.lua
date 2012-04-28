@@ -1,4 +1,4 @@
-Dialogspec{name = "portal of midguard", unique = true,
+Dialogspec{name = "portal of midguard", commands = {
 	{"branch", cond = "portal of midguard activated",
 		{"branch", cond = "portal of lips activated",
 			{"teleport", marker = "portal of lips"},
@@ -8,4 +8,4 @@ Dialogspec{name = "portal of midguard", unique = true,
 		{"exit"}},
 	{"quest", "Portal of Midguard", status = "completed", marker = "portal of midguard", text = "The portal of Midguard has been activated."},
 	{"flag", "portal of midguard activated"},
-	{"info", "You have activated the portal of Midguard."}}
+	{"info", "You have activated the portal of Midguard."}}}

@@ -1,6 +1,6 @@
 Program:add_path(Mod.path)
 
-Species{
+Actorspec{
 	name = "android",
 	base = "race",
 	damage_from_magma = 2,
@@ -19,12 +19,12 @@ Species{
 		lower_safe = "aerbloomers1",
 		upper = "aerupper1",
 		upper_safe = "aerbloomerstop1"},
-	skin_shader = "android",
+	skin_material = "animdiffnorm1",
 	skin_textures = {"android1", "aer1n"},
 	tilt_bone = {"back1", "back2", "back3"}}
 
-Species{
+Actorspec{
 	name = "android-player",
 	base = "android",
 	ai_enabled = false,
-	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
+	inventory_items = {["torch"] = 1, ["workbench"] = 1, ["dress"] = 1, ["leather leggings"] = 1}}

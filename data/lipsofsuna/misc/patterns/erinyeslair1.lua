@@ -1,8 +1,8 @@
-Pattern{
+Patternspec{
 	name = "erinyeslair1",
 	size = Vector(32,16,32),
 	position = Vector(128,128,512),
-	categories = {"init"},
+	categories = {["init"] = true},
 	creatures = {
 		{2,0,2,"Erinyes"}},
 	obstacles = {

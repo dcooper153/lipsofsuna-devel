@@ -124,9 +124,12 @@ Obstacle:add_setters{
 	realized = function(self, value)
 		Object.setters.realized(self, value)
 		if value then
-			for k,v in pairs(self.spec.constraints) do
-				if v[1] == "hinge" then
-					self:insert_hinge_constraint{position = v[2], axis = v[3]}
+			local cons = self.spec:get_constraints()
+			if cons then
+				for k,v in pairs(cons) do
+					if v.constraint == "hinge" then
+						self:insert_hinge_constraint{position = v.offset, axis = v.axis}
+					end
 				end
 			end
 		end

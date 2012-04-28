@@ -7,7 +7,7 @@ Itemspec{
 	animation_attack = "attack blunt",
 	animation_charge = "charge blunt",
 	animation_hold = "hold blunt",
-	categories = {"melee", "weapon"},
+	categories = {["melee"] = true, ["weapon"] = true},
 	crafting_materials = {["log"] = 4},
 	damage_mining = 1,
 	effect_craft = "craftwood1",

@@ -1,19 +1,19 @@
-Species{
+Actorspec{
 	name = "Guy",
 	base = "aer",
 	dialog = "guy",
 	marker = "guy",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"},
+	inventory_items = {["dress"] = 1},
 	preset = "Male 2",
 	ai_type = "camper",
 	personality = "tough"}
 
-Quest{
+Questspec{
 	name = "Guy's Request"}
 
-Dialogspec{name = "guy",
+Dialogspec{name = "guy", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"say", "Guy", "Greetings, adventurer!"},
@@ -27,7 +27,7 @@ Dialogspec{name = "guy",
 			{"random quest", "Guy's Request", difficulty = "easy"}},
 		{"choice", "Goodbye",
 			{"exit"}},
-		{"loop"}}}
+		{"loop"}}}}
 
-Dialogspec{name = "guy death",
-	{"quest", "Guy's Request", status = "completed", marker = "guy", text = "Guy is dead."}}
+Dialogspec{name = "guy death", commands = {
+	{"quest", "Guy's Request", status = "completed", marker = "guy", text = "Guy is dead."}}}

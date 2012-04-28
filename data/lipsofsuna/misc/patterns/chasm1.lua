@@ -1,10 +1,12 @@
-Pattern{
+Patternspec{
 	name = "chasm1",
 	size = Vector(48,36,32),
-	distance = {"lips1",10,40},
+	distance_pattern = "lips1",
+	distance_min = 10,
+	distance_max = 40,
 	position = Vector(700,960,700),
 	position_random = Vector(300,40,300),
-	categories = {"init"},
+	categories = {["init"] = true},
 	obstacles = {
 		{18.490000,20.990000,27.700000,"bridge chest"}},
 	creatures = {

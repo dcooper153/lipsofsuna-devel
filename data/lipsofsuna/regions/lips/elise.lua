@@ -1,19 +1,20 @@
-Species{
+Actorspec{
 	name = "Elise",
 	base = "aer",
-	animations = {
-		["idle"] = {animation = "tired", channel = 1, permanent = true}},
+	animations = {["idle"] = "elise idle"},
 	dialog = "elise",
 	marker = "elise",
-	hair_style = {"hair2",200,180,20},
-	inventory_items = {"iron hatchet", "dress"},
-	factions = {"neutral"},
+	hair_color = {200,180,20},
+	hair_style = "hair2",
+	inventory_items = {["iron hatchet"] = 1, ["dress"] = 1},
+	factions = {["neutral"] = true},
 	ai_type = "anchored",
 	personality = "feeble"}
 
-Quest{name = "Elise's Sorrow"}
+Questspec{
+	name = "Elise's Sorrow"}
 
-Dialogspec{name = "elise", unique = true,
+Dialogspec{name = "elise", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"branch", cond = "elise informed",
@@ -54,8 +55,8 @@ Dialogspec{name = "elise", unique = true,
 			{"exit"}},
 		{"choice", "Goodbye",
 			{"exit"}},
-		{"loop"}}}
+		{"loop"}}}}
 
-Dialogspec{name = "elise death",
+Dialogspec{name = "elise death", commands = {
 	{"quest", "Elise's Sorrow", status = "completed", marker = "elise", text = "Elise is dead."},
-	{"flag", "elise dead"}}
+	{"flag", "elise dead"}}}

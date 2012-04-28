@@ -1,6 +1,6 @@
 Program:add_path(Mod.path)
 
-Species{
+Actorspec{
 	name = "Foreman",
 	base = "aer",
 	ai_enable_combat = false,
@@ -9,17 +9,18 @@ Species{
 	marker = "foreman",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"}}
+	inventory_items = {["dress"] = 1}}
 
-Species{
+Actorspec{
 	name = "Noemi",
 	base = "aer",
 	dialog = "noemi",
 	marker = "noemi",
 	dead = true,
-	hair_style = {"hair2",200,180,20},
-	inventory_items = {"iron hatchet", "dress"},
-	factions = {"good"}}
+	hair_color = {200,180,20},
+	hair_style = "hair2",
+	inventory_items = {["iron hatchet"] = 1, ["dress"] = 1},
+	factions = {["good"] = true}}
 
 require(Mod.path .. "effects")
 require(Mod.path .. "items")

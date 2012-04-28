@@ -1,10 +1,12 @@
-Pattern{
+Patternspec{
 	name = "greatlibrary1",
 	size = Vector(16,8,16),
-	distance = {"lips1",30,60},
+	distance_pattern = "lips1",
+	distance_min = 30,
+	distance_max = 60,
 	position = Vector(700,960,700),
 	position_random = Vector(500,40,500),
-	categories = {"init"},
+	categories = {["init"] = true},
 	obstacles = {
 		{8.050000,1.630000,7.970000,"great library steam lever"}},
 	tiles = {

@@ -57,9 +57,11 @@ Creature.set_model = function(self, model)
 		self.model = m
 		Object.set_model(self, true)
 		-- Apply body scale.
-		if self.spec.body_scale then
+		if self.spec.body_scale_min or self.spec.body_scale_max then
+			local min = self.spec.body_scale_min or 1
+			local max = self.spec.body_scale_max or 1
 			local factor = self.body_scale or 0.5
-			local scale = self.spec.body_scale[1] * (1 - factor) + self.spec.body_scale[2] * factor
+			local scale = min * (1 - factor) + max * factor
 			self:animate{animation = "empty", channel = Animation.CHANNEL_CUSTOMIZE,
 				weight = 0, weight_scale = 1000, fade_in = 0, fade_out = 0, permanent = true}
 			self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "mover", scale = scale}
@@ -143,10 +145,10 @@ Creature.update = function(self, secs)
 	if not spec then return end
 	-- Update objects in equipment slots.
 	for slot,index in pairs(self.inventory.equipped) do
-		local eslot = spec.equipment_slots[slot]
+		local node = spec.equipment_slots[slot]
 		local object = self.inventory:get_object_by_index(index)
-		if eslot and eslot.node and object then
-			local p,r = self:find_node{name = eslot.node, space = "world"}
+		if node ~= "" and object then
+			local p,r = self:find_node{name = node, space = "world"}
 			if not p then p,r = self.position,self.rotation end
 			local h = object:find_node{name = "#handle"}
 			if h then p = p - r * h end
@@ -164,11 +166,11 @@ end
 Creature.update_inventory = function(self, args)
 	-- Get slot information from the actor spec.
 	if not self.spec then return end
-	local slot = self.spec.equipment_slots[args.slot]
-	if not slot then return end
+	local node = self.spec.equipment_slots[args.slot]
+	if not node then return end
 	-- Update achored equipment or the actor model.
 	if args.type == "inventory-equipped" then
-		if slot.node then
+		if node ~= "" then
 			-- Enable the anchored item.
 			args.object.collision_group = 0
 			args.object.collision_mask = 0
@@ -180,10 +182,10 @@ Creature.update_inventory = function(self, args)
 			self:request_model_rebuild()
 		end
 		if args.object.spec.effect_equip then
-			Effect:play_object(args.object.spec.effect_equip, self, slot.node)
+			Effect:play_object(args.object.spec.effect_equip, self, node)
 		end
 	elseif args.type == "inventory-unequipped" then
-		if slot.node then
+		if node then
 			-- Disable the anchored item.
 			args.object:detach()
 			self:disable_equipment_holding_animation(args.slot)
@@ -192,7 +194,7 @@ Creature.update_inventory = function(self, args)
 			self:request_model_rebuild()
 		end
 		if args.object.spec.effect_equip then
-			Effect:play_object(args.object.spec.effect_unequip, self, slot.node)
+			Effect:play_object(args.object.spec.effect_unequip, self, node)
 		end
 	end
 end

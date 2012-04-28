@@ -1,4 +1,4 @@
-Species{
+Actorspec{
 	name = "Craftress Xsphin",
 	base = "kraken",
 	dialog = "xsphin",
@@ -7,9 +7,9 @@ Species{
 	eye_style = "random",
 	hair_style = "random",
 	personality = "noble",
-	inventory_items = {"dress"}}
+	inventory_items = {["dress"] = 1}}
 
-Dialogspec{name = "xsphin",
+Dialogspec{name = "xsphin", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"branch",cond_not="learning crafting",
@@ -42,4 +42,4 @@ Dialogspec{name = "xsphin",
 		{"say", "Craftress Xsphin", "I've taught you what I know. You'll have to discover the art of crafting further by yourself. Now, go on to the other trainers, or talk to Spud"},
 		{"exit"}
 	},
-	{"loop"}}
+	{"loop"}}}

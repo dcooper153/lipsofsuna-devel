@@ -413,13 +413,13 @@ Generator.place_region = function(self, pat)
 	local dist = nil
 	if pat.position then
 		rel = Vector(pat.position.x, 0, pat.position.z)
-	elseif not pat.distance then
+	elseif not pat.distance_pattern then
 		rel = Vector(math.random(self.map_start.x, self.map_end.x), 0, math.random(self.map_start.z, self.map_end.z))
 		dist = {nil, 0.1 * self.map_size.x, 0.1 * self.map_size.x}
-	elseif self.regions_dict_name[pat.distance[1]] then
-		rel = self.regions_dict_name[pat.distance[1]].point
+	elseif self.regions_dict_name[pat.distance_pattern] then
+		rel = self.regions_dict_name[pat.distance_pattern].point
 		rel = Vector(rel.x, 0, rel.z)
-		dist = pat.distance
+		dist = {pat.distance_pattern, pat.distance_min, pat.distance_max}
 	else return end
 	-- Determine the final position.
 	-- Regions with a random position range are placed at different

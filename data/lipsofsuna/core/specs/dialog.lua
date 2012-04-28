@@ -5,20 +5,21 @@ Dialogspec.type = "dialog"
 Dialogspec.dict_id = {}
 Dialogspec.dict_cat = {}
 Dialogspec.dict_name = {}
+Dialogspec.introspect = Introspect{
+	name = "Dialogspec",
+	fields = {
+		{name = "name", type = "string", description = "Name of the spec."},
+		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+		{name = "commands", type = "dialog tree", default = {}, description = "Dialog commands"}
+	}}
 
 --- Creates a new dialog specification.
 -- @param clss Dialogspec class.
--- @param args Arguments.<ul>
---   <li>name: Unique dialog name.</li>
---   <li>unique: True to allow only one access to the dialog at a time.</li></ul>
+-- @param args Arguments.
 -- @return New dialog specification.
 Dialogspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
-	local copy = function(f, d) if self[f] == nil then self[f] = d end end
-	copy("unique")
-	self.commands = {}
-	for k,v in ipairs(args) do self.commands[k] = v end
-	self:validate()
+	self.introspect:read_table(self, args)
 	return self
 end
 
@@ -81,8 +82,10 @@ Dialogspec.validate = function(self, args)
 			assert(type(c[3]) == "nil", "too many arguments to \"flag clear\" command")
 			validate_arguments(c, {})
 		end,
-		func = function(c)
-			assert(type(c[2]) == "function", "argument #2 of \"func\" must be a function")
+		["func"] = function(c)
+			assert(type(c[2]) == "string", "argument #2 of \"func\" must be a string")
+			local f,e = loadstring("return function(q)\n" .. c[2] .. "\nend")
+			assert(f, "argument #2 of \"func\" must contain valid code: " .. (e or ""))
 			assert(type(c[3]) == "nil", "too many arguments to \"func\" command")
 			validate_arguments(c, {})
 		end,

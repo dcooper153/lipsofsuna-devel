@@ -1,6 +1,6 @@
 Aiactionspec{
 	name = "touch spell",
-	categories = {"combat", "offensive"},
+	categories = {["combat"] = true, ["offensive"] = true},
 	calculate = function(self, args)
 		args.feat_spell_touch = nil
 		if not args.spec.can_cast_touch then return end

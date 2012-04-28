@@ -1,17 +1,15 @@
 Program:add_path(Mod.path)
 
-Species{
+Actorspec{
 	name = "devora",
 	base = "race",
 	aim_ray_center = Vector(0, 1, 0),
-	body_scale = {0.65, 0.8},
+	body_scale_min = 0.65,
+	body_scale_max = 0.8,
 	camera_center = Vector(0, 1, 0),
 	damage_from_magma = 9,
 	equipment_class = "aer",
-	hair_styles = {
-		{"Bald", ""},
-		{"Plant 1", "devorahair1"},
-		{"Plant 2", "devorahair2"}},
+	hair_styles = {["Bald"] = "", ["Plant 1"] = "devorahair1", ["Plant 2"] = "devorahair2"},
 	model = "aer1",
 	models = {
 		skeleton = "aer1",
@@ -30,21 +28,22 @@ Species{
 	tilt_bone = {"back1", "back2", "back3"},
 	vulnerabilities = {["fire damage"] = 2, ["physical damage"] = 0.8}}
 
-Species{
+Actorspec{
 	name = "devora-player",
 	base = "devora",
 	ai_enabled = false,
-	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
+	inventory_items = {["torch"] = 1, ["workbench"] = 1, ["dress"] = 1, ["leather leggings"] = 1}}
 
-Species{
+Actorspec{
 	name = "feral devora",
 	base = "devora",
 	ai_offense_factor = 0.8,
-	categories = {"enemy"},
+	categories = {["enemy"] = true},
 	difficulty = 0.5,
-	factions = {"evil"},
+	factions = {["evil"] = true},
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"},
+	inventory_items = {["dress"] = 1},
 	loot_categories = {"material"},
-	loot_count = {2, 4}}
+	loot_count_min = 2,
+	loot_count_max = 4}

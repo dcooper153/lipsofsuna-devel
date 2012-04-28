@@ -1,4 +1,4 @@
-Pattern{
+Patternspec{
 	name = "castlegarden",
 	size = Vector(5,5,5),
 	categories = {},

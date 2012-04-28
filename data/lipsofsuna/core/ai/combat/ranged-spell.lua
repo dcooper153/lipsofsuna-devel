@@ -1,6 +1,6 @@
 Aiactionspec{
 	name = "ranged spell",
-	categories = {"combat", "offensive"},
+	categories = {["combat"] = true, ["offensive"] = true},
 	calculate = function(self, args)
 		if not args.spec.can_cast_ranged then return end
 		if args.aim < 0.8 then return end

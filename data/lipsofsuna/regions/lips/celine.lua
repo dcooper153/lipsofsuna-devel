@@ -1,15 +1,16 @@
-Species{
+Actorspec{
 	name = "Celine",
 	base = "aer",
 	dialog = "celine",
 	marker = "celine",
-	hair_style = {"hair1",0,255,0},
-	inventory_items = {"iron hatchet", "dress"},
-	factions = {"peculiar pet"},
+	hair_color = {0,255,0},
+	hair_style = "hair1",
+	inventory_items = {["iron hatchet"] = 1, ["dress"] = 1},
+	factions = {["peculiar pet"] = true},
 	ai_type = "camper",
 	personality = "feeble"}
 
-Dialogspec{name = "celine",
+Dialogspec{name = "celine", commands = {
 	{"default death check"},
 	{"branch", check = {{"flag", "imaginary friend completed"}},
 		{"choice", "Have you been feeling alright lately?",
@@ -91,11 +92,9 @@ Dialogspec{name = "celine",
 		{"choice", "[Poison potion] You look thirsty, have a drink.", check = {{"flag", "black-spotted parasite known"}},
 			{"remove player item", "poison potion",
 				{"branch",
-					{"func", function(q)
-						q.object:say("Aaaahhhh!")
+					{"func", [[q.object:say("Aaaahhhh!")
 						q.object:die()
-						q.object:damaged{amount = 200, type = "physical"}
-					end},
+						q.object:damaged{amount = 200, type = "physical"}]]},
 					{"spawn object", "bloodworm", position_relative = Vector(0,3,0)},
 					{"quest", "Imaginary Friend", status = "completed", marker = "celine", text = "Celine is dead. Her brain parasite broke through her skull violently when escaping the poison of the potion Celine drank."},
 					{"flag", "imaginary friend completed"},
@@ -112,9 +111,9 @@ Dialogspec{name = "celine",
 		},
 		{"loop"}
 	}
-}
+}}
 
-Dialogspec{name = "celine death",
+Dialogspec{name = "celine death", commands = {
 	{"branch", check = {{"!flag", "imaginary friend completed"}},
 		{"quest", "Imaginary Friend", status = "completed", marker = "celine", text = "Celine has been killed."}
 	},
@@ -122,4 +121,4 @@ Dialogspec{name = "celine death",
 		{"quest", "Imaginary Friend", status = "completed", marker = "celine", text = "Celine has been cured, permanently."}
 	},
 	{"flag", "imaginary friend completed"}
-}
+}}

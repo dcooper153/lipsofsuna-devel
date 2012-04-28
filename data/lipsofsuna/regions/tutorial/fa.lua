@@ -1,4 +1,4 @@
-Species{
+Actorspec{
 	name = "Fighting Instructor Fa",
 	base = "wyrm",
 	dialog = "fa",
@@ -7,9 +7,9 @@ Species{
 	eye_style = "random",
 	hair_style = "random",
 	personality = "savage",
-	inventory_items = {"iron breastplate", "iron greaves", "iron gauntlets","wooden staff"}}
+	inventory_items = {["iron breastplate"] = 1, ["iron greaves"] = 1, ["iron gauntlets"] = 1, ["wooden staff"] = 1}}
 
-Dialogspec{name = "fa",
+Dialogspec{name = "fa", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"branch",cond_not="learning fighting",
@@ -43,4 +43,4 @@ Dialogspec{name = "fa",
 		{"say", "Fighting Instructor Fa", "I've taught you what I know. There's more to fighting yet, like ranged weapons, grenades, directional attacks, but I'll leave that for you to discover further. Now, go on to the other trainers, or talk to Spud"},
 		{"exit"}
 	},
-	{"loop"}}
+	{"loop"}}}

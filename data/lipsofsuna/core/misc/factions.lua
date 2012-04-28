@@ -1,12 +1,11 @@
 -- Player characters and most townspeople.
-Faction{
+Factionspec{
 	name = "good",
-	enemies = {"evil"}}
+	enemies = {["evil"] = true}}
 
-Faction{
-	name = "neutral",
-	enemies = {}}
+Factionspec{
+	name = "neutral"}
 
-Faction{
+Factionspec{
 	name = "evil",
-	enemies = {"good"}}
+	enemies = {["good"] = true}}

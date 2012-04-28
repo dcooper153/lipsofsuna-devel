@@ -1,6 +1,6 @@
 Aiactionspec{
 	name = "spell on self",
-	categories = {"combat", "defensive"},
+	categories = {["combat"] = true, ["defensive"] = true},
 	calculate = function(self, args)
 		if not args.spec.can_cast_self then return end
 		if args.dist < 2 * args.hint then return end

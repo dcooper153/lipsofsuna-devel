@@ -1,2 +1,2 @@
-Dialogspec{name = "erinyes", unique = true,
-	{"func", function(q) Generator.inst:generate() end}}
+Dialogspec{name = "erinyes", commands = {
+	{"func", "Generator.inst:generate()"}}}

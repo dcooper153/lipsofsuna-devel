@@ -1,86 +1,92 @@
 Program:add_path(Mod.path)
 
-Species{
+Actorspec{
 	name = "brigand",
 	base = "aer",
-	categories = {"enemy"},
+	categories = {["enemy"] = true},
 	difficulty = 0.5,
-	factions = {"evil"},
+	factions = {["evil"] = true},
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"iron sword", "leather top", "leather pants", "leather leggings"},
+	inventory_items = {["iron sword"] = 1, ["leather top"] = 1, ["leather pants"] = 1, ["leather leggings"] = 1},
 	loot_categories = {"armor", "material", "potion", "shield", "weapon"},
-	loot_count = {2, 4},
+	loot_count_min = 2,
+	loot_count_max = 4,
 	personality = "savage"}
 
-Species{
+Actorspec{
 	name = "brigand king",
 	base = "aer",
-	categories = {"special"},
+	categories = {["special"] = true},
 	difficulty = 1,
-	factions = {"evil"},
+	factions = {["evil"] = true},
 	eye_style = "random",
 	hair_style = "random",
 	marker = "brigandking",
-	inventory_items = {"adamantium sword", "iron breastplate", "iron greaves", "iron gauntlets"},
+	inventory_items = {["adamantium sword"] = 1, ["iron breastplate"] = 1, ["iron greaves"] = 1, ["iron gauntlets"] = 1},
 	loot_categories = {"armor", "shield", "weapon"},
-	loot_count = {5, 10},
-	skills = {"Health lv4"},
+	loot_count_min = 5,
+	loot_count_max = 10,
+	skills = {["Health lv4"] = true},
 	personality = "savage"}
 
-Species{
+Actorspec{
 	name = "novice brigand archer",
 	base = "aer",
-	categories = {"enemy"},
+	categories = {["enemy"] = true},
 	difficulty = 0.3,
-	factions = {"evil"},
+	factions = {["evil"] = true},
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"wooden crossbow", "leather top", "leather pants", "leather leggings", ["arrow"] = 20},
+	inventory_items = {["wooden crossbow"] = 1, ["leather top"] = 1, ["leather pants"] = 1, ["leather leggings"] = 1, ["arrow"] = 20},
 	loot_categories = {"armor", "potion", "weapon"},
-	loot_count = {2, 4},
-	skills = {"Health lv1"},
+	loot_count_min = 2,
+	loot_count_max = 4,
+	skills = {["Health lv1"] = true},
 	personality = "savage"}
 
-Species{
+Actorspec{
 	name = "master brigand archer",
 	base = "aer",
-	categories = {"enemy"},
+	categories = {["enemy"] = true},
 	difficulty = 0.7,
-	factions = {"evil"},
+	factions = {["evil"] = true},
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"iron crossbow", "iron breastplate", "iron greaves", "iron gauntlets", ["arrow"] = 40},
+	inventory_items = {["iron crossbow"] = 1, ["iron breastplate"] = 1, ["iron greaves"] = 1, ["iron gauntlets"] = 1, ["arrow"] = 40},
 	loot_categories = {"armor", "potion", "weapon"},
-	loot_count = {2, 4},
-	skills = {"Health lv3"},
+	loot_count_min = 2,
+	loot_count_max = 4,
+	skills = {["Health lv3"] = true},
 	personality = "savage"}
 
-Species{
+Actorspec{
 	name = "suicide bomber",
 	base = "aer",
-	categories = {"enemy"},
+	categories = {["enemy"] = true},
 	difficulty = 0.5,
-	factions = {"evil"},
+	factions = {["evil"] = true},
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"leather top", "leather pants", ["crimson grenade"] = 15},
+	inventory_items = {["leather top"] = 1, ["leather pants"] = 1, ["crimson grenade"] = 15},
 	loot_categories = {"armor", "potion", "weapon"},
-	loot_count = {2, 4},
-	skills = {"Health lv3"},
+	loot_count_min = 2,
+	loot_count_max = 4,
+	skills = {["Health lv3"] = true},
 	personality = "savage"}
 
-Species{
+Actorspec{
 	name = "brigandmale",
 	base = "aermale",
-	categories = {"enemy"},
+	categories = {["enemy"] = true},
 	difficulty = 0.5,
-	factions = {"evil"},
+	factions = {["evil"] = true},
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"leather brigand chest", "leather brigand pants", "leather boots", "leather gloves", "leather helm"},
+	inventory_items = {["leather brigand chest"] = 1, ["leather brigand pants"] = 1, ["leather boots"] = 1, ["leather gloves"] = 1, ["leather helm"] = 1},
 	loot_categories = {"armor", "material", "potion", "shield", "weapon"},
-	loot_count = {2, 4},
+	loot_count_min = 2,
+	loot_count_max = 4,
 	personality = "savage"}
 
 Itemspec{
@@ -88,11 +94,11 @@ Itemspec{
 	model = "book-000",
 	icon = "leatherarmor1",
 	armor_class = 0.04,
-	categories = {"armor"},
+	categories = {["armor"] = true},
 	crafting_materials = {hide = 4},
 	effect_craft = "craftsewing1",
 	equipment_models = {
-		["aer/android/devora/kraken/wyrm"] = {skirt = "aerlowerarmor1", panties = "panties2"},
+		["aer"] = {skirt = "aerlowerarmor1", panties = "panties2"},
 		["kraken"] = {skirt = "aerlowerarmor1"},
 		["aermale"] = {legs = "aermale1leatherlegs1"}},
 	equipment_slot = "lowerbody",
@@ -104,11 +110,12 @@ Itemspec{
 	model = "book-000",
 	icon = "leatherarmor1",
 	armor_class = 0.04,
-	categories = {"armor"},
+	categories = {["armor"] = true},
 	crafting_materials = {hide = 4},
 	effect_craft = "craftsewing1",
 	equipment_models = {
-		["aer/android/devora/kraken/wyrm"] = {upper1 = "aerleatherchest1"},
+		["aer"] = {upper1 = "aerleatherchest1"},
+		["kraken"] = {upper1 = "aerleatherchest1"},
 		["aermale"] = {upper = "aermale1leatherchest1"}},
 	equipment_slot = "upperbody",
 	mass = 5,

@@ -171,7 +171,7 @@ Protocol:add_handler{type = "OBJECT_MOVED", func = function(event)
 					end
 				end
 				if ref_speed then
-					local speed = Vector(vx, vt, vz).length-- * 1.5
+					local speed = Vector(vx, vt, vz).length
 					local scale = speed / math.max(0.1, ref_speed)
 					a.time_scale = ref_scale * scale
 					o:animate(a)

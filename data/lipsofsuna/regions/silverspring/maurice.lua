@@ -1,4 +1,4 @@
-Dialogspec{name = "maurice",
+Dialogspec{name = "maurice", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"say", "Maurice", "That cursed hoarder took our houses and everything."},
@@ -35,10 +35,8 @@ Dialogspec{name = "maurice",
 				{"say", "Maurice", "He didn't even need it. He already had more than he could use!"},
 				{"say", "Maurice", "He's hoarding everything out of greed with any means possible."},
 				{"choice", "Your excuses are pathetic. Die!",
-					{"func", function(q)
-						q.object.spec.ai_enable_combat = true
-						q.object.spec:set_factions{"evil"}
-					end},
+					{"func", [[q.object.spec.ai_enable_combat = true
+						q.object.spec:set_factions{"evil"}]]},
 					{"exit"}},
 				{"choice", "Had you stopped to think for even a moment, it all could have been avoided.",
 					{"say", "Maurice", "TODO"}},
@@ -48,8 +46,8 @@ Dialogspec{name = "maurice",
 			{"exit"}}},
 	{"choice", "Goodbye.",
 		{"exit"}},
-	{"loop"}}
+	{"loop"}}}
 
-Dialogspec{name = "maurice death",
+Dialogspec{name = "maurice death", commands = {
 	{"quest", "Maurice's House", status = "completed", marker = "maurice", text = "Maurice has been killed."},
-	{"flag", "maurice dead"}}
+	{"flag", "maurice dead"}}}

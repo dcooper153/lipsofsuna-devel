@@ -1,4 +1,4 @@
-Dialogspec{name = "foreman",
+Dialogspec{name = "foreman", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"branch", cond_not = "building bridge",
@@ -25,4 +25,4 @@ Dialogspec{name = "foreman",
 	},
 	{"choice", "Goodbye.",
 		{"exit"}},
-	{"loop"}}
+	{"loop"}}}

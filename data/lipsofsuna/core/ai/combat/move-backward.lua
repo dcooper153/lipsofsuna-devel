@@ -1,6 +1,6 @@
 Aiactionspec{
 	name = "move backward",
-	categories = {"combat", "defensive"},
+	categories = {["combat"] = true, ["defensive"] = true},
 	calculate = function(self, args)
 		if not args.allow_backward and not args.allow_backward_jump then return end
 		if args.dist > 2 * args.hint then return end

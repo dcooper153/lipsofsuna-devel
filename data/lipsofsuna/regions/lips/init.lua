@@ -1,10 +1,16 @@
 Program:add_path(Mod.path)
 
-Quest{name = "Imaginary Friend"}
-Quest{name = "Sword on the Stone"}
-Quest{name = "Mining Guild"}
+Questspec{
+	name = "Imaginary Friend"}
 
-Faction{name = "peculiar pet"}
+Questspec{
+	name = "Sword on the Stone"}
+
+Questspec{
+	name = "Mining Guild"}
+
+Factionspec{
+	name = "peculiar pet"}
 
 require(Mod.path .. "lips1")
 require(Mod.path .. "lipsguard")

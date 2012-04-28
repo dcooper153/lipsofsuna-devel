@@ -1,6 +1,6 @@
 Program:add_path(Mod.path)
 
-Species{
+Actorspec{
 	name = "kraken",
 	base = "race",
 	damage_from_magma = 9,
@@ -18,23 +18,23 @@ Species{
 		lower = "krakenlower1",
 		upper = "aerupper1",
 		upper_safe = "aerbloomerstop1"},
-	skin_shader = "animdiffnorm",
+	skin_material = "animdiffnorm1",
 	skin_textures = {"kraken1", "kraken1n"},
 	tilt_bone = {"back1", "back2", "back3"},
 	vulnerabilities = {["cold damage"] = 0.5, ["fire damage"] = 2},
 	water_friction = 0}
 
-Species{
+Actorspec{
 	name = "kraken-player",
 	base = "kraken",
 	ai_enabled = false,
-	inventory_items = {"torch", "workbench", "dress"}}
+	inventory_items = {["torch"] = 1, ["workbench"] = 1, ["dress"] = 1}}
 
-Species{
+Actorspec{
 	name = "Lips guard mage",
 	base = "kraken",
 	dialog = "lips guard",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"lizard dress", "lizard gloves", ["milky powder"] = 100},
-	skills = {"Health lv1", "Willpower lv4"}}
+	inventory_items = {["lizard dress"] = 1, ["lizard gloves"] = 1, ["milky powder"] = 100},
+	skills = {["Health lv1"] = true, ["Willpower lv4"] = true}}

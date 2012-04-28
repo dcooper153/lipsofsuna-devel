@@ -63,7 +63,7 @@ Ui:add_state{
 		local widgets = {}
 			-- Get the list of map names.
 			local widgets = {}
-			for k in pairs(Pattern.dict_name) do table.insert(widgets, k) end
+			for k in pairs(Patternspec.dict_name) do table.insert(widgets, k) end
 			table.sort(widgets)
 			-- Create widgets for the maps.
 			for k,v in pairs(widgets) do

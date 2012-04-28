@@ -291,8 +291,15 @@ Ui:add_state{
 	label = "Select hair style",
 	init = function()
 		local widgets = {}
-		local spec = Operators.chargen:get_race()
-		for k,v in ipairs(spec.hair_styles) do
+		local race = Operators.chargen:get_race()
+		local spec = Actorspec:find{name = race}
+		if not spec.hair_styles then return end
+		local lst = {}
+		for k,v in pairs(spec.hair_styles) do
+			table.insert(lst, {k, v})
+		end
+		table.sort(lst, function(a,b) return a[1] < b[1] end)
+		for k,v in ipairs(lst) do
 			local widget = Widgets.Uiradio(v[1], "hair", function(w)
 				Operators.chargen:set_hair_style(w.style)
 			end)

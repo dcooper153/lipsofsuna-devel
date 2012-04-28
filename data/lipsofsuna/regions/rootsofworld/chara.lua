@@ -1,4 +1,4 @@
-Dialogspec{name = "chara", unique = true,
+Dialogspec{name = "chara", commands = {
 	{"branch", cond = "chara known",
 		{"say", "Chara", "Well, well, it's one of you low-lifes again."}},
 	{"branch", cond_not = "chara known",
@@ -80,4 +80,4 @@ Dialogspec{name = "chara", unique = true,
 			{"loop"}},
 		{"choice", "Goodbye",
 			{"exit"}},
-		{"loop"}}}
+		{"loop"}}}}

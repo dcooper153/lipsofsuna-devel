@@ -1,4 +1,4 @@
-Dialogspec{name="col", unique = true,
+Dialogspec{name = "col", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"branch", cond = "sword on the stone completed",
@@ -37,4 +37,4 @@ Dialogspec{name="col", unique = true,
 			{"choice", "Nope, I'm busy",
 				{"say","Col","Fine, but come back when you're done, I've got some work for you!"},
 				{"exit"}}
-		}}}
+		}}}}

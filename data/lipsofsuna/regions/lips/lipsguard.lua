@@ -1,26 +1,26 @@
-Species{
+Actorspec{
 	name = "Lips guard archer",
 	base = "aer",
 	dialog = "lips guard",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson crossbow", ["arrow"] = 100},
-	skills = {"Health lv2"},
+	inventory_items = {["iron greaves"] = 1, ["iron breastplate"] = 1, ["iron gauntlets"] = 1, ["crimson crossbow"] = 1, ["arrow"] = 100},
+	skills = {["Health lv2"] = true},
 	ai_type = "camper",
 	personality = "lawful"}
 
-Species{
+Actorspec{
 	name = "Lips guard knight",
 	base = "aer",
 	dialog = "lips guard",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"iron greaves", "iron breastplate", "iron gauntlets", "crimson sword", "round shield"},
-	skills = {"Health lv4"},
+	inventory_items = {["iron greaves"] = 1, ["iron breastplate"] = 1, ["iron gauntlets"] = 1, ["crimson sword"] = 1, ["round shield"] = 1},
+	skills = {["Health lv4"] = true},
 	ai_type = "camper",
 	personality = "lawful"}
 
-Dialogspec{name = "lips guard",
+Dialogspec{name = "lips guard", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"say", "Guard", "Greetings!"},
@@ -36,4 +36,4 @@ Dialogspec{name = "lips guard",
 		},
 		{"choice", "Goodbye.",
 			{"exit"}},
-		{"loop"}}}
+		{"loop"}}}}

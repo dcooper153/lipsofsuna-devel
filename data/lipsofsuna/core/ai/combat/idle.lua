@@ -1,6 +1,6 @@
 Aiactionspec{
 	name = "idle",
-	categories = {"combat", "defensive"},
+	categories = {["combat"] = true, ["defensive"] = true},
 	calculate = function(self, args)
 		return 0.0000001
 	end,

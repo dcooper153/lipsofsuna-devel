@@ -29,8 +29,10 @@ Item:add_setters{
 		if self.random and self.inventory and spec.loot_categories then
 			local num_cat = #spec.loot_categories
 			local num_item
-			if spec.loot_count then
-				num_item = math.random(spec.loot_count[1], spec.loot_count[2])
+			if spec.loot_count_min or spec.loot_count_max then
+				local min = spec.loot_count_min or 0
+				local max = spec.loot_count_max or min
+				num_item = math.random(min, max)
 			else
 				num_item = math.random(0, self.inventory.size)
 			end

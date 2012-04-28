@@ -55,10 +55,10 @@ end
 
 Object.set_anim = function(self, name, time)
 	-- Play the animation.
-	local args = {animation = name, fade_in = 0.3, fade_out = 0.3, time = t}
-	local anim = self.spec and self.spec.animations[name]
+	local args = {animation = name, fade_in = 0.3, fade_out = 0.3, time = time}
+	local anim = self.spec and self.spec.get_animation and self.spec:get_animation(name)
 	if anim then
-		for k,v in pairs(anim) do args[k] = v end
+		for k,v in pairs(anim:get_arguments()) do args[k] = v end
 	end
 	self:animate(args)
 	-- Mark as active.
@@ -128,15 +128,17 @@ Object.set_model = function(self, skip)
 	end
 	self.special_effects = nil
 	-- Create new special effects.
-	if self.spec.special_effects and #self.spec.special_effects then
+	local effects = self.spec.get_special_effects and self.spec:get_special_effects()
+	if effects then
 		self.special_effects = {}
-		for k,v in pairs(self.spec.special_effects) do
-			if v.type == "light" then
-				local fx = Light{ambient = v.ambient, diffuse = v.diffuse, node = v.node,
-					equation = v.equation, position = self.position, enabled = true}
+		for k,v in pairs(effects) do
+			if v.light then
+				local fx = Light{ambient = v.light_ambient, diffuse = v.light_diffuse, node = v.node,
+					equation = v.light_equation, position = self.position, enabled = true}
 				table.insert(self.special_effects, fx)
-			else
-				local fx = Object{particle = v.model, node = v.node, position = self.position, realized = true}
+			end
+			if v.particle then
+				local fx = Object{particle = v.particle, node = v.node, position = self.position, realized = true}
 				table.insert(self.special_effects, fx)
 			end
 		end

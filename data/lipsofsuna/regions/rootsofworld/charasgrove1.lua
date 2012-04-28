@@ -1,10 +1,12 @@
-Pattern{
+Patternspec{
 	name = "charasgrove1",
 	size = Vector(10,10,10),
-	distance = {"lips1",40,60},
+	distance_pattern = "lips1",
+	distance_min = 40,
+	distance_max = 60,
 	position = Vector(700,960,700),
 	position_random = Vector(200,10,200),
-	categories = {"init"},
+	categories = {["init"] = true},
 	obstacles = {
 		{4.23,1.85,3.84,"chara's portal"}},
 	creatures = {

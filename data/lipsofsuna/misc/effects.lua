@@ -1,130 +1,132 @@
-Effect{
+Effectspec{
 	name = "behead1",
-	model = "blood2",
+	particle = "blood2",
 	rotation = false,
 	sound = "squish-000"}
 
-Effect{
+Effectspec{
 	name = "berserk1",
-	model = "spell1",
+	particle = "spell1",
 	sound = "spellberserk1"}
 
-Effect{
+Effectspec{
 	name = "builtrock1",
 	sound = "builtrock1",
 	sound_delay = 0.1}
 
-Effect{
+Effectspec{
 	name = "builtwood1",
 	sound = "builtwood1",
 	sound_delay = 0.1}
 
-Effect{
+Effectspec{
 	name = "craftmetal1",
 	sound = "craftmetal1"}
 
-Effect{
+Effectspec{
 	name = "craftpotion1",
 	sound = "craftpotion1"}
 
-Effect{
+Effectspec{
 	name = "craftsewing1",
 	sound = "craftsewing1"}
 
-Effect{
+Effectspec{
 	name = "craftwood1",
 	sound = "craftwood1"}
 
-Effect{
+Effectspec{
 	name = "disease1",
 	sound = "diseasecontact1"}
 
-Effect{
+Effectspec{
 	name = "explosion1",
-	model = "explosion1",
+	particle = "explosion1",
 	quake = 1,
 	sound = "explosion1"}
 
-Effect{
+Effectspec{
 	name = "fleshimpact1",
-	model = "blood1",
+	particle = "blood1",
 	sound = "thud-000"}
 
-Effect{
+Effectspec{
 	name = "fireball1",
 	sound = "fire-000"}
 
-Effect{
+Effectspec{
 	name = "firewall1",
-	model = "firewall1"}
+	particle = "firewall1"}
 
-Effect{
+Effectspec{
 	name = "collapse1",
-	model = "dust1",
+	particle = "dust1",
 	sound = "destroyrock1"}
 
-Effect{
+Effectspec{
 	name = "collapse2",
-	model = "dust2",
+	particle = "dust2",
 	sound = "destroyrock1"}
 
-Effect{
+Effectspec{
 	name = "growl1",
 	sound = "growl-000",
-	sound_pitch = 0.1}
+	sound_pitch_min = 0.9,
+	sound_pitch_max = 1.1}
 
-Effect{
+Effectspec{
 	name = "harvest1",
 	sound = "scissor1"}
 
-Effect{
+Effectspec{
 	name = "light1",
-	model = "spell2",
+	particle = "spell2",
 	rotation = false,
 	sound = "spelllight1"}
 
-Effect{
+Effectspec{
 	name = "heal1",
-	model = "heal1",
+	particle = "heal1",
 	sound = "spellhealing1"}
 
-Effect{
+Effectspec{
 	name = "impact1",
 	sound = "thud-000",
-	sound_pitch = 0.1}
+	sound_pitch_min = 0.9,
+	sound_pitch_max = 1.1}
 
-Effect{
+Effectspec{
 	name = "portal1",
 	sound = "portal1"}
 
-Effect{
+Effectspec{
 	name = "potiondrink1",
 	sound = "potiondrink1"}
 
-Effect{
+Effectspec{
 	name = "quest1",
 	sound = "quest1",
 	sound_positional = false}
 
-Effect{
+Effectspec{
 	name = "sanctuary1",
-	model = "sanctuary1",
+	particle = "sanctuary1",
 	sound = "spellsanctuary1"}
 
-Effect{
+Effectspec{
 	name = "selfdestruct1",
-	model = "particle1",
+	particle = "particle1",
 	sound = "selfdestructcountdown1"}
 
-Effect{
+Effectspec{
 	name = "step1",
 	sound = "stepdirt_2",
 	sound_volume = 0.6}
 
-Effect{
+Effectspec{
 	name = "swing1",
 	sound = "swing-000"}
 
-Effect{
+Effectspec{
 	name = "wield1",
 	sound = "wield-000"}

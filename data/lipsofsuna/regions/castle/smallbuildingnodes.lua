@@ -1,4 +1,4 @@
-Pattern{
+Patternspec{
 	name = "smallbuildingnodes",
 	size = Vector(10,10,10),
 	categories = {},

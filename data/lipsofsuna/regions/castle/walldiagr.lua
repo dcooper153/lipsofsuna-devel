@@ -1,4 +1,4 @@
-Pattern{
+Patternspec{
 	name = "walldiagr",
 	size = Vector(10,10,10),
 	categories = {},

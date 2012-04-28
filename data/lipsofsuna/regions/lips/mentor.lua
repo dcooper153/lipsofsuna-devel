@@ -1,4 +1,4 @@
-Dialogspec{name="mentor", unique = true,
+Dialogspec{name = "mentor", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"say", "Mentor", "Hello there! Welcome to Lips! The world is still in developmental turmoil, so excuse the mess. Oh, also I was said to tell you this when you arrive by a cloaked figure, it seemed to be a man, but he didn’t say his name and shortly left afterwards. It doesn’t make much sense to me, so maybe you’ll have better luck! He said “Jump with Space, Climb with C, Swap to First-Person mode with Y, press Esc for the menu (and look at the further help there), I hope you’ve worked out how to move by now"},
@@ -10,4 +10,4 @@ Dialogspec{name="mentor", unique = true,
 		{"choice", "Goodbye",
 			{"exit"}},
 		{"loop"}}
-	}
+	}}

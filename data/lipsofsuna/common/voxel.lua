@@ -144,7 +144,7 @@ end
 --   <li>point: Position vector, in tiles.</li>
 --   <li>rotation: Counter-clockwise rotation in 90 degree steps.</li></ul>
 Voxel.place_pattern = function(clss, args)
-	local pat = Pattern:random(args)
+	local pat = Patternspec:random(args)
 	if not pat then return end
 	-- Initialize rotation
 	local coord

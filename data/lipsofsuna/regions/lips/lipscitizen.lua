@@ -1,14 +1,14 @@
-Species{
+Actorspec{
 	name = "Lips citizen",
 	base = "aer",
 	dialog = "lips citizen",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"leather top", "leather pants", "leather leggings"},
+	inventory_items = {["leather top"] = 1, ["leather pants"] = 1, ["leather leggings"] = 1},
 	ai_type = "camper",
 	personality = "feeble"}
 
-Dialogspec{name = "lips citizen",
+Dialogspec{name = "lips citizen", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"say", "Citizen", "Greetings!"},
@@ -24,4 +24,4 @@ Dialogspec{name = "lips citizen",
 				{"say", "Citizen", "Nothing apart from the end of the world."}}},
 		{"choice", "Goodbye.",
 			{"exit"}},
-		{"loop"}}}
+		{"loop"}}}}

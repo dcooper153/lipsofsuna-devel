@@ -4,7 +4,6 @@ Program:add_path(Mod.path .. "shaders")
 
 if not Settings then
 	-- Modelbuilder only
-	require "common/effect"
 	require "common/model"
 	require "common/material"
 else
@@ -12,7 +11,6 @@ else
 	Voxel.tiles_per_line = 12
 	require "common/color"
 	require "common/crafting"
-	require "common/effect"
 	require "common/material"
 	require "common/marker"
 	require "common/model"

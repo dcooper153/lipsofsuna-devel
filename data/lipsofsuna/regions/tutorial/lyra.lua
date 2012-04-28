@@ -1,4 +1,4 @@
-Species{
+Actorspec{
 	name = "Expedition Leader Lyra",
 	base = "aer",
 	dialog = "lyra",
@@ -7,9 +7,9 @@ Species{
 	eye_style = "random",
 	hair_style = "random",
 	personality = "feeble",
-	inventory_items = {"dress"}}
+	inventory_items = {["dress"] = 1}}
 
-Dialogspec{name = "lyra",
+Dialogspec{name = "lyra", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"branch", cond_not = "lyra introduced",
@@ -51,4 +51,4 @@ Dialogspec{name = "lyra",
 	{"say","Expedition Leader Lyra","I'd love to stay and chat, but the next freight of monster meat is arriving in a short while, and I have to reinforce my reserves of patience"},
 	{"choice", "Goodbye.",
 		{"exit"}},
-	{"loop"}}
+	{"loop"}}}

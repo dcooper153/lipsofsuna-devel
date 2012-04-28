@@ -4,7 +4,7 @@ Itemspec{
 	model = "book-000",
 	mass = 2,
 	action_use = "read",
-	categories = {"book"},
+	categories = {["book"] = true},
 	dialog = "sealedlibrarybook",
 	book_text = [[
 

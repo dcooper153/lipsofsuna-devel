@@ -1,4 +1,4 @@
-Dialogspec{name = "the hoarder", unique = true,
+Dialogspec{name = "the hoarder", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"branch",
@@ -30,9 +30,9 @@ Dialogspec{name = "the hoarder", unique = true,
 			{"loop"}},
 		{"choice", "Goodbye.",
 			{"exit"}},
-		{"loop"}}}
+		{"loop"}}}}
 
-Dialogspec{name = "the hoarder death",
+Dialogspec{name = "the hoarder death", commands = {
 	{"quest", "The Hoarder", status = "completed", marker = "the hoarder", text = "The Hoarder has been killed."},
 	{"flag", "silverspring known"},
-	{"flag", "the hoarder dead"}}
+	{"flag", "the hoarder dead"}}}

@@ -385,9 +385,12 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["func"] = function(vm, c)
-			local f = c[2]
+			local f = loadstring("return function(q)\n" .. c[2] .. "\nend")
 			vm[1].pos = vm[1].pos + 1
-			f(self)
+			if f then
+				local e,g = pcall(f)
+				if g then g(self) end
+			end
 		end,
 		["give player item"] = function(vm, c)
 			vm[1].pos = vm[1].pos + 1
@@ -504,7 +507,7 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["spawn pattern"] = function(vm, c)
-			local pat = Pattern:find{name = c[2]}
+			local pat = Patternspec:find{name = c[2]}
 			if pat then
 				local pos = select_spawn_position(c) * Voxel.tile_scale - pat.size * 0.5
 				pos = pos:round()

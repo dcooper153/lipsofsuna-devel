@@ -5,43 +5,71 @@ Obstaclespec.type = "obstacle"
 Obstaclespec.dict_id = {}
 Obstaclespec.dict_cat = {}
 Obstaclespec.dict_name = {}
+Obstaclespec.introspect = Introspect{
+	name = "Obstaclespec",
+	fields = {
+		{name = "name", type = "string", description = "Name of the spec."},
+		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+		{name = "collision_group", type = "number", default = 0x1000, description = "Collision group."},
+		{name = "collision_mask", type = "number", default = 0xFF, description = "Collision mask."},
+		{name = "constraints", type = "list", list = {type = "string", details = {spec = "Constraintspec"}}, default = {}, description = "List of constraints."},
+		{name = "dialog", type = "string", description = "Dialog name.", details = {spec = "Dialogspec"}},
+		{name = "harvest_behavior", type = "string", default = "keep", description = "Harvest behavior: keep/destroy."},
+		{name = "harvest_effect", type = "string", description = "Effect to play when harvested."},
+		{name = "harvest_materials", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of harvestable materials.", details = {keys = {spec = "Itemspec"}}},
+		{name = "destroy_actions", type = "list", list = {type = "string"}, default = {}, description = "List of actions to perform when the obstacle is destroyed."},
+		{name = "destroy_items", type = "list", list = {type = "spawn"}, default = {}, description = "List of items to spawn when the obstacle is destroyed."},
+		{name = "health", type = "number", description = "Number of hit points the obstacle has."},
+		{name = "interactive", type = "boolean", default = true, description = "False to make the object not appear interactive."},
+		{name = "marker", type = "string", description = "Map marker name."},
+		{name = "mass", type = "number", default = 10, description = "Mass in kilograms."},
+		{name = "model", type = "string", description = "Model to use for the obstacle."},
+		{name = "physics", type = "string", default = "static", description = "Physics mode."},
+		{name = "special_effects", type = "list", list = {type = "string", details = {value = {spec = "Effectspec"}}}, default = {}, description = "List of special effects to render."},
+		{name = "vulnerabilities", type = "dict", dict = {type = "number"}, description = "Dictionary of damage vulnerabilities."}
+	}}
 
 --- Creates a new obstacle specification.
 -- @param clss Obstaclespec class.
--- @param args Arguments.<ul>
---   <li>collision_group: Collision group.</li>
---   <li>collision_mask: Collision mask.</li>
---   <li>categories: List of categories to which the obstacle belongs.</li>
---   <li>harvest_behavior: Harvest behavior: "keep"/"destroy".</li>
---   <li>harvest_effect: Effect to play when harvested.</li>
---   <li>harvest_materials: Dictionary of harvestable materials.</li>
---   <li>destroy_actions: List of actions to perform when the obstacle is destroyed.</li>
---   <li>destroy_items: List of items to spawn when the obstacle is destroyed.</li>
---   <li>health: Number of hit points the obstacle has.</li>
---   <li>interactive: False to make the object not appear interactive.</li>
---   <li>mass: Mass in kilograms.</li>
---   <li>model: Model to use for the obstacle.</li>
---   <li>name: Name of the obstacle type.</li>
---   <li>physics: Physics mode.</li>
---   <li>special_effects: List of special effects to render. (see itemspec for details)</li></ul>
+-- @param args Arguments.
 -- @return New item specification.
 Obstaclespec.new = function(clss, args)
 	local self = Spec.new(clss, args)
-	local copy = function(f, d) if self[f] == nil then self[f] = d end end
+	self.introspect:read_table(self, args)
 	self.harvest_enabled = args.harvest_materials ~= nil
-	copy("collision_group", 0x1000)
-	copy("collision_mask", 0xFF)
-	copy("constraints", {})
-	copy("harvest_behavior", "keep")
-	copy("harvest_materials", {})
-	copy("destroy_actions", {})
-	copy("destroy_items", {})
-	copy("gravity", Vector(0, -15, 0))
-	copy("interactive", true)
-	copy("mass", 10)
-	copy("physics", "static")
-	copy("special_effects", {})
 	return self
+end
+
+--- Finds the constraints of the obstacle.
+-- @param self Obstacle spec.
+-- @return List of constraint specs, or nil.
+Obstaclespec.get_constraints = function(self)
+	if not self.constraints then return end
+	local res = {}
+	for k,v in pairs(self.constraints) do
+		local con = Constraintspec:find{name = v}
+		if con then
+			table.insert(res, con)
+		end
+	end
+	if #res == 0 then return end
+	return res
+end
+
+--- Finds the special effects of the obstacle.
+-- @param self Obstacle spec.
+-- @return List of effect specs, or nil.
+Obstaclespec.get_special_effects = function(self)
+	if not self.special_effects then return end
+	local res = {}
+	for k,v in pairs(self.special_effects) do
+		local eff = Effectspec:find{name = v}
+		if eff then
+			table.insert(res, eff)
+		end
+	end
+	if #res == 0 then return end
+	return res
 end
 
 --- Returns a random obstacle spec.

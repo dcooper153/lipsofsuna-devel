@@ -45,8 +45,19 @@ require "system/reload"
 require "system/widgets"
 end
 
-Itemspec:validate()
+Actorspec:validate_all()
+Actorpresetspec:validate_all()
+Animationspec:validate_all()
 Dialogspec:validate_all()
+Factionspec:validate_all()
+Iconspec:validate_all()
+Itemspec:validate_all()
+Obstaclespec:validate_all()
+Patternspec:validate_all()
+Questspec:validate_all()
+Skillspec:validate_all()
+Spellspec:validate_all()
+Staticspec:validate_all()
 
 if Settings.quit then Program.quit = true end
 if Settings.server then

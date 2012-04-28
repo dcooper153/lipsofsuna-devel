@@ -1,4 +1,4 @@
-Dialogspec{name = "smallbuildings",
+Dialogspec{name = "smallbuildings", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"branch",
@@ -31,7 +31,5 @@ Dialogspec{name = "smallbuildings",
 	{"choice", "Cancel",
 		{"exit"}}},
 	{"branch", check = {{"var", "built"}},
-	{"func", function(q)
-						--	q.object:damaged{amount = 200, type = "physical"}
-					end}},
-	{"loop"}}
+		{"func", [[--q.object:damaged{amount = 200, type = "physical"}]]}},
+	{"loop"}}}

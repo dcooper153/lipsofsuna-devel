@@ -1,4 +1,4 @@
-Species{
+Actorspec{
 	name = "Zyra the Mage",
 	base = "aer",
 	dialog = "zyra",
@@ -7,9 +7,9 @@ Species{
 	eye_style = "random",
 	hair_style = "random",
 	personality = "noble",
-	inventory_items = {"dress"}}
+	inventory_items = {["dress"] = 1}}
 
-Dialogspec{name = "zyra",
+Dialogspec{name = "zyra", commands = {
 	{"default death check"},
 	{"branch", check = {{"!flag", "zyra complained"}},
 		{"flag", "zyra complained"},
@@ -36,4 +36,4 @@ Dialogspec{name = "zyra",
 		{"choice", "Goodbye.",
 			{"exit"}},
 		{"loop"}
-	}}   
+	}}}

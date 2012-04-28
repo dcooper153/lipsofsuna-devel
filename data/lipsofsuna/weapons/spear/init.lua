@@ -4,8 +4,8 @@ Itemspec{
 	name = "iron spear",
 	model = "spear1",
 	icon = "staff1", --FIXME
-	categories = {"melee", "weapon"},
-	crafting_materials = {["iron"] = 4},
+	categories = {["melee"] = true, ["weapon"] = true},
+	crafting_materials = {["iron ingot"] = 4},
 	effect_attack_speedline = true,
 	influences = {["physical damage"] = 10},
 	influences_bonus = {"melee"},

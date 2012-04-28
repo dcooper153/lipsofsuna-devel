@@ -1,6 +1,6 @@
 Aiactionspec{
 	name = "throw",
-	categories = {"combat", "offensive"},
+	categories = {["combat"] = true, ["offensive"] = true},
 	calculate = function(self, args)
 		if not args.attack then return end
 		if not args.spec.can_throw then return end

@@ -1,4 +1,4 @@
-Dialogspec{name= "guildmastersam", unique = true,
+Dialogspec{name= "guildmastersam", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"branch", cond_not= "mining guild member",
@@ -70,4 +70,4 @@ Dialogspec{name= "guildmastersam", unique = true,
 		{"choice","Goodbye",{"exit"}},
 		{"loop"}
 	}
-} 
+}}

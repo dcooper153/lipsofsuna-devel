@@ -5,20 +5,26 @@ Actorpresetspec.type = "actorpresetspec"
 Actorpresetspec.dict_id = {}
 Actorpresetspec.dict_cat = {}
 Actorpresetspec.dict_name = {}
+Actorpresetspec.introspect = Introspect{
+	name = "Actorpresetspec",
+	fields = {
+		{name = "name", type = "string", description = "Name of the spec."},
+		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+		{name = "body", type = "list", list = {type = "number"}, description = "Body morph table."},
+		{name = "eye_color", type = "color", description = "Eye color."},
+		{name = "face", type = "list", list = {type = "number"}, description = "Face morph table."},
+		{name = "hair_color", type = "color", description = "Hair color."},
+		{name = "hair_style", type = "string", description = "Hair style name."},
+		{name = "skin_color", type = "color", description = "Skin color."},
+		{name = "height", type = "number", description = "Height multiplier."}
+	}}
 
 --- Registers an actor preset.
 -- @param clss Actorpresetspec class.
--- @param args Arguments.<ul>
---   <li>body: Body morph table.</li>
---   <li>eye_color: Eye color.</li>
---   <li>face: Face morph table.</li>
---   <li>hair_color: Hair color.</li>
---   <li>hair_style: Hair style name.</li>
---   <li>skin_color: Skin color.</li>
---   <li>height: Height multiplier.</li>
---   <li>name: Preset name.</li></ul>
+-- @param args Arguments.
 -- @return New actor preset spec.
 Actorpresetspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
+	self.introspect:read_table(self, args)
 	return self
 end

@@ -1,6 +1,6 @@
 Aiactionspec{
 	name = "move forward",
-	categories = {"combat", "offensive"},
+	categories = {["combat"] = true, ["offensive"] = true},
 	calculate = function(self, args)
 		if not args.allow_forward and not args.allow_forward_jump then return end
 		if args.dist < args.hint then return end

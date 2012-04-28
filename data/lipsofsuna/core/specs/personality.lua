@@ -5,18 +5,23 @@ Personalityspec.type = "personality"
 Personalityspec.dict_id = {}
 Personalityspec.dict_cat = {}
 Personalityspec.dict_name = {}
+Personalityspec.introspect = Introspect{
+	name = "Personalityspec",
+	fields = {
+		{name = "name", type = "string", description = "Name of the spec."},
+		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+		{name = "phrases_angered", type = "list", list = {type = "string"}, description = "List of angered phrases."},
+		{name = "phrases_combat", type = "list", list = {type = "string"}, description = "List of combat phrases."},
+		{name = "phrases_death", type = "list", list = {type = "string"}, description = "List of death phrases."}
+	}}
 
 --- Registers an actor personality.
 -- @param clss Personalityspec class.
--- @param args Arguments.<ul>
---   <li>categories: List of categories.</li>
---   <li>name: Personality name.</li>
---   <li>phrases_angered: List of angered phrases.</li>
---   <li>phrases_combat: List of combat phrases.</li>
---   <li>phrases_death: List of death phrases.</li></ul>
+-- @param args Arguments.
 -- @return New personality spec.
 Personalityspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
+	self.introspect:read_table(self, args)
 	return self
 end
 

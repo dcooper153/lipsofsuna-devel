@@ -90,12 +90,15 @@ Object.animate = function(self, name, force_temporary)
 	-- Prevent animation when dead.
 	-- This is a simple way to ensure that dead creatures look like dead.
 	if self.dead then return end
+	-- Get the animation spec.
+	if not self.spec.get_animation then return end
+	local anim = self.spec:get_animation(name)
+	if not anim then return end
 	-- Maintain channels.
 	-- When objects enter the vision of a player, the player class enumerates
 	-- through the persistent animations and sends them to the client. We need
 	-- to store them so that newly seen objects don't appear unanimated.
-	local anim = self.spec.animations[name]
-	if anim and anim.channel then
+	if anim.channel then
 		if anim.permanent and not force_temporary then
 			if not self.animations then self.animations = {} end
 			local prev = self.animations[anim.channel]

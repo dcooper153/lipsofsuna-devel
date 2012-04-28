@@ -1,9 +1,9 @@
-Pattern{
+Patternspec{
 	name = "lips1",
 	size = Vector(48,16,48),
 	position = Vector(700,100,700),
 	spawn_point = Vector(12,5,12),
-	categories = {"init"},
+	categories = {["init"] = true},
 	items = {
 		{9.050000,8.280000,27.030000,"stone's sword"},
 		{21.910000,5.990000,4.010000,"chair"},

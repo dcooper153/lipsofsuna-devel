@@ -1,48 +1,43 @@
 require(Mod.path .. "spec")
 
-Pattern = Class(Spec)
-Pattern.type = "pattern"
-Pattern.dict_id = {}
-Pattern.dict_cat = {}
-Pattern.dict_name = {}
+Patternspec = Class(Spec)
+Patternspec.type = "pattern"
+Patternspec.dict_id = {}
+Patternspec.dict_cat = {}
+Patternspec.dict_name = {}
+Patternspec.introspect = Introspect{
+	name = "Patternspec",
+	fields = {
+		{name = "name", type = "string", description = "Name of the spec."},
+		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+		{name = "size", type = "vector", default = Vector(4,4,4), decription = "Pattern size in tiles."},
+		{name = "distance_pattern", type = "string", decription = "Position reference pattern.", details = {spec = "Patternspec"}},
+		{name = "distance_min", type = "number", default = 11, decription = "Minimum distance to the reference pattern."},
+		{name = "distance_max", type = "number", default = 51, decription = "Maximum distance to the reference pattern."},
+		{name = "position", type = "vector", default = Vector(700,700,700), decription = "World map position, in tiles."},
+		{name = "position_random", type = "vector", default = Vector(), decription = "Position randomization, in tiles."},
+		{name = "spawn_point", type = "vector", decription = "Spawn point position, in tiles."},
+		{name = "items", type = "map object list", default = {}, decription = "List of items to create."},
+		{name = "obstacles", type = "map object list", default = {}, decription = "List of obstacles to create."},
+		{name = "creatures", type = "map object list", default = {}, decription = "List of creatures to create."},
+		{name = "statics", type = "map object list", default = {}, decription = "List of static objects to create."},
+		{name = "tiles", type = "map tile list", default = {}, decription = "List of terrain tiles to create."}
+	}}
 
-Patternspec = Pattern --FIXME
-
---- Creates a new map pattern.
--- @param clss Pattern class.
--- @param args Arguments.<ul>
---   <li>creatures: Array of creatures to create.</li>
---   <li>distance: Distance to another pattern.</li>
---   <li>file: Path to the file where the pattern was specified. Nil for autodetect.</li>
---   <li>items: Array of items to create.</li>
---   <li>position: World map position, in tiles.</li>
---   <li>position_random: Position randomization, in tiles.</li>
---   <li>obstacles: Array of obstacles to create.</li>
---   <li>size: Pattern size in tiles.</li>
---   <li>spawn_point: Spawn point position, in tiles.</li>
---   <li>statics: Array of static objects to create.</li>
---   <li>tiles: Array of terrain tiles to create.</li></ul>
--- @return New map pattern.
-Pattern.new = function(clss, args)
+--- Creates a new pattern specification.
+-- @param clss Patternspec class.
+-- @param args Arguments.
+-- @return New pattern spec.
+Patternspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
-	if not self.file then
-		self.file = Program:get_calling_file(4)
-	end
-	self.creatures = self.creatures or {}
-	self.items = self.items or {}
-	self.obstacles = self.obstacles or {}
-	self.statics = self.statics or {}
-	self.size = self.size or Vector(4,4,4)
-	self.position = self.position or Vector(700,700,700)
-	self.position_random = self.position_random or Vector()
-	self.tiles = self.tiles or {}
+	self.introspect:read_table(self, args)
 	return self
 end
 
 --- Finds patterns that have a spawn point.
 -- @param self Patternspec class.
 -- @return Table of patterns.
-Pattern.find_spawn_points = function(self)
+Patternspec.find_spawn_points = function(self)
 	local list = {}
 	for k,v in pairs(self.dict_id) do
 		if v.spawn_point then
@@ -53,91 +48,10 @@ Pattern.find_spawn_points = function(self)
 end
 
 --- Writes the pattern to a string.
--- @param self Pattern.
+-- @param self Patternspec.
 -- @return String.
-Pattern.write = function(self)
-	-- Format categories.
-	local t = "Pattern{\n\tname = \"" .. self.name .. "\",\n\tsize = " .. tostring(self.size) .. ",\n"
-	if self.distance then
-		t = t .. string.format("\tdistance = {%q,%d,%d},\n", self.distance[1], self.distance[2], self.distance[3])
-	end
-	if self.position then
-		t = t .. "\tposition = " .. tostring(self.position) .. ",\n"
-	end
-	if self.position_random.length >= 1 then
-		t = t .. "\tposition_random = " .. tostring(self.position_random) .. ",\n"
-	end
-	if self.spawn_point then
-		t = t .. "\tspawn_point = " .. tostring(self.spawn_point) .. ",\n"
-	end
-	if self.categories then
-		local categories = {}
-		for k,v in pairs(self.categories) do
-			table.insert(categories, k)
-		end
-		table.sort(categories)
-		if #categories then
-			t = t .. "\tcategories = {"
-			local comma
-			for k,v in ipairs(categories) do
-				if comma then t = t .. "," end
-				t = t .. "\"" .. v .. "\""
-				comma = true
-			end
-			t = t .. "}"
-		end
-	end
-	-- Format objects.
-	local addobj = function(t, k, v)
-		if v[5] then
-			return string.format("%s%s\t\t{%f,%f,%f,%q,%.2f}",
-				t, k > 1 and ",\n" or "", v[1], v[2], v[3], v[4], v[5])
-		else
-			return string.format("%s%s\t\t{%f,%f,%f,%q}",
-				t, k > 1 and ",\n" or "", v[1], v[2], v[3], v[4])
-		end
-	end
-	if #self.items > 0 then
-		t = t .. ",\n\titems = {\n"
-		for k,v in ipairs(self.items) do t = addobj(t, k, v) end
-		t = t .. "}"
-	end
-	if #self.obstacles > 0 then
-		t = t .. ",\n\tobstacles = {\n"
-		for k,v in ipairs(self.obstacles) do t = addobj(t, k, v) end
-		t = t .. "}"
-	end
-	if #self.statics > 0 then
-		t = t .. ",\n\tstatics = {\n"
-		for k,v in ipairs(self.statics) do t = addobj(t, k, v) end
-		t = t .. "}"
-	end
-	if #self.creatures > 0 then
-		t = t .. ",\n\tcreatures = {\n"
-		for k,v in ipairs(self.creatures) do t = addobj(t, k, v) end
-		t = t .. "}"
-	end
-	if #self.tiles > 0 then
-		local y = -1
-		local z = -1
-		local comma
-		t = t .. ",\n\ttiles = {\n"
-		for k,v in ipairs(self.tiles) do
-			local d
-			if comma then
-				d = (y ~= v[2] or z ~= v[3]) and ",\n\t\t" or ", "
-			else
-				d = "\t\t"
-			end
-			comma = true
-			y,z = v[2],v[3]
-			t = string.format("%s%s{%d,%d,%d,%q}", t, d, v[1], v[2], v[3], v[4])
-		end
-		t = t .. "}"
-	end
-	-- Finish the string.
-	t = t .. "}\n"
-	return t
+Patternspec.write = function(self)
+	return self.introspect:write_str(self)
 end
 
 Patternspec:add_getters{

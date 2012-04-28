@@ -4,7 +4,7 @@ Itemspec{
 	model = "book-000",
 	mass = 2,
 	action_use = "read",
-	categories = {"book"},
+	categories = {["book"] = true},
 	book_text = [[
 
 Day 1

@@ -1,2 +1,2 @@
-Dialogspec{name = "agathe",
-	{"say", "Agathe", "TODO"}}
+Dialogspec{name = "agathe", commands = {
+	{"say", "Agathe", "TODO"}}}

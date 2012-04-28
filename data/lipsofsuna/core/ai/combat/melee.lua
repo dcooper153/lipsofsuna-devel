@@ -1,6 +1,6 @@
 Aiactionspec{
 	name = "melee",
-	categories = {"combat", "offensive"},
+	categories = {["combat"] = true, ["offensive"] = true},
 	calculate = function(self, args)
 		-- Make sure that the actor can use melee.
 		if not args.attack then return end

@@ -4,7 +4,7 @@ Itemspec{
 	name = "adamantium dagger",
 	model = "dagger1", -- FIXME
 	icon = "dagger1",
-	categories = {"melee", "weapon"},
+	categories = {["melee"] = true, ["weapon"] = true},
 	crafting_materials = {["adamantium"] = 3},
 	effect_attack_speedline = true,
 	influences = {["physical damage"] = 10},
@@ -16,7 +16,7 @@ Itemspec{
 	name = "aquanite dagger",
 	model = "dagger1", -- FIXME
 	icon = "dagger1",
-	categories = {"melee", "weapon"},
+	categories = {["melee"] = true, ["weapon"] = true},
 	crafting_materials = {["aquanite stone"] = 3},
 	damage_mining = 1,
 	effect_attack_speedline = true,
@@ -31,7 +31,7 @@ Itemspec{
 	name = "crimson dagger",
 	model = "dagger1", -- FIXME
 	icon = "dagger1",
-	categories = {"melee", "weapon"},
+	categories = {["melee"] = true, ["weapon"] = true},
 	crafting_materials = {["crimson stone"] = 3},
 	damage_mining = 1,
 	effect_attack_speedline = true,
@@ -46,7 +46,7 @@ Itemspec{
 	name = "iron dagger",
 	model = "dagger1", -- FIXME
 	icon = "dagger1",
-	categories = {"melee", "weapon"},
+	categories = {["melee"] = true, ["weapon"] = true},
 	crafting_materials = {["iron ingot"] = 1},
 	damage_mining = 1,
 	effect_attack_speedline = true,
@@ -61,7 +61,7 @@ Itemspec{
 	name = "stone dagger",
 	model = "dagger1", -- FIXME
 	icon = "dagger1",
-	categories = {"melee", "weapon"},
+	categories = {["melee"] = true, ["weapon"] = true},
 	crafting_materials = {["granite stone"] = 2},
 	damage_mining = 1,
 	effect_attack_speedline = true,
@@ -75,7 +75,7 @@ Itemspec{
 	name = "wooden dagger",
 	model = "woodshortsword", -- FIXME
 	icon = "dagger1",
-	categories = {"melee", "weapon"},
+	categories = {["melee"] = true, ["weapon"] = true},
 	crafting_materials = {["log"] = 2},
 	damage_mining = 1,
 	effect_attack_speedline = true,

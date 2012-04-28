@@ -5,11 +5,10 @@ Itemspec{
 	model = "book-000",
 	icon = "cloth1",
 	armor_class = 0.04,
-	categories = {"armor"},
+	categories = {["armor"] = true},
 	crafting_materials = {hide = 1},
 	effect_craft = "craftsewing1",
-	equipment_models = {
-		["aermale"] = {upper = "aermale1shirt1"}},
+	equipment_models = {["aermale"] = {upper = "aermale1shirt1"}},
 	equipment_slot = "upperbody",
 	mass = 1,
 	water_gravity = Vector(0,6,0)}
@@ -19,21 +18,18 @@ Itemspec{
 	icon = "cloth1",
 	model = "book-000",
 	armor_class = 0.04,
-	categories = {"armor"},
+	categories = {["armor"] = true},
 	crafting_materials = {hide = 1},
 	effect_craft = "craftsewing1",
-	equipment_models = {
-		["aermale"] = {legs = "aermale1pants1"}},
+	equipment_models = {["aermale"] = {legs = "aermale1pants1"}},
 	equipment_slot = "lowerbody",
 	mass = 1,
 	water_gravity = Vector(0,6,0)}
 
-Species{
+Actorspec{
 	name = "aermale",
 	base = "race",
-	animations = {
-		["land ground"] = {animation = "land", channel = 5, fade_in = 0.1, fade_out = 0.5, weight = 10, node_weights = {LOWER = 1000}},
-		["spell self"] = {animation = "spell-self", channel = 2, weight = 30}},
+	animations = {["land ground"] = "aermale land ground", ["spell self"] = "aermale spell self"},
 	effect_falling_damage = "aerhurt1",
 	equipment_class = "aermale",
 	model = "aermale1",
@@ -46,16 +42,14 @@ Species{
 		feet = "aermale1feet1",
 		eyes = "aermale1eyes1",
 		upper = "aermale1chest1"},
-	hair_styles = {
-		{"Bald", ""},
-		{"Short", "aermale1hair1"}},
+	hair_styles = {["Bald"] = "", ["Short"] = "aermale1hair1"},
 	tilt_bone = {"back1", "back2", "back3"},
 	timing_attack_throw = 4,
 	timing_spell_ranged = 4,
 	timing_spell_touch = 4}
 
 -- TODO
-Species{
+Actorspec{
 	name = "androidmale",
 	base = "android",
 	equipment_class = "aermale",
@@ -69,11 +63,10 @@ Species{
 		feet = "aermale1feet1",
 		eyes = "aermale1eyes1",
 		upper = "aermale1chest1"},
-	hair_styles = {
-		{"Short", "aermale1hair1"}}}
+	hair_styles = {["Short"] = "aermale1hair1"}}
 
 -- TODO
-Species{
+Actorspec{
 	name = "wyrmmale",
 	base = "wyrm",
 	equipment_class = "aermale",
@@ -87,18 +80,17 @@ Species{
 		feet = "aermale1feet1",
 		eyes = "aermale1eyes1",
 		upper = "aermale1chest1"},
-	hair_styles = {
-		{"Short", "aermale1hair1"}}}
+	hair_styles = {["Short"] = "aermale1hair1"}}
 
-Species{
+Actorspec{
 	name = "lipscitizenmale",
 	base = "aermale",
 	dialog = "lips citizen",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"leather chest", "leather pants", "leather boots", "leather gloves", "leather helm"}}
+	inventory_items = {["leather chest"] = 1, ["leather pants"] = 1, ["leather boots"] = 1, ["leather gloves"] = 1, ["leather helm"] = 1}}
 
-Species{
+Actorspec{
 	name = "Mentor",
 	base = "aermale",
 	dialog = "mentor",
@@ -107,9 +99,9 @@ Species{
 	ai_enable_wander = false,
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"shirt", "pants", "leather boots"}}
+	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1}}
 
-Species{
+Actorspec{
 	name = "Col",
 	base = "aermale",
 	dialog = "col",
@@ -118,9 +110,9 @@ Species{
 	ai_enable_wander = false,
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"shirt", "pants", "leather boots"}}
+	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1}}
 
-Species{
+Actorspec{
 	name = "Guildmaster Sam",
 	base = "aermale",
 	dialog = "guildmastersam",
@@ -129,16 +121,18 @@ Species{
 	ai_enable_wander = false,
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"shirt", "pants", "leather boots","adamantium mattock"}}
+	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1, ["adamantium mattock"] = 1}}
 
-Species{
+Actorspec{
 	name = "Roland",
 	base = "aermale",
 	dialog = "roland",
 	marker = "roland",
 	ai_enable_combat = false,
 	ai_enable_wander = false,
-	eye_style = {"default",255,0,0},
-	factions = {"neutral"},
-	hair_style = {"aermale1hair1",128,128,128},
-	inventory_items = {"shirt", "pants", "leather boots"}}
+	eye_color = {255,0,0},
+	eye_style = "default",
+	factions = {["neutral"] = true},
+	hair_color = {128,128,128},
+	hair_style = "aermale1hair1",
+	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1}}

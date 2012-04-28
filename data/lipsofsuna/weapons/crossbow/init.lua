@@ -1,6 +1,6 @@
 Program:add_path(Mod.path)
 
-Effect{
+Effectspec{
 	name = "crossbow1",
 	sound = "weaponcrossbow1"}
 
@@ -12,13 +12,13 @@ Itemspec{
 	animation_attack = "attack crossbow",
 	animation_charge = "charge crossbow",
 	animation_hold = "hold crossbow",
-	categories = {"ranged", "weapon"},
+	categories = {["ranged"] = true, ["weapon"] = true},
 	crafting_materials = {["adamantium"] = 9},
 	effect_attack = "crossbow1",
 	influences = {["physical damage"] = 15},
 	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
-	equipment_slots_reserved = {"hand.L"},
+	equipment_slots_reserved = {["hand.L"] = true},
 	mass = 15}
 
 Itemspec{
@@ -29,14 +29,14 @@ Itemspec{
 	animation_attack = "attack crossbow",
 	animation_charge = "charge crossbow",
 	animation_hold = "hold crossbow",
-	categories = {"ranged", "weapon"},
+	categories = {["ranged"] = true, ["weapon"] = true},
 	crafting_materials = {["aquanite stone"] = 9},
 	effect_attack = "crossbow1",
 	effect_craft = "craftmetal1",
 	influences = {["cold damage"] = 6, ["physical damage"] = 6},
 	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
-	equipment_slots_reserved = {"hand.L"},
+	equipment_slots_reserved = {["hand.L"] = true},
 	mass = 15}
 
 Itemspec{
@@ -47,12 +47,12 @@ Itemspec{
 	animation_attack = "attack crossbow",
 	animation_charge = "charge crossbow",
 	animation_hold = "hold crossbow",
-	categories = {"ranged", "weapon"},
+	categories = {["ranged"] = true, ["weapon"] = true},
 	crafting_materials = {["crimson stone"] = 9},
 	effect_attack = "crossbow1",
 	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
-	equipment_slots_reserved = {"hand.L"},
+	equipment_slots_reserved = {["hand.L"] = true},
 	influences = {["fire damage"] = 6, ["physical damage"] = 6},
 	influences_bonus = {"ranged"},
 	mass = 15}
@@ -65,14 +65,14 @@ Itemspec{
 	animation_attack = "attack crossbow",
 	animation_charge = "charge crossbow",
 	animation_hold = "hold crossbow",
-	categories = {"ranged", "weapon"},
+	categories = {["ranged"] = true, ["weapon"] = true},
 	crafting_materials = {["iron ingot"] = 3},
 	effect_attack = "crossbow1",
 	effect_craft = "craftmetal1",
 	influences = {["physical damage"] = 8},
 	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
-	equipment_slots_reserved = {"hand.L"},
+	equipment_slots_reserved = {["hand.L"] = true},
 	mass = 15}
 
 Itemspec{
@@ -83,13 +83,13 @@ Itemspec{
 	animation_attack = "attack crossbow",
 	animation_charge = "charge crossbow",
 	animation_hold = "hold crossbow",
-	categories = {"ranged", "weapon"},
+	categories = {["ranged"] = true, ["weapon"] = true},
 	crafting_materials = {["log"] = 5},
 	effect_attack = "crossbow1",
 	effect_craft = "craftwood1",
 	influences = {["physical damage"] = 4},
 	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
-	equipment_slots_reserved = {"hand.L"},
+	equipment_slots_reserved = {["hand.L"] = true},
 	water_gravity = Vector(0,6,0),
 	mass = 7}

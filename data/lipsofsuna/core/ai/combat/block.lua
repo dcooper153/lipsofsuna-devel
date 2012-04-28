@@ -1,6 +1,6 @@
 Aiactionspec{
 	name = "block",
-	categories = {"combat", "defensive"},
+	categories = {["combat"] = true, ["defensive"] = true},
 	calculate = function(self, args)
 		if not args.spec.ai_enable_block then return end
 		if args.dist > args.hint then return end

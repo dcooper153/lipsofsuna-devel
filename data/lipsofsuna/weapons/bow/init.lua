@@ -1,9 +1,16 @@
 Program:add_path(Mod.path)
 
+Effectspec{
+	name = "firearrow1",
+	node = "#root",
+	light = true,
+	light_diffuse = {1,1,1,1},
+	light_equation = {1,0.1,0.01}}
+
 Itemspec{
 	name = "arrow",
 	model = "arrow-000",
-	categories = {"arrow"},
+	categories = {["arrow"] = true},
 	influences = {["physical damage"] = 5},
 	crafting_count = 10,
 	crafting_materials = {["log"] = 1},
@@ -17,7 +24,7 @@ Itemspec{
 Itemspec{
 	name = "fire arrow",
 	model = "arrow-000",
-	categories = {"arrow"},
+	categories = {["arrow"] = true},
 	influences = {["physical damage"] = 5},
 	crafting_count = 10,
 	crafting_materials = {["log"] = 1},
@@ -25,14 +32,13 @@ Itemspec{
 	mass = 1,
 	mass_inventory = 0.1,
 	stacking = true,
-	special_effects = {
-		{node = "#root", type = "light", equation = {1,0.1,0.01}, diffuse = {1,1,1,1}}},
+	special_effects = {"firearrow1"},
 	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "explosive arrow",
 	model = "arrow-000",
-	categories = {"arrow","explosive"},
+	categories = {["arrow"] = true, ["explosive"] = true},
 	influences = {["physical damage"] = 5},
 	crafting_count = 10,
 	crafting_materials = {["log"] = 1},
@@ -52,13 +58,13 @@ Itemspec{
 	animation_attack = "attack bow",
 	animation_charge = "charge bow",
 	animation_hold = "hold bow",
-	categories = {"ranged", "weapon"},
+	categories = {["ranged"] = true, ["weapon"] = true},
 	crafting_materials = {["log"] = 5},
 	effect_craft = "craftwood1",
 	influences = {["physical damage"] = 4},
 	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
-	equipment_slots_reserved = {"hand.L"},
+	equipment_slots_reserved = {["hand.L"] = true},
 	water_gravity = Vector(0,6,0),
 	mass = 7}
 
@@ -70,13 +76,13 @@ Itemspec{
 	animation_attack = "attack bow",
 	animation_charge = "charge bow",
 	animation_hold = "hold bow",
-	categories = {"ranged", "weapon"},
+	categories = {["ranged"] = true, ["weapon"] = true},
 	crafting_materials = {["log"] = 5},
 	effect_craft = "craftwood1",
 	influences = {["physical damage"] = 4},
 	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
-	equipment_slots_reserved = {"hand.L"},
+	equipment_slots_reserved = {["hand.L"] = true},
 	water_gravity = Vector(0,6,0),
 	mass = 7}
 
@@ -88,12 +94,12 @@ Itemspec{
 	animation_attack = "attack bow",
 	animation_charge = "charge bow",
 	animation_hold = "hold bow",
-	categories = {"ranged", "weapon"},
+	categories = {["ranged"] = true, ["weapon"] = true},
 	crafting_materials = {["log"] = 5},
 	effect_craft = "craftwood1",
 	influences = {["physical damage"] = 4},
 	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
-	equipment_slots_reserved = {"hand.L"},
+	equipment_slots_reserved = {["hand.L"] = true},
 	water_gravity = Vector(0,6,0),
 	mass = 7}

@@ -1,6 +1,6 @@
 Aiactionspec{
 	name = "ranged",
-	categories = {"combat", "offensive"},
+	categories = {["combat"] = true, ["offensive"] = true},
 	calculate = function(self, args)
 		-- Make sure that the actor can use ranged.
 		if not args.attack then return end

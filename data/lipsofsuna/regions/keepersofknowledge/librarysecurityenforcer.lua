@@ -1,4 +1,4 @@
-Dialogspec{name = "librarysecurityenforcer",
+Dialogspec{name = "librarysecurityenforcer", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"branch", cond = "sealed library owned",
@@ -78,4 +78,4 @@ Dialogspec{name = "librarysecurityenforcer",
 		},
 		{"loop"}
 	}
-}
+}}

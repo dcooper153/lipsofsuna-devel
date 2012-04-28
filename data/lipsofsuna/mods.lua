@@ -1,5 +1,6 @@
 -- Core
 Mod:load "core"
+Mod:load "core/introspect"
 Mod:load "core/specs"
 Mod:load "core/ai"
 Mod:load "core/ai/combat"

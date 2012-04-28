@@ -1,19 +1,17 @@
 Program:add_path(Mod.path)
 
-Effect{
+Effectspec{
 	name = "aerhurt1",
 	sound = "thud-000"}
 
-Effect{
+Effectspec{
 	name = "jump1",
 	sound = "hop-000"}
 
-Species{
+Actorspec{
 	name = "aer",
 	base = "race",
-	animations = {
-		["land ground"] = {animation = "land", channel = 5, fade_in = 0.1, fade_out = 0.5, weight = 10, node_weights = {LOWER = 1000}},
-		["spell self"] = {animation = "spell-self", channel = 2, weight = 30}},
+	animations = {["land ground"] = "aer land ground", ["spell self"] = "aer spell self"},
 	effect_falling_damage = "aerhurt1",
 	equipment_class = "aer",
 	model = "aer1",
@@ -31,8 +29,8 @@ Species{
 		upper_safe = "aerbloomerstop1"},
 	tilt_bone = {"back1", "back2", "back3"}}
 
-Species{
+Actorspec{
 	name = "aer-player",
 	base = "aer",
 	ai_enabled = false,
-	inventory_items = {"torch", "workbench", "dress", "leather leggings"}}
+	inventory_items = {["torch"] = 1, ["workbench"] = 1, ["dress"] = 1, ["leather leggings"] = 1}}

@@ -1,10 +1,12 @@
-Pattern{
+Patternspec{
 	name = "silverspring1",
 	size = Vector(32,16,32),
 	position = Vector(700,950,700),
 	position_random = Vector(300,50,300),
-	distance = {"lips1",30,60},
-	categories = {"init"},
+	distance_pattern = "lips1",
+	distance_min = 30,
+	distance_max = 60,
+	categories = {["init"] = true},
 	obstacles = {
 		{2.45,0.99,9.11,"rust sprig tree"},
 		{3.47,0.99,28.8,"rust sprig tree"},

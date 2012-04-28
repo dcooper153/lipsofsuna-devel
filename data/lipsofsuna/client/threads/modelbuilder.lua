@@ -28,12 +28,10 @@ local build = function(args)
 	if args.equipment then
 		for slot,name in pairs(args.equipment) do
 			local spec = Itemspec:find{name = name}
-			if spec and spec.equipment_models then
-				local models = spec:get_equipment_models(species.equipment_class or species.name, lod)
-				if models then
-					for k,v in pairs(models) do
-						meshes[k] = v
-					end
+			local models = spec and spec:get_equipment_models(species.equipment_class or species.name, lod)
+			if models then
+				for k,v in pairs(models) do
+					if v ~= "" then meshes[k] = v end
 				end
 			end
 		end

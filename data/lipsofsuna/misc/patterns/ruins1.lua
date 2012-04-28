@@ -1,7 +1,7 @@
-Pattern{
+Patternspec{
 	name = "ruins1",
 	size = Vector(12,7,8),
-	categories = {"ruins"},
+	categories = {["ruins"] = true},
 	items = {
 		{1.860000,1.990000,3.350000,"chest"},
 		{1.930000,1.980000,4.930000,"chest"}},

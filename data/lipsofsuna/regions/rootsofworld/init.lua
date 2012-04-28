@@ -1,16 +1,19 @@
 Program:add_path(Mod.path)
 
-Quest{name = "Chara's Illusion"}
-Quest{name = "Roots of World"}
+Questspec{
+	name = "Chara's Illusion"}
+
+Questspec{
+	name = "Roots of World"}
 
 Obstaclespec{
 	name = "chara's portal",
 	model = "portal1",
-	categories = {"portal", "special"},
+	categories = {["portal"] = true, ["special"] = true},
 	dialog = "chara's portal",
 	marker = "chara's portal"}
 
-Species{
+Actorspec{
 	name = "Chara",
 	base = "seirei",
 	dialog = "chara",

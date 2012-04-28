@@ -1,6 +1,6 @@
 Aiactionspec{
 	name = "switch weapon",
-	categories = {"combat", "offensive"},
+	categories = {["combat"] = true, ["offensive"] = true},
 	calculate = function(self, args)
 		-- Check that the actor can switch weapons.
 		if not args.spec.ai_enable_weapon_switch then return end

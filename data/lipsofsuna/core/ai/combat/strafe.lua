@@ -1,6 +1,6 @@
 Aiactionspec{
 	name = "strafe",
-	categories = {"combat", "defensive"},
+	categories = {["combat"] = true, ["defensive"] = true},
 	calculate = function(self, args)
 		if args.allow_strafe_left then return 1 end
 		if args.allow_strafe_left_jump then return 1 end

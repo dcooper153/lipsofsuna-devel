@@ -1,8 +1,8 @@
-Dialogspec{name = "scapegoat",
+Dialogspec{name = "scapegoat", commands = {
 	{"branch", cond_dead = true,
-		{"loot"}}}
+		{"loot"}}}}
 
-Dialogspec{name = "scapegoat death",
+Dialogspec{name = "scapegoat death", commands = {
 	{"branch generate", function(self)
 		-- Adds a branch for a random quest.
 		-- One scapegoat can be the mark for multiple kill quests. This function
@@ -35,59 +35,54 @@ Dialogspec{name = "scapegoat death",
 			end
 		end
 		return branch
-	end}}
+	end}}}
 
-Species{
+Actorspec{
 	name = "Bobbles",
-	categories = {"scapegoat"},
+	categories = {["scapegoat"] = true},
 	base = "aer",
-	dialog = "scapegoat",
 	marker = "bobbles",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"},
+	inventory_items = {["dress"] = 1},
 	preset = "Male 3"}
 
-Species{
+Actorspec{
 	name = "Mark",
-	categories = {"scapegoat"},
+	categories = {["scapegoat"] = true},
 	base = "aer",
-	dialog = "scapegoat",
 	marker = "mark",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"},
+	inventory_items = {["dress"] = 1},
 	preset = "Male 1"}
 
-Species{
+Actorspec{
 	name = "Jerkins",
-	categories = {"scapegoat"},
+	categories = {["scapegoat"] = true},
 	base = "aer",
-	dialog = "scapegoat",
 	marker = "jerkins",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"},
+	inventory_items = {["dress"] = 1},
 	preset = "Male 2"}
 
-Species{
+Actorspec{
 	name = "Rubert",
-	categories = {"scapegoat"},
+	categories = {["scapegoat"] = true},
 	base = "aer",
-	dialog = "scapegoat",
 	marker = "rubert",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"},
+	inventory_items = {["dress"] = 1},
 	preset = "Male 3"}
 
-Species{
+Actorspec{
 	name = "Rocky",
-	categories = {"scapegoat"},
+	categories = {["scapegoat"] = true},
 	base = "aer",
-	dialog = "scapegoat",
 	marker = "rocky",
 	eye_style = "random",
 	hair_style = "random",
-	inventory_items = {"dress"},
+	inventory_items = {["dress"] = 1},
 	preset = "Male 2"}

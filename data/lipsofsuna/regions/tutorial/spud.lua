@@ -1,4 +1,4 @@
-Species{
+Actorspec{
 	name = "Drill Sergent Spud",
 	base = "devora",
 	dialog = "spud",
@@ -7,9 +7,9 @@ Species{
 	eye_style = "random",
 	hair_style = "random",
 	personality = "tough",
-	inventory_items = {"lizard dress","torch"}}
+	inventory_items = {["lizard dress"] = 1, ["torch"] = 1}}
 
-Dialogspec{name = "spud",
+Dialogspec{name = "spud", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},
 	{"branch",cond="training quests given",
@@ -60,4 +60,4 @@ Dialogspec{name = "spud",
 		{"choice", "Goodbye.",
 			{"exit"}},
 		{"loop"}
-	}}
+	}}}

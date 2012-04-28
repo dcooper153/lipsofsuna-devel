@@ -5,19 +5,24 @@ Skillspec.type = "skillspec"
 Skillspec.dict_id = {}
 Skillspec.dict_cat = {}
 Skillspec.dict_name = {}
+Skillspec.introspect = Introspect{
+	name = "Skillspec",
+	fields = {
+		{name = "name", type = "string", description = "Name of the spec."},
+		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+		{name = "assign", type = "ignore"},
+		{name = "description", type = "string", description = "Description string."},
+		{name = "icon", type = "string", description = "Icon name."},
+		{name = "requires", type = "list", list = {type = "string"}, default = {}, description = "List of required skills."}
+	}}
 
 --- Registers a skill specifification.
 -- @param clss Skillspec class.
--- @param args Arguments.<ul>
---   <li>assign: Function that is called when the skill is assigned.</li>
---   <li>description: Description string.</li>
---   <li>icon: Icon name.</li>
---   <li>name: Skill name.</li>
---   <li>requires: Table of required skills.</li></ul>
+-- @param args Arguments.
 -- @return New skill spec.
 Skillspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
-	if not self.requires then self.requires = {} end
+	self.introspect:read_table(self, args)
 	return self
 end
 

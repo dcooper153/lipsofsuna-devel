@@ -18,28 +18,28 @@ Itemspec{
 	name = "berry",
 	model = "fruit1",
 	mass = 1,
-	categories = {"material"},
+	categories = {["material"] = true},
 	stacking = true}
 
 Itemspec{
 	name = "flax",
 	model = "book-000", -- FIXME
 	mass = 1,
-	categories = {"material"},
+	categories = {["material"] = true},
 	stacking = true}
 
 Itemspec{
 	name = "fruit",
 	model = "fruit1",
 	mass = 1,
-	categories = {"material"},
+	categories = {["material"] = true},
 	stacking = true}
 
 Itemspec{
 	name = "glass ingot",
 	model = "book-000", -- FIXME
 	icon = "ingot1",
-	categories = {"material"},
+	categories = {["material"] = true},
 	crafting_materials = {["sand chunk"] = 1},
 	health = 10,
 	mass = 1.5,
@@ -50,7 +50,7 @@ Itemspec{
 	model = "book-000", -- FIXME
 	icon = "ingot1",
 	mass = 2,
-	categories = {"build", "material"},
+	categories = {["build"] = true, ["material"] = true},
 	construct_tile = "iron1",
 	construct_tile_count = 1,
 	crafting_materials = {["ferrostone"] = 1},
@@ -62,14 +62,14 @@ Itemspec{
 	model = "book-000", -- FIXME
 	icon = "hide1",
 	mass = 1,
-	categories = {"material"},
+	categories = {["material"] = true},
 	stacking = true}
 
 Itemspec{
 	name = "milky powder",
 	model = "book-000", -- FIXME
 	icon = "potion3",
-	categories = {"material"},
+	categories = {["material"] = true},
 	crafting_count = 20,
 	description = "A magical reagent",
 	crafting_materials = {["mushroom"] = 1},
@@ -81,7 +81,7 @@ Itemspec{
 	name = "wheat",
 	model = "book-000", -- FIXME
 	mass = 1,
-	categories = {"material"},
+	categories = {["material"] = true},
 	stacking = true}
 
 ------------------------------------------------------------------------------
@@ -90,7 +90,7 @@ Itemspec{
 Itemspec{
 	name = "bullet",
 	model = "arrow-000", -- FIXME
-	categories = {"bullet"},
+	categories = {["bullet"] = true},
 	influences = {["physical damage"] = 1},
 	crafting_count = 10,
 	crafting_materials = {["iron ingot"] = 1, ["crimson stone"] = 1},
@@ -108,7 +108,7 @@ Itemspec{
 	model = "fence1",
 	icon = "chest1", -- FIXME
 	mass = 10,
-	categories = {"furniture"},
+	categories = {["furniture"] = true},
 	crafting_materials = {log = 7},
 	effect_craft = "craftwood1",
 	health = 50,
@@ -123,5 +123,5 @@ Itemspec{
 	icon = "gem1",
 	model = "gem-000",
 	mass = 2,
-	categories = {"reagent"},
+	categories = {["reagent"] = true},
 	stacking = true}

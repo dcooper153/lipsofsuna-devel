@@ -1,6 +1,6 @@
 Program:add_path(Mod.path)
 
-Effect{
+Effectspec{
 	name = "revolver1",
 	sound = "weaponmusket1"} -- TODO: Separate sound?
 
@@ -12,7 +12,7 @@ Itemspec{
 	animation_attack = "attack revolver",
 	animation_charge = "charge revolver",
 	animation_hold = "hold revolver",
-	categories = {"ranged", "weapon"},
+	categories = {["ranged"] = true, ["weapon"] = true},
 	crafting_materials = {["adamantium"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
 	influences = {["physical damage"] = 18},
@@ -28,7 +28,7 @@ Itemspec{
 	animation_attack = "attack revolver",
 	animation_charge = "charge revolver",
 	animation_hold = "hold revolver",
-	categories = {"ranged", "weapon"},
+	categories = {["ranged"] = true, ["weapon"] = true},
 	crafting_materials = {["aquanite stone"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
 	influences = {["cold damage"] = 7, ["physical damage"] = 7},
@@ -44,7 +44,7 @@ Itemspec{
 	animation_attack = "attack revolver",
 	animation_charge = "charge revolver",
 	animation_hold = "hold revolver",
-	categories = {"ranged", "weapon"},
+	categories = {["ranged"] = true, ["weapon"] = true},
 	crafting_materials = {["crimson stone"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
 	influences = {["fire damage"] = 7, ["physical damage"] = 7},
@@ -60,7 +60,7 @@ Itemspec{
 	animation_attack = "attack revolver",
 	animation_charge = "charge revolver",
 	animation_hold = "hold revolver",
-	categories = {"ranged", "weapon"},
+	categories = {["ranged"] = true, ["weapon"] = true},
 	crafting_materials = {["iron ingot"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
 	influences = {["physical damage"] = 10},

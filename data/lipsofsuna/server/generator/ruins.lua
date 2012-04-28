@@ -4,7 +4,7 @@ Generator.Ruins = Class()
 Generator.Ruins.class_name = "Generator.Ruins"
 Generator.Ruins.scale1 = Vector(0.3,0.3,0.3)
 Generator.Ruins.scale2 = Vector(0.15,0.3,0.15)
-Generator.Ruins.pats = Pattern:find{category = "ruins"}
+Generator.Ruins.pats = Patternspec:find{category = "ruins"}
 Generator.Ruins.mats = {
 	Material:find{name = "ferrostone1"},
 	Material:find{name = "sand1"},
