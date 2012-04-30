@@ -105,6 +105,122 @@ Spec.validate_all = function(clss)
 	end
 end
 
+--- Writes the spec to its source file.<br/>
+--
+-- This function loads the source Lua file of the spec to a string and attempts
+-- to manually parse it. If the a substring matching the spec is found from the
+-- string, it is replaced with the serialized version of the spec.<br/>
+--
+-- Upon success, the Lua source file containing the spec is rewritten so that
+-- the new spec replaces the old one. True is returned in such a case. If the
+-- spec could not be found from the file, false is returned.<br/>
+--
+-- NOTE: This function does not have perfect parsing at the moment. Known failures
+-- include mistaking commented out specs as the real one, and not detecting the
+-- spec if is defined with an alias or if the name isn't the first field.
+--
+-- @param self Spec.
+-- @return True on success.
+Spec.write_file = function(self)
+	if not self.introspect then return end
+	-- Read the file constaining the spec.
+	local f = File:read(self.file)
+	if not f then return end
+	-- Find the start of the spec.
+	local p = string.format("%s{[ \n\t]*name[ \n\t]*=[ \n\t]*%q", self.introspect.name, self.name)
+	local m = string.find(f, p)
+	if not m then return end
+	-- Find the end of the spec.
+	local i = m
+	local stack = 0
+	local length = string.len(f)
+	local skip = function()
+		-- Skip multiline comments.
+		if string.sub(f, i, i + 3) == "--[[" then
+			i = i + 4
+			while i <= length and string.sub(f, i, i + 1) ~= "]]" do
+				i = i + 1
+			end
+		-- Skip multiline strings.
+		elseif string.sub(f, i, i + 1) == "[[" then
+			i = i + 2
+			while i <= length and string.sub(f, i, i + 1) ~= "]]" do
+				i = i + 1
+			end
+		-- Skip strings.
+		elseif f[i] == "\"" then
+			i = i + 1
+			while i <= length do
+				local c = string.sub(f, i, i)
+				if c == "\\" then
+					i = i + 2
+				elseif c ~= "\"" then
+					i = i + 1
+				else
+					break
+				end
+			end
+		elseif f[i] == "\'" then
+			i = i + 1
+			while i <= length do
+				local c = string.sub(f, i, i)
+				if c == "\\" then
+					i = i + 2
+				elseif c ~= "'" then
+					i = i + 1
+				else
+					break
+				end
+			end
+		-- Nothing skipped.
+		else
+			return true
+		end
+	end
+	local success
+	while i < length do
+		if skip() then
+			local c = string.sub(f, i, i)
+			if c == "{" then
+				stack = stack + 1
+			elseif c == "}" then
+				stack = stack - 1
+				if stack == 0 then
+					success = true
+					break
+				end
+			end
+			i = i + 1
+		end
+	end
+	-- Make sure that the spec was correctly terminated.
+	if not success then return end
+	-- Replace the old spec string with a new one.
+	local new = self:write_str()
+	if not new then return end
+	local str = string.sub(f, 1, m - 1) .. new .. string.sub(f, i + 1, length)
+	-- Overwrite the old file with the new string.
+	File:write(self.file, str)
+	return true
+end
+
+--- Writes the spec to a new file.<br/>
+--
+-- Upon success, a new file is created and the spec is saved to it and the
+-- source file of the spec is set to that file.
+--
+-- @param self Spec.
+-- @param file Filename.
+-- @return True on success.
+Spec.write_file_new = function(self, file)
+	if not self.introspect then return end
+	local new = self:write_str()
+	if not new then return end
+	if not File:write(file, new .. "\n") then return end
+	self.file = file
+	return true
+end
+
 --- Writes the spec to a string.
 -- @param self Spec.
 -- @return String, or none if not implemented.

@@ -391,10 +391,10 @@ Editor.save = function(self)
 		end
 	end
 	-- Write to the file.
-	local t = self.pattern:write()
-	local name = self.pattern.file
-	if not File:write(name, t) then
-		print(string.format("ERROR: Could not save `%s'.", name))
+	if not self.pattern:write_file() then
+		if not self.pattern:write_file_new(self.pattern.file) then
+			print(string.format("ERROR: Could not save `%s'.", name))
+		end
 	end
 end
 
