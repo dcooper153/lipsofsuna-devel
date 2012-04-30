@@ -28,9 +28,9 @@ static void File_read (LIScrArgs* args)
 {
 	int i;
 	int len;
-	char* buf;
 	char* path_abs;
 	const char* path;
+	const char* buf;
 	LIArcReader* reader;
 	LIExtModule* module;
 
@@ -40,7 +40,8 @@ static void File_read (LIScrArgs* args)
 		return;
 	for (i = 0 ; i < strlen (path) ; i++)
 	{
-		if ((path[i] < 'a' || path[i] > 'z') && (path[i] != '/'))
+		if ((path[i] < 'a' || path[i] > 'z') && (path[i] < '0' || path[i] > '9') && 
+		    (path[i] != '/' && path[i] != '.' && path[i] != '-' && path[i] != '_'))
 			return;
 	}
 	path_abs = lisys_path_concat (module->program->paths->module_data, path, NULL);
@@ -54,12 +55,11 @@ static void File_read (LIScrArgs* args)
 
 	/* Return the file contents. */
 	len = reader->length;
-	buf = lisys_calloc (len, sizeof (char));
+	buf = reader->buffer;
 	if (buf != NULL)
 	{
 		lua_pushlstring (args->lua, buf, len);
 		liscr_args_seti_stack (args);
-		lisys_free (buf);
 	}
 	liarc_reader_free (reader);
 }
