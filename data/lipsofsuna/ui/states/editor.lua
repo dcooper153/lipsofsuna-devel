@@ -48,6 +48,10 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "editor/menu",
+	widget = function() return Widgets.Uitransition("Introspect", "introspect") end}
+
+Ui:add_widget{
+	state = "editor/menu",
 	widget = function() return Widgets.Uitransition("Quit", "quit") end}
 
 ------------------------------------------------------------------------------

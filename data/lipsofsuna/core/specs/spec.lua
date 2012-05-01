@@ -72,6 +72,24 @@ Spec.new = function(clss, args)
 	return self
 end
 
+--- Checks if the given field is set and is not the default value.
+-- @param self Spec.
+-- @param name Field name.
+-- @return True if set and not default.
+Spec.is_field_set = function(self, name)
+	-- Check if nil.
+	local value = self[name]
+	if value == nil then return end
+	-- Find the introspection field.
+	if not self.introspect then return true end
+	local field = self.introspect.fields_dict[name]
+	if not field then return end
+	-- Check if default.
+	if field.default == nil then return true end
+	local t = Introspect.types_dict[field.type]
+	if not t.equals(value, field.default) then return true end
+end
+
 --- Returns a random spec.
 -- @param clss Spec class.
 -- @param args Arguments.<ul>
