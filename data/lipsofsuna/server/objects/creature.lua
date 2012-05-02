@@ -612,6 +612,8 @@ Creature.inflict_modifier = function(self, name, strength, args)
 	end
 end
 
+--- Causes the creature to jump.
+-- @param self Object.
 Creature.jump = function(self)
 	-- Check for preconditions.
 	if self.blocking then return end
@@ -641,6 +643,19 @@ Creature.jump = function(self)
 			local v = self.velocity
 			Object.jump(self, {impulse = Vector(v.x, self.spec.jump_force * self.spec.mass, v.z)})
 		end)
+	end
+end
+
+--- Causes the creature to stop jumping, resulting to a lower jump.
+-- @param self Object.
+Creature.jump_stop = function(self)
+	if not self.jumping then return end
+	if self.submerged then return end
+	local init_y = self.spec.jump_force * self.spec.mass
+	local vel = self.velocity
+	if vel.y > 0 and vel.y < init_y then
+		vel.y = 0
+		self.velocity = vel
 	end
 end
 

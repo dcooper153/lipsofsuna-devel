@@ -57,9 +57,9 @@ Binding{name = "inventory", mode = "press", key1 = Keysym.i, func = function()
 	end
 end}
 
-Binding{name = "jump", mode = "press", key1 = Keysym.SPACE, func = function()
+Binding{name = "jump", mode = "toggle", key1 = Keysym.SPACE, func = function(v)
 	if not Client.player_object then return end
-	Network:send{packet = Packet(packets.PLAYER_JUMP)}
+	Network:send{packet = Packet(packets.PLAYER_JUMP, "bool", v)}
 end}
 
 Binding{name = "map", mode = "press", key1 = Keysym.m, func = function()

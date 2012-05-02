@@ -388,7 +388,13 @@ Protocol:add_handler{type = "PLAYER_JUMP", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
 	if player.dead then return end
-	player:jump()
+	local ok,on = args.packet:read("bool")
+	if not ok then return end
+	if on then
+		player:jump()
+	else
+		player:jump_stop()
+	end
 end}
 
 Protocol:add_handler{type = "PLAYER_LOOT_INVENTORY", func = function(args)
