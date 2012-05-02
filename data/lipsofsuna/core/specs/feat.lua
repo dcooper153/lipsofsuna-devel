@@ -254,10 +254,10 @@ Feat.get_info = function(self, args)
 	-- Holding the attack button allows a power attack of a kind. The damage
 	-- is doubled if charged to the maximum of 2 seconds.
 	if args and args.charge then
-		local p = influences["physical"]
-		if (anim.categories["melee"] or anim.categories["ranged"]) and p and p < 0 then
-			local f = 1 + math.min(1, args.charge / 2)
-			influences["physical"] = p * f
+		local p = influences["physical damage"]
+		if (anim.categories["melee"] or anim.categories["ranged"]) and p and p > 0 then
+			local f = 1 + math.min(1.5, args.charge / 2)
+			influences["physical damage"] = p * f
 		end
 	end
 	-- Apply object armor and blocking.
