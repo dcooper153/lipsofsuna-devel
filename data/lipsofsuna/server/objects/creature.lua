@@ -445,7 +445,14 @@ end
 Creature.climb = function(self)
 	if self.blocking then return end
 	if self.climbing then return end
+	local align_object = function()
+		local ctr = self.position * Voxel.tile_scale + Vector(0,0.5,0)
+		ctr = ctr:floor()
+		ctr = ctr * Voxel.tile_size + Vector(0.5,0.1,0.5)
+		self.position = ctr
+	end
 	if self:can_climb_high() then
+		align_object(self)
 		self.jumping = nil
 		self.climbing = true
 		self:animate("climb high")
@@ -454,11 +461,12 @@ Creature.climb = function(self)
 			local t = 0
 			local p = self.position
 			local r = self.rotation
+			local z = Vector()
 			repeat
 				local d = coroutine.yield()
 				t = t + d
 				self.position = p + Vector(0,2*t,0)
-				self.velocity = Vector()
+				self.velocity = z
 			until t > 0.8 * Voxel.tile_size
 			-- Slide.
 			t = 0
@@ -467,10 +475,12 @@ Creature.climb = function(self)
 				local d = coroutine.yield()
 				t = t + d
 				self.position = p + r * Vector(0,0.3,-0.8) * t
-			until t > 1
+				self.velocity = z
+			until t > 1.5
 			self.climbing = nil
 		end)
 	elseif self:can_climb_low() then
+		align_object(self)
 		self.jumping = nil
 		self.climbing = true
 		self:animate("climb low")
@@ -479,11 +489,12 @@ Creature.climb = function(self)
 			local t = 0
 			local p = self.position
 			local r = self.rotation
+			local z = Vector()
 			repeat
 				local d = coroutine.yield()
 				t = t + d
 				self.position = p + Vector(0,4*t,0)
-				self.velocity = Vector()
+				self.velocity = z
 			until t > 0.2 * Voxel.tile_size
 			-- Slide.
 			t = 0
@@ -492,7 +503,8 @@ Creature.climb = function(self)
 				local d = coroutine.yield()
 				t = t + d
 				self.position = p + r * Vector(0,0.3,-1) * 2 * t
-			until t > 0.5
+				self.velocity = z
+			until t > 0.7
 			self.climbing = nil
 		end)
 	end
