@@ -1,7 +1,7 @@
 Patternspec{
 	name = "lips1",
 	size = Vector(48,16,48),
-	position = Vector(700,100,700),
+	position = Vector(700,1000,700),
 	spawn_point = Vector(12,5,12),
 	categories = {["init"] = true},
 	items = {
