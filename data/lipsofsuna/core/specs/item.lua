@@ -150,3 +150,10 @@ Itemspec.get_trading_value = function(self)
 	self.value = value
 	return value
 end
+
+Itemspec:add_getters{
+	crafting_enabled = function(self)
+		for k,v in pairs(self.crafting_materials) do
+			return true
+		end
+	end}
