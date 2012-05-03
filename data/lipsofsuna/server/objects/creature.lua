@@ -619,8 +619,9 @@ end
 -- @param args Arguments passed to the modifier
 Creature.inflict_modifier = function(self, name, strength, args)
 	if not self.modifiers then self.modifiers = {} end
-	if not self.modifiers[name] or self.modifiers[name].st < strength then
-		self.modifiers[name] = {st=strength,a=args}
+	local mod = self.modifiers[name]
+	if not mod or mod.strength < strength then
+		self.modifiers[name] = Modifier{object = self, strength = strength, args = args}
 	end
 end
 

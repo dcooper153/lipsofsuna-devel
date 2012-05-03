@@ -1,16 +1,15 @@
-Modifier = Class(Spec)
-Modifier.type = "modifier"
-Modifier.dict_id = {}
-Modifier.dict_name = {}
+Modifier = Class()
 
---- Registers a new modifier type.
+--- Creates a new modifier.
 -- @param clss Modifier class.
 -- @param args Arguments.<ul>
---   <li>name: Modifier name.</li>
---   <li>func: Update function.</li></ul>
+--   <li>object: Target object.</li>
+--   <li>spec: Feat effect spec.</li>
+--   <li>strength: Strength value.</li></ul>
 -- @return Modifier.
 Modifier.new = function(clss, args)
-	local self = Spec.new(clss, args)
+	local self = Class.new(clss, args)
+	self.timer = 0
 	return self
 end
 
@@ -25,18 +24,19 @@ Modifier.update = function(clss, object, secs)
 	-- Update each modifier.
 	for k,v in pairs(object.modifiers) do
 		-- Update the modifier.
-		local m = Feateffectspec:find{name = k}
-		if m and m.modifier then
-			v = m:modifier(object, v, secs)
+		local remove
+		local effect = Feateffectspec:find{name = k}
+		if effect and effect.modifier then
+			remove = not effect:modifier(v, secs)
 		else
-			v.st = 0
+			remove = true
 		end
 		-- Handle removal.
-		if v.st > 0 then
+		if remove then
+			object:removed_modifier(k)
+		else
 			keep[k] = v
 			num = num + 1
-		else
-			object:removed_modifier(k)
 		end
 	end
 	-- Update the modifier list.

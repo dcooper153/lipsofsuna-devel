@@ -1,14 +1,15 @@
 Feateffectspec:extend{
 	name = "follow",
-	modifier = function(self, object, args, secs)
-		object.following_timer = (object.following_timer or 0) + secs
-		if object.following_timer > 1 then
-			object:face_point{point = args.a.position}
-			object:set_movement(10)
-			object:climb()
-			object.following_timer = object.following_timer - 1
+	modifier = function(self, mod, secs)
+		mod.timer = mod.timer + secs
+		if mod.timer > 1 then
+			mod.object:face_point{point = mod.args.position}
+			mod.object:set_movement(10)
+			mod.object:climb()
+			mod.timer = mod.timer - 1
 		end
-		return {st=args.st - secs,a=args.a}
+		mod.strength = mod.strength - secs
+		return mod.strength > 0
 	end,
 	touch = function(self, args)
 		if not args.object then return end

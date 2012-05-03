@@ -1,16 +1,17 @@
 -- Sets the target on fire.
 Feateffectspec:extend{
 	name = "burning",
-	modifier = function(self, object, args, secs)
+	modifier = function(self, mod, secs)
 		-- Update the burning timer.
-		object.burning_timer = (object.burning_timer or 0) + secs
+		mod.timer = mod.timer + secs
 		-- Damage the object every second.
-		if object.burning_timer > 1 then
-			object:damaged{amount = math.random(4,7), type = "burning"}
-			object.burning_timer = object.burning_timer - 1
+		if mod.timer > 1 then
+			mod.object:damaged{amount = math.random(4,7), type = "burning"}
+			mod.timer = mod.timer - 1
 		end
 		-- End after the timeout.
-		return {st=args.st - secs}
+		mod.strength = mod.strength - secs
+		return mod.strength > 0
 	end,
 	touch = function(self, args)
 		if not args.object then return end

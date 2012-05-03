@@ -1,21 +1,22 @@
 -- Summon plagued beasts.
 Feateffectspec:extend{
 	name = "black haze",
-	modifier = function(self, object, args, secs)
+	modifier = function(self, mod, secs)
 		-- Wait five seconds.
-		object.plague_timer = (object.plague_timer or 0) + secs
-		if object.plague_timer < 5 then return {st=10000} end
-		object.plague_timer = object.plague_timer - 5
+		mod.strength = 10000
+		mod.timer = mod.timer + secs
+		if mod.timer < 5 then return true end
+		mod.timer = mod.timer - 5
 		-- Damage the actor.
-		object:damaged{amount = 5, type = "disease"}
+		mod.object:damaged{amount = 5, type = "disease"}
 		-- Infect nearby actors.
-		local near = Object:find{point = object.position, radius = 5}
+		local near = Object:find{point = mod.object.position, radius = 5}
 		for k,v in pairs(near) do
 			if math.random() > 0.1 then
 				v:inflict_modifier("black haze", 10000)
 			end
 		end
-		return {st=10000}
+		return true
 	end,
 	ranged = function(self, args)
 		local s = Species:random{category = "plague"}
