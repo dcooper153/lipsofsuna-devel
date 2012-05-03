@@ -9,6 +9,7 @@ Widgets.Uistat.new = function(clss, skill, index)
 	self.index = index
 	self.cap = 1
 	self.value = 1
+	self.timer = 0
 	return self
 end
 
@@ -59,16 +60,23 @@ Widgets.Uistat.update = function(self, secs)
 		if self.cap ~= skill.cap or self.value ~= skill.value then
 			self.cap = skill.cap
 			self.value = skill.value
+			self.timer = 2
 			self.need_repaint = true
 		end
 	end
-	-- Update the offset and visibility.
+	-- Keep regenerating stats visible.
 	if skill and self.value < self.cap then
+		self.timer = 2
+	end
+	self.timer = self.timer - secs
+	-- Update the offset and visibility.
+	if skill and self.timer > 0 then
 		local mode = Program.video_mode
 		local pad = mode[1] - self.size.x
 		self.offset = Vector(pad / 2, mode[2] - self.index * 20 - 15)
 		self.visible = true
 	else
+		self.timer = 0
 		self.visible = false
 	end
 end

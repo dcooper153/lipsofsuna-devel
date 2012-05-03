@@ -26,7 +26,9 @@ Widgets.Hudmodifiers.add = function(self, name, time)
 		icon.time = time
 	else
 		local id = self.cols + 1
-		icon = Widgets.Modifier{id = id, icon = Iconspec:find{name = "modifier-" .. name}, name = name, time = time}
+		local effect = Feateffectspec:find{name = name}
+		local icon_name = effect and effect.icon or "missing1"
+		icon = Widgets.Modifier{id = id, icon = Iconspec:find{name = icon_name}, name = name, time = time}
 		self.dict_id[id] = icon
 		self.dict_name[name] = icon
 		self:append_col(icon)

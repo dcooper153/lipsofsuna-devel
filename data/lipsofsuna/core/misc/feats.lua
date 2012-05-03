@@ -212,12 +212,36 @@ Feateffectspec{
 	reagent_base = {mushroom = 1}}
 
 Feateffectspec{
+	name = "bless",
+	animations = {"missile spell", "ranged spell", "spell on self", "spell on touch"},
+	categories = {["beneficial"] = true, ["spell"] = true},
+	description = "Boost the maximum health and willpower of the target",
+	effect = "spell1",
+	icon = "modifier-heal", --FIXME
+	influences = {{"bless", 60}},
+	projectile = "fireball1",
+	skill_base = {["willpower"] = 10},
+	reagent_base = {["milky powder"] = 1}}
+
+Feateffectspec{
+	name = "curse",
+	animations = {"missile spell", "ranged spell", "spell on self", "spell on touch"},
+	categories = {["harmful"] = true, ["spell"] = true},
+	description = "Damages the maximum health and willpower of the target",
+	effect = "spell1",
+	icon = "firewall", --FIXME
+	influences = {{"curse", 60}},
+	projectile = "fireball1",
+	skill_base = {["willpower"] = 10},
+	reagent_base = {["milky powder"] = 1}}
+
+Feateffectspec{
 	name = "burning",
 	animations = {"missile spell", "ranged spell", "spell on self", "spell on touch"},
 	categories = {["harmful"] = true, ["spell"] = true},
 	description = "Inflict damage over time by putting the target on fire",
 	effect = "berserk1",
-	icon = "modifier-firewall", -- FIXME
+	icon = "firewall", -- FIXME
 	influences = {{"burning", 10}},
 	skill_base = {willpower = 5},
 	reagent_base = {["milky powder"] = 1}}
@@ -264,7 +288,7 @@ Feateffectspec{
 	categories = {["fire"] = true, ["harmful"] = true, ["spell"] = true},
 	description = "Conjure a wall of fire",
 	effect = "firewall1",
-	icon = "modifier-firewall",
+	icon = "firewall",
 	influences = {{"firewall", 5}},
 	projectile = "fireball1", -- FIXME
 	skill_mult = {willpower = 1},

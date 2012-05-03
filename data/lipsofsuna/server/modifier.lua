@@ -20,7 +20,6 @@ end
 -- @param args Arguments sent to the modifier
 Modifier.update = function(clss, object, secs)
 	local num = 0
-	local keep = {}
 	-- Update each modifier.
 	for k,v in pairs(object.modifiers) do
 		-- Update the modifier.
@@ -33,19 +32,20 @@ Modifier.update = function(clss, object, secs)
 		end
 		-- Handle removal.
 		if remove then
+			object.modifiers[k] = nil
 			object:removed_modifier(k)
 		else
-			keep[k] = v
 			num = num + 1
 		end
 	end
-	-- Update the modifier list.
+	-- Remove unused modifier lists.
 	if object.dead then
-		for k,v in pairs(keep) do
-			object:remove_modifier(k)
+		for k,v in pairs(object.modifiers) do
+			object.modifiers[k] = nil
+			object:removed_modifier(k)
 		end
 		object.modifiers = nil
-	else
-		object.modifiers = num > 0 and keep or nil
+	elseif num == 0 then
+		object.modifiers = nil
 	end
 end

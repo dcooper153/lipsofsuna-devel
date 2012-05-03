@@ -622,6 +622,7 @@ Creature.inflict_modifier = function(self, name, strength, args)
 	local mod = self.modifiers[name]
 	if not mod or mod.strength < strength then
 		self.modifiers[name] = Modifier{object = self, strength = strength, args = args}
+		self:update_skills()
 	end
 end
 
@@ -707,6 +708,7 @@ end
 -- @param self Object.
 -- @param name Modifier name.
 Creature.removed_modifier = function(self, name)
+	self:update_skills()
 end
 
 --- Enables or disables the blocking stance.
@@ -939,6 +941,15 @@ end
 Creature.update_skills = function(self)
 	-- Calculate the attributes.
 	local attr = self.skills:calculate_attributes()
+	if self.modifiers then
+		for k,v in pairs(self.modifiers) do
+			local effect = Feateffectspec:find{name = k}
+			if effect and effect.modifier_attributes then
+				effect:modifier_attributes(v, attr)
+			end
+		end
+	end
+	attr.max_health = math.max(1, attr.max_health)
 	-- Assign the attributes to the creature.
 	self.attributes = attr
 	self.stats:set_maximum("health", attr.max_health)

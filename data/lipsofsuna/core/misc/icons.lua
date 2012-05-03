@@ -500,6 +500,12 @@ Iconspec{
 	size = {34,34}}
 
 Iconspec{
+	name = "firewall", -- FIXME: fireball
+	image = "icons2",
+	offset = {0,136},
+	size = {34,34}}
+
+Iconspec{
 	name = "modifier-black haze",
 	image = "icons2",
 	offset = {34,170},
