@@ -6,10 +6,10 @@ Protocol:add_handler{type = "QUEST_MARKER", func = function(event)
 	local spec = Quest:find{id = id}
 	if not spec then return end
 	-- Find or create the quest.
-	local quest = Client.data.quests.quests[id]
+	local quest = Operators.quests:get_quest_by_id(id)
 	if not quest then
 		quest = {id = id, spec = spec, status = "inactive", text = ""}
-		Client.data.quests.quests[id] = quest
+		Operators.quests:add_quest(quest)
 	end
 	-- Update quest data.
 	if n ~= "" then
@@ -27,30 +27,16 @@ Protocol:add_handler{type = "QUEST_STATUS", func = function(event)
 	local spec = Quest:find{id = id}
 	if not spec then return end
 	-- Find or create the quest.
-	local quest = Client.data.quests.quests[id]
+	local quest = Operators.quests:get_quest_by_id(id)
 	if not quest then
 		quest = {id = id, spec = spec, status = "inactive", text = ""}
-		Client.data.quests.quests[id] = quest
+		Operators.quests:add_quest(quest)
 	end
-	-- Update quest data.
-	if quest.status == "inactive" and c == 0 then
-		Client:append_log("Started quest: " .. spec.name)
-		quest.status = "active"
-		quest.text = t
-	elseif quest.status ~= "completed" and c == 1 then
-		Client:append_log("Completed quest: " .. spec.name)
-		quest.status = "completed"
-		quest.text = t
-	elseif quest.text ~= t then
-		Client:append_log("Updated quest: " .. spec.name)
-		quest.text = t
-	else
-		return
-	end
-	-- Play a sound effect unless not played too recently.
-	if Program.time - Client.data.quests.sound_timer > 2 then
-		Client.data.quests.sound_timer = Program.time
-		Effect:play("quest1")
+	-- Update the quest.
+	if c == 0 then
+		Operators.quests:set_quest_status(quest, "active", t)
+	elseif c == 1 then
+		Operators.quests:set_quest_status(quest, "completed", t)
 	end
 	-- Update the user interface.
 	if Ui.state == "quests" then

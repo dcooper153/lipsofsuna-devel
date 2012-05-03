@@ -1,6 +1,7 @@
 if not Settings then return end
 if Settings.server then return end
 
+require(Mod.path .. "compass")
 require(Mod.path .. "log")
 require(Mod.path .. "modifiers")
 
@@ -19,24 +20,10 @@ Ui:add_hud{
 	active = function() return Ui.root == "play" end,
 	init = function() return Widgets.Uilog() end}
 
--- TODO
---[[Ui:add_hud{
+Ui:add_hud{
 	id = "compass",
 	active = function() return Ui.root == "play" end,
-	init = function()
-		local self = Widgets.Compass()
-		self.timer = 0
-		self.update = function(self, secs)
-			self.timer = self.timer + secs
-			if self.timer < 0.1 then return end
-			self.timer = 0
-			self.look_direction = math.pi - clss.rotation_curr.euler[1]
-			self.quest_direction = Client:get_compass_direction()
-			self.quest_distance = Client:get_compass_distance()
-			self.quest_height = Client:get_compass_height()
-		end
-		return self
-	end}]]
+	init = function() return Widgets.Hudcompass() end}
 
 Ui:add_hud{
 	id = "crosshair",
