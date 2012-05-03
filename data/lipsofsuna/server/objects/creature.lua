@@ -654,7 +654,8 @@ Creature.jump = function(self)
 			Coroutine:sleep(self.spec.timing_jump * 0.02)
 			if not self.realized then return end
 			local v = self.velocity
-			Object.jump(self, {impulse = Vector(v.x, self.spec.jump_force * self.spec.mass, v.z)})
+			local f = self.spec.mass * self.spec.jump_force * self.attributes.jump
+			Object.jump(self, {impulse = Vector(v.x, f, v.z)})
 		end)
 	end
 end
@@ -817,7 +818,7 @@ Creature.update_actions = function(self, secs)
 			local prevy = self.velocity_prev.y
 			local diffy = self.velocity.y - prevy
 			if prevy < -limity and diffy > limity then
-				local damage = (diffy - limity) * self.spec.falling_damage_rate
+				local damage = (diffy - limity) * self.spec.falling_damage_rate * self.attributes.falling_damage
 				if damage > 2 then
 					self:damaged{amount = damage, type = "falling"}
 					if self.spec.effect_falling_damage then

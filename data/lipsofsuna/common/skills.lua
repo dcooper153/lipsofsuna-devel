@@ -47,7 +47,9 @@ end
 Skills.calculate_attributes = function(self)
 	local attr = {
 		explosives = 1,
+		falling_damage = 1,
 		guns = 1,
+		jump = 1,
 		max_health = 20,
 		max_willpower = 20,
 		melee = 1,

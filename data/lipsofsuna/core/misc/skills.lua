@@ -64,6 +64,16 @@ Skillspec{
 	description = "Ranged weapons do double damage.",
 	assign = function(skills) skills.ranged = skills.ranged * 2 end}
 
+Skillspec{
+	name = "Giant leap",
+	description = "Jump higher.",
+	assign = function(skills) skills.jump = skills.jump * 1.5 end}
+
+Skillspec{
+	name = "Soft landing",
+	description = "Falling damage is halved.",
+	assign = function(skills) skills.falling_damage = skills.falling_damage / 2 end}
+
 ------------------------------------------------------------------------------
 -- Skills for monsters.
 
