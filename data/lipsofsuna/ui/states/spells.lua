@@ -6,10 +6,7 @@ Ui:add_widget{
 	state = "spells",
 	widget = function()
 		local index = Operators.spells:get_spell_index()
-		return Widgets.Uiscrollinteger("Slot", 1, 10, index, function(w)
-			Operators.spells:set_spell_index(w.value)
-			Ui:restart_state()
-		end)
+		return Widgets.Uitransition(string.format("Slot #%d", index), "spells/slots")
 	end}
 
 Ui:add_widget{
@@ -51,6 +48,37 @@ Ui:add_widget{
 		-- Create the text widget.
 		text = "Required reagents:\n" .. text
 		return Widgets.Uilabel(text) end}
+
+------------------------------------------------------------------------------
+
+Ui:add_state{
+	state = "spells/slots",
+	label = "Select slot",
+	init = function()
+		local spells = Operators.spells:get_spells()
+		local current = Operators.spells:get_spell_index()
+		local widgets = {}
+		for k,v in ipairs(spells) do
+			local name = string.format("#%d", k)
+			if v then
+				local s = v.animation
+				widgets[k] = Widgets.Uiradio(name .. ": " .. s, "slots", function()
+					Operators.spells:set_spell_index(k)
+					Ui:pop_state()
+				end)
+			else
+				widgets[k] = Widgets.Uiradio(name, "slots", function()
+					Operators.spells:set_spell_index(k)
+					Ui:pop_state()
+				end)
+			end
+			if k == current then
+				widgets[k].value = true
+			end
+		end
+		return widgets
+	end}
+
 
 ------------------------------------------------------------------------------
 
@@ -101,3 +129,4 @@ Ui:add_state{
 		end
 		return widgets
 	end}
+

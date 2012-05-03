@@ -102,6 +102,7 @@ end
 Client.reset_data = function(self)
 	Operators.camera:reset()
 	Operators.chargen:reset()
+	Operators.spells:reset()
 	self.data = {}
 	self.data.admin = {}
 	self.data.book = {}
@@ -112,7 +113,6 @@ Client.reset_data = function(self)
 	self.data.map = {scale = 1}
 	self.data.modifiers = {}
 	self.data.quests = {sound_timer = Program.time, quests = {}}
-	self.data.spells = {slot = 1}
 	self.data.skills = Skills()
 	self.data.trading = {buy = {}, sell = {}, shop = {}}
 	self.data.unlocks = Unlocks
