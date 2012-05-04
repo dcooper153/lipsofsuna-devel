@@ -5,7 +5,6 @@ Itemspec{
 	model = "bookcase1",
 	icon = "chest1",
 	mass = 30,
-	action_use = "loot",
 	categories = {["container"] = true, ["generate"] = true},
 	crafting_materials = {["log"] = 10},
 	effect_craft = "craftwood1",
@@ -15,6 +14,7 @@ Itemspec{
 	loot_count_min = 4,
 	loot_count_max = 8,
 	stacking = false,
+	usages = {["loot"] = true},
 	water_gravity = Vector(0,6,0)}
 
 Itemspec{

@@ -9,8 +9,26 @@ Ui:add_state{
 		-- Get the object spec.
 		local spec = object.spec
 		if not spec then return end
-		-- Create the widgets.
+		-- Create action spec widgets.
 		local widgets = {}
+		if spec.get_use_actions then
+			for k,v in pairs(spec:get_use_actions()) do
+				local name = v.label or v.name
+				local action = v.name
+				table.insert(widgets, Widgets.Uibutton(name, function()
+					Network:send{packet = Packet(packets.PLAYER_USE_WORLD,
+						"uint32", object.id,
+						"string", v.name)}
+					if v.dialog then
+						Client.active_dialog_object = object
+						Ui.state = "dialog"
+					else
+						Ui:pop_state()
+					end
+				end))
+			end
+		end
+		-- Create hard-coded widgets.
 		if spec.type == "species" then
 			if spec.dialog then
 				table.insert(widgets, Widgets.Uibutton(object.dead and "Evaluate" or "Chat", function()
@@ -36,35 +54,10 @@ Ui:add_state{
 				end))
 			end
 		elseif spec.type == "item" then
-			if spec.inventory_size then
-				table.insert(widgets, Widgets.Uibutton("Loot", function()
-					Network:send{packet = Packet(packets.PLAYER_LOOT_WORLD, "uint32", object.id)}
-					Client.data.inventory.id = object.id
-					Ui.state = "loot"
-				end))
-			end
 			table.insert(widgets, Widgets.Uibutton("Pick up", function()
 				Network:send{packet = Packet(packets.PLAYER_PICKUP, "uint32", object.id)}
 				Ui:pop_state()
 			end))
-		end
-		-- Create action widgets.
-		if spec.get_use_actions then
-			for k,v in pairs(spec:get_use_actions()) do
-				local name = v.label or v.name
-				local action = v.name
-				table.insert(widgets, Widgets.Uibutton(name, function()
-					Network:send{packet = Packet(packets.PLAYER_USE_WORLD,
-						"uint32", object.id,
-						"string", v.name)}
-					if v.dialog then
-						Client.active_dialog_object = object
-						Ui.state = "dialog"
-					else
-						Ui:pop_state()
-					end
-				end))
-			end
 		end
 		return widgets
 	end}

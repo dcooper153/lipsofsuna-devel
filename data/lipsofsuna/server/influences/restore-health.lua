@@ -1,4 +1,3 @@
--- Increase or decrease health.
 Feateffectspec:extend{
 	name = "restore health",
 	touch = function(self, args)

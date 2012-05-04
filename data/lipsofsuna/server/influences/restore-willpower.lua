@@ -1,6 +1,5 @@
--- Increase or decrease health.
 Feateffectspec:extend{
-	name = "restore health",
+	name = "restore willpower",
 	touch = function(self, args)
 		if not args.object then return end
 		-- Randomize the amount.
@@ -12,7 +11,9 @@ Feateffectspec:extend{
 		end
 		-- Apply unless friendly fire.
 		if val > 0 or not args.owner.client or not args.object.client then
-			args.target:damaged{amount = -val, point = args.point, type = "physical"}
+			local value = args.object.stats:get_value("willpower")
+			if not value then return end
+			args.object.stats:set_value("willpower", value + val)
 		end
 		-- Anger hurt creatures.
 		if val < 0 then

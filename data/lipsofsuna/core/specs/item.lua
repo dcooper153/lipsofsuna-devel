@@ -11,7 +11,6 @@ Itemspec.introspect = Introspect{
 	fields = {
 		{name = "name", type = "string", description = "Name of the spec."},
 		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "action_use", type = "string", default = "autoequip", description = "Name of the action to perform when the item is used."},
 		{name = "ammo_type", type = "string", description = "Name of the ammunition item type.", details = {spec = "Itemspec"}},
 		{name = "animation_looted", type = "string", description = "Animation played when the item is looted."},
 		{name = "animation_looting", type = "string", description = "Animation played when the item is being open during looting."},
@@ -56,6 +55,7 @@ Itemspec.introspect = Introspect{
 		{name = "mass", type = "number", default = 10, description = "Mass in the physics simulation, in kilograms."},
 		{name = "mass_inventory", type = "number", default = 10, description = "Mass in the inventory, in kilograms."},
 		{name = "model", type = "string", description = "Model to use for the item."},
+		{name = "potion_effects", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of potion effects.", details = {keys = {spec = "Feateffectspec"}}},
 		{name = "special_effects", type = "list", list = {type = "string", details = {value = {spec = "Effectspec"}}}, default = {}, description = "List of special effects to render."},
 		{name = "stacking", type = "boolean", description = "True to allow the item to stack in the inventory."},
 		{name = "usages", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of ways how the object can be used.", details = {keys = {spec = "Actionspec"}}},

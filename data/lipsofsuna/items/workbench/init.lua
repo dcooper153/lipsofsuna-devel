@@ -5,7 +5,6 @@ Itemspec{
 	model = "workbench1",
 	icon = "workbench1",
 	mass = 21,
-	action_use = "loot",
 	animation_looted = "open",
 	animation_looting = "opening",
 	categories = {["container"] = true, ["workbench"] = true},
@@ -14,4 +13,5 @@ Itemspec{
 	inventory_size = 4,
 	inventory_type = "workbench",
 	stacking = false,
+	usages = {["loot"] = true},
 	water_gravity = Vector(0,6,0)}

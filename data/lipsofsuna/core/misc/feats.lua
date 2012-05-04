@@ -196,7 +196,7 @@ Feateffectspec{
 	effect = "berserk1",
 	icon = "modifier-berserk",
 	influences = {{"berserk", 60}},
-	skill_base = {willpower = 5},
+	skill_base = {["willpower"] = 5},
 	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
@@ -208,8 +208,8 @@ Feateffectspec{
 	icon = "modifier-black haze",
 	influences = {{"black haze", 1}},
 	projectile = "fireball1",
-	skill_base = {willpower = 20},
-	reagent_base = {mushroom = 1}}
+	skill_base = {["willpower"] = 20},
+	reagent_base = {["mushroom"] = 1}}
 
 Feateffectspec{
 	name = "bless",
@@ -243,7 +243,7 @@ Feateffectspec{
 	effect = "berserk1",
 	icon = "firewall", -- FIXME
 	influences = {{"burning", 10}},
-	skill_base = {willpower = 5},
+	skill_base = {["willpower"] = 5},
 	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
@@ -255,7 +255,19 @@ Feateffectspec{
 	icon = "modifier-ice",
 	influences = {{"cold damage", 5}},
 	projectile = "fireball1", -- FIXME
-	skill_base = {willpower = 1},
+	skill_base = {["willpower"] = 1},
+	reagent_base = {["milky powder"] = 1}}
+
+Feateffectspec{
+	name = "cure disease",
+	animations = {"missile spell", "ranged spell", "spell on self", "spell on touch"},
+	categories = {["beneficial"] = true, ["spell"] = true},
+	description = "Cure the target of poison and diseases",
+	effect = "spell1",
+	icon = "modifier-heal", --FIXME
+	influences = {{"cure disease", 1}},
+	projectile = "fireball1",
+	skill_base = {["willpower"] = 10},
 	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
@@ -267,7 +279,7 @@ Feateffectspec{
 	icon = "modifier-earthmove",
 	influences = {{"dig", 1}},
 	projectile = "fireball1", -- FIXME
-	skill_base = {willpower = 3},
+	skill_base = {["willpower"] = 3},
 	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
@@ -279,7 +291,7 @@ Feateffectspec{
 	icon = "modifier-fireball",
 	influences = {{"fire damage", 5}},
 	projectile = "fireball1",
-	skill_base = {willpower = 1},
+	skill_base = {["willpower"] = 1},
 	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
@@ -291,7 +303,7 @@ Feateffectspec{
 	icon = "firewall",
 	influences = {{"firewall", 5}},
 	projectile = "fireball1", -- FIXME
-	skill_mult = {willpower = 1},
+	skill_mult = {["willpower"] = 1},
 	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
@@ -305,7 +317,7 @@ Feateffectspec{
 	duration = 10,
 	influences = {{"cold damage", 5}},
 	projectile = "fireball1",
-	skill_base = {willpower = 10},
+	skill_base = {["willpower"] = 10},
 	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
@@ -316,7 +328,7 @@ Feateffectspec{
 	effect = "light1",
 	icon = "modifier-light",
 	influences = {{"light", 60}},
-	skill_base = {willpower = 5},
+	skill_base = {["willpower"] = 5},
 	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
@@ -327,7 +339,7 @@ Feateffectspec{
 	effect = "light1",
 	icon = "modifier-light",
 	influences = {{"mindless march", 30}},
-	skill_base = {willpower = 5},
+	skill_base = {["willpower"] = 5},
 	projectile = "magicmissile1",
 	reagent_base = {["milky powder"] = 1}}
 
@@ -339,7 +351,7 @@ Feateffectspec{
 	effect = "light1",
 	icon = "modifier-light",
 	influences = {{"follow", 30}},
-	skill_base = {willpower = 5},
+	skill_base = {["willpower"] = 5},
 	projectile = "magicmissile1",
 	reagent_base = {["milky powder"] = 1}}
 
@@ -351,7 +363,7 @@ Feateffectspec{
 	effect = "light1",
 	icon = "sanctuary1",
 	influences = {{"home", 1}},
-	skill_base = {willpower = 1},
+	skill_base = {["willpower"] = 1},
 	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
@@ -363,6 +375,18 @@ Feateffectspec{
 	influences = {{"physical damage", 1}}}
 
 Feateffectspec{
+	name = "poison",
+	animations = {"missile spell", "ranged spell"},
+	categories = {["harmful"] = true, ["plague"] = true, ["spell"] = true},
+	description = "The target takes poison damage over time",
+	effect = "spell1",
+	icon = "modifier-black haze", --FIXME
+	influences = {{"poison", 10}},
+	projectile = "fireball1",
+	skill_base = {["willpower"] = 10},
+	reagent_base = {["milky powder"] = 1}}
+
+Feateffectspec{
 	name = "regeneration",
 	animations = {"missile spell", "ranged spell", "spell on self", "spell on touch"},
 	categories = {["beneficial"] = true, ["spell"] = true},
@@ -370,7 +394,7 @@ Feateffectspec{
 	effect = "berserk1",
 	icon = "modifier-heal",
 	influences = {{"regeneration", 60}},
-	skill_base = {willpower = 15},
+	skill_base = {["willpower"] = 15},
 	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
@@ -381,7 +405,18 @@ Feateffectspec{
 	effect = "heal1",
 	icon = "modifier-heal",
 	influences = {{"restore health", 15}},
-	skill_base = {willpower = 5},
+	skill_base = {["willpower"] = 5},
+	reagent_base = {["milky powder"] = 1}}
+
+Feateffectspec{
+	name = "restore willpower",
+	animations = {"spell on self", "spell on touch"},
+	categories = {["beneficial"] = true, ["spell"] = true},
+	description = "Restore health",
+	effect = "heal1",
+	icon = "modifier-heal", --FIXME
+	influences = {{"restore willpower", 15}},
+	skill_base = {["willpower"] = 5},
 	reagent_base = {["milky powder"] = 1}}
 
 Feateffectspec{
@@ -393,7 +428,7 @@ Feateffectspec{
 	icon = "modifier-sanctuary",
 	influences = {{"sanctuary", 30}},
 	reagent_base = {["milky powder"] = 3},
-	skill_base = {willpower = 20}}
+	skill_base = {["willpower"] = 20}}
 
 Feateffectspec{
 	name = "travel",
@@ -404,7 +439,7 @@ Feateffectspec{
 	icon = "modifier-sanctuary", -- FIXME
 	influences = {{"travel", 30}},
 	reagent_base = {["dewspring leaf"] = 1},
-	skill_base = {willpower = 10}}
+	skill_base = {["willpower"] = 10}}
 
 Feateffectspec{
 	name = "wilderness",
@@ -415,7 +450,7 @@ Feateffectspec{
 	icon = "modifier-nature",
 	influences = {{"wilderness", 5}},
 	reagent_base = {["milky powder"] = 1},
-	skill_base = {willpower = 5}}
+	skill_base = {["willpower"] = 5}}
 
 ---------------------------------------------------------------------
 -- Effects usable to monsters only.
@@ -428,4 +463,4 @@ Feateffectspec{
 	icon = "modifier-fireball",
 	influences = {{"fire damage", 20}},
 	projectile = "firebreath1",
-	skill_base = {willpower = 5}}
+	skill_base = {["willpower"] = 5}}
