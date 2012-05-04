@@ -85,7 +85,7 @@ Widgets.Quickpage.activate = function(self, index)
 		if not cont then return end
 		local index = cont:get_index_by_name(item)
 		if not index then return end
-		Commands:use(cont.id, slot)
+		--Commands:use(cont.id, slot)
 	end
 end
 

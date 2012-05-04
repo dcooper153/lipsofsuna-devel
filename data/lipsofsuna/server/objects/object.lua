@@ -461,22 +461,6 @@ Object.update_environment = function(self, secs)
 	return true, res
 end
 
---- Called when the object is used.
--- @param self Object.
--- @param user User.
-Object.use_cb = function(self, user)
-	-- Try to start a dialog.
-	if self.dialog then return end
-	local dialog = Dialog{object = self, user = user}
-	if dialog then
-		self.dialog = dialog
-		self.dialog:execute()
-		return
-	end
-	-- Try to loot if no dialog.
-	self:loot(user)
-end
-
 --- Reads the object from a database.
 -- @param self Object.
 -- @param db Database.

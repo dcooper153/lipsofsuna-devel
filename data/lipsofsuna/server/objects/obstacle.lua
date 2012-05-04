@@ -72,31 +72,6 @@ Obstacle.die = function(self)
 	Object.die(self)
 end
 
---- Called when the object is used.
--- @param self Object.
--- @param user User.
-Obstacle.use_cb = function(self, user)
-	if self.spec.harvest_enabled then
-		-- Create list of harvestable items.
-		local mats = {}
-		for k,v in pairs(self.spec.harvest_materials) do table.insert(mats, k) end
-		if #mats == 0 then return end
-		-- Effect playback.
-		if self.spec.harvest_effect then
-			Effect:play{effect = self.spec.harvest_effect, point = self.position}
-		end
-		-- Choose a random item from the list.
-		local item = Item{spec = Itemspec:find{name = mats[math.random(1, #mats)]}}
-		user.inventory:merge_or_drop_object(item)
-		user:send{packet = Packet(packets.MESSAGE, "string", "Harvested " .. item.name .. ".")}
-		-- Harvesting behavior.
-		if self.spec.harvest_behavior == "destroy" then
-			self:die()
-		end
-	end
-	Object.use_cb(self, user)
-end
-
 --- Writes the object to a database.
 -- @param self Object.
 -- @param db Database.
