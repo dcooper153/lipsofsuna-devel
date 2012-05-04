@@ -3,8 +3,8 @@ Itemspec{
 	icon = "scroll1",
 	model = "book-000",
 	mass = 2,
-	action_use = "read",
 	categories = {["book"] = true},
+	usages = {["read"] = true},
 	book_text = [[
 
 Day 1

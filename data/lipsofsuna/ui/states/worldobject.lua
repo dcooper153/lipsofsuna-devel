@@ -36,10 +36,6 @@ Ui:add_state{
 				end))
 			end
 		elseif spec.type == "item" then
-			table.insert(widgets, Widgets.Uibutton("Pick up", function()
-				Network:send{packet = Packet(packets.PLAYER_PICKUP, "uint32", object.id)}
-				Ui:pop_state()
-			end))
 			if spec.inventory_size then
 				table.insert(widgets, Widgets.Uibutton("Loot", function()
 					Network:send{packet = Packet(packets.PLAYER_LOOT_WORLD, "uint32", object.id)}
@@ -47,24 +43,26 @@ Ui:add_state{
 					Ui.state = "loot"
 				end))
 			end
-		elseif spec.type == "obstacle" then
-			if spec.harvest_enabled then
-				table.insert(widgets, Widgets.Uibutton("Harvest", function()
-					Network:send{packet = Packet(packets.PLAYER_HARVEST, "uint32", object.id)}
-					Ui:pop_state()
-				end))
-			end
-			if spec.interactive then
-				table.insert(widgets, Widgets.Uibutton("Use", function()
-					Network:send{packet = Packet(packets.PLAYER_USE_WORLD, "uint32", object.id)}
-					Ui:pop_state()
-				end))
-			end
-		elseif spec.type == "static" then
-			if spec.dialog then
-				table.insert(widgets, Widgets.Uibutton("Use", function()
-					Network:send{packet = Packet(packets.PLAYER_DIALOG, "uint32", object.id)}
-					Ui:pop_state()
+			table.insert(widgets, Widgets.Uibutton("Pick up", function()
+				Network:send{packet = Packet(packets.PLAYER_PICKUP, "uint32", object.id)}
+				Ui:pop_state()
+			end))
+		end
+		-- Create action widgets.
+		if spec.get_use_actions then
+			for k,v in pairs(spec:get_use_actions()) do
+				local name = v.label or v.name
+				local action = v.name
+				table.insert(widgets, Widgets.Uibutton(name, function()
+					Network:send{packet = Packet(packets.PLAYER_USE_WORLD,
+						"uint32", object.id,
+						"string", v.name)}
+					if v.dialog then
+						Client.active_dialog_object = object
+						Ui.state = "dialog"
+					else
+						Ui:pop_state()
+					end
 				end))
 			end
 		end

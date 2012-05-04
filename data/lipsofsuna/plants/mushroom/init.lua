@@ -16,4 +16,5 @@ Obstaclespec{
 	health = 10,
 	harvest_behavior = "destroy",
 	harvest_effect = "harvest1",
-	harvest_materials = { mushroom = 1 }}
+	harvest_materials = {["mushroom"] = 1},
+	usages = {["harvest"] = true}}

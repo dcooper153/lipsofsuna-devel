@@ -1,4 +1,5 @@
--- Loots a container.
-Actionspec{name = "loot", type = "item", func = function(item, user)
-	item:loot(user)
-end}
+Actionspec:extend{
+	name = "loot",
+	func = function(self, user)
+		self:loot(user)
+	end}

@@ -58,6 +58,7 @@ Itemspec.introspect = Introspect{
 		{name = "model", type = "string", description = "Model to use for the item."},
 		{name = "special_effects", type = "list", list = {type = "string", details = {value = {spec = "Effectspec"}}}, default = {}, description = "List of special effects to render."},
 		{name = "stacking", type = "boolean", description = "True to allow the item to stack in the inventory."},
+		{name = "usages", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of ways how the object can be used.", details = {keys = {spec = "Actionspec"}}},
 		{name = "water_friction", type = "number", default = 0.9},
 		{name = "water_gravity", type = "vector", default = Vector(0,-3)}
 	}}
@@ -149,6 +150,18 @@ Itemspec.get_trading_value = function(self)
 	-- Cache the value.
 	self.value = value
 	return value
+end
+
+--- Gets the use actions applicable to the item.
+-- @param self Item spec.
+-- @return List of actions specs.
+Itemspec.get_use_actions = function(self)
+	local res = {}
+	for k,v in pairs(self.usages) do
+		local a = Actionspec:find{name = k}
+		if a then table.insert(res, a) end
+	end
+	return res
 end
 
 Itemspec:add_getters{

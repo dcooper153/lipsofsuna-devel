@@ -61,14 +61,6 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "inventory/item",
-	widget = function() return Widgets.Uibutton("Use", function()
-			Network:send{packet = Packet(packets.PLAYER_USE_INVENTORY, "uint32", Client.data.inventory.id, "uint32", Client.data.inventory.index)}
-			Ui:pop_state()
-		end)
-	end}
-
-Ui:add_widget{
-	state = "inventory/item",
 	widget = function()
 		-- Get the active container.
 		if not Client.data.inventory.id then return end
@@ -104,6 +96,33 @@ Ui:add_widget{
 			Network:send{packet = Packet(packets.PLAYER_UNEQUIP, "uint32", index)}
 			Ui:pop_state()
 		end)
+	end}
+
+Ui:add_widget{
+	state = "inventory/item",
+	widget = function()
+		-- Get the active container.
+		if not Client.data.inventory.id then return end
+		local object = Object:find{id = Client.data.inventory.id}
+		if not object then return end
+		-- Get the active item.
+		local index = Client.data.inventory.index
+		local item = object.inventory:get_object_by_index(index)
+		if not item then return end
+		-- Add a widget for each special usage.
+		local widgets = {}
+		for k,v in pairs(item.spec:get_use_actions()) do
+			local name = v.label or v.name
+			local action = v.name
+			table.insert(widgets, Widgets.Uibutton(name, function()
+				Network:send{packet = Packet(packets.PLAYER_USE_INVENTORY,
+					"uint32", Client.data.inventory.id,
+					"uint32", Client.data.inventory.index,
+					"string", action)}
+				Ui:pop_state()
+			end))
+		end
+		return widgets
 	end}
 
 Ui:add_widget{

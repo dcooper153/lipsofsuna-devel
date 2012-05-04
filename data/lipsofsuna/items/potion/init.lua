@@ -21,6 +21,7 @@ Itemspec{
 	effect_use = "potiondrink1",
 	stacking = true,
 	icon = "potion2",
+	usages = {["drink"] = true},
 	water_gravity = Vector(0,6,0)}
 
 Itemspec{
@@ -35,6 +36,7 @@ Itemspec{
 	effect_use = "potiondrink1",
 	stacking = true,
 	icon = "potion1",
+	usages = {["drink"] = true},
 	water_gravity = Vector(0,6,0)}
 
 Itemspec{
@@ -49,6 +51,7 @@ Itemspec{
 	effect_use = "potiondrink1",
 	stacking = true,
 	icon = "potion2",
+	usages = {["drink"] = true},
 	water_gravity = Vector(0,6,0)}
 
 Itemspec{
@@ -61,4 +64,5 @@ Itemspec{
 	effect_use = "potiondrink1",
 	stacking = true,
 	icon = "potion2",
+	usages = {["drink"] = true},
 	water_gravity = Vector(0,6,0)}

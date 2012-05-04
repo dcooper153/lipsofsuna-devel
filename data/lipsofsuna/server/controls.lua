@@ -353,37 +353,6 @@ Protocol:add_handler{type = "PLAYER_EQUIP", func = function(args)
 	player.inventory:equip_index(index, slot)
 end}
 
-Protocol:add_handler{type = "PLAYER_HARVEST", func = function(args)
-	-- Get the player.
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if player.dead then return end
-	-- Read the object ID.
-	local ok,id = args.packet:read("uint32")
-	if not ok then return end
-	-- Find the object.
-	local object = Object:find{id = id}
-	if not object then return end
-	if not player:can_reach_object(object) then return end
-	if not object.spec.harvest_enabled then return end
-	-- Create list of harvestable items.
-	local mats = {}
-	for k,v in pairs(object.spec.harvest_materials) do table.insert(mats, k) end
-	if #mats == 0 then return end
-	-- Play the harvesting effect.
-	if object.spec.harvest_effect then
-		Effect:play{effect = object.spec.harvest_effect, point = object.position}
-	end
-	-- Choose a random item from the list.
-	local item = Item{spec = Itemspec:find{name = mats[math.random(1, #mats)]}}
-	player.inventory:merge_or_drop_object(item)
-	player:send{packet = Packet(packets.MESSAGE, "string", "Harvested " .. item.name .. ".")}
-	-- Apply the harvesting behavior.
-	if object.spec.harvest_behavior == "destroy" then
-		object:die()
-	end
-end}
-
 Protocol:add_handler{type = "PLAYER_JUMP", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end
@@ -588,7 +557,7 @@ Protocol:add_handler{type = "PLAYER_USE_INVENTORY", func = function(args)
 	if not player then return end
 	if player.dead then return end
 	-- Read the inventory index.
-	local ok,inv,index = args.packet:read("uint32", "uint32")
+	local ok,inv,index,action = args.packet:read("uint32", "uint32", "string")
 	if not ok then return end
 	-- Get the object.
 	local parent = Object:find{id = inv}
@@ -596,9 +565,13 @@ Protocol:add_handler{type = "PLAYER_USE_INVENTORY", func = function(args)
 	if not player:can_reach_object(parent) then return end
 	local object = parent.inventory:get_object_by_index(index)
 	if not object then return end
-	-- Use the object.
-	if not object.use_cb then return end
-	object:use_cb(player)
+	-- Validate the action.
+	if not object.spec.usages[action] then return end
+	action = Actionspec:find{name = action}
+	if not action then return end
+	if not action.func then return end
+	-- Perform the action.
+	action.func(object, player)
 end}
 
 Protocol:add_handler{type = "PLAYER_USE_WORLD", func = function(args)
@@ -607,13 +580,17 @@ Protocol:add_handler{type = "PLAYER_USE_WORLD", func = function(args)
 	if not player then return end
 	if player.dead then return end
 	-- Read the object ID.
-	local ok,id = args.packet:read("uint32")
+	local ok,id,action = args.packet:read("uint32", "string")
 	if not ok then return end
 	-- Find the object.
 	local object = Object:find{id = id}
 	if not object then return end
 	if not player:can_reach_object(object) then return end
-	-- Use the object.
-	if not object.use_cb then return end
-	object:use_cb(player)
+	-- Validate the action.
+	if not object.spec.usages[action] then return end
+	action = Actionspec:find{name = action}
+	if not action then return end
+	if not action.func then return end
+	-- Perform the action.
+	action.func(object, player)
 end}

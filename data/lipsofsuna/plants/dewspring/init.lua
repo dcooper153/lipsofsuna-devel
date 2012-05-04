@@ -7,7 +7,8 @@ Obstaclespec{
 	health = 10,
 	harvest_behavior = "destroy",
 	harvest_effect = "harvest1",
-	harvest_materials = {["dewspring leaf"] = 1}}
+	harvest_materials = {["dewspring leaf"] = 1},
+	usages = {["harvest"] = true}}
 
 Itemspec{
 	name = "dewspring leaf",

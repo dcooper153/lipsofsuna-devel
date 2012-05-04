@@ -26,6 +26,7 @@ Obstaclespec.introspect = Introspect{
 		{name = "model", type = "string", description = "Model to use for the obstacle."},
 		{name = "physics", type = "string", default = "static", description = "Physics mode."},
 		{name = "special_effects", type = "list", list = {type = "string", details = {value = {spec = "Effectspec"}}}, default = {}, description = "List of special effects to render."},
+		{name = "usages", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of ways how the object can be used.", details = {keys = {spec = "Actionspec"}}},
 		{name = "vulnerabilities", type = "dict", dict = {type = "number"}, description = "Dictionary of damage vulnerabilities."}
 	}}
 
@@ -69,6 +70,18 @@ Obstaclespec.get_special_effects = function(self)
 		end
 	end
 	if #res == 0 then return end
+	return res
+end
+
+--- Gets the use actions applicable to the obstacle.
+-- @param self Obstacle spec.
+-- @return List of actions specs.
+Obstaclespec.get_use_actions = function(self)
+	local res = {}
+	for k,v in pairs(self.usages) do
+		local a = Actionspec:find{name = k}
+		if a then table.insert(res, a) end
+	end
 	return res
 end
 

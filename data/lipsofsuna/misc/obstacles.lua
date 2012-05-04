@@ -5,21 +5,24 @@ Obstaclespec{
 	name = "wanted poster",
 	model = "wantedposter1",
 	categories = {["special"] = true},
-	dialog = "castlewanted"}
+	dialog = "castlewanted",
+	usages = {["examine"] = true}}
 
 Obstaclespec{
 	name = "sanctuary device",
 	model = "torch1",
 	categories = {["special"] = true},
 	dialog = "sanctuary",
-	marker = "sanctuary"}
+	marker = "sanctuary",
+	usages = {["examine"] = true}}
 
 Obstaclespec{
 	name = "bridge chest",
 	model = "chest1",
 	categories = {["special"] = true},
 	dialog = "bridgechest",
-	marker = "bridgechest"}
+	marker = "bridgechest",
+	usages = {["examine"] = true}}
 
 ------------------------------------------------------------------------------
 -- Map objects

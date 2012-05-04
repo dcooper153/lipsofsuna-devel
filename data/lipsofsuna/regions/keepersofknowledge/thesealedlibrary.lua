@@ -3,9 +3,9 @@ Itemspec{
 	icon = "scroll1",
 	model = "book-000",
 	mass = 2,
-	action_use = "read",
 	categories = {["book"] = true},
 	dialog = "sealedlibrarybook",
+	usages = {["read"] = true},
 	book_text = [[
 
 "In the face of a disaster threatening to run down the operations of the library, the doors shall be sealed and the emergency procedure initiated. The initiation marks the immediate termination of the personel as the air and temperature conditions are calibrated to be optimal for the preservation of knowledge. The library shall remain sealed until a new owner has purchased the knowledge from the Keepers of Knowledge."

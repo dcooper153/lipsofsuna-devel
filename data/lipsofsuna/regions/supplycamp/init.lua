@@ -5,7 +5,8 @@ Staticspec{
 	model = "portal1",
 	categories = {["portal"] = true, ["special"] = true},
 	dialog = "entrance to suna dungeons",
-	marker = "entrance to suna dungeons"}
+	marker = "entrance to suna dungeons",
+	usages = {["teleport"] = true}}
 
 Dialogspec{name = "entrance to suna dungeons", commands = {
 	{"teleport", marker = "lyra"}}}
