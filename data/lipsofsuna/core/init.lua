@@ -11,6 +11,7 @@ else
 	Voxel.tiles_per_line = 12
 	require "common/color"
 	require "common/crafting"
+	require "common/feat"
 	require "common/material"
 	require "common/marker"
 	require "common/model"

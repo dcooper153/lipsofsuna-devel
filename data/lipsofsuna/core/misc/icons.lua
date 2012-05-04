@@ -434,7 +434,7 @@ Iconspec{
 
 ------------------------------------------------------------------------------
 Iconspec{
-	name = "modifier-sanctuary",
+	name = "sanctuary1",
 	image = "icons2",
 	offset = {0,0},
 	size = {34,34}}

@@ -1,101 +1,3 @@
-require(Mod.path .. "spec")
-
-Featanimspec = Class(Spec)
-Featanimspec.type = "featanim"
-Featanimspec.dict_id = {}
-Featanimspec.dict_cat = {}
-Featanimspec.dict_name = {}
-
---- Registers a feat animation.
--- @param clss Featanimspec class.
--- @param args Arguments.<ul>
---   <li>action: The name of the action to perform.</li>
---   <li>action_frames: Blender frame range of the action portion.</li>
---   <li>bonuses_barehanded: Bonuses from being bare-handed are added to damage.</li>
---   <li>bonuses_projectile: Bonuses from the projectile are added to damage.</li>
---   <li>bonuses_weapon: Bonuses from the weapon are added to damage.</li>
---   <li>categories: List of categories.</li>
---   <li>cooldown: Cooldown time in seconds.</li>
---   <li>effect_animation: Animation name.</li>
---   <li>effect_sound: Sound effect name.</li>
---   <li>effects: List of effect spec names compatible with the animation.</li>
---   <li>icon: Icon name.</li>
---   <li>influences: List of {type, base} influences.</li>
---   <li>name: Feat animation name.</li>
---   <li>range: Maximum attack range estimate for the AI.</li>
---   <li>required_ammo: Table of required ammo.</li>
---   <li>toggle: True to trigger the handler on the key release event as well.</li></ul>
--- @return New feat animation.
-Featanimspec.new = function(clss, args)
-	local self = Spec.new(clss, args)
-	self.cooldown = self.cooldown or 0
-	self.action = self.action or self.name
-	self.action_frames = self.action_frames or {2, 10}
-	self.bonuses_barehanded = self.bonuses_barehanded or false
-	self.bonuses_projectile = self.bonuses_projectile or false
-	self.bonuses_weapon = self.bonuses_weapon or false
-	self.effects = {}
-	self.icon = self.icon or "skill-todo"
-	self.influences = self.influences or {}
-	self.required_ammo = self.required_ammo or {}
-	self.toggle = self.toggle or false
-	return self
-end
-
-Feateffectspec = Class(Spec)
-Feateffectspec.type = "feateffect"
-Feateffectspec.dict_id = {}
-Feateffectspec.dict_cat = {}
-Feateffectspec.dict_name = {}
-
---- Registers a feat effect.
--- @param clss Feateffectspec class.
--- @param args Arguments.<ul>
---   <li>affects_allies: Applicable to allied creatures.</li>
---   <li>affects_enemies: Applicable to enemy creatures.</li>
---   <li>affects_items: Applicable to items.</li>
---   <li>affects_terrain: Applicable to terrain.</li>
---   <li>categories: List of categories.</li>
---   <li>cooldown_base: Base cooldown time.</li>
---   <li>cooldown_mult: Cooldown time multiplier.</li>
---   <li>duration: Spell object duration, in seconds.</li>
---   <li>effect: Effect name.</li>
---   <li>influences: List of {type, base, mult} influences.</li>
---   <li>locked: True for not unlocked yet.</li>
---   <li>name: Feat effect name.</li>
---   <li>radius: Area of effect radius.</li>
---   <li>range: Maximum firing range for bullet and ray targeting modes.</li>
---   <li>skill_base: List of base skill requirements.</li>
---   <li>skill_mult: List of skill requirements multipliers.</li>
---   <li>reagent_base: List of base reagent requirements.</li>
---   <li>reagent_mult: List of reagent requirements multipliers.</li></ul>
--- @return New feat effect.
-Feateffectspec.new = function(clss, args)
-	local self = Spec.new(clss, args)
-	self.cooldown_base = self.cooldown_base or 0
-	self.cooldown_mult = self.cooldown_mult or 0
-	self.duration = self.duration or 0
-	self.influences = self.influences or {}
-	self.radius = self.radius or 0
-	self.range = self.range or 0
-	self.reagent_base = self.reagent_base or {}
-	self.reagent_mult = self.reagent_mult or {}
-	self.skill_base = self.skill_base or {}
-	self.skill_mult = self.skill_mult or {}
-	-- Compatible animations.
-	if args.animations then
-		for k,v in pairs(args.animations) do
-			local a = Featanimspec:find{name = v}
-			if a then
-				a.effects[self.name] = self
-			else
-				error(string.format("Feateffectspec '%s' refers to a missing Featanimspec '%s'", self.name, v))
-			end
-		end
-	end
-	return self
-end
-
 Feat = Class()
 
 --- Creates a new feat.
@@ -158,9 +60,7 @@ Feat.get_info = function(self, args)
 	if not anim then return end
 	local cooldown = anim.cooldown
 	-- Influence contribution.
-	for _,influ in pairs(anim.influences) do
-		local n = influ[1]
-		local v = influ[2]
+	for n,v in pairs(anim.influences) do
 		influences[n] = (influences[n] or 0) + v
 		if influences[n] == 0 then
 			influences[n] = nil
@@ -171,21 +71,19 @@ Feat.get_info = function(self, args)
 		local effect = Feateffectspec:find{name = data[1]}
 		if effect then
 			-- Stat requirements.
-			for stat,value in pairs(effect.skill_base) do
+			for stat,value in pairs(effect.required_stats) do
 				local val = stats[stat] or 0
 				stats[stat] = val + value
 			end
 			-- Reagent requirements.
-			for reagent,value in pairs(effect.reagent_base) do
+			for reagent,value in pairs(effect.required_reagents) do
 				local val = reagents[reagent] or 0
 				reagents[reagent] = val + value
 			end
 			-- Cooldown contribution.
-			cooldown = cooldown + effect.cooldown_base + effect.cooldown_mult * data[2]
+			cooldown = cooldown + effect.cooldown
 			-- Influence contribution.
-			for _,influ in pairs(effect.influences) do
-				local n = influ[1]
-				local v = influ[2]
+			for n,v in pairs(effect.influences) do
 				influences[n] = (influences[n] or 0) + v
 				if influences[n] == 0 then
 					influences[n] = nil
