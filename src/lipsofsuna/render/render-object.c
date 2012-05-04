@@ -198,6 +198,25 @@ void liren_render_object_set_effect (
 }
 
 /**
+ * \brief Returns nonzero if the object has been fully background loaded.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \return Nonzero if background loaded, zero if not.
+ */
+int liren_render_object_get_loaded (
+	LIRenRender* self,
+	int          id)
+{
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		return liren_object_get_loaded (object);
+	else
+		return 1;
+}
+
+/**
  * \brief Sets the model of the object.
  * \param self Renderer.
  * \param id Object ID.

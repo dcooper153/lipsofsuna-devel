@@ -108,6 +108,9 @@ Object:add_getters{
 	particle_emitting = function(s)
 		return rawget(s, "__particle_emitting")
 	end,
+	render_loaded = function(self)
+		return Los.object_get_render_loaded(self.handle)
+	end,
 	shadow_casting = function(s)
 		local v = rawget(s, "__shadow_casting")
 		return (v ~= nil) and v or false

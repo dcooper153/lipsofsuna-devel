@@ -32,6 +32,11 @@
 #include "render-model.h"
 #include "render-object.h"
 
+static LIRenEntity* private_create_entity (
+	LIRenObject* self);
+
+/*****************************************************************************/
+
 /**
  * \brief Creates a new render object and adds it to the scene.
  * \param render Renderer.
@@ -88,6 +93,8 @@ void liren_object_free (
 		self->node->detachAllObjects ();
 	if (self->entity != NULL)
 		OGRE_DELETE self->entity;
+	if (self->entity_build != NULL)
+		OGRE_DELETE self->entity_build;
 	if (self->particles != NULL)
 		self->render->data->scene_manager->destroyParticleSystem (self->particles);
 	if (self->node != NULL)
@@ -276,19 +283,41 @@ void liren_object_particle_animation (
 void liren_object_model_changed (
 	LIRenObject* self)
 {
-	liren_object_set_model (self, self->model);
+	if (self->entity_build != NULL)
+	{
+		self->node->detachObject (self->entity_build);
+		OGRE_DELETE self->entity_build;
+	}
+	self->entity_build = private_create_entity (self);
 }
 
-void liren_object_update_pose (
-	LIRenObject* self)
+void liren_object_update (
+	LIRenObject* self,
+	float        secs)
 {
+	/* Replace old entities with built ones. */
+	if (self->entity_build != NULL && self->entity_build->get_loaded ())
+	{
+		if (self->entity != NULL)
+		{
+			self->node->detachObject (self->entity);
+			OGRE_DELETE self->entity;
+		}
+		self->entity = self->entity_build;
+		self->entity_build = NULL;
+	}
+
 	/* Send the pose to the entity. */
 	/* To reduce load when there are lots of animated objects, entities only
 	   update their skeletons when they are rendered. The pose tranformation is
 	   always recalculated for each frame, but at least uploading useless pose
 	   buffers to the GPU is avoided. */
-	if (self->entity != NULL)
-		self->entity->set_pose (self->pose);
+	if (self->pose != NULL)
+	{
+		limdl_pose_update (self->pose, secs);
+		if (self->entity != NULL)
+			self->entity->set_pose (self->pose);
+	}
 }
 
 /**
@@ -320,6 +349,17 @@ int liren_object_get_id (
 }
 
 /**
+ * \brief Returns non-zero if the object has finished background loading.
+ * \param self Object.
+ * \return Non-zero if finished background loading.
+ */
+int liren_object_get_loaded (
+	LIRenObject* self)
+{
+	return self->entity_build == NULL;
+}
+
+/**
  * \brief Sets the model of the object.
  * \param self Object.
  * \param model Model.
@@ -329,14 +369,17 @@ int liren_object_set_model (
 	LIRenObject* self,
 	LIRenModel*  model)
 {
-	LIMdlModel* model_data;
-
 	/* Remove the old entity or particle system. */
 	self->node->detachAllObjects ();
 	if (self->entity != NULL)
 	{
 		OGRE_DELETE self->entity;
 		self->entity = NULL;
+	}
+	if (self->entity_build != NULL)
+	{
+		OGRE_DELETE self->entity_build;
+		self->entity_build = NULL;
 	}
 	if (self->particles != NULL)
 	{
@@ -347,38 +390,8 @@ int liren_object_set_model (
 	/* Store the new render model. */
 	self->model = model;
 
-	/* Create a new entity. */
-	if (model != NULL && !model->mesh.isNull ())
-	{
-		Ogre::String e_name = self->render->data->id.next ();
-		self->entity = OGRE_NEW LIRenEntity (e_name, model->mesh);
-		self->node->attachObject (self->entity);
-	}
-
-	/* Get the model copy created by the entity. */
-	if (self->entity != NULL)
-		model_data = self->entity->get_model ();
-	else
-		model_data = NULL;
-
-	/* Update the pose for the new model data. */
-	/* The model data might be NULL currently, but that can be because the model
-	   is is still loading in the background. We cannot remove the pose because
-	   of that since the caller might want to transfer it to the new model once
-	   it has loaded. */
-	if (self->pose != NULL)
-		limdl_pose_set_model (self->pose, model_data);
-
-	/* Set the entity flags. */
-	if (self->entity != NULL)
-		self->entity->setCastShadows (self->shadow_casting);
-
-	/* Set entity visibility. */
-	/* If a visible entity is added to a hidden scene node, the entity is
-	   still rendered. Hence, newly added entities needs to be explicitly
-	   hidden or Ogre will render our invisible objects. */
-	if (self->entity != NULL)
-		self->entity->setVisible (self->visible);
+	/* Create the new entity. */
+	self->entity = private_create_entity (self);
 
 	return 1;
 }
@@ -399,6 +412,11 @@ int liren_object_set_particle (
 	{
 		OGRE_DELETE self->entity;
 		self->entity = NULL;
+	}
+	if (self->entity_build != NULL)
+	{
+		OGRE_DELETE self->entity_build;
+		self->entity_build = NULL;
 	}
 	if (self->particles != NULL)
 	{
@@ -472,6 +490,8 @@ void liren_object_set_shadow (
 	self->shadow_casting = value;
 	if (self->entity != NULL)
 		self->entity->setCastShadows (self->shadow_casting);
+	if (self->entity_build != NULL)
+		self->entity_build->setCastShadows (self->shadow_casting);
 }
 
 /**
@@ -486,6 +506,49 @@ void liren_object_set_transform (
 	self->transform = *value;
 	self->node->setPosition (value->position.x, value->position.y, value->position.z);
 	self->node->setOrientation (value->rotation.w, value->rotation.x, value->rotation.y, value->rotation.z);
+}
+
+/*****************************************************************************/
+
+static LIRenEntity* private_create_entity (
+	LIRenObject* self)
+{
+	LIMdlModel* model_data;
+
+	/* Make sure that a model is set. */
+	if (self->model == NULL || self->model->mesh.isNull ())
+	{
+		if (self->pose != NULL)
+			limdl_pose_set_model (self->pose, NULL);
+		return NULL;
+	}
+
+	/* Create a new entity. */
+	Ogre::String e_name = self->render->data->id.next ();
+	LIRenEntity* entity = OGRE_NEW LIRenEntity (e_name, self->model->mesh);
+	self->node->attachObject (entity);
+
+	/* Get the model copy created by the entity. */
+	model_data = entity->get_model ();
+
+	/* Update the pose for the new model data. */
+	/* The model data might be NULL currently, but that can be because the model
+	   is is still loading in the background. We cannot remove the pose because
+	   of that since the caller might want to transfer it to the new model once
+	   it has loaded. */
+	if (self->pose != NULL)
+		limdl_pose_set_model (self->pose, model_data);
+
+	/* Set the entity flags. */
+	entity->setCastShadows (self->shadow_casting);
+
+	/* Set entity visibility. */
+	/* If a visible entity is added to a hidden scene node, the entity is
+	   still rendered. Hence, newly added entities needs to be explicitly
+	   hidden or Ogre will render our invisible objects. */
+	entity->setVisible (self->visible);
+
+	return entity;
 }
 
 /** @} */

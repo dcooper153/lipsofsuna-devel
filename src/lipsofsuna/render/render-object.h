@@ -93,6 +93,10 @@ LIAPICALL (void, liren_render_object_set_effect, (
 	const char*  shader,
 	const float* params));
 
+LIAPICALL (int, liren_render_object_get_loaded, (
+	LIRenRender* render,
+	int          id));
+
 LIAPICALL (void, liren_render_object_set_model, (
 	LIRenRender* self,
 	int          id,

@@ -88,19 +88,17 @@ Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
 	-- Find the feat animation.
 	local anim = Featanimspec:find{name = a}
 	if not anim then return end
-	-- Find the character animation.
+	-- Determine the character animation.
 	-- The animation of the feat may be overridden by a weapon specific
 	-- animation if there's a weapon in the slot used by the feat.
+	local weapon = anim.slot and obj.inventory:get_object_by_slot(anim.slot)
 	local animation = anim.animation
-	if anim.slot and obj.equipment then
-		local weapon = Itemspec:find{name = obj.equipment[anim.slot]}
-		if weapon and weapon.animation_attack then
-			animation = weapon.animation_attack
-		end
-		if weapon and weapon.effect_attack_speedline then
-			local w = obj.slots:get_object{slot = anim.slot}
-			if w then w:add_speedline{delay = 0.3, duration = 0.8} end
-		end
+	if weapon and weapon.spec.animation_attack then
+		animation = weapon.spec.animation_attack
+	end
+	-- Add a speedline effect for the weapon.
+	if weapon and weapon.spec.effect_attack_speedline then
+		weapon:add_speedline{delay = 0.3, duration = 0.8}
 	end
 	-- Melee feats may further override the animation since controls affect
 	-- what move the player performs. This is indicated with the move variable.

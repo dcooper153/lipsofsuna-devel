@@ -14,11 +14,11 @@ Speedline.new = function(clss, args)
 	self.path = {}
 	self.verts = {}
 	self.timer = 0
-	self.length = args.length or 15
+	self.length = args.length or 10
 	self.delay = args.delay or 0
 	self.duration = args.duration or 10000
 	self.model = Model()
-	self.model:add_material{cull = false, material = "speedline1"}
+	self.model:add_material{material = "speedline1"}
 	self:set_active_time(self.delay + self.duration + 3)
 	return self
 end
@@ -132,6 +132,7 @@ Speedline.update = function(self, secs)
 		self.verts[6 * i][4] = a2
 	end
 	-- Rebuild the model.
+	if not self.render_loaded then return end
 	self.model:remove_vertices()
 	self.model:add_triangles{material = 1, vertices = self.verts}
 	self.model:changed()

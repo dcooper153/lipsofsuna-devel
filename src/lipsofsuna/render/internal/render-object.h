@@ -76,8 +76,9 @@ LIAPICALL (void, liren_object_particle_animation, (
 LIAPICALL (void, liren_object_model_changed, (
 	LIRenObject* self));
 
-LIAPICALL (void, liren_object_update_pose, (
-	LIRenObject* self));
+LIAPICALL (void, liren_object_update, (
+	LIRenObject* self,
+	float        secs));
 
 LIAPICALL (int, liren_object_set_effect, (
 	LIRenObject* self,
@@ -85,6 +86,9 @@ LIAPICALL (int, liren_object_set_effect, (
 	const float* params));
 
 LIAPICALL (int, liren_object_get_id, (
+	LIRenObject* self));
+
+LIAPICALL (int, liren_object_get_loaded, (
 	LIRenObject* self));
 
 LIAPICALL (int, liren_object_set_model, (

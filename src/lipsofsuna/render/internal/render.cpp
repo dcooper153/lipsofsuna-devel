@@ -575,15 +575,11 @@ int liren_internal_update (
 	LIAlgU32dicIter iter1;
 	LIRenObject* object;
 
-	/* Animate objects. */
+	/* Update objects. */
 	LIALG_U32DIC_FOREACH (iter1, self->objects)
 	{
 		object = (LIRenObject*) iter1.value;
-		if (object->pose != NULL)
-		{
-			limdl_pose_update (object->pose, secs);
-			liren_object_update_pose (object);
-		}
+		liren_object_update (object, secs);
 	}
 
 	/* Update the backend. */

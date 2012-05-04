@@ -15,32 +15,32 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_ENTITY_HPP__
-#define __RENDER_INTERNAL_ENTITY_HPP__
+/**
+ * \addtogroup LIExt Extension
+ * @{
+ * \addtogroup LIExtRender Render
+ * @{
+ */
 
-#include "lipsofsuna/system.h"
-#include "lipsofsuna/model.h"
-#include "render-entity-builder.hpp"
-#include <OgreEntity.h>
-#include <OgreResource.h>
+#include "ext-module.h"
 
-class LIRenEntity : public Ogre::Entity
+static void Model_get_render_loaded (LIScrArgs* args)
 {
-public:
-	LIRenEntity (const Ogre::String& name, const Ogre::MeshPtr& mesh);
-	virtual ~LIRenEntity ();
-	void initialize ();
-	void update_pose ();
-	bool get_loaded () const;
-	LIMdlModel* get_model () const;
-	void set_pose (LIMdlPose* pose);
-public:
-	virtual void _updateRenderQueue (Ogre::RenderQueue* queue);
-protected:
-	bool pose_changed;
-	LIMdlPose* pose;
-	LIRenEntityBuilder builder;
-	Ogre::MeshPtr background_loaded_mesh;
-};
+	LIExtModule* module;
+	LIEngModel* model = args->self;
 
-#endif
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_MODEL);
+	if (liren_render_model_get_loaded (module->render, model->id))
+		liscr_args_seti_bool (args, 1);
+}
+
+/*****************************************************************************/
+
+void liext_script_render_model (
+	LIScrScript* self)
+{
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_get_render_loaded", Model_get_render_loaded);
+}
+
+/** @} */
+/** @} */

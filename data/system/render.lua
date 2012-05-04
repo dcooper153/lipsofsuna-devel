@@ -189,6 +189,13 @@ end
 
 ------------------------------------------------------------------------------
 
+Model:add_getters{
+	render_loaded = function(self)
+		return Los.model_get_render_loaded(self.handle)
+	end}
+
+------------------------------------------------------------------------------
+
 Render = Class()
 Render.class_name = "Render"
 

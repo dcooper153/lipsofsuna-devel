@@ -80,6 +80,7 @@ struct _LIRenObject
 	LIRenModel* model;
 	LIRenRender* render;
 	LIRenEntity* entity;
+	LIRenEntity* entity_build;
 	Ogre::ParticleSystem* particles;
 	Ogre::SceneNode* node;
 };

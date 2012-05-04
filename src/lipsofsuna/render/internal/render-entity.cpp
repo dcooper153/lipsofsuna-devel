@@ -107,6 +107,11 @@ void LIRenEntity::update_pose ()
 	skeleton->_notifyManualBonesDirty ();
 }
 
+bool LIRenEntity::get_loaded () const
+{
+	return mInitialised;
+}
+
 LIMdlModel* LIRenEntity::get_model () const
 {
 	if (background_loaded_mesh.isNull ())
