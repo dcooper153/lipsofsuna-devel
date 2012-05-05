@@ -49,6 +49,18 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "introspect",
+	widget = function() return Widgets.Uitransition("Feat effect", "introspect/specs",
+		function() Operators.introspect:set_spec_type("Feateffectspec") end)
+	end}
+
+Ui:add_widget{
+	state = "introspect",
+	widget = function() return Widgets.Uitransition("Feat type", "introspect/specs",
+		function() Operators.introspect:set_spec_type("Feattypespec") end)
+	end}
+
+Ui:add_widget{
+	state = "introspect",
 	widget = function() return Widgets.Uitransition("Help specs", "introspect/specs",
 		function() Operators.introspect:set_spec_type("Helpspec") end)
 	end}
