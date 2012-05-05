@@ -185,7 +185,7 @@ end}
 
 -- Unlock a spell type.
 ChatCommand{pattern = "^/unlock spell type (.*)$", permission = "admin", func = function(player, matches)
-	local spec = Featanimspec:find{name = matches[1]}
+	local spec = Feattypespec:find{name = matches[1]}
 	if spec then
 		Unlocks:unlock("spell type", matches[1])
 	else

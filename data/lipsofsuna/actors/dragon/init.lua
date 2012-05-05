@@ -25,7 +25,7 @@ Actorspec{
 	difficulty = 1,
 	effect_physical_damage = "fleshimpact1",
 	factions = {["evil"] = true},
-	feat_anims = {["dragon bite"] = true, ["dragon left claw"] = true, ["dragon right claw"] = true},--, ["ranged spell"] = true},
+	feat_types = {["dragon bite"] = true, ["dragon left claw"] = true, ["dragon right claw"] = true},--, ["ranged spell"] = true},
 	feat_effects = {["fire damage"] = true, ["physical damage"] = true},
 	inventory_size = 10,
 	inventory_items = {["dragon scale"] = 5, ["adamantium"] = 4, ["crimson stone"] = 2},

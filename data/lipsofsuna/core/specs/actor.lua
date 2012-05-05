@@ -56,7 +56,7 @@ Actorspec.introspect = Introspect{
 		{name = "factions", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of factions.", details = {keys = {spec = "Factionspec"}}},
 		{name = "falling_damage_rate", type = "number", default = 10, description = "Number of points of damage per every meters per second exceeding the falling damage speed."},
 		{name = "falling_damage_speed", type = "number", default = 10, description = "Speed in meters per seconds after which the creature starts taking falling damage."},
-		{name = "feat_anims", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of know feat types.", details = {keys = {spec = "Featanimspec"}}},
+		{name = "feat_types", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of know feat types.", details = {keys = {spec = "Feattypespec"}}},
 		{name = "feat_effects", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of know feat effects.", details = {keys = {spec = "Feateffectspec"}}},
 		{name = "footstep_height", type = "number", description = "Footstep height."},
 		{name = "footstep_sound", type = "string", description = "Name of the footstep sound effect."},
@@ -156,8 +156,8 @@ Actorspec.new = function(clss, args)
 	self.can_cast_ranged = false
 	self.can_cast_self = false
 	self.can_cast_touch = false
-	for k,v in pairs(self.feat_anims) do
-		local feat = Featanimspec:find{name = k}
+	for k,v in pairs(self.feat_types) do
+		local feat = Feattypespec:find{name = k}
 		if self.ai_enable_attack then
 			if feat.categories["melee"] then self.can_melee = true end
 			if feat.categories["ranged"] then self.can_ranged = true end

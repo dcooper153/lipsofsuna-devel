@@ -178,7 +178,7 @@ Protocol:add_handler{type = "FEAT", func = function(args)
 	local ok,anim,e1,v1,e2,v2,e3,v3,on = args.packet:read("string",
 		"string", "float", "string", "float", "string", "float", "bool")
 	if not ok then return end
-	if anim == "" or not Featanimspec:find{name = anim} then anim = nil end
+	if anim == "" or not Feattypespec:find{name = anim} then anim = nil end
 	if e1 == "" or not Feateffectspec:find{name = e1} then e1 = nil end
 	if e2 == "" or not Feateffectspec:find{name = e2} then e2 = nil end
 	if e3 == "" or not Feateffectspec:find{name = e3} then e3 = nil end

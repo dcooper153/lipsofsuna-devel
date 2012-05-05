@@ -1,12 +1,12 @@
 require(Mod.path .. "spec")
 
-Featanimspec = Class(Spec)
-Featanimspec.type = "featanim"
-Featanimspec.dict_id = {}
-Featanimspec.dict_cat = {}
-Featanimspec.dict_name = {}
-Featanimspec.introspect = Introspect{
-	name = "Featanimspec",
+Feattypespec = Class(Spec)
+Feattypespec.type = "feattype"
+Feattypespec.dict_id = {}
+Feattypespec.dict_cat = {}
+Feattypespec.dict_name = {}
+Feattypespec.introspect = Introspect{
+	name = "Feattypespec",
 	fields = {
 		{name = "name", type = "string", description = "Name of the spec."},
 		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
@@ -28,11 +28,11 @@ Featanimspec.introspect = Introspect{
 		{name = "toggle", type = "boolean", description = "True to trigger the handler on the key release event as well."}
 	}}
 
---- Registers a feat animation.
--- @param clss Featanimspec class.
+--- Registers a feat type.
+-- @param clss Feattypespec class.
 -- @param args Arguments.
--- @return New feat animation.
-Featanimspec.new = function(clss, args)
+-- @return New feat type.
+Feattypespec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.introspect:read_table(self, args)
 	self.effects = {}

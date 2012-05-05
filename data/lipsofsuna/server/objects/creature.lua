@@ -395,7 +395,7 @@ end
 -- @param self Object.
 -- @return Dictionary of booleans.
 Object.get_known_spell_types = function(self)
-	return self.spec.feat_anims
+	return self.spec.feat_types
 end
 
 Creature.get_weapon = function(self)

@@ -3,7 +3,7 @@ Feat = Class()
 --- Creates a new feat.
 -- @param clss Feat class.
 -- @param args Arguments.<ul>
---   <li>animation: Feat animation name.</li>
+--   <li>animation: Feat type name.</li>
 --   <li>effects: List of effects and their magnitudes.</li></ul>
 -- @return New feat.
 Feat.new = function(clss, args)
@@ -55,8 +55,8 @@ Feat.get_info = function(self, args)
 	local stats = {}
 	local influences = {}
 	local health_influences = {["cold damage"] = 1, ["fire damage"] = 1, ["physical damage"] = 1, poison = 1}
-	-- Get the feat animation.
-	local anim = Featanimspec:find{name = self.animation}
+	-- Get the feat type.
+	local anim = Feattypespec:find{name = self.animation}
 	if not anim then return end
 	local cooldown = anim.cooldown
 	-- Influence contribution.

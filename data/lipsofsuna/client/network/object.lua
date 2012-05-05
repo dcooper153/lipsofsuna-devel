@@ -85,8 +85,8 @@ Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
 	if not obj then return end
 	if not obj.spec then return end
 	if not obj.spec.animations then return end
-	-- Find the feat animation.
-	local anim = Featanimspec:find{name = a}
+	-- Find the feat type.
+	local anim = Feattypespec:find{name = a}
 	if not anim then return end
 	-- Determine the character animation.
 	-- The animation of the feat may be overridden by a weapon specific

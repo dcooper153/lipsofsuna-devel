@@ -12,7 +12,7 @@ Actorspec{
 	difficulty = 0,
 	effect_physical_damage = "fleshimpact1",
 	factions = {["evil"] = true},
-	feat_anims = {["bite"] = true},
+	feat_types = {["bite"] = true},
 	feat_effects = {["physical damage"] = true},
 	inventory_size = 3,
 	inventory_items = {["hide"] = 2},

@@ -10,7 +10,7 @@ Feateffectspec.introspect = Introspect{
 	fields = {
 		{name = "name", type = "string", description = "Name of the spec."},
 		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "animations", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of compatible feat animations.", details = {keys = {spec = "Featanimspec"}}},
+		{name = "animations", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of compatible feat types.", details = {keys = {spec = "Feattypespec"}}},
 		{name = "affects_allies", type = "boolean", description = "True if the effect is applicable to allied creatures."},
 		{name = "affects_enemies", type = "boolean", description = "True if the effect is applicable to enemy creatures."},
 		{name = "affects_items", type = "boolean", description = "True if the effect is applicable to items."},
@@ -37,7 +37,7 @@ Feateffectspec.new = function(clss, args)
 	self.introspect:read_table(self, args)
 	-- Store the effect to the compatible animations.
 	for k,v in pairs(self.animations) do
-		local a = Featanimspec:find{name = k}
+		local a = Feattypespec:find{name = k}
 		if a then a.effects[self.name] = self end
 	end
 	return self

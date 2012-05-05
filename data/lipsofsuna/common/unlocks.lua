@@ -90,7 +90,7 @@ Unlocks.unlock_random = function(self)
 	-- Find the unlockable spell types.
 	-- All spell types that have a description are assumed to be used by
 	-- players. Out of those, we choose ones not yet unlocked.
-	for k,v in pairs(Featanimspec.dict_name) do
+	for k,v in pairs(Feattypespec.dict_name) do
 		if v.description and not self:get("spell type", k) then
 			table.insert(choices, {"spell type", k})
 		end

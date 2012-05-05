@@ -88,7 +88,7 @@ Ui:add_state{
 	init = function()
 		-- Create the list of types.
 		local types = {}
-		for name,spec in pairs(Featanimspec.dict_name) do
+		for name,spec in pairs(Feattypespec.dict_name) do
 			if Client.data.unlocks:get("spell type", name) then
 				table.insert(types, name)
 			end
@@ -111,7 +111,7 @@ Ui:add_state{
 	init = function()
 		-- Get the spell type spec.
 		local spell = Operators.spells:get_spell()
-		local anim = Featanimspec:find{name = spell.animation}
+		local anim = Feattypespec:find{name = spell.animation}
 		if not anim then return end
 		-- Create the list of effects.
 		local effects = {}

@@ -51,7 +51,7 @@ Player.attack_charge_start = function(self)
 end
 
 Player.attack_charge_end = function(self, args)
-	-- Get the feat animation.
+	-- Get the feat type.
 	local anim = nil
 	local weapon = self:get_weapon()
 	if not weapon or weapon.spec.categories["melee"] then

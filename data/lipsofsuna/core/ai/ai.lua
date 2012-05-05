@@ -165,7 +165,7 @@ Ai.find_best_feat = function(self, args)
 	local best_feat = nil
 	local best_score = -1
 	local process_anim = function(anim)
-		-- Check if the feat animation is usable.
+		-- Check if the feat type is usable.
 		local feat = Feat{animation = anim.name}
 		if not feat:usable{user = self.object} then return end
 		-- Make sure that the feat can reach the target.
@@ -186,9 +186,9 @@ Ai.find_best_feat = function(self, args)
 		best_feat = feat
 		best_score = score
 	end
-	-- Score each feat animation and choose the best one.
-	for anim_name in pairs(self.object.spec.feat_anims) do
-		local anim = Featanimspec:find{name = anim_name}
+	-- Score each feat type and choose the best one.
+	for anim_name in pairs(self.object.spec.feat_types) do
+		local anim = Feattypespec:find{name = anim_name}
 		if anim and anim.categories[args.category] then process_anim(anim) end
 	end
 	return best_feat

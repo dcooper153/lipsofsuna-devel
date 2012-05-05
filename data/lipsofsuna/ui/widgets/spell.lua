@@ -6,7 +6,7 @@ Widgets.Uispell.class_name = "Widgets.Uispell"
 Widgets.Uispell.new = function(clss, mode, name, active)
 	local self = Widgets.Uiwidget.new(clss)
 	if mode == "type" then
-		self.spec = Featanimspec:find{name = name}
+		self.spec = Feattypespec:find{name = name}
 	else
 		self.spec = Feateffectspec:find{name = name}
 	end

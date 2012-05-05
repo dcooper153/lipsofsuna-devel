@@ -8,7 +8,7 @@ local oldinfo = Feat.get_info
 Feat.add_best_effects = function(self, args)
 	-- Add usable feat effects.
 	-- TODO: Reject effects if this will be used for animations that can have too many.
-	local anim = Featanimspec:find{name = self.animation}
+	local anim = Feattypespec:find{name = self.animation}
 	for name in pairs(args.user:get_known_spell_effects()) do
 		if anim.effects[name] then
 			local effect = Feateffectspec:find{name = name}
@@ -98,7 +98,7 @@ end
 --   <li>stop: True if stopped performing, false if started.</li></ul>
 -- @return True if performed successfully.
 Feat.perform = function(self, args)
-	local anim = Featanimspec:find{name = self.animation}
+	local anim = Feattypespec:find{name = self.animation}
 	local slot = anim and (anim.slot or (anim.required_weapon and args.user.spec.weapon_slot))
 	local weapon = slot and args.user.inventory:get_object_by_slot(slot)
 	local info = anim and self:get_info{owner = args.user, weapon = weapon}
@@ -141,7 +141,7 @@ end
 --   <li>user: Object using the feat. (required)</li>
 --   <li>stop: True if stopped performing, false if started.</li></ul>
 Feat.play_effects = function(self, args)
-	local anim = Featanimspec:find{name = self.animation}
+	local anim = Feattypespec:find{name = self.animation}
 	if not anim then return end
 	if anim.effect then
 		Effect:play{effect = anim.effect, object = args.user}
@@ -160,7 +160,7 @@ end
 Feat.play_effects_impact = function(self, args)
 	local effects = {}
 	-- Add the effect from the spell type.
-	local anim = Featanimspec:find{name = self.animation}
+	local anim = Feattypespec:find{name = self.animation}
 	if anim and anim.effect_impact then
 		effects[anim.effect_impact] = true
 	end
@@ -194,7 +194,7 @@ Feat.usable = function(self, args)
 	local spec = args.user.spec
 	if spec.type ~= "species" then return end
 	-- Check that the feat type exists.
-	local anim = Featanimspec:find{name = self.animation}
+	local anim = Feattypespec:find{name = self.animation}
 	if not anim then
 		return false, "No such feat exists."
 	end

@@ -19,7 +19,7 @@ Actorspec{
 	difficulty = 0.3,
 	effect_physical_damage = "fleshimpact1",
 	factions = {["evil"] = true},
-	feat_anims = {["right hand"] = true, ["bite"] = true},
+	feat_types = {["right hand"] = true, ["bite"] = true},
 	feat_effects = {["physical damage"] = true},
 	inventory_size = 5,
 	inventory_items = {["wooden club"] = 1, ["lizard scale"] = 3},

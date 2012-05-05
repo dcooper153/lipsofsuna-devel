@@ -80,7 +80,7 @@ Actorspec{
 		["lowerbody"] = "",
 		["upperbody"] = ""},
 	factions = {["good"] = true},
-	feat_anims = {["build"] = true, ["right hand"] = true, ["ranged"] = true, ["throw"] = true},
+	feat_types = {["build"] = true, ["right hand"] = true, ["ranged"] = true, ["throw"] = true},
 	footstep_height = 0.3,
 	footstep_sound = "step1",
 	inventory_size = 20,

@@ -1,7 +1,7 @@
 ---------------------------------------------------------------------
 -- Types usable to players.
 
-Featanimspec{
+Feattypespec{
 	name = "area spell",
 	action = "area spell",
 	animation = "spell ranged",
@@ -11,7 +11,7 @@ Featanimspec{
 	description = "Cast a spell that affects nearby targets.",
 	effect = "spell1"}
 
-Featanimspec{
+Feattypespec{
 	name = "build",
 	action = "build",
 	animation = "build",
@@ -20,7 +20,7 @@ Featanimspec{
 	effect = "swing1",
 	required_weapon = "build"}
 
-Featanimspec{
+Feattypespec{
 	name = "missile spell",
 	action = "missile spell",
 	animation = "spell ranged",
@@ -30,7 +30,7 @@ Featanimspec{
 	description = "Cast a magical missile that you can control.",
 	effect = "spell1"}
 
-Featanimspec{
+Feattypespec{
 	name = "right hand",
 	action = "melee",
 	animation = "attack punch",
@@ -43,7 +43,7 @@ Featanimspec{
 	required_weapon = "melee",
 	slot = "hand.R"}
 
-Featanimspec{
+Feattypespec{
 	name = "ranged",
 	action = "ranged",
 	animation = "attack bow",
@@ -55,7 +55,7 @@ Featanimspec{
 	required_ammo = true,
 	required_weapon = "ranged"}
 
-Featanimspec{
+Feattypespec{
 	name = "ranged spell",
 	action = "ranged spell",
 	animation = "spell ranged",
@@ -64,7 +64,7 @@ Featanimspec{
 	description = "Cast a magical projectile",
 	effect = "spell1"}
 
-Featanimspec{
+Feattypespec{
 	name = "spell on self",
 	action = "spell on self",
 	animation = "spell self",
@@ -73,7 +73,7 @@ Featanimspec{
 	description = "Cast a spell on yourself",
 	effect = "spell1"}
 
-Featanimspec{
+Feattypespec{
 	name = "spell on touch",
 	action = "spell on touch",
 	animation = "spell touch",
@@ -82,7 +82,7 @@ Featanimspec{
 	description = "Cast a short range touch spell",
 	effect = "spell1"}
 
-Featanimspec{
+Feattypespec{
 	name = "throw",
 	action = "throw",
 	animation = "throw",
@@ -96,7 +96,7 @@ Featanimspec{
 ---------------------------------------------------------------------
 -- Types usable to monsters only.
 
-Featanimspec{
+Feattypespec{
 	name = "bite",
 	action = "melee",
 	animation = "attack bite",
@@ -107,7 +107,7 @@ Featanimspec{
 	influences = {["physical damage"] = 1},
 	slot = "mouth"}
 
-Featanimspec{
+Feattypespec{
 	name = "dragon bite",
 	action = "melee",
 	animation = "attack bite",
@@ -117,7 +117,7 @@ Featanimspec{
 	influences = {["physical damage"] = 50},
 	slot = "mouth"}
 
-Featanimspec{
+Feattypespec{
 	name = "explode",
 	action = "explode",
 	animation = "explode",
@@ -126,7 +126,7 @@ Featanimspec{
 	influences = {["physical damage"] = 1},
 	effect = "selfdestruct1"}
 
-Featanimspec{
+Feattypespec{
 	name = "left claw",
 	action = "melee",
 	animation = "attack left claw",
@@ -137,7 +137,7 @@ Featanimspec{
 	influences = {["physical damage"] = 5},
 	slot = "hand.L"}
 
-Featanimspec{
+Feattypespec{
 	name = "right claw",
 	action = "melee",
 	animation = "attack right claw",
@@ -148,7 +148,7 @@ Featanimspec{
 	influences = {["physical damage"] = 5},
 	slot = "hand.R"}
 
-Featanimspec{
+Feattypespec{
 	name = "dragon left claw",
 	action = "melee",
 	animation = "attack left claw",
@@ -159,7 +159,7 @@ Featanimspec{
 	influences = {["physical damage"] = 30},
 	slot = "hand.L"}
 
-Featanimspec{
+Feattypespec{
 	name = "dragon right claw",
 	action = "melee",
 	animation = "attack right claw",
@@ -170,7 +170,7 @@ Featanimspec{
 	influences = {["physical damage"] = 30},
 	slot = "hand.R"}
 
-Featanimspec{
+Feattypespec{
 	name = "tackle",
 	action = "tackle",
 	animation = "tackle",
