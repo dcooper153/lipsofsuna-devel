@@ -470,12 +470,6 @@ Animationspec{
 	weight = 30}
 
 Animationspec{
-	name = "slime attack bite",
-	animation = "bite",
-	channel = 2,
-	weight = 30}
-
-Animationspec{
 	name = "aermale land ground",
 	animation = "land",
 	channel = 5,

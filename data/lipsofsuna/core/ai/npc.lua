@@ -15,19 +15,15 @@ NpcAi.new = function(clss, object)
 	local self = Ai.new(clss, object)
 	self.update_timer = 0
 	self:set_state{state = "none"}
+	-- Initialize states.
+	self.enabled_states = {}
+	for k,v in pairs(object.spec.ai_enabled_states) do
+		self.enabled_states[k] = Aistatespec:find{name = k}
+	end
 	-- Initialize combat actions.
 	self.combat_actions = {}
-	if object.spec.ai_combat_actions then
-		for k,v in pairs(object.spec.ai_combat_actions) do
-			self.combat_actions[k] = Aiactionspec:find{name = k}
-		end
-	else
-		local cat = Aiactionspec:find{category = "combat"}
-		if cat then
-			for k,v in pairs(cat) do
-				self.combat_actions[v.name] = v
-			end
-		end
+	for k,v in pairs(object.spec.ai_combat_actions) do
+		self.combat_actions[k] = Aiactionspec:find{name = k}
 	end
 	return self
 end
@@ -309,7 +305,7 @@ NpcAi.update_state = function(self)
 	-- Choose the next state.
 	local best_score
 	local best_state
-	for k,v in pairs(Aistatespec.dict_name) do
+	for k,v in pairs(self.enabled_states) do
 		local score = v.calculate(self)
 		if score and score > 0 then
 			if not best_score or score > best_score then
