@@ -206,6 +206,7 @@ Generator.generate_overworld = function(self)
 	end
 	gen("statictree1", 100)
 	gen("statichouse2", 20)
+	gen("obelisk", 15)
 end
 
 --- Creates ore deposits and places plants.

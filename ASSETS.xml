@@ -856,6 +856,13 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
   </asset>
 
   <asset>
+    <file>data/lipsofsuna/environment/obelisk/obelisk1.lmdl</file>
+    <file>import/obelisk1.blend</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
     <file>data/lipsofsuna/particle/particle*.dds</file>
     <file>import/particle1.png</file>
     <file>import/particle2.png</file>
