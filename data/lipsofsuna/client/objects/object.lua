@@ -82,12 +82,6 @@ Object.set_dialog = function(self, type, args)
 	end
 end
 
-Object.set_skill = function(self, s, v, m)
-end
-
-Object.set_slot = function(self, slot, spec, count)
-end
-
 Object.update = function(self, secs)
 	-- Update special effects.
 	if self.realized then

@@ -3,7 +3,6 @@ Creature = Class(Object)
 Creature.new = function(clss, args)
 	local self = Object.new(clss, args)
 	self.stats = {}
-	self.inventory = Inventory()
 	self.inventory:subscribe(self, function(args) self:update_inventory(args) end)
 	self.shadow_casting = Options.inst.shadow_casting_actors
 	Object.dict_active[self] = 1.0
@@ -185,7 +184,7 @@ Creature.update_inventory = function(self, args)
 			Effect:play_object(args.object.spec.effect_equip, self, node)
 		end
 	elseif args.type == "inventory-unequipped" then
-		if node then
+		if node ~= "" then
 			-- Disable the anchored item.
 			args.object:detach()
 			self:disable_equipment_holding_animation(args.slot)
