@@ -37,7 +37,7 @@ Ui:add_state{
 		if not object then return end
 		-- Create the inventory slots.
 		local widgets = {}
-		for index = 1,object.inventory.size do
+		for index = 1,object.spec.inventory_size do
 			local item = object.inventory:get_object_by_index(index)
 			local data = item and {
 				text = item.spec.name,
