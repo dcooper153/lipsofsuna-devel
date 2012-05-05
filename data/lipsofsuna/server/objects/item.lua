@@ -69,7 +69,6 @@ Item.new = function(clss, args)
 	copy("spec")
 	copy("looted")
 	copy("realized")
-	copy("variables")
 	self.update_timer = 0.3 * math.random()
 	if self.looted then self:animate("looted") end
 	return self
@@ -284,8 +283,7 @@ Item.write = function(self)
 		looted = self.looted,
 		spec = self.spec.name,
 		position = self.position,
-		rotation = self.rotation,
-		variables = self.variables},
+		rotation = self.rotation},
 		Serialize:encode_inventory(self.inventory),
 		"return self")
 end
@@ -309,8 +307,7 @@ Item.write_db = function(self, db)
 		looted = self.looted,
 		spec = self.spec.name,
 		position = self.position,
-		rotation = self.rotation,
-		variables = self.variables})
+		rotation = self.rotation})
 	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "item", data})
 	-- Write the sector.
 	if self.sector then

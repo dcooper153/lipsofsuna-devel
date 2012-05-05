@@ -254,15 +254,18 @@ Player.vision_cb = function(self, args)
 	{
 		["object-animated"] = function(args)
 			local o = args.object
+			if o.static then return end
 			self:send{packet = Packet(packets.OBJECT_ANIMATED, "uint32", o.id,
 				"string", args.animation or "", "float", args.time or 0.0)}
 		end,
 		["object-beheaded"] = function(args)
 			local o = args.object
+			if o.static then return end
 			self:send{packet = Packet(packets.OBJECT_BEHEADED, "uint32", o.id)}
 		end,
 		["object-dead"] = function(args)
 			local o = args.object
+			if o.static then return end
 			self:send{packet = Packet(packets.OBJECT_DEAD, "uint32", o.id, "bool", args.dead)}
 		end,
 		["object-dialog"] = function(args)
@@ -289,14 +292,17 @@ Player.vision_cb = function(self, args)
 		end,
 		["object-feat"] = function(args)
 			local o = args.object
+			if o.static then return end
 			self:send{packet = Packet(packets.OBJECT_FEAT, "uint32", o.id, "string", args.anim.name, "uint8", args.move or 0)}
 		end,
 		["object-hidden"] = function(args)
 			local o = args.object
+			if o.static then return end
 			self:send{packet = Packet(packets.OBJECT_HIDDEN, "uint32", o.id)}
 		end,
 		["object-moved"] = function(args)
 			local o = args.object
+			if o.static then return end
 			local tilt = (o.tilt and o.tilt.euler[3]) or 0
 			local p = Packet(packets.OBJECT_MOVED, "uint32", o.id,
 				"float", o.position.x, "float", o.position.y, "float", o.position.z, "float", tilt,
@@ -307,6 +313,7 @@ Player.vision_cb = function(self, args)
 		["object-shown"] = function(args)
 			-- Don't send static objects.
 			local o = args.object
+			if o.static then return end
 			if o.spec.name == "static" then return end
 			-- Wake up the AI.
 			if o.ai then o.ai:refresh() end
@@ -589,8 +596,7 @@ Player.write_db = function(self, db)
 		position = self.position,
 		rotation = self.rotation,
 		skin_style = self.skin_style,
-		spec = self.spec.name,
-		variables = self.variables})
+		spec = self.spec.name})
 	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "player", data})
 	-- Write the sector.
 	if self.sector and not self.client then

@@ -70,10 +70,10 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 	local npc_name = self.object.spec.name
 	local npc_marker = self.object.spec.marker
 	local var_name = string.gsub(string.lower(name), "[^A-Za-z]", "_")
-	local var_type = self.object.variables and self.object.variables[var_name .. "_type"]
-	local var_item = self.object.variables and self.object.variables[var_name .. "_item"]
-	local var_actor = self.object.variables and self.object.variables[var_name .. "_actor"]
-	local var_excuse = self.object.variables and self.object.variables[var_name .. "_excuse"]
+	local var_type = self.object:get_dialog_variable(var_name .. "_type")
+	local var_item = self.object:get_dialog_variable(var_name .. "_item")
+	local var_actor = self.object:get_dialog_variable(var_name .. "_actor")
+	local var_excuse = self.object:get_dialog_variable(var_name .. "_excuse")
 	-- Quest creation functions.
 	-- These implement quest initialization for each random quest type. They
 	-- select and create the necessary actors and set their variables.
@@ -107,12 +107,11 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 				"My mom discarded the old one so I need a new one.",
 				"It just feels so good to use one."}
 			var_excuse = excuses[math.random(1, #excuses)]
-			-- Set the actor variables.
-			if not self.object.variables then self.object.variables = {} end
-			self.object.variables[var_name .. "_init"] = nil
-			self.object.variables[var_name .. "_type"] = var_type
-			self.object.variables[var_name .. "_item"] = var_item
-			self.object.variables[var_name .. "_excuse"] = var_excuse
+			-- Set the dialog variables.
+			self.object:set_dialog_variable(var_name .. "_init", nil)
+			self.object:set_dialog_variable(var_name .. "_type", var_type)
+			self.object:set_dialog_variable(var_name .. "_item", var_item)
+			self.object:set_dialog_variable(var_name .. "_excuse", var_excuse)
 		end,
 		-- Kill an actor.
 		-- The player is asked to kill a randomly generated unique actor. The
@@ -162,16 +161,14 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			-- Reserve the actor for this quest.
 			npc_marker = actor.spec.marker
 			Dialog.flags["scapegoat_alive_" .. actor.spec.name] = "true"
-			-- Set the actor variables.
-			if not self.object.variables then self.object.variables = {} end
-			self.object.variables[var_name .. "_init"] = nil
-			self.object.variables[var_name .. "_type"] = var_type
-			self.object.variables[var_name .. "_actor"] = var_actor
-			self.object.variables[var_name .. "_excuse"] = var_excuse
-			if not actor.variables then actor.variables = {} end
-			actor.variables[var_name .. "_mark_actor"] = npc_name
-			actor.variables[var_name .. "_mark_marker"] = self.object.spec.marker
-			actor.variables[var_name .. "_mark_quest"] = name
+			-- Set the dialog variables.
+			self.object:set_dialog_variable(var_name .. "_init", nil)
+			self.object:set_dialog_variable(var_name .. "_type", var_type)
+			self.object:set_dialog_variable(var_name .. "_actor", var_actor)
+			self.object:set_dialog_variable(var_name .. "_excuse", var_excuse)
+			actor:set_dialog_variable(var_name .. "_mark_actor", npc_name)
+			actor:set_dialog_variable(var_name .. "_mark_marker", self.object.spec.marker)
+			actor:set_dialog_variable(var_name .. "_mark_quest", name)
 		end}
 	if not var_type then
 		local func = random_quests[math.random(1, #random_quests)]
@@ -241,6 +238,25 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 	end
 end
 
+--- Emits a dialog change event.<br>
+--
+-- The event is stored to the dialog and emitted as a vision event so that
+-- current and future observers can see it. In case of static objects, a
+-- global vision event is emitted to players only.
+--
+-- @param self Dialog.
+-- @param event Dialog event.
+Dialog.emit_event = function(self, event)
+	self.event = event
+	if self.object.spec.type ~= "static" then
+		Vision:event(event)
+	else
+		for k,v in pairs(Player.clients) do
+			v:vision_cb(event)
+		end
+	end
+end
+
 --- Executes the dialog.<br/>
 -- Continues the dialog until the next choice or message is encountered or
 -- the dialog ends.
@@ -281,9 +297,9 @@ Dialog.execute = function(self)
 				if not quest then return end
 				if quest.status == "completed" then return end
 			elseif type == "var" then
-				if not self.object.variables or not self.object.variables[name] then return end
+				if not self.object:get_dialog_variable(name) then return end
 			elseif type == "!var" then
-				if self.object.variables and self.object.variables[name] then return end
+				if self.object:get_dialog_variable(name) then return end
 			end
 		end
 		return true
@@ -346,13 +362,10 @@ Dialog.execute = function(self)
 				vm[1].pos = vm[1].pos + 1
 				cmd = vm[1].exe[vm[1].pos + vm[1].off]
 			until not cmd or cmd[1] ~= "choice"
-			-- Publish the choices.
-			local event = {type = "object-dialog", object = self.object, choices = choices}
-			self.event = event
-			Vision:event(event)
 			-- Break until answered.
 			self.choices = cmds
 			self.user = nil
+			self:emit_event{type = "object-dialog", object = self.object, choices = choices}
 			return true
 		end,
 		["default death check"] = function(vm, c)
@@ -404,12 +417,10 @@ Dialog.execute = function(self)
 			end
 		end,
 		info = function(vm, c)
-			-- Publish the info.
-			self.event = {type = "object-dialog", object = self.object, message = string.format("(%s)", c[2])}
-			Vision:event(self.event)
 			-- Break until answered.
 			self.choices = "info"
 			self.user = nil
+			self:emit_event{type = "object-dialog", object = self.object, message = string.format("(%s)", c[2])}
 			return true
 		end,
 		loop = function(vm, c)
@@ -462,11 +473,9 @@ Dialog.execute = function(self)
 		end,
 		say = function(vm, c)
 			-- Publish the line.
-			self.event = {type = "object-dialog", object = self.object, character = c[2], message = c[3]}
-			Vision:event(self.event)
-			-- Break until answered.
 			self.choices = "line"
 			self.user = nil
+			self:emit_event{type = "object-dialog", object = self.object, character = c[2], message = c[3]}
 			return true
 		end,
 		["spawn object"] = function(vm, c)
@@ -538,13 +547,11 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["var"] = function(vm, c)
-			if not self.object.variables then self.object.variables = {} end
-			self.object.variables[c[2]] = "true"
+			self.object:set_dialog_variable(c[2], "true")
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["var clear"] = function(vm, c)
-			if not self.object.variables then return end
-			self.object.variables[c[2]] = nil
+			self.object:set_dialog_variable(c[2], nil)
 			vm[1].pos = vm[1].pos + 1
 		end}
 	-- Execute commands until break or end.
@@ -560,7 +567,7 @@ Dialog.execute = function(self)
 		end
 	end
 	-- Reset at end.
-	Vision:event{type = "object-dialog", object = self.object}
+	self:emit_event{type = "object-dialog", object = self.object}
 	Dialog.dict_id[self.id] = nil
 	self.object.dialog = nil
 	self.object = nil

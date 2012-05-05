@@ -13,8 +13,8 @@ Dialogspec{name = "scapegoat death", commands = {
 			local quest = Quest:find{name = quest_name}
 			if not quest then return end
 			-- Get information on the main quest actor.
-			local actor = self.object.variables[var_name .. "_mark_actor"] or "the contact person"
-			local marker = self.object.variables[var_name .. "_mark_marker"]
+			local actor = self.object:get_dialog_variable(var_name .. "_mark_actor") or "the contact person"
+			local marker = self.object:get_dialog_variable(var_name .. "_mark_marker")
 			-- Append a branch for this quest.
 			table.insert(branch,
 				{"branch", check = {{"quest active", quest_name}},
@@ -26,10 +26,10 @@ Dialogspec{name = "scapegoat death", commands = {
 				})
 		end
 		-- Create a branch for each quest involving the actor.
-		if not self.object.variables then return end
+		local vars = self.object:get_dialog_variables()
 		local branch = {"branch",
 			{"flag clear", "scapegoat_alive_" .. self.object.spec.name}}
-		for k,v in pairs(self.object.variables) do
+		for k,v in pairs(vars) do
 			if string.match(k, ".*_mark_quest$") then
 				add(branch, string.sub(k, 0, -12), v)
 			end
@@ -41,48 +41,53 @@ Actorspec{
 	name = "Bobbles",
 	categories = {["scapegoat"] = true},
 	base = "aer",
-	marker = "bobbles",
+	dialog = "scapegoat",
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {["dress"] = 1},
+	marker = "bobbles",
 	preset = "Male 3"}
 
 Actorspec{
 	name = "Mark",
 	categories = {["scapegoat"] = true},
 	base = "aer",
-	marker = "mark",
+	dialog = "scapegoat",
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {["dress"] = 1},
+	marker = "mark",
 	preset = "Male 1"}
 
 Actorspec{
 	name = "Jerkins",
 	categories = {["scapegoat"] = true},
 	base = "aer",
-	marker = "jerkins",
+	dialog = "scapegoat",
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {["dress"] = 1},
+	marker = "jerkins",
 	preset = "Male 2"}
 
 Actorspec{
 	name = "Rubert",
 	categories = {["scapegoat"] = true},
 	base = "aer",
-	marker = "rubert",
+	dialog = "scapegoat",
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {["dress"] = 1},
+	marker = "rubert",
 	preset = "Male 3"}
 
 Actorspec{
 	name = "Rocky",
 	categories = {["scapegoat"] = true},
 	base = "aer",
-	marker = "rocky",
+	dialog = "scapegoat",
 	eye_style = "random",
 	hair_style = "random",
 	inventory_items = {["dress"] = 1},
+	marker = "rocky",
 	preset = "Male 2"}

@@ -21,7 +21,6 @@ Obstacle.new = function(clss, args)
 	copy("position")
 	copy("spec")
 	copy("realized")
-	copy("variables")
 	return self
 end
 
@@ -29,15 +28,13 @@ end
 -- @param self Object.
 -- @return New object.
 Obstacle.clone = function(self)
-	local variables = {}
-	for k,v in pairs(self.variables) do variables[k] = v end
+	-- TODO: Clone dialog variables?
 	return Obstacle{
 		angular = self.angular,
 		health = self.health,
 		position = self.position,
 		rotation = self.rotation,
-		spec = self.spec,
-		variables = variables}
+		spec = self.spec}
 end
 
 --- Causes the object to take damage.
@@ -83,8 +80,7 @@ Obstacle.write_db = function(self, db)
 		id = self.id,
 		position = self.position,
 		rotation = self.rotation,
-		spec = self.spec.name,
-		variables = self.variables})
+		spec = self.spec.name})
 	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "obstacle", data})
 	-- Write the sector.
 	if self.sector then

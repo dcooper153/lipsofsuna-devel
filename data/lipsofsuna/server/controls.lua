@@ -65,6 +65,12 @@ local spawn_player = function(object, client, spawnpoint)
 			"float", v.rotation.w)
 	end
 	object:send(packet)
+	-- Transmit dialog states of static objects.
+	for k,v in pairs(Dialog.dict_id) do
+		if v.object and v.object.static and v.event then
+			object:vision_cb(v.event)
+		end
+	end
 end
 
 Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)

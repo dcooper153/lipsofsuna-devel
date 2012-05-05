@@ -173,7 +173,6 @@ Creature.new = function(clss, args)
 	copy("skin_style")
 	copy("carried_weight", 0)
 	copy("spec")
-	copy("variables")
 	clss.dict_id[self.id] = self
 	self.update_timer = 0.1 * math.random()
 	if args and args.dead then self:set_dead_state() end
@@ -193,8 +192,7 @@ end
 -- @param self Object.
 -- @return New object.
 Creature.clone = function(self)
-	local variables = {}
-	for k,v in pairs(self.variables) do variables[k] = v end
+	-- TODO: Copy dialog variables?
 	return Creature{
 		angular = self.angular,
 		beheaded = self.beheaded,
@@ -205,8 +203,7 @@ Creature.clone = function(self)
 		physics = self.physics,
 		position = self.position,
 		rotation = self.rotation,
-		spec = self.spec,
-		variables = variables}
+		spec = self.spec}
 end
 
 --- Adds an object to the list of known enemies.<br/>
@@ -1009,8 +1006,7 @@ Creature.write = function(self)
 		physics = self.physics,
 		position = self.position,
 		rotation = self.rotation,
-		spec = self.spec.name,
-		variables = self.variables},
+		spec = self.spec.name},
 		Serialize:encode_skills(self.skills),
 		Serialize:encode_stats(self.stats),
 		Serialize:encode_inventory(self.inventory),
@@ -1045,8 +1041,7 @@ Creature.write_db = function(self, db)
 		physics = self.physics,
 		position = self.position,
 		rotation = self.rotation,
-		spec = self.spec.name,
-		variables = self.variables})
+		spec = self.spec.name})
 	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "actor", data})
 	-- Write the sector.
 	if self.sector then

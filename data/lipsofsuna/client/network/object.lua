@@ -75,6 +75,9 @@ Protocol:add_handler{type = "OBJECT_DIALOG_NONE", func = function(args)
 	if not obj then return end
 	-- Update the dialog.
 	obj:set_dialog("none")
+	if obj == Client.active_dialog_object and Ui.state == "dialog" then
+		Ui:pop_state()
+	end
 end}
 
 Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
@@ -128,10 +131,16 @@ end}
 
 Protocol:add_handler{type = "OBJECT_HIDDEN", func = function(event)
 	local ok,i = event.packet:read("uint32")
-	if ok then
-		local o = Object:find{id = i}
-		if o then o:detach(true) end
-		if i == Client.active_dialog then Client:set_dialog() end
+	if not ok then return end
+	-- Find the object.
+	local obj = Object:find{id = i}
+	if not obj then return end
+	-- Hide the object.
+	if obj.static then return end
+	obj:detach(true)
+	-- Close the dialog when the object is hidden.
+	if obj == Client.active_dialog_object and Ui.state == "dialog" then
+		Ui:pop_state()
 	end
 end}
 

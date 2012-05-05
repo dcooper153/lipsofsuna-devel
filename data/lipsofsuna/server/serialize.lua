@@ -1,7 +1,7 @@
 require "common/unlocks"
 
 Serialize = Class()
-Serialize.game_version = "2"
+Serialize.game_version = "3"
 Serialize.account_version = "1"
 Serialize.object_version = "1"
 
@@ -175,6 +175,7 @@ Serialize.init_game_database = function(self, reset)
 	if not reset and version == self.game_version then return end
 	-- Initialize tables.
 	self.db:query([[DROP TABLE IF EXISTS dialog_flags;]])
+	self.db:query([[DROP TABLE IF EXISTS dialog_variables;]])
 	self.db:query([[DROP TABLE IF EXISTS generator_sectors;]])
 	self.db:query([[DROP TABLE IF EXISTS generator_settings;]])
 	self.db:query([[DROP TABLE IF EXISTS markers;]])
@@ -188,6 +189,11 @@ Serialize.init_game_database = function(self, reset)
 	self.db:query([[CREATE TABLE dialog_flags (
 		name TEXT PRIMARY KEY,
 		value TEXT);]])
+	self.db:query([[CREATE TABLE dialog_variables (
+		id INTEGER,
+		key TEXT,
+		value TEXT,
+		PRIMARY KEY(id,key));]])
 	self.db:query([[CREATE TABLE generator_sectors (
 		id INTEGER PRIMARY KEY,
 		value TEXT);]])
@@ -226,6 +232,47 @@ Serialize.save_unlock = function(self, type, name, value)
 	else
 		self.db:query([[DELETE FROM unlocks WHERE type=? AND name=?;]], {type, name})
 	end
+end
+
+--- Gets a dialog variable by the owner object and variable name.
+-- @param self Serialize class.
+-- @param object Object.
+-- @param name Variable name.
+-- @return Variable value, or nil.
+Serialize.get_dialog_variable = function(self, object, name)
+	local rows = self.db:query([[SELECT value FROM dialog_variables WHERE id=? AND key=?;]], {object.id, name})
+	if not rows then return end
+	for k,v in ipairs(rows) do
+		return v[1]
+	end
+end
+
+--- Sets the given dialog variable of the owner object.
+-- @param self Serialize class.
+-- @param object Object.
+-- @param name Variable name.
+-- @param value Variable value.
+Serialize.set_dialog_variable = function(self, object, name, value)
+	if value then
+		self.db:query([[REPLACE INTO dialog_variables (id,key,value) VALUES (?,?,?);]], {object.id, name, value})
+	else
+		self.db:query([[DELETE FROM dialog_variables WHERE id=? AND key=?;]], {object.id, name})
+	end
+end
+
+--- Gets all dialog variables for the object.
+-- @param self Serialize class.
+-- @param object Object.
+-- @return Dictionary of variables.
+Serialize.get_dialog_variables = function(self, object)
+	local res = {}
+	local rows = self.db:query([[SELECT key,value FROM dialog_variables WHERE id=?;]], {object.id})
+	if rows then
+		for k,v in ipairs(rows) do
+			res[v[1]] = v[2]
+		end
+	end
+	return res
 end
 
 --- Gets a value from the key-value database.
