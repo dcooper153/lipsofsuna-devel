@@ -17,9 +17,17 @@ NpcAi.new = function(clss, object)
 	self:set_state{state = "none"}
 	-- Initialize combat actions.
 	self.combat_actions = {}
-	local cat = Aiactionspec:find{category = "combat"}
-	if cat then
-		for k,v in pairs(cat) do self.combat_actions[v.name] = v end
+	if object.spec.ai_combat_actions then
+		for k,v in pairs(object.spec.ai_combat_actions) do
+			self.combat_actions[k] = Aiactionspec:find{name = k}
+		end
+	else
+		local cat = Aiactionspec:find{category = "combat"}
+		if cat then
+			for k,v in pairs(cat) do
+				self.combat_actions[v.name] = v
+			end
+		end
 	end
 	return self
 end

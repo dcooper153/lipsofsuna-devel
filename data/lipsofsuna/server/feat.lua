@@ -106,8 +106,10 @@ Feat.perform = function(self, args)
 	if info and not args.stop then
 		if args.user.cooldown then return end
 		if not self:usable(args) then return end
-		for k,v in pairs(info.required_reagents) do
-			args.user.inventory:subtract_objects_by_name(k, v)
+		if not args.user.spec.reagentless_spells then
+			for k,v in pairs(info.required_reagents) do
+				args.user.inventory:subtract_objects_by_name(k, v)
+			end
 		end
 		local w = info.required_stats["willpower"]
 		if w then args.user.stats:subtract("willpower", w) end
@@ -223,10 +225,12 @@ Feat.usable = function(self, args)
 	end
 	-- Check for reagents.
 	local inventory = args.inventory or args.user.inventory
-	for k,v in pairs(info.required_reagents) do
-		local count = inventory:count_objects_by_name(k)
-		if count < v then
-			return false, "Not enough reagents."
+	if not args.user.spec.reagentless_spells then
+		for k,v in pairs(info.required_reagents) do
+			local count = inventory:count_objects_by_name(k)
+			if count < v then
+				return false, "Not enough reagents."
+			end
 		end
 	end
 	-- Check for ammo.

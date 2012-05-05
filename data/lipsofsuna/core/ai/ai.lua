@@ -68,7 +68,7 @@ end
 
 --- Calculates the tilt value for melee attacks.
 -- @param self Ai.
--- @return Tilt angle in radians.
+-- @return Tilt quaternion.
 Ai.calculate_melee_tilt = function(self)
 	-- Calculate distance to the target.
 	local diff = self.target.position + self.target.center_offset_physics - self.object.position - self.object.spec.aim_ray_center
@@ -80,9 +80,16 @@ Ai.calculate_melee_tilt = function(self)
 	return Quaternion{euler = {0,0,angle}}
 end
 
+--- Calculates the tilt value for ranged spell attacks.
+-- @param self Ai.
+-- @return Tilt quaternion.
+Ai.calculate_ranged_spell_tilt = function(self)
+	return self:calculate_melee_tilt()
+end
+
 --- Calculates the tilt value for ranged attacks.
 -- @param self Ai.
--- @return Tilt angle in radians.
+-- @return Tilt quaternion.
 Ai.calculate_ranged_tilt = function(self)
 	-- Get the ammo type.
 	local weapon = self.object:get_weapon()

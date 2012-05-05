@@ -11,7 +11,7 @@ Aiactionspec{
 		self.object:set_block(false)
 		self.object:set_movement(0)
 		self.object:set_strafing(0)
-		self.object.tilt = self:calculate_ranged_tilt()
+		self.object.tilt = self:calculate_ranged_spell_tilt()
 		args.feat_spell_ranged:perform{user = self.object}
 		self.action_timer = 1
 	end}

@@ -9,7 +9,8 @@ Feattypespec{
 	cooldown = 1,
 	icon = "modifier-fireball", -- FIXME
 	description = "Cast a spell that affects nearby targets.",
-	effect = "spell1"}
+	effect = "spell1",
+	range = 5}
 
 Feattypespec{
 	name = "build",
@@ -28,7 +29,8 @@ Feattypespec{
 	cooldown = 1,
 	icon = "modifier-fireball", -- FIXME
 	description = "Cast a magical missile that you can control.",
-	effect = "spell1"}
+	effect = "spell1",
+	range = 10}
 
 Feattypespec{
 	name = "right hand",
@@ -52,6 +54,7 @@ Feattypespec{
 	categories = {["ranged"] = true},
 	cooldown = 1.2,
 	effect_impact = "impact1",
+	range = 10,
 	required_ammo = true,
 	required_weapon = "ranged"}
 
@@ -62,7 +65,8 @@ Feattypespec{
 	categories = {["ranged spell"] = true},
 	cooldown = 1,
 	description = "Cast a magical projectile",
-	effect = "spell1"}
+	effect = "spell1",
+	range = 10}
 
 Feattypespec{
 	name = "spell on self",
@@ -287,6 +291,17 @@ Feateffectspec{
 	influences = {["fire damage"] = 5},
 	projectile = "fireball1",
 	required_stats = {["willpower"] = 1},
+	required_reagents = {["milky powder"] = 1}}
+
+Feateffectspec{
+	name = "fire elemental",
+	categories = {["spell"] = true, ["summon"] = true},
+	animations = {["spell on self"] = true},
+	description = "Conjure a fire elemental",
+	effect = "spell1", --FIXME
+	icon = "firewall", --FIXME
+	influences = {["fire elemental"] = 60},
+	required_stats = {["willpower"] = 10},
 	required_reagents = {["milky powder"] = 1}}
 
 Feateffectspec{

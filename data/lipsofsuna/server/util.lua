@@ -136,6 +136,53 @@ Utils.find_spawn_point = function(clss, point)
 	end
 end
 
+--- Finds a summon point suitable for creatures.
+-- @param clss Utils class.
+-- @param point Point in world space.
+-- @return Point in world units, or nil.
+Utils.find_summon_point = function(clss, point)
+	local p = Vector(point.x, point.y, point.z)
+	local validate_heightmap = function(p)
+		local hm = Map.heightmap:get_height(p, false)
+		if not hm then return "float" end
+		if p.y > hm - 100 and p.y < hm then return "block" end
+		if p.y > hm + 2 then return "float" end
+		return "stand"
+	end
+	local validate_voxel = function(p)
+		local c = (p * Voxel.tile_scale):round()
+		if Voxel:get_tile(c) ~= 0 then return "block" end
+		c.y = c.y + 1
+		if Voxel:get_tile(c) ~= 0 then return "block" end
+		c.y = c.y - 2
+		if Voxel:get_tile(c) == 0 then return "float" end
+		return "stand"
+	end
+	-- Loop through nearby world space points.
+	local horz_table = {2,-2,3,-3,4,-4}
+	local vert_table = {0,1,-1,2,-2,3,-3}
+	local p = Vector()
+	for k1,y in ipairs(vert_table) do
+		p.y = point.y + y
+		for k1,x in ipairs(horz_table) do
+			p.x = point.x + x
+			for k1,z in ipairs(horz_table) do
+				-- Return the tested point if neither the heightmap nor voxels block
+				-- it, and there's either heightmap or a voxel below it so that the
+				-- actor can stand on something.
+				p.z = point.z + z
+				local r1 = validate_heightmap(p)
+				if r1 ~= "block" then
+					local r2 = validate_voxel(p)
+					if r2 ~= "block" then
+						if r1 == "stand" or r2 == "stand" then return p end
+					end
+				end
+			end
+		end
+	end
+end
+
 --- Gets the default spawn point for players.
 -- @param self Utils class.
 -- @return Vector.

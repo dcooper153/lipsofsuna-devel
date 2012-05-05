@@ -328,9 +328,15 @@ end
 -- @param object Object.
 -- @return True if the object is an enemy.
 Creature.check_enemy = function(self, object)
+	-- Don't attack uninteresting targets.
 	if object == self then return end
 	if object.dead then return end
 	if object.god then return end
+	-- Enemy check for summons.
+	if self.summon_owner then
+		return self.summon_owner:check_enemy(object)
+	end
+	-- Default enemy check.
 	return self.spec:check_enemy(object)
 end
 
@@ -533,6 +539,10 @@ Creature.die = function(self)
 	end
 	-- Disable controls etc.
 	self:set_dead_state(true)
+	-- Unsummon summoned actors.
+	if self.summon_timer then
+		self:unsummon()
+	end
 	return true
 end
 
@@ -762,6 +772,13 @@ Creature.teleport = function(self, args)
 	end
 end
 
+--- Causes the summoned actor to be unsummoned.
+-- @param self Object.
+Creature.unsummon = function(self)
+	-- TODO: Some visual feedback would be nice.
+	self:detach()
+end
+
 --- Updates the state of the creature.
 -- @param self Object.
 -- @param secs Seconds since the last update.
@@ -775,6 +792,7 @@ Creature.update = function(self, secs)
 		self:update_actions(tick)
 		self:update_burdening(tick)
 		self:update_environment(tick)
+		self:update_summon(tick)
 		self.update_timer = 0
 	end
 	-- Update the AI.
@@ -965,6 +983,17 @@ Creature.update_skills = function(self)
 	end
 end
 
+--- Updates the summon status of the object.
+-- @param self Object.
+-- @param secs Seconds since the last update.
+Creature.update_summon = function(self, secs)
+	if not self.summon_timer then return end
+	self.summon_timer = self.summon_timer - secs
+	if self.summon_timer < 0 then
+		self:unsummon()
+	end
+end
+
 --- Serializes the object to a string.
 -- @param self Object.
 -- @return Data string.
@@ -1001,6 +1030,8 @@ end
 -- @param self Object.
 -- @param db Database.
 Creature.write_db = function(self, db)
+	-- Don't save summons.
+	if self.summon_timer then return end
 	-- Write the object.
 	local data = string.format("return Creature%s", serialize{
 		angular = self.angular,
