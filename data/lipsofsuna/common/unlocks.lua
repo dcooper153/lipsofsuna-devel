@@ -102,7 +102,7 @@ Unlocks.unlock_random = function(self)
 	for k,v in pairs(Feateffectspec.dict_name) do
 		if v.description and not self:get("spell effect", k) then
 			local pass = false
-			for index,name in pairs(v.animations) do
+			for name in pairs(v.animations) do
 				if self:get("spell type", name) then
 					pass = true
 					break
