@@ -34,8 +34,9 @@ end
 Binding.event = function(clss, args, handle)
 	-- Maintain key states.
 	if args.type == "keypress" then
+		args.time = Program.time + 0.25
 		clss.mods = args.mods
-		clss.dict_press[args.code] = true
+		clss.dict_press[args.code] = args
 	elseif args.type == "keyrelease" then
 		clss.mods = args.mods
 		clss.dict_press[args.code] = nil

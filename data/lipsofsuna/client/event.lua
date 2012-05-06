@@ -33,6 +33,16 @@ end}
 local compasst = 0
 local fpst = 0
 Eventhandler{type = "tick", func = function(self, args)
+	-- Emit key repeat events.
+	local t = Program.time
+	for k,v in pairs(Binding.dict_press) do
+		if t - v.time > 0.05 then
+			v.type = "keyrepeat"
+			v.mods = Binding.mods
+			v.time = t
+			Ui:handle_event(v)
+		end
+	end
 	-- Update the connection status.
 	if Client.connected and not Network.connected then
 		Client:terminate_game()
