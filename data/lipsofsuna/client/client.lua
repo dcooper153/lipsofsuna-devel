@@ -48,11 +48,13 @@ Client.add_speech_text = function(self, args)
 	-- Add to the chat log.
 	Client:append_log("<" .. args.name .. "> " .. args.text)
 	-- Create a text bubble.
+	local bounds = args.object.bounding_box
+	local offset = bounds.point.y + bounds.size.y + 0.5
 	TextBubble{
 		life = 5,
 		fade = 1,
 		object = args.object,
-		position = Vector(0,2,0),
+		position = Vector(0,offset,0),
 		text = args.text,
 		text_color = {1,1,1,1},
 		text_font = "medium"}
