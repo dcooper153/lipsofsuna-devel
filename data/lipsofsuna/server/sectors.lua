@@ -81,7 +81,7 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 	-- If the sector already contains monsters, reduce the number of newly
 	-- spawned monsters accodingly to not cramp the sector.
 	for k,obj in pairs(objects) do
-		if obj.spec.type == "species" then
+		if obj.spec.type == "actor" then
 			monsters = monsters - 1
 			if monsters == 0 then return end
 		end
@@ -99,7 +99,7 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 				local p = Utils:find_spawn_point(c * Voxel.tile_size)
 				if p then
 					local d = Utils:get_spawn_point_difficulty(p, true)
-					Voxel:place_creature{point = p * Voxel.tile_scale, category = "enemy", difficulty = d}
+					Voxel:place_actor{point = p * Voxel.tile_scale, category = "enemy", difficulty = d}
 					break
 				end
 				coroutine.yield()

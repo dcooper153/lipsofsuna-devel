@@ -21,7 +21,7 @@ end
 --- Finds a buildable point near the given point.
 -- @param clss Utils class.
 -- @param point Point in world space.
--- @param user Builder creature used for resolving conflicts.
+-- @param user Builder actor used for resolving conflicts.
 -- @return Point in tiles and point in world space, or nil.
 Utils.find_build_point = function(clss, point, user)
 	-- Find an empty tile.
@@ -89,7 +89,7 @@ Utils.find_drop_point = function(clss, point)
 	return (c + Vector(0.5,0.5,0.5)) * Voxel.tile_size
 end
 
---- Finds a random spawn point in the overworld that is suitable for creatures.
+--- Finds a random spawn point in the overworld that is suitable for actors.
 -- @param clss Utils class.
 -- @return Point in world units.
 Utils.find_random_overworld_point = function(clss)
@@ -105,7 +105,7 @@ Utils.find_random_overworld_point = function(clss)
 	end
 end
 
---- Finds a spawn point suitable for creatures.
+--- Finds a spawn point suitable for actors.
 -- @param clss Utils class.
 -- @param point Point in world space.
 -- @return Point in world units, or nil.
@@ -136,7 +136,7 @@ Utils.find_spawn_point = function(clss, point)
 	end
 end
 
---- Finds a summon point suitable for creatures.
+--- Finds a summon point suitable for actors.
 -- @param clss Utils class.
 -- @param point Point in world space.
 -- @return Point in world units, or nil.
@@ -313,10 +313,10 @@ Voxel.damage = function(self, user, point)
 	end
 	-- Spawn random monsters.
 	if not n and math.random() < 0.01 then
-		local spec = Species:random{category = "mining"}
+		local spec = Actorspec:random{category = "mining"}
 		if spec then
 			local offset = (point + Vector(0.5,0.1,0.5)) * Voxel.tile_size
-			local object = Creature{random = true, spec = spec, position = offset, realized = true}
+			local object = Actor{random = true, spec = spec, position = offset, realized = true}
 		end
 	end
 	return true

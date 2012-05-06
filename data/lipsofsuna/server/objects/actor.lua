@@ -1,152 +1,30 @@
 require "server/objects/object"
 
-Creature = Class(Object)
-Creature.class_name = "Creature"
-Creature.dict_id = setmetatable({}, {__mode = "kv"})
+Actor = Class(Object)
+Actor.class_name = "Actor"
+Actor.dict_id = setmetatable({}, {__mode = "kv"})
 
-Creature:add_getters{
-	armor_class = function(s)
-		local value = 0
-		for k,v in pairs(s.spec.equipment_slots) do
-			local i = s.inventory:get_object_by_slot(k)
-			value = value + (i and i.spec.armor_class or 0)
-		end
-		return value
-	end,
-	beheaded = function(s)
-		return Bitwise:band(s.flags or 0, Protocol.object_flags.BEHEADED) ~= 0
-	end}
-
-Creature:add_setters{
-	beheaded = function(s, v)
-		s.flags = Bitwise:bor(s.flags or 0, Protocol.object_flags.BEHEADED)
-		Vision:event{type = "object-beheaded", object = s}
-		local hat = s.inventory:get_object_by_slot("head")
-		if hat then
-			local p = s.position
-			hat:detach()
-			hat.position = p + s.rotation * (s.dead and Vector(0,0.5,2) or Vector(0,2,0))
-			hat.velocity = Vector(math.random(), math.random(), math.random())
-			hat.realized = true
-		end
-	end,
-	spec = function(s, v)
-		local spec = type(v) == "string" and Species:find{name = v} or v
-		if s.spec == spec then return end
-		rawset(s, "__spec", spec)
-		s.model = spec.model
-		s.mass = spec.mass
-		s.friction_liquid = spec.water_friction
-		s.gravity = spec.gravity
-		s.gravity_liquid = spec.water_gravity
-		-- Set appearance.
-		-- Only set once when spawned by the map generator or an admin.
-		if s.random then
-			s.eye_style = s.eye_style or spec:get_random_eyes()
-			s.hair_style = s.hair_style or spec:get_random_hair() 
-		end
-		-- Assign skills.
-		s.skills:clear()
-		for k in pairs(spec.skills) do
-			s.skills:add(k)
-		end
-		-- Initialize stats.
-		s:update_skills()
-		if s.random then
-			s.stats:set_value("health", s.stats:get_maximum("health"))
-			s.stats:set_value("willpower", s.stats:get_maximum("willpower"))
-		end
-		-- Create inventory.
-		-- When the map generator or an admin command creates an object, the
-		-- random field is set to indicate that items should be generated.
-		-- The field isn't saved so items are only created once as expected.
-		if s.inventory then
-			s.inventory = Inventory{id = s.id, size = spec.inventory_size}
-		else
-			-- FIXME: May break for existing objects that have too many inventory items.
-			s.inventory.size = spec.inventory_size
-		end
-		if s.random then
-			for k,v in pairs(spec.inventory_items) do
-				local itemspec = Itemspec:find{name = k}
-				if itemspec then
-					if itemspec.stacking then
-						s.inventory:merge_object(Item{spec = itemspec, count = v})
-					else
-						for i = 1,v do s.inventory:merge_object(Item{spec = itemspec}) end
-					end
-				else
-					print(string.format("WARNING: Creature '%s' uses an invalid inventory item name '%s'", s.spec.name, k))
-				end
-			end
-			s.inventory:equip_best_objects()
-		end
-		-- Create random loot.
-		-- The same about random objects applies as above.
-		if s.random and spec.loot_categories then
-			local num_cat = #spec.loot_categories
-			local num_item
-			if spec.loot_count_min or spec.loot_count_max then
-				local min = spec.loot_count_min or 0
-				local max = spec.loot_count_max or min
-				num_item = math.random(min, max)
-			else
-				num_item = math.random(0, s.inventory.size)
-			end
-			for i = 1,num_item do
-				local cat = spec.loot_categories[math.random(1, num_cat)]
-				local itemspec = Itemspec:random{category = cat}
-				if itemspec then
-					s.inventory:merge_object(Item{spec = itemspec})
-				else
-					print(string.format("WARNING: Creature '%s' uses an invalid inventory item category '%s'", s.spec.name, v))
-				end
-			end
-		end
-		-- Create the map marker.
-		-- Usually the marker exists already but we support creating new markers on
-		-- the fly in case that'll be needed in the future.
-		if spec.marker then
-			s.marker = Marker:find{name = spec.marker}
-			if s.marker then
-				s.marker.position = s.position
-				s.marker.target = s.id
-			else
-				s.marker = Marker{name = spec.marker, position = s.position, target = s.id}
-			end
-		end
-		-- Kill dead quest characters.
-		if spec.dead then
-			s.dead = true
-		end
-		-- Create the AI.
-		if not spec.dead and spec.ai_enabled and Ai then
-			ai_class = Ai.dict_name[spec.ai_type or "npc"]
-			s.ai = ai_class and ai_class(s)
-		end
-	end}
-
---- Creates a new creature.
--- @param clss Creature class.
+--- Creates a new actor.
+-- @param clss Actor class.
 -- @param args Arguments.<ul>
 --   <li>angular: Angular velocity.</li>
 --   <li>beheaded: True to spawn without a head.</li>
 --   <li>body_scale: Scale factor of the body.</li>
 --   <li>body_style: Body style defined by an array of scalars.</li>
---   <li>dead: True for a dead creature.</li>
+--   <li>dead: True for a dead actor.</li>
 --   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
 --   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
 --   <li>id: Unique object ID or nil for a random free one.</li>
 --   <li>jumped: Jump timer.</li>
---   <li>name: Name of the creature.</li>
+--   <li>name: Name of the actor.</li>
 --   <li>physics: Physics mode.</li>
---   <li>position: Position vector of the creature.</li>
---   <li>rotation: Rotation quaternion of the creature.</li>
+--   <li>position: Position vector of the actor.</li>
+--   <li>rotation: Rotation quaternion of the actor.</li>
 --   <li>skills: Skill table of the character.</li>
 --   <li>skin_style: Skin style defined by an array of {style, red, green, blue}.</li>
---   <li>spec: Species of the creature.</li>
+--   <li>spec: Actorspec of the actor.</li>
 --   <li>realized: True to add the object to the simulation.</li></ul>
-Creature.new = function(clss, args)
+Actor.new = function(clss, args)
 	local self = Object.new(clss, {id = args.id})
 	local copy = function(n, d)
 		if args[n] ~= nil or d then
@@ -191,9 +69,9 @@ end
 --- Clones the object.
 -- @param self Object.
 -- @return New object.
-Creature.clone = function(self)
+Actor.clone = function(self)
 	-- TODO: Copy dialog variables?
-	return Creature{
+	return Actor{
 		angular = self.angular,
 		beheaded = self.beheaded,
 		dead = self.dead,
@@ -208,11 +86,11 @@ end
 
 --- Adds an object to the list of known enemies.<br/>
 -- This function skips faction checks and adds the object directly to the
--- list. Hence, calling this temporarily makes the creature angry at the
+-- list. Hence, calling this temporarily makes the actor angry at the
 -- passed object.
 -- @param self Object.
 -- @param object Object to add to the list of enemies.
-Creature.add_enemy = function(self, object)
+Actor.add_enemy = function(self, object)
 	if not self.ai then return end
 	if object.god then return end
 	self.ai:add_enemy(object)
@@ -220,7 +98,7 @@ end
 
 --- Calculates the animation state based on the active controls.
 -- @param self Object.
-Creature.calculate_animation = function(self)
+Actor.calculate_animation = function(self)
 	local anim
 	local back = self.movement < 0
 	local front = self.movement > 0
@@ -238,9 +116,9 @@ Creature.calculate_animation = function(self)
 	else self:animate("idle") end
 end
 
---- Calculates the movement speed of the creature.
+--- Calculates the movement speed of the actor.
 -- @param self Object.
-Creature.calculate_speed = function(self)
+Actor.calculate_speed = function(self)
 	-- Base speed.
 	local s = (self.running and not self.blocking) and self.spec.speed_run or self.spec.speed_walk
 	-- Skill bonuses.
@@ -256,10 +134,10 @@ Creature.calculate_speed = function(self)
 	end
 end
 
---- Checks if the creature could climb over a low wall.
--- @param self Creature.
+--- Checks if the actor could climb over a low wall.
+-- @param self Actor.
 -- @return True if could climb.
-Creature.can_climb_low = function(self)
+Actor.can_climb_low = function(self)
 	if self.movement < 0 then return end
 	local ctr = self.position * Voxel.tile_scale + Vector(0,0.5,0)
 	local dir = self.rotation * Vector(0,0,-1)
@@ -270,10 +148,10 @@ Creature.can_climb_low = function(self)
 	return f1 ~= 0 and f2 == 0 and f3 == 0
 end
 
---- Checks if the creature could climb over a high wall.
--- @param self Creature.
+--- Checks if the actor could climb over a high wall.
+-- @param self Actor.
 -- @return True if could climb.
-Creature.can_climb_high = function(self)
+Actor.can_climb_high = function(self)
 	if self.movement < 0 then return end
 	local ctr = self.position * Voxel.tile_scale + Vector(0,0.5,0)
 	local dir = self.rotation * Vector(0,0,-1)
@@ -290,7 +168,7 @@ end
 --   <li>object: Object being looked for.</li>
 --   <li>point: Point being looked for.</li></ul>
 -- @return True if seen.
-Creature.check_line_of_sight = function(self, args)
+Actor.check_line_of_sight = function(self, args)
 	-- TODO: Take stealth into account.
 	local src
 	local dst
@@ -320,11 +198,11 @@ Creature.check_line_of_sight = function(self, args)
 	end
 end
 
---- Checks if the given object is an enemy of the creature.
+--- Checks if the given object is an enemy of the actor.
 -- @param self Object.
 -- @param object Object.
 -- @return True if the object is an enemy.
-Creature.check_enemy = function(self, object)
+Actor.check_enemy = function(self, object)
 	-- Don't attack uninteresting targets.
 	if object == self then return end
 	if object.dead then return end
@@ -343,7 +221,7 @@ end
 --   <li>amount: Amount of damage.</li>
 --   <li>point: Damage point.</li>
 --   <li>type: Damage type.</li></ul>
-Creature.damaged = function(self, args)
+Actor.damaged = function(self, args)
 	-- Check for invulnerability.
 	if not self.realized then return end
 	if self.god then return end
@@ -390,7 +268,7 @@ end
 --- Gets the spell effects known by the object.
 -- @param self Object.
 -- @return Dictionary of booleans.
-Creature.get_known_spell_effects = function(self)
+Actor.get_known_spell_effects = function(self)
 	return self.spec.feat_effects
 end
 
@@ -401,15 +279,15 @@ Object.get_known_spell_types = function(self)
 	return self.spec.feat_types
 end
 
-Creature.get_weapon = function(self)
+Actor.get_weapon = function(self)
 	return self.inventory:get_object_by_slot(self.spec.weapon_slot)
 end
 
-Creature.set_weapon = function(self, value)
+Actor.set_weapon = function(self, value)
 	return self.inventory:equip_object(value, self.spec.weapon_slot)
 end
 
-Creature.set_dead_state = function(self, drop)
+Actor.set_dead_state = function(self, drop)
 	-- Playback animation.
 	-- This needs to be done first because setting the 'dead' member will
 	-- prevent any future animation changes.
@@ -445,7 +323,7 @@ Creature.set_dead_state = function(self, drop)
 	Vision:event{type = "object-dead", object = self, dead = true}
 end
 
-Creature.climb = function(self)
+Actor.climb = function(self)
 	if self.blocking then return end
 	if self.climbing then return end
 	local align_object = function()
@@ -513,10 +391,10 @@ Creature.climb = function(self)
 	end
 end
 
---- Causes the creature to die.
+--- Causes the actor to die.
 -- @param self Object.
 -- @return True if killed, false if saved by Sanctuary.
-Creature.die = function(self)
+Actor.die = function(self)
 	if self.dead then return end
 	-- Sanctuary save.
 	if self.modifiers and self.modifiers.sanctuary and not self.beheaded then
@@ -543,13 +421,13 @@ Creature.die = function(self)
 	return true
 end
 
---- Makes the creature face a point.
+--- Makes the actor face a point.
 -- @param self Object.
 -- @param args Arguments.<ul>
 --   <li>point: Position vector.</li>
 --   <li>secs: Tick length or nil for instant rotation.</li></ul>
 -- @return The dot product of the current direction and the target direction.
-Creature.face_point = function(self, args)
+Actor.face_point = function(self, args)
 	local sdir = self.rotation * Vector(0, 0, -1)
 	local edir = (args.point - self.position):normalize()
 	local quat = Quaternion{dir = Vector(edir.x, 0, edir.z), up = Vector(0, 1, 0)}
@@ -569,17 +447,17 @@ end
 -- @param self Object.
 -- @param point Position vector in world space.
 -- @return Quaternion.
-Creature.get_rotation_to_point = function(self, point)
+Actor.get_rotation_to_point = function(self, point)
 	local dir = (point - self.position):normalize()
 	dir.y = 0
 	return Quaternion{dir = dir, up = Vector(0, 1, 0)}
 end
 
---- Gets the attack ray of the creature.
+--- Gets the attack ray of the actor.
 -- @param self Object.
 -- @param rel Destination shift vector or nil.
 -- @return Ray start point and ray end point relative to the object.
-Creature.get_attack_ray = function(self, rel)
+Actor.get_attack_ray = function(self, rel)
 	local ctr = self.spec.aim_ray_center
 	local ray1 = Vector(0, 0, -self.spec.aim_ray_start)
 	local ray2 = Vector(0, 0, -self.spec.aim_ray_end)
@@ -596,25 +474,25 @@ Creature.get_attack_ray = function(self, rel)
 	end
 end
 
---- Returns the burdening limit of the creature.
--- @param self creature.
+--- Returns the burdening limit of the actor.
+-- @param self Actor.
 -- @return Burdening limit in kilograms
-Creature.get_burden_limit = function(self)
+Actor.get_burden_limit = function(self)
 	-- TODO
 	return 500
 end
 
---- Returns true if the creature is burdened.
--- @param self Creature.
+--- Returns true if the actor is burdened.
+-- @param self Actor.
 -- @return True if burdened.
-Creature.get_burdened = function(self)
+Actor.get_burdened = function(self)
 	return self.carried_weight > self:get_burden_limit()
 end
 
 --- Gets a modifier by name.
 -- @param self Object.
 -- @param name Modifer name.
-Creature.get_modifier = function(self, name)
+Actor.get_modifier = function(self, name)
 	if not self.modifiers then return end
 	return self.modifiers[name]
 end
@@ -624,7 +502,7 @@ end
 -- @param name Modifier name.
 -- @param strength Modifier strength.
 -- @param args Arguments passed to the modifier
-Creature.inflict_modifier = function(self, name, strength, args)
+Actor.inflict_modifier = function(self, name, strength, args)
 	if not self.modifiers then self.modifiers = {} end
 	local mod = self.modifiers[name]
 	if not mod or mod.strength < strength then
@@ -633,9 +511,9 @@ Creature.inflict_modifier = function(self, name, strength, args)
 	end
 end
 
---- Causes the creature to jump.
+--- Causes the actor to jump.
 -- @param self Object.
-Creature.jump = function(self)
+Actor.jump = function(self)
 	-- Check for preconditions.
 	if self.blocking then return end
 	if self.climbing then return end
@@ -668,9 +546,9 @@ Creature.jump = function(self)
 	end
 end
 
---- Causes the creature to stop jumping, resulting to a lower jump.
+--- Causes the actor to stop jumping, resulting to a lower jump.
 -- @param self Object.
-Creature.jump_stop = function(self)
+Actor.jump_stop = function(self)
 	if not self.jumping then return end
 	if self.submerged then return end
 	local init_y = self.spec.jump_force * self.spec.mass
@@ -684,7 +562,7 @@ end
 --- Loots the object.
 -- @param self Object.
 -- @param user Object doing the looting.
-Creature.loot = function(self, user)
+Actor.loot = function(self, user)
 	return Object.loot(self, user)
 end
 
@@ -693,7 +571,7 @@ end
 -- @param src_id ID of the picked up object.
 -- @param dst_id ID of the inventory where to place the object.
 -- @param dst_slot Name of the inventory slot where to place the object.
-Creature.pick_up = function(self, src_id, dst_id, dst_slot)
+Actor.pick_up = function(self, src_id, dst_id, dst_slot)
 	self:animate("pick up")
 	Timer{delay = self.spec.timing_pickup * 0.02, func = function(timer)
 		Actions:move_from_world_to_inv(self, src_id, dst_id, dst_slot)
@@ -704,7 +582,7 @@ end
 --- Removes a modifier.
 -- @param self Object.
 -- @param name Modifier name.
-Creature.remove_modifier = function(self, name)
+Actor.remove_modifier = function(self, name)
 	if self.modifiers and self.modifiers[name] then
 		self.modifiers[name] = nil
 		self:removed_modifier(name)
@@ -714,14 +592,14 @@ end
 --- Called when a modifier is removed.
 -- @param self Object.
 -- @param name Modifier name.
-Creature.removed_modifier = function(self, name)
+Actor.removed_modifier = function(self, name)
 	self:update_skills()
 end
 
 --- Enables or disables the blocking stance.
--- @param self Creature.
+-- @param self Actor.
 -- @param value True to block.
-Creature.set_block = function(self, value)
+Actor.set_block = function(self, value)
 	if self.jumping then return end
 	if value and self.blocking then return end
 	if not value and not self.blocking then return end
@@ -736,18 +614,18 @@ Creature.set_block = function(self, value)
 	self:calculate_animation()
 end
 
---- Sets the forward/backward movement state of the creature.
+--- Sets the forward/backward movement state of the actor.
 -- @param self Object.
 -- @param value Movement rate.
-Creature.set_movement = function(self, value)
+Actor.set_movement = function(self, value)
 	self.movement = math.min(1, math.max(-1, value))
 	self:calculate_animation()
 end
 
---- Sets the strafing state of the creature.
+--- Sets the strafing state of the actor.
 -- @param self Object.
 -- @param value Strafing rate.
-Creature.set_strafing = function(self, value)
+Actor.set_strafing = function(self, value)
 	self.strafing = value
 	self:calculate_animation()
 end
@@ -759,7 +637,7 @@ end
 --   <li>position: World position.</li>
 --   <li>region: Region name.</li></ul>
 -- @return True on success.
-Creature.teleport = function(self, args)
+Actor.teleport = function(self, args)
 	if Object.teleport(self, args) then
 		-- Update skills.
 		-- As long as actors always teleport between the overworld and the
@@ -771,15 +649,15 @@ end
 
 --- Causes the summoned actor to be unsummoned.
 -- @param self Object.
-Creature.unsummon = function(self)
+Actor.unsummon = function(self)
 	-- TODO: Some visual feedback would be nice.
 	self:detach()
 end
 
---- Updates the state of the creature.
+--- Updates the state of the actor.
 -- @param self Object.
 -- @param secs Seconds since the last update.
-Creature.update = function(self, secs)
+Actor.update = function(self, secs)
 	-- Update the state.
 	self.update_timer = self.update_timer + secs
 	if self.update_timer > 0.3 then
@@ -798,7 +676,7 @@ Creature.update = function(self, secs)
 	end
 end
 
-Creature.update_actions = function(self, secs)
+Actor.update_actions = function(self, secs)
 	-- Update flying.
 	if self.flying and self.tilt then
 		local v = self.velocity
@@ -869,19 +747,19 @@ Creature.update_actions = function(self, secs)
 		end
 	end
 end
---- Updates the AI state of the creature.<br/>
+--- Updates the AI state of the actor.<br/>
 -- You can force the AI to recheck its state immediately by calling the function.
 -- This can be useful when, for example, the player has initiated a dialog and
 -- you want to set the NPC into the chat mode immediately instead of waiting for
 -- the next AI update cycle.
 -- @param self Object.
-Creature.update_ai_state = function(self)
+Actor.update_ai_state = function(self)
 	if self.ai then
 		self.ai:update_state()
 	end
 end
 
-Creature.update_burdening = function(self, secs)
+Actor.update_burdening = function(self, secs)
 	-- Don't update every frame.
 	self.burden_timer = (self.burden_timer or 0) + secs
 	if self.burden_timer < 1 then return end
@@ -917,7 +795,7 @@ end
 -- @param self Object.
 -- @param secs Seconds since the last update.
 -- @return Boolean and environment statistics. The boolean is true if the object isn't permanently stuck.
-Creature.update_environment = function(self, secs)
+Actor.update_environment = function(self, secs)
 	-- Don't update every frame.
 	if not self.realized then return true end
 	self.env_timer = (self.env_timer or 0) + secs
@@ -951,9 +829,9 @@ Creature.update_environment = function(self, secs)
 	return true, env
 end
 
---- Updates the skills and related attributes of the creature.
+--- Updates the skills and related attributes of the actor.
 -- @param self Object.
-Creature.update_skills = function(self)
+Actor.update_skills = function(self)
 	-- Calculate the attributes.
 	local attr = self.skills:calculate_attributes()
 	if self.modifiers then
@@ -965,7 +843,7 @@ Creature.update_skills = function(self)
 		end
 	end
 	attr.max_health = math.max(1, attr.max_health)
-	-- Assign the attributes to the creature.
+	-- Assign the attributes to the actor.
 	self.attributes = attr
 	self.stats:set_maximum("health", attr.max_health)
 	self.stats:set_maximum("willpower", attr.max_willpower)
@@ -983,7 +861,7 @@ end
 --- Updates the summon status of the object.
 -- @param self Object.
 -- @param secs Seconds since the last update.
-Creature.update_summon = function(self, secs)
+Actor.update_summon = function(self, secs)
 	if not self.summon_timer then return end
 	self.summon_timer = self.summon_timer - secs
 	if self.summon_timer < 0 then
@@ -994,8 +872,8 @@ end
 --- Serializes the object to a string.
 -- @param self Object.
 -- @return Data string.
-Creature.write = function(self)
-	return string.format("local self=Creature%s\n%s%s%s%s", serialize{
+Actor.write = function(self)
+	return string.format("local self=Actor%s\n%s%s%s%s", serialize{
 		angular = self.angular,
 		beheaded = self.beheaded or nil,
 		dead = self.dead,
@@ -1016,7 +894,7 @@ end
 --- Reads the object from a database.
 -- @param self Object.
 -- @param db Database.
-Creature.read_db = function(self, db)
+Actor.read_db = function(self, db)
 	Serialize:load_object_inventory(self)
 	Serialize:load_object_skills(self)
 	Serialize:load_object_stats(self)
@@ -1025,11 +903,11 @@ end
 --- Writes the object to a database.
 -- @param self Object.
 -- @param db Database.
-Creature.write_db = function(self, db)
+Actor.write_db = function(self, db)
 	-- Don't save summons.
 	if self.summon_timer then return end
 	-- Write the object.
-	local data = string.format("return Creature%s", serialize{
+	local data = string.format("return Actor%s", serialize{
 		angular = self.angular,
 		beheaded = self.beheaded or nil,
 		dead = self.dead,
@@ -1065,3 +943,121 @@ Creature.write_db = function(self, db)
 		db:query([[REPLACE INTO object_stats (id,name,value) VALUES (?,?,?);]], {self.id, name, args.value})
 	end
 end
+
+Actor:add_getters{
+	armor_class = function(s)
+		local value = 0
+		for k,v in pairs(s.spec.equipment_slots) do
+			local i = s.inventory:get_object_by_slot(k)
+			value = value + (i and i.spec.armor_class or 0)
+		end
+		return value
+	end,
+	beheaded = function(s)
+		return Bitwise:band(s.flags or 0, Protocol.object_flags.BEHEADED) ~= 0
+	end}
+
+Actor:add_setters{
+	beheaded = function(s, v)
+		s.flags = Bitwise:bor(s.flags or 0, Protocol.object_flags.BEHEADED)
+		Vision:event{type = "object-beheaded", object = s}
+		local hat = s.inventory:get_object_by_slot("head")
+		if hat then
+			local p = s.position
+			hat:detach()
+			hat.position = p + s.rotation * (s.dead and Vector(0,0.5,2) or Vector(0,2,0))
+			hat.velocity = Vector(math.random(), math.random(), math.random())
+			hat.realized = true
+		end
+	end,
+	spec = function(s, v)
+		local spec = type(v) == "string" and Actorspec:find{name = v} or v
+		if s.spec == spec then return end
+		rawset(s, "__spec", spec)
+		s.model = spec.model
+		s.mass = spec.mass
+		s.friction_liquid = spec.water_friction
+		s.gravity = spec.gravity
+		s.gravity_liquid = spec.water_gravity
+		-- Set appearance.
+		-- Only set once when spawned by the map generator or an admin.
+		if s.random then
+			s.eye_style = s.eye_style or spec:get_random_eyes()
+			s.hair_style = s.hair_style or spec:get_random_hair() 
+		end
+		-- Assign skills.
+		s.skills:clear()
+		for k in pairs(spec.skills) do
+			s.skills:add(k)
+		end
+		-- Initialize stats.
+		s:update_skills()
+		if s.random then
+			s.stats:set_value("health", s.stats:get_maximum("health"))
+			s.stats:set_value("willpower", s.stats:get_maximum("willpower"))
+		end
+		-- Create inventory.
+		-- When the map generator or an admin command creates an object, the
+		-- random field is set to indicate that items should be generated.
+		-- The field isn't saved so items are only created once as expected.
+		if s.inventory then
+			s.inventory = Inventory{id = s.id, size = spec.inventory_size}
+		else
+			-- FIXME: May break for existing objects that have too many inventory items.
+			s.inventory.size = spec.inventory_size
+		end
+		if s.random then
+			for k,v in pairs(spec.inventory_items) do
+				local itemspec = Itemspec:find{name = k}
+				if itemspec then
+					if itemspec.stacking then
+						s.inventory:merge_object(Item{spec = itemspec, count = v})
+					else
+						for i = 1,v do s.inventory:merge_object(Item{spec = itemspec}) end
+					end
+				end
+			end
+			s.inventory:equip_best_objects()
+		end
+		-- Create random loot.
+		-- The same about random objects applies as above.
+		if s.random and spec.loot_categories then
+			local num_cat = #spec.loot_categories
+			local num_item
+			if spec.loot_count_min or spec.loot_count_max then
+				local min = spec.loot_count_min or 0
+				local max = spec.loot_count_max or min
+				num_item = math.random(min, max)
+			else
+				num_item = math.random(0, s.inventory.size)
+			end
+			for i = 1,num_item do
+				local cat = spec.loot_categories[math.random(1, num_cat)]
+				local itemspec = Itemspec:random{category = cat}
+				if itemspec then
+					s.inventory:merge_object(Item{spec = itemspec})
+				end
+			end
+		end
+		-- Create the map marker.
+		-- Usually the marker exists already but we support creating new markers on
+		-- the fly in case that'll be needed in the future.
+		if spec.marker then
+			s.marker = Marker:find{name = spec.marker}
+			if s.marker then
+				s.marker.position = s.position
+				s.marker.target = s.id
+			else
+				s.marker = Marker{name = spec.marker, position = s.position, target = s.id}
+			end
+		end
+		-- Kill dead quest characters.
+		if spec.dead then
+			s.dead = true
+		end
+		-- Create the AI.
+		if not spec.dead and spec.ai_enabled and Ai then
+			ai_class = Ai.dict_name[spec.ai_type or "npc"]
+			s.ai = ai_class and ai_class(s)
+		end
+	end}

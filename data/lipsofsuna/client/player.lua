@@ -1,5 +1,4 @@
 Player = Class()
-Player.species = "aer" -- FIXME
 
 local radian_wrap = function(x)
 	local y = x

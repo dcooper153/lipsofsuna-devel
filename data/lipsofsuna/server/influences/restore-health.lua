@@ -13,7 +13,7 @@ Feateffectspec:extend{
 		if val > 0 or not args.owner.client or not args.object.client then
 			args.object:damaged{amount = -val, point = args.point, type = "physical"}
 		end
-		-- Anger hurt creatures.
+		-- Anger hurt actors.
 		if val < 0 then
 			args.object:add_enemy(args.owner)
 		end

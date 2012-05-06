@@ -8,7 +8,7 @@ Patternspec{
 		{02,02,10,"building marker"},{12,02,10,"building marker"},{22,02,10,"building marker"},{32,02,10,"building marker"},
 		{02,02,20,"building marker"},{12,02,20,"building marker"},{22,02,20,"building marker"},{32,02,20,"building marker"},
 		{02,02,30,"building marker"},{12,02,30,"building marker"},{22,02,30,"building marker"},{32,02,30,"building marker"}},
-	creatures = {
+	actors = {
 		{23.650000,0.990000,34.770000,"Castle Foreman"}},
 	tiles = {
 		{0,0,0,"granite1"}, {1,0,0,"granite1"}, {2,0,0,"granite1"}, {3,0,0,"granite1"}, {4,0,0,"granite1"}, {5,0,0,"granite1"}, {6,0,0,"granite1"}, {7,0,0,"granite1"}, {8,0,0,"granite1"}, {9,0,0,"granite1"}, {10,0,0,"granite1"}, {11,0,0,"granite1"}, {12,0,0,"granite1"}, {13,0,0,"granite1"}, {14,0,0,"granite1"}, {15,0,0,"granite1"}, {16,0,0,"granite1"}, {17,0,0,"granite1"}, {18,0,0,"granite1"}, {19,0,0,"granite1"}, {20,0,0,"granite1"}, {21,0,0,"granite1"}, {22,0,0,"granite1"}, {23,0,0,"granite1"}, {24,0,0,"granite1"}, {25,0,0,"granite1"}, {26,0,0,"granite1"}, {27,0,0,"granite1"}, {28,0,0,"granite1"}, {29,0,0,"granite1"}, {30,0,0,"granite1"}, {31,0,0,"granite1"}, {32,0,0,"granite1"}, {33,0,0,"granite1"}, {34,0,0,"granite1"}, {35,0,0,"granite1"}, {36,0,0,"granite1"}, {37,0,0,"granite1"}, {38,0,0,"granite1"}, {39,0,0,"granite1"}, {40,0,0,"granite1"}, {41,0,0,"granite1"}, {42,0,0,"granite1"}, {43,0,0,"granite1"},

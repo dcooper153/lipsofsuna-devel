@@ -131,7 +131,7 @@ end
 
 --- Gets the armor class of the item.
 -- @param self Object.
--- @param user Creature.
+-- @param user Actor.
 -- @return Armor rating.
 Item.get_armor_class = function(self, user)
 	return self.spec.armor_class
@@ -139,7 +139,7 @@ end
 
 --- Gets the weapon damage types of the item.
 -- @param self Object.
--- @param user Creature.
+-- @param user Actor.
 -- @return Array of influences.
 Item.get_weapon_influences = function(self, user)
 	if not self.spec.influences then return {} end

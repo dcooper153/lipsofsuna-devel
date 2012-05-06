@@ -184,7 +184,7 @@ Ui:add_state{
 	init = function()
 		-- Get the list of actor names.
 		local widgets = {}
-		for k in pairs(Species.dict_name) do table.insert(widgets, k) end
+		for k in pairs(Actorspec.dict_name) do table.insert(widgets, k) end
 		table.sort(widgets)
 		-- Create widgets for the actors.
 		for k,v in pairs(widgets) do

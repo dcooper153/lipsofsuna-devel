@@ -1,6 +1,6 @@
-Creature = Class(Object)
+Actor = Class(Object)
 
-Creature.new = function(clss, args)
+Actor.new = function(clss, args)
 	local self = Object.new(clss, args)
 	self.stats = {}
 	self.inventory:subscribe(self, function(args) self:update_inventory(args) end)
@@ -9,7 +9,7 @@ Creature.new = function(clss, args)
 	return self
 end
 
-Creature.detach = function(self)
+Actor.detach = function(self)
 	-- Hide equipment.
 	self.inventory:clear()
 	-- Call base.
@@ -17,9 +17,9 @@ Creature.detach = function(self)
 end
 
 --- Disables the equipment holding animation for the given slot.
--- @param self Creature.
+-- @param self Actor.
 -- @param slot Slot being modified.
-Creature.disable_equipment_holding_animation = function(self, slot)
+Actor.disable_equipment_holding_animation = function(self, slot)
 	if not self.equipment_animations then return end
 	if not self.equipment_animations[slot] then return end
 	self:animate{channel = self.equipment_animations[slot].channel}
@@ -27,11 +27,11 @@ Creature.disable_equipment_holding_animation = function(self, slot)
 end
 
 --- Enables the equipment holding animation for the given slot.
--- @param self Creature.
+-- @param self Actor.
 -- @param slot Slot being modified.
 -- @param item Item added to the slot.
-Creature.enable_equipment_holding_animation = function(self, slot, item)
-	-- Enable the animation if supported by the creature.
+Actor.enable_equipment_holding_animation = function(self, slot, item)
+	-- Enable the animation if supported by the actor.
 	local anim = self:animate_spec(item.spec.animation_hold)
 	if anim then
 		if self.equipment_animations then
@@ -44,7 +44,7 @@ Creature.enable_equipment_holding_animation = function(self, slot, item)
 	end
 end
 
-Creature.set_model = function(self, model)
+Actor.set_model = function(self, model)
 	if model or not self.spec.models then
 		-- Use the already built model.
 		local m = model or Model:find_or_load{file = self.spec.model}
@@ -82,7 +82,7 @@ Creature.set_model = function(self, model)
 	end
 end
 
-Creature.set_stat = function(self, s, v, m)
+Actor.set_stat = function(self, s, v, m)
 	-- Find or create the skill.
 	local stat = self.stats[s]
 	if not stat then
@@ -111,7 +111,7 @@ Creature.set_stat = function(self, s, v, m)
 			Client:apply_quake(self.position, 0.01 * (5 - diff))
 		end
 		-- Set the correct collision shape.
-		-- Dead creatures have a different collision shape. We switch between
+		-- Dead actors have a different collision shape. We switch between
 		-- the two when the health changes between zero and non-zero.
 		if v == 0 and self.animated then
 			self.shape = "dead"
@@ -121,14 +121,14 @@ Creature.set_stat = function(self, s, v, m)
 	end
 end
 
---- Updates the positions of equipment tagged to the creature.
--- @param self Creature.
+--- Updates the positions of equipment tagged to the actor.
+-- @param self Actor.
 -- @param secs Seconds since the last update.
-Creature.update = function(self, secs)
+Actor.update = function(self, secs)
 	-- Call the base class.
 	Object.update(self, secs)
 	-- Handle model rebuilding.
-	-- Equipment changes can occur frequently when newly appearing creatures are
+	-- Equipment changes can occur frequently when newly appearing actors are
 	-- being setup. Because of that, a delay is used to avoid too many expensive
 	-- rebuilds.
 	if self.model_rebuild_timer then
@@ -138,7 +138,7 @@ Creature.update = function(self, secs)
 			self:update_model()
 		end
 	end
-	-- Get the creature spec.
+	-- Get the actor spec.
 	if not self.realized then return end
 	local spec = self.spec
 	if not spec then return end
@@ -159,10 +159,10 @@ Creature.update = function(self, secs)
 	end
 end
 
---- Called when the inventory of the creature is updated.
--- @param self Creature.
+--- Called when the inventory of the actor is updated.
+-- @param self Actor.
 -- @param args Inventory event arguments.
-Creature.update_inventory = function(self, args)
+Actor.update_inventory = function(self, args)
 	-- Get slot information from the actor spec.
 	if not self.spec then return end
 	local node = self.spec.equipment_slots[args.slot]
@@ -200,11 +200,11 @@ end
 
 --- Queues a model rebuild for the actor.
 -- @param self Actor.
-Creature.request_model_rebuild = function(self)
+Actor.request_model_rebuild = function(self)
 	self.model_rebuild_timer = 0.1
 end
 
-Creature.update_model = function(self)
+Actor.update_model = function(self)
 	if not self.spec then return end
 	if not self.spec.models then return end
 	-- Create the equipment list.
@@ -216,6 +216,7 @@ Creature.update_model = function(self)
 	-- Build the character model in a separate thread.
 	-- The result is handled in the tick handler in event.lua.
 	Client.threads.model_builder:push_message(tostring(self.id), serialize{
+		actor = self.spec.name,
 		beheaded = Bitwise:bchk(self.flags or 0, Protocol.object_flags.BEHEADED),
 		body_scale = self.body_scale,
 		body_style = self.body_style,
@@ -226,7 +227,6 @@ Creature.update_model = function(self)
 		hair_color = self.hair_color,
 		hair_style = self.hair_style,
 		nudity = Client.options.nudity_enabled,
-		species = self.spec.name,
 		skin_color = self.skin_color,
 		skin_style = self.skin_style})
 end
@@ -235,7 +235,7 @@ end
 -- @param self Object.
 -- @param quat Rotation quaternion.
 -- @param tilt Tilt angle in radians.
-Creature.update_rotation = function(self, quat, tilt)
+Actor.update_rotation = function(self, quat, tilt)
 	Object.update_rotation(self, quat, tilt)
 	local spec = self.spec
 	if spec and spec.tilt_bone then
@@ -249,11 +249,11 @@ Creature.update_rotation = function(self, quat, tilt)
 	end
 end
 
---- Plays footstep sounds for creatures.
+--- Plays footstep sounds for actors.
 -- @param self Object.
 -- @param secs Seconds since the last update.
-Creature.update_sound = function(self, secs)
-	-- Check for an applicable species.
+Actor.update_sound = function(self, secs)
+	-- Check for an applicable actor.
 	local spec = self.spec
 	if not spec or not spec.footstep_sound then return end
 	-- Check for an applicable animation.
@@ -297,7 +297,7 @@ end
 --- Writes the appearance preset of the object to a string.
 -- @param self Object.
 -- @return String.
-Creature.write_preset = function(self)
+Actor.write_preset = function(self)
 	return serialize{
 		body_scale = self.body_scale,
 		body_style = self.body_style,

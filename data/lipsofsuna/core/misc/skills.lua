@@ -51,7 +51,7 @@ Skillspec{
 
 Skillspec{
 	name = "Far sight",
-	description = "Spot items and creatures twice as far.",
+	description = "Spot items and actors twice as far.",
 	assign = function(skills) skills.view_distance = skills.view_distance * 2 end}
 
 Skillspec{

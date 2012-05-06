@@ -1,5 +1,5 @@
 -- Self-destruction.
--- The creature explodes after the animation has played.
+-- The actor explodes after the animation has played.
 Actionspec{name = "explode", func = function(feat, info, args)
 	Coroutine(function(t)
 		feat:play_effects(args)

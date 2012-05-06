@@ -13,11 +13,11 @@ require "mods"
 Model.dict_name = {}
 
 local build = function(args)
-	local species = Species:find{name = args.species}
-	if not species then return end
+	local actor = Actorspec:find{name = args.actor}
+	if not actor then return end
 	-- Get the base meshes.
-	local meshes = {skeleton = species.model}
-	for k,v in pairs(species.models) do
+	local meshes = {skeleton = actor.model}
+	for k,v in pairs(actor.models) do
 		meshes[k] = v
 	end
 	-- Add the hair model.
@@ -28,7 +28,7 @@ local build = function(args)
 	if args.equipment then
 		for slot,name in pairs(args.equipment) do
 			local spec = Itemspec:find{name = name}
-			local models = spec and spec:get_equipment_models(species.equipment_class or species.name, lod)
+			local models = spec and spec:get_equipment_models(actor.equipment_class or actor.name, lod)
 			if models then
 				for k,v in pairs(models) do
 					if v ~= "" then meshes[k] = v end
@@ -105,7 +105,7 @@ local build = function(args)
 	-- Colorize materials.
 	m:edit_material{match_material = "animhair1", diffuse = args.hair_color}
 	m:edit_material{match_material = "animskin1", diffuse = args.skin_color,
-		material = species.skin_material, textures = species.skin_textures}
+		material = actor.skin_material, textures = actor.skin_textures}
 	m:edit_material{match_material = "animeye1", diffuse = args.eye_color}
 	-- Recalculate the bounding box.
 	m:calculate_bounds()

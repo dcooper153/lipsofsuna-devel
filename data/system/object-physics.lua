@@ -97,7 +97,7 @@ end
 -- @class table
 
 --- Movement direction.<br/>
--- Only used by kinematic objects. The value of -1 means that the creature is
+-- Only used by kinematic objects. The value of -1 means that the actor is
 -- moving forward at walking speed. The value of 1 means backward, and the
 -- value of 0 means no strafing.
 -- @name Object.movement
@@ -114,7 +114,7 @@ end
 --- Physics shape.<br/>
 -- A model can contain multiple physics shapes. By setting the field,
 -- you can switch to one of the alternative shapes. This can be used
--- to, for example, set a smaller collision shape when the creature
+-- to, for example, set a smaller collision shape when the actor
 -- is crouching.
 -- @name Object.shape
 -- @class table
@@ -125,7 +125,7 @@ end
 -- @class table
 
 --- Strafing direction.<br/>
--- Only used by kinematic objects. The value of -1 means that the creature is
+-- Only used by kinematic objects. The value of -1 means that the actor is
 -- strafing to the left at walking speed. The value of 1 means right, and the
 -- value of 0 means no strafing.
 -- @name Object.strafing

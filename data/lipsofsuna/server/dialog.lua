@@ -28,7 +28,7 @@ Dialog.new = function(clss, args)
 	clss.dict_id[self.id] = self
 	-- Attach to the object.
 	self.object.dialog = self
-	if self.object.spec.type == "creature" then
+	if self.object.spec.type == "actor" then
 		self.object:update_ai_state()
 	end
 	-- Initialize the virtual machine.
@@ -123,7 +123,7 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			-- Set the quest type.
 			var_type = "kill actor"
 			-- Get the list of possible target actors.
-			local list = Species:find{category = "scapegoat"}
+			local list = Actorspec:find{category = "scapegoat"}
 			if not list then return end
 			-- Randomize the order of target actors.
 			local actors = {}
@@ -139,7 +139,7 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 			for k,spec in ipairs(actors) do
 				if not Dialog.flags["scapegoat_alive_" .. spec.name] then
 					var_actor = spec.name
-					actor = Creature{
+					actor = Actor{
 						spec = spec,
 						position = Utils:find_random_overworld_point(),
 						random = true,
@@ -480,12 +480,12 @@ Dialog.execute = function(self)
 		end,
 		["spawn object"] = function(vm, c)
 			-- Spawn the object.
-			local spec1 = Species:find{name = c[2]}
+			local spec1 = Actorspec:find{name = c[2]}
 			local spec2 = Itemspec:find{name = c[2]}
 			local spec3 = Obstaclespec:find{name = c[2]}
 			local object
 			if spec1 then
-				object = Creature{spec = spec1, random = true}
+				object = Actor{spec = spec1, random = true}
 			elseif spec2 then
 				object = Item{spec = spec2, random = true}
 			elseif spec3 then

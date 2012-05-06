@@ -19,7 +19,7 @@ EditorObject:add_setters{
 			m:changed()
 			s.model = m
 		end
-		if v.type == "species" then
+		if v.type == "actor" then
 			s:animate{animation = "idle", channel = 1, permanent = true}
 		end
 	end}

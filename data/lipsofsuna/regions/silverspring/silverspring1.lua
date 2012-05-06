@@ -16,7 +16,7 @@ Patternspec{
 		{25.19,0.99,25.44,"rust sprig tree"},
 		{28.36,0.99,29.8,"rust sprig tree"},
 		{29.38,0.99,24.57,"rust sprig tree"}},
-	creatures = {
+	actors = {
 		{18.16,2,27.79,"The Hoarder"},
 		{18.67,0.98,7.4,"Maurice"},
 		{20.74,0.99,10.73,"Martin"},

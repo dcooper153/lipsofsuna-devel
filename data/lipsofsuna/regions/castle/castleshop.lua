@@ -4,7 +4,7 @@ Patternspec{
 	categories = {},
 	items = {
 		{3.450000,0.990000,1.900000,"chest"}},
-	creatures = {
+	actors = {
 		{2.420000,0.160000,2.270000,"Merchant"}},
 	tiles = {
 		{0,0,0,"brick1"}, {4,0,0,"brick1"},

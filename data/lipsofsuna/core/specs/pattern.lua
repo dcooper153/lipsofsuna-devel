@@ -19,7 +19,7 @@ Patternspec.introspect = Introspect{
 		{name = "spawn_point", type = "vector", decription = "Spawn point position, in tiles."},
 		{name = "items", type = "map object list", default = {}, decription = "List of items to create."},
 		{name = "obstacles", type = "map object list", default = {}, decription = "List of obstacles to create."},
-		{name = "creatures", type = "map object list", default = {}, decription = "List of creatures to create."},
+		{name = "actors", type = "map object list", default = {}, decription = "List of actors to create."},
 		{name = "statics", type = "map object list", default = {}, decription = "List of static objects to create."},
 		{name = "tiles", type = "map tile list", default = {}, decription = "List of terrain tiles to create."}
 	}}

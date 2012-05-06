@@ -1,9 +1,9 @@
 require "common/unlocks"
 
 Serialize = Class()
-Serialize.game_version = "3"
+Serialize.game_version = "4"
 Serialize.account_version = "1"
-Serialize.object_version = "1"
+Serialize.object_version = "2"
 
 --- Initializes the serializer.
 -- @param clss Serialize class.

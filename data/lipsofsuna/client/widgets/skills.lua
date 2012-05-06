@@ -31,7 +31,7 @@ Widgets.Skills.add = function(self, id, name, desc)
 		cap = 0, desc = desc, id = id, name = name,
 		index = index, max = 100, text = name, value = 0,
 		changed = function(w, v)
-			if self.species then v = math.min(v, self.species.skill_quota + w.value - self.total) end
+			if self.actor then v = math.min(v, self.actor.skill_quota + w.value - self.total) end
 			w.cap = v
 			self:update_points()
 			self:changed(w)
@@ -55,11 +55,11 @@ Widgets.Skills.get_value = function(self, id)
 	return self.dict_id[id].value
 end
 
---- Sets the species for which the skills are.
+--- Sets the actor for which the skills are.
 -- @param self Skills widget.
--- @param value Species.
-Widgets.Skills.set_species = function(self, value)
-	self.species = value
+-- @param value Actorspec.
+Widgets.Skills.set_actor = function(self, value)
+	self.actor = value
 	for k,v in pairs(value.skills) do
 		local w = self.dict_id[k]
 		if w then
@@ -74,9 +74,9 @@ end
 --- Updates the skill point display.
 -- @param self Skills widget.
 Widgets.Skills.update_points = function(self, value)
-	if self.species then
+	if self.actor then
 		local t = math.ceil(self.total)
-		local q = math.ceil(self.species.skill_quota)
+		local q = math.ceil(self.actor.skill_quota)
 		if t < q then
 			self.quota_text.text = string.format(" Points assigned: %d/%d (%+d)", t, q, q - t)
 			for k,v in pairs(self.dict_id) do v.allowance = q - t end

@@ -17,7 +17,7 @@ Operators.chargen.list_races = {
 -- @param self Operator.
 Operators.chargen.init = function(self)
 	-- Create the object.
-	self.data.object = Creature{position = Vector(1, 1, 1), realized = true}
+	self.data.object = Actor{position = Vector(1, 1, 1), realized = true}
 	self:randomize()
 	-- Create the camera.
 	self.data.translation = Vector(0, 1.8, -2)
@@ -181,7 +181,7 @@ Operators.chargen.update = function(self, secs)
 	-- Update model.
 	if self.data.update_needed then
 		local object = self.data.object
-		local spec = Species:find{name = self.char.race .. "-player"}
+		local spec = Actorspec:find{name = self.char.race .. "-player"}
 		self.data.update_needed = nil
 		object.spec = spec
 		object.body_scale = self.char.height

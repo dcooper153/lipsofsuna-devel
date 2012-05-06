@@ -83,11 +83,11 @@ ChatCommand{pattern = "^/spawn obstacle (.*)$", permission = "admin", func = fun
 		realized = true}
 end}
 
--- Spawn species.
-ChatCommand{pattern = "^/spawn species (.*)$", permission = "admin", func = function(player, matches)
-	local spec = Species:find{name = matches[1]}
+-- Spawn actor.
+ChatCommand{pattern = "^/spawn actor (.*)$", permission = "admin", func = function(player, matches)
+	local spec = Actorspec:find{name = matches[1]}
 	if not spec then return end
-	Creature{
+	Actor{
 		spec = spec,
 		position = player.position,
 		random = true,
@@ -96,12 +96,12 @@ end}
 
 -- Spawn any object.
 ChatCommand{pattern = "^/spawn (.*)$", permission = "admin", func = function(player, matches)
-	local spec1 = Species:find{name = matches[1]}
+	local spec1 = Actorspec:find{name = matches[1]}
 	local spec2 = Itemspec:find{name = matches[1]}
 	local spec3 = Obstaclespec:find{name = matches[1]}
 	local spec4 = Staticspec:find{name = matches[1]}
 	if spec1 then
-		Creature{
+		Actor{
 			spec = spec1,
 			position = player.position,
 			random = true,

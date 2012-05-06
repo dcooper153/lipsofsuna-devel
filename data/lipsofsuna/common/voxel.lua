@@ -38,20 +38,20 @@ end
 --- Places a monster to the map.
 -- @param clss Voxel class.
 -- @param args Arguments.<ul>
---   <li>category: Species category.</li>
+--   <li>category: Actorspec category.</li>
 --   <li>class: Forces all objects to use the given class.</li>
---   <li>diffuculty: Maximum difficulty of the creature.</li>
---   <li>name: Species name.</li>
+--   <li>diffuculty: Maximum difficulty of the actor.</li>
+--   <li>name: Actorspec name.</li>
 --   <li>point: Position vector, in tiles.</li>
 --   <li>rotation: Rotation around Y axis.</li></ul>
-Voxel.place_creature = function(clss, args)
-	-- Choose the species.
-	-- The species can by explicitly named or randomly selected from a specific
+Voxel.place_actor = function(clss, args)
+	-- Choose the actor.
+	-- The actor can by explicitly named or randomly selected from a specific
 	-- category. Selection from a category can also optionally be limited by the
-	-- maximum difficulty of the creature.
+	-- maximum difficulty of the actor.
 	local spec
 	if args.category and args.difficulty then
-		local cat = Species:find(args)
+		local cat = Actorspec:find(args)
 		if not cat then return end
 		local num = 0
 		local opt = {}
@@ -65,13 +65,13 @@ Voxel.place_creature = function(clss, args)
 		if num == 0 then return end
 		spec = opt[math.random(1, num)]
 	else
-		spec = Species:random(args)
+		spec = Actorspec:random(args)
 		if not spec then return end
 	end
-	-- Spawn the creature.
+	-- Spawn the actor.
 	-- This needs to support both the client and the server so the class
 	-- used varies depending on what's available.
-	local clss_ = args.class or Creature or Object
+	local clss_ = args.class or Actor or Object
 	clss_.new(clss_, {
 		spec = spec,
 		position = args.point * clss.tile_size,
@@ -194,9 +194,9 @@ Voxel.place_pattern = function(clss, args)
 		local point = args.point + coord(v[1], v[2], v[3])
 		clss:place_item{class = args.class, name = v[4], point = point, rotation = v[5]}
 	end
-	-- Create creatures.
-	for k,v in pairs(pat.creatures) do
+	-- Create actors.
+	for k,v in pairs(pat.actors) do
 		local point = args.point + coord(v[1], v[2], v[3])
-		clss:place_creature{class = args.class, name = v[4], point = point, rotation = v[5]}
+		clss:place_actor{class = args.class, name = v[4], point = point, rotation = v[5]}
 	end
 end

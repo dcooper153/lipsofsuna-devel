@@ -155,7 +155,7 @@ Protocol.object_show_flags = {
 	SKILLS = 0x008000,
 	SLOTS = 0x010000,
 	SPEC = 0x020000,
-	SPECIES = 0x040000,
+	ACTOR = 0x040000,
 	DIALOG = 0x080000}
 
 effects = {}

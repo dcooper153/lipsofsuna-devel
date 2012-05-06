@@ -8,6 +8,6 @@ Feateffectspec:extend{
 	end,
 	ranged = function(self, args)
 		if not args.object then return end
-		if args.object.spec.type ~= "species" then return end
+		if args.object.spec.type ~= "actor" then return end
 		args.object:inflict_modifier("push", 10)
 	end}

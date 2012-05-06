@@ -29,7 +29,7 @@ Ui:add_state{
 			end
 		end
 		-- Create hard-coded widgets.
-		if spec.type == "species" then
+		if spec.type == "actor" then
 			if spec.dialog then
 				table.insert(widgets, Widgets.Uibutton(object.dead and "Evaluate" or "Chat", function()
 					if not object.dialog then

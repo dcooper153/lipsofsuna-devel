@@ -221,7 +221,7 @@ Editor.create_actor = function(self, name)
 	local point,object,tile = self:pick_scene()
 	if not point then return end
 	-- Find the inserted object type.
-	local spec = Species:find{name = name}
+	local spec = Actorspec:find{name = name}
 	if not spec then return end
 	-- Create the object.
 	EditorObject{position = point, realized = true, spec = spec}
@@ -307,7 +307,7 @@ end
 Editor.save = function(self)
 	local items = {}
 	local obstacles = {}
-	local species = {}
+	local actors = {}
 	local statics = {}
 	-- Collect objects.
 	for k,v in pairs(Object.objects) do
@@ -316,8 +316,8 @@ Editor.save = function(self)
 				table.insert(items, v)
 			elseif v.spec.type == "obstacle" then
 				table.insert(obstacles, v)
-			elseif v.spec.type == "species" then
-				table.insert(species, v)
+			elseif v.spec.type == "actor" then
+				table.insert(actors, v)
 			elseif v.spec.type == "static" then
 				table.insert(statics, v)
 			end
@@ -345,7 +345,7 @@ Editor.save = function(self)
 	end
 	table.sort(items, sortobj)
 	table.sort(obstacles, sortobj)
-	table.sort(species, sortobj)
+	table.sort(actors, sortobj)
 	table.sort(statics, sortobj)
 	-- Update the pattern.
 	local makeobj = function(v)
@@ -366,9 +366,9 @@ Editor.save = function(self)
 	for k,v in pairs(obstacles) do
 		self.pattern.obstacles[k] = makeobj(v)
 	end
-	self.pattern.creatures = {}
-	for k,v in pairs(species) do
-		self.pattern.creatures[k] = makeobj(v)
+	self.pattern.actors = {}
+	for k,v in pairs(actors) do
+		self.pattern.actors[k] = makeobj(v)
 	end
 	self.pattern.statics = {}
 	for k,v in pairs(statics) do

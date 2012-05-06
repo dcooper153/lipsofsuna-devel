@@ -153,7 +153,7 @@ Protocol:add_handler{type = "OBJECT_MOVED", func = function(event)
 		-- Objects controlled by physics would normally float in the air
 		-- due to collision margins so we need to apply compensation.
 		local p = Vector(x, y, z)
-		if o.type == "item" or o.type == "species" then p = p + Object.physics_position_correction end
+		if o.type == "item" or o.type == "actor" then p = p + Object.physics_position_correction end
 		-- Set the target interpolation position.
 		o:set_motion_state(p, Quaternion(rx, ry, rz, rw), Vector(vx, vy, vz), tilt)
 		-- Adjust time scaling of movement animations.
@@ -206,7 +206,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		type = type_
 		if type == "item" then spec = Itemspec:find{name = name}
 		elseif type == "obstacle" then spec = Obstaclespec:find{name = name}
-		elseif type == "species" then spec = Species:find{name = name}
+		elseif type == "actor" then spec = Actorspec:find{name = name}
 		elseif type == "spell" then spec = Spellspec:find{name = name} end
 		debug("  SPEC %s %s", type, name)
 		if not spec then return end
@@ -221,8 +221,8 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	local o
 	local o_args = {collision_group = Physics.GROUP_OBJECT, flags = Bitwise:band(flags, 0xFF),
 		id = id, model = model, spec = spec, type = type}
-	if type == "species" then
-		o = Creature(o_args)
+	if type == "actor" then
+		o = Actor(o_args)
 	elseif type == "item" then
 		o = Item(o_args)
 	elseif type == "spell" then
@@ -263,9 +263,9 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		Client.player_object = o
 		Client.mouse_smoothing = Client.options.mouse_smoothing
 	end
-	-- Species.
-	if Bitwise:band(flags, Protocol.object_show_flags.SPECIES) ~= 0 then
-		debug("  SPECIES")
+	-- Actorspec.
+	if Bitwise:band(flags, Protocol.object_show_flags.ACTOR) ~= 0 then
+		debug("  ACTOR")
 		local ok,dead,tilt = event.packet:resume("bool", "float")
 		if not ok then return end
 		o.dead = dead
@@ -281,7 +281,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		if not ok then return end
 		debug("    %f %f %f", x, y, z)
 		local p = Vector(x,y,z)
-		if type == "item" or type == "species" then p = p + Object.physics_position_correction end
+		if type == "item" or type == "actor" then p = p + Object.physics_position_correction end
 		o.position = p
 	end
 	-- Rotation.

@@ -1,6 +1,6 @@
-require "server/objects/creature"
+require "server/objects/actor"
 
-Player = Class(Creature)
+Player = Class(Actor)
 Player.class_name = "Player"
 Player.clients = {}
 
@@ -8,7 +8,7 @@ Player.find = function(clss, args)
 	if args and args.client then
 		return clss.clients[args.client]
 	end
-	return Creature.find(clss, args)
+	return Actor.find(clss, args)
 end
 
 --- Creates a new player object.
@@ -22,16 +22,16 @@ end
 --   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
 --   <li>id: Unique object ID or nil for a random free one.</li>
 --   <li>jumped: Jump timer.</li>
---   <li>name: Name of the creature.</li>
+--   <li>name: Name of the actor.</li>
 --   <li>physics: Physics mode.</li>
---   <li>position: Position vector of the creature.</li>
---   <li>rotation: Rotation quaternion of the creature.</li>
+--   <li>position: Position vector of the actor.</li>
+--   <li>rotation: Rotation quaternion of the actor.</li>
 --   <li>skin_style: Skin style defined by an array of {style, red, green, blue}.</li>
---   <li>spec: Species of the creature.</li>
+--   <li>spec: Actorspec of the actor.</li>
 --   <li>realized: True to add the object to the simulation.</li></ul>
 -- @return Player.
 Player.new = function(clss, args)
-	local self = Creature.new(clss, args)
+	local self = Actor.new(clss, args)
 	self.account = args.account
 	self.running = true
 	self.vision_timer = 0
@@ -85,7 +85,7 @@ end
 --- Causes the player to die and respawn.
 -- @param self Player.
 Player.die = function(self)
-	if Creature.die(self) then
+	if Actor.die(self) then
 		self:send{packet = Packet(packets.MESSAGE, "string", "You have died...")}
 	else
 		self:send{packet = Packet(packets.MESSAGE, "string", "Saved by Sanctuary.")}
@@ -120,7 +120,7 @@ end
 -- @return Dictionary of booleans.
 Player.get_known_spell_types = function(self)
 	local ret = {}
-	local base = Creature.get_known_spell_types(self)
+	local base = Actor.get_known_spell_types(self)
 	local unlock = Unlocks.unlocks["spell type"]
 	for k in pairs(base) do ret[k] = true end
 	if unlock then
@@ -135,7 +135,7 @@ end
 -- @param strength Modifier strength.
 Player.inflict_modifier = function(self, name, strength)
 	self:send{packet = Packet(packets.MODIFIER_ADD, "string", name, "float", strength)}
-	return Creature.inflict_modifier(self, name, strength)
+	return Actor.inflict_modifier(self, name, strength)
 end
 
 --- Called when a modifier is removed.
@@ -143,7 +143,7 @@ end
 -- @param name Modifier name.
 Player.removed_modifier = function(self, name)
 	self:send{packet = Packet(packets.MODIFIER_REMOVE, "string", name)}
-	return Creature.removed_modifier(self, name)
+	return Actor.removed_modifier(self, name)
 end
 
 Player.respawn = function(self)
@@ -214,7 +214,7 @@ Player.update = function(self, secs)
 		end
 	end
 	-- Update the base class.
-	Creature.update(self, secs)
+	Actor.update(self, secs)
 end
 
 Player.update_map = function(self)
@@ -226,11 +226,11 @@ Player.update_map = function(self)
 	end
 end
 
---- Updates the skills and related attributes of the creature.
+--- Updates the skills and related attributes of the player.
 -- @param self Object.
 Player.update_skills = function(self)
 	-- Recalculate the skills.
-	Creature.update_skills(self)
+	Actor.update_skills(self)
 	-- Send an update to the client.
 	local packet = Packet(packets.PLAYER_SKILLS)
 	for k,v in pairs(self.skills:get_names()) do
@@ -329,13 +329,13 @@ Player.vision_cb = function(self, args)
 				data_spec = {
 					"string", o.model_name or ""}
 			end
-			-- Species.
-			local data_species = {}
-			if o.spec.type == "species" then
-				data_species = {
+			-- Actor.
+			local data_actor = {}
+			if o.spec.type == "actor" then
+				data_actor = {
 					"bool", o.dead or false,
 					"float", (o.tilt and o.tilt.euler[3]) or 0}
-				flags = flags + Protocol.object_show_flags.SPECIES
+				flags = flags + Protocol.object_show_flags.ACTOR
 			end
 			-- Position.
 			local data_pos = {}
@@ -506,7 +506,7 @@ Player.vision_cb = function(self, args)
 			-- Send to the player.
 			local p = Packet(packets.OBJECT_SHOWN, "uint32", o.id, "uint32", flags)
 			p:write(data_spec)
-			p:write(data_species)
+			p:write(data_actor)
 			p:write(data_pos)
 			p:write(data_rot)
 			p:write(data_name)

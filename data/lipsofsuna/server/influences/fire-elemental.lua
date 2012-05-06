@@ -8,14 +8,13 @@ Feateffectspec:extend{
 		-- Create the summon.
 		local spec = Actorspec:find{name = "fire elemental"}
 		if not spec then return end
-		local summon = Creature{
+		local summon = Actor{
 			spec = spec,
 			position = ctr,
 			random = true,
 			realized = true}
 		summon.summon_owner = args.owner
 		summon.summon_timer = args.value
-		-- TODO: Set the faction.
 	end,
 	ranged = function(self, args)
 		self:touch(args)

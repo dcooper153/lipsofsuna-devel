@@ -1,11 +1,11 @@
 Ai = Class()
 Ai.dict_name = {}
 
---- Creates a new creature AI.<br/>
+--- Creates a new actor AI.<br/>
 -- The AI is inactive when created. It's only activated when the controlled
--- creature enters the vision radius of the player. This allows us to save lots
+-- actor enters the vision radius of the player. This allows us to save lots
 -- of computing time since player motion often triggers loading of sectors whose
--- creatures are never seen.
+-- actors are never seen.
 -- @param clss AI class.
 -- @param object Controlled actor.
 -- @return AI.
@@ -30,7 +30,7 @@ Ai.add_enemy = function(self, object)
 	end
 end
 
---- Updates the combat ratings of the creature.
+--- Updates the combat ratings of the actor.
 -- @param self AI.
 Ai.calculate_combat_ratings = function(self)
 	self.melee_rating = 0
@@ -215,7 +215,7 @@ Ai.scan_enemies = function(self)
 			local enemy = old[v]
 			if enemy and time - enemy[2] < 10 then
 				-- If the enemy is still nearby and was last seen a very short time
-				-- ago, we add it back to the list. Without this, the creature would
+				-- ago, we add it back to the list. Without this, the actor would
 				-- give up the moment the target hides behind anything.
 				self.enemies[v] = enemy
 			elseif self.object:check_enemy(v) then

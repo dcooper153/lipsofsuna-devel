@@ -5,7 +5,7 @@ Ai.dict_name["camper"] = CamperAi
 
 --- Creates a new camper AI.
 -- @param clss CamperAi class.
--- @param object Controlled creature.
+-- @param object Controlled actor.
 -- @return AI.
 CamperAi.new = function(clss, object)
 	local self = NpcAi.new(clss, object)

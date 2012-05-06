@@ -247,11 +247,6 @@ Client:add_class_setters{
 		hud.widget.text = v
 	end,
 	player_object = function(self, v)
-		if v then
-			Player.species = v.spec.name
-		else
-			Player.species = "aer"
-		end
 		Player.object = v
 		Camera.mode = "third-person"
 	end}

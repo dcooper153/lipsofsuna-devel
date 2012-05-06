@@ -13,7 +13,7 @@ Patternspec{
 		{23.250000,0.970000,17.080000,"wooden mine support (wall)"},
 		{24.870000,0.980000,16.900000,"wooden mine support (wall)"},
 		{26.490000,0.980000,17.050000,"wooden mine support (wall)"}},
-	creatures = {
+	actors = {
 		{2.610000,0.980000,4.040000,"brigand"},
 		{7.920000,1.280000,7.980000,"brigand"},
 		{9.150000,4.980000,11.610000,"master brigand archer"},

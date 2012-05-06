@@ -144,7 +144,7 @@ end
 Object.update_model = function(self)
 end
 
---- Plays footstep sounds for creatures.
+--- Plays footstep sounds for actors.
 -- @param self Object.
 -- @param secs Seconds since the last update.
 Object.update_sound = function(self, secs)

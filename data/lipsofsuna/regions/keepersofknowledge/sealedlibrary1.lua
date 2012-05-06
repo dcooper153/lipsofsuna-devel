@@ -16,7 +16,7 @@ Patternspec{
 		{23.220000,3.000000,18.620000,"bookcase",0.50},
 		{23.360000,2.980000,7.870000,"bookcase",0.50},
 		{23.370000,3.020000,10.700000,"bookcase",0.50}},
-	creatures = {
+	actors = {
 		{2.650000,2.990000,23.150000,"library security turret"},
 		{2.920000,2.990000,13.230000,"library security turret"},
 		{5.250000,3.000000,9.490000,"library security robot"},

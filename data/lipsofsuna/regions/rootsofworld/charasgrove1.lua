@@ -9,7 +9,7 @@ Patternspec{
 	categories = {["init"] = true},
 	obstacles = {
 		{4.23,1.85,3.84,"chara's portal"}},
-	creatures = {
+	actors = {
 		{7.29,2,7.15,"Chara"}},
 	tiles = {
 		{0,0,0,"granite1"}, {1,0,0,"granite1"}, {2,0,0,"granite1"}, {3,0,0,"granite1"}, {4,0,0,"granite1"}, {5,0,0,"granite1"}, {6,0,0,"granite1"}, {7,0,0,"granite1"}, {8,0,0,"granite1"}, {9,0,0,"granite1"},

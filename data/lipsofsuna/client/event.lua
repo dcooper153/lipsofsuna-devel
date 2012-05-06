@@ -88,7 +88,7 @@ Eventhandler{type = "tick", func = function(self, args)
 		-- Update slots and special effects.
 		k:update(args.secs)
 		-- Maintain activity.
-		if k.spec and k.spec.type ~= "species" then
+		if k.spec and k.spec.type ~= "actor" then
 			v = v - args.secs
 			if v <= 0 then v = nil end
 			Object.dict_active[k] = v

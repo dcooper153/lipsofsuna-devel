@@ -1,7 +1,7 @@
 require(Mod.path .. "spec")
 
 Actorspec = Class(Spec)
-Actorspec.type = "species"
+Actorspec.type = "actor"
 Actorspec.dict_id = {}
 Actorspec.dict_cat = {}
 Actorspec.dict_name = {}
@@ -25,7 +25,7 @@ Actorspec.introspect = Introspect{
 		{name = "ai_enable_weapon_switch", type = "boolean", default = true, description = "False to prohibit weapon switching."},
 		{name = "ai_enabled", type = "boolean", default = true, description = "False to disable AI for the actor."},
 		{name = "ai_enabled_states", type = "dict", dict = {type = "boolean"}, default = {["chat"] = true, ["combat"] = true, ["flee"] = true, ["follow"] = true, ["hide"] = true, ["none"] = true, ["search"] = true, ["wait"] = true, ["wander"] = true}, description = "Dictionary of allowed combat actions", details = {keys = {spec = "Aistatespec"}}},
-		{name = "ai_offense_factor", type = "number", default = 0.75, description = "How much the creature prefers offense over defense, in the range of [0,1]."},
+		{name = "ai_offense_factor", type = "number", default = 0.75, description = "How much the actor prefers offense over defense, in the range of [0,1]."},
 		{name = "ai_search_time", type = "number", default = 20, description = "Time in seconds how long the AI will search for hidden foes."},
 		{name = "ai_type", type = "string", description = "Name of the AI type to use."},
 		{name = "ai_update_delay", type = "number", default = 2, description = "Number of seconds between AI state updates."},
@@ -44,12 +44,12 @@ Actorspec.introspect = Introspect{
 		{name = "collision_group", type = "number", default = 0x0001},
 		{name = "damage_from_magma", type = "number", default = 6, description = "Points of damage from magma per second."},
 		{name = "damage_from_water", type = "number", default = 0, description = "Points of damage from water per second."},
-		{name = "dead", type = "boolean", description = "True if the creature should spawn as dead."},
+		{name = "dead", type = "boolean", description = "True if the actor should spawn as dead."},
 		{name = "dialog", type = "string", description = "Dialog name.", details = {spec = "Dialogspec"}},
-		{name = "difficulty", type = "number", default = 0, description = "The approximate difficulty of the creature in the range of [0,1]."},
-		{name = "effect_falling_damage", type = "string", description = "Name of the effect played when the creature takes falling damage."},
-		{name = "effect_landing", type = "string", description = "Name of the effect played when the creature lands after jumping."},
-		{name = "effect_physical_damage", type = "string", description = "Name of the effect played when the creature is hurt physically."},
+		{name = "difficulty", type = "number", default = 0, description = "The approximate difficulty of the actor in the range of [0,1]."},
+		{name = "effect_falling_damage", type = "string", description = "Name of the effect played when the actor takes falling damage."},
+		{name = "effect_landing", type = "string", description = "Name of the effect played when the actor lands after jumping."},
+		{name = "effect_physical_damage", type = "string", description = "Name of the effect played when the actor is hurt physically."},
 		{name = "equipment_class", type = "string", description = "Name of the equipment class to use for equipment models."},
 		{name = "equipment_slots", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of equipment slots."},
 		{name = "eye_color", type = "color", description = "Eye color."},
@@ -57,7 +57,7 @@ Actorspec.introspect = Introspect{
 		{name = "eye_styles", type = "dict", dict = {type = "string"}, description = "Dictionary of eye styles."},
 		{name = "factions", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of factions.", details = {keys = {spec = "Factionspec"}}},
 		{name = "falling_damage_rate", type = "number", default = 10, description = "Number of points of damage per every meters per second exceeding the falling damage speed."},
-		{name = "falling_damage_speed", type = "number", default = 10, description = "Speed in meters per seconds after which the creature starts taking falling damage."},
+		{name = "falling_damage_speed", type = "number", default = 10, description = "Speed in meters per seconds after which the actor starts taking falling damage."},
 		{name = "feat_types", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of know feat types.", details = {keys = {spec = "Feattypespec"}}},
 		{name = "feat_effects", type = "dict", dict = {type = "boolean"}, default = {}, description = "List of know feat effects.", details = {keys = {spec = "Feateffectspec"}}},
 		{name = "footstep_height", type = "number", description = "Footstep height."},
@@ -67,10 +67,10 @@ Actorspec.introspect = Introspect{
 		{name = "hair_style", type = "string", description = "Hair style."},
 		{name = "hair_styles", type = "dict", dict = {type = "string"}, description = "Dictionary of hair styles."},
 		{name = "interactive", type = "boolean", default = true, description = "False to make the object not appear interactive."},
-		{name = "inventory_items", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of inventory items to give when the creature is spawned.", details = {keys = {spec = "Itemspec"}, values = {integer = true, min = 1}}},
-		{name = "inventory_size", type = "number", default = 0, description = "Number of inventory slots the creature has."},
-		{name = "jump_force", type = "number", default = 8, description = "Mass-independent jump force of the creature."},
-		{name = "loot_categories", type = "list", list = {type = "string"}, description = "List of item categories this creature can have as random loot."},
+		{name = "inventory_items", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of inventory items to give when the actor is spawned.", details = {keys = {spec = "Itemspec"}, values = {integer = true, min = 1}}},
+		{name = "inventory_size", type = "number", default = 0, description = "Number of inventory slots the actor has."},
+		{name = "jump_force", type = "number", default = 8, description = "Mass-independent jump force of the actor."},
+		{name = "loot_categories", type = "list", list = {type = "string"}, description = "List of item categories this actor can have as random loot."},
 		{name = "loot_count_min", type = "number", description = "Minimum number of random loot items this actor can have."},
 		{name = "loot_count_max", type = "number", description = "Maximum number of random loot items this actor can have."},
 		{name = "personality", type = "string", description = "Name of the personality type.", details = {spec = "Personalityspec"}},
@@ -81,7 +81,7 @@ Actorspec.introspect = Introspect{
 		{name = "models", type = "dict", dict = {type = "string"}, description = "Dictionary or model names."},
 		{name = "reagentless_spells", type = "boolean", description = "True to allow the actor to cast spells without reagents."},
 		{name = "skill_regen", type = "number", default = 0.5, description = "Skill regeneration speed in units per second."},
-		{name = "skill_quota", type = "number", default = 200, description = "Number of skill points the creature can distribute over skills."},
+		{name = "skill_quota", type = "number", default = 200, description = "Number of skill points the actor can distribute over skills."},
 		{name = "skills", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of skills.", details = {keys = {spec = "Skillspec"}}},
 		{name = "skin_color", type = "color", description = "Skin color."},
 		{name = "skin_material", type = "string", description = "Skin material name."},
@@ -90,8 +90,8 @@ Actorspec.introspect = Introspect{
 		{name = "special_effects", type = "list", list = {type = "string", details = {value = {spec = "Effectspec"}}}, default = {}, description = "List of special effects to render."},
 		{name = "speed_run", type = "number", default = 6, description = "Turning speed in meters per second."},
 		{name = "speed_walk", type = "number", default = 3, description = "Walking speed in meters per second."},
-		{name = "swim_force", type = "number", default = 3.5, description = "Mass-independent upward swim force of the creature."},
-		{name = "tilt_bone", type = "list", list = {type = "string"}, default = {}, description = "Name of the tilt bone of the creature."},
+		{name = "swim_force", type = "number", default = 3.5, description = "Mass-independent upward swim force of the actor."},
+		{name = "tilt_bone", type = "list", list = {type = "string"}, default = {}, description = "Name of the tilt bone of the actor."},
 		{name = "tilt_limit", type = "number", default = math.pi, description = "Tilt limit in radians of the tilting bone."},
 		{name = "timing_attack_bow", type = "number", default = 20, description = "Timing of bow firing, in frames."},
 		{name = "timing_attack_crossbow", type = "number", default = 20, description = "Timing of crossbow firing, in frames."},
@@ -110,12 +110,9 @@ Actorspec.introspect = Introspect{
 		{name = "view_cone", type = "number", default = 0.8 * math.pi, description = "View cone angle in radians."},
 		{name = "vulnerabilities", type = "dict", dict = {type = "number"}, description = "Dictionary of damage vulnerabilities."},
 		{name = "weapon_slot", type = "string", default = "hand.R", description = "Name of the weapon slot."},
-		{name = "water_friction", type = "number", default = 0.8, description = "How much being in water slows the creature down."},
-		{name = "water_gravity", type = "vector", default = Vector(0,-1), description = "The gravity of the creature in water."}
+		{name = "water_friction", type = "number", default = 0.8, description = "How much being in water slows the actor down."},
+		{name = "water_gravity", type = "vector", default = Vector(0,-1), description = "The gravity of the actor in water."}
 	}}
-
--- FIXME
-Species = Actorspec
 
 --- Registers a new actor spec.
 -- @param clss Actorspec class.
@@ -180,7 +177,7 @@ end
 -- @param object Object.
 -- @return True if an enemy.
 Actorspec.check_enemy = function(self, object)
-	if object.spec.type ~= "species" then return end
+	if object.spec.type ~= "actor" then return end
 	for name1 in pairs(self.factions) do
 		local spec1 = Factionspec:find{name = name1}
 		if spec1 then

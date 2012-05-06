@@ -3,13 +3,13 @@ require(Mod.path .. "ai")
 NpcAi = Class(Ai)
 Ai.dict_name["npc"] = NpcAi
 
---- Creates a new creature AI.<br/>
+--- Creates a new actor AI.<br/>
 -- The AI is inactive when created. It's only activated when the controlled
--- creature enters the vision radius of the player. This allows us to save lots
+-- actor enters the vision radius of the player. This allows us to save lots
 -- of computing time since player motion often triggers loading of sectors whose
--- creatures are never seen.
+-- actors are never seen.
 -- @param clss AI class.
--- @param object Controlled creature.
+-- @param object Controlled actor.
 -- @return AI.
 NpcAi.new = function(clss, object)
 	local self = Ai.new(clss, object)
@@ -256,7 +256,7 @@ end
 -- @param secs Seconds since the last update.
 NpcAi.update = function(self, secs)
 	-- Early exit for inactive AI.
-	-- There are often lots of creatures in the active map area but most of them
+	-- There are often lots of actors in the active map area but most of them
 	-- have their AI disabled due no player being nearby. Since this function
 	-- would otherwise do at least a bit of work for each tick, it pays to exit early.
 	if self.state == "none" then return end

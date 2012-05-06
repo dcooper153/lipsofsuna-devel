@@ -34,67 +34,6 @@ Protocol:add_handler{type = "ADMIN_SHUTDOWN", func = function(args)
 	Program:shutdown()
 end}
 
-Protocol:add_handler{type = "ADMIN_SPAWN", func = function(args)
-	-- Check for permissions.
-	local player = Player:find{client = args.client}
-	if not player.admin then return player:send("You have no permission to do that.") end
-	-- Spawn an object.
-	local ok,typ,msg = args.packet:read("string", "string")
-	if ok then
-		if msg == "" then msg = nil end
-		if typ == "item" then
-			if not msg then return end
-			local spec = Itemspec:find{name = msg}
-			if not spec then return end
-			Item{
-				spec = spec,
-				position = player.position,
-				random = true,
-				realized = true}
-		elseif typ == "item-cat" then
-			if not msg then return end
-			local spec = Itemspec:random{category = msg}
-			if not spec then return end
-			Item{
-				spec = spec,
-				position = player.position,
-				random = true,
-				realized = true}
-		elseif typ == "obstacle" then
-			if not msg then return end
-			local spec = Obstaclespec:find{name = msg}
-			if not spec then return end
-			Obstacle{
-				spec = spec,
-				position = player.position,
-				realized = true}
-		elseif typ == "obstacle-cat" then
-			if not msg then return end
-			local spec = Obstaclespec:random{category = msg}
-			if not spec then return end
-			Obstacle{
-				spec = spec,
-				position = player.position,
-				realized = true}
-		elseif typ == "creature" then
-			if not msg then return end
-			local spec = Species:find{name = msg}
-			if not spec then return end
-			Creature{
-				spec = spec,
-				position = player.position,
-				random = true,
-				realized = true}
-		elseif msg then
-			local object = Object{
-				model = msg,
-				position = player.position,
-				realized = true,
-				static = true}
-		end
-	end
-end}
-
 Protocol:add_handler{type = "ADMIN_STATS", func = function(args)
 	-- Check for permissions.
 	local player = Player:find{client = args.client}
@@ -102,9 +41,9 @@ Protocol:add_handler{type = "ADMIN_STATS", func = function(args)
 	-- Count objects.
 	local num_players_miss = 0
 	local num_players_real = 0
-	local num_creatures_idle = 0
-	local num_creatures_miss = 0
-	local num_creatures_real = 0
+	local num_actors_idle = 0
+	local num_actors_miss = 0
+	local num_actors_real = 0
 	local num_items_miss = 0
 	local num_items_inv = 0
 	local num_items_real = 0
@@ -130,15 +69,15 @@ Protocol:add_handler{type = "ADMIN_STATS", func = function(args)
 					end
 				end
 			end
-		elseif v.class_name == "Creature" then
+		elseif v.class_name == "Actor" then
 			if v.realized then
 				if v.ai and v.ai.state ~= "none" then
-					num_creatures_real = num_creatures_real + 1
+					num_actors_real = num_actors_real + 1
 				else
-					num_creatures_idle = num_creatures_idle + 1
+					num_actors_idle = num_actors_idle + 1
 				end
 			else
-				num_creatures_miss = num_creatures_miss + 1
+				num_actors_miss = num_actors_miss + 1
 			end
 		elseif v.class_name == "Item" then
 			if v.realized then
@@ -176,7 +115,7 @@ Terrain memory: %d kB
 Update tick: %d ms
 Event tick: %d ms
 Players: %d+%d
-Creatures: %d+%d+%d
+Actors: %d+%d+%d
 Items: %d+%d+%d
 Obstacles: %d+%d
 Others: %d+%d
@@ -185,7 +124,7 @@ Sectors: %d]],
 		Program.fps, Database.memory_used / 1024, gcinfo(), Voxel.memory_used / 1024,
 		1000 * Program.profiling.update, 1000 * Program.profiling.event,
 		num_players_real, num_players_miss,
-		num_creatures_real, num_creatures_idle, num_creatures_miss,
+		num_actors_real, num_actors_idle, num_actors_miss,
 		num_items_real, num_items_inv, num_items_miss,
 		num_obstacles_real, num_obstacles_miss,
 		num_objects_real, num_objects_miss,

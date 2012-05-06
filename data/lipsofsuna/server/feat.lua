@@ -194,7 +194,7 @@ Feat.usable = function(self, args)
 	-- Check that the user is valid.
 	if not args.user then return end
 	local spec = args.user.spec
-	if spec.type ~= "species" then return end
+	if spec.type ~= "actor" then return end
 	-- Check that the feat type exists.
 	local anim = Feattypespec:find{name = self.animation}
 	if not anim then

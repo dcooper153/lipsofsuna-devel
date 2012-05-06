@@ -2,7 +2,7 @@ Patternspec{
 	name = "castlebarracks",
 	size = Vector(5,5,5),
 	categories = {},
-	creatures = {
+	actors = {
 		{3.400000,0.190000,2.020000,"Lips guard archer"},
 		{3.470000,0.150000,1.240000,"Lips guard knight"},
 		{3.540000,0.180000,3.170000,"Lips guard mage"}},

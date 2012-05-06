@@ -41,8 +41,8 @@ end}
 
 local marker_timer = 0
 Eventhandler{type = "tick", func = function(self, event)
-	-- Update creatures.
-	for k,v in pairs(Creature.dict_id) do
+	-- Update actors.
+	for k,v in pairs(Actor.dict_id) do
 		if v.realized then
 			v:update(event.secs)
 		end

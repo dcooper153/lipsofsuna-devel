@@ -37,7 +37,7 @@ Patternspec{
 		{31.500000,1.000000,23.500000,"wooden mine support (simple)",0.25},
 		{31.500000,1.000000,27.000000,"wooden mine support (simple)",0.25},
 		{38.430000,0.930000,24.480000,"rust sprig tree"}},
-	creatures = {
+	actors = {
 		{13.850000,0.980000,38.330000,"Fighting Instructor Fa",-0.11},
 		{14.710000,12.970000,21.290000,"Expedition Leader Lyra",-0.30},
 		{14.790000,3.280000,13.780000,"Drill Sergent Spud",-0.42},

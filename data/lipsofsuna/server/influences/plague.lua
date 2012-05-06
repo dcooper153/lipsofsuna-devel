@@ -19,12 +19,12 @@ Feateffectspec:extend{
 		return true
 	end,
 	ranged = function(self, args)
-		local s = Species:random{category = "plague"}
+		local s = Actorspec:random{category = "plague"}
 		if not s then return end
 		local p = args.point + Vector(
 			-1 + 2 * math.random(),
 			-1 + 2 * math.random(),
 			-1 + 2 * math.random())
-		local o = Creature{spec = s, position = p, random = true, realized = true}
+		local o = Actor{spec = s, position = p, random = true, realized = true}
 		o:inflict_modifier("black haze", 10000)
 	end}

@@ -15,7 +15,7 @@ Feateffectspec:extend{
 			if not value then return end
 			args.object.stats:set_value("willpower", value + val)
 		end
-		-- Anger hurt creatures.
+		-- Anger hurt actors.
 		if val < 0 then
 			args.object:add_enemy(args.owner)
 		end

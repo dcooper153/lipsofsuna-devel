@@ -102,7 +102,7 @@ Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)
 		"string")
 	if not ok then return end
 	-- TODO: Input validation.
-	local spec = Species:find{name = ra .. "-player"}
+	local spec = Actorspec:find{name = ra .. "-player"}
 	if not spec then return end
 	-- Create the character.
 	local o = Player{

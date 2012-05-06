@@ -7,6 +7,6 @@ Patternspec{
 	position = Vector(700,960,700),
 	position_random = Vector(300,40,300),
 	categories = {["init"] = true},
-	creatures = {
+	actors = {
 		{5,0,5,"Noemi"},
 		{7,0,7,"dragon"}}}

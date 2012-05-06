@@ -88,7 +88,7 @@ end
 -- @return True if started a new animation.
 Object.animate = function(self, name, force_temporary)
 	-- Prevent animation when dead.
-	-- This is a simple way to ensure that dead creatures look like dead.
+	-- This is a simple way to ensure that dead actors look like dead.
 	if self.dead then return end
 	-- Get the animation spec.
 	if not self.spec.get_animation then return end
@@ -333,8 +333,8 @@ end
 -- @param self Object.
 -- @return Start vector, size vector.
 Object.get_tile_range = function(self)
-	-- TODO: Should depend on species.
-	local size = Vector(1,self.spec.type == "creature" and 2 or 1,1)
+	-- TODO: Should depend on actor spec.
+	local size = Vector(1,self.spec.type == "actor" and 2 or 1,1)
 	local src = self.position * Voxel.tile_scale
 	src.x = math.floor(src.x)
 	src.y = math.floor(src.y + 0.3)
