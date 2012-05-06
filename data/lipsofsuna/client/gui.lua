@@ -211,7 +211,13 @@ end
 --- Performs a control command in the UI.
 -- @param self Ui class.
 -- @param cmd Command string.
-Ui.command = function(self, cmd)
+-- @param press True for start, false for end.
+Ui.command = function(self, cmd, press)
+	if not press then
+		if cmd == "up" then self.repeat_up = nil end
+		if cmd == "down" then self.repeat_down = nil end
+		return
+	end
 	if cmd == "back" then
 		local widget = self.widgets[self.focused_item]
 		if not widget or not widget.apply_back then return self:pop_state() end
@@ -223,6 +229,7 @@ Ui.command = function(self, cmd)
 		end
 	elseif cmd == "up" then
 		self.repeat_timer = 0
+		self.repeat_up = true
 		if self.focused_item then
 			if self.focused_item > 1 then
 				self.widgets[self.focused_item].focused = false
@@ -241,6 +248,7 @@ Ui.command = function(self, cmd)
 		end
 	elseif cmd == "down" then
 		self.repeat_timer = 0
+		self.repeat_down = true
 		if self.focused_item then
 			if self.focused_item < #self.widgets then
 				self.widgets[self.focused_item].focused = false
@@ -634,12 +642,12 @@ Ui.update = function(self, secs)
 	if self.repeat_timer >= 0.15 then
 		self.repeat_timer = 0
 		local action1 = Binding.dict_name["menu up"]
-		if action1.key1 and Binding.dict_press[action1.key1] then
-			self:command("up")
+		if action1.key1 and Binding.dict_press[action1.key1] and self.repeat_up then
+			self:command("up", true)
 		end
 		local action2 = Binding.dict_name["menu down"]
-		if action2.key1 and Binding.dict_press[action2.key1] then
-			self:command("down")
+		if action2.key1 and Binding.dict_press[action2.key1] and self.repeat_down then
+			self:command("down", true)
 		end
 	end
 	-- Update mouse focus.

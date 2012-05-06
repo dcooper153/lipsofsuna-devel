@@ -94,20 +94,20 @@ Binding{name = "menu", mode = "press", key1 = Keysym.TAB, func = function()
 	end
 end}
 
-Binding{name = "menu up", mode = "press", key1 = Keysym.r, func = function()
-	Ui:command("up")
+Binding{name = "menu up", mode = "toggle", key1 = Keysym.r, func = function(v)
+	Ui:command("up", v)
 end}
 
-Binding{name = "menu down", mode = "press", key1 = Keysym.f, func = function()
-	Ui:command("down")
+Binding{name = "menu down", mode = "toggle", key1 = Keysym.f, func = function(v)
+	Ui:command("down", v)
 end}
 
-Binding{name = "menu back", mode = "press", key1 = Keysym.q, func = function()
-	Ui:command("back")
+Binding{name = "menu back", mode = "toggle", key1 = Keysym.q, func = function(v)
+	Ui:command("back", v)
 end}
 
-Binding{name = "menu apply", mode = "press", key1 = Keysym.e, func = function()
-	Ui:command("apply")
+Binding{name = "menu apply", mode = "toggle", key1 = Keysym.e, func = function(v)
+	Ui:command("apply", v)
 end}
 
 Binding{name = "mouse_grab", mode = "press", key1 = Keysym.ESCAPE, func = function()
