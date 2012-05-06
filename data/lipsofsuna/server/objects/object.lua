@@ -118,14 +118,24 @@ end
 -- @param object Object.
 -- @return True if reachable.
 Object.can_reach_object = function(self, object)
+	-- Check for reachability of inventory items.
 	if object.parent then
 		local parent = Object:find{id = object.parent}
 		if not parent then return end
 		if not parent.inventory:is_subscribed(self) then return end
 		return self:can_reach_object(parent)
 	end
+	-- Make sure that the target exists in the world.
 	if not object.realized then return end
-	return (object.position - self.position).length <= 5
+	-- Check the distance from the aim ray center to the bounding box of the target.
+	local center = self.position
+	if self.spec.aim_ray_center then
+		center = center + self.rotation * self.spec.aim_ray_center
+	end
+	local bounds = object.bounding_box
+	local diff = object.rotation.conjugate * (center - object.position)
+	local dist = bounds:get_distance_to_point(diff)
+	return dist <= 5
 end
 
 --- Clones the object.
