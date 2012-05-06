@@ -17,7 +17,7 @@ Widgets.Uiintrospectfield.new = function(clss, spec, field)
 		local t = Introspect.types_dict[field.type]
 		if value ~= nil then
 			if field.type == "string" then
-				str = string.gsub(value, "\n", "\\n")
+				str = value
 			else
 				str = t.write_str(value)
 			end
@@ -25,7 +25,6 @@ Widgets.Uiintrospectfield.new = function(clss, spec, field)
 			str = ""
 		end
 	end
-	str = string.sub(str, 1, 20)
 	-- Create the entry custom widget.
 	local self = Widgets.Uiwidget.new(clss, nil, label)
 	self.help = field.description
@@ -39,4 +38,17 @@ end
 Widgets.Uiintrospectfield.apply = function(self)
 	Operators.introspect:set_field_name(self.field.name)
 	Ui:push_state("introspect/field")
+end
+
+Widgets.Uiintrospectfield.rebuild_size = function(self)
+	-- Get the base size.
+	local size = Widgets.Uiwidget.rebuild_size(self)
+	size.x = math.max(size.x, 500)
+	-- Resize to fit the label.
+	if self.value then
+		local text = self:get_displayed_text()
+		local w,h = Program:measure_text("default", text, self:get_text_area_width(size))
+		if h then size.y = math.max(size.y, h + 10) end
+	end
+	return size
 end
