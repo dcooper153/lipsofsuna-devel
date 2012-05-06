@@ -42,6 +42,7 @@ Itemspec.introspect = Introspect{
 		{name = "gravity", type = "vector", default = Vector(0,-15), description = "Gravity vector."},
 		{name = "gravity_projectile", type = "vector", default = Vector(0,-15), description = "Gravity vector for projectile mode."},
 		{name = "health", type = "number", description = "Number of hit points the item has."},
+		{name = "important", type = "boolean", description = "True to not allow the item to be cleaned up from the map."},
 		{name = "influences", type = "dict", dict = {type = "number"}, description = "Dictionary of ways how attacks with the weapon influence the target."},
 		{name = "influences_bonus", type = "list", list = {type = "string"}, description = "List of skill-derived attribute names that affect influences."},
 		{name = "icon", type = "string", details = {value_in_spec = "Iconspec"}, description = "Icon name."},

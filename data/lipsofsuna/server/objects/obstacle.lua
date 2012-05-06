@@ -84,8 +84,7 @@ Obstacle.write_db = function(self, db)
 	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "obstacle", data})
 	-- Write the sector.
 	if self.sector then
-		db:query([[REPLACE INTO object_sectors (id,sector) VALUES (?,?);]],
-			{self.id, self.sector})
+		db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {self.id, self.sector, nil})
 	else
 		db:query([[DELETE FROM object_sectors where id=?;]], {self.id})
 	end

@@ -6,8 +6,9 @@ Actorspec{
 	ai_type = "anchored",
 	eye_style = "random",
 	hair_style = "random",
-	personality = "feeble",
-	inventory_items = {["dress"] = 1}}
+	important = true,
+	inventory_items = {["dress"] = 1},
+	personality = "feeble"}
 
 Dialogspec{name = "lyra", commands = {
 	{"branch", cond_dead = true,

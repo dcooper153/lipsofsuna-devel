@@ -7,6 +7,7 @@ Itemspec{
 	mass = 9,
 	categories = {["container"] = true, ["generate"] = true},
 	crafting_materials = {["log"] = 7},
+	important = true,
 	inventory_size = 6,
 	inventory_type = "chest",
 	description = "Round, wooden container for various things",

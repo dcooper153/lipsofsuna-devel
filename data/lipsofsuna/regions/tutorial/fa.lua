@@ -6,8 +6,9 @@ Actorspec{
 	ai_type = "anchored",
 	eye_style = "random",
 	hair_style = "random",
-	personality = "savage",
-	inventory_items = {["iron breastplate"] = 1, ["iron greaves"] = 1, ["iron gauntlets"] = 1, ["wooden staff"] = 1}}
+	important = true,
+	inventory_items = {["iron breastplate"] = 1, ["iron greaves"] = 1, ["iron gauntlets"] = 1, ["wooden staff"] = 1},
+	personality = "savage"}
 
 Dialogspec{name = "fa", commands = {
 	{"branch", cond_dead = true,

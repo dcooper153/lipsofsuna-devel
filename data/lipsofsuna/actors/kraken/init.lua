@@ -29,12 +29,3 @@ Actorspec{
 	base = "kraken",
 	ai_enabled = false,
 	inventory_items = {["torch"] = 1, ["workbench"] = 1, ["dress"] = 1}}
-
-Actorspec{
-	name = "Lips guard mage",
-	base = "kraken",
-	dialog = "lips guard",
-	eye_style = "random",
-	hair_style = "random",
-	inventory_items = {["lizard dress"] = 1, ["lizard gloves"] = 1, ["milky powder"] = 100},
-	skills = {["Health lv1"] = true, ["Willpower lv4"] = true}}

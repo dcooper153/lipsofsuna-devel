@@ -1,3 +1,14 @@
+Actorspec{
+	name = "Guildmaster Sam",
+	base = "aermale",
+	ai_type = "anchored",
+	dialog = "guildmastersam",
+	eye_style = "random",
+	hair_style = "random",
+	important = true,
+	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1, ["adamantium mattock"] = 1},
+	marker = "guildmastersam"}
+
 Dialogspec{name= "guildmastersam", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},

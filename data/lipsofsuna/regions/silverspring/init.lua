@@ -18,13 +18,13 @@ Factionspec{
 Actorspec{
 	name = "Agathe",
 	base = "aer",
+	ai_type = "camper",
 	dialog = "agathe",
 	marker = "agathe",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
 	factions = {["silverspring"] = true},
 	hair_color = {0,255,192},
 	hair_style = "hair1",
+	important = true,
 	inventory_items = {["dress"] = 1}}
 
 Actorspec{
@@ -37,25 +37,27 @@ Actorspec{
 	eye_style = "default",
 	hair_color = {128,128,128},
 	hair_style = "aermale1hair1",
+	important = true,
 	inventory_items = {["pants"] = 1}}
 
 Actorspec{
 	name = "Maurice",
 	base = "aermale",
+	ai_type = "camper",
 	dialog = "maurice",
 	marker = "maurice",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
 	eye_color = {64,192,64},
 	eye_style = "default",
 	factions = {["silverspring"] = true},
 	hair_color = {0,0,0},
 	hair_style = "bald",
+	important = true,
 	inventory_items = {["shirt"] = 1, ["pants"] = 1}}
 
 Actorspec{
 	name = "The Hoarder",
 	base = "aermale",
+	ai_type = "camper",
 	dialog = "the hoarder",
 	marker = "the hoarder",
 	eye_color = {255,32,32},
@@ -63,6 +65,7 @@ Actorspec{
 	factions = {["the hoarder"] = true},
 	hair_color = {200,20,180},
 	hair_style = "aermale1hair1",
+	important = true,
 	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1}}
 
 require(Mod.path .. "silverspring1")

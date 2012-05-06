@@ -923,7 +923,11 @@ Actor.write_db = function(self, db)
 	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "actor", data})
 	-- Write the sector.
 	if self.sector then
-		db:query([[REPLACE INTO object_sectors (id,sector) VALUES (?,?);]], {self.id, self.sector})
+		if self.spec.important or not self.dead then
+			db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {self.id, self.sector, nil})
+		else
+			db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {self.id, self.sector, 0})
+		end
 	else
 		db:query([[DELETE FROM object_sectors where id=?;]], {self.id})
 	end

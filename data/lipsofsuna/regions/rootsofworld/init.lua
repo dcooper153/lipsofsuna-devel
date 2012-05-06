@@ -17,6 +17,7 @@ Actorspec{
 	name = "Chara",
 	base = "seirei",
 	dialog = "chara",
+	important = true,
 	marker = "chara"}
 
 require(Mod.path .. "chara")

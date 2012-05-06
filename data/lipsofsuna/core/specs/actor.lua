@@ -66,6 +66,7 @@ Actorspec.introspect = Introspect{
 		{name = "hair_color", type = "color", description = "Hair color."},
 		{name = "hair_style", type = "string", description = "Hair style."},
 		{name = "hair_styles", type = "dict", dict = {type = "string"}, description = "Dictionary of hair styles."},
+		{name = "important", type = "boolean", description = "True to not allow the actor to be cleaned up from the map."},
 		{name = "interactive", type = "boolean", default = true, description = "False to make the object not appear interactive."},
 		{name = "inventory_items", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of inventory items to give when the actor is spawned.", details = {keys = {spec = "Itemspec"}, values = {integer = true, min = 1}}},
 		{name = "inventory_size", type = "number", default = 0, description = "Number of inventory slots the actor has."},

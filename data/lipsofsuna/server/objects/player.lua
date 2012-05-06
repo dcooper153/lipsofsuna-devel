@@ -600,7 +600,7 @@ Player.write_db = function(self, db)
 	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "player", data})
 	-- Write the sector.
 	if self.sector and not self.client then
-		db:query([[REPLACE INTO object_sectors (id,sector) VALUES (?,?);]], {self.id, self.sector})
+		db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {self.id, self.sector, 0})
 	else
 		db:query([[DELETE FROM object_sectors where id=?;]], {self.id})
 	end

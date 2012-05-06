@@ -9,6 +9,7 @@ Actorspec{
 	marker = "foreman",
 	eye_style = "random",
 	hair_style = "random",
+	important = true,
 	inventory_items = {["dress"] = 1}}
 
 Actorspec{
@@ -19,6 +20,7 @@ Actorspec{
 	dead = true,
 	hair_color = {200,180,20},
 	hair_style = "hair2",
+	important = true,
 	inventory_items = {["iron hatchet"] = 1, ["dress"] = 1},
 	factions = {["good"] = true}}
 

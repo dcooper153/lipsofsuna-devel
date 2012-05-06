@@ -87,22 +87,6 @@ Itemspec{
 	mass = 15}
 
 Itemspec{
-	name = "stone's sword",
-	model = "sword5",
-	icon = "sword1",
-	animation_attack = "attack sword",
-	animation_charge = "charge sword",
-	animation_hold = "hold sword",
-	categories = {["melee"] = true, ["weapon"] = true},
-	damage_mining = 1,
-	effect_attack_speedline = true,
-	equipment_slot = "hand.R",
-	health = 130,
-	influences = {["physical damage"] = 5},
-	influences_bonus = {"melee"},
-	mass = 15}
-
-Itemspec{
 	name = "wooden sword",
 	model = "woodsword",
 	icon = "sword1",

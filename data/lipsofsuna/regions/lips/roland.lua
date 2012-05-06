@@ -1,3 +1,16 @@
+Actorspec{
+	name = "Roland",
+	base = "aermale",
+	ai_type = "campter",
+	dialog = "roland",
+	eye_color = {255,0,0},
+	eye_style = "default",
+	factions = {["neutral"] = true},
+	hair_color = {128,128,128},
+	hair_style = "aermale1hair1",
+	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1},
+	marker = "roland"}
+
 Dialogspec{name = "roland", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},

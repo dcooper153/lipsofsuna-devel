@@ -1,11 +1,12 @@
 Actorspec{
 	name = "Lips citizen",
 	base = "aer",
+	ai_type = "camper",
 	dialog = "lips citizen",
 	eye_style = "random",
 	hair_style = "random",
+	important = true,
 	inventory_items = {["leather top"] = 1, ["leather pants"] = 1, ["leather leggings"] = 1},
-	ai_type = "camper",
 	personality = "feeble"}
 
 Dialogspec{name = "lips citizen", commands = {

@@ -74,4 +74,6 @@ Eventhandler{type = "tick", func = function(self, event)
 			end
 		end
 	end
+	-- Update world object decay.
+	Serialize:update_world_object_decay(event.secs)
 end}

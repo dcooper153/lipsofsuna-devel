@@ -10,6 +10,7 @@ Itemspec{
 	categories = {["container"] = true, ["workbench"] = true},
 	crafting_materials = {["log"] = 7},
 	effect_craft = "craftwood1",
+	important = true,
 	inventory_size = 4,
 	inventory_type = "workbench",
 	stacking = false,

@@ -88,51 +88,5 @@ Actorspec{
 	dialog = "lips citizen",
 	eye_style = "random",
 	hair_style = "random",
+	important = true,
 	inventory_items = {["leather chest"] = 1, ["leather pants"] = 1, ["leather boots"] = 1, ["leather gloves"] = 1, ["leather helm"] = 1}}
-
-Actorspec{
-	name = "Mentor",
-	base = "aermale",
-	dialog = "mentor",
-	marker = "mentor",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
-	eye_style = "random",
-	hair_style = "random",
-	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1}}
-
-Actorspec{
-	name = "Col",
-	base = "aermale",
-	dialog = "col",
-	marker = "col",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
-	eye_style = "random",
-	hair_style = "random",
-	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1}}
-
-Actorspec{
-	name = "Guildmaster Sam",
-	base = "aermale",
-	dialog = "guildmastersam",
-	marker = "guildmastersam",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
-	eye_style = "random",
-	hair_style = "random",
-	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1, ["adamantium mattock"] = 1}}
-
-Actorspec{
-	name = "Roland",
-	base = "aermale",
-	dialog = "roland",
-	marker = "roland",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
-	eye_color = {255,0,0},
-	eye_style = "default",
-	factions = {["neutral"] = true},
-	hair_color = {128,128,128},
-	hair_style = "aermale1hair1",
-	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1}}

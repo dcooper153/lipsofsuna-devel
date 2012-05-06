@@ -1,11 +1,12 @@
 Actorspec{
 	name = "Merchant",
 	base = "aer",
+	ai_type = "anchored",
 	dialog = "merchant",
 	eye_style = "random",
 	hair_style = "random",
+	important = true,
 	inventory_items = {["dress"] = 1},
-	ai_type = "anchored",
 	personality = "noble"}
 
 Dialogspec{name = "merchant", commands = {

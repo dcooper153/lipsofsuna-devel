@@ -170,6 +170,7 @@ Generator.generate = function(self, args)
 	Serialize:save_markers(true)
 	Serialize:save_quests(true)
 	Serialize:save_accounts(true)
+	Serialize:clear_world_object_decay()
 	-- Discard events emitted during map generation so that they
 	-- don't trigger when the game starts.
 	self:update_status(0, "Finishing")

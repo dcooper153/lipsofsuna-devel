@@ -22,6 +22,7 @@ Itemspec{
 	effect_unequip = "torch1",
 	equipment_slot = "hand.L",
 	icon = "torch1",
+	important = true,
 	mass = 3,
 	special_effects = {"torchflame1"},
 	water_gravity = Vector(0,6,0)}
@@ -32,6 +33,7 @@ Itemspec{
 	model = "gem-000",
 	mass = 2,
 	categories = {["quest"] = true},
+	important = true,
 	stacking = true}
 
 Actorspec{
@@ -42,6 +44,7 @@ Actorspec{
 	marker = "dummy",
 	eye_style = "random",
 	hair_style = "random",
+	important = true,
 	inventory_items = {["combat token"] = 1}}
 
 require(Mod.path .. "fa")

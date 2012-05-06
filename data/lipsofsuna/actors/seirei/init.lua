@@ -14,4 +14,5 @@ Actorspec{
 	name = "Erinyes",
 	base = "seirei",
 	dialog = "erinyes",
+	important = true,
 	marker = "erinyes"}

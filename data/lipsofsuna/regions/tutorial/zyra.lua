@@ -6,8 +6,9 @@ Actorspec{
 	ai_type = "anchored",
 	eye_style = "random",
 	hair_style = "random",
-	personality = "noble",
-	inventory_items = {["dress"] = 1}}
+	important = true,
+	inventory_items = {["dress"] = 1},
+	personality = "noble"}
 
 Dialogspec{name = "zyra", commands = {
 	{"default death check"},

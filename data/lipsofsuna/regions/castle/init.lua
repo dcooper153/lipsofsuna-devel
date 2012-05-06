@@ -26,12 +26,12 @@ Obstaclespec{
 Actorspec{
 	name = "Castle Foreman",
 	base = "aer",
+	ai_type = "anchored",
 	dialog = "castleforeman",
 	marker = "castleforeman",
-	ai_enable_combat = false,
-	ai_enable_wander = false,
 	eye_style = "random",
 	hair_style = "random",
+	important = true,
 	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1}}
 
 require(Mod.path .. "bigbuildings")

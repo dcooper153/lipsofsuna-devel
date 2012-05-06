@@ -1,13 +1,14 @@
 Actorspec{
 	name = "Celine",
 	base = "aer",
+	ai_type = "camper",
 	dialog = "celine",
-	marker = "celine",
+	factions = {["peculiar pet"] = true},
 	hair_color = {0,255,0},
 	hair_style = "hair1",
+	important = true,
 	inventory_items = {["iron hatchet"] = 1, ["dress"] = 1},
-	factions = {["peculiar pet"] = true},
-	ai_type = "camper",
+	marker = "celine",
 	personality = "feeble"}
 
 Dialogspec{name = "celine", commands = {

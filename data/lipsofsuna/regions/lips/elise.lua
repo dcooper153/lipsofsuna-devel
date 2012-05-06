@@ -1,14 +1,15 @@
 Actorspec{
 	name = "Elise",
 	base = "aer",
+	ai_type = "anchored",
 	animations = {["idle"] = "elise idle"},
 	dialog = "elise",
-	marker = "elise",
+	factions = {["neutral"] = true},
 	hair_color = {200,180,20},
 	hair_style = "hair2",
+	important = true,
 	inventory_items = {["iron hatchet"] = 1, ["dress"] = 1},
-	factions = {["neutral"] = true},
-	ai_type = "anchored",
+	marker = "elise",
 	personality = "feeble"}
 
 Questspec{

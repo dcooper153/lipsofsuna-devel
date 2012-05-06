@@ -3,7 +3,9 @@ require "common/unlocks"
 Serialize = Class()
 Serialize.game_version = "4"
 Serialize.account_version = "1"
-Serialize.object_version = "2"
+Serialize.object_version = "3"
+Serialize.object_decay_timeout = 900
+Serialize.object_decay_update = 300
 
 --- Initializes the serializer.
 -- @param clss Serialize class.
@@ -84,6 +86,7 @@ end
 Serialize.save = function(clss, erase)
 	if erase then clss:clear_objects() end
 	clss.sectors:save_world(erase)
+	if not erase then clss:update_world_object_decay() end
 	clss:save_generator(erase)
 	clss:save_markers(erase)
 	clss:save_quests(erase)
@@ -401,6 +404,8 @@ end
 -- @param self Serialize class.
 -- @param reset True to clear the database.
 Serialize.init_object_database = function(self, reset)
+	-- Initialize the decay timer.
+	self.object_decay_timer = 0
 	-- Check if changes are needed.
 	local version = self:get_value("object_version")
 	if not reset and version == self.object_version then return end
@@ -421,7 +426,8 @@ Serialize.init_object_database = function(self, reset)
 		slot TEXT);]])
 	self.db:query([[CREATE TABLE object_sectors (
 		id INTEGER PRIMARY KEY,
-		sector INTEGER);]])
+		sector INTEGER,
+		time INTEGER);]])
 	self.db:query([[CREATE TABLE object_skills (
 		id INTEGER,
 		name TEXT,
@@ -443,6 +449,12 @@ Serialize.clear_objects = function(self)
 	self.db:query([[DELETE FROM object_sectors;]])
 	self.db:query([[DELETE FROM object_skills;]])
 	self.db:query([[DELETE FROM object_stats;]])
+end
+
+--- Prevents all world objects from decaying until their sectors have been loaded.
+-- @param self Serialize class.
+Serialize.clear_world_object_decay = function(self)
+	self.db:query([[UPDATE object_sectors SET time=?;]], {nil})
 end
 
 --- Reads an object from the database.
@@ -594,6 +606,24 @@ Serialize.save_static_objects = function(self)
 			v:write_db(self.db)
 		end
 	end
+end
+
+--- Updates the age of world objects and removes decayed ones.
+-- @param self Serialize class.
+-- @param secs Seconds since the last delay, or nil to update immediately.
+Serialize.update_world_object_decay = function(self, secs)
+	-- Only update periodically.
+	if not self.object_decay_timer then return end
+	if secs then
+		self.object_decay_timer = self.object_decay_timer + secs
+		if self.object_decay_timer < self.object_decay_update then return end
+	end
+	-- Increment the age of the objects and delete old objects.
+	-- Important objects and obstacles set the time to NULL so this won't affect them.
+	self.db:query([[UPDATE object_sectors SET time=time+?;]], {self.object_decay_timer})
+	self.db:query([[DELETE FROM object_sectors WHERE time>?;]], {self.object_decay_timeout})
+	-- Wait for the next cycle.
+	self.object_decay_timer = 0
 end
 
 ------------------------------------------------------------------------------

@@ -1,3 +1,14 @@
+Actorspec{
+	name = "Mentor",
+	base = "aermale",
+	ai_type = "campter",
+	dialog = "mentor",
+	eye_style = "random",
+	hair_style = "random",
+	important = true,
+	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1},
+	marker = "mentor"}
+
 Dialogspec{name = "mentor", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},

@@ -1,3 +1,29 @@
+Itemspec{
+	name = "stone's sword",
+	model = "sword5",
+	icon = "sword1",
+	animation_attack = "attack sword",
+	animation_charge = "charge sword",
+	animation_hold = "hold sword",
+	categories = {["melee"] = true, ["weapon"] = true},
+	damage_mining = 1,
+	effect_attack_speedline = true,
+	equipment_slot = "hand.R",
+	important = true,
+	influences = {["physical damage"] = 5},
+	influences_bonus = {"melee"},
+	mass = 15}
+
+Actorspec{
+	name = "Col",
+	base = "aermale",
+	ai_type = "camper",
+	dialog = "col",
+	eye_style = "random",
+	hair_style = "random",
+	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1},
+	marker = "col"}
+
 Dialogspec{name = "col", commands = {
 	{"branch", cond_dead = true,
 		{"loot"}},

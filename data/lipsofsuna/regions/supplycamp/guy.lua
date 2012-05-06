@@ -1,13 +1,14 @@
 Actorspec{
 	name = "Guy",
 	base = "aer",
+	ai_type = "camper",
 	dialog = "guy",
 	marker = "guy",
 	eye_style = "random",
 	hair_style = "random",
+	important = true,
 	inventory_items = {["dress"] = 1},
 	preset = "Male 2",
-	ai_type = "camper",
 	personality = "tough"}
 
 Questspec{

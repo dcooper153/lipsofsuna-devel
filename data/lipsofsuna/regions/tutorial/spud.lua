@@ -6,8 +6,9 @@ Actorspec{
 	ai_type = "anchored",
 	eye_style = "random",
 	hair_style = "random",
-	personality = "tough",
-	inventory_items = {["lizard dress"] = 1, ["torch"] = 1}}
+	important = true,
+	inventory_items = {["lizard dress"] = 1, ["torch"] = 1},
+	personality = "tough"}
 
 Dialogspec{name = "spud", commands = {
 	{"branch", cond_dead = true,

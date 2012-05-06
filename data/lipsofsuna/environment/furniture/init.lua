@@ -8,6 +8,7 @@ Itemspec{
 	categories = {["container"] = true, ["generate"] = true},
 	crafting_materials = {["log"] = 10},
 	effect_craft = "craftwood1",
+	important = true,
 	inventory_size = 8,
 	inventory_type = "chest",
 	loot_categories = {"book"},
