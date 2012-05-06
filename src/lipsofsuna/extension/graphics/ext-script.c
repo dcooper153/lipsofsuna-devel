@@ -24,6 +24,31 @@
 
 #include "ext-module.h"
 
+static void Program_layout_text (LIScrArgs* args)
+{
+	int i;
+	int width_limit;
+	int glyphs_num;
+	int* glyphs;
+	const char* font_name;
+	const char* text;
+	LIExtGraphics* module;
+
+	if (liscr_args_geti_string (args, 0, &font_name) &&
+	    liscr_args_geti_string (args, 1, &text) &&
+	    liscr_args_geti_int (args, 2, &width_limit))
+	{
+		module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
+		if (liren_render_layout_text (module->render, font_name, text, width_limit, &glyphs, &glyphs_num))
+		{
+			liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+			for (i = 0 ; i < 3 * glyphs_num ; i++)
+				liscr_args_seti_int (args, glyphs[i]);
+			lisys_free (glyphs);
+		}
+	}
+}
+
 static void Program_measure_text (LIScrArgs* args)
 {
 	int width_limit = -1;
@@ -171,6 +196,7 @@ static void Program_get_video_modes (LIScrArgs* args)
 void liext_script_graphics (
 	LIScrScript* self)
 {
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_layout_text", Program_layout_text);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_measure_text", Program_measure_text);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_screenshot", Program_screenshot);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_set_video_mode", Program_set_video_mode);

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -66,6 +66,14 @@ LIAPICALL (int, liren_render_screenshot, (
 LIAPICALL (int, liren_render_update, (
 	LIRenRender* self,
 	float        secs));
+
+LIAPICALL (int, liren_render_layout_text, (
+	LIRenRender* self,
+	const char*  font,
+	const char*  text,
+	int          width_limit,
+	int**        result_glyphs,
+	int*         result_glyphs_num));
 
 LIAPICALL (int, liren_render_get_anisotropy, (
 	const LIRenRender* self));

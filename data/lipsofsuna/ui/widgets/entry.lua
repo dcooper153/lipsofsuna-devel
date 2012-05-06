@@ -9,6 +9,7 @@ Widgets.Uientry.new = function(clss, label, changed)
 	self.cursor_pos = 1
 	self.changed = changed
 	self.hint = "$A: Edit\n$$B\n$$U\n$$D"
+	self.need_reshape = true
 	return self
 end
 
@@ -39,6 +40,7 @@ Widgets.Uientry.handle_event = function(self, args)
 			table.remove(w, p)
 			self.value = String.wchar_to_utf8(w)
 			self.cursor_pos = p
+			self.need_reshape = true
 			self.need_repaint = true
 			self:changed()
 		end
@@ -50,6 +52,7 @@ Widgets.Uientry.handle_event = function(self, args)
 			table.remove(w, p)
 			self.value = String.wchar_to_utf8(w)
 			self.cursor_pos = p
+			self.need_reshape = true
 			self.need_repaint = true
 			self:changed()
 		end
@@ -76,6 +79,14 @@ Widgets.Uientry.handle_event = function(self, args)
 			self.cursor_pos = self.cursor_pos + 1
 			self.need_repaint = true
 		end
+	elseif args.code == Keysym.UP then
+		-- Move up.
+		self:move_cursor_up()
+		self.need_repaint = true
+	elseif args.code == Keysym.DOWN then
+		-- Move down.
+		self:move_cursor_down()
+		self.need_repaint = true
 	elseif args.text then
 		-- Typing.
 		local w = String.utf8_to_wchar(self.value or "")
@@ -87,23 +98,76 @@ Widgets.Uientry.handle_event = function(self, args)
 		end
 		self.value = String.wchar_to_utf8(w)
 		self.cursor_pos = p
+		self.need_reshape = true
 		self.need_repaint = true
 		self:changed()
 	end
 end
 
+--- Moves the cursor down one line.
+-- @param self Entry widget.
+Widgets.Uientry.move_cursor_down = function(self)
+	-- Layout the text.
+	local text = self:get_displayed_text()
+	local layout = Program:layout_text("default", text, self:get_text_area_width())
+	if not layout then return end
+	-- Find the closest glyph below the cursor.
+	local best
+	local cx,cy = self:get_cursor_position()
+	for i = 1,#layout,3 do
+		local x = layout[i]
+		local y = layout[i + 1]
+		if y > cy then
+			local dist = math.abs(x - cx) + math.abs(y - cy)
+			if not best or dist < best then
+				self.cursor_pos = (i+2) / 3
+				best = dist
+			end
+		end
+	end
+end
+
+--- Moves the cursor down one line.
+-- @param self Entry widget.
+Widgets.Uientry.move_cursor_up = function(self)
+	-- Layout the text.
+	local text = self:get_displayed_text()
+	local layout = Program:layout_text("default", text, self:get_text_area_width())
+	if not layout then return end
+	-- Find the closest glyph above the cursor.
+	local best
+	local cx,cy = self:get_cursor_position()
+	for i = 1,#layout,3 do
+		local x = layout[i]
+		local y = layout[i + 1]
+		if y < cy then
+			local dist = math.abs(x - cx) + math.abs(y - cy)
+			if not best or dist < best then
+				self.cursor_pos = (i+2) / 3
+				best = dist
+			end
+		end
+	end
+end
+
+Widgets.Uientry.rebuild_size = function(self)
+	-- Get the base size.
+	local size = Widgets.Uiwidget.rebuild_size(self)
+	-- Resize to fit the label.
+	if self.value then
+		local text = self:get_displayed_text()
+		local w,h = Program:measure_text("default", text, self:get_text_area_width(size))
+		if h then size.y = math.max(size.y, h + 10) end
+	end
+	return size
+end
+
 Widgets.Uientry.rebuild_canvas = function(self)
 	-- Format the text.
-	-- In password mode, all characters are replaced with '*'.
-	local text
-	if self.password and self.value then
-		text = ""
-		for i=1,#self.value do text = text .. "*" end
-	else
-		text = self.value
-	end
+	local text = self:get_displayed_text()
 	-- Add the base.
-	local w = self.size.x - 159
+	local w = self.size.x - 155
+	local w1 = self:get_text_area_width()
 	local h = self.size.y - 10
 	Widgets.Uiwidget.rebuild_canvas(self)
 	-- Add the background.
@@ -116,24 +180,63 @@ Widgets.Uientry.rebuild_canvas = function(self)
 	-- Add the text.
 	self:canvas_text{
 		dest_position = {152,5},
-		dest_size = {w,h},
+		dest_size = {w1,h},
 		text = text,
 		text_alignment = {0,0.5},
 		text_color = {1,1,1,1},
 		text_font = "default"}
 	-- Add the cursor.
 	if self.input_mode then
-		local ws = String.utf8_to_wchar(text)
-		ws[self.cursor_pos] = nil
-		local us = String.wchar_to_utf8(ws)
-		local pos = Program:measure_text("default", us, w)
+		local cx,cy = self:get_cursor_position()
 		self:canvas_text{
-			dest_position = {152+pos,5},
-			dest_size = {w,h},
+			dest_position = {152+cx,5+cy},
+			dest_size = {w1,h},
 			text = "|",
-			text_alignment = {0,0.5},
+			text_alignment = {0,0},
 			text_color = {1,1,1,1},
 			text_font = "default"}
 	end
 	self:canvas_compile()
+end
+
+--- Gets the visual position of the cursor relative to the text area origin.
+-- @param self Entry widget.
+-- @return X,Y.
+Widgets.Uientry.get_cursor_position = function(self)
+	local text = self:get_displayed_text()
+	local layout = Program:layout_text("default", text, self:get_text_area_width())
+	if not layout then return 0,0 end
+	local cx,cy
+	local cp = 3*self.cursor_pos-2
+	if cp < #layout then
+		cx = layout[cp] or 0
+		cy = layout[cp + 1] or 0
+	else
+		cp = #layout - 2
+		cx = (layout[cp] or 0) + (layout[cp + 2] or 0)
+		cy = layout[cp + 1] or 0
+	end
+	return cx,cy
+end
+
+--- Gets the characters visible to the user.
+-- @param self Entry widget.
+-- @return String.
+Widgets.Uientry.get_displayed_text = function(self)
+	-- In password mode, all characters are replaced with '*'.
+	if self.password and self.value then
+		local ws = String.utf8_to_wchar(self.value)
+		for k,v in pairs(ws) do ws[k] = "*" end
+		return string.concat(ws)
+	else
+		return self.value
+	end
+end
+
+--- Gets the width of the text area.
+-- @param self Entry widget.
+-- @return Width in pixels.
+Widgets.Uientry.get_text_area_width = function(self, size)
+	local s = size or self.size
+	return s.x - 160
 end

@@ -54,6 +54,14 @@ LIAPICALL (LIRenModel*, liren_internal_find_model, (
 	LIRenRender* self,
 	int          id));
 
+LIAPICALL (int, liren_internal_layout_text, (
+	LIRenRender* self,
+	const char*  font,
+	const char*  text,
+	int          width_limit,
+	int**        result_glyphs,
+	int*         result_glyphs_num));
+
 LIAPICALL (int, liren_internal_load_font, (
 	LIRenRender* self,
 	const char*  name,

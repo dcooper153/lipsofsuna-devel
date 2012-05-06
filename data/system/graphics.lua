@@ -14,6 +14,16 @@ Program.capture_screen = function(clss)
 	return Los.program_screenshot()
 end
 
+--- Layouts a string.
+-- @param clss Program class.
+-- @param font Font name.
+-- @param text Text to layout.
+-- @param width Width limit.
+-- @return Number list containing (x,y,width) for each glyph.
+Program.layout_text = function(clss, font, text, width)
+	return Los.program_layout_text(font, text, width)
+end
+
 --- Measures a string.
 -- @param clss Program class.
 -- @param ... Arguments.<ul>

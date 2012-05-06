@@ -451,6 +451,54 @@ void liren_internal_handle_message (
 		lisys_mutex_unlock (message->mutex_caller);
 }
 
+int liren_internal_layout_text (
+	LIRenRender* self,
+	const char*  font,
+	const char*  text,
+	int          width_limit,
+	int**        result_glyphs,
+	int*         result_glyphs_num)
+{
+	int i;
+	int h;
+	LIFntFont* font_;
+	LIFntLayout* layout;
+
+	font_ = (LIFntFont*) lialg_strdic_find (self->fonts, font);
+	if (font_ == NULL)
+		return 0;
+
+	layout = lifnt_layout_new ();
+	if (layout == NULL)
+		return 0;
+
+	lifnt_layout_set_width_limit (layout, width_limit);
+	lifnt_layout_append_string (layout, font_, text);
+	lifnt_layout_update (layout);
+	if (layout->n_glyphs)
+	{
+		*result_glyphs_num = layout->n_glyphs;
+		*result_glyphs = (int*) lisys_calloc (layout->n_glyphs, 3 * sizeof (int));
+		if (*result_glyphs == NULL)
+			return 0;
+		h = lifnt_font_get_height (font_);
+		for (i = 0 ; i < layout->n_glyphs ; i++)
+		{
+			(*result_glyphs)[3 * i] = layout->glyphs[i].x;
+			(*result_glyphs)[3 * i + 1] = layout->glyphs[i].y - h;
+			(*result_glyphs)[3 * i + 2] = layout->glyphs[i].advance;
+		}
+	}
+	else
+	{
+		*result_glyphs_num = 0;
+		*result_glyphs = NULL;
+	}
+	lifnt_layout_free (layout);
+
+	return 1;
+}
+
 int liren_internal_load_font (
 	LIRenRender* self,
 	const char*  name,
