@@ -1,9 +1,9 @@
 require "common/unlocks"
 
 Serialize = Class()
-Serialize.game_version = "4"
+Serialize.game_version = "5"
 Serialize.account_version = "1"
-Serialize.object_version = "3"
+Serialize.object_version = "4"
 Serialize.object_decay_timeout = 900
 Serialize.object_decay_update = 300
 
@@ -421,6 +421,8 @@ Serialize.init_object_database = function(self, reset)
 	self.db:query([[CREATE TABLE object_data (
 		id INTEGER PRIMARY KEY,
 		type TEXT,
+		spec TEXT,
+		dead INTEGER,
 		data TEXT);]])
 	self.db:query([[CREATE TABLE object_inventory (
 		id INTEGER PRIMARY KEY,
@@ -458,10 +460,9 @@ end
 -- @param self Serialize class.
 Serialize.clear_unused_objects = function(self)
 	-- Delete objects that are neither in the map or the inventory.
-	-- TODO: Delete corpses of players.
 	self.db:query([[DELETE FROM object_data WHERE
 		type <> 'static' AND
-		type <> 'player' AND
+		(type <> 'player' OR dead = 1) AND
 		NOT EXISTS (SELECT 1 FROM object_inventory AS a WHERE object_data.id=a.id) AND
 		NOT EXISTS (SELECT 1 FROM object_sectors AS a WHERE object_data.id=a.id);]])
 	-- Delete orphaned inventory data.
@@ -489,23 +490,44 @@ end
 -- @param self Serialize class.
 -- @param id Object ID.
 -- @param type Object type.
+-- @param spec Spec name.
+-- @param dead One for dead, zero for alive.
 -- @param data Object data.
 -- @return Object.
-Serialize.load_object = function(self, id, type, data)
+Serialize.load_object = function(self, id, type, spec, dead, data)
 	-- Load the data string.
 	if not data then return end
-	local func = loadstring(data)
+	local func = loadstring("return " .. data)
 	if not func then return end
-	-- Execute the load function.
-	local ok,ret = pcall(func)
+	-- Convert the data string into a table.
+	local ok,args = pcall(func)
 	if not ok then
-		print(ret)
+		print("ERROR: " .. ret)
 		return
 	end
-	if not ret then return end
+	-- Add arguements from the queried row.
+	args.id = id
+	args.dead = (dead == 1) and true or nil
+	args.spec = spec
+	-- Create the object.
+	local init = function(args)
+		if type == "actor" then return Actor(args)
+		elseif type == "item" then return Item(args)
+		elseif type == "obstacle" then return Obstacle(args)
+		elseif type == "player" then return Player(args)
+		elseif type == "static" then return Staticobject(args)
+		else
+			error(string.format("invalid object type %q", type))
+		end
+	end
+	local ok1,object = pcall(init, args)
+	if not ok1 then
+		print("ERROR: " .. ret)
+		return
+	end
 	-- Read additional data.
-	ret:read_db(self.db)
-	return ret
+	object:read_db(self.db)
+	return object
 end
 
 --- Reads all objects in a sector.
@@ -515,16 +537,16 @@ end
 Serialize.load_object_inventory = function(self, parent)
 	local objects = {}
 	local rows = self.db:query(
-		[[SELECT b.id,b.type,b.data,a.offset,a.slot FROM
+		[[SELECT b.id,b.type,b.spec,b.dead,b.data,a.offset,a.slot FROM
 		object_inventory AS a INNER JOIN
 		object_data AS b WHERE
 		a.parent=? AND a.id=b.id]], {parent.id})
 	for k,v in ipairs(rows) do
-		local obj = Serialize:load_object(v[1], v[2], v[3])
+		local obj = Serialize:load_object(v[1], v[2], v[3], v[4], v[5])
 		if obj then
-			parent.inventory:set_object(v[4], obj)
-			if v[5] then
-				parent.inventory:equip_index(v[4], v[5])
+			parent.inventory:set_object(v[6], obj)
+			if v[7] then
+				parent.inventory:equip_index(v[6], v[7])
 			end
 			table.insert(objects, obj)
 		end
@@ -562,11 +584,11 @@ end
 Serialize.load_player_object = function(self, account)
 	if not account.character then return end
 	local rows = self.db:query(
-		[[SELECT id,type,data FROM object_data
+		[[SELECT id,type,spec,dead,data FROM object_data
 		WHERE type=? AND id=?]],
 		{"player", account.character})
 	for k,v in ipairs(rows) do
-		return self:load_object(v[1], v[2], v[3])
+		return self:load_object(v[1], v[2], v[3], v[4], v[5])
 	end
 end
 
@@ -577,12 +599,12 @@ end
 Serialize.load_sector_objects = function(self, sector)
 	local objects = {}
 	local rows = self.db:query(
-		[[SELECT b.id,b.type,b.data FROM
+		[[SELECT b.id,b.type,b.spec,b.dead,b.data FROM
 		object_sectors AS a INNER JOIN
 		object_data AS b WHERE
 		a.sector=? AND a.id=b.id]], {sector})
 	for k,v in ipairs(rows) do
-		local obj = Serialize:load_object(v[1], v[2], v[3])
+		local obj = Serialize:load_object(v[1], v[2], v[3], v[4], v[5])
 		if obj then
 			obj.realized = true
 			table.insert(objects, obj)
@@ -597,9 +619,9 @@ end
 Serialize.load_static_objects = function(self)
 	local objects = {}
 	local rows = self.db:query(
-		[[SELECT id,type,data FROM object_data WHERE type=?]], {"static"})
+		[[SELECT id,type,spec,dead,data FROM object_data WHERE type=?]], {"static"})
 	for k,v in ipairs(rows) do
-		local obj = self:load_object(v[1], v[2], v[3])
+		local obj = self:load_object(v[1], v[2], v[3], v[4], v[5])
 		if obj then
 			obj.realized = true
 			table.insert(objects, obj)

@@ -54,13 +54,13 @@ end
 -- @param db Database.
 Staticobject.write_db = function(self, db)
 	-- Write the object.
-	local data = string.format("return Staticobject%s", serialize{
+	local data = serialize{
 		id = self.id,
 		position = self.position,
 		rotation = self.rotation,
-		spec = self.spec.name})
-	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]],
-		{self.id, "static", data})
+		spec = self.spec.name}
+	db:query([[REPLACE INTO object_data (id,type,spec,dead,data) VALUES (?,?,?,?,?);]],
+		{self.id, "static", self.spec.name, 0, data})
 end
 
 Staticobject:add_setters{

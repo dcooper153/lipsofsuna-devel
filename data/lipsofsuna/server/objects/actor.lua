@@ -907,20 +907,18 @@ Actor.write_db = function(self, db)
 	-- Don't save summons.
 	if self.summon_timer then return end
 	-- Write the object.
-	local data = string.format("return Actor%s", serialize{
+	local data = serialize{
 		angular = self.angular,
 		beheaded = self.beheaded or nil,
-		dead = self.dead,
 		eye_style = self.eye_style,
 		face_style = self.face_style,
 		hair_style = self.hair_style,
 		home_point = self.home_point,
-		id = self.id,
 		physics = self.physics,
 		position = self.position,
-		rotation = self.rotation,
-		spec = self.spec.name})
-	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "actor", data})
+		rotation = self.rotation}
+	db:query([[REPLACE INTO object_data (id,type,spec,dead,data) VALUES (?,?,?,?,?);]],
+		{self.id, "actor", self.spec.name, self.dead and 1 or 0, data})
 	-- Write the sector.
 	if self.sector then
 		if self.spec.important or not self.dead then

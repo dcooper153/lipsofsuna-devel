@@ -74,14 +74,13 @@ end
 -- @param db Database.
 Obstacle.write_db = function(self, db)
 	-- Write the object.
-	local data = string.format("return Obstacle%s", serialize{
+	local data = serialize{
 		angular = self.angular,
 		health = self.health,
-		id = self.id,
 		position = self.position,
-		rotation = self.rotation,
-		spec = self.spec.name})
-	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "obstacle", data})
+		rotation = self.rotation}
+	db:query([[REPLACE INTO object_data (id,type,spec,dead,data) VALUES (?,?,?,?,?);]],
+		{self.id, "obstacle", self.spec.name, 0, data})
 	-- Write the sector.
 	if self.sector then
 		db:query([[REPLACE INTO object_sectors (id,sector,time) VALUES (?,?,?);]], {self.id, self.sector, nil})

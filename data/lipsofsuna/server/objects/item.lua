@@ -300,15 +300,14 @@ end
 -- @param db Database.
 Item.write_db = function(self, db)
 	-- Write the object.
-	local data = string.format("return Item%s", serialize{
+	local data = serialize{
 		angular = self.angular,
 		count = self.count,
-		id = self.id,
 		looted = self.looted,
-		spec = self.spec.name,
 		position = self.position,
-		rotation = self.rotation})
-	db:query([[REPLACE INTO object_data (id,type,data) VALUES (?,?,?);]], {self.id, "item", data})
+		rotation = self.rotation}
+	db:query([[REPLACE INTO object_data (id,type,spec,dead,data) VALUES (?,?,?,?,?);]],
+		{self.id, "item", self.spec.name, 0, data})
 	-- Write the sector.
 	if self.sector then
 		if self.spec.important then
