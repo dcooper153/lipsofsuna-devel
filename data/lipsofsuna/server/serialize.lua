@@ -86,7 +86,10 @@ end
 Serialize.save = function(clss, erase)
 	if erase then clss:clear_objects() end
 	clss.sectors:save_world(erase)
-	if not erase then clss:update_world_object_decay() end
+	if not erase then
+		clss:update_world_object_decay()
+		clss:clear_unused_objects()
+	end
 	clss:save_generator(erase)
 	clss:save_markers(erase)
 	clss:save_quests(erase)
@@ -449,6 +452,31 @@ Serialize.clear_objects = function(self)
 	self.db:query([[DELETE FROM object_sectors;]])
 	self.db:query([[DELETE FROM object_skills;]])
 	self.db:query([[DELETE FROM object_stats;]])
+end
+
+--- Removes objects that are not in the world map or inventories.
+-- @param self Serialize class.
+Serialize.clear_unused_objects = function(self)
+	-- Delete objects that are neither in the map or the inventory.
+	-- TODO: Delete corpses of players.
+	self.db:query([[DELETE FROM object_data WHERE
+		type <> 'static' AND
+		type <> 'player' AND
+		NOT EXISTS (SELECT 1 FROM object_inventory AS a WHERE object_data.id=a.id) AND
+		NOT EXISTS (SELECT 1 FROM object_sectors AS a WHERE object_data.id=a.id);]])
+	-- Delete orphaned inventory data.
+	-- The fields of the object_inventory table are considered orphaned if
+	-- either the object ID or the parent ID are not in object_data
+	self.db:query([[DELETE FROM object_inventory WHERE NOT EXISTS
+		(SELECT 1 FROM
+		object_data AS a INNER JOIN
+		object_data AS b WHERE
+			a.id=object_inventory.id AND
+			b.id=object_inventory.parent);]])
+	-- Delete orphaned sector data.
+	self.db:query([[DELETE FROM object_sectors WHERE NOT EXISTS
+		(SELECT 1 FROM object_data WHERE
+			object_data.id=object_sectors.id);]])
 end
 
 --- Prevents all world objects from decaying until their sectors have been loaded.
