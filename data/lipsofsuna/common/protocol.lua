@@ -40,9 +40,6 @@ do
 		index = index + 1
 	end
 	add("ADMIN_DELETE")
-	add("ADMIN_SAVE")
-	add("ADMIN_SHUTDOWN")
-	add("ADMIN_SPAWN")
 	add("ADMIN_PRIVILEGE")
 	add("ADMIN_STATS")
 	add("EDIT_TILE") -- FIXME: ADMIN_TILE

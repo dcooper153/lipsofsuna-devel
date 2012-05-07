@@ -62,6 +62,34 @@ ChatCommand{pattern = "^/revoke admin ([a-zA-Z0-9]*)$", permission = "admin", fu
 	end
 end}
 
+ChatCommand{
+	name = "server_decay_objects",
+	description = "Causes unimporant objects to decay immediately.",
+	pattern = "^/server_decay_objects$",
+	permission = "admin",
+	func = function(player, matches)
+		Serialize:update_world_object_decay(Serialize.object_decay_timeout)
+	end}
+
+ChatCommand{
+	name = "server_save",
+	description = "Saves the game state to the database.",
+	pattern = "^/server_save$",
+	permission = "admin",
+	func = function(player, matches)
+		Serialize:save()
+	end}
+
+ChatCommand{
+	name = "server_shutdown",
+	description = "Saves the game state and shuts down the server.",
+	pattern = "^/server_shutdown$",
+	permission = "admin",
+	func = function(player, matches)
+		Serialize:save()
+		Program:shutdown()
+	end}
+
 -- Spawn item.
 ChatCommand{pattern = "^/spawn item (.*)$", permission = "admin", func = function(player, matches)
 	local spec = Itemspec:find{name = matches[1]}
@@ -128,10 +156,6 @@ end}
 -- Suicide.
 ChatCommand{pattern = "^/suicide$", permission = "player", func = function(player, matches)
 	player:die()
-end}
-
-ChatCommand{pattern = "^/wireframe$", permission = "player", func = function(player, matches)
-	Los.Wireframe_on()
 end}
 
 -- Teleportation.

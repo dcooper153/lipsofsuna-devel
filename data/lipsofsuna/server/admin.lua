@@ -15,25 +15,6 @@ Protocol:add_handler{type = "ADMIN_DELETE", func = function(args)
 	end
 end}
 
-Protocol:add_handler{type = "ADMIN_SAVE", func = function(args)
-	-- Check for permissions.
-	local player = Player:find{client = args.client}
-	if not player.admin then return player:send("You have no permission to do that.") end
-	-- Save.
-	print("Saving world state...")
-	Serialize:save()
-	print("Done")
-end}
-
-Protocol:add_handler{type = "ADMIN_SHUTDOWN", func = function(args)
-	-- Check for permissions.
-	local player = Player:find{client = args.client}
-	if not player.admin then return player:send("You have no permission to do that.") end
-	-- Save and shutdown.
-	Serialize:save()
-	Program:shutdown()
-end}
-
 Protocol:add_handler{type = "ADMIN_STATS", func = function(args)
 	-- Check for permissions.
 	local player = Player:find{client = args.client}
