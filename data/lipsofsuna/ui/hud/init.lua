@@ -65,3 +65,32 @@ Ui:add_hud{
 	init = function()
 		return Widgets.Notification()
 	end}
+
+Ui:add_hud{
+	id = "target",
+	active = function() return Ui.state == "play" end,
+	init = function()
+		local self = Widgets.Label{font = "medium"}
+		self.update_timer = 0
+		self.update = function(self, secs)
+			self.update_timer = self.update_timer + secs
+			if self.update_timer < 0.1 then return end
+			self.update_timer = 0
+			local obj = Operators.world:get_target_object()
+			if obj and Operators.world:get_target_usages() then
+				-- Format the text.
+				local key = Binding:get_control_name("menu apply") or "[---]"
+				self.text = string.format("%s %s", key, obj.spec.name)
+				-- Update the position.
+				local mode = Program.video_mode
+				local padx = mode[1] - self.width
+				self.offset = Vector(padx / 2, 50)
+				-- Show the widget.
+				self.visible = true
+			else
+				-- Hide the widget.
+				self.visible = false
+			end
+		end
+		return self
+	end}

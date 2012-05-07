@@ -2,62 +2,55 @@ Ui:add_state{
 	state = "world/object",
 	label = "Interact",
 	init = function()
-		-- Get the object.
-		local object = Target.target_object
-		if not object then return end
-		if not object.realized then return end
-		-- Get the object spec.
-		local spec = object.spec
-		if not spec then return end
-		-- Create action spec widgets.
+		local object = Operators.world:get_target_object()
+		local usages = Operators.world:get_target_usages()
+		if not object or not usages then return end
 		local widgets = {}
-		if spec.get_use_actions then
-			for k,v in pairs(spec:get_use_actions()) do
-				local name = v.label or v.name
-				local action = v.name
-				table.insert(widgets, Widgets.Uibutton(name, function()
+		for k,v in ipairs(usages) do
+			local action = v[3]
+			if action then
+				-- Add a standard action.
+				table.insert(widgets, Widgets.Uibutton(v[2], function()
 					Network:send{packet = Packet(packets.PLAYER_USE_WORLD,
 						"uint32", object.id,
-						"string", v.name)}
-					if v.dialog then
+						"string", action.name)}
+					if action.dialog then
 						Client.active_dialog_object = object
 						Ui.state = "dialog"
 					else
 						Ui:pop_state()
 					end
 				end))
-			end
-		end
-		-- Create hard-coded widgets.
-		if spec.type == "actor" then
-			if spec.dialog then
-				table.insert(widgets, Widgets.Uibutton(object.dead and "Evaluate" or "Chat", function()
-					if not object.dialog then
-						Network:send{packet = Packet(packets.PLAYER_DIALOG, "uint32", object.id)}
-					end
-					Client.active_dialog_object = object
-					Ui.state = "dialog"
-				end))
-			end
-			if object.dead then
-				table.insert(widgets, Widgets.Uibutton("Loot", function()
-					Network:send{packet = Packet(packets.PLAYER_LOOT_WORLD, "uint32", object.id)}
-					Client.data.inventory.id = object.id
-					Ui.state = "loot"
-				end))
 			else
-				table.insert(widgets, Widgets.Uibutton("Pickpocket", function()
-					Network:send{packet = Packet(packets.PLAYER_PICKPOCKET, "uint32", object.id)}
-					-- FIXME: Should use a different system.
-					Client.data.inventory.id = object.id
-					Ui.state = "loot"
-				end))
+				-- Add a special action.
+				if v[1] == "dialog" then
+					table.insert(widgets, Widgets.Uibutton(v[2], function()
+						if not object.dialog then
+							Network:send{packet = Packet(packets.PLAYER_DIALOG, "uint32", object.id)}
+						end
+						Client.active_dialog_object = object
+						Ui.state = "dialog"
+					end))
+				elseif v[1] == "loot" then
+					table.insert(widgets, Widgets.Uibutton(v[2], function()
+						Network:send{packet = Packet(packets.PLAYER_LOOT_WORLD, "uint32", object.id)}
+						Client.data.inventory.id = object.id
+						Ui.state = "loot"
+					end))
+				elseif v[1] == "pickpocket" then
+					table.insert(widgets, Widgets.Uibutton(v[2], function()
+						Network:send{packet = Packet(packets.PLAYER_PICKPOCKET, "uint32", object.id)}
+						-- FIXME: Should use a different system.
+						Client.data.inventory.id = object.id
+						Ui.state = "loot"
+					end))
+				elseif v[1] == "pick up" then
+					table.insert(widgets, Widgets.Uibutton(v[2], function()
+						Network:send{packet = Packet(packets.PLAYER_PICKUP, "uint32", object.id)}
+						Ui:pop_state()
+					end))
+				end
 			end
-		elseif spec.type == "item" then
-			table.insert(widgets, Widgets.Uibutton("Pick up", function()
-				Network:send{packet = Packet(packets.PLAYER_PICKUP, "uint32", object.id)}
-				Ui:pop_state()
-			end))
 		end
 		return widgets
 	end}
