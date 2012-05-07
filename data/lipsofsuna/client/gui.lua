@@ -588,7 +588,8 @@ end
 Ui.update = function(self, secs)
 	-- Update the window size.
 	local mode = Program.video_mode
-	if mode[1] ~= self.size.x or mode[2] ~= self.size.y then
+	self.was_resized = (mode[1] ~= self.size.x or mode[2] ~= self.size.y)
+	if self.was_resized then
 		self.size.x = mode[1]
 		self.size.y = mode[2]
 		self.window:set_request{width = mode[1], height = mode[2]}
