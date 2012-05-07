@@ -42,6 +42,7 @@ end
 -- Initialize the UI state.
 Ui:init()
 Client:init()
+Client.options:apply()
 Player.crosshair = Object{model = "crosshair1", collision_group = Physics.GROUP_CROSSHAIR}
 if Settings.join then
 	Client:join_game()

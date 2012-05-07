@@ -117,6 +117,10 @@ Options.new = function(clss)
 	return self
 end
 
+Options.apply = function(self)
+	Render.anisotrophy = self.anisotropic_filter
+end
+
 Options.save = function(self)
 	-- Get the sorted list of options.
 	local options = {}
