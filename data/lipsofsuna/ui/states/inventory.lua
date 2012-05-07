@@ -30,6 +30,7 @@ Ui:add_state{
 
 Ui:add_state{
 	state = "inventory/container",
+	label = "Loot",
 	init = function()
 		-- Get the active container.
 		if not Client.data.inventory.id then return end
@@ -58,6 +59,10 @@ Ui:add_state{
 	end}
 
 ------------------------------------------------------------------------------
+
+Ui:add_state{
+	state = "inventory/container",
+	label = "Item"}
 
 Ui:add_widget{
 	state = "inventory/item",
@@ -140,7 +145,30 @@ Ui:add_widget{
 		local count = Client.data.inventory.count
 		if count < 2 then return end
 		-- Create the widget.
+		return Widgets.Uitransition("Drop stack", "inventory/drop",
+			function() Ui:pop_state() end)
+	end}
+
+------------------------------------------------------------------------------
+
+Ui:add_state{
+	state = "inventory/drop",
+	label = "Item"}
+
+Ui:add_widget{
+	state = "inventory/drop",
+	widget = function()
+		local count = Client.data.inventory.count
 		return Widgets.Uiscrollinteger("Count", 1, count, count, function(w)
 			Client.data.inventory.count = w.value
+		end)
+	end}
+
+Ui:add_widget{
+	state = "inventory/drop",
+	widget = function()
+		return Widgets.Uibutton("Drop", function()
+			Network:send{packet = Packet(packets.PLAYER_DROP, "uint32", Client.data.inventory.index, "uint32", Client.data.inventory.count)}
+			Ui:pop_state()
 		end)
 	end}

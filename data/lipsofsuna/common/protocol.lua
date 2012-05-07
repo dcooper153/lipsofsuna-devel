@@ -153,7 +153,8 @@ Protocol.object_show_flags = {
 	SLOTS = 0x010000,
 	SPEC = 0x020000,
 	ACTOR = 0x040000,
-	DIALOG = 0x080000}
+	DIALOG = 0x080000,
+	COUNT = 0x100000}
 
 effects = {}
 do

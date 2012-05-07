@@ -422,6 +422,14 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 			o:set_dialog("none")
 		end
 	end
+	-- Count.
+	if Bitwise:band(flags, Protocol.object_show_flags.COUNT) ~= 0 then
+		debug("  COUNT")
+		local ok,a
+		ok,a = event.packet:resume("uint32")
+		if not ok then return end
+		o.count = a
+	end
 	-- Set the spec model.
 	debug("  OK")
 	o.flags = Bitwise:band(flags, 0xFF)

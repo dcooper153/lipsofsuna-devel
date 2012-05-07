@@ -88,7 +88,6 @@ Widgets.Uiconfigoptionint.new = function(clss, option, changed)
 end
 
 Widgets.Uiconfigoptionint.changed = function(self)
-	self.text = tostring(self.value)
 	Client.options[self.key] = self.value
 	Client.options:save()
 	if self.changed_cb then self.changed_cb(self.key, self.value) end

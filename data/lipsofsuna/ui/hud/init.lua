@@ -80,7 +80,11 @@ Ui:add_hud{
 			if obj and Operators.world:get_target_usages() then
 				-- Format the text.
 				local key = Binding:get_control_name("menu apply") or "[---]"
-				self.text = string.format("%s %s", key, obj.spec.name)
+				if obj.count and obj.count > 1 then
+					self.text = string.format("%s %s (%d)", key, obj.spec.name, obj.count)
+				else
+					self.text = string.format("%s %s", key, obj.spec.name)
+				end
 				-- Update the position.
 				local mode = Program.video_mode
 				local padx = mode[1] - self.width

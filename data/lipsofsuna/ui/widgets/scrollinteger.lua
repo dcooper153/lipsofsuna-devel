@@ -10,6 +10,18 @@ Widgets.Uiscrollinteger.new = function(clss, label, min, max, value, changed)
 	return self
 end
 
+Widgets.Uiscrollinteger.apply = function(self)
+	local ret = Widgets.Uiscrollfloat.apply(self)
+	self.text = tostring(self.value)
+	return ret
+end
+
+Widgets.Uiscrollinteger.apply_back = function(self)
+	local ret = Widgets.Uiscrollfloat.apply_back(self)
+	self.text = tostring(self.value)
+	return ret
+end
+
 Widgets.Uiscrollinteger.get_value_at = function(self, x)
 	return math.floor(Widgets.Uiscrollfloat.get_value_at(self, x) + 0.5)
 end

@@ -503,6 +503,13 @@ Player.vision_cb = function(self, args)
 			if o == self then
 				flags = flags + Protocol.object_show_flags.SELF
 			end
+			-- Count.
+			local data_count = {}
+			if o.count and o.count > 1 then
+				flags = flags + Protocol.object_show_flags.COUNT
+					table.insert(data_dialog, "uint32")
+					table.insert(data_dialog, o.count)
+			end
 			-- Send to the player.
 			local p = Packet(packets.OBJECT_SHOWN, "uint32", o.id, "uint32", flags)
 			p:write(data_spec)
@@ -516,6 +523,7 @@ Player.vision_cb = function(self, args)
 			p:write(data_body)
 			p:write(data_head)
 			p:write(data_dialog)
+			p:write(data_count)
 			self:send(p)
 			if o == self then self:update_map() end
 		end,

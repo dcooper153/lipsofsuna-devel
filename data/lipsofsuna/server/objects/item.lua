@@ -198,7 +198,7 @@ end
 -- @param count Number of items to split.
 -- @return Object.
 Item.split = function(self, count)
-	local c = args and args.count or 1
+	local c = count or 1
 	if c < self.count then
 		local o = self:clone()
 		self:subtract(c)

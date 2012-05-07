@@ -40,11 +40,30 @@ Widgets.Uiscrollfloat.changed = function(self)
 end
 
 Widgets.Uiscrollfloat.handle_event = function(self, args)
+	local handled
 	if self.input_mode then
-		local action1 = Binding.dict_name["menu up"]
-		local action2 = Binding.dict_name["menu down"]
-		if (action1 and action1:get_event_response(args) ~= nil) or
-		   (action2 and action2:get_event_response(args) ~= nil) then
+		-- Scroll if a horizontal menu key was pressed.
+		if args.type ~= "keyrelease" then
+			local a = {}
+			for k,v in pairs(args) do a[k] = v end
+			if args.type == "keyrepeat" then
+				a.type = "keypress"
+			end
+			local action1 = Binding.dict_name["menu apply"]
+			local action2 = Binding.dict_name["menu back"]
+			if (action1 and action1:get_event_response(a) ~= nil) then
+				self:apply()
+				handled = true
+			elseif (action2 and action2:get_event_response(a) ~= nil) then
+				self:apply_back()
+				handled = true
+			end
+		end
+		-- Stop editing if a vertical menu key.
+		local action3 = Binding.dict_name["menu up"]
+		local action4 = Binding.dict_name["menu down"]
+		if (action3 and action3:get_event_response(args) ~= nil) or
+		   (action4 and action4:get_event_response(args) ~= nil) then
 			self.hint = "$A: Edit\n$$B\n$$U\n$$D"
 			self.input_mode = nil
 		end
@@ -62,6 +81,7 @@ Widgets.Uiscrollfloat.handle_event = function(self, args)
 			return
 		end
 	end
+	if handled then return end
 	return Widgets.Uiwidget.handle_event(self, args)
 end
 
