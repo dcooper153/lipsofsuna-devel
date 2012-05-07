@@ -119,7 +119,7 @@ Widget.detach = function(self)
 	if p then
 		for k,v in pairs(p.__children) do
 			if v == self then
-				p[k] = nil
+				p.__children[k] = nil
 				break
 			end
 		end
