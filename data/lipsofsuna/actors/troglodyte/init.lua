@@ -8,7 +8,7 @@ Itemspec{
 	categories = {["armor"] = true},
 	crafting_materials = {["log"] = 1},
 	effect_craft = "craftsewing1",
-	equipment_models = {["troglodyte female"] = {upper1 = "trogfemrags1"}},
+	equipment_models = {["troglodyte"] = {upper1 = "trogfemrags1"}},
 	equipment_slot = "upperbody",
 	mass = 1,
 	water_gravity = Vector(0,6,0)}
