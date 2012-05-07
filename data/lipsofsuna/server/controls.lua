@@ -500,6 +500,27 @@ Protocol:add_handler{type = "PLAYER_SKILLS", func = function(args)
 	player:update_skills()
 end}
 
+Protocol:add_handler{type = "PLAYER_STORE", func = function(args)
+	-- Find the player.
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the inventory id and index.
+	local ok,id,index = args.packet:read("uint32", "uint32")
+	if not ok then return end
+	-- Get the item and validate the store.
+	local target = Object:find{id = id}
+	if not target then return end
+	if not target.inventory:is_subscribed(player) then return end
+	if not player:can_reach_object(target) then return end
+	local object = player.inventory:get_object_by_index(index)
+	if not object then return end
+	-- Store the item.
+	if not target.inventory:merge_object(object) then
+		player:send("Could not store the item.")
+	end
+end}
+
 Protocol:add_handler{type = "PLAYER_STRAFE", func = function(args)
 	local player = Player:find{client = args.client}
 	if not player then return end

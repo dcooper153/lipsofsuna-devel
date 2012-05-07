@@ -15,13 +15,10 @@ Ui:add_state{
 			table.insert(widgets, Widgets.Uiinvloot(object.id, data, index, slot))
 		end
 		return widgets
-	end,
-	input = function(args)
-		if not Drag.drag then return true end
-		if args.type ~= "mousemotion" then return true end
-		if args.rel > 0 then
-			Drag:change_count(1)
-		else
-			Drag:change_count(-1)
-		end
+	end}
+
+Ui:add_widget{
+	state = "loot",
+	widget = function()
+		return Widgets.Uitransition("Store", "store")
 	end}

@@ -120,6 +120,7 @@ do
 	add("PLAYER_RESPAWN")
 	add("PLAYER_RUN")
 	add("PLAYER_SKILLS")
+	add("PLAYER_STORE")
 	add("PLAYER_STRAFE")
 	add("PLAYER_TAKE")
 	add("PLAYER_TURN")

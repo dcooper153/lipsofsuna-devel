@@ -48,6 +48,8 @@ Protocol:add_handler{type = "INVENTORY_ITEM_ADDED", func = function(event)
 		Ui:restart_state()
 	elseif Ui.state == "loot" and object.id == Client.data.inventory.id then
 		Ui:restart_state()
+	elseif Ui.state == "store" and object == Client.player_object then
+		Ui:restart_state()
 	end
 end}
 
@@ -64,6 +66,8 @@ Protocol:add_handler{type = "INVENTORY_ITEM_EQUIPPED", func = function(event)
 	if Ui.state == "inventory" and object == Client.player_object then
 		Ui:restart_state()
 	elseif Ui.state == "loot" and object.id == Client.data.inventory.id then
+		Ui:restart_state()
+	elseif Ui.state == "store" and object == Client.player_object then
 		Ui:restart_state()
 	end
 end}
@@ -82,6 +86,8 @@ Protocol:add_handler{type = "INVENTORY_ITEM_REMOVED", func = function(event)
 		Ui:restart_state()
 	elseif Ui.state == "loot" and object.id == Client.data.inventory.id then
 		Ui:restart_state()
+	elseif Ui.state == "store" and object == Client.player_object then
+		Ui:restart_state()
 	end
 end}
 
@@ -98,6 +104,8 @@ Protocol:add_handler{type = "INVENTORY_ITEM_UNEQUIPPED", func = function(event)
 	if Ui.state == "inventory" and object == Client.player_object then
 		Ui:restart_state()
 	elseif Ui.state == "loot" and object.id == Client.data.inventory.id then
+		Ui:restart_state()
+	elseif Ui.state == "store" and object == Client.player_object then
 		Ui:restart_state()
 	end
 end}

@@ -29,39 +29,7 @@ Ui:add_state{
 ------------------------------------------------------------------------------
 
 Ui:add_state{
-	state = "inventory/container",
-	label = "Loot",
-	init = function()
-		-- Get the active container.
-		if not Client.data.inventory.id then return end
-		local object = Object:find{id = Client.data.inventory.id}
-		if not object then return end
-		-- Create the inventory slots.
-		local widgets = {}
-		for index = 1,object.spec.inventory_size do
-			local item = object.inventory:get_object_by_index(index)
-			local data = item and {
-				text = item.spec.name,
-				count = item.count or 1,
-				icon = item.spec.icon}
-			table.insert(widgets, Widgets.Uiinvitem(object.id, index, data))
-		end
-		return widgets
-	end,
-	input = function(args)
-		if not Drag.drag then return true end
-		if args.type ~= "mousemotion" then return true end
-		if args.rel > 0 then
-			Drag:change_count(1)
-		else
-			Drag:change_count(-1)
-		end
-	end}
-
-------------------------------------------------------------------------------
-
-Ui:add_state{
-	state = "inventory/container",
+	state = "inventory/item",
 	label = "Item"}
 
 Ui:add_widget{
@@ -153,7 +121,7 @@ Ui:add_widget{
 
 Ui:add_state{
 	state = "inventory/drop",
-	label = "Item"}
+	label = "Drop stack"}
 
 Ui:add_widget{
 	state = "inventory/drop",
