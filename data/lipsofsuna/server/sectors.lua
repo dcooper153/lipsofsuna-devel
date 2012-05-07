@@ -1,6 +1,15 @@
 Sectors.seed1 = math.random(10000, 60000)
 Sectors.seed2 = math.random(10000, 60000)
 
+--- Gets the center of the sector in world space coordinates.
+-- @param self Sectors.
+-- @return Position vector, in world space.
+Sectors.get_sector_center = function(self, sector)
+	local t = self:get_sector_offset(sector)
+	local w = Voxel.tiles_per_line / 2
+	return (t + Vector(w,w,w)) * Voxel.tile_size
+end
+
 --- Gets the offset of the sector in tiles.
 -- @param self Sectors.
 -- @param sector Sector index.
@@ -70,12 +79,14 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 	local org = self:get_sector_offset(sector)
 	local r = math.random()
 	local monsters
-	if org.y > 1600 then
-		if r < 0.6 then return end
+	if org.y > 1000 then
+		local dist = (self:get_sector_center(sector) - Utils:get_player_spawn_point()).length
+		local threshold = math.min(dist / 40 - 1, 0.5)
+		if r > threshold then return end
 		monsters = 1
 	else
-		if r < 0.35 then return end
-		monsters = (r < 0.85) and 1 or 2
+		if r > 0.65 then return end
+		monsters = (r > 0.80) and 1 or 2
 	end
 	-- Count monsters.
 	-- If the sector already contains monsters, reduce the number of newly
