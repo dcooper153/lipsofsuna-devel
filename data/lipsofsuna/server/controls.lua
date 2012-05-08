@@ -537,6 +537,37 @@ Protocol:add_handler{type = "PLAYER_SKILLS", func = function(args)
 	player:update_skills()
 end}
 
+Protocol:add_handler{type = "PLAYER_SPLIT_ITEM", func = function(args)
+	-- Get the player.
+	local player = Player:find{client = args.client}
+	if not player then return end
+	if player.dead then return end
+	-- Read the inventory index.
+	local ok,inv,index,count = args.packet:read("uint32", "uint32", "uint32")
+	if not ok then return end
+	-- Get the object.
+	local parent = Object:find{id = inv}
+	if not parent.inventory:is_subscribed(player) then return end
+	if not player:can_reach_object(parent) then return end
+	local object = parent.inventory:get_object_by_index(index)
+	if not object then return end
+	-- Validate the split.
+	if count == 0 then return end
+	if not object.spec.stacking then return end
+	if not object.count or object.count < 2 then return end
+	count = math.max(1, count)
+	count = math.min(count, object.count - 1)
+	-- Split the stack.
+	local dst = parent.inventory:get_empty_index()
+	if not dst then
+		player:send("No room for the split item")
+		return
+	end
+	local split = object:split(count)
+	parent.inventory:update_index(index)
+	parent.inventory:set_object(dst, split)
+end}
+
 Protocol:add_handler{type = "PLAYER_STORE", func = function(args)
 	-- Find the player.
 	local player = Player:find{client = args.client}

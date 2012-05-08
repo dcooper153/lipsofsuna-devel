@@ -111,6 +111,17 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "inventory/item",
 	widget = function()
+		-- Don't show the widget if the count isn't at least two.
+		local count = Client.data.inventory.count
+		if count < 2 then return end
+		-- Create the widget.
+		return Widgets.Uitransition("Split stack", "inventory/split",
+			function() Ui:pop_state() end)
+	end}
+
+Ui:add_widget{
+	state = "inventory/item",
+	widget = function()
 		return Widgets.Uitransition("Move", "inventory/move",
 			function() Ui:pop_state() end)
 	end}
@@ -135,6 +146,32 @@ Ui:add_widget{
 	widget = function()
 		return Widgets.Uibutton("Drop", function()
 			Network:send{packet = Packet(packets.PLAYER_DROP, "uint32", Client.data.inventory.index, "uint32", Client.data.inventory.count)}
+			Ui:pop_state()
+		end)
+	end}
+
+------------------------------------------------------------------------------
+
+Ui:add_state{
+	state = "inventory/split",
+	label = "Split stack"}
+
+Ui:add_widget{
+	state = "inventory/split",
+	widget = function()
+		local count = Client.data.inventory.count
+		local half = math.max(1, math.ceil(count / 2))
+		Client.data.inventory.count = half
+		return Widgets.Uiscrollinteger("Count", 1, count-1, half, function(w)
+			Client.data.inventory.count = w.value
+		end)
+	end}
+
+Ui:add_widget{
+	state = "inventory/split",
+	widget = function()
+		return Widgets.Uibutton("Split", function()
+			Network:send{packet = Packet(packets.PLAYER_SPLIT_ITEM, "uint32", Client.data.inventory.id, "uint32", Client.data.inventory.index, "uint32", Client.data.inventory.count)}
 			Ui:pop_state()
 		end)
 	end}
