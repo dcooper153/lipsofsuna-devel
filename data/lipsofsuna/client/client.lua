@@ -104,6 +104,7 @@ end
 Client.reset_data = function(self)
 	Operators.camera:reset()
 	Operators.chargen:reset()
+	Operators.inventory:reset()
 	Operators.spells:reset()
 	Operators.quests:reset()
 	self.data = {}

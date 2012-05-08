@@ -11,15 +11,7 @@ Ui:add_state{
 			if action then
 				-- Add a standard action.
 				table.insert(widgets, Widgets.Uibutton(v[2], function()
-					Network:send{packet = Packet(packets.PLAYER_USE_WORLD,
-						"uint32", object.id,
-						"string", action.name)}
-					if action.dialog then
-						Client.active_dialog_object = object
-						Ui.state = "dialog"
-					else
-						Ui:pop_state()
-					end
+					Operators.world:use_object(object, action)
 				end))
 			else
 				-- Add a special action.
@@ -33,14 +25,18 @@ Ui:add_state{
 					end))
 				elseif v[1] == "loot" then
 					table.insert(widgets, Widgets.Uibutton(v[2], function()
-						Network:send{packet = Packet(packets.PLAYER_LOOT_WORLD, "uint32", object.id)}
+						if not Operators.inventory:get_inventory_by_id(object.id) then
+							Network:send{packet = Packet(packets.PLAYER_LOOT_WORLD, "uint32", object.id)}
+						end
 						Client.data.inventory.id = object.id
 						Ui.state = "loot"
 					end))
 				elseif v[1] == "pickpocket" then
 					table.insert(widgets, Widgets.Uibutton(v[2], function()
-						Network:send{packet = Packet(packets.PLAYER_PICKPOCKET, "uint32", object.id)}
 						-- FIXME: Should use a different system.
+						if not Operators.inventory:get_inventory_by_id(object.id) then
+							Network:send{packet = Packet(packets.PLAYER_PICKPOCKET, "uint32", object.id)}
+						end
 						Client.data.inventory.id = object.id
 						Ui.state = "loot"
 					end))

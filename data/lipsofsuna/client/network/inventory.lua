@@ -2,6 +2,8 @@ Protocol:add_handler{type = "INVENTORY_CLOSED", func = function(event)
 	-- Parse the packet.
 	local ok,id = event.packet:read("uint32")
 	if not ok then return end
+	-- Remove the subscription.
+	Operators.inventory:remove_inventory(id)
 	-- Find the object.
 	local object = Object:find{id = id}
 	if not object then return end
@@ -17,6 +19,8 @@ Protocol:add_handler{type = "INVENTORY_CREATED", func = function(event)
 	-- Find the object.
 	local object = Object:find{id = id}
 	if not object then return end
+	-- Add the subscription.
+	Operators.inventory:add_inventory(id)
 	-- Initialize the inventory.
 	object.inventory:clear()
 	object.inventory.size = size

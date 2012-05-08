@@ -54,3 +54,30 @@ Operators.world.get_target_usages = function(self)
 	if not actions[1] then return end
 	return actions
 end
+
+--- Triggers the use action of the object.
+--
+-- Context: Any.
+--
+-- @param self Operator.
+-- @param object Object.
+-- @param action Action spec.
+Operators.world.use_object = function(self, object, action)
+	-- Open subscribed inventories directly.
+	if action.name == "loot" and Operators.inventory:get_inventory_by_id(object.id) then
+		Client.data.inventory.id = object.id
+		Ui.state = "loot"
+		return
+	end
+	-- Send a normal use command otherwise.
+	Network:send{packet = Packet(packets.PLAYER_USE_WORLD,
+		"uint32", object.id,
+		"string", action.name)}
+	-- Open the dialog screen if appropriate.
+	if action.dialog then
+		Client.active_dialog_object = object
+		Ui.state = "dialog"
+	else
+		Ui:pop_state()
+	end
+end
