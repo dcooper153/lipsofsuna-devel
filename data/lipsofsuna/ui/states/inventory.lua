@@ -180,6 +180,7 @@ Ui:add_widget{
 
 Ui:add_state{
 	state = "inventory/move",
+	history = "inventory",
 	label = "Move item",
 	init = function()
 		local object = Client.player_object

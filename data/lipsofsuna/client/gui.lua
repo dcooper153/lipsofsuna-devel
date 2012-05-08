@@ -84,6 +84,7 @@ end
 -- @param args Arguments.<ul>
 --   <li>background: Background creation function.</li>
 --   <li>grab: Grab disable function.</li>
+--   <li>history: Name of the state with which to share focus history.</li>
 --   <li>hint: Controls hint text shown to the user.</li>
 --   <li>init: Initializer function.</li>
 --   <li>input: Input handler function.</li>
@@ -117,6 +118,10 @@ Ui.add_state = function(self, args)
 	-- Set the hint text.
 	if args.hint then
 		state.hint = args.hint
+	end
+	-- Set the history sharing state.
+	if args.history then
+		state.history = args.history
 	end
 	-- Add the initializer.
 	if args.init then
@@ -244,7 +249,7 @@ Ui.command = function(self, cmd, press)
 				self:update_help()
 				self:autoscroll()
 			end
-			self.history[self.state] = self.focused_item
+			self.history[self.history_state] = self.focused_item
 		end
 	elseif cmd == "down" then
 		self.repeat_timer = 0
@@ -263,7 +268,7 @@ Ui.command = function(self, cmd, press)
 				self:update_help()
 				self:autoscroll()
 			end
-			self.history[self.state] = self.focused_item
+			self.history[self.history_state] = self.focused_item
 		end
 	end
 end
@@ -510,14 +515,14 @@ Ui.show_state = function(self, state, focus)
 	-- Attach the widgets.
 	self:show_state_attach()
 	-- Focus the first or previously focused widget.
-	local f = math.min(focus or self.history[state] or 1, #self.widgets)
+	local f = math.min(focus or self.history[self.history_state] or 1, #self.widgets)
 	if self.widgets[f] then
 		self.focused_item = f
 		self.widgets[f].focused = true
 	else
 		self.focused_item = nil
 	end
-	self.history[state] = self.focused_item
+	self.history[self.history_state] = self.focused_item
 	-- Position the widgets.
 	self.scroll_offset = 0
 	self.need_autoscroll = true
@@ -726,6 +731,11 @@ Ui:add_class_getters{
 	focused_widget = function(self)
 		if not self.focused_item then return end
 		return self.widgets[self.focused_item]
+	end,
+	history_state = function(self)
+		local name = self.state
+		local state = self.states[name]
+		return state and state.history or name
 	end,
 	pointer_grab = function(self)
 		return rawget(self, "__pointer_grab")

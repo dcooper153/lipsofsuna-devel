@@ -1,14 +1,7 @@
 Ui:add_state{
 	state = "store",
+	history = "inventory",
 	label = "Store"}
-
-Ui:add_widget{
-	state = "store",
-	widget = function()
-		local w = Widgets.Uibutton("Loot", function() Ui:pop_state() end)
-		w.hint = "$A: Enter\n$$B\n$$U\n$$D"
-		return w
-	end}
 
 Ui:add_widget{
 	state = "store",
@@ -26,4 +19,12 @@ Ui:add_widget{
 			table.insert(widgets, Widgets.Uiinvstore(Client.data.inventory.id, data, index, slot))
 		end
 		return widgets
+	end}
+
+Ui:add_widget{
+	state = "store",
+	widget = function()
+		local w = Widgets.Uibutton("Loot", function() Ui:pop_state() end)
+		w.hint = "$A: Enter\n$$B\n$$U\n$$D"
+		return w
 	end}
