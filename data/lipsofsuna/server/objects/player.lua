@@ -33,6 +33,7 @@ end
 Player.new = function(clss, args)
 	local self = Actor.new(clss, args)
 	self.account = args.account
+	self.inventory_subscriptions = {}
 	self.running = true
 	self.vision_timer = 0
 	self:calculate_speed()
@@ -181,11 +182,13 @@ Player.inventory_cb = function(self, args)
 		["inventory-subscribed"] = function()
 			local owner = Object:find{id = id}
 			local spec = owner.spec
+			self.inventory_subscriptions[id] = args.inventory
 			self:send{packet = Packet(packets.INVENTORY_CREATED, "uint32", id,
 				"string", spec.type, "string", spec.name,
 				"uint8", args.inventory.size, "bool", id == self.id)}
 		end,
 		["inventory-unsubscribed"] = function()
+			self.inventory_subscriptions[id] = nil
 			self:send{packet = Packet(packets.INVENTORY_CLOSED, "uint32", id)}
 		end
 	}
@@ -211,6 +214,7 @@ Player.update = function(self, secs)
 			self:update_vision_radius()
 			self.vision:update()
 			self:update_map()
+			self:update_inventory_subscriptions()
 		end
 	end
 	-- Update the base class.
@@ -222,6 +226,18 @@ Player.update_map = function(self)
 	for k,v in pairs(Marker.dict_discoverable) do
 		if (self.position - v.position).length < 3 * self.vision.radius then
 			v:unlock()
+		end
+	end
+end
+
+--- Closes unreachable inventories.
+-- @param self Object.
+Player.update_inventory_subscriptions = function(self)
+	if not self.inventory_subscriptions then return end
+	for id,inv in pairs(self.inventory_subscriptions) do
+		local object = Object:find{id = id}
+		if not object or not self:can_reach_object(object) then
+			inv:unsubscribe(self)
 		end
 	end
 end
