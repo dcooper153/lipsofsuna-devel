@@ -96,11 +96,9 @@ Item.contact_cb = function(self, result)
 		-- Boomerang mode.
 		if result.object == self.contact_args.owner then
 			-- Owner catch.
-			local o = self.contact_args.owner:get_weapon()
-			if not o then
-				self.contact_args.owner:set_weapon(self)
-			elseif not o:merge(self) then
-				self.contact_args.owner.inventory:merge_object(proj)
+			if self.contact_args.owner.inventory:merge_object(self) then
+				local o = self.contact_args.owner:get_weapon()
+				if not o then self.contact_args.owner:set_weapon(self) end
 			end
 		else
 			-- Damage target.
@@ -242,7 +240,7 @@ Item.fire = function(self, args)
 				proj.state = 2
 			else
 				proj.timer = nil
-				proj.gravity = Config.gravity
+				proj.gravity = proj.spec.gravity
 				timer:disable()
 			end
 		end}
