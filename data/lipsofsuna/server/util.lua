@@ -302,7 +302,7 @@ Voxel.damage = function(self, user, point)
 	local n = Material:find{name = m.mining_transform}
 	Voxel:set_tile(point, n and n.id or 0)
 	-- Create materials.
-	if m.mining_materials then
+	if m.mining_materials and user then
 		for k,v in pairs(m.mining_materials) do
 			for i = 1,v do
 				local spec = Itemspec:find{name = k}
