@@ -196,10 +196,13 @@ Generator.generate_overworld = function(self)
 		local spec = Staticspec:find{name = name}
 		if not spec then return end
 		for i = 1,count do
-			local point = self:find_overworld_generation_point()
-			if point then
-				local rot = Quaternion{axis = Vector(0,1), angle = 2.0 * math.pi * math.random()}
-				Staticobject{spec = spec, position = point, rotation = rot, realized = true}
+			for j = 1,10 do
+				local point = self:find_overworld_generation_point()
+				if point and self:validate_rect(point * Voxel.tile_scale - Vector(2,0,2), Vector(4,8,4), true) then
+					local rot = Quaternion{axis = Vector(0,1), angle = 2.0 * math.pi * math.random()}
+					Staticobject{spec = spec, position = point, rotation = rot, realized = true}
+					break
+				end
 			end
 		end
 	end
