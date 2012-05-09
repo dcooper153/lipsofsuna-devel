@@ -104,6 +104,7 @@ Mod:load "unused"
 
 -- Regions and quests
 Mod:load "regions/castle"
+Mod:load "regions/dungeons"
 Mod:load "regions/lips"
 Mod:load "regions/keepersofknowledge"
 Mod:load "regions/rootsofworld"

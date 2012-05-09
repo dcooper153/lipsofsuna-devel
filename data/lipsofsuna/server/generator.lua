@@ -98,6 +98,8 @@ Generator.generate = function(self, args)
 		self:reset()
 		self:update_status(0, "Placing regions")
 	until place_regions()
+	-- Place dungeons.
+	self:generate_dungeons()
 	-- Mark roads.
 	--[[self:update_status(0, "Creating roads")
 	local linkn = 0
@@ -193,13 +195,9 @@ Generator.generate_overworld = function(self)
 		-- FIXME: Generate static overworld obstacles properly.
 		local spec = Staticspec:find{name = name}
 		if not spec then return end
-		local min = Map.aabb.point
-		local max = Map.aabb.point + Map.aabb.size
 		for i = 1,count do
-			local point = Vector(math.random(min.x, max.x), 0, math.random(min.z, max.z))
-			local height = Map.heightmap:get_height(point, false)
-			if height then
-				point.y = height
+			local point = self:find_overworld_generation_point()
+			if point then
 				local rot = Quaternion{axis = Vector(0,1), angle = 2.0 * math.pi * math.random()}
 				Staticobject{spec = spec, position = point, rotation = rot, realized = true}
 			end
@@ -208,6 +206,49 @@ Generator.generate_overworld = function(self)
 	gen("statictree1", 100)
 	gen("statichouse2", 20)
 	gen("obelisk", 15)
+end
+
+Generator.find_overworld_generation_point = function(self)
+	for i = 1,10 do
+		local min = Map.aabb.point
+		local max = Map.aabb.point + Map.aabb.size
+		local point = Vector(math.random(min.x, max.x), 0, math.random(min.z, max.z))
+		local height = Map.heightmap:get_height(point, false)
+		if height then
+			point.y = height
+			return point
+		end
+	end
+end
+
+Generator.generate_dungeons = function(self)
+	local cat = Patternspec:find{category = "dungeon entrance"}
+	if not cat then return end
+	for k,v in pairs(cat) do
+		for i = 1,10 do
+			if self:generate_dungeon(v) then break end
+		end
+	end
+end
+
+Generator.generate_dungeon = function(self, pattern)
+	-- Find the counterpart pattern.
+	local name2 = string.gsub(pattern.name, "entrance", "exit")
+	local pattern2 = Patternspec:find{name = name2}
+	if not pattern2 then return end
+	-- Find the overworld point.
+	local point1 = self:find_overworld_generation_point()
+	point1 = (point1 * Voxel.tile_scale - Vector(pattern.size.x,0,pattern.size.z) * 0.5):ceil()
+	if not self:validate_pattern_position(pattern, point1, true) then return end
+	if not point1 then return end
+	-- Place the underground pattern.
+	local point2 = Vector(point1.x, 800, point1.z)
+	if not self:validate_pattern_position(pattern2, point2) then return end
+	-- Generate the patterns.
+	self:create_region(pattern, point1)
+	self:create_region(pattern2, point2)
+	-- TODO: Choose dungeon type by setting underground sector types.
+	return true
 end
 
 --- Creates ore deposits and places plants.
@@ -402,6 +443,13 @@ Generator.paint_corridor = function(self, src, dst)
 	Voxel:place_pattern{category = "corridor", point = dst}
 end
 
+Generator.create_region = function(self, pattern, point)
+	local aabb = Aabb{point = point, size = pattern.size}
+	local region = Region{aabb = aabb, pattern = pattern, point = point, size = pattern.size, spec = pattern}
+	self:add_region(region)
+	return region
+end
+
 --- Places a region to the map.
 -- @param self Generator.
 -- @param pat Pattern spec.
@@ -428,7 +476,6 @@ Generator.place_region = function(self, pat)
 	-- positions until one is found where they fit. Regions with fixed
 	-- positions are simply placed there without any checks.
 	local pos = Vector()
-	local aabb = Aabb{point = pos, size = size + Vector(2,2,2)}
 	local var = pat.position_random.y
 	if dist then
 		local success
@@ -439,8 +486,7 @@ Generator.place_region = function(self, pat)
 			if math.random(0, 1) == 1 then pos.x = -pos.x end
 			if math.random(0, 1) == 1 then pos.z = -pos.z end
 			pos = pos + rel
-			aabb.point = pos - Vector(1,1,1)
-			if self:validate_region_position(aabb) then
+			if self:validate_pattern_position(pat, pos) then
 				success = true
 				break
 			end
@@ -450,12 +496,9 @@ Generator.place_region = function(self, pat)
 		pos.x = rel.x
 		pos.y = math.random(pat.position.y - var, pat.position.y + var)
 		pos.z = rel.z
-		aabb.point = pos - Vector(5,5,5)
 	end
 	-- Create the region.
-	local region = Region{aabb = aabb, pattern = pat, point = pos, size = size, spec = pat}
-	self:add_region(region)
-	return region
+	return self:create_region(pat, pos)
 end
 
 Generator.reset = function(self)
@@ -502,26 +545,34 @@ Generator.update_status = function(self, frac, msg)
 	end
 end
 
-Generator.validate_rect = function(self, pos, size)
+--- Checks if the pattern can be placed in the given position.
+-- @param self Generator.
+-- @param pattern Pattern spec.
+-- @param point Position in tile space.
+-- @param overworld True if overworld placement is allowed.
+-- @return True if the position is valid.
+Generator.validate_pattern_position = function(self, pattern, point, overworld)
+	local point1 = Vector(point.x - 1, point.y - 1, point.z - 1)
+	local size = pattern.size + Vector(2,2,2)
+	return self:validate_rect(point1, size, overworld)
+end
+
+Generator.validate_rect = function(self, pos, size, overworld)
 	if pos.x < self.map_start.x then return end
 	if pos.y < self.map_start.y then return end
 	if pos.z < self.map_start.z then return end
 	if pos.x + size.x > self.map_end.x then return end
-	if pos.y + size.y > self.map_end.y then return end
 	if pos.z + size.z > self.map_end.z then return end
+	if not overworld then
+		if pos.y + size.y > self.map_end.y then return end
+	else
+		if pos.y + size.y > 1400 then return end
+	end
 	local hit
 	self:for_each_bin(pos, size, function(i)
 		hit = hit or self.bins[i]
 	end)
 	return not hit
-end
-
---- Checks if a region can be placed in the given position.
--- @param self Generator.
--- @param aabb Position of the region.
--- @return True if the position is valid.
-Generator.validate_region_position = function(self, aabb)
-	return self:validate_rect(aabb.point, aabb.size)
 end
 
 ------------------------------------------------------------------------------
