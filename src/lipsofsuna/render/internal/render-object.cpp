@@ -318,10 +318,10 @@ void liren_object_update (
 		if (dist2 > self->render_distance * self->render_distance)
 			self->node->setVisible (false);
 		else
-			self->node->setVisible (true);
+			self->node->setVisible (self->visible);
 	}
 	else
-		self->node->setVisible (true);
+		self->node->setVisible (self->visible);
 
 	/* Send the pose to the entity. */
 	/* To reduce load when there are lots of animated objects, entities only
