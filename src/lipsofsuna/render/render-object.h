@@ -117,6 +117,11 @@ LIAPICALL (void, liren_render_object_set_realized, (
 	int          id,
 	int          value));
 
+LIAPICALL (void, liren_render_object_set_render_distance, (
+	LIRenRender* self,
+	int          id,
+	float        value));
+
 LIAPICALL (void, liren_render_object_set_shadow, (
 	LIRenRender* self,
 	int          id,

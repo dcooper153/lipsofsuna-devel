@@ -75,6 +75,7 @@ struct _LIRenObject
 	int id;
 	int visible;
 	int shadow_casting;
+	float render_distance;
 	LIMatTransform transform;
 	LIMdlPose* pose;
 	LIRenModel* model;

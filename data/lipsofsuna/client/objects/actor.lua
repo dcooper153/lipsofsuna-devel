@@ -4,8 +4,8 @@ Actor.new = function(clss, args)
 	local self = Object.new(clss, args)
 	self.stats = {}
 	self.inventory:subscribe(self, function(args) self:update_inventory(args) end)
-	self.shadow_casting = Options.inst.shadow_casting_actors
 	Object.dict_active[self] = 1.0
+	Client.options:apply_object(self)
 	return self
 end
 

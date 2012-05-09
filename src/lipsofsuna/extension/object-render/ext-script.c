@@ -297,6 +297,22 @@ static void Object_set_particle_emitting (LIScrArgs* args)
 		liren_render_object_set_particle_emitting (module->render, object->id, value);
 }
 
+static void Object_set_render_distance (LIScrArgs* args)
+{
+	float value;
+	LIExtModule* module;
+	LIEngObject* object;
+
+	/* Get render object. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
+	object = args->self;
+
+	if (liscr_args_geti_float (args, 0, &value) && value >= 0.0f)
+		liren_render_object_set_render_distance (module->render, object->id, value);
+	else
+		liren_render_object_set_render_distance (module->render, object->id, -1.0f);
+}
+
 static void Object_get_render_loaded (LIScrArgs* args)
 {
 	LIExtModule* module;
@@ -336,6 +352,7 @@ void liext_script_render_object (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_particle", Object_set_particle);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_particle_emitting", Object_set_particle_emitting);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_effect", Object_set_effect);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_render_distance", Object_set_render_distance);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_render_loaded", Object_get_render_loaded);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_shadow_casting", Object_set_shadow_casting);
 }

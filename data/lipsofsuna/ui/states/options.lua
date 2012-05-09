@@ -27,25 +27,45 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "options",
-	widget = function() return Widgets.Uiconfigoption("outlines_enabled",
-		function() Client:update_rendering_style() end) end}
+	widget = function()
+		return Widgets.Uiconfigoption("landmark_view_distance",
+			function() Client.options:apply() end)
+		end}
 
 Ui:add_widget{
 	state = "options",
-	widget = function() return Widgets.Uiconfigoption("shadow_casting_actors") end}
+	widget = function()
+		return Widgets.Uiconfigoption("outlines_enabled",
+			function() Client:update_rendering_style() end)
+		end}
 
 Ui:add_widget{
 	state = "options",
-	widget = function() return Widgets.Uiconfigoption("shadow_casting_items") end}
+	widget = function()
+		return Widgets.Uiconfigoption("shadow_casting_actors",
+			function() Client.options:apply() end)
+	end}
 
 Ui:add_widget{
 	state = "options",
-	widget = function() return Widgets.Uiconfigoption("shadow_casting_obstacles") end}
+	widget = function()
+		return Widgets.Uiconfigoption("shadow_casting_items",
+			function() Client.options:apply() end)
+	end}
 
 Ui:add_widget{
 	state = "options",
-	widget = function() return Widgets.Uiconfigoption("bloom_enabled",
-		function() Client:update_rendering_style() end) end}
+	widget = function()
+		return Widgets.Uiconfigoption("shadow_casting_obstacles",
+			function() Client.options:apply() end)
+	end}
+
+Ui:add_widget{
+	state = "options",
+	widget = function()
+		return Widgets.Uiconfigoption("bloom_enabled",
+			function() Client:update_rendering_style() end)
+	end}
 
 Ui:add_widget{
 	state = "options",

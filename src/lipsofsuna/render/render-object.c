@@ -293,6 +293,23 @@ void liren_render_object_set_realized (
 }
 
 /**
+ * \brief Sets the render distance of the object.
+ * \param self Object.
+ * \param value Render distance.
+ */
+void liren_render_object_set_render_distance (
+	LIRenRender* self,
+	int          id,
+	float        value)
+{
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+		liren_object_set_render_distance (object, value);
+}
+
+/**
  * \brief Sets the shadow casting mode of the object.
  * \param self Renderer.
  * \param id Object ID.

@@ -55,6 +55,7 @@ LIRenObject* liren_object_new (
 	self->render = render;
 	self->visible = 0;
 	self->shadow_casting = 0;
+	self->render_distance = -1.0f;
 
 	/* Choose a unique ID. */
 	while (!id)
@@ -307,6 +308,21 @@ void liren_object_update (
 		self->entity_build = NULL;
 	}
 
+	/* Hide objects too far away. */
+	/* Frustum culling cannot necessarily eliminate all desirable objects if the
+	   view distance is very low. Because of that, we allow the user to specify
+	   the render distance for the object. */
+	if (self->render_distance > 0)
+	{
+		float dist2 = self->node->getSquaredViewDepth (self->render->data->camera);
+		if (dist2 > self->render_distance * self->render_distance)
+			self->node->setVisible (false);
+		else
+			self->node->setVisible (true);
+	}
+	else
+		self->node->setVisible (true);
+
 	/* Send the pose to the entity. */
 	/* To reduce load when there are lots of animated objects, entities only
 	   update their skeletons when they are rendered. The pose tranformation is
@@ -476,6 +492,22 @@ int liren_object_set_realized (
 	self->visible = value;
 	self->node->setVisible (value);
 	return 1;
+}
+
+/**
+ * \brief Sets the render distance of the object.
+ * \param self Object.
+ * \param value Render distance.
+ */
+void liren_object_set_render_distance (
+	LIRenObject* self,
+	float        value)
+{
+	self->render_distance = value;
+	if (self->entity != NULL)
+		self->entity->setCastShadows (self->shadow_casting);
+	if (self->entity_build != NULL)
+		self->entity_build->setCastShadows (self->shadow_casting);
 }
 
 /**

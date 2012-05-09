@@ -97,37 +97,52 @@ end
 -- @name Object.particle_emitting
 -- @class table
 
+--- Specifies the maxium render distance of the object.
+-- @name Object.render_distance
+-- @class table
+
+--- Evaluates to true if the render data of the object has been loaded.
+-- @name Object.render_loaded
+-- @class table
+
 --- Toggles shadow casting for the object.
 -- @name Object.shadow_casting
 -- @class table
 
 Object:add_getters{
-	particle = function(s)
-		return rawget(s, "__particle")
+	particle = function(self)
+		return rawget(self, "__particle")
 	end,
-	particle_emitting = function(s)
-		return rawget(s, "__particle_emitting")
+	particle_emitting = function(self)
+		return rawget(self, "__particle_emitting")
+	end,
+	render_distance = function(self)
+		return rawget(self, "__render_distance")
 	end,
 	render_loaded = function(self)
 		return Los.object_get_render_loaded(self.handle)
 	end,
-	shadow_casting = function(s)
-		local v = rawget(s, "__shadow_casting")
+	shadow_casting = function(self)
+		local v = rawget(self, "__shadow_casting")
 		return (v ~= nil) and v or false
 	end}
 
 Object:add_setters{
-	particle = function(s, v)
-		rawset(s, "__particle", v)
-		rawset(s, "__particle_emitting", true)
-		rawset(s, "__model", nil)
-		Los.object_set_particle(s.handle, v)
+	particle = function(self, v)
+		rawset(self, "__particle", v)
+		rawset(self, "__particle_emitting", true)
+		rawset(self, "__model", nil)
+		Los.object_set_particle(self.handle, v)
 	end,
-	particle_emitting = function(s, v)
-		rawset(s, "__particle_emitting", v)
-		Los.object_set_particle_emitting(s.handle, v)
+	particle_emitting = function(self, v)
+		rawset(self, "__particle_emitting", v)
+		Los.object_set_particle_emitting(self.handle, v)
 	end,
-	shadow_casting = function(s, v)
-		rawset(s, "__shadow_casting", v)
-		Los.object_set_shadow_casting(s.handle, v)
+	render_distance = function(self, v)
+		rawset(self, "__render_distance", v)
+		Los.object_set_render_distance(self.handle, v)
+	end,
+	shadow_casting = function(self, v)
+		rawset(self, "__shadow_casting", v)
+		Los.object_set_shadow_casting(self.handle, v)
 	end}

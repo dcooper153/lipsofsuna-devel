@@ -15,6 +15,7 @@ Options.config_keys = {
 	join_account = {"Account name", "string"},
 	join_address = {"Server address", "string"},
 	join_port = {"Server port", "int", 1, 65535},
+	landmark_view_distance = {"Landmark view distance", "int", 1, 10},
 	master_server = {"Master server", "string"},
 	model_quality = {"High quality models", "bool"},
 	mouse_sensitivity = {"Mouse sensitivity", "float", 0, 1},
@@ -53,6 +54,7 @@ Options.new = function(clss)
 	self.join_account = "guest"
 	self.join_address = "localhost"
 	self.join_port = 10101
+	self.landmark_view_distance = 5
 	self.master_server = "http://lipsofsuna.org"
 	self.mouse_sensitivity = 1
 	self.mouse_smoothing = true
@@ -118,7 +120,29 @@ Options.new = function(clss)
 end
 
 Options.apply = function(self)
+	-- Set the anisotropic filter.
 	Render.anisotrophy = self.anisotropic_filter
+	-- Update the render properties of objects.
+	for k,v in pairs(Object.objects) do
+		self:apply_object(v)
+	end
+end
+
+Options.apply_object = function(self, object)
+	if object.class == Staticobject then
+		if self.landmark_view_distance < 10 then
+			object.render_distance = self.landmark_view_distance * 50
+		else
+			object.render_distance = nil
+		end
+		object.shadow_casting = self.shadow_casting_obstacles
+	elseif object.class == Obstacle then
+		object.shadow_casting = self.shadow_casting_obstacles
+	elseif object.class == Actor then
+		object.shadow_casting = self.shadow_casting_actors
+	else
+		object.shadow_casting = self.shadow_casting_items
+	end
 end
 
 Options.save = function(self)
