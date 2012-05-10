@@ -29,7 +29,7 @@
 
 #define VERTEX_SIZE 24
 #define VERTEX_COUNT_INIT 0
-#define VERTEX_COUNT_MAX 1024
+#define VERTEX_COUNT_MAX 10240
 
 class LIRenTilePacker
 {
