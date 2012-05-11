@@ -121,7 +121,11 @@ void liext_vision_listener_update (
 			if (lialg_u32dic_find (self->objects, object->id) != NULL)
 			{
 				lialg_u32dic_remove (self->objects, object->id);
+#if LUA_VERSION_NUM > 501
+				lua_pushnumber (lua, lua_rawlen (lua, -1) + 1);
+#else
 				lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
+#endif
 				lua_newtable (lua);
 				if (liscr_pushdata (lua, object->script))
 				{
@@ -149,7 +153,11 @@ void liext_vision_listener_update (
 			if (dist <= radius_add_obj)
 			{
 				lialg_u32dic_insert (self->objects, object->id, NULL + 1);
+#if LUA_VERSION_NUM > 501
+				lua_pushnumber (lua, lua_rawlen (lua, -1) + 1);
+#else
 				lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
+#endif
 				lua_newtable (lua);
 				if (liscr_pushdata (lua, object->script))
 				{
@@ -169,7 +177,11 @@ void liext_vision_listener_update (
 			if (dist > radius_del_obj)
 			{
 				lialg_u32dic_remove (self->objects, object->id);
+#if LUA_VERSION_NUM > 501
+				lua_pushnumber (lua, lua_rawlen (lua, -1) + 1);
+#else
 				lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
+#endif
 				lua_newtable (lua);
 				if (liscr_pushdata (lua, object->script))
 				{

@@ -179,7 +179,11 @@ void liscr_traceback (
 	lua_State* lua)
 {
 	/* Get debug table. */
+#if LUA_VERSION_NUM > 501
+	lua_getglobal (lua, "debug");
+#else
 	lua_getfield (lua, LUA_GLOBALSINDEX, "debug");
+#endif
 	if (lua_type (lua, -1) != LUA_TTABLE)
 	{
 		lisys_error_set (EINVAL, "invalid debug table");

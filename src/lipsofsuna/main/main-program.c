@@ -217,7 +217,11 @@ void limai_program_eventva (
 		lua_pushvalue (lua, -1);
 		lua_setglobal (lua, "__events");
 	}
+#if LUA_VERSION_NUM > 501
+	lua_pushnumber (lua, lua_rawlen (lua, -1) + 1);
+#else
 	lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
+#endif
 
 	/* Create the event. */
 	lua_newtable (lua);

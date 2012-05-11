@@ -82,7 +82,11 @@ LIScrData* liscr_data_new (
 
 	/* Create private table. */
 	lua_newtable (lua);
+#if LUA_VERSION_NUM > 501
+	lua_setuservalue (lua, -2);
+#else
 	lua_setfenv (lua, -2);
+#endif
 
 	return object;
 }

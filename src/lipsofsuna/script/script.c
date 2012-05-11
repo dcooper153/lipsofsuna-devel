@@ -59,7 +59,11 @@ LIScrScript* liscr_script_new ()
 	}
 
 	/* Allocate script. */
+#if LUA_VERSION_NUM > 501
+	self->lua = luaL_newstate ();
+#else
 	self->lua = lua_open ();
+#endif
 	if (self->lua == NULL)
 	{
 		lisys_error_set (ENOMEM, "cannot allocate script");
@@ -329,7 +333,11 @@ static int private_init_includes (
 		return 0;
 
 	/* Set the include path. */
+#if LUA_VERSION_NUM > 501
+	lua_getglobal (self->lua, "package");
+#else
 	lua_getfield (self->lua, LUA_GLOBALSINDEX, "package");
+#endif
 	lua_pushstring (self->lua, inc);
 	lua_setfield (self->lua, -2, "path");
 	lua_pop (self->lua, 1);
