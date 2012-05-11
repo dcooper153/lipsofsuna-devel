@@ -21,8 +21,10 @@ Widgets.Uiserverinfo.rebuild_size = function(self)
 	local size = Widgets.Uiwidget.rebuild_size(self)
 	-- Resize to fit the label.
 	if self.desc then
-		local w,h = Program:measure_text("default", self.desc, 290)
-		if h then size.y = math.max(size.y, h + 30) end
+		local w1,h1 = Program:measure_text(Theme.text_font_2, self.name, 290)
+		local w2,h2 = Program:measure_text(Theme.text_font_1, self.desc, 290)
+		if h1 and h2 then size.y = math.max(size.y, h1 + h2 + 30) end
+		self.title_height = h1
 	end
 	return size
 end
@@ -33,13 +35,6 @@ Widgets.Uiserverinfo.rebuild_canvas = function(self)
 	local h = self.size.y
 	-- Add the base.
 	Widgets.Uiwidget.rebuild_canvas(self)
-	-- Add the background.
-	self:canvas_image{
-		dest_position = {5,3},
-		dest_size = {self.size.x-10,self.size.y-6},
-		source_image = "widgets1",
-		source_position = self.focused and {350,415} or {350,375},
-		source_tiling = {12,64,12,11,14,13}}
 	-- Add the name.
 	if self.name then
 		self:canvas_text{
@@ -47,18 +42,18 @@ Widgets.Uiserverinfo.rebuild_canvas = function(self)
 			dest_size = {w-10,h},
 			text = self.name,
 			text_alignment = {0,0},
-			text_color = self.focused and {1,1,0,1} or {a,a,a,1},
-			text_font = "bigger"}
+			text_color = Theme.text_color_1,
+			text_font = Theme.text_font_2}
 	end
 	-- Add the description.
-	if self.desc then
+	if self.desc and self.title_height then
 		self:canvas_text{
-			dest_position = {10,23},
+			dest_position = {10,5+self.title_height},
 			dest_size = {w-10,h},
 			text = self.desc,
 			text_alignment = {0,0},
-			text_color = self.focused and {1,1,0,1} or {a,a,a,1},
-			text_font = "default"}
+			text_color = Theme.text_color_1,
+			text_font = Theme.text_font_1}
 	end
 	-- Add the player count.
 	if self.players then
@@ -67,7 +62,7 @@ Widgets.Uiserverinfo.rebuild_canvas = function(self)
 			dest_size = {w-10,h},
 			text = tostring(self.players),
 			text_alignment = {1,0},
-			text_color = self.focused and {1,1,0,1} or {a,a,a,1},
-			text_font = "default"}
+			text_color = Theme.text_color_1,
+			text_font = Theme.text_font_1}
 	end
 end

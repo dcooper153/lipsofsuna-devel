@@ -19,9 +19,7 @@ Ui.init = function(self)
 		pressed = function() self:pop_state() end}
 	-- Create the help labels.
 	self.hint = Widgets.Label()
-	self.hint:set_request{width = 200}
-	self.label = Widgets.Label{font = "medium"}
-	self.label:set_request{width = 200}
+	self.label = Widgets.Label()
 	-- Create the scrollbar.
 	self.scrollbar = Widgets.Scrollbar{
 		offset = Vector(32, 0),
@@ -491,13 +489,7 @@ Ui.show_state = function(self, state, focus)
 	end
 	-- Set the state name text.
 	local mode = Program.video_mode
-	if state_.label then
-		self.label.text = state_.label
-		self.hint.offset = Vector(mode[1] - 200, 30)
-	else
-		self.label.text = ""
-		self.hint.offset = Vector(mode[1] - 200, 0)
-	end
+	self:update_help()
 	-- Toggle HUD widgets.
 	for index,hud in pairs(self.huds) do
 		if hud.active and hud.active() then
@@ -601,12 +593,7 @@ Ui.update = function(self, secs)
 		if self.background then
 			self.background:set_request{width = mode[1], height = mode[2]}
 		end
-		self.label.offset = Vector(mode[1] - 200, 0)
-		if self.label.text ~= "" then
-			self.hint.offset = Vector(mode[1] - 200, 30)
-		else
-			self.hint.offset = Vector(mode[1] - 200, 0)
-		end
+		self:update_help()
 		self.need_relayout = true
 	end
 	-- Update the cursor.
@@ -694,11 +681,11 @@ end
 --- Updates the help text of the state.
 -- @param self Ui class.
 Ui.update_help = function(self)
+	local state = self.states[self.state]
 	-- Get the hint format.
 	local hint
 	local widget = self.focused_widget
 	if not widget then
-		local state = self.states[self.state]
 		if state and state.hint then
 			hint = state.hint
 		else
@@ -723,8 +710,20 @@ Ui.update_help = function(self)
 	if help then
 		hint = hint .. "\n\n" .. help
 	end
-	-- Show the formatted hint text.
+	-- Update the help text.
+	local mode = Program.video_mode
+	self.label:set_request{width = Theme.help_text_width}
+	self.label.font = Theme.text_font_2
+	self.label.text = state and state.label or ""
+	self.label.offset = Vector(mode[1] - Theme.help_text_width, 0)
+	self.hint:set_request{width = Theme.help_text_width}
+	self.hint.font = Theme.text_font_1
 	self.hint.text = hint
+	if self.label.text ~= "" then
+		self.hint.offset = Vector(mode[1] - Theme.help_text_width, Theme.help_title_height)
+	else
+		self.hint.offset = Vector(mode[1] - Theme.help_text_width, 0)
+	end
 end
 
 Ui:add_class_getters{

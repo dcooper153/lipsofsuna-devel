@@ -14,11 +14,24 @@ Widgets.Background.reshaped = function(self)
 	local h = self.height
 	self:canvas_clear()
 	if self.image then
-		self:canvas_image{
-			dest_position = {0,0},
-			dest_size = {w,h},
-			source_image = self.image,
-			source_position = self.source_offset}
+		local tw,th = 1024,1024
+		if w > h then
+			local hh = th*h/w
+			self:canvas_image{
+				dest_position = {0,0},
+				dest_size = {w,h},
+				source_image = self.image,
+				source_position = {0,(th-hh)/2},
+				source_tiling = {-1,tw,-1,-1,hh,-1}}
+		else
+			local ww = tw*w/h
+			self:canvas_image{
+				dest_position = {0,0},
+				dest_size = {w,h},
+				source_image = self.image,
+				source_position = {(tw-ww)/2,0},
+				source_tiling = {-1,ww,-1,-1,th,-1}}
+		end
 	end
 	self:canvas_compile()
 end

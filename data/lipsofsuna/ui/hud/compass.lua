@@ -28,7 +28,7 @@ Widgets.Hudcompass.reshaped = function(self)
 	local w = self.width
 	local h = self.height
 	local mode = Program.video_mode
-	self.offset = Vector(mode[1] - 80, mode[2] - 80)
+	self.offset = Vector(0, mode[2] - 80)
 	self:canvas_clear()
 	-- Add the background.
 	self:canvas_image{
@@ -58,7 +58,7 @@ Widgets.Hudcompass.reshaped = function(self)
 			dest_size = {74,74},
 			text = string.format("%+d", self.quest_height),
 			text_alignment = {0.5,0.5},
-			text_color = {1,1,1,1},
+			text_color = Theme.text_color_3,
 			text_font = "tiny"}
 	end
 end

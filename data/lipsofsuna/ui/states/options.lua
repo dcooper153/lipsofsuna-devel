@@ -73,6 +73,13 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "options",
+	widget = function()
+		return Widgets.Uiconfigoption("ui_size",
+			function() Client.options:apply() end)
+	end}
+
+Ui:add_widget{
+	state = "options",
 	widget = function() return Widgets.Uiconfigoption("mouse_smoothing", function(k,v) Client.mouse_smoothing = v end) end}
 
 Ui:add_widget{

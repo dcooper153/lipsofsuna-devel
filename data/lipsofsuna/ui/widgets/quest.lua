@@ -26,8 +26,8 @@ Widgets.Uiquest.rebuild_size = function(self)
 	local size = Widgets.Uiwidget.rebuild_size(self)
 	-- Resize to fit the label.
 	if self.title and self.text then
-		local w1,h1 = Program:measure_text("bigger", self.title, 270)
-		local w2,h2 = Program:measure_text("default", self.text, 270)
+		local w1,h1 = Program:measure_text(Theme.text_font_2, self.title, size.x - 10)
+		local w2,h2 = Program:measure_text(Theme.text_font_1, self.text, size.x - 10)
 		if h1 and h2 then
 			size.y = math.max(size.y, h1 + h2 + 20)
 			self.title_height = h1 + 3
@@ -40,20 +40,17 @@ Widgets.Uiquest.rebuild_canvas = function(self)
 	-- Add the base.
 	Widgets.Uiwidget.rebuild_canvas(self)
 	-- Add the background.
-	self:canvas_image{
-		dest_position = {5,3},
-		dest_size = {self.size.x-10,self.size.y-6},
-		source_image = "widgets1",
-		source_position = self.value and {350,415} or {350,375},
-		source_tiling = {12,64,12,11,14,13}}
+	Theme:draw_button(self, nil,
+		5, 3, self.size.x-10, self.size.y-6,
+		self.focused, self.value)
 	-- Add the title.
 	self:canvas_text{
 		dest_position = {10,5 + (self.value and 3 or 0)},
 		dest_size = {self.size.x-20,self.size.y-10},
 		text = self.title,
 		text_alignment = {0.5,0},
-		text_color = {1,1,1,1},
-		text_font = "bigger"}
+		text_color = Theme.text_color_1,
+		text_font = Theme.text_font_2}
 	-- Add the text.
 	local text_y = (self.title_height or 0) + (self.value and 3 or 0)
 	self:canvas_text{
@@ -61,6 +58,6 @@ Widgets.Uiquest.rebuild_canvas = function(self)
 		dest_size = {self.size.x-20,self.size.y-text_y-10},
 		text = self.text,
 		text_alignment = {0,0},
-		text_color = {1,1,1,1},
-		text_font = "default"}
+		text_color = Theme.text_color_1,
+		text_font = Theme.text_font_1}
 end

@@ -52,10 +52,10 @@ Protocol:add_handler{type = "GENERATOR_STATUS", func = function(event)
 	local ok,s,f = event.packet:read("string", "float")
 	if ok then
 		-- TODO: Client:terminate_world()
-		Client.data.start_game = {}
-		Client.data.start_game.text = "Map generator: " .. s .. " (" .. math.ceil(f * 100) .. "%)"
-		Client.data.start_game.active = true
-		Client.data.start_game.waiting = true
+		Client.data.connection = {}
+		Client.data.connection.text = "Map generator: " .. s .. " (" .. math.ceil(f * 100) .. "%)"
+		Client.data.connection.active = true
+		Client.data.connection.waiting = true
 		Ui.state = "start-game"
 	end
 end}

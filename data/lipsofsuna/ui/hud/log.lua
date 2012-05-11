@@ -3,7 +3,6 @@ Widgets.Uilog.class_name = "Widgets.Uilog"
 
 Widgets.Uilog.new = function(clss, args)
 	local self = Widget.new(clss, args)
-	self.font = "medium"
 	self.lines = {}
 	return self
 end
@@ -19,15 +18,16 @@ Widgets.Uilog.reshaped = function(self)
 	local h = self.height
 	local y = 200
 	for k,v in ipairs(self.lines) do
-		local tw,th = Program:measure_text(self.font, v[1], w)
+		local c = Theme.text_color_3
+		local tw,th = Program:measure_text(Theme.text_font_1, v[1], w)
 		y = y - th
 		self:canvas_text{
 			dest_position = {0,y},
 			dest_size = {w,th},
 			text = v[1],
-			text_alignment = {0,0},
-			text_color = {1,1,1,v[3]},
-			text_font = self.font}
+			text_alignment = {0.5,0},
+			text_color = {c[1],c[2],c[3],v[3]},
+			text_font = Theme.text_font_1}
 	end
 end
 
@@ -38,7 +38,7 @@ Widgets.Uilog.update = function(self, secs)
 	-- Update the screen offset.
 	local mode = Program.video_mode
 	if self.width ~= mode[1] or self.offset.y ~= mode[2] - 200 then
-		self.offset = Vector(5, mode[2] - 200)
+		self.offset = Vector(5, mode[2] - 260)
 		self:set_request{width = mode[1], height = 200}
 		changed = true
 	end

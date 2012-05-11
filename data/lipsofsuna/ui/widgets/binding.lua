@@ -73,7 +73,6 @@ Widgets.Uibinding.handle_event = function(self, args)
 end
 
 Widgets.Uibinding.rebuild_canvas = function(self)
-	local a = 1
 	local w = self.size.x
 	local h = self.size.y
 	local keyname = function(k) return Keycode[k] or (k and tostring(k) or "----") end
@@ -85,28 +84,30 @@ Widgets.Uibinding.rebuild_canvas = function(self)
 		dest_size = {w-10,h},
 		text = self.name,
 		text_alignment = {0,0.5},
-		text_color = {1,1,1,1},
-		text_font = "bigger"}
+		text_color = Theme.text_color_1,
+		text_font = Theme.text_font_1}
 	-- Add the first key.
+	local x1 = Theme.width_label_1
 	local key1 = self.action.key1
 	local name1 = self.input_key ~= "key1" and keyname(key1) or "????"
 	self:canvas_text{
-		dest_position = {150,0},
-		dest_size = {w-150,h},
+		dest_position = {Theme.width_label_1,0},
+		dest_size = {w-Theme.width_label_1,h},
 		text = name1,
 		text_alignment = {0,0.5},
-		text_color = {a,a,a,1},
-		text_font = "bigger"}
+		text_color = Theme.text_color_1,
+		text_font = Theme.text_font_1}
 	-- Add the second key.
 	if self.action.mode == "analog" then
+		local x2 = x1 + (self.size.x - x1) / 2
 		local key2 = self.action.key2
 		local name2 = self.input_key ~= "key2" and keyname(key2) or "????"
 		self:canvas_text{
-			dest_position = {240,0},
-			dest_size = {w-240,h},
+			dest_position = {x2,0},
+			dest_size = {w-x2,h},
 			text = name2,
 			text_alignment = {0,0.5},
-			text_color = {1,1,1,1},
-			text_font = "bigger"}
+			text_color = Theme.text_color_1,
+			text_font = Theme.text_font_1}
 	end
 end

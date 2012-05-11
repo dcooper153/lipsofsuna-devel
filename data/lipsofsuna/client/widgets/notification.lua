@@ -3,32 +3,31 @@ Widgets.Notification.class_name = "Widgets.Notification"
 
 Widgets.Notification.new = function(clss, args)
 	local self = Widget.new(clss, args)
-	self.width_request = 200
 	return self
 end
 
 Widgets.Notification.reshaped = function(self)
+	local w = Theme.text_height_1*10
 	self:set_request{
-		font = "default",
+		font = Theme.text_font_1,
 		internal = true,
 		text = self.text,
-		paddings = {5,16,0,11},
-		width = self.width_request}
+		paddings = {7,7,7,7},
+		width = w-14}
 	self:canvas_clear()
 	self:canvas_image{
 		dest_position = {0,0},
-		dest_size = {self.width,self.height},
-		source_image = "widgets1",
-		source_position = {720,0},
-		source_tiling = {10,80,21,10,30,21}}
+		dest_size = {w,self.height},
+		source_image = "widgets2",
+		source_position = {300,0},
+		source_tiling = {7,86,7,7,86,7}}
 	self:canvas_text{
-		dest_position = {5,3},
-		dest_size = {self.width-15,self.height},
+		dest_position = {7,7},
+		dest_size = {w-14,self.height-10},
 		text = self.text,
-		text_alignment = {0,0},
-		text_color = {1,1,1,1},
-		text_font = "default"}
-	self:canvas_compile()
+		text_alignment = {0.5,0.5},
+		text_color = Theme.text_color_1,
+		text_font = Theme.text_font_1}
 end
 
 Widgets.Notification.update = function(self, secs)

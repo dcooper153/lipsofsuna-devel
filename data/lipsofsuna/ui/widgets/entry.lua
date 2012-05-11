@@ -109,7 +109,7 @@ end
 Widgets.Uientry.move_cursor_down = function(self)
 	-- Layout the text.
 	local text = self:get_displayed_text()
-	local layout = Program:layout_text("default", text, self:get_text_area_width())
+	local layout = Program:layout_text(Theme.text_font_1, text, self:get_text_area_width())
 	if not layout then return end
 	-- Find the closest glyph below the cursor.
 	local best
@@ -132,7 +132,7 @@ end
 Widgets.Uientry.move_cursor_up = function(self)
 	-- Layout the text.
 	local text = self:get_displayed_text()
-	local layout = Program:layout_text("default", text, self:get_text_area_width())
+	local layout = Program:layout_text(Theme.text_font_1, text, self:get_text_area_width())
 	if not layout then return end
 	-- Find the closest glyph above the cursor.
 	local best
@@ -156,7 +156,7 @@ Widgets.Uientry.rebuild_size = function(self)
 	-- Resize to fit the label.
 	if self.value then
 		local text = self:get_displayed_text()
-		local w,h = Program:measure_text("default", text, self:get_text_area_width(size))
+		local w,h = Program:measure_text(Theme.text_font_1, text, self:get_text_area_width(size))
 		if h then size.y = math.max(size.y, h + 10) end
 	end
 	return size
@@ -166,35 +166,32 @@ Widgets.Uientry.rebuild_canvas = function(self)
 	-- Format the text.
 	local text = self:get_displayed_text()
 	-- Add the base.
-	local w = self.size.x - 155
+	local w = self.size.x - Theme.width_label_1 - 5
 	local w1 = self:get_text_area_width()
 	local h = self.size.y - 10
 	Widgets.Uiwidget.rebuild_canvas(self)
 	-- Add the background.
-	self:canvas_image{
-		dest_position = {150,5},
-		dest_size = {w,h},
-		source_image = "widgets1",
-		source_position = self.focused and {967,383} or {910,383},
-		source_tiling = {15,25,15,10,14,10}}
+	Theme:draw_entry(self,
+		Theme.width_label_1, 5, w, h,
+		self.focused, self.input_mode)
 	-- Add the text.
 	self:canvas_text{
-		dest_position = {152,5},
+		dest_position = {Theme.width_label_1+2,5+Theme.text_pad_1},
 		dest_size = {w1,h},
 		text = text,
 		text_alignment = {0,0.5},
-		text_color = {1,1,1,1},
-		text_font = "default"}
+		text_color = Theme.text_color_1,
+		text_font = Theme.text_font_1}
 	-- Add the cursor.
 	if self.input_mode then
 		local cx,cy = self:get_cursor_position()
 		self:canvas_text{
-			dest_position = {152+cx,5+cy},
+			dest_position = {Theme.width_label_1+2+cx,5+Theme.text_pad_1+cy},
 			dest_size = {w1,h},
 			text = "|",
 			text_alignment = {0,0},
-			text_color = {1,1,1,1},
-			text_font = "default"}
+			text_color = Theme.text_color_1,
+			text_font = Theme.text_font_1}
 	end
 	self:canvas_compile()
 end
@@ -204,7 +201,7 @@ end
 -- @return X,Y.
 Widgets.Uientry.get_cursor_position = function(self)
 	local text = self:get_displayed_text()
-	local layout = Program:layout_text("default", text, self:get_text_area_width())
+	local layout = Program:layout_text(Theme.text_font_1, text, self:get_text_area_width())
 	if not layout then return 0,0 end
 	local cx,cy
 	local cp = 3*self.cursor_pos-2
@@ -238,5 +235,5 @@ end
 -- @return Width in pixels.
 Widgets.Uientry.get_text_area_width = function(self, size)
 	local s = size or self.size
-	return s.x - 160
+	return s.x - Theme.width_label_1 - 15
 end

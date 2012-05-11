@@ -33,48 +33,52 @@ Widgets.Uispell.rebuild_size = function(self)
 	local size = Widgets.Uiwidget.rebuild_size(self)
 	-- Resize to fit the description.
 	if self.spec then
-		local w,h = Program:measure_text("default", self.spec.description, size.x - 40)
-		if h then size.y = math.max(size.y, h + 25) end
+		local w1,h1 = Program:measure_text(Theme.text_font_2, self:get_pretty_name(), size.x-5-Theme.width_icon_1)
+		local w2,h2 = Program:measure_text(Theme.text_font_1, self.spec.description, size.x-5-Theme.width_icon_1)
+		local h = (h1 or 0) + (h2 or 0)
+		size.y = math.max(size.y, h + 10)
+		size.y = math.max(size.y, Theme.width_icon_1+10)
+		self.title_height = h1 or 0
 	end
 	return size
 end
 
 Widgets.Uispell.rebuild_canvas = function(self)
-	local a = self.active and 1 or 0.5
 	local w = self.size.x
 	local h = self.size.y
 	-- Add the base.
 	Widgets.Uiwidget.rebuild_canvas(self)
 	-- Add the icon.
-	local icon = self.icon
-	if icon then
-		self:canvas_image{
-			dest_position = {5,(h-icon.size[2])/2},
-			dest_size = {icon.size[1],icon.size[2]},
-			color = {1,1,1,a},
-			source_image = icon.image,
-			source_position = icon.offset,
-			source_tiling = {0,icon.size[1],0,0,icon.size[2],0}}
+	-- Add the icon.
+	if self.spec then
+		Theme:draw_icon_scaled(self, self.spec.icon,
+			5, 5, Theme.width_icon_1, Theme.width_icon_1,
+			self.active and {1,1,1,1} or {0.3,0.3,0.3,0.3})
 	end
 	-- Add the name.
 	if self.spec then
-		local cap = string.gsub(self.spec.name, "(.)(.*)", function(a,b) return string.upper(a) .. b end)
+		local cap = self:get_pretty_name()
 		self:canvas_text{
-			dest_position = {40,5},
-			dest_size = {w-40,h},
+			dest_position = {5+Theme.width_icon_1,5},
+			dest_size = {w-5-Theme.width_icon_1,h},
 			text = cap,
 			text_alignment = {0,0},
-			text_color = {a,a,a,1},
-			text_font = "bigger"}
+			text_color = self.active and Theme.text_color_1 or Theme.text_color_2,
+			text_font = Theme.text_font_2}
 	end
 	-- Add the description.
-	if self.spec then
+	if self.spec and self.title_height then
 		self:canvas_text{
-			dest_position = {40,20},
-			dest_size = {w-40,h},
+			dest_position = {5+Theme.width_icon_1,5+self.title_height},
+			dest_size = {w-5-Theme.width_icon_1,h},
 			text = self.spec.description,
 			text_alignment = {0,0},
-			text_color = {a,a,a,1},
-			text_font = "default"}
+			text_color = self.active and Theme.text_color_1 or Theme.text_color_2,
+			text_font = Theme.text_font_1}
 	end
+end
+
+Widgets.Uispell.get_pretty_name = function(self)
+	if not self.spec then return end
+	return string.gsub(self.spec.name, "(.)(.*)", function(a,b) return string.upper(a) .. b end)
 end

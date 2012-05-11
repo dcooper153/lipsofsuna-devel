@@ -27,7 +27,7 @@ Widgets.Uiinvitem.rebuild_size = function(self)
 	-- Resize to fit the description.
 	local name = self.pretty_name
 	if name then
-		local w,h = Program:measure_text("bigger", name, size.x - 40)
+		local w,h = Program:measure_text(Theme.text_font_1, name, size.x - 40)
 		if h then size.y = math.max(size.y, h + 10) end
 	end
 	return size
@@ -58,8 +58,8 @@ Widgets.Uiinvitem.rebuild_canvas = function(self)
 			dest_size = {w-40,h},
 			text = name,
 			text_alignment = {0,0},
-			text_color = {1,1,1,1},
-			text_font = "bigger"}
+			text_color = Theme.text_color_1,
+			text_font = Theme.text_font_2}
 	end
 	-- Add the equip text.
 	if self.slot then
@@ -68,8 +68,8 @@ Widgets.Uiinvitem.rebuild_canvas = function(self)
 			dest_size = {30,h-10},
 			text = "E",
 			text_alignment = {0.5,0},
-			text_color = {1,1,1,1},
-			text_font = "default"}
+			text_color = Theme.text_color_1,
+			text_font = Theme.text_font_1}
 	end
 	-- Add the count.
 	local count = self.pretty_count
@@ -79,8 +79,8 @@ Widgets.Uiinvitem.rebuild_canvas = function(self)
 			dest_size = {30,h-10},
 			text = count,
 			text_alignment = {0.5,1},
-			text_color = {1,1,1,1},
-			text_font = "default"}
+			text_color = Theme.text_color_1,
+			text_font = Theme.text_font_1}
 	end
 end
 

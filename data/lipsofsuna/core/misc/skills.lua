@@ -1,46 +1,54 @@
 Skillspec{
 	name = "Health lv1",
 	description = "Increase your base health to 40 points.",
+	icon = "modifier-heal",
 	assign = function(skills) skills.max_health = skills.max_health + 20 end}
 
 Skillspec{
 	name = "Health lv2",
 	description = "Increase your base health to 60 points.",
+	icon = "modifier-heal",
 	requires = {"Health lv1"},
 	assign = function(skills) skills.max_health = skills.max_health + 20 end}
 
 Skillspec{
 	name = "Health lv3",
 	description = "Increase your base health to 80 points.",
+	icon = "modifier-heal",
 	requires = {"Health lv2"},
 	assign = function(skills) skills.max_health = skills.max_health + 20 end}
 
 Skillspec{
 	name = "Health lv4",
 	description = "Increase your base health to 100 points.",
+	icon = "modifier-heal",
 	requires = {"Health lv3"},
 	assign = function(skills) skills.max_health = skills.max_health + 20 end}
 
 Skillspec{
 	name = "Willpower lv1",
 	description = "Increase your base willpower to 40 points.",
+	icon = "modifier-mana",
 	assign = function(skills) skills.max_willpower = skills.max_willpower + 20 end}
 
 Skillspec{
 	name = "Willpower lv2",
 	description = "Increase your base willpower to 60 points.",
+	icon = "modifier-mana",
 	requires = {"Willpower lv1"},
 	assign = function(skills) skills.max_willpower = skills.max_willpower + 20 end}
 
 Skillspec{
 	name = "Willpower lv3",
 	description = "Increase your base willpower to 80 points.",
+	icon = "modifier-mana",
 	requires = {"Willpower lv2"},
 	assign = function(skills) skills.max_willpower = skills.max_willpower + 20 end}
 
 Skillspec{
 	name = "Willpower lv4",
 	description = "Increase your base willpower to 100 points.",
+	icon = "modifier-mana",
 	requires = {"Willpower lv3"},
 	assign = function(skills) skills.max_willpower = skills.max_willpower + 20 end}
 

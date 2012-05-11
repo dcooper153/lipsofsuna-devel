@@ -100,8 +100,8 @@ Widgets.SkillControl.reshaped = function(self)
 			dest_size = {xbar,h},
 			text = self.text .. ":",
 			text_alignment = {0,0.5},
-			text_color = {1,1,1,1},
-			text_font = "default"}
+			text_color = Theme.text_color_1,
+			text_font = Theme.text_font_1}
 	end
 	-- Value string.
 	self:canvas_text{
@@ -109,7 +109,7 @@ Widgets.SkillControl.reshaped = function(self)
 		dest_size = {w,h},
 		text = tostring(self.value),
 		text_alignment = {0.5,0.5},
-		text_color = {1,1,1,1},
+		text_color = Theme.text_color_1,
 		text_font = "tiny"}
 	self:canvas_compile()
 end

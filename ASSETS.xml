@@ -1233,6 +1233,13 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
   </asset>
 
   <asset>
+    <file>data/lipsofsuna/ui/widgets2.png</file>
+    <file>import/widgets2.png</file>
+    <author>hiponboy</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
     <file>data/lipsofsuna/environment/wood/wood1.png</file>
     <file>import/wood1.png</file>
     <author>WeaponGuy</author>

@@ -74,7 +74,7 @@ Widgets.Scene.reshaped = function(self)
 			dest_size = {w,o},
 			text = self.action,
 			text_alignment = {0.5,0},
-			text_color = {0,0,0,1},
+			text_color = Theme.text_color_1,
 			text_font = "medium"}
 		self:canvas_text{
 			dest_position = {0,o},

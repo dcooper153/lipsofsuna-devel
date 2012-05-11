@@ -43,11 +43,13 @@ Ui:add_hud{
 	id = "fps",
 	active = function() return true end,
 	init = function()
-		local self = Widgets.Label{valign = 1, request = Vector(60,20)}
+		local self = Widgets.Label()
 		self.update = function(self, secs)
 			local mode = Program.video_mode
-			self.offset = Vector(mode[1] - 60, mode[2] - 20)
-			self.text = "FPS: " .. tostring(math.floor(Program.fps + 0.5))
+			local text = "FPS: " .. tostring(math.floor(Program.fps + 0.5))
+			self.offset = Vector(mode[1] - Theme.text_height_1 * 4.5, mode[2] - Theme.text_height_1 - 5)
+			self.font = Theme.text_font_1
+			self.text = text
 		end
 		return self
 	end}
@@ -88,7 +90,7 @@ Ui:add_hud{
 				-- Update the position.
 				local mode = Program.video_mode
 				local padx = mode[1] - self.width
-				self.offset = Vector(padx / 2, 50)
+				self.offset = Vector(padx / 2, Theme.width_icon_1 + Theme.text_height_1 * 2)
 				-- Show the widget.
 				self.visible = true
 			else

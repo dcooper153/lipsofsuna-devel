@@ -41,15 +41,15 @@ Widgets.Button.reshaped = function(self)
 		self:canvas_image{
 			dest_position = {0,0},
 			dest_size = {w,h},
-			source_image = "widgets1",
-			source_position = self.focused and {350,415} or {350,375},
-			source_tiling = {12,64,12,11,14,13}}
+			source_image = "widgets2",
+			source_position = self.focused and {100,100} or {100,0},
+			source_tiling = {7,86,7,7,86,7}}
 		self:canvas_text{
 			dest_position = {0,0},
 			dest_size = {w,h},
 			text = self.text,
 			text_alignment = {0.5,0.5},
-			text_color = self.focused and {1,1,0,1} or {1,1,1,1},
+			text_color = {0,0,0,1},
 			text_font = self.font}
 	elseif self.style == "scroll-up" then
 		local sx = self.enabled and 700 or 720

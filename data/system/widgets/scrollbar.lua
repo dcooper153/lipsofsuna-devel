@@ -84,11 +84,11 @@ Widgets.Scrollbar.reshaped = function(self)
 	-- Draw the background.
 	self:canvas_clear()
 	self:canvas_image{
-		dest_position = {0,0},
-		dest_size = {w,h},
-		source_image = "widgets1",
-		source_position = {670,0},
-		source_tiling = {0,21,0,32,226,32}}
+		dest_position = {0,21},
+		dest_size = {w,h-42},
+		source_image = "widgets2",
+		source_position = {700,0},
+		source_tiling = {7,86,7,7,86,7}}
 	-- Draw the slider.
 	local sy,sh
 	local alloc = h - 42
@@ -102,22 +102,22 @@ Widgets.Scrollbar.reshaped = function(self)
 	self:canvas_image{
 		dest_position = {0,21 + sy},
 		dest_size = {w,sh},
-		source_image = "widgets1",
-		source_position = {700,0},
-		source_tiling = {0,21,0,10,70,10}}
+		source_image = "widgets2",
+		source_position = {100,100},
+		source_tiling = {7,86,7,7,86,7}}
 	-- Draw the buttons.
 	self:canvas_image{
 		dest_position = {0,0},
 		dest_size = {21,21},
-		source_image = "widgets1",
-		source_position = (self.scroll_offset > 0) and {700,100} or {700,130},
-		source_tiling = {0,21,0,0,21,0}}
+		source_image = "widgets2",
+		source_position = (self.scroll_offset > 0) and {600,0} or {600,200},
+		source_tiling = {7,86,7,7,86,7}}
 	self:canvas_image{
 		dest_position = {0,h-22},
 		dest_size = {21,21},
-		source_image = "widgets1",
-		source_position = (self.scroll_offset < self.max - self.page) and {700,160} or {700,190},
-		source_tiling = {0,21,0,0,21,0}}
+		source_image = "widgets2",
+		source_position = (self.scroll_offset < self.max - self.page) and {600,100} or {600,300},
+		source_tiling = {7,86,7,7,86,7}}
 	self:canvas_compile()
 end
 

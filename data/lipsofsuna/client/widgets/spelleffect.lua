@@ -49,7 +49,7 @@ Widgets.Spelleffect.reshaped = function(self)
 			text = self.effect.description,
 			text_alignment = {0,0},
 			text_color = f and {1,1,0,1} or {a,a,a,1},
-			text_font = "default"}
+			text_font = Theme.text_font_1}
 	end
 	self:canvas_compile()
 end

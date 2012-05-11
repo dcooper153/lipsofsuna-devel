@@ -12,7 +12,8 @@ Protocol:add_handler{type = "AUTHENTICATE_REJECT", func = function(event)
 	local ok,s = event.packet:read("string")
 	if not ok then return end
 	Ui.state = "start-game"
-	Client.data.start_game.text = "Authentication failed: " .. s
+	Client.data.connection.text = "Authentication failed: " .. s
+	Ui:restart_state()
 end}
 
 Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(event)

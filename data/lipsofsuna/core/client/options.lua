@@ -29,6 +29,7 @@ Options.config_keys = {
 	shadow_casting_items = {"Items cast shadows", "bool"},
 	shadow_casting_obstacles = {"Obstacles cast shadows", "bool"},
 	sound_volume = {"Effect volume", "float", 0, 1},
+	ui_size = {"User interface size", "int", 1, 3},
 	view_distance = {"View distance", "float", 10, 1000000},
 	view_distance_underground = {"View distance underground", "float", 5, 1000000},
 	vsync = {"Vertical sync", "bool"},
@@ -67,6 +68,7 @@ Options.new = function(clss)
 	self.shadow_casting_obstacles = true
 	self.sound_volume = 1.0
 	self.music_volume = 0.1
+	self.ui_size = 2
 	self.view_distance = 5000
 	self.view_distance_underground = 30
 	-- Read values from the configuration file.
@@ -122,6 +124,10 @@ end
 Options.apply = function(self)
 	-- Set the anisotropic filter.
 	Render.anisotrophy = self.anisotropic_filter
+	-- Set the UI theme.
+	if Theme:set_theme(self.ui_size) then
+		Ui:restart_state()
+	end
 	-- Update the render properties of objects.
 	for k,v in pairs(Object.objects) do
 		self:apply_object(v)

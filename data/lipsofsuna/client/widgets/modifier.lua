@@ -1,45 +1,36 @@
 Widgets.Modifier = Class(Widget)
-Widgets.Modifier.DEFAULT = {image="icons1", offset={0,222}, size={34,34}}
 
 Widgets.Modifier.new = function(clss, args)
 	local self = Widget.new(clss, args)
-	self.icon = self.icon or clss.DEFAULT
-	self.font = self.font or "bigger"
+	self.icon = self.icon or "missing1"
 	return self
 end
 
 Widgets.Modifier.reshaped = function(self)
-	local icon = self.icon or self.DEFAULT
 	self:set_request{
 		internal = true,
-		width = 34,
-		height = 44}
+		width = Theme.width_icon_1 + 2,
+		height = Theme.width_icon_1 + Theme.text_height_1 + 2}
 	local w = self.width
 	local h = self.height
 	self:canvas_clear()
-	self:canvas_image{
-		dest_position = {0,0},
-		dest_size = icon.size,
-		source_image = icon.image,
-		source_position = icon.offset,
-		source_tiling = {0,icon.size[1],0,0,icon.size[1],0}}
+	Theme:draw_icon_scaled(self, self.icon, 0, 0, Theme.width_icon_1, Theme.width_icon_1)
 	if self.time_coarse < 10000 then
 		self:canvas_text{
 			dest_position = {2,2},
 			dest_size = {w,h},
 			text = tostring(self.time_coarse),
 			text_alignment = {0.5,1},
-			text_color = {0,0,0,1},
-			text_font = self.font}
+			text_color = Theme.text_color_1,
+			text_font = Theme.text_font_1}
 		self:canvas_text{
 			dest_position = {0.5,0},
 			dest_size = {w,h},
 			text = tostring(self.time_coarse),
 			text_alignment = {0.5,1},
-			text_color = {1,1,1,1},
-			text_font = self.font}
+			text_color = Theme.text_color_3,
+			text_font = Theme.text_font_1}
 	end
-	self:canvas_compile()
 end
 
 Widgets.Modifier.pressed = function(self, args)
