@@ -51,6 +51,7 @@ typedef struct _LIRenRenderData LIRenRenderData;
 #include "render-container-factory.hpp"
 #include "render-entity.hpp"
 #include "render-image-overlay-factory.hpp"
+#include "render-scaled-overlay-factory.hpp"
 #include "render-mesh-builder.hpp"
 #include "render-mesh-manager.hpp"
 #include "render-resource-loading-listener.hpp"
@@ -117,6 +118,7 @@ struct _LIRenRenderData
 	Ogre::LogManager* log;
 	LIRenContainerFactory* container_factory;
 	LIRenImageOverlayFactory* image_factory;
+	LIRenScaledOverlayFactory* scaled_factory;
 	LIRenMeshManager* mesh_manager;
 	LIRenResourceLoadingListener* resource_loading_listener;
 	LIRenUniqueId id;

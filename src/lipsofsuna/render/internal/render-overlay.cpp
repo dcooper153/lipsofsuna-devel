@@ -288,57 +288,24 @@ void liren_overlay_add_scaled (
 	Ogre::TexturePtr texture;
 	if (!private_create_material (self, material_name, &material, &texture))
 		return;
-	Ogre::Real w = texture->getWidth ();
-	Ogre::Real h = texture->getHeight ();
+	int source_size[2] = { texture->getWidth (), texture->getHeight () };
+	int source_tiling1[6] = {0, source_tiling[1], 0, 0, source_tiling[4], 0};
+	if (source_tiling1[1] < 0)
+		source_tiling1[1] = source_size[0];
+	if (source_tiling1[4] < 0)
+		source_tiling1[4] = source_size[1];
 
-	/* Calculate texture coordinates. */
-	float tiling[2] =
-	{
-		source_tiling[1] >= 0? source_tiling[1] : w,
-		source_tiling[4] >= 0? source_tiling[4] : h
-	};
-	float tx[2] =
-	{
-		(float)(source_position[0]) / w,
-		(float)(source_position[0] + tiling[0]) / w
-	};
-	float ty[2] =
-	{
-		(float)(source_position[1]) / h,
-		(float)(source_position[1] + tiling[1]) / h
-	};
-
-	/* Calculate pixels per texture unit. */
-	float xs = tx[1] - tx[0];
-	float ys = ty[1] - ty[0];
-	if (xs < LIMAT_EPSILON || ys < LIMAT_EPSILON)
-		return;
-	xs = dest_size[0] / xs;
-	ys = dest_size[1] / ys;
-
-	/* Scale and translate to fill the area. */
-	float center;
-	if (ty[1] - ty[0] >= dest_size[1] / xs)
-	{
-		center = 0.5f * (ty[0] + ty[1]);
-		ty[0] = center - 0.5f * dest_size[1] / xs;
-		ty[1] = center + 0.5f * dest_size[1] / xs;
-	}
-	else
-	{
-		center = 0.5f * (tx[0] + tx[1]);
-		tx[0] = center - 0.5f * dest_size[0] / ys;
-		tx[1] = center + 0.5f * dest_size[0] / ys;
-	}
-
-	/* Create a new panel overlay. */
+	/* Create a new scaled overlay. */
 	Ogre::String id = self->render->data->id.next ();
-	Ogre::PanelOverlayElement* elem = (Ogre::PanelOverlayElement*) self->render->data->overlay_manager->createOverlayElement ("Panel", id); 
+	LIRenImageOverlay* elem = (LIRenImageOverlay*) self->render->data->overlay_manager->createOverlayElement ("LIRenScaledOverlay", id); 
 	elem->setMetricsMode (Ogre::GMM_PIXELS);
 	elem->setPosition (dest_position[0], dest_position[1]);
 	elem->setDimensions (dest_size[0], dest_size[1]);
 	elem->setMaterialName (material->getName ());
-	elem->setUV (tx[0], ty[0], tx[1], ty[1]);
+	elem->set_clipping (NULL);
+	elem->set_rotation (0.0f, 0, 0);
+	elem->set_tiling (source_position, source_size, source_tiling1);
+	elem->set_color (color);
 	elem->show ();
 
 	/* Add to the container. */

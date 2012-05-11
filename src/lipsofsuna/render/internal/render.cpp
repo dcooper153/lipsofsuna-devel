@@ -91,6 +91,7 @@ int liren_internal_init (
 	self->data->unload_timer = 0.0f;
 	self->data->container_factory = NULL;
 	self->data->image_factory = NULL;
+	self->data->scaled_factory = NULL;
 
 	/* Disable console output. */
 	self->data->log = new Ogre::LogManager ();
@@ -197,6 +198,8 @@ int liren_internal_init (
 	self->data->overlay_manager->addOverlayElementFactory (self->data->container_factory);
 	self->data->image_factory = new LIRenImageOverlayFactory;
 	self->data->overlay_manager->addOverlayElementFactory (self->data->image_factory);
+	self->data->scaled_factory = new LIRenScaledOverlayFactory;
+	self->data->overlay_manager->addOverlayElementFactory (self->data->scaled_factory);
 
 	/* Create the group for temporary resources. */
 	/* This group is used for temporary resources such as meshes or
@@ -256,6 +259,7 @@ void liren_internal_deinit (
 		delete self->data->resource_loading_listener;
 		delete self->data->container_factory;
 		delete self->data->image_factory;
+		delete self->data->scaled_factory;
 		delete self->data->log;
 		delete self->data;
 		self->data = NULL;

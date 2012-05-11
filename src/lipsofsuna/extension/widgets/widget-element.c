@@ -95,8 +95,18 @@ int liwdg_widget_canvas_insert_image (
 		memcpy (elem.src_pos, src_pos, 2 * sizeof (int));
 	if (src_tiling != NULL)
 	{
-		elem.src_tiling_enabled = 1;
-		memcpy (elem.src_tiling, src_tiling, 6 * sizeof (int));
+		if (src_tiling[0] >= 0 && src_tiling[1] >= 0 &&
+		    src_tiling[2] >= 0 && src_tiling[3] >= 0 &&
+		    src_tiling[4] >= 0 && src_tiling[5] >= 0)
+		{
+			memcpy (elem.src_tiling, src_tiling, 6 * sizeof (int));
+			elem.src_tiling_enabled = 1;
+		}
+		else
+		{
+			elem.src_tiling[1] = src_tiling[1];
+			elem.src_tiling[4] = src_tiling[4];
+		}
 	}
 	else
 	{
