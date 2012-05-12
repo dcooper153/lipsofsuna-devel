@@ -65,22 +65,22 @@ Widgets.Uiinvitem.rebuild_canvas = function(self)
 	if self.slot then
 		self:canvas_text{
 			dest_position = {5,5},
-			dest_size = {30,h-10},
+			dest_size = {w-10,h},
 			text = "E",
-			text_alignment = {0.5,0},
+			text_alignment = {1,0},
 			text_color = Theme.text_color_1,
-			text_font = Theme.text_font_1}
+			text_font = Theme.text_font_2}
 	end
 	-- Add the count.
 	local count = self.pretty_count
 	if count then
 		self:canvas_text{
 			dest_position = {5,5},
-			dest_size = {30,h-10},
+			dest_size = {w-10-1.5*Theme.text_height_2,h},
 			text = count,
-			text_alignment = {0.5,1},
+			text_alignment = {1,0},
 			text_color = Theme.text_color_1,
-			text_font = Theme.text_font_1}
+			text_font = Theme.text_font_2}
 	end
 end
 

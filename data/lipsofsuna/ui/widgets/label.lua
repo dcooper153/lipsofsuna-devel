@@ -31,7 +31,7 @@ Widgets.Uilabel.rebuild_canvas = function(self)
 	-- Add the text.
 	self:canvas_text{
 		dest_position = {5,5},
-		dest_size = {self.size.x-80,self.size.y-10},
+		dest_size = {self.size.x-10,self.size.y-10},
 		text = self.text,
 		text_alignment = {0,0},
 		text_color = Theme.text_color_1,
