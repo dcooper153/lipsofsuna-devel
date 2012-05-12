@@ -59,20 +59,7 @@ Widgets.Hudmodifiers.reshaped = function(self)
 	for k,v in ipairs(self.dict_id) do
 		Theme:draw_icon_scaled(self, v.icon, x, 0, Theme.width_icon_1, Theme.width_icon_1)
 		if v.time_coarse then
-			self:canvas_text{
-				dest_position = {x+2,2},
-				dest_size = {w,h},
-				text = tostring(v.time_coarse),
-				text_alignment = {0.5,1},
-				text_color = Theme.text_color_1,
-				text_font = Theme.text_font_1}
-			self:canvas_text{
-				dest_position = {x+0.5,0},
-				dest_size = {w,h},
-				text = tostring(v.time_coarse),
-				text_alignment = {0.5,1},
-				text_color = Theme.text_color_3,
-				text_font = Theme.text_font_1}
+			Theme:draw_scene_text(self, tostring(v.time_coarse), x+0.5, 0, w, h)
 		end
 		x = x + w
 	end

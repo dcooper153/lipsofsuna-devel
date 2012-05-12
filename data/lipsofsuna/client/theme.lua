@@ -118,6 +118,28 @@ Theme.draw_icon_scaled = function(self, widget, name, x, y, w, h, color)
 	end
 end
 
+Theme.draw_scene_text = function(self, widget, text, x, y, w, h, alpha, align)
+	local d = 1.5
+	local a1 = 0.4 * (alpha or 1)
+	local a2 = (alpha or 1)
+	for k,v in pairs{Vector(-d,-d), Vector(d,-d), Vector(-d,d), Vector(d,d)} do
+		widget:canvas_text{
+			dest_position = {x+v.x,y+v.y},
+			dest_size = {w,h},
+			text = text,
+			text_alignment = align or {0.5,1},
+			text_color = {self.text_color_1[1], self.text_color_1[2], self.text_color_1[3], a1 * self.text_color_1[4]},
+			text_font = self.text_font_1}
+	end
+	widget:canvas_text{
+		dest_position = {x,y},
+		dest_size = {w,h},
+		text = text,
+		text_alignment = align or {0.5,1},
+		text_color =  {self.text_color_3[1], self.text_color_3[2], self.text_color_3[3], a2 * self.text_color_3[4]},
+		text_font = self.text_font_1}
+end
+
 Theme.draw_slider = function(self, widget, value, x, y, w, h, focused, editing)
 	local bw = self.width_slider_button_1
 	local position1

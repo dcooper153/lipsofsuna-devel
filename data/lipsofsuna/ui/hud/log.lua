@@ -18,16 +18,9 @@ Widgets.Uilog.reshaped = function(self)
 	local h = self.height
 	local y = 200
 	for k,v in ipairs(self.lines) do
-		local c = Theme.text_color_3
 		local tw,th = Program:measure_text(Theme.text_font_1, v[1], w)
 		y = y - th
-		self:canvas_text{
-			dest_position = {0,y},
-			dest_size = {w,th},
-			text = v[1],
-			text_alignment = {0.5,0},
-			text_color = {c[1],c[2],c[3],v[3]},
-			text_font = Theme.text_font_1}
+		Theme:draw_scene_text(self, v[1], 0, y, w, th, v[3], {0.5,0})
 	end
 end
 

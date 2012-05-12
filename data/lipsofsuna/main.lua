@@ -42,6 +42,7 @@ require "system/object-render"
 require "system/render"
 require "system/tiles-render"
 require "system/reload"
+require "system/string"
 require "system/widgets"
 end
 

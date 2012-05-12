@@ -2,9 +2,11 @@ if not Settings then return end
 if Settings.server then return end
 
 require(Mod.path .. "compass")
+require(Mod.path .. "fps")
 require(Mod.path .. "log")
-require(Mod.path .. "notification")
 require(Mod.path .. "modifiers")
+require(Mod.path .. "notification")
+require(Mod.path .. "target")
 
 Ui:add_hud{
 	id = "health",
@@ -43,61 +45,19 @@ Ui:add_hud{
 Ui:add_hud{
 	id = "fps",
 	active = function() return true end,
-	init = function()
-		local self = Widgets.Label()
-		self.update = function(self, secs)
-			local mode = Program.video_mode
-			local text = "FPS: " .. tostring(math.floor(Program.fps + 0.5))
-			self.offset = Vector(mode[1] - Theme.text_height_1 * 4.5, mode[2] - Theme.text_height_1 - 5)
-			self.font = Theme.text_font_1
-			self.text = text
-		end
-		return self
-	end}
+	init = function() return Widgets.Hudfps() end}
 
 Ui:add_hud{
 	id = "modifier",
 	active = function() return Ui.root == "play" end,
-	init = function()
-		return Widgets.Hudmodifiers()
-	end}
+	init = function() return Widgets.Hudmodifiers() end}
 
 Ui:add_hud{
 	id = "notification",
 	active = function() return Ui.root == "play" end,
-	init = function()
-		return Widgets.Hudnotification()
-	end}
+	init = function() return Widgets.Hudnotification() end}
 
 Ui:add_hud{
 	id = "target",
 	active = function() return Ui.state == "play" end,
-	init = function()
-		local self = Widgets.Label{font = "medium"}
-		self.update_timer = 0
-		self.update = function(self, secs)
-			self.update_timer = self.update_timer + secs
-			if self.update_timer < 0.1 then return end
-			self.update_timer = 0
-			local obj = Operators.world:get_target_object()
-			if obj and Operators.world:get_target_usages() then
-				-- Format the text.
-				local key = Binding:get_control_name("menu apply") or "[---]"
-				if obj.count and obj.count > 1 then
-					self.text = string.format("%s %s (%d)", key, obj.spec.name, obj.count)
-				else
-					self.text = string.format("%s %s", key, obj.spec.name)
-				end
-				-- Update the position.
-				local mode = Program.video_mode
-				local padx = mode[1] - self.width
-				self.offset = Vector(padx / 2, Theme.width_icon_1 + Theme.text_height_1 * 2)
-				-- Show the widget.
-				self.visible = true
-			else
-				-- Hide the widget.
-				self.visible = false
-			end
-		end
-		return self
-	end}
+	init = function() return Widgets.Hudtarget() end}

@@ -56,7 +56,7 @@ Widgets.Uiskill.rebuild_canvas = function(self)
 	Widgets.Uiwidget.rebuild_canvas(self)
 	-- Add the icon.
 	if self.skill then
-		Theme:draw_icon_scaled(self, self.skill.icon,
+		Theme:draw_icon_scaled(self, self.skill.icon or "missing1",
 			5, 5, Theme.width_icon_1, Theme.width_icon_1,
 			self.value and {1,1,1,1} or {0.3,0.3,0.3,0.3})
 	end
