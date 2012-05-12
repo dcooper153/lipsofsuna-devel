@@ -3,6 +3,7 @@ if Settings.server then return end
 
 require(Mod.path .. "compass")
 require(Mod.path .. "log")
+require(Mod.path .. "notification")
 require(Mod.path .. "modifiers")
 
 Ui:add_hud{
@@ -65,7 +66,7 @@ Ui:add_hud{
 	id = "notification",
 	active = function() return Ui.root == "play" end,
 	init = function()
-		return Widgets.Notification()
+		return Widgets.Hudnotification()
 	end}
 
 Ui:add_hud{

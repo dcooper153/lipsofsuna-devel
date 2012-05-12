@@ -46,13 +46,9 @@ Widgets.class_getters = {
 ------------------------------------------------------------------------------
 
 require "system/widgets/button"
-require "system/widgets/combo"
 require "system/widgets/cursor"
-require "system/widgets/entry"
 require "system/widgets/frame"
+require "system/widgets/label"
 require "system/widgets/list"
-require "system/widgets/menuitem"
 require "system/widgets/scrollbar"
-require "system/widgets/title"
-require "system/widgets/toggle"
 require "system/widgets/widgets"

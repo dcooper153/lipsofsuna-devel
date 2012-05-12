@@ -1,12 +1,12 @@
-Widgets.Notification = Class(Widget)
-Widgets.Notification.class_name = "Widgets.Notification"
+Widgets.Hudnotification = Class(Widget)
+Widgets.Hudnotification.class_name = "Widgets.Hudnotification"
 
-Widgets.Notification.new = function(clss, args)
+Widgets.Hudnotification.new = function(clss, args)
 	local self = Widget.new(clss, args)
 	return self
 end
 
-Widgets.Notification.reshaped = function(self)
+Widgets.Hudnotification.reshaped = function(self)
 	local w = Theme.text_height_1*10
 	self:set_request{
 		font = Theme.text_font_1,
@@ -30,7 +30,7 @@ Widgets.Notification.reshaped = function(self)
 		text_font = Theme.text_font_1}
 end
 
-Widgets.Notification.update = function(self, secs)
+Widgets.Hudnotification.update = function(self, secs)
 	if not self.visible then return end
 	if self.text and self.timer < 5 then
 		-- Show.
@@ -47,10 +47,10 @@ Widgets.Notification.update = function(self, secs)
 	end
 end
 
-Widgets.Notification:add_getters{
+Widgets.Hudnotification:add_getters{
 	text = function(self) return rawget(self, "__text") end}
 
-Widgets.Notification:add_setters{
+Widgets.Hudnotification:add_setters{
 	text = function(self, v)
 		if self.text == v then return end
 		rawset(self, "__text", v)

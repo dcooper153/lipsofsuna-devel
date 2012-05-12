@@ -536,10 +536,6 @@ Ui.show_state_attach = function(self)
 	for k,v in pairs(self.huds) do
 		if v.widget then root:add_child(v.widget) end
 	end
-	-- Attach the state widgets.
-	for k,v in pairs(self.widgets) do
-		root:add_child(v)
-	end
 	-- Attach the navigation widgets.
 	if self.widgets[1] then
 		root:add_child(self.back)
@@ -552,6 +548,10 @@ Ui.show_state_attach = function(self)
 	end
 	if self.widgets[1] then
 		root:add_child(self.scrollbar)
+	end
+	-- Attach the state widgets.
+	for k,v in pairs(self.widgets) do
+		root:add_child(v)
 	end
 	-- Mark repacking as done.
 	self.need_repack = nil
