@@ -1,23 +1,31 @@
 Ui:add_state{
 	state = "spells",
-	label = "Spells"}
-
-Ui:add_widget{
-	state = "spells",
-	widget = function()
-		local index = Operators.spells:get_spell_index()
-		return Widgets.Uitransition(string.format("Slot #%d", index), "spells/slots")
+	label = "Spells",
+	init = function()
+		local spells = Operators.spells:get_spells()
+		local current = Operators.spells:get_spell_index()
+		local widgets = {}
+		for k,v in ipairs(spells) do
+			widgets[k] = Widgets.Uispellpreview(k, v)
+		end
+		return widgets
 	end}
 
+------------------------------------------------------------------------------
+
+Ui:add_state{
+	state = "spells/spell",
+	label = "Edit spell"}
+
 Ui:add_widget{
-	state = "spells",
+	state = "spells/spell",
 	widget = function()
 		local spell = Operators.spells:get_spell()
 		return Widgets.Uispellslot("type", spell and spell.animation)
 	end}
 
 Ui:add_widget{
-	state = "spells",
+	state = "spells/spell",
 	widget = function()
 		local widgets = {}
 		for i = 1,3 do
@@ -29,7 +37,7 @@ Ui:add_widget{
 	end}
 
 Ui:add_widget{
-	state = "spells",
+	state = "spells/spell",
 	widget = function()
 		-- Calculate reagent requirements.
 		local spell = Operators.spells:get_spell()
@@ -48,37 +56,6 @@ Ui:add_widget{
 		-- Create the text widget.
 		text = "Required reagents:\n" .. text
 		return Widgets.Uilabel(text) end}
-
-------------------------------------------------------------------------------
-
-Ui:add_state{
-	state = "spells/slots",
-	label = "Select slot",
-	init = function()
-		local spells = Operators.spells:get_spells()
-		local current = Operators.spells:get_spell_index()
-		local widgets = {}
-		for k,v in ipairs(spells) do
-			local name = string.format("#%d", k)
-			if v then
-				local s = v.animation
-				widgets[k] = Widgets.Uiradio(name .. ": " .. s, "slots", function()
-					Operators.spells:set_spell_index(k)
-					Ui:pop_state()
-				end)
-			else
-				widgets[k] = Widgets.Uiradio(name, "slots", function()
-					Operators.spells:set_spell_index(k)
-					Ui:pop_state()
-				end)
-			end
-			if k == current then
-				widgets[k].value = true
-			end
-		end
-		return widgets
-	end}
-
 
 ------------------------------------------------------------------------------
 
