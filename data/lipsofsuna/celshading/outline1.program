@@ -4,10 +4,12 @@ vertex_program outline1_vert glsl
 	includes_skeletal_animation true
 	default_params
 	{
-		param_named LOS_outline_width float 0.015
-		param_named LOS_outline_distance_factor float 0.17
+		param_named LOS_outline_width1 float 0.0005
+		param_named LOS_outline_width2 float 0.0025
+		param_named LOS_outline_distance_factor float 0.02
+		param_named_auto LOS_matrix_proj projection_matrix
+		param_named_auto LOS_matrix_modelview worldview_matrix
 		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
-		param_named_auto LOS_camera_position camera_position_object_space
 	}
 }
 
