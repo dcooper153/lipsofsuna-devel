@@ -897,6 +897,7 @@ end
 Actor.read_db = function(self, db)
 	Serialize:load_object_inventory(self)
 	Serialize:load_object_skills(self)
+	self:update_skills()
 	Serialize:load_object_stats(self)
 end
 
