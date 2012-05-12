@@ -35,7 +35,7 @@ Widgets.Hudtarget.update = function(self, secs)
 	-- Update the position.
 	local mode = Program.video_mode
 	local padx = mode[1] - self.width
-	self.offset = Vector(padx / 2, Theme.width_icon_1 + Theme.text_height_1 * 2)
+	self.offset = Vector(padx / 2, Theme.width_icon_1 + Theme.text_height_1 * 2.5)
 	-- Show the widget.
 	self:reshaped()
 	self.visible = true

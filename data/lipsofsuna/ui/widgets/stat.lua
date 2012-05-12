@@ -14,7 +14,7 @@ Widgets.Uistat.new = function(clss, skill, index)
 end
 
 Widgets.Uistat.rebuild_size = function(self)
-	return Vector(300, 16)
+	return Vector(300, Theme.text_height_1)
 end
 
 Widgets.Uistat.rebuild_canvas = function(self)
@@ -24,9 +24,9 @@ Widgets.Uistat.rebuild_canvas = function(self)
 	self:canvas_image{
 		dest_position = {0,0},
 		dest_size = {w,h},
-		source_image = "widgets1",
-		source_position = {450,375},
-		source_tiling = {34,120,34,6,15,7}}
+		source_image = "widgets2",
+		source_position = {800,0},
+		source_tiling = {7,86,7,7,86,7}}
 	-- Make sure that initialized.
 	if self.value > 0 and self.cap > 0 then
 		-- Add the bar.
@@ -35,17 +35,17 @@ Widgets.Uistat.rebuild_canvas = function(self)
 			dest_clip = {0,0,v*w,h},
 			dest_position = {0,0},
 			dest_size = {w,h},
-			source_image = "widgets1",
-			source_position = {450,405},
-			source_tiling = {34,120,34,6,15,7}}
+			source_image = "widgets2",
+			source_position = (self.skill == "health") and {800,100} or {800,200},
+			source_tiling = {7,86,7,7,86,7}}
 		-- Add the label.
 		self:canvas_text{
-			dest_position = {0,2},
+			dest_position = {0,Theme.text_pad_1},
 			dest_size = {w,h},
 			text = string.format("%d / %d", self.value, self.cap),
 			text_alignment = {0.5,0.5},
-			text_color = {1,1,1,1},
-			text_font = "default"}
+			text_color = Theme.text_color_1,
+			text_font = Theme.text_font_1}
 	end
 end
 
@@ -73,7 +73,7 @@ Widgets.Uistat.update = function(self, secs)
 	if skill and self.timer > 0 then
 		local mode = Program.video_mode
 		local pad = mode[1] - self.size.x
-		self.offset = Vector(pad / 2, mode[2] - self.index * 20 - 15)
+		self.offset = Vector(pad / 2, mode[2] - self.index * Theme.text_height_1 * 1.2)
 		self.visible = true
 	else
 		self.timer = 0

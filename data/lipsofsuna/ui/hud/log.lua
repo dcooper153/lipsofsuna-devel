@@ -31,7 +31,7 @@ Widgets.Uilog.update = function(self, secs)
 	-- Update the screen offset.
 	local mode = Program.video_mode
 	if self.width ~= mode[1] or self.offset.y ~= mode[2] - 200 then
-		self.offset = Vector(5, mode[2] - 260)
+		self.offset = Vector(5, mode[2] - Theme.text_height_1 * 3 - 200)
 		self:set_request{width = mode[1], height = 200}
 		changed = true
 	end
