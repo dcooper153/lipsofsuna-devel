@@ -181,7 +181,9 @@ Actor.update_inventory = function(self, args)
 			self:request_model_rebuild()
 		end
 		if args.object.spec.effect_equip then
-			Effect:play_object(args.object.spec.effect_equip, self, node)
+			if not Operators.play:is_startup_period() then
+				Effect:play_object(args.object.spec.effect_equip, self, node)
+			end
 		end
 	elseif args.type == "inventory-unequipped" then
 		if node ~= "" then
@@ -193,7 +195,9 @@ Actor.update_inventory = function(self, args)
 			self:request_model_rebuild()
 		end
 		if args.object.spec.effect_equip then
-			Effect:play_object(args.object.spec.effect_unequip, self, node)
+			if not Operators.play:is_startup_period() then
+				Effect:play_object(args.object.spec.effect_unequip, self, node)
+			end
 		end
 	end
 end

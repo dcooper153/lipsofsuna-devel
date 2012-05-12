@@ -89,7 +89,9 @@ Protocol:add_handler{type = "UNLOCK", func = function(event)
 	for type,names in pairs(lock) do
 		for name in pairs(names) do
 			Client.data.unlocks:lock(type, name)
-			Client:append_log("Locked " .. type .. ": " .. name)
+			if not Operators.play:is_startup_period() then
+				Client:append_log("Locked " .. type .. ": " .. name)
+			end
 		end
 	end
 	-- Unlock items.
@@ -97,7 +99,9 @@ Protocol:add_handler{type = "UNLOCK", func = function(event)
 		for name in pairs(names) do
 			if not Client.data.unlocks:get(type, name) then
 				Client.data.unlocks:unlock(type, name)
-				Client:append_log("Unlocked " .. type .. ": " .. name)
+				if not Operators.play:is_startup_period() then
+					Client:append_log("Unlocked " .. type .. ": " .. name)
+				end
 			end
 		end
 	end

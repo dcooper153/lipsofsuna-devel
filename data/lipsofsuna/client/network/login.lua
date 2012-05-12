@@ -1,5 +1,6 @@
 Protocol:add_handler{type = "CHARACTER_ACCEPT", func = function(event)
 	Ui.state = "play"
+	Operators.play:reset()
 	Quickslots:reset()
 end}
 

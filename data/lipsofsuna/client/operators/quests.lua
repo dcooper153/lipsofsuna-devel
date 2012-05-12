@@ -132,28 +132,30 @@ end
 -- @param status New status.
 -- @param text Quest text.
 Operators.quests.set_quest_status = function(self, quest, status, text)
+	local t = Program.time
+	local joining = Operators.play:is_startup_period()
+	local silent = joining or (t - self.data.sound_timer < 2)
 	-- Update the status.
 	if quest.status == "inactive" and status == "active" then
-		Client:append_log("Started quest: " .. quest.spec.name)
+		if not joining then Client:append_log("Started quest: " .. quest.spec.name) end
 		quest.status = "active"
 		quest.text = text
 	elseif quest.status == "completed" and status == "active" then
-		Client:append_log("Restarted quest: " .. quest.spec.name)
+		if not joining then Client:append_log("Restarted quest: " .. quest.spec.name) end
 		quest.status = "active"
 		quest.text = text
 	elseif quest.status ~= "completed" and status == "completed" then
-		Client:append_log("Completed quest: " .. quest.spec.name)
+		if not joining then Client:append_log("Completed quest: " .. quest.spec.name) end
 		quest.status = "completed"
 		quest.text = text
 	elseif quest.text ~= text then
-		Client:append_log("Updated quest: " .. quest.spec.name)
+		if not joining then Client:append_log("Updated quest: " .. quest.spec.name) end
 		quest.text = text
 	else
 		return
 	end
 	-- Play a sound effect unless not played too recently.
-	local t = Program.time
-	if t - self.data.sound_timer > 2 then
+	if not silent then
 		Client.data.sound_timer = t
 		Effect:play("quest1")
 	end
