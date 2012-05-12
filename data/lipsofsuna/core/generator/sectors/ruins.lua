@@ -1,20 +1,21 @@
-require "server/generator"
+Generator.sector_types.Ruins = Class()
+Generator.sector_types.Ruins.class_name = "Generator.Ruins"
 
-Generator.Ruins = Class()
-Generator.Ruins.class_name = "Generator.Ruins"
-Generator.Ruins.scale1 = Vector(0.3,0.3,0.3)
-Generator.Ruins.scale2 = Vector(0.15,0.3,0.15)
-Generator.Ruins.pats = Patternspec:find{category = "ruins"}
-Generator.Ruins.mats = {
-	Material:find{name = "ferrostone1"},
-	Material:find{name = "sand1"},
-	Material:find{name = "soil1"}}
+Generator.sector_types.Ruins.init = function(self)
+	self.scale1 = Vector(0.3,0.3,0.3)
+	self.scale2 = Vector(0.15,0.3,0.15)
+	self.pats = Patternspec:find{category = "ruins"}
+	self.mats = {
+		Material:find{name = "ferrostone1"},
+		Material:find{name = "sand1"},
+		Material:find{name = "soil1"}}
+end
 
 --- Generates a ruins area.
 -- @param self Ruins generator.
 -- @param pos Offset of the generated area.
 -- @param size Size of the generated area.
-Generator.Ruins.generate = function(self, pos, size)
+Generator.sector_types.Ruins.generate = function(self, pos, size)
 	-- Create granite.
 	local m1 = Material:find{name = "granite1"}
 	Voxel:fill_region{point = pos, size = size, tile = m1.id}

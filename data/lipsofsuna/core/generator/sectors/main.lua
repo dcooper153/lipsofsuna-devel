@@ -1,27 +1,19 @@
-require "server/generator"
-require "server/generator/border"
-require "server/generator/dungeon"
-require "server/generator/forest"
-require "server/generator/ocean"
-require "server/generator/overworld"
-require "server/generator/road"
-require "server/generator/ruins"
-require "server/generator/town"
-require "server/generator/volcano"
+Generator.sector_types.Main = Class()
+Generator.sector_types.Main.class_name = "Generator.Main"
 
-Generator.Main = Class()
-Generator.Main.class_name = "Generator.Main"
-Generator.Main.scale1 = Vector(1,1,1) * (0.01 * Voxel.tile_scale)
+Generator.sector_types.Main.init = function(self)
+	self.scale1 = Vector(1,1,1) * (0.01 * Voxel.tile_scale)
+end
 
 --- Generates a sector of a suitable type.
 -- @param self Main generator.
 -- @param sector Sector index.
-Generator.Main.generate = function(self, sector)
+Generator.sector_types.Main.generate = function(self, sector)
 	local w = Voxel.tiles_per_line
 	local size = Vector(w,w,w)
-	local pos = Generator.inst.inst:get_sector_offset(sector)
+	local pos = Generator.inst:get_sector_offset(sector)
 	local t = self:get_sector(pos, size)
-	local g = Generator[t]
+	local g = Generator.sector_types[t]
 	if not g then
 		Voxel:fill_region{point = pos, size = size, tile = 0}
 	else
@@ -29,7 +21,7 @@ Generator.Main.generate = function(self, sector)
 	end
 end
 
-Generator.Main.get_cluster = function(self, pos, size)
+Generator.sector_types.Main.get_cluster = function(self, pos, size)
 	local s = Voxel.tiles_per_line
 	local a = {}
 	for x = -1,1 do
@@ -44,7 +36,7 @@ Generator.Main.get_cluster = function(self, pos, size)
 	return a
 end
 
-Generator.Main.get_sector = function(self, pos, size)
+Generator.sector_types.Main.get_sector = function(self, pos, size)
 	if pos.y > 1200 and pos.y < 1300 then return "Overworld" end
 	if pos.y > 1100 then return "Empty" end
 	-- Predefined sectors.

@@ -1,14 +1,15 @@
-require "server/generator"
+Generator.sector_types.Overworld = Class()
+Generator.sector_types.Overworld.class_name = "Generator.Overworld"
 
-Generator.Overworld = Class()
-Generator.Overworld.class_name = "Generator.Overworld"
-Generator.Overworld.scale1 = Vector(0.2,0.2,0.2)
+Generator.sector_types.Overworld.init = function(self)
+	self.scale1 = Vector(0.2,0.2,0.2)
+end
 
 --- Generates an overworld area.
 -- @param self Overworld generator.
 -- @param pos Offset of the generated area.
 -- @param size Size of the generated area.
-Generator.Overworld.generate = function(self, pos, size)
+Generator.sector_types.Overworld.generate = function(self, pos, size)
 	-- Generate random rocks.
 	local m1 = Material:find{name = "granite1"}
 	local p1 = Vector()

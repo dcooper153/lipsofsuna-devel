@@ -20,6 +20,25 @@ Itemspec{
 	water_gravity = Vector(0,6,0)}
 
 Itemspec{
+	name = "treasure chest",
+	model = "chest1",
+	icon = "chest1",
+	mass = 30,
+	animations = {["loot"] = "chest loot", ["looted"] = "chest looted"},
+	categories = {["container"] = true},
+	crafting_materials = {["iron ingot"] = 10},
+	effect_craft = "craftwood1",
+	important = true,
+	inventory_size = 8,
+	inventory_type = "chest",
+	loot_categories = {"armor", "shield", "weapon"},
+	loot_count_min = 8,
+	loot_count_max = 8,
+	stacking = false,
+	usages = {["loot"] = true},
+	water_gravity = Vector(0,6,0)}
+
+Itemspec{
 	name = "weapons",
 	model = "chest1",
 	icon = "chest1",

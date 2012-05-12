@@ -1,19 +1,20 @@
-require "server/generator"
+Generator.sector_types.Road = Class()
+Generator.sector_types.Road.class_name = "Generator.Road"
 
-Generator.Road = Class()
-Generator.Road.class_name = "Generator.Road"
-Generator.Road.scale1 = Vector(0.3,0.3,0.3)
-Generator.Road.scale2 = Vector(0.15,0.3,0.15)
-Generator.Road.mats = {
-	Material:find{name = "soil1"},
-	Material:find{name = "grass1"},
-	Material:find{name = "sand1"}}
+Generator.sector_types.Road.init = function(self)
+	self.scale1 = Vector(0.3,0.3,0.3)
+	self.scale2 = Vector(0.15,0.3,0.15)
+	self.mats = {
+		Material:find{name = "soil1"},
+		Material:find{name = "grass1"},
+		Material:find{name = "sand1"}}
+end
 
 --- Generates a town sector.
 -- @param self Town generator.
 -- @param pos Offset of the generated area.
 -- @param size Size of the generated area.
-Generator.Road.generate = function(self, pos, size)
+Generator.sector_types.Road.generate = function(self, pos, size)
 	-- Create granite.
 	local m1 = Material:find{name = "granite1"}
 	Voxel:fill_region{point = pos, size = size, tile = m1.id}

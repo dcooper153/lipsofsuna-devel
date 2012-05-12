@@ -1,4 +1,4 @@
-require "server/region"
+require(Mod.path .. "region")
 
 Generator = Class()
 Generator.class_name = "Generator"
@@ -12,15 +12,22 @@ Generator.layer_size = Generator.map_size.y / Generator.layer_count
 Generator.bin_size = 6
 Generator.bin_stride = 512
 Generator.bin_stride2 = 512*512
+Generator.sector_types = {}
 
 --- Creates a new map generator.
 -- @param clss Generator class.
 -- @return Generator.
 Generator.new = function(clss)
 	local self = Class.new(Generator)
+	-- Initialize random seeds.
 	self.seed1 = math.random(10000, 60000)
 	self.seed2 = math.random(10000, 60000)
 	self.seed3 = math.random(10000, 60000)
+	-- Initialize sector generators.
+	for k,v in pairs(self.sector_types) do
+		v:init()
+	end
+	-- Reset the status.
 	self:reset()
 	return self
 end
@@ -131,18 +138,19 @@ Generator.generate = function(self, args)
 	end
 	-- Find used sectors.
 	self:update_status(0, "Counting sectors")
-	self.sectors = {}
 	local sectorn = 0
 	local sectors = Program.sectors
 	for k in pairs(sectors) do
-		self.sectors[k] = "Town"
+		if not self.sectors[k] then
+			self.sectors[k] = "Town"
+		end
 		sectorn = sectorn + 1
 	end
 	-- Create fractal terrain.
 	self:update_status(0, "Randomizing terrain")
 	local index = 0
 	for k in pairs(sectors) do
-		Generator.Main:generate(k)
+		self:generate_sector(k)
 		self:update_status(index / sectorn)
 		index = index + 1
 	end
@@ -245,12 +253,23 @@ Generator.generate_dungeon = function(self, pattern)
 	if not self:validate_pattern_position(pattern, point1, true) then return end
 	if not point1 then return end
 	-- Place the underground pattern.
-	local point2 = Vector(point1.x, 800, point1.z)
+	local point2 = Vector(point1.x, 807, point1.z)
 	if not self:validate_pattern_position(pattern2, point2) then return end
 	-- Generate the patterns.
 	self:create_region(pattern, point1)
 	self:create_region(pattern2, point2)
-	-- TODO: Choose dungeon type by setting underground sector types.
+	-- TODO: Choose the dungeon type.
+	local dungeon = "Labyrinth"
+	local dungeon_boss = dungeon .. "Boss"
+	-- Mark sectors surrounding the exit.
+	-- TODO: Size management.
+	local offset = self:get_sector_offset_by_tile(point2)
+	for z = -3,1 do
+		for x = -2,2 do
+			self:set_sector_type_by_offset(offset + Vector(x,-1,z), dungeon)
+		end
+	end
+	self:set_sector_type_by_offset(offset + Vector(0,-1,-2), dungeon_boss)
 	return true
 end
 
@@ -331,6 +350,10 @@ Generator.generate_resources = function(self, pos, size, amount)
 			create_plant_or_item(p)
 		end
 	end
+end
+
+Generator.generate_sector = function(self, id)
+	self.sector_types.Main:generate(id)
 end
 
 --- Gets the ID of the sector.
@@ -579,5 +602,46 @@ Generator.validate_rect = function(self, pos, size, overworld)
 end
 
 ------------------------------------------------------------------------------
+-- TODO: Move to utils
 
-Generator.inst = Generator()
+Generator.get_sector_id_by_offset = function(self, offset)
+	local w = 128
+	local s = offset:floor()
+	return s.x + s.y * w + s.z * w^2
+end
+
+Generator.get_sector_id_by_point = function(self, point)
+	return self:get_sector_id_by_offset(point * Voxel.tile_scale * (1 / Voxel.tiles_per_line))
+end
+
+Generator.get_sector_id_by_tile = function(self, tile)
+	return self:get_sector_id_by_offset(tile * (1 / Voxel.tiles_per_line))
+end
+
+Generator.get_sector_offset_by_id = function(self, id)
+	local w = 128
+	local sx = id % w
+	local sy = math.floor(id / w) % w
+	local sz = math.floor(id / w / w) % w
+	return Vector(sx, sy, sz)
+end
+
+Generator.get_sector_offset_by_point = function(self, tile)
+	return (tile * Voxel.tile_scale * (1 / Voxel.tiles_per_line)):round()
+end
+
+Generator.get_sector_offset_by_tile = function(self, tile)
+	return (tile * (1 / Voxel.tiles_per_line)):round()
+end
+
+Generator.get_sector_tile_by_id = function(self, id)
+	return self:get_sector_offset_by_id(id) * Voxel.tiles_per_line
+end
+
+Generator.set_sector_type_by_id = function(self, id, type)
+	self.sectors[id] = type
+end
+
+Generator.set_sector_type_by_offset = function(self, offset, type)
+	self:set_sector_type_by_id(self:get_sector_id_by_offset(offset), type)
+end

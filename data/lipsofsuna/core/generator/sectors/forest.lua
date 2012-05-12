@@ -1,19 +1,20 @@
-require "server/generator"
+Generator.sector_types.Forest = Class()
+Generator.sector_types.Forest.class_name = "Generator.Forest"
 
-Generator.Forest = Class()
-Generator.Forest.class_name = "Generator.Forest"
-Generator.Forest.scale1 = Vector(0.1,0.5,0.1)
-Generator.Forest.scale2 = Vector(0.2,0.2,0.2)
-Generator.Forest.mats = {
-	Material:find{name = "granite1"},
-	Material:find{name = "soil1"},
-	Material:find{name = "grass1"}}
+Generator.sector_types.Forest.init = function(self)
+	self.scale1 = Vector(0.1,0.5,0.1)
+	self.scale2 = Vector(0.2,0.2,0.2)
+	self.mats = {
+		Material:find{name = "granite1"},
+		Material:find{name = "soil1"},
+		Material:find{name = "grass1"}}
+end
 
 --- Generates a forest area.
 -- @param self Forest generator.
 -- @param pos Offset of the generated area.
 -- @param size Size of the generated area.
-Generator.Forest.generate = function(self, pos, size)
+Generator.sector_types.Forest.generate = function(self, pos, size)
 	-- Create terrain.
 	Voxel:fill_region{point = pos, size = size, tile = 0}
 	Noise:perlin_terrain(pos, pos + size, self.mats[1].id, 0.15, self.scale1, 4, 4, 0.1, Generator.inst.seed1)

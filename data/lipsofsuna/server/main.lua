@@ -27,8 +27,6 @@ end
 for k,v in pairs(File:scan_directory("server/influences")) do
 	require("server/influences/" .. string.gsub(v, "([^.]*).*", "%1"))
 end
-require "server/generator"
-require "server/generator/main"
 
 Physics.GROUP_ACTORS = 0x0001
 Physics.GROUP_ITEMS = 0x0002
@@ -46,6 +44,7 @@ Network:host{port = Config.inst.server_port}
 Program:push_message{name = "join"}
 
 -- Initialize the dynamic map.
+Generator.inst = Generator()
 if Settings.generate or Serialize:get_value("map_version") ~= Generator.map_version then
 	Generator.inst:generate()
 	Serialize:set_value("data_version", Serialize.data_version)

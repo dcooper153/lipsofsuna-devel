@@ -1,19 +1,20 @@
-require "server/generator"
+Generator.sector_types.Dungeon = Class()
+Generator.sector_types.Dungeon.class_name = "Generator.Dungeon"
 
-Generator.Dungeon = Class()
-Generator.Dungeon.class_name = "Generator.Dungeon"
-Generator.Dungeon.scale1 = Vector(0.6,0.6,0.6)
-Generator.Dungeon.scale2 = Vector(0.3,0.6,0.3)
-Generator.Dungeon.mats = {
-	Material:find{name = "ferrostone1"},
-	Material:find{name = "sand1"},
-	Material:find{name = "soil1"}}
+Generator.sector_types.Dungeon.init = function(self)
+	self.scale1 = Vector(0.6,0.6,0.6)
+	self.scale2 = Vector(0.3,0.6,0.3)
+	self.mats = {
+		Material:find{name = "ferrostone1"},
+		Material:find{name = "sand1"},
+		Material:find{name = "soil1"}}
+end
 
 --- Generates a dungeon area.
 -- @param self Dungeon generator.
 -- @param pos Offset of the generated area.
 -- @param size Size of the generated area.
-Generator.Dungeon.generate = function(self, pos, size)
+Generator.sector_types.Dungeon.generate = function(self, pos, size)
 	-- Create granite.
 	local m1 = Material:find{name = "granite1"}
 	Voxel:fill_region{point = pos, size = size, tile = m1.id}
