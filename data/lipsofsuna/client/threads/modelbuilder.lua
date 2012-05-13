@@ -8,9 +8,7 @@ require "system/model-editing"
 require "common/mod"
 require "mods"
 
--- Character meshes are kept in memory to ensure fast builds.
--- TODO: Could also cache morphed models for a short period.
-Model.dict_name = {}
+-- TODO: Cache models if enough memory available.
 
 local build = function(args)
 	local actor = Actorspec:find{name = args.actor}
@@ -126,4 +124,7 @@ while not Program.quit do
 	local mdl = args and build(args)
 	-- Return the model.
 	Program:push_message{name = msg.name, model = mdl}
+	msg = nil
+	mdl = nil
+	collectgarbage()
 end

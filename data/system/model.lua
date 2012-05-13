@@ -34,8 +34,10 @@ end
 -- @param self Model.
 -- @return New model.
 Model.copy = function(self)
-	local handle = Los.model_copy(self.handle)
-	return Class.new(Model, {handle = handle})
+	local copy = Class.new(Model)
+	copy.handle = Los.model_copy(self.handle)
+	__userdata_lookup[copy.handle] = copy
+	return copy
 end
 
 --- Recalculates the bounding box of the model.
