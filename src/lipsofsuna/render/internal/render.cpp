@@ -894,9 +894,16 @@ static void private_load_plugin (
 	{
 		self->data->root->loadPlugin (path + name);
 	}
-	catch (...)
+	catch (Ogre::InternalErrorException e)
 	{
-		self->data->root->loadPlugin (path + name + Ogre::String("_d"));
+		try
+		{
+			self->data->root->loadPlugin (path + name + Ogre::String("_d"));
+		}
+		catch (...)
+		{
+			throw e;
+		}
 	}
 }
 
