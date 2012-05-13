@@ -24,6 +24,7 @@
 
 #include "ext-module.h"
 #include "ext-block.h"
+#include "ext-build-task.h"
 
 static int private_block_free (
 	LIExtModule*      self,
@@ -205,35 +206,13 @@ static int private_block_load (
 	LIExtModule*      self,
 	LIVoxUpdateEvent* event)
 {
-	int blockw;
-	LIVoxManager* manager;
 	LIExtBuildTask* ptr;
 	LIExtBuildTask* task;
 
 	/* Allocate a new task. */
-	task = lisys_calloc (1, sizeof (LIExtBuildTask));
+	task = liext_tiles_build_task_new (self, event);
 	if (task == NULL)
 		return 1;
-	task->addr.sector[0] = event->sector[0];
-	task->addr.sector[1] = event->sector[1];
-	task->addr.sector[2] = event->sector[2];
-	task->addr.block[0] = event->block[0];
-	task->addr.block[1] = event->block[1];
-	task->addr.block[2] = event->block[2];
-	manager = self->voxels;
-	blockw = manager->tiles_per_line / manager->blocks_per_line;
-
-	/* Initialize a new terrain builder. */
-	task->builder = livox_builder_new (self->voxels,
-		manager->tiles_per_line * event->sector[0] + blockw * event->block[0],
-		manager->tiles_per_line * event->sector[1] + blockw * event->block[1],
-		manager->tiles_per_line * event->sector[2] + blockw * event->block[2],
-		blockw, blockw, blockw);
-	if (task->builder == NULL)
-	{
-		lisys_free (task);
-		return 1;
-	}
 
 	/* Add the task to the pending queue. */
 	lisys_mutex_lock (self->tasks.mutex);
@@ -321,7 +300,7 @@ static void private_remove_redundant_tasks (
 		task1_next = task1->next;
 		for (task2 = task1->next ; task2 != NULL ; task2 = task2->next)
 		{
-			if (!memcmp (&task1->addr, &task2->addr, sizeof (LIVoxBlockAddr)))
+			if (liext_tiles_build_task_compare (task1, task2))
 				break;
 		}
 		if (task2 == NULL)
@@ -337,11 +316,7 @@ static void private_remove_redundant_tasks (
 			task1_prev->next = task1->next;
 
 		/* Free. */
-		if (task1->builder != NULL)
-			livox_builder_free (task1->builder);
-		if (task1->model != NULL)
-			limdl_model_free (task1->model);
-		lisys_free (task1);
+		liext_tiles_build_task_free (task1);
 	}
 }
 
@@ -369,9 +344,7 @@ static int private_tick (
 	{
 		task_next = task->next;
 		private_process_result (self, task);
-		if (task->model != NULL)
-			limdl_model_free (task->model);
-		lisys_free (task);
+		liext_tiles_build_task_free (task);
 	}
 	self->tasks.completed = task;
 	if (self->tasks.worker == NULL && self->tasks.pending != NULL)
@@ -424,27 +397,24 @@ static void private_worker_thread (
 		if (task == NULL)
 			break;
 		self->tasks.pending = task->next;
+		task->next = NULL;
 		lisys_mutex_unlock (self->tasks.mutex);
 
 		/* Process the task. */
-		livox_builder_preprocess (task->builder);
-		if (!livox_builder_build_model (task->builder, &task->offset, &task->model))
+		if (!liext_tiles_build_task_process (task))
 		{
-			livox_builder_free (task->builder);
+			liext_tiles_build_task_free (task);
 			lisys_mutex_lock (self->tasks.mutex);
 			continue;
 		}
-		livox_builder_free (task->builder);
-		task->builder = NULL;
-		task->next = NULL;
 
 		/* Publish the result. */
 		lisys_mutex_lock (self->tasks.mutex);
-		private_remove_redundant_tasks (&self->tasks.completed);
 		if (self->tasks.completed != NULL)
 		{
 			for (ptr = self->tasks.completed ; ptr->next != NULL ; ptr = ptr->next) {}
 			ptr->next = task;
+			private_remove_redundant_tasks (&self->tasks.completed);
 		}
 		else
 			self->tasks.completed = task;

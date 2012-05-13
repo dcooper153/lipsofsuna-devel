@@ -15,8 +15,8 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __EXT_TILES_RENDER_MODULE_H__
+#define __EXT_TILES_RENDER_MODULE_H__
 
 #include "lipsofsuna/extension.h"
 #include "lipsofsuna/render.h"
@@ -27,15 +27,6 @@ typedef struct _LIExtBuildTask LIExtBuildTask;
 typedef struct _LIExtModule LIExtModule;
 
 #define LIEXT_SCRIPT_TILES_RENDER "TilesRender"
-
-struct _LIExtBuildTask
-{
-	LIVoxBlockAddr addr;
-	LIVoxBuilder* builder;
-	LIMatVector offset;
-	LIMdlModel* model;
-	LIExtBuildTask* next;
-};
 
 struct _LIExtModule
 {

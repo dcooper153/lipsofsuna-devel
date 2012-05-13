@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2011 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,27 +15,32 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_TILES_RENDER_BLOCK_H__
-#define __EXT_TILES_RENDER_BLOCK_H__
+#ifndef __EXT_TILES_RENDER_BUILD_TASK_H__
+#define __EXT_TILES_RENDER_BUILD_TASK_H__
 
 #include "ext-module.h"
 
-struct _LIExtBlock
+struct _LIExtBuildTask
 {
-	LIExtModule* module;
-	int model;
-	int model_next;
-	int object;
-	int object_next;
+	LIVoxBlockAddr addr;
+	LIVoxBuilder* builder;
+	LIMatVector offset;
+	LIMdlModel* model;
+	LIExtBuildTask* next;
 };
 
-LIExtBlock* liext_tiles_render_block_new (
-	LIExtModule* module);
+LIAPICALL (LIExtBuildTask*, liext_tiles_build_task_new, (
+	LIExtModule*      module,
+	LIVoxUpdateEvent* event));
 
-void liext_tiles_render_block_free (
-	LIExtBlock* self);
+LIAPICALL (void, liext_tiles_build_task_free, (
+	LIExtBuildTask* self));
 
-void liext_tiles_render_block_clear (
-	LIExtBlock* self);
+LIAPICALL (int, liext_tiles_build_task_compare, (
+	LIExtBuildTask* self,
+	LIExtBuildTask* task));
+
+LIAPICALL (int, liext_tiles_build_task_process, (
+	LIExtBuildTask* self));
 
 #endif
