@@ -65,14 +65,22 @@ end
 -- @param args Arguments.
 Generator.generate = function(self, args)
 	local place_regions = function()
-		local special = Patternspec:find{category = "init"}
+		-- Get the list of patterns.
+		-- The list is sorted so that regions with strictest constraints are
+		-- placed first. This reduces the risk of running into a dead end.
+		local special = {}
+		for k,v in pairs(Patternspec:find{category = "init"}) do
+			table.insert(special, v)
+		end
+		table.sort(special, function(a,b) return a.position_random.length < b.position_random.length end)
+		-- Generate regions for the patterns.
 		while true do
 			local placed = 0
 			local skipped = 0
 			-- Try to place one or more regions.
 			-- Regions are often placed relative to each other so we need to
 			-- add them iteratively in the other of least dependencies.
-			for name,pat in pairs(special) do
+			for k,pat in pairs(special) do
 				if not self.regions_dict_name[pat.name] then
 					if not self:place_region(pat) then
 						skipped = skipped + 1
@@ -507,7 +515,7 @@ Generator.place_region = function(self, pat)
 		local success
 		for retry=1,50 do
 			pos.x = math.random(dist[2], dist[3])
-			pos.y = math.random(pat.position.y - var, pat.position.y + var)
+			pos.y = pat.position.y + math.random(-var, var)
 			pos.z = math.random(dist[2], dist[3])
 			if math.random(0, 1) == 1 then pos.x = -pos.x end
 			if math.random(0, 1) == 1 then pos.z = -pos.z end
@@ -519,9 +527,19 @@ Generator.place_region = function(self, pat)
 		end
 		if not success then return end
 	else
-		pos.x = rel.x
-		pos.y = math.random(pat.position.y - var, pat.position.y + var)
-		pos.z = rel.z
+		local success
+		local varx = pat.position_random.x
+		local varz = pat.position_random.z
+		for retry=1,50 do
+			pos.x = rel.x + math.random(-varx, varx)
+			pos.y = pat.position.y + math.random(-var, var)
+			pos.z = rel.z + math.random(-varz, varz)
+			if self:validate_pattern_position(pat, pos, pat.overworld) then
+				success = true
+				break
+			end
+		end
+		if not success then return end
 	end
 	-- Create the region.
 	return self:create_region(pat, pos)

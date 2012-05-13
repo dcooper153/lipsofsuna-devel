@@ -4,6 +4,7 @@ Patternspec{
 	position = Vector(855,1278,830),
 	spawn_point = Vector(5,5,5),
 	categories = {["init"] = true},
+	overworld = true,
 	obstacles = {
 		{-7.230000,0.970000,22.390000,"rust sprig tree"},
 		{-5.170000,1.540000,9.970000,"rust sprig tree"},

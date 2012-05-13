@@ -14,6 +14,7 @@ Patternspec.introspect = Introspect{
 		{name = "distance_pattern", type = "string", decription = "Position reference pattern.", details = {spec = "Patternspec"}},
 		{name = "distance_min", type = "number", default = 11, decription = "Minimum distance to the reference pattern."},
 		{name = "distance_max", type = "number", default = 51, decription = "Maximum distance to the reference pattern."},
+		{name = "overworld", type = "boolean", default = false, decription = "True to allow generation in the overworld."},
 		{name = "position", type = "vector", default = Vector(700,700,700), decription = "World map position, in tiles."},
 		{name = "position_random", type = "vector", default = Vector(), decription = "Position randomization, in tiles."},
 		{name = "spawn_point", type = "vector", decription = "Spawn point position, in tiles."},
