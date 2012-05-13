@@ -6,20 +6,6 @@ Questspec{
 Questspec{
 	name = "Roots of World"}
 
-Obstaclespec{
-	name = "chara's portal",
-	model = "portal1",
-	categories = {["portal"] = true, ["special"] = true},
-	dialog = "chara's portal",
-	marker = "chara's portal"}
-
-Actorspec{
-	name = "Chara",
-	base = "seirei",
-	dialog = "chara",
-	important = true,
-	marker = "chara"}
-
 require(Mod.path .. "chara")
 require(Mod.path .. "charasportal")
 require(Mod.path .. "portalofillusion")

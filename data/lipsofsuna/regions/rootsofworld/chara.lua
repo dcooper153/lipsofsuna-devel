@@ -1,3 +1,10 @@
+Actorspec{
+	name = "Chara",
+	base = "seirei",
+	dialog = "chara",
+	important = true,
+	marker = "chara"}
+
 Dialogspec{name = "chara", commands = {
 	{"branch", cond = "chara known",
 		{"say", "Chara", "Well, well, it's one of you low-lifes again."}},
