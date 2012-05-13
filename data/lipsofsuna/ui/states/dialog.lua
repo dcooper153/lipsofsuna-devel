@@ -14,10 +14,7 @@ Ui:add_state{
 			end
 		else
 			-- Show a dialog line.
-			if dlg.character ~= "" then
-				table.insert(widgets, Widgets.Uidialogtext(o.id, 1, dlg.character))
-			end
-			table.insert(widgets, Widgets.Uidialogtext(o.id, 1, dlg.message))
+			table.insert(widgets, Widgets.Uidialogtext(o.id, 1, dlg.character, dlg.message))
 		end
 		return widgets
 	end}
