@@ -293,10 +293,10 @@ Player.vision_cb = function(self, args)
 					table.insert(p, "string")
 					table.insert(p, v)
 				end
-				self:send{packet = Packet(packets.OBJECT_DIALOG_CHOICE, "uint32", o.id, "uint8", #args.choices, unpack(p))}
+				self:send{packet = Packet(packets.OBJECT_DIALOG_CHOICE, "uint32", o.id, "bool", o.dialog.user == self, "uint8", #args.choices, unpack(p))}
 			elseif args.message then
 				-- Message.
-				self:send{packet = Packet(packets.OBJECT_DIALOG_MESSAGE, "uint32", o.id, "string", args.character or "", "string", args.message)}
+				self:send{packet = Packet(packets.OBJECT_DIALOG_MESSAGE, "uint32", o.id, "bool", o.dialog.user == self, "string", args.character or "", "string", args.message)}
 			else
 				-- None.
 				self:send{packet = Packet(packets.OBJECT_DIALOG_NONE, "uint32", o.id)}

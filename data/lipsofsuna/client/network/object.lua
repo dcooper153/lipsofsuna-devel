@@ -40,7 +40,7 @@ end}
 
 Protocol:add_handler{type = "OBJECT_DIALOG_CHOICE", func = function(args)
 	-- Parse the packet.
-	local ok,i,n = args.packet:read("uint32", "uint8")
+	local ok,id,init,n = args.packet:read("uint32", "bool", "uint8")
 	if not ok then return end
 	local choices = {}
 	for i = 1,n do
@@ -49,21 +49,29 @@ Protocol:add_handler{type = "OBJECT_DIALOG_CHOICE", func = function(args)
 		table.insert(choices, m)
 	end
 	-- Find the object.
-	local obj = Object:find{id = i}
+	local obj = Object:find{id = id}
 	if not obj then return end
 	-- Update the dialog.
 	obj:set_dialog("choice", choices)
+	if init and (Ui.state == "play" or Ui.state == "world/object") then
+		Client.active_dialog_object = obj
+		Ui.state = "dialog"
+	end
 end}
 
 Protocol:add_handler{type = "OBJECT_DIALOG_MESSAGE", func = function(args)
 	-- Parse the packet.
-	local ok,i,c,m = args.packet:read("uint32", "string", "string")
+	local ok,id,init,c,m = args.packet:read("uint32", "bool", "string", "string")
 	if not ok then return end
 	-- Find the object.
-	local obj = Object:find{id = i}
+	local obj = Object:find{id = id}
 	if not obj then return end
 	-- Update the dialog.
 	obj:set_dialog("message", {character = c, message = m})
+	if init and (Ui.state == "play" or Ui.state == "world/object") then
+		Client.active_dialog_object = obj
+		Ui.state = "dialog"
+	end
 end}
 
 Protocol:add_handler{type = "OBJECT_DIALOG_NONE", func = function(args)

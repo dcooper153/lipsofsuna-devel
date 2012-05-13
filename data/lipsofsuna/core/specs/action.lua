@@ -11,7 +11,6 @@ Actionspec.introspect = Introspect{
 	fields = {
 		{name = "name", type = "string", description = "Name of the spec."},
 		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "dialog", type = "boolean", description = "True to make the client show the dialog of the object."},
 		{name = "func", type = "ignore"},
 		{name = "label", type = "string", description = "Human readable name of the action."}
 	}}

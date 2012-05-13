@@ -73,11 +73,5 @@ Operators.world.use_object = function(self, object, action)
 	Network:send{packet = Packet(packets.PLAYER_USE_WORLD,
 		"uint32", object.id,
 		"string", action.name)}
-	-- Open the dialog screen if appropriate.
-	if action.dialog then
-		Client.active_dialog_object = object
-		Ui.state = "dialog"
-	else
-		Ui:pop_state()
-	end
+	Ui:pop_state()
 end

@@ -364,8 +364,8 @@ Dialog.execute = function(self)
 			until not cmd or cmd[1] ~= "choice"
 			-- Break until answered.
 			self.choices = cmds
-			self.user = nil
 			self:emit_event{type = "object-dialog", object = self.object, choices = choices}
+			self.user = nil
 			return true
 		end,
 		["default death check"] = function(vm, c)
@@ -419,8 +419,8 @@ Dialog.execute = function(self)
 		info = function(vm, c)
 			-- Break until answered.
 			self.choices = "info"
-			self.user = nil
 			self:emit_event{type = "object-dialog", object = self.object, message = string.format("(%s)", c[2])}
+			self.user = nil
 			return true
 		end,
 		loop = function(vm, c)
@@ -474,8 +474,8 @@ Dialog.execute = function(self)
 		say = function(vm, c)
 			-- Publish the line.
 			self.choices = "line"
-			self.user = nil
 			self:emit_event{type = "object-dialog", object = self.object, character = c[2], message = c[3]}
+			self.user = nil
 			return true
 		end,
 		["spawn object"] = function(vm, c)

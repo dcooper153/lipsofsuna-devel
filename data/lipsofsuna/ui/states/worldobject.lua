@@ -19,9 +19,10 @@ Ui:add_state{
 					table.insert(widgets, Widgets.Uibutton(v[2], function()
 						if not object.dialog then
 							Network:send{packet = Packet(packets.PLAYER_DIALOG, "uint32", object.id)}
+						else
+							Client.active_dialog_object = object
+							Ui.state = "dialog"
 						end
-						Client.active_dialog_object = object
-						Ui.state = "dialog"
 					end))
 				elseif v[1] == "loot" then
 					table.insert(widgets, Widgets.Uibutton(v[2], function()

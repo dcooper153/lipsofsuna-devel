@@ -4,7 +4,6 @@ Actionspec{
 
 Actionspec{
 	name = "examine",
-	dialog = true,
 	label = "Examine"}
 
 Actionspec{
