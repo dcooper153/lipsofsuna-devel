@@ -5,7 +5,9 @@ Protocol:add_handler{type = "MARKER_ADD", func = function(event)
 	local m = Marker:find{name = n}
 	if not m then
 		m = Marker{name = n}
-		Client:append_log("Location added: " .. n)
+		if not Operators.play:is_startup_period() then
+			Client:append_log("Location added: " .. n)
+		end
 	end
 	m.position = Vector(x,y,z)
 end}
