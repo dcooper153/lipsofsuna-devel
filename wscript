@@ -23,6 +23,7 @@ def options(ctx):
 	ctx.add_option('--optimize', action='store', default=False, help='compile with heavy optimizations [default: false]')
 	ctx.add_option('--luajit', action='store', default=True, help='compile with LuaJIT if possible [default: true]')
 	ctx.add_option('--memdebug', action='store', default=False, help='compile with expensive memory debugging [default: false]')
+	ctx.add_option('--ogre-plugindir', action='store', default=False, help='override the default Ogre plugin directory')
 
 def configure(ctx):
 
@@ -128,12 +129,17 @@ def configure(ctx):
 	# When doing the fallback check_cxx tests, some kind of a bug seems to occur with MinGW 4.6
 	# as the linker won't output anything if the main function calls no function.
 	if ctx.check_cfg(package='OGRE', atleast_version='1.7.0', args='--cflags --libs', mandatory=False):
-		ctx.check_cfg(package='OGRE', msg='Checking for OGRE plugindir', variables='plugindir', mandatory=False)
+		if Options.options.ogre_plugindir:
+			ctx.env.OGRE_plugindir = Options.options.ogre_plugindir
+		else:
+			ctx.check_cfg(package='OGRE', msg='Checking for OGRE plugindir', variables='plugindir', mandatory=False)
 	else:
 		ctx.check_cxx(header_name='Ogre.h', mandatory=True, uselib='CORE TEST', uselib_store='OGRE', fragment='''
 			#include <stdio.h>
 			int main() { printf(""); return 0; }''')
 		ctx.check_cxx(lib='OgreMain', mandatory=True, uselib='CORE TEST', uselib_store='OGRE')
+		if Options.options.ogre_plugindir:
+			ctx.env.OGRE_plugindir = Options.options.ogreplugindir
 	if not ctx.check_cfg(package='OGRE-Terrain', atleast_version='1.7.0', args='--cflags --libs', mandatory=False, uselib_store='OGRE'):
 		ctx.check_cxx(header_name='Terrain/OgreTerrain.h', mandatory=True, uselib='CORE TEST', uselib_store='OGRE', fragment='''
 			#include <stdio.h>
