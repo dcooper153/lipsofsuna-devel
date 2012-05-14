@@ -34,27 +34,57 @@ vec3 los_blinn_phong(in vec3 lv, in vec3 ev, in vec3 ld, in vec4 eq, in vec3 nor
 	float spec = pow(max(0.0, ndh), shininess);
 	return vec3(diff, spec, 1.0 / attinv);
 }
-vec2 los_cel_shading(in vec3 l, in vec4 p, in sampler1D t1, in sampler1D t2)
+vec3 los_hsv_to_rgb(vec3 hsv)
 {
-	float celd = texture1D(t1, p.x * l.z * (1.0 + 0.5 * l.x)).x;
-	float cels = texture1D(t2, p.y * l.z * l.y).x;
-	float diff = mix(l.z * l.x, celd, p.z);
-	float spec = mix(l.z * l.y, cels, p.w);
-	return vec2(diff, spec);
+	float c = hsv.b * hsv.g;
+	float l = hsv.b - c;
+	float hh = hsv.r * 6.0;
+	float x = c * (1.0 - abs(mod(hh, 2.0) - 1.0));
+	if(0.0 <= hh && hh < 1.0) return vec3(c + l, x + l, l);
+	if(1.0 <= hh && hh < 2.0) return vec3(x + l, c + l, l);
+	if(2.0 <= hh && hh < 3.0) return vec3(l, c + l, x + l);
+	if(3.0 <= hh && hh < 4.0) return vec3(l, x + l, c + l);
+	if(4.0 <= hh && hh < 5.0) return vec3(x + l, l, c + l);
+	return vec3(c + l, l, x + l);
+}
+vec3 los_rgb_to_hsv(vec3 rgb)
+{
+	float v = max(max(rgb.r, rgb.g), rgb.b);
+	float m = min(min(rgb.r, rgb.g), rgb.b);
+	float c = v - m;
+	float h;
+	if(c < 0.00001) h = 0.0;
+	else if(v == rgb.r) h = (mod((rgb.g - rgb.b) / c, 6.0)) / 6.0;
+	else if(v == rgb.g) h = ((rgb.b - rgb.r) / c + 2.0) / 6.0;
+	else if(v == rgb.b) h = ((rgb.r - rgb.g) / c + 4.0) / 6.0;
+	if(c < 0.00001)
+		return vec3(h, 0.0, v);
+	else
+		return vec3(h, c / v, v);
+}
+vec4 los_cel_shading(in vec4 diff, in vec4 spec, in vec4 p, in sampler1D t1, in sampler1D t2)
+{
+	vec3 diff_hsv = los_rgb_to_hsv(diff.rgb);
+	vec3 spec_hsv = los_rgb_to_hsv(spec.rgb);
+	vec3 diff_rgb = los_hsv_to_rgb(vec3(diff_hsv.rg, texture1D(t1, p.x * diff_hsv.b).x));
+	vec3 spec_rgb = los_hsv_to_rgb(vec3(spec_hsv.rg, texture1D(t2, p.y * spec_hsv.b).x));
+	return vec4(diff_rgb + spec_rgb, diff.a + spec.a);
 }
 
 void main()
 {
 	vec3 normal = normalize(F_normal);
 	vec4 diffuse = texture2D(LOS_diffuse_texture_0, F_texcoord);
-	vec4 light = LOS_scene_ambient;
+	vec4 diff = LOS_scene_ambient;
+	vec4 spec = vec4(0.0);
 	for(int i = 0 ; i < LIGHTS ; i++)
 	{
 		vec3 l = los_blinn_phong(F_lightv[i], F_eyev, LOS_light_direction[i],
 			LOS_light_equation[i], normal, LOS_material_shininess);
-		vec2 c = los_cel_shading(l, LOS_material_celshading,
-			LOS_diffuse_texture_2, LOS_diffuse_texture_3);
-		light += c.x * LOS_light_diffuse[i] + c.y * LOS_light_specular[i];
+		diff += l.z * l.x * LOS_light_diffuse[i];
+		spec += l.z * l.y * LOS_light_specular[i];
 	}
+	vec4 light = los_cel_shading(diff, spec, LOS_material_celshading,
+		LOS_diffuse_texture_2, LOS_diffuse_texture_3);
 	gl_FragColor = vec4((LOS_material_diffuse * diffuse * light).rgb, diffuse.a);
 }
