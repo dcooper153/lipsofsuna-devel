@@ -109,8 +109,15 @@ Ui:add_state{
 
 Ui:add_state{
 	state = "chargen/body",
-	label = "Customize body",
-	init = function()
+	label = "Customize body"}
+
+Ui:add_widget{
+	state = "chargen/body",
+	widget = function() return Widgets.Uitransition("Skin style", "chargen/body/skinstyle") end}
+
+Ui:add_widget{
+	state = "chargen/body",
+	widget = function()
 		local sliders = {
 			{"Arm muscularity", false},
 			{"Body width", true},
@@ -149,12 +156,36 @@ Ui:add_widget{
 ------------------------------------------------------------------------------
 
 Ui:add_state{
+	state = "chargen/body/skinstyle",
+	label = "Select skin style",
+	init = function()
+		local widgets = {}
+		local race = Operators.chargen:get_race()
+		local specs = Actorskinspec:find_by_actor(race)
+		for k,v in ipairs(specs) do
+			local widget = Widgets.Uiradio(v.name, "skin", function(w)
+				Operators.chargen:set_skin_style(w.style)
+			end)
+			widget.style = v.name
+			if Operators.chargen:get_skin_style() == widget.style then
+				widget.value = true
+			end
+			table.insert(widgets, widget)
+		end
+		return widgets
+	end,
+	input = chargen_input,
+	update = chargen_update}
+
+------------------------------------------------------------------------------
+
+Ui:add_state{
 	state = "chargen/face",
 	label = "Customize face"}
 
 Ui:add_widget{
 	state = "chargen/face",
-	widget = function() return Widgets.Uitransition("Head style", "chargen/misc/headstyle") end}
+	widget = function() return Widgets.Uitransition("Head style", "chargen/face/headstyle") end}
 
 Ui:add_widget{
 	state = "chargen/face",
@@ -184,6 +215,36 @@ Ui:add_widget{
 				Operators.chargen:set_face(k, w.inverse and 1 - w.value or w.value)
 			end)
 			widget.inverse = v[2]
+			table.insert(widgets, widget)
+		end
+		return widgets
+	end,
+	input = chargen_input,
+	update = chargen_update}
+
+------------------------------------------------------------------------------
+
+Ui:add_state{
+	state = "chargen/face/headstyle",
+	label = "Select head style",
+	init = function()
+		local widgets = {}
+		local race = Operators.chargen:get_race()
+		local spec = Actorspec:find{name = race}
+		if not spec.head_styles then return end
+		local lst = {}
+		for k,v in pairs(spec.head_styles) do
+			table.insert(lst, {k, v})
+		end
+		table.sort(lst, function(a,b) return a[1] < b[1] end)
+		for k,v in ipairs(lst) do
+			local widget = Widgets.Uiradio(v[1], "head", function(w)
+				Operators.chargen:set_head_style(w.style)
+			end)
+			widget.style = v[2]
+			if Operators.chargen:get_head_style() == widget.style then
+				widget.value = true
+			end
 			table.insert(widgets, widget)
 		end
 		return widgets
@@ -261,10 +322,6 @@ Ui:add_widget{
 		end)
 	end}
 
---[[Ui:add_widget{
-	state = "chargen/misc",
-	widget = function() return Widgets.Uitransition("Skin style", "chargen/misc/skinstyle") end}]]
-
 Ui:add_widget{
 	state = "chargen/misc",
 	widget = function()
@@ -313,36 +370,6 @@ Ui:add_state{
 			end)
 			widget.style = v[2]
 			if Operators.chargen:get_hair_style() == widget.style then
-				widget.value = true
-			end
-			table.insert(widgets, widget)
-		end
-		return widgets
-	end,
-	input = chargen_input,
-	update = chargen_update}
-
-------------------------------------------------------------------------------
-
-Ui:add_state{
-	state = "chargen/misc/headstyle",
-	label = "Select head style",
-	init = function()
-		local widgets = {}
-		local race = Operators.chargen:get_race()
-		local spec = Actorspec:find{name = race}
-		if not spec.head_styles then return end
-		local lst = {}
-		for k,v in pairs(spec.head_styles) do
-			table.insert(lst, {k, v})
-		end
-		table.sort(lst, function(a,b) return a[1] < b[1] end)
-		for k,v in ipairs(lst) do
-			local widget = Widgets.Uiradio(v[1], "head", function(w)
-				Operators.chargen:set_head_style(w.style)
-			end)
-			widget.style = v[2]
-			if Operators.chargen:get_head_style() == widget.style then
 				widget.value = true
 			end
 			table.insert(widgets, widget)

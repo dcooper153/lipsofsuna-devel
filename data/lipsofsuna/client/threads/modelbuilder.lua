@@ -106,9 +106,15 @@ local build = function(args)
 		end
 	end
 	-- Colorize materials.
+	local skin = args.skin_style and Actorskinspec:find{name = args.skin_style}
 	m:edit_material{match_material = "animhair1", diffuse = args.hair_color}
-	m:edit_material{match_material = "animskin1", diffuse = args.skin_color,
-		material = actor.skin_material, textures = actor.skin_textures}
+	if skin then
+		m:edit_material{match_material = "animskin1", diffuse = args.skin_color,
+			material = skin.material, textures = skin.textures}
+	else
+		m:edit_material{match_material = "animskin1", diffuse = args.skin_color,
+			material = actor.skin_material, textures = actor.skin_textures}
+	end
 	m:edit_material{match_material = "animeye1", diffuse = args.eye_color}
 	-- Recalculate the bounding box.
 	m:calculate_bounds()

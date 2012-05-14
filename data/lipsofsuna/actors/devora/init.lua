@@ -46,3 +46,9 @@ Actorspec{
 	loot_categories = {"material"},
 	loot_count_min = 2,
 	loot_count_max = 4}
+
+Actorskinspec{
+	name = "Devora skin 1",
+	actors = {["devora"] = true},
+	material = "animdiffnorm1",
+	textures = {"devora1", "devora1n"}}

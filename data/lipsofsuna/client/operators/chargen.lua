@@ -49,7 +49,7 @@ Operators.chargen.reset = function(self)
 		name = "Guest",
 		race = "aer",
 		skin_color = {1,1,1},
-		skin_style = "default",
+		skin_style = "",
 		spawn_point = "Home"}
 end
 
@@ -199,7 +199,7 @@ Operators.chargen.update = function(self, secs)
 		object.hair_style = self.char.hair_style
 		object.head_style = self.char.head_style
 		object.skin_color = Color:hsv_to_rgb(self.char.skin_color)
-		object.skin_style = nil
+		object.skin_style = self.char.skin_style
 		object:set_model()
 		object:animate_spec("idle")
 		if self.dump_presets then
@@ -484,6 +484,16 @@ end
 -- @return Indexed list of races.
 Operators.chargen.get_races = function(self)
 	return self.list_races
+end
+
+--- Gets the skin style of the character.
+--
+-- Context: The character creator must have been initialized.
+--
+-- @param self Operator.
+-- @return Skin style name.
+Operators.chargen.get_skin_style = function(self)
+	return self.char.skin_style
 end
 
 --- Sets the skin style of the character.

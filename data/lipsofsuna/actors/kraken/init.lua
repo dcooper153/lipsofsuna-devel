@@ -28,3 +28,9 @@ Actorspec{
 	base = "kraken",
 	ai_enabled = false,
 	inventory_items = {["torch"] = 1, ["workbench"] = 1, ["dress"] = 1}}
+
+Actorskinspec{
+	name = "Kraken skin 1",
+	actors = {["kraken"] = true},
+	material = "animdiffnorm1",
+	textures = {"kraken1", "kraken1n"}}

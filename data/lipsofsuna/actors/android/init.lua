@@ -27,3 +27,9 @@ Actorspec{
 	base = "android",
 	ai_enabled = false,
 	inventory_items = {["torch"] = 1, ["workbench"] = 1, ["dress"] = 1, ["leather leggings"] = 1}}
+
+Actorskinspec{
+	name = "Android skin 1",
+	actors = {["android"] = true},
+	material = "animdiffnorm1",
+	textures = {"android1", "aer1n"}}

@@ -33,3 +33,18 @@ Actorspec{
 	base = "aer",
 	ai_enabled = false,
 	inventory_items = {["torch"] = 1, ["workbench"] = 1, ["dress"] = 1, ["leather leggings"] = 1}}
+
+Actorskinspec{
+	name = "Aer skin 1",
+	actors = {["aer"] = true},
+	textures = {"aer1", "aer1n"}}
+
+Actorskinspec{
+	name = "Aer skin 2",
+	actors = {["aer"] = true},
+	textures = {"aer1", "aer2n"}}
+
+Actorskinspec{
+	name = "Aer skin 3",
+	actors = {["aer"] = true},
+	textures = {"aer1", "aer3n"}}
