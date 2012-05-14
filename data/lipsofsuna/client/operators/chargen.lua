@@ -20,7 +20,7 @@ Operators.chargen.init = function(self)
 	self.data.object = Actor{position = Vector(1, 1, 1), realized = true}
 	self:randomize()
 	-- Create the camera.
-	self.data.translation = Vector(0, 1.8, -2)
+	self.data.translation = Vector(0.3, 1.8, -2)
 	self.data.camera = Camera{far = 60.0, near = 0.3, mode = "first-person"}
 	self.data.camera:warp()
 	self:update(0.0)
@@ -38,12 +38,13 @@ Operators.chargen.reset = function(self)
 	if self.data.object then self.data.object:detach() end
 	self.data = {}
 	self.char = {
-		body = {0,0,0,0,0,0,0,0},
+		body = {0,0,0,0,0,0,0,0,0,0},
 		eye_color = {1,1,1},
 		eye_style = "default",
 		face = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
 		hair_color = {1,1,1},
 		hair_style = "default",
+		head_style = "aerhead1",
 		height = 1,
 		name = "Guest",
 		race = "aer",
@@ -74,6 +75,10 @@ Operators.chargen.apply = function(self)
 		"uint8", 255 * self.char.body[6],
 		"uint8", 255 * self.char.body[7],
 		"uint8", 255 * self.char.body[8],
+		"uint8", 255 * self.char.body[9],
+		"uint8", 255 * self.char.body[10],
+		-- Head style.
+		"string", self.char.head_style,
 		-- Eye style.
 		"string", "default",
 		"uint8", 255 * eye_rgb[1],
@@ -192,6 +197,7 @@ Operators.chargen.update = function(self, secs)
 		object.face_style = self.char.face
 		object.hair_color = Color:hsv_to_rgb(self.char.hair_color)
 		object.hair_style = self.char.hair_style
+		object.head_style = self.char.head_style
 		object.skin_color = Color:hsv_to_rgb(self.char.skin_color)
 		object.skin_style = nil
 		object:set_model()
@@ -345,6 +351,27 @@ Operators.chargen.set_hair_color = function(self, channel, value)
 	self.data.update_needed = true
 end
 
+--- Gets the head style of the character.
+--
+-- Context: The character creator must have been initialized.
+--
+-- @param self Operator.
+-- @return Style name.
+Operators.chargen.get_head_style = function(self)
+	return self.char.head_style
+end
+
+--- Sets the head style of the character.
+--
+-- Context: The character creator must have been initialized.
+--
+-- @param self Operator.
+-- @param value Style name.
+Operators.chargen.set_head_style = function(self, value)
+	self.char.head_style = value
+	self.data.update_needed = true
+end
+
 --- Gets the height of the character.
 --
 -- Context: The character creator must have been initialized.
@@ -395,7 +422,13 @@ end
 Operators.chargen.set_preset = function(self, args)
 	for k,v in pairs(args) do
 		if k ~= "name" then
-			self.char[k] = v
+			if type(v) == "table" then
+				local t = {}
+				for k1,v1 in pairs(v) do t[k1] = v1 end
+				self.char[k] = t
+			else
+				self.char[k] = v
+			end
 		end
 	end
 	self.data.update_needed = true
@@ -410,7 +443,9 @@ end
 Operators.chargen.get_presets = function(self)
 	local presets = {}
 	for k,v in pairs(Actorpresetspec.dict_name) do
-		table.insert(presets, v)
+		if v.playable then
+			table.insert(presets, v)
+		end
 	end
 	table.sort(presets, function(a,b) return a.name < b.name end)
 	return presets
@@ -436,7 +471,8 @@ Operators.chargen.set_race = function(self, race)
 	-- Set the race selection.
 	self.char.race = race
 	-- Choose a random preset.
-	local preset = Actorpresetspec:random()
+	local presets = self:get_presets()
+	local preset = presets[math.random(1,#presets)]
 	self:set_preset(preset)
 end
 

@@ -10,7 +10,6 @@ Actorspec{
 	models = {
 		skeleton = "kraken1",
 		arms = "aerarm1",
-		eyes = "aereye1",
 		head = "aerhead1",
 		hands = "aerhand1",
 		feet = "krakenfoot1",

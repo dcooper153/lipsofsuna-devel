@@ -98,4 +98,5 @@ Actorspec{
 	eye_styles = {["Default"] = ""},
 	hair_styles = {["Bald"] = "", ["Pigtails"] = "hair1", ["Pigtails long"] = "hair3", ["Long"] = "hair2", ["Drill"] = "hair4", ["Short"] = "hair5"},
 		--{"Short", "aershorthair1"} -- TODO: Adapt to head mesh changes
+	head_styles = {["Head 1"] = "aerhead1", ["Head 2"] = "aerhead2"},
 	skin_styles = {["Default"] = ""}}

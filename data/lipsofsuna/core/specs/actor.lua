@@ -66,6 +66,7 @@ Actorspec.introspect = Introspect{
 		{name = "hair_color", type = "color", description = "Hair color."},
 		{name = "hair_style", type = "string", description = "Hair style."},
 		{name = "hair_styles", type = "dict", dict = {type = "string"}, description = "Dictionary of hair styles."},
+		{name = "head_styles", type = "dict", dict = {type = "string"}, description = "Dictionary of head styles."},
 		{name = "important", type = "boolean", description = "True to not allow the actor to be cleaned up from the map."},
 		{name = "interactive", type = "boolean", default = true, description = "False to make the object not appear interactive."},
 		{name = "inventory_items", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of inventory items to give when the actor is spawned.", details = {keys = {spec = "Itemspec"}, values = {integer = true, min = 1}}},
@@ -266,6 +267,25 @@ Actorspec.get_random_hair = function(self)
 	end
 	-- Return the style table.
 	return {style, color[1], color[2], color[3]}
+end
+
+--- Gets a random head style for the actor.
+-- @param self Actor spec.
+-- @return Head style name, or nil.
+Actorspec.get_random_head = function(self)
+	local style = self.head_style
+	if not style then return end
+	if style == "random" then
+		if not self.head_styles then return end
+		local lst = {}
+		for k,v in pairs(self.head_styles) do
+			table.insert(lst, v)
+		end
+		local l = #self.head_styles
+		if l == 0 then return end
+		style = lst[math.random(1, l)]
+	end
+	return style
 end
 
 --- Finds the special effects of the actor.

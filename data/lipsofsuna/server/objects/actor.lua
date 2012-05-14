@@ -14,6 +14,7 @@ Actor.dict_id = setmetatable({}, {__mode = "kv"})
 --   <li>dead: True for a dead actor.</li>
 --   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
 --   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
+--   <li>head_style: Head style name.</li>
 --   <li>id: Unique object ID or nil for a random free one.</li>
 --   <li>jumped: Jump timer.</li>
 --   <li>name: Name of the actor.</li>
@@ -41,6 +42,7 @@ Actor.new = function(clss, args)
 	copy("eye_style")
 	copy("face_style")
 	copy("hair_style")
+	copy("head_style")
 	copy("home_point")
 	copy("jumped", 0)
 	copy("name")
@@ -78,6 +80,7 @@ Actor.clone = function(self)
 		eye_style = self.eye_style,
 		face_style = self.face_style,
 		hair_style = self.hair_style,
+		head_style = self.head_style,
 		physics = self.physics,
 		position = self.position,
 		rotation = self.rotation,
@@ -880,6 +883,7 @@ Actor.write = function(self)
 		eye_style = self.eye_style,
 		face_style = self.face_style,
 		hair_style = self.hair_style,
+		head_style = self.head_style,
 		id = self.id,
 		physics = self.physics,
 		position = self.position,
@@ -914,6 +918,7 @@ Actor.write_db = function(self, db)
 		eye_style = self.eye_style,
 		face_style = self.face_style,
 		hair_style = self.hair_style,
+		head_style = self.head_style,
 		home_point = self.home_point,
 		physics = self.physics,
 		position = self.position,
@@ -986,6 +991,7 @@ Actor:add_setters{
 		-- Only set once when spawned by the map generator or an admin.
 		if s.random then
 			s.eye_style = s.eye_style or spec:get_random_eyes()
+			s.head_style = s.head_style or spec:get_random_head() 
 			s.hair_style = s.hair_style or spec:get_random_hair() 
 		end
 		-- Assign skills.

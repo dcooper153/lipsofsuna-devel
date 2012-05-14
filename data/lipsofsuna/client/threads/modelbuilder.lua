@@ -18,6 +18,10 @@ local build = function(args)
 	for k,v in pairs(actor.models) do
 		meshes[k] = v
 	end
+	-- Override the head style.
+	if args.head_style and args.head_style ~= "" then
+		meshes["head"] = args.head_style
+	end
 	-- Add the hair model.
 	if args.hair_style and args.hair_style ~= "" then
 		meshes.hair = args.hair_style
@@ -95,6 +99,7 @@ local build = function(args)
 				if args.body_style[6] then tmp:morph("torso wide", args.body_style[6], ref) end
 				if args.body_style[7] then tmp:morph("waist fat", args.body_style[7], ref) end
 				if args.body_style[8] then tmp:morph("waist wide", args.body_style[8], ref) end
+				if args.body_style[9] then tmp:morph("shoulder thin", 1 - args.body_style[9], ref) end
 			end
 			-- Merge to the character model.
 			m:merge(tmp or ref)

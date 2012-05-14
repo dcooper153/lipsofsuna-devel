@@ -259,6 +259,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 			o.face_style = copy_table(preset.face)
 			o.hair_color = copy_color(preset.hair_color)
 			o.hair_style = preset.hair_style
+			o.head_style = preset.head_style
 			o.body_scale = preset.height
 			o.skin_color = copy_color(preset.skin_color)
 			o.skin_style = preset.skin_style
@@ -354,7 +355,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	-- Body style.
 	if Bitwise:band(flags, Protocol.object_show_flags.BODY_STYLE) ~= 0 then
 		debug("  BODY STYLE")
-		local ok,a,b,c,d,e,f,g,h,i
+		local ok,a,b,c,d,e,f,g,h,i,j
 		-- Scale.
 		ok,a = event.packet:resume("uint8")
 		if not ok then return end
@@ -365,8 +366,8 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 			"uint8", "uint8", "uint8", "uint8", "uint8")
 		if not ok then return end
 		o.body_style = {a / 255, b / 255, c / 255, d / 255, e / 255,
-			f / 255, g / 255, h / 255, i / 255}
-		debug("    STYLE %d %d %d %d %d %d %d %d %d", a, b, c, d, e, f, g, h, i)
+			f / 255, g / 255, h / 255, i / 255, i / 255}
+		debug("    STYLE %d %d %d %d %d %d %d %d %d", a, b, c, d, e, f, g, h, i, j)
 		-- Skin.
 		ok,a,b,c,d = event.packet:resume("string", "uint8", "uint8", "uint8")
 		if not ok then return end
@@ -377,10 +378,12 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	-- Head style.
 	if Bitwise:band(flags, Protocol.object_show_flags.HEAD_STYLE) ~= 0 then
 		debug("  HEAD STYLE")
-		local ok,a,b,c,d,e,f,g,h,i,j,k,l,m,n,p
+		local ok,head,a,b,c,d,e,f,g,h,i,j,k,l,m,n,p
 		-- Eyes.
-		ok,a,b,c,d = event.packet:resume("string", "uint8", "uint8", "uint8")
+		ok,head,a,b,c,d = event.packet:resume("string", "string", "uint8", "uint8", "uint8")
 		if not ok then return end
+		o.head_style = head
+		debug("    HEAD %s", head)
 		o.eye_style = a
 		o.eye_color = {b / 255, c / 255, d / 255}
 		debug("    EYE %s %d %d %d", a, b, c, d)

@@ -20,6 +20,7 @@ end
 --   <li>body_style: Body style defined by an array of scalars.</li>
 --   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
 --   <li>hair_style: Hair style defined by an array of {style, red, green, blue}.</li>
+--   <li>head_style: Head style name.</li>
 --   <li>id: Unique object ID or nil for a random free one.</li>
 --   <li>jumped: Jump timer.</li>
 --   <li>name: Name of the actor.</li>
@@ -457,6 +458,7 @@ Player.vision_cb = function(self, args)
 					"uint8", o.body_style and o.body_style[7] or 0,
 					"uint8", o.body_style and o.body_style[8] or 255,
 					"uint8", o.body_style and o.body_style[9] or 0,
+					"uint8", o.body_style and o.body_style[10] or 255,
 					"string", o.skin_style and o.skin_style[1] or "",
 					"uint8", o.skin_style and o.skin_style[2] or 255,
 					"uint8", o.skin_style and o.skin_style[3] or 255,
@@ -467,6 +469,7 @@ Player.vision_cb = function(self, args)
 			local data_head = {}
 			if o.eye_style or o.face_style or o.hair_style then
 				data_head = {
+					"string", o.head_style or "",
 					"string", o.eye_style and o.eye_style[1] or "",
 					"uint8", o.eye_style and o.eye_style[2] or 255,
 					"uint8", o.eye_style and o.eye_style[3] or 255,
@@ -613,6 +616,7 @@ Player.write_db = function(self, db)
 		eye_style = self.eye_style,
 		face_style = self.face_style,
 		hair_style = self.hair_style,
+		head_style = self.head_style,
 		name = self.name,
 		physics = self.dead and "rigid" or "kinematic",
 		position = self.position,
