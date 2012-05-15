@@ -109,7 +109,9 @@ Ui:add_state{
 
 Ui:add_state{
 	state = "chargen/body",
-	label = "Customize body"}
+	label = "Customize body",
+	input = chargen_input,
+	update = chargen_update}
 
 Ui:add_widget{
 	state = "chargen/body",
@@ -140,9 +142,7 @@ Ui:add_widget{
 			table.insert(widgets, widget)
 		end
 		return widgets
-	end,
-	input = chargen_input,
-	update = chargen_update}
+	end}
 
 Ui:add_widget{
 	state = "chargen/body",
@@ -181,7 +181,9 @@ Ui:add_state{
 
 Ui:add_state{
 	state = "chargen/face",
-	label = "Customize face"}
+	label = "Customize face",
+	input = chargen_input,
+	update = chargen_update}
 
 Ui:add_widget{
 	state = "chargen/face",
@@ -218,9 +220,7 @@ Ui:add_widget{
 			table.insert(widgets, widget)
 		end
 		return widgets
-	end,
-	input = chargen_input,
-	update = chargen_update}
+	end}
 
 ------------------------------------------------------------------------------
 
