@@ -167,14 +167,13 @@ int liphy_physics_cast_ray (
 {
 	btVector3 src (start->x, start->y, start->z);
 	btVector3 dst (end->x, end->y, end->z);
-	btCollisionWorld* collision = self->dynamics->getCollisionWorld ();
 
 	/* Cast the ray. */
 	LIPhyRaycastWorld test (ignore_array, ignore_count, src, dst);
 	test.m_closestHitFraction = 1.0f;
 	test.m_collisionFilterGroup = group;
 	test.m_collisionFilterMask = mask;
-	collision->rayTest (src, dst, test);
+	self->dynamics->rayTest (src, dst, test);
 	if (test.m_closestHitFraction >= 1.0f)
 		return 0;
 
@@ -225,7 +224,6 @@ int liphy_physics_cast_shape (
 {
 	int i;
 	float best;
-	btCollisionWorld* collision;
 	btConvexShape* btshape;
 	LIPhyConvexcastWorld test (ignore_array, ignore_count);
 	btTransform btstart (
@@ -239,7 +237,6 @@ int liphy_physics_cast_shape (
 	test.m_closestHitFraction = 1.0f;
 	test.m_collisionFilterGroup = group;
 	test.m_collisionFilterMask = mask;
-	collision = self->dynamics->getCollisionWorld ();
 	result->fraction = best = 1.0f;
 
 	/* Sweep the shape. */
@@ -247,7 +244,7 @@ int liphy_physics_cast_shape (
 	for (i = 0 ; i < shape->shape->getNumChildShapes () ; i++)
 	{
 		btshape = (btConvexShape*) shape->shape->getChildShape (i);
-		collision->convexSweepTest (btshape, btstart, btend, test);
+		self->dynamics->convexSweepTest (btshape, btstart, btend, test);
 		if (test.m_closestHitFraction <= best && test.m_hitCollisionObject != NULL)
 		{
 			best = test.m_closestHitFraction;
