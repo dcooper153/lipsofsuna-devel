@@ -8,7 +8,8 @@ Actorspec{
 	hair_style = "random",
 	important = true,
 	inventory_items = {["dress"] = 1},
-	personality = "feeble"}
+	personality = "feeble",
+	preset = "Female 2"}
 
 Dialogspec{name = "lyra", commands = {
 	{"branch", cond_dead = true,

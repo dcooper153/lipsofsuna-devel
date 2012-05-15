@@ -9,7 +9,8 @@ Actorspec{
 	important = true,
 	inventory_items = {["iron hatchet"] = 1, ["dress"] = 1},
 	marker = "celine",
-	personality = "feeble"}
+	personality = "feeble",
+	preset = "Female 2"}
 
 Dialogspec{name = "celine", commands = {
 	{"default death check"},

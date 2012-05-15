@@ -10,7 +10,8 @@ Actorspec{
 	eye_style = "random",
 	hair_style = "random",
 	important = true,
-	inventory_items = {["dress"] = 1}}
+	inventory_items = {["dress"] = 1},
+	preset = "Male 2"}
 
 Actorspec{
 	name = "Noemi",
@@ -22,7 +23,8 @@ Actorspec{
 	hair_style = "hair2",
 	important = true,
 	inventory_items = {["iron hatchet"] = 1, ["dress"] = 1},
-	factions = {["good"] = true}}
+	factions = {["good"] = true},
+	preset = "Female 1"}
 
 require(Mod.path .. "effects")
 require(Mod.path .. "items")

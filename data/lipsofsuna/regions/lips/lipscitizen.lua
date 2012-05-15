@@ -7,7 +7,8 @@ Actorspec{
 	hair_style = "random",
 	important = true,
 	inventory_items = {["leather top"] = 1, ["leather pants"] = 1, ["leather leggings"] = 1},
-	personality = "feeble"}
+	personality = "feeble",
+	preset = "Female 1"}
 
 Dialogspec{name = "lips citizen", commands = {
 	{"branch", cond_dead = true,

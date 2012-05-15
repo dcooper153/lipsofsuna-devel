@@ -8,7 +8,8 @@ Actorspec{
 	hair_style = "random",
 	important = true,
 	inventory_items = {["iron breastplate"] = 1, ["iron greaves"] = 1, ["iron gauntlets"] = 1, ["wooden staff"] = 1},
-	personality = "savage"}
+	personality = "savage",
+	preset = "Female 1"}
 
 Dialogspec{name = "fa", commands = {
 	{"branch", cond_dead = true,

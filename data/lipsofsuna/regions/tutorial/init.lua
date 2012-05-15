@@ -45,7 +45,8 @@ Actorspec{
 	eye_style = "random",
 	hair_style = "random",
 	important = true,
-	inventory_items = {["combat token"] = 1}}
+	inventory_items = {["combat token"] = 1},
+	preset = "Female 3"}
 
 require(Mod.path .. "fa")
 require(Mod.path .. "spud")

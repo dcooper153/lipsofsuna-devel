@@ -12,7 +12,8 @@ Actorspec{
 	loot_categories = {"armor", "material", "potion", "shield", "weapon"},
 	loot_count_min = 2,
 	loot_count_max = 4,
-	personality = "savage"}
+	personality = "savage",
+	preset = "Male 1"}
 
 Actorspec{
 	name = "brigand king",
@@ -28,7 +29,8 @@ Actorspec{
 	loot_count_min = 5,
 	loot_count_max = 10,
 	skills = {["Health lv4"] = true},
-	personality = "savage"}
+	personality = "savage",
+	preset = "Male 3"}
 
 Actorspec{
 	name = "novice brigand archer",
@@ -43,7 +45,8 @@ Actorspec{
 	loot_count_min = 2,
 	loot_count_max = 4,
 	skills = {["Health lv1"] = true},
-	personality = "savage"}
+	personality = "savage",
+	preset = "Female 3"}
 
 Actorspec{
 	name = "master brigand archer",
@@ -58,7 +61,8 @@ Actorspec{
 	loot_count_min = 2,
 	loot_count_max = 4,
 	skills = {["Health lv3"] = true},
-	personality = "savage"}
+	personality = "savage",
+	preset = "Female 1"}
 
 Actorspec{
 	name = "suicide bomber",
@@ -73,7 +77,8 @@ Actorspec{
 	loot_count_min = 2,
 	loot_count_max = 4,
 	skills = {["Health lv3"] = true},
-	personality = "savage"}
+	personality = "savage",
+	preset = "Male 2"}
 
 Actorspec{
 	name = "brigandmale",

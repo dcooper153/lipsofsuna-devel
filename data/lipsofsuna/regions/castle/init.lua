@@ -32,7 +32,8 @@ Actorspec{
 	eye_style = "random",
 	hair_style = "random",
 	important = true,
-	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1}}
+	inventory_items = {["shirt"] = 1, ["pants"] = 1, ["leather boots"] = 1},
+	preset = "Male 3"}
 
 require(Mod.path .. "bigbuildings")
 require(Mod.path .. "smallbuildings")

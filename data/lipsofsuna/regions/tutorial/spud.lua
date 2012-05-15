@@ -8,7 +8,8 @@ Actorspec{
 	hair_style = "random",
 	important = true,
 	inventory_items = {["lizard dress"] = 1, ["torch"] = 1},
-	personality = "tough"}
+	personality = "tough",
+	preset = "Female 1"}
 
 Dialogspec{name = "spud", commands = {
 	{"branch", cond_dead = true,

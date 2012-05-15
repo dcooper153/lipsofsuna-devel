@@ -10,7 +10,8 @@ Actorspec{
 	important = true,
 	inventory_items = {["iron hatchet"] = 1, ["dress"] = 1},
 	marker = "elise",
-	personality = "feeble"}
+	personality = "feeble",
+	preset = "Female 2"}
 
 Questspec{
 	name = "Elise's Sorrow"}

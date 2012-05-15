@@ -25,7 +25,8 @@ Actorspec{
 	hair_color = {0,255,192},
 	hair_style = "hair1",
 	important = true,
-	inventory_items = {["dress"] = 1}}
+	inventory_items = {["dress"] = 1},
+	preset = "Female 3"}
 
 Actorspec{
 	name = "Martin",

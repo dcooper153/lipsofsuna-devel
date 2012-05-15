@@ -8,7 +8,8 @@ Actorspec{
 	hair_style = "random",
 	important = true,
 	inventory_items = {["dress"] = 1},
-	personality = "noble"}
+	personality = "noble",
+	preset = "Female 3"}
 
 Dialogspec{name = "xsphin", commands = {
 	{"branch", cond_dead = true,
