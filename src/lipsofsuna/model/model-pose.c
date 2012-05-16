@@ -108,8 +108,51 @@ LIMdlPose* limdl_pose_new ()
 }
 
 /**
+ * \brief Creates a copy of the pose.
+ *
+ * The copied pose only inherits the channels. The model of the pose is set as
+ * NULL so all animations are considered as missing. They can be reinstantiated
+ * by assigning a model to the pose.
+ *
+ * \param pose Model pose.
+ * \return Copied model pose.
+ */
+LIMdlPose* limdl_pose_new_copy (
+	LIMdlPose* pose)
+{
+	LIAlgU32dicIter iter;
+	LIMdlPose* self;
+	LIMdlPoseChannel* chan;
+	LIMdlPoseChannel* chan1;
+
+	/* Allocate the copy. */
+	self = limdl_pose_new ();
+	if (self == NULL)
+		return NULL;
+
+	/* Copy channels. */
+	LIALG_U32DIC_FOREACH (iter, pose->channels)
+	{
+		chan = iter.value;
+		chan1 = limdl_pose_channel_new_copy (chan);
+		if (chan1)
+		{
+			if (!lialg_u32dic_insert (self->channels, iter.key, chan1))
+				limdl_pose_channel_free (chan1);
+		}
+	}
+
+	/* TODO: Copy fades. */
+
+	/* Clear the model. */
+	limdl_pose_set_model (self, NULL);
+
+	return self;
+}
+
+/**
  * \brief Frees the model pose.
- * \param self A model pose.
+ * \param self Model pose.
  */
 void limdl_pose_free (
 	LIMdlPose* self)

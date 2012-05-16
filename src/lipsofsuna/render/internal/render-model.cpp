@@ -93,8 +93,7 @@ void liren_model_free (
 	LIALG_U32DIC_FOREACH (iter, self->render->objects)
 	{
 		LIRenObject* object = (LIRenObject*) iter.value;
-		if (object->model == self)
-			liren_object_set_model (object, NULL);
+		liren_object_remove_model (object, self);
 	}
 
 	/* Remove from the model dictionary. */
@@ -157,8 +156,7 @@ static void private_create_mesh (
 	LIALG_U32DIC_FOREACH (iter, self->render->objects)
 	{
 		LIRenObject* object = (LIRenObject*) iter.value;
-		if (object->model == self)
-			liren_object_model_changed (object);
+		liren_object_model_changed (object, self);
 	}
 }
 

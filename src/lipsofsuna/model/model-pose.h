@@ -82,6 +82,9 @@ struct _LIMdlPose
 
 LIAPICALL (LIMdlPose*, limdl_pose_new, ());
 
+LIAPICALL (LIMdlPose*, limdl_pose_new_copy, (
+	LIMdlPose* pose));
+
 LIAPICALL (void, limdl_pose_free, (
 	LIMdlPose* self));
 

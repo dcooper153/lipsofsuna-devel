@@ -29,16 +29,19 @@
  * @{
  */
 
-LIRenEntity::LIRenEntity (const Ogre::String& name, const Ogre::MeshPtr& mesh) :
-	Ogre::Entity (), builder (this, mesh)
+LIRenEntity::LIRenEntity (const Ogre::String& name, LIRenModel* model) :
+	Ogre::Entity (), builder (this, model->mesh)
 {
+	this->model = model;
+	replacing_entity = NULL;
+
 	/* A placeholder mesh is assigned to the entity until the real mesh is
 	   fully loaded. This is because Ogre assumes that a mesh always exists,
 	   and it won't wait for us to background load the textures if the real
 	   mesh is assigned. */
 	mName = name;
 	mMesh = Ogre::MeshPtr (new LIRenMesh ());
-	background_loaded_mesh = mesh;
+	background_loaded_mesh = model->mesh;
 	builder.start ();
 
 	/* Clear the pose. */
@@ -48,6 +51,8 @@ LIRenEntity::LIRenEntity (const Ogre::String& name, const Ogre::MeshPtr& mesh) :
 
 LIRenEntity::~LIRenEntity ()
 {
+	if (pose != NULL)
+		limdl_pose_free (pose);
 }
 
 void LIRenEntity::initialize ()
@@ -68,7 +73,32 @@ void LIRenEntity::initialize ()
 	}
 }
 
-void LIRenEntity::update_pose ()
+/**
+ * \brief Updates the CPU side pose transformation.
+ *
+ * The pose tranformation is always recalculated for each frame. However, the
+ * pose buffers are only calculated for objects that need to be rendered.
+ * Hence, this function only set the pose_changed flag.
+ *
+ * \param secs Seconds since the last update.
+ */
+void LIRenEntity::update_pose (float secs)
+{
+	if (pose != NULL)
+	{
+		limdl_pose_update (pose, secs);
+		pose_changed = true;
+	}
+}
+
+/**
+ * \brief Rebuilds the pose buffer and uploads it to the GPU.
+ *
+ * To reduce load when there are lots of animated objects, entities only
+ * update their pose buffers when they are rendered. In addition, the buffers
+ * are updated at most once per frame.
+ */
+void LIRenEntity::update_pose_buffer ()
 {
 	LIMdlModel* model;
 
@@ -121,8 +151,29 @@ LIMdlModel* LIRenEntity::get_model () const
 
 void LIRenEntity::set_pose (LIMdlPose* pose)
 {
-	this->pose = pose;
+	this->pose = limdl_pose_new_copy (pose);
 	this->pose_changed = true;
+	limdl_pose_set_model (this->pose, get_model ());
+}
+
+LIMdlPose* LIRenEntity::get_pose ()
+{
+	return pose;
+}
+
+LIRenModel* LIRenEntity::get_render_model ()
+{
+	return model;
+}
+
+LIRenEntity* LIRenEntity::get_replacing_entity ()
+{
+	return this->replacing_entity;
+}
+
+void LIRenEntity::set_replacing_entity (LIRenEntity* entity)
+{
+	this->replacing_entity = entity;
 }
 
 void LIRenEntity::_updateRenderQueue (Ogre::RenderQueue* queue)
@@ -140,7 +191,7 @@ void LIRenEntity::_updateRenderQueue (Ogre::RenderQueue* queue)
 		{
 			this->pose_changed = false;
 			if (displayEntity->hasSkeleton ())
-				update_pose ();
+				update_pose_buffer ();
 		}
 	}
 }

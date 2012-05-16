@@ -79,12 +79,10 @@ struct _LIRenObject
 	float render_distance;
 	LIMatTransform transform;
 	LIMdlPose* pose;
-	LIRenModel* model;
 	LIRenRender* render;
-	LIRenEntity* entity;
-	LIRenEntity* entity_build;
 	Ogre::ParticleSystem* particles;
 	Ogre::SceneNode* node;
+	std::vector<LIRenEntity*> entities;
 };
 struct _LIRenOverlay
 {

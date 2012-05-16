@@ -32,7 +32,49 @@
 #include "render-model.h"
 #include "render-object.h"
 
+static LIMdlPose* private_channel_animate (
+	LIRenObject* self,
+	LIMdlPose*   pose,
+	int          channel,
+	const char*  name,
+	int          additive,
+	int          repeat,
+	int          repeat_start,
+	int          keep,
+	float        fade_in,
+	float        fade_out,
+	float        weight,
+	float        weight_scale,
+	float        time,
+	float        time_scale,
+	const char** node_names,
+	float*       node_weights,
+	int          node_count);
+
+static void private_channel_edit (
+	LIRenObject*          self,
+	LIMdlPose*            pose,
+	int                   channel,
+	int                   frame,
+	const char*           node,
+	const LIMatTransform* transform,
+	float                 scale);
+
+static void private_channel_fade (
+	LIRenObject* self,
+	LIMdlPose*   pose,
+	int          channel,
+	float        time);
+
 static LIRenEntity* private_create_entity (
+	LIRenObject* self,
+	LIRenModel*  model);
+
+static void private_remove_entity (
+	LIRenObject* self,
+	int          index);
+
+static void private_update_entity_settings (
 	LIRenObject* self);
 
 /*****************************************************************************/
@@ -49,31 +91,36 @@ LIRenObject* liren_object_new (
 {
 	LIRenObject* self;
 
-	self = (LIRenObject*) lisys_calloc (1, sizeof (LIRenObject));
+	/* Allocate self. */
+	self = OGRE_NEW LIRenObject;
 	if (self == NULL)
 		return NULL;
-	self->render = render;
+	self->id = id;
 	self->visible = 0;
 	self->shadow_casting = 0;
 	self->render_distance = -1.0f;
+	self->transform = limat_transform_identity ();
+	self->pose = NULL;
+	self->render = render;
+	self->particles = NULL;
+	self->node = NULL;
 
 	/* Choose a unique ID. */
-	while (!id)
+	while (!self->id)
 	{
-		id = lialg_random_range (&render->random, LINET_RANGE_RENDER_START, LINET_RANGE_RENDER_END);
-		if (lialg_u32dic_find (render->objects, id))
-			id = 0;
+		self->id = lialg_random_range (&render->random, LINET_RANGE_RENDER_START, LINET_RANGE_RENDER_END);
+		if (lialg_u32dic_find (render->objects, self->id))
+			self->id = 0;
 	}
-	self->id = id;
 
-	/* Initialize the backend. */
+	/* Create the scene node. */
 	self->node = render->data->scene_root->createChildSceneNode ();
 	self->node->setVisible (false);
 
-	/* Add to dictionary. */
-	if (!lialg_u32dic_insert (render->objects, id, self))
+	/* Add self to the object dictionary. */
+	if (!lialg_u32dic_insert (render->objects, self->id, self))
 	{
-		liren_object_free (self);
+		OGRE_DELETE self;
 		return 0;
 	}
 
@@ -87,23 +134,40 @@ LIRenObject* liren_object_new (
 void liren_object_free (
 	LIRenObject* self)
 {
+	/* Remove from the object dictionary. */
 	lialg_u32dic_remove (self->render->objects, self->id);
 
-	/* Free the private data. */
-	if (self->node != NULL)
-		self->node->detachAllObjects ();
-	if (self->entity != NULL)
-		OGRE_DELETE self->entity;
-	if (self->entity_build != NULL)
-		OGRE_DELETE self->entity_build;
-	if (self->particles != NULL)
-		self->render->data->scene_manager->destroyParticleSystem (self->particles);
+	/* Free models and particles. */
+	liren_object_clear_models (self);
+
+	/* Free the scene node. */
 	if (self->node != NULL)
 		self->render->data->scene_root->removeAndDestroyChild (self->node->getName ());
 
+	/* Free the pose. */
 	if (self->pose != NULL)
 		limdl_pose_free (self->pose);
-	lisys_free (self);
+	OGRE_DELETE self;
+}
+
+/**
+ * \brief Adds a model to the object.
+ * \param self Object.
+ * \param model Model.
+ */
+void liren_object_add_model (
+	LIRenObject* self,
+	LIRenModel*  model)
+{
+	/* Remove particle systems. */
+	if (self->particles != NULL)
+	{
+		self->render->data->scene_manager->destroyParticleSystem (self->particles);
+		self->particles = NULL;
+	}
+
+	/* Create the new entity. */
+	self->entities.push_back (private_create_entity (self, model));
 }
 
 int liren_object_channel_animate (
@@ -124,72 +188,28 @@ int liren_object_channel_animate (
 	float*       node_weights,
 	int          node_count)
 {
-	int i;
-	const char* name1;
+	LIMdlPose* pose1;
 
-	/* Create the pose if it doesn't exist. */
-	if (self->pose == NULL)
-	{
-		self->pose = limdl_pose_new ();
-		if (self->pose == NULL)
-			return 0;
-		if (self->model != NULL)
-			limdl_pose_set_model (self->pose, liren_model_get_model (self->model));
-	}
+	/* Update the reference pose. */
+	pose1 = private_channel_animate (self, self->pose, channel, name, additive, repeat,
+		repeat_start, keep, fade_in, fade_out, weight, weight_scale, time,
+		time_scale, node_names, node_weights, node_count);
+	if (pose1 != NULL)
+		self->pose = pose1;
 
-	/* Avoid restarts in simple cases. */
-	/* The position is kept if the animation is repeating and being replaced with
-	   the same one but parameters such as fading and weights still need to be reset. */
-	if (repeat && channel != -1 && name != NULL)
+	/* Update the real poses controlling skeletons of entities. */
+	for (size_t i = 0 ; i < self->entities.size () ; i++)
 	{
-		if (limdl_pose_get_channel_state (self->pose, channel) == LIMDL_POSE_CHANNEL_STATE_PLAYING &&
-		    limdl_pose_get_channel_repeats (self->pose, channel) == -1)
+		LIRenEntity* entity = self->entities[i];
+		pose1 = entity->get_pose ();
+		if (pose1 != NULL)
 		{
-			name1 = limdl_pose_get_channel_name (self->pose, channel);
-			if (!strcmp (name, name1))
-				keep = 1;
+			private_channel_animate (self, pose1, channel, name, additive, repeat,
+				repeat_start, keep, fade_in, fade_out, weight, weight_scale, time,
+				time_scale, node_names, node_weights, node_count);
 		}
-	}
-
-	/* Automatic channel assignment. */
-	if (channel == -1)
-	{
-		for (channel = 254 ; channel > 0 ; channel--)
-		{
-			if (limdl_pose_get_channel_state (self->pose, channel) == LIMDL_POSE_CHANNEL_STATE_INVALID)
-				break;
-		}
-	}
-
-	/* Update or initialize the channel. */
-	if (!keep)
-	{
-		limdl_pose_fade_channel (self->pose, channel, LIMDL_POSE_FADE_AUTOMATIC);
-		if (name != NULL)
-		{
-			limdl_pose_set_channel_animation (self->pose, channel, name);
-			limdl_pose_set_channel_repeats (self->pose, channel, repeat? -1 : 1);
-			limdl_pose_set_channel_position (self->pose, channel, time);
-			limdl_pose_set_channel_state (self->pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
-		}
-	}
-	limdl_pose_set_channel_additive (self->pose, channel, additive);
-	limdl_pose_set_channel_repeat_start (self->pose, channel, repeat_start);
-	limdl_pose_set_channel_priority_scale (self->pose, channel, weight_scale);
-	limdl_pose_set_channel_priority_transform (self->pose, channel, weight);
-	limdl_pose_set_channel_time_scale (self->pose, channel, time_scale);
-	limdl_pose_set_channel_fade_in (self->pose, channel, fade_in);
-	limdl_pose_set_channel_fade_out (self->pose, channel, fade_out);
-
-	/* Handle optional per-node weights. */
-	if (name != NULL && node_count)
-	{
-		limdl_pose_clear_channel_node_priorities (self->pose, channel);
-		for (i = 0 ; i < node_count ; i++)
-		{
-			limdl_pose_set_channel_priority_node (self->pose, channel,
-				node_names[i], node_weights[i]);
-		}
+		else
+			entity->set_pose (self->pose);
 	}
 
 	return 1;
@@ -203,8 +223,12 @@ void liren_object_channel_edit (
 	const LIMatTransform* transform,
 	float                 scale)
 {
-	if (self->pose != NULL)
-		limdl_pose_set_channel_transform (self->pose, channel, frame, node, scale, transform);
+	private_channel_edit (self, self->pose, channel, frame, node, transform, scale);
+	for (size_t i = 0 ; i < self->entities.size () ; i++)
+	{
+		LIMdlPose* pose = self->entities[i]->get_pose ();
+		private_channel_edit (self, pose, channel, frame, node, transform, scale);
+	}
 }
 
 void liren_object_channel_fade (
@@ -212,8 +236,12 @@ void liren_object_channel_fade (
 	int          channel,
 	float        time)
 {
-	if (self->pose != NULL)
-		limdl_pose_fade_channel (self->pose, channel, time);
+	private_channel_fade (self, self->pose, channel, time);
+	for (size_t i = 0 ; i < self->entities.size () ; i++)
+	{
+		LIMdlPose* pose = self->entities[i]->get_pose ();
+		private_channel_fade (self, pose, channel, time);
+	}
 }
 
 LIMdlPoseChannel* liren_object_channel_get_state (
@@ -232,6 +260,29 @@ LIMdlPoseChannel* liren_object_channel_get_state (
 	return chan;
 }
 
+/**
+ * \brief Clears all models from the object.
+ * \param self Object.
+ */
+void liren_object_clear_models (
+	LIRenObject* self)
+{
+	/* Detach everything from the scene node. */
+	self->node->detachAllObjects ();
+
+	/* Remove entities. */
+	for (size_t i = 0 ; i < self->entities.size () ; i++)
+		OGRE_DELETE self->entities[i];
+	self->entities.clear ();
+
+	/* Remove the particle system. */
+	if (self->particles != NULL)
+	{
+		self->render->data->scene_manager->destroyParticleSystem (self->particles);
+		self->particles = NULL;
+	}
+}
+
 int liren_object_find_node (
 	LIRenObject*    self,
 	const char*     name,
@@ -240,21 +291,28 @@ int liren_object_find_node (
 {
 	float scale;
 	LIMatTransform transform;
-	LIMdlModel* model;
 	LIMdlNode* node;
 
-	/* Get the model. */
-	if (self->model == NULL)
-		return 0;
-	model = liren_model_get_model (self->model);
-	if (model == NULL)
-		return 0;
-
 	/* Find the node. */
-	if (self->pose == NULL)
-		node = limdl_model_find_node (model, name);
-	else
-		node = limdl_pose_find_node (self->pose, name);
+	/* This uses the poses of the entities instead of the pose of the object
+	   since the latter never has a model assigned. */
+	for (size_t i = 0 ; i < self->entities.size () ; i++)
+	{
+		LIRenEntity* entity = self->entities[i];
+		LIMdlPose* pose = entity->get_pose ();
+		if (pose != NULL)
+		{
+			node = limdl_pose_find_node (pose, name);
+			if (node != NULL)
+				break;
+		}
+		if (node == NULL)
+		{
+			LIMdlModel* model = entity->get_model ();
+			if (model != NULL)
+				node = limdl_model_find_node (model, name);
+		}
+	}
 	if (node == NULL)
 		return 0;
 
@@ -281,15 +339,55 @@ void liren_object_particle_animation (
 	/* TODO */
 }
 
+/**
+ * \brief Marks a model for rebuild.
+ *
+ * This function is called for all objects when a model is changed. Hence, the
+ * model does not necessarily exist in the object.
+ *
+ * The old mesh is not removed immediately because it takes time for the new
+ * entity to finish building. To avoid the object disappearing during the
+ * build period, we keep the old model around until the build has finished.
+ *
+ * \param self Object.
+ * \param model Model.
+ */
 void liren_object_model_changed (
-	LIRenObject* self)
+	LIRenObject* self,
+	LIRenModel*  model)
 {
-	if (self->entity_build != NULL)
+	for (size_t i = 0 ; i < self->entities.size () ; i++)
 	{
-		self->node->detachObject (self->entity_build);
-		OGRE_DELETE self->entity_build;
+		LIRenEntity* entity = self->entities[i];
+		if (entity->get_render_model () == model)
+		{
+			/* Start loading the new entity. */
+			liren_object_add_model (self, model);
+
+			/* Mark the old entity for replacement. */
+			entity->set_replacing_entity (self->entities[self->entities.size () - 1]);
+			break;
+		}
 	}
-	self->entity_build = private_create_entity (self);
+}
+
+/**
+ * \brief Removes a model from the object.
+ * \param self Object.
+ * \param model Model.
+ */
+void liren_object_remove_model (
+	LIRenObject* self,
+	LIRenModel*  model)
+{
+	for (size_t i = 0 ; i < self->entities.size () ; i++)
+	{
+		if (self->entities[i]->get_render_model () == model)
+		{
+			private_remove_entity (self, i);
+			break;
+		}
+	}
 }
 
 void liren_object_update (
@@ -297,15 +395,25 @@ void liren_object_update (
 	float        secs)
 {
 	/* Replace old entities with built ones. */
-	if (self->entity_build != NULL && self->entity_build->get_loaded ())
+	/* Removing an entity is a potentially recursive operation so there is no
+	   guarantee of the list index being in any given position afthe the removal.
+	   Because of that, the operation needs to be restarted from scratch after
+	   each removal. */
+	while (true)
 	{
-		if (self->entity != NULL)
+		bool found = false;
+		for (size_t i = 0 ; i < self->entities.size () ; i++)
 		{
-			self->node->detachObject (self->entity);
-			OGRE_DELETE self->entity;
+			LIRenEntity* repl = self->entities[i]->get_replacing_entity ();
+			if (repl != NULL && repl->get_loaded ())
+			{
+				private_remove_entity (self, i);
+				found = true;
+				break;
+			}
 		}
-		self->entity = self->entity_build;
-		self->entity_build = NULL;
+		if (!found)
+			break;
 	}
 
 	/* Hide objects too far away. */
@@ -323,16 +431,12 @@ void liren_object_update (
 	else
 		self->node->setVisible (self->visible);
 
-	/* Send the pose to the entity. */
-	/* To reduce load when there are lots of animated objects, entities only
-	   update their skeletons when they are rendered. The pose tranformation is
-	   always recalculated for each frame, but at least uploading useless pose
-	   buffers to the GPU is avoided. */
+	/* Update poses. */
 	if (self->pose != NULL)
 	{
 		limdl_pose_update (self->pose, secs);
-		if (self->entity != NULL)
-			self->entity->set_pose (self->pose);
+		for (size_t i = 0 ; i < self->entities.size () ; i++)
+			self->entities[i]->update_pose (secs);
 	}
 }
 
@@ -372,7 +476,12 @@ int liren_object_get_id (
 int liren_object_get_loaded (
 	LIRenObject* self)
 {
-	return self->entity_build == NULL;
+	for (size_t i = 0 ; i < self->entities.size () ; i++)
+	{
+		if (!self->entities[i]->get_loaded ())
+			return 0;
+	}
+	return 1;
 }
 
 /**
@@ -385,29 +494,27 @@ int liren_object_set_model (
 	LIRenObject* self,
 	LIRenModel*  model)
 {
-	/* Remove the old entity or particle system. */
-	self->node->detachAllObjects ();
-	if (self->entity != NULL)
+	/* Simply clear everything if setting to NULL. */
+	if (model == NULL)
 	{
-		OGRE_DELETE self->entity;
-		self->entity = NULL;
+		liren_object_clear_models (self);
+		return 1;
 	}
-	if (self->entity_build != NULL)
-	{
-		OGRE_DELETE self->entity_build;
-		self->entity_build = NULL;
-	}
+
+	/* Remove the particle system. */
 	if (self->particles != NULL)
 	{
 		self->render->data->scene_manager->destroyParticleSystem (self->particles);
 		self->particles = NULL;
 	}
 
-	/* Store the new render model. */
-	self->model = model;
+	/* Add the new model. */
+	liren_object_add_model (self, model);
+	LIRenEntity* successor = self->entities[self->entities.size () - 1];
 
-	/* Create the new entity. */
-	self->entity = private_create_entity (self);
+	/* Mark all the old entities for replacement. */
+	for (size_t i = 0 ; i < self->entities.size () - 1 ; i++)
+		self->entities[i]->set_replacing_entity (successor);
 
 	return 1;
 }
@@ -423,23 +530,7 @@ int liren_object_set_particle (
 	const char*  name)
 {
 	/* Remove the existing model or particle system. */
-	self->node->detachAllObjects ();
-	if (self->entity != NULL)
-	{
-		OGRE_DELETE self->entity;
-		self->entity = NULL;
-	}
-	if (self->entity_build != NULL)
-	{
-		OGRE_DELETE self->entity_build;
-		self->entity_build = NULL;
-	}
-	if (self->particles != NULL)
-	{
-		self->render->data->scene_manager->destroyParticleSystem (self->particles);
-		self->particles = NULL;
-	}
-	self->model = NULL;
+	liren_object_clear_models (self);
 
 	/* Remove the pose. */
 	if (self->pose != NULL)
@@ -504,10 +595,7 @@ void liren_object_set_render_distance (
 	float        value)
 {
 	self->render_distance = value;
-	if (self->entity != NULL)
-		self->entity->setCastShadows (self->shadow_casting);
-	if (self->entity_build != NULL)
-		self->entity_build->setCastShadows (self->shadow_casting);
+	private_update_entity_settings (self);
 }
 
 /**
@@ -520,10 +608,7 @@ void liren_object_set_shadow (
 	int          value)
 {
 	self->shadow_casting = value;
-	if (self->entity != NULL)
-		self->entity->setCastShadows (self->shadow_casting);
-	if (self->entity_build != NULL)
-		self->entity_build->setCastShadows (self->shadow_casting);
+	private_update_entity_settings (self);
 }
 
 /**
@@ -542,26 +627,129 @@ void liren_object_set_transform (
 
 /*****************************************************************************/
 
-static LIRenEntity* private_create_entity (
-	LIRenObject* self)
+static LIMdlPose* private_channel_animate (
+	LIRenObject* self,
+	LIMdlPose*   pose,
+	int          channel,
+	const char*  name,
+	int          additive,
+	int          repeat,
+	int          repeat_start,
+	int          keep,
+	float        fade_in,
+	float        fade_out,
+	float        weight,
+	float        weight_scale,
+	float        time,
+	float        time_scale,
+	const char** node_names,
+	float*       node_weights,
+	int          node_count)
 {
-	LIMdlModel* model_data;
+	int i;
+	const char* name1;
 
-	/* Make sure that a model is set. */
-	if (self->model == NULL || self->model->mesh.isNull ())
+	/* Create the pose if it doesn't exist. */
+	if (pose == NULL)
 	{
-		if (self->pose != NULL)
-			limdl_pose_set_model (self->pose, NULL);
-		return NULL;
+		pose = limdl_pose_new ();
+		if (pose == NULL)
+			return NULL;
 	}
+
+	/* Avoid restarts in simple cases. */
+	/* The position is kept if the animation is repeating and being replaced with
+	   the same one but parameters such as fading and weights still need to be reset. */
+	if (repeat && channel != -1 && name != NULL)
+	{
+		if (limdl_pose_get_channel_state (pose, channel) == LIMDL_POSE_CHANNEL_STATE_PLAYING &&
+		    limdl_pose_get_channel_repeats (pose, channel) == -1)
+		{
+			name1 = limdl_pose_get_channel_name (pose, channel);
+			if (!strcmp (name, name1))
+				keep = 1;
+		}
+	}
+
+	/* Automatic channel assignment. */
+	if (channel == -1)
+	{
+		for (channel = 254 ; channel > 0 ; channel--)
+		{
+			if (limdl_pose_get_channel_state (pose, channel) == LIMDL_POSE_CHANNEL_STATE_INVALID)
+				break;
+		}
+	}
+
+	/* Update or initialize the channel. */
+	if (!keep)
+	{
+		limdl_pose_fade_channel (pose, channel, LIMDL_POSE_FADE_AUTOMATIC);
+		if (name != NULL)
+		{
+			limdl_pose_set_channel_animation (pose, channel, name);
+			limdl_pose_set_channel_repeats (pose, channel, repeat? -1 : 1);
+			limdl_pose_set_channel_position (pose, channel, time);
+			limdl_pose_set_channel_state (pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
+		}
+	}
+	limdl_pose_set_channel_additive (pose, channel, additive);
+	limdl_pose_set_channel_repeat_start (pose, channel, repeat_start);
+	limdl_pose_set_channel_priority_scale (pose, channel, weight_scale);
+	limdl_pose_set_channel_priority_transform (pose, channel, weight);
+	limdl_pose_set_channel_time_scale (pose, channel, time_scale);
+	limdl_pose_set_channel_fade_in (pose, channel, fade_in);
+	limdl_pose_set_channel_fade_out (pose, channel, fade_out);
+
+	/* Handle optional per-node weights. */
+	if (name != NULL && node_count)
+	{
+		limdl_pose_clear_channel_node_priorities (pose, channel);
+		for (i = 0 ; i < node_count ; i++)
+		{
+			limdl_pose_set_channel_priority_node (pose, channel,
+				node_names[i], node_weights[i]);
+		}
+	}
+
+	return pose;
+}
+
+static void private_channel_edit (
+	LIRenObject*          self,
+	LIMdlPose*            pose,
+	int                   channel,
+	int                   frame,
+	const char*           node,
+	const LIMatTransform* transform,
+	float                 scale)
+{
+	if (pose != NULL)
+		limdl_pose_set_channel_transform (pose, channel, frame, node, scale, transform);
+}
+
+static void private_channel_fade (
+	LIRenObject* self,
+	LIMdlPose*   pose,
+	int          channel,
+	float        time)
+{
+	if (pose != NULL)
+		limdl_pose_fade_channel (pose, channel, time);
+}
+
+static LIRenEntity* private_create_entity (
+	LIRenObject* self,
+	LIRenModel*  model)
+{
+	/* Make sure that a model was given. */
+	if (model == NULL || model->mesh.isNull ())
+		return NULL;
 
 	/* Create a new entity. */
 	Ogre::String e_name = self->render->data->id.next ();
-	LIRenEntity* entity = OGRE_NEW LIRenEntity (e_name, self->model->mesh);
+	LIRenEntity* entity = OGRE_NEW LIRenEntity (e_name, model);
 	self->node->attachObject (entity);
-
-	/* Get the model copy created by the entity. */
-	model_data = entity->get_model ();
 
 	/* Update the pose for the new model data. */
 	/* The model data might be NULL currently, but that can be because the model
@@ -569,7 +757,7 @@ static LIRenEntity* private_create_entity (
 	   of that since the caller might want to transfer it to the new model once
 	   it has loaded. */
 	if (self->pose != NULL)
-		limdl_pose_set_model (self->pose, model_data);
+		entity->set_pose (self->pose);
 
 	/* Set the entity flags. */
 	entity->setCastShadows (self->shadow_casting);
@@ -581,6 +769,49 @@ static LIRenEntity* private_create_entity (
 	entity->setVisible (self->visible);
 
 	return entity;
+}
+
+static void private_remove_entity (
+	LIRenObject* self,
+	int          index)
+{
+	/* Remove from the list and the scene node. */
+	LIRenEntity* entity = self->entities[index];
+	self->node->detachObject (entity);
+	self->entities.erase(self->entities.begin () + index);
+
+	/* Free entities waiting for the removal of this entity. */
+	/* This is a potentially recursive operation so the list indices may change
+	   wildly. To avoid out of bounds errors for sure, we restart the loop from
+	   scratch immediately after removing something. */
+	while (true)
+	{
+		bool found = false;
+		for (size_t i = 0 ; i < self->entities.size () ; i++)
+		{
+			if (entity == self->entities[i]->get_replacing_entity ())
+			{
+				private_remove_entity (self, i);
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+			break;
+	}
+
+	/* Free this entity. */
+	OGRE_DELETE entity;
+}
+
+static void private_update_entity_settings (
+	LIRenObject* self)
+{
+	for (size_t i = 0 ; i < self->entities.size () ; i++)
+	{
+		LIRenEntity* entity = self->entities[i];
+		entity->setCastShadows (self->shadow_casting);
+	}
 }
 
 /** @} */
