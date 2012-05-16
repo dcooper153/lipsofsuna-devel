@@ -27,8 +27,6 @@ Effectspec.introspect = Introspect{
 		{name = "sound_positional", type = "boolean", description = "False to make the sound non-positional."}
 	}}
 
-Effect = Effectspec --FIXME
-
 --- Registers a new effect spec.
 -- @param clss Effectspec class.
 -- @param args Arguments.

@@ -1,3 +1,5 @@
+Effect = Class()
+
 Effect.play = function(clss, args)
 	if args.point then
 		Vision:event{type = "world-effect", point = args.point, effect = args.effect}

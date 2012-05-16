@@ -1,8 +1,10 @@
 require "client/objects/effectobject"
 
+Effect = Class()
+
 Effect.play = function(clss, name)
-	if not Player.object then return end
-	clss:play_object(name, Player.object)
+	if not Client.player_object then return end
+	clss:play_object(name, Client.player_object)
 end
 
 --- Plays a global sound effect, such as an UI sound.
@@ -10,7 +12,7 @@ end
 -- @param name Effect spec name.
 Effect.play_global = function(clss, name)
 	-- Find the effect.
-	local effect = Effect:find{name = name}
+	local effect = Effectspec:find{name = name}
 	if not effect then return end
 	-- Create the effect object.
 	EffectObject{
@@ -29,7 +31,7 @@ end
 
 Effect.play_object = function(clss, name, object, node)
 	-- Find the effect.
-	local effect = Effect:find{name = name}
+	local effect = Effectspec:find{name = name}
 	if not effect then return end
 	-- Find the node.
 	local p
@@ -37,7 +39,7 @@ Effect.play_object = function(clss, name, object, node)
 	if n then p = object:find_node{name = n} end
 	-- Create the effect object.
 	EffectObject{
-		particle = effect.model,
+		particle = effect.particle,
 		object = object,
 		node = p and n,
 		rotation_inherit = (effect.rotation ~= false),
@@ -53,11 +55,11 @@ end
 
 Effect.play_world = function(clss, name, position)
 	-- Find the effect.
-	local effect = Effect:find{name = name}
+	local effect = Effectspec:find{name = name}
 	if not effect then return end
 	-- Create the effect object.
 	EffectObject{
-		particle = effect.model,
+		particle = effect.particle,
 		position = position,
 		sound = effect.sound,
 		sound_delay = effect.sound_delay,

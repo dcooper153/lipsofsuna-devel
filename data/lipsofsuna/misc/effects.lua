@@ -47,7 +47,7 @@ Effectspec{
 
 Effectspec{
 	name = "fleshimpact1",
-	particle = "blood1",
+	particle = "impact1",
 	sound = "thud-000"}
 
 Effectspec{
@@ -91,6 +91,7 @@ Effectspec{
 
 Effectspec{
 	name = "impact1",
+	particle = "impact1",
 	sound = "thud-000",
 	sound_pitch_min = 0.9,
 	sound_pitch_max = 1.1}

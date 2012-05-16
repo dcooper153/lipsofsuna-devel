@@ -175,11 +175,7 @@ Feat.play_effects_impact = function(self, args)
 	end
 	-- Play each effect.
 	for effect in pairs(effects) do
-		if args.object then
-			Effect:play{effect = effect, object = args.object}
-		else
-			Effect:play{effect = effect, point = args.point}
-		end
+		Effect:play{effect = effect, point = args.point}
 	end
 end
 
