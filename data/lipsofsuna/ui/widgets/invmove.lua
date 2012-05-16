@@ -15,4 +15,5 @@ Widgets.Uiinvmove.apply = function(self)
 		"uint32", Client.data.inventory.index,
 		"uint32", self.index)}
 	Ui:pop_state()
+	Effect:play_global("uitransition1")
 end

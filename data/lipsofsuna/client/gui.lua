@@ -222,9 +222,13 @@ Ui.command = function(self, cmd, press)
 		return
 	end
 	if cmd == "back" then
+		local state = self.state
 		local widget = self.widgets[self.focused_item]
 		if not widget or not widget.apply_back then return self:pop_state() end
 		if widget:apply_back() then self:pop_state() end
+		if state ~= self.state then
+			Effect:play_global("uitransition1")
+		end
 	elseif cmd == "apply" then
 		if self.focused_item then
 			local widget = self.widgets[self.focused_item]
@@ -248,6 +252,7 @@ Ui.command = function(self, cmd, press)
 				self:autoscroll()
 			end
 			self.history[self.history_state] = self.focused_item
+			Effect:play_global("uimove1")
 		end
 	elseif cmd == "down" then
 		self.repeat_timer = 0
@@ -267,6 +272,7 @@ Ui.command = function(self, cmd, press)
 				self:autoscroll()
 			end
 			self.history[self.history_state] = self.focused_item
+			Effect:play_global("uimove1")
 		end
 	end
 end

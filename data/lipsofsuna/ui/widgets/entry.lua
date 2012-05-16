@@ -23,6 +23,7 @@ Widgets.Uientry.apply = function(self)
 	self.input_mode = true
 	self.hint = "[RETURN]: End editing"
 	self.need_repaint = true
+	Effect:play_global("uitoggle1")
 end
 
 Widgets.Uientry.changed = function(self)

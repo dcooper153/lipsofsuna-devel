@@ -1359,6 +1359,21 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
   </asset>
 
   <asset>
+    <file>data/lipsofsuna/ui/sounds/toggle1.ogg</file>
+    <file>data/lipsofsuna/ui/sounds/toggle2.ogg</file>
+    <file>data/lipsofsuna/ui/sounds/transition1.flac</file>
+    <author>Ari Mustonen</author>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/ui/sounds/slider1.flac</file>
+    <author>qubodup</author>
+    <source>http://opengameart.org/content/click-ui-menu-sfx-yesnoselect</source>
+    <license>CC0</license>
+  </asset>
+
+  <asset>
     <file>data/lipsofsuna/sounds/builtrock1.ogg</file>
     <file>data/lipsofsuna/sounds/builtwood1.ogg</file>
     <file>data/lipsofsuna/sounds/craftmetal1.ogg</file>

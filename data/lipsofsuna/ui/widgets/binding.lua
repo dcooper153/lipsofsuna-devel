@@ -13,6 +13,7 @@ Widgets.Uibinding.new = function(clss, action)
 end
 
 Widgets.Uibinding.apply = function(self)
+	Effect:play_global("uitoggle1")
 	self.input_mode = true
 	self.input_key = "key1"
 	if self.action.mode == "analog" then
@@ -60,6 +61,7 @@ Widgets.Uibinding.handle_event = function(self, args)
 	end
 	-- Finish the input grab.
 	if accept then
+		Effect:play_global("uitoggle1")
 		if k == "key1" and a.mode == "analog" then
 			self.input_key = "key2"
 			self.hint = "Input the second control"

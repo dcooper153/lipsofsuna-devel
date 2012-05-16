@@ -13,6 +13,7 @@ end
 
 Widgets.Uidialogchoice.apply = function(self)
 	Network:send{packet = Packet(packets.DIALOG_ANSWER, "uint32", self.dialog_id, "string", self.text)}
+	Effect:play_global("transition1")
 end
 
 Widgets.Uidialogchoice.rebuild_canvas = function(self)

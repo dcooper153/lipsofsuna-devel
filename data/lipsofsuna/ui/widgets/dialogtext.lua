@@ -15,6 +15,7 @@ end
 
 Widgets.Uidialogtext.apply = function(self)
 	Network:send{packet = Packet(packets.DIALOG_ANSWER, "uint32", self.dialog_id, "string", "")}
+	Effect:play_global("uitransition1")
 end
 
 Widgets.Uidialogtext.rebuild_size = function(self)

@@ -26,6 +26,7 @@ Widgets.Uispell.apply = function(self)
 		Operators.spells:set_effect{self.spec.name, 1}
 	end
 	Ui:pop_state()
+	Effect:play_global("uitransition1")
 end
 
 Widgets.Uispell.rebuild_size = function(self)

@@ -5,6 +5,28 @@ Effect.play = function(clss, name)
 	clss:play_object(name, Player.object)
 end
 
+--- Plays a global sound effect, such as an UI sound.
+-- @param clss Effect class.
+-- @param name Effect spec name.
+Effect.play_global = function(clss, name)
+	-- Find the effect.
+	local effect = Effect:find{name = name}
+	if not effect then return end
+	-- Create the effect object.
+	EffectObject{
+		object = object,
+		sound = effect.sound,
+		sound_delay = effect.sound_delay,
+		sound_pitch = effect.sound_pitch,
+		sound_positional = false,
+		sound_volume = effect.sound_volume,
+		realized = true}
+	-- Quake the camera.
+	if effect.quake and Client.player_object then
+		Client:apply_quake(Client.player_object.position, effect.quake)
+	end
+end
+
 Effect.play_object = function(clss, name, object, node)
 	-- Find the effect.
 	local effect = Effect:find{name = name}

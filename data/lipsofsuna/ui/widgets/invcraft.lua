@@ -13,4 +13,5 @@ end
 
 Widgets.Uiinvcraft.apply = function(self)
 	Network:send{packet = Packet(packets.CRAFTING, "uint32", self.inventory_id, "string", self.name)}
+	Effect:play_global("uitransition1")
 end

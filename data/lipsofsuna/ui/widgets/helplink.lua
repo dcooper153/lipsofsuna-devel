@@ -13,4 +13,5 @@ end
 Widgets.Uihelplink.apply = function(self)
 	Client.data.help.page = self.link
 	Ui.state = "help"
+	Effect:play_global("uitransition1")
 end

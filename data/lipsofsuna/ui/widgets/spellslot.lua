@@ -25,4 +25,5 @@ Widgets.Uispellslot.apply = function(self)
 		Operators.spells:set_effect_index(self.index)
 		Ui:push_state("spells/effects")
 	end
+	Effect:play_global("uitransition1")
 end

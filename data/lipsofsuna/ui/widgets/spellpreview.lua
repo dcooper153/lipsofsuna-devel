@@ -14,6 +14,7 @@ end
 Widgets.Uispellpreview.apply = function(self)
 	Operators.spells:set_spell_index(self.index)
 	Ui:push_state("spells/spell")
+	Effect:play_global("uitransition1")
 end
 
 Widgets.Uispellpreview.rebuild_size = function(self)

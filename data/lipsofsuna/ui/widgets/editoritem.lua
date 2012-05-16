@@ -13,4 +13,5 @@ end
 
 Widgets.Uieditoritem.apply = function(self)
 	Client.editor:create_item(self.name)
+	Effect:play_global("uitransition1")
 end

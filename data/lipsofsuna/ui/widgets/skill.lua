@@ -22,9 +22,11 @@ Widgets.Uiskill.apply = function(self)
 	-- Add or remove the skill.
 	if self.value then
 		Client.data.skills:add(self.skill.name)
+		Effect:play_global("uitoggle1")
 	else
 		Client.data.skills:remove(self.skill.name)
 		Ui:restart_state()
+		Effect:play_global("uitoggle2")
 	end
 	-- Send an update.
 	local packet = Packet(packets.PLAYER_SKILLS)

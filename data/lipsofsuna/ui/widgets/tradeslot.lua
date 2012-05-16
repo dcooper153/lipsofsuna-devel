@@ -34,4 +34,5 @@ Widgets.Uitradeslot.apply = function(self)
 		Operators.trading:set_sell_index(self.index)
 		Ui:push_state("trading/sell")
 	end
+	Effect:play_global("uitransition1")
 end
