@@ -291,7 +291,7 @@ int liren_object_find_node (
 {
 	float scale;
 	LIMatTransform transform;
-	LIMdlNode* node;
+	LIMdlNode* node = NULL;
 
 	/* Find the node. */
 	/* This uses the poses of the entities instead of the pose of the object
