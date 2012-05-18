@@ -103,6 +103,9 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
     <url>http://peragro.org/</url>
   </author-info>
   <author-info>
+    <name>Renoki</name>
+  </author-info>
+  <author-info>
     <name>Scopia Visual Interfaces Systems, s.l.</name>
     <url>http://www.scopia.es/</url>
   </author-info>
@@ -856,13 +859,6 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
   </asset>
 
   <asset>
-    <file>data/lipsofsuna/environment/obelisk/obelisk1.lmdl</file>
-    <file>import/obelisk1.blend</file>
-    <author>Ari Mustonen</author>
-    <license>CC0</license>
-  </asset>
-
-  <asset>
     <file>data/lipsofsuna/particle/particle*.dds</file>
     <file>import/particle1.png</file>
     <file>import/particle2.png</file>
@@ -1455,6 +1451,23 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
     <file>import/bitingbark1n.png</file>
     <author>Francisco "FreeLikeGNU" Athens</author>
     <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/environment/obelisk/obelisk1.lmdl</file>
+    <file>data/lipsofsuna/environment/obelisk/obelisk1.png</file>
+    <file>data/lipsofsuna/items/ingot/ingot1.lmdl</file>
+    <file>import/obelisk1.blend</file>
+    <file>import/obelisk1.png</file>
+    <author>Renoki</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/items/ingot/ingot1.png</file>
+    <author>tidbit (Joseph)</author>
+    <license>Creative Commons BY 3.0</license>
+    <comment>Recolored</comment>
   </asset>
 
 </assets>
