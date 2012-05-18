@@ -41,7 +41,9 @@ class LIEnum:
 		self.TEXTYPE_ENVMAP = 1
 		self.TEXTYPE_IMAGE = 2
 		self.euler = mathutils.Euler((-0.5 * math.pi, 0, 0))
+		self.euler1 = mathutils.Euler((0.5 * math.pi, 0, 0))
 		self.matrix = self.euler.to_matrix().to_4x4()
+		self.matrix1 = self.euler1.to_matrix().to_4x4()
 		self.quat = self.euler.to_quaternion()
 LIFormat = LIEnum()
 
@@ -193,7 +195,7 @@ def apply_shape_key_mirror(obj, mod):
 	# Store original counts.
 	num_verts = len(obj.data.vertices)
 	num_edges = len(obj.data.edges)
-	num_faces = len(obj.data.faces)
+	num_faces = len(obj.data.polygons)
 	num_groups = len(obj.vertex_groups)
 	num_shapes = len(obj.data.shape_keys.key_blocks)
 	num_layers = 0
@@ -218,7 +220,7 @@ def apply_shape_key_mirror(obj, mod):
 			verts.append(mathutils.Vector((-vert.x, vert.y, vert.z)))
 	# Add original faces.
 	for i in range(0,num_faces):
-		face = obj.data.faces[i]
+		face = obj.data.polygons[i]
 		if len(face.vertices) == 3:
 			indices = [face.vertices[0], face.vertices[1], face.vertices[2]]
 		else:
@@ -243,7 +245,10 @@ def apply_shape_key_mirror(obj, mod):
 	mesh = bpy.data.meshes.new("LosTmp")
 	mesh.from_pydata(verts, [], faces)
 	mesh.update()
-	# Add complete vertex data.
+	# Create materials.
+	for mat in obj.data.materials:
+		mesh.materials.append(mat)
+	# Create vertices.
 	for i in range(0,len(verts)):
 		old_vert = obj.data.vertices[vert_newtoold[i]]
 		new_vert = mesh.vertices[i]
@@ -253,47 +258,37 @@ def apply_shape_key_mirror(obj, mod):
 			new_vert.normal = n.normalized()
 		else:
 			new_vert.normal = old_vert.normal.copy()
-	# Create materials.
-	for mat in obj.data.materials:
-		mesh.materials.append(mat)
-	# Create texture layers.
-	for i in range(0,num_layers):
-		mesh.uv_textures.new(obj.data.uv_textures[i].name)
-	# Add complete face data.
+	# Create faces.
 	for i in range(0,len(faces)):
-		old_face = obj.data.faces[face_newtoold[i]]
-		new_face = mesh.faces[i]
+		old_face = obj.data.polygons[face_newtoold[i]]
+		new_face = mesh.polygons[i]
 		new_face.hide = old_face.hide
 		new_face.material_index = old_face.material_index
 		new_face.select = old_face.select
 		new_face.use_smooth = old_face.use_smooth
+	# Create UV textures.
+	for i in range(0,num_layers):
+		old_texture = obj.data.uv_textures[i]
+		new_texture = mesh.uv_textures.new(old_texture.name)
+		for i in range(0,len(faces)):
+			old_uv_face = old_texture.data[face_newtoold[i]]
+			new_uv_face = new_texture.data[i]
+			new_uv_face.image = old_uv_face.image
+	# Create UV layers.
+	for i in range(0,len(faces)):
+		old_face = obj.data.polygons[face_newtoold[i]]
+		new_face = mesh.polygons[i]
 		for j in range(0,num_layers):
-			old_uv = obj.data.uv_textures[j].data[face_newtoold[i]]
-			new_uv = mesh.uv_textures[j].data[i]
-			new_uv.blend_type = old_uv.blend_type
-			new_uv.hide = old_uv.hide
-			new_uv.image = old_uv.image
-			new_uv.pin_uv = old_uv.pin_uv
-			new_uv.select_uv = old_uv.select_uv
-			new_uv.use_alpha_sort = old_uv.use_alpha_sort
-			new_uv.use_billboard = old_uv.use_billboard
-			new_uv.use_bitmap_text = old_uv.use_bitmap_text
-			new_uv.use_blend_shared = old_uv.use_blend_shared
-			new_uv.use_collision = old_uv.use_collision
-			new_uv.use_halo = old_uv.use_halo
-			new_uv.use_image = old_uv.use_image
-			new_uv.use_light = old_uv.use_light
-			new_uv.use_object_color = old_uv.use_object_color
-			new_uv.use_shadow_cast = old_uv.use_shadow_cast
-			new_uv.use_twoside = old_uv.use_twoside
-			if not mirror_u or face_newtoold[i] == i:
-				new_uv.uv = [(uv[0], uv[1]) for uv in old_uv.uv]
-			else:
-				uv = [(1.0-uv[0], uv[1]) for uv in old_uv.uv]
-				if len(uv) == 3:
-					new_uv.uv = [uv[2], uv[1], uv[0]]
+			for k in range(0,old_face.loop_total):
+				old_uv_face = obj.data.uv_layers[j].data[old_face.loop_start + k]
+				new_uv_face = mesh.uv_layers[j].data[new_face.loop_start + k]
+				new_uv_face.pin_uv = old_uv_face.pin_uv
+				new_uv_face.select = old_uv_face.select
+				new_uv_face.select_edge = old_uv_face.select_edge
+				if not mirror_u or face_newtoold[i] == i:
+					new_uv_face.uv = (old_uv_face.uv[0], old_uv_face.uv[1])
 				else:
-					new_uv.uv = [uv[3], uv[2], uv[1], uv[0]]
+					new_uv_face.uv = (1.0-old_uv_face.uv[0], old_uv_face.uv[1])
 	# Create the object.
 	object_data_add(bpy.context, mesh, operator=None)
 	new_obj = bpy.context.scene.objects.active
@@ -518,7 +513,7 @@ class LICollision:
 			icohull.data = icohull.to_mesh(bpy.context.scene, True, 'PREVIEW')
 			bpy.data.meshes.remove(oldmesh)
 			# Fix the coordinate system.
-			icohull.matrix_local = LIFormat.matrix * icohull.matrix_local
+			icohull.matrix_local = LIFormat.matrix1 * icohull.matrix_local
 			bpy.ops.object.transform_apply(rotation=True)
 			# Collect the resulting vertices.
 			shape = LIShape('default')
@@ -768,17 +763,18 @@ class LIMesh:
 		# the face if it isn't.
 		idx = face.material_index
 		bmat = None
-		bimg = None
 		if idx < len(obj.material_slots):
 			bmat = obj.material_slots[idx].material
 			files = material_files(bmat)
 			if len(files) and self.file not in files:
 				return
 		# Texture attributes.
-		if mesh.uv_textures.active:
-			buvs = mesh.uv_textures.active.data[face.index]
-			bimg = buvs.image
-			uvs = buvs.uv
+		bimg = None
+		uvtexture = mesh.uv_textures.active
+		uvlayer = mesh.uv_layers.active
+		if uvtexture and uvlayer:
+			bimg = uvtexture.data[face.index].image
+			uvs = [uvlayer.data[face.loop_start + i].uv for i in range(0, len(verts))]
 		else:
 			uvs = ((0, 0), (0, 0), (0, 0), (0, 0))
 		# Emit material.
@@ -821,7 +817,7 @@ class LIMesh:
 			mat.indices.append(vert.index)
 
 	def emit_faces(self, obj, mesh):
-		for face in mesh.faces:
+		for face in mesh.polygons:
 			self.emit_face(obj, mesh, face)
 
 	def write_bounds(self, writer):
@@ -1301,7 +1297,7 @@ class LIShapePart:
 
 	def __init__(self, obj, offset):
 		self.vertices = []
-		matrix = LIFormat.matrix.copy().to_3x3() * obj.matrix_world.to_3x3()
+		matrix = LIFormat.matrix1.copy().to_3x3() * obj.matrix_world.to_3x3()
 		for v in obj.data.vertices:
 			self.vertices.append(v.co * matrix + offset)
 
@@ -1322,7 +1318,7 @@ class LIShapeKey:
 		self.empty = True
 		# Calculate shape key vertex normals.
 		dict_index = {}
-		for face in obj.data.faces:
+		for face in obj.data.polygons:
 			coords = [bl_key.data[face.vertices[i]].co for i in range(len(face.vertices))]
 			if len(face.vertices) == 3:
 				nml = mathutils.geometry.normal(coords[0], coords[1], coords[2])
