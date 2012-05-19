@@ -1,0 +1,34 @@
+import math
+import bpy, mathutils
+
+class LIFormat:
+
+	debug = False
+	files = []
+	MAGIC = 'lips/mdl'
+	VERSION = 0xFFFFFFF3
+	LIGHTFLAG_NOSHADOW = 0x01
+	LIGHTFLAG_NEWFORMAT = 0x80
+	MATRFLAG_BILLBOARD = 0x01
+	MATRFLAG_COLLISION = 0x02
+	MATRFLAG_CULLFACE = 0x04
+	MATRFLAG_ALPHA = 0x08
+	MATRFLAG_REFERENCE = 0x10
+	MATRFLAG_DEFAULT = MATRFLAG_COLLISION | MATRFLAG_CULLFACE | MATRFLAG_REFERENCE
+	NODETYPE_BONE = 0
+	NODETYPE_EMPTY = 1
+	NODETYPE_LIGHT = 2
+	PARTICLEFLAG_NEWFORMAT = 0x80000000
+	TEXFLAG_BILINEAR = 1
+	TEXFLAG_CLAMP = 2
+	TEXFLAG_MIPMAP = 4
+	TEXFLAG_REPEAT = 8
+	TEXFLAG_DEFAULT = TEXFLAG_BILINEAR | TEXFLAG_MIPMAP | TEXFLAG_REPEAT
+	TEXTYPE_NONE = 0
+	TEXTYPE_ENVMAP = 1
+	TEXTYPE_IMAGE = 2
+	euler = mathutils.Euler((-0.5 * math.pi, 0, 0))
+	euler1 = mathutils.Euler((0.5 * math.pi, 0, 0))
+	matrix = euler.to_matrix().to_4x4()
+	matrix1 = euler1.to_matrix().to_4x4()
+	quat = euler.to_quaternion()
