@@ -7,6 +7,8 @@ from .export_finished_dialog import *
 from .file import *
 from .format import *
 from .material import *
+from .material_export_settings_operator import *
+from .material_property_panel import *
 from .mesh import *
 from .node import *
 from .node_armature import *
@@ -42,6 +44,7 @@ bl_info = {
 ##############################################################################
 
 bpy.utils.register_class(LIExportFinishedDialog)
+bpy.utils.register_class(LIMaterialExportSettingsOperator)
 bpy.utils.register_class(LIObjectExportSettingsOperator)
 
 def menu_func(self, context):

@@ -1,8 +1,8 @@
 import bpy
 
 class LIObjectExportSettingsOperator(bpy.types.Operator):
-	bl_idname = "wm.lipsofsuna_export_settings"
-	bl_label = "Exporting Settings"
+	bl_idname = "wm.lipsofsuna_object_export_settings"
+	bl_label = "Object Exporting Settings"
 	bl_description = 'Control what data is exported of this object'
 
 	li_export = bpy.props.EnumProperty(name='Export mode', description='The type of data exported from the object', items=[\

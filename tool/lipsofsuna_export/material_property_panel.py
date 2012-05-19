@@ -1,11 +1,11 @@
 import bpy
 
-class LIObjectPropertyPanel(bpy.types.Panel):
-	bl_idname = "OBJECT_PT_lipsofsuna_object_property"
+class LIMaterialPropertyPanel(bpy.types.Panel):
+	bl_idname = "OBJECT_PT_lipsofsuna_material_property"
 	bl_label = "Lips of Suna"
 	bl_space_type = 'PROPERTIES'
 	bl_region_type = 'WINDOW'
-	bl_context = "object"
+	bl_context = "material"
 	bl_options = {'DEFAULT_CLOSED'}
 
 	@classmethod
@@ -15,4 +15,4 @@ class LIObjectPropertyPanel(bpy.types.Panel):
 	def draw(self, context):
 		layout = self.layout
 		col = layout.column()
-		col.operator("wm.lipsofsuna_object_export_settings", text="Exporting Settings", icon="FILE")
+		col.operator("wm.lipsofsuna_material_export_settings", text="Exporting Settings", icon="FILE")
