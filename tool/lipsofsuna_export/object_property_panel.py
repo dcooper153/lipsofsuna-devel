@@ -16,3 +16,4 @@ class LIObjectPropertyPanel(bpy.types.Panel):
 		layout = self.layout
 		col = layout.column()
 		col.operator("wm.lipsofsuna_object_export_settings", text="Exporting Settings", icon="FILE")
+		col.operator("wm.lipsofsuna_copy_shape_keys", text="Copy Shape Keys", icon="COPY_ID")
