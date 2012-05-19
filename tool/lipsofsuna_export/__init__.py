@@ -3,6 +3,7 @@ import bpy, mathutils
 from .animation import *
 from .collision import *
 from .copy_shape_keys_operator import *
+from .copy_weight_groups_operator import *
 from .exporter import *
 from .export_finished_dialog import *
 from .file import *
