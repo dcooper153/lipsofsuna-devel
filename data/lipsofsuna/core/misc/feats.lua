@@ -95,6 +95,7 @@ Feattypespec{
 	cooldown = 1,
 	effect = "swing1",
 	effect_impact = "impact1",
+	range = 10,
 	required_weapon = "throwable"}
 
 ---------------------------------------------------------------------
