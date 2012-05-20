@@ -1,4 +1,4 @@
-pass foliage1/lighting
+pass foliage1/3/lighting
 {
 	max_lights 3
 	ambient 0.3 0.3 0.3
@@ -36,25 +36,42 @@ material foliage1
 	technique
 	{
 		shadow_caster_material shadowcasteralpha1
-		pass LOS1 : foliage1/lighting
+		pass LOS1 : foliage1/3/lighting
 		{
 		}
 	}
 	technique
 	{
-		scheme no-outline
+		scheme quality3
 		shadow_caster_material shadowcasteralpha1
-		pass LOS1 : foliage1/lighting
+		pass LOS1 : foliage1/3/lighting
 		{
 		}
 	}
 	technique
 	{
+		scheme quality2outline
+		shadow_caster_material shadowcasteralpha1
+		pass LOS1 : foliage1/3/lighting
+		{
+		}
+	}
+	technique
+	{
+		scheme quality2
+		shadow_caster_material shadowcasteralpha1
+		pass LOS1 : foliage1/3/lighting
+		{
+		}
+	}
+	technique
+	{
+		scheme quality1
 		pass LOS1
 		{
 			ambient 0.3 0.3 0.3
 			diffuse 1.0 1.0 1.0
-			specular 1.0 1.0 1.0 1.0 64
+			specular 0.0 0.0 0.0 1.0 1
 			alpha_rejection greater_equal 128
 			cull_hardware none
 			texture_unit LOS1

@@ -35,8 +35,15 @@ Ui:add_widget{
 Ui:add_widget{
 	state = "options",
 	widget = function()
+		return Widgets.Uiconfigoption("shader_quality",
+			function() Client.options:apply() end)
+		end}
+
+Ui:add_widget{
+	state = "options",
+	widget = function()
 		return Widgets.Uiconfigoption("outlines_enabled",
-			function() Client:update_rendering_style() end)
+			function() Client.options:apply() end)
 		end}
 
 Ui:add_widget{
@@ -64,7 +71,7 @@ Ui:add_widget{
 	state = "options",
 	widget = function()
 		return Widgets.Uiconfigoption("bloom_enabled",
-			function() Client:update_rendering_style() end)
+			function() Client.options:apply() end)
 	end}
 
 Ui:add_widget{

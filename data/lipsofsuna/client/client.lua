@@ -23,7 +23,6 @@ Client.init = function(self)
 	self.options = Options.inst
 	self.controls = ConfigFile{name = "controls.cfg"}
 	self:load_controls()
-	self:update_rendering_style()
 	-- Initialize the world.
 	self.sectors = Sectors{database = Client.db, save_objects = false}
 	self.sectors:erase_world()
@@ -165,17 +164,6 @@ end
 --- Updates the rendering style to match the current settings.
 -- @param self Client.
 Client.update_rendering_style = function(self)
-	-- Outline rendering.
-	if self.options.outlines_enabled then
-		Render.material_scheme = "Default"
-	else
-		Render.material_scheme = "no-outline"
-	end
-	-- Bloom.
-	Render:remove_compositor("bloom1")
-	if self.options.bloom_enabled then
-		Render:add_compositor("bloom1")
-	end
 end
 
 --- Sets or unsets the active target.

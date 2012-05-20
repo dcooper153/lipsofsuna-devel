@@ -29,6 +29,7 @@ material bounds1
 	}
 	technique
 	{
+		scheme quality1
 		pass
 		{
 			ambient 1.0 1.0 1.0

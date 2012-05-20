@@ -1,49 +1,54 @@
+pass terrain1/3/lighting
+{
+	max_lights 3
+	ambient 0.7 0.7 0.7
+	diffuse 1.0 1.0 1.0
+	specular 0.1 0.1 0.1 0.1 64
+	texture_unit LOS1
+	{
+		texture granite1.dds
+	}
+	texture_unit LOS2
+	{
+		texture granite1n.dds
+	}
+	texture_unit LOS3
+	{
+		texture stone-001.dds
+	}
+	texture_unit
+	{
+		texture celramp1.png 1d
+		tex_address_mode clamp
+	}
+	texture_unit
+	{
+		texture celramp2.png 1d
+		tex_address_mode clamp
+	}
+	texture_unit
+	{
+		content_type shadow
+	}
+	vertex_program_ref terrain1_vert
+	{
+	}
+	fragment_program_ref terrain1_frag
+	{
+	}
+}
+
 material terrain1
 {
 	technique
 	{
-		pass
+		pass LOS1 : terrain1/3/lighting
 		{
-			max_lights 3
-			ambient 0.7 0.7 0.7
-			diffuse 1.0 1.0 1.0
-			specular 0.1 0.1 0.1 0.1 64
-			texture_unit LOS1
-			{
-				texture granite1.dds
-			}
-			texture_unit LOS2
-			{
-				texture granite1n.dds
-			}
-			texture_unit LOS3
-			{
-				texture stone-001.dds
-			}
-			texture_unit
-			{
-				texture celramp1.png 1d
-				tex_address_mode clamp
-			}
-			texture_unit
-			{
-				texture celramp2.png 1d
-				tex_address_mode clamp
-			}
-			texture_unit
-			{
-				content_type shadow
-			}
-			vertex_program_ref terrain1_vert
-			{
-			}
-			fragment_program_ref terrain1_frag
-			{
-			}
 		}
 	}
 	technique
 	{
+		scheme quality1
 		pass
 		{
 			ambient 1.0 1.0 1.0

@@ -1,4 +1,4 @@
-pass animskin1/lighting
+pass animskin1/3/lighting
 {
 	max_lights 3
 	ambient 0.3 0.3 0.3
@@ -28,6 +28,36 @@ pass animskin1/lighting
 	}
 }
 
+pass animskin1/2/lighting
+{
+	max_lights 3
+	ambient 0.3 0.3 0.3
+	diffuse 1.0 1.0 1.0
+	specular 1.0 1.0 1.0 1.0 64
+	texture_unit LOS1
+	{
+	}
+	texture_unit
+	{
+	}
+	texture_unit
+	{
+		texture celramp1.png 1d
+		tex_address_mode clamp
+	}
+	texture_unit
+	{
+		texture celramp2.png 1d
+		tex_address_mode clamp
+	}
+	vertex_program_ref animdiff1_vert
+	{
+	}
+	fragment_program_ref diff1_frag
+	{
+	}
+}
+
 pass animskin1/outline
 {
 	cull_hardware anticlockwise
@@ -45,7 +75,7 @@ material animskin1
 	technique
 	{
 		shadow_caster_material animshadowcaster1
-		pass LOS1 : animskin1/lighting
+		pass LOS1 : animskin1/3/lighting
 		{
 		}
 		pass outline : animskin1/outline
@@ -54,19 +84,39 @@ material animskin1
 	}
 	technique
 	{
-		scheme no-outline
+		scheme quality3
 		shadow_caster_material animshadowcaster1
-		pass LOS1 : animskin1/lighting
+		pass LOS1 : animskin1/3/lighting
 		{
 		}
 	}
-	technique fallback
+	technique
 	{
+		scheme quality2outline
+		shadow_caster_material animshadowcaster1
+		pass LOS1 : animskin1/2/lighting
+		{
+		}
+		pass outline : animskin1/outline
+		{
+		}
+	}
+	technique
+	{
+		scheme quality2
+		shadow_caster_material animshadowcaster1
+		pass LOS1 : animskin1/2/lighting
+		{
+		}
+	}
+	technique
+	{
+		scheme quality1
 		pass LOS1
 		{
 			ambient 0.3 0.3 0.3
 			diffuse 1.0 1.0 1.0
-			specular 1.0 1.0 1.0 1.0 64
+			specular 0.0 0.0 0.0 1.0 1
 			texture_unit LOS1
 			{
 			}
