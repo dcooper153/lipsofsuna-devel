@@ -275,6 +275,7 @@ static int private_process_result (
 		transform = limat_transform_init (task->offset, limat_quaternion_identity ());
 		liren_render_object_set_model (self->render, block->object_next, block->model_next);
 		liren_render_object_set_transform (self->render, block->object_next, &transform);
+		liren_render_object_set_realized (self->render, block->object_next, 1);
 	}
 	else
 	{
@@ -351,14 +352,14 @@ static int private_tick (
 		self->tasks.worker = lisys_async_call_new (private_worker_thread, NULL, self);
 	lisys_mutex_unlock (self->tasks.mutex);
 
-	/* Show blocks when they have been loaded. */
+	/* Clear replaced blocks when the replacement has finished loading. */
 	LIALG_MEMDIC_FOREACH (iter, self->blocks)
 	{
 		/* Filter out up-to-date blocks. */
 		block = iter.value;
 		if (!block->model_next || !block->object_next)
 			continue;
-		if (!liren_render_model_get_loaded (self->render, block->model_next))
+		if (!liren_render_object_get_loaded (self->render, block->object_next))
 			continue;
 
 		/* Replace the old model. */
@@ -372,9 +373,6 @@ static int private_tick (
 			liren_render_object_free (self->render, block->object);
 		block->object = block->object_next;
 		block->object_next = 0;
-
-		/* Show the finished object. */
-		liren_render_object_set_realized (self->render, block->object, 1);
 	}
 
 	return 1;
