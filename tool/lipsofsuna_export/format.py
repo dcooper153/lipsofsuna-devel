@@ -6,7 +6,9 @@ class LIFormat:
 	debug = False
 	files = []
 	MAGIC = 'lips/mdl'
+	MAGIC_ANIM = 'lips/ani'
 	VERSION = 0xFFFFFFF3
+	VERSION_ANIM = 0x00000001
 	LIGHTFLAG_NOSHADOW = 0x01
 	LIGHTFLAG_NEWFORMAT = 0x80
 	MATRFLAG_BILLBOARD = 0x01

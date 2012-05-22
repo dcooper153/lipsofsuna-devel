@@ -1,4 +1,4 @@
-import os
+import os, re
 import bpy
 from .collision import *
 from .format import *
@@ -237,10 +237,6 @@ class LIFile:
 			data.clear("nod")
 			if self.hier.write(data):
 				self.write_block("nod", data)
-			# Animations.
-			data.clear("ani")
-			if self.hier.write_anims(data):
-				self.write_block("ani", data)
 		# Shapes.
 		data.clear("sha")
 		if self.coll.write(data):
@@ -253,6 +249,35 @@ class LIFile:
 		self.file.close()
 		if debug:
 			debug.close()
+
+	def write_anims(self):
+		if not self.hier:
+			return
+		for anim in self.hier.animlist:
+			# Create the animation path.
+			name = re.sub("[^A-Za-z0-9]", "-", anim.name)
+			suff = "-" + name + ".lani"
+			path = suff.join(self.filepath.rsplit(".lmdl", 1))
+			# Open the file.
+			if LIFormat.debug:
+				debug = open(path + ".dbg.txt", "w")
+			else:
+				debug = None
+			self.file = open(path, "wb")
+			# Header.
+			data = LIWriter(debug)
+			data.clear(LIFormat.MAGIC_ANIM)
+			data.write_int(LIFormat.VERSION_ANIM)
+			data.write_marker()
+			self.write_block(LIFormat.MAGIC_ANIM, data)
+			# Animation.
+			data.clear("ani")
+			anim.write(data)
+			self.write_block("ani", data)
+			# Done.
+			self.file.close()
+			if debug:
+				debug.close()
 
 	def write_block(self, name, data):
 		self.file.write(name.encode())

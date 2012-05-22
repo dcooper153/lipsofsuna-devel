@@ -55,6 +55,7 @@ class LIExporter(bpy.types.Operator):
 			# Process the file some.
 			if file.process():
 				file.write()
+				file.write_anims()
 				self.state += 1
 			self.message = file.get_progress_info()
 			return True

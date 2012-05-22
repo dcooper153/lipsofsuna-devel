@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -25,7 +25,8 @@
 #include "lipsofsuna/system.h"
 #include "model-animation.h"
 
-#define TIMESCALE 0.02f
+#define LIMDL_ANIMATION_VERSION 0x00000001
+#define LIMDL_ANIMATION_TIMESCALE 0.02f
 
 static void private_frame_transform (
 	LIMdlAnimation* self,
@@ -34,7 +35,93 @@ static void private_frame_transform (
 	float*          scale,
 	LIMatTransform* value);
 
+static int private_read (
+	LIMdlAnimation* self,
+	LIArcReader*    reader);
+
 /*****************************************************************************/
+
+/**
+ * \brief Creates an empty animation.
+ * \return New animation.
+ */
+LIMdlAnimation* limdl_animation_new ()
+{
+	LIMdlAnimation* self;
+
+	self = lisys_calloc (1, sizeof (LIMdlAnimation));
+	if (self == NULL)
+		return NULL;
+
+	return self;
+}
+
+/**
+ * \brief Creates an deep copy of an animation.
+ * \param anim Animation to copy.
+ * \return New animation.
+ */
+LIMdlAnimation* limdl_animation_new_copy (
+	const LIMdlAnimation* anim)
+{
+	LIMdlAnimation* self;
+
+	self = lisys_calloc (1, sizeof (LIMdlAnimation));
+	if (self == NULL)
+		return NULL;
+	if (!limdl_animation_init_copy (self, anim))
+	{
+		limdl_animation_free (self);
+		return NULL;
+	}
+
+	return self;
+}
+
+/**
+ * \brief Creates an animation from a stream reader.
+ * \param reader Stream reader.
+ * \return New animation, or NULL.
+ */
+LIMdlAnimation* limdl_animation_new_from_data (
+	LIArcReader* reader)
+{
+	LIMdlAnimation* self;
+
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (LIMdlAnimation));
+	if (self == NULL)
+		return NULL;
+
+	/* Read from the stream. */
+	if (!private_read (self, reader))
+	{
+		limdl_animation_free (self);
+		return NULL;
+	}
+
+	return self;
+}
+
+/**
+ * \brief Creates an animation from a file.
+ * \param path File path.
+ * \return New animation, or NULL.
+ */
+LIMdlAnimation* limdl_animation_new_from_file (
+	const char* path)
+{
+	LIArcReader* reader;
+	LIMdlAnimation* self;
+
+	reader = liarc_reader_new_from_file (path);
+	if (reader == NULL)
+		return NULL;
+	self = limdl_animation_new_from_data (reader);
+	liarc_reader_free (reader);
+
+	return self;
+}
 
 /**
  * \brief Copies the animation.
@@ -43,8 +130,8 @@ static void private_frame_transform (
  * \return Nonzero on success.
  */
 int limdl_animation_init_copy (
-	LIMdlAnimation* self,
-	LIMdlAnimation* anim)
+	LIMdlAnimation*       self,
+	const LIMdlAnimation* anim)
 {
 	int i;
 
@@ -82,29 +169,6 @@ int limdl_animation_init_copy (
 	}
 
 	return 1;
-}
-
-/**
- * \brief Creates a soft copy of the animation.
- * \param anim Animation.
- * \return New animation or NULL.
- */
-LIMdlAnimation* limdl_animation_new_copy (
-	LIMdlAnimation* anim)
-{
-	LIMdlAnimation* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIMdlAnimation));
-	if (self == NULL)
-		return NULL;
-	if (!limdl_animation_init_copy (self, anim))
-	{
-		limdl_animation_free (self);
-		return NULL;
-	}
-
-	return self;
 }
 
 /**
@@ -314,8 +378,21 @@ float limdl_animation_get_duration (
 	const LIMdlAnimation* self)
 {
 	if (self->length > 1)
-		return (self->length - 1) * TIMESCALE;
+		return (self->length - 1) * LIMDL_ANIMATION_TIMESCALE;
 	return 1.0f;
+}
+
+/**
+ * \brief Gets the number of frames in the animation.
+ * \param self Animation.
+ * \return Number of frames.
+ */
+int limdl_animation_get_length (
+	const LIMdlAnimation* self)
+{
+	if (!self->channels.count)
+		return 0;
+	return self->buffer.count / self->channels.count;
 }
 
 /**
@@ -418,6 +495,7 @@ int limdl_animation_get_transform (
 {
 	int chan;
 	int frame;
+	int len;
 	float s0;
 	float s1;
 	float blend;
@@ -428,13 +506,16 @@ int limdl_animation_get_transform (
 	chan = limdl_animation_get_channel (self, name);
 	if (chan == -1)
 		return 0;
+	len = limdl_animation_get_length (self);
+	if (len == 0)
+		return 0;
 
-	frames = secs / TIMESCALE;
+	frames = secs / LIMDL_ANIMATION_TIMESCALE;
 	frame = (int) frames;
-	if (frame <= 0)
+	if (frame < 0)
 		private_frame_transform (self, chan, 0, scale, value);
-	else if (frame >= self->length - 1)
-		private_frame_transform (self, chan, self->length - 1, scale, value);
+	else if (frame >= len - 1)
+		private_frame_transform (self, chan, len - 1, scale, value);
 	else
 	{
 		blend = frames - frame;
@@ -459,6 +540,81 @@ static void private_frame_transform (
 {
 	*scale = self->buffer.array[self->channels.count * frame + chan].scale;
 	*value = self->buffer.array[self->channels.count * frame + chan].transform;
+}
+
+static int private_read (
+	LIMdlAnimation* self,
+	LIArcReader*    reader)
+{
+	int ret;
+	char* id;
+	uint32_t size;
+	uint32_t version;
+
+	/* Read the magic. */
+	if (!liarc_reader_check_text (reader, "lips/ani", ""))
+	{
+		lisys_error_set (EINVAL, "wrong animation file format");
+		return 0;
+	}
+
+	/* Read header chunk size. */
+	if (!liarc_reader_get_uint32 (reader, &size))
+		return 0;
+	if (size != 4)
+	{
+		lisys_error_set (LISYS_ERROR_VERSION, "invalid animation header block");
+		return 0;
+	}
+
+	/* Read the version. */
+	if (!liarc_reader_get_uint32 (reader, &version))
+		return 0;
+	if (version != LIMDL_ANIMATION_VERSION)
+	{
+		lisys_error_set (LISYS_ERROR_VERSION, "animation version mismatch");
+		return 0;
+	}
+
+	/* Read chunks. */
+	while (!liarc_reader_check_end (reader))
+	{
+		id = NULL;
+		if (!liarc_reader_get_text (reader, "", &id) ||
+		    !liarc_reader_get_uint32 (reader, &size))
+		{
+			lisys_error_set (LISYS_ERROR_VERSION, "reading chunk failed");
+			lisys_free (id);
+			return 0;
+		}
+		if (size > reader->length - reader->pos)
+		{
+			lisys_error_set (LISYS_ERROR_VERSION, "invalid chunk size for `%s'", id);
+			lisys_free (id);
+			return 0;
+		}
+		if (!strcmp (id, "ani"))
+			ret = limdl_animation_read (self, reader);
+		else
+		{
+			if (!liarc_reader_skip_bytes (reader, size))
+			{
+				lisys_error_set (LISYS_ERROR_VERSION, "failed to skip block `%s'", id);
+				lisys_free (id);
+				return 0;
+			}
+			ret = 1;
+		}
+		if (!ret)
+		{
+			lisys_error_set (LISYS_ERROR_VERSION, "failed to read block `%s'", id);
+			lisys_free (id);
+			return 0;
+		}
+		lisys_free (id);
+	}
+
+	return 1;
 }
 
 /** @} */

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,28 +15,28 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_MODULE_H__
-#define __EXT_MODULE_H__
+#ifndef __EXT_ANIMATION_MODULE_H__
+#define __EXT_ANIMATION_MODULE_H__
 
 #include "lipsofsuna/extension.h"
 
 #define LIEXT_SCRIPT_ANIMATION "Animation"
 
-typedef struct _LIExtModule LIExtModule;
-struct _LIExtModule
+typedef struct _LIExtAnimationModule LIExtAnimationModule;
+struct _LIExtAnimationModule
 {
 	LIMaiProgram* program;
 };
 
-LIExtModule* liext_animation_new (
+LIExtAnimationModule* liext_animation_new (
 	LIMaiProgram* program);
 
 void liext_animation_free (
-	LIExtModule* self);
+	LIExtAnimationModule* self);
 
 /*****************************************************************************/
 
-void liext_script_object_animation (
+void liext_script_animation (
 	LIScrScript* self);
 
 #endif

@@ -174,7 +174,3 @@ do
 end
 
 moveitem = { INVENTORY = 0, EQUIPMENT = 1, WORLD = 2 }
-
-Animation = {}
-Animation.CHANNEL_TILT = 127
-Animation.CHANNEL_CUSTOMIZE = 128

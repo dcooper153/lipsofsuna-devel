@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,9 +18,9 @@
 #ifndef __MODEL_ANIMATION_H__
 #define __MODEL_ANIMATION_H__
 
-#include <lipsofsuna/archive.h>
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/archive.h"
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/system.h"
 
 typedef struct _LIMdlFrame LIMdlFrame;
 struct _LIMdlFrame
@@ -48,12 +48,20 @@ struct _LIMdlAnimation
 	} channels;
 };
 
-LIAPICALL (int, limdl_animation_init_copy, (
-	LIMdlAnimation* self,
-	LIMdlAnimation* anim));
+LIAPICALL (LIMdlAnimation*, limdl_animation_new, ());
 
 LIAPICALL (LIMdlAnimation*, limdl_animation_new_copy, (
-	LIMdlAnimation* anim));
+	const LIMdlAnimation* anim));
+
+LIAPICALL (LIMdlAnimation*, limdl_animation_new_from_data, (
+	LIArcReader* reader));
+
+LIAPICALL (LIMdlAnimation*, limdl_animation_new_from_file, (
+	const char* path));
+
+LIAPICALL (int, limdl_animation_init_copy, (
+	LIMdlAnimation*       self,
+	const LIMdlAnimation* anim));
 
 LIAPICALL (void, limdl_animation_free, (
 	LIMdlAnimation* self));
@@ -74,6 +82,9 @@ LIAPICALL (int, limdl_animation_get_channel, (
 	const char*     name));
 
 LIAPICALL (float, limdl_animation_get_duration, (
+	const LIMdlAnimation* self));
+
+LIAPICALL (int, limdl_animation_get_length, (
 	const LIMdlAnimation* self));
 
 LIAPICALL (int, limdl_animation_set_length, (
