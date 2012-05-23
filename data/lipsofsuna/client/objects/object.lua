@@ -210,9 +210,6 @@ end
 if not Object.animate then
 	Object.animate = function() end
 end
-if not Object.edit_pose then
-	Object.edit_pose = function() end
-end
 if not Object.find_node then
 	Object.find_node = function() end
 end

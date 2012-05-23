@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,8 +18,8 @@
 #ifndef __MODEL_H__
 #define __MODEL_H__
 
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/system.h"
 #include "model-animation.h"
 #include "model-bone.h"
 #include "model-faces.h"
@@ -43,7 +43,6 @@ struct _LIMdlModel
 {
 	int flags;
 	LIMatAabb bounds;
-	struct { int count; LIMdlAnimation* array; } animations;
 	struct { int count; LIMdlHairs* array; } hairs;
 	struct { int count; LIMdlLod* array; } lod;
 	struct { int count; LIMdlMaterial* array; } materials;
@@ -79,10 +78,6 @@ LIAPICALL (void, limdl_model_calculate_tangents, (
 
 LIAPICALL (void, limdl_model_clear_vertices, (
 	LIMdlModel* self));
-
-LIAPICALL (LIMdlAnimation*, limdl_model_find_animation, (
-	LIMdlModel* self,
-	const char* name));
 
 LIAPICALL (int, limdl_model_find_material, (
 	const LIMdlModel*    self,

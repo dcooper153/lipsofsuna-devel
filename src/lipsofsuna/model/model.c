@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -38,10 +38,6 @@ static int private_read (
 	LIMdlModel*  self,
 	LIArcReader* reader,
 	int          mesh);
-
-static int private_read_animations (
-	LIMdlModel*  self,
-	LIArcReader* reader);
 
 static int private_read_bounds (
 	LIMdlModel*  self,
@@ -100,10 +96,6 @@ static int private_write_block (
 	const LIMdlModel* self,
 	const char*       name,
 	LIMdlWriteFunc    func,
-	LIArcWriter*      writer);
-
-static int private_write_animations (
-	const LIMdlModel* self,
 	LIArcWriter*      writer);
 
 static int private_write_bounds (
@@ -189,13 +181,6 @@ LIMdlModel* limdl_model_new_copy (
 
 	/* Copy everything. */
 	/* FIXME: Not all are supported yet.  */
-	if (model->animations.count)
-	{
-		self->animations.array = lisys_calloc (model->animations.count, sizeof (LIMdlAnimation));
-		self->animations.count = model->animations.count;
-		for (i = 0 ; i < model->animations.count ; i++)
-			limdl_animation_init_copy (self->animations.array + i, model->animations.array + i);
-	}
 #if 0
 	if (model->hairs.count)
 	{
@@ -403,14 +388,6 @@ void limdl_model_free (
 		lisys_free (self->nodes.array);
 	}
 
-	/* Free animations. */
-	if (self->animations.array != NULL)
-	{
-		for (i = 0 ; i < self->animations.count ; i++)
-			limdl_animation_clear (self->animations.array + i);
-		lisys_free (self->animations.array);
-	}
-
 	/* Free particles. */
 	if (self->particle_systems.array != NULL)
 	{
@@ -522,27 +499,6 @@ void limdl_model_clear_vertices (
 		lod->indices.count = 0;
 	}
 	self->lod.count = 1;
-}
-
-/**
- * \brief Finds an animation by name.
- * \param self Model.
- * \param name Animation name.
- * \return Animation or NULL.
- */
-LIMdlAnimation* limdl_model_find_animation (
-	LIMdlModel* self,
-	const char* name)
-{
-	int i;
-
-	for (i = 0 ; i < self->animations.count ; i++)
-	{
-		if (!strcmp (self->animations.array[i].name, name))
-			return self->animations.array + i;
-	}
-
-	return NULL;
 }
 
 /**
@@ -912,8 +868,6 @@ int limdl_model_get_memory (
 
 	/* TODO: Many of these have memory allocations of their own, */
 	total = sizeof (LIMdlModel);
-	for (i = 0 ; i < self->animations.count ; i++)
-		total += sizeof (LIMdlAnimation);
 	for (i = 0 ; i < self->hairs.count ; i++)
 		total += sizeof (LIMdlHairs);
 	for (i = 0 ; i < self->lod.count ; i++)
@@ -1089,8 +1043,6 @@ static int private_read (
 			ret = private_read_shape_keys (self, reader);
 		else if (mesh && !strcmp (id, "nod"))
 			ret = private_read_nodes (self, reader);
-		else if (mesh && !strcmp (id, "ani"))
-			ret = private_read_animations (self, reader);
 		else if (mesh && !strcmp (id, "hai"))
 			ret = private_read_hairs (self, reader);
 		else if (mesh && !strcmp (id, "par"))
@@ -1154,36 +1106,6 @@ static int private_read (
 				lisys_error_set (EINVAL, "weight group index out of bounds");
 				return 0;
 			}
-		}
-	}
-
-	return 1;
-}
-
-static int private_read_animations (
-	LIMdlModel*  self,
-	LIArcReader* reader)
-{
-	int i;
-	uint32_t tmp;
-	LIMdlAnimation* animation;
-
-	/* Read header. */
-	if (!liarc_reader_get_uint32 (reader, &tmp))
-		return 0;
-	self->animations.count = tmp;
-
-	/* Read animations. */
-	if (self->animations.count)
-	{
-		self->animations.array = lisys_calloc (self->animations.count, sizeof (LIMdlAnimation));
-		if (self->animations.array == NULL)
-			return 0;
-		for (i = 0 ; i < self->animations.count ; i++)
-		{
-			animation = self->animations.array + i;
-			if (!limdl_animation_read (animation, reader))
-				return 0;
 		}
 	}
 
@@ -1601,7 +1523,6 @@ static int private_write (
 	    !private_write_block (self, "lod", private_write_lod, writer) ||
 	    !private_write_block (self, "shk", private_write_shape_keys, writer) ||
 	    !private_write_block (self, "nod", private_write_nodes, writer) ||
-	    !private_write_block (self, "ani", private_write_animations, writer) ||
 	    !private_write_block (self, "hai", private_write_hairs, writer) ||
 	    !private_write_block (self, "par", private_write_particles, writer) ||
 	    !private_write_block (self, "sha", private_write_shapes, writer))
@@ -1644,53 +1565,6 @@ static int private_write_block (
 		return 0;
 	}
 	liarc_writer_free (data);
-
-	return 1;
-}
-
-static int private_write_animations (
-	const LIMdlModel* self,
-	LIArcWriter*      writer)
-{
-	int i;
-	int j;
-	LIMdlAnimation* animation;
-	LIMatTransform* transform;
-
-	/* Check if writing is needed. */
-	if (!self->animations.count)
-		return 1;
-
-	/* Write animations. */
-	if (!liarc_writer_append_uint32 (writer, self->animations.count))
-		return 0;
-	for (i = 0 ; i < self->animations.count ; i++)
-	{
-		animation = self->animations.array + i;
-		if (!liarc_writer_append_string (writer, animation->name) ||
-		    !liarc_writer_append_nul (writer) ||
-		    !liarc_writer_append_uint32 (writer, animation->channels.count) ||
-		    !liarc_writer_append_uint32 (writer, animation->length))
-			return 0;
-		for (j = 0 ; j < animation->channels.count ; j++)
-		{
-			if (!liarc_writer_append_string (writer, animation->channels.array[j]) ||
-				!liarc_writer_append_nul (writer))
-				return 0;
-		}
-		for (j = 0 ; j < animation->buffer.count ; j++)
-		{
-			transform = &animation->buffer.array[j].transform;
-			if (!liarc_writer_append_float (writer, transform->position.x) ||
-			    !liarc_writer_append_float (writer, transform->position.y) ||
-			    !liarc_writer_append_float (writer, transform->position.z) ||
-			    !liarc_writer_append_float (writer, transform->rotation.x) ||
-			    !liarc_writer_append_float (writer, transform->rotation.y) ||
-			    !liarc_writer_append_float (writer, transform->rotation.z) ||
-			    !liarc_writer_append_float (writer, transform->rotation.w))
-				return 0;
-		}
-	}
 
 	return 1;
 }

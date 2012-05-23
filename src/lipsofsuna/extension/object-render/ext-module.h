@@ -20,6 +20,7 @@
 
 #include "lipsofsuna/extension.h"
 #include "lipsofsuna/render.h"
+#include "lipsofsuna/extension/animation/ext-module.h"
 
 #define LIEXT_SCRIPT_RENDER_OBJECT "RenderObject"
 

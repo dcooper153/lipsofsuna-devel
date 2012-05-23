@@ -22,7 +22,7 @@ end
 Actor.disable_equipment_holding_animation = function(self, slot)
 	if not self.equipment_animations then return end
 	if not self.equipment_animations[slot] then return end
-	self:animate{channel = self.equipment_animations[slot].channel}
+	self:animate_fade{channel = self.equipment_animations[slot].channel}
 	self.equipment_animations[slot] = nil
 end
 
@@ -61,14 +61,10 @@ Actor.set_model = function(self, model)
 			local max = self.spec.body_scale_max or 1
 			local factor = self.body_scale or 0.5
 			local scale = min * (1 - factor) + max * factor
-			self:animate{animation = "empty", channel = Animation.CHANNEL_CUSTOMIZE,
-				weight = 0, weight_scale = 1000, fade_in = 0, fade_out = 0, permanent = true}
-			self:edit_pose{channel = Animation.CHANNEL_CUSTOMIZE, node = "mover", scale = scale}
-		end
-		-- Create the tilting channel.
-		if self.spec.models or self.spec.tilt_bone then
-			self:animate{animation = "empty", channel = Animation.CHANNEL_TILT,
-				additive = true, weight = 1, permanent = true}
+			local anim = Animation("scale")
+			anim:set_transform{frame = 1, node = "mover", scale = scale}
+			self:animate{channel = Animation.CHANNEL_CUSTOMIZE, animation = anim,
+				fade_in = 0, fade_out = 0, permanent = true, replace = true, weight = 0, weight_scale = 1000}
 		end
 		-- Initialize the pose.
 		self.animated = true
@@ -244,13 +240,17 @@ Actor.update_rotation = function(self, quat, tilt)
 	Object.update_rotation(self, quat, tilt)
 	local spec = self.spec
 	if spec and spec.tilt_bone then
+		-- Calculate the tilting rotation.
 		local nodes = spec.tilt_bone
-		if type(nodes) ~= "table" then nodes = {nodes} end
 		local angle = self.dead and 0 or -tilt
 		local rot = Quaternion{axis = Vector(1,0,0), angle = angle / #nodes}
+		-- Create the tilting channel.
+		local anim = Animation("tilt")
 		for k,v in pairs(nodes) do
-			self:edit_pose{channel = Animation.CHANNEL_TILT, node = v, rotation = rot}
+			anim:set_transform{frame = 1, node = v, rotation = rot}
 		end
+		self:animate{animation = anim, channel = Animation.CHANNEL_TILT,
+			additive = true, fade_in = 0, fade_out = 0, permanent = true, replace = true, weight = 1}
 	end
 end
 

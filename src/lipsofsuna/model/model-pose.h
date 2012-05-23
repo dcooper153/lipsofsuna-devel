@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -72,7 +72,6 @@ struct _LIMdlPoseVertex
 
 struct _LIMdlPose
 {
-	LIAlgStrdic* animations;
 	LIAlgU32dic* channels;
 	LIMdlPoseFade* fades;
 	struct { int count; LIMdlPoseBuffer* array; } buffer;
@@ -123,9 +122,9 @@ LIAPICALL (LIMdlAnimation*, limdl_pose_get_channel_animation, (
 	int              channel));
 
 LIAPICALL (void, limdl_pose_set_channel_animation, (
-	LIMdlPose*  self,
-	int         channel,
-	const char* animation));
+	LIMdlPose*      self,
+	int             channel,
+	LIMdlAnimation* animation));
 
 LIAPICALL (int, limdl_pose_get_channel_repeat_start, (
 	const LIMdlPose* self,

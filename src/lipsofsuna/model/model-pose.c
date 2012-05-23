@@ -25,9 +25,6 @@
 #include "lipsofsuna/system.h"
 #include "model-pose.h"
 
-static void private_clear_animations (
-	LIMdlPose* self);
-
 static void private_clear_buffer (
 	LIMdlPose* self);
 
@@ -44,20 +41,12 @@ static LIMdlPoseChannel* private_create_channel (
 	LIMdlPose* self,
 	int        channel);
 
-static LIMdlAnimation* private_create_placeholder_animation (
-	LIMdlPose*  self,
-	const char* animation);
-
 static void private_fade_free (
 	LIMdlPoseFade* fade);
 
 static void private_fade_remove (
 	LIMdlPose*     self,
 	LIMdlPoseFade* fade);
-
-static LIMdlAnimation* private_find_animation (
-	const LIMdlPose* self,
-	const char*      name);
 
 static LIMdlPoseChannel* private_find_channel (
 	const LIMdlPose* self,
@@ -443,26 +432,20 @@ LIMdlAnimation* limdl_pose_get_channel_animation (
 }
 
 void limdl_pose_set_channel_animation (
-	LIMdlPose*  self,
-	int         channel,
-	const char* animation)
+	LIMdlPose*      self,
+	int             channel,
+	LIMdlAnimation* animation)
 {
 	LIMdlAnimation* anim;
 	LIMdlPoseChannel* chan;
 
-	/* Create an animation. */
-	/* The animation is created even if it doesn't exist in the current model.
-	   This is done so that animations can be queued before changing the model.
-	   That makes animating objects with customizable meshes easier. */
-	anim = private_find_animation (self, animation);
-	if (anim == NULL)
-		anim = private_create_placeholder_animation (self, animation);
-	else
-		anim = limdl_animation_new_copy (anim);
+	/* Copy the animation. */
+	lisys_assert (animation != NULL);
+	anim = limdl_animation_new_copy (animation);
 	if (anim == NULL)
 		return;
 
-	/* Create a channel. */
+	/* Create the channel. */
 	chan = private_create_channel (self, channel);
 	if (chan == NULL)
 	{
@@ -864,52 +847,9 @@ int limdl_pose_set_model (
 	LIMdlPose*  self,
 	LIMdlModel* model)
 {
-	LIAlgU32dicIter iter;
-	LIMdlAnimation* anim;
-	LIMdlPoseChannel* chan;
-	LIMdlPoseFade* fade;
-	LIMdlPoseFade* fade_next;
-
 	/* Initialize the new pose. */
 	if (!private_init_pose (self, model))
 		return 0;
-
-	/* Replace invalid animations with placeholders. */
-	/* We want to keep the animations because in some cases it's necessary to
-	   temporary bind an incompatible or empty model to the animated object.
-	   Keeping the animations around is better to do here than to leave to the
-	   caller since it occurs rather frequently in practice. */
-	LIALG_U32DIC_FOREACH (iter, self->channels)
-	{
-		chan = iter.value;
-		anim = private_find_animation (self, chan->animation->name);
-		if (anim != NULL)
-			anim = limdl_animation_new_copy (anim);
-		if (anim == NULL)
-			anim = private_create_placeholder_animation (self, chan->animation->name);
-		if (anim != NULL)
-		{
-			limdl_animation_free (chan->animation);
-			chan->animation = anim;
-		}
-		else
-		{
-			lialg_u32dic_remove (self->channels, iter.key);
-			limdl_pose_channel_free (chan);
-		}
-	}
-
-	/* Clear invalid fades. */
-	for (fade = self->fades ; fade != NULL ; fade = fade_next)
-	{
-		fade_next = fade->next;
-		anim = private_find_animation (self, fade->animation->name);
-		if (anim == NULL)
-		{
-			private_fade_remove (self, fade);
-			private_fade_free (fade);
-		}
-	}
 
 	/* Rebuild pose channels. */
 	limdl_pose_update (self, 0.0f);
@@ -918,20 +858,6 @@ int limdl_pose_set_model (
 }
 
 /*****************************************************************************/
-
-static void private_clear_animations (
-	LIMdlPose* self)
-{
-	LIAlgStrdicIter iter;
-
-	if (self->animations != NULL)
-	{
-		LIALG_STRDIC_FOREACH (iter, self->animations)
-			limdl_animation_free (iter.value);
-		lialg_strdic_free (self->animations);
-		self->animations = NULL;
-	}
-}
 
 static void private_clear_buffer (
 	LIMdlPose* self)
@@ -991,7 +917,6 @@ static void private_clear_pose (
 	}
 
 	private_clear_nodes (self);
-	private_clear_animations (self);
 	private_clear_groups (self);
 	private_clear_buffer (self);
 }
@@ -1037,17 +962,6 @@ static LIMdlPoseChannel* private_create_channel (
 	return chan;
 }
 
-static LIMdlAnimation* private_create_placeholder_animation (
-	LIMdlPose*  self,
-	const char* animation)
-{
-	LIMdlAnimation tmp;
-
-	tmp = private_empty_anim;
-	tmp.name = (char*) animation;
-	return limdl_animation_new_copy (&tmp);
-}
-
 static void private_fade_free (
 	LIMdlPoseFade* fade)
 {
@@ -1067,15 +981,6 @@ static void private_fade_remove (
 		self->fades = fade->next;
 }
 
-static LIMdlAnimation* private_find_animation (
-	const LIMdlPose* self,
-	const char*      name)
-{
-	if (self->animations == NULL)
-		return NULL;
-	return lialg_strdic_find (self->animations, name);
-}
-
 static LIMdlPoseChannel* private_find_channel (
 	const LIMdlPose* self,
 	int              channel)
@@ -1088,35 +993,13 @@ static int private_init_pose (
 	LIMdlModel* model)
 {
 	int i;
-	LIMdlAnimation* anim;
 	LIMdlPoseGroup* pose_group;
 	LIMdlWeightGroup* weight_group;
 
 	/* Clear old data. */
-	private_clear_animations (self);
 	private_clear_nodes (self);
 	private_clear_groups (self);
 	private_clear_buffer (self);
-
-	/* Copy animations. */
-	if (model != NULL && model->animations.count)
-	{
-		self->animations = lialg_strdic_new ();
-		if (self->animations == NULL)
-			return 0;
-		for (i = 0 ; i < model->animations.count ; i++)
-		{
-			anim = model->animations.array + i;
-			anim = limdl_animation_new_copy (anim);
-			if (anim == NULL)
-				return 0;
-			if (!lialg_strdic_insert (self->animations, anim->name, anim))
-			{
-				limdl_animation_free (anim);
-				return 0;
-			}
-		}
-	}
 
 	/* Copy nodes. */
 	if (model != NULL && model->nodes.count)

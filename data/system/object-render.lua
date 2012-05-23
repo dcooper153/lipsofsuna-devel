@@ -17,10 +17,17 @@ end
 --   <li>weight: Blending weight.</li>
 --   <li>time: Starting time.</li>
 --   <li>time_scale: Time scaling factor.</li>
---   <li>permanent: True if should keep repeating.</li></ul>
+--   <li>permanent: True if should keep repeating.</li>
 --   <li>repeat_start: Starting time when repeating.</li>
+--   <li>replace: Completely replace the overwritten animation.</li></ul>
 -- @return True if started a new animation.
 Object.animate = function(self, args)
+	if type(args.animation) == "string" then
+		local anim = Animation.dict_name[args.animation] or Animation:load(args.animation)
+		args.animation = anim and anim.handle or nil
+	elseif args.animation then
+		args.animation = args.animation.handle
+	end
 	return Los.object_animate(self.handle, args)
 end
 
@@ -31,21 +38,6 @@ end
 --   <li>duration: Fade duration in seconds.</li></ul>
 Object.animate_fade = function(self, args)
 	return Los.object_animate_fade(self.handle, args)
-end
-
---- Edits the pose of a node.
--- @param self Object.
--- @param args Arguments.<ul>
---   <li>channel: Channel number.</li>
---   <li>frame: Frame number.</li>
---   <li>node: Node name.</li>
---   <li>position: Position change relative to rest pose.</li>
---   <li>rotation: Rotation change relative to rest pose.</li>
---   <li>scale: Scale factor.</li></ul>
-Object.edit_pose = function(self, args)
-	local p = args.position and args.position.handle
-	local r = args.rotation and args.rotation.handle
-	return Los.object_edit_pose(self.handle, {channel = args.channel, frame = args.frame, node = args.node, position = p, rotation = r, scale = args.scale})
 end
 
 --- Finds a bone or an anchor by name.

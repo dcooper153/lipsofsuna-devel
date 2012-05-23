@@ -32,23 +32,23 @@ LIAPICALL (void, liren_render_object_free, (
 	int          id));
 
 LIAPICALL (void, liren_render_object_channel_animate, (
-	LIRenRender* self,
-	int          id,
-	int          channel,
-	const char*  name,
-	int          additive,
-	int          repeat,
-	int          repeat_start,
-	int          keep,
-	float        fade_in,
-	float        fade_out,
-	float        weight,
-	float        weight_scale,
-	float        time,
-	float        time_scale,
-	const char** node_names,
-	float*       node_weights,
-	int          node_count));
+	LIRenRender*    self,
+	int             id,
+	int             channel,
+	LIMdlAnimation* anim,
+	int             additive,
+	int             repeat,
+	int             repeat_start,
+	int             keep,
+	float           fade_in,
+	float           fade_out,
+	float           weight,
+	float           weight_scale,
+	float           time,
+	float           time_scale,
+	const char**    node_names,
+	float*          node_weights,
+	int             node_count));
 
 LIAPICALL (void, liren_render_object_channel_edit, (
 	LIRenRender*          self,
