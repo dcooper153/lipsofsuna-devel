@@ -15,3 +15,14 @@ Itemspec{
 	equipment_slot = "hand.R",
 	stacking = true,
 	water_gravity = Vector(0,6,0)}
+
+Animationspec{
+	name = "boomerang fly start",
+	animation = "boomerang1-fly",
+	channel = 1,
+	permanent = true}
+
+Animationspec{
+	name = "boomerang fly stop",
+	channel = 1,
+	permanent = true}

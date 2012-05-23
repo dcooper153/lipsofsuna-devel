@@ -11,7 +11,6 @@ Effectspec{
 Actorspec{
 	name = "aer",
 	base = "race",
-	animations = {["land ground"] = "aer land ground", ["spell self"] = "aer spell self"},
 	effect_falling_damage = "aerhurt1",
 	equipment_class = "aer",
 	model = "aer1",

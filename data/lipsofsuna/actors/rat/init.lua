@@ -1,12 +1,61 @@
 Program:add_path(Mod.path)
 
+Animationspec{
+	name = "rat attack bite",
+	animation = "plaguerat1-bite",
+	channel = 2,
+	weight = 30}
+
+Animationspec{
+	name = "rat dead",
+	animation = "plaguerat1-death",
+	channel = 1,
+	permanent = true,
+	repeat_start = 10,
+	time = 10}
+
+Animationspec{
+	name = "rat death",
+	animation = "plaguerat1-death",
+	channel = 1,
+	permanent = true,
+	repeat_start = 10}
+
+Animationspec{
+	name = "rat idle",
+	animation = "plaguerat1-idle",
+	channel = 1,
+	permanent = true}
+
+Animationspec{
+	name = "rat run",
+	animation = "plaguerat1-run",
+	channel = 1,
+	permanent = true}
+
+Animationspec{
+	name = "rat walk",
+	animation = "plaguerat1-walk",
+	channel = 1,
+	permanent = true}
+
 Actorspec{
 	name = "small rat",
-	base = "base",
 	ai_enable_strafe = false,
 	ai_enable_block = false,
 	ai_offense_factor = .1,
-	animations = {["attack bite"] = "rat attack bite"},
+	animations = {
+		["attack bite"] = "rat attack bite",
+		["dead"] = "rat dead",
+		["death"] = "rat death",
+		["idle"] = "rat idle",
+		["run"] = "rat run",
+		["run left"] = "rat run",
+		["run right"] = "rat run",
+		["strafe left"] = "rat walk",
+		["strafe right"] = "rat walk",
+		["walk"] = "rat walk",
+		["walk back"] = "rat walk"},
 	categories = {["animal"] = true},
 	difficulty = 0,
 	effect_physical_damage = "fleshimpact1",
@@ -22,11 +71,10 @@ Actorspec{
 
 Actorspec{
 	name = "rat",
-	base = "base",
+	base = "small rat",
 	ai_enable_strafe = false,
 	ai_enable_block = false,
 	ai_offense_factor = 1,
-	animations = {["attack bite"] = "rat attack bite"},
 	categories = {["enemy"] = true},
 	difficulty = 0,
 	effect_physical_damage = "fleshimpact1",
@@ -42,11 +90,10 @@ Actorspec{
 
 Actorspec{
 	name = "plague rat",
-	base = "base",
+	base = "small rat",
 	ai_enable_strafe = false,
 	ai_enable_block = false,
 	ai_offense_factor = 1,
-	animations = {["attack bite"] = "rat attack bite"},
 	categories = {["plague"] = true},
 	difficulty = 0.7,
 	effect_physical_damage = "fleshimpact1",

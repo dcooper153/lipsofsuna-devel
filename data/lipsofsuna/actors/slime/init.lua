@@ -1,20 +1,41 @@
 Program:add_path(Mod.path)
 
 Animationspec{
+	name = "slime dead",
+	animation = "slime2-death",
+	channel = 1,
+	permanent = true,
+	repeat_start = 10,
+	time = 10}
+
+Animationspec{
+	name = "slime death",
+	animation = "slime2-death",
+	channel = 1,
+	permanent = true,
+	repeat_start = 10}
+
+Animationspec{
+	name = "slime idle",
+	animation = "slime2-idle",
+	channel = 1,
+	permanent = true}
+
+Animationspec{
 	name = "slime jump",
-	animation = "bounce",
+	animation = "slime2-bounce",
 	channel = 2,
 	weight = 30}
 
 Animationspec{
 	name = "slime land",
-	animation = "bounce",
+	animation = "slime2-bounce",
 	channel = 2,
 	weight = 30}
 
 Animationspec{
 	name = "slime tackle",
-	animation = "tackle",
+	animation = "slime2-tackle",
 	channel = 2,
 	weight = 30}
 
@@ -28,7 +49,15 @@ Actorspec{
 	ai_enable_strafe = false,
 	ai_enable_walk = false,
 	ai_enabled_states = {["bounce"] = true, ["combat"] = true, ["idle"] = true},
-	animations = {["jump"] = "slime jump", ["land ground"] = "slime land", ["land water"] = "slime land", ["tackle"] = "slime tackle", ["walk"] = "slime jump"},
+	animations = {
+		["dead"] = "slime dead",
+		["death"] = "slime death",
+		["idle"] = "slime idle",
+		["jump"] = "slime jump",
+		["land ground"] = "slime land",
+		["land water"] = "slime land",
+		["tackle"] = "slime tackle",
+		["walk"] = "slime jump"},
 	difficulty = 0,
 	factions = {["evil"] = true},
 	falling_damage_rate = 0,

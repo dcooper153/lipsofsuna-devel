@@ -1,5 +1,65 @@
 Program:add_path(Mod.path)
 
+Animationspec{
+	name = "stoneimp attack bite",
+	animation = "stoneimp1-bite",
+	channel = 2,
+	weight = 30}
+
+Animationspec{
+	name = "stoneimp dead",
+	animation = "stoneimp1-death",
+	channel = 1,
+	permanent = true,
+	repeat_start = 10,
+	time = 10}
+
+Animationspec{
+	name = "stoneimp death",
+	animation = "stoneimp1-death",
+	channel = 1,
+	permanent = true,
+	repeat_start = 10}
+
+Animationspec{
+	name = "stoneimp idle",
+	animation = "stoneimp1-idle",
+	channel = 1,
+	permanent = true}
+
+Animationspec{
+	name = "stoneimp jump",
+	animation = "stoneimp1-jump",
+	channel = 5,
+	fade_out = 0.4,
+	permanent = true,
+	repeat_start = 10,
+	weight = 10}
+
+Animationspec{
+	name = "stoneimp walk",
+	animation = "stoneimp1-walk",
+	channel = 1,
+	permanent = true}
+
+Animationspec{
+	name = "stoneimp walk back",
+	animation = "stoneimp1-walk-back",
+	channel = 1,
+	permanent = true}
+
+Animationspec{
+	name = "stoneimp strafe left",
+	animation = "stoneimp1-strafe-left",
+	channel = 1,
+	permanent = true}
+
+Animationspec{
+	name = "stoneimp strafe right",
+	animation = "stoneimp1-strafe-right",
+	channel = 1,
+	permanent = true}
+
 Effectspec{
 	name = "impflame1",
 	light = true,
@@ -40,8 +100,19 @@ Itemspec{
 
 Actorspec{
 	name = "stone imp",
-	base = "base",
-	animations = {["attack bite"] = "imp attack bite"},
+	animations = {
+		["attack bite"] = "stoneimp attack bite",
+		["dead"] = "stoneimp dead",
+		["death"] = "stoneimp death",
+		["idle"] = "stoneimp idle",
+		["jump"] = "stoneimp jump",
+		["run"] = "stoneimp walk",
+		["run left"] = "stoneimp walk",
+		["run right"] = "stoneimp walk",
+		["strafe left"] = "stoneimp strafe left",
+		["strafe right"] = "stoneimp strafe right",
+		["walk"] = "stoneimp walk",
+		["walk back"] = "stoneimp walk back"},
 	ai_enable_block = false,
 	ai_enable_strafe = false,
 	ai_enable_weapon_switch = false,
@@ -62,8 +133,7 @@ Actorspec{
 
 Actorspec{
 	name = "fire imp",
-	base = "base",
-	animations = {["attack bite"] = "imp attack bite"},
+	base = "stone imp",
 	ai_enable_block = false,
 	ai_enable_strafe = false,
 	ai_enable_weapon_switch = false,

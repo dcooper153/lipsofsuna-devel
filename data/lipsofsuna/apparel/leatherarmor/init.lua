@@ -1,3 +1,5 @@
+Program:add_path(Mod.path)
+
 Itemspec{
 	name = "leather helm",
 	model = "book-000",
@@ -6,7 +8,7 @@ Itemspec{
 	categories = {["armor"] = true},
 	crafting_materials = {hide = 2},
 	effect_craft = "craftsewing1",
-	equipment_models = {["aermale"] = {hair = "aermale1leatherhead2"}},
+	equipment_models = {["aermale"] = {hair = "aermaleleatherhead2"}},
 	equipment_slot = "head",
 	mass = 3,
 	water_gravity = Vector(0,6,0)}
@@ -19,7 +21,7 @@ Itemspec{
 	categories = {["armor"] = true},
 	crafting_materials = {["hide"] = 2},
 	effect_craft = "craftsewing1",
-	equipment_models = {["aermale"] = {hands = "aermale1leatherarms2"}},
+	equipment_models = {["aermale"] = {hands = "aermaleleatherarms2"}},
 	equipment_slot = "arms",
 	mass = 3,
 	water_gravity = Vector(0,6,0)}
@@ -35,7 +37,7 @@ Itemspec{
 	equipment_models = {
 		-- TODO: Needs to be redone to fit the new player model.
 		--["aer"] = {feet = "boots1"},
-		["aermale"] = {feet = "aermale1boots1"}},
+		["aermale"] = {feet = "aermaleboots1"}},
 	equipment_slot = "feet",
 	mass = 3,
 	water_gravity = Vector(0,6,0)}
@@ -51,7 +53,7 @@ Itemspec{
 	equipment_models = {
 		["aer"] = {skirt = "aerskirt1", panties = "panties2"},
 		["kraken"] = {skirt = "aerskirt1"},
-		["aermale"] = {legs = "aermale1leatherlegs2"}},
+		["aermale"] = {legs = "aermaleleatherlegs2"}},
 	equipment_slot = "lowerbody",
 	mass = 5,
 	water_gravity = Vector(0,6,0)}
@@ -70,8 +72,6 @@ Itemspec{
 	equipment_slot = "upperbody",
 	mass = 5,
 	water_gravity = Vector(0,6,0)}
-
-Program:add_path(Mod.path)
 
 Itemspec{
 	name = "leather skirt",
@@ -100,7 +100,7 @@ Itemspec{
 		-- TODO: Needs to be redone to fit the new player model.
 		--["aer"] = {upper1 = "aerleatherchest1"},
 		--["kraken"] = {upper1 = "aerleatherchest1"},
-		["aermale"] = {upper = "aermale1leatherchest2"}},
+		["aermale"] = {upper = "aermaleleatherchest2"}},
 	equipment_slot = "upperbody",
 	mass = 5,
 	water_gravity = Vector(0,6,0)}

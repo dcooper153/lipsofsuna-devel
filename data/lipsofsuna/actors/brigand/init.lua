@@ -105,7 +105,7 @@ Itemspec{
 	equipment_models = {
 		["aer"] = {skirt = "aerlowerarmor1", panties = "panties2"},
 		["kraken"] = {skirt = "aerlowerarmor1"},
-		["aermale"] = {legs = "aermale1leatherlegs1"}},
+		["aermale"] = {legs = "aermaleleatherlegs1"}},
 	equipment_slot = "lowerbody",
 	mass = 5,
 	water_gravity = Vector(0,6,0)}
@@ -121,7 +121,7 @@ Itemspec{
 	equipment_models = {
 		["aer"] = {upper1 = "aerleatherchest1"},
 		["kraken"] = {upper1 = "aerleatherchest1"},
-		["aermale"] = {upper = "aermale1leatherchest1"}},
+		["aermale"] = {upper = "aermaleleatherchest1"}},
 	equipment_slot = "upperbody",
 	mass = 5,
 	water_gravity = Vector(0,6,0)}

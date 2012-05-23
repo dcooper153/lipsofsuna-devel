@@ -67,3 +67,18 @@ Itemspec{
 	stacking = false,
 	usages = {["loot"] = true},
 	water_gravity = Vector(0,6,0)}
+
+Animationspec{
+	name = "chest loot",
+	animation = "chest1-opening",
+	channel = 1,
+	permanent = true,
+	repeat_start = 10}
+
+Animationspec{
+	name = "chest looted",
+	animation = "chest1-opening",
+	channel = 1,
+	permanent = true,
+	repeat_start = 10,
+	time = 10}

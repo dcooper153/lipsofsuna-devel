@@ -13,6 +13,12 @@ Actorspec{
 	personality = "feeble",
 	preset = "Female 2"}
 
+Animationspec{
+	name = "elise idle",
+	animation = "aer1-tired",
+	channel = 1,
+	permanent = true}
+
 Questspec{
 	name = "Elise's Sorrow"}
 
