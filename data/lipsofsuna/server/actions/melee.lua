@@ -9,12 +9,19 @@ Actionspec{name = "melee", func = function(feat, info, args)
 		--[[Right]] {Vector(0.5, 0.1, 0.7), Vector(0.1, 0.05, 0.5), Vector(-0.2, 0, 0.6), Vector(-0.5, 0, 1)},
 		--[[Back]] {Vector(0.1, 0.2, 1), Vector(0.05, 0.2, 0.75), Vector(0, 0.1, 0.5), Vector(0, -0.1, 0.25)},
 		--[[Forward]] {Vector(0.3, -0.1, 0.8), Vector(0.2, -0.1, 0.55), Vector(0.1, -0.05, 0.3), Vector(0, 0.05, 0.15)}}
-	if args.user.strafing < -0.2 then move = 2
-	elseif args.user.strafing > 0.2 then move = 3
-	elseif args.user.movement < -0.2 then move = 4
-	elseif args.user.movement > 0.2 then move = 5
-	else move = 1 end
-	local path = paths[move]
+	local move
+	local path
+	local anim = Feattypespec:find{name = feat.animation}
+	if anim and anim.directional then
+		if args.user.strafing < -0.2 then move = 2
+		elseif args.user.strafing > 0.2 then move = 3
+		elseif args.user.movement < -0.2 then move = 4
+		elseif args.user.movement > 0.2 then move = 5
+		else move = 1 end
+		path = paths[move]
+	else
+		path = paths[1]
+	end
 	Coroutine(function(t)
 		local apply = function(r)
 			local args = {

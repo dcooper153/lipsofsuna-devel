@@ -17,6 +17,7 @@ Feattypespec.introspect = Introspect{
 		{name = "bonuses_weapon", type = "boolean", description = "True if bonuses from the weapon are added to damage."},
 		{name = "cooldown", type = "number", default = 0, description = "Cooldown time in seconds."},
 		{name = "description", type = "string", description = "Description of the feat."},
+		{name = "directional", type = "boolean", description = "True to enable directional melee attacks."},
 		{name = "effect", type = "string", description = "Sound effect played when the feat is performed."},
 		{name = "effect_impact", type = "string", description = "Sound effect played when hits the target."},
 		{name = "icon", type = "string", description = "Icon name.", default = "missing1", details = {spec = "Iconspec"}},

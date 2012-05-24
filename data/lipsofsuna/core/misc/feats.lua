@@ -40,6 +40,7 @@ Feattypespec{
 	bonuses_weapon = true,
 	categories = {["melee"] = true},
 	cooldown = 0.8,
+	directional = true,
 	effect = "swing1",
 	effect_impact = "impact1",
 	required_weapon = "melee",
