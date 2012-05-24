@@ -7,7 +7,7 @@ vertex_program terrain2_vert glsl
 		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
 		param_named_auto LOS_camera_position camera_position_object_space
 		param_named_auto LOS_light_position light_position_object_space_array 3
-		param_named_auto LOS_matrix_shadow texture_worldviewproj_matrix_array 3
+		param_named_auto LOS_matrix_shadow texture_worldviewproj_matrix_array 1
 	}
 }
 
