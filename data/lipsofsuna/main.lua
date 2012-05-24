@@ -17,6 +17,7 @@ require "system/physics"
 require "system/thread"
 require "system/tiles"
 require "system/tiles-physics"
+require "system/time"
 require "system/timer"
 
 -- Handle command line arguments.

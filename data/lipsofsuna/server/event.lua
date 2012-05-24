@@ -1,5 +1,5 @@
 Eventhandler{type = "login", func = function(self, event)
-	print("Client login")
+	Log:format("Client connect from %q.", Network:get_client_address(event.client) or "???")
 	-- Tell the client to authenticate.
 	Network:send{client = event.client, packet = Packet(packets.CLIENT_AUTHENTICATE)}
 	-- Update lobby.
@@ -7,7 +7,7 @@ Eventhandler{type = "login", func = function(self, event)
 end}
 
 Eventhandler{type = "logout", func = function(self, event)
-	print("Client logout")
+	Log:text("Client disconnect.")
 	-- Detach the player object.
 	local object = Player.clients[event.client]
 	if object then

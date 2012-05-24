@@ -154,6 +154,7 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(args)
 	end
 	account.client = args.client
 	Account.dict_client[args.client] = account
+	Log:format("Client login from %q using account %q.", Network:get_client_address(args.client) or "???", login)
 	-- Create existing characters.
 	local object = Serialize:load_player_object(account)
 	if object then
