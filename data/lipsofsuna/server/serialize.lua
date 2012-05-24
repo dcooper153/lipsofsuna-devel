@@ -312,7 +312,7 @@ Serialize.init_account_database = function(self, reset)
 	local salt = self:get_account_option("password_salt")
 	local version = self:get_account_option("account_version")
 	if not reset and salt and version == self.account_version then
-		self.accounts.password_salt = self
+		self.accounts.password_salt = salt
 		return
 	end
 	-- Initialize tables.
