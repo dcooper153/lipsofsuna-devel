@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -54,6 +54,7 @@ extern LIMaiExtensionInfo liext_thread_info;
 extern LIMaiExtensionInfo liext_tiles_info;
 extern LIMaiExtensionInfo liext_tiles_physics_info;
 extern LIMaiExtensionInfo liext_tiles_render_info;
+extern LIMaiExtensionInfo liext_time_info;
 extern LIMaiExtensionInfo liext_vision_info;
 extern LIMaiExtensionInfo liext_watchdog_info;
 extern LIMaiExtensionInfo liext_widgets_info;
@@ -103,6 +104,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "tiles", &liext_tiles_info },
 		{ "tiles-physics", &liext_tiles_physics_info },
 		{ "tiles-render", &liext_tiles_render_info },
+		{ "time", &liext_time_info },
 		{ "vision", &liext_vision_info },
 		{ "watchdog", &liext_watchdog_info },
 		{ "widgets", &liext_widgets_info },

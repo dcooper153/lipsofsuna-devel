@@ -15,28 +15,28 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_SKELETON_MODULE_H__
-#define __EXT_SKELETON_MODULE_H__
+#ifndef __EXT_TIME_MODULE_H__
+#define __EXT_TIME_MODULE_H__
 
 #include "lipsofsuna/extension.h"
 
-#define LIEXT_SCRIPT_SKELETON "Skeleton"
+#define LIEXT_SCRIPT_TIME "Time"
 
-typedef struct _LIExtSkeletonModule LIExtSkeletonModule;
-struct _LIExtSkeletonModule
+typedef struct _LIExtTimeModule LIExtTimeModule;
+struct _LIExtTimeModule
 {
 	LIMaiProgram* program;
 };
 
-LIExtSkeletonModule* liext_skeleton_new (
+LIExtTimeModule* liext_time_new (
 	LIMaiProgram* program);
 
-void liext_skeleton_free (
-	LIExtSkeletonModule* self);
+void liext_time_free (
+	LIExtTimeModule* self);
 
 /*****************************************************************************/
 
-void liext_script_skeleton (
+void liext_script_time (
 	LIScrScript* self);
 
 #endif

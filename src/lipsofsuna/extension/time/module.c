@@ -15,28 +15,45 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_SKELETON_MODULE_H__
-#define __EXT_SKELETON_MODULE_H__
+/**
+ * \addtogroup LIExt Extension
+ * @{
+ * \addtogroup LIExtTime Time
+ * @{
+ */
 
-#include "lipsofsuna/extension.h"
+#include "module.h"
 
-#define LIEXT_SCRIPT_SKELETON "Skeleton"
-
-typedef struct _LIExtSkeletonModule LIExtSkeletonModule;
-struct _LIExtSkeletonModule
+LIMaiExtensionInfo liext_time_info =
 {
-	LIMaiProgram* program;
+	LIMAI_EXTENSION_VERSION, "Time",
+	liext_time_new,
+	liext_time_free
 };
 
-LIExtSkeletonModule* liext_skeleton_new (
-	LIMaiProgram* program);
+LIExtTimeModule* liext_time_new (
+	LIMaiProgram* program)
+{
+	LIExtTimeModule* self;
 
-void liext_skeleton_free (
-	LIExtSkeletonModule* self);
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (LIExtTimeModule));
+	if (self == NULL)
+		return NULL;
+	self->program = program;
 
-/*****************************************************************************/
+	/* Register classes. */
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_TIME, self);
+	liext_script_time (program->script);
 
-void liext_script_skeleton (
-	LIScrScript* self);
+	return self;
+}
 
-#endif
+void liext_time_free (
+	LIExtTimeModule* self)
+{
+	lisys_free (self);
+}
+
+/** @} */
+/** @} */

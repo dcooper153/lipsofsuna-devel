@@ -31,13 +31,13 @@ LIMaiExtensionInfo liext_skeleton_info =
 	liext_skeleton_free
 };
 
-LIExtModule* liext_skeleton_new (
+LIExtSkeletonModule* liext_skeleton_new (
 	LIMaiProgram* program)
 {
-	LIExtModule* self;
+	LIExtSkeletonModule* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIExtModule));
+	self = lisys_calloc (1, sizeof (LIExtSkeletonModule));
 	if (self == NULL)
 		return NULL;
 	self->program = program;
@@ -50,7 +50,7 @@ LIExtModule* liext_skeleton_new (
 }
 
 void liext_skeleton_free (
-	LIExtModule* self)
+	LIExtSkeletonModule* self)
 {
 	lisys_free (self);
 }

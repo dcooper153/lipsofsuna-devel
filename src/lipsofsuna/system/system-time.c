@@ -36,6 +36,22 @@ time_t lisys_time (
 }
 
 /**
+ * \brief Gets the component breakdown of the given time.
+ * \param t Time.
+ * \param tm Time breakdown.
+ */
+void lisys_time_get_components (
+	time_t         t,
+	LISysTimeinfo* tm)
+{
+#if _POSIX_C_SOURCE >= 1 || _XOPEN_SOURCE || _BSD_SOURCE || _SVID_SOURCE || _POSIX_SOURCE
+	localtime_r (&t, tm);
+#else
+	*tm = *localtime (&t);
+#endif
+}
+
+/**
  * \brief Initializes the timeval from current time.
  * \return Timeval.
  */

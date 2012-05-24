@@ -23,9 +23,14 @@
 #include <sys/time.h>
 
 typedef struct timeval LISysTimeval;
+typedef struct tm LISysTimeinfo;
 
 LIAPICALL (time_t, lisys_time, (
 	time_t* t));
+
+LIAPICALL (void, lisys_time_get_components, (
+	time_t         t,
+	LISysTimeinfo* tm));
 
 LIAPICALL (LISysTimeval, lisys_timeval_init, ());
 
