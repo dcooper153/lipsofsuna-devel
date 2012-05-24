@@ -17,6 +17,14 @@ Network.disconnect = function(clss, args)
 	Los.network_disconnect(args)
 end
 
+--- Gets the address of a client.
+-- @param clss Network class.
+-- @param client Client number.
+-- @return Client address, or nil.
+Network.get_client_address = function(clss, client)
+	return Los.network_get_client_address(client)
+end
+
 --- Begins listening for clients.
 -- @param clss Network class.
 -- @param args Arguments.<ul>

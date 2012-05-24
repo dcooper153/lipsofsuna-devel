@@ -125,5 +125,30 @@ void liext_client_send (
 	}
 }
 
+/**
+ * \brief Sends a network packet to the client.
+ * \param self Client.
+ * \param writer Packet.
+ * \param reliable Nonzero for reliable.
+ */
+char* liext_client_get_address (
+	const LIExtClient* self)
+{
+	char* res;
+
+	if (!self->connected)
+		return NULL;
+	res = lisys_calloc (128, sizeof (char));
+	if (res == NULL)
+		return NULL;
+	if (enet_address_get_host_ip (&self->peer->address, res, 127) != 0)
+	{
+		lisys_free (res);
+		return NULL;
+	}
+
+	return res;
+}
+
 /** @} */
 /** @} */

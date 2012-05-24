@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -29,19 +29,22 @@ struct _LIExtClient
 	LIExtModule* module;
 };
 
-LIExtClient* liext_client_new (
+LIAPICALL (LIExtClient*, liext_client_new, (
 	LIExtModule* module,
-	ENetPeer*    peer);
+	ENetPeer*    peer));
 
-void liext_client_free (
-	LIExtClient* self);
+LIAPICALL (void, liext_client_free, (
+	LIExtClient* self));
 
-void liext_client_disconnect (
-	LIExtClient* self);
+LIAPICALL (void, liext_client_disconnect, (
+	LIExtClient* self));
 
-void liext_client_send (
+LIAPICALL (void, liext_client_send, (
 	LIExtClient* self,
 	LIArcWriter* writer,
-	int          reliable);
+	int          reliable));
+
+LIAPICALL (char*, liext_client_get_address, (
+	const LIExtClient* self));
 
 #endif

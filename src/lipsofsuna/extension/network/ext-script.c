@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -113,6 +113,29 @@ static void Network_update (LIScrArgs* args)
 	liext_network_update (module, 1.0f);
 }
 
+static void Network_get_client_address (LIScrArgs* args)
+{
+	int id;
+	char* addr;
+	LIExtClient* client;
+	LIExtModule* module;
+
+	/* Get the client. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_NETWORK);
+	if (!liscr_args_geti_int (args, 0, &id))
+		return;
+	client = liext_network_find_client (module, id);
+	if (client == NULL)
+		return;
+
+	/* Return the address. */
+	addr = liext_client_get_address (client);
+	if (addr == NULL)
+		return;
+	liscr_args_seti_string (args, addr);
+	lisys_free (addr);
+}
+
 static void Network_get_clients (LIScrArgs* args)
 {
 	LIAlgU32dicIter iter;
@@ -163,6 +186,7 @@ void liext_script_network (
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NETWORK, "network_send", Network_send);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NETWORK, "network_shutdown", Network_shutdown);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NETWORK, "network_update", Network_update);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NETWORK, "network_get_client_address", Network_get_client_address);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NETWORK, "network_get_clients", Network_get_clients);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NETWORK, "network_get_closed", Network_get_closed);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_NETWORK, "network_set_closed", Network_set_closed);
