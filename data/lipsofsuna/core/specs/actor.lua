@@ -224,7 +224,7 @@ Actorspec.get_random_eyes = function(self)
 		for k,v in pairs(self.eye_styles) do
 			table.insert(lst, v)
 		end
-		local l = #self.eye_styles
+		local l = #lst
 		if l == 0 then return end
 		style = lst[math.random(1, l)]
 	end
@@ -253,7 +253,7 @@ Actorspec.get_random_hair = function(self)
 		for k,v in pairs(self.hair_styles) do
 			table.insert(lst, v)
 		end
-		local l = #self.eye_styles
+		local l = #lst
 		if l == 0 then return end
 		style = lst[math.random(1, l)]
 	end
@@ -281,7 +281,7 @@ Actorspec.get_random_head = function(self)
 		for k,v in pairs(self.head_styles) do
 			table.insert(lst, v)
 		end
-		local l = #self.head_styles
+		local l = #lst
 		if l == 0 then return end
 		style = lst[math.random(1, l)]
 	end
