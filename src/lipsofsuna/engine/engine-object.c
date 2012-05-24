@@ -236,9 +236,12 @@ int lieng_object_set_realized (
 	{
 		/* Link to the map. */
 		lieng_object_get_transform (self, &transform);
-		if (!private_warp (self, &transform.position))
-			return 0;
 		self->flags |= LIENG_OBJECT_FLAG_REALIZED;
+		if (!private_warp (self, &transform.position))
+		{
+			self->flags &= ~LIENG_OBJECT_FLAG_REALIZED;
+			return 0;
+		}
 
 		/* Invoke callbacks. */
 		lical_callbacks_call (self->engine->callbacks, "object-visibility", lical_marshal_DATA_PTR_INT, self, 1);

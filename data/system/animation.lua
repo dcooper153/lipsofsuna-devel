@@ -80,10 +80,14 @@ Animation:add_getters{
 	name = function(self) return Los.animation_get_name(self.handle) end}
 
 Animation.unittest = function()
-	local a = Animation("aer1-walk")
+	local a = Animation:load("aer1-walk")
 	assert(a)
 	assert(a.duration > 0)
 	assert(a.frames > 0)
-	local a = Animation("adfdsf")
+	local a = Animation:load("adfdsf")
 	assert(a == nil)
+	local a = Animation("fadfdsf")
+	assert(a ~= nil)
+	assert(a.duration == 1)
+	assert(a.frames == 0)
 end
