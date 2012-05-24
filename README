@@ -1,7 +1,7 @@
 About Lips of Suna
 ==================
 
-Lips of Suna is a tongue-in-cheek, online dungeon crawl game.
+Lips of Suna is a tongue-in-cheek action RPG.
 
 Website: http://lipsofsuna.org/
 Forums: http://forum.freegamedev.net/viewforum.php?f=25
@@ -14,9 +14,9 @@ System requirements
  * Recommended: Video card that supports OpenGL 3.2 or newer.
  * Minimum: Video card that supports OpenGL 2.1.
 
-To play the game in the quality graphics mode, your video card needs to
-support OpenGL 3.2 or newer. To play in the limited graphics mode, at least
-OpenGL 2.1 needs to be supported.
+To play the game with high quality settings, your need a relatively recent
+graphics card. If you reduce quality and effect settings in the options
+screen, you may be able to play with a less powerful graphics cards.
 
 
 Dependencies
@@ -37,9 +37,9 @@ Dependencies
 In Ubuntu and Mint, you can install the dependencies with the following
 command pasted to the terminal:
 
-sudo apt-get install build-essential libopenal-dev libogg-dev libvorbis-dev \
-  libflac-dev liblua5.1-0-dev libsqlite3-dev libbullet-dev libenet-dev \
-  libcurl3-dev libogre-dev libois-dev libpng12-dev
+sudo apt-get install build-essential libopenal-dev libogg-dev \
+  libvorbis-dev libflac-dev liblua5.1-0-dev libsqlite3-dev libbullet-dev \
+  libenet-dev libcurl4-openssl-dev libogre-dev libpng12-dev libois-dev
 
 
 Compiling
