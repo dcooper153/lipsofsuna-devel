@@ -5,6 +5,7 @@ Protocol:add_handler{type = "CHARACTER_ACCEPT", func = function(event)
 end}
 
 Protocol:add_handler{type = "CHARACTER_CREATE", func = function(event)
+	Client.player_object = nil
 	Operators.chargen:init()
 	Ui.state = "chargen"
 end}
