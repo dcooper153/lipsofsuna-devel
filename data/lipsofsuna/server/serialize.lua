@@ -286,6 +286,12 @@ end
 -- @param key Key string.
 -- @return Value string or nil.
 Serialize.get_value = function(self, key)
+	-- Check that the options table exists.
+	-- This is just to silence an error message.
+	local rows1 = self.db:query([[SELECT name FROM sqlite_master WHERE type='table' AND name='options';]])
+	if not rows1 then return end
+	if #rows1 == 0 then return end
+	-- Get the value from the options table
 	local rows = self.db:query([[SELECT value FROM options WHERE key=?;]], {key})
 	if not rows then return end
 	for k,v in ipairs(rows) do
@@ -383,8 +389,13 @@ end
 -- @param key Option name.
 -- @return Option value.
 Serialize.get_account_option = function(self, key)
-	local rows = self.accounts:query(
-		[[SELECT value FROM options WHERE key=?;]], {key})
+	-- Check that the options table exists.
+	-- This is just to silence an error message.
+	local rows1 = self.accounts:query([[SELECT name FROM sqlite_master WHERE type='table' AND name='options';]])
+	if not rows1 then return end
+	if #rows1 == 0 then return end
+	-- Get the value from the options table
+	local rows = self.accounts:query([[SELECT value FROM options WHERE key=?;]], {key})
 	if not rows then return end
 	for k,v in ipairs(rows) do
 		return v[1]
