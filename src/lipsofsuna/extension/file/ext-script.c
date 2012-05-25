@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -94,6 +94,7 @@ static void File_scan_directory (LIScrArgs* args)
 	lisys_free (path_abs);
 	if (dir == NULL)
 		return;
+	lisys_dir_set_sorter (dir, lisys_dir_sorter_alpha);
 	if (!lisys_dir_scan (dir))
 	{
 		lisys_dir_free (dir);
