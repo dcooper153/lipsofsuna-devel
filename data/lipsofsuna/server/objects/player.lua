@@ -197,6 +197,36 @@ Player.inventory_cb = function(self, args)
 	if fun then fun(args) end
 end
 
+--- Gets the spawn point of the player.
+-- @params self Object.
+-- @return Spawn point vector in world space, or nil.
+Player.get_spawn_point = function(self)
+	return self.account.spawn_point
+end
+
+--- Sets the spawn point of the player.
+-- @params self Object.
+-- @param name Spawn point name.
+-- @return Spawn point vector in world space, or nil.
+Player.set_spawn_point = function(self, name)
+	-- Select the spawn point.
+	local home
+	if not name or name == "Home" then
+		home = self.account.spawn_point
+	else
+		local r = Patternspec:find{name = spawnpoint}
+		if r and not r.spawn_point then r = nil end
+		if r then home = r.spawn_point_world end
+	end
+	-- Use the default if not found.
+	if not home then
+		home = Utils:get_player_spawn_point()
+	end
+	-- Set the spawn point vector.
+	self.account.spawn_point = home
+	return home
+end
+
 --- Updates the state of the player.
 -- @param self Object.
 -- @param secs Seconds since the last update.

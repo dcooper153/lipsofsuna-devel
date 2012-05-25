@@ -1,29 +1,11 @@
 local spawn_player = function(object, client, spawnpoint)
-	-- Select the spawn point.
-	-- The character creation message contains the name of the spawn point.
-	-- If home was chosen, the default spawn point of the account is used,
-	-- if set. Otherwise, the chosen spawn point or the fallback is used.
-	local home
-	if not spawnpoint or spawnpoint == "Home" then
-		home = object.account.spawn_point
-	else
-		local r = Patternspec:find{name = spawnpoint}
-		if r and not r.spawn_point then r = nil end
-		if r then home = r.spawn_point_world end
-	end
-	if not home then
-		home = Utils:get_player_spawn_point()
-	end
-	-- Set the default spawn point.
-	-- The default spawn point is set once at account creation. If it's
-	-- already set, the old one is kept regardless of where the player
-	-- decided to spawn this time.
-	if not object.account.spawn_point then
-		object.account.spawn_point = home
-	end
 	-- Add to the map.
 	Player.clients[client] = object
-	object:teleport{position = home}
+	local home = object:get_spawn_point()
+	if not home or spawnpoint then
+		home = object:set_spawn_point(spawnpoint)
+		object:teleport{position = home}
+	end
 	object.realized = true
 	object:set_client(client)
 	-- Transmit the home marker.
