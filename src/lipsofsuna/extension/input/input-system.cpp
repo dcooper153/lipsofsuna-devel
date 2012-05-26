@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,40 +22,21 @@
  * @{
  */
 
+#include "lipsofsuna/system.h"
 #include "input.hpp"
 #include "input-system.hpp"
 
 LIInpSystem::LIInpSystem (LIInpInput* input, bool grab) :
-	grab (grab),
+	grab (true),
 	input (input),
 	input_manager (NULL),
 	keyboard (NULL),
 	mouse (NULL)
 {
-	/* Enable or disable mouse input grabs. */
-	OIS::ParamList params;
-	if (!grab)
-	{
-#if defined OIS_WIN32_PLATFORM
-		// FIXME: This causes device initialization to throw an error.
-		//params.insert (std::make_pair(std::string ("w32_mouse"), std::string ("DISCL_NONEXCLUSIVE")));
-#elif defined OIS_LINUX_PLATFORM
-		params.insert (std::make_pair (std::string ("x11_mouse_grab"), std::string ("false")));
-#endif
-	}
-
-	/* Always disable keyboard grabs so that you can close the window with Alt+F4. */
-#if defined OIS_WIN32_PLATFORM
-	// FIXME: This causes device initialization to throw an error.
-	//params.insert (std::make_pair(std::string ("w32_keyboard"), std::string ("DISCL_NONEXCLUSIVE")));
-#elif defined OIS_LINUX_PLATFORM
-	params.insert (std::make_pair (std::string ("x11_keyboard_grab"), std::string ("false")));
-	params.insert (std::make_pair (std::string ("XAutoRepeatOn"), std::string ("true")));
-#endif
-
 	/* Get the window handle. */
 	size_t window = 0;
 	input->render->data->render_window->getCustomAttribute ("WINDOW", &window);
+	OIS::ParamList params;
 	params.insert (std::make_pair (std::string("WINDOW"), Ogre::StringConverter::toString (window)));
 
 	/* Initialize the input manager. */
@@ -64,14 +45,8 @@ LIInpSystem::LIInpSystem (LIInpInput* input, bool grab) :
 	/* Initialize mouse. */
 	try
 	{
-		int left, top;
-		unsigned int width, height, depth;
 		this->mouse = (OIS::Mouse*) this->input_manager->createInputObject (OIS::OISMouse, true);
 		this->mouse->setEventCallback (this);
-		this->input->render->data->render_window->getMetrics ( width, height, depth, left, top );
-		const OIS::MouseState &mouse_state = this->mouse->getMouseState ();
-		mouse_state.width  = width;
-		mouse_state.height = height;
 	}
 	catch (...)
 	{
@@ -87,6 +62,10 @@ LIInpSystem::LIInpSystem (LIInpInput* input, bool grab) :
 	catch (...)
 	{
 	}
+
+	/* Setup grabbing. */
+	if (!grab)
+		this->set_grab (false);
 
 	/* Call update to initialize the grabs. */
 	update (0.0f);
@@ -123,7 +102,24 @@ void LIInpSystem::update (float secs)
 	if (this->keyboard != NULL)
 		this->keyboard->capture ();
 	if (this->mouse != NULL)
+	{
+		/* Update the window size. */
+		int left, top;
+		unsigned int width, height, depth;
+		this->input->render->data->render_window->getMetrics (width, height, depth, left, top);
+		const OIS::MouseState& mouse_state = this->mouse->getMouseState ();
+		mouse_state.width  = width;
+		mouse_state.height = height;
+
+		/* Capture events. */
 		this->mouse->capture ();
+	}
+}
+
+void LIInpSystem::set_grab (bool enabled)
+{
+	this->grab = enabled;
+	/* FIXME: Can't change the grab state with OIS */
 }
 
 bool LIInpSystem::keyPressed (const OIS::KeyEvent& event)

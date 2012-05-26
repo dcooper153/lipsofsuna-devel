@@ -31,6 +31,7 @@ public:
 	int get_mouse_button_state ();
 	void get_mouse_state (int* x, int* y);
 	void update (float secs);
+	void set_grab (bool enabled);
 protected:
 	virtual bool keyPressed (const OIS::KeyEvent& event);
 	virtual bool keyReleased (const OIS::KeyEvent& event);

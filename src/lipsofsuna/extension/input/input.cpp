@@ -26,12 +26,8 @@
 
 #define ENABLE_GRABS
 
-static void private_initial_grab (
+static int private_initial_grab (
 	LIInpInput* self);
-
-static void private_grab (
-	LIInpInput* self,
-	int         value);
 
 static int private_tick (
 	LIInpInput* self,
@@ -77,8 +73,7 @@ LIInpInput* liinp_input_new (
 	}
 
 	/* Initialize the input system. */
-	private_initial_grab (self);
-	self->system = new LIInpSystem (self, self->grab);
+	self->system = new LIInpSystem (self, private_initial_grab (self));
 
 	/* Register the component. */
 	if (!limai_program_insert_component (self->program, "input", self))
@@ -151,7 +146,7 @@ void liinp_input_get_pointer (
 int liinp_input_get_pointer_grab (
 	LIInpInput* self)
 {
-	return self->grab;
+	return self->system->grab;
 }
 
 /**
@@ -167,16 +162,15 @@ void liinp_input_set_pointer_grab (
 	LIInpInput* self,
 	int         value)
 {
-	self->grab = value;
 	if (self->active && value)
-		private_grab (self, 1);
+		self->system->set_grab (true);
 	else
-		private_grab (self, 0);
+		self->system->set_grab (false);
 }
 
 /*****************************************************************************/
 
-static void private_initial_grab (
+static int private_initial_grab (
 	LIInpInput* self)
 {
 	lua_State* lua;
@@ -184,21 +178,10 @@ static void private_initial_grab (
 	lua = liscr_script_get_lua (self->program->script);
 	lua_getglobal (lua, "__initial_pointer_grab");
 	if (lua_type (lua, -1) == LUA_TBOOLEAN)
-		self->grab = lua_toboolean (lua, -1);
+		return lua_toboolean (lua, -1);
 	lua_pop (lua, 1);
-}
 
-static void private_grab (
-	LIInpInput* self,
-	int         value)
-{
-#ifdef ENABLE_GRABS
-	if (value != self->system->grab)
-	{
-		delete self->system;
-		self->system = new LIInpSystem (self, value);
-	}
-#endif
+	return 0;
 }
 
 static int private_tick (

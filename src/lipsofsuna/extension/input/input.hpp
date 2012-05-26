@@ -25,7 +25,6 @@
 struct _LIInpInput
 {
 	int active;
-	int grab;
 	LICalHandle calls[1];
 	LIInpSystem* system;
 	LIMaiProgram* program;

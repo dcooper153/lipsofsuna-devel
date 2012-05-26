@@ -149,7 +149,8 @@ def configure(ctx):
 	# Xlib
 	# Needed because Ogre can't change the window title.
 	if ctx.check_cc(header_name='X11/Xlib.h', uselib_store='OGRE', mandatory=False, define_name='HAVE_X11_XLIB_H'):
-		ctx.check_cc(lib='X11', uselib_store='OGRE', mandatory=False, define_name='HAVE_XLIB')
+		if ctx.check_cc(lib='X11', uselib_store='OGRE', mandatory=False):
+			ctx.define('HAVE_XLIB', 1)
 
 	# OIS
 	if not ctx.check_cfg(package='OIS', atleast_version='1.3.0', args='--cflags --libs', mandatory=False):
