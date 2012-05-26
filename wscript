@@ -327,7 +327,8 @@ def build(ctx):
 	# will find the data files from their current locations and we can avoid installing them.
 	ctx.set_group("install")
 	if not ctx.env.RELPATH:
-		ctx.install_files(ctx.env.TOOLDIR, ['tool/lipsofsuna_export.py'])
+		start_dir = ctx.path.find_dir('tool')
+		ctx.install_files(ctx.env.TOOLDIR, start_dir.ant_glob('lipsofsuna_export/*.py'), cwd=start_dir, relative_trick=True)
 		start_dir = ctx.path.find_dir('data')
 		ctx.install_files('${DATADIR}', start_dir.ant_glob('**/*.*'), cwd=start_dir, relative_trick=True)
 		ctx.install_files('${APPDIR}', ['misc/lipsofsuna.desktop'])
