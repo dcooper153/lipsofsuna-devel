@@ -1,3 +1,21 @@
+0.6.0:
+
+  * New graphics engine based on Ogre.
+  * New keyboard-friendly user interface.
+  * Added an overworld map area.
+  * Added primitive labyrinth dungeons.
+  * Added landmark objects that are visible from distance.
+  * Added several new spells, skills and monsters.
+  * Spells and skills can be unlocked by completing quests.
+  * More responsive controls and better hit checking for attacks.
+  * Several improvements to the AI.
+  * Added random item fetching and NPC killing quests.
+  * Added unique attacks and strategies for certain monsters.
+  * Added cel-shading and outline rendering.
+  * Added some new character creation settings.
+  * Added an object specification browser to the editor.
+  * Large rewrites to make adding and maintaining content easier.
+
 0.5.0
 
   * New starting area with tutorial quests.
