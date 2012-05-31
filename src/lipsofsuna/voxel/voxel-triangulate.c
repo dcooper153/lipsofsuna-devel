@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -49,6 +49,25 @@
 #define OCCLUDESYPOS(x,y,z) ((liquid && ISLIQUID(x,y,z)) || (!liquid && ISSOLID(x,y,z)))
 #define OCCLUDESZNEG(x,y,z) OCCLUDES(x,y,z)
 #define OCCLUDESZPOS(x,y,z) OCCLUDES(x,y,z)
+
+static void private_cube_get_face (
+	LIVoxBuilder* self,
+	int           face,
+	LIMatVector   v[3][3][3],
+	LIMatVector   r[3][3]);
+
+static int private_face_get_flat (
+	LIVoxBuilder* self,
+	LIMatVector   v[3][3]);
+
+static void private_face_triangulate (
+	LIVoxBuilder* self,
+	int           face,
+	LIMatVector   v[3][3],
+	LIMatVector*  result_verts,
+	int*          result_faces,
+	int*          count_verts,
+	int*          count_faces);
 
 static inline void private_noise_3d (
 	LIMatVector* vector,
@@ -105,6 +124,7 @@ int livox_triangulate_voxel (
 	int liquid = 0;
 	LIVoxVoxelB* voxel;
 	LIVoxVoxelB* voxels[3][3][3];
+	LIMatVector face_verts[3][3];
 	LIMatVector v[3][3][3] = {
 		{{{ 0.0f, 0.0f, 0.0f }, { 0.0f, 0.0f, 0.5f }, { 0.0f, 0.0f, 1.0f }},
 		 {{ 0.0f, 0.5f, 0.0f }, { 0.0f, 0.5f, 0.5f }, { 0.0f, 0.5f, 1.0f }},
@@ -163,93 +183,33 @@ int livox_triangulate_voxel (
 	count_faces = 0;
 	if (!OCCLUDESXNEG (0, 1, 1))
 	{
-		for (y = 0 ; y < 2 ; y++)
-		for (z = 0 ; z < 2 ; z++)
-		{
-			result[count++] = v[0][y+0][z+0];
-			result[count++] = v[0][y+1][z+1];
-			result[count++] = v[0][y+1][z+0];
-			result[count++] = v[0][y+0][z+0];
-			result[count++] = v[0][y+0][z+1];
-			result[count++] = v[0][y+1][z+1];
-			result_faces[count_faces++] = LIVOX_TRIANGULATE_NEGATIVE_X;
-			result_faces[count_faces++] = LIVOX_TRIANGULATE_NEGATIVE_X;
-		}
+		private_cube_get_face (self, LIVOX_TRIANGULATE_NEGATIVE_X, v, face_verts);
+		private_face_triangulate (self, LIVOX_TRIANGULATE_NEGATIVE_X, face_verts, result, result_faces, &count, &count_faces);
 	}
 	if (!OCCLUDESXPOS (2, 1, 1))
 	{
-		for (y = 0 ; y < 2 ; y++)
-		for (z = 0 ; z < 2 ; z++)
-		{
-			result[count++] = v[2][y+0][z+0];
-			result[count++] = v[2][y+1][z+0];
-			result[count++] = v[2][y+1][z+1];
-			result[count++] = v[2][y+0][z+0];
-			result[count++] = v[2][y+1][z+1];
-			result[count++] = v[2][y+0][z+1];
-			result_faces[count_faces++] = LIVOX_TRIANGULATE_POSITIVE_X;
-			result_faces[count_faces++] = LIVOX_TRIANGULATE_POSITIVE_X;
-		}
+		private_cube_get_face (self, LIVOX_TRIANGULATE_POSITIVE_X, v, face_verts);
+		private_face_triangulate (self, LIVOX_TRIANGULATE_POSITIVE_X, face_verts, result, result_faces, &count, &count_faces);
 	}
 	if (!OCCLUDESYNEG (1, 0, 1))
 	{
-		for (x = 0 ; x < 2 ; x++)
-		for (z = 0 ; z < 2 ; z++)
-		{
-			result[count++] = v[x+0][0][z+0];
-			result[count++] = v[x+1][0][z+0];
-			result[count++] = v[x+1][0][z+1];
-			result[count++] = v[x+0][0][z+0];
-			result[count++] = v[x+1][0][z+1];
-			result[count++] = v[x+0][0][z+1];
-			result_faces[count_faces++] = LIVOX_TRIANGULATE_NEGATIVE_Y;
-			result_faces[count_faces++] = LIVOX_TRIANGULATE_NEGATIVE_Y;
-		}
+		private_cube_get_face (self, LIVOX_TRIANGULATE_NEGATIVE_Y, v, face_verts);
+		private_face_triangulate (self, LIVOX_TRIANGULATE_NEGATIVE_Y, face_verts, result, result_faces, &count, &count_faces);
 	}
 	if (!OCCLUDESYPOS (1, 2, 1))
 	{
-		for (x = 0 ; x < 2 ; x++)
-		for (z = 0 ; z < 2 ; z++)
-		{
-			result[count++] = v[x+0][2][z+0];
-			result[count++] = v[x+1][2][z+1];
-			result[count++] = v[x+1][2][z+0];
-			result[count++] = v[x+0][2][z+0];
-			result[count++] = v[x+0][2][z+1];
-			result[count++] = v[x+1][2][z+1];
-			result_faces[count_faces++] = LIVOX_TRIANGULATE_POSITIVE_Y;
-			result_faces[count_faces++] = LIVOX_TRIANGULATE_POSITIVE_Y;
-		}
+		private_cube_get_face (self, LIVOX_TRIANGULATE_POSITIVE_Y, v, face_verts);
+		private_face_triangulate (self, LIVOX_TRIANGULATE_POSITIVE_Y, face_verts, result, result_faces, &count, &count_faces);
 	}
 	if (!OCCLUDESZNEG (1, 1, 0))
 	{
-		for (x = 0 ; x < 2 ; x++)
-		for (y = 0 ; y < 2 ; y++)
-		{
-			result[count++] = v[x+0][y+0][0];
-			result[count++] = v[x+1][y+1][0];
-			result[count++] = v[x+1][y+0][0];
-			result[count++] = v[x+0][y+0][0];
-			result[count++] = v[x+0][y+1][0];
-			result[count++] = v[x+1][y+1][0];
-			result_faces[count_faces++] = LIVOX_TRIANGULATE_NEGATIVE_Z;
-			result_faces[count_faces++] = LIVOX_TRIANGULATE_NEGATIVE_Z;
-		}
+		private_cube_get_face (self, LIVOX_TRIANGULATE_NEGATIVE_Z, v, face_verts);
+		private_face_triangulate (self, LIVOX_TRIANGULATE_NEGATIVE_Z, face_verts, result, result_faces, &count, &count_faces);
 	}
 	if (!OCCLUDESZPOS (1, 1, 2))
 	{
-		for (x = 0 ; x < 2 ; x++)
-		for (y = 0 ; y < 2 ; y++)
-		{
-			result[count++] = v[x+0][y+0][2];
-			result[count++] = v[x+1][y+0][2];
-			result[count++] = v[x+1][y+1][2];
-			result[count++] = v[x+0][y+0][2];
-			result[count++] = v[x+1][y+1][2];
-			result[count++] = v[x+0][y+1][2];
-			result_faces[count_faces++] = LIVOX_TRIANGULATE_POSITIVE_Z;
-			result_faces[count_faces++] = LIVOX_TRIANGULATE_POSITIVE_Z;
-		}
+		private_cube_get_face (self, LIVOX_TRIANGULATE_POSITIVE_Z, v, face_verts);
+		private_face_triangulate (self, LIVOX_TRIANGULATE_POSITIVE_Z, face_verts, result, result_faces, &count, &count_faces);
 	}
 #undef types
 
@@ -258,6 +218,151 @@ int livox_triangulate_voxel (
 
 /*****************************************************************************/
 
+static void private_cube_get_face (
+	LIVoxBuilder* self,
+	int           face,
+	LIMatVector   v[3][3][3],
+	LIMatVector   r[3][3])
+{
+	switch (face)
+	{
+		case LIVOX_TRIANGULATE_NEGATIVE_X:
+			r[0][0] = v[0][0][0];
+			r[1][0] = v[0][1][0];
+			r[2][0] = v[0][2][0];
+			r[0][1] = v[0][0][1];
+			r[1][1] = v[0][1][1];
+			r[2][1] = v[0][2][1];
+			r[0][2] = v[0][0][2];
+			r[1][2] = v[0][1][2];
+			r[2][2] = v[0][2][2];
+			break;
+		case LIVOX_TRIANGULATE_POSITIVE_X:
+			r[0][0] = v[2][0][2];
+			r[1][0] = v[2][1][2];
+			r[2][0] = v[2][2][2];
+			r[0][1] = v[2][0][1];
+			r[1][1] = v[2][1][1];
+			r[2][1] = v[2][2][1];
+			r[0][2] = v[2][0][0];
+			r[1][2] = v[2][1][0];
+			r[2][2] = v[2][2][0];
+			break;
+		case LIVOX_TRIANGULATE_NEGATIVE_Y:
+			r[0][0] = v[0][0][2];
+			r[1][0] = v[1][0][2];
+			r[2][0] = v[2][0][2];
+			r[0][1] = v[0][0][1];
+			r[1][1] = v[1][0][1];
+			r[2][1] = v[2][0][1];
+			r[0][2] = v[0][0][0];
+			r[1][2] = v[1][0][0];
+			r[2][2] = v[2][0][0];
+			break;
+		case LIVOX_TRIANGULATE_POSITIVE_Y:
+			r[0][0] = v[0][2][0];
+			r[1][0] = v[1][2][0];
+			r[2][0] = v[2][2][0];
+			r[0][1] = v[0][2][1];
+			r[1][1] = v[1][2][1];
+			r[2][1] = v[2][2][1];
+			r[0][2] = v[0][2][2];
+			r[1][2] = v[1][2][2];
+			r[2][2] = v[2][2][2];
+			break;
+		case LIVOX_TRIANGULATE_NEGATIVE_Z:
+			r[0][0] = v[0][0][0];
+			r[1][0] = v[1][0][0];
+			r[2][0] = v[2][0][0];
+			r[0][1] = v[0][1][0];
+			r[1][1] = v[1][1][0];
+			r[2][1] = v[2][1][0];
+			r[0][2] = v[0][2][0];
+			r[1][2] = v[1][2][0];
+			r[2][2] = v[2][2][0];
+			break;
+		case LIVOX_TRIANGULATE_POSITIVE_Z:
+			r[0][0] = v[0][2][2];
+			r[1][0] = v[1][2][2];
+			r[2][0] = v[2][2][2];
+			r[0][1] = v[0][1][2];
+			r[1][1] = v[1][1][2];
+			r[2][1] = v[2][1][2];
+			r[0][2] = v[0][0][2];
+			r[1][2] = v[1][0][2];
+			r[2][2] = v[2][0][2];
+			break;
+	}
+}
+
+static int private_face_get_flat (
+	LIVoxBuilder* self,
+	LIMatVector   v[3][3])
+{
+#define TEST(a,b,c)\
+	if (LIMAT_ABS (0.5f * (a.x + c.x) - b.x) > 0.01f) return 0;\
+	if (LIMAT_ABS (0.5f * (a.y + c.y) - b.y) > 0.01f) return 0;\
+	if (LIMAT_ABS (0.5f * (a.z + c.z) - b.z) > 0.01f) return 0;
+
+	TEST(v[0][0], v[1][0], v[2][0])
+	TEST(v[2][0], v[2][1], v[2][2])
+	TEST(v[2][2], v[1][2], v[0][2])
+	TEST(v[0][2], v[0][1], v[0][0])
+	TEST(v[0][0], v[1][1], v[2][2])
+
+#undef TEST
+
+	return 1;
+}
+
+static void private_face_triangulate (
+	LIVoxBuilder* self,
+	int           face,
+	LIMatVector   v[3][3],
+	LIMatVector*  result_verts,
+	int*          result_faces,
+	int*          count_verts,
+	int*          count_faces)
+{
+	int y;
+	int z;
+	int cv;
+	int cf;
+
+	cv = *count_verts;
+	cf = *count_faces;
+
+	if (private_face_get_flat (self, v))
+	{
+		result_verts[cv++] = v[0][0];
+		result_verts[cv++] = v[2][2];
+		result_verts[cv++] = v[2][0];
+		result_verts[cv++] = v[0][0];
+		result_verts[cv++] = v[0][2];
+		result_verts[cv++] = v[2][2];
+		result_faces[cf++] = face;
+		result_faces[cf++] = face;
+	}
+	else
+	{
+		for (y = 0 ; y < 2 ; y++)
+		for (z = 0 ; z < 2 ; z++)
+		{
+			result_verts[cv++] = v[y+0][z+0];
+			result_verts[cv++] = v[y+1][z+1];
+			result_verts[cv++] = v[y+1][z+0];
+			result_verts[cv++] = v[y+0][z+0];
+			result_verts[cv++] = v[y+0][z+1];
+			result_verts[cv++] = v[y+1][z+1];
+			result_faces[cf++] = face;
+			result_faces[cf++] = face;
+		}
+	}
+
+	*count_verts = cv;
+	*count_faces = cf;
+}
+
 static inline void private_noise_3d (
 	LIMatVector* vector,
 	LIMatVector* result)
@@ -265,15 +370,17 @@ static inline void private_noise_3d (
 	uint32_t seed;
 	LIAlgRandom random;
 
-	seed = ((((uint32_t)(0.8f * vector->x + 234023.3f)) % 0x3FF) << 0) |
-	       ((((uint32_t)(0.7f * vector->y + 8353.7f)) % 0x3FF) << 10) |
-	       ((((uint32_t)(0.9f * vector->z + 27345.11f)) % 0x3FF) << 20);
+#define SCALE 0.3f
+	seed = ((((uint32_t)(SCALE * 1.05f * vector->x + 234023.3f)) % 0x3FF) << 0) |
+	       ((((uint32_t)(SCALE * 1.00f * vector->y + 8353.7f)) % 0x3FF) << 10) |
+	       ((((uint32_t)(SCALE * 0.95f * vector->z + 27345.11f)) % 0x3FF) << 20);
+#undef SCALE
+#define STEPS 10
 	lialg_random_init (&random, 1 + seed);
-	result->x = lialg_random_float (&random);
-	lialg_random_init (&random, 2 + seed);
-	result->y = lialg_random_float (&random);
-	lialg_random_init (&random, 3 + seed);
-	result->z = lialg_random_float (&random);
+	result->x = lialg_random_max (&random, STEPS) * (1.0f / STEPS);
+	result->y = lialg_random_max (&random, STEPS) * (1.0f / STEPS);
+	result->z = lialg_random_max (&random, STEPS) * (1.0f / STEPS);
+#undef STEPS
 	*result = limat_vector_subtract (*result, limat_vector_init (0.5f, 0.5f, 0.5f));
 	*result = limat_vector_multiply (*result, 0.3f);
 }
