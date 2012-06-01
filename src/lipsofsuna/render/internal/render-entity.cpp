@@ -178,9 +178,6 @@ void LIRenEntity::set_replacing_entity (LIRenEntity* entity)
 
 void LIRenEntity::_updateRenderQueue (Ogre::RenderQueue* queue)
 {
-	/* Update the render queue. */
-	Ogre::Entity::_updateRenderQueue (queue);
-
 	/* Update the animation. */
 	if (this->pose_changed)
 	{
@@ -194,6 +191,9 @@ void LIRenEntity::_updateRenderQueue (Ogre::RenderQueue* queue)
 				update_pose_buffer ();
 		}
 	}
+
+	/* Update the render queue. */
+	Ogre::Entity::_updateRenderQueue (queue);
 }
 
 /** @} */
