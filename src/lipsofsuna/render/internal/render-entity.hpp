@@ -30,12 +30,11 @@ public:
 	LIRenEntity (const Ogre::String& name, LIRenModel* model);
 	virtual ~LIRenEntity ();
 	void initialize ();
-	void update_pose (float secs);
+	void update_pose (LIMdlPose* pose, float secs);
 	void update_pose_buffer ();
 	bool get_loaded () const;
 	LIMdlModel* get_model () const;
-	void set_pose (LIMdlPose* pose);
-	LIMdlPose* get_pose ();
+	LIMdlPoseBuffer* get_pose_buffer ();
 	LIRenModel* get_render_model ();
 	LIRenEntity* get_replacing_entity ();
 	void set_replacing_entity (LIRenEntity* entity);
@@ -43,10 +42,10 @@ public:
 	virtual void _updateRenderQueue (Ogre::RenderQueue* queue);
 protected:
 	bool pose_changed;
-	LIMdlPose* pose;
+	LIMdlPoseBuffer* pose_buffer;
 	LIRenEntity* replacing_entity;
 	LIRenEntityBuilder builder;
-	LIRenModel* model;
+	LIRenModel* render_model;
 	Ogre::MeshPtr background_loaded_mesh;
 };
 

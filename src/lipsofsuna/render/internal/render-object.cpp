@@ -51,15 +51,6 @@ static LIMdlPose* private_channel_animate (
 	float*          node_weights,
 	int             node_count);
 
-static void private_channel_edit (
-	LIRenObject*          self,
-	LIMdlPose*            pose,
-	int                   channel,
-	int                   frame,
-	const char*           node,
-	const LIMatTransform* transform,
-	float                 scale);
-
 static void private_channel_fade (
 	LIRenObject* self,
 	LIMdlPose*   pose,
@@ -197,38 +188,7 @@ int liren_object_channel_animate (
 	if (pose1 != NULL)
 		self->pose = pose1;
 
-	/* Update the real poses controlling skeletons of entities. */
-	for (size_t i = 0 ; i < self->entities.size () ; i++)
-	{
-		LIRenEntity* entity = self->entities[i];
-		pose1 = entity->get_pose ();
-		if (pose1 != NULL)
-		{
-			private_channel_animate (self, pose1, channel, anim, additive, repeat,
-				repeat_start, keep, fade_in, fade_out, weight, weight_scale, time,
-				time_scale, node_names, node_weights, node_count);
-		}
-		else
-			entity->set_pose (self->pose);
-	}
-
 	return 1;
-}
-
-void liren_object_channel_edit (
-	LIRenObject*          self,
-	int                   channel,
-	int                   frame,
-	const char*           node,
-	const LIMatTransform* transform,
-	float                 scale)
-{
-	private_channel_edit (self, self->pose, channel, frame, node, transform, scale);
-	for (size_t i = 0 ; i < self->entities.size () ; i++)
-	{
-		LIMdlPose* pose = self->entities[i]->get_pose ();
-		private_channel_edit (self, pose, channel, frame, node, transform, scale);
-	}
 }
 
 void liren_object_channel_fade (
@@ -237,11 +197,6 @@ void liren_object_channel_fade (
 	float        time)
 {
 	private_channel_fade (self, self->pose, channel, time);
-	for (size_t i = 0 ; i < self->entities.size () ; i++)
-	{
-		LIMdlPose* pose = self->entities[i]->get_pose ();
-		private_channel_fade (self, pose, channel, time);
-	}
 }
 
 LIMdlPoseChannel* liren_object_channel_get_state (
@@ -299,10 +254,10 @@ int liren_object_find_node (
 	for (size_t i = 0 ; i < self->entities.size () ; i++)
 	{
 		LIRenEntity* entity = self->entities[i];
-		LIMdlPose* pose = entity->get_pose ();
-		if (pose != NULL)
+		LIMdlPoseBuffer* buffer = entity->get_pose_buffer ();
+		if (buffer != NULL)
 		{
-			node = limdl_pose_find_node (pose, name);
+			node = limdl_pose_buffer_find_node (buffer, name);
 			if (node != NULL)
 				break;
 		}
@@ -436,7 +391,7 @@ void liren_object_update (
 	{
 		limdl_pose_update (self->pose, secs);
 		for (size_t i = 0 ; i < self->entities.size () ; i++)
-			self->entities[i]->update_pose (secs);
+			self->entities[i]->update_pose (self->pose, secs);
 	}
 }
 
@@ -728,19 +683,6 @@ static LIMdlPose* private_channel_animate (
 	return pose;
 }
 
-static void private_channel_edit (
-	LIRenObject*          self,
-	LIMdlPose*            pose,
-	int                   channel,
-	int                   frame,
-	const char*           node,
-	const LIMatTransform* transform,
-	float                 scale)
-{
-	if (pose != NULL)
-		limdl_pose_set_channel_transform (pose, channel, frame, node, scale, transform);
-}
-
 static void private_channel_fade (
 	LIRenObject* self,
 	LIMdlPose*   pose,
@@ -763,14 +705,6 @@ static LIRenEntity* private_create_entity (
 	Ogre::String e_name = self->render->data->id.next ();
 	LIRenEntity* entity = OGRE_NEW LIRenEntity (e_name, model);
 	self->node->attachObject (entity);
-
-	/* Update the pose for the new model data. */
-	/* The model data might be NULL currently, but that can be because the model
-	   is is still loading in the background. We cannot remove the pose because
-	   of that since the caller might want to transfer it to the new model once
-	   it has loaded. */
-	if (self->pose != NULL)
-		entity->set_pose (self->pose);
 
 	/* Set the entity flags. */
 	entity->setCastShadows (self->shadow_casting);

@@ -50,15 +50,6 @@ LIAPICALL (void, liren_render_object_channel_animate, (
 	float*          node_weights,
 	int             node_count));
 
-LIAPICALL (void, liren_render_object_channel_edit, (
-	LIRenRender*          self,
-	int                   id,
-	int                   channel,
-	int                   frame,
-	const char*           node,
-	const LIMatTransform* transform,
-	float                 scale));
-
 LIAPICALL (void, liren_render_object_channel_fade, (
 	LIRenRender* self,
 	int          id,

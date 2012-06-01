@@ -94,24 +94,6 @@ void liren_render_object_channel_animate (
 		node_weights, node_count);
 }
 
-void liren_render_object_channel_edit (
-	LIRenRender*          self,
-	int                   id,
-	int                   channel,
-	int                   frame,
-	const char*           node,
-	const LIMatTransform* transform,
-	float                 scale)
-{
-	LIRenObject* object;
-
-	object = lialg_u32dic_find (self->objects, id);
-	if (object == NULL)
-		return;
-
-	liren_object_channel_edit (object, channel, frame, node, transform, scale);
-}
-
 void liren_render_object_channel_fade (
 	LIRenRender* self,
 	int          id,

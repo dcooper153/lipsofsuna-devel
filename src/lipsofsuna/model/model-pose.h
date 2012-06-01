@@ -28,15 +28,6 @@
 
 #define LIMDL_POSE_FADE_AUTOMATIC -1.0f
 
-typedef struct _LIMdlPoseBuffer LIMdlPoseBuffer;
-struct _LIMdlPoseBuffer
-{
-	float quat1[4];
-	float quat2[4];
-	float head[3];
-	float scale;
-};
-
 struct _LIMdlPoseFade
 {
 	float time;
@@ -51,18 +42,6 @@ struct _LIMdlPoseFade
 	LIMdlAnimation* animation;
 };
 
-typedef struct _LIMdlPoseGroup LIMdlPoseGroup;
-struct _LIMdlPoseGroup
-{
-	int enabled;
-	float scale_pose;
-	LIMatVector head_pose;
-	LIMatVector head_rest;
-	LIMatQuaternion rotation;
-	LIMdlNode* node;
-	LIMdlWeightGroup* weight_group;
-};
-
 typedef struct _LIMdlPoseVertex LIMdlPoseVertex;
 struct _LIMdlPoseVertex
 {
@@ -74,9 +53,6 @@ struct _LIMdlPose
 {
 	LIAlgU32dic* channels;
 	LIMdlPoseFade* fades;
-	struct { int count; LIMdlPoseBuffer* array; } buffer;
-	struct { int count; LIMdlPoseGroup* array; } groups;
-	struct { int count; LIMdlNode** array; } nodes;
 };
 
 LIAPICALL (LIMdlPose*, limdl_pose_new, ());
@@ -86,6 +62,12 @@ LIAPICALL (LIMdlPose*, limdl_pose_new_copy, (
 
 LIAPICALL (void, limdl_pose_free, (
 	LIMdlPose* self));
+
+LIAPICALL (void, limdl_pose_calculate_node_tranformation, (
+	LIMdlPose*      self,
+	const char*     node,
+	LIMatTransform* result_transform,
+	float*          result_scale));
 
 LIAPICALL (void, limdl_pose_clear_channel_node_priorities, (
 	LIMdlPose*  self,
@@ -99,10 +81,6 @@ LIAPICALL (void, limdl_pose_fade_channel, (
 	LIMdlPose* self,
 	int        channel,
 	float      rate));
-
-LIAPICALL (LIMdlNode*, limdl_pose_find_node, (
-	const LIMdlPose* self,
-	const char*      name));
 
 LIAPICALL (void, limdl_pose_update, (
 	LIMdlPose* self,
@@ -225,17 +203,5 @@ LIAPICALL (void, limdl_pose_set_channel_time_scale, (
 	LIMdlPose* self,
 	int        channel,
 	float      value));
-
-LIAPICALL (int, limdl_pose_set_channel_transform, (
-	LIMdlPose*            self,
-	int                   channel,
-	int                   frame,
-	const char*           node,
-	float                 scale,
-	const LIMatTransform* transform));
-
-LIAPICALL (int, limdl_pose_set_model, (
-	LIMdlPose*  self,
-	LIMdlModel* model));
 
 #endif

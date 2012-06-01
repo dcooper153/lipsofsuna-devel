@@ -32,7 +32,7 @@
 LIRenEntity::LIRenEntity (const Ogre::String& name, LIRenModel* model) :
 	Ogre::Entity (), builder (this, model->mesh)
 {
-	this->model = model;
+	render_model = model;
 	replacing_entity = NULL;
 
 	/* A placeholder mesh is assigned to the entity until the real mesh is
@@ -44,19 +44,25 @@ LIRenEntity::LIRenEntity (const Ogre::String& name, LIRenModel* model) :
 	background_loaded_mesh = model->mesh;
 	builder.start ();
 
-	/* Clear the pose. */
-	pose = NULL;
+	/* Clear the pose buffer. */
+	pose_buffer = NULL;
 	pose_changed = false;
 }
 
 LIRenEntity::~LIRenEntity ()
 {
-	if (pose != NULL)
-		limdl_pose_free (pose);
+	if (pose_buffer != NULL)
+		limdl_pose_buffer_free (pose_buffer);
 }
 
 void LIRenEntity::initialize ()
 {
+	/* The entity builder may call this multiple times because Ogre
+	   may generate duplicate events when resources are loaded. The
+	   duplicates are filtered here because it's the most convenient. */
+	if (mInitialised)
+		return;
+
 	/* Create the mesh and skeleton instances. */
 	mMesh = background_loaded_mesh;
 	_initialise ();
@@ -71,6 +77,14 @@ void LIRenEntity::initialize ()
 			bone->setManuallyControlled (true);
 		}
 	}
+
+	/* Create the pose buffer. */
+	if (skeleton != NULL)
+	{
+		lisys_assert (pose_buffer == NULL);
+		pose_buffer = limdl_pose_buffer_new (get_model ());
+		pose_changed = true;
+	}
 }
 
 /**
@@ -82,11 +96,11 @@ void LIRenEntity::initialize ()
  *
  * \param secs Seconds since the last update.
  */
-void LIRenEntity::update_pose (float secs)
+void LIRenEntity::update_pose (LIMdlPose* pose, float secs)
 {
-	if (pose != NULL)
+	if (pose_buffer != NULL)
 	{
-		limdl_pose_update (pose, secs);
+		limdl_pose_buffer_update (pose_buffer, pose);
 		pose_changed = true;
 	}
 }
@@ -100,38 +114,23 @@ void LIRenEntity::update_pose (float secs)
  */
 void LIRenEntity::update_pose_buffer ()
 {
-	LIMdlModel* model;
-
 	/* Get the skeleton. */
 	/* If the model doesn't have one, we don't need to do anything. */
 	Ogre::SkeletonInstance* skeleton = getSkeleton ();
 	if (skeleton == NULL)
 		return;
+	lisys_assert (pose_buffer != NULL);
 
-	/* Get the model. */
-	model = get_model ();
-	lisys_assert (model != NULL);
-
-	/* Update weight group bones. */
-	/* The hierarchy doesn't matter because LIMdlPose already calculated the
-	   global transformations of the bones. We just need to copy the
-	   transformations of the bones used by weight groups. */
-	for (int i = 0 ; i < model->weight_groups.count ; i++)
+	/* Update bones. */
+	for (int i = 0 ; i < pose_buffer->bones.count ; i++)
 	{
-		LIMdlWeightGroup* group = model->weight_groups.array + i;
-		if (group->node != NULL)
-		{
-			LIMdlNode* node = limdl_pose_find_node (this->pose, group->node->name);
-			if (node != NULL)
-			{
-				Ogre::Bone* bone = skeleton->getBone (i + 1);
-				LIMatTransform t = node->pose_transform.global;
-				float s = node->pose_transform.global_scale;
-				bone->setScale (s, s, s);
-				bone->setPosition (t.position.x, t.position.y, t.position.z);
-				bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
-			}
-		}
+		LIMdlPoseBufferBone* src_bone = pose_buffer->bones.array + i;
+		Ogre::Bone* dst_bone = skeleton->getBone (i);
+		LIMatTransform t = src_bone->transform;
+		LIMatVector s = src_bone->scale;
+		dst_bone->setScale (s.x, s.y, s.z);
+		dst_bone->setPosition (t.position.x, t.position.y, t.position.z);
+		dst_bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
 	}
 
 	skeleton->_notifyManualBonesDirty ();
@@ -149,21 +148,14 @@ LIMdlModel* LIRenEntity::get_model () const
 	return static_cast<LIRenMesh*>(background_loaded_mesh.get ())->get_model ();
 }
 
-void LIRenEntity::set_pose (LIMdlPose* pose)
+LIMdlPoseBuffer* LIRenEntity::get_pose_buffer ()
 {
-	this->pose = limdl_pose_new_copy (pose);
-	this->pose_changed = true;
-	limdl_pose_set_model (this->pose, get_model ());
-}
-
-LIMdlPose* LIRenEntity::get_pose ()
-{
-	return pose;
+	return pose_buffer;
 }
 
 LIRenModel* LIRenEntity::get_render_model ()
 {
-	return model;
+	return render_model;
 }
 
 LIRenEntity* LIRenEntity::get_replacing_entity ()
@@ -178,13 +170,19 @@ void LIRenEntity::set_replacing_entity (LIRenEntity* entity)
 
 void LIRenEntity::_updateRenderQueue (Ogre::RenderQueue* queue)
 {
+	/* Make sure that the entity is initialized. */
+	/* Ogre may or may not check for this, but we do it just in case. */
+	if (!mInitialised)
+		return;
+	lisys_assert (!mMesh.isNull ());
+
 	/* Update the animation. */
 	if (this->pose_changed)
 	{
 		Ogre::Entity* displayEntity = this;
 		if (mMeshLodIndex > 0 && mMesh->isLodManual ())
 			displayEntity = mLodEntityList[mMeshLodIndex - 1];
-		if (mInitialised && displayEntity->hasSkeleton ())
+		if (displayEntity->hasSkeleton ())
 		{
 			this->pose_changed = false;
 			if (displayEntity->hasSkeleton ())
