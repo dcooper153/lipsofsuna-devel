@@ -18,6 +18,30 @@ class LIMesh:
 		self.vertmapping = [] # los_index -> bl_index
 		self.weightgroupdict = {}
 		self.weightgrouplist = []
+		# Calculate the bounding box.
+		# This may be needed by generated texture coordinates.
+		if len(mesh.vertices):
+			p0 = mathutils.Vector(mesh.vertices[0].co)
+			p1 = mathutils.Vector(mesh.vertices[1].co)
+		else:
+			p0 = mathutils.Vector((-1, -1, -1))
+			p1 = mathutils.Vector((1, 1, 1))
+		for vert in mesh.vertices:
+			v = vert.co
+			if p0.x > v[0]:
+				p0.x = v[0]
+			if p0.y > v[1]:
+				p0.y = v[1]
+			if p0.z > v[2]:
+				p0.z = v[2]
+			if p1.x < v[0]:
+				p1.x = v[0]
+			if p1.y < v[1]:
+				p1.y = v[1]
+			if p1.z < v[2]:
+				p1.z = v[2]
+		self.box_center = (p1 + p0) * 0.5
+		self.box_size = p1 - p0
 		# Emit faces.
 		self.emit_faces(obj, mesh)
 		# Emit shape keys.
@@ -27,6 +51,32 @@ class LIMesh:
 				if not key.empty:
 					self.shapekeydict[bl_key.name] = key
 					self.shapekeylist.append(key)
+
+	def generate_texcoord_uv(self, face, verts, layer):
+		return [layer.data[face.loop_start + i].uv for i in range(0, len(verts))]
+
+	def generate_texcoord_orco_sphere(self, face, verts):
+		# Helper function taken from Blender's source code.
+		# FIXME: This doesn't work correctly.
+		def map_to_sphere(orco):
+			l = orco.length
+			if l > 0.0:
+				if orco.x == 0.0 and orco.y == 0.0:
+					u = 0.0
+				else:
+					u = (1.0 - math.atan2(orco.x,orco.y) / math.pi) / 2.0
+				v = 1.0 - math.acos(orco.z / l) / math.pi
+				return (u,v)
+			else:
+				return (0,0)
+		# Generate.
+		def calc(v):
+			orco = 2.0 * (v - self.box_center)
+			orco.x /= self.box_size.x
+			orco.y /= self.box_size.y
+			orco.z /= self.box_size.z
+			return map_to_sphere(orco)
+		return [calc(mathutils.Vector(v.co)) for v in verts]
 
 	def emit_face(self, obj, mesh, face):
 		# Vertices.
@@ -43,15 +93,25 @@ class LIMesh:
 			files = LIUtils.get_files_for_material(bmat)
 			if len(files) and self.file not in files:
 				return
-		# Texture attributes.
-		bimg = None
+		# Get the image of the face.
 		uvtexture = mesh.uv_textures.active
 		uvlayer = mesh.uv_layers.active
+		bimg = None
 		if uvtexture and uvlayer:
 			bimg = uvtexture.data[face.index].image
-			uvs = [uvlayer.data[face.loop_start + i].uv for i in range(0, len(verts))]
+		# Select the texture coordinate mode.
+		uvmode = 'UV'
+		if uvtexture and uvlayer:
+			if bmat and len(bmat.texture_slots):
+				if bmat.texture_slots[0].texture_coords == 'ORCO':
+					uvmode = 'ORCO'
 		else:
-			uvs = ((0, 0), (0, 0), (0, 0), (0, 0))
+			uvmode = 'ORCO'
+		# Generate the texture coordinates.
+		if uvmode == 'UV':
+			uvs = self.generate_texcoord_uv(face, verts, uvlayer)
+		else:
+			uvs = self.generate_texcoord_orco_sphere(face, verts)
 		# Emit material.
 		key = (bmat and idx or -1, bimg and bimg.name or '')
 		if key not in self.matdict:
@@ -92,6 +152,7 @@ class LIMesh:
 			mat.indices.append(vert.index)
 
 	def emit_faces(self, obj, mesh):
+		# Emit the faces.
 		for face in mesh.polygons:
 			self.emit_face(obj, mesh, face)
 
