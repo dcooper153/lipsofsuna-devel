@@ -20,7 +20,7 @@ Dialogspec{name = "guy", commands = {
 	{"say", "Guy", "Greetings, adventurer!"},
 	{"branch",
 		{"choice", "What should I do?",
-			{"say", "Guy", "Enter that portal if you plant to be of any use."},
+			{"say", "Guy", "Enter that portal if you plan to be of any use."},
 			{"notification", "Activate portals in the overworld to travel to dungeons."},
 			{"say", "Guy", "You can also show off your mucles here, above the ground, like I do."},
 			{"say", "Guy", "Or at least you can try, once you have some muscle."}},
