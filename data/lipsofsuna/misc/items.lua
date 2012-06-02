@@ -15,22 +15,8 @@
 -- non generating admin items: "weapons", "logs", "health jar", "magic jar"
 
 Itemspec{
-	name = "berry",
-	model = "fruit1",
-	mass = 1,
-	categories = {["material"] = true},
-	stacking = true}
-
-Itemspec{
 	name = "flax",
 	model = "book-000", -- FIXME
-	mass = 1,
-	categories = {["material"] = true},
-	stacking = true}
-
-Itemspec{
-	name = "fruit",
-	model = "fruit1",
 	mass = 1,
 	categories = {["material"] = true},
 	stacking = true}
