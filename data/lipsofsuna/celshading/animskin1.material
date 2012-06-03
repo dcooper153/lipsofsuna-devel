@@ -23,7 +23,7 @@ pass animskin1/3/lighting
 	vertex_program_ref animdiffnorm1_vert
 	{
 	}
-	fragment_program_ref diffnorm1_frag
+	fragment_program_ref diffnormskin1_frag
 	{
 	}
 }

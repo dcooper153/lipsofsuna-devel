@@ -34,7 +34,7 @@ vec3 los_blinn_phong(in vec3 lv, in vec3 ev, in vec3 ld, in vec4 eq, in vec3 nor
 	float spec = pow(max(0.0, ndh), shininess);
 	return vec3(diff, spec, 1.0 / attinv);
 }
-vec3 los_hsv_to_rgb(vec3 hsv)
+vec3 los_hsv_to_rgb(in vec3 hsv)
 {
 	float c = hsv.b * hsv.g;
 	float l = hsv.b - c;
@@ -47,7 +47,7 @@ vec3 los_hsv_to_rgb(vec3 hsv)
 	if(4.0 <= hh && hh < 5.0) return vec3(x + l, l, c + l);
 	return vec3(c + l, l, x + l);
 }
-vec3 los_rgb_to_hsv(vec3 rgb)
+vec3 los_rgb_to_hsv(in vec3 rgb)
 {
 	float v = max(max(rgb.r, rgb.g), rgb.b);
 	float m = min(min(rgb.r, rgb.g), rgb.b);
@@ -62,13 +62,14 @@ vec3 los_rgb_to_hsv(vec3 rgb)
 	else
 		return vec3(h, c / v, v);
 }
-vec4 los_cel_shading(in vec4 diff, in vec4 spec, in vec4 p, in sampler1D t1, in sampler1D t2)
+vec3 los_cel_shading(in vec4 material, in vec4 diff, in vec4 spec, in vec4 p, in sampler1D t1, in sampler1D t2)
 {
 	vec3 diff_hsv = los_rgb_to_hsv(diff.rgb);
 	vec3 spec_hsv = los_rgb_to_hsv(spec.rgb);
-	vec3 diff_rgb = los_hsv_to_rgb(vec3(diff_hsv.rg, texture1D(t1, p.x * diff_hsv.b).x));
-	vec3 spec_rgb = los_hsv_to_rgb(vec3(spec_hsv.rg, texture1D(t2, p.y * spec_hsv.b).x));
-	return vec4(diff_rgb + spec_rgb, diff.a + spec.a);
+	float diff_f = texture1D(t1, p.x * diff_hsv.b).x;
+	float spec_f = texture1D(t2, p.y * spec_hsv.b).x;
+	vec3 hsv = vec3(diff_hsv.rg + spec_hsv.rg, diff_f + spec_f);
+	return material.rgb * los_hsv_to_rgb(hsv);
 }
 
 void main()
@@ -84,7 +85,7 @@ void main()
 		diff += l.z * l.x * LOS_light_diffuse[i];
 		spec += l.z * l.y * LOS_light_specular[i];
 	}
-	vec4 light = los_cel_shading(diff, spec, LOS_material_celshading,
-		LOS_diffuse_texture_2, LOS_diffuse_texture_3);
-	gl_FragColor = vec4((LOS_material_diffuse * diffuse * light).rgb, diffuse.a);
+	vec3 color = los_cel_shading(LOS_material_diffuse * diffuse, diff, spec,
+		LOS_material_celshading, LOS_diffuse_texture_2, LOS_diffuse_texture_3);
+	gl_FragColor = vec4(color, diffuse.a);
 }

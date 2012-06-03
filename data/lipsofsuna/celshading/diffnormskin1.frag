@@ -74,13 +74,14 @@ vec3 los_rgb_to_hsv(in vec3 rgb)
 	else
 		return vec3(h, c / v, v);
 }
-vec3 los_cel_shading(in vec4 material, in vec4 diff, in vec4 spec, in vec4 p, in sampler1D t1, in sampler1D t2)
+vec3 los_cel_shading_skin(in vec4 material, in vec4 diff, in vec4 spec, in vec4 p, in sampler1D t1, in sampler1D t2)
 {
 	vec3 diff_hsv = los_rgb_to_hsv(diff.rgb);
 	vec3 spec_hsv = los_rgb_to_hsv(spec.rgb);
 	float diff_f = texture1D(t1, p.x * diff_hsv.b).x;
 	float spec_f = texture1D(t2, p.y * spec_hsv.b).x;
 	vec3 hsv = vec3(diff_hsv.rg + spec_hsv.rg, diff_f + spec_f);
+	hsv.g = mix(1.0, hsv.g, diff_f); /* Adds more saturation for shadows. */
 	return material.rgb * los_hsv_to_rgb(hsv);
 }
 
@@ -98,7 +99,7 @@ void main()
 		diff += l.z * l.x * LOS_light_diffuse[i];
 		spec += l.z * l.y * LOS_light_specular[i];
 	}
-	vec3 color = los_cel_shading(LOS_material_diffuse * diffuse, diff, spec,
+	vec3 color = los_cel_shading_skin(LOS_material_diffuse * diffuse, diff, spec,
 		LOS_material_celshading, LOS_diffuse_texture_2, LOS_diffuse_texture_3);
 	gl_FragColor = vec4(color, diffuse.a);
 }
