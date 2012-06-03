@@ -421,6 +421,17 @@ Feateffectspec{
 	required_reagents = {["milky powder"] = 1}}
 
 Feateffectspec{
+	name = "resurrect",
+	categories = {["beneficial"] = true, ["spell"] = true},
+	animations = {["missile spell"] = true, ["ranged spell"] = true, ["spell on touch"] = true},
+	description = "Resurrect the targeted creature",
+	effect = "heal1",
+	icon = "modifier-heal",
+	influences = {["resurrect"] = 1},
+	required_stats = {["willpower"] = 20},
+	required_reagents = {["dewspring leaf"] = 1}}
+
+Feateffectspec{
 	name = "restore willpower",
 	categories = {["beneficial"] = true, ["spell"] = true},
 	animations = {["spell on self"] = true, ["spell on touch"] = true},
