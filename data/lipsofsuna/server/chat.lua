@@ -153,6 +153,11 @@ ChatCommand{pattern = "^/spawn (.*)$", permission = "admin", func = function(pla
 	end
 end}
 
+-- Resurrect.
+ChatCommand{pattern = "^/resurrect$", permission = "admin", func = function(player, matches)
+	player:resurrect()
+end}
+
 -- Suicide.
 ChatCommand{pattern = "^/suicide$", permission = "player", func = function(player, matches)
 	player:die()

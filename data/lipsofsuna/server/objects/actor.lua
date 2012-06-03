@@ -424,6 +424,23 @@ Actor.die = function(self)
 	return true
 end
 
+--- Causes the actor to rise from death.
+-- @param self Object.
+Actor.resurrect = function(self)
+	if not self.dead then return end
+	-- Enable controls.
+	self.dead = nil
+	self.shape = "default"
+	self.physics = "kinematic"
+	-- Enable stats.
+	self.stats.enabled = true
+	self.stats:set_value("health", 1)
+	-- Restore the idle animation.
+	self:animate("idle")
+	-- Emit a vision event.
+	Vision:event{type = "object-dead", object = self, dead = false}
+end
+
 --- Makes the actor face a point.
 -- @param self Object.
 -- @param args Arguments.<ul>
