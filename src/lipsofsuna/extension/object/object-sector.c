@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,37 +16,37 @@
  */
 
 /**
- * \addtogroup LIEng Engine
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup LIEngSector Sector
+ * \addtogroup LIObjObject Object
  * @{
  */
 
 #include "lipsofsuna/system.h"
-#include "engine-sector.h"
+#include "object-sector.h"
 
 /**
  * \brief Creates a new sector.
  * \param sector Sector manager sector.
  * \return New sector or NULL.
  */
-LIEngSector* lieng_sector_new (
+LIObjSector* liobj_sector_new (
 	LIAlgSector* sector)
 {
-	LIEngSector* self;
+	LIObjSector* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIEngSector));
+	self = lisys_calloc (1, sizeof (LIObjSector));
 	if (self == NULL)
 		return NULL;
-	self->engine = lialg_sectors_get_userdata (sector->manager, LIALG_SECTORS_CONTENT_ENGINE);
+	self->manager = lialg_sectors_get_userdata (sector->manager, LIALG_SECTORS_CONTENT_ENGINE);
 	self->sector = sector;
 
 	/* Allocate tree. */
 	self->objects = lialg_u32dic_new ();
 	if (self->objects == NULL)
 	{
-		lieng_sector_free (self);
+		liobj_sector_free (self);
 		return NULL;
 	}
 
@@ -57,11 +57,11 @@ LIEngSector* lieng_sector_new (
  * \brief Frees the sector.
  * \param self Sector.
  */
-void lieng_sector_free (
-	LIEngSector* self)
+void liobj_sector_free (
+	LIObjSector* self)
 {
 	LIAlgU32dicIter iter;
-	LIEngObject* object;
+	LIObjObject* object;
 
 	/* Remove objects. */
 	if (self->objects != NULL)
@@ -69,7 +69,7 @@ void lieng_sector_free (
 		LIALG_U32DIC_FOREACH (iter, self->objects)
 		{
 			object = iter.value;
-			lieng_object_set_realized (object, 0);
+			liobj_object_set_realized (object, 0);
 		}
 		lialg_u32dic_free (self->objects);
 	}

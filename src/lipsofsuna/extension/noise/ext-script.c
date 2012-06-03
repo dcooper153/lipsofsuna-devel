@@ -22,6 +22,7 @@
  * @{
  */
 
+#include "lipsofsuna/voxel.h"
 #include "ext-module.h"
 
 static void Noise_perlin_noise (LIScrArgs* args)

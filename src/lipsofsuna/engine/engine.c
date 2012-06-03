@@ -76,24 +76,6 @@ LIEngEngine* lieng_engine_new (
 void
 lieng_engine_free (LIEngEngine* self)
 {
-	LIAlgU32dicIter iter;
-	LIEngObject* object;
-
-	/* Clear objects. */
-	if (self->objects != NULL)
-	{
-		LIALG_U32DIC_FOREACH (iter, self->objects)
-		{
-			object = iter.value;
-			lieng_object_set_realized (object, 0);
-		}
-		while (self->objects->list)
-		{
-			object = self->objects->list->value;
-			lieng_object_free (object);
-		}
-	}
-
 	/* Invoke callbacks. */
 	lical_callbacks_call (self->callbacks, "free", lical_marshal_DATA_PTR, self);
 
@@ -107,25 +89,9 @@ lieng_engine_free (LIEngEngine* self)
 		self->sectors->sector_load_callback.userdata = NULL;
 	}
 
-	if (self->objects != NULL)
-		lialg_u32dic_free (self->objects);
 	if (self->models != NULL)
 		lialg_u32dic_free (self->models);
 	lisys_free (self);
-}
-
-/**
- * \brief Find an object by id.
- *
- * \param self Engine.
- * \param id Object number.
- * \return Object or NULL.
- */
-LIEngObject*
-lieng_engine_find_object (LIEngEngine* self,
-                          uint32_t     id)
-{
-	return lialg_u32dic_find (self->objects, id);
 }
 
 /**
@@ -146,20 +112,9 @@ void lieng_engine_update (
 static int
 private_init (LIEngEngine* self)
 {
-	/* Objects. */
-	self->objects = lialg_u32dic_new ();
-	if (self->objects == NULL)
-		return 0;
-
 	/* Models. */
 	self->models = lialg_u32dic_new ();
 	if (self->models == NULL)
-		return 0;
-
-	/* Sectors. */
-	if (!lialg_sectors_insert_content (self->sectors, LIALG_SECTORS_CONTENT_ENGINE, self,
-	     (LIAlgSectorFreeFunc) lieng_sector_free,
-	     (LIAlgSectorLoadFunc) lieng_sector_new))
 		return 0;
 
 	return 1;

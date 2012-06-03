@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,6 +16,8 @@
  */
 
 #include "lipsofsuna/extension.h"
+#include "lipsofsuna/object.h"
+#include "lipsofsuna/voxel.h"
 #include "ext-vision-listener.h"
 
 static float private_cone_factor (
@@ -102,21 +104,27 @@ void liext_vision_listener_update (
 	float radius_add_obj;
 	float radius_del_obj;
 	LIAlgU32dicIter iter;
-	LIEngObject* object;
+	LIObjManager* objects;
+	LIObjObject* object;
 	LIMatVector diff;
 	LIVoxManager* voxels;
+
+	/* Get the object manager. */
+	objects = limai_program_find_component (self->module->program, "object");
+	if (objects == NULL)
+		return;
 
 	/* Calculate the second powers of the vision radii. */
 	radius_add = self->scan_radius;
 	radius_del = self->scan_radius + self->keep_threshold;
 
 	/* Add and remove vision objects. */
-	LIALG_U32DIC_FOREACH (iter, self->module->program->engine->objects)
+	LIALG_U32DIC_FOREACH (iter, objects->objects)
 	{
 		object = iter.value;
 
 		/* Make sure the object is realized. */
-		if (!lieng_object_get_realized (object))
+		if (!liobj_object_get_realized (object))
 		{
 			if (lialg_u32dic_find (self->objects, object->id) != NULL)
 			{

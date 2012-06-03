@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,16 +18,14 @@
 #ifndef __ENGINE_H__
 #define __ENGINE_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/archive.h>
-#include <lipsofsuna/callback.h>
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/model.h>
-#include <lipsofsuna/paths.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/algorithm.h"
+#include "lipsofsuna/archive.h"
+#include "lipsofsuna/callback.h"
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/model.h"
+#include "lipsofsuna/paths.h"
+#include "lipsofsuna/system.h"
 #include "engine-model.h"
-#include "engine-object.h"
-#include "engine-sector.h"
 #include "engine-types.h"
 
 /*****************************************************************************/
@@ -37,7 +35,6 @@ struct _LIEngEngine
 	LIAlgRandom random;
 	LIAlgSectors* sectors;
 	LIAlgU32dic* models;
-	LIAlgU32dic* objects;
 	LICalCallbacks* callbacks;
 	LIPthPaths* paths;
 };
@@ -49,10 +46,6 @@ LIAPICALL (LIEngEngine*, lieng_engine_new, (
 
 LIAPICALL (void, lieng_engine_free, (
 	LIEngEngine* self));
-
-LIAPICALL (LIEngObject*, lieng_engine_find_object, (
-	LIEngEngine* self,
-	uint32_t     id));
 
 LIAPICALL (void, lieng_engine_update, (
 	LIEngEngine* self,

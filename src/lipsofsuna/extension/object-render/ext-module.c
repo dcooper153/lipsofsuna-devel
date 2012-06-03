@@ -22,6 +22,7 @@
  * @{
  */
 
+#include "lipsofsuna/object.h"
 #include "ext-module.h"
 
 static int private_engine_free (
@@ -42,25 +43,25 @@ static int private_model_new (
 
 static int private_object_new (
 	LIExtModule* self,
-	LIEngObject* object);
+	LIObjObject* object);
 
 static int private_object_free (
 	LIExtModule* self,
-	LIEngObject* object);
+	LIObjObject* object);
 
 static int private_object_model (
 	LIExtModule* self,
-	LIEngObject* object,
+	LIObjObject* object,
 	LIEngModel*  model);
 
 static int private_object_realize (
 	LIExtModule* self,
-	LIEngObject* object,
+	LIObjObject* object,
 	int          value);
 
 static int private_object_transform (
 	LIExtModule*    self,
-	LIEngObject*    object,
+	LIObjObject*    object,
 	LIMatTransform* value);
 
 /*****************************************************************************/
@@ -167,7 +168,7 @@ static int private_model_new (
 
 static int private_object_new (
 	LIExtModule* self,
-	LIEngObject* object)
+	LIObjObject* object)
 {
 	liren_render_object_new (self->render, object->id);
 
@@ -176,7 +177,7 @@ static int private_object_new (
 
 static int private_object_free (
 	LIExtModule* self,
-	LIEngObject* object)
+	LIObjObject* object)
 {
 	liren_render_object_free (self->render, object->id);
 
@@ -185,7 +186,7 @@ static int private_object_free (
 
 static int private_object_model (
 	LIExtModule* self,
-	LIEngObject* object,
+	LIObjObject* object,
 	LIEngModel*  model)
 {
 	if (model != NULL)
@@ -198,7 +199,7 @@ static int private_object_model (
 
 static int private_object_realize (
 	LIExtModule* self,
-	LIEngObject* object,
+	LIObjObject* object,
 	int          value)
 {
 	liren_render_object_set_realized (self->render, object->id, value);
@@ -208,7 +209,7 @@ static int private_object_realize (
 
 static int private_object_transform (
 	LIExtModule*    self,
-	LIEngObject*    object,
+	LIObjObject*    object,
 	LIMatTransform* value)
 {
 	liren_render_object_set_transform (self->render, object->id, value);

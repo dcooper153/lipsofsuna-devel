@@ -22,6 +22,7 @@
  * @{
  */
 
+#include "lipsofsuna/object.h"
 #include "ext-module.h"
 
 static void Sound_effect (LIScrArgs* args)
@@ -32,7 +33,7 @@ static void Sound_effect (LIScrArgs* args)
 	float pitch;
 	float volume;
 	const char* effect;
-	LIEngObject* object;
+	LIObjObject* object;
 	LIExtModule* module;
 	LIMatVector velocity;
 	LIScrData* data;

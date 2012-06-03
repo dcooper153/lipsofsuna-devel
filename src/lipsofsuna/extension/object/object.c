@@ -18,54 +18,55 @@
 /**
  * \addtogroup LIEng Engine
  * @{
- * \addtogroup LIEngObject Object
+ * \addtogroup LIObjObject Object
  * @{
  */
 
 #include "lipsofsuna/network.h"
-#include "engine-object.h"
+#include "object.h"
+#include "object-sector.h"
 
 static int private_warp (
-	LIEngObject*       self,
+	LIObjObject*       self,
 	const LIMatVector* position);
 
 /*****************************************************************************/
 
 /**
- * \brief Creates a new engine object.
- * \param engine Engine.
- * \return Engine object or NULL.
+ * \brief Creates a new object.
+ * \param manager Object manager.
+ * \return Object, or NULL.
  */
-LIEngObject* lieng_object_new (
-	LIEngEngine* engine)
+LIObjObject* liobj_object_new (
+	LIObjManager* manager)
 {
-	LIEngObject* self;
+	LIObjObject* self;
 
 	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIEngObject));
+	self = lisys_calloc (1, sizeof (LIObjObject));
 	if (self == NULL)
 		return NULL;
-	self->engine = engine;
+	self->manager = manager;
 	self->transform = limat_transform_identity ();
 
 	/* Choose object number. */
 	self->id = 0;
 	while (!self->id)
 	{
-		self->id = lialg_random_range (&engine->random, LINET_RANGE_ENGINE_START, LINET_RANGE_ENGINE_END);
-		if (lieng_engine_find_object (engine, self->id))
+		self->id = lialg_random_range (&manager->program->engine->random, LINET_RANGE_ENGINE_START, LINET_RANGE_ENGINE_END);
+		if (liobj_manager_find_object (manager, self->id))
 			self->id = 0;
 	}
 
 	/* Insert to object list. */
-	if (!lialg_u32dic_insert (engine->objects, self->id, self))
+	if (!lialg_u32dic_insert (manager->objects, self->id, self))
 	{
 		lisys_free (self);
 		return 0;
 	}
 
-	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, "object-new", lical_marshal_DATA_PTR, self);
+	/* Invoke program->callbacks. */
+	lical_callbacks_call (manager->program->callbacks, "object-new", lical_marshal_DATA_PTR, self);
 
 	return self;
 }
@@ -74,21 +75,21 @@ LIEngObject* lieng_object_new (
  * \brief Frees the object.
  * \param self Object.
  */
-void lieng_object_free (
-	LIEngObject* self)
+void liobj_object_free (
+	LIObjObject* self)
 {
 	/* Unrealize. */
 	/* When the execution gets here, the script data of the object has been
 	   garbage collected. Hence, we need to be careful not to generate any
 	   script events that refer to it. */
-	if (lieng_object_get_realized (self))
-		lieng_object_set_realized (self, 0);
+	if (liobj_object_get_realized (self))
+		liobj_object_set_realized (self, 0);
 
-	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, "object-free", lical_marshal_DATA_PTR, self);
+	/* Invoke program->callbacks. */
+	lical_callbacks_call (self->manager->program->callbacks, "object-free", lical_marshal_DATA_PTR, self);
 
-	/* Remove from engine. */
-	lialg_u32dic_remove (self->engine->objects, self->id);
+	/* Remove from the manager. */
+	lialg_u32dic_remove (self->manager->objects, self->id);
 
 	/* Free all memory. */
 	lisys_free (self);
@@ -98,18 +99,18 @@ void lieng_object_free (
  * \brief Called when the object has moved.
  * \param self Object.
  */
-int lieng_object_moved (
-	LIEngObject* self)
+int liobj_object_moved (
+	LIObjObject* self)
 {
 	LIMatTransform transform;
 
 	/* Move between sectors. */
-	lieng_object_get_transform (self, &transform);
+	liobj_object_get_transform (self, &transform);
 	if (!private_warp (self, &transform.position))
 		return 0;
 
-	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, "object-motion", lical_marshal_DATA_PTR, self);
+	/* Invoke program->callbacks. */
+	lical_callbacks_call (self->manager->program->callbacks, "object-motion", lical_marshal_DATA_PTR, self);
 
 	return 1;
 }
@@ -124,16 +125,16 @@ int lieng_object_moved (
  * \param self Object.
  * \param radius Refresh radius.
  */
-void lieng_object_refresh (
-	LIEngObject* self,
+void liobj_object_refresh (
+	LIObjObject* self,
 	float        radius)
 {
 	LIMatTransform transform;
 
-	if (lieng_object_get_realized (self))
+	if (liobj_object_get_realized (self))
 	{
-		lieng_object_get_transform (self, &transform);
-		lialg_sectors_refresh_point (self->engine->sectors, &transform.position, radius);
+		liobj_object_get_transform (self, &transform);
+		lialg_sectors_refresh_point (self->manager->program->sectors, &transform.position, radius);
 	}
 }
 
@@ -142,8 +143,8 @@ void lieng_object_refresh (
  * \param self Object.
  * \param bounds Return location for the bounding box.
  */
-void lieng_object_get_bounds (
-	const LIEngObject* self,
+void liobj_object_get_bounds (
+	const LIObjObject* self,
 	LIMatAabb*         bounds)
 {
 	if (self->model != NULL && self->model->model != NULL)
@@ -161,18 +162,18 @@ void lieng_object_get_bounds (
  * \param object An object.
  * \return The distance.
  */
-float lieng_object_get_distance (
-	const LIEngObject* self,
-	const LIEngObject* object)
+float liobj_object_get_distance (
+	const LIObjObject* self,
+	const LIObjObject* object)
 {
 	LIMatTransform t0;
 	LIMatTransform t1;
 
-	if (!lieng_object_get_realized (self) ||
-	    !lieng_object_get_realized (object))
+	if (!liobj_object_get_realized (self) ||
+	    !liobj_object_get_realized (object))
 		return LIMAT_INFINITE;
-	lieng_object_get_transform (self, &t0);
-	lieng_object_get_transform (object, &t1);
+	liobj_object_get_transform (self, &t0);
+	liobj_object_get_transform (object, &t1);
 
 	return limat_vector_get_length (limat_vector_subtract (t0.position, t1.position));
 }
@@ -183,15 +184,15 @@ float lieng_object_get_distance (
  * \param model Model or NULL.
  * \return Nonzero on success.
  */
-int lieng_object_set_model (
-	LIEngObject* self,
+int liobj_object_set_model (
+	LIObjObject* self,
 	LIEngModel*  model)
 {
 	/* Switch the model. */
 	self->model = model;
 
-	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, "object-model", lical_marshal_DATA_PTR_PTR, self, model);
+	/* Invoke program->callbacks. */
+	lical_callbacks_call (self->manager->program->callbacks, "object-model", lical_marshal_DATA_PTR_PTR, self, model);
 
 	return 1;
 }
@@ -201,8 +202,8 @@ int lieng_object_set_model (
  * \param self Object.
  * \return Nonzero if realized.
  */
-int lieng_object_get_realized (
-	const LIEngObject* self)
+int liobj_object_get_realized (
+	const LIObjObject* self)
 {
 	return (self->flags & LIENG_OBJECT_FLAG_REALIZED) != 0;
 }
@@ -224,18 +225,18 @@ int lieng_object_get_realized (
  * \param value Nonzero if the object should be realized.
  * \return Nonzero on success.
  */
-int lieng_object_set_realized (
-	LIEngObject* self,
+int liobj_object_set_realized (
+	LIObjObject* self,
 	int          value)
 {
 	LIMatTransform transform;
 
-	if (value == lieng_object_get_realized (self))
+	if (value == liobj_object_get_realized (self))
 		return 1;
 	if (value)
 	{
 		/* Link to the map. */
-		lieng_object_get_transform (self, &transform);
+		liobj_object_get_transform (self, &transform);
 		self->flags |= LIENG_OBJECT_FLAG_REALIZED;
 		if (!private_warp (self, &transform.position))
 		{
@@ -243,13 +244,13 @@ int lieng_object_set_realized (
 			return 0;
 		}
 
-		/* Invoke callbacks. */
-		lical_callbacks_call (self->engine->callbacks, "object-visibility", lical_marshal_DATA_PTR_INT, self, 1);
+		/* Invoke program->callbacks. */
+		lical_callbacks_call (self->manager->program->callbacks, "object-visibility", lical_marshal_DATA_PTR_INT, self, 1);
 	}
 	else
 	{
-		/* Invoke callbacks. */
-		lical_callbacks_call (self->engine->callbacks, "object-visibility", lical_marshal_DATA_PTR_INT, self, 0);
+		/* Invoke program->callbacks. */
+		lical_callbacks_call (self->manager->program->callbacks, "object-visibility", lical_marshal_DATA_PTR_INT, self, 0);
 
 		/* Remove from the map. */
 		if (self->sector != NULL)
@@ -268,8 +269,8 @@ int lieng_object_set_realized (
  * \param self Object.
  * \return Sector or NULL.
  */
-LIEngSector* lieng_object_get_sector (
-	LIEngObject* self)
+LIObjSector* liobj_object_get_sector (
+	LIObjObject* self)
 {
 	return self->sector;
 }
@@ -279,8 +280,8 @@ LIEngSector* lieng_object_get_sector (
  * \param self Object.
  * \return Nonzero if static.
  */
-int lieng_object_get_static (
-	const LIEngObject* self)
+int liobj_object_get_static (
+	const LIObjObject* self)
 {
 	return (self->flags & LIENG_OBJECT_FLAG_STATIC) != 0;
 }
@@ -290,8 +291,8 @@ int lieng_object_get_static (
  * \param self Object.
  * \param value Nonzero for static.
  */
-void lieng_object_set_static (
-	LIEngObject* self,
+void liobj_object_set_static (
+	LIObjObject* self,
 	int          value)
 {
 	LIMatTransform transform;
@@ -308,7 +309,7 @@ void lieng_object_set_static (
 	else
 	{
 		self->flags &= ~LIENG_OBJECT_FLAG_STATIC;
-		lieng_object_get_transform (self, &transform);
+		liobj_object_get_transform (self, &transform);
 		private_warp (self, &transform.position);
 	}
 }
@@ -318,8 +319,8 @@ void lieng_object_set_static (
  * \param self Object.
  * \param value Return location for the transformation.
  */
-void lieng_object_get_transform (
-	const LIEngObject* self,
+void liobj_object_get_transform (
+	const LIObjObject* self,
 	LIMatTransform*    value)
 {
 	*value = self->transform;
@@ -331,8 +332,8 @@ void lieng_object_get_transform (
  * \param value Transformation.
  * \return Nonzero on success.
  */
-int lieng_object_set_transform (
-	LIEngObject*          self,
+int liobj_object_set_transform (
+	LIObjObject*          self,
 	const LIMatTransform* value)
 {
 	/* Warp to new position. */
@@ -340,8 +341,8 @@ int lieng_object_set_transform (
 		return 0;
 	self->transform = *value;
 
-	/* Invoke callbacks. */
-	lical_callbacks_call (self->engine->callbacks, "object-transform", lical_marshal_DATA_PTR_PTR, self, value);
+	/* Invoke program->callbacks. */
+	lical_callbacks_call (self->manager->program->callbacks, "object-transform", lical_marshal_DATA_PTR_PTR, self, value);
 
 	return 1;
 }
@@ -349,11 +350,11 @@ int lieng_object_set_transform (
 /*****************************************************************************/
 
 static int private_warp (
-	LIEngObject*       self,
+	LIObjObject*       self,
 	const LIMatVector* position)
 {
-	LIEngSector* dst;
-	LIEngSector* src;
+	LIObjSector* dst;
+	LIObjSector* src;
 
 	/* Do not warp hidden objects. */
 	if (!(self->flags & LIENG_OBJECT_FLAG_REALIZED))
@@ -371,7 +372,7 @@ static int private_warp (
 
 	/* Get the source and destination sectors. */
 	src = self->sector;
-	dst = lialg_sectors_data_point (self->engine->sectors, LIALG_SECTORS_CONTENT_ENGINE, position, 1);
+	dst = lialg_sectors_data_point (self->manager->program->sectors, LIALG_SECTORS_CONTENT_ENGINE, position, 1);
 	if (dst == NULL)
 		return 0;
 

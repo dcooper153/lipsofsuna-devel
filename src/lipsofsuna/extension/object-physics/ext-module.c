@@ -22,6 +22,8 @@
  * @{
  */
 
+#include "lipsofsuna/object.h"
+#include "lipsofsuna/physics.h"
 #include "ext-module.h"
 
 static void private_object_contact (
@@ -30,24 +32,24 @@ static void private_object_contact (
 
 static int private_object_free (
 	LIExtModule* self,
-	LIEngObject* object);
+	LIObjObject* object);
 
 static int private_object_model (
 	LIExtModule* self,
-	LIEngObject* object,
+	LIObjObject* object,
 	LIEngModel*  model);
 
 static int private_object_new (
 	LIExtModule* self,
-	LIEngObject* object);
+	LIObjObject* object);
 
 static int private_object_transform (
 	LIExtModule* self,
-	LIEngObject* object);
+	LIObjObject* object);
 
 static int private_object_visibility (
 	LIExtModule* self,
-	LIEngObject* object,
+	LIObjObject* object,
 	int          value);
 
 static void private_physics_transform (
@@ -124,8 +126,8 @@ static void private_object_contact (
 	LIExtModule*  self,
 	LIPhyContact* contact)
 {
-	LIEngObject* object0;
-	LIEngObject* object1;
+	LIObjObject* object0;
+	LIObjObject* object1;
 	LIMatVector vector;
 
 	if (contact->object1 != NULL)
@@ -154,7 +156,7 @@ static void private_object_contact (
 
 static int private_object_free (
 	LIExtModule* self,
-	LIEngObject* object)
+	LIObjObject* object)
 {
 	LIPhyObject* phyobj;
 
@@ -171,7 +173,7 @@ static int private_object_free (
 
 static int private_object_model (
 	LIExtModule* self,
-	LIEngObject* object,
+	LIObjObject* object,
 	LIEngModel*  model)
 {
 	LIPhyModel* model_;
@@ -197,7 +199,7 @@ static int private_object_model (
 
 static int private_object_new (
 	LIExtModule* self,
-	LIEngObject* object)
+	LIObjObject* object)
 {
 	LIPhyObject* phyobj;
 
@@ -211,7 +213,7 @@ static int private_object_new (
 
 static int private_object_transform (
 	LIExtModule* self,
-	LIEngObject* object)
+	LIObjObject* object)
 {
 	LIPhyObject* phyobj;
 	LIMatTransform transform;
@@ -224,7 +226,7 @@ static int private_object_transform (
 	/* Set its transformation. */
 	if (!self->silence)
 	{
-		lieng_object_get_transform (object, &transform);
+		liobj_object_get_transform (object, &transform);
 		liphy_object_set_transform (phyobj, &transform);
 	}
 
@@ -235,12 +237,12 @@ static void private_physics_transform (
 	LIExtModule* self,
 	LIPhyObject* object)
 {
-	LIEngObject* obj;
+	LIObjObject* obj;
 	LIMatTransform transform;
 
 	/* Find the engine object. */
 	obj = liphy_object_get_userdata (object);
-	if (obj == NULL || !lieng_object_get_realized (obj))
+	if (obj == NULL || !liobj_object_get_realized (obj))
 		return;
 
 	/* Copy the transformation to the engine object. We set the silence
@@ -248,14 +250,14 @@ static void private_physics_transform (
 	   object from causing a feedback loop. */
 	self->silence++;
 	liphy_object_get_transform (object, &transform);
-	lieng_object_set_transform (obj, &transform);
-	lieng_object_moved (obj);
+	liobj_object_set_transform (obj, &transform);
+	liobj_object_moved (obj);
 	self->silence--;
 }
 
 static int private_object_visibility (
 	LIExtModule* self,
-	LIEngObject* object,
+	LIObjObject* object,
 	int          value)
 {
 	LIMatTransform transform;
@@ -269,7 +271,7 @@ static int private_object_visibility (
 	/* Set its visibility. */
 	if (value)
 	{
-		lieng_object_get_transform (object, &transform);
+		liobj_object_get_transform (object, &transform);
 		liphy_object_set_transform (phyobj, &transform);
 	}
 	liphy_object_set_realized (phyobj, value);

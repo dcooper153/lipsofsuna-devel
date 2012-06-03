@@ -18,7 +18,8 @@
 #ifndef __EXT_MODULE_H__
 #define __EXT_MODULE_H__
 
-#include <lipsofsuna/extension.h>
+#include "lipsofsuna/extension.h"
+#include "lipsofsuna/physics.h"
 
 #define LIEXT_SCRIPT_PHYSICS "Physics"
 

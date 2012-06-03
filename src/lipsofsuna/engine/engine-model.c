@@ -110,24 +110,13 @@ LIEngModel* lieng_model_new_model (
 void lieng_model_free (
 	LIEngModel* self)
 {
-	LIAlgU32dicIter iter;
-	LIEngObject* object;
-
+	/* Remove from the dictionary. */
 	lialg_u32dic_remove (self->engine->models, self->id);
 
 	/* Invoke callbacks. */
+	/* This will, among other things, cause the object manager to remove
+	   the model from each object that was using it. */
 	lical_callbacks_call (self->engine->callbacks, "model-free", lical_marshal_DATA_PTR, self);
-
-	/* Remove from objects. */
-	/* Keeping the model alive when it's assigned to objects is the job of scripts.
-	   If they don't reference the model, we'll remove it even if it's in use. We
-	   prevent crashing by removing it from objects in such a case. */
-	LIALG_U32DIC_FOREACH (iter, self->engine->objects)
-	{
-		object = iter.value;
-		if (object->model == self)
-			object->model = NULL;
-	}
 
 	/* Free data. */
 	if (self->model != NULL)

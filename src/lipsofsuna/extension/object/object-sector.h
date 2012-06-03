@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2012 Lips of Suna development team.
+ * Copyright© 2007-2010 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,28 +15,27 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_OBJECT_MODULE_H__
-#define __EXT_OBJECT_MODULE_H__
+#ifndef __EXT_OBJECT_SECTOR_H__
+#define __EXT_OBJECT_SECTOR_H__
 
-#include "lipsofsuna/extension.h"
+#include "lipsofsuna/algorithm.h"
+#include "lipsofsuna/math.h"
+#include "lipsofsuna/system.h"
+#include "object.h"
+#include "object-manager.h"
+#include "object-types.h"
 
-#define LIEXT_SCRIPT_OBJECT "Object"
-
-typedef struct _LIExtObjectModule LIExtObjectModule;
-struct _LIExtObjectModule
+struct _LIObjSector
 {
-	LIMaiProgram* program;
+	LIAlgSector* sector;
+	LIAlgU32dic* objects;
+	LIObjManager* manager;
 };
 
-LIExtObjectModule* liext_object_new (
-	LIMaiProgram* program);
+LIAPICALL (LIObjSector*, liobj_sector_new, (
+	LIAlgSector* sector));
 
-void liext_object_free (
-	LIExtObjectModule* self);
-
-/*****************************************************************************/
-
-void liext_script_object (
-	LIScrScript* self);
+LIAPICALL (void, liobj_sector_free, (
+	LIObjSector* self));
 
 #endif

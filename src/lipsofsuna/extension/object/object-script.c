@@ -18,34 +18,37 @@
 /**
  * \addtogroup LIExt Extension
  * @{
- * \addtogroup LIExtObject Object
+ * \addtogroup LIObjObject Object
  * @{
  */
 
-#include "lipsofsuna/engine.h"
+#include "lipsofsuna/system.h"
 #include "lipsofsuna/main.h"
 #include "lipsofsuna/script.h"
+#include "object.h"
+#include "object-manager.h"
+#include "object-sector.h"
 
 static void Object_find (LIScrArgs* args)
 {
 	int id;
 	float radius = 32.0f;
 	LIAlgU32dicIter iter1;
-	LIEngObject* object;
-	LIEngSector* sector;
 	LIMatVector center;
 	LIMatVector diff;
-	LIMaiProgram* program;
+	LIObjObject* object;
+	LIObjManager* manager;
+	LIObjSector* sector;
 
 	/* Find class data. */
-	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	manager = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_OBJECT);
 
 	/* Radial find mode. */
 	if (liscr_args_gets_vector (args, "point", &center))
 	{
 		liscr_args_gets_float (args, "radius", &radius);
 		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
-		LIALG_U32DIC_FOREACH (iter1, program->engine->objects)
+		LIALG_U32DIC_FOREACH (iter1, manager->objects)
 		{
 			object = iter1.value;
 			diff = limat_vector_subtract (center, object->transform.position);
@@ -57,7 +60,7 @@ static void Object_find (LIScrArgs* args)
 	/* Sector find mode. */
 	else if (liscr_args_gets_int (args, "sector", &id))
 	{
-		sector = lialg_sectors_data_index (program->sectors, LIALG_SECTORS_CONTENT_ENGINE, id, 0);
+		sector = lialg_sectors_data_index (manager->program->sectors, LIALG_SECTORS_CONTENT_ENGINE, id, 0);
 		liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
 		if (sector != NULL)
 		{
@@ -72,22 +75,22 @@ static void Object_find (LIScrArgs* args)
 
 static void Object_new (LIScrArgs* args)
 {
-	LIEngObject* self;
-	LIMaiProgram* program;
+	LIObjObject* self;
+	LIObjManager* manager;
 
 	/* Find class data. */
-	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	manager = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_OBJECT);
 
 	/* Allocate object. */
-	self = lieng_object_new (program->engine);
+	self = liobj_object_new (manager);
 	if (self == NULL)
 		return;
 
 	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, args->lua, self, LISCR_SCRIPT_OBJECT, lieng_object_free);
+	self->script = liscr_data_new (args->script, args->lua, self, LISCR_SCRIPT_OBJECT, liobj_object_free);
 	if (self->script == NULL)
 	{
-		lieng_object_free (self);
+		liobj_object_free (self);
 		return;
 	}
 	liscr_args_seti_stack (args);
@@ -98,12 +101,12 @@ static void Object_refresh (LIScrArgs* args)
 	float radius = 32.0f;
 
 	liscr_args_gets_float (args, "radius", &radius);
-	lieng_object_refresh (args->self, radius);
+	liobj_object_refresh (args->self, radius);
 }
 
 static void Object_get_model (LIScrArgs* args)
 {
-	LIEngObject* self = args->self;
+	LIObjObject* self = args->self;
 
 	if (self->model != NULL)
 		liscr_args_seti_data (args, self->model->script);
@@ -114,16 +117,16 @@ static void Object_set_model (LIScrArgs* args)
 	LIScrData* value;
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &value))
-		lieng_object_set_model (args->self, liscr_data_get_data (value));
+		liobj_object_set_model (args->self, liscr_data_get_data (value));
 	else
-		lieng_object_set_model (args->self, NULL);
+		liobj_object_set_model (args->self, NULL);
 }
 
 static void Object_get_position (LIScrArgs* args)
 {
 	LIMatTransform tmp;
 
-	lieng_object_get_transform (args->self, &tmp);
+	liobj_object_get_transform (args->self, &tmp);
 	liscr_args_seti_vector (args, &tmp.position);
 }
 
@@ -134,15 +137,15 @@ static void Object_set_position (LIScrArgs* args)
 
 	if (liscr_args_geti_vector (args, 0, &vector))
 	{
-		lieng_object_get_transform (args->self, &transform);
+		liobj_object_get_transform (args->self, &transform);
 		transform.position = vector;
-		lieng_object_set_transform (args->self, &transform);
+		liobj_object_set_transform (args->self, &transform);
 	}
 }
 
 static void Object_get_realized (LIScrArgs* args)
 {
-	liscr_args_seti_bool (args, lieng_object_get_realized (args->self));
+	liscr_args_seti_bool (args, liobj_object_get_realized (args->self));
 }
 
 static void Object_set_realized (LIScrArgs* args)
@@ -150,14 +153,14 @@ static void Object_set_realized (LIScrArgs* args)
 	int value;
 
 	if (liscr_args_geti_bool (args, 0, &value))
-		lieng_object_set_realized (args->self, value);
+		liobj_object_set_realized (args->self, value);
 }
 
 static void Object_get_rotation (LIScrArgs* args)
 {
 	LIMatTransform tmp;
 
-	lieng_object_get_transform (args->self, &tmp);
+	liobj_object_get_transform (args->self, &tmp);
 	liscr_args_seti_quaternion (args, &tmp.rotation);
 }
 
@@ -168,16 +171,16 @@ static void Object_set_rotation (LIScrArgs* args)
 
 	if (liscr_args_geti_quaternion (args, 0, &quat))
 	{
-		lieng_object_get_transform (args->self, &transform);
+		liobj_object_get_transform (args->self, &transform);
 		transform.rotation = quat;
 		limat_quaternion_normalize (transform.rotation);
-		lieng_object_set_transform (args->self, &transform);
+		liobj_object_set_transform (args->self, &transform);
 	}
 }
 
 static void Object_get_sector (LIScrArgs* args)
 {
-	LIEngObject* self = args->self;
+	LIObjObject* self = args->self;
 
 	if (self->sector != NULL)
 		liscr_args_seti_int (args, self->sector->sector->index);
@@ -185,18 +188,18 @@ static void Object_get_sector (LIScrArgs* args)
 
 static void Object_get_static (LIScrArgs* args)
 {
-	LIEngObject* self = args->self;
+	LIObjObject* self = args->self;
 
-	liscr_args_seti_bool (args, lieng_object_get_static (self));
+	liscr_args_seti_bool (args, liobj_object_get_static (self));
 }
 
 static void Object_set_static (LIScrArgs* args)
 {
 	int value;
-	LIEngObject* self = args->self;
+	LIObjObject* self = args->self;
 
 	if (liscr_args_geti_bool (args, 0, &value))
-		lieng_object_set_static (self, value);
+		liobj_object_set_static (self, value);
 }
 
 /*****************************************************************************/

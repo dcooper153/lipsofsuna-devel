@@ -22,6 +22,8 @@
  * @{
  */
 
+#include "lipsofsuna/object.h"
+#include "lipsofsuna/physics.h"
 #include "ext-module.h"
 
 static void Object_approach (LIScrArgs* args)
@@ -34,7 +36,7 @@ static void Object_approach (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -55,7 +57,7 @@ static void Object_impulse (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -77,7 +79,7 @@ static void Object_insert_hinge_constraint (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -98,7 +100,7 @@ static void Object_jump (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -113,7 +115,7 @@ static void Object_get_activated (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -127,7 +129,7 @@ static void Object_set_activated (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -143,7 +145,7 @@ static void Object_get_angular (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -158,7 +160,7 @@ static void Object_set_angular (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -174,7 +176,7 @@ static void Object_get_bounding_box_physics (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -192,7 +194,7 @@ static void Object_get_center_offset_physics (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -209,7 +211,7 @@ static void Object_get_collision_group (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -223,7 +225,7 @@ static void Object_set_collision_group (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -238,7 +240,7 @@ static void Object_get_collision_mask (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -252,7 +254,7 @@ static void Object_set_collision_mask (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -267,7 +269,7 @@ static void Object_get_contact_events (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -281,7 +283,7 @@ static void Object_set_contact_events (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -297,7 +299,7 @@ static void Object_get_gravity (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -312,7 +314,7 @@ static void Object_set_gravity (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -328,7 +330,7 @@ static void Object_get_friction_liquid (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -343,7 +345,7 @@ static void Object_set_friction_liquid (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -359,7 +361,7 @@ static void Object_get_gravity_liquid (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -374,7 +376,7 @@ static void Object_set_gravity_liquid (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -389,7 +391,7 @@ static void Object_get_ground (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -403,7 +405,7 @@ static void Object_get_mass (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -417,7 +419,7 @@ static void Object_set_mass (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -432,7 +434,7 @@ static void Object_get_movement (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -446,7 +448,7 @@ static void Object_set_movement (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -461,7 +463,7 @@ static void Object_get_physics (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -495,7 +497,7 @@ static void Object_set_physics (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -521,7 +523,7 @@ static void Object_get_shape (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -535,7 +537,7 @@ static void Object_set_shape (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -550,7 +552,7 @@ static void Object_get_speed (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -564,7 +566,7 @@ static void Object_set_speed (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -579,7 +581,7 @@ static void Object_get_strafing (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -593,7 +595,7 @@ static void Object_set_strafing (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -609,7 +611,7 @@ static void Object_get_velocity (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 
@@ -624,7 +626,7 @@ static void Object_set_velocity (LIScrArgs* args)
 
 	/* Get physics object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_PHYSICS_OBJECT);
-	object = liphy_physics_find_object (module->physics, ((LIEngObject*) args->self)->id);
+	object = liphy_physics_find_object (module->physics, ((LIObjObject*) args->self)->id);
 	if (object == NULL)
 		return;
 

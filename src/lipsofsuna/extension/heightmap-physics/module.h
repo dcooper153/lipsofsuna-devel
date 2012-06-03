@@ -19,6 +19,7 @@
 #define __EXT_HEIGHTMAP_PHYSICS_MODULE_H__
 
 #include "lipsofsuna/extension.h"
+#include "lipsofsuna/physics.h"
 #include "../heightmap/module.h"
 #include <btBulletDynamicsCommon.h>
 #include <BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>

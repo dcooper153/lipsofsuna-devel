@@ -15,45 +15,11 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-/**
- * \addtogroup LIExt Extension
- * @{
- * \addtogroup LIExtObject Object
- * @{
- */
+#ifndef __EXT_OBJECT_TYPES_H__
+#define __EXT_OBJECT_TYPES_H__
 
-#include "module.h"
+typedef struct _LIObjObject LIObjObject;
+typedef struct _LIObjManager LIObjManager;
+typedef struct _LIObjSector LIObjSector;
 
-LIMaiExtensionInfo liext_object_info =
-{
-	LIMAI_EXTENSION_VERSION, "Object",
-	liext_object_new,
-	liext_object_free
-};
-
-LIExtObjectModule* liext_object_new (
-	LIMaiProgram* program)
-{
-	LIExtObjectModule* self;
-
-	/* Allocate self. */
-	self = lisys_calloc (1, sizeof (LIExtObjectModule));
-	if (self == NULL)
-		return NULL;
-	self->program = program;
-
-	/* Register classes. */
-	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_OBJECT, self);
-	liext_script_object (program->script);
-
-	return self;
-}
-
-void liext_object_free (
-	LIExtObjectModule* self)
-{
-	lisys_free (self);
-}
-
-/** @} */
-/** @} */
+#endif

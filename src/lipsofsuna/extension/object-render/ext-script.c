@@ -22,6 +22,7 @@
  * @{
  */
 
+#include "lipsofsuna/object.h"
 #include "ext-module.h"
 
 static void Object_animate (LIScrArgs* args)
@@ -40,7 +41,7 @@ static void Object_animate (LIScrArgs* args)
 	const char* node_names[512];
 	float node_weights[512];
 	int node_num = 0;
-	LIEngObject* object;
+	LIObjObject* object;
 	LIExtModule* module;
 	LIMdlAnimation* animation = NULL;
 	LIScrData* data = NULL;
@@ -101,7 +102,7 @@ static void Object_animate_fade (LIScrArgs* args)
 {
 	int channel = 0;
 	float time = LIMDL_POSE_FADE_AUTOMATIC;
-	LIEngObject* object;
+	LIObjObject* object;
 	LIExtModule* module;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
@@ -129,7 +130,7 @@ static void Object_find_node (LIScrArgs* args)
 	const char* name;
 	const char* space = "local";
 	LIMatTransform transform;
-	LIEngObject* object;
+	LIObjObject* object;
 	LIExtModule* module;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
@@ -152,7 +153,7 @@ static void Object_get_animation (LIScrArgs* args)
 {
 	int chan;
 	LIAlgStrdicIter iter;
-	LIEngObject* object;
+	LIObjObject* object;
 	LIExtModule* module;
 	LIMdlPoseChannel* channel;
 
@@ -201,7 +202,7 @@ static void Object_particle_animation (LIScrArgs* args)
 	int loop = 1;
 	float start = 0.0f;
 	LIExtModule* module;
-	LIEngObject* object;
+	LIObjObject* object;
 
 	/* Get render object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
@@ -220,7 +221,7 @@ static void Object_set_effect (LIScrArgs* args)
 	float params[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 	const char* shader = NULL;
 	LIExtModule* module;
-	LIEngObject* object;
+	LIObjObject* object;
 
 	/* Get render object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
@@ -239,7 +240,7 @@ static void Object_set_particle (LIScrArgs* args)
 {
 	const char* name;
 	LIExtModule* module;
-	LIEngObject* object;
+	LIObjObject* object;
 
 	/* Get render object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
@@ -254,7 +255,7 @@ static void Object_set_particle_emitting (LIScrArgs* args)
 {
 	int value;
 	LIExtModule* module;
-	LIEngObject* object;
+	LIObjObject* object;
 
 	/* Get render object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
@@ -269,7 +270,7 @@ static void Object_set_render_distance (LIScrArgs* args)
 {
 	float value;
 	LIExtModule* module;
-	LIEngObject* object;
+	LIObjObject* object;
 
 	/* Get render object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
@@ -284,7 +285,7 @@ static void Object_set_render_distance (LIScrArgs* args)
 static void Object_get_render_loaded (LIScrArgs* args)
 {
 	LIExtModule* module;
-	LIEngObject* object = args->self;
+	LIObjObject* object = args->self;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
 	if (liren_render_object_get_loaded (module->render, object->id))
@@ -295,7 +296,7 @@ static void Object_set_shadow_casting (LIScrArgs* args)
 {
 	int value;
 	LIExtModule* module;
-	LIEngObject* object;
+	LIObjObject* object;
 
 	/* Get render object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);

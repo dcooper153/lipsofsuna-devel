@@ -32,10 +32,6 @@ static int private_init (
 	const char*   name,
 	const char*   args);
 
-static int private_object_motion (
-	LIMaiProgram* self,
-	LIEngObject*  object);
-
 static int private_sector_free (
 	LIMaiProgram* self,
 	int           sector);
@@ -746,43 +742,12 @@ static int private_init (
 	liscr_script_program (self->script);
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (self->callbacks, "object-motion", 63353, private_object_motion, self, self->calls + 0) ||
-	    !lical_callbacks_insert (self->callbacks, "sector-free", 65535, private_sector_free, self, self->calls + 1) ||
+	if (!lical_callbacks_insert (self->callbacks, "sector-free", 65535, private_sector_free, self, self->calls + 1) ||
 	    !lical_callbacks_insert (self->callbacks, "sector-load", 65535, private_sector_load, self, self->calls + 2) ||
 	    !lical_callbacks_insert (self->callbacks, "tick", 2, private_tick, self, self->calls + 3))
 		return 0;
 
 	lialg_random_init (&self->random, lisys_time (NULL));
-
-	return 1;
-}
-
-static int private_object_motion (
-	LIMaiProgram* self,
-	LIEngObject*  object)
-{
-	float diff_pos;
-	float diff_rot;
-	const float POSITION_THRESHOLD = 0.05;
-	const float ROTATION_THRESHOLD = 0.05;
-
-	if (object->script != NULL)
-	{
-		/* Don't emit events for ridiculously small changes. */
-		diff_pos = LIMAT_ABS (object->transform.position.x - object->transform_event.position.x) +
-		           LIMAT_ABS (object->transform.position.y - object->transform_event.position.y) +
-		           LIMAT_ABS (object->transform.position.z - object->transform_event.position.z);
-		diff_rot = LIMAT_ABS (object->transform.rotation.x - object->transform_event.rotation.x) +
-		           LIMAT_ABS (object->transform.rotation.y - object->transform_event.rotation.y) +
-		           LIMAT_ABS (object->transform.rotation.z - object->transform_event.rotation.z) +
-		           LIMAT_ABS (object->transform.rotation.w - object->transform_event.rotation.w);
-		if (diff_pos < POSITION_THRESHOLD && diff_rot < ROTATION_THRESHOLD)
-			return 1;
-		object->transform_event = object->transform;
-
-		/* Emit an object-motion event. */
-		limai_program_event (self, "object-motion", "object", LISCR_SCRIPT_OBJECT, object->script, NULL);
-	}
 
 	return 1;
 }

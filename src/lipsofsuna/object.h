@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -15,26 +15,11 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ENGINE_SECTOR_H__
-#define __ENGINE_SECTOR_H__
+#ifndef __LIPS_OBJECT_H__
+#define __LIPS_OBJECT_H__
 
-#include <lipsofsuna/algorithm.h>
-#include <lipsofsuna/math.h>
-#include <lipsofsuna/system.h>
-#include "engine.h"
-#include "engine-types.h"
-
-struct _LIEngSector
-{
-	LIAlgSector* sector;
-	LIAlgU32dic* objects;
-	LIEngEngine* engine;
-};
-
-LIAPICALL (LIEngSector*, lieng_sector_new, (
-	LIAlgSector* sector));
-
-LIAPICALL (void, lieng_sector_free, (
-	LIEngSector* self));
+#include "extension/object/object.h"
+#include "extension/object/object-manager.h"
+#include "extension/object/object-sector.h"
 
 #endif

@@ -22,6 +22,7 @@
  * @{
  */
 
+#include "lipsofsuna/object.h"
 #include "ext-module.h"
 
 static int private_build_ignore_list (
@@ -33,7 +34,7 @@ static int private_build_ignore_list (
 	int i;
 	int count = 0;
 	LIScrData* data;
-	LIEngObject* object;
+	LIObjObject* object;
 
 	/* Add an individual object to the ignore list. */
 	if (liscr_args_gets_data (args, "ignore", LISCR_SCRIPT_OBJECT, &data))
@@ -79,7 +80,7 @@ static void Physics_cast_ray (LIScrArgs* args)
 	int mask = LIPHY_DEFAULT_COLLISION_MASK;
 	LIMatVector start;
 	LIMatVector end;
-	LIEngObject* hitobj;
+	LIObjObject* hitobj;
 	LIExtModule* module;
 	LIMatVector vector;
 	LIPhyCollision result;
@@ -123,7 +124,7 @@ static void Physics_cast_sphere (LIScrArgs* args)
 	float radius = 0.5f;
 	LIMatVector start;
 	LIMatVector end;
-	LIEngObject* hitobj;
+	LIObjObject* hitobj;
 	LIExtModule* module;
 	LIMatVector vector;
 	LIPhyCollision result;

@@ -22,7 +22,9 @@
  * @{
  */
 
-#include <lipsofsuna/network.h>
+#include "lipsofsuna/object.h"
+#include "lipsofsuna/physics.h"
+#include "lipsofsuna/network.h"
 #include "ext-module.h"
 
 #ifndef LI_DISABLE_SOUND
@@ -177,13 +179,14 @@ LISndSource* liext_sound_set_effect (
 	int          flags)
 {
 	int create;
-	LIEngObject* engobj;
+	LIObjManager* objects;
+	LIObjObject* engobj;
 	LIExtObject* extobj;
 	LIMatTransform transform;
 	LISndSample* sample;
 	LISndSource* source;
 
-	/* Find sample. */
+	/* Find the sample. */
 	if (self->sound == NULL)
 	{
 		lisys_error_set (ENOTSUP, "no sound support");
@@ -193,11 +196,18 @@ LISndSource* liext_sound_set_effect (
 	if (sample == NULL)
 		return NULL;
 
-	/* Find engine object. */
+	/* Get the object manager. */
+	objects = limai_program_find_component (self->program, "object");
+	if (objects == NULL)
+		return NULL;
+
+	/* Find the object. */
 	create = 0;
-	engobj = lieng_engine_find_object (self->program->engine, object);
+	engobj = liobj_manager_find_object (objects, object);
 	if (engobj == NULL)
 		return NULL;
+
+	/* Find engine object. */
 
 	/* Find or create sound object. */
 	extobj = lialg_u32dic_find (self->objects, object);
@@ -237,7 +247,7 @@ LISndSource* liext_sound_set_effect (
 	}
 
 	/* Set properties. */
-	lieng_object_get_transform (engobj, &transform);
+	liobj_object_get_transform (engobj, &transform);
 	lisnd_source_set_position (source, &transform.position);
 	if (flags & LIEXT_SOUND_FLAG_REPEAT)
 		lisnd_source_set_looping (source, 1);
@@ -340,7 +350,7 @@ void liext_sound_object_free (
 
 int liext_sound_object_update (
 	LIExtObject* self,
-	LIEngObject* object,
+	LIObjObject* object,
 	LIExtModule* module,
 	float        secs)
 {
@@ -366,7 +376,7 @@ int liext_sound_object_update (
 		}
 		else if (object != NULL)
 		{
-			lieng_object_get_transform (object, &transform);
+			liobj_object_get_transform (object, &transform);
 			lisnd_source_set_position (source, &transform.position);
 		}
 		if (physics != NULL && object != NULL)
@@ -397,7 +407,8 @@ static int private_tick (
 	float        secs)
 {
 	LIAlgU32dicIter iter;
-	LIEngObject* engobj;
+	LIObjManager* objects;
+	LIObjObject* engobj;
 	LIExtObject* extobj;
 	LIMatVector direction;
 	LIMatVector velocity;
@@ -430,11 +441,16 @@ static int private_tick (
 		}
 	}
 
+	/* Get the object manager. */
+	objects = limai_program_find_component (self->program, "object");
+	if (objects == NULL)
+		return 1;
+
 	/* Update sound effects. */
 	LIALG_U32DIC_FOREACH (iter, self->objects)
 	{
 		extobj = iter.value;
-		engobj = lieng_engine_find_object (self->program->engine, iter.key);
+		engobj = liobj_manager_find_object (objects, iter.key);
 		if (!liext_sound_object_update (extobj, engobj, self, secs))
 		{
 			lialg_u32dic_remove (self->objects, iter.key);

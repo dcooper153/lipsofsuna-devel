@@ -20,8 +20,6 @@
 
 #include "engine/engine.h"
 #include "engine/engine-model.h"
-#include "engine/engine-object.h"
-#include "engine/engine-sector.h"
 #include "engine/engine-types.h"
 
 #endif
