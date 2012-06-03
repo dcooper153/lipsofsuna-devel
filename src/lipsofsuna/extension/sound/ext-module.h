@@ -94,9 +94,9 @@ struct _LIExtObject
 	LIAlgList* sounds;
 };
 
-LIExtObject* liext_object_new ();
+LIExtObject* liext_sound_object_new ();
 
-void liext_object_free (
+void liext_sound_object_free (
 	LIExtObject* self);
 #endif
 

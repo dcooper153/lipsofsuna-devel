@@ -16,14 +16,13 @@
  */
 
 /**
- * \addtogroup LIScr Script
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup LIScrVector Vector
+ * \addtogroup LIExtVector Vector
  * @{
  */
 
 #include "lipsofsuna/script.h"
-#include "script-private.h"
 
 static void Vector_new (LIScrArgs* args)
 {
@@ -40,7 +39,7 @@ static void Vector_add (LIScrArgs* args)
 	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &b))
 		return;
 
-	tmp = limat_vector_add (*((LIMatVector*) args->self), *((LIMatVector*) b->data));
+	tmp = limat_vector_add (*((LIMatVector*) args->self), *((LIMatVector*) liscr_data_get_data (b)));
 	liscr_args_seti_vector (args, &tmp);
 }
 
@@ -65,7 +64,7 @@ static void Vector_sub (LIScrArgs* args)
 	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &b))
 		return;
 
-	tmp = limat_vector_subtract (*((LIMatVector*) args->self), *((LIMatVector*) b->data));
+	tmp = limat_vector_subtract (*((LIMatVector*) args->self), *((LIMatVector*) liscr_data_get_data (b)));
 	liscr_args_seti_vector (args, &tmp);
 }
 
@@ -86,7 +85,7 @@ static void Vector_cross (LIScrArgs* args)
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &data))
 	{
-		tmp = limat_vector_cross (*((LIMatVector*) args->self), *((LIMatVector*) data->data));
+		tmp = limat_vector_cross (*((LIMatVector*) args->self), *((LIMatVector*) liscr_data_get_data (data)));
 		liscr_args_seti_vector (args, &tmp);
 	}
 }
@@ -98,7 +97,7 @@ static void Vector_dot (LIScrArgs* args)
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &data))
 	{
-		tmp = limat_vector_dot (*((LIMatVector*) args->self), *((LIMatVector*) data->data));
+		tmp = limat_vector_dot (*((LIMatVector*) args->self), *((LIMatVector*) liscr_data_get_data (data)));
 		liscr_args_seti_float (args, tmp);
 	}
 }
@@ -151,7 +150,7 @@ static void Vector_set_z (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void liscr_script_vector (
+void liext_script_vector (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_VECTOR, "vector_new", Vector_new);

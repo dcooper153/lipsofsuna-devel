@@ -742,12 +742,8 @@ static int private_init (
 
 	/* Register classes. */
 	liscr_script_set_userdata (self->script, LISCR_SCRIPT_PROGRAM, self);
-	liscr_script_model (self->script);
 	liscr_script_packet (self->script);
 	liscr_script_program (self->script);
-	liscr_script_object (self->script);
-	liscr_script_quaternion (self->script);
-	liscr_script_vector (self->script);
 
 	/* Register callbacks. */
 	if (!lical_callbacks_insert (self->callbacks, "object-motion", 63353, private_object_motion, self, self->calls + 0) ||

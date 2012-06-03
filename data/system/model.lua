@@ -1,5 +1,11 @@
 require "system/class"
 
+if not Los.program_load_extension("model") then
+	error("loading extension `model' failed")
+end
+
+------------------------------------------------------------------------------
+
 Model = Class()
 Model.class_name = "Model"
 Model.models = setmetatable({}, {__mode = "v"})

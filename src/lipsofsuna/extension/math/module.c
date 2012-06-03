@@ -15,32 +15,46 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SCRIPT_LIBRARY_H__
-#define __SCRIPT_LIBRARY_H__
+/**
+ * \addtogroup LIExt Extension
+ * @{
+ * \addtogroup LIExtMath Math
+ * @{
+ */
 
-#include "lipsofsuna/math.h"
-#include "lipsofsuna/script.h"
-#include "lipsofsuna/system.h"
+#include "module.h"
 
-#define LISCR_SCRIPT_CLASS "Class"
-#define LISCR_SCRIPT_EVENT "Event"
-#define LISCR_SCRIPT_MODEL "Model"
-#define LISCR_SCRIPT_OBJECT "Object"
-#define LISCR_SCRIPT_PACKET "Packet"
-#define LISCR_SCRIPT_PROGRAM "Program"
-#define LISCR_SCRIPT_QUATERNION "Quaternion"
-#define LISCR_SCRIPT_VECTOR "Vector"
+LIMaiExtensionInfo liext_math_info =
+{
+	LIMAI_EXTENSION_VERSION, "Math",
+	liext_math_new,
+	liext_math_free
+};
 
-LIAPICALL (void, liscr_script_event, (
-	LIScrScript* self));
+LIExtMathModule* liext_math_new (
+	LIMaiProgram* program)
+{
+	LIExtMathModule* self;
 
-LIAPICALL (void, liscr_script_packet, (
-	LIScrScript* self));
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (LIExtMathModule));
+	if (self == NULL)
+		return NULL;
+	self->program = program;
 
-LIAPICALL (void, liscr_script_program, (
-	LIScrScript* self));
+	/* Register classes. */
+	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_MATH, self);
+	liext_script_quaternion (program->script);
+	liext_script_vector (program->script);
 
-#include "script-packet.h"
+	return self;
+}
 
-#endif
+void liext_math_free (
+	LIExtMathModule* self)
+{
+	lisys_free (self);
+}
 
+/** @} */
+/** @} */

@@ -1,4 +1,11 @@
+require "system/class"
 require "system/model"
+
+if not Los.program_load_extension("object") then
+	error("loading extension `object' failed")
+end
+
+------------------------------------------------------------------------------
 
 Object = Class()
 Object.class_name = "Object"

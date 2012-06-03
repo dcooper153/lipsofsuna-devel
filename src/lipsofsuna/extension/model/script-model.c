@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,16 +16,15 @@
  */
 
 /**
- * \addtogroup LIScr Script
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup LIScrObject Object
+ * \addtogroup LIExtModel Model
  * @{
  */
 
-#include <lipsofsuna/engine.h>
-#include <lipsofsuna/main.h>
-#include <lipsofsuna/script.h>
-#include "script-private.h"
+#include "lipsofsuna/engine.h"
+#include "lipsofsuna/main.h"
+#include "lipsofsuna/script.h"
 
 static void Model_new (LIScrArgs* args)
 {
@@ -147,7 +146,7 @@ static void Model_load (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void liscr_script_model (
+void liext_script_model (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_MODEL, "model_new", Model_new);

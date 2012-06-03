@@ -16,16 +16,15 @@
  */
 
 /**
- * \addtogroup LIScr Script
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup LIScrObject Object
+ * \addtogroup LIExtObject Object
  * @{
  */
 
 #include "lipsofsuna/engine.h"
 #include "lipsofsuna/main.h"
 #include "lipsofsuna/script.h"
-#include "script-private.h"
 
 static void Object_find (LIScrArgs* args)
 {
@@ -115,7 +114,7 @@ static void Object_set_model (LIScrArgs* args)
 	LIScrData* value;
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &value))
-		lieng_object_set_model (args->self, value->data);
+		lieng_object_set_model (args->self, liscr_data_get_data (value));
 	else
 		lieng_object_set_model (args->self, NULL);
 }
@@ -202,7 +201,7 @@ static void Object_set_static (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void liscr_script_object (
+void liext_script_object (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_OBJECT, "object_find", Object_find);

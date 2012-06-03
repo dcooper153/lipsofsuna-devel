@@ -1,3 +1,11 @@
+require "system/class"
+
+if not Los.program_load_extension("math") then
+	error("loading extension `math' failed")
+end
+
+------------------------------------------------------------------------------
+
 Aabb = Class()
 Aabb.class_name = "Aabb"
 

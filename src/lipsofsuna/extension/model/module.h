@@ -15,32 +15,28 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __SCRIPT_LIBRARY_H__
-#define __SCRIPT_LIBRARY_H__
+#ifndef __EXT_MODEL_MODULE_H__
+#define __EXT_MODEL_MODULE_H__
 
-#include "lipsofsuna/math.h"
-#include "lipsofsuna/script.h"
-#include "lipsofsuna/system.h"
+#include "lipsofsuna/extension.h"
 
-#define LISCR_SCRIPT_CLASS "Class"
-#define LISCR_SCRIPT_EVENT "Event"
-#define LISCR_SCRIPT_MODEL "Model"
-#define LISCR_SCRIPT_OBJECT "Object"
-#define LISCR_SCRIPT_PACKET "Packet"
-#define LISCR_SCRIPT_PROGRAM "Program"
-#define LISCR_SCRIPT_QUATERNION "Quaternion"
-#define LISCR_SCRIPT_VECTOR "Vector"
+#define LIEXT_SCRIPT_MODEL "Model"
 
-LIAPICALL (void, liscr_script_event, (
-	LIScrScript* self));
+typedef struct _LIExtModelModule LIExtModelModule;
+struct _LIExtModelModule
+{
+	LIMaiProgram* program;
+};
 
-LIAPICALL (void, liscr_script_packet, (
-	LIScrScript* self));
+LIExtModelModule* liext_model_new (
+	LIMaiProgram* program);
 
-LIAPICALL (void, liscr_script_program, (
-	LIScrScript* self));
+void liext_model_free (
+	LIExtModelModule* self);
 
-#include "script-packet.h"
+/*****************************************************************************/
+
+void liext_script_model (
+	LIScrScript* self);
 
 #endif
-

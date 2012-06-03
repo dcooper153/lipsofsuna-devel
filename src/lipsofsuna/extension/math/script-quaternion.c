@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -16,14 +16,13 @@
  */
 
 /**
- * \addtogroup LIScr Script
+ * \addtogroup LIExt Extension
  * @{
- * \addtogroup LIScrQuaternion Quaternion
+ * \addtogroup LIExtQuaternion Quaternion
  * @{
  */
 
 #include "lipsofsuna/script.h"
-#include "script-private.h"
 
 static void Quaternion_new (LIScrArgs* args)
 {
@@ -95,7 +94,7 @@ static void Quaternion_add (LIScrArgs* args)
 	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &b))
 		return;
 
-	tmp = limat_quaternion_add (*((LIMatQuaternion*) args->self), *((LIMatQuaternion*) b->data));
+	tmp = limat_quaternion_add (*((LIMatQuaternion*) args->self), *((LIMatQuaternion*) liscr_data_get_data (b)));
 	liscr_args_seti_quaternion (args, &tmp);
 }
 
@@ -119,14 +118,14 @@ static void Quaternion_mul (LIScrArgs* args)
 	else if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &b))
 	{
 		/* Transform vector. */
-		v = limat_quaternion_transform (*((LIMatQuaternion*) args->self), *((LIMatVector*) b->data));
+		v = limat_quaternion_transform (*((LIMatQuaternion*) args->self), *((LIMatVector*) liscr_data_get_data (b)));
 		v = limat_vector_validate (v);
 		liscr_args_seti_vector (args, &v);
 	}
 	else if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &b))
 	{
 		/* Concatenate rotations. */
-		q = limat_quaternion_multiply (*((LIMatQuaternion*) args->self), *((LIMatQuaternion*) b->data));
+		q = limat_quaternion_multiply (*((LIMatQuaternion*) args->self), *((LIMatQuaternion*) liscr_data_get_data (b)));
 		q = limat_quaternion_validate (q);
 		liscr_args_seti_quaternion (args, &q);
 	}
@@ -140,7 +139,7 @@ static void Quaternion_sub (LIScrArgs* args)
 	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &b))
 		return;
 
-	tmp = limat_quaternion_subtract (*((LIMatQuaternion*) args->self), *((LIMatQuaternion*) b->data));
+	tmp = limat_quaternion_subtract (*((LIMatQuaternion*) args->self), *((LIMatQuaternion*) liscr_data_get_data (b)));
 	liscr_args_seti_quaternion (args, &tmp);
 }
 
@@ -244,7 +243,7 @@ static void Quaternion_set_z (LIScrArgs* args)
 
 /*****************************************************************************/
 
-void liscr_script_quaternion (
+void liext_script_quaternion (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new", Quaternion_new);

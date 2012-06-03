@@ -38,9 +38,12 @@ extern LIMaiExtensionInfo liext_heightmap_render_info;
 extern LIMaiExtensionInfo liext_image_info;
 extern LIMaiExtensionInfo liext_input_info;
 extern LIMaiExtensionInfo liext_lobby_info;
+extern LIMaiExtensionInfo liext_math_info;
+extern LIMaiExtensionInfo liext_model_info;
 extern LIMaiExtensionInfo liext_model_editing_info;
 extern LIMaiExtensionInfo liext_network_info;
 extern LIMaiExtensionInfo liext_noise_info;
+extern LIMaiExtensionInfo liext_object_info;
 extern LIMaiExtensionInfo liext_object_physics_info;
 extern LIMaiExtensionInfo liext_object_render_info;
 extern LIMaiExtensionInfo liext_password_info;
@@ -84,9 +87,12 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "heightmap-physics", &liext_heightmap_physics_info },
 		{ "image", &liext_image_info },
 		{ "lobby", &liext_lobby_info },
+		{ "math", &liext_math_info },
+		{ "model", &liext_model_info },
 		{ "model-editing", &liext_model_editing_info },
 		{ "network", &liext_network_info },
 		{ "noise", &liext_noise_info },
+		{ "object", &liext_object_info },
 		{ "object-physics", &liext_object_physics_info },
 		{ "password", &liext_password_info },
 		{ "physics", &liext_physics_info },

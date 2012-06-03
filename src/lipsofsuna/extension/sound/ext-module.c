@@ -99,7 +99,7 @@ void liext_sound_free (
 	if (self->objects != NULL)
 	{
 		LIALG_U32DIC_FOREACH (iter, self->objects)
-			liext_object_free (iter.value);
+			liext_sound_object_free (iter.value);
 		lialg_u32dic_free (self->objects);
 	}
 
@@ -204,12 +204,12 @@ LISndSource* liext_sound_set_effect (
 	if (extobj == NULL)
 	{
 		create = 1;
-		extobj = liext_object_new ();
+		extobj = liext_sound_object_new ();
 		if (extobj == NULL)
 			return NULL;
 		if (!lialg_u32dic_insert (self->objects, object, extobj))
 		{
-			liext_object_free (extobj);
+			liext_sound_object_free (extobj);
 			return NULL;
 		}
 	}
@@ -221,7 +221,7 @@ LISndSource* liext_sound_set_effect (
 		if (create)
 		{
 			lialg_u32dic_remove (self->objects, object);
-			liext_object_free (extobj);
+			liext_sound_object_free (extobj);
 		}
 		return NULL;
 	}
@@ -230,7 +230,7 @@ LISndSource* liext_sound_set_effect (
 		if (create)
 		{
 			lialg_u32dic_remove (self->objects, object);
-			liext_object_free (extobj);
+			liext_sound_object_free (extobj);
 		}
 		lisnd_source_free (source);
 		return NULL;
@@ -322,12 +322,12 @@ void liext_sound_set_music_volume (
 /*****************************************************************************/
 
 #ifndef LI_DISABLE_SOUND
-LIExtObject* liext_object_new ()
+LIExtObject* liext_sound_object_new ()
 {
 	return lisys_calloc (1, sizeof (LIExtObject));
 }
 
-void liext_object_free (
+void liext_sound_object_free (
 	LIExtObject* self)
 {
 	LIAlgList* ptr;
@@ -338,7 +338,7 @@ void liext_object_free (
 	lisys_free (self);
 }
 
-int liext_object_update (
+int liext_sound_object_update (
 	LIExtObject* self,
 	LIEngObject* object,
 	LIExtModule* module,
@@ -435,10 +435,10 @@ static int private_tick (
 	{
 		extobj = iter.value;
 		engobj = lieng_engine_find_object (self->program->engine, iter.key);
-		if (!liext_object_update (extobj, engobj, self, secs))
+		if (!liext_sound_object_update (extobj, engobj, self, secs))
 		{
 			lialg_u32dic_remove (self->objects, iter.key);
-			liext_object_free (extobj);
+			liext_sound_object_free (extobj);
 		}
 	}
 
