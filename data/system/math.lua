@@ -105,6 +105,18 @@ Quaternion.new = function(clss, x, y, z, w)
 	return self
 end
 
+--- Creates a quaternion that rotates from the source point to the destination.
+-- @param clss Quaternion class.
+-- @param src Vector.
+-- @param dst Vector.
+-- @return New quaternion.
+Quaternion.new_vectors = function(clss, src, dst)
+	local self = Class.new(clss)
+	self.handle = Los.quaternion_new_vectors(src.handle, dst.handle)
+	__userdata_lookup[self.handle] = self
+	return self
+end
+
 --- Calculates the sum of two quaternions.
 -- @param self Quaternion.
 -- @param quat Quaternion.

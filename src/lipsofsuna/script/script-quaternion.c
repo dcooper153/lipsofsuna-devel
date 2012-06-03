@@ -72,6 +72,21 @@ static void Quaternion_new_euler (LIScrArgs* args)
 	liscr_args_seti_quaternion (args, &quat);
 }
 
+static void Quaternion_new_vectors (LIScrArgs* args)
+{
+	LIMatQuaternion quat;
+	LIMatVector v1;
+	LIMatVector v2;
+
+	if (!liscr_args_geti_vector (args, 0, &v1) ||
+	    !liscr_args_geti_vector (args, 1, &v2))
+		return;
+	quat = limat_quaternion_init_vectors (v1, v2);
+	quat = limat_quaternion_validate (quat);
+	quat = limat_quaternion_normalize (quat);
+	liscr_args_seti_quaternion (args, &quat);
+}
+
 static void Quaternion_add (LIScrArgs* args)
 {
 	LIMatQuaternion tmp;
@@ -234,6 +249,7 @@ void liscr_script_quaternion (
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new", Quaternion_new);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new_euler", Quaternion_new_euler);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_new_vectors", Quaternion_new_vectors);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_add", Quaternion_add);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_mul", Quaternion_mul);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_QUATERNION, "quaternion_sub", Quaternion_sub);
