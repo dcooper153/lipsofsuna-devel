@@ -9,8 +9,10 @@ VERSION='0.6.0'
 top = '.'
 out = '.build'
 
-CORE_DIRS = 'ai algorithm archive callback client engine extension generator main math model network particle paths physics render render/font render/image render/internal script sound system voxel widget'
-EXTS_DIRS = 'ai animation camera config-file database file graphics heightmap heightmap-physics heightmap-render image input lobby model-editing network noise object-physics object-render password physics reload render skeleton sound string thread tiles tiles-physics tiles-render time vision watchdog widgets wireframe'
+CORE_DIRS = 'ai algorithm archive callback client engine extension generator main math model network particle paths physics script sound system voxel'
+CORE_DIRS_GFX = 'render render/font render/image render/internal'
+EXTS_DIRS = 'ai animation config-file database file heightmap heightmap-physics image lobby model-editing network noise object-physics password physics reload skeleton sound string thread tiles tiles-physics time vision watchdog'
+EXTS_DIRS_GFX = 'camera graphics heightmap-render input object-render render tiles-render widgets wireframe'
 
 def options(ctx):
 	ctx.tool_options('compiler_cc')
@@ -19,6 +21,7 @@ def options(ctx):
 	ctx.add_option('--bindir', action='store', default=None, help='override executable directory [default: PREFIX/bin]')
 	ctx.add_option('--libdir', action='store', default=None, help='override library directory [default: PREFIX/lib]')
 	ctx.add_option('--datadir', action='store', default=None, help='override data directory [default: PREFIX/share]')
+	ctx.add_option('--graphics', action='store', default=True, help='compile with graphics support [default: true]')
 	ctx.add_option('--sound', action='store', default=True, help='compile with sound support [default: true]')
 	ctx.add_option('--optimize', action='store', default=False, help='compile with heavy optimizations [default: false]')
 	ctx.add_option('--luajit', action='store', default=True, help='compile with LuaJIT if possible [default: true]')
@@ -33,6 +36,7 @@ def configure(ctx):
 		print("To enable a traditional build, configure with --relpath=false\n")
 		exit(1)
 	ctx.env.RELPATH = Options.options.relpath != "false"
+	ctx.env.GRAPHICS = Options.options.graphics != "false"
 	ctx.env.SOUND = Options.options.sound != "false"
 	ctx.env.MEMDEBUG = Options.options.memdebug == "true"
 	if Options.options.optimize == "true":
@@ -125,44 +129,43 @@ def configure(ctx):
 			if not ctx.check_cc(lib='lua5.1', uselib='CORE TEST', uselib_store='LUA', mandatory=False):
 				ctx.check_cc(lib='lua', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
 
-	# Ogre
-	# When doing the fallback check_cxx tests, some kind of a bug seems to occur with MinGW 4.6
-	# as the linker won't output anything if the main function calls no function.
-	if ctx.check_cfg(package='OGRE', atleast_version='1.7.0', args='--cflags --libs', mandatory=False):
-		if Options.options.ogre_plugindir:
-			ctx.env.OGRE_plugindir = Options.options.ogre_plugindir
-		else:
-			ctx.check_cfg(package='OGRE', msg='Checking for OGRE plugindir', variables='plugindir', mandatory=False)
-	else:
-		ctx.check_cxx(header_name='Ogre.h', mandatory=True, uselib='CORE TEST', uselib_store='OGRE', fragment='''
-			#include <stdio.h>
-			int main() { printf(""); return 0; }''')
-		ctx.check_cxx(lib='OgreMain', mandatory=True, uselib='CORE TEST', uselib_store='OGRE')
-		if Options.options.ogre_plugindir:
-			ctx.env.OGRE_plugindir = Options.options.ogreplugindir
-	if not ctx.check_cfg(package='OGRE-Terrain', atleast_version='1.7.0', args='--cflags --libs', mandatory=False, uselib_store='OGRE'):
-		ctx.check_cxx(header_name='Terrain/OgreTerrain.h', mandatory=True, uselib='CORE TEST', uselib_store='OGRE', fragment='''
-			#include <stdio.h>
-			int main() { printf(""); return 0; }''')
-		ctx.check_cxx(lib='OgreTerrain', mandatory=True, uselib='CORE TEST', uselib_store='OGRE')
-
-	# Xlib
-	# Needed because Ogre can't change the window title.
-	if ctx.check_cc(header_name='X11/Xlib.h', uselib_store='OGRE', mandatory=False, define_name='HAVE_X11_XLIB_H'):
-		if ctx.check_cc(lib='X11', uselib_store='OGRE', mandatory=False):
-			ctx.define('HAVE_XLIB', 1)
-
-	# OIS
-	if not ctx.check_cfg(package='OIS', atleast_version='1.3.0', args='--cflags --libs', mandatory=False):
-		ctx.check_cxx(header_name='OIS.h', mandatory=True, uselib='CORE TEST', uselib_store='OIS')
-		ctx.check_cxx(lib='OIS', mandatory=True, uselib='CORE TEST', uselib_store='OIS')
-
 	# libpng
 	if not ctx.check_cfg(package='libpng12', atleast_version='1.2.0', args='--cflags --libs', uselib_store='PNG', mandatory=False) and\
 	   not ctx.check_cfg(package='libpng14', atleast_version='1.4.0', args='--cflags --libs', uselib_store='PNG', mandatory=False) and\
 	   not ctx.check_cfg(package='libpng', atleast_version='1.2.0', args='--cflags --libs', uselib_store='PNG', mandatory=False):
 		ctx.check_cc(lib='png', mandatory=True, uselib_store='PNG')
 		ctx.check_cc(header_name='png.h', mandatory=True, uselib_store='PNG')
+
+	if ctx.env.GRAPHICS:
+		# Ogre
+		# When doing the fallback check_cxx tests, some kind of a bug seems to occur with MinGW 4.6
+		# as the linker won't output anything if the main function calls no function.
+		if ctx.check_cfg(package='OGRE', atleast_version='1.7.0', args='--cflags --libs', mandatory=False):
+			if Options.options.ogre_plugindir:
+				ctx.env.OGRE_plugindir = Options.options.ogre_plugindir
+			else:
+				ctx.check_cfg(package='OGRE', msg='Checking for OGRE plugindir', variables='plugindir', mandatory=False)
+		else:
+			ctx.check_cxx(header_name='Ogre.h', mandatory=True, uselib='CORE TEST', uselib_store='OGRE', fragment='''
+				#include <stdio.h>
+				int main() { printf(""); return 0; }''')
+			ctx.check_cxx(lib='OgreMain', mandatory=True, uselib='CORE TEST', uselib_store='OGRE')
+			if Options.options.ogre_plugindir:
+				ctx.env.OGRE_plugindir = Options.options.ogreplugindir
+		if not ctx.check_cfg(package='OGRE-Terrain', atleast_version='1.7.0', args='--cflags --libs', mandatory=False, uselib_store='OGRE'):
+			ctx.check_cxx(header_name='Terrain/OgreTerrain.h', mandatory=True, uselib='CORE TEST', uselib_store='OGRE', fragment='''
+				#include <stdio.h>
+				int main() { printf(""); return 0; }''')
+			ctx.check_cxx(lib='OgreTerrain', mandatory=True, uselib='CORE TEST', uselib_store='OGRE')
+		# OIS
+		if not ctx.check_cfg(package='OIS', atleast_version='1.3.0', args='--cflags --libs', mandatory=False):
+			ctx.check_cxx(header_name='OIS.h', mandatory=True, uselib='CORE TEST', uselib_store='OIS')
+			ctx.check_cxx(lib='OIS', mandatory=True, uselib='CORE TEST', uselib_store='OIS')
+		# Xlib
+		# Nice to have because Ogre can't change the window title.
+		if ctx.check_cc(header_name='X11/Xlib.h', uselib_store='OGRE', mandatory=False, define_name='HAVE_X11_XLIB_H'):
+			if ctx.check_cc(lib='X11', uselib_store='OGRE', mandatory=False):
+				ctx.define('HAVE_XLIB', 1)
 
 	if ctx.env.SOUND:
 		# AL
@@ -200,6 +203,8 @@ def configure(ctx):
 	ctx.define('LI_ENABLE_ERROR', 1)
 	if ctx.env.MEMDEBUG:
 		ctx.define('LI_ENABLE_MEMDEBUG', 1)
+	if not ctx.env.GRAPHICS:
+		ctx.define('LI_DISABLE_GRAPHICS', 1)
 	if not ctx.env.SOUND:
 		ctx.define('LI_DISABLE_SOUND', 1)
 	if ctx.env.RELPATH:
@@ -246,6 +251,8 @@ def configure(ctx):
 		print("\tbindir: " + bindir)
 		print("\tlibdir: " + libdir)
 		print("\tdatadir: " + datadir)
+	if ctx.env.GRAPHICS:
+		print("\tgraphics support")
 	if ctx.env.SOUND:
 		print("\tsound support")
 	if ctx.env.CURL:
@@ -265,7 +272,10 @@ def build(ctx):
 	libs = 'CORE LUA SQLITE BULLET ENET OIS OGRE PNG THREAD AL VORBIS OGG FLAC CURL ZLIB'
 
 	# Core objects.
-	for dir in CORE_DIRS.split(' '):
+	dirs = CORE_DIRS
+	if ctx.env.GRAPHICS:
+		dirs += " " + CORE_DIRS_GFX
+	for dir in dirs.split(' '):
 		srcs = ctx.path.ant_glob('src/lipsofsuna/%s/*.c' % dir)
 		if srcs:
 			objs += dir + '_objs '
@@ -284,7 +294,10 @@ def build(ctx):
 				use = libs)
 
 	# Extension objects.
-	for dir in EXTS_DIRS.split(' '):
+	dirs = EXTS_DIRS
+	if ctx.env.GRAPHICS:
+		dirs += " " + EXTS_DIRS_GFX
+	for dir in dirs.split(' '):
 		srcs = ctx.path.ant_glob('src/lipsofsuna/extension/%s/*.c' % dir)
 		if srcs:
 			objs += dir + '_ext_objs '

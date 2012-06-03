@@ -409,7 +409,7 @@ int limai_program_insert_extension (
 	{
 		if (self->paths->global_exts != NULL)
 		{
-			lisys_error_set (EINVAL, "cannot open extension `%s'");
+			lisys_error_set (EINVAL, "cannot open extension `%s'", name);
 			lisys_free (ident);
 			return 0;
 		}
@@ -435,7 +435,7 @@ int limai_program_insert_extension (
 			lisys_free (path);
 			if (module == NULL)
 			{
-				lisys_error_set (EINVAL, "cannot open extension `%s'");
+				lisys_error_set (EINVAL, "cannot open extension `%s'", name);
 				lisys_free (ident);
 				return 0;
 			}
