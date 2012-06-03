@@ -35,6 +35,10 @@ LIRenEntity::LIRenEntity (const Ogre::String& name, LIRenModel* model) :
 	render_model = model;
 	replacing_entity = NULL;
 
+	/* Clear the pose buffer. */
+	pose_buffer = NULL;
+	pose_changed = false;
+
 	/* A placeholder mesh is assigned to the entity until the real mesh is
 	   fully loaded. This is because Ogre assumes that a mesh always exists,
 	   and it won't wait for us to background load the textures if the real
@@ -42,11 +46,11 @@ LIRenEntity::LIRenEntity (const Ogre::String& name, LIRenModel* model) :
 	mName = name;
 	mMesh = Ogre::MeshPtr (new LIRenMesh ());
 	background_loaded_mesh = model->mesh;
-	builder.start ();
 
-	/* Clear the pose buffer. */
-	pose_buffer = NULL;
-	pose_changed = false;
+	/* Start building the mesh. */
+	/* NOTE: It is possible that the mesh gets built inside this call already.
+	   Because of that, all members need to be initialized before calling this. */
+	builder.start ();
 }
 
 LIRenEntity::~LIRenEntity ()
