@@ -18,7 +18,7 @@
 /**
  * \addtogroup LIMai Main
  * @{
- * \addtogroup LIMaiExtension Extension
+ * \addtogroup LIMaiMessage Message
  * @{
  */
 

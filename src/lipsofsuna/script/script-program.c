@@ -129,6 +129,14 @@ static void Program_pop_message (LIScrArgs* args)
 	limai_message_free (message);
 }
 
+static void Program_pump_events (LIScrArgs* args)
+{
+	LIMaiProgram* program;
+
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	limai_program_pump_events (program);
+}
+
 static void Program_push_message (LIScrArgs* args)
 {
 	const char* name = "";
@@ -319,6 +327,7 @@ void liscr_script_program (
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_launch_mod", Program_launch_mod);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_load_extension", Program_load_extension);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_pop_message", Program_pop_message);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_pump_events", Program_pump_events);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_push_message", Program_push_message);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_unittest", Program_unittest);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_unload_sector", Program_unload_sector);

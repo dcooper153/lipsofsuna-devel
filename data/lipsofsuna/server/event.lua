@@ -35,10 +35,6 @@ Eventhandler{type = "object-contact", func = function(self, event)
 	end
 end}
 
-Eventhandler{type = "object-motion", func = function(self, event)
-	Vision:event{type = "object-moved", object = event.object}
-end}
-
 local marker_timer = 0
 Eventhandler{type = "tick", func = function(self, event)
 	-- Update actors.

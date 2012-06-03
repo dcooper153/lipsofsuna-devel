@@ -89,12 +89,7 @@ while not Program.quit do
 	local t1 = Program.time
 	Program:update()
 	local t2 = Program.time
-	-- Handle events.
-	local event = Program:pop_event()
-	while event do
-		Eventhandler:event(event)
-		event = Program:pop_event()
-	end
+	Eventhandler:update()
 	local t3 = Program.time
 	-- Store timings.
 	Program.profiling.update = t2 - t1

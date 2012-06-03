@@ -77,7 +77,7 @@ end
 
 Player.set_client = function(self, client)
 	self.client = client
-	self.vision = Vision{cone_factor = 0.5, cone_angle = math.pi/2.5, enabled = true, object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
+	self.vision = Vision{cone_factor = 0.5, cone_angle = math.pi/2.5, enabled = true, id = self.id, object = self, radius = 10, callback = function(args) self:vision_cb(args) end}
 	self.vision.terrain = {}
 	self:update_vision_radius()
 	self.vision:update()

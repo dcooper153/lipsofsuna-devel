@@ -63,15 +63,10 @@ while not Program.quit do
 	local t1 = Program.time
 	Program:update()
 	local t2 = Program.time
-	-- Handle events.
-	local event = Program:pop_event()
-	while event do
-		Eventhandler:event(event)
-		event = Program:pop_event()
-	end
+	Eventhandler:update()
+	Client:update()
 	local t3 = Program.time
 	-- Render the scene.
-	Client:update()
 	Widgets:draw()
 	local t4 = Program.time
 	-- Update profiling stats.

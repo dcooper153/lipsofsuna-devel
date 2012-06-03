@@ -26,8 +26,7 @@ static float private_cone_factor (
 
 static void private_update_terrain (
 	LIExtVisionListener* self,
-	LIVoxManager*        voxels,
-	lua_State*           lua);
+	LIVoxManager*        voxels);
 
 /*****************************************************************************/
 
@@ -84,18 +83,15 @@ void liext_vision_listener_clear (
 }
 
 /**
- * \brief Updates the vision and added the events to a table in the Lua stack.
+ * \brief Updates the vision and emits global vision events.
  *
- * This function is intended to be called only from the scripting API. The
- * table where the events are added is already expected to be at the top of
- * the stack.
+ * The events can be distinguished from the events of other vision
+ * listeners by the external ID in the "vision" field.
  *
  * \param self Vision listener.
- * \param lua Lua state.
  */
 void liext_vision_listener_update (
-	LIExtVisionListener* self,
-	lua_State*           lua)
+	LIExtVisionListener* self)
 {
 	float dist;
 	float mult;
@@ -129,21 +125,7 @@ void liext_vision_listener_update (
 			if (lialg_u32dic_find (self->objects, object->id) != NULL)
 			{
 				lialg_u32dic_remove (self->objects, object->id);
-#if LUA_VERSION_NUM > 501
-				lua_pushnumber (lua, lua_rawlen (lua, -1) + 1);
-#else
-				lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
-#endif
-				lua_newtable (lua);
-				if (liscr_pushdata (lua, object->script))
-				{
-					lua_setfield (lua, -2, "object");
-					lua_pushstring (lua, "object-hidden");
-					lua_setfield (lua, -2, "type");
-					lua_settable (lua, -3);
-				}
-				else
-					lua_pop (lua, 2);
+				limai_program_event (self->module->program, "vision-object-hidden", "vision", LIMAI_FIELD_INT, self->external_id, "object", LIMAI_FIELD_INT, liobj_object_get_external_id (object), NULL);
 			}
 			continue;
 		}
@@ -161,21 +143,7 @@ void liext_vision_listener_update (
 			if (dist <= radius_add_obj)
 			{
 				lialg_u32dic_insert (self->objects, object->id, NULL + 1);
-#if LUA_VERSION_NUM > 501
-				lua_pushnumber (lua, lua_rawlen (lua, -1) + 1);
-#else
-				lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
-#endif
-				lua_newtable (lua);
-				if (liscr_pushdata (lua, object->script))
-				{
-					lua_setfield (lua, -2, "object");
-					lua_pushstring (lua, "object-shown");
-					lua_setfield (lua, -2, "type");
-					lua_settable (lua, -3);
-				}
-				else
-					lua_pop (lua, 2);
+				limai_program_event (self->module->program, "vision-object-shown", "vision", LIMAI_FIELD_INT, self->external_id, "object", LIMAI_FIELD_INT, liobj_object_get_external_id (object), NULL);
 			}
 		}
 
@@ -185,21 +153,7 @@ void liext_vision_listener_update (
 			if (dist > radius_del_obj)
 			{
 				lialg_u32dic_remove (self->objects, object->id);
-#if LUA_VERSION_NUM > 501
-				lua_pushnumber (lua, lua_rawlen (lua, -1) + 1);
-#else
-				lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
-#endif
-				lua_newtable (lua);
-				if (liscr_pushdata (lua, object->script))
-				{
-					lua_setfield (lua, -2, "object");
-					lua_pushstring (lua, "object-hidden");
-					lua_setfield (lua, -2, "type");
-					lua_settable (lua, -3);
-				}
-				else
-					lua_pop (lua, 2);
+				limai_program_event (self->module->program, "vision-object-hidden", "vision", LIMAI_FIELD_INT, self->external_id, "object", LIMAI_FIELD_INT, liobj_object_get_external_id (object), NULL);
 			}
 		}
 	}
@@ -209,7 +163,7 @@ void liext_vision_listener_update (
 	/* Update terrain blocks. */
 	voxels = limai_program_find_component (self->module->program, "voxels");
 	if (voxels != NULL)
-		private_update_terrain (self, voxels, lua);
+		private_update_terrain (self, voxels);
 }
 
 /*****************************************************************************/
@@ -232,8 +186,7 @@ static float private_cone_factor (
 
 static void private_update_terrain (
 	LIExtVisionListener* self,
-	LIVoxManager*        voxels,
-	lua_State*           lua)
+	LIVoxManager*        voxels)
 {
 	int sx;
 	int sy;
@@ -319,15 +272,7 @@ static void private_update_terrain (
 				continue;
 
 			/* Create an event. */
-			lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
-			lua_newtable (lua);
-			lua_pushnumber (lua, index);
-			lua_setfield (lua, -2, "index");
-			lua_pushnumber (lua, stamp);
-			lua_setfield (lua, -2, "stamp");
-			lua_pushstring (lua, "voxel-block-changed");
-			lua_setfield (lua, -2, "type");
-			lua_settable (lua, -3);
+			limai_program_event (self->module->program, "vision-voxel-block-changed", "vision", LIMAI_FIELD_INT, self->external_id, "index", LIMAI_FIELD_INT, index, "stamp", LIMAI_FIELD_INT, stamp, NULL);
 		}
 	}
 }

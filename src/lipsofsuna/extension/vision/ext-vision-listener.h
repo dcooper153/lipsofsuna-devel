@@ -24,6 +24,7 @@
 typedef struct _LIExtVisionListener LIExtVisionListener;
 struct _LIExtVisionListener
 {
+	int external_id;
 	float cone_angle;
 	float cone_cosine;
 	float cone_cutoff;
@@ -48,7 +49,6 @@ void liext_vision_listener_clear (
 	LIExtVisionListener* self);
 
 void liext_vision_listener_update (
-	LIExtVisionListener* self,
-	lua_State*           lua);
+	LIExtVisionListener* self);
 
 #endif

@@ -23,6 +23,7 @@
  */
 
 #include "lipsofsuna/voxel.h"
+#include "main-event.h"
 #include "main-extension.h"
 #include "main-program.h"
 
@@ -93,6 +94,8 @@ void limai_program_free (
 	int i;
 	LIMaiExtension* extension;
 	LIMaiExtension* extension_next;
+	LIMaiEvent* event;
+	LIMaiEvent* event_next;
 	LIMaiMessage* message;
 	LIMaiMessage* message_next;
 
@@ -160,6 +163,13 @@ void limai_program_free (
 		}
 	}
 
+	/* Free events. */
+	for (event = self->events ; event != NULL ; event = event_next)
+	{
+		event_next = event->next;
+		limai_event_free (event);
+	}
+
 	lisys_free (self->launch_args);
 	lisys_free (self->launch_name);
 	lisys_free (self->args);
@@ -195,92 +205,12 @@ void limai_program_eventva (
 	const char*   type,
 	va_list       args)
 {
-	int pint;
-	void* pptr;
-	char* pstr;
-	float pfloat;
-	const char* type_;
-	const char* name;
-	LIScrData* data;
-	lua_State* lua = liscr_script_get_lua (self->script);
+	LIMaiEvent* event;
 
-	/* Get the event queue. */
-	lua_getglobal (lua, "__events");
-	if (lua_type (lua, -1) != LUA_TTABLE)
-	{
-		lua_pop (lua, 1);
-		lua_newtable (lua);
-		lua_pushvalue (lua, -1);
-		lua_setglobal (lua, "__events");
-	}
-#if LUA_VERSION_NUM > 501
-	lua_pushnumber (lua, lua_rawlen (lua, -1) + 1);
-#else
-	lua_pushnumber (lua, lua_objlen (lua, -1) + 1);
-#endif
-
-	/* Create the event. */
-	lua_newtable (lua);
-	lua_pushstring (lua, type);
-	lua_setfield (lua, -2, "type");
-	while (1)
-	{
-		/* Get name. */
-		name = va_arg (args, char*);
-		if (name == NULL)
-			break;
-
-		/* Duplicated from LIScrData due to the behavior of varargs
-		   being undefined when passed to a function and then reused. */
-		type_ = va_arg (args, char*);
-		if (type_ == LISCR_TYPE_BOOLEAN)
-		{
-			pint = va_arg (args, int);
-			lua_pushboolean (lua, pint);
-		}
-		else if (type_ == LISCR_TYPE_FLOAT)
-		{
-			pfloat = va_arg (args, double);
-			lua_pushnumber (lua, pfloat);
-		}
-		else if (type_ == LISCR_TYPE_INT)
-		{
-			pint = va_arg (args, int);
-			lua_pushnumber (lua, pint);
-		}
-		else if (type_ == LISCR_TYPE_STRING)
-		{
-			pstr = va_arg (args, char*);
-			lua_pushstring (lua, pstr);
-		}
-		else if (!strcmp (type_, LISCR_SCRIPT_PACKET))
-		{
-			pptr = va_arg (args, void*);
-			data = liscr_data_new (self->script, lua, pptr, LISCR_SCRIPT_PACKET, liarc_packet_free);
-		}
-		else if (!strcmp (type_, LISCR_SCRIPT_VECTOR))
-		{
-			data = liscr_data_new_alloc (self->script, lua, sizeof (LIMatVector), LISCR_SCRIPT_VECTOR);
-			if (data == NULL)
-				break;
-			pptr = va_arg (args, void*);
-			*((LIMatVector*) liscr_data_get_data (data)) = *((LIMatVector*) pptr);
-		}
-		else
-		{
-			pptr = va_arg (args, void*);
-			if (pptr == NULL)
-				break;
-			liscr_pushdata (lua, pptr);
-		}
-
-		/* Set field. */
-		lua_setfield (lua, -2, name);
-	}
-
-	/* Push to event queue. */
-	lua_settable (lua, -3);
-	lua_pop (lua, 1);
+	event = limai_event_new (type, args);
+	if (event == NULL)
+		return;
+	limai_program_push_event (self, event);
 }
 
 /**
@@ -512,6 +442,27 @@ int limai_program_insert_component (
 }
 
 /**
+ * \brief Pops an event from the event queue.
+ * \param self Program.
+ * \return Event, or NULL.
+ */
+LIMaiEvent* limai_program_pop_event (
+	LIMaiProgram* self)
+{
+	LIMaiEvent* event;
+
+	event = self->events;
+	if (event != NULL)
+	{
+		if (event->next != NULL)
+			event->next->prev = NULL;
+		self->events = event->next;
+	}
+
+	return event;
+}
+
+/**
  * \brief Pops a message from the message queue.
  *
  * This function is thread safe. It's specifically intended for thread safe
@@ -519,7 +470,7 @@ int limai_program_insert_component (
  *
  * \param self Program.
  * \param queue Message queue.
- * \return Message or NULL.
+ * \return Message, or NULL.
  */
 LIMaiMessage* limai_program_pop_message (
 	LIMaiProgram* self,
@@ -542,11 +493,85 @@ LIMaiMessage* limai_program_pop_message (
 }
 
 /**
+ * \brief Moves events from the event queue to Lua.
+ *
+ * Events are added to a queue and pushed to scripts separately. This
+ * prevents the engine code from triggering garbage collection. That
+ * is necessary to avoid arbitrary objects being deleted during the
+ * physics update or other critical loops.
+ * 
+ * \param self Program.
+ */
+void limai_program_pump_events (
+	LIMaiProgram* self)
+{
+	int count;
+	LIMaiEvent* event;
+	lua_State* lua;
+
+	/* Get the event queue. */
+	lua = liscr_script_get_lua (self->script);
+	lua_getglobal (lua, "__events");
+	if (lua_type (lua, -1) != LUA_TTABLE)
+	{
+		lua_pop (lua, 1);
+		lua_newtable (lua);
+		lua_pushvalue (lua, -1);
+		lua_setglobal (lua, "__events");
+	}
+
+	/* Get the existing event count. */
+#if LUA_VERSION_NUM > 501
+	count = lua_rawlen (lua, -1);
+#else
+	count = lua_objlen (lua, -1);
+#endif
+
+	/* Append events to the table. */
+	while (1)
+	{
+		event = limai_program_pop_event (self);
+		if (event == NULL)
+			break;
+		lua_pushnumber (lua, ++count);
+		limai_event_write_script (event, self->script);
+		limai_event_free (event);
+		lua_settable (lua, -3);
+	}
+
+	/* Pop the table from the stack. */
+	lua_pop (lua, 1);
+}
+
+/**
+ * \brief Pushes an event to the event queue.
+ * \param self Program.
+ * \param event Event.
+ */
+void limai_program_push_event (
+	LIMaiProgram* self,
+	LIMaiEvent*   event)
+{
+	LIMaiEvent* ptr;
+
+	if (self->events != NULL)
+	{
+		for (ptr = self->events ; ptr->next != NULL ; ptr = ptr->next)
+			{}
+		ptr->next = event;
+		event->prev = ptr;
+	}
+	else
+		self->events = event;
+}
+
+/**
  * \brief Pushes a message to the message queue.
  *
  * This function is thread safe. It's specifically intended for thread safe
  * communication between scripted programs running in different threads.
  *
+ * \param self Program.
  * \param queue Message queue.
  * \param type Message type.
  * \param name Message name.
@@ -647,15 +672,10 @@ int limai_program_update (
 	self->tick = self->tick / LIMAI_PROGRAM_FPS_TICKS;
 
 	/* Update subsystems. */
-	/* Garbage collection is disabled so that we don't need to worry about
-	   objects getting collected while the physics simulation or something
-	   else is working on them and generating events. */
-	liscr_script_set_gc (self->script, 0);
 	lialg_sectors_update (self->sectors, secs);
 	liscr_script_update (self->script, secs);
 	lieng_engine_update (self->engine, secs);
 	lical_callbacks_call (self->callbacks, "tick", lical_marshal_DATA_FLT, secs);
-	liscr_script_set_gc (self->script, 1);
 
 	/* Sleep until end of frame. */
 	if (self->sleep > (int)(1000000 * secs))
@@ -756,7 +776,7 @@ static int private_sector_free (
 	LIMaiProgram* self,
 	int           sector)
 {
-	limai_program_event (self, "sector-free", "sector", LISCR_TYPE_INT, sector, NULL);
+	limai_program_event (self, "sector-free", "sector", LIMAI_FIELD_INT, sector, NULL);
 
 	return 1;
 }
@@ -765,7 +785,7 @@ static int private_sector_load (
 	LIMaiProgram* self,
 	int           sector)
 {
-	limai_program_event (self, "sector-load", "sector", LISCR_TYPE_INT, sector, NULL);
+	limai_program_event (self, "sector-load", "sector", LIMAI_FIELD_INT, sector, NULL);
 
 	return 1;
 }
@@ -774,7 +794,7 @@ static int private_tick (
 	LIMaiProgram* self,
 	float         secs)
 {
-	limai_program_event (self, "tick", "secs", LISCR_TYPE_FLOAT, secs, NULL);
+	limai_program_event (self, "tick", "secs", LIMAI_FIELD_FLOAT, secs, NULL);
 
 	return 1;
 }

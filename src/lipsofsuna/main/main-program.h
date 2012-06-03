@@ -23,6 +23,7 @@
 #include "lipsofsuna/engine.h"
 #include "lipsofsuna/paths.h"
 #include "lipsofsuna/script.h"
+#include "main-event.h"
 #include "main-extension.h"
 #include "main-message.h"
 
@@ -50,6 +51,7 @@ struct _LIMaiProgram
 	LICalHandle calls[4];
 	LIEngEngine* engine;
 	LIMaiExtension* extensions;
+	LIMaiEvent* events;
 	LIMaiMessage* messages[LIMAI_MESSAGE_QUEUE_MAX];
 	LIMaiProgram* parent;
 	LIPthPaths* paths;
@@ -100,9 +102,19 @@ LIAPICALL (int, limai_program_insert_extension, (
 	LIMaiProgram* self,
 	const char*   name));
 
+LIAPICALL (LIMaiEvent*, limai_program_pop_event, (
+	LIMaiProgram* self));
+
 LIAPICALL (LIMaiMessage*, limai_program_pop_message, (
 	LIMaiProgram* self,
 	int           queue));
+
+LIAPICALL (void, limai_program_pump_events, (
+	LIMaiProgram* self));
+
+LIAPICALL (void, limai_program_push_event, (
+	LIMaiProgram* self,
+	LIMaiEvent*   event));
 
 LIAPICALL (int, limai_program_push_message, (
 	LIMaiProgram* self,

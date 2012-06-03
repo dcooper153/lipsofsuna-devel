@@ -179,6 +179,29 @@ float liobj_object_get_distance (
 }
 
 /**
+ * \brief Gets the external ID of the object.
+ * \param self Object.
+ * \return ID.
+ */
+int liobj_object_get_external_id (
+	const LIObjObject* self)
+{
+	return self->external_id;
+}
+
+/**
+ * \brief Sets the external ID of the object.
+ * \param self Object.
+ * \param value ID.
+ */
+void liobj_object_set_external_id (
+	LIObjObject* self,
+	int          value)
+{
+	self->external_id = value;
+}
+
+/**
  * \brief Replaces the current model of the object.
  * \param self Object.
  * \param model Model or NULL.

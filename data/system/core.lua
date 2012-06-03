@@ -38,12 +38,37 @@ end
 
 --- Pops an event from the event queue.
 -- @param clss Program class.
--- @return Event table or nil.
+-- @return Event table, or nil.
 Program.pop_event = function(clss)
-	if not __events then return end
-	local t = __events[1]
-	if t then table.remove(__events, 1) end
-	return t
+	local pop = function()
+		clss:pump_events()
+		if not __events then return end
+		local t = __events[1]
+		if not t then return end
+		table.remove(__events, 1)
+		return t
+	end
+	local conv = function(t)
+		if t.type == "object-contact" then
+			if t.self then
+				t.self = Object:find{id = t.self}
+				if not t.self then return end
+			end
+			if t.object then
+				t.object = Object:find{id = t.object}
+				if not t.object then return end
+			end
+		elseif t.type == "object-motion" then
+			t.object = Object:find{id = t.object}
+			if not t.object then return end
+		end
+		return true
+	end
+	while true do
+		local t = pop()
+		if not t then return end
+		if conv(t) then return t end
+	end
 end
 
 --- Pops a message sent by the parent script.
@@ -58,11 +83,18 @@ Program.pop_message = function(self)
 	return r
 end
 
+--- Pumps engine events to the event queue.
+-- @param clss Program class.
+Program.pump_events = function(clss, args)
+	Los.program_pump_events(args)
+end
+
 --- Pushes an event to the back of the event queue.
 -- @param clss Program class.
 -- @return event Event table.
 Program.push_event = function(clss, event)
 	if not __events then __events = {} end
+	clss:pump_events()
 	table.insert(__events, event)
 end
 

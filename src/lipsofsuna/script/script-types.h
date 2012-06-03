@@ -27,11 +27,6 @@
 #endif
 #include "lipsofsuna/algorithm.h"
 
-#define LISCR_TYPE_BOOLEAN ((void*) -1)
-#define LISCR_TYPE_FLOAT ((void*) -2)
-#define LISCR_TYPE_INT ((void*) -3)
-#define LISCR_TYPE_STRING ((void*) -4)
-
 typedef struct _LIScrArgs LIScrArgs;
 typedef struct _LIScrData LIScrData;
 typedef struct _LIScrScript LIScrScript;

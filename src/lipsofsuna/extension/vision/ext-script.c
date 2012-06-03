@@ -54,12 +54,7 @@ static void Vision_clear (LIScrArgs* args)
 
 static void Vision_update (LIScrArgs* args)
 {
-	/* Add vision events to a table. */
-	liscr_script_set_gc (args->script, 0);
-	lua_newtable (args->lua);
-	liext_vision_listener_update (args->self, args->lua);
-	liscr_args_seti_stack (args);
-	liscr_script_set_gc (args->script, 1);
+	liext_vision_listener_update (args->self);
 }
 
 static void Vision_get_cone_angle (LIScrArgs* args)
@@ -117,6 +112,24 @@ static void Vision_set_direction (LIScrArgs* args)
 	self = args->self;
 	if (liscr_args_geti_vector (args, 0, &v))
 		self->direction = v;
+}
+
+static void Vision_get_id (LIScrArgs* args)
+{
+	LIExtVisionListener* self;
+
+	self = args->self;
+	liscr_args_seti_int (args, self->external_id);
+}
+
+static void Vision_set_id (LIScrArgs* args)
+{
+	int v;
+	LIExtVisionListener* self;
+
+	self = args->self;
+	if (liscr_args_geti_int (args, 0, &v))
+		self->external_id = v;
 }
 
 static void Vision_get_position (LIScrArgs* args)
@@ -187,6 +200,8 @@ void liext_script_vision (
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_set_cone_factor", Vision_set_cone_factor);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_get_direction", Vision_get_direction);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_set_direction", Vision_set_direction);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_get_id", Vision_get_id);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_set_id", Vision_set_id);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_get_position", Vision_get_position);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_set_position", Vision_set_position);
 	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_VISION, "vision_get_radius", Vision_get_radius);

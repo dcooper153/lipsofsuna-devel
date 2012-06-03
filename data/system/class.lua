@@ -145,7 +145,7 @@ Class.unittest = function()
 	local Object = Class()
 	Object.new = function(clss, args)
 		local self = Class.new(clss)
-		self.handle = Los.object_new()
+		self.handle = "foo"
 		if args then
 			for k,v in pairs(args) do self[k] = v end
 		end

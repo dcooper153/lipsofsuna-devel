@@ -36,6 +36,7 @@ enum
 struct _LIObjObject
 {
 	uint32_t id;
+	int external_id;
 	int flags;
 	LIEngModel* model;
 	LIObjManager* manager;
@@ -61,6 +62,13 @@ LIAPICALL (void, liobj_object_refresh, (
 LIAPICALL (void, liobj_object_get_bounds, (
 	const LIObjObject* self,
 	LIMatAabb*         bounds));
+
+LIAPICALL (int, liobj_object_get_external_id, (
+	const LIObjObject* self));
+
+LIAPICALL (void, liobj_object_set_external_id, (
+	LIObjObject* self,
+	int          value));
 
 LIAPICALL (int, liobj_object_get_dirty, (
 	const LIObjObject* self));

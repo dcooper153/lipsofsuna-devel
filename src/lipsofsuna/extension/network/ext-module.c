@@ -421,7 +421,7 @@ static int private_connect (
 		return 0;
 
 	/* Emit a login event. */
-	limai_program_event (self->program, "login", "client", LISCR_TYPE_INT, client->id, NULL);
+	limai_program_event (self->program, "login", "client", LIMAI_FIELD_INT, client->id, NULL);
 
 	return 1;
 }
@@ -450,7 +450,7 @@ static int private_message_client (
 	reader->reader->pos = 1;
 
 	/* Emit an event. */
-	limai_program_event (self->program, "packet", "message", LISCR_TYPE_INT, data[0], "packet", LISCR_SCRIPT_PACKET, reader, NULL);
+	limai_program_event (self->program, "packet", "message", LIMAI_FIELD_INT, data[0], "packet", LIMAI_FIELD_PACKET, reader, NULL);
 
 	return 1;
 }
@@ -476,7 +476,7 @@ static int private_message_server (
 	reader->reader->pos = 1;
 
 	/* Emit an event. */
-	limai_program_event (self->program, "packet", "message", LISCR_TYPE_INT, ((uint8_t*) event->packet->data)[0], "client", LISCR_TYPE_INT, client->id, "packet", LISCR_SCRIPT_PACKET, reader, NULL);
+	limai_program_event (self->program, "packet", "message", LIMAI_FIELD_INT, ((uint8_t*) event->packet->data)[0], "client", LIMAI_FIELD_INT, client->id, "packet", LIMAI_FIELD_PACKET, reader, NULL);
 
 	return 1;
 }

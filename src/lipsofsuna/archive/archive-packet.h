@@ -30,8 +30,17 @@ struct _LIArcPacket
 	LIArcWriter* writer;
 };
 
-LIAPICALL (LIArcPacket*, liarc_packet_new_readable, (const char* buffer, int length));
-LIAPICALL (LIArcPacket*, liarc_packet_new_writable, (int type));
-LIAPICALL (void, liarc_packet_free, (LIArcPacket* self));
+LIAPICALL (LIArcPacket*, liarc_packet_new_copy, (
+	const LIArcPacket* packet));
+
+LIAPICALL (LIArcPacket*, liarc_packet_new_readable, (
+	const char* buffer,
+	int         length));
+
+LIAPICALL (LIArcPacket*, liarc_packet_new_writable, (
+	int type));
+
+LIAPICALL (void, liarc_packet_free, (
+	LIArcPacket* self));
 
 #endif

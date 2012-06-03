@@ -9,6 +9,34 @@ end
 
 Object = Class()
 Object.class_name = "Object"
+Object.objects = setmetatable({}, {__mode = "v"})
+
+--- Creates a new object.
+-- @param clss Object class.
+-- @param args Arguments.<ul>
+--   <li>id: Unique object ID.</li></ul>
+-- @return New object.
+Object.new = function(clss, args)
+	-- Create the object.
+	local self = Class.new(clss)
+	self.handle = Los.object_new()
+	__userdata_lookup[self.handle] = self
+	-- Select the unique ID.
+	-- If there was an existing object with the same ID, hide it. This can
+	-- happen when object was hidden and displayed again before being GC'd.
+	self.id = args and args.id or clss:get_free_id()
+	local old = clss.objects[self.id]
+	if old then old.realized = false end
+	clss.objects[self.id] = self
+	-- Copy arguments.
+	if args then
+		for k,v in pairs(args) do
+			if k ~= "realized" then self[k] = v end
+		end
+		if args.realized then self.realized = true end
+	end
+	return self
+end
 
 --- Finds objects.
 -- @param clss Object class.
@@ -45,21 +73,16 @@ Object.find = function(self, args)
 	end
 end
 
---- Creates a new object.
+--- Gets a free object ID.
 -- @param clss Object class.
--- @param args Arguments.
--- @return New object.
-Object.new = function(clss, args)
-	local self = Class.new(clss)
-	self.handle = Los.object_new()
-	__userdata_lookup[self.handle] = self
-	if args then
-		for k,v in pairs(args) do
-			if k ~= "realized" then self[k] = v end
+-- @return Free object ID.
+Object.get_free_id = function(clss)
+	while true do
+		local id = math.random(0x1000000, 0x7FFFFFF)
+		if not clss:find{id = id} then
+			return id
 		end
-		if args.realized then self.realized = true end
 	end
-	return self
 end
 
 --- Recalculates the bounding box of the model of the object.
@@ -82,6 +105,10 @@ end
 
 --- The local center offset of the bounding box of the object.
 -- @name Object.center_offset
+-- @class table
+
+--- The unique ID of the object.
+-- @name Object.id
 -- @class table
 
 --- The model of the object.
@@ -125,6 +152,7 @@ Object:add_getters{
 		if not m then return Vector() end
 		return m.center_offset
 	end,
+	id = function(self) return Los.object_get_id(self.handle) end,
 	model = function(self) return rawget(self, "__model") end,
 	model_name = function(self)
 		local m = rawget(self, "__model")
@@ -137,6 +165,7 @@ Object:add_getters{
 	static = function(self, v) return Los.object_get_static(self.handle, v) end}
 
 Object:add_setters{
+	id = function(self, v) return Los.object_set_id(self.handle, v) end,
 	model = function(self, v)
 		local m = v
 		if type(v) == "string" then m = Model:find_or_load{file = v, mesh = Object.load_meshes} end

@@ -135,7 +135,7 @@ static void private_object_contact (
 		/* Object -> object */
 		object0 = liphy_object_get_userdata (contact->object0);
 		object1 = liphy_object_get_userdata (contact->object1);
-		limai_program_event (self->program, "object-contact", "impulse", LISCR_TYPE_FLOAT, contact->impulse, "normal", LISCR_SCRIPT_VECTOR, &contact->normal, "object", LISCR_SCRIPT_OBJECT, object1->script, "point", LISCR_SCRIPT_VECTOR, &contact->point, "self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
+		limai_program_event (self->program, "object-contact", "impulse", LIMAI_FIELD_FLOAT, contact->impulse, "normal", LIMAI_FIELD_VECTOR, &contact->normal, "object", LIMAI_FIELD_INT, liobj_object_get_external_id (object1), "point", LIMAI_FIELD_VECTOR, &contact->point, "self", LIMAI_FIELD_INT, liobj_object_get_external_id (object0), NULL);
 	}
 	else if (contact->terrain != NULL)
 	{
@@ -144,13 +144,13 @@ static void private_object_contact (
 		vector.x = contact->terrain_tile[0];
 		vector.y = contact->terrain_tile[1];
 		vector.z = contact->terrain_tile[2];
-		limai_program_event (self->program, "object-contact", "impulse", LISCR_TYPE_FLOAT, contact->impulse, "normal", LISCR_SCRIPT_VECTOR, &contact->normal,  "point", LISCR_SCRIPT_VECTOR, &contact->point, "tile", LISCR_SCRIPT_VECTOR, &vector, "self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
+		limai_program_event (self->program, "object-contact", "impulse", LIMAI_FIELD_FLOAT, contact->impulse, "normal", LIMAI_FIELD_VECTOR, &contact->normal,  "point", LIMAI_FIELD_VECTOR, &contact->point, "tile", LIMAI_FIELD_VECTOR, &vector, "self", LIMAI_FIELD_INT, liobj_object_get_external_id (object0), NULL);
 	}
 	else
 	{
 		/* Object -> heightmap */
 		object0 = liphy_object_get_userdata (contact->object0);
-		limai_program_event (self->program, "object-contact", "impulse", LISCR_TYPE_FLOAT, contact->impulse, "normal", LISCR_SCRIPT_VECTOR, &contact->normal, "heightmap", LISCR_TYPE_BOOLEAN, 1, "point", LISCR_SCRIPT_VECTOR, &contact->point, "self", LISCR_SCRIPT_OBJECT, object0->script, NULL);
+		limai_program_event (self->program, "object-contact", "impulse", LIMAI_FIELD_FLOAT, contact->impulse, "normal", LIMAI_FIELD_VECTOR, &contact->normal, "heightmap", LIMAI_FIELD_BOOL, 1, "point", LIMAI_FIELD_VECTOR, &contact->point, "self", LIMAI_FIELD_INT, liobj_object_get_external_id (object0), NULL);
 	}
 }
 

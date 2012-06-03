@@ -175,7 +175,7 @@ static void private_object_motion (
 		object->transform_event = object->transform;
 
 		/* Emit an object-motion event. */
-		limai_program_event (self->program, "object-motion", "object", LISCR_SCRIPT_OBJECT, object->script, NULL);
+		limai_program_event (self->program, "object-motion", "object", LIMAI_FIELD_INT, liobj_object_get_external_id (object), NULL);
 	}
 }
 

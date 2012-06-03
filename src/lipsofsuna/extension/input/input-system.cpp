@@ -140,24 +140,24 @@ bool LIInpSystem::mouseMoved (const OIS::MouseEvent& event)
 {
 	if (event.state.X.rel || event.state.Y.rel)
 	{
-		limai_program_event (this->input->program, "mousemotion", "x", LISCR_TYPE_INT, event.state.X.abs, "y", LISCR_TYPE_INT, event.state.Y.abs, "dx", LISCR_TYPE_INT, event.state.X.rel, "dy", LISCR_TYPE_INT, event.state.Y.rel, NULL);
+		limai_program_event (this->input->program, "mousemotion", "x", LIMAI_FIELD_INT, event.state.X.abs, "y", LIMAI_FIELD_INT, event.state.Y.abs, "dx", LIMAI_FIELD_INT, event.state.X.rel, "dy", LIMAI_FIELD_INT, event.state.Y.rel, NULL);
 	}
 	if (event.state.Z.rel)
 	{
-		limai_program_event (this->input->program, "mousescroll", "abs", LISCR_TYPE_INT, event.state.Z.abs, "rel", LISCR_TYPE_INT, event.state.Z.rel, NULL);
+		limai_program_event (this->input->program, "mousescroll", "abs", LIMAI_FIELD_INT, event.state.Z.abs, "rel", LIMAI_FIELD_INT, event.state.Z.rel, NULL);
 	}
 	return true;
 }
 
 bool LIInpSystem::mousePressed (const OIS::MouseEvent& event, OIS::MouseButtonID id)
 {
-	limai_program_event (this->input->program, "mousepress", "button", LISCR_TYPE_INT, translate_mouse_button (id), "x", LISCR_TYPE_INT, event.state.X.abs, "y", LISCR_TYPE_INT, event.state.Y.abs, NULL);
+	limai_program_event (this->input->program, "mousepress", "button", LIMAI_FIELD_INT, translate_mouse_button (id), "x", LIMAI_FIELD_INT, event.state.X.abs, "y", LIMAI_FIELD_INT, event.state.Y.abs, NULL);
 	return true;
 }
 
 bool LIInpSystem::mouseReleased (const OIS::MouseEvent& event, OIS::MouseButtonID id)
 {
-	limai_program_event (this->input->program, "mouserelease", "button", LISCR_TYPE_INT, translate_mouse_button (id), "x", LISCR_TYPE_INT, event.state.X.abs, "y", LISCR_TYPE_INT, event.state.Y.abs, NULL);
+	limai_program_event (this->input->program, "mouserelease", "button", LIMAI_FIELD_INT, translate_mouse_button (id), "x", LIMAI_FIELD_INT, event.state.X.abs, "y", LIMAI_FIELD_INT, event.state.Y.abs, NULL);
 	return true;
 }
 
@@ -182,12 +182,12 @@ void LIInpSystem::emit_key_event (const OIS::KeyEvent& event, bool press)
 		str = lisys_wchar_to_utf8 (event.text);
 	if (str != NULL)
 	{
-		limai_program_event (this->input->program, press? "keypress" : "keyrelease", "code", LISCR_TYPE_INT, event.key, "mods", LISCR_TYPE_INT, mods, "text", LISCR_TYPE_STRING, str, NULL);
+		limai_program_event (this->input->program, press? "keypress" : "keyrelease", "code", LIMAI_FIELD_INT, event.key, "mods", LIMAI_FIELD_INT, mods, "text", LIMAI_FIELD_STRING, str, NULL);
 		lisys_free (str);
 	}
 	else
 	{
-		limai_program_event (this->input->program, press? "keypress" : "keyrelease", "code", LISCR_TYPE_INT, event.key, "mods", LISCR_TYPE_INT, mods, NULL);
+		limai_program_event (this->input->program, press? "keypress" : "keyrelease", "code", LIMAI_FIELD_INT, event.key, "mods", LIMAI_FIELD_INT, mods, NULL);
 	}
 }
 
@@ -210,11 +210,11 @@ int LIInpSystem::translate_mouse_button (OIS::MouseButtonID id)
 
 /* TODO: Joystick.
 	case SDL_JOYAXISMOTION:
-		limai_program_event (self->program, "joystickmotion", "axis", LISCR_TYPE_INT, event.jaxis.axis + 1, "value", LISCR_TYPE_FLOAT, event.jaxis.value / 32768.0f, NULL);
+		limai_program_event (self->program, "joystickmotion", "axis", LIMAI_FIELD_INT, event.jaxis.axis + 1, "value", LIMAI_FIELD_FLOAT, event.jaxis.value / 32768.0f, NULL);
 		return 0;
 	case SDL_JOYBUTTONDOWN:
 	case SDL_JOYBUTTONUP:
-		limai_program_event (self->program, (event.type == SDL_JOYBUTTONDOWN)? "joystickpress" : "joystickrelease", "button", LISCR_TYPE_INT, event.jbutton.button, NULL);
+		limai_program_event (self->program, (event.type == SDL_JOYBUTTONDOWN)? "joystickpress" : "joystickrelease", "button", LIMAI_FIELD_INT, event.jbutton.button, NULL);
 		return 0;
 */
 

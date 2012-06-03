@@ -25,6 +25,47 @@
 #include "lipsofsuna/system.h"
 #include "archive-packet.h"
 
+LIArcPacket* liarc_packet_new_copy (
+	const LIArcPacket* packet)
+{
+	int length;
+	LIArcPacket* self;
+
+	/* Allocate self. */
+	self = lisys_calloc (1, sizeof (LIArcPacket));
+	if (self == NULL)
+		return NULL;
+
+	/* Copy the reader. */
+	if (packet->reader != NULL)
+	{
+		length = packet->reader->length;
+		self->buffer = lisys_calloc (length, 1);
+		if (self->buffer == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
+		memcpy (self->buffer, packet->buffer, length);
+		self->reader = liarc_reader_new (self->buffer, length);
+		if (self->reader == NULL)
+		{
+			liarc_packet_free (self);
+			return NULL;
+		}
+	}
+
+	/* TODO: Copy the writer. */
+	if (packet->writer != NULL)
+	{
+		lisys_assert (0 && "not implemented yet");
+		liarc_packet_free (self);
+		return NULL;
+	}
+
+	return self;
+}
+
 LIArcPacket* liarc_packet_new_readable (
 	const char* buffer,
 	int         length)

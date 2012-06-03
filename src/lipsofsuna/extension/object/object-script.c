@@ -104,6 +104,22 @@ static void Object_refresh (LIScrArgs* args)
 	liobj_object_refresh (args->self, radius);
 }
 
+static void Object_get_id (LIScrArgs* args)
+{
+	LIObjObject* self = args->self;
+
+	liscr_args_seti_int (args, liobj_object_get_external_id (self));
+}
+
+static void Object_set_id (LIScrArgs* args)
+{
+	int value;
+	LIObjObject* self = args->self;
+
+	if (liscr_args_geti_int (args, 0, &value))
+		liobj_object_set_external_id (self, value);
+}
+
 static void Object_get_model (LIScrArgs* args)
 {
 	LIObjObject* self = args->self;
@@ -210,6 +226,8 @@ void liext_script_object (
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_OBJECT, "object_find", Object_find);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_OBJECT, "object_new", Object_new);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_refresh", Object_refresh);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_id", Object_get_id);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_id", Object_set_id);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_model", Object_get_model);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_model", Object_set_model);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_position", Object_get_position);

@@ -185,14 +185,14 @@ static void private_reload_image (
 	LIExtReload* self,
 	const char*  name)
 {
-	limai_program_event (self->program, "reload-image", "file", LISCR_TYPE_STRING, name, NULL);
+	limai_program_event (self->program, "reload-image", "file", LIMAI_FIELD_STRING, name, NULL);
 }
 
 static void private_reload_model (
 	LIExtReload* self,
 	const char*  name)
 {
-	limai_program_event (self->program, "reload-model", "file", LISCR_TYPE_STRING, name, NULL);
+	limai_program_event (self->program, "reload-model", "file", LIMAI_FIELD_STRING, name, NULL);
 }
 
 /** @} */

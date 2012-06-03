@@ -1,7 +1,8 @@
+require "system/core"
+
 Eventhandler = Class()
 Eventhandler.class_name = "Eventhandler"
-Eventhandler.handlers = {}
-setmetatable(Eventhandler.handlers, {__mode = "v"})
+Eventhandler.handlers = setmetatable({}, {__mode = "v"})
 
 --- Creates a new event handler and enables it.<br/>
 -- The event handler will not be subject to garbage collection when enabled.
@@ -38,6 +39,7 @@ Eventhandler.event = function(clss, args)
 	-- Translate handles.
 	if args.type == "packet" then
 		args.packet = Class.new(Packet, {handle = args.packet})
+		args.packet:read()
 	end
 	for k,v in pairs(args) do
 		if type(v) == "userdata" then
@@ -58,3 +60,12 @@ Eventhandler.event = function(clss, args)
 	end
 end
 
+--- Reads events from the program and dispatches them.
+-- @param clss Event handler class.
+Eventhandler.update = function(clss)
+	local event = Program:pop_event()
+	while event do
+		clss:event(event)
+		event = Program:pop_event()
+	end
+end
