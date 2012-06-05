@@ -224,7 +224,7 @@ Client:add_class_setters{
 		self.camera:reset()
 	end,
 	mouse_smoothing = function(self, v)
-		local s = v and 0.15 or 1
+		local s = v and 0.7 or 1
 		if self.player_object then
 			self.player_object.rotation_smoothing = s
 		end
