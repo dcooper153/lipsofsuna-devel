@@ -1,8 +1,20 @@
+require "system/debug"
 require "common/chatcommand"
 
 -- Dump debug information.
 ChatCommand{pattern = "^/debug_dump$", func = function(matches)
 	Program:debug_dump()
+end}
+
+-- Dump debug information.
+ChatCommand{pattern = "^/debug_dump_class (.*)$", func = function(matches)
+	Debug:dump_paths_by_class_instance(matches[1])
+end}
+
+-- Restarts the client.
+ChatCommand{pattern = "^/client_restart$", func = function(matches)
+	Program:launch_mod{name = "lipsofsuna"}
+	Program.quit = true
 end}
 
 -- Show client stats.
