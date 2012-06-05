@@ -2,6 +2,9 @@ Ui:add_state{
 	state = "editor",
 	root = "editor",
 	hint = "",
+	exit_root = function()
+		Client.editor:reset()
+	end,
 	init = function()
 		Sound:switch_music_track("game")
 		if not Client.editor.initialized then

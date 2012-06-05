@@ -19,6 +19,16 @@ Editor.new = function(clss)
 	return self
 end
 
+Editor.reset = function(self)
+	self.prev_tiles = {}
+	self.selection = {}
+	self.copybuffer = {}
+	if self.corners then
+		self.corners.realized = false
+		self.corners = nil
+	end
+end
+
 --- Initializes the editor mode.
 -- @param self Editor.
 Editor.initialize = function(self)
@@ -136,6 +146,7 @@ end
 
 Editor.load = function(self, name)
 	-- Make sure the old map is erased.
+	self:reset()
 	for k,v in pairs(Object.objects) do v:detach() end
 	Client.sectors:unload_world()
 	-- Find or create the pattern.

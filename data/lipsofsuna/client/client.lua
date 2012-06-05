@@ -106,6 +106,7 @@ Client.reset_data = function(self)
 	Operators.inventory:reset()
 	Operators.spells:reset()
 	Operators.quests:reset()
+	self.editor:reset()
 	self.data = {}
 	self.data.admin = {}
 	self.data.book = {}
