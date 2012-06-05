@@ -20,7 +20,7 @@ end}
 
 Protocol:add_handler{type = "PLAYER_SKILLS", func = function(event)
 	-- Read the list of enabled skills.
-	enabled = {}
+	local enabled = {}
 	while true do
 		local ok,name = event.packet:resume("string")
 		if not ok then break end

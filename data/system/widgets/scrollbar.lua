@@ -41,7 +41,7 @@ end
 
 Widgets.Scrollbar.handle_event = function(self, args)
 	if args.type == "mousemotion" then
-		if math.mod(Program.mouse_button_state, 2) == 1 then
+		if Program.mouse_button_state % 2 == 1 then
 			self:set_value_at(Vector(args.x, args.y))
 			return
 		end

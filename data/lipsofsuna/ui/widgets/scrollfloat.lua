@@ -96,7 +96,7 @@ Widgets.Uiscrollfloat.handle_event = function(self, args)
 			end
 			return
 		elseif args.type == "mousemotion" then
-			if math.mod(Program.mouse_button_state, 2) == 1 then
+			if Program.mouse_button_state % 2 == 1 then
 				self:set_value_at(args.x)
 			end
 			return

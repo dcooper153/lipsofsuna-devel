@@ -122,12 +122,13 @@ def configure(ctx):
 	   ctx.check_cfg(package='luajit', atleast_version='2.0.0', args='--cflags --libs', uselib_store='LUAJIT', mandatory=False) and\
 	   ctx.check(msg="Checking for luajit architecture", fragment='int main() { return 0; }\n', mandatory=False, uselib='CORE TEST LUAJIT'):
 		ctx.check_cfg(package='luajit', args='--cflags --libs', uselib_store='LUA', mandatory=False)
-	elif not ctx.check_cfg(package='lua5.1', atleast_version='5.1', args='--cflags --libs', uselib_store='LUA', mandatory=False):
-		if not ctx.check_cfg(package='lua', atleast_version='5.1', args='--cflags --libs', mandatory=False):
-			ctx.check_cc(header_name='lua.h', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
-			ctx.check_cc(header_name='lauxlib.h', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
-			if not ctx.check_cc(lib='lua5.1', uselib='CORE TEST', uselib_store='LUA', mandatory=False):
-				ctx.check_cc(lib='lua', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
+	elif not ctx.check_cfg(package='lua5.1', atleast_version='5.1', args='--cflags --libs', uselib_store='LUA', mandatory=False) and\
+	     not ctx.check_cfg(package='lua', atleast_version='5.1', args='--cflags --libs', mandatory=False) and\
+	     not ctx.check_cfg(package='lua5.2', atleast_version='5.2', args='--cflags --libs', uselib_store='LUA', mandatory=False):
+		ctx.check_cc(header_name='lua.h', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
+		ctx.check_cc(header_name='lauxlib.h', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
+		if not ctx.check_cc(lib='lua5.1', uselib='CORE TEST', uselib_store='LUA', mandatory=False):
+			ctx.check_cc(lib='lua', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
 
 	# libpng
 	if not ctx.check_cfg(package='libpng12', atleast_version='1.2.0', args='--cflags --libs', uselib_store='PNG', mandatory=False) and\

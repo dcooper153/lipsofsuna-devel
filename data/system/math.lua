@@ -72,7 +72,7 @@ end
 ------------------------------------------------------------------------------
 
 Quaternion = Class()
-Quaternion.class_name = "Vector"
+Quaternion.class_name = "Quaternion"
 
 --- Creates a new quaternion.
 -- @param clss Quaternion class.

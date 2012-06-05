@@ -55,7 +55,7 @@ Allocated materials: %d/%d
 Active objects: %d
 Userdata: %d
 %s
-]], Program.fps, Database.memory_used / 1024, gcinfo(), Voxel.memory_used / 1024, models / 1024,
+]], Program.fps, Database.memory_used / 1024, collectgarbage("count") / 1024, Voxel.memory_used / 1024, models / 1024,
 1000 * Program.profiling.update, 1000 * Program.profiling.event, 1000 * Program.profiling.render,
 stats.batch_count, stats.face_count, stats.mesh_count, stats.mesh_memory / 1000, stats.skeleton_count,
 stats.texture_count_loaded, stats.texture_count, stats.texture_memory / 1000,

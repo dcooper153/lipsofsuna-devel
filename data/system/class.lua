@@ -30,7 +30,7 @@ local class_meta = {
 		rawset(self, k, v)
 	end,
 	__tostring = function(self)
-		return "class: " .. (self.class_name or "???")
+		return "class:" .. (self.class_name or "???")
 	end}
 
 local data_meta = {
@@ -74,7 +74,7 @@ local data_meta = {
 	__tostring = function(self)
 		local c = rawget(self, "class")
 		if c.__str then return c.__str(self) end
-		return "data: " .. (self.class.class_name or "???")
+		return "data:" .. (self.class.class_name or "???")
 	end}
 
 Class = setmetatable({class_name = "Class"}, class_meta)

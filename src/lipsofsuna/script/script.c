@@ -73,6 +73,22 @@ LIScrScript* liscr_script_new ()
 	}
 
 	/* Load libraries. */
+#if LUA_VERSION_NUM > 501
+	luaL_requiref (self->lua, "", luaopen_base, 1);
+	lua_pop (self->lua, 1);
+	luaL_requiref (self->lua, LUA_LOADLIBNAME, luaopen_package, 1);
+	lua_pop (self->lua, 1);
+	luaL_requiref (self->lua, LUA_COLIBNAME, luaopen_coroutine, 1);
+	lua_pop (self->lua, 1);
+	luaL_requiref (self->lua, LUA_TABLIBNAME, luaopen_table, 1);
+	lua_pop (self->lua, 1);
+	luaL_requiref (self->lua, LUA_STRLIBNAME, luaopen_string, 1);
+	lua_pop (self->lua, 1);
+	luaL_requiref (self->lua, LUA_MATHLIBNAME, luaopen_math, 1);
+	lua_pop (self->lua, 1);
+	luaL_requiref (self->lua, LUA_DBLIBNAME, luaopen_debug, 1);
+	lua_pop (self->lua, 1);
+#else
 	lua_pushcfunction (self->lua, luaopen_base);
 	lua_pushstring (self->lua, "");
 	lua_call (self->lua, 1, 0);
@@ -91,6 +107,7 @@ LIScrScript* liscr_script_new ()
 	lua_pushcfunction (self->lua, luaopen_debug);
 	lua_pushstring (self->lua, LUA_DBLIBNAME);
 	lua_call (self->lua, 1, 0);
+#endif
 
 	/* Create shortcut to self. */
 	lua_pushlightuserdata (self->lua, LISCR_SCRIPT_SELF);

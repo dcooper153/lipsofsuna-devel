@@ -23,11 +23,23 @@ Protocol:add_handler{type = "CLIENT_AUTHENTICATE", func = function(event)
 end}
 
 Protocol:add_handler{type = "CREATE_STATIC_OBJECTS", func = function(event)
+	local first = true
+	local read = function()
+		if first then
+			first = false
+			return event.packet:read(
+				"uint32", "string",
+				"float", "float", "float",
+				"float", "float", "float", "float")
+		else
+			return event.packet:resume(
+				"uint32", "string",
+				"float", "float", "float",
+				"float", "float", "float", "float")
+		end
+	end
 	while true do
-		local ok,id,name,x,y,z,rx,ry,rz,rw = event.packet:resume(
-			"uint32", "string",
-			"float", "float", "float",
-			"float", "float", "float", "float")
+		local ok,id,name,x,y,z,rx,ry,rz,rw = read()
 		if not ok then return end
 		local spec = Staticspec:find{name = name}
 		if spec then
