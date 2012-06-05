@@ -88,6 +88,8 @@ Binding{name = "menu", mode = "press", key1 = Keysym.TAB, func = function()
 		end
 	elseif Ui.root == "chargen" then
 		Ui.state = "chargen"
+	elseif Ui.root == "start-game" then
+		Ui.state = "start-game"
 	else
 		-- Main menu controls.
 		Ui.state = "mainmenu"
