@@ -81,6 +81,8 @@ end
 -- @param self Ui class.
 -- @param args Arguments.<ul>
 --   <li>background: Background creation function.</li>
+--   <li>exit: Exit function.</li>
+--   <li>exit_root: Exit function for a root state.</li>
 --   <li>grab: Grab disable function.</li>
 --   <li>history: Name of the state with which to share focus history.</li>
 --   <li>hint: Controls hint text shown to the user.</li>
@@ -97,6 +99,8 @@ Ui.add_state = function(self, args)
 	if not state then
 		state = {
 			background = function() end,
+			exit = {},
+			exit_root = {},
 			grab = function() return true end,
 			ids = {},
 			init = {},
@@ -124,6 +128,14 @@ Ui.add_state = function(self, args)
 	-- Add the initializer.
 	if args.init then
 		table.insert(state.init, args.init)
+	end
+	-- Add the exit hook.
+	if args.exit then
+		table.insert(state.exit, args.exit)
+	end
+	-- Add the root exit hook.
+	if args.exit_root then
+		table.insert(state.exit_root, args.exit_root)
 	end
 	-- Add the input handler.
 	if args.input then
@@ -385,15 +397,19 @@ end
 -- @param state State name.
 -- @param focus Focused widget index, nil for first.
 Ui.push_state = function(self, state, focus)
+	local src,src_root = self.state,self.root
 	table.insert(self.stack, state)
 	self:show_state(state, focus)
+	self:state_changed(src, src_root, self.state, self.root)
 end
 
 --- Pops the topmost state in the stack and shows the state below it.
 -- @param self Ui class.
 Ui.pop_state = function(self)
+	local src,src_root = self.state,self.root
 	table.remove(self.stack, #self.stack)
 	self:show_state(self.state)
+	self:state_changed(src, src_root, self.state, self.root)
 end
 
 --- Repaints all the widgets of the state.
@@ -684,6 +700,34 @@ Ui.update = function(self, secs)
 	end
 end
 
+--- Called when the state has been changed.
+-- @param self Ui class.
+-- @param src Source state name.
+-- @param src_root Source root state name.
+-- @param dst Destination state name.
+-- @param dst_root Destination root state name.
+Ui.state_changed = function(self, src, src_root, dst, dst_root)
+	-- Get the source state.
+	local state1 = self.states[src]
+	local root1 = src_root and self.states[src_root]
+	if not state1 then return end
+	-- Get the destination state.
+	local state2 = self.states[dst]
+	local root2 = dst_root and self.states[dst_root]
+	-- Call exit hooks.
+	if state1 ~= state2 then
+		for id,func in pairs(state1.exit) do
+			xpcall(func, function(err) print(debug.traceback("ERROR: " .. err)) end)
+		end
+	end
+	-- Call root exit hooks.
+	if root1 and root1 ~= root2 then
+		for id,func in pairs(root1.exit_root) do
+			xpcall(func, function(err) print(debug.traceback("ERROR: " .. err)) end)
+		end
+	end
+end
+
 --- Updates the help text of the state.
 -- @param self Ui class.
 Ui.update_help = function(self)
@@ -773,8 +817,10 @@ Ui:add_class_setters{
 		end
 	end,
 	state = function(self, v)
+		local src,src_root = self.state,self.root
 		self.stack = {v}
 		self:show_state(v)
+		self:state_changed(src, src_root, self.state, self.root)
 	end,
 	scroll_offset = function(self, v)
 		-- Decide if a scrollbar is needed.
