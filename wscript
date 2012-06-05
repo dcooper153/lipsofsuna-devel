@@ -201,6 +201,7 @@ def configure(ctx):
 		ctx.env.CURL = True
 
 	# Paths and defines
+	ctx.define('LI_VERSION_STRING', VERSION)
 	ctx.define('LI_ENABLE_ERROR', 1)
 	if ctx.env.MEMDEBUG:
 		ctx.define('LI_ENABLE_MEMDEBUG', 1)

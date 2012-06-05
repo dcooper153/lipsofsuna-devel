@@ -84,6 +84,9 @@ Settings.parse_command_line = function(clss)
 			clss.server = true
 			i = i + 1
 			i = i + parse_addr_port()
+		elseif a[i] == "--version" or a[i] == "-v" then
+			clss.version = true
+			i = i + 1
 		else
 			clss.help = true
 			break
@@ -94,6 +97,7 @@ Settings.parse_command_line = function(clss)
 		clss.client = true
 	end
 	-- Check for validity.
+	if clss.version then return end
 	if clss.help then return end
 	if clss.host and clss.editor then return end
 	if clss.join and clss.editor then return end
@@ -109,7 +113,10 @@ end
 -- @param clss Settings class.
 -- @return Usage string.
 Settings.usage = function(clss)
-	return [[Usage: lipsofsuna [options]
+	if clss.version then
+		return Program.version
+	else
+		return [[Usage: lipsofsuna [options]
 
 Options:
   -a --account <account>      Name of the player account.
@@ -123,5 +130,7 @@ Options:
   -p --password <password>    Password of the player account.
   -q --quit                   Quit immediately after startup.
   -S --server                 Run as a dedicated server.
-  -U --unittest               Run unittests.]]
+  -U --unittest               Run unittests.
+  -v --version                Print the version number and exit.]]
+	end
 end

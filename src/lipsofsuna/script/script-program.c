@@ -317,6 +317,11 @@ static void Program_get_time (LIScrArgs* args)
 	liscr_args_seti_float (args, limai_program_get_time (program));
 }
 
+static void Program_get_version (LIScrArgs* args)
+{
+	liscr_args_seti_string (args, LI_VERSION_STRING);
+}
+
 /*****************************************************************************/
 
 void liscr_script_program (
@@ -345,6 +350,7 @@ void liscr_script_program (
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_set_sleep", Program_set_sleep);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_tick", Program_get_tick);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_time", Program_get_time);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_version", Program_get_version);
 }
 
 /** @} */

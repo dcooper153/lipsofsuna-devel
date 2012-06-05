@@ -202,6 +202,10 @@ end
 -- @name Program.time
 -- @class table
 
+--- Version string of the engine.
+-- @name Program.version
+-- @class table
+
 Program.class_getters = {
 	args = function(s) return Los.program_get_args() end,
 	fps = function(s) return Los.program_get_fps() end,
@@ -210,7 +214,8 @@ Program.class_getters = {
 	sector_size = function(s) return Los.program_get_sector_size() end,
 	sleep = function(s) return Los.program_get_sleep() end,
 	tick = function(s) return Los.program_get_tick() end,
-	time = function(s) return Los.program_get_time() end}
+	time = function(s) return Los.program_get_time() end,
+	version = function(s) return Los.program_get_version() end}
 
 Program.class_setters = {
 	quit = function(s, v) Los.program_set_quit(v) end,
