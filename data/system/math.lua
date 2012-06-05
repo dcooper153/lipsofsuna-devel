@@ -280,37 +280,83 @@ Vector.new = function(clss, x, y, z)
 	return self
 end
 
---- Calculates the absolute of the vector.
+--- Calculates the absolute of the vector in-place.
 -- @param self Vector.
+-- @return New vector.
 Vector.abs = function(self)
-	return Vector(math.abs(self.x), math.abs(self.y), math.abs(self.z))
+	self.x = math.abs(self.x)
+	self.y = math.abs(self.y)
+	self.z = math.abs(self.z)
+	return self
 end
 
---- Calculates the ceil of the vector.
+--- Add a vector to another in-place.
 -- @param self Vector.
+-- @param vector Vector.
+-- @return Self.
+Vector.add = function(self, v)
+	Los.vector_add(self.handle, v.handle)
+	return self
+end
+
+--- Add components to the vector in-place.
+-- @param self Vector.
+-- @param x X component.
+-- @param y Y component.
+-- @param z Z component.
+-- @return Self.
+Vector.add_xyz = function(self, x, y, z)
+	if x then self.x = self.x + x end
+	if y then self.y = self.y + y end
+	if z then self.z = self.z + z end
+	return self
+end
+
+--- Calculates the ceil of the vector in-place.
+-- @param self Vector.
+-- @return Self.
 Vector.ceil = function(self)
-	return Vector(math.ceil(self.x), math.ceil(self.y), math.ceil(self.z))
+	self.x = math.ceil(self.x)
+	self.y = math.ceil(self.y)
+	self.z = math.ceil(self.z)
+	return self
 end
 
 --- Returns a copy of the vector.
 -- @param self Vector.
+-- @return New vector.
 Vector.copy = function(self)
 	return Vector(self.x, self.y, self.z)
 end
 
---- Calculates the floor of the vector.
+--- Divides the vector by a scalar in-place.
 -- @param self Vector.
-Vector.floor = function(self)
-	return Vector(math.floor(self.x), math.floor(self.y), math.floor(self.z))
+-- @param scalar Scalar.
+-- @return Self.
+Vector.divide = function(self, value)
+	if value ~= 0 then
+		Los.vector_mul(self.handle, 1/value)
+	end
+	return self
 end
 
---- Calculates the cross product of two vectors.
+--- Calculates the floor of the vector in-place.
+-- @param self Vector.
+-- @return Self.
+Vector.floor = function(self)
+	self.x = math.floor(self.x)
+	self.y = math.floor(self.y)
+	self.z = math.floor(self.z)
+	return self
+end
+
+--- Calculates the cross product of two vectors in-place.
 -- @param self Vector.
 -- @param v Vector.
--- @return New vector.
+-- @return Self.
 Vector.cross = function(self, v)
-	local handle = Los.vector_cross(self.handle, v.handle)
-	return Class.new(Vector, {handle = handle})
+	Los.vector_cross(self.handle, v.handle)
+	return self
 end
 
 --- Calculates the dot product of two vectors.
@@ -321,18 +367,62 @@ Vector.dot = function(self, v)
 	return Los.vector_dot(self.handle, v.handle)
 end
 
---- Returns a normalized copy of the vector.
+--- Multiplies the vector by a scalar in-place.
 -- @param self Vector.
--- @return Vector.
-Vector.normalize = function(self)
-	local handle = Los.vector_normalize(self.handle)
-	return Class.new(Vector, {handle = handle})
+-- @param scalar Scalar.
+-- @return Self.
+Vector.multiply = function(self, value)
+	Los.vector_mul(self.handle, value)
+	return self
 end
 
---- Calculates the vector rounded to the nearest integers.
+--- Normalizes the vector in-place.
 -- @param self Vector.
+-- @return Self.
+Vector.normalize = function(self)
+	Los.vector_normalize(self.handle)
+	return self
+end
+
+--- Calculates the vector rounded to the nearest integers in-place.
+-- @param self Vector.
+-- @return Self.
 Vector.round = function(self)
-	return Vector(math.ceil(self.x + 0.5), math.ceil(self.y + 0.5), math.ceil(self.z + 0.5))
+	self.x = math.ceil(self.x + 0.5)
+	self.y = math.ceil(self.y + 0.5)
+	self.z = math.ceil(self.z + 0.5)
+	return self
+end
+
+--- Subtracts a vector from another in-place.
+-- @param self Vector.
+-- @param vector Vector.
+-- @return Self.
+Vector.subtract = function(self, v)
+	Los.vector_sub(self.handle, v.handle)
+	return self
+end
+
+--- Substracts components from the vector in-place.
+-- @param self Vector.
+-- @param x X component.
+-- @param y Y component.
+-- @param z Z component.
+-- @return Self.
+Vector.subtract_xyz = function(self, x, y, z)
+	if x then self.x = self.x - x end
+	if y then self.y = self.y - y end
+	if z then self.z = self.z - z end
+	return self
+end
+
+--- Multiplies the vector by a quaternion in-place.
+-- @param self Vector.
+-- @param q Quaternion.
+-- @return Self.
+Vector.transform = function(self, q)
+	Los.quaternion_mul(q.handle, self.handle)
+	return self
 end
 
 --- Calculates the sum of two vectors.
@@ -340,21 +430,24 @@ end
 -- @param v Vector.
 -- @return New vector.
 Vector.__add = function(self, v)
-	local handle = Los.vector_add(self.handle, v.handle)
-	return Class.new(Vector, {handle = handle})
+	local copy = self:copy()
+	Los.vector_add(copy.handle, v.handle)
+	return copy
 end
 
---- Multiplies the vector by a scalar.
+--- Multiplies the vector by a scalar or quaternion.
 -- @param self Vector.
 -- @param scalar Scalar.
 -- @return New vector.
 Vector.__mul = function(self, value)
 	if type(value) == "number" then
-		local handle = Los.vector_mul(self.handle, value)
-		return Class.new(Vector, {handle = handle})
+		local copy = self:copy()
+		Los.vector_mul(copy.handle, value)
+		return copy
 	elseif value.class == Quaternion then
-		local handle = Los.quaternion_mul(value.handle, self.handle)
-		return Class.new(Vector, {handle = handle})
+		local copy = self:copy()
+		Los.quaternion_mul(value.handle, copy.handle)
+		return copy
 	end
 end
 
@@ -370,8 +463,9 @@ end
 -- @param vector Vector.
 -- @return New vector.
 Vector.__sub = function(self, v)
-	local handle = Los.vector_sub(self.handle, v.handle)
-	return Class.new(Vector, {handle = handle})
+	local copy = self:copy()
+	Los.vector_sub(copy.handle, v.handle)
+	return copy
 end
 
 --- Length.

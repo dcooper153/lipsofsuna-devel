@@ -518,8 +518,7 @@ Dialog.execute = function(self)
 		["spawn pattern"] = function(vm, c)
 			local pat = Patternspec:find{name = c[2]}
 			if pat then
-				local pos = select_spawn_position(c) * Voxel.tile_scale - pat.size * 0.5
-				pos = pos:round()
+				local pos = select_spawn_position(c):copy():multiply(Voxel.tile_scale):subtract(pat.size * 0.5):round()
 				if c.erase_tiles then
 					Voxel:fill_region{point = pos, size = pat.size}
 				end

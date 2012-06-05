@@ -33,39 +33,43 @@ static void Vector_new (LIScrArgs* args)
 
 static void Vector_add (LIScrArgs* args)
 {
-	LIMatVector tmp;
 	LIScrData* b;
+	LIMatVector* v1;
+	LIMatVector* v2;
 
 	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &b))
 		return;
 
-	tmp = limat_vector_add (*((LIMatVector*) args->self), *((LIMatVector*) liscr_data_get_data (b)));
-	liscr_args_seti_vector (args, &tmp);
+	v1 = args->self;
+	v2 = liscr_data_get_data (b);
+	*v1 = limat_vector_add (*v1, *v2);
 }
 
 static void Vector_mul (LIScrArgs* args)
 {
 	float s;
-	LIMatVector tmp;
+	LIMatVector* v1;
 
 	if (!liscr_args_geti_float (args, 0, &s))
 		return;
 
 	lisys_assert (!isnan (s));
-	tmp = limat_vector_multiply (*((LIMatVector*) args->self), s);
-	liscr_args_seti_vector (args, &tmp);
+	v1 = args->self;
+	*v1 = limat_vector_multiply (*v1, s);
 }
 
 static void Vector_sub (LIScrArgs* args)
 {
-	LIMatVector tmp;
 	LIScrData* b;
+	LIMatVector* v1;
+	LIMatVector* v2;
 
 	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &b))
 		return;
 
-	tmp = limat_vector_subtract (*((LIMatVector*) args->self), *((LIMatVector*) liscr_data_get_data (b)));
-	liscr_args_seti_vector (args, &tmp);
+	v1 = args->self;
+	v2 = liscr_data_get_data (b);
+	*v1 = limat_vector_subtract (*v1, *v2);
 }
 
 static void Vector_tostring (LIScrArgs* args)
@@ -80,72 +84,96 @@ static void Vector_tostring (LIScrArgs* args)
 
 static void Vector_cross (LIScrArgs* args)
 {
-	LIMatVector tmp;
-	LIScrData* data;
+	LIScrData* b;
+	LIMatVector* v1;
+	LIMatVector* v2;
 
-	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &data))
-	{
-		tmp = limat_vector_cross (*((LIMatVector*) args->self), *((LIMatVector*) liscr_data_get_data (data)));
-		liscr_args_seti_vector (args, &tmp);
-	}
+	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &b))
+		return;
+
+	v1 = args->self;
+	v2 = liscr_data_get_data (b);
+	*v1 = limat_vector_cross (*v1, *v2);
 }
 
 static void Vector_dot (LIScrArgs* args)
 {
 	float tmp;
-	LIScrData* data;
+	LIScrData* b;
+	LIMatVector* v1;
+	LIMatVector* v2;
 
-	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &data))
-	{
-		tmp = limat_vector_dot (*((LIMatVector*) args->self), *((LIMatVector*) liscr_data_get_data (data)));
-		liscr_args_seti_float (args, tmp);
-	}
+	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &b))
+		return;
+
+	v1 = args->self;
+	v2 = liscr_data_get_data (b);
+	tmp = limat_vector_dot (*v1, *v2);
+	liscr_args_seti_float (args, tmp);
 }
 
 static void Vector_normalize (LIScrArgs* args)
 {
-	LIMatVector tmp;
+	LIMatVector* v1;
 
-	tmp = limat_vector_normalize (*((LIMatVector*) args->self));
-	liscr_args_seti_vector (args, &tmp);
+	v1 = args->self;
+	*v1 = limat_vector_normalize (*v1);
 }
 
 static void Vector_get_length (LIScrArgs* args)
 {
-	liscr_args_seti_float (args, limat_vector_get_length (*((LIMatVector*) args->self)));
+	LIMatVector* v1;
+
+	v1 = args->self;
+	liscr_args_seti_float (args, limat_vector_get_length (*v1));
 }
 
 static void Vector_get_x (LIScrArgs* args)
 {
-	liscr_args_seti_float (args, ((LIMatVector*) args->self)->x);
+	LIMatVector* v1;
+
+	v1 = args->self;
+	liscr_args_seti_float (args, v1->x);
 }
 static void Vector_set_x (LIScrArgs* args)
 {
-	LIMatVector* self = args->self;
-	liscr_args_geti_float (args, 0, &self->x);
-	lisys_assert (!isnan (self->x));
+	LIMatVector* v1;
+
+	v1 = args->self;
+	liscr_args_geti_float (args, 0, &v1->x);
+	lisys_assert (!isnan (v1->x));
 }
 
 static void Vector_get_y (LIScrArgs* args)
 {
-	liscr_args_seti_float (args, ((LIMatVector*) args->self)->y);
+	LIMatVector* v1;
+
+	v1 = args->self;
+	liscr_args_seti_float (args, v1->y);
 }
 static void Vector_set_y (LIScrArgs* args)
 {
-	LIMatVector* self = args->self;
-	liscr_args_geti_float (args, 0, &self->y);
-	lisys_assert (!isnan (self->y));
+	LIMatVector* v1;
+
+	v1 = args->self;
+	liscr_args_geti_float (args, 0, &v1->y);
+	lisys_assert (!isnan (v1->y));
 }
 
 static void Vector_get_z (LIScrArgs* args)
 {
-	liscr_args_seti_float (args, ((LIMatVector*) args->self)->z);
+	LIMatVector* v1;
+
+	v1 = args->self;
+	liscr_args_seti_float (args, v1->z);
 }
 static void Vector_set_z (LIScrArgs* args)
 {
-	LIMatVector* self = args->self;
-	liscr_args_geti_float (args, 0, &self->z);
-	lisys_assert (!isnan (self->z));
+	LIMatVector* v1;
+
+	v1 = args->self;
+	liscr_args_geti_float (args, 0, &v1->z);
+	lisys_assert (!isnan (v1->z));
 }
 
 /*****************************************************************************/

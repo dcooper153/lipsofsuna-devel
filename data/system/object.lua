@@ -158,8 +158,24 @@ Object:add_getters{
 		local m = rawget(self, "__model")
 		return m and m.name or ""
 	end,
-	position = function(self) return Class.new(Vector, {handle = Los.object_get_position(self.handle)}) end,
-	rotation = function(self) return Class.new(Quaternion, {handle = Los.object_get_rotation(self.handle)}) end,
+	position = function(self)
+		local v = rawget(self, "__position")
+		if not v then
+			v = Vector()
+			rawset(self, "__position", v)
+		end
+		Los.object_get_position(self.handle, v.handle)
+		return v
+	end,
+	rotation = function(self)
+		local v = rawget(self, "__rotation")
+		if not v then
+			v = Quaternion()
+			rawset(self, "__rotation", v)
+		end
+		Los.object_get_rotation(self.handle, v.handle)
+		return v
+	end,
 	realized = function(self) return Los.object_get_realized(self.handle) end,
 	sector = function(self) return Los.object_get_sector(self.handle) end,
 	static = function(self, v) return Los.object_get_static(self.handle, v) end}

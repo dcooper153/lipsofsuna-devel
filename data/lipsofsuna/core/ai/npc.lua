@@ -171,7 +171,7 @@ end
 -- @param self AI.
 NpcAi.choose_wander_target = function(self)
 	-- Randomize the search order.
-	local src = (self.object.position * Voxel.tile_scale + Vector(0,0.5,0)):floor()
+	local src = (self.object.position * Voxel.tile_scale):add_xyz(0,0.5,0):floor()
 	local dirs = {Vector(1,0,0), Vector(-1,0,0), Vector(0,0,1), Vector(0,0,-1)}
 	for a=1,4 do
 		local b = math.random(1,4)
@@ -195,8 +195,8 @@ end
 -- @param target Point vector in world space.
 -- @return True if avoided successfully.
 NpcAi.avoid_wander_obstacles = function(self, target)
-	local src = (self.object.position * Voxel.tile_scale + Vector(0,0.5,0)):floor()
-	local dst = (target * Voxel.tile_scale + Vector(0,0.5,0)):floor()
+	local src = (self.object.position * Voxel.tile_scale):add_xyz(0,0.5,0):floor()
+	local dst = (target * Voxel.tile_scale):add_xyz(0,0.5,0):floor()
 	local p = Vector(
 		math.min(math.max(dst.x, src.x - 1), src.x + 1), src.y,
 		math.min(math.max(dst.z, src.z - 1), src.z + 1), src.y)

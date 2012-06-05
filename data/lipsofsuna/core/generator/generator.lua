@@ -49,8 +49,8 @@ Generator.add_region = function(self, region)
 end
 
 Generator.for_each_bin = function(self, point, size, func)
-	local p = (point * (1 / self.bin_size)):floor()
-	local s = (size * (1 / self.bin_size)):ceil()
+	local p = point:copy():divide(self.bin_size):floor()
+	local s = size:copy():divide(self.bin_size):ceil()
 	for x = p.x,p.x+s.x do
 		for y = p.y,p.y+s.y do
 			for z = p.z,p.z+s.z do
@@ -257,7 +257,7 @@ Generator.generate_dungeon = function(self, pattern)
 	if not pattern2 then return end
 	-- Find the overworld point.
 	local point1 = self:find_overworld_generation_point()
-	point1 = (point1 * Voxel.tile_scale - Vector(pattern.size.x,0,pattern.size.z) * 0.5):ceil()
+	point1:multiply(Voxel.tile_scale):subtract_xyz(0.5*pattern.size.x,0,0.5*pattern.size.z):ceil()
 	if not self:validate_pattern_position(pattern, point1, true) then return end
 	if not point1 then return end
 	-- Place the underground pattern.
@@ -370,7 +370,7 @@ end
 -- @return Vector.
 Generator.get_sector_id = function(self, tile)
 	local w = 128
-	local s = (tile:round() * (1 / Voxel.tiles_per_line)):floor()
+	local s = tile:copy():round():divide(Voxel.tiles_per_line):floor()
 	return s.x + s.y * w + s.z * w^2
 end
 
@@ -409,8 +409,8 @@ end
 -- @param dst Destination point in tiles.
 Generator.mark_road = function(self, src, dst)
 	local dist
-	local ssec = (src * (1/Voxel.tiles_per_line)):round()
-	local dsec = (dst * (1/Voxel.tiles_per_line)):round()
+	local ssec = src:copy():divide(Voxel.tiles_per_line):round()
+	local dsec = dst:copy():divide(Voxel.tiles_per_line):round()
 	local psec = ssec:copy()
 	repeat
 		-- Mark as road.
@@ -624,7 +624,7 @@ end
 
 Generator.get_sector_id_by_offset = function(self, offset)
 	local w = 128
-	local s = offset:floor()
+	local s = offset:copy():floor()
 	return s.x + s.y * w + s.z * w^2
 end
 
@@ -645,15 +645,15 @@ Generator.get_sector_offset_by_id = function(self, id)
 end
 
 Generator.get_sector_offset_by_point = function(self, tile)
-	return (tile * Voxel.tile_scale * (1 / Voxel.tiles_per_line)):round()
+	return tile:copy():multiply(Voxel.tile_scale):divide(Voxel.tiles_per_line):round()
 end
 
 Generator.get_sector_offset_by_tile = function(self, tile)
-	return (tile * (1 / Voxel.tiles_per_line)):round()
+	return tile:copy():divide(Voxel.tiles_per_line):round()
 end
 
 Generator.get_sector_tile_by_id = function(self, id)
-	return self:get_sector_offset_by_id(id) * Voxel.tiles_per_line
+	return self:get_sector_offset_by_id(id):multiply(Voxel.tiles_per_line)
 end
 
 Generator.set_sector_type_by_id = function(self, id, type)

@@ -141,9 +141,15 @@ static void Object_set_model (LIScrArgs* args)
 static void Object_get_position (LIScrArgs* args)
 {
 	LIMatTransform tmp;
+	LIMatVector* v;
+	LIScrData* data;
 
-	liobj_object_get_transform (args->self, &tmp);
-	liscr_args_seti_vector (args, &tmp.position);
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_VECTOR, &data))
+	{
+		liobj_object_get_transform (args->self, &tmp);
+		v = liscr_data_get_data (data);
+		*v = tmp.position;
+	}
 }
 
 static void Object_set_position (LIScrArgs* args)
@@ -175,9 +181,15 @@ static void Object_set_realized (LIScrArgs* args)
 static void Object_get_rotation (LIScrArgs* args)
 {
 	LIMatTransform tmp;
+	LIMatQuaternion* q;
+	LIScrData* data;
 
-	liobj_object_get_transform (args->self, &tmp);
-	liscr_args_seti_quaternion (args, &tmp.rotation);
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_QUATERNION, &data))
+	{
+		liobj_object_get_transform (args->self, &tmp);
+		q = liscr_data_get_data (data);
+		*q = tmp.rotation;
+	}
 }
 
 static void Object_set_rotation (LIScrArgs* args)

@@ -330,9 +330,8 @@ Actor.climb = function(self)
 	if self.blocking then return end
 	if self.climbing then return end
 	local align_object = function()
-		local ctr = self.position * Voxel.tile_scale + Vector(0,0.5,0)
-		ctr = ctr:floor()
-		ctr = ctr * Voxel.tile_size + Vector(0.5,0.1,0.5)
+		local ctr = (self.position * Voxel.tile_scale):add_xyz(0,0.5,0):floor()
+		ctr:multiply(Voxel.tile_size):add_xyz(0.5,0.1,0.5)
 		self.position = ctr
 	end
 	if self:can_climb_high() then

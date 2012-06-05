@@ -150,7 +150,7 @@ Utils.find_summon_point = function(clss, point)
 		return "stand"
 	end
 	local validate_voxel = function(p)
-		local c = (p * Voxel.tile_scale):round()
+		local c = p:copy():multiply(Voxel.tile_scale):round()
 		if Voxel:get_tile(c) ~= 0 then return "block" end
 		c.y = c.y + 1
 		if Voxel:get_tile(c) ~= 0 then return "block" end
