@@ -126,10 +126,9 @@ void liext_client_send (
 }
 
 /**
- * \brief Sends a network packet to the client.
+ * \brief Gets the address of the client.
  * \param self Client.
- * \param writer Packet.
- * \param reliable Nonzero for reliable.
+ * \return Address string, or NULL.
  */
 char* liext_client_get_address (
 	const LIExtClient* self)

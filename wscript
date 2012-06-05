@@ -386,5 +386,5 @@ def html(ctx):
 	ctx.exec_command('doxygen docs/Doxyfile')
 	Logs.pprint('GREEN', "Built Doxygen documentation")
 	# Compile the script documentation.
-	ctx.exec_command('luadoc -d docs/html/lua data/system data/lipsofsuna/scripts/common')
+	ctx.exec_command('luadoc -d docs/html/lua data/system data/lipsofsuna')
 	Logs.pprint('GREEN', "Built Lua documentation")

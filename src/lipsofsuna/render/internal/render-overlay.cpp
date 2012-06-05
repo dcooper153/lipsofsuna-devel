@@ -128,6 +128,7 @@ void liren_overlay_clear (
  * \param self Overlay.
  * \param shader Shader name.
  * \param font Font name.
+ * \param text Text of the overlay.
  * \param color Diffuse color.
  * \param scissor Screen space scissor rectangle.
  * \param pos Text offset relative to the overlay origin.

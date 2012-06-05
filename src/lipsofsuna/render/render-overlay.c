@@ -44,7 +44,7 @@ int liren_render_overlay_new (
 
 /**
  * \brief Frees the overlay.
- * \param render Renderer.
+ * \param self Renderer.
  * \param id Overlay ID.
  */
 void liren_render_overlay_free (
@@ -60,7 +60,7 @@ void liren_render_overlay_free (
 
 /**
  * \brief Clears the elements of the overlay.
- * \param render Renderer.
+ * \param self Renderer.
  * \param id Overlay ID.
  */
 void liren_render_overlay_clear (
@@ -76,10 +76,11 @@ void liren_render_overlay_clear (
 
 /**
  * \brief Adds text to the overlay.
- * \param render Renderer.
+ * \param self Renderer.
  * \param id Overlay ID.
  * \param shader Shader name.
  * \param font Font name.
+ * \param text Text of the overlay.
  * \param color Diffuse color.
  * \param scissor Screen space scissor rectangle.
  * \param pos Text offset relative to the overlay origin.
@@ -144,7 +145,7 @@ void liren_render_overlay_add_tiled (
 
 /**
  * \brief Adds a child overlay to the overlay.
- * \param render Renderer.
+ * \param self Renderer.
  * \param id Overlay ID.
  * \param overlay Overlay ID.
  * \param layer Zero for bottom, one for top.
@@ -166,7 +167,7 @@ void liren_render_overlay_add_overlay (
 
 /**
  * \brief Removes a child overlay from the overlay.
- * \param render Renderer.
+ * \param self Renderer.
  * \param id Overlay ID.
  * \param overlay Overlay ID.
  */
@@ -186,7 +187,7 @@ void liren_render_overlay_remove_overlay (
 
 /**
  * \brief Sets the Z offset of the overlay.
- * \param render Renderer.
+ * \param self Renderer.
  * \param id Overlay ID.
  * \param value Positive integer.
  */
@@ -204,7 +205,7 @@ void liren_render_overlay_set_depth (
 
 /**
  * \brief Sets the floating status of the overlay.
- * \param render Renderer.
+ * \param self Renderer.
  * \param id Overlay ID.
  * \param value Nonzero for floating.
  */
@@ -222,7 +223,7 @@ void liren_render_overlay_set_floating (
 
 /**
  * \brief Sets the screen position of the overlay.
- * \param render Renderer.
+ * \param self Renderer.
  * \param id Overlay ID.
  * \param value Position vector.
  */
@@ -240,7 +241,7 @@ void liren_render_overlay_set_position (
 
 /**
  * \brief Sets the visibility of the overlay.
- * \param render Renderer.
+ * \param self Renderer.
  * \param id Overlay ID.
  * \param value Nonzero for visible.
  */

@@ -29,6 +29,7 @@
 /**
  * \brief Creates a new texture layer.
  * \param self Heightmap.
+ * \param size Size.
  * \param name Unique layer name.
  * \param diffuse Image filename.
  * \param specular Image filename.
@@ -144,8 +145,9 @@ void liext_heightmap_rebuild (
 }
 
 /**
- * \brief Rebuilds the heightmap.
+ * \brief Sets the visibility of the heightmap.
  * \param self Heightmap.
+ * \param value Nonzero for visible, zero for invisible.
  */
 void liext_heightmap_set_visible (
 	LIExtHeightmap* self,
@@ -166,3 +168,6 @@ void liext_heightmap_set_visible (
 			terrain->setVisibilityFlags (0);
 	}
 }
+
+/** @} */
+/** @} */

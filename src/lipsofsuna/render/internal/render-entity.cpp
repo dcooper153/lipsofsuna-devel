@@ -98,6 +98,7 @@ void LIRenEntity::initialize ()
  * pose buffers are only calculated for objects that need to be rendered.
  * Hence, this function only set the pose_changed flag.
  *
+ * \param pose Pose whose transform to copy.
  * \param secs Seconds since the last update.
  */
 void LIRenEntity::update_pose (LIMdlPose* pose, float secs)

@@ -231,6 +231,7 @@ int liscr_script_load_file (
 /**
  * \brief Executes a string.
  * \param self Script.
+ * \param code String containing the executed code.
  * \param path_mod Module include path.
  * \param path_core Core include path.
  * \return Nonzero on success.

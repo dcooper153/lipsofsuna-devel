@@ -60,7 +60,8 @@ int liren_render_light_new (
 
 /**
  * \brief Frees a light source.
- * \param self Light source.
+ * \param self Renderer.
+ * \param id Light ID.
  */
 void liren_render_light_free (
 	LIRenRender* self,
@@ -73,6 +74,12 @@ void liren_render_light_free (
 		liren_light_free (light);
 }
 
+/**
+ * \brief Sets the ambient color of the light.
+ * \param self Renderer.
+ * \param id Light ID.
+ * \param value Array of 4 floats.
+ */
 void liren_render_light_set_ambient (
 	LIRenRender* self,
 	int          id,
@@ -85,6 +92,12 @@ void liren_render_light_set_ambient (
 		liren_light_set_ambient (light, value);
 }
 
+/**
+ * \brief Sets the diffuse color of the light.
+ * \param self Renderer.
+ * \param id Light ID.
+ * \param value Array of 4 floats.
+ */
 void liren_render_light_set_diffuse (
 	LIRenRender* self,
 	int          id,
@@ -98,8 +111,9 @@ void liren_render_light_set_diffuse (
 }
 
 /**
- * \brief Sets the light directional.
- * \param self Light source.
+ * \brief Sets the light directionality.
+ * \param self Renderer.
+ * \param id Light ID.
  * \param value Nonzero to set directional.
  */
 void liren_render_light_set_directional (
@@ -116,7 +130,8 @@ void liren_render_light_set_directional (
 
 /**
  * \brief Enables or disables the light.
- * \param self Light source.
+ * \param self Renderer.
+ * \param id Light ID.
  * \param value Nonzero to enable.
  */
 void liren_render_light_set_enabled (
@@ -131,6 +146,12 @@ void liren_render_light_set_enabled (
 		liren_light_set_enabled (light, value);
 }
 
+/**
+ * \brief Sets the attenuation equation of the light.
+ * \param self Renderer.
+ * \param id Light ID.
+ * \param value Array of 3 floats.
+ */
 void liren_render_light_set_equation (
 	LIRenRender* self,
 	int          id,
@@ -145,7 +166,8 @@ void liren_render_light_set_equation (
 
 /**
  * \brief Sets the priority of the light.
- * \param self Light source.
+ * \param self Renderer.
+ * \param id Light ID.
  * \param value Priority value, higher means more important.
  */
 void liren_render_light_set_priority (
@@ -162,7 +184,8 @@ void liren_render_light_set_priority (
 
 /**
  * \brief Sets the shadow casting mode of the light.
- * \param self Light source.
+ * \param self Renderer.
+ * \param id Light ID.
  * \param value Nonzero to allow shadow casting, zero to disable.
  */
 void liren_render_light_set_shadow (
@@ -177,6 +200,12 @@ void liren_render_light_set_shadow (
 		liren_light_set_shadow (light, value);
 }
 
+/**
+ * \brief Sets the shadow map far distance of the light.
+ * \param self Renderer.
+ * \param id Light ID.
+ * \param value Distance in world units.
+ */
 void liren_render_light_set_shadow_far (
 	LIRenRender* self,
 	int          id,
@@ -189,6 +218,12 @@ void liren_render_light_set_shadow_far (
 		liren_light_set_shadow_far (light, value);
 }
 
+/**
+ * \brief Sets the shadow map near distance of the light.
+ * \param self Renderer.
+ * \param id Light ID.
+ * \param value Distance in world units.
+ */
 void liren_render_light_set_shadow_near (
 	LIRenRender* self,
 	int          id,
@@ -201,6 +236,12 @@ void liren_render_light_set_shadow_near (
 		liren_light_set_shadow_near (light, value);
 }
 
+/**
+ * \brief Sets the specular color of the light.
+ * \param self Renderer.
+ * \param id Light ID.
+ * \param value Array of 4 floats.
+ */
 void liren_render_light_set_specular (
 	LIRenRender* self,
 	int          id,
@@ -213,6 +254,12 @@ void liren_render_light_set_specular (
 		liren_light_set_specular (light, value);
 }
 
+/**
+ * \brief Sets the spot cutoff angle of the light.
+ * \param self Renderer.
+ * \param id Light ID.
+ * \param value Angle in radians.
+ */
 void liren_render_light_set_spot_cutoff (
 	LIRenRender* self,
 	int          id,
@@ -225,6 +272,12 @@ void liren_render_light_set_spot_cutoff (
 		liren_light_set_spot_cutoff (light, value);
 }
 
+/**
+ * \brief Sets the spot exponent of the light.
+ * \param self Renderer.
+ * \param id Light ID.
+ * \param value Spot exponent.
+ */
 void liren_render_light_set_spot_exponent (
 	LIRenRender* self,
 	int          id,
@@ -239,7 +292,8 @@ void liren_render_light_set_spot_exponent (
 
 /**
  * \brief Gets the transformation of the light.
- * \param self Light source.
+ * \param self Renderer.
+ * \param id Light ID.
  * \param value Return value for the transformation.
  */
 void liren_render_light_get_transform (
@@ -256,7 +310,8 @@ void liren_render_light_get_transform (
 
 /**
  * \brief Sets the transformation of the light.
- * \param self Light source.
+ * \param self Renderer.
+ * \param id Light ID.
  * \param value Transformation.
  */
 void liren_render_light_set_transform (

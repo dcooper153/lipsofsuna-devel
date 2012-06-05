@@ -166,7 +166,7 @@ int liren_light_get_id (
 /**
  * \brief Gets the priority of the light.
  * \param self Light source.
- * \return Priority value, higher means more important.
+ * \param value Priority value, higher means more important.
  */
 void liren_light_set_priority (
 	LIRenLight* self,

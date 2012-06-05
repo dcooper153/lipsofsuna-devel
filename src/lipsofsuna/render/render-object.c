@@ -276,7 +276,8 @@ void liren_render_object_set_realized (
 
 /**
  * \brief Sets the render distance of the object.
- * \param self Object.
+ * \param self Renderer.
+ * \param id Object ID.
  * \param value Render distance.
  */
 void liren_render_object_set_render_distance (

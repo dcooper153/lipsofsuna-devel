@@ -389,9 +389,10 @@ const char* lipth_paths_find_file (
 }
 
 /**
- * \brief Finds a data ir cibfug file by a path relative to the data directory root.
+ * \brief Finds the data of a config file by a path relative to the data directory root.
  * \param self Paths.
- * \param name File name.
+ * \param path Path relative to the data directory root.
+ * \param config Nonzero for a config file, zero for a data file.
  * \return Absolute path or NULL.
  */
 char* lipth_paths_find_path (
