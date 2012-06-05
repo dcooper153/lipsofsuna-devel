@@ -60,6 +60,9 @@ LIAPICALL (LIMdlNode*, limdl_pose_buffer_find_node, (
 	const LIMdlPoseBuffer* self,
 	const char*            name));
 
+LIAPICALL (void, limdl_pose_buffer_reset, (
+	LIMdlPoseBuffer* self));
+
 LIAPICALL (void, limdl_pose_buffer_update, (
 	LIMdlPoseBuffer* self,
 	LIMdlPose*       pose));

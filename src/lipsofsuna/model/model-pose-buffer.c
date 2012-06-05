@@ -107,6 +107,9 @@ LIMdlPoseBuffer* limdl_pose_buffer_new (
 		}
 	}
 
+	/* Set the rest pose transformation. */
+	limdl_pose_buffer_reset (self);
+
 	return self;
 }
 
@@ -151,6 +154,32 @@ LIMdlNode* limdl_pose_buffer_find_node (
 	}
 
 	return NULL;
+}
+
+void limdl_pose_buffer_reset (
+	LIMdlPoseBuffer* self)
+{
+	int i;
+	float s;
+	LIMdlNode* node;
+	LIMdlPoseBufferBone* bone;
+	LIMdlWeightGroup* group;
+
+	for (i = 0 ; i < self->model->weight_groups.count ; i++)
+	{
+		bone = self->bones.array + i + 1;
+		group = self->model->weight_groups.array + i;
+		if (group->node != NULL)
+		{
+			node = limdl_model_find_node (self->model, group->node->name);
+			if (node != NULL)
+			{
+				s = node->pose_transform.global_scale;
+				bone->scale = limat_vector_init(s, s, s);
+				bone->transform = node->pose_transform.global;
+			}
+		}
+	}
 }
 
 void limdl_pose_buffer_update (
