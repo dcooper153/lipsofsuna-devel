@@ -330,8 +330,9 @@ Actor.climb = function(self)
 	if self.blocking then return end
 	if self.climbing then return end
 	local align_object = function()
-		local ctr = (self.position * Voxel.tile_scale):add_xyz(0,0.5,0):floor()
-		ctr:multiply(Voxel.tile_size):add_xyz(0.5,0.1,0.5)
+		local ctr = self.position * Voxel.tile_scale
+		ctr:add_xyz(0,0.5,0):floor()
+		ctr:add_xyz(0.5,0.1,0.5):multiply(Voxel.tile_size)
 		self.position = ctr
 	end
 	if self:can_climb_high() then
@@ -342,8 +343,8 @@ Actor.climb = function(self)
 		Coroutine(function()
 			-- Rise.
 			local t = 0
-			local p = self.position
-			local r = self.rotation
+			local p = self.position:copy()
+			local r = self.rotation:copy()
 			local z = Vector()
 			repeat
 				local d = coroutine.yield()
@@ -353,7 +354,7 @@ Actor.climb = function(self)
 			until t > 0.8 * Voxel.tile_size
 			-- Slide.
 			t = 0
-			p = self.position
+			p = self.position:copy()
 			repeat
 				local d = coroutine.yield()
 				t = t + d
@@ -370,8 +371,8 @@ Actor.climb = function(self)
 		Coroutine(function()
 			-- Rise.
 			local t = 0
-			local p = self.position
-			local r = self.rotation
+			local p = self.position:copy()
+			local r = self.rotation:copy()
 			local z = Vector()
 			repeat
 				local d = coroutine.yield()
@@ -381,7 +382,7 @@ Actor.climb = function(self)
 			until t > 0.2 * Voxel.tile_size
 			-- Slide.
 			t = 0
-			p = self.position
+			p = self.position:copy()
 			repeat
 				local d = coroutine.yield()
 				t = t + d

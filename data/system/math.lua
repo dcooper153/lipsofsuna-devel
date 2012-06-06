@@ -125,6 +125,13 @@ Quaternion.new_vectors = function(clss, src, dst)
 	return self
 end
 
+--- Returns a copy of the quaternion.
+-- @param self Quaternion.
+-- @return New quaternion.
+Quaternion.copy = function(self)
+	return Quaternion(self.x, self.y, self.z, self.w)
+end
+
 --- Calculates the sum of two quaternions.
 -- @param self Quaternion.
 -- @param quat Quaternion.
