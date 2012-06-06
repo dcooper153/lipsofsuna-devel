@@ -48,7 +48,9 @@ Protocol:add_handler{type = "INVENTORY_ITEM_ADDED", func = function(event)
 	-- Add to the inventory.
 	object.inventory:set_object(index, Item{spec = spec, count = count})
 	-- Update the user interface.
-	if Ui.state == "inventory" and object == Client.player_object then
+	if Ui.state == "crafting" and object == Client.player_object then
+		Operators.crafting:update_craftability()
+	elseif Ui.state == "inventory" and object == Client.player_object then
 		Ui:restart_state()
 	elseif Ui.state == "loot" and object.id == Client.data.inventory.id then
 		Ui:restart_state()
@@ -86,7 +88,9 @@ Protocol:add_handler{type = "INVENTORY_ITEM_REMOVED", func = function(event)
 	-- Remove from the inventory.
 	object.inventory:set_object(index)
 	-- Update the user interface.
-	if Ui.state == "inventory" and object == Client.player_object then
+	if Ui.state == "crafting" and object == Client.player_object then
+		Operators.crafting:update_craftability()
+	elseif Ui.state == "inventory" and object == Client.player_object then
 		Ui:restart_state()
 	elseif Ui.state == "loot" and object.id == Client.data.inventory.id then
 		Ui:restart_state()

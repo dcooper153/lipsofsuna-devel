@@ -5,6 +5,7 @@ Widgets.Uiinvitem.class_name = "Widgets.Uiinvitem"
 
 Widgets.Uiinvitem.new = function(clss, id, item, index, slot)
 	local self = Widgets.Uiwidget.new(clss)
+	self.enabled = true
 	self.inventory_id = id
 	self.item = item
 	self.index = index
@@ -59,7 +60,7 @@ Widgets.Uiinvitem.rebuild_canvas = function(self)
 			dest_size = {w-40,h},
 			text = name,
 			text_alignment = {0,0},
-			text_color = Theme.text_color_1,
+			text_color = self.enabled and Theme.text_color_1 or Theme.text_color_2,
 			text_font = Theme.text_font_2}
 	end
 	-- Add the equip text.
