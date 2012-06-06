@@ -19,15 +19,9 @@ require "server/quest"
 require "server/modifier"
 require "server/editing"
 require "server/particles"
-for k,v in pairs(File:scan_directory("server/actions")) do
-	require("server/actions/" .. string.gsub(v, "([^.]*).*", "%1"))
-end
-for k,v in pairs(File:scan_directory("server/objects")) do
-	require("server/objects/" .. string.gsub(v, "([^.]*).*", "%1"))
-end
-for k,v in pairs(File:scan_directory("server/influences")) do
-	require("server/influences/" .. string.gsub(v, "([^.]*).*", "%1"))
-end
+File:require_directory("server/actions")
+File:require_directory("server/objects")
+File:require_directory("server/influences")
 
 Physics.GROUP_ACTORS = 0x0001
 Physics.GROUP_ITEMS = 0x0002

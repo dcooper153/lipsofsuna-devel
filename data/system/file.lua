@@ -13,6 +13,17 @@ File.read = function(self, name)
 	return Los.file_read(name)
 end
 
+--- Requires all the Lua files in the given directory.
+-- @param self File class.
+-- @param name File name relative to the mod root.
+File.require_directory = function(self, name)
+	for k,v in pairs(File:scan_directory(name)) do
+		if string.match(v, "\.lua$") then
+			require(name .. "/" .. string.gsub(v, "(.*)\.lua$", "%1"))
+		end
+	end
+end
+
 --- Returns the contents of a directory.
 -- @param self File class.
 -- @param dir Directory name relative to the mod root.

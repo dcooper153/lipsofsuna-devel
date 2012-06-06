@@ -14,9 +14,7 @@ Physics.GROUP_TILES = 0x8000
 Physics.MASK_CAMERA = 0xF001
 Physics.MASK_PICK = 0xF001
 
-for k,v in pairs(File:scan_directory("client/widgets")) do
-	require("client/widgets/" .. string.gsub(v, "([^.]*).*", "%1"))
-end
+File:require_directory("client/widgets")
 require "client/action"
 require "client/audio"
 require "client/chat"
@@ -32,12 +30,8 @@ Lighting:init()
 require "client/player"
 require "client/slots"
 require "client/target"
-for k,v in pairs(File:scan_directory("client/network")) do
-	require("client/network/" .. string.gsub(v, "([^.]*).*", "%1"))
-end
-for k,v in pairs(File:scan_directory("client/objects")) do
-	require("client/objects/" .. string.gsub(v, "([^.]*).*", "%1"))
-end
+File:require_directory("client/network")
+File:require_directory("client/objects")
 
 -- Initialize the UI state.
 Ui:init()

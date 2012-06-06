@@ -8,10 +8,7 @@ Client = Class()
 Client.class_name = "Client"
 
 Operators = {}
-
-for k,v in pairs(File:scan_directory("client/operators/")) do
-	require("client/operators/" .. string.gsub(v, "([^.]*).*", "%1"))
-end
+File:require_directory("client/operators")
 
 -- Initialize the database.
 -- FIXME: Should be initialized in the initializer.
