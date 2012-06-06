@@ -7,8 +7,9 @@ Widgets.Uimap.class_name = "Widgets.Uimap"
 -- @return Map widget.
 Widgets.Uimap.new = function(clss)
 	local self = Widgets.Uiwidget.new(clss)
-	self.hint = "$$B\n$$U\n$$D"
+	self.hint = "$$B\n$U: Zoom in\n$D: Zoom out\n"
 	self.markers = {}
+	self.timer = 0
 	return self
 end
 
@@ -47,24 +48,38 @@ Widgets.Uimap.clear_markers = function(self)
 end
 
 Widgets.Uimap.handle_event = function(self, args)
-	if not Ui.pointer_grab then
-		if args.type == "mousescroll" then
-			if args.rel > 0 then
-				Client.data.map.scale = Client.data.map.scale * 1.5
-			else
-				Client.data.map.scale = Client.data.map.scale / 1.5
-			end
-			self.need_repaint = true
+	-- Zoom with keyboard.
+	if args.type ~= "keyrelease" then
+		local a = {}
+		for k,v in pairs(args) do a[k] = v end
+		if args.type == "keyrepeat" then
+			a.type = "keypress"
+		end
+		local action1 = Binding.dict_name["menu up"]
+		local action2 = Binding.dict_name["menu down"]
+		if (action1 and action1:get_event_response(a) ~= nil) then
+			self:zoom("in")
+			return
+		elseif (action2 and action2:get_event_response(a) ~= nil) then
+			self:zoom("out")
 			return
 		end
 	end
+	-- Zoom with mouse.
+	if not Ui.pointer_grab and args.type == "mousescroll" then
+		if args.rel > 0 then
+			self:zoom("in")
+		else
+			self:zoom("out")
+		end
+		return
+	end
+	-- Other actions.
 	return Widgets.Uiwidget.handle_event(self, args)
 end
 
 Widgets.Uimap.rebuild_size = function(self)
-	local size = Widgets.Uiwidget.rebuild_size(self)
-	size.y = math.max(size.y, 250)
-	return size
+	return Vector(Theme.text_height_1 * 10, Theme.text_height_1 * 10)
 end
 
 Widgets.Uimap.rebuild_canvas = function(self)
@@ -77,4 +92,22 @@ Widgets.Uimap.rebuild_canvas = function(self)
 	for k,v in pairs(Marker.dict_name) do
 		self:add_marker("mapmarker1", k, v.position, 0)
 	end
+end
+
+Widgets.Uimap.update = function(self, secs)
+	self.timer = self.timer + secs
+	if self.timer > 0.1 then
+		self.timer = 0
+		self.need_repaint = true
+	end
+	Widgets.Uiwidget.update(self, secs)
+end
+
+Widgets.Uimap.zoom = function(self, dir)
+	if dir == "in" then
+		Client.data.map.scale = Client.data.map.scale * 1.5
+	else
+		Client.data.map.scale = Client.data.map.scale / 1.5
+	end
+	self.need_repaint = true
 end
