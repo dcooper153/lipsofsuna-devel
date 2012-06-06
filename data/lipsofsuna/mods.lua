@@ -115,6 +115,9 @@ Mod:load "regions/silverspring"
 Mod:load "regions/supplycamp"
 Mod:load "regions/tutorial"
 
+-- Global events
+Mod:load "events"
+
 -- User interface.
 Mod:load "ui"
 Mod:load "ui/widgets"

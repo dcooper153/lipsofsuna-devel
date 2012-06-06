@@ -622,6 +622,10 @@ end
 ------------------------------------------------------------------------------
 -- TODO: Move to utils
 
+Generator.get_sector_type_by_id = function(self, id)
+	return self.sectors[id]
+end
+
 Generator.get_sector_id_by_offset = function(self, offset)
 	local w = 128
 	local s = offset:copy():floor()
@@ -662,4 +666,9 @@ end
 
 Generator.set_sector_type_by_offset = function(self, offset, type)
 	self:set_sector_type_by_id(self:get_sector_id_by_offset(offset), type)
+end
+
+Generator.is_overworld_sector_by_id = function(self, id)
+	local tile = self:get_sector_tile_by_id(id)
+	return tile.y > 1000
 end

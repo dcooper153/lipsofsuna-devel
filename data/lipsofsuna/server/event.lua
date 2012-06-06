@@ -70,6 +70,8 @@ Eventhandler{type = "tick", func = function(self, event)
 			end
 		end
 	end
+	-- Update global events.
+	Globaleventmanager:update(event.secs)
 	-- Update world object decay.
 	Serialize:update_world_object_decay(event.secs)
 end}

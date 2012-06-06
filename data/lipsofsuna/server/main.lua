@@ -11,6 +11,7 @@ require "server/crafting"
 require "server/dialog"
 require "server/event"
 require "server/feat"
+require "server/global-event-manager"
 require "server/log"
 require "server/marker"
 require "server/sectors"
@@ -50,6 +51,7 @@ else
 	Unlocks:init(Serialize.db)
 	Unlocks:read_db()
 end
+Globaleventmanager:init()
 
 -- Initialize unlock updates.
 Unlocks:unlock("skill", "Health lv1")

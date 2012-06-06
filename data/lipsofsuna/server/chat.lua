@@ -153,6 +153,16 @@ ChatCommand{pattern = "^/spawn (.*)$", permission = "admin", func = function(pla
 	end
 end}
 
+-- Start a global event.
+ChatCommand{pattern = "^/start global event (.*)$", permission = "admin", func = function(player, matches)
+	Globaleventmanager:start_event(matches[1])
+end}
+
+-- Stop a global event.
+ChatCommand{pattern = "^/stop global event (.*)$", permission = "admin", func = function(player, matches)
+	Globaleventmanager:stop_event(matches[1])
+end}
+
 -- Resurrect.
 ChatCommand{pattern = "^/resurrect$", permission = "admin", func = function(player, matches)
 	player:resurrect()
