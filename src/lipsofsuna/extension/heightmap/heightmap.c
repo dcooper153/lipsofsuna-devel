@@ -196,6 +196,7 @@ int liext_heightmap_get_height (
 	/* Solve the height with a plane intersection. */
 	src = limat_vector_init (bx, 0.0, bz);
 	dst = limat_vector_init (bx, 1.0, bz);
+	res.y = 0;
 	limat_plane_intersects_line (&plane, &src, &dst, &res);
 	*result = res.y;
 
