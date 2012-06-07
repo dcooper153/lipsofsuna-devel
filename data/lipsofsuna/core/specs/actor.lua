@@ -70,6 +70,7 @@ Actorspec.introspect = Introspect{
 		{name = "important", type = "boolean", description = "True to not allow the actor to be cleaned up from the map."},
 		{name = "interactive", type = "boolean", default = true, description = "False to make the object not appear interactive."},
 		{name = "inventory_items", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of inventory items to give when the actor is spawned.", details = {keys = {spec = "Itemspec"}, values = {integer = true, min = 1}}},
+		{name = "inventory_items_death", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of inventory items to give when the actor is killed.", details = {keys = {spec = "Itemspec"}, values = {integer = true, min = 1}}},
 		{name = "inventory_size", type = "number", default = 0, description = "Number of inventory slots the actor has."},
 		{name = "jump_force", type = "number", default = 8, description = "Mass-independent jump force of the actor."},
 		{name = "loot_categories", type = "list", list = {type = "string"}, description = "List of item categories this actor can have as random loot."},

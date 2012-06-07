@@ -421,6 +421,14 @@ Actor.die = function(self)
 	if self.summon_timer then
 		self:unsummon()
 	end
+	-- Spawn death drop items.
+	for k,v in pairs(self.spec.inventory_items_death) do
+		local s = Itemspec:find{name = k}
+		if s then
+			local o = Item{spec = s, count = v}
+			self.inventory:merge_or_drop_object(o)
+		end
+	end
 	return true
 end
 
