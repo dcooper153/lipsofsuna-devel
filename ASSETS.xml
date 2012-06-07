@@ -1471,6 +1471,17 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
     <file>data/lipsofsuna/items/food/ricebowl1.lmdl</file>
     <file>data/lipsofsuna/items/food/bowl1.png</file>
     <file>data/lipsofsuna/items/food/rice1.png</file>
+    <file>data/lipsofsuna/items/food/cookedmeat1.lmdl</file>
+    <file>data/lipsofsuna/items/food/cookedmeat1.png</file>
+    <file>data/lipsofsuna/items/food/cookedmeat2.lmdl</file>
+    <file>data/lipsofsuna/items/food/egg1.lmdl</file>
+    <file>data/lipsofsuna/items/food/rawmeat1.lmdl</file>
+    <file>data/lipsofsuna/items/food/rawmeat1.png</file>
+    <file>data/lipsofsuna/items/food/rawmeat2.lmdl</file>
+    <file>data/lipsofsuna/plants/watermelon/watermelon1.lmdl</file>
+    <file>data/lipsofsuna/plants/watermelon/watermelon1.png</file>
+    <file>data/lipsofsuna/plants/watermelon/watermelon2.lmdl</file>
+    <file>data/lipsofsuna/plants/watermelon/watermelonleaf1.png</file>
     <file>import/obelisk1.blend</file>
     <file>import/obelisk1.png</file>
     <file>import/apple1.blend</file>
@@ -1487,6 +1498,14 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
     <file>import/ricebowl1.blend</file>
     <file>import/bowl1.png</file>
     <file>import/rice1.png</file>
+    <file>import/meat1.blend</file>
+    <file>import/meat2.blend</file>
+    <file>import/cookedmeat1.png</file>
+    <file>import/rawmeat1.png</file>
+    <file>import/egg1.blend</file>
+    <file>import/watermelon1.blend</file>
+    <file>import/watermelon1.png</file>
+    <file>import/watermelonleaf1.png</file>
     <author>Renoki</author>
     <license>Creative Commons BY-SA 3.0</license>
   </asset>

@@ -16,6 +16,22 @@ Itemspec{
 	stacking = true}
 
 Itemspec{
+	name = "cooked meat",
+	model = "cookedmeat1",
+	mass = 1,
+	categories = {["food"] = true},
+	crafting_materials = {["raw meat"] = 1},
+	stacking = true}
+
+Itemspec{
+	name = "egg",
+	model = "egg1",
+	mass = 1,
+	mass_inventory = 0.1,
+	categories = {["food"] = true},
+	stacking = true}
+
+Itemspec{
 	name = "long bread",
 	model = "bread1",
 	mass = 1,
@@ -50,6 +66,28 @@ Itemspec{
 	model = "orange1",
 	mass = 1,
 	categories = {["food"] = true, ["material"] = true},
+	stacking = true}
+
+Itemspec{
+	name = "raw meat",
+	model = "rawmeat1",
+	mass = 1,
+	categories = {["food"] = true},
+	stacking = true}
+
+Itemspec{
+	name = "small cooked meat",
+	model = "cookedmeat2",
+	mass = 1,
+	categories = {["food"] = true},
+	crafting_materials = {["small raw meat"] = 1},
+	stacking = true}
+
+Itemspec{
+	name = "small raw meat",
+	model = "rawmeat2",
+	mass = 1,
+	categories = {["food"] = true},
 	stacking = true}
 
 Itemspec{

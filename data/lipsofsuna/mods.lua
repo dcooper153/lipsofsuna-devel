@@ -80,6 +80,7 @@ Mod:load "items/workbench"
 Mod:load "plants/dewspring"
 Mod:load "plants/mushroom"
 Mod:load "plants/tree"
+Mod:load "plants/watermelon"
 
 -- Obstacles and other environment
 Mod:load "environment/bricks"
