@@ -53,6 +53,8 @@ local spawn_player = function(object, client, spawnpoint)
 			object:vision_cb(v.event)
 		end
 	end
+	-- Notify the global event manager.
+	Globaleventmanager:notify_action("player spawn", object)
 end
 
 Protocol:add_handler{type = "CHARACTER_CREATE", func = function(args)

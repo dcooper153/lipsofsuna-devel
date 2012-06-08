@@ -13,6 +13,8 @@ Globaleventspec.introspect = Introspect{
 		{name = "duration", type = "number", description = "Duration of the event, in seconds."},
 		{name = "sector_created", type = "ignore"},
 		{name = "sector_loaded", type = "ignore"},
+		{name = "started", type = "ignore"},
+		{name = "stopped", type = "ignore"},
 		{name = "update", type = "ignore"},
 	}}
 

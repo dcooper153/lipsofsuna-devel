@@ -50,12 +50,14 @@ Dialog.answer = function(self, user, answer)
 		self.choices = nil
 		table.insert(self.vm, 1, {exe = sel, off = 2, pos = 1, len = #sel - 2})
 		self:execute()
+		Globaleventmanager:notify_action("dialog", user)
 	elseif self.choices == "info" or self.choices == "line" then
 		-- Info or say.
 		self.vm[1].pos = self.vm[1].pos + 1
 		self.user = user
 		self.choices = nil
 		self:execute()
+		Globaleventmanager:notify_action("dialog", user)
 	end
 end
 

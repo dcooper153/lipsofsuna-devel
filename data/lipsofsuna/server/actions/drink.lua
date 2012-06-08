@@ -16,4 +16,6 @@ Actionspec:extend{
 		-- Replace the potion with an empty bottle.
 		self:subtract(1)
 		user.inventory:merge_or_drop_object(Item{spec = Itemspec:find{name = "empty bottle"}})
+		-- Log the action.
+		Globaleventmanager:notify_action("eat", user)
 	end}

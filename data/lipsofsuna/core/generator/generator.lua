@@ -622,6 +622,11 @@ end
 ------------------------------------------------------------------------------
 -- TODO: Move to utils
 
+Generator.get_sector_center_by_id = function(self, id)
+	return self:get_sector_offset_by_id(id):add_xyz(0.5,0.5,0.5):
+		multiply(Voxel.tiles_per_line * Voxel.tile_size)
+end
+
 Generator.get_sector_type_by_id = function(self, id)
 	return self.sectors[id]
 end
@@ -671,4 +676,9 @@ end
 Generator.is_overworld_sector_by_id = function(self, id)
 	local tile = self:get_sector_tile_by_id(id)
 	return tile.y > 1000
+end
+
+Generator.is_overworld_sector_by_point = function(self, point)
+	local tile_y = point.y * Voxel.tile_scale
+	return tile_y > 1000
 end
