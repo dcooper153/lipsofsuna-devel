@@ -356,7 +356,7 @@ static int private_merge_triangles_model (
 		}
 
 		/* Merge vertices. */
-		if (!limdl_builder_insert_face (self->model_builder, 0, group, vertices, NULL))
+		if (!limdl_builder_insert_face_welded (self->model_builder, 0, group, vertices))
 			return 0;
 	}
 
