@@ -451,6 +451,7 @@ static int private_message_client (
 
 	/* Emit an event. */
 	limai_program_event (self->program, "packet", "message", LIMAI_FIELD_INT, data[0], "packet", LIMAI_FIELD_PACKET, reader, NULL);
+	liarc_packet_free (reader);
 
 	return 1;
 }
@@ -477,6 +478,7 @@ static int private_message_server (
 
 	/* Emit an event. */
 	limai_program_event (self->program, "packet", "message", LIMAI_FIELD_INT, ((uint8_t*) event->packet->data)[0], "client", LIMAI_FIELD_INT, client->id, "packet", LIMAI_FIELD_PACKET, reader, NULL);
+	liarc_packet_free (reader);
 
 	return 1;
 }
