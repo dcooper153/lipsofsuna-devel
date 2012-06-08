@@ -94,7 +94,6 @@ void main()
 		vec3 l = shadows[i] * los_blinn_phong(F_lightv[i], F_eyev, LOS_light_direction[i],
 			LOS_light_equation[i], normal, LOS_material_shininess);
 		diff += l.z * l.x * LOS_light_diffuse[i];
-		spec += l.z * l.y * LOS_light_specular[i];
 	}
 	vec3 color = los_cel_shading(LOS_material_diffuse * diffuse, diff, spec,
 		LOS_material_celshading, LOS_diffuse_texture_3, LOS_diffuse_texture_4);
