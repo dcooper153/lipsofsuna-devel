@@ -81,7 +81,6 @@ Player.set_client = function(self, client)
 	self.vision.terrain = {}
 	self:update_vision_radius()
 	self.vision:update()
-	self.inventory:subscribe(self, function(args) self:inventory_cb(args) end)
 end
 
 --- Causes the player to die and respawn.
@@ -103,6 +102,7 @@ Player.disable = function(self, keep)
 		Player.clients[self.client] = nil
 		self.client = nil
 	end
+	Globaleventmanager:notify_action("player disable", self)
 end
 
 Player.detach = function(self, keep)
@@ -265,6 +265,9 @@ end
 -- @param self Object.
 Player.update_inventory_subscriptions = function(self)
 	if not self.inventory_subscriptions then return end
+	if not self.inventory:is_subscribed(self) then
+		self.inventory:subscribe(self, function(args) self:inventory_cb(args) end)
+	end
 	for id,inv in pairs(self.inventory_subscriptions) do
 		local object = Object:find{id = id}
 		if not object or not self:can_reach_object(object) then
