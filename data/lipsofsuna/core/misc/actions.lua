@@ -1,4 +1,8 @@
 Actionspec{
+	name = "eat",
+	label = "Eat"}
+
+Actionspec{
 	name = "drink",
 	label = "Drink"}
 

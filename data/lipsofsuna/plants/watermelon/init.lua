@@ -7,13 +7,14 @@ Obstaclespec{
 	health = 10,
 	harvest_behavior = "destroy",
 	harvest_effect = "harvest1",
-	harvest_materials = {["dewspring leaf"] = 1},
+	harvest_materials = {["watermelon"] = 1},
 	usages = {["harvest"] = true}}
 
 Itemspec{
 	name = "watermelon",
-	model = "watermelon1",
-	icon = "mushroom1", -- FIXME
 	categories = {["food"] = true},
+	icon = "mushroom1", -- FIXME
 	mass = 1,
-	stacking = true}
+	model = "watermelon1",
+	stacking = true,
+	usages = {["eat"] = true}}
