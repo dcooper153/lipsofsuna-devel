@@ -131,9 +131,58 @@ Utils.find_spawn_point = function(clss, point)
 	-- Find the heightmap floor.
 	-- FIXME: Doesn't check if there are voxels blocking the point.
 	local hm = Map.heightmap:get_height(point, false)
-	if hm and point.y - 1 < hm and hm < point.y + 0.1 then
+	if hm and point.y - 3 < hm and hm < point.y + 0.1 then
 		return Vector(point.x, hm, point.z)
 	end
+end
+
+--- Finds spawns point suitable for actors.
+-- @param clss Utils class.
+-- @param sector Sector ID.
+-- @param count Spawn point count.
+-- @param allow_yield True to allow yielding.
+-- @return List of vectors in world units.
+Utils.find_spawn_points_in_sector = function(clss, sector, count, allow_yield)
+	local c = Vector()
+	local num = 0
+	local org = Serialize.sectors:get_sector_offset(sector)
+	local res = {}
+	local check = function(c)
+		-- Find the voxel floor.
+		local p = Vector()
+		for y=c.y,c.y+9 do
+			if Voxel:get_tile(p:set_xyz(c.x, y, c.z)) ~= 0 and
+			   Voxel:get_tile(p:set_xyz(c.x-1, y, c.z)) ~= 0 and
+			   Voxel:get_tile(p:set_xyz(c.x+1, y, c.z)) ~= 0 and
+			   Voxel:get_tile(p:set_xyz(c.x, y, c.z-1)) ~= 0 and
+			   Voxel:get_tile(p:set_xyz(c.x, y, c.z+1)) ~= 0 and
+			   Voxel:get_tile(p:set_xyz(c.x, y+1, c.z)) == 0 and
+			   Voxel:get_tile(p:set_xyz(c.x, y+2, c.z)) == 0 then
+				return p:set_xyz(c.x+0.5, y+1.5, c.z+0.5):multiply(Voxel.tile_size)
+			end
+		end
+		-- Find the heightmap floor.
+		-- FIXME: Doesn't check if there are voxels blocking the point.
+		local hm = Map.heightmap:get_height(c, false)
+		if hm and hm > c.y and hm < c.y + 11 * Voxel.tile_size then
+			return p:set_xyz(c.x, hm, c.z)
+		end
+	end
+	for i = 1,2*count do
+		c:set_xyz(org.x, org.y, org.z)
+		c.x = c.x + math.random(2, 10)
+		c.z = c.z + math.random(2, 10)
+		local p = check(c:multiply(Voxel.tile_size))
+		if p then
+			table.insert(res, p)
+			num = num + 1
+			if num == count then break end
+		end
+		if allow_yield then
+			coroutine.yield()
+		end
+	end
+	return res
 end
 
 --- Finds a summon point suitable for actors.

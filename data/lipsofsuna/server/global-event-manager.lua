@@ -12,7 +12,38 @@ Globaleventmanager.init = function(self)
 		self.events[k] = {name = k, spec = v}
 	end
 	-- Start the initial events.
+	self:start_event("brigand camp")
 	self:start_event("random monsters")
+end
+
+--- Finds players near the given sector.
+-- @param self Globaleventmanager.
+-- @param id Sector ID.
+-- @return Dictionary of players mapped to player states.
+Globaleventmanager.find_players_exploring_sector = function(self, id)
+	-- Find the closest player.
+	local c = Generator.inst:get_sector_center_by_id(id)
+	local nearest_dist
+	local nearest_player
+	for k,v in pairs(Player.clients) do
+		local d = (v.position - c).length
+		if not nearest_dist or d < nearest_dist then
+			nearest_dist = d
+			nearest_player = v
+		end
+	end
+	-- Check that the distance is sane.
+	local res = {}
+	if nearest_dist > 100 then return res end
+	nearest_dist = nearest_dist + 20
+	-- Use the closest player as the reference to find other players.
+	for k,v in pairs(Player.clients) do
+		local d = (v.position - c).length
+		if d < nearest_dist then
+			res[v] = self.player_states[v]
+		end
+	end
+	return res
 end
 
 --- Called when a player performs an action.

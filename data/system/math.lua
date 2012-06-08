@@ -401,6 +401,19 @@ Vector.round = function(self)
 	return self
 end
 
+--- Set the components of the vector in-place.
+-- @param self Vector.
+-- @param x X component.
+-- @param y Y component.
+-- @param z Z component.
+-- @return Self.
+Vector.set_xyz = function(self, x, y, z)
+	if x then self.x = x end
+	if y then self.y = y end
+	if z then self.z = z end
+	return self
+end
+
 --- Subtracts a vector from another in-place.
 -- @param self Vector.
 -- @param vector Vector.

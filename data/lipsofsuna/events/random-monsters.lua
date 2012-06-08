@@ -24,31 +24,15 @@ local count_monsters = function(sector, objects)
 	return math.max(0, monsters)
 end
 
-local spawn_monsters = function(sector, objects, monsters)
-	local org = Serialize.sectors:get_sector_offset(sector)
-	for i = 1,monsters do
-		for j = 1,15 do
-			local c = Vector()
-			c.x = org.x + math.random(4, Voxel.tiles_per_line - 4)
-			c.y = org.y + math.random(4, Voxel.tiles_per_line - 4)
-			c.z = org.z + math.random(4, Voxel.tiles_per_line - 4)
-			local p = Utils:find_spawn_point(c * Voxel.tile_size)
-			if p then
-				local d = Utils:get_spawn_point_difficulty(p, true)
-				Voxel:place_actor{point = p * Voxel.tile_scale, category = "enemy", difficulty = d}
-				break
-			end
-			coroutine.yield()
-		end
-		coroutine.yield()
-	end
-end
-
 Globaleventspec{
 	name = "random monsters",
 	sector_created = function(self, event, sector, loaded, objects)
-		if Generator.inst:get_sector_type_by_id(sector) ~= "Town" then
-			local monsters = count_monsters(sector, objects)
-			spawn_monsters(sector, objects, monsters)
+		if Generator.inst:get_sector_type_by_id(sector) == "Town" then return end
+		local count = count_monsters(sector, objects)
+		local spawns = Utils:find_spawn_points_in_sector(sector, count, true)
+		for k,v in pairs(spawns) do
+			v:multiply(Voxel.tile_scale)
+			local d = Utils:get_spawn_point_difficulty(v, true)
+			Voxel:place_actor{point = v, category = "enemy", difficulty = d}
 		end
 	end}
