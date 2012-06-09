@@ -124,3 +124,6 @@ Mod:load "ui"
 Mod:load "ui/widgets"
 Mod:load "ui/hud"
 Mod:load "ui/states"
+
+-- Custom
+Mod:load_optional "custom"
