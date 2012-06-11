@@ -31,11 +31,11 @@
 #include <OgreSubMesh.h>
 #include <OgreSkeletonManager.h>
 
-LIRenMeshBuilder::LIRenMeshBuilder (LIRenRender* render)
+LIRenMeshBuilder::LIRenMeshBuilder (LIRenRender* render, LIMdlModel* model)
 {
 	step = 0;
 	this->render = render;
-	this->model = NULL;
+	this->model = limdl_model_new_copy (model);
 	buffer_size_0 = 0;
 	buffer_size_1 = 0;
 	buffer_size_2 = 0;
@@ -51,6 +51,10 @@ LIRenMeshBuilder::~LIRenMeshBuilder ()
 	delete[] buffer_data_0;
 	delete[] buffer_data_1;
 	delete[] buffer_data_2;
+
+	/* Free the model. */
+	if (model != NULL)
+		limdl_model_free (model);
 }
 
 void LIRenMeshBuilder::prepareResource (Ogre::Resource* resource)
@@ -95,9 +99,9 @@ bool LIRenMeshBuilder::is_idle () const
 	return step == 0;
 }
 
-void LIRenMeshBuilder::set_model (LIMdlModel* model)
+LIMdlModel* LIRenMeshBuilder::get_model () const
 {
-	this->model = model;
+	return this->model;
 }
 
 /**

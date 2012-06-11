@@ -15,30 +15,34 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_MESH_HPP__
-#define __RENDER_INTERNAL_MESH_HPP__
+/**
+ * \addtogroup LIRen Render
+ * @{
+ * \addtogroup LIRenInternal Internal
+ * @{
+ * \addtogroup LIRenAttachmentParticle AttachmentParticle
+ * @{
+ */
 
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/model.h"
-#include "render-types.h"
-#include <OgreMesh.h>
+#include "render.h"
+#include "render-attachment-particle.hpp"
 
-class LIRenMesh : public Ogre::Mesh
+LIRenAttachmentParticle::LIRenAttachmentParticle (LIRenObject* object, const Ogre::String& particle) :
+	LIRenAttachment (object)
 {
-public:
-	LIRenMesh ();
-	LIRenMesh (
-		Ogre::ResourceManager* creator,
-		const Ogre::String&    name,
-		Ogre::ResourceHandle   handle,
-		const Ogre::String&    group,
-		LIRenRender*           render);
-	virtual ~LIRenMesh ();
-	void set_model (LIMdlModel* model);
-	LIMdlModel* get_model () const;
-private:
-	LIRenRender* render;
-	LIMdlModel* model;
-};
+	particles = NULL; //TODO
+}
 
-#endif
+LIRenAttachmentParticle::~LIRenAttachmentParticle ()
+{
+	render->data->scene_manager->destroyParticleSystem (particles);
+}
+
+void LIRenAttachmentParticle::update (float secs)
+{
+}
+
+/** @} */
+/** @} */
+/** @} */

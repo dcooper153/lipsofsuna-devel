@@ -28,7 +28,8 @@
 #include "lipsofsuna/network.h"
 #include "lipsofsuna/system.h"
 #include "render.h"
-#include "render-entity.hpp"
+#include "render-attachment-entity.hpp"
+#include "render-attachment-particle.hpp"
 #include "render-model.h"
 #include "render-object.h"
 
@@ -56,10 +57,6 @@ static void private_channel_fade (
 	LIMdlPose*   pose,
 	int          channel,
 	float        time);
-
-static LIRenEntity* private_create_entity (
-	LIRenObject* self,
-	LIRenModel*  model);
 
 static void private_remove_entity (
 	LIRenObject* self,
@@ -158,7 +155,7 @@ void liren_object_add_model (
 	}
 
 	/* Create the new entity. */
-	self->entities.push_back (private_create_entity (self, model));
+	self->attachments.push_back (OGRE_NEW LIRenAttachmentEntity (self, model));
 }
 
 int liren_object_channel_animate (
@@ -226,9 +223,9 @@ void liren_object_clear_models (
 	self->node->detachAllObjects ();
 
 	/* Remove entities. */
-	for (size_t i = 0 ; i < self->entities.size () ; i++)
-		OGRE_DELETE self->entities[i];
-	self->entities.clear ();
+	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+		OGRE_DELETE self->attachments[i];
+	self->attachments.clear ();
 
 	/* Remove the particle system. */
 	if (self->particles != NULL)
@@ -251,22 +248,11 @@ int liren_object_find_node (
 	/* Find the node. */
 	/* This uses the poses of the entities instead of the pose of the object
 	   since the latter never has a model assigned. */
-	for (size_t i = 0 ; i < self->entities.size () ; i++)
+	for (size_t i = 0 ; i < self->attachments.size () ; i++)
 	{
-		LIRenEntity* entity = self->entities[i];
-		LIMdlPoseBuffer* buffer = entity->get_pose_buffer ();
-		if (buffer != NULL)
-		{
-			node = limdl_pose_buffer_find_node (buffer, name);
-			if (node != NULL)
-				break;
-		}
-		if (node == NULL)
-		{
-			LIMdlModel* model = entity->get_model ();
-			if (model != NULL)
-				node = limdl_model_find_node (model, name);
-		}
+		node = self->attachments[i]->find_node (name);
+		if (node != NULL)
+			break;
 	}
 	if (node == NULL)
 		return 0;
@@ -311,16 +297,16 @@ void liren_object_model_changed (
 	LIRenObject* self,
 	LIRenModel*  model)
 {
-	for (size_t i = 0 ; i < self->entities.size () ; i++)
+	for (size_t i = 0 ; i < self->attachments.size () ; i++)
 	{
-		LIRenEntity* entity = self->entities[i];
-		if (entity->get_render_model () == model)
+		if (self->attachments[i]->has_model (model))
 		{
 			/* Start loading the new entity. */
 			liren_object_add_model (self, model);
 
 			/* Mark the old entity for replacement. */
-			entity->set_replacing_entity (self->entities[self->entities.size () - 1]);
+			self->attachments[i]->set_replacer (
+				self->attachments[self->attachments.size () - 1]);
 			break;
 		}
 	}
@@ -335,9 +321,9 @@ void liren_object_remove_model (
 	LIRenObject* self,
 	LIRenModel*  model)
 {
-	for (size_t i = 0 ; i < self->entities.size () ; i++)
+	for (size_t i = 0 ; i < self->attachments.size () ; i++)
 	{
-		if (self->entities[i]->get_render_model () == model)
+		if (self->attachments[i]->has_model (model))
 		{
 			private_remove_entity (self, i);
 			break;
@@ -357,10 +343,10 @@ void liren_object_update (
 	while (true)
 	{
 		bool found = false;
-		for (size_t i = 0 ; i < self->entities.size () ; i++)
+		for (size_t i = 0 ; i < self->attachments.size () ; i++)
 		{
-			LIRenEntity* repl = self->entities[i]->get_replacing_entity ();
-			if (repl != NULL && repl->get_loaded ())
+			LIRenAttachment* repl = self->attachments[i]->get_replacer ();
+			if (repl != NULL && repl->is_loaded ())
 			{
 				private_remove_entity (self, i);
 				found = true;
@@ -386,12 +372,16 @@ void liren_object_update (
 	else
 		self->node->setVisible (self->visible);
 
-	/* Update poses. */
+	/* Update attachments. */
+	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+		self->attachments[i]->update (secs);
+
+	/* Update attachment poses. */
 	if (self->pose != NULL)
 	{
 		limdl_pose_update (self->pose, secs);
-		for (size_t i = 0 ; i < self->entities.size () ; i++)
-			self->entities[i]->update_pose (self->pose, secs);
+		for (size_t i = 0 ; i < self->attachments.size () ; i++)
+			self->attachments[i]->update_pose (self->pose);
 	}
 }
 
@@ -431,9 +421,9 @@ int liren_object_get_id (
 int liren_object_get_loaded (
 	LIRenObject* self)
 {
-	for (size_t i = 0 ; i < self->entities.size () ; i++)
+	for (size_t i = 0 ; i < self->attachments.size () ; i++)
 	{
-		if (!self->entities[i]->get_loaded ())
+		if (!self->attachments[i]->is_loaded ())
 			return 0;
 	}
 	return 1;
@@ -465,11 +455,11 @@ int liren_object_set_model (
 
 	/* Add the new model. */
 	liren_object_add_model (self, model);
-	LIRenEntity* successor = self->entities[self->entities.size () - 1];
+	LIRenAttachment* successor = self->attachments[self->attachments.size () - 1];
 
 	/* Mark all the old entities for replacement. */
-	for (size_t i = 0 ; i < self->entities.size () - 1 ; i++)
-		self->entities[i]->set_replacing_entity (successor);
+	for (size_t i = 0 ; i < self->attachments.size () - 1 ; i++)
+		self->attachments[i]->set_replacer (successor);
 
 	return 1;
 }
@@ -693,50 +683,25 @@ static void private_channel_fade (
 		limdl_pose_fade_channel (pose, channel, time);
 }
 
-static LIRenEntity* private_create_entity (
-	LIRenObject* self,
-	LIRenModel*  model)
-{
-	/* Make sure that a model was given. */
-	if (model == NULL || model->mesh.isNull ())
-		return NULL;
-
-	/* Create a new entity. */
-	Ogre::String e_name = self->render->data->id.next ();
-	LIRenEntity* entity = OGRE_NEW LIRenEntity (e_name, model);
-	self->node->attachObject (entity);
-
-	/* Set the entity flags. */
-	entity->setCastShadows (self->shadow_casting);
-
-	/* Set entity visibility. */
-	/* If a visible entity is added to a hidden scene node, the entity is
-	   still rendered. Hence, newly added entities needs to be explicitly
-	   hidden or Ogre will render our invisible objects. */
-	entity->setVisible (self->visible);
-
-	return entity;
-}
-
 static void private_remove_entity (
 	LIRenObject* self,
 	int          index)
 {
-	/* Remove from the list and the scene node. */
-	LIRenEntity* entity = self->entities[index];
-	self->node->detachObject (entity);
-	self->entities.erase(self->entities.begin () + index);
+	/* Remove from the list. */
+	/* This must be done first to avoid potential double deletion. */
+	LIRenAttachment* attachment = self->attachments[index];
+	self->attachments.erase(self->attachments.begin () + index);
 
-	/* Free entities waiting for the removal of this entity. */
+	/* Free attachments waiting for the removal of this one. */
 	/* This is a potentially recursive operation so the list indices may change
 	   wildly. To avoid out of bounds errors for sure, we restart the loop from
 	   scratch immediately after removing something. */
 	while (true)
 	{
 		bool found = false;
-		for (size_t i = 0 ; i < self->entities.size () ; i++)
+		for (size_t i = 0 ; i < self->attachments.size () ; i++)
 		{
-			if (entity == self->entities[i]->get_replacing_entity ())
+			if (attachment == self->attachments[i]->get_replacer ())
 			{
 				private_remove_entity (self, i);
 				found = true;
@@ -747,18 +712,15 @@ static void private_remove_entity (
 			break;
 	}
 
-	/* Free this entity. */
-	OGRE_DELETE entity;
+	/* Free the attachment. */
+	OGRE_DELETE attachment;
 }
 
 static void private_update_entity_settings (
 	LIRenObject* self)
 {
-	for (size_t i = 0 ; i < self->entities.size () ; i++)
-	{
-		LIRenEntity* entity = self->entities[i];
-		entity->setCastShadows (self->shadow_casting);
-	}
+	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+		self->attachments[i]->update_settings ();
 }
 
 /** @} */

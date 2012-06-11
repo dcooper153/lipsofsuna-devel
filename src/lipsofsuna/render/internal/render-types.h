@@ -34,6 +34,7 @@ typedef struct _LIRenModel LIRenModel;
 typedef struct _LIRenRenderData LIRenRenderData;
 
 #ifdef __cplusplus
+class LIRenAttachment;
 #include <OgreBorderPanelOverlayElement.h>
 #include <OgreCamera.h>
 #include <OgreEntity.h>
@@ -48,12 +49,11 @@ typedef struct _LIRenRenderData LIRenRenderData;
 #include <OgreSceneManager.h>
 #include <OgreMaterialManager.h>
 #include <OgreTextAreaOverlayElement.h>
+#include "render-attachment.hpp"
 #include "render-container-factory.hpp"
-#include "render-entity.hpp"
 #include "render-image-overlay-factory.hpp"
 #include "render-scaled-overlay-factory.hpp"
 #include "render-mesh-builder.hpp"
-#include "render-mesh-manager.hpp"
 #include "render-resource-loading-listener.hpp"
 #include "render-unique-id.hpp"
 struct _LIRenLight
@@ -82,7 +82,7 @@ struct _LIRenObject
 	LIRenRender* render;
 	Ogre::ParticleSystem* particles;
 	Ogre::SceneNode* node;
-	std::vector<LIRenEntity*> entities;
+	std::vector<LIRenAttachment*> attachments;
 };
 struct _LIRenOverlay
 {
@@ -117,9 +117,9 @@ struct _LIRenRenderData
 	LIRenContainerFactory* container_factory;
 	LIRenImageOverlayFactory* image_factory;
 	LIRenScaledOverlayFactory* scaled_factory;
-	LIRenMeshManager* mesh_manager;
 	LIRenResourceLoadingListener* resource_loading_listener;
 	LIRenUniqueId id;
+	LIAlgStrdic* mesh_builders;
 };
 #endif
 

@@ -26,14 +26,14 @@
 class LIRenMeshBuilder : public Ogre::ManualResourceLoader
 {
 public:
-	LIRenMeshBuilder (LIRenRender* render);
+	LIRenMeshBuilder (LIRenRender* render, LIMdlModel* model);
 	virtual ~LIRenMeshBuilder ();
 private:
 	virtual void loadResource (Ogre::Resource* resource);
 	virtual void prepareResource (Ogre::Resource* resource);
 public:
 	bool is_idle () const;
-	void set_model (LIMdlModel* model);
+	LIMdlModel* get_model () const;
 	void step_1_bg (Ogre::Mesh* mesh);
 	void step_2_fg (Ogre::Mesh* mesh);
 	void step_3_fg (Ogre::Mesh* mesh);

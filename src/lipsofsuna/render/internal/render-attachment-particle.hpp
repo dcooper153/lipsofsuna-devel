@@ -15,29 +15,23 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_MESH_MANAGER_HPP__
-#define __RENDER_INTERNAL_MESH_MANAGER_HPP__
+#ifndef __RENDER_INTERNAL_ATTACHMENT_PARTICLE_HPP__
+#define __RENDER_INTERNAL_ATTACHMENT_PARTICLE_HPP__
 
 #include "lipsofsuna/system.h"
+#include "lipsofsuna/model.h"
+#include "render-attachment.hpp"
 #include "render-types.h"
-#include <OgreResourceManager.h>
+#include <OgreResource.h>
 
-class LIRenMeshManager : public Ogre::ResourceManager
+class LIRenAttachmentParticle : public LIRenAttachment
 {
 public:
-	LIRenMeshManager (LIRenRender* render);
-	virtual ~LIRenMeshManager ();
-	Ogre::ResourcePtr create_mesh (LIMdlModel* model);
+	LIRenAttachmentParticle (LIRenObject* object, const Ogre::String& particle);
+	virtual ~LIRenAttachmentParticle ();
+	virtual void update (float secs);
 protected:
-	virtual Ogre::Resource* createImpl (
-		const Ogre::String&            name,
-		Ogre::ResourceHandle           handle, 
-		const Ogre::String&            group,
-		bool                           isManual,
-		Ogre::ManualResourceLoader*    loader, 
-		const Ogre::NameValuePairList* createParams);
-protected:
-	LIRenRender* render;
+	Ogre::ParticleSystem* particles;
 };
 
 #endif

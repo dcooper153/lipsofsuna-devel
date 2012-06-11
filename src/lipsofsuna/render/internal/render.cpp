@@ -58,6 +58,9 @@ static int private_count_resources_loaded (
 	LIRenRender*           self,
 	Ogre::ResourceManager& manager);
 
+static void private_garbage_collect_builders (
+	LIRenRender* self);
+
 static void private_load_plugin (
 	LIRenRender* self,
 	const char*  name);
@@ -92,6 +95,7 @@ int liren_internal_init (
 	self->data->container_factory = NULL;
 	self->data->image_factory = NULL;
 	self->data->scaled_factory = NULL;
+	self->data->mesh_builders = lialg_strdic_new ();
 
 	/* Disable console output. */
 	self->data->log = new Ogre::LogManager ();
@@ -212,10 +216,6 @@ int liren_internal_init (
 	self->data->resource_loading_listener = new LIRenResourceLoadingListener (self->paths);
 	mgr.setLoadingListener (self->data->resource_loading_listener);
 
-	/* Create the custom mesh loader. */
-	self->data->mesh_manager = new LIRenMeshManager (self);
-	mgr._registerResourceManager ("LIRenMesh", self->data->mesh_manager);
-
 	/* Create the group for permanent resources. */
 	/* This group is used for resources that are managed by Ogre. They
 	   include textures and various scripts detected at initialization.
@@ -247,12 +247,12 @@ void liren_internal_deinit (
 {
 	if (self->data != NULL)
 	{
-		/* Free the mesh manager. */
+		/* Free the mesh builders. */
 		/* Some meshes may be being loaded in other threads so the Ogre root
 		   needs to be shut down first to guarantee clean shutdown. */
 		self->data->root->shutdown ();
-		Ogre::ResourceGroupManager::getSingleton ()._unregisterResourceManager ("LIRenMesh");
-		delete self->data->mesh_manager;
+		private_garbage_collect_builders (self);
+		lialg_strdic_free (self->data->mesh_builders);
 
 		/* Free the Ogre root. */
 		delete self->data->root;
@@ -504,13 +504,14 @@ int liren_internal_update (
 	/* Ogre seems to not have a function for removing unreferenced
 	   resources from a specific group so we need to do it manually. */
 	self->data->unload_timer += secs;
-	if (self->data->unload_timer > 2.0f)
+	if (self->data->unload_timer > 5.0f)
 	{
 		self->data->unload_timer = 0.0f;
-		private_unload_unused_resources (self, *self->data->mesh_manager);
+		private_unload_unused_resources (self, Ogre::MeshManager::getSingleton ());
 		private_unload_unused_resources (self, Ogre::SkeletonManager::getSingleton ());
 		private_unload_unused_resources (self, Ogre::MaterialManager::getSingleton ());
 		private_unload_unused_resources (self, Ogre::TextureManager::getSingleton ());
+		private_garbage_collect_builders (self);
 	}
 
 	return 1;
@@ -624,10 +625,9 @@ void liren_internal_get_stats (
 	result->batch_count = self->data->viewport->_getNumRenderedBatches ();
 	result->face_count = self->data->viewport->_getNumRenderedFaces ();
 	result->material_count = private_count_resources (self, Ogre::MaterialManager::getSingleton ());
-	result->material_count = private_count_resources (self, Ogre::MaterialManager::getSingleton ());
 	result->material_count_loaded = private_count_resources_loaded (self, Ogre::MaterialManager::getSingleton ());
-	result->mesh_count = private_count_resources (self, *self->data->mesh_manager);
-	result->mesh_memory = (int) self->data->mesh_manager->getMemoryUsage ();
+	result->mesh_count = private_count_resources (self, Ogre::MeshManager::getSingleton ());
+	result->mesh_memory = (int) Ogre::MeshManager::getSingleton ().getMemoryUsage ();
 	result->skeleton_count = private_count_resources (self, Ogre::SkeletonManager::getSingleton ());
 	result->texture_count = private_count_resources (self, Ogre::TextureManager::getSingleton ());
 	result->texture_count_loaded = private_count_resources_loaded (self, Ogre::TextureManager::getSingleton ());
@@ -770,6 +770,27 @@ static int private_check_plugin (
 	return 0;
 }
 
+static void private_garbage_collect_builders (
+	LIRenRender* self)
+{
+	LIAlgStrdicIter iter;
+
+	Ogre::MeshManager& mgr = Ogre::MeshManager::getSingleton ();
+
+	/* Ogre will happily leak our manual resource loaders. To avoid them being
+	   permanently leaked, we have stored them a dictionary by mesh name. If
+	   the mesh no longer exists, we free the associated builder. */
+	LIALG_STRDIC_FOREACH (iter, self->data->mesh_builders)
+	{
+		Ogre::MeshPtr ptr = mgr.getByName (iter.key, LIREN_RESOURCES_TEMPORARY);
+		if (ptr.isNull ())
+		{
+			lialg_strdic_remove (self->data->mesh_builders, iter.key);
+			OGRE_DELETE ((LIRenMeshBuilder*) iter.value);
+		}
+	}
+}
+
 static void private_unload_unused_resources (
 	LIRenRender*           self,
 	Ogre::ResourceManager& manager)
@@ -777,17 +798,14 @@ static void private_unload_unused_resources (
 	Ogre::ResourceManager::ResourceMapIterator iter = manager.getResourceIterator ();
 	while (iter.hasMoreElements ())
 	{
-		/* Check if the resource is in use. */
-		/* The resource pointer we create here adds one extra reference. */
+		/* Check if the resource is loaded. */
 		Ogre::ResourcePtr resource = iter.getNext ();
-		if (resource.useCount () > Ogre::ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
+		if (!resource->isLoaded ())
 			continue;
 
-		/* Don't unload resources that are still loading. */
-		/* These resources are likely to be used by someone once loaded so unloading
-		   them could potentially degrade the overall performance. */
-		Ogre::Resource::LoadingState state = resource->getLoadingState ();
-		if (state == Ogre::Resource::LOADSTATE_LOADING || state == Ogre::Resource::LOADSTATE_PREPARING)
+		/* Check if the resource is in use. */
+		/* The resource pointer we create here adds one extra reference. */
+		if (resource.useCount () > Ogre::ResourceGroupManager::RESOURCE_SYSTEM_NUM_REFERENCE_COUNTS + 1)
 			continue;
 
 		/* Remove or unload the resource. */

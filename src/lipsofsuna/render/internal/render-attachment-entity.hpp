@@ -15,38 +15,40 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_ENTITY_HPP__
-#define __RENDER_INTERNAL_ENTITY_HPP__
+#ifndef __RENDER_INTERNAL_ATTACHMENT_ENTITY_HPP__
+#define __RENDER_INTERNAL_ATTACHMENT_ENTITY_HPP__
 
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/model.h"
-#include "render-entity-builder.hpp"
+#include "render-attachment.hpp"
+#include "render-types.h"
 #include <OgreEntity.h>
 #include <OgreResource.h>
 
-class LIRenEntity : public Ogre::Entity
+class LIRenAttachmentEntity : public LIRenAttachment
 {
 public:
-	LIRenEntity (const Ogre::String& name, LIRenModel* model);
-	virtual ~LIRenEntity ();
-	void initialize ();
-	void update_pose (LIMdlPose* pose, float secs);
-	void update_pose_buffer ();
-	bool get_loaded () const;
-	LIMdlModel* get_model () const;
-	LIMdlPoseBuffer* get_pose_buffer ();
-	LIRenModel* get_render_model ();
-	LIRenEntity* get_replacing_entity ();
-	void set_replacing_entity (LIRenEntity* entity);
-public:
-	virtual void _updateRenderQueue (Ogre::RenderQueue* queue);
+	LIRenAttachmentEntity (LIRenObject* object, LIRenModel* model);
+	virtual ~LIRenAttachmentEntity ();
+	virtual bool has_model (LIRenModel* model);
+	virtual bool is_loaded () const;
+	virtual LIMdlNode* find_node (const char* name);
+	virtual void remove_model (LIRenModel* model);
+	virtual void update (float secs);
+	virtual void update_pose (LIMdlPose* pose);
+	virtual void update_settings ();
 protected:
-	bool pose_changed;
+	void clear ();
+	LIMdlModel* get_model () const;
+protected:
+	bool failed;
+	bool loading_mesh;
+	bool loading_deps;
 	LIMdlPoseBuffer* pose_buffer;
-	LIRenEntity* replacing_entity;
-	LIRenEntityBuilder builder;
-	LIRenModel* render_model;
-	Ogre::MeshPtr background_loaded_mesh;
+	LIRenModel* model;
+	Ogre::MeshPtr mesh;
+	Ogre::Entity* entity;
+	std::vector<Ogre::ResourcePtr> resources;
 };
 
 #endif

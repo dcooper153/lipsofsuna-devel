@@ -1,0 +1,267 @@
+/* Lips of Suna
+ * Copyright© 2007-2012 Lips of Suna development team.
+ *
+ * Lips of Suna is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * Lips of Suna is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+/**
+ * \addtogroup LIRen Render
+ * @{
+ * \addtogroup LIRenInternal Internal
+ * @{
+ * \addtogroup LIRenAttachmentEntity AttachmentEntity
+ * @{
+ */
+
+#include "lipsofsuna/system.h"
+#include "render.h"
+#include "render-attachment-entity.hpp"
+#include <OgreSubMesh.h>
+
+LIRenAttachmentEntity::LIRenAttachmentEntity (LIRenObject* object, LIRenModel* model) :
+	LIRenAttachment (object)
+{
+	lisys_assert (model != NULL);
+	lisys_assert (!model->mesh.isNull ());
+
+	this->failed = false;
+	this->loading_mesh = false;
+	this->loading_deps = false;
+	this->pose_buffer = NULL;
+	this->entity = NULL;
+	this->model = model;
+	this->mesh = model->mesh;
+}
+
+LIRenAttachmentEntity::~LIRenAttachmentEntity ()
+{
+	if (pose_buffer != NULL)
+		limdl_pose_buffer_free (pose_buffer);
+
+	if (entity != NULL)
+	{
+		object->node->detachObject (entity);
+		render->data->scene_manager->destroyEntity (entity);
+	}
+}
+
+LIMdlNode* LIRenAttachmentEntity::find_node (const char* name)
+{
+	LIMdlNode* node = NULL;
+
+	if (entity == NULL)
+		return NULL;
+
+	if (pose_buffer != NULL)
+		node = limdl_pose_buffer_find_node (pose_buffer, name);
+	if (node == NULL)
+	{
+		LIMdlModel* model = get_model ();
+		if (model != NULL)
+			node = limdl_model_find_node (model, name);
+	}
+
+	return node;
+}
+
+bool LIRenAttachmentEntity::has_model (LIRenModel* model)
+{
+	return this->model == model;
+}
+
+bool LIRenAttachmentEntity::is_loaded () const
+{
+	return entity != NULL;
+}
+
+void LIRenAttachmentEntity::remove_model (LIRenModel* model)
+{
+	if (model != this->model)
+		return;
+	this->model = NULL;
+
+	if (pose_buffer != NULL)
+	{
+		limdl_pose_buffer_free (pose_buffer);
+		pose_buffer = NULL;
+	}
+
+	if (entity != NULL)
+	{
+		object->node->detachObject (entity);
+		render->data->scene_manager->destroyEntity (entity);
+		entity = NULL;
+	}
+
+	resources.clear ();
+	loading_mesh = false;
+	loading_deps = false;
+	failed = true;
+}
+
+void LIRenAttachmentEntity::update (float secs)
+{
+	/* Only needed when background loading dependencies. */
+	if (failed || entity != NULL)
+		return;
+
+	/* Wait for the mesh to load. */
+	if (!mesh->isLoaded ())
+	{
+		if (loading_mesh)
+			return;
+		loading_mesh = true;
+#ifdef LIREN_BACKGROUND_LOADING
+		Ogre::ResourceBackgroundQueue::getSingleton ().load (
+			"Mesh", mesh->getName (), mesh->getGroup ());
+#else
+		mesh->load ();
+#endif
+		return;
+	}
+
+	/* Start loading dependencies. */
+	if (!loading_deps)
+	{
+		loading_deps = true;
+		for (size_t i = 0 ; i < mesh->getNumSubMeshes () ; i++)
+		{
+			Ogre::SubMesh* sub = mesh->getSubMesh (i);
+			if (sub->isMatInitialised ())
+			{
+				Ogre::MaterialManager& mgr = Ogre::MaterialManager::getSingleton ();
+				Ogre::MaterialPtr material = mgr.getByName (sub->getMaterialName (), mesh->getGroup ());
+				if (!material.isNull ())
+				{
+					resources.push_back (material);
+#ifdef LIREN_BACKGROUND_LOADING
+					Ogre::ResourceBackgroundQueue::getSingleton ().load (
+						"Material", material->getName (), material->getGroup ());
+#else
+					material->load (true);
+#endif
+				}
+			}
+		}
+		return;
+	}
+
+	/* Wait for the dependencies to load. */
+	for (size_t i = 0 ; i < resources.size () ; i++)
+	{
+		Ogre::ResourcePtr& resource = resources[i];
+		if (!resource->isLoaded ())
+			return;
+	}
+
+	/* Create the entity. */
+	Ogre::String e_name = render->data->id.next ();
+	entity = render->data->scene_manager->createEntity (e_name, mesh->getName (), LIREN_RESOURCES_TEMPORARY);
+	object->node->attachObject (entity);
+
+	/* Mark all bones as manually controlled. */
+	Ogre::SkeletonInstance* skeleton = entity->getSkeleton ();
+	if (skeleton != NULL)
+	{
+		for (int i = 0 ; i < skeleton->getNumBones () ; i++)
+		{
+			Ogre::Bone* bone = skeleton->getBone (i);
+			bone->setManuallyControlled (true);
+		}
+	}
+
+	/* Create the pose buffer. */
+	if (skeleton != NULL)
+	{
+		lisys_assert (pose_buffer == NULL);
+		pose_buffer = limdl_pose_buffer_new (get_model ());
+	}
+
+	/* Set the entity flags. */
+	entity->setCastShadows (object->shadow_casting);
+
+	/* Set entity visibility. */
+	/* If a visible entity is added to a hidden scene node, the entity is
+	   still rendered. Hence, newly added entities needs to be explicitly
+	   hidden or Ogre will render our invisible objects. */
+	entity->setVisible (object->visible);
+
+	/* Clear the now useless dependency list. */
+	resources.clear ();
+	loading_mesh = false;
+	loading_deps = false;
+}
+
+/**
+ * \brief Updates the CPU side pose transformation.
+ *
+ * The pose tranformation is always recalculated for each frame. However, the
+ * pose buffers are only calculated for objects that need to be rendered.
+ * Hence, this function only set the pose_changed flag.
+ *
+ * \param pose Pose whose transform to copy.
+ */
+void LIRenAttachmentEntity::update_pose (LIMdlPose* pose)
+{
+	if (entity == NULL || pose_buffer == NULL)
+		return;
+
+	/* Update the pose buffer. */
+	limdl_pose_buffer_update (pose_buffer, pose);
+
+	/* Get the skeleton. */
+	/* If the model doesn't have one, we don't need to do anything. */
+	Ogre::SkeletonInstance* skeleton = entity->getSkeleton ();
+	lisys_assert (skeleton != NULL);
+
+	/* Update bones. */
+	for (int i = 0 ; i < pose_buffer->bones.count ; i++)
+	{
+		LIMdlPoseBufferBone* src_bone = pose_buffer->bones.array + i;
+		Ogre::Bone* dst_bone = skeleton->getBone (i);
+		LIMatTransform t = src_bone->transform;
+		LIMatVector s = src_bone->scale;
+		dst_bone->setScale (s.x, s.y, s.z);
+		dst_bone->setPosition (t.position.x, t.position.y, t.position.z);
+		dst_bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
+	}
+
+	/* Queue a skeleton update. */
+	skeleton->_notifyManualBonesDirty ();
+}
+
+void LIRenAttachmentEntity::update_settings ()
+{
+	if (entity == NULL)
+		return;
+
+	entity->setCastShadows (object->shadow_casting);
+}
+
+LIMdlModel* LIRenAttachmentEntity::get_model () const
+{
+	if (mesh.isNull ())
+		return NULL;
+
+	LIRenMeshBuilder* builder = (LIRenMeshBuilder*) lialg_strdic_find (
+		render->data->mesh_builders, mesh->getName ().c_str ());
+	if (builder == NULL)
+		return NULL;
+
+	return builder->get_model ();
+}
+
+/** @} */
+/** @} */
+/** @} */

@@ -15,29 +15,32 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_ENTITY_BUILDER_HPP__
-#define __RENDER_INTERNAL_ENTITY_BUILDER_HPP__
+#ifndef __RENDER_INTERNAL_ATTACHMENT_HPP__
+#define __RENDER_INTERNAL_ATTACHMENT_HPP__
 
 #include "lipsofsuna/system.h"
+#include "lipsofsuna/model.h"
 #include "render-types.h"
-#include <OgreEntity.h>
-#include <OgreResource.h>
 
-class LIRenEntity;
-
-class LIRenEntityBuilder : public Ogre::Resource::Listener
+class LIRenAttachment
 {
 public:
-	LIRenEntityBuilder (LIRenEntity* entity, const Ogre::MeshPtr& mesh);
-	virtual ~LIRenEntityBuilder ();
-	void abort ();
-	void start ();
+	LIRenAttachment (LIRenObject* object);
+	virtual ~LIRenAttachment ();
+	virtual LIMdlNode* find_node (const char* name);
+	virtual bool has_model (LIRenModel* model);
+	virtual bool is_loaded () const;
+	virtual void remove_model (LIRenModel* model);
+	virtual void update (float secs);
+	virtual void update_pose (LIMdlPose* pose);
+	virtual void update_settings ();
 public:
-	virtual void backgroundLoadingComplete (Ogre::Resource* resource);
+	LIRenAttachment* get_replacer ();
+	void set_replacer (LIRenAttachment* replacer);
 protected:
-	LIRenEntity* entity;
-	std::vector<bool> listening;
-	std::vector<Ogre::ResourcePtr> resources;
+	LIRenObject* object;
+	LIRenRender* render;
+	LIRenAttachment* replacer;
 };
 
 #endif

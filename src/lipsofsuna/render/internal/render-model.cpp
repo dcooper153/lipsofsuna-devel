@@ -26,7 +26,6 @@
 
 #include "lipsofsuna/network.h"
 #include "render-internal.h"
-#include "render-mesh.hpp"
 
 static void private_create_mesh (
 	LIRenModel* self,
@@ -130,7 +129,13 @@ LIMdlModel* liren_model_get_model (
 {
 	if (self->mesh.isNull ())
 		return NULL;
-	return static_cast<LIRenMesh*>(self->mesh.get ())->get_model ();
+
+	LIRenMeshBuilder* builder = (LIRenMeshBuilder*) lialg_strdic_find (
+		self->render->data->mesh_builders, self->mesh->getName ().c_str ());
+	if (builder == NULL)
+		return NULL;
+
+	return builder->get_model ();
 }
 
 int liren_model_set_model (
@@ -148,8 +153,18 @@ static void private_create_mesh (
 	LIRenModel* self,
 	LIMdlModel* model)
 {
-	/* Create the new mesh. */
-	self->mesh = self->render->data->mesh_manager->create_mesh (model);
+	/* Create the resource loader. */
+	/* Ogre doesn't free the manual resource loader, nor does it allow us to
+	   store custom data to meshes. Because of those reasons, we store the
+	   loader to a dictionary that is searched by mesh name. The render class
+	   will also use the dictionary to garbage collect unused loaders. */
+	LIRenMeshBuilder* builder = new LIRenMeshBuilder (self->render, model);
+	Ogre::String name = self->render->data->id.next ();
+	lialg_strdic_insert (self->render->data->mesh_builders, name.c_str (), builder);
+
+	/* Create the manual mesh. */
+	Ogre::String group = LIREN_RESOURCES_TEMPORARY;
+	self->mesh = Ogre::MeshManager::getSingleton ().createManual (name, group, builder);
 
 	/* Tell objects using the old mesh to rebuild. */
 	LIAlgU32dicIter iter;
