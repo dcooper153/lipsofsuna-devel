@@ -152,7 +152,8 @@ Editor.load = function(self, name)
 	-- Find or create the pattern.
 	local pattern = Patternspec:find{name = name}
 	if not pattern then
-		pattern = Patternspec{name = name, file = name .. ".lua", size = Vector(32,8,32)}
+		pattern = Patternspec{name = name, size = Vector(32,8,32)}
+		pattern.file = name .. ".lua"
 		local i = 1
 		for x=0,31 do
 			for z=0,31 do
