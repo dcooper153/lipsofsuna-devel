@@ -28,8 +28,6 @@
 #include "../font/font.h"
 #include "../font/font-layout.h"
 
-#define MAX_CHARS_PER_LINE 1024
-
 static bool private_create_material (
 	LIRenOverlay*      self,
 	const char*        material_name,
@@ -152,7 +150,6 @@ void liren_overlay_add_text (
 	int w;
 	int x;
 	int y;
-	wchar_t chars[MAX_CHARS_PER_LINE + 1];
 	LIFntFont* font_;
 	LIFntLayout* layout;
 
@@ -174,6 +171,11 @@ void liren_overlay_add_text (
 	y = pos[1];
 	y += (size[1] - lifnt_layout_get_height (layout)) * align[1];
 
+	/* Allocate the temporary character buffer. */
+	/* The extra fields are used to silence valgrind errors caused by SIMD.
+	   The actual length required would be "layout->n_glyphs + 1". */
+	wchar_t* chars = (wchar_t*) lisys_calloc (layout->n_glyphs + 9, sizeof (wchar_t));
+
 	/* Handle each line */
 	for (i = 0 ; i < layout->n_glyphs ; i += j)
 	{
@@ -182,14 +184,10 @@ void liren_overlay_add_text (
 		{
 			if (j > 0 && layout->glyphs[i + j].wrapped)
 				break;
-			if (j < MAX_CHARS_PER_LINE)
-				chars[j] = layout->glyphs[i + j].glyph;
+			chars[j] = layout->glyphs[i + j].glyph;
 			w = layout->glyphs[i + j].x + layout->glyphs[i + j].advance;
 		}
-		if (j < MAX_CHARS_PER_LINE)
-			chars[j] = 0;
-		else
-			chars[MAX_CHARS_PER_LINE] = 0;
+		chars[j] = L'\0';
 
 		/* Horizontal alignment. */
 		x = pos[0];
@@ -213,7 +211,9 @@ void liren_overlay_add_text (
 		/* Start the next line. */
 		y += h;
 	}
+
 	lifnt_layout_free (layout);
+	lisys_free (chars);
 }
 
 /**

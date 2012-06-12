@@ -525,7 +525,11 @@ void LIRenMeshBuilder::override_pass (
 			Ogre::String texname = Ogre::String (mat->textures.array[j].string);
 			Ogre::String pngname = texname + ".png";
 			const char* path = lipth_paths_find_file (render->paths, pngname.c_str ());
-			int gotpng = lisys_filesystem_access (path, LISYS_ACCESS_READ);
+			int gotpng;
+			if (path != NULL)
+				gotpng = lisys_filesystem_access (path, LISYS_ACCESS_READ);
+			else
+				gotpng = 0;
 
 			/* Use either a PNG or a DDS file. */
 			/* PNG is favored over DDS so that artists don't need to bother

@@ -189,7 +189,9 @@ wchar_t* lisys_utf8_to_wchar (
 		return NULL;
 
 	/* Allocate result. */
-	result = lisys_malloc ((length + 1) * sizeof (wchar_t));
+	/* The extra fields are used to silence valgrind errors caused by SIMD.
+	   The actual length required would be "length + 1". */
+	result = lisys_calloc (length + 9, sizeof (wchar_t));
 	if (result == NULL)
 		return NULL;
 
@@ -199,7 +201,6 @@ wchar_t* lisys_utf8_to_wchar (
 		lisys_utf8_get_char (ptr, result + i);
 		ptr = lisys_utf8_get_next (ptr);
 	}
-	result[length] = L'\0';
 
 	return result;
 }
