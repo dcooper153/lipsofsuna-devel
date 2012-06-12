@@ -27,6 +27,7 @@ def options(ctx):
 	ctx.add_option('--luajit', action='store', default=True, help='compile with LuaJIT if possible [default: true]')
 	ctx.add_option('--memdebug', action='store', default=False, help='compile with expensive memory debugging [default: false]')
 	ctx.add_option('--ogre-plugindir', action='store', default=False, help='override the default Ogre plugin directory')
+	ctx.add_option('--disable-input-grabs', action='store', default=False, help='disable input grabbing for debug purposes [default: false]')
 
 def configure(ctx):
 
@@ -209,6 +210,8 @@ def configure(ctx):
 		ctx.define('LI_DISABLE_GRAPHICS', 1)
 	if not ctx.env.SOUND:
 		ctx.define('LI_DISABLE_SOUND', 1)
+	if Options.options.disable_input_grabs == "true":
+		ctx.define('LI_DISABLE_INPUT_GRABS', 1)
 	if ctx.env.RELPATH:
 		ctx.define('LI_RELATIVE_PATHS', 1)
 		ctx.env.RPATH_CORE = ['$ORIGIN/lib']

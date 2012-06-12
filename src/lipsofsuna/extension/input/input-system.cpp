@@ -40,6 +40,12 @@ LIInpSystem::LIInpSystem (LIInpInput* input, bool grab) :
 	params.insert (std::make_pair (std::string("WINDOW"), Ogre::StringConverter::toString (window)));
 
 	/* Initialize the input manager. */
+#ifdef LI_DISABLE_INPUT_GRABS
+#ifdef OIS_LINUX_PLATFORM
+	params.insert (std::make_pair (std::string ("x11_mouse_grab"), std::string ("false")));
+	params.insert (std::make_pair (std::string ("x11_keyboard_grab"), std::string ("false")));
+#endif
+#endif
 	this->input_manager = OIS::InputManager::createInputSystem (params);
 
 	/* Initialize mouse. */
