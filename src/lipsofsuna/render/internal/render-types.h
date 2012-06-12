@@ -82,7 +82,6 @@ struct _LIRenObject
 	LIMdlPose* pose;
 	LIMdlPoseSkeleton* pose_skeleton;
 	LIRenRender* render;
-	Ogre::ParticleSystem* particles;
 	Ogre::SceneNode* node;
 	std::vector<LIRenAttachment*> attachments;
 };

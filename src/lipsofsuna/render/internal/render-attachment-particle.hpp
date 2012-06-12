@@ -30,6 +30,7 @@ public:
 	LIRenAttachmentParticle (LIRenObject* object, const Ogre::String& particle);
 	virtual ~LIRenAttachmentParticle ();
 	virtual void update (float secs);
+	virtual void set_emitting (bool value);
 protected:
 	Ogre::ParticleSystem* particles;
 };

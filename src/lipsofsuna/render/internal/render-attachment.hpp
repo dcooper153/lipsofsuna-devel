@@ -35,6 +35,7 @@ public:
 	virtual void update (float secs);
 	virtual void update_pose (LIMdlPoseSkeleton* skeleton);
 	virtual void update_settings ();
+	virtual void set_emitting (bool value);
 public:
 	LIRenAttachment* get_replacer ();
 	void set_replacer (LIRenAttachment* replacer);

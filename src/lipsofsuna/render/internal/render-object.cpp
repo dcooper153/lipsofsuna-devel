@@ -95,7 +95,6 @@ LIRenObject* liren_object_new (
 	self->pose = NULL;
 	self->pose_skeleton = NULL;
 	self->render = render;
-	self->particles = NULL;
 	self->node = NULL;
 
 	/* Choose a unique ID. */
@@ -154,13 +153,6 @@ void liren_object_add_model (
 	LIRenObject* self,
 	LIRenModel*  model)
 {
-	/* Remove particle systems. */
-	if (self->particles != NULL)
-	{
-		self->render->data->scene_manager->destroyParticleSystem (self->particles);
-		self->particles = NULL;
-	}
-
 	/* Create the new entity. */
 	self->attachments.push_back (OGRE_NEW LIRenAttachmentEntity (self, model));
 	self->skeleton_rebuild_needed = 1;
@@ -241,13 +233,6 @@ void liren_object_clear_models (
 	for (size_t i = 0 ; i < self->attachments.size () ; i++)
 		OGRE_DELETE self->attachments[i];
 	self->attachments.clear ();
-
-	/* Remove the particle system. */
-	if (self->particles != NULL)
-	{
-		self->render->data->scene_manager->destroyParticleSystem (self->particles);
-		self->particles = NULL;
-	}
 
 	/* Remove the skeleton. */
 	if (self->pose_skeleton != NULL)
@@ -481,13 +466,6 @@ int liren_object_set_model (
 		return 1;
 	}
 
-	/* Remove the particle system. */
-	if (self->particles != NULL)
-	{
-		self->render->data->scene_manager->destroyParticleSystem (self->particles);
-		self->particles = NULL;
-	}
-
 	/* Add the new model. */
 	LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (self, model);
 	self->skeleton_rebuild_needed = 1;
@@ -513,20 +491,8 @@ int liren_object_set_particle (
 	/* Remove the existing model or particle system. */
 	liren_object_clear_models (self);
 
-	try
-	{
-		/* Attach a new particle system to the scene node. */
-		Ogre::String e_name = self->render->data->id.next ();
-		self->particles = self->render->data->scene_manager->createParticleSystem (e_name, name);
-		lisys_assert (self->particles != NULL);
-		self->node->attachObject (self->particles);
-
-		/* Set particle effect visibility. */
-		self->particles->setVisible (self->visible);
-	}
-	catch (...)
-	{
-	}
+	/* Add the new attachment. */
+	self->attachments.push_back (OGRE_NEW LIRenAttachmentParticle (self, name));
 
 	return 1;
 }
@@ -540,8 +506,8 @@ void liren_object_set_particle_emitting (
 	LIRenObject* self,
 	int          value)
 {
-	if (self->particles != NULL)
-		self->particles->setEmitting (value);
+	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+		self->attachments[i]->set_emitting (value);
 }
 
 /**

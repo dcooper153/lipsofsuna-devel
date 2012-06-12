@@ -74,6 +74,10 @@ void LIRenAttachment::update_settings ()
 {
 }
 
+void LIRenAttachment::set_emitting (bool value)
+{
+}
+
 LIRenAttachment* LIRenAttachment::get_replacer ()
 {
 	return replacer;

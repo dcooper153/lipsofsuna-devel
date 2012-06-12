@@ -31,16 +31,36 @@
 LIRenAttachmentParticle::LIRenAttachmentParticle (LIRenObject* object, const Ogre::String& particle) :
 	LIRenAttachment (object)
 {
-	particles = NULL; //TODO
+	particles = NULL;
+	try
+	{
+		/* Attach a new particle system to the scene node. */
+		Ogre::String e_name = render->data->id.next ();
+		particles = render->data->scene_manager->createParticleSystem (e_name, particle);
+		object->node->attachObject (particles);
+
+		/* Set particle effect visibility. */
+		particles->setVisible (object->visible);
+	}
+	catch (...)
+	{
+	}
 }
 
 LIRenAttachmentParticle::~LIRenAttachmentParticle ()
 {
-	render->data->scene_manager->destroyParticleSystem (particles);
+	if (particles != NULL)
+		render->data->scene_manager->destroyParticleSystem (particles);
 }
 
 void LIRenAttachmentParticle::update (float secs)
 {
+}
+
+void LIRenAttachmentParticle::set_emitting (bool value)
+{
+	if (particles != NULL)
+		particles->setEmitting (value);
 }
 
 /** @} */
