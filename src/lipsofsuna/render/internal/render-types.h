@@ -76,9 +76,11 @@ struct _LIRenObject
 	int id;
 	int visible;
 	int shadow_casting;
+	int skeleton_rebuild_needed;
 	float render_distance;
 	LIMatTransform transform;
 	LIMdlPose* pose;
+	LIMdlPoseSkeleton* pose_skeleton;
 	LIRenRender* render;
 	Ogre::ParticleSystem* particles;
 	Ogre::SceneNode* node;

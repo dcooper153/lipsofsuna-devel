@@ -50,7 +50,8 @@ LIMdlNode* limdl_node_new ()
 }
 
 LIMdlNode* limdl_node_copy (
-	const LIMdlNode* node)
+	const LIMdlNode* node,
+	int              recursive)
 {
 	int i;
 	LIMdlNode* self;
@@ -99,7 +100,7 @@ LIMdlNode* limdl_node_copy (
 	}
 
 	/* Copy child nodes. */
-	if (node->nodes.count)
+	if (recursive && node->nodes.count)
 	{
 		self->nodes.count = node->nodes.count;
 		self->nodes.array = lisys_calloc (self->nodes.count, sizeof (LIMdlNode*));
@@ -110,7 +111,7 @@ LIMdlNode* limdl_node_copy (
 		}
 		for (i = 0 ; i < self->nodes.count ; i++)
 		{
-			self->nodes.array[i] = limdl_node_copy (node->nodes.array[i]);
+			self->nodes.array[i] = limdl_node_copy (node->nodes.array[i], 1);
 			if (self->nodes.array[i] == NULL)
 			{
 				limdl_node_free (self);
@@ -142,6 +143,28 @@ void limdl_node_free (
 	lisys_free (self->name);
 	lisys_free (self);
 }
+
+/**
+ * \brief Adds a child node to the node.
+ * \param self Node.
+ * \param node Node.
+ * \return Nonzero on success.
+ */
+int limdl_node_add_child (
+	LIMdlNode* self,
+	LIMdlNode* node)
+{
+	LIMdlNode** tmp;
+
+	tmp = lisys_realloc (self->nodes.array, (self->nodes.count + 1) * sizeof (LIMdlNode*));
+	if (tmp == NULL)
+		return 0;
+	self->nodes.array = tmp;
+	self->nodes.array[self->nodes.count] = node;
+	self->nodes.count++;
+
+	return 1;
+}	
 
 LIMdlNode* limdl_node_find_node (
 	const LIMdlNode* self,

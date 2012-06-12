@@ -29,6 +29,7 @@
 #include "model/model-particle.h"
 #include "model/model-pose.h"
 #include "model/model-pose-buffer.h"
+#include "model/model-pose-skeleton.h"
 #include "model/model-shape.h"
 #include "model/model-shape-key.h"
 #include "model/model-texture.h"

@@ -61,21 +61,29 @@ LIRenAttachmentEntity::~LIRenAttachmentEntity ()
 
 LIMdlNode* LIRenAttachmentEntity::find_node (const char* name)
 {
-	LIMdlNode* node = NULL;
+	LIMdlNode* node;
 
 	if (entity == NULL)
 		return NULL;
 
-	if (pose_buffer != NULL)
-		node = limdl_pose_buffer_find_node (pose_buffer, name);
-	if (node == NULL)
-	{
-		LIMdlModel* model = get_model ();
-		if (model != NULL)
-			node = limdl_model_find_node (model, name);
-	}
+	LIMdlModel* model = get_model ();
+	if (model != NULL)
+		node = limdl_model_find_node (model, name);
 
 	return node;
+}
+
+LIMdlModel* LIRenAttachmentEntity::get_model () const
+{
+	if (mesh.isNull ())
+		return NULL;
+
+	LIRenMeshBuilder* builder = (LIRenMeshBuilder*) lialg_strdic_find (
+		render->data->mesh_builders, mesh->getName ().c_str ());
+	if (builder == NULL)
+		return NULL;
+
+	return builder->get_model ();
 }
 
 bool LIRenAttachmentEntity::has_model (LIRenModel* model)
@@ -213,26 +221,26 @@ void LIRenAttachmentEntity::update (float secs)
  * pose buffers are only calculated for objects that need to be rendered.
  * Hence, this function only set the pose_changed flag.
  *
- * \param pose Pose whose transform to copy.
+ * \param skeleton Skeleton whose transform to copy.
  */
-void LIRenAttachmentEntity::update_pose (LIMdlPose* pose)
+void LIRenAttachmentEntity::update_pose (LIMdlPoseSkeleton* skeleton)
 {
 	if (entity == NULL || pose_buffer == NULL)
 		return;
 
 	/* Update the pose buffer. */
-	limdl_pose_buffer_update (pose_buffer, pose);
+	limdl_pose_buffer_update (pose_buffer, skeleton);
 
 	/* Get the skeleton. */
 	/* If the model doesn't have one, we don't need to do anything. */
-	Ogre::SkeletonInstance* skeleton = entity->getSkeleton ();
-	lisys_assert (skeleton != NULL);
+	Ogre::SkeletonInstance* ogre_skeleton = entity->getSkeleton ();
+	lisys_assert (ogre_skeleton != NULL);
 
 	/* Update bones. */
 	for (int i = 0 ; i < pose_buffer->bones.count ; i++)
 	{
 		LIMdlPoseBufferBone* src_bone = pose_buffer->bones.array + i;
-		Ogre::Bone* dst_bone = skeleton->getBone (i);
+		Ogre::Bone* dst_bone = ogre_skeleton->getBone (i);
 		LIMatTransform t = src_bone->transform;
 		LIMatVector s = src_bone->scale;
 		dst_bone->setScale (s.x, s.y, s.z);
@@ -241,7 +249,7 @@ void LIRenAttachmentEntity::update_pose (LIMdlPose* pose)
 	}
 
 	/* Queue a skeleton update. */
-	skeleton->_notifyManualBonesDirty ();
+	ogre_skeleton->_notifyManualBonesDirty ();
 }
 
 void LIRenAttachmentEntity::update_settings ()
@@ -250,19 +258,6 @@ void LIRenAttachmentEntity::update_settings ()
 		return;
 
 	entity->setCastShadows (object->shadow_casting);
-}
-
-LIMdlModel* LIRenAttachmentEntity::get_model () const
-{
-	if (mesh.isNull ())
-		return NULL;
-
-	LIRenMeshBuilder* builder = (LIRenMeshBuilder*) lialg_strdic_find (
-		render->data->mesh_builders, mesh->getName ().c_str ());
-	if (builder == NULL)
-		return NULL;
-
-	return builder->get_model ();
 }
 
 /** @} */

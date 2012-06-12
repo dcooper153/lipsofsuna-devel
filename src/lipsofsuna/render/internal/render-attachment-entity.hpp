@@ -30,16 +30,16 @@ class LIRenAttachmentEntity : public LIRenAttachment
 public:
 	LIRenAttachmentEntity (LIRenObject* object, LIRenModel* model);
 	virtual ~LIRenAttachmentEntity ();
+	virtual LIMdlModel* get_model () const;
 	virtual bool has_model (LIRenModel* model);
 	virtual bool is_loaded () const;
 	virtual LIMdlNode* find_node (const char* name);
 	virtual void remove_model (LIRenModel* model);
 	virtual void update (float secs);
-	virtual void update_pose (LIMdlPose* pose);
+	virtual void update_pose (LIMdlPoseSkeleton* skeleton);
 	virtual void update_settings ();
 protected:
 	void clear ();
-	LIMdlModel* get_model () const;
 protected:
 	bool failed;
 	bool loading_mesh;

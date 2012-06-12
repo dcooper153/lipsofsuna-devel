@@ -20,6 +20,7 @@
 
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/math.h"
+#include "model-pose-skeleton.h"
 #include "model-types.h"
 
 typedef struct _LIMdlPoseBufferBone LIMdlPoseBufferBone;
@@ -32,12 +33,9 @@ struct _LIMdlPoseBufferBone
 typedef struct _LIMdlPoseGroup LIMdlPoseGroup;
 struct _LIMdlPoseGroup
 {
-	int enabled;
 	float scale_pose;
 	LIMatVector head_pose;
-	LIMatVector head_rest;
 	LIMatQuaternion rotation;
-	LIMdlNode* node;
 	LIMdlWeightGroup* weight_group;
 };
 
@@ -47,7 +45,6 @@ struct _LIMdlPoseBuffer
 	LIMdlModel* model;
 	struct { int count; LIMdlPoseBufferBone* array; } bones;
 	struct { int count; LIMdlPoseGroup* array; } groups;
-	struct { int count; LIMdlNode** array; } nodes;
 };
 
 LIAPICALL (LIMdlPoseBuffer*, limdl_pose_buffer_new, (
@@ -56,15 +53,11 @@ LIAPICALL (LIMdlPoseBuffer*, limdl_pose_buffer_new, (
 LIAPICALL (void, limdl_pose_buffer_free, (
 	LIMdlPoseBuffer* self));
 
-LIAPICALL (LIMdlNode*, limdl_pose_buffer_find_node, (
-	const LIMdlPoseBuffer* self,
-	const char*            name));
-
 LIAPICALL (void, limdl_pose_buffer_reset, (
 	LIMdlPoseBuffer* self));
 
 LIAPICALL (void, limdl_pose_buffer_update, (
-	LIMdlPoseBuffer* self,
-	LIMdlPose*       pose));
+	LIMdlPoseBuffer*   self,
+	LIMdlPoseSkeleton* skeleton));
 
 #endif

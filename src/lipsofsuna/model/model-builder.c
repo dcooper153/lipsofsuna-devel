@@ -491,7 +491,7 @@ int limdl_builder_insert_node (
 	self->model->nodes.array = tmp;
 	tmp += self->model->nodes.count;
 
-	*tmp = limdl_node_copy (node);
+	*tmp = limdl_node_copy (node, 1);
 	if (*tmp == NULL)
 		return 0;
 	self->model->nodes.count++;

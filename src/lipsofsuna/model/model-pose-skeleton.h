@@ -15,33 +15,37 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __RENDER_INTERNAL_ATTACHMENT_HPP__
-#define __RENDER_INTERNAL_ATTACHMENT_HPP__
+#ifndef __MODEL_POSE_SKELETON_H__
+#define __MODEL_POSE_SKELETON_H__
 
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/model.h"
-#include "render-types.h"
+#include "lipsofsuna/math.h"
+#include "model-types.h"
 
-class LIRenAttachment
+typedef struct _LIMdlPoseSkeleton LIMdlPoseSkeleton;
+struct _LIMdlPoseSkeleton
 {
-public:
-	LIRenAttachment (LIRenObject* object);
-	virtual ~LIRenAttachment ();
-	virtual LIMdlNode* find_node (const char* name);
-	virtual LIMdlModel* get_model () const;
-	virtual bool has_model (LIRenModel* model);
-	virtual bool is_loaded () const;
-	virtual void remove_model (LIRenModel* model);
-	virtual void update (float secs);
-	virtual void update_pose (LIMdlPoseSkeleton* skeleton);
-	virtual void update_settings ();
-public:
-	LIRenAttachment* get_replacer ();
-	void set_replacer (LIRenAttachment* replacer);
-protected:
-	LIRenObject* object;
-	LIRenRender* render;
-	LIRenAttachment* replacer;
+	struct { int count; LIMdlNode** array; } nodes;
 };
+
+LIAPICALL (LIMdlPoseSkeleton*, limdl_pose_skeleton_new, (
+	LIMdlModel** models,
+	int          count));
+
+LIAPICALL (void, limdl_pose_skeleton_free, (
+	LIMdlPoseSkeleton* self));
+
+LIAPICALL (LIMdlNode*, limdl_pose_skeleton_find_node, (
+	const LIMdlPoseSkeleton* self,
+	const char*              name));
+
+LIAPICALL (void, limdl_pose_skeleton_rebuild, (
+	LIMdlPoseSkeleton* self,
+	LIMdlModel**       models,
+	int                count));
+
+LIAPICALL (void, limdl_pose_skeleton_update, (
+	LIMdlPoseSkeleton* self,
+	LIMdlPose*         pose));
 
 #endif

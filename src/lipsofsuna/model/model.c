@@ -209,7 +209,7 @@ LIMdlModel* limdl_model_new_copy (
 		self->nodes.array = lisys_calloc (model->nodes.count, sizeof (LIMdlNode*));
 		self->nodes.count = model->nodes.count;
 		for (i = 0 ; i < model->nodes.count ; i++)
-			self->nodes.array[i] = limdl_node_copy (model->nodes.array[i]);
+			self->nodes.array[i] = limdl_node_copy (model->nodes.array[i], 1);
 	}
 #if 0
 	if (model->particle_systems.count)

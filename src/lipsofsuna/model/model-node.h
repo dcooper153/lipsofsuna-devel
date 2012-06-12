@@ -58,10 +58,15 @@ struct _LIMdlNode
 LIAPICALL (LIMdlNode*, limdl_node_new, ());
 
 LIAPICALL (LIMdlNode*, limdl_node_copy, (
-	const LIMdlNode* node));
+	const LIMdlNode* node,
+	int              recursive));
 
 LIAPICALL (void, limdl_node_free, (
 	LIMdlNode* self));
+
+LIAPICALL (int, limdl_node_add_child, (
+	LIMdlNode* self,
+	LIMdlNode* node));
 
 LIAPICALL (LIMdlNode*, limdl_node_find_node, (
 	const LIMdlNode* self,

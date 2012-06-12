@@ -43,6 +43,11 @@ LIMdlNode* LIRenAttachment::find_node (const char* name)
 	return NULL;
 }
 
+LIMdlModel* LIRenAttachment::get_model () const
+{
+	return NULL;
+}
+
 bool LIRenAttachment::has_model (LIRenModel* model)
 {
 	return false;
@@ -61,7 +66,7 @@ void LIRenAttachment::update (float secs)
 {
 }
 
-void LIRenAttachment::update_pose (LIMdlPose* pose)
+void LIRenAttachment::update_pose (LIMdlPoseSkeleton* skeleton)
 {
 }
 

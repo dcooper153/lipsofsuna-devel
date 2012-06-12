@@ -27,13 +27,6 @@
 #include "model-pose.h"
 #include "model-pose-buffer.h"
 
-static void private_transform_node (
-	LIMdlPoseBuffer* self,
-	LIMdlPose*       pose,
-	LIMdlNode*       node);
-
-/*****************************************************************************/
-
 LIMdlPoseBuffer* limdl_pose_buffer_new (
 	LIMdlModel* model)
 {
@@ -61,27 +54,6 @@ LIMdlPoseBuffer* limdl_pose_buffer_new (
 	self->bones.array[0].transform = limat_transform_identity ();
 	self->bones.array[0].scale = limat_vector_init (1.0f, 1.0f, 1.0f);
 
-	/* Copy nodes. */
-	if (model != NULL && model->nodes.count)
-	{
-		self->nodes.count = model->nodes.count;
-		self->nodes.array = lisys_calloc (self->nodes.count, sizeof (LIMdlNode*));
-		if (self->nodes.array == NULL)
-		{
-			limdl_pose_buffer_free (self);
-			return NULL;
-		}
-		for (i = 0 ; i < self->nodes.count ; i++)
-		{
-			self->nodes.array[i] = limdl_node_copy (model->nodes.array[i]);
-			if (self->nodes.array[i] == NULL)
-			{
-				limdl_pose_buffer_free (self);
-				return NULL;
-			}
-		}
-	}
-
 	/* Precalculate weight group information. */
 	if (model != NULL && model->weight_groups.count)
 	{
@@ -97,13 +69,7 @@ LIMdlPoseBuffer* limdl_pose_buffer_new (
 			weight_group = model->weight_groups.array + i;
 			pose_group = self->groups.array + i;
 			pose_group->weight_group = weight_group;
-			pose_group->node = limdl_pose_buffer_find_node (self, weight_group->bone);
 			pose_group->rotation = limat_quaternion_identity ();
-			if (pose_group->node != NULL)
-			{
-				pose_group->head_rest = pose_group->node->rest_transform.global.position;
-				pose_group->enabled = 1;
-			}
 		}
 	}
 
@@ -116,44 +82,9 @@ LIMdlPoseBuffer* limdl_pose_buffer_new (
 void limdl_pose_buffer_free (
 	LIMdlPoseBuffer* self)
 {
-	int i;
-
-	if (self->nodes.array != NULL)
-	{
-		for (i = 0 ; i < self->nodes.count ; i++)
-		{
-			if (self->nodes.array[i] != NULL)
-				limdl_node_free (self->nodes.array[i]);
-		}
-		lisys_free (self->nodes.array);
-	}
 	lisys_free (self->groups.array);
 	lisys_free (self->bones.array);
 	lisys_free (self);
-}
-
-/**
- * \brief Finds a node by name.
- * \param self Pose buffer.
- * \param name Name of the node to find.
- * \return Node or NULL.
- */
-LIMdlNode* limdl_pose_buffer_find_node (
-	const LIMdlPoseBuffer* self,
-	const char*            name)
-{
-	int i;
-	LIMdlNode* node;
-
-	for (i = 0 ; i < self->nodes.count ; i++)
-	{
-		node = self->nodes.array[i];
-		node = limdl_node_find_node (node, name);
-		if (node != NULL)
-			return node;
-	}
-
-	return NULL;
 }
 
 void limdl_pose_buffer_reset (
@@ -170,21 +101,26 @@ void limdl_pose_buffer_reset (
 		bone = self->bones.array + i + 1;
 		group = self->model->weight_groups.array + i;
 		if (group->node != NULL)
-		{
 			node = limdl_model_find_node (self->model, group->node->name);
-			if (node != NULL)
-			{
-				s = node->pose_transform.global_scale;
-				bone->scale = limat_vector_init(s, s, s);
-				bone->transform = node->pose_transform.global;
-			}
+		else
+			node = NULL;
+		if (node != NULL)
+		{
+			s = node->pose_transform.global_scale;
+			bone->scale = limat_vector_init(s, s, s);
+			bone->transform = node->pose_transform.global;
+		}
+		else
+		{
+			bone->scale = limat_vector_init(1.0f, 1.0f, 1.0f);
+			bone->transform = limat_transform_identity ();
 		}
 	}
 }
 
 void limdl_pose_buffer_update (
-	LIMdlPoseBuffer* self,
-	LIMdlPose*       pose)
+	LIMdlPoseBuffer*   self,
+	LIMdlPoseSkeleton* skeleton)
 {
 	int i;
 	float s;
@@ -193,30 +129,23 @@ void limdl_pose_buffer_update (
 	LIMdlNode* node;
 	LIMdlPoseBufferBone* bone;
 	LIMdlPoseGroup* group1;
-	LIMdlNode* node0;
 	LIMdlWeightGroup* group;
 
 	lisys_assert (self->bones.count == self->model->weight_groups.count + 1);
-
-	/* Transform each node. */
-	for (i = 0 ; i < self->nodes.count ; i++)
-	{
-		node0 = self->nodes.array[i];
-		private_transform_node (self, pose, node0);
-	}
 
 	/* Update node transformations. */
 	for (i = 0 ; i < self->groups.count ; i++)
 	{
 		group1 = self->groups.array + i;
-		if (group1->enabled)
+		node = limdl_pose_skeleton_find_node (skeleton, group1->weight_group->bone);
+		if (node != NULL)
 		{
-			quat0 = group1->node->rest_transform.global.rotation;
-			quat1 = group1->node->pose_transform.global.rotation;
+			quat0 = node->rest_transform.global.rotation;
+			quat1 = node->pose_transform.global.rotation;
 			quat0 = limat_quaternion_conjugate (quat0);
 			group1->rotation = limat_quaternion_multiply (quat1, quat0);
-			group1->head_pose = group1->node->pose_transform.global.position;
-			group1->scale_pose = group1->node->pose_transform.global_scale;
+			group1->head_pose = node->pose_transform.global.position;
+			group1->scale_pose = node->pose_transform.global_scale;
 		}
 		else
 		{
@@ -227,13 +156,13 @@ void limdl_pose_buffer_update (
 	}
 
 	/* Update the pose buffer. */
-	for (i = 0 ; i < self->model->weight_groups.count ; i++)
+	for (i = 0 ; i < self->bones.count - 1 ; i++)
 	{
 		bone = self->bones.array + i + 1;
 		group = self->model->weight_groups.array + i;
 		if (group->node != NULL)
 		{
-			node = limdl_pose_buffer_find_node (self, group->node->name);
+			node = limdl_pose_skeleton_find_node (skeleton, group->node->name);
 			if (node != NULL)
 			{
 				s = node->pose_transform.global_scale;
@@ -242,29 +171,6 @@ void limdl_pose_buffer_update (
 			}
 		}
 	}
-}
-
-/*****************************************************************************/
-
-static void private_transform_node (
-	LIMdlPoseBuffer* self,
-	LIMdlPose*       pose,
-	LIMdlNode*       node)
-{
-	int i;
-	float scale;
-	LIMatTransform transform;
-
-	/* Calculate the transformation. */
-	limdl_pose_calculate_node_tranformation (pose, node->name, &transform, &scale);
-
-	/* Update the node transformation. */
-	limdl_node_set_local_transform (node, scale, &transform);
-	limdl_node_rebuild_pose (node, 0);
-
-	/* Update the child transformations recursively. */
-	for (i = 0 ; i < node->nodes.count ; i++)
-		private_transform_node (self, pose, node->nodes.array[i]);
 }
 
 /** @} */

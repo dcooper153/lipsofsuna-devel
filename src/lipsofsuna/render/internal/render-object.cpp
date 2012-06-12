@@ -58,6 +58,9 @@ static void private_channel_fade (
 	int          channel,
 	float        time);
 
+static void private_rebuild_skeleton (
+	LIRenObject* self);
+
 static void private_remove_entity (
 	LIRenObject* self,
 	int          index);
@@ -86,9 +89,11 @@ LIRenObject* liren_object_new (
 	self->id = id;
 	self->visible = 0;
 	self->shadow_casting = 0;
+	self->skeleton_rebuild_needed = 0;
 	self->render_distance = -1.0f;
 	self->transform = limat_transform_identity ();
 	self->pose = NULL;
+	self->pose_skeleton = NULL;
 	self->render = render;
 	self->particles = NULL;
 	self->node = NULL;
@@ -133,6 +138,8 @@ void liren_object_free (
 		self->render->data->scene_root->removeAndDestroyChild (self->node->getName ());
 
 	/* Free the pose. */
+	if (self->pose_skeleton != NULL)
+		limdl_pose_skeleton_free (self->pose_skeleton);
 	if (self->pose != NULL)
 		limdl_pose_free (self->pose);
 	OGRE_DELETE self;
@@ -156,6 +163,7 @@ void liren_object_add_model (
 
 	/* Create the new entity. */
 	self->attachments.push_back (OGRE_NEW LIRenAttachmentEntity (self, model));
+	self->skeleton_rebuild_needed = 1;
 }
 
 int liren_object_channel_animate (
@@ -183,7 +191,14 @@ int liren_object_channel_animate (
 		repeat_start, keep, fade_in, fade_out, weight, weight_scale, time,
 		time_scale, node_names, node_weights, node_count);
 	if (pose1 != NULL)
+	{
 		self->pose = pose1;
+		if (self->pose_skeleton == NULL)
+		{
+			self->pose_skeleton = limdl_pose_skeleton_new (NULL, 0);
+			private_rebuild_skeleton (self);
+		}
+	}
 
 	return 1;
 }
@@ -233,6 +248,13 @@ void liren_object_clear_models (
 		self->render->data->scene_manager->destroyParticleSystem (self->particles);
 		self->particles = NULL;
 	}
+
+	/* Remove the skeleton. */
+	if (self->pose_skeleton != NULL)
+	{
+		limdl_pose_skeleton_free (self->pose_skeleton);
+		self->pose_skeleton = NULL;
+	}
 }
 
 int liren_object_find_node (
@@ -245,17 +267,22 @@ int liren_object_find_node (
 	LIMatTransform transform;
 	LIMdlNode* node = NULL;
 
-	/* Find the node. */
-	/* This uses the poses of the entities instead of the pose of the object
-	   since the latter never has a model assigned. */
-	for (size_t i = 0 ; i < self->attachments.size () ; i++)
-	{
-		node = self->attachments[i]->find_node (name);
-		if (node != NULL)
-			break;
-	}
+	/* Search from the skeleton. */
+	if (self->pose_skeleton != NULL)
+		node = limdl_pose_skeleton_find_node (self->pose_skeleton, name);
+
+	/* Search from attachments. */
 	if (node == NULL)
-		return 0;
+	{
+		for (size_t i = 0 ; i < self->attachments.size () ; i++)
+		{
+			node = self->attachments[i]->find_node (name);
+			if (node != NULL)
+				break;
+		}
+		if (node == NULL)
+			return 0;
+	}
 
 	/* Get the transformation. */
 	limdl_node_get_world_transform (node, &scale, &transform);
@@ -326,6 +353,7 @@ void liren_object_remove_model (
 		if (self->attachments[i]->has_model (model))
 		{
 			private_remove_entity (self, i);
+			self->skeleton_rebuild_needed = 1;
 			break;
 		}
 	}
@@ -348,6 +376,7 @@ void liren_object_update (
 			LIRenAttachment* repl = self->attachments[i]->get_replacer ();
 			if (repl != NULL && repl->is_loaded ())
 			{
+				self->skeleton_rebuild_needed = 1;
 				private_remove_entity (self, i);
 				found = true;
 				break;
@@ -377,11 +406,14 @@ void liren_object_update (
 		self->attachments[i]->update (secs);
 
 	/* Update attachment poses. */
-	if (self->pose != NULL)
+	if (self->pose_skeleton != NULL)
 	{
 		limdl_pose_update (self->pose, secs);
+		if (self->skeleton_rebuild_needed)
+			private_rebuild_skeleton (self);
+		limdl_pose_skeleton_update (self->pose_skeleton, self->pose);
 		for (size_t i = 0 ; i < self->attachments.size () ; i++)
-			self->attachments[i]->update_pose (self->pose);
+			self->attachments[i]->update_pose (self->pose_skeleton);
 	}
 }
 
@@ -476,13 +508,6 @@ int liren_object_set_particle (
 {
 	/* Remove the existing model or particle system. */
 	liren_object_clear_models (self);
-
-	/* Remove the pose. */
-	if (self->pose != NULL)
-	{
-		limdl_pose_free (self->pose);
-		self->pose = NULL;
-	}
 
 	try
 	{
@@ -681,6 +706,49 @@ static void private_channel_fade (
 {
 	if (pose != NULL)
 		limdl_pose_fade_channel (pose, channel, time);
+}
+
+static void private_rebuild_skeleton (
+	LIRenObject* self)
+{
+	int count;
+	LIMdlModel** models;
+
+	/* Check if a skeleton exists. */
+	self->skeleton_rebuild_needed = 0;
+	if (self->pose_skeleton == NULL)
+		return;
+
+	/* Check for attachments. */
+	if (!self->attachments.size ())
+	{
+		limdl_pose_skeleton_rebuild (self->pose_skeleton, NULL, 0);
+		return;
+	}
+
+	/* Allocate space for models. */
+	count = 0;
+	models = (LIMdlModel**) lisys_calloc (self->attachments.size (), sizeof (LIMdlModel*));
+	if (models == NULL)
+		return;
+
+	/* Add each model to the list. */
+	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+	{
+		if (self->attachments[i]->get_replacer () == NULL)
+		{
+			LIMdlModel* m = self->attachments[i]->get_model ();
+			if (m != NULL)
+			{
+				models[count] = m;
+				count++;
+			}
+		}
+	}
+
+	/* Rebuild the skeleton. */
+	limdl_pose_skeleton_rebuild (self->pose_skeleton, models, count);
+	lisys_free (models);
 }
 
 static void private_remove_entity (
