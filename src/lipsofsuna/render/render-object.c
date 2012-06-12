@@ -63,6 +63,30 @@ void liren_render_object_free (
 		liren_object_free (object);
 }
 
+/**
+ * \brief Adds a model to the object.
+ * \param self Object.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \param model Model ID.
+ */
+void liren_render_object_add_model (
+	LIRenRender* self,
+	int          id,
+	int          model)
+{
+	LIRenObject* object;
+	LIRenModel* model_;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+	{
+		model_ = lialg_u32dic_find (self->models, model);
+		if (model_ != NULL)
+			liren_object_add_model (object, model_);
+	}
+}
+
 void liren_render_object_channel_animate (
 	LIRenRender*    self,
 	int             id,
@@ -157,6 +181,63 @@ void liren_render_object_particle_animation (
 	object = lialg_u32dic_find (self->objects, id);
 	if (object != NULL)
 		liren_object_particle_animation (object, start, loop);
+}
+
+/**
+ * \brief Replaces a model with another.
+ *
+ * This function performs a delayed removal for the old model. The new
+ * model is loaded in the background and shown after loading. At the same
+ * time of showing the new model, the old model is removed.
+ *
+ * \param self Object.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \param model_old Model ID to remove.
+ * \param model_new Model ID to add.
+ */
+void liren_render_object_replace_model (
+	LIRenRender* self,
+	int          id,
+	int          model_old,
+	int          model_new)
+{
+	LIRenObject* object;
+	LIRenModel* model_old_;
+	LIRenModel* model_new_;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+	{
+		model_old_ = lialg_u32dic_find (self->models, model_old);
+		model_new_ = lialg_u32dic_find (self->models, model_new);
+		if (model_new_ != NULL)
+			liren_object_replace_model (object, model_old_, model_new_);
+	}
+}
+
+/**
+ * \brief Removes a model from the object.
+ * \param self Object.
+ * \param self Renderer.
+ * \param id Object ID.
+ * \param model Model ID.
+ */
+void liren_render_object_remove_model (
+	LIRenRender* self,
+	int          id,
+	int          model)
+{
+	LIRenObject* object;
+	LIRenModel* model_;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object != NULL)
+	{
+		model_ = lialg_u32dic_find (self->models, model);
+		if (model_ != NULL)
+			liren_object_remove_model (object, model_);
+	}
 }
 
 /**

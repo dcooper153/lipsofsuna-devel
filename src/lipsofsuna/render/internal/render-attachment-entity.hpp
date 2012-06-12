@@ -40,14 +40,16 @@ public:
 	virtual void update_settings ();
 protected:
 	void clear ();
+	bool create_skeleton ();
 protected:
 	bool failed;
 	bool loading_mesh;
 	bool loading_deps;
 	LIMdlPoseBuffer* pose_buffer;
 	LIRenModel* model;
-	Ogre::MeshPtr mesh;
 	Ogre::Entity* entity;
+	Ogre::MeshPtr mesh;
+	Ogre::SkeletonPtr skeleton;
 	std::vector<Ogre::ResourcePtr> resources;
 };
 

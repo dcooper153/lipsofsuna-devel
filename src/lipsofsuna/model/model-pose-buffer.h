@@ -30,21 +30,11 @@ struct _LIMdlPoseBufferBone
 	LIMatVector scale;
 };
 
-typedef struct _LIMdlPoseGroup LIMdlPoseGroup;
-struct _LIMdlPoseGroup
-{
-	float scale_pose;
-	LIMatVector head_pose;
-	LIMatQuaternion rotation;
-	LIMdlWeightGroup* weight_group;
-};
-
 typedef struct _LIMdlPoseBuffer LIMdlPoseBuffer;
 struct _LIMdlPoseBuffer
 {
 	LIMdlModel* model;
 	struct { int count; LIMdlPoseBufferBone* array; } bones;
-	struct { int count; LIMdlPoseGroup* array; } groups;
 };
 
 LIAPICALL (LIMdlPoseBuffer*, limdl_pose_buffer_new, (

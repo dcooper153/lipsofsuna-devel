@@ -405,16 +405,17 @@ int limdl_node_get_child_total (
 	const LIMdlNode* self)
 {
 	int i;
+	int n;
 	const LIMdlNode* node;
 
-	i = self->nodes.count;
+	n = self->nodes.count;
 	for (i = 0 ; i < self->nodes.count ; i++)
 	{
 		node = self->nodes.array[i];
-		i += limdl_node_get_child_total (node);
+		n += limdl_node_get_child_total (node);
 	}
 
-	return i;
+	return n;
 }
 
 /**

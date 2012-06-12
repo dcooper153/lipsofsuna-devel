@@ -1,5 +1,6 @@
 require "client/firstpersoncamera"
 require "client/thirdpersoncamera"
+require "client/model-builder"
 require "editor/editor"
 require "common/skills"
 require "common/unlocks"

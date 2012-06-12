@@ -25,7 +25,6 @@ struct _LIMdlWeightGroup
 {
 	char* name;
 	char* bone;
-	LIMdlNode* node;
 };
 
 LIAPICALL (int, limdl_weight_group_init_copy, (

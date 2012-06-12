@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -24,6 +24,24 @@
 
 #include "lipsofsuna/object.h"
 #include "ext-module.h"
+
+static void Object_add_model (LIScrArgs* args)
+{
+	LIEngModel* model;
+	LIExtModule* module;
+	LIObjObject* object;
+	LIScrData* value;
+
+	/* Get the object. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
+	object = args->self;
+
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &value))
+	{
+		model = liscr_data_get_data (value);
+		liren_render_object_add_model (module->render, object->id, model->id);
+	}
+}
 
 static void Object_animate (LIScrArgs* args)
 {
@@ -120,11 +138,6 @@ static void Object_animate_fade (LIScrArgs* args)
 	liren_render_object_channel_fade (module->render, object->id, channel, time);
 }
 
-static void Object_deform_mesh (LIScrArgs* args)
-{
-	/* FIXME: remove */
-}
-
 static void Object_find_node (LIScrArgs* args)
 {
 	const char* name;
@@ -204,7 +217,7 @@ static void Object_particle_animation (LIScrArgs* args)
 	LIExtModule* module;
 	LIObjObject* object;
 
-	/* Get render object. */
+	/* Get the render object. */
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
 	object = args->self;
 
@@ -214,6 +227,46 @@ static void Object_particle_animation (LIScrArgs* args)
 
 	/* Deform the mesh. */
 	liren_render_object_particle_animation (module->render, object->id, start, loop);
+}
+
+static void Object_remove_model (LIScrArgs* args)
+{
+	LIEngModel* model;
+	LIExtModule* module;
+	LIObjObject* object;
+	LIScrData* value;
+
+	/* Get the object. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
+	object = args->self;
+
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &value))
+	{
+		model = liscr_data_get_data (value);
+		liren_render_object_remove_model (module->render, object->id, model->id);
+	}
+}
+
+static void Object_replace_model (LIScrArgs* args)
+{
+	LIEngModel* model;
+	LIEngModel* model1;
+	LIExtModule* module;
+	LIObjObject* object;
+	LIScrData* value;
+	LIScrData* value1;
+
+	/* Get the object. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
+	object = args->self;
+
+	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &value) &&
+	    liscr_args_geti_data (args, 1, LISCR_SCRIPT_MODEL, &value1))
+	{
+		model = liscr_data_get_data (value);
+		model1 = liscr_data_get_data (value1);
+		liren_render_object_replace_model (module->render, object->id, model->id, model1->id);
+	}
 }
 
 static void Object_set_effect (LIScrArgs* args)
@@ -311,12 +364,14 @@ static void Object_set_shadow_casting (LIScrArgs* args)
 void liext_script_render_object (
 	LIScrScript* self)
 {
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_add_model", Object_add_model);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_animate", Object_animate);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_animate_fade", Object_animate_fade);
-	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_deform_mesh", Object_deform_mesh);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_find_node", Object_find_node);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_animation", Object_get_animation);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_particle_animation", Object_particle_animation);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_remove_model", Object_remove_model);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_replace_model", Object_replace_model);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_particle", Object_set_particle);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_particle_emitting", Object_set_particle_emitting);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_effect", Object_set_effect);

@@ -215,7 +215,7 @@ Actor.update_model = function(self)
 	end
 	-- Build the character model in a separate thread.
 	-- The result is handled in the tick handler in event.lua.
-	Client.threads.model_builder:push_message(tostring(self.id), serialize{
+	local m = ModelBuilder:build(self, {
 		actor = self.spec.name,
 		beheaded = Bitwise:bchk(self.flags or 0, Protocol.object_flags.BEHEADED),
 		body_scale = self.body_scale,
@@ -229,7 +229,8 @@ Actor.update_model = function(self)
 		head_style = self.head_style,
 		nudity = Client.options.nudity_enabled,
 		skin_color = self.skin_color,
-		skin_style = self.skin_style})
+		skin_style = self.skin_style,
+		spec = self.spec})
 end
 
 --- Updates the rotation and tilt of the object.

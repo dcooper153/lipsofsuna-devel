@@ -37,6 +37,7 @@ public:
 	void step_1_bg (Ogre::Mesh* mesh);
 	void step_2_fg (Ogre::Mesh* mesh);
 	void step_3_fg (Ogre::Mesh* mesh);
+	void step_4_fg (Ogre::Mesh* mesh);
 private:
 	Ogre::MaterialPtr create_material (LIMdlMaterial* mat);
 	bool create_skeleton (Ogre::Mesh* mesh);

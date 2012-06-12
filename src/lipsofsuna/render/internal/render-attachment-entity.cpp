@@ -29,6 +29,7 @@
 #include "render-attachment-entity.hpp"
 #include <OgreSubMesh.h>
 #include <OgreResourceBackgroundQueue.h>
+#include <OgreSkeletonManager.h>
 
 #define LIREN_BACKGROUND_LOADING 1
 
@@ -181,22 +182,13 @@ void LIRenAttachmentEntity::update (float secs)
 	entity = render->data->scene_manager->createEntity (e_name, mesh->getName (), LIREN_RESOURCES_TEMPORARY);
 	object->node->attachObject (entity);
 
-	/* Mark all bones as manually controlled. */
-	Ogre::SkeletonInstance* skeleton = entity->getSkeleton ();
-	if (skeleton != NULL)
-	{
-		for (int i = 0 ; i < skeleton->getNumBones () ; i++)
-		{
-			Ogre::Bone* bone = skeleton->getBone (i);
-			bone->setManuallyControlled (true);
-		}
-	}
-
-	/* Create the pose buffer. */
-	if (skeleton != NULL)
+	/* Create the skeleton and its pose buffer. */
+	if (create_skeleton ())
 	{
 		lisys_assert (pose_buffer == NULL);
 		pose_buffer = limdl_pose_buffer_new (get_model ());
+		lisys_assert (pose_buffer != NULL);
+		lisys_assert (pose_buffer->bones.count == entity->getSkeleton ()->getNumBones ());
 	}
 
 	/* Set the entity flags. */
@@ -235,6 +227,7 @@ void LIRenAttachmentEntity::update_pose (LIMdlPoseSkeleton* skeleton)
 	/* If the model doesn't have one, we don't need to do anything. */
 	Ogre::SkeletonInstance* ogre_skeleton = entity->getSkeleton ();
 	lisys_assert (ogre_skeleton != NULL);
+	lisys_assert (pose_buffer->bones.count == ogre_skeleton->getNumBones ());
 
 	/* Update bones. */
 	for (int i = 0 ; i < pose_buffer->bones.count ; i++)
@@ -258,6 +251,41 @@ void LIRenAttachmentEntity::update_settings ()
 		return;
 
 	entity->setCastShadows (object->shadow_casting);
+}
+
+bool LIRenAttachmentEntity::create_skeleton ()
+{
+	Ogre::SkeletonInstance* skeleton = entity->getSkeleton ();
+	if (skeleton == NULL)
+		return false;
+
+	/* Set the initial bone transformations. */
+	/* The mesh may not have set these correctly if it depended on bones
+	   in external skeletons. Because of external bones, we need to set
+	   the transformations using the pose skeleton of the object. */
+	if (object->pose_skeleton != NULL)
+	{
+		LIMdlModel* model = get_model ();
+		for (int i = 0 ; i < model->weight_groups.count ; i++)
+		{
+			Ogre::Bone* bone = skeleton->getBone (i + 1);
+			LIMdlWeightGroup* group = model->weight_groups.array + i;
+			LIMdlNode* node = limdl_pose_skeleton_find_node (object->pose_skeleton, group->bone);
+			if (node != NULL)
+			{
+				LIMatTransform t = node->rest_transform.global;
+				bone->setPosition (t.position.x, t.position.y, t.position.z);
+				bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
+				bone->setManuallyControlled (true);
+				bone->setInitialState ();
+			}
+		}
+	}
+
+	/* Set the binding pose. */
+	skeleton->setBindingPose ();
+
+	return true;
 }
 
 /** @} */

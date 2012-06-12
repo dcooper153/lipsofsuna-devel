@@ -84,6 +84,15 @@ LIAPICALL (void, liren_object_model_changed, (
 	LIRenObject* self,
 	LIRenModel*  model));
 
+LIAPICALL (void, liren_object_remove_model, (
+	LIRenObject* self,
+	LIRenModel*  model));
+
+LIAPICALL (void, liren_object_replace_model, (
+	LIRenObject* self,
+	LIRenModel*  model_old,
+	LIRenModel*  model_new));
+
 LIAPICALL (void, liren_object_update, (
 	LIRenObject* self,
 	float        secs));

@@ -85,6 +85,11 @@ void LIRenMeshBuilder::loadResource (Ogre::Resource* resource)
 		step_3_fg ((Ogre::Mesh*) resource);
 		step = 3;
 	}
+	if (step < 4)
+	{
+		step_4_fg ((Ogre::Mesh*) resource);
+		step = 4;
+	}
 	step = 0;
 	delete[] buffer_data_0;
 	delete[] buffer_data_1;
@@ -265,8 +270,7 @@ void LIRenMeshBuilder::step_2_fg (Ogre::Mesh* mesh)
 /**
  * \brief Creates the mesh.
  *
- * This is called from the main thread. It creates the vertex buffers and
- * initializes the skeleton.
+ * This is called from the main thread. It creates the vertex buffers.
  *
  * \param mesh Ogre mesh to finish.
  */
@@ -312,17 +316,29 @@ void LIRenMeshBuilder::step_3_fg (Ogre::Mesh* mesh)
 		Ogre::SubMesh* submesh = mesh->getSubMesh (i);
 		submesh->indexData->indexBuffer = index_buffer;
 	}
+}
 
+/**
+ * \brief Creates the skeleton.
+ *
+ * This is called from the main thread. It initializes the skeleton
+ * when needed.
+ *
+ * \param mesh Ogre mesh to finish.
+ */
+void LIRenMeshBuilder::step_4_fg (Ogre::Mesh* mesh)
+{
 	/* Create a skeleton if needed. */
-	if (model->weight_groups.count)
+	if (!model->vertices.count || !model->lod.count || !model->weight_groups.count)
+		return;
+	bool ok = create_skeleton (mesh);
+
+	/* If creating the skeleton failed due to too many bones, disable
+	   the mesh completely to avoid exploding vertices. */
+	if (!ok)
 	{
-		if (!create_skeleton (mesh))
-		{
-			/* If creating the skeleton failed due to too many bones, disable
-			   the mesh completely to avoid exploding vertices. */
-			for (int i = mesh->getNumSubMeshes () - 1 ; i >= 0 ; i--)
-				mesh->destroySubMesh (i);
-		}
+		for (int i = mesh->getNumSubMeshes () - 1 ; i >= 0 ; i--)
+			mesh->destroySubMesh (i);
 	}
 }
 
@@ -411,6 +427,7 @@ Ogre::MaterialPtr LIRenMeshBuilder::create_material (
 bool LIRenMeshBuilder::create_skeleton (Ogre::Mesh* mesh)
 {
 	Ogre::Bone* bone;
+	LIMdlNode* node;
 	LIMdlWeightGroup* group;
 
 	/* Make sure that there aren't too many bones. */
@@ -435,12 +452,14 @@ bool LIRenMeshBuilder::create_skeleton (Ogre::Mesh* mesh)
 	/* Create weight group bones. */
 	/* We disregard the hierarchy and just create a bone for each weight group.
 	   This ensures that the minimal number of bones is uploaded to the GPU. */
-	for (int i = 0 ; i < model->weight_groups.count ; i++)
+	int i;
+	for (i = 0 ; i < model->weight_groups.count ; i++)
 	{
 		group = model->weight_groups.array + i;
-		if (group->node != NULL)
+		node = limdl_model_find_node (model, group->bone);
+		if (node != NULL)
 		{
-			LIMatTransform t = group->node->rest_transform.global;
+			LIMatTransform t = node->rest_transform.global;
 			bone = skeleton->createBone (i + 1);
 			bone->setPosition (t.position.x, t.position.y, t.position.z);
 			bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);

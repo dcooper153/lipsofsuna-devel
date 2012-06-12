@@ -235,7 +235,7 @@ void liren_object_clear_models (
 	self->attachments.clear ();
 
 	/* Remove the skeleton. */
-	if (self->pose_skeleton != NULL)
+	if (self->pose == NULL && self->pose_skeleton != NULL)
 	{
 		limdl_pose_skeleton_free (self->pose_skeleton);
 		self->pose_skeleton = NULL;
@@ -339,6 +339,38 @@ void liren_object_remove_model (
 			break;
 		}
 	}
+}
+
+/**
+ * \brief Replace a model with another.
+ *
+ * This performs a delayed replacement in such a way that the old model
+ * won't be removed until the new model has been background loaded.
+ *
+ * \param self Object.
+ * \param model_old Model to be removed.
+ * \param model_new Model to be added.
+ */
+void liren_object_replace_model (
+	LIRenObject* self,
+	LIRenModel*  model_old,
+	LIRenModel*  model_new)
+{
+	/* Try to replace. */
+	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+	{
+		if (self->attachments[i]->has_model (model_old))
+		{
+			LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (self, model_new);
+			self->attachments[i]->set_replacer (attachment);
+			self->attachments.insert (self->attachments.begin () + i, attachment);
+			self->skeleton_rebuild_needed = 1;
+			return;
+		}
+	}
+
+	/* Just add if there was nothing to replace. */
+	liren_object_add_model (self, model_new);
 }
 
 void liren_object_update (
@@ -708,7 +740,7 @@ static void private_rebuild_skeleton (
 		if (self->attachments[i]->get_replacer () == NULL)
 		{
 			LIMdlModel* m = self->attachments[i]->get_model ();
-			if (m != NULL)
+			if (m != NULL && m->nodes.count)
 			{
 				models[count] = m;
 				count++;

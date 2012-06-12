@@ -6,6 +6,14 @@ end
 
 ------------------------------------------------------------------------------
 
+--- Adds a model to the object.
+-- @param self Object.
+-- @param model Model.
+Object.add_model = function(self, model)
+	if not model then return end
+	Los.object_add_model(self.handle, model.handle)
+end
+
 --- Sets or clears an animation.
 -- @param self Object.
 -- @param args Arguments.<ul>
@@ -70,6 +78,24 @@ end
 --   <li>time: Animation offset in seconds.</li></ul>
 Object.particle_animation = function(self, args)
 	return Los.object_particle_animation(self.handle, args)
+end
+
+--- Removes a model from the object.
+-- @param self Object.
+-- @param model Model.
+Object.remove_model = function(self, model)
+	if not model then return end
+	Los.object_remove_model(self.handle, model.handle)
+end
+
+--- Removes a model from the object.
+-- @param self Object.
+-- @param model_old Model.
+-- @param model_new Model.
+Object.replace_model = function(self, model_old, model_new)
+	Los.object_replace_model(self.handle,
+		model_old and model_old.handle or nil,
+		model_new and model_new.handle or nil)
 end
 
 --- Set or clears the additional effect layer of the object.

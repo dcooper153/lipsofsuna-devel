@@ -159,12 +159,12 @@ static int private_copy_node (
 		/* Store the copy. */
 		if (parent != NULL)
 		{
-			copy->parent = parent;
 			if (!limdl_node_add_child (parent, copy))
 			{
 				limdl_node_free (copy);
 				return 0;
 			}
+			copy->parent = parent;
 		}
 		else
 		{

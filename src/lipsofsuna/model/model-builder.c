@@ -576,9 +576,6 @@ int limdl_builder_insert_weightgroup (
 	}
 	self->model->weight_groups.count++;
 
-	/* Map node. */
-	tmp->node = limdl_model_find_node (self->model, tmp->bone);
-
 	return 1;
 }
 
