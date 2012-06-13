@@ -28,6 +28,9 @@
 #include "render.h"
 #include "render-attachment-entity.hpp"
 #include <OgreSubMesh.h>
+#include <OgreResourceBackgroundQueue.h>
+
+#define LIREN_BACKGROUND_LOADING 1
 
 LIRenAttachmentEntity::LIRenAttachmentEntity (LIRenObject* object, LIRenModel* model) :
 	LIRenAttachment (object)
