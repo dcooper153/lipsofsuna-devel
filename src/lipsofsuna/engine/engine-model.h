@@ -35,7 +35,8 @@ LIAPICALL (LIEngModel*, lieng_model_new, (
 	LIEngEngine* engine));
 
 LIAPICALL (LIEngModel*, lieng_model_new_copy, (
-	LIEngModel* model));
+	LIEngModel* model,
+	int         shape_keys));
 
 LIAPICALL (LIEngModel*, lieng_model_new_model, (
 	LIEngEngine* engine,

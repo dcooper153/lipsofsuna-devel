@@ -52,13 +52,14 @@ LIEngModel* lieng_model_new (
 }
 
 LIEngModel* lieng_model_new_copy (
-	LIEngModel* model)
+	LIEngModel* model,
+	int         shape_keys)
 {
 	LIEngModel* self;
 	LIMdlModel* model_;
 
 	/* Copy the model. */
-	model_ = limdl_model_new_copy (model->model);
+	model_ = limdl_model_new_copy (model->model, shape_keys);
 	if (model_ == NULL)
 		return NULL;
 

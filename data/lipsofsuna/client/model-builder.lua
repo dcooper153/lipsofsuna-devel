@@ -1,6 +1,10 @@
 ModelBuilder = Class()
 ModelBuilder.class_name = "ModelBuilder"
 
+--- Builds the mesh for the given object.
+-- @param clss ModelBuilder class.
+-- @param object Object whose model to build and set.
+-- @param args Model building arguments.
 ModelBuilder.build = function(clss, object, args)
 	-- Get the base meshes.
 	local meshes = {skeleton = args.spec.model}
@@ -49,6 +53,10 @@ ModelBuilder.build = function(clss, object, args)
 		end
 	end
 	-- Create the models.
+	--
+	-- Due to body morphing and skin customization, each submodel
+	-- generally needs to be copied and modified before it can be
+	-- added to the object.
 	local models = {}
 	for k,v in pairs(meshes) do
 		if k == "skeleton" then
@@ -57,76 +65,101 @@ ModelBuilder.build = function(clss, object, args)
 			models[k] = clss:build_submesh(k, v, args)
 		end
 	end
-	-- Remove unused models.
-	if object.used_models then
-		for k,v in pairs(object.used_models) do
-			if not models[k] then
-				object:remove_model(v)
-				object.used_models[k] = nil
-			end
-		end
-	else
+	-- Set the skeleton.
+	--
+	-- This needs to be set separately at the start so that the object
+	-- will get the right collision shape. Changing the skeleton will
+	-- make the object disappear until built so we only do it if the
+	-- skeleton is different.
+	local s1 = object.used_models and object.used_models["skeleton"]
+	local s2 = models["skeleton"]
+	if not s1 or not s2 or s1.file ~= s2.file then
 		object.used_models = {}
-		object:set_model(nil)
+		object.model = s2
+	end
+	-- Remove unused models.
+	for k,v in pairs(object.used_models) do
+		if not models[k] then
+			if Object.remove_model then
+				object:remove_model(v)
+			end
+			object.used_models[k] = nil
+		end
 	end
 	-- Add new models.
 	for k,v in pairs(models) do
-		v:changed()
-		local old = object.used_models[k]
-		if old then
-			object:replace_model(old, v)
-		else
-			object:add_model(v)
+		if k ~= "skeleton" then
+			v:changed()
+			local old = object.used_models[k]
+			if old then
+				if Object.replace_model then
+					object:replace_model(old, v)
+				end
+			else
+				if Object.add_model then
+					object:add_model(v)
+				end
+			end
+			object.used_models[k] = v
 		end
-		object.used_models[k] = v
 	end
-	return m
 end
 
+--- Builds a submesh.
+-- @param clss ModelBuilder class.
+-- @param name Submesh name.
+-- @param file Filename of the model.
+-- @param args Model building arguments.
 ModelBuilder.build_submesh = function(clss, name, file, args)
 	local tmp
 	local ref = Model:find_or_load{file = file}
 	-- Face customization.
+	local morph = {}
+	local add = function(name, value)
+		if not value then return end
+		table.insert(morph, name)
+		table.insert(morph, value)
+	end
 	if args.face_style and (string.match(name, ".*head.*") or string.match(name, ".*eye.*")) then
-		tmp = ref:copy()
-		if args.face_style[1] then tmp:morph("cheekbone small", args.face_style[1], ref) end
-		if args.face_style[2] then tmp:morph("cheek small", args.face_style[2], ref) end
-		if args.face_style[3] then tmp:morph("chin sharp", args.face_style[3], ref) end
-		if args.face_style[4] then tmp:morph("chin small", args.face_style[4], ref) end
-		if args.face_style[5] then tmp:morph("eye inner", args.face_style[5], ref) end
-		if args.face_style[6] then tmp:morph("eye near", args.face_style[6], ref) end
-		if args.face_style[7] then tmp:morph("eye outer", args.face_style[7], ref) end
-		if args.face_style[8] then tmp:morph("eye small", args.face_style[8], ref) end
-		if args.face_style[9] then tmp:morph("face wrinkle", args.face_style[9], ref) end
-		if args.face_style[10] then tmp:morph("jaw straight", args.face_style[10], ref) end
-		if args.face_style[11] then tmp:morph("jaw wide", args.face_style[11], ref) end
-		if args.face_style[12] then tmp:morph("lips protrude", args.face_style[12], ref) end
-		if args.face_style[13] then tmp:morph("mouth wide", args.face_style[13], ref) end
-		if args.face_style[14] then tmp:morph("nose dull", args.face_style[14], ref) end
-		if args.face_style[15] then tmp:morph("nose up", args.face_style[15], ref) end
+		add("cheekbone small", args.face_style[1])
+		add("cheek small", args.face_style[2])
+		add("chin sharp", args.face_style[3])
+		add("chin small", args.face_style[4])
+		add("eye inner", args.face_style[5])
+		add("eye near", args.face_style[6])
+		add("eye outer", args.face_style[7])
+		add("eye small", args.face_style[8])
+		add("face wrinkle", args.face_style[9])
+		add("jaw straight", args.face_style[10])
+		add("jaw wide", args.face_style[11])
+		add("lips protrude", args.face_style[12])
+		add("mouth wide", args.face_style[13])
+		add("nose dull", args.face_style[14])
+		add("nose up", args.face_style[15])
 	end
 	-- Body customization.
 	if args.body_style then
-		if not tmp then tmp = ref:copy() end
-		if args.body_style[1] then tmp:morph("arms muscular", args.body_style[1], ref) end
-		if args.body_style[2] then tmp:morph("body thin", args.body_style[2], ref) end
+		add("arms muscular", args.body_style[1])
+		add("body thin", args.body_style[2])
 		if args.body_style[3] then
 			if args.body_style[3] < 0.5 then
-				tmp:morph("breast small", 1 - 2 * args.body_style[3], ref)
+				add("breast small", 1 - 2 * args.body_style[3])
 			elseif args.body_style[3] > 0.5 then
-				tmp:morph("breast big", 2 * args.body_style[3] - 1, ref)
+				add("breast big", 2 * args.body_style[3] - 1)
 			end
 		end
-		if args.body_style[4] then tmp:morph("hips wide", args.body_style[4], ref) end
-		if args.body_style[5] then tmp:morph("legs muscular", args.body_style[5], ref) end
-		if args.body_style[6] then tmp:morph("torso wide", args.body_style[6], ref) end
-		if args.body_style[7] then tmp:morph("waist fat", args.body_style[7], ref) end
-		if args.body_style[8] then tmp:morph("waist wide", args.body_style[8], ref) end
-		if args.body_style[9] then tmp:morph("shoulder thin", 1 - args.body_style[9], ref) end
+		add("hips wide", args.body_style[4])
+		add("legs muscular", args.body_style[5])
+		add("torso wide", args.body_style[6])
+		add("waist fat", args.body_style[7])
+		add("waist wide", args.body_style[8])
+		if args.body_style[9] then
+			add("shoulder thin", 1 - args.body_style[9])
+		end
 	end
 	-- Colorize materials.
 	-- TODO: Copying the model could perhaps be avoided in some cases.
-	tmp = tmp or ref:copy()
+	tmp = ref:morph_copy(morph)
 	local skin = args.skin_style and Actorskinspec:find{name = args.skin_style}
 	tmp:edit_material{match_material = "animeye1", diffuse = args.eye_color}
 	tmp:edit_material{match_material = "animhair1", diffuse = args.hair_color}

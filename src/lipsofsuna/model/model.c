@@ -166,7 +166,8 @@ LIMdlModel* limdl_model_new ()
 }
 
 LIMdlModel* limdl_model_new_copy (
-	const LIMdlModel* model)
+	const LIMdlModel* model,
+	int               shape_keys)
 {
 	int i;
 	LIMdlModel* self;
@@ -226,7 +227,7 @@ LIMdlModel* limdl_model_new_copy (
 		for (i = 0 ; i < model->shapes.count ; i++)
 			limdl_shape_init_copy (self->shapes.array + i, model->shapes.array + i);
 	}
-	if (model->shape_keys.count)
+	if (shape_keys && model->shape_keys.count)
 	{
 		self->shape_keys.array = lisys_calloc (model->shape_keys.count, sizeof (LIMdlShapeKey));
 		self->shape_keys.count = model->shape_keys.count;
@@ -751,14 +752,16 @@ int limdl_model_merge (
 /**
  * \brief Morphs the vertices of the model and one of its shape keys.
  * \param self Model.
- * \param ref Reference model for relative morphing.
+ * \param key_model Model containing the shape keys.
+ * \param ref_model Reference model for relative morphing.
  * \param shape Shape key name.
  * \param value Shape key influence.
  * \return Nonzero on success.
  */
 int limdl_model_morph (
 	LIMdlModel* self,
-	LIMdlModel* ref,
+	LIMdlModel* key_model,
+	LIMdlModel* ref_model,
 	const char* shape,
 	float       value)
 {
@@ -770,17 +773,20 @@ int limdl_model_morph (
 	LIMdlVertex* r;
 	LIMdlVertex* v;
 
-	key = limdl_model_find_shape_key (self, shape);
+	lisys_assert (self->vertices.count == key_model->vertices.count);
+
+	/* Find the shape key. */
+	key = limdl_model_find_shape_key (key_model, shape);
 	if (key == NULL)
 		return 0;
 
-	if (ref != NULL && ref->vertices.count == self->vertices.count)
+	if (ref_model != NULL && ref_model->vertices.count == self->vertices.count)
 	{
 		/* Relative morphing. */
 		for (i = 0 ; i < key->vertices.count && i < self->vertices.count ; i++)
 		{
 			k = key->vertices.array + i;
-			r = ref->vertices.array + i;
+			r = ref_model->vertices.array + i;
 			v = self->vertices.array + i;
 			v->coord = limat_vector_add (v->coord, limat_vector_multiply (
 				limat_vector_subtract (k->coord, r->coord), value));

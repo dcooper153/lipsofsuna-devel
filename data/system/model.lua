@@ -38,11 +38,15 @@ end
 
 --- Creates a copy of the model.
 -- @param self Model.
+-- @param shape_keys False to not copy shape keys.
 -- @return New model.
-Model.copy = function(self)
+Model.copy = function(self, shape_keys)
 	local copy = Class.new(Model)
-	copy.handle = Los.model_copy(self.handle)
+	copy.handle = Los.model_copy(self.handle, shape_keys)
 	__userdata_lookup[copy.handle] = copy
+	if self.name then
+		copy.name = "*" .. self.name
+	end
 	return copy
 end
 

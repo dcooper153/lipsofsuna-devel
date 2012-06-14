@@ -166,6 +166,11 @@ static void private_create_mesh (
 	Ogre::String group = LIREN_RESOURCES_TEMPORARY;
 	self->mesh = Ogre::MeshManager::getSingleton ().createManual (name, group, builder);
 
+	/* Prevent edge list building. */
+	/* Building edge lists is hideously slow. Since we don't use shadow
+	   volumes, it's also completely useless for us. */
+	self->mesh->setAutoBuildEdgeLists (false);
+
 	/* Tell objects using the old mesh to rebuild. */
 	LIAlgU32dicIter iter;
 	LIALG_U32DIC_FOREACH (iter, self->render->objects)

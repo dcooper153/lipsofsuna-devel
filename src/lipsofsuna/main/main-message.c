@@ -46,7 +46,7 @@ LIMaiMessage* limai_message_new (
 		case LIMAI_MESSAGE_TYPE_EMPTY:
 			break;
 		case LIMAI_MESSAGE_TYPE_MODEL:
-			self->model = limdl_model_new_copy (data);
+			self->model = limdl_model_new_copy (data, 1);
 			if (self->model == NULL)
 			{
 				lisys_free (self->name);

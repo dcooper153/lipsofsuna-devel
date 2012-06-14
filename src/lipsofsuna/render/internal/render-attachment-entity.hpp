@@ -42,7 +42,7 @@ protected:
 	void clear ();
 	bool create_skeleton ();
 protected:
-	bool failed;
+	bool loaded;
 	bool loading_mesh;
 	bool loading_deps;
 	LIMdlPoseBuffer* pose_buffer;

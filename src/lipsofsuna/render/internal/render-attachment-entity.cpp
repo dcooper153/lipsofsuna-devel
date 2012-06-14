@@ -39,7 +39,7 @@ LIRenAttachmentEntity::LIRenAttachmentEntity (LIRenObject* object, LIRenModel* m
 	lisys_assert (model != NULL);
 	lisys_assert (!model->mesh.isNull ());
 
-	this->failed = false;
+	this->loaded = false;
 	this->loading_mesh = false;
 	this->loading_deps = false;
 	this->pose_buffer = NULL;
@@ -94,7 +94,7 @@ bool LIRenAttachmentEntity::has_model (LIRenModel* model)
 
 bool LIRenAttachmentEntity::is_loaded () const
 {
-	return entity != NULL;
+	return loaded;
 }
 
 void LIRenAttachmentEntity::remove_model (LIRenModel* model)
@@ -119,14 +119,19 @@ void LIRenAttachmentEntity::remove_model (LIRenModel* model)
 	resources.clear ();
 	loading_mesh = false;
 	loading_deps = false;
-	failed = true;
+	loaded = true;
 }
 
 void LIRenAttachmentEntity::update (float secs)
 {
 	/* Only needed when background loading dependencies. */
-	if (failed || entity != NULL)
+	if (loaded)
 		return;
+	if (entity != NULL)
+	{
+		loaded = true;
+		return;
+	}
 
 	/* Wait for the mesh to load. */
 	if (!mesh->isLoaded ())

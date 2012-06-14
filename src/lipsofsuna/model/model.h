@@ -58,7 +58,8 @@ struct _LIMdlModel
 LIAPICALL (LIMdlModel*, limdl_model_new, ());
 
 LIAPICALL (LIMdlModel*, limdl_model_new_copy, (
-	const LIMdlModel* model));
+	const LIMdlModel* model,
+	int               shape_keys));
 
 LIAPICALL (LIMdlModel*, limdl_model_new_from_data, (
 	LIArcReader* reader,
@@ -112,7 +113,8 @@ LIAPICALL (int, limdl_model_merge, (
 
 LIAPICALL (int, limdl_model_morph, (
 	LIMdlModel* self,
-	LIMdlModel* ref,
+	LIMdlModel* key_model,
+	LIMdlModel* ref_model,
 	const char* shape,
 	float       value));
 

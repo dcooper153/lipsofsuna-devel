@@ -44,38 +44,35 @@ Actor.enable_equipment_holding_animation = function(self, slot, item)
 	end
 end
 
-Actor.set_model = function(self, model)
-	if model or not self.spec.models then
-		-- Use the already built model.
-		local m = model or Model:find_or_load{file = self.spec.model}
-		if not m then return end
-		if m and m.name and Program.opengl_version < 3.2 then
-			m = m:copy()
-			m:changed()
-		end
-		self.model = m
-		Object.set_model(self, true)
-		-- Apply body scale.
-		if self.spec.body_scale_min or self.spec.body_scale_max then
-			local min = self.spec.body_scale_min or 1
-			local max = self.spec.body_scale_max or 1
-			local factor = self.body_scale or 0.5
-			local scale = min * (1 - factor) + max * factor
-			local anim = Animation("scale")
-			anim:set_transform{frame = 1, node = "mover", scale = scale}
-			self:animate{channel = Animation.CHANNEL_CUSTOMIZE, animation = anim,
-				fade_in = 0, fade_out = 0, permanent = true, replace = true, weight = 0, weight_scale = 1000}
-		end
-		-- Initialize the pose.
-		self.animated = true
-	else
-		-- Order a new model to be built.
-		-- The model is instantly replaced only if there's no existing model.
-		-- The base model only contains the armature and animations so we'd
-		-- rather keep the existing build result until the new model has been built.
+Actor.update_body_scale = function(self, value)
+	if self.spec.body_scale_min or self.spec.body_scale_max then
+		local min = self.spec.body_scale_min or 1
+		local max = self.spec.body_scale_max or 1
+		local factor = self.body_scale or 0.5
+		local scale = min * (1 - factor) + max * factor
+		local anim = Animation("scale")
+		anim:set_transform{frame = 1, node = "mover", scale = scale}
+		self:animate{channel = Animation.CHANNEL_CUSTOMIZE, animation = anim,
+			fade_in = 0, fade_out = 0, permanent = true, replace = true, weight = 0, weight_scale = 1000}
+	end
+end
+
+Actor.set_model = function(self)
+	if self.spec.models then
+		-- Create a custom model.
 		Object.set_model(self, self.model)
 		self:request_model_rebuild()
+	else
+		-- Use a static model.
+		local m = Model:find_or_load{file = self.spec.model}
+		if not m then return end
+		self.model = m
 	end
+	-- Update body scale.
+	self:update_body_scale()
+	-- Update special effects
+	Object.set_model(self, true)
+	self.animated = true
 end
 
 Actor.set_stat = function(self, s, v, m)

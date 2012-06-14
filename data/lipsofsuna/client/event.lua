@@ -65,18 +65,6 @@ Eventhandler{type = "tick", func = function(self, args)
 		Client.options.vsync = v[4]
 		Client.options:save()
 	end
-	-- Update built models.
-	while true do
-		local msg = Client.threads.model_builder:pop_message()
-		if not msg then break end
-		if msg.model then
-			local obj = Object:find{id = tonumber(msg.name)}
-			if obj and obj.spec then
-				msg.model:changed()
-				obj:set_model(msg.model)
-			end
-		end
-	end
 	-- Update active objects.
 	for k,v in pairs(Object.dict_active) do
 		-- Update sound.

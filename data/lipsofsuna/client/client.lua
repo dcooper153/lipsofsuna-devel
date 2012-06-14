@@ -36,7 +36,6 @@ Client.init = function(self)
 	self:reset_data()
 	-- Initialize helper threads.
 	self.threads = {}
-	self.threads.model_builder = Thread("client/threads/modelbuilder.lua")
 end
 
 Client.add_speech_text = function(self, args)

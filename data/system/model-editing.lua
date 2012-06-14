@@ -7,7 +7,7 @@ end
 ------------------------------------------------------------------------------
 
 --- Adds a material to the model.
--- @param self Object.
+-- @param self Model.
 -- @param ... Arguments.<ul>
 --   <li>cull: False to disable face culling.</li>
 --   <li>shader: Shader name.</li></ul>
@@ -16,7 +16,7 @@ Model.add_material = function(self, ...)
 end
 
 --- Adds triangles to the model.
--- @param self Object.
+-- @param self Model.
 -- @param ... Arguments.<ul>
 --   <li>material: Material index.</li>
 --   <li>vertices: Array of vertices.</li></ul>
@@ -25,7 +25,7 @@ Model.add_triangles = function(self, ...)
 end
 
 --- Calculates LOD data for the model.
--- @param self Object.
+-- @param self Model.
 -- @param ... Arguments.<ul>
 --   <li>1: Number of levels.</li>
 --   <li>2: Minimum detail level.</li></ul>
@@ -35,7 +35,7 @@ Model.calculate_lod = function(self, ...)
 end
 
 --- Edits the matching material.
--- @param self Object.
+-- @param self Model.
 -- @param args Arguments.<ul>
 --   <li>diffuse: Diffuse color to set, or nil.</li>
 --   <li>match_shader: Shader name to match, or nil.</li>
@@ -57,7 +57,7 @@ Model.merge_morph = function(self, model, targets)
 end
 
 --- Morphs a model with one of its shape keys.
--- @param self Object.
+-- @param self Model.
 -- @param ... Arguments.<ul>
 --   <li>1,shape: Shape key name.</li>
 --   <li>2,value: Shape influence multiplier.</li>
@@ -71,8 +71,22 @@ Model.morph = function(self, ...)
 	end
 end
 
+--- Creates a morphed copy of the model.
+-- @param self Model.
+-- @param targets List of alternating morph target names and influence.
+-- @return Copied and morphed model.
+Model.morph_copy = function(self, targets)
+	local copy = Class.new(Model)
+	copy.handle = Los.model_morph_copy(self.handle, unpack(targets))
+	__userdata_lookup[copy.handle] = copy
+	if self.name then
+		copy.name = "*" .. self.name
+	end
+	return copy
+end
+
 --- Removes the vertices and indices of the model.
--- @param self Object.
+-- @param self Model.
 Model.remove_vertices = function(self)
 	Los.model_remove_vertices(self.handle)
 end

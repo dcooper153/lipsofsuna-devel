@@ -35,7 +35,7 @@ LIRenMeshBuilder::LIRenMeshBuilder (LIRenRender* render, LIMdlModel* model)
 {
 	step = 0;
 	this->render = render;
-	this->model = limdl_model_new_copy (model);
+	this->model = limdl_model_new_copy (model, 0);
 	buffer_size_0 = 0;
 	buffer_size_1 = 0;
 	buffer_size_2 = 0;

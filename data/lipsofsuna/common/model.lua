@@ -10,7 +10,7 @@ Model.find_or_load = function(clss, args)
 	if self then return self end
 	-- Load a new model.
 	local spec = Modelspec:find{name = args.file}
-	self = Model{name = spec and spec.file or args.file}
+	self = Model{name = args.file}
 	self:load(args)
 	-- Edit materials.
 	if args.mesh ~= false and spec then

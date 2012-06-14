@@ -351,7 +351,44 @@ static void Model_morph (LIScrArgs* args)
 		ref = liscr_data_get_data (data);
 
 	liscr_args_seti_bool (args, limdl_model_morph (model->model,
-		(ref != NULL)? ref->model : NULL, shape, value));
+		model->model, (ref != NULL)? ref->model : NULL, shape, value));
+}
+
+static void Model_morph_copy (LIScrArgs* args)
+{
+	int i;
+	float value;
+	const char* shape;
+	LIEngModel* model;
+	LIEngModel* copy;
+
+	/* Get the original model. */
+	model = args->self;
+
+	/* Copy without shape keys. */
+	copy = lieng_model_new_copy (model, 0);
+	if (copy == NULL)
+		return;
+
+	/* Allocate the userdata. */
+	copy->script = liscr_data_new (args->script, args->lua, copy, LISCR_SCRIPT_MODEL, lieng_model_free);
+	if (copy->script == NULL)
+	{
+		lieng_model_free (copy);
+		return;
+	}
+	liscr_args_seti_stack (args);
+
+	/* Morph using the original model. */
+	i = 0;
+	while (1)
+	{
+		if (!liscr_args_geti_string (args, i, &shape) ||
+		    !liscr_args_geti_float (args, i + 1, &value))
+			break;
+		limdl_model_morph (copy->model, model->model, model->model, shape, value);
+		i += 2;
+	}
 }
 
 static void Model_remove_vertices (LIScrArgs* args)
@@ -374,6 +411,7 @@ void liext_script_model_editing (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_merge", Model_merge);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_merge_morph", Model_merge_morph);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_morph", Model_morph);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_morph_copy", Model_morph_copy);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_remove_vertices", Model_remove_vertices);
 }
 

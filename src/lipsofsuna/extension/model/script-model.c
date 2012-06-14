@@ -50,10 +50,14 @@ static void Model_new (LIScrArgs* args)
 
 static void Model_copy (LIScrArgs* args)
 {
+	int shape_keys = 1;
 	LIEngModel* self;
 
+	/* Get arguments. */
+	liscr_args_geti_bool (args, 0, &shape_keys);
+
 	/* Allocate model. */
-	self = lieng_model_new_copy (args->self);
+	self = lieng_model_new_copy (args->self, shape_keys);
 	if (self == NULL)
 		return;
 
