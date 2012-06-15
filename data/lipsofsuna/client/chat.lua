@@ -60,6 +60,8 @@ Event tick: %d ms
 Render tick: %d ms
 Rendered batches: %d
 Rendered faces: %d
+Allocated attachments: %d
+Allocated entities: %d
 Allocated meshes: %d : %dkB
 Allocated skeletons: %d
 Allocated textures: %d/%d : %dkB
@@ -69,9 +71,9 @@ Userdata: %d
 %s
 ]], Program.fps, Database.memory_used / 1024, collectgarbage("count") / 1024, Voxel.memory_used / 1024, models / 1024,
 1000 * Program.profiling.update, 1000 * Program.profiling.event, 1000 * Program.profiling.render,
-stats.batch_count, stats.face_count, stats.mesh_count, stats.mesh_memory / 1000, stats.skeleton_count,
-stats.texture_count_loaded, stats.texture_count, stats.texture_memory / 1000,
-stats.material_count_loaded, stats.material_count, numactive, userdata, objects)
+stats.batch_count, stats.face_count, stats.attachment_count, stats.entity_count, stats.mesh_count,
+stats.mesh_memory / 1000, stats.skeleton_count, stats.texture_count_loaded, stats.texture_count,
+stats.texture_memory / 1000, stats.material_count_loaded, stats.material_count, numactive, userdata, objects)
 	-- Activate the stats state.
 	Ui.state = "admin/client-stats"
 end}

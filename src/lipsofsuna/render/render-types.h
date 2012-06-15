@@ -54,7 +54,9 @@ struct _LIRenVideomode
 typedef struct _LIRenStats LIRenStats;
 struct _LIRenStats
 {
+	int attachment_count;
 	int batch_count;
+	int entity_count;
 	int face_count;
 	int material_count;
 	int material_count_loaded;

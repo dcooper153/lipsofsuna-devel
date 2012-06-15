@@ -167,7 +167,9 @@ static void Render_get_stats (LIScrArgs* args)
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER);
 	liren_render_get_stats (module->render, &stats);
 	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE);
+	liscr_args_sets_int (args, "attachment_count", stats.attachment_count);
 	liscr_args_sets_int (args, "batch_count", stats.batch_count);
+	liscr_args_sets_int (args, "entity_count", stats.entity_count);
 	liscr_args_sets_int (args, "face_count", stats.face_count);
 	liscr_args_sets_int (args, "material_count", stats.material_count);
 	liscr_args_sets_int (args, "material_count_loaded", stats.material_count_loaded);

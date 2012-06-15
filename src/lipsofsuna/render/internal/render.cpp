@@ -632,6 +632,24 @@ void liren_internal_get_stats (
 	result->texture_count = private_count_resources (self, Ogre::TextureManager::getSingleton ());
 	result->texture_count_loaded = private_count_resources_loaded (self, Ogre::TextureManager::getSingleton ());
 	result->texture_memory = (int) Ogre::TextureManager::getSingleton ().getMemoryUsage ();
+
+	/* Count entities. */
+	result->entity_count = 0;
+	Ogre::SceneManager::MovableObjectIterator iterator = self->data->scene_manager->getMovableObjectIterator ("Entity");
+	while (iterator.hasMoreElements ())
+	{
+		result->entity_count++;
+		iterator.getNext ();
+	}
+
+	/* Count attachments. */
+	result->attachment_count = 0;
+	LIAlgU32dicIter iter;
+	LIALG_U32DIC_FOREACH (iter, self->objects)
+	{
+		LIRenObject* object = (LIRenObject*) iter.value;
+		result->attachment_count += object->attachments.size ();
+	}
 }
 
 void liren_internal_set_title (
@@ -799,8 +817,14 @@ static void private_unload_unused_resources (
 	while (iter.hasMoreElements ())
 	{
 		/* Check if the resource is loaded. */
+		/* Resources that are not loaded may be subject to removal if they
+		   belong to the group of temporary resources. Resources in the
+		   permanent group are never removed, nor are resources that are
+		   currently being background loaded. */
 		Ogre::ResourcePtr resource = iter.getNext ();
-		if (!resource->isLoaded ())
+		if (resource->isLoading ())
+			continue;
+		if (!resource->isLoaded () && resource->getGroup () == LIREN_RESOURCES_PERMANENT)
 			continue;
 
 		/* Check if the resource is in use. */

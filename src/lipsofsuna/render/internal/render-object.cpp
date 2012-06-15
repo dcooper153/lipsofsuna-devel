@@ -486,12 +486,13 @@ int liren_object_set_model (
 	}
 
 	/* Add the new model. */
-	liren_object_add_model (self, model);
-	LIRenAttachment* successor = self->attachments[self->attachments.size () - 1];
+	LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (self, model);
+	self->skeleton_rebuild_needed = 1;
 
 	/* Mark all the old entities for replacement. */
-	for (size_t i = 0 ; i < self->attachments.size () - 1 ; i++)
-		self->attachments[i]->set_replacer (successor);
+	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+		self->attachments[i]->set_replacer (attachment);
+	self->attachments.push_back (attachment);
 
 	return 1;
 }
