@@ -328,13 +328,10 @@ void liren_object_model_changed (
 	{
 		if (self->attachments[i]->has_model (model))
 		{
-			/* Start loading the new entity. */
-			liren_object_add_model (self, model);
-
-			/* Mark the old entity for replacement. */
-			self->attachments[i]->set_replacer (
-				self->attachments[self->attachments.size () - 1]);
-			break;
+			LIRenAttachmentEntity* attachment = OGRE_NEW LIRenAttachmentEntity (self, model);
+			self->attachments[i]->set_replacer (attachment);
+			self->attachments.insert (self->attachments.begin () + i, attachment);
+			i++;
 		}
 	}
 }
@@ -363,9 +360,17 @@ void liren_object_update (
 	LIRenObject* self,
 	float        secs)
 {
-	/* Replace old entities with built ones. */
-	/* Removing an entity is a potentially recursive operation so there is no
-	   guarantee of the list index being in any given position afthe the removal.
+	/* Update attachments. */
+	/* This needs to be done before replacing attachments since an
+	   attachment may finish loading here. If replacing were done first,
+	   both the replaced attachment and the replacement would be shown
+	   during the same frame. */
+	for (size_t i = 0 ; i < self->attachments.size () ; i++)
+		self->attachments[i]->update (secs);
+
+	/* Replace old attachments with built ones. */
+	/* Removing an attachment is a potentially recursive operation so there is no
+	   guarantee of the list index being in any given position after the removal.
 	   Because of that, the operation needs to be restarted from scratch after
 	   each removal. */
 	while (true)
@@ -400,10 +405,6 @@ void liren_object_update (
 	}
 	else
 		self->node->setVisible (self->visible);
-
-	/* Update attachments. */
-	for (size_t i = 0 ; i < self->attachments.size () ; i++)
-		self->attachments[i]->update (secs);
 
 	/* Update attachment poses. */
 	if (self->pose_skeleton != NULL)
@@ -456,6 +457,8 @@ int liren_object_get_loaded (
 	for (size_t i = 0 ; i < self->attachments.size () ; i++)
 	{
 		if (!self->attachments[i]->is_loaded ())
+			return 0;
+		if (self->attachments[i]->get_replacer () != NULL)
 			return 0;
 	}
 	return 1;

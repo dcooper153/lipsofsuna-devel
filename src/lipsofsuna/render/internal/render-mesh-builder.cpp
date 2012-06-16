@@ -59,6 +59,7 @@ LIRenMeshBuilder::~LIRenMeshBuilder ()
 
 void LIRenMeshBuilder::prepareResource (Ogre::Resource* resource)
 {
+	materials.clear ();
 	if (step < 1)
 	{
 		step_1_bg ((Ogre::Mesh*) resource);
@@ -68,6 +69,7 @@ void LIRenMeshBuilder::prepareResource (Ogre::Resource* resource)
 
 void LIRenMeshBuilder::loadResource (Ogre::Resource* resource)
 {
+	materials.clear ();
 	if (step < 1)
 	{
 		step_1_bg ((Ogre::Mesh*) resource);
@@ -244,9 +246,19 @@ void LIRenMeshBuilder::step_2_fg (Ogre::Mesh* mesh)
 
 	for (int i = 0 ; i < model->materials.count ; i++)
 	{
+		/* Create the material. */
 		Ogre::MaterialPtr material = create_material (model->materials.array + i);
+
+		/* Set the material name of the submesh. */
 		Ogre::SubMesh* submesh = mesh->getSubMesh (i);
 		submesh->setMaterialName (material->getName ());
+
+		/* Reference the material. */
+		/* Ogre meshes don't reference the material, instead only storing
+		   its name. Since the mesh can have temporary materials that would
+		   be subject to garbage collection without a reference, we need to
+		   add keep one here. */
+		materials.push_back (material);
 	}
 }
 

@@ -65,6 +65,11 @@ private:
 	Ogre::HardwareVertexBufferSharedPtr vertex_buffer_1;
 	Ogre::HardwareVertexBufferSharedPtr vertex_buffer_2;
 	Ogre::HardwareIndexBufferSharedPtr index_buffer;
+	/* Referenced data. */
+	/* To prevent temporary materials from being removed during the
+	   period of the mesh being initialized but not used, we need to
+	   keep references to the materials. */
+	std::vector<Ogre::MaterialPtr> materials;
 };
 
 #endif
