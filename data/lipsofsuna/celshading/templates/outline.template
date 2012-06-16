@@ -1,0 +1,21 @@
+pass outline/anim
+{
+	cull_hardware anticlockwise
+	vertex_program_ref animoutline1_vert
+	{
+	}
+	fragment_program_ref outline1_frag
+	{
+	}
+}
+
+pass outline/static
+{
+	cull_hardware anticlockwise
+	vertex_program_ref outline1_vert
+	{
+	}
+	fragment_program_ref outline1_frag
+	{
+	}
+}

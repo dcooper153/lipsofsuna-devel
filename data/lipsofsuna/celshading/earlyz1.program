@@ -1,0 +1,16 @@
+vertex_program earlyz1_vert glsl
+{
+	source earlyz1.vert
+	default_params
+	{
+		param_named_auto LOS_matrix_modelviewproj worldviewproj_matrix
+	}
+}
+
+fragment_program earlyz1_frag glsl
+{
+	source earlyz1.frag
+	default_params
+	{
+	}
+}

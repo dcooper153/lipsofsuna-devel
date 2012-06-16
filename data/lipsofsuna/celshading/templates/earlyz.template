@@ -1,0 +1,52 @@
+pass earlyz/base
+{
+	max_lights 0
+	ambient 1.0 1.0 1.0
+	diffuse 0.0 0.0 0.0
+	specular 0.0 0.0 0.0 1.0
+	colour_write off
+	lighting off
+	shading flat
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+pass earlyz/3/anim : earlyz/base
+{
+	vertex_program_ref animearlyz1_vert
+	{
+	}
+	fragment_program_ref earlyz1_frag
+	{
+	}
+}
+
+pass earlyz/3/static : earlyz/base
+{
+	vertex_program_ref earlyz1_vert
+	{
+	}
+	fragment_program_ref earlyz1_frag
+	{
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+pass earlyz/2/anim : earlyz/3/anim
+{
+}
+
+pass earlyz/2/static : earlyz/3/static
+{
+}
+
+//////////////////////////////////////////////////////////////////////////////
+
+pass earlyz/1/anim : earlyz/base
+{
+}
+
+pass earlyz/1/static : earlyz/base
+{
+}

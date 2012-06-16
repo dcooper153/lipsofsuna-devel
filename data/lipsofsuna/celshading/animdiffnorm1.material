@@ -1,3 +1,5 @@
+import * from "outline.template"
+
 pass animdiffnorm1/3/lighting
 {
 	max_lights 3
@@ -58,17 +60,6 @@ pass animdiffnorm1/2/lighting
 	}
 }
 
-pass animdiffnorm1/outline
-{
-	cull_hardware anticlockwise
-	vertex_program_ref animoutline1_vert
-	{
-	}
-	fragment_program_ref outline1_frag
-	{
-	}
-}
-
 material animdiffnorm1
 {
 	receive_shadows off
@@ -78,7 +69,7 @@ material animdiffnorm1
 		pass LOS1 : animdiffnorm1/3/lighting
 		{
 		}
-		pass outline : animdiffnorm1/outline
+		pass outline : outline/anim
 		{
 		}
 	}
@@ -97,7 +88,7 @@ material animdiffnorm1
 		pass LOS1 : animdiffnorm1/2/lighting
 		{
 		}
-		pass outline : animdiffnorm1/outline
+		pass outline : outline/anim
 		{
 		}
 	}

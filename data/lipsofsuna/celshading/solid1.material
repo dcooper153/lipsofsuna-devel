@@ -1,3 +1,5 @@
+import * from "outline.template"
+
 pass solid1/lighting
 {
 	max_lights 3
@@ -25,17 +27,6 @@ pass solid1/lighting
 	}
 }
 
-pass solid1/outline
-{
-	cull_hardware anticlockwise
-	vertex_program_ref outline1_vert
-	{
-	}
-	fragment_program_ref outline1_frag
-	{
-	}
-}
-
 material solid1
 {
 	receive_shadows off
@@ -44,14 +35,14 @@ material solid1
 		pass LOS1 : solid1/lighting
 		{
 		}
-		pass outline : solid1/outline
+		pass outline : outline/static
 		{
 		}
 	}
 	technique
 	{
 		scheme quality3
-		shadow_caster_material animshadowcaster1
+		shadow_caster_material shadowcaster1
 		pass LOS1 : solid1/lighting
 		{
 		}
@@ -62,14 +53,14 @@ material solid1
 		pass LOS1 : solid1/lighting
 		{
 		}
-		pass outline : solid1/outline
+		pass outline : outline/static
 		{
 		}
 	}
 	technique
 	{
 		scheme quality2
-		shadow_caster_material animshadowcaster1
+		shadow_caster_material shadowcaster1
 		pass LOS1 : solid1/lighting
 		{
 		}

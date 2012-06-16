@@ -1,3 +1,5 @@
+import * from "outline.template"
+
 pass animskin1/3/lighting
 {
 	max_lights 3
@@ -58,17 +60,6 @@ pass animskin1/2/lighting
 	}
 }
 
-pass animskin1/outline
-{
-	cull_hardware anticlockwise
-	vertex_program_ref animoutline1_vert
-	{
-	}
-	fragment_program_ref outline1_frag
-	{
-	}
-}
-
 material animskin1
 {
 	receive_shadows off
@@ -78,7 +69,7 @@ material animskin1
 		pass LOS1 : animskin1/3/lighting
 		{
 		}
-		pass outline : animskin1/outline
+		pass outline : outline/anim
 		{
 		}
 	}
@@ -97,7 +88,7 @@ material animskin1
 		pass LOS1 : animskin1/2/lighting
 		{
 		}
-		pass outline : animskin1/outline
+		pass outline : outline/anim
 		{
 		}
 	}

@@ -1,3 +1,5 @@
+import * from "outline.template"
+
 pass diffnorm1/3/lighting
 {
 	max_lights 3
@@ -58,17 +60,6 @@ pass diffnorm1/2/lighting
 	}
 }
 
-pass diffnorm1/outline
-{
-	cull_hardware anticlockwise
-	vertex_program_ref outline1_vert
-	{
-	}
-	fragment_program_ref outline1_frag
-	{
-	}
-}
-
 material diffnorm1
 {
 	receive_shadows off
@@ -78,14 +69,14 @@ material diffnorm1
 		pass LOS1 : diffnorm1/3/lighting
 		{
 		}
-		pass outline : diffnorm1/outline
+		pass outline : outline/static
 		{
 		}
 	}
 	technique
 	{
 		scheme quality3
-		shadow_caster_material animshadowcaster1
+		shadow_caster_material shadowcaster1
 		pass LOS1 : diffnorm1/3/lighting
 		{
 		}
@@ -97,14 +88,14 @@ material diffnorm1
 		pass LOS1 : diffnorm1/2/lighting
 		{
 		}
-		pass outline : diffnorm1/outline
+		pass outline : outline/static
 		{
 		}
 	}
 	technique
 	{
 		scheme quality2
-		shadow_caster_material animshadowcaster1
+		shadow_caster_material shadowcaster1
 		pass LOS1 : diffnorm1/2/lighting
 		{
 		}

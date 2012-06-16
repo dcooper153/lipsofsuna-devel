@@ -389,11 +389,19 @@ Ogre::MaterialPtr LIRenMeshBuilder::create_material (
 		for (int i = 0 ; i < material->getNumTechniques () ; i++)
 		{
 			Ogre::Technique* technique = material->getTechnique (i);
-			Ogre::Pass* pass = technique->getPass (0);
 			if (existing)
-				override_pass (mat, pass);
+			{
+				for (int j = 0 ; j < technique->getNumPasses () ; j++)
+				{
+					Ogre::Pass* pass = technique->getPass (j);
+					override_pass (mat, pass);
+				}
+			}
 			else
+			{
+				Ogre::Pass* pass = technique->getPass (0);
 				initialize_pass (mat, pass);
+			}
 		}
 	}
 
@@ -458,18 +466,21 @@ bool LIRenMeshBuilder::check_material_override (
 {
 	for (int k = 0 ; k < material->getNumTechniques () ; k++)
 	{
-		/* Check if the pass needs to be overridden. */
 		Ogre::Technique* tech = material->getTechnique (k);
-		Ogre::Pass* pass = tech->getPass (0);
-		if (check_name_override (pass->getName ()))
-			return true;
-
-		/* Check if any textures need to be overridden. */
-		for (int i = 0 ; i < pass->getNumTextureUnitStates () ; i++)
+		for (int i = 0 ; i < tech->getNumPasses () ; i++)
 		{
-			Ogre::TextureUnitState* state = pass->getTextureUnitState (i);
-			if (check_name_override (state->getName ()))
+			/* Check if the pass needs to be overridden. */
+			Ogre::Pass* pass = tech->getPass (i);
+			if (check_name_override (pass->getName ()))
 				return true;
+
+			/* Check if any textures need to be overridden. */
+			for (int i = 0 ; i < pass->getNumTextureUnitStates () ; i++)
+			{
+				Ogre::TextureUnitState* state = pass->getTextureUnitState (i);
+				if (check_name_override (state->getName ()))
+					return true;
+			}
 		}
 	}
 

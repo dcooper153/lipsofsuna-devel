@@ -231,7 +231,6 @@ material wood1 : terrainmaterial
 	set $texture2 "wood1n.png"
 }
 
-
 material water1 : terrainmaterial
 {
 	set $cullmode "none"

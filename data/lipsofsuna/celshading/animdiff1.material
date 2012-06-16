@@ -1,3 +1,6 @@
+import * from "earlyz.template"
+import * from "outline.template"
+
 pass animdiff1/lighting
 {
 	max_lights 3
@@ -28,34 +31,54 @@ pass animdiff1/lighting
 	}
 }
 
-pass animdiff1/outline
-{
-	cull_hardware anticlockwise
-	vertex_program_ref animoutline1_vert
-	{
-	}
-	fragment_program_ref outline1_frag
-	{
-	}
-}
-
 material animdiff1
 {
 	receive_shadows off
 	technique
 	{
 		shadow_caster_material animshadowcaster1
+		pass earlyz : earlyz/3/anim
+		{
+		}
 		pass LOS1 : animdiff1/lighting
 		{
 		}
-		pass outline : animdiff1/outline
+		pass outline : outline/anim
 		{
 		}
 	}
 	technique
 	{
-		scheme no-outline
+		scheme quality3
 		shadow_caster_material animshadowcaster1
+		pass earlyz : earlyz/3/anim
+		{
+		}
+		pass LOS1 : animdiff1/lighting
+		{
+		}
+	}
+	technique
+	{
+		scheme quality2outline
+		shadow_caster_material animshadowcaster1
+		pass earlyz : earlyz/2/anim
+		{
+		}
+		pass LOS1 : animdiff1/lighting
+		{
+		}
+		pass outline : outline/anim
+		{
+		}
+	}
+	technique
+	{
+		scheme quality2
+		shadow_caster_material animshadowcaster1
+		pass earlyz : earlyz/2/anim
+		{
+		}
 		pass LOS1 : animdiff1/lighting
 		{
 		}
