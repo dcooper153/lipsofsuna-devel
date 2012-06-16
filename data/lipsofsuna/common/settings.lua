@@ -45,6 +45,9 @@ Settings.parse_command_line = function(clss)
 		elseif a[i] == "--admin" or a[i] == "-d" then
 			clss.admin = true
 			i = i + 1
+		elseif a[i] == "--benchmark" or a[i] == "-B" then
+			clss.benchmark = true
+			i = i + 1
 		elseif a[i] == "--editor" or a[i] == "-E" then
 			clss.editor = true
 			i = i + 1
@@ -124,6 +127,7 @@ Settings.usage = function(clss)
 
 Options:
   -a --account <account>      Name of the player account.
+  -B --benchmark              Run graphics benchmarks.
   -d --admin                  Play as an admin on a hosted server.
   -E --editor <pattern>       Edit a map region.
   -f --file <number>          Save file number.

@@ -120,7 +120,7 @@ Globaleventmanager.sector_created = function(self, id, loaded, objects)
 		end
 	end
 	-- Take note of players who were close enough to qualify as finders.
-	if nearest_dist < 100 then
+	if nearest_dist and nearest_dist < 100 then
 		nearest_dist = nearest_dist + 20
 		for k,v in pairs(Player.clients) do
 			local d = (v.position - c).length

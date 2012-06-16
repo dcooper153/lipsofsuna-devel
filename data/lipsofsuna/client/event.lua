@@ -43,17 +43,6 @@ Eventhandler{type = "tick", func = function(self, args)
 			Ui:handle_event(v)
 		end
 	end
-	-- Update the connection status.
-	if Client.connected and not Network.connected then
-		Client:terminate_game()
-		Client.options.host_restart = false
-		Client.data.connection.active = false
-		Client.data.connection.waiting = false
-		Client.data.connection.connecting = false
-		Client.data.connection.text = "Lost connection to the server!"
-		Client.data.load.next_state = "start-game"
-		Ui.state = "load"
-	end
 	-- Update the user interface state.
 	Ui:update(args.secs)
 	-- Update the window size.
@@ -65,24 +54,25 @@ Eventhandler{type = "tick", func = function(self, args)
 		Client.options.vsync = v[4]
 		Client.options:save()
 	end
-	-- Update active objects.
-	for k,v in pairs(Object.dict_active) do
-		-- Update sound.
-		if k.animated then
-			k:update_sound(animt)
-		end
-		-- Interpolate positions.
-		k:update_motion_state(args.secs)
-		-- Update slots and special effects.
-		k:update(args.secs)
-		-- Maintain activity.
-		if k.spec and k.spec.type ~= "actor" then
-			v = v - args.secs
-			if v <= 0 then v = nil end
-			Object.dict_active[k] = v
-		end
+	-- Update the simulation.
+	Simulation:update(args.secs)
+	-- Update the benchmark.
+	if Client.benchmark then
+		Client.benchmark:update(args.secs)
+		return
 	end
-	-- Update player state.
+	-- Update the connection status.
+	if Client.connected and not Network.connected then
+		Client:terminate_game()
+		Client.options.host_restart = false
+		Client.data.connection.active = false
+		Client.data.connection.waiting = false
+		Client.data.connection.connecting = false
+		Client.data.connection.text = "Lost connection to the server!"
+		Client.data.load.next_state = "start-game"
+		Ui.state = "load"
+	end
+	-- Update the player state.
 	if Client.player_object then
 		Player:update_pose(args.secs)
 		Player:update_rotation(args.secs)

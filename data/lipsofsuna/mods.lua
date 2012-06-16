@@ -12,6 +12,7 @@ Mod:load "core/shadows"
 Mod:load "core/misc"
 Mod:load "server"
 Mod:load "client"
+Mod:load "benchmark"
 
 -- Actors
 Mod:load "actors/aer"

@@ -28,6 +28,7 @@ require "client/quickslots"
 require "client/lighting"
 Lighting:init()
 require "client/player"
+require "client/simulation"
 require "client/slots"
 require "client/target"
 File:require_directory("client/network")
@@ -44,6 +45,9 @@ elseif Settings.host then
 	Client:host_game()
 elseif Settings.editor then
 	Ui.state = "editor"
+elseif Settings.benchmark then
+	Ui.state = "benchmark"
+	Client.benchmark = Benchmark()
 else
 	Ui.state = "mainmenu"
 end

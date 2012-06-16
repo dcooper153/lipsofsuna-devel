@@ -191,6 +191,7 @@ Ui.add_widget = function(self, args)
 	-- If the widget was given an ID, try to replace an existing widget with the
 	-- same ID. If no ID was given or no replacement occurred, append to the list.
 	if args.id then
+		spec.id = args.id
 		local index = state.ids[args.id]
 		if index then
 			state.widgets[index] = spec
@@ -412,6 +413,12 @@ Ui.pop_state = function(self)
 	self:state_changed(src, src_root, self.state, self.root)
 end
 
+--- Queues a relayout for all widgets.
+-- @param self Ui class.
+Ui.queue_relayout = function(self)
+	self.need_repack = true
+end
+
 --- Repaints all the widgets of the state.
 -- @param self Ui class.
 Ui.repaint_state = function(self)
@@ -502,7 +509,7 @@ Ui.show_state = function(self, state, focus)
 				if spec.hint then widget.hint = spec.hint end
 				if spec.input then widget.handle_input = spec.input end
 				if spec.update then widget.update = spec.update end
-				if not widget.id then widget.id = id end
+				if not widget.id then widget.id = spec.id or id end
 				add(widget)
 			else
 				for k,v in ipairs(widget) do add(v) end
@@ -753,6 +760,7 @@ Ui.update_help = function(self)
 	hint = string.gsub(hint, "$B", Binding:get_control_name("menu back") or "[---]")
 	hint = string.gsub(hint, "$D", Binding:get_control_name("menu down") or "[---]")
 	hint = string.gsub(hint, "$U", Binding:get_control_name("menu up") or "[---]")
+	hint = string.gsub(hint, "$M", Binding:get_control_name("menu") or "[---]")
 	-- Get the detailed help string.
 	if widget then
 		help = widget.help

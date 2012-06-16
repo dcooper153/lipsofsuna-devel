@@ -4,7 +4,7 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "admin/client-stats",
-	widget = function(secs) return Widgets.Uilabel(Client.data.admin.client_stats) end}
+	widget = function(secs) return Widgets.Uilabel(Operators.stats:get_client_stats_text()) end}
 
 ------------------------------------------------------------------------------
 

@@ -226,45 +226,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 		type = "object"
 	end
 	-- Create the object.
-	local o
-	local o_args = {collision_group = Physics.GROUP_OBJECT, flags = Bitwise:band(flags, 0xFF),
-		id = id, model = model, spec = spec, type = type}
-	if type == "actor" then
-		o = Actor(o_args)
-	elseif type == "item" then
-		o = Item(o_args)
-	elseif type == "spell" then
-		o = Spell(o_args)
-	else
-		o = Obstacle(o_args)
-	end
-	-- Apply the preset.
-	if spec and spec.preset then
-		local preset = Actorpresetspec:find{name = spec.preset}
-		if preset then
-			local copy_table = function(t)
-				if not t then return end
-				local u = {}
-				for k,v in pairs(t) do u[k] = v end
-				return u
-			end
-			local copy_color = function(t)
-				local u = copy_table(t)
-				if not u then return end
-				return Color:hsv_to_rgb(u)
-			end
-			o.body_style = copy_table(preset.body)
-			o.eye_color = copy_color(preset.eye_color)
-			o.eye_style = preset.eye_style
-			o.face_style = copy_table(preset.face)
-			o.hair_color = copy_color(preset.hair_color)
-			o.hair_style = preset.hair_style
-			o.head_style = preset.head_style
-			o.body_scale = preset.height
-			o.skin_color = copy_color(preset.skin_color)
-			o.skin_style = preset.skin_style
-		end
-	end
+	local o = Simulation:create_object_by_spec(spec, {flags = flags, id = id, model = model})
 	-- Self.
 	if Bitwise:band(flags, Protocol.object_show_flags.SELF) ~= 0 then
 		debug("  SELF")
