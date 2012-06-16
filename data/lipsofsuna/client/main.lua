@@ -53,7 +53,9 @@ Program.profiling = {}
 -- Main loop.
 while not Program.quit do
 	-- Update program state.
-	Program:watchdog_start(30)
+	if Settings.watchdog then
+		Program:watchdog_start(30)
+	end
 	local t1 = Program.time
 	Program:update()
 	local t2 = Program.time

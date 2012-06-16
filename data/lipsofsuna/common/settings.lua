@@ -7,6 +7,7 @@ Settings.port = 10101
 Settings.account = "guest"
 Settings.password = ""
 Settings.file = 1
+Settings.watchdog = true
 
 --- Parses command line arguments.
 -- @param clss Settings class.
@@ -87,6 +88,9 @@ Settings.parse_command_line = function(clss)
 		elseif a[i] == "--version" or a[i] == "-v" then
 			clss.version = true
 			i = i + 1
+		elseif a[i] == "--watchdog" or a[i] == "-w" then
+			clss.watchdog = false
+			i = i + 1
 		else
 			clss.help = true
 			break
@@ -131,6 +135,7 @@ Options:
   -q --quit                   Quit immediately after startup.
   -S --server                 Run as a dedicated server.
   -U --unittest               Run unittests.
-  -v --version                Print the version number and exit.]]
+  -v --version                Print the version number and exit.
+  -w --watchdog               Disable the watchdog timer.]]
 	end
 end
