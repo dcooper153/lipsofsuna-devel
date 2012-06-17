@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -54,10 +54,6 @@ LIAPICALL (LIWdgManager*, liwdg_manager_new, (
 LIAPICALL (void, liwdg_manager_free, (
 	LIWdgManager* self));
 
-LIAPICALL (int, liwdg_manager_alloc_widgets, (
-	LIWdgManager* self,
-	              ...));
-
 LIAPICALL (LIWdgWidget*, liwdg_manager_find_widget_by_point, (
 	LIWdgManager* self,
 	int           x,
@@ -75,9 +71,6 @@ LIAPICALL (int, liwdg_manager_insert_window, (
 LIAPICALL (int, liwdg_manager_remove_window, (
 	LIWdgManager* self,
 	LIWdgWidget*  widget));
-
-LIAPICALL (void, liwdg_manager_render, (
-	LIWdgManager* self));
 
 LIAPICALL (void, liwdg_manager_update, (
 	LIWdgManager* self,

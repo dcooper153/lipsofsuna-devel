@@ -32,10 +32,6 @@ static void private_initial_videomode (
 	int*           vsync,
 	int*           multisamples);
 
-static int private_engine_tick (
-	LIExtGraphics* self,
-	float          secs);
-
 /*****************************************************************************/
 
 LIMaiExtensionInfo liext_graphics_info =
@@ -87,13 +83,6 @@ LIExtGraphics* liext_graphics_new (
 		return NULL;
 	}
 
-	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, "tick", 1, private_engine_tick, self, self->calls + 0))
-	{
-		liext_graphics_free (self);
-		return NULL;
-	}
-
 	/* Extend scripts. */
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_GRAPHICS, self);
 	liext_script_graphics (program->script);
@@ -104,8 +93,6 @@ LIExtGraphics* liext_graphics_new (
 void liext_graphics_free (
 	LIExtGraphics* self)
 {
-	lical_handle_releasev (self->calls, sizeof (self->calls) / sizeof (LICalHandle));
-
 	/* Remove the components. */
 	if (self->program != NULL)
 	{
@@ -118,6 +105,16 @@ void liext_graphics_free (
 		liren_render_free (self->render);
 
 	lisys_free (self);
+}
+
+void liext_graphics_update (
+	LIExtGraphics* self,
+	float          secs)
+{
+	if (!liren_render_update (self->render, secs))
+		self->program->quit = 1;
+	else
+		liren_render_get_videomode (self->render, &self->mode);
 }
 
 int liext_graphics_set_videomode (
@@ -207,18 +204,6 @@ static void private_initial_videomode (
 
 	/* Pop the videomode table. */
 	lua_pop (lua, 1);
-}
-
-static int private_engine_tick (
-	LIExtGraphics* self,
-	float          secs)
-{
-	if (!liren_render_update (self->render, secs))
-		self->program->quit = 1;
-	else
-		liren_render_get_videomode (self->render, &self->mode);
-
-	return 1;
 }
 
 /** @} */

@@ -26,7 +26,6 @@
 typedef struct _LIExtGraphics LIExtGraphics;
 struct _LIExtGraphics
 {
-	LICalHandle calls[1];
 	LIMaiProgram* program;
 	LIRenRender* render;
 	LIRenVideomode mode;
@@ -40,6 +39,10 @@ LIAPICALL (void, liext_graphics_free, (
 
 LIAPICALL (void, liext_graphics_free, (
 	LIExtGraphics* self));
+
+LIAPICALL (void, liext_graphics_update, (
+	LIExtGraphics* self,
+	float          secs));
 
 LIAPICALL (int, liext_graphics_set_videomode, (
 	LIExtGraphics* self,

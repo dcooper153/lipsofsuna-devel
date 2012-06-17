@@ -71,6 +71,16 @@ static void Program_measure_text (LIScrArgs* args)
 	}
 }
 
+static void Program_render (LIScrArgs* args)
+{
+	float secs;
+	LIExtGraphics* module;
+
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
+	if (liscr_args_geti_float (args, 0, &secs))
+		liext_graphics_update (module, secs);
+}
+
 static void Program_screenshot (LIScrArgs* args)
 {
 	char* home;
@@ -198,6 +208,7 @@ void liext_script_graphics (
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_layout_text", Program_layout_text);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_measure_text", Program_measure_text);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_render", Program_render);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_screenshot", Program_screenshot);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_set_video_mode", Program_set_video_mode);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_get_opengl_version", Program_get_opengl_version);

@@ -63,14 +63,6 @@ static void Widgets_add_font_style (LIScrArgs* args)
 		lisys_error_report ();
 }
 
-static void Widgets_draw (LIScrArgs* args)
-{
-	LIExtModule* module;
-
-	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_WIDGETS);
-	liwdg_manager_render (module->widgets);
-}
-
 static void Widgets_find_widget (LIScrArgs* args)
 {
 	int x;
@@ -122,7 +114,6 @@ void liext_script_widgets (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_WIDGETS, "widgets_add_font_style", Widgets_add_font_style);
-	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_WIDGETS, "widgets_draw", Widgets_draw);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_WIDGETS, "widgets_find_widget", Widgets_find_widget);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_WIDGETS, "widgets_get_focused_widget", Widgets_get_focused_widget);
 }

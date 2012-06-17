@@ -17,12 +17,6 @@ Widgets.add_font_style = function(clss, ...)
 	Los.widgets_add_font_style(...)
 end
 
---- Draws the user interface.
--- @param clss Widgets class.
-Widgets.draw = function(clss)
-	Los.widgets_draw()
-end
-
 --- Finds a widget by screen position.
 -- @param clss Widgets class.
 -- @param args Arguments.<ul>

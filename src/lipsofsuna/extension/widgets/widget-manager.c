@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -111,68 +111,6 @@ void liwdg_manager_free (
 }
 
 /**
- * \brief Stores allocated widgets to pointers.
- * \param self Widget manager.
- * \param ... List of pointer-to-pointer and pointer pairs terminated by NULL.
- */
-int liwdg_manager_alloc_widgets (
-	LIWdgManager* self,
-	              ...)
-{
-	int fail;
-	va_list args;
-	LIWdgWidget* ptr;
-	LIWdgWidget** pptr;
-
-	/* Check for errors. */
-	fail = 0;
-	va_start (args, self);
-	while (1)
-	{
-		pptr = va_arg (args, LIWdgWidget**);
-		if (pptr == NULL)
-			break;
-		ptr = va_arg (args, LIWdgWidget*);
-		if (ptr == NULL)
-		{
-			fail = 1;
-			break;
-		}
-	}
-	va_end (args);
-	if (fail)
-	{
-		va_start (args, self);
-		while (1)
-		{
-			pptr = va_arg (args, LIWdgWidget**);
-			if (pptr == NULL)
-				break;
-			ptr = va_arg (args, LIWdgWidget*);
-			if (ptr != NULL)
-				liwdg_widget_free (ptr);
-		}
-		va_end (args);
-		return 0;
-	}
-
-	/* Copy widgets to target variables. */
-	va_start (args, self);
-	while (1)
-	{
-		pptr = va_arg (args, LIWdgWidget**);
-		if (pptr == NULL)
-			break;
-		ptr = va_arg (args, LIWdgWidget*);
-		lisys_assert (ptr != NULL);
-		*pptr = ptr;
-	}
-	va_end (args);
-
-	return 1;
-}
-
-/**
  * \brief Finds a widget by screen position.
  * \param self Widget manager.
  * \param x Screen X coordinate.
@@ -264,11 +202,6 @@ int liwdg_manager_remove_window (
 	widget->floating = 0;
 
 	return 1;
-}
-
-void liwdg_manager_render (
-	LIWdgManager* self)
-{
 }
 
 void liwdg_manager_sort_windows (

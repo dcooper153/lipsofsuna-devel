@@ -40,6 +40,13 @@ Program.measure_text = function(clss, ...)
 	end
 end
 
+--- Updates and renders the scene.
+-- @param clss Program class.
+-- @param secs Seconds since the last update.
+Program.render = function(clss, secs)
+	return Los.program_render(secs)
+end
+
 --- Sets the current video mode.
 -- @param clss Program class.
 -- @param ... Arguments.<ul>

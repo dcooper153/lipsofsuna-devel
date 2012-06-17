@@ -51,6 +51,7 @@ end
 Program.profiling = {}
 
 -- Main loop.
+local frame = Program.time
 while not Program.quit do
 	-- Update program state.
 	if Settings.watchdog then
@@ -63,7 +64,8 @@ while not Program.quit do
 	Client:update()
 	local t3 = Program.time
 	-- Render the scene.
-	Widgets:draw()
+	Program:render(t3 - frame)
+	frame = t3
 	local t4 = Program.time
 	-- Update profiling stats.
 	Program.profiling.update = t2 - t1
