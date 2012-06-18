@@ -121,6 +121,7 @@ Actor.update = function(self, secs)
 	-- Call the base class.
 	Object.update(self, secs)
 	-- Handle model rebuilding.
+	--
 	-- Equipment changes can occur frequently when newly appearing actors are
 	-- being setup. Because of that, a delay is used to avoid too many expensive
 	-- rebuilds.
@@ -129,6 +130,18 @@ Actor.update = function(self, secs)
 		if self.model_rebuild_timer <= 0 then
 			self.model_rebuild_timer = nil
 			self:update_model()
+		end
+	end
+	-- Apply built models.
+	--
+	-- Models are built asynchronously to avoid stuttering when multiple models
+	-- are built at the same time. As building is completed, the merged model
+	-- can be popped from the model merger of the object.
+	if self.model_merger then
+		local m = self.model_merger:pop_model()
+		if m then
+			m:changed()
+			self.model = m
 		end
 	end
 	-- Get the actor spec.

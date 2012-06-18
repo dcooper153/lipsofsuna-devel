@@ -6,6 +6,12 @@ ModelBuilder.class_name = "ModelBuilder"
 -- @param object Object whose model to build and set.
 -- @param args Model building arguments.
 ModelBuilder.build = function(clss, object, args)
+	-- Create or reuse the model merger.
+	local merger = object.model_merger
+	if not merger then
+		merger = Merger()
+		object.model_merger = merger
+	end
 	-- Get the base meshes.
 	local meshes = {skeleton = args.spec.model}
 	for k,v in pairs(args.spec.models) do
@@ -52,74 +58,44 @@ ModelBuilder.build = function(clss, object, args)
 			meshes[v] = nil
 		end
 	end
-	-- Create the models.
-	--
-	-- Due to body morphing and skin customization, each submodel
-	-- generally needs to be copied and modified before it can be
-	-- added to the object.
-	local models = {}
+	-- Morph and merge the submodels.
+	local model = Model:find_or_load{file = meshes["skeleton"]}
+	if model then merger:add_model(model) end
+	meshes["skeleton"] = nil
 	for k,v in pairs(meshes) do
-		if k == "skeleton" then
-			models[k] = Model:find_or_load{file = v}
-		else
-			models[k] = clss:build_submesh(k, v, args)
-		end
+		clss:build_submesh(merger, k, v, args)
 	end
-	-- Set the skeleton.
-	--
-	-- This needs to be set separately at the start so that the object
-	-- will get the right collision shape. Changing the skeleton will
-	-- make the object disappear until built so we only do it if the
-	-- skeleton is different.
-	local s1 = object.used_models and object.used_models["skeleton"]
-	local s2 = models["skeleton"]
-	if not s1 or not s2 or s1.file ~= s2.file then
-		object.used_models = {}
-		object.model = s2
+	-- Colorize materials.
+	local skin = args.skin_style and Actorskinspec:find{name = args.skin_style}
+	merger:replace_material{match_material = "animeye1", diffuse = args.eye_color}
+	merger:replace_material{match_material = "animhair1", diffuse = args.hair_color}
+	if skin then
+		merger:replace_material{match_material = "animskin1", diffuse = args.skin_color,
+			material = skin.material, textures = skin.textures}
+	else
+		merger:replace_material{match_material = "animskin1", diffuse = args.skin_color,
+			material = args.spec.skin_material, textures = args.spec.skin_textures}
 	end
-	-- Remove unused models.
-	for k,v in pairs(object.used_models) do
-		if not models[k] then
-			if Object.remove_model then
-				object:remove_model(v)
-			end
-			object.used_models[k] = nil
-		end
-	end
-	-- Add new models.
-	for k,v in pairs(models) do
-		if k ~= "skeleton" then
-			v:changed()
-			local old = object.used_models[k]
-			if old then
-				if Object.replace_model then
-					object:replace_model(old, v)
-				end
-			else
-				if Object.add_model then
-					object:add_model(v)
-				end
-			end
-			object.used_models[k] = v
-		end
-	end
+	-- Queue the build.
+	merger:finish()
 end
 
 --- Builds a submesh.
 -- @param clss ModelBuilder class.
+-- @param merger Model merger.
 -- @param name Submesh name.
 -- @param file Filename of the model.
 -- @param args Model building arguments.
-ModelBuilder.build_submesh = function(clss, name, file, args)
-	local tmp
+ModelBuilder.build_submesh = function(clss, merger, name, file, args)
+	-- Load the model.
 	local ref = Model:find_or_load{file = file}
-	-- Face customization.
 	local morph = {}
 	local add = function(name, value)
 		if not value then return end
 		table.insert(morph, name)
 		table.insert(morph, value)
 	end
+	-- Face customization.
 	if args.face_style and (string.match(name, ".*head.*") or string.match(name, ".*eye.*")) then
 		add("cheekbone small", args.face_style[1])
 		add("cheek small", args.face_style[2])
@@ -157,18 +133,6 @@ ModelBuilder.build_submesh = function(clss, name, file, args)
 			add("shoulder thin", 1 - args.body_style[9])
 		end
 	end
-	-- Colorize materials.
-	-- TODO: Copying the model could perhaps be avoided in some cases.
-	tmp = ref:morph_copy(morph)
-	local skin = args.skin_style and Actorskinspec:find{name = args.skin_style}
-	tmp:edit_material{match_material = "animeye1", diffuse = args.eye_color}
-	tmp:edit_material{match_material = "animhair1", diffuse = args.hair_color}
-	if skin then
-		tmp:edit_material{match_material = "animskin1", diffuse = args.skin_color,
-			material = skin.material, textures = skin.textures}
-	else
-		tmp:edit_material{match_material = "animskin1", diffuse = args.skin_color,
-			material = args.spec.skin_material, textures = args.spec.skin_textures}
-	end
-	return tmp
+	-- Morph and merge.
+	merger:add_model_morph(ref, morph)
 end
