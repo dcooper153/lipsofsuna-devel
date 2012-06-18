@@ -34,6 +34,7 @@
 #include "system/system-path.h"
 #include "system/system-paths.h"
 #include "system/system-relative.h"
+#include "system/system-serial-worker.h"
 #include "system/system-string.h"
 #include "system/system-thread.h"
 #include "system/system-time.h"
