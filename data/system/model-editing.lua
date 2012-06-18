@@ -48,6 +48,14 @@ Model.edit_material = function(self, args)
 	Los.model_edit_material(self.handle, args)
 end
 
+--- Merges a morphed copy of the given model to this model.
+-- @param self Model.
+-- @param model Model.
+-- @param targets List of alternating morph target names and influence.
+Model.merge_morph = function(self, model, targets)
+	Los.model_merge_morph(self.handle, model.handle, unpack(targets))
+end
+
 --- Morphs a model with one of its shape keys.
 -- @param self Object.
 -- @param ... Arguments.<ul>

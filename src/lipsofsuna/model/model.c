@@ -554,18 +554,7 @@ LIMdlNode* limdl_model_find_node (
 	const LIMdlModel* self,
 	const char*       name)
 {
-	int i;
-	LIMdlNode* node;
-
-	for (i = 0 ; i < self->nodes.count ; i++)
-	{
-		node = self->nodes.array[i];
-		node = limdl_node_find_node (node, name);
-		if (node != NULL)
-			return node;
-	}
-
-	return NULL;
+	return limdl_nodes_find_node (&self->nodes, name);
 }
 
 /**
@@ -747,6 +736,9 @@ int limdl_model_merge (
 		}
 	}
 
+	/* Merge node hierarchies. */
+	limdl_nodes_merge (&self->nodes, &model->nodes);
+
 	/* FIXME: Recalculates tangents unnecessarily. */
 	/* FIXME: Recalculates the bounding box from scratch even though could just calculate the intersection. */
 	limdl_builder_finish (builder);
@@ -815,6 +807,58 @@ int limdl_model_morph (
 	}
 
 	return 1;
+}
+
+/**
+ * \brief Replaces contents of all materials whose material string matches the search.
+ * \param self Model.
+ * \param match_material Material string to match.
+ * \param set_diffuse Diffuse color, or NULL to not alter.
+ * \param set_specular Specular color, or NULL to not alter.
+ * \param set_material Material string, or NULL to not alter.
+ * \param set_textures Texture list, or NULL to not alter.
+ * \param set_textures_count Texture count in the list.
+ */
+void limdl_model_replace_material_by_string (
+	LIMdlModel*  self,
+	const char*  match_material,
+	const float* set_diffuse,
+	const float* set_specular,
+	const char*  set_material,
+	const char** set_textures,
+	int          set_textures_count)
+{
+	int i;
+	int j;
+	LIMdlMaterial* material;
+
+	/* Edit each matching material. */
+	for (i = 0 ; i < self->materials.count ; i++)
+	{
+		material = self->materials.array + i;
+		if (strcmp (material->material, match_material))
+			continue;
+		if (set_diffuse != NULL)
+			limdl_material_set_diffuse (material, set_diffuse);
+		if (set_specular != NULL)
+			limdl_material_set_specular (material, set_specular);
+		if (set_material != NULL)
+			limdl_material_set_material (material, set_material);
+		if (set_textures != NULL)
+		{
+			if (material->textures.count != set_textures_count)
+			{
+				if (!limdl_material_realloc_textures (material, set_textures_count))
+					continue;
+			}
+			for (j = 0 ; j < set_textures_count ; j++)
+			{
+				limdl_material_set_texture (material, j, LIMDL_TEXTURE_TYPE_IMAGE,
+					LIMDL_TEXTURE_FLAG_BILINEAR | LIMDL_TEXTURE_FLAG_MIPMAP |
+					LIMDL_TEXTURE_FLAG_REPEAT, set_textures[j]);
+			}
+		}
+	}
 }
 
 int limdl_model_write (

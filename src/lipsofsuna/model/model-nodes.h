@@ -15,38 +15,35 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __MODEL_POSE_SKELETON_H__
-#define __MODEL_POSE_SKELETON_H__
+#ifndef __MODEL_NODES_H__
+#define __MODEL_NODES_H__
 
 #include "lipsofsuna/system.h"
-#include "lipsofsuna/math.h"
-#include "model-nodes.h"
-#include "model-types.h"
+#include "model-node.h"
 
-typedef struct _LIMdlPoseSkeleton LIMdlPoseSkeleton;
-struct _LIMdlPoseSkeleton
+typedef struct _LIMdlNodes LIMdlNodes;
+struct _LIMdlNodes
 {
-	LIMdlNodes nodes;
+	int count;
+	LIMdlNode** array;
 };
 
-LIAPICALL (LIMdlPoseSkeleton*, limdl_pose_skeleton_new, (
-	LIMdlModel** models,
-	int          count));
+LIAPICALL (void, limdl_nodes_init, (
+	LIMdlNodes* self));
 
-LIAPICALL (void, limdl_pose_skeleton_free, (
-	LIMdlPoseSkeleton* self));
+LIAPICALL (void, limdl_nodes_deinit, (
+	LIMdlNodes* self));
 
-LIAPICALL (LIMdlNode*, limdl_pose_skeleton_find_node, (
-	const LIMdlPoseSkeleton* self,
-	const char*              name));
+LIAPICALL (void, limdl_nodes_clear, (
+	LIMdlNodes* self));
 
-LIAPICALL (void, limdl_pose_skeleton_rebuild, (
-	LIMdlPoseSkeleton* self,
-	LIMdlModel**       models,
-	int                count));
+LIAPICALL (LIMdlNode*, limdl_nodes_find_node, (
+	const LIMdlNodes* self,
+	const char*       name));
 
-LIAPICALL (void, limdl_pose_skeleton_update, (
-	LIMdlPoseSkeleton* self,
-	LIMdlPose*         pose));
+LIAPICALL (void, limdl_nodes_merge, (
+	LIMdlNodes* self,
+	LIMdlNodes* nodes));
+
 
 #endif

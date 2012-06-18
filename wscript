@@ -11,7 +11,7 @@ out = '.build'
 
 CORE_DIRS = 'ai algorithm archive callback client engine extension generator main math model network particle paths physics script sound system voxel'
 CORE_DIRS_GFX = 'render render/font render/image render/internal'
-EXTS_DIRS = 'ai animation config-file database file heightmap heightmap-physics image lobby math model model-editing network noise object object-physics password physics reload skeleton sound string thread tiles tiles-physics time vision watchdog'
+EXTS_DIRS = 'ai animation config-file database file heightmap heightmap-physics image lobby math model model-editing model-merge network noise object object-physics password physics reload skeleton sound string thread tiles tiles-physics time vision watchdog'
 EXTS_DIRS_GFX = 'camera graphics heightmap-render input object-render render tiles-render widgets wireframe'
 
 def options(ctx):

@@ -27,6 +27,7 @@
 #include "model-light.h"
 #include "model-lod.h"
 #include "model-material.h"
+#include "model-nodes.h"
 #include "model-particle.h"
 #include "model-node.h"
 #include "model-shape.h"
@@ -43,10 +44,10 @@ struct _LIMdlModel
 {
 	int flags;
 	LIMatAabb bounds;
+	LIMdlNodes nodes;
 	struct { int count; LIMdlHairs* array; } hairs;
 	struct { int count; LIMdlLod* array; } lod;
 	struct { int count; LIMdlMaterial* array; } materials;
-	struct { int count; LIMdlNode** array; } nodes;
 	struct { int count; LIMdlParticleSystem* array; } particle_systems;
 	struct { int count; LIMdlShape* array; } shapes;
 	struct { int count; LIMdlShapeKey* array; } shape_keys;
@@ -114,6 +115,15 @@ LIAPICALL (int, limdl_model_morph, (
 	LIMdlModel* ref,
 	const char* shape,
 	float       value));
+
+LIAPICALL (void, limdl_model_replace_material_by_string, (
+	LIMdlModel*  self,
+	const char*  match_material,
+	const float* set_diffuse,
+	const float* set_specular,
+	const char*  set_material,
+	const char** set_textures,
+	int          set_textures_count));
 
 LIAPICALL (int, limdl_model_write, (
 	const LIMdlModel* self,

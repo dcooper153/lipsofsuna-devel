@@ -3,6 +3,13 @@ local catch = function(f)
 	if not s then print(e) end
 end
 
+Unittest = {}
+Unittest.tests = {}
+Unittest.add = function(self, name, func)
+	assert(not self.tests[name])
+	self.tests[name] = func
+end
+
 ------------------------------------------------------------------------------
 
 Los.program_unittest()
@@ -18,6 +25,12 @@ catch(function() Thread.unittest() end)
 
 require "system/file"
 catch(function() File.unittest() end)
+
+File:require_directory("tests")
+for k,v in pairs(Unittest.tests) do
+	print("Testing " .. k .. "...")
+	catch(function() v() end)
+end
 
 require "system/math"
 catch(function() Vector.unittest() end)

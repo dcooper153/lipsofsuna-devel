@@ -27,21 +27,10 @@
 #include "model-pose.h"
 #include "model-pose-skeleton.h"
 
-static int private_copy_node (
-	LIMdlPoseSkeleton* self,
-	LIMdlNode*         node,
-	LIMdlNode*         parent,
-	LIMdlNode***       root_array,
-	int*               root_count);
-
 static void private_copy_nodes (
 	LIMdlPoseSkeleton* self,
 	LIMdlModel**       models,
 	int                models_num);
-
-static LIMdlNode* private_find_node (
-	const LIMdlPoseSkeleton* self,
-	const char*              name);
 
 static void private_transform_node (
 	LIMdlPoseSkeleton* self,
@@ -73,17 +62,7 @@ LIMdlPoseSkeleton* limdl_pose_skeleton_new (
 void limdl_pose_skeleton_free (
 	LIMdlPoseSkeleton* self)
 {
-	int i;
-
-	if (self->nodes.array != NULL)
-	{
-		for (i = 0 ; i < self->nodes.count ; i++)
-		{
-			if (self->nodes.array[i] != NULL)
-				limdl_node_free (self->nodes.array[i]);
-		}
-		lisys_free (self->nodes.array);
-	}
+	limdl_nodes_deinit (&self->nodes);
 	lisys_free (self);
 }
 
@@ -97,7 +76,7 @@ LIMdlNode* limdl_pose_skeleton_find_node (
 	const LIMdlPoseSkeleton* self,
 	const char*              name)
 {
-	return private_find_node (self, name);
+	return limdl_nodes_find_node (&self->nodes, name);
 }
 
 /**
@@ -133,63 +112,6 @@ void limdl_pose_skeleton_update (
 
 /*****************************************************************************/
 
-static int private_copy_node (
-	LIMdlPoseSkeleton* self,
-	LIMdlNode*         node,
-	LIMdlNode*         parent,
-	LIMdlNode***       root_array,
-	int*               root_count)
-{
-	int i;
-	LIMdlNode* copy;
-	LIMdlNode** tmp;
-
-	/* Create a new node if there was no existing one. */
-	/* If no existing node with the same name existed, we need to create a new
-	   node. The new node is added to the parent node, if any, or to the list
-	   of root nodes. */
-	copy = private_find_node (self, node->name);
-	if (copy == NULL)
-	{
-		/* Copy the node. */
-		copy = limdl_node_copy (node, 0);
-		if (copy == NULL)
-			return 0;
-
-		/* Store the copy. */
-		if (parent != NULL)
-		{
-			if (!limdl_node_add_child (parent, copy))
-			{
-				limdl_node_free (copy);
-				return 0;
-			}
-			copy->parent = parent;
-		}
-		else
-		{
-			tmp = lisys_realloc (*root_array, ((*root_count) + 1) * sizeof (LIMdlNode*));
-			if (tmp == NULL)
-			{
-				limdl_node_free (copy);
-				return 0;
-			}
-			*root_array = tmp;
-			(*root_array)[*root_count] = copy;
-			*root_count = (*root_count) + 1;
-		}
-	}
-
-	/* Copy the child nodes recursively. */
-	for (i = 0 ; i < node->nodes.count ; i++)
-	{
-		if (!private_copy_node (self, node->nodes.array[i], copy, root_array, root_count))
-			return 0;
-	}
-
-	return 1;
-}
-
 static void private_copy_nodes (
 	LIMdlPoseSkeleton* self,
 	LIMdlModel**       models,
@@ -199,17 +121,7 @@ static void private_copy_nodes (
 	int j;
 
 	/* Free the old nodes. */
-	if (self->nodes.array != NULL)
-	{
-		for (i = 0 ; i < self->nodes.count ; i++)
-		{
-			if (self->nodes.array[i] != NULL)
-				limdl_node_free (self->nodes.array[i]);
-		}
-		lisys_free (self->nodes.array);
-		self->nodes.array = NULL;
-		self->nodes.count = 0;
-	}
+	limdl_nodes_clear (&self->nodes);
 
 	/* Copy nodes from the models. */
 	/* This does skeleton merging by adding new nodes under an existing node
@@ -218,26 +130,8 @@ static void private_copy_nodes (
 	for (j = 0 ; j < models_num ; j++)
 	{
 		for (i = 0 ; i < models[j]->nodes.count ; i++)
-			private_copy_node (self, models[j]->nodes.array[i], NULL, &self->nodes.array, &self->nodes.count);
+			limdl_nodes_merge (&self->nodes, &models[j]->nodes);
 	}
-}
-
-static LIMdlNode* private_find_node (
-	const LIMdlPoseSkeleton* self,
-	const char*              name)
-{
-	int i;
-	LIMdlNode* node;
-
-	for (i = 0 ; i < self->nodes.count ; i++)
-	{
-		node = self->nodes.array[i];
-		node = limdl_node_find_node (node, name);
-		if (node != NULL)
-			return node;
-	}
-
-	return NULL;
 }
 
 static void private_transform_node (

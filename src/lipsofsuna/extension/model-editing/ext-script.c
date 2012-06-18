@@ -291,6 +291,46 @@ static void Model_merge (LIScrArgs* args)
 	}
 }
 
+static void Model_merge_morph (LIScrArgs* args)
+{
+	int i;
+	float value;
+	const char* shape;
+	LIEngModel* model1;
+	LIEngModel* model2;
+	LIMdlModel* copy;
+	LIScrData* data;
+
+	/* Get arguments. */
+	if (!liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &data))
+		return;
+	model1 = args->self;
+	model2 = liscr_data_get_data (data);
+
+	/* Copy without shape keys. */
+	copy = limdl_model_new_copy (model2->model, 0);
+	if (copy == NULL)
+		return;
+
+	/* Morph using the original model. */
+	i = 1;
+	while (1)
+	{
+		if (!liscr_args_geti_string (args, i, &shape) ||
+		    !liscr_args_geti_float (args, i + 1, &value))
+			break;
+		limdl_model_morph (copy, model2->model, model2->model, shape, value);
+		i += 2;
+	}
+
+	/* Merge the morphed model to this one. */
+	if (!limdl_model_merge (model1->model, copy))
+		lisys_error_report ();
+
+	/* Free the copied model. */
+	limdl_model_free (copy);
+}
+
 static void Model_morph (LIScrArgs* args)
 {
 	float value = 0.5f;
@@ -332,6 +372,7 @@ void liext_script_model_editing (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_calculate_lod", Model_calculate_lod);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_edit_material", Model_edit_material);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_merge", Model_merge);
+	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_merge_morph", Model_merge_morph);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_morph", Model_morph);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_MODEL, "model_remove_vertices", Model_remove_vertices);
 }

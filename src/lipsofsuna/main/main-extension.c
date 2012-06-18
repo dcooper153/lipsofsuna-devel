@@ -41,6 +41,7 @@ extern LIMaiExtensionInfo liext_lobby_info;
 extern LIMaiExtensionInfo liext_math_info;
 extern LIMaiExtensionInfo liext_model_info;
 extern LIMaiExtensionInfo liext_model_editing_info;
+extern LIMaiExtensionInfo liext_model_merge_info;
 extern LIMaiExtensionInfo liext_network_info;
 extern LIMaiExtensionInfo liext_noise_info;
 extern LIMaiExtensionInfo liext_object_info;
@@ -90,6 +91,7 @@ LIMaiExtensionInfo* limai_extension_get_builtin (
 		{ "math", &liext_math_info },
 		{ "model", &liext_model_info },
 		{ "model-editing", &liext_model_editing_info },
+		{ "model-merge", &liext_model_merge_info },
 		{ "network", &liext_network_info },
 		{ "noise", &liext_noise_info },
 		{ "object", &liext_object_info },
