@@ -807,20 +807,15 @@ Ui:add_class_getters{
 
 Ui:add_class_setters{
 	pointer_grab = function(self, v)
-		-- Set cursor visibility.
-		rawset(self, "__pointer_grab", v)
-		self.cursor.floating = not v
-		-- Set pointer grabbing.
-		-- If the state indicates that the cursor does not need to be grabbed,
-		-- we just hide it so that it can leave the window in windowed mode.
+		-- The pointer is always shown in pure UI states.
 		local state_ = self.states[self.state]
-		if v then
-			if state_ and state_.grab() then
-				Program.cursor_grabbed = true
-			else
-				Program.cursor_grabbed = false
-			end
+		if v and state_ and state_.grab() then
+			rawset(self, "__pointer_grab", true)
+			self.cursor.floating = false
+			Program.cursor_grabbed = true
 		else
+			rawset(self, "__pointer_grab", false)
+			self.cursor.floating = true
 			Program.cursor_grabbed = false
 		end
 	end,
