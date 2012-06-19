@@ -1,0 +1,13 @@
+Unittest:add(1, "animation", function()
+	require "system/animation"
+	local a = Animation:load("aer1-walk")
+	assert(a)
+	assert(a.duration > 0)
+	assert(a.frames > 0)
+	local a = Animation:load("adfdsf")
+	assert(a == nil)
+	local a = Animation("fadfdsf")
+	assert(a ~= nil)
+	assert(a.duration == 1)
+	assert(a.frames == 0)
+end)

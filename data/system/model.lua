@@ -115,16 +115,3 @@ Model:add_getters{
 	memory_used = function(self)
 		return Los.model_get_memory_used(self.handle)
 	end}
-
-Model.unittest = function()
-	-- Creating models.
-	local m = Model()
-	assert(m)
-	assert(m.handle)
-	-- Copying models.
-	local m1 = m:copy()
-	assert(m1)
-	assert(m1.handle)
-	-- Function access.
-	m:calculate_bounds()
-end

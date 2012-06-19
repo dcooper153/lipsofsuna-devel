@@ -240,31 +240,6 @@ Quaternion:add_setters{
 	y = function(s, v) Los.quaternion_set_y(s.handle, v) end,
 	z = function(s, v) Los.quaternion_set_z(s.handle, v) end}
 
-Quaternion.unittest = function()
-	-- XYZW presentation.
-	local q1 = Quaternion(1,0,0,0)
-	assert(q1.x == 1)
-	assert(q1.length == 1)
-	-- Axis-angle presentation.
-	local q2 = Quaternion{axis = Vector(0,1,0), angle = math.pi}
-	assert(q2.y == 1)
-	assert(q2.length == 1)
-	-- Look-at presentation.
-	local q3 = Quaternion{dir = Vector(0,0,1), up = Vector(0,1,0)}
-	assert(q3.y == -1)
-	assert(q3.length == 1)
-	-- Euler presentation.
-	local q4 = Quaternion{euler = {0,0,1.5}}
-	assert(q4.euler[1] == 0)
-	assert(q4.euler[2] == 0)
-	assert(q4.euler[3] == 1.5)
-	-- Multiplication vectors.
-	local q5 = q4 * q3
-	assert(q5.class == Quaternion)
-	local v1 = q4 * Vector(1,0,0)
-	assert(v1.class == Vector)
-end
-
 ------------------------------------------------------------------------------
 
 Vector = Class()
@@ -515,30 +490,3 @@ Vector:add_setters{
 	x = function(s, v) Los.vector_set_x(s.handle, v) end,
 	y = function(s, v) Los.vector_set_y(s.handle, v) end,
 	z = function(s, v) Los.vector_set_z(s.handle, v) end}
-
-Vector.unittest = function()
-	-- Addition.
-	local vec = Vector(1, 100) + Vector(5,5,5)
-	assert(vec.x == 6 and vec.y == 105 and vec.z == 5)
-	-- Normalization.
-	assert(math.abs(1-vec:normalize().length) < 0.0001)
-	-- Scalar multiplication.
-	local a = Vector(1,-2,3) * 5
-	assert(a.class == Vector)
-	assert(math.abs(a.x - 5) < 0.0001)
-	assert(math.abs(a.y + 10) < 0.0001)
-	assert(math.abs(a.z - 15) < 0.0001)
-	-- Dot product.
-	local b = a:dot(a)
-	assert(math.abs(b - 350) < 0.0001)
-	-- Cross product.
-	local c = Vector(1):cross(Vector(0,1))
-	assert(math.abs(c.x) < 0.0001)
-	assert(math.abs(c.y) < 0.0001)
-	assert(math.abs(c.z - 1) < 0.0001)
-	-- Protection from nan and inf.
-	local d = Vector(0/0, -0/0, 1/0)
-	assert(d.x == 0 and d.y == 0 and d.z == 0)
-	d:normalize()
-	assert(d.x == 0 and d.y == 0 and d.z == 0)
-end

@@ -220,18 +220,3 @@ Program.class_getters = {
 Program.class_setters = {
 	quit = function(s, v) Los.program_set_quit(v) end,
 	sleep = function(s, v) Los.program_set_sleep(v) end}
-
-Program.unittest = function()
-	-- Getters and setters.
-	assert(type(Program.args) == "string")
-	assert(type(Program.quit) == "boolean")
-	assert(type(Program.sectors) == "table")
-	assert(type(Program.sleep) == "number")
-	assert(type(Program.tick) == "number")
-	assert(type(Program.time) == "number")
-	Program.quit = true
-	assert(Program.quit)
-	-- Message passing disabled for non-threads.
-	assert(not Program:push_message("fail", "fail"))
-	assert(not Program:pop_message())
-end

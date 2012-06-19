@@ -78,16 +78,3 @@ Animation:add_getters{
 	duration = function(self) return Los.animation_get_duration(self.handle) end,
 	frames = function(self) return Los.animation_get_frames(self.handle) end,
 	name = function(self) return Los.animation_get_name(self.handle) end}
-
-Animation.unittest = function()
-	local a = Animation:load("aer1-walk")
-	assert(a)
-	assert(a.duration > 0)
-	assert(a.frames > 0)
-	local a = Animation:load("adfdsf")
-	assert(a == nil)
-	local a = Animation("fadfdsf")
-	assert(a ~= nil)
-	assert(a.duration == 1)
-	assert(a.frames == 0)
-end

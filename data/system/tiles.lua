@@ -100,22 +100,6 @@ Material:add_setters{
 	texture_scale = function(s, v) Los.material_set_texture_scale(s.handle, v) end,
 	type = function(s, v) Los.material_set_type(s.handle, v) end}
 
-Material.unittest = function()
-	local m = Material()
-	assert(type(m.cullface) == "boolean")
-	assert(type(m.diffuse) == "table")
-	assert(type(m.flags) == "number")
-	assert(type(m.friction) == "number")
-	assert(type(m.id) == "number")
-	assert(type(m.name) == "string")
-	assert(type(m.shader) == "string")
-	assert(type(m.shininess) == "number")
-	assert(type(m.specular) == "table")
-	assert(type(m.texture) == "table")
-	assert(type(m.texture_scale) == "number")
-	assert(type(m.type) == "string")
-end
-
 ------------------------------------------------------------------------------
 
 Voxel = Class()
@@ -279,10 +263,3 @@ Voxel.class_setters = {
 	blocks_per_line = function(s, v) Los.voxel_set_blocks_per_line(v) end,
 	fill = function(s, v) Los.voxel_set_fill(v) end,
 	tiles_per_line = function(s, v) Los.voxel_set_tiles_per_line(v) end}
-
-Voxel.unittest = function()
-	-- Getting and setting tiles.
-	assert(Voxel:get_tile(Vector(100,101,102)) == 0)
-	Voxel:set_tile(Vector(100,101,102), 5)
-	assert(Voxel:get_tile(Vector(100,101,102)) == 5)
-end

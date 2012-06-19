@@ -42,23 +42,3 @@ end
 File.write = function(self, name, data)
 	return Los.file_write(name, data)
 end
-
-File.unittest = function()
-	-- Directory scanning.
-	local r1 = File:scan_directory("/")
-	assert(#r1 == 3)
-	assert(r1[1] == "aer1-walk.lani")
-	assert(r1[2] == "main.lua")
-	assert(r1[3] == "tests")
-	local r2 = File:scan_directory("..")
-	assert(r2 == nil)
-	local r3 = File:scan_directory("")
-	assert(#r3 == 3)
-	assert(r3[2] == "main.lua")
-	local r4 = File:scan_directory(".")
-	assert(#r4 == 3)
-	assert(r4[2] == "main.lua")
-	local r5 = File:scan_directory("./")
-	assert(#r5 == 3)
-	assert(r5[2] == "main.lua")
-end
