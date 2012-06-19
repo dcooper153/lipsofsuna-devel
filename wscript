@@ -131,12 +131,27 @@ def configure(ctx):
 		if not ctx.check_cc(lib='lua5.1', uselib='CORE TEST', uselib_store='LUA', mandatory=False):
 			ctx.check_cc(lib='lua', mandatory=True, uselib='CORE TEST', uselib_store='LUA')
 
-	# libpng
-	if not ctx.check_cfg(package='libpng', atleast_version='1.2.0', args='--cflags --libs', uselib_store='PNG', mandatory=False) and\
-	   not ctx.check_cfg(package='libpng12', atleast_version='1.2.0', args='--cflags --libs', uselib_store='PNG', mandatory=False) and\
-	   not ctx.check_cfg(package='libpng14', atleast_version='1.4.0', args='--cflags --libs', uselib_store='PNG', mandatory=False):
-		ctx.check_cc(lib='png', mandatory=True, uselib_store='PNG')
-		ctx.check_cc(header_name='png.h', mandatory=True, uselib_store='PNG')
+	# Freeimage
+	if ctx.check_cfg(package='freeimage', atleast_version='3.0.0', args='--cflags --libs', uselib_store='PNG', mandatory=False):
+		ctx.env.FREEIMAGE = True
+	elif ctx.check_cc(lib='freeimage', mandatory=False, uselib_store='PNG') and\
+	     ctx.check_cc(header_name='FreeImage.h', mandatory=False, uselib_store='PNG'):
+		ctx.env.FREEIMAGE = True
+	if ctx.env.FREEIMAGE:
+		ctx.define('HAVE_FREEIMAGE', 1)
+
+	# Libpng
+	if not ctx.env.FREEIMAGE:
+		if ctx.check_cfg(package='libpng', atleast_version='1.2.0', args='--cflags --libs', uselib_store='PNG', mandatory=False) or\
+		   ctx.check_cfg(package='libpng12', atleast_version='1.2.0', args='--cflags --libs', uselib_store='PNG', mandatory=False) or\
+		   ctx.check_cfg(package='libpng14', atleast_version='1.4.0', args='--cflags --libs', uselib_store='PNG', mandatory=False):
+			ctx.env.LIBPNG = True
+		else:
+			ctx.check_cc(lib='png', mandatory=True, uselib_store='PNG')
+			ctx.check_cc(header_name='png.h', mandatory=True, uselib_store='PNG')
+			ctx.env.LIBPNG = True
+	if ctx.env.LIBPNG:
+		ctx.define('HAVE_LIBPNG', 1)
 
 	if ctx.env.GRAPHICS:
 		# Ogre
@@ -262,6 +277,10 @@ def configure(ctx):
 		print("\tsound support")
 	if ctx.env.CURL:
 		print("\tmaster server connectivity")
+	if ctx.env.FREEIMAGE:
+		print("\timage loading with FreeImage")
+	if ctx.env.LIBPNG:
+		print("\image loading with libpng")
 	if ctx.env.MEMDEBUG:
 		print("\tmemory debugging")
 	if ctx.env.OGRE_plugindir:

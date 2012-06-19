@@ -15,42 +15,15 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __EXT_IMAGE_IMAGE_H__
-#define __EXT_IMAGE_IMAGE_H__
+#ifndef __EXT_IMAGE_IMAGE_PNG_H__
+#define __EXT_IMAGE_IMAGE_PNG_H__
 
-typedef struct _LIImgImage LIImgImage;
-struct _LIImgImage
-{
-	int width;
-	int height;
-	void* pixels;
-};
+#include "lipsofsuna/system.h"
 
-LIAPICALL (LIImgImage*, liimg_image_new, ());
-
-LIAPICALL (LIImgImage*, liimg_image_new_from_file, (
-	const char* path));
-
-LIAPICALL (void, liimg_image_free, (
-	LIImgImage* self));
-
-LIAPICALL (int, liimg_image_load_dds, (
-	LIImgImage* self,
-	const char* path));
-
-LIAPICALL (int, liimg_image_load_png, (
-	LIImgImage* self,
-	const char* path));
-
-LIAPICALL (int, liimg_image_save_rgba, (
-	LIImgImage* self,
-	const char* path));
-
-LIAPICALL (int, liimg_image_save_s3tc, (
-	LIImgImage* self,
-	const char* path));
-
-LIAPICALL (void, liimg_image_shrink_half, (
-	LIImgImage* self));
+LIAPICALL (int, liimg_png_load, (
+	const char* file,
+	int*        result_width,
+	int*        result_height,
+	void**      result_pixels));
 
 #endif

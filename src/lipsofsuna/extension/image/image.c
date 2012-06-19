@@ -24,11 +24,11 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <png.h>
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/render/image/image-dds.h"
 #include "image.h"
 #include "image-compress.h"
+#include "image-png.h"
 
 /**
  * \brief Creates a new empty image.
@@ -161,97 +161,7 @@ int liimg_image_load_png (
 	LIImgImage* self,
 	const char* path)
 {
-	int x;
-	int y;
-	int depth;
-	int width;
-	int height;
-	char* dst;
-	void* pixels;
-	FILE* file;
-	png_bytepp rows;
-	png_infop info;
-	png_structp png;
-
-	/* Initialize structures. */
-	png = png_create_read_struct (PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
-	if (png == NULL)
-	{
-		lisys_error_set (ENOMEM, NULL);
-		return 0;
-	}
-	info = png_create_info_struct (png);
-	if (info == NULL)
-	{
-		png_destroy_read_struct (&png, NULL, NULL);
-		lisys_error_set (ENOMEM, NULL);
-		return 0;
-	}
-
-	/* Open file. */
-	file = fopen (path, "rb");
-	if (file == NULL)
-	{
-		lisys_error_set (EIO, "cannot open file `%s'", path);
-		png_destroy_read_struct (&png, &info, NULL);
-		return 0;
-	}
-
-	/* Read data. */
-	if (setjmp (png_jmpbuf (png)))
-	{
-		lisys_error_set (EIO, "error while reading `%s'", path);
-		png_destroy_read_struct (&png, &info, NULL);
-		fclose (file);
-		return 0;
-	}
-	png_init_io (png, file);
-	png_read_png (png, info, PNG_TRANSFORM_EXPAND | PNG_TRANSFORM_STRIP_16 | PNG_TRANSFORM_PACKING, NULL);
-	width = png_get_image_width (png, info);
-	height = png_get_image_height (png, info);
-	rows = png_get_rows (png, info);
-	depth = png_get_rowbytes (png, info);
-	depth /= width;
-	fclose (file);
-
-	/* Allocate pixel data. */
-	pixels = lisys_malloc (width * height * 4);
-	if (pixels == NULL)
-	{
-		png_destroy_read_struct (&png, &info, NULL);
-		return 0;
-	}
-
-	/* Copy pixel data. */
-	if (depth == 3)
-	{
-		for (y = 0 ; y < height ; y++)
-		{
-			dst = pixels + 4 * width * y;
-			for (x = 0 ; x < width ; x++)
-			{
-				dst[4 * x + 0] = ((char*) rows[y])[3 * x + 0];
-				dst[4 * x + 1] = ((char*) rows[y])[3 * x + 1];
-				dst[4 * x + 2] = ((char*) rows[y])[3 * x + 2];
-				dst[4 * x + 3] = 0xFF;
-			}
-		}
-	}
-	else
-	{
-		for (y = 0 ; y < height ; y++)
-		{
-			dst = pixels + 4 * width * y;
-			memcpy (dst, rows[y], 4 * width);
-		}
-	}
-	lisys_free (self->pixels);
-	self->pixels = pixels;
-	self->width = width;
-	self->height = height;
-	png_destroy_read_struct (&png, &info, NULL);
-
-	return 1;
+	return liimg_png_load (path, &self->width, &self->height, &self->pixels);
 }
 
 /**
