@@ -30,18 +30,6 @@ Itemspec{
 	stacking = true}
 
 Itemspec{
-	name = "milky powder",
-	model = "book-000", -- FIXME
-	icon = "potion3",
-	categories = {["material"] = true},
-	crafting_count = 20,
-	description = "A magical reagent",
-	crafting_materials = {["mushroom"] = 1},
-	mass = 1,
-	mass_inventory = 0.05,
-	stacking = true}
-
-Itemspec{
 	name = "wheat",
 	model = "book-000", -- FIXME
 	mass = 1,

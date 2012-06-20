@@ -1478,6 +1478,8 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
     <file>data/lipsofsuna/items/food/rawmeat1.lmdl</file>
     <file>data/lipsofsuna/items/food/rawmeat1.png</file>
     <file>data/lipsofsuna/items/food/rawmeat2.lmdl</file>
+    <file>data/lipsofsuna/items/milkypowder/milkypowder1.lmdl</file>
+    <file>data/lipsofsuna/items/milkypowder/milkypowder1.png</file>
     <file>data/lipsofsuna/plants/watermelon/watermelon1.lmdl</file>
     <file>data/lipsofsuna/plants/watermelon/watermelon1.png</file>
     <file>data/lipsofsuna/plants/watermelon/watermelon2.lmdl</file>
@@ -1506,6 +1508,8 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
     <file>import/watermelon1.blend</file>
     <file>import/watermelon1.png</file>
     <file>import/watermelonleaf1.png</file>
+    <file>import/milkypowder1.blend</file>
+    <file>import/milkypowder1.png</file>
     <author>Renoki</author>
     <license>Creative Commons BY-SA 3.0</license>
   </asset>
