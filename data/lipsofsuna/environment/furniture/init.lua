@@ -30,6 +30,15 @@ Itemspec{
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
 
+Obstaclespec{
+	name = "shelf",
+	categories = {["furniture"] = true},
+	collision_mask = 0xFFFF,
+	health = 100,
+	mass = 20,
+	model = "shelf1",
+	physics = "rigid"}
+
 Itemspec{
 	name = "wood bench",
 	model = "bench1",

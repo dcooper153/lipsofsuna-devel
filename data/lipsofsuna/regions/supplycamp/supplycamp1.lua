@@ -1,14 +1,15 @@
 Patternspec{
 	name = "supplycamp1",
+	categories = {["init"] = true},
 	size = Vector(32,8,32),
+	overworld = true,
 	position = Vector(855,1278,830),
 	spawn_point = Vector(5,5,5),
-	categories = {["init"] = true},
-	overworld = true,
 	obstacles = {
 		{-7.230000,0.970000,22.390000,"rust sprig tree"},
 		{-5.170000,1.540000,9.970000,"rust sprig tree"},
 		{-1.440000,0.480000,6.910000,"arch 1"},
+		{1.500000,1.160000,15.960000,"shelf"},
 		{2.470000,4.970000,17.840000,"roof 1",0.50},
 		{2.640000,4.930000,12.350000,"roof 1"},
 		{3.020000,0.330000,20.330000,"wooden stairs"},
@@ -16,10 +17,10 @@ Patternspec{
 		{22.260000,-1.620000,26.340000,"rust sprig tree"},
 		{31.500000,-2.700000,23.420000,"rust sprig tree"},
 		{39.660000,-3.000000,20.020000,"rust sprig tree"}},
-	statics = {
-		{12.020000,0.990000,8.710000,"entrance to suna dungeons"}},
 	actors = {
 		{7.790000,1.160000,16.320000,"Guy"}},
+	statics = {
+		{12.020000,0.990000,8.710000,"entrance to suna dungeons"}},
 	tiles = {
 		{0,0,0,"granite1"}, {1,0,0,"granite1"}, {2,0,0,"granite1"}, {3,0,0,"granite1"}, {4,0,0,"granite1"}, {5,0,0,"granite1"}, {6,0,0,"granite1"}, {7,0,0,"granite1"}, {8,0,0,"granite1"}, {9,0,0,"granite1"}, {10,0,0,"granite1"}, {11,0,0,"granite1"}, {12,0,0,"granite1"}, {13,0,0,"granite1"}, {14,0,0,"granite1"}, {15,0,0,"granite1"}, {16,0,0,"granite1"}, {17,0,0,"granite1"}, {18,0,0,"granite1"}, {19,0,0,"granite1"}, {20,0,0,"granite1"}, {21,0,0,"granite1"}, {22,0,0,"granite1"}, {23,0,0,"granite1"}, {24,0,0,"granite1"}, {25,0,0,"granite1"}, {26,0,0,"granite1"}, {27,0,0,"granite1"}, {28,0,0,"granite1"}, {29,0,0,"granite1"}, {30,0,0,"granite1"}, {31,0,0,"granite1"},
 		{0,0,1,"granite1"}, {1,0,1,"granite1"}, {2,0,1,"granite1"}, {3,0,1,"granite1"}, {4,0,1,"granite1"}, {5,0,1,"granite1"}, {6,0,1,"granite1"}, {7,0,1,"granite1"}, {8,0,1,"granite1"}, {9,0,1,"granite1"}, {10,0,1,"granite1"}, {11,0,1,"granite1"}, {12,0,1,"granite1"}, {13,0,1,"granite1"}, {14,0,1,"granite1"}, {15,0,1,"granite1"}, {16,0,1,"granite1"}, {17,0,1,"granite1"}, {18,0,1,"granite1"}, {19,0,1,"granite1"}, {20,0,1,"granite1"}, {21,0,1,"granite1"}, {22,0,1,"granite1"}, {23,0,1,"granite1"}, {24,0,1,"granite1"}, {25,0,1,"granite1"}, {26,0,1,"granite1"}, {27,0,1,"granite1"}, {28,0,1,"granite1"}, {29,0,1,"granite1"}, {30,0,1,"granite1"}, {31,0,1,"granite1"},
