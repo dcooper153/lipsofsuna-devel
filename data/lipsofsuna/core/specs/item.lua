@@ -36,6 +36,7 @@ Itemspec.introspect = Introspect{
 		{name = "effect_equip", type = "string", description = "Name of the effect to play when the item is equiped."},
 		{name = "effect_unequip", type = "string", description = "Name of the effect to play when the item is unequiped."},
 		{name = "effect_use", type = "string", description = "Name of the effect to play when the item is used."},
+		{name = "equipment_anchor", type = "string", description = "Name of the node snapped to the hand of the actor when wielded."},
 		{name = "equipment_models", type = "dict", dict = {type = "dict", dict = {type = "string"}}, description = "Dictionary of equipment models."},
 		{name = "equipment_slot", type = "string", description = "Equipment slot into which the item can be placed."},
 		{name = "equipment_slots_reserved", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of equipment slots that the item reserves in addition to the main slot."},

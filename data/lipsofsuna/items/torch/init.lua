@@ -5,12 +5,12 @@ Effectspec{
 	sound = "torchlit1"}
 
 Effectspec{
-        name = "torchflame1",
-        light = true,
-        light_diffuse = {1,1,1,1},
-        light_equation = {2,0.1,0.1},
-        node = "#flame",
-        particle = "torchfx1"}
+	name = "torchflame1",
+	light = true,
+	light_diffuse = {1,1,1,1},
+	light_equation = {2,0.1,0.1},
+	node = "#flame",
+	particle = "torchfx1"}
 
 Itemspec{
 	name = "torch",

@@ -1,0 +1,39 @@
+particle_system candlefx1
+{
+	material torchfx1
+	particle_width 0.05
+	particle_height 0.05
+	cull_each false
+	quota 5000
+	billboard_type point
+	local_space true
+	emitter Box
+	{
+		angle 30
+		emission_rate 60
+		time_to_live 0.18
+		direction 0 1 0
+		velocity 0
+		colour_range_start 1 1 0
+		colour_range_end 1 0 0
+		width 0.02
+		height 0.02
+		depth 0.02
+	}
+	affector LinearForce
+	{
+		force_vector 0 2 0
+		force_application add
+	}
+	affector ColourFader
+	{
+		red -0.4
+		green -0.4
+		blue -0.2
+		alpha -0.5
+	}
+	affector DirectionRandomiser
+	{
+		randomness 3
+	}
+}

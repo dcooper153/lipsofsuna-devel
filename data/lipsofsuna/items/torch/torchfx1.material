@@ -7,10 +7,6 @@ material torchfx1
 			lighting off
 			scene_blend add
 			depth_write off
-			diffuse vertexcolour
-			point_sprites on
-			point_size 2
-			point_size_attenuation on
 			texture_unit
 			{
 				texture particle5.dds

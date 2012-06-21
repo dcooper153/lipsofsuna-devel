@@ -1,16 +1,17 @@
 Patternspec{
 	name = "giantshaft",
+	categories = {["init"] = true},
 	size = Vector(42,64,42),
 	position = Vector(600,1000,700),
 	spawn_point = Vector(17,15,22),
-	categories = {["init"] = true},
 	items = {
 		{12.930000,1.000000,34.740000,"barrel"},
 		{15.010000,13.210000,19.550000,"bookcase",-0.26},
 		{16.500000,16.000000,25.520000,"dying torch"},
 		{16.550000,0.990000,38.280000,"barrel"},
 		{27.980000,3.220000,29.080000,"torch"},
-		{36.580000,1.000000,11.830000,"barrel"},
+		{33.680000,2.090000,13.790000,"wooden lantern"},
+		{36.540000,0.990000,11.830000,"barrel"},
 		{38.120000,0.990000,23.840000,"mushroom"},
 		{38.820000,2.420000,24.040000,"mushroom"},
 		{38.960000,1.000000,12.420000,"barrel"},
@@ -36,6 +37,7 @@ Patternspec{
 		{31.500000,1.000000,17.000000,"wooden mine support (simple)",0.25},
 		{31.500000,1.000000,23.500000,"wooden mine support (simple)",0.25},
 		{31.500000,1.000000,27.000000,"wooden mine support (simple)",0.25},
+		{33.510000,1.040000,13.040000,"shelf"},
 		{38.430000,0.930000,24.480000,"rust sprig tree"}},
 	actors = {
 		{13.850000,0.980000,38.330000,"Fighting Instructor Fa",-0.11},

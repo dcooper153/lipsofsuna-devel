@@ -155,8 +155,14 @@ Actor.update = function(self, secs)
 		if node ~= "" and object then
 			local p,r = self:find_node{name = node, space = "world"}
 			if not p then p,r = self.position,self.rotation end
-			local h = object:find_node{name = "#handle"}
-			if h then p = p - r * h end
+			if object.spec.equipment_anchor then
+				local h,s = object:find_node{name = object.spec.equipment_anchor}
+				if h then
+					h = s.conjugate * h
+					p = p - r * h
+					r = r * s.conjugate
+				end
+			end
 			object.position = p
 			object.rotation = r
 			object.realized = true
