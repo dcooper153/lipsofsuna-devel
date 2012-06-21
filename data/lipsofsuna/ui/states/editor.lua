@@ -12,7 +12,11 @@ Ui:add_state{
 		end
 	end,
 	update = function(secs)
-		Client.editor:update(secs)
+		if not Client.editor.pattern then
+			Ui.state = "editor/menu"
+		else
+			Client.editor:update(secs)
+		end
 	end}
 
 ------------------------------------------------------------------------------
