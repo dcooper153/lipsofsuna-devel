@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -22,20 +22,31 @@
  * @{
  */
 
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/system.h"
+#include "lipsofsuna/archive.h"
+#include "lipsofsuna/main.h"
 #include "script.h"
 #include "script-args.h"
 #include "script-data.h"
+#include "script-library.h"
 #include "script-private.h"
 #include "script-util.h"
 
 static int private_exec_script (
 	LIScrScript* self);
 
-static int private_init_includes (
-	LIScrScript* self,
-	const char*  path1,
-	const char*  path2);
+static int private_load_file (
+	lua_State*  lua,
+	const char* root,
+	const char* path);
+
+static int private_lua_require (
+	lua_State* lua);
+
+static int private_lua_require_load (
+	lua_State*  lua,
+	const char* root,
+	const char* path);
 
 /*****************************************************************************/
 
@@ -76,8 +87,6 @@ LIScrScript* liscr_script_new ()
 #if LUA_VERSION_NUM > 501
 	luaL_requiref (self->lua, "", luaopen_base, 1);
 	lua_pop (self->lua, 1);
-	luaL_requiref (self->lua, LUA_LOADLIBNAME, luaopen_package, 1);
-	lua_pop (self->lua, 1);
 	luaL_requiref (self->lua, LUA_COLIBNAME, luaopen_coroutine, 1);
 	lua_pop (self->lua, 1);
 	luaL_requiref (self->lua, LUA_TABLIBNAME, luaopen_table, 1);
@@ -91,9 +100,6 @@ LIScrScript* liscr_script_new ()
 #else
 	lua_pushcfunction (self->lua, luaopen_base);
 	lua_pushstring (self->lua, "");
-	lua_call (self->lua, 1, 0);
-	lua_pushcfunction (self->lua, luaopen_package);
-	lua_pushstring (self->lua, LUA_LOADLIBNAME);
 	lua_call (self->lua, 1, 0);
 	lua_pushcfunction (self->lua, luaopen_table);
 	lua_pushstring (self->lua, LUA_TABLIBNAME);
@@ -143,6 +149,10 @@ LIScrScript* liscr_script_new ()
 		lisys_error_report ();
 		lua_pop (self->lua, 1);
 	}
+
+	/* Register the custom require function. */
+	lua_pushcclosure (self->lua, private_lua_require, 0);
+	lua_setglobal (self->lua, "require");
 
 	return self;
 }
@@ -208,18 +218,16 @@ int liscr_script_load_file (
 {
 	int ret;
 
-	/* Setup include paths. */
-	if (!private_init_includes (self, path_mod, path_core))
-		return 0;
-
 	/* Load the file. */
-	ret = luaL_loadfile (self->lua, path);
-	if (ret)
+	ret = private_load_file (self->lua, path_mod, path);
+	if (ret == -1)
 	{
 		lisys_error_set (EIO, "%s", lua_tostring (self->lua, -1));
 		lua_pop (self->lua, 1);
 		return 0;
 	}
+	if (ret != 1)
+		return 0;
 
 	/* Execute the file. */
 	if (!private_exec_script (self))
@@ -243,10 +251,6 @@ int liscr_script_load_string (
 	const char*  path_core)
 {
 	int ret;
-
-	/* Setup include paths. */
-	if (!private_init_includes (self, path_mod, path_core))
-		return 0;
 
 	/* Load the string. */
 	ret = luaL_loadstring (self->lua, code);
@@ -338,28 +342,135 @@ static int private_exec_script (
 	return 1;
 }
 
-static int private_init_includes (
-	LIScrScript* self,
-	const char*  path1,
-	const char*  path2)
+static int private_load_file (
+	lua_State*  lua,
+	const char* root,
+	const char* path)
 {
-	char* inc;
+	int ret;
+	char* tmp;
+	char* path_abs;
+	char* path_err;
+	LIArcReader* reader;
 
-	/* Construct the include path. */
-	inc = lisys_string_format ("%s/?.lua;%s/?.lua", path1, path2);
-	if (inc == NULL)
+	/* Construct the absolute path. */
+	tmp = lisys_path_concat (root, path, NULL);
+	if (tmp == NULL)
+		return 0;
+	path_abs = lisys_string_concat (tmp, ".lua");
+	lisys_free (tmp);
+	if (path_abs == NULL)
 		return 0;
 
-	/* Set the include path. */
-#if LUA_VERSION_NUM > 501
-	lua_getglobal (self->lua, "package");
-#else
-	lua_getfield (self->lua, LUA_GLOBALSINDEX, "package");
-#endif
-	lua_pushstring (self->lua, inc);
-	lua_setfield (self->lua, -2, "path");
-	lua_pop (self->lua, 1);
-	lisys_free (inc);
+	/* Construct the name used for error reporting. */
+	path_err = lisys_string_format ("@%s.lua", path);
+	if (path_err == NULL)
+	{
+		lisys_free (path_abs);
+		return 0;
+	}
+
+	/* Open the file. */
+	reader = liarc_reader_new_from_file (path_abs);
+	lisys_free (path_abs);
+	if (reader == NULL)
+	{
+		lisys_free (path_err);
+		return 0;
+	}
+
+	/* Load the file. */
+	ret = luaL_loadbuffer (lua, reader->buffer, reader->length, path_err);
+	liarc_reader_free (reader);
+	lisys_free (path_err);
+	if (ret != 0)
+		return -1;
+
+	return 1;
+}
+
+static int private_lua_require (
+	lua_State* lua)
+{
+	int i;
+	const char* path;
+	LIMaiProgram* program;
+	LIScrScript* script;
+
+	/* Get the program pointer. */
+	script = liscr_script (lua);
+	program = liscr_script_get_userdata (script, LISCR_SCRIPT_PROGRAM);
+
+	/* Validate the path. */
+	path = luaL_checkstring (lua, 1);
+	if (strstr (path, "..") != NULL)
+	{
+		luaL_error (lua, "invalid module path \"%s\"", path);
+		return 0;
+	}
+	for (i = 0 ; i < strlen (path) ; i++)
+	{
+		if ((path[i] < 'a' || path[i] > 'z') && (path[i] < '0' || path[i] > '9') && 
+		    (path[i] != '/' && path[i] != '.' && path[i] != '-' && path[i] != '_'))
+		{
+			luaL_error (lua, "invalid module path \"%s\"", path);
+			return 0;
+		}
+	}
+
+	/* Check if already loaded. */
+	lua_getfield (lua, LUA_REGISTRYINDEX, "_LOADED");
+	lua_getfield (lua, -1, path);
+	if (lua_toboolean (lua, -1))
+		return 1;
+	lua_pop (lua, 3);
+
+	/* Load the file. */
+	/* This will push the result to the stack upon success. */
+	/* TODO: Also support additions in the home directory. */
+	if (!private_lua_require_load (lua, program->paths->module_data, path) &&
+	    !private_lua_require_load (lua, program->paths->global_data, path))
+	{
+		luaL_error (lua, "failed to open module \"%s\"", path);
+		return 0;
+	}
+
+	/* Mark as loaded. */
+	if (!lua_isnil (lua, -1))
+	{
+		lua_getfield (lua, LUA_REGISTRYINDEX, "_LOADED");
+		lua_insert (lua, -2);
+		lua_setfield (lua, -2, path);
+		lua_pop (lua, 1);
+	}
+	else
+	{
+		lua_getfield (lua, LUA_REGISTRYINDEX, "_LOADED");
+		lua_pushboolean (lua, 1);
+		lua_setfield (lua, -2, path);
+		lua_pop (lua, 2);
+		lua_pushboolean (lua, 1);
+	}
+
+	return 1;
+}
+
+static int private_lua_require_load (
+	lua_State*  lua,
+	const char* root,
+	const char* path)
+{
+	int ret;
+
+	/* Load and parse the file. */
+	ret = private_load_file (lua, root, path);
+	if (ret == -1)
+		lua_error (lua);
+	if (ret != 1)
+		return 0;
+
+	/* Run the function. */
+	lua_call (lua, 0, 1);
 
 	return 1;
 }

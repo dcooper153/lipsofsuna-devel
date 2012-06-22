@@ -103,7 +103,7 @@ int main (int argc, char** argv)
 	while (program != NULL)
 	{
 		/* Execute the module until the script exits. */
-		if (!limai_program_execute_script (program, "main.lua"))
+		if (!limai_program_execute_script (program, "main"))
 		{
 			lisys_error_report ();
 			break;

@@ -6,7 +6,7 @@ Client.host_game = function(self)
 	local opts = string.format("--file %s --server %s %d", Settings.file, Settings.address, Settings.port)
 	if Settings.admin then opts = opts .. " -d" end
 	if Settings.generate then opts = opts .. " -g" end
-	self.threads.server = Thread("main.lua", opts)
+	self.threads.server = Thread("main", opts)
 	-- Set information for the UI.
 	self.data.connection.mode = "host"
 	self.data.connection.text = "Starting the server on " .. Settings.address .. ":" .. Settings.port .. "..."

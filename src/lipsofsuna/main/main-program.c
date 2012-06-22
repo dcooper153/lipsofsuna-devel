@@ -224,16 +224,9 @@ int limai_program_execute_script (
 	const char*   file)
 {
 	int ret;
-	char* path;
-
-	/* Get paths. */
-	path = lipth_paths_find_path (self->paths, file, 0);
-	if (path == NULL)
-		return 0;
 
 	/* Load and execute the script. */
-	ret = liscr_script_load_file (self->script, path, self->paths->module_data, self->paths->global_data);
-	lisys_free (path);
+	ret = liscr_script_load_file (self->script, file, self->paths->module_data, self->paths->global_data);
 	if (!ret)
 		return 0;
 

@@ -27,7 +27,7 @@
 static void Thread_new (LIScrArgs* args)
 {
 	const char* args_ = "";
-	const char* file = "main.lua";
+	const char* file = "main";
 	const char* code = NULL;
 	LIExtModule* module;
 
