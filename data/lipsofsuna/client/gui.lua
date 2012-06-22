@@ -389,6 +389,7 @@ Ui.handle_event = function(self, args)
 	end
 	-- Scroll with remaining mouse wheel events.
 	if args.type == "mousescroll" then
+		if not self.scroll_active then return true end
 		self:scroll(args.rel > 0 and "up" or "down")
 	end
 end

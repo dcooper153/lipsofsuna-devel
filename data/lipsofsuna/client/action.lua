@@ -49,6 +49,21 @@ Binding.event = function(clss, args, handle)
 	end
 end
 
+--- Returns the human readable name of the key.
+-- @param self Action class.
+-- @param key Key symbol or internal name.
+-- @return Key name.
+Binding.get_key_name = function(self, key)
+	if not key then return "----" end
+	local mapping = {
+		["mousex"] = "mouse x",
+		["mousey"] = "mouse y",
+		["mousez"] = "wheel",
+		["mousez+"] = "wheel+",
+		["mousez-"] = "wheel-"}
+	return Keycode[key] or mapping[key] or tostring(key)
+end
+
 --- Returns the name of the control that triggers the action with the requested name.
 -- @param self Action class.
 -- @param name Action name.
@@ -57,7 +72,7 @@ Binding.get_control_name = function(self, name)
 	local action = self.dict_name[name]
 	if not action then return nil end
 	if not action.key1 then return nil end
-	return "[" .. (Keycode[action.key1] or tostring(action.key1)) .. "]"
+	return "[" .. self:get_key_name(action.key1) .. "]"
 end
 
 --- Gets the control response to the event.
@@ -98,7 +113,11 @@ Binding.get_event_response = function(self, args)
 	elseif args.type == "mouserelease" then
 		return digital("mouse" .. args.button, false)
 	elseif args.type == "mousescroll" then
-		return analog("mousez", args.rel < 0 and -1 or 1)
+		local digi = args.rel < 0 and "mousez-" or "mousez+"
+		local res1 = analog("mousez", args.rel < 0 and -1 or 1)
+		local res2 = digital(digi, true)
+		local res3 = digital(digi, false)
+		return res1 or res2 or res3
 	elseif args.type == "keypress" then
 		return digital(args.code, true)
 	elseif args.type == "keyrelease" then

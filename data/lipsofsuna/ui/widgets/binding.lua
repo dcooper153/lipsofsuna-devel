@@ -38,10 +38,15 @@ Widgets.Uibinding.handle_event = function(self, args)
 		a[k] = string.format("mouse%d", args.button)
 		accept = true
 	elseif args.type == "mousescroll" then
-		a.key1 = "mousez"
-		a.key2 = nil
-		accept = true
-		self.editing_binding_key = "key2"
+		if a.mode == "analog" then
+			a.key1 = "mousez"
+			a.key2 = nil
+			accept = true
+			self.editing_binding_key = "key2"
+		else
+			a[k] = args.rel < 0 and "mousez-" or "mousez+"
+			accept = true
+		end
 	elseif args.type == "mousemotion" and a.mode == "analog" then
 		local v = Vector(args.dx, args.dy)
 		local n = self.editing_binding_motion + v
@@ -70,6 +75,7 @@ Widgets.Uibinding.handle_event = function(self, args)
 			self.input_key = nil
 			self.hint = "$A: Change the control\n$$B\n$$U\n$$D"
 		end
+		Operators.controls:save()
 		Ui:repaint_state()
 	end
 end
@@ -77,7 +83,6 @@ end
 Widgets.Uibinding.rebuild_canvas = function(self)
 	local w = self.size.x
 	local h = self.size.y
-	local keyname = function(k) return Keycode[k] or (k and tostring(k) or "----") end
 	-- Add the base.
 	Widgets.Uiwidget.rebuild_canvas(self)
 	-- Add the action name.
@@ -91,7 +96,7 @@ Widgets.Uibinding.rebuild_canvas = function(self)
 	-- Add the first key.
 	local x1 = Theme.width_label_1
 	local key1 = self.action.key1
-	local name1 = self.input_key ~= "key1" and keyname(key1) or "????"
+	local name1 = self.input_key ~= "key1" and Binding:get_key_name(key1) or "????"
 	self:canvas_text{
 		dest_position = {Theme.width_label_1,0},
 		dest_size = {w-Theme.width_label_1,h},
@@ -103,7 +108,7 @@ Widgets.Uibinding.rebuild_canvas = function(self)
 	if self.action.mode == "analog" then
 		local x2 = x1 + (self.size.x - x1) / 2
 		local key2 = self.action.key2
-		local name2 = self.input_key ~= "key2" and keyname(key2) or "????"
+		local name2 = self.input_key ~= "key2" and Binding:get_key_name(key2) or "????"
 		self:canvas_text{
 			dest_position = {x2,0},
 			dest_size = {w-x2,h},

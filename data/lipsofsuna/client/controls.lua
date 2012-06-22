@@ -96,11 +96,11 @@ Binding{name = "menu", mode = "press", key1 = Keysym.TAB, func = function()
 	end
 end}
 
-Binding{name = "menu up", mode = "toggle", key1 = Keysym.r, func = function(v)
+Binding{name = "menu up", mode = "toggle", key1 = "mousez+", func = function(v)
 	Ui:command("up", v)
 end}
 
-Binding{name = "menu down", mode = "toggle", key1 = Keysym.f, func = function(v)
+Binding{name = "menu down", mode = "toggle", key1 = "mousez-", func = function(v)
 	Ui:command("down", v)
 end}
 
@@ -276,5 +276,6 @@ end}
 
 Binding{name = "zoom", mode = "analog", key1 = "mousez", key2 = "", func = function(v)
 	if not Client.player_object then return end
+	if Ui.state ~= "play" then return end
 	Client.camera:zoom{rate = -v}
 end}

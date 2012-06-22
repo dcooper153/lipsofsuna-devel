@@ -19,8 +19,8 @@ Client.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value T
 Client.init = function(self)
 	-- Initialize options.
 	self.options = Options.inst
-	self.controls = ConfigFile{name = "controls.cfg"}
-	self:load_controls()
+	Operators.controls:init()
+	Operators.controls:load()
 	-- Initialize the world.
 	self.sectors = Sectors{database = Client.db, save_objects = false}
 	self.sectors:erase_world()
