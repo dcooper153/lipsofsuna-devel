@@ -82,6 +82,12 @@ LIAPICALL (void, limdl_pose_fade_channel, (
 	int        channel,
 	float      rate));
 
+LIAPICALL (void, limdl_pose_merge_channel, (
+	LIMdlPose*              self,
+	int                     channel,
+	int                     keep,
+	const LIMdlPoseChannel* info));
+
 LIAPICALL (void, limdl_pose_update, (
 	LIMdlPose* self,
 	float      secs));
@@ -104,14 +110,23 @@ LIAPICALL (void, limdl_pose_set_channel_animation, (
 	int             channel,
 	LIMdlAnimation* animation));
 
-LIAPICALL (int, limdl_pose_get_channel_repeat_start, (
+LIAPICALL (float, limdl_pose_get_channel_repeat_end, (
+	const LIMdlPose* self,
+	int              channel));
+
+LIAPICALL (void, limdl_pose_set_channel_repeat_end, (
+	LIMdlPose* self,
+	int        channel,
+	float      value));
+
+LIAPICALL (float, limdl_pose_get_channel_repeat_start, (
 	const LIMdlPose* self,
 	int              channel));
 
 LIAPICALL (void, limdl_pose_set_channel_repeat_start, (
 	LIMdlPose* self,
 	int        channel,
-	int        value));
+	float      value));
 
 LIAPICALL (float, limdl_pose_get_channel_fade_in, (
 	LIMdlPose* self,

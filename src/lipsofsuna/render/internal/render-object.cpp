@@ -34,23 +34,11 @@
 #include "render-object.h"
 
 static LIMdlPose* private_channel_animate (
-	LIRenObject*    self,
-	LIMdlPose*      pose,
-	int             channel,
-	LIMdlAnimation* anim,
-	int             additive,
-	int             repeat,
-	int             repeat_start,
-	int             keep,
-	float           fade_in,
-	float           fade_out,
-	float           weight,
-	float           weight_scale,
-	float           time,
-	float           time_scale,
-	const char**    node_names,
-	float*          node_weights,
-	int             node_count);
+	LIRenObject*            self,
+	LIMdlPose*              pose,
+	int                     channel,
+	int                     keep,
+	const LIMdlPoseChannel* info);
 
 static void private_channel_fade (
 	LIRenObject* self,
@@ -159,29 +147,15 @@ void liren_object_add_model (
 }
 
 int liren_object_channel_animate (
-	LIRenObject*    self,
-	int             channel,
-	LIMdlAnimation* anim,
-	int             additive,
-	int             repeat,
-	int             repeat_start,
-	int             keep,
-	float           fade_in,
-	float           fade_out,
-	float           weight,
-	float           weight_scale,
-	float           time,
-	float           time_scale,
-	const char**    node_names,
-	float*          node_weights,
-	int             node_count)
+	LIRenObject*            self,
+	int                     channel,
+	int                     keep,
+	const LIMdlPoseChannel* info)
 {
 	LIMdlPose* pose1;
 
 	/* Update the reference pose. */
-	pose1 = private_channel_animate (self, self->pose, channel, anim, additive, repeat,
-		repeat_start, keep, fade_in, fade_out, weight, weight_scale, time,
-		time_scale, node_names, node_weights, node_count);
+	pose1 = private_channel_animate (self, self->pose, channel, keep, info);
 	if (pose1 != NULL)
 	{
 		self->pose = pose1;
@@ -600,27 +574,12 @@ void liren_object_set_transform (
 /*****************************************************************************/
 
 static LIMdlPose* private_channel_animate (
-	LIRenObject*    self,
-	LIMdlPose*      pose,
-	int             channel,
-	LIMdlAnimation* anim,
-	int             additive,
-	int             repeat,
-	int             repeat_start,
-	int             keep,
-	float           fade_in,
-	float           fade_out,
-	float           weight,
-	float           weight_scale,
-	float           time,
-	float           time_scale,
-	const char**    node_names,
-	float*          node_weights,
-	int             node_count)
+	LIRenObject*            self,
+	LIMdlPose*              pose,
+	int                     channel,
+	int                     keep,
+	const LIMdlPoseChannel* info)
 {
-	int i;
-	const char* name1;
-
 	/* Create the pose if it doesn't exist. */
 	if (pose == NULL)
 	{
@@ -629,38 +588,8 @@ static LIMdlPose* private_channel_animate (
 			return NULL;
 	}
 
-	/* Avoid restarts in simple cases. */
-	/* The position is kept if the animation is repeating and being replaced with
-	   the same one but parameters such as fading and weights still need to be reset. */
-	if (repeat && channel != -1 && anim != NULL)
-	{
-		if (keep)
-		{
-			keep = 0;
-			if (limdl_pose_get_channel_state (pose, channel) == LIMDL_POSE_CHANNEL_STATE_PLAYING &&
-				limdl_pose_get_channel_repeats (pose, channel) == -1)
-			{
-				name1 = limdl_pose_get_channel_name (pose, channel);
-				if (!strcmp (anim->name, name1))
-					keep = 1;
-			}
-		}
-	}
-	else
-		keep = 0;
-
-	/* Automatic channel assignment. */
-	if (channel == -1)
-	{
-		for (channel = 254 ; channel > 0 ; channel--)
-		{
-			if (limdl_pose_get_channel_state (pose, channel) == LIMDL_POSE_CHANNEL_STATE_INVALID)
-				break;
-		}
-	}
-
 	/* Clear the channel if NULL was given as the animation. */
-	if (anim == NULL)
+	if (info == NULL)
 	{
 		if (keep)
 			limdl_pose_fade_channel (pose, channel, LIMDL_POSE_FADE_AUTOMATIC);
@@ -669,33 +598,8 @@ static LIMdlPose* private_channel_animate (
 		return pose;
 	}
 
-	/* Update or initialize the channel. */
-	if (!keep)
-	{
-		limdl_pose_fade_channel (pose, channel, LIMDL_POSE_FADE_AUTOMATIC);
-		limdl_pose_set_channel_animation (pose, channel, anim);
-		limdl_pose_set_channel_repeats (pose, channel, repeat? -1 : 1);
-		limdl_pose_set_channel_position (pose, channel, time);
-		limdl_pose_set_channel_state (pose, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
-	}
-	limdl_pose_set_channel_additive (pose, channel, additive);
-	limdl_pose_set_channel_repeat_start (pose, channel, repeat_start);
-	limdl_pose_set_channel_priority_scale (pose, channel, weight_scale);
-	limdl_pose_set_channel_priority_transform (pose, channel, weight);
-	limdl_pose_set_channel_time_scale (pose, channel, time_scale);
-	limdl_pose_set_channel_fade_in (pose, channel, fade_in);
-	limdl_pose_set_channel_fade_out (pose, channel, fade_out);
-
-	/* Handle optional per-node weights. */
-	if (anim != NULL && node_count)
-	{
-		limdl_pose_clear_channel_node_priorities (pose, channel);
-		for (i = 0 ; i < node_count ; i++)
-		{
-			limdl_pose_set_channel_priority_node (pose, channel,
-				node_names[i], node_weights[i]);
-		}
-	}
+	/* Merge the channel. */
+	limdl_pose_merge_channel (pose, channel, keep, info);
 
 	return pose;
 }

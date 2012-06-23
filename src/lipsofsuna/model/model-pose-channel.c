@@ -55,6 +55,7 @@ LIMdlPoseChannel* limdl_pose_channel_new (
 	self->priority_scale = 0.0f;
 	self->priority_transform = 1.0f;
 	self->time_scale = 1.0f;
+	self->repeat_end = -1.0f;
 
 	return self;
 }
@@ -84,6 +85,7 @@ LIMdlPoseChannel* limdl_pose_channel_new_copy (
 	self->state = channel->state;
 	self->repeat = channel->repeat;
 	self->repeats = channel->repeats;
+	self->repeat_end = channel->repeat_end;
 	self->repeat_start = channel->repeat_start;
 	self->time = channel->time;
 	self->time_scale = channel->time_scale;
@@ -149,6 +151,8 @@ int limdl_pose_channel_play (
 
 	/* Skip empty. */
 	duration = limdl_animation_get_duration (self->animation);
+	if (self->repeat_end >= 0.0f)
+		duration = LIMAT_MIN (self->repeat_end, duration);
 	if (duration < LIMAT_EPSILON)
 	{
 		self->time = 0.0f;
@@ -180,6 +184,39 @@ int limdl_pose_channel_play (
 	/* Handle ending. */
 	if (self->repeats != -1 && self->repeat >= self->repeats)
 		return 0;
+
+	return 1;
+}
+
+int limdl_pose_channel_set_node_priority (
+	LIMdlPoseChannel* self,
+	const char*       node,
+	float             value)
+{
+	float* ptr;
+
+	/* Make sure the node weight dictionary exists. */
+	if (self->weights == NULL)
+	{
+		self->weights = lialg_strdic_new ();
+		if (self->weights == NULL)
+			return 0;
+	}
+
+	/* Replace or add a node weight. */
+	ptr = lialg_strdic_find (self->weights, node);
+	if (ptr == NULL)
+	{
+		ptr = lisys_calloc (1, sizeof (float));
+		if (ptr == NULL)
+			return 0;
+		if (!lialg_strdic_insert (self->weights, node, ptr))
+		{
+			lisys_free (ptr);
+			return 0;
+		}
+	}
+	*ptr = value;
 
 	return 1;
 }

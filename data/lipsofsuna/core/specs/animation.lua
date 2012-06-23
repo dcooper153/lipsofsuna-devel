@@ -15,7 +15,8 @@ Animationspec.introspect = Introspect{
 		{name = "fade_in", type = "number", description = "Fade in duration."},
 		{name = "fade_out", type = "number", description = "Fade out duration."},
 		{name = "permanent", type = "boolean", description = "Enables looping of the animation."},
-		{name = "repeat_start", type = "number", description = "Repeat starting offset."},
+		{name = "repeat_end", type = "number", description = "Repeat range end offset."},
+		{name = "repeat_start", type = "number", description = "Repeat range start offset."},
 		{name = "time", type = "number", description = "Starting time offset."},
 		{name = "time_scale", type = "number", description = "Time scale multiplier."},
 		{name = "weight", type = "number", description = "Blending weight."},
@@ -42,6 +43,7 @@ Animationspec.get_arguments = function(self)
 		fade_in = self.fade_in,
 		fade_out = self.fade_out,
 		permanent = self.permanent,
+		repeat_end = self.repeat_end,
 		repeat_start = self.repeat_start,
 		time = self.time,
 		time_scale = self.time_scale,
@@ -63,10 +65,10 @@ Animationspec.get_node_weights = function(self)
 	local mapping = {
 		LOWER = {"back1", "pelvis", "leg1.L", "leg2.L", "foot.L", "leg1.R", "leg2.R", "foot.R", "pelvis1", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6"},
 		LEGS = {"leg1.L", "leg2.L", "foot.L", "leg1.R", "leg2.R", "foot.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6"},
-		ARMS = {"arm1.L", "arm2.L", "wrist.L", "palm.L", "arm1.R", "arm2.R", "wrist.R", "palm.R"},
-		ARML = {"arm1.L", "arm2.L", "wrist.L", "palm.L"},
-		ARMR = {"arm1.R", "arm2.R", "wrist.R", "palm.R"},
-		BACK = {"back", "back1", "back2", "back3"}}
+		ARMS = {"arm1.L", "arm2.L", "palm.L", "palm1.L", "arm1.R", "arm2.R", "palm.R", "palm1.R"},
+		ARML = {"arm1.L", "arm2.L", "palm.L", "palm1.L"},
+		ARMR = {"arm1.R", "arm2.R", "palm.R", "palm1.R"},
+		BACK = {"back1", "back2", "back3"}}
 	local w = {}
 	for k,v in pairs(self.node_weights) do
 		local replace = mapping[k]

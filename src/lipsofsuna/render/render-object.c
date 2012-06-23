@@ -88,23 +88,11 @@ void liren_render_object_add_model (
 }
 
 void liren_render_object_channel_animate (
-	LIRenRender*    self,
-	int             id,
-	int             channel,
-	LIMdlAnimation* anim,
-	int             additive,
-	int             repeat,
-	int             repeat_start,
-	int             keep,
-	float           fade_in,
-	float           fade_out,
-	float           weight,
-	float           weight_scale,
-	float           time,
-	float           time_scale,
-	const char**    node_names,
-	float*          node_weights,
-	int             node_count)
+	LIRenRender*            self,
+	int                     id,
+	int                     channel,
+	int                     keep,
+	const LIMdlPoseChannel* info)
 {
 	LIRenObject* object;
 
@@ -112,10 +100,7 @@ void liren_render_object_channel_animate (
 	if (object == NULL)
 		return;
 
-	liren_object_channel_animate (object,
-		channel, anim, additive, repeat, repeat_start, keep, fade_in,
-		fade_out, weight, weight_scale, time, time_scale, node_names,
-		node_weights, node_count);
+	liren_object_channel_animate (object, channel, keep, info);
 }
 
 void liren_render_object_channel_fade (

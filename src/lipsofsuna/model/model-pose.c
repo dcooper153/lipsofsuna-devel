@@ -385,6 +385,85 @@ void limdl_pose_fade_channel (
 }
 
 /**
+ * \brief Merges or adds a pose channel.
+ * \param self Model pose.
+ * \param channel Channel number, or -1 for automatic.
+ * \param keep Nonzero to keep appropriate data from old animations, zero to overwrite all data.
+ * \param info Pose channel data.
+ */
+void limdl_pose_merge_channel (
+	LIMdlPose*              self,
+	int                     channel,
+	int                     keep,
+	const LIMdlPoseChannel* info)
+{
+	const char* name1;
+	LIAlgStrdicIter iter;
+
+	lisys_assert (info != NULL);
+	lisys_assert (info->animation != NULL);
+
+	/* Avoid restarts in simple cases. */
+	/* The position is kept if the animation is repeating and being replaced with
+	   the same one but parameters such as fading and weights still need to be reset. */
+	if (info->repeats > 0 && channel != -1)
+	{
+		if (keep)
+		{
+			keep = 0;
+			if (limdl_pose_get_channel_state (self, channel) == LIMDL_POSE_CHANNEL_STATE_PLAYING &&
+				limdl_pose_get_channel_repeats (self, channel) == -1)
+			{
+				name1 = limdl_pose_get_channel_name (self, channel);
+				if (!strcmp (info->animation->name, name1))
+					keep = 1;
+			}
+		}
+	}
+	else
+		keep = 0;
+
+	/* Automatic channel assignment. */
+	if (channel == -1)
+	{
+		for (channel = 254 ; channel > 0 ; channel--)
+		{
+			if (limdl_pose_get_channel_state (self, channel) == LIMDL_POSE_CHANNEL_STATE_INVALID)
+				break;
+		}
+	}
+
+	/* Update or initialize the channel. */
+	if (!keep)
+	{
+		limdl_pose_fade_channel (self, channel, LIMDL_POSE_FADE_AUTOMATIC);
+		limdl_pose_set_channel_animation (self, channel, info->animation);
+		limdl_pose_set_channel_repeats (self, channel, info->repeats);
+		limdl_pose_set_channel_position (self, channel, info->time);
+		limdl_pose_set_channel_state (self, channel, LIMDL_POSE_CHANNEL_STATE_PLAYING);
+	}
+	limdl_pose_set_channel_additive (self, channel, info->additive);
+	limdl_pose_set_channel_repeat_end (self, channel, info->repeat_end);
+	limdl_pose_set_channel_repeat_start (self, channel, info->repeat_start);
+	limdl_pose_set_channel_priority_scale (self, channel, info->priority_scale);
+	limdl_pose_set_channel_priority_transform (self, channel, info->priority_transform);
+	limdl_pose_set_channel_time_scale (self, channel, info->time_scale);
+	limdl_pose_set_channel_fade_in (self, channel, info->fade_in);
+	limdl_pose_set_channel_fade_out (self, channel, info->fade_out);
+
+	/* Handle optional per-node weights. */
+	if (info->weights != NULL)
+	{
+		limdl_pose_clear_channel_node_priorities (self, channel);
+		LIALG_STRDIC_FOREACH (iter, info->weights)
+		{
+			limdl_pose_set_channel_priority_node (self, channel,
+				iter.key, *((float*) iter.value));
+		}
+	}
+}
+
+/**
  * \brief Progresses the animation.
  *
  * \param self Model pose.
@@ -505,7 +584,13 @@ void limdl_pose_set_channel_animation (
 	chan->animation = anim;
 }
 
-int limdl_pose_get_channel_repeat_start (
+/**
+ * \brief Gets the repeat range end offset, in seconds.
+ * \param self Model pose.
+ * \param channel Channel number.
+ * \return Repeat range end, in seconds.
+ */
+float limdl_pose_get_channel_repeat_end (
 	const LIMdlPose* self,
 	int              channel)
 {
@@ -513,14 +598,57 @@ int limdl_pose_get_channel_repeat_start (
 
 	chan = private_find_channel (self, channel);
 	if (chan == NULL)
-		return 0;
+		return 0.0f;
+	return chan->repeat_end;
+}
+
+/**
+ * \brief Sets the repeat range end offset, in seconds.
+ * \param self Model pose.
+ * \param channel Channel number.
+ * \param value Repeat range end, in seconds.
+ */
+void limdl_pose_set_channel_repeat_end (
+	LIMdlPose* self,
+	int        channel,
+	float      value)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_create_channel (self, channel);
+	if (chan == NULL)
+		return;
+	chan->repeat_end = value;
+}
+
+/**
+ * \brief Gets the repeat range start offset, in seconds.
+ * \param self Model pose.
+ * \param channel Channel number.
+ * \return Repeat range start, in seconds.
+ */
+float limdl_pose_get_channel_repeat_start (
+	const LIMdlPose* self,
+	int              channel)
+{
+	LIMdlPoseChannel* chan;
+
+	chan = private_find_channel (self, channel);
+	if (chan == NULL)
+		return 0.0f;
 	return chan->repeat_start;
 }
 
+/**
+ * \brief Sets the repeat range start offset, in seconds.
+ * \param self Model pose.
+ * \param channel Channel number.
+ * \param value Repeat range start, in seconds.
+ */
 void limdl_pose_set_channel_repeat_start (
 	LIMdlPose* self,
 	int        channel,
-	int        value)
+	float      value)
 {
 	LIMdlPoseChannel* chan;
 
@@ -639,7 +767,6 @@ int limdl_pose_set_channel_priority_node (
 	const char* node,
 	float       value)
 {
-	float* ptr;
 	LIMdlPoseChannel* chan;
 
 	/* Find the channel. */
@@ -647,30 +774,8 @@ int limdl_pose_set_channel_priority_node (
 	if (chan == NULL)
 		return 0;
 
-	/* Make sure the node weight dictionary exists. */
-	if (chan->weights == NULL)
-	{
-		chan->weights = lialg_strdic_new ();
-		if (chan->weights == NULL)
-			return 0;
-	}
-
 	/* Replace or add a node weight. */
-	ptr = lialg_strdic_find (chan->weights, node);
-	if (ptr == NULL)
-	{
-		ptr = lisys_calloc (1, sizeof (float));
-		if (ptr == NULL)
-			return 0;
-		if (!lialg_strdic_insert (chan->weights, node, ptr))
-		{
-			lisys_free (ptr);
-			return 0;
-		}
-	}
-	*ptr = value;
-
-	return 1;
+	return limdl_pose_channel_set_node_priority (chan, node, value);
 }
 
 LIAlgStrdic* limdl_pose_get_channel_priority_nodes (
@@ -763,7 +868,6 @@ void limdl_pose_set_channel_repeats (
 
 /**
  * \brief Gets the state of a channel.
- *
  * \param self Model pose.
  * \param channel Channel number.
  * \return Current state.

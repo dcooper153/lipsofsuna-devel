@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -37,23 +37,11 @@ LIAPICALL (void, liren_render_object_add_model, (
 	int          model));
 
 LIAPICALL (void, liren_render_object_channel_animate, (
-	LIRenRender*    self,
-	int             id,
-	int             channel,
-	LIMdlAnimation* anim,
-	int             additive,
-	int             repeat,
-	int             repeat_start,
-	int             keep,
-	float           fade_in,
-	float           fade_out,
-	float           weight,
-	float           weight_scale,
-	float           time,
-	float           time_scale,
-	const char**    node_names,
-	float*          node_weights,
-	int             node_count));
+	LIRenRender*            self,
+	int                     id,
+	int                     channel,
+	int                     keep,
+	const LIMdlPoseChannel* info));
 
 LIAPICALL (void, liren_render_object_channel_fade, (
 	LIRenRender* self,

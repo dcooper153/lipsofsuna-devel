@@ -47,7 +47,8 @@ static void Object_animate (LIScrArgs* args)
 {
 	int additive = 0;
 	int repeat = 0;
-	int repeat_start = 0;
+	float repeat_start = 0.0f;
+	float repeat_end = -1.0f;
 	int channel = -1;
 	int keep = 1;
 	float fade_in = 0.0f;
@@ -56,12 +57,10 @@ static void Object_animate (LIScrArgs* args)
 	float weight_scale = 0.0f;
 	float time = 0.0f;
 	float time_scale = 1.0f;
-	const char* node_names[512];
-	float node_weights[512];
-	int node_num = 0;
 	LIObjObject* object;
 	LIExtModule* module;
 	LIMdlAnimation* animation = NULL;
+	LIMdlPoseChannel* chan = NULL;
 	LIScrData* data = NULL;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_OBJECT);
@@ -75,7 +74,8 @@ static void Object_animate (LIScrArgs* args)
 	liscr_args_gets_float (args, "fade_in", &fade_in);
 	liscr_args_gets_float (args, "fade_out", &fade_out);
 	liscr_args_gets_bool (args, "permanent", &repeat);
-	liscr_args_gets_int (args, "repeat_start", &repeat_start);
+	liscr_args_gets_float (args, "repeat_end", &repeat_end);
+	liscr_args_gets_float (args, "repeat_start", &repeat_start);
 	if (liscr_args_gets_bool (args, "replace", &keep))
 		keep = !keep;
 	liscr_args_gets_float (args, "time", &time);
@@ -89,6 +89,22 @@ static void Object_animate (LIScrArgs* args)
 	repeat_start = LIMAT_MAX (0, repeat_start);
 	time_scale = LIMAT_MAX (0.0f, time_scale);
 
+	/* Set the pose channel arguments. */
+	if (animation != NULL)
+	{
+		chan = limdl_pose_channel_new (animation);
+		chan->repeats = repeat? -1 : 1;
+		chan->time = time;
+		chan->additive = additive;
+		chan->repeat_end = repeat_end;
+		chan->repeat_start = repeat_start;
+		chan->priority_scale = weight_scale;
+		chan->priority_transform = weight;
+		chan->time_scale = time_scale;
+		chan->fade_in = fade_in;
+		chan->fade_out = fade_out;
+	}
+
 	/* Handle optional per-node weights. */
 	if (animation != NULL && liscr_args_gets_table (args, "node_weights"))
 	{
@@ -98,22 +114,21 @@ static void Object_animate (LIScrArgs* args)
 			if (lua_type (args->lua, -2) == LUA_TSTRING &&
 				lua_type (args->lua, -1) == LUA_TNUMBER)
 			{
-				if (node_num < 512)
-				{
-					node_names[node_num] = lua_tostring (args->lua, -2);
-					node_weights[node_num] = lua_tonumber (args->lua, -1);
-					node_num++;
-				}
+				limdl_pose_channel_set_node_priority (chan,
+					lua_tostring (args->lua, -2), lua_tonumber (args->lua, -1));
 			}
 			lua_pop (args->lua, 1);
 		}
 		lua_pop (args->lua, 1);
 	}
 
-	liren_render_object_channel_animate (module->render, object->id, channel,
-		animation, additive, repeat, repeat_start, keep, fade_in, fade_out,
-		weight, weight_scale, time, time_scale, node_names, node_weights, node_num);
+	/* Set the animation. */
+	liren_render_object_channel_animate (module->render, object->id, channel, keep, chan);
 	liscr_args_seti_bool (args, 1);
+
+	/* Free the pose channel arguments. */
+	if (chan != NULL)
+		limdl_pose_channel_free (chan);
 }
 
 static void Object_animate_fade (LIScrArgs* args)
