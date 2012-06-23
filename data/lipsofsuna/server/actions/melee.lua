@@ -13,11 +13,20 @@ Actionspec{name = "melee", func = function(feat, info, args)
 	local path
 	local anim = Feattypespec:find{name = feat.animation}
 	if anim and anim.directional then
-		if args.user.strafing < -0.2 then move = 2
-		elseif args.user.strafing > 0.2 then move = 3
-		elseif args.user.movement < -0.2 then move = 4
-		elseif args.user.movement > 0.2 then move = 5
-		else move = 1 end
+		move = args.user.attack_charge_move
+		if move then
+			if move == "left" then move = 2
+			elseif move == "right" then move = 3
+			elseif move == "back" then move = 4
+			elseif move == "front" then move = 5
+			else move = 1 end
+		else
+			if args.user.strafing < -0.2 then move = 2
+			elseif args.user.strafing > 0.2 then move = 3
+			elseif args.user.movement < -0.2 then move = 4
+			elseif args.user.movement > 0.2 then move = 5
+			else move = 1 end
+		end
 		path = paths[move]
 	else
 		path = paths[1]

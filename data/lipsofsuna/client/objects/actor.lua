@@ -162,6 +162,8 @@ Actor.update = function(self, secs)
 					p = p - r * h
 					r = r * s.conjugate
 				end
+			else
+				r = r * Quaternion{axis = Vector(0,1,0), angle = math.pi/2}
 			end
 			object.position = p
 			object.rotation = r

@@ -1,45 +1,60 @@
+local frames = function(n) return n * 0.02 end
+
 Animationspec{
 	name = "default attack back",
 	animation = "aer1-attack-back",
 	channel = 2,
-	fade_in = 0.1,
-	weight = 100,
+	fade_in = 0,
+	replace = true,
+	time = frames(20),
+	weight = 1000,
 	node_weights = {LOWER = 1}}
 
 Animationspec{
 	name = "default attack bow",
 	animation = "aer1-attack-bow",
 	channel = 2,
-	weight = 100,
+	weight = 1000,
 	node_weights = {LOWER = 1}}
 
 Animationspec{
 	name = "default attack crossbow",
 	animation = "aer1-attack-crossbow",
 	channel = 2,
-	weight = 5000,
+	fade_in = 0,
+	replace = true,
+	time = frames(20),
+	weight = 1000,
 	node_weights = {LOWER = 1}}
 
 Animationspec{
 	name = "default attack front",
 	animation = "aer1-attack-front",
 	channel = 2,
-	fade_in = 0.1,
-	weight = 100,
+	fade_in = 0,
+	replace = true,
+	time = frames(20),
+	weight = 1000,
 	node_weights = {LOWER = 1}}
 
 Animationspec{
 	name = "default attack left",
 	animation = "aer1-attack-left",
 	channel = 2,
-	weight = 100,
+	fade_in = 0,
+	replace = true,
+	time = frames(20),
+	weight = 1000,
 	node_weights = {LOWER = 1}}
 
 Animationspec{
 	name = "default attack right",
 	animation = "aer1-attack-right",
 	channel = 2,
-	weight = 100,
+	fade_in = 0,
+	replace = true,
+	time = frames(20),
+	weight = 1000,
 	node_weights = {LOWER = 1}}
 
 Animationspec{
@@ -47,29 +62,31 @@ Animationspec{
 	animation = "aer1-attack-punch",
 	channel = 2,
 	fade_out = 0.1,
-	weight = 100,
+	weight = 1000,
 	node_weights = {LOWER = 1}}
 
 Animationspec{
 	name = "default attack stand",
 	animation = "aer1-attack-stand",
 	channel = 2,
-	fade_in = 0.1,
-	weight = 100,
+	fade_in = 0,
+	replace = true,
+	time = frames(20),
+	weight = 1000,
 	node_weights = {LOWER = 1}}
 
 Animationspec{
 	name = "default attack musket",
 	animation = "aer1-attack-musket",
 	channel = 2,
-	weight = 5000,
+	weight = 1000,
 	node_weights = {LOWER = 1}}
 
 Animationspec{
 	name = "default attack revolver",
 	animation = "aer1-attack-revolver",
 	channel = 2,
-	weight = 5000,
+	weight = 1000,
 	node_weights = {LOWER = 1}}
 
 Animationspec{
@@ -94,22 +111,57 @@ Animationspec{
 	weight = 30}
 
 Animationspec{
-	name = "default charge axe",
-	animation = "aer1-charge-melee",
+	name = "default charge back",
+	animation = "aer1-attack-back",
 	channel = 2,
 	fade_in = 0.1,
 	permanent = true,
-	repeat_start = 10,
+	repeat_end = frames(20),
+	repeat_start = frames(20),
 	weight = 100,
 	node_weights = {LOWER = 1}}
 
 Animationspec{
-	name = "default charge blunt",
-	animation = "aer1-charge-melee",
+	name = "default charge front",
+	animation = "aer1-attack-front",
 	channel = 2,
 	fade_in = 0.1,
 	permanent = true,
-	repeat_start = 10,
+	repeat_end = frames(20),
+	repeat_start = frames(20),
+	weight = 100,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default charge left",
+	animation = "aer1-attack-left",
+	channel = 2,
+	fade_in = 0.1,
+	permanent = true,
+	repeat_end = frames(20),
+	repeat_start = frames(20),
+	weight = 100,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default charge right",
+	animation = "aer1-attack-right",
+	channel = 2,
+	fade_in = 0.1,
+	permanent = true,
+	repeat_end = frames(20),
+	repeat_start = frames(20),
+	weight = 100,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default charge stand",
+	animation = "aer1-attack-stand",
+	channel = 2,
+	fade_in = 0.1,
+	permanent = true,
+	repeat_end = frames(20),
+	repeat_start = frames(20),
 	weight = 100,
 	node_weights = {LOWER = 1}}
 
@@ -128,19 +180,23 @@ Animationspec{
 
 Animationspec{
 	name = "default charge crossbow",
-	animation = "aer1-charge-crossbow",
+	animation = "aer1-attack-crossbow",
 	channel = 2,
+	fade_in = 0.1,
 	permanent = true,
-	repeat_start = 10,
+	repeat_end = frames(50),
+	repeat_start = frames(50),
 	weight = 5000,
 	node_weights = {LOWER = 1}}
 
 Animationspec{
 	name = "default charge grenade",
-	animation = "aer1-charge-throw",
+	animation = "aer1-throw",
 	channel = 2,
+	fade_in = 0.1,
 	permanent = true,
-	repeat_start = 10,
+	repeat_end = frames(20),
+	repeat_start = frames(20),
 	weight = 100,
 	node_weights = {LOWER = 1}}
 
@@ -171,24 +227,6 @@ Animationspec{
 	permanent = true,
 	repeat_start = 10,
 	weight = 5000,
-	node_weights = {LOWER = 1}}
-
-Animationspec{
-	name = "default charge sword",
-	animation = "aer1-charge-melee",
-	channel = 2,
-	permanent = true,
-	repeat_start = 10,
-	weight = 100,
-	node_weights = {LOWER = 1}}
-
-Animationspec{
-	name = "default charge staff",
-	animation = "aer1-charge-melee",
-	channel = 2,
-	permanent = true,
-	repeat_start = 10,
-	weight = 100,
 	node_weights = {LOWER = 1}}
 
 Animationspec{
@@ -283,7 +321,7 @@ Animationspec{
 
 Animationspec{
 	name = "default hold sword",
-	animation = "aer1-hold-blunt",
+	animation = "aer1-hold-right",
 	channel = 3,
 	permanent = true,
 	repeat_start = 10,
@@ -412,19 +450,11 @@ Animationspec{
 	name = "default throw",
 	animation = "aer1-throw",
 	channel = 2,
-	weight = 10}
-
-Animationspec{
-	name = "default throw bulky",
-	animation = "aer1-throw-bulky",
-	channel = 2,
-	weight = 10}
-
-Animationspec{
-	name = "default throw grenade",
-	animation = "aer1-throw",
-	channel = 2,
-	weight = 10}
+	fade_in = 0,
+	replace = true,
+	time = frames(20),
+	weight = 1000,
+	node_weights = {LOWER = 1}}
 
 Animationspec{
 	name = "default walk",

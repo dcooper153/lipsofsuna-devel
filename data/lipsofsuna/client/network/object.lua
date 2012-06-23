@@ -109,7 +109,7 @@ Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
 	end
 	-- Add a speedline effect for the weapon.
 	if weapon and weapon.spec.effect_attack_speedline then
-		weapon:add_speedline{delay = 0.3, duration = 0.8}
+		weapon:add_speedline{delay = 0.1, duration = 0.3}
 	end
 	-- Melee feats may further override the animation since controls affect
 	-- what move the player performs. This is indicated with the move variable.

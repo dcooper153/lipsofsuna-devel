@@ -43,18 +43,8 @@ end
 
 Player.attack_charge_start = function(self)
 	if self.cooldown then return end
-	local weapon = self:get_weapon()
-	if weapon and weapon.spec.animation_charge then
-		self:animate(weapon.spec.animation_charge, true)
-	else
-		self:animate("charge punch", true)
-	end
-	self.attack_charge = Program.time
-end
-
-Player.attack_charge_end = function(self, args)
-	-- Get the feat type.
-	local anim = nil
+	-- Get the attack type.
+	local anim = "right hand"
 	local weapon = self:get_weapon()
 	if not weapon or weapon.spec.categories["melee"] then
 		anim = "right hand"
@@ -65,14 +55,48 @@ Player.attack_charge_end = function(self, args)
 	elseif weapon.spec.categories["build"] then
 		anim = "build"
 	end
+	-- Get the attack direction.
+	local move
+	local anim1 = Feattypespec:find{name = anim}
+	if anim1 and anim1.directional then
+		if self.strafing < -0.2 then move = "left"
+		elseif self.strafing > 0.2 then move = "right"
+		elseif self.movement < -0.2 then move = "back"
+		elseif self.movement > 0.2 then move = "front"
+		else move = "stand" end
+	end
+	-- Start charging the attack.
+	if move then
+		self:animate("charge " .. move, true)
+	elseif weapon and weapon.spec.animation_charge then
+		self:animate(weapon.spec.animation_charge, true)
+	else
+		self:animate("charge front", true)
+	end
+	self.attack_charge = Program.time
+	self.attack_charge_anim = anim
+	self.attack_charge_move = move
+end
+
+Player.attack_charge_end = function(self, args)
+	-- Validate the charge.
+	if not self.attack_charge_anim then
+		self:animate("charge cancel")
+		self.attack_charge = nil
+		self.attack_charge_move = nil
+		return
+	end
 	-- Initialize the feat.
-	local feat = Feat{animation = anim}
+	local feat = Feat{animation = self.attack_charge_anim}
 	feat:add_best_effects{user = self}
 	-- Perform the feat.
 	if not feat:perform{stop = false, user = self} then
 		self:animate("charge cancel")
 	end
+	-- Clear the charge.
 	self.attack_charge = nil
+	self.attack_charge_anim = nil
+	self.attack_charge_move = nil
 end
 
 Player.set_client = function(self, client)

@@ -256,9 +256,8 @@ void limdl_pose_calculate_node_tranformation (
 
 	/* Apply additive transformations and scaling. */
 	/* Additive channels aren't normalized against the total weight but applied as
-	   is on top of other transformations. If the weight of an additive channel is
-	   1, the blended transformation of other channels is multiplied by its full
-	   rotation and scaling. */
+	   is on top of other transformations. The weight of additive channels has no
+	   effect on the result. */
 	LIALG_U32DIC_FOREACH (iter, self->channels)
 	{
 		chan = iter.value;
@@ -268,10 +267,9 @@ void limdl_pose_calculate_node_tranformation (
 		{
 			bonepos = transform.position;
 			bonerot = transform.rotation;
-			limdl_pose_channel_get_weight (chan, node, &weight1, &weight);
-			rotation = limat_quaternion_nlerp (bonerot, rotation, weight);
-			position = limat_vector_lerp (bonepos, position, weight);
-			scale += scale1 * weight1;
+			rotation = limat_quaternion_multiply (bonerot, rotation);
+			position = limat_vector_add (bonepos, position);
+			scale *= scale1;
 		}
 	}
 

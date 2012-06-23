@@ -34,6 +34,7 @@ Globaleventmanager.find_players_exploring_sector = function(self, id)
 	end
 	-- Check that the distance is sane.
 	local res = {}
+	if not nearest_dist then return res end
 	if nearest_dist > 100 then return res end
 	nearest_dist = nearest_dist + 20
 	-- Use the closest player as the reference to find other players.

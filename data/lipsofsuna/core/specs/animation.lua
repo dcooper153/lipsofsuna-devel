@@ -17,6 +17,7 @@ Animationspec.introspect = Introspect{
 		{name = "permanent", type = "boolean", description = "Enables looping of the animation."},
 		{name = "repeat_end", type = "number", description = "Repeat range end offset."},
 		{name = "repeat_start", type = "number", description = "Repeat range start offset."},
+		{name = "replace", type = "boolean", description = "True to replace the old animation, false to inherit it when possible."},
 		{name = "time", type = "number", description = "Starting time offset."},
 		{name = "time_scale", type = "number", description = "Time scale multiplier."},
 		{name = "weight", type = "number", description = "Blending weight."},
@@ -45,6 +46,7 @@ Animationspec.get_arguments = function(self)
 		permanent = self.permanent,
 		repeat_end = self.repeat_end,
 		repeat_start = self.repeat_start,
+		replace = self.replace,
 		time = self.time,
 		time_scale = self.time_scale,
 		weight = self.weight,
@@ -63,8 +65,8 @@ end
 Animationspec.get_node_weights = function(self)
 	if not self.node_weights then return end
 	local mapping = {
-		LOWER = {"back1", "pelvis", "leg1.L", "leg2.L", "foot.L", "leg1.R", "leg2.R", "foot.R", "pelvis1", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6"},
-		LEGS = {"leg1.L", "leg2.L", "foot.L", "leg1.R", "leg2.R", "foot.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6"},
+		LOWER = {"IK", "pelvis", "pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "foot.L", "leg1.R", "leg2.R", "foot.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6"},
+		LEGS = {"pelvis.L", "pelvis.R", "leg1.L", "leg2.L", "foot.L", "leg1.R", "leg2.R", "foot.R", "leg1", "leg2", "leg3", "leg4", "leg5", "leg6"},
 		ARMS = {"arm1.L", "arm2.L", "palm.L", "palm1.L", "arm1.R", "arm2.R", "palm.R", "palm1.R"},
 		ARML = {"arm1.L", "arm2.L", "palm.L", "palm1.L"},
 		ARMR = {"arm1.R", "arm2.R", "palm.R", "palm1.R"},
