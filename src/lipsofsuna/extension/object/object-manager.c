@@ -157,8 +157,8 @@ static void private_object_motion (
 {
 	float diff_pos;
 	float diff_rot;
-	const float POSITION_THRESHOLD = 0.05;
-	const float ROTATION_THRESHOLD = 0.05;
+	const float POSITION_THRESHOLD = 0.02;
+	const float ROTATION_THRESHOLD = 0.02;
 
 	if (object->script != NULL)
 	{

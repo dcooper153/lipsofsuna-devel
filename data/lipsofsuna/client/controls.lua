@@ -135,6 +135,9 @@ Binding{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func =
 	if not Client.player_object then return end
 	v = math.max(-1, math.min(1, v))
 	Network:send{packet = Packet(packets.PLAYER_MOVE, "int8", v * -127)}
+	-- Set the predicted velocity.
+	local vel = Client.player_object.rotation * Vector(0,0,1) * (v * Client.player_object.spec.speed_walk)
+	Client.player_object.prediction:set_target_velocity(vel)
 end}
 
 Binding{name = "options", mode = "press", key1 = Keysym.o, func = function()

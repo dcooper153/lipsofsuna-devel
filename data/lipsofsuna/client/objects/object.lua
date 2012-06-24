@@ -1,7 +1,6 @@
+require "client/movement-prediction"
 require "client/objects/speedline"
 
-Object.ipol_correction = 0.8
-Object.ipol_max_error = 20
 Object.dict_active = setmetatable({}, {__mode = "k"})
 Object.physics_position_correction = Vector(0, 0, 0)
 
@@ -9,6 +8,7 @@ local oldinit = Object.new
 Object.new = function(clss, args)
 	local self = oldinit(clss, args)
 	self.inventory = Inventory{id = self.id}
+	self.prediction = MovementPrediction()
 	return self
 end
 
@@ -157,52 +157,20 @@ end
 Object.update_rotation = function(self, quat, tilt)
 	self.rotation = quat
 	self.tilt = tilt
+	self.prediction:set_target_rotation(quat, tilt)
 end
 
-Object.update_motion_state = function(self, tick)
-	if not self.interpolation then return end
-	if self.interpolation_linear then
-		-- Linear interpolation when the object is stopping.
-		local t = 10 * tick
-		if self.interpolation < 1 - t then
-			self.position = self.position + self.correction * t
-			self.interpolation = self.interpolation + t
-		elseif self.interpolation < 1 then
-			self.position = self.position + self.correction * (1 - self.interpolation)
-			self.correction = Vector()
-			self.interpolation = 1
-		end
-	else
-		-- Damp velocity to reduce overshoots.
-		self.interpolation = self.interpolation + tick
-		if self.interpolation > 0.3 then
-			self.velocity = self.velocity * 0.93
-		end
-		-- Apply position change predicted by the velocity.
-		self.position = self.position + self.velocity * tick
-		-- Correct prediction errors over time.
-		self.position = self.position + self.correction * (1 - Object.ipol_correction)
-		self.correction = self.correction * Object.ipol_correction
+Object.update_motion_state = function(self, secs)
+	self.prediction:update(secs)
+	self.position = self.prediction:get_predicted_position()
+	if self.dead or self ~= Client.player_object then
+		self.rotation = self.prediction:get_predicted_rotation()
+		self.tilt = self.prediction:get_predicted_tilt()
 	end
 end
 
 Object.set_motion_state = function(self, pos, rot, vel, tilt)
-	-- Store the prediction error so that it can be corrected over time.
-	if (pos - self.position).length < Object.ipol_max_error then
-		self.correction = pos - self.position
-	else
-		self.position = pos
-		self.correction = Vector()
-	end
-	-- Store the current velocity so that we can predict future movements.
-	self.velocity = vel
-	self.interpolation = 0
-	self.interpolation_linear = (vel.length < 0.5)
-	-- Set rotation unless controlled by the local player.
-	if self.dead or self ~= Client.player_object then
-		self:update_rotation(rot, tilt)
-	end
-	-- Mark as active.
+	self.prediction:set_target_state(pos, rot, tilt, vel)
 	Object.dict_active[self] = 5.0
 end
 

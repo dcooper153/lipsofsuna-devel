@@ -407,7 +407,8 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 	debug("  OK")
 	o.flags = Bitwise:band(flags, 0xFF)
 	o:set_model()
-	o:update_rotation(o.rotation, o.tilt)
+	o.prediction:set_target_state(o.position, o.rotation, o.tilt, Vector())
+	o.prediction:warp()
 	o.realized = true
 	-- Initialize speed lines.
 	if Bitwise:band(flags, Protocol.object_flags.SPEEDLINE) ~= 0 then

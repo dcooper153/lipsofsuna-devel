@@ -349,6 +349,16 @@ Vector.dot = function(self, v)
 	return Los.vector_dot(self.handle, v.handle)
 end
 
+--- Interpolates two vectors linearly in-place.
+-- @param self Vector.
+-- @param v Vector.
+-- @param f Scalar in range [0, 1], where 0 corresponds to the own value.
+Vector.lerp = function(self, v, f)
+	self.x = self.x * (1 - f) + v.x * f
+	self.y = self.y * (1 - f) + v.y * f
+	self.z = self.z * (1 - f) + v.z * f
+end
+
 --- Multiplies the vector by a scalar in-place.
 -- @param self Vector.
 -- @param scalar Scalar.
