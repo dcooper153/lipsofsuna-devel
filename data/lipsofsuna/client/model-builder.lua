@@ -32,7 +32,11 @@ ModelBuilder.build = function(clss, object, args)
 			local models = spec and spec:get_equipment_models(args.spec.equipment_class or args.spec.name, lod)
 			if models then
 				for k,v in pairs(models) do
-					if v ~= "" then meshes[k] = v end
+					if v ~= "" then
+						meshes[k] = v
+					else
+						meshes[k] = nil
+					end
 				end
 			end
 		end

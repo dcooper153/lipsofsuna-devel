@@ -218,21 +218,20 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
   <asset>
     <file>data/lipsofsuna/actors/aer/*.lmdl</file>
     <file>data/lipsofsuna/actors/aer/*.dds</file>
+    <file>data/lipsofsuna/apparel/longcoat/*.lmdl</file>
+    <file>data/lipsofsuna/apparel/longcoat/*.png</file>
     <file>import/aer1.blend</file>
+    <file>import/aerbody1.blend</file>
+    <file>import/aeritem1.blend</file>
     <file>import/aer1.png</file>
     <file>import/aer1n.png</file>
     <file>import/eye1.png</file>
     <file>import/eyes-000.png</file>
+    <file>import/longcoat1.blend</file>
+    <file>import/longcoat1.png</file>
+    <file>import/longcoat1.xcf</file>
     <author>Ari Mustonen</author>
     <license>Creative Commons BY-SA 3.0</license>
-  </asset>
-
-  <asset>
-    <file>import/aeritem1.blend</file>
-    <author>Ari Mustonen</author>
-    <license>Creative Commons BY-SA 3.0</license>
-    <dep>import/aer1.png</dep>
-    <dep>import/aer1n.png</dep>
   </asset>
 
   <asset>
