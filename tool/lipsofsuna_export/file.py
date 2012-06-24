@@ -4,8 +4,9 @@ from .collision import *
 from .format import *
 from .hierarchy import *
 from .mesh import *
+from .modifier_edgesplit import *
+from .modifier_mirror import *
 from .particles import *
-from .utils import *
 from .writer import *
 
 class LIFile:
@@ -99,10 +100,17 @@ class LIFile:
 					if mod.type == 'ARMATURE' or mod.type == 'MULTIRES':
 						obj.modifiers.remove(mod)
 					elif mod.type == "MIRROR" and obj.data.shape_keys:
-						LIUtils.apply_shape_key_mirror(obj, mod)
 						self.junkobjs.append(obj)
 						obj.select = False
-						newobj = bpy.context.scene.objects.active
+						m = LIModifierMirror(obj, mod)
+						newobj = m.apply()
+						newobj.select = True
+						self.tempobjs[self.tempobjs.index(obj)] = newobj
+					elif mod.type == "EDGE_SPLIT" and obj.data.shape_keys:
+						self.junkobjs.append(obj)
+						obj.select = False
+						m = LIModifierEdgeSplit(obj, mod)
+						newobj = m.apply()
 						newobj.select = True
 						self.tempobjs[self.tempobjs.index(obj)] = newobj
 					else:

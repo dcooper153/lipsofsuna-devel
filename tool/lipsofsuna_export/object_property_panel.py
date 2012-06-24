@@ -17,4 +17,7 @@ class LIObjectPropertyPanel(bpy.types.Panel):
 		col = layout.column()
 		col.operator("wm.lipsofsuna_object_export_settings", text="Exporting Settings", icon="FILE")
 		col.operator("wm.lipsofsuna_copy_shape_keys", text="Copy Shape Keys", icon="COPY_ID")
+		col.operator("wm.lipsofsuna_copy_shape_sliders", text="Copy Shape Sliders", icon="COPY_ID")
 		col.operator("wm.lipsofsuna_copy_weight_groups", text="Copy Weight Groups", icon="COPY_ID")
+		col.operator("wm.lipsofsuna_apply_edgesplit_modifier", text="Apply Edge Split Modifier", icon="COPY_ID")
+		col.operator("wm.lipsofsuna_apply_mirror_modifier", text="Apply Mirror Modifier", icon="COPY_ID")

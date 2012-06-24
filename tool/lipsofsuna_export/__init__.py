@@ -1,8 +1,11 @@
 import array, math, os, re, struct, sys
 import bpy, mathutils
 from .animation import *
+from .apply_mirror_modifier_operator import *
+from .apply_edgesplit_modifier_operator import *
 from .collision import *
 from .copy_shape_keys_operator import *
+from .copy_shape_sliders_operator import *
 from .copy_weight_groups_operator import *
 from .exporter import *
 from .export_finished_dialog import *
@@ -45,6 +48,8 @@ bl_info = {
 
 ##############################################################################
 
+bpy.utils.register_class(LIApplyEdgeSplitModifierOperator)
+bpy.utils.register_class(LIApplyMirrorModifierOperator)
 bpy.utils.register_class(LIExportFinishedDialog)
 bpy.utils.register_class(LIMaterialExportSettingsOperator)
 bpy.utils.register_class(LIObjectExportSettingsOperator)
