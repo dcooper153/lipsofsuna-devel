@@ -1,9 +1,11 @@
-Obstacle = Class(Object)
+require "client/objects/remote"
+
+Obstacle = Class(RemoteObject)
 
 Obstacle.new = function(clss, args)
-	local self = Object.new(clss, args)
+	local self = RemoteObject.new(clss, args)
 	if args and args.spec and args.spec.special_effects then
-		Object.dict_active[self] = 0.1
+		self:activate(0.1)
 	end
 	Client.options:apply_object(self)
 	return self

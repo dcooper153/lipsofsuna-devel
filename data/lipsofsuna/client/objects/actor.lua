@@ -1,10 +1,12 @@
-Actor = Class(Object)
+require "client/objects/remote"
+
+Actor = Class(RemoteObject)
 
 Actor.new = function(clss, args)
-	local self = Object.new(clss, args)
+	local self = RemoteObject.new(clss, args)
 	self.stats = {}
 	self.inventory:subscribe(self, function(args) self:update_inventory(args) end)
-	Object.dict_active[self] = 1.0
+	self:activate(1)
 	Client.options:apply_object(self)
 	return self
 end
@@ -13,7 +15,7 @@ Actor.detach = function(self)
 	-- Hide equipment.
 	self.inventory:clear()
 	-- Call base.
-	Object.detach(self)
+	RemoteObject.detach(self)
 end
 
 --- Disables the equipment holding animation for the given slot.
@@ -32,7 +34,7 @@ end
 -- @param item Item added to the slot.
 Actor.enable_equipment_holding_animation = function(self, slot, item)
 	-- Enable the animation if supported by the actor.
-	local anim = self:animate_spec(item.spec.animation_hold)
+	local anim = self:add_animation(item.spec.animation_hold)
 	if anim then
 		if self.equipment_animations then
 			self.equipment_animations[slot] = anim
@@ -60,7 +62,7 @@ end
 Actor.set_model = function(self)
 	if self.spec.models then
 		-- Create a custom model.
-		Object.set_model(self, self.model)
+		RemoteObject.set_model(self, self.model)
 		self:request_model_rebuild()
 	else
 		-- Use a static model.
@@ -71,7 +73,7 @@ Actor.set_model = function(self)
 	-- Update body scale.
 	self:update_body_scale()
 	-- Update special effects
-	Object.set_model(self, true)
+	RemoteObject.set_model(self, true)
 	self.animated = true
 end
 
@@ -119,7 +121,7 @@ end
 -- @param secs Seconds since the last update.
 Actor.update = function(self, secs)
 	-- Call the base class.
-	Object.update(self, secs)
+	RemoteObject.update(self, secs)
 	-- Handle model rebuilding.
 	--
 	-- Equipment changes can occur frequently when newly appearing actors are
@@ -251,12 +253,12 @@ Actor.update_model = function(self)
 		spec = self.spec})
 end
 
---- Updates the rotation and tilt of the object.
+--- Sets the client overridden rotation and tilt of the object.
 -- @param self Object.
 -- @param quat Rotation quaternion.
 -- @param tilt Tilt angle in radians.
-Actor.update_rotation = function(self, quat, tilt)
-	Object.update_rotation(self, quat, tilt)
+Actor.set_local_rotation = function(self, quat, tilt)
+	RemoteObject.set_local_rotation(self, quat, tilt)
 	local spec = self.spec
 	if spec and spec.tilt_bone then
 		-- Calculate the tilting rotation.

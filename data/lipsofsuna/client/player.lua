@@ -84,7 +84,7 @@ Player.update_rotation = function(clss, secs)
 	clss.tilt = 0
 	-- Update rotation.
 	local rot = Quaternion{euler = {clss.turn_state, 0, 0}}
-	clss.object:update_rotation(rot, -clss.tilt_state)
+	clss.object:set_local_rotation(rot, -clss.tilt_state)
 	-- Sync rotation with the server.
 	-- Rotation takes at most 0.25 seconds to fully synchronize. Large changes
 	-- are sent immediately whereas smaller changes are grouped together to

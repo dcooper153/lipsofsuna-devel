@@ -1,28 +1,7 @@
-EditorObject = Class(Object)
+require "client/objects/base"
+
+EditorObject = Class(BaseObject)
 EditorObject.class_name = "EditorObject"
-
-EditorObject:add_getters{
-	spec = function(s) return rawget(s, "__spec") end}
-
-EditorObject:add_setters{
-	spec = function(s, v)
-		rawset(s, "__spec", v)
-		s.model = v.model
-		if s.model and v.models then
-			local m = s.model:copy()
-			for k,v in pairs(v.models) do
-				if k ~= "skeleton" then
-					m:merge(Model:find_or_load{file = v})
-				end
-			end
-			m:calculate_bounds()
-			m:changed()
-			s.model = m
-		end
-		if v.type == "actor" then
-			s:animate{animation = "idle", channel = 1, permanent = true}
-		end
-	end}
 
 EditorObject.move = function(self, value, step)
 	self.position = self.position + value * step
@@ -50,3 +29,26 @@ EditorObject.rotate = function(self, value, steps)
 	e[1] = math.floor(e[1] / s + value + 0.5) * s
 	self.rotation = Quaternion{euler = e}
 end
+
+EditorObject:add_getters{
+	spec = function(s) return rawget(s, "__spec") end}
+
+EditorObject:add_setters{
+	spec = function(s, v)
+		rawset(s, "__spec", v)
+		s.model = v.model
+		if s.model and v.models then
+			local m = s.model:copy()
+			for k,v in pairs(v.models) do
+				if k ~= "skeleton" then
+					m:merge(Model:find_or_load{file = v})
+				end
+			end
+			m:calculate_bounds()
+			m:changed()
+			s.model = m
+		end
+		if v.type == "actor" then
+			s:animate{animation = "idle", channel = 1, permanent = true}
+		end
+	end}

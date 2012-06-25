@@ -11,6 +11,7 @@ end
 Object = Class()
 Object.class_name = "Object"
 Object.objects = setmetatable({}, {__mode = "v"})
+Object.dict_active = setmetatable({}, {__mode = "k"})
 
 --- Creates a new object.
 -- @param clss Object class.
@@ -86,10 +87,24 @@ Object.get_free_id = function(clss)
 	end
 end
 
+--- Adds the object to the list of active objects.
+-- @param self Objects.
+-- @param secs Number of seconds to remain active.
+Object.activate = function(self, secs)
+	Object.dict_active[self] = secs
+end
+
 --- Recalculates the bounding box of the model of the object.
 -- @param self Object.
 Object.calculate_bounds = function(self)
 	Los.object_calculate_bounds(self.handle)
+end
+
+--- Detaches the object from the scene.
+-- @param self Object.
+Object.detach = function(self)
+	self.realized = false
+	Object.dict_active[self] = nil
 end
 
 --- Prevents map sectors around the object from being unloaded.

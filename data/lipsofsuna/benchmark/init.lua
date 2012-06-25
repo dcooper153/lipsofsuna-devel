@@ -10,9 +10,9 @@ Benchmark.new = function(clss)
 	for i = 1,20 do
 		local o = Simulation:create_object_by_spec(spec)
 		local a = i/20*2*math.pi
-		o.position = Vector(500,500,500) + Vector(math.cos(a), 0, math.sin(a)):multiply(i/4)
+		o:set_motion_state(Vector(500,500,500) + Vector(math.cos(a), 0, math.sin(a)):multiply(i/4))
 		o:set_model()
-		o:animate_spec(anims[i % 3 + 1])
+		o:add_animation(anims[i % 3 + 1])
 		o.realized = true
 		self.objects[o.id] = o
 		self.object = o
@@ -55,7 +55,7 @@ Benchmark.update = function(self, secs)
 	Lighting:update(secs)
 	-- Modify objects.
 	for k,v in pairs(self.objects) do
-		Object.dict_active[v] = 5
+		v:activate(5)
 		if not v.model_rebuild_timer then
 			v.model_rebuild_timer = 2
 			v.body_style = {}

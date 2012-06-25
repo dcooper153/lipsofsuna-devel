@@ -3,7 +3,7 @@ Protocol:add_handler{type = "OBJECT_ANIMATED", func = function(event)
 	if not ok then return end
 	local o = Object:find{id = id}
 	if not o then return end
-	o:set_anim(anim, time)
+	o:add_animation(anim, time)
 end}
 
 Protocol:add_handler{type = "OBJECT_BEHEADED", func = function(event)
@@ -30,9 +30,7 @@ Protocol:add_handler{type = "OBJECT_DEAD", func = function(args)
 	-- Update death status.
 	if obj.dead == b then return end
 	obj.dead = b
-	if obj.rotation_real then
-		obj:update_rotation(obj.rotation_real)
-	end
+	obj:set_local_rotation()
 	if obj == Client.player_object then
 		Client:set_player_dead(b)
 	end
@@ -123,7 +121,7 @@ Protocol:add_handler{type = "OBJECT_FEAT", func = function(event)
 		animation = map[move] or animation
 	end
 	-- Play the animation.
-	obj:animate_spec(animation)
+	obj:add_animation(animation)
 end}
 
 Protocol:add_handler{type = "OBJECT_EFFECT", func = function(event)
@@ -281,7 +279,7 @@ Protocol:add_handler{type = "OBJECT_SHOWN", func = function(event)
 			local ok,anim,time = event.packet:resume("string", "float")
 			if not ok then return end
 			debug("    %s %f", anim, time)
-			o:set_anim(anim, time)
+			o:add_animation(anim, time)
 		end
 	end
 	-- Equipment.

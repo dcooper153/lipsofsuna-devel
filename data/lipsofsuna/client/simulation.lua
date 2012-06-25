@@ -68,14 +68,21 @@ Simulation.update = function(self, secs)
 			k:update_sound(secs)
 		end
 		-- Interpolate positions.
-		k:update_motion_state(secs)
+		if k.prediction and k.prediction.enabled then
+			k.prediction:update(secs)
+			k.position = k.prediction:get_predicted_position()
+			if k.dead or k ~= Client.player_object then
+				k.rotation = k.prediction:get_predicted_rotation()
+				k.tilt = k.prediction:get_predicted_tilt()
+			end
+		end
 		-- Update slots and special effects.
 		k:update(secs)
 		-- Maintain activity.
 		if k.spec and k.spec.type ~= "actor" then
 			v = v - secs
 			if v <= 0 then v = nil end
-			Object.dict_active[k] = v
+			k:activate(v)
 		end
 	end
 end

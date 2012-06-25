@@ -6,6 +6,7 @@ MovementPrediction.class_name = "MovementPrediction"
 -- @return Movement predictor.
 MovementPrediction.new = function(clss)
 	local self = Class.new(clss)
+	self.enabled = true
 	self.timer = 0
 	self.tick = 1/60
 	self.pred_position = Vector()
@@ -21,6 +22,14 @@ MovementPrediction.new = function(clss)
 	self.rotation_corr_rate = 0.2
 	self.prediction_velocity_decay = 0.99
 	return self
+end
+
+--- Enables or disables movement prediction.
+-- @param self Movement prediction.
+-- @param value True to enable.
+MovementPrediction.set_enabled = function(self, value)
+	self.enabled = value
+	if not value then self:warp() end
 end
 
 --- Gets the current predicted position.
@@ -51,6 +60,7 @@ end
 MovementPrediction.set_target_rotation = function(self, rot, tilt)
 	self.target_rotation = rot
 	self.target_tilt = tilt or 0
+	if not self.enabled then self:warp() end
 end
 
 --- Sets the target velocity.
@@ -77,12 +87,17 @@ MovementPrediction.set_target_state = function(self, pos, rot, tilt, vel)
 	-- Initialize the interpolation cycle.
 	self.ipol_timer = 0
 	self.ipol_velocity = self.target_velocity:copy()
+	if not self.enabled then self:warp() end
 end
 
 --- Updates the movement prediction.
 -- @param self Movement prediction.
 -- @param secs Seconds since the last update.
 MovementPrediction.update = function(self, secs)
+	-- Check if enabled.
+	if not self.enabled then
+		return self:warp()
+	end
 	-- Update the timer.
 	if not self.ipol_timer then return self:warp() end
 	self.timer = self.timer + secs

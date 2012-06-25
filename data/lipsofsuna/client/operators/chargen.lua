@@ -201,7 +201,7 @@ Operators.chargen.update = function(self, secs)
 		object.skin_color = Color:hsv_to_rgb(self.char.skin_color)
 		object.skin_style = self.char.skin_style
 		object:set_model()
-		object:animate_spec("idle")
+		object:add_animation("idle")
 		if self.dump_presets then
 			print(self.data.object:write_preset())
 		end

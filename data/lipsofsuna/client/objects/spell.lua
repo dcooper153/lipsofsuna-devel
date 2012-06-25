@@ -1,8 +1,10 @@
-Spell = Class(Object)
+require "client/objects/remote"
+
+Spell = Class(RemoteObject)
 Spell.class_name = "Spell"
 
 Spell.new = function(clss, args)
-	local self = Object.new(clss, args)
+	local self = RemoteObject.new(clss, args)
 	if args and args.spec then
 		if args.spec.particle then
 			self.particle = args.spec.particle
@@ -21,13 +23,13 @@ Spell.detach = function(self, soft)
 		self.particle_emitting = false
 	else
 		-- Forced instant removal.
-		Object.detach(self)
+		RemoteObject.detach(self)
 	end
 end
 
 Spell.update = function(self, secs)
 	-- Call base update.
-	Object.update(self, secs)
+	RemoteObject.update(self, secs)
 	-- Handle delayed destruction.
 	if self.destroy_timer then
 		self.destroy_timer = self.destroy_timer - secs
