@@ -61,6 +61,8 @@ Speedline.update = function(self, secs)
 		-- Realize the effect.
 		if not self.realized then
 			self.position = self.object.position
+			self.prediction:set_target_state(self.position, self.rotation, 0, Vector())
+			self.prediction:warp()
 			self.realized = true
 		end
 		-- Get the current line vertices.
