@@ -50,15 +50,13 @@ vec3 los_rgb_to_hsv(in vec3 rgb)
 	float v = max(max(rgb.r, rgb.g), rgb.b);
 	float m = min(min(rgb.r, rgb.g), rgb.b);
 	float c = v - m;
-	float h;
-	if(c < 0.00001) h = 0.0;
-	else if(v == rgb.r) h = (mod((rgb.g - rgb.b) / c, 6.0)) / 6.0;
+	if(c < 0.00001)
+		return vec3(0.0, 0.0, v);
+	float h = 0.0;
+	if(v == rgb.r) h = (mod((rgb.g - rgb.b) / c, 6.0)) / 6.0;
 	else if(v == rgb.g) h = ((rgb.b - rgb.r) / c + 2.0) / 6.0;
 	else if(v == rgb.b) h = ((rgb.r - rgb.g) / c + 4.0) / 6.0;
-	if(c < 0.00001)
-		return vec3(h, 0.0, v);
-	else
-		return vec3(h, c / v, v);
+	return vec3(h, c / v, v);
 }
 vec3 los_cel_shading(in vec4 material, in vec4 diff, in vec4 spec, in vec4 p, in sampler1D t1, in sampler1D t2)
 {
