@@ -70,6 +70,8 @@ LIMdlNode* LIRenAttachmentEntity::find_node (const char* name)
 	LIMdlModel* model = get_model ();
 	if (model != NULL)
 		node = limdl_model_find_node (model, name);
+	else
+		node = NULL;
 
 	return node;
 }
@@ -190,10 +192,14 @@ void LIRenAttachmentEntity::update (float secs)
 	/* Create the skeleton and its pose buffer. */
 	if (create_skeleton ())
 	{
+		LIMdlModel* model = get_model ();
 		lisys_assert (pose_buffer == NULL);
-		pose_buffer = limdl_pose_buffer_new (get_model ());
-		lisys_assert (pose_buffer != NULL);
-		lisys_assert (pose_buffer->bones.count == entity->getSkeleton ()->getNumBones ());
+		if (model != NULL)
+		{
+			pose_buffer = limdl_pose_buffer_new (model);
+			lisys_assert (pose_buffer != NULL);
+			lisys_assert (pose_buffer->bones.count == entity->getSkeleton ()->getNumBones ());
+		}
 	}
 
 	/* Set the entity flags. */
@@ -268,9 +274,9 @@ bool LIRenAttachmentEntity::create_skeleton ()
 	/* The mesh may not have set these correctly if it depended on bones
 	   in external skeletons. Because of external bones, we need to set
 	   the transformations using the pose skeleton of the object. */
-	if (object->pose_skeleton != NULL)
+	LIMdlModel* model = get_model ();
+	if (object->pose_skeleton != NULL && model != NULL)
 	{
-		LIMdlModel* model = get_model ();
 		for (int i = 0 ; i < model->weight_groups.count ; i++)
 		{
 			Ogre::Bone* bone = skeleton->getBone (i + 1);
@@ -281,10 +287,15 @@ bool LIRenAttachmentEntity::create_skeleton ()
 				LIMatTransform t = node->rest_transform.global;
 				bone->setPosition (t.position.x, t.position.y, t.position.z);
 				bone->setOrientation (t.rotation.w, t.rotation.x, t.rotation.y, t.rotation.z);
-				bone->setManuallyControlled (true);
-				bone->setInitialState ();
 			}
 		}
+	}
+
+	/* Make all bones manually controlled. */
+	for (int i = 0 ; i < skeleton->getNumBones () ; i++)
+	{
+		Ogre::Bone* bone = skeleton->getBone (i);
+		bone->setManuallyControlled (true);
 	}
 
 	/* Set the binding pose. */

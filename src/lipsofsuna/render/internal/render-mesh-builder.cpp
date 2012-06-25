@@ -466,8 +466,6 @@ bool LIRenMeshBuilder::create_skeleton (Ogre::Mesh* mesh)
 		}
 		else
 			bone = skeleton->createBone (i + 1);
-		bone->setManuallyControlled (true);
-		bone->setInitialState ();
 	}
 
 	/* Set the binding pose. */
@@ -475,7 +473,7 @@ bool LIRenMeshBuilder::create_skeleton (Ogre::Mesh* mesh)
 	skeleton->load ();
 
 	/* Assign the skeleton to the mesh. */
-	mesh->_notifySkeleton (skeleton);
+	mesh->setSkeletonName (skeleton->getName ());
 
 	return true;
 }
