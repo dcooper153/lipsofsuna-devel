@@ -452,6 +452,8 @@ void liren_internal_reload (
 void liren_internal_render (
 	LIRenRender* self)
 {
+	/* Render a frame. */
+	self->data->root->renderOneFrame ();
 }
 
 int liren_internal_screenshot (
@@ -493,9 +495,6 @@ int liren_internal_update (
 	Ogre::Real w (self->data->viewport->getActualWidth ());
 	Ogre::Real h (self->data->viewport->getActualHeight ());
 	self->data->camera->setAspectRatio (w / h);
-
-	/* Render a frame. */
-	self->data->root->renderOneFrame ();
 
 	/* Free unused resources. */
 	/* Ogre internals seem to be sloppy with using resource pointers. At

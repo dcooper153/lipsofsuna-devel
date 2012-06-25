@@ -63,13 +63,14 @@ while not Program.quit do
 	end
 	local t1 = Program.time
 	Program:update()
+	Program:update_scene(t1 - frame)
+	frame = t1
 	local t2 = Program.time
 	Eventhandler:update()
 	Client:update()
 	local t3 = Program.time
 	-- Render the scene.
-	Program:render(t3 - frame)
-	frame = t3
+	Program:render_scene()
 	local t4 = Program.time
 	-- Update profiling stats.
 	Program.profiling.update = t2 - t1
