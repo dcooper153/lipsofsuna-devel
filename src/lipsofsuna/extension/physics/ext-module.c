@@ -158,7 +158,11 @@ static int private_model_new (
 
 	model_ = liphy_physics_find_model (self->physics, model->id);
 	if (model_ == NULL)
-		liphy_model_new (self->physics, model->model, model->id);
+	{
+		model_ = liphy_model_new (self->physics, model->id);
+		if (model_ != NULL)
+			liphy_model_set_model (model_, model->model);
+	}
 
 	return 1;
 }

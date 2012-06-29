@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,28 +18,23 @@
 #ifndef __PHYSICS_MODEL_H__
 #define __PHYSICS_MODEL_H__
 
-#include <lipsofsuna/model.h>
-#include <lipsofsuna/system.h>
+#include "lipsofsuna/model.h"
+#include "lipsofsuna/system.h"
 #include "physics-types.h"
 
 LIAPICALL (LIPhyModel*, liphy_model_new, (
 	LIPhyPhysics* physics,
-	LIMdlModel*   model,
 	int           id));
 
 LIAPICALL (void, liphy_model_free, (
 	LIPhyModel* self));
-
-LIAPICALL (int, liphy_model_build, (
-	LIPhyModel* self,
-	int         terrain));
 
 LIAPICALL (LIPhyShape*, liphy_model_find_shape, (
 	LIPhyModel* self,
 	const char* name));
 
 LIAPICALL (int, liphy_model_set_model, (
-	LIPhyModel* self,
-	LIMdlModel* model));
+	LIPhyModel*       self,
+	const LIMdlModel* model));
 
 #endif

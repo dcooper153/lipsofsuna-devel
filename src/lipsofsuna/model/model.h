@@ -42,6 +42,7 @@ typedef int LIMdlModelFlags;
 
 struct _LIMdlModel
 {
+	int id;
 	int flags;
 	LIMatAabb bounds;
 	LIMdlNodes nodes;

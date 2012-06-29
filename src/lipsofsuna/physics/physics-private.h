@@ -90,9 +90,7 @@ struct _LIPhyModelMesh
 struct _LIPhyModel
 {
 	int id;
-	int flags;
 	LIAlgStrdic* shapes;
-	LIMdlModel* model;
 	LIPhyPhysics* physics;
 	struct
 	{
