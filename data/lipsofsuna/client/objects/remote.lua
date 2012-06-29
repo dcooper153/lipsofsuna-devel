@@ -120,8 +120,8 @@ end
 -- @param quat Rotation quaternion.
 -- @param tilt Tilt angle in radians.
 RemoteObject.set_local_rotation = function(self, quat, tilt)
-	self.rotation = quat
-	self.tilt = tilt
+	if quat then self.rotation = quat end
+	if tilt then self.tilt = tilt end
 	self.prediction:set_target_rotation(quat, tilt)
 end
 
