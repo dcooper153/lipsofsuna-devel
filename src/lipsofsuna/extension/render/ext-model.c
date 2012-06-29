@@ -27,7 +27,7 @@
 static void Model_get_render_loaded (LIScrArgs* args)
 {
 	LIExtModule* module;
-	LIEngModel* model = args->self;
+	LIMdlModel* model = args->self;
 
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_RENDER_MODEL);
 	if (liren_render_model_get_loaded (module->render, model->id))

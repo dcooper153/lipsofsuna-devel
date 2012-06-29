@@ -25,21 +25,17 @@
 #include "lipsofsuna/object.h"
 #include "ext-module.h"
 
-static int private_engine_free (
-	LIExtModule* self,
-	LIEngEngine* engine);
-
 static int private_model_changed (
 	LIExtModule* self,
-	LIEngModel*  model);
+	LIMdlModel*  model);
 
 static int private_model_free (
 	LIExtModule* self,
-	LIEngModel*  model);
+	LIMdlModel*  model);
 
 static int private_model_new (
 	LIExtModule* self,
-	LIEngModel*  model);
+	LIMdlModel*  model);
 
 static int private_object_new (
 	LIExtModule* self,
@@ -52,7 +48,7 @@ static int private_object_free (
 static int private_object_model (
 	LIExtModule* self,
 	LIObjObject* object,
-	LIEngModel*  model);
+	LIMdlModel*  model);
 
 static int private_object_realize (
 	LIExtModule* self,
@@ -100,8 +96,7 @@ LIExtModule* liext_object_render_new (
 	}
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (program->callbacks, "engine-free", 1, private_engine_free, self, self->calls + 0) ||
-	    !lical_callbacks_insert (program->callbacks, "model-changed", 1, private_model_changed, self, self->calls + 1) ||
+	if (!lical_callbacks_insert (program->callbacks, "model-changed", 1, private_model_changed, self, self->calls + 1) ||
 	    !lical_callbacks_insert (program->callbacks, "model-free", 1, private_model_free, self, self->calls + 2) ||
 	    !lical_callbacks_insert (program->callbacks, "model-new", 1, private_model_new, self, self->calls + 3) ||
 	    !lical_callbacks_insert (program->callbacks, "object-new", 1, private_object_new, self, self->calls + 4) ||
@@ -130,25 +125,18 @@ void liext_object_render_free (
 
 /*****************************************************************************/
 
-static int private_engine_free (
-	LIExtModule* self,
-	LIEngEngine* engine)
-{
-	return 1;
-}
-
 static int private_model_changed (
 	LIExtModule* self,
-	LIEngModel*  model)
+	LIMdlModel*  model)
 {
-	liren_render_model_set_model (self->render, model->id, model->model);
+	liren_render_model_set_model (self->render, model->id, model);
 
 	return 1;
 }
 
 static int private_model_free (
 	LIExtModule* self,
-	LIEngModel*  model)
+	LIMdlModel*  model)
 {
 	lisys_assert (model != NULL);
 
@@ -159,9 +147,9 @@ static int private_model_free (
 
 static int private_model_new (
 	LIExtModule* self,
-	LIEngModel*  model)
+	LIMdlModel*  model)
 {
-	liren_render_model_new (self->render, model->model, model->id);
+	liren_render_model_new (self->render, model, model->id);
 
 	return 1;
 }
@@ -187,7 +175,7 @@ static int private_object_free (
 static int private_object_model (
 	LIExtModule* self,
 	LIObjObject* object,
-	LIEngModel*  model)
+	LIMdlModel*  model)
 {
 	if (model != NULL)
 		liren_render_object_set_model (self->render, object->id, model->id);

@@ -26,6 +26,7 @@
 #include "model-hair.h"
 #include "model-light.h"
 #include "model-lod.h"
+#include "model-manager.h"
 #include "model-material.h"
 #include "model-nodes.h"
 #include "model-particle.h"
@@ -46,6 +47,7 @@ struct _LIMdlModel
 	int flags;
 	LIMatAabb bounds;
 	LIMdlNodes nodes;
+	LIMdlManager* manager;
 	struct { int count; LIMdlHairs* array; } hairs;
 	struct { int count; LIMdlLod* array; } lod;
 	struct { int count; LIMdlMaterial* array; } materials;
@@ -77,6 +79,9 @@ LIAPICALL (void, limdl_model_calculate_bounds, (
 	LIMdlModel* self));
 
 LIAPICALL (void, limdl_model_calculate_tangents, (
+	LIMdlModel* self));
+
+LIAPICALL (void, limdl_model_clear, (
 	LIMdlModel* self));
 
 LIAPICALL (void, limdl_model_clear_vertices, (
@@ -118,6 +123,10 @@ LIAPICALL (int, limdl_model_morph, (
 	LIMdlModel* ref_model,
 	const char* shape,
 	float       value));
+
+LIAPICALL (int, limdl_model_replace, (
+	LIMdlModel*       self,
+	const LIMdlModel* model));
 
 LIAPICALL (void, limdl_model_replace_material_by_string, (
 	LIMdlModel*  self,

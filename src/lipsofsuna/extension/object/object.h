@@ -20,7 +20,6 @@
 
 #include "lipsofsuna/system.h"
 #include "lipsofsuna/archive.h"
-#include "lipsofsuna/engine.h"
 #include "lipsofsuna/math.h"
 #include "lipsofsuna/script.h"
 #include "object-manager.h"
@@ -38,7 +37,7 @@ struct _LIObjObject
 	uint32_t id;
 	int external_id;
 	int flags;
-	LIEngModel* model;
+	LIMdlModel* model;
 	LIObjManager* manager;
 	LIObjSector* sector;
 	LIMatTransform transform;
@@ -83,7 +82,7 @@ LIAPICALL (float, liobj_object_get_distance, (
 
 LIAPICALL (int, liobj_object_set_model, (
 	LIObjObject* self,
-	LIEngModel*  model));
+	LIMdlModel*  model));
 
 LIAPICALL (int, liobj_object_get_realized, (
 	const LIObjObject* self));

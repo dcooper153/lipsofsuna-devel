@@ -27,7 +27,7 @@
 
 static void Object_add_model (LIScrArgs* args)
 {
-	LIEngModel* model;
+	LIMdlModel* model;
 	LIExtModule* module;
 	LIObjObject* object;
 	LIScrData* value;
@@ -246,7 +246,7 @@ static void Object_particle_animation (LIScrArgs* args)
 
 static void Object_remove_model (LIScrArgs* args)
 {
-	LIEngModel* model;
+	LIMdlModel* model;
 	LIExtModule* module;
 	LIObjObject* object;
 	LIScrData* value;
@@ -264,8 +264,8 @@ static void Object_remove_model (LIScrArgs* args)
 
 static void Object_replace_model (LIScrArgs* args)
 {
-	LIEngModel* model;
-	LIEngModel* model1;
+	LIMdlModel* model;
+	LIMdlModel* model1;
 	LIExtModule* module;
 	LIObjObject* object;
 	LIScrData* value;

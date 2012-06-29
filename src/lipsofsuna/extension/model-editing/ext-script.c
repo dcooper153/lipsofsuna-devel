@@ -33,11 +33,11 @@ static void Model_add_material (LIScrArgs* args)
 	const char* shader;
 	LIMdlBuilder* builder;
 	LIMdlMaterial material;
-	LIEngModel* model;
+	LIMdlModel* model;
 
 	/* Create a model builder. */
 	model = args->self;
-	builder = limdl_builder_new (model->model);
+	builder = limdl_builder_new (model);
 	if (builder == NULL)
 		return;
 
@@ -77,12 +77,12 @@ static void Model_add_triangles (LIScrArgs* args)
 	LIMdlVertex* tmp;
 	LIMdlVertex* vertex;
 	LIMdlVertex* vertices = NULL;
-	LIEngModel* model;
+	LIMdlModel* model;
 
 	/* Get the edited material group. */
 	model = args->self;
 	liscr_args_gets_int (args, "material", &group);
-	if (group < 1 || group > model->model->materials.count)
+	if (group < 1 || group > model->materials.count)
 		return;
 
 	/* Read vertex data. */
@@ -162,10 +162,10 @@ static void Model_add_triangles (LIScrArgs* args)
 		return;
 	}
 	for (i = 0 ; i < vertices_num ; i++)
-		indices[i] = model->model->vertices.count + i;
+		indices[i] = model->vertices.count + i;
 
 	/* Create a model builder. */
-	builder = limdl_builder_new (model->model);
+	builder = limdl_builder_new (model);
 	if (builder == NULL)
 	{
 		lisys_free (vertices);
@@ -188,7 +188,7 @@ static void Model_calculate_lod (LIScrArgs* args)
 {
 	int levels = 5;
 	float factor = 0.3f;
-	LIEngModel* model;
+	LIMdlModel* model;
 	LIMdlBuilder* builder;
 
 	model = args->self;
@@ -197,7 +197,7 @@ static void Model_calculate_lod (LIScrArgs* args)
 	if (liscr_args_geti_float (args, 1, &factor))
 		factor = LIMAT_CLAMP (factor, 0.0f, 1.0f);
 
-	builder = limdl_builder_new (model->model);
+	builder = limdl_builder_new (model);
 	if (builder == NULL)
 		return;
 	limdl_builder_calculate_lod (builder, levels, factor);
@@ -216,7 +216,7 @@ static void Model_edit_material (LIScrArgs* args)
 	const char* shader = NULL;
 	const char* texture = NULL;
 	const char* material_ = NULL;
-	LIEngModel* model;
+	LIMdlModel* model;
 	LIMdlMaterial* material;
 
 	/* Get the engine model. */
@@ -226,9 +226,9 @@ static void Model_edit_material (LIScrArgs* args)
 	liscr_args_gets_string (args, "match_material", &material_);
 
 	/* Edit each matching material. */
-	for (i = 0 ; i < model->model->materials.count ; i++)
+	for (i = 0 ; i < model->materials.count ; i++)
 	{
-		material = model->model->materials.array + i;
+		material = model->materials.array + i;
 		if (!limdl_material_compare_shader_and_texture (material, material_, shader, texture))
 			continue;
 		if (liscr_args_gets_floatv (args, "diffuse", 4, color))
@@ -278,15 +278,15 @@ static void Model_edit_material (LIScrArgs* args)
 static void Model_merge (LIScrArgs* args)
 {
 	LIScrData* data;
-	LIEngModel* model1;
-	LIEngModel* model2;
+	LIMdlModel* model1;
+	LIMdlModel* model2;
 
 	if (liscr_args_geti_data (args, 0, LISCR_SCRIPT_MODEL, &data) ||
 	    liscr_args_gets_data (args, "model", LISCR_SCRIPT_MODEL, &data))
 	{
 		model1 = args->self;
 		model2 = liscr_data_get_data (data);
-		if (!limdl_model_merge (model1->model, model2->model))
+		if (!limdl_model_merge (model1, model2))
 			lisys_error_report ();
 	}
 }
@@ -296,8 +296,8 @@ static void Model_merge_morph (LIScrArgs* args)
 	int i;
 	float value;
 	const char* shape;
-	LIEngModel* model1;
-	LIEngModel* model2;
+	LIMdlModel* model1;
+	LIMdlModel* model2;
 	LIMdlModel* copy;
 	LIScrData* data;
 
@@ -308,7 +308,7 @@ static void Model_merge_morph (LIScrArgs* args)
 	model2 = liscr_data_get_data (data);
 
 	/* Copy without shape keys. */
-	copy = limdl_model_new_copy (model2->model, 0);
+	copy = limdl_model_new_copy (model2, 0);
 	if (copy == NULL)
 		return;
 
@@ -319,12 +319,12 @@ static void Model_merge_morph (LIScrArgs* args)
 		if (!liscr_args_geti_string (args, i, &shape) ||
 		    !liscr_args_geti_float (args, i + 1, &value))
 			break;
-		limdl_model_morph (copy, model2->model, model2->model, shape, value);
+		limdl_model_morph (copy, model2, model2, shape, value);
 		i += 2;
 	}
 
 	/* Merge the morphed model to this one. */
-	if (!limdl_model_merge (model1->model, copy))
+	if (!limdl_model_merge (model1, copy))
 		lisys_error_report ();
 
 	/* Free the copied model. */
@@ -335,8 +335,8 @@ static void Model_morph (LIScrArgs* args)
 {
 	float value = 0.5f;
 	const char* shape;
-	LIEngModel* model;
-	LIEngModel* ref = NULL;
+	LIMdlModel* model;
+	LIMdlModel* ref = NULL;
 	LIScrData* data;
 
 	model = args->self;
@@ -350,8 +350,7 @@ static void Model_morph (LIScrArgs* args)
 	if (data != NULL)
 		ref = liscr_data_get_data (data);
 
-	liscr_args_seti_bool (args, limdl_model_morph (model->model,
-		model->model, (ref != NULL)? ref->model : NULL, shape, value));
+	liscr_args_seti_bool (args, limdl_model_morph (model, model, ref, shape, value));
 }
 
 static void Model_morph_copy (LIScrArgs* args)
@@ -359,22 +358,32 @@ static void Model_morph_copy (LIScrArgs* args)
 	int i;
 	float value;
 	const char* shape;
-	LIEngModel* model;
-	LIEngModel* copy;
+	LIMaiProgram* program;
+	LIMdlModel* model;
+	LIMdlModel* copy;
+	LIScrData* data;
 
 	/* Get the original model. */
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
 	model = args->self;
 
 	/* Copy without shape keys. */
-	copy = lieng_model_new_copy (model, 0);
+	copy = limdl_model_new_copy (model, 0);
 	if (copy == NULL)
 		return;
 
-	/* Allocate the userdata. */
-	copy->script = liscr_data_new (args->script, args->lua, copy, LISCR_SCRIPT_MODEL, lieng_model_free);
-	if (copy->script == NULL)
+	/* Allocate the unique ID. */
+	if (!limdl_manager_add_model (program->models, copy))
 	{
-		lieng_model_free (copy);
+		limdl_model_free (copy);
+		return;
+	}
+
+	/* Allocate the userdata. */
+	data = liscr_data_new (args->script, args->lua, copy, LISCR_SCRIPT_MODEL, limdl_manager_free_model);
+	if (data == NULL)
+	{
+		limdl_model_free (copy);
 		return;
 	}
 	liscr_args_seti_stack (args);
@@ -386,17 +395,17 @@ static void Model_morph_copy (LIScrArgs* args)
 		if (!liscr_args_geti_string (args, i, &shape) ||
 		    !liscr_args_geti_float (args, i + 1, &value))
 			break;
-		limdl_model_morph (copy->model, model->model, model->model, shape, value);
+		limdl_model_morph (copy, model, model, shape, value);
 		i += 2;
 	}
 }
 
 static void Model_remove_vertices (LIScrArgs* args)
 {
-	LIEngModel* model;
+	LIMdlModel* model;
 
 	model = args->self;
-	limdl_model_clear_vertices (model->model);
+	limdl_model_clear_vertices (model);
 }
 
 /*****************************************************************************/

@@ -47,8 +47,8 @@ static void Merger_new (LIScrArgs* args)
 
 static void Merger_add_model (LIScrArgs* args)
 {
-	LIEngModel* model;
 	LIMdlAsyncMerger* self;
+	LIMdlModel* model;
 	LIScrData* data;
 
 	/* Get arguments. */
@@ -58,7 +58,7 @@ static void Merger_add_model (LIScrArgs* args)
 	model = liscr_data_get_data (data);
 
 	/* Add the task. */
-	limdl_async_merger_add_model (self, model->model);
+	limdl_async_merger_add_model (self, model);
 }
 
 static void Merger_add_model_morph (LIScrArgs* args)
@@ -66,9 +66,9 @@ static void Merger_add_model_morph (LIScrArgs* args)
 	int i = 0;
 	float value;
 	const char* shape;
-	LIEngModel* model;
 	LIMdlAsyncMerger* self;
 	LIMdlAsyncMergerMorph morphs[128];
+	LIMdlModel* model;
 	LIScrData* data;
 
 	/* Get arguments. */
@@ -87,7 +87,7 @@ static void Merger_add_model_morph (LIScrArgs* args)
 	}
 
 	/* Add the task. */
-	limdl_async_merger_add_model_morph (self, model->model, morphs, i);
+	limdl_async_merger_add_model_morph (self, model, morphs, i);
 }
 
 static void Merger_finish (LIScrArgs* args)
@@ -103,10 +103,10 @@ static void Merger_finish (LIScrArgs* args)
 
 static void Merger_pop_model (LIScrArgs* args)
 {
-	LIEngModel* emodel;
 	LIMaiProgram* program;
 	LIMdlAsyncMerger* self;
 	LIMdlModel* model;
+	LIScrData* data;
 
 	/* Get arguments. */
 	self = args->self;
@@ -117,18 +117,18 @@ static void Merger_pop_model (LIScrArgs* args)
 	if (model == NULL)
 		return;
 
-	/* Create the script model. */
-	emodel = lieng_model_new (program->engine);
-	if (emodel == NULL)
+	/* Allocate the unique ID. */
+	if (!limdl_manager_add_model (program->models, model))
 	{
 		limdl_model_free (model);
 		return;
 	}
-	emodel->model = model;
-	emodel->script = liscr_data_new (args->script, args->lua, emodel, LISCR_SCRIPT_MODEL, lieng_model_free);
-	if (emodel->script == NULL)
+
+	/* Create the script model. */
+	data = liscr_data_new (args->script, args->lua, model, LISCR_SCRIPT_MODEL, limdl_manager_free_model);
+	if (data == NULL)
 	{
-		lieng_model_free (emodel);
+		limdl_model_free (model);
 		return;
 	}
 	liscr_args_seti_stack (args);

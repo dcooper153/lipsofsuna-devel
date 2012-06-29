@@ -12,6 +12,7 @@ Model.find_or_load = function(clss, args)
 	local spec = Modelspec:find{name = args.file}
 	self = Model{name = args.file}
 	self:load(args)
+	self:changed()
 	-- Edit materials.
 	if args.mesh ~= false and spec then
 		-- Replace shaders.

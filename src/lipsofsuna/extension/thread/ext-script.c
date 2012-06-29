@@ -47,9 +47,10 @@ static void Thread_new (LIScrArgs* args)
 
 static void Thread_pop_message (LIScrArgs* args)
 {
-	LIMaiMessage* message;
 	LIExtThread* self;
-	LIEngModel* model;
+	LIMaiMessage* message;
+	LIMdlModel* model;
+	LIScrData* data;
 
 	/* Pop the name. */
 	self = args->self;
@@ -67,15 +68,14 @@ static void Thread_pop_message (LIScrArgs* args)
 			break;
 		case LIMAI_MESSAGE_TYPE_MODEL:
 			liscr_args_sets_string (args, "type", "model");
-			model = lieng_model_new_model (self->program->parent->engine, message->model);
-			if (model != NULL)
+			model = message->model;
+			if (!limdl_manager_add_model (self->program->models, model))
+				break;
+			data = liscr_data_new (args->script, args->lua, model, LISCR_SCRIPT_MODEL, limdl_manager_free_model);
+			if (data != NULL)
 			{
+				liscr_args_sets_stack (args, "model");
 				message->model = NULL;
-				model->script = liscr_data_new (args->script, args->lua, model, LISCR_SCRIPT_MODEL, lieng_model_free);
-				if (model->script != NULL)
-					liscr_args_sets_stack (args, "model");
-				else
-					lieng_model_free (model);
 			}
 			break;
 		case LIMAI_MESSAGE_TYPE_STRING:
@@ -93,7 +93,7 @@ static void Thread_push_message (LIScrArgs* args)
 	const char* name = "";
 	const char* string = NULL;
 	LIScrData* data;
-	LIEngModel* emodel;
+	LIMdlModel* model;
 	LIExtThread* self;
 
 	/* Read the name. */
@@ -111,8 +111,8 @@ static void Thread_push_message (LIScrArgs* args)
 	else if (liscr_args_geti_data (args, 1, LISCR_SCRIPT_MODEL, &data) ||
 	         liscr_args_gets_data (args, "model", LISCR_SCRIPT_MODEL, &data))
 	{
-		emodel = liscr_data_get_data (data);
-		if (limai_program_push_message (self->program, LIMAI_MESSAGE_QUEUE_THREAD, LIMAI_MESSAGE_TYPE_MODEL, name, emodel->model))
+		model = liscr_data_get_data (data);
+		if (limai_program_push_message (self->program, LIMAI_MESSAGE_QUEUE_THREAD, LIMAI_MESSAGE_TYPE_MODEL, name, model))
 			liscr_args_seti_bool (args, 1);
 	}
 	else

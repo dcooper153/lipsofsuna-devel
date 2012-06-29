@@ -28,7 +28,7 @@
 
 static void private_model_free (
 	LIObjManager* self,
-	LIEngModel*   model);
+	LIMdlModel*   model);
 
 static void private_object_motion (
 	LIObjManager* self,
@@ -111,6 +111,9 @@ void liobj_manager_free (
 		lialg_u32dic_free (self->objects);
 	}
 
+	/* Free sector data. */
+	lialg_sectors_remove_content (self->program->sectors, LIALG_SECTORS_CONTENT_ENGINE);
+
 	/* Unregister the component. */
 	limai_program_remove_component (self->program, "object");
 
@@ -134,7 +137,7 @@ LIObjObject* liobj_manager_find_object (
 
 static void private_model_free (
 	LIObjManager* self,
-	LIEngModel*   model)
+	LIMdlModel*   model)
 {
 	LIAlgU32dicIter iter;
 	LIObjObject* object;

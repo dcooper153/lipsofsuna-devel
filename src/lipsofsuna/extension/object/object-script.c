@@ -120,14 +120,6 @@ static void Object_set_id (LIScrArgs* args)
 		liobj_object_set_external_id (self, value);
 }
 
-static void Object_get_model (LIScrArgs* args)
-{
-	LIObjObject* self = args->self;
-
-	if (self->model != NULL)
-		liscr_args_seti_data (args, self->model->script);
-}
-
 static void Object_set_model (LIScrArgs* args)
 {
 	LIScrData* value;
@@ -240,7 +232,6 @@ void liext_script_object (
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_refresh", Object_refresh);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_id", Object_get_id);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_id", Object_set_id);
-	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_model", Object_get_model);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_model", Object_set_model);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_get_position", Object_get_position);
 	liscr_script_insert_mfunc (self, LISCR_SCRIPT_OBJECT, "object_set_position", Object_set_position);

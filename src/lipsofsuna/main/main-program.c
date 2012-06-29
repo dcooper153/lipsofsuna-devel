@@ -33,13 +33,21 @@ static int private_init (
 	const char*   name,
 	const char*   args);
 
-static int private_sector_free (
-	LIMaiProgram* self,
-	int           sector);
+static void private_model_added (
+	void*       data,
+	LIMdlModel* model);
 
-static int private_sector_load (
-	LIMaiProgram* self,
-	int           sector);
+static void private_model_removed (
+	void*       data,
+	LIMdlModel* model);
+
+static void private_sector_free (
+	void*        data,
+	LIAlgSector* sector);
+
+static void private_sector_load (
+	void*        data,
+	LIAlgSector* sector);
 
 static int private_tick (
 	LIMaiProgram* self,
@@ -131,9 +139,9 @@ void limai_program_free (
 		lialg_strdic_free (self->components);
 	}
 
-	/* Free engine. */
-	if (self->engine != NULL)
-		lieng_engine_free (self->engine);
+	/* Free the model manager. */
+	if (self->models != NULL)
+		limdl_manager_free (self->models);
 
 	/* Invoke callbacks. */
 	if (self->callbacks != NULL)
@@ -667,7 +675,7 @@ int limai_program_update (
 	/* Update subsystems. */
 	lialg_sectors_update (self->sectors, secs);
 	liscr_script_update (self->script, secs);
-	lieng_engine_update (self->engine, secs);
+	lical_callbacks_update (self->callbacks);
 	lical_callbacks_call (self->callbacks, "tick", lical_marshal_DATA_FLT, secs);
 
 	/* Sleep until end of frame. */
@@ -728,11 +736,19 @@ static int private_init (
 	self->sectors = lialg_sectors_new (128, 16.0f);
 	if (self->sectors == NULL)
 		return 0;
+	self->sectors->sector_free_callback.callback = private_sector_free;
+	self->sectors->sector_free_callback.userdata = self;
+	self->sectors->sector_load_callback.callback = private_sector_load;
+	self->sectors->sector_load_callback.userdata = self;
 
-	/* Create engine. */
-	self->engine = lieng_engine_new (self->callbacks, self->sectors, self->paths);
-	if (self->engine == NULL)
+	/* Allocate the model manager. */
+	self->models = limdl_manager_new ();
+	if (self->models == NULL)
 		return 0;
+	self->models->model_added_callback.callback = private_model_added;
+	self->models->model_added_callback.userdata = self;
+	self->models->model_removed_callback.callback = private_model_removed;
+	self->models->model_removed_callback.userdata = self;
 
 	/* Allocate the script. */
 	self->script = liscr_script_new ();
@@ -755,9 +771,7 @@ static int private_init (
 	liscr_script_program (self->script);
 
 	/* Register callbacks. */
-	if (!lical_callbacks_insert (self->callbacks, "sector-free", 65535, private_sector_free, self, self->calls + 1) ||
-	    !lical_callbacks_insert (self->callbacks, "sector-load", 65535, private_sector_load, self, self->calls + 2) ||
-	    !lical_callbacks_insert (self->callbacks, "tick", 2, private_tick, self, self->calls + 3))
+	if (!lical_callbacks_insert (self->callbacks, "tick", 2, private_tick, self, self->calls))
 		return 0;
 
 	lialg_random_init (&self->random, lisys_time (NULL));
@@ -765,22 +779,50 @@ static int private_init (
 	return 1;
 }
 
-static int private_sector_free (
-	LIMaiProgram* self,
-	int           sector)
+static void private_model_added (
+	void*       data,
+	LIMdlModel* model)
 {
-	limai_program_event (self, "sector-free", "sector", LIMAI_FIELD_INT, sector, NULL);
+	LIMaiProgram* self = data;
 
-	return 1;
+	/* Invoke callbacks. */
+	lical_callbacks_call (self->callbacks, "model-new", lical_marshal_DATA_PTR, model);
 }
 
-static int private_sector_load (
-	LIMaiProgram* self,
-	int           sector)
+static void private_model_removed (
+	void*       data,
+	LIMdlModel* model)
 {
-	limai_program_event (self, "sector-load", "sector", LIMAI_FIELD_INT, sector, NULL);
+	LIMaiProgram* self = data;
 
-	return 1;
+	/* Invoke callbacks. */
+	lical_callbacks_call (self->callbacks, "model-free", lical_marshal_DATA_PTR, model);
+}
+
+static void private_sector_free (
+	void*        data,
+	LIAlgSector* sector)
+{
+	LIMaiProgram* self = data;
+
+	/* Invoke callbacks. */
+	lical_callbacks_call (self->callbacks, "sector-free", lical_marshal_DATA_INT, sector->index);
+
+	/* Inform scripts. */
+	limai_program_event (self, "sector-free", "sector", LIMAI_FIELD_INT, sector->index, NULL);
+}
+
+static void private_sector_load (
+	void*        data,
+	LIAlgSector* sector)
+{
+	LIMaiProgram* self = data;
+
+	/* Invoke callbacks. */
+	lical_callbacks_call (self->callbacks, "sector-load", lical_marshal_DATA_INT, sector->index);
+
+	/* Inform scripts. */
+	limai_program_event (self, "sector-load", "sector", LIMAI_FIELD_INT, sector->index, NULL);
 }
 
 static int private_tick (

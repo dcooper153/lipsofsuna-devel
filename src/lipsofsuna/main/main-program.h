@@ -20,7 +20,6 @@
 
 #include "lipsofsuna/algorithm.h"
 #include "lipsofsuna/callback.h"
-#include "lipsofsuna/engine.h"
 #include "lipsofsuna/paths.h"
 #include "lipsofsuna/script.h"
 #include "main-event.h"
@@ -48,12 +47,12 @@ struct _LIMaiProgram
 	LIAlgSectors* sectors;
 	LIAlgStrdic* components;
 	LICalCallbacks* callbacks;
-	LICalHandle calls[4];
-	LIEngEngine* engine;
+	LICalHandle calls[1];
 	LIMaiExtension* extensions;
 	LIMaiEvent* events;
 	LIMaiMessage* messages[LIMAI_MESSAGE_QUEUE_MAX];
 	LIMaiProgram* parent;
+	LIMdlManager* models;
 	LIPthPaths* paths;
 	LIScrScript* script;
 	LISysMutex* message_mutex;

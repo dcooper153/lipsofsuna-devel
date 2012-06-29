@@ -53,7 +53,7 @@ LIObjObject* liobj_object_new (
 	self->id = 0;
 	while (!self->id)
 	{
-		self->id = lialg_random_range (&manager->program->engine->random, LINET_RANGE_ENGINE_START, LINET_RANGE_ENGINE_END);
+		self->id = lialg_random_range (&manager->program->random, LINET_RANGE_ENGINE_START, LINET_RANGE_ENGINE_END);
 		if (liobj_manager_find_object (manager, self->id))
 			self->id = 0;
 	}
@@ -147,8 +147,8 @@ void liobj_object_get_bounds (
 	const LIObjObject* self,
 	LIMatAabb*         bounds)
 {
-	if (self->model != NULL && self->model->model != NULL)
-		*bounds = self->model->model->bounds;
+	if (self->model != NULL)
+		*bounds = self->model->bounds;
 	else
 		limat_aabb_init (bounds);
 }
@@ -209,7 +209,7 @@ void liobj_object_set_external_id (
  */
 int liobj_object_set_model (
 	LIObjObject* self,
-	LIEngModel*  model)
+	LIMdlModel*  model)
 {
 	/* Switch the model. */
 	self->model = model;

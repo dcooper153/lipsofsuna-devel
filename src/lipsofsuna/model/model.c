@@ -34,6 +34,9 @@ static void private_build (
 static void private_build_tangents (
 	LIMdlModel* self);
 
+static void private_clear (
+	LIMdlModel* self);
+
 static int private_read (
 	LIMdlModel*  self,
 	LIArcReader* reader,
@@ -336,81 +339,9 @@ error:
 void limdl_model_free (
 	LIMdlModel* self)
 {
-	int i;
-	LIMdlMaterial* material;
+	lisys_assert (self->manager == NULL);
 
-	/* Free materials. */
-	if (self->materials.array != NULL)
-	{
-		for (i = 0 ; i < self->materials.count ; i++)
-		{
-			material = self->materials.array + i;
-			limdl_material_free (material);
-		}
-		lisys_free (self->materials.array);
-	}
-
-	/* Free levels of detail. */
-	if (self->lod.array != NULL)
-	{
-		for (i = 0 ; i < self->lod.count ; i++)
-			limdl_lod_free (self->lod.array + i);
-		lisys_free (self->lod.array);
-	}
-
-	/* Free weight groups. */
-	if (self->weight_groups.array != NULL)
-	{
-		for (i = 0 ; i < self->weight_groups.count ; i++)
-		{
-			lisys_free (self->weight_groups.array[i].name);
-			lisys_free (self->weight_groups.array[i].bone);
-		}
-		lisys_free (self->weight_groups.array);
-	}
-	lisys_free (self->vertices.array);
-
-	/* Free nodes. */
-	if (self->nodes.array != NULL)
-	{
-		for (i = 0 ; i < self->nodes.count ; i++)
-		{
-			if (self->nodes.array[i] != NULL)
-				limdl_node_free (self->nodes.array[i]);
-		}
-		lisys_free (self->nodes.array);
-	}
-
-	/* Free particles. */
-	if (self->particle_systems.array != NULL)
-	{
-		for (i = 0 ; i < self->particle_systems.count ; i++)
-			limdl_particle_system_clear (self->particle_systems.array + i);
-		lisys_free (self->particle_systems.array);
-	}
-	if (self->hairs.array != NULL)
-	{
-		for (i = 0 ; i < self->hairs.count ; i++)
-			limdl_hairs_free (self->hairs.array + i);
-		lisys_free (self->hairs.array);
-	}
-
-	/* Free shapes. */
-	if (self->shapes.array != NULL)
-	{
-		for (i = 0 ; i < self->shapes.count ; i++)
-			limdl_shape_clear (self->shapes.array + i);
-		lisys_free (self->shapes.array);
-	}
-
-	/* Free shape keys. */
-	if (self->shape_keys.array != NULL)
-	{
-		for (i = 0 ; i < self->shape_keys.count ; i++)
-			limdl_shape_key_clear (self->shape_keys.array + i);
-		lisys_free (self->shape_keys.array);
-	}
-
+	private_clear (self);
 	lisys_free (self);
 }
 
@@ -452,6 +383,7 @@ void limdl_model_calculate_bounds (
 		self->bounds.max = limat_vector_init (0.0f, 0.0f, 0.0f);
 	}
 }
+
 /**
  * \brief Calculates the vertex tangents.
  * \param self Model.
@@ -462,6 +394,28 @@ void limdl_model_calculate_tangents (
 	private_build_tangents (self);
 }
 
+/**
+ * \brief Clears all data of the model.
+ * \param self Model.
+ */
+void limdl_model_clear (
+	LIMdlModel* self)
+{
+	int id;
+	LIMdlManager* manager;
+
+	private_clear (self);
+	id = self->id;
+	manager = self->manager;
+	memset (self, 0, sizeof (LIMdlModel));
+	self->id = id;
+	self->manager = manager;
+}
+
+/**
+ * \brief Clears the vertex and face data of the model.
+ * \param self Model.
+ */
 void limdl_model_clear_vertices (
 	LIMdlModel* self)
 {
@@ -816,6 +770,42 @@ int limdl_model_morph (
 }
 
 /**
+ * \brief Replaces the contents of the model with another.
+ *
+ * The ID and the model manager pointer are not replaced, but all the
+ * model data is. This will invalidate any pointers to the model data.
+ *
+ * \param self Model.
+ * \param model Model.
+ * \return Nonzero on success.
+ */
+int limdl_model_replace (
+	LIMdlModel*       self,
+	const LIMdlModel* model)
+{
+	int id;
+	LIMdlManager* manager;
+	LIMdlModel* copy;
+
+	/* Create a copy of the passed model. */
+	copy = limdl_model_new_copy (model, 1);
+	if (copy == NULL)
+		return 0;
+
+	/* Hijack the data of the copy and free the old data. */
+	id = self->id;
+	manager = self->manager;
+	*self = *copy;
+	self->id = id;
+	self->manager = manager;
+
+	/* Free only the copy pointer but not its data. */
+	lisys_free (copy);
+
+	return 1;
+}
+
+/**
  * \brief Replaces contents of all materials whose material string matches the search.
  * \param self Model.
  * \param match_material Material string to match.
@@ -998,6 +988,85 @@ static void private_build_tangents (
 	}
 	for (i = 0 ; i < self->vertices.count ; i++)
 		self->vertices.array[i].tangent = limat_vector_normalize (self->vertices.array[i].tangent);
+}
+
+static void private_clear (
+	LIMdlModel* self)
+{
+	int i;
+	LIMdlMaterial* material;
+
+	/* Free materials. */
+	if (self->materials.array != NULL)
+	{
+		for (i = 0 ; i < self->materials.count ; i++)
+		{
+			material = self->materials.array + i;
+			limdl_material_free (material);
+		}
+		lisys_free (self->materials.array);
+	}
+
+	/* Free levels of detail. */
+	if (self->lod.array != NULL)
+	{
+		for (i = 0 ; i < self->lod.count ; i++)
+			limdl_lod_free (self->lod.array + i);
+		lisys_free (self->lod.array);
+	}
+
+	/* Free weight groups. */
+	if (self->weight_groups.array != NULL)
+	{
+		for (i = 0 ; i < self->weight_groups.count ; i++)
+		{
+			lisys_free (self->weight_groups.array[i].name);
+			lisys_free (self->weight_groups.array[i].bone);
+		}
+		lisys_free (self->weight_groups.array);
+	}
+	lisys_free (self->vertices.array);
+
+	/* Free nodes. */
+	if (self->nodes.array != NULL)
+	{
+		for (i = 0 ; i < self->nodes.count ; i++)
+		{
+			if (self->nodes.array[i] != NULL)
+				limdl_node_free (self->nodes.array[i]);
+		}
+		lisys_free (self->nodes.array);
+	}
+
+	/* Free particles. */
+	if (self->particle_systems.array != NULL)
+	{
+		for (i = 0 ; i < self->particle_systems.count ; i++)
+			limdl_particle_system_clear (self->particle_systems.array + i);
+		lisys_free (self->particle_systems.array);
+	}
+	if (self->hairs.array != NULL)
+	{
+		for (i = 0 ; i < self->hairs.count ; i++)
+			limdl_hairs_free (self->hairs.array + i);
+		lisys_free (self->hairs.array);
+	}
+
+	/* Free shapes. */
+	if (self->shapes.array != NULL)
+	{
+		for (i = 0 ; i < self->shapes.count ; i++)
+			limdl_shape_clear (self->shapes.array + i);
+		lisys_free (self->shapes.array);
+	}
+
+	/* Free shape keys. */
+	if (self->shape_keys.array != NULL)
+	{
+		for (i = 0 ; i < self->shape_keys.count ; i++)
+			limdl_shape_key_clear (self->shape_keys.array + i);
+		lisys_free (self->shape_keys.array);
+	}
 }
 
 static int private_read (

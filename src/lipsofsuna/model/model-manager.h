@@ -15,40 +15,44 @@
  * along with Lips of Suna. If not, see <http://www.gnu.org/licenses/>.
  */
 
-#ifndef __ENGINE_H__
-#define __ENGINE_H__
+#ifndef __MODEL_MANAGER_H__
+#define __MODEL_MANAGER_H__
 
 #include "lipsofsuna/algorithm.h"
-#include "lipsofsuna/archive.h"
-#include "lipsofsuna/callback.h"
-#include "lipsofsuna/math.h"
-#include "lipsofsuna/model.h"
-#include "lipsofsuna/paths.h"
 #include "lipsofsuna/system.h"
-#include "engine-model.h"
-#include "engine-types.h"
+#include "model.h"
 
-/*****************************************************************************/
+typedef struct _LIMdlManagerCallback LIMdlManagerCallback;
+typedef struct _LIMdlManager LIMdlManager;
 
-struct _LIEngEngine
+struct _LIMdlManagerCallback
 {
-	LIAlgRandom random;
-	LIAlgSectors* sectors;
-	LIAlgU32dic* models;
-	LICalCallbacks* callbacks;
-	LIPthPaths* paths;
+	void (*callback)(void*, LIMdlModel*);
+	void* userdata;
 };
 
-LIAPICALL (LIEngEngine*, lieng_engine_new, (
-	LICalCallbacks* calls,
-	LIAlgSectors*   sectors,
-	LIPthPaths*     paths));
+struct _LIMdlManager
+{
+	LIAlgRandom random;
+	LIAlgU32dic* models;
+	LIMdlManagerCallback model_added_callback;
+	LIMdlManagerCallback model_removed_callback;
+};
 
-LIAPICALL (void, lieng_engine_free, (
-	LIEngEngine* self));
+LIAPICALL (LIMdlManager*, limdl_manager_new, ());
 
-LIAPICALL (void, lieng_engine_update, (
-	LIEngEngine* self,
-	float        secs));
+LIAPICALL (void, limdl_manager_free, (
+	LIMdlManager* self));
+
+LIAPICALL (int, limdl_manager_add_model, (
+	LIMdlManager* self,
+	LIMdlModel*   model));
+
+LIAPICALL (void, limdl_manager_remove_model, (
+	LIMdlManager* self,
+	LIMdlModel*   model));
+
+LIAPICALL (void, limdl_manager_free_model, (
+	LIMdlModel* model));
 
 #endif

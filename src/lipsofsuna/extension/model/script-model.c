@@ -22,27 +22,34 @@
  * @{
  */
 
-#include "lipsofsuna/engine.h"
 #include "lipsofsuna/main.h"
 #include "lipsofsuna/script.h"
 
 static void Model_new (LIScrArgs* args)
 {
-	LIEngModel* self;
 	LIMaiProgram* program;
+	LIMdlModel* self;
+	LIScrData* data;
 
 	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
 
-	/* Allocate model. */
-	self = lieng_model_new (program->engine);
+	/* Allocate the model. */
+	self = limdl_model_new ();
 	if (self == NULL)
 		return;
 
-	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, args->lua, self, LISCR_SCRIPT_MODEL, lieng_model_free);
-	if (self->script == NULL)
+	/* Allocate the unique ID. */
+	if (!limdl_manager_add_model (program->models, self))
 	{
-		lieng_model_free (self);
+		limdl_model_free (self);
+		return;
+	}
+
+	/* Allocate userdata. */
+	data = liscr_data_new (args->script, args->lua, self, LISCR_SCRIPT_MODEL, limdl_manager_free_model);
+	if (data == NULL)
+	{
+		limdl_model_free (self);
 		return;
 	}
 	liscr_args_seti_stack (args);
@@ -51,21 +58,31 @@ static void Model_new (LIScrArgs* args)
 static void Model_copy (LIScrArgs* args)
 {
 	int shape_keys = 1;
-	LIEngModel* self;
+	LIMaiProgram* program;
+	LIMdlModel* self;
+	LIScrData* data;
 
 	/* Get arguments. */
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
 	liscr_args_geti_bool (args, 0, &shape_keys);
 
-	/* Allocate model. */
-	self = lieng_model_new_copy (args->self, shape_keys);
+	/* Allocate the model. */
+	self = limdl_model_new_copy (args->self, shape_keys);
 	if (self == NULL)
 		return;
 
-	/* Allocate userdata. */
-	self->script = liscr_data_new (args->script, args->lua, self, LISCR_SCRIPT_MODEL, lieng_model_free);
-	if (self->script == NULL)
+	/* Allocate the unique ID. */
+	if (!limdl_manager_add_model (program->models, self))
 	{
-		lieng_model_free (self);
+		limdl_model_free (self);
+		return;
+	}
+
+	/* Allocate userdata. */
+	data = liscr_data_new (args->script, args->lua, self, LISCR_SCRIPT_MODEL, limdl_manager_free_model);
+	if (data == NULL)
+	{
+		limdl_model_free (self);
 		return;
 	}
 	liscr_args_seti_stack (args);
@@ -73,79 +90,87 @@ static void Model_copy (LIScrArgs* args)
 
 static void Model_calculate_bounds (LIScrArgs* args)
 {
-	lieng_model_calculate_bounds (args->self);
+	limdl_model_calculate_bounds (args->self);
 }
 
 static void Model_changed (LIScrArgs* args)
 {
-	lieng_model_changed (args->self);
+	LIMaiProgram* program;
+
+	/* Invoke callbacks. */
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	lical_callbacks_call (program->callbacks, "model-changed", lical_marshal_DATA_PTR, args->self);
 }
 
 static void Model_get_bounding_box (LIScrArgs* args)
 {
-	LIEngModel* self;
 	LIMatVector min;
 	LIMatVector max;
+	LIMdlModel* self;
 
 	self = args->self;
-	if (self->model != NULL)
-	{
-		min = self->model->bounds.min;
-		max = self->model->bounds.max;
-	}
-	else
-	{
-		min = limat_vector_init (-0.1f, -0.1f, -0.1f);
-		max = limat_vector_init (0.1f, 0.1f, 0.1f);
-	}
+	min = self->bounds.min;
+	max = self->bounds.max;
 	liscr_args_seti_vector (args, &min);
 	liscr_args_seti_vector (args, &max);
 }
 
 static void Model_get_center_offset (LIScrArgs* args)
 {
-	LIEngModel* self;
 	LIMatVector ctr;
+	LIMdlModel* self;
 
 	self = args->self;
-	if (self->model != NULL)
-	{
-		ctr = limat_vector_add (self->model->bounds.min, self->model->bounds.max);
-		ctr = limat_vector_multiply (ctr, 0.5f);
-	}
-	else
-		ctr = limat_vector_init (0.0f, 0.0f, 0.0f);
+	ctr = limat_vector_add (self->bounds.min, self->bounds.max);
+	ctr = limat_vector_multiply (ctr, 0.5f);
 	liscr_args_seti_vector (args, &ctr);
 }
 
 static void Model_get_memory_used (LIScrArgs* args)
 {
-	LIEngModel* self;
+	LIMdlModel* self;
 
 	self = args->self;
-	if (self->model != NULL)
-		liscr_args_seti_int (args, limdl_model_get_memory (self->model));
-	else
-		liscr_args_seti_int (args, 0);
+	liscr_args_seti_int (args, limdl_model_get_memory (self));
 }
 
 static void Model_load (LIScrArgs* args)
 {
 	int mesh = 1;
-	const char* file;
+	char* file;
+	const char* name;
+	const char* path;
+	LIMdlModel* tmpmdl;
+	LIMaiProgram* program;
 
-	if (!liscr_args_geti_string (args, 0, &file) &&
-	    !liscr_args_gets_string (args, "file", &file))
+	program = liscr_script_get_userdata (args->script, LISCR_SCRIPT_PROGRAM);
+	if (!liscr_args_geti_string (args, 0, &name) &&
+	    !liscr_args_gets_string (args, "file", &name))
 		return;
 	if (!liscr_args_geti_bool (args, 1, &mesh))
 		liscr_args_gets_bool (args, "mesh", &mesh);
 
-	if (!lieng_model_load (args->self, file, mesh))
+	/* Find the absolute path. */
+	file = lisys_string_concat (name, ".lmdl");
+	if (file == NULL)
+		return;
+	path = lipth_paths_find_file (program->paths, file);
+	if (path == NULL)
 	{
-		lisys_error_report ();
+		lisys_free (file);
 		return;
 	}
-	liscr_args_seti_bool (args, 1);
+	lisys_free (file);
+
+	/* Load the new model data. */
+	tmpmdl = limdl_model_new_from_file (path, mesh);
+	if (tmpmdl == NULL)
+		return;
+
+	/* Replace the old model data. */
+	if (limdl_model_replace (args->self, tmpmdl))
+		liscr_args_seti_bool (args, 1);
+	limdl_model_free (tmpmdl);
 }
 
 /*****************************************************************************/

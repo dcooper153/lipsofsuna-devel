@@ -26,15 +26,15 @@
 
 static int private_model_changed (
 	LIExtModule* self,
-	LIEngModel*  model);
+	LIMdlModel*  model);
 
 static int private_model_free (
 	LIExtModule* self,
-	LIEngModel*  model);
+	LIMdlModel*  model);
 
 static int private_model_new (
 	LIExtModule* self,
-	LIEngModel*  model);
+	LIMdlModel*  model);
 
 static int private_tick (
 	LIExtModule* self,
@@ -111,7 +111,7 @@ void liext_physics_free (
 
 static int private_model_changed (
 	LIExtModule* self,
-	LIEngModel*  model)
+	LIMdlModel*  model)
 {
 	LIPhyModel* model_;
 
@@ -119,14 +119,14 @@ static int private_model_changed (
 
 	model_ = liphy_physics_find_model (self->physics, model->id);
 	if (model_ != NULL)
-		liphy_model_set_model (model_, model->model);
+		liphy_model_set_model (model_, model);
 
 	return 1;
 }
 
 static int private_model_free (
 	LIExtModule* self,
-	LIEngModel*  model)
+	LIMdlModel*  model)
 {
 	LIPhyModel* model_;
 
@@ -150,7 +150,7 @@ static int private_model_free (
 
 static int private_model_new (
 	LIExtModule* self,
-	LIEngModel*  model)
+	LIMdlModel*  model)
 {
 	LIPhyModel* model_;
 
@@ -161,7 +161,7 @@ static int private_model_new (
 	{
 		model_ = liphy_model_new (self->physics, model->id);
 		if (model_ != NULL)
-			liphy_model_set_model (model_, model->model);
+			liphy_model_set_model (model_, model);
 	}
 
 	return 1;

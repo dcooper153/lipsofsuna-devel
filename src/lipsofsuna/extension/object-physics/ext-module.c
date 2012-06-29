@@ -37,7 +37,7 @@ static int private_object_free (
 static int private_object_model (
 	LIExtModule* self,
 	LIObjObject* object,
-	LIEngModel*  model);
+	LIMdlModel*  model);
 
 static int private_object_new (
 	LIExtModule* self,
@@ -174,7 +174,7 @@ static int private_object_free (
 static int private_object_model (
 	LIExtModule* self,
 	LIObjObject* object,
-	LIEngModel*  model)
+	LIMdlModel*  model)
 {
 	LIPhyModel* model_;
 	LIPhyObject* phyobj;
