@@ -1,6 +1,6 @@
 require "server/objects/object"
 
-Item = Class(Object)
+Item = Class(ServerObject)
 Item.class_name = "Item"
 Item.pickable = true
 
@@ -54,7 +54,7 @@ Item:add_setters{
 --   <li>realized: True to add the object to the simulation.</li></ul>
 -- @return New item.
 Item.new = function(clss, args)
-	local self = Object.new(clss, {id = args.id})
+	local self = ServerObject.new(clss, {id = args.id})
 	local copy = function(n, d)
 		if args[n] ~= nil or d then
 			self[n] = (args[n] ~= nil) and args[n] or d
@@ -121,7 +121,7 @@ Item.contact_cb = function(self, result)
 		self:animate("fly stop")
 	else
 		-- Projectile mode.
-		if Object.contact_cb(self, result) then
+		if ServerObject.contact_cb(self, result) then
 			self.gravity = self.spec.gravity
 		end
 	end
@@ -188,7 +188,7 @@ Item.die = function(self)
 		end
 	end
 	-- Remove from the world.
-	Object.die(self)
+	ServerObject.die(self)
 end
 
 --- Splits items from the stack.
@@ -221,7 +221,7 @@ Item.fire = function(self, args)
 	-- Split a projectile from the stack and fire it.
 	if not args.owner or not args.feat then return end
 	local proj = self:split()
-	Object.fire(proj, args)
+	ServerObject.fire(proj, args)
 	proj.gravity = self.spec.gravity_projectile
 	-- Special handling for boomerangs.
 	if proj.spec.categories["boomerang"] then
@@ -323,7 +323,7 @@ Item.write_db = function(self, db)
 	end
 	-- Write the own inventory index.
 	if self.parent then
-		local parent = Object:find{id = self.parent}
+		local parent = ServerObject:find{id = self.parent}
 		local index = parent.inventory:get_index_by_object(self)
 		local slot = parent.inventory:get_slot_by_index(index)
 		db:query([[REPLACE INTO object_inventory (id,parent,offset,slot) VALUES (?,?,?,?);]],

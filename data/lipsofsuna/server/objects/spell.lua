@@ -1,6 +1,6 @@
 require "server/objects/object"
 
-Spell = Class(Object)
+Spell = Class(ServerObject)
 Spell.class_name = "Spell"
 Spell.dict_id = setmetatable({}, {__mode = "kv"})
 
@@ -16,7 +16,7 @@ Spell.dict_id = setmetatable({}, {__mode = "kv"})
 --   <li>spec: Spell spec.</li></ul>
 -- @return Spell.
 Spell.new = function(clss, args)
-	local self = Object.new(clss)
+	local self = ServerObject.new(clss)
 	self.dict_id[self.id] = self
 	self.effect = args.effect
 	self.feat = args.feat
@@ -73,7 +73,7 @@ Spell.fire = function(self, args)
 	a.collision = true
 	a.feat = self.feat
 	a.owner = self.owner
-	local ret = Object.fire(self, a)
+	local ret = ServerObject.fire(self, a)
 	self.orig_rotation = self.rotation
 	self.orig_velocity = self.velocity
 	return ret

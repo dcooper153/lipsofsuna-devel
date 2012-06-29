@@ -1,6 +1,6 @@
 require "server/objects/object"
 
-Actor = Class(Object)
+Actor = Class(ServerObject)
 Actor.class_name = "Actor"
 Actor.dict_id = setmetatable({}, {__mode = "kv"})
 
@@ -26,7 +26,7 @@ Actor.dict_id = setmetatable({}, {__mode = "kv"})
 --   <li>spec: Actorspec of the actor.</li>
 --   <li>realized: True to add the object to the simulation.</li></ul>
 Actor.new = function(clss, args)
-	local self = Object.new(clss, {id = args.id})
+	local self = ServerObject.new(clss, {id = args.id})
 	local copy = function(n, d)
 		if args[n] ~= nil or d then
 			self[n] = (args[n] ~= nil) and args[n] or d
@@ -278,7 +278,7 @@ end
 --- Gets the spell types known by the object.
 -- @param self Object.
 -- @return Dictionary of booleans.
-Object.get_known_spell_types = function(self)
+Actor.get_known_spell_types = function(self)
 	return self.spec.feat_types
 end
 
@@ -555,7 +555,7 @@ Actor.jump = function(self)
 		self.jumped = t - 0.3
 		self.jumping = true
 		if v.y < self.speed then
-			Object.jump(self, {impulse = Vector(v.x, self.spec.swim_force * self.spec.mass, v.z)})
+			ServerObject.jump(self, {impulse = Vector(v.x, self.spec.swim_force * self.spec.mass, v.z)})
 		end
 	else
 		-- Jumping.
@@ -569,7 +569,7 @@ Actor.jump = function(self)
 			if not self.realized then return end
 			local v = self.velocity
 			local f = self.spec.mass * self.spec.jump_force * self.attributes.jump
-			Object.jump(self, {impulse = Vector(v.x, f, v.z)})
+			ServerObject.jump(self, {impulse = Vector(v.x, f, v.z)})
 		end)
 	end
 end
@@ -591,7 +591,7 @@ end
 -- @param self Object.
 -- @param user Object doing the looting.
 Actor.loot = function(self, user)
-	return Object.loot(self, user)
+	return ServerObject.loot(self, user)
 end
 
 --- Picks up an object.
@@ -666,7 +666,7 @@ end
 --   <li>region: Region name.</li></ul>
 -- @return True on success.
 Actor.teleport = function(self, args)
-	if Object.teleport(self, args) then
+	if ServerObject.teleport(self, args) then
 		-- Update skills.
 		-- As long as actors always teleport between the overworld and the
 		-- underworld, this ensures that view distance is update correctly.

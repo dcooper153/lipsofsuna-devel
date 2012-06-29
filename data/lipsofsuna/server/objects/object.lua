@@ -1,44 +1,12 @@
-local oldanimate = Object.animate
+require "system/object"
+
+ServerObject = Class(Object)
+ServerObject.class_name = "ServerObject"
+
 local objspec = Spec{name = "object", type = "object"}
 
-Object:add_getters{
-	admin = function(s)
-		local a = rawget(s, "account")
-		return a and Config.inst.admins[a.login]
-	end,
-	count = function(s)
-		return rawget(s, "__count") or 1
-	end,
-	spec = function(s)
-		return rawget(s, "__spec") or objspec
-	end}
-
-Object:add_setters{
-	admin = function(s, v)
-		Config.inst.admins[s] = v and true or nil
-		Config.inst:save()
-	end,
-	count = function(s, v)
-		-- Store the new count.
-		if s.count == v then return end
-		rawset(s, "__count", v ~= 0 and v or nil)
-		-- Update the inventory containing the object.
-		if s.parent then
-			local parent = Object:find{id = s.parent}
-			if parent then
-				parent.inventory:update_object(s)
-			else
-				s.parent = nil
-			end
-		end
-	end,
-	spec = function(s, v)
-		rawset(s, "__spec", v)
-	end}
-
-local oldnew = Object.new
-Object.new = function(clss, args)
-	local self = oldnew(clss, {id = args and args.id})
+ServerObject.new = function(clss, args)
+	local self = Object.new(clss, {id = args and args.id})
 	self.inventory = Inventory{id = self.id}
 	if args then
 		for k,v in pairs(args) do
@@ -52,7 +20,7 @@ end
 -- @param self Object.
 -- @param result Contact result.
 -- @return True if the hit was processed.
-Object.contact_cb = function(self, result)
+ServerObject.contact_cb = function(self, result)
 	if not self.contact_args then
 		self.contact_args = nil
 		self.contact_events = false
@@ -78,7 +46,7 @@ end
 --- Default add enemy call.
 -- @param self Object.
 -- @param object Object to add to the list of enemies.
-Object.add_enemy = function(self, object)
+ServerObject.add_enemy = function(self, object)
 end
 
 --- Plays an animation.
@@ -86,7 +54,7 @@ end
 -- @param name Animation name.
 -- @param force_temporary Forces the animation to be temporary in the server side.
 -- @return True if started a new animation.
-Object.animate = function(self, name, force_temporary)
+ServerObject.animate = function(self, name, force_temporary)
 	-- Prevent animation when dead.
 	-- This is a simple way to ensure that dead actors look like dead.
 	if self.dead then return end
@@ -117,10 +85,10 @@ end
 -- @param self Object.
 -- @param object Object.
 -- @return True if reachable.
-Object.can_reach_object = function(self, object)
+ServerObject.can_reach_object = function(self, object)
 	-- Check for reachability of inventory items.
 	if object.parent then
-		local parent = Object:find{id = object.parent}
+		local parent = ServerObject:find{id = object.parent}
 		if not parent then return end
 		if not parent.inventory:is_subscribed(self) then return end
 		return self:can_reach_object(parent)
@@ -141,7 +109,7 @@ end
 --- Clones the object.
 -- @param self Object.
 -- @return New object.
-Object.clone = function(self)
+ServerObject.clone = function(self)
 end
 
 --- Causes the object to take damage.
@@ -150,17 +118,17 @@ end
 --   <li>amount: Amount of damage.</li>
 --   <li>point: Damage point.</li>
 --   <li>type: Damage type.</li></ul>
-Object.damaged = function(self, args)
+ServerObject.damaged = function(self, args)
 end
 
 --- Detaches the object from the world or any container.
 -- @param self Object.
-Object.detach = function(self)
+ServerObject.detach = function(self)
 	-- Detach from world.
 	self.realized = false
 	-- Detach from inventory.
 	if self.parent then
-		local parent = Object:find{id = self.parent}
+		local parent = ServerObject:find{id = self.parent}
 		if parent then
 			parent.inventory:remove_object(self)
 		end
@@ -170,12 +138,12 @@ end
 
 --- Hides the object and purges it from the database.
 -- @param self Object to kill.
-Object.die = function(self)
+ServerObject.die = function(self)
 	self:detach()
 	self:purge()
 end
 
-Object.effect = function(self, args)
+ServerObject.effect = function(self, args)
 	if args.effect then
 		Vision:event{type = "object-effect", object = self, effect = args.effect}
 	end
@@ -185,8 +153,8 @@ end
 -- @param self Object.
 -- @param id Inventory ID.
 -- @return Inventory or nil.
-Object.find_open_inventory = function(self, id)
-	local obj = Object:find{id = id}
+ServerObject.find_open_inventory = function(self, id)
+	local obj = ServerObject:find{id = id}
 	if not obj then return end
 	if not object.inv:is_subscribed(self) then return end
 	return object.inv
@@ -197,11 +165,11 @@ end
 -- @param where Inventory number or zero for world.
 -- @param what Inventory slot number or object number for world.
 -- @return Object or nil.
-Object.find_target = function(self, where, what)
+ServerObject.find_target = function(self, where, what)
 	if where == 0 then
-		return Object:find{id = what, point = self.position, radius = 5}
+		return ServerObject:find{id = what, point = self.position, radius = 5}
 	else
-		local obj = Object:find{id = where}
+		local obj = ServerObject:find{id = where}
 		if not obj then return end
 		if obj.inventory:is_subscribed(self) then
 			return obj.inventory:get_object_by_index(what)
@@ -222,7 +190,7 @@ end
 --   <li>timer: Trigger at timeout.</li>
 --   <li>weapon: Used weapon.</ul>
 -- @return True on success.
-Object.fire = function(self, args)
+ServerObject.fire = function(self, args)
 	if not args.owner or not args.feat then return end
 	-- Enable collision callback.
 	if args.collision then
@@ -260,7 +228,7 @@ end
 -- @param self Object.
 -- @param name Variable name.
 -- @return Variable value, or nil.
-Object.get_dialog_variable = function(self, name)
+ServerObject.get_dialog_variable = function(self, name)
 	return Serialize:get_dialog_variable(self, name)
 end
 
@@ -268,18 +236,18 @@ end
 -- @param self Object.
 -- @param name Variable name.
 -- @param value Variable value.
-Object.set_dialog_variable = function(self, name, value)
+ServerObject.set_dialog_variable = function(self, name, value)
 	return Serialize:set_dialog_variable(self, name, value)
 end
 
 --- Gets all dialog variable for the object.
 -- @param self Object.
 -- @return List of variables.
-Object.get_dialog_variables = function(self, name)
+ServerObject.get_dialog_variables = function(self, name)
 	return Serialize:get_dialog_variables(self)
 end
 
-Object.get_equip_value = function(self, user)
+ServerObject.get_equip_value = function(self, user)
 	local score = 50 * self:get_armor_class(user)
 	for k,v in pairs(self:get_weapon_influences(user)) do
 		if k ~= "hatchet" then
@@ -291,10 +259,10 @@ end
 --- Gets a free object ID.
 -- @param clss Object class.
 -- @return Free object ID.
-Object.get_free_id = function(clss)
+ServerObject.get_free_id = function(clss)
 	while true do
 		local id = math.random(0x0000001, 0x0FFFFFF)
-		if not Object:find{id = id} then
+		if not ServerObject:find{id = id} then
 			local rows = Serialize.db:query([[SELECT id FROM object_data WHERE id=?;]], {id})
 			if not rows[1] then
 				return id
@@ -306,21 +274,21 @@ end
 --- Gets the spell effects known by the object.
 -- @param self Object.
 -- @return List of strings.
-Object.get_known_spell_effects = function(self)
+ServerObject.get_known_spell_effects = function(self)
 	return {}
 end
 
 --- Gets the spell types known by the object.
 -- @param self Object.
 -- @return Dictionary of booleans.
-Object.get_known_spell_types = function(self)
+ServerObject.get_known_spell_types = function(self)
 	return {}
 end
 
 --- Gets a full name string for the object.
 -- @param self Object.
 -- @return String.
-Object.get_name_with_count = function(self)
+ServerObject.get_name_with_count = function(self)
 	local name = self.name or "unnamed object"
 	local count = self.count
 	if count > 1 then
@@ -332,7 +300,7 @@ end
 --- Returns the range of tiles occupied by the object.
 -- @param self Object.
 -- @return Start vector, size vector.
-Object.get_tile_range = function(self)
+ServerObject.get_tile_range = function(self)
 	-- TODO: Should depend on actor spec.
 	local size = Vector(1,self.spec.type == "actor" and 2 or 1,1)
 	local src = self.position * Voxel.tile_scale
@@ -347,13 +315,13 @@ end
 -- @param name Modifier name.
 -- @param strength Modifier strength.
 -- @param args Args passed to modifier
-Object.inflict_modifier = function(self, name, strength, args)
+ServerObject.inflict_modifier = function(self, name, strength, args)
 end
 
 --- Loots the object.
 -- @param self Object.
 -- @param user Object doing the looting.
-Object.loot = function(self, user)
+ServerObject.loot = function(self, user)
 	if self.inventory.size > 0 then
 		self.inventory:subscribe(user, function(args) user:inventory_cb(args) end)
 		self:animate("loot")
@@ -365,7 +333,7 @@ end
 -- @param self Object.
 -- @param object Object to merge to this one.
 -- @return True if merged successfully.
-Object.merge = function(self, object)
+ServerObject.merge = function(self, object)
 	if self.spec == object.spec and self.spec.stacking then
 		self.count = self.count + object.count
 		object:detach()
@@ -373,7 +341,7 @@ Object.merge = function(self, object)
 	end
 end
 
-Object.purge = function(self)
+ServerObject.purge = function(self)
 	Serialize.db:query([[DELETE FROM object_data WHERE id=?;]], {self.id})
 	Serialize.db:query([[DELETE FROM object_inventory WHERE id=?;]], {self.id})
 	Serialize.db:query([[DELETE FROM object_sectors WHERE id=?;]], {self.id})
@@ -384,7 +352,7 @@ end
 --- Sends a chat message to all players near the object.
 -- @param self Speaking object.
 -- @param msg Message to send.
-Object.say = function(self, msg)
+ServerObject.say = function(self, msg)
 	if msg then
 		Vision:event{type = "object-speech", object = self, message = msg}
 	end
@@ -395,7 +363,7 @@ end
 -- @param args Arguments.<ul>
 --   <li>packet: Packet.</li>
 --   <li>reliable: False for unreliable.</li></ul>
-Object.send = function(self, args)
+ServerObject.send = function(self, args)
 	if self.client then
 		if type(args) == "string" then
 			local packet = Packet(packets.MESSAGE, "string", args)
@@ -411,7 +379,7 @@ end
 --- Fixes the position of a stuck object.
 -- @param self Object.
 -- @return True if fixing succeeded.
-Object.stuck_fix = function(self)
+ServerObject.stuck_fix = function(self)
 	do return true end
 	-- Get the tile position of the object.
 	local src = self:get_tile_range()
@@ -427,7 +395,7 @@ end
 --- Subtracts stacked objects.
 -- @param self Object.
 -- @param count: Count to subtract.
-Object.subtract = function(self, count)
+ServerObject.subtract = function(self, count)
 	local c = count or 1
 	if self.count > c then
 		self.count = self.count - c
@@ -444,7 +412,7 @@ end
 --   <li>position: World position.</li>
 --   <li>region: Region name.</li></ul>
 -- @return True on success.
-Object.teleport = function(self, args)
+ServerObject.teleport = function(self, args)
 	-- Set the position.
 	if args.marker then
 		local marker = Marker:find{name = args.marker}
@@ -466,7 +434,7 @@ end
 -- @param self Object.
 -- @param secs Seconds since the last update.
 -- @return Boolean and environment statistics. The boolean is true if the object isn't permanently stuck.
-Object.update_environment = function(self, secs)
+ServerObject.update_environment = function(self, secs)
 	if not self.env_timer then self.env_timer = 0 end
 	self.env_timer = self.env_timer + secs
 	if self.env_timer < 2 then return true end
@@ -497,11 +465,46 @@ end
 --- Reads the object from a database.
 -- @param self Object.
 -- @param db Database.
-Object.read_db = function(self, db)
+ServerObject.read_db = function(self, db)
 end
 
 --- Writes the object to a database.
 -- @param self Object.
 -- @param db Database.
-Object.write_db = function(self, db)
+ServerObject.write_db = function(self, db)
 end
+
+ServerObject:add_getters{
+	admin = function(s)
+		local a = rawget(s, "account")
+		return a and Config.inst.admins[a.login]
+	end,
+	count = function(s)
+		return rawget(s, "__count") or 1
+	end,
+	spec = function(s)
+		return rawget(s, "__spec") or objspec
+	end}
+
+ServerObject:add_setters{
+	admin = function(s, v)
+		Config.inst.admins[s] = v and true or nil
+		Config.inst:save()
+	end,
+	count = function(s, v)
+		-- Store the new count.
+		if s.count == v then return end
+		rawset(s, "__count", v ~= 0 and v or nil)
+		-- Update the inventory containing the object.
+		if s.parent then
+			local parent = ServerObject:find{id = s.parent}
+			if parent then
+				parent.inventory:update_object(s)
+			else
+				s.parent = nil
+			end
+		end
+	end,
+	spec = function(s, v)
+		rawset(s, "__spec", v)
+	end}

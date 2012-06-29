@@ -55,7 +55,7 @@ Eventhandler{type = "tick", func = function(self, event)
 		marker_timer = 0
 		for k,m in pairs(Marker.dict_name) do
 			if m.unlocked and m.target then
-				local o = Object:find{id = m.target}
+				local o = ServerObject:find{id = m.target}
 				if o and (m.position - o.position).length > 1 then
 					m.position = o.position
 					local p = Packet(packets.MARKER_UPDATE,

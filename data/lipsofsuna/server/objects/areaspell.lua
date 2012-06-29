@@ -33,7 +33,7 @@ AreaSpell.update = function(self, secs)
 	if self.timer < 1 then return end
 	self.timer = self.timer - 1
 	-- Apply the feat to each nearby object.
-	local objs = Object:find{point = self.position + Vector(0,1), radius = self.radius}
+	local objs = ServerObject:find{point = self.position + Vector(0,1), radius = self.radius}
 	for k,v in pairs(objs) do
 		if v.realized and v.class_name ~= "AreaSpell" then
 			self.feat:apply{

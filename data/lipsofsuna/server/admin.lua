@@ -7,7 +7,7 @@ Protocol:add_handler{type = "ADMIN_DELETE", func = function(args)
 	while true do
 		local ok,id = args.packet:resume("uint32")
 		if not ok then break end
-		local obj = Object:find{id = id}
+		local obj = ServerObject:find{id = id}
 		if obj then
 			obj:die()
 			obj:purge()
@@ -34,7 +34,7 @@ Protocol:add_handler{type = "ADMIN_STATS", func = function(args)
 	local num_objects_real = 0
 	local num_vision_miss = 0
 	local num_vision_real = 0
-	for k,v in pairs(Object.objects) do
+	for k,v in pairs(ServerObject.objects) do
 		if v.class_name == "Player" then
 			if v.realized then
 				num_players_real = num_players_real + 1

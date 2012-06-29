@@ -1,6 +1,6 @@
 require "server/objects/object"
 
-Obstacle = Class(Object)
+Obstacle = Class(ServerObject)
 Obstacle.class_name = "Obstacle"
 
 --- Creates an obstacle.
@@ -8,7 +8,7 @@ Obstacle.class_name = "Obstacle"
 -- @param args Arguments.
 -- @return New obstacle.
 Obstacle.new = function(clss, args)
-	local self = Object.new(clss, {id = args.id})
+	local self = ServerObject.new(clss, {id = args.id})
 	local copy = function(n, d)
 		if args[n] ~= nil or d then
 			self[n] = (args[n] ~= nil) and args[n] or d
@@ -66,7 +66,7 @@ Obstacle.die = function(self)
 			local o = Item{random = true, spec = spec, position = p, rotation = r, realized = true}
 		end
 	end
-	Object.die(self)
+	ServerObject.die(self)
 end
 
 --- Writes the object to a database.
@@ -91,7 +91,7 @@ end
 
 Obstacle:add_setters{
 	realized = function(self, value)
-		Object.setters.realized(self, value)
+		ServerObject.setters.realized(self, value)
 		if value then
 			local cons = self.spec:get_constraints()
 			if cons then

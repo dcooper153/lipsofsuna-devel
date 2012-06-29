@@ -1,6 +1,6 @@
 require "server/objects/object"
 
-Staticobject = Class(Object)
+Staticobject = Class(ServerObject)
 Staticobject.class_name = "Staticobject"
 Staticobject.dict_id = setmetatable({}, {__mode = "kv"})
 
@@ -9,7 +9,7 @@ Staticobject.dict_id = setmetatable({}, {__mode = "kv"})
 -- @param args Arguments.
 -- @return New static object.
 Staticobject.new = function(clss, args)
-	local self = Object.new(clss, {id = args.id})
+	local self = ServerObject.new(clss, {id = args.id})
 	local copy = function(n, d)
 		if args[n] ~= nil or d then
 			self[n] = (args[n] ~= nil) and args[n] or d

@@ -198,7 +198,7 @@ Protocol:add_handler{type = "INVENTORY_CLOSED", func = function(args)
 	if not ok then return end
 	if id == player.id then return end
 	-- Find the inventory.
-	local obj = Object:find{id = id}
+	local obj = ServerObject:find{id = id}
 	if not obj then return end
 	-- Unsubscribe.
 	obj.inventory:unsubscribe(player)
@@ -299,7 +299,7 @@ Protocol:add_handler{type = "PLAYER_DIALOG", func = function(args)
 	local ok,id = args.packet:read("uint32")
 	if not ok then return end
 	-- Find the object.
-	local object = Object:find{id = id}
+	local object = ServerObject:find{id = id}
 	if not object then return end
 	if not player:can_reach_object(object) then return end
 	-- Execute the dialog of the object.
@@ -370,7 +370,7 @@ Protocol:add_handler{type = "PLAYER_LOOT_INVENTORY", func = function(args)
 	local ok,inv,index = args.packet:read("uint32", "uint32")
 	if not ok then return end
 	-- Get the object.
-	local parent = Object:find{id = inv}
+	local parent = ServerObject:find{id = inv}
 	if not parent.inventory:is_subscribed(player) then return end
 	if not player:can_reach_object(parent) then return end
 	local object = parent.inventory:get_object_by_index(index)
@@ -388,7 +388,7 @@ Protocol:add_handler{type = "PLAYER_LOOT_WORLD", func = function(args)
 	local ok,id = args.packet:read("uint32")
 	if not ok then return end
 	-- Find the object.
-	local object = Object:find{id = id}
+	local object = ServerObject:find{id = id}
 	if not object then return end
 	if not player:can_reach_object(object) then return end
 	-- Use the object.
@@ -420,7 +420,7 @@ Protocol:add_handler{type = "PLAYER_MOVE_ITEM", func = function(args)
 	if not ok then return end
 	if src == dst then return end
 	-- Get the modified inventory.
-	local target = Object:find{id = id}
+	local target = ServerObject:find{id = id}
 	if not target then return end
 	if not target.inventory:is_subscribed(player) then return end
 	if not player:can_reach_object(target) then return end
@@ -456,7 +456,7 @@ Protocol:add_handler{type = "PLAYER_PICKPOCKET", func = function(args)
 	local ok,id = args.packet:read("uint32")
 	if not ok then return end
 	-- Find the object.
-	local object = Object:find{id = id}
+	local object = ServerObject:find{id = id}
 	if not object then return end
 	if not player:can_reach_object(object) then return end
 	-- Use the object.
@@ -472,7 +472,7 @@ Protocol:add_handler{type = "PLAYER_PICKUP", func = function(args)
 	local ok,id = args.packet:read("uint32")
 	if not ok then return end
 	-- Find the object.
-	local object = Object:find{id = id}
+	local object = ServerObject:find{id = id}
 	if not object then return end
 	if object.spec.type ~= "item" then return end
 	if not player:can_reach_object(object) then return end
@@ -535,7 +535,7 @@ Protocol:add_handler{type = "PLAYER_SPLIT_ITEM", func = function(args)
 	local ok,inv,index,count = args.packet:read("uint32", "uint32", "uint32")
 	if not ok then return end
 	-- Get the object.
-	local parent = Object:find{id = inv}
+	local parent = ServerObject:find{id = inv}
 	if not parent.inventory:is_subscribed(player) then return end
 	if not player:can_reach_object(parent) then return end
 	local object = parent.inventory:get_object_by_index(index)
@@ -566,7 +566,7 @@ Protocol:add_handler{type = "PLAYER_STORE", func = function(args)
 	local ok,id,index = args.packet:read("uint32", "uint32")
 	if not ok then return end
 	-- Get the item and validate the store.
-	local target = Object:find{id = id}
+	local target = ServerObject:find{id = id}
 	if not target then return end
 	if not target.inventory:is_subscribed(player) then return end
 	if not player:can_reach_object(target) then return end
@@ -596,7 +596,7 @@ Protocol:add_handler{type = "PLAYER_TAKE", func = function(args)
 	local ok,id,index = args.packet:read("uint32", "uint32")
 	if not ok then return end
 	-- Get the item and validate the take.
-	local parent = Object:find{id = id}
+	local parent = ServerObject:find{id = id}
 	if not parent then return end
 	if not parent.inventory:is_subscribed(player) then return end
 	if not player:can_reach_object(parent) then return end
@@ -644,7 +644,7 @@ Protocol:add_handler{type = "PLAYER_USE_INVENTORY", func = function(args)
 	local ok,inv,index,action = args.packet:read("uint32", "uint32", "string")
 	if not ok then return end
 	-- Get the object.
-	local parent = Object:find{id = inv}
+	local parent = ServerObject:find{id = inv}
 	if not parent.inventory:is_subscribed(player) then return end
 	if not player:can_reach_object(parent) then return end
 	local object = parent.inventory:get_object_by_index(index)
@@ -667,7 +667,7 @@ Protocol:add_handler{type = "PLAYER_USE_WORLD", func = function(args)
 	local ok,id,action = args.packet:read("uint32", "string")
 	if not ok then return end
 	-- Find the object.
-	local object = Object:find{id = id}
+	local object = ServerObject:find{id = id}
 	if not object then return end
 	if not player:can_reach_object(object) then return end
 	-- Validate the action.

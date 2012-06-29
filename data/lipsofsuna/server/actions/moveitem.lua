@@ -10,10 +10,10 @@
 Actions.move_from_inv_to_inv = function(clss, user, srcid, srcslot, dstid, dstslot, count)
 	-- Find inventories.
 	local srcinv = Inventory:find{id = srcid}
-	local srcown = Object:find{id = srcid}
+	local srcown = ServerObject:find{id = srcid}
 	if not srcinv or not srcown or not srcinv:subscribed{object = user} then return end
 	local dstinv = Inventory:find{id = dstid}
-	local dstown = Object:find{id = dstid}
+	local dstown = ServerObject:find{id = dstid}
 	if not dstinv or not dstown or not dstinv:subscribed{object = user} then return end
 	if srcinv == dstinv and srcslot == dstslot then return end
 	local srcobj = srcinv:get_object{slot = srcslot}
@@ -139,7 +139,7 @@ end
 Actions.move_from_world_to_inv = function(clss, user, srcid, dstid, dstslot)
 	-- Find the inventory.
 	local dstinv = Inventory:find{id = dstid}
-	local dstown = Object:find{id = dstid}
+	local dstown = ServerObject:find{id = dstid}
 	if not dstinv or not dstown or not dstinv:subscribed{object = user} then return end
 	-- Validate slots.
 	if type(dstslot) == "string" then
@@ -151,7 +151,7 @@ Actions.move_from_world_to_inv = function(clss, user, srcid, dstid, dstslot)
 		return
 	end
 	-- Find the world item.
-	local srcobj = Object:find{id = srcid, point = user.position, radius = 5.0}
+	local srcobj = ServerObject:find{id = srcid, point = user.position, radius = 5.0}
 	if not srcobj or not srcobj.pickable then return end
 	-- Try to move the item.
 	local dstobj = dstinv:get_object{slot = dstslot}

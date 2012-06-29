@@ -205,7 +205,7 @@ Player.inventory_cb = function(self, args)
 				"uint8", args.index)}
 		end,
 		["inventory-subscribed"] = function()
-			local owner = Object:find{id = id}
+			local owner = ServerObject:find{id = id}
 			local spec = owner.spec
 			self.inventory_subscriptions[id] = args.inventory
 			self:send{packet = Packet(packets.INVENTORY_CREATED, "uint32", id,
@@ -293,7 +293,7 @@ Player.update_inventory_subscriptions = function(self)
 		self.inventory:subscribe(self, function(args) self:inventory_cb(args) end)
 	end
 	for id,inv in pairs(self.inventory_subscriptions) do
-		local object = Object:find{id = id}
+		local object = ServerObject:find{id = id}
 		if not object or not self:can_reach_object(object) then
 			inv:unsubscribe(self)
 		end

@@ -2,7 +2,7 @@
 Actionspec{name = "autoequip", type = "item", func = function(item, user)
 	if not item.spec.equipment_slot then return end
 	-- Find the object whose inventory contains the item.
-	local owner = Object:find{id = item.parent}
+	local owner = ServerObject:find{id = item.parent}
 	if not owner then return end
 	-- Check if the item is equipped.
 	local index = owner.inventory:get_slot_by_object(item)

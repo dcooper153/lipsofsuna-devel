@@ -653,7 +653,7 @@ end
 -- @param sector Sector number.
 Serialize.save_sector_objects = function(self, sector)
 	self.db:query([[DELETE FROM object_sectors WHERE sector=?;]], {sector})
-	local objs = Object:find{sector = sector}
+	local objs = ServerObject:find{sector = sector}
 	for k,v in pairs(objs) do
 		v:write_db(self.db)
 	end
