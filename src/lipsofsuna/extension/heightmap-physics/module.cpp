@@ -23,7 +23,7 @@
  */
 
 #include "module.h"
-#include "lipsofsuna/physics/physics-private.h"
+#include "lipsofsuna/extension/physics/physics-private.h"
 #include "heightfield-terrain-shape.hpp"
 
 static void private_init_heightmap (

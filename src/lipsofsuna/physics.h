@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -18,12 +18,12 @@
 #ifndef __LIPS_PHYSICS_H__
 #define __LIPS_PHYSICS_H__
 
-#include "physics/physics.h"
-#include "physics/physics-constraint.h"
-#include "physics/physics-model.h"
-#include "physics/physics-object.h"
-#include "physics/physics-shape.h"
-#include "physics/physics-terrain.h"
-#include "physics/physics-types.h"
+#include "lipsofsuna/extension/physics/physics.h"
+#include "lipsofsuna/extension/physics/physics-constraint.h"
+#include "lipsofsuna/extension/physics/physics-model.h"
+#include "lipsofsuna/extension/physics/physics-object.h"
+#include "lipsofsuna/extension/physics/physics-shape.h"
+#include "lipsofsuna/extension/physics/physics-terrain.h"
+#include "lipsofsuna/extension/physics/physics-types.h"
 
 #endif
