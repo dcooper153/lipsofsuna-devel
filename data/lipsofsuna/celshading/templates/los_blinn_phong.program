@@ -1,0 +1,4 @@
+fragment_program los_blinn_phong glsl
+{
+	source los_blinn_phong.frag
+}

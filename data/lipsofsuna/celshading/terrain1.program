@@ -1,6 +1,6 @@
-vertex_program terrain2_vert glsl
+vertex_program terrain1_vert glsl
 {
-	source terrain2.vert
+	source terrain1.vert
 	preprocessor_defines LIGHTS=3
 	default_params
 	{
@@ -11,9 +11,10 @@ vertex_program terrain2_vert glsl
 	}
 }
 
-fragment_program terrain2_frag glsl
+fragment_program terrain1_frag glsl
 {
-	source terrain2.frag
+	source terrain1.frag
+	attach los_blinn_phong los_cel_shading los_normal_mapping
 	preprocessor_defines LIGHTS=3
 	default_params
 	{

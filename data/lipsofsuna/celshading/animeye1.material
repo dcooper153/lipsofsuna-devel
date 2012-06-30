@@ -6,7 +6,6 @@ pass animeye1/lighting
 	specular 0.0 0.0 0.0 0.0 1
 	texture_unit LOS1
 	{
-		texture eye1.dds
 	}
 	texture_unit
 	{
@@ -24,7 +23,7 @@ pass animeye1/lighting
 	vertex_program_ref animdiff1_vert
 	{
 	}
-	fragment_program_ref animeye1_frag
+	fragment_program_ref eye1_frag
 	{
 	}
 }
@@ -73,7 +72,6 @@ material animeye1
 			specular 0.0 0.0 0.0 1.0 1
 			texture_unit LOS1
 			{
-				texture eye1.dds
 				colour_op_ex blend_texture_alpha src_texture src_diffuse
 			}
 		}

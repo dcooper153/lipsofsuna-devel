@@ -46,15 +46,17 @@ class LIModifierMirror(LIModifier):
 			self.faces.append(indices)
 
 	def _create_uv_polygons(self):
+		LIModifier._create_uv_polygons(self)
 		if not self.mirror_u:
 			return
-		for i in range(0,len(self.faces)):
+		for i in range(self.old_num_faces,len(self.faces)):
 			old_face = self.old_mesh.polygons[self.face_newtoold[i]]
 			new_face = self.new_mesh.polygons[i]
 			for j in range(0,self.old_num_layers):
 				for k in range(0,old_face.loop_total):
-					if self.face_newtoold[i] == i:
-						new_uv_face.uv = (1.0-old_uv_face.uv[0], old_uv_face.uv[1])
+					old_uv_face = self.old_mesh.uv_layers[j].data[old_face.loop_start + k]
+					new_uv_face = self.new_mesh.uv_layers[j].data[new_face.loop_start + old_face.loop_total - k - 1]
+					new_uv_face.uv = (1.0-old_uv_face.uv[0], old_uv_face.uv[1])
 
 	def _create_vertices(self):
 		LIModifier._create_vertices(self)

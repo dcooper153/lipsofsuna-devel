@@ -1,6 +1,7 @@
 fragment_program diffnormskin1_frag glsl
 {
 	source diffnormskin1.frag
+	attach los_blinn_phong los_cel_shading_skin los_normal_mapping
 	preprocessor_defines LIGHTS=3
 	default_params
 	{

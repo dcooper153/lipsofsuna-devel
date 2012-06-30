@@ -1,0 +1,4 @@
+fragment_program los_normal_mapping glsl
+{
+	source los_normal_mapping.frag
+}

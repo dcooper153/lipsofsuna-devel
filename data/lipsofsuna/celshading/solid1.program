@@ -14,6 +14,7 @@ vertex_program solid1_vert glsl
 fragment_program solid1_frag glsl
 {
 	source solid1.frag
+	attach los_blinn_phong los_cel_shading
 	preprocessor_defines LIGHTS=3
 	default_params
 	{

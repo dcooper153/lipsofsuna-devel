@@ -1,0 +1,4 @@
+fragment_program los_cel_shading glsl
+{
+	source los_cel_shading.frag
+}
