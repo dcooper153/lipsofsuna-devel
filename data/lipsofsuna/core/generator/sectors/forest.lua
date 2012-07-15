@@ -29,7 +29,7 @@ Generator.sector_types.Forest.generate = function(self, pos, size)
 				ord[j],ord[i] = ord[i],ord[j]
 			end
 			for k,v in ipairs(ord) do
-				if math.random(1,2)==1 then
+				if math.random(1,4)==1 then
 					if Utils:spawn_plant_or_item(Vector(x,pos.y+v,z)) then
 						break
 					end

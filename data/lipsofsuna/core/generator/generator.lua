@@ -345,7 +345,7 @@ Generator.generate_resources = function(self, pos, size, amount)
 	end
 	-- Generate resources.
 	local p = Vector()
-	local n = amount or 10
+	local n = amount or 3
 	for i=1,n do
 		p.x = pos.x + math.random(1, size.x - 2)
 		p.y = pos.y + math.random(1, size.y - 2)

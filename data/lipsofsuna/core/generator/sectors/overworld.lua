@@ -34,7 +34,7 @@ Generator.sector_types.Overworld.generate = function(self, pos, size)
 	end
 	-- Generate objects.
 	local c = Vector()
-	for i=1,25 do
+	for i=1,10 do
 		c.x = pos.x + math.random(1, size.x - 2)
 		c.y = pos.y + math.random(1, size.y - 2)
 		c.z = pos.z + math.random(1, size.z - 2)
