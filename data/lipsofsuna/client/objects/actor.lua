@@ -263,7 +263,7 @@ Actor.set_local_rotation = function(self, quat, tilt)
 	if spec and spec.tilt_bone then
 		-- Calculate the tilting rotation.
 		local nodes = spec.tilt_bone
-		local angle = self.dead and 0 or -tilt
+		local angle = self.dead and 0 or -(tilt or 0)
 		local rot = Quaternion{axis = Vector(1,0,0), angle = angle / #nodes}
 		-- Create the tilting channel.
 		local anim = Animation("tilt")

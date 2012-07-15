@@ -58,7 +58,7 @@ end
 -- @param rot Rotation quaternion.
 -- @param tilt Tilt angle.
 MovementPrediction.set_target_rotation = function(self, rot, tilt)
-	self.target_rotation = rot
+	self.target_rotation = rot or self.pred_rotation:copy()
 	self.target_tilt = tilt or 0
 	if not self.enabled then self:warp() end
 end
@@ -81,7 +81,7 @@ end
 MovementPrediction.set_target_state = function(self, pos, rot, tilt, vel)
 	-- Store the target state.
 	self.target_position = pos
-	self.target_rotation = rot
+	self.target_rotation = rot or self.pred_rotation:copy()
 	self.target_tilt = tilt or 0
 	self.target_velocity = vel or Vector()
 	-- Initialize the interpolation cycle.
