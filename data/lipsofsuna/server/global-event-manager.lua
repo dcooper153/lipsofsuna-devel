@@ -16,6 +16,46 @@ Globaleventmanager.init = function(self)
 	self:start_event("random monsters")
 end
 
+--- Finds a random spawn point near an active player.
+-- @param self Global event manager.
+-- @return Position vector in world space, or nil.
+Globaleventmanager.find_actor_spawn_point = function(self)
+	-- Select a random player.
+	local players = {}
+	for client,player in pairs(Player.clients) do
+		table.insert(players, player)
+	end
+	if #players == 0 then return end
+	local player = players[math.random(1, #players)]
+	-- Check that there are not too many actors nearby.
+	local radius = player.vision.radius
+	local objects = Object:find{point = player.position, radius = radius * 2}
+	local monsters = 0
+	for id,object in pairs(objects) do
+		if object.class == Actor then
+			monsters = monsters + 1
+			if monsters > 3 then return end
+		end
+	end
+	-- Select a random point just outside of the vision radius.
+	local a = 2 * math.pi * math.random()
+	local r = radius * 1.2
+	local point = player.position:copy():add_xyz(r * math.cos(a), 0, r * math.sin(a))
+	-- Check that no player sees the spawn point.
+	for k,v in pairs(players) do
+		if (point - v.position).length < v.vision.radius then
+			return
+		end
+	end
+	-- Find a valid spawn point near the chosen point.
+	local spawn = Utils:find_spawn_point(point)
+	if not spawn then return end
+	-- Ensure that the point is in a loaded sector.
+	local sector = Generator.inst:get_sector_id_by_point(spawn)
+	if not Serialize.sectors.sectors[sector] then return end
+	return spawn
+end
+
 --- Finds players near the given sector.
 -- @param self Globaleventmanager.
 -- @param id Sector ID.
