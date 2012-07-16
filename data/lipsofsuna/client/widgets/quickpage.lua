@@ -67,18 +67,12 @@ Widgets.Quickpage.activate = function(self, index)
 			names[i] = feat.effects[i] and feat.effects[i][1] or ""
 			values[i] = feat.effects[i] and feat.effects[i][2] or 0
 		end
-		Network:send{packet = Packet(packets.FEAT,
-			"string", feat.animation or "",
-			"string", names[1], "float", values[1],
-			"string", names[2], "float", values[2],
-			"string", names[3], "float", values[3],
-			"bool", true)}
-		Network:send{packet = Packet(packets.FEAT,
-			"string", feat.animation or "",
-			"string", names[1], "float", values[1],
-			"string", names[2], "float", values[2],
-			"string", names[3], "float", values[3],
-			"bool", false)}
+		Game.messaging:client_event("cast spell", feat.animation or "",
+			names[1], values[1], names[2], values[2],
+			names[3], values[3], true)
+		Game.messaging:client_event("cast spell", feat.animation or "",
+			names[1], values[1], names[2], values[2],
+			names[3], values[3], false)
 	elseif item then
 		-- Use an item.
 		local cont = Client.player_object.inventory

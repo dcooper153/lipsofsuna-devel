@@ -1,12 +1,11 @@
 Binding{name = "attack", mode = "toggle", key1 = "mouse1", func = function(v)
 	if not Client.player_object then return end
-	Network:send{packet = Packet(packets.PLAYER_ATTACK, "bool", v)}
+	Game.messaging:client_event("attack", v)
 end}
 
 Binding{name = "block", mode = "toggle", key1 = "mouse3", func = function(v)
-	if Client.player_object then
-		Network:send{packet = Packet(packets.PLAYER_BLOCK, "bool", v)}
-	end
+	if not Client.player_object then return end
+	Game.messaging:client_event("block", v)
 end}
 
 Binding{name = "camera", mode = "press", key1 = Keysym.y, func = function()
@@ -30,7 +29,7 @@ end}
 
 Binding{name = "climb", mode = "press", key1 = Keysym.c, func = function()
 	if not Client.player_object then return end
-	Network:send{packet = Packet(packets.PLAYER_CLIMB)}
+	Game.messaging:client_event("climb")
 end}
 
 Binding{name = "feats", mode = "press", key1 = Keysym.u, func = function()
@@ -59,7 +58,7 @@ end}
 
 Binding{name = "jump", mode = "toggle", key1 = Keysym.SPACE, func = function(v)
 	if not Client.player_object then return end
-	Network:send{packet = Packet(packets.PLAYER_JUMP, "bool", v)}
+	Game.messaging:client_event("jump", v)
 end}
 
 Binding{name = "map", mode = "press", key1 = Keysym.m, func = function()
@@ -133,11 +132,7 @@ end}
 
 Binding{name = "move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = function(v)
 	if not Client.player_object then return end
-	v = math.max(-1, math.min(1, v))
-	Network:send{packet = Packet(packets.PLAYER_MOVE, "int8", v * -127)}
-	-- Set the predicted velocity.
-	local vel = Client.player_object.rotation * Vector(0,0,1) * (v * Client.player_object.spec.speed_walk)
-	Client.player_object.prediction:set_target_velocity(vel)
+	Game.messaging:client_event("walk", math.max(-1, math.min(1, -v)))
 end}
 
 Binding{name = "options", mode = "press", key1 = Keysym.o, func = function()
@@ -233,12 +228,13 @@ Binding{name = "quickslot_10", mode = "press", key1 = Keysym.NUM0, func = functi
 end}
 
 Binding{name = "rotate_camera", mode = "toggle", key1 = Keysym.LCTRL, func = function(v)
+	if not Client.player_object then return end
 	Operators.camera:set_rotation_mode(v)
 end}
 
 Binding{name = "run", mode = "toggle", key1 = Keysym.LSHIFT, func = function(v)
 	if not Client.player_object then return end
-	Network:send{packet = Packet(packets.PLAYER_RUN, "bool", not v)}
+	Game.messaging:client_event("run", not v)
 end}
 
 Binding{name = "screenshot", mode = "press", key1 = Keysym.PRINT, func = function()
@@ -248,7 +244,7 @@ end}
 
 Binding{name = "strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func = function(v)
 	if not Client.player_object then return end
-	Network:send{packet = Packet(packets.PLAYER_STRAFE, "int8", v * 127)}
+	Game.messaging:client_event("sidestep", v)
 end}
 
 Binding{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
@@ -258,7 +254,7 @@ Binding{name = "tilt", mode = "analog", key1 = "mousey", func = function(v)
 	if Operators.camera:get_rotation_mode() then
 		Client.camera.tilt_state = Client.camera.tilt_state - v * sens
 	else
-		Player.tilt_state = Player.tilt_state + v * sens
+		PlayerState.tilt_state = PlayerState.tilt_state - v * sens
 	end
 end}
 
@@ -268,7 +264,7 @@ Binding{name = "turn", mode = "analog", key1 = "mousex", func = function(v)
 	if Operators.camera:get_rotation_mode() then
 		Client.camera.turn_state = Client.camera.turn_state + v * sens
 	else
-		Player.turn_state = Player.turn_state - v * sens
+		PlayerState.turn_state = PlayerState.turn_state - v * sens
 	end
 end}
 

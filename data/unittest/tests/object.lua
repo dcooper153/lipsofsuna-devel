@@ -5,12 +5,12 @@ Unittest:add(1, "object", function()
 	-- Getters and setters.
 	do
 		local obj = Object{position = Vector(1,2,3), realized = true}
-		assert(obj.position.class == Vector)
-		assert(obj.position.x == 1 and obj.position.y == 2 and obj.position.z == 3)
-		assert(obj.rotation.class == Quaternion)
-		assert(obj.realized)
+		assert(obj:get_position().class == Vector)
+		assert(obj:get_position().x == 1 and obj:get_position().y == 2 and obj:get_position().z == 3)
+		assert(obj:get_rotation().class == Quaternion)
+		assert(obj:get_visible())
 		assert(obj.sector == 0)
-		obj.realized = false
+		obj:set_visible(false)
 		assert(obj.sector == nil)
 		collectgarbage()
 	end
@@ -35,7 +35,7 @@ Unittest:add(1, "object", function()
 	for i = 1,1000 do
 		local o = Object{model = Model(), position = Vector(50,50,50), realized = true}
 		Program:update()
-		o.realized = false
+		o:set_visible(false)
 	end
 	-- Unloading objects.
 	Program:unload_world()

@@ -10,6 +10,6 @@ Widgets.Uiinvstore.new = function(clss, id, item, index, slot)
 end
 
 Widgets.Uiinvstore.apply = function(self)
-	Network:send{packet = Packet(packets.PLAYER_STORE, "uint32", self.inventory_id, "uint32", self.index)}
+	Game.messaging:client_event("store to container", self.inventory_id, self.index)
 	Effect:play_global("uitransition1")
 end

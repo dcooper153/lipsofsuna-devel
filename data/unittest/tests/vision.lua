@@ -17,7 +17,7 @@ Unittest:add(1, "vision", function()
 	evt = update(vis)
 	assert(#evt == 0)
 	-- Realizing within the sphere.
-	obj.realized = true
+	obj:set_visible(true)
 	evt = update(vis)
 	assert(#evt == 1)
 	assert(evt[1].type == "object-shown")
@@ -49,16 +49,16 @@ Unittest:add(1, "vision", function()
 	assert(evt[1].type == "object-shown")
 	assert(evt[1].object == obj)
 	-- Unrealizing within the sphere.
-	obj.realized = false
+	obj:set_visible(false)
 	evt = update(vis)
 	assert(#evt == 1)
 	assert(evt[1].type == "object-hidden")
 	assert(evt[1].object == obj)
 	-- Multiple events.
-	obj.realized = true
+	obj:set_visible(true)
 	evt = update(vis)
 	local obj1 = Object{position = Vector(100,200,300), realized = true}
-	obj.realized = false
+	obj:set_visible(false)
 	evt = update(vis)
 	assert(#evt == 2)
 	if evt[2].type == "object-hidden" then
@@ -73,7 +73,7 @@ Unittest:add(1, "vision", function()
 		assert(evt[2].object == obj1)
 	end
 	-- Garbage collection.
-	obj1.realized = nil
+	obj1:set_visible(false)
 	evt = update(vis)
 	obj = nil
 	obj1 = nil

@@ -203,6 +203,30 @@ Actorspec.get_animation = function(self, name)
 	return Animationspec:find{name = n}
 end
 
+--- Gets animation playback arguments by name.
+-- @param self Actor spec.
+-- @param name Animation name.
+-- @return Table of animation playback arguments.
+Actorspec.get_animation_arguments = function(self, name)
+	local args = {animation = name, fade_in = 0.3, fade_out = 0.3, time = time}
+	local anim = self:get_animation(name)
+	if anim then
+		for k,v in pairs(anim:get_arguments()) do args[k] = v end
+	end
+	return args
+end
+
+--- Gets a model node name for the given equipment slot.
+-- @param self Actor spec.
+-- @param slot Equipment slot name.
+-- @return Node name, or nil.
+Actorspec.get_node_by_equipment_slot = function(self, slot)
+	if not self.equipment_slots then return end
+	local node = self.equipment_slots[slot]
+	if node == "" then return end
+	return node
+end
+
 --- Gets the personality of the actor.
 -- @param self Actor spec.
 -- @return Personality spec, or nil.
@@ -212,11 +236,25 @@ Actorspec.get_personality = function(self)
 	return Personalityspec:find{name = self.personality}
 end
 
+--- Gets a random eye color for the actor.
+-- @param self Actor spec.
+-- @return Color table, or nil.
+Actorspec.get_random_eye_color = function(self)
+	if not self.eye_style then return end
+	local color = self.eye_color
+	if not color then
+		color = Color:hsv_to_rgb{math.random(), 0.2 + 0.8 * math.random(), math.random()}
+		color[1] = math.floor(255 * color[1] + 0.5)
+		color[2] = math.floor(255 * color[1] + 0.5)
+		color[3] = math.floor(255 * color[1] + 0.5)
+	end
+	return {color[1], color[2], color[3]}
+end
+
 --- Gets a random eye style for the actor.
 -- @param self Actor spec.
--- @return Table containing the style and color, or nil.
-Actorspec.get_random_eyes = function(self)
-	-- Choose the style.
+-- @return Style name, or nil.
+Actorspec.get_random_eye_style = function(self)
 	local style = self.eye_style
 	if not style then return end
 	if style == "random" then
@@ -229,23 +267,28 @@ Actorspec.get_random_eyes = function(self)
 		if l == 0 then return end
 		style = lst[math.random(1, l)]
 	end
-	-- Choose the color.
-	local color = self.eye_color
+	return style
+end
+
+--- Gets a random hair color for the actor.
+-- @param self Actor spec.
+-- @return Color table, or nil.
+Actorspec.get_random_hair_color = function(self)
+	if not self.hair_style then return end
+	local color = self.hair_color
 	if not color then
-		color = Color:hsv_to_rgb{math.random(), 0.2 + 0.8 * math.random(), math.random()}
-		color[1] = math.floor(255 * color[1] + 0.5)
-		color[2] = math.floor(255 * color[1] + 0.5)
-		color[3] = math.floor(255 * color[1] + 0.5)
+		color = {}
+		color[1] = math.random(0, 255)
+		color[2] = math.random(0, 255)
+		color[3] = math.random(0, 255)
 	end
-	-- Return the style table.
-	return {style, color[1], color[2], color[3]}
+	return {color[1], color[2], color[3]}
 end
 
 --- Gets a random hair style for the actor.
 -- @param self Actor spec.
--- @return Table containing the style and color, or nil.
-Actorspec.get_random_hair = function(self)
-	-- Choose the style.
+-- @return Style string, or nil.
+Actorspec.get_random_hair_style = function(self)
 	local style = self.hair_style
 	if not style then return end
 	if style == "random" then
@@ -258,16 +301,7 @@ Actorspec.get_random_hair = function(self)
 		if l == 0 then return end
 		style = lst[math.random(1, l)]
 	end
-	-- Choose the color.
-	local color = self.hair_color
-	if not color then
-		color = {}
-		color[1] = math.random(0, 255)
-		color[2] = math.random(0, 255)
-		color[3] = math.random(0, 255)
-	end
-	-- Return the style table.
-	return {style, color[1], color[2], color[3]}
+	return style
 end
 
 --- Gets a random head style for the actor.

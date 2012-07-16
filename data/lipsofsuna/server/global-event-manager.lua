@@ -1,9 +1,11 @@
 Globaleventmanager = Class()
 Globaleventmanager.class_name = "Globaleventmanager"
 
---- Initializes the global event manager.
--- @param self Globaleventmanager.
-Globaleventmanager.init = function(self)
+--- Creates a new global event manager.
+-- @param clss Globaleventmanager class.
+-- @return Globaleventmanager.
+Globaleventmanager.new = function(clss)
+	local self = Class.new(clss)
 	self.player_states = setmetatable({}, {__mode = "k"})
 	self.timer = 0
 	-- Create the events.
@@ -14,6 +16,7 @@ Globaleventmanager.init = function(self)
 	-- Start the initial events.
 	self:start_event("brigand camp")
 	self:start_event("random monsters")
+	return self
 end
 
 --- Finds a random spawn point near an active player.
@@ -22,7 +25,7 @@ end
 Globaleventmanager.find_actor_spawn_point = function(self)
 	-- Select a random player.
 	local players = {}
-	for client,player in pairs(Player.clients) do
+	for client,player in pairs(Server.players_by_client) do
 		table.insert(players, player)
 	end
 	if #players == 0 then return end
@@ -51,8 +54,8 @@ Globaleventmanager.find_actor_spawn_point = function(self)
 	local spawn = Utils:find_spawn_point(point)
 	if not spawn then return end
 	-- Ensure that the point is in a loaded sector.
-	local sector = Generator.inst:get_sector_id_by_point(spawn)
-	if not Serialize.sectors.sectors[sector] then return end
+	local sector = Server.generator:get_sector_id_by_point(spawn)
+	if not Game.sectors.sectors[sector] then return end
 	return spawn
 end
 
@@ -62,10 +65,10 @@ end
 -- @return Dictionary of players mapped to player states.
 Globaleventmanager.find_players_exploring_sector = function(self, id)
 	-- Find the closest player.
-	local c = Generator.inst:get_sector_center_by_id(id)
+	local c = Server.generator:get_sector_center_by_id(id)
 	local nearest_dist
 	local nearest_player
-	for k,v in pairs(Player.clients) do
+	for k,v in pairs(Server.players_by_client) do
 		local d = (v.position - c).length
 		if not nearest_dist or d < nearest_dist then
 			nearest_dist = d
@@ -78,7 +81,7 @@ Globaleventmanager.find_players_exploring_sector = function(self, id)
 	if nearest_dist > 100 then return res end
 	nearest_dist = nearest_dist + 20
 	-- Use the closest player as the reference to find other players.
-	for k,v in pairs(Player.clients) do
+	for k,v in pairs(Server.players_by_client) do
 		local d = (v.position - c).length
 		if d < nearest_dist then
 			res[v] = self.player_states[v]
@@ -150,10 +153,10 @@ end
 -- @param objects List of objects in the sector.
 Globaleventmanager.sector_created = function(self, id, loaded, objects)
 	-- Find the player who most likely triggered the creation.
-	local c = Generator.inst:get_sector_center_by_id(id)
+	local c = Server.generator:get_sector_center_by_id(id)
 	local nearest_dist
 	local nearest_player
-	for k,v in pairs(Player.clients) do
+	for k,v in pairs(Server.players_by_client) do
 		local d = (v.position - c).length
 		if not nearest_dist or d < nearest_dist then
 			nearest_dist = d
@@ -163,7 +166,7 @@ Globaleventmanager.sector_created = function(self, id, loaded, objects)
 	-- Take note of players who were close enough to qualify as finders.
 	if nearest_dist and nearest_dist < 100 then
 		nearest_dist = nearest_dist + 20
-		for k,v in pairs(Player.clients) do
+		for k,v in pairs(Server.players_by_client) do
 			local d = (v.position - c).length
 			if d < nearest_dist then
 				self:notify_action("player explore", v)

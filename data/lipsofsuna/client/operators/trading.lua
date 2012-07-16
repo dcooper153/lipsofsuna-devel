@@ -8,8 +8,7 @@ Operators.trading = Client
 -- @param self Client.
 -- @return Table of shop items.
 Operators.trading.accept = function(self)
-	local packet = Packet(packets.TRADING_ACCEPT)
-	Network:send{packet = packet}
+	Game.messaging:client_event("trading accept")
 end
 
 --- Gets the list of items selected for buying.<br/>
@@ -208,14 +207,6 @@ Operators.trading.notify_server = function(self)
 			self.data.trading.buy[k] = nil
 		end
 	end
-	-- Create the packet.
-	local packet = Packet(packets.TRADING_UPDATE, "uint8", #buy, "uint8", #sell)
-	for k,v in ipairs(buy) do
-		packet:write("uint32", v[1], "uint32", v[2])
-	end
-	for k,v in ipairs(sell) do
-		packet:write("uint32", v[1], "uint32", v[2])
-	end
-	-- Send the packet.
-	Network:send{packet = packet}
+	-- Notify the server.
+	Game.messaging:client_event("update trading", buy, sell)
 end

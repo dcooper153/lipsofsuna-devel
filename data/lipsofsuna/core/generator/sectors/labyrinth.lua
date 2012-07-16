@@ -25,10 +25,10 @@ Generator.sector_types.Labyrinth.generate = function(self, pos, size)
 	local t1 = 0.1
 	local t2 = -0.2
 	local a,b,c,d,a2,b2,d2 = 3,6,3,6,5,2,4
-	local r2 = Noise:perlin_noise(pos + Vector(size.x,0,size.z/2), self.scale1, 1, 3, 0.5, Generator.inst.seed1)
-	local r3 = Noise:perlin_noise(pos + Vector(size.x/2,0,size.z), self.scale1, 1, 3, 0.5, Generator.inst.seed1)
-	local r4 = Noise:perlin_noise(pos + Vector(0,0,size.z/2), self.scale1, 1, 3, 0.5, Generator.inst.seed1)
-	local r5 = Noise:perlin_noise(pos + Vector(size.x/2,0,0), self.scale1, 1, 3, 0.5, Generator.inst.seed1)
+	local r2 = Noise:perlin_noise(pos + Vector(size.x,0,size.z/2), self.scale1, 1, 3, 0.5, Server.generator.seed1)
+	local r3 = Noise:perlin_noise(pos + Vector(size.x/2,0,size.z), self.scale1, 1, 3, 0.5, Server.generator.seed1)
+	local r4 = Noise:perlin_noise(pos + Vector(0,0,size.z/2), self.scale1, 1, 3, 0.5, Server.generator.seed1)
+	local r5 = Noise:perlin_noise(pos + Vector(size.x/2,0,0), self.scale1, 1, 3, 0.5, Server.generator.seed1)
 	Voxel:fill_region{point = pos, size = size, tile = self.mats[2].id}
 	Voxel:fill_region{point = pos + Vector(a,c,a), size = Vector(b,d,b), tile = 0}
 	if r2 > t1 then

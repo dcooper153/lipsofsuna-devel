@@ -8,9 +8,8 @@ Simulation.class_name = "Simulation"
 -- @return Object.
 Simulation.create_object_by_spec = function(self, spec, args)
 	-- Prepare the arguments.
-	local a = {collision_group = Physics.GROUP_OBJECT, flags = 0, spec = spec, type = spec.type}
+	local a = {spec = spec, type = spec.type}
 	if args then
-		a.flags = Bitwise:band(args.flags, 0xFF)
 		a.id = args.id
 		a.model = args.model
 	end
@@ -40,7 +39,7 @@ Simulation.create_object_by_spec = function(self, spec, args)
 			local copy_color = function(t)
 				local u = copy_table(t)
 				if not u then return end
-				return Color:hsv_to_rgb(u)
+				return Color:float_to_ubyte(Color:hsv_to_rgb(u))
 			end
 			o.body_style = copy_table(preset.body)
 			o.eye_color = copy_color(preset.eye_color)
@@ -62,27 +61,15 @@ end
 -- @param self Simulation.
 -- @param secs Seconds since the last update.
 Simulation.update = function(self, secs)
-	for k,v in pairs(Object.dict_active) do
-		-- Update sound.
-		if k.animated then
-			k:update_sound(secs)
-		end
-		-- Interpolate positions.
-		if k.prediction and k.prediction.enabled then
-			k.prediction:update(secs)
-			k.position = k.prediction:get_predicted_position()
-			if k.dead or k ~= Client.player_object then
-				k.rotation = k.prediction:get_predicted_rotation()
-				k.tilt = k.prediction:get_predicted_tilt()
-			end
-		end
-		-- Update slots and special effects.
-		k:update(secs)
-		-- Maintain activity.
-		if k.spec and k.spec.type ~= "actor" then
-			v = v - secs
-			if v <= 0 then v = nil end
-			k:activate(v)
+	-- Update objects.
+	--
+	-- When a local server is running, it already takes care of updating
+	-- the objects, and the update functions also do the client side work.
+	-- Hence, this needs not to be done in single player or when hosting
+	-- an embedded server.
+	if not Server.initialized then
+		for k,v in pairs(Object.objects) do
+			v:update(secs)
 		end
 	end
 end

@@ -295,6 +295,16 @@ void limdl_pose_clear_channel_node_priorities (
 }
 
 /**
+ * \brief Destroys all channels and fades.
+ * \param self Model pose.
+ */
+void limdl_pose_destroy_all (
+	LIMdlPose* self)
+{
+	private_clear_pose (self);
+}
+
+/**
  * \brief Destroys an animation channel.
  *
  * Channels are destroyed automatically with the pose but it's also possible to

@@ -26,7 +26,6 @@ Heightmap.new = function(clss, args)
 	local scaling = args and args.scaling
 	local heights = args and args.heights and args.heights.handle
 	self.handle = Los.heightmap_new(pos, size, spacing, scaling, heights)
-	__userdata_lookup[self.handle] = self
 	if args then
 		for k,v in pairs(args) do self[k] = v end
 	end

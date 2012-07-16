@@ -18,6 +18,5 @@ Image.new = function(clss, file)
 	if not handle then return end
 	local self = Class.new(clss)
 	self.handle = handle
-	__userdata_lookup[handle] = self
 	return self
 end

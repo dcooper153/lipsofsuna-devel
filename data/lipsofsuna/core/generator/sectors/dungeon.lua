@@ -22,10 +22,10 @@ Generator.sector_types.Dungeon.generate = function(self, pos, size)
 	-- FIXME: The distribution should be much more random.
 	local m = self.mats[math.random(1,#self.mats)]
 	if m then
-		Noise:perlin_terrain(pos, pos + size, m.id, 0.5, self.scale1, 4, 4, 0.25, Generator.inst.seed2)
+		Noise:perlin_terrain(pos, pos + size, m.id, 0.5, self.scale1, 4, 4, 0.25, Server.generator.seed2)
 	end
 	-- Create caverns.
-	Noise:perlin_terrain(pos, pos + size, 0, 0.1, self.scale2, 5, 5, 0.1, Generator.inst.seed1)
+	Noise:perlin_terrain(pos, pos + size, 0, 0.1, self.scale2, 5, 5, 0.1, Server.generator.seed1)
 	-- Create plants and ores.
-	Generator.inst:generate_resources(pos, size)
+	Server.generator:generate_resources(pos, size)
 end

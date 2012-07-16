@@ -1,5 +1,4 @@
 if not Settings then return end
-if not Settings.server then return end
 
 require "system/noise"
 require(Mod.path .. "generator")

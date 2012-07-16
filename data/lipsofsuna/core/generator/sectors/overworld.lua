@@ -25,7 +25,7 @@ Generator.sector_types.Overworld.generate = function(self, pos, size)
 			local height = Map.heightmap:get_height(p2, false)
 			if height and height >= miny and height < maxy then
 				p1.y = math.ceil(height * Voxel.tile_scale) - 1
-				local n1 = Noise:perlin_noise(p1, self.scale1, 1, 3, 0.5, Generator.inst.seed1)
+				local n1 = Noise:perlin_noise(p1, self.scale1, 1, 3, 0.5, Server.generator.seed1)
 				if n1 > 0.8 then
 					Voxel:fill_region{point = p1, size = Vector(1, 1+(n1-0.8)/0.3, 1), tile = m1.id}
 				end

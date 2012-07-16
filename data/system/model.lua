@@ -17,7 +17,6 @@ Model.models = setmetatable({}, {__mode = "v"})
 Model.new = function(clss, args)
 	local self = Class.new(clss)
 	self.handle = Los.model_new()
-	__userdata_lookup[self.handle] = self
 	if args then
 		if args.name then clss.models[args.name] = self end
 		for k,v in pairs(args) do self[k] = v end
@@ -43,7 +42,6 @@ end
 Model.copy = function(self, shape_keys)
 	local copy = Class.new(Model)
 	copy.handle = Los.model_copy(self.handle, shape_keys)
-	__userdata_lookup[copy.handle] = copy
 	if self.name then
 		copy.name = "*" .. self.name
 	end

@@ -1,12 +1,14 @@
 Effectspec{
 	name = "behead1",
 	particle = "blood2",
+	particle_life = 5,
 	rotation = false,
 	sound = "squish-000"}
 
 Effectspec{
 	name = "berserk1",
 	particle = "spell1",
+	particle_life = 5,
 	sound = "spellberserk1"}
 
 Effectspec{
@@ -42,12 +44,14 @@ Effectspec{
 Effectspec{
 	name = "explosion1",
 	particle = "explosion1",
+	particle_life = 5,
 	quake = 1,
 	sound = "explosion1"}
 
 Effectspec{
 	name = "fleshimpact1",
 	particle = "impact1",
+	particle_life = 5,
 	sound = "thud-000"}
 
 Effectspec{
@@ -61,11 +65,13 @@ Effectspec{
 Effectspec{
 	name = "collapse1",
 	particle = "dust1",
+	particle_life = 5,
 	sound = "destroyrock1"}
 
 Effectspec{
 	name = "collapse2",
 	particle = "dust2",
+	particle_life = 5,
 	sound = "destroyrock1"}
 
 Effectspec{
@@ -81,17 +87,20 @@ Effectspec{
 Effectspec{
 	name = "light1",
 	particle = "spell2",
+	particle_life = 5,
 	rotation = false,
 	sound = "spelllight1"}
 
 Effectspec{
 	name = "heal1",
 	particle = "heal1",
+	particle_life = 5,
 	sound = "spellhealing1"}
 
 Effectspec{
 	name = "impact1",
 	particle = "impact1",
+	particle_life = 5,
 	sound = "thud-000",
 	sound_pitch_min = 0.9,
 	sound_pitch_max = 1.1}
@@ -112,11 +121,13 @@ Effectspec{
 Effectspec{
 	name = "sanctuary1",
 	particle = "sanctuary1",
+	particle_life = 5,
 	sound = "spellsanctuary1"}
 
 Effectspec{
 	name = "selfdestruct1",
 	particle = "particle1",
+	particle_life = 5,
 	sound = "selfdestructcountdown1"}
 
 Effectspec{

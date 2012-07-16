@@ -14,7 +14,7 @@ Widgets.Uidialogtext.new = function(clss, id, index, char, text)
 end
 
 Widgets.Uidialogtext.apply = function(self)
-	Network:send{packet = Packet(packets.DIALOG_ANSWER, "uint32", self.dialog_id, "string", "")}
+	Game.messaging:client_event("choose dialog answer", self.dialog_id, "")
 	Effect:play_global("uitransition1")
 end
 

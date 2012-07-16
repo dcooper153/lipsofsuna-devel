@@ -29,11 +29,7 @@ Widgets.Uiskill.apply = function(self)
 		Effect:play_global("uitoggle2")
 	end
 	-- Send an update.
-	local packet = Packet(packets.PLAYER_SKILLS)
-	for k in pairs(Client.data.skills:get_names()) do
-		packet:write("string", k)
-	end
-	Network:send{packet = packet}
+	Game.messaging:client_event("update skills", Client.data.skills:get_names())
 end
 
 Widgets.Uiskill.rebuild_size = function(self)

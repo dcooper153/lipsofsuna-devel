@@ -35,7 +35,7 @@ TextBubble.new = function(clss, args)
 	end
 	-- Initialize self.
 	local self = Class.new(clss, args)
-	self.offset = self.position or Vector()
+	self.offset = self.offset or Vector()
 	-- Add the text widget.
 	self.widgets = {widget}
 	self:transform()
@@ -60,19 +60,21 @@ TextBubble.disable = function(self)
 end
 
 TextBubble.transform = function(self)
-	if self.object then
-		local p = node and self.object:find_node{name = self.node}
-		if p then
-			self.position = self.offset + self.object.position + self.object.rotation * p
-		else
-			self.position = self.offset + self.object.position
-		end
+	if not self.object then return end
+	local p
+	if self.node and self.object.render then
+		p = self.object.render:find_node{name = self.node}
+	end
+	if p then
+		self.position = self.offset + self.object.position + self.object.rotation * p
+	else
+		self.position = self.offset + self.object.position
 	end
 end
 
 TextBubble.update = function(self, secs)
 	-- Remove if the object disappeared.
-	if self.object and not self.object.realized then
+	if self.object and not self.object:get_visible() then
 		self:disable()
 		return
 	end

@@ -43,8 +43,7 @@ Feat.apply_digging = function(self, args)
 	-- Damage the weapon.
 	if args.weapon and args.weapon.spec.damage_mining then
 		if not args.weapon:damaged{amount = 2 * args.weapon.spec.damage_mining * math.random(), type = "mining"} then
-			args.owner:send{packet = Packet(packets.MESSAGE, "string",
-				"The " .. args.weapon.spec.name .. " broke!")}
+			args.owner:send_message("The " .. args.weapon.spec.name .. " broke!")
 		end
 	end
 end
@@ -131,8 +130,7 @@ Feat.perform = function(self, args)
 		end
 		if self.func then self:func(args) end
 	end
-	-- Animate the feat.
-	-- The move parameter is used by melee feats to tell which attack animation was used.
+	-- Emit a vision event.
 	Vision:event{type = "object-feat", object = args.user, anim = anim, move = move}
 	return true
 end
@@ -145,13 +143,11 @@ end
 Feat.play_effects = function(self, args)
 	local anim = Feattypespec:find{name = self.animation}
 	if not anim then return end
-	if anim.effect then
-		Effect:play{effect = anim.effect, object = args.user}
-	end
+	Server:object_effect(args.user, anim.effect)
 	if anim.action ~= "melee" and anim.slot then
 		local weapon = args.user.inventory:get_object_by_slot(anim.slot)
 		if weapon and weapon.spec.effect_attack then
-			Effect:play{effect = weapon.spec.effect_attack, object = args.user}
+			Server:object_effect(args.user, weapon.spec.effect_attack)
 		end
 	end
 end
@@ -175,7 +171,7 @@ Feat.play_effects_impact = function(self, args)
 	end
 	-- Play each effect.
 	for effect in pairs(effects) do
-		Effect:play{effect = effect, point = args.point}
+		Server:world_effect(args.point, effect)
 	end
 end
 

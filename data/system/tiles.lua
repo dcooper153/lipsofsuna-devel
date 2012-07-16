@@ -1,4 +1,5 @@
 require "system/class"
+require "system/sector"
 
 if not Los.program_load_extension("tiles") then
 	error("loading extension `tiles' failed")
@@ -16,7 +17,6 @@ Material.class_name = "Material"
 Material.new = function(clss, args)
 	local self = Class.new(clss)
 	self.handle = Los.material_new()
-	__userdata_lookup[self.handle] = self
 	if args then
 		for k,v in pairs(args) do self[k] = v end
 	end
@@ -151,15 +151,31 @@ end
 
 --- Gets the data of a voxel block.
 -- @param self Voxel class.
--- @param args Arguments.<ul>
---   <li>index: Block index.</li>
---   <li>packet: Packet writer.</li>
---   <li>type: Packet type.</li></ul>
--- @return Packet writer or nil.
-Voxel.get_block = function(self, args)
-	local handle = Los.voxel_get_block{index = args.index, packet = args.packet and args.packet.handle, type = args.type}
-	if args.packet then return args.packet end
-	return Class.new(Packet, {handle = handle})
+-- @param x Block offset.
+-- @param y Block offset.
+-- @param z Block offset.
+-- @param packet Packet writer.
+Voxel.get_block = function(self, x, y, z, packet)
+	Los.voxel_get_block(x, y, z, packet.handle)
+end
+
+--- Gets the offsets of the blocks in the given sector.
+-- @param self Voxel class.
+-- @param id Sector ID.
+-- @return Iterator over the offsets.
+Voxel.get_blocks_by_sector_id = function(self, id)
+	return coroutine.wrap(function()
+		local bps = self.blocks_per_line
+		local bpl = bps * 128
+		local org = Sector:get_offset_by_id(id):multiply(bps)
+		for z = 0,self.blocks_per_line-1 do
+			for y = 0,self.blocks_per_line-1 do
+				for x = 0,self.blocks_per_line-1 do
+					coroutine.yield(org.x + x, org.y + y, org.z + z)
+				end
+			end
+		end
+	end)
 end
 
 --- Gets the contents of a tile.
@@ -205,11 +221,13 @@ end
 
 --- Sets the contents of a block of voxels.
 -- @param self Voxel class.
--- @param args Arguments.<ul>
---   <li>packet: Packet reader.</li></ul>
+-- @param x Block offset.
+-- @param y Block offset.
+-- @param z Block offset.
+-- @param packet Packet reader.
 -- @return True on success.
-Voxel.set_block = function(self, args)
-	return Los.voxel_set_block{packet = args.packet.handle}
+Voxel.set_block = function(self, x, y, z, packet)
+	return Los.voxel_set_block(x, y, z, packet.handle)
 end
 
 --- Sets the contents of a tile.

@@ -21,13 +21,34 @@
 #include "lipsofsuna/extension.h"
 #include "lipsofsuna/render.h"
 #include "lipsofsuna/extension/animation/ext-module.h"
+#include "lipsofsuna/extension/render-model/module.h"
 
 #define LIEXT_SCRIPT_RENDER_OBJECT "RenderObject"
 
+typedef struct _LIExtRenderObject LIExtRenderObject;
 typedef struct _LIExtModule LIExtModule;
+
+/*****************************************************************************/
+
+struct _LIExtRenderObject
+{
+	LIExtModule* module;
+	LIRenRender* render;
+	LIMatTransform transform;
+	int id;
+};
+
+LIExtRenderObject* liext_render_object_new (
+	LIExtModule* module);
+
+void liext_render_object_free (
+	LIExtRenderObject* self);
+
+/*****************************************************************************/
+
 struct _LIExtModule
 {
-	LICalHandle calls[9];
+	LIAlgU32dic* objects;
 	LIMaiProgram* program;
 	LIRenRender* render;
 };

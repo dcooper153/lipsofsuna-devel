@@ -20,7 +20,7 @@ Generator.sector_types.Ruins.generate = function(self, pos, size)
 	local m1 = Material:find{name = "granite1"}
 	Voxel:fill_region{point = pos, size = size, tile = m1.id}
 	-- Create caverns.
-	Noise:perlin_terrain(pos, pos + size, 0, 0.2, self.scale2, 2, 2, 0.2, Generator.inst.seed1)
+	Noise:perlin_terrain(pos, pos + size, 0, 0.2, self.scale2, 2, 2, 0.2, Server.generator.seed1)
 	-- Create ruins.
 	-- FIXME: The pattern can overflow out of the sector if it's too big.
 	local pat = self.pats[math.random(1, #self.pats)]

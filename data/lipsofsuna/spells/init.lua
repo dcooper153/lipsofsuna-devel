@@ -1,4 +1,5 @@
-Program:add_path(Mod.path)
+Program:add_path(Mod.path .. "effects")
+File:require_directory(Mod.path .. "influences")
 
 Spellspec{
 	name = "fireball1",

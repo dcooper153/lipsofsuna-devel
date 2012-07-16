@@ -11,11 +11,11 @@ Editor.new = function(clss)
 	self.prev_tiles = {}
 	self.mouse_sensitivity = 0.01
 	self.selection = {}
+	self.highlight = Selection()
 	self.copybuffer = {}
 	-- Camera and lighting.
 	self.camera = EditorCamera()
 	self.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equation={1.0,0.0,0.01}, priority = 2}
-	self.scene = Widgets.Scene{camera = self.camera} -- FIXME
 	return self
 end
 
@@ -24,7 +24,7 @@ Editor.reset = function(self)
 	self.selection = {}
 	self.copybuffer = {}
 	if self.corners then
-		self.corners.realized = false
+		self.corners:detach()
 		self.corners = nil
 	end
 end
@@ -32,24 +32,22 @@ end
 --- Initializes the editor mode.
 -- @param self Editor.
 Editor.initialize = function(self)
+	Game:init("editor")
 	self.initialized = true
 	if Settings.pattern then
 		self:load(Settings.pattern)
 		Settings.pattern = nil
 	end
 	self.light.enabled = true
-	Client.sectors.unload_time = nil
 	if Map then Map:init() end
 end
 
 --- Uninitializes the editor mode.
 -- @param self Editor.
 Editor.uninitialize = function(self)
+	Game:deinit()
 	self.initialized = nil
-	for k,v in pairs(Object.objects) do v:detach() end
-	Client.sectors:unload_world()
 	self.light.enabled = false
-	Client.sectors.unload_time = 10
 end
 
 --- Extrudes the selected tiles.
@@ -148,7 +146,7 @@ Editor.load = function(self, name)
 	-- Make sure the old map is erased.
 	self:reset()
 	for k,v in pairs(Object.objects) do v:detach() end
-	Client.sectors:unload_world()
+	Game.sectors:unload_world()
 	-- Find or create the pattern.
 	local pattern = Patternspec:find{name = name}
 	if not pattern then
@@ -171,7 +169,10 @@ Editor.load = function(self, name)
 	self.camera:warp((self.origin + self.size * 0.5) * Voxel.tile_size, Quaternion(0, 1, 0, 0))
 	-- Corner markers.
 	if not self.corners then
-		self.corners = EditorObject{position = self.origin * Voxel.tile_size, realized = true}
+		self.corners = EditorObject()
+		self.corners:set_position(self.origin * Voxel.tile_size)
+		self.corners.render:init(self.corners)
+		self.corners:set_visible(true)
 	end
 	self.corners.model = Model()
 	self.corners.model:add_material{material = "bounds1"}
@@ -323,7 +324,7 @@ Editor.save = function(self)
 	local statics = {}
 	-- Collect objects.
 	for k,v in pairs(Object.objects) do
-		if v.realized and v.spec then
+		if v:get_visible() and v.spec then
 			if v.spec.type == "item" then
 				table.insert(items, v)
 			elseif v.spec.type == "obstacle" then
@@ -454,7 +455,7 @@ Editor.pick = function(self)
 		local i = object
 		local se = self.selection[i]
 		if se then return se end
-		return Selection(object,face)
+		return Selection(object, face, true)
 	elseif tile then
 		-- Determine the face.
 		local r = point * Voxel.tile_scale - (tile + Vector(0.5,0.5,0.5))
@@ -473,7 +474,7 @@ Editor.pick = function(self)
 		local i = Selection:get_tile_key(tile, face)
 		local s = self.selection[i]
 		if s then return s end
-		return Selection(tile, face)
+		return Selection(tile, face, true)
 	end
 end
 
@@ -482,7 +483,7 @@ end
 -- @param add True to add to the selection instead of replacing it.
 Editor.select = function(self, add)
 	local h = self.highlight
-	if not h then return end
+	if not h.key then return end
 	if self.selection[h.key] then
 		-- Unselect.
 		self.selection[h.key] = nil
@@ -497,8 +498,8 @@ Editor.select = function(self, add)
 			end
 		end
 		-- Select.
-		self.selection[h.key] = h
-		self.selection_prev = h
+		self.selection_prev = Selection(h.tile or h.object, h.face)
+		self.selection[h.key] = self.selection_prev
 		-- Select rectangle.
 		if self.selection_rect then
 			for k,v in pairs(self.selection_rect) do
@@ -537,18 +538,34 @@ Editor.update = function(self, secs, force)
 	local cp0 = self.camera.target_position
 	local cr0 = self.camera.rotation
 	self.camera:update(secs)
-	self.scene:update_camera()
+
+	-- FIXME: Is some of this redundant?
+	Program.hdr = Client.options.bloom_enabled
+	Program.multisamples = Client.options.multisamples
+	Program.camera_far = self.camera.far
+	Program.camera_near = self.camera.near
+	Program.camera_position = self.camera.position
+	Program.camera_rotation = self.camera.rotation
+	local mode = Program.video_mode
+	local viewport = {0, 0, mode[1], mode[2]}
+	self.camera.viewport = viewport
+
 	local cp1 = self.camera.target_position
 	local cr1 = self.camera.rotation
 	-- Update the light source.
 	self.light.position = cp1 + cr1 * Vector(0,0,-5)
-	-- Pick the scene.
-	local h = self.highlight
-	local s = self:pick()
-	if h == s and not force then return end
-	-- Update highlight.
-	if h and not self.selection[h.key] then h:detach() end
-	if s then self.highlight = s end
+	-- Update the highlight.
+	self.highlight:update(secs)
+	if self.highlight:get_loaded() then
+		local s = self:pick()
+		if not s or self.selection[s.key] then
+			self.highlight:set_empty()
+		elseif s.tile then
+			self.highlight:set_tile(s.tile, s.face)
+		elseif s.object then
+			self.highlight:set_object(s.object, s.face)
+		end
+	end
 	-- Update the rectangle selection.
 	self:update_rect_select()
 end
@@ -583,6 +600,7 @@ Editor.update_corners = function(self)
 	self.corners.model:remove_vertices()
 	self.corners.model:add_triangles{material = 1, vertices = v}
 	self.corners.model:changed()
+	self.corners.render:set_model(RenderModel(self.corners.model))
 end
 
 Editor.update_rect_select = function(self)

@@ -1,20 +1,20 @@
+require "system/model"
+
 --- Finds or loads a model by name.
 -- @param clss Model class.
--- @param args Arguments.<ul>
---   <li>file: Model filename.</li>
---   <li>mesh: False to not load the mesh.</li></ul>
+-- @param file Model filename.
 -- @return Model.
-Model.find_or_load = function(clss, args)
+Model.find_or_load = function(clss, file)
 	-- Reuse existing models.
-	local self = clss:find(args)
+	local self = clss:find{file = file}
 	if self then return self end
 	-- Load a new model.
-	local spec = Modelspec:find{name = args.file}
-	self = Model{name = args.file}
-	self:load(args)
+	local spec = Modelspec:find{name = file}
+	self = Model{name = file}
+	self:load(file, Client and true or false)
 	self:changed()
 	-- Edit materials.
-	if args.mesh ~= false and spec then
+	if Client and spec then
 		-- Replace shaders.
 		if spec.replace_shaders then
 			for k,v in pairs(spec.replace_shaders) do
@@ -33,4 +33,26 @@ Model.find_or_load = function(clss, args)
 		end
 	end
 	return self
+end
+
+--- Updates the render and physics meshes of the model.
+--
+-- FIXME: Shouldn't overwrite the original.
+--
+-- @param self Model.
+Model.changed = function(self)
+	Los.model_changed(self.handle)
+	if self.render then
+		self.render:set_model(self)
+	end
+end
+
+--- Gets the render model of the model.
+-- @param self Model.
+-- @return Render model.
+Model.get_render = function(self)
+	if not self.render then
+		self.render = RenderModel(self)
+	end
+	return self.render
 end

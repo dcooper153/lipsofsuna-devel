@@ -24,6 +24,13 @@ MovementPrediction.new = function(clss)
 	return self
 end
 
+--- Marks the current target state as a known state.
+-- @param self Movement prediction.
+MovementPrediction.mark = function(self)
+	self.ipol_timer = 0
+	self.ipol_velocity = self.target_velocity:copy()
+end
+
 --- Enables or disables movement prediction.
 -- @param self Movement prediction.
 -- @param value True to enable.
@@ -57,8 +64,15 @@ end
 -- @param self Movement prediction.
 -- @param rot Rotation quaternion.
 -- @param tilt Tilt angle.
-MovementPrediction.set_target_rotation = function(self, rot, tilt)
+MovementPrediction.set_target_rotation = function(self, rot)
 	self.target_rotation = rot or self.pred_rotation:copy()
+	if not self.enabled then self:warp() end
+end
+
+--- Sets the target tilt angle.
+-- @param self Movement prediction.
+-- @param tilt Tilt angle.
+MovementPrediction.set_target_tilt = function(self, tilt)
 	self.target_tilt = tilt or 0
 	if not self.enabled then self:warp() end
 end
@@ -68,25 +82,13 @@ end
 -- @param vel Velocity vector.
 MovementPrediction.set_target_velocity = function(self, vel)
 	self.target_velocity = vel or Vector()
-	self.ipol_timer = 0
-	self.ipol_velocity = self.target_velocity:copy()
 end
 
---- Sets the target movement state.
+--- Sets the target position.
 -- @param self Movement prediction.
--- @param pos Position vector.
--- @param rot Rotation quaternion.
--- @param tilt Tilt angle.
--- @param vel Velocity vector.
-MovementPrediction.set_target_state = function(self, pos, rot, tilt, vel)
-	-- Store the target state.
-	self.target_position = pos
-	self.target_rotation = rot or self.pred_rotation:copy()
-	self.target_tilt = tilt or 0
-	self.target_velocity = vel or Vector()
-	-- Initialize the interpolation cycle.
-	self.ipol_timer = 0
-	self.ipol_velocity = self.target_velocity:copy()
+-- @param value Position vector.
+MovementPrediction.set_target_position = function(self, value)
+	self.target_position = value
 	if not self.enabled then self:warp() end
 end
 

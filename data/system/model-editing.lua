@@ -78,7 +78,6 @@ end
 Model.morph_copy = function(self, targets)
 	local copy = Class.new(Model)
 	copy.handle = Los.model_morph_copy(self.handle, unpack(targets))
-	__userdata_lookup[copy.handle] = copy
 	if self.name then
 		copy.name = "*" .. self.name
 	end

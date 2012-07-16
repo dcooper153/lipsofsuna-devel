@@ -16,7 +16,7 @@ Aistatespec{
 	end,
 	update = function(self, secs)
 		-- Check if the target is has died.
-		if not self.target or self.target.dead or not self.target.realized then
+		if not self.target or self.target.dead or not self.target:get_visible() then
 			self.ai_timer = self.object.spec.ai_update_delay
 			return
 		end

@@ -36,3 +36,21 @@ Color.rgb_to_hsv = function(clss, rgb)
 	else s = c / v end
 	return {h, s, v}
 end
+
+--- Converts a [0,1] color to [0,255]
+-- @param clss Color class.
+-- @param color Ccolor.
+-- @return Color.
+Color.float_to_ubyte = function(clss, color)
+	if not color then return end
+	return {color[1] * 255, color[2] * 255, color[3] * 255}
+end
+
+--- Converts a [0,255] color to [0,1]
+-- @param clss Color class.
+-- @param color Ccolor.
+-- @return Color.
+Color.ubyte_to_float = function(clss, color)
+	if not color then return end
+	return {color[1] / 255, color[2] / 255, color[3] / 255}
+end

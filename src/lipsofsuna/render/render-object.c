@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -130,6 +130,19 @@ LIMdlPoseChannel* liren_render_object_channel_get_state (
 		return NULL;
 
 	return liren_object_channel_get_state (object, channel);
+}
+
+void liren_render_object_clear_animations (
+	LIRenRender* self,
+	int          id)
+{
+	LIRenObject* object;
+
+	object = lialg_u32dic_find (self->objects, id);
+	if (object == NULL)
+		return;
+
+	liren_object_clear_animations (object);
 }
 
 int liren_render_object_find_node (

@@ -20,7 +20,7 @@ Trading.accept = function(clss, player)
 	end
 	-- Close the trading screen.
 	player.trading = nil
-	player:send(Packet(packets.TRADING_CLOSE))
+	Game.messaging:server_event("trading end", player.client)
 end
 
 --- Cancels the trade.
@@ -28,7 +28,7 @@ end
 -- @param player Player.
 Trading.cancel = function(clss, player)
 	if not player.trading then return end
-	player:send(Packet(packets.TRADING_CLOSE))
+	Game.messaging:server_event("trading end", player.client)
 	player.trading = nil
 end
 
@@ -80,76 +80,17 @@ Trading.start = function(clss, player, merchant)
 	-- Create the shop list.
 	-- TODO: Should depend on the merchant.
 	local count = 20
-	local data = {}
 	for i = 1,count do
 		local s = Itemspec:random()
 		table.insert(player.trading.shop, s.name)
-		table.insert(data, "string")
-		table.insert(data, s.name)
 	end
 	-- Send the trading start packet.
-	player:send(Packet(packets.TRADING_START, "uint8", count, unpack(data)))
+	Game.messaging:server_event("trading start", player.client, player.trading.shop)
 end
 
 --- Sends a deal status update to the player.
 -- @param clss Trading.
 -- @param player Player.
 Trading.update = function(clss, player)
-	player:send(Packet(packets.TRADING_ACCEPT, "bool", clss:deal(player)))
+	Game.messaging:server_event("trading accept", player.client, clss:deal(player))
 end
-
-Protocol:add_handler{type = "TRADING_ACCEPT", func = function(args)
-	-- Find the player.
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if player.dead then return end
-	if not player.trading then return end
-	-- Accept trading.
-	Trading:accept(player)
-end}
-
-Protocol:add_handler{type = "TRADING_CANCEL", func = function(args)
-	-- Find the player.
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if player.dead then return end
-	if not player.trading then return end
-	-- Cancel trading.
-	Trading:cancel(player)
-end}
-
-Protocol:add_handler{type = "TRADING_UPDATE", func = function(args)
-	-- Find the player.
-	local player = Player:find{client = args.client}
-	if not player then return end
-	if player.dead then return end
-	if not player.trading then return end
-	-- Read item counts info.
-	local ok,buy,sell = args.packet:read("uint8", "uint8")
-	if not ok then return end
-	-- Read bought items.
-	player.trading.buy = {}
-	for i = 1,buy do
-		local ok,index,count = args.packet:resume("uint32", "uint32")
-		if ok then
-			local item = player.trading.shop[index]
-			if item then
-				table.insert(player.trading.buy, {index, count})
-			end
-		end
-	end
-	-- Read sold items.
-	player.trading.sell = {}
-	for i = 1,sell do
-		local ok,index,count = args.packet:resume("uint32", "uint32")
-		if ok then
-			local item = player.inventory:get_object_by_index(index)
-			if item then
-				count = math.max(item.count, count)
-				table.insert(player.trading.sell, {index, count})
-			end
-		end
-	end
-	-- Update the deal status.
-	Trading:update(player)
-end}

@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2010 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -253,59 +253,42 @@ static void Voxel_find_tile (LIScrArgs* args)
 
 static void Voxel_get_block (LIScrArgs* args)
 {
-	int tmp;
-	int index;
-	int type = 1;
+	int x;
+	int y;
+	int z;
 	LIArcPacket* packet;
 	LIExtModule* module;
 	LIScrData* data = NULL;
 	LIVoxSector* sector;
 	LIVoxBlockAddr addr;
 
-	/* Get block index. */
-	if (!liscr_args_gets_int (args, "index", &index))
+	/* Get the block index. */
+	if (!liscr_args_geti_int (args, 0, &x) ||
+	    !liscr_args_geti_int (args, 1, &y) ||
+	    !liscr_args_geti_int (args, 2, &z))
 		return;
 	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
-	tmp = index;
-	addr.block[0] = tmp % module->voxels->blocks_per_line;
-	addr.sector[0] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
-	tmp /= module->voxels->blocks_per_line * module->voxels->sectors->count;
-	addr.block[1] = tmp % module->voxels->blocks_per_line;
-	addr.sector[1] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
-	tmp /= module->voxels->blocks_per_line * module->voxels->sectors->count;
-	addr.block[2] = tmp % module->voxels->blocks_per_line;
-	addr.sector[2] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
+	addr.block[0] = x % module->voxels->blocks_per_line;
+	addr.sector[0] = x / module->voxels->blocks_per_line;
+	addr.block[1] = y % module->voxels->blocks_per_line;
+	addr.sector[1] = y / module->voxels->blocks_per_line;
+	addr.block[2] = z % module->voxels->blocks_per_line;
+	addr.sector[2] = z / module->voxels->blocks_per_line;
 
-	/* Get block. */
+	/* Get the packet. */
+	if (!liscr_args_geti_data (args, 3, LISCR_SCRIPT_PACKET, &data))
+		return;
+	packet = liscr_data_get_data (data);
+	if (packet->writer == NULL)
+		return;
+
+	/* Get the block. */
 	sector = lialg_sectors_data_offset (module->program->sectors, LIALG_SECTORS_CONTENT_VOXEL,
 		addr.sector[0], addr.sector[1], addr.sector[2], 0);
 	if (sector == NULL)
 		return;
 
-	/* Get or create packet. */
-	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
-	{
-		liscr_args_gets_int (args, "type", &type);
-		packet = liarc_packet_new_writable (type);
-		if (packet == NULL)
-			return;
-		data = liscr_data_new (args->script, args->lua, packet, LISCR_SCRIPT_PACKET, liarc_packet_free);
-		if (data == NULL)
-		{
-			liarc_packet_free (packet);
-			return;
-		}
-		liscr_args_seti_stack (args);
-	}
-	else
-	{
-		packet = liscr_data_get_data (data);
-		if (packet->writer == NULL)
-			return;
-	}
-
 	/* Build the packet. */
-	liarc_writer_append_uint32 (packet->writer, index);
 	livox_sector_write_block (sector, addr.block[0], addr.block[1], addr.block[2], packet->writer);
 }
 
@@ -466,47 +449,47 @@ static void Voxel_update (LIScrArgs* args)
 
 static void Voxel_set_block (LIScrArgs* args)
 {
+	int x;
+	int y;
+	int z;
 	uint8_t skip;
-	uint32_t index;
-	uint32_t tmp;
 	LIArcPacket* packet;
 	LIExtModule* module;
 	LIVoxBlockAddr addr;
 	LIVoxSector* sector;
 	LIScrData* data;
 
-	/* Get packet. */
-	if (!liscr_args_gets_data (args, "packet", LISCR_SCRIPT_PACKET, &data))
+	/* Get the block index. */
+	if (!liscr_args_geti_int (args, 0, &x) ||
+	    !liscr_args_geti_int (args, 1, &y) ||
+	    !liscr_args_geti_int (args, 2, &z))
+		return;
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
+	addr.block[0] = x % module->voxels->blocks_per_line;
+	addr.sector[0] = x / module->voxels->blocks_per_line;
+	addr.block[1] = y % module->voxels->blocks_per_line;
+	addr.sector[1] = y / module->voxels->blocks_per_line;
+	addr.block[2] = z % module->voxels->blocks_per_line;
+	addr.sector[2] = z / module->voxels->blocks_per_line;
+
+	/* Get the packet. */
+	if (!liscr_args_geti_data (args, 3, LISCR_SCRIPT_PACKET, &data))
 		return;
 	packet = liscr_data_get_data (data);
 	if (!packet->reader)
 		return;
 
-	/* Skip type. */
+	/* Skip the type field. */
 	if (!packet->reader->pos && !liarc_reader_get_uint8 (packet->reader, &skip))
 		return;
 
-	/* Read block offset. */
-	if (!liarc_reader_get_uint32 (packet->reader, &index))
-		return;
-	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_VOXEL);
-	tmp = index;
-	addr.block[0] = tmp % module->voxels->blocks_per_line;
-	addr.sector[0] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
-	tmp /= module->voxels->blocks_per_line * module->voxels->sectors->count;
-	addr.block[1] = tmp % module->voxels->blocks_per_line;
-	addr.sector[1] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
-	tmp /= module->voxels->blocks_per_line * module->voxels->sectors->count;
-	addr.block[2] = tmp % module->voxels->blocks_per_line;
-	addr.sector[2] = tmp / module->voxels->blocks_per_line % module->voxels->sectors->count;
-
-	/* Find or create sector. */
+	/* Find or create the sector. */
 	sector = lialg_sectors_data_offset (module->voxels->sectors, LIALG_SECTORS_CONTENT_VOXEL,
 		addr.sector[0], addr.sector[1], addr.sector[2], 1);
 	if (sector == NULL)
 		return;
 
-	/* Read block data. */
+	/* Read the block data. */
 	if (!livox_sector_read_block (sector, addr.block[0], addr.block[1], addr.block[2], packet->reader))
 		return;
 

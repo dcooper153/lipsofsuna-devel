@@ -34,6 +34,14 @@ File.scan_directory = function(self, dir)
 	return Los.file_scan_directory(dir)
 end
 
+--- Returns the contents of a save directory.
+-- @param self File class.
+-- @param dir Directory name relative to the mod save directory root.
+-- @return Table of file names or nil.
+File.scan_save_directory = function(self, dir)
+	return Los.file_scan_save_directory(dir)
+end
+
 --- Writes the contents of a file.
 -- @param self File class.
 -- @param name File name relative to the mod root.

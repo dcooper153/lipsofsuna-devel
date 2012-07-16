@@ -17,9 +17,6 @@ Light.class_name = "Light"
 Light.new = function(clss, args)
 	local self = Class.new(clss)
 	self.handle = Los.light_new()
-	if self.handle then
-		__userdata_lookup[self.handle] = self
-	end
 	rawset(self, "__ambient", {0,0,0,1})
 	rawset(self, "__diffuse", {1,1,1,1})
 	rawset(self, "__enabled", false)
@@ -167,13 +164,6 @@ Light:add_setters{
 	spot_exponent = function(s, v)
 		rawset(s, "__spot_exponent", v)
 		Los.light_set_spot_exponent(s.handle, v)
-	end}
-
-------------------------------------------------------------------------------
-
-Model:add_getters{
-	render_loaded = function(self)
-		return Los.model_get_render_loaded(self.handle)
 	end}
 
 ------------------------------------------------------------------------------

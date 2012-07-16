@@ -1,31 +1,20 @@
 Sectors = Class()
 
---- Initializes the serializer.
--- @param clss Serialize class.
--- @param args Arguments.<ul>
---   <li>database: Database.</li>
---   <li>save_objects: False to disable saving of objects.</li>
---   <li>save_terrain: False to disable saving of terrain.</li>
---   <li>unload_time: Number of seconds it takes for an inactive sector to be unloaded.</li></ul>
--- @return New sectors.
-Sectors.new = function(clss, args)
-	local self = Class.new(clss, args)
+--- Creates a new sector manager.
+-- @param clss Sectors class.
+-- @param database Database, or nil.
+-- @return Sectors.
+Sectors.new = function(clss, database)
+	local self = Class.new(clss)
+	self.database = database
 	self.sectors = {}
-	self.save_objects = (self.save_objects ~= false)
-	self.save_terrain = (self.save_terrain ~= false)
-	self.unload_time = self.unload_time or 10
-	-- Use asynchronous writes for much better write performance.
-	self.database:query("PRAGMA synchronous=OFF;")
-	self.database:query("PRAGMA count_changes=OFF;")
+	self.unload_time = 10
 	-- Initialize the database tables needed by us.
-	if self.save_objects then
+	if self.database then
 		self.database:query("CREATE TABLE IF NOT EXISTS objects (id INTEGER PRIMARY KEY,sector UNSIGNED INTEGER,data TEXT);");
-	end
-	if self.save_terrain then
 		self.database:query("CREATE TABLE IF NOT EXISTS terrain (sector INTEGER PRIMARY KEY,data BLOB);");
 	end
 	-- Load and unload sectors automatically from now on.
-	self.handler = Eventhandler{type = "sector-load", func = function(_,a) self:load_sector(a.sector) end}
 	self.timer = Timer{delay = 2, func = function() self:update() end}
 	return self
 end
@@ -41,9 +30,10 @@ end
 --- Removes all sectors from the database.
 -- @param self Sectors.
 Sectors.erase_world = function(self, erase)
+	if not self.database then return end
 	self.database:query("BEGIN TRANSACTION;")
-	if self.save_objects then self.database:query("DELETE FROM objects;") end
-	if self.save_terrain then self.database:query("DELETE FROM terrain;") end
+	self.database:query("DELETE FROM objects;")
+	self.database:query("DELETE FROM terrain;")
 	self.database:query("END TRANSACTION;")
 end
 
@@ -56,8 +46,9 @@ Sectors.load_sector = function(self, sector)
 	-- Only load once.
 	if self.sectors[sector] then return end
 	self.sectors[sector] = true
-	-- Load terrain.
-	if self.save_terrain then
+	-- Load database content.
+	if self.database then
+		-- Load terrain.
 		local rows = self.database:query("SELECT * FROM terrain WHERE sector=?;", {sector})
 		if #rows ~= 0 then
 			for k,v in ipairs(rows) do
@@ -65,29 +56,32 @@ Sectors.load_sector = function(self, sector)
 			end
 			terrain = true
 		end
-	end
-	-- Load objects.
-	if self.save_objects then
-		objects = Serialize:load_sector_objects(sector)
+		-- Load objects.
+		if Server.initialized then
+			objects = Server.serialize:load_sector_objects(sector)
+		end
 	end
 	-- Load custom content.
 	self:created_sector(sector, terrain, objects)
+	-- Handle client side terrain swapping.
+	if Game.mode == "join" then
+		Client.terrain_sync:load_sector(sector)
+	end
 end
 
 --- Saves a sector to the database.
 -- @param self Sectors.
 -- @param sector Sector index.
 Sectors.save_sector = function(self, sector)
+	if not self.database then return end
 	-- Write objects.
-	if self.save_objects then
-		Serialize:save_sector_objects(sector)
+	if Server.initialized then
+		Server.serialize:save_sector_objects(sector)
 	end
 	-- Write terrain.
-	if self.save_terrain then
-		self.database:query("DELETE FROM terrain WHERE sector=?;", {sector})
-		local data = Voxel:copy_region{sector = sector}
-		self.database:query("INSERT INTO terrain (sector,data) VALUES (?,?);", {sector, data})
-	end
+	self.database:query("DELETE FROM terrain WHERE sector=?;", {sector})
+	local data = Voxel:copy_region{sector = sector}
+	self.database:query("INSERT INTO terrain (sector,data) VALUES (?,?);", {sector, data})
 end
 
 --- Saves all active sectors to the database.
@@ -95,10 +89,11 @@ end
 -- @param erase True to completely erase the old map.
 -- @param progress Progress callback.
 Sectors.save_world = function(self, erase, progress)
+	if not self.database then return end
 	self.database:query("BEGIN TRANSACTION;")
 	-- Erase old world from the database.
 	if erase then
-		if self.save_terrain then self.database:query("DELETE FROM terrain;") end
+		self.database:query("DELETE FROM terrain;")
 	end
 	-- Write the new world data.
 	local sectors = Program.sectors
@@ -135,11 +130,13 @@ Sectors.update = function(self)
 	local written = 0
 	for k,d in pairs(Program.sectors) do
 		if d > self.unload_time and written < 40 then
-			-- Group into a single transaction.
-			if written == 0 then self.database:query("BEGIN TRANSACTION;") end
-			written = written + 1
-			-- Save and unload the sector.
-			self:save_sector(k)
+			-- Save the sector.
+			if self.database then
+				if written == 0 then self.database:query("BEGIN TRANSACTION;") end
+				written = written + 1
+				self:save_sector(k)
+			end
+			-- Unload the sector.
 			self.sectors[k] = nil
 			Program:unload_sector{sector = k}
 		end

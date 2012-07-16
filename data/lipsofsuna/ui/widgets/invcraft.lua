@@ -13,7 +13,7 @@ end
 
 Widgets.Uiinvcraft.apply = function(self)
 	if not self.enabled then return end
-	Network:send{packet = Packet(packets.CRAFTING, "uint32", self.inventory_id, "string", self.name)}
+	Game.messaging:client_event("craft", self.inventory_id, self.name)
 	Effect:play_global("uitransition1")
 end
 

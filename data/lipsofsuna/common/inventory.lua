@@ -118,7 +118,7 @@ Inventory.equip_index = function(self, index, slot)
 		v{type = "inventory-equipped", index = index, inventory = self, object = o, slot = slot}
 	end
 	-- Notify vision.
-	if Vision then
+	if Server.initialized then
 		local parent = Object:find{id = self.id}
 		Vision:event{type = "object-equip", id = self.id, index = index, item = o, object = parent, slot = slot}
 	end
@@ -148,7 +148,7 @@ end
 -- @return Inventory index, or nil.
 Inventory.get_index_by_name = function(self, name)
 	for k,v in pairs(self.stored) do
-		if v.name == name then
+		if v.spec.name == name then
 			return k
 		end
 	end
@@ -186,7 +186,7 @@ end
 -- @return Object and inventory index, or nil.
 Inventory.get_object_by_name = function(self, name)
 	for k,v in pairs(self.stored) do
-		if v.name == name then
+		if v.spec.name == name then
 			return v, k
 		end
 	end
@@ -303,9 +303,9 @@ Inventory.merge_or_drop_object = function(self, object)
 	local o = Object:find{id = self.id}
 	if not o then return end
 	-- Drop near the owner.
-	local p = Utils:find_drop_point{point = o.position}
-	object.position = p or o.position
-	object.realized = true
+	local p = Utils:find_drop_point{point = o:get_position()}
+	object:set_position(p or o.position)
+	object:set_visible(true)
 end
 
 --- Removes an object from the inventory.
@@ -419,7 +419,7 @@ end
 Inventory.subtract_objects_by_name = function(self, name, count)
 	local left = count
 	for k,v in pairs(self.stored) do
-		if v.name == name then
+		if v.spec.name == name then
 			if v.count < left then
 				left = left - v.count
 				self:set_object(k)
@@ -477,7 +477,7 @@ Inventory.unequip_index = function(self, index)
 		v{type = "inventory-unequipped", index = index, inventory = self, object = o, slot = slot}
 	end
 	-- Notify vision.
-	if Vision then
+	if Server.initialized then
 		local parent = Object:find{id = self.id}
 		Vision:event{type = "object-unequip", id = self.id, index = index, item = o, object = parent, slot = slot}
 	end
@@ -497,7 +497,7 @@ Inventory.unequip_slot = function(self, slot)
 		v{type = "inventory-unequipped", index = index, inventory = self, object = o, slot = slot}
 	end
 	-- Notify vision.
-	if Vision then
+	if Server.initialized then
 		local parent = Object:find{id = self.id}
 		Vision:event{type = "object-unequip", id = self.id, index = index, item = o, object = parent, slot = slot}
 	end

@@ -1,3 +1,4 @@
+require "system/password"
 require "common/unlocks"
 
 Serialize = Class()
@@ -7,18 +8,20 @@ Serialize.object_version = "4"
 Serialize.object_decay_timeout = 900
 Serialize.object_decay_update = 300
 
---- Initializes the serializer.
+--- Creates a new serializer.
 -- @param clss Serialize class.
-Serialize.init = function(clss)
+-- @returns Serializer.
+Serialize.new = function(clss, db, sectors)
+	local self = Class.new(clss)
 	-- Create the save database.
-	clss.db = Database{name = "save" .. Settings.file .. ".sqlite"}
-	clss:init_game_database()
-	clss:init_object_database()
-	clss.sectors = Sectors{database = clss.db}
-	Sectors.instance = clss.sectors
+	self.db = db
+	self.sectors = sectors
+	self:init_game_database()
+	self:init_object_database()
 	-- Create the account database.
-	clss.accounts = Database{name = "accounts" .. Settings.file .. ".sqlite"}
-	clss:init_account_database(self)
+	self.accounts = Database{name = "accounts" .. Settings.file .. ".sqlite"}
+	self:init_account_database()
+	return self
 end
 
 --- Loads everything except map data.
@@ -36,9 +39,9 @@ Serialize.load_generator = function(clss)
 	-- Load settings.
 	local r1 = clss.db:query("SELECT key,value FROM generator_settings;")
 	local f1 = {
-		seed1 = function(v) Generator.inst.seed1 = tonumber(v) end,
-		seed2 = function(v) Generator.inst.seed2 = tonumber(v) end,
-		seed3 = function(v) Generator.inst.seed3 = tonumber(v) end}
+		seed1 = function(v) Server.generator.seed1 = tonumber(v) end,
+		seed2 = function(v) Server.generator.seed2 = tonumber(v) end,
+		seed3 = function(v) Server.generator.seed3 = tonumber(v) end}
 	for k,v in ipairs(r1) do
 		local f = f1[v[1]]
 		if f then f(v[2]) end
@@ -46,7 +49,7 @@ Serialize.load_generator = function(clss)
 	-- Load special sectors.
 	local r2 = clss.db:query("SELECT id,value FROM generator_sectors;")
 	for k,v in ipairs(r2) do
-		Generator.inst.sectors[v[1]] = v[2]
+		Server.generator.sectors[v[1]] = v[2]
 	end
 end
 
@@ -106,10 +109,10 @@ Serialize.save_generator = function(clss, erase)
 		clss.db:query("DELETE FROM generator_settings;")
 		clss.db:query("DELETE FROM generator_sectors;")
 	end
-	clss.db:query("REPLACE INTO generator_settings (key,value) VALUES (?,?);", {"seed1", tostring(Generator.inst.seed1)})
-	clss.db:query("REPLACE INTO generator_settings (key,value) VALUES (?,?);", {"seed2", tostring(Generator.inst.seed2)})
-	clss.db:query("REPLACE INTO generator_settings (key,value) VALUES (?,?);", {"seed3", tostring(Generator.inst.seed3)})
-	for k,v in pairs(Generator.inst.sectors) do
+	clss.db:query("REPLACE INTO generator_settings (key,value) VALUES (?,?);", {"seed1", tostring(Server.generator.seed1)})
+	clss.db:query("REPLACE INTO generator_settings (key,value) VALUES (?,?);", {"seed2", tostring(Server.generator.seed2)})
+	clss.db:query("REPLACE INTO generator_settings (key,value) VALUES (?,?);", {"seed3", tostring(Server.generator.seed3)})
+	for k,v in pairs(Server.generator.sectors) do
 		clss.db:query("REPLACE INTO generator_sectors (id,value) VALUES (?,?);", {k, v})
 	end
 	clss.db:query("END TRANSACTION;")
@@ -379,7 +382,7 @@ Serialize.save_accounts = function(self, erase)
 		self.accounts:query([[UPDATE accounts SET spawn_point = NULL;]])
 	end
 	-- Write accounts.
-	for k,v in pairs(Player.clients) do
+	for k,v in pairs(Server.players_by_client) do
 		self:save_account(v.account, v)
 	end
 end
@@ -513,7 +516,7 @@ Serialize.load_object = function(self, id, type, spec, dead, data)
 	-- Convert the data string into a table.
 	local ok,args = pcall(func)
 	if not ok then
-		print("ERROR: " .. ret)
+		print("ERROR: " .. args)
 		return
 	end
 	-- Add arguements from the queried row.
@@ -533,7 +536,7 @@ Serialize.load_object = function(self, id, type, spec, dead, data)
 	end
 	local ok1,object = pcall(init, args)
 	if not ok1 then
-		print("ERROR: " .. ret)
+		print("ERROR: " .. object)
 		return
 	end
 	-- Read additional data.
@@ -553,7 +556,7 @@ Serialize.load_object_inventory = function(self, parent)
 		object_data AS b WHERE
 		a.parent=? AND a.id=b.id]], {parent.id})
 	for k,v in ipairs(rows) do
-		local obj = Serialize:load_object(v[1], v[2], v[3], v[4], v[5])
+		local obj = Server.serialize:load_object(v[1], v[2], v[3], v[4], v[5])
 		if obj then
 			parent.inventory:set_object(v[6], obj)
 			if v[7] then
@@ -615,9 +618,9 @@ Serialize.load_sector_objects = function(self, sector)
 		object_data AS b WHERE
 		a.sector=? AND a.id=b.id]], {sector})
 	for k,v in ipairs(rows) do
-		local obj = Serialize:load_object(v[1], v[2], v[3], v[4], v[5])
+		local obj = Server.serialize:load_object(v[1], v[2], v[3], v[4], v[5])
 		if obj then
-			obj.realized = true
+			obj:set_visible(true)
 			table.insert(objects, obj)
 		end
 	end
@@ -634,7 +637,7 @@ Serialize.load_static_objects = function(self)
 	for k,v in ipairs(rows) do
 		local obj = self:load_object(v[1], v[2], v[3], v[4], v[5])
 		if obj then
-			obj.realized = true
+			obj:set_visible(true)
 			table.insert(objects, obj)
 		end
 	end
@@ -653,7 +656,7 @@ end
 -- @param sector Sector number.
 Serialize.save_sector_objects = function(self, sector)
 	self.db:query([[DELETE FROM object_sectors WHERE sector=?;]], {sector})
-	local objs = ServerObject:find{sector = sector}
+	local objs = SimulationObject:find{sector = sector}
 	for k,v in pairs(objs) do
 		v:write_db(self.db)
 	end
@@ -662,8 +665,8 @@ end
 --- Writes all static objects to the database.
 -- @param self Serialize class.
 Serialize.save_static_objects = function(self)
-	for k,v in pairs(Staticobject.dict_id) do
-		if v.realized then
+	for k,v in pairs(Game.static_objects_by_id) do
+		if v:get_visible() then
 			v:write_db(self.db)
 		end
 	end
@@ -686,7 +689,3 @@ Serialize.update_world_object_decay = function(self, secs)
 	-- Wait for the next cycle.
 	self.object_decay_timer = 0
 end
-
-------------------------------------------------------------------------------
-
-Serialize:init()

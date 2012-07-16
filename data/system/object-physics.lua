@@ -50,6 +50,10 @@ Object.jump = function(self, args)
 	end
 end
 
+Object.set_velocity = function(self, value)
+	Los.object_set_velocity(self.handle, value.handle)
+end
+
 --- Activation state of the object.
 -- @name Object.activated
 -- @class table
@@ -185,4 +189,4 @@ Object:add_setters{
 	shape = function(s, v) Los.object_set_shape(s.handle, v) end,
 	speed = function(s, v) Los.object_set_speed(s.handle, v) end,
 	strafing = function(s, v) Los.object_set_strafing(s.handle, v) end,
-	velocity = function(s, v) Los.object_set_velocity(s.handle, v.handle) end}
+	velocity = function(self, v) self:set_velocity(v) end}

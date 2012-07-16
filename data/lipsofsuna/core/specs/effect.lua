@@ -17,6 +17,7 @@ Effectspec.introspect = Introspect{
 		{name = "model", type = "string", description = "Model to render."},
 		{name = "node", type = "string", description = "Name of the anchor when emitted by an object."},
 		{name = "particle", type = "string", description = "Particle effect to show."},
+		{name = "particle_life", type = "number", description = "Life-time of particle effects, in seconds."},
 		{name = "quake", type = "number", description = "Camera quake amount."},
 		{name = "rotation", type = "string", description = "False to not inherit rotation from the parent object."},
 		{name = "sound", type = "string", description = "Sound effect to play."},

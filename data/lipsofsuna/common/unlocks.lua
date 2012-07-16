@@ -13,7 +13,14 @@ end
 -- @param self Unlocks class.
 -- @param type Unlock type.
 -- @param name Unlock name.
-Unlocks.changed = function(self, type, name)
+-- @param added True if added, false if removed.
+Unlocks.changed = function(self, type, name, added)
+	if not Server.initialized then return end
+	if added then
+		Game.messaging:server_event_broadcast("unlocks add", type, name)
+	else
+		Game.messaging:server_event_broadcast("unlocks remove", type, name)
+	end
 end
 
 --- Returne true if the item is unlocked.
@@ -26,6 +33,19 @@ Unlocks.get = function(self, type, name)
 	return true
 end
 
+--- Gets the unlocks in a list form.
+-- @param self Unlocks class.
+-- @return List of unlocks.
+Unlocks.get_list = function(self, packet)
+	local res = {}
+	for type,names in pairs(self.unlocks) do
+		for name in pairs(names) do
+			table.insert(res, {type, name})
+		end
+	end
+	return res
+end
+
 --- Locks an item.
 -- @param self Unlocks class.
 -- @param type Unlock type.
@@ -36,7 +56,7 @@ Unlocks.lock = function(self, type, name)
 	if not self.unlocks[type][name] then return end
 	self.unlocks[type][name] = nil
 	-- Call the change callback.
-	self:changed(type, name)
+	self:changed(type, name, false)
 	-- Update the database.
 	if self.db then
 		self.db:query([[DELETE FROM unlocks WHERE type=? AND name=?;]], {type, name})
@@ -56,7 +76,7 @@ Unlocks.unlock = function(self, type, name)
 		self.unlocks[type][name] = true
 	end
 	-- Call the change callback.
-	self:changed(type, name)
+	self:changed(type, name, true)
 	-- Update the database.
 	if self.db then
 		self.db:query([[REPLACE INTO unlocks (type,name) VALUES (?,?);]], {type, name})
@@ -144,17 +164,6 @@ Unlocks.write_db = function(self)
 	for type,names in pairs(self.unlocks) do
 		for name in pairs(names) do
 			self.db:query([[INSERT INTO unlocks (type,name) VALUES (?,?);]], {type, name})
-		end
-	end
-end
-
---- Writes the unlocks to a packet.
--- @param self Unlocks class.
--- @param packet Packet.
-Unlocks.write_packet = function(self, packet)
-	for type,names in pairs(self.unlocks) do
-		for name in pairs(names) do
-			packet:write("string", type, "string", name)
 		end
 	end
 end

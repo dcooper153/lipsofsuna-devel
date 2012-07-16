@@ -14,7 +14,7 @@ Quest.activate = function(clss, args)
 	if q.status == "unused" or q.status == "inactive" then
 		q.status = "active"
 		q:send{all = true}
-		Serialize:save_quest(q)
+		Server.serialize:save_quest(q)
 	end
 end
 
@@ -32,7 +32,7 @@ Quest.complete = function(clss, args)
 	if q.status ~= "completed" then
 		q.status = "completed"
 		q:send{all = true}
-		Serialize:save_quest(q)
+		Server.serialize:save_quest(q)
 	end
 end
 
@@ -44,16 +44,13 @@ end
 Quest.send = function(self, args)
 	-- Skip inactive quests.
 	if self.status ~= "active" and self.status ~= "completed" then return end
-	-- Create update packet.
-	local c = self.status == "completed" and 1 or 0
-	local p = Packet(packets.QUEST_STATUS, "uint32", self.id, "uint8", c, "string", self.text)
-	-- Send the packet to clients.
+	-- Notify clients of the change.
 	if args.all then
-		for k,v in pairs(Player.clients) do
-			v:send{packet = p}
+		for k,v in pairs(Server.players_by_client) do
+			Game.messaging:server_event("update quest status", k, self.id, self.status, self.text)
 		end
 	elseif args.client then
-		args.client:send{packet = p}
+		Game.messaging:server_event("update quest status", args.client, self.id, self.status, self.text)
 	end
 	-- Send the mark if one is set.
 	self:send_marker(args)
@@ -69,15 +66,13 @@ Quest.send_marker = function(self, args)
 	if self.status ~= "active" and self.status ~= "completed" then return end
 	-- Create marker packet.
 	local m = self.marker and Marker:find{name = self.marker}
-	local pos = m and m.position or Vector()
-	local p = Packet(packets.QUEST_MARKER, "uint32", self.id, "string", self.marker)
 	-- Send the packet to clients.
 	if args.all then
-		for k,v in pairs(Player.clients) do
-			v:send{packet = p}
+		for k,v in pairs(Server.players_by_client) do
+			Game.messaging:server_event("update quest marker", k, self.id, self.marker)
 		end
 	elseif args.client then
-		args.client:send{packet = p}
+		Game.messaging:server_event("update quest marker", args.client, self.id, self.marker)
 	end
 end
 
@@ -125,6 +120,6 @@ Quest.update = function(self, args)
 	end
 	-- Save changes.
 	if ch_m or ch_p or ch_s or ch_t then
-		Serialize:save_quest(self)
+		Server.serialize:save_quest(self)
 	end
 end

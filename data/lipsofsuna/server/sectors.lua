@@ -25,8 +25,9 @@ end
 -- @param terrain True if terrain was loaded.
 -- @param objects Array of objects.
 Sectors.created_sector = function(self, sector, terrain, objects)
+	if not Server.initialized then return end
 	-- Create fractal terrain for newly found sectors.
-	if not terrain then Generator.inst:generate_sector(sector) end
+	if not terrain then Server.generator:generate_sector(sector) end
 	-- Spawn monsters and events.
-	Globaleventmanager:sector_created(sector, terrain, objects)
+	Server.events:sector_created(sector, terrain, objects)
 end

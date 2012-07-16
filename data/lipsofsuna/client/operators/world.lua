@@ -1,4 +1,25 @@
 Operators.world = Class()
+Operators.world.data = {}
+
+--- Gets the currently manipulated object.</br>
+--
+-- Context: Any.
+--
+-- @param self Operator.
+-- @return Object, or nil.
+Operators.world.get_manipulated_object = function(self)
+	return self.data.manipulated_object
+end
+
+--- Sets the currently manipulated object.</br>
+--
+-- Context: Any.
+--
+-- @param self Operator.
+-- @param object Object, or nil.
+Operators.world.set_manipulated_object = function(self, object)
+	self.data.manipulated_object = object
+end
 
 --- Gets the currently targeted object.</br>
 --
@@ -9,7 +30,7 @@ Operators.world = Class()
 Operators.world.get_target_object = function(self)
 	local object = Target.target_object
 	if not object then return end
-	if not object.realized then return end
+	if not object:get_visible() then return end
 	return object
 end
 
@@ -70,8 +91,8 @@ Operators.world.use_object = function(self, object, action)
 		return
 	end
 	-- Send a normal use command otherwise.
-	Network:send{packet = Packet(packets.PLAYER_USE_WORLD,
-		"uint32", object.id,
-		"string", action.name)}
-	Ui:pop_state()
+	Game.messaging:client_event("use in world", object.id, action.name)
+	if Ui.state == "word/object" then
+		Ui:pop_state()
+	end
 end

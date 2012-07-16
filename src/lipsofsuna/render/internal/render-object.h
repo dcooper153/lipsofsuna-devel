@@ -54,6 +54,9 @@ LIAPICALL (LIMdlPoseChannel*, liren_object_channel_get_state, (
 	LIRenObject* self,
 	int          channel));
 
+LIAPICALL (void, liren_object_clear_animations, (
+	LIRenObject* self));
+
 LIAPICALL (void, liren_object_clear_models, (
 	LIRenObject* self));
 

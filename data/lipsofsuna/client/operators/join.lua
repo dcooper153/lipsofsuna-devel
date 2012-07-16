@@ -3,6 +3,7 @@
 Client.join_game = function(self)
 	-- Clear the world.
 	Program:unload_world()
+	Game:init("join")
 	-- Set information for the UI.
 	self.data.connection.mode = "join"
 	self.data.connection.text = "Joining the server at " .. Settings.address .. ":" .. Settings.port .. "..."

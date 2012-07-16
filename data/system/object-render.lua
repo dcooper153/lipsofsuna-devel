@@ -1,4 +1,4 @@
-require "system/object"
+require "system/class"
 
 if not Los.program_load_extension("object-render") then
 	error("loading extension `object-render' failed")
@@ -6,12 +6,24 @@ end
 
 ------------------------------------------------------------------------------
 
+RenderObject = Class()
+RenderObject.class_name = "RenderObject"
+
+--- Creates a new render object.
+-- @param self Render object class.
+-- @return Render object.
+RenderObject.new = function(clss)
+	local self = Class.new(clss)
+	self.handle = Los.render_object_new()
+	return self
+end
+
 --- Adds a model to the object.
 -- @param self Object.
 -- @param model Model.
-Object.add_model = function(self, model)
+RenderObject.add_model = function(self, model)
 	if not model then return end
-	Los.object_add_model(self.handle, model.handle)
+	Los.render_object_add_model(self.handle, model.handle)
 end
 
 --- Sets or clears an animation.
@@ -29,14 +41,14 @@ end
 --   <li>repeat_start: Starting time when repeating.</li>
 --   <li>replace: Completely replace the overwritten animation.</li></ul>
 -- @return True if started a new animation.
-Object.animate = function(self, args)
+RenderObject.animate = function(self, args)
 	if type(args.animation) == "string" then
 		local anim = Animation.dict_name[args.animation] or Animation:load(args.animation)
 		args.animation = anim and anim.handle or nil
 	elseif args.animation then
 		args.animation = args.animation.handle
 	end
-	return Los.object_animate(self.handle, args)
+	return Los.render_object_animate(self.handle, args)
 end
 
 --- Fades out an animation channel.
@@ -44,8 +56,14 @@ end
 -- @param args Arguments.<ul>
 --   <li>channel: Channel number.</li>
 --   <li>duration: Fade duration in seconds.</li></ul>
-Object.animate_fade = function(self, args)
-	return Los.object_animate_fade(self.handle, args)
+RenderObject.animate_fade = function(self, args)
+	return Los.render_object_animate_fade(self.handle, args)
+end
+
+--- Removes all animation channels and fades.
+-- @param self Object.
+RenderObject.clear_animations = function(self)
+	return Los.render_object_clear_animations(self.handle)
 end
 
 --- Finds a bone or an anchor by name.
@@ -54,8 +72,8 @@ end
 --   <li>name: Node name.</li>
 --   <li>space: Coordinate space. ("local"/"world")</li></ul>
 -- @return Position and rotation, or nil if not found.
-Object.find_node = function(self, args)
-	local p,r = Los.object_find_node(self.handle, args)
+RenderObject.find_node = function(self, args)
+	local p,r = Los.render_object_find_node(self.handle, args)
 	if not p then return end
 	return Class.new(Vector, {handle = p}), Class.new(Quaternion, {handle = r})
 end
@@ -67,8 +85,8 @@ end
 -- @param args Arguments.<ul>
 --   <li>channel: Channel number. (required)</li></ul>
 -- @return Animation info table or nil.
-Object.get_animation = function(self, args)
-	return Los.object_get_animation(self.handle, args)
+RenderObject.get_animation = function(self, args)
+	return Los.render_object_get_animation(self.handle, args)
 end
 
 --- Starts the particle animation of the object.
@@ -76,24 +94,24 @@ end
 -- @param args Arguments.<ul>
 --   <li>loop: True to loop infinitely.</li>
 --   <li>time: Animation offset in seconds.</li></ul>
-Object.particle_animation = function(self, args)
-	return Los.object_particle_animation(self.handle, args)
+RenderObject.particle_animation = function(self, args)
+	return Los.render_object_particle_animation(self.handle, args)
 end
 
 --- Removes a model from the object.
 -- @param self Object.
 -- @param model Model.
-Object.remove_model = function(self, model)
+RenderObject.remove_model = function(self, model)
 	if not model then return end
-	Los.object_remove_model(self.handle, model.handle)
+	Los.render_object_remove_model(self.handle, model.handle)
 end
 
 --- Removes a model from the object.
 -- @param self Object.
 -- @param model_old Model.
 -- @param model_new Model.
-Object.replace_model = function(self, model_old, model_new)
-	Los.object_replace_model(self.handle,
+RenderObject.replace_model = function(self, model_old, model_new)
+	Los.render_object_replace_model(self.handle,
 		model_old and model_old.handle or nil,
 		model_new and model_new.handle or nil)
 end
@@ -103,64 +121,131 @@ end
 -- @param ... Arguments.<ul>
 --   <li>params: Array numbers to be passed to the shader.</li>
 --   <li>shader: Shader name.</li></ul>
-Object.set_effect = function(self, ...)
-	Los.object_set_effect(self.handle, ...)
+RenderObject.set_effect = function(self, ...)
+	Los.render_object_set_effect(self.handle, ...)
 end
 
---- The particle system of the object.
--- @name Object.particle
--- @class table
+--- Gets the particle effect name of the object.
+-- @param self Object.
+-- @return Particle effect name.
+RenderObject.get_particle = function(self)
+	return rawget(self, "__particle")
+end
+
+--- Gets the particle emitting state for the object.
+-- @param self Object.
+-- @return True if enabled, false if disable.
+RenderObject.get_particle_emitting = function(self)
+	return rawget(self, "__particle_emitting")
+end
+
+--- Gets the position of the object.
+-- @param self Object.
+-- @return Vector.
+RenderObject.get_position = function(self)
+	local v = rawget(self, "__position")
+	if not v then
+		v = Vector()
+		rawset(self, "__position", v)
+	end
+	return v
+end
+
+--- Gets the maxium render distance of the object.
+-- @param self Object.
+-- @return Render distance in world units.
+RenderObject.get_render_distance = function(self)
+	return rawget(self, "__render_distance")
+end
+
+--- Returns true if the render data of the object has been loaded.
+-- @param self Object.
+-- @return True if loaded, false if not.
+RenderObject.get_loaded = function(self)
+	return Los.render_object_get_render_loaded(self.handle)
+end
+
+--- Gets the rotation of the object.
+-- @param self Object.
+-- @return Quaternion.
+RenderObject.get_rotation = function(self)
+	local v = rawget(self, "__rotation")
+	if not v then
+		v = Quaternion()
+		rawset(self, "__rotation", v)
+	end
+	return v
+end
+
+--- Gets the shadow casting mode of the object.
+-- @param self Object.
+-- @return True if enabled, false if disable.
+RenderObject.get_shadow_casting = function(self)
+	local v = rawget(self, "__shadow_casting")
+	return (v ~= nil) and v or false
+end
+
+--- Gets the visibility status of the object.
+-- @param self Object.
+-- @return True if visible, false if not.
+RenderObject.get_visible = function(self)
+	return rawget(self, "__visible")
+end
+
+--- Sets the particle effect of the object.
+-- @param self Object.
+-- @param v Particle effect name.
+RenderObject.set_particle = function(self, v)
+	rawset(self, "__particle", v)
+	rawset(self, "__particle_emitting", true)
+	rawset(self, "__model", nil)
+	Los.render_object_set_particle(self.handle, v)
+end
 
 --- Toggles particle emitting for the object.
--- @name Object.particle_emitting
--- @class table
+-- @param self Object.
+-- @param v True to enable, false to disable.
+RenderObject.set_particle_emitting = function(self, v)
+	rawset(self, "__particle_emitting", v)
+	Los.render_object_set_particle_emitting(self.handle, v)
+end
 
---- Specifies the maxium render distance of the object.
--- @name Object.render_distance
--- @class table
+--- Sets the position of the object.
+-- @param self Object.
+-- @param v Vector.
+RenderObject.set_position = function(self, v)
+	rawset(self, "__position", v)
+	Los.render_object_set_position(self.handle, v.handle)
+end
 
---- Evaluates to true if the render data of the object has been loaded.
--- @name Object.render_loaded
--- @class table
+--- Sets the rotation of the object.
+-- @param self Object.
+-- @param v Quaternion.
+RenderObject.set_rotation = function(self, v)
+	rawset(self, "__rotation", v)
+	Los.render_object_set_rotation(self.handle, v.handle)
+end
 
---- Toggles shadow casting for the object.
--- @name Object.shadow_casting
--- @class table
+--- Specifies the maximum render distance of the object.
+-- @param self Object.
+-- @param v Render distance in world units.
+RenderObject.set_render_distance = function(self, v)
+	rawset(self, "__render_distance", v)
+	Los.render_object_set_render_distance(self.handle, v)
+end
 
-Object:add_getters{
-	particle = function(self)
-		return rawget(self, "__particle")
-	end,
-	particle_emitting = function(self)
-		return rawget(self, "__particle_emitting")
-	end,
-	render_distance = function(self)
-		return rawget(self, "__render_distance")
-	end,
-	render_loaded = function(self)
-		return Los.object_get_render_loaded(self.handle)
-	end,
-	shadow_casting = function(self)
-		local v = rawget(self, "__shadow_casting")
-		return (v ~= nil) and v or false
-	end}
+--- Enables or disables shadow casting for the object.
+-- @param self Object.
+-- @param v True to enable, false to disable.
+RenderObject.set_shadow_casting = function(self, v)
+	rawset(self, "__shadow_casting", v)
+	Los.render_object_set_shadow_casting(self.handle, v)
+end
 
-Object:add_setters{
-	particle = function(self, v)
-		rawset(self, "__particle", v)
-		rawset(self, "__particle_emitting", true)
-		rawset(self, "__model", nil)
-		Los.object_set_particle(self.handle, v)
-	end,
-	particle_emitting = function(self, v)
-		rawset(self, "__particle_emitting", v)
-		Los.object_set_particle_emitting(self.handle, v)
-	end,
-	render_distance = function(self, v)
-		rawset(self, "__render_distance", v)
-		Los.object_set_render_distance(self.handle, v)
-	end,
-	shadow_casting = function(self, v)
-		rawset(self, "__shadow_casting", v)
-		Los.object_set_shadow_casting(self.handle, v)
-	end}
+--- Sets the visibility status of the object.
+-- @param self Object.
+-- @param v True if visible, false if not.
+RenderObject.set_visible = function(self, v)
+	rawset(self, "__visible", v)
+	Los.render_object_set_visible(self.handle, v)
+end

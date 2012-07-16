@@ -1,10 +1,21 @@
 Ui:add_state{
 	state = "world/object",
 	label = "Interact",
+	update = function()
+		local object = Operators.world:get_manipulated_object()
+		if not object or not object:get_visible() then
+			Ui:pop_state()
+		end
+	end,
 	init = function()
 		local object = Operators.world:get_target_object()
 		local usages = Operators.world:get_target_usages()
-		if not object or not usages then return end
+		if not object or not usages then
+			Operators.world:set_manipulated_object(nil)
+			return
+		else
+			Operators.world:set_manipulated_object(object)
+		end
 		local widgets = {}
 		for k,v in ipairs(usages) do
 			local action = v[3]
@@ -18,7 +29,7 @@ Ui:add_state{
 				if v[1] == "dialog" then
 					table.insert(widgets, Widgets.Uibutton(v[2], function()
 						if not object.dialog then
-							Network:send{packet = Packet(packets.PLAYER_DIALOG, "uint32", object.id)}
+							Game.messaging:client_event("dialog start", object.id)
 						else
 							Client.active_dialog_object = object
 							Ui.state = "dialog"
@@ -27,7 +38,7 @@ Ui:add_state{
 				elseif v[1] == "loot" then
 					table.insert(widgets, Widgets.Uibutton(v[2], function()
 						if not Operators.inventory:get_inventory_by_id(object.id) then
-							Network:send{packet = Packet(packets.PLAYER_LOOT_WORLD, "uint32", object.id)}
+							Game.messaging:client_event("loot in world", object.id)
 						end
 						Client.data.inventory.id = object.id
 						Ui.state = "loot"
@@ -36,14 +47,14 @@ Ui:add_state{
 					table.insert(widgets, Widgets.Uibutton(v[2], function()
 						-- FIXME: Should use a different system.
 						if not Operators.inventory:get_inventory_by_id(object.id) then
-							Network:send{packet = Packet(packets.PLAYER_PICKPOCKET, "uint32", object.id)}
+							Game.messaging:client_event("pickpocket", object.id)
 						end
 						Client.data.inventory.id = object.id
 						Ui.state = "loot"
 					end))
 				elseif v[1] == "pick up" then
 					table.insert(widgets, Widgets.Uibutton(v[2], function()
-						Network:send{packet = Packet(packets.PLAYER_PICKUP, "uint32", object.id)}
+						Game.messaging:client_event("take from world", object.id)
 						Ui:pop_state()
 					end))
 				end

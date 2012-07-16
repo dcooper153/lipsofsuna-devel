@@ -1,2 +1,2 @@
 Dialogspec{name = "erinyes", commands = {
-	{"func", "Generator.inst:generate()"}}}
+	{"func", "Server.generator:generate()"}}}

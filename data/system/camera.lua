@@ -11,7 +11,6 @@ Camera.class_name = "Camera"
 Camera.new = function(clss, args)
 	local self = Class.new(clss)
 	self.handle = Los.camera_new()
-	__userdata_lookup[self.handle] = self
 	if args then
 		for k,v in pairs(args) do self[k] = v end
 	end

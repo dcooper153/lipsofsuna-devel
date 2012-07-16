@@ -11,7 +11,7 @@ end
 Generator.sector_types.Main.generate = function(self, sector)
 	local w = Voxel.tiles_per_line
 	local size = Vector(w,w,w)
-	local pos = Generator.inst:get_sector_offset(sector)
+	local pos = Server.generator:get_sector_offset(sector)
 	local t = self:get_sector(pos, size)
 	local g = Generator.sector_types[t]
 	if not g then
@@ -42,9 +42,9 @@ Generator.sector_types.Main.get_sector = function(self, pos, size)
 	-- Predefined sectors.
 	-- The map generator allocates some sectors for towns. They're formatted
 	-- using a specific town generator.
-	local s = Generator.inst.sectors[Generator.inst:get_sector_id(pos)]
+	local s = Server.generator.sectors[Server.generator:get_sector_id(pos)]
 	if s then return s end
-	if not Generator.inst.inst:validate_rect(pos, size) then return "Town" end
+	if not Server.generator:validate_rect(pos, size) then return "Town" end
 	-- Map boundaries.
 	-- The map is surrounded by special border sectors to prevent things from
 	-- falling outside of the map.
@@ -54,7 +54,7 @@ Generator.sector_types.Main.get_sector = function(self, pos, size)
 	-- Random ruins.
 	-- Ruins can appear anywhere so their generation is a bit special. They're
 	-- generated if the random number falls inside one of a few gaps in the range.
-	local n1 = Noise:perlin_noise(pos, self.scale1, 1, 3, 0.5, Generator.inst.seed1)
+	local n1 = Noise:perlin_noise(pos, self.scale1, 1, 3, 0.5, Server.generator.seed1)
 	local n2 = math.abs(3 * n1)
 	if math.ceil(n2) - n2 < 0.2 then return "Ruins" end
 	-- Random sectors.

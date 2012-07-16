@@ -10,8 +10,8 @@ Ui:add_widget{
 		widget.hint = "[RETURN]: Send\n[ESCAPE]: Cancel"
 		widget.accepted = function(w)
 			-- Perform the command.
-			local cmd,match = ChatCommand:find(w.value)
-			if cmd then cmd.func{match} end
+			local cmd,match = ChatCommand:find(w.value, "client")
+			if cmd then cmd.func(Client.player_object, {match}) end
 			-- Close the chat unless the command did already.
 			if Ui.state == "chat" then Ui:pop_state() end
 		end

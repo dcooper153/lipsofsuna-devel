@@ -14,26 +14,15 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "mainmenu",
-	widget = function() return Widgets.Uibutton("Play now", function()
-			Settings.address = "localhost"
-			Settings.file = Client.options.host_savefile
-			Settings.admin = Client.options.host_admin
-			Settings.generate = Client.options.host_restart
-			Settings.host = true
-			Settings.port = 10101
-			Settings.account = Client.options.host_account
-			Settings.password = Client.options.host_password
-			Client:host_game()
-		end)
-	end}
+	widget = function() return Widgets.Uitransition("New game", "newgame") end}
 
 Ui:add_widget{
 	state = "mainmenu",
-	widget = function() return Widgets.Uitransition("Host", "host") end}
+	widget = function() return Widgets.Uitransition("Load game", "loadgame") end}
 
 Ui:add_widget{
 	state = "mainmenu",
-	widget = function() return Widgets.Uitransition("Join", "join") end}
+	widget = function() return Widgets.Uitransition("Multiplayer", "multiplayer") end}
 
 Ui:add_widget{
 	state = "mainmenu",

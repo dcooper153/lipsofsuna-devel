@@ -18,11 +18,11 @@ Generator.sector_types.Ocean.generate = function(self, pos, size)
 	local m1 = Material:find{name = "granite1"}
 	Voxel:fill_region{point = pos, size = size, tile = m1.id}
 	-- Create ice.
-	Noise:perlin_terrain(pos, pos + size, self.mats[1].id, 0.3, self.scale1, 4, 4, 0.25, Generator.inst.seed2)
+	Noise:perlin_terrain(pos, pos + size, self.mats[1].id, 0.3, self.scale1, 4, 4, 0.25, Server.generator.seed2)
 	-- Create caverns.
-	Noise:perlin_terrain(pos, pos + size, 0, 0.15, self.scale2, 2, 2, 0.2, Generator.inst.seed1)
+	Noise:perlin_terrain(pos, pos + size, 0, 0.15, self.scale2, 2, 2, 0.2, Server.generator.seed1)
 	-- Create water.
-	Noise:perlin_terrain(pos, pos + size, self.mats[2].id, 0.3, self.scale1, 4, 4, 0.25, Generator.inst.seed3)
+	Noise:perlin_terrain(pos, pos + size, self.mats[2].id, 0.3, self.scale1, 4, 4, 0.25, Server.generator.seed3)
 	-- Create plants and ores.
-	Generator.inst:generate_resources(pos, size, 5)
+	Server.generator:generate_resources(pos, size, 5)
 end

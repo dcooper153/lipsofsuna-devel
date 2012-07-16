@@ -109,7 +109,6 @@ Quaternion.new = function(clss, x, y, z, w)
 	else
 		self.handle = Los.quaternion_new(x, y, z, w)
 	end
-	__userdata_lookup[self.handle] = self
 	return self
 end
 
@@ -121,7 +120,6 @@ end
 Quaternion.new_vectors = function(clss, src, dst)
 	local self = Class.new(clss)
 	self.handle = Los.quaternion_new_vectors(src.handle, dst.handle)
-	__userdata_lookup[self.handle] = self
 	return self
 end
 
@@ -255,7 +253,6 @@ Vector.class_name = "Vector"
 Vector.new = function(clss, x, y, z)
 	local self = Class.new(clss)
 	self.handle = Los.vector_new()
-	__userdata_lookup[self.handle] = self
 	Los.vector_set_x(self.handle, x)
 	Los.vector_set_y(self.handle, y)
 	Los.vector_set_z(self.handle, z)

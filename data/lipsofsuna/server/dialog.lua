@@ -50,14 +50,14 @@ Dialog.answer = function(self, user, answer)
 		self.choices = nil
 		table.insert(self.vm, 1, {exe = sel, off = 2, pos = 1, len = #sel - 2})
 		self:execute()
-		Globaleventmanager:notify_action("dialog", user)
+		Server.events:notify_action("dialog", user)
 	elseif self.choices == "info" or self.choices == "line" then
 		-- Info or say.
 		self.vm[1].pos = self.vm[1].pos + 1
 		self.user = user
 		self.choices = nil
 		self:execute()
-		Globaleventmanager:notify_action("dialog", user)
+		Server.events:notify_action("dialog", user)
 	end
 end
 
@@ -175,7 +175,7 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 	if not var_type then
 		local func = random_quests[math.random(1, #random_quests)]
 		func()
-		Serialize:save_quests()
+		Server.serialize:save_quests()
 	end
 	-- Dialog creation functions.
 	-- These build the dialog trees for each random quest type.
@@ -253,7 +253,7 @@ Dialog.emit_event = function(self, event)
 	if self.object.spec.type ~= "static" then
 		Vision:event(event)
 	else
-		for k,v in pairs(Player.clients) do
+		for k,v in pairs(Server.players_by_client) do
 			v:vision_cb(event)
 		end
 	end
@@ -263,6 +263,7 @@ end
 -- Continues the dialog until the next choice or message is encountered or
 -- the dialog ends.
 -- @param self Dialog.
+-- @return True if the dialog is in progress, false if it ended.
 Dialog.execute = function(self)
 	-- Utility functions.
 	local check_cond = function(c)
@@ -382,21 +383,21 @@ Dialog.execute = function(self)
 			for i = #vm,1,-1 do vm[i] = nil end
 		end,
 		effect = function(vm, c)
-			Effect:play{effect = c[2], object = self.object}
+			Server:object_effect(self.object, c[2])
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["effect player"] = function(vm, c)
-			Effect:play{effect = c[2], object = self.user}
+			Server:object_effect(self.user, c[2])
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["flag"] = function(vm, c)
 			Dialog.flags[c[2]] = "true"
-			Serialize:save_quests()
+			Server.serialize:save_quests()
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["flag clear"] = function(vm, c)
 			Dialog.flags[c[2]] = nil
-			Serialize:save_quests()
+			Server.serialize:save_quests()
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["func"] = function(vm, c)
@@ -413,9 +414,9 @@ Dialog.execute = function(self)
 			if not s then return end
 			local o = Item{spec = s, count = c.count}
 			if self.user.inventory:merge_or_drop_object(o) then
-				self.user:send("Received " .. c[2])
+				self.user:send_message("Received " .. c[2])
 			else
-				self.user:send("Received " .. c[2] .. " but couldn't carry it")
+				self.user:send_message("Received " .. c[2] .. " but couldn't carry it")
 			end
 		end,
 		info = function(vm, c)
@@ -434,7 +435,7 @@ Dialog.execute = function(self)
 		end,
 		notification = function(vm, c)
 			vm[1].pos = vm[1].pos + 1
-			self.user:send{packet = Packet(packets.MESSAGE_NOTIFICATION, "string", c[2])}
+			Game.messaging:server_event("notification", self.user.client, c[2])
 		end,
 		quest = function(vm, c)
 			local q = Quest:find{name = c[2]}
@@ -457,7 +458,7 @@ Dialog.execute = function(self)
 			vm[1].pos = vm[1].pos + 1
 			local o = self.user.inventory:get_object_by_name(c[2])
 			if o then
-				self.user:send("Lost " .. c[2])
+				self.user:send_message("Lost " .. c[2])
 				o:subtract(1)
 				table.insert(vm, 1, {exe = c, off = 2, pos = 1, len = 1})
 			elseif #c >= 3 then
@@ -495,13 +496,13 @@ Dialog.execute = function(self)
 			end
 			-- Set the position.
 			if object then
-				object.position = select_spawn_position(c)
+				object:set_position(select_spawn_position(c))
 				if type(c.rotation) == "number" then
 					object.rotation = Quaternion{axis = Vector(0,1), angle = c.rotation / math.pi * 180}
 				elseif type(c.rotation) == "table" then
 					object.rotation = c.rotation
 				end
-				object.realized = true
+				object:set_visible(true)
 			end
 			-- Create the marker.
 			if object and c.assign_marker then
@@ -564,7 +565,7 @@ Dialog.execute = function(self)
 			local cmd = vm[1].exe[vm[1].pos + vm[1].off]
 			local fun = commands[cmd[1]]
 			local brk = fun(vm, cmd)
-			if brk then return end
+			if brk then return true end
 		end
 	end
 	-- Reset at end.
@@ -574,14 +575,3 @@ Dialog.execute = function(self)
 	self.object = nil
 	self.user = nil
 end
-
-------------------------------------------------------------------------------
-
-Protocol:add_handler{type = "DIALOG_ANSWER", func = function(event)
-	local ok,id,msg = event.packet:read("uint32", "string")
-	if not ok then return end
-	local dialog = Dialog.dict_id[id]
-	local player = Player:find{client = event.client}
-	if not dialog or not dialog.choices or not player.vision.objects[dialog.object] then return end
-	dialog:answer(player, msg)
-end}

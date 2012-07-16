@@ -18,7 +18,6 @@ ConfigFile.new = function(clss, args)
 	local self = Class.new(clss)
 	self.handle = Los.config_file_new(args)
 	assert(self.handle, string.format("creating config file %q failed", args[1] or args.name))
-	__userdata_lookup[self.handle] = self
 	return self
 end
 

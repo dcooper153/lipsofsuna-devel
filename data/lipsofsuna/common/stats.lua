@@ -1,3 +1,5 @@
+require "system/vision"
+
 --- Create and synchronize stats.
 -- @name Stats
 -- @class table
@@ -27,16 +29,17 @@ Stats.new = function(clss, args)
 	return self
 end
 
---- Tries to subtract a value from the specified skill.
+--- Tries to subtract a value from the specified stat.
 -- @param self Stats.
 -- @param name Stat name.
 -- @param value Value to subtract.
--- @return True if there was enough skill.
+-- @return True if there was enough stat.
 Stats.subtract = function(self, name, value)
 	local v = self.stats[name]
 	if not v or v.value < value then return end
+	v.value_prev = v.value
 	v.value = v.value - value
-	Vision:event{type = "skill-changed", id = self.id, skill = name}
+	self:notify_change(v)
 	return true
 end
 
@@ -115,6 +118,17 @@ Stats.has_skill = function(self, name)
 	return self.stats[name] ~= nil
 end
 
+--- Notifies vision listeners of a stat change.
+-- @param self Stats.
+-- @param stat Stat table.
+Stats.notify_change = function(self, stat)
+	if not Server.initialized then return end
+	if not stat.value_prev then return end
+	if math.floor(stat.value) == math.floor(stat.value_prev) then return end
+	Vision:event{type = "stat changed", id = self.id, name = stat.name,
+		maximum = stat.maximum, value = stat.value, value_prev = stat.value_prev}
+end
+
 --- Registers a skill.
 -- @param self Stats.
 -- @param args Arguments.<ul>
@@ -128,13 +142,14 @@ Stats.register = function(self, args)
 	if self.stats[args.name] then error("skill already exists") end
 	local v =
 	{
+		name = args.name,
 		maximum = args.maximum or 0,
 		regen = args.regen or 0,
 		prot = args.prot or "private",
 		value = math.max(0, math.min(args.value, args.maximum or 0))
 	}
 	self.stats[args.name] = v
-	Vision:event{type = "skill-changed", id = self.id, skill = args.name}
+	self:notify_change(v)
 	return v
 end
 
@@ -157,20 +172,19 @@ end
 Stats.set = function(self, name, value, maximum, regen)
 	local v = self.stats[name]
 	if not v then return end
-	local old = math.floor(v.value)
 	if maximum then
 		v.maximum = maximum
+		if not value then v.value_prev = v.value end
 		v.value = math.min(v.value, v.maximum)
 	end
 	if value then
+		v.value_prev = v.value
 		v.value = math.max(0, math.min(value, v.maximum))
 	end
 	if regen then
 		v.regen = regen
 	end
-	if math.floor(v.value) ~= old then
-		Vision:event{type = "skill-changed", id = self.id, skill = name}
-	end
+	self:notify_change(v)
 end
 
 --- Sets the maximum value of a skill.
@@ -181,8 +195,9 @@ Stats.set_maximum = function(self, name, value)
 	local v = self.stats[name]
 	if not v then return end
 	v.maximum = value
+	v.value_prev = v.value
 	v.value = math.min(v.value, v.maximum)
-	Vision:event{type = "skill-changed", id = self.id, skill = name}
+	self:notify_change(v)
 end
 
 --- Sets the regeneration speed of a skill.
@@ -202,9 +217,7 @@ end
 Stats.set_value = function(self, name, value)
 	local v = self.stats[name]
 	if not v then return end
-	local old = math.floor(v.value)
+	v.value_prev = v.value
 	v.value = math.max(0, math.min(value or 0, v.maximum))
-	if math.floor(v.value) ~= old then
-		Vision:event{type = "skill-changed", id = self.id, skill = name}
-	end
+	self:notify_change(v)
 end

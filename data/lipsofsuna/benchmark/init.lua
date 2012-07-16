@@ -3,6 +3,9 @@ Benchmark.class_name = "Benchmark"
 
 Benchmark.new = function(clss)
 	local self = Class.new(clss)
+	-- Initialize the game.
+	Game:init("benchmark")
+	Game.sectors.unload_time = nil
 	-- Create the objects.
 	self.objects = setmetatable({}, {__mode = "kv"})
 	local anims = {"idle", "walk", "strafe left"}
@@ -10,10 +13,10 @@ Benchmark.new = function(clss)
 	for i = 1,20 do
 		local o = Simulation:create_object_by_spec(spec)
 		local a = i/20*2*math.pi
-		o:set_motion_state(Vector(500,500,500) + Vector(math.cos(a), 0, math.sin(a)):multiply(i/4))
-		o:set_model()
-		o:add_animation(anims[i % 3 + 1])
-		o.realized = true
+		o:set_position(Vector(500,500,500) + Vector(math.cos(a), 0, math.sin(a)):multiply(i/4), true)
+		o.render:init(o)
+		o.render:add_animation(anims[i % 3 + 1])
+		o:set_visible(true)
 		self.objects[o.id] = o
 		self.object = o
 	end
@@ -27,8 +30,6 @@ Benchmark.new = function(clss)
 	-- Create the light.
 	self.light = Light{ambient = {0.3,0.3,0.3,1.0}, diffuse={0.6,0.6,0.6,1.0}, equation={1.0,0.0,0.01}}
 	self.light.enabled = true
-	-- Prevent the map from unloading.
-	Client.sectors.unload_time = nil
 	return self
 end
 

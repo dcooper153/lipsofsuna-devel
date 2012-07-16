@@ -15,14 +15,14 @@ Effect.play_global = function(clss, name)
 	local effect = Effectspec:find{name = name}
 	if not effect then return end
 	-- Create the effect object.
-	EffectObject{
-		object = object,
-		sound = effect.sound,
-		sound_delay = effect.sound_delay,
-		sound_pitch = effect.sound_pitch,
-		sound_positional = false,
-		sound_volume = effect.sound_volume,
-		realized = true}
+	if effect.sound then
+		SoundEffect{
+			sound = effect.sound,
+			sound_delay = effect.sound_delay,
+			sound_pitch = effect.sound_pitch,
+			sound_positional = false,
+			sound_volume = effect.sound_volume}
+	end
 	-- Quake the camera.
 	if effect.quake and Client.player_object then
 		Client:apply_quake(Client.player_object.position, effect.quake)
@@ -38,17 +38,25 @@ Effect.play_object = function(clss, name, object, node)
 	local n = node or effect.node
 	if n then p = object:find_node{name = n} end
 	-- Create the effect object.
-	EffectObject{
-		particle = effect.particle,
-		object = object,
-		node = p and n,
-		rotation_inherit = (effect.rotation ~= false),
-		sound = effect.sound,
-		sound_delay = effect.sound_delay,
-		sound_pitch = effect.sound_pitch,
-		sound_positional = effect.sound_positional,
-		sound_volume = effect.sound_volume,
-		realized = true}
+	if effect.particle then
+		ParticleEffect{
+			life = effect.particle_life,
+			object = object,
+			particle = effect.particle,
+			node = p and n,
+			rotation_mode = (effect.rotation and "parent" or nil)}
+	end
+	if effect.sound then
+		SoundEffect{
+			object = object,
+			node = p and n,
+			rotation_mode = (effect.rotation and "parent" or nil),
+			sound = effect.sound,
+			sound_delay = effect.sound_delay,
+			sound_pitch = effect.sound_pitch,
+			sound_positional = effect.sound_positional,
+			sound_volume = effect.sound_volume}
+	end
 	-- Quake the camera.
 	Client:apply_quake(object.position, effect.quake)
 end
@@ -58,15 +66,21 @@ Effect.play_world = function(clss, name, position)
 	local effect = Effectspec:find{name = name}
 	if not effect then return end
 	-- Create the effect object.
-	EffectObject{
-		particle = effect.particle,
-		position = position,
-		sound = effect.sound,
-		sound_delay = effect.sound_delay,
-		sound_pitch = effect.sound_pitch,
-		sound_positional = effect.sound_positional,
-		sound_volume = effect.sound_volume,
-		realized = true}
+	if effect.particle then
+		ParticleEffect{
+			life = effect.particle_life,
+			particle = effect.particle,
+			position = position}
+	end
+	if effect.sound then
+		SoundEffect{
+			position = position,
+			sound = effect.sound,
+			sound_delay = effect.sound_delay,
+			sound_pitch = effect.sound_pitch,
+			sound_positional = effect.sound_positional,
+			sound_volume = effect.sound_volume}
+	end
 	-- Quake the camera.
 	Client:apply_quake(Vector(x,y,z), effect.quake)
 end

@@ -52,25 +52,27 @@ end
 Widgets.Uistat.update = function(self, secs)
 	-- Call the base class update.
 	Widgets.Uiwidget.update(self, secs)
-	-- Update the skill values.
+	-- Update the stat values.
 	local object = Client.player_object
 	if not object then return end
-	local skill = object.stats[self.skill]
-	if skill then
-		if self.cap ~= skill.cap or self.value ~= skill.value then
-			self.cap = skill.cap
-			self.value = skill.value
+	local stats = object.stats
+	if not stats then return end
+	local stat = stats:get_skill(self.skill)
+	if stat then
+		if self.cap ~= stat.maximum or self.value ~= stat.value then
+			self.cap = stat.maximum
+			self.value = stat.value
 			self.timer = 2
 			self.need_repaint = true
 		end
 	end
 	-- Keep regenerating stats visible.
-	if skill and self.value < self.cap then
+	if stat and self.value < stat.maximum then
 		self.timer = 2
 	end
 	self.timer = self.timer - secs
 	-- Update the offset and visibility.
-	if skill and self.timer > 0 then
+	if stat and self.timer > 0 then
 		local mode = Program.video_mode
 		local pad = mode[1] - self.size.x
 		self.offset = Vector(pad / 2, mode[2] - self.index * Theme.text_height_1 * 1.2)

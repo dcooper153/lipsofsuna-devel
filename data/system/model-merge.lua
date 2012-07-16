@@ -15,7 +15,6 @@ Merger.class_name = "Merger"
 Merger.new = function(clss)
 	local self = Class.new(Merger)
 	self.handle = Los.merger_new()
-	__userdata_lookup[self.handle] = self
 	return self
 end
 

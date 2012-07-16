@@ -21,7 +21,6 @@ Database.new = function(clss, args)
 		local n = (type(args) == "string") and args or args.name
 		assert(self.handle, string.format("creating database %q failed", n))
 	end
-	__userdata_lookup[self.handle] = self
 	return self
 end
 

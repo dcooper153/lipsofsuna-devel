@@ -11,14 +11,20 @@ Ui:add_state{
 	end,
 	init = function()
 		Client.data.load.timer = 0
+		Client.data.load.finished = false
 	end,
 	update = function(secs)
-		if not Map or Map.initialized then
+		if Client.data.load.finished then
 			Ui.state = Client.data.load.next_state
+			return
 		end
 		if Client.data.load.timer >= 0.1 then
 			Client:create_world()
 			Map:init()
+			if Server.initialized then
+				Server:load()
+			end
+			Client.data.load.finished = true
 		end
 		Client.data.load.timer = Client.data.load.timer + secs
 	end}

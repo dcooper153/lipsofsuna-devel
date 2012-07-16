@@ -22,7 +22,6 @@ Animation.new = function(clss, name)
 	local self = Class.new(clss)
 	self.handle = Los.animation_new(name)
 	if not self.handle then return end
-	__userdata_lookup[self.handle] = self
 	return self
 end
 
@@ -34,7 +33,6 @@ Animation.copy = function(clss, anim)
 	local self = Class.new(clss)
 	self.handle = Los.animation_copy(anim.handle)
 	if not self.handle then return end
-	__userdata_lookup[self.handle] = self
 	return self
 end
 
@@ -46,7 +44,6 @@ Animation.load = function(clss, name)
 	local self = Class.new(clss)
 	self.handle = Los.animation_load(name)
 	if not self.handle then return end
-	__userdata_lookup[self.handle] = self
 	clss.dict_name[name] = self
 	return self
 end

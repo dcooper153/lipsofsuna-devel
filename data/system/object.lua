@@ -28,14 +28,14 @@ Object.new = function(clss, args)
 	-- happen when object was hidden and displayed again before being GC'd.
 	self.id = args and args.id or clss:get_free_id()
 	local old = clss.objects[self.id]
-	if old then old.realized = false end
+	if old then old:detach() end
 	clss.objects[self.id] = self
 	-- Copy arguments.
 	if args then
 		for k,v in pairs(args) do
 			if k ~= "realized" then self[k] = v end
 		end
-		if args.realized then self.realized = true end
+		if args.realized then self:set_visible(true) end
 	end
 	return self
 end
@@ -55,7 +55,7 @@ Object.find = function(self, args)
 		if not obj then return end
 		-- Optional distance check.
 		if args.point and args.radius then
-			if not obj.realized then return end
+			if not obj:get_visible() then return end
 			if (obj.position - args.point).length > args.radius then return end
 		end
 		return obj
@@ -103,7 +103,7 @@ end
 --- Detaches the object from the scene.
 -- @param self Object.
 Object.detach = function(self)
-	self.realized = false
+	self:set_visible(false)
 	Object.dict_active[self] = nil
 end
 
@@ -115,9 +115,95 @@ Object.refresh = function(self, args)
 	Los.object_refresh(self.handle, args)
 end
 
---- The local bounding box of the object.
--- @name Object.bounding_box
--- @class table
+--- Gets the local bounding box of the object.
+-- @oaram self Object.
+-- @return Bounding box.
+Object.get_bounding_box = function(self)
+	local m = rawget(self, "__model")
+	if not m then return Aabb{point = Vector(-0.1,-0.1,-0.1), size = Vector(0.2,0.2,0.2)} end
+	return m.bounding_box
+end
+
+--- Gets the position of the object.
+-- @param self Object.
+-- @return Vector.
+Object.get_position = function(self)
+	local v = rawget(self, "__position")
+	if not v then
+		v = Vector()
+		rawset(self, "__position", v)
+	end
+	Los.object_get_position(self.handle, v.handle)
+	return v
+end
+
+--- Sets the position of the object.
+-- @param self Object.
+-- @param v Vector.
+Object.set_position = function(self, v)
+	if not v then return end
+	Los.object_set_position(self.handle, v.handle)
+end
+
+--- Gets the rotation of the object.
+-- @param self Object.
+-- @return Quaternion.
+Object.get_rotation = function(self)
+	local v = rawget(self, "__rotation")
+	if not v then
+		v = Quaternion()
+		rawset(self, "__rotation", v)
+	end
+	Los.object_get_rotation(self.handle, v.handle)
+	return v
+end
+
+--- Sets the rotation of the object.
+-- @param self Object.
+-- @param v Quaternion.
+Object.set_rotation = function(self, v)
+	if not v then return end
+	Los.object_set_rotation(self.handle, v.handle)
+end
+
+--- Gets the model of the object.
+-- @param self Object.
+-- @return Model.
+Object.get_model = function(self, v)
+	return rawget(self, "__model")
+end
+
+--- Sets the model of the object.
+-- @param self Object.
+-- @param v Model.
+Object.set_model = function(self, v)
+	if type(v) == "string" then
+		self:set_model_name(v)
+	else
+		rawset(self, "__model", v)
+		rawset(self, "__particle", nil)
+		Los.object_set_model(self.handle, v and v.handle)
+	end
+end
+
+Object.get_visible = function(self)
+	return __objects_realized[self]
+	--return Los.object_get_visible(self.handle)
+end
+
+Object.set_visible = function(self, v)
+	if v then
+		if __objects_realized[self] then return end
+		__objects_realized[self] = true
+		Los.object_set_realized(self.handle, true)
+		Program:push_event{type = "object-visibility", object = self, visible = true}
+	else
+		if not __objects_realized[self] then return end
+		__objects_realized[self] = nil
+		Los.object_set_realized(self.handle, false)
+		Program:push_event{type = "object-visibility", object = self, visible = false}
+	end
+end
 
 --- The local center offset of the bounding box of the object.
 -- @name Object.center_offset
@@ -158,69 +244,26 @@ end
 -- @class table
 
 Object:add_getters{
-	bounding_box = function(self)
-		local m = rawget(self, "__model")
-		if not m then return Aabb{point = Vector(-0.1,-0.1,-0.1), size = Vector(0.2,0.2,0.2)} end
-		return m.bounding_box
-	end,
+	bounding_box = function(self) return self:get_bounding_box() end,
 	center_offset = function(self)
 		local m = rawget(self, "__model")
 		if not m then return Vector() end
 		return m.center_offset
 	end,
 	id = function(self) return Los.object_get_id(self.handle) end,
-	model = function(self) return rawget(self, "__model") end,
-	model_name = function(self)
-		local m = rawget(self, "__model")
-		return m and m.name or ""
-	end,
-	position = function(self)
-		local v = rawget(self, "__position")
-		if not v then
-			v = Vector()
-			rawset(self, "__position", v)
-		end
-		Los.object_get_position(self.handle, v.handle)
-		return v
-	end,
-	rotation = function(self)
-		local v = rawget(self, "__rotation")
-		if not v then
-			v = Quaternion()
-			rawset(self, "__rotation", v)
-		end
-		Los.object_get_rotation(self.handle, v.handle)
-		return v
-	end,
-	realized = function(self) return Los.object_get_realized(self.handle) end,
+	model = function(self) return self:get_model() end,
+	position = function(self) return self:get_position() end,
+	rotation = function(self) return self:get_rotation() end,
+	realized = function(self) return self:get_visible() end,
 	sector = function(self) return Los.object_get_sector(self.handle) end,
 	static = function(self, v) return Los.object_get_static(self.handle, v) end}
 
 Object:add_setters{
 	id = function(self, v) return Los.object_set_id(self.handle, v) end,
-	model = function(self, v)
-		local m = v
-		if type(v) == "string" then m = Model:find_or_load{file = v, mesh = Object.load_meshes} end
-		rawset(self, "__model", m)
-		rawset(self, "__particle", nil)
-		Los.object_set_model(self.handle, m and m.handle)
-	end,
-	model_name = function(self, v) self.model = Model:find_or_load{file = v, mesh = Object.load_meshes} end,
-	position = function(self, v) Los.object_set_position(self.handle, v.handle) end,
-	rotation = function(self, v) Los.object_set_rotation(self.handle, v.handle) end,
-	realized = function(self, v)
-		if v then
-			if __objects_realized[self] then return end
-			__objects_realized[self] = true
-			Los.object_set_realized(self.handle, true)
-			Program:push_event{type = "object-visibility", object = self, visible = true}
-		else
-			if not __objects_realized[self] then return end
-			__objects_realized[self] = nil
-			Los.object_set_realized(self.handle, false)
-			Program:push_event{type = "object-visibility", object = self, visible = false}
-		end
-	end,
+	model = function(self, v) self:set_model(v) end,
+	position = function(self, v) self:set_position(v) end,
+	rotation = function(self, v) self:set_rotation(v) end,
+	realized = function(self, v) self:set_visible(v) end,
 	static = function(self, v) Los.object_set_static(self.handle, v) end}
 
 __objects_realized = {}

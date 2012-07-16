@@ -1,4 +1,4 @@
-Player = Class()
+PlayerState = Class()
 
 local radian_wrap = function(x)
 	local y = x
@@ -11,9 +11,9 @@ local radian_wrap = function(x)
 	return y
 end
 
-Player.get_ignored_objects = function(clss)
-	local ignore = {clss.object}
-	local slots = clss.object.slots
+PlayerState.get_ignored_objects = function(clss)
+	local ignore = {Client.player_object}
+	local slots = Client.player_object.slots
 	if slots then
 		for k,v in pairs(slots.slots) do
 			table.insert(ignore, v)
@@ -22,9 +22,9 @@ Player.get_ignored_objects = function(clss)
 	return ignore
 end
 
-Player.pick_look = function(clss)
+PlayerState.pick_look = function(clss)
 	-- Make sure that the player is logged in.
-	if not clss.object then
+	if not Client.player_object then
 		Target.target_object = nil
 		return
 	end
@@ -33,12 +33,12 @@ Player.pick_look = function(clss)
 	if not r1 then return end
 	local p,o = Target:pick_ray{ray1 = r1, ray2 = r2}
 	-- Update highlighting.
-	if o ~= Target.target_object and Object.set_effect then
+	if o ~= Target.target_object then
 		if Target.target_object then
-			Target.target_object:set_effect()
+			Target.target_object.render:set_effect()
 		end
 		if o then
-			o:set_effect{shader = "highlight"}
+			o.render:set_effect{shader = "highlight"}
 		end
 	end
 	Target.target_object = o
@@ -58,19 +58,19 @@ Player.pick_look = function(clss)
 		Client:set_target_text()
 	end
 	-- Update the 3D crosshair position.
-	clss.crosshair_position = (p or r2) - (r2 - r1):normalize() * 0.1
+	Client.crosshair_position = (p or r2) - (r2 - r1):normalize() * 0.1
 end
 
-Player.tilt = 0
-Player.turn = 0
-Player.tilt_state = 0
-Player.turn_state = 0
-Player.rotation_curr = Quaternion()
-Player.rotation_prev = Quaternion()
-Player.rotation_sync_timer = 0
-Player.update_rotation = function(clss, secs)
-	if clss.object.dead then return end
-	local spec = Player.object.spec
+PlayerState.tilt = 0
+PlayerState.turn = 0
+PlayerState.tilt_state = 0
+PlayerState.turn_state = 0
+PlayerState.rotation_curr = Quaternion()
+PlayerState.rotation_prev = Quaternion()
+PlayerState.rotation_sync_timer = 0
+PlayerState.update_rotation = function(clss, secs)
+	if Client.player_object.dead then return end
+	local spec = Client.player_object.spec
 	-- Update turning.
 	clss.turn_state = clss.turn_state + clss.turn * secs
 	clss.turn_state = radian_wrap(clss.turn_state)
@@ -83,24 +83,10 @@ Player.update_rotation = function(clss, secs)
 	end
 	clss.tilt = 0
 	-- Update rotation.
-	local rot = Quaternion{euler = {clss.turn_state, 0, 0}}
-	clss.object:set_local_rotation(rot, -clss.tilt_state)
-	-- Sync rotation with the server.
-	-- Rotation takes at most 0.25 seconds to fully synchronize. Large changes
-	-- are sent immediately whereas smaller changes are grouped together to
-	-- reduce useless network traffic.
-	clss.rotation_curr = Quaternion{euler = {clss.turn_state, 0, -clss.tilt_state}}
-	clss.rotation_sync_timer = clss.rotation_sync_timer + secs
-	if (clss.rotation_prev - clss.rotation_curr).length > math.max(0, 0.1 - 0.4 * clss.rotation_sync_timer) then
-		clss:send_rotation()
+	if Game.initialized then
+		Game.messaging:client_event("rotate", clss.turn_state, clss.tilt_state)
 	end
 end
 
-Player.send_rotation = function(clss)
-	local r = clss.rotation_curr
-	clss.rotation_prev = r
-	Network:send{packet = Packet(packets.PLAYER_TURN, "float", r.x, "float", r.y, "float", r.z, "float", r.w)}
-end
-
-Player.update_pose = function(clss, secs)
+PlayerState.update_pose = function(clss, secs)
 end

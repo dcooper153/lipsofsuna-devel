@@ -26,7 +26,7 @@ end
 -- @return New models.
 Material.new = function(clss, args)
 	if type(args.model) == "string" then
-		args.model = Model:find_or_load{file = args.model}
+		args.model = Model:find_or_load(args.model)
 	end
 	local self = instfunc(clss, args)
 	clss.dict_id[self.id] = self

@@ -1,80 +1,5 @@
-print "INFO: Loading server scripts."
-
-require "common/unlocks"
-require "server/util"
-require "server/account"
-require "server/serialize"
-require "server/controls"
-require "server/chat"
-require "server/config"
-require "server/crafting"
-require "server/dialog"
-require "server/event"
-require "server/feat"
-require "server/global-event-manager"
-require "server/log"
-require "server/marker"
-require "server/sectors"
-require "server/admin"
-require "server/quest"
-require "server/modifier"
-require "server/editing"
-require "server/particles"
-File:require_directory("server/actions")
-File:require_directory("server/objects")
-File:require_directory("server/influences")
-
-Physics.GROUP_ACTORS = 0x0001
-Physics.GROUP_ITEMS = 0x0002
-Physics.GROUP_OBSTACLES = 0x1000
-Physics.GROUP_STATICS = 0x2000
-Physics.GROUP_HEIGHTMAP = 0x4000
-Physics.GROUP_VOXELS = 0x8000
-
--- Initialize the heightmap.
-if Map then Map:init() end
-
--- Initialize networking.
--- When the socket is up, we tell the local client that it can join.
-Network:host{port = Config.inst.server_port}
-Program:push_message{name = "join"}
-
--- Initialize the dynamic map.
-Generator.inst = Generator()
-if Settings.generate or Serialize:get_value("map_version") ~= Generator.map_version then
-	Generator.inst:generate()
-	Serialize:set_value("data_version", Serialize.data_version)
-	Unlocks:init(Serialize.db)
-	Unlocks:write_db()
-else
-	Serialize:load()
-	Unlocks:init(Serialize.db)
-	Unlocks:read_db()
-end
-Globaleventmanager:init()
-
--- Initialize unlock updates.
-Unlocks:unlock("skill", "Health lv1")
-Unlocks:unlock("skill", "Willpower lv1")
-Unlocks:unlock("spell type", "ranged spell")
-Unlocks:unlock("spell type", "spell on self")
-Unlocks:unlock("spell effect", "fire damage")
-Unlocks:unlock("spell effect", "light")
-Unlocks:unlock("spell effect", "physical damage")
-Unlocks:unlock("spell effect", "restore health")
-Unlocks.changed = function(self)
-	local p = Packet(packets.UNLOCK)
-	self:write_packet(p)
-	for k,v in pairs(Network.clients) do
-		Network:send{client = v, packet = p}
-	end
-end
-Unlocks:changed()
-
--- Initialize terrain updates.
-Voxel.block_changed_cb = function(index, stamp)
-	Vision:event{type = "voxel-block-changed", index = index, point = ARGH, stamp = stamp}
-end
+Game:init("server", Settings.file, Settings.port)
+Server:load()
 
 Program.sleep = 1/60
 Program.profiling = {}
@@ -93,4 +18,4 @@ while not Program.quit do
 end
 
 -- Save at exit.
-Serialize:save()
+Server:deinit()

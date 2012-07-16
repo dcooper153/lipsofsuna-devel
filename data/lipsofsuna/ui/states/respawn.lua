@@ -11,6 +11,6 @@ Ui:add_widget{
 	state = "respawn",
 	widget = function()
 		return Widgets.Uibutton("Respawn", function()
-			Network:send{packet = Packet(packets.PLAYER_RESPAWN)}
+			Game.messaging:client_event("respawn")
 		end)
 	end}

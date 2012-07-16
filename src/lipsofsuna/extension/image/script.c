@@ -1,5 +1,5 @@
 /* Lips of Suna
- * Copyright© 2007-2011 Lips of Suna development team.
+ * Copyright© 2007-2012 Lips of Suna development team.
  *
  * Lips of Suna is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as
@@ -58,12 +58,54 @@ static void Image_new (LIScrArgs* args)
 	liscr_args_seti_stack (args);
 }
 
+static void Image_blit (LIScrArgs* args)
+{
+	LIImgImage* self;
+	LIImgImage* image;
+	LIScrData* value;
+
+	self = args->self;
+	if (liscr_args_geti_data (args, 0, LIEXT_SCRIPT_IMAGE, &value))
+	{
+		image = liscr_data_get_data (value);
+		liimg_image_blit (self, image);
+	}
+}
+
+static void Image_copy (LIScrArgs* args)
+{
+	LIImgImage* image;
+	LIImgImage* src;
+	LIScrData* data;
+
+	/* Get arguments. */
+	if (!liscr_args_geti_data (args, 0, LIEXT_SCRIPT_IMAGE, &data))
+		return;
+	src = liscr_data_get_data (data);
+
+	/* Allocate the image. */
+	image = liimg_image_new_from_image (src);
+	if (image == NULL)
+		return;
+
+	/* Allocate the userdata. */
+	data = liscr_data_new (args->script, args->lua, image, LIEXT_SCRIPT_IMAGE, liimg_image_free);
+	if (data == NULL)
+	{
+		liimg_image_free (image);
+		return;
+	}
+	liscr_args_seti_stack (args);
+}
+
 /*****************************************************************************/
 
 void liext_script_image (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_IMAGE, "image_new", Image_new);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_blit", Image_blit);
+	liscr_script_insert_mfunc (self, LIEXT_SCRIPT_IMAGE, "image_copy", Image_copy);
 }
 
 /** @} */

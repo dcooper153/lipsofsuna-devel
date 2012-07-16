@@ -1,6 +1,12 @@
 Ui:add_state{
 	state = "dialog",
 	label = "Dialog",
+	update = function()
+		local object = Client.active_dialog_object
+		if not object or not object:get_visible() then
+			Ui:pop_state()
+		end
+	end,
 	init = function()
 		local o = Client.active_dialog_object
 		if not o then return end

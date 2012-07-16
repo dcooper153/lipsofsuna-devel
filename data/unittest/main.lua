@@ -17,6 +17,7 @@ end
 -- @param self Unittest class.
 Unittest.add_all = function(self)
 	File:require_directory("tests")
+	File:require_directory("tests/lipsofsuna")
 end
 
 --- Runs all loaded unittests.

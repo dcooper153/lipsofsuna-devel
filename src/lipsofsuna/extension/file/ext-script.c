@@ -114,6 +114,55 @@ static void File_scan_directory (LIScrArgs* args)
 	lisys_dir_free (dir);
 }
 
+static void File_scan_save_directory (LIScrArgs* args)
+{
+	int i;
+	int count;
+	char* path_abs;
+	const char* name;
+	const char* path;
+	LIExtModule* module;
+	LISysDir* dir;
+
+	/* Construct the path. */
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_FILE);
+	if (!liscr_args_geti_string (args, 0, &path))
+		return;
+	if (strstr (path, ".."))
+		return;
+	for (i = 0 ; i < strlen (path) ; i++)
+	{
+		if ((path[i] < 'a' || path[i] > 'z') && (path[i] < '0' || path[i] > '9') && 
+		    (path[i] != '/' && path[i] != '.' && path[i] != '-' && path[i] != '_'))
+			return;
+	}
+	path_abs = lisys_path_concat (module->program->paths->module_data_save, path, NULL);
+
+	/* Scan the directory. */
+	dir = lisys_dir_open (path_abs);
+	lisys_free (path_abs);
+	if (dir == NULL)
+		return;
+	lisys_dir_set_sorter (dir, lisys_dir_sorter_alpha);
+	if (!lisys_dir_scan (dir))
+	{
+		lisys_dir_free (dir);
+		return;
+	}
+
+	/* Return the file names. */
+	liscr_args_set_output (args, LISCR_ARGS_OUTPUT_TABLE_FORCE);
+	count = lisys_dir_get_count (dir);
+	for (i = 0 ; i < count ; i++)
+	{
+		name = lisys_dir_get_name (dir, i);
+		if (name[0] != '.')
+			liscr_args_seti_string (args, name);
+	}
+
+	lisys_dir_free (dir);
+}
+
 static void File_write (LIScrArgs* args)
 {
 	int i;
@@ -156,6 +205,7 @@ void liext_script_file (
 {
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_FILE, "file_read", File_read);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_FILE, "file_scan_directory", File_scan_directory);
+	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_FILE, "file_scan_save_directory", File_scan_save_directory);
 	liscr_script_insert_cfunc (self, LIEXT_SCRIPT_FILE, "file_write", File_write);
 }
 

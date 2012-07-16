@@ -1,5 +1,5 @@
 local count_monsters = function(sector, objects)
-	if not Generator.inst:is_overworld_sector_by_id(sector) then return 0 end
+	if not Server.generator:is_overworld_sector_by_id(sector) then return 0 end
 	local monsters = math.random(1, 2)
 	for k,obj in pairs(objects) do
 		if obj.spec.type == "lizardman" then
@@ -13,7 +13,7 @@ Globaleventspec{
 	name = "lizardman attack",
 	duration = 200,
 	sector_created = function(self, event, sector, loaded, objects)
-		if not Generator.inst:is_overworld_sector_by_id(sector) then return end
+		if not Server.generator:is_overworld_sector_by_id(sector) then return end
 		local count = count_monsters(sector, objects)
 		local spawns = Utils:find_spawn_points_in_sector(sector, count, true)
 		for k,v in pairs(spawns) do
@@ -34,7 +34,7 @@ Globaleventspec{
 		-- Start the event at a suitable moment.
 		local check = function(player, status)
 			-- FIXME: The condition is too arbitrary.
-			if not Generator.inst:is_overworld_sector_by_point(player.position) then return end
+			if not Server.generator:is_overworld_sector_by_point(player.position) then return end
 			if #status.explored < 5 then return end
 			if #status.eaten < 3 then return end
 			if status.eaten[3] < status.explored[1]  then return end
@@ -43,9 +43,9 @@ Globaleventspec{
 			if t - status.eaten[3] > 200 then return end
 			return true
 		end
-		for k,v in pairs(Globaleventmanager.player_states) do
+		for k,v in pairs(Server.events.player_states) do
 			if check(k, v) then
-				Globaleventmanager:start_event("lizardman attack")
+				Server.events:start_event("lizardman attack")
 				break
 			end
 		end

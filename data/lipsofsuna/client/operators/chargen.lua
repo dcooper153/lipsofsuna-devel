@@ -1,3 +1,9 @@
+local scale255 = function(t)
+	local res = {}
+	for k,v in pairs(t) do res[k] = v * 255 end
+	return res
+end
+
 Operators.chargen = Class()
 Operators.chargen.char = {}
 Operators.chargen.data = {}
@@ -17,7 +23,10 @@ Operators.chargen.list_races = {
 -- @param self Operator.
 Operators.chargen.init = function(self)
 	-- Create the object.
-	self.data.object = Actor{position = Vector(1, 1, 1), realized = true}
+	self.data.merger = Merger()
+	self.data.render = RenderObject()
+	self.data.render:set_position(Vector(1, 1, 1))
+	self.data.render:set_visible(true)
 	self:randomize()
 	-- Create the camera.
 	self.data.translation = Vector(0.3, 1.8, -2)
@@ -35,7 +44,7 @@ end
 --
 -- @param self Operator.
 Operators.chargen.reset = function(self)
-	if self.data.object then self.data.object:detach() end
+	if self.data.render then self.data.render:set_visible(false) end
 	self.data = {}
 	self.char = {
 		body = {0,0,0,0,0,0,0,0,0,0},
@@ -59,60 +68,20 @@ end
 --
 -- @param self Operator.
 Operators.chargen.apply = function(self)
-	local hair_rgb = Color:hsv_to_rgb(self.char.hair_color)
-	local eye_rgb = Color:hsv_to_rgb(self.char.eye_color)
-	local skin_rgb = Color:hsv_to_rgb(self.char.skin_color)
-	local packet = Packet(packets.CHARACTER_CREATE,
-		"string", self.char.name,
-		"string", self.char.race,
-		-- Body style.
-		"uint8", 255 * self.char.height,
-		"uint8", 255 * self.char.body[1],
-		"uint8", 255 * self.char.body[2],
-		"uint8", 255 * self.char.body[3],
-		"uint8", 255 * self.char.body[4],
-		"uint8", 255 * self.char.body[5],
-		"uint8", 255 * self.char.body[6],
-		"uint8", 255 * self.char.body[7],
-		"uint8", 255 * self.char.body[8],
-		"uint8", 255 * self.char.body[9],
-		"uint8", 255 * self.char.body[10],
-		-- Head style.
-		"string", self.char.head_style,
-		-- Eye style.
-		"string", "default",
-		"uint8", 255 * eye_rgb[1],
-		"uint8", 255 * eye_rgb[2],
-		"uint8", 255 * eye_rgb[3],
-		-- Face style.
-		"uint8", 255 * self.char.face[1],
-		"uint8", 255 * self.char.face[2],
-		"uint8", 255 * self.char.face[3],
-		"uint8", 255 * self.char.face[4],
-		"uint8", 255 * self.char.face[5],
-		"uint8", 255 * self.char.face[6],
-		"uint8", 255 * self.char.face[7],
-		"uint8", 255 * self.char.face[8],
-		"uint8", 255 * self.char.face[9],
-		"uint8", 255 * self.char.face[10],
-		"uint8", 255 * self.char.face[11],
-		"uint8", 255 * self.char.face[12],
-		"uint8", 255 * self.char.face[13],
-		"uint8", 255 * self.char.face[14],
-		"uint8", 255 * self.char.face[15],
-		-- Hair style.
-		"string", self.char.hair_style,
-		"uint8", 255 * hair_rgb[1],
-		"uint8", 255 * hair_rgb[2],
-		"uint8", 255 * hair_rgb[3],
-		-- Skin style.
-		"string", self.char.skin_style,
-		"uint8", 255 * skin_rgb[1],
-		"uint8", 255 * skin_rgb[2],
-		"uint8", 255 * skin_rgb[3],
-		-- Spawn point
-		"string", self.char.spawn_point)
-	Network:send{packet = packet}
+	Game.messaging:client_event("create character", {
+		body_style = scale255(self.char.body),
+		eye_color = scale255(Color:hsv_to_rgb(self.char.eye_color)),
+		eye_style = self.char.eye_style,
+		face_style = scale255(self.char.face),
+		hair_color = scale255(Color:hsv_to_rgb(self.char.hair_color)),
+		hair_style = self.char.hair_style,
+		head_style = self.char.head_style,
+		body_scale = self.char.height,
+		name = self.char.name,
+		race = self.char.race,
+		skin_color = scale255(Color:hsv_to_rgb(self.char.skin_color)),
+		skin_style = self.char.skin_style,
+		spawn_point = self.char.spawn_point})
 end
 
 --- Handles character generator controls.
@@ -162,7 +131,7 @@ end
 Operators.chargen.rotate = function(self, value)
 	local rad = math.pi * value / 300
 	local rot = Quaternion{axis = Vector(0, 1, 0), angle = rad}
-	self.data.object.rotation = self.data.object.rotation * rot
+	self.data.render:set_rotation(self.data.render:get_rotation() * rot)
 end
 
 --- Translates the model of the character creator.
@@ -183,35 +152,48 @@ end
 -- @param self Operator.
 -- @param secs Seconds since the last update.
 Operators.chargen.update = function(self, secs)
-	-- Update model.
+	local spec = Actorspec:find{name = self.char.race .. "-player"}
+	-- Build models.
 	if self.data.update_needed then
-		local object = self.data.object
-		local spec = Actorspec:find{name = self.char.race .. "-player"}
+		ModelBuilder:build_with_merger(self.data.merger, {
+			beheaded = false,
+			body_scale = self.char.height,
+			body_style = scale255(self.char.body),
+			equipment = {},
+			eye_color = Color:hsv_to_rgb(self.char.eye_color),
+			eye_style = self.char.eye_style,
+			face_style = scale255(self.char.face),
+			hair_color = Color:hsv_to_rgb(self.char.hair_color),
+			hair_style = self.char.hair_style,
+			head_style = self.char.head_style,
+			nudity = Client.options.nudity_enabled,
+			skin_color = Color:hsv_to_rgb(self.char.skin_color),
+			skin_style = self.char.skin_style,
+			spec = spec})
 		self.data.update_needed = nil
-		object.spec = spec
-		object.body_scale = self.char.height
-		object.body_style = self.char.body
-		object.equipment = {}
-		object.eye_color = Color:hsv_to_rgb(self.char.eye_color)
-		object.eye_style = nil
-		object.face_style = self.char.face
-		object.hair_color = Color:hsv_to_rgb(self.char.hair_color)
-		object.hair_style = self.char.hair_style
-		object.head_style = self.char.head_style
-		object.skin_color = Color:hsv_to_rgb(self.char.skin_color)
-		object.skin_style = self.char.skin_style
-		object:set_model()
-		object:add_animation("idle")
-		if self.dump_presets then
-			print(self.data.object:write_preset())
-		end
 	end
-	self.data.object:refresh()
+	-- Apply models.
+	local model = self.data.merger:pop_model()
+	if model then
+		-- Set the new model.
+		local r = RenderModel(model)
+		if self.data.render.model then
+			self.data.render:replace_model(self.data.render.model, r)
+		else
+			self.data.render:add_model(r)
+		end
+		self.data.render.model = r
+		-- Reset the animation.
+		local args = spec:get_animation_arguments("idle")
+		self.data.render:animate(args)
+		-- Set the body scale.
+		local args = RenderUtils:create_scale_animation(spec, self.char.height)
+		if args then self.data.render:animate(args) end
+	end
 	-- Update the camera.
-	self.data.camera.target_position = self.data.object.position + self.data.translation
+	self.data.camera.target_position = self.data.render:get_position() + self.data.translation
 	self.data.camera.target_rotation = Quaternion{axis = Vector(0, 1, 0), angle = math.pi}
 	self.data.camera:update(secs)
-	--self:update_camera()
 	Client:update_camera()
 	-- Update lighting.
 	Lighting:update(secs)

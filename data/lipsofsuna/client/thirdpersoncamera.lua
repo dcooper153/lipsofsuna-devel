@@ -59,8 +59,8 @@ ThirdPersonCamera.get_position_displacement = function(self, pos, rot, turn)
 		local score = 3 * dist + (i + 1)
 		-- Prevent the crosshair corrected rotation from diverging too much
 		-- from the look direction when the target is very close.
-		if Player.crosshair_position then
-			local dir = (Player.crosshair_position - center):normalize()
+		if Client.crosshair_position then
+			local dir = (Client.crosshair_position - center):normalize()
 			local rot1 = Quaternion{dir = dir, up = Vector(0,1,0)}
 			local dir1 = rot * Vector(0,0,-1)
 			local dir2 = rot1 * Vector(0,0,-1)
@@ -78,7 +78,7 @@ end
 
 ThirdPersonCamera.get_rotation_displacement = function(self, pos, rot, ratio)
 	-- Rotate the 3D cursor to the screen center.
-	local cur = Player.crosshair_position or pos + rot * Vector(0,0,-5)
+	local cur = Client.crosshair_position or pos + rot * Vector(0,0,-5)
 	local dir = (cur - pos):normalize()
 	local drot = Quaternion{dir = dir, up = Vector(0,1,0)}
 	-- Damp cases when the 3D cursor is too close.
@@ -89,8 +89,8 @@ end
 
 ThirdPersonCamera.get_transform = function(self)
 	-- Calculate the initial rotation.
-	local turn = self.turn_state + self.object.rotation.euler[1]
-	local tilt = self.tilt_state + (self.object.tilt or 0)
+	local turn = self.turn_state + self.object:get_turn_angle()
+	local tilt = self.tilt_state + self.object:get_tilt_angle()
 	local rot = Quaternion{euler = {turn, 0, tilt}}
 	local turn1 = Quaternion{euler = {turn}}
 	-- Calculate the initial center position.

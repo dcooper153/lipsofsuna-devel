@@ -21,7 +21,6 @@ Vision.new = function(clss, args)
 	self.id = args and args.id or 0
 	self.events = {}
 	self.objects = setmetatable({}, {__mode = "k"})
-	__userdata_lookup[self.handle] = self
 	if args then
 		for k,v in pairs(args) do self[k] = v end
 	end

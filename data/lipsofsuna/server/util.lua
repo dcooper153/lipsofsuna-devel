@@ -11,7 +11,7 @@ Utils = Class()
 -- @return True if there's room for the model.
 Utils.check_room = function(clss, point, model)
 	-- FIXME: Should rather do physics based testings.
-	for k,v in pairs(ServerObject.objects) do
+	for k,v in pairs(SimulationObject.objects) do
 		local d = (v.position - point).length
 		if d < 1.5 then return end
 	end
@@ -145,7 +145,7 @@ end
 Utils.find_spawn_points_in_sector = function(clss, sector, count, allow_yield)
 	local c = Vector()
 	local num = 0
-	local org = Serialize.sectors:get_sector_offset(sector)
+	local org = Game.sectors:get_sector_offset(sector)
 	local res = {}
 	local check = function(c)
 		-- Find the voxel floor.
@@ -290,7 +290,7 @@ end
 Utils.explosion = function(clss, point, radius)
 	local r1 = radius or 1
 	local r2 = (r1 + 3) * Voxel.tile_size
-	Effect:play{effect = "explosion1", point = point}
+	Server:world_effect(point, "explosion1")
 	-- Damage nearby tiles.
 	local _,ctr = Voxel:find_tile{point = point}
 	for x=-r1,r1 do
@@ -304,7 +304,7 @@ Utils.explosion = function(clss, point, radius)
 		end
 	end
 	-- Damage nearby objects.
-	for k1,v1 in pairs(ServerObject:find{point = point, radius = r2}) do
+	for k1,v1 in pairs(SimulationObject:find{point = point, radius = r2}) do
 		local diff = v1.position - point
 		local frac = diff.length / r2
 		local mult = 10 * math.min(100, v1.mass)
@@ -345,7 +345,7 @@ Voxel.damage = function(self, user, point)
 	-- Play collapse effect.
 	if m.effect_collapse then
 		local center = (point + Vector(0.5,0.5,0.5)) * Voxel.tile_size
-		Effect:play{effect = m.effect_collapse, point = center}
+		Server:world_effect(center, m.effect_collapse)
 	end
 	-- Change tile type.
 	local n = Material:find{name = m.mining_transform}

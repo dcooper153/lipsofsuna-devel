@@ -6,7 +6,7 @@ Globaleventspec{
 		if event.timer < 60 then return end
 		event.timer = 0
 		-- Find the first spawn point.
-		local spawn = Globaleventmanager:find_actor_spawn_point()
+		local spawn = Server.events:find_actor_spawn_point()
 		if not spawn then return end
 		-- Spawn the brigands.
 		Voxel:place_actor{point = spawn:copy():multiply(Voxel.tile_scale), name = "brigandmale"}

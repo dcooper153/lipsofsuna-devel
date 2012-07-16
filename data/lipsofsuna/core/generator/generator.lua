@@ -98,14 +98,14 @@ Generator.generate = function(self, args)
 		return true
 	end
 	-- Remove all player characters.
-	for k,v in pairs(Player.clients) do
+	for k,v in pairs(Server.players_by_client) do
 		v:detach(true)
 	end
-	Player.clients = {}
+	Server.players_by_client = {}
 	-- Reset the world.
 	self:update_status(0, "Resetting world")
 	Marker:reset()
-	Sectors.instance:unload_world()
+	Game.sectors:unload_world()
 	-- Place special areas.
 	-- Regions have dependencies so we need to place them in several passes.
 	-- The region tables are filled but the map is all empty after this.
@@ -171,24 +171,24 @@ Generator.generate = function(self, args)
 	-- Generate static objects.
 	self:generate_overworld()
 	local statics = {}
-	for k,v in pairs(Staticobject.dict_id) do
+	for k,v in pairs(Game.static_objects_by_id) do
 		statics[k] = v
 	end
 	-- Save the map.
 	self:update_status(0, "Saving the map")
-	Serialize:clear_objects()
-	Sectors.instance:save_world(true, function(p) self:update_status(p) end)
-	Sectors.instance:unload_world()
-	for k,v in pairs(statics) do v.realized = true end
-	Serialize:save_static_objects()
-	Serialize:set_value("map_version", Generator.map_version)
+	Server.serialize:clear_objects()
+	Game.sectors:save_world(true, function(p) self:update_status(p) end)
+	Game.sectors:unload_world()
+	for k,v in pairs(statics) do v:set_visible(true) end
+	Server.serialize:save_static_objects()
+	Server.serialize:set_value("map_version", Generator.map_version)
 	-- Save map markers.
 	self:update_status(0, "Saving quests")
-	Serialize:save_generator(true)
-	Serialize:save_markers(true)
-	Serialize:save_quests(true)
-	Serialize:save_accounts(true)
-	Serialize:clear_world_object_decay()
+	Server.serialize:save_generator(true)
+	Server.serialize:save_markers(true)
+	Server.serialize:save_quests(true)
+	Server.serialize:save_accounts(true)
+	Server.serialize:clear_world_object_decay()
 	-- Discard events emitted during map generation so that they
 	-- don't trigger when the game starts.
 	self:update_status(0, "Finishing")
@@ -198,9 +198,8 @@ Generator.generate = function(self, args)
 	repeat until not Program:pop_event()
 	-- Inform players of the generation being complete.
 	-- All accounts were erased so clients need to re-authenticate.
-	local status = Packet(packets.CLIENT_AUTHENTICATE)
 	for k,v in pairs(Network.clients) do
-		Network:send{client = v, packet = status}
+		Game.messaging:server_event("login", v)
 	end
 end
 
@@ -391,14 +390,13 @@ end
 -- @param client Specific client to inform or nil to inform all.
 -- @return Network packet.
 Generator.inform_clients = function(self, client)
-	local p = Packet(packets.GENERATOR_STATUS,
-		"string", self.prev_message or "",
-		"float", self.prev_fraction or 0)
+	local msg = self.prev_message or ""
+	local prg = self.prev_fraction or 0
 	if client then
-		Network:send{client = client, packet = p}
+		Game.messaging:server_event("generator status", client, msg, prg)
 	else
 		for k,v in pairs(Network.clients) do
-			Network:send{client = v, packet = p}
+			Game.messaging:server_event("generator status", v, msg, prg)
 		end
 	end
 end
@@ -660,6 +658,9 @@ end
 Generator.get_sector_offset_by_tile = function(self, tile)
 	return tile:copy():divide(Voxel.tiles_per_line):round()
 end
+
+------------------------------------------------------------------------------
+-- TODO: Move to utils
 
 Generator.get_sector_tile_by_id = function(self, id)
 	return self:get_sector_offset_by_id(id):multiply(Voxel.tiles_per_line)

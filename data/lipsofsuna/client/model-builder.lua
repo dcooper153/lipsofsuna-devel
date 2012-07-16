@@ -1,17 +1,48 @@
 ModelBuilder = Class()
 ModelBuilder.class_name = "ModelBuilder"
 
---- Builds the mesh for the given object.
+--- Builds the mesh for the given actor.
 -- @param clss ModelBuilder class.
--- @param object Object whose model to build and set.
--- @param args Model building arguments.
-ModelBuilder.build = function(clss, object, args)
+-- @param object Object whose model to build.
+ModelBuilder.build_for_actor = function(clss, object)
+	if not object.spec then return end
+	if not object.spec.models then return end
+	-- Create the equipment list.
+	equipment = {}
+	for k in pairs(object.spec.equipment_slots) do
+		local item = object.inventory:get_object_by_slot(k)
+		if item then equipment[k] = item.spec.name end
+	end
 	-- Create or reuse the model merger.
 	local merger = object.model_merger
 	if not merger then
 		merger = Merger()
 		object.model_merger = merger
 	end
+	-- Build the character model in a separate thread.
+	-- The result is handled in the tick handler in event.lua.
+	clss:build_with_merger(merger, {
+		beheaded = object.beheaded,
+		body_scale = object.body_scale,
+		body_style = object.body_style,
+		equipment = equipment,
+		eye_color = Color:ubyte_to_float(object.eye_color),
+		eye_style = object.eye_style,
+		face_style = object.face_style,
+		hair_color = Color:ubyte_to_float(object.hair_color),
+		hair_style = object.hair_style,
+		head_style = object.head_style,
+		nudity = Client.options.nudity_enabled,
+		skin_color = Color:ubyte_to_float(object.skin_color),
+		skin_style = object.skin_style,
+		spec = object.spec})
+end
+
+--- Builds the mesh for the given object.
+-- @param clss ModelBuilder class.
+-- @param merger Model merger to use.
+-- @param args Model building arguments.
+ModelBuilder.build_with_merger = function(clss, merger, args)
 	-- Get the base meshes.
 	local meshes = {skeleton = args.spec.model}
 	for k,v in pairs(args.spec.models) do
@@ -63,7 +94,7 @@ ModelBuilder.build = function(clss, object, args)
 		end
 	end
 	-- Morph and merge the submodels.
-	local model = Model:find_or_load{file = meshes["skeleton"]}
+	local model = Model:find_or_load(meshes["skeleton"])
 	if model then merger:add_model(model) end
 	meshes["skeleton"] = nil
 	for k,v in pairs(meshes) do
@@ -92,12 +123,12 @@ end
 -- @param args Model building arguments.
 ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 	-- Load the model.
-	local ref = Model:find_or_load{file = file}
+	local ref = Model:find_or_load(file)
 	local morph = {}
 	local add = function(name, value)
 		if not value then return end
 		table.insert(morph, name)
-		table.insert(morph, value)
+		table.insert(morph, value / 255)
 	end
 	-- Face customization.
 	if args.face_style and (string.match(name, ".*head.*") or string.match(name, ".*eye.*")) then
@@ -122,10 +153,10 @@ ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 		add("arms muscular", args.body_style[1])
 		add("body thin", args.body_style[2])
 		if args.body_style[3] then
-			if args.body_style[3] < 0.5 then
-				add("breast small", 1 - 2 * args.body_style[3])
-			elseif args.body_style[3] > 0.5 then
-				add("breast big", 2 * args.body_style[3] - 1)
+			if args.body_style[3] < 127 then
+				add("breast small", 255 - 2 * args.body_style[3])
+			elseif args.body_style[3] > 127 then
+				add("breast big", 2 * args.body_style[3] - 255)
 			end
 		end
 		add("hips wide", args.body_style[4])
@@ -134,7 +165,7 @@ ModelBuilder.build_submesh = function(clss, merger, name, file, args)
 		add("waist fat", args.body_style[7])
 		add("waist wide", args.body_style[8])
 		if args.body_style[9] then
-			add("shoulder thin", 1 - args.body_style[9])
+			add("shoulder thin", 255 - args.body_style[9])
 		end
 	end
 	-- Morph and merge.

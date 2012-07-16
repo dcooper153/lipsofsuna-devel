@@ -1,6 +1,8 @@
 require "client/firstpersoncamera"
 require "client/thirdpersoncamera"
 require "client/model-builder"
+require "client/render-object"
+require "client/terrain-sync"
 require "editor/editor"
 require "common/skills"
 require "common/unlocks"
@@ -21,10 +23,7 @@ Client.init = function(self)
 	self.options = Options.inst
 	Operators.controls:init()
 	Operators.controls:load()
-	-- Initialize the world.
-	self.sectors = Sectors{database = Client.db, save_objects = false}
-	self.sectors:erase_world()
-	-- Initielize the editor.
+	-- Initialize the editor.
 	self.editor = Editor()
 	-- Initialize the camera.
 	-- These need to be initialized before options since they'll be
@@ -34,23 +33,24 @@ Client.init = function(self)
 	self.camera_mode = "third-person"
 	-- Initialize data.
 	self:reset_data()
+	self.terrain_sync = TerrainSync()
 	-- Initialize helper threads.
 	self.threads = {}
 end
 
 Client.add_speech_text = function(self, args)
-	-- FIXME
-	Sound:effect{object = args.object, effect = "spring-000"}
 	-- Add to the chat log.
 	Client:append_log("<" .. args.name .. "> " .. args.text)
+	-- Play the sound effect.
+	Effect:play_object("chat1", args.object)
 	-- Create a text bubble.
-	local bounds = args.object.bounding_box
+	local bounds = args.object:get_bounding_box()
 	local offset = bounds.point.y + bounds.size.y + 0.5
 	TextBubble{
 		life = 5,
 		fade = 1,
 		object = args.object,
-		position = Vector(0,offset,0),
+		offset = Vector(0,offset,0),
 		text = args.text,
 		text_color = {1,1,1,1},
 		text_font = "medium"}
@@ -61,7 +61,7 @@ Client.add_damage_text = function(self, args)
 		life = 3,
 		fade = 1,
 		object = args.object,
-		position = Vector(0,2,0),
+		offset = Vector(0,2,0),
 		text = args.text,
 		text_color = args.color,
 		text_font = "medium",
@@ -93,8 +93,10 @@ end
 --- Creates the static terrain and objects of the world.
 -- @param self Client.
 Client.create_world = function(self)
-	for k,v in pairs(Object.objects) do v:detach() end
-	self.sectors:erase_world()
+	if not Server.initialized then
+		for k,v in pairs(Object.objects) do v:detach() end
+		Game.sectors:unload_world()
+	end
 end
 
 Client.reset_data = function(self)
@@ -124,18 +126,101 @@ Client.reset_data = function(self)
 	end
 end
 
-Client.update = function(self)
+Client.update = function(self, secs)
+	-- Emit key repeat events.
+	local t = Program.time
+	for k,v in pairs(Binding.dict_press) do
+		if t - v.time > 0.05 then
+			v.type = "keyrepeat"
+			v.mods = Binding.mods
+			v.time = t
+			Ui:handle_event(v)
+		end
+	end
+	-- Update the user interface state.
+	Ui:update(secs)
+	-- Update the window size.
+	if Ui.was_resized then
+		local v = Program.video_mode
+		self.options.window_width = v[1]
+		self.options.window_height = v[2]
+		self.options.fullscreen = v[3]
+		self.options.vsync = v[4]
+		self.options:save()
+	end
+	-- Update the simulation.
+	Simulation:update(secs)
+	-- Update the benchmark.
+	if self.benchmark then
+		self.benchmark:update(secs)
+		return
+	end
+	-- Update the connection status.
+	if self.connected and not Network.connected then
+		self:terminate_game()
+		self.options.host_restart = false
+		self.data.connection.active = false
+		self.data.connection.waiting = false
+		self.data.connection.connecting = false
+		self.data.connection.text = "Lost connection to the server!"
+		self.data.load.next_state = "start-game"
+		Ui.state = "load"
+	end
+	-- Update the player state.
+	if self.player_object then
+		PlayerState:update_pose(secs)
+		PlayerState:update_rotation(secs)
+		self.camera1.object = self.player_object
+		self.camera3.object = self.player_object
+		self.camera1:update(secs)
+		self.camera3:update(secs)
+		Lighting:update(secs)
+		-- Sound playback.
+		local p,r = self.player_object:find_node{name = "#neck", space = "world"}
+		if p then
+			Sound.listener_position = p
+			Sound.listener_rotation = r
+		else
+			Sound.listener_position = self.player_object.position + Vector(0,1.5,0)
+			Sound.listener_rotation = self.player_object.rotation
+		end
+		local vel = self.player_object.velocity
+		if vel then Sound.listener_velocity = vel end
+		-- Refresh the active portion of the map.
+		self.player_object:refresh()
+	end
+	-- Update effects.
+	-- Must be done after objects to ensure correct anchoring.
+	if Game.initialized then
+		for k in pairs(Game.scene_nodes_by_ref) do
+			k:update(secs)
+		end
+	end
+	-- Update text bubbles.
+	-- Must be done after camera for the bubbles to stay fixed.
+	for k in pairs(TextBubble.dict) do
+		k:update(secs)
+	end
+	-- Update the 3D cursor.
+	-- This really needs to be done every frame since the 3rd person
+	-- camera suffers greatly from any big cursor position changes.
+	if self.player_object and Ui.pointer_grab then
+		PlayerState:pick_look()
+	else
+		Target.target_object = nil
+	end
 	-- FIXME
-	if not self.player_object then return end
-	self:update_camera()
-	local player_y = self.player_object.position.y
-	local overworld_y = Map.heightmap.position.y - 10
-	local overworld = (player_y > overworld_y)
-	Map.heightmap.visible = overworld
-	Lighting:set_dungeon_mode(not overworld)
-	local wd = overworld and Options.inst.view_distance or Options.inst.view_distance_underground
-	self.camera1.far = wd
-	self.camera3.far = wd
+	if self.player_object then
+		self:update_camera()
+		local player_y = self.player_object.position.y
+		local overworld_y = Map.heightmap.position.y - 10
+		local overworld = (player_y > overworld_y)
+		Map.heightmap.visible = overworld
+		Lighting:set_dungeon_mode(not overworld)
+		local wd = overworld and Options.inst.view_distance or Options.inst.view_distance_underground
+		self.camera1.far = wd
+		self.camera3.far = wd
+	end
 end
 
 Client.update_camera = function(self)
@@ -180,22 +265,11 @@ end
 --- Terminates the connection to the server.
 -- @param self Client class.
 Client.terminate_game = function(self)
-	-- Disconnect from the server.
-	Network:shutdown()
 	self.data.connection.active = false
 	self.data.connection.connecting = false
 	self.data.connection.waiting = false
-	-- Terminate the local server.
-	if self.threads.server then
-		self.threads.server.quit = true
-		while not self.threads.server.done do
-		end
-		self.threads.server = nil
-	end
-	-- Clear the world.
-	for k,v in pairs(Object.objects) do v:detach() end
-	Client.player_object = nil
-	self.sectors:erase_world()
+	Game:deinit()
+	self.terrain_sync:clear()
 end
 
 Client:add_class_getters{
@@ -209,7 +283,9 @@ Client:add_class_getters{
 	connected = function(self)
 		return self.data.connection.waiting
 	end,
-	player_object = function(self) return Player.object end}
+	player_object = function(self)
+		return rawget(self, "__player_object")
+	end}
 
 Client:add_class_setters{
 	camera_mode = function(self, v)
@@ -234,6 +310,6 @@ Client:add_class_setters{
 		hud.widget.text = v
 	end,
 	player_object = function(self, v)
-		Player.object = v
+		rawset(self, "__player_object", v)
 		Camera.mode = "third-person"
 	end}

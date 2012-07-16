@@ -128,7 +128,7 @@ Program.unload_sector = function(clss, args)
 	end
 	-- Unrealize all objects.
 	for k,v in pairs(Object:find{sector = args.sector}) do
-		v.realized = false
+		v:detach()
 	end
 	-- Remove the sector.
 	Los.program_unload_sector(args)
@@ -140,7 +140,9 @@ end
 -- the map generator to avoid parts of the old map being left in the game.
 -- @param clss Program class.
 Program.unload_world = function(clss)
-	for k,v in pairs(__objects_realized) do k.realized = false end
+	for k,v in pairs(__objects_realized) do
+		k:detach()
+	end
 	Los.program_unload_world()
 end
 

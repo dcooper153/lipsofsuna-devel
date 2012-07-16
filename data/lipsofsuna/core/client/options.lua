@@ -158,17 +158,17 @@ end
 Options.apply_object = function(self, object)
 	if object.class == Staticobject then
 		if self.landmark_view_distance < 10 then
-			object.render_distance = self.landmark_view_distance * 50
+			object.render:set_render_distance(self.landmark_view_distance * 50)
 		else
-			object.render_distance = nil
+			object.render:set_render_distance(nil)
 		end
-		object.shadow_casting = self.shadow_casting_obstacles
+		object.render:set_shadow_casting(self.shadow_casting_obstacles)
 	elseif object.class == Obstacle then
-		object.shadow_casting = self.shadow_casting_obstacles
+		object.render:set_shadow_casting(self.shadow_casting_obstacles)
 	elseif object.class == Actor then
-		object.shadow_casting = self.shadow_casting_actors
+		object.render:set_shadow_casting(self.shadow_casting_actors)
 	else
-		object.shadow_casting = self.shadow_casting_items
+		object.render:set_shadow_casting(self.shadow_casting_items)
 	end
 end
 

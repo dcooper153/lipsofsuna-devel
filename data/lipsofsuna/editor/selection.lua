@@ -16,25 +16,18 @@ Selection.get_tile_key = function(clss, tile, face)
 	return math.floor(face + 10 * tile.x + 10000 * tile.y + 10000000 * tile.z + 0.5)
 end
 
-Selection.new = function(clss, data, face)
+Selection.new = function(clss, data, face, hide)
 	local self = Class.new(clss)
-	if data.class_name == "Vector" then
-		-- Tile.
-		local p = (data + Vector(0.5,0.5,0.5)) * Voxel.tile_size
-		self.key = clss:get_tile_key(data, face)
-		self.tile = data
-		self.face = face
-		self.visual = EditorObject{model = "select1", position = p, rotation = clss.face_rot[face], realized = true, collision_mask = 0, collision_group = 0}
-	else
-		-- Object.
-		local model = self:create_face_model(face, data.rotation, data.bounding_box_physics)
-		self.face = face
-		self.key = data
-		self.object = data
-		self.visual = EditorObject{model = model, position = data.position, realized = true,
-			collision_mask = 0, collision_group = 0}
+	if data and face then
+		if data.class_name == "Vector" then
+			self:set_tile(data, face)
+		else
+			self:set_object(data, face)
+		end
 	end
-	self.visual.selection = self
+	if not hide and self.visual then
+		self.visual:set_visible(true)
+	end
 	return self
 end
 
@@ -86,16 +79,28 @@ Selection.create_face_model = function(self, face, rotation, aabb)
 end
 
 Selection.detach = function(self)
-	self.visual.realized = false
+	if not self.visual then return end
+	self.visual:set_visible(false)
+	if self.visual_prev then
+		self.visual_prev:set_visible(false)
+		self.visual_prev = nil
+	end
+end
+
+Selection.get_loaded = function(self)
+	if not self.visual then return true end
+	return self.visual:get_loaded()
 end
 
 Selection.refresh = function(self)
+	if not self.visual then return end
 	if not self.object then return end
-	self.visual.position = self.object.position
-	self.visual.rotation = self.object.rotation
+	self.visual:set_position(self.object.position)
+	self.visual:set_rotation(self.object.rotation)
 end
 
 Selection.rotate = function(self, drot)
+	if not self.visual then return end
 	if not self.object then return end
 	self.object.rotation = drot * self.object.rotation
 	self:refresh()
@@ -105,4 +110,51 @@ Selection.transform = function(self, center, dpos, drot)
 	if not self.object then return end
 	self.object.position = drot * (self.object.position + dpos - center) + center
 	self:refresh()
+end
+
+Selection.update = function(self, secs)
+	if not self.visual then return end
+	if self.visual:get_visible() then return end
+	if not self.visual:get_loaded() then return end
+	self.visual:set_visible(true)
+	if self.visual_prev then
+		self.visual_prev:set_visible(false)
+		self.visual_prev = nil
+	end
+end
+
+Selection.set_empty = function(self)
+	self:detach()
+	self.face = nil
+	self.key = nil
+	self.object = nil
+	self.tile = nil
+	self.visual = nil
+end
+
+Selection.set_object = function(self, data, face)
+	local model = self:create_face_model(face, data.rotation, data.bounding_box_physics)
+	self.face = face
+	self.key = data
+	self.object = data
+	self.tile = nil
+	self.visual_prev = self.visual
+	self.visual = RenderObject()
+	self.visual.model = model:get_render()
+	self.visual:add_model(self.visual.model)
+	self.visual:set_position(data.position)
+end
+
+Selection.set_tile = function(self, data, face)
+	local p = (data + Vector(0.5,0.5,0.5)) * Voxel.tile_size
+	self.face = face
+	self.key = self:get_tile_key(data, face)
+	self.object = nil
+	self.tile = data
+	self.visual_prev = self.visual
+	self.visual = RenderObject()
+	self.visual.model = Model:find_or_load("select1"):get_render()
+	self.visual:add_model(self.visual.model)
+	self.visual:set_position(p)
+	self.visual:set_rotation(self.face_rot[face])
 end

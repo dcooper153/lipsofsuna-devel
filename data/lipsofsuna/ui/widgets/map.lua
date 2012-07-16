@@ -90,7 +90,9 @@ Widgets.Uimap.rebuild_canvas = function(self)
 	self:clear_markers()
 	self:add_marker("mapmarker2", "player", player.position, player.rotation.euler[1])
 	for k,v in pairs(Marker.dict_name) do
-		self:add_marker("mapmarker1", k, v.position, 0)
+		if v.unlocked then
+			self:add_marker("mapmarker1", k, v.position, 0)
+		end
 	end
 end
 

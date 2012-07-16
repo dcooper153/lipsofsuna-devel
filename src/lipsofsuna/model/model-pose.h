@@ -73,6 +73,9 @@ LIAPICALL (void, limdl_pose_clear_channel_node_priorities, (
 	LIMdlPose*  self,
 	int         channel));
 
+LIAPICALL (void, limdl_pose_destroy_all, (
+	LIMdlPose* self));
+
 LIAPICALL (void, limdl_pose_destroy_channel, (
 	LIMdlPose* self,
 	int        channel));

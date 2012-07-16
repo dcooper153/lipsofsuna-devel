@@ -194,6 +194,18 @@ LIMdlPoseChannel* liren_object_channel_get_state (
 }
 
 /**
+ * \brief Clears all animations from the object.
+ * \param self Object.
+ */
+void liren_object_clear_animations (
+	LIRenObject* self)
+{
+	if (self->pose == NULL)
+		return;
+	limdl_pose_destroy_all (self->pose);
+}
+
+/**
  * \brief Clears all models from the object.
  * \param self Object.
  */
