@@ -246,7 +246,7 @@ void liren_overlay_add_tiled (
 	Ogre::TexturePtr texture;
 	if (!private_create_material (self, material_name, &material, &texture))
 		return;
-	int source_size[2] = { texture->getWidth (), texture->getHeight () };
+	int source_size[2] = { static_cast<int>(texture->getWidth ()), static_cast<int>(texture->getHeight ()) };
 
 	/* Create a new image overlay. */
 	Ogre::String id = self->render->data->id.next ();
@@ -289,7 +289,7 @@ void liren_overlay_add_scaled (
 	Ogre::TexturePtr texture;
 	if (!private_create_material (self, material_name, &material, &texture))
 		return;
-	int source_size[2] = { texture->getWidth (), texture->getHeight () };
+	int source_size[2] = { static_cast<int>(texture->getWidth ()), static_cast<int>(texture->getHeight ()) };
 	int source_tiling1[6] = {0, source_tiling[1], 0, 0, source_tiling[4], 0};
 	if (source_tiling1[1] < 0)
 		source_tiling1[1] = source_size[0];

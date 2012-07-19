@@ -25,7 +25,7 @@
 typedef struct _LIMaiExtensionInfo LIMaiExtensionInfo;
 struct _LIMaiExtensionInfo
 {
-	int version;
+	unsigned int version;
 	const char* name;
 	void* init;
 	void* free;

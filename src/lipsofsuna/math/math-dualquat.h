@@ -71,7 +71,7 @@ static inline LIMatDualquat limat_dualquat_init_translation (
 {
 	LIMatDualquat self = {
 		{ 0.0f, 0.0f, 0.0f, 1.0f },
-		{ 0.5 * t.x, 0.5 * t.y, 0.5 * t.z, 0.0f }};
+		{ 0.5f * t.x, 0.5f * t.y, 0.5f * t.z, 0.0f }};
 	return self;
 }
 
