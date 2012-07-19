@@ -25,6 +25,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "lipsofsuna/system.h"
+#include "lipsofsuna/math.h"
 #include "lipsofsuna/render/image/image-dds.h"
 #include "image.h"
 #include "image-compress.h"
@@ -69,6 +70,35 @@ LIImgImage* liimg_image_new_from_file (
 }
 
 /**
+ * \brief Creates a copy of the image.
+ * \param image Image.
+ * \return New image or NULL.
+ */
+LIImgImage* liimg_image_new_from_image (
+	LIImgImage* image)
+{
+	LIImgImage* self;
+
+	self = lisys_calloc (1, sizeof (LIImgImage));
+	if (self == NULL)
+		return NULL;
+	self->width = image->width;
+	self->height = image->height;
+	if (self->width && self->height)
+	{
+		self->pixels = lisys_malloc (4 * self->width * self->height * sizeof (uint8_t));
+		if (self->pixels == NULL)
+		{
+			lisys_free (self);
+			return NULL;
+		}
+		memcpy (self->pixels, image->pixels, 4 * self->width * self->height * sizeof (uint8_t));
+	}
+
+	return self;
+}
+
+/**
  * \brief Frees the image.
  * \param self Image.
  */
@@ -77,6 +107,36 @@ void liimg_image_free (
 {
 	lisys_free (self->pixels);
 	lisys_free (self);
+}
+
+/**
+ * \brief Blits another image over this one.
+ * \param self Image.
+ * \param image Image.
+ */
+void liimg_image_blit (
+	LIImgImage* self,
+	LIImgImage* image)
+{
+	int x;
+	int y;
+	int a;
+	uint8_t* src;
+	uint8_t* dst;
+
+	for (y = 0 ; y < self->height && y < image->height ; y++)
+	{
+		for (x = 0 ; x < self->width && x < image->width ; x++)
+		{
+			src = image->pixels + 4 * (x + y * image->width);
+			dst = self->pixels + 4 * (x + y * self->width);
+			a = src[3];
+			dst[0] = ((src[0] << 8) * a + (dst[0] << 8) * (255 - a)) >> 8;
+			dst[1] = ((src[1] << 8) * a + (dst[1] << 8) * (255 - a)) >> 8;
+			dst[2] = ((src[2] << 8) * a + (dst[2] << 8) * (255 - a)) >> 8;
+			dst[3] = LIMAT_MIN (255, dst[3] + a);
+		}
+	}
 }
 
 /**
