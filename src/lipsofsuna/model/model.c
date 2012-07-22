@@ -832,6 +832,8 @@ void limdl_model_replace_material_by_string (
 	for (i = 0 ; i < self->materials.count ; i++)
 	{
 		material = self->materials.array + i;
+		if (material->material == NULL)
+			continue;
 		if (strcmp (material->material, match_material))
 			continue;
 		if (set_diffuse != NULL)
