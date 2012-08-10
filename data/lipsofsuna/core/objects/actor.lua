@@ -283,6 +283,10 @@ Actor.damaged = function(self, args)
 			Server:object_effect(self, self.spec.effect_physical_damage)
 		end
 	end
+	-- Play the flinch animation.
+	if args.type == "physical" and args.amount > 0 then
+		self:animate("flinch")
+	end
 end
 
 --- Gets the spell effects known by the object.

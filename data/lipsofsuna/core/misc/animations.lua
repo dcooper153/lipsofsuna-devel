@@ -97,7 +97,8 @@ Animationspec{
 	fade_out = 0.6,
 	permanent = true,
 	repeat_start = 10,
-	weight = 50}
+	weight = 50,
+	node_weights = {LOWER = 10}}
 
 Animationspec{
 	name = "default block stop",
@@ -357,6 +358,14 @@ Animationspec{
 	weight = 10}
 
 Animationspec{
+	name = "default flinch",
+	animation = "aer1-flinch1",
+	animations = {"aer1-flinch1", "aer1-flinch2"},
+	fade_in = 0.1,
+	fade_out = 0.1,
+	weight = 1000}
+
+Animationspec{
 	name = "default idle",
 	animation = "aer1-idle",
 	channel = 1,
@@ -458,6 +467,12 @@ Animationspec{
 	node_weights = {LOWER = 100}}
 
 Animationspec{
+	name = "default talk",
+	animation = "aer1-talk1",
+	animations = {"aer1-talk1", "aer1-talk2", "aer1-talk3", "aer1-talk4", "aer1-talk5"},
+	weight = 100}
+
+Animationspec{
 	name = "default throw",
 	animation = "aer1-throw",
 	channel = 2,
@@ -511,6 +526,7 @@ AnimationProfileSpec{
 		["charge revolver"] = "default charge revolver",
 		["climb high"] = "default climb high",
 		["climb low"] = "default climb low",
+		["flinch"] = "default flinch",
 		["hang"] = "default hang",
 		["hold axe"] = "default hold axe",
 		["hold blunt"] = "default hold blunt",
@@ -540,6 +556,7 @@ AnimationProfileSpec{
 		["stagger"] = "default stagger",
 		["strafe left"] = "default strafe left",
 		["strafe right"] = "default strafe right",
+		["talk"] = "default talk",
 		["throw"] = "default throw",
 		["throw bulky"] = "default throw",
 		["throw grenade"] = "default throw",

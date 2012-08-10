@@ -478,6 +478,7 @@ Dialog.execute = function(self)
 			-- Publish the line.
 			self.choices = "line"
 			self:emit_event{type = "object-dialog", object = self.object, character = c[2], message = c[3]}
+			self.object:animate("talk")
 			self.user = nil
 			return true
 		end,
