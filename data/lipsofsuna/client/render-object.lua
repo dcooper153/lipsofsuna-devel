@@ -75,7 +75,8 @@ end
 ClientRenderObject.add_animation = function(self, name, time)
 	if not self.initialized then return end
 	if not self.object.spec.get_animation_arguments then return end
-	local args = self.object.spec:get_animation_arguments(name)
+	local profile = self.object:get_animation_profile()
+	local args = self.object.spec:get_animation_arguments(name, profile)
 	if time and time > 0 then
 		args.time = (args.time or 0) + time
 		args.fade_in = 0

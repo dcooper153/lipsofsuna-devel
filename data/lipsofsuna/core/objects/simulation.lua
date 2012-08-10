@@ -252,6 +252,18 @@ SimulationObject.has_server_data = function(self)
 	return Server.initialized
 end
 
+--- Gets the animation profile for the object.
+-- @param self Object.
+-- @return String.
+SimulationObject.get_animation_profile = function(self)
+	if self.animation_profile then return self.animation_profile end
+	if self.spec.preset then
+		local preset = Actorpresetspec:find{name = self.spec.preset}
+		if preset.animation_profile then return preset.animation_profile end
+	end
+	return "default"
+end
+
 --- Gets a dialog variable by name.
 -- @param self Object.
 -- @param name Variable name.

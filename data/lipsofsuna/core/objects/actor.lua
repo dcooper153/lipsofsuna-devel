@@ -9,6 +9,7 @@ Actor.dict_id = setmetatable({}, {__mode = "kv"})
 -- @param clss Actor class.
 -- @param args Arguments.<ul>
 --   <li>angular: Angular velocity.</li>
+--   <li>animation_profile: Animation preset name.</li>
 --   <li>beheaded: True to spawn without a head.</li>
 --   <li>body_scale: Scale factor of the body.</li>
 --   <li>body_style: Body style defined by an array of scalars.</li>
@@ -37,6 +38,7 @@ Actor.new = function(clss, args)
 	self.skills = Skills{id = self.id}
 	self.stats = Stats{id = self.id}
 	copy("angular")
+	copy("animation_profile")
 	copy("beheaded")
 	copy("body_scale")
 	copy("body_style")
@@ -1027,6 +1029,7 @@ Actor.write_db = function(self, db)
 	-- Write the object.
 	local data = serialize{
 		angular = self.angular,
+		animation_profile = self.animation_profile,
 		beheaded = self.beheaded or nil,
 		body_scale = self.body_scale,
 		body_style = self.body_style,
@@ -1077,6 +1080,7 @@ end
 Actor.write_preset = function(self)
 	assert(self:has_client_data())
 	return serialize{
+		animation_profile = self.animation_profile,
 		body_scale = self.body_scale,
 		body_style = self.body_style,
 		eye_color = self.eye_color,

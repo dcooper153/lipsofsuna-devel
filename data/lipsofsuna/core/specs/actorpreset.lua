@@ -10,6 +10,7 @@ Actorpresetspec.introspect = Introspect{
 	fields = {
 		{name = "name", type = "string", description = "Name of the spec."},
 		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+		{name = "animation_profile", type = "string", description = "Default animation profile."},
 		{name = "body", type = "list", list = {type = "number"}, description = "Body morph table."},
 		{name = "eye_color", type = "color", description = "Eye color."},
 		{name = "face", type = "list", list = {type = "number"}, description = "Face morph table."},

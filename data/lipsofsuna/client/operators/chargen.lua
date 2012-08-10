@@ -47,6 +47,7 @@ Operators.chargen.reset = function(self)
 	if self.data.render then self.data.render:set_visible(false) end
 	self.data = {}
 	self.char = {
+		animation_profile = "default",
 		body = {0,0,0,0,0,0,0,0,0,0},
 		eye_color = {1,1,1},
 		eye_style = "default",
@@ -69,6 +70,7 @@ end
 -- @param self Operator.
 Operators.chargen.apply = function(self)
 	Game.messaging:client_event("create character", {
+		animation_profile = self.char.animation_profile,
 		body_style = scale255(self.char.body),
 		eye_color = scale255(Color:hsv_to_rgb(self.char.eye_color)),
 		eye_style = self.char.eye_style,
@@ -184,7 +186,7 @@ Operators.chargen.update = function(self, secs)
 		end
 		self.data.render.model = r
 		-- Reset the animation.
-		local args = spec:get_animation_arguments("idle")
+		local args = spec:get_animation_arguments("idle", self.char.animation_profile)
 		self.data.render:animate(args)
 		-- Set the body scale.
 		local args = RenderUtils:create_scale_animation(spec, self.char.height)
@@ -197,6 +199,27 @@ Operators.chargen.update = function(self, secs)
 	Client:update_camera()
 	-- Update lighting.
 	Lighting:update(secs)
+end
+
+--- Gets the animation profile of the character.
+--
+-- Context: The character creator must have been initialized.
+--
+-- @param self Operator.
+-- @return Profile name.
+Operators.chargen.get_animation_profile = function(self)
+	return self.char.animation_profile
+end
+
+--- Sets the animation profile of the character.
+--
+-- Context: The character creator must have been initialized.
+--
+-- @param self Operator.
+-- @param value Profile name.
+Operators.chargen.set_animation_profile = function(self, value)
+	self.char.animation_profile = value
+	self.data.update_needed = true
 end
 
 --- Gets the value of a body slider.
@@ -412,6 +435,9 @@ Operators.chargen.set_preset = function(self, args)
 				self.char[k] = v
 			end
 		end
+	end
+	if not args.animation_profile then
+		self.char.animation_profile = "default"
 	end
 	self.data.update_needed = true
 end

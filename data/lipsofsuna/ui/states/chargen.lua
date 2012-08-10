@@ -264,6 +264,10 @@ Ui:add_state{
 
 Ui:add_widget{
 	state = "chargen/misc",
+	widget = function() return Widgets.Uitransition("Animation profile", "chargen/misc/animation") end}
+
+Ui:add_widget{
+	state = "chargen/misc",
 	widget = function() return Widgets.Uitransition("Hair style", "chargen/misc/hairstyle") end}
 
 Ui:add_widget{
@@ -350,6 +354,36 @@ Ui:add_widget{
 			Operators.chargen:set_skin_color(3, w.value)
 		end)
 	end}
+
+------------------------------------------------------------------------------
+
+Ui:add_state{
+	state = "chargen/misc/animation",
+	label = "Select animation",
+	init = function()
+		local widgets = {}
+		local race = Operators.chargen:get_race()
+		local spec = Actorspec:find{name = race}
+		if not spec.animations then return end
+		local lst = {}
+		for k,v in pairs(spec.animations) do
+			table.insert(lst, {k, v})
+		end
+		table.sort(lst, function(a,b) return a[1] < b[1] end)
+		for k,v in ipairs(lst) do
+			local widget = Widgets.Uiradio(v[1], "animations", function(w)
+				Operators.chargen:set_animation_profile(w.profile)
+			end)
+			widget.profile = v[2]
+			if Operators.chargen:get_animation_profile() == widget.style then
+				widget.value = true
+			end
+			table.insert(widgets, widget)
+		end
+		return widgets
+	end,
+	input = chargen_input,
+	update = chargen_update}
 
 ------------------------------------------------------------------------------
 

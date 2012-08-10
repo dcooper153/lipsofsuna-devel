@@ -8,6 +8,7 @@ Player.class_name = "Player"
 -- @param args Arguments.<ul>
 --   <li>account: Account data.</li>
 --   <li>angular: Angular velocity.</li>
+--   <li>animation_profile: Animation preset name.</li>
 --   <li>body_scale: Scale factor of the body.</li>
 --   <li>body_style: Body style defined by an array of scalars.</li>
 --   <li>eye_style: Eye style defined by an array of {style, red, green, blue}.</li>
@@ -438,6 +439,7 @@ Player.write_db = function(self, db)
 	-- Write the object.
 	local data = serialize{
 		angular = self.angular,
+		animation_profile = self.animation_profile,
 		body_scale = self.body_scale,
 		body_style = self.body_style,
 		eye_color = self.eye_color,

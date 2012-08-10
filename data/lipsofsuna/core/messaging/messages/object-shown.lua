@@ -7,7 +7,8 @@ local make_flags = function(list)
 end
 local FlagType = make_flags{
 	"SELF", "SPEC", "ACTOR", "NAME", "COUNT", "POSITION", "ROTATION", "HEAD", "SKIN",
-	"EYE", "HAIR", "BODY", "FACE", "ANIMS", "EQUIPMENT", "STATS", "DIALOG", "SPEEDLINE"}
+	"EYE", "HAIR", "BODY", "FACE", "ANIMS", "EQUIPMENT", "STATS", "DIALOG", "SPEEDLINE",
+	"PROFILE"}
 
 -- The number of fields is so high that an exception is made for message
 -- type: the server passes the object itself and the client accepts either
@@ -39,6 +40,11 @@ Message{
 			flags = flags + FlagType.ACTOR
 			add(data, "bool", o.dead or false)
 			add(data, "float", o:get_tilt_angle())
+		end
+		-- Animation profile.
+		if o.animation_profile then
+			flags = flags + FlagType.PROFILE
+			add(data, "string", o.animation_profile)
 		end
 		-- Name.
 		if o.name then
@@ -230,6 +236,10 @@ Message{
 			ok,args.dead,args.tilt = packet:resume("bool", "float")
 			if not ok then return end
 		end
+		-- Animation profile.
+		if Bitwise:band(args.flags, FlagType.PROFILE) ~= 0 then
+			ok,args.animation_profile = packet:resume("string")
+		end
 		-- Name.
 		if Bitwise:band(args.flags, FlagType.NAME) ~= 0 then
 			ok,args.name = packet:resume("string")
@@ -414,6 +424,10 @@ Message{
 			if args.self then
 				Client:set_player_dead(args.dead)
 			end
+		end
+		-- Animation profile.
+		if args.animation_profile then
+			o.animation_profile = args.animation_profile
 		end
 		-- Name.
 		if args.name then

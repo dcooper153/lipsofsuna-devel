@@ -4,6 +4,8 @@ Message{
 		return {
 			"string", char.name,
 			"string", char.race,
+			-- Animation profile.
+			"string", chat.animation_profile,
 			-- Body style.
 			"uint8", char.body_scale,
 			"uint8", char.body_style[1],
@@ -55,7 +57,7 @@ Message{
 	client_to_server_decode = function(self, packet)
 		-- Reconstruct the character style.
 		local style,ok1,ok2 = {}
-		ok1,style.name,style.race = packet:read("string", "string")
+		ok1,style.name,style.race,style.animation_profile = packet:read("string", "string", "string")
 		if not ok1 then return end
 		ok1,style.body_scale = packet:resume("uint8")
 		ok2,style.body_style = packet:resume_table(
@@ -95,6 +97,7 @@ Message{
 		-- Create the character.
 		local player = Player{
 			account = account,
+			animation_profile = char.animation_profile,
 			body_scale = char.body_scale,
 			body_style = char.body_style,
 			eye_color = char.eye_color,
