@@ -199,12 +199,13 @@ end
 -- @param self Actor spec.
 -- @param name Animation name.
 -- @param profile Animation profile mapping, or nil for "default".
+-- @param variant Variant number, or nil.
 -- @return Table of animation playback arguments.
-Actorspec.get_animation_arguments = function(self, name, profile)
+Actorspec.get_animation_arguments = function(self, name, profile, variant)
 	local args = {animation = name, fade_in = 0.3, fade_out = 0.3, time = time}
 	local anim = self:get_animation(name, profile)
 	if anim then
-		for k,v in pairs(anim:get_arguments()) do args[k] = v end
+		for k,v in pairs(anim:get_arguments(variant)) do args[k] = v end
 	end
 	return args
 end

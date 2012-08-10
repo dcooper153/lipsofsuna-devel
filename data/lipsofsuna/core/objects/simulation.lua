@@ -85,7 +85,7 @@ SimulationObject.animate = function(self, name, force_temporary)
 		end
 	end
 	-- Emit a vision event.
-	Vision:event{type = "object-animated", animation = name, object = self}
+	Vision:event{type = "object-animated", animation = name, object = self, variant = math.random(0, 255)}
 	return true
 end
 

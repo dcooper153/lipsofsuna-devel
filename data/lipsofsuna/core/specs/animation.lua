@@ -10,7 +10,8 @@ Animationspec.introspect = Introspect{
 	fields = {
 		{name = "name", type = "string", description = "Name of the spec."},
 		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
-		{name = "animation", type = "string", description = "Animation name in the skeleton file."},
+		{name = "animation", type = "string", description = "Animation file name."},
+		{name = "animations", type = "list", list = {type = "string"}, description = "List of animation file names."},
 		{name = "channel", type = "number", description = "Channel number.", details = {integer = true, min = 0, max = 255}},
 		{name = "fade_in", type = "number", description = "Fade in duration."},
 		{name = "fade_out", type = "number", description = "Fade out duration."},
@@ -36,9 +37,10 @@ end
 
 --- Gets the animation playback arguments of the animation.
 -- @param self Animation spec.
+-- @param variant Variant number, or nil.
 -- @return Table of playback arguments.
-Animationspec.get_arguments = function(self)
-	return {
+Animationspec.get_arguments = function(self, variant)
+	local res = {
 		animation = self.animation,
 		channel = self.channel,
 		fade_in = self.fade_in,
@@ -51,6 +53,10 @@ Animationspec.get_arguments = function(self)
 		time_scale = self.time_scale,
 		weight = self.weight,
 		node_weights = self:get_node_weights()}
+	if variant and self.animations then
+		res.animation = self.animations[variant % #self.animations + 1]
+	end
+	return res
 end
 
 --- Gets the node weights of the animation.

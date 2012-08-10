@@ -320,7 +320,7 @@ Player.vision_cb = function(self, args)
 		["object-animated"] = function(args)
 			local o = args.object
 			if o.static then return end
-			Game.messaging:server_event("object animated", self.client, o.id, args.animation or "", args.time or 0.0)
+			Game.messaging:server_event("object animated", self.client, o.id, args.animation or "", args.time or 0.0, args.variant)
 		end,
 		["object-beheaded"] = function(args)
 			local o = args.object

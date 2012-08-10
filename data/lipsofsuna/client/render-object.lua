@@ -71,12 +71,13 @@ end
 -- @param self Render object.
 -- @param name Animation name.
 -- @param time Optional start time, or nil.
+-- @param variant Animation variant number, or nil.
 -- @return Animation arguments.
-ClientRenderObject.add_animation = function(self, name, time)
+ClientRenderObject.add_animation = function(self, name, time, variant)
 	if not self.initialized then return end
 	if not self.object.spec.get_animation_arguments then return end
 	local profile = self.object:get_animation_profile()
-	local args = self.object.spec:get_animation_arguments(name, profile)
+	local args = self.object.spec:get_animation_arguments(name, profile, variant)
 	if time and time > 0 then
 		args.time = (args.time or 0) + time
 		args.fade_in = 0
