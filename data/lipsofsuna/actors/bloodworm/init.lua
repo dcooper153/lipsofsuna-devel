@@ -33,12 +33,8 @@ Animationspec{
 	channel = 1,
 	permanent = true}
 
-Actorspec{
+AnimationProfileSpec{
 	name = "bloodworm",
-	ai_enable_strafe = false,
-	ai_enable_block = false,
-	ai_enable_jump = false,
-	ai_offense_factor = 1,
 	animations = {
 		["attack bite"] = "bloodworm attack bite",
 		["dead"] = "bloodworm dead",
@@ -50,7 +46,15 @@ Actorspec{
 		["strafe left"] = "bloodworm walk",
 		["strafe right"] = "bloodworm walk",
 		["walk"] = "bloodworm walk",
-		["walk back"] = "bloodworm walk"},
+		["walk back"] = "bloodworm walk"}}
+
+Actorspec{
+	name = "bloodworm",
+	ai_enable_strafe = false,
+	ai_enable_block = false,
+	ai_enable_jump = false,
+	ai_offense_factor = 1,
+	animations = {["default"] = "bloodworm"},
 	categories = {["enemy"] = true},
 	difficulty = 0,
 	effect_physical_damage = "fleshimpact1",

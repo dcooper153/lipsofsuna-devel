@@ -43,10 +43,10 @@ Obstaclespec{
 
 Actorspec{
 	name = "library security enforcer",
-	base = "base",
 	ai_offense_factor = 1,
 	ai_type = "anchored",
 	aim_ray_start = 0.7,
+	animations = {["default"] = "default"},
 	dialog = "librarysecurityenforcer",
 	equipment_slots = {["robotarm.L"] = "#hand.L", ["robotarm.R"] = "#hand.R"},
 	factions = {["keepers of knowledge"] = true},
@@ -62,9 +62,9 @@ Actorspec{
 
 Actorspec{
 	name = "library security robot",
-	base = "base",
 	model = "barrel1",
 	aim_ray_start = 0.7,
+	animations = {["default"] = "default"},
 	equipment_slots = {["robotarm.L"] = "#hand.L", ["robotarm.R"] = "#hand.R"},
 	factions = {["sealed library"] = true},
 	feat_types = {["ranged"] = true},
@@ -77,7 +77,6 @@ Actorspec{
 
 Actorspec{
 	name = "library security turret",
-	base = "base",
 	model = "barrel1",
 	ai_enable_backstep = false,
 	ai_enable_block = false,
@@ -87,6 +86,7 @@ Actorspec{
 	ai_enable_walk = false,
 	ai_enable_weapon_switch = false,
 	aim_ray_start = 0.7,
+	animations = {["default"] = "default"},
 	-- TODO: Should have no gravity, shouldn't be pushable
 	factions = {["sealed library"] = true},
 	feat_types = {["ranged"] = true},

@@ -57,6 +57,24 @@ Animationspec{
 	channel = 1,
 	permanent = true}
 
+AnimationProfileSpec{
+	name = "dragon",
+	animations = {
+		["attack bite"] = "dragon attack bite",
+		["attack left claw"] = "dragon attack left claw",
+		["attack right claw"] = "dragon attack right claw",
+		["dead"] = "dragon dead",
+		["death"] = "dragon death",
+		["idle"] = "dragon idle",
+		["run"] = "dragon walk",
+		["run left"] = "dragon walk",
+		["run right"] = "dragon walk",
+		["spell ranged"] = "dragon spell ranged",
+		["strafe left"] = "dragon walk",
+		["strafe right"] = "dragon walk",
+		["walk"] = "dragon walk",
+		["walk back"] = "dragon walk back"}}
+
 Effectspec{
 	name = "dragonbreath1",
 	node = "head",
@@ -77,21 +95,7 @@ Actorspec{
 	ai_enable_strafe = false,
 	ai_enable_block = false,
 	ai_offense_factor = 1,
-	animations = {
-		["attack bite"] = "dragon attack bite",
-		["attack left claw"] = "dragon attack left claw",
-		["attack right claw"] = "dragon attack right claw",
-		["dead"] = "dragon dead",
-		["death"] = "dragon death",
-		["idle"] = "dragon idle",
-		["run"] = "dragon walk",
-		["run left"] = "dragon walk",
-		["run right"] = "dragon walk",
-		["spell ranged"] = "dragon spell ranged",
-		["strafe left"] = "dragon walk",
-		["strafe right"] = "dragon walk",
-		["walk"] = "dragon walk",
-		["walk back"] = "dragon walk back"},
+	animations = {["default"] = "dragon"},
 	difficulty = 1,
 	effect_physical_damage = "fleshimpact1",
 	factions = {["evil"] = true},

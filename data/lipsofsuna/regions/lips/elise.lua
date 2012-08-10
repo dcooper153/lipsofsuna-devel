@@ -1,8 +1,19 @@
+Animationspec{
+	name = "elise idle",
+	animation = "aer1-tired",
+	channel = 1,
+	permanent = true}
+
+AnimationProfileSpec{
+	name = "elise",
+	animations = {["idle"] = "elise idle"},
+	inherit = {"default"}}
+
 Actorspec{
 	name = "Elise",
 	base = "aer",
 	ai_type = "anchored",
-	animations = {["idle"] = "elise idle"},
+	animations = {["default"] = "elise"},
 	dialog = "elise",
 	factions = {["neutral"] = true},
 	hair_color = {200,180,20},
@@ -12,12 +23,6 @@ Actorspec{
 	marker = "elise",
 	personality = "feeble",
 	preset = "Female 2"}
-
-Animationspec{
-	name = "elise idle",
-	animation = "aer1-tired",
-	channel = 1,
-	permanent = true}
 
 Questspec{
 	name = "Elise's Sorrow"}

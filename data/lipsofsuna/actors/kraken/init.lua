@@ -1,8 +1,7 @@
 Program:add_path(Mod.path)
 
-Actorspec{
+AnimationProfileSpec{
 	name = "kraken",
-	base = "race",
 	animations = {
 		["attack back"] = "kraken attack back",
 		["attack bow"] = "kraken attack bow",
@@ -49,7 +48,12 @@ Actorspec{
 		["throw bulky"] = "kraken throw",
 		["throw grenade"] = "kraken throw",
 		["walk"] = "kraken walk",
-		["walk back"] = "kraken walk back"},
+		["walk back"] = "kraken walk back"}}
+
+Actorspec{
+	name = "kraken",
+	base = "race",
+	animations = {["default"] = "kraken"},
 	damage_from_magma = 9,
 	damage_from_water = -2,
 	equipment_class = "kraken",

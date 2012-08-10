@@ -39,16 +39,8 @@ Animationspec{
 	channel = 2,
 	weight = 30}
 
-Actorspec{
+AnimationProfileSpec{
 	name = "slime",
-	base = "base",
-	categories = {["enemy"] = true},
-	ai_combat_actions = {["bounce"] = true, ["melee"] = true},
-	ai_offense_factor = 0.5,
-	ai_enable_backstep = false,
-	ai_enable_strafe = false,
-	ai_enable_walk = false,
-	ai_enabled_states = {["bounce"] = true, ["combat"] = true, ["idle"] = true},
 	animations = {
 		["dead"] = "slime dead",
 		["death"] = "slime death",
@@ -58,6 +50,18 @@ Actorspec{
 		["land water"] = "slime land",
 		["tackle"] = "slime tackle",
 		["walk"] = "slime jump"},
+	inherit = {"default"}}
+
+Actorspec{
+	name = "slime",
+	categories = {["enemy"] = true},
+	ai_combat_actions = {["bounce"] = true, ["melee"] = true},
+	ai_offense_factor = 0.5,
+	ai_enable_backstep = false,
+	ai_enable_strafe = false,
+	ai_enable_walk = false,
+	ai_enabled_states = {["bounce"] = true, ["combat"] = true, ["idle"] = true},
+	animations = {["default"] = "slime"},
 	difficulty = 0,
 	factions = {["evil"] = true},
 	falling_damage_rate = 0,
@@ -72,7 +76,6 @@ Actorspec{
 
 Actorspec{
 	name = "plague slime",
-	base = "base",
 	categories = {["plague"] = true},
 	ai_combat_actions = {["bounce"] = true, ["melee"] = true},
 	ai_offense_factor = 0.5,
@@ -80,7 +83,7 @@ Actorspec{
 	ai_enable_strafe = false,
 	ai_enable_walk = false,
 	ai_enabled_states = {["bounce"] = true, ["combat"] = true, ["idle"] = true},
-	animations = {["jump"] = "slime jump", ["land ground"] = "slime land", ["land water"] = "slime land", ["tackle"] = "slime tackle", ["walk"] = "slime jump"},
+	animations = {["default"] = "slime"},
 	difficulty = 0.7,
 	factions = {["evil"] = true},
 	falling_damage_rate = 0,

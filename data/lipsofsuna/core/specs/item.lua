@@ -17,7 +17,7 @@ Itemspec.introspect = Introspect{
 		{name = "animation_attack", type = "string", description = "Attack animation name for actors wielding the item."},
 		{name = "animation_charge", type = "string", description = "Charge animation name for actors wielding the item."},
 		{name = "animation_hold", type = "string", description = "Hold animation name for actors wielding the item."},
-		{name = "animations", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animations.", details = {values = {spec = "Animationspec"}}},
+		{name = "animations", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation profiles.", details = {values = {spec = "AnimationProfileSpec"}}},
 		{name = "armor_class", type = "number", default = 0, description = "How much protection the item offers when equipped."},
 		{name = "book_text", type = "string", description = "Content of player readable items."},
 		{name = "collision_group", type = "number", default = 0x0002, description = "Collision group."},
@@ -78,11 +78,17 @@ end
 --- Gets an animation by name.
 -- @param self Itemspec.
 -- @param name Animation name.
+-- @param profile Animation profile mapping, or nil for "default".
 -- @return Animation spec, or nil.
-Itemspec.get_animation = function(self, name)
-	local n = self.animations[name]
-	if not n then return end
-	return Animationspec:find{name = n}
+Itemspec.get_animation = function(self, name, profile)
+	local try = function(self, p, a)
+		local pname = self.animations[p]
+		if not pname then return end
+		local profile = AnimationProfileSpec:find{name = pname}
+		if not profile then return end
+		return profile:get_animation(a)
+	end
+	return profile and try(self, profile, name) or try(self, "default", name)
 end
 
 --- Finds the equipment models of the item for the given race.

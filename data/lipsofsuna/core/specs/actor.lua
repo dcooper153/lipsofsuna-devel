@@ -34,7 +34,7 @@ Actorspec.introspect = Introspect{
 		{name = "aim_ray_center", type = "vector", default = Vector(0,1), description = "Center vector of the aim ray."},
 		{name = "aim_ray_end", type = "number", default = 5, description = "Aim ray end distance."},
 		{name = "aim_ray_start", type = "number", default = 0.1, description = "Aim ray start distance."},
-		{name = "animations", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animations.", details = {values = {spec = "Animationspec"}}},
+		{name = "animations", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation profiles.", details = {values = {spec = "AnimationProfileSpec"}}},
 		{name = "blocking_armor", type = "number", default = 0.5, description = "How much armor class blocking offsers."},
 		{name = "blocking_cooldown", type = "number", default = 0.4, description = "Time in seconds how long it takes to leave the blocking stance."},
 		{name = "blocking_delay", type = "number", default = 0.4, description = "Time in seconds how long it takes to enter the blocking stance."},
@@ -138,20 +138,6 @@ Actorspec.new = function(clss, args)
 	local self = Spec.new(clss, args)
 	self.args = args
 	self.introspect:read_table(self, args)
-	-- Animations.
-	-- Inheritance of animations is special in that they're inherited
-	-- in per animation basis instead of the usual all or none inheritance.
-	self.animations = {}
-	if base and base.animations then
-		for k,v in pairs(base.animations) do
-			self.animations[k] = v
-		end
-	end
-	if args.animations then
-		for k,v in pairs(args.animations) do
-			self.animations[k] = v
-		end
-	end
 	-- Precalculate combat abilities.
 	self.can_melee = false
 	self.can_ranged = false
@@ -196,20 +182,27 @@ end
 --- Gets an animation by name.
 -- @param self Actor spec.
 -- @param name Animation name.
+-- @param profile Animation profile mapping, or nil for "default".
 -- @return Animation spec, or nil.
-Actorspec.get_animation = function(self, name)
-	local n = self.animations[name]
-	if not n then return end
-	return Animationspec:find{name = n}
+Actorspec.get_animation = function(self, name, profile)
+	local try = function(self, p, a)
+		local pname = self.animations[p]
+		if not pname then return end
+		local profile = AnimationProfileSpec:find{name = pname}
+		if not profile then return end
+		return profile:get_animation(a)
+	end
+	return profile and try(self, profile, name) or try(self, "default", name)
 end
 
 --- Gets animation playback arguments by name.
 -- @param self Actor spec.
 -- @param name Animation name.
+-- @param profile Animation profile mapping, or nil for "default".
 -- @return Table of animation playback arguments.
-Actorspec.get_animation_arguments = function(self, name)
+Actorspec.get_animation_arguments = function(self, name, profile)
 	local args = {animation = name, fade_in = 0.3, fade_out = 0.3, time = time}
-	local anim = self:get_animation(name)
+	local anim = self:get_animation(name, profile)
 	if anim then
 		for k,v in pairs(anim:get_arguments()) do args[k] = v end
 	end

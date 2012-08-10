@@ -60,6 +60,22 @@ Animationspec{
 	channel = 1,
 	permanent = true}
 
+AnimationProfileSpec{
+	name = "imp",
+	animations = {
+		["attack bite"] = "stoneimp attack bite",
+		["dead"] = "stoneimp dead",
+		["death"] = "stoneimp death",
+		["idle"] = "stoneimp idle",
+		["jump"] = "stoneimp jump",
+		["run"] = "stoneimp walk",
+		["run left"] = "stoneimp walk",
+		["run right"] = "stoneimp walk",
+		["strafe left"] = "stoneimp strafe left",
+		["strafe right"] = "stoneimp strafe right",
+		["walk"] = "stoneimp walk",
+		["walk back"] = "stoneimp walk back"}}
+
 Effectspec{
 	name = "impflame1",
 	light = true,
@@ -100,24 +116,12 @@ Itemspec{
 
 Actorspec{
 	name = "stone imp",
-	animations = {
-		["attack bite"] = "stoneimp attack bite",
-		["dead"] = "stoneimp dead",
-		["death"] = "stoneimp death",
-		["idle"] = "stoneimp idle",
-		["jump"] = "stoneimp jump",
-		["run"] = "stoneimp walk",
-		["run left"] = "stoneimp walk",
-		["run right"] = "stoneimp walk",
-		["strafe left"] = "stoneimp strafe left",
-		["strafe right"] = "stoneimp strafe right",
-		["walk"] = "stoneimp walk",
-		["walk back"] = "stoneimp walk back"},
+	categories = {["enemy"] = true, ["mining"] = true},
 	ai_enable_block = false,
 	ai_enable_strafe = false,
 	ai_enable_weapon_switch = false,
 	ai_offense_factor = 0.8,
-	categories = {["enemy"] = true, ["mining"] = true},
+	animations = {["default"] = "imp"},
 	difficulty = 0,
 	factions = {["evil"] = true},
 	feat_types = {["bite"] = true, ["tackle"] = true},
@@ -133,12 +137,12 @@ Actorspec{
 
 Actorspec{
 	name = "fire imp",
+	categories = {["enemy"] = true, ["mining"] = true},
 	base = "stone imp",
 	ai_enable_block = false,
 	ai_enable_strafe = false,
 	ai_enable_weapon_switch = false,
 	ai_offense_factor = 0.8,
-	categories = {["enemy"] = true, ["mining"] = true},
 	difficulty = 0.2,
 	equipment_slots = {["hand.R"] = "#hand.R", ["hand.L"] = "#hand.L"},
 	factions = {["evil"] = true},

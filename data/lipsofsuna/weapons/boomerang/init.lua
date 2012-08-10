@@ -1,8 +1,25 @@
 Program:add_path(Mod.path)
 
+Animationspec{
+	name = "boomerang fly start",
+	animation = "boomerang1-fly",
+	channel = 1,
+	permanent = true}
+
+Animationspec{
+	name = "boomerang fly stop",
+	channel = 1,
+	permanent = true}
+
+AnimationProfileSpec{
+	name = "boomerang",
+	animations = {
+		["fly start"] = "boomerang fly start",
+		["fly stop"] = "boomerang fly stop"}}
+
 Itemspec{
 	name = "boomerang",
-	animations = {["fly start"] = "boomerang fly start", ["fly stop"] = "boomerang fly stop"},
+	animations = {["default"] = "boomerang"},
 	mass = 2,
 	model = "boomerang1",
 	icon = "boomerang1",
@@ -15,14 +32,3 @@ Itemspec{
 	equipment_slot = "hand.R",
 	stacking = true,
 	water_gravity = Vector(0,6,0)}
-
-Animationspec{
-	name = "boomerang fly start",
-	animation = "boomerang1-fly",
-	channel = 1,
-	permanent = true}
-
-Animationspec{
-	name = "boomerang fly stop",
-	channel = 1,
-	permanent = true}

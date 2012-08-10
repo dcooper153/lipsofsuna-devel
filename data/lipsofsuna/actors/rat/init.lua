@@ -39,11 +39,8 @@ Animationspec{
 	channel = 1,
 	permanent = true}
 
-Actorspec{
-	name = "small rat",
-	ai_enable_strafe = false,
-	ai_enable_block = false,
-	ai_offense_factor = .1,
+AnimationProfileSpec{
+	name = "rat",
 	animations = {
 		["attack bite"] = "rat attack bite",
 		["dead"] = "rat dead",
@@ -55,7 +52,14 @@ Actorspec{
 		["strafe left"] = "rat walk",
 		["strafe right"] = "rat walk",
 		["walk"] = "rat walk",
-		["walk back"] = "rat walk"},
+		["walk back"] = "rat walk"}}
+
+Actorspec{
+	name = "small rat",
+	ai_enable_strafe = false,
+	ai_enable_block = false,
+	ai_offense_factor = .1,
+	animations = {["default"] = "rat"},
 	categories = {["animal"] = true},
 	difficulty = 0,
 	effect_physical_damage = "fleshimpact1",

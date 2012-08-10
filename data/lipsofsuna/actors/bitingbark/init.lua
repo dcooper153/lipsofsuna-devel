@@ -51,13 +51,8 @@ Animationspec{
 	channel = 1,
 	permanent = true}
 
-Actorspec{
+AnimationProfileSpec{
 	name = "bitingbark",
-	ai_enable_strafe = false,
-	ai_enable_block = false,
-	ai_enable_jump = false,
-	ai_enable_weapon_switch = false,
-	ai_offense_factor = 1,
 	animations = {
 		["attack left claw"] = "bitingbark attack claw left",
 		["attack right claw"] = "bitingbark attack claw right",
@@ -70,7 +65,16 @@ Actorspec{
 		["strafe left"] = "bitingbark walk",
 		["strafe right"] = "bitingbark walk",
 		["walk"] = "bitingbark walk",
-		["walk back"] = "bitingbark walk back"},
+		["walk back"] = "bitingbark walk back"}}
+
+Actorspec{
+	name = "bitingbark",
+	ai_enable_strafe = false,
+	ai_enable_block = false,
+	ai_enable_jump = false,
+	ai_enable_weapon_switch = false,
+	ai_offense_factor = 1,
+	animations = {["default"] = "bitingbark"},
 	categories = {["enemy"] = true},
 	difficulty = 0.3,
 	effect_physical_damage = "fleshimpact1",

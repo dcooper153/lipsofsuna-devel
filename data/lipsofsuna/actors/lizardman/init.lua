@@ -75,18 +75,8 @@ Animationspec{
 	channel = 1,
 	permanent = true}
 
-Itemspec{
-	name = "lizard scale",
-	icon = "bone1", -- FIXME
-	model = "book-000", -- FIXME
-	mass = 1,
-	categories = {["material"] = true},
-	stacking = true}
-
-Actorspec{
+AnimationProfileSpec{
 	name = "lizardman",
-	ai_enable_block = false,
-	ai_offense_factor = 0.9,
 	animations = {
 		["attack back"] = "lizardman attack punch",
 		["attack bite"] = "lizardman attack bite",
@@ -103,8 +93,22 @@ Actorspec{
 		["strafe left"] = "lizardman strafe left",
 		["strafe right"] = "lizardman strafe right",
 		["walk"] = "lizardman walk",
-		["walk back"] = "lizardman walk back"},
+		["walk back"] = "lizardman walk back"}}
+
+Itemspec{
+	name = "lizard scale",
+	icon = "bone1", -- FIXME
+	model = "book-000", -- FIXME
+	mass = 1,
+	categories = {["material"] = true},
+	stacking = true}
+
+Actorspec{
+	name = "lizardman",
 	categories = {["enemy"] = true},
+	ai_enable_block = false,
+	ai_offense_factor = 0.9,
+	animations = {["default"] = "lizardman"},
 	difficulty = 0.3,
 	effect_physical_damage = "fleshimpact1",
 	factions = {["evil"] = true},
