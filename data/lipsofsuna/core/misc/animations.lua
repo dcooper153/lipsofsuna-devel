@@ -439,6 +439,11 @@ Animationspec{
 	weight = 30}
 
 Animationspec{
+	name = "default stagger",
+	animation = "aer1-stagger-2h", --FIXME
+	weight = 1000}
+
+Animationspec{
 	name = "default strafe left",
 	animation = "aer1-strafe-left",
 	channel = 1,
@@ -532,6 +537,7 @@ AnimationProfileSpec{
 		["spell ranged"] = "default spell ranged",
 		["spell self"] = "default spell self",
 		["spell touch"] = "default spell touch",
+		["stagger"] = "default stagger",
 		["strafe left"] = "default strafe left",
 		["strafe right"] = "default strafe right",
 		["throw"] = "default throw",

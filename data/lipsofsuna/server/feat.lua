@@ -30,6 +30,7 @@ Feat.apply_block_penalty = function(self, args)
 	if args.owner and args.object and args.object.blocking then
 		if Program.time - args.object.blocking > args.object.spec.blocking_delay then
 			args.owner.cooldown = (args.owner.cooldown or 0) * 2
+			args.owner:animate("stagger")
 		end
 	end
 end
