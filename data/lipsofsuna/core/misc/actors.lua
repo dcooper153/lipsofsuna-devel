@@ -5,7 +5,7 @@ Actorspec{
 	aim_ray_center = Vector(0, 1.5, 0),
 	aim_ray_end = 5,
 	aim_ray_start = 0.5,
-	animations = {["default"] = "default"},
+	animations = {["default"] = "default", ["feminine"] = "feminine"},
 	camera_center = Vector(0, 1.5, 0),
 	effect_physical_damage = "fleshimpact1",
 	equipment_slots = {

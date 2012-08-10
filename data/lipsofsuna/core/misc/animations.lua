@@ -539,3 +539,15 @@ AnimationProfileSpec{
 		["throw grenade"] = "default throw",
 		["walk"] = "default walk",
 		["walk back"] = "default walk back"}}
+
+Animationspec{
+	name = "feminine idle",
+	animation = "aer1-idle2",
+	channel = 1,
+	permanent = true}
+
+AnimationProfileSpec{
+	name = "feminine",
+	animations = {
+		["idle"] = "feminine idle"},
+	inherit = {"default"}}
