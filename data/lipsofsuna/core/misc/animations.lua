@@ -627,6 +627,56 @@ AnimationProfileSpec{
 
 ------------------------------------------------------------------------------
 
+Animationspec{
+	name = "default attack back two-handed",
+	animation = "aer1-attack-back-2h",
+	channel = 2,
+	fade_in = 0,
+	replace = true,
+	time = frames(20),
+	weight = 1000,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default attack front two-handed",
+	animation = "aer1-attack-front-2h",
+	channel = 2,
+	fade_in = 0,
+	replace = true,
+	time = frames(20),
+	weight = 1000,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default attack stand two-handed",
+	animation = "aer1-attack-stand-2h",
+	channel = 2,
+	fade_in = 0,
+	replace = true,
+	time = frames(20),
+	weight = 1000,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default hold two-handed",
+	animation = "aer1-hold-2h",
+	channel = 3,
+	permanent = true,
+	repeat_start = 10,
+	weight = 5}
+
+AnimationProfileSpec{
+	name = "default two-handed equipped",
+	animations = {
+		["attack back"] = "default attack back two-handed",
+		["attack front"] = "default attack front two-handed",
+		["attack left"] = "default attack stand two-handed", -- TODO
+		["attack right"] = "default attack stand two-handed", -- TODO
+		["attack stand"] = "default attack stand two-handed",
+		["hold"] = "default hold two-handed"}}
+
+------------------------------------------------------------------------------
+
 -- FIXME
 AnimationProfileSpec{
 	name = "default sword equipped"}

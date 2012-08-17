@@ -3,7 +3,7 @@ Program:add_path(Mod.path)
 Itemspec{
 	name = "adamantium sword",
 	categories = {["melee"] = true, ["weapon"] = true},
-	animations_equipped = {["default"] = "default sword equipped"},
+	animations_equipped = {["default"] = "default two-handed equipped"},
 	crafting_materials = {["adamantium"] = 3},
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
