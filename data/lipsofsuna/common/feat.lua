@@ -92,7 +92,10 @@ Feat.get_info = function(self, args)
 		end
 	end
 	-- Ammo requirements.
-	local ammo = args and args.weapon and args.weapon.spec.ammo_type
+	local ammo = anim.required_ammo
+	if anim.required_ammo == "WEAPON" then
+		ammo = args and args.weapon and args.weapon.spec.ammo_type
+	end
 	-- Stat requirements.
 	for k,v in pairs(stats) do
 		stats[k] = math.max(1, math.floor(v))
@@ -128,13 +131,19 @@ Feat.get_info = function(self, args)
 	end
 	-- Add projectile-specific influences.
 	-- Works like the weapon variant but uses the projectile as the item.
-	if args and args.projectile and anim.bonuses_projectile and args.projectile.spec.influences then
-		local mult = 1
-		if args.owner.skills then
-			mult = args.owner.skills:calculate_damage_multiplier_for_item(args.weapon)
+	if anim.bonuses_projectile then
+		local projspec = args and args.projectile and args.projectile.spec
+		if not projspec and ammo then
+			projspec = Itemspec:find{name = ammo}
 		end
-		for k,v in pairs(args.projectile.spec.influences) do
-			influences[k] = (influences[k] or 0) + mult * v
+		if projspec and projspec.influences then
+			local mult = 1
+			if args.owner.skills and args.weapon then
+				mult = args.owner.skills:calculate_damage_multiplier_for_item(args.weapon)
+			end
+			for k,v in pairs(projspec.influences) do
+				influences[k] = (influences[k] or 0) + mult * v
+			end
 		end
 	end
 	-- Add berserk bonus.

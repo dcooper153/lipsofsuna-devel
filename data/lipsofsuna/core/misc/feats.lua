@@ -58,7 +58,7 @@ Feattypespec{
 	directional = true,
 	effect_impact = "impact1",
 	range = 10,
-	required_ammo = true,
+	required_ammo = "WEAPON",
 	required_weapon = "ranged",
 	slot = "hand.R"}
 
@@ -492,3 +492,15 @@ Feateffectspec{
 	influences = {["fire damage"] = 20},
 	projectile = "firebreath1",
 	required_stats = {["willpower"] = 5}}
+
+Feattypespec{
+	name = "turret fire",
+	action = "turret fire",
+	animation = "fire",
+	bonuses_projectile = true,
+	categories = {["ranged"] = true},
+	cooldown = 0.1,
+	effect = "musket1", --FIXME
+	effect_impact = "impact1",
+	range = 10,
+	required_ammo = "bullet"}

@@ -23,7 +23,7 @@ Feattypespec.introspect = Introspect{
 		{name = "icon", type = "string", description = "Icon name.", default = "missing1", details = {spec = "Iconspec"}},
 		{name = "influences", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of influences and their strengths.", details = {keys = {spec = "Feateffectspec"}}},
 		{name = "range", type = "number", description = "Maximum attack range estimate for the AI."},
-		{name = "required_ammo", type = "boolean", description = "True for the feat the require ammo for the weapon."},
+		{name = "required_ammo", type = "string", description = "Name of the ammo item consumed by the feat, or \"WEAPON\" for using the ammo of the wielded weapon."},
 		{name = "required_weapon", type = "string", description = "Weapon category required for performing the feat."},
 		{name = "slot", type = "string", description = "Weapon slot used by the feat."},
 		{name = "toggle", type = "boolean", description = "True to trigger the handler on the key release event as well."}
