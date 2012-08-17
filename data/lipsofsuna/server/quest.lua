@@ -1,4 +1,4 @@
-require "server/marker"
+require "common/marker"
 
 --- Marks the quest as active.
 -- @param clss Quest class.
