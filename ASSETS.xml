@@ -216,11 +216,11 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
   </asset>
 
   <asset>
-    <file>data/lipsofsuna/actors/aer/*.lmdl</file>
+    <file>data/lipsofsuna/actors/aer/aer*1.lmdl</file>
+    <file>data/lipsofsuna/actors/aer/aer*2.lmdl</file>
     <file>data/lipsofsuna/actors/aer/*.dds</file>
     <file>data/lipsofsuna/apparel/longcoat/*.lmdl</file>
     <file>data/lipsofsuna/apparel/longcoat/*.png</file>
-    <file>import/aer1.blend</file>
     <file>import/aerbody1.blend</file>
     <file>import/aeritem1.blend</file>
     <file>import/aer1.png</file>
@@ -231,6 +231,15 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
     <file>import/longcoat1.png</file>
     <file>import/longcoat1.xcf</file>
     <author>Ari Mustonen</author>
+    <license>Creative Commons BY-SA 3.0</license>
+  </asset>
+
+  <asset>
+    <file>data/lipsofsuna/actors/aer/aer1.lmdl</file>
+    <file>data/lipsofsuna/actors/aer/aer1-*.lani</file>
+    <file>import/aer1.blend</file>
+    <author>Ari Mustonen</author>
+    <author>Renoki</author>
     <license>Creative Commons BY-SA 3.0</license>
   </asset>
 
@@ -1487,6 +1496,9 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
     <file>data/lipsofsuna/plants/watermelon/watermelon1.png</file>
     <file>data/lipsofsuna/plants/watermelon/watermelon2.lmdl</file>
     <file>data/lipsofsuna/plants/watermelon/watermelonleaf1.png</file>
+    <file>data/lipsofsuna/regions/keepersofknowledge/turret1.lmdl</file>
+    <file>data/lipsofsuna/regions/keepersofknowledge/turret1.png</file>
+    <file>data/lipsofsuna/regions/keepersofknowledge/turret1-*.lani</file>
     <file>import/obelisk1.blend</file>
     <file>import/obelisk1.png</file>
     <file>import/apple1.blend</file>
@@ -1517,6 +1529,8 @@ with 'import/' and can be downloaded from the Lips of Suna data repository.
     <file>import/shelf1.png</file>
     <file>import/lantern1.blend</file>
     <file>import/lantern1.png</file>
+    <file>import/turret1.blend</file>
+    <file>import/turret1.png</file>
     <author>Renoki</author>
     <license>Creative Commons BY-SA 3.0</license>
   </asset>

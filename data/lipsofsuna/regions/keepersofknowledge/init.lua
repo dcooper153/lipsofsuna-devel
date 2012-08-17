@@ -75,9 +75,22 @@ Actorspec{
 	skills = {["Health lv4"] = true, ["Willpower lv4"] = true},
 	weapon_slot = "robotarm.R"}
 
+Animationspec{
+	name = "turret fire",
+	animation = "turret1-fire",
+	channel = 1}
+
+AnimationProfileSpec{
+	name = "turret",
+	animations = {
+		["attack back"] = "turret fire",
+		["attack front"] = "turret fire",
+		["attack left"] = "turret fire",
+		["attack right"] = "turret fire",
+		["attack stand"] = "turret fire"}}
+
 Actorspec{
 	name = "library security turret",
-	model = "barrel1",
 	ai_enable_backstep = false,
 	ai_enable_block = false,
 	ai_enable_jump = false,
@@ -86,16 +99,17 @@ Actorspec{
 	ai_enable_walk = false,
 	ai_enable_weapon_switch = false,
 	aim_ray_start = 0.7,
-	animations = {["default"] = "default"},
+	animations = {["default"] = "turret"},
 	-- TODO: Should have no gravity, shouldn't be pushable
 	factions = {["sealed library"] = true},
-	feat_types = {["ranged"] = true},
+	feat_types = {["turret fire"] = true},
 	feat_effects = {["physical damage"] = true},
 	important = true,
 	inventory_size = 2,
-	inventory_items = {["bullet"] = 100, ["security turret barrel"] = 1},
-	equipment_slots = {["turretbarrel"] = "#barrel"},
+	inventory_items = {["bullet"] = 100},
+	model = "turret1",
 	skills = {["Health lv4"] = true, ["Willpower lv4"] = true},
+	tilt_bone = {"tilt"},
 	weapon_slot = "turretbarrel"}
 
 require(Mod.path .. "greatlibrary1")
