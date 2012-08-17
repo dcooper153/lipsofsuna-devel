@@ -50,56 +50,68 @@ Itemspec{
 	stacking = true,
 	water_gravity = Vector(0,6,0)}
 
+AnimationProfileSpec{
+	name = "default bow equipped",
+	animations = {
+		["attack back"] = "default attack bow",
+		["attack front"] = "default attack bow",
+		["attack left"] = "default attack bow",
+		["attack right"] = "default attack bow",
+		["attack stand"] = "default attack bow",
+		["charge back"] = "default charge bow",
+		["charge front"] = "default charge bow",
+		["charge left"] = "default charge bow",
+		["charge right"] = "default charge bow",
+		["charge stand"] = "default charge bow",
+		["hold"] = "default hold bow"}}
+
 Itemspec{
 	name = "wooden bow",
-	model = "bow1",
-	icon = "bow1",
-	ammo_type = "arrow",
-	animation_attack = "attack bow",
-	animation_charge = "charge bow",
-	animation_hold = "hold bow",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	ammo_type = "arrow",
+	animations_equipped = {["default"] = "default bow equipped"},
 	crafting_materials = {["log"] = 5},
 	effect_craft = "craftwood1",
-	influences = {["physical damage"] = 4},
-	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {["hand.L"] = true},
-	water_gravity = Vector(0,6,0),
-	mass = 7}
+	icon = "bow1",
+	influences = {["physical damage"] = 4},
+	influences_bonus = {"ranged"},
+	mass = 7,
+	model = "bow1",
+	timings = {["fire"] = 20},
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "fire bow",
-	model = "bow1", -- FIXME
-	icon = "bow2",
-	ammo_type = "fire arrow",
-	animation_attack = "attack bow",
-	animation_charge = "charge bow",
-	animation_hold = "hold bow",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	ammo_type = "fire arrow",
+	animations_equipped = {["default"] = "default bow equipped"},
 	crafting_materials = {["log"] = 5},
 	effect_craft = "craftwood1",
-	influences = {["physical damage"] = 4},
-	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {["hand.L"] = true},
-	water_gravity = Vector(0,6,0),
-	mass = 7}
+	icon = "bow2",
+	influences = {["physical damage"] = 4},
+	influences_bonus = {"ranged"},
+	mass = 7,
+	model = "bow1", -- FIXME
+	timings = {["fire"] = 20},
+	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "explosive bow",
-	model = "bow1", -- FIXME
-	icon = "bow2",
-	ammo_type = "explosive arrow",
-	animation_attack = "attack bow",
-	animation_charge = "charge bow",
-	animation_hold = "hold bow",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	ammo_type = "explosive arrow",
+	animations_equipped = {["default"] = "default bow equipped"},
 	crafting_materials = {["log"] = 5},
 	effect_craft = "craftwood1",
-	influences = {["physical damage"] = 4},
-	influences_bonus = {"ranged"},
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {["hand.L"] = true},
-	water_gravity = Vector(0,6,0),
-	mass = 7}
+	icon = "bow2",
+	influences = {["physical damage"] = 4},
+	influences_bonus = {"ranged"},
+	mass = 7,
+	model = "bow1", -- FIXME
+	timings = {["fire"] = 20},
+	water_gravity = Vector(0,6,0)}

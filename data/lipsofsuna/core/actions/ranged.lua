@@ -5,14 +5,9 @@
 Actionspec{name = "ranged", func = function(feat, info, args)
 	Coroutine(function(t)
 		if args.weapon then
-			if args.weapon.spec.animation_attack == "attack bow" then
-				Coroutine:sleep(args.user.spec.timing_attack_bow * 0.02)
-			elseif args.weapon.spec.animation_attack == "attack crossbow" then
-				Coroutine:sleep(args.user.spec.timing_attack_crossbow * 0.02)
-			elseif args.weapon.spec.animation_attack == "attack musket" then
-				Coroutine:sleep(args.user.spec.timing_attack_musket * 0.02)
-			elseif args.weapon.spec.animation_attack == "attack revolver" then
-				Coroutine:sleep(args.user.spec.timing_attack_revolver * 0.02)
+			local frames = args.weapon.spec.timings["fire"]
+			if frames then
+				Coroutine:sleep(frames * 0.02)
 			end
 		end
 		feat:play_effects(args)

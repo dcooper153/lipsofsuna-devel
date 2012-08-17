@@ -10,7 +10,7 @@ Effectspec{
 
 Itemspec{
 	name = "wooden lantern",
-	animation_hold = "hold torch",
+	animations_equipped = {["default"] = "default torch equipped"},
 	crafting_count = 1,
 	crafting_materials = {["log"] = 2},
 	description = "A wooden lantern commonly used as a ligth source",

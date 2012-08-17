@@ -15,7 +15,7 @@ Questspec{
 Itemspec{
 	name = "dying torch",
 	model = "torch1",
-	animation_hold = "hold torch",
+	animations_equipped = {["default"] = "default torch equipped"},
 	categories = {["quest"] = true},
 	crafting_materials = {["log"] = 1},
 	effect_equip = "torch1",

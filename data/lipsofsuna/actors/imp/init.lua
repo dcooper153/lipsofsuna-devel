@@ -84,33 +84,36 @@ Effectspec{
 	node = "#flame",
 	particle = "torchfx1"}
 
+AnimationProfileSpec{
+	name = "default stone equipped",
+	animations = {
+		["hold"] = "default hold bulky"}}
+
 Itemspec{
 	name = "impstone",
-	model = "firestone1",
-	icon = "stone1",
-	equipment_slot = "hand.R",
 	categories = {["melee"] = true, ["weapon"] = true},
-	animation_hold = "hold bulky",
-	animation_attack = "throw bulky",
+	animations_equipped = {["default"] = "default stone equipped"},
+	equipment_slot = "hand.R",
+	icon = "stone1",
 	influences = {["physical damage"] = 1},
 	mass = 4,
+	model = "firestone1",
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
 
 Itemspec{
 	name = "firestone",
-	icon = "stone2",
-	model = "firestone1",
 	categories = {["explosive"] = true, ["melee"] = true, ["weapon"] = true},
-	animation_hold = "hold bulky",
-	animation_attack = "throw bulky",
-	influences = {["fire damage"] = 10, ["physical damage"] = 10},
-	influences_bonus = {"melee", "explosives"},
+	animations_equipped = {["default"] = "default stone equipped"},
 	destroy_actions = {"explode"},
 	destroy_timer = 5,
 	equipment_slot = "hand.R",
 	health = 1,
+	icon = "stone2",
+	influences = {["fire damage"] = 10, ["physical damage"] = 10},
+	influences_bonus = {"melee", "explosives"},
 	mass = 4,
+	model = "firestone1",
 	special_effects = {"impflame1"},
 	stacking = false}
 

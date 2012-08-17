@@ -52,6 +52,7 @@ end
 Actorspec:validate_all()
 Actorpresetspec:validate_all()
 Animationspec:validate_all()
+AnimationProfileSpec:validate_all()
 Dialogspec:validate_all()
 Factionspec:validate_all()
 Feattypespec:validate_all()

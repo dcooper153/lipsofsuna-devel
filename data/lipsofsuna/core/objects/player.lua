@@ -52,22 +52,13 @@ Player.attack_charge_start = function(self)
 	end
 	-- Get the attack direction.
 	local move
-	local anim1 = Feattypespec:find{name = anim}
-	if anim1 and anim1.directional then
-		if self.strafing < -0.2 then move = "left"
-		elseif self.strafing > 0.2 then move = "right"
-		elseif self.movement < -0.2 then move = "back"
-		elseif self.movement > 0.2 then move = "front"
-		else move = "stand" end
-	end
+	if self.strafing < -0.2 then move = "left"
+	elseif self.strafing > 0.2 then move = "right"
+	elseif self.movement < -0.2 then move = "back"
+	elseif self.movement > 0.2 then move = "front"
+	else move = "stand" end
 	-- Start charging the attack.
-	if move then
-		self:animate("charge " .. move, true)
-	elseif weapon and weapon.spec.animation_charge then
-		self:animate(weapon.spec.animation_charge, true)
-	else
-		self:animate("charge front", true)
-	end
+	self:animate("charge " .. move, true)
 	self.attack_charge = Program.time
 	self.attack_charge_anim = anim
 	self.attack_charge_move = move

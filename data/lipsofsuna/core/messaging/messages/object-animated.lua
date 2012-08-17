@@ -13,5 +13,7 @@ Message{
 		local o = Object:find{id = id}
 		if not o then return end
 		-- Set the client side animation.
-		o.render:add_animation(name, time, variant)
+		-- FIXME: Weapon slot assumption to hack functional charge attacks.
+		local weapon = o and o.inventory:get_object_by_slot("hand.R")
+		o.render:add_animation(name, time, variant, weapon)
 	end}

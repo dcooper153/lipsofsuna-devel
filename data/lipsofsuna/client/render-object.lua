@@ -73,15 +73,35 @@ end
 -- @param time Optional start time, or nil.
 -- @param variant Animation variant number, or nil.
 -- @return Animation arguments.
-ClientRenderObject.add_animation = function(self, name, time, variant)
+ClientRenderObject.add_animation = function(self, name, time, variant, weapon)
+	-- Check for initialization.
 	if not self.initialized then return end
 	if not self.object.spec.get_animation_arguments then return end
+	-- Determine the animation profile.
+	--
+	-- Animation selection is based on the animation profile name provided by
+	-- the actor. The name determines from which profile the animations will
+	-- be taken. Actors can easily customize their animations by changing the
+	-- animation profile they are using.
 	local profile = self.object:get_animation_profile()
-	local args = self.object.spec:get_animation_arguments(name, profile, variant)
+	-- Get the animation arguments.
+	--
+	-- Animations may be overridden by the wielded weapon. In such a case, the
+	-- spec of the weapon will return an equipment animation that will be used.
+	-- Otherwise, the animation is obtained from the actor spec.
+	local args
+	if weapon then
+		args = weapon.spec:get_animation_arguments_equipped(name, profile, variant)
+	end
+	if not args then
+		args = self.object.spec:get_animation_arguments(name, profile, variant)
+	end
+	-- Set the time offset.
 	if time and time > 0 then
 		args.time = (args.time or 0) + time
 		args.fade_in = 0
 	end
+	-- Animate the render model.
 	self:animate(args)
 	return args
 end
@@ -123,7 +143,7 @@ ClientRenderObject.add_equipment_anchor = function(self, object, slot, node)
 	-- Add special effects for the anchor.
 	effect:add_special_effects(RenderUtils:create_special_effects(effect, object.spec))
 	-- Add the equipment holding animation.
-	local anim = self:add_animation(object.spec.animation_hold)
+	local anim = self:add_animation("hold", 0, 0, object)
 	if anim then
 		if self.equipment_animations then
 			self.equipment_animations[slot] = anim

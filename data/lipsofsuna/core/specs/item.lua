@@ -12,12 +12,8 @@ Itemspec.introspect = Introspect{
 		{name = "name", type = "string", description = "Name of the spec."},
 		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
 		{name = "ammo_type", type = "string", description = "Name of the ammunition item type.", details = {spec = "Itemspec"}},
-		{name = "animation_looted", type = "string", description = "Animation played when the item is looted."},
-		{name = "animation_looting", type = "string", description = "Animation played when the item is being open during looting."},
-		{name = "animation_attack", type = "string", description = "Attack animation name for actors wielding the item."},
-		{name = "animation_charge", type = "string", description = "Charge animation name for actors wielding the item."},
-		{name = "animation_hold", type = "string", description = "Hold animation name for actors wielding the item."},
 		{name = "animations", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation profiles.", details = {values = {spec = "AnimationProfileSpec"}}},
+		{name = "animations_equipped", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation profiles used by the actor when equipping the item.", details = {values = {spec = "AnimationProfileSpec"}}},
 		{name = "armor_class", type = "number", default = 0, description = "How much protection the item offers when equipped."},
 		{name = "book_text", type = "string", description = "Content of player readable items."},
 		{name = "collision_group", type = "number", default = 0x0002, description = "Collision group."},
@@ -60,6 +56,7 @@ Itemspec.introspect = Introspect{
 		{name = "potion_effects", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of potion effects.", details = {keys = {spec = "Feateffectspec"}}},
 		{name = "special_effects", type = "list", list = {type = "string", details = {value = {spec = "Effectspec"}}}, default = {}, description = "List of special effects to render."},
 		{name = "stacking", type = "boolean", description = "True to allow the item to stack in the inventory."},
+		{name = "timings", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of timings."},
 		{name = "usages", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of ways how the object can be used.", details = {keys = {spec = "Actionspec"}}},
 		{name = "water_friction", type = "number", default = 0.9},
 		{name = "water_gravity", type = "vector", default = Vector(0,-3)}
@@ -89,6 +86,53 @@ Itemspec.get_animation = function(self, name, profile)
 		return profile:get_animation(a)
 	end
 	return profile and try(self, profile, name) or try(self, "default", name)
+end
+
+--- Gets an equipment animation by name.
+-- @param self Itemspec.
+-- @param name Animation name.
+-- @param profile Animation profile mapping, or nil for "default".
+-- @return Animation spec, or nil.
+Itemspec.get_animation_equipped = function(self, name, profile)
+	local try = function(self, p, a)
+		local pname = self.animations_equipped[p]
+		if not pname then return end
+		local profile = AnimationProfileSpec:find{name = pname}
+		if not profile then return end
+		return profile:get_animation(a)
+	end
+	return profile and try(self, profile, name) or try(self, "default", name)
+end
+
+--- Gets animation playback arguments by name.
+-- @param self Actor spec.
+-- @param name Animation name.
+-- @param profile Animation profile mapping, or nil for "default".
+-- @param variant Variant number, or nil.
+-- @return Table of animation playback arguments.
+Itemspec.get_animation_arguments = function(self, name, profile, variant)
+	local args = {animation = name, fade_in = 0.3, fade_out = 0.3, time = time}
+	local anim = self:get_animation(name, profile)
+	if anim then
+		for k,v in pairs(anim:get_arguments(variant)) do args[k] = v end
+	end
+	return args
+end
+
+--- Gets equipment animation playback arguments by name.
+-- @param self Actor spec.
+-- @param name Animation name.
+-- @param profile Animation profile mapping, or nil for "default".
+-- @param variant Variant number, or nil.
+-- @return Table of animation playback arguments, or nil.
+Itemspec.get_animation_arguments_equipped = function(self, name, profile, variant)
+	local anim = self:get_animation_equipped(name, profile)
+	if not anim then return end
+	local args = {animation = name, fade_in = 0.3, fade_out = 0.3, time = time}
+	if anim then
+		for k,v in pairs(anim:get_arguments(variant)) do args[k] = v end
+	end
+	return args
 end
 
 --- Finds the equipment models of the item for the given race.

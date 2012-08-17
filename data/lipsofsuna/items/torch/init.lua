@@ -12,16 +12,21 @@ Effectspec{
 	node = "#flame",
 	particle = "torchfx1"}
 
+AnimationProfileSpec{
+	name = "default torch equipped",
+	animations = {
+		["hold"] = "default hold torch"}}
+
 Itemspec{
 	name = "torch",
-	model = "torch1",
-	animation_hold = "hold torch",
 	categories = {["misc"] = true},
+	animations_equipped = {["default"] = "default torch equipped"},
 	crafting_materials = {["log"] = 1},
 	effect_equip = "torch1",
 	effect_unequip = "torch1",
 	equipment_slot = "hand.L",
 	icon = "torch1",
 	mass = 3,
+	model = "torch1",
 	special_effects = {"torchflame1"},
 	water_gravity = Vector(0,6,0)}

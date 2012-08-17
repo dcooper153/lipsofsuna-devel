@@ -19,7 +19,8 @@ Feattypespec{
 	categories = {["build"] = true},
 	cooldown = 0.5,
 	effect = "swing1",
-	required_weapon = "build"}
+	required_weapon = "build",
+	slot = "hand.R"}
 
 Feattypespec{
 	name = "missile spell",
@@ -35,7 +36,7 @@ Feattypespec{
 Feattypespec{
 	name = "right hand",
 	action = "melee",
-	animation = "attack punch",
+	animation = "attack",
 	bonuses_barehanded = true,
 	bonuses_weapon = true,
 	categories = {["melee"] = true},
@@ -49,15 +50,17 @@ Feattypespec{
 Feattypespec{
 	name = "ranged",
 	action = "ranged",
-	animation = "attack bow",
+	animation = "attack",
 	bonuses_projectile = true,
 	bonuses_weapon = true,
 	categories = {["ranged"] = true},
 	cooldown = 1.2,
+	directional = true,
 	effect_impact = "impact1",
 	range = 10,
 	required_ammo = true,
-	required_weapon = "ranged"}
+	required_weapon = "ranged",
+	slot = "hand.R"}
 
 Feattypespec{
 	name = "ranged spell",
@@ -94,10 +97,12 @@ Feattypespec{
 	bonuses_weapon = true,
 	categories = {["throw"] = true},
 	cooldown = 1,
+	directional = true,
 	effect = "swing1",
 	effect_impact = "impact1",
 	range = 10,
-	required_weapon = "throwable"}
+	required_weapon = "throwable",
+	slot = "hand.R"}
 
 ---------------------------------------------------------------------
 -- Types usable to monsters only.

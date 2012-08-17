@@ -11,23 +11,6 @@ Animationspec{
 	node_weights = {LOWER = 1}}
 
 Animationspec{
-	name = "default attack bow",
-	animation = "aer1-attack-bow",
-	channel = 2,
-	weight = 1000,
-	node_weights = {LOWER = 1}}
-
-Animationspec{
-	name = "default attack crossbow",
-	animation = "aer1-attack-crossbow",
-	channel = 2,
-	fade_in = 0,
-	replace = true,
-	time = frames(20),
-	weight = 1000,
-	node_weights = {LOWER = 1}}
-
-Animationspec{
 	name = "default attack front",
 	animation = "aer1-attack-front",
 	channel = 2,
@@ -72,20 +55,6 @@ Animationspec{
 	fade_in = 0,
 	replace = true,
 	time = frames(20),
-	weight = 1000,
-	node_weights = {LOWER = 1}}
-
-Animationspec{
-	name = "default attack musket",
-	animation = "aer1-attack-musket",
-	channel = 2,
-	weight = 1000,
-	node_weights = {LOWER = 1}}
-
-Animationspec{
-	name = "default attack revolver",
-	animation = "aer1-attack-revolver",
-	channel = 2,
 	weight = 1000,
 	node_weights = {LOWER = 1}}
 
@@ -167,28 +136,8 @@ Animationspec{
 	node_weights = {LOWER = 1}}
 
 Animationspec{
-	name = "default charge bow",
-	animation = "aer1-charge-bow",
-	channel = 2,
-	permanent = true,
-	repeat_start = 10,
-	weight = 100,
-	node_weights = {LOWER = 1}}
-
-Animationspec{
 	name = "default charge cancel",
 	channel = 2}
-
-Animationspec{
-	name = "default charge crossbow",
-	animation = "aer1-attack-crossbow",
-	channel = 2,
-	fade_in = 0.1,
-	permanent = true,
-	repeat_end = frames(50),
-	repeat_start = frames(50),
-	weight = 5000,
-	node_weights = {LOWER = 1}}
 
 Animationspec{
 	name = "default charge grenade",
@@ -202,15 +151,6 @@ Animationspec{
 	node_weights = {LOWER = 1}}
 
 Animationspec{
-	name = "default charge musket",
-	animation = "aer1-charge-musket",
-	channel = 2,
-	permanent = true,
-	repeat_start = 10,
-	weight = 5000,
-	node_weights = {LOWER = 1}}
-
-Animationspec{
 	name = "default charge punch",
 	animation = "aer1-charge-punch",
 	channel = 2,
@@ -220,15 +160,6 @@ Animationspec{
 	weight = 100,
 	node_weights = {LOWER = 1,
 	ARML = 1}}
-
-Animationspec{
-	name = "default charge revolver",
-	animation = "aer1-charge-revolver",
-	channel = 2,
-	permanent = true,
-	repeat_start = 10,
-	weight = 5000,
-	node_weights = {LOWER = 1}}
 
 Animationspec{
 	name = "default climb high",
@@ -265,44 +196,12 @@ Animationspec{
 	weight = 5}
 
 Animationspec{
-	name = "default hold bow",
-	animation = "aer1-hold-right",
-	channel = 3,
-	permanent = true,
-	repeat_start = 10,
-	weight = 5}
-
-Animationspec{
 	name = "default hold bulky",
 	animation = "aer1-hold-bulky",
 	channel = 3,
 	permanent = true,
 	repeat_start = 10,
 	weight = 5}
-
-Animationspec{
-	name = "default hold crossbow",
-	animation = "aer1-hold-crossbow",
-	channel = 3,
-	permanent = true,
-	repeat_start = 10,
-	weight = 50}
-
-Animationspec{
-	name = "default hold musket",
-	animation = "aer1-hold-musket",
-	channel = 3,
-	permanent = true,
-	repeat_start = 10,
-	weight = 50}
-
-Animationspec{
-	name = "default hold revolver",
-	animation = "aer1-hold-revolver",
-	channel = 3,
-	permanent = true,
-	repeat_start = 10,
-	weight = 50}
 
 Animationspec{
 	name = "default hold staff",
@@ -504,11 +403,7 @@ AnimationProfileSpec{
 		["attack left"] = "default attack left",
 		["attack right"] = "default attack right",
 		["attack stand"] = "default attack stand",
-		["attack bow"] = "default attack bow",
-		["attack crossbow"] = "default attack crossbow",
-		["attack musket"] = "default attack musket",
 		["attack punch"] = "default attack punch",
-		["attack revolver"] = "default attack revolver",
 		["block start"] = "default block start",
 		["block stop"] = "default block stop",
 		["build"] = "default build",
@@ -518,27 +413,13 @@ AnimationProfileSpec{
 		["charge left"] = "default charge left",
 		["charge right"] = "default charge right",
 		["charge stand"] = "default charge stand",
-		["charge bow"] = "default charge bow",
-		["charge crossbow"] = "default charge crossbow",
 		["charge grenade"] = "default charge grenade",
-		["charge musket"] = "default charge musket",
 		["charge punch"] = "default charge punch",
-		["charge revolver"] = "default charge revolver",
 		["climb high"] = "default climb high",
 		["climb low"] = "default climb low",
 		["flinch"] = "default flinch",
 		["hang"] = "default hang",
-		["hold axe"] = "default hold axe",
-		["hold blunt"] = "default hold blunt",
-		["hold bow"] = "default hold bow",
-		["hold bulky"] = "default hold bulky",
-		["hold crossbow"] = "default hold crossbow",
-		["hold musket"] = "default hold musket",
-		["hold revolver"] = "default hold revolver",
-		["hold staff"] = "default hold staff",
-		["hold shield"] = "default hold shield",
-		["hold sword"] = "default hold sword",
-		["hold torch"] = "default hold torch",
+		["hold"] = "default hold sword",
 		["dead"] = "default dead",
 		["death"] = "default death",
 		["drop"] = "default drop",
@@ -558,10 +439,10 @@ AnimationProfileSpec{
 		["strafe right"] = "default strafe right",
 		["talk"] = "default talk",
 		["throw"] = "default throw",
-		["throw bulky"] = "default throw",
-		["throw grenade"] = "default throw",
 		["walk"] = "default walk",
 		["walk back"] = "default walk back"}}
+
+------------------------------------------------------------------------------
 
 Animationspec{
 	name = "feminine idle",
@@ -574,3 +455,178 @@ AnimationProfileSpec{
 	animations = {
 		["idle"] = "feminine idle"},
 	inherit = {"default"}}
+
+------------------------------------------------------------------------------
+
+Animationspec{
+	name = "default attack bow",
+	animation = "aer1-attack-bow",
+	channel = 2,
+	weight = 1000,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default charge bow",
+	animation = "aer1-charge-bow",
+	channel = 2,
+	permanent = true,
+	repeat_start = 10,
+	weight = 100,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default hold bow",
+	animation = "aer1-hold-right",
+	channel = 3,
+	permanent = true,
+	repeat_start = 10,
+	weight = 5}
+
+AnimationProfileSpec{
+	name = "default bow equipped",
+	animations = {
+		["attack back"] = "default attack bow",
+		["attack front"] = "default attack bow",
+		["attack left"] = "default attack bow",
+		["attack right"] = "default attack bow",
+		["attack stand"] = "default attack bow",
+		["charge back"] = "default charge bow",
+		["charge front"] = "default charge bow",
+		["charge left"] = "default charge bow",
+		["charge right"] = "default charge bow",
+		["charge stand"] = "default charge bow"}}
+		["hold"] = "default hold bow",
+
+------------------------------------------------------------------------------
+
+Animationspec{
+	name = "default attack crossbow",
+	animation = "aer1-attack-crossbow",
+	channel = 2,
+	fade_in = 0,
+	replace = true,
+	time = frames(20),
+	weight = 1000,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default charge crossbow",
+	animation = "aer1-attack-crossbow",
+	channel = 2,
+	fade_in = 0.1,
+	permanent = true,
+	repeat_end = frames(50),
+	repeat_start = frames(50),
+	weight = 5000,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default hold crossbow",
+	animation = "aer1-hold-crossbow",
+	channel = 3,
+	permanent = true,
+	repeat_start = 10,
+	weight = 50}
+
+AnimationProfileSpec{
+	name = "default crossbow equipped",
+	animations = {
+		["attack back"] = "default attack crossbow",
+		["attack front"] = "default attack crossbow",
+		["attack left"] = "default attack crossbow",
+		["attack right"] = "default attack crossbow",
+		["attack stand"] = "default attack crossbow",
+		["charge back"] = "default charge crossbow",
+		["charge front"] = "default charge crossbow",
+		["charge left"] = "default charge crossbow",
+		["charge right"] = "default charge crossbow",
+		["charge stand"] = "default charge crossbow",
+		["hold"] = "default hold crossbow"}}
+
+------------------------------------------------------------------------------
+
+Animationspec{
+	name = "default attack musket",
+	animation = "aer1-attack-musket",
+	channel = 2,
+	weight = 1000,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default charge musket",
+	animation = "aer1-charge-musket",
+	channel = 2,
+	permanent = true,
+	repeat_start = 10,
+	weight = 5000,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default hold musket",
+	animation = "aer1-hold-musket",
+	channel = 3,
+	permanent = true,
+	repeat_start = 10,
+	weight = 50}
+
+AnimationProfileSpec{
+	name = "default musket equipped",
+	animations = {
+		["attack back"] = "default attack musket",
+		["attack front"] = "default attack musket",
+		["attack left"] = "default attack musket",
+		["attack right"] = "default attack musket",
+		["attack stand"] = "default attack musket",
+		["charge back"] = "default charge musket",
+		["charge front"] = "default charge musket",
+		["charge left"] = "default charge musket",
+		["charge right"] = "default charge musket",
+		["charge stand"] = "default charge musket",
+		["hold"] = "default hold musket"}}
+
+------------------------------------------------------------------------------
+
+Animationspec{
+	name = "default attack revolver",
+	animation = "aer1-attack-revolver",
+	channel = 2,
+	weight = 1000,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default charge revolver",
+	animation = "aer1-charge-revolver",
+	channel = 2,
+	permanent = true,
+	repeat_start = 10,
+	weight = 5000,
+	node_weights = {LOWER = 1}}
+
+Animationspec{
+	name = "default hold revolver",
+	animation = "aer1-hold-revolver",
+	channel = 3,
+	permanent = true,
+	repeat_start = 10,
+	weight = 50}
+
+AnimationProfileSpec{
+	name = "default revolver equipped",
+	animations = {
+		["attack back"] = "default attack revolver",
+		["attack front"] = "default attack revolver",
+		["attack left"] = "default attack revolver",
+		["attack right"] = "default attack revolver",
+		["attack stand"] = "default attack revolver",
+		["charge back"] = "default charge revolver",
+		["charge front"] = "default charge revolver",
+		["charge left"] = "default charge revolver",
+		["charge right"] = "default charge revolver",
+		["charge stand"] = "default charge revolver",
+		["hold"] = "default hold revolver"}}
+
+------------------------------------------------------------------------------
+
+-- FIXME
+AnimationProfileSpec{
+	name = "default sword equipped"}

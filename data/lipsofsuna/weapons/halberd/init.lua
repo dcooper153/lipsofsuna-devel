@@ -1,16 +1,19 @@
 Program:add_path(Mod.path)
 
+AnimationProfileSpec{
+	name = "default staff equipped",
+	animations = {
+		["hold"] = "default hold staff"}}
+
 Itemspec{
 	name = "iron halberd",
-	model = "halberd1",
-	icon = "staff1", --FIXME
-	animation_attack = "attack staff",
-	animation_charge = "charge staff",
-	animation_hold = "hold staff",
 	categories = {["melee"] = true, ["weapon"] = true},
+	animations_equipped = {["default"] = "default staff equipped"},
 	crafting_materials = {["iron ingot"] = 4},
 	effect_attack_speedline = true,
+	equipment_slot = "hand.R",
+	icon = "staff1", --FIXME
 	influences = {["physical damage"] = 10},
 	influences_bonus = {"melee"},
-	equipment_slot = "hand.R",
-	mass = 15}
+	mass = 15,
+	model = "halberd1"}
