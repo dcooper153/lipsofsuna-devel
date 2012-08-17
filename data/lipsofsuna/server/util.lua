@@ -145,7 +145,7 @@ end
 Utils.find_spawn_points_in_sector = function(clss, sector, count, allow_yield)
 	local c = Vector()
 	local num = 0
-	local org = Game.sectors:get_sector_offset(sector)
+	local org = Sector:get_tile_by_id(sector)
 	local res = {}
 	local check = function(c)
 		-- Find the voxel floor.

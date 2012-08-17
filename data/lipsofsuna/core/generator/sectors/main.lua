@@ -11,7 +11,7 @@ end
 Generator.sector_types.Main.generate = function(self, sector)
 	local w = Voxel.tiles_per_line
 	local size = Vector(w,w,w)
-	local pos = Server.generator:get_sector_offset(sector)
+	local pos = Sector:get_tile_by_id(sector)
 	local t = self:get_sector(pos, size)
 	local g = Generator.sector_types[t]
 	if not g then
@@ -42,7 +42,7 @@ Generator.sector_types.Main.get_sector = function(self, pos, size)
 	-- Predefined sectors.
 	-- The map generator allocates some sectors for towns. They're formatted
 	-- using a specific town generator.
-	local s = Server.generator.sectors[Server.generator:get_sector_id(pos)]
+	local s = Server.generator.sectors[Sector:get_id_by_tile(pos)]
 	if s then return s end
 	if not Server.generator:validate_rect(pos, size) then return "Town" end
 	-- Map boundaries.

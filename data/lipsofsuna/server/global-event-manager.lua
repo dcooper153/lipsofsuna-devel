@@ -54,7 +54,7 @@ Globaleventmanager.find_actor_spawn_point = function(self)
 	local spawn = Utils:find_spawn_point(point)
 	if not spawn then return end
 	-- Ensure that the point is in a loaded sector.
-	local sector = Server.generator:get_sector_id_by_point(spawn)
+	local sector = Sector:get_id_by_point(spawn)
 	if not Game.sectors.sectors[sector] then return end
 	return spawn
 end
@@ -65,7 +65,7 @@ end
 -- @return Dictionary of players mapped to player states.
 Globaleventmanager.find_players_exploring_sector = function(self, id)
 	-- Find the closest player.
-	local c = Server.generator:get_sector_center_by_id(id)
+	local c = Sector:get_center_by_id(id)
 	local nearest_dist
 	local nearest_player
 	for k,v in pairs(Server.players_by_client) do
@@ -153,7 +153,7 @@ end
 -- @param objects List of objects in the sector.
 Globaleventmanager.sector_created = function(self, id, loaded, objects)
 	-- Find the player who most likely triggered the creation.
-	local c = Server.generator:get_sector_center_by_id(id)
+	local c = Sector:get_center_by_id(id)
 	local nearest_dist
 	local nearest_player
 	for k,v in pairs(Server.players_by_client) do

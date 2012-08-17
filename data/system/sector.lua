@@ -34,6 +34,15 @@ Sector.get_id_by_tile = function(self, tile)
 	return self:get_id_by_offset(tile * (1 / Voxel.tiles_per_line))
 end
 
+--- Gets the ID of the sector.
+-- @param self Sector.
+-- @param tile Sector offset in tiles.
+-- @return Number.
+Sector.get_id_by_tile = function(self, tile)
+	local s = tile:copy():round():divide(Voxel.tiles_per_line)
+	return self:get_id_by_offset(s)
+end
+
 Sector.get_offset_by_id = function(self, id)
 	local w = 128
 	local sx = id % w
@@ -42,10 +51,22 @@ Sector.get_offset_by_id = function(self, id)
 	return Vector(sx, sy, sz)
 end
 
-Sector.get_offset_by_point = function(self, tile)
-	return tile:copy():multiply(Voxel.tile_scale):divide(Voxel.tiles_per_line):round()
+Sector.get_offset_by_point = function(self, point)
+	return point:copy():multiply(Voxel.tile_scale):divide(Voxel.tiles_per_line):round()
 end
 
 Sector.get_offset_by_tile = function(self, tile)
 	return tile:copy():divide(Voxel.tiles_per_line):round()
+end
+
+Sector.get_tile_by_id = function(self, id)
+	return self:get_offset_by_id(id):multiply(Voxel.tiles_per_line)
+end
+
+Sector.get_tile_by_offset = function(self, offset)
+	return offset:copy():multiply(Voxel.tiles_per_line)
+end
+
+Sector.get_tile_by_point = function(self, point)
+	return self:get_offset_by_point(point):multiply(Voxel.tiles_per_line)
 end

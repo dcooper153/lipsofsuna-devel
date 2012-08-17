@@ -270,7 +270,7 @@ Generator.generate_dungeon = function(self, pattern)
 	local dungeon_boss = dungeon .. "Boss"
 	-- Mark sectors surrounding the exit.
 	-- TODO: Size management.
-	local offset = self:get_sector_offset_by_tile(point2)
+	local offset = Sector:get_offset_by_tile(point2)
 	for z = -3,1 do
 		for x = -2,2 do
 			self:set_sector_type_by_offset(offset + Vector(x,-1,z), dungeon)
@@ -363,28 +363,6 @@ Generator.generate_sector = function(self, id)
 	self.sector_types.Main:generate(id)
 end
 
---- Gets the ID of the sector.
--- @param self Generator.
--- @param sector Sector offset in tiles.
--- @return Vector.
-Generator.get_sector_id = function(self, tile)
-	local w = 128
-	local s = tile:copy():round():divide(Voxel.tiles_per_line):floor()
-	return s.x + s.y * w + s.z * w^2
-end
-
---- Gets the offset of the sector in tiles.
--- @param self Generator.
--- @param sector Sector index.
--- @return Vector.
-Generator.get_sector_offset = function(self, sector)
-	local w = 128
-	local sx = sector % w
-	local sy = math.floor(sector / w) % w
-	local sz = math.floor(sector / w / w) % w
-	return Vector(sx, sy, sz) * Voxel.tiles_per_line
-end
-
 --- Informs clients of the generator status.
 -- @param self Generator.
 -- @param client Specific client to inform or nil to inform all.
@@ -412,7 +390,7 @@ Generator.mark_road = function(self, src, dst)
 	local psec = ssec:copy()
 	repeat
 		-- Mark as road.
-		local sec = self:get_sector_id(psec * Voxel.tiles_per_line)
+		local sec = Sector:get_id_by_tile(psec * Voxel.tiles_per_line)
 		self.sectors[sec] = "Road"
 		dist = (dsec - psec):round()
 		if dist.length < 1 then break end
@@ -439,8 +417,8 @@ Generator.mark_road = function(self, src, dst)
 		end
 	until false
 	-- Mark the endpoints.
-	self.sectors[self:get_sector_id(src)] = "Road"
-	self.sectors[self:get_sector_id(dst)] = "Road"
+	self.sectors[Sector:get_id_by_tile(src)] = "Road"
+	self.sectors[Sector:get_id_by_tile(dst)] = "Road"
 end
 
 --- Draws a corridor in the map.
@@ -620,50 +598,8 @@ end
 ------------------------------------------------------------------------------
 -- TODO: Move to utils
 
-Generator.get_sector_center_by_id = function(self, id)
-	return self:get_sector_offset_by_id(id):add_xyz(0.5,0.5,0.5):
-		multiply(Voxel.tiles_per_line * Voxel.tile_size)
-end
-
 Generator.get_sector_type_by_id = function(self, id)
 	return self.sectors[id]
-end
-
-Generator.get_sector_id_by_offset = function(self, offset)
-	local w = 128
-	local s = offset:copy():floor()
-	return s.x + s.y * w + s.z * w^2
-end
-
-Generator.get_sector_id_by_point = function(self, point)
-	return self:get_sector_id_by_offset(point * Voxel.tile_scale * (1 / Voxel.tiles_per_line))
-end
-
-Generator.get_sector_id_by_tile = function(self, tile)
-	return self:get_sector_id_by_offset(tile * (1 / Voxel.tiles_per_line))
-end
-
-Generator.get_sector_offset_by_id = function(self, id)
-	local w = 128
-	local sx = id % w
-	local sy = math.floor(id / w) % w
-	local sz = math.floor(id / w / w) % w
-	return Vector(sx, sy, sz)
-end
-
-Generator.get_sector_offset_by_point = function(self, tile)
-	return tile:copy():multiply(Voxel.tile_scale):divide(Voxel.tiles_per_line):round()
-end
-
-Generator.get_sector_offset_by_tile = function(self, tile)
-	return tile:copy():divide(Voxel.tiles_per_line):round()
-end
-
-------------------------------------------------------------------------------
--- TODO: Move to utils
-
-Generator.get_sector_tile_by_id = function(self, id)
-	return self:get_sector_offset_by_id(id):multiply(Voxel.tiles_per_line)
 end
 
 Generator.set_sector_type_by_id = function(self, id, type)
@@ -671,11 +607,11 @@ Generator.set_sector_type_by_id = function(self, id, type)
 end
 
 Generator.set_sector_type_by_offset = function(self, offset, type)
-	self:set_sector_type_by_id(self:get_sector_id_by_offset(offset), type)
+	self:set_sector_type_by_id(Sector:get_id_by_offset(offset), type)
 end
 
 Generator.is_overworld_sector_by_id = function(self, id)
-	local tile = self:get_sector_tile_by_id(id)
+	local tile = Sector:get_tile_by_id(id)
 	return tile.y > 1000
 end
 
