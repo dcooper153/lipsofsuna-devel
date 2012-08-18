@@ -14,8 +14,12 @@ Operators = {}
 File:require_directory("client/operators")
 
 Client.init = function(self)
-	-- Initialize the UI.
+	-- Initialize graphics.
 	Program:load_graphics()
+	Render.skybox = "skybox1"
+	Reload.enabled = true
+	Lighting:init()
+	-- Initialize the UI.
 	Theme:init()
 	Ui:init()
 	-- Initialize the database.
@@ -39,6 +43,24 @@ Client.init = function(self)
 	self.terrain_sync = TerrainSync()
 	-- Initialize helper threads.
 	self.threads = {}
+	-- Execute the startup command.
+	Client.options:apply()
+	if Settings.join then
+		Client:join_game()
+	elseif Settings.host then
+		Client:host_game()
+	elseif Settings.editor then
+		Ui.state = "editor"
+	elseif Settings.benchmark then
+		Ui.state = "benchmark"
+		Client.benchmark = Benchmark()
+	else
+		Ui.state = "mainmenu"
+	end
+end
+
+Client.deinit = function(self)
+	self:terminate_game()
 end
 
 Client.add_speech_text = function(self, args)
