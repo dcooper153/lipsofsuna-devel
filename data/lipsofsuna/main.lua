@@ -31,24 +31,6 @@ end
 require "common/mod"
 require "mods"
 
--- Initialize the client core.
-if not Settings.server then
-require "system/graphics"
-require "system/input"
-Program.window_title = "Lips of Suna"
-require "system/camera"
-require "system/heightmap-render"
-require "system/model-editing"
-require "system/model-merge"
-require "system/object-render"
-require "system/render"
-require "system/render-model"
-require "system/tiles-render"
-require "system/reload"
-require "system/string"
-require "system/widgets"
-end
-
 Actorspec:validate_all()
 Actorpresetspec:validate_all()
 Animationspec:validate_all()

@@ -80,5 +80,3 @@ Quickslots.class_setters = {
 			self.group:set_child(1, 1, self.items)
 		end
 	end}
-
-Quickslots:init()

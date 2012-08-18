@@ -49,6 +49,14 @@ static void Program_layout_text (LIScrArgs* args)
 	}
 }
 
+static void Program_load_graphics (LIScrArgs* args)
+{
+	LIExtGraphics* module;
+
+	module = liscr_script_get_userdata (args->script, LIEXT_SCRIPT_GRAPHICS);
+	liren_render_load_resources (module->render);
+}
+
 static void Program_measure_text (LIScrArgs* args)
 {
 	int width_limit = -1;
@@ -215,6 +223,7 @@ void liext_script_graphics (
 	LIScrScript* self)
 {
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_layout_text", Program_layout_text);
+	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_load_graphics", Program_load_graphics);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_measure_text", Program_measure_text);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_render", Program_render);
 	liscr_script_insert_cfunc (self, LISCR_SCRIPT_PROGRAM, "program_render_update", Program_render_update);

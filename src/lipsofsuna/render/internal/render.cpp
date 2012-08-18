@@ -84,7 +84,6 @@ int liren_internal_init (
 {
 	Ogre::Real w;
 	Ogre::Real h;
-	LIAlgList* ptr;
 	Ogre::String data1 (self->paths->module_data);
 
 	/* Initialize the private data. */
@@ -216,28 +215,10 @@ int liren_internal_init (
 	self->data->resource_loading_listener = new LIRenResourceLoadingListener (self->paths);
 	mgr.setLoadingListener (self->data->resource_loading_listener);
 
-	/* Create the group for permanent resources. */
-	/* This group is used for resources that are managed by Ogre. They
-	   include textures and various scripts detected at initialization.
-	   Out of these, we only want to unload textures and even for them
-	   we want to keep the resource info available at all times. */
-	Ogre::String group = LIREN_RESOURCES_PERMANENT;
-	if (self->paths->paths != NULL)
-	{
-		for (ptr = self->paths->paths ; ptr->next != NULL ; ptr = ptr->next)
-			{}
-		for ( ; ptr != NULL ; ptr = ptr->prev)
-		{
-			const char* dir = (const char*) ptr->data;
-			mgr.addResourceLocation (dir, "FileSystem", group, false);
-		}
-	}
-
-	/* Load all resource scripts. */
+	/* Inialize texture and material managers. */
 	self->data->texture_manager = &Ogre::TextureManager::getSingleton ();
 	self->data->texture_manager->setDefaultNumMipmaps (5);
 	self->data->material_manager = &Ogre::MaterialManager::getSingleton ();
-	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups ();
 
 	return 1;
 }
@@ -378,6 +359,34 @@ int liren_internal_load_font (
 	}
 
 	return 1;
+}
+
+void liren_internal_load_resources (
+	LIRenRender* self)
+{
+	LIAlgList* ptr;
+
+	Ogre::ResourceGroupManager& mgr = Ogre::ResourceGroupManager::getSingleton ();
+
+	/* Create the group for permanent resources. */
+	/* This group is used for resources that are managed by Ogre. They
+	   include textures and various scripts detected at initialization.
+	   Out of these, we only want to unload textures and even for them
+	   we want to keep the resource info available at all times. */
+	Ogre::String group = LIREN_RESOURCES_PERMANENT;
+	if (self->paths->paths != NULL)
+	{
+		for (ptr = self->paths->paths ; ptr->next != NULL ; ptr = ptr->next)
+			{}
+		for ( ; ptr != NULL ; ptr = ptr->prev)
+		{
+			const char* dir = (const char*) ptr->data;
+			mgr.addResourceLocation (dir, "FileSystem", group, false);
+		}
+	}
+
+	/* Load the resources. */
+	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups ();
 }
 
 int liren_internal_measure_text (

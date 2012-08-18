@@ -43,6 +43,9 @@ LIAPICALL (int, liren_render_load_font, (
 	const char*  file,
 	int          size));
 
+LIAPICALL (void, liren_render_load_resources, (
+	LIRenRender* self));
+
 LIAPICALL (int, liren_render_measure_text, (
 	LIRenRender* self,
 	const char*  font,

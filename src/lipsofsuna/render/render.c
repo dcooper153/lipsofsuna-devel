@@ -175,6 +175,12 @@ int liren_render_load_font (
 	return liren_internal_load_font (self, name, file, size);
 }
 
+void liren_render_load_resources (
+	LIRenRender* self)
+{
+	liren_internal_load_resources (self);
+}
+
 int liren_render_measure_text (
 	LIRenRender* self,
 	const char*  font,

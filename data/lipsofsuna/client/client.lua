@@ -13,12 +13,15 @@ Client.class_name = "Client"
 Operators = {}
 File:require_directory("client/operators")
 
--- Initialize the database.
--- FIXME: Should be initialized in the initializer.
-Client.db = Database{name = "client.sqlite"}
-Client.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
-
 Client.init = function(self)
+	-- Initialize the UI.
+	Program:load_graphics()
+	Theme:init()
+	Ui:init()
+	-- Initialize the database.
+	Client.db = Database{name = "client.sqlite"}
+	Client.db:query("CREATE TABLE IF NOT EXISTS keyval (key TEXT PRIMARY KEY,value TEXT);")
+	Quickslots:init()
 	-- Initialize options.
 	self.options = Options.inst
 	Operators.controls:init()

@@ -1,14 +1,3 @@
-Widgets:add_font_style("serif1", "serif", 14)
-Widgets:add_font_style("serif2", "serif", 20)
-Widgets:add_font_style("serif3", "serif", 26)
-Widgets:add_font_style("serif4", "serif", 32)
-
-Widgets:add_font_style("default", "serif", 14)
-Widgets:add_font_style("bigger", "serif", 18)
-Widgets:add_font_style("medium", "serif", 24)
-Widgets:add_font_style("mainmenu", "serif", 48)
-Widgets:add_font_style("tiny", "serif", 9)
-
 Theme = Class()
 Theme.themes = {
 	{
@@ -62,6 +51,19 @@ Theme.themes = {
 		width_slider_button_1 = 26,
 		width_widget_1 = 600
 	}}
+
+Theme.init = function(self)
+	Widgets:add_font_style("serif1", "serif", 14)
+	Widgets:add_font_style("serif2", "serif", 20)
+	Widgets:add_font_style("serif3", "serif", 26)
+	Widgets:add_font_style("serif4", "serif", 32)
+
+	Widgets:add_font_style("default", "serif", 14)
+	Widgets:add_font_style("bigger", "serif", 18)
+	Widgets:add_font_style("medium", "serif", 24)
+	Widgets:add_font_style("mainmenu", "serif", 48)
+	Widgets:add_font_style("tiny", "serif", 9)
+end
 
 Theme.draw_button = function(self, widget, text, x, y, w, h, focused, pressed)
 	local position

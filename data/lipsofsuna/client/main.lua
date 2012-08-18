@@ -2,25 +2,9 @@ print "INFO: Loading client scripts."
 
 Render.skybox = "skybox1"
 Reload.enabled = true
-
-require "client/client"
-File:require_directory("client/widgets")
-require "client/action"
-require "client/audio"
-require "client/event"
-require "client/theme"
-require "client/controls"
-require "client/effect"
-require "client/quickslots"
-require "client/lighting"
 Lighting:init()
-require "client/player"
-require "client/simulation"
-require "client/target"
-File:require_directory("client/objects")
 
 -- Initialize the UI state.
-Ui:init()
 Client:init()
 Client.options:apply()
 if Settings.join then

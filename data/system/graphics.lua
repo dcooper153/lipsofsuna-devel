@@ -24,6 +24,12 @@ Program.layout_text = function(clss, font, text, width)
 	return Los.program_layout_text(font, text, width)
 end
 
+--- Loads the graphics resources.
+-- @param clss Program class.
+Program.load_graphics = function(clss)
+	return Los.program_load_graphics()
+end
+
 --- Measures a string.
 -- @param clss Program class.
 -- @param ... Arguments.<ul>
