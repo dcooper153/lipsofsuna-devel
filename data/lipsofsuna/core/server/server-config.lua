@@ -1,9 +1,11 @@
-Config = Class()
+require "system/lobby"
+
+ServerConfig = Class()
 
 --- Creates a new server configuration instance.
--- @param clss Config class.
--- @return Config.
-Config.new = function(clss)
+-- @param clss ServerConfig class.
+-- @return Server config.
+ServerConfig.new = function(clss)
 	local self = Class.new(clss)
 	-- Initialize defaults.
 	self.admins = {}
@@ -12,15 +14,11 @@ Config.new = function(clss)
 	self.server_name = "Unnamed server"
 	self.server_master = "http://lipsofsuna.org"
 	self.server_port = 10101
-	-- Get the spawn point.
-	print("setting spawn point")
-	local reg = Patternspec:find{name = "giantshaft"}
-	Config.spawn_point = reg.spawn_point_world
-	-- Load configuration.
+	-- Load the configuration.
 	self.config = ConfigFile{name = "server.cfg"}
 	self:load()
 	self:save()
-	-- Setup lobby.
+	-- Setup the lobby.
 	Lobby.players = 0
 	if self.server_announce then
 		Lobby.desc = self.server_desc
@@ -32,8 +30,8 @@ Config.new = function(clss)
 end
 
 --- Loads server configuration.
--- @param self Config.
-Config.load = function(self)
+-- @param self Server config.
+ServerConfig.load = function(self)
 	local opts = {
 		admins = function(v)
 			self.admins = {}
@@ -57,8 +55,8 @@ Config.load = function(self)
 end
 
 --- Saves server configuration.
--- @param self Config.
-Config.save = function(self)
+-- @param self Server config.
+ServerConfig.save = function(self)
 	-- Construct admin list.
 	local a = {}
 	for k in pairs(self.admins) do table.insert(a, k) end

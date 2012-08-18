@@ -32,16 +32,6 @@ Sectors.created_sector = function(self, sector, terrain, objects)
 	Server.events:sector_created(sector, terrain, objects)
 end
 
---- Removes all sectors from the database.
--- @param self Sectors.
-Sectors.erase_world = function(self, erase)
-	if not self.database then return end
-	self.database:query("BEGIN TRANSACTION;")
-	self.database:query("DELETE FROM objects;")
-	self.database:query("DELETE FROM terrain;")
-	self.database:query("END TRANSACTION;")
-end
-
 --- Reads a sector from the database.
 -- @param self Sectors.
 -- @param sector Sector index.
@@ -63,7 +53,7 @@ Sectors.load_sector = function(self, sector)
 		end
 		-- Load objects.
 		if Server.initialized then
-			objects = Server.serialize:load_sector_objects(sector)
+			objects = Server.object_database:load_sector_objects(sector)
 		end
 	end
 	-- Load custom content.
@@ -81,7 +71,7 @@ Sectors.save_sector = function(self, sector)
 	if not self.database then return end
 	-- Write objects.
 	if Server.initialized then
-		Server.serialize:save_sector_objects(sector)
+		Server.object_database:save_sector_objects(sector)
 	end
 	-- Write terrain.
 	self.database:query("DELETE FROM terrain WHERE sector=?;", {sector})

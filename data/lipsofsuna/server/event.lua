@@ -11,7 +11,7 @@ Eventhandler{type = "logout", func = function(self, event)
 	-- Detach the player object.
 	local object = Server.players_by_client[event.client]
 	if object then
-		Server.serialize:save_object(object)
+		Server.object_database:save_object(object)
 		object:detach()
 		Server.players_by_client[event.client] = nil
 	end
@@ -19,7 +19,7 @@ Eventhandler{type = "logout", func = function(self, event)
 	local account = Server.accounts_by_client[event.client]
 	if account then
 		if not object then
-			Server.serialize:save_account(account)
+			Server.account_database:save_account(account)
 		end
 		account.client = nil
 		Server.accounts_by_client[event.client] = nil

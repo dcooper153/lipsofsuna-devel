@@ -8,8 +8,8 @@ Account = Class()
 -- @param password Password.
 -- @return Account, or nil if authentication failed.
 Account.new = function(clss, login, password)
-	local data = Server.serialize:load_account(login)
-	local hash = Password:hash(password, Server.serialize.accounts.password_salt)
+	local data = Server.account_database:load_account(login)
+	local hash = Password:hash(password, Server.account_database.password_salt)
 	if data and data[2] ~= hash then return end
 	local self = Class.new(clss, {
 		login = login,

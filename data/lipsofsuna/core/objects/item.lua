@@ -246,7 +246,7 @@ end
 -- @param self Object.
 -- @param db Database.
 Item.read_db = function(self, db)
-	Server.serialize:load_object_inventory(self)
+	Server.object_database:load_inventory(self)
 end
 
 --- Writes the object to a database.

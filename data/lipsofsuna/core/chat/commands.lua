@@ -45,7 +45,7 @@ ChatCommand{
 	permission = "admin",
 	handler = "server",
 	func = function(player, matches)
-		Server.serialize:update_world_object_decay(Server.serialize.object_decay_timeout)
+		Server.object_database:decay_world_now()
 	end}
 
 ChatCommand{

@@ -175,7 +175,7 @@ Dialog.create_random_quest_branch = function(self, name, difficulty)
 	if not var_type then
 		local func = random_quests[math.random(1, #random_quests)]
 		func()
-		Server.serialize:save_quests()
+		Server.quest_database:save_quests()
 	end
 	-- Dialog creation functions.
 	-- These build the dialog trees for each random quest type.
@@ -392,12 +392,12 @@ Dialog.execute = function(self)
 		end,
 		["flag"] = function(vm, c)
 			Dialog.flags[c[2]] = "true"
-			Server.serialize:save_quests()
+			Server.quest_database:save_quests()
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["flag clear"] = function(vm, c)
 			Dialog.flags[c[2]] = nil
-			Server.serialize:save_quests()
+			Server.quest_database:save_quests()
 			vm[1].pos = vm[1].pos + 1
 		end,
 		["func"] = function(vm, c)

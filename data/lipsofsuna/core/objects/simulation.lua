@@ -269,7 +269,7 @@ end
 -- @param name Variable name.
 -- @return Variable value, or nil.
 SimulationObject.get_dialog_variable = function(self, name)
-	return Server.serialize:get_dialog_variable(self, name)
+	return Server.quest_database:get_dialog_variable(self, name)
 end
 
 --- Sets a dialog variable.
@@ -277,14 +277,14 @@ end
 -- @param name Variable name.
 -- @param value Variable value.
 SimulationObject.set_dialog_variable = function(self, name, value)
-	return Server.serialize:set_dialog_variable(self, name, value)
+	return Server.quest_database:set_dialog_variable(self, name, value)
 end
 
 --- Gets all dialog variable for the object.
 -- @param self Object.
 -- @return List of variables.
 SimulationObject.get_dialog_variables = function(self, name)
-	return Server.serialize:get_dialog_variables(self)
+	return Server.quest_database:get_dialog_variables(self)
 end
 
 SimulationObject.get_equip_value = function(self, user)
@@ -304,8 +304,7 @@ SimulationObject.get_free_id = function(clss)
 		while true do
 			local id = math.random(0x0000001, 0x0FFFFFF)
 			if not SimulationObject:find{id = id} then
-				local rows = Server.serialize.db:query([[SELECT id FROM object_data WHERE id=?;]], {id})
-				if not rows[1] then
+				if not Server.object_database:does_object_exist(id) then
 					return id
 				end
 			end
@@ -419,11 +418,7 @@ SimulationObject.merge = function(self, object)
 end
 
 SimulationObject.purge = function(self)
-	Server.serialize.db:query([[DELETE FROM object_data WHERE id=?;]], {self.id})
-	Server.serialize.db:query([[DELETE FROM object_inventory WHERE id=?;]], {self.id})
-	Server.serialize.db:query([[DELETE FROM object_sectors WHERE id=?;]], {self.id})
-	Server.serialize.db:query([[DELETE FROM object_skills WHERE id=?;]], {self.id})
-	Server.serialize.db:query([[DELETE FROM object_stats WHERE id=?;]], {self.id})
+	Server.object_database:delete_object(self)
 end
 
 --- Sends a chat message to all players near the object.

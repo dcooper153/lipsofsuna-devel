@@ -1,24 +1,9 @@
 require "system/class"
-require "common/crafting"
-require "common/sectors"
-require "common/unlocks"
-require "server/util"
-require "server/account"
-require "server/serialize"
-require "server/config"
-require "server/dialog"
-require "server/event"
-require "server/global-event-manager"
-require "server/log"
-require "server/quest"
-require "server/modifier"
-require "server/particles"
 
 Server = Class()
-require "server/admin"
 
 Server.init = function(self, multiplayer, client)
-	self.config = Config()
+	self.config = ServerConfig()
 	self.marker_timer = 0
 	self.initialized = true
 	self.multiplayer = multiplayer
@@ -26,7 +11,19 @@ Server.init = function(self, multiplayer, client)
 	self.accounts_by_client = {}
 	self.accounts_by_name = setmetatable({}, {__mode = "v"})
 	self.players_by_client = {}
-	self.serialize = Serialize(Game.database, Game.sectors)
+	-- Initialize the databases.
+	self.serialize = Serialize(Game.database)
+	self.account_database = AccountDatabase(Database{name = "accounts" .. Settings.file .. ".sqlite"})
+	self.object_database = ObjectDatabase(Game.database)
+	self.quest_database = QuestDatabase(Game.database)
+	if self.serialize:get_value("game_version") ~= self.serialize.game_version then
+		self.quest_database:reset()
+		Server.serialize:set_value("game_version", self.serialize.game_version)
+	end
+	if self.serialize:get_value("object_version") ~= self.serialize.object_version then
+		self.object_database:reset()
+		Server.serialize:set_value("object_version", self.serialize.object_version)
+	end
 	-- Initialize the map generator.
 	self.generator = Generator()
 	-- Initialize the event manager.
@@ -104,7 +101,7 @@ Server.authenticate_client = function(self, client, login, pass)
 	-- Log the successful login.
 	Log:format("Client login from %q using account %q.", self:get_client_address(client), login)
 	-- Create existing characters.
-	local object = Server.serialize:load_player_object(account)
+	local object = self.object_database:load_player(account)
 	if object then
 		object.account = account
 		self:spawn_player(object, client)
@@ -112,14 +109,14 @@ Server.authenticate_client = function(self, client, login, pass)
 	-- Check for permissions.
 	-- Check if the account has admin rights in the config file.
 	-- Grant admin rights to the first client if started with --admin.
-	local admin = (Server.config.admins[login] == true)
+	local admin = (self.config.admins[login] == true)
 	if Settings.admin or client == -1 then
 		Settings.admin = nil
-		Server.config.admins[login] = true
+		self.config.admins[login] = true
 		admin = true
 	end
 	-- Inform about admin privileges.
-	Game.messaging:server_event("change privilege level", client, Server.config.admins[login] or false)
+	Game.messaging:server_event("change privilege level", client, self.config.admins[login] or false)
 	-- Enter the character creation mode.
 	if not object then
 		Game.messaging:server_event("start character creation", client)
@@ -185,7 +182,7 @@ Server.spawn_player = function(self, player, client, spawnpoint)
 		end
 	end
 	-- Notify the global event manager.
-	Server.events:notify_action("player spawn", player)
+	self.events:notify_action("player spawn", player)
 end
 
 Server.update = function(self, secs)
@@ -213,7 +210,7 @@ Server.update = function(self, secs)
 	-- Update global events.
 	self.events:update(secs)
 	-- Update world object decay.
-	self.serialize:update_world_object_decay(secs)
+	self.object_database:update_world_decay(secs)
 end
 
 Server.world_effect = function(self, point, name)

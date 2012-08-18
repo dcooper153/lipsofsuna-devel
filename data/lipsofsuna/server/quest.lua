@@ -14,7 +14,7 @@ Quest.activate = function(clss, args)
 	if q.status == "unused" or q.status == "inactive" then
 		q.status = "active"
 		q:send{all = true}
-		Server.serialize:save_quest(q)
+		Server.quest_database:save_quest(q)
 	end
 end
 
@@ -32,7 +32,7 @@ Quest.complete = function(clss, args)
 	if q.status ~= "completed" then
 		q.status = "completed"
 		q:send{all = true}
-		Server.serialize:save_quest(q)
+		Server.quest_database:save_quest(q)
 	end
 end
 
@@ -120,6 +120,6 @@ Quest.update = function(self, args)
 	end
 	-- Save changes.
 	if ch_m or ch_p or ch_s or ch_t then
-		Server.serialize:save_quest(self)
+		Server.quest_database:save_quest(self)
 	end
 end

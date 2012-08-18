@@ -176,19 +176,19 @@ Generator.generate = function(self, args)
 	end
 	-- Save the map.
 	self:update_status(0, "Saving the map")
-	Server.serialize:clear_objects()
+	Server.object_database:clear_objects()
 	Game.sectors:save_world(true, function(p) self:update_status(p) end)
 	Game.sectors:unload_world()
 	for k,v in pairs(statics) do v:set_visible(true) end
-	Server.serialize:save_static_objects()
+	Server.object_database:save_static_objects()
 	Server.serialize:set_value("map_version", Generator.map_version)
 	-- Save map markers.
 	self:update_status(0, "Saving quests")
 	Server.serialize:save_generator(true)
 	Server.serialize:save_markers(true)
-	Server.serialize:save_quests(true)
-	Server.serialize:save_accounts(true)
-	Server.serialize:clear_world_object_decay()
+	Server.quest_database:save_quests(true)
+	Server.account_database:save_accounts(true)
+	Server.object_database:clear_world_decay()
 	-- Discard events emitted during map generation so that they
 	-- don't trigger when the game starts.
 	self:update_status(0, "Finishing")

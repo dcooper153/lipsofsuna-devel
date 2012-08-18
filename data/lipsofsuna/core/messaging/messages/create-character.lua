@@ -113,5 +113,5 @@ Message{
 			spec = spec}
 		Game.messaging:server_event("accept character", client)
 		Server:spawn_player(player, client, char.spawn_point)
-		Server.serialize:save_object(player)
+		Server.object_database:save_object(player)
 	end}

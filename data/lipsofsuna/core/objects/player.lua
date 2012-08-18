@@ -161,7 +161,7 @@ end
 
 Player.respawn = function(self)
 	self:disable()
-	Server.serialize:save_account(self.account)
+	Server.account_database:save_account(self.account)
 end
 
 Player.handle_inventory_event = function(self, args)
@@ -486,6 +486,6 @@ Player.write_db = function(self, db)
 	end
 	-- Write account information.
 	if self.client and self.account then
-		Server.serialize:save_account(self.account, self)
+		Server.account_database:save_account(self.account, self)
 	end
 end

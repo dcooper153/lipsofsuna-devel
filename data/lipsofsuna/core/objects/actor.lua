@@ -923,10 +923,10 @@ end
 -- @param self Object.
 -- @param db Database.
 Actor.read_db = function(self, db)
-	Server.serialize:load_object_inventory(self)
-	Server.serialize:load_object_skills(self)
+	Server.object_database:load_inventory(self)
+	Server.object_database:load_skills(self)
 	self:update_skills()
-	Server.serialize:load_object_stats(self)
+	Server.object_database:load_stats(self)
 end
 
 --- Causes the actor to rise from death.
