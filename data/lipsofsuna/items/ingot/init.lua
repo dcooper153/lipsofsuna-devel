@@ -1,23 +1,32 @@
 Program:add_path(Mod.path)
 
+CraftingRecipeSpec{
+	name = "glass ingot",
+	effect = "craftmetal1",
+	materials = {["sand chunk"] = 1}}
+
 Itemspec{
 	name = "glass ingot",
-	model = "ingot1",
-	icon = "ingot1",
 	categories = {["material"] = true},
-	crafting_materials = {["sand chunk"] = 1},
 	health = 10,
+	icon = "ingot1",
 	mass = 1.5,
+	model = "ingot1",
 	stacking = true}
+
+CraftingRecipeSpec{
+	name = "iron ingot",
+	effect = "craftmetal1",
+	materials = {["ferrostone"] = 1},
+	modes = {["metal"] = true, ["default"] = true}}
 
 Itemspec{
 	name = "iron ingot",
-	model = "ingot1",
-	icon = "ingot1",
-	mass = 2,
 	categories = {["build"] = true, ["material"] = true},
+	icon = "ingot1",
 	construct_tile = "iron1",
 	construct_tile_count = 1,
-	crafting_materials = {["ferrostone"] = 1},
 	equipment_slot = "hand.R",
+	mass = 2,
+	model = "ingot1",
 	stacking = true}

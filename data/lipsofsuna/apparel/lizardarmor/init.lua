@@ -1,11 +1,14 @@
 Program:add_path(Mod.path)
 
+CraftingRecipeSpec{
+	name = "lizard boots",
+	effect = "craftsewing1",
+	materials = {["lizard scale"] = 4}}
+
 Itemspec{
 	name = "lizard boots",
-	armor_class = 0.05,
 	categories = {["armor"] = true},
-	crafting_materials = {["lizard scale"] = 4},
-	effect_craft = "craftsewing1",
+	armor_class = 0.05,
 	equipment_models = {
 		["aer"] = {feet = "aerlizardboots1"}},
 	equipment_slot = "feet",
@@ -14,12 +17,15 @@ Itemspec{
 	model = "lizardboots1",
 	water_gravity = Vector(0,6,0)}
 
+CraftingRecipeSpec{
+	name = "lizard dress",
+	effect = "craftsewing1",
+	materials = {["lizard scale"] = 6}}
+
 Itemspec{
 	name = "lizard dress",
-	armor_class = 0.1,
 	categories = {["armor"] = true},
-	crafting_materials = {["lizard scale"] = 6},
-	effect_craft = "craftsewing1",
+	armor_class = 0.1,
 	equipment_models = {
 		["aer"] = {dress1 = "aerlizarddress1", panties = "panties2", upper_safe = ""},
 		["kraken"] = {dress1 = "aerlizarddress1"}},
@@ -29,12 +35,15 @@ Itemspec{
 	model = "lizarddress1",
 	water_gravity = Vector(0,6,0)}
 
+CraftingRecipeSpec{
+	name = "lizard gloves",
+	effect = "craftsewing1",
+	materials = {["lizard scale"] = 4}}
+
 Itemspec{
 	name = "lizard gloves",
-	armor_class = 0.05,
 	categories = {["armor"] = true},
-	crafting_materials = {["lizard scale"] = 4},
-	effect_craft = "craftsewing1",
+	armor_class = 0.05,
 	equipment_models = {
 		["aer"] = {hands = "aerlizardgloves1"},
 		["kraken"] = {hands = "aerlizardgloves1"}},

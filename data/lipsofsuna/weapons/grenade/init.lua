@@ -4,15 +4,19 @@ AnimationProfileSpec{
 	name = "default grenade equipped",
 	animations = {}} --TODO
 
+CraftingRecipeSpec{
+	name = "aquanite grenade",
+	effect = "craftmetal1",
+	materials = {["aquanite stone"] = 1, ["iron ingot"] = 1},
+	modes = {["metal"] = true}}
+
 Itemspec{
 	name = "aquanite grenade",
 	categories = {["explosive"] = true, ["throwable"] = true, ["weapon"] = true},
 	animations_equipped = {["default"] = "default grenade equipped"},
-	crafting_materials = {["aquanite stone"] = 1, ["iron ingot"] = 1},
 	damage_mining = 1,
 	destroy_actions = {"explode"},
 	destroy_timer = 3,
-	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	health = 1,
 	icon = "grenade1",
@@ -22,12 +26,16 @@ Itemspec{
 	model = "grenade1",
 	stacking = true}
 
+CraftingRecipeSpec{
+	name = "crimson grenade",
+	effect = "craftmetal1",
+	materials = {["crimson stone"] = 1, ["iron ingot"] = 1},
+	modes = {["metal"] = true}}
+
 Itemspec{
 	name = "crimson grenade",
 	categories = {["explosive"] = true, ["throwable"] = true, ["weapon"] = true},
 	animations_equipped = {["default"] = "default grenade equipped"},
-	crafting_materials = {["crimson stone"] = 1, ["iron ingot"] = 1},
-	effect_craft = "craftmetal1",
 	destroy_actions = {"explode"},
 	destroy_timer = 3,
 	equipment_slot = "hand.R",

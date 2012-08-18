@@ -17,11 +17,16 @@ AnimationProfileSpec{
 	animations = {
 		["hold"] = "default hold torch"}}
 
+CraftingRecipeSpec{
+	name = "torch",
+	effect = "craftwood1",
+	materials = {["log"] = 1},
+	modes = {["wood"] = true, ["default"] = true}}
+
 Itemspec{
 	name = "torch",
 	categories = {["misc"] = true},
 	animations_equipped = {["default"] = "default torch equipped"},
-	crafting_materials = {["log"] = 1},
 	effect_equip = "torch1",
 	effect_unequip = "torch1",
 	equipment_slot = "hand.L",

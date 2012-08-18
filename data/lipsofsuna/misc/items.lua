@@ -39,21 +39,32 @@ Itemspec{
 ------------------------------------------------------------------------------
 -- Ammo.
 
+CraftingRecipeSpec{
+	name = "bullet",
+	effect = "craftmetal1",
+	count = 10,
+	materials = {["iron ingot"] = 1},
+	modes = {["metal"] = true}}
+
 Itemspec{
 	name = "bullet",
-	model = "arrow-000", -- FIXME
 	categories = {["bullet"] = true},
-	influences = {["physical damage"] = 1},
-	crafting_count = 10,
-	crafting_materials = {["iron ingot"] = 1, ["crimson stone"] = 1},
 	gravity_projectile = Vector(0,-4,0),
 	icon = "arrow1",
+	influences = {["physical damage"] = 1},
 	mass = 1,
 	mass_inventory = 0.1,
+	model = "arrow-000", -- FIXME
 	stacking = true}
 
 ------------------------------------------------------------------------------
 -- Decorations
+
+CraftingRecipeSpec{
+	name = "broken wooden fence",
+	effect = "craftwood1",
+	materials = {["log"] = 7},
+	modes = {["wood"] = true}}
 
 Itemspec{
 	name = "broken wooden fence",
@@ -61,8 +72,6 @@ Itemspec{
 	icon = "chest1", -- FIXME
 	mass = 10,
 	categories = {["furniture"] = true},
-	crafting_materials = {log = 7},
-	effect_craft = "craftwood1",
 	health = 50,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}

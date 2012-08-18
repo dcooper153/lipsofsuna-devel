@@ -1,10 +1,15 @@
 Program:add_path(Mod.path)
 
+CraftingRecipeSpec{
+	name = "adamantium sword",
+	effect = "craftmetal1",
+	materials = {["adamantium"] = 3},
+	modes = {["metal"] = true}}
+
 Itemspec{
 	name = "adamantium sword",
 	categories = {["melee"] = true, ["weapon"] = true},
 	animations_equipped = {["default"] = "default two-handed equipped"},
-	crafting_materials = {["adamantium"] = 3},
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
 	icon = "sword3",
@@ -13,14 +18,18 @@ Itemspec{
 	mass = 15,
 	model = "sword6"}
 
+CraftingRecipeSpec{
+	name = "aquanite sword",
+	effect = "craftmetal1",
+	materials = {["aquanite stone"] = 3},
+	modes = {["metal"] = true}}
+
 Itemspec{
 	name = "aquanite sword",
 	categories = {["melee"] = true, ["weapon"] = true},
 	animations_equipped = {["default"] = "default sword equipped"},
-	crafting_materials = {["aquanite stone"] = 3},
 	damage_mining = 1,
 	effect_attack_speedline = true,
-	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	health = 500,
 	icon = "sword2",
@@ -29,14 +38,18 @@ Itemspec{
 	mass = 15,
 	model = "sword5"}
 
+CraftingRecipeSpec{
+	name = "crimson sword",
+	effect = "craftmetal1",
+	materials = {["crimson stone"] = 3},
+	modes = {["metal"] = true}}
+
 Itemspec{
 	name = "crimson sword",
 	categories = {["melee"] = true, ["weapon"] = true},
 	animations_equipped = {["default"] = "default sword equipped"},
-	crafting_materials = {["crimson stone"] = 3},
 	damage_mining = 1,
 	effect_attack_speedline = true,
-	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	health = 500,
 	icon = "sword2",
@@ -45,14 +58,18 @@ Itemspec{
 	mass = 15,
 	model = "sword5"}
 
+CraftingRecipeSpec{
+	name = "iron sword",
+	effect = "craftmetal1",
+	materials = {["iron ingot"] = 3},
+	modes = {["metal"] = true}}
+
 Itemspec{
 	name = "iron sword",
 	categories = {["melee"] = true, ["weapon"] = true},
 	animations_equipped = {["default"] = "default sword equipped"},
-	crafting_materials = {["iron ingot"] = 3},
 	damage_mining = 1,
 	effect_attack_speedline = true,
-	effect_craft = "craftmetal1",
 	equipment_slot = "hand.R",
 	health = 220,
 	icon = "sword2",
@@ -61,11 +78,16 @@ Itemspec{
 	mass = 15,
 	model = "sword1"}
 
+CraftingRecipeSpec{
+	name = "stone sword",
+	effect = "craftmetal1",
+	materials = {["granite stone"] = 5},
+	modes = {["metal"] = true, ["default"] = true}}
+
 Itemspec{
 	name = "stone sword",
 	categories = {["melee"] = true, ["weapon"] = true},
 	animations_equipped = {["default"] = "default sword equipped"},
-	crafting_materials = {["granite stone"] = 5},
 	damage_mining = 1,
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
@@ -76,14 +98,18 @@ Itemspec{
 	mass = 15,
 	model = "sword1"}
 
+CraftingRecipeSpec{
+	name = "wooden sword",
+	effect = "craftwood1",
+	materials = {["log"] = 5},
+	modes = {["wood"] = true, ["default"] = true}}
+
 Itemspec{
 	name = "wooden sword",
 	categories = {["melee"] = true, ["weapon"] = true},
 	animations_equipped = {["default"] = "default sword equipped"},
-	crafting_materials = {["log"] = 5},
 	damage_mining = 1,
 	effect_attack_speedline = true,
-	effect_craft = "craftwood1",
 	equipment_slot = "hand.R",
 	health = 100,
 	icon = "sword1",

@@ -19,12 +19,17 @@ AnimationProfileSpec{
 		["charge stand"] = "default charge revolver",
 		["hold"] = "default hold revolver"}}
 
+CraftingRecipeSpec{
+	name = "adamantium revolver",
+	effect = "craftmetal1",
+	materials = {["adamantium"] = 10, ["log"] = 1},
+	modes = {["metal"] = true}}
+
 Itemspec{
 	name = "adamantium revolver",
 	categories = {["ranged"] = true, ["weapon"] = true},
 	ammo_type = "bullet",
 	animations_equipped = {["default"] = "default revolver equipped"},
-	crafting_materials = {["adamantium"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
 	icon = "revolver1",
 	influences = {["physical damage"] = 18},
@@ -34,12 +39,17 @@ Itemspec{
 	model = "revolver1",
 	timings = {["fire"] = 20}}
 
+CraftingRecipeSpec{
+	name = "aquanite revolver",
+	effect = "craftmetal1",
+	materials = {["aquanite stone"] = 10, ["log"] = 1},
+	modes = {["metal"] = true}}
+
 Itemspec{
 	name = "aquanite revolver",
 	categories = {["ranged"] = true, ["weapon"] = true},
 	ammo_type = "bullet",
 	animations_equipped = {["default"] = "default revolver equipped"},
-	crafting_materials = {["aquanite stone"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
 	icon = "revolver1",
 	influences = {["cold damage"] = 7, ["physical damage"] = 7},
@@ -49,12 +59,17 @@ Itemspec{
 	model = "revolver1",
 	timings = {["fire"] = 20}}
 
+CraftingRecipeSpec{
+	name = "crimson revolver",
+	effect = "craftmetal1",
+	materials = {["crimson stone"] = 10, ["log"] = 1},
+	modes = {["metal"] = true}}
+
 Itemspec{
 	name = "crimson revolver",
 	categories = {["ranged"] = true, ["weapon"] = true},
 	ammo_type = "bullet",
 	animations_equipped = {["default"] = "default revolver equipped"},
-	crafting_materials = {["crimson stone"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
 	icon = "revolver1",
 	influences = {["fire damage"] = 7, ["physical damage"] = 7},
@@ -64,12 +79,17 @@ Itemspec{
 	model = "revolver1",
 	timings = {["fire"] = 20}}
 
+CraftingRecipeSpec{
+	name = "iron revolver",
+	effect = "craftmetal1",
+	materials = {["iron ingot"] = 4, ["log"] = 1},
+	modes = {["metal"] = true}}
+
 Itemspec{
 	name = "iron revolver",
 	categories = {["ranged"] = true, ["weapon"] = true},
 	ammo_type = "bullet",
 	animations_equipped = {["default"] = "default revolver equipped"},
-	crafting_materials = {["iron ingot"] = 10, ["log"] = 1},
 	effect_attack = "revolver1",
 	icon = "revolver1",
 	influences = {["physical damage"] = 10},

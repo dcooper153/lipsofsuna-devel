@@ -1,12 +1,16 @@
 Program:add_path(Mod.path)
 
+CraftingRecipeSpec{
+	name = "granite ramp",
+	effect = "craftmetal1",
+	materials = {["granite stone"] = 1}}
+
 Itemspec{
 	name = "granite ramp",
 	model = "granitestone1",
 	icon = "stone1",
 	categories = {["build"] = true, ["material"] = true},
-	crafting_materials = {["granite stone"] = 1},
-	description = "Left click to build a ramp block",
+	description = "Place on ground to build a ramp block.",
 	construct_tile = "concrete2",
 	construct_tile_count = 1,
 	equipment_slot = "hand.R",

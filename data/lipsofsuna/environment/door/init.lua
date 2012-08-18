@@ -1,13 +1,17 @@
 Program:add_path(Mod.path)
 
+CraftingRecipeSpec{
+	name = "broken door",
+	effect = "craftwood1",
+	materials = {["log"] = 7},
+	modes = {["wood"] = true}}
+
 Itemspec{
 	name = "broken door",
 	model = "door1",
 	icon = "chest1", -- FIXME
 	mass = 20,
 	categories = {["furniture"] = true},
-	crafting_materials = {log = 7},
-	effect_craft = "craftwood1",
 	health = 30,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}

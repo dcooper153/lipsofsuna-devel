@@ -17,15 +17,19 @@ AnimationProfileSpec{
 		["fly start"] = "boomerang fly start",
 		["fly stop"] = "boomerang fly stop"}}
 
+CraftingRecipeSpec{
+	name = "boomerang",
+	effect = "craftwood1",
+	materials = {["log"] = 2},
+	modes = {["wood"] = true, ["default"] = true}}
+
 Itemspec{
 	name = "boomerang",
+	categories = {["boomerang"] = true, ["throwable"] = true, ["weapon"] = true},
 	animations = {["default"] = "boomerang"},
 	mass = 2,
 	model = "boomerang1",
 	icon = "boomerang1",
-	categories = {["boomerang"] = true, ["throwable"] = true, ["weapon"] = true},
-	crafting_materials = {["log"] = 2},
-	effect_craft = "craftwood1",
 	gravity_projectile = Vector(0,2,0),
 	influences = {["physical damage"] = 5},
 	influences_bonus = {"ranged"},

@@ -21,6 +21,12 @@ AnimationProfileSpec{
 		["loot"] = "chest loot",
 		["looted"] = "chest looted"}}
 
+CraftingRecipeSpec{
+	name = "chest",
+	effect = "craftwood1",
+	materials = {["log"] = 10},
+	modes = {["wood"] = true}}
+
 Itemspec{
 	name = "chest",
 	categories = {["container"] = true, ["generate"] = true},
@@ -28,8 +34,6 @@ Itemspec{
 	model = "chest1",
 	icon = "chest1",
 	mass = 30,
-	crafting_materials = {log = 10},
-	effect_craft = "craftwood1",
 	important = true,
 	inventory_size = 8,
 	inventory_type = "chest",
@@ -44,8 +48,6 @@ Itemspec{
 	name = "treasure chest",
 	categories = {["container"] = true},
 	animations = {["default"] = "chest"},
-	crafting_materials = {["iron ingot"] = 10},
-	effect_craft = "craftwood1",
 	icon = "chest1",
 	mass = 30,
 	model = "chest1",

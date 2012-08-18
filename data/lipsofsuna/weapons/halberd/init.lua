@@ -5,11 +5,16 @@ AnimationProfileSpec{
 	animations = {
 		["hold"] = "default hold staff"}}
 
+CraftingRecipeSpec{
+	name = "iron halberd",
+	effect = "craftmetal1",
+	materials = {["iron ingot"] = 4},
+	modes = {["metal"] = true}}
+
 Itemspec{
 	name = "iron halberd",
 	categories = {["melee"] = true, ["weapon"] = true},
 	animations_equipped = {["default"] = "default staff equipped"},
-	crafting_materials = {["iron ingot"] = 4},
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
 	icon = "staff1", --FIXME

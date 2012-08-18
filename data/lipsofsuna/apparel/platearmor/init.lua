@@ -1,17 +1,27 @@
 Program:add_path(Mod.path)
 
+CraftingRecipeSpec{
+	name = "iron greaves",
+	effect = "craftmetal1",
+	materials = {["iron ingot"] = 3},
+	modes = {["metal"] = true}}
+
 Itemspec{
 	name = "iron greaves",
 	model = "legplate1",
 	icon = "metalboot1",
 	armor_class = 0.08,
 	categories = {["armor"] = true},
-	crafting_materials = {["iron ingot"] = 3},
-	effect_craft = "craftmetal1",
 	equipment_models = {
 		["aer"] = {feet = "", legs = "aerlegplate1"}},
 	equipment_slot = "feet",
 	mass = 15}
+
+CraftingRecipeSpec{
+	name = "iron gauntlets",
+	effect = "craftmetal1",
+	materials = {["iron ingot"] = 2},
+	modes = {["metal"] = true}}
 
 Itemspec{
 	name = "iron gauntlets",
@@ -19,13 +29,17 @@ Itemspec{
 	icon = "metalglove1",
 	armor_class = 0.08,
 	categories = {["armor"] = true},
-	crafting_materials = {["iron ingot"] = 2},
-	effect_craft = "craftmetal1",
 	equipment_models = {
 		["aer"] = {arms = "aerarmplate1", hands = ""},
 		["kraken"] = {arms = "aerarmplate1", hands = ""}},
 	equipment_slot = "arms",
 	mass = 10}
+
+CraftingRecipeSpec{
+	name = "iron breastplate",
+	effect = "craftmetal1",
+	materials = {["iron ingot"] = 5},
+	modes = {["metal"] = true}}
 
 Itemspec{
 	name = "iron breastplate",
@@ -33,8 +47,6 @@ Itemspec{
 	icon = "metalarmor1",
 	armor_class = 0.18,
 	categories = {["armor"] = true},
-	crafting_materials = {["iron ingot"] = 5},
-	effect_craft = "craftmetal1",
 	equipment_models = {
 		["aer"] = {upper_safe = "", upper1 = "aerupperplate1"},
 		["kraken"] = {upper_safe = "", upper1 = "aerupperplate1"}},

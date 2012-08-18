@@ -1,13 +1,17 @@
 Program:add_path(Mod.path)
 
+CraftingRecipeSpec{
+	name = "bookcase",
+	effect = "craftwood1",
+	materials = {["log"] = 10},
+	modes = {["wood"] = true}}
+
 Itemspec{
 	name = "bookcase",
 	model = "bookcase1",
 	icon = "chest1",
 	mass = 30,
 	categories = {["container"] = true, ["generate"] = true},
-	crafting_materials = {["log"] = 10},
-	effect_craft = "craftwood1",
 	important = true,
 	inventory_size = 8,
 	inventory_type = "chest",
@@ -18,14 +22,18 @@ Itemspec{
 	usages = {["loot"] = true},
 	water_gravity = Vector(0,6,0)}
 
+CraftingRecipeSpec{
+	name = "chair",
+	effect = "craftwood1",
+	materials = {["log"] = 5},
+	modes = {["wood"] = true}}
+
 Itemspec{
 	name = "chair",
 	icon = "chest1", -- FIXME
 	model = "chair1",
 	mass = 10,
 	categories = {["furniture"] = true},
-	crafting_materials = {["log"] = 5},
-	effect_craft = "craftwood1",
 	health = 30,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
@@ -39,17 +47,27 @@ Obstaclespec{
 	model = "shelf1",
 	physics = "rigid"}
 
+CraftingRecipeSpec{
+	name = "wood bench",
+	effect = "craftwood1",
+	materials = {["log"] = 6},
+	modes = {["wood"] = true}}
+
 Itemspec{
 	name = "wood bench",
 	model = "bench1",
 	icon = "chest1", -- FIXME
 	mass = 15,
 	categories = {["furniture"] = true},
-	crafting_materials = {["log"] = 6},
-	effect_craft = "craftwood1",
 	health = 30,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
+
+CraftingRecipeSpec{
+	name = "wood chair",
+	effect = "craftwood1",
+	materials = {["log"] = 5},
+	modes = {["wood"] = true}}
 
 Itemspec{
 	name = "wood chair",
@@ -57,11 +75,15 @@ Itemspec{
 	icon = "chest1", -- FIXME
 	mass = 10,
 	categories = {["furniture"] = true},
-	crafting_materials = {["log"] = 5},
-	effect_craft = "craftwood1",
 	health = 30,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}
+
+CraftingRecipeSpec{
+	name = "wood table",
+	effect = "craftwood1",
+	materials = {["log"] = 7},
+	modes = {["wood"] = true}}
 
 Itemspec{
 	name = "wood table",
@@ -69,8 +91,6 @@ Itemspec{
 	icon = "chest1", -- FIXME
 	mass = 20,
 	categories = {["furniture"] = true},
-	crafting_materials = {["log"] = 7},
-	effect_craft = "craftwood1",
 	health = 30,
 	stacking = false,
 	water_gravity = Vector(0,6,0)}

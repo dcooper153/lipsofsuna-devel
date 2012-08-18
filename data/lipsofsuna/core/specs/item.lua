@@ -19,8 +19,6 @@ Itemspec.introspect = Introspect{
 		{name = "collision_group", type = "number", default = 0x0002, description = "Collision group."},
 		{name = "construct_tile", type = "string", description = "Tile type to construct when used."},
 		{name = "construct_tile_count", type = "number", description = "Material count required by tile construction.", details = {integer = true, min = 1}},
-		{name = "crafting_count", type = "number", default = 1, description = "Number of items crafted per use.", details = {integer = true, min = 1}},
-		{name = "crafting_materials", type = "dict", dict = {type = "number"}, default = {}, description = "Dictionary of crafting materials.", details = {keys = {spec = "Itemspec"}, values = {integer = true, min = 1}}},
 		{name = "damage_mining", type = "number", description = "Damage the item takes from mining."},
 		{name = "description", type = "string", description = "Description of the item."},
 		{name = "destroy_actions", type = "list", list = {type = "string"}, default = {}, description = "List of actions to perform when the item is destroyed."},
@@ -28,7 +26,6 @@ Itemspec.introspect = Introspect{
 		{name = "dialog", type = "string", description = "Dialog name.", details = {spec = "Dialogspec"}},
 		{name = "effect_attack", type = "string", description = "Name of the effect to play when the item is used for attacking."},
 		{name = "effect_attack_speedline", type = "boolean", description = "True to enable the speed line effect for attacks."},
-		{name = "effect_craft", type = "string", description = "Name of the effect to play when the item is crafted."},
 		{name = "effect_equip", type = "string", description = "Name of the effect to play when the item is equiped."},
 		{name = "effect_unequip", type = "string", description = "Name of the effect to play when the item is unequiped."},
 		{name = "effect_use", type = "string", description = "Name of the effect to play when the item is used."},
@@ -188,7 +185,8 @@ Itemspec.get_trading_value = function(self)
 			value = value + 100
 		end
 	end
-	local req = Crafting:get_requiring_items(self)
+	local craft = CraftingRecipeSpec:find{name = self.name}
+	local req = Crafting:get_requiring_items(craft)
 	if #req > 0 then
 		self.value = value
 		local awg = 0
@@ -215,10 +213,3 @@ Itemspec.get_use_actions = function(self)
 	end
 	return res
 end
-
-Itemspec:add_getters{
-	crafting_enabled = function(self)
-		for k,v in pairs(self.crafting_materials) do
-			return true
-		end
-	end}

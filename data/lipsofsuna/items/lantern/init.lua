@@ -8,11 +8,15 @@ Effectspec{
 	node = "#flame",
 	particle = "candlefx1"}
 
+CraftingRecipeSpec{
+	name = "wooden lantern",
+	effect = "craftwood1",
+	materials = {["log"] = 2},
+	modes = {["wood"] = true}}
+
 Itemspec{
 	name = "wooden lantern",
 	animations_equipped = {["default"] = "default torch equipped"},
-	crafting_count = 1,
-	crafting_materials = {["log"] = 2},
 	description = "A wooden lantern commonly used as a ligth source",
 	equipment_anchor = "#handle",
 	equipment_slot = "hand.L",

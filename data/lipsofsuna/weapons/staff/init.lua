@@ -10,13 +10,17 @@ Effectspec{
 	node = "#flame2",
 	particle = "torchfx1"}
 
+CraftingRecipeSpec{
+	name = "wooden staff",
+	effect = "craftwood1",
+	materials = {["log"] = 4},
+	modes = {["wood"] = true}}
+
 Itemspec{
 	name = "wooden staff",
 	categories = {["melee"] = true, ["weapon"] = true},
 	animations_equipped = {["default"] = "default staff equipped"},
-	crafting_materials = {["log"] = 5},
 	damage_mining = 1,
-	effect_craft = "craftwood1",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {["hand.L"] = true},
 	health = 100,
@@ -27,13 +31,17 @@ Itemspec{
 	model = "spear1",
 	water_gravity = Vector(0,6,0)}
 
+CraftingRecipeSpec{
+	name = "luminous staff",
+	effect = "craftwood1",
+	materials = {["log"] = 4, ["crimson stone"] = 2},
+	modes = {["wood"] = true}}
+
 Itemspec{
 	name = "luminous staff",
 	categories = {["melee"] = true, ["weapon"] = true},
 	animations_equipped = {["default"] = "default staff equipped"},
-	crafting_materials = {["log"] = 5, ["crimson stone"] = 2},
 	damage_mining = 1,
-	effect_craft = "craftwood1",
 	equipment_slot = "hand.R",
 	equipment_slots_reserved = {["hand.L"] = true},
 	health = 300,

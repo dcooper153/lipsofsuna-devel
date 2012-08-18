@@ -1,12 +1,16 @@
 Program:add_path(Mod.path)
 
+CraftingRecipeSpec{
+	name = "jar",
+	effect = "craftmetal1",
+	materials = {["granite stone"] = 3}}
+
 Itemspec{
 	name = "jar",
 	model = "jar1",
 	icon = "potion3", -- FIXME
 	mass = 9,
 	categories = {["container"] = true, ["generate"] = true},
-	crafting_materials = {["granite stone"] = 3},
 	description = "Small container, used for storing things",
 	important = true,
 	inventory_size = 4,

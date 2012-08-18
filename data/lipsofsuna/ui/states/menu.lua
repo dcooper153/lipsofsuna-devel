@@ -9,7 +9,8 @@ Ui:add_widget{
 
 Ui:add_widget{
 	state = "menu",
-	widget = function() return Widgets.Uitransition("Crafting", "crafting") end}
+	widget = function() return Widgets.Uitransition("Crafting", "crafting",
+		function() Operators.crafting:reset() end) end}
 
 Ui:add_widget{
 	state = "menu",

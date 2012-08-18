@@ -94,14 +94,17 @@ Actorspec{
 	loot_count_max = 4,
 	personality = "savage"}
 
+CraftingRecipeSpec{
+	name = "leather brigand pants",
+	effect = "craftsewing1",
+	materials = {["hide"] = 4}}
+
 Itemspec{
 	name = "leather brigand pants",
 	model = "book-000",
 	icon = "leatherarmor1",
 	armor_class = 0.04,
 	categories = {["armor"] = true},
-	crafting_materials = {hide = 4},
-	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer"] = {skirt = "aerlowerarmor1", panties = "panties2"},
 		["kraken"] = {skirt = "aerlowerarmor1"},
@@ -110,14 +113,18 @@ Itemspec{
 	mass = 5,
 	water_gravity = Vector(0,6,0)}
 
+
+CraftingRecipeSpec{
+	name = "leather brigand chest",
+	effect = "craftsewing1",
+	materials = {["hide"] = 4}}
+
 Itemspec{
 	name = "leather brigand chest",
 	model = "book-000",
 	icon = "leatherarmor1",
 	armor_class = 0.04,
 	categories = {["armor"] = true},
-	crafting_materials = {hide = 4},
-	effect_craft = "craftsewing1",
 	equipment_models = {
 		["aer"] = {upper1 = "aerleatherchest1"},
 		["kraken"] = {upper1 = "aerleatherchest1"},

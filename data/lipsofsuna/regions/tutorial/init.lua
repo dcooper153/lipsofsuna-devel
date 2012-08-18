@@ -17,7 +17,6 @@ Itemspec{
 	model = "torch1",
 	animations_equipped = {["default"] = "default torch equipped"},
 	categories = {["quest"] = true},
-	crafting_materials = {["log"] = 1},
 	effect_equip = "torch1",
 	effect_unequip = "torch1",
 	equipment_slot = "hand.L",

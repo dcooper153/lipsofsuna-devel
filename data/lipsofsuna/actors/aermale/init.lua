@@ -1,13 +1,21 @@
 Program:add_path(Mod.path)
 
+CraftingRecipeSpec{
+	name = "shirt",
+	effect = "craftsewing1",
+	materials = {["hide"] = 1}}
+
+CraftingRecipeSpec{
+	name = "pants",
+	effect = "craftsewing1",
+	materials = {["hide"] = 1}}
+
 Itemspec{
 	name = "shirt",
 	model = "book-000",
 	icon = "cloth1",
 	armor_class = 0.04,
 	categories = {["armor"] = true},
-	crafting_materials = {hide = 1},
-	effect_craft = "craftsewing1",
 	equipment_models = {["aermale"] = {upper = "aermaleshirt1"}},
 	equipment_slot = "upperbody",
 	mass = 1,
@@ -19,8 +27,6 @@ Itemspec{
 	model = "book-000",
 	armor_class = 0.04,
 	categories = {["armor"] = true},
-	crafting_materials = {hide = 1},
-	effect_craft = "craftsewing1",
 	equipment_models = {["aermale"] = {legs = "aermalepants1"}},
 	equipment_slot = "lowerbody",
 	mass = 1,

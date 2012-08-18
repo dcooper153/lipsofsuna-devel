@@ -204,6 +204,16 @@ Player.handle_inventory_event = function(self, args)
 	Actor.handle_inventory_event(self, args)
 end
 
+--- Sets the crafting device used by the player.
+-- @param self Object.
+-- @param object Crafting device, or nil.
+-- @param mode Crafting mode, or nil.
+Player.set_crafting_device = function(self, object, mode)
+	self.crafting_mode = mode
+	self.crafting_device = object
+	Game.messaging:server_event("craft", self.client, mode or "default")
+end
+
 --- Gets the spawn point of the player.
 -- @params self Object.
 -- @return Spawn point vector in world space, or nil.
@@ -255,6 +265,12 @@ Player.update = function(self, secs)
 				self.vision:update()
 				self:update_map()
 				self:update_inventory_subscriptions()
+			end
+		end
+		-- Verify crafting device distance.
+		if self.crafting_device then
+			if not self:can_reach_object(self.crafting_device) then
+				self:set_crafting_device()
 			end
 		end
 	end

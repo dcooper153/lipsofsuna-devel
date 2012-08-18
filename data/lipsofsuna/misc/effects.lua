@@ -26,6 +26,14 @@ Effectspec{
 	sound = "craftmetal1"}
 
 Effectspec{
+	name = "craftalchemy1",
+	sound = "craftpotion1"}--FIXME
+
+Effectspec{
+	name = "craftfood1",
+	sound = "craftpotion1"}--FIXME
+
+Effectspec{
 	name = "craftpotion1",
 	sound = "craftpotion1"}
 

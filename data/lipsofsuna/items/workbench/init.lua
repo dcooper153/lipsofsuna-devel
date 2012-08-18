@@ -1,10 +1,14 @@
 Program:add_path(Mod.path)
 
+CraftingRecipeSpec{
+	name = "workbench",
+	effect = "craftwood1",
+	materials = {["log"] = 7},
+	modes = {["wood"] = true}}
+
 Itemspec{
 	name = "workbench",
 	categories = {["container"] = true, ["workbench"] = true},
-	crafting_materials = {["log"] = 7},
-	effect_craft = "craftwood1",
 	icon = "workbench1",
 	important = true,
 	inventory_size = 4,

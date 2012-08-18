@@ -1,13 +1,16 @@
 Program:add_path(Mod.path)
 
+CraftingRecipeSpec{
+	name = "trog rags",
+	effect = "craftsewing1",
+	materials = {["hide"] = 2}}
+
 Itemspec{
 	name = "trog rags",
 	model = "book-000",
 	icon = "cloth1",
 	armor_class = 0.02,
 	categories = {["armor"] = true},
-	crafting_materials = {["log"] = 1},
-	effect_craft = "craftsewing1",
 	equipment_models = {["troglodyte"] = {upper1 = "trogfemrags1"}},
 	equipment_slot = "upperbody",
 	mass = 1,
