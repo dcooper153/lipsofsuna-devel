@@ -94,6 +94,7 @@ Mod:load "plants/watermelon"
 -- Obstacles and other environment
 Mod:load "environment/bricks"
 Mod:load "environment/building"
+Mod:load "environment/crafting"
 Mod:load "environment/door"
 Mod:load "environment/furnace"
 Mod:load "environment/furniture"
