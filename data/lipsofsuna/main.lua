@@ -69,7 +69,9 @@ Staticspec:validate_all()
 
 if Settings.quit then Program.quit = true end
 if Settings.server then
-	require "server/main"
+	Game:init("server", Settings.file, Settings.port)
+	Game:server_main()
+	Game:deinit()
 else
-	require "client/main"
+	Game:client_main()
 end

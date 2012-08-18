@@ -1,3 +1,6 @@
+require "system/class"
+require "system/password"
+
 AccountDatabase = Class()
 AccountDatabase.account_version = "1"
 

@@ -1,4 +1,4 @@
-require "server/trading"
+require(Mod.path .. "trading")
 
 Dialog = Class()
 Dialog.dict_id = {}

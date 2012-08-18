@@ -15,7 +15,6 @@ Mod:load "core/objects"
 Mod:load "core/server"
 Mod:load "core/shadows"
 Mod:load "core/misc"
-Mod:load "server"
 Mod:load "client"
 Mod:load "benchmark"
 

@@ -1,3 +1,5 @@
+require "system/class"
+
 ObjectDatabase = Class()
 
 --- Creates a new object database.

@@ -1,3 +1,5 @@
+require "system/class"
+
 QuestDatabase = Class()
 
 --- Creates a new quest database.
