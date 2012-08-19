@@ -42,7 +42,6 @@ LIExtModule* liext_cameras_new (
 	if (self == NULL)
 		return NULL;
 	self->program = program;
-	self->render = limai_program_find_component (program, "render");
 
 	/* Register classes. */
 	liscr_script_set_userdata (program->script, LIEXT_SCRIPT_CAMERA, self);

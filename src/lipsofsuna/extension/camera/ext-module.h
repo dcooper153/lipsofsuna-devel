@@ -27,7 +27,6 @@ typedef struct _LIExtModule LIExtModule;
 struct _LIExtModule
 {
 	LIMaiProgram* program;
-	LIRenRender* render;
 };
 
 LIExtModule* liext_cameras_new (

@@ -29,6 +29,7 @@ static void Camera_new (LIScrArgs* args)
 	LIAlgCamera* self;
 	LIExtModule* module;
 	LIScrData* data;
+	LIRenRender* render;
 	LIRenVideomode mode;
 
 	/* Allocate self. */
@@ -36,10 +37,16 @@ static void Camera_new (LIScrArgs* args)
 	self = lialg_camera_new ();
 	if (self == NULL)
 		return;
-	liren_render_get_videomode (module->render, &mode);
 	lialg_camera_set_driver (self, LIALG_CAMERA_THIRDPERSON);
 	lialg_camera_set_clipping (self, (LIAlgCameraClip) liext_cameras_clip_camera, module);
-	lialg_camera_set_viewport (self, 0, 0, mode.width, mode.height);
+
+	/* Initialize the viewport. */
+	render = limai_program_find_component (module->program, "render");
+	if (render)
+	{
+		liren_render_get_videomode (render, &mode);
+		lialg_camera_set_viewport (self, 0, 0, mode.width, mode.height);
+	}
 
 	/* Allocate userdata. */
 	data = liscr_data_new (args->script, args->lua, self, LIEXT_SCRIPT_CAMERA, lialg_camera_free);
