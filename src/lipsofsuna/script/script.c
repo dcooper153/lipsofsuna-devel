@@ -439,7 +439,7 @@ static int private_lua_require (
 	if (!lua_isnil (lua, -1))
 	{
 		lua_getfield (lua, LUA_REGISTRYINDEX, "_LOADED");
-		lua_insert (lua, -2);
+		lua_pushvalue (lua, -2);
 		lua_setfield (lua, -2, path);
 		lua_pop (lua, 1);
 	}
