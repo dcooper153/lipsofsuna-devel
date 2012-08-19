@@ -63,20 +63,29 @@ LIFntFont* lifnt_font_new (
 		return NULL;
 	}
 
-	/* Load the font. */
-	Ogre::FontManager& manager = Ogre::FontManager::getSingleton ();
-	Ogre::FontPtr resource = manager.create (name, LIREN_RESOURCES_TEMPORARY);
-	resource->setParameter ("type", "truetype");
-	resource->setParameter ("source", Ogre::String (file) + ".ttf");
-	resource->setParameter ("size", Ogre::StringConverter::toString (size * 72 / 96));
-	resource->setParameter ("resolution", "96");
-	resource->load ();
-	self->font = new Ogre::FontPtr (resource);
+	try
+	{
+		/* Load the font. */
+		Ogre::FontManager& manager = Ogre::FontManager::getSingleton ();
+		Ogre::FontPtr resource = manager.create (name, LIREN_RESOURCES_TEMPORARY);
+		resource->setParameter ("type", "truetype");
+		resource->setParameter ("source", Ogre::String (file) + ".ttf");
+		resource->setParameter ("size", Ogre::StringConverter::toString (size * 72 / 96));
+		resource->setParameter ("resolution", "96");
+		resource->load ();
+		self->font = new Ogre::FontPtr (resource);
 
-	/* Calculate the height in pixels. */
-	Ogre::Font::GlyphInfo glyph = resource->getGlyphInfo (0x0030);
-	Ogre::TextureUnitState* unit = resource->getMaterial ()->getTechnique (0)->getPass (0)->getTextureUnitState (0);
-	self->height = unit->getTextureDimensions ().second * (glyph.uvRect.bottom - glyph.uvRect.top);
+		/* Calculate the height in pixels. */
+		Ogre::Font::GlyphInfo glyph = resource->getGlyphInfo (0x0030);
+		Ogre::TextureUnitState* unit = resource->getMaterial ()->getTechnique (0)->getPass (0)->getTextureUnitState (0);
+		self->height = unit->getTextureDimensions ().second * (glyph.uvRect.bottom - glyph.uvRect.top);
+	}
+	catch (...)
+	{
+		lisys_error_set (EINVAL, "Failed to load font `%s'", name);
+		lifnt_font_free (self);
+		return NULL;
+	}
 
 	return self;
 }
