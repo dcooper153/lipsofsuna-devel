@@ -19,7 +19,7 @@ Widgets.Uiscrollfloat.apply = function(self)
 		self.input_mode = true
 		self.hint = "$A: Increment\n$B: Decrement\n$$U\n$$D"
 		self.need_repaint = true
-		Effect:play_global("uislider1")
+		Client.effects:play_global("uislider1")
 		return
 	end
 	if self.value == self.max then return end
@@ -27,13 +27,13 @@ Widgets.Uiscrollfloat.apply = function(self)
 	self.need_repaint = true
 	self:update_text()
 	self:changed()
-	Effect:play_global("uislider1")
+	Client.effects:play_global("uislider1")
 end
 
 Widgets.Uiscrollfloat.apply_back = function(self)
 	if not self.input_mode then
 		self.need_repaint = true
-		Effect:play_global("uislider1")
+		Client.effects:play_global("uislider1")
 		return Widgets.Uiwidget.apply_back(self)
 	end
 	if self.value == self.min then return true end
@@ -41,7 +41,7 @@ Widgets.Uiscrollfloat.apply_back = function(self)
 	self.need_repaint = true
 	self:update_text()
 	self:changed()
-	Effect:play_global("uislider1")
+	Client.effects:play_global("uislider1")
 end
 
 Widgets.Uiscrollfloat.changed = function(self)
@@ -57,8 +57,8 @@ Widgets.Uiscrollfloat.handle_event = function(self, args)
 			if args.type == "keyrepeat" then
 				a.type = "keypress"
 			end
-			local action1 = Binding.dict_name["menu apply"]
-			local action2 = Binding.dict_name["menu back"]
+			local action1 = Client.bindings:find_by_name("menu apply")
+			local action2 = Client.bindings:find_by_name("menu back")
 			if (action1 and action1:get_event_response(a) ~= nil) then
 				self:apply()
 				handled = true
@@ -68,8 +68,8 @@ Widgets.Uiscrollfloat.handle_event = function(self, args)
 			end
 		end
 		-- Stop editing if a vertical menu key.
-		local action3 = Binding.dict_name["menu up"]
-		local action4 = Binding.dict_name["menu down"]
+		local action3 = Client.bindings:find_by_name("menu up")
+		local action4 = Client.bindings:find_by_name("menu down")
 		if (action3 and action3:get_event_response(args) ~= nil) or
 		   (action4 and action4:get_event_response(args) ~= nil) then
 			self.hint = "$A: Edit\n$$B\n$$U\n$$D"

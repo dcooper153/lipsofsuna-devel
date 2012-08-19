@@ -139,3 +139,5 @@ Class.add_setters = function(clss, args)
 	for k,v in pairs(args) do s[k] = v end
 	clss.setters = s
 end
+
+return Class

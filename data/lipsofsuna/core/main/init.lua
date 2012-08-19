@@ -1,4 +1,5 @@
-require "system/class"
+require(Mod.path .. "event")
+local Class = require("system/class")
 
 Main = Class()
 
@@ -30,16 +31,19 @@ Main.new = function(clss)
 		Server:load()
 		Program.sleep = 1/60
 		Program.profiling = {}
+		local frame = Program.time
 		while not Program.quit do
 			-- Update program state.
 			local t1 = Program.time
 			Program:update()
 			local t2 = Program.time
 			Eventhandler:update()
+			Server:update(t1 - frame)
 			local t3 = Program.time
 			-- Store timings.
 			Program.profiling.update = t2 - t1
 			Program.profiling.event = t3 - t2
+			frame = t1
 		end
 		Game:deinit()
 	else
@@ -57,6 +61,7 @@ Main.new = function(clss)
 			Program:update_scene(t1 - frame)
 			local t2 = Program.time
 			Eventhandler:update()
+			Server:update(t1 - frame)
 			Client:update(t1 - frame)
 			local t3 = Program.time
 			-- Render the scene.

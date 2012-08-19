@@ -13,7 +13,7 @@ Widgets.Uibinding.new = function(clss, action)
 end
 
 Widgets.Uibinding.apply = function(self)
-	Effect:play_global("uitoggle1")
+	Client.effects:play_global("uitoggle1")
 	self.input_mode = true
 	self.input_key = "key1"
 	if self.action.mode == "analog" then
@@ -66,7 +66,7 @@ Widgets.Uibinding.handle_event = function(self, args)
 	end
 	-- Finish the input grab.
 	if accept then
-		Effect:play_global("uitoggle1")
+		Client.effects:play_global("uitoggle1")
 		if k == "key1" and a.mode == "analog" then
 			self.input_key = "key2"
 			self.hint = "Input the second control"
@@ -96,7 +96,7 @@ Widgets.Uibinding.rebuild_canvas = function(self)
 	-- Add the first key.
 	local x1 = Theme.width_label_1
 	local key1 = self.action.key1
-	local name1 = self.input_key ~= "key1" and Binding:get_key_name(key1) or "????"
+	local name1 = self.input_key ~= "key1" and Client.input:get_key_name(key1) or "????"
 	self:canvas_text{
 		dest_position = {Theme.width_label_1,0},
 		dest_size = {w-Theme.width_label_1,h},
@@ -108,7 +108,7 @@ Widgets.Uibinding.rebuild_canvas = function(self)
 	if self.action.mode == "analog" then
 		local x2 = x1 + (self.size.x - x1) / 2
 		local key2 = self.action.key2
-		local name2 = self.input_key ~= "key2" and Binding:get_key_name(key2) or "????"
+		local name2 = self.input_key ~= "key2" and Client.input:get_key_name(key2) or "????"
 		self:canvas_text{
 			dest_position = {x2,0},
 			dest_size = {w-x2,h},

@@ -15,7 +15,7 @@ Widgets.Uitoggle.apply = function(self)
 	self.value = not self.value
 	self.need_repaint = true
 	self:changed()
-	Effect:play_global(self.value and "uitoggle1" or "uitoggle2")
+	Client.effects:play_global(self.value and "uitoggle1" or "uitoggle2")
 end
 
 Widgets.Uitoggle.changed = function(self)

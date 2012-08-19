@@ -6,7 +6,7 @@ Ui:add_state{
 		Client.benchmark = nil
 	end,
 	init = function()
-		Sound:switch_music_track("game")
+		Client.effects:switch_music_track("game")
 	end,
 	update = function(secs)
 		local w = Ui:get_widget("stats")

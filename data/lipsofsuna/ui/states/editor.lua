@@ -6,7 +6,7 @@ Ui:add_state{
 		Client.editor:reset()
 	end,
 	init = function()
-		Sound:switch_music_track("game")
+		Client.effects:switch_music_track("game")
 		if not Client.editor.initialized then
 			Client.editor:initialize()
 		end

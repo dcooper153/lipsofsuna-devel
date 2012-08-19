@@ -1,3 +1,5 @@
+Binding = require("core/client/binding")
+
 Binding{name = "editor_copy", mode = "press", key1 = Keysym.x, func = function(v)
 	if Ui.root ~= "editor" then return end
 	Client.editor:copy()
@@ -27,8 +29,8 @@ end}
 
 Binding{name = "editor_move", mode = "analog", key1 = Keysym.w, key2 = Keysym.s, func = function(v)
 	if Ui.root ~= "editor" then return end
-	local mult = Binding.dict_press[Keysym.LCTRL] and 1 or 10
-	if Binding.dict_press[Keysym.LSHIFT] then
+	local mult = Client.input:is_pressed(Keysym.LCTRL) and 1 or 10
+	if Client.input:is_pressed(Keysym.LSHIFT) then
 		Client.editor.camera.lifting = -mult * v
 		Client.editor.camera.movement = nil
 	else
@@ -56,7 +58,7 @@ Binding{name = "editor_select", mode = "toggle", key1 = "mouse1", func = functio
 	if v then
 		-- Grabbed.
 		Client.editor.mode = "grab"
-		local add = Binding.dict_press[Keysym.LSHIFT]
+		local add = Client.input:is_pressed(Keysym.LSHIFT)
 		Client.editor:select(add)
 	else
 		-- Released.
@@ -71,7 +73,7 @@ end}
 
 Binding{name = "editor_snap", mode = "press", key1 = Keysym.PERIOD, func = function()
 	if Ui.root ~= "editor" then return end
-	local mult = Binding.dict_press[Keysym.LCTRL] and 0.25 or 0.5
+	local mult = Client.input:is_pressed(Keysym.LCTRL) and 0.25 or 0.5
 	for k,v in pairs(Client.editor.selection) do
 		if v.object then
 			v.object:snap(mult * Voxel.tile_size, mult * math.pi)
@@ -82,7 +84,7 @@ end}
 
 Binding{name = "editor_strafe", mode = "analog", key1 = Keysym.a, key2 = Keysym.d, func = function(v)
 	if Ui.root ~= "editor" then return end
-	local mult = Binding.dict_press[Keysym.LCTRL] and 1 or 10
+	local mult = Client.input:is_pressed(Keysym.LCTRL) and 1 or 10
 	Client.editor.camera.strafing = mult * v
 end}
 
@@ -109,7 +111,7 @@ Binding{name = "editor_turn", mode = "analog", key1 = "mousex", func = function(
 	else
 		-- Rotate the selected objects.
 		-- If left control is pressed, rotation is 10x slower.
-		local mult = Binding.dict_press[Keysym.LCTRL] and 0.1 or 1
+		local mult = Client.input:is_pressed(Keysym.LCTRL) and 0.1 or 1
 		local drot = Quaternion{euler = {-v * mult * sens, 0, 0}}
 		for k,v in pairs(Client.editor.selection) do
 			v:rotate(drot)

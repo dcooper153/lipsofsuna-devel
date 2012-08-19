@@ -15,7 +15,7 @@ end
 
 Widgets.Uidialogtext.apply = function(self)
 	Game.messaging:client_event("choose dialog answer", self.dialog_id, "")
-	Effect:play_global("uitransition1")
+	Client.effects:play_global("uitransition1")
 end
 
 Widgets.Uidialogtext.rebuild_size = function(self)

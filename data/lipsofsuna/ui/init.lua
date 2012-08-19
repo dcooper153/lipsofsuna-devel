@@ -1,3 +1,6 @@
+require(Mod.path .. "theme")
+require(Mod.path .. "ui")
+
 Program:add_path(Mod.path)
 Program:add_path(Mod.path .. "sounds")
 

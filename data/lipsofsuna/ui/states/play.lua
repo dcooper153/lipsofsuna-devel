@@ -3,7 +3,7 @@ Ui:add_state{
 	root = "play",
 	hint = "",
 	init = function()
-		Sound:switch_music_track("game")
+		Client.effects:switch_music_track("game")
 		if Client.camera ~= Client.camera1 and Client.camera ~= Client.camera2 then
 			Client.camera = Client.camera3
 		end
@@ -11,11 +11,11 @@ Ui:add_state{
 	input = function(args)
 		-- Only handle apply button presses.
 		if args.type ~= "keypress" then return true end
-		local action = Binding.dict_name["menu apply"]
+		local action = Client.bindings:find_by_name("menu apply")
 		if not action then return true end
 		if not action:handle_event(args) then return true end
 		-- Activate the item the player is looking at.
-		if Target.target_object then
+		if Operators.world:get_target_object() then
 			Ui.state = "world/object"
 		end
 	end,

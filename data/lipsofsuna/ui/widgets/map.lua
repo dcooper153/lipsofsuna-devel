@@ -30,9 +30,7 @@ Widgets.Uimap.add_marker = function(self, icon, name, pos, rot)
 	if pix.x < 0 or pix.y < 0 or pix.x >= size.x or pix.y >= size.y then return end
 	-- Create the widget.
 	local tooltip = string.format("%s\nDistance: %d\nDepth: %d", name, loc.length, pos.y - center.y)
-	local widget = Widgets.Icon{
-		icon = Iconspec:find{name = icon}, offset = pix,
-		rotation = rot, tooltip = Widgets.Tooltip{text = tooltip}}
+	local widget = Widgets.Uiicon(Iconspec:find{name = icon}, pix, rot, Widgets.Tooltip(tooltip))
 	-- Pack the widget.
 	self:add_child(widget)
 	table.insert(self.markers, widget)
@@ -55,8 +53,8 @@ Widgets.Uimap.handle_event = function(self, args)
 		if args.type == "keyrepeat" then
 			a.type = "keypress"
 		end
-		local action1 = Binding.dict_name["menu up"]
-		local action2 = Binding.dict_name["menu down"]
+		local action1 = Client.bindings:find_by_name("menu up")
+		local action2 = Client.bindings:find_by_name("menu down")
 		if (action1 and action1:get_event_response(a) ~= nil) then
 			self:zoom("in")
 			return

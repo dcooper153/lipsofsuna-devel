@@ -11,5 +11,5 @@ end
 
 Widgets.Uiinvstore.apply = function(self)
 	Game.messaging:client_event("store to container", self.inventory_id, self.index)
-	Effect:play_global("uitransition1")
+	Client.effects:play_global("uitransition1")
 end

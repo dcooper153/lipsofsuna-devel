@@ -13,7 +13,7 @@ end
 
 Widgets.Uidialogchoice.apply = function(self)
 	Game.messaging:client_event("choose dialog answer", self.dialog_id, self.text)
-	Effect:play_global("transition1")
+	Client.effects:play_global("transition1")
 end
 
 Widgets.Uidialogchoice.rebuild_canvas = function(self)

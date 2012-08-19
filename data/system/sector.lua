@@ -70,3 +70,5 @@ end
 Sector.get_tile_by_point = function(self, point)
 	return self:get_offset_by_point(point):multiply(Voxel.tiles_per_line)
 end
+
+return Sector

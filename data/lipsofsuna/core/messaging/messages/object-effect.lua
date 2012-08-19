@@ -11,5 +11,5 @@ Message{
 	server_to_client_handle = function(self, id, name)
 		local object = Object:find{id = id}
 		if not object then return end
-		Effect:play_object(name, object)
+		Client.effects:play_object(name, object)
 	end}

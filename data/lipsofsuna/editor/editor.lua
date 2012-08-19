@@ -1,3 +1,4 @@
+local Simulation = require("core/client/simulation")
 require "editor/controls"
 require "editor/editorcamera"
 require "editor/editorobject"
@@ -189,7 +190,7 @@ Editor.paste = function(self, args)
 	--FIXME make objects spawn at cursor
 	--FIXME Tile copying
 	--TODO make pasted objects current selection
-	local point,object,tile = Target:pick_ray{camera = self.camera}
+	local point,object,tile = Simulation:pick_scene_by_camera(self.camera)
 	if self.highlight and self.selection[self.highlight.key] then point = self.selection[self.highlight.key].tile end
 	local prevpoint = nil
 	

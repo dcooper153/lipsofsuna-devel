@@ -6,12 +6,12 @@ Ui:add_state{
 	end,
 	background = function()
 		if Client.player_object then return end
-		return Widgets.Background{fullscreen = true, image = "mainmenu1"}
+		return Widgets.Uibackground("mainmenu1")
 	end,
 	init = function()
 		-- Get the control actions.
 		local actions = {}
-		for k,v in pairs(Binding.dict_name) do
+		for k,v in pairs(Client.bindings.dict_name) do
 			table.insert(actions, v)
 		end
 		table.sort(actions, function(a,b) return a.name < b.name end)

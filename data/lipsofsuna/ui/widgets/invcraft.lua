@@ -14,7 +14,7 @@ end
 Widgets.Uiinvcraft.apply = function(self)
 	if not self.enabled then return end
 	Game.messaging:client_event("craft", self.inventory_id, self.name)
-	Effect:play_global("uitransition1")
+	Client.effects:play_global("uitransition1")
 end
 
 --- Toggles whether the item is craftable.

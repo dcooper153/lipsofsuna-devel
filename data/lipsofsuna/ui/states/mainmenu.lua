@@ -6,10 +6,10 @@ Ui:add_state{
 		return false
 	end,
 	background = function()
-		return Widgets.Background{fullscreen = true, image = "mainmenu1"}
+		return Widgets.Uibackground("mainmenu1")
 	end,
 	init = function()
-		Sound:switch_music_track("menu")
+		Client.effects:switch_music_track("menu")
 	end}
 
 Ui:add_widget{

@@ -23,5 +23,5 @@ Widgets.Uitradeitem.apply = function(self)
 		Operators.trading:add_sell()
 	end
 	Ui:pop_state()
-	Effect:play_global("uitransition1")
+	Client.effects:play_global("uitransition1")
 end

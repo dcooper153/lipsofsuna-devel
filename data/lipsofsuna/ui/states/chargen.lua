@@ -12,7 +12,7 @@ Ui:add_state{
 	state = "chargen",
 	root = "chargen",
 	label = "Create character",
-	init = function() Lighting:set_dungeon_mode(false) end,
+	init = function() Client.lighting:set_dungeon_mode(false) end,
 	exit_root = function() Operators.chargen:reset() end,
 	input = chargen_input,
 	update = chargen_update}

@@ -18,8 +18,8 @@ end
 -- @param time Modifier duration.
 Widgets.Hudmodifiers.add = function(self, name, time)
 	-- Special handling for light and plague.
-	if name == "light" then Lighting:set_light_spell(true) end
-	if name == "black haze" and not self.dict_name[name] then Effect:play("disease1") end
+	if name == "light" then Client.lighting:set_light_spell(true) end
+	if name == "black haze" and not self.dict_name[name] then Client.effects:play("disease1") end
 	-- Add the icon.
 	local icon = self.dict_name[name]
 	if icon then
@@ -48,7 +48,7 @@ Widgets.Hudmodifiers.remove = function(self, name)
 		self.dict_id[id].id = id
 	end
 	-- Special handling for light.
-	if name == "light" then Lighting:set_light_spell(false) end
+	if name == "light" then Client.lighting:set_light_spell(false) end
 end
 
 Widgets.Hudmodifiers.reshaped = function(self)

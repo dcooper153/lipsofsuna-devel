@@ -8,7 +8,6 @@ require "common/stats"
 require(Mod.path .. "account")
 require(Mod.path .. "account-database")
 require(Mod.path .. "dialog")
-require(Mod.path .. "event")
 require(Mod.path .. "game")
 require(Mod.path .. "global-event-manager")
 require(Mod.path .. "log")

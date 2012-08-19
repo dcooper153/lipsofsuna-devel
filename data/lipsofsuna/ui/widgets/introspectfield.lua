@@ -38,7 +38,7 @@ end
 Widgets.Uiintrospectfield.apply = function(self)
 	Operators.introspect:set_field_name(self.field.name)
 	Ui:push_state("introspect/field")
-	Effect:play_global("uitransition1")
+	Client.effects:play_global("uitransition1")
 end
 
 Widgets.Uiintrospectfield.rebuild_size = function(self)

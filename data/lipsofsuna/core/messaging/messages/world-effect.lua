@@ -9,5 +9,5 @@ Message{
 		return {Vector(x,y,z), t}
 	end,
 	server_to_client_handle = function(self, point, name)
-		Effect:play_world(name, point)
+		Client.effects:play_world(name, point)
 	end}

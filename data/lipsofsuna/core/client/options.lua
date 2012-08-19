@@ -1,4 +1,6 @@
-Options = Class()
+local Class = require("system/class")
+
+local Options = Class()
 
 Options.config_keys = {
 	anisotropic_filter = {"Anisotropic filtering", "int", 0, 32},
@@ -185,3 +187,5 @@ Options.save = function(self)
 	end
 	self.config:save()
 end
+
+return Options

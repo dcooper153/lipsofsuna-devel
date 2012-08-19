@@ -1,3 +1,5 @@
+local Simulation = require("core/client/simulation")
+
 local make_flags = function(list)
 	local res = {}
 	for k,v in ipairs(list) do

@@ -1,6 +1,8 @@
-require "system/class"
+local Class = require("system/class")
+local LightEffect = require(Mod.path .. "light-effect")
+local ParticleEffect = require(Mod.path .. "particle-effect")
 
-RenderUtils = Class()
+local RenderUtils = Class()
 
 --- Creates a scale animation for an actor.
 -- @param self Render utils.
@@ -52,3 +54,5 @@ RenderUtils.create_special_effects = function(self, parent, spec)
 	end
 	return result
 end
+
+return RenderUtils

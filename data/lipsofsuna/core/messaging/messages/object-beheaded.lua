@@ -15,5 +15,5 @@ Message{
 		-- Remove the head.
 		object.render:set_beheaded(true)
 		-- Play the effect.
-		Effect:play_object("behead1", object, "#neck")
+		Client.effects:play_object("behead1", object, "#neck")
 	end}

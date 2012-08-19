@@ -17,7 +17,7 @@ Widgets.Hudcompass.update = function(self, secs)
 	self.timer = self.timer + secs
 	if self.timer < 0.03 then return end
 	self.timer = 0
-	self.look_direction = math.pi - PlayerState.rotation_curr.euler[1]
+	self.look_direction = math.pi - Client.player_state:get_turn_angle()
 	self.quest_direction = Operators.quests:get_compass_direction()
 	self.quest_distance = Operators.quests:get_compass_distance()
 	self.quest_height = Operators.quests:get_compass_height()

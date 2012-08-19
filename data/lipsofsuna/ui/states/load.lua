@@ -7,7 +7,7 @@ Ui:add_state{
 		return false
 	end,
 	background = function()
-		return Widgets.Background{fullscreen = true, image = "mainmenu1"}
+		return Widgets.Uibackground("mainmenu1")
 	end,
 	init = function()
 		Client.data.load.timer = 0

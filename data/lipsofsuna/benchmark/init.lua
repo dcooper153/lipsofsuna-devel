@@ -1,3 +1,5 @@
+local Simulation = require("core/client/simulation")
+
 Benchmark = Class()
 Benchmark.class_name = "Benchmark"
 
@@ -53,7 +55,7 @@ Benchmark.update = function(self, secs)
 	Client.camera = self.camera
 	Client:update_camera()
 	-- Update lighting.
-	Lighting:update(secs)
+	Client.lighting:update(secs)
 	-- Modify objects.
 	for k,v in pairs(self.objects) do
 		v:activate(5)

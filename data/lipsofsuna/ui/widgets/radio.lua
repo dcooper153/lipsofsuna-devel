@@ -26,7 +26,7 @@ Widgets.Uiradio.apply = function(self)
 	self.value = true
 	self.need_repaint = true
 	self:changed()
-	Effect:play_global("uitoggle1")
+	Client.effects:play_global("uitoggle1")
 end
 
 Widgets.Uiradio.changed = function(self)

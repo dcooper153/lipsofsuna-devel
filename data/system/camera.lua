@@ -182,3 +182,5 @@ Camera:add_setters{
 	target_position = function(s, v) Los.camera_set_target_position(s.handle, v.handle) end,
 	target_rotation = function(s, v) Los.camera_set_target_rotation(s.handle, v.handle) end,
 	viewport = function(s, v) Los.camera_set_viewport(s.handle, v) end}
+
+return Camera

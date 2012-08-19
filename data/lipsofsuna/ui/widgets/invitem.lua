@@ -20,7 +20,7 @@ Widgets.Uiinvitem.apply = function(self)
 	Client.data.inventory.index = self.index
 	Client.data.inventory.count = self.item.count or 1
 	Ui:push_state("inventory/item")
-	Effect:play_global("uitransition1")
+	Client.effects:play_global("uitransition1")
 end
 
 Widgets.Uiinvitem.rebuild_size = function(self)

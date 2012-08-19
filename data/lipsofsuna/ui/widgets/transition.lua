@@ -14,7 +14,7 @@ end
 Widgets.Uitransition.apply = function(self)
 	self:changed()
 	Ui:push_state(self.target_state)
-	Effect:play_global("uitransition1")
+	Client.effects:play_global("uitransition1")
 end
 
 Widgets.Uitransition.changed = function(self)

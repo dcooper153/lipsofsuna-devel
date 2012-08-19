@@ -1,6 +1,7 @@
 require "system/object"
 require "common/inventory"
-require "client/movement-prediction"
+local ClientRenderObject = not Settings.server and require("core/client/client-render-object")
+local MovementPrediction = not Settings.server and require("core/client/movement-prediction")
 
 SimulationObject = Class(Object)
 SimulationObject.class_name = "SimulationObject"

@@ -541,14 +541,14 @@ Actor.handle_inventory_event = function(self, args)
 		self.render:handle_inventory_equip(args.slot, args.object)
 		if args.object.spec.effect_equip then
 			if not Operators.play:is_startup_period() then
-				Effect:play_object(args.object.spec.effect_equip, self, node)
+				Client.effects:play_object(args.object.spec.effect_equip, self, node)
 			end
 		end
 	elseif args.type == "inventory-unequipped" then
 		self.render:handle_inventory_unequip(args.slot, args.object)
 		if args.object.spec.effect_equip then
 			if not Operators.play:is_startup_period() then
-				Effect:play_object(args.object.spec.effect_unequip, self, node)
+				Client.effects:play_object(args.object.spec.effect_unequip, self, node)
 			end
 		end
 	end
@@ -981,14 +981,14 @@ Actor.update_sound = function(self, secs)
 	self.lfoot_prev = self.lfoot_curr
 	self.lfoot_curr = self:find_node{name = "#foot.L"}
 	if self.lfoot_prev and self.lfoot_curr.z < 0 and self.lfoot_prev.z >= 0 then
-		Effect:play_world(spec.footstep_sound, lnode)
+		Client.effects:play_world(spec.footstep_sound, lnode)
 	end
 	-- Right foot.
 	-- Works the same way with the left foot.
 	self.rfoot_prev = self.rfoot_curr
 	self.rfoot_curr = self:find_node{name = "#foot.R"}
 	if self.rfoot_prev and self.rfoot_curr.z < 0 and self.rfoot_prev.z >= 0 then
-		Effect:play_world(spec.footstep_sound, rnode)
+		Client.effects:play_world(spec.footstep_sound, rnode)
 	end
 	return true
 end
@@ -1214,7 +1214,7 @@ Actor.set_stat = function(self, s, v, m, diff)
 		end
 		-- Quake the camera if the player was hurt.
 		if self == player and diff < -5 then
-			Client:apply_quake(self.position, 0.01 * (5 - diff))
+			Client.effects:apply_quake(self.position, 0.01 * (5 - diff))
 		end
 		-- Set the correct collision shape.
 		-- Dead actors have a different collision shape. We switch between

@@ -6,7 +6,7 @@ Ui:add_state{
 	end,
 	background = function()
 		if Client.player_object then return end
-		return Widgets.Background{fullscreen = true, image = "mainmenu1"}
+		return Widgets.Uibackground("mainmenu1")
 	end}
 
 Ui:add_widget{
@@ -119,7 +119,7 @@ Ui:add_state{
 	end,
 	background = function()
 		if Client.player_object then return end
-		return Widgets.Background{fullscreen = true, image = "mainmenu1"}
+		return Widgets.Uibackground("mainmenu1")
 	end,
 	init = function()
 		-- Get the sorted list of video modes.

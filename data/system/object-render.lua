@@ -249,3 +249,5 @@ RenderObject.set_visible = function(self, v)
 	rawset(self, "__visible", v)
 	Los.render_object_set_visible(self.handle, v)
 end
+
+return RenderObject
