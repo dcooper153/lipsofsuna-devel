@@ -653,6 +653,11 @@ Actor.removed_modifier = function(self, name)
 	self:update_skills()
 end
 
+Actor.get_attack_charge = function(self)
+	if not self.attack_charge then return 0 end
+	return math.min(1, (Program.time - self.attack_charge) / 2)
+end
+
 --- Enables or disables the blocking stance.
 -- @param self Actor.
 -- @param value True to block.

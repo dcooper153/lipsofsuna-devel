@@ -39,3 +39,21 @@ Feattypespec.new = function(clss, args)
 	self.effects = {}
 	return self
 end
+
+Feattypespec.get_casting_info = function(self, result)
+	local info = result or {}
+	info.cooldown = (info.cooldown or 0) + self.cooldown
+	info.influences = self:get_influences(info.influences)
+	return info
+end
+
+Feattypespec.get_influences = function(self, result)
+	local influences = result or {}
+	for name,value in pairs(self.influences) do
+		influences[name] = (influences[n] or 0) + value
+		if influences[name] == 0 then
+			influences[name] = nil
+		end
+	end
+	return influences
+end

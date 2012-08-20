@@ -73,10 +73,23 @@ end
 -- @param item Item object.
 -- @return Number.
 Skills.calculate_damage_multiplier_for_item = function(self, item)
-	if not item.spec.influences_bonus then return 1 end
+	return self:calculate_damage_multiplier_for_itemspec(item.spec)
+end
+
+--- Calculates the damage multiplier for the given itemspec.<br/>
+--
+-- The damage multiplier depends on the active skills and the type of the item.
+-- The active skills determine the attributes of the actor. The attribute names
+-- that affect the damage of the weapon are listed in the spec of the item.
+--
+-- @param self Skills.
+-- @param item Item object.
+-- @return Number.
+Skills.calculate_damage_multiplier_for_itemspec = function(self, spec)
+	if not spec.influences_bonus then return 1 end
 	local mult = 1
 	local attr = self:calculate_attributes()
-	for name in pairs(item.spec.influences_bonus) do
+	for name in pairs(spec.influences_bonus) do
 		if attr[name] then mult = mult * attr[name] end
 	end
 	return mult

@@ -42,3 +42,43 @@ Feateffectspec.new = function(clss, args)
 	end
 	return self
 end
+
+Feateffectspec.get_casting_info = function(self, result)
+	local info = result or {}
+	self.cooldown = self:get_cooldown(info.cooldown)
+	self.stats = self:get_required_stats(info.stats)
+	self.reagents = self:get_required_reagents(info.reagents)
+	self.influences = self:get_influences(info.influences)
+	return info
+end
+
+Feateffectspec.get_cooldown = function(self, result)
+	return (cooldown or 0) + self.cooldown
+end
+
+Feateffectspec.get_influences = function(self, result)
+	local influences = result or {}
+	for name,value in pairs(self.influences) do
+		influences[name] = (influences[name] or 0) + value
+		if influences[name] == 0 then
+			influences[name] = nil
+		end
+	end
+	return influences
+end
+
+Feateffectspec.get_required_stats = function(self, result)
+	local stats = result or {}
+	for stat,value in pairs(self.required_stats) do
+		stats[stat] = (stats[stat] or 0) + value
+	end
+	return res
+end
+
+Feateffectspec.get_required_reagents = function(self, result)
+	local reagents = result or {}
+	for reagent,value in pairs(self.required_reagents) do
+		reagents[reagent] = (reagents[reagent] or 0) + value
+	end
+	return result
+end

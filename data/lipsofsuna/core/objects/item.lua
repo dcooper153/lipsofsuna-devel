@@ -46,69 +46,8 @@ end
 -- @param self Object.
 -- @param result Contact result.
 Item.contact_cb = function(self, result)
-	-- Multiple contact points might be generated during one frame so we
-	-- might have to skip some of the calls.
-	if not self.contact_args then return end
-	if self.spec.categories["boomerang"] then
-		-- Boomerang mode.
-		if result.object == self.contact_args.owner then
-			-- Owner catch.
-			if self.contact_args.owner.inventory:merge_object(self) then
-				local o = self.contact_args.owner:get_weapon()
-				if not o then self.contact_args.owner:set_weapon(self) end
-			end
-		else
-			-- Damage target.
-			self.contact_args.feat:apply{
-				charge = self.contact_args.charge,
-				object = result.object,
-				owner = self.contact_args.owner,
-				point = result.point,
-				tile = result.tile,
-				weapon = self}
-		end
-		-- Disable boomerang mode.
-		if self.timer then
-			self.timer:disable()
-			self.timer = nil
-		end
-		self.contact_events = false
-		self.contact_args = nil
-		self.gravity = self.spec.gravity
-		self:animate("fly stop")
-	else
-		-- Projectile mode.
-		if SimulationObject.contact_cb(self, result) then
-			self.gravity = self.spec.gravity
-		end
-	end
-end
-
---- Gets the armor class of the item.
--- @param self Object.
--- @param user Actor.
--- @return Armor rating.
-Item.get_armor_class = function(self, user)
-	return self.spec.armor_class
-end
-
---- Gets the weapon damage types of the item.
--- @param self Object.
--- @param user Actor.
--- @return Array of influences.
-Item.get_weapon_influences = function(self, user)
-	if not self.spec.influences then return {} end
-	-- Calculate the damage multiplier.
-	local mult = 1
-	if user.skills then
-		mult = user.skills:calculate_damage_multiplier_for_item(self)
-	end
-	-- Calculate influences.
-	local influences = {}
-	for k,v in pairs(self.spec.influences) do
-		influences[k] = mult * v
-	end
-	return influences
+	if not self.controller then return end
+	self.controller:handle_contact(result)
 end
 
 --- Causes the object to take damage.
@@ -148,6 +87,13 @@ Item.die = function(self)
 	SimulationObject.die(self)
 end
 
+--- Called when the object is examined.
+-- @param self Object.
+-- @param user User.
+Item.examine_cb = function(self, user)
+	user:send_message(self.spec.name)
+end
+
 --- Splits items from the stack.
 -- @param self Object.
 -- @param count Number of items to split.
@@ -165,66 +111,14 @@ Item.split = function(self, count)
 	end
 end
 
---- Fires or throws the item.
+--- Updates the state of the item.
 -- @param self Object.
--- @param args Arguments.<ul>
---   <li>collision: Trigger at collision.</li>
---   <li>feat: Feat.</li>
---   <li>owner: Object firing the projectile.</li>
---   <li>speed: Initial speed.</li>
---   <li>timer: Trigger at timeout.</li></ul>
--- @return The split and fired item.
-Item.fire = function(self, args)
-	-- Split a projectile from the stack and fire it.
-	if not args.owner or not args.feat then return end
-	local proj = self:split()
-	SimulationObject.fire(proj, args)
-	proj.gravity = self.spec.gravity_projectile
-	-- Special handling for boomerangs.
-	if proj.spec.categories["boomerang"] then
-		-- Work around an initial collision with the user.
-		proj:set_position(proj:get_position() + proj:get_rotation() * Vector(0,0,-0.7))
-		-- Enable boomerang return.
-		proj.state = 0
-		proj.rotation = Quaternion{axis = Vector(0,0,1), angle = -0.5 * math.pi}
-		proj:animate("fly start")
-		proj.timer = Timer{delay = 1, func = function(timer, secs)
-			if proj.state == 0 then
-				proj.velocity = proj.velocity * -2
-				proj.state = 1
-			elseif proj.state == 1 then
-				proj.velocity = proj.velocity * 2
-				proj.state = 2
-			else
-				proj.timer = nil
-				proj.gravity = proj.spec.gravity
-				timer:disable()
-			end
-		end}
+-- @param secs Seconds since the last update.
+Item.update = function(self, secs)
+	if self.controller then
+		self.controller:update(secs)
 	end
-	-- Return the fired projectile.
-	return proj
-end
-
---- Called when the object is examined.
--- @param self Object.
--- @param user User.
-Item.examine_cb = function(self, user)
-	user:send_message(self.spec.name)
-end
-
---- Called when the item is being equipped.
--- @param self Object.
--- @param user User object.
--- @param slot Slot name.
-Item.equipped = function(self, user, slot)
-end
-
---- Called when the item is being unequipped.
--- @param self Object.
--- @param user User object.
--- @param slot Slot name.
-Item.unequipped = function(self, user, slot)
+	SimulationObject.update(self, secs)
 end
 
 --- Writes the object to a string.
@@ -287,6 +181,33 @@ Item.write_db = function(self, db)
 	else
 		db:query([[DELETE FROM object_inventory WHERE id=?;]], {self.id})
 	end
+end
+
+--- Gets the armor class of the item.
+-- @param self Object.
+-- @param user Actor.
+-- @return Armor rating.
+Item.get_armor_class = function(self, user)
+	return self.spec.armor_class
+end
+
+--- Gets the weapon damage types of the item.
+-- @param self Object.
+-- @param user Actor.
+-- @return Array of influences.
+Item.get_weapon_influences = function(self, user)
+	if not self.spec.influences then return {} end
+	-- Calculate the damage multiplier.
+	local mult = 1
+	if user.skills then
+		mult = user.skills:calculate_damage_multiplier_for_item(self)
+	end
+	-- Calculate influences.
+	local influences = {}
+	for k,v in pairs(self.spec.influences) do
+		influences[k] = mult * v
+	end
+	return influences
 end
 
 Item.set_spec = function(self, value)

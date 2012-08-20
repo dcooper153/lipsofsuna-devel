@@ -1,3 +1,5 @@
+local Damage = require("core/server/damage")
+
 Feat = Class()
 
 --- Creates a new feat.
@@ -141,174 +143,66 @@ end
 --   <li>weapon: Used weapon.</li></ul>
 -- @return Feat info table.
 Feat.get_info = function(self, args)
-	local damage = 0
-	local reagents = {}
-	local stats = {}
-	local influences = {}
-	local health_influences = {["cold damage"] = 1, ["fire damage"] = 1, ["physical damage"] = 1, poison = 1}
 	-- Get the feat type.
 	local anim = Feattypespec:find{name = self.animation}
 	if not anim then return end
-	local cooldown = anim.cooldown
-	-- Influence contribution.
-	for n,v in pairs(anim.influences) do
-		influences[n] = (influences[n] or 0) + v
-		if influences[n] == 0 then
-			influences[n] = nil
-		end
-	end
-	-- Effect contributions.
+	-- Get the feat information.
+	local info = anim:get_casting_info()
 	for index,data in pairs(self.effects) do
 		local effect = Feateffectspec:find{name = data[1]}
-		if effect then
-			-- Stat requirements.
-			for stat,value in pairs(effect.required_stats) do
-				local val = stats[stat] or 0
-				stats[stat] = val + value
-			end
-			-- Reagent requirements.
-			for reagent,value in pairs(effect.required_reagents) do
-				local val = reagents[reagent] or 0
-				reagents[reagent] = val + value
-			end
-			-- Cooldown contribution.
-			cooldown = cooldown + effect.cooldown
-			-- Influence contribution.
-			for n,v in pairs(effect.influences) do
-				influences[n] = (influences[n] or 0) + v
-				if influences[n] == 0 then
-					influences[n] = nil
-				end
-			end
-		end
+		if effect then effect:get_casting_info(info) end
 	end
-	-- Ammo requirements.
+	-- Get the ammo requirements.
 	local ammo = anim.required_ammo
 	if anim.required_ammo == "WEAPON" then
 		ammo = args and args.weapon and args.weapon.spec.ammo_type
 	end
-	-- Stat requirements.
-	for k,v in pairs(stats) do
-		stats[k] = math.max(1, math.floor(v))
-	end
-	-- Reagent requirements.
-	for k,v in pairs(reagents) do
-		reagents[k] = math.max(1, math.floor(v))
-	end
+	-- Set the base damage.
+	local damage = Damage(influences)
 	-- Add weapon-specific influences.
-	-- In addition to the base influences, weapons may grant bonuses for having
-	-- points in certain skills. The skill bonuses are multiplicative since the
-	-- system is easier to balance that way.
-	if args and args.weapon and anim.bonuses_weapon and args.weapon.spec.influences then
-		local mult = 1
-		if args.owner.skills then
-			mult = args.owner.skills:calculate_damage_multiplier_for_item(args.weapon)
-		end
-		for k,v in pairs(args.weapon.spec.influences) do
-			influences[k] = (influences[k] or 0) + mult * v
-		end
+	if args and anim.bonuses_weapon then
+		damage:add_item_influences(args.weapon, args.owner.skills)
 	end
 	-- Add bare-handed-specific influences.
-	-- Works like the weapon variant but uses hardcoded attributes and base damage.
 	if args and not args.weapon and anim.bonuses_barehanded then
-		local mult = 1
-		if args.owner.skills then
-			mult = args.owner.skills:calculate_damage_multiplier_for_unarmed()
-		end
-		local bonuses = {["physical damage"] = 3}
-		for k,v in pairs(bonuses) do
-			influences[k] = (influences[k] or 0) + mult * v
-		end
+		damage:add_barehanded_influences(args.owner.skills)
 	end
 	-- Add projectile-specific influences.
-	-- Works like the weapon variant but uses the projectile as the item.
 	if anim.bonuses_projectile then
-		local projspec = args and args.projectile and args.projectile.spec
-		if not projspec and ammo then
-			projspec = Itemspec:find{name = ammo}
-		end
-		if projspec and projspec.influences then
-			local mult = 1
-			if args.owner.skills and args.weapon then
-				mult = args.owner.skills:calculate_damage_multiplier_for_item(args.weapon)
-			end
-			for k,v in pairs(projspec.influences) do
-				influences[k] = (influences[k] or 0) + mult * v
-			end
+		if args and args.projectile then
+			damage:add_item_influences(args.projectile, args.owner.skills)
+		elseif ammo then
+			damage:add_itemspec_influences(Itemspec:find{name = ammo}, args.owner.skills)
 		end
 	end
-	-- Add berserk bonus.
-	-- The bonus increases physical damage if the health of the owner is
-	-- lower than 25 points. If the health is 1 point, the damage is tripled.
-	if args and args.owner:get_modifier("berserk") then
-		local p = influences["physical"]
-		if anim.categories["melee"] and p and p < 0 then
-			local h = args.owner.stats:get_value("health")
-			local f = 3 - 2 * math.min(h, 25) / 25
-			influences["physical"] = p * f
+	-- Apply attacker modifiers.
+	if args then
+		if anim.categories["melee"] then
+			damage:apply_attacker_physical_modifiers(args.owner)
+		end
+		if args.charge and (anim.categories["melee"] or anim.categories["ranged"]) then
+			damage:apply_attacker_charge(args.charge)
 		end
 	end
-	-- Add charge bonus.
-	-- Holding the attack button allows a power attack of a kind. The damage
-	-- is doubled if charged to the maximum of 2 seconds.
-	if args and args.charge then
-		local p = influences["physical damage"]
-		if (anim.categories["melee"] or anim.categories["ranged"]) and p and p > 0 then
-			local f = 1 + math.min(1.5, args.charge / 2)
-			influences["physical damage"] = p * f
-		end
-	end
-	-- Apply object armor and blocking.
-	-- Only a limited number of influence types is affected by this.
-	-- Positive influences that would increase stats are never blocked.
+	-- Apply defender modifiers.
 	if args and args.object then
-		local reduce = {["cold damage"] = true, ["fire damage"] = true, ["physical damage"] = true}
-		local armor = args.object.armor_class or 0
-		if args.object.blocking then
-			local delay = args.object.spec.blocking_delay
-			local elapsed = Program.time - args.object.blocking
-			local frac = math.min(1, elapsed / delay)
-			armor = armor + frac * args.object.spec.blocking_armor
-		end
-		local mult = math.max(0.0, 1 - armor)
-		for k,v in pairs(influences) do
-			if reduce[k] then
-				local prev = influences[k]
-				if prev < 0 then
-					influences[k] = prev * mult
-				end
-			end
-		end
-	end
-	-- Apply object vulnerabilities.
-	-- Individual influences are multiplied by the vulnerability coefficients
-	-- of the object and summed together to the total health influence.
-	local vuln = args and args.object and args.object.spec.vulnerabilities
-	if not vuln then vuln = health_influences end
-	local health = influences.health or 0
-	for k,v in pairs(influences) do
-		local mult = vuln[k] or health_influences[k]
-		if mult then
-			local val = v * mult
-			influences[k] = val 
-			health = health + val
-		end
+		damage:apply_defender_armor(args.object)
+		damage:apply_defender_vulnerabilities(args.object)
 	end
 	-- Set the total health influence.
-	-- This is the actual value added to the health of the object. The
-	-- individual influence components remain in the table may be used
-	-- by special feats but they aren't used for regular health changes.
+	local influences = damage.influences
+	local health = damage:get_total_health_influence()
 	if health ~= 0 then
-		influences.health = health
+		damage.influences.health = health
 	end
 	-- Return the final results.
 	return {
 		animation = anim,
-		cooldown = cooldown,
-		influences = influences,
+		cooldown = info.cooldown or 0,
+		influences = damage.influences,
 		required_ammo = ammo and {[ammo] = 1} or {},
-		required_reagents = reagents,
-		required_stats = stats,
+		required_reagents = info.reagents or {},
+		required_stats = info.stats or {},
 		required_weapon = anim and anim.required_weapon}
 end
 
@@ -355,9 +249,7 @@ Feat.perform = function(self, args)
 		end
 	end
 	-- Calculate the charge time.
-	if args.user.attack_charge then
-		args.charge = Program.time - args.user.attack_charge
-	end
+	args.charge = args.user:get_attack_charge()
 	-- Call the feat function.
 	local move
 	if not info or anim.toggle or not args.stop then

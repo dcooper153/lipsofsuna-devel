@@ -1,30 +1,45 @@
+local BoomerangController = require("core/server/boomerang-controller")
+local Combat = require("core/server/combat")
+local ProjectileController = require("core/server/projectile-controller")
+
+local perform_attack = function(attacker, weapon)
+	local charge = 1 + 2 * attacker:get_attack_charge()
+	Coroutine(function(t)
+		Coroutine:sleep(attacker.spec.timing_attack_throw * 0.02)
+		-- Play the attack effect.
+		Server:object_effect(attacker, "swing1")
+		Vision:event{type = "object attack", object = attacker, move = "stand", variant = math.random(0, 255)}
+		-- Fire the projectile.
+		local projectile = weapon:split()
+		local damage = Combat:calculate_ranged_damage(attacker, projectile)
+		local controller
+		if projectile.spec.categories["boomerang"] then
+			controller = BoomerangController(attacker, projectile, damage)
+		else
+			controller = ProjectileController(attacker, projectile, damage, 10 * charge)
+		end
+		controller:attach()
+	end)
+end
+
 Actionspec{
 	name = "throw",
 	charge_start = function(user)
-		-- Start charging the attack.
 		user:animate("charge stand", true)
 		user.attack_charge = Program.time
 		user.attack_charge_anim = "throw"
 	end,
 	charge_end = function(user)
-		-- Initialize the feat.
-		local feat = Feat{animation = "throw"}
-		feat:add_best_effects{user = user}
-		-- Perform the feat.
-		local res = feat:perform{stop = false, user = user}
-		user:attack_charge_cancel(not res)
+		local weapon = user:get_weapon()
+		if weapon then
+			perform_attack(user, weapon)
+			user:attack_charge_cancel()
+		else
+			user:attack_charge_cancel(true)
+		end
+		user.auto_attack = nil
+		user.cooldown = (user.cooldown or 0) + 1
 	end,
 	func = function(feat, info, args)
-		local charge = 1 + 2 * math.min(1, (args.charge or 0) / 2)
-		Coroutine(function(t)
-			Coroutine:sleep(args.user.spec.timing_attack_throw * 0.02)
-			feat:play_effects(args)
-			local proj = args.weapon:fire{
-				charge = charge,
-				collision = not args.weapon.spec.destroy_timer,
-				feat = feat,
-				owner = args.user,
-				speed = 10 * charge,
-				timer = args.weapon.spec.destroy_timer}
-		end)
+		perform_attack(args.user, args.weapon)
 	end}

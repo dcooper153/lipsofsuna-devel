@@ -50,6 +50,13 @@ Object.jump = function(self, args)
 	end
 end
 
+--- Gets the velocity of the object.
+-- @param self Object.
+-- @return Velocity vector.
+Object.get_velocity = function(self)
+	return Class.new(Vector, {handle = Los.object_get_velocity(self.handle)})
+end
+
 Object.set_velocity = function(self, value)
 	Los.object_set_velocity(self.handle, value.handle)
 end
