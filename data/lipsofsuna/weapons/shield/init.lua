@@ -13,6 +13,7 @@ CraftingRecipeSpec{
 
 Itemspec{
 	name = "round shield",
+	actions = {["left"] = "block shield"},
 	animations_equipped = {["default"] = "default shield equipped"},
 	armor_class = 0.08,
 	categories = {["shield"] = true},
@@ -29,6 +30,7 @@ CraftingRecipeSpec{
 
 Itemspec{
 	name = "wooden shield",
+	actions = {["left"] = "block shield"},
 	animations_equipped = {["default"] = "default shield equipped"},
 	armor_class = 0.08,
 	categories = {["shield"] = true},

@@ -13,6 +13,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "adamantium musket",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "bullet",
 	animations_equipped = {["default"] = "default musket equipped"},
 	icon = "musket1",
@@ -33,6 +34,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "aquanite musket",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "bullet",
 	animations_equipped = {["default"] = "default musket equipped"},
 	effect_attack = "musket1",
@@ -54,6 +56,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "crimson musket",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "bullet",
 	animations_equipped = {["default"] = "default musket equipped"},
 	effect_attack = "musket1",
@@ -75,6 +78,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "iron musket",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "bullet",
 	animations_equipped = {["default"] = "default musket equipped"},
 	effect_attack = "musket1",

@@ -8,13 +8,14 @@ CraftingRecipeSpec{
 
 Itemspec{
 	name = "wooden club",
-	model = "woodenclub1",
-	icon = "mace1",
 	categories = {["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	damage_mining = 1,
 	equipment_slot = "hand.R",
 	health = 100,
+	icon = "mace1",
 	influences = {["physical damage"] = 4},
 	influences_bonus = {"melee"},
 	mass = 7,
+	model = "woodenclub1",
 	water_gravity = Vector(0,6,0)}

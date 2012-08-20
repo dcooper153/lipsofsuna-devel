@@ -13,6 +13,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "adamantium hatchet",
 	categories = {["hatchet"] = true, ["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default axe equipped"},
 	equipment_slot = "hand.R",
 	icon = "axe3",
@@ -30,6 +31,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "aquanite hatchet",
 	categories = {["hatchet"] = true, ["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default axe equipped"},
 	damage_mining = 1,
 	equipment_slot = "hand.R",
@@ -49,6 +51,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "crimson hatchet",
 	categories = {["hatchet"] = true, ["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default axe equipped"},
 	damage_mining = 1,
 	equipment_slot = "hand.R",
@@ -68,6 +71,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "iron hatchet",
 	categories = {["hatchet"] = true, ["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default axe equipped"},
 	damage_mining = 1,
 	equipment_slot = "hand.R",
@@ -87,6 +91,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "stone hatchet",
 	categories = {["hatchet"] = true, ["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default axe equipped"},
 	damage_mining = 1,
 	equipment_slot = "hand.R",
@@ -106,6 +111,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "wooden hatchet",
 	categories = {["hatchet"] = true, ["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default axe equipped"},
 	damage_mining = 1,
 	effect_attack_speedline = true,

@@ -14,6 +14,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "iron halberd",
 	categories = {["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default staff equipped"},
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",

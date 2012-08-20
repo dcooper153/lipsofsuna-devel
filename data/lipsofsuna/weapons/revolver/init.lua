@@ -28,6 +28,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "adamantium revolver",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "bullet",
 	animations_equipped = {["default"] = "default revolver equipped"},
 	effect_attack = "revolver1",
@@ -48,6 +49,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "aquanite revolver",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "bullet",
 	animations_equipped = {["default"] = "default revolver equipped"},
 	effect_attack = "revolver1",
@@ -68,6 +70,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "crimson revolver",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "bullet",
 	animations_equipped = {["default"] = "default revolver equipped"},
 	effect_attack = "revolver1",
@@ -88,6 +91,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "iron revolver",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "bullet",
 	animations_equipped = {["default"] = "default revolver equipped"},
 	effect_attack = "revolver1",

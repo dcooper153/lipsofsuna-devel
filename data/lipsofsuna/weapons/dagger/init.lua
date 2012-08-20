@@ -8,14 +8,15 @@ CraftingRecipeSpec{
 
 Itemspec{
 	name = "adamantium dagger",
-	model = "dagger1", -- FIXME
-	icon = "dagger1",
 	categories = {["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	effect_attack_speedline = true,
+	icon = "dagger1",
 	influences = {["physical damage"] = 10},
 	influences_bonus = {"melee"},
 	equipment_slot = "hand.R",
-	mass = 15}
+	mass = 15,
+	model = "dagger1"} -- FIXME
 
 CraftingRecipeSpec{
 	name = "aquanite dagger",
@@ -26,14 +27,15 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "aquanite dagger",
 	model = "dagger1", -- FIXME
-	icon = "dagger1",
 	categories = {["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
-	influences = {["cold damage"] = 4, ["physical damage"] = 4},
-	influences_bonus = {"melee"},
 	equipment_slot = "hand.R",
 	health = 500,
+	icon = "dagger1",
+	influences = {["cold damage"] = 4, ["physical damage"] = 4},
+	influences_bonus = {"melee"},
 	mass = 15}
 
 CraftingRecipeSpec{
@@ -44,16 +46,17 @@ CraftingRecipeSpec{
 
 Itemspec{
 	name = "crimson dagger",
-	model = "dagger1", -- FIXME
-	icon = "dagger1",
 	categories = {["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
 	health = 500,
+	icon = "dagger1",
 	influences = {["fire damage"] = 4, ["physical damage"] = 4},
 	influences_bonus = {"melee"},
-	mass = 15}
+	mass = 15,
+	model = "dagger1"} -- FIXME
 
 CraftingRecipeSpec{
 	name = "iron dagger",
@@ -63,16 +66,17 @@ CraftingRecipeSpec{
 
 Itemspec{
 	name = "iron dagger",
-	model = "dagger1", -- FIXME
-	icon = "dagger1",
 	categories = {["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
 	health = 220,
+	icon = "dagger1",
 	influences = {["physical damage"] = 5},
 	influences_bonus = {"melee"},
-	mass = 5}
+	mass = 5,
+	model = "dagger1"} -- FIXME
 
 CraftingRecipeSpec{
 	name = "stone dagger",
@@ -82,16 +86,17 @@ CraftingRecipeSpec{
 
 Itemspec{
 	name = "stone dagger",
-	model = "dagger1", -- FIXME
-	icon = "dagger1",
 	categories = {["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
+	icon = "dagger1",
 	influences = {["physical damage"] = 3},
 	influences_bonus = {"melee"},
 	health = 130,
-	mass = 6}
+	mass = 6,
+	model = "dagger1"} -- FIXME
 
 CraftingRecipeSpec{
 	name = "wooden dagger",
@@ -101,14 +106,15 @@ CraftingRecipeSpec{
 
 Itemspec{
 	name = "wooden dagger",
-	model = "woodshortsword", -- FIXME
-	icon = "dagger1",
 	categories = {["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	damage_mining = 1,
 	effect_attack_speedline = true,
 	equipment_slot = "hand.R",
 	health = 100,
+	icon = "dagger1",
 	influences = {["physical damage"] = 3},
 	influences_bonus = {"melee"},
 	mass = 7,
+	model = "woodshortsword", -- FIXME
 	water_gravity = Vector(0,6,0)}

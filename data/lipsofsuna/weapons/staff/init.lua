@@ -19,6 +19,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "wooden staff",
 	categories = {["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default staff equipped"},
 	damage_mining = 1,
 	equipment_slot = "hand.R",
@@ -40,6 +41,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "luminous staff",
 	categories = {["melee"] = true, ["weapon"] = true},
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	animations_equipped = {["default"] = "default staff equipped"},
 	damage_mining = 1,
 	equipment_slot = "hand.R",

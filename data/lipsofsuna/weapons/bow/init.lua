@@ -89,6 +89,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "wooden bow",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "arrow",
 	animations_equipped = {["default"] = "default bow equipped"},
 	equipment_slot = "hand.R",
@@ -110,6 +111,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "fire bow",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "fire arrow",
 	animations_equipped = {["default"] = "default bow equipped"},
 	equipment_slot = "hand.R",
@@ -131,6 +133,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "explosive bow",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "explosive arrow",
 	animations_equipped = {["default"] = "default bow equipped"},
 	equipment_slot = "hand.R",

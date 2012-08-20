@@ -35,7 +35,7 @@ Feattypespec{
 
 Feattypespec{
 	name = "right hand",
-	action = "melee",
+	action = "right melee",
 	animation = "attack",
 	bonuses_barehanded = true,
 	bonuses_weapon = true,
@@ -109,7 +109,7 @@ Feattypespec{
 
 Feattypespec{
 	name = "bite",
-	action = "melee",
+	action = "right melee",
 	animation = "attack bite",
 	categories = {["melee"] = true},
 	cooldown = 2,
@@ -120,7 +120,7 @@ Feattypespec{
 
 Feattypespec{
 	name = "dragon bite",
-	action = "melee",
+	action = "right melee",
 	animation = "attack bite",
 	categories = {["melee"] = true},
 	cooldown = 4,
@@ -139,7 +139,7 @@ Feattypespec{
 
 Feattypespec{
 	name = "left claw",
-	action = "melee",
+	action = "right melee",
 	animation = "attack left claw",
 	categories = {["melee"] = true},
 	cooldown = 2,
@@ -150,7 +150,7 @@ Feattypespec{
 
 Feattypespec{
 	name = "right claw",
-	action = "melee",
+	action = "right melee",
 	animation = "attack right claw",
 	categories = {["melee"] = true},
 	cooldown = 2,
@@ -161,7 +161,7 @@ Feattypespec{
 
 Feattypespec{
 	name = "dragon left claw",
-	action = "melee",
+	action = "right melee",
 	animation = "attack left claw",
 	categories = {["melee"] = true},
 	cooldown = 2,
@@ -172,7 +172,7 @@ Feattypespec{
 
 Feattypespec{
 	name = "dragon right claw",
-	action = "melee",
+	action = "right melee",
 	animation = "attack right claw",
 	categories = {["melee"] = true},
 	cooldown = 2,

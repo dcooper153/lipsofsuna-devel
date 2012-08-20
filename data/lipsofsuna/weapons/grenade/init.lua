@@ -13,6 +13,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "aquanite grenade",
 	categories = {["explosive"] = true, ["throwable"] = true, ["weapon"] = true},
+	actions = {["right"] = "throw"},
 	animations_equipped = {["default"] = "default grenade equipped"},
 	damage_mining = 1,
 	destroy_actions = {"explode"},
@@ -35,6 +36,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "crimson grenade",
 	categories = {["explosive"] = true, ["throwable"] = true, ["weapon"] = true},
+	actions = {["right"] = "throw"},
 	animations_equipped = {["default"] = "default grenade equipped"},
 	destroy_actions = {"explode"},
 	destroy_timer = 3,

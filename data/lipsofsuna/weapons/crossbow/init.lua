@@ -13,6 +13,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "adamantium crossbow",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "arrow",
 	animations_equipped = {["default"] = "default crossbow equipped"},
 	effect_attack = "crossbow1",
@@ -34,6 +35,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "aquanite crossbow",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "arrow",
 	animations_equipped = {["default"] = "default crossbow equipped"},
 	effect_attack = "crossbow1",
@@ -55,6 +57,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "crimson crossbow",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "arrow",
 	animations_equipped = {["default"] = "default crossbow equipped"},
 	effect_attack = "crossbow1",
@@ -76,6 +79,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "iron crossbow",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "arrow",
 	animations_equipped = {["default"] = "default crossbow equipped"},
 	effect_attack = "crossbow1",
@@ -97,6 +101,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "wooden crossbow",
 	categories = {["ranged"] = true, ["weapon"] = true},
+	actions = {["right"] = "ranged", ["left"] = "cancel ranged"},
 	ammo_type = "arrow",
 	animations_equipped = {["default"] = "default crossbow equipped"},
 	effect_attack = "crossbow1",

@@ -11,6 +11,7 @@ Itemspec.introspect = Introspect{
 	fields = {
 		{name = "name", type = "string", description = "Name of the spec."},
 		{name = "categories", type = "dict", dict = {type = "boolean"}, default = {}, description = "Dictionary of categories."},
+		{name = "actions", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of actions the object performs when wielded.", details = {values = {spec = "Actionspec"}}},
 		{name = "ammo_type", type = "string", description = "Name of the ammunition item type.", details = {spec = "Itemspec"}},
 		{name = "animations", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation profiles.", details = {values = {spec = "AnimationProfileSpec"}}},
 		{name = "animations_equipped", type = "dict", dict = {type = "string"}, default = {}, description = "Dictionary of animation profiles used by the actor when equipping the item.", details = {values = {spec = "AnimationProfileSpec"}}},

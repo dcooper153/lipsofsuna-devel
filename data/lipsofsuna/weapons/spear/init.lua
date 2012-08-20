@@ -8,11 +8,12 @@ CraftingRecipeSpec{
 
 Itemspec{
 	name = "iron spear",
-	model = "spear1",
-	icon = "staff1", --FIXME
+	actions = {["right"] = "right melee", ["left"] = "block weapon"},
 	categories = {["melee"] = true, ["weapon"] = true},
 	effect_attack_speedline = true,
+	icon = "staff1", --FIXME
 	influences = {["physical damage"] = 10},
 	influences_bonus = {"melee"},
 	equipment_slot = "hand.R",
-	mass = 15}
+	mass = 15,
+	model = "spear1"}

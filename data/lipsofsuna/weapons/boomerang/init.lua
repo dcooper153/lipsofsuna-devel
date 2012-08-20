@@ -26,6 +26,7 @@ CraftingRecipeSpec{
 Itemspec{
 	name = "boomerang",
 	categories = {["boomerang"] = true, ["throwable"] = true, ["weapon"] = true},
+	actions = {["right"] = "throw", ["left"] = "block weapon"},
 	animations = {["default"] = "boomerang"},
 	mass = 2,
 	model = "boomerang1",

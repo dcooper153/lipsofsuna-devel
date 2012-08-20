@@ -12,5 +12,9 @@ Message{
 		local player = Server:get_player_by_client(client)
 		if not player then return end
 		if player.dead then return end
-		player:set_block(value)
+		if value then
+			player:attack_charge_start(true)
+		else
+			player:attack_charge_end(true)
+		end
 	end}

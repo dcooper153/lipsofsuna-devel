@@ -36,50 +36,45 @@ Player.new = function(clss, args)
 	return self
 end
 
-Player.attack_charge_start = function(self)
-	if self.cooldown then return end
-	-- Get the attack type.
-	local anim = "right hand"
-	local weapon = self:get_weapon()
-	if not weapon or weapon.spec.categories["melee"] then
-		anim = "right hand"
-	elseif weapon.spec.categories["ranged"] then
-		anim = "ranged"
-	elseif weapon.spec.categories["throwable"] then
-		anim = "throw"
-	elseif weapon.spec.categories["build"] then
-		anim = "build"
+Player.attack_charge_start = function(self, left)
+	-- Cancel the existing charge.
+	if self.attack_charge_anim then
+		local action = Actionspec:find{name = self.attack_charge_anim}
+		if action and action.charge_cancel then
+			action.charge_cancel(self)
+		else
+			self:attack_charge_cancel()
+		end
 	end
-	-- Get the attack direction.
-	local move
-	if self.strafing < -0.2 then move = "left"
-	elseif self.strafing > 0.2 then move = "right"
-	elseif self.movement < -0.2 then move = "back"
-	elseif self.movement > 0.2 then move = "front"
-	else move = "stand" end
-	-- Start charging the attack.
-	self:animate("charge " .. move, true)
-	self.attack_charge = Program.time
-	self.attack_charge_anim = anim
-	self.attack_charge_move = move
+	-- Prevent during the cooldown.
+	if self.cooldown then return end
+	-- Get the action name.
+	local name = left and "block" or "right melee"
+	local weapon = self:get_weapon()
+	if weapon then
+		name = weapon.spec.actions[left and "left" or "right"]
+		if not name then return end
+	end
+	-- Start charging the action.
+	local action = Actionspec:find{name = name}
+	if not action then return end
+	if not action.charge_start then return end
+	action.charge_start(self)
 end
 
 Player.attack_charge_end = function(self)
-	-- Validate the charge.
-	if not self.attack_charge_anim then
-		self:animate("charge cancel")
-		self.attack_charge = nil
-		self.attack_charge_move = nil
-		return
-	end
-	-- Initialize the feat.
-	local feat = Feat{animation = self.attack_charge_anim}
-	feat:add_best_effects{user = self}
-	-- Perform the feat.
-	if not feat:perform{stop = false, user = self} then
-		self:animate("charge cancel")
-	end
-	-- Clear the charge.
+	-- Get the action name.
+	local name = self.attack_charge_anim
+	if not name then return end
+	-- Finish charging the action.
+	local action = Actionspec:find{name = name}
+	if not action then return self:attack_charge_cancel() end
+	if not action.charge_end then return self:attack_charge_cancel() end
+	action.charge_end(self)
+end
+
+Player.attack_charge_cancel = function(self, animate)
+	if animate then self:animate("charge cancel") end
 	self.attack_charge = nil
 	self.attack_charge_anim = nil
 	self.attack_charge_move = nil
